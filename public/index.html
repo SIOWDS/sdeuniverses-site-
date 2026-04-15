@@ -11,23 +11,23 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{
-  --bg:#070B16;
-  --surface:#0C1020;
-  --card:#121828;
-  --card2:#161E30;
-  --gold:#C8A44A;
-  --gold2:#E8C46A;
-  --text:#DDD5C4;
-  --text2:#A89E8E;
-  --muted:#5A5248;
-  --border:rgba(200,164,74,0.18);
-  --border2:rgba(200,164,74,0.08);
+  --bg:#F5EFE0;
+  --surface:#EBE3CE;
+  --card:#FAF6EC;
+  --card2:#F0E8D3;
+  --gold:#8A6817;
+  --gold2:#A88233;
+  --text:#2A2315;
+  --text2:#6B5D47;
+  --muted:#98886C;
+  --border:rgba(138,104,23,0.22);
+  --border2:rgba(138,104,23,0.10);
 }
 html{scroll-behavior:smooth}
 body{background:var(--bg);color:var(--text);font-family:'Noto Serif SC','EB Garamond',Georgia,serif;line-height:1.7;overflow-x:hidden}
 body.en{font-family:'EB Garamond','Playfair Display',Georgia,serif}
 /* ── NAV ── */
-nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:1rem 3rem;background:rgba(7,11,22,0.85);backdrop-filter:blur(12px);border-bottom:1px solid var(--border2)}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:1rem 3rem;background:rgba(245,239,224,0.85);backdrop-filter:blur(12px);border-bottom:1px solid var(--border2)}
 .nav-logo{font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:700;color:var(--gold);letter-spacing:0.05em;text-decoration:none}
 .nav-links{display:flex;align-items:center;gap:2rem}
 .nav-links a{color:var(--text2);text-decoration:none;font-size:0.85rem;letter-spacing:0.08em;transition:color 0.2s}
@@ -37,10 +37,10 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
 .lang-btn.active{background:var(--gold);color:#070B16;font-weight:600}
 /* ── HERO ── */
 #hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:6rem 2rem 4rem;position:relative;overflow:hidden}
-.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 40%,rgba(200,164,74,0.06) 0%,transparent 70%)}
-.hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(200,164,74,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(200,164,74,0.03) 1px,transparent 1px);background-size:60px 60px}
+.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 40%,rgba(138,104,23,0.08) 0%,transparent 70%)}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(138,104,23,0.05) 1px,transparent 1px),linear-gradient(90deg,rgba(138,104,23,0.05) 1px,transparent 1px);background-size:60px 60px}
 .hero-eyebrow{font-size:0.7rem;letter-spacing:0.25em;color:var(--gold);text-transform:uppercase;margin-bottom:1.5rem;opacity:0.8}
-.hero-title{font-family:'Playfair Display',serif;font-size:clamp(3rem,8vw,7rem);font-weight:700;line-height:1.05;color:#fff;margin-bottom:0.5rem}
+.hero-title{font-family:'Playfair Display',serif;font-size:clamp(3rem,8vw,7rem);font-weight:700;line-height:1.05;color:var(--text);margin-bottom:0.5rem}
 .hero-title span{color:var(--gold)}
 .hero-subtitle{font-size:clamp(1.1rem,2.5vw,1.5rem);color:var(--text2);margin:1.5rem 0 2.5rem;font-style:italic;font-weight:300}
 .hero-formula{display:inline-flex;align-items:center;gap:0.5rem;background:var(--card);border:1px solid var(--border);border-radius:4px;padding:0.6rem 1.5rem;font-size:1rem;letter-spacing:0.1em;color:var(--gold2);margin-bottom:3rem}
@@ -57,7 +57,7 @@ section{padding:5rem 2rem}
 .section-inner{max-width:1100px;margin:0 auto}
 .section-label{font-size:0.65rem;letter-spacing:0.3em;color:var(--gold);text-transform:uppercase;margin-bottom:1rem;display:flex;align-items:center;gap:1rem}
 .section-label::after{content:'';flex:1;height:1px;background:var(--border)}
-h2.section-title{font-family:'Playfair Display',serif;font-size:clamp(1.8rem,4vw,2.8rem);font-weight:600;color:#fff;line-height:1.2;margin-bottom:1rem}
+h2.section-title{font-family:'Playfair Display',serif;font-size:clamp(1.8rem,4vw,2.8rem);font-weight:600;color:var(--text);line-height:1.2;margin-bottom:1rem}
 .section-divider{width:60px;height:2px;background:var(--gold);margin:1.5rem 0}
 /* ── ABOUT ── */
 #about{background:var(--surface)}
@@ -80,9 +80,9 @@ h2.section-title{font-family:'Playfair Display',serif;font-size:clamp(1.8rem,4vw
 /* ── SDE FRAMEWORK ── */
 #sde .sde-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;margin-top:3rem}
 .sde-card{padding:2.5rem;background:var(--card);position:relative;overflow:hidden}
-.sde-card::before{content:attr(data-letter);position:absolute;top:-0.2em;right:0.2em;font-family:'Playfair Display',serif;font-size:8rem;font-weight:700;color:rgba(200,164,74,0.04);line-height:1;pointer-events:none}
+.sde-card::before{content:attr(data-letter);position:absolute;top:-0.2em;right:0.2em;font-family:'Playfair Display',serif;font-size:8rem;font-weight:700;color:rgba(138,104,23,0.08);line-height:1;pointer-events:none}
 .sde-letter{font-family:'Playfair Display',serif;font-size:3.5rem;font-weight:700;color:var(--gold);line-height:1;margin-bottom:0.5rem}
-.sde-name-zh{font-size:1.1rem;font-weight:500;color:#fff;margin-bottom:0.25rem}
+.sde-name-zh{font-size:1.1rem;font-weight:500;color:var(--text);margin-bottom:0.25rem}
 .sde-name-en{font-size:0.75rem;letter-spacing:0.15em;color:var(--text2);text-transform:uppercase;margin-bottom:1.2rem}
 .sde-desc{font-size:0.9rem;color:var(--text2);line-height:1.8}
 .sde-formula{margin-top:3rem;text-align:center;padding:2rem;background:var(--card2);border:1px solid var(--border)}
