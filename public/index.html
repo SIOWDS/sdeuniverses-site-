@@ -145,6 +145,59 @@ footer{background:var(--surface);border-top:1px solid var(--border2);padding:3re
 .zh-only,.en-only{transition:opacity 0.2s}
 body.en .zh-only{display:none}
 body.zh .en-only{display:none}
+
+/* ── MEANING LAWS (意义三律) ── */
+#laws{background:var(--surface)}
+.laws-intro{max-width:680px;color:var(--text2);font-size:0.95rem;margin:0.5rem 0 0;line-height:1.8}
+.laws-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2rem;margin-top:3rem}
+.law-card{position:relative;padding:2.5rem 2rem;background:var(--card);border:1px solid var(--border2);border-top:3px solid var(--gold);transition:transform .25s,border-color .25s}
+.law-card:hover{transform:translateY(-4px);border-color:var(--gold)}
+.law-num{font-family:'Playfair Display',serif;font-size:0.75rem;letter-spacing:0.3em;color:var(--gold);text-transform:uppercase}
+.law-icon{font-family:'Playfair Display',serif;font-size:2.5rem;color:var(--gold);margin:0.4rem 0 0.8rem;font-style:italic;line-height:1}
+.law-name-zh{font-size:1.35rem;font-weight:600;color:var(--text);margin-bottom:0.3rem;letter-spacing:0.05em}
+.law-name-en{font-size:0.7rem;letter-spacing:0.2em;color:var(--text2);text-transform:uppercase;margin-bottom:1.2rem}
+.law-desc{font-size:0.9rem;color:var(--text2);line-height:1.85}
+.law-keyword{display:inline-block;margin-top:1.2rem;padding:0.2rem 0.6rem;font-size:0.7rem;letter-spacing:0.1em;border:1px solid var(--border);color:var(--gold);border-radius:2px}
+
+/* ── CLUSTER OVERVIEW (7 集群) ── */
+.clusters-overview{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:1rem;margin:2rem 0 2.5rem}
+.cluster-card{padding:1.2rem 1rem;background:var(--card);border:1px solid var(--border2);border-left:3px solid var(--gold);cursor:pointer;transition:all .2s;display:flex;flex-direction:column;gap:0.4rem}
+.cluster-card:hover{transform:translateY(-3px);border-color:var(--gold);box-shadow:0 8px 24px rgba(138,104,23,0.10)}
+.cluster-count{font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:700;color:var(--gold);line-height:1}
+.cluster-name{font-size:0.95rem;color:var(--text);font-weight:500;letter-spacing:0.02em}
+.cluster-tag{font-size:0.7rem;letter-spacing:0.1em;color:var(--text2);text-transform:uppercase}
+/* cluster swatches */
+.cluster-card[data-d="core"]{border-left-color:#1A2545}
+.cluster-card[data-d="civ"] {border-left-color:#3A1820}
+.cluster-card[data-d="gov"] {border-left-color:#102A24}
+.cluster-card[data-d="edu"] {border-left-color:#3A2810}
+.cluster-card[data-d="life"]{border-left-color:#1A2A10}
+.cluster-card[data-d="cre"] {border-left-color:#2A1840}
+.cluster-card[data-d="ai"]  {border-left-color:#102828}
+
+/* ── VISION (意义文明) ── */
+#vision{background:var(--surface);text-align:center;padding:6rem 2rem}
+.vision-inner{max-width:900px;margin:0 auto}
+.vision-eyebrow{font-size:0.7rem;letter-spacing:0.3em;color:var(--gold);text-transform:uppercase;margin-bottom:1.5rem}
+.vision-quote{font-family:'Playfair Display',serif;font-size:clamp(1.6rem,3.5vw,2.6rem);font-weight:600;color:var(--text);line-height:1.4;font-style:italic;margin:1rem 0 2rem;letter-spacing:0.02em}
+.vision-quote::before,.vision-quote::after{content:'"';color:var(--gold);font-family:'Playfair Display',serif;font-weight:700;opacity:0.6;font-style:normal;margin:0 0.15em}
+.vision-body{color:var(--text2);font-size:1rem;line-height:1.9;max-width:680px;margin:0 auto}
+.vision-axis{display:flex;justify-content:center;gap:2rem;margin-top:2.5rem;flex-wrap:wrap}
+.vision-axis-item{padding:0.5rem 1.2rem;border:1px solid var(--border);color:var(--gold);font-size:0.8rem;letter-spacing:0.1em;border-radius:2px;background:var(--card)}
+
+/* ── TIMELINE (学术轨迹) ── */
+.timeline{margin-top:2.5rem;position:relative;padding-left:2rem;border-left:1px solid var(--border)}
+.timeline-item{position:relative;padding-bottom:1.8rem}
+.timeline-item:last-child{padding-bottom:0}
+.timeline-item::before{content:'';position:absolute;left:-2.4rem;top:0.45rem;width:9px;height:9px;background:var(--gold);border-radius:50%;border:2px solid var(--bg)}
+.timeline-period{font-family:'Playfair Display',serif;font-size:0.75rem;letter-spacing:0.15em;color:var(--gold);text-transform:uppercase}
+.timeline-title{font-size:1rem;font-weight:600;color:var(--text);margin:0.2rem 0 0.4rem}
+.timeline-desc{font-size:0.85rem;color:var(--text2);line-height:1.7}
+
+@media(max-width:768px){
+  .laws-grid{grid-template-columns:1fr}
+  .clusters-overview{grid-template-columns:repeat(2,1fr)}
+}
 </style>
 </head>
 <body class="zh">
@@ -153,8 +206,10 @@ body.zh .en-only{display:none}
   <a class="nav-logo" href="#">SDE Universes</a>
   <div class="nav-links">
     <a href="#about" class="zh-only">关于</a><a href="#about" class="en-only">About</a>
-    <a href="#sde" class="zh-only">SDE体系</a><a href="#sde" class="en-only">SDE</a>
+    <a href="#sde" class="zh-only">SDE</a><a href="#sde" class="en-only">SDE</a>
+    <a href="#laws" class="zh-only">三律</a><a href="#laws" class="en-only">Axioms</a>
     <a href="#books" class="zh-only">专著</a><a href="#books" class="en-only">Works</a>
+    <a href="#vision" class="zh-only">愿景</a><a href="#vision" class="en-only">Vision</a>
     <a href="#platform" class="zh-only">平台</a><a href="#platform" class="en-only">Platform</a>
     <div class="lang-toggle">
       <button class="lang-btn active" onclick="setLang('zh')">中</button>
@@ -210,18 +265,53 @@ body.zh .en-only{display:none}
       </div>
     </div>
     <div class="about-text">
-      <p class="zh-only">王德生是SDE（结构-差异-纠缠）思想体系的创始人，一位独立运营的"超级个体"研究者与平台开发者。其学术背景源于计算数学，经由Voronoi/Delaunay剖分与有限元网格生成的深层研究，逐步演化出一套跨域知识发生学方法论——SDE。</p>
-      <p class="en-only">Wang Desheng is the founder of the SDE (Structure–Difference–Entanglement) thought system, an independent "super-individual" researcher and platform developer. His academic background in computational mathematics — deep work on Voronoi/Delaunay triangulation and finite element mesh generation — evolved into a cross-domain knowledge-genesis methodology: SDE.</p>
-      <p class="zh-only">SDE的核心命题是：新知识结构在特定纠缠（E）条件下，经由差异流（D）的驱动而发生（S）。这一公式不是隐喻，而是跨越艺术、治理、教育、企业、哲学、宗教、数学等二十余个领域的实际操作框架。</p>
-      <p class="en-only">SDE's core proposition: new knowledge structures emerge (S) through the drive of difference-flow (D) under specific entanglement (E) conditions. This formula is not a metaphor but an operational framework spanning over twenty domains — from art and governance to mathematics and AI.</p>
-      <p class="zh-only">迄今已出版57部专著（约每部20万字，均在Bowker ISBN注册），目标100部。每一部都是SDE在该领域的实战展开，共同构成一部跨域知识发生学的百科全书。</p>
-      <p class="en-only">To date, 57 monographs have been published (~200,000 characters each, all ISBN-registered on Bowker), with a target of 100. Each is a live deployment of SDE in a specific domain, together forming a cross-domain encyclopedia of knowledge genesis.</p>
+      <p class="zh-only">王德生，数学博士、哲学家，<strong style="color:var(--text)">SIO 本体论</strong>与<strong style="color:var(--text)">SDE 发生学</strong>的创立者，新加坡德麦国际出版公司（Demai International Pte. Ltd.）创始人。以三十余年的学术探索，完成了从计算数学家到跨域思想家的根本转向——构筑了一座以数学精度承载哲学抱负的思想建筑。</p>
+      <p class="en-only">Wang Desheng — mathematician (PhD), philosopher, founder of <strong style="color:var(--text)">SIO Ontology</strong> and <strong style="color:var(--text)">SDE Generativics</strong>, founder of Demai International Pte. Ltd. (Singapore). Over three decades, he completed a fundamental turn from computational mathematician to cross-domain thinker — constructing a rare intellectual architecture that carries philosophical ambition with mathematical precision.</p>
+      <p class="zh-only">核心命题：<em>"不是 S、I、O 组合成 SIO，而是 SIO 整体先于三者——它是存在的第一性。"</em> 由此奠定意义三律（特征律 · 自由律 · 幸福律）的哲学基础，并以 SDE 三维引擎回答"存在如何发生"。</p>
+      <p class="en-only">Core proposition: <em>"It is not that S, I, O combine into SIO; SIO as whole is prior to the three — it is the first principle of existence."</em> From this, the Three Axioms of Meaning (Feature · Freedom · Happiness) gain their philosophical ground, and the SDE three-dimensional engine answers "how existence comes to be."</p>
+      <p class="zh-only">截至 2026 年 3 月，已出版 52 部跨域专著（每部约 20 万字，全部 Bowker ISBN 注册），覆盖哲学本体论、文明研究、治理学、教育学、健康科学、创造力研究、AI 哲学等十二个领域。此前在计算数学与计算机图形学领域发表 47 篇国际顶刊论文。</p>
+      <p class="en-only">As of March 2026, 52 cross-domain monographs (~200,000 characters each, all Bowker ISBN registered), covering philosophical ontology, civilization studies, governance, education, health sciences, creativity research, AI philosophy and more — twelve fields in total. Previously, 47 papers in top international journals in computational mathematics and computer graphics.</p>
       <div class="tag-row">
-        <span class="tag">SDE Theory</span>
-        <span class="tag zh-only">跨域发生学</span><span class="tag en-only">Cross-Domain Generativics</span>
+        <span class="tag">SIO Ontology</span>
+        <span class="tag">SDE Generativics</span>
+        <span class="tag zh-only">意义三律</span><span class="tag en-only">Three Axioms of Meaning</span>
         <span class="tag">Dragon Claw 龙爪手</span>
         <span class="tag zh-only">超级个体</span><span class="tag en-only">Super-Individual</span>
         <span class="tag">GCG Framework</span>
+      </div>
+      <div class="timeline">
+        <div class="timeline-item">
+          <div class="timeline-period zh-only">1990 – 2014 · 数学筋骨</div>
+          <div class="timeline-period en-only">1990 – 2014 · MATHEMATICAL SINEW</div>
+          <div class="timeline-title zh-only">计算数学的结构训练</div>
+          <div class="timeline-title en-only">Structural Training in Computational Mathematics</div>
+          <p class="timeline-desc zh-only">湘潭大学数学系（学/硕）→ 中科院数学所（博士，导师梁国平）→ 中科院计算数学所博士后（导师杜强）→ 英国威尔士大学斯旺西分校 → 新加坡南洋理工大学十三年（博导）。47 篇国际顶刊论文锻造了对"差异如何在结构约束下自组织为稳定秩序"的数学直觉。</p>
+          <p class="timeline-desc en-only">Xiangtan Univ. (BS/MS) → CAS Institute of Mathematics (PhD, advisor Liang Guoping) → CAS Computational Mathematics Postdoc (advisor Qiang Du) → Univ. of Wales Swansea → Nanyang Technological Univ. (13 years, PhD supervisor). 47 top-tier journal papers forged a mathematical intuition for "how difference self-organizes into stable order under structural constraint."</p>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-period zh-only">2015 – 2021 · 形式理性</div>
+          <div class="timeline-period en-only">2015 – 2021 · FORMAL REASON</div>
+          <div class="timeline-title zh-only">三视角方法论的跨域展开</div>
+          <div class="timeline-title en-only">Cross-Domain Unfolding of the Three-Perspective Method</div>
+          <p class="timeline-desc zh-only">以 John Frame 三视角分析法为起点，构建三视角教育学/管理学/心理学/美学等十部专著。讲学数百场。但形式的优雅带来了结构的寒冷——"若结构不能生成意义，它就只是一具理性的外壳。"</p>
+          <p class="timeline-desc en-only">Beginning from John Frame's three-perspective method, built ten three-perspective monographs across education, management, psychology, aesthetics. Hundreds of lectures. Yet the elegance of form brought the coldness of structure — "if structure cannot generate meaning, it is merely a shell of reason."</p>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-period zh-only">2022 – 2023 · 内容张力</div>
+          <div class="timeline-period en-only">2022 – 2023 · CONTENT TENSION</div>
+          <div class="timeline-title zh-only">321 智慧与意义的混沌</div>
+          <div class="timeline-title en-only">321 Wisdom and the Chaos of Meaning</div>
+          <p class="timeline-desc zh-only">为突破形式僵化，提出 321 智慧——存在（1）、矛盾（2）、视角（3）。思想重新充满生命力，也带来了新的混乱："内容的极致是虚无，形式的极致是僵死。"</p>
+          <p class="timeline-desc en-only">To break formal rigidity, the 321 Wisdom emerged — Being (1), Contradiction (2), Perspective (3). Thought regained vitality but brought new chaos: "the extreme of content is nothingness; the extreme of form is rigor mortis."</p>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-period zh-only">2024 – 至今 · 本体革命</div>
+          <div class="timeline-period en-only">2024 – PRESENT · ONTOLOGICAL REVOLUTION</div>
+          <div class="timeline-title zh-only">SIO 整体哲学与 SDE 发生学的诞生</div>
+          <div class="timeline-title en-only">Birth of SIO Holistic Philosophy & SDE Generativics</div>
+          <p class="timeline-desc zh-only">2024 年实现"0→1 突破"——SIO 整体先于三者。哲学被重新定义为"结构识别与判断合法性的生成学"。四个月内（2025.12 – 2026.3）密集出版 52 部跨域专著，构成意义文明的全景蓝图。</p>
+          <p class="timeline-desc en-only">In 2024, the "0→1 breakthrough" — SIO whole prior to three. Philosophy is redefined as "the generativics of structure-identification and judgment-legitimacy." In four months (Dec 2025 – Mar 2026), 52 cross-domain monographs were intensively published — a panoramic blueprint of the Civilization of Meaning.</p>
+        </div>
       </div>
     </div>
   </div>
@@ -267,6 +357,47 @@ body.zh .en-only{display:none}
   </div>
 </div>
 </section>
+<!-- MEANING LAWS (意义三律) -->
+<section id="laws">
+<div class="section-inner">
+  <div class="section-label zh-only">意义三律</div>
+  <div class="section-label en-only">Three Axioms of Meaning</div>
+  <h2 class="section-title zh-only">特征 · 自由 · 幸福</h2>
+  <h2 class="section-title en-only">Feature · Freedom · Happiness</h2>
+  <div class="section-divider"></div>
+  <p class="laws-intro zh-only">SIO 本体论的社会算法。三律共同回答：意义文明如何运行？特征律校准 AI 的结构稳定，自由律鼓励创新突变，幸福律统整文明目标。</p>
+  <p class="laws-intro en-only">The social algorithm of SIO ontology. Together they answer: how does the Civilization of Meaning operate? Feature Law calibrates AI's structural stability, Freedom Law encourages innovative mutation, Happiness Law integrates civilizational purpose.</p>
+  <div class="laws-grid">
+    <div class="law-card">
+      <div class="law-num zh-only">第 一 律</div><div class="law-num en-only">AXIOM I</div>
+      <div class="law-icon">F</div>
+      <div class="law-name-zh zh-only">特征律</div>
+      <div class="law-name-en">Feature Law</div>
+      <p class="law-desc zh-only">意义的有限发生律。特征不是无中生有，必须在已有纠缠条件下经差异序列推进而显露——这是科学的本体根基。</p>
+      <p class="law-desc en-only">The finite-genesis law of meaning. Features do not arise ex nihilo; they emerge only through difference-sequences advancing within existing entanglement — the ontological ground of science.</p>
+      <span class="law-keyword zh-only">校准结构稳定</span><span class="law-keyword en-only">CALIBRATES STABILITY</span>
+    </div>
+    <div class="law-card">
+      <div class="law-num zh-only">第 二 律</div><div class="law-num en-only">AXIOM II</div>
+      <div class="law-icon">L</div>
+      <div class="law-name-zh zh-only">自由律</div>
+      <div class="law-name-en">Freedom Law</div>
+      <p class="law-desc zh-only">差异序列得以推进的必要条件。自由不是无限选择，而是结构允许新差异进入并被锻造为新结构的开放度——这是创新的本体根基。</p>
+      <p class="law-desc en-only">The necessary condition for difference-sequences to advance. Freedom is not infinite choice but the openness allowing new differences to enter and be forged into new structure — the ontological ground of innovation.</p>
+      <span class="law-keyword zh-only">鼓励创新突变</span><span class="law-keyword en-only">ENABLES MUTATION</span>
+    </div>
+    <div class="law-card">
+      <div class="law-num zh-only">第 三 律</div><div class="law-num en-only">AXIOM III</div>
+      <div class="law-icon">H</div>
+      <div class="law-name-zh zh-only">幸福律</div>
+      <div class="law-name-en">Happiness Law</div>
+      <p class="law-desc zh-only">意义在主体经验中的回响。幸福不是欲望满足，而是 SDE 三维联动的成熟态在主体上的显露——这是文明的本体目标。</p>
+      <p class="law-desc en-only">The reverberation of meaning in subject-experience. Happiness is not desire-satisfaction but the manifestation in the subject of S-D-E coupled maturity — the ontological purpose of civilization.</p>
+      <span class="law-keyword zh-only">统整文明目标</span><span class="law-keyword en-only">INTEGRATES PURPOSE</span>
+    </div>
+  </div>
+</div>
+</section>
 <!-- BOOKS -->
 <section id="books">
 <div class="section-inner">
@@ -279,8 +410,25 @@ body.zh .en-only{display:none}
   <p style="color:var(--text2);font-size:0.85rem;margin-top:0.5rem" class="en-only">~200,000 characters each · Published Dec 2025–Mar 2026 · Bowker ISBN authorId 26927366 · 19 sole-authored · 33 co-authored with 26 collaborators · Demai International Pte. Ltd.</p>
   <p style="color:var(--muted);font-size:0.75rem;margin-top:0.4rem;font-style:italic" class="zh-only">已收录 38 部基础信息 · 余下专著陆续录入</p>
   <p style="color:var(--muted);font-size:0.75rem;margin-top:0.4rem;font-style:italic" class="en-only">38 monographs catalogued · remaining titles being added</p>
+  <div class="clusters-overview" id="clustersOverview"></div>
   <div class="books-filter" id="booksFilter"></div>
   <div class="books-grid" id="booksGrid"></div>
+</div>
+</section>
+<!-- VISION (意义文明) -->
+<section id="vision">
+<div class="vision-inner">
+  <div class="vision-eyebrow zh-only">意 义 文 明 · CIVILIZATION OF MEANING</div>
+  <div class="vision-eyebrow en-only">CIVILIZATION OF MEANING · 意 义 文 明</div>
+  <h2 class="vision-quote zh-only">让意义成为文明的第一生产力</h2>
+  <h2 class="vision-quote en-only">Let Meaning Become the Prime Productive Force of Civilization</h2>
+  <p class="vision-body zh-only">从"价值文明"向"意义文明"的转型——以生成逻辑为文明核心，以意义三律为社会算法。在 AI 时代，这不仅是哲学命题，更是文明结构重组的操作纲领：以特征律守住科学的真，以自由律打开创新的可能，以幸福律托起主体的存在。</p>
+  <p class="vision-body en-only">A transition from "civilization of value" to "civilization of meaning" — with generative logic as the civilizational core and the Three Axioms of Meaning as the social algorithm. In the AI era, this is not merely a philosophical proposition but an operational program for civilizational restructuring: hold the truth of science through Feature Law, open the possibility of innovation through Freedom Law, sustain the existence of the subject through Happiness Law.</p>
+  <div class="vision-axis">
+    <div class="vision-axis-item zh-only">特征律 · 守科学之真</div><div class="vision-axis-item en-only">FEATURE · TRUTH OF SCIENCE</div>
+    <div class="vision-axis-item zh-only">自由律 · 开创新之机</div><div class="vision-axis-item en-only">FREEDOM · OPENING OF NOVELTY</div>
+    <div class="vision-axis-item zh-only">幸福律 · 托主体之在</div><div class="vision-axis-item en-only">HAPPINESS · GROUND OF BEING</div>
+  </div>
 </div>
 </section>
 <!-- PLATFORM -->
@@ -317,9 +465,11 @@ body.zh .en-only{display:none}
   <div class="footer-col">
     <h4 class="zh-only">导航</h4><h4 class="en-only">Navigation</h4>
     <ul>
-      <li><a href="#about" class="zh-only">关于作者</a><a href="#about" class="en-only">About</a></li>
-      <li><a href="#sde" class="zh-only">SDE体系</a><a href="#sde" class="en-only">SDE Framework</a></li>
+      <li><a href="#about" class="zh-only">关于作者</a><a href="#about" class="en-only">About the Author</a></li>
+      <li><a href="#sde" class="zh-only">SDE 发生学</a><a href="#sde" class="en-only">SDE Generativics</a></li>
+      <li><a href="#laws" class="zh-only">意义三律</a><a href="#laws" class="en-only">Three Axioms</a></li>
       <li><a href="#books" class="zh-only">专著系列</a><a href="#books" class="en-only">Publications</a></li>
+      <li><a href="#vision" class="zh-only">意义文明愿景</a><a href="#vision" class="en-only">Civilization Vision</a></li>
       <li><a href="#platform" class="zh-only">龙爪手平台</a><a href="#platform" class="en-only">Dragon Claw</a></li>
     </ul>
   </div>
@@ -445,6 +595,40 @@ function renderBooks(){
   }).join('');
 }
 renderBooks();
+
+// ── RENDER 7-CLUSTER OVERVIEW
+const clusterTagline={
+  core:{zh:'存在的第一性原理',en:'First principles of being'},
+  civ: {zh:'文明的发生学重写',en:'Genetic rewriting of civilization'},
+  gov: {zh:'治理与社会的范式重建',en:'Paradigm rebuild of governance'},
+  edu: {zh:'学习作为意义生成',en:'Learning as meaning-genesis'},
+  life:{zh:'健康作为结构重建',en:'Health as structural reconstruction'},
+  cre: {zh:'原创性的发生学机制',en:'Generative mechanics of originality'},
+  ai:  {zh:'人机复合智能的本体根基',en:'Ontological ground of hybrid intelligence'}
+};
+const clustersEl=document.getElementById('clustersOverview');
+function renderClusters(){
+  const isZh=document.body.classList.contains('zh');
+  const order=['core','civ','gov','edu','life','cre','ai'];
+  clustersEl.innerHTML=order.map(d=>{
+    const dm=domainMeta[d]; if(!dm) return '';
+    const count=books.filter(b=>b.d===d).length;
+    const tag=clusterTagline[d]||{zh:'',en:''};
+    return`<div class="cluster-card" data-d="${d}" onclick="selectCluster('${d}')">
+      <div class="cluster-count">${count}</div>
+      <div class="cluster-name">${isZh?dm.zh:dm.en}</div>
+      <div class="cluster-tag">${isZh?tag.zh:tag.en}</div>
+    </div>`;
+  }).join('');
+}
+window.selectCluster=function(d){
+  activeDomain=d;
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.toggle('active',b.dataset.domain===d));
+  renderBooks();
+  document.getElementById('booksGrid').scrollIntoView({behavior:'smooth',block:'start'});
+};
+renderClusters();
+
 // Update filter labels on lang change
 const origSetLang=window.setLang;
 window.setLang=function(lang){
@@ -455,6 +639,7 @@ window.setLang=function(lang){
     else if(domainMeta[d]) btn.innerHTML=lang==='zh'?domainMeta[d].zh:domainMeta[d].en;
   });
   renderBooks();
+  renderClusters();
 };
 </script>
 </body>
