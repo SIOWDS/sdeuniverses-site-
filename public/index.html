@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SDE Universes | 王德生 Wang Desheng</title>
-<meta name="description" content="SIO本体论 · SDE发生学 · 意义三律 · 52部跨域专著 · 王德生思想体系">
+<title>SDE Universes | 100 个 AI 超级员工平台</title>
+<meta name="description" content="100 个 AI 超级员工 · 10 大行业 · 龙爪手元工具 · SDE 发生学平台 · 王德生 52 部专著理论锻造">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=EB+Garamond:wght@400;500&family=Noto+Serif+SC:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -22,463 +22,364 @@
   --muted:#98886C;
   --border:rgba(138,104,23,0.22);
   --border2:rgba(138,104,23,0.10);
+  --claw-bg:#1A1410;
+  --claw-gold:#D4B25E;
 }
 html{scroll-behavior:smooth}
 body{background:var(--bg);color:var(--text);font-family:'Noto Serif SC','EB Garamond',Georgia,serif;line-height:1.7;overflow-x:hidden}
 body.en{font-family:'EB Garamond','Playfair Display',Georgia,serif}
+
 /* ── NAV ── */
-nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:1rem 3rem;background:rgba(245,239,224,0.85);backdrop-filter:blur(12px);border-bottom:1px solid var(--border2)}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:1rem 3rem;background:rgba(245,239,224,0.88);backdrop-filter:blur(12px);border-bottom:1px solid var(--border2)}
 .nav-logo{font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:700;color:var(--gold);letter-spacing:0.05em;text-decoration:none}
 .nav-links{display:flex;align-items:center;gap:2rem}
 .nav-links a{color:var(--text2);text-decoration:none;font-size:0.85rem;letter-spacing:0.08em;transition:color 0.2s}
 .nav-links a:hover{color:var(--gold)}
+.nav-links a.primary{color:var(--gold);font-weight:600}
 .lang-toggle{display:flex;background:var(--card);border:1px solid var(--border);border-radius:20px;overflow:hidden;cursor:pointer}
 .lang-btn{padding:0.3rem 0.8rem;font-size:0.75rem;letter-spacing:0.05em;border:none;background:transparent;color:var(--text2);cursor:pointer;transition:all 0.2s;font-family:inherit}
-.lang-btn.active{background:var(--gold);color:#070B16;font-weight:600}
+.lang-btn.active{background:var(--gold);color:#F5EFE0;font-weight:600}
+
 /* ── HERO ── */
-#hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:6rem 2rem 4rem;position:relative;overflow:hidden}
+#hero{min-height:92vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:7rem 2rem 4rem;position:relative;overflow:hidden}
 .hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 40%,rgba(138,104,23,0.08) 0%,transparent 70%)}
-.hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(138,104,23,0.05) 1px,transparent 1px),linear-gradient(90deg,rgba(138,104,23,0.05) 1px,transparent 1px);background-size:60px 60px}
-.hero-eyebrow{font-size:0.7rem;letter-spacing:0.25em;color:var(--gold);text-transform:uppercase;margin-bottom:1.5rem;opacity:0.8}
-.hero-title{font-family:'Playfair Display',serif;font-size:clamp(3rem,8vw,7rem);font-weight:700;line-height:1.05;color:var(--text);margin-bottom:0.5rem}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(138,104,23,0.05) 1px,transparent 1px),linear-gradient(90deg,rgba(138,104,23,0.05) 1px,transparent 1px);background-size:60px 60px;opacity:0.5}
+.hero-eyebrow{font-size:0.72rem;letter-spacing:0.3em;color:var(--gold);text-transform:uppercase;margin-bottom:1.5rem;font-weight:600;z-index:1;position:relative}
+.hero-title{font-family:'Playfair Display',serif;font-size:clamp(3rem,8vw,7rem);font-weight:700;line-height:1.05;color:var(--text);margin-bottom:0.5rem;z-index:1;position:relative}
 .hero-title span{color:var(--gold)}
-.hero-subtitle{font-size:clamp(1.1rem,2.5vw,1.5rem);color:var(--text2);margin:1.5rem 0 2.5rem;font-style:italic;font-weight:300}
-.hero-formula{display:inline-flex;align-items:center;gap:0.5rem;background:var(--card);border:1px solid var(--border);border-radius:4px;padding:0.6rem 1.5rem;font-size:1rem;letter-spacing:0.1em;color:var(--gold2);margin-bottom:3rem}
-.hero-formula .op{color:var(--muted);font-size:0.8em;margin:0 0.2rem}
-.hero-stats{display:flex;gap:3rem;margin-top:1rem;flex-wrap:wrap;justify-content:center}
+.hero-subtitle{font-size:clamp(1.15rem,2.4vw,1.7rem);color:var(--text);margin:1.5rem 0 2.5rem;font-weight:400;z-index:1;position:relative;max-width:680px}
+.hero-subtitle em{color:var(--gold);font-style:normal;font-weight:600}
+.hero-ctas{display:flex;gap:1rem;flex-wrap:wrap;justify-content:center;margin-bottom:3rem;z-index:1;position:relative}
+.btn-primary{display:inline-flex;align-items:center;gap:0.5rem;padding:0.95rem 2rem;background:var(--gold);color:#F5EFE0;font-size:0.9rem;font-weight:600;letter-spacing:0.1em;text-decoration:none;border-radius:2px;transition:all 0.2s;font-family:inherit;border:none;cursor:pointer}
+.btn-primary:hover{background:var(--gold2);transform:translateY(-2px)}
+.btn-secondary{display:inline-flex;align-items:center;gap:0.5rem;padding:0.95rem 2rem;background:transparent;color:var(--text);border:1px solid var(--gold);font-size:0.9rem;font-weight:600;letter-spacing:0.1em;text-decoration:none;border-radius:2px;transition:all 0.2s;font-family:inherit;cursor:pointer}
+.btn-secondary:hover{background:var(--card);border-color:var(--gold2)}
+.hero-stats{display:flex;gap:2.5rem;flex-wrap:wrap;justify-content:center;z-index:1;position:relative;padding-top:2rem;border-top:1px solid var(--border2);max-width:720px}
 .stat{text-align:center}
-.stat-n{font-family:'Playfair Display',serif;font-size:2.5rem;font-weight:700;color:var(--gold);display:block;line-height:1}
-.stat-l{font-size:0.7rem;letter-spacing:0.15em;color:var(--text2);margin-top:0.3rem;display:block}
-.scroll-hint{position:absolute;bottom:2rem;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:0.5rem;color:var(--muted);font-size:0.7rem;letter-spacing:0.2em}
-.scroll-arrow{width:1px;height:40px;background:linear-gradient(var(--gold),transparent);animation:scrollpulse 2s ease-in-out infinite}
-@keyframes scrollpulse{0%,100%{opacity:0.3;transform:scaleY(0.8)}50%{opacity:1;transform:scaleY(1)}}
+.stat-n{font-family:'Playfair Display',serif;font-size:2.2rem;font-weight:700;color:var(--gold);display:block;line-height:1}
+.stat-l{font-size:0.68rem;letter-spacing:0.2em;color:var(--text2);margin-top:0.3rem;display:block;text-transform:uppercase}
+
+/* ── DRAGON CLAW (E-layer) ── */
+#claw{background:var(--claw-bg);color:#E4D8B8;padding:6rem 2rem;position:relative;overflow:hidden}
+#claw::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 80% at 70% 30%,rgba(212,178,94,0.08) 0%,transparent 60%)}
+.claw-inner{max-width:1100px;margin:0 auto;position:relative;z-index:1;display:grid;grid-template-columns:1.3fr 1fr;gap:4rem;align-items:center}
+.claw-label{font-size:0.7rem;letter-spacing:0.35em;color:var(--claw-gold);text-transform:uppercase;margin-bottom:1.2rem;font-weight:600}
+.claw-label::before{content:'◆ ';color:var(--claw-gold);margin-right:0.4rem}
+.claw-title{font-family:'Playfair Display',serif;font-size:clamp(2.4rem,5vw,3.8rem);font-weight:700;color:#F5EFE0;line-height:1.1;margin-bottom:1rem}
+.claw-title .cn{color:var(--claw-gold);display:block;font-size:0.85em;margin-bottom:0.4rem;letter-spacing:0.05em}
+.claw-tagline{font-size:1.15rem;color:#E4D8B8;line-height:1.7;margin-bottom:2rem;font-style:italic;max-width:520px}
+.claw-body{font-size:0.95rem;color:#C7BB9E;line-height:1.85;margin-bottom:2rem}
+.claw-six{display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:2.5rem;align-items:center}
+.claw-step{padding:0.4rem 0.9rem;background:rgba(212,178,94,0.08);border:1px solid rgba(212,178,94,0.22);color:var(--claw-gold);font-size:0.78rem;letter-spacing:0.05em;border-radius:2px}
+.claw-arrow{color:rgba(212,178,94,0.5);font-size:0.7rem}
+.btn-claw{display:inline-flex;align-items:center;gap:0.5rem;padding:1rem 2.2rem;background:var(--claw-gold);color:var(--claw-bg);font-size:0.9rem;font-weight:700;letter-spacing:0.1em;text-decoration:none;border-radius:2px;transition:all 0.2s;font-family:inherit}
+.btn-claw:hover{background:#E8C878;transform:translateY(-2px);box-shadow:0 10px 30px rgba(212,178,94,0.25)}
+.claw-visual{position:relative;aspect-ratio:1;max-width:380px;justify-self:center;width:100%}
+.claw-circle{position:absolute;inset:0;border:1px dashed rgba(212,178,94,0.35);border-radius:50%;animation:rotate 40s linear infinite}
+.claw-circle.inner{inset:15%;border-style:solid;border-width:1px;border-color:rgba(212,178,94,0.22);animation-duration:28s;animation-direction:reverse}
+.claw-circle.core{inset:32%;background:radial-gradient(circle,rgba(212,178,94,0.25) 0%,rgba(212,178,94,0.05) 60%,transparent 100%);border:none;animation:pulse 4s ease-in-out infinite}
+.claw-core-text{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;z-index:2}
+.claw-core-letter{font-family:'Playfair Display',serif;font-size:5rem;font-weight:700;color:var(--claw-gold);line-height:1;margin-bottom:0.3rem}
+.claw-core-label{font-size:0.65rem;letter-spacing:0.3em;color:#E4D8B8;text-transform:uppercase}
+.claw-satellites{position:absolute;inset:0}
+.claw-sat{position:absolute;width:8px;height:8px;background:var(--claw-gold);border-radius:50%;box-shadow:0 0 16px rgba(212,178,94,0.6)}
+.claw-sat:nth-child(1){top:8%;left:50%;margin-left:-4px}
+.claw-sat:nth-child(2){top:30%;right:8%}
+.claw-sat:nth-child(3){top:72%;right:12%}
+.claw-sat:nth-child(4){bottom:8%;left:50%;margin-left:-4px}
+.claw-sat:nth-child(5){top:72%;left:12%}
+.claw-sat:nth-child(6){top:30%;left:8%}
+@keyframes rotate{to{transform:rotate(360deg)}}
+@keyframes pulse{0%,100%{opacity:0.7;transform:scale(1)}50%{opacity:1;transform:scale(1.06)}}
+
 /* ── SECTIONS ── */
-section{padding:5rem 2rem}
-.section-inner{max-width:1100px;margin:0 auto}
-.section-label{font-size:0.65rem;letter-spacing:0.3em;color:var(--gold);text-transform:uppercase;margin-bottom:1rem;display:flex;align-items:center;gap:1rem}
+section.panel{padding:5rem 2rem}
+.section-inner{max-width:1200px;margin:0 auto}
+.section-label{font-size:0.7rem;letter-spacing:0.3em;color:var(--gold);text-transform:uppercase;margin-bottom:1rem;display:flex;align-items:center;gap:1rem;font-weight:600}
 .section-label::after{content:'';flex:1;height:1px;background:var(--border)}
-h2.section-title{font-family:'Playfair Display',serif;font-size:clamp(1.8rem,4vw,2.8rem);font-weight:600;color:var(--text);line-height:1.2;margin-bottom:1rem}
-.section-divider{width:60px;height:2px;background:var(--gold);margin:1.5rem 0}
-/* ── ABOUT ── */
-#about{background:var(--surface)}
-.about-grid{display:grid;grid-template-columns:1fr 2fr;gap:4rem;align-items:start;margin-top:3rem}
-.about-portrait{position:relative}
-.portrait-frame{width:100%;aspect-ratio:3/4;background:var(--card);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
-.portrait-frame::before{content:'王德生\A Wang Desheng';white-space:pre;text-align:center;font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--gold);opacity:0.4;letter-spacing:0.1em}
-.portrait-corner{position:absolute;width:20px;height:20px;border-color:var(--gold);border-style:solid}
-.portrait-corner.tl{top:8px;left:8px;border-width:1px 0 0 1px}
-.portrait-corner.tr{top:8px;right:8px;border-width:1px 1px 0 0}
-.portrait-corner.bl{bottom:8px;left:8px;border-width:0 0 1px 1px}
-.portrait-corner.br{bottom:8px;right:8px;border-width:0 1px 1px 0}
-.about-info{display:flex;flex-direction:column;gap:0.5rem;margin-top:1rem;font-size:0.75rem;color:var(--text2)}
-.about-info span{display:flex;align-items:center;gap:0.5rem}
-.about-info span::before{content:'';width:4px;height:4px;border-radius:50%;background:var(--gold);flex-shrink:0}
-.about-text p{font-size:1.05rem;line-height:1.9;color:var(--text);margin-bottom:1.2rem}
-.about-text p:first-child{font-size:1.15rem;color:var(--text)}
-.tag-row{display:flex;flex-wrap:wrap;gap:0.5rem;margin-top:1.5rem}
-.tag{padding:0.3rem 0.8rem;border:1px solid var(--border);color:var(--gold);font-size:0.7rem;letter-spacing:0.1em;border-radius:2px}
-/* ── SDE FRAMEWORK ── */
-#sde .sde-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;margin-top:3rem}
-.sde-card{padding:2.5rem;background:var(--card);position:relative;overflow:hidden}
-.sde-card::before{content:attr(data-letter);position:absolute;top:-0.2em;right:0.2em;font-family:'Playfair Display',serif;font-size:8rem;font-weight:700;color:rgba(138,104,23,0.08);line-height:1;pointer-events:none}
-.sde-letter{font-family:'Playfair Display',serif;font-size:3.5rem;font-weight:700;color:var(--gold);line-height:1;margin-bottom:0.5rem}
-.sde-name-zh{font-size:1.1rem;font-weight:500;color:var(--text);margin-bottom:0.25rem}
-.sde-name-en{font-size:0.75rem;letter-spacing:0.15em;color:var(--text2);text-transform:uppercase;margin-bottom:1.2rem}
-.sde-desc{font-size:0.9rem;color:var(--text2);line-height:1.8}
-.sde-formula{margin-top:3rem;text-align:center;padding:2rem;background:var(--card2);border:1px solid var(--border)}
-.sde-formula p{font-size:0.85rem;color:var(--text2);margin-bottom:0.8rem;letter-spacing:0.1em}
-.formula-line{font-family:'EB Garamond','Playfair Display',serif;font-size:1.3rem;color:var(--gold2);letter-spacing:0.2em;font-style:italic}
-/* ── BOOKS ── */
-#books{background:var(--surface)}
-.books-filter{display:flex;flex-wrap:wrap;gap:0.5rem;margin:2rem 0;border-bottom:1px solid var(--border2);padding-bottom:1.5rem}
-.filter-btn{padding:0.35rem 1rem;border:1px solid var(--border);background:transparent;color:var(--text2);font-family:inherit;font-size:0.75rem;letter-spacing:0.08em;cursor:pointer;transition:all 0.2s;border-radius:2px}
-.filter-btn:hover,.filter-btn.active{background:var(--gold);color:#070B16;border-color:var(--gold)}
-.books-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:1.5rem;margin-top:1.5rem}
-.book-card{cursor:default;transition:transform 0.2s}
-.book-card:hover{transform:translateY(-4px)}
-.book-cover{width:100%;aspect-ratio:2/3;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:1rem;text-align:center;position:relative;overflow:hidden;border:1px solid rgba(255,255,255,0.06)}
-.book-cover-title{font-size:0.8rem;font-weight:500;color:#fff;line-height:1.4;z-index:1;position:relative;word-break:break-all}
-.book-cover-num{position:absolute;bottom:0.5rem;right:0.6rem;font-size:0.6rem;color:rgba(255,255,255,0.25);font-family:'Playfair Display',serif;font-style:italic}
-.book-info{padding:0.6rem 0}
-.book-title{font-size:0.75rem;color:var(--text);line-height:1.4;margin-bottom:0.2rem;font-weight:500}
-.book-desc{font-size:0.65rem;color:var(--muted);line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.book-domain{display:inline-block;font-size:0.6rem;letter-spacing:0.1em;color:var(--gold);border:1px solid rgba(200,164,74,0.3);padding:0.1rem 0.4rem;margin-bottom:0.3rem;border-radius:1px}
-/* domain colors — 7 clusters */
-.d-core{background:linear-gradient(135deg,#1A2545,#0E1830)}   /* deep navy — ontology core */
-.d-civ{background:linear-gradient(135deg,#3A1820,#220E14)}    /* burgundy — civilization & humanities */
-.d-gov{background:linear-gradient(135deg,#102A24,#0A1A16)}    /* forest — governance & social */
-.d-edu{background:linear-gradient(135deg,#3A2810,#22180A)}    /* amber — education */
-.d-life{background:linear-gradient(135deg,#1A2A10,#0E1A0A)}   /* olive — health & life */
-.d-cre{background:linear-gradient(135deg,#2A1840,#180E2A)}    /* violet — creativity */
-.d-ai{background:linear-gradient(135deg,#102828,#0A1818)}     /* teal — AI frontier */
-.d-ph{background:linear-gradient(135deg,#3A352A,#22201A)}     /* muted brown — forthcoming */
-/* ── PLATFORM ── */
-#platform{position:relative;overflow:hidden}
-.platform-bg{position:absolute;inset:0;background:radial-gradient(ellipse 70% 80% at 50% 50%,rgba(200,164,74,0.05) 0%,transparent 70%)}
-.platform-inner{position:relative;z-index:1;text-align:center;max-width:800px;margin:0 auto}
-.platform-badge{display:inline-block;background:rgba(200,164,74,0.1);border:1px solid var(--border);color:var(--gold);font-size:0.7rem;letter-spacing:0.2em;padding:0.4rem 1rem;margin-bottom:2rem;border-radius:2px}
-.platform-modules{display:flex;flex-wrap:wrap;justify-content:center;gap:1rem;margin:3rem 0}
-.module{padding:0.8rem 1.5rem;background:var(--card);border:1px solid var(--border2);font-size:0.8rem;color:var(--text2);border-radius:2px;transition:all 0.2s}
-.module:hover{border-color:var(--gold);color:var(--gold)}
-.cta-btn{display:inline-block;padding:0.9rem 2.5rem;background:var(--gold);color:#070B16;font-size:0.85rem;font-weight:600;letter-spacing:0.1em;text-decoration:none;border-radius:2px;transition:background 0.2s}
-.cta-btn:hover{background:var(--gold2)}
+.section-title{font-family:'Playfair Display',serif;font-size:clamp(2rem,4.2vw,3rem);font-weight:600;color:var(--text);line-height:1.15;margin-bottom:0.6rem}
+.section-subtitle{font-size:1rem;color:var(--text2);max-width:700px;line-height:1.8;margin-bottom:0.5rem}
+.section-divider{width:60px;height:2px;background:var(--gold);margin:1.5rem 0 2.5rem}
+
+/* ── EMPLOYEE MATRIX (S-layer) ── */
+#matrix{background:var(--surface)}
+.industries-tabs{display:flex;flex-wrap:wrap;gap:0.5rem;margin:2.5rem 0 2rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border2)}
+.tab-btn{padding:0.55rem 1.1rem;background:var(--card);border:1px solid var(--border2);color:var(--text2);font-family:inherit;font-size:0.82rem;letter-spacing:0.05em;cursor:pointer;transition:all 0.2s;border-radius:2px;display:flex;align-items:center;gap:0.5rem}
+.tab-btn:hover{border-color:var(--gold);color:var(--text)}
+.tab-btn.active{background:var(--gold);color:#F5EFE0;border-color:var(--gold)}
+.tab-count{font-size:0.7rem;opacity:0.8;font-family:'Playfair Display',serif;font-weight:600}
+.employees-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:1.2rem}
+.emp-card{background:var(--card);border:1px solid var(--border2);border-left:3px solid var(--gold);padding:1.2rem 1.2rem 1rem;transition:all 0.25s;cursor:pointer;display:flex;flex-direction:column;min-height:160px;text-decoration:none;color:inherit}
+.emp-card:hover{transform:translateY(-4px);border-left-color:var(--gold2);box-shadow:0 12px 32px rgba(138,104,23,0.10);background:var(--card2)}
+.emp-industry{font-size:0.6rem;letter-spacing:0.15em;color:var(--gold);text-transform:uppercase;margin-bottom:0.4rem;font-weight:600}
+.emp-name{font-size:1rem;font-weight:600;color:var(--text);margin-bottom:0.25rem;line-height:1.3}
+.emp-name-en{font-size:0.72rem;color:var(--text2);margin-bottom:0.8rem;font-style:italic;letter-spacing:0.03em}
+.emp-desc{font-size:0.82rem;color:var(--text2);line-height:1.65;flex:1}
+.emp-enter{margin-top:0.9rem;padding-top:0.7rem;border-top:1px solid var(--border2);font-size:0.72rem;letter-spacing:0.12em;color:var(--gold);text-transform:uppercase;font-weight:600;display:flex;align-items:center;justify-content:space-between}
+.emp-enter .arrow{transition:transform 0.2s}
+.emp-card:hover .emp-enter .arrow{transform:translateX(4px)}
+.emp-badge-soon{position:absolute;top:0.6rem;right:0.6rem;font-size:0.58rem;letter-spacing:0.1em;color:var(--muted);padding:0.15rem 0.4rem;background:var(--card2);border-radius:2px;text-transform:uppercase}
+.emp-card{position:relative}
+
+/* industry tab color swatches */
+.tab-btn[data-ind="edu"]::before,.tab-btn[data-ind="law"]::before,.tab-btn[data-ind="med"]::before,.tab-btn[data-ind="ent"]::before,.tab-btn[data-ind="art"]::before,.tab-btn[data-ind="aca"]::before,.tab-btn[data-ind="fin"]::before,.tab-btn[data-ind="mda"]::before,.tab-btn[data-ind="gov"]::before,.tab-btn[data-ind="tec"]::before{content:'';width:8px;height:8px;border-radius:50%;display:inline-block}
+.tab-btn[data-ind="edu"]::before{background:#3A2810}
+.tab-btn[data-ind="law"]::before{background:#102A24}
+.tab-btn[data-ind="med"]::before{background:#2A1010}
+.tab-btn[data-ind="ent"]::before{background:#1A2545}
+.tab-btn[data-ind="art"]::before{background:#3A1820}
+.tab-btn[data-ind="aca"]::before{background:#20201A}
+.tab-btn[data-ind="fin"]::before{background:#1A2A10}
+.tab-btn[data-ind="mda"]::before{background:#2A1840}
+.tab-btn[data-ind="gov"]::before{background:#102828}
+.tab-btn[data-ind="tec"]::before{background:#103040}
+
+/* ── CREDENTIALS STRIP (SDE backing) ── */
+#credentials{background:var(--bg);padding:5rem 2rem}
+.creds-inner{max-width:1100px;margin:0 auto;text-align:center}
+.creds-title{font-family:'Playfair Display',serif;font-size:clamp(1.6rem,3.2vw,2.4rem);font-weight:600;color:var(--text);line-height:1.3;margin-bottom:1rem}
+.creds-sub{color:var(--text2);font-size:1rem;max-width:700px;margin:0 auto 3rem;line-height:1.85}
+.creds-three{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;max-width:900px;margin:0 auto 2.5rem}
+.creds-card{padding:1.8rem 1.5rem;background:var(--card);border:1px solid var(--border2);border-top:2px solid var(--gold)}
+.creds-card h4{font-family:'Playfair Display',serif;font-size:1.15rem;color:var(--text);margin-bottom:0.5rem;font-weight:600}
+.creds-card .letter{font-family:'Playfair Display',serif;font-size:2rem;color:var(--gold);line-height:1;margin-bottom:0.5rem;font-weight:700}
+.creds-card p{font-size:0.85rem;color:var(--text2);line-height:1.75}
+
+/* ── AUTHOR MINI ── */
+#author{background:var(--surface);padding:4rem 2rem;border-top:1px solid var(--border2)}
+.author-inner{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:auto 1fr auto;gap:2.5rem;align-items:center}
+.author-portrait{width:90px;height:120px;background:var(--card);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:0.8rem;color:var(--gold);text-align:center;letter-spacing:0.1em}
+.author-info h3{font-family:'Playfair Display',serif;font-size:1.4rem;color:var(--text);margin-bottom:0.3rem;font-weight:600}
+.author-info .tagline{font-size:0.8rem;color:var(--gold);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:0.8rem}
+.author-info p{font-size:0.9rem;color:var(--text2);line-height:1.7}
+.author-info .meta{margin-top:0.7rem;font-size:0.75rem;color:var(--muted)}
+.author-link{display:flex;align-items:center;gap:0.4rem;color:var(--gold);font-size:0.85rem;font-weight:600;letter-spacing:0.08em;text-decoration:none;padding:0.7rem 1.3rem;border:1px solid var(--gold);border-radius:2px;transition:all 0.2s;white-space:nowrap}
+.author-link:hover{background:var(--gold);color:#F5EFE0}
+
 /* ── FOOTER ── */
-footer{background:var(--surface);border-top:1px solid var(--border2);padding:3rem 2rem}
-.footer-inner{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr 1fr;gap:3rem}
-.footer-brand p{font-size:0.85rem;color:var(--text2);margin-top:0.8rem;line-height:1.7;max-width:280px}
-.footer-col h4{font-size:0.7rem;letter-spacing:0.2em;color:var(--gold);text-transform:uppercase;margin-bottom:1rem}
+footer{background:var(--bg);border-top:1px solid var(--border2);padding:3rem 2rem}
+.footer-inner{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:3rem}
+.footer-brand h4{font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--gold);font-weight:700;letter-spacing:0.05em}
+.footer-brand p{font-size:0.82rem;color:var(--text2);margin-top:0.8rem;line-height:1.7;max-width:280px}
+.footer-col h4{font-size:0.7rem;letter-spacing:0.2em;color:var(--gold);text-transform:uppercase;margin-bottom:1rem;font-weight:600}
 .footer-col ul{list-style:none}
-.footer-col ul li{margin-bottom:0.5rem}
-.footer-col ul li a{color:var(--text2);text-decoration:none;font-size:0.8rem;transition:color 0.2s}
+.footer-col ul li{margin-bottom:0.55rem}
+.footer-col ul li a{color:var(--text2);text-decoration:none;font-size:0.82rem;transition:color 0.2s}
 .footer-col ul li a:hover{color:var(--gold)}
-.footer-bottom{max-width:1100px;margin:2rem auto 0;padding-top:1.5rem;border-top:1px solid var(--border2);display:flex;justify-content:space-between;align-items:center;font-size:0.7rem;color:var(--muted)}
+.footer-bottom{max-width:1200px;margin:2.5rem auto 0;padding-top:1.5rem;border-top:1px solid var(--border2);display:flex;justify-content:space-between;align-items:center;font-size:0.72rem;color:var(--muted);flex-wrap:wrap;gap:0.5rem}
+
 /* ── RESPONSIVE ── */
-@media(max-width:768px){
+@media(max-width:968px){
+  .claw-inner{grid-template-columns:1fr;gap:3rem}
+  .claw-visual{max-width:300px}
+  .creds-three{grid-template-columns:1fr}
+  .author-inner{grid-template-columns:auto 1fr;gap:1.5rem}
+  .author-link{grid-column:1/-1;justify-content:center}
+  .footer-inner{grid-template-columns:1fr 1fr}
+}
+@media(max-width:640px){
   nav{padding:1rem 1.5rem}
+  .nav-links{gap:1rem}
   .nav-links a{display:none}
-  .about-grid{grid-template-columns:1fr}
-  .sde-grid{grid-template-columns:1fr}
-  .books-grid{grid-template-columns:repeat(auto-fill,minmax(130px,1fr))}
+  .nav-links a.primary,.nav-links .lang-toggle{display:flex}
+  .employees-grid{grid-template-columns:1fr}
+  .hero-stats{gap:1.5rem}
   .footer-inner{grid-template-columns:1fr}
 }
+
 /* ── LANGUAGE VISIBILITY ── */
 .zh-only,.en-only{transition:opacity 0.2s}
 body.en .zh-only{display:none}
 body.zh .en-only{display:none}
-
-/* ── MEANING LAWS (意义三律) ── */
-#laws{background:var(--surface)}
-.laws-intro{max-width:680px;color:var(--text2);font-size:0.95rem;margin:0.5rem 0 0;line-height:1.8}
-.laws-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2rem;margin-top:3rem}
-.law-card{position:relative;padding:2.5rem 2rem;background:var(--card);border:1px solid var(--border2);border-top:3px solid var(--gold);transition:transform .25s,border-color .25s}
-.law-card:hover{transform:translateY(-4px);border-color:var(--gold)}
-.law-num{font-family:'Playfair Display',serif;font-size:0.75rem;letter-spacing:0.3em;color:var(--gold);text-transform:uppercase}
-.law-icon{font-family:'Playfair Display',serif;font-size:2.5rem;color:var(--gold);margin:0.4rem 0 0.8rem;font-style:italic;line-height:1}
-.law-name-zh{font-size:1.35rem;font-weight:600;color:var(--text);margin-bottom:0.3rem;letter-spacing:0.05em}
-.law-name-en{font-size:0.7rem;letter-spacing:0.2em;color:var(--text2);text-transform:uppercase;margin-bottom:1.2rem}
-.law-desc{font-size:0.9rem;color:var(--text2);line-height:1.85}
-.law-keyword{display:inline-block;margin-top:1.2rem;padding:0.2rem 0.6rem;font-size:0.7rem;letter-spacing:0.1em;border:1px solid var(--border);color:var(--gold);border-radius:2px}
-
-/* ── CLUSTER OVERVIEW (7 集群) ── */
-.clusters-overview{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:1rem;margin:2rem 0 2.5rem}
-.cluster-card{padding:1.2rem 1rem;background:var(--card);border:1px solid var(--border2);border-left:3px solid var(--gold);cursor:pointer;transition:all .2s;display:flex;flex-direction:column;gap:0.4rem}
-.cluster-card:hover{transform:translateY(-3px);border-color:var(--gold);box-shadow:0 8px 24px rgba(138,104,23,0.10)}
-.cluster-count{font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:700;color:var(--gold);line-height:1}
-.cluster-name{font-size:0.95rem;color:var(--text);font-weight:500;letter-spacing:0.02em}
-.cluster-tag{font-size:0.7rem;letter-spacing:0.1em;color:var(--text2);text-transform:uppercase}
-/* cluster swatches */
-.cluster-card[data-d="core"]{border-left-color:#1A2545}
-.cluster-card[data-d="civ"] {border-left-color:#3A1820}
-.cluster-card[data-d="gov"] {border-left-color:#102A24}
-.cluster-card[data-d="edu"] {border-left-color:#3A2810}
-.cluster-card[data-d="life"]{border-left-color:#1A2A10}
-.cluster-card[data-d="cre"] {border-left-color:#2A1840}
-.cluster-card[data-d="ai"]  {border-left-color:#102828}
-
-/* ── VISION (意义文明) ── */
-#vision{background:var(--surface);text-align:center;padding:6rem 2rem}
-.vision-inner{max-width:900px;margin:0 auto}
-.vision-eyebrow{font-size:0.7rem;letter-spacing:0.3em;color:var(--gold);text-transform:uppercase;margin-bottom:1.5rem}
-.vision-quote{font-family:'Playfair Display',serif;font-size:clamp(1.6rem,3.5vw,2.6rem);font-weight:600;color:var(--text);line-height:1.4;font-style:italic;margin:1rem 0 2rem;letter-spacing:0.02em}
-.vision-quote::before,.vision-quote::after{content:'"';color:var(--gold);font-family:'Playfair Display',serif;font-weight:700;opacity:0.6;font-style:normal;margin:0 0.15em}
-.vision-body{color:var(--text2);font-size:1rem;line-height:1.9;max-width:680px;margin:0 auto}
-.vision-axis{display:flex;justify-content:center;gap:2rem;margin-top:2.5rem;flex-wrap:wrap}
-.vision-axis-item{padding:0.5rem 1.2rem;border:1px solid var(--border);color:var(--gold);font-size:0.8rem;letter-spacing:0.1em;border-radius:2px;background:var(--card)}
-
-/* ── TIMELINE (学术轨迹) ── */
-.timeline{margin-top:2.5rem;position:relative;padding-left:2rem;border-left:1px solid var(--border)}
-.timeline-item{position:relative;padding-bottom:1.8rem}
-.timeline-item:last-child{padding-bottom:0}
-.timeline-item::before{content:'';position:absolute;left:-2.4rem;top:0.45rem;width:9px;height:9px;background:var(--gold);border-radius:50%;border:2px solid var(--bg)}
-.timeline-period{font-family:'Playfair Display',serif;font-size:0.75rem;letter-spacing:0.15em;color:var(--gold);text-transform:uppercase}
-.timeline-title{font-size:1rem;font-weight:600;color:var(--text);margin:0.2rem 0 0.4rem}
-.timeline-desc{font-size:0.85rem;color:var(--text2);line-height:1.7}
-
-@media(max-width:768px){
-  .laws-grid{grid-template-columns:1fr}
-  .clusters-overview{grid-template-columns:repeat(2,1fr)}
-}
 </style>
 </head>
 <body class="zh">
+
 <!-- NAV -->
 <nav>
-  <a class="nav-logo" href="#">SDE Universes</a>
+  <a class="nav-logo" href="/">SDE Universes</a>
   <div class="nav-links">
-    <a href="#about" class="zh-only">关于</a><a href="#about" class="en-only">About</a>
-    <a href="#sde" class="zh-only">SDE</a><a href="#sde" class="en-only">SDE</a>
-    <a href="#laws" class="zh-only">三律</a><a href="#laws" class="en-only">Axioms</a>
-    <a href="#books" class="zh-only">专著</a><a href="#books" class="en-only">Works</a>
-    <a href="#vision" class="zh-only">愿景</a><a href="#vision" class="en-only">Vision</a>
-    <a href="#platform" class="zh-only">平台</a><a href="#platform" class="en-only">Platform</a>
+    <a href="#claw" class="primary zh-only">龙爪手</a><a href="#claw" class="primary en-only">Dragon Claw</a>
+    <a href="#matrix" class="zh-only">行业员工</a><a href="#matrix" class="en-only">Employees</a>
+    <a href="#credentials" class="zh-only">SDE体系</a><a href="#credentials" class="en-only">System</a>
+    <a href="/philosophy/" class="zh-only">思想宇宙</a><a href="/philosophy/" class="en-only">Philosophy</a>
     <div class="lang-toggle">
       <button class="lang-btn active" onclick="setLang('zh')">中</button>
       <button class="lang-btn" onclick="setLang('en')">EN</button>
     </div>
   </div>
 </nav>
+
 <!-- HERO -->
 <section id="hero">
   <div class="hero-bg"></div>
   <div class="hero-grid"></div>
-  <div class="hero-eyebrow zh-only">跨域知识发生学 · 超级个体研究体系</div>
-  <div class="hero-eyebrow en-only">Cross-Domain Knowledge Generativics · Super-Individual Research System</div>
+  <div class="hero-eyebrow zh-only">100 AI 超级员工 · 10 大行业 · 1 个母体引擎</div>
+  <div class="hero-eyebrow en-only">100 AI SUPER EMPLOYEES · 10 INDUSTRIES · 1 META-ENGINE</div>
   <h1 class="hero-title">SDE <span>Universes</span></h1>
-  <p class="hero-subtitle zh-only">在纠缠中，经由差异，结构显现</p>
-  <p class="hero-subtitle en-only">In entanglement, through difference, structure emerges</p>
-  <div class="hero-formula">
-    <span>S</span><span class="op">·</span>
-    <span>D</span><span class="op">·</span>
-    <span>E</span>
+  <p class="hero-subtitle zh-only">选择你的行业，进入你的 <em>AI 超级员工</em><br>每一位都由 <em>龙爪手</em> 锻造，由 52 部专著背书</p>
+  <p class="hero-subtitle en-only">Choose your industry, meet your <em>AI super-employee</em><br>All forged by <em>Dragon Claw</em>, backed by 52 monographs</p>
+  <div class="hero-ctas">
+    <a href="#matrix" class="btn-primary zh-only">进入员工矩阵 →</a>
+    <a href="#matrix" class="btn-primary en-only">Enter Employee Matrix →</a>
+    <a href="#claw" class="btn-secondary zh-only">了解龙爪手</a>
+    <a href="#claw" class="btn-secondary en-only">About Dragon Claw</a>
   </div>
   <div class="hero-stats">
-    <div class="stat"><span class="stat-n">52</span><span class="stat-l zh-only">已出版专著</span><span class="stat-l en-only">MONOGRAPHS</span></div>
-    <div class="stat"><span class="stat-n">12</span><span class="stat-l zh-only">覆盖领域</span><span class="stat-l en-only">DOMAINS</span></div>
-    <div class="stat"><span class="stat-n">∞</span><span class="stat-l zh-only">发生可能</span><span class="stat-l en-only">GENERATIVE POTENTIAL</span></div>
-  </div>
-  <div class="scroll-hint" style="margin-top:2rem">
-    <span class="zh-only">向下探索</span><span class="en-only">EXPLORE</span>
-    <div class="scroll-arrow"></div>
+    <div class="stat"><span class="stat-n">100</span><span class="stat-l zh-only">AI 超级员工</span><span class="stat-l en-only">AI EMPLOYEES</span></div>
+    <div class="stat"><span class="stat-n">10</span><span class="stat-l zh-only">行业覆盖</span><span class="stat-l en-only">INDUSTRIES</span></div>
+    <div class="stat"><span class="stat-n">52</span><span class="stat-l zh-only">专著背书</span><span class="stat-l en-only">MONOGRAPHS</span></div>
+    <div class="stat"><span class="stat-n">47</span><span class="stat-l zh-only">顶刊论文</span><span class="stat-l en-only">JOURNAL PAPERS</span></div>
   </div>
 </section>
-<!-- ABOUT -->
-<section id="about">
-<div class="section-inner">
-  <div class="section-label zh-only">关于作者</div>
-  <div class="section-label en-only">About the Author</div>
-  <h2 class="section-title zh-only">王德生</h2>
-  <h2 class="section-title en-only">Wang Desheng</h2>
-  <div class="section-divider"></div>
-  <div class="about-grid">
+
+<!-- DRAGON CLAW (E-layer META-ENGINE) -->
+<section id="claw">
+  <div class="claw-inner">
     <div>
-      <div class="portrait-frame">
-        <div class="portrait-corner tl"></div>
-        <div class="portrait-corner tr"></div>
-        <div class="portrait-corner bl"></div>
-        <div class="portrait-corner br"></div>
+      <div class="claw-label zh-only">元工具 · E 层纠缠引擎</div>
+      <div class="claw-label en-only">META-ENGINE · E-LAYER</div>
+      <h2 class="claw-title">
+        <span class="cn zh-only">龙爪手</span><span class="cn en-only">Dragon Claw</span>
+        <span class="zh-only">锻造所有知识武器的母体</span>
+        <span class="en-only">The Mother-Engine That Forges All Knowledge Weapons</span>
+      </h2>
+      <p class="claw-tagline zh-only">其他 99 个 AI 超级员工，都是它在各行业的具体显露态。</p>
+      <p class="claw-tagline en-only">The other 99 AI super-employees are its specific manifestations across industries.</p>
+      <p class="claw-body zh-only">龙爪手是 SDE 发生学的操作化身，六爪动作链的执行者——以裂缝扫描为入口，以学科改姓为出口，在每一个行业里锻造不写"SDE"却携带 SDE 内核的知识武器。</p>
+      <p class="claw-body en-only">Dragon Claw is the operational embodiment of SDE Generativics and the executor of the six-claw action chain — entering through fissure-scanning, exiting through disciplinary renaming, forging in every industry knowledge-weapons that carry the SDE core without writing "SDE."</p>
+      <div class="claw-six">
+        <span class="claw-step zh-only">抓核</span><span class="claw-step en-only">Grasp Core</span>
+        <span class="claw-arrow">→</span>
+        <span class="claw-step zh-only">抓裂缝</span><span class="claw-step en-only">Find Fissure</span>
+        <span class="claw-arrow">→</span>
+        <span class="claw-step zh-only">重组</span><span class="claw-step en-only">Reassemble</span>
+        <span class="claw-arrow">→</span>
+        <span class="claw-step zh-only">改姓</span><span class="claw-step en-only">Rename</span>
+        <span class="claw-arrow">→</span>
+        <span class="claw-step zh-only">锻造</span><span class="claw-step en-only">Forge</span>
+        <span class="claw-arrow">→</span>
+        <span class="claw-step zh-only">投放</span><span class="claw-step en-only">Deploy</span>
       </div>
-      <div class="about-info">
-        <span class="zh-only">计算数学博士 · 中国科学院</span><span class="en-only">PhD Computational Mathematics · CAS</span>
-        <span class="zh-only">哥伦比亚大学博士后 · Qiang Du团队</span><span class="en-only">Postdoc Columbia University · Qiang Du</span>
-        <span class="zh-only">南洋理工大学 · 德麦国际有限公司</span><span class="en-only">NTU · Demai International Pte. Ltd.</span>
-        <span>Singapore · ORCID 0009-0009-8196-0030</span>
-      </div>
+      <a href="#" class="btn-claw zh-only" data-emp="dragon-claw">进入龙爪手平台 →</a>
+      <a href="#" class="btn-claw en-only" data-emp="dragon-claw">Enter Dragon Claw →</a>
     </div>
-    <div class="about-text">
-      <p class="zh-only">王德生，数学博士、哲学家，<strong style="color:var(--text)">SIO 本体论</strong>与<strong style="color:var(--text)">SDE 发生学</strong>的创立者，新加坡德麦国际出版公司（Demai International Pte. Ltd.）创始人。以三十余年的学术探索，完成了从计算数学家到跨域思想家的根本转向——构筑了一座以数学精度承载哲学抱负的思想建筑。</p>
-      <p class="en-only">Wang Desheng — mathematician (PhD), philosopher, founder of <strong style="color:var(--text)">SIO Ontology</strong> and <strong style="color:var(--text)">SDE Generativics</strong>, founder of Demai International Pte. Ltd. (Singapore). Over three decades, he completed a fundamental turn from computational mathematician to cross-domain thinker — constructing a rare intellectual architecture that carries philosophical ambition with mathematical precision.</p>
-      <p class="zh-only">核心命题：<em>"不是 S、I、O 组合成 SIO，而是 SIO 整体先于三者——它是存在的第一性。"</em> 由此奠定意义三律（特征律 · 自由律 · 幸福律）的哲学基础，并以 SDE 三维引擎回答"存在如何发生"。</p>
-      <p class="en-only">Core proposition: <em>"It is not that S, I, O combine into SIO; SIO as whole is prior to the three — it is the first principle of existence."</em> From this, the Three Axioms of Meaning (Feature · Freedom · Happiness) gain their philosophical ground, and the SDE three-dimensional engine answers "how existence comes to be."</p>
-      <p class="zh-only">截至 2026 年 3 月，已出版 52 部跨域专著（每部约 20 万字，全部 Bowker ISBN 注册），覆盖哲学本体论、文明研究、治理学、教育学、健康科学、创造力研究、AI 哲学等十二个领域。此前在计算数学与计算机图形学领域发表 47 篇国际顶刊论文。</p>
-      <p class="en-only">As of March 2026, 52 cross-domain monographs (~200,000 characters each, all Bowker ISBN registered), covering philosophical ontology, civilization studies, governance, education, health sciences, creativity research, AI philosophy and more — twelve fields in total. Previously, 47 papers in top international journals in computational mathematics and computer graphics.</p>
-      <div class="tag-row">
-        <span class="tag">SIO Ontology</span>
-        <span class="tag">SDE Generativics</span>
-        <span class="tag zh-only">意义三律</span><span class="tag en-only">Three Axioms of Meaning</span>
-        <span class="tag">Dragon Claw 龙爪手</span>
-        <span class="tag zh-only">超级个体</span><span class="tag en-only">Super-Individual</span>
-        <span class="tag">GCG Framework</span>
+    <div class="claw-visual">
+      <div class="claw-circle"></div>
+      <div class="claw-circle inner"></div>
+      <div class="claw-circle core"></div>
+      <div class="claw-core-text">
+        <div class="claw-core-letter">爪</div>
+        <div class="claw-core-label zh-only">E · 纠缠引擎</div>
+        <div class="claw-core-label en-only">E · ENGINE</div>
       </div>
-      <div class="timeline">
-        <div class="timeline-item">
-          <div class="timeline-period zh-only">1990 – 2014 · 数学筋骨</div>
-          <div class="timeline-period en-only">1990 – 2014 · MATHEMATICAL SINEW</div>
-          <div class="timeline-title zh-only">计算数学的结构训练</div>
-          <div class="timeline-title en-only">Structural Training in Computational Mathematics</div>
-          <p class="timeline-desc zh-only">湘潭大学数学系（学/硕）→ 中科院数学所（博士，导师梁国平）→ 中科院计算数学所博士后（导师杜强）→ 英国威尔士大学斯旺西分校 → 新加坡南洋理工大学十三年（博导）。47 篇国际顶刊论文锻造了对"差异如何在结构约束下自组织为稳定秩序"的数学直觉。</p>
-          <p class="timeline-desc en-only">Xiangtan Univ. (BS/MS) → CAS Institute of Mathematics (PhD, advisor Liang Guoping) → CAS Computational Mathematics Postdoc (advisor Qiang Du) → Univ. of Wales Swansea → Nanyang Technological Univ. (13 years, PhD supervisor). 47 top-tier journal papers forged a mathematical intuition for "how difference self-organizes into stable order under structural constraint."</p>
-        </div>
-        <div class="timeline-item">
-          <div class="timeline-period zh-only">2015 – 2021 · 形式理性</div>
-          <div class="timeline-period en-only">2015 – 2021 · FORMAL REASON</div>
-          <div class="timeline-title zh-only">三视角方法论的跨域展开</div>
-          <div class="timeline-title en-only">Cross-Domain Unfolding of the Three-Perspective Method</div>
-          <p class="timeline-desc zh-only">以 John Frame 三视角分析法为起点，构建三视角教育学/管理学/心理学/美学等十部专著。讲学数百场。但形式的优雅带来了结构的寒冷——"若结构不能生成意义，它就只是一具理性的外壳。"</p>
-          <p class="timeline-desc en-only">Beginning from John Frame's three-perspective method, built ten three-perspective monographs across education, management, psychology, aesthetics. Hundreds of lectures. Yet the elegance of form brought the coldness of structure — "if structure cannot generate meaning, it is merely a shell of reason."</p>
-        </div>
-        <div class="timeline-item">
-          <div class="timeline-period zh-only">2022 – 2023 · 内容张力</div>
-          <div class="timeline-period en-only">2022 – 2023 · CONTENT TENSION</div>
-          <div class="timeline-title zh-only">321 智慧与意义的混沌</div>
-          <div class="timeline-title en-only">321 Wisdom and the Chaos of Meaning</div>
-          <p class="timeline-desc zh-only">为突破形式僵化，提出 321 智慧——存在（1）、矛盾（2）、视角（3）。思想重新充满生命力，也带来了新的混乱："内容的极致是虚无，形式的极致是僵死。"</p>
-          <p class="timeline-desc en-only">To break formal rigidity, the 321 Wisdom emerged — Being (1), Contradiction (2), Perspective (3). Thought regained vitality but brought new chaos: "the extreme of content is nothingness; the extreme of form is rigor mortis."</p>
-        </div>
-        <div class="timeline-item">
-          <div class="timeline-period zh-only">2024 – 至今 · 本体革命</div>
-          <div class="timeline-period en-only">2024 – PRESENT · ONTOLOGICAL REVOLUTION</div>
-          <div class="timeline-title zh-only">SIO 整体哲学与 SDE 发生学的诞生</div>
-          <div class="timeline-title en-only">Birth of SIO Holistic Philosophy & SDE Generativics</div>
-          <p class="timeline-desc zh-only">2024 年实现"0→1 突破"——SIO 整体先于三者。哲学被重新定义为"结构识别与判断合法性的生成学"。四个月内（2025.12 – 2026.3）密集出版 52 部跨域专著，构成意义文明的全景蓝图。</p>
-          <p class="timeline-desc en-only">In 2024, the "0→1 breakthrough" — SIO whole prior to three. Philosophy is redefined as "the generativics of structure-identification and judgment-legitimacy." In four months (Dec 2025 – Mar 2026), 52 cross-domain monographs were intensively published — a panoramic blueprint of the Civilization of Meaning.</p>
-        </div>
+      <div class="claw-satellites">
+        <div class="claw-sat"></div><div class="claw-sat"></div><div class="claw-sat"></div>
+        <div class="claw-sat"></div><div class="claw-sat"></div><div class="claw-sat"></div>
       </div>
     </div>
   </div>
-</div>
 </section>
-<!-- SDE FRAMEWORK -->
-<section id="sde">
+
+<!-- MATRIX (S-layer: 99 industry employees) -->
+<section id="matrix" class="panel">
 <div class="section-inner">
-  <div class="section-label zh-only">核心体系</div>
-  <div class="section-label en-only">Core Framework</div>
-  <h2 class="section-title zh-only">结构 · 差异 · 纠缠</h2>
-  <h2 class="section-title en-only">Structure · Difference · Entanglement</h2>
+  <div class="section-label zh-only">行业超级员工矩阵 · S 层</div>
+  <div class="section-label en-only">Industry Super-Employee Matrix · S-Layer</div>
+  <h2 class="section-title zh-only">99 个 AI 超级员工</h2>
+  <h2 class="section-title en-only">99 AI Super-Employees</h2>
+  <p class="section-subtitle zh-only">覆盖 10 大行业 · 每个员工背后是 SDE 发生学的方法论锻造 · 点击卡片进入对应工具</p>
+  <p class="section-subtitle en-only">Across 10 industries · Each employee forged through SDE generativics · Click a card to enter the tool</p>
   <div class="section-divider"></div>
-  <p style="color:var(--text2);font-size:0.95rem;max-width:600px;margin-top:0.5rem" class="zh-only">SDE不是框架，而是知识的发生机制。它解释新知识结构在什么条件下生长出来。</p>
-  <p style="color:var(--text2);font-size:0.95rem;max-width:600px;margin-top:0.5rem" class="en-only">SDE is not a framework but a generative mechanism of knowledge — explaining the conditions under which new knowledge structures come into being.</p>
-  <div class="sde-grid" style="margin-top:2.5rem">
-    <div class="sde-card" data-letter="S">
-      <div class="sde-letter">S</div>
-      <div class="sde-name-zh zh-only">结构</div>
-      <div class="sde-name-en">Structure</div>
-      <p class="sde-desc zh-only">新知识的显现形态。结构不是给定的，而是在特定纠缠与差异流的驱动下生长出来的。S是发生的终态，也是下一轮发生的起点。</p>
-      <p class="sde-desc en-only">The emergent form of new knowledge. Structure is not given but grown — driven by specific entanglement and difference-flow. S is the end-state of one genesis and the starting point of the next.</p>
-    </div>
-    <div class="sde-card" data-letter="D">
-      <div class="sde-letter">D</div>
-      <div class="sde-name-zh zh-only">差异</div>
-      <div class="sde-name-en">Difference</div>
-      <p class="sde-desc zh-only">驱动结构发生的动力源。差异不是简单的不同，而是具有方向性的差异流——正是它的流动方式决定了新结构的形态与路径。</p>
-      <p class="sde-desc en-only">The motive force driving structural genesis. Difference is not mere distinction but directional difference-flow — its mode of movement determines the form and pathway of new structure.</p>
-    </div>
-    <div class="sde-card" data-letter="E">
-      <div class="sde-letter">E</div>
-      <div class="sde-name-zh zh-only">纠缠</div>
-      <div class="sde-name-en">Entanglement</div>
-      <p class="sde-desc zh-only">发生的场域条件。纠缠是元素之间深层的相互作用网络——它决定哪些差异流能被激活，哪些结构发生具有可能性。</p>
-      <p class="sde-desc en-only">The field condition of genesis. Entanglement is the deep network of interaction among elements — it determines which difference-flows can be activated and which structural emergences are possible.</p>
-    </div>
-  </div>
-  <div class="sde-formula">
-    <p class="zh-only">核心公式 · Core Formula</p>
-    <div class="formula-line">S = H(D, E) &nbsp;·&nbsp; D = G(S, E) &nbsp;·&nbsp; E = F(S, D)</div>
-    <p style="font-size:0.75rem;color:var(--muted);margin-top:0.8rem;letter-spacing:0.05em" class="zh-only">在纠缠中，经由差异，结构显现 · In entanglement, through difference, structure emerges</p>
-  </div>
+  <div class="industries-tabs" id="industriesTabs"></div>
+  <div class="employees-grid" id="employeesGrid"></div>
 </div>
 </section>
-<!-- MEANING LAWS (意义三律) -->
-<section id="laws">
-<div class="section-inner">
-  <div class="section-label zh-only">意义三律</div>
-  <div class="section-label en-only">Three Axioms of Meaning</div>
-  <h2 class="section-title zh-only">特征 · 自由 · 幸福</h2>
-  <h2 class="section-title en-only">Feature · Freedom · Happiness</h2>
-  <div class="section-divider"></div>
-  <p class="laws-intro zh-only">SIO 本体论的社会算法。三律共同回答：意义文明如何运行？特征律校准 AI 的结构稳定，自由律鼓励创新突变，幸福律统整文明目标。</p>
-  <p class="laws-intro en-only">The social algorithm of SIO ontology. Together they answer: how does the Civilization of Meaning operate? Feature Law calibrates AI's structural stability, Freedom Law encourages innovative mutation, Happiness Law integrates civilizational purpose.</p>
-  <div class="laws-grid">
-    <div class="law-card">
-      <div class="law-num zh-only">第 一 律</div><div class="law-num en-only">AXIOM I</div>
-      <div class="law-icon">F</div>
-      <div class="law-name-zh zh-only">特征律</div>
-      <div class="law-name-en">Feature Law</div>
-      <p class="law-desc zh-only">意义的有限发生律。特征不是无中生有，必须在已有纠缠条件下经差异序列推进而显露——这是科学的本体根基。</p>
-      <p class="law-desc en-only">The finite-genesis law of meaning. Features do not arise ex nihilo; they emerge only through difference-sequences advancing within existing entanglement — the ontological ground of science.</p>
-      <span class="law-keyword zh-only">校准结构稳定</span><span class="law-keyword en-only">CALIBRATES STABILITY</span>
+
+<!-- CREDENTIALS (SDE theoretical backing) -->
+<section id="credentials">
+<div class="creds-inner">
+  <div class="section-label zh-only" style="justify-content:center">为什么可信 · WHY TRUST</div>
+  <div class="section-label en-only" style="justify-content:center">WHY TRUST · 为什么可信</div>
+  <h2 class="creds-title zh-only">每个员工背后，是 SDE 发生学的系统锻造</h2>
+  <h2 class="creds-title en-only">Behind Every Employee: the Systematic Forge of SDE Generativics</h2>
+  <p class="creds-sub zh-only">这不是又一套提示词模板，而是一套哲学本体论—方法论—操作平台的完整闭环。从 SIO 整体到 SDE 发生学到意义三律，每一个 AI 超级员工都是这个闭环在行业里的具体显露。</p>
+  <p class="creds-sub en-only">This is not another prompt-template kit. It is a complete loop — from ontology to methodology to operational platform. From SIO wholeness to SDE generativics to the Three Axioms of Meaning, each AI super-employee is a specific manifestation of this loop in its industry.</p>
+  <div class="creds-three">
+    <div class="creds-card">
+      <div class="letter">SIO</div>
+      <h4 class="zh-only">本体论</h4><h4 class="en-only">Ontology</h4>
+      <p class="zh-only">主体-互动-客体整体先于三者。存在即生成整体——这是一切 AI 超级员工的第一性原理。</p>
+      <p class="en-only">Subject-Interaction-Object as whole, prior to the three. Existence is generative wholeness — the first principle behind every AI employee.</p>
     </div>
-    <div class="law-card">
-      <div class="law-num zh-only">第 二 律</div><div class="law-num en-only">AXIOM II</div>
-      <div class="law-icon">L</div>
-      <div class="law-name-zh zh-only">自由律</div>
-      <div class="law-name-en">Freedom Law</div>
-      <p class="law-desc zh-only">差异序列得以推进的必要条件。自由不是无限选择，而是结构允许新差异进入并被锻造为新结构的开放度——这是创新的本体根基。</p>
-      <p class="law-desc en-only">The necessary condition for difference-sequences to advance. Freedom is not infinite choice but the openness allowing new differences to enter and be forged into new structure — the ontological ground of innovation.</p>
-      <span class="law-keyword zh-only">鼓励创新突变</span><span class="law-keyword en-only">ENABLES MUTATION</span>
+    <div class="creds-card">
+      <div class="letter">SDE</div>
+      <h4 class="zh-only">发生学</h4><h4 class="en-only">Generativics</h4>
+      <p class="zh-only">结构-差异-纠缠三维引擎。S 在 E 中经 D 而发生——这是每个员工的运转机制。</p>
+      <p class="en-only">The S-D-E three-dimensional engine. S emerges in E through D — the operational mechanism of every employee.</p>
     </div>
-    <div class="law-card">
-      <div class="law-num zh-only">第 三 律</div><div class="law-num en-only">AXIOM III</div>
-      <div class="law-icon">H</div>
-      <div class="law-name-zh zh-only">幸福律</div>
-      <div class="law-name-en">Happiness Law</div>
-      <p class="law-desc zh-only">意义在主体经验中的回响。幸福不是欲望满足，而是 SDE 三维联动的成熟态在主体上的显露——这是文明的本体目标。</p>
-      <p class="law-desc en-only">The reverberation of meaning in subject-experience. Happiness is not desire-satisfaction but the manifestation in the subject of S-D-E coupled maturity — the ontological purpose of civilization.</p>
-      <span class="law-keyword zh-only">统整文明目标</span><span class="law-keyword en-only">INTEGRATES PURPOSE</span>
+    <div class="creds-card">
+      <div class="letter">三律</div>
+      <h4 class="zh-only">意义三律</h4><h4 class="en-only">Three Axioms</h4>
+      <p class="zh-only">特征律校准稳定 · 自由律开启创新 · 幸福律守护主体——这是每个员工的伦理底盘。</p>
+      <p class="en-only">Feature stabilizes · Freedom innovates · Happiness grounds being — the ethical bedrock of every employee.</p>
     </div>
   </div>
+  <a href="/philosophy/" class="btn-secondary zh-only">查看完整思想宇宙 →</a>
+  <a href="/philosophy/" class="btn-secondary en-only">View Full Philosophy →</a>
 </div>
 </section>
-<!-- BOOKS -->
-<section id="books">
-<div class="section-inner">
-  <div class="section-label zh-only">学术著作</div>
-  <div class="section-label en-only">Publications</div>
-  <h2 class="section-title zh-only">52部跨域专著</h2>
-  <h2 class="section-title en-only">52 Cross-Domain Monographs</h2>
-  <div class="section-divider"></div>
-  <p style="color:var(--text2);font-size:0.85rem;margin-top:0.5rem" class="zh-only">每部约20万字 · 2025年12月–2026年3月密集出版 · Bowker ISBN authorId 26927366 · 19部独著 · 33部与26位合作者共著 · 出版方：德麦国际有限公司</p>
-  <p style="color:var(--text2);font-size:0.85rem;margin-top:0.5rem" class="en-only">~200,000 characters each · Published Dec 2025–Mar 2026 · Bowker ISBN authorId 26927366 · 19 sole-authored · 33 co-authored with 26 collaborators · Demai International Pte. Ltd.</p>
-  <p style="color:var(--muted);font-size:0.75rem;margin-top:0.4rem;font-style:italic" class="zh-only">已收录 38 部基础信息 · 余下专著陆续录入</p>
-  <p style="color:var(--muted);font-size:0.75rem;margin-top:0.4rem;font-style:italic" class="en-only">38 monographs catalogued · remaining titles being added</p>
-  <div class="clusters-overview" id="clustersOverview"></div>
-  <div class="books-filter" id="booksFilter"></div>
-  <div class="books-grid" id="booksGrid"></div>
-</div>
-</section>
-<!-- VISION (意义文明) -->
-<section id="vision">
-<div class="vision-inner">
-  <div class="vision-eyebrow zh-only">意 义 文 明 · CIVILIZATION OF MEANING</div>
-  <div class="vision-eyebrow en-only">CIVILIZATION OF MEANING · 意 义 文 明</div>
-  <h2 class="vision-quote zh-only">让意义成为文明的第一生产力</h2>
-  <h2 class="vision-quote en-only">Let Meaning Become the Prime Productive Force of Civilization</h2>
-  <p class="vision-body zh-only">从"价值文明"向"意义文明"的转型——以生成逻辑为文明核心，以意义三律为社会算法。在 AI 时代，这不仅是哲学命题，更是文明结构重组的操作纲领：以特征律守住科学的真，以自由律打开创新的可能，以幸福律托起主体的存在。</p>
-  <p class="vision-body en-only">A transition from "civilization of value" to "civilization of meaning" — with generative logic as the civilizational core and the Three Axioms of Meaning as the social algorithm. In the AI era, this is not merely a philosophical proposition but an operational program for civilizational restructuring: hold the truth of science through Feature Law, open the possibility of innovation through Freedom Law, sustain the existence of the subject through Happiness Law.</p>
-  <div class="vision-axis">
-    <div class="vision-axis-item zh-only">特征律 · 守科学之真</div><div class="vision-axis-item en-only">FEATURE · TRUTH OF SCIENCE</div>
-    <div class="vision-axis-item zh-only">自由律 · 开创新之机</div><div class="vision-axis-item en-only">FREEDOM · OPENING OF NOVELTY</div>
-    <div class="vision-axis-item zh-only">幸福律 · 托主体之在</div><div class="vision-axis-item en-only">HAPPINESS · GROUND OF BEING</div>
+
+<!-- AUTHOR MINI -->
+<section id="author">
+<div class="author-inner">
+  <div class="author-portrait">王德生<br>Wang<br>Desheng</div>
+  <div class="author-info">
+    <h3 class="zh-only">王德生 博士 · 思想建筑师</h3>
+    <h3 class="en-only">Dr. Wang Desheng · Architect of Thought</h3>
+    <div class="tagline zh-only">SIO 本体论 · SDE 发生学创立者</div>
+    <div class="tagline en-only">Founder of SIO Ontology & SDE Generativics</div>
+    <p class="zh-only">计算数学博士（中国科学院）· 哥伦比亚大学博士后 · 新加坡南洋理工大学 13 年博导 · Demai International 创始人</p>
+    <p class="en-only">PhD Computational Mathematics (CAS) · Columbia postdoc · 13 years as PhD supervisor at NTU Singapore · Founder of Demai International</p>
+    <div class="meta zh-only">47 篇国际顶刊论文 · 52 部跨域专著 · Bowker authorID 26927366 · ORCID 0009-0009-8196-0030</div>
+    <div class="meta en-only">47 top-tier journal papers · 52 monographs · Bowker authorID 26927366 · ORCID 0009-0009-8196-0030</div>
   </div>
+  <a href="/philosophy/#about" class="author-link zh-only">完整学术履历 →</a>
+  <a href="/philosophy/#about" class="author-link en-only">Full Academic Profile →</a>
 </div>
 </section>
-<!-- PLATFORM -->
-<section id="platform">
-<div class="platform-bg"></div>
-<div class="platform-inner">
-  <div class="platform-badge zh-only">SDE 龙爪手平台</div>
-  <div class="platform-badge en-only">SDE DRAGON CLAW PLATFORM</div>
-  <h2 class="section-title zh-only" style="text-align:center">龙爪手 · 知识创新引擎</h2>
-  <h2 class="section-title en-only" style="text-align:center">Dragon Claw · Knowledge Innovation Engine</h2>
-  <div class="section-divider" style="margin:1.5rem auto"></div>
-  <p style="color:var(--text2);font-size:1rem;line-height:1.8" class="zh-only">基于SDE发生学的六模块科研自动化平台。全程零拷贝，一键流转——从课题到成果，龙爪手在每一个关键节点把SDE智慧注入你的研究过程。</p>
-  <p style="color:var(--text2);font-size:1rem;line-height:1.8" class="en-only">A six-module research automation platform built on SDE generativics. Zero-copy throughout, one-click flow — from topic to output, Dragon Claw injects SDE wisdom at every critical node of your research process.</p>
-  <div class="platform-modules">
-    <div class="module zh-only">① 课题诊断</div><div class="module en-only">① Topic Diagnosis</div>
-    <div class="module zh-only">② 文献解析</div><div class="module en-only">② Literature Analysis</div>
-    <div class="module zh-only">③ SDE发生</div><div class="module en-only">③ SDE Genesis</div>
-    <div class="module zh-only">④ 论文生成</div><div class="module en-only">④ Paper Generation</div>
-    <div class="module zh-only">⑤ 质量审查</div><div class="module en-only">⑤ Quality Review</div>
-    <div class="module zh-only">⑥ 期刊匹配</div><div class="module en-only">⑥ Journal Match</div>
-  </div>
-  <a href="#" class="cta-btn zh-only">进入龙爪手平台 →</a>
-  <a href="#" class="cta-btn en-only">Enter Dragon Claw Platform →</a>
-</div>
-</section>
+
 <!-- FOOTER -->
 <footer>
 <div class="footer-inner">
   <div class="footer-brand">
-    <div style="font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--gold);font-weight:700">SDE Universes</div>
-    <p class="zh-only">跨域知识发生学研究平台。SDE体系由王德生创立，由德麦国际有限公司运营，以新加坡为基地，面向全球。</p>
-    <p class="en-only">A cross-domain knowledge-genesis research platform. The SDE system was founded by Wang Desheng, operated by Demai International Pte. Ltd., based in Singapore.</p>
+    <h4>SDE Universes</h4>
+    <p class="zh-only">100 个 AI 超级员工平台。龙爪手锻造引擎驱动，SDE 发生学理论背书，由王德生创立，Demai International 运营，新加坡为基地，面向全球。</p>
+    <p class="en-only">A platform of 100 AI super-employees, powered by the Dragon Claw forging engine and backed by SDE Generativics. Founded by Wang Desheng, operated by Demai International, based in Singapore.</p>
   </div>
   <div class="footer-col">
-    <h4 class="zh-only">导航</h4><h4 class="en-only">Navigation</h4>
+    <h4 class="zh-only">平台</h4><h4 class="en-only">Platform</h4>
     <ul>
-      <li><a href="#about" class="zh-only">关于作者</a><a href="#about" class="en-only">About the Author</a></li>
-      <li><a href="#sde" class="zh-only">SDE 发生学</a><a href="#sde" class="en-only">SDE Generativics</a></li>
-      <li><a href="#laws" class="zh-only">意义三律</a><a href="#laws" class="en-only">Three Axioms</a></li>
-      <li><a href="#books" class="zh-only">专著系列</a><a href="#books" class="en-only">Publications</a></li>
-      <li><a href="#vision" class="zh-only">意义文明愿景</a><a href="#vision" class="en-only">Civilization Vision</a></li>
-      <li><a href="#platform" class="zh-only">龙爪手平台</a><a href="#platform" class="en-only">Dragon Claw</a></li>
+      <li><a href="#claw" class="zh-only">龙爪手</a><a href="#claw" class="en-only">Dragon Claw</a></li>
+      <li><a href="#matrix" class="zh-only">行业员工</a><a href="#matrix" class="en-only">Employees</a></li>
+      <li><a href="#credentials" class="zh-only">SDE 体系</a><a href="#credentials" class="en-only">SDE System</a></li>
+    </ul>
+  </div>
+  <div class="footer-col">
+    <h4 class="zh-only">思想</h4><h4 class="en-only">Thought</h4>
+    <ul>
+      <li><a href="/philosophy/#sde" class="zh-only">SDE 发生学</a><a href="/philosophy/#sde" class="en-only">SDE Generativics</a></li>
+      <li><a href="/philosophy/#laws" class="zh-only">意义三律</a><a href="/philosophy/#laws" class="en-only">Three Axioms</a></li>
+      <li><a href="/philosophy/#books" class="zh-only">52 部专著</a><a href="/philosophy/#books" class="en-only">52 Monographs</a></li>
+      <li><a href="/philosophy/#vision" class="zh-only">意义文明</a><a href="/philosophy/#vision" class="en-only">Civilization of Meaning</a></li>
     </ul>
   </div>
   <div class="footer-col">
     <h4 class="zh-only">联系</h4><h4 class="en-only">Contact</h4>
     <ul>
       <li><a href="mailto:desheng@sdeuniverses.com">desheng@sdeuniverses.com</a></li>
+      <li><a href="/philosophy/#about" class="zh-only">关于王德生</a><a href="/philosophy/#about" class="en-only">About Author</a></li>
       <li><a href="https://www.myidentifiers.com" target="_blank">Bowker #26927366</a></li>
-      <li><a href="#">ORCID 0009-0009-8196-0030</a></li>
     </ul>
   </div>
 </div>
@@ -487,160 +388,201 @@ body.zh .en-only{display:none}
   <span>SDE Universes · sdeuniverses.com</span>
 </div>
 </footer>
+
 <script>
-// ── LANGUAGE TOGGLE
+// ── LANGUAGE
 function setLang(lang){
   document.body.className=lang;
-  document.querySelectorAll('.lang-btn').forEach(b=>b.classList.toggle('active',b.textContent.toLowerCase()===lang||b.textContent==='中'&&lang==='zh'));
+  document.querySelectorAll('.lang-btn').forEach(b=>b.classList.toggle('active',b.textContent.toLowerCase()===lang||(b.textContent==='中'&&lang==='zh')));
   document.documentElement.lang=lang==='zh'?'zh':'en';
+  renderMatrix();
 }
-// ── BOOK DATA
-const domainMeta={
-  core:{zh:'本体论核心',en:'Ontology Core',cls:'d-core'},
-  civ: {zh:'文明与人文',en:'Civilization & Humanities',cls:'d-civ'},
-  gov: {zh:'治理与社科',en:'Governance & Social',cls:'d-gov'},
-  edu: {zh:'教育革命',en:'Education Revolution',cls:'d-edu'},
-  life:{zh:'健康与生命',en:'Health & Life',cls:'d-life'},
-  cre: {zh:'创造力',en:'Creativity & Originality',cls:'d-cre'},
-  ai:  {zh:'AI 时代前沿',en:'AI Frontier',cls:'d-ai'},
-  ph:  {zh:'信息待补',en:'Forthcoming',cls:'d-ph'}
-};
-const books=[
-  // ── A · 本体论核心（5）
-  {id:1, zh:'SIO哲学导论', en:'An Introduction to SIO Philosophy', d:'core', zhDesc:'SIO（主体-互动-客体）整体本体论的系统入门读本，奠定"存在即生成整体"的第一性命题。', enDesc:'Systematic introduction to SIO (Subject–Interaction–Object) holistic ontology, establishing the first-principle proposition that "existence is generative wholeness."'},
-  {id:2, zh:'SIO本体论', en:'SIO Ontology', d:'core', zhDesc:'SIO本体论的完整理论建构：主体、互动、客体不是分立部分，而是同一生成整体的三个面向。', enDesc:'Complete theoretical construction of SIO ontology: S, I, O are not separable parts but three facets of the same generative whole.'},
-  {id:3, zh:'SIO三大公理', en:'The Three Axioms of SIO', d:'core', zhDesc:'意义三律的奠基之作：特征律、自由律、幸福律，构成意义文明的社会算法。', enDesc:'Foundational treatise on the Three Axioms of Meaning — Feature Law, Freedom Law, Happiness Law — as the social algorithm of the Civilization of Meaning.'},
-  {id:4, zh:'SDE发生学', en:'SDE Genealogics', d:'core', zhDesc:'回答"存在如何发生"的操作系统：S（结构）-D（差异序列）-E（特征纠缠）三维引擎与六步迭代环。', enDesc:'The operational system answering "how existence comes to be": the S-D-E three-dimensional engine and six-step iterative loop.'},
-  {id:5, zh:'特征纠缠解码', en:'Decoding Feature Entanglement', d:'core', zhDesc:'深入解析E维度——特征如何通过构建、稳定、触发、释放的循环成为可行动的模块。', enDesc:'In-depth analysis of the E-dimension: how features become actionable modules through build–stabilize–trigger–release cycles.'},
 
-  // ── B · 文明与人文重构（5）
-  {id:6, zh:'西方哲学史', en:'A History of Western Philosophy', d:'civ', zhDesc:'以"同一性寿命"重写西方哲学史——每个哲学体系都是同一性张力的特定显露态。', enDesc:'Rewriting Western philosophical history through "identity-lifespan" — each philosophical system as a particular manifestation of identity-tension.'},
-  {id:7, zh:'中华文化导论', en:'Introduction to Chinese Culture', d:'civ', zhDesc:'以"第三位文化"框架重建中华文明诊断，超越东西二元对立的文化定位。', enDesc:'Rebuilding the diagnosis of Chinese civilization through the "Third-Position Culture" framework, beyond East-West binary opposition.'},
-  {id:8, zh:'中华文明之气', en:'The Qi of Chinese Civilization', d:'civ', zhDesc:'将"气"重新定义为文明节律逻辑——文明如何在张弛、聚散中维持其结构活性。', enDesc:'Redefining "Qi" as the rhythmic logic of civilization — how a civilization maintains structural vitality through tension and release.'},
-  {id:9, zh:'论艺术', en:'On Art', d:'civ', zhDesc:'以SIO/SDE对艺术进行发生学重建，揭示艺术从发现已有到发生新结构的根本跃迁。', enDesc:'Generative reconstruction of art through SIO/SDE, revealing the fundamental leap from "discovery of the given" to "genesis of the new."'},
-  {id:10, zh:'论自由', en:'On Freedom', d:'civ', zhDesc:'自由律的深度展开：自由不是无限选择，而是差异序列得以推进的必要条件。', enDesc:'Deep unfolding of the Freedom Law: freedom is not infinite choice but the necessary condition for difference-sequences to advance.'},
-
-  // ── C · 治理与社会科学（7）
-  {id:11, zh:'三律治理', en:'Three-Law Governance', d:'gov', zhDesc:'以意义三律重建治理理论：从控制范式转向意义生成范式的制度建构。', enDesc:'Rebuilding governance theory through the Three Axioms of Meaning: institutional construction shifting from control paradigm to meaning-generation paradigm.'},
-  {id:12, zh:'意义管理学', en:'Meaning Management', d:'gov', zhDesc:'管理学的根本转向：从控制效率转向意义生成，组织即意义场的设计与运营。', enDesc:'A fundamental turn in management: from control-of-efficiency to generation-of-meaning; the organization as a designed meaning-field.'},
-  {id:13, zh:'三元法学', en:'Triadic Law', d:'gov', zhDesc:'以SIO三元结构重写法学基础：法律不是规则集合，而是社会S-D-E三维的稳定机制。', enDesc:'Rewriting the foundations of jurisprudence through the SIO triad: law not as rule-set but as stabilization mechanism of the social S-D-E.'},
-  {id:14, zh:'SIO逻辑学导论', en:'An Introduction to SIO Logic', d:'gov', zhDesc:'逻辑学的本体论重建：推理不是符号演算，而是结构-差异-纠缠的合法推进。', enDesc:'Ontological reconstruction of logic: inference is not symbolic calculus but the legitimate advance of structure-difference-entanglement.'},
-  {id:15, zh:'生成认识论', en:'Generative Epistemology', d:'gov', zhDesc:'知识不是对预存对象的发现，而是在E中经D成S的发生过程——认识论的根本转向。', enDesc:'Knowledge is not discovery of pre-existing objects but the generative process "in E, through D, becomes S" — a fundamental epistemological turn.'},
-  {id:16, zh:'SIO心理学', en:'SIO Psychology', d:'gov', zhDesc:'心理学的本体论重写：心理不是内在状态，而是主体-互动-客体的动态平衡。', enDesc:'Ontological rewriting of psychology: the psyche is not inner-state but the dynamic equilibrium of subject-interaction-object.'},
-  {id:17, zh:'SIO经济学导论', en:'An Introduction to SIO Economics', d:'gov', zhDesc:'经济学的范式重建：经济活动作为意义生成场，价值即特征纠缠的可传态结晶。', enDesc:'Paradigm reconstruction of economics: economic activity as meaning-generation field; value as transmittable crystallization of feature-entanglement.'},
-
-  // ── D · 教育革命（6 部 — 标题待录入）
-  {id:18, zh:'教育革命系列 · 第一卷', en:'Education Revolution · Vol. I', d:'edu', zhDesc:'六部教育系列之一：从基础教育到大学改革到学习科学的SIO/SDE重构。详细书名信息陆续录入。', enDesc:'Volume I of the six-book education series: SIO/SDE reconstruction from K-12 to university reform to learning science. Title details forthcoming.'},
-  {id:19, zh:'教育革命系列 · 第二卷', en:'Education Revolution · Vol. II', d:'edu', zhDesc:'核心命题：学习不是知识传递，而是意义生成。详细书名信息陆续录入。', enDesc:'Core thesis: learning is not knowledge transmission but meaning generation. Title details forthcoming.'},
-  {id:20, zh:'教育革命系列 · 第三卷', en:'Education Revolution · Vol. III', d:'edu', zhDesc:'大学不是知识看门人，而是创业母机与知识平台。详细书名信息陆续录入。', enDesc:'The university is not a gatekeeper of knowledge but an entrepreneurial mothership and knowledge platform. Title details forthcoming.'},
-  {id:21, zh:'教育革命系列 · 第四卷', en:'Education Revolution · Vol. IV', d:'edu', zhDesc:'六部教育系列之四。详细书名信息陆续录入。', enDesc:'Volume IV of the education revolution series. Title details forthcoming.'},
-  {id:22, zh:'教育革命系列 · 第五卷', en:'Education Revolution · Vol. V', d:'edu', zhDesc:'六部教育系列之五。详细书名信息陆续录入。', enDesc:'Volume V of the education revolution series. Title details forthcoming.'},
-  {id:23, zh:'教育革命系列 · 第六卷', en:'Education Revolution · Vol. VI', d:'edu', zhDesc:'六部教育系列之六。详细书名信息陆续录入。', enDesc:'Volume VI of the education revolution series. Title details forthcoming.'},
-
-  // ── E · 健康与生命科学（7 部 — 标题待录入）
-  {id:24, zh:'健康生命系列 · 第一卷', en:'Health & Life · Vol. I', d:'life', zhDesc:'七部健康系列之一：从"指标控制"转向"结构重建"——慢性病作为SDE三维耦合的中间阶段失败。详细书名陆续录入。', enDesc:'Volume I of the seven-book health series: from "indicator-control" to "structural reconstruction" — chronic disease as failure at the intermediate stage of SDE coupling. Title details forthcoming.'},
-  {id:25, zh:'健康生命系列 · 第二卷', en:'Health & Life · Vol. II', d:'life', zhDesc:'高血压的SDE结构重建——超越降压药物的指标主义。详细书名陆续录入。', enDesc:'Structural reconstruction of hypertension via SDE — beyond the indicator-ism of antihypertensive drugs. Title details forthcoming.'},
-  {id:26, zh:'健康生命系列 · 第三卷', en:'Health & Life · Vol. III', d:'life', zhDesc:'糖尿病的发生学诊断与意义重建。详细书名陆续录入。', enDesc:'Generative diagnosis and meaning reconstruction of diabetes. Title details forthcoming.'},
-  {id:27, zh:'健康生命系列 · 第四卷', en:'Health & Life · Vol. IV', d:'life', zhDesc:'心血管疾病的SIO视角：从血管壁修复到生命节律重建。详细书名陆续录入。', enDesc:'Cardiovascular disease through SIO lens: from vessel-wall repair to life-rhythm reconstruction. Title details forthcoming.'},
-  {id:28, zh:'健康生命系列 · 第五卷', en:'Health & Life · Vol. V', d:'life', zhDesc:'抑郁症作为E3点火与续航机制被持续按压的纠缠态。详细书名陆续录入。', enDesc:'Depression as an entangled state where E3 ignition and endurance mechanisms are persistently suppressed. Title details forthcoming.'},
-  {id:29, zh:'健康生命系列 · 第六卷', en:'Health & Life · Vol. VI', d:'life', zhDesc:'七部健康系列之六。详细书名陆续录入。', enDesc:'Volume VI of the health & life series. Title details forthcoming.'},
-  {id:30, zh:'健康生命系列 · 第七卷', en:'Health & Life · Vol. VII', d:'life', zhDesc:'七部健康系列之七。详细书名陆续录入。', enDesc:'Volume VII of the health & life series. Title details forthcoming.'},
-
-  // ── F · 创造力与原创性（4 部 — 标题待录入）
-  {id:31, zh:'创造力系列 · 第一卷', en:'Creativity & Originality · Vol. I', d:'cre', zhDesc:'四部创造力系列之一：将原创性从"天赋/灵感"拆解为可诊断、可训练的发生学机制。详细书名陆续录入。', enDesc:'Volume I of the four-book creativity series: disassembling originality from "talent/inspiration" into diagnosable, trainable generative mechanisms. Title details forthcoming.'},
-  {id:32, zh:'创造力系列 · 第二卷', en:'Creativity & Originality · Vol. II', d:'cre', zhDesc:'四部创造力系列之二：龙爪手六爪动作链的实战展开。详细书名陆续录入。', enDesc:'Volume II: practical unfolding of the Dragon Claw six-claw action chain. Title details forthcoming.'},
-  {id:33, zh:'创造力系列 · 第三卷', en:'Creativity & Originality · Vol. III', d:'cre', zhDesc:'四部创造力系列之三：知识武器锻造五律。详细书名陆续录入。', enDesc:'Volume III: the five laws of knowledge weapon-forging. Title details forthcoming.'},
-  {id:34, zh:'创造力系列 · 第四卷', en:'Creativity & Originality · Vol. IV', d:'cre', zhDesc:'四部创造力系列之四：人机复合创新体的运行机制。详细书名陆续录入。', enDesc:'Volume IV: operating mechanisms of human-machine composite innovation entities. Title details forthcoming.'},
-
-  // ── G · AI 时代前沿（4 部 — 标题待录入）
-  {id:35, zh:'AI前沿系列 · 第一卷', en:'AI Frontier · Vol. I', d:'ai', zhDesc:'四部AI系列之一：人机复合智能体的SDE结构。详细书名陆续录入。', enDesc:'Volume I of the four-book AI series: the SDE structure of human-machine composite intelligence. Title details forthcoming.'},
-  {id:36, zh:'AI前沿系列 · 第二卷', en:'AI Frontier · Vol. II', d:'ai', zhDesc:'AGI的结构性困境——大模型E2极强但E1为空、E3不存在的本体论缺陷。详细书名陆续录入。', enDesc:'The structural impasse of AGI: large models with strong E2 but empty E1 and absent E3 — an ontological deficiency. Title details forthcoming.'},
-  {id:37, zh:'AI前沿系列 · 第三卷', en:'AI Frontier · Vol. III', d:'ai', zhDesc:'问题创造力作为GPT时代的第一生产力。详细书名陆续录入。', enDesc:'Problem-creativity as the prime productive force of the GPT era. Title details forthcoming.'},
-  {id:38, zh:'AI前沿系列 · 第四卷', en:'AI Frontier · Vol. IV', d:'ai', zhDesc:'内卷的结构性诊断与突围路径——从SDE视角看高维S牵引的缺失。详细书名陆续录入。', enDesc:'Structural diagnosis and breakthrough pathways for involution — examining the absence of higher-dimensional S-traction from an SDE perspective. Title details forthcoming.'},
+// ── INDUSTRY DATA (10 industries)
+const industries=[
+  {id:'edu', zh:'教育',    en:'Education',  tag:'learning as meaning-genesis'},
+  {id:'law', zh:'法律',    en:'Law',        tag:'triadic jurisprudence'},
+  {id:'med', zh:'医疗',    en:'Medicine',   tag:'health as structural reconstruction'},
+  {id:'ent', zh:'企业管理',en:'Enterprise', tag:'organization as meaning-field'},
+  {id:'art', zh:'艺术创作',en:'Arts',       tag:'from discovery to genesis'},
+  {id:'aca', zh:'学术研究',en:'Academia',   tag:'paper as knowledge weapon'},
+  {id:'fin', zh:'金融投资',en:'Finance',    tag:'value as feature-entanglement'},
+  {id:'mda', zh:'媒体传播',en:'Media',      tag:'narrative as difference-flow'},
+  {id:'gov', zh:'公共治理',en:'Governance', tag:'society as S-D-E coupling'},
+  {id:'tec', zh:'科技创新',en:'Tech',       tag:'product as generative body'}
 ];
-// ── RENDER BOOKS
-const filterEl=document.getElementById('booksFilter');
-const gridEl=document.getElementById('booksGrid');
-let activeDomain='all';
-const allDomains=['all',...new Set(books.map(b=>b.d))];
-allDomains.forEach(d=>{
-  const btn=document.createElement('button');
-  btn.className='filter-btn'+(d==='all'?' active':'');
+
+// ── EMPLOYEES (99 total — 10 per industry except tec=9)
+const employees=[
+  // 教育 Education (10)
+  {i:'edu', zh:'课程设计师',   en:'Course Designer',         zhDesc:'根据学生画像生成个性化课程大纲与学习路径。', enDesc:'Personalized course outlines & learning paths.'},
+  {i:'edu', zh:'教案发生器',   en:'Lesson Generator',        zhDesc:'一键生成完整教案 + 教学步骤 + 课堂互动设计。', enDesc:'One-click full lesson plans & interactive design.'},
+  {i:'edu', zh:'作业诊断师',   en:'Homework Diagnostician',  zhDesc:'诊断学生作业中的结构性漏洞与发生学断点。', enDesc:'Diagnose structural gaps in student work.'},
+  {i:'edu', zh:'个性化辅导员', en:'Personalized Tutor',      zhDesc:'基于 SDE 发生学的一对一动态辅导。', enDesc:'One-on-one tutoring via SDE generativics.'},
+  {i:'edu', zh:'考试命题师',   en:'Exam Designer',           zhDesc:'按知识发生路径出题，而非按知识点清单。', enDesc:'Exam items built on knowledge-genesis pathways.'},
+  {i:'edu', zh:'学习路径规划师',en:'Learning Path Planner',  zhDesc:'为跨学科学习者规划长程发展路径。', enDesc:'Long-range paths for cross-disciplinary learners.'},
+  {i:'edu', zh:'论文指导师',   en:'Thesis Coach',            zhDesc:'学位论文从选题到定稿的全程陪跑。', enDesc:'End-to-end thesis coaching, topic to defense.'},
+  {i:'edu', zh:'教材改写师',   en:'Textbook Rewriter',       zhDesc:'把现有教材用 SDE 发生顺序重写。', enDesc:'Rewrite textbooks in SDE generative order.'},
+  {i:'edu', zh:'教育咨询师',   en:'Education Consultant',    zhDesc:'学校/机构层面的教育改革咨询。', enDesc:'School-level education reform consulting.'},
+  {i:'edu', zh:'学习动机师',   en:'Motivation Coach',        zhDesc:'重建学习者的意义动机与内在驱动。', enDesc:'Rebuild learners\' meaning-driven motivation.'},
+
+  // 法律 Law (10)
+  {i:'law', zh:'合同审查师',   en:'Contract Reviewer',       zhDesc:'条款风险识别、对手方陷阱扫描、修订建议。', enDesc:'Risk detection, trap scanning, revision advice.'},
+  {i:'law', zh:'法律文书撰写师',en:'Legal Document Drafter', zhDesc:'起诉状、答辩状、法律意见书一键生成。', enDesc:'One-click pleadings & legal opinions.'},
+  {i:'law', zh:'案例检索师',   en:'Case Retriever',          zhDesc:'全球判例库检索 + 相似度排序 + 要点提炼。', enDesc:'Global case search, similarity ranking, key points.'},
+  {i:'law', zh:'法律顾问',     en:'Legal Advisor',           zhDesc:'企业/个人法律咨询 · 可工作的策略建议。', enDesc:'Actionable legal strategy for firms & individuals.'},
+  {i:'law', zh:'合规审查师',   en:'Compliance Reviewer',     zhDesc:'跨司法辖区合规要点与冲突点识别。', enDesc:'Multi-jurisdiction compliance review.'},
+  {i:'law', zh:'知识产权专员', en:'IP Specialist',           zhDesc:'专利/商标/著作权的布局与风险诊断。', enDesc:'Patent/trademark/copyright strategy & risk.'},
+  {i:'law', zh:'诉讼策略师',   en:'Litigation Strategist',   zhDesc:'诉讼路径规划 · 证据链梳理 · 对抗预测。', enDesc:'Litigation paths, evidence chains, adversary prediction.'},
+  {i:'law', zh:'劳动法顾问',   en:'Labor Law Advisor',       zhDesc:'用工合规 · 劳动争议 · 员工关系处理。', enDesc:'Employment compliance, disputes, HR relations.'},
+  {i:'law', zh:'国际商法顾问', en:'Int\'l Commercial Law',   zhDesc:'跨境交易合规 · 国际仲裁 · 制裁合规。', enDesc:'Cross-border compliance, arbitration, sanctions.'},
+  {i:'law', zh:'法律培训师',   en:'Legal Trainer',           zhDesc:'面向非法律人员的企业法务能力培训。', enDesc:'Legal training for non-lawyers in enterprises.'},
+
+  // 医疗 Medicine (10)
+  {i:'med', zh:'诊断助理',     en:'Diagnostic Assistant',    zhDesc:'症状分析 · 鉴别诊断 · 检查建议。', enDesc:'Symptom analysis, differential diagnosis, test advice.'},
+  {i:'med', zh:'慢病管理师',   en:'Chronic Disease Manager', zhDesc:'高血压/糖尿病从指标控制转向结构重建。', enDesc:'Chronic disease: from indicators to structure.'},
+  {i:'med', zh:'心理健康顾问', en:'Mental Health Advisor',   zhDesc:'抑郁/焦虑的 SDE 视角诊断与干预。', enDesc:'Depression/anxiety diagnosis via SDE.'},
+  {i:'med', zh:'营养规划师',   en:'Nutrition Planner',       zhDesc:'个性化营养方案 · 慢性病膳食干预。', enDesc:'Personalized nutrition & dietary interventions.'},
+  {i:'med', zh:'康复指导师',   en:'Rehab Coach',             zhDesc:'术后康复 · 运动康复 · 功能重建。', enDesc:'Post-op, sports, and functional rehabilitation.'},
+  {i:'med', zh:'医患沟通师',   en:'Doctor-Patient Bridge',   zhDesc:'医嘱翻译 · 就医流程 · 医患矛盾调解。', enDesc:'Translating medical advice; mediating disputes.'},
+  {i:'med', zh:'病历整理师',   en:'Medical Record Organizer',zhDesc:'多家医院病历整合 · 时间线重建。', enDesc:'Integrate records across hospitals into timelines.'},
+  {i:'med', zh:'医学文献分析师',en:'Medical Literature Analyst',zhDesc:'最新研究综述 · 证据等级评估。', enDesc:'Latest research reviews, evidence-level grading.'},
+  {i:'med', zh:'睡眠改善师',   en:'Sleep Optimizer',         zhDesc:'睡眠结构诊断 · 节律重建方案。', enDesc:'Sleep architecture diagnosis & rhythm rebuild.'},
+  {i:'med', zh:'长寿策略师',   en:'Longevity Strategist',    zhDesc:'Sirtuins-AMPK-mTOR 三角的个性化干预。', enDesc:'Personalized Sirtuins-AMPK-mTOR interventions.'},
+
+  // 企业管理 Enterprise (10)
+  {i:'ent', zh:'战略咨询师',   en:'Strategy Consultant',     zhDesc:'企业战略诊断 · 方向选择 · 路径规划。', enDesc:'Strategy diagnosis, direction, path planning.'},
+  {i:'ent', zh:'组织诊断师',   en:'Org Diagnostician',       zhDesc:'组织能力 · 文化 · 结构三维诊断。', enDesc:'Org capability, culture, structure diagnosis.'},
+  {i:'ent', zh:'HR 规划师',   en:'HR Planner',              zhDesc:'人才梯队 · 能力模型 · 继任规划。', enDesc:'Talent pipeline, competency models, succession.'},
+  {i:'ent', zh:'商业模式设计师',en:'Business Model Designer',zhDesc:'价值主张 · 盈利模式 · 护城河设计。', enDesc:'Value prop, revenue model, moat design.'},
+  {i:'ent', zh:'运营优化师',   en:'Ops Optimizer',           zhDesc:'流程再造 · 效率提升 · 成本结构。', enDesc:'Process redesign, efficiency, cost structure.'},
+  {i:'ent', zh:'企业文化建构师',en:'Culture Builder',        zhDesc:'以意义三律重建企业文化底盘。', enDesc:'Rebuild culture via the Three Axioms of Meaning.'},
+  {i:'ent', zh:'绩效设计师',   en:'Performance Designer',    zhDesc:'KPI/OKR 设计 · 激励机制 · 考核闭环。', enDesc:'KPI/OKR design, incentives, feedback loops.'},
+  {i:'ent', zh:'领导力教练',   en:'Leadership Coach',        zhDesc:'CEO/高管一对一发展教练。', enDesc:'CEO/executive one-on-one development.'},
+  {i:'ent', zh:'危机管理师',   en:'Crisis Manager',          zhDesc:'重大危机响应 · 声誉修复 · 情景推演。', enDesc:'Major crisis response, reputation, scenarios.'},
+  {i:'ent', zh:'董事会顾问',   en:'Board Advisor',           zhDesc:'董事会议程 · 治理结构 · 股东沟通。', enDesc:'Board agenda, governance, shareholder comm.'},
+
+  // 艺术创作 Arts (10)
+  {i:'art', zh:'剧本发生师',   en:'Screenplay Genesis',      zhDesc:'剧本从主题到场次的 SDE 结构化发生。', enDesc:'Screenplay genesis from theme to scenes via SDE.'},
+  {i:'art', zh:'小说结构师',   en:'Novel Architect',         zhDesc:'长篇小说的底层结构与节奏设计。', enDesc:'Deep structure & pacing for long-form fiction.'},
+  {i:'art', zh:'诗歌炼字师',   en:'Poetry Refiner',          zhDesc:'意象选择 · 声韵打磨 · 张力控制。', enDesc:'Imagery, sonic refinement, tension control.'},
+  {i:'art', zh:'艺术评论师',   en:'Art Critic',              zhDesc:'作品的发生学评论 · 超越风格学分析。', enDesc:'Generative criticism beyond stylistic analysis.'},
+  {i:'art', zh:'视觉概念师',   en:'Visual Concept',          zhDesc:'品牌/展览/插画的视觉概念生成。', enDesc:'Visual concepts for brands, exhibits, illustrations.'},
+  {i:'art', zh:'音乐结构师',   en:'Music Architect',         zhDesc:'编曲结构 · 情绪曲线 · 段落发生学。', enDesc:'Arrangement, emotion curves, section genesis.'},
+  {i:'art', zh:'舞蹈编导',     en:'Choreographer',           zhDesc:'舞蹈动机发生 · 空间调度 · 叙事整合。', enDesc:'Motif genesis, spatial design, narrative.'},
+  {i:'art', zh:'游戏叙事师',   en:'Game Narrator',           zhDesc:'游戏世界观 · 任务链 · 玩家体验弧。', enDesc:'Worldbuilding, quest chains, player arcs.'},
+  {i:'art', zh:'广告文案师',   en:'Ad Copywriter',           zhDesc:'洞察-概念-文案的三阶生成。', enDesc:'Insight-concept-copy three-stage generation.'},
+  {i:'art', zh:'品牌美学师',   en:'Brand Aesthetician',      zhDesc:'品牌视觉体系 · 调性 · 触点设计。', enDesc:'Brand visual system, tone, touchpoints.'},
+
+  // 学术研究 Academia (10)
+  {i:'aca', zh:'文献综述师',   en:'Literature Reviewer',     zhDesc:'研究领域全景综述 · 流派谱系梳理。', enDesc:'Panoramic reviews, school lineage mapping.'},
+  {i:'aca', zh:'研究设计师',   en:'Research Designer',       zhDesc:'研究问题 · 方法选择 · 效度保障。', enDesc:'Research questions, methodology, validity.'},
+  {i:'aca', zh:'论文发生师',   en:'Paper Geneticist',        zhDesc:'论文从裂缝识别到成文的完整发生。', enDesc:'Full paper genesis: fissure to publication.'},
+  {i:'aca', zh:'数据分析师',   en:'Data Analyst',            zhDesc:'定量分析 · 可视化 · 统计诊断。', enDesc:'Quant analysis, visualization, diagnostics.'},
+  {i:'aca', zh:'同行评议师',   en:'Peer Reviewer',           zhDesc:'投稿前的预审 · 反驳预测 · 修订建议。', enDesc:'Pre-submit review, rebuttal prediction.'},
+  {i:'aca', zh:'学术写作教练', en:'Academic Writing Coach',  zhDesc:'论文语言 · 论证链 · 读者意识训练。', enDesc:'Prose, argumentation, reader-awareness.'},
+  {i:'aca', zh:'开题报告师',   en:'Proposal Writer',         zhDesc:'博硕开题 · 基金申请 · 评审导向。', enDesc:'Thesis proposals, grant applications.'},
+  {i:'aca', zh:'期刊匹配师',   en:'Journal Matcher',         zhDesc:'投稿期刊精准匹配 · 影响因子 · 审稿周期。', enDesc:'Journal matching, IF, review timelines.'},
+  {i:'aca', zh:'答辩训练师',   en:'Defense Trainer',         zhDesc:'答辩情景演练 · 关键问题预判。', enDesc:'Defense rehearsals & critical Q prediction.'},
+  {i:'aca', zh:'课题诊断师',   en:'Topic Diagnostician',     zhDesc:'研究方向的裂缝扫描与生长性评估。', enDesc:'Fissure scan & growth assessment of research.'},
+
+  // 金融投资 Finance (10)
+  {i:'fin', zh:'投研分析师',   en:'Investment Researcher',   zhDesc:'行业/公司深度研究 · 估值建模。', enDesc:'Deep industry/company research, valuation.'},
+  {i:'fin', zh:'财报解读师',   en:'Financial Statement Reader',zhDesc:'三表联动分析 · 异常点识别。', enDesc:'Three-statement analysis, anomaly detection.'},
+  {i:'fin', zh:'宏观经济分析师',en:'Macro Analyst',          zhDesc:'宏观周期 · 政策解读 · 资产配置建议。', enDesc:'Macro cycles, policy, asset allocation.'},
+  {i:'fin', zh:'量化策略师',   en:'Quant Strategist',        zhDesc:'因子挖掘 · 回测 · 策略组合。', enDesc:'Factor mining, backtesting, portfolios.'},
+  {i:'fin', zh:'风险管理师',   en:'Risk Manager',            zhDesc:'VaR/压力测试 · 尾部风险识别。', enDesc:'VaR, stress tests, tail risk.'},
+  {i:'fin', zh:'个人财务规划师',en:'Personal Finance Planner',zhDesc:'家庭资产规划 · 税务 · 传承。', enDesc:'Family wealth, tax, succession planning.'},
+  {i:'fin', zh:'公司估值师',   en:'Corporate Valuator',      zhDesc:'DCF/可比/期权法估值与敏感度分析。', enDesc:'DCF/comparables/options valuation.'},
+  {i:'fin', zh:'行业研究师',   en:'Industry Researcher',     zhDesc:'行业图谱 · 竞争格局 · 投资机会。', enDesc:'Industry maps, competition, opportunities.'},
+  {i:'fin', zh:'尽调专员',     en:'Due Diligence Specialist',zhDesc:'财务/法务/商业尽调要点清单。', enDesc:'Financial, legal, commercial DD checklists.'},
+  {i:'fin', zh:'并购顾问',     en:'M&A Advisor',             zhDesc:'交易结构 · 估值谈判 · 整合路径。', enDesc:'Deal structuring, valuation, integration.'},
+
+  // 媒体传播 Media (10)
+  {i:'mda', zh:'新闻写作师',   en:'News Writer',             zhDesc:'事实核查 · 结构化叙事 · 中立表达。', enDesc:'Fact-checking, narrative, neutral voice.'},
+  {i:'mda', zh:'深度报道师',   en:'Feature Reporter',        zhDesc:'长篇深度报道的选题、采访、写作。', enDesc:'Long-form features: topic, interview, write.'},
+  {i:'mda', zh:'社交媒体策划师',en:'Social Media Planner',   zhDesc:'平台策略 · 内容日历 · 互动设计。', enDesc:'Platform strategy, content calendar, engagement.'},
+  {i:'mda', zh:'短视频脚本师', en:'Short Video Writer',      zhDesc:'抖音/小红书/YouTube Shorts 脚本。', enDesc:'TikTok/Reels/Shorts scripts.'},
+  {i:'mda', zh:'播客策划师',   en:'Podcast Producer',        zhDesc:'播客选题 · 嘉宾策略 · 节目结构。', enDesc:'Podcast topics, guest strategy, structure.'},
+  {i:'mda', zh:'传播策略师',   en:'Comms Strategist',        zhDesc:'品牌/组织的整合传播战略。', enDesc:'Integrated communication strategy.'},
+  {i:'mda', zh:'公关危机师',   en:'PR Crisis Manager',       zhDesc:'舆情监测 · 危机响应 · 声誉修复。', enDesc:'Sentiment, crisis response, reputation.'},
+  {i:'mda', zh:'新媒体运营师', en:'New Media Operator',      zhDesc:'账号运营 · 粉丝增长 · 变现路径。', enDesc:'Account ops, audience growth, monetization.'},
+  {i:'mda', zh:'内容编辑师',   en:'Content Editor',          zhDesc:'稿件编辑 · 风格统一 · 事实校验。', enDesc:'Editorial: style unification, fact-checking.'},
+  {i:'mda', zh:'品牌故事师',   en:'Brand Storyteller',       zhDesc:'品牌的本源故事 · 叙事线构建。', enDesc:'Brand origin story, narrative arc design.'},
+
+  // 公共治理 Governance (10)
+  {i:'gov', zh:'政策研究师',   en:'Policy Researcher',       zhDesc:'公共政策分析 · 比较研究 · 建议报告。', enDesc:'Policy analysis, comparative studies, memos.'},
+  {i:'gov', zh:'社区治理师',   en:'Community Governor',      zhDesc:'社区自治 · 居民参与 · 矛盾调解。', enDesc:'Self-governance, participation, mediation.'},
+  {i:'gov', zh:'社会创新师',   en:'Social Innovator',        zhDesc:'社会问题的发生学诊断与系统性创新。', enDesc:'Genetic diagnosis & systemic innovation.'},
+  {i:'gov', zh:'城市规划师',   en:'Urban Planner',           zhDesc:'城市空间 · 功能分区 · 人本尺度。', enDesc:'Urban spaces, zoning, human scale.'},
+  {i:'gov', zh:'环境治理师',   en:'Env Governance',          zhDesc:'环保政策 · ESG 战略 · 可持续方案。', enDesc:'Environmental policy, ESG, sustainability.'},
+  {i:'gov', zh:'公共服务设计师',en:'Public Service Designer', zhDesc:'政府服务的用户体验再设计。', enDesc:'Gov service UX redesign.'},
+  {i:'gov', zh:'社会调研师',   en:'Social Researcher',       zhDesc:'问卷/访谈/民族志 · 混合方法研究。', enDesc:'Surveys, interviews, ethnography, mixed methods.'},
+  {i:'gov', zh:'非营利运营师', en:'NGO Operator',            zhDesc:'NGO 战略 · 募款 · 项目评估。', enDesc:'NGO strategy, fundraising, evaluation.'},
+  {i:'gov', zh:'政府沟通师',   en:'Gov Communications',      zhDesc:'政策阐释 · 公众沟通 · 危机应对。', enDesc:'Policy explanation, public comms, crisis.'},
+  {i:'gov', zh:'青年发展师',   en:'Youth Development',       zhDesc:'青年政策 · 成长支持 · 代际对话。', enDesc:'Youth policy, development, generational dialogue.'},
+
+  // 科技创新 Tech (9)
+  {i:'tec', zh:'AI 应用设计师',en:'AI App Designer',         zhDesc:'AI 产品的场景发掘与体验设计。', enDesc:'AI product scenarios & experience design.'},
+  {i:'tec', zh:'产品发生师',   en:'Product Genesis',         zhDesc:'产品从需求裂缝到 MVP 的完整发生。', enDesc:'Full product genesis from fissure to MVP.'},
+  {i:'tec', zh:'UX 研究师',   en:'UX Researcher',           zhDesc:'用户研究 · 体验地图 · 可用性测试。', enDesc:'User research, journey maps, usability.'},
+  {i:'tec', zh:'技术评估师',   en:'Tech Evaluator',          zhDesc:'新技术成熟度 · 落地性 · ROI 评估。', enDesc:'Tech maturity, viability, ROI assessment.'},
+  {i:'tec', zh:'原型设计师',   en:'Prototyper',              zhDesc:'快速原型 · 交互验证 · 迭代优化。', enDesc:'Rapid prototypes, interaction validation.'},
+  {i:'tec', zh:'专利策略师',   en:'Patent Strategist',       zhDesc:'技术专利布局 · 规避设计 · 许可策略。', enDesc:'Patent portfolio, design-around, licensing.'},
+  {i:'tec', zh:'开源项目顾问', en:'OSS Advisor',             zhDesc:'开源战略 · 社区运营 · 商业化路径。', enDesc:'OSS strategy, community, commercialization.'},
+  {i:'tec', zh:'创业孵化师',   en:'Startup Incubator',       zhDesc:'从 0 到 1 · 早期团队 · 融资路径。', enDesc:'Zero-to-one, early team, fundraising paths.'},
+  {i:'tec', zh:'科技伦理师',   en:'Tech Ethicist',           zhDesc:'AI/基因/数据科技的伦理审查。', enDesc:'Ethics review: AI, genomics, data tech.'}
+];
+
+// ── RENDER MATRIX
+let activeInd='all';
+const tabsEl=document.getElementById('industriesTabs');
+const gridEl=document.getElementById('employeesGrid');
+
+function renderTabs(){
   const isZh=document.body.classList.contains('zh');
-  btn.innerHTML=d==='all'?(isZh?`全部 (${books.length})`:`All (${books.length})`):(domainMeta[d]?.zh||d);
-  btn.dataset.domain=d;
-  btn.onclick=()=>{
-    activeDomain=d;
-    document.querySelectorAll('.filter-btn').forEach(b=>b.classList.toggle('active',b.dataset.domain===d));
-    renderBooks();
-  };
-  filterEl.appendChild(btn);
+  const all=[{id:'all',zh:'全部',en:'All',count:employees.length}]
+    .concat(industries.map(i=>({...i,count:employees.filter(e=>e.i===i.id).length})));
+  tabsEl.innerHTML=all.map(t=>`
+    <button class="tab-btn${t.id===activeInd?' active':''}" data-ind="${t.id}" onclick="selectInd('${t.id}')">
+      <span>${isZh?t.zh:t.en}</span>
+      <span class="tab-count">${t.count}</span>
+    </button>`).join('');
+}
+
+function renderGrid(){
+  const isZh=document.body.classList.contains('zh');
+  const filtered=activeInd==='all'?employees:employees.filter(e=>e.i===activeInd);
+  gridEl.innerHTML=filtered.map(e=>{
+    const ind=industries.find(i=>i.id===e.i);
+    return`<a class="emp-card" href="#" data-emp="${e.en.toLowerCase().replace(/[^a-z0-9]/g,'-')}">
+      <div class="emp-badge-soon">${isZh?'即将开通':'SOON'}</div>
+      <div class="emp-industry">${isZh?ind.zh:ind.en}</div>
+      <div class="emp-name">${isZh?e.zh:e.en}</div>
+      <div class="emp-name-en">${isZh?e.en:e.zh}</div>
+      <div class="emp-desc">${isZh?e.zhDesc:e.enDesc}</div>
+      <div class="emp-enter">
+        <span>${isZh?'进入工作台':'ENTER'}</span>
+        <span class="arrow">→</span>
+      </div>
+    </a>`;
+  }).join('');
+}
+
+function renderMatrix(){renderTabs();renderGrid();}
+
+window.selectInd=function(id){
+  activeInd=id;
+  renderMatrix();
+};
+
+renderMatrix();
+
+// Prevent employee cards/claw link from navigating (placeholder URLs)
+document.addEventListener('click',e=>{
+  const t=e.target.closest('[data-emp]');
+  if(t){e.preventDefault();alert((document.body.classList.contains('zh')?'此员工工作台即将开通。':'This employee tool is coming soon.')+'\n\nID: '+t.dataset.emp);}
 });
-function renderBooks(){
-  const isZh=document.body.classList.contains('zh');
-  const filtered=activeDomain==='all'?books:books.filter(b=>b.d===activeDomain);
-  gridEl.innerHTML=filtered.map(b=>{
-    const dm=domainMeta[b.d]||{zh:b.d,en:b.d,cls:'d-ph'};
-    return`<div class="book-card">
-      <div class="book-cover ${dm.cls}">
-        <div class="book-cover-title">${isZh?b.zh:b.en}</div>
-        <div class="book-cover-num">${String(b.id).padStart(2,'0')}</div>
-      </div>
-      <div class="book-info">
-        <div class="book-domain">${isZh?dm.zh:dm.en}</div>
-        <div class="book-title">${isZh?b.zh:b.en}</div>
-        <div class="book-desc">${isZh?b.zhDesc:b.enDesc}</div>
-      </div>
-    </div>`;
-  }).join('');
-}
-renderBooks();
-
-// ── RENDER 7-CLUSTER OVERVIEW
-const clusterTagline={
-  core:{zh:'存在的第一性原理',en:'First principles of being'},
-  civ: {zh:'文明的发生学重写',en:'Genetic rewriting of civilization'},
-  gov: {zh:'治理与社会的范式重建',en:'Paradigm rebuild of governance'},
-  edu: {zh:'学习作为意义生成',en:'Learning as meaning-genesis'},
-  life:{zh:'健康作为结构重建',en:'Health as structural reconstruction'},
-  cre: {zh:'原创性的发生学机制',en:'Generative mechanics of originality'},
-  ai:  {zh:'人机复合智能的本体根基',en:'Ontological ground of hybrid intelligence'}
-};
-const clustersEl=document.getElementById('clustersOverview');
-function renderClusters(){
-  const isZh=document.body.classList.contains('zh');
-  const order=['core','civ','gov','edu','life','cre','ai'];
-  clustersEl.innerHTML=order.map(d=>{
-    const dm=domainMeta[d]; if(!dm) return '';
-    const count=books.filter(b=>b.d===d).length;
-    const tag=clusterTagline[d]||{zh:'',en:''};
-    return`<div class="cluster-card" data-d="${d}" onclick="selectCluster('${d}')">
-      <div class="cluster-count">${count}</div>
-      <div class="cluster-name">${isZh?dm.zh:dm.en}</div>
-      <div class="cluster-tag">${isZh?tag.zh:tag.en}</div>
-    </div>`;
-  }).join('');
-}
-window.selectCluster=function(d){
-  activeDomain=d;
-  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.toggle('active',b.dataset.domain===d));
-  renderBooks();
-  document.getElementById('booksGrid').scrollIntoView({behavior:'smooth',block:'start'});
-};
-renderClusters();
-
-// Update filter labels on lang change
-const origSetLang=window.setLang;
-window.setLang=function(lang){
-  origSetLang(lang);
-  document.querySelectorAll('.filter-btn').forEach(btn=>{
-    const d=btn.dataset.domain;
-    if(d==='all') btn.innerHTML=lang==='zh'?`全部 (${books.length})`:`All (${books.length})`;
-    else if(domainMeta[d]) btn.innerHTML=lang==='zh'?domainMeta[d].zh:domainMeta[d].en;
-  });
-  renderBooks();
-  renderClusters();
-};
 </script>
 </body>
 </html>
