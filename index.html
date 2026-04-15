@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SDE Universes | 王德生 Wang Desheng</title>
+<meta name="description" content="SDE（结构-差异-纠缠）思想体系 · 55部跨域专著 · 龙爪手知识创新平台">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=EB+Garamond:wght@400;500&family=Noto+Serif+SC:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#070B16;
+  --surface:#0C1020;
+  --card:#121828;
+  --card2:#161E30;
+  --gold:#C8A44A;
+  --gold2:#E8C46A;
+  --text:#DDD5C4;
+  --text2:#A89E8E;
+  --muted:#5A5248;
+  --border:rgba(200,164,74,0.18);
+  --border2:rgba(200,164,74,0.08);
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Noto Serif SC','EB Garamond',Georgia,serif;line-height:1.7;overflow-x:hidden}
+body.en{font-family:'EB Garamond','Playfair Display',Georgia,serif}
+/* ── NAV ── */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:1rem 3rem;background:rgba(7,11,22,0.85);backdrop-filter:blur(12px);border-bottom:1px solid var(--border2)}
+.nav-logo{font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:700;color:var(--gold);letter-spacing:0.05em;text-decoration:none}
+.nav-links{display:flex;align-items:center;gap:2rem}
+.nav-links a{color:var(--text2);text-decoration:none;font-size:0.85rem;letter-spacing:0.08em;transition:color 0.2s}
+.nav-links a:hover{color:var(--gold)}
+.lang-toggle{display:flex;background:var(--card);border:1px solid var(--border);border-radius:20px;overflow:hidden;cursor:pointer}
+.lang-btn{padding:0.3rem 0.8rem;font-size:0.75rem;letter-spacing:0.05em;border:none;background:transparent;color:var(--text2);cursor:pointer;transition:all 0.2s;font-family:inherit}
+.lang-btn.active{background:var(--gold);color:#070B16;font-weight:600}
+/* ── HERO ── */
+#hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:6rem 2rem 4rem;position:relative;overflow:hidden}
+.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 40%,rgba(200,164,74,0.06) 0%,transparent 70%)}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(200,164,74,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(200,164,74,0.03) 1px,transparent 1px);background-size:60px 60px}
+.hero-eyebrow{font-size:0.7rem;letter-spacing:0.25em;color:var(--gold);text-transform:uppercase;margin-bottom:1.5rem;opacity:0.8}
+.hero-title{font-family:'Playfair Display',serif;font-size:clamp(3rem,8vw,7rem);font-weight:700;line-height:1.05;color:#fff;margin-bottom:0.5rem}
+.hero-title span{color:var(--gold)}
+.hero-subtitle{font-size:clamp(1.1rem,2.5vw,1.5rem);color:var(--text2);margin:1.5rem 0 2.5rem;font-style:italic;font-weight:300}
+.hero-formula{display:inline-flex;align-items:center;gap:0.5rem;background:var(--card);border:1px solid var(--border);border-radius:4px;padding:0.6rem 1.5rem;font-size:1rem;letter-spacing:0.1em;color:var(--gold2);margin-bottom:3rem}
+.hero-formula .op{color:var(--muted);font-size:0.8em;margin:0 0.2rem}
+.hero-stats{display:flex;gap:3rem;margin-top:1rem;flex-wrap:wrap;justify-content:center}
+.stat{text-align:center}
+.stat-n{font-family:'Playfair Display',serif;font-size:2.5rem;font-weight:700;color:var(--gold);display:block;line-height:1}
+.stat-l{font-size:0.7rem;letter-spacing:0.15em;color:var(--text2);margin-top:0.3rem;display:block}
+.scroll-hint{position:absolute;bottom:2rem;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:0.5rem;color:var(--muted);font-size:0.7rem;letter-spacing:0.2em}
+.scroll-arrow{width:1px;height:40px;background:linear-gradient(var(--gold),transparent);animation:scrollpulse 2s ease-in-out infinite}
+@keyframes scrollpulse{0%,100%{opacity:0.3;transform:scaleY(0.8)}50%{opacity:1;transform:scaleY(1)}}
+/* ── SECTIONS ── */
+section{padding:5rem 2rem}
+.section-inner{max-width:1100px;margin:0 auto}
+.section-label{font-size:0.65rem;letter-spacing:0.3em;color:var(--gold);text-transform:uppercase;margin-bottom:1rem;display:flex;align-items:center;gap:1rem}
+.section-label::after{content:'';flex:1;height:1px;background:var(--border)}
+h2.section-title{font-family:'Playfair Display',serif;font-size:clamp(1.8rem,4vw,2.8rem);font-weight:600;color:#fff;line-height:1.2;margin-bottom:1rem}
+.section-divider{width:60px;height:2px;background:var(--gold);margin:1.5rem 0}
+/* ── ABOUT ── */
+#about{background:var(--surface)}
+.about-grid{display:grid;grid-template-columns:1fr 2fr;gap:4rem;align-items:start;margin-top:3rem}
+.about-portrait{position:relative}
+.portrait-frame{width:100%;aspect-ratio:3/4;background:var(--card);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.portrait-frame::before{content:'王德生\A Wang Desheng';white-space:pre;text-align:center;font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--gold);opacity:0.4;letter-spacing:0.1em}
+.portrait-corner{position:absolute;width:20px;height:20px;border-color:var(--gold);border-style:solid}
+.portrait-corner.tl{top:8px;left:8px;border-width:1px 0 0 1px}
+.portrait-corner.tr{top:8px;right:8px;border-width:1px 1px 0 0}
+.portrait-corner.bl{bottom:8px;left:8px;border-width:0 0 1px 1px}
+.portrait-corner.br{bottom:8px;right:8px;border-width:0 1px 1px 0}
+.about-info{display:flex;flex-direction:column;gap:0.5rem;margin-top:1rem;font-size:0.75rem;color:var(--text2)}
+.about-info span{display:flex;align-items:center;gap:0.5rem}
+.about-info span::before{content:'';width:4px;height:4px;border-radius:50%;background:var(--gold);flex-shrink:0}
+.about-text p{font-size:1.05rem;line-height:1.9;color:var(--text);margin-bottom:1.2rem}
+.about-text p:first-child{font-size:1.15rem;color:var(--text)}
+.tag-row{display:flex;flex-wrap:wrap;gap:0.5rem;margin-top:1.5rem}
+.tag{padding:0.3rem 0.8rem;border:1px solid var(--border);color:var(--gold);font-size:0.7rem;letter-spacing:0.1em;border-radius:2px}
+/* ── SDE FRAMEWORK ── */
+#sde .sde-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;margin-top:3rem}
+.sde-card{padding:2.5rem;background:var(--card);position:relative;overflow:hidden}
+.sde-card::before{content:attr(data-letter);position:absolute;top:-0.2em;right:0.2em;font-family:'Playfair Display',serif;font-size:8rem;font-weight:700;color:rgba(200,164,74,0.04);line-height:1;pointer-events:none}
+.sde-letter{font-family:'Playfair Display',serif;font-size:3.5rem;font-weight:700;color:var(--gold);line-height:1;margin-bottom:0.5rem}
+.sde-name-zh{font-size:1.1rem;font-weight:500;color:#fff;margin-bottom:0.25rem}
+.sde-name-en{font-size:0.75rem;letter-spacing:0.15em;color:var(--text2);text-transform:uppercase;margin-bottom:1.2rem}
+.sde-desc{font-size:0.9rem;color:var(--text2);line-height:1.8}
+.sde-formula{margin-top:3rem;text-align:center;padding:2rem;background:var(--card2);border:1px solid var(--border)}
+.sde-formula p{font-size:0.85rem;color:var(--text2);margin-bottom:0.8rem;letter-spacing:0.1em}
+.formula-line{font-family:'EB Garamond','Playfair Display',serif;font-size:1.3rem;color:var(--gold2);letter-spacing:0.2em;font-style:italic}
+/* ── BOOKS ── */
+#books{background:var(--surface)}
+.books-filter{display:flex;flex-wrap:wrap;gap:0.5rem;margin:2rem 0;border-bottom:1px solid var(--border2);padding-bottom:1.5rem}
+.filter-btn{padding:0.35rem 1rem;border:1px solid var(--border);background:transparent;color:var(--text2);font-family:inherit;font-size:0.75rem;letter-spacing:0.08em;cursor:pointer;transition:all 0.2s;border-radius:2px}
+.filter-btn:hover,.filter-btn.active{background:var(--gold);color:#070B16;border-color:var(--gold)}
+.books-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:1.5rem;margin-top:1.5rem}
+.book-card{cursor:default;transition:transform 0.2s}
+.book-card:hover{transform:translateY(-4px)}
+.book-cover{width:100%;aspect-ratio:2/3;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:1rem;text-align:center;position:relative;overflow:hidden;border:1px solid rgba(255,255,255,0.06)}
+.book-cover-title{font-size:0.8rem;font-weight:500;color:#fff;line-height:1.4;z-index:1;position:relative;word-break:break-all}
+.book-cover-num{position:absolute;bottom:0.5rem;right:0.6rem;font-size:0.6rem;color:rgba(255,255,255,0.25);font-family:'Playfair Display',serif;font-style:italic}
+.book-info{padding:0.6rem 0}
+.book-title{font-size:0.75rem;color:var(--text);line-height:1.4;margin-bottom:0.2rem;font-weight:500}
+.book-desc{font-size:0.65rem;color:var(--muted);line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.book-domain{display:inline-block;font-size:0.6rem;letter-spacing:0.1em;color:var(--gold);border:1px solid rgba(200,164,74,0.3);padding:0.1rem 0.4rem;margin-bottom:0.3rem;border-radius:1px}
+/* domain colors */
+.d-core{background:linear-gradient(135deg,#1A2545,#0E1830)}
+.d-art{background:linear-gradient(135deg,#2E1A10,#1E120A)}
+.d-gov{background:linear-gradient(135deg,#102A24,#0A1A16)}
+.d-ent{background:linear-gradient(135deg,#1E1040,#130A2A)}
+.d-soc{background:linear-gradient(135deg,#2E1010,#1A0A0A)}
+.d-life{background:linear-gradient(135deg,#102010,#0A140A)}
+.d-phi{background:linear-gradient(135deg,#20201A,#141410)}
+.d-rel{background:linear-gradient(135deg,#2E2010,#1E140A)}
+.d-edu{background:linear-gradient(135deg,#102030,#0A1420)}
+.d-ai{background:linear-gradient(135deg,#102828,#0A1818)}
+.d-ph{background:var(--card)}
+/* ── PLATFORM ── */
+#platform{position:relative;overflow:hidden}
+.platform-bg{position:absolute;inset:0;background:radial-gradient(ellipse 70% 80% at 50% 50%,rgba(200,164,74,0.05) 0%,transparent 70%)}
+.platform-inner{position:relative;z-index:1;text-align:center;max-width:800px;margin:0 auto}
+.platform-badge{display:inline-block;background:rgba(200,164,74,0.1);border:1px solid var(--border);color:var(--gold);font-size:0.7rem;letter-spacing:0.2em;padding:0.4rem 1rem;margin-bottom:2rem;border-radius:2px}
+.platform-modules{display:flex;flex-wrap:wrap;justify-content:center;gap:1rem;margin:3rem 0}
+.module{padding:0.8rem 1.5rem;background:var(--card);border:1px solid var(--border2);font-size:0.8rem;color:var(--text2);border-radius:2px;transition:all 0.2s}
+.module:hover{border-color:var(--gold);color:var(--gold)}
+.cta-btn{display:inline-block;padding:0.9rem 2.5rem;background:var(--gold);color:#070B16;font-size:0.85rem;font-weight:600;letter-spacing:0.1em;text-decoration:none;border-radius:2px;transition:background 0.2s}
+.cta-btn:hover{background:var(--gold2)}
+/* ── FOOTER ── */
+footer{background:var(--surface);border-top:1px solid var(--border2);padding:3rem 2rem}
+.footer-inner{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr 1fr;gap:3rem}
+.footer-brand p{font-size:0.85rem;color:var(--text2);margin-top:0.8rem;line-height:1.7;max-width:280px}
+.footer-col h4{font-size:0.7rem;letter-spacing:0.2em;color:var(--gold);text-transform:uppercase;margin-bottom:1rem}
+.footer-col ul{list-style:none}
+.footer-col ul li{margin-bottom:0.5rem}
+.footer-col ul li a{color:var(--text2);text-decoration:none;font-size:0.8rem;transition:color 0.2s}
+.footer-col ul li a:hover{color:var(--gold)}
+.footer-bottom{max-width:1100px;margin:2rem auto 0;padding-top:1.5rem;border-top:1px solid var(--border2);display:flex;justify-content:space-between;align-items:center;font-size:0.7rem;color:var(--muted)}
+/* ── RESPONSIVE ── */
+@media(max-width:768px){
+  nav{padding:1rem 1.5rem}
+  .nav-links a{display:none}
+  .about-grid{grid-template-columns:1fr}
+  .sde-grid{grid-template-columns:1fr}
+  .books-grid{grid-template-columns:repeat(auto-fill,minmax(130px,1fr))}
+  .footer-inner{grid-template-columns:1fr}
+}
+/* ── LANGUAGE VISIBILITY ── */
+.zh-only,.en-only{transition:opacity 0.2s}
+body.en .zh-only{display:none}
+body.zh .en-only{display:none}
+</style>
+</head>
+<body class="zh">
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="#">SDE Universes</a>
+  <div class="nav-links">
+    <a href="#about" class="zh-only">关于</a><a href="#about" class="en-only">About</a>
+    <a href="#sde" class="zh-only">SDE体系</a><a href="#sde" class="en-only">SDE</a>
+    <a href="#books" class="zh-only">专著</a><a href="#books" class="en-only">Works</a>
+    <a href="#platform" class="zh-only">平台</a><a href="#platform" class="en-only">Platform</a>
+    <div class="lang-toggle">
+      <button class="lang-btn active" onclick="setLang('zh')">中</button>
+      <button class="lang-btn" onclick="setLang('en')">EN</button>
+    </div>
+  </div>
+</nav>
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-eyebrow zh-only">跨域知识发生学 · 超级个体研究体系</div>
+  <div class="hero-eyebrow en-only">Cross-Domain Knowledge Generativics · Super-Individual Research System</div>
+  <h1 class="hero-title">SDE <span>Universes</span></h1>
+  <p class="hero-subtitle zh-only">在纠缠中，经由差异，结构显现</p>
+  <p class="hero-subtitle en-only">In entanglement, through difference, structure emerges</p>
+  <div class="hero-formula">
+    <span>S</span><span class="op">·</span>
+    <span>D</span><span class="op">·</span>
+    <span>E</span>
+  </div>
+  <div class="hero-stats">
+    <div class="stat"><span class="stat-n">57</span><span class="stat-l zh-only">已出版专著</span><span class="stat-l en-only">MONOGRAPHS</span></div>
+    <div class="stat"><span class="stat-n">20</span><span class="stat-l zh-only">覆盖领域</span><span class="stat-l en-only">DOMAINS</span></div>
+    <div class="stat"><span class="stat-n">∞</span><span class="stat-l zh-only">发生可能</span><span class="stat-l en-only">GENERATIVE POTENTIAL</span></div>
+  </div>
+  <div class="scroll-hint" style="margin-top:2rem">
+    <span class="zh-only">向下探索</span><span class="en-only">EXPLORE</span>
+    <div class="scroll-arrow"></div>
+  </div>
+</section>
+<!-- ABOUT -->
+<section id="about">
+<div class="section-inner">
+  <div class="section-label zh-only">关于作者</div>
+  <div class="section-label en-only">About the Author</div>
+  <h2 class="section-title zh-only">王德生</h2>
+  <h2 class="section-title en-only">Wang Desheng</h2>
+  <div class="section-divider"></div>
+  <div class="about-grid">
+    <div>
+      <div class="portrait-frame">
+        <div class="portrait-corner tl"></div>
+        <div class="portrait-corner tr"></div>
+        <div class="portrait-corner bl"></div>
+        <div class="portrait-corner br"></div>
+      </div>
+      <div class="about-info">
+        <span class="zh-only">计算数学博士 · 中国科学院</span><span class="en-only">PhD Computational Mathematics · CAS</span>
+        <span class="zh-only">哥伦比亚大学博士后 · Qiang Du团队</span><span class="en-only">Postdoc Columbia University · Qiang Du</span>
+        <span class="zh-only">南洋理工大学 · 德麦国际有限公司</span><span class="en-only">NTU · Demai International Pte. Ltd.</span>
+        <span>Singapore · ORCID 0009-0009-8196-0030</span>
+      </div>
+    </div>
+    <div class="about-text">
+      <p class="zh-only">王德生是SDE（结构-差异-纠缠）思想体系的创始人，一位独立运营的"超级个体"研究者与平台开发者。其学术背景源于计算数学，经由Voronoi/Delaunay剖分与有限元网格生成的深层研究，逐步演化出一套跨域知识发生学方法论——SDE。</p>
+      <p class="en-only">Wang Desheng is the founder of the SDE (Structure–Difference–Entanglement) thought system, an independent "super-individual" researcher and platform developer. His academic background in computational mathematics — deep work on Voronoi/Delaunay triangulation and finite element mesh generation — evolved into a cross-domain knowledge-genesis methodology: SDE.</p>
+      <p class="zh-only">SDE的核心命题是：新知识结构在特定纠缠（E）条件下，经由差异流（D）的驱动而发生（S）。这一公式不是隐喻，而是跨越艺术、治理、教育、企业、哲学、宗教、数学等二十余个领域的实际操作框架。</p>
+      <p class="en-only">SDE's core proposition: new knowledge structures emerge (S) through the drive of difference-flow (D) under specific entanglement (E) conditions. This formula is not a metaphor but an operational framework spanning over twenty domains — from art and governance to mathematics and AI.</p>
+      <p class="zh-only">迄今已出版57部专著（约每部20万字，均在Bowker ISBN注册），目标100部。每一部都是SDE在该领域的实战展开，共同构成一部跨域知识发生学的百科全书。</p>
+      <p class="en-only">To date, 57 monographs have been published (~200,000 characters each, all ISBN-registered on Bowker), with a target of 100. Each is a live deployment of SDE in a specific domain, together forming a cross-domain encyclopedia of knowledge genesis.</p>
+      <div class="tag-row">
+        <span class="tag">SDE Theory</span>
+        <span class="tag zh-only">跨域发生学</span><span class="tag en-only">Cross-Domain Generativics</span>
+        <span class="tag">Dragon Claw 龙爪手</span>
+        <span class="tag zh-only">超级个体</span><span class="tag en-only">Super-Individual</span>
+        <span class="tag">GCG Framework</span>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+<!-- SDE FRAMEWORK -->
+<section id="sde">
+<div class="section-inner">
+  <div class="section-label zh-only">核心体系</div>
+  <div class="section-label en-only">Core Framework</div>
+  <h2 class="section-title zh-only">结构 · 差异 · 纠缠</h2>
+  <h2 class="section-title en-only">Structure · Difference · Entanglement</h2>
+  <div class="section-divider"></div>
+  <p style="color:var(--text2);font-size:0.95rem;max-width:600px;margin-top:0.5rem" class="zh-only">SDE不是框架，而是知识的发生机制。它解释新知识结构在什么条件下生长出来。</p>
+  <p style="color:var(--text2);font-size:0.95rem;max-width:600px;margin-top:0.5rem" class="en-only">SDE is not a framework but a generative mechanism of knowledge — explaining the conditions under which new knowledge structures come into being.</p>
+  <div class="sde-grid" style="margin-top:2.5rem">
+    <div class="sde-card" data-letter="S">
+      <div class="sde-letter">S</div>
+      <div class="sde-name-zh zh-only">结构</div>
+      <div class="sde-name-en">Structure</div>
+      <p class="sde-desc zh-only">新知识的显现形态。结构不是给定的，而是在特定纠缠与差异流的驱动下生长出来的。S是发生的终态，也是下一轮发生的起点。</p>
+      <p class="sde-desc en-only">The emergent form of new knowledge. Structure is not given but grown — driven by specific entanglement and difference-flow. S is the end-state of one genesis and the starting point of the next.</p>
+    </div>
+    <div class="sde-card" data-letter="D">
+      <div class="sde-letter">D</div>
+      <div class="sde-name-zh zh-only">差异</div>
+      <div class="sde-name-en">Difference</div>
+      <p class="sde-desc zh-only">驱动结构发生的动力源。差异不是简单的不同，而是具有方向性的差异流——正是它的流动方式决定了新结构的形态与路径。</p>
+      <p class="sde-desc en-only">The motive force driving structural genesis. Difference is not mere distinction but directional difference-flow — its mode of movement determines the form and pathway of new structure.</p>
+    </div>
+    <div class="sde-card" data-letter="E">
+      <div class="sde-letter">E</div>
+      <div class="sde-name-zh zh-only">纠缠</div>
+      <div class="sde-name-en">Entanglement</div>
+      <p class="sde-desc zh-only">发生的场域条件。纠缠是元素之间深层的相互作用网络——它决定哪些差异流能被激活，哪些结构发生具有可能性。</p>
+      <p class="sde-desc en-only">The field condition of genesis. Entanglement is the deep network of interaction among elements — it determines which difference-flows can be activated and which structural emergences are possible.</p>
+    </div>
+  </div>
+  <div class="sde-formula">
+    <p class="zh-only">核心公式 · Core Formula</p>
+    <div class="formula-line">S = H(D, E) &nbsp;·&nbsp; D = G(S, E) &nbsp;·&nbsp; E = F(S, D)</div>
+    <p style="font-size:0.75rem;color:var(--muted);margin-top:0.8rem;letter-spacing:0.05em" class="zh-only">在纠缠中，经由差异，结构显现 · In entanglement, through difference, structure emerges</p>
+  </div>
+</div>
+</section>
+<!-- BOOKS -->
+<section id="books">
+<div class="section-inner">
+  <div class="section-label zh-only">学术著作</div>
+  <div class="section-label en-only">Publications</div>
+  <h2 class="section-title zh-only">57部跨域专著</h2>
+  <h2 class="section-title en-only">57 Cross-Domain Monographs</h2>
+  <div class="section-divider"></div>
+  <p style="color:var(--text2);font-size:0.85rem;margin-top:0.5rem" class="zh-only">每部约20万字 · 全部Bowker ISBN注册 · authorId 26927366 · 出版方：德麦国际有限公司</p>
+  <p style="color:var(--text2);font-size:0.85rem;margin-top:0.5rem" class="en-only">~200,000 characters each · All Bowker ISBN registered · authorId 26927366 · Publisher: Demai International Pte. Ltd.</p>
+  <div class="books-filter" id="booksFilter"></div>
+  <div class="books-grid" id="booksGrid"></div>
+</div>
+</section>
+<!-- PLATFORM -->
+<section id="platform">
+<div class="platform-bg"></div>
+<div class="platform-inner">
+  <div class="platform-badge zh-only">SDE 龙爪手平台</div>
+  <div class="platform-badge en-only">SDE DRAGON CLAW PLATFORM</div>
+  <h2 class="section-title zh-only" style="text-align:center">龙爪手 · 知识创新引擎</h2>
+  <h2 class="section-title en-only" style="text-align:center">Dragon Claw · Knowledge Innovation Engine</h2>
+  <div class="section-divider" style="margin:1.5rem auto"></div>
+  <p style="color:var(--text2);font-size:1rem;line-height:1.8" class="zh-only">基于SDE发生学的六模块科研自动化平台。全程零拷贝，一键流转——从课题到成果，龙爪手在每一个关键节点把SDE智慧注入你的研究过程。</p>
+  <p style="color:var(--text2);font-size:1rem;line-height:1.8" class="en-only">A six-module research automation platform built on SDE generativics. Zero-copy throughout, one-click flow — from topic to output, Dragon Claw injects SDE wisdom at every critical node of your research process.</p>
+  <div class="platform-modules">
+    <div class="module zh-only">① 课题诊断</div><div class="module en-only">① Topic Diagnosis</div>
+    <div class="module zh-only">② 文献解析</div><div class="module en-only">② Literature Analysis</div>
+    <div class="module zh-only">③ SDE发生</div><div class="module en-only">③ SDE Genesis</div>
+    <div class="module zh-only">④ 论文生成</div><div class="module en-only">④ Paper Generation</div>
+    <div class="module zh-only">⑤ 质量审查</div><div class="module en-only">⑤ Quality Review</div>
+    <div class="module zh-only">⑥ 期刊匹配</div><div class="module en-only">⑥ Journal Match</div>
+  </div>
+  <a href="#" class="cta-btn zh-only">进入龙爪手平台 →</a>
+  <a href="#" class="cta-btn en-only">Enter Dragon Claw Platform →</a>
+</div>
+</section>
+<!-- FOOTER -->
+<footer>
+<div class="footer-inner">
+  <div class="footer-brand">
+    <div style="font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--gold);font-weight:700">SDE Universes</div>
+    <p class="zh-only">跨域知识发生学研究平台。SDE体系由王德生创立，由德麦国际有限公司运营，以新加坡为基地，面向全球。</p>
+    <p class="en-only">A cross-domain knowledge-genesis research platform. The SDE system was founded by Wang Desheng, operated by Demai International Pte. Ltd., based in Singapore.</p>
+  </div>
+  <div class="footer-col">
+    <h4 class="zh-only">导航</h4><h4 class="en-only">Navigation</h4>
+    <ul>
+      <li><a href="#about" class="zh-only">关于作者</a><a href="#about" class="en-only">About</a></li>
+      <li><a href="#sde" class="zh-only">SDE体系</a><a href="#sde" class="en-only">SDE Framework</a></li>
+      <li><a href="#books" class="zh-only">专著系列</a><a href="#books" class="en-only">Publications</a></li>
+      <li><a href="#platform" class="zh-only">龙爪手平台</a><a href="#platform" class="en-only">Dragon Claw</a></li>
+    </ul>
+  </div>
+  <div class="footer-col">
+    <h4 class="zh-only">联系</h4><h4 class="en-only">Contact</h4>
+    <ul>
+      <li><a href="mailto:desheng@sdeuniverses.com">desheng@sdeuniverses.com</a></li>
+      <li><a href="https://www.myidentifiers.com" target="_blank">Bowker #26927366</a></li>
+      <li><a href="#">ORCID 0009-0009-8196-0030</a></li>
+    </ul>
+  </div>
+</div>
+<div class="footer-bottom">
+  <span>© 2025 Demai International Pte. Ltd. · Singapore</span>
+  <span>SDE Universes · sdeuniverses.com</span>
+</div>
+</footer>
+<script>
+// ── LANGUAGE TOGGLE
+function setLang(lang){
+  document.body.className=lang;
+  document.querySelectorAll('.lang-btn').forEach(b=>b.classList.toggle('active',b.textContent.toLowerCase()===lang||b.textContent==='中'&&lang==='zh'));
+  document.documentElement.lang=lang==='zh'?'zh':'en';
+}
+// ── BOOK DATA
+const domainMeta={
+  core:{zh:'SDE核心',en:'SDE Core',cls:'d-core'},
+  art:{zh:'艺术',en:'Art',cls:'d-art'},
+  gov:{zh:'治理',en:'Governance',cls:'d-gov'},
+  ent:{zh:'企业',en:'Enterprise',cls:'d-ent'},
+  soc:{zh:'社会',en:'Social',cls:'d-soc'},
+  life:{zh:'生活',en:'Life',cls:'d-life'},
+  phi:{zh:'哲学',en:'Philosophy',cls:'d-phi'},
+  rel:{zh:'宗教',en:'Religion',cls:'d-rel'},
+  edu:{zh:'教育',en:'Education',cls:'d-edu'},
+  ai:{zh:'人工智能',en:'AI',cls:'d-ai'},
+  ph:{zh:'待录入',en:'Forthcoming',cls:'d-ph'}
+};
+const books=[
+  {id:1,zh:'SDE本体论系统入门',en:'Introduction to the SDE Ontology System',d:'core',zhDesc:'SDE思想体系的系统性入门读本，涵盖结构-差异-纠缠三维本体论的完整架构。',enDesc:'A systematic introduction to the SDE thought system, covering the complete triadic ontology.'},
+  {id:2,zh:'龙爪手创新宪法',en:'Dragon Claw Innovation Constitution',d:'core',zhDesc:'SDE知识武器锻造方法论，六爪动作链与零拷贝宪法的完整阐述。',enDesc:'SDE knowledge weapon-forging methodology: the six-claw action chain and zero-copy constitution.'},
+  {id:3,zh:'词向量外冲击创新原理',en:'Extra-Vectorial Impact Innovation Principle',d:'core',zhDesc:'超越词向量空间边界的创新发生机制，SDE视角下的知识突破理论。',enDesc:'The generative mechanism of innovation beyond word-vector space boundaries.'},
+  {id:4,zh:'SDE个性化教育新产业经济学',en:'SDE Personalized Education: New Industry Economics',d:'edu',zhDesc:'以SDE框架重构个性化教育的产业逻辑，探索AI时代教育新经济的发生路径。',enDesc:'Reconstructing personalized education industrial logic through SDE, exploring new educational economics.'},
+  {id:5,zh:'AI超级员工',en:'AI Super Employee',d:'ai',zhDesc:'探讨AI时代超级个体的知识生产与运营模式，以SDE方法论重构人机协同架构。',enDesc:'Exploring knowledge production models for super-individuals in the AI era through SDE.'},
+  {id:6,zh:'企业数字SDE大脑',en:'Enterprise Digital SDE Brain',d:'ent',zhDesc:'将SDE方法论应用于企业操作系统，构建企业知识发生与运营智慧的完整体系。',enDesc:'Applying SDE methodology to enterprise operating systems and organizational intelligence.'},
+  {id:7,zh:'论艺术：从发现到发生',en:'On Art: From Discovery to Genesis',d:'art',zhDesc:'以SDE发生学重构艺术本体论，揭示艺术从发现已有到发生新结构的根本跃迁。',enDesc:'Reconstructing art ontology through SDE generativics, revealing the leap from discovery to genesis.'},
+  {id:8,zh:'三法治理',en:'Three-Law Governance',d:'gov',zhDesc:'以SDE三律框架重构社会治理理论，探索结构性差异在制度演化中的驱动机制。',enDesc:'Reconstructing social governance theory through the SDE tri-law framework.'},
+  {id:9,zh:'少年罪错的发生学',en:'The Genesis of Juvenile Delinquency',d:'soc',zhDesc:'运用SDE发生学框架系统分析少年罪错的发生条件、路径与干预机制。',enDesc:'Systematically analyzing juvenile delinquency through the SDE generativist framework.'},
+  {id:10,zh:'换活法',en:'The Method of Life Renewal',d:'life',zhDesc:'专为50-70岁退休人群设计的生命更新方法论，以SDE视角重构人生后半段的可能。',enDesc:'A life-renewal methodology for retirees aged 50–70, through the SDE lens.'},
+  {id:11,zh:'道德经SDE解读导论',en:'Introduction to SDE Reading of the Tao Te Ching',d:'phi',zhDesc:'以SDE本体论框架重新诠释道德经，揭示老子思想与SDE发生学的深层呼应。',enDesc:"Re-interpreting the Tao Te Ching through the SDE ontological framework."},
+  {id:12,zh:'SDE圣经个性化 第一册',en:'SDE Bible Personalization Vol. I',d:'rel',zhDesc:'SDE视角下的基督教牧养实践，个性化信仰发生的第一卷探索。',enDesc:'Christian pastoral practice through the SDE lens: Volume I of personalized faith genesis.'},
+  {id:13,zh:'SDE圣经个性化 第二册',en:'SDE Bible Personalization Vol. II',d:'rel',zhDesc:'SDE圣经个性化系列第二册，深化信仰结构的差异化发生路径。',enDesc:'Volume II, deepening differentiated pathways of faith structure genesis.'},
+  {id:14,zh:'SDE圣经个性化 第三册',en:'SDE Bible Personalization Vol. III',d:'rel',zhDesc:'探索纠缠条件下的灵性成长机制。',enDesc:'Volume III, exploring spiritual growth under entanglement conditions.'},
+  {id:15,zh:'SDE圣经个性化 第四册',en:'SDE Bible Personalization Vol. IV',d:'rel',zhDesc:'SDE圣经个性化系列第四册。',enDesc:'SDE Bible Personalization series, Volume IV.'},
+  {id:16,zh:'SDE圣经个性化 第五册',en:'SDE Bible Personalization Vol. V',d:'rel',zhDesc:'SDE圣经个性化系列第五册。',enDesc:'SDE Bible Personalization series, Volume V.'},
+  {id:17,zh:'SDE圣经个性化 第六册',en:'SDE Bible Personalization Vol. VI',d:'rel',zhDesc:'SDE圣经个性化系列第六册。',enDesc:'SDE Bible Personalization series, Volume VI.'},
+  {id:18,zh:'SDE圣经个性化 第七册',en:'SDE Bible Personalization Vol. VII',d:'rel',zhDesc:'SDE圣经个性化系列第七册。',enDesc:'SDE Bible Personalization series, Volume VII.'},
+  {id:19,zh:'SDE圣经个性化 第八册',en:'SDE Bible Personalization Vol. VIII',d:'rel',zhDesc:'SDE圣经个性化系列第八册。',enDesc:'SDE Bible Personalization series, Volume VIII.'},
+  {id:20,zh:'SDE圣经个性化 第九册',en:'SDE Bible Personalization Vol. IX',d:'rel',zhDesc:'SDE圣经个性化系列第九册。',enDesc:'SDE Bible Personalization series, Volume IX.'},
+  {id:21,zh:'SDE圣经个性化 第十册',en:'SDE Bible Personalization Vol. X',d:'rel',zhDesc:'SDE圣经个性化系列第十册。',enDesc:'SDE Bible Personalization series, Volume X.'},
+  {id:22,zh:'SDE圣经个性化 第十一册',en:'SDE Bible Personalization Vol. XI',d:'rel',zhDesc:'SDE圣经个性化系列完结篇，整合SDE牧养方法论的全面综述。',enDesc:'Concluding volume of the SDE Bible Personalization series.'},
+  // Placeholders 23–57
+  ...Array.from({length:35},(_,i)=>({id:23+i,zh:'【待录入】',en:'Forthcoming',d:'ph',zhDesc:'即将收录',enDesc:'To be added.'}))
+];
+// ── RENDER BOOKS
+const filterEl=document.getElementById('booksFilter');
+const gridEl=document.getElementById('booksGrid');
+let activeDomain='all';
+const allDomains=['all',...new Set(books.map(b=>b.d))];
+allDomains.forEach(d=>{
+  const btn=document.createElement('button');
+  btn.className='filter-btn'+(d==='all'?' active':'');
+  const isZh=document.body.classList.contains('zh');
+  btn.innerHTML=d==='all'?(isZh?'全部 (57)':'All (57)'):(domainMeta[d]?.zh||d);
+  btn.dataset.domain=d;
+  btn.onclick=()=>{
+    activeDomain=d;
+    document.querySelectorAll('.filter-btn').forEach(b=>b.classList.toggle('active',b.dataset.domain===d));
+    renderBooks();
+  };
+  filterEl.appendChild(btn);
+});
+function renderBooks(){
+  const isZh=document.body.classList.contains('zh');
+  const filtered=activeDomain==='all'?books:books.filter(b=>b.d===activeDomain);
+  gridEl.innerHTML=filtered.map(b=>{
+    const dm=domainMeta[b.d]||{zh:b.d,en:b.d,cls:'d-ph'};
+    return`<div class="book-card">
+      <div class="book-cover ${dm.cls}">
+        <div class="book-cover-title">${isZh?b.zh:b.en}</div>
+        <div class="book-cover-num">${String(b.id).padStart(2,'0')}</div>
+      </div>
+      <div class="book-info">
+        <div class="book-domain">${isZh?dm.zh:dm.en}</div>
+        <div class="book-title">${isZh?b.zh:b.en}</div>
+        <div class="book-desc">${isZh?b.zhDesc:b.enDesc}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+renderBooks();
+// Update filter labels on lang change
+const origSetLang=window.setLang;
+window.setLang=function(lang){
+  origSetLang(lang);
+  document.querySelectorAll('.filter-btn').forEach(btn=>{
+    const d=btn.dataset.domain;
+    if(d==='all') btn.innerHTML=lang==='zh'?'全部 (57)':'All (57)';
+    else if(domainMeta[d]) btn.innerHTML=lang==='zh'?domainMeta[d].zh:domainMeta[d].en;
+  });
+  renderBooks();
+};
+</script>
+</body>
+</html>
