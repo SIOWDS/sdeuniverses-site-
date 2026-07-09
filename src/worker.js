@@ -21,6 +21,14 @@ export class VisitCounter {
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
+    // /fresh：永不缓存的首页镜像，用于验证最新版本
+    if (url.pathname === "/fresh") {
+      const home = await env.ASSETS.fetch(new Request(new URL("/", url), request));
+      const r = new Response(home.body, home);
+      r.headers.set("cache-control", "no-store");
+      r.headers.set("cdn-cache-control", "no-store");
+      return r;
+    }
     if (url.pathname === "/api/visits") {
       const id = env.COUNTER.idFromName("site-total");
       return env.COUNTER.get(id).fetch(request);
