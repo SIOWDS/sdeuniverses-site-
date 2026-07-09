@@ -26,6 +26,14 @@ export default {
       return env.COUNTER.get(id).fetch(request);
     }
     // Everything else: serve static assets (with configured html/404 handling)
-    return env.ASSETS.fetch(request);
+    const resp = await env.ASSETS.fetch(request);
+    const ct = resp.headers.get("content-type") || "";
+    if (ct.includes("text/html")) {
+      const r = new Response(resp.body, resp);
+      r.headers.set("cache-control", "no-cache, must-revalidate");
+      r.headers.set("cdn-cache-control", "no-store");
+      return r;
+    }
+    return resp;
   },
 };
