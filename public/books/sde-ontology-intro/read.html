@@ -46,7 +46,7 @@ canvas{display:block;max-width:100%;height:auto}
       <button class="btn" id="zoomOut">−</button>
       <button class="btn" id="zoomIn">＋</button>
     </div>
-    <a class="btn" href="https://books.sdeuniverses.com/SDE-Ontology-Intro-Preview-2026.pdf" target="_blank" style="text-decoration:none">下载 PDF</a>
+    <a class="btn" href="SDE-Ontology-Intro-Preview.pdf" target="_blank" style="text-decoration:none">下载 PDF</a>
   </div>
 </div>
 
@@ -62,7 +62,7 @@ canvas{display:block;max-width:100%;height:auto}
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script>
-const PDF_URL = "https://books.sdeuniverses.com/SDE-Ontology-Intro-Preview-2026.pdf";
+const PDF_URL = "SDE-Ontology-Intro-Preview.pdf"; // 同域相对路径，避免CORS
 pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
 
 let pdfDoc=null, pageNum=1, rendering=false, pending=null, scale=1.3;
