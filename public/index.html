@@ -195,6 +195,14 @@ footer{background:var(--bg);border-top:1px solid var(--border2);padding:3rem 2re
 .zh-only,.en-only{transition:opacity 0.2s}
 body.en .zh-only{display:none}
 body.zh .en-only{display:none}
+
+/* 今日长文星光闪烁 */
+.ll-stars{position:absolute;inset:0;pointer-events:none}
+.ll-star{position:absolute;background:#fff;border-radius:50%;opacity:0;animation:lltw var(--d,3s) ease-in-out infinite;animation-delay:var(--dl,0s);box-shadow:0 0 6px 1px rgba(255,245,220,0.8)}
+@keyframes lltw{0%,100%{opacity:0;transform:scale(0.5)}50%{opacity:var(--mo,0.85);transform:scale(1)}}
+.ll-shoot{position:absolute;width:2px;height:2px;background:linear-gradient(90deg,#fff,transparent);border-radius:50%;opacity:0;animation:llshoot 7s linear infinite;box-shadow:0 0 8px 2px rgba(255,245,220,0.6)}
+@keyframes llshoot{0%{opacity:0;transform:translate(0,0) rotate(32deg) scaleX(1)}9%{opacity:1}20%{opacity:1;transform:translate(220px,130px) rotate(32deg) scaleX(26)}26%,100%{opacity:0;transform:translate(300px,180px) rotate(32deg) scaleX(1)}}
+#today-longread a:hover div[style*="border:1px solid rgba(212,178,94,0.35)"]{border-color:rgba(212,178,94,0.7)!important}
 </style>
 </head>
 <body class="zh">
@@ -203,6 +211,7 @@ body.zh .en-only{display:none}
 <nav>
   <a class="nav-logo" href="/">SDE Universes</a>
   <div class="nav-links">
+    <a href="#today-longread" class="zh-only" style="color:#8A6817;font-weight:600">今日长文</a><a href="#today-longread" class="en-only" style="color:#8A6817;font-weight:600">Long Read</a>
     <a href="#daily" class="zh-only" style="color:#8A6817;font-weight:600">每日更新</a><a href="#daily" class="en-only" style="color:#8A6817;font-weight:600">Daily</a>
     <a href="#drwang" class="zh-only">王博士与SDE</a><a href="#drwang" class="en-only">Dr. Wang</a>
     <a href="#monograph" class="zh-only">专著导读</a><a href="#monograph" class="en-only">Monographs</a>
@@ -404,6 +413,30 @@ body.zh .en-only{display:none}
 </div>
 </section>
 
+<!-- TODAY'S LONG READ 今日长文 -->
+<section id="today-longread" style="position:relative;background:radial-gradient(ellipse at 50% 40%,#241a3a 0%,#150f24 55%,#0c0818 100%);border-bottom:1px solid rgba(212,178,94,0.25);padding:72px 24px;overflow:hidden">
+  <div class="ll-stars" id="ll-stars"></div>
+  <div style="position:relative;z-index:2;max-width:880px;margin:0 auto">
+    <div class="zh-only" style="font-size:12.5px;letter-spacing:0.45em;color:#D4B25E;margin-bottom:18px">今日长文 · TODAY'S LONG READ</div>
+    <div class="en-only" style="font-size:12.5px;letter-spacing:0.45em;color:#D4B25E;margin-bottom:18px">TODAY'S LONG READ</div>
+    <a href="/column/fuzi-yi-yiguanzhi/" style="display:block;text-decoration:none">
+      <div style="border:1px solid rgba(212,178,94,0.35);border-radius:3px;background:rgba(20,15,36,0.5);padding:36px 34px;transition:border-color 0.3s">
+        <div class="zh-only" style="font-size:clamp(28px,4.5vw,42px);font-weight:700;color:#F3ECD9;letter-spacing:0.1em;line-height:1.4">夫子之道：一以贯之</div>
+        <div class="en-only" style="font-size:clamp(24px,4vw,38px);font-weight:700;color:#F3ECD9;letter-spacing:0.06em;line-height:1.4">The Master's Way: One Thread</div>
+        <div class="zh-only" style="font-size:16px;color:#D4B25E;margin-top:14px;letter-spacing:0.04em">那个贯穿一切的"一",究竟是什么?</div>
+        <div class="en-only" style="font-size:16px;color:#D4B25E;margin-top:14px;letter-spacing:0.04em">What exactly is the "one" that runs through everything?</div>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:22px">
+          <span style="padding:6px 16px;border:1px solid rgba(212,178,94,0.4);border-radius:2px;font-size:13.5px;color:#CBB98A;letter-spacing:0.08em">壹 · 中庸的一</span>
+          <span style="padding:6px 16px;border:1px solid rgba(212,178,94,0.4);border-radius:2px;font-size:13.5px;color:#CBB98A;letter-spacing:0.08em">贰 · 论语的一</span>
+          <span style="padding:6px 16px;border:1px solid rgba(212,178,94,0.4);border-radius:2px;font-size:13.5px;color:#CBB98A;letter-spacing:0.08em">叁 · 大学的一</span>
+        </div>
+        <div class="zh-only" style="margin-top:24px;color:#F3ECD9;font-size:15px;font-weight:700;letter-spacing:0.1em">约两万字 · 阅读全文 →</div>
+        <div class="en-only" style="margin-top:24px;color:#F3ECD9;font-size:15px;font-weight:700;letter-spacing:0.1em">~20,000 chars · Read →</div>
+      </div>
+    </a>
+  </div>
+</section>
+
 <!-- DAILY UPDATES -->
 <section id="daily" style="background:#EBE3CE;border-bottom:1px solid rgba(138,104,23,0.22);padding:72px 24px">
 <div style="max-width:880px;margin:0 auto">
@@ -414,6 +447,11 @@ body.zh .en-only{display:none}
 
   <div style="border:1px solid rgba(138,104,23,0.22);background:#FAF6EC">
     <!-- 新条目请添加在此行之下，保持最新在最上 -->
+    <a href="/column/fuzi-yi-yiguanzhi/" style="display:flex;gap:20px;align-items:baseline;padding:18px 26px;border-bottom:1px solid rgba(138,104,23,0.22);color:#2A2315">
+      <span style="font-size:13px;color:#8A6817;letter-spacing:0.08em;white-space:nowrap;font-variant-numeric:tabular-nums">07-10</span>
+      <span class="zh-only" style="font-size:16px"><b style="color:#D4B25E;text-shadow:0 0 1px rgba(0,0,0,0.3)">今日长文</b> · 《夫子之道:一以贯之》两万字长文发表——中庸的一·论语的一·大学的一,读毕儒家SDE三卷</span>
+      <span class="en-only" style="font-size:16px"><b style="color:#B8901F">Long Read</b> · The Master's Way: One Thread — a 20,000-char essay across three Confucian classics</span>
+    </a>
     <a href="/column/sio-not-ontology/" style="display:flex;gap:20px;align-items:baseline;padding:18px 26px;border-bottom:1px solid rgba(138,104,23,0.22);color:#2A2315">
       <span style="font-size:13px;color:#8A6817;letter-spacing:0.08em;white-space:nowrap;font-variant-numeric:tabular-nums">07-09</span>
       <span class="zh-only" style="font-size:16px"><b style="color:#2E5090">今日专文</b> · 《SIO 不是本体论，SDE 才是本体论——一次理论的收口与归位》发表（约万字）</span>
@@ -926,6 +964,20 @@ document.addEventListener('click',e=>{
     var d=await r.json();
     el.textContent=d.total.toLocaleString('zh-Hans-CN');
   }catch(e){/* 静默失败，不影响页面 */}
+})();
+
+// 今日长文星光生成
+(function(){
+  var c=document.getElementById('ll-stars');
+  if(!c)return;
+  var html='';
+  for(var i=0;i<60;i++){
+    var x=Math.random()*100,y=Math.random()*100,size=Math.random()*2+0.8,dur=Math.random()*3+2,dl=Math.random()*4,mo=Math.random()*0.45+0.5;
+    html+='<span class="ll-star" style="left:'+x+'%;top:'+y+'%;width:'+size+'px;height:'+size+'px;--d:'+dur+'s;--dl:'+dl+'s;--mo:'+mo+'"></span>';
+  }
+  html+='<span class="ll-shoot" style="left:10%;top:15%;animation-delay:2s"></span>';
+  html+='<span class="ll-shoot" style="left:60%;top:8%;animation-delay:5s"></span>';
+  c.innerHTML=html;
 })();
 </script>
 </body>
