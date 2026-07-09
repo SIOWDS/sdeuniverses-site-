@@ -3,9 +3,19 @@
   "name": "steep-band-faf5",
   "compatibility_date": "2026-04-15",
   "workers_dev": true,
+  "main": "src/worker.js",
   "assets": {
     "directory": "./public/",
+    "binding": "ASSETS",
     "html_handling": "auto-trailing-slash",
     "not_found_handling": "404-page"
-  }
+  },
+  "durable_objects": {
+    "bindings": [
+      { "name": "COUNTER", "class_name": "VisitCounter" }
+    ]
+  },
+  "migrations": [
+    { "tag": "v1", "new_sqlite_classes": ["VisitCounter"] }
+  ]
 }

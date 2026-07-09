@@ -462,6 +462,7 @@ body.zh .en-only{display:none}
 <div class="footer-inner">
   <div class="footer-brand">
     <div style="font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--gold);font-weight:700">SDE Universes</div>
+    <p style="margin-top:10px;font-size:0.8rem;letter-spacing:0.08em;color:var(--muted)"><span class="zh-only">访问总次数 </span><span class="en-only">Total visits </span><span id="visitCount" style="color:var(--gold);font-weight:700">—</span></p>
     <p class="zh-only">跨域知识发生学研究平台。SDE体系由王德生创立，由德麦国际有限公司运营，以新加坡为基地，面向全球。</p>
     <p class="en-only">A cross-domain knowledge-genesis research platform. The SDE system was founded by Wang Desheng, operated by Demai International Pte. Ltd., based in Singapore.</p>
   </div>
@@ -645,6 +646,7 @@ window.setLang=function(lang){
   renderBooks();
   renderClusters();
 };
+(async function(){try{var el=document.getElementById('visitCount');if(!el)return;var c=sessionStorage.getItem('sde_visit_counted');var r=await fetch('/api/visits',{method:c?'GET':'POST'});if(!c)sessionStorage.setItem('sde_visit_counted','1');var d=await r.json();el.textContent=d.total.toLocaleString('zh-Hans-CN');}catch(e){}})();
 </script>
 </body>
 </html>

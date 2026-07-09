@@ -419,6 +419,7 @@ body.zh .en-only{display:none}
     <h4>SDE Universes</h4>
     <p class="zh-only">100 个 AI 超级员工平台。龙爪手锻造引擎驱动，SDE 发生学理论背书，由王德生创立，Demai International 运营，新加坡为基地，面向全球。</p>
     <p class="en-only">A platform of 100 AI super-employees, powered by the Dragon Claw forging engine and backed by SDE Generativics. Founded by Wang Desheng, operated by Demai International, based in Singapore.</p>
+    <p style="margin-top:14px;font-size:13px;letter-spacing:0.08em;opacity:0.85"><span class="zh-only">访问总次数 </span><span class="en-only">Total visits </span><span id="visitCount" style="color:#D4B25E;font-weight:700">—</span></p>
   </div>
   <div class="footer-col">
     <h4 class="zh-only">平台</h4><h4 class="en-only">Platform</h4>
@@ -646,6 +647,18 @@ document.addEventListener('click',e=>{
   const t=e.target.closest('[data-emp]');
   if(t){e.preventDefault();alert((document.body.classList.contains('zh')?'此员工工作台即将开通。':'This employee tool is coming soon.')+'\n\nID: '+t.dataset.emp);}
 });
+
+// ===== 访问总次数（Durable Object 计数）=====
+(async function(){
+  try{
+    var el=document.getElementById('visitCount'); if(!el) return;
+    var counted=sessionStorage.getItem('sde_visit_counted');
+    var r=await fetch('/api/visits',{method:counted?'GET':'POST'});
+    if(!counted) sessionStorage.setItem('sde_visit_counted','1');
+    var d=await r.json();
+    el.textContent=d.total.toLocaleString('zh-Hans-CN');
+  }catch(e){/* 静默失败，不影响页面 */}
+})();
 </script>
 </body>
 </html>
