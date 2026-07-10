@@ -96,7 +96,7 @@ h2.section-title{font-family:'Playfair Display',serif;font-size:clamp(1.8rem,4vw
 .books-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:1.5rem;margin-top:1.5rem}
 .book-card{cursor:default;transition:transform 0.2s}
 .book-card:hover{transform:translateY(-4px)}
-.book-cover{width:100%;aspect-ratio:2/3;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:1rem;text-align:center;position:relative;overflow:hidden;border:1px solid rgba(255,255,255,0.06)}
+a.book-card-link{text-decoration:none;color:inherit;display:block;transition:transform .16s ease,box-shadow .16s ease}a.book-card-link:hover{transform:translateY(-4px);box-shadow:0 14px 30px rgba(0,0,0,0.28)}a.book-card-link:hover .book-title{text-decoration:underline}.book-cover{width:100%;aspect-ratio:2/3;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:1rem;text-align:center;position:relative;overflow:hidden;border:1px solid rgba(255,255,255,0.06)}
 .book-cover-title{font-size:0.8rem;font-weight:500;color:#fff;line-height:1.4;z-index:1;position:relative;word-break:break-all}
 .book-cover-num{position:absolute;bottom:0.5rem;right:0.6rem;font-size:0.6rem;color:rgba(255,255,255,0.25);font-family:'Playfair Display',serif;font-style:italic}
 .book-info{padding:0.6rem 0}
@@ -609,7 +609,11 @@ function renderBooks(){
     const coverInner=hasCover
       ? `<img src="/books/covers/${b.id}.jpg" alt="${(isZh?b.zh:b.en).replace(/"/g,'')} 封面" loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">`
       : `<div class="book-cover-title">${isZh?b.zh:b.en}</div><div class="book-cover-num">${String(b.id).padStart(2,'0')}</div>`;
-    return`<div class="book-card">
+    const SPECIAL={0:'/books/sde-ontology-intro/'};
+    const href=SPECIAL[b.id]||(hasCover?`/books/m/${b.id}/`:null);
+    const openA=href?`<a class="book-card book-card-link" href="${href}">`:`<div class="book-card">`;
+    const closeA=href?`</a>`:`</div>`;
+    return`${openA}
       <div class="book-cover ${hasCover?'':dm.cls}">
         ${coverInner}
       </div>
@@ -618,7 +622,7 @@ function renderBooks(){
         <div class="book-title">${isZh?b.zh:b.en}</div>
         <div class="book-desc">${isZh?b.zhDesc:b.enDesc}</div>
       </div>
-    </div>`;
+    ${closeA}`;
   }).join('');
 }
 renderBooks();
