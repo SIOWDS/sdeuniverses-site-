@@ -129,7 +129,7 @@ footer{border-top:1px solid var(--border);text-align:center;padding:30px 20px 44
   <div class="hero-glow"></div>
   <div class="hero-eyebrow">SDE 智能体品尝系列 · 其一</div>
   <h1>SDE <span class="grad">金点子发生器</span></h1>
-  <p class="hero-sub">同一个问题,从三个角度各写一篇小论文。普通 AI 与 SDE 提智 AI 六路并行,<br>每篇约 4000 字——唯一的区别,只是右边被注入了那套完整的 SDE 内功。</p>
+  <p class="hero-sub">同一个问题,从三个角度各写一篇小论文。用最强的 DeepSeek,普通 AI 与 SDE 提智 AI 依次对决,<br>每篇约 4000 字——唯一的区别,只是右边被注入了那套完整的 SDE 内功。</p>
 </header>
 
 <div class="controls">
@@ -154,14 +154,14 @@ footer{border-top:1px solid var(--border);text-align:center;padding:30px 20px 44
   <div class="go-row">
     <button class="btn-go" id="goBtn">✦ 生成六篇小论文 —— 三视角对决(约4000字/篇)</button>
     <select class="model-select" id="modelSel" title="模型">
-      <option value="flash">V4 Flash · 快速(几秒出字 · 推荐)</option>
-      <option value="pro">V4 Pro · 深度思考(更强 · 首字需1-2分钟)</option>
+      <option value="pro">V4 Pro · 最强推理(Think Max · 推荐)</option>
+      <option value="flash">V4 Flash · 快速(几秒出字 · 想快选这个)</option>
     </select>
   </div>
 </div>
 
 <div class="privacy-note">
-  🔒 你的 API Key 全程只保存在本机浏览器(localStorage),请求直接从你的浏览器发往 DeepSeek,<b>我们的服务器不经手、不存储、不记录你的 Key 或问题</b>。<br>⏱ 六篇各约 4000 字的小论文<b>依次生成</b>（一篇接一篇，避免同时请求被限流）。用 <b>V4 Flash</b> 总共约两三分钟;用 <b>V4 Pro 深度思考</b> 质量更高但每篇要等思考，六篇总计可能十几分钟。<b>建议先用 V4 Flash 快速体验</b>。
+  🔒 你的 API Key 全程只保存在本机浏览器(localStorage),请求直接从你的浏览器发往 DeepSeek,<b>我们的服务器不经手、不存储、不记录你的 Key 或问题</b>。<br>⏱ 六篇各约 4000 字的小论文<b>依次生成</b>（一篇接一篇，避免同时请求被限流）。默认用 <b>V4 Pro 最强推理（Think Max）</b>——这是 DeepSeek 目前最强的思考模式，每篇会先深度思考 1-2 分钟再动笔，六篇总计可能<b>十几到二十分钟</b>，但质量最高、最能展现 SDE 的威力。<b>想快速体验可切换 V4 Flash（总共两三分钟）</b>。
 </div>
 
 <div class="err-box" id="errBox"></div>
@@ -331,7 +331,7 @@ function buildPayload(tier, systemPrompt, userQ){
   if(tier === 'pro'){
     base.model = 'deepseek-v4-pro';
     base.thinking = {type:'enabled'};
-    base.reasoning_effort = 'high';
+    base.reasoning_effort = 'xhigh';   // Think Max：DeepSeek 最强推理档
   } else {
     base.model = 'deepseek-v4-flash';
     base.thinking = {type:'disabled'};
