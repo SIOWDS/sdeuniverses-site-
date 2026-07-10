@@ -192,7 +192,7 @@ footer{border-top:1px solid var(--border);text-align:center;padding:30px 20px 44
 <div class="triview" id="results">
 
   <!-- 视角一：土壤与条件 -->
-  <div class="view-label"><span>维度一 · 显露 —— 它如今显露成什么样子（S）</span></div>
+  <div class="view-label"><span id="viewLabel1">维度一 · 显露（S）</span></div>
   <div class="pair-row">
     <div class="col plain">
       <div class="col-head"><div class="col-title"><span class="dot"></span>普通 AI</div><span class="col-tag">未提智</span></div>
@@ -207,7 +207,7 @@ footer{border-top:1px solid var(--border);text-align:center;padding:30px 20px 44
   </div>
 
   <!-- 视角二：分叉与选择 -->
-  <div class="view-label"><span>维度二 · 差异 —— 它如何一步步走成今天（D）</span></div>
+  <div class="view-label"><span id="viewLabel2">维度二 · 差异（D）</span></div>
   <div class="pair-row">
     <div class="col plain">
       <div class="col-head"><div class="col-title"><span class="dot"></span>普通 AI</div><span class="col-tag">未提智</span></div>
@@ -222,7 +222,7 @@ footer{border-top:1px solid var(--border);text-align:center;padding:30px 20px 44
   </div>
 
   <!-- 视角三：退化与显露 -->
-  <div class="view-label"><span>维度三 · 纠缠 —— 它扎根在什么土壤里（E）</span></div>
+  <div class="view-label"><span id="viewLabel3">维度三 · 纠缠（E）</span></div>
   <div class="pair-row">
     <div class="col plain">
       <div class="col-head"><div class="col-title"><span class="dot"></span>普通 AI</div><span class="col-tag">未提智</span></div>
@@ -293,18 +293,31 @@ let SDE_BASE_LOADED = false;
 })();
 
 // 三个视角：各自从不同的切入点，生成真正不同的金点子
-// 三个"共享的角度提问"——左右两边逐字相同，唯一变量是"右边是否注入内功"
-// 措辞完全中性：用任何人都会用的日常语言，不带任何学派特有的概念或提示，
-// 以保证对两个模型完全平等。深度差异只能来自右侧注入的内功本身。
+// 九个"共享的子层提问" = SDE 议题诊断坐标（每维度3个子层，共9格）
+// 每次生成时，每个维度随机抽取1个子层 → 3×3×3 = 27 种组合，大幅降低重复
+// 措辞完全中性（零学派术语），左右两边逐字相同，唯一变量是"右边是否注入内功"
 const SHARED_VIEWS = {
-  // 角度一：现状（它现在是什么状况）
-  show: `请围绕"它现在的状况"来回答用户的问题：这个现象当前处于什么状态？它现在呈现出来的样子有哪些值得注意的地方？请深入分析，给出你的判断。`,
-
-  // 角度二：来历（它是怎么变成今天这样的）
-  diff: `请围绕"它的来龙去脉"来回答用户的问题：这个现象是怎么一步步发展成今天这个样子的？在这个过程中有哪些值得注意的转折？请深入分析，给出你的判断。`,
-
-  // 角度三：依赖（它靠什么存在）
-  entangle: `请围绕"它依赖什么而存在"来回答用户的问题：这个现象的存在和延续，依赖于哪些条件和因素？其中哪些是容易被忽视的？请深入分析，给出你的判断。`
+  show: [  // S维度三子层：S1萌芽将显 / S2成熟显露 / S3退化空壳
+    `请围绕"它正在变成什么"来回答用户的问题：这个现象里，哪些新的苗头正在出现、但还没有被大家看清？它可能正在悄悄变成一个和现在很不一样的东西吗？请深入分析，给出你的判断。`,
+    `请围绕"它现在的样子"来回答用户的问题：这个现象当前以什么样子被大家看见和认定？这个"公认的样子"里，有什么值得注意、甚至可疑的地方？请深入分析，给出你的判断。`,
+    `请围绕"它是否还名副其实"来回答用户的问题：这个现象是否曾经有一个完整的内核，而如今那个内核已经悄悄变质或流失，只剩外表照旧运转？请深入分析，给出你的判断。`
+  ],
+  diff: [  // D维度三子层：D1意义目标 / D2路径组织 / D3优化约束
+    `请围绕"它为了什么而存在"来回答用户的问题：这个现象的目标是什么？这个目标是谁定的、有没有在历史中被悄悄改写过？今天它实际追求的，和它宣称追求的，还是一回事吗？请深入分析，给出你的判断。`,
+    `请围绕"它怎么一步步走到今天"来回答用户的问题：这个现象是经过怎样的选择、转折、取舍，走成今天这条路的？在关键的岔路口上，什么被选中了，什么被放弃了？请深入分析，给出你的判断。`,
+    `请围绕"它被什么标准衡量"来回答用户的问题：这个现象是被什么样的标准在考核、筛选、优化？这套衡量标准本身，是否已经反过来改变了它的样子？请深入分析，给出你的判断。`
+  ],
+  entangle: [  // E维度三子层：E1三界土壤 / E2信息话语 / E3能量动力
+    `请围绕"它扎根在什么土壤里"来回答用户的问题：这个现象依赖哪些现实条件、社会安排、人们的共同认定才能存在和延续？其中最容易被忽视、却一抽掉就全塌的是哪一个？请深入分析，给出你的判断。`,
+    `请围绕"它靠什么说法活着"来回答用户的问题：这个现象依赖什么样的概念、说法、话语在流通和维持？如果换一套说法来描述它，它还会是现在这个样子吗？请深入分析，给出你的判断。`,
+    `请围绕"它靠什么劲头维持"来回答用户的问题：这个现象靠什么样的动力、情感、价值感在支撑着运转？这股劲头如今是在增强还是在衰减？一旦它耗尽，会发生什么？请深入分析，给出你的判断。`
+  ]
+};
+// 子层展示名（UI标签用，不进prompt）
+const SUB_NAMES = {
+  show: ['S1 · 萌芽将显','S2 · 成熟显露','S3 · 退化空壳'],
+  diff: ['D1 · 意义目标','D2 · 路径组织','D3 · 优化约束'],
+  entangle: ['E1 · 三界土壤','E2 · 信息话语','E3 · 能量动力']
 };
 
 // 右边（有内功）= SDE内功底座 + 相同角度
@@ -330,7 +343,7 @@ const SDE_OUTPUT_SPEC = `
 · 篇幅约 4000 字（3500-4500 字），充分展开，把洞察的每一层都论证透彻，但绝不注水凑字数——每一段都要有推进。
 · 让人读完有"我从没这样想过，但你说得对"的震动，并且觉得"这是一篇真正有分量的文章"。`;
 
-function sdePrompt(view){ return SDE_BASE + SDE_OUTPUT_SPEC + '\n\n【请特别侧重这个角度】\n' + SHARED_VIEWS[view]; }
+function sdePrompt(dim, idx){ return SDE_BASE + SDE_OUTPUT_SPEC + '\n\n【请特别侧重这个角度】\n' + SHARED_VIEWS[dim][idx]; }
 
 const PLAIN_SYSTEM = `你是一个乐于助人、见识广博的 AI 助手。请针对用户的问题，写成一篇有深度、有见地的小论文（约 4000 字）。
 
@@ -342,7 +355,7 @@ const PLAIN_SYSTEM = `你是一个乐于助人、见识广博的 AI 助手。请
 
 // 普通AI的三视角提示（对照用：同样从三个角度问，但不注入任何SDE方法）
 // 左边（无内功）= 普通助手设定 + 完全相同的角度提问
-function plainPrompt(view){ return PLAIN_SYSTEM + '\n\n【本次作答角度】\n' + SHARED_VIEWS[view]; }
+function plainPrompt(dim, idx){ return PLAIN_SYSTEM + '\n\n【本次作答角度】\n' + SHARED_VIEWS[dim][idx]; }
 
 // 多厂商 API 地址
 const API_URLS = {
@@ -395,7 +408,8 @@ const apiKeyEl=$('apiKey'), questionEl=$('question'), goBtn=$('goBtn'), modelSel
 // 三视角，每个视角一对：普通 + SDE
 const VIEWS=['show','diff','entangle'];
 const rowEls=[1,2,3].map((n,i)=>({
-  view: VIEWS[i],
+  dim: VIEWS[i],
+  labelEl: $('viewLabel'+n),
   plain:{body:$('plain'+n+'Body'), status:$('plain'+n+'Status'), meta:$('plain'+n+'Meta')},
   sde:{body:$('sde'+n+'Body'), status:$('sde'+n+'Status'), meta:$('sde'+n+'Meta')},
 }));
@@ -540,20 +554,27 @@ async function run(){
       cell.meta.textContent='';
     });
   });
-  // 六路并行：3视角 × (普通+SDE) = 6 次调用同时发起
-  // 顺序索引：[0]视角1普通 [1]视角1SDE [2]视角2普通 [3]视角2SDE [4]视角3普通 [5]视角3SDE
+  // 每个维度随机抽1个子层（3×3×3=27种组合，大幅降低重复）
+  const dimTitles={show:'维度一 · 显露（S）',diff:'维度二 · 差异（D）',entangle:'维度三 · 纠缠（E）'};
+  const picks = rowEls.map(row=>{
+    const idx = Math.floor(Math.random()*3);
+    // 更新维度标签，显示本次抽中的子层
+    if(row.labelEl) row.labelEl.textContent = dimTitles[row.dim]+' —— 本次子层：'+SUB_NAMES[row.dim][idx];
+    return idx;
+  });
+
+  // 六路并行：3维度 × (普通+SDE) = 6 次调用同时发起
   const tasks=[];
-  rowEls.forEach((row)=>{
-    // 普通AI
+  rowEls.forEach((row,i)=>{
+    const idx = picks[i];
     tasks.push(
-      streamChat(key, model, plainPrompt(row.view), q, row.plain.body, row.plain.status, row.plain.meta)
+      streamChat(key, model, plainPrompt(row.dim, idx), q, row.plain.body, row.plain.status, row.plain.meta)
         .catch(e=>{ showErr('普通AI：'+e.message);
           row.plain.body.innerHTML='<span class="placeholder">生成失败：'+e.message+'</span>';
           row.plain.status.textContent='失败'; return {text:'',chars:0,thinkChars:0,secs:0}; })
     );
-    // SDE金点子
     tasks.push(
-      streamChat(key, model, sdePrompt(row.view), q, row.sde.body, row.sde.status, row.sde.meta)
+      streamChat(key, model, sdePrompt(row.dim, idx), q, row.sde.body, row.sde.status, row.sde.meta)
         .catch(e=>{ showErr('金点子：'+e.message);
           row.sde.body.innerHTML='<span class="placeholder">生成失败：'+e.message+'</span>';
           row.sde.status.textContent='失败'; return {text:'',chars:0,thinkChars:0,secs:0}; })
@@ -565,7 +586,7 @@ async function run(){
   goBtn.disabled=false; goBtn.textContent='✦ 生成六篇小论文 —— 三视角对决(约4000字/篇)';
 
   // results 顺序：[plain1,sde1, plain2,sde2, plain3,sde3]（每项是{text,chars,thinkChars,secs}）
-  const viewNames=['显露 · Show(S)','差异 · Difference(D)','纠缠 · Entanglement(E)'];
+  const viewNames=rowEls.map((row,i)=>({show:'显露(S)',diff:'差异(D)',entangle:'纠缠(E)'}[row.dim]+' · '+SUB_NAMES[row.dim][picks[i]]));
   const plainStats=[results[0],results[2],results[4]].filter(x=>x&&x.chars>0);
   const sdeStats  =[results[1],results[3],results[5]].filter(x=>x&&x.chars>0);
   window._lastResult = {
@@ -631,7 +652,7 @@ function clearResults(){
     row.plain.body.innerHTML='<span class="placeholder">'+placeholders.plain+'</span>';
     row.plain.status.textContent='待命';
     row.plain.meta.textContent='';
-    row.sde.body.innerHTML='<span class="placeholder">'+placeholders.sde[row.view]+'</span>';
+    row.sde.body.innerHTML='<span class="placeholder">'+placeholders.sde[row.dim]+'</span>';
     row.sde.status.textContent='待命';
     row.sde.meta.textContent='';
     // 移除可能残留的高亮
@@ -641,6 +662,9 @@ function clearResults(){
   window._lastResult = null;
   $('downloadRow').style.display='none';
   if($('effBox')) $('effBox').style.display='none';
+  // 恢复维度标签为默认
+  const defTitles={show:'维度一 · 显露（S）',diff:'维度二 · 差异（D）',entangle:'维度三 · 纠缠（E）'};
+  rowEls.forEach(row=>{ if(row.labelEl) row.labelEl.textContent=defTitles[row.dim]; });
   hideErr();
   // 滚回问题输入区，方便再问
   document.querySelector('.controls').scrollIntoView({behavior:'smooth', block:'center'});
