@@ -144,8 +144,8 @@ footer{border-top:1px solid var(--border);text-align:center;padding:30px 20px 44
   <div class="go-row">
     <button class="btn-go" id="goBtn">✦ 发生金点子 —— 看两边的差距</button>
     <select class="model-select" id="modelSel" title="模型">
+      <option value="pro">V4 Pro · 深度思考(更强 · 推荐)</option>
       <option value="flash">V4 Flash(快 · 便宜)</option>
-      <option value="pro">V4 Pro(深度思考 · 更强)</option>
     </select>
   </div>
 </div>
@@ -236,7 +236,7 @@ function buildPayload(tier, systemPrompt, userQ){
   const base = {
     stream: true,
     messages: [{role:'system',content:systemPrompt},{role:'user',content:userQ}],
-    max_tokens: 1600
+    max_tokens: 2400
   };
   if(tier === 'pro'){
     base.model = 'deepseek-v4-pro';
@@ -309,7 +309,7 @@ async function streamChat(apiKey, model, systemPrompt, userQ, bodyEl, statusEl, 
 
   const reader = resp.body.getReader();
   const decoder = new TextDecoder();
-  let buf='';
+  let buf='', thinking=false, thinkChars=0;
   while(true){
     const {done,value}=await reader.read();
     if(done) break;
@@ -323,8 +323,18 @@ async function streamChat(apiKey, model, systemPrompt, userQ, bodyEl, statusEl, 
       if(data==='[DONE]') continue;
       try{
         const j=JSON.parse(data);
-        const delta = j.choices?.[0]?.delta?.content || '';
+        const d = j.choices?.[0]?.delta || {};
+        // 深度思考过程（reasoning_content）：显示思考状态，不计入正文
+        const rc = d.reasoning_content || '';
+        if(rc){
+          thinking=true; thinkChars+=rc.length;
+          statusEl.innerHTML='<span class="spinner"></span> 🧠 深度思考中 ('+thinkChars+'字)';
+          if(!acc){ bodyEl.innerHTML='<span class="placeholder">🧠 正在深度思考，稍候将给出金点子……</span>'; bodyEl.appendChild(cursor); }
+        }
+        // 正式答案
+        const delta = d.content || '';
         if(delta){
+          if(thinking && !acc){ bodyEl.innerHTML=''; bodyEl.appendChild(cursor); statusEl.innerHTML='<span class="spinner"></span> 生成金点子'; }
           acc+=delta; chars+=delta.length;
           bodyEl.textContent=acc;
           bodyEl.appendChild(cursor);
@@ -335,8 +345,14 @@ async function streamChat(apiKey, model, systemPrompt, userQ, bodyEl, statusEl, 
   }
   cursor.remove();
   const secs=((Date.now()-t0)/1000).toFixed(1);
+  if(!acc){
+    bodyEl.innerHTML='<span class="placeholder">（模型没有返回内容，可能是被安全策略拦截或额度问题，换个问题或模型再试）</span>';
+    statusEl.textContent='空响应';
+    metaEl.textContent = secs+'s';
+    return '';
+  }
   statusEl.textContent='✓ 完成';
-  metaEl.textContent = chars+' 字 · '+secs+'s';
+  metaEl.textContent = chars+' 字 · '+secs+'s'+(thinkChars?' · 思考'+thinkChars+'字':'');
   return acc;
 }
 
