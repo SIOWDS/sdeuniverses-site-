@@ -374,12 +374,11 @@ function hideErr(){ errBox.style.display='none'; }
 
 // 流式调用 DeepSeek，token 逐字写入目标元素
 async function streamChat(apiKey, model, systemPrompt, userQ, bodyEl, statusEl, metaEl){
-  bodyEl.innerHTML=''; 
-  const cursor=document.createElement('span'); cursor.className='cursor-blink';
-  bodyEl.appendChild(cursor);
-  statusEl.innerHTML='<span class="spinner"></span> 思考中';
+  bodyEl.innerHTML='<span class="placeholder">正在连接 DeepSeek……</span>';
+  statusEl.innerHTML='<span class="spinner"></span> 连接中';
   const t0=Date.now();
   let acc='', chars=0;
+  const cursor=document.createElement('span'); cursor.className='cursor-blink';
 
   let resp;
   try{
@@ -401,6 +400,9 @@ async function streamChat(apiKey, model, systemPrompt, userQ, bodyEl, statusEl, 
   const reader = resp.body.getReader();
   const decoder = new TextDecoder();
   let buf='', thinking=false, thinkChars=0;
+  // 连接成功，清空占位，准备逐字接收
+  bodyEl.innerHTML=''; bodyEl.appendChild(cursor);
+  statusEl.innerHTML='<span class="spinner"></span> 生成中';
   while(true){
     const {done,value}=await reader.read();
     if(done) break;
@@ -458,6 +460,15 @@ async function run(){
 
   goBtn.disabled=true; goBtn.textContent='⏳ 六篇小论文生成中(每篇约4000字,需数分钟)……';
   $('downloadRow').style.display='none';
+
+  // 点击瞬间：把六个面板全部预置为"排队中"，让用户立刻看到六路都已激活
+  rowEls.forEach(row=>{
+    [row.plain, row.sde].forEach(cell=>{
+      cell.body.innerHTML='<span class="placeholder">已排队,即将开始……</span>';
+      cell.status.innerHTML='<span class="spinner"></span> 排队中';
+      cell.meta.textContent='';
+    });
+  });
   plainMeta.textContent=''; sdeMeta.textContent='';
 
   // 六路并行：每个视角一对（普通 + SDE），共 3 视角 × 2 = 6 次调用
