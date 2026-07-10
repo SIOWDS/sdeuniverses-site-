@@ -83,6 +83,9 @@ textarea{resize:vertical;min-height:76px;line-height:1.6}
 .col-body{padding:20px;font-size:15px;line-height:1.85;flex:1;white-space:pre-wrap;word-wrap:break-word;overflow-wrap:break-word;min-height:200px;max-height:600px;overflow-y:auto;color:var(--text)}
 .col-body .placeholder{color:var(--muted);font-style:italic}
 .col.sde .col-body{background:var(--sde-bg)}
+.col.generating{box-shadow:0 0 0 2px var(--gold), 0 0 20px rgba(212,178,94,0.25);border-color:var(--gold)}
+.col.done-flash{animation:donePulse 0.6s ease}
+@keyframes donePulse{0%{box-shadow:0 0 0 2px var(--ok)}100%{box-shadow:none}}
 .col.plain .col-body{background:var(--plain-bg)}
 .col-foot{padding:10px 20px;border-top:1px solid var(--border);font-size:12px;color:var(--muted);display:flex;justify-content:space-between;align-items:center;min-height:38px}
 .spinner{display:inline-block;width:13px;height:13px;border:2px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite;vertical-align:middle}
@@ -502,7 +505,9 @@ async function run(){
   const results=[];
   for(let i=0;i<jobs.length;i++){
     goBtn.textContent='⏳ 正在生成 '+jobs[i].label+'（共6篇，请勿关闭）……';
-    // 把即将开始的面板从"等待中"更新
+    // 找到当前cell对应的.col元素并高亮
+    const colEl = jobs[i].cell.body.closest('.col');
+    if(colEl) colEl.classList.add('generating');
     try{
       const r = await jobs[i].fn();
       results.push(r||'');
@@ -510,6 +515,8 @@ async function run(){
       showErr(jobs[i].label+'：'+e.message);
       results.push('');
     }
+    // 完成：移除高亮，闪一下完成动画
+    if(colEl){ colEl.classList.remove('generating'); colEl.classList.add('done-flash'); setTimeout(()=>colEl.classList.remove('done-flash'),600); }
     // 更新后续面板的排队数字
     for(let j=i+1;j<jobs.length;j++){
       jobs[j].cell.body.innerHTML='<span class="placeholder">排队等待中（前面还有 '+(j-i-1)+' 篇正在生成）……</span>';
