@@ -192,7 +192,7 @@ footer{border-top:1px solid var(--border);text-align:center;padding:30px 20px 44
 <div class="triview" id="results">
 
   <!-- 视角一：土壤与条件 -->
-  <div class="view-label"><span id="viewLabel1">维度一 · 显露（S）</span></div>
+  <div class="view-label"><span id="viewLabel1">视角一（点击生成后从九宫格随机抽取）</span></div>
   <div class="pair-row">
     <div class="col plain">
       <div class="col-head"><div class="col-title"><span class="dot"></span>普通 AI</div><span class="col-tag">未提智</span></div>
@@ -200,14 +200,14 @@ footer{border-top:1px solid var(--border);text-align:center;padding:30px 20px 44
       <div class="col-foot"><span class="col-badge" id="plain1Status">待命</span><span id="plain1Meta"></span></div>
     </div>
     <div class="col sde">
-      <div class="col-head"><div class="col-title"><span class="dot"></span>SDE 金点子 · 显露(S)</div><span class="col-tag">发生学加持</span></div>
-      <div class="col-body" id="sde1Body"><span class="placeholder">从"显露态"追问——它如今显露成的样子是成熟还是退化……</span></div>
+      <div class="col-head"><div class="col-title"><span class="dot"></span>SDE 金点子 ①</div><span class="col-tag">发生学加持</span></div>
+      <div class="col-body" id="sde1Body"><span class="placeholder">SDE 金点子(视角由九宫格随机抽取)……</span></div>
       <div class="col-foot"><span class="col-badge" id="sde1Status">待命</span><span id="sde1Meta"></span></div>
     </div>
   </div>
 
   <!-- 视角二：分叉与选择 -->
-  <div class="view-label"><span id="viewLabel2">维度二 · 差异（D）</span></div>
+  <div class="view-label"><span id="viewLabel2">视角二（点击生成后从九宫格随机抽取）</span></div>
   <div class="pair-row">
     <div class="col plain">
       <div class="col-head"><div class="col-title"><span class="dot"></span>普通 AI</div><span class="col-tag">未提智</span></div>
@@ -215,14 +215,14 @@ footer{border-top:1px solid var(--border);text-align:center;padding:30px 20px 44
       <div class="col-foot"><span class="col-badge" id="plain2Status">待命</span><span id="plain2Meta"></span></div>
     </div>
     <div class="col sde">
-      <div class="col-head"><div class="col-title"><span class="dot"></span>SDE 金点子 · 差异(D)</div><span class="col-tag">发生学加持</span></div>
-      <div class="col-body" id="sde2Body"><span class="placeholder">从"差异序列"追问——它如何一步步走成今天这条路……</span></div>
+      <div class="col-head"><div class="col-title"><span class="dot"></span>SDE 金点子 ②</div><span class="col-tag">发生学加持</span></div>
+      <div class="col-body" id="sde2Body"><span class="placeholder">SDE 金点子(视角由九宫格随机抽取)……</span></div>
       <div class="col-foot"><span class="col-badge" id="sde2Status">待命</span><span id="sde2Meta"></span></div>
     </div>
   </div>
 
   <!-- 视角三：退化与显露 -->
-  <div class="view-label"><span id="viewLabel3">维度三 · 纠缠（E）</span></div>
+  <div class="view-label"><span id="viewLabel3">视角三（点击生成后从九宫格随机抽取）</span></div>
   <div class="pair-row">
     <div class="col plain">
       <div class="col-head"><div class="col-title"><span class="dot"></span>普通 AI</div><span class="col-tag">未提智</span></div>
@@ -230,8 +230,8 @@ footer{border-top:1px solid var(--border);text-align:center;padding:30px 20px 44
       <div class="col-foot"><span class="col-badge" id="plain3Status">待命</span><span id="plain3Meta"></span></div>
     </div>
     <div class="col sde">
-      <div class="col-head"><div class="col-title"><span class="dot"></span>SDE 金点子 · 纠缠(E)</div><span class="col-tag">发生学加持</span></div>
-      <div class="col-body" id="sde3Body"><span class="placeholder">从"纠缠网络"追问——它扎根在什么土壤里才得以发生……</span></div>
+      <div class="col-head"><div class="col-title"><span class="dot"></span>SDE 金点子 ③</div><span class="col-tag">发生学加持</span></div>
+      <div class="col-body" id="sde3Body"><span class="placeholder">SDE 金点子(视角由九宫格随机抽取)……</span></div>
       <div class="col-foot"><span class="col-badge" id="sde3Status">待命</span><span id="sde3Meta"></span></div>
     </div>
   </div>
@@ -405,14 +405,26 @@ const EXAMPLES = ["如何理解拖延症?","教育的本质是什么?","为什�
 // ============ DOM ============
 const $ = id => document.getElementById(id);
 const apiKeyEl=$('apiKey'), questionEl=$('question'), goBtn=$('goBtn'), modelSel=$('modelSel');
-// 三视角，每个视角一对：普通 + SDE
-const VIEWS=['show','diff','entangle'];
-const rowEls=[1,2,3].map((n,i)=>({
-  dim: VIEWS[i],
+// 三个视角行，每行一对：普通 + SDE（本次视角由九宫格随机抽取，不固定维度）
+const rowEls=[1,2,3].map(n=>({
   labelEl: $('viewLabel'+n),
   plain:{body:$('plain'+n+'Body'), status:$('plain'+n+'Status'), meta:$('plain'+n+'Meta')},
   sde:{body:$('sde'+n+'Body'), status:$('sde'+n+'Status'), meta:$('sde'+n+'Meta')},
 }));
+
+// 九宫格池（S1-S3 / D1-D3 / E1-E3 共9格）
+const GRID = [];
+['show','diff','entangle'].forEach(dim=>{ [0,1,2].forEach(idx=>GRID.push({dim, idx})); });
+// 从九格中无放回随机抽3个（三次不重合）
+function pick3(){
+  const pool = GRID.slice();
+  const out = [];
+  for(let k=0;k<3;k++){
+    const j = Math.floor(Math.random()*pool.length);
+    out.push(pool.splice(j,1)[0]);
+  }
+  return out;
+}
 const errBox=$('errBox');
 
 // Key 本地持久化
@@ -554,27 +566,25 @@ async function run(){
       cell.meta.textContent='';
     });
   });
-  // 每个维度随机抽1个子层（3×3×3=27种组合，大幅降低重复）
-  const dimTitles={show:'维度一 · 显露（S）',diff:'维度二 · 差异（D）',entangle:'维度三 · 纠缠（E）'};
-  const picks = rowEls.map(row=>{
-    const idx = Math.floor(Math.random()*3);
-    // 更新维度标签，显示本次抽中的子层
-    if(row.labelEl) row.labelEl.textContent = dimTitles[row.dim]+' —— 本次子层：'+SUB_NAMES[row.dim][idx];
-    return idx;
+  // 从九宫格随机抽3个不重复的视角（C(9,3)=84种组合）
+  const cells = pick3();
+  rowEls.forEach((row,i)=>{
+    const c = cells[i];
+    if(row.labelEl) row.labelEl.textContent = '视角'+['一','二','三'][i]+' —— 本次抽中：'+SUB_NAMES[c.dim][c.idx];
   });
 
-  // 六路并行：3维度 × (普通+SDE) = 6 次调用同时发起
+  // 六路并行：3视角 × (普通+SDE) = 6 次调用同时发起
   const tasks=[];
   rowEls.forEach((row,i)=>{
-    const idx = picks[i];
+    const c = cells[i];
     tasks.push(
-      streamChat(key, model, plainPrompt(row.dim, idx), q, row.plain.body, row.plain.status, row.plain.meta)
+      streamChat(key, model, plainPrompt(c.dim, c.idx), q, row.plain.body, row.plain.status, row.plain.meta)
         .catch(e=>{ showErr('普通AI：'+e.message);
           row.plain.body.innerHTML='<span class="placeholder">生成失败：'+e.message+'</span>';
           row.plain.status.textContent='失败'; return {text:'',chars:0,thinkChars:0,secs:0}; })
     );
     tasks.push(
-      streamChat(key, model, sdePrompt(row.dim, idx), q, row.sde.body, row.sde.status, row.sde.meta)
+      streamChat(key, model, sdePrompt(c.dim, c.idx), q, row.sde.body, row.sde.status, row.sde.meta)
         .catch(e=>{ showErr('金点子：'+e.message);
           row.sde.body.innerHTML='<span class="placeholder">生成失败：'+e.message+'</span>';
           row.sde.status.textContent='失败'; return {text:'',chars:0,thinkChars:0,secs:0}; })
@@ -586,7 +596,8 @@ async function run(){
   goBtn.disabled=false; goBtn.textContent='✦ 生成六篇小论文 —— 三视角对决(约4000字/篇)';
 
   // results 顺序：[plain1,sde1, plain2,sde2, plain3,sde3]（每项是{text,chars,thinkChars,secs}）
-  const viewNames=rowEls.map((row,i)=>({show:'显露(S)',diff:'差异(D)',entangle:'纠缠(E)'}[row.dim]+' · '+SUB_NAMES[row.dim][picks[i]]));
+  const dimCN={show:'显露(S)',diff:'差异(D)',entangle:'纠缠(E)'};
+  const viewNames=cells.map(c=>dimCN[c.dim]+' · '+SUB_NAMES[c.dim][c.idx]);
   const plainStats=[results[0],results[2],results[4]].filter(x=>x&&x.chars>0);
   const sdeStats  =[results[1],results[3],results[5]].filter(x=>x&&x.chars>0);
   window._lastResult = {
@@ -644,15 +655,11 @@ goBtn.addEventListener('click', run);
 
 // 清空结果 · 再问一次
 function clearResults(){
-  const placeholders = {
-    plain: '普通 AI 的回答……',
-    sde: {show:'从"显露态"追问——它如今显露成的样子是成熟还是退化……', diff:'从"差异序列"追问——它如何一步步走成今天这条路……', entangle:'从"纠缠网络"追问——它扎根在什么土壤里才得以发生……'}
-  };
   rowEls.forEach(row=>{
-    row.plain.body.innerHTML='<span class="placeholder">'+placeholders.plain+'</span>';
+    row.plain.body.innerHTML='<span class="placeholder">普通 AI 的回答……</span>';
     row.plain.status.textContent='待命';
     row.plain.meta.textContent='';
-    row.sde.body.innerHTML='<span class="placeholder">'+placeholders.sde[row.dim]+'</span>';
+    row.sde.body.innerHTML='<span class="placeholder">SDE 金点子(视角由九宫格随机抽取)……</span>';
     row.sde.status.textContent='待命';
     row.sde.meta.textContent='';
     // 移除可能残留的高亮
@@ -662,9 +669,8 @@ function clearResults(){
   window._lastResult = null;
   $('downloadRow').style.display='none';
   if($('effBox')) $('effBox').style.display='none';
-  // 恢复维度标签为默认
-  const defTitles={show:'维度一 · 显露（S）',diff:'维度二 · 差异（D）',entangle:'维度三 · 纠缠（E）'};
-  rowEls.forEach(row=>{ if(row.labelEl) row.labelEl.textContent=defTitles[row.dim]; });
+  // 恢复视角标签为默认
+  rowEls.forEach((row,i)=>{ if(row.labelEl) row.labelEl.textContent='视角'+['一','二','三'][i]+'（点击生成后从九宫格随机抽取）'; });
   hideErr();
   // 滚回问题输入区，方便再问
   document.querySelector('.controls').scrollIntoView({behavior:'smooth', block:'center'});
