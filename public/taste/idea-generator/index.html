@@ -154,14 +154,14 @@ footer{border-top:1px solid var(--border);text-align:center;padding:30px 20px 44
   <div class="go-row">
     <button class="btn-go" id="goBtn">✦ 生成六篇小论文 —— 三视角对决(约4000字/篇)</button>
     <select class="model-select" id="modelSel" title="模型">
-      <option value="pro">V4 Pro · 最强推理(Think Max · 推荐)</option>
-      <option value="flash">V4 Flash · 快速(几秒出字 · 想快选这个)</option>
+      <option value="flash">V4 Flash · 快速(几秒出字 · 推荐品尝)</option>
+      <option value="pro">V4 Pro · 最强推理(Think Max · 慢但最强)</option>
     </select>
   </div>
 </div>
 
 <div class="privacy-note">
-  🔒 你的 API Key 全程只保存在本机浏览器(localStorage),请求直接从你的浏览器发往 DeepSeek,<b>我们的服务器不经手、不存储、不记录你的 Key 或问题</b>。<br>⏱ 六篇各约 4000 字的小论文<b>依次生成</b>（一篇接一篇，避免同时请求被限流）。默认用 <b>V4 Pro 最强推理（Think Max）</b>——这是 DeepSeek 目前最强的思考模式，每篇会先深度思考 1-2 分钟再动笔，六篇总计可能<b>十几到二十分钟</b>，但质量最高、最能展现 SDE 的威力。<b>想快速体验可切换 V4 Flash（总共两三分钟）</b>。
+  🔒 你的 API Key 全程只保存在本机浏览器(localStorage),请求直接从你的浏览器发往 DeepSeek,<b>我们的服务器不经手、不存储、不记录你的 Key 或问题</b>。<br>⏱ 六篇各约 4000 字的小论文<b>依次生成</b>（一篇接一篇）。默认用 <b>V4 Flash</b>——几秒出字，六篇总共约<b>两三分钟</b>，对比已经很震撼，适合快速品尝。想看极致质量可切换 <b>V4 Pro 最强推理（Think Max）</b>：质量最高，但每篇先深度思考 1-2 分钟，六篇总计可能十几到二十分钟。
 </div>
 
 <div class="err-box" id="errBox"></div>
@@ -505,21 +505,26 @@ async function run(){
   const results=[];
   for(let i=0;i<jobs.length;i++){
     goBtn.textContent='⏳ 正在生成 '+jobs[i].label+'（共6篇，请勿关闭）……';
-    // 找到当前cell对应的.col元素并高亮
-    const colEl = jobs[i].cell.body.closest('.col');
+    const cell = jobs[i].cell;
+    const colEl = cell.body.closest('.col');
     if(colEl) colEl.classList.add('generating');
+    // 关键：当前篇开始前，立即把它从"排队中"改成"启动中"，让用户看到它轮到了
+    cell.body.innerHTML='<span class="placeholder">▶ 正在启动本篇，连接 DeepSeek……</span>';
+    cell.status.innerHTML='<span class="spinner"></span> 启动中';
+    // 让浏览器有机会重绘这个状态（await一个微任务）
+    await new Promise(r=>setTimeout(r,50));
     try{
       const r = await jobs[i].fn();
       results.push(r||'');
     }catch(e){
       showErr(jobs[i].label+'：'+e.message);
+      cell.body.innerHTML='<span class="placeholder">本篇生成失败：'+e.message+'</span>';
+      cell.status.textContent='失败';
       results.push('');
     }
-    // 完成：移除高亮，闪一下完成动画
     if(colEl){ colEl.classList.remove('generating'); colEl.classList.add('done-flash'); setTimeout(()=>colEl.classList.remove('done-flash'),600); }
-    // 更新后续面板的排队数字
     for(let j=i+1;j<jobs.length;j++){
-      jobs[j].cell.body.innerHTML='<span class="placeholder">排队等待中（前面还有 '+(j-i-1)+' 篇正在生成）……</span>';
+      jobs[j].cell.body.innerHTML='<span class="placeholder">排队等待中（前面还有 '+(j-i-1)+' 篇）……</span>';
     }
   }
 
