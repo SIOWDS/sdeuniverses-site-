@@ -181,7 +181,7 @@ footer{border-top:1px solid var(--border);text-align:center;padding:30px 20px 44
 </div>
 
 <div class="privacy-note">
-  🔒 你的 API Key 全程只保存在本机浏览器(localStorage),请求直接从你的浏览器发往 DeepSeek,<b>我们的服务器不经手、不存储、不记录你的 Key 或问题</b>。<br>⏱ 六篇各约 4000 字的小论文<b>并行生成</b>（六路同时进行）。默认用 <b>V4 Pro 最强推理（Think Max）</b>——这是 DeepSeek 目前最强的思考模式，每篇会先深度思考 1-2 分钟再动笔，质量最高、最能展现 SDE 的威力。六路同时深度思考，请耐心等待几分钟。若某篇报错（并发被限流），刷新重试或改用 V4 Flash。
+  🔒 你的 API Key 全程只保存在本机浏览器(localStorage),请求直接从你的浏览器发往你所选的模型厂商（DeepSeek 或智谱）,<b>我们的服务器不经手、不存储、不记录你的 Key 或问题</b>。<br>⏱ 六篇各约 4000 字的小论文<b>并行生成</b>（六路同时进行）。选"深度思考/最强"档时，每篇会先深度思考 1-2 分钟再动笔，质量最高、最能展现 SDE 的威力，请耐心等待几分钟；选"快速"档几秒出字。若某篇报错（并发被限流），刷新重试或换快速档。
 </div>
 
 <div class="err-box" id="errBox"></div>
@@ -432,7 +432,7 @@ function hideErr(){ errBox.style.display='none'; }
 
 // 流式调用 DeepSeek，token 逐字写入目标元素
 async function streamChat(apiKey, model, systemPrompt, userQ, bodyEl, statusEl, metaEl){
-  bodyEl.innerHTML='<span class="placeholder">正在连接 DeepSeek……</span>';
+  bodyEl.innerHTML='<span class="placeholder">正在连接 '+vendorName()+'……</span>';
   statusEl.innerHTML='<span class="spinner"></span> 连接中';
   const t0=Date.now();
   let acc='', chars=0;
@@ -459,7 +459,7 @@ async function streamChat(apiKey, model, systemPrompt, userQ, bodyEl, statusEl, 
   const decoder = new TextDecoder();
   let buf='', thinking=false, thinkChars=0, gotAnything=false;
   // 连接成功，显示等待模型响应（深度思考首字可能要1-2分钟）
-  bodyEl.innerHTML='<span class="placeholder">✓ 已连接，模型正在启动（V4 Pro 深度思考首次响应约需 1-2 分钟，请稍候）……</span>';
+  bodyEl.innerHTML='<span class="placeholder">✓ 已连接，模型正在启动'+(parseModel(model).tier==='pro'?'（深度思考首次响应约需 1-2 分钟，请稍候）':'')+'……</span>';
   statusEl.innerHTML='<span class="spinner"></span> 等待响应';
   // 计时器：每秒更新"已等待N秒"，让用户确信连接是活的
   const waitTimer = setInterval(()=>{
