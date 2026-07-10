@@ -421,6 +421,7 @@ body.zh .en-only{display:none}
   </div>
   <div class="clusters-overview" id="clustersOverview"></div>
   <div class="books-filter" id="booksFilter"></div>
+  <div id="deepreadBanner"></div>
   <div class="books-grid" id="booksGrid"></div>
 </div>
 </section>
@@ -590,6 +591,17 @@ allDomains.forEach(d=>{
 function renderBooks(){
   const isZh=document.body.classList.contains('zh');
   const filtered=activeDomain==='all'?books:books.filter(b=>b.d===activeDomain);
+  (function(){
+    var DR={core:'本体论核心',civ:'文明与人文',gov:'治理与社科',edu:'教育革命',life:'健康与生命',cre:'创造力',ai:'AI 时代前沿'};
+    var bn=document.getElementById('deepreadBanner'); if(!bn) return;
+    if(activeDomain!=='all' && DR[activeDomain]){
+      var nm=DR[activeDomain];
+      bn.innerHTML='<a href="/philosophy/clusters/'+activeDomain+'/" style="display:block;margin:0 0 22px;padding:18px 22px;border:1px solid var(--gold);border-radius:4px;background:rgba(201,161,90,0.08);text-decoration:none;display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px">'
+        +'<span style="font-size:11px;letter-spacing:0.3em;color:var(--gold)">'+(isZh?'这一群 · 五千字深读':'IN-DEPTH READ')+'</span>'
+        +'<span style="flex:1;min-width:200px;color:var(--text);font-size:15.5px;font-weight:700">'+(isZh?'读《'+nm+'》这一群到底颠覆了什么 →':nm+' — read the full essay →')+'</span>'
+        +'<span style="color:var(--gold);font-weight:700;font-size:14px;white-space:nowrap">'+(isZh?'阅读全文':'Read')+' →</span></a>';
+    } else { bn.innerHTML=''; }
+  })();
   gridEl.innerHTML=filtered.map(b=>{
     const dm=domainMeta[b.d]||{zh:b.d,en:b.d,cls:'d-ph'};
     return`<div class="book-card">
