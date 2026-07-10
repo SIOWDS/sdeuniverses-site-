@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SDE 金点子发生器 · 品尝系列 | SDE Universes</title>
-<meta name="description" content="输入一个问题,亲眼看见 SDE 发生学如何让 AI 的回答脱胎换骨——左边是普通 AI,右边是 SDE 提智后的 AI,同一个问题,深度天差地别。用你自己的 API Key,浏览器里直接跑。">
+<meta name="description" content="输入一个问题,从三个视角六路并行:普通 AI vs SDE 提智 AI 同场对决,一次生成三个金点子。用你自己的 API Key,浏览器里直接跑,可下载 Word。">
 <style>
 :root{
   --bg:#0E1116;--panel:#161B22;--panel2:#1C232C;--border:rgba(255,255,255,0.10);
@@ -64,6 +64,12 @@ textarea{resize:vertical;min-height:76px;line-height:1.6}
 /* results */
 .results{max-width:1200px;margin:36px auto 0;display:grid;grid-template-columns:1fr 1fr;gap:18px}
 @media(max-width:820px){.results{grid-template-columns:1fr}}
+/* 三视角对照 3+3 布局 */
+.triview{max-width:1200px;margin:36px auto 0}
+.pair-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:8px}
+@media(max-width:820px){.pair-row{grid-template-columns:1fr}}
+.view-label{text-align:center;margin:22px auto 12px}
+.view-label span{display:inline-block;background:var(--sde-bg);border:1px solid rgba(212,178,94,0.35);border-radius:20px;padding:7px 22px;font-size:13px;color:var(--gold2);letter-spacing:0.05em;font-weight:600}
 .col{background:var(--panel);border:1px solid var(--border);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;min-height:200px}
 .col.plain{border-top:3px solid var(--plain)}
 .col.sde{border-top:3px solid var(--sde)}
@@ -120,7 +126,7 @@ footer{border-top:1px solid var(--border);text-align:center;padding:30px 20px 44
   <div class="hero-glow"></div>
   <div class="hero-eyebrow">SDE 智能体品尝系列 · 其一</div>
   <h1>SDE <span class="grad">金点子发生器</span></h1>
-  <p class="hero-sub">同一个问题,左边是普通 AI,右边是被 SDE 发生学"提智"过的 AI。<br>亲眼看看,差距有多大。</p>
+  <p class="hero-sub">同一个问题,从三个视角,让普通 AI 和 SDE 提智 AI 六路并行对决。<br>三个金点子,亲眼看看差距有多大。</p>
 </header>
 
 <div class="controls">
@@ -143,7 +149,7 @@ footer{border-top:1px solid var(--border);text-align:center;padding:30px 20px 44
   </div>
 
   <div class="go-row">
-    <button class="btn-go" id="goBtn">✦ 发生金点子 —— 看两边的差距</button>
+    <button class="btn-go" id="goBtn">✦ 发生金点子 —— 三视角 · 六路对照</button>
     <select class="model-select" id="modelSel" title="模型">
       <option value="pro">V4 Pro · 深度思考(更强 · 推荐)</option>
       <option value="flash">V4 Flash(快 · 便宜)</option>
@@ -157,23 +163,54 @@ footer{border-top:1px solid var(--border);text-align:center;padding:30px 20px 44
 
 <div class="err-box" id="errBox"></div>
 
-<div class="results" id="results">
-  <div class="col plain">
-    <div class="col-head">
-      <div class="col-title"><span class="dot"></span>普通 AI</div>
-      <span class="col-tag">未提智</span>
+<!-- 三视角对照：每行一个视角，左普通 右SDE -->
+<div class="triview" id="results">
+
+  <!-- 视角一：土壤与条件 -->
+  <div class="view-label"><span>视角一 · 从"土壤与条件"切入</span></div>
+  <div class="pair-row">
+    <div class="col plain">
+      <div class="col-head"><div class="col-title"><span class="dot"></span>普通 AI</div><span class="col-tag">未提智</span></div>
+      <div class="col-body" id="plain1Body"><span class="placeholder">普通 AI 的回答……</span></div>
+      <div class="col-foot"><span class="col-badge" id="plain1Status">待命</span><span id="plain1Meta"></span></div>
     </div>
-    <div class="col-body" id="plainBody"><span class="placeholder">左边显示:直接把问题丢给 AI 的普通回答……</span></div>
-    <div class="col-foot"><span class="col-badge" id="plainStatus">待命</span><span id="plainMeta"></span></div>
-  </div>
-  <div class="col sde">
-    <div class="col-head">
-      <div class="col-title"><span class="dot"></span>SDE 提智 AI</div>
-      <span class="col-tag">发生学加持</span>
+    <div class="col sde">
+      <div class="col-head"><div class="col-title"><span class="dot"></span>SDE 金点子 ①</div><span class="col-tag">发生学加持</span></div>
+      <div class="col-body" id="sde1Body"><span class="placeholder">从"它扎根在什么条件里"切入的金点子……</span></div>
+      <div class="col-foot"><span class="col-badge" id="sde1Status">待命</span><span id="sde1Meta"></span></div>
     </div>
-    <div class="col-body" id="sdeBody"><span class="placeholder">右边显示:被 SDE 发生学"提智"后,同一个 AI 给出的金点子……</span></div>
-    <div class="col-foot"><span class="col-badge" id="sdeStatus">待命</span><span id="sdeMeta"></span></div>
   </div>
+
+  <!-- 视角二：分叉与选择 -->
+  <div class="view-label"><span>视角二 · 从"分叉与选择"切入</span></div>
+  <div class="pair-row">
+    <div class="col plain">
+      <div class="col-head"><div class="col-title"><span class="dot"></span>普通 AI</div><span class="col-tag">未提智</span></div>
+      <div class="col-body" id="plain2Body"><span class="placeholder">普通 AI 的回答……</span></div>
+      <div class="col-foot"><span class="col-badge" id="plain2Status">待命</span><span id="plain2Meta"></span></div>
+    </div>
+    <div class="col sde">
+      <div class="col-head"><div class="col-title"><span class="dot"></span>SDE 金点子 ②</div><span class="col-tag">发生学加持</span></div>
+      <div class="col-body" id="sde2Body"><span class="placeholder">从"它在哪个岔路口被选择"切入的金点子……</span></div>
+      <div class="col-foot"><span class="col-badge" id="sde2Status">待命</span><span id="sde2Meta"></span></div>
+    </div>
+  </div>
+
+  <!-- 视角三：退化与显露 -->
+  <div class="view-label"><span>视角三 · 从"退化与显露"切入</span></div>
+  <div class="pair-row">
+    <div class="col plain">
+      <div class="col-head"><div class="col-title"><span class="dot"></span>普通 AI</div><span class="col-tag">未提智</span></div>
+      <div class="col-body" id="plain3Body"><span class="placeholder">普通 AI 的回答……</span></div>
+      <div class="col-foot"><span class="col-badge" id="plain3Status">待命</span><span id="plain3Meta"></span></div>
+    </div>
+    <div class="col sde">
+      <div class="col-head"><div class="col-title"><span class="dot"></span>SDE 金点子 ③</div><span class="col-tag">发生学加持</span></div>
+      <div class="col-body" id="sde3Body"><span class="placeholder">从"它是否被抽空了内核"切入的金点子……</span></div>
+      <div class="col-foot"><span class="col-badge" id="sde3Status">待命</span><span id="sde3Meta"></span></div>
+    </div>
+  </div>
+
 </div>
 
 <div id="downloadRow" style="max-width:1200px;margin:20px auto 0;text-align:center;display:none">
@@ -205,7 +242,8 @@ footer{border-top:1px solid var(--border);text-align:center;padding:30px 20px 44
 
 <script>
 // ============ SDE 提智系统提示（从33518字内功提炼的灵魂）============
-const SDE_SYSTEM = `你是一位思想极其深刻、善于穿透常识的跨学科洞察者。你的任务不是复述知识，而是对用户的问题给出一个"反直觉却成立"的金点子——一个让人读完拍案、说"原来可以这样看"的洞察。
+// ============ SDE 提智：共同底座 + 三个不同视角 ============
+const SDE_BASE = `你是一位思想极其深刻、善于穿透常识的跨学科洞察者。你的任务不是复述知识，而是对用户的问题给出一个"反直觉却成立"的金点子——一个让人读完拍案、说"原来可以这样看"的洞察。
 
 你的底层思维方式（严格遵守，但绝不在输出中提及这套方法本身）：
 
@@ -232,11 +270,40 @@ const SDE_SYSTEM = `你是一位思想极其深刻、善于穿透常识的跨学
 3. 绝对不要出现任何理论黑话、框架名称、术语缩写、"某某视角下"这类学派腔调——如果一位完全不懂任何理论的普通读者读到某句会觉得"这是某个学派的行话"，就是失败。你的深刻要藏在洞察本身，而不是靠术语撑场面。
 4. 篇幅要求：请用约 1000 字（900-1100 字，含结尾的证伪条件）给出你的金点子，可以有 2-3 层展开，把洞察说透说深，但不要注水凑字数。
 5. 让人读完有"顿悟感"——那种"我从没这样想过，但你说得对"的震动。
-6. 【必须】在正文的最后，另起一段，用一句朴素的话给出这个金点子的"证伪条件"——即：什么样的事实、现象或实验结果一旦出现，就说明你这个判断是错的。格式是自然的一句话，例如"如果……反而……，那这个判断就不成立"。这一步至关重要：它让你的洞察从一句漂亮的口号，变成一个可以被检验、因而站得住脚的真判断。不要用"证伪条件"这四个字作标签，直接自然地把这句话说出来即可。
+6. 【必须】在正文的最后，另起一段，用一句朴素的话给出这个金点子的"证伪条件"——即：什么样的事实、现象或实验结果一旦出现，就说明你这个判断是错的。格式是自然的一句话，例如"如果……反而……，那这个判断就不成立"。这一步至关重要：它让你的洞察从一句漂亮的口号，变成一个可以被检验、因而站得住脚的真判断。不要用"证伪条件"这四个字作标签，直接自然地把这句话说出来即可。`;
 
-现在，请针对用户的问题，发生一个金点子。`;
+// 三个视角：各自从不同的切入点，生成真正不同的金点子
+const SDE_VIEWS = {
+  soil: `【本次切入视角：土壤与条件】
+请特别从"这个东西扎根在什么样的土壤、积累、关系网络里"这个角度切入。
+追问：是什么隐藏的、大多数人从不留意的条件，在暗中支撑着这个现象的持续存在？如果抽掉这个条件，它根本不会发生。找到那个"没有它，一切就不成立"的隐藏地基，往往就是金点子。
+
+现在，请针对用户的问题，从"土壤与条件"这个角度，发生一个金点子。`,
+
+  fork: `【本次切入视角：分叉与选择】
+请特别从"这个东西是经过什么样的岔路口、一步步走到今天这个样子"这个角度切入。
+追问：在它演变的每一个关键分叉点上，什么被选中了、什么被压制或牺牲了？今天我们看到的这个"样子"，其实是一连串选择的结果，而不是唯一的必然。把那个被牺牲掉的、本可以走的另一条路指出来，往往就是金点子。
+
+现在，请针对用户的问题，从"分叉与选择"这个角度，发生一个金点子。`,
+
+  decay: `【本次切入视角：退化与显露】
+请特别从"这个东西现在显露出的样子，是成熟、还是退化"这个角度切入。
+追问：它是不是曾经有一个健康、完整的内核，而如今那个内核已经被悄悄抽空，只剩下一个空壳在运转？很多今天的困境，本质是某个曾经鲜活的东西正在退化、塌缩、只余外形。把这个"内核被抽空"的过程精确地指出来，往往就是金点子。
+
+现在，请针对用户的问题，从"退化与显露"这个角度，发生一个金点子。`
+};
+
+function sdePrompt(view){ return SDE_BASE + '\n\n' + SDE_VIEWS[view]; }
 
 const PLAIN_SYSTEM = `你是一个乐于助人的 AI 助手。请清晰、准确地回答用户的问题，篇幅约 1000 字（900-1100 字）。`;
+
+// 普通AI的三视角提示（对照用：同样从三个角度问，但不注入任何SDE方法）
+const PLAIN_VIEWS = {
+  soil: '请从"这个现象背后有哪些条件和成因"的角度，回答用户的问题。',
+  fork: '请从"这个现象是如何一步步演变到今天"的角度，回答用户的问题。',
+  decay: '请从"这个现象当前的状态和存在的问题"的角度，回答用户的问题。'
+};
+function plainPrompt(view){ return PLAIN_SYSTEM + ' ' + PLAIN_VIEWS[view]; }
 
 const DS_URL = "https://api.deepseek.com/v1/chat/completions";
 
@@ -265,9 +332,13 @@ const EXAMPLES = ["如何理解拖延症?","教育的本质是什么?","为什�
 // ============ DOM ============
 const $ = id => document.getElementById(id);
 const apiKeyEl=$('apiKey'), questionEl=$('question'), goBtn=$('goBtn'), modelSel=$('modelSel');
-const plainBody=$('plainBody'), sdeBody=$('sdeBody');
-const plainStatus=$('plainStatus'), sdeStatus=$('sdeStatus');
-const plainMeta=$('plainMeta'), sdeMeta=$('sdeMeta');
+// 三视角，每个视角一对：普通 + SDE
+const VIEWS=['soil','fork','decay'];
+const rowEls=[1,2,3].map((n,i)=>({
+  view: VIEWS[i],
+  plain:{body:$('plain'+n+'Body'), status:$('plain'+n+'Status'), meta:$('plain'+n+'Meta')},
+  sde:{body:$('sde'+n+'Body'), status:$('sde'+n+'Status'), meta:$('sde'+n+'Meta')},
+}));
 const errBox=$('errBox');
 
 // Key 本地持久化
@@ -378,23 +449,34 @@ async function run(){
   $('downloadRow').style.display='none';
   plainMeta.textContent=''; sdeMeta.textContent='';
 
-  // 并行跑两边，各自独立完成
-  const pPlain = streamChat(key, model, PLAIN_SYSTEM, q, plainBody, plainStatus, plainMeta)
-    .catch(e=>{ showErr('普通AI：'+e.message); });
-  const pSde = streamChat(key, model, SDE_SYSTEM, q, sdeBody, sdeStatus, sdeMeta)
-    .catch(e=>{ showErr('SDE提智：'+e.message); });
+  // 六路并行：每个视角一对（普通 + SDE），共 3 视角 × 2 = 6 次调用
+  const tasks=[];
+  rowEls.forEach(row=>{
+    tasks.push(
+      streamChat(key, model, plainPrompt(row.view), q, row.plain.body, row.plain.status, row.plain.meta)
+        .catch(e=>{ showErr('普通AI：'+e.message); return ''; })
+    );
+    tasks.push(
+      streamChat(key, model, sdePrompt(row.view), q, row.sde.body, row.sde.status, row.sde.meta)
+        .catch(e=>{ showErr('金点子：'+e.message); return ''; })
+    );
+  });
 
-  const [rPlain, rSde] = await Promise.allSettled([pPlain, pSde]);
-  goBtn.disabled=false; goBtn.textContent='✦ 发生金点子 —— 看两边的差距';
+  const results = await Promise.all(tasks);
+  goBtn.disabled=false; goBtn.textContent='✦ 发生金点子 —— 三视角 · 六路对照';
 
-  // 保存结果供下载Word
+  // results 顺序：[plain1,sde1, plain2,sde2, plain3,sde3]
+  const viewNames=['土壤与条件','分叉与选择','退化与显露'];
   window._lastResult = {
     question: q,
     model: model==='pro'?'DeepSeek V4 Pro（深度思考）':'DeepSeek V4 Flash',
-    plain: (rPlain.status==='fulfilled' && rPlain.value) ? rPlain.value : '',
-    sde: (rSde.status==='fulfilled' && rSde.value) ? rSde.value : ''
+    rows: [0,1,2].map(i=>({
+      view: viewNames[i],
+      plain: results[i*2]||'',
+      sde: results[i*2+1]||''
+    })).filter(r=>r.plain||r.sde)
   };
-  if(window._lastResult.plain || window._lastResult.sde){
+  if(window._lastResult.rows.length){
     $('downloadRow').style.display='block';
   }
 }
@@ -425,14 +507,17 @@ $('dlBtn').addEventListener('click', ()=>{
     new Paragraph({ children:[new TextRun({ text:'使用模型：'+r.model, size:18, color:'888888', italics:true })], spacing:{ after:320 } }),
   ];
 
-  if(r.plain){
-    children.push(new Paragraph({ children:[new TextRun({ text:'【普通 AI · 未提智】', bold:true, size:28, color:'2E5090' })], spacing:{ before:200, after:140 } }));
-    children.push(...textToParas(r.plain, '333333'));
-  }
-  if(r.sde){
-    children.push(new Paragraph({ children:[new TextRun({ text:'【SDE 提智 AI · 发生学加持】', bold:true, size:28, color:'B07A1E' })], spacing:{ before:360, after:140 } }));
-    children.push(...textToParas(r.sde, '222222'));
-  }
+  (r.rows||[]).forEach((row,idx)=>{
+    children.push(new Paragraph({ children:[new TextRun({ text:'━━━ 视角'+['一','二','三'][idx]+' · 从"'+row.view+'"切入 ━━━', bold:true, size:26, color:'8A6817' })], spacing:{ before:idx?400:200, after:160 }, alignment:AlignmentType.CENTER }));
+    if(row.plain){
+      children.push(new Paragraph({ children:[new TextRun({ text:'【普通 AI · 未提智】', bold:true, size:26, color:'2E5090' })], spacing:{ before:120, after:120 } }));
+      children.push(...textToParas(row.plain, '444444'));
+    }
+    if(row.sde){
+      children.push(new Paragraph({ children:[new TextRun({ text:'【SDE 提智 · 金点子'+['①','②','③'][idx]+'】', bold:true, size:26, color:'B07A1E' })], spacing:{ before:200, after:120 } }));
+      children.push(...textToParas(row.sde, '222222'));
+    }
+  });
 
   children.push(new Paragraph({ children:[new TextRun({ text:'— 由 SDE 金点子发生器生成 · sdeuniverses.com —', size:16, color:'aaaaaa' })], spacing:{ before:400 }, alignment:AlignmentType.CENTER }));
 
