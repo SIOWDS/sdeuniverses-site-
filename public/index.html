@@ -196,6 +196,9 @@ footer{background:var(--bg);border-top:1px solid var(--border2);padding:3rem 2re
 body.en .zh-only{display:none}
 body.zh .en-only{display:none}
 
+/* 每日热点红点 */
+@keyframes hsblink{0%,100%{opacity:1}50%{opacity:0.25}}
+.hs-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#E23B3B;animation:hsblink 1.4s ease-in-out infinite;vertical-align:middle;margin-right:8px}
 /* 今日长文星光闪烁 */
 .ll-stars{position:absolute;inset:0;pointer-events:none}
 .ll-star{position:absolute;background:#fff;border-radius:50%;opacity:0;animation:lltw var(--d,3s) ease-in-out infinite;animation-delay:var(--dl,0s);box-shadow:0 0 6px 1px rgba(255,245,220,0.8)}
@@ -211,6 +214,7 @@ body.zh .en-only{display:none}
 <nav>
   <a class="nav-logo" href="/">SDE Universes</a>
   <div class="nav-links">
+    <a href="#daily-hotspot" class="zh-only" style="color:#E23B3B;font-weight:600">每日热点</a><a href="#daily-hotspot" class="en-only" style="color:#E23B3B;font-weight:600">Hot Take</a>
     <a href="#today-longread" class="zh-only" style="color:#8A6817;font-weight:600">今日长文</a><a href="#today-longread" class="en-only" style="color:#8A6817;font-weight:600">Long Read</a>
     <a href="#daily" class="zh-only" style="color:#8A6817;font-weight:600">每日更新</a><a href="#daily" class="en-only" style="color:#8A6817;font-weight:600">Daily</a>
     <a href="#drwang" class="zh-only">王博士与SDE</a><a href="#drwang" class="en-only">Dr. Wang</a>
@@ -510,6 +514,33 @@ body.zh .en-only{display:none}
     <a href="/books/sde-ontology-intro/" class="en-only" style="display:inline-block;padding:12px 30px;border:1px solid #8A6817;color:#8A6817;letter-spacing:0.1em;font-size:14.5px">Read the New Monograph</a>
   </div>
 </div>
+</section>
+
+<!-- DAILY HOTSPOT 每日热点 -->
+<section id="daily-hotspot" style="background:#141210;border-bottom:1px solid rgba(226,59,59,0.28);padding:72px 24px">
+  <div style="max-width:880px;margin:0 auto">
+    <div class="zh-only" style="font-size:12.5px;letter-spacing:0.45em;color:#E23B3B;margin-bottom:10px"><span class="hs-dot"></span>每日热点 · DAILY HOT TAKE</div>
+    <div class="en-only" style="font-size:12.5px;letter-spacing:0.45em;color:#E23B3B;margin-bottom:10px"><span class="hs-dot"></span>DAILY HOT TAKE</div>
+    <div class="zh-only" style="font-size:15px;color:#9A8F80;margin-bottom:26px;letter-spacing:0.06em">用一双追问"事物如何发生"的眼,解构最近一周正在发生的事。</div>
+    <div class="en-only" style="font-size:15px;color:#9A8F80;margin-bottom:26px;letter-spacing:0.06em">Deconstructing this week's headlines with a genesis-minded eye.</div>
+    <a href="/hotspot/worldcup-eleven/" style="display:block;text-decoration:none">
+      <div style="border:1px solid rgba(226,59,59,0.4);border-left:4px solid #E23B3B;border-radius:3px;background:#1E1B18;padding:32px 32px;transition:border-color 0.3s">
+        <div class="zh-only" style="font-size:12px;letter-spacing:0.3em;color:#C9A227;margin-bottom:12px">本期 · 2026世界杯 · 7月10日</div>
+        <div class="en-only" style="font-size:12px;letter-spacing:0.3em;color:#C9A227;margin-bottom:12px">THIS WEEK · WORLD CUP · JUL 10</div>
+        <div class="zh-only" style="font-size:clamp(24px,4vw,36px);font-weight:700;color:#F5EDE0;letter-spacing:0.06em;line-height:1.5">十四亿人,为什么找不出十一个人?</div>
+        <div class="en-only" style="font-size:clamp(22px,3.6vw,32px);font-weight:700;color:#F5EDE0;letter-spacing:0.04em;line-height:1.5">1.4 Billion People, and No Eleven?</div>
+        <div class="zh-only" style="font-size:15.5px;color:#9A8F80;margin-top:12px;letter-spacing:0.03em">世界杯0球0分只剩国足与印尼 · 50万人口的佛得角踢进了世界杯 · 骂了二十年为何全部落空——因为国足是果,不是因。</div>
+        <div class="en-only" style="font-size:15.5px;color:#9A8F80;margin-top:12px;letter-spacing:0.03em">Cape Verde (pop. 500k) made the World Cup. Twenty years of blame changed nothing — because the team is the fruit, not the root.</div>
+        <div class="zh-only" style="margin-top:22px;display:flex;gap:12px;flex-wrap:wrap">
+          <span style="color:#fff;background:#E23B3B;font-size:14px;font-weight:700;letter-spacing:0.08em;padding:9px 20px;border-radius:2px">阅读解构 →</span>
+          <span style="color:#C9A227;border:1px solid #C9A227;font-size:14px;font-weight:700;letter-spacing:0.08em;padding:9px 20px;border-radius:2px">约三千五百字</span>
+        </div>
+        <div class="en-only" style="margin-top:22px;color:#F5EDE0;font-size:15px;font-weight:700;letter-spacing:0.1em">Read →</div>
+      </div>
+    </a>
+    <div class="zh-only" style="font-size:13px;color:#6B6154;margin-top:16px;letter-spacing:0.1em">每周热点持续解构中 · 往期将陈列于此</div>
+    <div class="en-only" style="font-size:13px;color:#6B6154;margin-top:16px;letter-spacing:0.1em">New takes weekly · Archive grows here</div>
+  </div>
 </section>
 
 <!-- TODAY'S LONG READ 今日长文 -->
