@@ -143,7 +143,7 @@ footer{border-top:1px solid var(--border);text-align:center;padding:30px 20px 44
   <div class="hero-glow"></div>
   <div class="hero-eyebrow">SDE 智能体品尝系列 · 其一</div>
   <h1>SDE <span class="grad">金点子发生器</span></h1>
-  <p class="hero-sub">同一个问题,从三个角度各写一篇小论文。用最强的 DeepSeek（Think Max）,普通 AI 与 SDE 提智 AI 六路对决,<br>每篇约 4000 字——唯一的区别,只是右边被注入了那套完整的 SDE 内功。</p>
+  <p class="hero-sub">同一个问题,从三个角度各写一篇小论文。可选 DeepSeek 或智谱 GLM,普通 AI 与 SDE 提智 AI 六路对决,<br>每篇约 4000 字——唯一的区别,只是右边被注入了那套完整的 SDE 内功。</p>
 </header>
 
 <div class="controls">
@@ -154,8 +154,8 @@ footer{border-top:1px solid var(--border);text-align:center;padding:30px 20px 44
       <button class="key-toggle" id="keyToggle">显示</button>
     </div>
     <div class="key-hint">
-      <b>Key 只存在你的浏览器本地,绝不上传任何服务器</b> · 计算直接在你的浏览器里进行 ·
-      没有 Key?<a href="https://platform.deepseek.com" target="_blank" rel="noopener">去 DeepSeek 申请 →</a>(充值几十元即可体验)
+      <b>Key 只存在你的浏览器本地,绝不上传任何服务器</b> · 计算直接在你的浏览器里进行<br>
+      请根据下方选择的模型，填入对应厂商的 Key：<a href="https://platform.deepseek.com" target="_blank" rel="noopener">DeepSeek 申请 →</a> · <a href="https://open.bigmodel.cn" target="_blank" rel="noopener">智谱 GLM 申请 →</a>（都充值几十元即可体验）
     </div>
   </div>
 
@@ -168,8 +168,14 @@ footer{border-top:1px solid var(--border);text-align:center;padding:30px 20px 44
   <div class="go-row">
     <button class="btn-go" id="goBtn">✦ 生成六篇小论文 —— 三视角对决(约4000字/篇)</button>
     <select class="model-select" id="modelSel" title="模型">
-      <option value="pro">V4 Pro · 最强推理(Think Max · 推荐)</option>
-      <option value="flash">V4 Flash · 快速(几秒出字 · 想快选这个)</option>
+      <optgroup label="DeepSeek">
+        <option value="ds:pro">DeepSeek V4 Pro · 最强推理(Think Max)</option>
+        <option value="ds:flash">DeepSeek V4 Flash · 快速</option>
+      </optgroup>
+      <optgroup label="智谱 GLM">
+        <option value="glm:pro">智谱 GLM-5 · 深度思考(最强)</option>
+        <option value="glm:flash">智谱 GLM-4-Flash · 快速</option>
+      </optgroup>
     </select>
   </div>
 </div>
@@ -338,23 +344,44 @@ const PLAIN_SYSTEM = `你是一个乐于助人、见识广博的 AI 助手。请
 // 左边（无内功）= 普通助手设定 + 完全相同的角度提问
 function plainPrompt(view){ return PLAIN_SYSTEM + '\n\n【本次作答角度】\n' + SHARED_VIEWS[view]; }
 
-const DS_URL = "https://api.deepseek.com/v1/chat/completions";
+// 多厂商 API 地址
+const API_URLS = {
+  ds:  "https://api.deepseek.com/v1/chat/completions",
+  glm: "https://open.bigmodel.cn/api/paas/v4/chat/completions"
+};
+// 解析 "厂商:档位" → {vendor, tier}
+function parseModel(sel){
+  const [vendor, tier] = sel.split(':');
+  return { vendor, tier };
+}
+function apiUrl(sel){ return API_URLS[parseModel(sel).vendor]; }
 
-// V4 模型映射：flash=快/便宜(非思考), pro=深度思考
-function buildPayload(tier, systemPrompt, userQ){
+// 根据 厂商:档位 构造 payload
+function buildPayload(sel, systemPrompt, userQ){
+  const { vendor, tier } = parseModel(sel);
   const base = {
     stream: true,
     messages: [{role:'system',content:systemPrompt},{role:'user',content:userQ}],
     max_tokens: 12000
   };
-  if(tier === 'pro'){
-    base.model = 'deepseek-v4-pro';
-    base.thinking = {type:'enabled'};
-    base.reasoning_effort = 'xhigh';   // Think Max：DeepSeek 最强推理档
-  } else {
-    base.model = 'deepseek-v4-flash';
-    base.thinking = {type:'disabled'};
-    base.temperature = 0.7;
+  if(vendor === 'ds'){
+    if(tier === 'pro'){
+      base.model = 'deepseek-v4-pro';
+      base.thinking = {type:'enabled'};
+      base.reasoning_effort = 'xhigh';   // Think Max：DeepSeek 最强推理档
+    } else {
+      base.model = 'deepseek-v4-flash';
+      base.thinking = {type:'disabled'};
+      base.temperature = 0.7;
+    }
+  } else if(vendor === 'glm'){
+    if(tier === 'pro'){
+      base.model = 'glm-5';
+      base.thinking = {type:'enabled'};   // 智谱 GLM-5 思考模式
+    } else {
+      base.model = 'glm-4-flash';
+      base.temperature = 0.7;
+    }
   }
   return base;
 }
@@ -404,7 +431,7 @@ async function streamChat(apiKey, model, systemPrompt, userQ, bodyEl, statusEl, 
 
   let resp;
   try{
-    resp = await fetch(DS_URL, {
+    resp = await fetch(apiUrl(model), {
       method:'POST',
       headers:{ 'Content-Type':'application/json', 'Authorization':'Bearer '+apiKey },
       body: JSON.stringify(buildPayload(model, systemPrompt, userQ))
@@ -534,7 +561,7 @@ async function run(){
   const sdeStats  =[results[1],results[3],results[5]].filter(x=>x&&x.chars>0);
   window._lastResult = {
     question: q,
-    model: model==='pro'?'DeepSeek V4 Pro（深度思考）':'DeepSeek V4 Flash',
+    model: ({'ds:pro':'DeepSeek V4 Pro（深度思考）','ds:flash':'DeepSeek V4 Flash','glm:pro':'智谱 GLM-5（深度思考）','glm:flash':'智谱 GLM-4-Flash'})[model] || model,
     rows: [0,1,2].map(i=>({
       view: viewNames[i],
       plain: (results[i*2]&&results[i*2].text)||'',
