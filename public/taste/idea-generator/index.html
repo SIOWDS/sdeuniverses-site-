@@ -484,8 +484,6 @@ async function run(){
       cell.meta.textContent='';
     });
   });
-  plainMeta.textContent=''; sdeMeta.textContent='';
-
   // 六路串行：一篇一篇来，避免同时打 DeepSeek 撞并发限制导致全部排队卡住
   // 顺序：视角1普通→视角1SDE→视角2普通→视角2SDE→视角3普通→视角3SDE
   const jobs=[];
