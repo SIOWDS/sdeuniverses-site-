@@ -80,6 +80,32 @@ p.lead{font-size:18.5px}
 .btn.ghost:hover{background:rgba(212,178,94,0.12);text-decoration:none}
 footer{background:var(--ink);color:#8C7E5C;text-align:center;padding:34px 0 44px;font-size:13px;letter-spacing:0.08em}
 footer a{color:var(--ink-gold)}
+
+/* ===== 分页阅读 ===== */
+.page{display:none;animation:pgfade 0.4s ease}
+.page.active{display:block}
+body.readall .page{display:block!important}
+@keyframes pgfade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+/* 顶部章节导航条 */
+.pgbar{position:sticky;top:60px;z-index:15;background:rgba(246,242,233,0.96);backdrop-filter:blur(8px);border-bottom:1px solid var(--border)}
+.pgbar-inner{max-width:768px;margin:0 auto;padding:12px 24px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.pgbar-tabs{display:flex;gap:6px;flex-wrap:wrap}
+.pgbar-tabs button{background:transparent;border:1px solid var(--border);color:var(--muted);padding:6px 13px;border-radius:2px;font-size:13px;cursor:pointer;font-family:inherit;letter-spacing:0.03em;transition:all 0.2s}
+.pgbar-tabs button.on{background:var(--ink);color:var(--ink-gold);border-color:var(--ink)}
+.pgbar-tabs button:hover:not(.on){border-color:var(--gold);color:var(--gold2)}
+.pgbar-mode{font-size:12.5px;color:var(--muted);cursor:pointer;white-space:nowrap;border:none;background:transparent;font-family:inherit;text-decoration:underline;text-underline-offset:3px}
+.pgbar-mode:hover{color:var(--gold2)}
+/* 进度条 */
+.pgprog{height:3px;background:rgba(138,104,23,0.15)}
+.pgprog-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--ink-gold));width:20%;transition:width 0.4s ease}
+/* 底部翻页栏 */
+.pgnav{max-width:768px;margin:20px auto 0;padding:28px 24px 8px;border-top:2px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:16px}
+.pgnav button{background:var(--ink);color:var(--ink-gold);border:1px solid var(--ink);padding:12px 24px;border-radius:2px;font-size:15px;cursor:pointer;font-family:inherit;letter-spacing:0.05em;transition:all 0.2s}
+.pgnav button:hover:not(:disabled){background:#2a2010}
+.pgnav button:disabled{opacity:0.3;cursor:not-allowed}
+.pgnav .pgnav-info{font-size:13.5px;color:var(--muted);text-align:center;flex:1}
+body.readall .pgbar-tabs,body.readall .pgnav,body.readall .pgprog{display:none}
+@media(max-width:560px){.pgbar-tabs button{padding:5px 9px;font-size:12px}.pgnav button{padding:10px 16px;font-size:14px}}
 </style>
 </head>
 <body>
@@ -90,6 +116,19 @@ footer a{color:var(--ink-gold)}
     <a class="nav-back" href="/#today-longread">← 今日长文</a>
   </div>
 </nav>
+
+<div class="pgprog"><div class="pgprog-fill" id="pgProgFill"></div></div>
+<div class="pgbar" id="pgBar">
+  <div class="pgbar-inner">
+    <div class="pgbar-tabs" id="pgTabs">
+      <button data-goto="1" class="on">引子</button>
+      <button data-goto="2">壹·中庸</button>
+      <button data-goto="3">贰·论语</button>
+      <button data-goto="4">叁·大学</button>
+    </div>
+    <button class="pgbar-mode" id="pgModeBtn">一次读完整篇 ▾</button>
+  </div>
+</div>
 
 <header class="hero">
   <div class="stars" id="starfield"></div>
@@ -103,6 +142,8 @@ footer a{color:var(--ink-gold)}
 </header>
 
 <article class="wrap">
+<div class="pages">
+<div class="page" data-page="1" data-title="引子">
 
 <!-- ============ 引子 ============ -->
 <div class="chapter">
@@ -114,6 +155,8 @@ footer a{color:var(--ink-gold)}
   <p>下面,我们就沿着"立法—原料—制造"这条线,分三章,一章一部书,把那个"一"彻底看清。而在看清的同时,我们也会看见一件更深、也更沉重的事:这套关于"一"的伟大工程,在它最精密、最令人叹服的地方,恰恰藏着一个决定了一个文明命运的抉择——它在给出无与伦比的稳定的同一刻,悄悄锁死了另一样东西。这样东西是什么,要等三章走完,才能真正看清。</p>
 </div>
 
+</div><!--/page1-->
+<div class="page" data-page="2" data-title="壹 · 中庸的一">
 <!-- ============ 第一章 中庸的一 ============ -->
 <div class="chapter ch1">
   <div class="ch-head">
@@ -195,6 +238,8 @@ footer a{color:var(--ink-gold)}
   <p>要看这个,我们得离开《中庸》的立法庭,走进《论语》的矿场。</p>
 </div>
 
+</div><!--/page2-->
+<div class="page" data-page="3" data-title="贰 · 论语的一">
 <!-- ============ 第二章 论语的一 ============ -->
 <div class="chapter ch2">
   <div class="ch-head">
@@ -279,6 +324,8 @@ footer a{color:var(--ink-gold)}
   <p>这道工序流程,写在四书里最短、却被排在第一位读的那一部——《大学》里。</p>
 </div>
 
+</div><!--/page3-->
+<div class="page" data-page="4" data-title="叁 · 大学的一">
 <!-- ============ 第三章 大学的一 ============ -->
 <div class="chapter ch3">
   <div class="ch-head">
@@ -359,6 +406,15 @@ footer a{color:var(--ink-gold)}
   <p>这重反讽,反而给了我们最大的启示和底气:守护"一"与创造"一",在孔子那里,本就不是矛盾的。他一生都在维持那个"人与人之间的同一性"(守1),同时又大胆地创造着全新的思想与制度(0→1)。是后来的宪章,才把这两件事对立起来、把后者禁止掉的。所以我们今天要做的,不是背叛孔子,恰恰是回到那个更本真的孔子——一个既深情维持着"一"、又勇敢创造着"一"的孔子。读懂"夫子之道:一以贯之",最终读懂的,或许正是这一点:那个"一",从来不只是一条要我们守护的旧律,它更是一份邀请,邀请我们像孔子本人那样,在守护中创造,在创造中守护。这,才是"一以贯之"留给这个时代,最完整、也最深情的一道回响。</p>
 </div>
 
+</div><!--/page4-->
+</div><!--/pages-->
+
+<div class="pgnav" id="pgNav">
+  <button id="pgPrev" disabled>‹ 上一章</button>
+  <div class="pgnav-info" id="pgInfo">引子 · 第 1 / 5 页</div>
+  <button id="pgNext">下一章 ›</button>
+</div>
+
 </article>
 
 <div class="endbox">
@@ -402,5 +458,61 @@ function seedStars(containerId, count){
 seedStars('starfield',80);
 seedStars('starfield2',40);
 </script>
+
+<script>
+(function(){
+  var pages=Array.prototype.slice.call(document.querySelectorAll('.page'));
+  var total=pages.length; // 4章页 + 结语(endbox)算第5页概念
+  var TOTAL_LABEL=5;
+  var titles=['引子','壹 · 中庸的一','贰 · 论语的一','叁 · 大学的一'];
+  var cur=1;
+  var tabs=document.getElementById('pgTabs');
+  var prev=document.getElementById('pgPrev'), next=document.getElementById('pgNext');
+  var info=document.getElementById('pgInfo'), fill=document.getElementById('pgProgFill');
+  var modeBtn=document.getElementById('pgModeBtn');
+  var readall=false;
+
+  function show(n){
+    if(n<1)n=1; if(n>total)n=total;
+    cur=n;
+    pages.forEach(function(p){p.classList.toggle('active', +p.getAttribute('data-page')===n);});
+    // tabs
+    Array.prototype.forEach.call(tabs.children,function(b){b.classList.toggle('on', +b.getAttribute('data-goto')===n);});
+    prev.disabled=(n<=1);
+    next.textContent = (n>=total)? '读完 · 看结语 ›' : '下一章 ›';
+    info.textContent = titles[n-1]+' · 第 '+n+' / '+TOTAL_LABEL+' 页';
+    fill.style.width = (n/TOTAL_LABEL*100)+'%';
+  }
+  function goTop(){ var hd=document.querySelector('.pgbar'); if(hd){window.scrollTo({top:hd.offsetTop-70,behavior:'smooth'});} else window.scrollTo({top:0,behavior:'smooth'}); }
+
+  tabs.addEventListener('click',function(e){
+    var b=e.target.closest('button[data-goto]'); if(!b)return;
+    if(readall){toggleMode();}
+    show(+b.getAttribute('data-goto')); goTop();
+  });
+  prev.addEventListener('click',function(){ show(cur-1); goTop(); });
+  next.addEventListener('click',function(){
+    if(cur>=total){ // 已在最后一章，滚到结语
+      var eb=document.querySelector('.endbox'); if(eb)eb.scrollIntoView({behavior:'smooth'});
+    } else { show(cur+1); goTop(); }
+  });
+  document.addEventListener('keydown',function(e){
+    if(readall)return;
+    if(e.key==='ArrowLeft'&&cur>1){show(cur-1);goTop();}
+    if(e.key==='ArrowRight'&&cur<total){show(cur+1);goTop();}
+  });
+
+  function toggleMode(){
+    readall=!readall;
+    document.body.classList.toggle('readall',readall);
+    modeBtn.textContent = readall? '分页阅读 ▾' : '一次读完整篇 ▾';
+    if(!readall){ show(cur); goTop(); }
+  }
+  modeBtn.addEventListener('click',toggleMode);
+
+  show(1);
+})();
+</script>
+
 </body>
 </html>
