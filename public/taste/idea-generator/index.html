@@ -144,8 +144,8 @@ footer{border-top:1px solid var(--border);text-align:center;padding:30px 20px 44
   <div class="go-row">
     <button class="btn-go" id="goBtn">✦ 发生金点子 —— 看两边的差距</button>
     <select class="model-select" id="modelSel" title="模型">
-      <option value="deepseek-chat">DeepSeek Chat(快)</option>
-      <option value="deepseek-reasoner">DeepSeek Reasoner(深度思考·更慢)</option>
+      <option value="flash">V4 Flash(快 · 便宜)</option>
+      <option value="pro">V4 Pro(深度思考 · 更强)</option>
     </select>
   </div>
 </div>
@@ -231,6 +231,25 @@ const PLAIN_SYSTEM = `你是一个乐于助人的 AI 助手。请清晰、准确
 
 const DS_URL = "https://api.deepseek.com/v1/chat/completions";
 
+// V4 模型映射：flash=快/便宜(非思考), pro=深度思考
+function buildPayload(tier, systemPrompt, userQ){
+  const base = {
+    stream: true,
+    messages: [{role:'system',content:systemPrompt},{role:'user',content:userQ}],
+    max_tokens: 1600
+  };
+  if(tier === 'pro'){
+    base.model = 'deepseek-v4-pro';
+    base.thinking = {type:'enabled'};
+    base.reasoning_effort = 'high';
+  } else {
+    base.model = 'deepseek-v4-flash';
+    base.thinking = {type:'disabled'};
+    base.temperature = 0.7;
+  }
+  return base;
+}
+
 // 示例问题
 const EXAMPLES = ["如何理解拖延症?","教育的本质是什么?","为什么越努力越焦虑?","什么是真正的自律?","爱情为什么会消退?","内卷的根源是什么?"];
 
@@ -276,11 +295,7 @@ async function streamChat(apiKey, model, systemPrompt, userQ, bodyEl, statusEl, 
     resp = await fetch(DS_URL, {
       method:'POST',
       headers:{ 'Content-Type':'application/json', 'Authorization':'Bearer '+apiKey },
-      body: JSON.stringify({
-        model, stream:true,
-        messages:[{role:'system',content:systemPrompt},{role:'user',content:userQ}],
-        temperature: 0.7, max_tokens: 1400
-      })
+      body: JSON.stringify(buildPayload(model, systemPrompt, userQ))
     });
   }catch(e){ statusEl.textContent='网络错误'; throw new Error('网络请求失败：'+e.message); }
 
