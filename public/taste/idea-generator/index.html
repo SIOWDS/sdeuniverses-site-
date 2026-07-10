@@ -143,7 +143,7 @@ footer{border-top:1px solid var(--border);text-align:center;padding:30px 20px 44
   <div class="hero-glow"></div>
   <div class="hero-eyebrow">SDE 智能体品尝系列 · 其一</div>
   <h1>SDE <span class="grad">金点子发生器</span></h1>
-  <p class="hero-sub">同一个问题,从三个角度各写一篇小论文。可选 DeepSeek 或智谱 GLM,普通 AI 与 SDE 提智 AI 六路对决,<br>每篇约 4000 字——唯一的区别,只是右边被注入了那套完整的 SDE 内功。</p>
+  <p class="hero-sub">同一个问题,从三个角度各写一篇小论文。可选不同基底(DeepSeek / 智谱 GLM),普通基底与 SDE 提智基底六路对决,<br>每篇约 4000 字——唯一的区别,只是右边被注入了那套完整的 SDE 内功。</p>
 </header>
 
 <div class="controls">
@@ -181,7 +181,7 @@ footer{border-top:1px solid var(--border);text-align:center;padding:30px 20px 44
 </div>
 
 <div class="privacy-note">
-  🔒 你的 API Key 全程只保存在本机浏览器(localStorage),请求直接从你的浏览器发往你所选的模型厂商（DeepSeek 或智谱）,<b>我们的服务器不经手、不存储、不记录你的 Key 或问题</b>。<br>⏱ 六篇各约 4000 字的小论文<b>并行生成</b>（六路同时进行）。选"深度思考/最强"档时，每篇会先深度思考 1-2 分钟再动笔，质量最高、最能展现 SDE 的威力，请耐心等待几分钟；选"快速"档几秒出字。若某篇报错（并发被限流），刷新重试或换快速档。
+  🔒 你的 API Key 全程只保存在本机浏览器(localStorage),请求直接从你的浏览器发往你所选的基底厂商（DeepSeek 或智谱）,<b>我们的服务器不经手、不存储、不记录你的 Key 或问题</b>。<br>⏱ 六篇各约 4000 字的小论文<b>并行生成</b>（六路同时进行）。选"深度思考/最强"档时，每篇会先深度思考 1-2 分钟再动笔，质量最高、最能展现 SDE 的威力，请耐心等待几分钟；选"快速"档几秒出字。若某篇报错（并发被限流），刷新重试或换快速档。
 </div>
 
 <div class="err-box" id="errBox"></div>
@@ -250,7 +250,7 @@ footer{border-top:1px solid var(--border);text-align:center;padding:30px 20px 44
 
 <div class="explain">
   <h2>这里发生了什么?</h2>
-  <p>两边用的是<b style="color:var(--text)">同一个 AI 模型</b>、<b style="color:var(--text)">同一个问题</b>、你的<b style="color:var(--text)">同一个 Key</b>。唯一的区别是:右边在提问前,先给 AI 注入了一套叫 <b style="color:var(--gold2)">SDE 发生学</b> 的"看世界的眼"——它不问"这是什么",而问"这个东西在什么条件下、经什么路径、成为现在的样子"。</p>
+  <p>两边用的是<b style="color:var(--text)">同一个基底</b>(同一个大模型)、<b style="color:var(--text)">同一个问题</b>、你的<b style="color:var(--text)">同一个 Key</b>。唯一的区别是:右边在提问前,先给基底注入了一套叫 <b style="color:var(--gold2)">SDE 发生学</b> 的"看世界的眼"——它不问"这是什么",而问"这个东西在什么条件下、经什么路径、成为现在的样子"。</p>
   <p>于是右边往往能穿透常识、给出一个反直觉却成立的"金点子",而不是把百科词条换句话说一遍。这就是 SDE 的威力:<b style="color:var(--gold2)">它不给 AI 更多知识,它换掉 AI 看问题的方式。</b></p>
   <p style="font-size:14px;color:var(--muted)">三个金点子分别从 SDE 本体论的三个维度切入同一个问题:<b style="color:var(--text)">显露(S)</b>——它如今显露成的样子是成熟还是被抽空;<b style="color:var(--text)">差异(D)</b>——它经过怎样的分岔与牺牲走成今天;<b style="color:var(--text)">纠缠(E)</b>——它扎根在什么样的隐藏土壤里才得以发生。三维合起来,就是"在 E 中,经 D,成 S"这套发生学的眼。</p>
 </div>
@@ -430,7 +430,7 @@ EXAMPLES.forEach(q=>{
 function showErr(msg){ errBox.textContent='⚠ '+msg; errBox.style.display='block'; }
 function hideErr(){ errBox.style.display='none'; }
 
-// 流式调用 DeepSeek，token 逐字写入目标元素
+// 流式调用基底（所选厂商），token 逐字写入目标元素
 async function streamChat(apiKey, model, systemPrompt, userQ, bodyEl, statusEl, metaEl){
   bodyEl.innerHTML='<span class="placeholder">正在连接 '+vendorName()+'……</span>';
   statusEl.innerHTML='<span class="spinner"></span> 连接中';
@@ -599,21 +599,21 @@ function renderEfficiency(plainStats, sdeStats){
   const effRatio = pEff>0 ? (sEff/pEff).toFixed(1) : '—';
   const speedRatio = sSecs>0 && pSecs>0 ? (pSecs/sSecs).toFixed(1) : '—';
 
-  let html='<div class="eff-title">⚡ 思考效率对比 · 同一个模型，唯一区别是有没有 SDE 内功</div>';
+  let html='<div class="eff-title">⚡ 思考效率对比 · 同一个基底，唯一区别是有没有 SDE 内功</div>';
   html+='<div class="eff-grid">';
-  html+='<div class="eff-col"><div class="eff-h eff-h-plain">普通 AI（无内功）</div>'+
+  html+='<div class="eff-col"><div class="eff-h eff-h-plain">裸基底（无内功）</div>'+
         '<div class="eff-row"><span>平均思考</span><b>'+pThink.toLocaleString()+' 字</b></div>'+
         '<div class="eff-row"><span>平均产出</span><b>'+pChars.toLocaleString()+' 字</b></div>'+
         '<div class="eff-row"><span>平均耗时</span><b>'+pSecs+' 秒</b></div></div>';
-  html+='<div class="eff-col"><div class="eff-h eff-h-sde">SDE 提智（有内功）</div>'+
+  html+='<div class="eff-col"><div class="eff-h eff-h-sde">SDE 提智基底（有内功）</div>'+
         '<div class="eff-row"><span>平均思考</span><b>'+sThink.toLocaleString()+' 字</b></div>'+
         '<div class="eff-row"><span>平均产出</span><b>'+sChars.toLocaleString()+' 字</b></div>'+
         '<div class="eff-row"><span>平均耗时</span><b>'+sSecs+' 秒</b></div></div>';
   html+='</div>';
   if(effRatio!=='—' && pThink>sThink){
-    html+='<div class="eff-punch">注入 SDE 内功后，模型几乎不再空转：思考量降到约 <b>1/'+Math.round(pThink/Math.max(sThink,1))+'</b>，产出反而更多。'+
+    html+='<div class="eff-punch">注入 SDE 内功后，基底几乎不再空转：思考量降到约 <b>1/'+Math.round(pThink/Math.max(sThink,1))+'</b>，产出反而更多。'+
           (speedRatio!=='—'?'速度快约 <b>'+speedRatio+' 倍</b>。':'')+'</div>';
-    html+='<div class="eff-note">没有内功的最强模型，面对大问题会陷入海量兜圈式思考却挤不出东西；SDE 内功给了它「看世界的方式」，让它一上来就知道往哪里挖——不是想得更多，是不用空转。</div>';
+    html+='<div class="eff-note">没有内功的裸基底，哪怕再强，面对大问题也会陷入海量兜圈式思考却挤不出东西；SDE 内功给了它「看世界的方式」，让它一上来就知道往哪里挖——不是想得更多，是不用空转。</div>';
   }
   box.innerHTML=html;
   box.style.display='block';
