@@ -151,14 +151,14 @@ footer{border-top:1px solid var(--border);text-align:center;padding:30px 20px 44
   <div class="go-row">
     <button class="btn-go" id="goBtn">✦ 生成六篇小论文 —— 三视角对决(约4000字/篇)</button>
     <select class="model-select" id="modelSel" title="模型">
-      <option value="pro">V4 Pro · 深度思考(更强 · 推荐)</option>
-      <option value="flash">V4 Flash(快 · 便宜)</option>
+      <option value="flash">V4 Flash · 快速(几秒出字 · 推荐)</option>
+      <option value="pro">V4 Pro · 深度思考(更强 · 首字需1-2分钟)</option>
     </select>
   </div>
 </div>
 
 <div class="privacy-note">
-  🔒 你的 API Key 全程只保存在本机浏览器(localStorage),请求直接从你的浏览器发往 DeepSeek,<b>我们的服务器不经手、不存储、不记录你的 Key 或问题</b>。<br>⏱ 六篇各约 4000 字的小论文并行生成,通常需要几分钟,请耐心等待——这是深度换来的分量。
+  🔒 你的 API Key 全程只保存在本机浏览器(localStorage),请求直接从你的浏览器发往 DeepSeek,<b>我们的服务器不经手、不存储、不记录你的 Key 或问题</b>。<br>⏱ 六篇各约 4000 字的小论文并行生成。用 <b>V4 Flash</b> 通常一两分钟出齐;用 <b>V4 Pro 深度思考</b> 质量更高,但首次响应需 1-2 分钟、总共可能要三五分钟——请耐心等待。
 </div>
 
 <div class="err-box" id="errBox"></div>
@@ -399,10 +399,18 @@ async function streamChat(apiKey, model, systemPrompt, userQ, bodyEl, statusEl, 
 
   const reader = resp.body.getReader();
   const decoder = new TextDecoder();
-  let buf='', thinking=false, thinkChars=0;
-  // 连接成功，清空占位，准备逐字接收
-  bodyEl.innerHTML=''; bodyEl.appendChild(cursor);
-  statusEl.innerHTML='<span class="spinner"></span> 生成中';
+  let buf='', thinking=false, thinkChars=0, gotAnything=false;
+  // 连接成功，显示等待模型响应（深度思考首字可能要1-2分钟）
+  bodyEl.innerHTML='<span class="placeholder">✓ 已连接，模型正在启动（V4 Pro 深度思考首次响应约需 1-2 分钟，请稍候）……</span>';
+  statusEl.innerHTML='<span class="spinner"></span> 等待响应';
+  // 计时器：每秒更新"已等待N秒"，让用户确信连接是活的
+  const waitTimer = setInterval(()=>{
+    if(!gotAnything){
+      const s = Math.round((Date.now()-t0)/1000);
+      statusEl.innerHTML='<span class="spinner"></span> 等待响应 ('+s+'s)';
+    }
+  }, 1000);
+  try{
   while(true){
     const {done,value}=await reader.read();
     if(done) break;
@@ -411,7 +419,9 @@ async function streamChat(apiKey, model, systemPrompt, userQ, bodyEl, statusEl, 
     buf = lines.pop();
     for(const line of lines){
       const s=line.trim();
-      if(!s || !s.startsWith('data:')) continue;
+      // 跳过空行与 SSE keep-alive 注释行（: keep-alive）
+      if(!s || s.startsWith(':')) continue;
+      if(!s.startsWith('data:')) continue;
       const data=s.slice(5).trim();
       if(data==='[DONE]') continue;
       try{
@@ -420,14 +430,15 @@ async function streamChat(apiKey, model, systemPrompt, userQ, bodyEl, statusEl, 
         // 深度思考过程（reasoning_content）：显示思考状态，不计入正文
         const rc = d.reasoning_content || '';
         if(rc){
-          thinking=true; thinkChars+=rc.length;
+          gotAnything=true; thinking=true; thinkChars+=rc.length;
           statusEl.innerHTML='<span class="spinner"></span> 🧠 深度思考中 ('+thinkChars+'字)';
-          if(!acc){ bodyEl.innerHTML='<span class="placeholder">🧠 正在深度思考，稍候将给出金点子……</span>'; bodyEl.appendChild(cursor); }
+          if(!acc){ bodyEl.innerHTML='<span class="placeholder">🧠 模型正在深度思考（已思考 '+thinkChars+' 字），稍候给出正文……</span>'; bodyEl.appendChild(cursor); }
         }
         // 正式答案
         const delta = d.content || '';
         if(delta){
-          if(thinking && !acc){ bodyEl.innerHTML=''; bodyEl.appendChild(cursor); statusEl.innerHTML='<span class="spinner"></span> 生成金点子'; }
+          gotAnything=true;
+          if(!acc){ bodyEl.innerHTML=''; bodyEl.appendChild(cursor); statusEl.innerHTML='<span class="spinner"></span> 生成中'; }
           acc+=delta; chars+=delta.length;
           bodyEl.textContent=acc;
           bodyEl.appendChild(cursor);
@@ -436,6 +447,7 @@ async function streamChat(apiKey, model, systemPrompt, userQ, bodyEl, statusEl, 
       }catch(_){}
     }
   }
+  }finally{ clearInterval(waitTimer); }
   cursor.remove();
   const secs=((Date.now()-t0)/1000).toFixed(1);
   if(!acc){
@@ -458,7 +470,7 @@ async function run(){
   if(!key){ showErr('请先填入你的 DeepSeek API Key'); apiKeyEl.focus(); return; }
   if(!q){ showErr('请输入一个问题'); questionEl.focus(); return; }
 
-  goBtn.disabled=true; goBtn.textContent='⏳ 六篇小论文生成中(每篇约4000字,需数分钟)……';
+  goBtn.disabled=true; goBtn.textContent='⏳ 六篇小论文生成中(每篇约4000字)……';
   $('downloadRow').style.display='none';
 
   // 点击瞬间：把六个面板全部预置为"排队中"，让用户立刻看到六路都已激活
