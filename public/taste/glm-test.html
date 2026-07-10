@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>智谱 GLM 浏览器直连测试</title>
+<style>
+  body{background:#0d1117;color:#e6edf3;font-family:system-ui,-apple-system,sans-serif;max-width:760px;margin:0 auto;padding:40px 20px;line-height:1.6}
+  h1{color:#D4B25E;font-size:22px}
+  .card{background:#161b22;border:1px solid #30363d;border-radius:12px;padding:24px;margin:20px 0}
+  input{width:100%;padding:12px;background:#0d1117;border:1px solid #30363d;border-radius:8px;color:#e6edf3;font-size:14px;box-sizing:border-box;margin:8px 0}
+  select{width:100%;padding:12px;background:#0d1117;border:1px solid #30363d;border-radius:8px;color:#e6edf3;font-size:14px;box-sizing:border-box;margin:8px 0}
+  button{background:#D4B25E;color:#1a1205;font-weight:700;border:none;border-radius:8px;padding:14px 28px;font-size:15px;cursor:pointer;width:100%;margin-top:10px}
+  button:disabled{opacity:0.5}
+  #result{margin-top:20px;padding:16px;border-radius:8px;white-space:pre-wrap;font-size:14px;display:none}
+  .ok{background:#0f2a17;border:1px solid #2ea043;color:#7ee787}
+  .err{background:#2d1214;border:1px solid #da3633;color:#ff7b72}
+  .muted{color:#8b949e;font-size:13px}
+  code{background:#21262d;padding:2px 6px;border-radius:4px;font-size:13px}
+</style>
+</head>
+<body>
+<h1>🧪 智谱 GLM 浏览器直连测试</h1>
+<p class="muted">测试浏览器能否直接调用智谱 GLM API（CORS 是否放行）。这决定了金点子发生器能不能加智谱选项。你的 Key 只用于这次测试，不保存、不上传任何服务器。</p>
+
+<div class="card">
+  <label>智谱 API Key（从 open.bigmodel.cn 获取）</label>
+  <input type="password" id="key" placeholder="粘贴你的智谱 API Key">
+  
+  <label>选择模型测试</label>
+  <select id="model">
+    <option value="glm-5">GLM-5（最新旗舰，2026年7月）</option>
+    <option value="glm-4.6">GLM-4.6</option>
+    <option value="glm-4-flash">GLM-4-Flash（免费/快速）</option>
+  </select>
+
+  <button id="testBtn" onclick="test()">▶ 测试浏览器直连</button>
+  <div id="result"></div>
+</div>
+
+<div class="card">
+  <div class="muted">
+    <b>可能的结果：</b><br>
+    ✅ <b>绿色成功</b> = 浏览器能直连智谱，可以加进发生器<br>
+    ❌ <b>红色 CORS 错误</b>（含 <code>Failed to fetch</code> 或 <code>Access-Control</code>）= 智谱不允许浏览器直连，需要服务器中转，加不了<br>
+    ❌ <b>红色 401/余额</b> = 能连上（CORS通过了！），只是 Key 或余额问题——这也算 CORS 测试通过
+  </div>
+</div>
+
+<script>
+async function test(){
+  const key = document.getElementById('key').value.trim();
+  const model = document.getElementById('model').value;
+  const btn = document.getElementById('testBtn');
+  const result = document.getElementById('result');
+  if(!key){ alert('请先填入智谱 API Key'); return; }
+  
+  btn.disabled = true; btn.textContent = '⏳ 测试中……';
+  result.style.display = 'block';
+  result.className = '';
+  result.textContent = '正在从你的浏览器直接调用智谱 GLM API……';
+  
+  const t0 = Date.now();
+  try{
+    const resp = await fetch('https://open.bigmodel.cn/api/paas/v4/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + key
+      },
+      body: JSON.stringify({
+        model: model,
+        messages: [{role:'user', content:'请回复两个字：成功'}],
+        max_tokens: 20,
+        stream: false
+      })
+    });
+    const secs = ((Date.now()-t0)/1000).toFixed(1);
+    
+    if(resp.ok){
+      const data = await resp.json();
+      const reply = data.choices?.[0]?.message?.content || JSON.stringify(data);
+      result.className = 'ok';
+      result.textContent = '✅ 浏览器直连成功！CORS 放行！\n\n模型：' + model + '\n耗时：' + secs + 's\n模型回复：' + reply + '\n\n👉 智谱可以加进金点子发生器。';
+    }else{
+      let detail = '';
+      try{ const j = await resp.json(); detail = j.error?.message || j.message || JSON.stringify(j); }
+      catch(_){ detail = resp.statusText; }
+      // 能收到HTTP响应，说明CORS其实通过了，只是业务错误
+      result.className = 'ok';
+      result.textContent = '⚠️ CORS 其实通过了（浏览器收到了智谱的响应）！\n\nHTTP 状态：' + resp.status + '\n错误信息：' + detail + '\n\n这通常是 Key 无效或余额不足，不是 CORS 问题。\n👉 只要不是 Failed to fetch，就说明浏览器能直连智谱，可以加进发生器。';
+    }
+  }catch(e){
+    const secs = ((Date.now()-t0)/1000).toFixed(1);
+    result.className = 'err';
+    result.textContent = '❌ 直连失败（' + secs + 's）\n\n错误：' + e.message + '\n\n如果错误是 "Failed to fetch" 或含 "CORS"／"Access-Control"，说明智谱不允许浏览器直连，需要服务器中转，无法加进纯浏览器的发生器。';
+  }
+  btn.disabled = false; btn.textContent = '▶ 测试浏览器直连';
+}
+</script>
+</body>
+</html>
