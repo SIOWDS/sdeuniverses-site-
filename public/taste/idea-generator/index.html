@@ -187,6 +187,11 @@ footer{border-top:1px solid var(--border);text-align:center;padding:30px 20px 44
 <div class="err-box" id="errBox"></div>
 
 <!-- 三视角对照：每行一个视角，左普通 右SDE -->
+<div id="comboBar" style="display:none;max-width:1000px;margin:30px auto 0;text-align:center;background:linear-gradient(135deg,rgba(40,32,12,0.75),rgba(20,20,30,0.75));border:1px solid rgba(212,178,94,0.45);border-radius:14px;padding:16px 22px">
+  <div style="font-size:13px;color:#8B98A5;margin-bottom:6px;letter-spacing:0.08em">🎲 本次从九宫格抽中的组合（三格不重合）</div>
+  <div id="comboText" style="font-size:17px;font-weight:700;color:#E8C97A;letter-spacing:0.02em"></div>
+</div>
+
 <div id="effBox" style="display:none"></div>
 
 <div class="triview" id="results">
@@ -572,6 +577,9 @@ async function run(){
     const c = cells[i];
     if(row.labelEl) row.labelEl.textContent = '视角'+['一','二','三'][i]+' —— 本次抽中：'+SUB_NAMES[c.dim][c.idx];
   });
+  // 顶部组合条：一眼看到本次三格组合
+  $('comboText').textContent = cells.map(c=>SUB_NAMES[c.dim][c.idx]).join('　✕　');
+  $('comboBar').style.display='block';
 
   // 六路并行：3视角 × (普通+SDE) = 6 次调用同时发起
   const tasks=[];
@@ -669,6 +677,7 @@ function clearResults(){
   window._lastResult = null;
   $('downloadRow').style.display='none';
   if($('effBox')) $('effBox').style.display='none';
+  if($('comboBar')) $('comboBar').style.display='none';
   // 恢复视角标签为默认
   rowEls.forEach((row,i)=>{ if(row.labelEl) row.labelEl.textContent='视角'+['一','二','三'][i]+'（点击生成后从九宫格随机抽取）'; });
   hideErr();
