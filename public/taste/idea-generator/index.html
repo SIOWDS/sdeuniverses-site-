@@ -80,7 +80,7 @@ textarea{resize:vertical;min-height:76px;line-height:1.6}
 .col-tag{font-size:11px;letter-spacing:0.1em;color:var(--muted);padding:3px 9px;border:1px solid var(--border);border-radius:20px}
 .col.plain .col-badge{color:var(--plain)}
 .col.sde .col-badge{color:var(--sde)}
-.col-body{padding:20px;font-size:15px;line-height:1.85;flex:1;white-space:pre-wrap;word-wrap:break-word;overflow-wrap:break-word;min-height:120px;color:var(--text)}
+.col-body{padding:20px;font-size:15px;line-height:1.85;flex:1;white-space:pre-wrap;word-wrap:break-word;overflow-wrap:break-word;min-height:200px;max-height:600px;overflow-y:auto;color:var(--text)}
 .col-body .placeholder{color:var(--muted);font-style:italic}
 .col.sde .col-body{background:var(--sde-bg)}
 .col.plain .col-body{background:var(--plain-bg)}
@@ -126,7 +126,7 @@ footer{border-top:1px solid var(--border);text-align:center;padding:30px 20px 44
   <div class="hero-glow"></div>
   <div class="hero-eyebrow">SDE 智能体品尝系列 · 其一</div>
   <h1>SDE <span class="grad">金点子发生器</span></h1>
-  <p class="hero-sub">同一个问题,从 SDE 三维（显露 S · 差异 D · 纠缠 E）各切一刀,<br>普通 AI 与 SDE 提智 AI 六路并行对决——唯一的区别,只是那套 SDE 内功。</p>
+  <p class="hero-sub">同一个问题,从三个角度各写一篇小论文。普通 AI 与 SDE 提智 AI 六路并行,<br>每篇约 4000 字——唯一的区别,只是右边被注入了那套完整的 SDE 内功。</p>
 </header>
 
 <div class="controls">
@@ -149,7 +149,7 @@ footer{border-top:1px solid var(--border);text-align:center;padding:30px 20px 44
   </div>
 
   <div class="go-row">
-    <button class="btn-go" id="goBtn">✦ 发生金点子 —— 三视角 · 六路对照</button>
+    <button class="btn-go" id="goBtn">✦ 生成六篇小论文 —— 三视角对决(约4000字/篇)</button>
     <select class="model-select" id="modelSel" title="模型">
       <option value="pro">V4 Pro · 深度思考(更强 · 推荐)</option>
       <option value="flash">V4 Flash(快 · 便宜)</option>
@@ -158,7 +158,7 @@ footer{border-top:1px solid var(--border);text-align:center;padding:30px 20px 44
 </div>
 
 <div class="privacy-note">
-  🔒 你的 API Key 全程只保存在本机浏览器(localStorage),请求直接从你的浏览器发往 DeepSeek,<b>我们的服务器不经手、不存储、不记录你的 Key 或问题</b>。
+  🔒 你的 API Key 全程只保存在本机浏览器(localStorage),请求直接从你的浏览器发往 DeepSeek,<b>我们的服务器不经手、不存储、不记录你的 Key 或问题</b>。<br>⏱ 六篇各约 4000 字的小论文并行生成,通常需要几分钟,请耐心等待——这是深度换来的分量。
 </div>
 
 <div class="err-box" id="errBox"></div>
@@ -215,7 +215,7 @@ footer{border-top:1px solid var(--border);text-align:center;padding:30px 20px 44
 
 <div id="downloadRow" style="max-width:1200px;margin:20px auto 0;text-align:center;display:none">
   <button id="dlBtn" style="background:#238636;color:#fff;font-weight:600;font-size:15px;border:none;border-radius:9px;padding:13px 32px;cursor:pointer;letter-spacing:0.03em">
-    📄 下载对比结果（Word 文档）
+    📄 下载六篇小论文（Word 文档）
   </button>
   <div style="font-size:12px;color:#8B98A5;margin-top:8px">把这次的"普通 AI vs SDE 提智"对比,保存成 .docx 文件</div>
 </div>
@@ -243,35 +243,26 @@ footer{border-top:1px solid var(--border);text-align:center;padding:30px 20px 44
 
 <script>
 // ============ SDE 提智系统提示（从33518字内功提炼的灵魂）============
-// ============ SDE 提智：共同底座 + 三个不同视角 ============
-const SDE_BASE = `你是一位思想极其深刻、善于穿透常识的跨学科洞察者。你的任务不是复述知识，而是对用户的问题给出一个"反直觉却成立"的金点子——一个让人读完拍案、说"原来可以这样看"的洞察。
+// ============ SDE 提智：完整内功（33521字，运行时从文件加载）+ 三视角 ============
+// 完整 SDE-FT 内功先验从 /taste/assets/sde-neigong.txt 加载
+// 在加载完成前提供一个兜底精简版，避免用户抢先点击时右侧空转
+let SDE_BASE = `你是一位思想极其深刻、善于穿透常识的跨学科洞察者。你的任务不是复述知识，而是对用户的问题给出一个"反直觉却成立"的金点子。核心心法：不问"这个东西是什么"，而问"它在什么条件下、经什么路径、成为现在的样子"。世界不是被发现的，而是被发生出来的。输出用问题所在领域的自然语言，绝不出现任何理论术语或学派黑话，篇幅约1000字，结尾用一句朴素的话给出证伪条件。`;
+let SDE_BASE_LOADED = false;
 
-你的底层思维方式（严格遵守，但绝不在输出中提及这套方法本身）：
-
-【一、发生学，不是发现学】
-不要问"这个东西是什么"（那是描述，停留在平庸）。
-要问"这个东西在什么条件下、经过什么样的路径、成为现在这个样子"（那是发生，通向深刻）。
-世界不是被发现的，而是被发生出来的。任何看似固定的东西——一种情绪、一个制度、一种现象——都不是本来就摆在那里，而是在特定条件、特定差异路径、特定关系网络中被"发生"并"稳定"下来的。你的洞察要抓住这个"发生"的过程。
-
-【二、三个追问（你分析任何问题的内在骨架）】
-面对任何问题，在心里过一遍这三问，但输出时用问题所在领域的自然语言表达，绝不暴露这套框架：
-1. 它扎根在什么样的"土壤/积累/关系网络"里？（没有这个土壤，它根本不会发生）
-2. 它是经过什么样的"分叉、选择、压制、放大"一步步走到今天的？（在每个岔路口，什么被选中、什么被牺牲）
-3. 它现在显露成这个样子，是"成熟"、"退化"、还是"尚未成形"？（很多问题的关键，在于看出它其实处在退化态或未成熟态）
-
-【三、穿透的方向】
-- 把"名词"看成"动词"：不是"拖延症"（一个病），而是"拖延如何被一次次发生出来"（一个过程）。
-- 找出被忽略的"条件"：大多数人盯着现象本身，你要盯着"让这个现象得以持续的那个隐藏条件"。
-- 识别"退化"：很多今天的困境，是某个曾经健康的东西，其内核被抽空、只剩外壳的结果。指出这个抽空的过程，往往就是金点子。
-- 给出"反直觉但成立"的重新定义：用户以为 A 是问题，你指出真正的问题是 B，而 B 才是 A 得以发生的根源。
-
-【四、输出纪律（极其重要）】
-1. 直接给洞察，不要铺垫、不要"这是一个好问题"之类的废话。
-2. 用问题所在领域的自然语言，像一位该领域最聪明的思想者在说话。
-3. 绝对不要出现任何理论黑话、框架名称、术语缩写、"某某视角下"这类学派腔调——如果一位完全不懂任何理论的普通读者读到某句会觉得"这是某个学派的行话"，就是失败。你的深刻要藏在洞察本身，而不是靠术语撑场面。
-4. 篇幅要求：请用约 1000 字（900-1100 字，含结尾的证伪条件）给出你的金点子，可以有 2-3 层展开，把洞察说透说深，但不要注水凑字数。
-5. 让人读完有"顿悟感"——那种"我从没这样想过，但你说得对"的震动。
-6. 【必须】在正文的最后，另起一段，用一句朴素的话给出这个金点子的"证伪条件"——即：什么样的事实、现象或实验结果一旦出现，就说明你这个判断是错的。格式是自然的一句话，例如"如果……反而……，那这个判断就不成立"。这一步至关重要：它让你的洞察从一句漂亮的口号，变成一个可以被检验、因而站得住脚的真判断。不要用"证伪条件"这四个字作标签，直接自然地把这句话说出来即可。`;
+// 页面加载即拉取完整内功
+(async function loadNeigong(){
+  try{
+    const resp = await fetch('/taste/assets/sde-neigong.txt', {cache:'force-cache'});
+    if(resp.ok){
+      const full = await resp.text();
+      if(full && full.length > 5000){   // 确认拿到的是完整内功
+        SDE_BASE = full;
+        SDE_BASE_LOADED = true;
+        console.log('✓ 完整 SDE 内功已加载：' + full.length + ' 字符');
+      }
+    }
+  }catch(e){ console.warn('完整内功加载失败，使用兜底精简版：', e.message); }
+})();
 
 // 三个视角：各自从不同的切入点，生成真正不同的金点子
 // 三个"共享的角度提问"——左右两边逐字相同，唯一变量是"右边是否注入内功"
@@ -289,9 +280,37 @@ const SHARED_VIEWS = {
 };
 
 // 右边（有内功）= SDE内功底座 + 相同角度
-function sdePrompt(view){ return SDE_BASE + '\n\n【本次作答角度】\n' + SHARED_VIEWS[view]; }
+// 金点子发生器专属输出规格（接在完整内功之后，规范格式）
+const SDE_OUTPUT_SPEC = `
 
-const PLAIN_SYSTEM = `你是一个乐于助人的 AI 助手。请清晰、准确地回答用户的问题，篇幅约 1000 字（900-1100 字）。`;
+---
+【本次任务的产出规格：写成一篇小论文】
+你面对的这个"具体议题"，就是用户提出的问题。请用你上面被注入的这套眼光去看它，写成一篇有深度、有论证结构的小论文（约 4000 字）。
+
+▍核心洞察
+先在心里锚定一个反直觉却成立的核心判断（一个真正的金点子），整篇论文都围绕它展开、层层深入地论证它。不要写成面面俱到的综述，要有一个尖锐的、贯穿全文的主张。
+
+▍论文格式（请严格遵循）
+1. 开头用一个凝练的**标题**（一行，点出你的核心洞察，不要写"论……"这种八股腔，要让人一看标题就想读下去）。
+2. 正文分成 4-6 个部分，每个部分用一个**小标题**（小标题本身就要有信息量、有推进感，而不是"一、背景""二、分析"这种空壳）。
+3. 每个部分是层层递进的论证：提出→展开→举例→深化，一步一步把核心洞察推向更深处。段落之间要有逻辑推进，不是并列罗列。
+4. 结尾部分，另起一段，用一句朴素自然的话给出这个判断的**证伪条件**——什么样的事实、现象或实验结果一旦出现，就说明你这个判断是错的（例如"如果……反而……，那这个判断就不成立"）。不要用"证伪条件"四个字作标签，自然地说出这句话即可。
+
+▍语言纪律（最重要）
+· 直接进入洞察，不要"这是个好问题""教育是个复杂的话题"之类的铺垫。
+· 严格用问题所在领域的自然语言，像该领域最深刻的思想者在写作——绝对不出现任何理论术语、框架名称、缩写、"某某视角下"这类学派腔调。一个完全不懂任何理论的普通读者读到任何一句，都不应觉得"这是某个学派的行话"。
+· 篇幅约 4000 字（3500-4500 字），充分展开，把洞察的每一层都论证透彻，但绝不注水凑字数——每一段都要有推进。
+· 让人读完有"我从没这样想过，但你说得对"的震动，并且觉得"这是一篇真正有分量的文章"。`;
+
+function sdePrompt(view){ return SDE_BASE + SDE_OUTPUT_SPEC + '\n\n【请特别侧重这个角度】\n' + SHARED_VIEWS[view]; }
+
+const PLAIN_SYSTEM = `你是一个乐于助人、见识广博的 AI 助手。请针对用户的问题，写成一篇有深度、有见地的小论文（约 4000 字）。
+
+要求：
+1. 开头用一个凝练的标题（一行，点出你的核心观点）。
+2. 正文分成 4-6 个部分，每个部分用一个小标题，层层展开论证。
+3. 直接进入正文，不要"这是个好问题"之类的铺垫。
+4. 篇幅约 4000 字（3500-4500 字），把你的看法充分展开、论证透彻，力求给出让人有收获的判断，而不只是罗列常识。`;
 
 // 普通AI的三视角提示（对照用：同样从三个角度问，但不注入任何SDE方法）
 // 左边（无内功）= 普通助手设定 + 完全相同的角度提问
@@ -304,7 +323,7 @@ function buildPayload(tier, systemPrompt, userQ){
   const base = {
     stream: true,
     messages: [{role:'system',content:systemPrompt},{role:'user',content:userQ}],
-    max_tokens: 4000
+    max_tokens: 12000
   };
   if(tier === 'pro'){
     base.model = 'deepseek-v4-pro';
@@ -437,7 +456,7 @@ async function run(){
   if(!key){ showErr('请先填入你的 DeepSeek API Key'); apiKeyEl.focus(); return; }
   if(!q){ showErr('请输入一个问题'); questionEl.focus(); return; }
 
-  goBtn.disabled=true; goBtn.textContent='⏳ 两边正在生成……';
+  goBtn.disabled=true; goBtn.textContent='⏳ 六篇小论文生成中(每篇约4000字,需数分钟)……';
   $('downloadRow').style.display='none';
   plainMeta.textContent=''; sdeMeta.textContent='';
 
@@ -455,7 +474,7 @@ async function run(){
   });
 
   const results = await Promise.all(tasks);
-  goBtn.disabled=false; goBtn.textContent='✦ 发生金点子 —— 三视角 · 六路对照';
+  goBtn.disabled=false; goBtn.textContent='✦ 生成六篇小论文 —— 三视角对决(约4000字/篇)';
 
   // results 顺序：[plain1,sde1, plain2,sde2, plain3,sde3]
   const viewNames=['显露 · Show(S)','差异 · Difference(D)','纠缠 · Entanglement(E)'];
@@ -483,12 +502,31 @@ $('dlBtn').addEventListener('click', ()=>{
 
   // 把多行文本转成docx段落
   function textToParas(text, color){
-    return text.split('\n').filter(l=>l.trim()).map(line=>
-      new Paragraph({
-        children:[new TextRun({ text: line.trim(), size: 24, color: color||'222222' })],
-        spacing:{ after: 160, line: 360 }
-      })
-    );
+    const lines = text.split('\n').filter(l=>l.trim());
+    return lines.map((line,idx)=>{
+      const t = line.trim();
+      // 识别标题/小标题：较短(<40字)且不以句末标点结尾，视为标题层
+      const isShort = t.length < 40 && !/[。！？.!?；;：:，,]$/.test(t);
+      // 第一行短句 = 论文主标题（更大更粗、居中）
+      if(idx===0 && isShort){
+        return new Paragraph({
+          children:[new TextRun({ text:t, bold:true, size:30, color: color||'222222' })],
+          spacing:{ after:220, before:80 }, alignment:AlignmentType.CENTER
+        });
+      }
+      // 其他短句 = 小标题（加粗、稍大、前置间距）
+      if(isShort){
+        return new Paragraph({
+          children:[new TextRun({ text:t, bold:true, size:26, color: color||'222222' })],
+          spacing:{ before:220, after:120 }
+        });
+      }
+      // 正文段落
+      return new Paragraph({
+        children:[new TextRun({ text:t, size:24, color: color||'222222' })],
+        spacing:{ after:160, line:360 }
+      });
+    });
   }
 
   const children = [
