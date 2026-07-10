@@ -161,7 +161,7 @@ footer{border-top:1px solid var(--border);text-align:center;padding:30px 20px 44
 </div>
 
 <div class="privacy-note">
-  🔒 你的 API Key 全程只保存在本机浏览器(localStorage),请求直接从你的浏览器发往 DeepSeek,<b>我们的服务器不经手、不存储、不记录你的 Key 或问题</b>。<br>⏱ 六篇各约 4000 字的小论文<b>依次生成</b>（一篇接一篇）。默认用 <b>V4 Flash</b>——几秒出字，六篇总共约<b>两三分钟</b>，对比已经很震撼，适合快速品尝。想看极致质量可切换 <b>V4 Pro 最强推理（Think Max）</b>：质量最高，但每篇先深度思考 1-2 分钟，六篇总计可能十几到二十分钟。
+  🔒 你的 API Key 全程只保存在本机浏览器(localStorage),请求直接从你的浏览器发往 DeepSeek,<b>我们的服务器不经手、不存储、不记录你的 Key 或问题</b>。<br>⏱ 六篇各约 4000 字的小论文<b>并行生成</b>（六路同时进行）。默认用 <b>V4 Flash</b>——几秒出字，六篇同时冒出，通常一两分钟出齐，适合快速品尝。想看极致质量可切换 <b>V4 Pro 最强推理（Think Max）</b>：质量最高，但每篇先深度思考 1-2 分钟。若遇到某篇报错（并发过高被限流），刷新重试即可。
 </div>
 
 <div class="err-box" id="errBox"></div>
@@ -473,7 +473,7 @@ async function run(){
   if(!key){ showErr('请先填入你的 DeepSeek API Key'); apiKeyEl.focus(); return; }
   if(!q){ showErr('请输入一个问题'); questionEl.focus(); return; }
 
-  goBtn.disabled=true; goBtn.textContent='⏳ 六篇小论文生成中(每篇约4000字)……';
+  goBtn.disabled=true; goBtn.textContent='⏳ 六篇小论文并行生成中(每篇约4000字)……';
   $('downloadRow').style.display='none';
 
   // 点击瞬间：把六个面板全部预置为"排队中"，让用户立刻看到六路都已激活
@@ -484,47 +484,27 @@ async function run(){
       cell.meta.textContent='';
     });
   });
-  // 六路串行：一篇一篇来，避免同时打 DeepSeek 撞并发限制导致全部排队卡住
-  // 顺序：视角1普通→视角1SDE→视角2普通→视角2SDE→视角3普通→视角3SDE
-  const jobs=[];
-  rowEls.forEach((row,i)=>{
-    jobs.push({label:'第'+(i*2+1)+'/6篇 · 视角'+(i+1)+'普通AI', fn:()=>streamChat(key, model, plainPrompt(row.view), q, row.plain.body, row.plain.status, row.plain.meta), cell:row.plain});
-    jobs.push({label:'第'+(i*2+2)+'/6篇 · 视角'+(i+1)+'金点子', fn:()=>streamChat(key, model, sdePrompt(row.view), q, row.sde.body, row.sde.status, row.sde.meta), cell:row.sde});
+  // 六路并行：3视角 × (普通+SDE) = 6 次调用同时发起
+  // 顺序索引：[0]视角1普通 [1]视角1SDE [2]视角2普通 [3]视角2SDE [4]视角3普通 [5]视角3SDE
+  const tasks=[];
+  rowEls.forEach((row)=>{
+    // 普通AI
+    tasks.push(
+      streamChat(key, model, plainPrompt(row.view), q, row.plain.body, row.plain.status, row.plain.meta)
+        .catch(e=>{ showErr('普通AI：'+e.message);
+          row.plain.body.innerHTML='<span class="placeholder">生成失败：'+e.message+'</span>';
+          row.plain.status.textContent='失败'; return ''; })
+    );
+    // SDE金点子
+    tasks.push(
+      streamChat(key, model, sdePrompt(row.view), q, row.sde.body, row.sde.status, row.sde.meta)
+        .catch(e=>{ showErr('金点子：'+e.message);
+          row.sde.body.innerHTML='<span class="placeholder">生成失败：'+e.message+'</span>';
+          row.sde.status.textContent='失败'; return ''; })
+    );
   });
 
-  // 把未开始的面板标为"等待中（前面还有N篇）"
-  jobs.forEach((job,idx)=>{
-    if(idx>0){
-      job.cell.body.innerHTML='<span class="placeholder">排队等待中（前面还有 '+idx+' 篇正在生成）……</span>';
-      job.cell.status.textContent='等待中';
-    }
-  });
-
-  const results=[];
-  for(let i=0;i<jobs.length;i++){
-    goBtn.textContent='⏳ 正在生成 '+jobs[i].label+'（共6篇，请勿关闭）……';
-    const cell = jobs[i].cell;
-    const colEl = cell.body.closest('.col');
-    if(colEl) colEl.classList.add('generating');
-    // 关键：当前篇开始前，立即把它从"排队中"改成"启动中"，让用户看到它轮到了
-    cell.body.innerHTML='<span class="placeholder">▶ 正在启动本篇，连接 DeepSeek……</span>';
-    cell.status.innerHTML='<span class="spinner"></span> 启动中';
-    // 让浏览器有机会重绘这个状态（await一个微任务）
-    await new Promise(r=>setTimeout(r,50));
-    try{
-      const r = await jobs[i].fn();
-      results.push(r||'');
-    }catch(e){
-      showErr(jobs[i].label+'：'+e.message);
-      cell.body.innerHTML='<span class="placeholder">本篇生成失败：'+e.message+'</span>';
-      cell.status.textContent='失败';
-      results.push('');
-    }
-    if(colEl){ colEl.classList.remove('generating'); colEl.classList.add('done-flash'); setTimeout(()=>colEl.classList.remove('done-flash'),600); }
-    for(let j=i+1;j<jobs.length;j++){
-      jobs[j].cell.body.innerHTML='<span class="placeholder">排队等待中（前面还有 '+(j-i-1)+' 篇）……</span>';
-    }
-  }
+  const results = await Promise.all(tasks);
 
   goBtn.disabled=false; goBtn.textContent='✦ 生成六篇小论文 —— 三视角对决(约4000字/篇)';
 
