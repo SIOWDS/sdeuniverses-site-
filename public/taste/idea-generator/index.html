@@ -148,7 +148,7 @@ footer{border-top:1px solid var(--border);text-align:center;padding:30px 20px 44
 
 <div class="controls">
   <div class="field">
-    <label>你的 DeepSeek API Key <span class="req">*</span></label>
+    <label id="keyLabel">你的 DeepSeek API Key <span class="req">*</span></label>
     <div class="key-row">
       <input type="password" id="apiKey" placeholder="sk-..." autocomplete="off" spellcheck="false">
       <button class="key-toggle" id="keyToggle">显示</button>
@@ -402,8 +402,17 @@ const rowEls=[1,2,3].map((n,i)=>({
 const errBox=$('errBox');
 
 // Key 本地持久化
-apiKeyEl.value = localStorage.getItem('sde_ds_key') || '';
-apiKeyEl.addEventListener('input', ()=>localStorage.setItem('sde_ds_key', apiKeyEl.value.trim()));
+// 两家的 Key 分开保存；切换模型时自动切换对应厂商的 Key
+function keyStoreName(){ return parseModel(modelSel.value).vendor==='glm' ? 'sde_glm_key' : 'sde_ds_key'; }
+function vendorName(){ return parseModel(modelSel.value).vendor==='glm' ? '智谱' : 'DeepSeek'; }
+function refreshKeyUI(){
+  apiKeyEl.value = localStorage.getItem(keyStoreName()) || '';
+  const lbl = $('keyLabel');
+  if(lbl) lbl.innerHTML = '你的 ' + vendorName() + ' API Key <span class="req">*</span>';
+}
+refreshKeyUI();
+apiKeyEl.addEventListener('input', ()=>localStorage.setItem(keyStoreName(), apiKeyEl.value.trim()));
+modelSel.addEventListener('change', refreshKeyUI);
 $('keyToggle').addEventListener('click', ()=>{
   const t = apiKeyEl.type==='password';
   apiKeyEl.type = t?'text':'password';
@@ -516,7 +525,7 @@ async function run(){
   const key=apiKeyEl.value.trim().replace(/^["']|["']$/g,'');
   const q=questionEl.value.trim();
   const model=modelSel.value;
-  if(!key){ showErr('请先填入你的 DeepSeek API Key'); apiKeyEl.focus(); return; }
+  if(!key){ showErr('请先填入你的 '+vendorName()+' API Key'); apiKeyEl.focus(); return; }
   if(!q){ showErr('请输入一个问题'); questionEl.focus(); return; }
 
   goBtn.disabled=true; goBtn.textContent='⏳ 六篇小论文并行生成中(每篇约4000字)……';
