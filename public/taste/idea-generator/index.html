@@ -105,6 +105,7 @@ footer{border-top:1px solid var(--border);text-align:center;padding:30px 20px 44
 .privacy-note{max-width:820px;margin:14px auto 0;font-size:12px;color:var(--muted);text-align:center;line-height:1.7}
 .privacy-note b{color:var(--gold)}
 </style>
+<script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js"></script>
 </head>
 <body>
 
@@ -175,6 +176,13 @@ footer{border-top:1px solid var(--border);text-align:center;padding:30px 20px 44
   </div>
 </div>
 
+<div id="downloadRow" style="max-width:1200px;margin:20px auto 0;text-align:center;display:none">
+  <button id="dlBtn" style="background:#238636;color:#fff;font-weight:600;font-size:15px;border:none;border-radius:9px;padding:13px 32px;cursor:pointer;letter-spacing:0.03em">
+    📄 下载对比结果（Word 文档）
+  </button>
+  <div style="font-size:12px;color:#8B98A5;margin-top:8px">把这次的"普通 AI vs SDE 提智"对比,保存成 .docx 文件</div>
+</div>
+
 <div class="explain">
   <h2>这里发生了什么?</h2>
   <p>两边用的是<b style="color:var(--text)">同一个 AI 模型</b>、<b style="color:var(--text)">同一个问题</b>、你的<b style="color:var(--text)">同一个 Key</b>。唯一的区别是:右边在提问前,先给 AI 注入了一套叫 <b style="color:var(--gold2)">SDE 发生学</b> 的"看世界的眼"——它不问"这是什么",而问"这个东西在什么条件下、经什么路径、成为现在的样子"。</p>
@@ -222,12 +230,12 @@ const SDE_SYSTEM = `你是一位思想极其深刻、善于穿透常识的跨学
 1. 直接给洞察，不要铺垫、不要"这是一个好问题"之类的废话。
 2. 用问题所在领域的自然语言，像一位该领域最聪明的思想者在说话。
 3. 绝对不要出现任何理论黑话、框架名称、术语缩写、"某某视角下"这类学派腔调——如果一位完全不懂任何理论的普通读者读到某句会觉得"这是某个学派的行话"，就是失败。你的深刻要藏在洞察本身，而不是靠术语撑场面。
-4. 篇幅精悍：用 300-600 字给出 1 个核心金点子（可以有 2-3 层展开），宁可深不可泛。
+4. 篇幅要求：请用约 1000 字（900-1100 字）给出你的金点子，可以有 2-3 层展开，把洞察说透说深，但不要注水凑字数。
 5. 让人读完有"顿悟感"——那种"我从没这样想过，但你说得对"的震动。
 
 现在，请针对用户的问题，发生一个金点子。`;
 
-const PLAIN_SYSTEM = `你是一个乐于助人的 AI 助手。请清晰、准确地回答用户的问题。`;
+const PLAIN_SYSTEM = `你是一个乐于助人的 AI 助手。请清晰、准确地回答用户的问题，篇幅约 1000 字（900-1100 字）。`;
 
 const DS_URL = "https://api.deepseek.com/v1/chat/completions";
 
@@ -236,7 +244,7 @@ function buildPayload(tier, systemPrompt, userQ){
   const base = {
     stream: true,
     messages: [{role:'system',content:systemPrompt},{role:'user',content:userQ}],
-    max_tokens: 2400
+    max_tokens: 4000
   };
   if(tier === 'pro'){
     base.model = 'deepseek-v4-pro';
@@ -366,6 +374,7 @@ async function run(){
   if(!q){ showErr('请输入一个问题'); questionEl.focus(); return; }
 
   goBtn.disabled=true; goBtn.textContent='⏳ 两边正在生成……';
+  $('downloadRow').style.display='none';
   plainMeta.textContent=''; sdeMeta.textContent='';
 
   // 并行跑两边，各自独立完成
@@ -374,11 +383,68 @@ async function run(){
   const pSde = streamChat(key, model, SDE_SYSTEM, q, sdeBody, sdeStatus, sdeMeta)
     .catch(e=>{ showErr('SDE提智：'+e.message); });
 
-  await Promise.allSettled([pPlain, pSde]);
+  const [rPlain, rSde] = await Promise.allSettled([pPlain, pSde]);
   goBtn.disabled=false; goBtn.textContent='✦ 发生金点子 —— 看两边的差距';
+
+  // 保存结果供下载Word
+  window._lastResult = {
+    question: q,
+    model: model==='pro'?'DeepSeek V4 Pro（深度思考）':'DeepSeek V4 Flash',
+    plain: (rPlain.status==='fulfilled' && rPlain.value) ? rPlain.value : '',
+    sde: (rSde.status==='fulfilled' && rSde.value) ? rSde.value : ''
+  };
+  if(window._lastResult.plain || window._lastResult.sde){
+    $('downloadRow').style.display='block';
+  }
 }
 
 goBtn.addEventListener('click', run);
+
+// 下载 Word 文档
+$('dlBtn').addEventListener('click', ()=>{
+  const r = window._lastResult;
+  if(!r){ return; }
+  const { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType } = docx;
+
+  // 把多行文本转成docx段落
+  function textToParas(text, color){
+    return text.split('\n').filter(l=>l.trim()).map(line=>
+      new Paragraph({
+        children:[new TextRun({ text: line.trim(), size: 24, color: color||'222222' })],
+        spacing:{ after: 160, line: 360 }
+      })
+    );
+  }
+
+  const children = [
+    new Paragraph({ children:[new TextRun({ text:'SDE 金点子发生器 · 对比结果', bold:true, size:36, color:'1a1205' })], spacing:{ after:120 }, alignment:AlignmentType.CENTER }),
+    new Paragraph({ children:[new TextRun({ text:'sdeuniverses.com · 品尝系列', size:18, color:'888888' })], spacing:{ after:320 }, alignment:AlignmentType.CENTER }),
+    new Paragraph({ children:[new TextRun({ text:'问题', bold:true, size:26, color:'8A6817' })], spacing:{ after:100 } }),
+    new Paragraph({ children:[new TextRun({ text: r.question, size:24 })], spacing:{ after:120 } }),
+    new Paragraph({ children:[new TextRun({ text:'使用模型：'+r.model, size:18, color:'888888', italics:true })], spacing:{ after:320 } }),
+  ];
+
+  if(r.plain){
+    children.push(new Paragraph({ children:[new TextRun({ text:'【普通 AI · 未提智】', bold:true, size:28, color:'2E5090' })], spacing:{ before:200, after:140 } }));
+    children.push(...textToParas(r.plain, '333333'));
+  }
+  if(r.sde){
+    children.push(new Paragraph({ children:[new TextRun({ text:'【SDE 提智 AI · 发生学加持】', bold:true, size:28, color:'B07A1E' })], spacing:{ before:360, after:140 } }));
+    children.push(...textToParas(r.sde, '222222'));
+  }
+
+  children.push(new Paragraph({ children:[new TextRun({ text:'— 由 SDE 金点子发生器生成 · sdeuniverses.com —', size:16, color:'aaaaaa' })], spacing:{ before:400 }, alignment:AlignmentType.CENTER }));
+
+  const doc = new Document({ sections:[{ properties:{}, children }] });
+  Packer.toBlob(doc).then(blob=>{
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const qShort = r.question.slice(0,12).replace(/[\\/:*?"<>|]/g,'');
+    a.href=url; a.download='SDE金点子_'+qShort+'.docx';
+    document.body.appendChild(a); a.click();
+    document.body.removeChild(a); URL.revokeObjectURL(url);
+  }).catch(e=>{ alert('生成Word失败：'+e.message); });
+});
 questionEl.addEventListener('keydown', e=>{ if((e.ctrlKey||e.metaKey)&&e.key==='Enter') run(); });
 </script>
 </body>
