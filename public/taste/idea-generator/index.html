@@ -1317,17 +1317,30 @@ async function runOnePaper(cfg){
   const dummy = { textContent:'', innerHTML:'' };
   const setStat = (t)=>{ if(cfg.statusEl) cfg.statusEl.textContent = t; };
 
+  // 简化：只显示"✍ 已生成 N 字"的滚动字数。开一个轮询，实时读正文已有字数。
+  // streamChat 的 statusEl 传 dummy（屏蔽它内部那套"等待/深度思考/生成中"花哨状态），正文 bodyEl 照旧滚动。
+  let ticker = null;
+  const startTicker = ()=>{
+    stopTicker();
+    ticker = setInterval(()=>{
+      const n = (cfg.bodyEl && cfg.bodyEl.textContent ? cfg.bodyEl.textContent.length : 0);
+      setStat(n>0 ? ('✍ 已生成 ' + n + ' 字') : '✍ 生成中…');
+    }, 500);
+  };
+  const stopTicker = ()=>{ if(ticker){ clearInterval(ticker); ticker=null; } };
+
   // 1. 写初稿
-  setStat('① 写初稿中…');
+  startTicker();
   let draft;
   try{
-    draft = await streamChat(cfg.writeKey, cfg.writeSel, paper1wPrompt(), cfg.writeInput, cfg.bodyEl, cfg.statusEl, dummy);
-  }catch(e){ setStat('✗ 初稿失败：'+e.message); throw e; }
+    draft = await streamChat(cfg.writeKey, cfg.writeSel, paper1wPrompt(), cfg.writeInput, cfg.bodyEl, dummy, dummy);
+  }catch(e){ stopTicker(); setStat('✗ 生成失败：'+e.message); throw e; }
   let paperText = draft.text || '';
-  if(!paperText){ setStat('✗ 初稿为空'); throw new Error('初稿为空'); }
+  if(!paperText){ stopTicker(); setStat('✗ 未产出内容'); throw new Error('初稿为空'); }
 
-  // 2. 双审（并行）
-  setStat('② 两位评审审稿中…');
+  // 2. 双审（并行，静默——评审意见不显示在正文，正文保持初稿）
+  stopTicker();
+  setStat('✍ 初稿 ' + paperText.length + ' 字 · 审稿中…');
   let revA='', revB='';
   const jobs=[];
   jobs.push(
@@ -1343,18 +1356,19 @@ async function runOnePaper(cfg){
   await Promise.all(jobs);
 
   // 若两审都失败，保留初稿
-  if(!revA && !revB){ setStat('⚠ 评审未产出，保留初稿'); cfg.bodyEl.innerHTML = renderPaperText(paperText); return { title:cfg.title, text:paperText }; }
+  if(!revA && !revB){ setStat('✍ 完成 ' + paperText.length + ' 字'); cfg.bodyEl.innerHTML = renderPaperText(paperText); return { title:cfg.title, text:paperText }; }
 
-  // 3. 主笔据两份意见改一次
-  setStat('③ 主笔据评审意见改稿中…');
+  // 3. 主笔据两份意见改一次（正文重新滚动，字数重新计）
+  startTicker();
   let finalText = paperText;
   try{
-    const rev = await streamChat(cfg.writeKey, cfg.writeSel, revisePrompt(), buildReviseInputDual(paperText, revA, revB), cfg.bodyEl, cfg.statusEl, dummy);
+    const rev = await streamChat(cfg.writeKey, cfg.writeSel, revisePrompt(), buildReviseInputDual(paperText, revA, revB), cfg.bodyEl, dummy, dummy);
     if(rev.text) finalText = rev.text;
   }catch(e){ /* 改稿失败则保留初稿 */ }
+  stopTicker();
 
   cfg.bodyEl.innerHTML = renderPaperText(finalText);
-  setStat('✓ 完成（已评审打磨一轮）');
+  setStat('✍ 完成 ' + finalText.length + ' 字');
   return { title:cfg.title, text:finalText };
 }
 
