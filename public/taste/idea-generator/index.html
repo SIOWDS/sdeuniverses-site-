@@ -1527,19 +1527,15 @@ async function run(){
   $('comboText').textContent = cells.map(c=>SUB_NAMES[c.dim][c.idx]).join('　✕　');
   $('comboBar').style.display='block';
 
-  // 【第一次内功提智·内化】六篇一开始就先写一次《从发现到发生》心得——发现vs发生的对决从源头就带上内化的认知。
-  //  只注入右栏(SDE提智侧)；左栏(普通AI)保持纯裸基底，对照才纯粹。心得整轮写一次，三篇右栏共用。
-  let sixReflection = '';
-  {
-    const rb = document.getElementById('sixReflectBar');
-    if(rb){ rb.style.display='block'; const s=document.getElementById('sixReflectStatus'); if(s) s.textContent='正在写《从发现到发生》认知内化短文（约5000字）…'; }
-    sixReflection = await getReflection(model, key, (n)=>{ const s=document.getElementById('sixReflectStatus'); if(s) s.textContent = n>0?('✍ 已写 '+n+' 字'):'写作中…'; });
-    if(rb){
-      const s=document.getElementById('sixReflectStatus'), b=document.getElementById('sixReflectBody');
-      if(sixReflection){ if(s) s.textContent='✓ 内化完成 '+sixReflection.length+' 字 · 右侧三篇将带着这份认知来写'; if(b) b.innerHTML=renderPaperText(sixReflection); }
-      else { if(s) s.textContent='（跳过·右栏退回常规提智）'; if(b) b.innerHTML='<span class="placeholder">心得未成功，右栏退回常规提智继续</span>'; }
-    }
-  }
+  // 【第一次内功提智·内化】右栏(SDE提智)才需要《从发现到发生》心得；左栏(普通AI)是纯裸基底，不用心得、不该等。
+  //  所以：不阻塞主流程——启动一个心得Promise，左栏三路立刻发请求，右栏三路各自等心得好了再发。
+  const rb0 = document.getElementById('sixReflectBar');
+  if(rb0){ rb0.style.display='block'; const s=document.getElementById('sixReflectStatus'); if(s) s.textContent='正在写《从发现到发生》认知内化短文（约5000字）…右栏三篇将带着它来写，左栏（普通AI）不受影响、已开始'; }
+  const reflectionReady = getReflection(model, key, (n)=>{ const s=document.getElementById('sixReflectStatus'); if(s) s.textContent = n>0?('✍ 心得已写 '+n+' 字'):'心得写作中…'; })
+    .then(txt=>{ const s=document.getElementById('sixReflectStatus'), b=document.getElementById('sixReflectBody');
+      if(txt){ if(s) s.textContent='✓ 内化完成 '+txt.length+' 字 · 右栏三篇带着这份认知来写'; if(b) b.innerHTML=renderPaperText(txt); }
+      else { if(s) s.textContent='（心得未成功·右栏退回常规提智）'; if(b) b.innerHTML='<span class="placeholder">心得生成未成功，右栏用常规提智继续</span>'; }
+      return txt || ''; });
 
   // 六路并行：3视角 × (普通+SDE) = 6 次调用同时发起
   const tasks=[];
@@ -1551,9 +1547,13 @@ async function run(){
           row.plain.body.innerHTML='<span class="placeholder">生成失败：'+e.message+'</span>';
           row.plain.status.textContent='失败'; return {text:'',chars:0,thinkChars:0,secs:0}; })
     );
+    // 右栏(SDE提智)：等《从发现到发生》心得写好，带着它再发请求；心得失败则退回不带心得的常规提智
+    row.sde.status.innerHTML='<span class="spinner"></span> 等待内化…';
     tasks.push(
-      streamChat(key, model, sdePrompt(c.dim, c.idx, c.focus, sixReflection), q, row.sde.body, row.sde.status, row.sde.meta)
-        .catch(e=>{ showErr('金点子：'+e.message);
+      reflectionReady.then(refl=>{
+        row.sde.status.innerHTML='<span class="spinner"></span> 生成中…';
+        return streamChat(key, model, sdePrompt(c.dim, c.idx, c.focus, refl), q, row.sde.body, row.sde.status, row.sde.meta);
+      }).catch(e=>{ showErr('金点子：'+e.message);
           row.sde.body.innerHTML='<span class="placeholder">生成失败：'+e.message+'</span>';
           row.sde.status.textContent='失败'; return {text:'',chars:0,thinkChars:0,secs:0}; })
     );
