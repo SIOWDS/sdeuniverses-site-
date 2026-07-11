@@ -1175,6 +1175,29 @@ function refreshKeyUI(){
 refreshKeyUI();
 apiKeyEl.addEventListener('input', ()=>localStorage.setItem(keyStoreName(), apiKeyEl.value.trim()));
 modelSel.addEventListener('change', refreshKeyUI);
+
+// 审稿人 A/B 的下拉与 Key 框：切换基底时自动把该基底已存的 Key 带进框里显示；在框里输入时也自动存回该基底，
+// 这样七个基底的 Key 都只需填一次，之后无论主用还是当审稿人，选到它就自动带出，测试时不必反复输入。
+(function wireReviewerKey(selId, keyId){
+  const sel = $(selId), keyEl = $(keyId);
+  if(!sel || !keyEl) return;
+  const storeName = ()=>{ const v = parseModel(sel.value).vendor;
+    return {ds:'sde_ds_key',glm:'sde_glm_key',kimi:'sde_kimi_key',qwen:'sde_qwen_key',gpt:'sde_gpt_key',claude:'sde_claude_key',gemini:'sde_gemini_key'}[v] || 'sde_ds_key'; };
+  const fill = ()=>{ keyEl.value = localStorage.getItem(storeName()) || ''; };
+  sel.addEventListener('change', fill);
+  keyEl.addEventListener('input', ()=>localStorage.setItem(storeName(), keyEl.value.trim()));
+  fill();   // 初始也带出一次
+})('fourRevA','fourRevAKey');
+(function wireReviewerKey(selId, keyId){
+  const sel = $(selId), keyEl = $(keyId);
+  if(!sel || !keyEl) return;
+  const storeName = ()=>{ const v = parseModel(sel.value).vendor;
+    return {ds:'sde_ds_key',glm:'sde_glm_key',kimi:'sde_kimi_key',qwen:'sde_qwen_key',gpt:'sde_gpt_key',claude:'sde_claude_key',gemini:'sde_gemini_key'}[v] || 'sde_ds_key'; };
+  const fill = ()=>{ keyEl.value = localStorage.getItem(storeName()) || ''; };
+  sel.addEventListener('change', fill);
+  keyEl.addEventListener('input', ()=>localStorage.setItem(storeName(), keyEl.value.trim()));
+  fill();
+})('fourRevB','fourRevBKey');
 $('keyToggle').addEventListener('click', ()=>{
   const t = apiKeyEl.type==='password';
   apiKeyEl.type = t?'text':'password';
