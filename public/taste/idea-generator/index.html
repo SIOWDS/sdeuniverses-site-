@@ -386,7 +386,7 @@ footer{border-top:1px solid var(--border);text-align:center;padding:30px 20px 44
       <div style="font-size:19px;font-weight:700;color:#B98CFF;letter-spacing:0.04em">⚡ 第二批 · 发生引擎提智 · 冲击 150</div>
       <div id="upliftStatus" style="font-size:13px;color:#8B98A5"></div>
     </div>
-    <div style="font-size:13px;color:#9AA5B0;margin-bottom:16px;line-height:1.7">第一批四篇已达资深学者水平（约145）。这一步<b style="color:#B98CFF">对基底再做一次 SDE 提智</b>，但换用的不是静态坐标（27宫格），而是 SDE <b style="color:#B98CFF">发生引擎</b>——三大方程 · 123原理 · 六路径 · 五连问逮先验。对每篇执行：重判任务DNA→五连问逮住那个没人质疑的先验→撤销它→让新判断从 D-E 矛盾里结算出来并精确命名→回写重组全篇。目标：把"从角度看出来的判断"升级为"从矛盾里生成出来的、不可还原的新结构"，冲击本体论级 150。四篇并发，约需 10-30 分钟，请勿关闭页面。</div>
+    <div style="font-size:13px;color:#9AA5B0;margin-bottom:16px;line-height:1.7">第一批四篇已达资深学者水平（约145）。这一步<b style="color:#B98CFF">对基底再做一次 SDE 提智</b>，但换用的不是静态坐标（27宫格），而是 SDE <b style="color:#B98CFF">发生引擎</b>——三大方程 · 123原理 · 六路径 · 五连问逮先验。对每篇执行：重判任务DNA→五连问逮住那个没人质疑的先验→撤销它→让新判断从 D-E 矛盾里结算出来并精确命名→回写重组全篇。目标：把"从角度看出来的判断"升级为"从矛盾里生成出来的、不可还原的新结构"，冲击本体论级 150。与第一批同规格：发生引擎重写初稿 → 两位审稿人各审一次 → 主笔据意见改稿一轮（沿用第一批设定的审稿人 A、B）。四篇并发，约需 15-40 分钟，请勿关闭页面。</div>
     <div id="upliftPapers"></div>
     <div id="upliftDlRow" style="margin-top:18px;display:none">
       <button id="upliftDlBtn" style="background:#238636;color:#fff;font-weight:600;font-size:14px;border:none;border-radius:8px;padding:11px 26px;cursor:pointer">📄 第二批四篇一起下载（Word）</button>
@@ -1448,11 +1448,13 @@ async function runOnePaper(cfg){
   };
   const stopTicker = ()=>{ if(ticker){ clearInterval(ticker); ticker=null; } };
 
-  // 1. 写初稿
+  // 1. 写初稿（初稿的写作规范可由 cfg.draftPrompt 指定；不传则默认用 paper1wPrompt。
+  //    第一批用默认；第二批传 upliftPrompt——用发生引擎写初稿冲150，再走同样的双审+改稿）
   startTicker();
+  const draftSys = cfg.draftPrompt || paper1wPrompt();
   let draft;
   try{
-    draft = await streamChat(cfg.writeKey, cfg.writeSel, paper1wPrompt(), cfg.writeInput, cfg.bodyEl, dummy, dummy);
+    draft = await streamChat(cfg.writeKey, cfg.writeSel, draftSys, cfg.writeInput, cfg.bodyEl, dummy, dummy);
   }catch(e){ stopTicker(); setStat('✗ 生成失败：'+e.message); throw e; }
   let paperText = draft.text || '';
   if(!paperText){ stopTicker(); setStat('✗ 未产出内容'); throw new Error('初稿为空'); }
@@ -1606,16 +1608,22 @@ if(upliftBtn){
   upliftBtn.addEventListener('click', async ()=>{
     const papers = window._fourPapers;
     if(!papers || papers.filter(p=>p&&p.text).length===0){ showErr('请先生成第一批四篇论文，再做二次提智'); return; }
-    const writeSel = modelSel.value;
+    const writeSel = modelSel.value;               // 写作/主笔 = 当前主基底
     const writeKey = keyForVendor(writeSel);
     if(!writeKey){ showErr('请先在上方填入'+vendorName()+'的 API Key'); return; }
+
+    // 审稿人复用第一批已设定的 A/B（第二批与第一批同规格：双审+改稿）
+    const revA = $('fourRevA').value, revAKey = keyForVendor(revA, $('fourRevAKey').value);
+    const revB = $('fourRevB').value, revBKey = keyForVendor(revB, $('fourRevBKey').value);
+    if(!revA || !revAKey || !revB || !revBKey){ showErr('二次提智同样需要两位审稿人（沿用第一批的设定）。请确认上方审稿人 A、B 都已选好基底并填好 Key'); return; }
+    if(revA === revB){ showErr('审稿人 A 与 B 需为不同基底'); return; }
 
     $('upliftWrap').style.display='block';
     $('upliftWrap').scrollIntoView({behavior:'smooth', block:'start'});
     $('upliftDlRow').style.display='none';
     upliftBtn.disabled = true;
-    upliftBtn.textContent = '⏳ 发生引擎提智中（四篇并发，约10-30分钟，请勿关闭）…';
-    $('upliftStatus').textContent = '四篇同时用发生引擎重写中…';
+    upliftBtn.textContent = '⏳ 发生引擎提智中（含评审打磨，四篇并发，约15-40分钟，请勿关闭）…';
+    $('upliftStatus').textContent = '四篇同时进行：发生引擎重写 → 双审 → 改稿…';
 
     // 只对有内容的第一批论文做提升
     const defs = papers.map((p,i)=>({ src:p, idx:i })).filter(x=>x.src && x.src.text);
@@ -1630,31 +1638,27 @@ if(upliftBtn){
       return { bodyEl: wrap.querySelector('.upCellBody'), statusEl: wrap.querySelector('.upCellStatus'), title:newTitle };
     });
 
-    // 并发：每篇跑 upliftPrompt（滚动字数）
-    const runOne = async (srcText, bodyEl, statusEl)=>{
-      const dummy={textContent:'',innerHTML:''};
-      let ticker=setInterval(()=>{ const n=(bodyEl.textContent||'').length; statusEl.textContent = n>0?('⚡ 已生成 '+n+' 字'):'⚡ 发生引擎运转中…'; },500);
-      try{
-        const res = await streamChat(writeKey, writeSel, upliftPrompt(), buildUpliftInput(srcText), bodyEl, dummy, dummy);
-        clearInterval(ticker);
-        const t=res.text||'';
-        bodyEl.innerHTML = renderPaperText(t);
-        statusEl.textContent = '✓ 完成 '+t.length+' 字';
-        return t;
-      }catch(e){ clearInterval(ticker); statusEl.textContent='✗ 失败：'+e.message; throw e; }
-    };
-
-    const results = await Promise.allSettled(defs.map((d,i)=>runOne(d.src.text, cells[i].bodyEl, cells[i].statusEl)));
+    // 并发：每篇复用 runOnePaper —— 初稿用发生引擎(upliftPrompt)，然后同样走双审+改稿
+    const results = await Promise.allSettled(defs.map((d,i)=>runOnePaper({
+      title: cells[i].title,
+      draftPrompt: upliftPrompt(),               // ★ 初稿改用发生引擎冲150
+      writeInput: buildUpliftInput(d.src.text),  // 输入 = 第一批那篇全文
+      bodyEl: cells[i].bodyEl,
+      statusEl: cells[i].statusEl,
+      writeSel, writeKey,
+      revA, revAKey,
+      revB, revBKey
+    })));
 
     window._upliftPapers = results.map((res,i)=>({
       title: cells[i].title,
-      text: res.status==='fulfilled' ? (res.value||'') : ''
+      text: res.status==='fulfilled' ? (res.value.text||'') : ''
     }));
     const okCount = window._upliftPapers.filter(p=>p.text).length;
 
     upliftBtn.disabled = false;
     upliftBtn.textContent = '⚡ 二次 SDE 提智 · 用发生引擎冲击 150';
-    $('upliftStatus').textContent = '完成：'+okCount+'/'+defs.length+' 篇提升成功';
+    $('upliftStatus').textContent = '完成：'+okCount+'/'+defs.length+' 篇（发生引擎 + 双审打磨）';
     if(okCount>0) $('upliftDlRow').style.display='block';
   });
 }
