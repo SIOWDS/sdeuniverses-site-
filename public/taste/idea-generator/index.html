@@ -1089,17 +1089,22 @@ function upliftPromptR(reflectionText){ return reflectionText ? withReflection(U
 
 // 生成一批共用的《从发现到发生》心得：整批只写一次，四篇论文共用同一份思维底座。
 // 返回心得文本；失败则返回空串（此时论文退回到不带心得的常规提智，不阻断流程）。
+// 失败原因记入 _reflectLastErr 并在页面显示（此前错误被写进不在页面上的 sink 后吞掉，用户只见"未成功"查无原因）。
+let _reflectLastErr = '';
+function escTxt(s){ return String(s||'').replace(/[<>&]/g, c=>({'<':'&lt;','>':'&gt;','&':'&amp;'}[c])); }
 async function getReflection(writeSel, writeKey, onProgress){
   const sink = document.createElement('div'), dummy = { textContent:'', innerHTML:'' };
-  let ticker=null;
+  let ticker=null; _reflectLastErr='';
   if(onProgress){ ticker=setInterval(()=>{ const n=(sink.textContent||'').length; onProgress(n); },500); }
   try{
     const res = await streamChat(writeKey, writeSel, reflectPrompt(),
       '请写这篇《从发现到发生——兼对我自身认知惯性的一次检视》，约5000字。这是你接下来所有工作的思维底座。',
       sink, dummy, dummy, REFLECT_MAX_TOKENS);
     if(ticker) clearInterval(ticker);
-    return (res && res.text) ? res.text : '';
-  }catch(e){ if(ticker) clearInterval(ticker); return ''; }
+    if(res && res.text) return res.text;
+    _reflectLastErr = '模型返回了空内容（可能被安全策略拦截、余额/额度不足，或响应格式异常）';
+    return '';
+  }catch(e){ if(ticker) clearInterval(ticker); _reflectLastErr=(e&&e.message)?e.message:String(e); console.error('[心得阶段失败]', e); return ''; }
 }
 
 // 整轮只写一次《从发现到发生》心得，六篇→涌现→四篇→第二批全部复用同一份。
@@ -1116,7 +1121,7 @@ async function getSharedReflection(writeSel, writeKey, onProgress){
   // 换轮或首次 → 真正写一次
   _sharedReflection.key = rk;
   _sharedReflection.text = '';
-  _sharedReflection.promise = getReflection(writeSel, writeKey, onProgress).then(txt=>{ _sharedReflection.text = txt || ''; return _sharedReflection.text; });
+  _sharedReflection.promise = getReflection(writeSel, writeKey, onProgress).then(txt=>{ _sharedReflection.text = txt || ''; if(!txt){ _sharedReflection.promise = null; } return _sharedReflection.text; });
   return await _sharedReflection.promise;
 }
 // 二次提智的输入 = 第一批那篇论文全文
@@ -1254,9 +1259,11 @@ function buildPayload(sel, systemPrompt, userQ, maxTokens){
     base.temperature = 0.7;
   } else if(vendor === 'claude'){
     // Claude（Anthropic /v1/messages 格式，system 独立字段；经代理、非流式）
+    // max_tokens 跟随调用方传入（心得8000/论文16000），不再硬编码8000——否则万字论文会被静默截断在五六千字；
+    // 非流式护栏16000（再高Anthropic会要求流式）。快速档用真实存在的 claude-sonnet-4-6（原 claude-sonnet-5 不存在，选中必404）。
     return {
-      model: (tier === 'pro') ? 'claude-opus-4-8' : 'claude-sonnet-5',
-      max_tokens: 8000,
+      model: (tier === 'pro') ? 'claude-opus-4-8' : 'claude-sonnet-4-6',
+      max_tokens: Math.min(cap, 16000),
       system: systemPrompt,
       messages: [{ role:'user', content: userQ }]
     };
@@ -1265,7 +1272,7 @@ function buildPayload(sel, systemPrompt, userQ, maxTokens){
     return {
       systemInstruction: { parts: [{ text: systemPrompt }] },
       contents: [{ role:'user', parts: [{ text: userQ }] }],
-      generationConfig: { maxOutputTokens: 8000, temperature: 0.7 }
+      generationConfig: { maxOutputTokens: Math.min(cap, 16000), temperature: 0.7 }
     };
   }
   return base;
@@ -1594,7 +1601,7 @@ async function run(){
   const sixReflection = await getSharedReflection(model, key, (n)=>{ const s=document.getElementById('sixReflectStatus'); if(s) s.textContent = n>0?('✍ 第一阶段·心得已写 '+n+' 字'):'第一阶段·心得写作中…'; });
   { const s=document.getElementById('sixReflectStatus'), b=document.getElementById('sixReflectBody');
     if(sixReflection){ if(s) s.textContent='✓ 第一阶段完成 · 内化 '+sixReflection.length+' 字（本轮六篇→涌现→四篇→第二批全部复用这份心得）'; if(b) b.innerHTML=renderPaperText(sixReflection); }
-    else { if(s) s.textContent='（第一阶段心得未成功·后续退回常规提智）'; if(b) b.innerHTML='<span class="placeholder">心得生成未成功，后续用常规提智继续</span>'; } }
+    else { if(s) s.textContent='（第一阶段心得未成功·后续退回常规提智）'; if(b) b.innerHTML='<span class="placeholder">心得生成未成功，后续用常规提智继续'+(_reflectLastErr?('<br><span style="color:#E8897B">失败原因：'+escTxt(_reflectLastErr)+'</span>'):'')+'</span>'; } }
 
   // ═══ 第二阶段：六路并行 · 3视角 × (普通AI + SDE金点子) ═══
   //  此时心得已缓存就位——右栏(SDE金点子)直接带着它写；左栏(普通AI)是纯裸基底对照，不用心得。
@@ -1860,7 +1867,7 @@ if(fourStartBtn){
       $('reflBody').innerHTML = renderPaperText(reflection);
       $('reflStatus').textContent = '✓ 内化完成 '+reflection.length+' 字 · 四篇将带着这份认知来写';
     } else {
-      $('reflBody').innerHTML = '<span class="placeholder" style="color:#E8897B">心得生成未成功，四篇将退回常规提智继续（不影响生成）</span>';
+      $('reflBody').innerHTML = '<span class="placeholder" style="color:#E8897B">心得生成未成功，四篇将退回常规提智继续（不影响生成）'+(_reflectLastErr?('<br>失败原因：'+escTxt(_reflectLastErr)):'')+'</span>';
       $('reflStatus').textContent = '（跳过）';
     }
 
@@ -1983,7 +1990,7 @@ if(upliftBtn){
       $('ureflBody').innerHTML = renderPaperText(ureflection);
       $('ureflStatus').textContent = '✓ 内化完成 '+ureflection.length+' 字 · 四篇将带着这份认知做发生引擎';
     } else {
-      $('ureflBody').innerHTML = '<span class="placeholder" style="color:#E8897B">心得生成未成功，四篇将退回常规发生引擎继续</span>';
+      $('ureflBody').innerHTML = '<span class="placeholder" style="color:#E8897B">心得生成未成功，四篇将退回常规发生引擎继续'+(_reflectLastErr?('<br>失败原因：'+escTxt(_reflectLastErr)):'')+'</span>';
       $('ureflStatus').textContent = '（跳过）';
     }
 
