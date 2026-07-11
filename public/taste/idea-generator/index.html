@@ -1799,7 +1799,7 @@ async function runOnePaper(cfg){
   }catch(_){}
   if(cfg.bodyEl) cfg.bodyEl.innerHTML = finalHtml;
   setStat('✍ 完成 ' + finalText.length + ' 字');
-  return { title:cfg.title, text:finalText };
+  return { title:cfg.title, text:finalText, revA:revA, revB:revB, revLabelA:vendorLabel(cfg.revA), revLabelB:cfg.revB?vendorLabel(cfg.revB):'' };
 }
 
 window._fourPapers = null;
@@ -1898,7 +1898,11 @@ if(fourStartBtn){
     // 收集成功的
     window._fourPapers = results.map((res,i)=>({
       title: paperDefs[i].title,
-      text: res.status==='fulfilled' ? (res.value.text||'') : ''
+      text: res.status==='fulfilled' ? (res.value.text||'') : '',
+      revA: res.status==='fulfilled' ? (res.value.revA||'') : '',
+      revB: res.status==='fulfilled' ? (res.value.revB||'') : '',
+      revLabelA: res.status==='fulfilled' ? (res.value.revLabelA||'') : '',
+      revLabelB: res.status==='fulfilled' ? (res.value.revLabelB||'') : ''
     }));
     const okCount = window._fourPapers.filter(p=>p.text).length;
 
@@ -1916,11 +1920,18 @@ if(fourDlBtn){
   fourDlBtn.addEventListener('click', ()=>{
     const papers = window._fourPapers; if(!papers) return;
     const q = (window._lastResult && window._lastResult.question) || '';
+    const showRev = document.getElementById('showReviewsChk') && document.getElementById('showReviewsChk').checked;
     let bodyHtml = '<h1 style="text-align:center">四篇学术论文</h1><p style="text-align:center;color:#666">原初问题：'+esc4(q)+'</p><hr/>';
     papers.forEach((p,i)=>{
       if(!p.text) return;
       bodyHtml += '<h2 style="page-break-before:always">'+esc4(p.title)+'</h2>';
       bodyHtml += p.text.split(/\n{2,}/).map(para=>'<p>'+esc4(para).replace(/\n/g,'<br/>')+'</p>').join('');
+      // 若勾选了"显示审稿意见"，把这篇的两位审稿意见也写进 Word
+      if(showRev && (p.revA || p.revB)){
+        bodyHtml += '<hr/><h3 style="color:#7A2FE0">📝 审稿意见（改稿前）</h3>';
+        if(p.revA){ bodyHtml += '<p><b>审稿人 A · '+esc4(p.revLabelA||'')+'</b></p>' + p.revA.split(/\n{2,}/).map(para=>'<p>'+esc4(para).replace(/\n/g,'<br/>')+'</p>').join(''); }
+        if(p.revB){ bodyHtml += '<p><b>审稿人 B · '+esc4(p.revLabelB||'')+'</b></p>' + p.revB.split(/\n{2,}/).map(para=>'<p>'+esc4(para).replace(/\n/g,'<br/>')+'</p>').join(''); }
+      }
     });
     const html='<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"><title>四篇学术论文</title></head><body>'+bodyHtml+'</body></html>';
     const blob=new Blob(['\ufeff'+html],{type:'application/msword'});
