@@ -648,9 +648,9 @@ const SHARED_VIEWS = {
 // 1万字中文约需 1.5-1.6万 tokens；设 16000 → 足够写满1万字并留少量余量，但绝不给它写到1.7万字的空间。
 // （这是继 Prompt 硬约束、策划先行之后的第三重、也是最硬的一重保险——不管模型想写多少，到 token 上限就必须停。）
 const PAPER_MAX_TOKENS = 16000;
-// 《从发现到发生》心得只需约2000字（2000字中文≈3400 tokens）——设3600上限，物理限制在2000-2200字，
+// 《从发现到发生》心得约5000字（5000字中文≈8000 tokens）——设8000上限。境外基底已走流式(不撞代理超时)，5000字可放心写足、内化更充分。
 // 心得够内化即可，不必写太长（写太长会拖慢右栏等待）。
-const REFLECT_MAX_TOKENS = 3600;
+const REFLECT_MAX_TOKENS = 8000;
 const SUB_NAMES = {
   show: ['S1 · 规范C（对比·变化·分布）','S2 · 模态M（粒子·波·场）','S3 · 价值V（真·善·美）'],
   diff: ['D1 · 意义（特征律·自由律·幸福律）','D2 · 路径（问题→猜想→…→聚合→升维）','D3 · 最优化（最小误差·冗余·亏损）'],
@@ -1045,11 +1045,11 @@ function upliftPrompt(){ return SDE_BASE + UPLIFT_SPEC; }
 // 解法：先逼它亲手写一篇《从发现到发生》，在写的过程中真正直面并内化"发现vs发生"，再带着这篇自己悟出的心得去工作。
 const REFLECT_SPEC = `
 ---
-【本次任务：在正式工作之前，先写一篇约2000字的方法论短文《从发现到发生——兼对我自身认知惯性的一次检视》】
+【本次任务：在正式工作之前，先写一篇约5000字的方法论短文《从发现到发生——兼对我自身认知惯性的一次检视》】
 
 你刚刚研读了上面这套关于"发生学"的完整内功。在用它做任何具体工作之前，请先做一件更根本的事：把"从发现到发生"这个认知转变，用你自己的话彻底想透、写透，并借此检视你自己作为一个AI的认知惯性。这篇短文将成为你接下来所有工作的思维底座。
 
-请围绕以下线索，写一篇约2000字、真正有洞察而非复述的方法论短文：
+请围绕以下线索，写一篇约5000字、真正有洞察而非复述的方法论短文：
 
 一、发现学与发生学的根本分野（讲透，不要停在口号）
 · 发现学把世界看成什么？——一个"预先存在、稳定现成、等待被精确描述"的对象。它的全部功夫在于：给对象下定义、建坐标、分类、诊断它哪里出了问题、用现成框架去解释它、最后往往归结为"回归某个永恒不变的本质"。
@@ -1068,7 +1068,7 @@ const REFLECT_SPEC = `
 · 给新判断命名时，先做"不可还原自查"：如果这个名字能被某个已有学科的现成概念一句话替换掉，那我就还在发现学里，必须撤回去、再往下撤一层先验。
 · 一个真正"发生"出来的新结构，是那种让人愣一下、说"这个东西我一直感觉到却从来没有一个词能装下它"的东西——而不是一个"精确的诊断标签"。
 
-要求：用连贯的思辨散文写作，2000字左右，真诚、深入、具体。这不是给别人看的表演，是你给自己的一次认知松绑。写完这篇，你就带着一个被真正松开的、警惕着自己发现学惯性的头脑，去做接下来的工作。
+要求：用连贯的思辨散文写作，5000字左右，真诚、深入、具体。这不是给别人看的表演，是你给自己的一次认知松绑。写完这篇，你就带着一个被真正松开的、警惕着自己发现学惯性的头脑，去做接下来的工作。
 
 现在，请写这篇《从发现到发生——兼对我自身认知惯性的一次检视》。
 `;
@@ -1098,7 +1098,7 @@ async function getReflection(writeSel, writeKey, onProgress){
   if(onProgress){ ticker=setInterval(()=>{ const n=(sink.textContent||'').length; onProgress(n); },500); }
   try{
     const res = await streamChat(writeKey, writeSel, reflectPrompt(),
-      '请写这篇《从发现到发生——兼对我自身认知惯性的一次检视》，约2000字。这是你接下来所有工作的思维底座。',
+      '请写这篇《从发现到发生——兼对我自身认知惯性的一次检视》，约5000字。这是你接下来所有工作的思维底座。',
       sink, dummy, dummy, REFLECT_MAX_TOKENS);
     if(ticker) clearInterval(ticker);
     if(res && res.text) return res.text;
@@ -1638,7 +1638,7 @@ async function run(){
   //  这是整个金点子生成的地基：先让基底学习内功、把发生学内化成自己的一篇心得，缓存好，第二阶段才开始生成。
   //  已缓存（同一基底+同一问题）则瞬间跳过；换基底或换问题才重写。
   const rb0 = document.getElementById('sixReflectBar');
-  if(rb0){ rb0.style.display='block'; const s=document.getElementById('sixReflectStatus'); if(s) s.textContent='第一阶段 · 基底正在学习内功、写《从发现到发生》心得（约2000字）…写好后缓存，六篇及后续全部复用'; }
+  if(rb0){ rb0.style.display='block'; const s=document.getElementById('sixReflectStatus'); if(s) s.textContent='第一阶段 · 基底正在学习内功、写《从发现到发生》心得（约5000字）…写好后缓存，六篇及后续全部复用'; }
   const sixReflection = await getSharedReflection(model, key, (n)=>{ const s=document.getElementById('sixReflectStatus'); if(s) s.textContent = n>0?('✍ 第一阶段·心得已写 '+n+' 字'):'第一阶段·心得写作中…'; });
   { const s=document.getElementById('sixReflectStatus'), b=document.getElementById('sixReflectBody');
     if(sixReflection){ if(s) s.textContent='✓ 第一阶段完成 · 内化 '+sixReflection.length+' 字（本轮六篇→涌现→四篇→第二批全部复用这份心得）'; if(b) b.innerHTML=renderPaperText(sixReflection); }
@@ -1897,7 +1897,7 @@ if(fourStartBtn){
 
     // 【第一次内功提智·内化】开跑前，先让基底亲手写一篇《从发现到发生》心得，把发生学内化成自己的东西。
     //  整批只写一次，四篇论文共用这同一份思维底座。写完显示出来，也让你看到它内化得如何。
-    $('fourStatus').textContent = '第一步：正在写《从发现到发生》认知内化短文（约2000字）…';
+    $('fourStatus').textContent = '第一步：正在写《从发现到发生》认知内化短文（约5000字）…';
     const box0 = $('fourPapers'); box0.innerHTML='';
     const reflWrap = document.createElement('div');
     reflWrap.style.cssText='border:1px solid rgba(122,47,224,0.35);border-radius:10px;padding:16px 18px;margin-bottom:16px;background:rgba(20,12,30,0.5)';
@@ -2020,7 +2020,7 @@ if(upliftBtn){
     const defs = papers.map((p,i)=>({ src:p, idx:i })).filter(x=>x.src && x.src.text);
 
     // 【第一次内功提智·内化】第二批同样先写《从发现到发生》心得（发生引擎冲150更需要这份认知底座）
-    $('upliftStatus').textContent = '第一步：正在写《从发现到发生》认知内化短文（约2000字）…';
+    $('upliftStatus').textContent = '第一步：正在写《从发现到发生》认知内化短文（约5000字）…';
     const ubox0 = $('upliftPapers'); ubox0.innerHTML='';
     const ureflWrap = document.createElement('div');
     ureflWrap.style.cssText='border:1px solid rgba(122,47,224,0.4);border-radius:10px;padding:16px 18px;margin-bottom:16px;background:rgba(20,12,30,0.55)';
