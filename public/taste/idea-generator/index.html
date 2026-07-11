@@ -612,6 +612,24 @@ const SUB_NAMES = {
   diff: ['D1 · 意义（特征律·自由律·幸福律）','D2 · 路径（问题→猜想→…→聚合→升维）','D3 · 最优化（最小误差·冗余·亏损）'],
   entangle: ['E1 · 三界（理念·现实·自我）','E2 · 信息（符号·逻辑·数学）','E3 · 能量（内能·动能·势能）']
 };
+// 每个宫格内部的三个要点名——抽中宫格后，再随机侧重其中一个深入研究（focus）
+const FOCUS_NAMES = {
+  show: [
+    ['对比（它靠和什么区分才被切出来）','变化（它变来变去时凭什么还认得）','分布（它在关系网里处于什么位置）'],
+    ['粒子（它作为一个个可数、有边界的东西）','波（它作为流动推进的过程）','场（它作为弥漫无形的整体氛围）'],
+    ['真（它作为一个显现立不立得住）','善（它与他者的往来通不通畅、成不成全）','美（它作为整体值不值得让人愿意亲近）']
+  ],
+  diff: [
+    ['特征律（创造的发生：目标是被指派还是从差异中稳定长出）','自由律（自由的发生：是挑现成选项还是裁出新路）','幸福律（幸福的发生：是静态占有还是张力化解的过程体验）'],
+    ['起源与最初问题（它当初为解决什么问题而出现）','中段的分化与试错（做过哪些猜想、路线如何分合淘汰）','走到今天的升维或走窄（究竟上升到新层次还是原地打转）'],
+    ['最小误差（尽量不出错、追求精确达标）','最小冗余（尽量不浪费、追求精简高效）','最小亏损（尽量不亏本、追求收益核算）']
+  ],
+  entangle: [
+    ['现实土壤（物质、制度、社会安排等现实条件）','理念土壤（大家共同相信的观念与理想）','自我土壤（每个人内心的认同与意愿）'],
+    ['名称与说法（怎么称呼它、讲述它的故事）','道理与解释（用什么推理论证它的必要）','数字与指标（用什么计量它、给它打分排名）'],
+    ['内能·底子（多年沉淀的根基、信念与热爱）','动能·当下的劲（日常运转与推进的实际动力）','势能·被架的势（社会赋予的地位与对它的期望）']
+  ]
+};
 
 // 右边（有内功）= SDE内功底座 + 相同角度
 // 金点子发生器专属输出规格（接在完整内功之后，规范格式）
@@ -636,7 +654,13 @@ const SDE_OUTPUT_SPEC = `
 · 篇幅约 4000 字（3500-4500 字），充分展开，把洞察的每一层都论证透彻，但绝不注水凑字数——每一段都要有推进。
 · 让人读完有"我从没这样想过，但你说得对"的震动，并且觉得"这是一篇真正有分量的文章"。`;
 
-function sdePrompt(dim, idx){ return SDE_BASE + SDE_OUTPUT_SPEC + '\n\n【请特别侧重这个角度】\n' + SHARED_VIEWS[dim][idx]; }
+function sdePrompt(dim, idx, focus){
+  let p = SDE_BASE + SDE_OUTPUT_SPEC + '\n\n【请特别侧重这个角度】\n' + SHARED_VIEWS[dim][idx];
+  if(typeof focus==='number' && FOCUS_NAMES[dim] && FOCUS_NAMES[dim][idx]){
+    p += '\n\n【本次尤其聚焦其中这一个要点，把它往深里打】\n在上面这个角度的三个要点里，本次请重点侧重「'+FOCUS_NAMES[dim][idx][focus]+'」这一个，把它作为切入的主锋刃深入下去，另外两个要点作为背景陪衬即可，不必平均用力——与其三个都泛泛扫过，不如抓住这一个往深处凿出一个真正锋利的判断。';
+  }
+  return p;
+}
 
 // ============ 二阶涌现：三金点子碰撞成新典范 ============
 const EMERGE_SPEC = `
@@ -974,7 +998,13 @@ const PLAIN_SYSTEM = `你是一个乐于助人、见识广博的 AI 助手。请
 
 // 普通AI的三视角提示（对照用：同样从三个角度问，但不注入任何SDE方法）
 // 左边（无内功）= 普通助手设定 + 完全相同的角度提问
-function plainPrompt(dim, idx){ return PLAIN_SYSTEM + '\n\n【本次作答角度】\n' + SHARED_VIEWS[dim][idx]; }
+function plainPrompt(dim, idx, focus){
+  let p = PLAIN_SYSTEM + '\n\n【本次作答角度】\n' + SHARED_VIEWS[dim][idx];
+  if(typeof focus==='number' && FOCUS_NAMES[dim] && FOCUS_NAMES[dim][idx]){
+    p += '\n\n【本次尤其聚焦其中这一个要点】\n在上面这个角度的三个要点里，本次请重点侧重「'+FOCUS_NAMES[dim][idx][focus]+'」这一个，深入展开，另外两个作为背景即可。';
+  }
+  return p;
+}
 
 // 多厂商 API 地址
 const API_URLS = {
@@ -1090,7 +1120,9 @@ function pick3(){
   const nums = [0,1,2];
   for(let i=nums.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [nums[i],nums[j]]=[nums[j],nums[i]]; }
   const dims = ['show','diff','entangle'];
-  return dims.map((dim,i)=>({ dim, idx: nums[i] }));   // 顺序固定为 S → D → E，层号为 [0,1,2] 的一个排列
+  // 抽中宫格后，再为每个宫格在它内部的三个要点里随机侧重一个（focus 0/1/2）——
+  // 这样即使两次抽到同一个宫格（如都是S1），侧重点也不同（一次重点打"对比"、一次重点打"分布"），金点子更聚焦、更有变化
+  return dims.map((dim,i)=>({ dim, idx: nums[i], focus: Math.floor(Math.random()*3) }));
 }
 const errBox=$('errBox');
 
@@ -1352,13 +1384,13 @@ async function run(){
   rowEls.forEach((row,i)=>{
     const c = cells[i];
     tasks.push(
-      streamChat(key, model, plainPrompt(c.dim, c.idx), q, row.plain.body, row.plain.status, row.plain.meta)
+      streamChat(key, model, plainPrompt(c.dim, c.idx, c.focus), q, row.plain.body, row.plain.status, row.plain.meta)
         .catch(e=>{ showErr('普通AI：'+e.message);
           row.plain.body.innerHTML='<span class="placeholder">生成失败：'+e.message+'</span>';
           row.plain.status.textContent='失败'; return {text:'',chars:0,thinkChars:0,secs:0}; })
     );
     tasks.push(
-      streamChat(key, model, sdePrompt(c.dim, c.idx), q, row.sde.body, row.sde.status, row.sde.meta)
+      streamChat(key, model, sdePrompt(c.dim, c.idx, c.focus), q, row.sde.body, row.sde.status, row.sde.meta)
         .catch(e=>{ showErr('金点子：'+e.message);
           row.sde.body.innerHTML='<span class="placeholder">生成失败：'+e.message+'</span>';
           row.sde.status.textContent='失败'; return {text:'',chars:0,thinkChars:0,secs:0}; })
