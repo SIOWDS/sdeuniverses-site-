@@ -301,7 +301,7 @@ footer{border-top:1px solid var(--border);text-align:center;padding:30px 20px 44
 
     <!-- 评审配置 -->
     <div id="fourReviewCfg" style="border:1px dashed rgba(192,57,43,0.4);border-radius:10px;padding:16px 18px;margin-bottom:18px">
-      <div style="font-size:13px;color:#9AA5B0;line-height:1.7;margin-bottom:14px">四篇论文<b style="color:#E8897B">共用</b>下面这套评审配置。写初稿与主笔改稿默认用你上方选的主基底；两位评审可另选基底（多一双眼睛照出盲区，评审尽量选与主笔不同的基底）。</div>
+      <div style="font-size:13px;color:#9AA5B0;line-height:1.7;margin-bottom:14px">四篇论文<b style="color:#E8897B">共用</b>下面这套评审配置。写初稿与主笔改稿默认用你上方选的主基底。<b style="color:#E8897B">开始生产前，必须先把两位审稿人都设定好</b>（各选一个基底、各填对应 Key），且两位用<b style="color:#E8897B">不同</b>的基底——多一双眼睛照出盲区。</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
         <div>
           <div style="font-size:12.5px;font-weight:700;color:#E8897B;margin:0 0 6px">审稿人 A</div>
@@ -324,7 +324,7 @@ footer{border-top:1px solid var(--border);text-align:center;padding:30px 20px 44
           <select id="fourRevB" style="width:100%;padding:8px 9px;border-radius:7px;border:1px solid rgba(255,255,255,0.15);background:#0d1117;color:#D4DCE4;font-size:13px">
         <optgroup label="国产 · 浏览器直连">
         <option value="ds:pro">DeepSeek V4 Pro · 最强推理</option>
-        <option value="glm:pro">智谱 GLM-5 · 深度思考</option>
+        <option value="glm:pro" selected>智谱 GLM-5 · 深度思考</option>
         <option value="kimi:pro">月之暗面 Kimi K2.6</option>
         <option value="qwen:pro">通义千问 Qwen-Max</option>
         </optgroup>
@@ -336,7 +336,7 @@ footer{border-top:1px solid var(--border);text-align:center;padding:30px 20px 44
           <input id="fourRevBKey" type="password" placeholder="审稿人B的Key" style="width:100%;margin-top:7px;padding:8px 9px;border-radius:7px;border:1px solid rgba(255,255,255,0.15);background:#0d1117;color:#D4DCE4;font-size:12.5px">
         </div>
       </div>
-      <div style="font-size:12px;color:#8B98A5;margin-top:10px">💡 两位评审填不同基底效果最好。若某评审基底与主笔/其它已填Key相同，会自动带出，无需重复填。</div>
+      <div style="font-size:12px;color:#8B98A5;margin-top:10px">💡 两位审稿人必须都设定好、且用不同基底，才能开始生产四篇。若某评审基底的 Key 与你之前填过的相同，会自动带出，无需重复填。</div>
     </div>
 
     <!-- 四篇结果 -->
@@ -1372,9 +1372,11 @@ if(fourPapersBtn){
 
     const revA = $('fourRevA').value, revAKey = keyForVendor(revA, $('fourRevAKey').value);
     const revB = $('fourRevB').value, revBKey = keyForVendor(revB, $('fourRevBKey').value);
-    if(!revAKey){ showErr('请填入审稿人A的 Key（或选一个你已填过Key的基底）'); return; }
-    // B可留空——若B有选但没Key，也当作只有A
-    const useB = !!(revB && revBKey);
+    // 强制：两个审稿基底都必须设定好（各有Key）且互不相同，才允许开始生产四篇
+    if(!revA || !revAKey){ showErr('请先设定审稿人 A：选好基底并填入对应的 Key'); $('fourRevAKey').focus(); return; }
+    if(!revB || !revBKey){ showErr('请先设定审稿人 B：选好基底并填入对应的 Key（两位审稿人都设定好，才能开始生产四篇论文）'); $('fourRevBKey').focus(); return; }
+    if(revA === revB){ showErr('审稿人 A 与 B 请选择两个不同的基底——两位审稿人用不同基底，才能多一双眼睛照出盲区'); $('fourRevB').focus(); return; }
+    const useB = true;
 
     $('fourWrap').style.display='block';
     $('fourWrap').scrollIntoView({behavior:'smooth', block:'start'});
