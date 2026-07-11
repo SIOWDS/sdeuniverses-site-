@@ -1458,10 +1458,10 @@ async function runOnePaper(cfg){
   let draft;
   try{
     draft = await streamChat(cfg.writeKey, cfg.writeSel, draftSys, cfg.writeInput, sink, dummy, dummy);
-  }catch(e){ stopTicker(); setStat('✗ 生成失败：'+e.message); throw e; }
+  }catch(e){ stopTicker(); setStat('✗ 生成失败：'+e.message); if(cfg.bodyEl) cfg.bodyEl.innerHTML='<span class="placeholder" style="color:#E8897B">✗ 这篇生成失败：'+esc4(e.message)+'（多为 API Key 无此基底权限、余额不足或被限流；可刷新重试或换基底/换快速档）</span>'; throw e; }
   stopTicker();
   let paperText = draft.text || '';
-  if(!paperText){ setStat('✗ 未产出内容'); throw new Error('初稿为空'); }
+  if(!paperText){ setStat('✗ 未产出内容'); if(cfg.bodyEl) cfg.bodyEl.innerHTML='<span class="placeholder" style="color:#E8897B">✗ 未产出内容（基底返回了空结果，通常是该档位/基底暂时不可用或被限流；请刷新重试，或换一个写作基底、换快速档）</span>'; throw new Error('初稿为空'); }
   if(cfg.bodyEl) cfg.bodyEl.innerHTML = renderPaperText(paperText);   // 初稿完成，一次性显示
 
   // 2. 双审（并行，静默——评审意见不显示在正文，正文保持初稿）
