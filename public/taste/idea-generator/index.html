@@ -157,7 +157,11 @@ footer{border-top:1px solid var(--border);text-align:center;padding:30px 20px 44
     </div>
     <div class="key-hint">
       <b>Key 只存在你的浏览器本地,绝不上传任何服务器</b> · 计算直接在你的浏览器里进行<br>
-      请根据下方选择的模型，填入对应厂商的 Key：<a href="https://platform.deepseek.com" target="_blank" rel="noopener">DeepSeek 申请 →</a> · <a href="https://open.bigmodel.cn" target="_blank" rel="noopener">智谱 GLM 申请 →</a> · <a href="https://platform.moonshot.cn" target="_blank" rel="noopener">月之暗面 Kimi 申请 →</a> · <a href="https://bailian.console.aliyun.com" target="_blank" rel="noopener">通义千问申请 →</a>（都充值几十元即可体验）
+      国产基底申请：<a href="https://platform.deepseek.com" target="_blank" rel="noopener">DeepSeek →</a> · <a href="https://open.bigmodel.cn" target="_blank" rel="noopener">智谱 GLM →</a> · <a href="https://platform.moonshot.cn" target="_blank" rel="noopener">月之暗面 Kimi →</a> · <a href="https://bailian.console.aliyun.com" target="_blank" rel="noopener">通义千问 →</a><br>
+      境外基底申请：<a href="https://platform.openai.com" target="_blank" rel="noopener">OpenAI GPT →</a> · <a href="https://console.anthropic.com" target="_blank" rel="noopener">Anthropic Claude →</a> · <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">Google Gemini →</a>（都充值少量即可体验）
+    </div>
+    <div class="key-hint" id="overseasNote" style="display:none;background:rgba(64,196,176,0.08);border:1px solid rgba(64,196,176,0.25);border-radius:5px;padding:9px 12px;margin-top:8px">
+      🌐 <b style="color:#40C4B0">你选择了境外基底（GPT/Claude/Gemini）</b>：由于这些服务在中国大陆无法直连，你的请求会<b>经本站中转服务器转发</b>给对应厂商。中转<b>只转发、不存储、不记录</b>你的 Key（用完即走）。介意的话，可改用上面的国产基底（它们是浏览器直连、Key 全程只在本地）。
     </div>
   </div>
 
@@ -181,6 +185,12 @@ footer{border-top:1px solid var(--border);text-align:center;padding:30px 20px 44
         <option value="kimi:flash">月之暗面 Kimi (moonshot-v1-32k) · 快速</option>
         <option value="qwen:pro">通义千问 Qwen-Max · 最强</option>
         <option value="qwen:flash">通义千问 Qwen-Plus · 均衡快速</option>
+        <option value="gpt:pro">🌐 GPT-4o（OpenAI·经代理）</option>
+        <option value="gpt:flash">🌐 GPT-4o-mini（OpenAI·快·经代理）</option>
+        <option value="claude:pro">🌐 Claude Sonnet 4.5（Anthropic·经代理）</option>
+        <option value="claude:flash">🌐 Claude 3.5 Haiku（Anthropic·快·经代理）</option>
+        <option value="gemini:pro">🌐 Gemini 2.5 Pro（Google·经代理）</option>
+        <option value="gemini:flash">🌐 Gemini 2.5 Flash（Google·快·经代理）</option>
       </optgroup>
     </select>
   </div>
@@ -308,6 +318,9 @@ footer{border-top:1px solid var(--border);text-align:center;padding:30px 20px 44
                 <option value="kimi:flash">月之暗面 Kimi (v1-32k) · 快速</option>
                 <option value="qwen:pro">通义千问 Qwen-Max · 最强</option>
                 <option value="qwen:flash">通义千问 Qwen-Plus · 均衡</option>
+                <option value="gpt:pro">🌐 GPT-4o（经代理）</option>
+                <option value="claude:pro">🌐 Claude Sonnet 4.5（经代理）</option>
+                <option value="gemini:pro">🌐 Gemini 2.5 Pro（经代理）</option>
               </optgroup>
             </select>
           </div>
@@ -630,13 +643,21 @@ const API_URLS = {
   ds:  "https://api.deepseek.com/v1/chat/completions",
   glm: "https://open.bigmodel.cn/api/paas/v4/chat/completions",
   kimi:"https://api.moonshot.cn/v1/chat/completions",
-  qwen:"https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions"
+  qwen:"https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions",
+  // 境外三家：经本站 /api/llm-proxy 中转（解决 CORS + 大陆直连）。这里存"目标 API 地址"，实际请求发给代理。
+  gpt:"https://api.openai.com/v1/chat/completions",
+  claude:"https://api.anthropic.com/v1/messages",
+  gemini:"https://generativelanguage.googleapis.com/v1beta/models"  // 实际URL在streamChat里按模型拼
 };
 // 解析 "厂商:档位" → {vendor, tier}
 function parseModel(sel){
   const [vendor, tier] = sel.split(':');
   return { vendor, tier };
 }
+// 境外厂商集合：这些走代理、非流式、格式各异
+const OVERSEAS = ['gpt','claude','gemini'];
+function isOverseas(sel){ return OVERSEAS.includes(parseModel(sel).vendor); }
+const PROXY_URL = "/api/llm-proxy";
 function apiUrl(sel){ return API_URLS[parseModel(sel).vendor]; }
 
 // 根据 厂商:档位 构造 payload
@@ -683,6 +704,26 @@ function buildPayload(sel, systemPrompt, userQ){
       base.model = 'qwen-plus';           // 均衡快速
       base.temperature = 0.7;
     }
+  } else if(vendor === 'gpt'){
+    // GPT（OpenAI，chat/completions 格式；经代理、非流式）
+    base.model = (tier === 'pro') ? 'gpt-4o' : 'gpt-4o-mini';
+    base.stream = false;
+    base.temperature = 0.7;
+  } else if(vendor === 'claude'){
+    // Claude（Anthropic /v1/messages 格式，system 独立字段；经代理、非流式）
+    return {
+      model: (tier === 'pro') ? 'claude-sonnet-4-5-20250929' : 'claude-3-5-haiku-20241022',
+      max_tokens: 8000,
+      system: systemPrompt,
+      messages: [{ role:'user', content: userQ }]
+    };
+  } else if(vendor === 'gemini'){
+    // Gemini（Google generateContent 格式；经代理、非流式）
+    return {
+      systemInstruction: { parts: [{ text: systemPrompt }] },
+      contents: [{ role:'user', parts: [{ text: userQ }] }],
+      generationConfig: { maxOutputTokens: 8000, temperature: 0.7 }
+    };
   }
   return base;
 }
@@ -719,16 +760,24 @@ const errBox=$('errBox');
 // 两家的 Key 分开保存；切换模型时自动切换对应厂商的 Key
 function keyStoreName(){
   const v = parseModel(modelSel.value).vendor;
-  return v==='glm' ? 'sde_glm_key' : v==='kimi' ? 'sde_kimi_key' : v==='qwen' ? 'sde_qwen_key' : 'sde_ds_key';
+  return v==='glm' ? 'sde_glm_key' : v==='kimi' ? 'sde_kimi_key' : v==='qwen' ? 'sde_qwen_key' : v==='gpt' ? 'sde_gpt_key' : v==='claude' ? 'sde_claude_key' : v==='gemini' ? 'sde_gemini_key' : 'sde_ds_key';
 }
 function vendorName(){
   const v = parseModel(modelSel.value).vendor;
-  return v==='glm' ? '智谱' : v==='kimi' ? '月之暗面 Kimi' : v==='qwen' ? '通义千问' : 'DeepSeek';
+  return v==='glm' ? '智谱' : v==='kimi' ? '月之暗面 Kimi' : v==='qwen' ? '通义千问' : v==='gpt' ? 'GPT (OpenAI)' : v==='claude' ? 'Claude (Anthropic)' : v==='gemini' ? 'Gemini (Google)' : 'DeepSeek';
 }
 function refreshKeyUI(){
   apiKeyEl.value = localStorage.getItem(keyStoreName()) || '';
   const lbl = $('keyLabel');
   if(lbl) lbl.innerHTML = '你的 ' + vendorName() + ' API Key <span class="req">*</span>';
+  // 境外基底：显示中转告知；Gemini 的 Key 是 AIza 开头
+  const over = isOverseas(modelSel.value);
+  const note = $('overseasNote');
+  if(note) note.style.display = over ? 'block' : 'none';
+  const v = parseModel(modelSel.value).vendor;
+  if(v === 'gemini') apiKeyEl.placeholder = 'AIza... (Google Gemini Key)';
+  else if(over) apiKeyEl.placeholder = 'sk-... (境外基底 Key，经中转转发)';
+  else apiKeyEl.placeholder = 'sk-...';
 }
 refreshKeyUI();
 apiKeyEl.addEventListener('input', ()=>localStorage.setItem(keyStoreName(), apiKeyEl.value.trim()));
@@ -755,6 +804,12 @@ async function streamChat(apiKey, model, systemPrompt, userQ, bodyEl, statusEl, 
   bodyEl.innerHTML='<span class="placeholder">正在连接 '+vendorName()+'……</span>';
   statusEl.innerHTML='<span class="spinner"></span> 连接中';
   const t0=Date.now();
+
+  // ===== 境外基底（GPT/Claude/Gemini）：走 /api/llm-proxy 代理、非流式、各家格式不同 =====
+  if(isOverseas(model)){
+    return await callOverseas(apiKey, model, systemPrompt, userQ, bodyEl, statusEl, metaEl, t0);
+  }
+
   let acc='', chars=0;
   const cursor=document.createElement('span'); cursor.className='cursor-blink';
 
@@ -839,6 +894,76 @@ async function streamChat(apiKey, model, systemPrompt, userQ, bodyEl, statusEl, 
   return { text:acc, chars, thinkChars, secs:parseFloat(secs) };
 }
 
+// 境外基底（GPT/Claude/Gemini）：经 /api/llm-proxy 中转、非流式一次性返回，按各家格式解析
+async function callOverseas(apiKey, model, systemPrompt, userQ, bodyEl, statusEl, metaEl, t0){
+  const { vendor, tier } = parseModel(model);
+  const payload = buildPayload(model, systemPrompt, userQ);
+
+  // 组装代理请求头：不同厂商鉴权方式不同
+  const headers = { 'Content-Type':'application/json' };
+  let targetUrl = API_URLS[vendor];
+  if(vendor === 'gpt'){
+    headers['Authorization'] = 'Bearer ' + apiKey;
+    headers['x-target-url'] = 'https://api.openai.com/v1/chat/completions';
+  } else if(vendor === 'claude'){
+    headers['x-api-key'] = apiKey;
+    headers['anthropic-version'] = '2023-06-01';
+    headers['anthropic-dangerous-direct-browser-access'] = 'true';
+    headers['x-target-url'] = 'https://api.anthropic.com/v1/messages';
+  } else if(vendor === 'gemini'){
+    const gm = (tier === 'pro') ? 'gemini-2.5-pro' : 'gemini-2.5-flash';
+    headers['x-target-url'] = 'https://generativelanguage.googleapis.com/v1beta/models/' + gm + ':generateContent?key=' + encodeURIComponent(apiKey);
+  }
+
+  bodyEl.innerHTML='<span class="placeholder">✓ 已连接，'+vendorName()+' 正在生成'+(tier==='pro'?'（较强模型首次响应可能需 1-2 分钟）':'')+'……<br><span style="font-size:12px;opacity:.7">境外基底经中转、一次性返回，请耐心等待完整结果</span></span>';
+  statusEl.innerHTML='<span class="spinner"></span> 生成中';
+  // 计时器
+  let done=false;
+  const waitTimer=setInterval(()=>{ if(!done){ const s=Math.round((Date.now()-t0)/1000); statusEl.innerHTML='<span class="spinner"></span> 生成中 ('+s+'s)'; } },1000);
+
+  let resp;
+  try{
+    resp = await fetch(PROXY_URL, { method:'POST', headers, body: JSON.stringify(payload) });
+  }catch(e){ done=true; clearInterval(waitTimer); statusEl.textContent='网络错误'; bodyEl.innerHTML='<span class="placeholder">中转请求失败：'+e.message+'</span>'; throw new Error('代理请求失败：'+e.message); }
+
+  const raw = await resp.text();
+  done=true; clearInterval(waitTimer);
+
+  if(!resp.ok){
+    let detail='';
+    try{ const j=JSON.parse(raw); detail = j.error?.message || j.error?.type || JSON.stringify(j).slice(0,200); }catch(_){ detail = raw.slice(0,200) || resp.statusText; }
+    statusEl.textContent='失败';
+    bodyEl.innerHTML='<span class="placeholder">调用失败（'+resp.status+'）：'+detail+'</span>';
+    throw new Error('API '+resp.status+'：'+detail);
+  }
+
+  // 按各家格式提取正文
+  let text='';
+  try{
+    const j = JSON.parse(raw);
+    if(vendor === 'gpt'){
+      text = j.choices?.[0]?.message?.content || '';
+    } else if(vendor === 'claude'){
+      // content 是数组，取所有 text 块拼接
+      text = (Array.isArray(j.content) ? j.content.filter(b=>b.type==='text').map(b=>b.text).join('') : '') || '';
+    } else if(vendor === 'gemini'){
+      const parts = j.candidates?.[0]?.content?.parts;
+      text = Array.isArray(parts) ? parts.map(p=>p.text||'').join('') : '';
+    }
+  }catch(e){ statusEl.textContent='解析失败'; bodyEl.innerHTML='<span class="placeholder">响应解析失败，原始返回：'+raw.slice(0,200)+'</span>'; throw new Error('响应解析失败'); }
+
+  const secs=((Date.now()-t0)/1000).toFixed(1);
+  if(!text){
+    bodyEl.innerHTML='<span class="placeholder">（模型没有返回内容，可能被安全策略拦截或额度问题，换个问题或模型再试）</span>';
+    statusEl.textContent='空响应'; metaEl.textContent=secs+'s';
+    return { text:'', chars:0, thinkChars:0, secs:parseFloat(secs) };
+  }
+  bodyEl.textContent = text;
+  statusEl.textContent='✓ 完成';
+  metaEl.textContent = text.length+' 字 · '+secs+'s';
+  return { text, chars:text.length, thinkChars:0, secs:parseFloat(secs) };
+}
+
 // 主流程：两边并行
 async function run(){
   hideErr();
@@ -899,7 +1024,7 @@ async function run(){
   const sdeStats  =[results[1],results[3],results[5]].filter(x=>x&&x.chars>0);
   window._lastResult = {
     question: q,
-    model: ({'ds:pro':'DeepSeek V4 Pro（深度思考）','ds:flash':'DeepSeek V4 Flash','glm:pro':'智谱 GLM-5（深度思考）','glm:flash':'智谱 GLM-4-Flash','kimi:pro':'月之暗面 Kimi K2.6','kimi:flash':'月之暗面 Kimi (v1-32k)','qwen:pro':'通义千问 Qwen-Max','qwen:flash':'通义千问 Qwen-Plus'})[model] || model,
+    model: ({'ds:pro':'DeepSeek V4 Pro（深度思考）','ds:flash':'DeepSeek V4 Flash','glm:pro':'智谱 GLM-5（深度思考）','glm:flash':'智谱 GLM-4-Flash','kimi:pro':'月之暗面 Kimi K2.6','kimi:flash':'月之暗面 Kimi (v1-32k)','qwen:pro':'通义千问 Qwen-Max','qwen:flash':'通义千问 Qwen-Plus','gpt:pro':'GPT-4o','gpt:flash':'GPT-4o-mini','claude:pro':'Claude Sonnet 4.5','claude:flash':'Claude 3.5 Haiku','gemini:pro':'Gemini 2.5 Pro','gemini:flash':'Gemini 2.5 Flash'})[model] || model,
     rows: [0,1,2].map(i=>({
       view: viewNames[i],
       plain: (results[i*2]&&results[i*2].text)||'',
@@ -1231,11 +1356,11 @@ if(paperPdfBtn){
 // Key 按厂商取用（复用两家分存的 localStorage）
 function vendorKeyName(sel){
   const v = parseModel(sel).vendor;
-  return v==='glm' ? 'sde_glm_key' : v==='kimi' ? 'sde_kimi_key' : v==='qwen' ? 'sde_qwen_key' : 'sde_ds_key';
+  return v==='glm' ? 'sde_glm_key' : v==='kimi' ? 'sde_kimi_key' : v==='qwen' ? 'sde_qwen_key' : v==='gpt' ? 'sde_gpt_key' : v==='claude' ? 'sde_claude_key' : v==='gemini' ? 'sde_gemini_key' : 'sde_ds_key';
 }
 function vendorLabel(sel){
   const v = parseModel(sel).vendor;
-  return v==='glm' ? '智谱 GLM' : v==='kimi' ? '月之暗面 Kimi' : v==='qwen' ? '通义千问' : 'DeepSeek';
+  return v==='glm' ? '智谱 GLM' : v==='kimi' ? '月之暗面 Kimi' : v==='qwen' ? '通义千问' : v==='gpt' ? 'GPT (OpenAI)' : v==='claude' ? 'Claude (Anthropic)' : v==='gemini' ? 'Gemini (Google)' : 'DeepSeek';
 }
 
 // 打开审稿弹框：默认预选“另一个厂商”的 pro 档，并带出其已存 Key
