@@ -244,6 +244,9 @@ footer{border-top:1px solid var(--border);text-align:center;padding:30px 20px 44
 </div>
 
 <div id="downloadRow" style="max-width:1200px;margin:20px auto 0;text-align:center;display:none">
+  <button id="emergeBtn" style="background:linear-gradient(135deg,#C9A227,#E5C86E);color:#1a1205;font-weight:700;font-size:15px;border:none;border-radius:9px;padding:13px 30px;cursor:pointer;letter-spacing:0.03em;margin-right:12px;box-shadow:0 4px 16px rgba(201,162,39,0.3)">
+    ⚗ 二阶涌现 · 把三个金点子撞成新典范
+  </button>
   <button id="dlBtn" style="background:#238636;color:#fff;font-weight:600;font-size:15px;border:none;border-radius:9px;padding:13px 32px;cursor:pointer;letter-spacing:0.03em">
     📄 下载六篇小论文（Word 文档）
   </button>
@@ -251,6 +254,22 @@ footer{border-top:1px solid var(--border);text-align:center;padding:30px 20px 44
     🔄 清空结果 · 再问一次
   </button>
   <div style="font-size:12px;color:#8B98A5;margin-top:8px">下载后可点"清空结果"，用同一个问题再生成一次，对比多次结果的差异</div>
+</div>
+
+<!-- 二阶涌现结果面板 -->
+<div id="emergeWrap" style="max-width:1000px;margin:26px auto 0;display:none">
+  <div style="background:linear-gradient(135deg,rgba(201,162,39,0.12),rgba(20,16,8,0.4));border:1px solid rgba(201,162,39,0.45);border-radius:14px;padding:26px 30px">
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:6px">
+      <div style="font-size:19px;font-weight:700;color:#E5C86E;letter-spacing:0.04em">⚗ 二阶涌现 · 新典范</div>
+      <div id="emergeStatus" style="font-size:13px;color:#8B98A5"></div>
+    </div>
+    <div style="font-size:13px;color:#9AA5B0;margin-bottom:16px;line-height:1.7">三个金点子各是一个孤立的真判断，但它们之间的<b style="color:#C9A227">空隙</b>才是新东西的诞生地。下面这套"碰撞 → 暗流 → 新典范"，逼出的是任何单个金点子都看不到的东西——最后一步的<b style="color:#C9A227">自反检验</b>，会让新典范照出它自己身上的同一个毛病。</div>
+    <div id="emergeBody" style="color:#D4DCE4;font-size:15px;line-height:1.95;white-space:normal"><span class="placeholder">点击上方按钮开始涌现……</span></div>
+    <div id="emergeMeta" style="font-size:12px;color:#8B98A5;margin-top:14px"></div>
+    <div id="emergeDlRow" style="margin-top:18px;display:none">
+      <button id="emergeDlBtn" style="background:#238636;color:#fff;font-weight:600;font-size:14px;border:none;border-radius:8px;padding:11px 26px;cursor:pointer">📄 连新典范一起下载（Word）</button>
+    </div>
+  </div>
 </div>
 
 <div class="explain">
@@ -349,6 +368,70 @@ const SDE_OUTPUT_SPEC = `
 · 让人读完有"我从没这样想过，但你说得对"的震动，并且觉得"这是一篇真正有分量的文章"。`;
 
 function sdePrompt(dim, idx){ return SDE_BASE + SDE_OUTPUT_SPEC + '\n\n【请特别侧重这个角度】\n' + SHARED_VIEWS[dim][idx]; }
+
+// ============ 二阶涌现：三金点子碰撞成新典范 ============
+const EMERGE_SPEC = `
+---
+【本次任务：二阶涌现工程——把三个金点子碰撞成一个新典范】
+
+你面前有三篇小论文，是同一个问题从三个不同角度被追问出来的三个"金点子"（每篇各有一个反直觉却成立的核心判断）。你的任务不是总结它们，而是执行一套严格的三阶涌现工程，从三个孤立判断里，逼出一个任何单篇都看不到的"新典范"。
+
+三个金点子单独看是三个真判断，但它们之间的**空隙**才是新东西的诞生地。严格依次执行下面三阶，不许跳阶，不许把"两个观点合并"冒充"碰撞"。
+
+▍第一阶 · 混沌碰撞（三对两两相撞）
+把三个金点子两两相撞，共 3 对（①×②、①×③、②×③）。每对做四步：
+1. 撞击焦点：这两个判断在什么根本问题上有结构性张力？用一句话说清它们在哪里"打架"（是"打架"，不是"互补"）。若确实无张力，标注"无焦点"并作废这一对。
+2. 展开撞击：当两个角度同时盯住同一个对象，暴露了什么任何单角度都看不到的东西？必须是打架的结果，不是观点的并列。
+3. 命名涌现物：给这个新暴露的结构起个名，不超过 12 字，必须是新概念/新结构（优先用"…性""…症""…悖论""…陷阱""…耦合""…锁定"这类结构性命名），不能是金点子的换句话说。
+4. 守边界：这个涌现物说的还是原来那个对象吗？漂移到别的话题就重做。
+
+▍第二阶 · 自组织（把涌现物聚成暗流）
+看这几个涌现物：哪些其实指向同一条更深的暗流（同一种"消失/缺失""锁定机制""双面性""演化路径""伪解决""时间结构"）？把它们聚类，命名 1-3 条暗流（每条≤12字，用"…流""…轴""…机制"这类结构性命名）。每条暗流最好由≥2个涌现物支撑；只被单个涌现物支撑的，作为反例单列。任意两条暗流之间要有真差异，别重叠。
+
+▍第三阶 · 涌现（结晶出新典范）
+1. 找核心枢纽：哪条暗流是别的暗流的根、锁住别的暗流？用一两句话说清暗流之间的关系。
+2. 提炼新典范：给它命名（≤20字，用"…病理""…悖论""…陷阱""…律"这类），并给出它的核心判断。
+3. 四重检验（逐条如实回答，不许自我表扬）：
+   ① 不可还原：能从任何单独一个金点子直接推出这个新典范吗？（应答：不能——若能，作废重做）
+   ② 不可消解：能用一个现成的旧词（"范式""内卷""系统失灵"等）直接替代它吗？（应答：不能——若能，作废重做）
+   ③ 跨学科：它在至少 3 个不同学科里都有真正的对应吗？（列出学科+各自的对应）
+   ④ 自反：这个新典范，对它自己、对"这套追问方法本身"适不适用？必须严肃回答。**如果你的答案是"我们的方法是完美的、不适用于自身"，那就说明这个新典范没有真深度——推倒重做。** 真正有深度的新典范，一定能照出它自己身上的同一个毛病。
+4. 跨学科创新地图：把新典范展开到至少 5 个学科，每个学科一句话（≤25字）说清它在那里意味着什么——必须是真对应，不是表面比喻。
+
+▍输出格式（请严格照此结构，让人一步步看清涌现是怎么发生的）
+先写一句话点题：这次三个金点子最终撞出了什么。然后：
+
+一、三对碰撞
+用清单逐对写：【①×②】焦点：… ／ 撞出：… ／ 涌现物:「…」（②×③、①×③同样）
+
+二、暗流
+逐条写：暗流「…」← 由哪几个涌现物支撑 ／ 它们共同指向的深层不变量是…
+
+三、新典范
+【新典范：「…」】
+核心判断：（两三句话）
+四重检验：不可还原 ✓/✗ … ／ 不可消解 ✓/✗ … ／ 跨学科 ✓/✗（列学科）／ 自反 ✓/✗（诚实回答它对自己是否适用）
+
+四、跨学科创新地图
+逐个学科一行：〔学科〕→ 一句话真对应
+
+▍纪律
+· 严格依次三阶，不许跳。碰撞必须有焦点，无焦点的对就作废，不许用"也""并且"强行拉扯。
+· 涌现物、暗流、新典范都必须是新结构，不是金点子换皮。
+· 自反检验是这整件事的试金石，必须诚实，不许给"完美方法"式答案。
+· 全程用问题所在领域的自然语言写作，像该领域最深的思想者在说话；除了"金点子/涌现物/暗流/新典范/新典范级"这几个本工具的工作词，不要冒出任何其它理论术语、框架名或缩写。
+· 不要客套铺垫，直接进入。让读者读完有"原来这三个点背后是同一个更深的东西"的震动。
+`;
+// 涌现用的系统提示 = SDE 内功底盘 + 三阶涌现工程规格
+function emergePrompt(){ return SDE_BASE + EMERGE_SPEC; }
+// 把三篇 SDE 金点子拼成涌现的输入
+function buildEmergeInput(rows, question){
+  let s = '用户最初的问题是：' + question + '\n\n下面是从三个不同角度追问出来的三个金点子（三篇小论文）。请对它们执行三阶涌现工程。\n';
+  rows.forEach((r,i)=>{
+    s += '\n════ 金点子' + ['①','②','③'][i] + '（' + (r.view||('视角'+(i+1))) + '）════\n' + (r.sde||'').trim() + '\n';
+  });
+  return s;
+}
 
 const PLAIN_SYSTEM = `你是一个乐于助人、见识广博的 AI 助手。请针对用户的问题，写成一篇有深度、有见地的小论文（约 4000 字）。
 
@@ -661,6 +744,104 @@ function renderEfficiency(plainStats, sdeStats){
 
 goBtn.addEventListener('click', run);
 
+// ============ 二阶涌现执行 ============
+// 轻量渲染：换行 + **加粗** + 「新典范」高亮 + ✓/✗ 上色
+function renderEmergeText(text){
+  const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const lines = text.split('\n');
+  let html = '';
+  for(let raw of lines){
+    let t = raw.trim();
+    if(!t){ html += '<div style="height:8px"></div>'; continue; }
+    let line = esc(t);
+    // **加粗**
+    line = line.replace(/\*\*(.+?)\*\*/g, '<b style="color:#E5C86E">$1</b>');
+    // ✓ 绿 / ✗ 红
+    line = line.replace(/✓/g,'<span style="color:#4ade80;font-weight:700">✓</span>').replace(/✗/g,'<span style="color:#f87171;font-weight:700">✗</span>');
+    // 章节大标题：一、二、三、四
+    if(/^[一二三四五]、/.test(t)){
+      html += '<div style="font-size:16px;font-weight:700;color:#C9A227;margin:18px 0 8px;letter-spacing:0.04em">'+line+'</div>';
+      continue;
+    }
+    // 新典范行高亮
+    if(/新典范[:：]|【新典范/.test(t)){
+      html += '<div style="background:rgba(201,162,39,0.15);border-left:3px solid #C9A227;padding:10px 14px;margin:10px 0;font-size:16px;font-weight:700;color:#F3E0B0;border-radius:0 6px 6px 0">'+line+'</div>';
+      continue;
+    }
+    html += '<div style="margin:3px 0">'+line+'</div>';
+  }
+  return html;
+}
+
+const emergeBtn = $('emergeBtn');
+if(emergeBtn){
+  emergeBtn.addEventListener('click', async ()=>{
+    const r = window._lastResult;
+    if(!r || !r.rows || r.rows.length < 2){ showErr('需要先生成金点子（至少两个）才能涌现'); return; }
+    const key = apiKeyEl.value.trim().replace(/^["']|["']$/g,'');
+    if(!key){ showErr('请先填入 API Key'); apiKeyEl.focus(); return; }
+    const model = modelSel.value;
+
+    hideErr();
+    $('emergeWrap').style.display='block';
+    $('emergeWrap').scrollIntoView({behavior:'smooth', block:'start'});
+    $('emergeDlRow').style.display='none';
+    emergeBtn.disabled = true;
+    emergeBtn.textContent = '⏳ 涌现中（碰撞→暗流→新典范，深度思考约需 1-3 分钟）……';
+    const bodyEl = $('emergeBody'), statusEl = $('emergeStatus'), metaEl = $('emergeMeta');
+
+    const userQ = buildEmergeInput(r.rows, r.question||'');
+    try{
+      const res = await streamChat(key, model, emergePrompt(), userQ, bodyEl, statusEl, metaEl);
+      if(res && res.text){
+        // 流式结束后，用轻排版重渲染
+        bodyEl.innerHTML = renderEmergeText(res.text);
+        window._lastEmerge = res.text;
+        $('emergeDlRow').style.display='block';
+        statusEl.textContent = '✓ 涌现完成';
+      }
+    }catch(e){
+      showErr('涌现失败：'+e.message);
+      statusEl.textContent = '失败';
+    }finally{
+      emergeBtn.disabled = false;
+      emergeBtn.textContent = '⚗ 二阶涌现 · 把三个金点子撞成新典范';
+    }
+  });
+}
+
+// 涌现结果下载（含新典范）
+const emergeDlBtn = $('emergeDlBtn');
+if(emergeDlBtn){
+  emergeDlBtn.addEventListener('click', ()=>{
+    const r = window._lastResult, em = window._lastEmerge;
+    if(!em){ return; }
+    const { Document, Packer, Paragraph, TextRun, HeadingLevel } = docx;
+    function toParas(text){
+      return text.split('\n').filter(l=>l.trim()).map(line=>{
+        const t=line.trim();
+        const isTitle = /^[一二三四五]、/.test(t) || /新典范/.test(t);
+        return new Paragraph({
+          children:[new TextRun({text:t.replace(/\*\*/g,''), bold:isTitle, size:isTitle?26:22})],
+          spacing:{after:120}
+        });
+      });
+    }
+    const kids = [
+      new Paragraph({children:[new TextRun({text:'二阶涌现 · 新典范', bold:true, size:36})], spacing:{after:160}}),
+      new Paragraph({children:[new TextRun({text:'问题：'+(r&&r.question||''), italics:true, size:22})], spacing:{after:200}}),
+      ...toParas(em)
+    ];
+    const doc = new Document({sections:[{children:kids}]});
+    Packer.toBlob(doc).then(blob=>{
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = '二阶涌现_新典范.docx'; a.click();
+      URL.revokeObjectURL(url);
+    });
+  });
+}
+
 // 清空结果 · 再问一次
 function clearResults(){
   rowEls.forEach(row=>{
@@ -678,6 +859,8 @@ function clearResults(){
   $('downloadRow').style.display='none';
   if($('effBox')) $('effBox').style.display='none';
   if($('comboBar')) $('comboBar').style.display='none';
+  if($('emergeWrap')) $('emergeWrap').style.display='none';
+  window._lastEmerge = null;
   // 恢复视角标签为默认
   rowEls.forEach((row,i)=>{ if(row.labelEl) row.labelEl.textContent='视角'+['一','二','三'][i]+'（点击生成后从九宫格随机抽取）'; });
   hideErr();
