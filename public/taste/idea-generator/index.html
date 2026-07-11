@@ -940,17 +940,16 @@ const rowEls=[1,2,3].map(n=>({
 }));
 
 // 九宫格池（S1-S3 / D1-D3 / E1-E3 共9格）
-const GRID = [];
-['show','diff','entangle'].forEach(dim=>{ [0,1,2].forEach(idx=>GRID.push({dim, idx})); });
 // 从九格中无放回随机抽3个（三次不重合）
+// 三个金点子必须分别来自 S、D、E 三个维度各一个（不允许同一维度出现两个）：
+// 先从 S(show)的 S1/S2/S3 随机抽一个，再从 D(diff)的 D1/D2/D3 随机抽一个，再从 E(entangle)的 E1/E2/E3 随机抽一个。
 function pick3(){
-  const pool = GRID.slice();
   const out = [];
-  for(let k=0;k<3;k++){
-    const j = Math.floor(Math.random()*pool.length);
-    out.push(pool.splice(j,1)[0]);
-  }
-  return out;
+  ['show','diff','entangle'].forEach(dim=>{
+    const idx = Math.floor(Math.random()*3);   // 该维度内随机选 0/1/2 → S1/S2/S3、D1/D2/D3、E1/E2/E3
+    out.push({ dim, idx });
+  });
+  return out;   // 顺序固定为 S → D → E
 }
 const errBox=$('errBox');
 
