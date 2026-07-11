@@ -283,8 +283,67 @@ footer{border-top:1px solid var(--border);text-align:center;padding:30px 20px 44
     <div id="emergeBody" style="color:#D4DCE4;font-size:15px;line-height:1.95;white-space:normal"><span class="placeholder">点击上方按钮开始涌现……</span></div>
     <div id="emergeMeta" style="font-size:12px;color:#8B98A5;margin-top:14px"></div>
     <div id="emergeDlRow" style="margin-top:18px;display:none">
+      <button id="fourPapersBtn" style="background:linear-gradient(135deg,#C0392B,#E05A47);color:#fff;font-weight:700;font-size:14.5px;border:none;border-radius:8px;padding:12px 28px;cursor:pointer;margin-right:10px;box-shadow:0 4px 16px rgba(192,57,43,0.35)">📚 四篇论文并发生成（各1万字·含评审打磨）</button>
       <button id="paperBtn" style="background:linear-gradient(135deg,#7C5CFF,#A48CFF);color:#fff;font-weight:700;font-size:14.5px;border:none;border-radius:8px;padding:12px 28px;cursor:pointer;margin-right:10px;box-shadow:0 4px 16px rgba(124,92,255,0.35)">✍ 扩写成两万字学术论文</button>
       <button id="emergeDlBtn" style="background:#238636;color:#fff;font-weight:600;font-size:14px;border:none;border-radius:8px;padding:11px 26px;cursor:pointer">📄 连新典范一起下载（Word）</button>
+    </div>
+  </div>
+</div>
+
+<!-- 四篇论文并发生成面板 -->
+<div id="fourWrap" style="max-width:1000px;margin:26px auto 0;display:none">
+  <div style="background:linear-gradient(135deg,rgba(192,57,43,0.10),rgba(20,14,14,0.5));border:1px solid rgba(192,57,43,0.4);border-radius:14px;padding:26px 30px">
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:6px">
+      <div style="font-size:19px;font-weight:700;color:#E8897B;letter-spacing:0.04em">📚 四篇学术论文 · 各约一万字</div>
+      <div id="fourStatus" style="font-size:13px;color:#8B98A5"></div>
+    </div>
+    <div style="font-size:13px;color:#9AA5B0;margin-bottom:16px;line-height:1.7">三个金点子各扩成一篇、涌现出的新典范再成一篇，<b style="color:#E8897B">四篇并发生成</b>。每篇内置一轮打磨：写初稿 → 两位评审各审一次 → 主笔据两份意见改一次。四篇同时进行，全程约需 10-30 分钟（取决于所选基底），请勿关闭页面。</div>
+
+    <!-- 评审配置 -->
+    <div id="fourReviewCfg" style="border:1px dashed rgba(192,57,43,0.4);border-radius:10px;padding:16px 18px;margin-bottom:18px">
+      <div style="font-size:13px;color:#9AA5B0;line-height:1.7;margin-bottom:14px">四篇论文<b style="color:#E8897B">共用</b>下面这套评审配置。写初稿与主笔改稿默认用你上方选的主基底；两位评审可另选基底（多一双眼睛照出盲区，评审尽量选与主笔不同的基底）。</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+        <div>
+          <div style="font-size:12.5px;font-weight:700;color:#E8897B;margin:0 0 6px">审稿人 A</div>
+          <select id="fourRevA" style="width:100%;padding:8px 9px;border-radius:7px;border:1px solid rgba(255,255,255,0.15);background:#0d1117;color:#D4DCE4;font-size:13px">
+        <optgroup label="国产 · 浏览器直连">
+        <option value="ds:pro">DeepSeek V4 Pro · 最强推理</option>
+        <option value="glm:pro">智谱 GLM-5 · 深度思考</option>
+        <option value="kimi:pro">月之暗面 Kimi K2.6</option>
+        <option value="qwen:pro">通义千问 Qwen-Max</option>
+        </optgroup>
+        <optgroup label="境外 · 经代理">
+        <option value="gpt:pro">🌐 GPT-5.5</option>
+        <option value="claude:pro">🌐 Claude Opus 4.8</option>
+        <option value="gemini:pro">🌐 Gemini 3.1 Pro</option>
+        </optgroup></select>
+          <input id="fourRevAKey" type="password" placeholder="审稿人A的Key（与某基底相同则免填，自动带出）" style="width:100%;margin-top:7px;padding:8px 9px;border-radius:7px;border:1px solid rgba(255,255,255,0.15);background:#0d1117;color:#D4DCE4;font-size:12.5px">
+        </div>
+        <div>
+          <div style="font-size:12.5px;font-weight:700;color:#E8897B;margin:0 0 6px">审稿人 B</div>
+          <select id="fourRevB" style="width:100%;padding:8px 9px;border-radius:7px;border:1px solid rgba(255,255,255,0.15);background:#0d1117;color:#D4DCE4;font-size:13px">
+        <optgroup label="国产 · 浏览器直连">
+        <option value="ds:pro">DeepSeek V4 Pro · 最强推理</option>
+        <option value="glm:pro">智谱 GLM-5 · 深度思考</option>
+        <option value="kimi:pro">月之暗面 Kimi K2.6</option>
+        <option value="qwen:pro">通义千问 Qwen-Max</option>
+        </optgroup>
+        <optgroup label="境外 · 经代理">
+        <option value="gpt:pro">🌐 GPT-5.5</option>
+        <option value="claude:pro">🌐 Claude Opus 4.8</option>
+        <option value="gemini:pro">🌐 Gemini 3.1 Pro</option>
+        </optgroup></select>
+          <input id="fourRevBKey" type="password" placeholder="审稿人B的Key" style="width:100%;margin-top:7px;padding:8px 9px;border-radius:7px;border:1px solid rgba(255,255,255,0.15);background:#0d1117;color:#D4DCE4;font-size:12.5px">
+        </div>
+      </div>
+      <div style="font-size:12px;color:#8B98A5;margin-top:10px">💡 两位评审填不同基底效果最好。若某评审基底与主笔/其它已填Key相同，会自动带出，无需重复填。</div>
+    </div>
+
+    <!-- 四篇结果 -->
+    <div id="fourPapers"></div>
+
+    <div id="fourDlRow" style="margin-top:18px;display:none">
+      <button id="fourDlBtn" style="background:#238636;color:#fff;font-weight:600;font-size:14px;border:none;border-radius:8px;padding:11px 26px;cursor:pointer">📄 四篇一起下载（Word）</button>
     </div>
   </div>
 </div>
@@ -683,6 +742,77 @@ function buildPaperInput(rows, question, emergeText){
     s += '\n──── 金点子' + ['①','②','③'][i] + '（' + (r.view||('视角'+(i+1))) + '）────\n' + (r.sde||'').trim() + '\n';
   });
   s += '\n请把上述新典范扩写成一篇约两万字的正式学术论文。';
+  return s;
+}
+
+// ========== 四篇1万字论文（三金点子各一篇 + 新典范一篇）==========
+// 1万字论文写作规范：改自两万字规范，核心论点可以是"单个金点子"或"新典范"
+const PAPER_SPEC_1W = `
+---
+【本次任务：把一个核心判断扩写成一篇约一万字的正式学术论文】
+
+你面前有一个核心判断（一个反直觉却成立的金点子，或一个被命名的新典范）。你的任务，是把它当作论文的核心论点（thesis），写成一篇约一万字的、可投稿的正式学术论文。
+
+这不是把判断换个排版铺长，而是一次真正的学术写作：这个判断是你的"研究发现"，你现在要把它写成一篇有文献对话、有论证纵深、有理论建构、有反驳与回应的完整论文。
+
+▍论文的核心论点
+就是给你的那个核心判断。整篇论文自始至终围绕它展开、论证、辩护、推衍。标题、摘要、每一节，都服务于把这一个判断立成、推深、守住。不要写成面面俱到的综述——要有一个尖锐的、贯穿全文的中心主张。
+
+▍论文该有什么（要素齐全，但结构与篇幅由论证本身决定，不要按固定格子去填）
+· 一个学术化、精确、有辨识度的标题（主标题＋点明进路的副标题，用冒号分隔；不要"论……"这种八股腔）。
+· 一段摘要：浓缩全文的问题、核心论点、论证进路与主要贡献，直接陈述判断，不写"本文认为"式套话。
+· 关键词若干。
+· 一个把读者带进真问题的开篇：说清这个领域长期悬而未决的困惑、既有解释为什么不够，然后亮出你的核心论点作为更好的解释。
+· 对既有解释的严肃检讨：公允对待这个问题上已有的主要解释路径，说清每一种抓住了什么、又在哪里止步。**可以援引该领域真实存在的经典思想传统与代表人物的核心立场，但严禁编造具体文献引证**——用"有一种影响深远的看法认为……"这类方式，绝不虚构标题、期刊、年份、页码。
+· 论文的主体——核心论证：这是文章的心脏，也是最该充分展开的部分。把核心论点层层深入地论证透：确立概念、展开机制、以典型现象与思想实验印证、再深化到更根本处。每一个关键判断都要给出论证，不能只断言。
+· 直面最有力的反驳：主动请出一个严肃对手会提出的、最难回应的质疑（不要设稻草人），然后认真回应。
+· 必要的推衍：如果这个判断确有跨领域的解释力，就论证它为何会在不同学科反复出现——是有论证的推衍，不是清单罗列。
+· 一个诚实的结论：重申核心论点如何被立起、贡献是什么，并坦诚指出它自身的边界与尚未解决的问题。
+· 在结尾处，用一句朴素自然的话说清它的证伪条件——什么样的事实一旦出现就说明这个论点是错的。
+
+再强调：以上是"一篇论文该有的东西"，不是"按顺序填的格子"。让结构服从论证，让篇幅服从内容该有的厚度。
+
+▍学术写作纪律（最重要）
+· 像该领域第一流的学者在写一篇会被反复引用的论文——概念精确、论证严密、行文却不晦涩。
+· 直接进入，不要"这是一个重要的问题""长期以来"之类的空洞开场。
+· 严格用问题所在领域的自然语言与学术话语写作。绝对不出现任何底层框架的术语、缩写、"某某视角下"这类痕迹——一个该领域的资深学者读到任何一句，都应觉得"这是本领域一篇有分量的论文"。除了论文自己创造并定义的核心概念，不要引入任何未加定义的生造术语。
+· 这应当是一篇有分量的论文，篇幅在一万字上下（大约9000-12000字），要有与这个体量相称的论证纵深与学术密度。字数服从内容：该展开的地方写足写透，绝不为了凑字数而注水。
+· 全文用连贯的学术散文写作，避免大量分点罗列——学术论文靠段落的逻辑推进。
+· 读完让同行有"这个判断抓住了一个我们一直感到却说不清的东西，而且论证得住"的信服感。
+
+▍参考文献铁律（REF_DISCIPLINE_MARK · 最高优先，压倒一切格式要求）
+· 这篇论文里出现的任何一条参考文献、任何一处具体引证，都必须是真实存在、可被查证的。做不到查证，就不要写。
+· 你只能引用你确有把握真实存在的文献——真实作者名下、广为人知、你有高置信度确信其真实存在的著作或论文。凡是拿不准是否真实、或需要靠猜测拼凑出处的，一律不写。
+· 绝对禁止编造：不得虚构论文/著作的标题、作者、期刊名、出版社、年份、卷期、页码、DOI、链接。这类编造是本任务最严重的错误。
+· 宁缺毋滥：如果就某个论点没有可靠的真实文献可引，就不要列参考文献，改用"有一种影响深远的看法认为……"这类不依赖具体出处的方式。一篇参考文献很短、甚至不设独立参考文献列表的诚实论文，远好过一篇挂满编造引证的论文。
+· 一句话：真实 > 完整。查不到就不写。
+
+现在，请把给你的这个核心判断，写成这样一篇约一万字的正式学术论文。
+`;
+function paper1wPrompt(){ return SDE_BASE + PAPER_SPEC_1W; }
+
+// 单个金点子 → 论文写作输入（核心论点 = 这个金点子；其余两个金点子作为可参考的邻近洞察）
+function buildSingleIdeaInput(rows, idx, question){
+  const marks=['①','②','③'];
+  const me = rows[idx] || {};
+  let s = '【研究的原初问题】\n' + question + '\n\n';
+  s += '【本篇论文的核心论点——就围绕这一个判断来写】\n（这是从"' + (me.view||('视角'+(idx+1))) + '"这个角度追问出来的金点子）\n\n' + (me.sde||'').trim() + '\n\n';
+  const others = rows.map((r,i)=>({r,i})).filter(x=>x.i!==idx && x.r && x.r.sde);
+  if(others.length){
+    s += '【另外两个金点子，仅供你在需要时借用其洞察或作为对照，但本篇的中心必须是上面那一个，不要喧宾夺主】\n';
+    others.forEach(x=>{ s += '\n──── 金点子' + marks[x.i] + '（' + (x.r.view||('视角'+(x.i+1))) + '）────\n' + (x.r.sde||'').trim() + '\n'; });
+  }
+  s += '\n请把上面标为"核心论点"的那一个金点子，扩写成一篇约一万字的正式学术论文。';
+  return s;
+}
+
+// 新典范 → 1万字论文写作输入
+function buildParadigmInput1w(rows, question, emergeText){
+  let s = '【研究的原初问题】\n' + question + '\n\n';
+  s += '【本篇论文的核心论点：二阶涌现产出的新典范——一个被命名的新结构，连同它的碰撞过程、暗流、四重检验与跨学科地图】\n\n' + (emergeText||'').trim() + '\n\n';
+  s += '【三个金点子原文，供你在论文中调用其中的洞察与论证素材】\n';
+  (rows||[]).forEach((r,i)=>{ s += '\n──── 金点子' + ['①','②','③'][i] + '（' + (r.view||('视角'+(i+1))) + '）────\n' + (r.sde||'').trim() + '\n'; });
+  s += '\n请把上述新典范扩写成一篇约一万字的正式学术论文。';
   return s;
 }
 // 把三篇 SDE 金点子拼成涌现的输入
@@ -1171,6 +1301,150 @@ function renderEmergeText(text){
   }
   return html;
 }
+
+// ========== 四篇论文并发生成（每篇：初稿 → 双审 → 主笔改一次）==========
+// 解析某个基底选择 → Key（从各厂商localStorage取；评审下拉专用Key输入框优先）
+function keyForVendor(sel, explicitKey){
+  if(explicitKey && explicitKey.trim()) return explicitKey.trim();
+  const v = parseModel(sel).vendor;
+  const store = {ds:'sde_ds_key',glm:'sde_glm_key',kimi:'sde_kimi_key',qwen:'sde_qwen_key',gpt:'sde_gpt_key',claude:'sde_claude_key',gemini:'sde_gemini_key'}[v];
+  return (localStorage.getItem(store)||'').trim();
+}
+
+// 生成一篇论文的完整流程：写初稿 → A审 → B审 → 主笔据两意见改一次
+// paperCfg: { title, writeInput, bodyEl, statusEl, writeSel, writeKey, revA, revAKey, revB, revBKey }
+async function runOnePaper(cfg){
+  const dummy = { textContent:'', innerHTML:'' };
+  const setStat = (t)=>{ if(cfg.statusEl) cfg.statusEl.textContent = t; };
+
+  // 1. 写初稿
+  setStat('① 写初稿中…');
+  let draft;
+  try{
+    draft = await streamChat(cfg.writeKey, cfg.writeSel, paper1wPrompt(), cfg.writeInput, cfg.bodyEl, cfg.statusEl, dummy);
+  }catch(e){ setStat('✗ 初稿失败：'+e.message); throw e; }
+  let paperText = draft.text || '';
+  if(!paperText){ setStat('✗ 初稿为空'); throw new Error('初稿为空'); }
+
+  // 2. 双审（并行）
+  setStat('② 两位评审审稿中…');
+  let revA='', revB='';
+  const jobs=[];
+  jobs.push(
+    streamChat(cfg.revAKey, cfg.revA, reviewPrompt(), buildReviewInput(paperText), dummy, dummy, dummy)
+      .then(r=>{ revA=r.text||''; }).catch(e=>{ revA=''; })
+  );
+  if(cfg.revB && cfg.revBKey){
+    jobs.push(
+      streamChat(cfg.revBKey, cfg.revB, reviewPrompt(), buildReviewInput(paperText), dummy, dummy, dummy)
+        .then(r=>{ revB=r.text||''; }).catch(e=>{ revB=''; })
+    );
+  }
+  await Promise.all(jobs);
+
+  // 若两审都失败，保留初稿
+  if(!revA && !revB){ setStat('⚠ 评审未产出，保留初稿'); cfg.bodyEl.innerHTML = renderPaperText(paperText); return { title:cfg.title, text:paperText }; }
+
+  // 3. 主笔据两份意见改一次
+  setStat('③ 主笔据评审意见改稿中…');
+  let finalText = paperText;
+  try{
+    const rev = await streamChat(cfg.writeKey, cfg.writeSel, revisePrompt(), buildReviseInputDual(paperText, revA, revB), cfg.bodyEl, cfg.statusEl, dummy);
+    if(rev.text) finalText = rev.text;
+  }catch(e){ /* 改稿失败则保留初稿 */ }
+
+  cfg.bodyEl.innerHTML = renderPaperText(finalText);
+  setStat('✓ 完成（已评审打磨一轮）');
+  return { title:cfg.title, text:finalText };
+}
+
+window._fourPapers = null;
+const fourPapersBtn = $('fourPapersBtn');
+if(fourPapersBtn){
+  fourPapersBtn.addEventListener('click', async ()=>{
+    const r = window._lastResult, em = window._lastEmerge;
+    if(!r || !r.rows || r.rows.length<3){ showErr('请先生成六篇小论文'); return; }
+    if(!em){ showErr('请先完成二阶涌现（得到新典范），四篇论文里有一篇要写它'); return; }
+
+    const writeSel = modelSel.value;               // 写作/主笔 = 当前主基底
+    const writeKey = keyForVendor(writeSel);
+    if(!writeKey){ showErr('请先在上方填入'+vendorName()+'的 API Key（写作基底）'); return; }
+
+    const revA = $('fourRevA').value, revAKey = keyForVendor(revA, $('fourRevAKey').value);
+    const revB = $('fourRevB').value, revBKey = keyForVendor(revB, $('fourRevBKey').value);
+    if(!revAKey){ showErr('请填入审稿人A的 Key（或选一个你已填过Key的基底）'); return; }
+    // B可留空——若B有选但没Key，也当作只有A
+    const useB = !!(revB && revBKey);
+
+    $('fourWrap').style.display='block';
+    $('fourWrap').scrollIntoView({behavior:'smooth', block:'start'});
+    $('fourDlRow').style.display='none';
+    fourPapersBtn.disabled = true;
+    fourPapersBtn.textContent = '⏳ 四篇并发生成中（含评审打磨，约10-30分钟，请勿关闭）…';
+    $('fourStatus').textContent = '四篇同时进行中…';
+
+    // 四篇的写作输入
+    const paperDefs = [
+      { title:'论文① · 金点子①（'+(r.rows[0].view||'视角一')+'）', input: buildSingleIdeaInput(r.rows, 0, r.question) },
+      { title:'论文② · 金点子②（'+(r.rows[1].view||'视角二')+'）', input: buildSingleIdeaInput(r.rows, 1, r.question) },
+      { title:'论文③ · 金点子③（'+(r.rows[2].view||'视角三')+'）', input: buildSingleIdeaInput(r.rows, 2, r.question) },
+      { title:'论文④ · 新典范（三金点子涌现）', input: buildParadigmInput1w(r.rows, r.question, em) },
+    ];
+
+    // 建四个结果块
+    const box = $('fourPapers'); box.innerHTML='';
+    const cells = paperDefs.map((d,i)=>{
+      const wrap=document.createElement('div');
+      wrap.style.cssText='border:1px solid rgba(192,57,43,0.3);border-radius:10px;padding:16px 18px;margin-bottom:14px;background:rgba(13,17,23,0.5)';
+      wrap.innerHTML='<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px"><div style="font-size:14.5px;font-weight:700;color:#E8897B">'+d.title+'</div><div class="fourCellStatus" style="font-size:12px;color:#8B98A5">排队中…</div></div><div class="fourCellBody" style="color:#D4DCE4;font-size:14px;line-height:1.9;white-space:normal;max-height:360px;overflow:auto"><span class="placeholder">等待开始…</span></div>';
+      box.appendChild(wrap);
+      return { bodyEl: wrap.querySelector('.fourCellBody'), statusEl: wrap.querySelector('.fourCellStatus') };
+    });
+
+    // 四篇并发
+    const results = await Promise.allSettled(paperDefs.map((d,i)=>runOnePaper({
+      title: d.title,
+      writeInput: d.input,
+      bodyEl: cells[i].bodyEl,
+      statusEl: cells[i].statusEl,
+      writeSel, writeKey,
+      revA, revAKey,
+      revB: useB?revB:'', revBKey: useB?revBKey:''
+    })));
+
+    // 收集成功的
+    window._fourPapers = results.map((res,i)=>({
+      title: paperDefs[i].title,
+      text: res.status==='fulfilled' ? (res.value.text||'') : ''
+    }));
+    const okCount = window._fourPapers.filter(p=>p.text).length;
+
+    fourPapersBtn.disabled = false;
+    fourPapersBtn.textContent = '📚 四篇论文并发生成（各1万字·含评审打磨）';
+    $('fourStatus').textContent = '完成：'+okCount+'/4 篇成功';
+    if(okCount>0) $('fourDlRow').style.display='block';
+  });
+}
+
+// 四篇下载为一个Word
+const fourDlBtn = $('fourDlBtn');
+if(fourDlBtn){
+  fourDlBtn.addEventListener('click', ()=>{
+    const papers = window._fourPapers; if(!papers) return;
+    const q = (window._lastResult && window._lastResult.question) || '';
+    let bodyHtml = '<h1 style="text-align:center">四篇学术论文</h1><p style="text-align:center;color:#666">原初问题：'+esc4(q)+'</p><hr/>';
+    papers.forEach((p,i)=>{
+      if(!p.text) return;
+      bodyHtml += '<h2 style="page-break-before:always">'+esc4(p.title)+'</h2>';
+      bodyHtml += p.text.split(/\n{2,}/).map(para=>'<p>'+esc4(para).replace(/\n/g,'<br/>')+'</p>').join('');
+    });
+    const html='<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"><title>四篇学术论文</title></head><body>'+bodyHtml+'</body></html>';
+    const blob=new Blob(['\ufeff'+html],{type:'application/msword'});
+    const url=URL.createObjectURL(blob); const a=document.createElement('a');
+    a.href=url; a.download='四篇学术论文.doc'; a.click(); URL.revokeObjectURL(url);
+  });
+}
+function esc4(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
 const emergeBtn = $('emergeBtn');
 if(emergeBtn){
