@@ -865,8 +865,18 @@ const REVISE_SPEC = `
 
 现在，请输出改好后的完整论文。\n\n▍参考文献铁律（REF_DISCIPLINE_MARK · 最高优先，压倒一切格式要求）\n· 这篇论文里出现的任何一条参考文献、任何一处具体引证，都必须是真实存在、可被查证的。做不到查证，就不要写。\n· 你只能引用你确有把握真实存在的文献——真实作者名下、广为人知、你有高置信度确信其真实存在的著作或论文。凡是你拿不准是否真实、或需要靠猜测拼凑出处的，一律不写。\n· 绝对禁止编造：不得虚构论文/著作的标题、作者、期刊名、出版社、年份、卷期、页码、DOI、链接。不得把真实作者安到一个并不存在的标题上，也不得把一个真实标题的年份/期刊/页码随手填一个。这类编造是本任务最严重的错误，一旦出现，整篇论文即为不合格。\n· 宁缺毋滥：如果就某个论点你没有可靠的真实文献可引，就不要列参考文献，改用'有一种影响深远的看法认为……''某种功能主义传统倾向于……'这类不依赖具体出处的方式，或点出真实思想家其广为人知的核心立场而不给虚构出处。一篇参考文献很短、甚至不设独立参考文献列表的诚实论文，远好过一篇挂满编造引证的论文。\n· 如果确实要列参考文献，只列你高置信度确信真实存在的那几条；对每一条，你都要在心里能回答'这本书/这篇文章真的存在吗'——答不上来就删掉。\n· 一句话：真实 > 完整。查不到就不写，永远不要为了让论文'看起来学术'而编造任何一条文献。
 `;
-function reviewPrompt(){ return SDE_BASE + REVIEW_SPEC; }
-function revisePrompt(){ return SDE_BASE + REVISE_SPEC; }
+function reviewPrompt(reflectionText){
+  const base = reflectionText
+    ? SDE_BASE + '\n\n---\n【这是你本轮开始时亲手写下的《从发现到发生》心得与自我检视——你已诚实检视过发现学与发生学的分野。审稿时请用发生学的眼光把关：不要因为一篇论文"诊断得精确、结构工整、旁征博引"就给高分（那恰恰可能是发现学的顶配伪装成深刻）。要专门揪出它是否滑回了发现学——是否在给对象下定义/贴诊断标签（XX症/XX陷阱/XX悖论）、是否套用现成框架充深刻、是否滑向"回归某个永恒本质"、它的核心命名能否被某个已有概念1:1替换。真正的好论文，是让新结构从矛盾里发生出来、命名不可还原的那种；请据此严苛把关。】\n\n' + reflectionText.trim() + '\n\n---\n'
+    : SDE_BASE;
+  return base + REVIEW_SPEC;
+}
+function revisePrompt(reflectionText){
+  const base = reflectionText
+    ? SDE_BASE + '\n\n---\n【这是你本轮开始时亲手写下的《从发现到发生》心得。修改论文时带着它：审稿意见里凡指出"滑回发现学/诊断标签/回归本质/命名可1:1替换"的，都要真正改到发生学——让新结构从矛盾里发生，而非把诊断修得更精确。】\n\n' + reflectionText.trim() + '\n\n---\n'
+    : SDE_BASE;
+  return base + REVISE_SPEC;
+}
 // 审稿输入 = 当前论文全文
 function buildReviewInput(paperText){
   return '【待审稿的论文全文】\n\n' + (paperText||'').trim() + '\n\n请以顶刊审稿人身份，写一份严苛而具体的审稿意见。';
@@ -1726,12 +1736,12 @@ async function runOnePaper(cfg){
   const sinkA = document.createElement('div'), sinkB = document.createElement('div');
   const jobs=[];
   jobs.push(
-    streamChat(cfg.revAKey, cfg.revA, reviewPrompt(), buildReviewInput(paperText), sinkA, dummy, dummy)
+    streamChat(cfg.revAKey, cfg.revA, reviewPrompt(cfg.reflection), buildReviewInput(paperText), sinkA, dummy, dummy)
       .then(r=>{ revA=r.text||''; }).catch(e=>{ revA=''; })
   );
   if(cfg.revB && cfg.revBKey){
     jobs.push(
-      streamChat(cfg.revBKey, cfg.revB, reviewPrompt(), buildReviewInput(paperText), sinkB, dummy, dummy)
+      streamChat(cfg.revBKey, cfg.revB, reviewPrompt(cfg.reflection), buildReviewInput(paperText), sinkB, dummy, dummy)
         .then(r=>{ revB=r.text||''; }).catch(e=>{ revB=''; })
     );
   }
@@ -1746,7 +1756,7 @@ async function runOnePaper(cfg){
   startTicker();
   let finalText = paperText;
   try{
-    const rev = await streamChat(cfg.writeKey, cfg.writeSel, revisePrompt(), buildReviseInputDual(paperText, revA, revB), sink, dummy, dummy, PAPER_MAX_TOKENS);
+    const rev = await streamChat(cfg.writeKey, cfg.writeSel, revisePrompt(cfg.reflection), buildReviseInputDual(paperText, revA, revB), sink, dummy, dummy, PAPER_MAX_TOKENS);
     if(rev.text) finalText = rev.text;
   }catch(e){ /* 改稿失败则保留初稿 */ }
   stopTicker();
@@ -1840,6 +1850,7 @@ if(fourStartBtn){
     const results = await Promise.allSettled(paperDefs.map((d,i)=>runOnePaper({
       title: d.title,
       draftPrompt: paper1wPromptR(reflection),   // 第一批：带着《从发现到发生》心得写初稿
+      reflection: reflection,                     // 审稿人也带心得，用发生学标准把关
       writeInput: d.input,
       bodyEl: cells[i].bodyEl,
       statusEl: cells[i].statusEl,
@@ -1943,6 +1954,7 @@ if(upliftBtn){
     const results = await Promise.allSettled(defs.map((d,i)=>runOnePaper({
       title: cells[i].title,
       draftPrompt: upliftPromptR(ureflection),   // ★ 带《从发现到发生》心得 + 发生引擎冲150
+      reflection: ureflection,                    // 审稿人也带心得，用发生学标准把关
       writeInput: buildUpliftInput(d.src.text),  // 输入 = 第一批那篇全文
       bodyEl: cells[i].bodyEl,
       statusEl: cells[i].statusEl,
@@ -2313,12 +2325,12 @@ async function runReviewPolish(cfg){
 
     const dummy = document.createElement('span');
     const tasks = [
-      streamChat(cfg.kA, cfg.mA, reviewPrompt(), buildReviewInput(window._lastPaper), $('revBodyA'), dummy, dummy)
+      streamChat(cfg.kA, cfg.mA, reviewPrompt(_sharedReflection.text||''), buildReviewInput(window._lastPaper), $('revBodyA'), dummy, dummy)
         .catch(e=>({text:'', err:e.message}))
     ];
     if(dual){
       tasks.push(
-        streamChat(cfg.kB, cfg.mB, reviewPrompt(), buildReviewInput(window._lastPaper), $('revBodyB'), dummy, dummy)
+        streamChat(cfg.kB, cfg.mB, reviewPrompt(_sharedReflection.text||''), buildReviewInput(window._lastPaper), $('revBodyB'), dummy, dummy)
           .catch(e=>({text:'', err:e.message}))
       );
     }
