@@ -767,7 +767,12 @@ const EMERGE_SPEC = `
 · 不要客套铺垫，直接进入。让读者读完有"原来这三个点背后是同一个更深的东西"的震动。
 `;
 // 涌现用的系统提示 = SDE 内功底盘 + 三阶涌现工程规格
-function emergePrompt(){ return SDE_BASE + EMERGE_SPEC; }
+function emergePrompt(reflectionText){
+  const base = reflectionText
+    ? SDE_BASE + '\n\n---\n【这是你本轮开始时亲手写下的《从发现到发生》心得与自我检视——你已诚实检视过自己的发现学惯性。涌现这一步尤其危险：把三个金点子碰撞出新典范时，你最容易滑回发现学——给它们的共同点起一个"精确的诊断标签"（XX症/XX陷阱/XX悖论），而不是让一个不可还原的新结构从三者的矛盾里真正发生出来。请带着你心得里的自觉：命名新典范前先做"不可还原自查"，若这个名字能被某个已有概念1:1替换，就撤回去、再往矛盾深处结算一层。】\n\n' + reflectionText.trim() + '\n\n---\n'
+    : SDE_BASE;
+  return base + EMERGE_SPEC;
+}
 
 // ============ 三阶：新典范 → 两万字学术论文 ============
 const PAPER_SPEC = `
@@ -1062,6 +1067,24 @@ async function getReflection(writeSel, writeKey, onProgress){
     if(ticker) clearInterval(ticker);
     return (res && res.text) ? res.text : '';
   }catch(e){ if(ticker) clearInterval(ticker); return ''; }
+}
+
+// 整轮只写一次《从发现到发生》心得，六篇→涌现→四篇→第二批全部复用同一份。
+// 第一次调用（通常是六篇）真正写；之后各环节直接返回已写好的那份（认知连贯、不重复耗时）。
+// key 用"基底+问题"标识：同一基底同一问题算同一轮；换基底或换问题则重写。
+let _sharedReflection = { key:'', text:'', promise:null };
+function reflectionRoundKey(writeSel){ return (writeSel||'') + '|' + (($('question')&&$('question').value||'').trim()); }
+async function getSharedReflection(writeSel, writeKey, onProgress){
+  const rk = reflectionRoundKey(writeSel);
+  // 已写好且是同一轮 → 直接复用
+  if(_sharedReflection.key===rk && _sharedReflection.text){ if(onProgress) onProgress(_sharedReflection.text.length); return _sharedReflection.text; }
+  // 正在写（同一轮）→ 等它写完，避免并发重复写
+  if(_sharedReflection.key===rk && _sharedReflection.promise){ return await _sharedReflection.promise; }
+  // 换轮或首次 → 真正写一次
+  _sharedReflection.key = rk;
+  _sharedReflection.text = '';
+  _sharedReflection.promise = getReflection(writeSel, writeKey, onProgress).then(txt=>{ _sharedReflection.text = txt || ''; return _sharedReflection.text; });
+  return await _sharedReflection.promise;
 }
 // 二次提智的输入 = 第一批那篇论文全文
 function buildUpliftInput(paperText){
@@ -1534,7 +1557,7 @@ async function run(){
   //  所以：不阻塞主流程——启动一个心得Promise，左栏三路立刻发请求，右栏三路各自等心得好了再发。
   const rb0 = document.getElementById('sixReflectBar');
   if(rb0){ rb0.style.display='block'; const s=document.getElementById('sixReflectStatus'); if(s) s.textContent='正在写《从发现到发生》认知内化短文（约5000字）…右栏三篇将带着它来写，左栏（普通AI）不受影响、已开始'; }
-  const reflectionReady = getReflection(model, key, (n)=>{ const s=document.getElementById('sixReflectStatus'); if(s) s.textContent = n>0?('✍ 心得已写 '+n+' 字'):'心得写作中…'; })
+  const reflectionReady = getSharedReflection(model, key, (n)=>{ const s=document.getElementById('sixReflectStatus'); if(s) s.textContent = n>0?('✍ 心得已写 '+n+' 字'):'心得写作中…'; })
     .then(txt=>{ const s=document.getElementById('sixReflectStatus'), b=document.getElementById('sixReflectBody');
       if(txt){ if(s) s.textContent='✓ 内化完成 '+txt.length+' 字 · 右栏三篇带着这份认知来写'; if(b) b.innerHTML=renderPaperText(txt); }
       else { if(s) s.textContent='（心得未成功·右栏退回常规提智）'; if(b) b.innerHTML='<span class="placeholder">心得生成未成功，右栏用常规提智继续</span>'; }
@@ -1788,7 +1811,7 @@ if(fourStartBtn){
     reflWrap.style.cssText='border:1px solid rgba(122,47,224,0.35);border-radius:10px;padding:16px 18px;margin-bottom:16px;background:rgba(20,12,30,0.5)';
     reflWrap.innerHTML='<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px"><div style="font-size:14px;font-weight:700;color:#B98CFF">📖 第一次提智·内化：《从发现到发生》</div><div id="reflStatus" style="font-size:12px;color:#8B98A5">写作中…</div></div><div id="reflBody" style="color:#C9B8DC;font-size:13.5px;line-height:1.85;max-height:280px;overflow:auto"><span class="placeholder">正在把发生学内化为自己的理解…</span></div>';
     box0.appendChild(reflWrap);
-    const reflection = await getReflection(writeSel, writeKey, (n)=>{ const el=$('reflStatus'); if(el) el.textContent = n>0?('✍ 已写 '+n+' 字'):'写作中…'; });
+    const reflection = await getSharedReflection(writeSel, writeKey, (n)=>{ const el=$('reflStatus'); if(el) el.textContent = n>0?('✍ 已写 '+n+' 字（含复用六篇那次）'):'写作中…'; });
     if(reflection){
       $('reflBody').innerHTML = renderPaperText(reflection);
       $('reflStatus').textContent = '✓ 内化完成 '+reflection.length+' 字 · 四篇将带着这份认知来写';
@@ -1899,7 +1922,7 @@ if(upliftBtn){
     ureflWrap.style.cssText='border:1px solid rgba(122,47,224,0.4);border-radius:10px;padding:16px 18px;margin-bottom:16px;background:rgba(20,12,30,0.55)';
     ureflWrap.innerHTML='<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px"><div style="font-size:14px;font-weight:700;color:#B98CFF">📖 第一次提智·内化：《从发现到发生》</div><div id="ureflStatus" style="font-size:12px;color:#8B98A5">写作中…</div></div><div id="ureflBody" style="color:#C9B8DC;font-size:13.5px;line-height:1.85;max-height:280px;overflow:auto"><span class="placeholder">正在把发生学内化为自己的理解…</span></div>';
     ubox0.appendChild(ureflWrap);
-    const ureflection = await getReflection(writeSel, writeKey, (n)=>{ const el=$('ureflStatus'); if(el) el.textContent = n>0?('✍ 已写 '+n+' 字'):'写作中…'; });
+    const ureflection = await getSharedReflection(writeSel, writeKey, (n)=>{ const el=$('ureflStatus'); if(el) el.textContent = n>0?('✍ 已写 '+n+' 字（含复用前面那次）'):'写作中…'; });
     if(ureflection){
       $('ureflBody').innerHTML = renderPaperText(ureflection);
       $('ureflStatus').textContent = '✓ 内化完成 '+ureflection.length+' 字 · 四篇将带着这份认知做发生引擎';
@@ -1979,9 +2002,14 @@ if(emergeBtn){
     emergeBtn.textContent = '⏳ 涌现中（碰撞→暗流→新典范，深度思考约需 1-3 分钟）……';
     const bodyEl = $('emergeBody'), statusEl = $('emergeStatus'), metaEl = $('emergeMeta');
 
+    // 确保内功已加载；并复用本轮已写的《从发现到发生》心得（六篇时已写，这里直接取用，不重写）
+    try{ await ensureNeigong(); }catch(e){ showErr(e.message); emergeBtn.disabled=false; emergeBtn.textContent='⚗ 二阶涌现 · 把三个金点子撞成新典范'; return; }
+    statusEl.textContent = '复用本轮《从发现到发生》心得…';
+    const emReflection = await getSharedReflection(model, key);
+
     const userQ = buildEmergeInput(r.rows, r.question||'');
     try{
-      const res = await streamChat(key, model, emergePrompt(), userQ, bodyEl, statusEl, metaEl);
+      const res = await streamChat(key, model, emergePrompt(emReflection), userQ, bodyEl, statusEl, metaEl);
       if(res && res.text){
         // 流式结束后，用轻排版重渲染
         bodyEl.innerHTML = renderEmergeText(res.text);
