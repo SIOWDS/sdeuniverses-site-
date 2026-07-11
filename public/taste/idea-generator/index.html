@@ -1253,17 +1253,18 @@ function buildPayload(sel, systemPrompt, userQ, maxTokens){
       base.temperature = 0.7;
     }
   } else if(vendor === 'gpt'){
-    // GPT（OpenAI，chat/completions 格式；经代理、非流式）
+    // GPT（OpenAI，chat/completions 格式；经代理、【流式】）
     base.model = (tier === 'pro') ? 'gpt-5.5' : 'gpt-5.4';  // 5.5当前广泛可用旗舰 / 5.4均衡稳妥
-    base.stream = false;
+    base.stream = true;   // 流式：首字节快，绕开代理网关超时
     base.temperature = 0.7;
   } else if(vendor === 'claude'){
-    // Claude（Anthropic /v1/messages 格式，system 独立字段；经代理、非流式）
-    // max_tokens 跟随调用方传入（心得8000/论文16000），不再硬编码8000——否则万字论文会被静默截断在五六千字；
-    // 非流式护栏16000（再高Anthropic会要求流式）。快速档用真实存在的 claude-sonnet-4-6（原 claude-sonnet-5 不存在，选中必404）。
+    // Claude（Anthropic /v1/messages 格式，system 独立字段；经代理、【流式】）
+    // 流式(stream:true)：首字节几秒到达，代理逐块透传，永不撞 ~100s 网关超时——这才能让长文（论文16000）跑通。
+    // max_tokens 跟随调用方传入（心得3600/论文16000）。快速档用真实存在的 claude-sonnet-4-6（原 claude-sonnet-5 不存在，选中必404）。
     return {
       model: (tier === 'pro') ? 'claude-opus-4-8' : 'claude-sonnet-4-6',
-      max_tokens: Math.min(cap, 16000),
+      max_tokens: Math.min(cap, 32000),
+      stream: true,
       system: systemPrompt,
       messages: [{ role:'user', content: userQ }]
     };
@@ -1489,14 +1490,15 @@ async function streamChat(apiKey, model, systemPrompt, userQ, bodyEl, statusEl, 
   return { text:acc, chars, thinkChars, secs:parseFloat(secs) };
 }
 
-// 境外基底（GPT/Claude/Gemini）：经 /api/llm-proxy 中转、非流式一次性返回，按各家格式解析
+// 境外基底（GPT/Claude/Gemini）：经 /api/llm-proxy 中转、【流式】逐块返回，按各家 SSE 格式解析。
+// 流式的意义：首字节几秒到达、代理逐块透传（src/worker.js 直接透传 upstream.body），
+// 服务端不必等全部生成完，永不撞 Cloudflare ~100s 网关超时——这才让长文（论文 max_tokens 16000）在境外基底上跑得通。
 async function callOverseas(apiKey, model, systemPrompt, userQ, bodyEl, statusEl, metaEl, t0, maxTokens){
   const { vendor, tier } = parseModel(model);
   const payload = buildPayload(model, systemPrompt, userQ, maxTokens);
 
   // 组装代理请求头：不同厂商鉴权方式不同
   const headers = { 'Content-Type':'application/json' };
-  let targetUrl = API_URLS[vendor];
   if(vendor === 'gpt'){
     headers['Authorization'] = 'Bearer ' + apiKey;
     headers['x-target-url'] = 'https://api.openai.com/v1/chat/completions';
@@ -1507,56 +1509,95 @@ async function callOverseas(apiKey, model, systemPrompt, userQ, bodyEl, statusEl
     headers['x-target-url'] = 'https://api.anthropic.com/v1/messages';
   } else if(vendor === 'gemini'){
     const gm = (tier === 'pro') ? 'gemini-3.1-pro-preview' : 'gemini-2.5-flash';
-    headers['x-target-url'] = 'https://generativelanguage.googleapis.com/v1beta/models/' + gm + ':generateContent?key=' + encodeURIComponent(apiKey);
+    // 流式端点：streamGenerateContent + alt=sse，返回 SSE 而非一次性 JSON
+    headers['x-target-url'] = 'https://generativelanguage.googleapis.com/v1beta/models/' + gm + ':streamGenerateContent?alt=sse&key=' + encodeURIComponent(apiKey);
   }
 
-  bodyEl.innerHTML='<span class="placeholder">✓ 已连接，'+vendorName()+' 正在生成'+(tier==='pro'?'（较强模型首次响应可能需 1-2 分钟）':'')+'……<br><span style="font-size:12px;opacity:.7">境外基底经中转、一次性返回，请耐心等待完整结果</span></span>';
-  statusEl.innerHTML='<span class="spinner"></span> 生成中';
-  // 计时器
-  let done=false;
-  const waitTimer=setInterval(()=>{ if(!done){ const s=Math.round((Date.now()-t0)/1000); statusEl.innerHTML='<span class="spinner"></span> 生成中 ('+s+'s)'; } },1000);
+  bodyEl.innerHTML='<span class="placeholder">✓ 已连接，'+vendorName()+' 正在启动'+(tier==='pro'?'（较强模型首次响应可能需 1-2 分钟）':'')+'……<br><span style="font-size:12px;opacity:.7">境外基底经中转、流式逐字返回，请稍候</span></span>';
+  statusEl.innerHTML='<span class="spinner"></span> 等待响应';
+  const cursor=document.createElement('span'); cursor.className='cursor-blink';
+
+  // 超时保护：整条请求最多 12 分钟（与国产基底一致）
+  const ac = new AbortController();
+  const HARD_TIMEOUT_MS = 12*60*1000;
+  const killer = setTimeout(()=>{ try{ ac.abort(); }catch(_){} }, HARD_TIMEOUT_MS);
+  let gotAnything=false;
+  const waitTimer=setInterval(()=>{ if(!gotAnything){ const s=Math.round((Date.now()-t0)/1000); statusEl.innerHTML='<span class="spinner"></span> 等待响应 ('+s+'s)'; } },1000);
 
   let resp;
   try{
-    resp = await fetch(PROXY_URL, { method:'POST', headers, body: JSON.stringify(payload) });
-  }catch(e){ done=true; clearInterval(waitTimer); statusEl.textContent='网络错误'; bodyEl.innerHTML='<span class="placeholder">中转请求失败：'+e.message+'</span>'; throw new Error('代理请求失败：'+e.message); }
-
-  const raw = await resp.text();
-  done=true; clearInterval(waitTimer);
+    resp = await fetch(PROXY_URL, { method:'POST', headers, body: JSON.stringify(payload), signal: ac.signal });
+  }catch(e){ clearInterval(waitTimer); clearTimeout(killer); statusEl.textContent='网络错误'; bodyEl.innerHTML='<span class="placeholder">中转请求失败：'+e.message+'</span>'; throw new Error(e.name==='AbortError'?'超时：12分钟内未完成，已中止（建议改用快速档或稍后重试）':'代理请求失败：'+e.message); }
 
   if(!resp.ok){
+    clearInterval(waitTimer); clearTimeout(killer);
     let detail='';
-    try{ const j=JSON.parse(raw); detail = j.error?.message || j.error?.type || JSON.stringify(j).slice(0,200); }catch(_){ detail = raw.slice(0,200) || resp.statusText; }
+    try{ const raw=await resp.text(); try{ const j=JSON.parse(raw); detail=j.error?.message||j.error?.type||JSON.stringify(j).slice(0,200); }catch(_){ detail=raw.slice(0,200)||resp.statusText; } }catch(_){ detail=resp.statusText; }
     statusEl.textContent='失败';
     bodyEl.innerHTML='<span class="placeholder">调用失败（'+resp.status+'）：'+detail+'</span>';
     throw new Error('API '+resp.status+'：'+detail);
   }
 
-  // 按各家格式提取正文
-  let text='';
+  // 流式读取：逐块解析 SSE，按厂商格式取增量文本
+  const reader = resp.body.getReader();
+  const decoder = new TextDecoder();
+  let buf='', acc='', chars=0, thinkChars=0;
   try{
-    const j = JSON.parse(raw);
-    if(vendor === 'gpt'){
-      text = j.choices?.[0]?.message?.content || '';
-    } else if(vendor === 'claude'){
-      // content 是数组，取所有 text 块拼接
-      text = (Array.isArray(j.content) ? j.content.filter(b=>b.type==='text').map(b=>b.text).join('') : '') || '';
-    } else if(vendor === 'gemini'){
-      const parts = j.candidates?.[0]?.content?.parts;
-      text = Array.isArray(parts) ? parts.map(p=>p.text||'').join('') : '';
+    while(true){
+      const {done,value}=await reader.read();
+      if(done) break;
+      buf += decoder.decode(value,{stream:true});
+      const lines = buf.split('\n');
+      buf = lines.pop();
+      for(const line of lines){
+        const s=line.trim();
+        if(!s || s.startsWith(':')) continue;         // 空行 / SSE keep-alive 注释
+        if(!s.startsWith('data:')) continue;           // 只处理 data 行（Anthropic 的 event: 行忽略，靠 data 里的 type 判断）
+        const data=s.slice(5).trim();
+        if(data==='[DONE]') continue;                  // OpenAI 结束标记
+        let j; try{ j=JSON.parse(data); }catch(_){ continue; }
+        let delta='';
+        if(vendor === 'gpt'){
+          // OpenAI: data:{choices:[{delta:{content}}]}
+          delta = j.choices?.[0]?.delta?.content || '';
+        } else if(vendor === 'claude'){
+          // Anthropic: 各类事件都在 data 里带 type
+          //   content_block_delta → delta.text（正文）; message_delta/…忽略; error → 抛出
+          if(j.type === 'content_block_delta'){ delta = j.delta?.text || ''; }
+          else if(j.type === 'error'){ throw new Error(j.error?.message || 'Anthropic 流式错误'); }
+        } else if(vendor === 'gemini'){
+          // Gemini SSE: data:{candidates:[{content:{parts:[{text}]}}]}
+          const parts = j.candidates?.[0]?.content?.parts;
+          delta = Array.isArray(parts) ? parts.map(p=>p.text||'').join('') : '';
+        }
+        if(delta){
+          gotAnything=true;
+          if(!acc){ bodyEl.innerHTML=''; bodyEl.appendChild(cursor); statusEl.innerHTML='<span class="spinner"></span> 生成中'; }
+          acc+=delta; chars+=delta.length;
+          bodyEl.textContent=acc; bodyEl.appendChild(cursor); bodyEl.scrollTop=bodyEl.scrollHeight;
+        }
+      }
     }
-  }catch(e){ statusEl.textContent='解析失败'; bodyEl.innerHTML='<span class="placeholder">响应解析失败，原始返回：'+raw.slice(0,200)+'</span>'; throw new Error('响应解析失败'); }
+  }catch(e){
+    clearInterval(waitTimer); clearTimeout(killer); cursor.remove();
+    if(e.name==='AbortError'){
+      if(acc){ statusEl.textContent='✓ 部分完成（超时截断）'; return { text:acc, chars, thinkChars:0, secs:parseFloat(((Date.now()-t0)/1000).toFixed(1)) }; }
+      statusEl.textContent='超时'; throw new Error('超时：12分钟内未完成，已中止（建议改用快速档或稍后重试）');
+    }
+    statusEl.textContent='读取中断'; throw new Error('响应读取中断：'+e.message);
+  }finally{ clearInterval(waitTimer); clearTimeout(killer); }
+  cursor.remove();
 
   const secs=((Date.now()-t0)/1000).toFixed(1);
-  if(!text){
+  if(!acc){
     bodyEl.innerHTML='<span class="placeholder">（模型没有返回内容，可能被安全策略拦截或额度问题，换个问题或模型再试）</span>';
     statusEl.textContent='空响应'; metaEl.textContent=secs+'s';
     return { text:'', chars:0, thinkChars:0, secs:parseFloat(secs) };
   }
-  bodyEl.textContent = text;
+  bodyEl.textContent = acc;
   statusEl.textContent='✓ 完成';
-  metaEl.textContent = text.length+' 字 · '+secs+'s';
-  return { text, chars:text.length, thinkChars:0, secs:parseFloat(secs) };
+  metaEl.textContent = chars+' 字 · '+secs+'s';
+  return { text:acc, chars, thinkChars:0, secs:parseFloat(secs) };
 }
 
 // 主流程：两边并行
