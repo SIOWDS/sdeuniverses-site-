@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SDE 金点子发生器 · 品尝系列 | SDE Universes</title>
-<meta name="description" content="输入一个问题,从三个视角六路并行:普通 AI vs SDE 提智 AI 同场对决,一次生成三个金点子。用你自己的 API Key,浏览器里直接跑,可下载 Word。">
+<meta name="description" content="输入一个问题,从 S/D/E 三个角度六路并行:普通 AI vs SDE 提智 AI 同场对决,一次生成三个金点子。七大主流基底任选(DeepSeek/GLM/Kimi/千问/GPT/Claude/Gemini),用你自己的 API Key,可扩写成四篇学术论文并下载 Word。">
 <style>
 :root{
   --bg:#0E1116;--panel:#161B22;--panel2:#1C232C;--border:rgba(255,255,255,0.10);
@@ -145,7 +145,7 @@ footer{border-top:1px solid var(--border);text-align:center;padding:30px 20px 44
   <div class="hero-glow"></div>
   <div class="hero-eyebrow">SDE 智能体品尝系列 · 其一</div>
   <h1>SDE <span class="grad">金点子发生器</span></h1>
-  <p class="hero-sub">同一个问题,从三个角度各写一篇小论文。可选不同基底(DeepSeek / 智谱 GLM),普通基底与 SDE 提智基底六路对决,<br>每篇约 4000 字——唯一的区别,只是右边被注入了那套完整的 SDE 内功。</p>
+  <p class="hero-sub">同一个问题,从 S、D、E 三个角度各写一篇小论文。七大主流基底任选(DeepSeek · 智谱GLM · Kimi · 通义千问 · GPT · Claude · Gemini),普通基底与 SDE 提智基底六路对决,<br>每篇约 4000 字——唯一的区别,只是右边被注入了那套完整的 SDE 内功。</p>
 </header>
 
 <div class="controls">
@@ -197,7 +197,7 @@ footer{border-top:1px solid var(--border);text-align:center;padding:30px 20px 44
 </div>
 
 <div class="privacy-note">
-  🔒 你的 API Key 全程只保存在本机浏览器(localStorage),请求直接从你的浏览器发往你所选的基底厂商（DeepSeek 或智谱）,<b>我们的服务器不经手、不存储、不记录你的 Key 或问题</b>。<br>⏱ 六篇各约 4000 字的小论文<b>并行生成</b>（六路同时进行）。选"深度思考/最强"档时，每篇会先深度思考 1-2 分钟再动笔，质量最高、最能展现 SDE 的威力，请耐心等待几分钟；选"快速"档几秒出字。若某篇报错（并发被限流），刷新重试或换快速档。
+  🔒 你的 API Key 全程只保存在本机浏览器(localStorage)。<b>国产基底</b>(DeepSeek · 智谱GLM · Kimi · 通义千问)——请求直接从你的浏览器发往对应厂商，我们的服务器全程不经手、不存储、不记录你的 Key 或问题。<b>境外基底</b>(GPT · Claude · Gemini)——因在中国大陆无法直连，请求会经本站中转服务器转发给对应厂商，中转<b>只转发、不存储、不记录</b>你的 Key（用完即走）；介意的话请改用国产基底。<br>⏱ 六篇各约 4000 字的小论文<b>并行生成</b>（六路同时进行）。选"深度思考/最强"档时，每篇会先深度思考 1-2 分钟再动笔，质量最高、最能展现 SDE 的威力，请耐心等待几分钟；选"快速"档几秒出字。若某篇报错（并发被限流），刷新重试或换快速档。
 </div>
 
 <div class="err-box" id="errBox"></div>
@@ -213,7 +213,7 @@ footer{border-top:1px solid var(--border);text-align:center;padding:30px 20px 44
 <div class="triview" id="results">
 
   <!-- 视角一：土壤与条件 -->
-  <div class="view-label"><span id="viewLabel1">视角一（点击生成后从九宫格随机抽取）</span></div>
+  <div class="view-label"><span id="viewLabel1">视角一 · S 显露维（点击生成后在 S1/S2/S3 中随机抽取）</span></div>
   <div class="pair-row">
     <div class="col plain">
       <div class="col-head"><div class="col-title"><span class="dot"></span>普通 AI</div><span class="col-tag">未提智</span></div>
@@ -222,13 +222,13 @@ footer{border-top:1px solid var(--border);text-align:center;padding:30px 20px 44
     </div>
     <div class="col sde">
       <div class="col-head"><div class="col-title"><span class="dot"></span>SDE 金点子 ①</div><span class="col-tag">发生学加持</span></div>
-      <div class="col-body" id="sde1Body"><span class="placeholder">SDE 金点子(视角由九宫格随机抽取)……</span></div>
+      <div class="col-body" id="sde1Body"><span class="placeholder">SDE 金点子(从 S/D/E 三维各抽一个角度)……</span></div>
       <div class="col-foot"><span class="col-badge" id="sde1Status">待命</span><span id="sde1Meta"></span></div>
     </div>
   </div>
 
   <!-- 视角二：分叉与选择 -->
-  <div class="view-label"><span id="viewLabel2">视角二（点击生成后从九宫格随机抽取）</span></div>
+  <div class="view-label"><span id="viewLabel2">视角二 · D 差异维（点击生成后在 D1/D2/D3 中随机抽取）</span></div>
   <div class="pair-row">
     <div class="col plain">
       <div class="col-head"><div class="col-title"><span class="dot"></span>普通 AI</div><span class="col-tag">未提智</span></div>
@@ -237,13 +237,13 @@ footer{border-top:1px solid var(--border);text-align:center;padding:30px 20px 44
     </div>
     <div class="col sde">
       <div class="col-head"><div class="col-title"><span class="dot"></span>SDE 金点子 ②</div><span class="col-tag">发生学加持</span></div>
-      <div class="col-body" id="sde2Body"><span class="placeholder">SDE 金点子(视角由九宫格随机抽取)……</span></div>
+      <div class="col-body" id="sde2Body"><span class="placeholder">SDE 金点子(从 S/D/E 三维各抽一个角度)……</span></div>
       <div class="col-foot"><span class="col-badge" id="sde2Status">待命</span><span id="sde2Meta"></span></div>
     </div>
   </div>
 
   <!-- 视角三：退化与显露 -->
-  <div class="view-label"><span id="viewLabel3">视角三（点击生成后从九宫格随机抽取）</span></div>
+  <div class="view-label"><span id="viewLabel3">视角三 · E 纠缠维（点击生成后在 E1/E2/E3 中随机抽取）</span></div>
   <div class="pair-row">
     <div class="col plain">
       <div class="col-head"><div class="col-title"><span class="dot"></span>普通 AI</div><span class="col-tag">未提智</span></div>
@@ -252,7 +252,7 @@ footer{border-top:1px solid var(--border);text-align:center;padding:30px 20px 44
     </div>
     <div class="col sde">
       <div class="col-head"><div class="col-title"><span class="dot"></span>SDE 金点子 ③</div><span class="col-tag">发生学加持</span></div>
-      <div class="col-body" id="sde3Body"><span class="placeholder">SDE 金点子(视角由九宫格随机抽取)……</span></div>
+      <div class="col-body" id="sde3Body"><span class="placeholder">SDE 金点子(从 S/D/E 三维各抽一个角度)……</span></div>
       <div class="col-foot"><span class="col-badge" id="sde3Status">待命</span><span id="sde3Meta"></span></div>
     </div>
   </div>
@@ -971,7 +971,7 @@ function pick3(){
 const errBox=$('errBox');
 
 // Key 本地持久化
-// 两家的 Key 分开保存；切换模型时自动切换对应厂商的 Key
+// 七家的 Key 分开保存；切换模型时自动切换对应厂商的 Key
 function keyStoreName(){
   const v = parseModel(modelSel.value).vendor;
   return v==='glm' ? 'sde_glm_key' : v==='kimi' ? 'sde_kimi_key' : v==='qwen' ? 'sde_qwen_key' : v==='gpt' ? 'sde_gpt_key' : v==='claude' ? 'sde_claude_key' : v==='gemini' ? 'sde_gemini_key' : 'sde_ds_key';
@@ -1727,7 +1727,7 @@ if(paperPdfBtn){
 }
 
 // ============ 四阶：审稿 → 改稿 循环打磨（审稿换第二个模型）============
-// Key 按厂商取用（复用两家分存的 localStorage）
+// Key 按厂商取用（复用各厂商分存的 localStorage）
 function vendorKeyName(sel){
   const v = parseModel(sel).vendor;
   return v==='glm' ? 'sde_glm_key' : v==='kimi' ? 'sde_kimi_key' : v==='qwen' ? 'sde_qwen_key' : v==='gpt' ? 'sde_gpt_key' : v==='claude' ? 'sde_claude_key' : v==='gemini' ? 'sde_gemini_key' : 'sde_ds_key';
@@ -1883,7 +1883,7 @@ function clearResults(){
     row.plain.body.innerHTML='<span class="placeholder">普通 AI 的回答……</span>';
     row.plain.status.textContent='待命';
     row.plain.meta.textContent='';
-    row.sde.body.innerHTML='<span class="placeholder">SDE 金点子(视角由九宫格随机抽取)……</span>';
+    row.sde.body.innerHTML='<span class="placeholder">SDE 金点子(从 S/D/E 三维各抽一个角度)……</span>';
     row.sde.status.textContent='待命';
     row.sde.meta.textContent='';
     // 移除可能残留的高亮
@@ -1901,7 +1901,7 @@ function clearResults(){
   const _rt=$('paperRoundTag'); if(_rt) _rt.textContent='';
   window._lastEmerge = null; window._lastPaper = null; window._lastReview = null; window._paperRound = 0;
   // 恢复视角标签为默认
-  rowEls.forEach((row,i)=>{ if(row.labelEl) row.labelEl.textContent='视角'+['一','二','三'][i]+'（点击生成后从九宫格随机抽取）'; });
+  rowEls.forEach((row,i)=>{ if(row.labelEl) row.labelEl.textContent='视角'+['一','二','三'][i]+' · '+['S 显露维','D 差异维','E 纠缠维'][i]+'（点击生成后随机抽取）'; });
   hideErr();
   // 滚回问题输入区，方便再问
   document.querySelector('.controls').scrollIntoView({behavior:'smooth', block:'center'});
