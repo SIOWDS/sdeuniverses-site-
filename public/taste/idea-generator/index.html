@@ -301,39 +301,107 @@ footer{border-top:1px solid var(--border);text-align:center;padding:30px 20px 44
     <div id="paperMeta" style="font-size:12px;color:#8B98A5;margin-top:14px"></div>
     <div id="reviewModalWrap" style="margin-top:18px;display:none;border-top:1px dashed rgba(192,57,43,0.4);padding-top:18px">
       <div style="background:rgba(192,57,43,0.08);border:1px solid rgba(192,57,43,0.35);border-radius:10px;padding:18px 20px">
-        <div style="font-size:14.5px;font-weight:700;color:#E8897B;margin-bottom:6px">🔬 换一个模型来审稿</div>
-        <div style="font-size:12.5px;color:#9AA5B0;line-height:1.7;margin-bottom:14px">同一个模型自审自改，盲区是重合的。换一个不同的基底来审，才能照出原模型看不见的问题。请选择审稿用的模型并填入它的 Key（改稿仍由原模型完成）。</div>
-        <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end">
-          <div style="flex:1;min-width:200px">
-            <label style="display:block;font-size:12px;color:#8B98A5;margin-bottom:4px">审稿模型</label>
-            <select id="reviewModelSel" style="width:100%;padding:9px 10px;border-radius:7px;border:1px solid rgba(255,255,255,0.15);background:#0d1117;color:#D4DCE4;font-size:13.5px">
-              <optgroup label="DeepSeek">
-                <option value="ds:pro">DeepSeek V4 Pro · 最强推理</option>
-                <option value="ds:flash">DeepSeek V4 Flash · 快速</option>
-              </optgroup>
-              <optgroup label="智谱 GLM">
-                <option value="glm:pro">智谱 GLM-5 · 深度思考</option>
-                <option value="glm:flash">智谱 GLM-4-Flash · 快速</option>
-                <option value="kimi:pro">月之暗面 Kimi K2.6 · 最新最强</option>
-                <option value="kimi:flash">月之暗面 Kimi (v1-32k) · 快速</option>
-                <option value="qwen:pro">通义千问 Qwen-Max · 最强</option>
-                <option value="qwen:flash">通义千问 Qwen-Plus · 均衡</option>
-                <option value="gpt:pro">🌐 GPT-4o（经代理）</option>
-                <option value="claude:pro">🌐 Claude Sonnet 4.5（经代理）</option>
-                <option value="gemini:pro">🌐 Gemini 2.5 Pro（经代理）</option>
-              </optgroup>
-            </select>
-          </div>
-          <div style="flex:1.4;min-width:240px">
-            <label style="display:block;font-size:12px;color:#8B98A5;margin-bottom:4px"><span id="reviewKeyLabel">审稿模型的 API Key</span></label>
-            <input id="reviewKeyInput" type="password" placeholder="填入审稿模型对应厂商的 Key" style="width:100%;padding:9px 10px;border-radius:7px;border:1px solid rgba(255,255,255,0.15);background:#0d1117;color:#D4DCE4;font-size:13.5px">
-          </div>
+        <div style="font-size:14.5px;font-weight:700;color:#E8897B;margin-bottom:6px">🔬 双审稿 + 一主笔</div>
+        <div style="font-size:12.5px;color:#9AA5B0;line-height:1.7;margin-bottom:16px">用两个不同的基底各出一份审稿意见（多一双眼睛，多照出一层盲区），再由主笔基底综合两份意见改稿。审稿人尽量选和主笔不同的基底。留空某个审稿位则只用一位审稿人。</div>
+
+        <div style="font-size:12.5px;font-weight:700;color:#E8897B;margin:0 0 8px">审稿人 A</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin-bottom:14px">
+          <div style="flex:1;min-width:180px">
+              <label style="display:block;font-size:12px;color:#8B98A5;margin-bottom:4px">模型</label>
+              <select id="reviewModelSelA" style="width:100%;padding:8px 9px;border-radius:7px;border:1px solid rgba(255,255,255,0.15);background:#0d1117;color:#D4DCE4;font-size:13px">
+                <optgroup label="DeepSeek">
+        <option value="ds:pro">DeepSeek V4 Pro · 最强推理(Think Max)</option>
+        <option value="ds:flash">DeepSeek V4 Flash · 快速</option>
+      </optgroup>
+      <optgroup label="智谱 GLM">
+        <option value="glm:pro">智谱 GLM-5 · 深度思考(最强)</option>
+        <option value="glm:flash">智谱 GLM-4-Flash · 快速</option>
+        <option value="kimi:pro">月之暗面 Kimi K2.6 · 最新最强(256K)</option>
+        <option value="kimi:flash">月之暗面 Kimi (moonshot-v1-32k) · 快速</option>
+        <option value="qwen:pro">通义千问 Qwen-Max · 最强</option>
+        <option value="qwen:flash">通义千问 Qwen-Plus · 均衡快速</option>
+        <option value="gpt:pro">🌐 GPT-4o（OpenAI·经代理）</option>
+        <option value="gpt:flash">🌐 GPT-4o-mini（OpenAI·快·经代理）</option>
+        <option value="claude:pro">🌐 Claude Sonnet 4.5（Anthropic·经代理）</option>
+        <option value="claude:flash">🌐 Claude 3.5 Haiku（Anthropic·快·经代理）</option>
+        <option value="gemini:pro">🌐 Gemini 2.5 Pro（Google·经代理）</option>
+        <option value="gemini:flash">🌐 Gemini 2.5 Flash（Google·快·经代理）</option>
+      </optgroup>
+              </select>
+            </div>
+          <div style="flex:1.3;min-width:200px">
+              <label style="display:block;font-size:12px;color:#8B98A5;margin-bottom:4px"><span id="reviewKeyLabelA">API Key</span></label>
+              <input id="reviewKeyInputA" type="password" placeholder="填入对应厂商的 Key" style="width:100%;padding:8px 9px;border-radius:7px;border:1px solid rgba(255,255,255,0.15);background:#0d1117;color:#D4DCE4;font-size:13px">
+            </div>
         </div>
-        <div style="margin-top:14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-          <button id="reviewGoBtn" style="background:linear-gradient(135deg,#C0392B,#E05A47);color:#fff;font-weight:700;font-size:14px;border:none;border-radius:8px;padding:11px 26px;cursor:pointer">开始审稿 →</button>
+
+        <div style="font-size:12.5px;font-weight:700;color:#E8897B;margin:0 0 8px">审稿人 B <span style="font-weight:400;color:#8B98A5">（可留空，只用一位审稿人）</span></div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin-bottom:14px">
+          <div style="flex:1;min-width:180px">
+              <label style="display:block;font-size:12px;color:#8B98A5;margin-bottom:4px">模型</label>
+              <select id="reviewModelSelB" style="width:100%;padding:8px 9px;border-radius:7px;border:1px solid rgba(255,255,255,0.15);background:#0d1117;color:#D4DCE4;font-size:13px">
+                <optgroup label="DeepSeek">
+        <option value="ds:pro">DeepSeek V4 Pro · 最强推理(Think Max)</option>
+        <option value="ds:flash">DeepSeek V4 Flash · 快速</option>
+      </optgroup>
+      <optgroup label="智谱 GLM">
+        <option value="glm:pro">智谱 GLM-5 · 深度思考(最强)</option>
+        <option value="glm:flash">智谱 GLM-4-Flash · 快速</option>
+        <option value="kimi:pro">月之暗面 Kimi K2.6 · 最新最强(256K)</option>
+        <option value="kimi:flash">月之暗面 Kimi (moonshot-v1-32k) · 快速</option>
+        <option value="qwen:pro">通义千问 Qwen-Max · 最强</option>
+        <option value="qwen:flash">通义千问 Qwen-Plus · 均衡快速</option>
+        <option value="gpt:pro">🌐 GPT-4o（OpenAI·经代理）</option>
+        <option value="gpt:flash">🌐 GPT-4o-mini（OpenAI·快·经代理）</option>
+        <option value="claude:pro">🌐 Claude Sonnet 4.5（Anthropic·经代理）</option>
+        <option value="claude:flash">🌐 Claude 3.5 Haiku（Anthropic·快·经代理）</option>
+        <option value="gemini:pro">🌐 Gemini 2.5 Pro（Google·经代理）</option>
+        <option value="gemini:flash">🌐 Gemini 2.5 Flash（Google·快·经代理）</option>
+      </optgroup>
+              </select>
+            </div>
+          <div style="flex:1.3;min-width:200px">
+              <label style="display:block;font-size:12px;color:#8B98A5;margin-bottom:4px"><span id="reviewKeyLabelB">API Key</span></label>
+              <input id="reviewKeyInputB" type="password" placeholder="填入对应厂商的 Key" style="width:100%;padding:8px 9px;border-radius:7px;border:1px solid rgba(255,255,255,0.15);background:#0d1117;color:#D4DCE4;font-size:13px">
+            </div>
+        </div>
+
+        <div style="font-size:12.5px;font-weight:700;color:#7C5CFF;margin:0 0 8px">✍ 主笔（据两份审稿意见改稿）</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin-bottom:16px">
+          <div style="flex:1;min-width:180px">
+              <label style="display:block;font-size:12px;color:#8B98A5;margin-bottom:4px">模型</label>
+              <select id="writerModelSel" style="width:100%;padding:8px 9px;border-radius:7px;border:1px solid rgba(255,255,255,0.15);background:#0d1117;color:#D4DCE4;font-size:13px">
+                <optgroup label="DeepSeek">
+        <option value="ds:pro">DeepSeek V4 Pro · 最强推理(Think Max)</option>
+        <option value="ds:flash">DeepSeek V4 Flash · 快速</option>
+      </optgroup>
+      <optgroup label="智谱 GLM">
+        <option value="glm:pro">智谱 GLM-5 · 深度思考(最强)</option>
+        <option value="glm:flash">智谱 GLM-4-Flash · 快速</option>
+        <option value="kimi:pro">月之暗面 Kimi K2.6 · 最新最强(256K)</option>
+        <option value="kimi:flash">月之暗面 Kimi (moonshot-v1-32k) · 快速</option>
+        <option value="qwen:pro">通义千问 Qwen-Max · 最强</option>
+        <option value="qwen:flash">通义千问 Qwen-Plus · 均衡快速</option>
+        <option value="gpt:pro">🌐 GPT-4o（OpenAI·经代理）</option>
+        <option value="gpt:flash">🌐 GPT-4o-mini（OpenAI·快·经代理）</option>
+        <option value="claude:pro">🌐 Claude Sonnet 4.5（Anthropic·经代理）</option>
+        <option value="claude:flash">🌐 Claude 3.5 Haiku（Anthropic·快·经代理）</option>
+        <option value="gemini:pro">🌐 Gemini 2.5 Pro（Google·经代理）</option>
+        <option value="gemini:flash">🌐 Gemini 2.5 Flash（Google·快·经代理）</option>
+      </optgroup>
+              </select>
+            </div>
+          <div style="flex:1.3;min-width:200px">
+              <label style="display:block;font-size:12px;color:#8B98A5;margin-bottom:4px"><span id="writerKeyLabel">API Key</span></label>
+              <input id="writerKeyInput" type="password" placeholder="填入对应厂商的 Key" style="width:100%;padding:8px 9px;border-radius:7px;border:1px solid rgba(255,255,255,0.15);background:#0d1117;color:#D4DCE4;font-size:13px">
+            </div>
+        </div>
+
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+          <button id="reviewGoBtn" style="background:linear-gradient(135deg,#C0392B,#E05A47);color:#fff;font-weight:700;font-size:14px;border:none;border-radius:8px;padding:11px 26px;cursor:pointer">开始双审 → 改稿</button>
           <button id="reviewCancelBtn" style="background:transparent;color:#8B98A5;font-size:13px;border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:10px 20px;cursor:pointer">取消</button>
-          <span id="reviewSameWarn" style="font-size:12px;color:#C9A227;display:none">⚠ 审稿模型和写论文用的是同一个，等于自审自改，建议换一个</span>
         </div>
+        <div id="reviewSameWarn" style="font-size:12px;color:#C9A227;display:none;margin-top:10px"></div>
       </div>
     </div>
     <div id="reviewWrap" style="margin-top:20px;display:none;border-top:1px dashed rgba(192,57,43,0.4);padding-top:18px">
@@ -1367,52 +1435,92 @@ function vendorLabel(sel){
 function openReviewModal(){
   if(!window._lastPaper){ showErr('请先生成论文，再进行审稿打磨'); return; }
   const writeVendor = parseModel(modelSel.value).vendor;
-  const otherModel = writeVendor==='glm' ? 'ds:pro' : 'glm:pro';   // 换到另一家
-  const sel = $('reviewModelSel');
-  sel.value = otherModel;
+  // 审稿人默认选两个和主笔不同的厂商（从常见几家里挑）
+  const pool = ['ds:pro','glm:pro','kimi:pro','qwen:pro'].filter(m=>parseModel(m).vendor!==writeVendor);
+  $('reviewModelSelA').value = pool[0] || 'glm:pro';
+  $('reviewModelSelB').value = pool[1] || pool[0] || 'ds:pro';
+  $('writerModelSel').value  = modelSel.value;   // 主笔默认原写作模型
   syncReviewKeyUI();
   $('reviewModalWrap').style.display = 'block';
   $('reviewModalWrap').scrollIntoView({behavior:'smooth', block:'center'});
 }
-// 弹框内：模型变化时，切换 Key 输入的标签并带出该厂商已存 Key、提示是否与写作模型同厂
+// 三个位子：切模型时刷新各自 Key 标签+带出已存 Key，并提示重合风险
 function syncReviewKeyUI(){
-  const sel = $('reviewModelSel'), keyInput = $('reviewKeyInput'), keyLabel = $('reviewKeyLabel');
-  keyLabel.textContent = vendorLabel(sel.value) + ' 的 API Key';
-  keyInput.value = localStorage.getItem(vendorKeyName(sel.value)) || '';
-  const sameVendor = parseModel(sel.value).vendor === parseModel(modelSel.value).vendor;
-  $('reviewSameWarn').style.display = sameVendor ? 'inline' : 'none';
+  const set = (selId, keyId, lblId)=>{
+    const sel=$(selId); if(!sel) return;
+    $(lblId).textContent = vendorLabel(sel.value) + ' 的 API Key';
+    if(!$(keyId).value) $(keyId).value = localStorage.getItem(vendorKeyName(sel.value)) || '';
+  };
+  set('reviewModelSelA','reviewKeyInputA','reviewKeyLabelA');
+  set('reviewModelSelB','reviewKeyInputB','reviewKeyLabelB');
+  set('writerModelSel','writerKeyInput','writerKeyLabel');
+  // 提示：两审稿人同厂 or 审稿人与主笔同厂
+  const va=parseModel($('reviewModelSelA').value).vendor;
+  const vb=$('reviewModelSelB').value ? parseModel($('reviewModelSelB').value).vendor : null;
+  const vw=parseModel($('writerModelSel').value).vendor;
+  let warn='';
+  if(vb && va===vb) warn='⚠ 两位审稿人是同一个基底，多一份意见但视角重合，建议换成不同基底';
+  else if(va===vw || (vb&&vb===vw)) warn='⚠ 有审稿人与主笔是同一个基底，等于部分自审自改，建议错开';
+  const w=$('reviewSameWarn'); w.textContent=warn; w.style.display = warn?'block':'none';
 }
 
-// 真正执行：审稿(第二个模型) → 改稿(原模型)
-async function runReviewPolish(reviewModel, reviewKey){
+// 把两份审稿意见合给主笔改稿
+function buildReviseInputDual(paperText, revA, revB){
+  let s = '【当前版本的论文全文】\n\n' + (paperText||'').trim() + '\n\n\n';
+  s += '你收到了两位审稿人的意见。请综合两份意见——尤其是两人都指出的问题（那是最该改的），以及各自独有的尖锐意见——改出实质更强的一版。两位意见若有冲突，用你的学术判断权衡。\n\n';
+  s += '════ 审稿人 A 的意见 ════\n' + (revA||'').trim() + '\n\n';
+  if(revB && revB.trim()){ s += '════ 审稿人 B 的意见 ════\n' + revB.trim() + '\n\n'; }
+  s += '请据此直接输出改好后的完整论文全文。';
+  return s;
+}
+
+// 执行：双审并行 → 合并 → 主笔改稿
+async function runReviewPolish(cfg){
   hideErr();
   const paperBtnEl = $('paperBtn'); if(paperBtnEl) paperBtnEl.disabled = true;
   reviewBtn.disabled = true;
   $('reviewModalWrap').style.display = 'none';
   const reviewWrap = $('reviewWrap'), reviewBody = $('reviewBody'), reviewStatus = $('reviewStatus');
   const paperBody = $('paperBody'), paperStatus = $('paperStatus');
-  const writeModel = modelSel.value;
-  const writeKey = apiKeyEl.value.trim().replace(/^["']|["']$/g,'');
 
   reviewWrap.style.display = 'block';
   reviewWrap.scrollIntoView({behavior:'smooth', block:'start'});
 
   try{
-    // ① 审稿 —— 用第二个模型
-    reviewBtn.textContent = '⏳ 审稿中（'+vendorLabel(reviewModel)+' 正在逐条挑问题）……';
-    reviewStatus.textContent = '审稿模型：'+vendorLabel(reviewModel);
-    const rev = await streamChat(reviewKey, reviewModel, reviewPrompt(), buildReviewInput(window._lastPaper), reviewBody, reviewStatus, reviewStatus);
-    if(!rev || !rev.text){ throw new Error('审稿未产出内容'); }
-    reviewBody.innerHTML = renderEmergeText(rev.text);
-    window._lastReview = rev.text;
-    reviewStatus.textContent = '✓ 审稿完成（由 '+vendorLabel(reviewModel)+' 审），正在据此改稿……';
+    // ① 双审并行 —— 各写到审稿区的两个子块
+    const dual = !!cfg.mB;
+    reviewBtn.textContent = '⏳ 审稿中（'+(dual?'两位审稿人并行挑问题':'审稿人正在挑问题')+'）……';
+    reviewBody.innerHTML =
+      '<div style="margin-bottom:14px"><div id="revHeadA" style="font-size:13px;font-weight:700;color:#E8897B;margin-bottom:6px">审稿人 A · '+vendorLabel(cfg.mA)+'</div><div id="revBodyA" style="font-size:14px;line-height:1.9;color:#CBB8B4"><span class="placeholder">审稿中……</span></div></div>' +
+      (dual ? '<div style="border-top:1px dashed rgba(192,57,43,0.3);padding-top:12px"><div id="revHeadB" style="font-size:13px;font-weight:700;color:#E8897B;margin-bottom:6px">审稿人 B · '+vendorLabel(cfg.mB)+'</div><div id="revBodyB" style="font-size:14px;line-height:1.9;color:#CBB8B4"><span class="placeholder">审稿中……</span></div></div>' : '');
+    reviewStatus.textContent = dual ? ('审稿人：'+vendorLabel(cfg.mA)+' + '+vendorLabel(cfg.mB)) : ('审稿人：'+vendorLabel(cfg.mA));
 
-    // ② 改稿 —— 仍用原模型（原作者据意见改）
-    if(!writeKey){ throw new Error('原模型 Key 缺失，无法改稿'); }
-    reviewBtn.textContent = '⏳ 改稿中（'+vendorLabel(writeModel)+' 据意见重写，约 3-8 分钟）……';
-    paperStatus.textContent = '正在根据审稿意见改写……';
-    paperBody.innerHTML = '<span class="placeholder">正在根据审稿意见改写论文……</span>';
-    const rewritten = await streamChat(writeKey, writeModel, revisePrompt(), buildReviseInput(window._lastPaper, window._lastReview), paperBody, paperStatus, paperStatus);
+    const dummy = document.createElement('span');
+    const tasks = [
+      streamChat(cfg.kA, cfg.mA, reviewPrompt(), buildReviewInput(window._lastPaper), $('revBodyA'), dummy, dummy)
+        .catch(e=>({text:'', err:e.message}))
+    ];
+    if(dual){
+      tasks.push(
+        streamChat(cfg.kB, cfg.mB, reviewPrompt(), buildReviewInput(window._lastPaper), $('revBodyB'), dummy, dummy)
+          .catch(e=>({text:'', err:e.message}))
+      );
+    }
+    const results = await Promise.all(tasks);
+    const revA = results[0] && results[0].text || '';
+    const revB = dual ? (results[1] && results[1].text || '') : '';
+    if(!revA && !revB){ throw new Error('两位审稿人都未产出意见（'+((results[0]&&results[0].err)||'')+'）'); }
+    if($('revBodyA')) $('revBodyA').innerHTML = revA ? renderEmergeText(revA) : '<span class="placeholder">审稿失败</span>';
+    if(dual && $('revBodyB')) $('revBodyB').innerHTML = revB ? renderEmergeText(revB) : '<span class="placeholder">审稿失败</span>';
+    window._lastReview = revA + (revB?('\n\n──── 审稿人B ────\n'+revB):'');
+
+    // ② 主笔综合两份意见改稿
+    if(!cfg.kW){ throw new Error('主笔 Key 缺失，无法改稿'); }
+    reviewStatus.textContent = '✓ 审稿完成，'+vendorLabel(cfg.mW)+' 正在综合意见改稿……';
+    reviewBtn.textContent = '⏳ 主笔改稿中（'+vendorLabel(cfg.mW)+'，约 3-8 分钟）……';
+    paperStatus.textContent = '主笔正在综合两份审稿意见改写……';
+    paperBody.innerHTML = '<span class="placeholder">主笔正在据两份审稿意见改写论文……</span>';
+    const rewritten = await streamChat(cfg.kW, cfg.mW, revisePrompt(), buildReviseInputDual(window._lastPaper, revA, revB), paperBody, paperStatus, paperStatus);
     if(rewritten && rewritten.text){
       paperBody.innerHTML = renderPaperText(rewritten.text);
       window._lastPaper = rewritten.text;
@@ -1420,32 +1528,44 @@ async function runReviewPolish(reviewModel, reviewKey){
       const wc = rewritten.text.replace(/\s/g,'').length;
       paperStatus.textContent = '✓ 已完成第 '+window._paperRound+' 轮打磨 · 约 '+wc.toLocaleString()+' 字';
       const tag = $('paperRoundTag'); if(tag) tag.textContent = '已打磨 '+window._paperRound+' 轮';
-      reviewStatus.textContent = '✓ 第 '+window._paperRound+' 轮 · 由 '+vendorLabel(reviewModel)+' 审、'+vendorLabel(writeModel)+' 改（论文已升级）';
+      const who = dual ? (vendorLabel(cfg.mA)+' + '+vendorLabel(cfg.mB)) : vendorLabel(cfg.mA);
+      reviewStatus.textContent = '✓ 第 '+window._paperRound+' 轮 · '+who+' 审、'+vendorLabel(cfg.mW)+' 改（论文已升级）';
     }
   }catch(e){
     showErr('审稿打磨失败：'+e.message);
     reviewStatus.textContent = '失败';
   }finally{
     reviewBtn.disabled = false;
-    reviewBtn.textContent = '🔬 再打磨一轮（换模型审稿→改稿）';
+    reviewBtn.textContent = '🔬 再打磨一轮（双审→改稿）';
     if(paperBtnEl) paperBtnEl.disabled = false;
   }
 }
 
-// 绑定：审稿按钮打开弹框；弹框内确认/取消/模型切换
+// 绑定
 const reviewBtn = $('reviewBtn');
 if(reviewBtn){ reviewBtn.addEventListener('click', openReviewModal); }
-const reviewModelSelEl = $('reviewModelSel');
-if(reviewModelSelEl){ reviewModelSelEl.addEventListener('change', syncReviewKeyUI); }
+['reviewModelSelA','reviewModelSelB','writerModelSel'].forEach(id=>{
+  const el=$(id); if(el) el.addEventListener('change', syncReviewKeyUI);
+});
 const reviewGoBtn = $('reviewGoBtn');
 if(reviewGoBtn){
   reviewGoBtn.addEventListener('click', ()=>{
-    const rm = $('reviewModelSel').value;
-    const rk = $('reviewKeyInput').value.trim().replace(/^["']|["']$/g,'');
-    if(!rk){ showErr('请填入审稿模型的 API Key'); $('reviewKeyInput').focus(); return; }
-    // 顺手把这把 Key 存进对应厂商槽，方便下次
-    try{ localStorage.setItem(vendorKeyName(rm), rk); }catch(_){}
-    runReviewPolish(rm, rk);
+    const clean = v => (v||'').trim().replace(/^["']|["']$/g,'');
+    const mA=$('reviewModelSelA').value, kA=clean($('reviewKeyInputA').value);
+    const mBraw=$('reviewModelSelB').value, kBraw=clean($('reviewKeyInputB').value);
+    const mW=$('writerModelSel').value, kW=clean($('writerKeyInput').value);
+    if(!kA){ showErr('请填入审稿人 A 的 API Key'); $('reviewKeyInputA').focus(); return; }
+    if(!kW){ showErr('请填入主笔的 API Key'); $('writerKeyInput').focus(); return; }
+    // 审稿人B：有填Key才启用
+    const useB = !!kBraw;
+    const cfg = { mA, kA, mB: useB?mBraw:null, kB: useB?kBraw:null, mW, kW };
+    // 存Key方便下次
+    try{
+      localStorage.setItem(vendorKeyName(mA), kA);
+      if(useB) localStorage.setItem(vendorKeyName(mBraw), kBraw);
+      localStorage.setItem(vendorKeyName(mW), kW);
+    }catch(_){}
+    runReviewPolish(cfg);
   });
 }
 const reviewCancelBtn = $('reviewCancelBtn');
