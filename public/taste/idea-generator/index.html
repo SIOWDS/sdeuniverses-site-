@@ -221,6 +221,20 @@ footer{border-top:1px solid var(--border);text-align:center;padding:30px 20px 44
   </div>
 </div>
 
+<!-- 心得存储选择：当选中的基底已有本地存储的《从发现到发生》心得时显示，让用户选用存的还是重写 -->
+<div id="reflectChoiceBar" style="display:none;max-width:1000px;margin:14px auto 0;background:rgba(20,12,30,0.45);border:1px solid rgba(122,47,224,0.32);border-radius:12px;padding:12px 20px">
+  <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+    <span style="font-size:13px;color:#B98CFF;font-weight:600">📖 <span id="reflectChoiceName">该基底</span>已有存储的心得</span>
+    <label style="font-size:13px;color:#C9B8DC;cursor:pointer;display:inline-flex;align-items:center;gap:5px">
+      <input type="radio" name="reflectChoice" value="use" checked style="accent-color:#A45CFF;cursor:pointer"> 使用已存的（秒载·跳过写作）
+    </label>
+    <label style="font-size:13px;color:#C9B8DC;cursor:pointer;display:inline-flex;align-items:center;gap:5px">
+      <input type="radio" name="reflectChoice" value="rewrite" style="accent-color:#A45CFF;cursor:pointer"> ↻ 重写心得（这次让它重新写一份）
+    </label>
+    <span id="reflectChoiceHint" style="font-size:11.5px;color:#8B98A5"></span>
+  </div>
+</div>
+
 <div class="privacy-note">
   🔒 你的 API Key 全程只保存在本机浏览器(localStorage)。<b>国产基底</b>(DeepSeek · 智谱GLM · Kimi · 通义千问)——请求直接从你的浏览器发往对应厂商，我们的服务器全程不经手、不存储、不记录你的 Key 或问题。<b>境外基底</b>(GPT · Claude · Gemini)——因在中国大陆无法直连，请求会经本站中转服务器转发给对应厂商，中转<b>只转发、不存储、不记录</b>你的 Key（用完即走）；介意的话请改用国产基底。<br>⏱ 六篇各约 4000 字的小论文<b>并行生成</b>（六路同时进行）。选"深度思考/最强"档时，每篇会先深度思考 1-2 分钟再动笔，质量最高、最能展现 SDE 的威力，请耐心等待几分钟；选"快速"档几秒出字。若某篇报错（并发被限流），刷新重试或换快速档。
 </div>
@@ -1133,6 +1147,47 @@ function clearReflect(writeSel){
 }
 window.clearReflect = clearReflect;
 
+// ── 心得存储选择控件（reflectChoiceBar）──
+// 当前基底已有本地心得 → 显示控件让用户选：使用已存的(默认) / 重写心得。
+// 无存储则隐藏（第一次本来就要写，没得选）。跟随基底选择框动态更新。
+const REFLECT_MODEL_NAMES = {'ds:pro':'DeepSeek V4 Pro','ds:flash':'DeepSeek V4 Flash','glm:pro':'智谱 GLM-5','glm:flash':'智谱 GLM-4-Flash','kimi:pro':'Kimi K2.6','kimi:flash':'Kimi (v1-32k)','qwen:pro':'通义千问 Qwen-Max','qwen:flash':'通义千问 Qwen-Plus','gpt:pro':'GPT-5.5','gpt:flash':'GPT-5.4','claude:pro':'Claude Opus 4.8','claude:flash':'Claude Sonnet 4.6','gemini:pro':'Gemini 3.1 Pro','gemini:flash':'Gemini 2.5 Flash'};
+function updateReflectChoiceBar(){
+  try{
+    const bar = document.getElementById('reflectChoiceBar'); if(!bar) return;
+    const sel = (typeof modelSel!=='undefined' && modelSel) ? modelSel.value : '';
+    const stored = loadReflectLS(sel);
+    if(stored){
+      const nameEl = document.getElementById('reflectChoiceName');
+      if(nameEl) nameEl.textContent = (REFLECT_MODEL_NAMES[sel] || sel) + ' ';
+      const hint = document.getElementById('reflectChoiceHint');
+      if(hint) hint.textContent = '（已存 ' + stored.length + ' 字）';
+      // 每次显示时默认回到"使用已存的"，避免上次选的"重写"残留导致误重写
+      const useRadio = document.querySelector('input[name="reflectChoice"][value="use"]');
+      if(useRadio) useRadio.checked = true;
+      bar.style.display = 'block';
+    } else {
+      bar.style.display = 'none';
+    }
+  }catch(_){}
+}
+// 生成入口调用：读取用户选择。若选了"重写"→ 清掉该基底的本地+内存缓存（本次会重新写并存盘），
+// 并把选择重置回"使用已存的"、隐藏控件（写完存盘后 updateReflectChoiceBar 会重新亮出来）。
+function consumeReflectRewriteChoice(sel){
+  try{
+    const bar = document.getElementById('reflectChoiceBar');
+    if(!bar || bar.style.display === 'none') return false;   // 控件没显示 = 没有存储 = 无需处理
+    const r = document.querySelector('input[name="reflectChoice"]:checked');
+    if(r && r.value === 'rewrite'){
+      clearReflect(sel);                                       // 清本地磁盘 + 内存，本次自然重写
+      const useRadio = document.querySelector('input[name="reflectChoice"][value="use"]');
+      if(useRadio) useRadio.checked = true;                    // 防下次误重写
+      bar.style.display = 'none';
+      return true;
+    }
+  }catch(_){}
+  return false;
+}
+
 let _sharedReflection = { key:'', text:'', promise:null, fromCache:false };
 // 心得按"基底"标识（与问题无关）：同一基底算同一份；换基底才重写。
 function reflectionRoundKey(writeSel){ return (writeSel || ''); }
@@ -1376,6 +1431,8 @@ function refreshKeyUI(){
 refreshKeyUI();
 apiKeyEl.addEventListener('input', ()=>localStorage.setItem(keyStoreName(), apiKeyEl.value.trim()));
 modelSel.addEventListener('change', refreshKeyUI);
+modelSel.addEventListener('change', updateReflectChoiceBar);
+updateReflectChoiceBar();   // 页面加载即按当前基底显示/隐藏心得选择控件
 
 // 审稿人 A/B 的下拉与 Key 框：切换基底时自动把该基底已存的 Key 带进框里显示；在框里输入时也自动存回该基底，
 // 这样七个基底的 Key 都只需填一次，之后无论主用还是当审稿人，选到它就自动带出，测试时不必反复输入。
@@ -1673,10 +1730,12 @@ async function run(){
   //  这是整个金点子生成的地基：先让基底学习内功、把发生学内化成自己的一篇心得，缓存好，第二阶段才开始生成。
   //  已缓存（该基底·本地磁盘或本会话）则瞬间跳过；换基底才重写。心得与具体问题无关，换问题不重写。
   const rb0 = document.getElementById('sixReflectBar');
-  if(rb0){ rb0.style.display='block'; const s=document.getElementById('sixReflectStatus'); if(s) s.textContent='第一阶段 · 基底正在学习内功、写《从发现到发生》心得（约5000字）…写好后存本地磁盘，下次自动载入'; }
+  // 读取用户在控件上的选择：若选了"重写心得"，先清掉该基底的存储，本次会重新写一份并存盘
+  const forceRewrite = consumeReflectRewriteChoice(model);
+  if(rb0){ rb0.style.display='block'; const s=document.getElementById('sixReflectStatus'); if(s) s.textContent= forceRewrite ? '第一阶段 · 已按你的选择清除旧心得，基底正在重新写《从发现到发生》（约5000字）…' : '第一阶段 · 基底正在学习内功、写《从发现到发生》心得（约5000字）…写好后存本地磁盘，下次自动载入'; }
   const sixReflection = await getSharedReflection(model, key, (n)=>{ const s=document.getElementById('sixReflectStatus'); if(s) s.textContent = n>0?('✍ 第一阶段·心得已写 '+n+' 字'):'第一阶段·心得写作中…'; });
   { const s=document.getElementById('sixReflectStatus'), b=document.getElementById('sixReflectBody'); const cachedNote = _sharedReflection.fromCache ? '（✓ 本地缓存·未重写）' : '';
-    if(sixReflection){ if(s) s.textContent='✓ 第一阶段完成 · 内化 '+sixReflection.length+' 字'+cachedNote+'（本轮六篇→涌现→四篇→第二批全部复用这份心得）'; if(b) b.innerHTML=renderPaperText(sixReflection); }
+    if(sixReflection){ if(s) s.textContent='✓ 第一阶段完成 · 内化 '+sixReflection.length+' 字'+cachedNote+'（本轮六篇→涌现→四篇→第二批全部复用这份心得）'; if(b) b.innerHTML=renderPaperText(sixReflection); updateReflectChoiceBar(); }
     else { if(s) s.textContent='（第一阶段心得未成功·后续退回常规提智）'; if(b) b.innerHTML='<span class="placeholder">心得生成未成功，后续用常规提智继续'+(_reflectLastErr?('<br><span style="color:#E8897B">失败原因：'+escTxt(_reflectLastErr)+'</span>'):'')+'</span>'; } }
 
   // ═══ 第二阶段：六路并行 · 3视角 × (普通AI + SDE金点子) ═══
@@ -1938,10 +1997,12 @@ if(fourStartBtn){
     reflWrap.style.cssText='border:1px solid rgba(122,47,224,0.35);border-radius:10px;padding:16px 18px;margin-bottom:16px;background:rgba(20,12,30,0.5)';
     reflWrap.innerHTML='<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px"><div style="font-size:14px;font-weight:700;color:#B98CFF">📖 第一次提智·内化：《从发现到发生》</div><div id="reflStatus" style="font-size:12px;color:#8B98A5">写作中…</div></div><div id="reflBody" style="color:#C9B8DC;font-size:13.5px;line-height:1.85;max-height:280px;overflow:auto"><span class="placeholder">正在把发生学内化为自己的理解…</span></div>';
     box0.appendChild(reflWrap);
+    consumeReflectRewriteChoice(writeSel);   // 尊重用户在控件上的"重写心得"选择
     const reflection = await getSharedReflection(writeSel, writeKey, (n)=>{ const el=$('reflStatus'); if(el) el.textContent = n>0?('✍ 已写 '+n+' 字（或复用已存的心得）'):'写作中…'; });
     if(reflection){
       $('reflBody').innerHTML = renderPaperText(reflection);
       $('reflStatus').textContent = '✓ 内化完成 '+reflection.length+' 字 · 四篇将带着这份认知来写';
+      updateReflectChoiceBar();
     } else {
       $('reflBody').innerHTML = '<span class="placeholder" style="color:#E8897B">心得生成未成功，四篇将退回常规提智继续（不影响生成）'+(_reflectLastErr?('<br>失败原因：'+escTxt(_reflectLastErr)):'')+'</span>';
       $('reflStatus').textContent = '（跳过）';
@@ -2061,6 +2122,7 @@ if(upliftBtn){
     ureflWrap.style.cssText='border:1px solid rgba(122,47,224,0.4);border-radius:10px;padding:16px 18px;margin-bottom:16px;background:rgba(20,12,30,0.55)';
     ureflWrap.innerHTML='<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px"><div style="font-size:14px;font-weight:700;color:#B98CFF">📖 第一次提智·内化：《从发现到发生》</div><div id="ureflStatus" style="font-size:12px;color:#8B98A5">写作中…</div></div><div id="ureflBody" style="color:#C9B8DC;font-size:13.5px;line-height:1.85;max-height:280px;overflow:auto"><span class="placeholder">正在把发生学内化为自己的理解…</span></div>';
     ubox0.appendChild(ureflWrap);
+    consumeReflectRewriteChoice(writeSel);   // 尊重用户在控件上的"重写心得"选择
     const ureflection = await getSharedReflection(writeSel, writeKey, (n)=>{ const el=$('ureflStatus'); if(el) el.textContent = n>0?('✍ 已写 '+n+' 字（或复用已存的心得）'):'写作中…'; });
     if(ureflection){
       $('ureflBody').innerHTML = renderPaperText(ureflection);
