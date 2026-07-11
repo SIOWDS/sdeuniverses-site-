@@ -644,6 +644,9 @@ const SHARED_VIEWS = {
 // 1万字中文约需 1.5-1.6万 tokens；设 16000 → 足够写满1万字并留少量余量，但绝不给它写到1.7万字的空间。
 // （这是继 Prompt 硬约束、策划先行之后的第三重、也是最硬的一重保险——不管模型想写多少，到 token 上限就必须停。）
 const PAPER_MAX_TOKENS = 16000;
+// 《从发现到发生》心得只需约5000字（5000字中文≈8000 tokens）——设8000上限，物理限制在5000-6000字，
+// 心得够内化即可，不必写太长（写太长会拖慢右栏等待）。
+const REFLECT_MAX_TOKENS = 8000;
 const SUB_NAMES = {
   show: ['S1 · 规范C（对比·变化·分布）','S2 · 模态M（粒子·波·场）','S3 · 价值V（真·善·美）'],
   diff: ['D1 · 意义（特征律·自由律·幸福律）','D2 · 路径（问题→猜想→…→聚合→升维）','D3 · 最优化（最小误差·冗余·亏损）'],
@@ -1055,7 +1058,7 @@ async function getReflection(writeSel, writeKey, onProgress){
   try{
     const res = await streamChat(writeKey, writeSel, reflectPrompt(),
       '请写这篇《从发现到发生——兼对我自身认知惯性的一次检视》，约5000字。这是你接下来所有工作的思维底座。',
-      sink, dummy, dummy, PAPER_MAX_TOKENS);
+      sink, dummy, dummy, REFLECT_MAX_TOKENS);
     if(ticker) clearInterval(ticker);
     return (res && res.text) ? res.text : '';
   }catch(e){ if(ticker) clearInterval(ticker); return ''; }
