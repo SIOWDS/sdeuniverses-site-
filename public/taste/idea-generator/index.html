@@ -267,7 +267,24 @@ footer{border-top:1px solid var(--border);text-align:center;padding:30px 20px 44
     <div id="emergeBody" style="color:#D4DCE4;font-size:15px;line-height:1.95;white-space:normal"><span class="placeholder">点击上方按钮开始涌现……</span></div>
     <div id="emergeMeta" style="font-size:12px;color:#8B98A5;margin-top:14px"></div>
     <div id="emergeDlRow" style="margin-top:18px;display:none">
+      <button id="paperBtn" style="background:linear-gradient(135deg,#7C5CFF,#A48CFF);color:#fff;font-weight:700;font-size:14.5px;border:none;border-radius:8px;padding:12px 28px;cursor:pointer;margin-right:10px;box-shadow:0 4px 16px rgba(124,92,255,0.35)">✍ 扩写成两万字学术论文</button>
       <button id="emergeDlBtn" style="background:#238636;color:#fff;font-weight:600;font-size:14px;border:none;border-radius:8px;padding:11px 26px;cursor:pointer">📄 连新典范一起下载（Word）</button>
+    </div>
+  </div>
+</div>
+
+<!-- 学术论文结果面板 -->
+<div id="paperWrap" style="max-width:900px;margin:26px auto 0;display:none">
+  <div style="background:linear-gradient(135deg,rgba(124,92,255,0.10),rgba(16,14,26,0.5));border:1px solid rgba(124,92,255,0.4);border-radius:14px;padding:26px 30px">
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:6px">
+      <div style="font-size:19px;font-weight:700;color:#A48CFF;letter-spacing:0.04em">✍ 学术论文 · 约两万字</div>
+      <div id="paperStatus" style="font-size:13px;color:#8B98A5"></div>
+    </div>
+    <div style="font-size:13px;color:#9AA5B0;margin-bottom:16px;line-height:1.7">把上面的新典范当作论文的核心论点，写成一篇可投稿的正式学术论文——有摘要、文献检讨、层层递进的核心论证、<b style="color:#A48CFF">主动设置的反驳与回应</b>、跨学科推衍与坦诚边界。生成需要几分钟，请耐心等它写完。</div>
+    <div id="paperBody" style="color:#D4DCE4;font-size:15px;line-height:2.0;white-space:normal"><span class="placeholder">点击上方按钮开始撰写……</span></div>
+    <div id="paperMeta" style="font-size:12px;color:#8B98A5;margin-top:14px"></div>
+    <div id="paperDlRow" style="margin-top:18px;display:none">
+      <button id="paperDlBtn" style="background:#238636;color:#fff;font-weight:600;font-size:14px;border:none;border-radius:8px;padding:11px 26px;cursor:pointer">📄 下载论文（Word）</button>
     </div>
   </div>
 </div>
@@ -424,6 +441,77 @@ const EMERGE_SPEC = `
 `;
 // 涌现用的系统提示 = SDE 内功底盘 + 三阶涌现工程规格
 function emergePrompt(){ return SDE_BASE + EMERGE_SPEC; }
+
+// ============ 三阶：新典范 → 两万字学术论文 ============
+const PAPER_SPEC = `
+---
+【本次任务：把新典范扩写成一篇两万字的正式学术论文】
+
+你面前有一份"二阶涌现"的产物：一个被命名的新典范，连同它的碰撞过程、暗流、四重检验与跨学科地图。你的任务，是把这个新典范当作论文的核心论点（thesis），写成一篇约两万字的、可投稿的正式学术论文。
+
+这不是把涌现记录换个排版，而是一次真正的学术写作：涌现产物是你的"研究发现"，你现在要把它写成一篇有文献对话、有论证纵深、有理论建构、有反驳与回应的完整论文。
+
+▍论文的核心论点
+就是那个新典范。整篇论文自始至终围绕它展开、论证、辩护、推衍。标题、摘要、每一节，都服务于把这一个判断立成、推深、守住。不要写成面面俱到的综述——要有一个尖锐的、贯穿全文的中心主张。
+
+▍论文的正式结构（严格遵循，用规范的学术论文骨架）
+
+一、标题
+一个学术化、精确、有辨识度的主标题，配一个点明论证进路的副标题（用冒号分隔）。不要"论……"这种八股腔。
+
+二、摘要（Abstract，约400字）
+浓缩全文：研究要解决的问题、核心论点（新典范）、论证进路、主要贡献。写成一段连贯的学术摘要，最后不要写"本文认为"式套话，直接陈述判断。
+
+三、关键词（5-7个）
+
+四、引言（Introduction，约2000字）
+从一个真实的、重要的、悬而未决的问题切入——说清这个领域长期存在什么困惑、既有的解释为什么不够。然后亮出你的核心论点（新典范）作为一个更好的解释。交代论文的论证路线图（本文将先……继而……最后……）。引言要让读者相信：这篇论文要解决一个真问题，而不是制造术语。
+
+五、文献与既有解释的检讨（约3000字）
+严肃对待这个问题上已有的主要解释路径（至少梳理3-4种有代表性的既有观点/理论传统）。对每一种，公允地陈述它抓住了什么、又在哪里止步。这一节的目的是腾出理论空间——说明为什么需要一个新典范。**你可以援引该领域真实存在的经典思想传统与代表人物的核心观点，但严禁编造具体的文献引证（不要伪造论文标题、期刊、年份、页码）。** 当你需要指涉某种观点时，用"有一种影响深远的看法认为……""某种功能主义的解释倾向于……"这类方式，或点出真实存在的思想家其广为人知的核心立场，而不虚构出处。
+
+六、核心论证（论文主体，约8000-10000字，分4-6节）
+这是论文的心脏。把新典范的核心判断，分成层层递进的若干节，逐节深入论证：
+- 每节一个小标题（有信息量、有推进感，不是"一、背景"这种空壳）。
+- 把二阶涌现里的"碰撞—暗流—新典范"过程，重新组织为学术论证的纵深：先确立概念、再展开机制、再举出现象印证、再深化到更根本的层面。
+- 充分调用涌现产物里的三对碰撞、两条暗流作为论证的骨架，但要把它们从"碰撞记录"改写成"层层展开的学理分析"——用连贯的学术散文推进，不是分点罗列。
+- 每一个关键判断都要给出论证，不能只断言。用思想实验、典型现象、机制分析来支撑。
+
+七、反驳与回应（约2000字）
+主动提出对你这个新典范最有力的两三个反驳（一个严肃的对手会怎么攻击它），然后逐一回应。这一节是论文学术严谨性的试金石——不要设稻草人，要设真正有力的反方。
+
+八、跨学科推衍（约2000字）
+把新典范展开到本领域之外的若干学科，论证它作为一个一般性结构的解释力。这里可以吸收涌现产物里的跨学科地图，但要写成有论证的推衍，不是清单罗列——说明为什么同一个结构会在不同学科里反复出现。
+
+九、结论（约1500字）
+收束全文：重申核心论点如何被立起，总结论文的理论贡献，坦诚指出这个新典范自身的边界与尚未解决的问题（呼应涌现里的自反检验——一篇诚实的论文要说清自己的适用边界）。最后可指出后续研究方向。
+
+十、（可选）一句自然语言的证伪条件
+在结论末尾，用一句朴素的话说清：什么样的事实或现象一旦出现，就说明这个核心论点是错的。自然地说出，不要用"证伪条件"作标签。
+
+▍学术写作纪律（最重要）
+· 学术的严谨与文章的可读性兼顾：像该领域第一流的学者在写一篇会被反复引用的论文——概念精确、论证严密、行文却不晦涩。
+· 直接进入，不要"这是一个重要的问题""长期以来"之类的空洞开场（引言可以有真正的问题意识开场，但不能是套话）。
+· 严格用问题所在领域的自然语言与学术话语写作。绝对不出现任何底层框架的术语、缩写、"某某视角下"这类痕迹——一个该领域的资深学者读到任何一句，都应觉得"这是本领域一篇有分量的论文"，而不是"这是某个外来框架的行话"。除了论文自己创造并定义的那个新典范概念（及其必要的衍生概念），不要引入任何未加定义的生造术语。
+· 篇幅约两万字（18000-22000字），每一节都要写足、写透、写出学术密度。这是一篇长论文，要有与两万字相称的论证纵深，但绝不注水凑字数——每一段都要推进论证。
+· 全文用连贯的学术散文写作。除了必要处，避免大量分点罗列——学术论文靠段落的逻辑推进，不是靠项目符号。
+· 读完让同行有"这个概念抓住了一个我们一直感到却说不清的东西，而且论证得住"的信服感。
+
+现在，请把这个新典范，写成这样一篇两万字的正式学术论文。
+`;
+// 论文用系统提示 = SDE 内功底盘 + 学术论文写作规格
+function paperPrompt(){ return SDE_BASE + PAPER_SPEC; }
+// 论文输入 = 原问题 + 三金点子 + 二阶涌现产物
+function buildPaperInput(rows, question, emergeText){
+  let s = '【研究的原初问题】\n' + question + '\n\n';
+  s += '【二阶涌现的产物：这就是你要写成论文的核心发现——一个被命名的新典范，连同它的碰撞过程、暗流、四重检验与跨学科地图】\n\n' + (emergeText||'').trim() + '\n\n';
+  s += '【三个金点子原文，供你在论文中调用其中的洞察与论证素材】\n';
+  (rows||[]).forEach((r,i)=>{
+    s += '\n──── 金点子' + ['①','②','③'][i] + '（' + (r.view||('视角'+(i+1))) + '）────\n' + (r.sde||'').trim() + '\n';
+  });
+  s += '\n请把上述新典范扩写成一篇约两万字的正式学术论文。';
+  return s;
+}
 // 把三篇 SDE 金点子拼成涌现的输入
 function buildEmergeInput(rows, question){
   let s = '用户最初的问题是：' + question + '\n\n下面是从三个不同角度追问出来的三个金点子（三篇小论文）。请对它们执行三阶涌现工程。\n';
@@ -463,7 +551,7 @@ function buildPayload(sel, systemPrompt, userQ){
   const base = {
     stream: true,
     messages: [{role:'system',content:systemPrompt},{role:'user',content:userQ}],
-    max_tokens: 12000
+    max_tokens: 32000
   };
   if(vendor === 'ds'){
     if(tier === 'pro'){
@@ -842,6 +930,103 @@ if(emergeDlBtn){
   });
 }
 
+// ============ 三阶：扩写成两万字学术论文 ============
+// 论文轻渲染：识别标题层/正文段/摘要关键词
+function renderPaperText(text){
+  const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const lines = text.split('\n');
+  let html = '', first = true;
+  for(let raw of lines){
+    let t = raw.trim();
+    if(!t){ html += '<div style="height:10px"></div>'; continue; }
+    let line = esc(t).replace(/\*\*(.+?)\*\*/g,'<b style="color:#C5B6FF">$1</b>');
+    // 第一行非空 = 论文主标题
+    if(first){
+      html += '<div style="font-size:21px;font-weight:700;color:#EDE7FF;line-height:1.5;margin:0 0 14px;text-align:center">'+line+'</div>';
+      first = false; continue;
+    }
+    // 一级节标题：中文数字、或"摘要/关键词/引言/结论/参考"等
+    if(/^(摘\s*要|关键词|引\s*言|结\s*论|参考文献|Abstract|Keywords)/.test(t) || /^[一二三四五六七八九十]+[、\.]/.test(t)){
+      html += '<div style="font-size:16.5px;font-weight:700;color:#A48CFF;margin:22px 0 10px;letter-spacing:0.03em">'+line+'</div>';
+      continue;
+    }
+    // 二级小标题（较短、无句末标点）
+    if(t.length<=34 && !/[。！？.!?："]$/.test(t) && /^[（(]?[0-9一二三四五六七八九]/.test(t)){
+      html += '<div style="font-size:15px;font-weight:600;color:#C5B6FF;margin:16px 0 6px">'+line+'</div>';
+      continue;
+    }
+    html += '<p style="margin:0 0 12px;text-align:justify;text-indent:2em">'+line+'</p>';
+  }
+  return html;
+}
+
+const paperBtn = $('paperBtn');
+if(paperBtn){
+  paperBtn.addEventListener('click', async ()=>{
+    const r = window._lastResult, em = window._lastEmerge;
+    if(!em){ showErr('请先完成二阶涌现，得到新典范后再扩写论文'); return; }
+    const key = apiKeyEl.value.trim().replace(/^["']|["']$/g,'');
+    if(!key){ showErr('请先填入 API Key'); apiKeyEl.focus(); return; }
+    const model = modelSel.value;
+    if(parseModel(model).tier !== 'pro'){
+      if(!confirm('两万字长论文强烈建议用「深度思考(Pro)」档，Flash 档可能写不足两万字或质量下降。仍要继续吗？')) return;
+    }
+
+    hideErr();
+    $('paperWrap').style.display='block';
+    $('paperWrap').scrollIntoView({behavior:'smooth', block:'start'});
+    $('paperDlRow').style.display='none';
+    paperBtn.disabled = true;
+    paperBtn.textContent = '⏳ 撰写中（两万字长文，深度思考约需 3-8 分钟，请勿关闭）……';
+    const bodyEl = $('paperBody'), statusEl = $('paperStatus'), metaEl = $('paperMeta');
+
+    const userQ = buildPaperInput(r.rows, r.question||'', em);
+    try{
+      const res = await streamChat(key, model, paperPrompt(), userQ, bodyEl, statusEl, metaEl);
+      if(res && res.text){
+        bodyEl.innerHTML = renderPaperText(res.text);
+        window._lastPaper = res.text;
+        $('paperDlRow').style.display='block';
+        const wc = res.text.replace(/\s/g,'').length;
+        statusEl.textContent = '✓ 完成 · 约 '+wc.toLocaleString()+' 字';
+      }
+    }catch(e){
+      showErr('论文生成失败：'+e.message);
+      statusEl.textContent = '失败';
+    }finally{
+      paperBtn.disabled = false;
+      paperBtn.textContent = '✍ 扩写成两万字学术论文';
+    }
+  });
+}
+
+// 论文下载
+const paperDlBtn = $('paperDlBtn');
+if(paperDlBtn){
+  paperDlBtn.addEventListener('click', ()=>{
+    const r = window._lastResult, p = window._lastPaper;
+    if(!p){ return; }
+    const { Document, Packer, Paragraph, TextRun } = docx;
+    const paras = p.split('\n').filter(l=>l.trim()).map((line,i)=>{
+      const t = line.trim();
+      const isTitle = i===0;
+      const isHead = /^(摘\s*要|关键词|引\s*言|结\s*论|参考文献)/.test(t) || /^[一二三四五六七八九十]+[、\.]/.test(t);
+      return new Paragraph({
+        children:[new TextRun({text:t.replace(/\*\*/g,''), bold:isTitle||isHead, size:isTitle?32:(isHead?26:22)})],
+        alignment: isTitle ? 'center' : 'both',
+        spacing:{after:isHead?140:100}
+      });
+    });
+    const doc = new Document({sections:[{children:paras}]});
+    Packer.toBlob(doc).then(blob=>{
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'SDE学术论文_新典范.docx'; a.click();
+      URL.revokeObjectURL(url);
+    });
+  });
+}
+
 // 清空结果 · 再问一次
 function clearResults(){
   rowEls.forEach(row=>{
@@ -860,7 +1045,8 @@ function clearResults(){
   if($('effBox')) $('effBox').style.display='none';
   if($('comboBar')) $('comboBar').style.display='none';
   if($('emergeWrap')) $('emergeWrap').style.display='none';
-  window._lastEmerge = null;
+  if($('paperWrap')) $('paperWrap').style.display='none';
+  window._lastEmerge = null; window._lastPaper = null;
   // 恢复视角标签为默认
   rowEls.forEach((row,i)=>{ if(row.labelEl) row.labelEl.textContent='视角'+['一','二','三'][i]+'（点击生成后从九宫格随机抽取）'; });
   hideErr();
