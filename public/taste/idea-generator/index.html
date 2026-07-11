@@ -1130,14 +1130,20 @@ async function streamChat(apiKey, model, systemPrompt, userQ, bodyEl, statusEl, 
   let acc='', chars=0;
   const cursor=document.createElement('span'); cursor.className='cursor-blink';
 
+  // 超时保护：整个请求（含流式读取）最多 12 分钟；到点自动中止，避免迟迟无响应时前端无限空转。
+  const ac = new AbortController();
+  const HARD_TIMEOUT_MS = 12*60*1000;
+  const killer = setTimeout(()=>{ try{ ac.abort(); }catch(_){} }, HARD_TIMEOUT_MS);
+
   let resp;
   try{
     resp = await fetch(apiUrl(model), {
       method:'POST',
       headers:{ 'Content-Type':'application/json', 'Authorization':'Bearer '+apiKey },
-      body: JSON.stringify(buildPayload(model, systemPrompt, userQ))
+      body: JSON.stringify(buildPayload(model, systemPrompt, userQ)),
+      signal: ac.signal
     });
-  }catch(e){ statusEl.textContent='网络错误'; throw new Error('网络请求失败：'+e.message); }
+  }catch(e){ clearTimeout(killer); statusEl.textContent='网络错误'; throw new Error(e.name==='AbortError'?'超时：12分钟内没有完成，已中止（深度思考档+长文本可能过慢，建议改用快速档，或稍后重试）':'网络请求失败：'+e.message); }
 
   if(!resp.ok){
     let detail='';
@@ -1197,7 +1203,15 @@ async function streamChat(apiKey, model, systemPrompt, userQ, bodyEl, statusEl, 
       }catch(_){}
     }
   }
-  }finally{ clearInterval(waitTimer); }
+  }catch(e){
+    clearInterval(waitTimer); clearTimeout(killer); cursor.remove();
+    if(e.name==='AbortError'){
+      // 超时中止：如果已经收到部分正文，保留；否则报超时
+      if(acc){ statusEl.textContent='✓ 部分完成（超时截断）'; return { text:acc, chars, thinkChars, secs:parseFloat(((Date.now()-t0)/1000).toFixed(1)) }; }
+      statusEl.textContent='超时'; throw new Error('超时：12分钟内没有完成，已中止（深度思考档+长文本可能过慢，建议改用快速档，或稍后重试）');
+    }
+    statusEl.textContent='读取中断'; throw new Error('响应读取中断：'+e.message);
+  }finally{ clearInterval(waitTimer); clearTimeout(killer); }
   cursor.remove();
   const secs=((Date.now()-t0)/1000).toFixed(1);
   if(!acc){
