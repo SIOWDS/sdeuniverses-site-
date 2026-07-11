@@ -157,7 +157,7 @@ footer{border-top:1px solid var(--border);text-align:center;padding:30px 20px 44
     </div>
     <div class="key-hint">
       <b>Key 只存在你的浏览器本地,绝不上传任何服务器</b> · 计算直接在你的浏览器里进行<br>
-      请根据下方选择的模型，填入对应厂商的 Key：<a href="https://platform.deepseek.com" target="_blank" rel="noopener">DeepSeek 申请 →</a> · <a href="https://open.bigmodel.cn" target="_blank" rel="noopener">智谱 GLM 申请 →</a>（都充值几十元即可体验）
+      请根据下方选择的模型，填入对应厂商的 Key：<a href="https://platform.deepseek.com" target="_blank" rel="noopener">DeepSeek 申请 →</a> · <a href="https://open.bigmodel.cn" target="_blank" rel="noopener">智谱 GLM 申请 →</a> · <a href="https://platform.moonshot.cn" target="_blank" rel="noopener">月之暗面 Kimi 申请 →</a>（都充值几十元即可体验）
     </div>
   </div>
 
@@ -177,6 +177,8 @@ footer{border-top:1px solid var(--border);text-align:center;padding:30px 20px 44
       <optgroup label="智谱 GLM">
         <option value="glm:pro">智谱 GLM-5 · 深度思考(最强)</option>
         <option value="glm:flash">智谱 GLM-4-Flash · 快速</option>
+        <option value="kimi:pro">月之暗面 Kimi K2.6 · 最新最强(256K)</option>
+        <option value="kimi:flash">月之暗面 Kimi (moonshot-v1-32k) · 快速</option>
       </optgroup>
     </select>
   </div>
@@ -300,6 +302,8 @@ footer{border-top:1px solid var(--border);text-align:center;padding:30px 20px 44
               <optgroup label="智谱 GLM">
                 <option value="glm:pro">智谱 GLM-5 · 深度思考</option>
                 <option value="glm:flash">智谱 GLM-4-Flash · 快速</option>
+                <option value="kimi:pro">月之暗面 Kimi K2.6 · 最新最强</option>
+                <option value="kimi:flash">月之暗面 Kimi (v1-32k) · 快速</option>
               </optgroup>
             </select>
           </div>
@@ -620,7 +624,8 @@ function plainPrompt(dim, idx){ return PLAIN_SYSTEM + '\n\n【本次作答角度
 // 多厂商 API 地址
 const API_URLS = {
   ds:  "https://api.deepseek.com/v1/chat/completions",
-  glm: "https://open.bigmodel.cn/api/paas/v4/chat/completions"
+  glm: "https://open.bigmodel.cn/api/paas/v4/chat/completions",
+  kimi:"https://api.moonshot.cn/v1/chat/completions"
 };
 // 解析 "厂商:档位" → {vendor, tier}
 function parseModel(sel){
@@ -654,6 +659,15 @@ function buildPayload(sel, systemPrompt, userQ){
     } else {
       base.model = 'glm-4-flash';
       base.temperature = 0.7;
+    }
+  } else if(vendor === 'kimi'){
+    // 月之暗面 Kimi（国内站 api.moonshot.cn，OpenAI 兼容）
+    if(tier === 'pro'){
+      base.model = 'kimi-k2.6';           // 最新最强·256K
+      base.temperature = 0.6;
+    } else {
+      base.model = 'moonshot-v1-32k';     // 经典长文款
+      base.temperature = 0.6;
     }
   }
   return base;
@@ -689,8 +703,14 @@ const errBox=$('errBox');
 
 // Key 本地持久化
 // 两家的 Key 分开保存；切换模型时自动切换对应厂商的 Key
-function keyStoreName(){ return parseModel(modelSel.value).vendor==='glm' ? 'sde_glm_key' : 'sde_ds_key'; }
-function vendorName(){ return parseModel(modelSel.value).vendor==='glm' ? '智谱' : 'DeepSeek'; }
+function keyStoreName(){
+  const v = parseModel(modelSel.value).vendor;
+  return v==='glm' ? 'sde_glm_key' : v==='kimi' ? 'sde_kimi_key' : 'sde_ds_key';
+}
+function vendorName(){
+  const v = parseModel(modelSel.value).vendor;
+  return v==='glm' ? '智谱' : v==='kimi' ? '月之暗面 Kimi' : 'DeepSeek';
+}
 function refreshKeyUI(){
   apiKeyEl.value = localStorage.getItem(keyStoreName()) || '';
   const lbl = $('keyLabel');
@@ -865,7 +885,7 @@ async function run(){
   const sdeStats  =[results[1],results[3],results[5]].filter(x=>x&&x.chars>0);
   window._lastResult = {
     question: q,
-    model: ({'ds:pro':'DeepSeek V4 Pro（深度思考）','ds:flash':'DeepSeek V4 Flash','glm:pro':'智谱 GLM-5（深度思考）','glm:flash':'智谱 GLM-4-Flash'})[model] || model,
+    model: ({'ds:pro':'DeepSeek V4 Pro（深度思考）','ds:flash':'DeepSeek V4 Flash','glm:pro':'智谱 GLM-5（深度思考）','glm:flash':'智谱 GLM-4-Flash','kimi:pro':'月之暗面 Kimi K2.6','kimi:flash':'月之暗面 Kimi (v1-32k)'})[model] || model,
     rows: [0,1,2].map(i=>({
       view: viewNames[i],
       plain: (results[i*2]&&results[i*2].text)||'',
@@ -1195,8 +1215,14 @@ if(paperPdfBtn){
 
 // ============ 四阶：审稿 → 改稿 循环打磨（审稿换第二个模型）============
 // Key 按厂商取用（复用两家分存的 localStorage）
-function vendorKeyName(sel){ return parseModel(sel).vendor==='glm' ? 'sde_glm_key' : 'sde_ds_key'; }
-function vendorLabel(sel){ return parseModel(sel).vendor==='glm' ? '智谱 GLM' : 'DeepSeek'; }
+function vendorKeyName(sel){
+  const v = parseModel(sel).vendor;
+  return v==='glm' ? 'sde_glm_key' : v==='kimi' ? 'sde_kimi_key' : 'sde_ds_key';
+}
+function vendorLabel(sel){
+  const v = parseModel(sel).vendor;
+  return v==='glm' ? '智谱 GLM' : v==='kimi' ? '月之暗面 Kimi' : 'DeepSeek';
+}
 
 // 打开审稿弹框：默认预选“另一个厂商”的 pro 档，并带出其已存 Key
 function openReviewModal(){
