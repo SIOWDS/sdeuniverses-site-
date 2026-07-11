@@ -339,6 +339,12 @@ footer{border-top:1px solid var(--border);text-align:center;padding:30px 20px 44
       <div style="font-size:12px;color:#8B98A5;margin-top:10px">💡 两位审稿人必须都设定好、且用不同基底，才能开始生产四篇。若某评审基底的 Key 与你之前填过的相同，会自动带出，无需重复填。</div>
     </div>
 
+    <!-- 最后开始按钮：审稿人设定好后，点这里才真正启动四篇生成 -->
+    <div id="fourStartRow" style="text-align:center;margin-bottom:18px">
+      <button id="fourStartBtn" style="background:linear-gradient(135deg,#C0392B,#E05A47);color:#fff;font-weight:700;font-size:15px;border:none;border-radius:9px;padding:14px 40px;cursor:pointer;letter-spacing:0.03em;box-shadow:0 4px 16px rgba(192,57,43,0.4)">✅ 两位审稿人已设定好 · 开始生成四篇论文</button>
+      <div style="font-size:12px;color:#8B98A5;margin-top:8px">先在上面选好两位审稿人的基底、填好各自的 Key，确认无误后再点此开始。一旦开始，四篇约需 10-30 分钟，请勿关闭页面。</div>
+    </div>
+
     <!-- 四篇结果 -->
     <div id="fourPapers"></div>
 
@@ -1389,12 +1395,29 @@ async function runOnePaper(cfg){
 }
 
 window._fourPapers = null;
+// 第一步：点"📚四篇论文并发生成"→ 只展开面板、显示审稿配置，不开跑（让用户从容设定审稿人）
 const fourPapersBtn = $('fourPapersBtn');
 if(fourPapersBtn){
-  fourPapersBtn.addEventListener('click', async ()=>{
+  fourPapersBtn.addEventListener('click', ()=>{
     const r = window._lastResult, em = window._lastEmerge;
     if(!r || !r.rows || r.rows.length<3){ showErr('请先生成六篇小论文'); return; }
     if(!em){ showErr('请先完成二阶涌现（得到新典范），四篇论文里有一篇要写它'); return; }
+    // 只展开面板并滚动过去，把"设定审稿→开始"交给面板里的"最后开始"按钮
+    $('fourWrap').style.display='block';
+    $('fourStartRow').style.display='block';
+    $('fourDlRow').style.display='none';
+    $('fourStatus').textContent = '请在下方设定好两位审稿人，再点"开始生成四篇论文"';
+    $('fourWrap').scrollIntoView({behavior:'smooth', block:'start'});
+  });
+}
+
+// 第二步：点"✅ 开始生成四篇论文"→ 校验审稿A/B都设定好且不同 → 真正启动四篇并发
+const fourStartBtn = $('fourStartBtn');
+if(fourStartBtn){
+  fourStartBtn.addEventListener('click', async ()=>{
+    const r = window._lastResult, em = window._lastEmerge;
+    if(!r || !r.rows || r.rows.length<3){ showErr('请先生成六篇小论文'); return; }
+    if(!em){ showErr('请先完成二阶涌现（得到新典范）'); return; }
 
     const writeSel = modelSel.value;               // 写作/主笔 = 当前主基底
     const writeKey = keyForVendor(writeSel);
@@ -1402,17 +1425,16 @@ if(fourPapersBtn){
 
     const revA = $('fourRevA').value, revAKey = keyForVendor(revA, $('fourRevAKey').value);
     const revB = $('fourRevB').value, revBKey = keyForVendor(revB, $('fourRevBKey').value);
-    // 强制：两个审稿基底都必须设定好（各有Key）且互不相同，才允许开始生产四篇
+    // 强制：两个审稿基底都必须设定好（各有Key）且互不相同
     if(!revA || !revAKey){ showErr('请先设定审稿人 A：选好基底并填入对应的 Key'); $('fourRevAKey').focus(); return; }
     if(!revB || !revBKey){ showErr('请先设定审稿人 B：选好基底并填入对应的 Key（两位审稿人都设定好，才能开始生产四篇论文）'); $('fourRevBKey').focus(); return; }
     if(revA === revB){ showErr('审稿人 A 与 B 请选择两个不同的基底——两位审稿人用不同基底，才能多一双眼睛照出盲区'); $('fourRevB').focus(); return; }
     const useB = true;
 
-    $('fourWrap').style.display='block';
-    $('fourWrap').scrollIntoView({behavior:'smooth', block:'start'});
     $('fourDlRow').style.display='none';
+    fourStartBtn.disabled = true;
+    fourStartBtn.textContent = '⏳ 四篇并发生成中（含评审打磨，约10-30分钟，请勿关闭）…';
     fourPapersBtn.disabled = true;
-    fourPapersBtn.textContent = '⏳ 四篇并发生成中（含评审打磨，约10-30分钟，请勿关闭）…';
     $('fourStatus').textContent = '四篇同时进行中…';
 
     // 四篇的写作输入
@@ -1451,8 +1473,9 @@ if(fourPapersBtn){
     }));
     const okCount = window._fourPapers.filter(p=>p.text).length;
 
+    fourStartBtn.disabled = false;
+    fourStartBtn.textContent = '✅ 两位审稿人已设定好 · 开始生成四篇论文';
     fourPapersBtn.disabled = false;
-    fourPapersBtn.textContent = '📚 四篇论文并发生成（各1万字·含评审打磨）';
     $('fourStatus').textContent = '完成：'+okCount+'/4 篇成功';
     if(okCount>0) $('fourDlRow').style.display='block';
   });
