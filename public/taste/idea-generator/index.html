@@ -656,8 +656,13 @@ const SDE_OUTPUT_SPEC = `
 
 function sdePrompt(dim, idx, focus){
   let p = SDE_BASE + SDE_OUTPUT_SPEC + '\n\n【请特别侧重这个角度】\n' + SHARED_VIEWS[dim][idx];
-  if(typeof focus==='number' && FOCUS_NAMES[dim] && FOCUS_NAMES[dim][idx]){
-    p += '\n\n【本次尤其聚焦其中这一个要点，把它往深里打】\n在上面这个角度的三个要点里，本次请重点侧重「'+FOCUS_NAMES[dim][idx][focus]+'」这一个，把它作为切入的主锋刃深入下去，另外两个要点作为背景陪衬即可，不必平均用力——与其三个都泛泛扫过，不如抓住这一个往深处凿出一个真正锋利的判断。';
+  if(Array.isArray(focus) && focus.length && FOCUS_NAMES[dim] && FOCUS_NAMES[dim][idx]){
+    const names = focus.map(f=>'「'+FOCUS_NAMES[dim][idx][f]+'」').join(' 与 ');
+    if(focus.length===1){
+      p += '\n\n【本次尤其聚焦其中这一个要点，把它往深里打】\n在上面这个角度的三个要点里，本次请重点侧重 '+names+' 这一个，把它作为切入的主锋刃深入下去，另外两个要点作为背景陪衬即可，不必平均用力——与其三个都泛泛扫过，不如抓住这一个往深处凿出一个真正锋利的判断。';
+    } else {
+      p += '\n\n【本次尤其聚焦其中这两个要点，把它们的相互作用往深里打】\n在上面这个角度的三个要点里，本次请重点侧重 '+names+' 这两个，尤其要盯住它们之间的张力与相互作用（它们如何彼此牵制、彼此成就、或彼此撕扯），把这一对的纠缠作为切入的主锋刃深入下去，剩下那一个要点作为背景即可，不必平均用力——抓住这两个的相互作用，往深处凿出一个真正锋利的判断。';
+    }
   }
   return p;
 }
@@ -1000,8 +1005,9 @@ const PLAIN_SYSTEM = `你是一个乐于助人、见识广博的 AI 助手。请
 // 左边（无内功）= 普通助手设定 + 完全相同的角度提问
 function plainPrompt(dim, idx, focus){
   let p = PLAIN_SYSTEM + '\n\n【本次作答角度】\n' + SHARED_VIEWS[dim][idx];
-  if(typeof focus==='number' && FOCUS_NAMES[dim] && FOCUS_NAMES[dim][idx]){
-    p += '\n\n【本次尤其聚焦其中这一个要点】\n在上面这个角度的三个要点里，本次请重点侧重「'+FOCUS_NAMES[dim][idx][focus]+'」这一个，深入展开，另外两个作为背景即可。';
+  if(Array.isArray(focus) && focus.length && FOCUS_NAMES[dim] && FOCUS_NAMES[dim][idx]){
+    const names = focus.map(f=>'「'+FOCUS_NAMES[dim][idx][f]+'」').join(' 与 ');
+    p += '\n\n【本次尤其聚焦'+(focus.length===1?'其中这一个要点':'其中这两个要点及其相互作用')+'】\n在上面这个角度的三个要点里，本次请重点侧重 '+names+'，深入展开，其余作为背景即可。';
   }
   return p;
 }
@@ -1120,9 +1126,15 @@ function pick3(){
   const nums = [0,1,2];
   for(let i=nums.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [nums[i],nums[j]]=[nums[j],nums[i]]; }
   const dims = ['show','diff','entangle'];
-  // 抽中宫格后，再为每个宫格在它内部的三个要点里随机侧重一个（focus 0/1/2）——
-  // 这样即使两次抽到同一个宫格（如都是S1），侧重点也不同（一次重点打"对比"、一次重点打"分布"），金点子更聚焦、更有变化
-  return dims.map((dim,i)=>({ dim, idx: nums[i], focus: Math.floor(Math.random()*3) }));
+  // 抽中宫格后，再为每个宫格在它内部的三个要点里随机侧重——可以侧重"一个"，也可以侧重"两个的组合"。
+  // 这样即使两次抽到同一个宫格（如都是S1），侧重点也不同（一次重点打"对比"、一次打"对比+分布"），金点子更聚焦、组合更多变。
+  const pickFocus = ()=>{
+    const three=[0,1,2];
+    for(let i=three.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [three[i],three[j]]=[three[j],three[i]]; }
+    const k = Math.random()<0.5 ? 1 : 2;   // 一半概率侧重1个，一半概率侧重2个
+    return three.slice(0,k).sort((a,b)=>a-b);   // 返回被侧重的要点下标数组，如 [0] 或 [0,2]
+  };
+  return dims.map((dim,i)=>({ dim, idx: nums[i], focus: pickFocus() }));
 }
 const errBox=$('errBox');
 
