@@ -1437,8 +1437,10 @@ async function runOnePaper(cfg){
   const setStat = (t)=>{ if(cfg.statusEl) cfg.statusEl.textContent = t; };
 
   // 论文生成不用"流式蹦字"——正文区不显示逐字过程，只让状态栏"✍ 已生成 N 字"滚动，
-  // 每一步完成后再把整篇一次性显示到正文区。用一个隐藏的 sink 接收流式输出、ticker 读它的字数。
-  let sink = { textContent:'', innerHTML:'' };
+  // 每一步完成后再把整篇一次性显示到正文区。
+  // sink 必须是一个真实的 DOM 元素（streamChat 内部会对它调用 appendChild/scrollTop 等 DOM 方法），
+  // 只是不挂到页面上、用户看不到；不能用纯对象，否则 appendChild 会抛 TypeError 导致整篇失败。
+  let sink = document.createElement('div');
   let ticker = null;
   const startTicker = ()=>{
     stopTicker();
@@ -1452,7 +1454,7 @@ async function runOnePaper(cfg){
 
   // 1. 写初稿（初稿的写作规范可由 cfg.draftPrompt 指定；不传则默认用 paper1wPrompt。
   //    第一批用默认；第二批传 upliftPrompt——用发生引擎写初稿冲150，再走同样的双审+改稿）
-  sink = { textContent:'', innerHTML:'' };
+  sink = document.createElement('div');
   startTicker();
   const draftSys = cfg.draftPrompt || paper1wPrompt();
   let draft;
@@ -1465,16 +1467,18 @@ async function runOnePaper(cfg){
   if(cfg.bodyEl) cfg.bodyEl.innerHTML = renderPaperText(paperText);   // 初稿完成，一次性显示
 
   // 2. 双审（并行，静默——评审意见不显示在正文，正文保持初稿）
+  //    审稿的 bodyEl 同样要真实 DOM 元素（streamChat 会 appendChild）；statusEl/metaEl 用 dummy 即可。
   setStat('✍ 初稿 ' + paperText.length + ' 字 · 审稿中…');
   let revA='', revB='';
+  const sinkA = document.createElement('div'), sinkB = document.createElement('div');
   const jobs=[];
   jobs.push(
-    streamChat(cfg.revAKey, cfg.revA, reviewPrompt(), buildReviewInput(paperText), dummy, dummy, dummy)
+    streamChat(cfg.revAKey, cfg.revA, reviewPrompt(), buildReviewInput(paperText), sinkA, dummy, dummy)
       .then(r=>{ revA=r.text||''; }).catch(e=>{ revA=''; })
   );
   if(cfg.revB && cfg.revBKey){
     jobs.push(
-      streamChat(cfg.revBKey, cfg.revB, reviewPrompt(), buildReviewInput(paperText), dummy, dummy, dummy)
+      streamChat(cfg.revBKey, cfg.revB, reviewPrompt(), buildReviewInput(paperText), sinkB, dummy, dummy)
         .then(r=>{ revB=r.text||''; }).catch(e=>{ revB=''; })
     );
   }
@@ -1484,7 +1488,7 @@ async function runOnePaper(cfg){
   if(!revA && !revB){ setStat('✍ 完成 ' + paperText.length + ' 字'); if(cfg.bodyEl) cfg.bodyEl.innerHTML = renderPaperText(paperText); return { title:cfg.title, text:paperText }; }
 
   // 3. 主笔据两份意见改一次（同样不流式，只滚动字数，完成后一次性显示）
-  sink = { textContent:'', innerHTML:'' };
+  sink = document.createElement('div');
   setStat('✍ 改稿中…');
   startTicker();
   let finalText = paperText;
