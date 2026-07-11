@@ -1436,13 +1436,15 @@ async function runOnePaper(cfg){
   const dummy = { textContent:'', innerHTML:'' };
   const setStat = (t)=>{ if(cfg.statusEl) cfg.statusEl.textContent = t; };
 
-  // 简化：只显示"✍ 已生成 N 字"的滚动字数。开一个轮询，实时读正文已有字数。
-  // streamChat 的 statusEl 传 dummy（屏蔽它内部那套"等待/深度思考/生成中"花哨状态），正文 bodyEl 照旧滚动。
+  // 论文生成不用"流式蹦字"——正文区不显示逐字过程，只让状态栏"✍ 已生成 N 字"滚动，
+  // 每一步完成后再把整篇一次性显示到正文区。用一个隐藏的 sink 接收流式输出、ticker 读它的字数。
+  let sink = { textContent:'', innerHTML:'' };
   let ticker = null;
   const startTicker = ()=>{
     stopTicker();
+    if(cfg.bodyEl) cfg.bodyEl.innerHTML = '<span class="placeholder">✍ 生成中，请稍候……</span>';
     ticker = setInterval(()=>{
-      const n = (cfg.bodyEl && cfg.bodyEl.textContent ? cfg.bodyEl.textContent.length : 0);
+      const n = (sink.textContent ? sink.textContent.length : 0);
       setStat(n>0 ? ('✍ 已生成 ' + n + ' 字') : '✍ 生成中…');
     }, 500);
   };
@@ -1450,17 +1452,19 @@ async function runOnePaper(cfg){
 
   // 1. 写初稿（初稿的写作规范可由 cfg.draftPrompt 指定；不传则默认用 paper1wPrompt。
   //    第一批用默认；第二批传 upliftPrompt——用发生引擎写初稿冲150，再走同样的双审+改稿）
+  sink = { textContent:'', innerHTML:'' };
   startTicker();
   const draftSys = cfg.draftPrompt || paper1wPrompt();
   let draft;
   try{
-    draft = await streamChat(cfg.writeKey, cfg.writeSel, draftSys, cfg.writeInput, cfg.bodyEl, dummy, dummy);
+    draft = await streamChat(cfg.writeKey, cfg.writeSel, draftSys, cfg.writeInput, sink, dummy, dummy);
   }catch(e){ stopTicker(); setStat('✗ 生成失败：'+e.message); throw e; }
+  stopTicker();
   let paperText = draft.text || '';
-  if(!paperText){ stopTicker(); setStat('✗ 未产出内容'); throw new Error('初稿为空'); }
+  if(!paperText){ setStat('✗ 未产出内容'); throw new Error('初稿为空'); }
+  if(cfg.bodyEl) cfg.bodyEl.innerHTML = renderPaperText(paperText);   // 初稿完成，一次性显示
 
   // 2. 双审（并行，静默——评审意见不显示在正文，正文保持初稿）
-  stopTicker();
   setStat('✍ 初稿 ' + paperText.length + ' 字 · 审稿中…');
   let revA='', revB='';
   const jobs=[];
@@ -1477,18 +1481,20 @@ async function runOnePaper(cfg){
   await Promise.all(jobs);
 
   // 若两审都失败，保留初稿
-  if(!revA && !revB){ setStat('✍ 完成 ' + paperText.length + ' 字'); cfg.bodyEl.innerHTML = renderPaperText(paperText); return { title:cfg.title, text:paperText }; }
+  if(!revA && !revB){ setStat('✍ 完成 ' + paperText.length + ' 字'); if(cfg.bodyEl) cfg.bodyEl.innerHTML = renderPaperText(paperText); return { title:cfg.title, text:paperText }; }
 
-  // 3. 主笔据两份意见改一次（正文重新滚动，字数重新计）
+  // 3. 主笔据两份意见改一次（同样不流式，只滚动字数，完成后一次性显示）
+  sink = { textContent:'', innerHTML:'' };
+  setStat('✍ 改稿中…');
   startTicker();
   let finalText = paperText;
   try{
-    const rev = await streamChat(cfg.writeKey, cfg.writeSel, revisePrompt(), buildReviseInputDual(paperText, revA, revB), cfg.bodyEl, dummy, dummy);
+    const rev = await streamChat(cfg.writeKey, cfg.writeSel, revisePrompt(), buildReviseInputDual(paperText, revA, revB), sink, dummy, dummy);
     if(rev.text) finalText = rev.text;
   }catch(e){ /* 改稿失败则保留初稿 */ }
   stopTicker();
 
-  cfg.bodyEl.innerHTML = renderPaperText(finalText);
+  if(cfg.bodyEl) cfg.bodyEl.innerHTML = renderPaperText(finalText);
   setStat('✍ 完成 ' + finalText.length + ' 字');
   return { title:cfg.title, text:finalText };
 }
