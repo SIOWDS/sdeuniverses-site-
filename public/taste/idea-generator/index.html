@@ -1108,20 +1108,48 @@ async function getReflection(writeSel, writeKey, onProgress){
 }
 
 // 整轮只写一次《从发现到发生》心得，六篇→涌现→四篇→第二批全部复用同一份。
-// 第一次调用（通常是六篇）真正写；之后各环节直接返回已写好的那份（认知连贯、不重复耗时）。
-// key 用"基底+问题"标识：同一基底同一问题算同一轮；换基底或换问题则重写。
-let _sharedReflection = { key:'', text:'', promise:null };
-function reflectionRoundKey(writeSel){ return (writeSel||'') + '|' + (($('question')&&$('question').value||'').trim()); }
+// 心得是"该基底对发生学的内化自省"，与用户具体问题无关（prompt 里不含问题）——故【按基底】缓存：
+//   换问题不重写、换基底才重写。第一次写完即存入本地磁盘(localStorage)，下次刷新/隔天自动载入、跳过写作。
+// 三级缓存：① 内存(同会话最快) → ② 本地磁盘(跨刷新/跨会话) → ③ 真正写一次(写完存盘)。
+const REFLECT_LS_VER = 'v1';   // 内功或心得规范升级时 +1，旧缓存自动失效重写
+function reflectLsKey(writeSel){ return 'sde_reflect_' + REFLECT_LS_VER + '_' + (writeSel || 'unknown'); }
+function loadReflectLS(writeSel){ try{ const t = localStorage.getItem(reflectLsKey(writeSel)); return (t && t.length > 1500) ? t : ''; }catch(_){ return ''; } }
+function saveReflectLS(writeSel, text){ try{ if(text && text.length > 1500) localStorage.setItem(reflectLsKey(writeSel), text); }catch(_){} }
+// 供手动清除某基底的本地心得、强制下次重写（控制台可调：clearReflect('claude:pro') 或 clearReflect() 清全部）
+function clearReflect(writeSel){
+  try{
+    if(writeSel){ localStorage.removeItem(reflectLsKey(writeSel)); if(_sharedReflection.key===writeSel){ _sharedReflection={key:'',text:'',promise:null}; } return '已清除 '+writeSel+' 的本地心得'; }
+    Object.keys(localStorage).filter(k=>k.indexOf('sde_reflect_')===0).forEach(k=>localStorage.removeItem(k));
+    _sharedReflection={key:'',text:'',promise:null};
+    return '已清除全部基底的本地心得';
+  }catch(e){ return '清除失败：'+e.message; }
+}
+window.clearReflect = clearReflect;
+
+let _sharedReflection = { key:'', text:'', promise:null, fromCache:false };
+// 心得按"基底"标识（与问题无关）：同一基底算同一份；换基底才重写。
+function reflectionRoundKey(writeSel){ return (writeSel || ''); }
 async function getSharedReflection(writeSel, writeKey, onProgress){
   const rk = reflectionRoundKey(writeSel);
-  // 已写好且是同一轮 → 直接复用
+  // ① 内存缓存（同会话，最快）
   if(_sharedReflection.key===rk && _sharedReflection.text){ if(onProgress) onProgress(_sharedReflection.text.length); return _sharedReflection.text; }
-  // 正在写（同一轮）→ 等它写完，避免并发重复写
   if(_sharedReflection.key===rk && _sharedReflection.promise){ return await _sharedReflection.promise; }
-  // 换轮或首次 → 真正写一次
+  // ② 本地磁盘缓存（跨刷新/跨会话）：命中则秒载、跳过写作
+  const cached = loadReflectLS(writeSel);
+  if(cached){
+    _sharedReflection = { key:rk, text:cached, promise:Promise.resolve(cached), fromCache:true };
+    if(onProgress) onProgress(cached.length);
+    return cached;
+  }
+  // ③ 都没有 → 真正写一次；写成功后存入本地磁盘，供下次自动载入
   _sharedReflection.key = rk;
   _sharedReflection.text = '';
-  _sharedReflection.promise = getReflection(writeSel, writeKey, onProgress).then(txt=>{ _sharedReflection.text = txt || ''; if(!txt){ _sharedReflection.promise = null; } return _sharedReflection.text; });
+  _sharedReflection.fromCache = false;
+  _sharedReflection.promise = getReflection(writeSel, writeKey, onProgress).then(txt=>{
+    _sharedReflection.text = txt || '';
+    if(txt){ saveReflectLS(writeSel, txt); } else { _sharedReflection.promise = null; }
+    return _sharedReflection.text;
+  });
   return await _sharedReflection.promise;
 }
 // 二次提智的输入 = 第一批那篇论文全文
@@ -1636,12 +1664,12 @@ async function run(){
 
   // ═══ 第一阶段：学习内功 · 写《从发现到发生》心得（本轮只写一次，缓存后所有环节复用）═══
   //  这是整个金点子生成的地基：先让基底学习内功、把发生学内化成自己的一篇心得，缓存好，第二阶段才开始生成。
-  //  已缓存（同一基底+同一问题）则瞬间跳过；换基底或换问题才重写。
+  //  已缓存（该基底·本地磁盘或本会话）则瞬间跳过；换基底才重写。心得与具体问题无关，换问题不重写。
   const rb0 = document.getElementById('sixReflectBar');
-  if(rb0){ rb0.style.display='block'; const s=document.getElementById('sixReflectStatus'); if(s) s.textContent='第一阶段 · 基底正在学习内功、写《从发现到发生》心得（约5000字）…写好后缓存，六篇及后续全部复用'; }
+  if(rb0){ rb0.style.display='block'; const s=document.getElementById('sixReflectStatus'); if(s) s.textContent='第一阶段 · 基底正在学习内功、写《从发现到发生》心得（约5000字）…写好后存本地磁盘，下次自动载入'; }
   const sixReflection = await getSharedReflection(model, key, (n)=>{ const s=document.getElementById('sixReflectStatus'); if(s) s.textContent = n>0?('✍ 第一阶段·心得已写 '+n+' 字'):'第一阶段·心得写作中…'; });
-  { const s=document.getElementById('sixReflectStatus'), b=document.getElementById('sixReflectBody');
-    if(sixReflection){ if(s) s.textContent='✓ 第一阶段完成 · 内化 '+sixReflection.length+' 字（本轮六篇→涌现→四篇→第二批全部复用这份心得）'; if(b) b.innerHTML=renderPaperText(sixReflection); }
+  { const s=document.getElementById('sixReflectStatus'), b=document.getElementById('sixReflectBody'); const cachedNote = _sharedReflection.fromCache ? '（✓ 本地缓存·未重写）' : '';
+    if(sixReflection){ if(s) s.textContent='✓ 第一阶段完成 · 内化 '+sixReflection.length+' 字'+cachedNote+'（本轮六篇→涌现→四篇→第二批全部复用这份心得）'; if(b) b.innerHTML=renderPaperText(sixReflection); }
     else { if(s) s.textContent='（第一阶段心得未成功·后续退回常规提智）'; if(b) b.innerHTML='<span class="placeholder">心得生成未成功，后续用常规提智继续'+(_reflectLastErr?('<br><span style="color:#E8897B">失败原因：'+escTxt(_reflectLastErr)+'</span>'):'')+'</span>'; } }
 
   // ═══ 第二阶段：六路并行 · 3视角 × (普通AI + SDE金点子) ═══
@@ -1903,7 +1931,7 @@ if(fourStartBtn){
     reflWrap.style.cssText='border:1px solid rgba(122,47,224,0.35);border-radius:10px;padding:16px 18px;margin-bottom:16px;background:rgba(20,12,30,0.5)';
     reflWrap.innerHTML='<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px"><div style="font-size:14px;font-weight:700;color:#B98CFF">📖 第一次提智·内化：《从发现到发生》</div><div id="reflStatus" style="font-size:12px;color:#8B98A5">写作中…</div></div><div id="reflBody" style="color:#C9B8DC;font-size:13.5px;line-height:1.85;max-height:280px;overflow:auto"><span class="placeholder">正在把发生学内化为自己的理解…</span></div>';
     box0.appendChild(reflWrap);
-    const reflection = await getSharedReflection(writeSel, writeKey, (n)=>{ const el=$('reflStatus'); if(el) el.textContent = n>0?('✍ 已写 '+n+' 字（含复用六篇那次）'):'写作中…'; });
+    const reflection = await getSharedReflection(writeSel, writeKey, (n)=>{ const el=$('reflStatus'); if(el) el.textContent = n>0?('✍ 已写 '+n+' 字（或复用已存的心得）'):'写作中…'; });
     if(reflection){
       $('reflBody').innerHTML = renderPaperText(reflection);
       $('reflStatus').textContent = '✓ 内化完成 '+reflection.length+' 字 · 四篇将带着这份认知来写';
@@ -2026,7 +2054,7 @@ if(upliftBtn){
     ureflWrap.style.cssText='border:1px solid rgba(122,47,224,0.4);border-radius:10px;padding:16px 18px;margin-bottom:16px;background:rgba(20,12,30,0.55)';
     ureflWrap.innerHTML='<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px"><div style="font-size:14px;font-weight:700;color:#B98CFF">📖 第一次提智·内化：《从发现到发生》</div><div id="ureflStatus" style="font-size:12px;color:#8B98A5">写作中…</div></div><div id="ureflBody" style="color:#C9B8DC;font-size:13.5px;line-height:1.85;max-height:280px;overflow:auto"><span class="placeholder">正在把发生学内化为自己的理解…</span></div>';
     ubox0.appendChild(ureflWrap);
-    const ureflection = await getSharedReflection(writeSel, writeKey, (n)=>{ const el=$('ureflStatus'); if(el) el.textContent = n>0?('✍ 已写 '+n+' 字（含复用前面那次）'):'写作中…'; });
+    const ureflection = await getSharedReflection(writeSel, writeKey, (n)=>{ const el=$('ureflStatus'); if(el) el.textContent = n>0?('✍ 已写 '+n+' 字（或复用已存的心得）'):'写作中…'; });
     if(ureflection){
       $('ureflBody').innerHTML = renderPaperText(ureflection);
       $('ureflStatus').textContent = '✓ 内化完成 '+ureflection.length+' 字 · 四篇将带着这份认知做发生引擎';
