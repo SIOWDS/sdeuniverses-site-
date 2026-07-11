@@ -1084,12 +1084,13 @@ const rowEls=[1,2,3].map(n=>({
 // 三个金点子必须分别来自 S、D、E 三个维度各一个（不允许同一维度出现两个）：
 // 先从 S(show)的 S1/S2/S3 随机抽一个，再从 D(diff)的 D1/D2/D3 随机抽一个，再从 E(entangle)的 E1/E2/E3 随机抽一个。
 function pick3(){
-  const out = [];
-  ['show','diff','entangle'].forEach(dim=>{
-    const idx = Math.floor(Math.random()*3);   // 该维度内随机选 0/1/2 → S1/S2/S3、D1/D2/D3、E1/E2/E3
-    out.push({ dim, idx });
-  });
-  return out;   // 顺序固定为 S → D → E
+  // 三个维度 S/D/E 各抽一个子层，且三个子层号(1/2/3)也各不相同——
+  // 即把 [0,1,2] 随机打乱后依次分给 show/diff/entangle，保证出现的是 1、2、3 各一次
+  // （形成一条"对角线"：既跨三维、又跨三层，例如 S1·D2·E3 或 S2·D3·E1，绝不会出现两个相同层号如 S3·D2·E3）
+  const nums = [0,1,2];
+  for(let i=nums.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [nums[i],nums[j]]=[nums[j],nums[i]]; }
+  const dims = ['show','diff','entangle'];
+  return dims.map((dim,i)=>({ dim, idx: nums[i] }));   // 顺序固定为 S → D → E，层号为 [0,1,2] 的一个排列
 }
 const errBox=$('errBox');
 
