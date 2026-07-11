@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kimi 基底 · 浏览器直连测试 | SDE Universes 内部工具</title>
+<style>
+:root{--bg:#0E1116;--card:#171B22;--line:#2A3240;--txt:#D6DCE6;--muted:#8B94A4;--cyan:#3BA6C8;--green:#3BC873;--red:#E2544A;--amber:#D8A84E}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--txt);font-family:-apple-system,"PingFang SC","Noto Sans CJK SC",system-ui,sans-serif;line-height:1.7;padding:24px;max-width:920px;margin:0 auto}
+h1{font-size:22px;margin-bottom:4px;color:#fff}
+.sub{color:var(--muted);font-size:14px;margin-bottom:24px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:20px;margin-bottom:18px}
+.card h2{font-size:15px;color:var(--cyan);margin-bottom:14px;letter-spacing:0.03em}
+label{display:block;font-size:13px;color:var(--muted);margin:12px 0 6px}
+input,select{width:100%;background:#0E1116;border:1px solid var(--line);color:var(--txt);padding:10px 12px;border-radius:5px;font-size:14px;font-family:inherit}
+input:focus,select:focus{outline:none;border-color:var(--cyan)}
+.row{display:flex;gap:12px;flex-wrap:wrap}
+.row>div{flex:1;min-width:200px}
+button{background:var(--cyan);color:#001018;border:none;padding:12px 24px;border-radius:5px;font-size:15px;font-weight:600;cursor:pointer;margin-top:18px;font-family:inherit}
+button:hover{background:#4FBCDE}
+button:disabled{opacity:0.4;cursor:not-allowed}
+button.ghost{background:transparent;border:1px solid var(--line);color:var(--muted);padding:8px 16px;font-size:13px;font-weight:400;margin-top:0}
+.result{margin-top:16px}
+.endpoint-test{border:1px solid var(--line);border-radius:6px;padding:14px 16px;margin-bottom:12px;background:#0E1116}
+.endpoint-test .name{font-size:13px;color:var(--txt);font-family:ui-monospace,Menlo,monospace;margin-bottom:8px;word-break:break-all}
+.badge{display:inline-block;padding:2px 10px;border-radius:12px;font-size:12px;font-weight:600;margin-left:8px}
+.badge.ok{background:rgba(59,200,115,0.15);color:var(--green)}
+.badge.fail{background:rgba(226,84,74,0.15);color:var(--red)}
+.badge.wait{background:rgba(216,168,78,0.15);color:var(--amber)}
+.badge.idle{background:rgba(139,148,164,0.12);color:var(--muted)}
+.detail{font-size:12.5px;color:var(--muted);font-family:ui-monospace,Menlo,monospace;white-space:pre-wrap;word-break:break-all;margin-top:8px;padding:10px;background:#080A0E;border-radius:4px;max-height:200px;overflow:auto;line-height:1.55}
+.verdict{padding:14px 16px;border-radius:6px;margin-top:8px;font-size:14px;line-height:1.75}
+.verdict.pass{background:rgba(59,200,115,0.1);border:1px solid rgba(59,200,115,0.35);color:#9FE8BE}
+.verdict.blocked{background:rgba(226,84,74,0.1);border:1px solid rgba(226,84,74,0.35);color:#F0A9A3}
+.verdict.mixed{background:rgba(216,168,78,0.1);border:1px solid rgba(216,168,78,0.35);color:#EBD199}
+.note{font-size:12.5px;color:var(--muted);margin-top:14px;line-height:1.7}
+code{background:#0E1116;padding:1px 6px;border-radius:3px;font-size:12.5px;color:var(--amber);font-family:ui-monospace,Menlo,monospace}
+.warn{background:rgba(216,168,78,0.08);border:1px solid rgba(216,168,78,0.25);border-radius:6px;padding:12px 14px;font-size:13px;color:#EBD199;margin-bottom:18px}
+a{color:var(--cyan)}
+</style>
+</head>
+<body>
+
+<h1>Kimi 基底 · 浏览器直连测试</h1>
+<div class="sub">测试"月之暗面 Kimi"能否像 DeepSeek / GLM 那样,从网页前端直接调用(CORS 是否放行)。SDE Universes 内部工具。</div>
+
+<div class="warn">
+⚠️ <b>关于 Key 安全</b>:本页面纯前端运行,你填的 Key 只在你自己的浏览器里用于发起测试请求,<b>不会上传到本站服务器、不写日志、不落库</b>。但为稳妥起见,建议用一个<b>额度有限的测试 Key</b>,测完可在月之暗面后台删除。测试只发一次极短请求(约几十 token),几乎不耗额度。
+</div>
+
+<div class="card">
+  <h2>① 填入测试参数</h2>
+  <label>Kimi API Key（sk- 开头）</label>
+  <input id="key" type="password" placeholder="sk-xxxxxxxxxxxxxxxxxxxxxxxx" autocomplete="off">
+  <div class="row">
+    <div>
+      <label>模型（可改）</label>
+      <select id="model">
+        <option value="kimi-k2-0905-preview">kimi-k2-0905-preview（稳定·256K）</option>
+        <option value="moonshot-v1-8k">moonshot-v1-8k（经典轻量）</option>
+        <option value="kimi-k2.5">kimi-k2.5（多模态·较新）</option>
+        <option value="kimi-k2.6">kimi-k2.6（最新最强）</option>
+        <option value="kimi-latest">kimi-latest（始终指向最新）</option>
+      </select>
+    </div>
+    <div>
+      <label>测试请求内容</label>
+      <input id="prompt" type="text" value="用一句话证明你是Kimi,并说出1+1等于几。">
+    </div>
+  </div>
+  <button id="run" onclick="runTest()">开始测试两个官方域名 →</button>
+</div>
+
+<div id="results"></div>
+
+<div class="card">
+  <h2>说明:测试意味着什么</h2>
+  <div class="note">
+    <b>为什么测两个域名?</b> Kimi 官方有国际站 <code>api.moonshot.ai</code> 和国内站 <code>api.moonshot.cn</code>,两者 Key 未必通用、CORS 策略也可能不同。哪个能从浏览器直连是关键未知数,所以两个都测。<br><br>
+    <b>三种可能结果:</b><br>
+    • <span class="badge ok">通过</span> —— 该域名放行了 CORS,浏览器能直连,<b>可以像 DeepSeek/GLM 一样接入发生器</b>。<br>
+    • <span class="badge fail">被 CORS 拦</span> —— 请求发出去了,但浏览器因跨域策略拦下响应。这种情况<b>无法前端直连</b>,需要走后端中转(Cloudflare Worker 代理)。<br>
+    • <span class="badge fail">Key/其它错误</span> —— 能连通但 Key 无效、模型名错、或额度不足(此时 CORS 其实是放行的,换正确 Key 即可)。<br><br>
+    <b>如何区分"CORS 拦"和"其它错误"?</b> 若浏览器控制台(F12)报 <code>CORS policy</code> / <code>Failed to fetch</code> 且本页显示"网络层失败",基本是 CORS 拦;若返回了 JSON 错误(如 401/404),说明 CORS 放行了,只是参数问题。本页会尽量替你判断。
+  </div>
+</div>
+
+<script>
+const ENDPOINTS = [
+  { name: "国际站  https://api.moonshot.ai/v1/chat/completions", url: "https://api.moonshot.ai/v1/chat/completions" },
+  { name: "国内站  https://api.moonshot.cn/v1/chat/completions", url: "https://api.moonshot.cn/v1/chat/completions" }
+];
+
+function esc(s){ return (s||'').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+async function testEndpoint(ep, key, model, prompt){
+  const box = document.getElementById('ep-'+btoa(ep.url).replace(/=/g,''));
+  const badge = box.querySelector('.badge');
+  const detail = box.querySelector('.detail');
+  badge.className='badge wait'; badge.textContent='测试中…';
+  detail.textContent='正在发送请求…';
+
+  const payload = {
+    model: model,
+    messages: [
+      { role:"system", content:"You are Kimi, an AI assistant created by Moonshot AI." },
+      { role:"user", content: prompt }
+    ],
+    max_tokens: 60,
+    temperature: 0.6,
+    stream: false
+  };
+
+  const t0 = performance.now();
+  let resp;
+  try {
+    resp = await fetch(ep.url, {
+      method:"POST",
+      headers:{ "Content-Type":"application/json", "Authorization":"Bearer "+key },
+      body: JSON.stringify(payload)
+    });
+  } catch(err){
+    // 网络层失败 —— 极可能是 CORS 拦截或域名不可达
+    const ms = Math.round(performance.now()-t0);
+    badge.className='badge fail'; badge.textContent='被 CORS 拦 / 不可达';
+    detail.textContent='❌ 网络层失败（'+ms+'ms）\n'+err.name+': '+err.message+
+      '\n\n判断:这通常是浏览器 CORS 跨域拦截,或域名从你的网络不可达。\n请按 F12 打开控制台,若看到 "CORS policy" / "blocked by CORS" 字样,即确认是 CORS 拦截 —— 该域名无法前端直连,需走后端代理。';
+    return { url:ep.url, ok:false, kind:'cors' };
+  }
+
+  const ms = Math.round(performance.now()-t0);
+  let bodyText='';
+  try { bodyText = await resp.text(); } catch(e){ bodyText='(无法读取响应体)'; }
+
+  if(resp.ok){
+    let answer='';
+    try { const j=JSON.parse(bodyText); answer = j.choices?.[0]?.message?.content || '(无 content 字段)'; } catch(e){ answer='(响应非 JSON)'; }
+    badge.className='badge ok'; badge.textContent='通过 · '+resp.status;
+    detail.textContent='✅ CORS 放行,调用成功!（'+ms+'ms）\n\nKimi 回答:\n"'+answer.trim()+'"\n\n结论:此域名可从浏览器前端直连,可像 DeepSeek/GLM 一样接入金点子发生器。';
+    return { url:ep.url, ok:true, kind:'pass', answer };
+  } else {
+    // HTTP 错误 —— 但能拿到响应,说明 CORS 其实放行了!
+    badge.className='badge fail'; badge.textContent='CORS放行·但HTTP '+resp.status;
+    let hint='';
+    if(resp.status===401) hint='→ Key 无效或未授权。换正确的 Key 即可,CORS 本身是通的。';
+    else if(resp.status===404) hint='→ 模型名可能不对。换个模型再试,CORS 本身是通的。';
+    else if(resp.status===429) hint='→ 额度不足或限流。CORS 本身是通的。';
+    else hint='→ 其它 API 错误,但 CORS 已放行。';
+    detail.textContent='⚠️ HTTP '+resp.status+'（'+ms+'ms）—— 注意:能收到响应说明 CORS 其实是放行的!\n\n响应体:\n'+esc(bodyText.slice(0,600))+'\n\n'+hint;
+    return { url:ep.url, ok:false, kind:'http_ok_cors', status:resp.status };
+  }
+}
+
+async function runTest(){
+  const key = document.getElementById('key').value.trim();
+  const model = document.getElementById('model').value;
+  const prompt = document.getElementById('prompt').value.trim();
+  if(!key){ alert('请先填入 Kimi API Key'); return; }
+
+  const btn = document.getElementById('run'); btn.disabled=true; btn.textContent='测试中…';
+
+  // 建结果框
+  const R = document.getElementById('results');
+  R.innerHTML = '<div class="card"><h2>② 测试结果</h2>' +
+    ENDPOINTS.map(ep => {
+      const id='ep-'+btoa(ep.url).replace(/=/g,'');
+      return '<div class="endpoint-test" id="'+id+'"><div class="name">'+esc(ep.name)+
+        '<span class="badge idle">待测</span></div><div class="detail">等待开始…</div></div>';
+    }).join('') +
+    '<div id="verdict"></div></div>';
+
+  const results=[];
+  for(const ep of ENDPOINTS){
+    results.push(await testEndpoint(ep, key, model, prompt));
+  }
+
+  // 总结论
+  const V = document.getElementById('verdict');
+  const anyPass = results.some(r=>r.kind==='pass');
+  const anyCorsOkButErr = results.some(r=>r.kind==='http_ok_cors');
+  const allCors = results.every(r=>r.kind==='cors');
+  if(anyPass){
+    const p = results.find(r=>r.kind==='pass');
+    V.innerHTML='<div class="verdict pass">✅ <b>结论:Kimi 可以做基底(前端直连)。</b><br>域名 <code>'+esc(p.url)+'</code> 通过了浏览器直连测试,可以像 DeepSeek/GLM 一样接入金点子发生器。告诉我用哪个域名+哪个模型,我就把 Kimi 加进发生器。</div>';
+  } else if(anyCorsOkButErr){
+    V.innerHTML='<div class="verdict mixed">⚠️ <b>结论:CORS 放行了,但这次调用有参数问题(Key/模型/额度)。</b><br>好消息是:<b>前端直连这条路是通的</b>——只要换成正确的 Key / 模型 / 补足额度,就能接入发生器。请根据上面每个域名的提示修正后重试。</div>';
+  } else if(allCors){
+    V.innerHTML='<div class="verdict blocked">❌ <b>结论:两个官方域名都无法从浏览器前端直连(CORS 拦截或不可达)。</b><br>这意味着 Kimi 不能像 DeepSeek/GLM 那样"裸奔"接入,需要走<b>后端中转</b>:我可以做一个 Cloudflare Worker 代理,前端调 Worker、Worker 再转发给 Kimi(顺便把 Key 藏在服务端,更安全)。要不要走这条路,你定。<br><br>提示:也请按 F12 看控制台确认是否为 <code>CORS policy</code> 报错。</div>';
+  } else {
+    V.innerHTML='<div class="verdict mixed">结果不一。请看上面每个域名的详细判断。</div>';
+  }
+
+  btn.disabled=false; btn.textContent='重新测试 →';
+}
+</script>
+
+</body>
+</html>
