@@ -129,6 +129,8 @@ footer{border-top:1px solid var(--border);text-align:center;padding:30px 20px 44
 .privacy-note b{color:var(--gold)}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 </head>
 <body>
 
@@ -292,7 +294,7 @@ footer{border-top:1px solid var(--border);text-align:center;padding:30px 20px 44
     </div>
     <div id="paperDlRow" style="margin-top:18px;display:none">
       <button id="reviewBtn" style="background:linear-gradient(135deg,#C0392B,#E05A47);color:#fff;font-weight:700;font-size:14.5px;border:none;border-radius:8px;padding:12px 26px;cursor:pointer;margin-right:10px;box-shadow:0 4px 16px rgba(192,57,43,0.32)">🔬 审稿并打磨一轮</button>
-      <button id="paperDlBtn" style="background:#238636;color:#fff;font-weight:600;font-size:14px;border:none;border-radius:8px;padding:11px 26px;cursor:pointer">📄 下载论文（Word）</button>
+      <button id="paperPdfBtn" style="background:#B23A2E;color:#fff;font-weight:700;font-size:14px;border:none;border-radius:8px;padding:11px 26px;cursor:pointer;margin-right:10px">📕 下载 PDF（学术格式）</button><button id="paperDlBtn" style="background:#238636;color:#fff;font-weight:600;font-size:14px;border:none;border-radius:8px;padding:11px 26px;cursor:pointer">📄 下载论文（Word）</button>
       <span id="paperRoundTag" style="font-size:12.5px;color:#8B98A5;margin-left:10px"></span>
     </div>
   </div>
@@ -1095,6 +1097,88 @@ if(paperDlBtn){
       a.href = url; a.download = 'SDE学术论文_新典范.docx'; a.click();
       URL.revokeObjectURL(url);
     });
+  });
+}
+
+// ============ 下载正规学术 PDF（jsPDF + 学术排版）============
+// 把论文文本组装成学术论文版式的 HTML（标题块/摘要/关键词/小节/正文）
+function buildPaperPdfHTML(text, question){
+  const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const lines = text.split('\n').map(l=>l.trim()).filter(l=>l);
+  let title='', bodyHTML='', started=false, absMode=false, kwLine='';
+  const parts=[];
+  lines.forEach((t,i)=>{
+    const line = esc(t).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>');
+    if(i===0){ title = line; return; }
+    // 摘要
+    if(/^摘\s*要$/.test(t) || /^摘要[:：]/.test(t)){ parts.push('<div class="abs-h">摘要</div>'); absMode='abs'; return; }
+    if(/^关键词/.test(t)){ parts.push('<div class="kw">'+line+'</div>'); absMode=false; return; }
+    // 一级节标题
+    if(/^[一二三四五六七八九十]+[、\.]/.test(t) || /^(引\s*言|结\s*论|参考文献)/.test(t)){
+      parts.push('<h2>'+line+'</h2>'); absMode=false; return;
+    }
+    // 二级小标题
+    if(t.length<=34 && !/[。！？.!?："]$/.test(t) && /^[（(]?[0-9一二三四五六七八九]/.test(t)){
+      parts.push('<h3>'+line+'</h3>'); absMode=false; return;
+    }
+    if(absMode==='abs'){ parts.push('<div class="abstract">'+line+'</div>'); absMode=false; return; }
+    parts.push('<p>'+line+'</p>');
+  });
+  bodyHTML = parts.join('\n');
+  return `<div class="paper-pdf-root" style="width:170mm;padding:0;background:#fff;color:#111;font-family:'Songti SC','Noto Serif SC',serif">
+    <div style="font-size:18pt;font-weight:700;text-align:center;line-height:1.4;margin:0 0 6pt">${title}</div>
+    <div style="font-size:10pt;text-align:center;color:#444;margin:0 0 3pt">王德生</div>
+    <div style="font-size:9pt;text-align:center;color:#666;font-style:italic;margin:0 0 6pt">德麦国际 · SDE Universes</div>
+    <div style="font-size:8.5pt;text-align:center;color:#888;margin:0 0 16pt">原初问题：${esc(question||'')}</div>
+    <style>
+      .paper-pdf-root h2{font-size:13pt;font-weight:700;margin:15pt 0 6pt;color:#000}
+      .paper-pdf-root h3{font-size:11pt;font-weight:700;margin:11pt 0 4pt;color:#222}
+      .paper-pdf-root p{margin:0 0 8pt;text-align:justify;text-indent:2em;font-size:10.5pt;line-height:1.75}
+      .paper-pdf-root .abs-h{font-size:9.5pt;font-weight:700;margin:2pt 0 4pt}
+      .paper-pdf-root .abstract{font-size:9.5pt;line-height:1.6;color:#222;background:#f6f6f6;padding:9pt 11pt;margin:0 0 6pt;text-align:justify}
+      .paper-pdf-root .kw{font-size:9pt;color:#555;margin:0 0 14pt}
+      .paper-pdf-root b{color:#000}
+    </style>
+    ${bodyHTML}
+  </div>`;
+}
+
+const paperPdfBtn = $('paperPdfBtn');
+if(paperPdfBtn){
+  paperPdfBtn.addEventListener('click', async ()=>{
+    const r = window._lastResult, p = window._lastPaper;
+    if(!p){ return; }
+    if(!window.jspdf || !window.jspdf.jsPDF){ showErr('PDF 组件仍在加载，请稍候再试'); return; }
+    paperPdfBtn.disabled = true;
+    const oldTxt = paperPdfBtn.textContent;
+    paperPdfBtn.textContent = '⏳ 正在排版 PDF……';
+    try{
+      // 造一个离屏容器承载排版好的 HTML
+      const holder = document.createElement('div');
+      holder.style.position='fixed'; holder.style.left='-9999px'; holder.style.top='0';
+      holder.style.width='170mm'; holder.style.background='#fff';
+      holder.innerHTML = buildPaperPdfHTML(p, (r&&r.question)||'');
+      document.body.appendChild(holder);
+
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF({unit:'mm', format:'a4', orientation:'portrait'});
+      await pdf.html(holder.firstElementChild, {
+        margin:[20,20,20,20],
+        autoPaging:'text',
+        html2canvas:{ scale: 2, useCORS:true, backgroundColor:'#ffffff' },
+        width: 170,          // 内容宽度(mm) = A4宽210 - 左右各20
+        windowWidth: 643     // 170mm ≈ 643px @96dpi，保证换算比例
+      });
+      document.body.removeChild(holder);
+      pdf.save('SDE学术论文_新典范.pdf');
+      paperPdfBtn.textContent = '✓ PDF 已下载';
+      setTimeout(()=>{ paperPdfBtn.textContent = oldTxt; }, 2500);
+    }catch(e){
+      showErr('PDF 生成失败：'+e.message);
+      paperPdfBtn.textContent = oldTxt;
+    }finally{
+      paperPdfBtn.disabled = false;
+    }
   });
 }
 
