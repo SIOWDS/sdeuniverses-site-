@@ -285,6 +285,36 @@ footer{border-top:1px solid var(--border);text-align:center;padding:30px 20px 44
     <div style="font-size:13px;color:#9AA5B0;margin-bottom:16px;line-height:1.7">把上面的新典范当作论文的核心论点，写成一篇可投稿的正式学术论文——有摘要、文献检讨、层层递进的核心论证、<b style="color:#A48CFF">主动设置的反驳与回应</b>、跨学科推衍与坦诚边界。生成需要几分钟，请耐心等它写完。</div>
     <div id="paperBody" style="color:#D4DCE4;font-size:15px;line-height:2.0;white-space:normal"><span class="placeholder">点击上方按钮开始撰写……</span></div>
     <div id="paperMeta" style="font-size:12px;color:#8B98A5;margin-top:14px"></div>
+    <div id="reviewModalWrap" style="margin-top:18px;display:none;border-top:1px dashed rgba(192,57,43,0.4);padding-top:18px">
+      <div style="background:rgba(192,57,43,0.08);border:1px solid rgba(192,57,43,0.35);border-radius:10px;padding:18px 20px">
+        <div style="font-size:14.5px;font-weight:700;color:#E8897B;margin-bottom:6px">🔬 换一个模型来审稿</div>
+        <div style="font-size:12.5px;color:#9AA5B0;line-height:1.7;margin-bottom:14px">同一个模型自审自改，盲区是重合的。换一个不同的基底来审，才能照出原模型看不见的问题。请选择审稿用的模型并填入它的 Key（改稿仍由原模型完成）。</div>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end">
+          <div style="flex:1;min-width:200px">
+            <label style="display:block;font-size:12px;color:#8B98A5;margin-bottom:4px">审稿模型</label>
+            <select id="reviewModelSel" style="width:100%;padding:9px 10px;border-radius:7px;border:1px solid rgba(255,255,255,0.15);background:#0d1117;color:#D4DCE4;font-size:13.5px">
+              <optgroup label="DeepSeek">
+                <option value="ds:pro">DeepSeek V4 Pro · 最强推理</option>
+                <option value="ds:flash">DeepSeek V4 Flash · 快速</option>
+              </optgroup>
+              <optgroup label="智谱 GLM">
+                <option value="glm:pro">智谱 GLM-5 · 深度思考</option>
+                <option value="glm:flash">智谱 GLM-4-Flash · 快速</option>
+              </optgroup>
+            </select>
+          </div>
+          <div style="flex:1.4;min-width:240px">
+            <label style="display:block;font-size:12px;color:#8B98A5;margin-bottom:4px"><span id="reviewKeyLabel">审稿模型的 API Key</span></label>
+            <input id="reviewKeyInput" type="password" placeholder="填入审稿模型对应厂商的 Key" style="width:100%;padding:9px 10px;border-radius:7px;border:1px solid rgba(255,255,255,0.15);background:#0d1117;color:#D4DCE4;font-size:13.5px">
+          </div>
+        </div>
+        <div style="margin-top:14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+          <button id="reviewGoBtn" style="background:linear-gradient(135deg,#C0392B,#E05A47);color:#fff;font-weight:700;font-size:14px;border:none;border-radius:8px;padding:11px 26px;cursor:pointer">开始审稿 →</button>
+          <button id="reviewCancelBtn" style="background:transparent;color:#8B98A5;font-size:13px;border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:10px 20px;cursor:pointer">取消</button>
+          <span id="reviewSameWarn" style="font-size:12px;color:#C9A227;display:none">⚠ 审稿模型和写论文用的是同一个，等于自审自改，建议换一个</span>
+        </div>
+      </div>
+    </div>
     <div id="reviewWrap" style="margin-top:20px;display:none;border-top:1px dashed rgba(192,57,43,0.4);padding-top:18px">
       <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px">
         <div style="font-size:15px;font-weight:700;color:#E8897B;letter-spacing:0.03em">🔬 审稿意见</div>
@@ -1163,59 +1193,98 @@ if(paperPdfBtn){
   });
 }
 
-// ============ 四阶：审稿 → 改稿 循环打磨 ============
-const reviewBtn = $('reviewBtn');
-if(reviewBtn){
-  reviewBtn.addEventListener('click', async ()=>{
-    const p = window._lastPaper;
-    if(!p){ showErr('请先生成论文，再进行审稿打磨'); return; }
-    const key = apiKeyEl.value.trim().replace(/^["']|["']$/g,'');
-    if(!key){ showErr('请先填入 API Key'); apiKeyEl.focus(); return; }
-    const model = modelSel.value;
+// ============ 四阶：审稿 → 改稿 循环打磨（审稿换第二个模型）============
+// Key 按厂商取用（复用两家分存的 localStorage）
+function vendorKeyName(sel){ return parseModel(sel).vendor==='glm' ? 'sde_glm_key' : 'sde_ds_key'; }
+function vendorLabel(sel){ return parseModel(sel).vendor==='glm' ? '智谱 GLM' : 'DeepSeek'; }
 
-    hideErr();
-    reviewBtn.disabled = true;
-    const paperBtnEl = $('paperBtn'); if(paperBtnEl) paperBtnEl.disabled = true;
-    const reviewWrap = $('reviewWrap'), reviewBody = $('reviewBody'), reviewStatus = $('reviewStatus');
-    const paperBody = $('paperBody'), paperStatus = $('paperStatus');
+// 打开审稿弹框：默认预选“另一个厂商”的 pro 档，并带出其已存 Key
+function openReviewModal(){
+  if(!window._lastPaper){ showErr('请先生成论文，再进行审稿打磨'); return; }
+  const writeVendor = parseModel(modelSel.value).vendor;
+  const otherModel = writeVendor==='glm' ? 'ds:pro' : 'glm:pro';   // 换到另一家
+  const sel = $('reviewModelSel');
+  sel.value = otherModel;
+  syncReviewKeyUI();
+  $('reviewModalWrap').style.display = 'block';
+  $('reviewModalWrap').scrollIntoView({behavior:'smooth', block:'center'});
+}
+// 弹框内：模型变化时，切换 Key 输入的标签并带出该厂商已存 Key、提示是否与写作模型同厂
+function syncReviewKeyUI(){
+  const sel = $('reviewModelSel'), keyInput = $('reviewKeyInput'), keyLabel = $('reviewKeyLabel');
+  keyLabel.textContent = vendorLabel(sel.value) + ' 的 API Key';
+  keyInput.value = localStorage.getItem(vendorKeyName(sel.value)) || '';
+  const sameVendor = parseModel(sel.value).vendor === parseModel(modelSel.value).vendor;
+  $('reviewSameWarn').style.display = sameVendor ? 'inline' : 'none';
+}
 
-    reviewWrap.style.display = 'block';
-    reviewWrap.scrollIntoView({behavior:'smooth', block:'start'});
+// 真正执行：审稿(第二个模型) → 改稿(原模型)
+async function runReviewPolish(reviewModel, reviewKey){
+  hideErr();
+  const paperBtnEl = $('paperBtn'); if(paperBtnEl) paperBtnEl.disabled = true;
+  reviewBtn.disabled = true;
+  $('reviewModalWrap').style.display = 'none';
+  const reviewWrap = $('reviewWrap'), reviewBody = $('reviewBody'), reviewStatus = $('reviewStatus');
+  const paperBody = $('paperBody'), paperStatus = $('paperStatus');
+  const writeModel = modelSel.value;
+  const writeKey = apiKeyEl.value.trim().replace(/^["']|["']$/g,'');
 
-    try{
-      // ① 审稿
-      reviewBtn.textContent = '⏳ 审稿中（严苛审稿人正在逐条挑问题）……';
-      const rev = await streamChat(key, model, reviewPrompt(), buildReviewInput(window._lastPaper), reviewBody, reviewStatus, reviewStatus);
-      if(!rev || !rev.text){ throw new Error('审稿未产出内容'); }
-      // 审稿意见轻排版（复用涌现渲染：章节/加粗/上色）
-      reviewBody.innerHTML = renderEmergeText(rev.text);
-      window._lastReview = rev.text;
-      reviewStatus.textContent = '✓ 审稿完成，正在据此改稿……';
+  reviewWrap.style.display = 'block';
+  reviewWrap.scrollIntoView({behavior:'smooth', block:'start'});
 
-      // ② 改稿（据审稿意见改出新版论文，替换正文）
-      reviewBtn.textContent = '⏳ 改稿中（据审稿意见重写，约 3-8 分钟）……';
-      paperStatus.textContent = '正在根据审稿意见改写……';
-      paperBody.innerHTML = '<span class="placeholder">正在根据审稿意见改写论文……</span>';
-      const rewritten = await streamChat(key, model, revisePrompt(), buildReviseInput(window._lastPaper, window._lastReview), paperBody, paperStatus, paperStatus);
-      if(rewritten && rewritten.text){
-        paperBody.innerHTML = renderPaperText(rewritten.text);
-        window._lastPaper = rewritten.text;   // 论文升级为新版
-        window._paperRound = (window._paperRound||0) + 1;
-        const wc = rewritten.text.replace(/\s/g,'').length;
-        paperStatus.textContent = '✓ 已完成第 '+window._paperRound+' 轮打磨 · 约 '+wc.toLocaleString()+' 字';
-        const tag = $('paperRoundTag'); if(tag) tag.textContent = '已打磨 '+window._paperRound+' 轮';
-        reviewStatus.textContent = '✓ 本轮审稿意见（论文已据此升级）';
-      }
-    }catch(e){
-      showErr('审稿打磨失败：'+e.message);
-      reviewStatus.textContent = '失败';
-    }finally{
-      reviewBtn.disabled = false;
-      reviewBtn.textContent = '🔬 再打磨一轮（审稿→改稿）';
-      if(paperBtnEl) paperBtnEl.disabled = false;
+  try{
+    // ① 审稿 —— 用第二个模型
+    reviewBtn.textContent = '⏳ 审稿中（'+vendorLabel(reviewModel)+' 正在逐条挑问题）……';
+    reviewStatus.textContent = '审稿模型：'+vendorLabel(reviewModel);
+    const rev = await streamChat(reviewKey, reviewModel, reviewPrompt(), buildReviewInput(window._lastPaper), reviewBody, reviewStatus, reviewStatus);
+    if(!rev || !rev.text){ throw new Error('审稿未产出内容'); }
+    reviewBody.innerHTML = renderEmergeText(rev.text);
+    window._lastReview = rev.text;
+    reviewStatus.textContent = '✓ 审稿完成（由 '+vendorLabel(reviewModel)+' 审），正在据此改稿……';
+
+    // ② 改稿 —— 仍用原模型（原作者据意见改）
+    if(!writeKey){ throw new Error('原模型 Key 缺失，无法改稿'); }
+    reviewBtn.textContent = '⏳ 改稿中（'+vendorLabel(writeModel)+' 据意见重写，约 3-8 分钟）……';
+    paperStatus.textContent = '正在根据审稿意见改写……';
+    paperBody.innerHTML = '<span class="placeholder">正在根据审稿意见改写论文……</span>';
+    const rewritten = await streamChat(writeKey, writeModel, revisePrompt(), buildReviseInput(window._lastPaper, window._lastReview), paperBody, paperStatus, paperStatus);
+    if(rewritten && rewritten.text){
+      paperBody.innerHTML = renderPaperText(rewritten.text);
+      window._lastPaper = rewritten.text;
+      window._paperRound = (window._paperRound||0) + 1;
+      const wc = rewritten.text.replace(/\s/g,'').length;
+      paperStatus.textContent = '✓ 已完成第 '+window._paperRound+' 轮打磨 · 约 '+wc.toLocaleString()+' 字';
+      const tag = $('paperRoundTag'); if(tag) tag.textContent = '已打磨 '+window._paperRound+' 轮';
+      reviewStatus.textContent = '✓ 第 '+window._paperRound+' 轮 · 由 '+vendorLabel(reviewModel)+' 审、'+vendorLabel(writeModel)+' 改（论文已升级）';
     }
+  }catch(e){
+    showErr('审稿打磨失败：'+e.message);
+    reviewStatus.textContent = '失败';
+  }finally{
+    reviewBtn.disabled = false;
+    reviewBtn.textContent = '🔬 再打磨一轮（换模型审稿→改稿）';
+    if(paperBtnEl) paperBtnEl.disabled = false;
+  }
+}
+
+// 绑定：审稿按钮打开弹框；弹框内确认/取消/模型切换
+const reviewBtn = $('reviewBtn');
+if(reviewBtn){ reviewBtn.addEventListener('click', openReviewModal); }
+const reviewModelSelEl = $('reviewModelSel');
+if(reviewModelSelEl){ reviewModelSelEl.addEventListener('change', syncReviewKeyUI); }
+const reviewGoBtn = $('reviewGoBtn');
+if(reviewGoBtn){
+  reviewGoBtn.addEventListener('click', ()=>{
+    const rm = $('reviewModelSel').value;
+    const rk = $('reviewKeyInput').value.trim().replace(/^["']|["']$/g,'');
+    if(!rk){ showErr('请填入审稿模型的 API Key'); $('reviewKeyInput').focus(); return; }
+    // 顺手把这把 Key 存进对应厂商槽，方便下次
+    try{ localStorage.setItem(vendorKeyName(rm), rk); }catch(_){}
+    runReviewPolish(rm, rk);
   });
 }
+const reviewCancelBtn = $('reviewCancelBtn');
+if(reviewCancelBtn){ reviewCancelBtn.addEventListener('click', ()=>{ $('reviewModalWrap').style.display='none'; }); }
 
 // 清空结果 · 再问一次
 function clearResults(){
@@ -1237,6 +1306,7 @@ function clearResults(){
   if($('emergeWrap')) $('emergeWrap').style.display='none';
   if($('paperWrap')) $('paperWrap').style.display='none';
   if($('reviewWrap')) $('reviewWrap').style.display='none';
+  if($('reviewModalWrap')) $('reviewModalWrap').style.display='none';
   const _rt=$('paperRoundTag'); if(_rt) _rt.textContent='';
   window._lastEmerge = null; window._lastPaper = null; window._lastReview = null; window._paperRound = 0;
   // 恢复视角标签为默认
