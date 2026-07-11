@@ -175,6 +175,7 @@ footer{border-top:1px solid var(--border);text-align:center;padding:30px 20px 44
 <div class="controls">
   <div class="field">
     <label id="keyLabel">你的 DeepSeek API Key <span class="req">*</span></label>
+    <span id="neigongStatus" style="margin-left:10px;font-size:12px;color:#8B98A5;vertical-align:middle">⏳ SDE 内功加载中…</span>
     <div class="key-row">
       <input type="password" id="apiKey" placeholder="sk-..." autocomplete="off" spellcheck="false">
       <button class="key-toggle" id="keyToggle">显示</button>
@@ -563,6 +564,7 @@ let neigongPromise = (async function loadNeigong(){
         SDE_BASE = full;
         SDE_BASE_LOADED = true;
         console.log('✓ 完整 SDE 内功已加载：' + full.length + ' 字符');
+        try{ const el=document.getElementById('neigongStatus'); if(el){ el.textContent='✓ SDE 内功已加载（'+full.length+' 字·提智就绪）'; el.style.color='#5FBF7F'; } }catch(_){}
         return true;
       }
     }
