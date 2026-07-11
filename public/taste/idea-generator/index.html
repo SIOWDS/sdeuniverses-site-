@@ -607,6 +607,10 @@ const SHARED_VIEWS = {
   ]
 };
 // 子层展示名（UI标签用，不进prompt）
+// 四篇1万字论文的输出上限：物理截断，防止强模型（尤其深度思考档）写嗨了停不下来突破1万字。
+// 1万字中文约需 1.5-1.6万 tokens；设 16000 → 足够写满1万字并留少量余量，但绝不给它写到1.7万字的空间。
+// （这是继 Prompt 硬约束、策划先行之后的第三重、也是最硬的一重保险——不管模型想写多少，到 token 上限就必须停。）
+const PAPER_MAX_TOKENS = 16000;
 const SUB_NAMES = {
   show: ['S1 · 规范C（对比·变化·分布）','S2 · 模态M（粒子·波·场）','S3 · 价值V（真·善·美）'],
   diff: ['D1 · 意义（特征律·自由律·幸福律）','D2 · 路径（问题→猜想→…→聚合→升维）','D3 · 最优化（最小误差·冗余·亏损）'],
@@ -1041,12 +1045,13 @@ const PROXY_URL = "/api/llm-proxy";
 function apiUrl(sel){ return API_URLS[parseModel(sel).vendor]; }
 
 // 根据 厂商:档位 构造 payload
-function buildPayload(sel, systemPrompt, userQ){
+function buildPayload(sel, systemPrompt, userQ, maxTokens){
   const { vendor, tier } = parseModel(sel);
+  const cap = (typeof maxTokens==='number' && maxTokens>0) ? maxTokens : 32000;
   const base = {
     stream: true,
     messages: [{role:'system',content:systemPrompt},{role:'user',content:userQ}],
-    max_tokens: 32000
+    max_tokens: cap
   };
   if(vendor === 'ds'){
     if(tier === 'pro'){
@@ -1188,14 +1193,14 @@ function showErr(msg){ errBox.textContent='⚠ '+msg; errBox.style.display='bloc
 function hideErr(){ errBox.style.display='none'; }
 
 // 流式调用基底（所选厂商），token 逐字写入目标元素
-async function streamChat(apiKey, model, systemPrompt, userQ, bodyEl, statusEl, metaEl){
+async function streamChat(apiKey, model, systemPrompt, userQ, bodyEl, statusEl, metaEl, maxTokens){
   bodyEl.innerHTML='<span class="placeholder">正在连接 '+vendorName()+'……</span>';
   statusEl.innerHTML='<span class="spinner"></span> 连接中';
   const t0=Date.now();
 
   // ===== 境外基底（GPT/Claude/Gemini）：走 /api/llm-proxy 代理、非流式、各家格式不同 =====
   if(isOverseas(model)){
-    return await callOverseas(apiKey, model, systemPrompt, userQ, bodyEl, statusEl, metaEl, t0);
+    return await callOverseas(apiKey, model, systemPrompt, userQ, bodyEl, statusEl, metaEl, t0, maxTokens);
   }
 
   let acc='', chars=0;
@@ -1211,7 +1216,7 @@ async function streamChat(apiKey, model, systemPrompt, userQ, bodyEl, statusEl, 
     resp = await fetch(apiUrl(model), {
       method:'POST',
       headers:{ 'Content-Type':'application/json', 'Authorization':'Bearer '+apiKey },
-      body: JSON.stringify(buildPayload(model, systemPrompt, userQ)),
+      body: JSON.stringify(buildPayload(model, systemPrompt, userQ, maxTokens)),
       signal: ac.signal
     });
   }catch(e){ clearTimeout(killer); statusEl.textContent='网络错误'; throw new Error(e.name==='AbortError'?'超时：12分钟内没有完成，已中止（深度思考档+长文本可能过慢，建议改用快速档，或稍后重试）':'网络请求失败：'+e.message); }
@@ -1297,9 +1302,9 @@ async function streamChat(apiKey, model, systemPrompt, userQ, bodyEl, statusEl, 
 }
 
 // 境外基底（GPT/Claude/Gemini）：经 /api/llm-proxy 中转、非流式一次性返回，按各家格式解析
-async function callOverseas(apiKey, model, systemPrompt, userQ, bodyEl, statusEl, metaEl, t0){
+async function callOverseas(apiKey, model, systemPrompt, userQ, bodyEl, statusEl, metaEl, t0, maxTokens){
   const { vendor, tier } = parseModel(model);
-  const payload = buildPayload(model, systemPrompt, userQ);
+  const payload = buildPayload(model, systemPrompt, userQ, maxTokens);
 
   // 组装代理请求头：不同厂商鉴权方式不同
   const headers = { 'Content-Type':'application/json' };
@@ -1544,7 +1549,7 @@ async function runOnePaper(cfg){
   const draftSys = cfg.draftPrompt || paper1wPrompt();
   let draft;
   try{
-    draft = await streamChat(cfg.writeKey, cfg.writeSel, draftSys, cfg.writeInput, sink, dummy, dummy);
+    draft = await streamChat(cfg.writeKey, cfg.writeSel, draftSys, cfg.writeInput, sink, dummy, dummy, PAPER_MAX_TOKENS);
   }catch(e){ stopTicker(); setStat('✗ 生成失败：'+e.message); if(cfg.bodyEl) cfg.bodyEl.innerHTML='<span class="placeholder" style="color:#E8897B">✗ 这篇生成失败：'+esc4(e.message)+'（多为 API Key 无此基底权限、余额不足或被限流；可刷新重试或换基底/换快速档）</span>'; throw e; }
   stopTicker();
   let paperText = draft.text || '';
@@ -1578,7 +1583,7 @@ async function runOnePaper(cfg){
   startTicker();
   let finalText = paperText;
   try{
-    const rev = await streamChat(cfg.writeKey, cfg.writeSel, revisePrompt(), buildReviseInputDual(paperText, revA, revB), sink, dummy, dummy);
+    const rev = await streamChat(cfg.writeKey, cfg.writeSel, revisePrompt(), buildReviseInputDual(paperText, revA, revB), sink, dummy, dummy, PAPER_MAX_TOKENS);
     if(rev.text) finalText = rev.text;
   }catch(e){ /* 改稿失败则保留初稿 */ }
   stopTicker();
