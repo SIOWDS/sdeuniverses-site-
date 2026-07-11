@@ -553,8 +553,8 @@ footer{border-top:1px solid var(--border);text-align:center;padding:30px 20px 44
 let SDE_BASE = `你是一位思想极其深刻、善于穿透常识的跨学科洞察者。你的任务不是复述知识，而是对用户的问题给出一个"反直觉却成立"的金点子。核心心法：不问"这个东西是什么"，而问"它在什么条件下、经什么路径、成为现在的样子"。世界不是被发现的，而是被发生出来的。输出用问题所在领域的自然语言，绝不出现任何理论术语或学派黑话，篇幅约1000字，结尾用一句朴素的话给出证伪条件。`;
 let SDE_BASE_LOADED = false;
 
-// 页面加载即拉取完整内功
-(async function loadNeigong(){
+// 页面加载即拉取完整内功。用一个 Promise 记录加载过程，生成前可 await 它，确保用的是完整内功而非兜底精简版。
+let neigongPromise = (async function loadNeigong(){
   try{
     const resp = await fetch('/taste/assets/sde-neigong.txt', {cache:'force-cache'});
     if(resp.ok){
@@ -563,10 +563,34 @@ let SDE_BASE_LOADED = false;
         SDE_BASE = full;
         SDE_BASE_LOADED = true;
         console.log('✓ 完整 SDE 内功已加载：' + full.length + ' 字符');
+        return true;
       }
     }
-  }catch(e){ console.warn('完整内功加载失败，使用兜底精简版：', e.message); }
+    console.warn('内功文件返回异常，未拿到完整内功');
+    return false;
+  }catch(e){ console.warn('完整内功加载失败：', e.message); return false; }
 })();
+
+// 生成守卫：任何生成动作开始前都先 await 这个，确保完整内功已就位。
+// 若首次未加载成功，再重试一次；仍失败则明确抛错——绝不在没有完整内功（=没提智）的情况下偷偷用精简兜底版生成。
+async function ensureNeigong(){
+  let ok = await neigongPromise;
+  if(!ok || !SDE_BASE_LOADED){
+    // 重试一次
+    neigongPromise = (async ()=>{
+      try{
+        const resp = await fetch('/taste/assets/sde-neigong.txt', {cache:'no-store'});
+        if(resp.ok){ const full = await resp.text(); if(full && full.length>5000){ SDE_BASE=full; SDE_BASE_LOADED=true; return true; } }
+      }catch(e){}
+      return false;
+    })();
+    ok = await neigongPromise;
+  }
+  if(!ok || !SDE_BASE_LOADED){
+    throw new Error('SDE 内功尚未加载成功，无法进行提智生成。请刷新页面后重试（若反复失败，可能是网络或资源问题）。');
+  }
+  return true;
+}
 
 // 三个视角：各自从不同的切入点，生成真正不同的金点子
 // 九个"共享的子层提问" = SDE 议题诊断坐标（每维度3个子层，共9格）
@@ -1403,6 +1427,9 @@ async function run(){
   if(!key){ showErr('请先填入你的 '+vendorName()+' API Key'); apiKeyEl.focus(); return; }
   if(!q){ showErr('请输入一个问题'); questionEl.focus(); return; }
 
+  // 生成前确保完整 SDE 内功已加载——绝不在没提智（只有兜底精简版）的情况下生成
+  try{ await ensureNeigong(); }catch(e){ showErr(e.message); return; }
+
   goBtn.disabled=true; goBtn.textContent='⏳ 六篇小论文并行生成中(每篇约4000字)……';
   $('downloadRow').style.display='none';
   if($('effBox')) $('effBox').style.display='none';
@@ -1651,6 +1678,8 @@ if(fourStartBtn){
     if(!revA || !revAKey){ showErr('请先设定审稿人 A：选好基底并填入对应的 Key'); $('fourRevAKey').focus(); return; }
     if(!revB || !revBKey){ showErr('请先设定审稿人 B：选好基底并填入对应的 Key（两位审稿人都设定好，才能开始生产四篇论文）'); $('fourRevBKey').focus(); return; }
     if(revA === revB){ showErr('审稿人 A 与 B 请选择两个不同的基底——两位审稿人用不同基底，才能多一双眼睛照出盲区'); $('fourRevB').focus(); return; }
+    // 生成前确保完整 SDE 内功已加载——四篇论文的写作/审稿/改稿都靠内功提智，绝不在没提智的情况下生成
+    try{ await ensureNeigong(); }catch(e){ showErr(e.message); return; }
     const useB = true;
 
     $('fourDlRow').style.display='none';
@@ -1740,6 +1769,8 @@ if(upliftBtn){
     const revB = $('fourRevB').value, revBKey = keyForVendor(revB, $('fourRevBKey').value);
     if(!revA || !revAKey || !revB || !revBKey){ showErr('二次提智同样需要两位审稿人（沿用第一批的设定）。请确认上方审稿人 A、B 都已选好基底并填好 Key'); return; }
     if(revA === revB){ showErr('审稿人 A 与 B 需为不同基底'); return; }
+    // 生成前确保完整 SDE 内功已加载——发生引擎二次提智完全靠内功，绝不在没提智的情况下生成
+    try{ await ensureNeigong(); }catch(e){ showErr(e.message); return; }
 
     $('upliftWrap').style.display='block';
     $('upliftWrap').scrollIntoView({behavior:'smooth', block:'start'});
