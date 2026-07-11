@@ -369,6 +369,10 @@ footer{border-top:1px solid var(--border);text-align:center;padding:30px 20px 44
         </div>
       </div>
       <div style="font-size:12px;color:#8B98A5;margin-top:10px">💡 两位审稿人必须都设定好、且用不同基底，才能开始生产四篇。若某评审基底的 Key 与你之前填过的相同，会自动带出，无需重复填。</div>
+      <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:#B98CFF;margin-top:10px;cursor:pointer;user-select:none">
+        <input type="checkbox" id="showReviewsChk" style="width:16px;height:16px;cursor:pointer">
+        显示两位审稿人的评审意见（想看审稿人是否用发生学的眼光把关，就勾上——审稿意见会显示在每篇论文下方）
+      </label>
     </div>
 
     <!-- 最后开始按钮：审稿人设定好后，点这里才真正启动四篇生成 -->
@@ -1761,7 +1765,20 @@ async function runOnePaper(cfg){
   }catch(e){ /* 改稿失败则保留初稿 */ }
   stopTicker();
 
-  if(cfg.bodyEl) cfg.bodyEl.innerHTML = renderPaperText(finalText);
+  // 最终显示：改好的论文；若勾选了"显示审稿意见"，把两位审稿意见附在论文下方一并保留
+  let finalHtml = renderPaperText(finalText);
+  try{
+    if(document.getElementById('showReviewsChk') && document.getElementById('showReviewsChk').checked && (revA||revB)){
+      const revLabelA = vendorLabel(cfg.revA), revLabelB = cfg.revB?vendorLabel(cfg.revB):'';
+      let rh = '<div style="margin-top:18px;border-top:2px dashed rgba(122,47,224,0.4);padding-top:14px">';
+      rh += '<div style="font-size:13px;font-weight:700;color:#B98CFF;margin-bottom:10px">📝 审稿意见（改稿前）— 看审稿人是否用发生学眼光把关</div>';
+      if(revA){ rh += '<div style="margin-bottom:12px"><div style="font-size:12px;font-weight:700;color:#E8897B;margin-bottom:5px">审稿人 A · '+revLabelA+'</div><div style="font-size:13px;line-height:1.8;color:#B7A9C9">'+renderPaperText(revA)+'</div></div>'; }
+      if(revB){ rh += '<div style="border-top:1px dashed rgba(192,57,43,0.25);padding-top:10px"><div style="font-size:12px;font-weight:700;color:#E8897B;margin-bottom:5px">审稿人 B · '+revLabelB+'</div><div style="font-size:13px;line-height:1.8;color:#B7A9C9">'+renderPaperText(revB)+'</div></div>'; }
+      rh += '</div>';
+      finalHtml += rh;
+    }
+  }catch(_){}
+  if(cfg.bodyEl) cfg.bodyEl.innerHTML = finalHtml;
   setStat('✍ 完成 ' + finalText.length + ' 字');
   return { title:cfg.title, text:finalText };
 }
