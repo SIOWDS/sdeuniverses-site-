@@ -228,6 +228,13 @@ footer{border-top:1px solid var(--border);text-align:center;padding:30px 20px 44
 <div class="err-box" id="errBox"></div>
 
 <!-- 三视角对照：每行一个视角，左普通 右SDE -->
+<div id="sixReflectBar" style="display:none;max-width:1000px;margin:24px auto 0;background:rgba(20,12,30,0.5);border:1px solid rgba(122,47,224,0.4);border-radius:14px;padding:16px 22px">
+  <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px">
+    <div style="font-size:14px;font-weight:700;color:#B98CFF">📖 第一次提智·内化：基底亲手写《从发现到发生》</div>
+    <div id="sixReflectStatus" style="font-size:12px;color:#8B98A5">准备中…</div>
+  </div>
+  <div id="sixReflectBody" style="color:#C9B8DC;font-size:13.5px;line-height:1.85;max-height:260px;overflow:auto"><span class="placeholder">写作前，先让基底把发生学内化为自己的理解…</span></div>
+</div>
 <div id="comboBar" style="display:none;max-width:1000px;margin:30px auto 0;text-align:center;background:linear-gradient(135deg,rgba(40,32,12,0.75),rgba(20,20,30,0.75));border:1px solid rgba(212,178,94,0.45);border-radius:14px;padding:16px 22px">
   <div style="font-size:13px;color:#8B98A5;margin-bottom:6px;letter-spacing:0.08em">🎲 本次从九宫格抽中的组合（三格不重合）</div>
   <div id="comboText" style="font-size:17px;font-weight:700;color:#E8C97A;letter-spacing:0.02em"></div>
@@ -684,8 +691,12 @@ const SDE_OUTPUT_SPEC = `
 · 篇幅约 4000 字（3500-4500 字），充分展开，把洞察的每一层都论证透彻，但绝不注水凑字数——每一段都要有推进。
 · 让人读完有"我从没这样想过，但你说得对"的震动，并且觉得"这是一篇真正有分量的文章"。`;
 
-function sdePrompt(dim, idx, focus){
-  let p = SDE_BASE + SDE_OUTPUT_SPEC + '\n\n【请特别侧重这个角度】\n' + SHARED_VIEWS[dim][idx];
+function sdePrompt(dim, idx, focus, reflectionText){
+  // 若已写过《从发现到发生》心得，把它作为思维底座注入（两次内功提智：右栏=内功+心得的发生学）
+  const baseWithReflection = reflectionText
+    ? SDE_BASE + '\n\n---\n【这是你刚刚亲手写下的、关于"从发现到发生"的方法论心得与自我检视。它是你此刻的思维底座——你已亲手把发生学想透一遍，也诚实检视了自己的发现学惯性。接下来作答，带着这份警惕着自己发现学惯性的头脑：每当你想给对象"精确命名一个故障/下一个定义"时，回想你下面写过的话，逼自己改问"这个新结构如何从矛盾里发生出来"。】\n\n' + reflectionText.trim() + '\n\n---\n'
+    : SDE_BASE;
+  let p = baseWithReflection + SDE_OUTPUT_SPEC + '\n\n【请特别侧重这个角度】\n' + SHARED_VIEWS[dim][idx];
   if(Array.isArray(focus) && focus.length && FOCUS_NAMES[dim] && FOCUS_NAMES[dim][idx]){
     const names = focus.map(f=>'「'+FOCUS_NAMES[dim][idx][f]+'」').join(' 与 ');
     if(focus.length===1){
@@ -1516,6 +1527,20 @@ async function run(){
   $('comboText').textContent = cells.map(c=>SUB_NAMES[c.dim][c.idx]).join('　✕　');
   $('comboBar').style.display='block';
 
+  // 【第一次内功提智·内化】六篇一开始就先写一次《从发现到发生》心得——发现vs发生的对决从源头就带上内化的认知。
+  //  只注入右栏(SDE提智侧)；左栏(普通AI)保持纯裸基底，对照才纯粹。心得整轮写一次，三篇右栏共用。
+  let sixReflection = '';
+  {
+    const rb = document.getElementById('sixReflectBar');
+    if(rb){ rb.style.display='block'; const s=document.getElementById('sixReflectStatus'); if(s) s.textContent='正在写《从发现到发生》认知内化短文（约5000字）…'; }
+    sixReflection = await getReflection(model, key, (n)=>{ const s=document.getElementById('sixReflectStatus'); if(s) s.textContent = n>0?('✍ 已写 '+n+' 字'):'写作中…'; });
+    if(rb){
+      const s=document.getElementById('sixReflectStatus'), b=document.getElementById('sixReflectBody');
+      if(sixReflection){ if(s) s.textContent='✓ 内化完成 '+sixReflection.length+' 字 · 右侧三篇将带着这份认知来写'; if(b) b.innerHTML=renderPaperText(sixReflection); }
+      else { if(s) s.textContent='（跳过·右栏退回常规提智）'; if(b) b.innerHTML='<span class="placeholder">心得未成功，右栏退回常规提智继续</span>'; }
+    }
+  }
+
   // 六路并行：3视角 × (普通+SDE) = 6 次调用同时发起
   const tasks=[];
   rowEls.forEach((row,i)=>{
@@ -1527,7 +1552,7 @@ async function run(){
           row.plain.status.textContent='失败'; return {text:'',chars:0,thinkChars:0,secs:0}; })
     );
     tasks.push(
-      streamChat(key, model, sdePrompt(c.dim, c.idx, c.focus), q, row.sde.body, row.sde.status, row.sde.meta)
+      streamChat(key, model, sdePrompt(c.dim, c.idx, c.focus, sixReflection), q, row.sde.body, row.sde.status, row.sde.meta)
         .catch(e=>{ showErr('金点子：'+e.message);
           row.sde.body.innerHTML='<span class="placeholder">生成失败：'+e.message+'</span>';
           row.sde.status.textContent='失败'; return {text:'',chars:0,thinkChars:0,secs:0}; })
