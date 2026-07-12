@@ -1359,6 +1359,10 @@ function buildPayload(sel, systemPrompt, userQ, maxTokens){
     }
   } else if(vendor === 'qwen'){
     // 通义千问（阿里百炼北京站 dashscope.aliyuncs.com，OpenAI 兼容）
+    // 【硬钳位】千问单次输出上限 8192 tokens——超限 DashScope 直接拒绝（曾致六篇/论文 0.6s 秒挂"空响应"，
+    //  而心得传 8000 恰好能过，症状是"第一阶段行、第二阶段不行"）。七基底里只有它这么严，必须钳。
+    //  代价：千问的论文被物理限制在约 1.1-1.2 万字（8192 tokens），这是模型上限，不是本站限制。
+    base.max_tokens = Math.min(cap, 8192);
     if(tier === 'pro'){
       base.model = 'qwen-max';            // 最强
       base.temperature = 0.7;
