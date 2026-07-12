@@ -1486,6 +1486,10 @@ function buildPayload(sel, systemPrompt, userQ, maxTokens){
     // 不传 temperature（K2.6 的教训：推理模型对采样参数挑剔，走默认最稳）。M3 输出上限 131072，无需钳位。
     base.model = (tier === 'pro') ? 'MiniMax-M3' : 'MiniMax-M2.7-highspeed';
     base.reasoning_split = true;
+    // 【思考余量】M 系为重推理模型，思考疑似与正文共享 max_tokens 预算（实测：论文写到771字即被"完成"，
+    // 与思考吞掉预算的症状吻合）。给思考预留 32k 余量——正文预算仍是调用方的 cap，思考另有口粮；
+    // M3 输出上限 131072 不越界。finish_reason 已诚实化，下轮界面会直接显示是否仍触顶。
+    base.max_tokens = Math.min(cap + 32000, 131072);
   } else if(vendor === 'gpt'){
     // GPT（OpenAI，chat/completions 格式；经代理、【流式】）
     base.model = (tier === 'pro') ? 'gpt-5.5' : 'gpt-5.4';  // 5.5当前广泛可用旗舰 / 5.4均衡稳妥
@@ -1659,6 +1663,7 @@ async function streamChat(apiKey, model, systemPrompt, userQ, bodyEl, statusEl, 
   const decoder = new TextDecoder();
   let buf='', thinking=false, thinkChars=0, gotAnything=false;
   let rawHead='';   // 捕获响应体开头（诊断用）：空响应时把它亮给用户，别让真实错误被"空响应"三个字埋掉
+  let fin='';        // finish_reason：'length'=触及token上限被截断——必须如实显示，不许谎报"完成"
   // 连接成功，显示等待模型响应（深度思考首字可能要1-2分钟）
   bodyEl.innerHTML='<span class="placeholder">✓ 已连接，模型正在启动'+(parseModel(model).tier==='pro'?'（深度思考首次响应约需 1-2 分钟，请稍候）':'')+'……</span>';
   statusEl.innerHTML='<span class="spinner"></span> 等待响应';
@@ -1698,6 +1703,7 @@ async function streamChat(apiKey, model, systemPrompt, userQ, bodyEl, statusEl, 
         // 流内错误事件：有些厂商以 200 + data:{"error":...} 返回错误——同样必须抛出
         if(j.error) throw new Error('接口报错：'+(j.error.message || j.error.code || JSON.stringify(j.error).slice(0,180)));
         if(j.code && j.message && !j.choices) throw new Error('接口报错：'+j.code+'：'+j.message);
+        if(j.choices && j.choices[0] && j.choices[0].finish_reason) fin = j.choices[0].finish_reason;
         const d = j.choices?.[0]?.delta || {};
         // 深度思考过程（reasoning_content）：显示思考状态，不计入正文
         const rc = d.reasoning_content || '';
@@ -1737,9 +1743,9 @@ async function streamChat(apiKey, model, systemPrompt, userQ, bodyEl, statusEl, 
     metaEl.textContent = secs+'s';
     return { text:'', chars:0, thinkChars, secs:parseFloat(secs) };
   }
-  statusEl.textContent='✓ 完成';
+  statusEl.textContent = (fin==='length') ? '⚠ 完成(触及token上限·尾部被截)' : '✓ 完成';
   metaEl.textContent = chars+' 字 · '+secs+'s'+(thinkChars?' · 思考'+thinkChars+'字':'');
-  return { text:acc, chars, thinkChars, secs:parseFloat(secs) };
+  return { text:acc, chars, thinkChars, finish:fin, secs:parseFloat(secs) };
 }
 
 // 境外基底（GPT/Claude/Gemini）：经 /api/llm-proxy 中转、【流式】逐块返回，按各家 SSE 格式解析。
@@ -1797,6 +1803,7 @@ async function callOverseas(apiKey, model, systemPrompt, userQ, bodyEl, statusEl
   const reader = resp.body.getReader();
   const decoder = new TextDecoder();
   let buf='', acc='', chars=0, thinkChars=0;
+  let fin='';   // finish_reason（'length'=触及max_tokens被截断），四家形态统一归一到这里
   try{
     while(true){
       const {done,value}=await reader.read();
@@ -1815,6 +1822,7 @@ async function callOverseas(apiKey, model, systemPrompt, userQ, bodyEl, statusEl
         if(vendor === 'gpt' || vendor === 'minimax'){
           // OpenAI 形态: data:{choices:[{delta:{content}}]}；MiniMax 另有 delta.reasoning_content（reasoning_split:true 时）
           const dd = j.choices?.[0]?.delta || {};
+          if(j.choices?.[0]?.finish_reason) fin = j.choices[0].finish_reason;
           const rc = dd.reasoning_content || '';
           if(rc){
             gotAnything=true; thinkChars+=rc.length;
@@ -1826,11 +1834,13 @@ async function callOverseas(apiKey, model, systemPrompt, userQ, bodyEl, statusEl
           // Anthropic: 各类事件都在 data 里带 type
           //   content_block_delta → delta.text（正文）; message_delta/…忽略; error → 抛出
           if(j.type === 'content_block_delta'){ delta = j.delta?.text || ''; }
+          else if(j.type === 'message_delta'){ const sr = j.delta?.stop_reason; if(sr) fin = (sr === 'max_tokens') ? 'length' : sr; }
           else if(j.type === 'error'){ throw new Error(j.error?.message || 'Anthropic 流式错误'); }
         } else if(vendor === 'gemini'){
           // Gemini SSE: data:{candidates:[{content:{parts:[{text}]}}]}
           const parts = j.candidates?.[0]?.content?.parts;
           delta = Array.isArray(parts) ? parts.map(p=>p.text||'').join('') : '';
+          const fr = j.candidates?.[0]?.finishReason; if(fr) fin = (fr === 'MAX_TOKENS') ? 'length' : String(fr).toLowerCase();
         }
         if(delta){
           gotAnything=true;
@@ -1861,9 +1871,9 @@ async function callOverseas(apiKey, model, systemPrompt, userQ, bodyEl, statusEl
     acc = acc.replace(/<think>[\s\S]*?<\/think>/g, '').replace(/^[\s\S]*?<\/think>/, '').trim();
   }
   bodyEl.textContent = acc;
-  statusEl.textContent='✓ 完成';
+  statusEl.textContent = (fin==='length') ? '⚠ 完成(触及token上限·尾部被截)' : '✓ 完成';
   metaEl.textContent = chars+' 字 · '+secs+'s'+(thinkChars ? ' · 思考'+thinkChars+'字' : '');
-  return { text:acc, chars, thinkChars, secs:parseFloat(secs) };
+  return { text:acc, chars, thinkChars, finish:fin, secs:parseFloat(secs) };
 }
 
 // 主流程：两边并行
@@ -2087,16 +2097,17 @@ async function runOnePaper(cfg){
   await Promise.all(jobs);
 
   // 若两审都失败，保留初稿
-  if(!revA && !revB){ setStat('✍ 完成 ' + paperText.length + ' 字'); if(cfg.bodyEl) cfg.bodyEl.innerHTML = renderPaperText(paperText); return { title:cfg.title, text:paperText }; }
+  if(!revA && !revB){ setStat('✍ 完成 ' + paperText.length + ' 字' + ((draft && draft.finish==='length') ? ' · ⚠触及token上限被截断' : '') + ((draft && draft.thinkChars) ? ' · 思考'+draft.thinkChars+'字' : '')); if(cfg.bodyEl) cfg.bodyEl.innerHTML = renderPaperText(paperText); return { title:cfg.title, text:paperText }; }
 
   // 3. 主笔据两份意见改一次（同样不流式，只滚动字数，完成后一次性显示）
   sink = document.createElement('div');
   setStat('✍ 改稿中…');
   startTicker();
   let finalText = paperText;
+  let lastFin = (draft && draft.finish) || '', lastThink = (draft && draft.thinkChars) || 0;
   try{
     const rev = await streamChat(cfg.writeKey, cfg.writeSel, revisePrompt(cfg.reflection), buildReviseInputDual(paperText, revA, revB), sink, dummy, dummy, PAPER_MAX_TOKENS);
-    if(rev.text) finalText = rev.text;
+    if(rev.text){ finalText = rev.text; lastFin = rev.finish || ''; lastThink = rev.thinkChars || 0; }
   }catch(e){ /* 改稿失败则保留初稿 */ }
   stopTicker();
 
@@ -2114,7 +2125,7 @@ async function runOnePaper(cfg){
     }
   }catch(_){}
   if(cfg.bodyEl) cfg.bodyEl.innerHTML = finalHtml;
-  setStat('✍ 完成 ' + finalText.length + ' 字');
+  setStat('✍ 完成 ' + finalText.length + ' 字' + (lastFin==='length' ? ' · ⚠触及token上限被截断' : '') + (lastThink ? ' · 思考'+lastThink+'字' : ''));
   return { title:cfg.title, text:finalText, revA:revA, revB:revB, revLabelA:vendorLabel(cfg.revA), revLabelB:cfg.revB?vendorLabel(cfg.revB):'' };
 }
 
@@ -2244,7 +2255,7 @@ function thoughtDeclPara(){
 }
 (function(){ const el=document.getElementById('thoughtDeclBar'); if(el) el.textContent='📖 '+THOUGHT_DECL; })();
 // 构建版本徽章：每次部署改这个 tag——用户一眼能看出浏览器跑的是不是最新代码（根治"改了但没刷到"的排障黑洞）
-const BUILD_TAG = '20260712-1345·界面全面化';
+const BUILD_TAG = '20260712-1400·截断诚实化+M3思考余量';
 (function(){ const el=document.getElementById('buildTag'); if(el) el.textContent=BUILD_TAG; })();
 
 // 四篇下载为一个Word
