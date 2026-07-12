@@ -659,9 +659,11 @@ const SHARED_VIEWS = {
 };
 // 子层展示名（UI标签用，不进prompt）
 // 四篇1万字论文的输出上限：物理截断，防止强模型（尤其深度思考档）写嗨了停不下来突破1万字。
-// 1万字中文约需 1.5-1.6万 tokens；设 16000 → 足够写满1万字并留少量余量，但绝不给它写到1.7万字的空间。
+// 1万字中文约需 1.5-1.6万 tokens。曾设16000做硬顶，结果Claude等写到1.5万字时被拦腰截断——四篇论文全部断在句子中间，
+// 而按规范"证伪条件"写在结尾，截断=系统性砍掉证伪条款，直接拖死创新智商评分的F维。
+// 流式时代已无非流式16000护栏，改设32000：长度由规格里"字数服从内容"约束，token上限只做安全天花板，绝不让论文断头。
 // （这是继 Prompt 硬约束、策划先行之后的第三重、也是最硬的一重保险——不管模型想写多少，到 token 上限就必须停。）
-const PAPER_MAX_TOKENS = 16000;
+const PAPER_MAX_TOKENS = 32000;
 // 《从发现到发生》心得约5000字（5000字中文≈8000 tokens）——设8000上限。境外基底已走流式(不撞代理超时)，5000字可放心写足、内化更充分。
 // 心得够内化即可，不必写太长（写太长会拖慢右栏等待）。
 const REFLECT_MAX_TOKENS = 8000;
@@ -1359,8 +1361,8 @@ function buildPayload(sel, systemPrompt, userQ, maxTokens){
     base.temperature = 0.7;
   } else if(vendor === 'claude'){
     // Claude（Anthropic /v1/messages 格式，system 独立字段；经代理、【流式】）
-    // 流式(stream:true)：首字节几秒到达，代理逐块透传，永不撞 ~100s 网关超时——这才能让长文（论文16000）跑通。
-    // max_tokens 跟随调用方传入（心得3600/论文16000）。快速档用真实存在的 claude-sonnet-4-6（原 claude-sonnet-5 不存在，选中必404）。
+    // 流式(stream:true)：首字节几秒到达，代理逐块透传，永不撞 ~100s 网关超时——这才能让长文（论文32000）跑通。
+    // max_tokens 跟随调用方传入（心得8000/论文32000）。快速档用真实存在的 claude-sonnet-4-6（原 claude-sonnet-5 不存在，选中必404）。
     return {
       model: (tier === 'pro') ? 'claude-opus-4-8' : 'claude-sonnet-4-6',
       max_tokens: Math.min(cap, 32000),
@@ -1373,7 +1375,7 @@ function buildPayload(sel, systemPrompt, userQ, maxTokens){
     return {
       systemInstruction: { parts: [{ text: systemPrompt }] },
       contents: [{ role:'user', parts: [{ text: userQ }] }],
-      generationConfig: { maxOutputTokens: Math.min(cap, 16000), temperature: 0.7 }
+      generationConfig: { maxOutputTokens: Math.min(cap, 32000), temperature: 0.7 }
     };
   }
   return base;
@@ -1594,7 +1596,7 @@ async function streamChat(apiKey, model, systemPrompt, userQ, bodyEl, statusEl, 
 
 // 境外基底（GPT/Claude/Gemini）：经 /api/llm-proxy 中转、【流式】逐块返回，按各家 SSE 格式解析。
 // 流式的意义：首字节几秒到达、代理逐块透传（src/worker.js 直接透传 upstream.body），
-// 服务端不必等全部生成完，永不撞 Cloudflare ~100s 网关超时——这才让长文（论文 max_tokens 16000）在境外基底上跑得通。
+// 服务端不必等全部生成完，永不撞 Cloudflare ~100s 网关超时——这才让长文（论文 max_tokens 32000）在境外基底上跑得通。
 async function callOverseas(apiKey, model, systemPrompt, userQ, bodyEl, statusEl, metaEl, t0, maxTokens){
   const { vendor, tier } = parseModel(model);
   const payload = buildPayload(model, systemPrompt, userQ, maxTokens);
