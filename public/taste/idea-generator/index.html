@@ -1499,7 +1499,11 @@ function buildPayload(sel, systemPrompt, userQ, maxTokens){
     // GPT（OpenAI，chat/completions 格式；经代理、【流式】）
     base.model = (tier === 'pro') ? 'gpt-5.5' : 'gpt-5.4';  // 5.5当前广泛可用旗舰 / 5.4均衡稳妥
     base.stream = true;   // 流式：首字节快，绕开代理网关超时
-    base.temperature = 0.7;
+    // 【2026-07-12 实测】GPT-5.x 推理系参数改制：不认 max_tokens（API 400: Unsupported parameter,
+    // use 'max_completion_tokens'），且 temperature 仅支持默认值（同 o 系）——不传采样参数、预算改新名。
+    // 注意：max_completion_tokens 含推理 token（OpenAI 语义）；finish_reason 诚实化已上线，若思考吞预算会当场亮牌。
+    base.max_completion_tokens = base.max_tokens;
+    delete base.max_tokens;
   } else if(vendor === 'claude'){
     // Claude（Anthropic /v1/messages 格式，system 独立字段；经代理、【流式】）
     // 流式(stream:true)：首字节几秒到达，代理逐块透传，永不撞 ~100s 网关超时——这才能让长文（论文32000）跑通。
@@ -2274,7 +2278,7 @@ function thoughtDeclPara(){
 }
 (function(){ const el=document.getElementById('thoughtDeclBar'); if(el) el.textContent='📖 '+THOUGHT_DECL; })();
 // 构建版本徽章：每次部署改这个 tag——用户一眼能看出浏览器跑的是不是最新代码（根治"改了但没刷到"的排障黑洞）
-const BUILD_TAG = '20260712-1420·M3拆雷+验尸仪';
+const BUILD_TAG = '20260712-1510·GPT参数改制';
 (function(){ const el=document.getElementById('buildTag'); if(el) el.textContent=BUILD_TAG; })();
 
 // 四篇下载为一个Word
