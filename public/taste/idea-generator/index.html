@@ -1156,7 +1156,19 @@ async function getReflection(writeSel, writeKey, onProgress){
 // 心得是"该基底对发生学的内化自省"，与用户具体问题无关（prompt 里不含问题）——故【按基底】缓存：
 //   换问题不重写、换基底才重写。第一次写完即存入本地磁盘(localStorage)，下次刷新/隔天自动载入、跳过写作。
 // 三级缓存：① 内存(同会话最快) → ② 本地磁盘(跨刷新/跨会话) → ③ 真正写一次(写完存盘)。
-const REFLECT_LS_VER = 'v1';   // 内功或心得规范升级时 +1，旧缓存自动失效重写
+const REFLECT_LS_VER = 'v2';   // 内功或心得规范升级、或某档位【底层模型更换】时 +1，旧缓存自动失效重写
+// v1→v2 一次性迁移（2026-07-12）：qwen:pro 底层模型从 qwen-max 换成 qwen-plus(思考)。
+// 按【基底↔心得一一对应】铁律，qwen-plus 不可继承 qwen-max 写的心得——其它基底的心得原样搬运到 v2，仅 qwen:pro 作废重写。
+try{
+  Object.keys(localStorage).filter(k=>k.indexOf('sde_reflect_v1_')===0).forEach(k=>{
+    const sel = k.slice('sde_reflect_v1_'.length);
+    if(sel !== 'qwen:pro'){
+      const v = localStorage.getItem(k);
+      if(v && !localStorage.getItem('sde_reflect_v2_'+sel)) localStorage.setItem('sde_reflect_v2_'+sel, v);
+    }
+    localStorage.removeItem(k);
+  });
+}catch(_){}
 function reflectLsKey(writeSel){ return 'sde_reflect_' + REFLECT_LS_VER + '_' + (writeSel || 'unknown'); }
 function loadReflectLS(writeSel){ try{ const t = localStorage.getItem(reflectLsKey(writeSel)); return (t && t.length > 1500) ? t : ''; }catch(_){ return ''; } }
 function saveReflectLS(writeSel, text){ try{ if(text && text.length > 1500) localStorage.setItem(reflectLsKey(writeSel), text); }catch(_){} }
@@ -2118,7 +2130,7 @@ function thoughtDeclPara(){
 }
 (function(){ const el=document.getElementById('thoughtDeclBar'); if(el) el.textContent='📖 '+THOUGHT_DECL; })();
 // 构建版本徽章：每次部署改这个 tag——用户一眼能看出浏览器跑的是不是最新代码（根治"改了但没刷到"的排障黑洞）
-const BUILD_TAG = '20260712-1225·千问Plus思考';
+const BUILD_TAG = '20260712-1240·千问Plus思考·心得迁移';
 (function(){ const el=document.getElementById('buildTag'); if(el) el.textContent=BUILD_TAG; })();
 
 // 四篇下载为一个Word
