@@ -1124,7 +1124,15 @@ function escTxt(s){ return String(s||'').replace(/[<>&]/g, c=>({'<':'&lt;','>':'
 async function getReflection(writeSel, writeKey, onProgress){
   const sink = document.createElement('div'), dummy = { textContent:'', innerHTML:'' };
   let ticker=null; _reflectLastErr='';
-  if(onProgress){ ticker=setInterval(()=>{ const n=(sink.textContent||'').length; onProgress(n); },500); }
+  const _t0=Date.now();
+  // 进度上报要诚实：思考/连接阶段 sink 里是占位提示（"深度思考中…"等），不是心得正文——
+  // 不能把占位文本的长度当成"已写N字"报出去（曾把用户吓成"卡死"：其实K2.6在深思，界面却冻结在"已写32字"）。
+  // 占位阶段上报 n=-1 + 占位原文 + 已等待秒数；只有真正文出现后才报字数。
+  if(onProgress){ ticker=setInterval(()=>{
+    const ph = sink.querySelector ? sink.querySelector('.placeholder') : null;
+    if(ph){ const secs=Math.round((Date.now()-_t0)/1000); onProgress(-1, (ph.textContent||'').trim()+'（已等待 '+secs+'s）'); }
+    else { const n=(sink.textContent||'').length; onProgress(n); }
+  },500); }
   try{
     const res = await streamChat(writeKey, writeSel, reflectPrompt(),
       '请写这篇《从发现到发生——兼对我自身认知惯性的一次检视》，约5000字。这是你接下来所有工作的思维底座。',
@@ -1749,7 +1757,7 @@ async function run(){
   // 读取用户在控件上的选择：若选了"重写心得"，先清掉该基底的存储，本次会重新写一份并存盘
   const forceRewrite = consumeReflectRewriteChoice(model);
   if(rb0){ rb0.style.display='block'; const s=document.getElementById('sixReflectStatus'); if(s) s.textContent= forceRewrite ? '第一阶段 · 已按你的选择清除旧心得，基底正在重新写《从发现到发生》（约5000字）…' : '第一阶段 · 基底正在学习内功、写《从发现到发生》心得（约5000字）…写好后存本地磁盘，下次自动载入'; }
-  const sixReflection = await getSharedReflection(model, key, (n)=>{ const s=document.getElementById('sixReflectStatus'); if(s) s.textContent = n>0?('✍ 第一阶段·心得已写 '+n+' 字'):'第一阶段·心得写作中…'; });
+  const sixReflection = await getSharedReflection(model, key, (n, note)=>{ const s=document.getElementById('sixReflectStatus'); if(!s) return; if(n<0){ s.textContent='第一阶段 · '+(note||'基底准备中…'); } else s.textContent = n>0?('✍ 第一阶段·心得已写 '+n+' 字'):'第一阶段·心得写作中…'; });
   { const s=document.getElementById('sixReflectStatus'), b=document.getElementById('sixReflectBody'); const cachedNote = _sharedReflection.fromCache ? '（✓ 本地缓存·未重写）' : '';
     if(sixReflection){ if(s) s.textContent='✓ 第一阶段完成 · 内化 '+sixReflection.length+' 字'+cachedNote+'（本轮六篇→涌现→四篇→第二批全部复用这份心得）'; if(b) b.innerHTML=renderPaperText(sixReflection); updateReflectChoiceBar(); }
     else { if(s) s.textContent='（第一阶段心得未成功·后续退回常规提智）'; if(b) b.innerHTML='<span class="placeholder">心得生成未成功，后续用常规提智继续'+(_reflectLastErr?('<br><span style="color:#E8897B">失败原因：'+escTxt(_reflectLastErr)+'</span>'):'')+'</span>'; } }
@@ -2014,7 +2022,7 @@ if(fourStartBtn){
     reflWrap.innerHTML='<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px"><div style="font-size:14px;font-weight:700;color:#B98CFF">📖 第一次提智·内化：《从发现到发生》</div><div id="reflStatus" style="font-size:12px;color:#8B98A5">写作中…</div></div><div id="reflBody" style="color:#C9B8DC;font-size:13.5px;line-height:1.85;max-height:280px;overflow:auto"><span class="placeholder">正在把发生学内化为自己的理解…</span></div>';
     box0.appendChild(reflWrap);
     consumeReflectRewriteChoice(writeSel);   // 尊重用户在控件上的"重写心得"选择
-    const reflection = await getSharedReflection(writeSel, writeKey, (n)=>{ const el=$('reflStatus'); if(el) el.textContent = n>0?('✍ 已写 '+n+' 字（或复用已存的心得）'):'写作中…'; });
+    const reflection = await getSharedReflection(writeSel, writeKey, (n, note)=>{ const el=$('reflStatus'); if(!el) return; if(n<0){ el.textContent=note||'准备中…'; } else el.textContent = n>0?('✍ 已写 '+n+' 字（或复用已存的心得）'):'写作中…'; });
     if(reflection){
       $('reflBody').innerHTML = renderPaperText(reflection);
       $('reflStatus').textContent = '✓ 内化完成 '+reflection.length+' 字 · 四篇将带着这份认知来写';
@@ -2151,7 +2159,7 @@ if(upliftBtn){
     ureflWrap.innerHTML='<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px"><div style="font-size:14px;font-weight:700;color:#B98CFF">📖 第一次提智·内化：《从发现到发生》</div><div id="ureflStatus" style="font-size:12px;color:#8B98A5">写作中…</div></div><div id="ureflBody" style="color:#C9B8DC;font-size:13.5px;line-height:1.85;max-height:280px;overflow:auto"><span class="placeholder">正在把发生学内化为自己的理解…</span></div>';
     ubox0.appendChild(ureflWrap);
     consumeReflectRewriteChoice(writeSel);   // 尊重用户在控件上的"重写心得"选择
-    const ureflection = await getSharedReflection(writeSel, writeKey, (n)=>{ const el=$('ureflStatus'); if(el) el.textContent = n>0?('✍ 已写 '+n+' 字（或复用已存的心得）'):'写作中…'; });
+    const ureflection = await getSharedReflection(writeSel, writeKey, (n, note)=>{ const el=$('ureflStatus'); if(!el) return; if(n<0){ el.textContent=note||'准备中…'; } else el.textContent = n>0?('✍ 已写 '+n+' 字（或复用已存的心得）'):'写作中…'; });
     if(ureflection){
       $('ureflBody').innerHTML = renderPaperText(ureflection);
       $('ureflStatus').textContent = '✓ 内化完成 '+ureflection.length+' 字 · 四篇将带着这份认知做发生引擎';
