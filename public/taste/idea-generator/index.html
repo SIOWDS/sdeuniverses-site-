@@ -1366,6 +1366,12 @@ function buildPayload(sel, systemPrompt, userQ, maxTokens){
     if(tier === 'pro'){
       base.model = 'qwen-max';            // 最强
       base.temperature = 0.7;
+      // 打开深度思考：Qwen3 系在 DashScope 兼容模式支持 enable_thinking（须流式，本站恒为流式），
+      // 思考过程经 reasoning_content 流出——前端解析器已支持，会显示"🧠 深度思考中(N字)"。
+      // 此前千问是七基底里唯一没开思考开关的（DeepSeek 传 thinking:enabled、GLM/K2.6/Opus 原生深思），
+      // 导致 pro 档 30 秒裸奔出稿、质量明显平。若个别账号的 qwen-max 快照不支持此参数，
+      // 面板会显示厂商报错原话（诊断已上线），届时改用 qwen-plus 即可。
+      base.enable_thinking = true;
     } else {
       base.model = 'qwen-plus';           // 均衡快速
       base.temperature = 0.7;
