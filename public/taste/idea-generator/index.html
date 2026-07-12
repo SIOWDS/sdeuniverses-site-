@@ -1490,6 +1490,11 @@ function buildPayload(sel, systemPrompt, userQ, maxTokens){
     // 与思考吞掉预算的症状吻合）。给思考预留 32k 余量——正文预算仍是调用方的 cap，思考另有口粮；
     // M3 输出上限 131072 不越界。finish_reason 已诚实化，下轮界面会直接显示是否仍触顶。
     base.max_tokens = Math.min(cap + 32000, 131072);
+    // 【正文字数硬约束】实测 M3 每篇思考约2.2万字、正文仅967-2596字——"长推理短作答"的智能体风格
+    // 会无视规格里的字数要求。此为合规补丁（同"不传temperature"性质），不是提智：只强制它把话说完。
+    if(base.messages && base.messages[0] && base.messages[0].role === 'system'){
+      base.messages[0].content = '【硬性要求】你的思考过程不计入正文字数；正文必须达到任务规定的篇幅下限，不得因为思考已经详尽就压缩正文——思考是给你自己的，正文才是交付物。\n\n' + base.messages[0].content;
+    }
   } else if(vendor === 'gpt'){
     // GPT（OpenAI，chat/completions 格式；经代理、【流式】）
     base.model = (tier === 'pro') ? 'gpt-5.5' : 'gpt-5.4';  // 5.5当前广泛可用旗舰 / 5.4均衡稳妥
@@ -2255,7 +2260,7 @@ function thoughtDeclPara(){
 }
 (function(){ const el=document.getElementById('thoughtDeclBar'); if(el) el.textContent='📖 '+THOUGHT_DECL; })();
 // 构建版本徽章：每次部署改这个 tag——用户一眼能看出浏览器跑的是不是最新代码（根治"改了但没刷到"的排障黑洞）
-const BUILD_TAG = '20260712-1400·截断诚实化+M3思考余量';
+const BUILD_TAG = '20260712-1410·M3正文字数硬约束';
 (function(){ const el=document.getElementById('buildTag'); if(el) el.textContent=BUILD_TAG; })();
 
 // 四篇下载为一个Word
