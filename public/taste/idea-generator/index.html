@@ -1809,6 +1809,7 @@ async function callOverseas(apiKey, model, systemPrompt, userQ, bodyEl, statusEl
   const decoder = new TextDecoder();
   let buf='', acc='', chars=0, thinkChars=0;
   let fin='';   // finish_reason（'length'=触及max_tokens被截断），四家形态统一归一到这里
+  let lastData='', sensFlag=false;   // minimax 验尸用：最后一个原始chunk + 内容审查标记
   try{
     while(true){
       const {done,value}=await reader.read();
@@ -1828,6 +1829,7 @@ async function callOverseas(apiKey, model, systemPrompt, userQ, bodyEl, statusEl
           // OpenAI 形态: data:{choices:[{delta:{content}}]}；MiniMax 另有 delta.reasoning_content（reasoning_split:true 时）
           const dd = j.choices?.[0]?.delta || {};
           if(j.choices?.[0]?.finish_reason) fin = j.choices[0].finish_reason;
+          if(vendor === 'minimax'){ lastData = data.slice(0, 400); if(j.output_sensitive === true || (j.base_resp && j.base_resp.status_code && j.base_resp.status_code !== 0)) sensFlag = true; }
           const rc = dd.reasoning_content || '';
           if(rc){
             gotAnything=true; thinkChars+=rc.length;
@@ -1871,11 +1873,23 @@ async function callOverseas(apiKey, model, systemPrompt, userQ, bodyEl, statusEl
     statusEl.textContent='空响应'; metaEl.textContent=secs+'s';
     return { text:'', chars:0, thinkChars:0, secs:parseFloat(secs) };
   }
-  // MiniMax 保险丝：若 reasoning_split 未生效、思考仍以 <think> 标签内联在正文——最终剥离，绝不让思考文本混进成品
-  if(vendor === 'minimax' && acc.indexOf('<think>') >= 0){
-    acc = acc.replace(/<think>[\s\S]*?<\/think>/g, '').replace(/^[\s\S]*?<\/think>/, '').trim();
+  // MiniMax 保险丝：若 reasoning_split 未生效、思考以 <think> 标签内联在正文——剥离成对块 + 开头漏出的孤立闭合标签。
+  // 【拆雷记录】旧写法 /^[\s\S]*?<\/think>/ 会在正文中段出现孤立 </think>（M 系 reasoning_split 半生效的已知漏标）时
+  // 把它之前的全部正文一口吞掉——现改为只清理开头 80 字内的漏标，正文永不误伤。
+  if(vendor === 'minimax' && (acc.indexOf('<think>') >= 0 || acc.indexOf('</think>') >= 0)){
+    acc = acc.replace(/<think>[\s\S]*?<\/think>/g, '');
+    const early = acc.slice(0, 80);
+    if(early.indexOf('</think>') >= 0){ acc = acc.slice(acc.indexOf('</think>') + 8); }
+    acc = acc.trim();
   }
   bodyEl.textContent = acc;
+  // MiniMax 正文短于规格时自动附上验尸报告——不再靠猜，让流自己交代
+  if(vendor === 'minimax' && chars > 0 && chars < 3200){
+    const diag = document.createElement('div');
+    diag.style.cssText = 'margin-top:10px;padding:8px 10px;border:1px dashed rgba(232,137,123,0.45);border-radius:6px;font-size:11px;color:#C98;line-height:1.7;word-break:break-all';
+    diag.textContent = '🔬 短交付诊断：finish_reason=' + (fin || '(未收到)') + ' · 思考' + thinkChars + '字 · 正文' + chars + '字 · 审查标记=' + (sensFlag ? '触发' : '无') + ' · 最后chunk原文：' + (lastData || '(空)');
+    bodyEl.appendChild(diag);
+  }
   statusEl.textContent = (fin==='length') ? '⚠ 完成(触及token上限·尾部被截)' : '✓ 完成';
   metaEl.textContent = chars+' 字 · '+secs+'s'+(thinkChars ? ' · 思考'+thinkChars+'字' : '');
   return { text:acc, chars, thinkChars, finish:fin, secs:parseFloat(secs) };
@@ -2260,7 +2274,7 @@ function thoughtDeclPara(){
 }
 (function(){ const el=document.getElementById('thoughtDeclBar'); if(el) el.textContent='📖 '+THOUGHT_DECL; })();
 // 构建版本徽章：每次部署改这个 tag——用户一眼能看出浏览器跑的是不是最新代码（根治"改了但没刷到"的排障黑洞）
-const BUILD_TAG = '20260712-1410·M3正文字数硬约束';
+const BUILD_TAG = '20260712-1420·M3拆雷+验尸仪';
 (function(){ const el=document.getElementById('buildTag'); if(el) el.textContent=BUILD_TAG; })();
 
 // 四篇下载为一个Word
