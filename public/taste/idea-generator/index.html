@@ -239,6 +239,9 @@ footer{border-top:1px solid var(--border);text-align:center;padding:30px 20px 44
   🔒 你的 API Key 全程只保存在本机浏览器(localStorage)。<b>国产基底</b>(DeepSeek · 智谱GLM · Kimi · 通义千问)——请求直接从你的浏览器发往对应厂商，我们的服务器全程不经手、不存储、不记录你的 Key 或问题。<b>境外基底</b>(GPT · Claude · Gemini)——因在中国大陆无法直连，请求会经本站中转服务器转发给对应厂商，中转<b>只转发、不存储、不记录</b>你的 Key（用完即走）；介意的话请改用国产基底。<br>⏱ 六篇各约 4000 字的小论文<b>并行生成</b>（六路同时进行）。选"深度思考/最强"档时，每篇会先深度思考 1-2 分钟再动笔，质量最高、最能展现 SDE 的威力，请耐心等待几分钟；选"快速"档几秒出字。若某篇报错（并发被限流），刷新重试或换快速档。
 </div>
 
+<!-- 思想拓展功能声明：页面常驻；同一文案由 JS 注入（单一来源 THOUGHT_DECL），并写入所有导出文件 -->
+<div id="thoughtDeclBar" style="max-width:1000px;margin:10px auto 0;background:rgba(30,24,12,0.45);border:1px solid rgba(201,162,39,0.35);border-radius:10px;padding:10px 18px;font-size:12.5px;color:#C9B27A;line-height:1.7;text-align:center"></div>
+
 <div class="err-box" id="errBox"></div>
 
 <!-- 三视角对照：每行一个视角，左普通 右SDE -->
@@ -2070,6 +2073,18 @@ if(fourStartBtn){
   });
 }
 
+// ════════════════════════════════════════════════════════════════════════
+// 【思想拓展功能声明 · 强制项】本智能体产出的定位声明——页面常驻显示 + 写入每一个导出文件。
+//   单一来源：THOUGHT_DECL。任何新增的导出通道（Word/PDF/其它）都必须带上本声明，不许遗漏。
+// ════════════════════════════════════════════════════════════════════════
+const THOUGHT_DECL = '思想拓展声明：本智能体（SDE 金点子发生器）产生的任何论文与文本，均作为"思想拓展功能"提供——是 AI 在特定方法引导下的思想实验与观点探索，用于拓展思路、激发思考，不构成正式学术研究成果或事实性结论；如需正式使用，请自行核验并遵守学术规范。';
+const THOUGHT_DECL_HTML = '<p style="text-align:center;color:#888;font-size:10.5pt;border:1px solid #ddd;padding:6pt 10pt;margin:8pt auto">📖 '+THOUGHT_DECL+'</p>';
+function thoughtDeclPara(){
+  const { Paragraph, TextRun } = docx;
+  return new Paragraph({ children:[new TextRun({ text:'📖 '+THOUGHT_DECL, italics:true, size:18, color:'888888' })], spacing:{ after:220 } });
+}
+(function(){ const el=document.getElementById('thoughtDeclBar'); if(el) el.textContent='📖 '+THOUGHT_DECL; })();
+
 // 四篇下载为一个Word
 const fourDlBtn = $('fourDlBtn');
 if(fourDlBtn){
@@ -2077,7 +2092,7 @@ if(fourDlBtn){
     const papers = window._fourPapers; if(!papers) return;
     const q = (window._lastResult && window._lastResult.question) || '';
     const showRev = document.getElementById('showReviewsChk') && document.getElementById('showReviewsChk').checked;
-    let bodyHtml = '<h1 style="text-align:center">四篇学术论文</h1><p style="text-align:center;color:#666">原初问题：'+esc4(q)+'</p><hr/>';
+    let bodyHtml = '<h1 style="text-align:center">四篇学术论文</h1><p style="text-align:center;color:#666">原初问题：'+esc4(q)+'</p>' + THOUGHT_DECL_HTML + '<hr/>';
     papers.forEach((p,i)=>{
       if(!p.text) return;
       bodyHtml += '<h2 style="page-break-before:always">'+esc4(p.title)+'</h2>';
@@ -2186,14 +2201,14 @@ if(upliftDlBtn){
   upliftDlBtn.addEventListener('click', ()=>{
     const papers = window._upliftPapers; if(!papers) return;
     const q = (window._lastResult && window._lastResult.question) || '';
-    let bodyHtml = '<h1 style="text-align:center">第二批 · 发生引擎提升 · 四篇学术论文</h1><p style="text-align:center;color:#666">原初问题：'+esc4(q)+'　·　经三方程·123原理·六路径二次提智</p><hr/>';
+    let bodyHtml = '<h1 style="text-align:center">第二批 · 发生引擎提升 · 四篇学术论文</h1><p style="text-align:center;color:#666">原初问题：'+esc4(q)+'　·　经三方程·123原理·六路径二次提智</p>' + THOUGHT_DECL_HTML + '<hr/>';
     papers.forEach((p)=>{
       if(!p.text) return;
       bodyHtml += '<h2 style="page-break-before:always">'+esc4(p.title)+'</h2>';
-      bodyHtml += p.text.split(/\\n{2,}/).map(para=>'<p>'+esc4(para).replace(/\\n/g,'<br/>')+'</p>').join('');
+      bodyHtml += p.text.split(/\n{2,}/).map(para=>'<p>'+esc4(para).replace(/\n/g,'<br/>')+'</p>').join('');
     });
     const html='<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"><title>第二批四篇</title></head><body>'+bodyHtml+'</body></html>';
-    const blob=new Blob(['\\ufeff'+html],{type:'application/msword'});
+    const blob=new Blob(['\ufeff'+html],{type:'application/msword'});
     const url=URL.createObjectURL(blob); const a=document.createElement('a');
     a.href=url; a.download='第二批_发生引擎提升_四篇学术论文.doc'; a.click(); URL.revokeObjectURL(url);
   });
@@ -2260,6 +2275,7 @@ if(emergeDlBtn){
     }
     const kids = [
       new Paragraph({children:[new TextRun({text:'二阶涌现 · 新典范', bold:true, size:36})], spacing:{after:160}}),
+      thoughtDeclPara(),
       new Paragraph({children:[new TextRun({text:'问题：'+(r&&r.question||''), italics:true, size:22})], spacing:{after:200}}),
       ...toParas(em)
     ];
@@ -2360,6 +2376,7 @@ if(paperDlBtn){
         spacing:{after:isHead?140:100}
       });
     });
+    paras.splice(1, 0, thoughtDeclPara());   // 标题之后插入思想拓展声明
     const doc = new Document({sections:[{children:paras}]});
     Packer.toBlob(doc).then(blob=>{
       const url = URL.createObjectURL(blob);
@@ -2400,6 +2417,7 @@ function buildPaperPdfHTML(text, question){
     <div style="font-size:10pt;text-align:center;color:#444;margin:0 0 3pt">王德生</div>
     <div style="font-size:9pt;text-align:center;color:#666;font-style:italic;margin:0 0 6pt">德麦国际 · SDE Universes</div>
     <div style="font-size:8.5pt;text-align:center;color:#888;margin:0 0 16pt">原初问题：${esc(question||'')}</div>
+    <div style="font-size:8pt;text-align:center;color:#999;border:0.5pt solid #ddd;padding:4pt 8pt;margin:0 0 14pt">📖 ${THOUGHT_DECL}</div>
     <style>
       .paper-pdf-root h2{font-size:13pt;font-weight:700;margin:15pt 0 6pt;color:#000}
       .paper-pdf-root h3{font-size:11pt;font-weight:700;margin:11pt 0 4pt;color:#222}
@@ -2689,6 +2707,7 @@ $('dlBtn').addEventListener('click', ()=>{
     }
   });
 
+  children.push(thoughtDeclPara());
   children.push(new Paragraph({ children:[new TextRun({ text:'— 由 SDE 金点子发生器生成 · sdeuniverses.com —', size:16, color:'aaaaaa' })], spacing:{ before:400 }, alignment:AlignmentType.CENTER }));
 
   const doc = new Document({ sections:[{ properties:{}, children }] });

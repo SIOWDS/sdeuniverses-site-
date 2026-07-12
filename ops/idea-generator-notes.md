@@ -49,5 +49,7 @@
 
 - **前台零 SDE 术语**：发生器面向公众，武器锻造第五律——前台不出现"SDE/发生学/纠缠"等黑话（内功在后台跑）。
 - Key 分存：`sde_ds_key / sde_glm_key / sde_claude_key ...`，全程只在浏览器 localStorage，国产直连、境外经代理只转发不存储。
+- **思想拓展功能声明（强制项，2026-07-12）**：本智能体产出的定位声明。单一来源常量 `THOUGHT_DECL`（页面 `thoughtDeclBar` 常驻 + 六个导出通道全部内嵌：四篇/第二批 HTML-Word、涌现/单篇/六篇 docx、学术 PDF）。**将来任何新增导出通道必须带上此声明**（HTML 用 `THOUGHT_DECL_HTML`，docx 用 `thoughtDeclPara()`，模板字面量直接 `${THOUGHT_DECL}`），不许遗漏。改文案只改 THOUGHT_DECL 一处。
+- 顺手修复（同日）：第二批 Word 导出的双重转义 bug——分段正则曾写成 `/\\n{2,}/`（匹配字面反斜杠n，永不命中→整篇塞进一个巨型段落）+ BOM 写成字面 `\ufeff` 文本；已改回 `/\n{2,}/` 与真 BOM。
 - 快速档模型名要用真实存在的（如 `claude-sonnet-4-6`，别用不存在的 `claude-sonnet-5` 会 404）。
 - 改 JS 后先 `node --check`；改 HTML 检查标签配对；改完照 `sde-website-ops` 流程 push + 验证构建 success。
