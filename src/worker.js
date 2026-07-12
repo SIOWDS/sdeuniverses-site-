@@ -57,6 +57,7 @@ export default {
         "https://api.openai.com/",
         "https://api.anthropic.com/",
         "https://generativelanguage.googleapis.com/",
+        "https://api.minimaxi.com/",
       ];
       const ok = ALLOW.some((p) => target.startsWith(p));
       if (!ok) {
