@@ -187,7 +187,7 @@ footer{border-top:1px solid var(--border);text-align:center;padding:30px 20px 44
         <tr style="border-bottom:1px solid rgba(255,255,255,0.06)"><td style="padding:7px 10px 7px 0;color:#D4DCE4">Kimi K2.6</td><td style="padding:7px 10px">✓ 原生深思</td><td style="padding:7px 10px">浏览器直连</td><td style="padding:7px 10px"><a href="https://platform.moonshot.cn" target="_blank" rel="noopener">platform.moonshot.cn</a></td><td style="padding:7px 0 7px 10px">256K 上下文</td></tr>
         <tr style="border-bottom:1px solid rgba(255,255,255,0.06)"><td style="padding:7px 10px 7px 0;color:#D4DCE4">通义千问 Qwen3.7-Max</td><td style="padding:7px 10px">✓ 已开启</td><td style="padding:7px 10px">浏览器直连</td><td style="padding:7px 10px"><a href="https://bailian.console.aliyun.com" target="_blank" rel="noopener">阿里云百炼</a></td><td style="padding:7px 0 7px 10px">单次输出上限 8192,论文约 1.2 万字封顶</td></tr>
         <tr style="border-bottom:1px solid rgba(255,255,255,0.06)"><td style="padding:7px 10px 7px 0;color:#D4DCE4">MiniMax M3</td><td style="padding:7px 10px">✓ 推理优先</td><td style="padding:7px 10px">经本站中转</td><td style="padding:7px 10px"><a href="https://platform.minimaxi.com" target="_blank" rel="noopener">platform.minimaxi.com</a></td><td style="padding:7px 0 7px 10px">1M 上下文</td></tr>
-        <tr style="border-bottom:1px solid rgba(255,255,255,0.06)"><td style="padding:7px 10px 7px 0;color:#D4DCE4">GPT-5.5</td><td style="padding:7px 10px">✓</td><td style="padding:7px 10px">经本站中转</td><td style="padding:7px 10px"><a href="https://platform.openai.com" target="_blank" rel="noopener">platform.openai.com</a></td><td style="padding:7px 0 7px 10px">大陆无法直连</td></tr>
+        <tr style="border-bottom:1px solid rgba(255,255,255,0.06)"><td style="padding:7px 10px 7px 0;color:#D4DCE4">GPT-5.5</td><td style="padding:7px 10px">✓ 服务端(内容隐藏)</td><td style="padding:7px 10px">经本站中转</td><td style="padding:7px 10px"><a href="https://platform.openai.com" target="_blank" rel="noopener">platform.openai.com</a></td><td style="padding:7px 0 7px 10px">大陆无法直连</td></tr>
         <tr style="border-bottom:1px solid rgba(255,255,255,0.06)"><td style="padding:7px 10px 7px 0;color:#D4DCE4">Claude Opus 4.8</td><td style="padding:7px 10px">✓ 深思</td><td style="padding:7px 10px">经本站中转</td><td style="padding:7px 10px"><a href="https://console.anthropic.com" target="_blank" rel="noopener">console.anthropic.com</a></td><td style="padding:7px 0 7px 10px">大陆无法直连</td></tr>
         <tr><td style="padding:7px 10px 7px 0;color:#D4DCE4">Gemini 3.1 Pro</td><td style="padding:7px 10px">✓</td><td style="padding:7px 10px">经本站中转</td><td style="padding:7px 10px"><a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">aistudio.google.com</a></td><td style="padding:7px 0 7px 10px">大陆无法直连</td></tr>
       </table>
@@ -1504,6 +1504,10 @@ function buildPayload(sel, systemPrompt, userQ, maxTokens){
     // 注意：max_completion_tokens 含推理 token（OpenAI 语义）；finish_reason 诚实化已上线，若思考吞预算会当场亮牌。
     base.max_completion_tokens = base.max_tokens;
     delete base.max_tokens;
+    // 【思考不可见≠没思考】OpenAI 推理系在 chat completions 上从不返回思考内容（服务端推理，仅计费）。
+    // 能做两件事：pro 档把思考力度拧到 high；开 include_usage 从账单里读出隐藏思考的 token 数亮给用户。
+    base.reasoning_effort = (tier === 'pro') ? 'high' : 'medium';
+    base.stream_options = { include_usage: true };
   } else if(vendor === 'claude'){
     // Claude（Anthropic /v1/messages 格式，system 独立字段；经代理、【流式】）
     // 流式(stream:true)：首字节几秒到达，代理逐块透传，永不撞 ~100s 网关超时——这才能让长文（论文32000）跑通。
@@ -1814,6 +1818,7 @@ async function callOverseas(apiKey, model, systemPrompt, userQ, bodyEl, statusEl
   let buf='', acc='', chars=0, thinkChars=0;
   let fin='';   // finish_reason（'length'=触及max_tokens被截断），四家形态统一归一到这里
   let lastData='', sensFlag=false;   // minimax 验尸用：最后一个原始chunk + 内容审查标记
+  let hiddenReasonTok=0;             // GPT 推理系：OpenAI 隐藏思考内容，只能从 usage 读出思考 token 数
   try{
     while(true){
       const {done,value}=await reader.read();
@@ -1833,6 +1838,9 @@ async function callOverseas(apiKey, model, systemPrompt, userQ, bodyEl, statusEl
           // OpenAI 形态: data:{choices:[{delta:{content}}]}；MiniMax 另有 delta.reasoning_content（reasoning_split:true 时）
           const dd = j.choices?.[0]?.delta || {};
           if(j.choices?.[0]?.finish_reason) fin = j.choices[0].finish_reason;
+          // GPT 推理系：思考内容被 OpenAI 隐藏，但 usage 账单里有 reasoning_tokens——挖出来亮账
+          const rtok = j.usage?.completion_tokens_details?.reasoning_tokens;
+          if(vendor === 'gpt' && rtok > 0){ hiddenReasonTok = rtok; }
           if(vendor === 'minimax'){ lastData = data.slice(0, 400); if(j.output_sensitive === true || (j.base_resp && j.base_resp.status_code && j.base_resp.status_code !== 0)) sensFlag = true; }
           const rc = dd.reasoning_content || '';
           if(rc){
@@ -1895,8 +1903,8 @@ async function callOverseas(apiKey, model, systemPrompt, userQ, bodyEl, statusEl
     bodyEl.appendChild(diag);
   }
   statusEl.textContent = (fin==='length') ? '⚠ 完成(触及token上限·尾部被截)' : '✓ 完成';
-  metaEl.textContent = chars+' 字 · '+secs+'s'+(thinkChars ? ' · 思考'+thinkChars+'字' : '');
-  return { text:acc, chars, thinkChars, finish:fin, secs:parseFloat(secs) };
+  metaEl.textContent = chars+' 字 · '+secs+'s'+(thinkChars ? ' · 思考'+thinkChars+'字' : '')+(hiddenReasonTok ? ' · 思考≈'+hiddenReasonTok+' tokens(OpenAI隐藏内容)' : '');
+  return { text:acc, chars, thinkChars: thinkChars || hiddenReasonTok, finish:fin, secs:parseFloat(secs) };
 }
 
 // 主流程：两边并行
@@ -2278,7 +2286,7 @@ function thoughtDeclPara(){
 }
 (function(){ const el=document.getElementById('thoughtDeclBar'); if(el) el.textContent='📖 '+THOUGHT_DECL; })();
 // 构建版本徽章：每次部署改这个 tag——用户一眼能看出浏览器跑的是不是最新代码（根治"改了但没刷到"的排障黑洞）
-const BUILD_TAG = '20260712-1510·GPT参数改制';
+const BUILD_TAG = '20260712-1525·GPT思考显影';
 (function(){ const el=document.getElementById('buildTag'); if(el) el.textContent=BUILD_TAG; })();
 
 // 四篇下载为一个Word
