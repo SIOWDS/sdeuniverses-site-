@@ -208,7 +208,7 @@ footer{border-top:1px solid var(--border);text-align:center;padding:30px 20px 44
         <option value="glm:flash">智谱 GLM-4-Flash · 快速</option>
         <option value="kimi:pro">月之暗面 Kimi K2.6 · 最新最强(256K)</option>
         <option value="kimi:flash">月之暗面 Kimi (moonshot-v1-32k) · 快速</option>
-        <option value="qwen:pro">通义千问 Qwen-Max · 最强</option>
+        <option value="qwen:pro">通义千问 Qwen-Plus · 深度思考</option>
         <option value="qwen:flash">通义千问 Qwen-Plus · 均衡快速</option>
         <option value="gpt:pro">🌐 GPT-5.5（OpenAI 旗舰·经代理）</option>
         <option value="gpt:flash">🌐 GPT-5.4（OpenAI 均衡·经代理）</option>
@@ -360,7 +360,7 @@ footer{border-top:1px solid var(--border);text-align:center;padding:30px 20px 44
         <option value="ds:pro">DeepSeek V4 Pro · 最强推理</option>
         <option value="glm:pro">智谱 GLM-5 · 深度思考</option>
         <option value="kimi:pro">月之暗面 Kimi K2.6</option>
-        <option value="qwen:pro">通义千问 Qwen-Max</option>
+        <option value="qwen:pro">通义千问 Qwen-Plus·思考</option>
         </optgroup>
         <optgroup label="境外 · 经代理">
         <option value="gpt:pro">🌐 GPT-5.5</option>
@@ -376,7 +376,7 @@ footer{border-top:1px solid var(--border);text-align:center;padding:30px 20px 44
         <option value="ds:pro">DeepSeek V4 Pro · 最强推理</option>
         <option value="glm:pro" selected>智谱 GLM-5 · 深度思考</option>
         <option value="kimi:pro">月之暗面 Kimi K2.6</option>
-        <option value="qwen:pro">通义千问 Qwen-Max</option>
+        <option value="qwen:pro">通义千问 Qwen-Plus·思考</option>
         </optgroup>
         <optgroup label="境外 · 经代理">
         <option value="gpt:pro">🌐 GPT-5.5</option>
@@ -453,7 +453,7 @@ footer{border-top:1px solid var(--border);text-align:center;padding:30px 20px 44
         <option value="glm:flash">智谱 GLM-4-Flash · 快速</option>
         <option value="kimi:pro">月之暗面 Kimi K2.6 · 最新最强(256K)</option>
         <option value="kimi:flash">月之暗面 Kimi (moonshot-v1-32k) · 快速</option>
-        <option value="qwen:pro">通义千问 Qwen-Max · 最强</option>
+        <option value="qwen:pro">通义千问 Qwen-Plus · 深度思考</option>
         <option value="qwen:flash">通义千问 Qwen-Plus · 均衡快速</option>
         <option value="gpt:pro">🌐 GPT-5.5（OpenAI 旗舰·经代理）</option>
         <option value="gpt:flash">🌐 GPT-5.4（OpenAI 均衡·经代理）</option>
@@ -484,7 +484,7 @@ footer{border-top:1px solid var(--border);text-align:center;padding:30px 20px 44
         <option value="glm:flash">智谱 GLM-4-Flash · 快速</option>
         <option value="kimi:pro">月之暗面 Kimi K2.6 · 最新最强(256K)</option>
         <option value="kimi:flash">月之暗面 Kimi (moonshot-v1-32k) · 快速</option>
-        <option value="qwen:pro">通义千问 Qwen-Max · 最强</option>
+        <option value="qwen:pro">通义千问 Qwen-Plus · 深度思考</option>
         <option value="qwen:flash">通义千问 Qwen-Plus · 均衡快速</option>
         <option value="gpt:pro">🌐 GPT-5.5（OpenAI 旗舰·经代理）</option>
         <option value="gpt:flash">🌐 GPT-5.4（OpenAI 均衡·经代理）</option>
@@ -515,7 +515,7 @@ footer{border-top:1px solid var(--border);text-align:center;padding:30px 20px 44
         <option value="glm:flash">智谱 GLM-4-Flash · 快速</option>
         <option value="kimi:pro">月之暗面 Kimi K2.6 · 最新最强(256K)</option>
         <option value="kimi:flash">月之暗面 Kimi (moonshot-v1-32k) · 快速</option>
-        <option value="qwen:pro">通义千问 Qwen-Max · 最强</option>
+        <option value="qwen:pro">通义千问 Qwen-Plus · 深度思考</option>
         <option value="qwen:flash">通义千问 Qwen-Plus · 均衡快速</option>
         <option value="gpt:pro">🌐 GPT-5.5（OpenAI 旗舰·经代理）</option>
         <option value="gpt:flash">🌐 GPT-5.4（OpenAI 均衡·经代理）</option>
@@ -1174,7 +1174,7 @@ window.clearReflect = clearReflect;
 // ── 心得存储选择控件（reflectChoiceBar）──
 // 当前基底已有本地心得 → 显示控件让用户选：使用已存的(默认) / 重写心得。
 // 无存储则隐藏（第一次本来就要写，没得选）。跟随基底选择框动态更新。
-const REFLECT_MODEL_NAMES = {'ds:pro':'DeepSeek V4 Pro','ds:flash':'DeepSeek V4 Flash','glm:pro':'智谱 GLM-5','glm:flash':'智谱 GLM-4-Flash','kimi:pro':'Kimi K2.6','kimi:flash':'Kimi (v1-32k)','qwen:pro':'通义千问 Qwen-Max','qwen:flash':'通义千问 Qwen-Plus','gpt:pro':'GPT-5.5','gpt:flash':'GPT-5.4','claude:pro':'Claude Opus 4.8','claude:flash':'Claude Sonnet 4.6','gemini:pro':'Gemini 3.1 Pro','gemini:flash':'Gemini 2.5 Flash'};
+const REFLECT_MODEL_NAMES = {'ds:pro':'DeepSeek V4 Pro','ds:flash':'DeepSeek V4 Flash','glm:pro':'智谱 GLM-5','glm:flash':'智谱 GLM-4-Flash','kimi:pro':'Kimi K2.6','kimi:flash':'Kimi (v1-32k)','qwen:pro':'通义千问 Qwen-Plus·思考','qwen:flash':'通义千问 Qwen-Plus','gpt:pro':'GPT-5.5','gpt:flash':'GPT-5.4','claude:pro':'Claude Opus 4.8','claude:flash':'Claude Sonnet 4.6','gemini:pro':'Gemini 3.1 Pro','gemini:flash':'Gemini 2.5 Flash'};
 function updateReflectChoiceBar(){
   try{
     const bar = document.getElementById('reflectChoiceBar'); if(!bar) return;
@@ -1365,14 +1365,12 @@ function buildPayload(sel, systemPrompt, userQ, maxTokens){
     //  代价：千问的论文被物理限制在约 1.1-1.2 万字（8192 tokens），这是模型上限，不是本站限制。
     base.max_tokens = Math.min(cap, 8192);
     if(tier === 'pro'){
-      base.model = 'qwen-max';            // 最强
+      // 【实测结论 2026-07-12】qwen-max 对 enable_thinking 是【静默忽略】——不报错、也不思考（正常出稿无🧠），
+      // DashScope 的思考开关只支持 Qwen3 系的 plus/turbo/flash 商用款。故 pro 档改用 qwen-plus + 思考：
+      // 思考版 qwen-plus 的实际输出质量优于裸跑的 qwen-max（无思考=SDE提智失灵，实测提智Δ仅+5 vs 其它基底+15）。
+      base.model = 'qwen-plus';           // Qwen3 系·支持深度思考
       base.temperature = 0.7;
-      // 打开深度思考：Qwen3 系在 DashScope 兼容模式支持 enable_thinking（须流式，本站恒为流式），
-      // 思考过程经 reasoning_content 流出——前端解析器已支持，会显示"🧠 深度思考中(N字)"。
-      // 此前千问是七基底里唯一没开思考开关的（DeepSeek 传 thinking:enabled、GLM/K2.6/Opus 原生深思），
-      // 导致 pro 档 30 秒裸奔出稿、质量明显平。若个别账号的 qwen-max 快照不支持此参数，
-      // 面板会显示厂商报错原话（诊断已上线），届时改用 qwen-plus 即可。
-      base.enable_thinking = true;
+      base.enable_thinking = true;        // 思考经 reasoning_content 流出，前端显示"🧠 深度思考中(N字)"
     } else {
       base.model = 'qwen-plus';           // 均衡快速
       base.temperature = 0.7;
@@ -1819,7 +1817,7 @@ async function run(){
   const sdeStats  =[results[1],results[3],results[5]].filter(x=>x&&x.chars>0);
   window._lastResult = {
     question: q,
-    model: ({'ds:pro':'DeepSeek V4 Pro（深度思考）','ds:flash':'DeepSeek V4 Flash','glm:pro':'智谱 GLM-5（深度思考）','glm:flash':'智谱 GLM-4-Flash','kimi:pro':'月之暗面 Kimi K2.6','kimi:flash':'月之暗面 Kimi (v1-32k)','qwen:pro':'通义千问 Qwen-Max','qwen:flash':'通义千问 Qwen-Plus','gpt:pro':'GPT-5.5','gpt:flash':'GPT-5.4','claude:pro':'Claude Opus 4.8','claude:flash':'Claude Sonnet 5','gemini:pro':'Gemini 3.1 Pro','gemini:flash':'Gemini 2.5 Flash'})[model] || model,
+    model: ({'ds:pro':'DeepSeek V4 Pro（深度思考）','ds:flash':'DeepSeek V4 Flash','glm:pro':'智谱 GLM-5（深度思考）','glm:flash':'智谱 GLM-4-Flash','kimi:pro':'月之暗面 Kimi K2.6','kimi:flash':'月之暗面 Kimi (v1-32k)','qwen:pro':'通义千问 Qwen-Plus·思考','qwen:flash':'通义千问 Qwen-Plus','gpt:pro':'GPT-5.5','gpt:flash':'GPT-5.4','claude:pro':'Claude Opus 4.8','claude:flash':'Claude Sonnet 5','gemini:pro':'Gemini 3.1 Pro','gemini:flash':'Gemini 2.5 Flash'})[model] || model,
     rows: [0,1,2].map(i=>({
       view: viewNames[i],
       plain: (results[i*2]&&results[i*2].text)||'',
@@ -2120,7 +2118,7 @@ function thoughtDeclPara(){
 }
 (function(){ const el=document.getElementById('thoughtDeclBar'); if(el) el.textContent='📖 '+THOUGHT_DECL; })();
 // 构建版本徽章：每次部署改这个 tag——用户一眼能看出浏览器跑的是不是最新代码（根治"改了但没刷到"的排障黑洞）
-const BUILD_TAG = '20260712-1210·千问思考版';
+const BUILD_TAG = '20260712-1225·千问Plus思考';
 (function(){ const el=document.getElementById('buildTag'); if(el) el.textContent=BUILD_TAG; })();
 
 // 四篇下载为一个Word
