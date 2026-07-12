@@ -241,6 +241,7 @@ footer{border-top:1px solid var(--border);text-align:center;padding:30px 20px 44
 
 <!-- 思想拓展功能声明：页面常驻；同一文案由 JS 注入（单一来源 THOUGHT_DECL），并写入所有导出文件 -->
 <div id="thoughtDeclBar" style="max-width:1000px;margin:10px auto 0;background:rgba(30,24,12,0.45);border:1px solid rgba(201,162,39,0.35);border-radius:10px;padding:10px 18px;font-size:12.5px;color:#C9B27A;line-height:1.7;text-align:center"></div>
+<div style="text-align:center;font-size:11px;color:#5A6070;margin-top:6px">构建 <span id="buildTag">…</span>（若与最新不符，请刷新页面）</div>
 
 <div class="err-box" id="errBox"></div>
 
@@ -2118,6 +2119,9 @@ function thoughtDeclPara(){
   return new Paragraph({ children:[new TextRun({ text:'📖 '+THOUGHT_DECL, italics:true, size:18, color:'888888' })], spacing:{ after:220 } });
 }
 (function(){ const el=document.getElementById('thoughtDeclBar'); if(el) el.textContent='📖 '+THOUGHT_DECL; })();
+// 构建版本徽章：每次部署改这个 tag——用户一眼能看出浏览器跑的是不是最新代码（根治"改了但没刷到"的排障黑洞）
+const BUILD_TAG = '20260712-1210·千问思考版';
+(function(){ const el=document.getElementById('buildTag'); if(el) el.textContent=BUILD_TAG; })();
 
 // 四篇下载为一个Word
 const fourDlBtn = $('fourDlBtn');
