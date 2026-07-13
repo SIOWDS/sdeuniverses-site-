@@ -121,17 +121,19 @@ async function loadCorpus(env, url) {
   CORPUS = { docs: man.docs, secLabel, chunks };
   return CORPUS;
 }
-function retrieve(corpus, q, k) {
+function retrieve(corpus, q, k, expTerms) {
   const terms = q.toLowerCase().split(/\s+/).filter(Boolean);
   const zh = q.replace(/[^\u4e00-\u9fff]/g, "");
   const grams = [];
   for (let i = 0; i + 2 <= zh.length; i++) grams.push(zh.slice(i, i + 2)); // 中文无空格→补 bigram 提召回
-  const keys = terms.concat(grams).filter((v, i, a) => v && a.indexOf(v) === i);
+  const baseKeys = terms.concat(grams).filter((v, i, a) => v && a.indexOf(v) === i);
+  const exp = (expTerms || []).map((t) => t.toLowerCase()).filter((v, i, a) => v && v.length >= 2 && a.indexOf(v) === i && baseKeys.indexOf(v) < 0); // SDE 词义扩展词
   const scored = [];
   for (const ck of corpus.chunks) {
     const tl = ck.t.toLowerCase();
     let sc = 0;
-    for (const key of keys) { const n = tl.split(key).length - 1; if (n) sc += n; }
+    for (const key of baseKeys) { const n = tl.split(key).length - 1; if (n) sc += n; }
+    for (const key of exp) { const n = tl.split(key).length - 1; if (n) sc += n * 1.2; } // SDE 义命中略加权
     if (q && ck.t.indexOf(q) >= 0) sc += 8;
     if (sc > 0) scored.push({ sc, ck });
   }
@@ -199,6 +201,19 @@ async function llmText(VC, KEY, sys, usr, maxTok) {
   } catch (e) { return ""; }
 }
 
+// ===== SDE 词义查询扩展：把访客问题翻成 SDE 术语，再拿去召回（检索侧提智，对称于答题侧内功）=====
+const SDE_LEXICON = "你是 SDE（显露·差异·纠缠 / Show-Difference-Entanglement 本体论）术语解析器。SDE 核心词表：\n"
+  + "· 三维：S=显露(结构/可辨认单位/稳定核心/显影/结构显露态)；D=差异(过程/差异序列/张力/路径/演化/发生)；E=纠缠(环境/特征纠缠/三界/信息/能量)。\n"
+  + "· 三界(E1)：现实界、理念界、自我界。信息三模态(E2)：符号/逻辑/信息。能量三态(E3)：真/善/美。\n"
+  + "· SIO 27宫格：O=一号位=客体，I=二号位=互动，S=三号位=主体(最后才显影/最后才亮)；C⊗M⊗V=内容⊗方法⊗价值。\n"
+  + "· 核心概念：发生(相对于发现)、显影、名是指针、特征纠缠、中心位轮转、意义三律(特征律/自由律/幸福律)、三大方程 S=F(D,E)/D=G(S,E)/E=H(S,D)、六路径、123原理、底盘与回写、成熟态与退化谱系、解构、裂缝、约束性发生、反身的发生不可自我封顶。\n"
+  + "任务：把用户问题解析成一串【最能帮助在 SDE 语料里检索到相关内容】的具体术语——包括它触及的维度(S/D/E)、相关核心概念、可能落在的三界或宫格位、以及同义/近义的 SDE 说法。只输出术语本身，用顿号分隔，8–20 个，不要解释、不要整句、不要泛词（如“事物/问题/研究”）。";
+async function sdeExpandQuery(VC, KEY, q) {
+  const out = await llmText(VC, KEY, SDE_LEXICON, "用户问题：" + q + "\n\n请只输出 SDE 检索术语（顿号分隔）：", 300);
+  if (!out) return [];
+  return out.replace(/\n/g, "、").split(/[、,，;；\s]+/).map((s) => s.trim()).filter((s) => s.length >= 2 && s.length <= 12).slice(0, 24);
+}
+
 async function handleAsk(request, env, url) {
   if (request.method === "OPTIONS") return new Response(null, { headers: _cors() });
   if (request.method !== "POST") return new Response("Method Not Allowed", { status: 405 });
@@ -246,7 +261,9 @@ async function handleAsk(request, env, url) {
   const K = deep ? 120 : 20;              // 取多少块（深度档广撒网；retrieve 只收相关块、clamp 兜底，窄问题不会被噪声塞满）
   const CTX_MAX = deep ? 50000 : 12000;   // 《站内资料》字数上限
   const corpus = await loadCorpus(env, url);
-  const hits = retrieve(corpus, q, K);
+  const expTerms = await sdeExpandQuery(VC, KEY, q); // SDE 词义扩展：问题→SDE 术语，再拿去召回
+  const expStr = expTerms.join(" · ");
+  const hits = retrieve(corpus, q, K, expTerms);
   const sources = [];
   const seen = {};
   let ctxText = "";
@@ -272,6 +289,7 @@ async function handleAsk(request, env, url) {
         async start(controller) {
           const st = (v) => controller.enqueue(_sseBytes({ t: "status", v }));
           controller.enqueue(_sseBytes({ t: "sources", v: sources }));
+          if (expStr) controller.enqueue(_sseBytes({ t: "expand", v: expStr }));
           try {
             st("① S 维度·显露分析中…（四步法·约需数分钟，请勿关闭）");
             const sA = await llmText(VC, KEY, dimSys, usr4 + "\n\n" + Q1, 2500);
@@ -371,6 +389,7 @@ async function handleAsk(request, env, url) {
   const stream = new ReadableStream({
     async start(controller) {
       controller.enqueue(_sseBytes({ t: "sources", v: sources })); // 先给出处，再流答案
+      if (expStr) controller.enqueue(_sseBytes({ t: "expand", v: expStr }));
       let buf = "";
       try {
         while (true) {
