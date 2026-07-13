@@ -65,6 +65,18 @@ export class ConfigVault {
       await this.ctx.storage.put("reflect:" + (body.vendor || ""), String(body.reflect || ""));
       return Response.json({ ok: true });
     }
+    if (op === "clearReflect") { // 重写心得：清掉缓存，下次深度提问重写
+      const stored = (await this.ctx.storage.get("adminHash")) || "";
+      if (!stored || (await this._hash(String(body.pass || ""))) !== stored) return Response.json({ ok: false, msg: "管理口令不正确。" });
+      const v = String(body.vendor || "");
+      if (v === "all") {
+        await this.ctx.storage.delete("reflect:glm");
+        await this.ctx.storage.delete("reflect:ds");
+        return Response.json({ ok: true, msg: "已清空全部基底的心得，下次深度提问将重写。" });
+      }
+      await this.ctx.storage.delete("reflect:" + v);
+      return Response.json({ ok: true, msg: "已清空 " + (v || "?") + " 的心得，下次深度提问将重写。" });
+    }
     if (op === "set") {
       const pass = String(body.pass || ""), key = String(body.key || "");
       if (pass.length < 4) return Response.json({ ok: false, msg: "管理口令太短（至少 4 位）。" });
@@ -217,8 +229,8 @@ async function handleAsk(request, env, url) {
 
   // 站内检索（按档分级喂料：深度档拿更多材料，普通档保持轻快）
   const deep = body.deep === true;
-  const K = deep ? 24 : 15;              // 取多少块
-  const CTX_MAX = deep ? 18000 : 9000;   // 《站内资料》字数上限
+  const K = deep ? 120 : 20;              // 取多少块（深度档广撒网；retrieve 只收相关块、clamp 兜底，窄问题不会被噪声塞满）
+  const CTX_MAX = deep ? 50000 : 12000;   // 《站内资料》字数上限
   const corpus = await loadCorpus(env, url);
   const hits = retrieve(corpus, q, K);
   const sources = [];
@@ -410,6 +422,12 @@ export default {
       return Response.json(await r.json(), { headers: { "access-control-allow-origin": "*" } });
     }
     // /api/ask：站内智能问答（RAG）——浏览器只发问题，Key 锁在服务端
+    if (url.pathname === "/api/admin/clearreflect" && request.method === "POST") {
+      const b = await request.json().catch(() => ({}));
+      const cv = env.CONFIG_VAULT.get(env.CONFIG_VAULT.idFromName("global"));
+      const r = await cv.fetch(new Request("https://cfg.internal/", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ op: "clearReflect", pass: b.pass, vendor: b.vendor }) }));
+      return Response.json(await r.json(), { headers: { "access-control-allow-origin": "*" } });
+    }
     if (url.pathname === "/api/ask") {
       return handleAsk(request, env, url);
     }
