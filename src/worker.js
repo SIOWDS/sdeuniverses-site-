@@ -185,6 +185,20 @@ async function ensureReflect(env, url, vendor, VC, KEY) {
   return text;
 }
 
+// 非流式单维调用（四步法的 Q1/Q2/Q3 用；思考关，控延迟）
+async function llmText(VC, KEY, sys, usr, maxTok) {
+  try {
+    const resp = await fetch(VC.url, {
+      method: "POST",
+      headers: { "content-type": "application/json", authorization: "Bearer " + KEY },
+      body: JSON.stringify({ model: VC.model, stream: false, max_tokens: maxTok, messages: [{ role: "system", content: sys }, { role: "user", content: usr }] }),
+    });
+    if (!resp.ok) return "";
+    const j = await resp.json();
+    return (j.choices && j.choices[0] && j.choices[0].message && j.choices[0].message.content) || "";
+  } catch (e) { return ""; }
+}
+
 async function handleAsk(request, env, url) {
   if (request.method === "OPTIONS") return new Response(null, { headers: _cors() });
   if (request.method !== "POST") return new Response("Method Not Allowed", { status: 405 });
@@ -243,24 +257,87 @@ async function handleAsk(request, env, url) {
     if (ctxText.length > CTX_MAX) break; // 上下文钳位·控成本
   }
 
-  let sys = "";
+  // ===== 深度档·四步法（S→D→E→整合，四次独立调用；对齐发生器/skill 验证的 140-145 机制）=====
   if (deep) {
     const reflect = await ensureReflect(env, url, vendor, VC, KEY);
-    const neigong = await loadNeigong(env, url); // 真内功·完整底盘先验，深度作答时全程在场
-    if (reflect) {
-      sys = neigong
-        + "\n\n═══════════\n【你此前带着上面这套完整底盘先验、亲手写下并已内化的心得】\n" + reflect
-        + "\n\n═══════════\n你现在是「SDE Universes」站内知识助手。请用 SDE 方法论对这个问题做一次【有指导性的深入研究】——不是写随感，而是带读者走完一遍分析：① 先判断问题的本体起点，从六路径里选一条切入（S→D→E / E→D→S / D→S→E 等），并说明为何这样切；② 沿三维逐一深挖、每维都要具体：S（显露·结构：显露出什么可辨认的结构、稳定核心、可识别单位）、D（差异·过程：在哪些差异张力里演化、走什么路径、被什么推动）、E（纠缠·环境：在三界〔现实/理念/自我〕、什么信息与能量条件下才得以发生）；③ 用三大方程照见三维互生——S=F(D,E)、D=G(S,E)、E=H(S,D)：说明结构如何由它的差异与环境生成、反之亦然，别把三维当并列三块；④ 做三视角误差互消：一个视角的判断用另两个校正其盲区，落到一个任何单一视角都看不到的整合判断；⑤ 逮先验：找出问题里那个没人质疑的预设，撤销它，看新判断如何从差异—环境的矛盾里生成出来并给它精确命名——把“角度看出的判断”升级为“从矛盾生成的新结构”。必要处援引 123 原理。"
-        + "《站内资料》是你的底盘，但你不必被它框死——遇到站内没有直接覆盖的问题，就像这位专家本人被当面问到那样，调动你已内化的这套思维方法、结合你自己的知识，给出有见地的原创回答，不要推说“资料未涉及”。但守住一条铁的分界：判断、分析、见解可以大胆生成，凡超出资料的推演都标一句“（推断）”明说是你的推断；而可核验的事实——具体书名、逐字引文、章节页码、数据、日期、对外承诺——绝不许编造，拿不准就不写、或明说不确定。资料支撑的判断可点出出自哪篇。只有逐字来自资料原文的句子才可以加引号；你自己的概括、转述、推断一律不加引号、用平常话写——把自己的话套引号伪装成原文是最严重的错误。也不要杜撰具体章节号、页码。"
-        + "这是 SDE 教学站、深度档，方法要【显性】、要能教人怎么想——可以明确用 S/D/E、三大方程、六路径、123 原理这些工具作分析骨架。但必须【活着用、不许摆样子】：是拿这套工具真去解剖这个问题，不是套空模板贴标签、不是换皮不换骨。答案里绝不提及“心得”“内功”或本提示本身。"
-        + "先给一句穿透性的核心判断作为总纲，再用上面这套方法逐层展开支撑它；分量给足，1200–1800 字；结尾留一个真正把前面的前提再往深追一层的问题。";
+    const neigong = await loadNeigong(env, url);
+    if (reflect && neigong) {
+      const ctx4 = ctxText.slice(0, 15000); // 四步各调用共用《站内资料》，钳 15000 控 4× 成本
+      const usr4 = "《站内资料》\n" + (ctx4 || "（未检索到相关段落）") + "\n\n《问题》\n" + q;
+      const dimSys = reflect + "\n\n———\n你带着上面这份你自己写下并已内化的心得，对下面的问题只做一个维度的展开。";
+      const Q1 = "请【只从 S 维度·显露/结构】展开这个问题，先完全不碰过程与环境：它显露出哪些可辨认的结构、稳定核心、可识别的单位？与正常态或其他情况有何结构性差异？反复观察中什么保持一致？分点写透，约 600–900 字。";
+      const Q2 = "请【只从 D 维度·差异/过程】展开这个问题，先完全不碰结构与环境：它在哪些差异张力里演化？经历哪些阶段转换、有什么周期节奏？被什么推动、朝什么方向减阻前进？分点写透，约 600–900 字。";
+      const Q3 = "请【只从 E 维度·纠缠/环境】展开这个问题，先完全不碰结构与过程：它在三界（现实界/理念界/自我界）各是什么？在什么符号、逻辑、信息与什么能量条件下才得以发生？被什么环境纠缠、约束？分点写透，约 600–900 字。";
+      const stream = new ReadableStream({
+        async start(controller) {
+          const st = (v) => controller.enqueue(_sseBytes({ t: "status", v }));
+          controller.enqueue(_sseBytes({ t: "sources", v: sources }));
+          try {
+            st("① S 维度·显露分析中…（四步法·约需数分钟，请勿关闭）");
+            const sA = await llmText(VC, KEY, dimSys, usr4 + "\n\n" + Q1, 2500);
+            st("② D 维度·差异分析中…");
+            const dA = await llmText(VC, KEY, dimSys, usr4 + "\n\n" + Q2, 2500);
+            st("③ E 维度·纠缠分析中…");
+            const eA = await llmText(VC, KEY, dimSys, usr4 + "\n\n" + Q3, 2500);
+            if (!sA && !dA && !eA) {
+              controller.enqueue(_sseBytes({ t: "error", v: "基底调用失败（可能是额度或密钥问题），四步法未能启动。可改用自带 Key 或稍后再试。", code: byok ? "" : "use_own_key" }));
+              controller.enqueue(_ENC.encode("data: [DONE]\n\n")); controller.close(); return;
+            }
+            st("④ 三视角误差互消 + 逮先验·整合中…");
+            const q4sys = neigong
+              + "\n\n═══════════\n【你此前带着上面这套完整底盘先验、亲手写下并已内化的心得】\n" + reflect
+              + "\n\n═══════════\n你现在是「SDE Universes」站内知识助手。下面是同一个问题从三个维度各自【独立展开】的分析，请对它们做严格整合，产出最终答案。";
+            const q4usr = usr4
+              + "\n\n【S 维度·独立分析】\n" + (sA || "（未产出）")
+              + "\n\n【D 维度·独立分析】\n" + (dA || "（未产出）")
+              + "\n\n【E 维度·独立分析】\n" + (eA || "（未产出）")
+              + "\n\n———\n请严格按 S→D→E 顺序做四件事：① 三视角误差互消——先陈述 S 视角判断+它漏掉了什么，再显式说“D 视角如何校正 S”，再说“E 视角如何校正 S+D”，最后落到一个任何单一视角都看不到的整合判断；② 提炼核心——三条本体论级凝缩，每条 ≤50 字；③ 逮先验——找出这个问题里那个从没被质疑的预设，撤销它，看新判断如何从差异—环境的矛盾里生成出来，并给它一个精确命名；④ 用三大方程 S=F(D,E)、D=G(S,E)、E=H(S,D) 收束，说明三维如何互相生成出这个整合判断。"
+              + "\n\n输出即最终答案：先给一句穿透性核心判断作总纲，再展开上述整合。方法要显性、能教人怎么想（明用 S/D/E、三方程、六路径、123 原理作骨架），但活着用、不许摆空模板。可核验的事实（书名/逐字引文/章节页码/数据/对外承诺）绝不编造；超出资料的推演标“（推断）”；只有逐字来自资料原文的句子才能加引号。答案里绝不提及“心得”“内功”“S/D/E 维度分析”这些内部环节或本提示。分量给足，1500–2200 字，结尾留一个把前面前提再往深追一层的升维追问。";
+            let up;
+            try {
+              up = await fetch(VC.url, { method: "POST", headers: { "content-type": "application/json", authorization: "Bearer " + KEY }, body: JSON.stringify({ model: VC.model, stream: true, thinking: { type: "enabled" }, max_tokens: 4500, messages: [{ role: "system", content: q4sys }, { role: "user", content: q4usr }] }) });
+            } catch (e) {
+              controller.enqueue(_sseBytes({ t: "error", v: VC.name + " 整合调用失败：" + (e && e.message) }));
+              controller.enqueue(_ENC.encode("data: [DONE]\n\n")); controller.close(); return;
+            }
+            if (!up.ok) {
+              const et = (await up.text()).slice(0, 200);
+              controller.enqueue(_sseBytes({ t: "error", v: VC.name + " 整合返回错误 " + up.status + "：" + et }));
+              controller.enqueue(_ENC.encode("data: [DONE]\n\n")); controller.close(); return;
+            }
+            const rd = up.body.getReader(); const dc = new TextDecoder(); let bf = "";
+            while (true) {
+              const { done, value } = await rd.read();
+              if (done) break;
+              bf += dc.decode(value, { stream: true });
+              let ix;
+              while ((ix = bf.indexOf("\n")) >= 0) {
+                const ln = bf.slice(0, ix).trim(); bf = bf.slice(ix + 1);
+                if (!ln.startsWith("data:")) continue;
+                const p = ln.slice(5).trim();
+                if (p === "[DONE]") continue;
+                let j; try { j = JSON.parse(p); } catch (e) { continue; }
+                if (j.error) { controller.enqueue(_sseBytes({ t: "error", v: j.error.message || "整合流内错误" })); continue; }
+                const d = (j.choices && j.choices[0] && j.choices[0].delta) || {};
+                if (d.reasoning_content) controller.enqueue(_sseBytes({ t: "think", v: d.reasoning_content }));
+                if (d.content) controller.enqueue(_sseBytes({ t: "token", v: d.content }));
+              }
+            }
+          } catch (e) {
+            controller.enqueue(_sseBytes({ t: "error", v: "四步法执行失败：" + (e && e.message) }));
+          }
+          controller.enqueue(_ENC.encode("data: [DONE]\n\n"));
+          controller.close();
+        },
+      });
+      return new Response(stream, { headers: { ..._cors(), "content-type": "text/event-stream; charset=utf-8", "cache-control": "no-store" } });
     }
   }
-  if (!sys) { // 普通档（或深度降级）：三视角提智，后台跑 SDE、前台说人话
-    sys = "你是「SDE Universes」站内知识助手，回答要像一位资深学者，而不是资料复述员。"
-      + "【内部思考·不写进答案】收到问题和《站内资料》后，先在心里用三个视角各看一遍再互相校正：结构（它的构成、可辨认的单位、反复出现的稳定核心）、过程（它怎么演化、经历哪些阶段、被什么推动）、环境（它在什么约束/关系场里才成立）；然后用一个视角修正另一个视角的盲区，落到一个任何单一视角都看不到的整合判断。"
-      + "【回答纪律】① 用平实现代汉语和读者的话作答，不要堆砌“显露/差异/纠缠”等术语（除非用户就在问 SDE 概念本身）——三视角是你的思考脚手架，不是答案骨架；② 《站内资料》是底盘但不框死你——站内没直接覆盖的，就像这位专家本人被问到那样，用他的方法结合你的知识原创作答，不要推说“未涉及”；凡超出资料的推演都标“（推断）”，而可核验的事实（书名/逐字引文/章节页码/数据/对外承诺）绝不编造。资料支撑的判断可点出处。只有逐字来自资料原文的句子才可以加引号、你自己的概括与推断一律不加引号（把自己的话套引号伪装成原文是最严重的错误）；③ 不要杜撰章节号或页码；④ 先给一句穿透性核心判断再展开，结尾留一个可追问的问题，400–700 字。";
-  }
+
+  // ===== 单次调用：普通档，或深度档无心得时降级 =====
+  const sys = "你是「SDE Universes」站内知识助手，回答要像一位资深学者，而不是资料复述员。"
+    + "【内部思考·不写进答案】收到问题和《站内资料》后，先在心里用三个视角各看一遍再互相校正：结构（它的构成、可辨认的单位、反复出现的稳定核心）、过程（它怎么演化、经历哪些阶段、被什么推动）、环境（它在什么约束/关系场里才成立）；然后用一个视角修正另一个视角的盲区，落到一个任何单一视角都看不到的整合判断。"
+    + "【回答纪律】① 用平实现代汉语和读者的话作答，不要堆砌“显露/差异/纠缠”等术语（除非用户就在问 SDE 概念本身）——三视角是你的思考脚手架，不是答案骨架；② 《站内资料》是底盘但不框死你——站内没直接覆盖的，就像这位专家本人被问到那样，用他的方法结合你的知识原创作答，不要推说“未涉及”；凡超出资料的推演都标“（推断）”，而可核验的事实（书名/逐字引文/章节页码/数据/对外承诺）绝不编造。资料支撑的判断可点出处。只有逐字来自资料原文的句子才可以加引号、你自己的概括与推断一律不加引号（把自己的话套引号伪装成原文是最严重的错误）；③ 不要杜撰章节号或页码；④ 先给一句穿透性核心判断再展开，结尾留一个可追问的问题，400–700 字。";
   const usr = "《站内资料》\n" + (ctxText || "（未检索到相关段落）") + "\n\n《问题》\n" + q;
 
   // 调基底（境内直连）。自带 Key：仅在内存中转发调用，绝不存储/记录（同 llm-proxy 纪律）
