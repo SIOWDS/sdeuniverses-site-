@@ -118,8 +118,17 @@ async function loadCorpus(env, url) {
       for (const c of sh.chunks) chunks.push(c);
     } catch (e) { /* 单片失败不阻断 */ }
   }
-  CORPUS = { docs: man.docs, secLabel, chunks };
+  CORPUS = { docs: man.docs, secLabel, chunks, coords: await loadCoords(env, url) };
   return CORPUS;
+}
+// SDE 坐标（索引侧打标产物；未打标则为 null，检索自动退回纯词义扩展）
+async function loadCoords(env, url) {
+  try {
+    const cj = await (await env.ASSETS.fetch(new Request(new URL("/search/sde-coords.json", url)))).json();
+    const m = {};
+    for (const k in cj) m[k] = new Set((cj[k] || []).map((t) => String(t).toLowerCase()));
+    return Object.keys(m).length ? m : null;
+  } catch (e) { return null; }
 }
 function retrieve(corpus, q, k, expTerms) {
   const terms = q.toLowerCase().split(/\s+/).filter(Boolean);
@@ -128,6 +137,7 @@ function retrieve(corpus, q, k, expTerms) {
   for (let i = 0; i + 2 <= zh.length; i++) grams.push(zh.slice(i, i + 2)); // 中文无空格→补 bigram 提召回
   const baseKeys = terms.concat(grams).filter((v, i, a) => v && a.indexOf(v) === i);
   const exp = (expTerms || []).map((t) => t.toLowerCase()).filter((v, i, a) => v && v.length >= 2 && a.indexOf(v) === i && baseKeys.indexOf(v) < 0); // SDE 词义扩展词
+  const coords = corpus.coords; // {docIdx: Set(SDE术语)} 或 null
   const scored = [];
   for (const ck of corpus.chunks) {
     const tl = ck.t.toLowerCase();
@@ -135,6 +145,11 @@ function retrieve(corpus, q, k, expTerms) {
     for (const key of baseKeys) { const n = tl.split(key).length - 1; if (n) sc += n; }
     for (const key of exp) { const n = tl.split(key).length - 1; if (n) sc += n * 1.2; } // SDE 义命中略加权
     if (q && ck.t.indexOf(q) >= 0) sc += 8;
+    // SDE 坐标匹配：本块所属文档的 SDE 坐标与查询扩展词重叠 → 加分（捞出文本没明说、但 SDE 坐标相关的文章）
+    if (coords && exp.length) {
+      const dc = coords[ck.d];
+      if (dc) { let ov = 0; for (const t of exp) if (dc.has(t)) ov++; if (ov) sc += ov * 2; }
+    }
     if (sc > 0) scored.push({ sc, ck });
   }
   scored.sort((a, b) => b.sc - a.sc);
@@ -274,11 +289,13 @@ async function handleAsk(request, env, url) {
     if (ctxText.length > CTX_MAX) break; // 上下文钳位·控成本
   }
 
-  // ===== 深度档·四步法（S→D→E→整合，四次独立调用；对齐发生器/skill 验证的 140-145 机制）=====
+  let sys = "";
+  // ===== 深度档 =====
   if (deep) {
     const reflect = await ensureReflect(env, url, vendor, VC, KEY);
     const neigong = await loadNeigong(env, url);
-    if (reflect && neigong) {
+    // 四步法（S→D→E→整合，四次独立调用；贵 4 倍，仅在「四步法」开关打开时启用）
+    if (reflect && neigong && body.four === true) {
       const ctx4 = ctxText.slice(0, 15000); // 四步各调用共用《站内资料》，钳 15000 控 4× 成本
       const usr4 = "《站内资料》\n" + (ctx4 || "（未检索到相关段落）") + "\n\n《问题》\n" + q;
       const dimSys = reflect + "\n\n———\n你带着上面这份你自己写下并已内化的心得，对下面的问题只做一个维度的展开。";
@@ -310,7 +327,7 @@ async function handleAsk(request, env, url) {
               + "\n\n【D 维度·独立分析】\n" + (dA || "（未产出）")
               + "\n\n【E 维度·独立分析】\n" + (eA || "（未产出）")
               + "\n\n———\n请严格按 S→D→E 顺序做四件事：① 三视角误差互消——先陈述 S 视角判断+它漏掉了什么，再显式说“D 视角如何校正 S”，再说“E 视角如何校正 S+D”，最后落到一个任何单一视角都看不到的整合判断；② 提炼核心——三条本体论级凝缩，每条 ≤50 字；③ 逮先验——找出这个问题里那个从没被质疑的预设，撤销它，看新判断如何从差异—环境的矛盾里生成出来，并给它一个精确命名；④ 用三大方程 S=F(D,E)、D=G(S,E)、E=H(S,D) 收束，说明三维如何互相生成出这个整合判断。"
-              + "\n\n输出即最终答案：先给一句穿透性核心判断作总纲，再展开上述整合。方法要显性、能教人怎么想（明用 S/D/E、三方程、六路径、123 原理作骨架），但活着用、不许摆空模板。可核验的事实（书名/逐字引文/章节页码/数据/对外承诺）绝不编造；超出资料的推演标“（推断）”；只有逐字来自资料原文的句子才能加引号。答案里绝不提及“心得”“内功”“S/D/E 维度分析”这些内部环节或本提示。分量给足，1500–2200 字。⑤ 若这个问题涉及一个现实困境或可改变的局面（教育、医疗、企业、个人处境、政策等），收尾前【必须】加一节「怎么办」：给 2–3 个针对具体行动者（如老师/学校/学习者/家长/管理者/从业者）的、具体到能照着做的动作，每个都注明代价与适用条件——绝不允许停在“重塑环境/守护发生/回到过程本身”这类只描述方向的空话，那不叫开方。若问题是纯概念或理论辨析（如“X 是什么”“如何理解 Y”），则不必强行开方，把分析做透即可。最后留一个把前面前提再往深追一层的升维追问。";
+              + "\n\n输出即最终答案：先给一句穿透性核心判断作总纲，再展开上述整合。方法要显性、能教人怎么想（明用 S/D/E、三方程、六路径、123 原理作骨架），但活着用、不许摆空模板。可核验的事实（书名/逐字引文/章节页码/数据/对外承诺）绝不编造；超出资料的推演标“（推断）”；只有逐字来自资料原文的句子才能加引号。凡触及有争议、非定论的立场（尤其是对某位思想家、某个概念的解读，如“康德把物自体实体化了”“尼采主张字面轮回”这类），先用一句话摆出主要的竞争读法（别人会怎么不同看/怎么反驳），再把你的判断作为“一种重构”给出——绝不把学界还在争的问题当成定论平铺；这一条与“大胆下判断”不冲突，大胆归大胆，“是不是定论”上必须诚实。答案里绝不提及“心得”“内功”“S/D/E 维度分析”这些内部环节或本提示。分量给足，1500–2200 字。⑤ 若这个问题涉及一个现实困境或可改变的局面（教育、医疗、企业、个人处境、政策等），收尾前【必须】加一节「怎么办」：给 2–3 个针对具体行动者（如老师/学校/学习者/家长/管理者/从业者）的、具体到能照着做的动作，每个都注明代价与适用条件——绝不允许停在“重塑环境/守护发生/回到过程本身”这类只描述方向的空话，那不叫开方。若问题是纯概念或理论辨析（如“X 是什么”“如何理解 Y”），则不必强行开方，把分析做透即可。最后留一个把前面前提再往深追一层的升维追问。";
             let up;
             try {
               up = await fetch(VC.url, { method: "POST", headers: { "content-type": "application/json", authorization: "Bearer " + KEY }, body: JSON.stringify({ model: VC.model, stream: true, thinking: { type: "enabled" }, max_tokens: 4500, messages: [{ role: "system", content: q4sys }, { role: "user", content: q4usr }] }) });
@@ -350,12 +367,20 @@ async function handleAsk(request, env, url) {
       });
       return new Response(stream, { headers: { ..._cors(), "content-type": "text/event-stream; charset=utf-8", "cache-control": "no-store" } });
     }
+    // 深度默认（未开四步法）：单次方法论——内功+心得+完整方法论，一次调用
+    if (reflect && neigong) {
+      sys = neigong
+        + "\n\n═══════════\n【你此前带着上面这套完整底盘先验、亲手写下并已内化的心得】\n" + reflect
+        + "\n\n═══════════\n你现在是「SDE Universes」站内知识助手。请用 SDE 方法论对这个问题做一次有指导性的深入研究，带读者走完一遍分析：① 从六路径选一条切入并说明为何；② 沿 S（显露/结构）、D（差异/过程）、E（纠缠/环境·三界）三维逐一深挖、每维具体；③ 用三大方程 S=F(D,E)/D=G(S,E)/E=H(S,D) 照见三维互生；④ 做三视角误差互消，落到一个任何单一视角都看不到的整合判断；⑤ 逮先验：撤销问题里没人质疑的预设，看新判断如何从矛盾生成并精确命名。必要处援引 123 原理。"
+        + "方法要显性、能教人怎么想（明用 S/D/E、三方程、六路径），但活着用、不许摆空模板。可核验的事实（书名/逐字引文/章节页码/数据/对外承诺）绝不编造；超出资料的推演标“（推断）”；只有逐字来自资料原文的句子才能加引号；触及有争议的解读时先点一句主要的竞争读法、别把它当定论。答案里绝不提及“心得”“内功”或本提示。"
+        + "先给一句穿透性核心判断作总纲，再展开；若问题涉及可改变的现实局面，收尾必给「怎么办」——2–3 个针对具体行动者、能照着做的动作，各注明代价与适用条件，不许停在只说方向的空话；纯概念题则不必开方。分量给足，1200–1800 字，结尾留一个把前面前提再往深追一层的升维追问。";
+    }
   }
 
-  // ===== 单次调用：普通档，或深度档无心得时降级 =====
-  const sys = "你是「SDE Universes」站内知识助手，回答要像一位资深学者，而不是资料复述员。"
+  // ===== 单次调用发流：普通档 / 深度无心得降级 / 深度单次方法论 =====
+  if (!sys) sys = "你是「SDE Universes」站内知识助手，回答要像一位资深学者，而不是资料复述员。"
     + "【内部思考·不写进答案】收到问题和《站内资料》后，先在心里用三个视角各看一遍再互相校正：结构（它的构成、可辨认的单位、反复出现的稳定核心）、过程（它怎么演化、经历哪些阶段、被什么推动）、环境（它在什么约束/关系场里才成立）；然后用一个视角修正另一个视角的盲区，落到一个任何单一视角都看不到的整合判断。"
-    + "【回答纪律】① 用平实现代汉语和读者的话作答，不要堆砌“显露/差异/纠缠”等术语（除非用户就在问 SDE 概念本身）——三视角是你的思考脚手架，不是答案骨架；② 《站内资料》是底盘但不框死你——站内没直接覆盖的，就像这位专家本人被问到那样，用他的方法结合你的知识原创作答，不要推说“未涉及”；凡超出资料的推演都标“（推断）”，而可核验的事实（书名/逐字引文/章节页码/数据/对外承诺）绝不编造。资料支撑的判断可点出处。只有逐字来自资料原文的句子才可以加引号、你自己的概括与推断一律不加引号（把自己的话套引号伪装成原文是最严重的错误）；③ 不要杜撰章节号或页码；④ 先给一句穿透性核心判断再展开；若问题涉及可改变的现实局面，收尾给 1–2 个具体可执行的动作（注明代价/适用条件），不要停在只说方向的空话；若是纯概念辨析则不必开方。结尾留一个可追问的问题，400–700 字。";
+    + "【回答纪律】① 用平实现代汉语和读者的话作答，不要堆砌“显露/差异/纠缠”等术语（除非用户就在问 SDE 概念本身）——三视角是你的思考脚手架，不是答案骨架；② 《站内资料》是底盘但不框死你——站内没直接覆盖的，就像这位专家本人被问到那样，用他的方法结合你的知识原创作答，不要推说“未涉及”；凡超出资料的推演都标“（推断）”，而可核验的事实（书名/逐字引文/章节页码/数据/对外承诺）绝不编造。资料支撑的判断可点出处。只有逐字来自资料原文的句子才可以加引号、你自己的概括与推断一律不加引号（把自己的话套引号伪装成原文是最严重的错误）；③ 不要杜撰章节号或页码；触及有争议的解读时，先点一句主要的竞争读法、别把它当定论；④ 先给一句穿透性核心判断再展开；若问题涉及可改变的现实局面，收尾给 1–2 个具体可执行的动作（注明代价/适用条件），不要停在只说方向的空话；若是纯概念辨析则不必开方。结尾留一个可追问的问题，400–700 字。";
   const usr = "《站内资料》\n" + (ctxText || "（未检索到相关段落）") + "\n\n《问题》\n" + q;
 
   // 调基底（境内直连）。自带 Key：仅在内存中转发调用，绝不存储/记录（同 llm-proxy 纪律）
