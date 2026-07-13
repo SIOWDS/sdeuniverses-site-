@@ -108,8 +108,17 @@ export default {
     const ct = resp.headers.get("content-type") || "";
     if (ct.includes("text/html")) {
       const r = new Response(resp.body, resp);
-      r.headers.set("cache-control", "no-cache, must-revalidate");
+      // 釜底抽薪式禁缓存：no-store = 绝不留副本；同时剥掉 ETag/Last-Modified，
+      // 让浏览器无从发起 If-None-Match/If-Modified-Since 协商，边缘再也无法回 304 旧副本。
+      // 这是"普通刷新即最新"的根治手段——不再依赖用户强刷或手动 Purge。
+      r.headers.set("cache-control", "no-store, no-cache, must-revalidate, max-age=0");
       r.headers.set("cdn-cache-control", "no-store");
+      r.headers.set("pragma", "no-cache");
+      r.headers.set("expires", "0");
+      r.headers.delete("etag");
+      r.headers.delete("last-modified");
+      // 版本可验证：每次响应盖实时时间戳，线上一眼看出服务的是不是最新版。
+      r.headers.set("x-served-at", new Date().toISOString());
       return r;
     }
     return resp;
