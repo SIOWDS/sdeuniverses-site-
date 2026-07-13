@@ -202,9 +202,7 @@ body.zh .en-only{display:none}
 /* 每日三句 */
 .dq-card{position:relative;display:flex;flex-direction:column;text-align:left;background:#FFFDF6;border:1px solid rgba(138,104,23,0.3);border-top:3px solid #8A6817;padding:26px 24px 20px;text-decoration:none;color:#2A2315;box-shadow:0 8px 26px rgba(90,70,20,0.08);transition:transform .18s,box-shadow .18s}
 .dq-card:hover{transform:translateY(-4px);box-shadow:0 16px 36px rgba(90,70,20,0.14)}
-.dq-mark{font-family:Georgia,serif;font-size:34px;line-height:1;color:#C9A84C;margin-bottom:6px}
-.dq-text{font-family:Georgia,"Songti SC",serif;font-size:18.5px;font-weight:700;line-height:1.75;letter-spacing:0.02em;flex:1}
-.dq-src{margin-top:16px;font-size:13px;color:#8A6817;letter-spacing:0.06em}
+.dq-text{font-family:Georgia,"Songti SC",serif;font-size:17.5px;font-weight:700;line-height:1.75;letter-spacing:0.02em;flex:1}
 .dq-go{margin-top:10px;font-size:13px;color:#B07A1E;font-weight:700;letter-spacing:0.1em}
 /* 今日长文星光闪烁 */
 .ll-stars{position:absolute;inset:0;pointer-events:none}
@@ -249,8 +247,6 @@ body.zh .en-only{display:none}
   <div class="en-only" style="font-size:12.5px;letter-spacing:0.5em;color:#8A6817;margin-bottom:16px">DAILY THREE · WISDOM LINES</div>
   <h2 class="zh-only" style="font-family:Georgia,'Songti SC',serif;font-size:clamp(30px,5vw,46px);font-weight:800;color:#2A2315;letter-spacing:0.06em;margin-bottom:10px">今日三句 · <span id="dq-date" style="color:#8A6817">…</span></h2>
   <h2 class="en-only" style="font-family:Georgia,serif;font-size:clamp(26px,4.4vw,40px);font-weight:800;color:#2A2315;letter-spacing:0.04em;margin-bottom:10px">Three Lines, Renewed Daily</h2>
-  <div class="zh-only" style="font-size:15px;color:#6B5B33;letter-spacing:0.1em;margin-bottom:44px">出自德麦专著与今日长文 · 王德生 著 · 按日轮换</div>
-  <div class="en-only" style="font-size:15px;color:#6B5B33;letter-spacing:0.1em;margin-bottom:44px">From Demai monographs &amp; long reads · by Wang Desheng</div>
   <div id="dq-cards" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px;max-width:1080px;width:100%"></div>
   <a href="#hero" class="zh-only" style="margin-top:52px;color:#8A6817;text-decoration:none;font-size:14px;letter-spacing:0.2em">↓ 进入 SDE Universes</a>
   <a href="#hero" class="en-only" style="margin-top:52px;color:#8A6817;text-decoration:none;font-size:14px;letter-spacing:0.2em">↓ Enter SDE Universes</a>
@@ -1488,70 +1484,60 @@ document.addEventListener('click',e=>{
 <script>
 /* ══ 每日三句 ══ */
 const DQ=[
- {t:"你越用力地抓它，它越不是它。",s:"《自律发生学》",u:"/column/self-discipline-genesis/"},
- {t:"持续的意志，不是执行的产物，而是观看暂停的产物。",s:"《自律发生学》",u:"/column/self-discipline-genesis/"},
- {t:"苦熬不是自律的代价——苦熬是征兆。",s:"《自律发生学》",u:"/column/self-discipline-genesis/"},
- {t:"批判是白天的公文，而法庭在天亮之前就已开过庭了。",s:"《自律发生学》",u:"/column/self-discipline-genesis/"},
- {t:"你无法通过不再相信，来解雇一个从不需要你相信的东西。",s:"《自律发生学》",u:"/column/self-discipline-genesis/"},
- {t:"守护，是征用的最高形态。",s:"《自律发生学》",u:"/column/self-discipline-genesis/"},
- {t:"热爱不会被『没用』杀死，它死于『我很珍惜我的热爱』。",s:"《自律发生学》",u:"/column/self-discipline-genesis/"},
- {t:"能被打卡稳定造出来的，从来不是热爱本身，而是热爱的行为外壳。",s:"《自律发生学》",u:"/column/self-discipline-genesis/"},
- {t:"目的化败坏，是一种余裕才配得上的病。",s:"《自律发生学》",u:"/column/self-discipline-genesis/"},
- {t:"匮乏没收了他伸手的资格，也就免除了伸手的毒。",s:"《自律发生学》",u:"/column/self-discipline-genesis/"},
- {t:"仪表从不撒谎；它只对测不到的东西，保持诚实的沉默。",s:"《自律发生学》",u:"/column/self-discipline-genesis/"},
- {t:"你看不出来的，正是你错得最深的地方。",s:"《自律发生学》",u:"/column/self-discipline-genesis/"},
- {t:"一个人越『自律』，他的错位往往越深——他正用自律来掩盖错位。",s:"《自律发生学》",u:"/column/self-discipline-genesis/"},
- {t:"通过维持『暂时』，来实现『永远不』。",s:"《自律发生学》",u:"/column/self-discipline-genesis/"},
- {t:"它是一个软件，不是操作系统——凡是有安装日期的囚禁，就留着不再触发的出口。",s:"《自律发生学》",u:"/column/self-discipline-genesis/"},
- {t:"留白，是结算的最后一种记账方式。",s:"《自律发生学》",u:"/column/self-discipline-genesis/"},
- {t:"他以为自己在留白，其实是换了一家公司打卡。",s:"《自律发生学》",u:"/column/self-discipline-genesis/"},
- {t:"无法报账，正是它唯一的账目。",s:"《自律发生学》",u:"/column/self-discipline-genesis/"},
- {t:"影子变薄的每一分，都不是挣来的，是省下来的。",s:"《自律发生学》",u:"/column/self-discipline-genesis/"},
- {t:"连对自律的批判，都成了延长陷阱的养料。",s:"《自律发生学》",u:"/column/self-discipline-genesis/"},
- {t:"拆掉刻度的那一天，你以为砸碎的是镣铐——落地才知道，那声脆响里有一半是你自己的骨头。",s:"《自律发生学》",u:"/column/self-discipline-genesis/"},
- {t:"数字时代最深的贫困，是离开记录，便无力向自己证明生活曾经发生。",s:"《自律发生学》",u:"/column/self-discipline-genesis/"},
- {t:"崩塌带走的是撑着你的东西，留下的才是属于你的东西。",s:"《自律发生学》",u:"/column/self-discipline-genesis/"},
- {t:"人不是一只被生活取用的容器——人是一场燃烧，而燃烧从不欠火焰的债。",s:"《自律发生学》",u:"/column/self-discipline-genesis/"},
- {t:"坚持是一场接力，第一棒的全部使命，是活到交棒的那一天。",s:"《自律发生学》",u:"/column/self-discipline-genesis/"},
- {t:"人是在走出一条路之后，才被这条路追认为一直有方向的人。",s:"《自律发生学》",u:"/column/self-discipline-genesis/"},
- {t:"品格不是行为的产地证明——它是判决书上的签名。",s:"《自律发生学》",u:"/column/self-discipline-genesis/"},
- {t:"现代人留下了整座神庙的规矩，只搬走了那个能说『够了』的神。",s:"《自律发生学》",u:"/column/self-discipline-genesis/"},
- {t:"这个时代最精巧的支配，不再没收你的自律——它替你持有自律，而把辛苦原封留给你。",s:"《自律发生学》",u:"/column/self-discipline-genesis/"},
- {t:"把对自己的一杯水、一页书、一次晨跑，记成需要人格担保的贷款，是这个时代最普遍的自我高利贷。",s:"《自律发生学》",u:"/column/self-discipline-genesis/"},
- {t:"你最好的时刻，从来不是你在场的时刻。",s:"《自律发生学》",u:"/column/self-discipline-genesis/"},
- {t:"把正门修好，然后离开门口。",s:"《自律发生学》",u:"/column/self-discipline-genesis/"},
- {t:"出庭，不是义务。",s:"《自律发生学》",u:"/column/self-discipline-genesis/"},
- {t:"有一个教育在发生，有一个教育在证明发生。",s:"《教育是什么？》",u:"/column/what-is-education/"},
- {t:"钟还在报时，只是没有人再抬头。",s:"《教育的困境和出路》",u:"/column/education-dilemma/"},
- {t:"判决太早，是这个时代最大的思维病。",s:"《SDE批判性思维》",u:"/column/critique-is-first-an-unveiling/"},
- {t:"道不是一个东西，道是「发生」本身。",s:"《老子的道，为何物》",u:"/column/what-is-dao/"},
- {t:"老子的动词，永远是「生」，不是「是」。",s:"《老子的道，为何物》",u:"/column/what-is-dao/"},
- {t:"「道是什么」——这个「是」字，就是圈套本身。",s:"《老子的道，为何物》",u:"/column/what-is-dao/"},
- {t:"把名词的追问，换成动词的追问；把对实体的指认，换成对过程的描述。",s:"《老子的道，为何物》",u:"/column/what-is-dao/"},
- {t:"道无法被物化，因为它根本不是物；它无处不在，因为凡有发生处，就有它。",s:"《老子的道，为何物》",u:"/column/what-is-dao/"},
- {t:"名是发生的产物，不是发生的前提。",s:"《老子的道，为何物》",u:"/column/what-is-dao/"},
- {t:"老子不是在描述一个神秘的东西，他是在极其精确地描述「发生」这件事的性质。",s:"《老子的道，为何物》",u:"/column/what-is-dao/"},
- {t:"「道法自然」——道效法的是「自己如此」。",s:"《老子的道，为何物》",u:"/column/what-is-dao/"},
- {t:"名不在物之后，名在物之先——名是让物得以成为物的那个动作。",s:"《老子的道，为何物》",u:"/column/what-is-dao/"},
- {t:"他关心的从来不是世界由哪些东西构成，而是世界如何一层层地发生出来。",s:"《老子的道，为何物》",u:"/column/what-is-dao/"},
- {t:"任何看似稳定的存在，都只是缘起暂时闭合后的一张阶段性画像，而不是恒常本质。",s:"《佛法的SDE智慧入门》",u:"/column/buddhism-sde-intro/"},
- {t:"寂静的不是世界，是那颗不断向相中安家、向法中固化、向所得里重生我执的心。",s:"《佛法的SDE智慧入门》",u:"/column/buddhism-sde-intro/"},
- {t:"不是先有一个客观世界、你再对它起念；而是你的一念，当场就把那个世界发生出来了。",s:"《佛法的SDE智慧入门》",u:"/column/buddhism-sde-intro/"},
- {t:"无明的要害在于：它不是「不知道」。",s:"《佛法的SDE智慧入门》",u:"/column/buddhism-sde-intro/"},
- {t:"一个名字，就是给一束流动的缘起打上的一枚稳定化的印章。",s:"《同一个空，两个方向》",u:"/column/buddha-and-science/"},
- {t:"表征被错认成了自性——而这个错认，正是苦的总根。",s:"《同一个空，两个方向》",u:"/column/buddha-and-science/"},
- {t:"文明的一切——你脚下的桥、手中的药、眼前的字——都驮在这些印章上。",s:"《同一个空，两个方向》",u:"/column/buddha-and-science/"},
- {t:"稳定非天然，稳定需靠条件维持。",s:"《同一个空，两个方向》",u:"/column/buddha-and-science/"},
- {t:"它不是一个待破译的密码，是一台正在运转的引擎。",s:"《SDE红学导论》",u:"/column/redology-intro/"},
- {t:"空只能说明终局，情才能发动过程。",s:"《SDE红学导论》",u:"/column/redology-intro/"},
- {t:"恰恰因为空在远处，前八十回的情才具有最高强度。",s:"《SDE红学导论》",u:"/column/redology-intro/"},
- {t:"情越真的人，输得越尽。",s:"《SDE红学导论》",u:"/column/redology-intro/"},
- {t:"她的死，不是任何人从外面加给她的；是从她生命内部，一寸一寸自己完成的。",s:"《黛玉为什么必须死》",u:"/column/redology-daiyu/"},
- {t:"她的眼泪不是软弱，是她生命的计量单位；流泪不是被伤害的结果，是她主动履约的方式。",s:"《黛玉为什么必须死》",u:"/column/redology-daiyu/"},
- {t:"黛玉的一生，就是一场眼泪的倒计时。",s:"《黛玉为什么必须死》",u:"/column/redology-daiyu/"},
- {t:"创造力在这里不是通往幸福的阶梯，而是一面照出牢笼的镜子——看得越清，痛得越深。",s:"《十二种被碾碎的方式》",u:"/column/redology-twelve/"},
- {t:"他们的才华越高，就越是清醒地照见自己被环境锁死的处境。",s:"《十二种被碾碎的方式》",u:"/column/redology-twelve/"},
- {t:"才越高，越是清醒地照见这个家的末世；越是想力挽狂澜，越是无力回天。",s:"《十二种被碾碎的方式》",u:"/column/redology-twelve/"},
+ {t:"谁被养出来了，谁就走得下去；谁没被养出来、始终是最初那个逼自己的人在硬扛——谁就迟早力竭。",u:"/column/self-discipline-genesis/"},
+ {t:"意志力的真正用途，不是把一件事撑到底，而是把最初那段「新人尚未出生」的空窗期撑过去。",u:"/column/self-discipline-genesis/"},
+ {t:"一件不反哺的事，做十年也养不出接班人，做的人只能永远是那个咬牙的初代。",u:"/column/self-discipline-genesis/"},
+ {t:"问一个作家他的方向从何而来，他会讲一个故事：童年的某本书，少年的某次震动，仿佛方向自始就在，后来的一切只是奔赴。",u:"/column/self-discipline-genesis/"},
+ {t:"方向不是先于努力而存在、再由努力去服务的；方向是被努力制造出来的，然后被回溯性地投射到过去，让努力看起来像是一直在服务它。",u:"/column/self-discipline-genesis/"},
+ {t:"防御性的自造：故事一道工序独转，用宣称的方向遮挡无向的恐慌——履历上的「热爱」，身体里没有对应的发热。",u:"/column/self-discipline-genesis/"},
+ {t:"三者的判别，不靠追问「这是不是你真正想要的」——这个问题已随本真一起下葬——而靠一条可观察的探针：停下来的时候，发生什么。",u:"/column/self-discipline-genesis/"},
+ {t:"生长性的方向，停下时如呼吸暂停，身体自己会去续上；防御性的方向，停下时故事立刻慌张地加大音量；异化性的方向，停下时只剩推送在响。",u:"/column/self-discipline-genesis/"},
+ {t:"人不是找到方向的——人是在走出一条路之后，才被这条路追认为一直有方向的人。",u:"/column/self-discipline-genesis/"},
+ {t:"通行的想法认为，功劳与过失像重量一样，是行为自带的客观量——它已经在那儿了，剩下的只是把它称准，或者揭穿那些称错的人。",u:"/column/self-discipline-genesis/"},
+ {t:"撤销之后浮现的事实是：当我们说「这是你努力的结果」时，我们不是在读出这件事已有的归属——我们是在做出一次判定。",u:"/column/self-discipline-genesis/"},
+ {t:"判定是一个动作，发生在事后，可以这样落，也可以那样落；同一件事，昨天被判给运气，今天可以被判给刻苦，取决于开庭的是奶奶还是表哥。",u:"/column/self-discipline-genesis/"},
+ {t:"现代人的一个隐秘处境是：他生命中最重大的归属判定——我做成的事算不算数、算在什么名下——越来越多地由他从未见过法官的法庭作出。",u:"/column/self-discipline-genesis/"},
+ {t:"品格不是行为的产地证明——它是判决书上的签名，而大多数人终其一生，没看清签字的是谁的手。",u:"/column/self-discipline-genesis/"},
+ {t:"韦伯讲过那段著名的谱系：新教徒相信，人在尘世的劳作是神指派的天职，勤勉与节制不是手段，是对召唤的应答；财富不可挥霍，因为它是恩宠的记号。",u:"/column/self-discipline-genesis/"},
+ {t:"天职的神学地基抽掉之后，那套自我督导的机器没有随之拆除——它只是失去了雇主，空转着，等待新的招牌。",u:"/column/self-discipline-genesis/"},
+ {t:"天职的谱系正是示范：不问「自律的本质是什么」，问「这套纪律是在什么条件下被造出来、又在什么条件下失去主人而空转的」。",u:"/column/self-discipline-genesis/"},
+ {t:"跑步的是你的腿，早起的是你的身体，朋友圈晒图的是你的账号；只是标准、推力与裁决权，都由别处代为行使。",u:"/column/self-discipline-genesis/"},
+ {t:"这个时代最精巧的支配，不再没收你的自律——它替你持有自律，而把辛苦，原封留给你。",u:"/column/self-discipline-genesis/"},
+ {t:"立志，是举债——你向未来的自己借了一笔「我会做到」；每天的行动，是还款；中断，是违约；而那弥漫的自我厌恶，是催收。",u:"/column/self-discipline-genesis/"},
+ {t:"肌肉的疲劳本应像饥饿一样中性——可账房把疲劳记成了逾期，于是每一次累，都自动附赠一份「你欠着」的道德利息。",u:"/column/self-discipline-genesis/"},
+ {t:"其二，为什么损耗总被定向掏空——同样的一天，花在待办清单上的力气让人虚脱，花在计划外的帮忙上的力气反而让人踏实？",u:"/column/self-discipline-genesis/"},
+ {t:"回程、返场、破产保护——每一个词都默认了借贷关系本身的合法性，它把催收改成了协商，把无期改成了缓刑，却让那本账簿原封端坐堂上。",u:"/column/self-discipline-genesis/"},
+ {t:"设想另一种结算制——姑且叫它实时自偿：每一次行动，在它发生的当场自我结清，不挂账，不留应收。",u:"/column/self-discipline-genesis/"},
+ {t:"压垮人的从来不是今天这一件事——是这一件事背后，那本永远翻不到「两讫」那一页的账。",u:"/column/self-discipline-genesis/"},
+ {t:"如果崩溃只是核算对生命的压迫，解除压迫后生命理应恢复活力——除非，刻度早已不是压在肉上的枷锁，而是长进肉里的骨头。",u:"/column/self-discipline-genesis/"},
+ {t:"对一个刻度已骨化的人说「放下数字、跟随内心」，等于对拆了石膏的骨折病人说「跑起来、相信你的腿」——内心那块位置上，此刻正是空的。",u:"/column/self-discipline-genesis/"},
+ {t:"拆掉刻度的那一天，你以为自己砸碎的是镣铐——落地才知道，那声脆响里，有一半是你自己的骨头。",u:"/column/self-discipline-genesis/"},
+ {t:"本书把这一瞬命名为悬停——人被吊在「物理上发生」与「经验上作数」之间的半空里，两头都够不着地。",u:"/column/self-discipline-genesis/"},
+ {t:"为什么「没发朋友圈的旅行像白去了」能成为一代人的玩笑——玩笑底下是真实的账法：未被见证的经历，入不了账。",u:"/column/self-discipline-genesis/"},
+ {t:"为什么独处变得这样难——独处正是最大宗的无见证时间，对结算失能的人，那不是安宁，是成片成片「不作数」的荒地。",u:"/column/self-discipline-genesis/"},
+ {t:"跑完那五公里再发一条「今天手表没电，但我跑了」——那是把见证外包给了迟到的观众，功课作废。",u:"/column/self-discipline-genesis/"},
+ {t:"它只能在悬停的当场做：手表黑着，路还长，你对自己说不出任何将来能出示的话——就在这个说不出的位置上，把那五公里跑完。",u:"/column/self-discipline-genesis/"},
+ {t:"道不是一个最高的对象高踞于万物之上，道是万物得以显露、得以分别、得以关联的那个过程本身。",u:"/column/what-is-dao/"},
+ {t:"一个「造物主」是站在世界之外的，他先于世界存在，然后像工匠造物一样把世界制造出来——这是西方许多思想的底色。",u:"/column/what-is-dao/"},
+ {t:"道之上没有更高的东西可效法，因为道就是那个自我生成、自我缠绕的联立运动本身；它不向外求原因，它自己就是自己的根据。",u:"/column/what-is-dao/"},
+ {t:"世界不是先有一堆现成的物、我们再去命名；而是命名的动作参与了物的发生，把「无名」的开放态，切割、聚合成了「有名」的万物。",u:"/column/what-is-dao/"},
+ {t:"名是万物之母，名极其有用——没有名，就没有可积累、可传递的知识，人类文明无从谈起。",u:"/column/what-is-dao/"},
+ {t:"「山」叫久了，人就以为世上真有一个自足自立、名叫「山」的恒常实体；「我」用久了，人就深信身体里真住着一个不变的「我」。",u:"/column/what-is-dao/"},
+ {t:"老子反复推崇的那一整串意象——柔弱、曲、谷、婴儿、水、朴、虚、静——它们指向的其实是同一种东西： 最强的发生能力。",u:"/column/what-is-dao/"},
+ {t:"原著把佛陀的诊断压缩成一句： 一切执，执的都是被误认为实有的表征；一切苦，源于抓着流沙以为是磐石。",u:"/column/buddha-and-science/"},
+ {t:"SDE（显露·差异·纠缠）是一套跨领域的知识发生学方法——它不问一个对象「是什么」，而问它「如何如此发生」。",u:"/column/redology-intro/"},
+ {t:"情为本 ——情不是被缩小为男女私情，而是一种主客互动的本体力量：主体向对象敞开，被对象吸引、牵动、伤害、改变，并由此生成意义。",u:"/column/redology-intro/"},
+ {t:"在发生学的语言里，情就是那台引擎的点火装置——没有情，大观园里什么也不会「发生」。",u:"/column/redology-intro/"},
+ {t:"当你问「谁害死了黛玉」，你已经默认了她的死是一桩 外部事件 ——一个受害者，被一个阴谋、一个婚讯、一次打击，从外面击倒了。",u:"/column/redology-daiyu/"},
+ {t:"通俗的读法把宝黛之恋当作一段「本来就有、只待被拆散」的既成恋情——仿佛两人一见钟情，剩下的只是等待那把拆散他们的剪刀。",u:"/column/redology-daiyu/"},
+ {t:"它的 原初契约 是「还泪」——指向耗尽，不指向圆满，从一开始就没打算有个好结局。",u:"/column/redology-daiyu/"},
+ {t:"探春的悲，是「有创造之才，却被出身与末世双重锁死自由」的悲，是一个能臣生错了时代与位置的悲。",u:"/column/redology-twelve/"},
+ {t:"妙玉的悲，是「以孤高求自由，反被孤高所困」的悲——她想飞得离这个脏世界远一点，却飞不出这套环境为她画定的命。",u:"/column/redology-twelve/"},
+ {t:"一个问题若被回答了两千年还悬在半空，多半不是答案不够多，而是问题本身指着两样东西。",u:"/column/what-is-education/"},
+ {t:"它发生在一个人身上，从内部把他点着，无法代办，无法转交，无法储存，甚至无法当场出示——它是火。",u:"/column/what-is-education/"},
+ {t:"不是没有教与学，而是教与学不需要一个单独的名字——它们和生活长在一起，像盐溶在水里，你指不出哪一口是咸的。",u:"/column/what-is-education/"},
+ {t:"就像一个法官在还没听完案情、没查清证据、没理清动机的情况下，就一拍惊堂木宣判——他或许显得很有权威，但那不是审判，那是武断。",u:"/column/critique-is-first-an-unveiling/"},
+ {t:"所谓显影，是一个来自照相的词：底片上本来什么都看不见，是在显影液里，影像才一点点浮现出来。",u:"/column/critique-is-first-an-unveiling/"},
 ];
 (function(){
   const d=new Date();
@@ -1562,7 +1548,7 @@ const DQ=[
   const box=document.getElementById('dq-cards');
   if(box){
     box.innerHTML=idx.map(function(k){const q=DQ[k];
-      return '<a class="dq-card" href="'+q.u+'"><div class="dq-mark">「</div><div class="dq-text">'+q.t+'</div><div class="dq-src">—— '+q.s+' · 王德生</div><div class="dq-go">读全文 →</div></a>';}).join('');
+      return '<a class="dq-card" href="'+q.u+'"><div class="dq-text">'+q.t+'</div><div class="dq-go">读全文 →</div></a>';}).join('');
     var dt=document.getElementById('dq-date');
     if(dt) dt.textContent=(d.getMonth()+1)+'月'+d.getDate()+'日';
   }
