@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>解构大师 · 往期全集 | 王博士与 SDE · SDE Universes</title>
+<meta name="description" content="解构大师专栏往期全集——用 SDE 发生学的眼，逐一解构思想史上的巨人：尼采、福柯、柏拉图、康德、德里达。带着敬意的精确，先把对手扶到最强，再指出他那记重拳偏了几度。">
+<style>
+:root{--gold:#C9A84C;--gold2:#D4B25E;--ink:#F0E9D8;--ink2:#B8AE96;--bg:#0E0B08;--panel:#171310;--panel2:#1C1712;--line:rgba(201,168,76,0.22);--accent:#8C6A2E}
+*{margin:0;padding:0;box-sizing:border-box}
+::selection{background:rgba(201,168,76,0.35)}
+body{background:var(--bg);color:var(--ink);font-family:"Noto Serif SC",Georgia,"Songti SC",serif;line-height:1.9}
+nav{position:sticky;top:0;z-index:20;background:rgba(14,11,8,0.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+nav .w{max-width:1000px;margin:0 auto;padding:13px 24px;display:flex;justify-content:space-between;align-items:center}
+nav a{color:var(--gold);text-decoration:none;font-size:14px;letter-spacing:0.05em}
+.hero{max-width:820px;margin:0 auto;padding:66px 24px 20px;text-align:center;position:relative}
+.hero .eyebrow{font-size:11px;letter-spacing:0.42em;color:var(--gold);margin-bottom:20px}
+.hero h1{font-size:clamp(34px,6vw,52px);font-weight:800;line-height:1.1;margin-bottom:20px;color:#F5EFE0;font-family:Georgia,"Noto Serif SC",serif;letter-spacing:0.04em}
+.hero .lead{font-size:16.5px;color:var(--ink2);line-height:1.95;max-width:640px;margin:0 auto}
+.hero .lead b{color:#F5E6BF}
+.hero .rule{width:60px;height:2px;background:var(--gold);margin:26px auto 0;opacity:0.6}
+.wrap{max-width:1000px;margin:0 auto;padding:40px 24px 80px}
+.count{font-size:12px;letter-spacing:0.3em;color:var(--accent);text-align:center;margin-bottom:34px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:22px}
+.card{background:linear-gradient(160deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:14px;padding:26px 24px 22px;display:flex;flex-direction:column;transition:border-color .18s,transform .18s;position:relative;overflow:hidden}
+.card:hover{border-color:rgba(201,168,76,0.6);transform:translateY(-3px)}
+.card.feature{grid-column:1/-1;background:radial-gradient(ellipse 80% 120% at 12% 0%,rgba(212,178,94,0.12),transparent 60%),linear-gradient(160deg,var(--panel2),var(--panel))}
+.chip{display:inline-block;font-size:11px;letter-spacing:0.2em;color:#1A1410;background:var(--gold);border-radius:20px;padding:3px 12px;font-weight:700;margin-bottom:14px;align-self:flex-start}
+.chip.ser{color:var(--gold);background:transparent;border:1px solid rgba(201,168,76,0.5);font-weight:400}
+.badge-today{position:absolute;top:18px;right:18px;font-size:11px;letter-spacing:0.16em;color:#0E0B08;background:linear-gradient(90deg,#E8CE7E,#C9A84C);padding:4px 12px;border-radius:4px;font-weight:800}
+.card h2{font-size:20px;font-weight:800;color:#F5EFE0;line-height:1.42;margin-bottom:12px}
+.card.feature h2{font-size:26px}
+.card .hook{font-size:14.5px;color:var(--ink2);line-height:1.85;margin-bottom:18px;flex:1}
+.card.feature .hook{font-size:15.5px;max-width:720px}
+.card .meta{font-size:12px;color:#7C7159;letter-spacing:0.04em;margin-bottom:16px}
+.modes{display:flex;gap:9px;flex-wrap:wrap}
+.m{font-size:13px;letter-spacing:0.03em;text-decoration:none;border-radius:6px;padding:9px 15px;transition:all .15s}
+.m.primary{background:var(--gold);color:#1A1410;font-weight:700}
+.m.primary:hover{background:#E0C468}
+.m.ghost{background:rgba(201,168,76,0.08);color:var(--gold);border:1px solid rgba(201,168,76,0.4)}
+.m.ghost:hover{background:rgba(201,168,76,0.18)}
+.foretop{text-align:center;margin:70px auto 0;max-width:640px;padding:0 24px;color:#6B6250;font-size:13.5px;line-height:1.9}
+.foretop a{color:var(--gold);text-decoration:none}
+footer{border-top:1px solid var(--line);margin-top:56px;padding:30px 24px;text-align:center;color:#6B6250;font-size:13px}
+footer a{color:var(--gold);text-decoration:none}
+@media(max-width:640px){.card.feature h2{font-size:21px}.hero h1{font-size:34px}}
+</style></head>
+<body>
+<nav><div class="w"><a href="/">SDE Universes</a><a href="/#master">← 返回首页</a></div></nav>
+
+<div class="hero">
+  <div class="eyebrow">解 构 大 师 · DECONSTRUCTION MASTER</div>
+  <h1>解构大师</h1>
+  <p class="lead">用一双“事物如何发生”的眼，逐一解构思想史上的巨人。<br><b>带着敬意的精确</b>——先把对手扶到最强、最难反驳的状态，再指出他那记重拳，究竟偏了几度、偏在哪一个关节上。</p>
+  <div class="rule"></div>
+</div>
+
+<div class="wrap">
+  <div class="count">往 期 全 集 · 共 6 篇</div>
+  <div class="grid">
+
+    <!-- 今日/最新 · 头条 -->
+    <a class="card feature" href="/column/nietzsche-perspectivism/" style="text-decoration:none">
+      <span class="badge-today">最新 · 今日</span>
+      <span class="chip">尼采 · Nietzsche</span>
+      <h2>解构尼采：视角主义的错误</h2>
+      <p class="hook">你以为你在“选一个角度”看杯子——尼采把这一秒的错觉，盖成了一整座权力哲学。断口，在第二步：他把三界当场的联动，误记成了“主体的选择”；而剩下的那一界，就只能叫权力。约两万字，一只白瓷杯贯穿全篇。</p>
+      <div class="meta">约 2 万字 · 三种读法 · 二〇二六年七月十三日</div>
+      <div class="modes">
+        <span class="m primary">📖 长文阅读</span>
+        <span class="m ghost">📄 在线 PDF</span>
+        <span class="m ghost">⬇ 下载</span>
+      </div>
+    </a>
+
+    <!-- 福柯 -->
+    <div class="card">
+      <span class="chip">福柯 · Foucault</span>
+      <h2>福柯站到了悬崖边，却没有桥</h2>
+      <p class="hook">两千五百年的权力思想都在问“谁在统治”。福柯把问题翻转成“权力如何运作”，一举看穿了知识与权力的合谋——可他拆掉了旧主体之后，没能为“意义如何重新发生”架起一座桥，于是停在了悬崖边。</p>
+      <div class="meta">约 3 万字 · 三种读法 · 2026年7月</div>
+      <div class="modes">
+        <a class="m primary" href="/column/deconstructing-foucault/">📖 长文阅读</a>
+        <a class="m ghost" href="/column/deconstructing-foucault/read.html">📄 在线 PDF</a>
+        <a class="m ghost" href="/column/deconstructing-foucault/deconstructing-foucault.pdf" download>⬇ 下载</a>
+      </div>
+    </div>
+
+    <!-- 柏拉图 · 系列之一 -->
+    <div class="card">
+      <span class="chip ser">解构西方哲学家 · 之一</span>
+      <h2>柏拉图的理念，不是被回忆的，而是被发生的</h2>
+      <p class="hook">理念不是灵魂在出生前见过、此生只需回忆的现成模板。SDE 顺着柏拉图的“回忆说”往下追问：那被回忆的东西，最初又是怎么来的？答案是——它不是被回忆的，是在追问中当场被发生的。</p>
+      <div class="meta">深度长文 · 长文阅读 · 2026年7月</div>
+      <div class="modes"><a class="m primary" href="/column/plato-idea-genesis/">📖 长文阅读</a></div>
+    </div>
+
+    <!-- 康德 · 系列之二 -->
+    <div class="card">
+      <span class="chip ser">解构西方哲学家 · 之二</span>
+      <h2>康德的范畴，不是先天的模具，而是沉淀的纠缠</h2>
+      <p class="hook">康德说，十二范畴是先天装好、扣在一切经验之上的模具。SDE 反问：模具自己又是从哪儿来的？范畴不是天生现成的铁模，而是无数次纠缠沉淀下来的结晶——它会生长，也会变形。</p>
+      <div class="meta">深度长文 · 长文阅读 · 2026年7月</div>
+      <div class="modes"><a class="m primary" href="/column/kant-categories-genesis/">📖 长文阅读</a></div>
+    </div>
+
+    <!-- 尼采 · 系列之三 -->
+    <div class="card">
+      <span class="chip ser">解构西方哲学家 · 之三</span>
+      <h2>尼采的视角，不是主体选择的，而是发生出来的</h2>
+      <p class="hook">与头条同一命门的另一角切入：视角从来不是一个主体站在高处、从一份菜单里挑出来的。它是在“看”的当场，被三界联动发生出来的一个侧面——主体，只是这场发生在下游落下的一个签名。</p>
+      <div class="meta">深度长文 · 长文阅读 · 2026年7月</div>
+      <div class="modes"><a class="m primary" href="/column/nietzsche-perspective-genesis/">📖 长文阅读</a></div>
+    </div>
+
+    <!-- 德里达 -->
+    <div class="card">
+      <span class="chip">德里达 · Derrida</span>
+      <h2>德里达那一拳，为何砸空？</h2>
+      <p class="hook">德里达一拳砸碎了结构主义的中心、在场与稳定所指，延异（différance）让意义永远被推迟。这一拳锐利无匹——可它最终砸在了哪里？为什么砸得结构粉碎，却砸不出一个新的立足之地？</p>
+      <div class="meta">王博士与 SDE · 长文阅读 · 据《SDE本体论入门》第二十七章</div>
+      <div class="modes"><a class="m primary" href="/column/derrida-deconstruction/">📖 长文阅读</a></div>
+    </div>
+
+  </div>
+
+  <div class="foretop">
+    每一篇解构，靠的都不是嗓门，是一双能看清“事情如何发生”的眼。<br>
+    这双眼，你也可以借来一用 —— <a href="/taste/idea-generator/">免费品尝 SDE 金点子发生器 →</a>
+  </div>
+</div>
+
+<footer>© 德麦国际 Demai International · 解构大师专栏 · <a href="/">sdeuniverses.com</a></footer>
+</body>
+</html>
