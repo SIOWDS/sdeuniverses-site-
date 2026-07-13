@@ -1,0 +1,21 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>诊断 · SDE Universes</title>
+<style>body{background:#0b0820;color:#e8ffe8;font:15px/1.9 Menlo,Consolas,monospace;padding:28px}b{color:#E7C86B}</style></head><body>
+<div><b>SDE Universes 诊断页</b></div>
+<div>页面构建戳: <b>202607130056-check</b>（能看到这行＝已绕过旧缓存）</div>
+<div id="log">JS 未运行 ✗（一直停在这行＝浏览器 JS 被禁或崩了）</div>
+<script src="/assets/daily-quotes.js?v=202607130056"></script>
+<script>
+(function(){
+  var L=document.getElementById('log'); function p(s){var d=document.createElement('div');d.innerHTML=s;L.appendChild(d);}
+  L.textContent='';
+  window.onerror=function(m,src,ln){p('<b>运行错误:</b> '+m+' @'+(src||'')+':'+ln);};
+  p('JS 运行: <b>✓</b>');
+  p('浏览器 UA: '+navigator.userAgent);
+  p('共享池加载: <b>'+(window.DQ?('✓ '+window.DQ.length+' 句'):'✗ 未加载')+'</b>');
+  try{var d=new Date();var t=window.DQ_pickForDate(d.getFullYear(),d.getMonth()+1,d.getDate());
+    p('今日抽取: <b>✓</b> '+t.map(function(q){return q.t.slice(0,12)+'…'}).join(' / '));
+  }catch(e){p('<b>抽取失败:</b> '+e.message);}
+  p('本页时间: '+new Date().toString());
+})();
+</script></body></html>
