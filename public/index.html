@@ -1533,7 +1533,7 @@ document.addEventListener('click',e=>{
     sf.innerHTML=html;
   }
   /* 指针3D倾斜 */
-  if(window.matchMedia && matchMedia('(pointer:fine)').matches && !matchMedia('(prefers-reduced-motion: reduce)').matches){
+  if(window.matchMedia && window.matchMedia('(pointer:fine)').matches && !window.matchMedia('(prefers-reduced-motion: reduce)').matches){
     document.querySelectorAll('.dq-card').forEach(function(card){
       card.addEventListener('pointermove',function(e){
         var r=card.getBoundingClientRect();
