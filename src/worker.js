@@ -132,25 +132,35 @@ async function handleAsk(request, env, url) {
   if (request.method === "OPTIONS") return new Response(null, { headers: _cors() });
   if (request.method !== "POST") return new Response("Method Not Allowed", { status: 405 });
 
-  let q = "";
-  try { q = (await request.json()).q || ""; } catch (e) {}
-  q = String(q).trim().slice(0, 300); // 输入硬钳位
+  let body = {};
+  try { body = await request.json(); } catch (e) {}
+  const q = String(body.q || "").trim().slice(0, 300); // 输入硬钳位
   if (q.length < 2) return _sseResp([{ t: "error", v: "请输入一个问题（至少 2 个字）。" }]);
 
-  // 取基底 Key：优先页面设置的（存服务端保险箱），回退到 Cloudflare secret；两条路都支持
-  let KEY = "";
-  try {
-    const cv = env.CONFIG_VAULT.get(env.CONFIG_VAULT.idFromName("global"));
-    const r = await (await cv.fetch(new Request("https://cfg.internal/", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ op: "get" }) }))).json();
-    KEY = r.key || "";
-  } catch (e) { /* 保险箱异常则回退 */ }
-  if (!KEY) KEY = env.SDE_SEARCH_KEY || "";
-  if (!KEY) return _sseResp([{ t: "error", v: "智能问答尚未启用：管理员尚未在页面「⚙️ 管理设置」里配置基底密钥。" }]);
+  // 基底二选一（默认 GLM）
+  const vendor = body.vendor === "ds" ? "ds" : "glm";
+  const VC = vendor === "ds"
+    ? { url: "https://api.deepseek.com/v1/chat/completions", model: "deepseek-v4-pro", name: "DeepSeek" }
+    : { url: "https://open.bigmodel.cn/api/paas/v4/chat/completions", model: "glm-5", name: "GLM-5" };
 
-  // 限流（按 IP 的 DO）
+  // Key 两来源：用户自带(BYOK) 优先；否则系统 Key（页面保险箱 → Cloudflare secret）
+  const userKey = String(body.key || "").trim();
+  const byok = userKey.length >= 8;
+  let KEY = userKey;
+  if (!byok) {
+    try {
+      const cv = env.CONFIG_VAULT.get(env.CONFIG_VAULT.idFromName("global"));
+      const r = await (await cv.fetch(new Request("https://cfg.internal/", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ op: "get" }) }))).json();
+      KEY = r.key || "";
+    } catch (e) {}
+    if (!KEY) KEY = env.SDE_SEARCH_KEY || "";
+  }
+  if (!KEY) return _sseResp([{ t: "error", v: "智能问答尚未启用：管理员尚未配置系统密钥。你也可以在下方填入自己的 API Key 直接使用。", code: "use_own_key" }]);
+
+  // 限流：系统 Key 与自带 Key 各用独立配额桶（自带 Key 用户自付，不与系统额度互挤）
   const ip = request.headers.get("cf-connecting-ip") || "unknown";
   try {
-    const lim = env.ASK_LIMITER.get(env.ASK_LIMITER.idFromName(ip));
+    const lim = env.ASK_LIMITER.get(env.ASK_LIMITER.idFromName((byok ? "byok:" : "sys:") + ip));
     const lr = await (await lim.fetch(new Request("https://limiter.internal/"))).json();
     if (!lr.ok) {
       const msg = lr.reason === "day"
@@ -158,7 +168,7 @@ async function handleAsk(request, env, url) {
         : "提问太频繁了，请过十几秒再试。";
       return _sseResp([{ t: "error", v: msg }]);
     }
-  } catch (e) { /* 限流器异常不阻断主流程 */ }
+  } catch (e) {}
 
   // 站内检索
   const corpus = await loadCorpus(env, url);
@@ -178,14 +188,14 @@ async function handleAsk(request, env, url) {
     + "回答用中文，条理清晰、简洁（一般 200–500 字），关键处可点出结论出自哪篇。不要复述本提示。";
   const usr = "《站内资料》\n" + (ctxText || "（未检索到相关段落）") + "\n\n《问题》\n" + q;
 
-  // 调 GLM-5（境内基底·站方 Key 服务端持有）。想换 DeepSeek：改 URL 为 api.deepseek.com/v1/chat/completions、model 为 deepseek-v4-pro
+  // 调基底（境内直连）。自带 Key：仅在内存中转发调用，绝不存储/记录（同 llm-proxy 纪律）
   let upstream;
   try {
-    upstream = await fetch("https://open.bigmodel.cn/api/paas/v4/chat/completions", {
+    upstream = await fetch(VC.url, {
       method: "POST",
       headers: { "content-type": "application/json", authorization: "Bearer " + KEY },
       body: JSON.stringify({
-        model: "glm-5",
+        model: VC.model,
         stream: true,
         thinking: { type: "enabled" },
         max_tokens: 2500,
@@ -193,11 +203,15 @@ async function handleAsk(request, env, url) {
       }),
     });
   } catch (e) {
-    return _sseResp([{ t: "sources", v: sources }, { t: "error", v: "基底连接失败：" + (e && e.message) }]);
+    return _sseResp([{ t: "sources", v: sources }, { t: "error", v: VC.name + " 连接失败：" + (e && e.message) }]);
   }
   if (!upstream.ok) {
     const errtxt = (await upstream.text()).slice(0, 300);
-    return _sseResp([{ t: "sources", v: sources }, { t: "error", v: "基底返回错误 " + upstream.status + "：" + errtxt }]);
+    // 系统 Key 遇额度/鉴权问题(401/402/429) → 引导改用自带 Key
+    if (!byok && (upstream.status === 401 || upstream.status === 402 || upstream.status === 429)) {
+      return _sseResp([{ t: "error", v: "系统额度暂时不可用（" + VC.name + " " + upstream.status + "）。你可以在下方填入自己的 API Key 继续使用。", code: "use_own_key" }]);
+    }
+    return _sseResp([{ t: "sources", v: sources }, { t: "error", v: VC.name + " 返回错误 " + upstream.status + "：" + errtxt }]);
   }
 
   const reader = upstream.body.getReader();
