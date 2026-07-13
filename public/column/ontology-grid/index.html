@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SDE 本体论 · 三维九宫 | 一套本体论的九个入口 · 王博士与SDE</title>
+<meta name="description" content="SDE本体论的三个不可还原维度——显露（S）、差异序列（D）、特征纠缠（E）——每维再分三格，合成九宫格。一格一篇，一格一个入口，走完便握住一整套"世界如何发生"的眼睛。">
+<style>
+:root{
+  --bg:#F5EFE0; --surface:#EBE3CE; --card:#FAF6EC;
+  --gold:#8A6817; --text:#2A2315; --muted:#98886C;
+  --border:rgba(138,104,23,0.22);
+  --ink:#1A1410; --ink-gold:#D4B25E;
+  --s:#8A6817; --d:#1C4470; --e:#0A5A4E;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:"Songti SC","Noto Serif SC","Source Han Serif SC",Georgia,serif;line-height:2.0;font-size:17px}
+a{color:var(--gold);text-decoration:none}
+a:hover{text-decoration:underline}
+.wrap{max-width:960px;margin:0 auto;padding:0 24px}
+
+nav{position:sticky;top:0;background:rgba(245,239,224,0.93);backdrop-filter:blur(8px);border-bottom:1px solid var(--border);z-index:10}
+nav .inner{display:flex;align-items:center;justify-content:space-between;height:60px;max-width:960px;margin:0 auto;padding:0 24px}
+.nav-logo{font-weight:700;letter-spacing:0.06em;color:var(--text)}
+.nav-back{font-size:14px;color:var(--muted)}
+
+header.hub{background:var(--ink);color:#EDE4CF;padding:82px 0 64px;text-align:center}
+.hub-eyebrow{font-size:12.5px;letter-spacing:0.45em;color:var(--ink-gold);margin-bottom:24px}
+.hub-title{font-size:clamp(28px,5vw,46px);font-weight:700;letter-spacing:0.06em;line-height:1.4}
+.hub-sub{font-size:clamp(16px,2.4vw,20px);color:var(--ink-gold);margin-top:18px;letter-spacing:0.06em;line-height:1.7}
+.hub-formula{margin-top:30px;font-size:15px;color:#B4A780;letter-spacing:0.14em}
+.hub-formula b{color:var(--ink-gold)}
+
+.intro{padding:56px 0 8px;max-width:760px}
+.intro p{margin-bottom:24px;text-align:justify}
+.intro p.lead{font-size:18.5px}
+.intro b{color:var(--gold)}
+.eqbox{background:var(--card);border:1px solid var(--border);border-left:3px solid var(--gold);padding:22px 28px;margin:30px 0;font-size:16px;line-height:2.1}
+.eqbox .eq{letter-spacing:0.04em}
+.eqbox .eq b{color:var(--gold)}
+
+.gridwrap{padding:24px 0 40px}
+.dim{margin-bottom:34px}
+.dim-head{display:flex;align-items:baseline;gap:14px;margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+.dim-code{font-size:30px;font-weight:700;letter-spacing:0.05em}
+.dim-name{font-size:16px;color:var(--text);font-weight:700}
+.dim-desc{font-size:13.5px;color:var(--muted)}
+.dim.S .dim-code{color:var(--s)} .dim.D .dim-code{color:var(--d)} .dim.E .dim-code{color:var(--e)}
+.row{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+@media(max-width:720px){.row{grid-template-columns:1fr}}
+.cell{background:var(--card);border:1px solid var(--border);padding:22px 20px;display:flex;flex-direction:column;min-height:190px;position:relative;transition:transform .15s,box-shadow .15s}
+.cell.live{cursor:pointer}
+.cell.live:hover{transform:translateY(-3px);box-shadow:0 10px 24px rgba(138,104,23,0.14)}
+.dim.S .cell{border-top:3px solid var(--s)} .dim.D .cell{border-top:3px solid var(--d)} .dim.E .cell{border-top:3px solid var(--e)}
+.cell .code{font-size:13px;font-weight:700;letter-spacing:0.14em;margin-bottom:8px}
+.dim.S .cell .code{color:var(--s)} .dim.D .cell .code{color:var(--d)} .dim.E .cell .code{color:var(--e)}
+.cell .name{font-size:19px;font-weight:700;color:var(--text);letter-spacing:0.03em}
+.cell .trio{font-size:13px;color:var(--muted);margin-top:6px;letter-spacing:0.08em}
+.cell .ess{font-size:13.5px;color:#6E6047;margin-top:12px;line-height:1.75;flex:1}
+.cell .cta{margin-top:14px;font-size:13.5px;font-weight:700}
+.dim.S .cell .cta{color:var(--s)} .dim.D .cell .cta{color:var(--d)} .dim.E .cell .cta{color:var(--e)}
+.cell .soon{margin-top:14px;font-size:12.5px;color:#B3A588;letter-spacing:0.14em}
+.badge{position:absolute;top:14px;right:14px;font-size:10.5px;letter-spacing:0.1em;color:#fff;background:var(--gold);padding:3px 9px;border-radius:2px}
+.cell.live .badge{background:#B8901F}
+
+.helong{max-width:760px;background:var(--surface);border:1px solid var(--border);padding:24px 30px;margin:8px auto 0;font-size:15.5px;line-height:2.0}
+.helong b{color:var(--gold)}
+
+.endbox{background:var(--ink);color:#EDE4CF;text-align:center;padding:60px 24px;margin-top:48px}
+.endbox p{color:#B4A780;max-width:600px;margin:0 auto 30px;text-align:center}
+.btn{display:inline-block;padding:13px 32px;border:1px solid var(--ink-gold);letter-spacing:0.12em;font-size:15px;margin:6px}
+.btn.solid{background:var(--ink-gold);color:var(--ink);font-weight:700}
+.btn.solid:hover{background:#E4C878;text-decoration:none}
+.btn.ghost{color:var(--ink-gold)}
+.btn.ghost:hover{background:rgba(212,178,94,0.12);text-decoration:none}
+footer{background:var(--ink);color:#8B7E5E;text-align:center;padding:34px 0 44px;font-size:13px;letter-spacing:0.08em}
+footer a{color:#B4A780}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="inner">
+    <a class="nav-logo" href="/">SDE Universes</a>
+    <a class="nav-back" href="/#grid">← 王博士与 SDE</a>
+  </div>
+</nav>
+
+<header class="hub">
+  <div class="wrap">
+    <div class="hub-eyebrow">SDE 本体论 · 三维九宫</div>
+    <h1 class="hub-title">一套本体论的九个入口</h1>
+    <div class="hub-sub">显露（S）· 差异序列（D）· 特征纠缠（E）<br>三维各分三格，合成九宫；一格一篇，走完便握住一整套眼睛</div>
+    <div class="hub-formula"><b>在 E 中，经 D，成 S</b> — 在纠缠的土壤里，经差异的路径，成显露的形态</div>
+  </div>
+</header>
+
+<div class="wrap">
+<section class="intro">
+  <p class="lead">世界不是被发现的，是被发生的。任何可被认识、表达、维持的存在，都不是预先摆好、等着被看见的现成之物，而是在一定的纠缠土壤里，经过差异的推进，被发生、被稳定、被显露出来的。</p>
+  <p>要把"如何发生"说清楚，SDE 把存在拆成三个<b>不可还原</b>的维度——它们互相生成、缺一不成熟：</p>
+  <div class="eqbox">
+    <div class="eq"><b>S 显露</b>　存在被看见、维持、识别的方式（一条从模糊到清晰到可计算的连续谱，"结构"只是最稳定的一端）</div>
+    <div class="eq"><b>D 差异序列</b>　存在在比较、试探、修正、收敛中，形成路径的运行机制</div>
+    <div class="eq"><b>E 特征纠缠</b>　存在得以发生的厚度层、沉淀层、发生土壤（不是背景，是产房）</div>
+  </div>
+  <p>三维不是三个标签，而是一台互生的引擎，闭合成三大方程：<b>S = F(D, E)</b>、<b>D = G(S, E)</b>、<b>E = H(S, D)</b>——没有任何一维能被单独抽出来当原初起点。而每一个维度，内部又各分三格，于是三维展开成<b>九个宫格</b>。这九格，就是同一套本体论的九个入口。</p>
+  <p>下面这张表，是这个专栏的全图。<b>每一格，先各成一篇万字长文</b>；点开一格，你就从那个入口走进去。九格走完，你手里就不再是九个零件，而是一整套"世界如何发生"的眼睛。</p>
+</section>
+</div>
+
+<div class="wrap">
+<section class="gridwrap">
+
+  <div class="dim S">
+    <div class="dim-head">
+      <div class="dim-code">S</div>
+      <div class="dim-name">显露 · Show</div>
+      <div class="dim-desc">存在被看见、维持、识别的方式 —— 一条连续谱</div>
+    </div>
+    <div class="row">
+      <a class="cell live" href="/column/ontology-grid/s1/">
+        <span class="badge">已上线</span>
+        <div class="code">S1</div>
+        <div class="name">显露 · 规范维</div>
+        <div class="trio">对比 · 变化 · 分布</div>
+        <div class="ess">世界如何被"规范"成可对比、可陈述、可分布的知识。对比就是抽象、就是上升——你以为在"看"，其实一直在"比"。</div>
+        <div class="cta">阅读全文 →</div>
+      </a>
+      <div class="cell">
+        <span class="badge">即将上线</span>
+        <div class="code">S2</div>
+        <div class="name">显露 · 模态维</div>
+        <div class="trio">粒子 · 波 · 场</div>
+        <div class="ess">显露以哪三种模态被给到你面前：一颗颗分明的粒子、一段流动的波、还是一整片弥漫的场。</div>
+        <div class="soon">敬请期待</div>
+      </div>
+      <div class="cell">
+        <span class="badge">即将上线</span>
+        <div class="code">S3</div>
+        <div class="name">显露 · 价值维</div>
+        <div class="trio">真 · 善 · 美</div>
+        <div class="ess">显露朝哪个价值方位亮起。全书最反直觉的一笔：那个正在"看"的"我"，为什么偏偏是最后才亮的。</div>
+        <div class="soon">敬请期待</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="dim D">
+    <div class="dim-head">
+      <div class="dim-code">D</div>
+      <div class="dim-name">差异序列 · Difference</div>
+      <div class="dim-desc">在比较、试探、修正、收敛中形成路径的运行机制</div>
+    </div>
+    <div class="row">
+      <div class="cell">
+        <span class="badge">即将上线</span>
+        <div class="code">D1</div>
+        <div class="name">意义目标</div>
+        <div class="trio">创造 · 自由 · 幸福</div>
+        <div class="ess">方向从哪来。意义三律——为什么达成一个静态目标之后，反而是空虚，而非满足。</div>
+        <div class="soon">敬请期待</div>
+      </div>
+      <div class="cell">
+        <span class="badge">即将上线</span>
+        <div class="code">D2</div>
+        <div class="name">路径组织</div>
+        <div class="trio">六步 · 九步</div>
+        <div class="ess">差异如何组织成路径：猜想·执行·评估·反馈·修正·迭代，再到分化·重组·升维。创造最关键的温床。</div>
+        <div class="soon">敬请期待</div>
+      </div>
+      <div class="cell">
+        <span class="badge">即将上线</span>
+        <div class="code">D3</div>
+        <div class="name">优化约束</div>
+        <div class="trio">误差 · 冗余 · 损耗</div>
+        <div class="ess">分寸的调节者。为什么"高效"会走向"贫血"——创造之时，必须先松后紧。</div>
+        <div class="soon">敬请期待</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="dim E">
+    <div class="dim-head">
+      <div class="dim-code">E</div>
+      <div class="dim-name">特征纠缠 · Entanglement</div>
+      <div class="dim-desc">存在得以发生的厚度层、沉淀层、发生土壤</div>
+    </div>
+    <div class="row">
+      <div class="cell">
+        <span class="badge">即将上线</span>
+        <div class="code">E1</div>
+        <div class="name">三界</div>
+        <div class="trio">理念 · 现实 · 自我</div>
+        <div class="ess">发生扎根的三处土壤。名是一根指针，指向特征纠缠聚合体——不是包含、不是等于，是指向。</div>
+        <div class="soon">敬请期待</div>
+      </div>
+      <div class="cell">
+        <span class="badge">即将上线</span>
+        <div class="code">E2</div>
+        <div class="name">信息三模态</div>
+        <div class="trio">符号 · 逻辑 · 数学</div>
+        <div class="ess">纠缠朝"可把握、可传递"那一面转过来的形态。一个反直觉的判断：没有通用的逻辑学。</div>
+        <div class="soon">敬请期待</div>
+      </div>
+      <div class="cell">
+        <span class="badge">即将上线</span>
+        <div class="code">E3</div>
+        <div class="name">能量三状态</div>
+        <div class="trio">内能 · 动能 · 势能</div>
+        <div class="ess">每一束纠缠此刻携带的劲。能量即真善美——事实与价值的鸿沟，就在这里被填平。</div>
+        <div class="soon">敬请期待</div>
+      </div>
+    </div>
+  </div>
+
+</section>
+</div>
+
+<div class="helong">
+  <p><b>为什么 S 与 E 像一对双生子？</b>细看会发现：S3 与 E3 都是"真·善·美"，S2（粒子·波·场）与 E2（符号·逻辑·数学）也共着一副模态骨架。这不是巧合。<b>显露（S）是纠缠开出的花，特征纠缠（E）是沉淀下来的壤</b>——花与壤，共享同一副"规范·模态·价值"的骨架，只是一个朝上显为形态、一个朝下沉为土壤。而差异序列（D），正是让这副骨架，从壤显为花、又从花沉为壤的那台推进引擎。九格环环相扣，谁也不能单独站住。</p>
+</div>
+
+<div class="endbox">
+  <p>这九格，是一整套发生学的九个入口。它们互相生成、互相扶持——先从已上线的第一格 S1 走进去，再一格一格补齐。</p>
+  <a class="btn solid" href="/column/ontology-grid/s1/">从 S1 · 显露·规范维 读起 →</a>
+  <a class="btn ghost" href="/books/sde-ontology-intro/">读新著《SDE本体论入门》 →</a>
+</div>
+
+<footer>
+  <div class="wrap">SDE Universes · 德麦国际 · 王德生 著 · 三维九宫 · <a href="/">返回首页</a></div>
+</footer>
+
+</body>
+</html>
