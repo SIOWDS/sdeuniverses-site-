@@ -202,6 +202,8 @@ body.zh .en-only{display:none}
 .hs-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#E23B3B;animation:hsblink 1.4s ease-in-out infinite;vertical-align:middle;margin-right:8px}
 /* 每日三句 · 深空晶体版 */
 #daily-quotes>*{position:relative;z-index:2}
+/* decorative layers must stay out of flow — the #daily-quotes>* rule above (ID specificity) was overriding their own position:absolute, dropping them into flow and pushing the title/quotes ~1830px down (the empty dark first screen) */
+#daily-quotes>.ll-stars,#daily-quotes>.dq-orb,#daily-quotes>.dq-net{position:absolute}
 #daily-quotes .ll-stars,#daily-quotes .dq-orb{z-index:0}
 .dq-orb{position:absolute;border-radius:50%;filter:blur(70px);opacity:0.5;pointer-events:none;animation:dqdrift 16s ease-in-out infinite alternate}
 .dq-orb1{width:520px;height:520px;left:-140px;top:-120px;background:radial-gradient(circle,rgba(212,178,94,0.55),rgba(212,178,94,0) 70%)}
