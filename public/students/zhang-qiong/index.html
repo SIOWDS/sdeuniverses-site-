@@ -2,12 +2,12 @@
 <html lang="zh-CN"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>张琼 · 学员专栏 | SDE Universes</title>
-<meta name="description" content="张琼专栏·开篇辞 —— 在AI重塑的世界里，打捞人的坐标。社会学博士出身，转向应用心理学，回到传统文化，以 SDE「从发现到发生」的翻转为底层。SDE 学员专栏 · SDE Universes">
+<meta name="description" content="张琼 · SDE 学员 · 三焦架构下的社会学研究：非人行动者与新公共性。经 SDE 改写完善的三篇论文。">
 <style>
-:root{--gold:#C9A84C;--ink:#F0E9D8;--ink2:#B8AE96;--bg:#0E0B08;--panel:#171310;--panel2:#1C1712;--line:rgba(201,168,76,0.22);--accent:#8C6A2E}
+:root{--gold:#C9A84C;--gold2:#E0C36A;--ink:#F0E9D8;--ink2:#B8AE96;--bg:#0E0B08;--panel:#171310;--panel2:#1C1712;--line:rgba(201,168,76,0.22);--accent:#8C6A2E}
 *{margin:0;padding:0;box-sizing:border-box}
 ::selection{background:rgba(201,168,76,0.35)}
-body{background:var(--bg);color:var(--ink);font-family:"Noto Serif SC",Georgia,"Songti SC",serif;line-height:1.95}
+body{background:var(--bg);color:var(--ink);font-family:"Noto Serif SC",Georgia,"Songti SC",serif;line-height:1.9}
 body.zh .en-only{display:none!important}
 body.en .zh-only{display:none!important}
 nav{position:sticky;top:0;z-index:20;background:rgba(14,11,8,0.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
@@ -17,50 +17,29 @@ nav a{color:var(--gold);text-decoration:none;font-size:14px;letter-spacing:0.05e
 .lang-toggle{display:flex;border:1px solid var(--line);border-radius:20px;overflow:hidden}
 .lang-btn{background:transparent;border:none;color:var(--ink2);font-family:inherit;font-size:13px;padding:5px 13px;cursor:pointer;letter-spacing:0.05em}
 .lang-btn.active{background:var(--gold);color:#1A1410;font-weight:700}
-
-.hero{max-width:720px;margin:0 auto;padding:80px 24px 8px;text-align:center}
-.hero .eyebrow{font-size:11px;letter-spacing:0.4em;color:var(--gold);margin-bottom:26px}
-.hero .photo{width:150px;height:188px;margin:0 auto 24px;border-radius:14px;overflow:hidden;border:1px solid var(--line);box-shadow:0 14px 40px rgba(0,0,0,0.5)}
-.hero .photo img{width:100%;height:100%;object-fit:cover;object-position:center 20%;display:block}
-.hero h1{font-size:clamp(32px,5.5vw,46px);font-weight:800;line-height:1.15;color:#F5EFE0;font-family:Georgia,"Noto Serif SC",serif;letter-spacing:0.06em}
-.hero .role{font-size:12.5px;color:var(--accent);letter-spacing:0.22em;margin-top:16px}
-
-.wrap{max-width:720px;margin:0 auto;padding:20px 24px 90px}
-
-.banner{background:linear-gradient(160deg,var(--panel2),var(--panel));border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:16px;padding:34px 32px;margin-top:34px}
-.banner .col-title{font-size:clamp(19px,3vw,23px);font-weight:800;color:#F5EFE0;line-height:1.55;margin-bottom:8px;letter-spacing:0.02em}
-.banner .col-sub{font-size:13px;letter-spacing:0.28em;color:var(--gold);margin-bottom:20px}
-.banner p{font-size:15px;color:var(--ink);line-height:2;margin-top:14px}
-.banner p.soft{color:var(--ink2)}
-
-.sec{margin-top:44px}
-.sec .h{display:flex;align-items:center;gap:14px;margin-bottom:22px}
-.sec .h .cn{font-size:20px;font-weight:800;color:var(--gold);letter-spacing:0.08em;white-space:nowrap}
-.sec .h .rule{flex:1;height:1px;background:linear-gradient(90deg,var(--line),transparent)}
-
-.journey{list-style:none;display:flex;flex-direction:column;gap:2px}
-.journey li{position:relative;padding:16px 0 16px 30px;border-left:1px solid var(--line)}
-.journey li::before{content:"";position:absolute;left:-6px;top:22px;width:11px;height:11px;border-radius:50%;background:var(--panel);border:2px solid var(--gold)}
-.journey li:last-child::before{background:var(--gold);box-shadow:0 0 14px rgba(201,168,76,0.6)}
-.journey .step{font-size:12px;letter-spacing:0.2em;color:var(--accent);margin-bottom:5px}
-.journey .txt{font-size:15px;color:var(--ink);line-height:1.9}
-.journey .txt b{color:#F5E6BF;font-weight:700}
-
-.flip{background:linear-gradient(160deg,rgba(201,168,76,0.10),rgba(201,168,76,0.02));border:1px solid var(--line);border-radius:14px;padding:26px 28px;margin-top:24px}
-.flip .k{font-size:12px;letter-spacing:0.24em;color:var(--gold);margin-bottom:12px}
-.flip p{font-size:15px;color:var(--ink);line-height:2}
-.flip .arrow{color:var(--gold);font-weight:800;padding:0 4px}
-
-.closing{margin-top:44px;text-align:center}
-.closing p{font-size:16.5px;color:#F5EFE0;line-height:2.05;letter-spacing:0.02em}
-.closing .sign{margin-top:26px;font-size:14px;color:var(--ink2);letter-spacing:0.12em;line-height:1.9}
-.closing .sign b{color:var(--gold);font-weight:700;letter-spacing:0.16em}
-
-.back{text-align:center;margin-top:48px}
+.hero{max-width:760px;margin:0 auto;padding:80px 24px 12px;text-align:center}
+.hero .eyebrow{font-size:11px;letter-spacing:0.4em;color:var(--gold);margin-bottom:22px}
+.hero .avatar{width:96px;height:96px;border-radius:50%;margin:0 auto 22px;background:linear-gradient(160deg,rgba(212,178,94,0.28),rgba(212,178,94,0.06));border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-family:Georgia,serif;font-size:38px;font-weight:800;color:#F5E6BF}
+.hero h1{font-size:clamp(32px,5.5vw,46px);font-weight:800;line-height:1.15;color:#F5EFE0;font-family:Georgia,"Noto Serif SC",serif;letter-spacing:0.04em}
+.hero .role{font-size:13px;color:var(--accent);letter-spacing:0.2em;margin-top:16px}
+.hero .bio{font-size:15px;color:var(--ink2);line-height:1.95;max-width:620px;margin:18px auto 0}
+.wrap{max-width:760px;margin:0 auto;padding:30px 24px 90px}
+.sec-lbl{font-size:12px;letter-spacing:0.3em;color:var(--accent);text-align:center;margin:20px 0 24px}
+.paper{display:block;text-decoration:none;background:linear-gradient(160deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:14px;padding:26px 26px 22px;margin-bottom:18px;transition:border-color .18s,transform .18s}
+a.paper:hover{border-color:rgba(201,168,76,0.6);transform:translateY(-3px)}
+.paper .row{display:flex;align-items:center;gap:12px;margin-bottom:12px;flex-wrap:wrap}
+.paper .iq{font-size:12px;letter-spacing:0.08em;color:#1A1410;background:linear-gradient(90deg,#E8CE7E,#C9A84C);padding:3px 12px;border-radius:20px;font-weight:800}
+.paper .soon{font-size:12px;letter-spacing:0.12em;color:var(--gold);border:1px solid rgba(201,168,76,0.5);padding:2px 11px;border-radius:20px}
+.paper h2{font-size:20px;font-weight:800;color:#F5EFE0;line-height:1.45;margin-bottom:10px}
+.paper .concept{font-size:14.5px;color:var(--ink2);line-height:1.85;margin-bottom:14px}
+.paper .concept b{color:#F5E6BF}
+.paper .more{font-size:14px;font-weight:700;color:var(--gold2);letter-spacing:0.05em}
+.paper.pending{opacity:0.72}
+.note{text-align:center;color:#6B6250;font-size:13px;margin-top:14px;letter-spacing:0.06em}
+.back{text-align:center;margin-top:40px}
 .back a{color:var(--gold);text-decoration:none;font-size:14.5px;letter-spacing:0.06em;border-bottom:1px solid rgba(201,168,76,0.4);padding-bottom:2px}
 footer{border-top:1px solid var(--line);margin-top:40px;padding:30px 24px;text-align:center;color:#6B6250;font-size:13px}
 footer a{color:var(--gold);text-decoration:none}
-@media(max-width:560px){.banner,.flip{padding:24px 22px}.hero .photo{width:132px;height:166px}}
 </style></head>
 <body class="zh">
 <nav><div class="w">
@@ -74,64 +53,43 @@ footer a{color:var(--gold);text-decoration:none}
 <div class="hero">
   <div class="eyebrow zh-only">学 员 专 栏 · STUDENTS’ COLUMN</div>
   <div class="eyebrow en-only">STUDENTS’ COLUMN · SDE UNIVERSES</div>
-  <div class="photo"><img src="zhang-qiong.jpg" alt="张琼"></div>
+  <div class="avatar">张</div>
   <h1>张琼</h1>
-  <div class="role zh-only">SDE 学员 · 社会学博士 · 应用心理</div>
-  <div class="role en-only">SDE TRAINEE · PhD IN SOCIOLOGY · APPLIED PSYCHOLOGY</div>
+  <div class="role zh-only">SDE 学员 · 社会学</div>
+  <div class="role en-only">SDE TRAINEE · SOCIOLOGY</div>
+  <div class="bio zh-only">以“三焦”架构追问两个问题：为何社会学纳入<b>非人行动者</b>如此之难，以及数字时代的<b>新公共性</b>如何被悄然消解。下列三篇，是从其研究文集中按 SDE 创新智商选出、并经 SDE 改写完善的最高分之作——每一篇都命名了一个“被看见却说不出”的机制，并亮出自己可被推翻的条件。</div>
+  <div class="bio en-only">Using a “three-focus” architecture to ask two questions: why sociology finds it so hard to admit <b>non-human actors</b>, and how the <b>new publicness</b> of the digital age is quietly dissolved. The three papers below are the highest-scoring works selected from her corpus by SDE Innovation-IQ and refined through SDE — each names a mechanism “seen but unsayable,” and states the conditions under which it could be overturned.</div>
 </div>
 
 <div class="wrap">
+  <div class="sec-lbl zh-only">三 篇 · 经 SDE 改写完善</div>
+  <div class="sec-lbl en-only">THREE PAPERS · REFINED THROUGH SDE</div>
 
-  <div class="banner">
-    <div class="col-sub zh-only">张琼专栏 · 开篇辞</div>
-    <div class="col-sub en-only">ZHANG QIONG’S COLUMN · OPENING</div>
-    <div class="col-title zh-only">关于我 ｜ 在 AI 重塑的世界里，打捞人的坐标</div>
-    <div class="col-title en-only">About Me ｜ Salvaging the Coordinates of the Human, in a World Remade by AI</div>
-    <p class="zh-only">欢迎！这里不贩卖答案，只追问正在发生的问题。</p>
-    <p class="en-only">Welcome. This place does not sell answers — it only questions the problems that are happening right now.</p>
-    <p class="soft zh-only">如果你觉得 AI 写的东西「没味」——那不是文笔问题，是意义问题。请坐，这间客厅，为你而留。</p>
-    <p class="soft en-only">If what AI writes feels “flavorless” to you — that is not a matter of style, but of meaning. Please, take a seat: this living room was kept for you.</p>
+  <a class="paper" href="/students/zhang-qiong/panzhun-jisheng/">
+    <div class="row"><span class="iq">创新智商 ≈ 148</span></div>
+    <h2>判准寄生的双向吞噬环——非人行动者与社会学研究范式的转型困境</h2>
+    <p class="concept">范式转型不是一场胜利，<b>而是一台双向吞噬机</b>：每一次为技术物划定新判准，都把它本要解释的外部操作逻辑，不可逆地引进学科内核；判准越巩固，内核越被蚀空。设“判准寄生度”剂量-反应证伪闸门，排除“学派政治”竞争解释。</p>
+    <span class="more">阅读全文 →</span>
+  </a>
+
+  <div class="paper pending">
+    <div class="row"><span class="iq">创新智商 ≈ 146</span><span class="soon">即将上线</span></div>
+    <h2>自噬性适应——数字时代社会形态叠加下的新公共性消解机制</h2>
+    <p class="concept">社会系统为应对压力而生的适应性策略，<b>在成功运作中不可逆地消耗着它赖以生效的底层资源</b>——跨域互译的可能、从适应退回干预的潜能、共同事实的基础。以“跨岛叙事翻译尝试频率”为独有证伪变量。</p>
+    <span class="more" style="color:#8C7A4E">SDE 改写完善中</span>
   </div>
 
-  <div class="sec">
-    <div class="h"><span class="cn zh-only">我是谁</span><span class="cn en-only">Who I Am</span><span class="rule"></span></div>
-    <ul class="journey">
-      <li>
-        <div class="step zh-only">起点 · 社会学</div><div class="step en-only">ORIGIN · SOCIOLOGY</div>
-        <div class="txt zh-only">社会学博士出身——训练我读懂<b>系统如何塑造人</b>。</div>
-        <div class="txt en-only">A PhD in sociology by training — it taught me to read <b>how systems shape people</b>.</div>
-      </li>
-      <li>
-        <div class="step zh-only">转向 · 应用心理学</div><div class="step en-only">TURN · APPLIED PSYCHOLOGY</div>
-        <div class="txt zh-only">半路转向应用心理学——学习如何<b>触碰个体的温度</b>。</div>
-        <div class="txt en-only">A mid-course turn to applied psychology — learning how to <b>touch the warmth of the individual</b>.</div>
-      </li>
-      <li>
-        <div class="step zh-only">回归 · 传统文化</div><div class="step en-only">RETURN · CLASSICAL CULTURE</div>
-        <div class="txt zh-only">最终回到传统文化——追问<b>心安何处</b>。</div>
-        <div class="txt en-only">And finally, a return to classical culture — asking <b>where the heart finds its rest</b>.</div>
-      </li>
-    </ul>
-
-    <div class="flip">
-      <div class="k zh-only">我的 SDE 底层翻转</div>
-      <div class="k en-only">MY SDE FOUNDATIONAL FLIP</div>
-      <p class="zh-only">从「发现」<span class="arrow">→</span>到「发生」。我只是去辨认、记录、陪伴它们。</p>
-      <p class="en-only">From “discovery” <span class="arrow">→</span> to “genesis.” I only go to recognize them, record them, and keep them company.</p>
-    </div>
+  <div class="paper pending">
+    <div class="row"><span class="iq">创新智商 ≈ 143</span><span class="soon">即将上线</span></div>
+    <h2>数字公共领域的伪分叉——结构-生态双轨退化中的公共性危机与合法性假象</h2>
+    <p class="concept">结构层不断给出改革选项，生态层却已失去采纳选项的认知能力；<b>“选项存在但无人使用”被系统性转化为“公众不需要”的合法性叙事</b>，形成自我巩固的证据闭环。排除“市场选择/技术决定/受众退化”三大竞争解释。</p>
+    <span class="more" style="color:#8C7A4E">SDE 改写完善中</span>
   </div>
 
-  <div class="closing">
-    <div class="h" style="justify-content:center"><span class="cn zh-only" style="color:var(--gold)">最后的话</span><span class="cn en-only" style="color:var(--gold)">A Last Word</span></div>
-    <p class="zh-only">旧坐标在消失，新大陆正从裂缝中生成。<br>我们一起去看看。</p>
-    <p class="en-only">The old coordinates are vanishing; a new continent is being generated out of the cracks.<br>Let us go and see it together.</p>
-    <div class="sign zh-only">——<b>张 琼</b><br>2026 年 · 盛夏 · 于开平</div>
-    <div class="sign en-only">— <b>ZHANG QIONG</b><br>Midsummer 2026 · Kaiping</div>
-  </div>
+  <div class="note zh-only">三篇均据张琼「三焦」研究文集 · 按 SDE 创新智商评分选出 · 逐篇上线中</div>
+  <div class="note en-only">Selected from Zhang Qiong’s “three-focus” corpus by SDE Innovation-IQ · publishing one by one</div>
 
-  <div class="back">
-    <a href="/students/"><span class="zh-only">← 返回学员专栏名单</span><span class="en-only">← Back to the students roster</span></a>
-  </div>
+  <div class="back"><a href="/students/"><span class="zh-only">← 返回学员专栏名单</span><span class="en-only">← Back to the students roster</span></a></div>
 </div>
 
 <footer>
