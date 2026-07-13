@@ -39,6 +39,44 @@ export class AskLimiter {
   }
 }
 
+// ===== 密钥保险箱·服务端存基底 Key（页面设置，免进 Cloudflare）=====
+// 纪律：key 只写入、只在 Worker 内部（op:get）读取用于调用基底；绝不经任何公开路由回传浏览器。
+export class ConfigVault {
+  constructor(ctx, env) { this.ctx = ctx; }
+  async _hash(s) {
+    const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode("sde-admin-v1:" + s));
+    return [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, "0")).join("");
+  }
+  async fetch(request) {
+    const body = await request.json().catch(() => ({}));
+    const op = body.op;
+    if (op === "get") { // 仅 Worker 内部调用（DO 不对公网暴露）
+      return Response.json({ key: (await this.ctx.storage.get("key")) || "" });
+    }
+    if (op === "status") {
+      const key = (await this.ctx.storage.get("key")) || "";
+      const adminHash = (await this.ctx.storage.get("adminHash")) || "";
+      return Response.json({ configured: !!key, hasAdmin: !!adminHash });
+    }
+    if (op === "set") {
+      const pass = String(body.pass || ""), key = String(body.key || "");
+      if (pass.length < 4) return Response.json({ ok: false, msg: "管理口令太短（至少 4 位）。" });
+      if (key.length < 8) return Response.json({ ok: false, msg: "密钥格式无效。" });
+      const stored = (await this.ctx.storage.get("adminHash")) || "";
+      const h = await this._hash(pass);
+      if (!stored) { // 首次：设定管理口令 + 密钥
+        await this.ctx.storage.put("adminHash", h);
+        await this.ctx.storage.put("key", key);
+        return Response.json({ ok: true, msg: "已启用。首次口令即管理口令，请牢记。" });
+      }
+      if (h !== stored) return Response.json({ ok: false, msg: "管理口令不正确。" });
+      await this.ctx.storage.put("key", key);
+      return Response.json({ ok: true, msg: "密钥已更新。" });
+    }
+    return Response.json({ ok: false, msg: "unknown op" });
+  }
+}
+
 // ===== Tier2 智能问答·站内 RAG =====
 const _ENC = new TextEncoder();
 function _sseBytes(o) { return _ENC.encode("data: " + JSON.stringify(o) + "\n\n"); }
@@ -99,8 +137,15 @@ async function handleAsk(request, env, url) {
   q = String(q).trim().slice(0, 300); // 输入硬钳位
   if (q.length < 2) return _sseResp([{ t: "error", v: "请输入一个问题（至少 2 个字）。" }]);
 
-  const KEY = env.SDE_SEARCH_KEY; // 站方基底密钥·仅服务端持有，浏览器永不接触
-  if (!KEY) return _sseResp([{ t: "error", v: "智能问答尚未启用：管理员尚未配置基底密钥（SDE_SEARCH_KEY）。" }]);
+  // 取基底 Key：优先页面设置的（存服务端保险箱），回退到 Cloudflare secret；两条路都支持
+  let KEY = "";
+  try {
+    const cv = env.CONFIG_VAULT.get(env.CONFIG_VAULT.idFromName("global"));
+    const r = await (await cv.fetch(new Request("https://cfg.internal/", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ op: "get" }) }))).json();
+    KEY = r.key || "";
+  } catch (e) { /* 保险箱异常则回退 */ }
+  if (!KEY) KEY = env.SDE_SEARCH_KEY || "";
+  if (!KEY) return _sseResp([{ t: "error", v: "智能问答尚未启用：管理员尚未在页面「⚙️ 管理设置」里配置基底密钥。" }]);
 
   // 限流（按 IP 的 DO）
   const ip = request.headers.get("cf-connecting-ip") || "unknown";
@@ -275,7 +320,19 @@ export default {
         headers: respHeaders,
       });
     }
-    // /api/ask：站内智能问答（RAG）——浏览器只发问题，Key 锁在服务端 SDE_SEARCH_KEY
+    // /api/admin/*：页面设置基底密钥（op 由服务端固定，浏览器只能传 pass+key，无法注入 op:get 回读密钥）
+    if (url.pathname === "/api/admin/setkey" && request.method === "POST") {
+      const b = await request.json().catch(() => ({}));
+      const cv = env.CONFIG_VAULT.get(env.CONFIG_VAULT.idFromName("global"));
+      const r = await cv.fetch(new Request("https://cfg.internal/", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ op: "set", pass: b.pass, key: b.key }) }));
+      return Response.json(await r.json(), { headers: { "access-control-allow-origin": "*" } });
+    }
+    if (url.pathname === "/api/admin/status") {
+      const cv = env.CONFIG_VAULT.get(env.CONFIG_VAULT.idFromName("global"));
+      const r = await cv.fetch(new Request("https://cfg.internal/", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ op: "status" }) }));
+      return Response.json(await r.json(), { headers: { "access-control-allow-origin": "*" } });
+    }
+    // /api/ask：站内智能问答（RAG）——浏览器只发问题，Key 锁在服务端
     if (url.pathname === "/api/ask") {
       return handleAsk(request, env, url);
     }

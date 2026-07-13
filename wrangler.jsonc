@@ -14,11 +14,13 @@
   "durable_objects": {
     "bindings": [
       { "name": "COUNTER", "class_name": "VisitCounter" },
-      { "name": "ASK_LIMITER", "class_name": "AskLimiter" }
+      { "name": "ASK_LIMITER", "class_name": "AskLimiter" },
+      { "name": "CONFIG_VAULT", "class_name": "ConfigVault" }
     ]
   },
   "migrations": [
     { "tag": "v1", "new_sqlite_classes": ["VisitCounter"] },
-    { "tag": "v2", "new_sqlite_classes": ["AskLimiter"] }
+    { "tag": "v2", "new_sqlite_classes": ["AskLimiter"] },
+    { "tag": "v3", "new_sqlite_classes": ["ConfigVault"] }
   ]
 }
