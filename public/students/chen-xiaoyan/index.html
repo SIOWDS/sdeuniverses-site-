@@ -37,6 +37,13 @@ nav a{color:var(--gold);text-decoration:none;font-size:14px;letter-spacing:0.05e
 .panel{background:linear-gradient(160deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:16px;padding:40px 30px;text-align:center;margin-top:20px}
 .panel .tag{font-size:12px;letter-spacing:0.34em;color:var(--gold);margin-bottom:14px}
 .panel p{font-size:14.5px;color:var(--ink2);line-height:1.9;max-width:520px;margin:0 auto}
+.works-entry{display:block;text-decoration:none;margin-top:20px}
+.we-card{background:linear-gradient(135deg,#C9A84C,#8C6A2E);border:1px solid #C9A84C;border-radius:14px;padding:24px 28px;display:flex;align-items:center;justify-content:space-between;gap:16px;transition:transform .18s,box-shadow .18s}
+.works-entry:hover .we-card{transform:translateY(-2px);box-shadow:0 12px 30px rgba(201,168,76,0.28)}
+.we-lbl{font-size:12px;letter-spacing:0.3em;color:#2A2008;margin-bottom:8px;font-weight:700}
+.we-title{font-size:20px;font-weight:800;color:#1A1206}
+.we-sub{font-size:13px;color:#3A2E10;margin-top:7px;line-height:1.7}
+.we-arrow{font-size:30px;color:#1A1206;flex-shrink:0}
 .back{text-align:center;margin-top:30px}
 .back a{color:var(--gold);text-decoration:none;font-size:14.5px;letter-spacing:0.06em;border-bottom:1px solid rgba(201,168,76,0.4);padding-bottom:2px}
 footer{border-top:1px solid var(--line);margin-top:24px;padding:30px 24px;text-align:center;color:#6B6250;font-size:13px}
@@ -82,12 +89,19 @@ footer a{color:var(--gold);text-decoration:none}
   <span class="n">03</span><span class="t zh-only">作 品 与 专 栏 · WORKS</span><span class="t en-only">WORKS &amp; COLUMNS</span><span class="line"></span>
 </div>
 <div class="works">
-  <div class="panel">
-    <div class="tag zh-only">作 品 陆 续 上 线</div>
-    <div class="tag en-only">WORKS COMING SOON</div>
-    <p class="zh-only">借一双「事物如何发生」的眼，在自己的领域里落笔——把 SDE 作为隐性的引擎，用本行的母语写作。作品通过合宪性审读后，将署名发表于此。</p>
-    <p class="en-only">Borrowing an eye trained on how things come to be, and writing in the native idiom of one’s own field — with SDE as a hidden engine. Once a piece passes its constitutionality review, it will be published here under this name.</p>
-  </div>
+  <a class="works-entry" href="/students/chen-xiaoyan/works/">
+    <div class="we-card">
+      <div>
+        <div class="we-lbl zh-only">进 入 作 品</div>
+        <div class="we-lbl en-only">ENTER THE WORKS</div>
+        <div class="we-title zh-only">陈晓艳 · 四篇文章</div>
+        <div class="we-title en-only">Four papers by Chen Xiaoyan</div>
+        <div class="we-sub zh-only">知信行的归责陷阱 · 行动的双重捕获 · 专业围墙的病理 · 从状态到过程（心理健康与旅游）—— 每篇三种阅读方式</div>
+        <div class="we-sub en-only">The KAP blame-trap · dual-capture of action · the professional-wall pathology · from state to process — each in three reading modes</div>
+      </div>
+      <div class="we-arrow">→</div>
+    </div>
+  </a>
   <div class="back"><a href="/students/"><span class="zh-only">← 返回学员专栏名单</span><span class="en-only">← Back to the students roster</span></a></div>
 </div>
 
