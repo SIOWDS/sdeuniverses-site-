@@ -13,10 +13,12 @@
   },
   "durable_objects": {
     "bindings": [
-      { "name": "COUNTER", "class_name": "VisitCounter" }
+      { "name": "COUNTER", "class_name": "VisitCounter" },
+      { "name": "ASK_LIMITER", "class_name": "AskLimiter" }
     ]
   },
   "migrations": [
-    { "tag": "v1", "new_sqlite_classes": ["VisitCounter"] }
+    { "tag": "v1", "new_sqlite_classes": ["VisitCounter"] },
+    { "tag": "v2", "new_sqlite_classes": ["AskLimiter"] }
   ]
 }
