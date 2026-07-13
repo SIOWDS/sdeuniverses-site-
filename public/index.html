@@ -199,6 +199,13 @@ body.zh .en-only{display:none}
 /* 每日热点红点 */
 @keyframes hsblink{0%,100%{opacity:1}50%{opacity:0.25}}
 .hs-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#E23B3B;animation:hsblink 1.4s ease-in-out infinite;vertical-align:middle;margin-right:8px}
+/* 每日三句 */
+.dq-card{position:relative;display:flex;flex-direction:column;text-align:left;background:#FFFDF6;border:1px solid rgba(138,104,23,0.3);border-top:3px solid #8A6817;padding:26px 24px 20px;text-decoration:none;color:#2A2315;box-shadow:0 8px 26px rgba(90,70,20,0.08);transition:transform .18s,box-shadow .18s}
+.dq-card:hover{transform:translateY(-4px);box-shadow:0 16px 36px rgba(90,70,20,0.14)}
+.dq-mark{font-family:Georgia,serif;font-size:34px;line-height:1;color:#C9A84C;margin-bottom:6px}
+.dq-text{font-family:Georgia,"Songti SC",serif;font-size:18.5px;font-weight:700;line-height:1.75;letter-spacing:0.02em;flex:1}
+.dq-src{margin-top:16px;font-size:13px;color:#8A6817;letter-spacing:0.06em}
+.dq-go{margin-top:10px;font-size:13px;color:#B07A1E;font-weight:700;letter-spacing:0.1em}
 /* 今日长文星光闪烁 */
 .ll-stars{position:absolute;inset:0;pointer-events:none}
 .ll-star{position:absolute;background:#fff;border-radius:50%;opacity:0;animation:lltw var(--d,3s) ease-in-out infinite;animation-delay:var(--dl,0s);box-shadow:0 0 6px 1px rgba(255,245,220,0.8)}
@@ -236,6 +243,19 @@ body.zh .en-only{display:none}
 </nav>
 
 <!-- HERO -->
+<!-- DAILY THREE QUOTES 每日三句 · 第一屏 -->
+<section id="daily-quotes" style="min-height:92vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:7.5rem 2rem 4rem;background:radial-gradient(ellipse at 50% 30%,#FBF7EB 0%,#F5EFE0 60%,#EFE7D2 100%);border-bottom:1px solid rgba(138,104,23,0.22);position:relative">
+  <div class="zh-only" style="font-size:12.5px;letter-spacing:0.5em;color:#8A6817;margin-bottom:16px">每 日 三 句 · DAILY THREE</div>
+  <div class="en-only" style="font-size:12.5px;letter-spacing:0.5em;color:#8A6817;margin-bottom:16px">DAILY THREE · WISDOM LINES</div>
+  <h2 class="zh-only" style="font-family:Georgia,'Songti SC',serif;font-size:clamp(30px,5vw,46px);font-weight:800;color:#2A2315;letter-spacing:0.06em;margin-bottom:10px">今日三句 · <span id="dq-date" style="color:#8A6817">…</span></h2>
+  <h2 class="en-only" style="font-family:Georgia,serif;font-size:clamp(26px,4.4vw,40px);font-weight:800;color:#2A2315;letter-spacing:0.04em;margin-bottom:10px">Three Lines, Renewed Daily</h2>
+  <div class="zh-only" style="font-size:15px;color:#6B5B33;letter-spacing:0.1em;margin-bottom:44px">出自德麦专著与今日长文 · 王德生 著 · 按日轮换</div>
+  <div class="en-only" style="font-size:15px;color:#6B5B33;letter-spacing:0.1em;margin-bottom:44px">From Demai monographs &amp; long reads · by Wang Desheng</div>
+  <div id="dq-cards" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px;max-width:1080px;width:100%"></div>
+  <a href="#hero" class="zh-only" style="margin-top:52px;color:#8A6817;text-decoration:none;font-size:14px;letter-spacing:0.2em">↓ 进入 SDE Universes</a>
+  <a href="#hero" class="en-only" style="margin-top:52px;color:#8A6817;text-decoration:none;font-size:14px;letter-spacing:0.2em">↓ Enter SDE Universes</a>
+</section>
+
 <section id="hero">
   <div class="hero-bg"></div>
   <div class="hero-grid"></div>
@@ -1463,6 +1483,61 @@ document.addEventListener('click',e=>{
   html+='<span class="ll-shoot" style="left:10%;top:15%;animation-delay:2s"></span>';
   html+='<span class="ll-shoot" style="left:60%;top:8%;animation-delay:5s"></span>';
   c.innerHTML=html;
+})();
+</script>
+<script>
+/* ══ 每日三句 ══ */
+const DQ=[
+ {t:"你越用力地抓它，它越不是它。",s:"《自律发生学》",u:"/column/self-discipline-genesis/"},
+ {t:"持续的意志，不是执行的产物，而是观看暂停的产物。",s:"《自律发生学》",u:"/column/self-discipline-genesis/"},
+ {t:"苦熬不是自律的代价——苦熬是征兆。",s:"《自律发生学》",u:"/column/self-discipline-genesis/"},
+ {t:"批判是白天的公文，而法庭在天亮之前就已开过庭了。",s:"《自律发生学》",u:"/column/self-discipline-genesis/"},
+ {t:"你无法通过不再相信，来解雇一个从不需要你相信的东西。",s:"《自律发生学》",u:"/column/self-discipline-genesis/"},
+ {t:"守护，是征用的最高形态。",s:"《自律发生学》",u:"/column/self-discipline-genesis/"},
+ {t:"热爱不会被『没用』杀死，它死于『我很珍惜我的热爱』。",s:"《自律发生学》",u:"/column/self-discipline-genesis/"},
+ {t:"能被打卡稳定造出来的，从来不是热爱本身，而是热爱的行为外壳。",s:"《自律发生学》",u:"/column/self-discipline-genesis/"},
+ {t:"目的化败坏，是一种余裕才配得上的病。",s:"《自律发生学》",u:"/column/self-discipline-genesis/"},
+ {t:"匮乏没收了他伸手的资格，也就免除了伸手的毒。",s:"《自律发生学》",u:"/column/self-discipline-genesis/"},
+ {t:"仪表从不撒谎；它只对测不到的东西，保持诚实的沉默。",s:"《自律发生学》",u:"/column/self-discipline-genesis/"},
+ {t:"你看不出来的，正是你错得最深的地方。",s:"《自律发生学》",u:"/column/self-discipline-genesis/"},
+ {t:"一个人越『自律』，他的错位往往越深——他正用自律来掩盖错位。",s:"《自律发生学》",u:"/column/self-discipline-genesis/"},
+ {t:"通过维持『暂时』，来实现『永远不』。",s:"《自律发生学》",u:"/column/self-discipline-genesis/"},
+ {t:"它是一个软件，不是操作系统——凡是有安装日期的囚禁，就留着不再触发的出口。",s:"《自律发生学》",u:"/column/self-discipline-genesis/"},
+ {t:"留白，是结算的最后一种记账方式。",s:"《自律发生学》",u:"/column/self-discipline-genesis/"},
+ {t:"他以为自己在留白，其实是换了一家公司打卡。",s:"《自律发生学》",u:"/column/self-discipline-genesis/"},
+ {t:"无法报账，正是它唯一的账目。",s:"《自律发生学》",u:"/column/self-discipline-genesis/"},
+ {t:"影子变薄的每一分，都不是挣来的，是省下来的。",s:"《自律发生学》",u:"/column/self-discipline-genesis/"},
+ {t:"连对自律的批判，都成了延长陷阱的养料。",s:"《自律发生学》",u:"/column/self-discipline-genesis/"},
+ {t:"拆掉刻度的那一天，你以为砸碎的是镣铐——落地才知道，那声脆响里有一半是你自己的骨头。",s:"《自律发生学》",u:"/column/self-discipline-genesis/"},
+ {t:"数字时代最深的贫困，是离开记录，便无力向自己证明生活曾经发生。",s:"《自律发生学》",u:"/column/self-discipline-genesis/"},
+ {t:"崩塌带走的是撑着你的东西，留下的才是属于你的东西。",s:"《自律发生学》",u:"/column/self-discipline-genesis/"},
+ {t:"人不是一只被生活取用的容器——人是一场燃烧，而燃烧从不欠火焰的债。",s:"《自律发生学》",u:"/column/self-discipline-genesis/"},
+ {t:"坚持是一场接力，第一棒的全部使命，是活到交棒的那一天。",s:"《自律发生学》",u:"/column/self-discipline-genesis/"},
+ {t:"人是在走出一条路之后，才被这条路追认为一直有方向的人。",s:"《自律发生学》",u:"/column/self-discipline-genesis/"},
+ {t:"品格不是行为的产地证明——它是判决书上的签名。",s:"《自律发生学》",u:"/column/self-discipline-genesis/"},
+ {t:"现代人留下了整座神庙的规矩，只搬走了那个能说『够了』的神。",s:"《自律发生学》",u:"/column/self-discipline-genesis/"},
+ {t:"这个时代最精巧的支配，不再没收你的自律——它替你持有自律，而把辛苦原封留给你。",s:"《自律发生学》",u:"/column/self-discipline-genesis/"},
+ {t:"把对自己的一杯水、一页书、一次晨跑，记成需要人格担保的贷款，是这个时代最普遍的自我高利贷。",s:"《自律发生学》",u:"/column/self-discipline-genesis/"},
+ {t:"你最好的时刻，从来不是你在场的时刻。",s:"《自律发生学》",u:"/column/self-discipline-genesis/"},
+ {t:"把正门修好，然后离开门口。",s:"《自律发生学》",u:"/column/self-discipline-genesis/"},
+ {t:"出庭，不是义务。",s:"《自律发生学》",u:"/column/self-discipline-genesis/"},
+ {t:"有一个教育在发生，有一个教育在证明发生。",s:"《教育是什么？》",u:"/column/what-is-education/"},
+ {t:"钟还在报时，只是没有人再抬头。",s:"《教育的困境和出路》",u:"/column/education-dilemma/"},
+ {t:"判决太早，是这个时代最大的思维病。",s:"《SDE批判性思维》",u:"/column/critique-is-first-an-unveiling/"},
+];
+(function(){
+  const d=new Date();
+  const seed=d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate();
+  function rnd(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+  const r=rnd(seed), n=DQ.length, idx=[];
+  while(idx.length<3){const k=Math.floor(r()*n); if(idx.indexOf(k)<0) idx.push(k);}
+  const box=document.getElementById('dq-cards');
+  if(box){
+    box.innerHTML=idx.map(function(k){const q=DQ[k];
+      return '<a class="dq-card" href="'+q.u+'"><div class="dq-mark">「</div><div class="dq-text">'+q.t+'</div><div class="dq-src">—— '+q.s+' · 王德生</div><div class="dq-go">读全文 →</div></a>';}).join('');
+    var dt=document.getElementById('dq-date');
+    if(dt) dt.textContent=(d.getMonth()+1)+'月'+d.getDate()+'日';
+  }
 })();
 </script>
 </body>
