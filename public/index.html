@@ -1543,8 +1543,13 @@ const DQ=[
   const d=new Date();
   const seed=d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate();
   function rnd(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
-  const r=rnd(seed), n=DQ.length, idx=[];
-  while(idx.length<3){const k=Math.floor(r()*n); if(idx.indexOf(k)<0) idx.push(k);}
+  const r=rnd(seed);
+  const srcs=[]; DQ.forEach(function(q){if(srcs.indexOf(q.u)<0)srcs.push(q.u);});
+  for(let i=srcs.length-1;i>0;i--){const j=Math.floor(r()*(i+1));const t=srcs[i];srcs[i]=srcs[j];srcs[j]=t;}
+  const idx=srcs.slice(0,3).map(function(u){
+    const grp=[]; DQ.forEach(function(q,k){if(q.u===u)grp.push(k);});
+    return grp[Math.floor(r()*grp.length)];
+  });
   const box=document.getElementById('dq-cards');
   if(box){
     box.innerHTML=idx.map(function(k){const q=DQ[k];
