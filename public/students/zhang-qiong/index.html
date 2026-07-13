@@ -31,7 +31,7 @@ nav a{color:var(--gold);text-decoration:none;font-size:14px;letter-spacing:0.05e
 .p-info h1{font-size:clamp(30px,5vw,42px);font-weight:800;color:#F5EFE0;letter-spacing:0.04em;font-family:Georgia,"Noto Serif SC",serif}
 .p-info .role{font-size:13px;color:var(--accent);letter-spacing:0.2em;margin-top:10px}
 .p-info .bio{font-size:15px;color:var(--ink2);line-height:1.9;margin-top:16px}
-.p-info .bio.placeholder{color:#6B6250;font-style:italic}
+.p-info .bio.placeholder{color:#6B6250;font-style:italic}.p-photo{width:190px;flex-shrink:0;border-radius:12px;overflow:hidden;border:1px solid var(--line);box-shadow:0 14px 40px rgba(0,0,0,0.5)}.p-photo img{width:100%;display:block}.p-tagline{font-size:clamp(16px,2.4vw,20px);color:var(--gold2);line-height:1.7;margin-top:14px;letter-spacing:0.02em}.about{max-width:820px;margin:0 auto;padding:6px 24px 8px}.about .welcome{font-size:16px;color:#DCD2BC;line-height:2.0;background:var(--panel);border-left:3px solid var(--gold);padding:20px 24px;border-radius:0 8px 8px 0;margin-bottom:26px}.about h3{font-size:13px;letter-spacing:0.3em;color:var(--gold);margin:26px 0 14px}.about .journey{list-style:none;padding:0;margin:0 0 8px}.about .journey li{font-size:15.5px;color:var(--ink);line-height:1.9;padding:7px 0 7px 22px;position:relative}.about .journey li::before{content:"—";position:absolute;left:0;color:var(--gold2)}.about .journey li b{color:#F5E6BF;font-weight:700}.about .flip{font-size:15.5px;color:#DCD2BC;line-height:1.95;margin-top:12px}.about .flip b{color:var(--gold2)}.about .closing{font-size:16px;color:#E7DcC2;line-height:2.0;margin-top:8px}.about .sign{text-align:right;color:var(--muted);font-size:14px;letter-spacing:0.06em;margin-top:16px}
 /* 第二层 作品 */
 .works{max-width:820px;margin:0 auto;padding:10px 24px 80px}
 .work{background:linear-gradient(160deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:14px;padding:26px 26px 22px;margin-top:20px;transition:border-color .18s}
@@ -64,14 +64,39 @@ footer a{color:var(--gold);text-decoration:none}
   <span class="n">01</span><span class="t zh-only">学 员 介 绍 · PROFILE</span><span class="t en-only">PROFILE</span><span class="line"></span>
 </div>
 <div class="profile">
-  <div class="avatar">张<span class="ph zh-only">照片待补</span><span class="ph en-only">photo TBA</span></div>
+  <div class="p-photo"><img src="zhang-qiong.jpg" alt="张琼" width="560" height="746"></div>
   <div class="p-info">
     <h1>张琼</h1>
-    <div class="role zh-only">SDE 学员 · 社会学</div>
-    <div class="role en-only">SDE TRAINEE · SOCIOLOGY</div>
-    <p class="bio placeholder zh-only">个人简介待补 —— 研究方向、职业背景等，稍后补充。（照片与简介可随时更新。）</p>
-    <p class="bio placeholder en-only">Bio coming soon — research focus and background to be added. (Photo and bio can be updated anytime.)</p>
+    <div class="role zh-only">SDE 学员 · 社会学博士</div>
+    <div class="role en-only">SDE TRAINEE · PhD IN SOCIOLOGY</div>
+    <div class="p-tagline zh-only">在 AI 重塑的世界里，打捞人的坐标</div>
+    <div class="p-tagline en-only">In a world reshaped by AI, salvaging the coordinates of the human</div>
   </div>
+</div>
+
+<div class="about">
+  <div class="welcome zh-only">欢迎。这里不贩卖答案，只追问正在发生的问题。如果你觉得 AI 写的东西“没味”——那不是文笔问题，是意义问题。请坐，这间客厅，为你而留。</div>
+  <div class="welcome en-only">Welcome. This is not a place that sells answers — only one that keeps asking about what is happening. If AI-written text feels “flavorless” to you, that is not a matter of style, but of meaning. Please, take a seat; this living room is kept for you.</div>
+
+  <h3 class="zh-only">我 是 谁</h3><h3 class="en-only">WHO I AM</h3>
+  <ul class="journey zh-only">
+    <li><b>社会学博士出身</b>——训练我读懂系统如何塑造人。</li>
+    <li><b>半路转向应用心理学</b>——学习如何触碰个体的温度。</li>
+    <li><b>最终回到传统文化</b>——追问心安何处。</li>
+  </ul>
+  <ul class="journey en-only">
+    <li><b>A PhD in sociology</b> — trained to read how systems shape people.</li>
+    <li><b>Turned midway to applied psychology</b> — learning to touch the warmth of the individual.</li>
+    <li><b>And finally back to traditional culture</b> — asking where the heart finds its peace.</li>
+  </ul>
+  <p class="flip zh-only">我的 SDE 底层翻转：从“<b>发现</b>”到“<b>发生</b>”。旧坐标不是被我找到的，是正在发生的——我只是去辨认、记录、陪伴它们。</p>
+  <p class="flip en-only">My SDE inversion at the ground: from “<b>discovery</b>” to “<b>genesis</b>.” The coordinates are not found by me but are happening — I only go to recognize them, record them, and keep them company.</p>
+
+  <h3 class="zh-only">最 后 的 话</h3><h3 class="en-only">A LAST WORD</h3>
+  <p class="closing zh-only">旧坐标在消失，新大陆正从裂缝中生成。我们一起去看看。</p>
+  <p class="closing en-only">The old coordinates are vanishing; a new continent is forming from the cracks. Let us go and see it, together.</p>
+  <div class="sign zh-only">—— 张琼 · 2026 年 · 盛夏 · 于开平</div>
+  <div class="sign en-only">— Zhang Qiong · Midsummer 2026 · Kaiping</div>
 </div>
 
 <!-- ══ 第二层 · 作品与专栏 ══ -->
