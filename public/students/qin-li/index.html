@@ -36,6 +36,13 @@ nav a{color:var(--gold);text-decoration:none;font-size:14px;letter-spacing:0.05e
 .statement p{font-size:16px;color:var(--ink);line-height:2.02;margin-bottom:18px}
 .statement p:last-child{margin-bottom:0}
 .statement b{color:var(--gold2);font-weight:600}
+.works-entry{display:block;text-decoration:none;margin-top:20px}
+.we-card{background:linear-gradient(135deg,#C9A84C,#8C6A2E);border:1px solid #C9A84C;border-radius:14px;padding:24px 28px;display:flex;align-items:center;justify-content:space-between;gap:16px;transition:transform .18s,box-shadow .18s}
+.works-entry:hover .we-card{transform:translateY(-2px);box-shadow:0 12px 30px rgba(201,168,76,0.28)}
+.we-lbl{font-size:12px;letter-spacing:0.3em;color:#2A2008;margin-bottom:8px;font-weight:700}
+.we-title{font-size:20px;font-weight:800;color:#1A1206}
+.we-sub{font-size:13px;color:#3A2E10;margin-top:7px;line-height:1.7}
+.we-arrow{font-size:30px;color:#1A1206;flex-shrink:0}
 .works{max-width:820px;margin:0 auto;padding:10px 24px 80px}
 .panel{background:linear-gradient(160deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:16px;padding:40px 30px;text-align:center;margin-top:20px}
 .panel .tag{font-size:12px;letter-spacing:0.34em;color:var(--gold);margin-bottom:14px}
@@ -79,12 +86,19 @@ footer a{color:var(--gold);text-decoration:none}
   <span class="n">03</span><span class="t zh-only">作 品 与 专 栏 · WORKS</span><span class="t en-only">WORKS &amp; COLUMNS</span><span class="line"></span>
 </div>
 <div class="works">
-  <div class="panel">
-    <div class="tag zh-only">作 品 陆 续 上 线</div>
-    <div class="tag en-only">WORKS COMING SOON</div>
-    <p class="zh-only">借一双「事物如何发生」的眼，在自己的领域里落笔——把 SDE 作为隐性的引擎，用本行的母语写作。作品通过合宪性审读后，将署名发表于此。</p>
-    <p class="en-only">Borrowing an eye trained on how things come to be, and writing in the native idiom of one’s own field — with SDE as a hidden engine. Once a piece passes its constitutionality review, it will be published here under this name.</p>
-  </div>
+  <a class="works-entry" href="/students/qin-li/works/">
+    <div class="we-card">
+      <div>
+        <div class="we-lbl zh-only">进 入 诗 选</div>
+        <div class="we-lbl en-only">SELECTED POEMS</div>
+        <div class="we-title zh-only">秦莉 · 诗选</div>
+        <div class="we-title en-only">Qin Li · Selected Poems</div>
+        <div class="we-sub zh-only">山那边 · 黑咖啡 · 2023年的夏天 · 我和我的影子 · 起初之爱 —— 五首，附合集 PDF</div>
+        <div class="we-sub en-only">The other side of the mountain · Black coffee · Summer 2023 · Me and my shadow · The love you had at first — five poems, with a downloadable collection PDF</div>
+      </div>
+      <div class="we-arrow">→</div>
+    </div>
+  </a>
   <div class="back"><a href="/students/"><span class="zh-only">← 返回学员专栏名单</span><span class="en-only">← Back to the students roster</span></a></div>
 </div>
 
