@@ -21,7 +21,7 @@
 
 ### D. 检索侧·两条腿(把"正确=SDE词义"落到检索)
 - **腿1·SDE 词义查询扩展**(`sdeExpandQuery` + `SDE_LEXICON`):检索前让基底把问题翻成 SDE 术语(维度/概念/三界/27宫格位/同义SDE说法),再拿去召回——把"字面不共词、但 SDE 义相关"的文章捞上来(实测"主体性从哪来"→浮出 SIO 导论)。前端显示 `🧭 SDE 词义检索:…`。**意义在查询时解析(意义即发生),不预先冻成向量**。
-- **腿2·SDE 坐标匹配**(`retrieve` + `sde-coords.json`):doc 的 SDE 坐标 ∩ 查询扩展词 → 加分(×2)。**须先跑 `tools/label_sde_coords.py`(用你的Key)给每篇打坐标**;坐标文件不存在时该分支**安全跳过**、退回腿1。
+- **腿2·SDE 坐标匹配**(`retrieve` + `sde-coords.json`):doc 的 SDE 坐标 ∩ 查询扩展词 → 加分(×2)。**须先跑 `tools/label_sde_coords.py`(用你的Key)给每篇打坐标**;坐标文件不存在时该分支**安全跳过**、退回腿1。**现状：已用规则打标器 label_sde_coords_rules.py 免Key引导激活（160篇、区分性坐标+少量推断）；想要更细的LLM推断坐标，跑 label_sde_coords.py 覆盖即可。**
 - 基础召回:关键词 + 中文 bigram,`retrieve(corpus,q,K,expTerms)`,每篇最多2块;K/CTX 按档分级(普通 15/9千字、深度 120/5万字);四步法各调用 RAG 钳 15000。
 - **打坐标怎么跑**:`export SDE_LABEL_KEY=你的Key && export SDE_LABEL_VENDOR=glm && python3 tools/label_sde_coords.py`(文档级、断点续跑、无第三方依赖)→ 生成 `public/search/sde-coords.json` → 提交推送。
 
