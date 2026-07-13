@@ -29,6 +29,13 @@ nav a{color:var(--gold);text-decoration:none;font-size:14px;letter-spacing:0.05e
 .p-note{font-size:14px;color:var(--ink2);margin-top:6px;letter-spacing:0.04em}
 .p-info .role{font-size:13px;color:var(--accent);letter-spacing:0.2em;margin-top:12px}
 .p-info .bio{font-size:15px;color:#6B6250;line-height:1.9;margin-top:16px;font-style:italic}
+.p-photo{width:200px;flex:0 0 200px}
+.p-photo img{display:block;width:100%;height:auto;border-radius:14px;border:1px solid var(--line);box-shadow:0 16px 42px rgba(201,168,76,0.14)}
+.tagline{font-size:15.5px;color:var(--gold2);letter-spacing:0.05em;margin-top:14px;font-family:"Noto Serif SC",Georgia,serif}
+.statement{max-width:820px;margin:0 auto;padding:18px 24px 6px}
+.statement p{font-size:16px;color:var(--ink);line-height:2.02;margin-bottom:18px}
+.statement p:last-child{margin-bottom:0}
+.statement b{color:var(--gold2);font-weight:600}
 .works{max-width:820px;margin:0 auto;padding:10px 24px 80px}
 .panel{background:linear-gradient(160deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:16px;padding:40px 30px;text-align:center;margin-top:20px}
 .panel .tag{font-size:12px;letter-spacing:0.34em;color:var(--gold);margin-bottom:14px}
@@ -37,7 +44,7 @@ nav a{color:var(--gold);text-decoration:none;font-size:14px;letter-spacing:0.05e
 .back a{color:var(--gold);text-decoration:none;font-size:14.5px;letter-spacing:0.06em;border-bottom:1px solid rgba(201,168,76,0.4);padding-bottom:2px}
 footer{border-top:1px solid var(--line);margin-top:24px;padding:30px 24px;text-align:center;color:#6B6250;font-size:13px}
 footer a{color:var(--gold);text-decoration:none}
-@media(max-width:640px){.profile{justify-content:center;text-align:center}.p-info{text-align:center}}
+@media(max-width:640px){.profile{justify-content:center;text-align:center}.p-info{text-align:center}.p-photo{flex:0 0 168px;width:168px}}
 </style></head>
 <body class="zh">
 <nav><div class="w">
@@ -52,19 +59,28 @@ footer a{color:var(--gold);text-decoration:none}
   <span class="n">01</span><span class="t zh-only">学 员 介 绍 · PROFILE</span><span class="t en-only">PROFILE</span><span class="line"></span>
 </div>
 <div class="profile">
-  <div class="avatar">向<span class="ph zh-only">照片待补</span><span class="ph en-only">photo TBA</span></div>
+  <div class="p-photo"><img src="xiang-qing.jpg" alt="向晴"></div>
   <div class="p-info">
     <h1>向晴</h1>
-    
-    <div class="role zh-only">SDE 学员</div>
-    <div class="role en-only">SDE TRAINEE</div>
-    <p class="bio zh-only">个人简介待补 —— 照片与简介陆续补充。</p>
-    <p class="bio en-only">Bio coming soon — photo and introduction to be added.</p>
+    <div class="role zh-only">SDE 学员 · 生命成长陪伴者</div>
+    <div class="role en-only">SDE TRAINEE · COMPANION IN LIFE &amp; GROWTH</div>
+    <div class="tagline zh-only">在生活、关系、亲子和信仰的路上，一点一点走向晴朗</div>
+    <div class="tagline en-only">On the path of life, relationship, parenting and faith — turning, little by little, toward the light</div>
   </div>
 </div>
 
 <div class="level-tag" style="margin-top:36px">
-  <span class="n">02</span><span class="t zh-only">作 品 与 专 栏 · WORKS</span><span class="t en-only">WORKS &amp; COLUMNS</span><span class="line"></span>
+  <span class="n">02</span><span class="t zh-only">简 述 · STATEMENT</span><span class="t en-only">STATEMENT</span><span class="line"></span>
+</div>
+<div class="statement">
+  <p class="zh-only">“向晴”不是因为生命没有阴天，而是在阴天里，依然选择转向光。曾经，她也习惯用过去的经验、固有的思维与熟悉的方式去应对人生的问题——努力、承担、解决、控制。在 <b>SDE</b> 的学习中，她开始有了新的看见：生命不是重复过去的模式，而是在每一个当下重新觉察、重新选择、重新<b>发生</b>。她学习的，不只是“发现”生命的问题，而是参与生命的“<b>发生</b>”；不只是分析过去，而是在当下创造新的可能。</p>
+  <p class="en-only">“Xiang Qing” — turning toward the clear sky — does not mean a life without cloudy days, but choosing, even on cloudy days, to turn toward the light. She once met life’s problems with past experience and habitual thinking: striving, bearing, solving, controlling. Through her study of <b>SDE</b>, a new way of seeing opened up: life is not the repetition of old patterns, but a re-noticing, re-choosing and re-<b>occurring</b> in each present moment. What she learns is not only to “discover” life’s problems, but to take part in life’s “<b>occurring</b>” — not only to analyze the past, but to create new possibility in the present.</p>
+  <p class="zh-only">多年的家庭、婚姻、亲子、企业经营与生命成长经历，让她越来越相信：<b>每一个生命都值得被看见，每一个关系都有重新连接的可能</b>。「向晴有光」是她记录生命探索、陪伴同行的空间——分享关于家庭、关系、亲子、情绪成长与信仰的思考与实践。愿这些文字像一盏小灯，陪伴正在经历风雨的人：在真实中遇见自己，在关系中学习爱，在每一个当下向光而行。</p>
+  <p class="en-only">Years of experience in family, marriage, parenting, running a business and personal growth have led her to a deepening conviction: <b>every life deserves to be seen, and every relationship holds the possibility of reconnection</b>. “Xiang Qing You Guang” — where there is a turn toward clarity, there is light — is her space for recording the exploration of life and walking alongside others, sharing reflections and practice on family, relationship, parenting, emotional growth and faith. May these words be a small lamp for those weathering life’s storms: to meet themselves in what is real, to learn love within relationship, and to move toward the light in every present moment.</p>
+</div>
+
+<div class="level-tag" style="margin-top:36px">
+  <span class="n">03</span><span class="t zh-only">作 品 与 专 栏 · WORKS</span><span class="t en-only">WORKS &amp; COLUMNS</span><span class="line"></span>
 </div>
 <div class="works">
   <div class="panel">
