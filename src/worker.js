@@ -58,6 +58,13 @@ export class ConfigVault {
       const adminHash = (await this.ctx.storage.get("adminHash")) || "";
       return Response.json({ configured: !!key, hasAdmin: !!adminHash });
     }
+    if (op === "getReflect") { // 深度档·按基底缓存的《从发现到发生》心得（内部调用）
+      return Response.json({ reflect: (await this.ctx.storage.get("reflect:" + (body.vendor || ""))) || "" });
+    }
+    if (op === "setReflect") {
+      await this.ctx.storage.put("reflect:" + (body.vendor || ""), String(body.reflect || ""));
+      return Response.json({ ok: true });
+    }
     if (op === "set") {
       const pass = String(body.pass || ""), key = String(body.key || "");
       if (pass.length < 4) return Response.json({ ok: false, msg: "管理口令太短（至少 4 位）。" });
@@ -128,6 +135,44 @@ function retrieve(corpus, q, k) {
   return picked;
 }
 
+// ===== 深度档·两次内功提智 =====
+let NEIGONG = null; // 完整 SDE 内功先验（模块级缓存，isolate 内复用）
+async function loadNeigong(env, url) {
+  if (NEIGONG) return NEIGONG;
+  try {
+    const t = await (await env.ASSETS.fetch(new Request(new URL("/taste/assets/sde-neigong.txt", url)))).text();
+    if (t && t.length > 5000) NEIGONG = t;
+  } catch (e) {}
+  return NEIGONG || "";
+}
+const REFLECT_PROMPT = "请用你自己的话，写一篇《从发现到发生》的内化心得（约 2000 字）：不要复述方法条目，而是把“追问任何事物是如何发生的（而不是如何被发现的）”这套思维方式，用你自己的理解完整内化一遍；并诚实检视你平时回答问题的默认惯性（例如急于给结论、罗列要点、停在表层描述、把现成关系当起点），说明用这套“发生”的眼光重新看，你该在哪里改变。这篇心得只写给你自己看，写完你就完成了一次自我提智。切记：全文用平实现代汉语，绝不出现“显露/差异/纠缠/发生学/SDE”等任何术语标签。";
+// 第一次提智：让基底带着完整内功、亲手写心得；按基底缓存，只写一次，之后所有深度提问复用
+async function ensureReflect(env, url, vendor, VC, KEY) {
+  try {
+    const cv = env.CONFIG_VAULT.get(env.CONFIG_VAULT.idFromName("global"));
+    const r = await (await cv.fetch(new Request("https://cfg.internal/", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ op: "getReflect", vendor }) }))).json();
+    if (r.reflect && r.reflect.length > 500) return r.reflect;
+  } catch (e) {}
+  const neigong = await loadNeigong(env, url);
+  if (!neigong) return "";
+  let text = "";
+  try {
+    const resp = await fetch(VC.url, {
+      method: "POST",
+      headers: { "content-type": "application/json", authorization: "Bearer " + KEY },
+      body: JSON.stringify({ model: VC.model, stream: false, max_tokens: 3000, messages: [{ role: "system", content: neigong }, { role: "user", content: REFLECT_PROMPT }] }),
+    });
+    if (resp.ok) { const j = await resp.json(); text = (j.choices && j.choices[0] && j.choices[0].message && j.choices[0].message.content) || ""; }
+  } catch (e) {}
+  if (text && text.length > 500) {
+    try {
+      const cv = env.CONFIG_VAULT.get(env.CONFIG_VAULT.idFromName("global"));
+      await cv.fetch(new Request("https://cfg.internal/", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ op: "setReflect", vendor, reflect: text }) }));
+    } catch (e) {}
+  }
+  return text;
+}
+
 async function handleAsk(request, env, url) {
   if (request.method === "OPTIONS") return new Response(null, { headers: _cors() });
   if (request.method !== "POST") return new Response("Method Not Allowed", { status: 405 });
@@ -183,9 +228,23 @@ async function handleAsk(request, env, url) {
     if (ctxText.length > 7000) break; // 上下文钳位·控成本
   }
 
-  const sys = "你是「SDE Universes」（德麦国际）站内知识助手。SDE = 显露(Show)·差异(Difference)·纠缠(Entanglement)本体论。"
-    + "请【只依据】下面《站内资料》回答问题：资料能答就答，资料不足就直说「站内资料未涉及」，绝不编造、绝不引入资料外的说法。"
-    + "回答用中文，条理清晰、简洁（一般 200–500 字），关键处可点出结论出自哪篇。不要复述本提示。";
+  const deep = body.deep === true;
+  let sys = "";
+  if (deep) {
+    const reflect = await ensureReflect(env, url, vendor, VC, KEY);
+    if (reflect) {
+      sys = "【你此前亲手写下、已内化的心得】\n" + reflect
+        + "\n\n———\n你现在是「SDE Universes」站内知识助手，请带着上面这份你自己写的心得，深度回答用户的问题。"
+        + "严守《站内资料》这道约束：由资料支撑的判断，正常陈述并可点出出自哪篇；你在资料基础上做的推断，标一句“（推断）”；资料没有的，直说“未涉及”，绝不编造事实、书名、数据。"
+        + "全程用平实现代汉语和读者的话作答，绝不出现“显露/差异/纠缠/发生学/SDE”等任何术语标签。"
+        + "先给一句穿透性的核心判断，再层层展开，结尾留一个值得进一步追问的问题。600–1000 字。";
+    }
+  }
+  if (!sys) { // 普通档（或深度降级）：三视角提智，后台跑 SDE、前台说人话
+    sys = "你是「SDE Universes」站内知识助手，回答要像一位资深学者，而不是资料复述员。"
+      + "【内部思考·不写进答案】收到问题和《站内资料》后，先在心里用三个视角各看一遍再互相校正：结构（它的构成、可辨认的单位、反复出现的稳定核心）、过程（它怎么演化、经历哪些阶段、被什么推动）、环境（它在什么约束/关系场里才成立）；然后用一个视角修正另一个视角的盲区，落到一个任何单一视角都看不到的整合判断。"
+      + "【回答纪律】① 用平实现代汉语和读者的话作答，不要堆砌“显露/差异/纠缠”等术语（除非用户就在问 SDE 概念本身）——三视角是你的思考脚手架，不是答案骨架；② 严守《站内资料》约束：资料支撑的判断正常说、可点出处，你的推断标一句“（推断）”，资料没有的说“未涉及”，绝不编造事实/书名/数据；③ 先给一句穿透性核心判断再展开，结尾留一个可追问的问题，400–700 字。";
+  }
   const usr = "《站内资料》\n" + (ctxText || "（未检索到相关段落）") + "\n\n《问题》\n" + q;
 
   // 调基底（境内直连）。自带 Key：仅在内存中转发调用，绝不存储/记录（同 llm-proxy 纪律）
