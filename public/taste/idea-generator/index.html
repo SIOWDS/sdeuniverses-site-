@@ -1632,7 +1632,7 @@ EXAMPLES.forEach(q=>{
   exWrap.appendChild(c);
 });
 
-function showErr(msg){ errBox.textContent='⚠ '+msg; errBox.style.display='block'; }
+function showErr(msg){ errBox.textContent='⚠ '+msg; errBox.style.display='block'; try{ errBox.scrollIntoView({behavior:'smooth', block:'center'}); }catch(_){ try{ errBox.scrollIntoView(); }catch(__){} } }
 function hideErr(){ errBox.style.display='none'; }
 
 // 流式调用基底（所选厂商），token 逐字写入目标元素
@@ -2342,6 +2342,7 @@ if(upliftBtn){
     upliftBtn.disabled = true;
     upliftBtn.textContent = '⏳ 发生引擎提智中（含评审打磨，四篇并发，约15-40分钟，请勿关闭）…';
     $('upliftStatus').textContent = '四篇同时进行：发生引擎重写 → 双审 → 改稿…';
+    try{
 
     // 只对有内容的第一批论文做提升
     const defs = papers.map((p,i)=>({ src:p, idx:i })).filter(x=>x.src && x.src.text);
@@ -2392,10 +2393,15 @@ if(upliftBtn){
     }));
     const okCount = window._upliftPapers.filter(p=>p.text).length;
 
-    upliftBtn.disabled = false;
-    upliftBtn.textContent = '⚡ 二次 SDE 提智 · 用发生引擎冲击 150';
     $('upliftStatus').textContent = '完成：'+okCount+'/'+defs.length+' 篇（发生引擎 + 双审打磨）';
     if(okCount>0) $('upliftDlRow').style.display='block';
+    }catch(err){
+      showErr('二次提智出错：'+(err&&err.message?err.message:err)+'（按钮已复位，可重试；若反复失败请按 F12 看 Console）');
+      const us=$('upliftStatus'); if(us) us.textContent='出错，已停止';
+    }finally{
+      upliftBtn.disabled = false;
+      upliftBtn.textContent = '⚡ 二次 SDE 提智 · 用发生引擎冲击 150';
+    }
   });
 }
 
