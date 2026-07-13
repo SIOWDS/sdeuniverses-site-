@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>往日金句池 · 每日三句 | SDE Universes</title>
+<meta name="description" content="每日三句的往日汇总——自上线之日起逐日回放，每句可回到原长文。">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:radial-gradient(ellipse at 50% 0%,#FBF7EB 0%,#F5EFE0 55%,#EFE7D2 100%);color:#2A2315;font-family:Georgia,"Songti SC","Noto Serif SC",serif;line-height:1.85}
+nav{position:sticky;top:0;z-index:20;background:rgba(245,239,224,0.95);backdrop-filter:blur(8px);border-bottom:1px solid rgba(138,104,23,0.25)}
+nav .w{max-width:860px;margin:0 auto;padding:13px 24px;display:flex;justify-content:space-between}
+nav a{color:#8A6817;text-decoration:none;font-size:14px;letter-spacing:0.06em}
+.hero{max-width:860px;margin:0 auto;padding:56px 24px 18px;text-align:center}
+.hero h1{font-size:clamp(28px,4.6vw,40px);font-weight:800;letter-spacing:0.08em}
+.hero .sub{margin-top:10px;font-size:14px;color:#6B5B33;letter-spacing:0.1em}
+#pool{max-width:860px;margin:0 auto;padding:26px 24px 90px}
+.day{margin-bottom:34px;background:#FFFDF6;border:1px solid rgba(138,104,23,0.28);border-left:4px solid #8A6817;padding:22px 26px;box-shadow:0 6px 20px rgba(90,70,20,0.06)}
+.day .dt{font-size:15px;font-weight:800;color:#8A6817;letter-spacing:0.18em;margin-bottom:14px}
+.day a{display:block;text-decoration:none;color:#2A2315;padding:10px 0;border-top:1px dashed rgba(138,104,23,0.22)}
+.day a:first-of-type{border-top:none}
+.day a:hover .q{color:#7A5A10}
+.day .q{font-size:16.5px;font-weight:700;line-height:1.8;letter-spacing:0.02em}
+.day .go{margin-top:4px;font-size:12.5px;color:#B07A1E;letter-spacing:0.12em}
+footer{border-top:1px solid rgba(138,104,23,0.22);padding:26px;text-align:center;color:#8a7a52;font-size:13px}
+footer a{color:#8A6817;text-decoration:none}
+</style></head>
+<body>
+<nav><div class="w"><a href="/">SDE Universes</a><a href="/#daily-quotes">← 返回首页</a></div></nav>
+<div class="hero"><h1>往日金句池</h1><div class="sub">每日三句 · 逐日回放 · 每句可回到原长文</div></div>
+<div id="pool"></div>
+<footer>© 德麦国际 Demai International · <a href="/">sdeuniverses.com</a></footer>
+<script src="/assets/daily-quotes.js"></script>
+<script>
+(function(){
+  const box=document.getElementById('pool');
+  const L=window.DQ_LAUNCH;
+  const start=new Date(L[0],L[1]-1,L[2]);
+  const today=new Date(); today.setHours(0,0,0,0);
+  const blocks=[];
+  for(let d=new Date(today);d>=start;d.setDate(d.getDate()-1)){
+    const y=d.getFullYear(),mo=d.getMonth()+1,dd=d.getDate();
+    const trio=window.DQ_pickForDate(y,mo,dd);
+    const tag=(d.getTime()===today.getTime())?'今日':'';
+    const rows=trio.map(function(q){
+      return '<a href="'+q.u+'"><div class="q">'+q.t+'</div><div class="go">读全文 →</div></a>';}).join('');
+    blocks.push('<div class="day"><div class="dt">'+y+'年'+mo+'月'+dd+'日'+(tag?' · '+tag:'')+'</div>'+rows+'</div>');
+    if(blocks.length>=120) break;
+  }
+  box.innerHTML=blocks.join('');
+})();
+</script>
+</body></html>
