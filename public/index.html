@@ -228,6 +228,7 @@ body.zh .en-only{display:none}
 .hs-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#E23B3B;animation:hsblink 1.4s ease-in-out infinite;vertical-align:middle;margin-right:8px}
 /* 每日三句 · 深空晶体版 */
 #daily-quotes>*{position:relative;z-index:2}
+@media(min-width:1650px){#daily-quotes{padding-top:7.2rem!important}}@media(max-width:640px){#daily-quotes{padding-top:6.5rem!important}}
 /* decorative layers must stay out of flow — the #daily-quotes>* rule above (ID specificity) was overriding their own position:absolute, dropping them into flow and pushing the title/quotes ~1830px down (the empty dark first screen) */
 #daily-quotes>.ll-stars,#daily-quotes>.dq-orb,#daily-quotes>.dq-net{position:absolute}
 #daily-quotes .ll-stars,#daily-quotes .dq-orb{z-index:0}
@@ -318,7 +319,7 @@ body.zh .en-only{display:none}
 
 <!-- HERO -->
 <!-- DAILY THREE QUOTES 每日三句 · 第一屏 -->
-<section id="daily-quotes" style="min-height:86vh;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;text-align:center;padding:6.2rem 2rem 3rem;background:radial-gradient(ellipse at 28% 18%,#221743 0%,#141031 46%,#0a0820 100%);border-bottom:1px solid rgba(212,178,94,0.35);position:relative;overflow:hidden">
+<section id="daily-quotes" style="min-height:86vh;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;text-align:center;padding:10rem 2rem 3rem;background:radial-gradient(ellipse at 28% 18%,#221743 0%,#141031 46%,#0a0820 100%);border-bottom:1px solid rgba(212,178,94,0.35);position:relative;overflow:hidden">
   <div class="ll-stars" id="dq-stars"></div>
   <div class="dq-orb dq-orb1"></div><div class="dq-orb dq-orb2"></div>
   <svg class="dq-net" viewBox="0 0 1200 620" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
