@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>健康专栏 · Health | SDE Universes</title>
+<meta name="description" content="疾病不是被发现的故障，而是身体在特征纠缠中「如何发生、如何自持、如何锁死」。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=EB+Garamond:wght@400;500&family=Noto+Serif+SC:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#F5EFE0;--card:#FAF6EC;--card2:#F0E8D3;--gold:#8A6817;--text:#2A2315;--text2:#6B5D47;--muted:#98886C;--border:rgba(138,104,23,0.22);--border2:rgba(138,104,23,0.10);--accent:#127C6E;--accent2:#1E9683}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Noto Serif SC','EB Garamond',Georgia,serif;line-height:1.75;overflow-x:hidden}
+body.en{font-family:'EB Garamond','Playfair Display',Georgia,serif}
+body.en .zh-only{display:none}
+body.zh .en-only{display:none}
+a{color:inherit}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0.9rem 3rem;background:rgba(245,239,224,0.9);backdrop-filter:blur(12px);border-bottom:1px solid var(--border2)}
+.nav-logo{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;color:var(--gold);letter-spacing:0.05em;text-decoration:none}
+.nav-links{display:flex;align-items:center;gap:1.6rem}
+.nav-links a{color:var(--text2);text-decoration:none;font-size:0.85rem;letter-spacing:0.1em;transition:color 0.2s}
+.nav-links a:hover{color:var(--accent)}
+.nav-links a.here{color:var(--accent);font-weight:600}
+.lang-toggle{display:flex;background:var(--card);border:1px solid var(--border);border-radius:20px;overflow:hidden}
+.lang-btn{padding:0.3rem 0.8rem;font-size:0.75rem;border:none;background:transparent;color:var(--text2);cursor:pointer;font-family:inherit}
+.lang-btn.active{background:var(--accent);color:#fff;font-weight:600}
+.wrap{max-width:940px;margin:0 auto;padding:0 2rem}
+header.hero{min-height:66vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:9rem 2rem 4rem;position:relative;overflow:hidden}
+.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 70% 55% at 50% 34%,#127C6E14 0%,transparent 70%)}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(#127C6E0d 1px,transparent 1px),linear-gradient(90deg,#127C6E0d 1px,transparent 1px);background-size:60px 60px;opacity:0.7}
+.eyebrow{position:relative;font-size:0.72rem;letter-spacing:0.28em;color:var(--accent);text-transform:uppercase;margin-bottom:1.4rem}
+.title{position:relative;font-family:'Playfair Display','Noto Serif SC',serif;font-size:clamp(2.6rem,7vw,5rem);font-weight:700;line-height:1.05;color:var(--text)}
+.title .en-only{color:var(--accent)}
+.sub{position:relative;font-size:clamp(1.05rem,2.3vw,1.35rem);color:var(--text2);max-width:640px;margin:1.6rem auto 2rem;font-style:italic;font-weight:300}
+.badge{position:relative;display:inline-flex;align-items:center;gap:0.5rem;background:var(--card);border:1px solid var(--accent);color:var(--accent);border-radius:30px;padding:0.5rem 1.3rem;font-size:0.78rem;letter-spacing:0.14em}
+.badge .dot{width:7px;height:7px;border-radius:50%;background:var(--accent);animation:pulse 1.8s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:0.35;transform:scale(0.85)}50%{opacity:1;transform:scale(1)}}
+section{padding:3.5rem 0}
+.lead{font-size:1.12rem;color:var(--text);line-height:1.95;border-left:3px solid var(--accent);padding:0.2rem 0 0.2rem 1.5rem;margin:0 0 3rem}
+.picks{display:grid;grid-template-columns:repeat(3,1fr);gap:1.4rem}
+.pick{background:var(--card);border:1px solid var(--border2);border-top:3px solid var(--accent);border-radius:6px;padding:1.6rem 1.4rem;transition:transform 0.2s,box-shadow 0.2s}
+.pick:hover{transform:translateY(-3px);box-shadow:0 10px 30px rgba(138,104,23,0.1)}
+.pick h3{font-family:'Playfair Display','Noto Serif SC',serif;font-size:1.12rem;font-weight:600;color:var(--accent);margin-bottom:0.7rem;line-height:1.35}
+.pick p{font-size:0.94rem;color:var(--text2);line-height:1.75}
+.note{margin-top:3rem;text-align:center;background:var(--card2);border:1px dashed var(--accent);border-radius:8px;padding:1.8rem 1.5rem}
+.note p{color:var(--text2);font-size:0.98rem}
+.note b{color:var(--accent)}
+.crosslinks{display:flex;flex-wrap:wrap;gap:0.8rem;justify-content:center;margin-top:1.4rem}
+.crosslinks a{text-decoration:none;font-size:0.86rem;letter-spacing:0.08em;padding:0.5rem 1.1rem;border:1px solid var(--border);border-radius:24px;color:var(--text2);transition:all 0.2s;background:var(--card)}
+.crosslinks a:hover{border-color:var(--accent);color:var(--accent)}
+footer{border-top:1px solid var(--border2);margin-top:4rem;padding:2.5rem 2rem;text-align:center;color:var(--muted);font-size:0.78rem;letter-spacing:0.05em}
+footer a{color:var(--gold);text-decoration:none}
+@media(max-width:640px){
+  nav{padding:0.7rem 1.2rem}
+  .nav-links{gap:1rem}
+  .nav-links a.sib{display:none}
+  .picks{grid-template-columns:1fr}
+  header.hero{padding:7rem 1.2rem 3rem;min-height:auto}
+}
+</style>
+</head>
+<body class="zh">
+
+<nav>
+  <a class="nav-logo" href="/">SDE Universes</a>
+  <div class="nav-links">
+    <a href="/" class="zh-only">首页</a><a href="/" class="en-only">Home</a>
+    <a href="/education/" class="sib zh-only">教育专栏</a><a href="/education/" class="sib en-only">Education</a>
+    <a href="/health/" class="sib here zh-only">健康专栏</a><a href="/health/" class="sib here en-only">Health</a>
+    <a href="/business/" class="sib zh-only">商业专栏</a><a href="/business/" class="sib en-only">Business</a>
+    <a href="/philosophy/" class="sib zh-only">思想宇宙</a><a href="/philosophy/" class="sib en-only">Philosophy</a>
+    <div class="lang-toggle">
+      <button class="lang-btn active" onclick="setLang('zh')">中</button>
+      <button class="lang-btn" onclick="setLang('en')">EN</button>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="hero-bg"></div><div class="hero-grid"></div>
+  <div class="eyebrow zh-only">SDE 专栏 · 健康</div><div class="eyebrow en-only">SDE COLUMN · HEALTH</div>
+  <h1 class="title"><span class="zh-only">健康专栏</span><span class="en-only">Health</span></h1>
+  <p class="sub zh-only">疾病不是被发现的故障，而是身体在特征纠缠中「如何发生、如何自持、如何锁死」。</p><p class="sub en-only">Illness is not a defect to be discovered — it is how the body occurs, self-sustains, and locks in through entanglement.</p>
+  <div class="badge"><span class="dot"></span><span class="zh-only">专栏筹建中 · 内容陆续上线</span><span class="en-only">Column in the making · essays landing soon</span></div>
+</header>
+
+<main class="wrap">
+  <section>
+    <p class="lead zh-only">发现范式把病看成一个已经在那里、等着被找到的坏零件。SDE 健康发生学换一个问题：这套失衡为何如此发生、又如何把自己稳定成一个回不去的状态？从慢性炎症到肿瘤，答案往往不在某个单点，而在差异序列被锁死的方式里。</p>
+    <p class="lead en-only">The discovery paradigm treats disease as a broken part already there, waiting to be found. SDE health genesis asks a different question: why does this imbalance occur as it does, and how does it stabilise into a state that cannot roll back? From chronic inflammation to tumours, the answer often lies not in a single point but in how a sequence of difference gets locked in.</p>
+
+    <div class="picks">
+      <div class="pick">
+        <h3><span class="zh-only">五诊 · 看的是发生</span><span class="en-only">Five readings of occurrence</span></h3>
+        <p class="zh-only">不止看指标，更读身体如何一步步把自己走进当前的稳态。</p><p class="en-only">Beyond metrics — reading how the body walked itself, step by step, into its present steady state.</p>
+      </div>
+      <div class="pick">
+        <h3><span class="zh-only">癌症作为发生学问题</span><span class="en-only">Cancer as a genesis question</span></h3>
+        <p class="zh-only">不是「哪里坏了」，而是「为何这套增殖能自我供养、并锁死退路」。</p><p class="en-only">Not “what broke” but “why this proliferation feeds itself and seals every exit.”</p>
+      </div>
+      <div class="pick">
+        <h3><span class="zh-only">命运即长期稳定化</span><span class="en-only">Fate as long-run stabilisation</span></h3>
+        <p class="zh-only">健康不是一次修复，而是让身体的长期纠缠稳定在能持续再发生的一侧。</p><p class="en-only">Health is not a one-off repair but keeping the body's long entanglement on the side that keeps re-occurring.</p>
+      </div>
+    </div>
+
+    <div class="note">
+      <p class="zh-only">本专栏正在建设中——王博士将陆续把 <b>健康专栏</b> 相关的长文、专著导读与 SDE 智能体品尝汇聚于此。</p>
+      <p class="en-only">This column is under construction — long reads, monograph guides and SDE agent tastings on <b>Health</b> will gather here.</p>
+      <div class="crosslinks">
+        <a href="/" class="zh-only">← 返回首页</a><a href="/" class="en-only">← Back home</a>
+        <a href="/#daily" class="zh-only">每日更新</a><a href="/#daily" class="en-only">Daily updates</a>
+        <a href="/#taste" class="zh-only">SDE 智能体免费品尝</a><a href="/#taste" class="en-only">Free SDE agent taste</a>
+        <a href="/philosophy/" class="zh-only">思想宇宙</a><a href="/philosophy/" class="en-only">Philosophy</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="zh-only">SDE Universes · 显露 · 差异 · 纠缠 &nbsp;|&nbsp; 德麦国际 · 王德生 &nbsp;|&nbsp; <a href="/">sdeuniverses.com</a></div>
+  <div class="en-only">SDE Universes · Show · Difference · Entanglement &nbsp;|&nbsp; Demai International · Desheng Wang &nbsp;|&nbsp; <a href="/">sdeuniverses.com</a></div>
+</footer>
+
+<script>
+function setLang(lang){
+  document.body.className=lang;
+  document.querySelectorAll('.lang-btn').forEach(b=>b.classList.toggle('active',(b.textContent==='中'&&lang==='zh')||(b.textContent==='EN'&&lang==='en')));
+  document.documentElement.lang=lang;
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>商业专栏 · Business | SDE Universes</title>
+<meta name="description" content="商业不是资源的调配，而是价值在差异序列中被反复「重新发生」。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=EB+Garamond:wght@400;500&family=Noto+Serif+SC:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#F5EFE0;--card:#FAF6EC;--card2:#F0E8D3;--gold:#8A6817;--text:#2A2315;--text2:#6B5D47;--muted:#98886C;--border:rgba(138,104,23,0.22);--border2:rgba(138,104,23,0.10);--accent:#A0651F;--accent2:#BC7C2E}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Noto Serif SC','EB Garamond',Georgia,serif;line-height:1.75;overflow-x:hidden}
+body.en{font-family:'EB Garamond','Playfair Display',Georgia,serif}
+body.en .zh-only{display:none}
+body.zh .en-only{display:none}
+a{color:inherit}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0.9rem 3rem;background:rgba(245,239,224,0.9);backdrop-filter:blur(12px);border-bottom:1px solid var(--border2)}
+.nav-logo{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;color:var(--gold);letter-spacing:0.05em;text-decoration:none}
+.nav-links{display:flex;align-items:center;gap:1.6rem}
+.nav-links a{color:var(--text2);text-decoration:none;font-size:0.85rem;letter-spacing:0.1em;transition:color 0.2s}
+.nav-links a:hover{color:var(--accent)}
+.nav-links a.here{color:var(--accent);font-weight:600}
+.lang-toggle{display:flex;background:var(--card);border:1px solid var(--border);border-radius:20px;overflow:hidden}
+.lang-btn{padding:0.3rem 0.8rem;font-size:0.75rem;border:none;background:transparent;color:var(--text2);cursor:pointer;font-family:inherit}
+.lang-btn.active{background:var(--accent);color:#fff;font-weight:600}
+.wrap{max-width:940px;margin:0 auto;padding:0 2rem}
+header.hero{min-height:66vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:9rem 2rem 4rem;position:relative;overflow:hidden}
+.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 70% 55% at 50% 34%,#A0651F14 0%,transparent 70%)}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(#A0651F0d 1px,transparent 1px),linear-gradient(90deg,#A0651F0d 1px,transparent 1px);background-size:60px 60px;opacity:0.7}
+.eyebrow{position:relative;font-size:0.72rem;letter-spacing:0.28em;color:var(--accent);text-transform:uppercase;margin-bottom:1.4rem}
+.title{position:relative;font-family:'Playfair Display','Noto Serif SC',serif;font-size:clamp(2.6rem,7vw,5rem);font-weight:700;line-height:1.05;color:var(--text)}
+.title .en-only{color:var(--accent)}
+.sub{position:relative;font-size:clamp(1.05rem,2.3vw,1.35rem);color:var(--text2);max-width:640px;margin:1.6rem auto 2rem;font-style:italic;font-weight:300}
+.badge{position:relative;display:inline-flex;align-items:center;gap:0.5rem;background:var(--card);border:1px solid var(--accent);color:var(--accent);border-radius:30px;padding:0.5rem 1.3rem;font-size:0.78rem;letter-spacing:0.14em}
+.badge .dot{width:7px;height:7px;border-radius:50%;background:var(--accent);animation:pulse 1.8s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:0.35;transform:scale(0.85)}50%{opacity:1;transform:scale(1)}}
+section{padding:3.5rem 0}
+.lead{font-size:1.12rem;color:var(--text);line-height:1.95;border-left:3px solid var(--accent);padding:0.2rem 0 0.2rem 1.5rem;margin:0 0 3rem}
+.picks{display:grid;grid-template-columns:repeat(3,1fr);gap:1.4rem}
+.pick{background:var(--card);border:1px solid var(--border2);border-top:3px solid var(--accent);border-radius:6px;padding:1.6rem 1.4rem;transition:transform 0.2s,box-shadow 0.2s}
+.pick:hover{transform:translateY(-3px);box-shadow:0 10px 30px rgba(138,104,23,0.1)}
+.pick h3{font-family:'Playfair Display','Noto Serif SC',serif;font-size:1.12rem;font-weight:600;color:var(--accent);margin-bottom:0.7rem;line-height:1.35}
+.pick p{font-size:0.94rem;color:var(--text2);line-height:1.75}
+.note{margin-top:3rem;text-align:center;background:var(--card2);border:1px dashed var(--accent);border-radius:8px;padding:1.8rem 1.5rem}
+.note p{color:var(--text2);font-size:0.98rem}
+.note b{color:var(--accent)}
+.crosslinks{display:flex;flex-wrap:wrap;gap:0.8rem;justify-content:center;margin-top:1.4rem}
+.crosslinks a{text-decoration:none;font-size:0.86rem;letter-spacing:0.08em;padding:0.5rem 1.1rem;border:1px solid var(--border);border-radius:24px;color:var(--text2);transition:all 0.2s;background:var(--card)}
+.crosslinks a:hover{border-color:var(--accent);color:var(--accent)}
+footer{border-top:1px solid var(--border2);margin-top:4rem;padding:2.5rem 2rem;text-align:center;color:var(--muted);font-size:0.78rem;letter-spacing:0.05em}
+footer a{color:var(--gold);text-decoration:none}
+@media(max-width:640px){
+  nav{padding:0.7rem 1.2rem}
+  .nav-links{gap:1rem}
+  .nav-links a.sib{display:none}
+  .picks{grid-template-columns:1fr}
+  header.hero{padding:7rem 1.2rem 3rem;min-height:auto}
+}
+</style>
+</head>
+<body class="zh">
+
+<nav>
+  <a class="nav-logo" href="/">SDE Universes</a>
+  <div class="nav-links">
+    <a href="/" class="zh-only">首页</a><a href="/" class="en-only">Home</a>
+    <a href="/education/" class="sib zh-only">教育专栏</a><a href="/education/" class="sib en-only">Education</a>
+    <a href="/health/" class="sib zh-only">健康专栏</a><a href="/health/" class="sib en-only">Health</a>
+    <a href="/business/" class="sib here zh-only">商业专栏</a><a href="/business/" class="sib here en-only">Business</a>
+    <a href="/philosophy/" class="sib zh-only">思想宇宙</a><a href="/philosophy/" class="sib en-only">Philosophy</a>
+    <div class="lang-toggle">
+      <button class="lang-btn active" onclick="setLang('zh')">中</button>
+      <button class="lang-btn" onclick="setLang('en')">EN</button>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="hero-bg"></div><div class="hero-grid"></div>
+  <div class="eyebrow zh-only">SDE 专栏 · 商业</div><div class="eyebrow en-only">SDE COLUMN · BUSINESS</div>
+  <h1 class="title"><span class="zh-only">商业专栏</span><span class="en-only">Business</span></h1>
+  <p class="sub zh-only">商业不是资源的调配，而是价值在差异序列中被反复「重新发生」。</p><p class="sub en-only">Business is not the allocation of resources — it is value re-occurring through sequences of difference.</p>
+  <div class="badge"><span class="dot"></span><span class="zh-only">专栏筹建中 · 内容陆续上线</span><span class="en-only">Column in the making · essays landing soon</span></div>
+</header>
+
+<main class="wrap">
+  <section>
+    <p class="lead zh-only">把企业看成一台分配资源的机器，只能解释它如何运转，解释不了它为何还活着。SDE 商业发生学问的是：这门生意的价值凭什么持续再发生？在 AI 把执行力变成商品的时代，护城河不再是「已完成的能力」，而是「知识如何发生」的过程本身。</p>
+    <p class="lead en-only">Seeing a company as a resource-allocation machine explains how it runs, not why it stays alive. SDE business genesis asks: on what does this venture's value keep re-occurring? As AI turns execution into a commodity, the moat is no longer finished capability but the process of how knowledge occurs.</p>
+
+    <div class="picks">
+      <div class="pick">
+        <h3><span class="zh-only">意义原理 · 越用越强</span><span class="en-only">The meaning principle</span></h3>
+        <p class="zh-only">好产品不制造依赖，而是让用户在使用中长出自己的能力——意义密度即壁垒。</p><p class="en-only">A good product breeds capability, not dependence — meaning-density is the moat.</p>
+      </div>
+      <div class="pick">
+        <h3><span class="zh-only">从执行力到发生力</span><span class="en-only">From execution to genesis</span></h3>
+        <p class="zh-only">当执行被外包给 AI，真正稀缺的是把混沌变成新知识的发生力。</p><p class="en-only">When execution is outsourced to AI, what stays scarce is the power to turn chaos into new knowledge.</p>
+      </div>
+      <div class="pick">
+        <h3><span class="zh-only">四步商业模型</span><span class="en-only">The four-step model</span></h3>
+        <p class="zh-only">SDE 化 → 微调 → APP 化 → OpenClaw 化：把发生学过程沉淀为不可复制的资产。</p><p class="en-only">SDE-ify → fine-tune → app-ify → open-claw: distilling genesis process into an un-copyable asset.</p>
+      </div>
+    </div>
+
+    <div class="note">
+      <p class="zh-only">本专栏正在建设中——王博士将陆续把 <b>商业专栏</b> 相关的长文、专著导读与 SDE 智能体品尝汇聚于此。</p>
+      <p class="en-only">This column is under construction — long reads, monograph guides and SDE agent tastings on <b>Business</b> will gather here.</p>
+      <div class="crosslinks">
+        <a href="/" class="zh-only">← 返回首页</a><a href="/" class="en-only">← Back home</a>
+        <a href="/#daily" class="zh-only">每日更新</a><a href="/#daily" class="en-only">Daily updates</a>
+        <a href="/#taste" class="zh-only">SDE 智能体免费品尝</a><a href="/#taste" class="en-only">Free SDE agent taste</a>
+        <a href="/philosophy/" class="zh-only">思想宇宙</a><a href="/philosophy/" class="en-only">Philosophy</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="zh-only">SDE Universes · 显露 · 差异 · 纠缠 &nbsp;|&nbsp; 德麦国际 · 王德生 &nbsp;|&nbsp; <a href="/">sdeuniverses.com</a></div>
+  <div class="en-only">SDE Universes · Show · Difference · Entanglement &nbsp;|&nbsp; Demai International · Desheng Wang &nbsp;|&nbsp; <a href="/">sdeuniverses.com</a></div>
+</footer>
+
+<script>
+function setLang(lang){
+  document.body.className=lang;
+  document.querySelectorAll('.lang-btn').forEach(b=>b.classList.toggle('active',(b.textContent==='中'&&lang==='zh')||(b.textContent==='EN'&&lang==='en')));
+  document.documentElement.lang=lang;
+}
+</script>
+</body>
+</html>
