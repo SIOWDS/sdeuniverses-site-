@@ -197,12 +197,16 @@ export class SubmissionBox {
     return _subJson({ ok: false, msg: "unknown op" });
   }
 }
-// 学员上传（multipart）：Worker 收整包 → 1MB 分片转存 DO；口令服务端校验、ZIP 魔数校验、25MB 上限
+// 学员上传（multipart）：服务端校验口令 → 校验 ZIP → 直接写入私有 GitHub 仓库（Claude 每日 clone 提取后清空）
+const _SUBMIT_STUDENT_HASH = "319559c4b95d9e9010f74c1cd3c5af90b0d6b7aff4efc58a9253b4854d4f3dc1"; // newlife2013
+const _SUBMIT_REPO = "SIOWDS/sde-submissions"; // 私有收件仓库（需先由账户主创建）
+async function _subHash(s) {
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode("sde-submit-v1:" + s));
+  return [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, "0")).join("");
+}
 async function handleSubmit(request, env) {
   const CORS = { "access-control-allow-origin": "*", "access-control-allow-methods": "POST, OPTIONS", "access-control-allow-headers": "content-type" };
   if (request.method === "OPTIONS") return new Response(null, { headers: CORS });
-  const box = env.SUBMISSIONS.get(env.SUBMISSIONS.idFromName("global"));
-  const call = async (payload) => (await box.fetch(new Request("https://sub.internal/", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(payload) }))).json();
   const ip = request.headers.get("cf-connecting-ip") || "unknown";
   try {
     const lim = env.ASK_LIMITER.get(env.ASK_LIMITER.idFromName("submit:" + ip));
@@ -212,30 +216,39 @@ async function handleSubmit(request, env) {
   let form;
   try { form = await request.formData(); } catch (e) { return _subJson({ ok: false, msg: "表单解析失败。" }, CORS); }
   const pass = String(form.get("pass") || "");
-  const student = String(form.get("student") || "");
-  const note = String(form.get("note") || "");
+  if ((await _subHash(pass)) !== _SUBMIT_STUDENT_HASH) return _subJson({ ok: false, code: "badpass", msg: "密码不正确。" }, CORS);
+  const student = String(form.get("student") || "").slice(0, 80);
+  const note = String(form.get("note") || "").slice(0, 500);
   const file = form.get("file");
   if (!file || typeof file === "string") return _subJson({ ok: false, msg: "请选择一个 ZIP 文件。" }, CORS);
-  const name = file.name || "paper.zip";
+  const rawName = file.name || "paper.zip";
   const size = file.size || 0;
-  const MAX = 25 * 1024 * 1024;
   if (size <= 0) return _subJson({ ok: false, msg: "文件为空。" }, CORS);
-  if (size > MAX) return _subJson({ ok: false, msg: "文件超过 25MB 上限。" }, CORS);
+  if (size > 25 * 1024 * 1024) return _subJson({ ok: false, msg: "文件超过 25MB 上限。" }, CORS);
   const u8 = new Uint8Array(await file.arrayBuffer());
   if (!(u8[0] === 0x50 && u8[1] === 0x4B)) return _subJson({ ok: false, msg: "文件不是有效的 ZIP。" }, CORS);
-  const bg = await call({ op: "begin", pass, name, student, note, size });
-  if (!bg.ok) return _subJson({ ok: false, code: bg.code, msg: bg.code === "badpass" ? "密码不正确。" : (bg.msg || "启动失败") }, CORS);
-  const id = bg.id;
-  const CHUNK = 1024 * 1024;
-  const nchunks = Math.ceil(u8.length / CHUNK);
-  for (let n = 0; n < nchunks; n++) {
-    const view = u8.subarray(n * CHUNK, Math.min((n + 1) * CHUNK, u8.length));
-    const cr = await call({ op: "chunk", pass, id, n, data: _bytesToB64(view) });
-    if (!cr.ok) return _subJson({ ok: false, msg: "分片写入失败（" + n + "）。" }, CORS);
+  const token = env.GH_SUBMIT_TOKEN || "";
+  if (!token) return _subJson({ ok: false, msg: "收件箱尚未配置完成（缺少仓库令牌）。请联系管理员。" }, CORS);
+  // 唯一、纯 ASCII 的存档路径；中文原名保存在旁挂 .json 里（避免 URL 编码问题）
+  const ts = new Date().toISOString().replace(/[:.]/g, "-").replace("Z", "");
+  const rand = crypto.randomUUID().slice(0, 8);
+  const safe = rawName.replace(/[^\w.\-]+/g, "_").replace(/_+/g, "_").replace(/\.zip$/i, "").slice(0, 60) || "paper";
+  const base = "inbox/" + ts + "__" + rand + "__" + safe;
+  const ghPut = async (path, contentB64, message) => fetch("https://api.github.com/repos/" + _SUBMIT_REPO + "/contents/" + path, {
+    method: "PUT",
+    headers: { "authorization": "Bearer " + token, "accept": "application/vnd.github+json", "content-type": "application/json", "user-agent": "sde-submit-worker", "x-github-api-version": "2022-11-28" },
+    body: JSON.stringify({ message, content: contentB64 }),
+  });
+  const zipResp = await ghPut(base + ".zip", _bytesToB64(u8), "submission: " + safe);
+  if (!zipResp.ok) {
+    const et = (await zipResp.text()).slice(0, 160);
+    if (zipResp.status === 401 || zipResp.status === 403) return _subJson({ ok: false, msg: "收件箱配置有误（仓库令牌无效或无权限）。请联系管理员。" }, CORS);
+    if (zipResp.status === 404) return _subJson({ ok: false, msg: "收件仓库不存在，请联系管理员。" }, CORS);
+    return _subJson({ ok: false, msg: "存档失败（GitHub " + zipResp.status + "）。" + et }, CORS);
   }
-  const cm = await call({ op: "commit", pass, id, nchunks });
-  if (!cm.ok) return _subJson({ ok: false, msg: "提交完成失败。" }, CORS);
-  return _subJson({ ok: true, msg: "上传成功", id }, CORS);
+  const meta = { original_name: rawName, student, note, size, uploaded_at: new Date().toISOString(), ip };
+  await ghPut(base + ".json", _bytesToB64(new TextEncoder().encode(JSON.stringify(meta, null, 2))), "meta: " + safe); // 元数据失败不致命
+  return _subJson({ ok: true, msg: "上传成功" }, CORS);
 }
 // 管理端转发：仅放行 list/meta/getchunk/delete，DO 侧校验 adminHash
 async function handleSubmitAdmin(request, env) {
