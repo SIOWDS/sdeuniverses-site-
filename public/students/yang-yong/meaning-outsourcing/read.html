@@ -5,30 +5,30 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>意义的外包与回收：AI 时代幸福悖论的一个发生学分析 · PDF在线阅读 | 学员专栏 · SDE Universes</title>
 <style>
-:root{--ink:#1A1410;--gold:#D4B25E;--gold2:#B8901F;--paper:#F5EFE0;--muted:#8B7E5E}
+:root{--ink:#1D2925;--gold:#B28A32;--gold2:#9A7528;--paper:#26312E;--muted:#78837D}
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:#0F0B07;color:var(--paper);font-family:"Songti SC","Noto Serif SC",Georgia,serif;min-height:100vh}
-.topbar{position:sticky;top:0;z-index:20;background:rgba(15,11,7,0.95);backdrop-filter:blur(8px);border-bottom:1px solid rgba(212,178,94,0.25);display:flex;align-items:center;justify-content:space-between;padding:12px 20px;gap:12px;flex-wrap:wrap}
-.tb-title{font-size:15px;color:var(--gold);letter-spacing:0.05em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:52vw}
-.tb-title a{color:var(--muted);text-decoration:none;font-size:13px;margin-right:14px}
+body{background:#F3F6F2;color:var(--paper);font-family:"Songti SC","Noto Serif SC",Georgia,serif;min-height:100vh}
+.topbar{position:sticky;top:0;z-index:20;background:rgba(29,41,37,0.97);backdrop-filter:blur(8px);border-bottom:1px solid rgba(255,255,255,0.10);display:flex;align-items:center;justify-content:space-between;padding:12px 20px;gap:12px;flex-wrap:wrap}
+.tb-title{font-size:15px;color:#E4D9B8;letter-spacing:0.05em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:52vw}
+.tb-title a{color:#C7D0CA;text-decoration:none;font-size:13px;margin-right:14px}
 .controls{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.btn{background:rgba(212,178,94,0.12);border:1px solid rgba(212,178,94,0.45);color:var(--gold);padding:7px 16px;border-radius:3px;font-size:14px;cursor:pointer;font-family:inherit;letter-spacing:0.03em}
-.btn:hover:not(:disabled){background:rgba(212,178,94,0.22)}
+.btn{background:rgba(226,213,170,0.14);border:1px solid rgba(226,213,170,0.5);color:#E4D9B8;padding:7px 16px;border-radius:3px;font-size:14px;cursor:pointer;font-family:inherit;letter-spacing:0.03em}
+.btn:hover:not(:disabled){background:rgba(226,213,170,0.24)}
 .btn:disabled{opacity:0.35;cursor:not-allowed}
-.pagebox{display:flex;align-items:center;gap:6px;font-size:14px;color:var(--paper)}
-.pagebox input{width:56px;background:#1A1410;border:1px solid rgba(212,178,94,0.4);color:var(--gold);padding:6px 8px;border-radius:3px;text-align:center;font-family:inherit;font-size:14px}
-.pagebox .total{color:var(--muted)}
+.pagebox{display:flex;align-items:center;gap:6px;font-size:14px;color:#E8ECE9}
+.pagebox input{width:56px;background:#26312E;border:1px solid rgba(226,213,170,0.4);color:#E4D9B8;padding:6px 8px;border-radius:3px;text-align:center;font-family:inherit;font-size:14px}
+.pagebox .total{color:#9FB0A8}
 .zoom{display:flex;align-items:center;gap:4px}
 .zoom .btn{padding:6px 12px}
 .stage{display:flex;justify-content:center;padding:28px 16px 60px;min-height:60vh}
-#canvas-wrap{position:relative;box-shadow:0 20px 60px rgba(0,0,0,0.6);background:#fff;border-radius:2px;overflow:hidden;max-width:100%}
+#canvas-wrap{position:relative;box-shadow:0 16px 44px rgba(29,41,37,0.20);background:#fff;border-radius:2px;overflow:hidden;max-width:100%}
 canvas{display:block;max-width:100%;height:auto}
 .loading{text-align:center;color:var(--muted);padding:80px 20px;font-size:16px}
-.spinner{width:40px;height:40px;border:3px solid rgba(212,178,94,0.25);border-top-color:var(--gold);border-radius:50%;margin:0 auto 20px;animation:spin 0.9s linear infinite}
+.spinner{width:40px;height:40px;border:3px solid rgba(178,138,50,0.25);border-top-color:var(--gold);border-radius:50%;margin:0 auto 20px;animation:spin 0.9s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-.err{text-align:center;color:#E8A0A0;padding:60px 20px;line-height:1.9}
+.err{text-align:center;color:#B4544A;padding:60px 20px;line-height:1.9}
 .err a{color:var(--gold)}
-.navhint{position:fixed;bottom:0;left:0;right:0;text-align:center;padding:10px;font-size:12px;color:var(--muted);background:linear-gradient(transparent,rgba(15,11,7,0.9));pointer-events:none}
+.navhint{position:fixed;bottom:0;left:0;right:0;text-align:center;padding:10px;font-size:12px;color:var(--muted);background:linear-gradient(transparent,rgba(243,246,242,0.92));pointer-events:none}
 .side-tap{position:fixed;top:64px;bottom:0;width:12%;z-index:5;cursor:pointer}
 .side-tap.left{left:0}.side-tap.right{right:0}
 @media(max-width:640px){.tb-title{font-size:13px;max-width:40vw}.side-tap{width:18%}}
