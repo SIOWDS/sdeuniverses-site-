@@ -59,6 +59,25 @@ footer a{color:var(--gold);text-decoration:none}
   .picks{grid-template-columns:1fr}
   header.hero{padding:7rem 1.2rem 3rem;min-height:auto}
 }
+
+.block{margin:0 0 3.4rem}
+.block-head{display:flex;align-items:baseline;gap:0.85rem;border-bottom:1px solid var(--border);padding-bottom:0.7rem;margin-bottom:0.9rem}
+.block-num{font-family:'Playfair Display',serif;font-size:1.55rem;font-weight:700;color:var(--accent);line-height:1}
+.block-title{font-family:'Playfair Display','Noto Serif SC',serif;font-size:1.32rem;font-weight:600;color:var(--text);line-height:1.25}
+.block-desc{font-size:0.98rem;color:var(--text2);font-style:italic;margin:0 0 1.4rem;line-height:1.7}
+.art-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.art{display:block;text-decoration:none;background:var(--card);border:1px solid var(--border2);border-left:3px solid var(--accent);border-radius:5px;padding:1.05rem 1.25rem;transition:transform .2s,box-shadow .2s,border-color .2s}
+.art:hover{border-left-color:var(--accent2);transform:translateX(3px);box-shadow:0 6px 20px rgba(138,104,23,.08)}
+.art .k{display:block;font-size:0.71rem;letter-spacing:0.1em;color:var(--accent);text-transform:uppercase;font-weight:600;margin-bottom:0.35rem}
+.art h4{font-family:'Noto Serif SC',serif;font-size:1.05rem;font-weight:600;color:var(--text);margin-bottom:0.4rem;line-height:1.42}
+.art p{font-size:0.9rem;color:var(--text2);line-height:1.68}
+.art .rd{display:inline-block;margin-top:0.55rem;font-size:0.82rem;color:var(--accent);letter-spacing:0.05em}
+.art.feature{grid-column:1 / -1;border-left-width:4px;background:linear-gradient(180deg,var(--card),var(--card2))}
+.art.feature h4{font-size:1.22rem}
+.tailnote{margin-top:1rem;text-align:center;background:var(--card2);border:1px dashed var(--accent);border-radius:8px;padding:1.5rem 1.4rem}
+.tailnote p{color:var(--text2);font-size:0.96rem}
+.tailnote b{color:var(--accent)}
+@media(max-width:640px){.art-grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body class="zh">
@@ -83,32 +102,156 @@ footer a{color:var(--gold);text-decoration:none}
   <div class="eyebrow zh-only">SDE 专栏 · 教育</div><div class="eyebrow en-only">SDE COLUMN · EDUCATION</div>
   <h1 class="title"><span class="zh-only">教育专栏</span><span class="en-only">Education</span></h1>
   <p class="sub zh-only">AI 时代，教育不是传递已完成的知识，而是点燃「知识如何发生」。</p><p class="sub en-only">In the age of AI, education is not the delivery of finished knowledge — it is igniting how knowledge occurs.</p>
-  <div class="badge"><span class="dot"></span><span class="zh-only">专栏筹建中 · 内容陆续上线</span><span class="en-only">Column in the making · essays landing soon</span></div>
+  <div class="badge"><span class="dot"></span><span class="zh-only">教育发生学 · 长文合辑 · 17 篇 / 4 板块 · 持续增补</span><span class="en-only">Genesis Pedagogy · Essay Collection · 17 pieces / 4 blocks</span></div>
 </header>
 
 <main class="wrap">
   <section>
-    <p class="lead zh-only">当答案唾手可得，教育的旧根基（分数=能力、知识=可传递之物）正在同步松动与硬化。SDE 教育发生学把课堂重新理解为一场发生：混沌激发 · 路径探索 · 冲突整合——三次点火，让学习者不是被灌满，而是被点着。</p>
-    <p class="lead en-only">When answers are one prompt away, education's old foundations — score-as-ability, knowledge-as-transferable-thing — loosen and harden at once. SDE genesis pedagogy re-reads the classroom as an occurrence: chaos ignition, path exploration, conflict integration — three sparks that light the learner rather than fill them.</p>
-
-    <div class="picks">
-      <div class="pick">
-        <h3><span class="zh-only">从「有用」到「不可比」</span><span class="en-only">From useful to incomparable</span></h3>
-        <p class="zh-only">善能被外包，美不能——教育两百年把价值单押在有用上的欠账，正在被 AI 照见。</p><p class="en-only">Goodness can be outsourced; beauty cannot — AI reveals education's two-century bet on usefulness alone.</p>
+    <div class="block">
+      <div class="block-head">
+        <span class="block-num"><span class="zh-only">壹</span><span class="en-only">I</span></span>
+        <span class="block-title"><span class="zh-only">AI 时代的教育困境 · 四部曲</span><span class="en-only">The AI-Era Education Predicament · Four Parts</span></span>
       </div>
-      <div class="pick">
-        <h3><span class="zh-only">筛选机器失灵之后</span><span class="en-only">When the sorting machine fails</span></h3>
-        <p class="zh-only">当「分数=能力」被击穿，出口是从可比的分数，转向不可伪造的成长。</p><p class="en-only">Once score-equals-ability breaks, the way out is from comparable scores to un-fakeable growth.</p>
-      </div>
-      <div class="pick">
-        <h3><span class="zh-only">负空间教育学</span><span class="en-only">Negative-space pedagogy</span></h3>
-        <p class="zh-only">模子底下不是废墟，是产房——被代理的「人」消退之处，正是育人重新发生之地。</p><p class="en-only">Beneath the mold is not rubble but a delivery room — where the proxied person fades, the human re-occurs.</p>
+      <p class="block-desc zh-only">一份诊断，一篇檄文——四篇连读，把教育两百年「证明取代培养」的欠账一次照见，也给出三条出路。</p><p class="block-desc en-only">A diagnosis and a manifesto — read the four in sequence: they expose education's two-century debt of proving over cultivating, and name three ways out.</p>
+      <div class="art-grid">
+        <a class="art feature" href="/column/education-dilemma/">
+          <span class="k"><span class="zh-only">系列总纲 · 约一万字</span><span class="en-only">Overview · ~10k words</span></span>
+          <h4><span class="zh-only">教育的困境和出路在哪儿？</span><span class="en-only">Where Do Education's Predicament and Way Out Lie?</span></h4>
+          <p class="zh-only">四重困境:证明取代培养、计量政变为本体、那把切掉试错与徘徊的刀、三股劲的失衡;三条出路:赎回不可测量、让秤归位、守住人与人的窄门。</p><p class="en-only">Four predicaments and three ways out — the whole diagnosis in one sweep, and the manifesto that frames the series.</p>
+          <span class="rd"><span class="zh-only">读全文 →</span><span class="en-only">Read →</span></span>
+        </a>
+        <a class="art" href="/column/education-dilemma-1/">
+          <span class="k"><span class="zh-only">之一</span><span class="en-only">Part I</span></span>
+          <h4><span class="zh-only">当善不再需要人</span><span class="en-only">When Goodness No Longer Needs Us</span></h4>
+          <p class="zh-only">AI 是「善的超级放大器」,它照见了教育把价值单一押在「有用」上的两百年欠账;善能被外包,美不能——因为美只发生在真实的人的注视里。</p><p class="en-only">AI is a super-amplifier of goodness; it exposes education's bet on usefulness. Goodness can be outsourced; beauty cannot.</p>
+          <span class="rd"><span class="zh-only">读全文 →</span><span class="en-only">Read →</span></span>
+        </a>
+        <a class="art" href="/column/education-dilemma-2/">
+          <span class="k"><span class="zh-only">之二</span><span class="en-only">Part II</span></span>
+          <h4><span class="zh-only">筛选机器失灵时</span><span class="en-only">When the Sorting Machine Fails</span></h4>
+          <p class="zh-only">AI 给教育的不是技术冲击,而是一次「功能裸露」;当「分数=能力」被击穿,唯一出口是从可比的分数,转向不可比、也不可伪造的成长。</p><p class="en-only">Not a technical shock but a function laid bare; once score-equals-ability breaks, the exit is un-fakeable growth.</p>
+          <span class="rd"><span class="zh-only">读全文 →</span><span class="en-only">Read →</span></span>
+        </a>
+        <a class="art" href="/column/education-dilemma-3/">
+          <span class="k"><span class="zh-only">之三</span><span class="en-only">Part III</span></span>
+          <h4><span class="zh-only">松动与硬化</span><span class="en-only">Loosening and Hardening</span></h4>
+          <p class="zh-only">困境的本质是「松动与硬化同步发生」:旧根基松解、新的更硬的结构同步生成,锁成一台拧过就回不去的棘轮,而非能转回起点的循环。</p><p class="en-only">Old foundations loosen while a harder structure sets — a ratchet that will not turn back, not a circle.</p>
+          <span class="rd"><span class="zh-only">读全文 →</span><span class="en-only">Read →</span></span>
+        </a>
+        <a class="art" href="/column/education-dilemma-4/">
+          <span class="k"><span class="zh-only">之四 · 压轴</span><span class="en-only">Part IV · Finale</span></span>
+          <h4><span class="zh-only">消退的模子,何以为人</span><span class="en-only">The Fading Mold — What Makes a Human</span></h4>
+          <p class="zh-only">代理指标崩塌后,人们惊恐地发现那个被代理的「人」本身早已从共识中消退;模子底下是空的,而那个空不是废墟,是产房——负空间教育学。</p><p class="en-only">After proxy metrics collapse, the proxied 'person' has already faded; the void is not rubble but a delivery room. Negative-space pedagogy.</p>
+          <span class="rd"><span class="zh-only">读全文 →</span><span class="en-only">Read →</span></span>
+        </a>
       </div>
     </div>
 
-    <div class="note">
-      <p class="zh-only">本专栏正在建设中——王博士将陆续把 <b>教育专栏</b> 相关的长文、专著导读与 SDE 智能体品尝汇聚于此。</p>
-      <p class="en-only">This column is under construction — long reads, monograph guides and SDE agent tastings on <b>Education</b> will gather here.</p>
+    <div class="block">
+      <div class="block-head">
+        <span class="block-num"><span class="zh-only">贰</span><span class="en-only">II</span></span>
+        <span class="block-title"><span class="zh-only">课堂内外 · 教学的本体论诊断</span><span class="en-only">Inside the Classroom · An Ontological Diagnosis</span></span>
+      </div>
+      <p class="block-desc zh-only">把课堂重新看成一场「意义的发生」——它为何在批量销毁意义,又如何被重新点火。</p><p class="block-desc en-only">Re-seeing the classroom as an occurrence of meaning — why it mass-destroys meaning, and how it can be re-ignited.</p>
+      <div class="art-grid">
+        <a class="art" href="/column/classroom-kills-meaning/">
+          <span class="k"><span class="zh-only">据《SIO心理学》</span><span class="en-only">From SIO Psychology</span></span>
+          <h4><span class="zh-only">课堂，正在批量销毁意义</span><span class="en-only">The Classroom Is Mass-Destroying Meaning</span></h4>
+          <p class="zh-only">课堂已不再是意义生成的空间,而是意义结构的死亡车间:压抑差异、切断互动、用分数伪造意义。孩子不是不聪明,是被排除在意义生成之外的断裂者。</p><p class="en-only">It suppresses difference, severs interaction, fakes meaning with scores — children aren't dull, they're cut off from meaning-making.</p>
+          <span class="rd"><span class="zh-only">读全文 →</span><span class="en-only">Read →</span></span>
+        </a>
+        <a class="art" href="/column/gpt-classroom-ignition/">
+          <span class="k"><span class="zh-only">据《基于GPT的中国教育改革》</span><span class="en-only">From GPT & China's Education Reform</span></span>
+          <h4><span class="zh-only">课堂里的三次点火</span><span class="en-only">Three Ignitions in the Classroom</span></h4>
+          <p class="zh-only">如果 GPT 只当更快的刷题机,教育的恶性循环只会转得更快。真正的出路,是让课堂经历三次点火:混沌激发、路径探索、冲突整合。</p><p class="en-only">If GPT is only a faster drill machine, the vicious cycle spins faster. The way out: chaos ignition, path exploration, conflict integration.</p>
+          <span class="rd"><span class="zh-only">读全文 →</span><span class="en-only">Read →</span></span>
+        </a>
+        <a class="art" href="/column/why-high-scores-low-creativity/">
+          <span class="k"><span class="zh-only">据《基于GPT的中国教育改革》</span><span class="en-only">From GPT & China's Education Reform</span></span>
+          <h4><span class="zh-only">高分为什么低创</span><span class="en-only">High Scores, Low Creativity</span></h4>
+          <p class="zh-only">为什么我们的课堂盛产高分,却鲜有创造力？八个原因不是孤立的,它们在课堂内部织成了一张系统性压制创造力的隐形网。</p><p class="en-only">Eight causes are not isolated — they weave one invisible net that systematically suppresses creativity.</p>
+          <span class="rd"><span class="zh-only">读全文 →</span><span class="en-only">Read →</span></span>
+        </a>
+        <a class="art" href="/column/ai-education-cage/">
+          <span class="k"><span class="zh-only">据《SDE教育发生学导论》 · 约两万字</span><span class="en-only">From SDE Genesis Pedagogy · ~20k words</span></span>
+          <h4><span class="zh-only">个性化，还是更柔软的牢笼？</span><span class="en-only">Personalization, or a Softer Cage?</span></h4>
+          <p class="zh-only">AI 教育的最大风险,不是取代老师,而是以个性化、精准、高效之名,把牢笼织得更柔软、更细密、更难反抗。底线:AI 不能替孩子完成「自己想、自己错、自己改」。</p><p class="en-only">AI's real risk is weaving the cage softer and finer in the name of precision — it can't do a child's own thinking, erring and revising.</p>
+          <span class="rd"><span class="zh-only">读全文 →</span><span class="en-only">Read →</span></span>
+        </a>
+        <a class="art" href="/column/negative-education/">
+          <span class="k"><span class="zh-only">据《SDE教育发生学导论》 · 约两万字</span><span class="en-only">From SDE Genesis Pedagogy · ~20k words</span></span>
+          <h4><span class="zh-only">纪律严明、成绩优秀，却在杀死教育</span><span class="en-only">Disciplined and High-Scoring, Yet Killing Education</span></h4>
+          <p class="zh-only">大量「教育」正在杀死意义:把孩子固化成标签,压制真问题,用恐惧当燃料,有分数却没有创造、自由、幸福。这篇给你一把尺子,照出「高效训练」与「真教育」的区别。</p><p class="en-only">A ruler to tell 'efficient training' from real education — scores without creation, freedom, or joy.</p>
+          <span class="rd"><span class="zh-only">读全文 →</span><span class="en-only">Read →</span></span>
+        </a>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-head">
+        <span class="block-num"><span class="zh-only">叁</span><span class="en-only">III</span></span>
+        <span class="block-title"><span class="zh-only">大学的黄昏与重生</span><span class="en-only">The Twilight and Rebirth of the University</span></span>
+      </div>
+      <p class="block-desc zh-only">当知识不再需要看门人,大学靠什么活着？三篇长文,从崩塌,写到重生。</p><p class="block-desc en-only">When knowledge needs no gatekeeper, on what does the university live? Three essays, from collapse to rebirth.</p>
+      <div class="art-grid">
+        <a class="art" href="/column/university-twilight/">
+          <span class="k"><span class="zh-only">据《基于GPT的中国教育改革》</span><span class="en-only">From GPT & China's Education Reform</span></span>
+          <h4><span class="zh-only">大学的黄昏 · 当知识不再需要看门人</span><span class="en-only">The Twilight of the University</span></h4>
+          <p class="zh-only">大学曾是知识的看门人。当知识免费流动、机器能即时生成结构,看门人还有门可看吗？这不是哀悼,是为大学设计一条重生之路。</p><p class="en-only">The university was knowledge's gatekeeper. When knowledge flows free, is there a gate left to keep? Not a eulogy but a path to rebirth.</p>
+          <span class="rd"><span class="zh-only">读全文 →</span><span class="en-only">Read →</span></span>
+        </a>
+        <a class="art" href="/column/gpt-is-not-here-to-kill-the-university/">
+          <span class="k"><span class="zh-only">据《大学的终结与重生》</span><span class="en-only">From The End & Rebirth of the University</span></span>
+          <h4><span class="zh-only">GPT 不是来杀死大学的</span><span class="en-only">GPT Is Not Here to Kill the University</span></h4>
+          <p class="zh-only">大学并非被 GPT 打败:讲堂依然开设,证书依然颁布,可作业毫无痛感、讨论毫无判断。GPT 不是外部威胁,而是本体显影镜——它只是让早已发生的崩塌显形。</p><p class="en-only">Not an external threat but an ontological mirror — GPT only makes visible a collapse that already happened.</p>
+          <span class="rd"><span class="zh-only">读全文 →</span><span class="en-only">Read →</span></span>
+        </a>
+        <a class="art" href="/column/university-immortal-meaning-undying/">
+          <span class="k"><span class="zh-only">据《大学的终结与重生》</span><span class="en-only">From The End & Rebirth of the University</span></span>
+          <h4><span class="zh-only">大学不灭，意义不死</span><span class="en-only">The University Undying, Meaning Undying</span></h4>
+          <p class="zh-only">在一切都能被生成的时代,只有节奏与判断无法被替代。未来的大学是节奏协同大学:张力生成、节奏承受、判断承担、意义升维、协同共鸣、节奏认证。</p><p class="en-only">When all can be generated, only rhythm and judgment can't. The rhythm-synergy university: six principles no machine can replace.</p>
+          <span class="rd"><span class="zh-only">读全文 →</span><span class="en-only">Read →</span></span>
+        </a>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-head">
+        <span class="block-num"><span class="zh-only">肆</span><span class="en-only">IV</span></span>
+        <span class="block-title"><span class="zh-only">学习的发生 · 从摇篮到终身</span><span class="en-only">How Learning Occurs · From Cradle to Lifelong</span></span>
+      </div>
+      <p class="block-desc zh-only">学习不是发现,而是发生——从 0-3 岁那扇正在关闭的窗,到穿越一生的生存力。</p><p class="block-desc en-only">Learning is not discovery but occurrence — from the closing 0–3 window to a survival power that spans a lifetime.</p>
+      <div class="art-grid">
+        <a class="art" href="/column/what-is-education/">
+          <span class="k"><span class="zh-only">今日长文 · 两万字美文</span><span class="en-only">Long Read · 20,000 words</span></span>
+          <h4><span class="zh-only">教育是什么？</span><span class="en-only">What Is Education?</span></h4>
+          <p class="zh-only">有一个教育在发生,有一个教育在证明发生。收据的王朝、尺子的政变、被抵押的现在、沉默的第三者、教不了的那一步——十二章长卷,把教育还给发生。</p><p class="en-only">One education occurs; another merely proves it occurred. Twelve chapters that give education back to occurrence.</p>
+          <span class="rd"><span class="zh-only">读全文 →</span><span class="en-only">Read →</span></span>
+        </a>
+        <a class="art" href="/column/gifted-child/">
+          <span class="k"><span class="zh-only">王博士与SDE</span><span class="en-only">Dr. Wang & SDE</span></span>
+          <h4><span class="zh-only">天才儿童，为何泯然众人？</span><span class="en-only">Why Do Gifted Children Fade?</span></h4>
+          <p class="zh-only">每个婴儿降生时,都是一台惊人的学习机器。可为什么许多聪慧的孩子,长大后却泯然众人？——0-3 岁那扇正在关闭的窗。</p><p class="en-only">Every infant is an astonishing learning machine — so why do so many bright children fade? The 0–3 window that is quietly closing.</p>
+          <span class="rd"><span class="zh-only">读全文 →</span><span class="en-only">Read →</span></span>
+        </a>
+        <a class="art" href="/column/how-do-you-learn-what-you-dont-know/">
+          <span class="k"><span class="zh-only">据《大学的终结与重生》</span><span class="en-only">From The End & Rebirth of the University</span></span>
+          <h4><span class="zh-only">你如何学会你不知道的东西？</span><span class="en-only">How Do You Learn What You Don't Know?</span></h4>
+          <p class="zh-only">苏格拉底之问悬置两千五百年:回忆说、归纳说全部落入新悖论,因为它们共享同一个假设:学习=发现。真相是:认知不是发现,而是发生。</p><p class="en-only">A 2,500-year paradox — recollection and induction both fail because they assume learning is discovery. It isn't: cognition occurs.</p>
+          <span class="rd"><span class="zh-only">读全文 →</span><span class="en-only">Read →</span></span>
+        </a>
+        <a class="art" href="/column/learning-is-survival/">
+          <span class="k"><span class="zh-only">据《人生的真谛》</span><span class="en-only">From The Meaning of Life</span></span>
+          <h4><span class="zh-only">学习力就是生存力</span><span class="en-only">Learning Power Is Survival Power</span></h4>
+          <p class="zh-only">学习不是背单词,是建立纠缠。一个不会学习的人生存空间极窄,一个善于学习的文明能穿越千年。而中庸维持了纠缠使文明长久,却也可能陷入停滞。</p><p class="en-only">Learning is not memorizing words but building entanglement — a civilization that learns can cross millennia.</p>
+          <span class="rd"><span class="zh-only">读全文 →</span><span class="en-only">Read →</span></span>
+        </a>
+      </div>
+    </div>
+
+    <div class="tailnote">
+      <p class="zh-only">教育发生学长文持续增补中——更多长文、专著导读与 SDE 智能体品尝将陆续汇入本栏。</p>
+      <p class="en-only">The genesis-pedagogy collection keeps growing — more essays, monograph guides and SDE agent tastings will gather here.</p>
       <div class="crosslinks">
         <a href="/" class="zh-only">← 返回首页</a><a href="/" class="en-only">← Back home</a>
         <a href="/#daily" class="zh-only">每日更新</a><a href="/#daily" class="en-only">Daily updates</a>
