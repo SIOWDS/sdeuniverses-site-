@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>发现VS发生 · Discovery vs Genesis | SDE Universes</title>
+<meta name="description" content="同一个问题，两副眼睛。范式对照实验：同一副模态三宫，从「照对象」翻转成「照发生」——答案的整个地基就换了。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=EB+Garamond:wght@400;500&family=Noto+Serif+SC:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#F5EFE0;--card:#FAF6EC;--card2:#F0E8D3;--gold:#8A6817;--text:#2A2315;--text2:#6B5D47;--muted:#98886C;--border:rgba(138,104,23,0.22);--border2:rgba(138,104,23,0.10);--accent:#7A4A8C;--accent2:#9560A8;--dis:#3E5F80;--dis2:#2C4762;--disbg:#EDF2F7;--gen:#A8322E;--gen2:#7E211E;--genbg:#F7EDE9}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Noto Serif SC','EB Garamond',Georgia,serif;line-height:1.75;overflow-x:hidden}
+body.en{font-family:'EB Garamond','Playfair Display',Georgia,serif}
+body.en .zh-only{display:none}
+body.zh .en-only{display:none}
+a{color:inherit}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;flex-direction:column;padding:0.6rem 3rem 0.5rem;background:rgba(245,239,224,0.9);backdrop-filter:blur(12px);border-bottom:1px solid var(--border2)}
+.nav-bar-main{display:flex;align-items:center;justify-content:space-between}
+.nav-logo{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;color:var(--gold);letter-spacing:0.05em;text-decoration:none}
+.nav-links{display:flex;align-items:center;gap:1.6rem}
+.nav-links a{color:var(--text2);text-decoration:none;font-size:0.85rem;letter-spacing:0.1em;transition:color 0.2s}
+.nav-links a:hover{color:var(--accent)}
+.nav-links a.here{color:var(--accent);font-weight:600}
+.nav-bar-sub{display:flex;gap:1.6rem;padding-top:0.35rem}
+.nav-bar-sub a{text-decoration:none;font-size:0.9rem;letter-spacing:0.06em}
+.nav-bar-sub a[href="#pair"]{color:var(--accent)}
+.nav-bar-sub a[href="#bench"]{color:var(--dis)}
+.nav-bar-sub a[href="#method"]{color:var(--gen)}
+.lang-toggle{display:flex;background:var(--card);border:1px solid var(--border);border-radius:20px;overflow:hidden}
+.lang-btn{padding:0.3rem 0.8rem;font-size:0.75rem;border:none;background:transparent;color:var(--text2);cursor:pointer;font-family:inherit}
+.lang-btn.active{background:var(--accent);color:#fff;font-weight:600}
+.wrap{max-width:1040px;margin:0 auto;padding:0 2rem}
+
+/* ── HERO: 分体式 ── */
+header.hero{min-height:70vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:9.5rem 2rem 4rem;position:relative;overflow:hidden}
+.hero-split{position:absolute;inset:0;background:linear-gradient(100deg,#3E5F8014 0%,#3E5F8006 42%,transparent 50%,#A8322E06 58%,#A8322E14 100%)}
+.hero-seam{position:absolute;left:50%;top:0;bottom:0;width:1px;background:linear-gradient(180deg,transparent,rgba(122,74,140,0.34) 30%,rgba(122,74,140,0.34) 70%,transparent)}
+.eyebrow{position:relative;font-size:0.72rem;letter-spacing:0.28em;color:var(--accent);text-transform:uppercase;margin-bottom:1.5rem}
+.title{position:relative;font-family:'Playfair Display','Noto Serif SC',serif;font-size:clamp(2.5rem,7.5vw,5.2rem);font-weight:700;line-height:1.05;letter-spacing:0.02em}
+.title .d{color:var(--dis)}
+.title .v{color:var(--accent);font-size:0.5em;vertical-align:0.34em;margin:0 0.28em;font-style:italic;letter-spacing:0.04em}
+.title .g{color:var(--gen)}
+.sub{position:relative;font-size:clamp(1.05rem,2.3vw,1.32rem);color:var(--text2);max-width:660px;margin:1.7rem auto 2rem;font-style:italic;font-weight:300}
+.badge{position:relative;display:inline-flex;align-items:center;gap:0.5rem;background:var(--card);border:1px solid var(--accent);color:var(--accent);border-radius:30px;padding:0.5rem 1.3rem;font-size:0.78rem;letter-spacing:0.14em}
+.badge .dot{width:7px;height:7px;border-radius:50%;background:var(--accent);animation:pulse 1.8s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:0.35;transform:scale(0.85)}50%{opacity:1;transform:scale(1)}}
+
+section{padding:3.2rem 0}
+.lead{font-size:1.12rem;color:var(--text);line-height:1.95;border-left:3px solid var(--accent);padding:0.2rem 0 0.2rem 1.5rem;margin:0 0 3rem}
+.block{margin:0 0 3.4rem;scroll-margin-top:7rem}
+.block-head{display:flex;align-items:baseline;gap:0.85rem;border-bottom:1px solid var(--border);padding-bottom:0.7rem;margin-bottom:0.9rem}
+.block-num{font-family:'Playfair Display',serif;font-size:1.55rem;font-weight:700;color:var(--accent);line-height:1}
+.block-title{font-family:'Playfair Display','Noto Serif SC',serif;font-size:1.32rem;font-weight:600;color:var(--text);line-height:1.25}
+.block-desc{font-size:0.98rem;color:var(--text2);font-style:italic;margin:0 0 1.5rem;line-height:1.7}
+
+/* ── 双联文章卡 ── */
+.diptych{display:grid;grid-template-columns:1fr 1fr;gap:1.3rem}
+.art{display:flex;flex-direction:column;text-decoration:none;background:var(--card);border:1px solid var(--border2);border-radius:6px;padding:1.7rem 1.5rem 1.5rem;transition:transform .2s,box-shadow .2s}
+.art.dis{border-top:3px solid var(--dis);background:linear-gradient(180deg,var(--disbg),var(--card) 62%)}
+.art.gen{border-top:3px solid var(--gen);background:linear-gradient(180deg,var(--genbg),var(--card) 62%)}
+.art:hover{transform:translateY(-3px);box-shadow:0 12px 32px rgba(42,35,21,0.10)}
+.art .k{display:block;font-size:0.7rem;letter-spacing:0.14em;font-weight:600;margin-bottom:0.7rem}
+.art.dis .k{color:var(--dis)}
+.art.gen .k{color:var(--gen)}
+.art .q{font-size:0.9rem;color:var(--muted);margin-bottom:0.3rem;letter-spacing:0.02em}
+.art h3{font-family:'Playfair Display','Noto Serif SC',serif;font-size:1.18rem;font-weight:600;margin-bottom:0.75rem;line-height:1.45}
+.art.dis h3{color:var(--dis2)}
+.art.gen h3{color:var(--gen2)}
+.art p{font-size:0.93rem;color:var(--text2);line-height:1.8;flex:1}
+.art .rd{display:inline-block;margin-top:0.9rem;font-size:0.84rem;letter-spacing:0.05em;font-weight:600}
+.art.dis .rd{color:var(--dis)}
+.art.gen .rd{color:var(--gen)}
+
+/* ── 签名元素：对照台 ── */
+.bench{border:1px solid var(--border);border-radius:8px;overflow:hidden;background:var(--card)}
+.bench-head{display:grid;grid-template-columns:96px 1fr 1fr;background:var(--card2);border-bottom:1px solid var(--border)}
+.bh{padding:0.85rem 1.1rem;font-size:0.76rem;letter-spacing:0.22em;font-weight:700}
+.bh.k{color:var(--muted);letter-spacing:0.14em}
+.bh.d{color:var(--dis);border-left:1px solid var(--border);background:var(--disbg)}
+.bh.g{color:var(--gen);border-left:1px solid var(--border);background:var(--genbg)}
+.brow{display:grid;grid-template-columns:96px 1fr 1fr;border-bottom:1px solid var(--border2)}
+.brow:last-child{border-bottom:none}
+.brow:hover .bc{background:rgba(122,74,140,0.035)}
+.bk{padding:1.05rem 0.9rem;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;gap:0.2rem;background:var(--card2)}
+.bk .mode{font-size:0.63rem;letter-spacing:0.16em;color:var(--accent);font-weight:600}
+.bk .attr{font-size:1.02rem;font-weight:700;color:var(--text)}
+.bc{padding:1.05rem 1.15rem;border-left:1px solid var(--border2);transition:background .18s}
+.bc .rdg{font-size:0.93rem;line-height:1.72;color:var(--text)}
+.bc .rx{display:block;margin-top:0.5rem;font-size:0.84rem;line-height:1.65;color:var(--text2);padding-left:0.85rem;border-left:2px solid var(--border2)}
+.bc.d .rx{border-left-color:rgba(62,95,128,0.4)}
+.bc.g .rx{border-left-color:rgba(168,50,46,0.4)}
+.bc .rx b{font-weight:600}
+.bc.d .rx b{color:var(--dis)}
+.bc.g .rx b{color:var(--gen)}
+.bench-foot{padding:1.35rem 1.4rem;background:linear-gradient(100deg,var(--disbg),var(--card2) 50%,var(--genbg));border-top:1px solid var(--border);text-align:center;font-size:1rem;line-height:1.85;color:var(--text)}
+.bench-foot b.d{color:var(--dis2)}
+.bench-foot b.g{color:var(--gen2)}
+.bench-note{margin-top:0.9rem;font-size:0.85rem;color:var(--muted);text-align:center;line-height:1.7}
+
+/* ── 母题 ── */
+.motif{background:linear-gradient(150deg,#231A2E,#1A1424);border-radius:10px;padding:2.6rem 2.2rem;text-align:center;position:relative;overflow:hidden}
+.motif .ml{font-size:0.68rem;letter-spacing:0.42em;color:var(--accent2);margin-bottom:1.1rem}
+.motif p{color:#E8DEEC;font-size:1.12rem;line-height:2;max-width:720px;margin:0 auto}
+.motif p b{color:#D9A8E8}
+.motif .src{margin-top:1.3rem;font-size:0.8rem;color:#8A7A94;letter-spacing:0.08em}
+
+.note{margin-top:2.6rem;text-align:center;background:var(--card2);border:1px dashed var(--accent);border-radius:8px;padding:1.8rem 1.5rem}
+.note p{color:var(--text2);font-size:0.98rem;line-height:1.85}
+.note b{color:var(--accent)}
+.crosslinks{display:flex;flex-wrap:wrap;gap:0.8rem;justify-content:center;margin-top:1.4rem}
+.crosslinks a{text-decoration:none;font-size:0.86rem;letter-spacing:0.08em;padding:0.5rem 1.1rem;border:1px solid var(--border);border-radius:24px;color:var(--text2);transition:all 0.2s;background:var(--card)}
+.crosslinks a:hover{border-color:var(--accent);color:var(--accent)}
+footer{border-top:1px solid var(--border2);margin-top:4rem;padding:2.5rem 2rem;text-align:center;color:var(--muted);font-size:0.78rem;letter-spacing:0.05em}
+footer a{color:var(--gold);text-decoration:none}
+
+@media(max-width:860px){
+  .bench-head{display:none}
+  .brow{grid-template-columns:1fr}
+  .bk{flex-direction:row;justify-content:flex-start;gap:0.7rem;padding:0.75rem 1.1rem;border-bottom:1px solid var(--border2)}
+  .bc{border-left:none;border-bottom:1px solid var(--border2)}
+  .bc.d{background:var(--disbg)}
+  .bc.g{background:var(--genbg)}
+  .bc::before{display:block;font-size:0.66rem;letter-spacing:0.2em;font-weight:700;margin-bottom:0.45rem}
+  .bc.d::before{content:"发现学读作";color:var(--dis)}
+  .bc.g::before{content:"发生学读作";color:var(--gen)}
+  body.en .bc.d::before{content:"DISCOVERY READS"}
+  body.en .bc.g::before{content:"GENESIS READS"}
+}
+@media(max-width:640px){
+  nav{padding:0.55rem 1rem 0.45rem}
+  .nav-bar-sub{justify-content:flex-start;gap:1.1rem;overflow-x:auto;padding-bottom:0.15rem}
+  .nav-links{gap:1rem}
+  .nav-links a.sib{display:none}
+  .diptych{grid-template-columns:1fr}
+  header.hero{padding:7.5rem 1.2rem 3rem;min-height:auto}
+  .motif{padding:2rem 1.3rem}
+  .wrap{padding:0 1.1rem}
+}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body class="zh">
+
+<nav>
+  <div class="nav-bar-main">
+  <a class="nav-logo" href="/">SDE Universes</a>
+  <div class="nav-links">
+    <a href="/" class="zh-only">首页</a><a href="/" class="en-only">Home</a>
+    <a href="/education/" class="sib zh-only">教育专栏</a><a href="/education/" class="sib en-only">Education</a>
+    <a href="/health/" class="sib zh-only">健康专栏</a><a href="/health/" class="sib en-only">Health</a>
+    <a href="/business/" class="sib zh-only">商业专栏</a><a href="/business/" class="sib en-only">Business</a>
+    <a href="/discovery-vs-genesis/" class="sib here zh-only">发现VS发生</a><a href="/discovery-vs-genesis/" class="sib here en-only">Discovery vs Genesis</a>
+    <a href="/philosophy/" class="sib zh-only">思想宇宙</a><a href="/philosophy/" class="sib en-only">Philosophy</a>
+    <div class="lang-toggle">
+      <button class="lang-btn active" onclick="setLang('zh')">中</button>
+      <button class="lang-btn" onclick="setLang('en')">EN</button>
+    </div>
+  </div>
+</div>
+  <div class="nav-bar-sub">
+    <a href="#pair" class="zh-only">对照双篇</a><a href="#pair" class="en-only">The Pair</a>
+    <a href="#bench" class="zh-only">对照台</a><a href="#bench" class="en-only">The Bench</a>
+    <a href="#method" class="zh-only">为什么要做对照</a><a href="#method" class="en-only">Why Contrast</a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="hero-split"></div><div class="hero-seam"></div>
+  <div class="eyebrow zh-only">SDE 范式对照实验</div><div class="eyebrow en-only">SDE PARADIGM CONTRAST</div>
+  <h1 class="title"><span class="d zh-only">发现</span><span class="d en-only">Discovery</span><span class="v">vs</span><span class="g zh-only">发生</span><span class="g en-only">Genesis</span></h1>
+  <p class="sub zh-only">同一个问题，换一副眼睛——答案的整个地基，就换了。</p>
+  <p class="sub en-only">One question, two pairs of eyes — and the entire foundation of the answer changes.</p>
+  <div class="badge"><span class="dot"></span><span class="zh-only">第一组 · AI 时代的教育困境 · 2 篇 · 持续增补</span><span class="en-only">Set I · The Education Predicament · 2 pieces</span></div>
+</header>
+
+<main class="wrap">
+  <section>
+    <p class="lead zh-only">这个专栏只做一件事：<b>把同一个问题，交给两个范式，各答一遍，然后把两份答卷并排摊开。</b>不是为了分个高下，而是因为——只有并排摆着，你才看得见那个平时看不见的东西：范式不是回答问题的方法，范式决定了你能问出什么问题。第一组实验，用的是同一个提问、同一副工具（模态三宫：粒子 · 波 · 场），只换一副眼睛。</p>
+    <p class="lead en-only">This column does one thing: <b>hand the same question to two paradigms, let each answer in full, then lay the two answers side by side.</b> Not to crown a winner — but because only side by side does the invisible thing show: a paradigm is not a method for answering questions; it decides which questions you can ask at all. Set I uses one question and one instrument (the modal triad: particle · wave · field) — and swaps only the eyes.</p>
+
+    <div class="block" id="pair">
+      <div class="block-head">
+        <span class="block-num"><span class="zh-only">壹</span><span class="en-only">I</span></span>
+        <span class="block-title"><span class="zh-only">第一组 · AI 时代的教育困境是什么？</span><span class="en-only">Set I · What Is the Education Predicament in the Age of AI?</span></span>
+      </div>
+      <p class="block-desc zh-only">两篇文章的标题一字不差，副标题分岔——这不是排版巧合，这就是实验本身。左边这副眼睛问：AI 把哪些教育对象弄坏了？右边这副眼睛问：受过教育的人，究竟是怎样被发生出来的？</p>
+      <p class="block-desc en-only">Both essays carry the identical title; only the subtitle forks — not a typographic coincidence, but the experiment itself. The left eye asks: which educational objects did AI break? The right eye asks: how does an educated person come to occur at all?</p>
+      <div class="diptych">
+        <a class="art dis" href="/column/discovery-vs-genesis-1/">
+          <span class="k"><span class="zh-only">一 / 二 · 发现学 · 约四千三百字</span><span class="en-only">I / II · DISCOVERY · ~4,300 chars</span></span>
+          <span class="q zh-only">AI 时代的教育困境是什么？</span><span class="q en-only">What is the education predicament in the age of AI?</span>
+          <h3><span class="zh-only">发现学思维 · 模态三宫的一次诊断</span><span class="en-only">A Discovery-Paradigm Diagnosis via the Modal Triad</span></h3>
+          <p class="zh-only">教育、学生、知识、AI，都是已然存在、等待观测的对象；粒子 / 波 / 场，是它们身上可被发现的三种客观属性。于是诊断＝测量损坏，对策＝修复。九条属性一一测出，实证背书扎实，处方句句落地——检测、恢复摩擦、重设结构。这是当下绝对的主流，而且它确实有用。可这场防守一直在退：你堵住一个洞，工具就替学生开出三个。</p>
+          <p class="en-only">Education, students, knowledge, AI — all pre-existing objects awaiting observation; particle / wave / field are three objective properties to be found on them. Diagnosis becomes damage assessment; the remedy, repair. Nine properties measured, each backed by solid empirical work, each prescription concrete — detect, restore friction, rebuild structure. This is the reigning mainstream, and it genuinely works. Yet the defense keeps retreating: plug one hole, the tool opens three.</p>
+          <span class="rd"><span class="zh-only">读一 / 二 →</span><span class="en-only">Read I / II →</span></span>
+        </a>
+        <a class="art gen" href="/column/discovery-vs-genesis-2/">
+          <span class="k"><span class="zh-only">二 / 二 · 发生学（SDE）· 约四千七百字</span><span class="en-only">II / II · GENESIS (SDE) · ~4,700 chars</span></span>
+          <span class="q zh-only">AI 时代的教育困境是什么？</span><span class="q en-only">What is the education predicament in the age of AI?</span>
+          <h3><span class="zh-only">发生学思维（SDE）· 模态三宫发生学的一次诊断</span><span class="en-only">A Genesis-Paradigm (SDE) Diagnosis via the Modal Triad</span></h3>
+          <p class="zh-only">同一副三宫，从「照对象」翻转成「照发生」：粒子 / 波 / 场不再是属性，而是三种发生学。于是每一处发现学读作「该有而缺失的现成品」的地方，发生学都读作「该点火而被绕过的发生」。方向一变，药方全变——不是把缺失的补给学生，而是把被绕过的那场发生，还给学生。</p>
+          <p class="en-only">The same triad, flipped from lighting up objects to lighting up occurrence: particle / wave / field are no longer properties but three genetic accounts. Everywhere Discovery reads a missing ready-made, Genesis reads an occurrence that should have ignited and was bypassed. Flip the direction and every remedy flips: not supplying what's missing, but giving back the occurrence that was routed around.</p>
+          <span class="rd"><span class="zh-only">读二 / 二 →</span><span class="en-only">Read II / II →</span></span>
+        </a>
+      </div>
+    </div>
+
+    <div class="block" id="bench">
+      <div class="block-head">
+        <span class="block-num"><span class="zh-only">贰</span><span class="en-only">II</span></span>
+        <span class="block-title"><span class="zh-only">对照台 · 九条属性，两种读法</span><span class="en-only">The Bench · Nine Properties, Two Readings</span></span>
+      </div>
+      <p class="block-desc zh-only">如果你只有三分钟，就读这张台子。左右两栏说的是同一件事实，读法却相反；每栏底下那一行，是它开出的药方。注意方向：左边全在「补」，右边全在「还」。</p>
+      <p class="block-desc en-only">If you have three minutes, read this bench. Both columns describe the same fact and read it in opposite directions; the indented line under each is the remedy it prescribes. Watch the direction: the left supplies what's missing, the right gives back what was bypassed.</p>
+
+      <div class="bench">
+        <div class="bench-head">
+          <div class="bh k"><span class="zh-only">模态 · 属性</span><span class="en-only">MODE</span></div>
+          <div class="bh d"><span class="zh-only">发现学读作</span><span class="en-only">DISCOVERY READS</span></div>
+          <div class="bh g"><span class="zh-only">发生学读作</span><span class="en-only">GENESIS READS</span></div>
+        </div>
+
+        <div class="brow">
+          <div class="bk"><span class="mode"><span class="zh-only">粒子</span><span class="en-only">PARTICLE</span></span><span class="attr"><span class="zh-only">整体</span><span class="en-only">Whole</span></span></div>
+          <div class="bc d"><div class="rdg"><span class="zh-only">学生手里握着成品，却没有整体把握——唯一能对抗碎片化的动作「亲手拼装」，被外包了出去。</span><span class="en-only">The student holds the finished product but has no grasp of the whole — the one act that fights fragmentation, assembling by hand, has been outsourced.</span><span class="rx"><b><span class="zh-only">药方</span><span class="en-only">Remedy</span></b> <span class="zh-only">检测代笔 · 过程留痕，证明这个整体是他自己拼的。</span><span class="en-only">Detect ghostwriting; demand drafts as proof he assembled it himself.</span></span></div></div>
+          <div class="bc g"><div class="rdg"><span class="zh-only">整体是「聚」出来的，不是「收」来的。这不是学生缺整体，而是成整体的发生根本没点火——占有可以事后补发，发生只能当场亲历。</span><span class="en-only">A whole is gathered, not received. The student does not lack a whole — the occurrence of wholing never ignited. Possession can be reissued later; occurrence can only be lived through on the spot.</span><span class="rx"><b><span class="zh-only">药方</span><span class="en-only">Remedy</span></b> <span class="zh-only">让 AI 当差异发生器，不当成品交付器——抛出碎片、张力、反例，逼整体在学生这里真的发生一次。</span><span class="en-only">Make AI a difference generator, not a product deliverer — throw out fragments, tensions, counter-examples.</span></span></div></div>
+        </div>
+
+        <div class="brow">
+          <div class="bk"><span class="mode"><span class="zh-only">粒子</span><span class="en-only">PARTICLE</span></span><span class="attr"><span class="zh-only">稳定</span><span class="en-only">Stability</span></span></div>
+          <div class="bc d"><div class="rdg"><span class="zh-only">工具一拿走，「知识」当场蒸发。作业篇篇满分，闭卷考试断崖式下跌——像贴在桌角的小抄，铃声一响什么都不剩。</span><span class="en-only">Take the tool away and the knowledge evaporates. Perfect homework, cliff-drop exams — like a cheat sheet taped to the desk: the bell rings, nothing remains.</span><span class="rx"><b><span class="zh-only">药方</span><span class="en-only">Remedy</span></b> <span class="zh-only">闭卷、手写、当堂完成——把测量搬回没有工具的现场。</span><span class="en-only">Closed-book, handwritten, in-class — move measurement back to a tool-free setting.</span></span></div></div>
+          <div class="bc g"><div class="rdg"><span class="zh-only">稳定是被解决的差异沉淀下来的。稳定度为零，不是仓储故障——是这里根本没有任何差异，被拿去解决过。</span><span class="en-only">Stability is resolved difference, settled. Zero retention is not a storage fault — no difference was ever taken up and resolved here at all.</span><span class="rx"><b><span class="zh-only">药方</span><span class="en-only">Remedy</span></b> <span class="zh-only">AI 尽情抛出未解决的差异，但把「解决」这一步的权利，留在学生手里。</span><span class="en-only">Let AI throw unresolved differences freely — but keep the act of resolving in the student's hands.</span></span></div></div>
+        </div>
+
+        <div class="brow">
+          <div class="bk"><span class="mode"><span class="zh-only">粒子</span><span class="en-only">PARTICLE</span></span><span class="attr"><span class="zh-only">独立</span><span class="en-only">Independence</span></span></div>
+          <div class="bc d"><div class="rdg"><span class="zh-only">我们本想培养「独立的知者」，得到的却是「一个与 AI 绑定的操作员」：工具在，无所不能；工具走，寸步难行。</span><span class="en-only">We meant to raise an independent knower; we got an operator bound to the tool. With it, omnipotent; without it, stranded.</span><span class="rx"><b><span class="zh-only">药方</span><span class="en-only">Remedy</span></b> <span class="zh-only">过程留痕：草稿、修改记录、中间版本。</span><span class="en-only">Process traces: drafts, revision logs, intermediate versions.</span></span></div></div>
+          <div class="bc g"><div class="rdg"><span class="zh-only">独立是发生完成的签名。学生握着的是借来的粒子，不是自己生成的——发生被外包了，所以签名永远不出现。</span><span class="en-only">Independence is the signature of a completed occurrence. The student holds a borrowed particle. The occurrence was outsourced, so the signature never arrives.</span><span class="rx"><b><span class="zh-only">药方</span><span class="en-only">Remedy</span></b> <span class="zh-only">让 AI 驱动学生自己的发生，而不是替他发生。</span><span class="en-only">Use AI to drive the student's own occurrence — never to perform it for him.</span></span></div></div>
+        </div>
+
+        <div class="brow">
+          <div class="bk"><span class="mode"><span class="zh-only">波</span><span class="en-only">WAVE</span></span><span class="attr"><span class="zh-only">轨迹</span><span class="en-only">Trajectory</span></span></div>
+          <div class="bc d"><div class="rdg"><span class="zh-only">学生一步跨到终点，中间那段路一步没走。把题目里的数字换一个，他立刻就崩了——他拥有的是终点，不是通往终点的路。</span><span class="en-only">One leap to the endpoint, the middle stretch never walked. Change one number and he collapses — he owns the destination, not the road to it.</span><span class="rx"><b><span class="zh-only">药方</span><span class="en-only">Remedy</span></b> <span class="zh-only">show your work，逼他把中间那段路补走完。</span><span class="en-only">Show your work — force him back through the middle stretch.</span></span></div></div>
+          <div class="bc g"><div class="rdg"><span class="zh-only">路是被裁出来的，不是被走的。在路被裁出来之前，根本没有轨迹可跳；AI 交付终点，意味着这条路永远不被裁——自由律被关掉了。</span><span class="en-only">A path is cut, not walked. Before it is cut there is no trajectory to skip; delivering the endpoint means the path is never cut at all — the law of freedom is switched off.</span><span class="rx"><b><span class="zh-only">药方</span><span class="en-only">Remedy</span></b> <span class="zh-only">抛出「路还不存在于这个学生」的问题。AI 能帮着抛，但不能替着裁。</span><span class="en-only">Pose problems whose path does not yet exist for this student. AI may help throw; it must not cut.</span></span></div></div>
+        </div>
+
+        <div class="brow">
+          <div class="bk"><span class="mode"><span class="zh-only">波</span><span class="en-only">WAVE</span></span><span class="attr"><span class="zh-only">速度</span><span class="en-only">Speed</span></span></div>
+          <div class="bc d"><div class="rdg"><span class="zh-only">虚假的快：飙升的是搬运的速度，长本事的速度纹丝未动。像全靠导航开车十年的人，关掉导航依旧认不得路。</span><span class="en-only">A false speed: what soars is haulage; competence has not budged. Like someone who drove by GPS for ten years and still cannot find the road without it.</span><span class="rx"><b><span class="zh-only">药方</span><span class="en-only">Remedy</span></b> <span class="zh-only">抵抗效率崇拜，主动慢下来。</span><span class="en-only">Resist the efficiency cult; deliberately slow down.</span></span></div></div>
+          <div class="bc g"><div class="rdg"><span class="zh-only">提速本身就是病：为速度而优化，是 D3 的过度优化——高效而贫血。这病早在 AI 之前就有了，AI 只是那台终极提速器。</span><span class="en-only">The drive to accelerate is itself the disease: optimizing for speed is D3 over-optimization — efficient and anemic. The illness predates AI; AI is merely the ultimate accelerator.</span><span class="rx"><b><span class="zh-only">药方</span><span class="en-only">Remedy</span></b> <span class="zh-only">刻意护住余裕与摩擦；只在不涉及发生的苦力活上，才放心用快。</span><span class="en-only">Guard slack and friction on purpose; spend the speed only on drudgery where nothing occurs.</span></span></div></div>
+        </div>
+
+        <div class="brow">
+          <div class="bk"><span class="mode"><span class="zh-only">波</span><span class="en-only">WAVE</span></span><span class="attr"><span class="zh-only">粘性</span><span class="en-only">Friction</span></span></div>
+          <div class="bc d"><div class="rdg"><span class="zh-only">摩擦被系统性抹平，而摩擦正是让知识粘住的那部分力气。查字典很费事，可正因为费事你记住了；问 AI 一秒就懂，转头就忘。</span><span class="en-only">Friction is systematically smoothed away — and friction is exactly the effort that makes knowledge stick. The dictionary is a chore, and that chore is why you remember; ask AI and it's gone by the next breath.</span><span class="rx"><b><span class="zh-only">药方</span><span class="en-only">Remedy</span></b> <span class="zh-only">把「必要难度」请回来：手写、口试、限时、禁用工具。</span><span class="en-only">Bring back desirable difficulties: handwriting, orals, time limits, tool bans.</span></span></div></div>
+          <div class="bc g"><div class="rdg"><span class="zh-only">摩擦就是发生从内部的体感——你感到的那股阻力，就是那束还没被解决的差异本身。抹掉它，就是抹掉发生，没有别的。AI 在学生的模式转换点火之前，就抢先把张力释放了。</span><span class="en-only">Friction is what occurrence feels like from inside — the resistance you feel is the unresolved difference itself. Erase it and you erase the occurrence, nothing less. AI discharges the tension before the student's own switch ignites.</span><span class="rx"><b><span class="zh-only">药方</span><span class="en-only">Remedy</span></b> <span class="zh-only">让 AI 制造更狠的摩擦：「现在把你自己的答案打破」「从相反的立场再论证一遍」。摩擦当催化剂，不当障碍。</span><span class="en-only">Have AI manufacture harsher friction: &ldquo;now break your own answer,&rdquo; &ldquo;argue it from the opposite side.&rdquo; Friction as catalyst, not obstacle.</span></span></div></div>
+        </div>
+
+        <div class="brow">
+          <div class="bk"><span class="mode"><span class="zh-only">场</span><span class="en-only">FIELD</span></span><span class="attr"><span class="zh-only">连接</span><span class="en-only">Connection</span></span></div>
+          <div class="bc d"><div class="rdg"><span class="zh-only">AI 成了替代知识源，师生与生生的关系网被削弱。从前一道难题会在宿舍夜谈里争到面红耳赤，如今各自问一句 AI 便就此了结。</span><span class="en-only">AI becomes a substitute source and the web of relations thins. A hard problem once sparked an argument late in the dorm; now each asks AI privately and it's over.</span><span class="rx"><b><span class="zh-only">药方</span><span class="en-only">Remedy</span></b> <span class="zh-only">用制度手段把关系补回来：小班、导师制、更多面对面。</span><span class="en-only">Rebuild relations institutionally: small classes, tutorials, more face time.</span></span></div></div>
+          <div class="bc g"><div class="rdg"><span class="zh-only">缠绕在先。这不是 AI 切断了现成的连接，而是纠缠土壤里多了一台机器，于是学生、教师、知识都在被重新发生。问题不是修复，是要培育出什么样的新纠缠。</span><span class="en-only">Entanglement comes first. AI did not sever ready-made links — a machine has entered the entangled soil, and student, teacher and knowledge are all being re-occurred. The question is not repair but which new entanglement to cultivate.</span><span class="rx"><b><span class="zh-only">药方</span><span class="en-only">Remedy</span></b> <span class="zh-only">培育「AI 提高学生发生能力」的纠缠，而不是「AI 替代学生」的纠缠。</span><span class="en-only">Cultivate the entanglement where AI raises the student's power to occur — not the one where it replaces him.</span></span></div></div>
+        </div>
+
+        <div class="brow">
+          <div class="bk"><span class="mode"><span class="zh-only">场</span><span class="en-only">FIELD</span></span><span class="attr"><span class="zh-only">次序</span><span class="en-only">Order</span></span></div>
+          <div class="bc d"><div class="rdg"><span class="zh-only">先修依赖被随意越过——还没弄懂微积分，也能让 AI「用上」微积分把题做完。地基被跳过，学生悬浮在自己并未搭起的高层之上。</span><span class="en-only">Prerequisites are freely leapfrogged — calculus not understood, yet AI &ldquo;uses&rdquo; calculus to finish the problem. The foundation is skipped; the student floats on a storey he never built.</span><span class="rx"><b><span class="zh-only">药方</span><span class="en-only">Remedy</span></b> <span class="zh-only">强制次序，把先修依赖管得更严。</span><span class="en-only">Enforce the order; police prerequisites harder.</span></span></div></div>
+          <div class="bc g"><div class="rdg"><span class="zh-only">知识没有内在的学习顺序。那副次序是一副发生的脚手架，为一个特定的 E——只有人类在处理知识——临时搭起来的；而现在 E 变了，脚手架正在失效。</span><span class="en-only">Knowledge has no intrinsic learning order. That order is scaffolding for occurrence, raised for one particular E — humans alone handling knowledge. E has changed; the scaffold is failing.</span><span class="rx"><b><span class="zh-only">药方</span><span class="en-only">Remedy</span></b> <span class="zh-only">次序从「固定且普适」转向「个人化且由发生驱动」——每个学生的那条路，在他自己的 E 里现场裁出来。</span><span class="en-only">Shift order from fixed-and-universal to personal-and-occurrence-driven — each student's path cut live in his own E.</span></span></div></div>
+        </div>
+
+        <div class="brow">
+          <div class="bk"><span class="mode"><span class="zh-only">场</span><span class="en-only">FIELD</span></span><span class="attr"><span class="zh-only">结构</span><span class="en-only">Structure</span></span></div>
+          <div class="bc d"><div class="rdg"><span class="zh-only">文凭与能力脱钩：有学位，不一定会做。信号失灵、权威危机、考核方式普遍失效。</span><span class="en-only">The credential decouples from competence: a degree no longer implies the work can be done. The signal fails, authority frays, assessment breaks down.</span><span class="rx"><b><span class="zh-only">药方</span><span class="en-only">Remedy</span></b> <span class="zh-only">重设结构：新的文凭、新的评价、新的角色，堵住 AI 撕开的信号漏洞。</span><span class="en-only">Reset the structure: new credentials, new assessment, new roles, to plug the signalling leak.</span></span></div></div>
+          <div class="bc g"><div class="rdg"><span class="zh-only">这个场正卡在介生态：旧的显露态（学位即信号、教师即权威）正在死去，新的还没结晶出来。发现学对着旧显露态做心肺复苏；发生学看见的是「正在重生」。</span><span class="en-only">The field is stuck in the intergenerative state: the old manifestation — degree-as-signal, teacher-as-authority — is dying and the new has not yet crystallized. Discovery performs CPR on the corpse; Genesis sees a birth underway.</span><span class="rx"><b><span class="zh-only">药方</span><span class="en-only">Remedy</span></b> <span class="zh-only">围绕那颗外包不掉的核重新结晶——判根 · 抓核定向 · 自我界的赋义与承受。把制度重心从认证「搬运得对不对」，挪到认证「发生得成不成」。</span><span class="en-only">Re-crystallize around the core that cannot be outsourced — judging the root, seizing and orienting it, conferring and bearing meaning. Move certification from &ldquo;hauled it correctly?&rdquo; to &ldquo;did it occur?&rdquo;</span></span></div></div>
+        </div>
+
+        <div class="bench-foot">
+          <span class="zh-only">九条属性，<b class="d">发现学都读成「该有而缺失的现成品」</b>，<b class="g">发生学都读成「该点火而被绕过的发生」</b>。</span>
+          <span class="en-only">Across all nine, <b class="d">Discovery reads a ready-made that should be there and isn't</b>; <b class="g">Genesis reads an occurrence that should have ignited and was routed around</b>.</span>
+        </div>
+      </div>
+      <p class="bench-note zh-only">这张台子是两篇长文的压缩。每一行的细节、证据与来龙去脉，都在正文里。</p>
+      <p class="bench-note en-only">This bench compresses both essays. The evidence and reasoning behind every row live in the full texts.</p>
+    </div>
+
+    <div class="motif">
+      <div class="ml zh-only">母 题</div><div class="ml en-only">THE MOTIF</div>
+      <p class="zh-only">AI 没有制造教育的困境。它把教育一直暗藏的困境——<b>把「发生」误当成「发现」</b>——逼到了台面上。困境不是 AI 在毁掉学习，而是一个把学习当搬运的旧范式，撞上了一台搬运得比任何人都好的机器。</p>
+      <p class="en-only">AI did not create the education predicament. It forced into the open the one education had been hiding all along — <b>mistaking occurrence for discovery</b>. The trouble is not that AI is destroying learning; it is that an old paradigm treating learning as haulage has collided with a machine that hauls better than anyone.</p>
+      <div class="src zh-only">— 二 / 二 · 发生学诊断</div><div class="src en-only">— II / II · The Genesis Diagnosis</div>
+    </div>
+
+    <div class="block" id="method" style="margin-top:3.4rem">
+      <div class="block-head">
+        <span class="block-num"><span class="zh-only">叁</span><span class="en-only">III</span></span>
+        <span class="block-title"><span class="zh-only">为什么要做对照，而不是直接讲结论</span><span class="en-only">Why Contrast, Rather Than Just State the Conclusion</span></span>
+      </div>
+      <p class="block-desc zh-only">因为一个范式最要命的地方，从来不在它答错的题上，而在它问不出的题上——而这一点，只有把另一副眼睛并排放上来，才看得见。</p>
+      <p class="block-desc en-only">Because what is fatal about a paradigm is never the questions it answers wrong, but the ones it cannot ask — and that only becomes visible when you set another pair of eyes beside it.</p>
+      <div class="note" style="margin-top:0;text-align:left">
+        <p class="zh-only">直接讲「世界不是被发现的，是发生的」，听上去像一句口号，你可以点头，也可以不。但如果先让发现学把话说尽——说得精确、扎实、句句落地，甚至承认它<b>确实有用</b>——然后让同一个问题在发生学里再走一遍，你会亲眼看见那道地平线：发现学能没完没了地打补丁，却始终问不出那个更靠底的问题。<b>不是它答错了，是它问不出。</b><br><br>所以这个专栏的规矩是：<b>对照的双方都必须被认真对待。</b>发现学那一篇不是稻草人——它引了生成效应、流畅性错觉、必要难度、测试效应、信号理论、脚手架、实践共同体，是这个领域最好的说法。只有把它写到最强，翻面的那一下才有力道。<br><br>后续会有更多组：同一个问题，两副眼睛，一次一组。</p>
+        <p class="en-only">Say &ldquo;the world is not discovered but occurs&rdquo; outright and it sounds like a slogan — you can nod, or not. But let Discovery speak first, in full, precisely and concretely, and even grant that <b>it genuinely works</b>; then send the same question through Genesis. You will see the horizon yourself: Discovery can patch endlessly and still never ask the question underneath. <b>It is not that it answers wrong. It cannot ask.</b><br><br>Hence this column's rule: <b>both sides must be taken seriously.</b> The Discovery essay is no straw man — it draws on the generation effect, the fluency illusion, desirable difficulties, the testing effect, signalling theory, scaffolding, communities of practice. It is the best the field has to say. Only written at full strength does the flip land.<br><br>More sets will follow: one question, two pairs of eyes, one set at a time.</p>
+      </div>
+    </div>
+
+    <div class="note">
+      <p class="zh-only">对照实验持续增补中——更多「同一个问题，两副眼睛」的成组实验，将陆续汇入本栏。</p>
+      <p class="en-only">The experiment keeps going — more paired sets, one question through two paradigms, will gather here.</p>
+      <div class="crosslinks">
+        <a href="/" class="zh-only">← 返回首页</a><a href="/" class="en-only">← Back home</a>
+        <a href="/education/" class="zh-only">教育专栏</a><a href="/education/" class="en-only">Education</a>
+        <a href="/philosophy/" class="zh-only">思想宇宙</a><a href="/philosophy/" class="en-only">Philosophy</a>
+        <a href="/#taste" class="zh-only">SDE 智能体免费品尝</a><a href="/#taste" class="en-only">Free SDE agent taste</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="zh-only">SDE Universes · 显露 · 差异 · 纠缠 &nbsp;|&nbsp; 德麦国际 · 王德生 &nbsp;|&nbsp; <a href="/">sdeuniverses.com</a></div>
+  <div class="en-only">SDE Universes · Show · Difference · Entanglement &nbsp;|&nbsp; Demai International · Desheng Wang &nbsp;|&nbsp; <a href="/">sdeuniverses.com</a></div>
+</footer>
+
+<script>
+function setLang(lang){
+  document.body.className=lang;
+  document.querySelectorAll('.lang-btn').forEach(b=>b.classList.toggle('active',(b.textContent==='中'&&lang==='zh')||(b.textContent==='EN'&&lang==='en')));
+  document.documentElement.lang=lang;
+}
+</script>
+</body>
+</html>
