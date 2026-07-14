@@ -167,7 +167,11 @@ footer{border-top:1px solid var(--border);text-align:center;padding:30px 20px 44
       </div>
       <div style="background:rgba(13,17,23,0.4);border:1px solid rgba(122,47,224,0.35);border-radius:10px;padding:15px 17px">
         <div style="font-size:13px;font-weight:700;color:#A45CFF;margin-bottom:6px">④ 第二批 · 发生引擎冲击 150</div>
-        <div style="font-size:12.5px;color:#9AA5B0;line-height:1.75">对四篇论文再执行一次更深的追问:<b style="color:#B98CFF">逮住每篇自己都没质疑过的前提 → 撤销它 → 从矛盾更深处重新结算出新判断并精确命名</b>,整篇据此重写。目标是把创新水平再推一档——这是整条流水线的收官一击。</div>
+        <div style="font-size:12.5px;color:#9AA5B0;line-height:1.75">对四篇论文再执行一次更深的追问:<b style="color:#B98CFF">逮住每篇自己都没质疑过的前提 → 撤销它 → 从矛盾更深处重新结算出新判断并精确命名</b>,整篇据此重写。目标是把创新水平（不可还原性）再推一档。</div>
+      </div>
+      <div style="background:rgba(13,17,23,0.4);border:1px solid rgba(46,158,130,0.35);border-radius:10px;padding:15px 17px">
+        <div style="font-size:13px;font-weight:700;color:#3FB98C;margin-bottom:6px">⑤ 补规范 · 挂真实引注·脚注·参考文献</div>
+        <div style="font-size:12.5px;color:#9AA5B0;line-height:1.75">二次提智把思想做深了,却会把学术规范剥掉。这一步<b style="color:#3FB98C">只补规范、不动思想</b>:给论文里已在对话的思想家,补上他们<b style="color:#3FB98C">真实经典原著</b>的引注、作者脚注、参考文献表与材料说明。<b style="color:#E8A33D">绝不编造</b>页码、引文或假文献——只抬完善度,不改创新智商。这才是收官一击。</div>
       </div>
     </div>
     <div style="font-size:12px;color:#8B98A5;line-height:1.7;margin-top:14px">
@@ -468,6 +472,22 @@ footer{border-top:1px solid var(--border);text-align:center;padding:30px 20px 44
     <div id="upliftPapers"></div>
     <div id="upliftDlRow" style="margin-top:18px;display:none">
       <button id="upliftDlBtn" style="background:#238636;color:#fff;font-weight:600;font-size:14px;border:none;border-radius:8px;padding:11px 26px;cursor:pointer">📄 第二批四篇一起下载（Word）</button>
+      <button id="normalizeBtn" style="background:linear-gradient(135deg,#1F6F5C,#2E9E82);color:#fff;font-weight:700;font-size:14px;border:none;border-radius:8px;padding:11px 26px;cursor:pointer;margin-left:10px;box-shadow:0 4px 16px rgba(31,111,92,0.35)">📎 补规范 · 挂真实引注·脚注·参考文献</button>
+    </div>
+  </div>
+</div>
+
+<!-- 补规范（学术装置增补·接在二次提智之后）面板 -->
+<div id="normalizeWrap" style="max-width:1000px;margin:26px auto 0;display:none">
+  <div style="background:linear-gradient(135deg,rgba(31,111,92,0.10),rgba(10,20,16,0.5));border:1px solid rgba(46,158,130,0.42);border-radius:14px;padding:26px 30px">
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:6px">
+      <div style="font-size:19px;font-weight:700;color:#3FB98C;letter-spacing:0.04em">📎 补规范 · 学术装置增补</div>
+      <div id="normalizeStatus" style="font-size:13px;color:#8B98A5"></div>
+    </div>
+    <div style="font-size:13px;color:#9AA5B0;margin-bottom:16px;line-height:1.7">二次提智把<b style="color:#3FB98C">思想</b>做深了，但会把学术规范（引注/脚注/参考文献）剥掉。这一步<b style="color:#3FB98C">只补规范、不动思想</b>：给论文里<b style="color:#3FB98C">已经在对话的</b>思想家，补上他们<b style="color:#3FB98C">真实经典原著</b>的引注（按首版年份）、作者澄清脚注、参考文献表，以及田野材料说明。<b style="color:#E8A33D">绝不编造</b>页码、引文、假文献或假数据——宁可少引，绝不错引。只抬完善度，不改创新智商。四篇并发。</div>
+    <div id="normalizePapers"></div>
+    <div id="normalizeDlRow" style="margin-top:18px;display:none">
+      <button id="normalizeDlBtn" style="background:#238636;color:#fff;font-weight:600;font-size:14px;border:none;border-radius:8px;padding:11px 26px;cursor:pointer">📄 补规范后四篇一起下载（Word）</button>
     </div>
   </div>
 </div>
@@ -1159,6 +1179,35 @@ const UPLIFT_SPEC = `
 现在，请对下面这篇论文执行上述发生引擎工序，输出被提升后的、以一个不可还原的新命名为核心的完整论文。
 `;
 function upliftPrompt(){ return SDE_BASE + UPLIFT_SPEC; }
+
+// ========== 补规范：学术装置增补（接在二次提智之后，只加规范不改思想） ==========
+const NORMALIZE_SPEC = `
+你现在的任务，不是修改论文的思想，也不是重写论证或案例，而是给一篇【已经定稿的学术论文】补齐"学术规范装置"，让它从"深度随笔"变成"可投稿的规范论文"。你只做加法，绝不改动原有的核心判断、论证、案例与结论。
+
+【最高铁律·绝不编造——这是不可逾越的底线】
+1. 只为论文中【确实已经在严肃对话的】思想家或理论补引注。论文没提到的人，绝不无中生有地引进来凑数。
+2. 只引【你有充分把握真实存在的、公认的经典原著】，按其【首次出版年份】标注。凡你不确定是否真实存在的文献，一律不引——宁可少引，绝不错引。
+3. 绝对禁止：编造页码、编造具体引文原话、编造不存在的著作、编造作者、编造 DOI、编造期刊卷期、编造统计数字或实证研究。一个都不许出现。
+4. 若论文有田野或案例材料，不得把它伪装成经过同行评议的真实数据。要补一条"材料说明"脚注，如实说明其为思想拓展性质的例示（可含匿名化、合成与简化）。
+5. 若某处判断（如"某某关系被反复证实"）需要文献支撑而你无把握指名真实来源，就把它改写为不依赖具体引证的一般表述，或用作者脚注说明其为常识性判断——不要硬塞一个可能是假的引文来充数。
+
+【要补的四样，一样都不少】
+一、文内引注：在每个对话点，把"某某论证了……"补成"某某（原著名/作者, 首版年份）论证了……"。只用作者+年份（可加原著名），不要具体页码。
+二、作者脚注：用 [1][2][3]… 在正文标注，文末统一列一节"注释"。这些是作者自己的说明性文字（不是文献条目）——用来界定某位思想家的哪一面在对话范围内、划清与最近邻概念的边界、说明次级对话者、以及那条田野材料说明。5-8 条为宜。
+三、参考文献：文末列一节"参考文献"，把上面文内真正引到的经典著作，按作者字母序排好，每条给出【作者、首版年份、原书名】；出版社/出版地只在你确知时才写，不确定就不写，绝不编。
+四、材料说明脚注：见铁律第 4 条，必须有（若原文已含则完善之）。
+
+【格式与保真】
+· 原文的标题、摘要、关键词、每一节标题与正文、每一个案例、每一条证伪条件——全部原样保留，一字不改其实质；你只在对话点插入引注、在文末新增"注释"与"参考文献"两节。
+· 直接输出补规范后的【完整论文全文】（从标题一路到参考文献）。不要输出任何解释、不要说明你做了什么、不要用代码块或反引号包裹。
+· 正文语言与原文保持一致（中文为主，西文著作可保留原文名）。
+
+记住：你的价值在于把规范补"真"，不是把规范装"像"。一个假引文对这篇论文的伤害，远大于少补一个引注。
+`;
+function normalizePrompt(){ return NORMALIZE_SPEC; }
+function buildNormalizeInput(paperText){
+  return '【待补规范的论文全文（思想、论证与案例均已定稿，不得改动）】\n\n' + (paperText||'').trim() + '\n\n请对上面这篇论文执行"补规范"工序：只加文内引注、作者脚注、参考文献与材料说明，不改动其思想、论证与案例，严格遵守"绝不编造"铁律。直接输出补规范后的完整论文全文。';
+}
 
 // ========== 两次内功提智：第一次让基底写《从发现到发生》心得，把发生学内化成自己的东西 ==========
 // GLM等基底的问题不是"不懂发生学方法"，而是"没意识到自己在用发现学"——两次自己写下"发生"却两次做诊断。
@@ -2421,6 +2470,87 @@ if(upliftDlBtn){
     const blob=new Blob(['\ufeff'+html],{type:'application/msword'});
     const url=URL.createObjectURL(blob); const a=document.createElement('a');
     a.href=url; a.download='第二批_发生引擎提升_四篇学术论文.doc'; a.click(); URL.revokeObjectURL(url);
+  });
+}
+
+// ========== 补规范（学术装置增补·接在二次提智之后）编排 ==========
+// 对第二批四篇各跑一遍补规范（单遍，不走双审）。并发；用当前主基底。
+window._normalizedPapers = null;
+const normalizeBtn = $('normalizeBtn');
+if(normalizeBtn){
+  normalizeBtn.addEventListener('click', async ()=>{
+    const papers = window._upliftPapers;
+    if(!papers || papers.filter(p=>p&&p.text).length===0){ showErr('请先完成"二次提智"生成第二批四篇，再补规范'); return; }
+    const writeSel = modelSel.value;
+    const writeKey = keyForVendor(writeSel);
+    if(!writeKey){ showErr('请先在上方填入'+vendorName()+'的 API Key'); return; }
+    $('normalizeWrap').style.display='block';
+    $('normalizeWrap').scrollIntoView({behavior:'smooth', block:'start'});
+    const dlRow=$('normalizeDlRow'); if(dlRow) dlRow.style.display='none';
+    normalizeBtn.disabled = true;
+    const oldLabel = normalizeBtn.textContent;
+    normalizeBtn.textContent = '⏳ 补规范中（四篇并发，挂引注·脚注·参考文献）…';
+    const st=$('normalizeStatus'); if(st) st.textContent='四篇同时补规范：只加真实引注，绝不编造…';
+    try{
+      const defs = papers.map((p,i)=>({src:p,idx:i})).filter(x=>x.src && x.src.text);
+      const box = $('normalizePapers'); if(box) box.innerHTML='';
+      const cells = defs.map(d=>{
+        const wrap=document.createElement('div');
+        wrap.style.cssText='border:1px solid rgba(46,158,130,0.3);border-radius:10px;padding:16px 18px;margin-bottom:14px;background:rgba(10,20,16,0.5)';
+        const t = d.src.title || ('论文'+(d.idx+1));
+        wrap.innerHTML='<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px"><div style="font-size:14.5px;font-weight:700;color:#3FB98C">📎 '+esc4(t)+'</div><div class="nmCellStatus" style="font-size:12px;color:#8B98A5">排队中…</div></div><div class="nmCellBody" style="color:#D4DCE4;font-size:14px;line-height:1.9;white-space:normal;max-height:360px;overflow:auto"><span class="placeholder">等待补规范…</span></div>';
+        if(box) box.appendChild(wrap);
+        return { bodyEl: wrap.querySelector('.nmCellBody'), statusEl: wrap.querySelector('.nmCellStatus'), title:t };
+      });
+      const dummy = { textContent:'', innerHTML:'' };
+      const results = await Promise.allSettled(defs.map(async (d,i)=>{
+        const cell = cells[i];
+        const setStat=(x)=>{ if(cell.statusEl) cell.statusEl.textContent=x; };
+        setStat('✍ 补规范中…');
+        const sink = document.createElement('div');
+        let out;
+        try{
+          out = await streamChat(writeKey, writeSel, normalizePrompt(), buildNormalizeInput(d.src.text), sink, dummy, dummy, PAPER_MAX_TOKENS);
+        }catch(e){ setStat('✗ 失败：'+e.message); if(cell.bodyEl) cell.bodyEl.innerHTML='<span class="placeholder" style="color:#E8897B">✗ 补规范失败：'+esc4(e.message)+'（多为 Key 权限/余额/限流，可重试或换基底）</span>'; throw e; }
+        const txt = (out && out.text) || '';
+        if(!txt){ setStat('✗ 空结果'); throw new Error('补规范返回空'); }
+        setStat('✓ 已补规范 '+txt.length+' 字');
+        if(cell.bodyEl) cell.bodyEl.innerHTML = renderPaperText(txt);
+        return txt;
+      }));
+      window._normalizedPapers = results.map((res,i)=>({
+        title: cells[i].title,
+        text: res.status==='fulfilled' ? (res.value||'') : ''
+      }));
+      const okCount = window._normalizedPapers.filter(p=>p.text).length;
+      if(st) st.textContent='完成：'+okCount+'/'+defs.length+' 篇已补规范（真实引注·脚注·参考文献）';
+      if(okCount>0 && dlRow) dlRow.style.display='block';
+    }catch(err){
+      showErr('补规范出错：'+(err&&err.message?err.message:err)+'（按钮已复位，可重试；反复失败请按 F12 看 Console）');
+      const s2=$('normalizeStatus'); if(s2) s2.textContent='出错，已停止';
+    }finally{
+      normalizeBtn.disabled = false;
+      normalizeBtn.textContent = oldLabel;
+    }
+  });
+}
+
+// 补规范后四篇下载
+const normalizeDlBtn = $('normalizeDlBtn');
+if(normalizeDlBtn){
+  normalizeDlBtn.addEventListener('click', ()=>{
+    const papers = window._normalizedPapers; if(!papers) return;
+    const q = (window._lastResult && window._lastResult.question) || '';
+    let bodyHtml = '<h1 style="text-align:center">第二批 · 发生引擎提升 · 补规范版 · 四篇学术论文</h1><p style="text-align:center;color:#666">原初问题：'+esc4(q)+'　·　二次提智 + 补规范（真实引注·脚注·参考文献）</p>' + THOUGHT_DECL_HTML + '<hr/>';
+    papers.forEach((pp)=>{
+      if(!pp.text) return;
+      bodyHtml += '<h2 style="page-break-before:always">'+esc4(pp.title)+'</h2>';
+      bodyHtml += pp.text.split(/\n{2,}/).map(para=>'<p>'+esc4(para).replace(/\n/g,'<br/>')+'</p>').join('');
+    });
+    const html='<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"><title>补规范版四篇</title></head><body>'+bodyHtml+'</body></html>';
+    const blob=new Blob(['\ufeff'+html],{type:'application/msword'});
+    const url=URL.createObjectURL(blob); const a=document.createElement('a');
+    a.href=url; a.download='第二批_补规范版_四篇学术论文.doc'; a.click(); URL.revokeObjectURL(url);
   });
 }
 
