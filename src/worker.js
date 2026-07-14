@@ -96,6 +96,151 @@ export class ConfigVault {
   }
 }
 
+// ===== 学员投稿收件箱 · SubmissionBox（DO·SQLite 分片存储）=====
+// 学员上传 ZIP → 服务端校验密码(newlife2013) → 分片存进本 DO。
+// 管理端(admin 口令)每日 list/getchunk/delete：提取→审核→改写→清除。文件绝不经公开路由下载。
+function _subJson(obj, extra) { return new Response(JSON.stringify(obj), { headers: { "content-type": "application/json", ...(extra || {}) } }); }
+function _bytesToB64(u8) {
+  const bytes = u8 instanceof Uint8Array ? u8 : new Uint8Array(u8);
+  let bin = ""; const CH = 0x8000;
+  for (let i = 0; i < bytes.length; i += CH) bin += String.fromCharCode.apply(null, bytes.subarray(i, i + CH));
+  return btoa(bin);
+}
+function _b64ToBytes(b64) {
+  const bin = atob(b64); const len = bin.length; const arr = new Uint8Array(len);
+  for (let i = 0; i < len; i++) arr[i] = bin.charCodeAt(i);
+  return arr.buffer; // 精确长度 ArrayBuffer，直接作 BLOB 绑定
+}
+export class SubmissionBox {
+  constructor(ctx, env) {
+    this.ctx = ctx;
+    this.ctx.storage.sql.exec("CREATE TABLE IF NOT EXISTS cfg(k TEXT PRIMARY KEY, v TEXT)");
+    this.ctx.storage.sql.exec("CREATE TABLE IF NOT EXISTS subs(id TEXT PRIMARY KEY, name TEXT, student TEXT, note TEXT, size INTEGER, nchunks INTEGER, ts INTEGER, done INTEGER)");
+    this.ctx.storage.sql.exec("CREATE TABLE IF NOT EXISTS chunks(id TEXT, n INTEGER, data BLOB, PRIMARY KEY(id, n))");
+  }
+  async _hash(s) {
+    const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode("sde-submit-v1:" + s));
+    return [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, "0")).join("");
+  }
+  _cfgGet(k) { const r = this.ctx.storage.sql.exec("SELECT v FROM cfg WHERE k=?", k).toArray(); return r.length ? r[0].v : ""; }
+  _cfgSet(k, v) { this.ctx.storage.sql.exec("INSERT INTO cfg(k,v) VALUES(?,?) ON CONFLICT(k) DO UPDATE SET v=excluded.v", k, v); }
+  async fetch(request) {
+    const b = await request.json().catch(() => ({}));
+    const op = b.op;
+    if (op === "bootstrap") { // 一次性设定学员口令+管理口令；已设定则拒绝
+      if (this._cfgGet("studentHash")) return _subJson({ ok: false, msg: "already configured" });
+      if (!b.studentPass || !b.adminPass) return _subJson({ ok: false, msg: "missing pass" });
+      this._cfgSet("studentHash", await this._hash(String(b.studentPass)));
+      this._cfgSet("adminHash", await this._hash(String(b.adminPass)));
+      return _subJson({ ok: true, msg: "configured" });
+    }
+    if (op === "status") return _subJson({ configured: !!this._cfgGet("studentHash") });
+    const okStudent = async () => { const h = this._cfgGet("studentHash"); return !!h && (await this._hash(String(b.pass || ""))) === h; };
+    const okAdmin = async () => { const h = this._cfgGet("adminHash"); return !!h && (await this._hash(String(b.pass || ""))) === h; };
+    if (op === "begin") {
+      if (!(await okStudent())) return _subJson({ ok: false, code: "badpass" });
+      const id = crypto.randomUUID().replace(/-/g, "");
+      this.ctx.storage.sql.exec(
+        "INSERT INTO subs(id,name,student,note,size,nchunks,ts,done) VALUES(?,?,?,?,?,?,?,0)",
+        id, String(b.name || "paper.zip").slice(0, 200), String(b.student || "").slice(0, 80),
+        String(b.note || "").slice(0, 500), Number(b.size || 0), 0, Date.now()
+      );
+      return _subJson({ ok: true, id });
+    }
+    if (op === "chunk") {
+      if (!(await okStudent())) return _subJson({ ok: false, code: "badpass" });
+      const id = String(b.id || ""); const n = Number(b.n || 0);
+      const row = this.ctx.storage.sql.exec("SELECT done FROM subs WHERE id=?", id).toArray();
+      if (!row.length) return _subJson({ ok: false, msg: "no such id" });
+      if (row[0].done) return _subJson({ ok: false, msg: "already committed" });
+      const buf = _b64ToBytes(String(b.data || ""));
+      this.ctx.storage.sql.exec("INSERT INTO chunks(id,n,data) VALUES(?,?,?) ON CONFLICT(id,n) DO UPDATE SET data=excluded.data", id, n, buf);
+      return _subJson({ ok: true });
+    }
+    if (op === "commit") {
+      if (!(await okStudent())) return _subJson({ ok: false, code: "badpass" });
+      const id = String(b.id || ""); const nchunks = Number(b.nchunks || 0);
+      const cnt = Number(this.ctx.storage.sql.exec("SELECT COUNT(*) c FROM chunks WHERE id=?", id).toArray()[0].c);
+      if (cnt !== nchunks) return _subJson({ ok: false, msg: "chunk mismatch " + cnt + "/" + nchunks });
+      this.ctx.storage.sql.exec("UPDATE subs SET nchunks=?, done=1 WHERE id=?", nchunks, id);
+      return _subJson({ ok: true });
+    }
+    // ---- 管理端（每日提取）----
+    if (op === "list") {
+      if (!(await okAdmin())) return _subJson({ ok: false, code: "badpass" });
+      const rows = this.ctx.storage.sql.exec("SELECT id,name,student,note,size,nchunks,ts FROM subs WHERE done=1 ORDER BY ts ASC").toArray();
+      return _subJson({ ok: true, items: rows });
+    }
+    if (op === "meta") {
+      if (!(await okAdmin())) return _subJson({ ok: false, code: "badpass" });
+      const rows = this.ctx.storage.sql.exec("SELECT id,name,student,note,size,nchunks,ts FROM subs WHERE id=? AND done=1", String(b.id || "")).toArray();
+      return rows.length ? _subJson({ ok: true, item: rows[0] }) : _subJson({ ok: false, msg: "not found" });
+    }
+    if (op === "getchunk") {
+      if (!(await okAdmin())) return _subJson({ ok: false, code: "badpass" });
+      const rows = this.ctx.storage.sql.exec("SELECT data FROM chunks WHERE id=? AND n=?", String(b.id || ""), Number(b.n || 0)).toArray();
+      return rows.length ? _subJson({ ok: true, data: _bytesToB64(rows[0].data) }) : _subJson({ ok: false, msg: "no chunk" });
+    }
+    if (op === "delete") {
+      if (!(await okAdmin())) return _subJson({ ok: false, code: "badpass" });
+      const id = String(b.id || "");
+      this.ctx.storage.sql.exec("DELETE FROM chunks WHERE id=?", id);
+      this.ctx.storage.sql.exec("DELETE FROM subs WHERE id=?", id);
+      return _subJson({ ok: true });
+    }
+    return _subJson({ ok: false, msg: "unknown op" });
+  }
+}
+// 学员上传（multipart）：Worker 收整包 → 1MB 分片转存 DO；口令服务端校验、ZIP 魔数校验、25MB 上限
+async function handleSubmit(request, env) {
+  const CORS = { "access-control-allow-origin": "*", "access-control-allow-methods": "POST, OPTIONS", "access-control-allow-headers": "content-type" };
+  if (request.method === "OPTIONS") return new Response(null, { headers: CORS });
+  const box = env.SUBMISSIONS.get(env.SUBMISSIONS.idFromName("global"));
+  const call = async (payload) => (await box.fetch(new Request("https://sub.internal/", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(payload) }))).json();
+  const ip = request.headers.get("cf-connecting-ip") || "unknown";
+  try {
+    const lim = env.ASK_LIMITER.get(env.ASK_LIMITER.idFromName("submit:" + ip));
+    const lr = await (await lim.fetch(new Request("https://limiter.internal/", { method: "POST" }))).json();
+    if (!lr.ok) return _subJson({ ok: false, msg: "提交太频繁，请过一会儿再试。" }, CORS);
+  } catch (e) {}
+  let form;
+  try { form = await request.formData(); } catch (e) { return _subJson({ ok: false, msg: "表单解析失败。" }, CORS); }
+  const pass = String(form.get("pass") || "");
+  const student = String(form.get("student") || "");
+  const note = String(form.get("note") || "");
+  const file = form.get("file");
+  if (!file || typeof file === "string") return _subJson({ ok: false, msg: "请选择一个 ZIP 文件。" }, CORS);
+  const name = file.name || "paper.zip";
+  const size = file.size || 0;
+  const MAX = 25 * 1024 * 1024;
+  if (size <= 0) return _subJson({ ok: false, msg: "文件为空。" }, CORS);
+  if (size > MAX) return _subJson({ ok: false, msg: "文件超过 25MB 上限。" }, CORS);
+  const u8 = new Uint8Array(await file.arrayBuffer());
+  if (!(u8[0] === 0x50 && u8[1] === 0x4B)) return _subJson({ ok: false, msg: "文件不是有效的 ZIP。" }, CORS);
+  const bg = await call({ op: "begin", pass, name, student, note, size });
+  if (!bg.ok) return _subJson({ ok: false, code: bg.code, msg: bg.code === "badpass" ? "密码不正确。" : (bg.msg || "启动失败") }, CORS);
+  const id = bg.id;
+  const CHUNK = 1024 * 1024;
+  const nchunks = Math.ceil(u8.length / CHUNK);
+  for (let n = 0; n < nchunks; n++) {
+    const view = u8.subarray(n * CHUNK, Math.min((n + 1) * CHUNK, u8.length));
+    const cr = await call({ op: "chunk", pass, id, n, data: _bytesToB64(view) });
+    if (!cr.ok) return _subJson({ ok: false, msg: "分片写入失败（" + n + "）。" }, CORS);
+  }
+  const cm = await call({ op: "commit", pass, id, nchunks });
+  if (!cm.ok) return _subJson({ ok: false, msg: "提交完成失败。" }, CORS);
+  return _subJson({ ok: true, msg: "上传成功", id }, CORS);
+}
+// 管理端转发：仅放行 list/meta/getchunk/delete，DO 侧校验 adminHash
+async function handleSubmitAdmin(request, env) {
+  const b = await request.json().catch(() => ({}));
+  const allow = ["list", "meta", "getchunk", "delete"];
+  if (!allow.includes(b.op)) return _subJson({ ok: false, msg: "unknown op" }, { "access-control-allow-origin": "*" });
+  const box = env.SUBMISSIONS.get(env.SUBMISSIONS.idFromName("global"));
+  const r = await box.fetch(new Request("https://sub.internal/", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(b) }));
+  return _subJson(await r.json(), { "access-control-allow-origin": "*" });
+}
+
 // ===== Tier2 智能问答·站内 RAG =====
 const _ENC = new TextEncoder();
 function _sseBytes(o) { return _ENC.encode("data: " + JSON.stringify(o) + "\n\n"); }
@@ -551,6 +696,24 @@ export default {
     }
     if (url.pathname === "/api/ask") {
       return handleAsk(request, env, url);
+    }
+    // ===== 学员投稿收件箱 =====
+    if (url.pathname === "/api/submit" && (request.method === "POST" || request.method === "OPTIONS")) {
+      return handleSubmit(request, env);
+    }
+    if (url.pathname === "/api/submit/admin" && request.method === "POST") {
+      return handleSubmitAdmin(request, env);
+    }
+    if (url.pathname === "/api/submit/bootstrap" && request.method === "POST") { // 一次性设定口令（设定后自锁）
+      const box = env.SUBMISSIONS.get(env.SUBMISSIONS.idFromName("global"));
+      const bb = await request.json().catch(() => ({}));
+      const rr = await box.fetch(new Request("https://sub.internal/", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ op: "bootstrap", studentPass: bb.studentPass, adminPass: bb.adminPass }) }));
+      return _subJson(await rr.json(), { "access-control-allow-origin": "*" });
+    }
+    if (url.pathname === "/api/submit/status") {
+      const box = env.SUBMISSIONS.get(env.SUBMISSIONS.idFromName("global"));
+      const rr = await box.fetch(new Request("https://sub.internal/", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ op: "status" }) }));
+      return _subJson(await rr.json(), { "access-control-allow-origin": "*" });
     }
     // Everything else: serve static assets (with configured html/404 handling)
     const resp = await env.ASSETS.fetch(request);

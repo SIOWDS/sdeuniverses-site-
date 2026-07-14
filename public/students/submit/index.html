@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>学员投稿 · Submit | SDE Universes</title>
+<meta name="description" content="学员投稿入口 · Students' submission — 把论文打包成 ZIP 上传，通过审读后署名发表。">
+<style>
+:root{--gold:#C9A84C;--gold2:#E4CB7E;--ink:#F0E9D8;--ink2:#B8AE96;--bg:#0E0B08;--panel:#171310;--panel2:#1C1712;--line:rgba(201,168,76,0.22);--accent:#8C6A2E;--ok:#7FB77E;--err:#D98B7A}
+*{margin:0;padding:0;box-sizing:border-box}
+::selection{background:rgba(201,168,76,0.35)}
+body{background:var(--bg);color:var(--ink);font-family:"Noto Serif SC",Georgia,"Songti SC",serif;line-height:1.9}
+body.zh .en-only{display:none!important}
+body.en .zh-only{display:none!important}
+nav{position:sticky;top:0;z-index:20;background:rgba(14,11,8,0.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+nav .w{max-width:720px;margin:0 auto;padding:13px 24px;display:flex;justify-content:space-between;align-items:center}
+nav a{color:var(--gold);text-decoration:none;font-size:14px;letter-spacing:0.05em}
+.nav-right{display:flex;align-items:center;gap:16px}
+.lang-toggle{display:flex;border:1px solid var(--line);border-radius:20px;overflow:hidden}
+.lang-btn{background:transparent;border:none;color:var(--ink2);font-family:inherit;font-size:13px;padding:5px 13px;cursor:pointer;letter-spacing:0.05em}
+.lang-btn.active{background:var(--gold);color:#1A1410;font-weight:700}
+.hero{max-width:640px;margin:0 auto;padding:64px 24px 12px;text-align:center}
+.hero .eyebrow{font-size:11px;letter-spacing:0.42em;color:var(--gold);margin-bottom:18px}
+.hero h1{font-size:clamp(30px,5.5vw,42px);font-weight:800;line-height:1.14;margin-bottom:18px;color:#F5EFE0;font-family:Georgia,"Noto Serif SC",serif;letter-spacing:0.04em}
+.hero .lead{font-size:15.5px;color:var(--ink2);line-height:1.95;max-width:520px;margin:0 auto}
+.hero .lead b{color:#F5E6BF}
+.wrap{max-width:640px;margin:0 auto;padding:14px 24px 90px}
+.card{background:linear-gradient(160deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:18px;padding:34px 30px;margin-top:30px}
+.field{margin-bottom:20px}
+.field label{display:block;font-size:13px;letter-spacing:0.14em;color:var(--gold);margin-bottom:9px}
+.field label .opt{color:var(--ink2);letter-spacing:0.04em;font-size:12px}
+.field input[type=password],.field input[type=text],.field textarea{width:100%;background:rgba(0,0,0,0.28);border:1px solid var(--line);border-radius:10px;color:var(--ink);font-family:inherit;font-size:15px;padding:12px 14px;line-height:1.7;transition:border-color .15s}
+.field input:focus,.field textarea:focus{outline:none;border-color:rgba(201,168,76,0.65)}
+.field textarea{resize:vertical;min-height:74px}
+.field input::placeholder,.field textarea::placeholder{color:#6E664F}
+.file-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.file-btn{display:inline-block;background:rgba(201,168,76,0.12);border:1px dashed rgba(201,168,76,0.5);color:var(--gold);border-radius:10px;padding:12px 20px;cursor:pointer;font-size:14.5px;letter-spacing:0.04em;transition:background .15s,border-color .15s;white-space:nowrap}
+.file-btn:hover{background:rgba(201,168,76,0.2);border-color:var(--gold)}
+#file{display:none}
+.file-name{font-size:13.5px;color:var(--ink2);word-break:break-all;flex:1;min-width:160px}
+.file-name.set{color:#F5E6BF}
+.submit-btn{width:100%;margin-top:6px;background:var(--gold);color:#1A1410;border:none;border-radius:10px;font-family:inherit;font-size:16px;font-weight:700;letter-spacing:0.06em;padding:15px;cursor:pointer;transition:filter .15s,opacity .15s}
+.submit-btn:hover{filter:brightness(1.06)}
+.submit-btn:disabled{opacity:0.5;cursor:not-allowed}
+.progress{height:6px;background:rgba(255,255,255,0.07);border-radius:6px;margin-top:18px;overflow:hidden;display:none}
+.progress.show{display:block}
+.progress .bar{height:100%;width:0;background:linear-gradient(90deg,var(--gold),var(--gold2));transition:width .2s;border-radius:6px}
+.status{margin-top:16px;font-size:14.5px;line-height:1.8;padding:0 2px;display:none}
+.status.show{display:block}
+.status.ok{color:var(--ok)}
+.status.err{color:var(--err)}
+.notes{margin-top:26px;border-top:1px solid var(--line);padding-top:22px}
+.notes .n{font-size:13px;color:var(--ink2);line-height:1.85;margin-bottom:9px;display:flex;gap:9px}
+.notes .n::before{content:"·";color:var(--gold);font-weight:700}
+.back{text-align:center;margin-top:34px}
+.back a{color:var(--gold);text-decoration:none;font-size:14.5px;letter-spacing:0.06em;border-bottom:1px solid rgba(201,168,76,0.4);padding-bottom:2px}
+footer{border-top:1px solid var(--line);margin-top:40px;padding:30px 24px;text-align:center;color:#6B6250;font-size:13px}
+footer a{color:var(--gold);text-decoration:none}
+</style></head>
+<body class="zh">
+<nav><div class="w">
+  <a href="/">SDE Universes</a>
+  <div class="nav-right">
+    <a href="/students/"><span class="zh-only">← 学员专栏</span><span class="en-only">← Students</span></a>
+    <div class="lang-toggle"><button class="lang-btn active" onclick="setLang('zh')">中</button><button class="lang-btn" onclick="setLang('en')">EN</button></div>
+  </div>
+</div></nav>
+
+<div class="hero">
+  <div class="eyebrow zh-only">学 员 投 稿 · SUBMIT</div>
+  <div class="eyebrow en-only">STUDENT SUBMISSION · SUBMIT</div>
+  <h1 class="zh-only">学员投稿入口</h1>
+  <h1 class="en-only">Submit Your Work</h1>
+  <p class="lead zh-only">把你的论文打包成一个 <b>ZIP</b> 上传到这里。通过审读后，将以你的名字在学员专栏署名发表。</p>
+  <p class="lead en-only">Upload your paper as a single <b>ZIP</b>. Once it passes review, it will be published in the Students' Column under your name.</p>
+</div>
+
+<div class="wrap">
+  <div class="card">
+    <div class="field">
+      <label class="zh-only" for="pass">投 稿 密 码</label>
+      <label class="en-only" for="pass">SUBMISSION PASSWORD</label>
+      <input type="password" id="pass" autocomplete="off" placeholder="请输入投稿密码 / password">
+    </div>
+    <div class="field">
+      <label class="zh-only" for="student">署 名 <span class="opt">（选填）</span></label>
+      <label class="en-only" for="student">YOUR NAME <span class="opt">(optional)</span></label>
+      <input type="text" id="student" maxlength="80" placeholder="希望如何署名 / how to credit you">
+    </div>
+    <div class="field">
+      <label class="zh-only" for="note">给编辑的话 <span class="opt">（选填）</span></label>
+      <label class="en-only" for="note">NOTE TO EDITOR <span class="opt">(optional)</span></label>
+      <textarea id="note" maxlength="500" placeholder="论文题目、学科、想说明的事…… / title, field, anything to note…"></textarea>
+    </div>
+    <div class="field">
+      <label class="zh-only">论 文 文 件（ZIP）</label>
+      <label class="en-only">PAPER FILE (ZIP)</label>
+      <div class="file-row">
+        <label class="file-btn" for="file"><span class="zh-only">选择 ZIP 文件</span><span class="en-only">Choose ZIP</span></label>
+        <input type="file" id="file" accept=".zip,application/zip,application/x-zip-compressed">
+        <span class="file-name" id="fname"><span class="zh-only">尚未选择文件</span><span class="en-only">No file chosen</span></span>
+      </div>
+    </div>
+    <button class="submit-btn" id="go" onclick="upload()"><span class="zh-only">上传论文</span><span class="en-only">Upload paper</span></button>
+    <div class="progress" id="prog"><div class="bar" id="bar"></div></div>
+    <div class="status" id="status"></div>
+
+    <div class="notes">
+      <div class="n"><span class="zh-only">仅接受 <b>.zip</b>，单个文件不超过 25MB。</span><span class="en-only">.zip only, up to 25MB per file.</span></div>
+      <div class="n"><span class="zh-only">建议 ZIP 里放论文正文（Word / PDF），如有图表一并打包。</span><span class="en-only">Put your paper (Word / PDF) in the ZIP, together with any figures.</span></div>
+      <div class="n"><span class="zh-only">上传的文件只用于本专栏的审读与改写，不会被公开下载。</span><span class="en-only">Your file is used only for review and rewriting for this column, and is never made publicly downloadable.</span></div>
+    </div>
+  </div>
+
+  <div class="back"><a href="/students/"><span class="zh-only">← 返回学员专栏</span><span class="en-only">← Back to Students' Column</span></a></div>
+</div>
+
+<footer>
+  <span class="zh-only">© 德麦国际 Demai International · 学员专栏 · <a href="/">sdeuniverses.com</a></span>
+  <span class="en-only">© Demai International · Students' Column · <a href="/">sdeuniverses.com</a></span>
+</footer>
+<script>
+function setLang(l){document.body.className=l;document.querySelectorAll('.lang-btn').forEach(function(b){b.classList.toggle('active',(b.textContent==='中'&&l==='zh')||(b.textContent==='EN'&&l==='en'));});document.documentElement.lang=l==='zh'?'zh-CN':'en';}
+var isZh=function(){return document.body.className!=='en';};
+var fileInput=document.getElementById('file');
+fileInput.addEventListener('change',function(){
+  var f=fileInput.files[0];
+  var el=document.getElementById('fname');
+  if(f){el.classList.add('set');el.textContent=f.name+'  ('+(f.size/1048576).toFixed(2)+' MB)';}
+  else{el.classList.remove('set');el.innerHTML='<span class="zh-only">尚未选择文件</span><span class="en-only">No file chosen</span>';}
+});
+function setStatus(kind,zh,en){
+  var s=document.getElementById('status');
+  s.className='status show '+kind;
+  s.innerHTML='<span class="zh-only">'+zh+'</span><span class="en-only">'+en+'</span>';
+}
+function setBusy(b){document.getElementById('go').disabled=b;document.getElementById('prog').classList.toggle('show',b);}
+function upload(){
+  var pass=document.getElementById('pass').value.trim();
+  var student=document.getElementById('student').value.trim();
+  var note=document.getElementById('note').value.trim();
+  var f=fileInput.files[0];
+  if(!pass){return setStatus('err','请先输入投稿密码。','Please enter the submission password.');}
+  if(!f){return setStatus('err','请选择一个 ZIP 文件。','Please choose a ZIP file.');}
+  if(!/\.zip$/i.test(f.name)){return setStatus('err','只接受 .zip 文件。','Only .zip files are accepted.');}
+  if(f.size>25*1048576){return setStatus('err','文件超过 25MB 上限。','File exceeds the 25MB limit.');}
+  if(f.size<=0){return setStatus('err','文件为空。','The file is empty.');}
+  var fd=new FormData();
+  fd.append('pass',pass);fd.append('student',student);fd.append('note',note);fd.append('file',f,f.name);
+  var xhr=new XMLHttpRequest();
+  xhr.open('POST','/api/submit');
+  xhr.upload.onprogress=function(e){if(e.lengthComputable){document.getElementById('bar').style.width=Math.round(e.loaded/e.total*100)+'%';}};
+  xhr.onload=function(){
+    setBusy(false);
+    var r={};try{r=JSON.parse(xhr.responseText);}catch(e){}
+    if(xhr.status===200&&r.ok){
+      setStatus('ok','✓ 上传成功！你的论文已进入审读队列，通过后会在学员专栏署名发表。','✓ Uploaded. Your paper is now in the review queue and will appear in the Students\u2019 Column under your name once reviewed.');
+      fileInput.value='';document.getElementById('fname').innerHTML='<span class="zh-only">尚未选择文件</span><span class="en-only">No file chosen</span>';document.getElementById('fname').classList.remove('set');
+      document.getElementById('note').value='';document.getElementById('bar').style.width='0';
+    }else if(r.code==='badpass'){
+      setStatus('err','投稿密码不正确。','Incorrect submission password.');
+    }else{
+      var m=r.msg||('上传失败（'+xhr.status+'）。');
+      setStatus('err',m,r.msg?m:('Upload failed ('+xhr.status+').'));
+    }
+  };
+  xhr.onerror=function(){setBusy(false);setStatus('err','网络错误，请重试。','Network error, please try again.');};
+  setStatus(isZh()?'ok':'ok','上传中，请稍候……','Uploading, please wait…');
+  document.getElementById('status').className='status show';
+  setBusy(true);
+  xhr.send(fd);
+}
+</script>
+</body></html>
