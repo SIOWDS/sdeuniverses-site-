@@ -17,7 +17,12 @@ body.en{font-family:'EB Garamond','Playfair Display',Georgia,serif}
 body.en .zh-only{display:none}
 body.zh .en-only{display:none}
 a{color:inherit}
-nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0.9rem 3rem;background:rgba(245,239,224,0.9);backdrop-filter:blur(12px);border-bottom:1px solid var(--border2)}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;flex-direction:column;padding:0.6rem 3rem 0.5rem;background:rgba(245,239,224,0.9);backdrop-filter:blur(12px);border-bottom:1px solid var(--border2)}
+.nav-bar-main{display:flex;align-items:center;justify-content:space-between;width:100%}
+.nav-bar-sub{display:flex;align-items:center;justify-content:space-around;width:100%;margin-top:0.5rem;padding-top:0.5rem;border-top:1px solid var(--border2)}
+.nav-bar-sub a{color:var(--text2);text-decoration:none;font-size:0.86rem;font-weight:600;letter-spacing:0.12em;white-space:nowrap;transition:color .2s}
+.nav-bar-sub a:hover{color:var(--accent);text-decoration:underline;text-underline-offset:4px}
+.block{scroll-margin-top:6.5rem}
 .nav-logo{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;color:var(--gold);letter-spacing:0.05em;text-decoration:none}
 .nav-links{display:flex;align-items:center;gap:1.6rem}
 .nav-links a{color:var(--text2);text-decoration:none;font-size:0.85rem;letter-spacing:0.1em;transition:color 0.2s}
@@ -53,7 +58,10 @@ section{padding:3.5rem 0}
 footer{border-top:1px solid var(--border2);margin-top:4rem;padding:2.5rem 2rem;text-align:center;color:var(--muted);font-size:0.78rem;letter-spacing:0.05em}
 footer a{color:var(--gold);text-decoration:none}
 @media(max-width:640px){
-  nav{padding:0.7rem 1.2rem}
+  nav{padding:0.55rem 1rem 0.45rem}
+  .nav-bar-sub{justify-content:flex-start;gap:1.1rem;overflow-x:auto;padding-bottom:0.15rem}
+  .nav-bar-sub a{font-size:0.8rem}
+  .block{scroll-margin-top:5.5rem}
   .nav-links{gap:1rem}
   .nav-links a.sib{display:none}
   .picks{grid-template-columns:1fr}
@@ -83,6 +91,7 @@ footer a{color:var(--gold);text-decoration:none}
 <body class="zh">
 
 <nav>
+  <div class="nav-bar-main">
   <a class="nav-logo" href="/">SDE Universes</a>
   <div class="nav-links">
     <a href="/" class="zh-only">首页</a><a href="/" class="en-only">Home</a>
@@ -94,6 +103,14 @@ footer a{color:var(--gold);text-decoration:none}
       <button class="lang-btn active" onclick="setLang('zh')">中</button>
       <button class="lang-btn" onclick="setLang('en')">EN</button>
     </div>
+  </div>
+</div>
+  <div class="nav-bar-sub">
+    <a href="#edu-predicament" class="zh-only">教育困境</a><a href="#edu-predicament" class="en-only">Predicament</a>
+    <a href="#edu-classroom" class="zh-only">课堂诊断</a><a href="#edu-classroom" class="en-only">Classroom</a>
+    <a href="#edu-university" class="zh-only">大学重生</a><a href="#edu-university" class="en-only">University</a>
+    <a href="#edu-learning" class="zh-only">学习发生</a><a href="#edu-learning" class="en-only">Learning</a>
+    <a href="#edu-early" class="zh-only">婴幼儿教育</a><a href="#edu-early" class="en-only">Early Years</a>
   </div>
 </nav>
 
@@ -107,7 +124,7 @@ footer a{color:var(--gold);text-decoration:none}
 
 <main class="wrap">
   <section>
-    <div class="block">
+    <div class="block" id="edu-predicament">
       <div class="block-head">
         <span class="block-num"><span class="zh-only">壹</span><span class="en-only">I</span></span>
         <span class="block-title"><span class="zh-only">AI 时代的教育困境 · 四部曲</span><span class="en-only">The AI-Era Education Predicament · Four Parts</span></span>
@@ -147,7 +164,7 @@ footer a{color:var(--gold);text-decoration:none}
       </div>
     </div>
 
-    <div class="block">
+    <div class="block" id="edu-classroom">
       <div class="block-head">
         <span class="block-num"><span class="zh-only">贰</span><span class="en-only">II</span></span>
         <span class="block-title"><span class="zh-only">课堂内外 · 教学的本体论诊断</span><span class="en-only">Inside the Classroom · An Ontological Diagnosis</span></span>
@@ -187,7 +204,7 @@ footer a{color:var(--gold);text-decoration:none}
       </div>
     </div>
 
-    <div class="block">
+    <div class="block" id="edu-university">
       <div class="block-head">
         <span class="block-num"><span class="zh-only">叁</span><span class="en-only">III</span></span>
         <span class="block-title"><span class="zh-only">大学的黄昏与重生</span><span class="en-only">The Twilight and Rebirth of the University</span></span>
@@ -215,7 +232,7 @@ footer a{color:var(--gold);text-decoration:none}
       </div>
     </div>
 
-    <div class="block">
+    <div class="block" id="edu-learning">
       <div class="block-head">
         <span class="block-num"><span class="zh-only">肆</span><span class="en-only">IV</span></span>
         <span class="block-title"><span class="zh-only">学习的发生 · 认知与终身</span><span class="en-only">How Learning Occurs · Cognition &amp; the Lifelong</span></span>
@@ -243,7 +260,7 @@ footer a{color:var(--gold);text-decoration:none}
       </div>
     </div>
 
-    <div class="block">
+    <div class="block" id="edu-early">
       <div class="block-head">
         <span class="block-num"><span class="zh-only">伍</span><span class="en-only">V</span></span>
         <span class="block-title"><span class="zh-only">婴幼儿教育 · 那扇正在关闭的窗</span><span class="en-only">Early Childhood · The Window That Is Closing</span></span>
