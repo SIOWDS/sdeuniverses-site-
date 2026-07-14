@@ -488,6 +488,22 @@ footer{border-top:1px solid var(--border);text-align:center;padding:30px 20px 44
     <div id="normalizePapers"></div>
     <div id="normalizeDlRow" style="margin-top:18px;display:none">
       <button id="normalizeDlBtn" style="background:#238636;color:#fff;font-weight:600;font-size:14px;border:none;border-radius:8px;padding:11px 26px;cursor:pointer">📄 补规范后四篇一起下载（Word）</button>
+      <button id="polishBtn" style="background:linear-gradient(135deg,#B0842E,#D4A845);color:#fff;font-weight:700;font-size:14px;border:none;border-radius:8px;padding:11px 26px;cursor:pointer;margin-left:10px;box-shadow:0 4px 16px rgba(176,132,46,0.35)">🔬 二次审稿 + 打磨</button>
+    </div>
+  </div>
+</div>
+
+<!-- 二次审稿 + 打磨（最后四篇·终审打磨）面板 -->
+<div id="polishWrap" style="max-width:1000px;margin:26px auto 0;display:none">
+  <div style="background:linear-gradient(135deg,rgba(176,132,46,0.10),rgba(26,20,8,0.5));border:1px solid rgba(212,168,69,0.42);border-radius:14px;padding:26px 30px">
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:6px">
+      <div style="font-size:19px;font-weight:700;color:#D4A845;letter-spacing:0.04em">🔬 二次审稿 + 打磨 · 最后四篇终审</div>
+      <div id="polishStatus" style="font-size:13px;color:#8B98A5"></div>
+    </div>
+    <div style="font-size:13px;color:#9AA5B0;margin-bottom:16px;line-height:1.7">补规范后的最后四篇，再走一轮<b style="color:#D4A845">独立双审 + 主笔打磨</b>：两位审稿人（沿用第一批设定的 A、B）各以发生学眼光把关——守住判断不滑回发现学、逐条核查论证/文献/反驳，并<b style="color:#D4A845">重点复核补规范挂上的真实引注</b>（可疑即要求删改）；主笔据两份意见把全篇打磨一遍，只加固、不推倒。四篇并发，约需 15-40 分钟，请勿关闭页面。</div>
+    <div id="polishPapers"></div>
+    <div id="polishDlRow" style="margin-top:18px;display:none">
+      <button id="polishDlBtn" style="background:#238636;color:#fff;font-weight:600;font-size:14px;border:none;border-radius:8px;padding:11px 26px;cursor:pointer">📄 最后四篇（打磨版）一起下载（Word）</button>
     </div>
   </div>
 </div>
@@ -2666,6 +2682,122 @@ if(normalizeDlBtn){
     const blob=new Blob(['\ufeff'+html],{type:'application/msword'});
     const url=URL.createObjectURL(blob); const a=document.createElement('a');
     a.href=url; a.download='第二批_补规范版_四篇学术论文.doc'; a.click(); URL.revokeObjectURL(url);
+  });
+}
+
+
+// ========== 二次审稿 + 打磨（最后四篇·终审打磨）编排 ==========
+// 对补规范后的最后四篇，各跑一轮：两位审稿人独立审 → 主笔据两份意见打磨改稿（复用现有审稿/改稿机制）。
+async function polishOnePaper(cfg){
+  const dummy={ textContent:'', innerHTML:'' };
+  const setStat=(t)=>{ if(cfg.statusEl) cfg.statusEl.textContent=t; };
+  const paperText = cfg.paperText||'';
+  if(cfg.bodyEl) cfg.bodyEl.innerHTML = renderPaperText(paperText);
+  // 1. 双审（并行·静默）
+  setStat('✍ 二次审稿中…');
+  let revA='', revB='';
+  const sinkA=document.createElement('div'), sinkB=document.createElement('div');
+  const jobs=[
+    streamChat(cfg.revAKey, cfg.revA, reviewPrompt(cfg.reflection), buildReviewInput(paperText), sinkA, dummy, dummy).then(r=>{revA=r.text||'';}).catch(()=>{revA='';})
+  ];
+  if(cfg.revB && cfg.revBKey){
+    jobs.push(streamChat(cfg.revBKey, cfg.revB, reviewPrompt(cfg.reflection), buildReviewInput(paperText), sinkB, dummy, dummy).then(r=>{revB=r.text||'';}).catch(()=>{revB='';}));
+  }
+  await Promise.all(jobs);
+  if(!revA && !revB){ setStat('✍ 审稿未成功，保留原稿 '+paperText.length+' 字'); if(cfg.bodyEl) cfg.bodyEl.innerHTML=renderPaperText(paperText); return { title:cfg.title, text:paperText }; }
+  // 2. 主笔据两审打磨改稿（滚动字数，完成后一次性显示）
+  setStat('✍ 打磨改稿中…');
+  let finalText=paperText;
+  const sink=document.createElement('div');
+  const tk=setInterval(()=>{ const n=sink.textContent?sink.textContent.length:0; if(n>0) setStat('✍ 打磨中 · 已写 '+n+' 字'); }, 500);
+  try{
+    const rev=await streamChat(cfg.writeKey, cfg.writeSel, revisePrompt(cfg.reflection), buildReviseInputDual(paperText, revA, revB), sink, dummy, dummy, PAPER_MAX_TOKENS);
+    if(rev.text) finalText=rev.text;
+  }catch(_){/* 改稿失败保留原稿 */}
+  clearInterval(tk);
+  if(cfg.bodyEl) cfg.bodyEl.innerHTML=renderPaperText(finalText);
+  setStat('✍ 完成 '+finalText.length+' 字');
+  return { title:cfg.title, text:finalText, revA:revA, revB:revB, revLabelA:vendorLabel(cfg.revA), revLabelB:cfg.revB?vendorLabel(cfg.revB):'' };
+}
+
+window._polishedPapers = null;
+const polishBtn = $('polishBtn');
+if(polishBtn){
+  polishBtn.addEventListener('click', async ()=>{
+    const papers = window._normalizedPapers;
+    if(!papers || papers.filter(p=>p&&p.text).length===0){ showErr('请先完成"补规范"，得到最后四篇，再做二次审稿+打磨'); return; }
+    const writeSel = modelSel.value;
+    const writeKey = keyForVendor(writeSel);
+    if(!writeKey){ showErr('请先在上方填入'+vendorName()+'的 API Key（主笔基底）'); return; }
+    // 沿用第一批设定的审稿人 A/B
+    const revA = $('fourRevA').value, revAKey = keyForVendor(revA, $('fourRevAKey').value);
+    const revB = $('fourRevB').value, revBKey = keyForVendor(revB, $('fourRevBKey').value);
+    if(!revA || !revAKey || !revB || !revBKey){ showErr('二次审稿同样需要两位审稿人（沿用第一批的设定）。请确认上方审稿人 A、B 都已选好基底并填好 Key'); return; }
+    if(revA === revB){ showErr('审稿人 A 与 B 需为不同基底'); return; }
+    try{ await ensureNeigong(); }catch(e){ showErr(e.message); return; }
+
+    $('polishWrap').style.display='block';
+    $('polishWrap').scrollIntoView({behavior:'smooth', block:'start'});
+    const dlRow=$('polishDlRow'); if(dlRow) dlRow.style.display='none';
+    polishBtn.disabled = true;
+    const oldLabel = polishBtn.textContent;
+    polishBtn.textContent = '⏳ 二次审稿+打磨中（四篇并发·双审+改稿·约15-40分钟，请勿关闭）…';
+    const st=$('polishStatus'); if(st) st.textContent='四篇同时进行：两位审稿人各审一次 → 主笔据意见打磨改稿…';
+    try{
+      // 复用（或写）《从发现到发生》心得——供审稿人/主笔用发生学眼光把关（已缓存则秒回）
+      let reflection='';
+      try{ reflection = (await getSharedReflection(writeSel, writeKey, (n,note)=>{ if(st){ st.textContent = (n<0) ? (note||'准备心得…') : (n>0?('✍ 心得就绪 '+n+' 字 · 开始审稿…'):'准备心得…'); } })) || ''; }catch(_){ reflection=''; }
+
+      const defs = papers.map((p,i)=>({src:p,idx:i})).filter(x=>x.src && x.src.text);
+      const box = $('polishPapers'); if(box) box.innerHTML='';
+      const cells = defs.map(d=>{
+        const wrap=document.createElement('div');
+        wrap.style.cssText='border:1px solid rgba(176,132,46,0.3);border-radius:10px;padding:16px 18px;margin-bottom:14px;background:rgba(22,17,8,0.5)';
+        const t = d.src.title || ('论文'+(d.idx+1));
+        wrap.innerHTML='<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px"><div style="font-size:14.5px;font-weight:700;color:#D4A845">🔬 '+esc4(t)+'</div><div class="poCellStatus" style="font-size:12px;color:#8B98A5">排队中…</div></div><div class="poCellBody" style="color:#D4DCE4;font-size:14px;line-height:1.9;white-space:normal;max-height:360px;overflow:auto"><span class="placeholder">等待二次审稿…</span></div>';
+        if(box) box.appendChild(wrap);
+        return { bodyEl: wrap.querySelector('.poCellBody'), statusEl: wrap.querySelector('.poCellStatus'), title:t };
+      });
+      const results = await Promise.allSettled(defs.map((d,i)=>polishOnePaper({
+        title: cells[i].title,
+        paperText: d.src.text,
+        reflection: reflection,
+        bodyEl: cells[i].bodyEl, statusEl: cells[i].statusEl,
+        writeSel, writeKey, revA, revAKey, revB, revBKey
+      })));
+      window._polishedPapers = results.map((res,i)=>({
+        title: cells[i].title,
+        text: res.status==='fulfilled' ? (res.value.text||'') : ''
+      }));
+      const okCount = window._polishedPapers.filter(p=>p.text).length;
+      if(st) st.textContent='完成：'+okCount+'/'+defs.length+' 篇已二次审稿 + 打磨';
+      if(okCount>0 && dlRow) dlRow.style.display='block';
+    }catch(err){
+      showErr('二次审稿+打磨出错：'+(err&&err.message?err.message:err)+'（按钮已复位，可重试；反复失败请按 F12 看 Console）');
+      const s2=$('polishStatus'); if(s2) s2.textContent='出错，已停止';
+    }finally{
+      polishBtn.disabled = false;
+      polishBtn.textContent = oldLabel;
+    }
+  });
+}
+
+// 最后四篇（打磨版）下载
+const polishDlBtn = $('polishDlBtn');
+if(polishDlBtn){
+  polishDlBtn.addEventListener('click', ()=>{
+    const papers = window._polishedPapers; if(!papers) return;
+    const q = (window._lastResult && window._lastResult.question) || '';
+    let bodyHtml = '<h1 style="text-align:center">最后四篇 · 二次审稿打磨版 · 学术论文</h1><p style="text-align:center;color:#666">原初问题：'+esc4(q)+'　·　补规范 + 二次双审 + 打磨改稿</p>' + THOUGHT_DECL_HTML + '<hr/>';
+    papers.forEach((pp)=>{
+      if(!pp.text) return;
+      bodyHtml += '<h2 style="page-break-before:always">'+esc4(pp.title)+'</h2>';
+      bodyHtml += mdToHtml(pp.text);
+    });
+    const html='<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"><title>最后四篇·打磨版</title></head><body>'+bodyHtml+'</body></html>';
+    const blob=new Blob(['\ufeff'+html],{type:'application/msword'});
+    const url=URL.createObjectURL(blob); const a=document.createElement('a');
+    a.href=url; a.download='最后四篇_二次审稿打磨版.doc'; a.click(); URL.revokeObjectURL(url);
   });
 }
 
