@@ -2109,13 +2109,15 @@ function renderEmergeText(text){
   for(let raw of lines){
     let t = raw.trim();
     if(!t){ html += '<div style="height:8px"></div>'; continue; }
+    let forceHead=false; const _hm=t.match(/^(#{1,6})\s+(.*)$/); if(_hm){ t=_hm[2]; forceHead=true; }
+    t = t.replace(/^([-*+]|•)\s+/,'• ');
     let line = esc(t);
     // **加粗**
-    line = line.replace(/\*\*(.+?)\*\*/g, '<b style="color:#E5C86E">$1</b>');
+    line = line.replace(/\*\*(.+?)\*\*/g, '<b style="color:#E5C86E">$1</b>').replace(/`([^`]+)`/g,'<code style="font-family:Consolas,monospace;background:rgba(255,255,255,0.08);padding:0 3px;border-radius:3px">$1</code>');
     // ✓ 绿 / ✗ 红
     line = line.replace(/✓/g,'<span style="color:#4ade80;font-weight:700">✓</span>').replace(/✗/g,'<span style="color:#f87171;font-weight:700">✗</span>');
-    // 章节大标题：一、二、三、四
-    if(/^[一二三四五]、/.test(t)){
+    // 章节大标题：Markdown # 标题、一、二、三、四
+    if(forceHead || /^[一二三四五]、/.test(t)){
       html += '<div style="font-size:16px;font-weight:700;color:#C9A227;margin:18px 0 8px;letter-spacing:0.04em">'+line+'</div>';
       continue;
     }
@@ -2373,13 +2375,18 @@ if(fourDlBtn){
         if(p.revB){ bodyHtml += '<p><b>审稿人 B · '+esc4(p.revLabelB||'')+'</b></p>' + mdToHtml(p.revB); }
       }
     });
-    const html='<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"><title>四篇学术论文</title></head><body>'+bodyHtml+'</body></html>';
-    const blob=new Blob(['\ufeff'+html],{type:'application/msword'});
-    const url=URL.createObjectURL(blob); const a=document.createElement('a');
-    a.href=url; a.download='四篇学术论文.doc'; a.click(); URL.revokeObjectURL(url);
+    saveWordDoc('四篇学术论文', bodyHtml, '四篇学术论文.doc');
   });
 }
 function esc4(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+// —— 统一的 .doc（Word）保存：HTML 包壳 + BOM + 触发下载（四处导出共用，消除样板重复）——
+function saveWordDoc(title, bodyHtml, filename){
+  const html='<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"><title>'+title+'</title></head><body>'+bodyHtml+'</body></html>';
+  const blob=new Blob(['\ufeff'+html],{type:'application/msword'});
+  const url=URL.createObjectURL(blob); const a=document.createElement('a');
+  a.href=url; a.download=filename; a.click(); URL.revokeObjectURL(url);
+}
+
 
 // ===== Markdown 统一渲染：把 LLM 输出的 Markdown 记号转成 Word 真正的格式（而非原样漏出）=====
 function mdInlineTokens(str){
@@ -2597,10 +2604,7 @@ if(upliftDlBtn){
       bodyHtml += '<h2 style="page-break-before:always">'+esc4(p.title)+'</h2>';
       bodyHtml += mdToHtml(p.text);
     });
-    const html='<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"><title>第二批四篇</title></head><body>'+bodyHtml+'</body></html>';
-    const blob=new Blob(['\ufeff'+html],{type:'application/msword'});
-    const url=URL.createObjectURL(blob); const a=document.createElement('a');
-    a.href=url; a.download='第二批_发生引擎提升_四篇学术论文.doc'; a.click(); URL.revokeObjectURL(url);
+    saveWordDoc('第二批四篇', bodyHtml, '第二批_发生引擎提升_四篇学术论文.doc');
   });
 }
 
@@ -2678,10 +2682,7 @@ if(normalizeDlBtn){
       bodyHtml += '<h2 style="page-break-before:always">'+esc4(pp.title)+'</h2>';
       bodyHtml += mdToHtml(pp.text);
     });
-    const html='<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"><title>补规范版四篇</title></head><body>'+bodyHtml+'</body></html>';
-    const blob=new Blob(['\ufeff'+html],{type:'application/msword'});
-    const url=URL.createObjectURL(blob); const a=document.createElement('a');
-    a.href=url; a.download='第二批_补规范版_四篇学术论文.doc'; a.click(); URL.revokeObjectURL(url);
+    saveWordDoc('补规范版四篇', bodyHtml, '第二批_补规范版_四篇学术论文.doc');
   });
 }
 
@@ -2794,10 +2795,7 @@ if(polishDlBtn){
       bodyHtml += '<h2 style="page-break-before:always">'+esc4(pp.title)+'</h2>';
       bodyHtml += mdToHtml(pp.text);
     });
-    const html='<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"><title>最后四篇·打磨版</title></head><body>'+bodyHtml+'</body></html>';
-    const blob=new Blob(['\ufeff'+html],{type:'application/msword'});
-    const url=URL.createObjectURL(blob); const a=document.createElement('a');
-    a.href=url; a.download='最后四篇_二次审稿打磨版.doc'; a.click(); URL.revokeObjectURL(url);
+    saveWordDoc('最后四篇·打磨版', bodyHtml, '最后四篇_二次审稿打磨版.doc');
   });
 }
 
@@ -2876,14 +2874,16 @@ function renderPaperText(text){
   for(let raw of lines){
     let t = raw.trim();
     if(!t){ html += '<div style="height:10px"></div>'; continue; }
-    let line = esc(t).replace(/\*\*(.+?)\*\*/g,'<b style="color:#C5B6FF">$1</b>');
+    let forceHead=false; const _hm=t.match(/^(#{1,6})\s+(.*)$/); if(_hm){ t=_hm[2]; forceHead=true; }
+    t = t.replace(/^([-*+]|•)\s+/,'• ');
+    let line = esc(t).replace(/\*\*(.+?)\*\*/g,'<b style="color:#C5B6FF">$1</b>').replace(/`([^`]+)`/g,'<code style="font-family:Consolas,monospace;background:rgba(255,255,255,0.08);padding:0 3px;border-radius:3px">$1</code>');
     // 第一行非空 = 论文主标题
     if(first){
       html += '<div style="font-size:21px;font-weight:700;color:#EDE7FF;line-height:1.5;margin:0 0 14px;text-align:center">'+line+'</div>';
       first = false; continue;
     }
-    // 一级节标题：中文数字、或"摘要/关键词/引言/结论/参考"等
-    if(/^(摘\s*要|关键词|引\s*言|结\s*论|参考文献|Abstract|Keywords)/.test(t) || /^[一二三四五六七八九十]+[、\.]/.test(t)){
+    // 一级节标题：Markdown # 标题、中文数字、或"摘要/关键词/引言/结论/参考"等
+    if(forceHead || /^(摘\s*要|关键词|引\s*言|结\s*论|参考文献|Abstract|Keywords)/.test(t) || /^[一二三四五六七八九十]+[、\.]/.test(t)){
       html += '<div style="font-size:16.5px;font-weight:700;color:#A48CFF;margin:22px 0 10px;letter-spacing:0.03em">'+line+'</div>';
       continue;
     }
