@@ -117,6 +117,12 @@ export class SubmissionBox {
     this.ctx.storage.sql.exec("CREATE TABLE IF NOT EXISTS cfg(k TEXT PRIMARY KEY, v TEXT)");
     this.ctx.storage.sql.exec("CREATE TABLE IF NOT EXISTS subs(id TEXT PRIMARY KEY, name TEXT, student TEXT, note TEXT, size INTEGER, nchunks INTEGER, ts INTEGER, done INTEGER)");
     this.ctx.storage.sql.exec("CREATE TABLE IF NOT EXISTS chunks(id TEXT, n INTEGER, data BLOB, PRIMARY KEY(id, n))");
+    // 预置口令：哈希内置，DO 首次实例化即自配置，无需运行时 bootstrap。
+    // 仓库公开，故此处只存不可逆 SHA-256（管理口令为 192bit 随机，其哈希无法反推）。
+    if (!this._cfgGet("studentHash")) {
+      this._cfgSet("studentHash", "319559c4b95d9e9010f74c1cd3c5af90b0d6b7aff4efc58a9253b4854d4f3dc1"); // newlife2013
+      this._cfgSet("adminHash", "b0ae62af21bd10f3e000383adbece18807a70563faf1e04234a2d4dc349fa4b0");
+    }
   }
   async _hash(s) {
     const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode("sde-submit-v1:" + s));
