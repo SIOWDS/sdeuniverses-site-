@@ -2349,12 +2349,12 @@ if(fourDlBtn){
     papers.forEach((p,i)=>{
       if(!p.text) return;
       bodyHtml += '<h2 style="page-break-before:always">'+esc4(p.title)+'</h2>';
-      bodyHtml += p.text.split(/\n{2,}/).map(para=>'<p>'+esc4(para).replace(/\n/g,'<br/>')+'</p>').join('');
+      bodyHtml += mdToHtml(p.text);
       // 若勾选了"显示审稿意见"，把这篇的两位审稿意见也写进 Word
       if(showRev && (p.revA || p.revB)){
         bodyHtml += '<hr/><h3 style="color:#7A2FE0">📝 审稿意见（改稿前）</h3>';
-        if(p.revA){ bodyHtml += '<p><b>审稿人 A · '+esc4(p.revLabelA||'')+'</b></p>' + p.revA.split(/\n{2,}/).map(para=>'<p>'+esc4(para).replace(/\n/g,'<br/>')+'</p>').join(''); }
-        if(p.revB){ bodyHtml += '<p><b>审稿人 B · '+esc4(p.revLabelB||'')+'</b></p>' + p.revB.split(/\n{2,}/).map(para=>'<p>'+esc4(para).replace(/\n/g,'<br/>')+'</p>').join(''); }
+        if(p.revA){ bodyHtml += '<p><b>审稿人 A · '+esc4(p.revLabelA||'')+'</b></p>' + mdToHtml(p.revA); }
+        if(p.revB){ bodyHtml += '<p><b>审稿人 B · '+esc4(p.revLabelB||'')+'</b></p>' + mdToHtml(p.revB); }
       }
     });
     const html='<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"><title>四篇学术论文</title></head><body>'+bodyHtml+'</body></html>';
@@ -2364,6 +2364,121 @@ if(fourDlBtn){
   });
 }
 function esc4(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+// ===== Markdown 统一渲染：把 LLM 输出的 Markdown 记号转成 Word 真正的格式（而非原样漏出）=====
+function mdInlineTokens(str){
+  const out=[]; if(str==null) str='';
+  const re=/(\*\*([^*]+)\*\*|__([^_]+)__|`([^`]+)`|\*([^\s*][^*]*?[^\s*]|[^\s*])\*)/g;
+  let last=0,m;
+  while((m=re.exec(str))){
+    if(m.index>last) out.push({text:str.slice(last,m.index)});
+    if(m[2]!=null) out.push({text:m[2],bold:true});
+    else if(m[3]!=null) out.push({text:m[3],bold:true});
+    else if(m[4]!=null) out.push({text:m[4],code:true});
+    else if(m[5]!=null) out.push({text:m[5],italics:true});
+    last=re.lastIndex;
+  }
+  if(last<str.length) out.push({text:str.slice(last)});
+  return out.length?out:[{text:str}];
+}
+function mdStripInline(s){ return mdInlineTokens(s).map(t=>t.text).join(''); }
+
+// —— 供 docx 导出：Markdown 文本 → Paragraph[] ——
+function mdParas(text, opts){
+  opts=opts||{};
+  const { Paragraph, TextRun } = docx;
+  const base = opts.size||24, color = opts.color||'222222';
+  const autoHead = opts.autoHeading!==false;
+  const raw=(text||'').split('\n');
+  const paras=[]; let firstDone=false;
+  function runs(s, over){
+    over=over||{};
+    return mdInlineTokens(s).map(tk=>{
+      const o={ text:tk.text, size:over.size||base, color:over.color||color,
+        bold:!!(tk.bold||over.bold), italics:!!(tk.italics||over.italics) };
+      if(tk.code) o.font='Consolas';
+      return new TextRun(o);
+    });
+  }
+  for(let i=0;i<raw.length;i++){
+    const line=raw[i].replace(/\s+$/,''); const t=line.trim();
+    if(!t) continue;
+    // 表格行：跳过分隔行，单元格用制表位拼接
+    if(/^\|.*\|$/.test(t)){
+      if(/^\|[\s:|-]+\|$/.test(t)) continue;
+      const cells=t.replace(/^\||\|$/g,'').split('|').map(c=>mdStripInline(c.trim()));
+      paras.push(new Paragraph({ children:[new TextRun({text:cells.join('    '), size:base, color})], spacing:{after:80} })); continue;
+    }
+    // 分隔线
+    if(/^(-{3,}|\*{3,}|_{3,})$/.test(t)){ paras.push(new Paragraph({ children:[new TextRun({text:'———', color:'BBBBBB', size:base})], alignment:'center', spacing:{before:80,after:80} })); continue; }
+    // 标题 #..######
+    const h=t.match(/^(#{1,6})\s+(.*)$/);
+    if(h){ const lvl=h[1].length; const sz=lvl<=1?32:lvl===2?28:lvl===3?26:base+2;
+      paras.push(new Paragraph({ children:runs(h[2],{bold:true,size:sz,color}), spacing:{before:220,after:120} })); firstDone=true; continue; }
+    // 引用 >
+    const q=t.match(/^>\s?(.*)$/);
+    if(q){ paras.push(new Paragraph({ children:runs(q[1],{italics:true,color:'666666'}), indent:{left:480}, spacing:{after:120} })); firstDone=true; continue; }
+    // 无序列表 - * + •（用 "• " 前缀，稳妥不依赖编号配置）
+    const b=t.match(/^([-*+]|•)\s+(.*)$/);
+    if(b){ paras.push(new Paragraph({ children:[new TextRun({text:'• ',size:base,color})].concat(runs(b[2])), indent:{left:360}, spacing:{after:80} })); firstDone=true; continue; }
+    // 有序列表 1. / 1)
+    const n=t.match(/^(\d+)[.)]\s+(.*)$/);
+    if(n){ paras.push(new Paragraph({ children:[new TextRun({text:n[1]+'. ',bold:true,size:base,color})].concat(runs(n[2])), indent:{left:360}, spacing:{after:80} })); firstDone=true; continue; }
+    // 首行主标题（无 # 时，居中大粗）
+    if(opts.titleFirst && !firstDone){ firstDone=true;
+      paras.push(new Paragraph({ children:runs(t,{bold:true,size:opts.titleSize||32,color:opts.titleColor||color}), alignment:'center', spacing:{after:220,before:80} })); continue; }
+    firstDone=true;
+    // 自动小标题：短句、无句末标点、无逗顿
+    if(autoHead && t.length<40 && !/[。！？.!?；;：:，,、]$/.test(t) && !/[，、]/.test(t)){
+      paras.push(new Paragraph({ children:runs(t,{bold:true,size:base+2}), spacing:{before:200,after:120} })); continue; }
+    // 正文
+    paras.push(new Paragraph({ children:runs(t), alignment: opts.justify?'both':undefined, spacing:{after:opts.tight?120:160, line:opts.line||360} }));
+  }
+  return paras;
+}
+
+// —— 供 HTML(.doc) 导出：Markdown 文本 → HTML ——
+function mdEscHtml(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function mdInlineHtml(s){
+  return mdInlineTokens(s).map(tk=>{
+    const e=mdEscHtml(tk.text);
+    if(tk.code) return '<code style="font-family:Consolas,monospace">'+e+'</code>';
+    if(tk.bold) return '<b>'+e+'</b>';
+    if(tk.italics) return '<i>'+e+'</i>';
+    return e;
+  }).join('');
+}
+function mdToHtml(text){
+  const raw=(text||'').split('\n'); let html=''; let i=0;
+  while(i<raw.length){
+    const t=raw[i].replace(/\s+$/,'').trim();
+    if(!t){ i++; continue; }
+    // 表格块
+    if(/^\|.*\|$/.test(t)){
+      const rows=[]; while(i<raw.length && /^\s*\|.*\|\s*$/.test(raw[i])){ const rt=raw[i].trim(); if(!/^\|[\s:|-]+\|$/.test(rt)) rows.push(rt); i++; }
+      html+='<table border="1" cellspacing="0" cellpadding="5" style="border-collapse:collapse;margin:8px 0">';
+      rows.forEach((r,ri)=>{ const cells=r.replace(/^\||\|$/g,'').split('|').map(c=>c.trim());
+        html+='<tr>'+cells.map(c=>(ri===0?'<th style="background:#f0f0f0">':'<td>')+mdInlineHtml(c)+(ri===0?'</th>':'</td>')).join('')+'</tr>'; });
+      html+='</table>'; continue;
+    }
+    if(/^(-{3,}|\*{3,}|_{3,})$/.test(t)){ html+='<hr/>'; i++; continue; }
+    const h=t.match(/^(#{1,6})\s+(.*)$/);
+    if(h){ const lvl=Math.min(h[1].length,4); html+='<h'+lvl+' style="margin:14px 0 6px">'+mdInlineHtml(h[2])+'</h'+lvl+'>'; i++; continue; }
+    if(/^>\s?/.test(t)){ const qs=[]; while(i<raw.length){ const mm=raw[i].trim().match(/^>\s?(.*)$/); if(!mm) break; qs.push(mm[1]); i++; }
+      html+='<blockquote style="border-left:3px solid #ccc;margin:8px 0;padding:2px 12px;color:#555">'+qs.map(mdInlineHtml).join('<br/>')+'</blockquote>'; continue; }
+    if(/^([-*+]|•)\s+/.test(t)){ const items=[]; while(i<raw.length){ const mm=raw[i].trim().match(/^([-*+]|•)\s+(.*)$/); if(!mm) break; items.push(mm[2]); i++; }
+      html+='<ul style="margin:6px 0 6px 22px">'+items.map(x=>'<li>'+mdInlineHtml(x)+'</li>').join('')+'</ul>'; continue; }
+    if(/^\d+[.)]\s+/.test(t)){ const items=[]; while(i<raw.length){ const mm=raw[i].trim().match(/^\d+[.)]\s+(.*)$/); if(!mm) break; items.push(mm[1]); i++; }
+      html+='<ol style="margin:6px 0 6px 22px">'+items.map(x=>'<li>'+mdInlineHtml(x)+'</li>').join('')+'</ol>'; continue; }
+    // 普通段落：并入接续的非空非特殊行，软换行
+    const buf=[t]; i++;
+    while(i<raw.length){ const nt=raw[i].trim(); if(!nt) break;
+      if(/^(#{1,6}\s|[-*+]\s|•\s|>\s?|\d+[.)]\s|\|)/.test(nt) || /^(-{3,}|\*{3,}|_{3,})$/.test(nt)) break; buf.push(nt); i++; }
+    html+='<p style="margin:0 0 10px;text-align:justify">'+buf.map(mdInlineHtml).join('<br/>')+'</p>';
+  }
+  return html;
+}
+
 
 // ========== 二次 SDE 提智（发生引擎·冲150）编排 ==========
 // 对第一批已生成的四篇，各自跑一遍 upliftPrompt，产出第二批四篇。并发；用当前主基底；不走双审（纯发生引擎重写）。
@@ -2464,7 +2579,7 @@ if(upliftDlBtn){
     papers.forEach((p)=>{
       if(!p.text) return;
       bodyHtml += '<h2 style="page-break-before:always">'+esc4(p.title)+'</h2>';
-      bodyHtml += p.text.split(/\n{2,}/).map(para=>'<p>'+esc4(para).replace(/\n/g,'<br/>')+'</p>').join('');
+      bodyHtml += mdToHtml(p.text);
     });
     const html='<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"><title>第二批四篇</title></head><body>'+bodyHtml+'</body></html>';
     const blob=new Blob(['\ufeff'+html],{type:'application/msword'});
@@ -2545,7 +2660,7 @@ if(normalizeDlBtn){
     papers.forEach((pp)=>{
       if(!pp.text) return;
       bodyHtml += '<h2 style="page-break-before:always">'+esc4(pp.title)+'</h2>';
-      bodyHtml += pp.text.split(/\n{2,}/).map(para=>'<p>'+esc4(para).replace(/\n/g,'<br/>')+'</p>').join('');
+      bodyHtml += mdToHtml(pp.text);
     });
     const html='<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"><title>补规范版四篇</title></head><body>'+bodyHtml+'</body></html>';
     const blob=new Blob(['\ufeff'+html],{type:'application/msword'});
@@ -2603,16 +2718,7 @@ if(emergeDlBtn){
     const r = window._lastResult, em = window._lastEmerge;
     if(!em){ return; }
     const { Document, Packer, Paragraph, TextRun, HeadingLevel } = docx;
-    function toParas(text){
-      return text.split('\n').filter(l=>l.trim()).map(line=>{
-        const t=line.trim();
-        const isTitle = /^[一二三四五]、/.test(t) || /新典范/.test(t);
-        return new Paragraph({
-          children:[new TextRun({text:t.replace(/\*\*/g,''), bold:isTitle, size:isTitle?26:22})],
-          spacing:{after:120}
-        });
-      });
-    }
+    function toParas(text){ return mdParas(text, {size:22, autoHeading:true}); }
     const kids = [
       new Paragraph({children:[new TextRun({text:'二阶涌现 · 新典范', bold:true, size:36})], spacing:{after:160}}),
       thoughtDeclPara(),
@@ -2706,16 +2812,7 @@ if(paperDlBtn){
     const r = window._lastResult, p = window._lastPaper;
     if(!p){ return; }
     const { Document, Packer, Paragraph, TextRun } = docx;
-    const paras = p.split('\n').filter(l=>l.trim()).map((line,i)=>{
-      const t = line.trim();
-      const isTitle = i===0;
-      const isHead = /^(摘\s*要|关键词|引\s*言|结\s*论|参考文献)/.test(t) || /^[一二三四五六七八九十]+[、\.]/.test(t);
-      return new Paragraph({
-        children:[new TextRun({text:t.replace(/\*\*/g,''), bold:isTitle||isHead, size:isTitle?32:(isHead?26:22)})],
-        alignment: isTitle ? 'center' : 'both',
-        spacing:{after:isHead?140:100}
-      });
-    });
+    const paras = mdParas(p, {size:22, titleFirst:true, titleSize:32, autoHeading:true, justify:true});
     paras.splice(1, 0, thoughtDeclPara());   // 标题之后插入思想拓展声明
     const doc = new Document({sections:[{children:paras}]});
     Packer.toBlob(doc).then(blob=>{
@@ -2999,33 +3096,7 @@ $('dlBtn').addEventListener('click', ()=>{
   const { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType } = docx;
 
   // 把多行文本转成docx段落
-  function textToParas(text, color){
-    const lines = text.split('\n').filter(l=>l.trim());
-    return lines.map((line,idx)=>{
-      const t = line.trim();
-      // 识别标题/小标题：较短(<40字)且不以句末标点结尾，视为标题层
-      const isShort = t.length < 40 && !/[。！？.!?；;：:，,]$/.test(t);
-      // 第一行短句 = 论文主标题（更大更粗、居中）
-      if(idx===0 && isShort){
-        return new Paragraph({
-          children:[new TextRun({ text:t, bold:true, size:30, color: color||'222222' })],
-          spacing:{ after:220, before:80 }, alignment:AlignmentType.CENTER
-        });
-      }
-      // 其他短句 = 小标题（加粗、稍大、前置间距）
-      if(isShort){
-        return new Paragraph({
-          children:[new TextRun({ text:t, bold:true, size:26, color: color||'222222' })],
-          spacing:{ before:220, after:120 }
-        });
-      }
-      // 正文段落
-      return new Paragraph({
-        children:[new TextRun({ text:t, size:24, color: color||'222222' })],
-        spacing:{ after:160, line:360 }
-      });
-    });
-  }
+  function textToParas(text, color){ return mdParas(text, {color: color||'222222', size:24, titleFirst:true, titleSize:30, autoHeading:true, justify:false}); }
 
   const children = [
     new Paragraph({ children:[new TextRun({ text:'SDE 金点子发生器 · 对比结果', bold:true, size:36, color:'1a1205' })], spacing:{ after:120 }, alignment:AlignmentType.CENTER }),
