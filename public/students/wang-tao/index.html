@@ -22,13 +22,17 @@ nav a{color:var(--gold);text-decoration:none;font-size:14px;letter-spacing:0.05e
 .level-tag .t{font-size:12px;letter-spacing:0.32em;color:var(--gold)}
 .level-tag .line{flex:1;height:1px;background:var(--line)}
 .profile{max-width:820px;margin:0 auto;padding:52px 24px 20px;display:flex;gap:34px;align-items:center;flex-wrap:wrap}
-.avatar{width:132px;height:132px;border-radius:50%;flex-shrink:0;background:linear-gradient(160deg,rgba(212,178,94,0.30),rgba(212,178,94,0.06));border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-family:Georgia,serif;font-size:52px;font-weight:800;color:#F5E6BF;position:relative}
-.avatar .ph{font-size:10px;letter-spacing:0.15em;color:var(--ink2);position:absolute;bottom:12px;font-family:"Noto Serif SC",serif}
 .p-info{flex:1;min-width:240px}
 .p-info h1{font-size:clamp(30px,5vw,42px);font-weight:800;color:#F5EFE0;letter-spacing:0.04em;font-family:Georgia,"Noto Serif SC",serif}
 .p-note{font-size:14px;color:var(--ink2);margin-top:6px;letter-spacing:0.04em}
 .p-info .role{font-size:13px;color:var(--accent);letter-spacing:0.2em;margin-top:12px}
-.p-info .bio{font-size:15px;color:#6B6250;line-height:1.9;margin-top:16px;font-style:italic}
+.p-photo{width:200px;flex:0 0 200px}
+.p-photo img{display:block;width:100%;height:auto;border-radius:14px;border:1px solid var(--line);box-shadow:0 16px 42px rgba(201,168,76,0.14)}
+.tagline{font-size:15.5px;color:var(--gold2);letter-spacing:0.05em;margin-top:14px;font-family:"Noto Serif SC",Georgia,serif}
+.statement{max-width:820px;margin:0 auto;padding:18px 24px 6px}
+.statement p{font-size:16px;color:var(--ink);line-height:2.02;margin-bottom:18px}
+.statement p:last-child{margin-bottom:0}
+.statement b{color:var(--gold2);font-weight:600}
 .works{max-width:820px;margin:0 auto;padding:10px 24px 80px}
 .panel{background:linear-gradient(160deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:16px;padding:40px 30px;text-align:center;margin-top:20px}
 .panel .tag{font-size:12px;letter-spacing:0.34em;color:var(--gold);margin-bottom:14px}
@@ -37,7 +41,7 @@ nav a{color:var(--gold);text-decoration:none;font-size:14px;letter-spacing:0.05e
 .back a{color:var(--gold);text-decoration:none;font-size:14.5px;letter-spacing:0.06em;border-bottom:1px solid rgba(201,168,76,0.4);padding-bottom:2px}
 footer{border-top:1px solid var(--line);margin-top:24px;padding:30px 24px;text-align:center;color:#6B6250;font-size:13px}
 footer a{color:var(--gold);text-decoration:none}
-@media(max-width:640px){.profile{justify-content:center;text-align:center}.p-info{text-align:center}}
+@media(max-width:640px){.profile{justify-content:center;text-align:center}.p-info{text-align:center}.p-photo{flex:0 0 168px;width:168px}}
 </style></head>
 <body class="zh">
 <nav><div class="w">
@@ -52,19 +56,33 @@ footer a{color:var(--gold);text-decoration:none}
   <span class="n">01</span><span class="t zh-only">学 员 介 绍 · PROFILE</span><span class="t en-only">PROFILE</span><span class="line"></span>
 </div>
 <div class="profile">
-  <div class="avatar">王<span class="ph zh-only">照片待补</span><span class="ph en-only">photo TBA</span></div>
+  <div class="p-photo"><img src="wang-tao.jpg" alt="王涛"></div>
   <div class="p-info">
-    <h1>王涛</h1>
-    
-    <div class="role zh-only">SDE 学员</div>
-    <div class="role en-only">SDE TRAINEE</div>
-    <p class="bio zh-only">个人简介待补 —— 照片与简介陆续补充。</p>
-    <p class="bio en-only">Bio coming soon — photo and introduction to be added.</p>
+    <h1 class="zh-only">王涛</h1>
+    <h1 class="en-only">Wang Tao</h1>
+    <div class="p-note zh-only">王涛 · Wang Tao</div>
+    <div class="p-note en-only">王涛 · Wang Tao</div>
+    <div class="role zh-only">SDE 学员 · 企业经营者</div>
+    <div class="role en-only">SDE TRAINEE · ENTREPRENEUR</div>
+    <div class="tagline zh-only">上半场经营企业，下半场经营自己</div>
+    <div class="tagline en-only">First half of life, I built businesses; the second half, I cultivate myself.</div>
   </div>
 </div>
 
 <div class="level-tag" style="margin-top:36px">
-  <span class="n">02</span><span class="t zh-only">作 品 与 专 栏 · WORKS</span><span class="t en-only">WORKS &amp; COLUMNS</span><span class="line"></span>
+  <span class="n">02</span><span class="t zh-only">简 述 · STATEMENT</span><span class="t en-only">STATEMENT</span><span class="line"></span>
+</div>
+<div class="statement">
+  <p class="zh-only">人生上半场，我致力经营企业；人生下半场，我希望<b>经营自己</b>。这些年，我逐渐把探索的重心聚焦于两大主题：<b>健康与财富</b>。健康是创造的根基，却常在拥有时被忽视；财富是自由的保障，却易在追逐中失去方向。我相信，两者都不是人生的目的，而是通向<b>创造、自由与幸福</b>的重要基础。</p>
+  <p class="en-only">In the first half of life, I devoted myself to building businesses; in the second half, I hope to <b>cultivate myself</b>. Over these years, I have gradually drawn the focus of my exploration onto two themes: <b>health and wealth</b>. Health is the ground of all creation, yet it is often neglected precisely while we have it; wealth is the guarantor of freedom, yet in the chase for it we easily lose our bearings. I have come to believe that neither is the end of life — both are foundations on the way toward <b>creation, freedom and happiness</b>.</p>
+  <p class="zh-only">2023 年，有幸跟随王德生老师学习。从三视角、321、SIO，到今天的 <b>SDE</b>，每一步学习都让我不断重新理解生命、生存与生活。而 SDE <b>发生学</b>，更让我进一步感受到：什么是真正的智慧——也促使我把学习中的思考与实践中的体悟，持续整理成文字。</p>
+  <p class="en-only">In 2023 I had the good fortune to study under Mr. Wang Desheng. From the Three Perspectives, 321 and SIO to today's <b>SDE</b>, each step has led me to keep re-understanding life, survival and living. And the <b>genesis</b> view of SDE has let me feel, more deeply still, what real wisdom is — moving me to set down, little by little, the reflections of study and the realizations of practice into words.</p>
+  <p class="zh-only">愿与更多同行者一起，在探索中成长，在创造中自由，在自由中走向幸福。</p>
+  <p class="en-only">May I walk together with more fellow travelers — growing through exploration, made free through creation, and through freedom moving toward happiness.</p>
+</div>
+
+<div class="level-tag" style="margin-top:36px">
+  <span class="n">03</span><span class="t zh-only">作 品 与 专 栏 · WORKS</span><span class="t en-only">WORKS &amp; COLUMNS</span><span class="line"></span>
 </div>
 <div class="works">
   <div class="panel">
