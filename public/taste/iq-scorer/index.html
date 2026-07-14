@@ -4,15 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SDE 创新智商评分官 · 品尝系列 | SDE Universes</title>
-<meta name="description" content="上传一篇论文(Word 或 PDF),先对 DeepSeek 与 GLM 两个基底做 SDE 内功提智+写心得,再由两个提智后的基底各自打分:创新智商(满分160,天才·典范级封顶)与论文水平(满分100),取两基底平均。附五维雷达、扣分句证据与提升路径。用你自己的 API Key,浏览器直连。">
+<meta name="description" content="上传一篇(或含多篇)论文的 Word/PDF。若文档含多篇论文,自动拆分并逐篇评分。每篇先对 DeepSeek 与 GLM 两个基底做 SDE 内功提智+写心得,再各自打分:创新智商(满分160,天才·典范级封顶)与论文水平(满分100),取两基底平均,最后出汇总报告。">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/mammoth@1.6.0/mammoth.browser.min.js"></script>
 <style>
-:root{
-  --bg:#0E1116;--panel:#161B22;--panel2:#1C232C;--border:rgba(255,255,255,0.10);
-  --text:#E6EDF3;--muted:#8B98A5;--gold:#D4B25E;--gold2:#E5C86E;
-  --ok:#3FB950;--err:#F85149;--purple:#B98CFF;--blue:#6E9FD4;
-}
+:root{--bg:#0E1116;--panel:#161B22;--panel2:#1C232C;--border:rgba(255,255,255,0.10);--text:#E6EDF3;--muted:#8B98A5;--gold:#D4B25E;--gold2:#E5C86E;--ok:#3FB950;--err:#F85149;--purple:#B98CFF;--blue:#6E9FD4;}
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:var(--bg);color:var(--text);font-family:-apple-system,"PingFang SC","Microsoft YaHei","Segoe UI",sans-serif;line-height:1.7;min-height:100vh}
 a{color:var(--gold2);text-decoration:none}a:hover{text-decoration:underline}
@@ -21,17 +17,16 @@ nav{border-bottom:1px solid var(--border);background:rgba(14,17,22,0.9);backdrop
 nav .wrap{display:flex;align-items:center;justify-content:space-between;height:58px}
 .nav-logo{font-weight:700;letter-spacing:0.04em;color:var(--text);font-size:16px}
 .nav-back{font-size:14px;color:var(--muted)}
-header.hero{text-align:center;padding:50px 20px 22px;position:relative;overflow:hidden}
-.hero-glow{position:absolute;left:50%;top:14%;transform:translateX(-50%);width:520px;height:280px;background:radial-gradient(ellipse,rgba(212,178,94,0.13),transparent 70%);pointer-events:none}
-.hero-eyebrow{font-size:12px;letter-spacing:0.4em;color:var(--gold);margin-bottom:15px;position:relative}
+header.hero{text-align:center;padding:48px 20px 20px;position:relative;overflow:hidden}
+.hero-glow{position:absolute;left:50%;top:12%;transform:translateX(-50%);width:520px;height:280px;background:radial-gradient(ellipse,rgba(212,178,94,0.13),transparent 70%);pointer-events:none}
+.hero-eyebrow{font-size:12px;letter-spacing:0.4em;color:var(--gold);margin-bottom:14px;position:relative}
 h1{font-size:clamp(26px,5vw,42px);font-weight:800;letter-spacing:0.02em;position:relative;line-height:1.3}
 h1 .grad{background:linear-gradient(120deg,var(--gold),var(--gold2));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
-.hero-sub{color:var(--muted);font-size:clamp(14px,2vw,16px);margin-top:14px;max-width:720px;margin-left:auto;margin-right:auto;position:relative}
+.hero-sub{color:var(--muted);font-size:clamp(14px,2vw,16px);margin-top:14px;max-width:730px;margin-left:auto;margin-right:auto;position:relative}
 .hero-sub b{color:#C9B27A;font-weight:600}
 .flow{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-top:16px;font-size:12px;color:var(--muted)}
 .flow span{background:var(--panel);border:1px solid var(--border);border-radius:20px;padding:5px 13px}
 .flow .arr{border:none;background:none;color:var(--gold);align-self:center}
-
 .controls{max-width:860px;margin:28px auto 0;background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:24px}
 .field{margin-bottom:16px}.field:last-child{margin-bottom:0}
 .field label{display:block;font-size:13px;color:var(--muted);margin-bottom:8px;letter-spacing:0.02em}
@@ -44,26 +39,43 @@ textarea{resize:vertical;min-height:150px;line-height:1.7}
 .key-toggle{flex-shrink:0;background:var(--panel2);border:1px solid var(--border);border-radius:9px;color:var(--muted);padding:0 14px;font-size:13px;cursor:pointer;white-space:nowrap}
 .key-toggle:hover{color:var(--text);border-color:var(--gold)}
 .key-hint{font-size:12px;color:var(--muted);margin-top:7px;line-height:1.6}
-.key-hint b{color:var(--gold)}
 .key-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 @media(max-width:600px){.key-grid{grid-template-columns:1fr}}
 .key-card{background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:14px}
 .key-card .kc-head{font-size:12.5px;font-weight:700;margin-bottom:9px;display:flex;align-items:center;gap:6px}
 .key-card input{background:#12161C}
-
-/* upload */
 .drop{border:1.5px dashed rgba(212,178,94,0.4);border-radius:12px;padding:26px 20px;text-align:center;cursor:pointer;transition:all .2s;background:rgba(212,178,94,0.03)}
 .drop:hover,.drop.over{border-color:var(--gold);background:rgba(212,178,94,0.08)}
-.drop .di{font-size:30px;margin-bottom:8px}
-.drop .dt{font-size:14px;color:var(--text)}
-.drop .ds{font-size:12px;color:var(--muted);margin-top:5px}
+.drop .di{font-size:30px;margin-bottom:8px}.drop .dt{font-size:14px;color:var(--text)}.drop .ds{font-size:12px;color:var(--muted);margin-top:5px}
 .file-info{margin-top:10px;font-size:13px;display:none;align-items:center;gap:8px;color:var(--ok);background:rgba(63,185,80,0.08);border:1px solid rgba(63,185,80,0.3);border-radius:8px;padding:9px 13px}
 .file-info.err{color:#FCA5A5;background:rgba(248,81,73,0.08);border-color:rgba(248,81,73,0.35)}
-
 .examples{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
 .ex-chip{background:var(--panel2);border:1px solid var(--border);border-radius:20px;padding:6px 14px;font-size:12.5px;color:var(--muted);cursor:pointer;transition:all .2s}
 .ex-chip:hover{color:var(--gold);border-color:var(--gold)}
-
+/* split */
+.split-row{display:flex;gap:10px;flex-wrap:wrap}
+.btn-split{background:var(--panel2);border:1px solid rgba(212,178,94,0.4);color:var(--gold);border-radius:9px;padding:10px 16px;font-size:13.5px;cursor:pointer;transition:all .2s}
+.btn-split:hover:not(:disabled){background:rgba(212,178,94,0.1);border-color:var(--gold)}
+.btn-split:disabled{opacity:.5;cursor:not-allowed}
+.btn-split.alt{color:var(--muted);border-color:var(--border)}
+.btn-split.alt:hover{color:var(--gold);border-color:var(--gold)}
+.split-hint{font-size:12px;color:var(--muted);margin-top:8px;line-height:1.6}
+.split-hint code{background:var(--panel2);padding:1px 6px;border-radius:4px;color:#C9B27A}
+.split-note{font-size:12.5px;color:var(--blue);margin-top:8px;display:none}
+.queue-box{display:none;margin-top:12px;background:rgba(20,24,30,0.5);border:1px solid rgba(212,178,94,0.25);border-radius:12px;padding:14px 16px}
+.q-head{font-size:13.5px;color:var(--text);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.q-head b{color:var(--gold)}
+.q-reset{background:none;border:1px solid var(--border);color:var(--muted);border-radius:7px;padding:5px 11px;font-size:12px;cursor:pointer}
+.q-reset:hover{color:var(--gold);border-color:var(--gold)}
+.q-list{display:flex;flex-direction:column;gap:8px}
+.q-item{display:flex;align-items:center;gap:10px;background:var(--panel2);border-radius:8px;padding:9px 12px}
+.q-idx{flex-shrink:0;width:22px;height:22px;border-radius:50%;background:rgba(212,178,94,0.15);color:var(--gold);font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.q-main{flex:1;min-width:0}
+.q-title{font-size:13px;color:var(--text);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.q-prev{font-size:11.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.q-del{flex-shrink:0;background:none;border:none;color:var(--muted);font-size:14px;cursor:pointer;padding:4px 8px;border-radius:6px}
+.q-del:hover{color:var(--err);background:rgba(248,81,73,0.1)}
+.q-fast{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--muted);margin-top:11px;cursor:pointer}
 .go-row{display:flex;gap:12px;align-items:center;margin-top:20px}
 .btn-go{flex:1;background:linear-gradient(120deg,var(--gold),var(--gold2));color:#1a1205;font-weight:700;font-size:16px;border:none;border-radius:10px;padding:15px;cursor:pointer;letter-spacing:0.04em;transition:transform .1s,opacity .2s}
 .btn-go:hover:not(:disabled){transform:translateY(-1px)}
@@ -76,31 +88,24 @@ details.explain{max-width:860px;margin:12px auto 0}
 details.explain summary{cursor:pointer;font-size:13px;font-weight:600;color:var(--purple);padding:8px 0}
 details.explain .ex-body{font-size:13px;color:#C9BEDA;line-height:1.9;background:rgba(30,20,44,0.35);border:1px solid rgba(122,47,224,0.25);border-radius:10px;padding:14px 18px}
 details.explain .ex-body b{color:#D4DCE4}
-
 .privacy-note{max-width:860px;margin:14px auto 0;font-size:12px;color:var(--muted);line-height:1.7;background:rgba(20,24,30,0.5);border:1px solid var(--border);border-radius:10px;padding:12px 18px}
 .privacy-note b{color:var(--gold)}
 .err-box{max-width:860px;margin:16px auto 0;display:none;background:rgba(248,81,73,0.08);border:1px solid rgba(248,81,73,0.4);border-radius:10px;padding:12px 18px;color:#FCA5A5;font-size:13.5px;line-height:1.6}
-
-/* progress rows */
 #progress{max-width:860px;margin:22px auto 0;display:none}
 .prow{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:14px 18px;margin-bottom:10px;display:flex;align-items:center;gap:14px}
 .prow .pname{font-size:14px;font-weight:700;min-width:135px}
 .prow .pstage{flex:1;font-size:13px;color:var(--muted)}
-.prow.done{border-color:rgba(63,185,80,0.4)}
-.prow.fail{border-color:rgba(248,81,73,0.4)}
-
-/* results */
+.prow.done{border-color:rgba(63,185,80,0.4)}.prow.fail{border-color:rgba(248,81,73,0.4)}
 #result{max-width:900px;margin:26px auto 60px;display:none}
-.avg-card{background:linear-gradient(135deg,rgba(212,178,94,0.10),rgba(122,47,224,0.06));border:1px solid rgba(212,178,94,0.35);border-radius:16px;padding:26px 28px;margin-bottom:22px}
-.avg-head{font-size:12px;letter-spacing:0.25em;color:var(--gold);text-align:center;margin-bottom:18px}
+.avg-card{background:linear-gradient(135deg,rgba(212,178,94,0.10),rgba(122,47,224,0.06));border:1px solid rgba(212,178,94,0.35);border-radius:16px;padding:24px 26px;margin-bottom:22px}
+.avg-head{font-size:12px;letter-spacing:0.25em;color:var(--gold);text-align:center;margin-bottom:16px}
 .avg-scores{display:flex;gap:24px;justify-content:center;flex-wrap:wrap}
-.avg-one{text-align:center;min-width:180px}
-.avg-one .an{font-size:58px;font-weight:800;line-height:1}
-.avg-one .amax{font-size:20px;color:var(--muted);font-weight:600}
+.avg-one{text-align:center;min-width:170px}
+.avg-one .an{font-size:54px;font-weight:800;line-height:1}
+.avg-one .amax{font-size:19px;color:var(--muted);font-weight:600}
 .avg-one .al{font-size:12px;letter-spacing:0.15em;color:var(--muted);margin-top:8px}
 .avg-one .abadge{display:inline-block;font-size:12.5px;font-weight:700;padding:4px 13px;border-radius:20px;margin-top:9px}
-.avg-note{text-align:center;font-size:12.5px;color:var(--muted);margin-top:16px;line-height:1.7}
-
+.avg-note{text-align:center;font-size:12.5px;color:var(--muted);margin-top:15px;line-height:1.7}
 .base-panel{background:var(--panel);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:20px}
 .bp-head{padding:18px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:14px;flex-wrap:wrap}
 .bp-name{font-size:16px;font-weight:700}
@@ -118,8 +123,7 @@ details.explain .ex-body b{color:#D4DCE4}
 .bar{height:7px;background:var(--panel2);border-radius:5px;overflow:hidden}
 .bar-fill{height:100%;border-radius:5px}
 .dim-ev{font-size:11.5px;color:var(--muted);line-height:1.55;margin-top:4px}
-.iq-sub,.pp-sub{font-size:13px;color:var(--muted);margin-top:10px}
-.iq-sub b,.pp-sub b{color:#C9B27A;font-weight:600}
+.iq-sub,.pp-sub{font-size:13px;color:var(--muted);margin-top:10px}.iq-sub b,.pp-sub b{color:#C9B27A;font-weight:600}
 .block{margin-top:22px;padding-top:18px;border-top:1px solid var(--border)}
 .quote-box{background:var(--panel2);border-left:3px solid var(--err);border-radius:0 8px 8px 0;padding:12px 15px}
 .quote-box .q{font-size:13px;color:#E6EDF3;font-style:italic;line-height:1.7}
@@ -133,6 +137,27 @@ details.think-fold .fold-body{font-size:11.5px;color:#9A8FAC;line-height:1.7;whi
 .result-actions{display:flex;gap:12px;margin-top:4px;flex-wrap:wrap}
 .btn-ghost{background:var(--panel);border:1px solid var(--border);border-radius:9px;color:var(--muted);padding:10px 18px;font-size:13.5px;cursor:pointer;transition:all .2s}
 .btn-ghost:hover{color:var(--gold);border-color:var(--gold)}
+/* batch report */
+.batch-sum{background:linear-gradient(135deg,rgba(212,178,94,0.10),rgba(122,47,224,0.06));border:1px solid rgba(212,178,94,0.35);border-radius:16px;padding:22px 26px;margin-bottom:20px;text-align:center}
+.batch-sum .bh{font-size:12px;letter-spacing:0.22em;color:var(--gold);margin-bottom:14px}
+.batch-sum .bnums{display:flex;gap:26px;justify-content:center;flex-wrap:wrap}
+.batch-sum .bn{min-width:120px}
+.batch-sum .bn .v{font-size:40px;font-weight:800;line-height:1}
+.batch-sum .bn .l{font-size:11.5px;color:var(--muted);letter-spacing:.1em;margin-top:6px}
+.batch-sum .bextra{font-size:12.5px;color:var(--muted);margin-top:14px;line-height:1.7}
+.batch-table{width:100%;border-collapse:collapse;margin-bottom:20px;font-size:13px}
+.batch-table th,.batch-table td{padding:9px 10px;border-bottom:1px solid var(--border);text-align:left}
+.batch-table th{color:var(--muted);font-size:11.5px;letter-spacing:.08em;font-weight:600}
+.batch-table td.num{text-align:center;font-weight:700}
+.batch-table .rank{color:var(--muted);text-align:center;width:34px}
+.batch-table .tt{max-width:340px}
+details.paper-fold{margin-bottom:12px;border:1px solid var(--border);border-radius:12px;overflow:hidden}
+details.paper-fold summary{cursor:pointer;padding:14px 18px;font-size:14px;font-weight:600;background:var(--panel);list-style:none}
+details.paper-fold summary::-webkit-details-marker{display:none}
+details.paper-fold summary:hover{background:var(--panel2)}
+details.paper-fold[open] summary{border-bottom:1px solid var(--border)}
+.paper-fold .pf-body{padding:18px}
+.section-title{font-size:14px;font-weight:700;color:var(--text);margin:6px 0 12px}
 .rubric-note{max-width:900px;margin:0 auto 60px;font-size:12px;color:var(--muted);line-height:1.8;text-align:center}
 .rubric-note b{color:#C9B27A}
 </style>
@@ -148,79 +173,64 @@ details.think-fold .fold-body{font-size:11.5px;color:#9A8FAC;line-height:1.7;whi
   <div class="hero-glow"></div>
   <div class="hero-eyebrow">SDE 智能体品尝系列 · 其一</div>
   <h1>SDE <span class="grad">创新智商评分官</span></h1>
-  <p class="hero-sub">上传一篇论文（Word / PDF）。先对 <b>DeepSeek</b> 与 <b>GLM</b> 两个基底做 <b>SDE 内功提智 + 写心得</b>，让它们真正内化发生学；再由两个提智后的基底各自打两个分——<b>创新智商（满分 160，天才·典范级封顶）</b>与<b>论文水平（满分 100）</b>——最后取两基底平均。</p>
-  <div class="flow">
-    <span>上传论文</span><span class="arr">→</span><span>双基底 SDE 提智+心得</span><span class="arr">→</span><span>各打两分</span><span class="arr">→</span><span>取平均</span>
-  </div>
+  <p class="hero-sub">上传一篇论文（Word / PDF）。<b>若文档里含多篇论文，会自动拆分、逐篇各评一套分</b>。每篇都先对 <b>DeepSeek</b> 与 <b>GLM</b> 两个基底做 SDE 内功提智+写心得，再各打 <b>创新智商（满分 160，天才·典范级封顶）</b>与 <b>论文水平（满分 100）</b>，取两基底平均；多篇时最后出一份汇总报告。</p>
+  <div class="flow"><span>上传（可含多篇）</span><span class="arr">→</span><span>拆分</span><span class="arr">→</span><span>逐篇双基底提智评分</span><span class="arr">→</span><span>汇总报告</span></div>
 </header>
 
 <div class="controls">
   <div class="field">
     <label>上传论文 <span class="req">*</span><span class="count" id="count">0 字</span></label>
-    <div class="drop" id="drop">
-      <div class="di">📄</div>
-      <div class="dt">点击选择，或把 <b>Word（.docx）/ PDF</b> 文件拖到这里</div>
-      <div class="ds">文件在你本机浏览器内解析成文字，不上传到任何服务器 · 也可在下方直接粘贴</div>
-    </div>
+    <div class="drop" id="drop"><div class="di">📄</div><div class="dt">点击选择，或把 <b>Word（.docx）/ PDF</b> 文件拖到这里</div><div class="ds">文件在你本机浏览器内解析成文字，不上传 · 也可在下方直接粘贴</div></div>
     <input type="file" id="fileIn" accept=".docx,.pdf" style="display:none">
     <div class="file-info" id="fileInfo"></div>
   </div>
 
   <div class="field">
     <label>论文正文 <span style="color:var(--muted);font-weight:400">（上传后自动填入，可编辑；也可直接粘贴）</span></label>
-    <textarea id="docText" placeholder="上传 Word/PDF 后正文出现在这里；或直接把论文全文粘贴进来。"></textarea>
-    <div class="examples">
-      <span style="font-size:12px;color:var(--muted);margin-right:2px">没有文件？试一段：</span>
-      <span class="ex-chip" data-ex="mass">大众水平样本</span>
-      <span class="ex-chip" data-ex="r3">资深学者样本</span>
-      <span class="ex-chip" data-ex="r4">顶级金点子样本</span>
+    <textarea id="docText" placeholder="上传 Word/PDF 后正文出现在这里；或直接粘贴。若含多篇论文，用下方「拆分」。"></textarea>
+    <div class="examples"><span style="font-size:12px;color:var(--muted);margin-right:2px">没有文件？试一段：</span><span class="ex-chip" data-ex="mass">大众水平样本</span><span class="ex-chip" data-ex="r3">资深学者样本</span><span class="ex-chip" data-ex="r4">顶级金点子样本</span></div>
+  </div>
+
+  <div class="field" id="splitField">
+    <label>多篇论文拆分 <span style="color:var(--muted);font-weight:400">（文档里有多篇论文时用；单篇可跳过）</span></label>
+    <div class="split-row">
+      <button class="btn-split" id="splitBtn">🔍 识别文档中的多篇论文</button>
+      <button class="btn-split alt" id="manualSplitBtn">按分隔符拆分</button>
     </div>
+    <div class="split-hint">「识别」用 AI 自动找出每篇论文的边界（需已填至少一个 Key）；或在每两篇之间单独加一行分隔线（<code>=====</code> / <code>-----</code>，≥3 个字符）后点「按分隔符拆分」。拆分后可删除误分项，或点「其实是单篇」还原。</div>
+    <div class="split-note" id="splitNote"></div>
+    <div class="queue-box" id="queueBox"></div>
   </div>
 
   <div class="field">
-    <label>论文标题 <span style="color:var(--muted);font-weight:400">（选填，留空自动拟名）</span></label>
+    <label>论文标题 <span style="color:var(--muted);font-weight:400">（单篇时选填；多篇时按拆分自动命名）</span></label>
     <input type="text" id="docTitle" placeholder="例如：AI 时代的教育评价系统阻力">
   </div>
 
   <div class="field">
     <label>两个基底的 API Key <span class="req">*</span> <span style="color:var(--muted);font-weight:400">（都填 → 双基底取平均；只填一个 → 单基底评分）</span></label>
     <div class="key-grid">
-      <div class="key-card">
-        <div class="kc-head" style="color:#4C8BF5">🧠 DeepSeek-V4-Pro</div>
-        <div class="key-row"><input type="password" id="dsKey" placeholder="DeepSeek API Key" autocomplete="off"><button class="key-toggle" data-for="dsKey">显示</button></div>
-        <div class="key-hint">DeepSeek 开放平台 → API keys，以 sk- 开头。</div>
-      </div>
-      <div class="key-card">
-        <div class="kc-head" style="color:#3FB6A8">🧠 GLM-5（智谱）</div>
-        <div class="key-row"><input type="password" id="glmKey" placeholder="智谱 GLM API Key" autocomplete="off"><button class="key-toggle" data-for="glmKey">显示</button></div>
-        <div class="key-hint">智谱开放平台（bigmodel.cn）→ API Key。</div>
-      </div>
+      <div class="key-card"><div class="kc-head" style="color:#4C8BF5">🧠 DeepSeek-V4-Pro</div><div class="key-row"><input type="password" id="dsKey" placeholder="DeepSeek API Key" autocomplete="off"><button class="key-toggle" data-for="dsKey">显示</button></div><div class="key-hint">DeepSeek 开放平台 → API keys，以 sk- 开头。</div></div>
+      <div class="key-card"><div class="kc-head" style="color:#3FB6A8">🧠 GLM-5（智谱）</div><div class="key-row"><input type="password" id="glmKey" placeholder="智谱 GLM API Key" autocomplete="off"><button class="key-toggle" data-for="glmKey">显示</button></div><div class="key-hint">智谱开放平台（bigmodel.cn）→ API Key。</div></div>
     </div>
   </div>
 
-  <div class="go-row">
-    <button class="btn-go" id="goBtn">开始双基底评分</button>
-    <div class="status" id="status"></div>
-  </div>
+  <div class="go-row"><button class="btn-go" id="goBtn">开始评分</button><div class="status" id="status"></div></div>
   <div class="neigong-tag" id="neigongStatus">⏳ SDE 内功加载中…</div>
 </div>
 
 <details class="explain">
   <summary>📖 什么是「SDE 提智 + 心得」？为什么评分前要先做这一步？</summary>
-  <div class="ex-body">
-    直接让一个大模型给论文打创新分，它往往被漂亮的表达和高密度术语迷惑、一路给高分（通胀）。所以每个基底在打分前，会先<b>研读完整的 SDE 发生学内功</b>，再<b>亲手写一篇《从发现到发生》的心得</b>——用它自己的话把"追问事物如何发生、而非如何被发现"这套思维彻底内化一遍，并诚实检视自己"擅长精确诊断、容易把描述当深刻"的惯性。写完的心得<b>存在你的浏览器本地、与基底一一对应</b>（谁写的谁用），下次同一基底直接秒载复用。带着这份内化过的、警惕自己惯性的头脑，它才去打分——这就是评分不通胀、能识别真创新的关键。若你之前在「金点子发生器」里已让某基底写过心得，这里会直接复用同一份。
-  </div>
+  <div class="ex-body">直接让大模型给论文打创新分，它往往被漂亮的表达和高密度术语迷惑、一路给高分（通胀）。所以每个基底在打分前，会先<b>研读完整的 SDE 发生学内功</b>，再<b>亲手写一篇《从发现到发生》心得</b>——用它自己的话把"追问事物如何发生、而非如何被发现"这套思维彻底内化一遍，并诚实检视自己"擅长精确诊断、易把描述当深刻"的惯性。写完的心得<b>存在你的浏览器本地、与基底一一对应</b>，同一基底下次秒载复用（多篇论文共用同一份心得）。带着这份内化过的头脑，它才去审稿打分。若你在「金点子发生器」里已让某基底写过心得，这里直接复用。</div>
 </details>
 
 <div class="privacy-note">
-  🔒 论文在你本机浏览器内解析成文字，<b>不上传</b>。API Key 只存本机浏览器（localStorage）。DeepSeek 与 GLM 都是国产基底，请求直接从你的浏览器发往对应厂商，本站服务器全程不经手、不存储。<br>
-  ⏱ 深度思考档：每个基底会先写心得（首次约 1–2 分钟，之后秒载）再逐维审读打分（约 1–2 分钟）。两个基底<b>并行</b>进行。首次完整跑约 3–4 分钟，之后约 1–2 分钟。请耐心等待。
+  🔒 论文在你本机浏览器内解析成文字，<b>不上传</b>；API Key 只存本机浏览器。DeepSeek 与 GLM 都是国产基底，请求直接从你的浏览器发往厂商，本站服务器不经手。<br>
+  ⏱ 深度思考档：每个基底先写心得（首次约 1–2 分钟，之后秒载）再逐维审读打分（约 1–2 分钟），两基底并行。<b>多篇论文按篇串行评分</b>，篇数越多耗时越长——N 篇约 N×1–2 分钟；可在拆分后勾选「批量提速」每篇只用一个基底。请耐心等待。
 </div>
 
 <div class="err-box" id="errBox"></div>
-
 <div id="progress"></div>
-
 <div id="result"></div>
 
 <div class="rubric-note">
@@ -230,47 +240,36 @@ details.think-fold .fold-body{font-size:11.5px;color:#9A8FAC;line-height:1.7;whi
 </div>
 
 <script>
-/* ═══════════ 基底路由（DeepSeek + GLM，浏览器直连） ═══════════ */
-const API_URLS = { ds:"https://api.deepseek.com/v1/chat/completions", glm:"https://open.bigmodel.cn/api/paas/v4/chat/completions" };
-const KEY_STORE = { ds:'sde_ds_key', glm:'sde_glm_key' };
-const SEL_NAME = { 'ds:pro':'DeepSeek-V4-Pro', 'glm:pro':'GLM-5' };
-const SEL_COLOR = { 'ds:pro':'#4C8BF5', 'glm:pro':'#3FB6A8' };
+/* ═══ 基底路由 ═══ */
+const API_URLS={ ds:"https://api.deepseek.com/v1/chat/completions", glm:"https://open.bigmodel.cn/api/paas/v4/chat/completions" };
+const SEL_NAME={ 'ds:pro':'DeepSeek-V4-Pro','glm:pro':'GLM-5' };
+const SEL_COLOR={ 'ds:pro':'#4C8BF5','glm:pro':'#3FB6A8' };
 function parseModel(sel){ const [vendor,tier]=sel.split(':'); return {vendor,tier}; }
 function apiUrl(sel){ return API_URLS[parseModel(sel).vendor]; }
-function buildPayload(sel, systemPrompt, userMsg, maxTokens){
-  const {vendor,tier}=parseModel(sel);
-  const cap=(typeof maxTokens==='number'&&maxTokens>0)?maxTokens:12000;
+function buildPayload(sel,systemPrompt,userMsg,maxTokens){
+  const {vendor}=parseModel(sel); const cap=(typeof maxTokens==='number'&&maxTokens>0)?maxTokens:12000;
   const base={ stream:true, messages:[{role:'system',content:systemPrompt},{role:'user',content:userMsg}], max_tokens:cap };
   if(vendor==='ds'){ base.model='deepseek-v4-pro'; base.thinking={type:'enabled'}; base.reasoning_effort='xhigh'; }
   else if(vendor==='glm'){ base.model='glm-5'; base.thinking={type:'enabled'}; }
   return base;
 }
-
-/* ═══════════ SDE 内功（从 assets 加载，与发生器同源） ═══════════ */
-let SDE_BASE = `你是一位思想极其深刻、善于穿透常识的跨学科洞察者。核心心法：不问"这个东西是什么"，而问"它在什么条件下、经什么路径、成为现在的样子"。世界不是被发现的，而是被发生出来的。`;
-let SDE_BASE_LOADED = false;
-let neigongPromise = (async function(){
-  try{
-    const resp = await fetch('/taste/assets/sde-neigong.txt', {cache:'force-cache'});
-    if(resp.ok){ const full = await resp.text();
-      if(full && full.length > 5000){ SDE_BASE=full; SDE_BASE_LOADED=true;
-        const el=document.getElementById('neigongStatus'); if(el){ el.textContent='✓ SDE 内功已加载（'+full.length+' 字 · 提智就绪）'; el.style.color='#5FBF7F'; }
-        return true; } }
-    return false;
-  }catch(e){ return false; }
-})();
-async function ensureNeigong(){
-  let ok = await neigongPromise;
-  if(!ok || !SDE_BASE_LOADED){
-    neigongPromise=(async()=>{ try{ const r=await fetch('/taste/assets/sde-neigong.txt',{cache:'no-store'}); if(r.ok){ const f=await r.text(); if(f&&f.length>5000){ SDE_BASE=f; SDE_BASE_LOADED=true; return true; } } }catch(e){} return false; })();
-    ok=await neigongPromise;
-  }
-  if(!ok || !SDE_BASE_LOADED) throw new Error('SDE 内功尚未加载成功，无法提智评分。请刷新页面后重试。');
-  return true;
+/* 拆分专用：flash·关思考·小额度（快） */
+function buildSplitPayload(sel,systemPrompt,userMsg){
+  const {vendor}=parseModel(sel);
+  const base={ stream:true, messages:[{role:'system',content:systemPrompt},{role:'user',content:userMsg}], max_tokens:4000, temperature:0.2 };
+  if(vendor==='ds'){ base.model='deepseek-v4-flash'; base.thinking={type:'disabled'}; }
+  else { base.model='glm-4-flash'; }
+  return base;
 }
 
-/* ═══════════ 第一次提智：写《从发现到发生》心得（与发生器同规范·同缓存键） ═══════════ */
-const REFLECT_SPEC = `
+/* ═══ SDE 内功 ═══ */
+let SDE_BASE=`你是一位思想极其深刻、善于穿透常识的跨学科洞察者。核心心法：不问"这个东西是什么"，而问"它在什么条件下、经什么路径、成为现在的样子"。世界不是被发现的，而是被发生出来的。`;
+let SDE_BASE_LOADED=false;
+let neigongPromise=(async function(){ try{ const r=await fetch('/taste/assets/sde-neigong.txt',{cache:'force-cache'}); if(r.ok){ const f=await r.text(); if(f&&f.length>5000){ SDE_BASE=f; SDE_BASE_LOADED=true; const el=document.getElementById('neigongStatus'); if(el){ el.textContent='✓ SDE 内功已加载（'+f.length+' 字 · 提智就绪）'; el.style.color='#5FBF7F'; } return true; } } return false; }catch(e){ return false; } })();
+async function ensureNeigong(){ let ok=await neigongPromise; if(!ok||!SDE_BASE_LOADED){ neigongPromise=(async()=>{ try{ const r=await fetch('/taste/assets/sde-neigong.txt',{cache:'no-store'}); if(r.ok){ const f=await r.text(); if(f&&f.length>5000){ SDE_BASE=f; SDE_BASE_LOADED=true; return true; } } }catch(e){} return false; })(); ok=await neigongPromise; } if(!ok||!SDE_BASE_LOADED) throw new Error('SDE 内功尚未加载成功，无法提智评分。请刷新页面后重试。'); return true; }
+
+/* ═══ 第一次提智：写《从发现到发生》心得（同规范·同缓存键） ═══ */
+const REFLECT_SPEC=`
 ---
 【本次任务：在正式工作之前，先写一篇约5000字的方法论短文《从发现到发生——兼对我自身认知惯性的一次检视》】
 
@@ -297,26 +296,24 @@ const REFLECT_SPEC = `
 要求：连贯思辨散文，5000字左右，真诚、深入、具体。这是你给自己的一次认知松绑。现在，请写这篇《从发现到发生——兼对我自身认知惯性的一次检视》。
 `;
 function reflectPrompt(){ return SDE_BASE + REFLECT_SPEC; }
-const REFLECT_MAX_TOKENS = 8000;
-const REFLECT_LS_VER = 'v2';   // 与发生器一致，可复用同一份缓存心得
+const REFLECT_MAX_TOKENS=8000;
+const REFLECT_LS_VER='v2';
 function reflectLsKey(sel){ return 'sde_reflect_'+REFLECT_LS_VER+'_'+(sel||'unknown'); }
 function loadReflectLS(sel){ try{ const t=localStorage.getItem(reflectLsKey(sel)); return (t&&t.length>1500)?t:''; }catch(_){ return ''; } }
 function saveReflectLS(sel,text){ try{ if(text&&text.length>1500) localStorage.setItem(reflectLsKey(sel),text); }catch(_){} }
 
-/* 第二次提智：把该基底自己写的心得注入评分 system */
+/* 第二次提智：心得 ＋ 全内功 ＋ 审稿评分规范 */
 function withReflection(reflectionText){
-  const spec = '\n\n═══════════\n' + SCORING_SPEC;
+  const spec='\n\n═══════════\n'+SCORING_SPEC;
   if(!reflectionText) return SDE_BASE + spec;
-  // 与发生器同构的两次提智·第二遍拼装：心得 ＋ 全内功 ＋ 审稿评分规范
-  return '【以下是你此前亲手写下的《从发现到发生》心得与自我检视——你已把 SDE 发生学内化过一遍，也诚实检视过自己“擅长精确诊断、易把描述当深刻”的发现学惯性。这是你此刻审稿评分的思维底座：不要因为一篇论文“诊断得精确、结构工整、旁征博引”就给高创新分（那恰恰可能是发现学的顶配伪装成深刻），要专门揪出它是否滑回发现学——只下定义/贴诊断标签、套现成框架充深刻、滑向“回归本质”、核心命名能被某已有概念1:1替换。真正的高创新，是让新结构从矛盾里发生、命名不可还原的那种。】\n\n'
+  return '【以下是你此前亲手写下的《从发现到发生》心得与自我检视——你已把 SDE 发生学内化过一遍，也诚实检视过自己"擅长精确诊断、易把描述当深刻"的发现学惯性。这是你此刻审稿评分的思维底座：不要因为一篇论文"诊断得精确、结构工整、旁征博引"就给高创新分（那恰恰可能是发现学的顶配伪装成深刻），要专门揪出它是否滑回发现学——只下定义/贴诊断标签、套现成框架充深刻、滑向"回归本质"、核心命名能被某已有概念1:1替换。真正的高创新，是让新结构从矛盾里发生、命名不可还原的那种。】\n\n'
     + reflectionText.trim()
     + '\n\n═══════════\n【以下是完整的 SDE 内功——你审稿评分的理论准绳，始终以它为依据。】\n\n'
-    + SDE_BASE
-    + spec;
+    + SDE_BASE + spec;
 }
 
-/* ═══════════ 评分内核（两把尺子：创新智商0-160 + 论文水平0-100） ═══════════ */
-const SCORING_SPEC = `
+/* ═══ 评分内核（创新智商0-160 + 论文水平0-100） ═══ */
+const SCORING_SPEC=`
 【本次任务：给这篇论文打两个分——创新智商（满分160）与论文水平（满分100）】
 
 你已研读上面的 SDE 发生学内功、也写过《从发现到发生》心得，你现在是一位真正吃透"发现学 vs 发生学"分野的严苛评审。请给用户提交的论文客观、可重现、可证伪的评分。两把独立的尺子：
@@ -354,34 +351,39 @@ F 可证伪性(权重0.15)：怎样会被证伪；找不到→≤100。80口号�
 "uplift":{"action":"同时抬高两个分的关键动作,具体可操作"},
 "verdict":"一句话总评(≤40字)"}
 `;
-function buildScoreUserMsg(title, text){
-  return '请给下面这篇论文打分，严格按要求只输出一个 JSON 对象：\n\n'+(title?'论文标题：'+title+'\n\n':'')+'【论文正文开始】\n'+text+'\n【论文正文结束】';
-}
+function buildScoreUserMsg(title,text){ return '请给下面这篇论文打分，严格按要求只输出一个 JSON 对象：\n\n'+(title?'论文标题：'+title+'\n\n':'')+'【论文正文开始】\n'+text+'\n【论文正文结束】'; }
 
-/* ═══════════ 示例文本 ═══════════ */
+/* ═══ 拆分内核 ═══ */
+const SPLIT_SPEC=`你是一个文档结构切分器。下面是一份可能包含【多篇独立论文】的文档。请判断它包含几篇独立论文，并给出每篇的标题与定位锚点。
+规则：
+- 只有当文档确实由多篇各自独立、各有标题的论文拼接而成时，才拆成多篇；若整份其实是一篇（含多个章节/小节），就返回 1 篇。
+- 每篇给出：title（该篇标题）、anchor（该篇最开头连续约30-50个字，从标题第一个字开始，与原文逐字一致，用于定位；不要改写、不要加省略号、不要跳字）。
+- anchor 必须能在原文中唯一定位到该篇起点。
+只输出一个 JSON，不要任何前后缀或代码围栏：
+{"count":篇数整数,"papers":[{"title":"...","anchor":"该篇开头约30-50字原文"}]}`;
+
+/* ═══ 示例 ═══ */
 const EXAMPLES={};
 EXAMPLES.mass='AI 正在改变教育。教师需要学习如何使用 AI 工具，这样才能跟上时代。学生也应该学习 AI，因为未来工作都需要 AI 技能。学校应该尽快引入 AI 课程，帮助大家适应新的时代。';
 EXAMPLES.r3='AI 时代的教育不再是知识传递，而是认知能力建构。教师角色从"知识权威"转向"认知教练"。这一转变的关键阻力不是技术，而是教育评价系统：只要高考用单一标准评价，认知多样性就无法在教育中落地。因此，真正的教育变革入口不在课堂，而在评价制度——如果评价维度不打开，任何课堂创新最终都会被单一分数拉回原点。';
 EXAMPLES.r4='英语成为最终审核权：在大模型时代，英语不是工具，而是审核语言。所有非英语 prompt 最终被翻译/解析回英语模型权重空间，因此英语承担最终语义裁定权。这一转变让英语教育从"交流工具课"变为"审核权训练课"。证伪条件：某个非英语 LLM 在标准评测中持续超越同等规模英语 LLM 至少 6 个月，则此命题被推翻。';
 
-/* ═══════════ DOM ═══════════ */
+/* ═══ DOM ═══ */
 const $=id=>document.getElementById(id);
-const docTextEl=$('docText'), docTitleEl=$('docTitle'), dsKeyEl=$('dsKey'), glmKeyEl=$('glmKey');
-const goBtn=$('goBtn'), statusEl=$('status'), errBox=$('errBox'), progressEl=$('progress'), resultEl=$('result');
-const fileIn=$('fileIn'), dropEl=$('drop'), fileInfoEl=$('fileInfo');
+const docTextEl=$('docText'),docTitleEl=$('docTitle'),dsKeyEl=$('dsKey'),glmKeyEl=$('glmKey');
+const goBtn=$('goBtn'),statusEl=$('status'),errBox=$('errBox'),progressEl=$('progress'),resultEl=$('result');
+const fileIn=$('fileIn'),dropEl=$('drop'),fileInfoEl=$('fileInfo');
+const splitBtn=$('splitBtn'),manualSplitBtn=$('manualSplitBtn'),splitNoteEl=$('splitNote'),queueBox=$('queueBox');
+let papersQueue=[]; let batchFast=false;
 
 dsKeyEl.value=localStorage.getItem('sde_ds_key')||''; glmKeyEl.value=localStorage.getItem('sde_glm_key')||'';
 dsKeyEl.addEventListener('input',()=>localStorage.setItem('sde_ds_key',dsKeyEl.value.trim()));
 glmKeyEl.addEventListener('input',()=>localStorage.setItem('sde_glm_key',glmKeyEl.value.trim()));
 document.querySelectorAll('.key-toggle').forEach(b=>b.addEventListener('click',()=>{ const el=$(b.dataset.for); const p=el.type==='password'; el.type=p?'text':'password'; b.textContent=p?'隐藏':'显示'; }));
 docTextEl.addEventListener('input',()=>{ $('count').textContent=docTextEl.value.length+' 字'; });
-document.querySelectorAll('.ex-chip').forEach(c=>c.addEventListener('click',()=>{
-  docTextEl.value=EXAMPLES[c.dataset.ex]; $('count').textContent=docTextEl.value.length+' 字';
-  docTitleEl.value=c.dataset.ex==='mass'?'AI 改变教育':c.dataset.ex==='r3'?'评价系统是真阻力':'英语作为审核权';
-  fileInfoEl.style.display='none';
-}));
+document.querySelectorAll('.ex-chip').forEach(c=>c.addEventListener('click',()=>{ docTextEl.value=EXAMPLES[c.dataset.ex]; $('count').textContent=docTextEl.value.length+' 字'; docTitleEl.value=c.dataset.ex==='mass'?'AI 改变教育':c.dataset.ex==='r3'?'评价系统是真阻力':'英语作为审核权'; fileInfoEl.style.display='none'; papersQueue=[]; renderQueue(); }));
 
-/* 文件上传解析 */
+/* 文件上传 */
 try{ if(window.pdfjsLib) pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js"; }catch(_){}
 dropEl.addEventListener('click',()=>fileIn.click());
 ['dragover','dragenter'].forEach(ev=>dropEl.addEventListener(ev,e=>{e.preventDefault();dropEl.classList.add('over');}));
@@ -396,33 +398,28 @@ async function handleFile(f){
   showFile('<span class="spinner"></span> 正在解析 '+name+' …',false);
   try{
     let text='';
-    if(lo.endsWith('.docx')){
-      if(!window.mammoth) throw new Error('docx 解析库未加载，请刷新页面');
-      const ab=await f.arrayBuffer(); const r=await window.mammoth.extractRawText({arrayBuffer:ab}); text=(r&&r.value)||'';
-    } else {
-      if(!window.pdfjsLib) throw new Error('PDF 解析库未加载，请刷新页面');
-      const ab=await f.arrayBuffer(); const pdf=await pdfjsLib.getDocument({data:ab}).promise;
-      for(let i=1;i<=pdf.numPages;i++){ const pg=await pdf.getPage(i); const tc=await pg.getTextContent(); text+=tc.items.map(it=>it.str).join(' ')+'\n\n'; }
-    }
+    if(lo.endsWith('.docx')){ if(!window.mammoth) throw new Error('docx 解析库未加载，请刷新页面'); const ab=await f.arrayBuffer(); const r=await window.mammoth.extractRawText({arrayBuffer:ab}); text=(r&&r.value)||''; }
+    else { if(!window.pdfjsLib) throw new Error('PDF 解析库未加载，请刷新页面'); const ab=await f.arrayBuffer(); const pdf=await pdfjsLib.getDocument({data:ab}).promise; for(let i=1;i<=pdf.numPages;i++){ const pg=await pdf.getPage(i); const tc=await pg.getTextContent(); text+=tc.items.map(it=>it.str).join(' ')+'\n\n'; } }
     text=text.replace(/\n{3,}/g,'\n\n').trim();
     if(text.length<20){ showFile('⚠ 解析出的文字太少（可能是扫描版 PDF/纯图片，无法提取文字）。可手动粘贴正文。',true); return; }
-    docTextEl.value=text; $('count').textContent=text.length+' 字';
-    if(!docTitleEl.value){ const guess=name.replace(/\.(docx|pdf)$/i,''); docTitleEl.value=guess.slice(0,40); }
-    showFile('✓ 已解析 '+name+' · '+text.length+' 字（可在下方编辑）',false);
+    docTextEl.value=text; $('count').textContent=text.length+' 字'; papersQueue=[]; renderQueue();
+    if(!docTitleEl.value){ docTitleEl.value=name.replace(/\.(docx|pdf)$/i,'').slice(0,40); }
+    showFile('✓ 已解析 '+name+' · '+text.length+' 字（如含多篇，请用下方「拆分」）',false);
   }catch(e){ showFile('⚠ 解析失败：'+(e.message||e)+'。可手动粘贴正文。',true); }
 }
 
-/* ═══════════ 通用流式调用（国产基底直连） ═══════════ */
-async function streamChat(apiKey, sel, systemPrompt, userMsg, maxTokens, statusEl2, stageLabel){
+/* ═══ 通用流式调用 ═══ */
+async function streamChat(apiKey,sel,systemPrompt,userMsg,maxTokens,statusEl2,stageLabel,opts){
   const ac=new AbortController(); const killer=setTimeout(()=>{try{ac.abort();}catch(_){}}, 12*60*1000);
   const setS=(t)=>{ if(statusEl2) statusEl2.innerHTML='<span class="spinner"></span> '+stageLabel+' · '+t; };
   setS('连接中…');
+  const payload=(opts&&opts.split)?buildSplitPayload(sel,systemPrompt,userMsg):buildPayload(sel,systemPrompt,userMsg,maxTokens);
   let resp;
-  try{ resp=await fetch(apiUrl(sel),{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+apiKey},body:JSON.stringify(buildPayload(sel,systemPrompt,userMsg,maxTokens)),signal:ac.signal}); }
+  try{ resp=await fetch(apiUrl(sel),{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+apiKey},body:JSON.stringify(payload),signal:ac.signal}); }
   catch(e){ clearTimeout(killer); throw new Error(e.name==='AbortError'?'超时中止':'网络请求失败：'+e.message); }
   if(!resp.ok){ let d=''; try{const j=await resp.json(); d=j.error?.message||JSON.stringify(j);}catch(_){d=resp.statusText;} clearTimeout(killer); throw new Error('接口 '+resp.status+'：'+d); }
-  const reader=resp.body.getReader(), decoder=new TextDecoder();
-  let buf='', acc='', think='', gotAny=false, rawHead='';
+  const reader=resp.body.getReader(),decoder=new TextDecoder();
+  let buf='',acc='',think='',gotAny=false,rawHead='';
   const t0=Date.now();
   try{
     while(true){
@@ -433,8 +430,7 @@ async function streamChat(apiKey, sel, systemPrompt, userMsg, maxTokens, statusE
         const s=line.trim(); if(!s||s.startsWith(':')) continue;
         if(!s.startsWith('data:')){ if(s.charAt(0)==='{'){ let je=null; try{je=JSON.parse(s);}catch(_){je=null;} if(je&&je.error) throw new Error('接口报错：'+(je.error.message||je.error.code||'')); if(je&&je.code&&je.message&&!je.choices) throw new Error('接口报错：'+je.code+'：'+je.message); } continue; }
         const data=s.slice(5).trim(); if(data==='[DONE]') continue;
-        try{
-          const j=JSON.parse(data);
+        try{ const j=JSON.parse(data);
           if(j.error) throw new Error('接口报错：'+(j.error.message||j.error.code||''));
           if(j.code&&j.message&&!j.choices) throw new Error('接口报错：'+j.code+'：'+j.message);
           const d=j.choices?.[0]?.delta||{};
@@ -448,20 +444,17 @@ async function streamChat(apiKey, sel, systemPrompt, userMsg, maxTokens, statusE
   if(!acc){ throw new Error('基底返回空内容（Key 未开通该模型/额度不足/被安全策略拦截）。'+(rawHead?'返回开头：'+rawHead.slice(0,160):'')); }
   return { text:acc, think, secs:((Date.now()-t0)/1000).toFixed(1) };
 }
-
-/* 取心得（缓存优先，与发生器共用缓存键） */
-async function getReflection(sel, key, statusEl2){
+async function getReflection(sel,key,statusEl2){
   const cached=loadReflectLS(sel);
   if(cached){ if(statusEl2) statusEl2.innerHTML='✓ ① 已载入本地心得（秒载 · '+cached.length+'字）'; return cached; }
-  const res=await streamChat(key, sel, reflectPrompt(), '请写这篇《从发现到发生——兼对我自身认知惯性的一次检视》，约5000字。这是你接下来评分工作的思维底座。', REFLECT_MAX_TOKENS, statusEl2, '① SDE提智·写心得');
+  const res=await streamChat(key,sel,reflectPrompt(),'请写这篇《从发现到发生——兼对我自身认知惯性的一次检视》，约5000字。这是你接下来评分工作的思维底座。',REFLECT_MAX_TOKENS,statusEl2,'① SDE提智·写心得');
   if(res&&res.text){ saveReflectLS(sel,res.text); return res.text; }
   return '';
 }
 
-/* ═══════════ 解析 & 计算 ═══════════ */
-function extractJSON(raw){ let t=raw.trim().replace(/^```(?:json)?/i,'').replace(/```$/,'').trim(); const a=t.indexOf('{'), b=t.lastIndexOf('}'); if(a>=0&&b>a) t=t.slice(a,b+1); return JSON.parse(t); }
-const IQ_W={S:0.20,D:0.25,E:0.20,I:0.20,F:0.15};
-const PP_W={topic:0.25,argument:0.30,structure:0.20,contribution:0.25};
+/* ═══ 解析 & 计算 ═══ */
+function extractJSON(raw){ let t=raw.trim().replace(/^```(?:json)?/i,'').replace(/```$/,'').trim(); const a=t.indexOf('{'),b=t.lastIndexOf('}'); if(a>=0&&b>a) t=t.slice(a,b+1); return JSON.parse(t); }
+const IQ_W={S:0.20,D:0.25,E:0.20,I:0.20,F:0.15}, PP_W={topic:0.25,argument:0.30,structure:0.20,contribution:0.25};
 function num(x){ const v=Number(x); return isFinite(v)?v:NaN; }
 function recomputeIQ(dims){ let s=0; for(const k in IQ_W){ const v=num(dims?.[k]?.score); if(isNaN(v)) return NaN; s+=v*IQ_W[k]; } return Math.round(s*10)/10; }
 function recomputePaper(a){ let s=0; for(const k in PP_W){ const v=num(a?.[k]?.score); if(isNaN(v)) return NaN; s+=v*PP_W[k]; } return Math.round(s*10)/10; }
@@ -469,124 +462,209 @@ function clampIQ(v){ return Math.max(0,Math.min(160,v)); }
 function clampP(v){ return Math.max(0,Math.min(100,v)); }
 function mean(arr){ return arr.reduce((a,b)=>a+b,0)/arr.length; }
 function round1(v){ return Math.round(v*10)/10; }
+function iqTier(s){ if(s<110) return {c:'#8B98A5',bg:'rgba(139,152,165,0.16)',tag:'入门 · 大众区',glow:''}; if(s<135) return {c:'#6E9FD4',bg:'rgba(46,80,144,0.18)',tag:'专业区',glow:''}; if(s<150) return {c:'#D4B25E',bg:'rgba(212,178,94,0.16)',tag:'资深学者区',glow:''}; if(s<158) return {c:'#E5C86E',bg:'rgba(212,178,94,0.22)',tag:'本体论级 · SDE提智达标',glow:'0 0 20px rgba(212,178,94,0.5)'}; return {c:'#B98CFF',bg:'rgba(122,47,224,0.22)',tag:'天才 · 典范级（满级160）',glow:'0 0 22px rgba(122,47,224,0.5)'}; }
+function paperGrade(s){ if(s>=90) return {g:'卓越 A+',c:'#B98CFF'}; if(s>=80) return {g:'优秀 A',c:'#E5C86E'}; if(s>=70) return {g:'良好 B',c:'#D4B25E'}; if(s>=60) return {g:'合格 C',c:'#6E9FD4'}; return {g:'待完善 D',c:'#8B98A5'}; }
 
-function iqTier(s){
-  if(s<110) return {c:'#8B98A5',bg:'rgba(139,152,165,0.16)',tag:'入门 · 大众区',glow:''};
-  if(s<135) return {c:'#6E9FD4',bg:'rgba(46,80,144,0.18)',tag:'专业区',glow:''};
-  if(s<150) return {c:'#D4B25E',bg:'rgba(212,178,94,0.16)',tag:'资深学者区',glow:''};
-  if(s<158) return {c:'#E5C86E',bg:'rgba(212,178,94,0.22)',tag:'本体论级 · SDE提智达标',glow:'0 0 20px rgba(212,178,94,0.5)'};
-  return {c:'#B98CFF',bg:'rgba(122,47,224,0.22)',tag:'天才 · 典范级（满级160）',glow:'0 0 22px rgba(122,47,224,0.5)'};
-}
-function paperGrade(s){
-  if(s>=90) return {g:'卓越 A+',c:'#B98CFF'};
-  if(s>=80) return {g:'优秀 A',c:'#E5C86E'};
-  if(s>=70) return {g:'良好 B',c:'#D4B25E'};
-  if(s>=60) return {g:'合格 C',c:'#6E9FD4'};
-  return {g:'待完善 D',c:'#8B98A5'};
-}
-
-/* 雷达图（IQ 五维，0-160） */
 function radarSVG(dims){
-  const order=['S','D','E','I','F'], labels={S:'S 结构',D:'D 差异',E:'E 纠缠',I:'I 不可还原',F:'F 可证伪'};
+  const order=['S','D','E','I','F'],labels={S:'S 结构',D:'D 差异',E:'E 纠缠',I:'I 不可还原',F:'F 可证伪'};
   const cx=140,cy=118,maxR=80,floor=80,ceil=160;
-  const ang=i=>(-90+i*72)*Math.PI/180, rOf=v=>Math.max(0,Math.min(1,(v-floor)/(ceil-floor)))*maxR, pt=(i,r)=>[cx+r*Math.cos(ang(i)),cy+r*Math.sin(ang(i))];
+  const ang=i=>(-90+i*72)*Math.PI/180,rOf=v=>Math.max(0,Math.min(1,(v-floor)/(ceil-floor)))*maxR,pt=(i,r)=>[cx+r*Math.cos(ang(i)),cy+r*Math.sin(ang(i))];
   let grid=''; [100,120,140,160].forEach(g=>{ const r=rOf(g); let p=''; for(let i=0;i<5;i++){const[x,y]=pt(i,r); p+=(i?'L':'M')+x.toFixed(1)+' '+y.toFixed(1);} grid+='<path d="'+p+'Z" fill="none" stroke="rgba(255,255,255,0.10)" stroke-width="1"/>'; });
   let axes='',lab=''; for(let i=0;i<5;i++){ const[ex,ey]=pt(i,maxR); axes+='<line x1="'+cx+'" y1="'+cy+'" x2="'+ex.toFixed(1)+'" y2="'+ey.toFixed(1)+'" stroke="rgba(255,255,255,0.10)"/>'; const[lx,ly]=pt(i,maxR+20); const an=Math.abs(Math.cos(ang(i)))<0.3?'middle':(Math.cos(ang(i))>0?'start':'end'); lab+='<text x="'+lx.toFixed(1)+'" y="'+(ly+4).toFixed(1)+'" fill="#C9B27A" font-size="11" text-anchor="'+an+'">'+labels[order[i]]+'</text>'; }
   let dp='',dots=''; for(let i=0;i<5;i++){ const v=num(dims[order[i]].score); const[x,y]=pt(i,rOf(v)); dp+=(i?'L':'M')+x.toFixed(1)+' '+y.toFixed(1); dots+='<circle cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="3" fill="#E5C86E"/>'; }
   return '<svg viewBox="0 0 280 240" width="260" xmlns="http://www.w3.org/2000/svg">'+grid+axes+'<path d="'+dp+'Z" fill="rgba(212,178,94,0.22)" stroke="#D4B25E" stroke-width="1.8"/>'+dots+lab+'</svg>';
 }
 
-/* ═══════════ 渲染 ═══════════ */
+/* ═══ 拆分逻辑 ═══ */
+function stripMap(text){ let s='';const map=[]; for(let i=0;i<text.length;i++){ if(!/\s/.test(text[i])){ map.push(i); s+=text[i]; } } return {stripped:s,map}; }
+function findAnchor(text,sm,anchor){ if(!anchor) return -1; const a=String(anchor).replace(/\s+/g,''); if(a.length<6) return -1; let pos=sm.stripped.indexOf(a); if(pos<0){ const frag=a.slice(0,Math.max(8,Math.floor(a.length*0.6))); pos=sm.stripped.indexOf(frag); } if(pos<0) return -1; return sm.map[pos]; }
+function firstLine(p){ const l=(p.split('\n').find(x=>x.trim())||'').trim(); return l.slice(0,60); }
+function buildPapersFromAnchors(text,arr){
+  const sm=stripMap(text); const found=[];
+  (arr||[]).forEach(p=>{ const idx=findAnchor(text,sm,p.anchor||p.title||''); if(idx>=0) found.push({title:(p.title||'').trim(),idx}); });
+  found.sort((a,b)=>a.idx-b.idx);
+  const uniq=[]; found.forEach(f=>{ if(!uniq.length||f.idx-uniq[uniq.length-1].idx>20) uniq.push(f); });
+  if(uniq.length<=1) return [];
+  const papers=[]; for(let i=0;i<uniq.length;i++){ const start=uniq[i].idx,end=(i+1<uniq.length)?uniq[i+1].idx:text.length; const seg=text.slice(start,end).trim(); if(seg.length>30) papers.push({title:uniq[i].title||firstLine(seg),text:seg}); }
+  return papers;
+}
+function splitBySeparator(text){ const parts=text.split(/\n\s*[=\-—＝─*_·]{3,}\s*\n/); return parts.map(p=>p.trim()).filter(p=>p.length>30).map(p=>({title:firstLine(p),text:p})); }
+
+async function detectSplit(){
+  const text=docTextEl.value.trim();
+  if(text.length<50){ showErr('请先上传或粘贴文档。'); return; }
+  const dsKey=dsKeyEl.value.trim(),glmKey=glmKeyEl.value.trim();
+  const sel=dsKey?'ds:pro':(glmKey?'glm:pro':null),key=dsKey||glmKey;
+  if(!key){ showErr('AI 识别多篇需要至少一个基底的 Key（也可改用「按分隔符拆分」）。'); return; }
+  errBox.style.display='none'; splitBtn.disabled=true; splitBtn.textContent='识别中…'; splitNoteEl.style.display='block'; splitNoteEl.textContent='正在用 AI 识别文档中的论文边界…';
+  try{
+    const res=await streamChat(key,sel,SPLIT_SPEC,'下面是文档全文，请判断包含几篇独立论文并给出定位锚点：\n\n'+text,4000,null,'',{split:true});
+    const obj=extractJSON(res.text);
+    const papers=buildPapersFromAnchors(text,obj.papers);
+    if(papers.length<=1){ papersQueue=[]; renderQueue(); splitNoteEl.textContent='识别结果：这份文档判定为单篇（或无法可靠拆分），将整体评分。若确有多篇，请用「按分隔符拆分」。'; }
+    else{ papersQueue=papers; renderQueue(); const claimed=Number(obj.count)||papers.length; splitNoteEl.textContent = (claimed>papers.length) ? ('AI 认为约 '+claimed+' 篇，成功定位 '+papers.length+' 篇。请核对下方列表；若与实际不符，可删除误分项或改用分隔符拆分。') : ('已识别 '+papers.length+' 篇，请核对下方列表（可删除误分项）。'); }
+  }catch(e){ showErr('AI 识别失败：'+(e.message||e)+'。可改用「按分隔符拆分」，或直接整体评分。'); splitNoteEl.style.display='none'; }
+  finally{ splitBtn.disabled=false; splitBtn.textContent='🔍 识别文档中的多篇论文'; }
+}
+function doManualSplit(){
+  const text=docTextEl.value.trim();
+  const papers=splitBySeparator(text);
+  if(papers.length<2){ showErr('没找到分隔符。请在每两篇论文之间单独加一行分隔线（如 ===== 或 -----，至少 3 个字符）后再点此。'); return; }
+  errBox.style.display='none'; papersQueue=papers; renderQueue(); splitNoteEl.style.display='block'; splitNoteEl.textContent='按分隔符拆出 '+papers.length+' 篇（请核对，可删除误分项）。';
+}
+splitBtn.addEventListener('click',detectSplit);
+manualSplitBtn.addEventListener('click',doManualSplit);
+
+function renderQueue(){
+  if(!papersQueue.length){ queueBox.style.display='none'; queueBox.innerHTML=''; return; }
+  let h='<div class="q-head"><span>检测到 <b>'+papersQueue.length+'</b> 篇论文 · 将逐篇评分并出汇总报告</span><button class="q-reset" id="qReset">↺ 其实是单篇 · 整体评分</button></div><div class="q-list">';
+  papersQueue.forEach((p,i)=>{ h+='<div class="q-item"><span class="q-idx">'+(i+1)+'</span><div class="q-main"><div class="q-title">'+esc(p.title||('论文'+(i+1)))+'</div><div class="q-prev">'+esc(p.text.slice(0,70))+'… · '+p.text.length+'字</div></div><button class="q-del" data-i="'+i+'">✕</button></div>'; });
+  h+='</div>';
+  if(papersQueue.length>1) h+='<label class="q-fast"><input type="checkbox" id="fastMode"'+(batchFast?' checked':'')+'> 批量提速：每篇只用一个基底（不取平均，快约一半）</label>';
+  queueBox.innerHTML=h; queueBox.style.display='block';
+  $('qReset').addEventListener('click',()=>{ papersQueue=[]; renderQueue(); splitNoteEl.style.display='none'; });
+  queueBox.querySelectorAll('.q-del').forEach(b=>b.addEventListener('click',()=>{ papersQueue.splice(+b.dataset.i,1); renderQueue(); }));
+  const fm=$('fastMode'); if(fm) fm.addEventListener('change',()=>{ batchFast=fm.checked; });
+}
+
+/* ═══ 渲染 ═══ */
 function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function barW160(v){ return Math.max(3,Math.min(100,((num(v)-80)/(160-80))*100)); }
 function barW100(v){ return Math.max(3,Math.min(100,num(v))); }
-function barColor(pct){ return 'linear-gradient(90deg,#D4B25E,#E5C86E)'; }
+function barColor(){ return 'linear-gradient(90deg,#D4B25E,#E5C86E)'; }
 
-function basePanelHTML(sel, data, iqScore, ppScore){
-  const t=iqTier(iqScore), g=paperGrade(ppScore), col=SEL_COLOR[sel]||'#D4B25E';
-  const dims=data.iq.dims, order=['S','D','E','I','F'];
-  const dimNames={S:'S · 结构精确度',D:'D · 差异锐度',E:'E · 纠缠深度',I:'I · 不可还原性',F:'F · 可证伪性'};
+function basePanelHTML(sel,data,iqScore,ppScore){
+  const t=iqTier(iqScore),g=paperGrade(ppScore),col=SEL_COLOR[sel]||'#D4B25E';
+  const dims=data.iq.dims,order=['S','D','E','I','F'],dimNames={S:'S · 结构精确度',D:'D · 差异锐度',E:'E · 纠缠深度',I:'I · 不可还原性',F:'F · 可证伪性'};
   let dimsHtml=''; for(const k of order){ const dd=dims[k]||{}; dimsHtml+='<div><div class="dim-head"><span class="dim-name">'+dimNames[k]+'<span class="w">权重 '+IQ_W[k].toFixed(2)+'</span></span><span class="dim-score">'+esc(dd.score)+'</span></div><div class="bar"><div class="bar-fill" style="width:'+barW160(dd.score)+'%;background:'+barColor()+'"></div></div>'+(dd.evidence?'<div class="dim-ev">'+esc(dd.evidence)+'</div>':'')+'</div>'; }
-  const asp=data.paper.aspects, aOrder=[['topic','选题价值',0.25],['argument','论证质量',0.30],['structure','结构规范',0.20],['contribution','学术贡献',0.25]];
-  let aspHtml=''; for(const [k,nm,w] of aOrder){ const aa=asp[k]||{}; aspHtml+='<div><div class="dim-head"><span class="dim-name">'+nm+'<span class="w">权重 '+w.toFixed(2)+'</span></span><span class="dim-score">'+esc(aa.score)+'/100</span></div><div class="bar"><div class="bar-fill" style="width:'+barW100(aa.score)+'%;background:'+barColor()+'"></div></div>'+(aa.note?'<div class="dim-ev">'+esc(aa.note)+'</div>':'')+'</div>'; }
-  const kd=data.key_deduction||{}, up=data.uplift||{};
-  const thinkFold = data.__think && data.__think.length>50 ? '<details class="think-fold"><summary>▸ 展开该基底评分时的审读思考（'+data.__think.length+'字）</summary><div class="fold-body">'+esc(data.__think)+'</div></details>' : '';
-  return '<div class="base-panel"><div class="bp-head"><span class="bp-name" style="color:'+col+'">'+esc(SEL_NAME[sel]||sel)+'</span>'
-    +'<span class="bp-chip" style="background:'+t.bg+';color:'+t.c+'">创新智商 '+iqScore+' / 160</span>'
-    +'<span class="bp-chip" style="background:'+g.c.replace(')',',0.15)').replace('#','rgba(')+';color:'+g.c+';background:rgba(212,178,94,0.12)">论文水平 '+ppScore+' / 100</span></div>'
-    +'<div class="bp-body">'
-      +'<div class="sec-h">尺子一 · 创新智商（0–160）</div>'
-      +'<div class="two-col"><div class="radar-wrap">'+radarSVG(dims)+'</div><div class="dims">'+dimsHtml+'</div></div>'
-      +'<div class="iq-sub">综合 <b>'+iqScore+'</b> · '+esc(data.iq.level||t.tag)+'</div>'
-      +'<div class="block"><div class="sec-h">尺子二 · 论文水平（0–100）</div><div class="aspects">'+aspHtml+'</div><div class="pp-sub">综合 <b>'+ppScore+'/100</b> · 档位 '+esc(data.paper.grade||g.g)+'</div></div>'
-      +(kd.quote?'<div class="block"><div class="sec-h">关键扣分句</div><div class="quote-box"><div class="q">「'+esc(kd.quote)+'」</div><div class="r">'+esc(kd.reason)+'</div></div></div>':'')
-      +(up.action?'<div class="block"><div class="sec-h">如何同时抬高两个分</div><div class="uplift-box">'+esc(up.action)+'</div></div>':'')
-      +(data.verdict?'<div class="verdict">'+esc(data.verdict)+'</div>':'')
-      +thinkFold
-    +'</div></div>';
+  const asp=data.paper.aspects,aOrder=[['topic','选题价值',0.25],['argument','论证质量',0.30],['structure','结构规范',0.20],['contribution','学术贡献',0.25]];
+  let aspHtml=''; for(const a of aOrder){ const aa=asp[a[0]]||{}; aspHtml+='<div><div class="dim-head"><span class="dim-name">'+a[1]+'<span class="w">权重 '+a[2].toFixed(2)+'</span></span><span class="dim-score">'+esc(aa.score)+'/100</span></div><div class="bar"><div class="bar-fill" style="width:'+barW100(aa.score)+'%;background:'+barColor()+'"></div></div>'+(aa.note?'<div class="dim-ev">'+esc(aa.note)+'</div>':'')+'</div>'; }
+  const kd=data.key_deduction||{},up=data.uplift||{};
+  const thinkFold=data.__think&&data.__think.length>50?'<details class="think-fold"><summary>▸ 展开该基底评分时的审读思考（'+data.__think.length+'字）</summary><div class="fold-body">'+esc(data.__think)+'</div></details>':'';
+  return '<div class="base-panel"><div class="bp-head"><span class="bp-name" style="color:'+col+'">'+esc(SEL_NAME[sel]||sel)+'</span><span class="bp-chip" style="background:'+t.bg+';color:'+t.c+'">创新智商 '+iqScore+' / 160</span><span class="bp-chip" style="background:rgba(212,178,94,0.12);color:'+g.c+'">论文水平 '+ppScore+' / 100</span></div><div class="bp-body">'
+    +'<div class="sec-h">尺子一 · 创新智商（0–160）</div><div class="two-col"><div class="radar-wrap">'+radarSVG(dims)+'</div><div class="dims">'+dimsHtml+'</div></div><div class="iq-sub">综合 <b>'+iqScore+'</b> · '+esc(data.iq.level||t.tag)+'</div>'
+    +'<div class="block"><div class="sec-h">尺子二 · 论文水平（0–100）</div><div class="aspects">'+aspHtml+'</div><div class="pp-sub">综合 <b>'+ppScore+'/100</b> · 档位 '+esc(data.paper.grade||g.g)+'</div></div>'
+    +(kd.quote?'<div class="block"><div class="sec-h">关键扣分句</div><div class="quote-box"><div class="q">「'+esc(kd.quote)+'」</div><div class="r">'+esc(kd.reason)+'</div></div></div>':'')
+    +(up.action?'<div class="block"><div class="sec-h">如何同时抬高两个分</div><div class="uplift-box">'+esc(up.action)+'</div></div>':'')
+    +(data.verdict?'<div class="verdict">'+esc(data.verdict)+'</div>':'')+thinkFold+'</div></div>';
 }
 
-function renderResults(results){
-  const ok=results.filter(r=>r.data);
-  ok.forEach(r=>{ r.iq=clampIQ(recomputeIQ(r.data.iq.dims)); r.pp=clampP(recomputePaper(r.data.paper.aspects)); r.iq=round1(r.iq); r.pp=round1(r.pp); });
-  const avgIQ=round1(mean(ok.map(r=>r.iq))), avgPP=round1(mean(ok.map(r=>r.pp)));
-  const t=iqTier(avgIQ), g=paperGrade(avgPP);
-  const title=ok[0]&&ok[0].data.title?ok[0].data.title:'';
+/* 一篇论文的评分块（双基底平均卡 + 各基底面板）→ 返回 HTML 字符串 */
+function resultsBlockHTML(settled){
+  const ok=settled.filter(r=>r.data);
+  ok.forEach(r=>{ if(r.iq==null){ r.iq=round1(clampIQ(recomputeIQ(r.data.iq.dims))); r.pp=round1(clampP(recomputePaper(r.data.paper.aspects))); } });
+  const avgIQ=ok.length?round1(mean(ok.map(r=>r.iq))):0, avgPP=ok.length?round1(mean(ok.map(r=>r.pp))):0;
+  const t=iqTier(avgIQ),g=paperGrade(avgPP), title=ok[0]&&ok[0].data.title?ok[0].data.title:'';
   let note='';
-  if(ok.length>=2){ const spread=Math.abs(ok[0].iq-ok[1].iq); note='双基底平均：'+ok.map(r=>SEL_NAME[r.sel]+' '+r.iq).join(' · ')+' → 创新智商均分 '+avgIQ+'（两基底相差 '+round1(spread)+' 分'+(spread>12?'，分歧较大，建议人工复核':'，一致性良好')+'）'; }
-  else { note='仅一个基底参与（另一基底未填 Key，无法取平均）'; }
-
+  if(ok.length>=2){ const spread=Math.abs(ok[0].iq-ok[1].iq); note='双基底：'+ok.map(r=>SEL_NAME[r.sel]+' '+r.iq).join(' · ')+' → 均分 '+avgIQ+'（相差 '+round1(spread)+' 分'+(spread>12?'，分歧较大':'，一致性良好')+'）'; }
+  else note='仅一个基底参与（未取平均）';
   let html='<div class="avg-card"><div class="avg-head">'+(ok.length>=2?'两基底平均成绩':'评分成绩')+(title?' · '+esc(title):'')+'</div><div class="avg-scores">'
     +'<div class="avg-one"><div class="an" style="color:'+t.c+';text-shadow:'+(t.glow||'none')+'">'+avgIQ+'<span class="amax"> /160</span></div><div class="al">平均创新智商</div><div class="abadge" style="background:'+t.bg+';color:'+t.c+'">'+t.tag+'</div></div>'
     +'<div class="avg-one"><div class="an" style="color:'+g.c+'">'+avgPP+'<span class="amax"> /100</span></div><div class="al">平均论文水平</div><div class="abadge" style="background:rgba(212,178,94,0.14);color:'+g.c+'">'+g.g+'</div></div>'
     +'</div><div class="avg-note">'+note+'</div></div>';
-  for(const r of ok) html+=basePanelHTML(r.sel, r.data, r.iq, r.pp);
-  const failed=results.filter(r=>!r.data);
-  if(failed.length) html+='<div class="err-box" style="display:block">部分基底未能完成：'+failed.map(r=>SEL_NAME[r.sel]+'（'+esc(r.err||'失败')+'）').join('；')+'</div>';
+  for(const r of ok) html+=basePanelHTML(r.sel,r.data,r.iq,r.pp);
+  const failed=settled.filter(r=>!r.data);
+  if(failed.length) html+='<div class="err-box" style="display:block">部分基底未完成：'+failed.map(r=>SEL_NAME[r.sel]+'（'+esc(r.err||'失败')+'）').join('；')+'</div>';
+  return html;
+}
+function renderSingle(settled){
+  resultEl.innerHTML=resultsBlockHTML(settled)+'<div class="result-actions"><button class="btn-ghost" id="againBtn">重新评分</button></div>';
+  resultEl.style.display='block';
+  $('againBtn').addEventListener('click',()=>{ resultEl.style.display='none'; progressEl.style.display='none'; window.scrollTo({top:0,behavior:'smooth'}); });
+}
+
+/* 批量报告：汇总卡 + 成绩表 + 逐篇可展开 */
+function renderBatch(all){
+  const okP=all.filter(p=>p.avgIQ!=null);
+  const bIQ=okP.length?round1(mean(okP.map(p=>p.avgIQ))):0, bPP=okP.length?round1(mean(okP.map(p=>p.avgPP))):0;
+  const t=iqTier(bIQ),g=paperGrade(bPP);
+  let hi=null,lo=null; okP.forEach(p=>{ if(!hi||p.avgIQ>hi.avgIQ)hi=p; if(!lo||p.avgIQ<lo.avgIQ)lo=p; });
+  let extra=''; if(okP.length>=2&&hi&&lo) extra='最高：'+esc(hi.title)+'（'+hi.avgIQ+'） · 最低：'+esc(lo.title)+'（'+lo.avgIQ+'）';
+  let html='<div class="batch-sum"><div class="bh">批量评估报告 · 共 '+all.length+' 篇</div><div class="bnums">'
+    +'<div class="bn"><div class="v" style="color:'+t.c+';text-shadow:'+(t.glow||'none')+'">'+bIQ+'</div><div class="l">批次平均创新智商 /160</div></div>'
+    +'<div class="bn"><div class="v" style="color:'+g.c+'">'+bPP+'</div><div class="l">批次平均论文水平 /100</div></div>'
+    +'</div><div class="bextra">'+t.tag+' · '+g.g+(extra?'<br>'+extra:'')+'</div></div>';
+  // 成绩表
+  html+='<div class="section-title">逐篇成绩</div><table class="batch-table"><thead><tr><th class="rank">#</th><th class="tt">论文</th><th style="text-align:center">创新智商</th><th style="text-align:center">论文水平</th><th>档位</th></tr></thead><tbody>';
+  all.forEach((p,i)=>{ if(p.avgIQ!=null){ const tt=iqTier(p.avgIQ),gg=paperGrade(p.avgPP); html+='<tr><td class="rank">'+(i+1)+'</td><td class="tt">'+esc(p.title||('论文'+(i+1)))+'</td><td class="num" style="color:'+tt.c+'">'+p.avgIQ+'</td><td class="num" style="color:'+gg.c+'">'+p.avgPP+'</td><td style="color:'+gg.c+'">'+gg.g+'</td></tr>'; }
+    else html+='<tr><td class="rank">'+(i+1)+'</td><td class="tt">'+esc(p.title||('论文'+(i+1)))+'</td><td class="num" colspan="3" style="color:var(--err)">评分失败：'+esc(p.err||'')+'</td></tr>'; });
+  html+='</tbody></table>';
+  // 逐篇详情
+  html+='<div class="section-title">逐篇详细评分卡</div>';
+  all.forEach((p,i)=>{ const label=p.avgIQ!=null?('智商 '+p.avgIQ+'/160 · 论文 '+p.avgPP+'/100 · '+paperGrade(p.avgPP).g):'评分失败';
+    html+='<details class="paper-fold"'+(all.length<=3?' open':'')+'><summary>#'+(i+1)+' · '+esc(p.title||('论文'+(i+1)))+' — '+label+'</summary><div class="pf-body">'+(p.avgIQ!=null?resultsBlockHTML(p.settled):'<div class="err-box" style="display:block">该篇评分失败：'+esc(p.err||'')+'</div>')+'</div></details>'; });
   html+='<div class="result-actions"><button class="btn-ghost" id="againBtn">重新评分</button></div>';
   resultEl.innerHTML=html; resultEl.style.display='block';
   $('againBtn').addEventListener('click',()=>{ resultEl.style.display='none'; progressEl.style.display='none'; window.scrollTo({top:0,behavior:'smooth'}); });
 }
 
-/* ═══════════ 单基底流程：提智+心得 → 评分 ═══════════ */
-async function runOneBase(sel, key, rowStage){
+/* ═══ 单篇/单基底评分 ═══ */
+async function runOneBase(sel,key,rowStage,paperText,paperTitle){
   await ensureNeigong();
-  const reflection = await getReflection(sel, key, rowStage);
-  const res = await streamChat(key, sel, withReflection(reflection), buildScoreUserMsg(docTitleEl.value.trim(), docTextEl.value.trim()), 12000, rowStage, '② 评分审读');
-  let data; try{ data=extractJSON(res.text); }catch(e){ throw new Error('返回不是规范JSON（可改深度思考重试）：'+res.text.slice(0,120)); }
-  if(!data.iq||!data.iq.dims||!data.paper||!data.paper.aspects) throw new Error('评分JSON缺少必需字段');
+  const reflection=await getReflection(sel,key,rowStage);
+  const res=await streamChat(key,sel,withReflection(reflection),buildScoreUserMsg(paperTitle,paperText),12000,rowStage,'② 评分审读');
+  let data; try{ data=extractJSON(res.text); }catch(e){ throw new Error('返回不是规范JSON：'+res.text.slice(0,120)); }
+  if(!data.iq||!data.iq.dims||!data.paper||!data.paper.aspects) throw new Error('评分JSON缺字段');
   data.__think=res.think||'';
-  return { sel, data };
+  return {sel,data};
+}
+async function scoreOnePaper(paperText,paperTitle,bases){
+  await ensureNeigong();
+  const tasks=bases.map(([sel,key])=>runOneBase(sel,key,null,paperText,paperTitle).catch(e=>({sel,err:(e.message||String(e))})));
+  return await Promise.all(tasks);
 }
 
-/* ═══════════ 主流程 ═══════════ */
+/* ═══ 主流程 ═══ */
 let running=false;
+function rowId(x){ return x.replace(/[:\s]/g,'_'); }
 async function run(){
   if(running) return;
   errBox.style.display='none'; resultEl.style.display='none'; progressEl.innerHTML=''; progressEl.style.display='none';
-  const text=docTextEl.value.trim(), dsKey=dsKeyEl.value.trim(), glmKey=glmKeyEl.value.trim();
+  const text=docTextEl.value.trim(),dsKey=dsKeyEl.value.trim(),glmKey=glmKeyEl.value.trim();
   if(text.length<50){ showErr('论文正文太短了（至少 50 字）。请上传 Word/PDF，或把正文粘贴进来。'); return; }
-  if(!dsKey && !glmKey){ showErr('请至少填入一个基底的 API Key（DeepSeek 或 GLM）。两个都填才能取平均。'); return; }
+  if(!dsKey&&!glmKey){ showErr('请至少填入一个基底的 API Key（DeepSeek 或 GLM）。两个都填才能取平均。'); return; }
+  const papers = papersQueue.length>=1 ? papersQueue.slice() : [{title:docTitleEl.value.trim(),text:text}];
+  let bases=[]; if(dsKey) bases.push(['ds:pro',dsKey]); if(glmKey) bases.push(['glm:pro',glmKey]);
 
-  running=true; goBtn.disabled=true; goBtn.textContent='评分中…'; statusEl.innerHTML='<span class="spinner"></span> 进行中';
-  progressEl.style.display='block';
-  const bases=[]; if(dsKey) bases.push(['ds:pro',dsKey]); if(glmKey) bases.push(['glm:pro',glmKey]);
-  const rows={};
-  progressEl.innerHTML=bases.map(([sel])=>'<div class="prow" id="prow-'+sel.replace(':','_')+'"><span class="pname" style="color:'+(SEL_COLOR[sel])+'">'+SEL_NAME[sel]+'</span><span class="pstage" id="pstage-'+sel.replace(':','_')+'">排队中…</span></div>').join('');
-  bases.forEach(([sel])=>{ rows[sel]={ set innerHTML(v){ const e=$('pstage-'+sel.replace(':','_')); if(e) e.innerHTML=v; } }; });
-
-  const tasks=bases.map(([sel,key])=>runOneBase(sel,key,rows[sel]).then(r=>{ const pr=$('prow-'+sel.replace(':','_')); if(pr) pr.classList.add('done'); rows[sel].innerHTML='✓ 评分完成'; return r; }).catch(e=>{ const pr=$('prow-'+sel.replace(':','_')); if(pr) pr.classList.add('fail'); rows[sel].innerHTML='✗ '+(e.message||e); return {sel, err:(e.message||String(e))}; }));
-
+  running=true; goBtn.disabled=true; goBtn.textContent='评分中…'; statusEl.innerHTML='<span class="spinner"></span> 进行中'; progressEl.style.display='block';
   try{
-    const settled=await Promise.all(tasks);
-    const anyOk=settled.some(r=>r.data);
-    if(!anyOk){ showErr('两个基底都没能完成评分：'+settled.map(r=>SEL_NAME[r.sel]+'（'+esc(r.err||'失败')+'）').join('；')); statusEl.textContent='失败'; }
-    else{ renderResults(settled); statusEl.textContent='✓ 完成'; resultEl.scrollIntoView({behavior:'smooth',block:'start'}); }
+    if(papers.length===1){
+      // 单篇：逐基底进度行
+      progressEl.innerHTML=bases.map(([sel])=>'<div class="prow" id="prow-'+rowId(sel)+'"><span class="pname" style="color:'+SEL_COLOR[sel]+'">'+SEL_NAME[sel]+'</span><span class="pstage" id="pstage-'+rowId(sel)+'">排队中…</span></div>').join('');
+      const rows={}; bases.forEach(([sel])=>{ rows[sel]={ set innerHTML(v){ const e=$('pstage-'+rowId(sel)); if(e) e.innerHTML=v; } }; });
+      const tasks=bases.map(([sel,key])=>runOneBase(sel,key,rows[sel],papers[0].text,papers[0].title).then(r=>{ const pr=$('prow-'+rowId(sel)); if(pr)pr.classList.add('done'); rows[sel].innerHTML='✓ 评分完成'; return r; }).catch(e=>{ const pr=$('prow-'+rowId(sel)); if(pr)pr.classList.add('fail'); rows[sel].innerHTML='✗ '+(e.message||e); return {sel,err:(e.message||String(e))}; }));
+      const settled=await Promise.all(tasks);
+      if(!settled.some(r=>r.data)){ showErr('两个基底都没能完成评分：'+settled.map(r=>SEL_NAME[r.sel]+'（'+esc(r.err||'失败')+'）').join('；')); statusEl.textContent='失败'; }
+      else{ renderSingle(settled); statusEl.textContent='✓ 完成'; resultEl.scrollIntoView({behavior:'smooth',block:'start'}); }
+    } else {
+      // 多篇：批量
+      const fast = batchFast && bases.length>1;
+      const scoreBases = fast ? [bases[0]] : bases;
+      progressEl.innerHTML='<div class="prow" style="border-color:rgba(212,178,94,0.4)"><span class="pstage" style="flex:1">共 '+papers.length+' 篇 · 每篇 '+(scoreBases.length>1?'双基底取平均':SEL_NAME[scoreBases[0][0]]+' 单基底')+'，按篇串行评分，请耐心等待…</span></div>'
+        + papers.map((p,i)=>'<div class="prow" id="prow-p'+i+'"><span class="pname" style="min-width:150px">#'+(i+1)+' '+esc((p.title||'论文'+(i+1)).slice(0,18))+'</span><span class="pstage" id="pstage-p'+i+'">排队中…</span></div>').join('');
+      const all=[];
+      for(let i=0;i<papers.length;i++){
+        const setStage=(v)=>{ const e=$('pstage-p'+i); if(e) e.innerHTML=v; };
+        setStage('<span class="spinner"></span> 评分中…（'+(scoreBases.length>1?'DeepSeek＋GLM 并行':SEL_NAME[scoreBases[0][0]])+'）');
+        let settled;
+        try{ settled=await scoreOnePaper(papers[i].text,papers[i].title,scoreBases); }
+        catch(e){ settled=scoreBases.map(([sel])=>({sel,err:(e.message||String(e))})); }
+        const ok=settled.filter(r=>r.data);
+        ok.forEach(r=>{ r.iq=round1(clampIQ(recomputeIQ(r.data.iq.dims))); r.pp=round1(clampP(recomputePaper(r.data.paper.aspects))); });
+        const avgIQ=ok.length?round1(mean(ok.map(r=>r.iq))):null, avgPP=ok.length?round1(mean(ok.map(r=>r.pp))):null;
+        const pr=$('prow-p'+i);
+        if(ok.length){ if(pr)pr.classList.add('done'); setStage('✓ 智商 '+avgIQ+'/160 · 论文 '+avgPP+'/100'); }
+        else{ if(pr)pr.classList.add('fail'); setStage('✗ 失败：'+esc(settled[0]&&settled[0].err||'')); }
+        all.push({ title:(ok[0]&&ok[0].data.title)||papers[i].title||('论文'+(i+1)), settled, avgIQ, avgPP, err:(ok.length?'':(settled[0]&&settled[0].err||'失败')) });
+      }
+      if(!all.some(p=>p.avgIQ!=null)){ showErr('所有论文都未能完成评分，请检查 Key 与网络后重试。'); statusEl.textContent='失败'; }
+      else{ renderBatch(all); statusEl.textContent='✓ 完成（'+all.length+' 篇）'; resultEl.scrollIntoView({behavior:'smooth',block:'start'}); }
+    }
   }catch(e){ showErr(e.message||String(e)); statusEl.textContent='失败'; }
-  finally{ running=false; goBtn.disabled=false; goBtn.textContent='开始双基底评分'; }
+  finally{ running=false; goBtn.disabled=false; goBtn.textContent='开始评分'; }
 }
 function showErr(html){ errBox.innerHTML=html; errBox.style.display='block'; }
-goBtn.addEventListener('click', run);
+goBtn.addEventListener('click',run);
 </script>
 </body>
 </html>
