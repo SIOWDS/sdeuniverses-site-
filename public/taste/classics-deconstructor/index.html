@@ -103,7 +103,6 @@ textarea{resize:vertical;min-height:120px;line-height:1.75}
 .reflect-desc{font-size:12.5px;color:#8B98A5;line-height:1.7;margin-bottom:12px}
 .reflect-body{font-size:12.5px;line-height:1.85;color:#B9C3CD;white-space:pre-wrap;word-wrap:break-word;max-height:300px;overflow-y:auto;background:rgba(13,17,23,0.45);border:1px solid var(--border);border-radius:8px;padding:14px 16px}
 .reflect-body .placeholder{color:#6E7B88;font-style:italic}
-.reflect-choice{margin-top:10px;padding:11px 14px;background:rgba(13,17,23,0.4);border:1px solid rgba(201,162,39,0.3);border-radius:8px;font-size:12.5px;color:#9AA5B0;display:none}
 .reflect-choice label{margin-right:16px;cursor:pointer;color:#B9C3CD}
 .reflect-choice input{margin-right:5px;cursor:pointer}
 .iq-card{background:var(--panel2);border:1px solid var(--border);border-radius:10px;overflow:hidden}
@@ -154,7 +153,7 @@ footer a{color:var(--gold)}
       </div>
       <div style="background:rgba(13,17,23,0.4);border:1px solid rgba(201,162,39,0.4);border-radius:10px;padding:15px 17px">
         <div style="font-size:13px;font-weight:700;color:#C9A227;margin-bottom:6px">② 先写心得内化，再三件工具并行</div>
-        <div style="font-size:12.5px;color:#9AA5B0;line-height:1.75"><b style="color:#E5C86E">开跑前先做一件事</b>：写作基底自己读完 SDE 内功、亲手写一篇约7000字的《从发现到发生》心得（第一次提智），存本地、下次同一基底秒载复用。三条 SDE 链带着这份自己写的心得去解构。<br><br>SDE 1／2／3 <b style="color:#D4DCE4">不是同一篇稿子改出来的三个版本</b>，而是三篇各自独立成篇的论文——<b style="color:#D4DCE4">SDE1 只用三大方程</b>（S=F(D,E)等）、<b style="color:#D4DCE4">SDE2 只用六路径</b>（先读任务DNA再按路径展开）、<b style="color:#D4DCE4">SDE3 只用123原理</b>（D-E矛盾→S改变→回写）。三篇<b style="color:#E5C86E">同时并行生成</b>、互不依赖，且各自独立走完<b style="color:#E5C86E">两轮自审自改</b>——审自己、改一遍，再审一次、再改一次。同一段经典换一件工具会显出什么不同的断面，并排就看得见。</div>
+        <div style="font-size:12.5px;color:#9AA5B0;line-height:1.75"><b style="color:#E5C86E">开跑前先做一件事</b>：写作基底自己读完 SDE 内功、亲手写一篇约7000字的《从发现到发生》心得（第一次提智）。<b style="color:#E8A33D">每次点"生成"都重新写一遍，不缓存、不复用</b>——心得每次想过的角度不同，会顺着传导进三篇论文，让同一段经典每次解构出来的味道也不尽相同。三条 SDE 链带着这份自己写的心得去解构。<br><br>SDE 1／2／3 <b style="color:#D4DCE4">不是同一篇稿子改出来的三个版本</b>，而是三篇各自独立成篇的论文——<b style="color:#D4DCE4">SDE1 只用三大方程</b>（S=F(D,E)等）、<b style="color:#D4DCE4">SDE2 只用六路径</b>（先读任务DNA再按路径展开）、<b style="color:#D4DCE4">SDE3 只用123原理</b>（D-E矛盾→S改变→回写）。三篇<b style="color:#E5C86E">同时并行生成</b>、互不依赖，且各自独立走完<b style="color:#E5C86E">两轮自审自改</b>——审自己、改一遍，再审一次、再改一次。同一段经典换一件工具会显出什么不同的断面，并排就看得见。</div>
       </div>
       <div style="background:rgba(13,17,23,0.4);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:15px 17px">
         <div style="font-size:13px;font-weight:700;color:#C9A227;margin-bottom:6px">③ 任何经典都可以，只用顶配模型</div>
@@ -291,12 +290,6 @@ footer a{color:var(--gold)}
     </div>
   </div>
 
-  <div class="reflect-choice" id="reflectChoiceBar">
-    <b style="color:#E5C86E">已有本地心得</b> · <span id="reflectChoiceName"></span><span id="reflectChoiceHint"></span>——本次要：
-    <label><input type="radio" name="reflectChoice" value="use" checked>直接用已存的（秒开，不重写）</label>
-    <label><input type="radio" name="reflectChoice" value="rewrite">重新写一遍（较慢，会覆盖旧的）</label>
-  </div>
-
   <div class="go-row">
     <button class="btn-go" id="goBtn">✦ 生成四篇论文（传统 · SDE1 · SDE2 · SDE3）</button>
     <select class="model-select" id="modelSel" title="模型">
@@ -333,7 +326,7 @@ footer a{color:var(--gold)}
 <div class="reflect-panel" id="reflectPanel">
   <div class="reflect-inner">
     <div class="reflect-h"><span>🧠 第一步 · 基底先读 SDE 内功，亲手写一篇《从发现到发生》心得</span><span class="reflect-st" id="reflectStatus">待命</span></div>
-    <div class="reflect-desc">这是四篇论文共同的思维底座：<b style="color:#D4DCE4">先让写作基底把内功读进去、用自己的话完整想一遍</b>（约7000字，含三大方程/六路径/123原理的学习心得），再带着这个已内化的认知去解构经典。写好后<b style="color:#D4DCE4">存在你自己浏览器本地</b>，下次同一基底秒载复用，不必重写。<b style="color:#E8A33D">传统经学那篇是对照组，不注入内功也不注入心得</b>——否则就不成其为对照了。</div>
+    <div class="reflect-desc">这是本工具的<b style="color:#D4DCE4">主功能之一</b>，不是幕后铺垫：<b style="color:#D4DCE4">写作基底先把内功读进去、用自己的话完整想一遍</b>（约7000字，含三大方程/六路径/123原理的学习心得），再带着这个已内化的认知去解构经典。<b style="color:#E8A33D">每次点"生成"都会重新写一遍，不缓存、不复用</b>——同一段内功，基底每次想过的角度都会有细微差异，这份差异会顺着心得传导进三篇论文，让同一段经典每次解构出来的味道也不尽相同。<b style="color:#E8A33D">传统经学那篇是对照组，不注入内功也不注入心得</b>——否则就不成其为对照了。</div>
     <div class="reflect-body" id="reflectBody"><span class="placeholder">尚未开始</span></div>
   </div>
 </div>
@@ -594,52 +587,42 @@ function reflectPrompt(sel){
 // 心得本身也不省预算，与本工具其余调用一致(用户明确要求"预算可以巨大无比")
 const REFLECT_MAX_TOKENS = 60000;
 
-// 存储版本号：内功或心得规格升级、或某档位【底层模型更换】时 +1，旧缓存自动失效重写。
-// v1（2026-07-15）：本工具首次引入心得机制。
-// v1→v2（同日）：第四节从"照搬金点子发生器的通用三件套心得"，换成本工具专属版本——
-//   金点子那份第四节讲的是三件工具在泛用场景下怎么用，跟经典解构器接下来真正要做的事(用其中一件工具写一篇解构论文)脱节；
-//   新版第四节直接对齐 sdeDraftPrompt() 里 eq/paths/principle 三个 toolBlock 的实际指令，并加了一个完整走一遍的例子
-//   （《道德经》"知者不言，言者不知"）与三件工具各自的踩坑对照表。不 +1 则老用户会继续复用内容脱节的旧版心得。
-const REFLECT_LS_VER = 'v2';
-function reflectLsKey(sel){ return 'sde_cd_reflect_' + REFLECT_LS_VER + '_' + (sel || 'unknown'); }
-function loadReflectLS(sel){ try{ const t = localStorage.getItem(reflectLsKey(sel)); return (t && t.length > 1500) ? t : ''; }catch(_){ return ''; } }
-function saveReflectLS(sel, text){ try{ if(text && text.length > 1500) localStorage.setItem(reflectLsKey(sel), text); }catch(_){} }
-// 供手动清除：控制台可调 clearReflect('claude:pro') 或 clearReflect() 清全部
-function clearReflect(sel){
-  try{
-    if(sel){ localStorage.removeItem(reflectLsKey(sel)); if(_sharedReflection.key===sel){ _sharedReflection={key:'',text:'',promise:null,fromCache:false}; } return '已清除 '+sel+' 的本地心得'; }
-    Object.keys(localStorage).filter(k=>k.indexOf('sde_cd_reflect_')===0).forEach(k=>localStorage.removeItem(k));
-    _sharedReflection={key:'',text:'',promise:null,fromCache:false};
-    return '已清除全部基底的本地心得';
-  }catch(e){ return '清除失败：'+e.message; }
-}
-window.clearReflect = clearReflect;
-
-let _sharedReflection = { key:'', text:'', promise:null, fromCache:false };
-// 心得按【基底】标识，与经典原文无关：同一基底算同一份，换基底才需要重写。
-async function getSharedReflection(sel, apiKey, onProgress){
-  const rk = sel || '';
-  // ① 内存缓存（同一次会话内最快）
-  // 命中内存缓存 = 本次没写、是复用——必须标记 fromCache，否则面板会显示"已写好"，等于谎称刚花十几分钟写了一遍
-  if(_sharedReflection.key===rk && _sharedReflection.text){ _sharedReflection.fromCache = true; if(onProgress) onProgress(_sharedReflection.text.length); return _sharedReflection.text; }
-  if(_sharedReflection.key===rk && _sharedReflection.promise){ return await _sharedReflection.promise; }
-  // ② 本地磁盘缓存（跨刷新、跨会话）：命中则秒载，直接跳过写作
-  const cached = loadReflectLS(sel);
-  if(cached){
-    _sharedReflection = { key:rk, text:cached, promise:Promise.resolve(cached), fromCache:true };
-    if(onProgress) onProgress(cached.length);
-    return cached;
-  }
-  // ③ 都没有 → 真写一次；写成功后存盘，供下次自动载入
-  _sharedReflection.key = rk; _sharedReflection.text = ''; _sharedReflection.fromCache = false;
-  _sharedReflection.promise = getReflection(sel, apiKey, onProgress).then(txt=>{
-    _sharedReflection.text = txt || '';
-    if(txt){ saveReflectLS(sel, txt); } else { _sharedReflection.promise = null; }
-    return _sharedReflection.text;
-  });
-  return await _sharedReflection.promise;
-}
 let _reflectLastErr = '';
+// ============ 心得完整性校验：不是"总字数够了就算数"，而是逐节核查 ============
+// 背景：金点子发生器那边也只有一道">1500字"的总长闸门——这道闸门太松，一篇总长过关、
+// 但前三节草草几句、第四节应付一段的心得，照样能混过去、被当成"正式心得"存进缓存，此后每次复用的都是这份浅层货。
+// 这里补一道结构性校验：逐节核查，任何一节明显过短或整节缺失，都不许被当成合格心得存进缓存——
+// 宁可这一轮不缓存、下次重新判定，也不让一份肤浅的心得永久占住缓存位置。
+function checkReflectionCompleteness(text, sel){
+  if(!text) return { ok:false, issues:['心得为空'] };
+  // 四节的起始标记就是 REFLECT_SPEC 里给模型的原始编号——模型据此写作，理应原样或近似复现
+  const markers = ['一、', '二、', '三、', '四、'];
+  const positions = markers.map(m => text.indexOf(m));
+  const issues = [];
+  positions.forEach((pos, i) => { if(pos < 0) issues.push('缺少第'+markers[i]+'节的标记，疑似整节缺失'); });
+  if(issues.length) return { ok:false, issues, sectionLens:null };
+
+  // 逐节切片测长度：第i节 = 从它自己的标记开始，到下一节标记为止（第四节到全文结尾）
+  const sorted = positions.slice().sort((a,b)=>a-b);
+  const sectionLens = [];
+  for(let i=0;i<4;i++){
+    const start = positions[i];
+    const end = (i<3) ? Math.min(...positions.filter(p=>p>start).concat([text.length])) : text.length;
+    sectionLens.push(Math.max(0, end - start));
+  }
+  // 门槛按基底真实输出上限分两档：千问被硬钳在约4800字总量(前三节3400+第四节1400)，其余基底奔7000字(5000+2000)。
+  // 门槛定得比目标宽松很多(目标的4-5折)，只用来抓"明显应付"，不是逼它字字顶格。
+  const isQwen = parseModel(sel).vendor === 'qwen';
+  const floor123 = isQwen ? 700 : 900;   // 前三节，每节至少这么多字，三节合计门槛见下
+  const floorTotal123 = isQwen ? 1700 : 2500;
+  const floor4 = isQwen ? 550 : 900;
+  const sum123 = sectionLens[0] + sectionLens[1] + sectionLens[2];
+  if(sum123 < floorTotal123) issues.push('前三节合计仅 '+sum123+' 字，明显低于'+(isQwen?'千问':'该基底')+'应有的篇幅（门槛 '+floorTotal123+' 字），疑似走过场');
+  sectionLens.slice(0,3).forEach((len,i)=>{ if(len < floor123) issues.push('第'+markers[i]+'节仅 '+len+' 字，单节过短，疑似只写了一两句就跳过'); });
+  if(sectionLens[3] < floor4) issues.push('第四节(SDE方法论三件套)仅 '+sectionLens[3]+' 字，低于门槛 '+floor4+' 字——这一节最直接决定解构经典时用不用得上工具，写得太薄形同没写');
+  return { ok: issues.length===0, issues, sectionLens };
+}
+
 async function getReflection(sel, apiKey, onProgress){
   const sink = reflectBody, dummy = { textContent:'', innerHTML:'' }, dummyCol = { classList:{add(){},remove(){}} };
   let ticker=null; _reflectLastErr=''; const _t0=Date.now();
@@ -954,41 +937,7 @@ function restoreSelectors(){
   if(typeof saved.assess==='string' && validOption(assessModelSel, saved.assess)) assessModelSel.value = saved.assess;
 }
 restoreSelectors();
-// 心得选择控件：当前写作基底已有本地心得 → 亮出来让用户选"用已存的(默认)/重写"；没有则隐藏(第一次本来就得写，没得选)
-const REFLECT_MODEL_NAMES = {'ds:pro':'DeepSeek V4 Pro','glm:pro':'智谱 GLM-5','kimi:pro':'Kimi K2.6','qwen:pro':'通义千问 Qwen3.7-Max','minimax:pro':'MiniMax M3','gpt:pro':'GPT-5.5','claude:pro':'Claude Opus 4.8','gemini:pro':'Gemini 3.1 Pro'};
-function updateReflectChoiceBar(){
-  try{
-    const bar = $('reflectChoiceBar'); if(!bar) return;
-    const sel = modelSel.value;
-    const stored = loadReflectLS(sel);
-    if(stored){
-      const nameEl = $('reflectChoiceName'); if(nameEl) nameEl.textContent = (REFLECT_MODEL_NAMES[sel] || sel) + ' ';
-      const hint = $('reflectChoiceHint'); if(hint) hint.textContent = '（已存 ' + stored.length + ' 字）';
-      // 每次重新显示都默认回到"用已存的"，避免上次选的"重写"残留导致这次误重写
-      const useRadio = document.querySelector('input[name="reflectChoice"][value="use"]');
-      if(useRadio) useRadio.checked = true;
-      bar.style.display = 'block';
-    } else { bar.style.display = 'none'; }
-  }catch(_){}
-}
-// 开跑时读取选择：选了"重写"就清掉该基底的本地+内存缓存(本次自然会重写并存盘)，
-// 然后把选择重置回"用已存的"、隐藏控件——写完存盘后 updateReflectChoiceBar 会重新亮出来。
-function consumeReflectRewriteChoice(sel){
-  try{
-    const bar = $('reflectChoiceBar');
-    if(!bar || bar.style.display === 'none') return false;   // 没显示 = 没缓存 = 无需处理
-    const r = document.querySelector('input[name="reflectChoice"]:checked');
-    if(r && r.value === 'rewrite'){
-      clearReflect(sel);
-      const useRadio = document.querySelector('input[name="reflectChoice"][value="use"]');
-      if(useRadio) useRadio.checked = true;
-      bar.style.display = 'none';
-      return true;
-    }
-  }catch(_){}
-  return false;
-}
-modelSel.addEventListener('change', ()=>{ refreshKeyUI(); saveSelectors(); updateReflectChoiceBar(); });
+modelSel.addEventListener('change', ()=>{ refreshKeyUI(); saveSelectors(); });
 reviewModelSel1.addEventListener('change', ()=>{ refreshReviewKeyUI(1); saveSelectors(); });
 reviewModelSel2.addEventListener('change', ()=>{ refreshReviewKeyUI(2); saveSelectors(); });
 assessModelSel.addEventListener('change', ()=>{ refreshReviewKeyUI('assess'); saveSelectors(); });
@@ -998,7 +947,6 @@ assessKeyEl.addEventListener('input', ()=>{ if(assessModelSel.value) localStorag
 // 还原选择之后，才第一次刷新Key相关UI——确保读到的是还原后的选择，而不是浏览器默认的第一个选项
 refreshKeyUI();
 refreshReviewKeyUI(1); refreshReviewKeyUI(2); refreshReviewKeyUI('assess');
-updateReflectChoiceBar();
 $('keyToggle').addEventListener('click', ()=>{
   apiKeyEl.type = apiKeyEl.type==='password' ? 'text' : 'password';
   $('keyToggle').textContent = apiKeyEl.type==='password' ? '显示' : '隐藏';
@@ -1491,18 +1439,17 @@ async function run(){
 
   const userQ = src ? ('【出处】'+src+'\n【原文】\n'+text) : ('【原文】\n'+text);
 
-  // ===== 第一步：写作基底先读内功、亲手写心得（或秒载本地缓存）=====
-  // 必须在四条链启动【之前】完成——它是三条 SDE 链共同的思维底座，不是可以并行的旁支。
-  // 若用户选了"重写"，先清掉缓存，下面自然会重写一遍。
-  consumeReflectRewriteChoice(model);
+  // ===== 第一步(主功能，非幕后铺垫)：写作基底先读内功、亲手写一遍心得 —— 每次都重新生成 =====
+  // 必须在四条链启动【之前】完成——它是三条 SDE 链共同的思维底座。
+  // 【不缓存、不复用】：故意每次都让基底重新写一遍——同一段内功，基底每次想过的角度、抓住的重点都会有细微差异，
+  // 这份差异会顺着心得传导进三篇论文，让同一段经典每次解构出来的味道也不尽相同。这是特意设计的行为，不是省不了的成本。
   reflectPanel.style.display = 'block';
   reflectStatus.classList.remove('done','failed');
-  const hadCache = !!loadReflectLS(model);
-  reflectStatus.innerHTML = hadCache ? '<span class="spinner"></span> 载入本地心得…' : '<span class="spinner"></span> 正在写心得…';
-  if(!hadCache) reflectBody.innerHTML = '<span class="placeholder">基底正在读内功、写《从发现到发生》……首次较慢，写好后存本地，下次秒载</span>';
+  reflectStatus.innerHTML = '<span class="spinner"></span> 正在写心得（每次都会重新写一遍，不复用）…';
+  reflectBody.innerHTML = '<span class="placeholder">基底正在读内功、亲手写一遍《从发现到发生》……这是本次解构的思维底座，不会跳过</span>';
   let reflectionText = '';
   try{
-    reflectionText = await getSharedReflection(model, key, (n, ph)=>{
+    reflectionText = await getReflection(model, key, (n, ph)=>{
       // n<0 表示还停在"思考中/连接中"的占位阶段，不是真的写了 n 字——如实显示等待提示，不谎报进度
       if(n < 0) reflectStatus.innerHTML = '<span class="spinner"></span> ' + escTxt(ph || '思考中…');
       else reflectStatus.innerHTML = '<span class="spinner"></span> 已写 ' + n + ' 字';
@@ -1510,9 +1457,18 @@ async function run(){
   }catch(e){ reflectionText = ''; _reflectLastErr = e.message; }
   if(reflectionText){
     reflectBody.textContent = reflectionText;
-    reflectStatus.textContent = (_sharedReflection.fromCache ? '✓ 已载入本地缓存 · ' : '✓ 已写好 · ') + reflectionText.length + ' 字';
-    reflectStatus.classList.add('done');
-    updateReflectChoiceBar(); // 新写好的心得已存盘，让选择控件亮出来供下次使用
+    const q = checkReflectionCompleteness(reflectionText, model);
+    if(q && q.ok === false){
+      // 完整性校验没过：本轮仍用它（总比没有强），但如实告诉用户这份心得偏浅——毕竟不缓存，下一次点生成就会是全新一份
+      // 【与成功分支保持一致，统一用 textContent】：两个分支做的是同一件事(设置一句纯文字状态)。
+      reflectStatus.textContent = '⚠ 完整性校验未过 · ' + reflectionText.length + ' 字';
+      reflectStatus.classList.add('failed');
+      reflectBody.innerHTML = '<span class="placeholder" style="color:#E8897B">⚠ 这份心得没通过完整性校验：'+escTxt(q.issues.join('；'))+'。本轮仍会用它继续解构（好过完全没有）——下次点"生成"会是全新重写的一份。</span>'
+        + '\n\n' + escTxt(reflectionText);
+    } else {
+      reflectStatus.textContent = '✓ 已写好·完整性校验通过 · ' + reflectionText.length + ' 字';
+      reflectStatus.classList.add('done');
+    }
   } else {
     // 心得写失败不该让整轮生成停摆：退回"只用内功、不带心得"继续跑，但必须如实告诉用户这一轮的底座不完整
     reflectBody.innerHTML = '<span class="placeholder">心得未能生成：'+escTxt(_reflectLastErr || '未知原因')+'　→ 本轮退回【只注入内功、不带心得】继续解构（提智程度会低一些）</span>';
