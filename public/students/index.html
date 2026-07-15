@@ -28,6 +28,9 @@ nav a{color:var(--gold);text-decoration:none;font-size:14px;letter-spacing:0.05e
 .panel .tag{font-size:12px;letter-spacing:0.36em;color:var(--gold);margin-bottom:18px}
 .panel h2{font-size:22px;color:#F5EFE0;font-weight:800;margin-bottom:14px}
 .panel p{font-size:15px;color:var(--ink2);line-height:1.95;max-width:560px;margin:0 auto 10px}.roster-head{text-align:center;margin-top:44px}.roster-head .tag{font-size:12px;letter-spacing:0.34em;color:var(--gold);margin-bottom:10px}.roster-head .sub{font-size:14.5px;color:var(--ink2);margin-bottom:6px}.roster-count{font-size:13px;color:var(--accent);letter-spacing:0.14em;margin-bottom:8px}.roster{display:grid;grid-template-columns:repeat(auto-fill,minmax(158px,1fr));gap:12px;margin-top:22px}.stu{display:flex;align-items:center;gap:12px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:13px 16px;text-decoration:none;transition:border-color .15s,transform .15s}a.stu:hover{border-color:rgba(201,168,76,0.6);transform:translateY(-2px)}a.stu:hover .nm{color:#FFF3D6}.stu .no{font-size:13px;color:#1A1410;background:var(--gold);width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0}.stu .nm{font-size:15px;color:#F5EFE0;line-height:1.35}.stu .nm small{display:block;font-size:11.5px;color:var(--ink2);letter-spacing:0.03em;margin-top:1px}.stu.open{border-style:dashed}.stu.open .no{background:transparent;border:1px dashed var(--gold);color:var(--gold)}.stu.open .nm{color:var(--ink2)}
+.roster-note{text-align:center;font-size:12px;color:var(--ink2);letter-spacing:0.06em;margin-top:6px;margin-bottom:-6px}
+.stu .cnt{font-size:10px;color:var(--accent);letter-spacing:0.04em;margin-top:2px}
+.stu-loading{grid-column:1/-1;text-align:center;color:var(--ink2);font-size:13.5px;padding:20px 0}
 .what{margin-top:44px}
 .what h3{font-size:13px;letter-spacing:0.28em;color:var(--accent);margin-bottom:16px;text-align:center}
 .what .row{display:flex;gap:16px;flex-wrap:wrap;justify-content:center}
@@ -69,39 +72,11 @@ footer a{color:var(--gold);text-decoration:none}
     <div class="sub zh-only">接龙持续进行，人数不设上限——每一位学员的作品，通过合宪性审读后，都将署名在此陆续发表。</div>
     <div class="sub en-only">Sign-up is ongoing with no cap on numbers — every trainee’s work, once it passes a constitutionality review, will be published here under their name.</div>
   </div>
-  <div class="roster">
-    <a class="stu" href="/students/li-jiacheng/"><div class="no">1</div><div class="nm">李佳城</div></a>
-    <a class="stu" href="/students/lei-jianhua/"><div class="no">2</div><div class="nm">雷建华</div></a>
-    <a class="stu" href="/students/zhang-qiong/"><div class="no">3</div><div class="nm">张琼</div></a>
-    <a class="stu" href="/students/he-lixia/"><div class="no">4</div><div class="nm">何丽霞</div></a>
-    <a class="stu" href="/students/judy/"><div class="no">5</div><div class="nm">Judy</div></a>
-    <a class="stu" href="/students/lin-zi/"><div class="no">6</div><div class="nm">林子</div></a>
-    <a class="stu" href="/students/hu-zhiying/"><div class="no">7</div><div class="nm">胡志英<small>约翰 · John</small></div></a>
-    <a class="stu" href="/students/gao-peng/"><div class="no">8</div><div class="nm">高鹏<small>高朋满座</small></div></a>
-    <a class="stu" href="/students/shao-min/"><div class="no">9</div><div class="nm">少敏</div></a>
-    <a class="stu" href="/students/huang-qianying/"><div class="no">10</div><div class="nm">黄倩盈</div></a>
-    <a class="stu" href="/students/yan-qun/"><div class="no">11</div><div class="nm">燕群</div></a>
-    <a class="stu" href="/students/yang-yong/"><div class="no">12</div><div class="nm">阳涌</div></a>
-    <a class="stu" href="/students/qin-li/"><div class="no">13</div><div class="nm">秦莉</div></a>
-    <a class="stu" href="/students/xiaobo/"><div class="no">14</div><div class="nm">小波老师</div></a>
-    <a class="stu" href="/students/hu-min/"><div class="no">15</div><div class="nm">胡敏</div></a>
-    <a class="stu" href="/students/jin-hua/"><div class="no">16</div><div class="nm">金华</div></a>
-    <a class="stu" href="/students/putao/"><div class="no">17</div><div class="nm">葡萄</div></a>
-    <a class="stu" href="/students/xiang-qing/"><div class="no">18</div><div class="nm">向晴</div></a>
-    <a class="stu" href="/students/jack/"><div class="no">19</div><div class="nm">Jack</div></a>
-    <a class="stu" href="/students/fu-ziwen/"><div class="no">20</div><div class="nm">付自文</div></a>
-    <a class="stu" href="/students/wu-yanqin/"><div class="no">21</div><div class="nm">邬燕琴</div></a>
-    <a class="stu" href="/students/liu-chunhua/"><div class="no">22</div><div class="nm">刘春华</div></a>
-    <a class="stu" href="/students/mou-jun/"><div class="no">23</div><div class="nm">牟军</div></a>
-    <a class="stu" href="/students/wang-tao/"><div class="no">24</div><div class="nm">王涛</div></a>
-    <a class="stu" href="/students/zhou-long/"><div class="no">25</div><div class="nm">周龙</div></a>
-    <a class="stu" href="/students/chen-xiaoxing/"><div class="no">26</div><div class="nm">陈小星</div></a>
-    <a class="stu" href="/students/kong-fanhe/"><div class="no">27</div><div class="nm">孔凡鹤</div></a>
-    <a class="stu" href="/students/chen-xiaoyan/"><div class="no">28</div><div class="nm">陈晓艳</div></a>
-    <a class="stu" href="/students/li-qiujin/"><div class="no">29</div><div class="nm">李秋金</div></a>
-    <a class="stu" href="/students/yang-bide/"><div class="no">30</div><div class="nm">杨彼得</div></a>
-    <a class="stu" href="/students/chai-ao/"><div class="no">31</div><div class="nm">柴翱</div></a>
-    <div class="stu open"><div class="no">+</div><div class="nm"><span class="zh-only">虚位以待 · 报名中</span><span class="en-only">Open · joining</span></div></div>
+  <div class="roster-note zh-only">编号按发稿数量自动排序，每日更新 · 并列时按报名顺序</div>
+  <div class="roster-note en-only">Numbering auto-ranks by published works, updated daily · ties by sign-up order</div>
+  <div class="roster" id="roster">
+    <div class="stu-loading zh-only">名单加载中…</div>
+    <div class="stu-loading en-only">Loading roster…</div>
   </div>
 
   <div class="what">
@@ -139,6 +114,33 @@ footer a{color:var(--gold);text-decoration:none}
 </footer>
 <script>
 function setLang(l){document.body.className=l;document.querySelectorAll('.lang-btn').forEach(function(b){b.classList.toggle('active',(b.textContent==='中'&&l==='zh')||(b.textContent==='EN'&&l==='en'));});document.documentElement.lang=l==='zh'?'zh-CN':'en';}
+fetch('/students/roster.json').then(function(r){return r.json();}).then(function(data){
+  var students = data.students.slice();
+  students.sort(function(a,b){
+    if(b.count!==a.count) return b.count-a.count;
+    return a.enrolled_order-b.enrolled_order;
+  });
+  var host = document.getElementById('roster');
+  host.innerHTML='';
+  students.forEach(function(s,i){
+    var a=document.createElement('a');
+    a.className='stu';
+    a.href='/students/'+s.slug+'/';
+    var no=document.createElement('div'); no.className='no'; no.textContent=(i+1);
+    var nm=document.createElement('div'); nm.className='nm';
+    nm.textContent=s.name;
+    if(s.small){ var sm=document.createElement('small'); sm.textContent=s.small; nm.appendChild(sm); }
+    if(s.count>0){ var cnt=document.createElement('div'); cnt.className='cnt'; cnt.textContent='已发表 '+s.count+' 篇'; nm.appendChild(cnt); }
+    a.appendChild(no); a.appendChild(nm);
+    host.appendChild(a);
+  });
+  var open=document.createElement('div');
+  open.className='stu open';
+  open.innerHTML='<div class="no">+</div><div class="nm"><span class="zh-only">虚位以待 · 报名中</span><span class="en-only">Open · joining</span></div>';
+  host.appendChild(open);
+}).catch(function(){
+  document.getElementById('roster').innerHTML='<div class="stu-loading">名单暂时加载失败，请刷新重试。</div>';
+});
 </script>
 </body>
 </html>
