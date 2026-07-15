@@ -84,6 +84,13 @@ textarea{resize:vertical;min-height:120px;line-height:1.75}
 .rev-head .st{margin-left:auto;font-size:11.5px;color:#7A8694;font-weight:400}
 .rev-body{padding:14px 16px;font-size:13px;line-height:1.85;color:#B9C3CD;white-space:pre-wrap;word-wrap:break-word;max-height:380px;overflow-y:auto}
 .rev-body .placeholder{color:#6E7B88;font-style:italic}
+.rev-input{border-bottom:1px solid rgba(232,163,61,0.12);background:rgba(0,0,0,0.15)}
+.rev-input summary{cursor:pointer;padding:8px 16px;font-size:11.5px;color:#9AA5B0;list-style:none;user-select:none}
+.rev-input summary::-webkit-details-marker{display:none}
+.rev-input summary:hover{color:#D4B25E}
+.rev-input-body{padding:0 16px 12px;font-size:11.5px;line-height:1.7;color:#8A97A3;white-space:pre-wrap;word-wrap:break-word;max-height:220px;overflow-y:auto}
+.rev-input-body .placeholder{color:#5A6570;font-style:italic}
+.rev-input-body .k{color:#C9A227;font-weight:700}
 .lib-toggle{cursor:pointer;font-size:13px;color:var(--gold2);margin-top:10px;display:inline-flex;align-items:center;gap:6px;user-select:none}
 .lib-toggle:hover{text-decoration:underline}
 .lib-panel{display:none;margin-top:14px;background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:16px 18px}
@@ -254,15 +261,18 @@ footer a{color:var(--gold)}
 <div id="revPanel" style="max-width:1460px;margin:26px auto 0;padding:0 20px;display:none">
   <div style="background:linear-gradient(135deg,rgba(232,163,61,0.06),rgba(20,16,8,0.3));border:1px solid rgba(232,163,61,0.26);border-radius:14px;padding:20px 22px">
     <div style="font-size:14px;font-weight:700;color:#E8A33D;margin-bottom:6px">🔬 三组自审意见 · 每篇论文各自调转刀口审自己</div>
-    <div style="font-size:12.5px;color:#8B98A5;line-height:1.7;margin-bottom:16px">SDE 1／2／3 是三篇独立生成的论文，各自走自己的两轮自审自改，互不干扰。八条硬检查里新加的一条专管"有没有偷偷夹带另外两件工具"——只准用被指定的那一件。审稿意见往往比终稿更能暴露基底的真实水平：它敢不敢承认自己刚才在说套话。</div>
+    <div style="font-size:12.5px;color:#8B98A5;line-height:1.7;margin-bottom:6px">SDE 1／2／3 是三篇独立生成的论文，各自走自己的两轮自审自改，互不干扰。九条硬检查里专管"有没有偷偷夹带另外两件工具""应用一节是否落到实处"。审稿意见往往比终稿更能暴露基底的真实水平：它敢不敢承认自己刚才在说套话。</div>
+    <div style="font-size:12px;color:var(--gold2);margin-bottom:16px" id="revBaseLine">本轮审稿基底：待选择</div>
     <div class="rev-group" id="revGroup1">
       <div class="rev-group-h">SDE 1 · 三大方程</div>
       <div class="rev-block" id="revBlock1a">
         <div class="rev-head"><span class="n">1</span><span>审稿一</span><span class="st" id="rev1aStatus">待命</span></div>
+        <details class="rev-input"><summary>查看本轮基底设定与输入</summary><div class="rev-input-body" id="rev1aInput"><span class="placeholder">尚未开始</span></div></details>
         <div class="rev-body" id="rev1aBody"><span class="placeholder">尚未开始</span></div>
       </div>
       <div class="rev-block" id="revBlock1b">
         <div class="rev-head"><span class="n">2</span><span>审稿二</span><span class="st" id="rev1bStatus">待命</span></div>
+        <details class="rev-input"><summary>查看本轮基底设定与输入</summary><div class="rev-input-body" id="rev1bInput"><span class="placeholder">尚未开始</span></div></details>
         <div class="rev-body" id="rev1bBody"><span class="placeholder">尚未开始</span></div>
       </div>
     </div>
@@ -270,10 +280,12 @@ footer a{color:var(--gold)}
       <div class="rev-group-h">SDE 2 · 六路径</div>
       <div class="rev-block" id="revBlock2a">
         <div class="rev-head"><span class="n">1</span><span>审稿一</span><span class="st" id="rev2aStatus">待命</span></div>
+        <details class="rev-input"><summary>查看本轮基底设定与输入</summary><div class="rev-input-body" id="rev2aInput"><span class="placeholder">尚未开始</span></div></details>
         <div class="rev-body" id="rev2aBody"><span class="placeholder">尚未开始</span></div>
       </div>
       <div class="rev-block" id="revBlock2b">
         <div class="rev-head"><span class="n">2</span><span>审稿二</span><span class="st" id="rev2bStatus">待命</span></div>
+        <details class="rev-input"><summary>查看本轮基底设定与输入</summary><div class="rev-input-body" id="rev2bInput"><span class="placeholder">尚未开始</span></div></details>
         <div class="rev-body" id="rev2bBody"><span class="placeholder">尚未开始</span></div>
       </div>
     </div>
@@ -281,10 +293,12 @@ footer a{color:var(--gold)}
       <div class="rev-group-h">SDE 3 · 123原理</div>
       <div class="rev-block" id="revBlock3a">
         <div class="rev-head"><span class="n">1</span><span>审稿一</span><span class="st" id="rev3aStatus">待命</span></div>
+        <details class="rev-input"><summary>查看本轮基底设定与输入</summary><div class="rev-input-body" id="rev3aInput"><span class="placeholder">尚未开始</span></div></details>
         <div class="rev-body" id="rev3aBody"><span class="placeholder">尚未开始</span></div>
       </div>
       <div class="rev-block" id="revBlock3b">
         <div class="rev-head"><span class="n">2</span><span>审稿二</span><span class="st" id="rev3bStatus">待命</span></div>
+        <details class="rev-input"><summary>查看本轮基底设定与输入</summary><div class="rev-input-body" id="rev3bInput"><span class="placeholder">尚未开始</span></div></details>
         <div class="rev-body" id="rev3bBody"><span class="placeholder">尚未开始</span></div>
       </div>
     </div>
@@ -399,7 +413,7 @@ const sde2Cell={body:$('sde2Body'),status:$('sde2Status'),meta:$('sde2Meta'),col
 const sde3Cell={body:$('sde3Body'),status:$('sde3Status'),meta:$('sde3Meta'),col:$('colSde3')};
 // 审稿块：复用 streamChat 的签名（body/status/meta/col），meta 与 col 用轻量占位即可
 const noopEl = {textContent:'', innerHTML:'', classList:{add(){},remove(){},toggle(){}}, style:{}, appendChild(){}, scrollTop:0, scrollHeight:0};
-function makeRevCell(n){ return {body:$('rev'+n+'Body'), status:$('rev'+n+'Status'), meta:noopEl, col:noopEl}; }
+function makeRevCell(n){ return {body:$('rev'+n+'Body'), status:$('rev'+n+'Status'), meta:noopEl, col:noopEl, input:$('rev'+n+'Input')}; }
 const revCells = { '1a':makeRevCell('1a'), '1b':makeRevCell('1b'), '2a':makeRevCell('2a'), '2b':makeRevCell('2b'), '3a':makeRevCell('3a'), '3b':makeRevCell('3b') };
 const errBox=$('errBox');
 function showErr(m){ errBox.textContent=m; errBox.style.display='block'; }
@@ -769,6 +783,14 @@ classicTextEl.addEventListener('input', updateCharCount);
 updateCharCount();
 
 // ============ 主流程：传统经学(独立1次成稿) + 三条完全独立并行的SDE链，每条各自完成 draft→review→revise→review→revise ============
+// 把"基底设定 + 实际输入"写进每个审稿块的可展开面板——审稿意见之外，用户还能核实这一轮到底喂了什么给基底
+function fillRevInput(cell, round, tool, userContent){
+  const sys = `完整 SDE 内功先验（约${Math.round(SDE_BASE.length/1000)}千字）+《审稿（第${round}轮）》任务说明，工具锁定为 ${TOOL_LABEL[tool]}`;
+  cell.input.innerHTML = '<span class="k">基底：</span>'+escTxt(vendorName())+'\n'
+    + '<span class="k">系统提示：</span>'+escTxt(sys)+'\n\n'
+    + '<span class="k">本轮实际输入（原文 + 待审论文全文）：</span>\n'+escTxt(userContent);
+}
+
 async function run(){
   hideErr();
   const key=apiKeyEl.value.trim().replace(/^["']|["']$/g,'');
@@ -783,8 +805,12 @@ async function run(){
 
   goBtn.disabled=true; goBtn.textContent='⏳ 四篇论文同时生成中（每篇独立走完两轮自审自改）……';
   $('revPanel').style.display='block';
+  $('revBaseLine').textContent = '本轮审稿基底：' + vendorName() + '（' + model + '，与四篇论文使用同一顶配基底）';
   [plainCell, sde1Cell, sde2Cell, sde3Cell].forEach(c=>{ c.body.innerHTML='<span class="placeholder">已排队，即将开始……</span>'; c.status.innerHTML='<span class="spinner"></span> 排队中'; c.meta.textContent=''; });
-  Object.values(revCells).forEach(c=>{ c.body.innerHTML='<span class="placeholder">等待对应论文初稿完成……</span>'; c.status.textContent='排队中'; });
+  Object.values(revCells).forEach(c=>{
+    c.body.innerHTML='<span class="placeholder">等待对应论文初稿完成……</span>'; c.status.textContent='排队中';
+    c.input.innerHTML='<span class="placeholder">尚未发起调用</span>';
+  });
 
   const userQ = src ? ('【出处】'+src+'\n【原文】\n'+text) : ('【原文】\n'+text);
   const N = SDE_BASE;
@@ -800,7 +826,9 @@ async function run(){
       const draft = await streamChat(key, model, sdeDraftPrompt(N, tool), userQ, paperCell.body, paperCell.status, paperCell.meta, paperCell.col, PAPER_TOKENS);
       if(!draft.text) throw new Error(label+' 初稿为空，自审自改无法进行');
 
-      const rA = await streamChat(key, model, sdeReviewPrompt(N, 1, tool), userQ + '\n\n【待审的解构稿】\n' + draft.text,
+      const rAInput = userQ + '\n\n【待审的解构稿】\n' + draft.text;
+      fillRevInput(revA, 1, tool, rAInput);
+      const rA = await streamChat(key, model, sdeReviewPrompt(N, 1, tool), rAInput,
         revA.body, revA.status, revA.meta, revA.col, REVIEW_TOKENS);
 
       let cur = draft.text;
@@ -811,7 +839,9 @@ async function run(){
         if(fixA.text) cur = fixA.text;
       }
 
-      const rB = await streamChat(key, model, sdeReviewPrompt(N, 2, tool), userQ + '\n\n【待审的解构稿】\n' + cur,
+      const rBInput = userQ + '\n\n【待审的解构稿】\n' + cur;
+      fillRevInput(revB, 2, tool, rBInput);
+      const rB = await streamChat(key, model, sdeReviewPrompt(N, 2, tool), rBInput,
         revB.body, revB.status, revB.meta, revB.col, REVIEW_TOKENS);
 
       let fin = cur;
