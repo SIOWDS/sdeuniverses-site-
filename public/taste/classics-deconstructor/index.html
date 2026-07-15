@@ -94,6 +94,13 @@ textarea{resize:vertical;min-height:120px;line-height:1.75}
 .rev-input-body{padding:0 16px 12px;font-size:11.5px;line-height:1.7;color:#8A97A3;white-space:pre-wrap;word-wrap:break-word;max-height:220px;overflow-y:auto}
 .rev-input-body .placeholder{color:#5A6570;font-style:italic}
 .rev-input-body .k{color:#C9A227;font-weight:700}
+.iq-card{background:var(--panel2);border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.iq-card-h{padding:11px 14px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;font-size:13px;font-weight:700;color:#D4DCE4}
+.iq-status{font-size:11px;font-weight:400;color:var(--muted)}
+.iq-status.done{color:var(--gold2);font-weight:700}
+.iq-status.failed{color:#F85149}
+.iq-card-body{padding:14px;font-size:12.5px;line-height:1.8;color:var(--text);white-space:pre-wrap;word-wrap:break-word;max-height:420px;overflow-y:auto}
+.iq-card-body .placeholder{color:var(--muted);font-style:italic}
 .lib-toggle{cursor:pointer;font-size:13px;color:var(--gold2);margin-top:10px;display:inline-flex;align-items:center;gap:6px;user-select:none}
 .lib-toggle:hover{text-decoration:underline}
 .lib-panel{display:none;margin-top:14px;background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:16px 18px}
@@ -143,7 +150,7 @@ footer a{color:var(--gold)}
       </div>
     </div>
     <div style="font-size:12px;color:#8B98A5;line-height:1.7;margin-top:14px">
-      🧬 <b style="color:#B0B8C0">八大主流基底任选（均为顶配旗舰档）</b>：DeepSeek · 智谱GLM · Kimi · 通义千问 · MiniMax · GPT · Claude · Gemini——用你自己的 API Key，全程在浏览器里跑，Key 绝不上传本站服务器。<b style="color:#E8A33D">注意</b>：四篇论文同时并行生成（共 20 路模型调用：每篇各 5 路），但<b style="color:#E8A33D">每篇内部的 5 步是顺序进行</b>的（初稿→审→改→审→改，一步等一步）。篇幅预算已经<b style="color:#E8A33D">大幅放开、不设紧张上限</b>，顶配深度思考档想思考多久就思考多久，<b style="color:#E8A33D">单步可能要十几分钟，每篇论文全程可能要一小时以上</b>——这是把"预算不够被砍"这个故障模式基本排除掉之后必然的代价，请耐心等待、不要中途刷新。
+      🧬 <b style="color:#B0B8C0">八大主流基底任选（均为顶配旗舰档）</b>：DeepSeek · 智谱GLM · Kimi · 通义千问 · MiniMax · GPT · Claude · Gemini——用你自己的 API Key，全程在浏览器里跑，Key 绝不上传本站服务器。<b style="color:#E8A33D">注意</b>：四篇论文同时并行生成（共 24 路模型调用：每篇写作5步 + 终稿定稿后各送评一次），但<b style="color:#E8A33D">每篇内部的 5 步是顺序进行</b>的（初稿→审→改→审→改，一步等一步）。篇幅预算已经<b style="color:#E8A33D">大幅放开、不设紧张上限</b>，顶配深度思考档想思考多久就思考多久，<b style="color:#E8A33D">单步可能要十几分钟，每篇论文全程可能要一小时以上</b>——这是把"预算不够被砍"这个故障模式基本排除掉之后必然的代价，请耐心等待、不要中途刷新。
     </div>
   </div>
 </div>
@@ -193,8 +200,8 @@ footer a{color:var(--gold)}
   </div>
 
   <div class="field" id="reviewBaseField">
-    <label>审稿基底设定 <span class="opt" style="color:#8B98A5;font-weight:400">（选填——默认两次审稿都用下面"写作基底"自己审自己；也可以单独指定，比如让另一家基底来审，不只是自己审自己）</span></label>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:8px">
+    <label>审稿 / 评估基底设定 <span class="opt" style="color:#8B98A5;font-weight:400">（选填——默认都跟随下面"写作基底"；也可以单独指定，比如让另一家基底来审、或换一家客观评估创新智商）</span></label>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:8px">
       <div>
         <div style="font-size:12px;color:#8B98A5;margin-bottom:6px">审稿一基底</div>
         <select class="model-select" id="reviewModelSel1" style="width:100%">
@@ -229,8 +236,47 @@ footer a{color:var(--gold)}
           <input type="password" id="reviewKey2" placeholder="sk-..." autocomplete="off" spellcheck="false">
         </div>
       </div>
+      <div>
+        <div style="font-size:12px;color:#8B98A5;margin-bottom:6px">评估基底 <span style="color:#E8A33D">（IQ评分）</span></div>
+        <select class="model-select" id="assessModelSel" style="width:100%">
+          <option value="">跟随写作基底（自己评自己）</option>
+          <option value="ds:pro">DeepSeek V4 Pro</option>
+          <option value="glm:pro">智谱 GLM-5</option>
+          <option value="kimi:pro">月之暗面 Kimi K2.6</option>
+          <option value="qwen:pro">通义千问 Qwen3.7-Max</option>
+          <option value="minimax:pro">MiniMax M3</option>
+          <option value="gpt:pro">🌐 GPT-5.5</option>
+          <option value="claude:pro">🌐 Claude Opus 4.8</option>
+          <option value="gemini:pro">🌐 Gemini 3.1 Pro</option>
+        </select>
+        <div class="key-row" id="assessKeyRow" style="display:none;margin-top:8px">
+          <input type="password" id="assessKey" placeholder="sk-..." autocomplete="off" spellcheck="false">
+        </div>
+      </div>
     </div>
-    <div class="key-hint" style="margin-top:10px">两次审稿分别应用于全部四篇论文（传统经学 + SDE1/2/3）——不是每篇单独设，是统一的"谁来审第一轮、谁来审第二轮"。<b>改稿仍由写作基底自己完成</b>（审稿人挑毛病，作者自己动笔改，符合真实的审稿流程）。选了不同厂商，会在上方多出一个该厂商的 Key 输入框，Key 同样只存本地。</div>
+    <div class="key-hint" style="margin-top:10px">两次审稿、以及终稿定稿后的"SDE创新智商评估"，分别应用于全部四篇论文（传统经学 + SDE1/2/3）——不是每篇单独设，是统一的"谁来审第一轮、谁来审第二轮、谁来评智商"。<b>改稿仍由写作基底自己完成</b>（审稿人挑毛病，作者自己动笔改，符合真实的审稿流程）；<b>评估最好换一家不同的基底</b>，自己给自己的论文打分容易膨胀——但默认仍是跟随写作基底，你可以自行改。选了不同厂商，会在上方多出一个该厂商的 Key 输入框，Key 同样只存本地。</div>
+  </div>
+
+  <div class="field" id="assessResultsField" style="display:none">
+    <label>SDE 创新智商评估 <span class="opt" style="color:#8B98A5;font-weight:400">（四篇论文终稿定稿后，各自独立送评一次；评分标尺见站内 SDE 创新智商评分系统）</span></label>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:12px;margin-top:8px">
+      <div class="iq-card" id="iqCardPlain">
+        <div class="iq-card-h"><span>传统经学</span><span class="iq-status" id="iqStatusPlain">待终稿</span></div>
+        <div class="iq-card-body" id="iqBodyPlain"><span class="placeholder">终稿定稿后自动送评</span></div>
+      </div>
+      <div class="iq-card" id="iqCardSde1">
+        <div class="iq-card-h"><span>SDE 1 · 三大方程</span><span class="iq-status" id="iqStatusSde1">待终稿</span></div>
+        <div class="iq-card-body" id="iqBodySde1"><span class="placeholder">终稿定稿后自动送评</span></div>
+      </div>
+      <div class="iq-card" id="iqCardSde2">
+        <div class="iq-card-h"><span>SDE 2 · 六路径</span><span class="iq-status" id="iqStatusSde2">待终稿</span></div>
+        <div class="iq-card-body" id="iqBodySde2"><span class="placeholder">终稿定稿后自动送评</span></div>
+      </div>
+      <div class="iq-card" id="iqCardSde3">
+        <div class="iq-card-h"><span>SDE 3 · 123原理</span><span class="iq-status" id="iqStatusSde3">待终稿</span></div>
+        <div class="iq-card-body" id="iqBodySde3"><span class="placeholder">终稿定稿后自动送评</span></div>
+      </div>
+    </div>
   </div>
 
   <div class="go-row">
@@ -304,7 +350,7 @@ footer a{color:var(--gold)}
     <div class="col-meta"><span id="sde3Status">待命</span><span id="sde3Meta"></span></div>
   </div>
 </div>
-<div class="flowhint">四篇都是正经论文（标题·摘要·关键词·六节分节正文·参考文献，各约四千五百字，末节均为教育/健康/商业中一个具体领域的应用），<b>四篇同时并行生成，互不依赖，且每篇各自独立完成两轮自审自改</b> · 传统经学是对照组(应用接教育) · <b>SDE 1／2／3 各自只用三大方程／六路径／123原理这一件工具</b>解构同一段经典(应用分别接商业/健康/商业) · 四篇并排读，能看见对照组与换一件工具会显出什么不同的断面</div>
+<div class="flowhint">四篇都是正经论文（标题·摘要·关键词·六节分节正文·参考文献，各约四千五百字，末节均为教育/健康/商业中一个具体领域的应用），<b>四篇同时并行生成，互不依赖，且每篇各自独立完成两轮自审自改</b> · 传统经学是对照组(应用接教育) · <b>SDE 1／2／3 各自只用三大方程／六路径／123原理这一件工具</b>解构同一段经典(应用分别接商业/健康/商业) · <b>终稿定稿后各自独立送 SDE 创新智商评估</b>，用评估基底（默认跟随写作基底，建议换一家避免自评膨胀）打出五维度分数 · 四篇并排读，能看见对照组与换一件工具会显出什么不同的断面</div>
 
 <div id="exportSection" style="max-width:1460px;margin:20px auto 0;padding:0 20px;display:none">
   <div style="background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:18px 22px;display:flex;align-items:center;gap:16px;flex-wrap:wrap">
@@ -481,6 +527,13 @@ const apiKeyEl=$('apiKey'), classicTextEl=$('classicText'), sourceInfoEl=$('sour
 const reviewModelSel1=$('reviewModelSel1'), reviewModelSel2=$('reviewModelSel2');
 const reviewKeyRow1=$('reviewKeyRow1'), reviewKeyRow2=$('reviewKeyRow2');
 const reviewKeyEl1=$('reviewKey1'), reviewKeyEl2=$('reviewKey2');
+const assessModelSel=$('assessModelSel'), assessKeyRow=$('assessKeyRow'), assessKeyEl=$('assessKey');
+const iqCells = {
+  plain: { body:$('iqBodyPlain'), status:$('iqStatusPlain') },
+  sde1:  { body:$('iqBodySde1'),  status:$('iqStatusSde1')  },
+  sde2:  { body:$('iqBodySde2'),  status:$('iqStatusSde2')  },
+  sde3:  { body:$('iqBodySde3'),  status:$('iqStatusSde3')  },
+};
 const plainCell={body:$('plainBody'),status:$('plainStatus'),meta:$('plainMeta'),col:$('colPlain'),stageTag:$('plainStageTag')};
 const sde1Cell={body:$('sde1Body'),status:$('sde1Status'),meta:$('sde1Meta'),col:$('colSde1'),stageTag:$('sde1StageTag')};
 const sde2Cell={body:$('sde2Body'),status:$('sde2Status'),meta:$('sde2Meta'),col:$('colSde2'),stageTag:$('sde2StageTag')};
@@ -644,14 +697,17 @@ function refreshKeyUI(){
   else if(v === 'minimax') apiKeyEl.placeholder = 'MiniMax API Key（经中转转发）';
   else if(over) apiKeyEl.placeholder = 'sk-... (境外基底 Key，经中转转发)';
   else apiKeyEl.placeholder = 'sk-...';
-  refreshReviewKeyUI(1); refreshReviewKeyUI(2); // 主基底一变，"是否需要单独填Key"的判断也要跟着重算
+  refreshReviewKeyUI(1); refreshReviewKeyUI(2); refreshReviewKeyUI('assess'); // 主基底一变，"是否需要单独填Key"的判断也要跟着重算
 }
-// 审稿一/审稿二基底："跟随写作基底"（空值）或选了跟写作基底同厂商 → 复用主Key，不用单独填；
+// 审稿一/审稿二/评估 三个基底：都遵循同一条规则——"跟随写作基底"（空值）或选了跟写作基底同厂商 → 复用主Key，不用单独填；
 // 选了不同厂商 → 才显示一个该厂商专属的Key输入框（自动从本地读取，与本工具/其他SDE工具共用同一套Key存储命名）
+const REVIEW_UI_MAP = {
+  1: { sel: reviewModelSel1, row: reviewKeyRow1, key: reviewKeyEl1 },
+  2: { sel: reviewModelSel2, row: reviewKeyRow2, key: reviewKeyEl2 },
+  assess: { sel: assessModelSel, row: assessKeyRow, key: assessKeyEl },
+};
 function refreshReviewKeyUI(n){
-  const sel = n===1 ? reviewModelSel1 : reviewModelSel2;
-  const row = n===1 ? reviewKeyRow1 : reviewKeyRow2;
-  const keyInput = n===1 ? reviewKeyEl1 : reviewKeyEl2;
+  const { sel, row, key: keyInput } = REVIEW_UI_MAP[n];
   const val = sel.value;
   const needsOwnKey = val !== '' && parseModel(val).vendor !== parseModel(modelSel.value).vendor;
   row.style.display = needsOwnKey ? 'flex' : 'none';
@@ -662,10 +718,10 @@ function refreshReviewKeyUI(n){
 }
 apiKeyEl.addEventListener('input', ()=>localStorage.setItem(keyStoreName(), apiKeyEl.value.trim()));
 
-// ============ 记住三个下拉框的选择，不只是Key字符串本身 ============
-// 之前只把每家的Key存了localStorage，但"选了哪个基底写作／哪个基底审第一轮／哪个基底审第二轮"这个选择本身没存——
-// 刷新页面后三个下拉框弹回默认值，审稿基底一旦弹回"跟随写作基底"，那个专属Key输入框就跟着隐藏，
-// 看起来就像"填的Key不见了"（其实Key还在，只是选择丢了、行被藏起来了）。这里把三个选择也存住、开局自动还原。
+// ============ 记住四个下拉框的选择，不只是Key字符串本身 ============
+// 之前只把每家的Key存了localStorage，但"选了哪个基底写作／哪个基底审第一轮／哪个基底审第二轮／哪个基底评估"这个选择本身没存——
+// 刷新页面后下拉框弹回默认值，一旦弹回"跟随写作基底"，那个专属Key输入框就跟着隐藏，
+// 看起来就像"填的Key不见了"（其实Key还在，只是选择丢了、行被藏起来了）。这里把四个选择也存住、开局自动还原。
 const SEL_LS_KEY = 'sde_cd_selectors_v1';
 function saveSelectors(){
   try{
@@ -673,6 +729,7 @@ function saveSelectors(){
       model: modelSel.value,
       review1: reviewModelSel1.value,
       review2: reviewModelSel2.value,
+      assess: assessModelSel.value,
     }));
   }catch(e){}
 }
@@ -685,16 +742,19 @@ function restoreSelectors(){
   if(saved.model && validOption(modelSel, saved.model)) modelSel.value = saved.model;
   if(typeof saved.review1==='string' && validOption(reviewModelSel1, saved.review1)) reviewModelSel1.value = saved.review1;
   if(typeof saved.review2==='string' && validOption(reviewModelSel2, saved.review2)) reviewModelSel2.value = saved.review2;
+  if(typeof saved.assess==='string' && validOption(assessModelSel, saved.assess)) assessModelSel.value = saved.assess;
 }
 restoreSelectors();
 modelSel.addEventListener('change', ()=>{ refreshKeyUI(); saveSelectors(); });
 reviewModelSel1.addEventListener('change', ()=>{ refreshReviewKeyUI(1); saveSelectors(); });
 reviewModelSel2.addEventListener('change', ()=>{ refreshReviewKeyUI(2); saveSelectors(); });
+assessModelSel.addEventListener('change', ()=>{ refreshReviewKeyUI('assess'); saveSelectors(); });
 reviewKeyEl1.addEventListener('input', ()=>{ if(reviewModelSel1.value) localStorage.setItem(keyStoreName(reviewModelSel1.value), reviewKeyEl1.value.trim()); });
 reviewKeyEl2.addEventListener('input', ()=>{ if(reviewModelSel2.value) localStorage.setItem(keyStoreName(reviewModelSel2.value), reviewKeyEl2.value.trim()); });
+assessKeyEl.addEventListener('input', ()=>{ if(assessModelSel.value) localStorage.setItem(keyStoreName(assessModelSel.value), assessKeyEl.value.trim()); });
 // 还原选择之后，才第一次刷新Key相关UI——确保读到的是还原后的选择，而不是浏览器默认的第一个选项
 refreshKeyUI();
-refreshReviewKeyUI(1); refreshReviewKeyUI(2);
+refreshReviewKeyUI(1); refreshReviewKeyUI(2); refreshReviewKeyUI('assess');
 $('keyToggle').addEventListener('click', ()=>{
   apiKeyEl.type = apiKeyEl.type==='password' ? 'text' : 'password';
   $('keyToggle').textContent = apiKeyEl.type==='password' ? '显示' : '隐藏';
@@ -821,6 +881,61 @@ function plainRevisePrompt(round){
 · 输出**完整的论文全文**（不是修改说明、不是差异对照），保持原有的论文规格（标题／摘要／关键词／六节正文，含第六节教育应用／参考文献），篇幅仍约 4000-5000 字。
 
 直接输出改后的论文全文，从标题开始，不要写"根据审稿意见我做了如下修改"这类前言。`;
+}
+
+// ============ SDE 创新智商评估 · 终稿定稿后独立送评一次 ============
+// 提示语忠实按站内 sde-innovation-iq-scoring skill 的方法论写：五维度独立评分(S/D/E/I/F)、
+// 加权综合分、层级判定+锚点对比、扣分句证据、提升路径——七步流程压缩进一次调用，输出标准评分卡格式。
+function iqAssessPrompt(){
+  return `你是 SDE 学派创新智商评分系统的评分员。用户会给你一篇论文全文，请严格按以下方法给出创新智商评分。
+
+【评分方法 · 五维度独立打分，不许直觉打综合分】
+
+- **S 结构精确度**(权重0.20)：论证链是否严密、概念是否清晰、推理是否可重现。80=概念堆砌无论证；130=论证严密每步可追溯；150=论证本身可独立成方法论搬去别处；170+=论证形式被其他学科引用。
+- **D 差异锐度**(权重0.25，最高权重)：是否提供了未被命名/未被辨识的差异，是否切开一个旧概念切不开的辨别面。80=换皮不换骨；130=切入点产生新概念；150=命名了一个之前"看见但说不出"的现象；170+=改变其他学科的辨别方式。
+- **E 纠缠深度**(权重0.20)：是否跨域、跨域之间是否有结构性纠缠而非单纯类比。80=单领域线性；130=一个学科的结构搬到另一个学科且论证有效；150=学科边界本身被重新画；170+=学科生成机制本身被改写。
+- **I 不可还原性**(权重0.20)：把核心命题压缩到≤50字，能否被已有学科任何命题1:1替换。能替换=80-100；不能但70%已有=100-120；不能但30%已有=130-140；完全不能=150+。
+- **F 可证伪性**(权重0.15，SDE学派最容易在此掉分)：这个文本的命题怎么样会被证伪。80=模糊不可证伪的口号；130=清晰的成败标准；150=文本自带"如果遇到X我们就错"的自我证伪条件；找不到证伪条件一律≤100分。
+
+综合分 = S×0.20 + D×0.25 + E×0.20 + I×0.20 + F×0.15
+
+【层级标尺】
+<90大众水平 · 100±10 AI默认产出水平 · 130±10 资深学者(R1/R2/R3典型) · **150 本体论级阈值(SDE提智达标线)** · **160 典范级阈值(双学科诞生)** · 170+ 改写学科分界
+
+【评分纪律 · 违反下列任一条＝评分失效】
+1. 五个维度必须都给独立分，不许只给综合分
+2. 每个维度必须给出1个具体的"证据句"（直接引用原文，说明为什么打这个分）
+3. 必须给出≥1个"扣分句"证据——精确引用文本中让分数掉下去的那一句，说明扣分原因
+4. 综合分必须能用上面的加权公式重算出来，不能与维度分脱节
+5. 不被SDE内部术语（显露/差异/纠缠等）唬住而高估，也不因为通俗易懂而低估——只看实质命题
+6. 不要用"真"作强调词
+7. 必须给出"如何从当前层级提升到下一层级"的具体可操作建议（不是"写得再深入一点"这类空话）
+
+【输出格式 · 严格照此结构】
+
+**标题**：[论文标题]
+**评分时间**：[本次评估]
+
+**五维度评分**：
+S 结构精确度　__ /170　（证据："___"）
+D 差异锐度　　__ /170　（证据："___"）
+E 纠缠深度　　__ /170　（证据："___"）
+I 不可还原性　__ /170　（证据："___"）
+F 可证伪性　　__ /170　（证据："___"）
+
+**综合分计算**：S×0.20 + D×0.25 + E×0.20 + I×0.20 + F×0.15 = __
+
+**层级判定**：__ 分 = [大众水平／AI默认水平／资深学者水平／本体论级／典范级／改写学科分界]水平
+
+**关键扣分**：
+原文："________"
+扣分原因：________（扣 __ 分）
+
+**提升路径**：
+当前 __ → 目标 __
+关键动作：________
+
+直接按此格式输出，不要写额外的开场白或总结。`;
 }
 // ============ 三篇独立 SDE 论文的初稿提示语：各自用三方程/六路径/三原理作为主分析工具 ============
 const TOOL_LABEL = { eq:'三大方程', paths:'六路径', principle:'123原理' };
@@ -1087,13 +1202,16 @@ async function run(){
   if(!text){ showErr('请贴一段经典文本'); classicTextEl.focus(); return; }
   if(text.length > 500){ showErr('经典文本最长 500 字，当前 '+text.length+' 字——请截取其中最要紧的一段。'); classicTextEl.focus(); return; }
 
-  // 审稿一/审稿二基底：留空＝跟随写作基底（同厂商，复用主Key）；选了别的厂商＝用户单独填的那把Key
+  // 审稿一/审稿二/评估 三个基底：留空＝跟随写作基底（同厂商，复用主Key）；选了别的厂商＝用户单独填的那把Key
   const reviewModel1 = reviewModelSel1.value || model;
   const reviewModel2 = reviewModelSel2.value || model;
+  const assessModel = assessModelSel.value || model;
   const reviewKey1 = (reviewModelSel1.value && parseModel(reviewModelSel1.value).vendor !== parseModel(model).vendor) ? reviewKeyEl1.value.trim() : key;
   const reviewKey2 = (reviewModelSel2.value && parseModel(reviewModelSel2.value).vendor !== parseModel(model).vendor) ? reviewKeyEl2.value.trim() : key;
+  const assessKey = (assessModelSel.value && parseModel(assessModelSel.value).vendor !== parseModel(model).vendor) ? assessKeyEl.value.trim() : key;
   if(!reviewKey1){ showErr('审稿一基底选了 '+vendorName(reviewModel1)+'，请先填入它的 API Key'); reviewKeyEl1.focus(); return; }
   if(!reviewKey2){ showErr('审稿二基底选了 '+vendorName(reviewModel2)+'，请先填入它的 API Key'); reviewKeyEl2.focus(); return; }
+  if(!assessKey){ showErr('评估基底选了 '+vendorName(assessModel)+'，请先填入它的 API Key'); assessKeyEl.focus(); return; }
 
   try{ await ensureNeigong(); }catch(e){ showErr(e.message); return; }
 
@@ -1101,7 +1219,8 @@ async function run(){
   $('revPanel').style.display='block';
   $('revBaseLine').textContent = '写作基底：' + vendorName(model)
     + ' · 审稿一基底：' + vendorName(reviewModel1) + (reviewModelSel1.value ? '' : '（同写作基底）')
-    + ' · 审稿二基底：' + vendorName(reviewModel2) + (reviewModelSel2.value ? '' : '（同写作基底）');
+    + ' · 审稿二基底：' + vendorName(reviewModel2) + (reviewModelSel2.value ? '' : '（同写作基底）')
+    + ' · 评估基底：' + vendorName(assessModel) + (assessModelSel.value ? '' : '（同写作基底）');
   [plainCell, sde1Cell, sde2Cell, sde3Cell].forEach(c=>{
     c.body.innerHTML='<span class="placeholder">已排队，即将开始……</span>'; c.status.innerHTML='<span class="spinner"></span> 排队中'; c.meta.textContent='';
     if(c.stageTag){ c.stageTag.textContent=''; c.stageTag.classList.remove('show','done'); }
@@ -1109,6 +1228,10 @@ async function run(){
   Object.values(revCells).forEach(c=>{
     c.body.innerHTML='<span class="placeholder">等待对应论文初稿完成……</span>'; c.status.textContent='排队中';
     c.input.innerHTML='<span class="placeholder">尚未发起调用</span>';
+  });
+  $('assessResultsField').style.display = 'block';
+  Object.values(iqCells).forEach(c=>{
+    c.body.innerHTML='<span class="placeholder">待终稿……</span>'; c.status.textContent='待终稿'; c.status.classList.remove('done','failed');
   });
   // 每次新一轮生成开始，三阶段快照全部清空重置——导出面板此时立即可用（不必等生成完成），
   // 因为"无论是否成功都要能导出"意味着导出这个动作本身不该依赖生成是否已经跑完。
@@ -1124,6 +1247,30 @@ async function run(){
 
   const userQ = src ? ('【出处】'+src+'\n【原文】\n'+text) : ('【原文】\n'+text);
   const N = SDE_BASE;
+
+  // SDE 创新智商评估：终稿定稿后独立送评一次，用评估基底（默认跟随写作基底，也可单独指定）。
+  // 用自己的 try/catch 包起来——评估失败不能反过来把已经写好的论文标记成"生成中断"，两件事互不牵连。
+  async function runIqAssess(iqKey, finalText, label){
+    const iqCell = iqCells[iqKey];
+    if(!finalText){ iqCell.status.textContent='无终稿·未送评'; return; }
+    iqCell.status.innerHTML = '<span class="spinner"></span> 送评中';
+    iqCell.body.innerHTML = '<span class="placeholder">正在请求 '+escTxt(vendorName(assessModel))+' 评估……</span>';
+    try{
+      const dummyMeta = { textContent:'' }, dummyCol = { classList:{add(){},remove(){}} };
+      const res = await streamChat(assessKey, assessModel, iqAssessPrompt(), finalText,
+        iqCell.body, iqCell.status, dummyMeta, dummyCol, REVIEW_TOKENS);
+      if(res.text){
+        iqCell.body.textContent = res.text;
+        iqCell.status.textContent = '✓ 已评分'; iqCell.status.classList.add('done');
+      } else {
+        iqCell.body.innerHTML = '<span class="placeholder">评估返回了空文本（可能是评估基底的Key未开通、额度不足或被安全策略拦截）</span>';
+        iqCell.status.textContent = '评分失败'; iqCell.status.classList.add('failed');
+      }
+    }catch(e){
+      iqCell.body.innerHTML = '<span class="placeholder">评估调用出错：'+escTxt(e.message)+'</span>';
+      iqCell.status.textContent = '评分失败'; iqCell.status.classList.add('failed');
+    }
+  }
 
   // 传统经学：现在也走完整的两轮自审自改，规格与 SDE 三链一致，只是审稿人设定不同（没有"工具"这个变量）
   function runPlainChain(paperCell, revA, revB, label, snap){
@@ -1177,12 +1324,14 @@ async function run(){
       if(fin === cur) snap.final.note = '审稿二或改稿二未产出有效文本，沿用改稿一';
       paperCell.body.textContent = fin;
       setStageDone(paperCell);
+      await runIqAssess('plain', fin, label);
       return { text: fin };
     })().catch(e=>{
       showErr(label+'：'+e.message);
       paperCell.status.textContent='失败';
       paperCell.body.innerHTML='<span class="placeholder">生成中断：'+escTxt(e.message)+'</span>';
       setStageFailed(paperCell, curStage);
+      iqCells.plain.status.textContent='无终稿·未送评'; // 链条早退没走到 runIqAssess，这里补上，否则IQ卡片会永远卡在初始的"待终稿"
       return {text:''};
     });
   }
@@ -1242,12 +1391,14 @@ async function run(){
       if(fin === cur) snap.final.note = '审稿二或改稿二未产出有效文本，沿用改稿一';
       paperCell.body.textContent = fin;
       setStageDone(paperCell);
+      await runIqAssess(({eq:'sde1',paths:'sde2',principle:'sde3'})[tool], fin, label);
       return { text: fin };
     })().catch(e=>{
       showErr(label+'：'+e.message);
       paperCell.status.textContent='失败';
       paperCell.body.innerHTML='<span class="placeholder">生成中断：'+escTxt(e.message)+'</span>';
       setStageFailed(paperCell, curStage);
+      iqCells[({eq:'sde1',paths:'sde2',principle:'sde3'})[tool]].status.textContent='无终稿·未送评'; // 同上：链条早退没走到 runIqAssess
       return {text:''};
     });
   }
