@@ -325,8 +325,8 @@ footer a{color:var(--gold)}
 
 <div class="reflect-panel" id="reflectPanel">
   <div class="reflect-inner">
-    <div class="reflect-h"><span>🧠 第一步 · 基底先读 SDE 内功，亲手写一篇《从发现到发生》心得</span><span class="reflect-st" id="reflectStatus">待命</span></div>
-    <div class="reflect-desc">这是本工具的<b style="color:#D4DCE4">主功能之一</b>，不是幕后铺垫：<b style="color:#D4DCE4">写作基底先把内功读进去、用自己的话完整想一遍</b>（约7000字，含三大方程/六路径/123原理的学习心得），再带着这个已内化的认知去解构经典。<b style="color:#E8A33D">每次点"生成"都会重新写一遍，不缓存、不复用</b>——同一段内功，基底每次想过的角度都会有细微差异，这份差异会顺着心得传导进三篇论文，让同一段经典每次解构出来的味道也不尽相同。<b style="color:#E8A33D">传统经学那篇是对照组，不注入内功也不注入心得</b>——否则就不成其为对照了。</div>
+    <div class="reflect-h"><span>🧠 第一步 · 每个参与基底各自读 SDE 内功、亲手写自己的《从发现到发生》心得</span><span class="reflect-st" id="reflectStatus">待命</span></div>
+    <div class="reflect-desc">这是本工具的<b style="color:#D4DCE4">主功能之一</b>，不是幕后铺垫：<b style="color:#D4DCE4">每个真正干活的基底，都要先自己把内功读进去、用自己的话完整想一遍</b>（约7000字，含三大方程/六路径/123原理的学习心得），再带着这份已内化的认知上阵。<b style="color:#E8A33D">审稿基底若换了别家，它会写自己的那一份</b>——让它读写作基底的心得，那是读别人的读后感，不叫它自己提智。<b style="color:#E8A33D">每次点"生成"都会重新写一遍，不缓存、不复用</b>——同一段内功，基底每次想过的角度都会有细微差异，这份差异会顺着心得传导进三篇论文，让同一段经典每次解构出来的味道也不尽相同。<b style="color:#E8A33D">传统经学那篇是对照组，不注入内功也不注入心得</b>——否则就不成其为对照了。</div>
     <div class="reflect-body" id="reflectBody"><span class="placeholder">尚未开始</span></div>
   </div>
 </div>
@@ -1147,12 +1147,19 @@ const TOOL_DOMAIN = {
   principle: {name:'商业', hint:'组织变革、企业转型中的某个真实难题——例如：一场改革为什么推不动或推行后名存实亡、新政策一旦落地又如何反过来重塑了组织本身'},
 };
 
-function sdeDraftPrompt(neigong, tool){
-  const toolBlock = {
+// 【方法指导】三件工具各自的具体操作说明。
+// 提到函数外做成共享常量，是因为它此前只写在 sdeDraftPrompt 内部——
+// 结果 12 个审稿/改稿步骤只拿到工具的【名字】("三大方程"四个字)，却拿不到"这件工具到底怎么用才算到位"。
+// 那等于要求审稿人"检查这篇有没有把三大方程用到实处"，却不告诉它到实处长什么样；
+// 改稿同理，被要求"工具不能换、要用深"，却不知道用深的标准。现在五步共用同一份。
+const TOOL_BLOCK = {
     eq: `本篇论文唯一的分析工具是**三大方程**（S=F(D,E)、D=G(S,E)、E=H(S,D)）。你要做的不是泛泛地提"显露/差异/纠缠"，而是把这三条方程真正当成解剖刀，具体指认：这段经典文本里，哪个字句是显露态(S)、哪个是差异序列(D)、哪个是纠缠土壤(E)？三者如何"同时互生"——像三脚架三条腿一样，谁也不能被单独抽出来当原初起点？这段经典之所以能立住、能流传，是不是恰恰因为它把三者同时焊死了？请用三大方程"非线性互生、取消先后"的逻辑，论证传统读法为什么会把这段话读成一个单向的教诲（先有真理S，再教人接受），而三大方程揭示的却是三者同时成立。`,
     paths: `本篇论文唯一的分析工具是**六路径**（先读任务DNA——这段经典的要害落在S/D/E哪一维，再按对应路径次序展开）。你要做的第一件事，是明确判断：这段经典的任务DNA落在哪一维——它是在讲"一个结构该是什么"（S起手）、"一个过程该怎么走"（D起手），还是"一片土壤该如何构成"（E起手）？判断清楚后，按对应路径的次序（例如S→D→E或D→E→S等）逐层展开你的解读，并且要具体论证：如果换一个起点去读这段经典，会读出什么更浅、甚至读错方向的东西？——传统注疏惯用的起点是哪一条，为什么它会让人错过这段经典真正的要害？`,
     principle: `本篇论文唯一的分析工具是**123原理**（D与E相互矛盾→矛盾逼出S改变→S回写D与E→循环不止）。你要做的是把这段经典放回它诞生、流传、被反复引用的具体历史过程里，指认：促成这段话被说出来的D-E矛盾是什么（当时有哪些新旧张力在积累）？这段话作为S，是在哪一刻被那股张力"逼"出来的结算——不是作者凭空想出来的真理，而是矛盾逼到那里必然的位移？更关键的一步：这段话一旦立住，它是如何回写了后世的D与E的——它怎样重新定义了后人"该沿什么路径推进"（重置D）、又怎样沉淀成了后世无法绕开的新土壤（重置E）？请论证：传统读法止步于"这句话说了什么"，恰恰漏掉了回写这一步，把一个仍在循环中的活结构，读成了一次性说完就散场的死结论。`,
-  }[tool];
+};
+
+function sdeDraftPrompt(neigong, tool){
+  const toolBlock = TOOL_BLOCK[tool];
   const dom = TOOL_DOMAIN[tool];
 
   return neigong + `
@@ -1193,6 +1200,9 @@ function sdeReviewPrompt(neigong, round, tool){
 【本次任务：审稿（第${round}轮）· 你审的是你自己刚写的那篇论文】
 用户会给你：一段经典原文 + 一篇针对它的发生学解构论文。这篇论文本该只用**${TOOL_LABEL[tool]}**这一件工具来解构，是你自己写的——现在请调转刀口，用最挑剔的审稿人的眼光审它。
 
+【先看清楚：这件工具本该怎么用】（这就是当初交给作者的原始指令，你按这个标准审）
+${TOOL_BLOCK[tool]}
+
 审稿不是夸奖，不是复述，更不是打分。请逐条挑出**具体的、可指认的**问题，每条都要引用论文里的原话作为证据，并给出**可操作的改法**（改成什么、为什么这样改更对）。重点审这八处：
 
 1. **有没有滑回传统注疏**：它是不是换了几个词，骨子里还在做"这句话是什么意思"的疏解？哪一节最像是伪装成发生学的注疏？
@@ -1214,6 +1224,9 @@ function sdeRevisePrompt(neigong, round, tool){
 ---
 【本次任务：据审稿意见改稿（第${round}轮）】
 用户会给你：一段经典原文 + 一篇发生学解构论文（唯一工具是**${TOOL_LABEL[tool]}**）+ 一份针对这篇论文的审稿意见。请据审稿意见，把论文改一遍。
+
+【重温：这件工具本该怎么用】（这就是当初写初稿时给你的原始指令，改稿仍以此为准）
+${TOOL_BLOCK[tool]}
 
 改稿纪律：
 · **逐条落实**审稿意见里点名的问题——尤其是被指为"最致命"的那一处，必须真的动刀，不能装作改了。
@@ -1447,45 +1460,92 @@ async function run(){
 
   const userQ = src ? ('【出处】'+src+'\n【原文】\n'+text) : ('【原文】\n'+text);
 
-  // ===== 第一步(主功能，非幕后铺垫)：写作基底先读内功、亲手写一遍心得 —— 每次都重新生成 =====
-  // 必须在四条链启动【之前】完成——它是三条 SDE 链共同的思维底座。
-  // 【不缓存、不复用】：故意每次都让基底重新写一遍——同一段内功，基底每次想过的角度、抓住的重点都会有细微差异，
-  // 这份差异会顺着心得传导进三篇论文，让同一段经典每次解构出来的味道也不尽相同。这是特意设计的行为，不是省不了的成本。
+  // ===== 第一步(主功能，非幕后铺垫)：每个实际参与的基底，各自读内功、亲手写自己的心得 =====
+  // 必须在四条链启动【之前】完成。
+  // 【关键：谁干活谁写心得】审稿基底若换成了另一家，它自己从没读过内功——塞给它写作基底的心得，
+  // 那是让它读【别人的读后感】，不是它自己的提智。所以：写作基底一份、审稿一/审稿二若是不同基底各自再写一份。
+  // 同一基底不重复写（同一次运行内复用即可，这跟"跨运行不缓存"不冲突）。
+  // 【不跨运行缓存】：每次点生成都重新写——同一段内功，基底每次想过的角度都有细微差异，
+  // 这份差异会顺着心得传导进论文，让同一段经典每次解构出的味道不尽相同。这是特意设计，不是省不掉的成本。
   reflectPanel.style.display = 'block';
   reflectStatus.classList.remove('done','failed');
-  reflectStatus.innerHTML = '<span class="spinner"></span> 正在写心得（每次都会重新写一遍，不复用）…';
-  reflectBody.innerHTML = '<span class="placeholder">基底正在读内功、亲手写一遍《从发现到发生》……这是本次解构的思维底座，不会跳过</span>';
-  let reflectionText = '';
-  try{
-    reflectionText = await getReflection(model, key, (n, ph)=>{
-      // n<0 表示还停在"思考中/连接中"的占位阶段，不是真的写了 n 字——如实显示等待提示，不谎报进度
-      if(n < 0) reflectStatus.innerHTML = '<span class="spinner"></span> ' + escTxt(ph || '思考中…');
-      else reflectStatus.innerHTML = '<span class="spinner"></span> 已写 ' + n + ' 字';
-    });
-  }catch(e){ reflectionText = ''; _reflectLastErr = e.message; }
-  if(reflectionText){
-    reflectBody.textContent = reflectionText;
-    const q = checkReflectionCompleteness(reflectionText, model);
-    if(q && q.ok === false){
-      // 完整性校验没过：本轮仍用它（总比没有强），但如实告诉用户这份心得偏浅——毕竟不缓存，下一次点生成就会是全新一份
-      // 【与成功分支保持一致，统一用 textContent】：两个分支做的是同一件事(设置一句纯文字状态)。
-      reflectStatus.textContent = '⚠ 完整性校验未过 · ' + reflectionText.length + ' 字';
-      reflectStatus.classList.add('failed');
-      reflectBody.innerHTML = '<span class="placeholder" style="color:#E8897B">⚠ 这份心得没通过完整性校验：'+escTxt(q.issues.join('；'))+'。本轮仍会用它继续解构（好过完全没有）——下次点"生成"会是全新重写的一份。</span>'
-        + '\n\n' + escTxt(reflectionText);
-    } else {
-      reflectStatus.textContent = '✓ 已写好·完整性校验通过 · ' + reflectionText.length + ' 字';
-      reflectStatus.classList.add('done');
-    }
-  } else {
-    // 心得写失败不该让整轮生成停摆：退回"只用内功、不带心得"继续跑，但必须如实告诉用户这一轮的底座不完整
-    reflectBody.innerHTML = '<span class="placeholder">心得未能生成：'+escTxt(_reflectLastErr || '未知原因')+'　→ 本轮退回【只注入内功、不带心得】继续解构（提智程度会低一些）</span>';
-    reflectStatus.textContent = '✗ 心得失败·已降级继续';
-    reflectStatus.classList.add('failed');
+
+  // 本次真正要用到的基底去重：写作 / 审稿一 / 审稿二（评估基底不参与写论文，无需心得）
+  const reflectJobs = [];
+  const seenBase = {};
+  [[model, key, '写作'], [reviewModel1, reviewKey1, '审稿一'], [reviewModel2, reviewKey2, '审稿二']].forEach(([m, k, role])=>{
+    if(seenBase[m]) { seenBase[m].roles.push(role); return; }
+    seenBase[m] = { model:m, key:k, roles:[role] };
+    reflectJobs.push(seenBase[m]);
+  });
+
+  const reflections = {};   // model -> 该基底自己写的心得
+  for(let i=0; i<reflectJobs.length; i++){
+    const job = reflectJobs[i];
+    const label = vendorName(job.model) + '（' + job.roles.join('／') + '基底）';
+    const prefix = reflectJobs.length > 1 ? ('第 ' + (i+1) + '/' + reflectJobs.length + ' 份 · ' + label + '：') : '';
+    reflectStatus.textContent = '';
+    reflectStatus.innerHTML = '<span class="spinner"></span> ' + escTxt(prefix) + '正在写心得…';
+    reflectBody.innerHTML = '<span class="placeholder">' + escTxt(label) + ' 正在读内功、亲手写一遍《从发现到发生》……</span>';
+    let txt = '';
+    try{
+      txt = await getReflection(job.model, job.key, (n, ph)=>{
+        // n<0 表示还停在"思考中/连接中"的占位阶段，不是真写了 n 字——如实显示等待提示，不谎报进度
+        if(n < 0) reflectStatus.innerHTML = '<span class="spinner"></span> ' + escTxt(prefix + (ph || '思考中…'));
+        else reflectStatus.innerHTML = '<span class="spinner"></span> ' + escTxt(prefix) + '已写 ' + n + ' 字';
+      });
+    }catch(e){ txt = ''; _reflectLastErr = e.message; }
+    reflections[job.model] = txt || '';
+    job.text = txt || '';
+    job.quality = txt ? checkReflectionCompleteness(txt, job.model) : null;
   }
 
+  // 汇总显示：每份心得各自的状态 + 正文（多份时可分别展开查看）
+  const okCount = reflectJobs.filter(j=>j.text && j.quality && j.quality.ok).length;
+  const failCount = reflectJobs.filter(j=>!j.text).length;
+  const warnCount = reflectJobs.filter(j=>j.text && j.quality && !j.quality.ok).length;
+  if(failCount === reflectJobs.length){
+    reflectStatus.textContent = '✗ 心得全部失败·已降级继续';
+    reflectStatus.classList.add('failed');
+  } else if(warnCount || failCount){
+    reflectStatus.textContent = '⚠ ' + okCount + ' 份合格 / ' + warnCount + ' 份未过校验 / ' + failCount + ' 份失败';
+    reflectStatus.classList.add('failed');
+  } else {
+    reflectStatus.textContent = '✓ ' + okCount + ' 份心得均已写好·完整性校验通过';
+    reflectStatus.classList.add('done');
+  }
+  reflectBody.innerHTML = '';
+  reflectJobs.forEach(job=>{
+    const label = vendorName(job.model) + '（' + job.roles.join('／') + '基底）';
+    const d = document.createElement('details');
+    d.style.cssText = 'border:1px solid var(--border);border-radius:8px;margin-bottom:8px;background:rgba(13,17,23,0.4)';
+    if(reflectJobs.length === 1) d.open = true;
+    const sum = document.createElement('summary');
+    sum.style.cssText = 'cursor:pointer;padding:9px 12px;font-size:12.5px;color:#D4DCE4';
+    let badge;
+    if(!job.text) badge = '<span style="color:#F85149">✗ 未能生成：' + escTxt(_reflectLastErr || '未知原因') + '（本轮该基底退回只用内功、不带心得）</span>';
+    else if(job.quality && !job.quality.ok) badge = '<span style="color:#E8897B">⚠ 完整性校验未过 · ' + job.text.length + ' 字（本轮仍会用它）</span>';
+    else badge = '<span style="color:#3FB950">✓ ' + job.text.length + ' 字</span>';
+    sum.innerHTML = '<b style="color:#E5C86E">' + escTxt(label) + '</b> · ' + badge;
+    const body = document.createElement('div');
+    body.style.cssText = 'padding:0 12px 12px;font-size:12px;line-height:1.8;color:#B9C3CD;white-space:pre-wrap;max-height:240px;overflow-y:auto';
+    if(job.text && job.quality && !job.quality.ok){
+      body.textContent = '⚠ ' + job.quality.issues.join('；') + '\n\n' + job.text;
+    } else {
+      body.textContent = job.text || '（无正文）';
+    }
+    d.appendChild(sum); d.appendChild(body);
+    reflectBody.appendChild(d);
+  });
+
+  const reflectionText = reflections[model] || '';   // 写作基底自己的心得
+
   // 三条 SDE 链的底座 = 内功 + 基底自己写的心得；传统经学是对照组，不碰这个 N
-  const N = baseWithReflection(reflectionText);
+  // 【一条铁律：谁干活，就用谁自己写的心得】——不分写作/审稿，不分第几轮。
+  // 不再手工维护 N / N_rev1 / N_rev2 这种"哪个变量配哪个model"的对应关系：
+  // 那种写法每加一步都可能配错，而且配错了不报错、只会静默地让某个基底去读别人的读后感。
+  // 改成由基底自己查自己的心得——从根上不可能配错。
+  const baseFor = (m) => baseWithReflection(reflections[m] || '');
 
   // SDE 创新智商评估：终稿定稿后独立送评一次，用评估基底（默认跟随写作基底，也可单独指定）。
   // 用自己的 try/catch 包起来——评估失败不能反过来把已经写好的论文标记成"生成中断"，两件事互不牵连。
@@ -1585,7 +1645,7 @@ async function run(){
       setStage(paperCell, 'draft');
       let draft;
       try{
-        draft = await streamChat(key, model, sdeDraftPrompt(N, tool), userQ, paperCell.body, paperCell.status, paperCell.meta, paperCell.col, PAPER_TOKENS);
+        draft = await streamChat(key, model, sdeDraftPrompt(baseFor(model), tool), userQ, paperCell.body, paperCell.status, paperCell.meta, paperCell.col, PAPER_TOKENS);
       }catch(e){ snap.draft.status='failed'; snap.draft.note=e.message; snap.revise1.status='skipped'; snap.revise1.note='初稿调用出错，未进行'; snap.final.status='skipped'; snap.final.note='初稿调用出错，未进行'; throw e; }
       snap.draft.text = draft.text || '';
       snap.draft.status = draft.text ? 'done' : 'failed';
@@ -1593,7 +1653,7 @@ async function run(){
 
       curStage = 'review1'; setStage(paperCell, 'review1');
       const rAInput = userQ + '\n\n【待审的解构稿】\n' + draft.text;
-      const rASys = sdeReviewPrompt(N, 1, tool);
+      const rASys = sdeReviewPrompt(baseFor(reviewModel1), 1, tool);
       fillRevInput(revA, reviewModel1, rASys, rAInput);
       const rA = await streamChat(reviewKey1, reviewModel1, rASys, rAInput,
         revA.body, revA.status, revA.meta, revA.col, REVIEW_TOKENS);
@@ -1601,7 +1661,7 @@ async function run(){
       curStage = 'revise1'; setStage(paperCell, 'revise1');
       let cur = draft.text;
       if(rA.text){
-        const fixA = await streamChat(key, model, sdeRevisePrompt(N, 1, tool),
+        const fixA = await streamChat(key, model, sdeRevisePrompt(baseFor(model), 1, tool),
           userQ + '\n\n【原解构稿】\n' + draft.text + '\n\n【审稿意见】\n' + rA.text,
           paperCell.body, paperCell.status, paperCell.meta, paperCell.col, PAPER_TOKENS);
         if(fixA.text) cur = fixA.text;
@@ -1612,7 +1672,7 @@ async function run(){
 
       curStage = 'review2'; setStage(paperCell, 'review2');
       const rBInput = userQ + '\n\n【待审的解构稿】\n' + cur;
-      const rBSys = sdeReviewPrompt(N, 2, tool);
+      const rBSys = sdeReviewPrompt(baseFor(reviewModel2), 2, tool);
       fillRevInput(revB, reviewModel2, rBSys, rBInput);
       const rB = await streamChat(reviewKey2, reviewModel2, rBSys, rBInput,
         revB.body, revB.status, revB.meta, revB.col, REVIEW_TOKENS);
@@ -1620,7 +1680,7 @@ async function run(){
       curStage = 'revise2'; setStage(paperCell, 'revise2');
       let fin = cur;
       if(rB.text){
-        const fixB = await streamChat(key, model, sdeRevisePrompt(N, 2, tool),
+        const fixB = await streamChat(key, model, sdeRevisePrompt(baseFor(model), 2, tool),
           userQ + '\n\n【原解构稿】\n' + cur + '\n\n【审稿意见】\n' + rB.text,
           paperCell.body, paperCell.status, paperCell.meta, paperCell.col, PAPER_TOKENS);
         if(fixB.text) fin = fixB.text;
