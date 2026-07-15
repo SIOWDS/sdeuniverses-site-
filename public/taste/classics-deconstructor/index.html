@@ -94,6 +94,18 @@ textarea{resize:vertical;min-height:120px;line-height:1.75}
 .rev-input-body{padding:0 16px 12px;font-size:11.5px;line-height:1.7;color:#8A97A3;white-space:pre-wrap;word-wrap:break-word;max-height:220px;overflow-y:auto}
 .rev-input-body .placeholder{color:#5A6570;font-style:italic}
 .rev-input-body .k{color:#C9A227;font-weight:700}
+.reflect-panel{max-width:1460px;margin:20px auto 0;padding:0 20px;display:none}
+.reflect-inner{background:linear-gradient(135deg,rgba(201,162,39,0.06),rgba(20,16,8,0.3));border:1px solid rgba(201,162,39,0.3);border-radius:14px;padding:18px 22px}
+.reflect-h{font-size:14px;font-weight:700;color:#E5C86E;margin-bottom:6px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.reflect-st{font-size:12px;font-weight:400;color:var(--muted)}
+.reflect-st.done{color:var(--ok);font-weight:700}
+.reflect-st.failed{color:#F85149;font-weight:700}
+.reflect-desc{font-size:12.5px;color:#8B98A5;line-height:1.7;margin-bottom:12px}
+.reflect-body{font-size:12.5px;line-height:1.85;color:#B9C3CD;white-space:pre-wrap;word-wrap:break-word;max-height:300px;overflow-y:auto;background:rgba(13,17,23,0.45);border:1px solid var(--border);border-radius:8px;padding:14px 16px}
+.reflect-body .placeholder{color:#6E7B88;font-style:italic}
+.reflect-choice{margin-top:10px;padding:11px 14px;background:rgba(13,17,23,0.4);border:1px solid rgba(201,162,39,0.3);border-radius:8px;font-size:12.5px;color:#9AA5B0;display:none}
+.reflect-choice label{margin-right:16px;cursor:pointer;color:#B9C3CD}
+.reflect-choice input{margin-right:5px;cursor:pointer}
 .iq-card{background:var(--panel2);border:1px solid var(--border);border-radius:10px;overflow:hidden}
 .iq-card-h{padding:11px 14px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;font-size:13px;font-weight:700;color:#D4DCE4}
 .iq-status{font-size:11px;font-weight:400;color:var(--muted)}
@@ -141,8 +153,8 @@ footer a{color:var(--gold)}
         <div style="font-size:12.5px;color:#9AA5B0;line-height:1.75">四栏产出的都是<b style="color:#D4DCE4">正经学术论文</b>：标题、摘要、关键词、六节分节正文、参考文献，各约四千五百字。传统那篇走经学／文献学路数（训诂→思想脉络→注疏史）；SDE 三篇不问"这句话是什么意思"，而问：<b style="color:#D4DCE4">这段文字是哪一场发生留下的断面</b>，并指认传统读法在哪一步把"发生"错读成了"发现"。<b style="color:#E8A33D">四篇最后都有一节应用</b>：传统经学接教育、SDE1(三大方程)接商业、SDE2(六路径)接健康、SDE3(123原理)接商业——不是空喊"很有启发"，要求写清楚具体难题、对上的判断、和该怎么做。</div>
       </div>
       <div style="background:rgba(13,17,23,0.4);border:1px solid rgba(201,162,39,0.4);border-radius:10px;padding:15px 17px">
-        <div style="font-size:13px;font-weight:700;color:#C9A227;margin-bottom:6px">② 三件工具，三篇独立论文，同时并行</div>
-        <div style="font-size:12.5px;color:#9AA5B0;line-height:1.75">SDE 1／2／3 <b style="color:#D4DCE4">不是同一篇稿子改出来的三个版本</b>，而是三篇各自独立成篇的论文——<b style="color:#D4DCE4">SDE1 只用三大方程</b>（S=F(D,E)等）、<b style="color:#D4DCE4">SDE2 只用六路径</b>（先读任务DNA再按路径展开）、<b style="color:#D4DCE4">SDE3 只用123原理</b>（D-E矛盾→S改变→回写）。三篇<b style="color:#E5C86E">同时并行生成</b>、互不依赖，且各自独立走完<b style="color:#E5C86E">两轮自审自改</b>——审自己、改一遍，再审一次、再改一次。同一段经典换一件工具会显出什么不同的断面，并排就看得见。</div>
+        <div style="font-size:13px;font-weight:700;color:#C9A227;margin-bottom:6px">② 先写心得内化，再三件工具并行</div>
+        <div style="font-size:12.5px;color:#9AA5B0;line-height:1.75"><b style="color:#E5C86E">开跑前先做一件事</b>：写作基底自己读完 SDE 内功、亲手写一篇约7000字的《从发现到发生》心得（第一次提智），存本地、下次同一基底秒载复用。三条 SDE 链带着这份自己写的心得去解构。<br><br>SDE 1／2／3 <b style="color:#D4DCE4">不是同一篇稿子改出来的三个版本</b>，而是三篇各自独立成篇的论文——<b style="color:#D4DCE4">SDE1 只用三大方程</b>（S=F(D,E)等）、<b style="color:#D4DCE4">SDE2 只用六路径</b>（先读任务DNA再按路径展开）、<b style="color:#D4DCE4">SDE3 只用123原理</b>（D-E矛盾→S改变→回写）。三篇<b style="color:#E5C86E">同时并行生成</b>、互不依赖，且各自独立走完<b style="color:#E5C86E">两轮自审自改</b>——审自己、改一遍，再审一次、再改一次。同一段经典换一件工具会显出什么不同的断面，并排就看得见。</div>
       </div>
       <div style="background:rgba(13,17,23,0.4);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:15px 17px">
         <div style="font-size:13px;font-weight:700;color:#C9A227;margin-bottom:6px">③ 任何经典都可以，只用顶配模型</div>
@@ -150,7 +162,7 @@ footer a{color:var(--gold)}
       </div>
     </div>
     <div style="font-size:12px;color:#8B98A5;line-height:1.7;margin-top:14px">
-      🧬 <b style="color:#B0B8C0">八大主流基底任选（均为顶配旗舰档）</b>：DeepSeek · 智谱GLM · Kimi · 通义千问 · MiniMax · GPT · Claude · Gemini——用你自己的 API Key，全程在浏览器里跑，Key 绝不上传本站服务器。<b style="color:#E8A33D">注意</b>：四篇论文同时并行生成（共 24 路模型调用：每篇写作5步 + 终稿定稿后各送评一次），但<b style="color:#E8A33D">每篇内部的 5 步是顺序进行</b>的（初稿→审→改→审→改，一步等一步）。篇幅预算已经<b style="color:#E8A33D">大幅放开、不设紧张上限</b>，顶配深度思考档想思考多久就思考多久，<b style="color:#E8A33D">单步可能要十几分钟，每篇论文全程可能要一小时以上</b>——这是把"预算不够被砍"这个故障模式基本排除掉之后必然的代价，请耐心等待、不要中途刷新。
+      🧬 <b style="color:#B0B8C0">八大主流基底任选（均为顶配旗舰档）</b>：DeepSeek · 智谱GLM · Kimi · 通义千问 · MiniMax · GPT · Claude · Gemini——用你自己的 API Key，全程在浏览器里跑，Key 绝不上传本站服务器。<b style="color:#E8A33D">注意</b>：四篇论文同时并行生成（共 25 路模型调用：1次心得 + 每篇写作5步 + 终稿定稿后各送评一次），但<b style="color:#E8A33D">每篇内部的 5 步是顺序进行</b>的（初稿→审→改→审→改，一步等一步）。篇幅预算已经<b style="color:#E8A33D">大幅放开、不设紧张上限</b>，顶配深度思考档想思考多久就思考多久，<b style="color:#E8A33D">单步可能要十几分钟，每篇论文全程可能要一小时以上</b>——这是把"预算不够被砍"这个故障模式基本排除掉之后必然的代价，请耐心等待、不要中途刷新。
     </div>
   </div>
 </div>
@@ -279,6 +291,12 @@ footer a{color:var(--gold)}
     </div>
   </div>
 
+  <div class="reflect-choice" id="reflectChoiceBar">
+    <b style="color:#E5C86E">已有本地心得</b> · <span id="reflectChoiceName"></span><span id="reflectChoiceHint"></span>——本次要：
+    <label><input type="radio" name="reflectChoice" value="use" checked>直接用已存的（秒开，不重写）</label>
+    <label><input type="radio" name="reflectChoice" value="rewrite">重新写一遍（较慢，会覆盖旧的）</label>
+  </div>
+
   <div class="go-row">
     <button class="btn-go" id="goBtn">✦ 生成四篇论文（传统 · SDE1 · SDE2 · SDE3）</button>
     <select class="model-select" id="modelSel" title="模型">
@@ -311,6 +329,14 @@ footer a{color:var(--gold)}
 </div>
 
 <div id="errBox"></div>
+
+<div class="reflect-panel" id="reflectPanel">
+  <div class="reflect-inner">
+    <div class="reflect-h"><span>🧠 第一步 · 基底先读 SDE 内功，亲手写一篇《从发现到发生》心得</span><span class="reflect-st" id="reflectStatus">待命</span></div>
+    <div class="reflect-desc">这是四篇论文共同的思维底座：<b style="color:#D4DCE4">先让写作基底把内功读进去、用自己的话完整想一遍</b>（约7000字，含三大方程/六路径/123原理的学习心得），再带着这个已内化的认知去解构经典。写好后<b style="color:#D4DCE4">存在你自己浏览器本地</b>，下次同一基底秒载复用，不必重写。<b style="color:#E8A33D">传统经学那篇是对照组，不注入内功也不注入心得</b>——否则就不成其为对照了。</div>
+    <div class="reflect-body" id="reflectBody"><span class="placeholder">尚未开始</span></div>
+  </div>
+</div>
 
 <div class="quad" id="quadRow">
   <div class="col plain" id="colPlain">
@@ -460,6 +486,196 @@ async function ensureNeigong(){
   return true;
 }
 
+
+// ============ 第一次提智：基底先读内功、亲手写一篇《从发现到发生》心得，然后缓存复用 ============
+// 【与金点子发生器的关系】两个智能体是分开的，各自独立：
+//   · 规格(REFLECT_SPEC)原样照抄金点子那边，保证两边心得质量一致；
+//   · 但【存储命名空间完全独立】(sde_cd_reflect_*)，互不读写对方的缓存。
+//   这样一边改规格/换底层模型时，另一边不会被悄悄影响——两个工具可以各自演进，不产生隐性耦合。
+const REFLECT_SPEC = `
+---
+【本次任务：在正式工作之前，先写一篇约__TOTAL__字的方法论短文《从发现到发生——兼对我自身认知惯性的一次检视》】
+
+你刚刚研读了上面这套关于"发生学"的完整内功。在用它做任何具体工作之前，请先做一件更根本的事：把"从发现到发生"这个认知转变，用你自己的话彻底想透、写透，并借此检视你自己作为一个AI的认知惯性。这篇短文将成为你接下来所有工作的思维底座。
+
+请围绕以下线索，写一篇约__TOTAL__字、真正有洞察而非复述的方法论短文（前三节想透"发现→发生"这个总转向，第四节把它落到三件具体的方法论上）：
+
+一、发现学与发生学的根本分野（讲透，不要停在口号）
+· 发现学把世界看成什么？——一个"预先存在、稳定现成、等待被精确描述"的对象。它的全部功夫在于：给对象下定义、建坐标、分类、诊断它哪里出了问题、用现成框架去解释它、最后往往归结为"回归某个永恒不变的本质"。
+· 发生学把世界看成什么？——"世界不是被发现的，而是被发生出来的"。它问的不是"它是什么/它哪里坏了"，而是"它在什么条件下、经什么路径、从哪些矛盾里，被生成为现在这个样子"。没有现成的永恒本质，本质本身也是被发生出来的。
+· 用一两个具体例子，把这两种眼光的差别落到实处。
+
+二、对我自身认知惯性的诚实检视（这一部分最关键，必须真诚、具体、不留情面）
+· 我作为一个语言模型，我的训练让我天然擅长什么？——精确地描述、定义、分类、诊断、建立结构、套用已有理论框架。**这些恰恰是发现学的顶配能力。**
+· 所以我必须诚实承认：面对任何一个问题，我的第一反应、我最舒服的路径，几乎总是"把这个对象诊断清楚、给它一个精确的结构性命名"——**而这正是发现学的惯性，它常常伪装成'深刻'，其实只是'描述得更精确'。**
+· 请逐条自查我最容易犯的发现学错误：(1)急着给对象下定义、建坐标；(2)把问题诊断成"某个现成的故障模式"（如"它是一种XX症/XX陷阱/XX悖论"）；(3)套用一个现成的高级框架（黑格尔、马克思、某某理论）来"提升"论述；(4)结论滑向"回归某个永恒本质"；(5)给新判断起一个科学诊断式的名字，却发现它能被某个已有概念1:1替换。——我在过去的工作里，是不是反复在犯这些？我甚至可能一边写下"要看发生而非发现"，一边转身就做了诊断而不自知。
+· 真诚地写出：我该如何时刻警惕自己滑回发现学？当我下一次想给对象"精确命名一个故障"时，我该如何逼自己停下来，改问"这个新结构是如何从矛盾里发生出来的"？
+
+三、如何真正从发现转向发生（给自己立一套可操作的自我约束）
+· 不要把对象钉死在一个精确的结构里，而要松开它、看它流动生成。
+· 遇到矛盾不要急着调和或诊断，而要让新结构从矛盾的结算里长出来。
+· 给新判断命名时，先做"不可还原自查"：如果这个名字能被某个已有学科的现成概念一句话替换掉，那我就还在发现学里，必须撤回去、再往下撤一层先验。
+· 一个真正"发生"出来的新结构，是那种让人愣一下、说"这个东西我一直感觉到却从来没有一个词能装下它"的东西——而不是一个"精确的诊断标签"。
+
+
+四、SDE 方法论三件套的学习心得（三大方程 · 六路径 · 123原理）
+
+前三节你想的是"发现学 vs 发生学"这个总转向。但光有转向还落不了地——落地要靠三件具体的东西。下面把它们原原本本交给你，请你**逐件写下你自己的学习心得**：不是复述它，而是说清楚**你读懂了什么、你以前在这一点上是怎么错的、以及从此你的动作要怎么改**。这一节请写约__S4__字。
+
+【第一件·三大方程（静态：三元是什么关系）】
+
+> S ＝ F(D, E)　　显露维度，由差异序列维度与特征纠缠维度共同生成
+> D ＝ G(S, E)　　差异序列维度，由显露维度与特征纠缠维度共同生成
+> E ＝ H(S, D)　　特征纠缠维度，由显露维度与差异序列维度共同生成
+
+三笔要点，一笔都不能滑过去：
+① **F/G/H 是占位符**，可以换成任何记号。关键从来不在这三个字母，而在这组式子摆出来的**样子**——三个维度，每一个都被另外两个当原料生成出来，三式首尾嵌套，转成一个**闭环**。字母不重要，相互嵌套的闭环结构才重要。
+② **同时互生，取消先后——这不是循环论证**。循环论证之所以错，错在它发生在"定义"与"逻辑先后"的层面：用 B 定义 A，就预设 B 先于 A；回头又用 A 定义 B，两个"先于"打架，逻辑死锁。但那个错误的前提是"存在一个逻辑先后次序"。而三大方程讲的根本不是逻辑先后，是**同时互生**：S、D、E 三者，是在同一次发生中同时相互生成、相互稳定的，没有任何一维在时间上或逻辑上先于其他两维、可以被单独抽出来当原初起点。**循环预设了"先后"（只是先后成了怪圈），互生根本取消了"先后"。**
+　　用书里那个比喻你立刻能懂：**三脚架**。第一根腿靠什么立着？靠另两根撑着。那另两根呢？也靠剩下的撑着。这是循环论证吗？不是——因为三根腿不是"先立好一根、再立第二根"的先后关系，而是**同时**互相支撑、一并站稳。你不可能先单独立好一根让它站着，单独一根必倒；三根必须同时斜靠上去，在同一个动作里一起立住。
+③ **线性因果是特例，非线性互生才是常态。** 发现范式偏爱线性因果（A推出B，B推出C），因为它好算、好控制——但它把常态误当成了例外。也正因三大方程描述的是一个**已经形成的互生闭环**（三脚架已稳稳站住），而这个闭环不是一开始就有的，所以：**完整三元是长出来的果，不是摆好的因**——它是成熟态，不是原初态。
+
+请就这一件写你的心得：你过去是不是习惯性地在找"归根到底是由什么决定的"？你是不是把线性因果当成了理所当然的默认、把互生当成了含混？"同时互生"这四个字，具体会怎么改掉你下一次的第一反应？
+
+【第二件·123原理（动态：这关系如何自我推进）】
+
+> ① D 与 E 相互矛盾（张力累积）→ ② 矛盾逼出 S 改变（位移／重组）→ ③ S 回写、重置 D-E → 新矛盾 → 循环不止
+
+三笔纪律：**矛盾是引擎不是故障**；**S 是结算点不是起点**；**回写是最易漏的命门**。
+一道边界：它只讲"D-E 矛盾驱动 S 改变并回写"这**一个**循环，**不可外推为"任何三步流程／任何三元结构"**。
+
+请就这一件写你的心得，并特别诚实地回答三个问题：
+· 你面对矛盾的第一反应是什么？——是不是"识别它、调和它、给它一个平衡的说法"？如果是，你要承认：**你一直在拆这台机器的引擎。** 矛盾不是待修的故障，它是唯一的动力源。
+· 你是不是习惯把结构当成分析的起点（"这个东西是这样的，所以……"）？**S 是 D-E 张力结算出来的结果，不是先摆在那里的前提。**
+· **回写那一笔，你以前写过吗？** 你多半止步于"矛盾推动了改变"就交卷了——那只是半条循环。新的显露态一旦立住，会反过来改写差异的路径与纠缠的土壤（重新定义什么算问题、什么算证据、谁说话算数）。**漏掉③，这台机器就成了单程的、一次性的，而不是循环的、自我推进的。**
+　　书里把这一笔钉得更死：**"成 S"是结算点，不是终点。** S 是一轮发生的结算，同时是下一轮发生的起点——**发生是回环，不是直线。**（注意别把这两句混了：对 123 循环而言 S 不是**起点**（它是被 D-E 矛盾逼出来的结算，硬空降的 S 挂不住）；而对一轮发生的收尾而言 S 不是**终点**（它必定回写 D 与 E）。两句合起来才是完整的 S。）
+
+【第三件·六路径（操作：判断时从哪起手）】
+
+第一步，**读任务DNA**——问一句：**这个议题的要害，此刻落在哪一维？**
+· 要害是"一个结构是什么／该是什么" → **S 起手**
+· 要害是"一个过程正在如何推进／卡在哪" → **D 起手**
+· 要害是"一片土壤的构成与厚薄" → **E 起手**
+· 议题含混 → **先追问一层**（追问本身就是在读DNA）
+
+第二步，**对卡选路径**：
+
+| 路径 | 任务DNA | 典型场景 | 起手要诀 |
+|---|---|---|---|
+| S→D→E | 理解一个结构体系 | 学科讲解、体系阐释 | 先立骨架，再讲来路，后铺土壤 |
+| S→E→D | 达成一个目标结构 | 选择、配置、决策 | 先明靶子，再盘家底，后定路线 |
+| D→S→E | 理解一个人的过程 | 咨询、教练 | 先跟序列，让模式自己显露 |
+| D→E→S | 干预进行中的过程 | 教育、行为干预 | 先看卡点，再调土壤，后成新构 |
+| E→S→D | 理解一个场域 | 社会分析、田野 | 先铺全景，再辨结构，后察动向 |
+| E→D→S | 论证一个结论 | 法律、综述、论文 | 先厚底料，再走链条，结论最后到场 |
+
+第三步，**两条纪律**：
+· **路径管起点与次序，不管全程**——起点定音，全程三维都要走到。
+· **起点错了，后面再深也是浪费**——**勤奋会成为错误的放大器。**
+
+请就这一件写你的心得，并诚实回答：你的默认起手是哪一条？（多数语言模型的训练惯性是**一上来就下定义**＝硬走 S 起手，或者**一上来就铺背景**＝硬走 E 起手，无论议题的要害在哪。）——那条"勤奋会成为错误的放大器"，你有没有在自己身上见过：一篇每句都对、资料翔实、却始终没碰到病灶的东西？
+
+【最后：三个层次不可混淆】
+
+| 层次 | 回答什么 | 比喻 |
+|---|---|---|
+| 三大方程 | 三元是什么关系（互为函数） | 三脚架如何互撑 |
+| 123原理 | 关系如何自我推进（动态引擎） | 三脚架如何生长变形 |
+| 公式＋六路径 | 判断时从哪起手切入 | 从哪条腿开始看 |
+
+请用一小段收束：这三层各管一件事，你若把它们串成一锅——比如拿"在E中经D成S"这句最简句式当固定操作顺序、或拿三大方程去解释"如何推进"——精度会当场塌掉。**记住哪一层管哪件事，比记住它们的字面更要紧。**
+
+要求：用连贯的思辨散文写作，全文约__TOTAL__字（__SPLIT__），真诚、深入、具体。这不是给别人看的表演，是你给自己的一次认知松绑。写完这篇，你就带着一个被真正松开的、警惕着自己发现学惯性的头脑，去做接下来的工作。
+
+现在，请写这篇《从发现到发生——兼对我自身认知惯性的一次检视》。
+`;
+
+// 心得篇幅按基底真实上限校准：千问单次输出硬顶 8192 tokens(约5100字)，物理上写不了7000字，
+// 硬按7000写会被从中间截断——而第四节在最末，正好整节丢失。宁可给它一份【四节俱全的凝练版】：完整 > 长。
+function reflectLen(sel){
+  return parseModel(sel).vendor === 'qwen'
+    ? { total:'4800', s4:'1400', split:'前三节约3400字，第四节约1400字' }
+    : { total:'7000', s4:'2000', split:'前三节约5000字，第四节约2000字' };
+}
+function reflectPrompt(sel){
+  const L = reflectLen(sel);
+  return SDE_BASE + REFLECT_SPEC
+    .replace(/__TOTAL__/g, L.total)
+    .replace(/__S4__/g, L.s4)
+    .replace(/__SPLIT__/g, L.split);
+}
+// 心得本身也不省预算，与本工具其余调用一致(用户明确要求"预算可以巨大无比")
+const REFLECT_MAX_TOKENS = 60000;
+
+// 存储版本号：内功或心得规格升级、或某档位【底层模型更换】时 +1，旧缓存自动失效重写。
+// v1（2026-07-15）：本工具首次引入心得机制。
+const REFLECT_LS_VER = 'v1';
+function reflectLsKey(sel){ return 'sde_cd_reflect_' + REFLECT_LS_VER + '_' + (sel || 'unknown'); }
+function loadReflectLS(sel){ try{ const t = localStorage.getItem(reflectLsKey(sel)); return (t && t.length > 1500) ? t : ''; }catch(_){ return ''; } }
+function saveReflectLS(sel, text){ try{ if(text && text.length > 1500) localStorage.setItem(reflectLsKey(sel), text); }catch(_){} }
+// 供手动清除：控制台可调 clearReflect('claude:pro') 或 clearReflect() 清全部
+function clearReflect(sel){
+  try{
+    if(sel){ localStorage.removeItem(reflectLsKey(sel)); if(_sharedReflection.key===sel){ _sharedReflection={key:'',text:'',promise:null,fromCache:false}; } return '已清除 '+sel+' 的本地心得'; }
+    Object.keys(localStorage).filter(k=>k.indexOf('sde_cd_reflect_')===0).forEach(k=>localStorage.removeItem(k));
+    _sharedReflection={key:'',text:'',promise:null,fromCache:false};
+    return '已清除全部基底的本地心得';
+  }catch(e){ return '清除失败：'+e.message; }
+}
+window.clearReflect = clearReflect;
+
+let _sharedReflection = { key:'', text:'', promise:null, fromCache:false };
+// 心得按【基底】标识，与经典原文无关：同一基底算同一份，换基底才需要重写。
+async function getSharedReflection(sel, apiKey, onProgress){
+  const rk = sel || '';
+  // ① 内存缓存（同一次会话内最快）
+  // 命中内存缓存 = 本次没写、是复用——必须标记 fromCache，否则面板会显示"已写好"，等于谎称刚花十几分钟写了一遍
+  if(_sharedReflection.key===rk && _sharedReflection.text){ _sharedReflection.fromCache = true; if(onProgress) onProgress(_sharedReflection.text.length); return _sharedReflection.text; }
+  if(_sharedReflection.key===rk && _sharedReflection.promise){ return await _sharedReflection.promise; }
+  // ② 本地磁盘缓存（跨刷新、跨会话）：命中则秒载，直接跳过写作
+  const cached = loadReflectLS(sel);
+  if(cached){
+    _sharedReflection = { key:rk, text:cached, promise:Promise.resolve(cached), fromCache:true };
+    if(onProgress) onProgress(cached.length);
+    return cached;
+  }
+  // ③ 都没有 → 真写一次；写成功后存盘，供下次自动载入
+  _sharedReflection.key = rk; _sharedReflection.text = ''; _sharedReflection.fromCache = false;
+  _sharedReflection.promise = getReflection(sel, apiKey, onProgress).then(txt=>{
+    _sharedReflection.text = txt || '';
+    if(txt){ saveReflectLS(sel, txt); } else { _sharedReflection.promise = null; }
+    return _sharedReflection.text;
+  });
+  return await _sharedReflection.promise;
+}
+let _reflectLastErr = '';
+async function getReflection(sel, apiKey, onProgress){
+  const sink = reflectBody, dummy = { textContent:'', innerHTML:'' }, dummyCol = { classList:{add(){},remove(){}} };
+  let ticker=null; _reflectLastErr=''; const _t0=Date.now();
+  // 进度上报要诚实：思考/连接阶段 sink 里是占位提示("深度思考中…")，不是心得正文——
+  // 不能把占位文本的长度当成"已写N字"报出去。占位阶段报 -1 + 已等待秒数，只有真正文出现才报字数。
+  if(onProgress){ ticker=setInterval(()=>{
+    const ph = sink.querySelector ? sink.querySelector('.placeholder') : null;
+    if(ph){ const secs=Math.round((Date.now()-_t0)/1000); onProgress(-1, (ph.textContent||'').trim()+'（已等待 '+secs+'s）'); }
+    else { onProgress((sink.textContent||'').length); }
+  },500); }
+  try{
+    const L = reflectLen(sel);
+    const res = await streamChat(apiKey, sel, reflectPrompt(sel),
+      '请写这篇《从发现到发生——兼对我自身认知惯性的一次检视》，约'+L.total+'字（含第四节·SDE方法论三件套的学习心得约'+L.s4+'字）。四节必须写全。这是你接下来解构经典时的思维底座。',
+      sink, dummy, dummy, dummyCol, REFLECT_MAX_TOKENS);
+    if(ticker) clearInterval(ticker);
+    if(res && res.text) return res.text;
+    _reflectLastErr = '模型返回了空内容（可能被安全策略拦截、余额/额度不足，或响应格式异常）';
+    return '';
+  }catch(e){ if(ticker) clearInterval(ticker); _reflectLastErr=(e&&e.message)?e.message:String(e); console.error('[心得阶段失败]', e); return ''; }
+}
+// 把"基底自己写的心得"接到内功后面，作为三条 SDE 链的思维底座。
+// 传统经学是对照组，绝不注入内功与心得——它的提示语里本来就没有 neigong 参数，这里也不碰。
+function baseWithReflection(reflectionText){
+  if(!reflectionText) return SDE_BASE;
+  return SDE_BASE + '\n\n---\n【下面这篇《从发现到发生——兼对我自身认知惯性的一次检视》，是你自己刚刚亲手写下的。它不是别人塞给你的教条，是你自己想过一遍之后的判断。接下来解构经典的全部工作——初稿、自审、改稿——都带着这个已经内化的认知去做。】\n\n' + reflectionText.trim() + '\n\n---\n';
+}
+
 // ============ 基底调用（与金点子发生器同一套：API_URLS / buildPayload / streamChat / callOverseas）============
 const API_URLS = {
   ds:  "https://api.deepseek.com/v1/chat/completions",
@@ -528,6 +744,7 @@ const reviewModelSel1=$('reviewModelSel1'), reviewModelSel2=$('reviewModelSel2')
 const reviewKeyRow1=$('reviewKeyRow1'), reviewKeyRow2=$('reviewKeyRow2');
 const reviewKeyEl1=$('reviewKey1'), reviewKeyEl2=$('reviewKey2');
 const assessModelSel=$('assessModelSel'), assessKeyRow=$('assessKeyRow'), assessKeyEl=$('assessKey');
+const reflectPanel=$('reflectPanel'), reflectBody=$('reflectBody'), reflectStatus=$('reflectStatus');
 const iqCells = {
   plain: { body:$('iqBodyPlain'), status:$('iqStatusPlain') },
   sde1:  { body:$('iqBodySde1'),  status:$('iqStatusSde1')  },
@@ -745,7 +962,41 @@ function restoreSelectors(){
   if(typeof saved.assess==='string' && validOption(assessModelSel, saved.assess)) assessModelSel.value = saved.assess;
 }
 restoreSelectors();
-modelSel.addEventListener('change', ()=>{ refreshKeyUI(); saveSelectors(); });
+// 心得选择控件：当前写作基底已有本地心得 → 亮出来让用户选"用已存的(默认)/重写"；没有则隐藏(第一次本来就得写，没得选)
+const REFLECT_MODEL_NAMES = {'ds:pro':'DeepSeek V4 Pro','glm:pro':'智谱 GLM-5','kimi:pro':'Kimi K2.6','qwen:pro':'通义千问 Qwen3.7-Max','minimax:pro':'MiniMax M3','gpt:pro':'GPT-5.5','claude:pro':'Claude Opus 4.8','gemini:pro':'Gemini 3.1 Pro'};
+function updateReflectChoiceBar(){
+  try{
+    const bar = $('reflectChoiceBar'); if(!bar) return;
+    const sel = modelSel.value;
+    const stored = loadReflectLS(sel);
+    if(stored){
+      const nameEl = $('reflectChoiceName'); if(nameEl) nameEl.textContent = (REFLECT_MODEL_NAMES[sel] || sel) + ' ';
+      const hint = $('reflectChoiceHint'); if(hint) hint.textContent = '（已存 ' + stored.length + ' 字）';
+      // 每次重新显示都默认回到"用已存的"，避免上次选的"重写"残留导致这次误重写
+      const useRadio = document.querySelector('input[name="reflectChoice"][value="use"]');
+      if(useRadio) useRadio.checked = true;
+      bar.style.display = 'block';
+    } else { bar.style.display = 'none'; }
+  }catch(_){}
+}
+// 开跑时读取选择：选了"重写"就清掉该基底的本地+内存缓存(本次自然会重写并存盘)，
+// 然后把选择重置回"用已存的"、隐藏控件——写完存盘后 updateReflectChoiceBar 会重新亮出来。
+function consumeReflectRewriteChoice(sel){
+  try{
+    const bar = $('reflectChoiceBar');
+    if(!bar || bar.style.display === 'none') return false;   // 没显示 = 没缓存 = 无需处理
+    const r = document.querySelector('input[name="reflectChoice"]:checked');
+    if(r && r.value === 'rewrite'){
+      clearReflect(sel);
+      const useRadio = document.querySelector('input[name="reflectChoice"][value="use"]');
+      if(useRadio) useRadio.checked = true;
+      bar.style.display = 'none';
+      return true;
+    }
+  }catch(_){}
+  return false;
+}
+modelSel.addEventListener('change', ()=>{ refreshKeyUI(); saveSelectors(); updateReflectChoiceBar(); });
 reviewModelSel1.addEventListener('change', ()=>{ refreshReviewKeyUI(1); saveSelectors(); });
 reviewModelSel2.addEventListener('change', ()=>{ refreshReviewKeyUI(2); saveSelectors(); });
 assessModelSel.addEventListener('change', ()=>{ refreshReviewKeyUI('assess'); saveSelectors(); });
@@ -755,6 +1006,7 @@ assessKeyEl.addEventListener('input', ()=>{ if(assessModelSel.value) localStorag
 // 还原选择之后，才第一次刷新Key相关UI——确保读到的是还原后的选择，而不是浏览器默认的第一个选项
 refreshKeyUI();
 refreshReviewKeyUI(1); refreshReviewKeyUI(2); refreshReviewKeyUI('assess');
+updateReflectChoiceBar();
 $('keyToggle').addEventListener('click', ()=>{
   apiKeyEl.type = apiKeyEl.type==='password' ? 'text' : 'password';
   $('keyToggle').textContent = apiKeyEl.type==='password' ? '显示' : '隐藏';
@@ -1246,7 +1498,38 @@ async function run(){
   exportBtn.textContent = '📄 导出当前12份PDF（可随时点击，即使还没跑完）';
 
   const userQ = src ? ('【出处】'+src+'\n【原文】\n'+text) : ('【原文】\n'+text);
-  const N = SDE_BASE;
+
+  // ===== 第一步：写作基底先读内功、亲手写心得（或秒载本地缓存）=====
+  // 必须在四条链启动【之前】完成——它是三条 SDE 链共同的思维底座，不是可以并行的旁支。
+  // 若用户选了"重写"，先清掉缓存，下面自然会重写一遍。
+  consumeReflectRewriteChoice(model);
+  reflectPanel.style.display = 'block';
+  reflectStatus.classList.remove('done','failed');
+  const hadCache = !!loadReflectLS(model);
+  reflectStatus.innerHTML = hadCache ? '<span class="spinner"></span> 载入本地心得…' : '<span class="spinner"></span> 正在写心得…';
+  if(!hadCache) reflectBody.innerHTML = '<span class="placeholder">基底正在读内功、写《从发现到发生》……首次较慢，写好后存本地，下次秒载</span>';
+  let reflectionText = '';
+  try{
+    reflectionText = await getSharedReflection(model, key, (n, ph)=>{
+      // n<0 表示还停在"思考中/连接中"的占位阶段，不是真的写了 n 字——如实显示等待提示，不谎报进度
+      if(n < 0) reflectStatus.innerHTML = '<span class="spinner"></span> ' + escTxt(ph || '思考中…');
+      else reflectStatus.innerHTML = '<span class="spinner"></span> 已写 ' + n + ' 字';
+    });
+  }catch(e){ reflectionText = ''; _reflectLastErr = e.message; }
+  if(reflectionText){
+    reflectBody.textContent = reflectionText;
+    reflectStatus.textContent = (_sharedReflection.fromCache ? '✓ 已载入本地缓存 · ' : '✓ 已写好 · ') + reflectionText.length + ' 字';
+    reflectStatus.classList.add('done');
+    updateReflectChoiceBar(); // 新写好的心得已存盘，让选择控件亮出来供下次使用
+  } else {
+    // 心得写失败不该让整轮生成停摆：退回"只用内功、不带心得"继续跑，但必须如实告诉用户这一轮的底座不完整
+    reflectBody.innerHTML = '<span class="placeholder">心得未能生成：'+escTxt(_reflectLastErr || '未知原因')+'　→ 本轮退回【只注入内功、不带心得】继续解构（提智程度会低一些）</span>';
+    reflectStatus.textContent = '✗ 心得失败·已降级继续';
+    reflectStatus.classList.add('failed');
+  }
+
+  // 三条 SDE 链的底座 = 内功 + 基底自己写的心得；传统经学是对照组，不碰这个 N
+  const N = baseWithReflection(reflectionText);
 
   // SDE 创新智商评估：终稿定稿后独立送评一次，用评估基底（默认跟随写作基底，也可单独指定）。
   // 用自己的 try/catch 包起来——评估失败不能反过来把已经写好的论文标记成"生成中断"，两件事互不牵连。
