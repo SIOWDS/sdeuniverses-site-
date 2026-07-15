@@ -299,6 +299,16 @@ footer a{color:var(--gold)}
 </div>
 <div class="flowhint">四篇都是正经论文（标题·摘要·关键词·六节分节正文·参考文献，各约四千五百字，末节均为教育/健康/商业中一个具体领域的应用），<b>四篇同时并行生成，互不依赖，且每篇各自独立完成两轮自审自改</b> · 传统经学是对照组(应用接教育) · <b>SDE 1／2／3 各自只用三大方程／六路径／123原理这一件工具</b>解构同一段经典(应用分别接商业/健康/商业) · 四篇并排读，能看见对照组与换一件工具会显出什么不同的断面</div>
 
+<div id="exportSection" style="max-width:1460px;margin:20px auto 0;padding:0 20px;display:none">
+  <div style="background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:18px 22px;display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+    <div style="flex:1;min-width:220px">
+      <div style="font-size:13.5px;font-weight:700;color:var(--text)">📄 分批导出 PDF（共 12 份：4 篇初稿 + 4 篇改稿一 + 4 篇改稿二/终稿）</div>
+      <div style="font-size:11.5px;color:var(--muted);margin-top:4px" id="exportHint">无论某篇某阶段是否成功，都会导出——失败或未进行的阶段会生成一份写明原因的 PDF，不会被静默跳过。浏览器可能会弹出"允许多个下载"的提示，请允许。</div>
+    </div>
+    <button class="key-toggle" id="exportBtn" style="padding:10px 18px;font-size:13px;white-space:nowrap" disabled>生成中才能导出</button>
+  </div>
+</div>
+
 <div id="revPanel" style="max-width:1460px;margin:26px auto 0;padding:0 20px;display:none">
   <div style="background:linear-gradient(135deg,rgba(232,163,61,0.06),rgba(20,16,8,0.3));border:1px solid rgba(232,163,61,0.26);border-radius:14px;padding:20px 22px">
     <div style="font-size:14px;font-weight:700;color:#E8A33D;margin-bottom:6px">🔬 四组自审意见 · 每篇论文各自调转刀口审自己</div>
@@ -476,6 +486,119 @@ const noopEl = {textContent:'', innerHTML:'', classList:{add(){},remove(){},togg
 function makeRevCell(n){ return {body:$('rev'+n+'Body'), status:$('rev'+n+'Status'), meta:noopEl, col:noopEl, input:$('rev'+n+'Input')}; }
 const revCells = { '0a':makeRevCell('0a'), '0b':makeRevCell('0b'), '1a':makeRevCell('1a'), '1b':makeRevCell('1b'), '2a':makeRevCell('2a'), '2b':makeRevCell('2b'), '3a':makeRevCell('3a'), '3b':makeRevCell('3b') };
 const errBox=$('errBox');
+const exportSection=$('exportSection'), exportBtn=$('exportBtn'), exportHint=$('exportHint');
+
+// ============ PDF 导出：三阶段快照 ============
+// 每篇论文三个阶段(初稿/改稿一/改稿二终稿)各自的文本与状态都单独存一份，不依赖 DOM 当前显示的内容——
+// 因为 paperCell.body 会被后续阶段不断覆盖，跑完之后只剩终稿，中间阶段的文本会永久丢失、导不出来。
+// status: 'pending'(尚未跑到) / 'done'(这一步成功产出文本) / 'failed'(这一步本身出错或返回空)
+//        / 'skipped'(更早的阶段失败了，这一步压根没跑，但仍要为它生成一份说明性PDF，不能静默不导出)
+function freshSnap(title){
+  return {
+    title,
+    draft:   {text:'', status:'pending', note:''},
+    revise1: {text:'', status:'pending', note:''},
+    final:   {text:'', status:'pending', note:''},
+  };
+}
+let paperSnapshots = {
+  plain: freshSnap('传统经学'),
+  sde1:  freshSnap('SDE1·三大方程'),
+  sde2:  freshSnap('SDE2·六路径'),
+  sde3:  freshSnap('SDE3·123原理'),
+};
+
+let _pdfLibsPromise = null;
+function loadScript(src){
+  return new Promise((resolve,reject)=>{
+    const s=document.createElement('script'); s.src=src;
+    s.onload=()=>resolve(); s.onerror=()=>reject(new Error('PDF组件加载失败：'+src));
+    document.head.appendChild(s);
+  });
+}
+function ensurePdfLibs(){
+  if(!_pdfLibsPromise){
+    _pdfLibsPromise = Promise.all([
+      loadScript('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js'),
+      loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js'),
+    ]);
+  }
+  return _pdfLibsPromise;
+}
+
+// 把一段文字(不管是正常产出还是失败说明)渲染成一份可下载的PDF。
+// 用 html2canvas 截图再喂给 jsPDF，而不是让 jsPDF 自己排版文字——因为 jsPDF 内置字体不含中文字形，
+// 直接写中文字符会变成方框；截图法直接复用浏览器已经正确渲染出的中文，不需要额外内嵌字体文件。
+async function exportOnePdf(title, meta, bodyText, filename, statusBadge){
+  await ensurePdfLibs();
+  const wrap = document.createElement('div');
+  wrap.style.cssText = 'position:fixed;left:-99999px;top:0;width:794px;background:#ffffff;color:#1a1a1a;'
+    + 'padding:48px 52px;font-family:"PingFang SC","Microsoft YaHei","Noto Sans SC",sans-serif;font-size:14.5px;line-height:1.95;'
+    + 'white-space:pre-wrap;word-wrap:break-word;box-sizing:border-box;';
+  const badgeColor = statusBadge==='done' ? '#1a7a3c' : statusBadge==='failed' ? '#b23b2e' : '#8a6d1a';
+  const badgeText = statusBadge==='done' ? '✓ 本阶段正常完成' : statusBadge==='failed' ? '✗ 本阶段生成失败' : '⚠ 本阶段未进行（上一阶段失败）';
+  wrap.innerHTML = '<div style="font-size:11px;letter-spacing:0.08em;color:#8a8a8a;margin-bottom:6px">SDE UNIVERSES · 经典解构器</div>'
+    + '<h1 style="font-size:21px;font-weight:700;margin:0 0 8px;color:#1a1a1a">'+escTxt(title)+'</h1>'
+    + '<div style="font-size:12px;color:'+badgeColor+';font-weight:700;margin-bottom:6px">'+badgeText+'</div>'
+    + '<div style="font-size:11.5px;color:#666;margin-bottom:22px;border-bottom:1px solid #ddd;padding-bottom:14px">'+escTxt(meta)+'</div>'
+    + '<div>'+escTxt(bodyText && bodyText.trim() ? bodyText : '（本阶段没有可导出的正文——见上方状态说明）')+'</div>';
+  document.body.appendChild(wrap);
+  try{
+    const canvas = await html2canvas(wrap, {scale:2, backgroundColor:'#ffffff', windowWidth:794});
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF({ unit:'pt', format:'a4' });
+    const pageW = pdf.internal.pageSize.getWidth();
+    const pageH = pdf.internal.pageSize.getHeight();
+    const imgW = pageW;
+    const imgH = canvas.height * imgW / canvas.width;
+    const imgData = canvas.toDataURL('image/jpeg', 0.92);
+    let heightLeft = imgH, position = 0;
+    pdf.addImage(imgData, 'JPEG', 0, position, imgW, imgH);
+    heightLeft -= pageH;
+    while(heightLeft > 0){
+      position = heightLeft - imgH;
+      pdf.addPage();
+      pdf.addImage(imgData, 'JPEG', 0, position, imgW, imgH);
+      heightLeft -= pageH;
+    }
+    pdf.save(filename);
+  } finally {
+    wrap.remove();
+  }
+}
+
+// 三批依次导出：先四篇初稿，再四篇改稿一，最后四篇改稿二/终稿——不管每一份实际是成功/失败/未进行，12份全部生成。
+// 逐份之间留一点间隔，避免浏览器把连续多个下载当成弹窗轰炸而拦截。
+async function exportAllPdfs(){
+  exportBtn.disabled = true;
+  const order = [['plain','传统经学'], ['sde1','SDE1'], ['sde2','SDE2'], ['sde3','SDE3']];
+  const stages = [
+    {key:'draft',   label:'初稿',       batchNo:1},
+    {key:'revise1', label:'改稿一',     batchNo:2},
+    {key:'final',   label:'改稿二·终稿', batchNo:3},
+  ];
+  let done = 0, total = order.length * stages.length;
+  for(const stage of stages){
+    exportBtn.textContent = '⏳ 正在导出第'+stage.batchNo+'批（'+stage.label+'）……'+done+'/'+total;
+    for(const [key, shortName] of order){
+      const snap = paperSnapshots[key][stage.key];
+      const meta = '阶段：'+stage.label+' · 状态：'+(snap.status==='done'?'成功':snap.status==='failed'?'失败':'未进行')
+        + (snap.note ? ' · 备注：'+snap.note : '') + ' · 导出时间：'+new Date().toLocaleString('zh-CN');
+      const filename = '经典解构-'+shortName+'-'+stage.label+'.pdf';
+      try{
+        await exportOnePdf(paperSnapshots[key].title, meta, snap.text, filename, snap.status);
+      }catch(e){
+        console.error('导出失败:', filename, e);
+        showErr('导出 '+filename+' 失败：'+e.message+'（其余文件仍会继续导出）');
+      }
+      done++;
+      await new Promise(r=>setTimeout(r, 250)); // 给浏览器喘息时间，降低被当成弹窗轰炸拦截的概率
+    }
+  }
+  exportBtn.disabled = false;
+  exportBtn.textContent = '✓ 已导出全部 12 份 PDF（可再次点击重新导出）';
+}
+exportBtn.addEventListener('click', ()=>{ exportAllPdfs().catch(e=>showErr('批量导出中断：'+e.message)); });
 function showErr(m){ errBox.textContent=m; errBox.style.display='block'; }
 function hideErr(){ errBox.style.display='none'; }
 
@@ -964,15 +1087,31 @@ async function run(){
     c.body.innerHTML='<span class="placeholder">等待对应论文初稿完成……</span>'; c.status.textContent='排队中';
     c.input.innerHTML='<span class="placeholder">尚未发起调用</span>';
   });
+  // 每次新一轮生成开始，三阶段快照全部清空重置——导出面板此时立即可用（不必等生成完成），
+  // 因为"无论是否成功都要能导出"意味着导出这个动作本身不该依赖生成是否已经跑完。
+  paperSnapshots = {
+    plain: freshSnap('传统经学'),
+    sde1:  freshSnap('SDE1·三大方程'),
+    sde2:  freshSnap('SDE2·六路径'),
+    sde3:  freshSnap('SDE3·123原理'),
+  };
+  exportSection.style.display = 'block';
+  exportBtn.disabled = false;
+  exportBtn.textContent = '📄 导出当前12份PDF（可随时点击，即使还没跑完）';
 
   const userQ = src ? ('【出处】'+src+'\n【原文】\n'+text) : ('【原文】\n'+text);
   const N = SDE_BASE;
 
   // 传统经学：现在也走完整的两轮自审自改，规格与 SDE 三链一致，只是审稿人设定不同（没有"工具"这个变量）
-  function runPlainChain(paperCell, revA, revB, label){
+  function runPlainChain(paperCell, revA, revB, label, snap){
     return (async ()=>{
-      const draft = await streamChat(key, model, plainPrompt(), userQ, paperCell.body, paperCell.status, paperCell.meta, paperCell.col, PAPER_TOKENS);
-      if(!draft.text) throw new Error(label+' 初稿为空，自审自改无法进行');
+      let draft;
+      try{
+        draft = await streamChat(key, model, plainPrompt(), userQ, paperCell.body, paperCell.status, paperCell.meta, paperCell.col, PAPER_TOKENS);
+      }catch(e){ snap.draft.status='failed'; snap.draft.note=e.message; snap.revise1.status='skipped'; snap.revise1.note='初稿调用出错，未进行'; snap.final.status='skipped'; snap.final.note='初稿调用出错，未进行'; throw e; }
+      snap.draft.text = draft.text || '';
+      snap.draft.status = draft.text ? 'done' : 'failed';
+      if(!draft.text){ snap.draft.note='API返回了空文本'; snap.revise1.status='skipped'; snap.revise1.note='初稿为空，未进行'; snap.final.status='skipped'; snap.final.note='初稿为空，未进行'; throw new Error(label+' 初稿为空，自审自改无法进行'); }
 
       const rAInput = userQ + '\n\n【待审的论文】\n' + draft.text;
       const rASys = plainReviewPrompt(1);
@@ -987,6 +1126,9 @@ async function run(){
           paperCell.body, paperCell.status, paperCell.meta, paperCell.col, PAPER_TOKENS);
         if(fixA.text) cur = fixA.text;
       }
+      snap.revise1.text = cur;
+      snap.revise1.status = (cur !== draft.text) ? 'done' : 'failed';
+      if(cur === draft.text) snap.revise1.note = '审稿一或改稿一未产出有效文本，沿用初稿';
 
       const rBInput = userQ + '\n\n【待审的论文】\n' + cur;
       const rBSys = plainReviewPrompt(2);
@@ -1001,6 +1143,9 @@ async function run(){
           paperCell.body, paperCell.status, paperCell.meta, paperCell.col, PAPER_TOKENS);
         if(fixB.text) fin = fixB.text;
       }
+      snap.final.text = fin;
+      snap.final.status = (fin !== cur) ? 'done' : 'failed';
+      if(fin === cur) snap.final.note = '审稿二或改稿二未产出有效文本，沿用改稿一';
       paperCell.body.textContent = fin;
       return { text: fin };
     })().catch(e=>{
@@ -1010,15 +1155,20 @@ async function run(){
       return {text:''};
     });
   }
-  const plainTask = runPlainChain(plainCell, revCells['0a'], revCells['0b'], '传统经学');
+  const plainTask = runPlainChain(plainCell, revCells['0a'], revCells['0b'], '传统经学', paperSnapshots.plain);
 
   // 三篇 SDE 论文各自独立：initial draft → review a → revise → review b → revise，互不依赖、同时跑
   // tool: 'eq'(三大方程) / 'paths'(六路径) / 'principle'(123原理)；paperCell 是该篇论文最终显示的那一栏
   // 两次审稿分别用 reviewModel1/reviewModel2（默认跟随写作基底，也可各自单独指定）；改稿仍由写作基底(key/model)完成
-  function runSdeChain(tool, paperCell, revA, revB, label){
+  function runSdeChain(tool, paperCell, revA, revB, label, snap){
     return (async ()=>{
-      const draft = await streamChat(key, model, sdeDraftPrompt(N, tool), userQ, paperCell.body, paperCell.status, paperCell.meta, paperCell.col, PAPER_TOKENS);
-      if(!draft.text) throw new Error(label+' 初稿为空，自审自改无法进行');
+      let draft;
+      try{
+        draft = await streamChat(key, model, sdeDraftPrompt(N, tool), userQ, paperCell.body, paperCell.status, paperCell.meta, paperCell.col, PAPER_TOKENS);
+      }catch(e){ snap.draft.status='failed'; snap.draft.note=e.message; snap.revise1.status='skipped'; snap.revise1.note='初稿调用出错，未进行'; snap.final.status='skipped'; snap.final.note='初稿调用出错，未进行'; throw e; }
+      snap.draft.text = draft.text || '';
+      snap.draft.status = draft.text ? 'done' : 'failed';
+      if(!draft.text){ snap.draft.note='API返回了空文本'; snap.revise1.status='skipped'; snap.revise1.note='初稿为空，未进行'; snap.final.status='skipped'; snap.final.note='初稿为空，未进行'; throw new Error(label+' 初稿为空，自审自改无法进行'); }
 
       const rAInput = userQ + '\n\n【待审的解构稿】\n' + draft.text;
       const rASys = sdeReviewPrompt(N, 1, tool);
@@ -1033,6 +1183,9 @@ async function run(){
           paperCell.body, paperCell.status, paperCell.meta, paperCell.col, PAPER_TOKENS);
         if(fixA.text) cur = fixA.text;
       }
+      snap.revise1.text = cur;
+      snap.revise1.status = (cur !== draft.text) ? 'done' : 'failed';
+      if(cur === draft.text) snap.revise1.note = '审稿一或改稿一未产出有效文本，沿用初稿';
 
       const rBInput = userQ + '\n\n【待审的解构稿】\n' + cur;
       const rBSys = sdeReviewPrompt(N, 2, tool);
@@ -1047,6 +1200,9 @@ async function run(){
           paperCell.body, paperCell.status, paperCell.meta, paperCell.col, PAPER_TOKENS);
         if(fixB.text) fin = fixB.text;
       }
+      snap.final.text = fin;
+      snap.final.status = (fin !== cur) ? 'done' : 'failed';
+      if(fin === cur) snap.final.note = '审稿二或改稿二未产出有效文本，沿用改稿一';
       paperCell.body.textContent = fin;
       return { text: fin };
     })().catch(e=>{
@@ -1058,9 +1214,9 @@ async function run(){
   }
 
   // 三条链完全独立、同时并行——任何一条的成败或早晚都不影响另外两条
-  const sde1Task = runSdeChain('eq',        sde1Cell, revCells['1a'], revCells['1b'], 'SDE1(三大方程)');
-  const sde2Task = runSdeChain('paths',     sde2Cell, revCells['2a'], revCells['2b'], 'SDE2(六路径)');
-  const sde3Task = runSdeChain('principle', sde3Cell, revCells['3a'], revCells['3b'], 'SDE3(123原理)');
+  const sde1Task = runSdeChain('eq',        sde1Cell, revCells['1a'], revCells['1b'], 'SDE1(三大方程)', paperSnapshots.sde1);
+  const sde2Task = runSdeChain('paths',     sde2Cell, revCells['2a'], revCells['2b'], 'SDE2(六路径)', paperSnapshots.sde2);
+  const sde3Task = runSdeChain('principle', sde3Cell, revCells['3a'], revCells['3b'], 'SDE3(123原理)', paperSnapshots.sde3);
 
   await Promise.all([plainTask, sde1Task, sde2Task, sde3Task]);
   goBtn.disabled=false; goBtn.textContent='✦ 生成四篇论文（传统 · SDE1 · SDE2 · SDE3）';
