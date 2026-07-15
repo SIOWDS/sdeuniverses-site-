@@ -84,6 +84,17 @@ textarea{resize:vertical;min-height:120px;line-height:1.75}
 .rev-head .st{margin-left:auto;font-size:11.5px;color:#7A8694;font-weight:400}
 .rev-body{padding:14px 16px;font-size:13px;line-height:1.85;color:#B9C3CD;white-space:pre-wrap;word-wrap:break-word;max-height:380px;overflow-y:auto}
 .rev-body .placeholder{color:#6E7B88;font-style:italic}
+.lib-toggle{cursor:pointer;font-size:13px;color:var(--gold2);margin-top:10px;display:inline-flex;align-items:center;gap:6px;user-select:none}
+.lib-toggle:hover{text-decoration:underline}
+.lib-panel{display:none;margin-top:14px;background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:16px 18px}
+.lib-panel.open{display:block}
+.lib-group{margin-bottom:14px}
+.lib-group:last-child{margin-bottom:0}
+.lib-group-h{font-size:11.5px;letter-spacing:0.12em;color:var(--muted);margin-bottom:8px;text-transform:uppercase}
+.lib-grid{display:flex;flex-wrap:wrap;gap:8px}
+.lib-item{display:inline-flex;align-items:center;gap:6px;background:rgba(212,178,94,0.06);border:1px solid var(--border);border-radius:8px;padding:6px 11px;font-size:12.5px;color:var(--text)}
+.lib-item a{color:var(--gold2);font-size:11.5px;white-space:nowrap}
+.lib-note{font-size:11.5px;color:var(--muted);line-height:1.7;margin-top:12px;padding-top:12px;border-top:1px solid var(--border)}
 footer{border-top:1px solid var(--border);margin-top:60px;padding:30px 20px;text-align:center;color:var(--muted);font-size:13px}
 footer a{color:var(--gold)}
 </style>
@@ -149,6 +160,22 @@ footer a{color:var(--gold)}
     <label>贴一段经典文本（原文）<span id="charCount" style="float:right;color:#8B98A5">0 / 500 字</span></label>
     <textarea id="classicText" maxlength="500" placeholder="例如：&#10;「道可道，非常道。名可名，非常名。无名天地之始，有名万物之母。」&#10;或论语、孟子、圣经、佛经的一段——原文贴进来即可（最长 500 字）"></textarea>
     <div class="examples" id="examples"></div>
+    <div class="lib-toggle" id="libToggle">📚 经典库·中西20本原文入口（点击展开，自动打开原文页，方便你自己挑段落、复制）▾</div>
+    <div class="lib-panel" id="libPanel">
+      <div class="lib-group">
+        <div class="lib-group-h">中国典籍</div>
+        <div class="lib-grid" id="libGroupCN"></div>
+      </div>
+      <div class="lib-group">
+        <div class="lib-group-h">佛教经典（汉译）</div>
+        <div class="lib-grid" id="libGroupBUD"></div>
+      </div>
+      <div class="lib-group">
+        <div class="lib-group-h">西方与宗教经典</div>
+        <div class="lib-grid" id="libGroupW"></div>
+      </div>
+      <div class="lib-note">点"打开原文→"会在新标签页打开权威公开来源（中国哲学书电子化计划 ctext.org / CBETA线上阅读 / BibleGateway / Quran.com / Project Gutenberg）——在那边选中你要的一段、复制，回来贴进上面的文本框即可（最长500字）。这些都是可自由查阅的公共来源，不代表本站对具体译本的权威性背书。</div>
+    </div>
   </div>
   <div class="field">
     <label>出处（选填——书名、篇章，帮两边的解读都对准位置）</label>
@@ -417,6 +444,59 @@ EXAMPLES.forEach(ex=>{
   chip.className='ex-chip'; chip.textContent=ex.label;
   chip.addEventListener('click', ()=>{ classicTextEl.value=ex.text; sourceInfoEl.value=ex.src; });
   exWrap.appendChild(chip);
+});
+
+// ============ 经典库·中西20本 · 权威公共来源的原文链接（自动打开，方便用户自己选段落、复制）============
+// 链接来源核实原则：中国典籍用 ctext.org(中国哲学书电子化计划) 的确认可用页面；
+// 佛教经典用 CBETA 线上阅读（未逐一核实深链，统一指向可靠的首页检索入口，避免猜错具体经号）；
+// 西方哲学经典用 Project Gutenberg 的检索页（而非猜测具体电子书编号——检索页保证一定能打开，不会 404）；
+// 圣经用 BibleGateway 的标准检索式 URL；古兰经用 quran.com。
+const CLASSICS_LIBRARY = {
+  cn: [
+    {name:'《道德经》', who:'老子', url:'https://ctext.org/dao-de-jing'},
+    {name:'《论语》', who:'孔子', url:'https://ctext.org/analects'},
+    {name:'《孟子》', who:'孟子', url:'https://ctext.org/mengzi'},
+    {name:'《庄子》', who:'庄子', url:'https://ctext.org/zhuangzi'},
+    {name:'《大学》', who:'曾子', url:'https://ctext.org/liji/da-xue'},
+    {name:'《中庸》', who:'子思', url:'https://ctext.org/liji/zhong-yong'},
+    {name:'《易经》', who:'—', url:'https://ctext.org/book-of-changes'},
+    {name:'《诗经》', who:'—', url:'https://ctext.org/book-of-poetry'},
+    {name:'《孝经》', who:'—', url:'https://ctext.org/xiao-jing'},
+    {name:'《荀子》', who:'荀子', url:'https://ctext.org/xunzi'},
+  ],
+  bud: [
+    {name:'《金刚经》', who:'鸠摩罗什译', url:'https://cbetaonline.dila.edu.tw/'},
+    {name:'《心经》', who:'玄奘译', url:'https://cbetaonline.dila.edu.tw/'},
+    {name:'《六祖坛经》', who:'惠能', url:'https://cbetaonline.dila.edu.tw/'},
+  ],
+  w: [
+    {name:'《圣经·创世记》', who:'', url:'https://www.biblegateway.com/passage/?search=Genesis+1&version=CUV'},
+    {name:'《圣经·马太福音》', who:'登山宝训', url:'https://www.biblegateway.com/passage/?search=Matthew+5&version=CUV'},
+    {name:'《古兰经》', who:'', url:'https://quran.com/1'},
+    {name:'《理想国》', who:'柏拉图', url:'https://www.gutenberg.org/ebooks/search/?query=Plato+Republic'},
+    {name:'《沉思录》', who:'马可·奥勒留', url:'https://www.gutenberg.org/ebooks/search/?query=Marcus+Aurelius+Meditations'},
+    {name:'《忏悔录》', who:'奥古斯丁', url:'https://www.gutenberg.org/ebooks/search/?query=Augustine+Confessions'},
+    {name:'《尼各马可伦理学》', who:'亚里士多德', url:'https://www.gutenberg.org/ebooks/search/?query=Aristotle+Nicomachean+Ethics'},
+  ],
+};
+function renderLibGroup(hostId, items){
+  const host = $(hostId);
+  items.forEach(it=>{
+    const el = document.createElement('div');
+    el.className = 'lib-item';
+    const nm = document.createElement('span'); nm.textContent = it.name + (it.who ? '·'+it.who : '');
+    const a = document.createElement('a'); a.href = it.url; a.target='_blank'; a.rel='noopener'; a.textContent = '打开原文→';
+    el.appendChild(nm); el.appendChild(a);
+    host.appendChild(el);
+  });
+}
+renderLibGroup('libGroupCN', CLASSICS_LIBRARY.cn);
+renderLibGroup('libGroupBUD', CLASSICS_LIBRARY.bud);
+renderLibGroup('libGroupW', CLASSICS_LIBRARY.w);
+$('libToggle').addEventListener('click', ()=>{
+  const panel = $('libPanel');
+  const open = panel.classList.toggle('open');
+  $('libToggle').textContent = (open ? '📚 经典库·中西20本原文入口（点击收起）▴' : '📚 经典库·中西20本原文入口（点击展开，自动打开原文页，方便你自己挑段落、复制）▾');
 });
 
 function escTxt(s){ return String(s).replace(/[<>&]/g, c=>({'<':'&lt;','>':'&gt;','&':'&amp;'}[c])); }
