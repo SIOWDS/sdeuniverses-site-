@@ -72,8 +72,8 @@ footer a{color:var(--gold);text-decoration:none}
     <div class="sub zh-only">接龙持续进行，人数不设上限——每一位学员的作品，通过合宪性审读后，都将署名在此陆续发表。</div>
     <div class="sub en-only">Sign-up is ongoing with no cap on numbers — every trainee’s work, once it passes a constitutionality review, will be published here under their name.</div>
   </div>
-  <div class="roster-note zh-only">编号按发稿数量自动排序，每日更新 · 并列时按报名顺序</div>
-  <div class="roster-note en-only">Numbering auto-ranks by published works, updated daily · ties by sign-up order</div>
+  <div class="roster-note zh-only">编号按"发表活跃度分数"自动排序（近期发表权重更高、篇幅更扎实加分、持续多月发表额外加分），每次发表新文章即时更新 · 并列按报名顺序</div>
+  <div class="roster-note en-only">Numbering auto-ranks by a publishing-activity score (recent pieces weighted higher, substantial length adds weight, sustained multi-month publishing adds a bonus) — updates the instant a new piece is published · ties by sign-up order</div>
   <div class="roster" id="roster">
     <div class="stu-loading zh-only">名单加载中…</div>
     <div class="stu-loading en-only">Loading roster…</div>
@@ -116,8 +116,27 @@ footer a{color:var(--gold);text-decoration:none}
 function setLang(l){document.body.className=l;document.querySelectorAll('.lang-btn').forEach(function(b){b.classList.toggle('active',(b.textContent==='中'&&l==='zh')||(b.textContent==='EN'&&l==='en'));});document.documentElement.lang=l==='zh'?'zh-CN':'en';}
 fetch('/students/roster.json').then(function(r){return r.json();}).then(function(data){
   var students = data.students.slice();
+  var now = Date.now();
+  function activityScore(papers){
+    if(!papers || !papers.length) return 0;
+    var total = 0;
+    var months = {};
+    papers.forEach(function(p){
+      var d = new Date(p.date+'T00:00:00Z');
+      var ageDays = Math.max(0,(now-d.getTime())/86400000);
+      var recency = Math.pow(0.5, ageDays/60);           // 60天半衰期：越近的发表，权重越高
+      var depth = Math.sqrt((p.words||8000)/10000);
+      depth = Math.max(0.6, Math.min(1.8, depth));         // 篇幅深度加权，双端封顶
+      total += 10 * recency * depth;
+      months[p.date.slice(0,7)] = true;
+    });
+    var monthCount = Object.keys(months).length;
+    total += Math.min(20, 4*monthCount);                   // 持续多月发表的连续性加分，封顶20
+    return total;
+  }
+  students.forEach(function(s){ s.score = activityScore(s.papers); });
   students.sort(function(a,b){
-    if(b.count!==a.count) return b.count-a.count;
+    if(Math.abs(b.score-a.score)>0.01) return b.score-a.score;
     return a.enrolled_order-b.enrolled_order;
   });
   var host = document.getElementById('roster');
@@ -130,7 +149,7 @@ fetch('/students/roster.json').then(function(r){return r.json();}).then(function
     var nm=document.createElement('div'); nm.className='nm';
     nm.textContent=s.name;
     if(s.small){ var sm=document.createElement('small'); sm.textContent=s.small; nm.appendChild(sm); }
-    if(s.count>0){ var cnt=document.createElement('div'); cnt.className='cnt'; cnt.textContent='已发表 '+s.count+' 篇'; nm.appendChild(cnt); }
+    if(s.count>0){ var cnt=document.createElement('div'); cnt.className='cnt'; cnt.textContent='已发表 '+s.count+' 篇 · 活跃分 '+s.score.toFixed(0); nm.appendChild(cnt); }
     a.appendChild(no); a.appendChild(nm);
     host.appendChild(a);
   });
