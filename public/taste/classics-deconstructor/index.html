@@ -72,6 +72,16 @@ textarea{resize:vertical;min-height:120px;line-height:1.75}
 .cursor-blink{display:inline-block;width:2px;height:14px;background:var(--gold);margin-left:2px;animation:blink .9s step-end infinite;vertical-align:text-bottom}
 @keyframes blink{50%{opacity:0}}
 #errBox{max-width:820px;margin:16px auto 0;background:rgba(248,81,73,0.1);border:1px solid rgba(248,81,73,0.4);border-radius:10px;padding:14px 18px;color:#F5A8A3;font-size:14px;display:none}
+.proc-stage{border:1px solid rgba(255,255,255,0.09);border-radius:10px;margin-bottom:10px;background:rgba(13,17,23,0.45);overflow:hidden}
+.proc-stage summary{cursor:pointer;padding:11px 15px;font-size:13.5px;font-weight:700;color:#D4DCE4;list-style:none;display:flex;align-items:center;gap:9px}
+.proc-stage summary::-webkit-details-marker{display:none}
+.proc-stage summary .n{flex-shrink:0;width:20px;height:20px;border-radius:50%;font-size:11px;display:inline-flex;align-items:center;justify-content:center;font-weight:700}
+.proc-stage.draft summary .n{background:rgba(110,159,212,0.25);color:#8FBDF0}
+.proc-stage.review summary .n{background:rgba(232,163,61,0.25);color:#E8A33D}
+.proc-stage.revise summary .n{background:rgba(212,178,94,0.25);color:#E5C86E}
+.proc-stage summary .sz{margin-left:auto;font-size:11.5px;color:#7A8694;font-weight:400}
+.proc-stage .pbody{padding:2px 16px 16px;font-size:13.5px;line-height:1.85;color:#B9C3CD;white-space:pre-wrap;word-wrap:break-word;max-height:420px;overflow-y:auto}
+.stage-live{font-size:11px;letter-spacing:0.08em;color:#1a1205;background:var(--gold);border-radius:20px;padding:3px 9px;font-weight:700}
 footer{border-top:1px solid var(--border);margin-top:60px;padding:30px 20px;text-align:center;color:var(--muted);font-size:13px}
 footer a{color:var(--gold)}
 </style>
@@ -89,7 +99,7 @@ footer a{color:var(--gold)}
   <div class="hero-glow"></div>
   <div class="hero-eyebrow">SDE 智能体品尝系列 · 其三</div>
   <h1>SDE <span class="grad">经典解构器</span></h1>
-  <p class="hero-sub">贴一段经典——《道德经》的一句、《论语》的一段、圣经的一节经文、佛经的一偈——普通 AI 给出<b style="color:#6E9FD4">传统注疏式解读</b>，被注入完整 SDE 内功的 AI 给出<b style="color:#C9A227">发生学式解构</b>：这段经典记录的，到底是一个被传下来的静态教诲，还是一场"发生"留下的断面？</p>
+  <p class="hero-sub">贴一段经典（最长 500 字）——《道德经》的一句、《论语》的一段、圣经的一节、佛经的一偈。左边普通 AI <b style="color:#6E9FD4">一次成稿</b>；右边被注入完整 SDE 内功的基底，把稿子<b style="color:#C9A227">自己审两次、自己改两次</b>，一路磨到终稿——五步全程可回看。</p>
 </header>
 
 <div class="howto" style="max-width:1000px;margin:8px auto 0;padding:0 20px">
@@ -97,20 +107,20 @@ footer a{color:var(--gold)}
     <div style="font-size:15px;font-weight:700;color:#E5C86E;letter-spacing:0.03em;margin-bottom:14px">这个工具能做什么</div>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px">
       <div style="background:rgba(13,17,23,0.4);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:15px 17px">
-        <div style="font-size:13px;font-weight:700;color:#C9A227;margin-bottom:6px">① 同一段经典，两副眼睛</div>
-        <div style="font-size:12.5px;color:#9AA5B0;line-height:1.75">左边是<b style="color:#D4DCE4">普通AI</b>：字面疏解、历史背景、主流注疏传统——这是我们熟悉的"发现学"读法：把经典当成一个等待被解释清楚的既成真理。</div>
+        <div style="font-size:13px;font-weight:700;color:#C9A227;margin-bottom:6px">① 把经典读成一次发生</div>
+        <div style="font-size:12.5px;color:#9AA5B0;line-height:1.75">不问"这句话是什么意思"，而问：<b style="color:#D4DCE4">这段文字，是哪一场发生过程留下的断面</b>——它的土壤是什么、经过了什么样的推进，才凝成你现在读到的这几句？并指出传统读法在哪一步，把"发生"错读成了"发现"。</div>
       </div>
-      <div style="background:rgba(13,17,23,0.4);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:15px 17px">
-        <div style="font-size:13px;font-weight:700;color:#C9A227;margin-bottom:6px">② SDE发生学：把经典读成一次发生</div>
-        <div style="font-size:12.5px;color:#9AA5B0;line-height:1.75">右边是被注入<b style="color:#C9A227">完整SDE内功</b>的AI：不问"这句话是什么意思"，而问"这段文字，是哪一场发生过程留下的断面"——指认其中显露/差异/纠缠三维各自在哪里显现，再给出一次改写。</div>
+      <div style="background:rgba(13,17,23,0.4);border:1px solid rgba(201,162,39,0.4);border-radius:10px;padding:15px 17px">
+        <div style="font-size:13px;font-weight:700;color:#C9A227;margin-bottom:6px">② 自审两次 · 自改两次</div>
+        <div style="font-size:12.5px;color:#9AA5B0;line-height:1.75">这是本工具的核心：初稿写完不算完。基底<b style="color:#E5C86E">调转刀口审自己</b>——逐条挑出"哪里滑回了传统注疏、哪里是套话、证伪条件是不是废话"，然后据此改一遍；再审一次、再改一次。<b style="color:#D4DCE4">五步全程可回看</b>，改了什么、为什么改，一目了然。</div>
       </div>
       <div style="background:rgba(13,17,23,0.4);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:15px 17px">
         <div style="font-size:13px;font-weight:700;color:#C9A227;margin-bottom:6px">③ 任何经典都可以</div>
-        <div style="font-size:12.5px;color:#9AA5B0;line-height:1.75">道德经、论语、孟子、佛经、圣经、古兰经、莎士比亚、诗经——只要是一段被反复引用、被当成"该怎么理解"的经典文字，都能拿来解构。</div>
+        <div style="font-size:12.5px;color:#9AA5B0;line-height:1.75">道德经、论语、孟子、佛经、圣经、古兰经、莎士比亚、诗经——只要是一段被反复引用、被当成"该怎么理解"的经典文字，都能拿来解构。<b style="color:#D4DCE4">输入最长 500 字</b>：一句到一段最好，太长会稀释解构的锋利。</div>
       </div>
     </div>
     <div style="font-size:12px;color:#8B98A5;line-height:1.7;margin-top:14px">
-      🧬 <b style="color:#B0B8C0">八大主流基底任选</b>：DeepSeek · 智谱GLM · Kimi · 通义千问 · MiniMax · GPT · Claude · Gemini——用你自己的 API Key，全程在浏览器里跑，Key 绝不上传本站服务器。
+      🧬 <b style="color:#B0B8C0">八大主流基底任选</b>：DeepSeek · 智谱GLM · Kimi · 通义千问 · MiniMax · GPT · Claude · Gemini——用你自己的 API Key，全程在浏览器里跑，Key 绝不上传本站服务器。<b style="color:#E8A33D">注意</b>：右栏要跑五步（初稿→审→改→审→改），比左栏慢得多，深度思考档可能要好几分钟，这是它该花的时间。
     </div>
   </div>
 </div>
@@ -134,8 +144,8 @@ footer a{color:var(--gold)}
   </div>
 
   <div class="field">
-    <label>贴一段经典文本（原文，任何语言、任何篇幅——建议一段到一章）</label>
-    <textarea id="classicText" placeholder="例如：&#10;道德经：「道可道，非常道。名可名，非常名。无名天地之始，有名万物之母。」&#10;或论语、孟子、圣经、佛经的一段——原文贴进来即可"></textarea>
+    <label>贴一段经典文本（原文）<span id="charCount" style="float:right;color:#8B98A5">0 / 500 字</span></label>
+    <textarea id="classicText" maxlength="500" placeholder="例如：&#10;「道可道，非常道。名可名，非常名。无名天地之始，有名万物之母。」&#10;或论语、孟子、圣经、佛经的一段——原文贴进来即可（最长 500 字）"></textarea>
     <div class="examples" id="examples"></div>
   </div>
   <div class="field">
@@ -144,7 +154,7 @@ footer a{color:var(--gold)}
   </div>
 
   <div class="go-row">
-    <button class="btn-go" id="goBtn">✦ 两副眼睛，同场解构</button>
+    <button class="btn-go" id="goBtn">✦ 解构这段经典（自审2次·自改2次）</button>
     <select class="model-select" id="modelSel" title="模型">
       <optgroup label="DeepSeek">
         <option value="ds:pro">DeepSeek V4 Pro · 最强推理(Think Max)</option>
@@ -188,18 +198,26 @@ footer a{color:var(--gold)}
   <div class="col plain" id="colPlain">
     <div class="col-head">
       <div class="col-title"><span class="dot"></span>普通 AI · 传统注疏</div>
-      <div class="col-tag">发现学</div>
+      <div class="col-tag">一次成稿 · 对照</div>
     </div>
-    <div class="col-body" id="plainBody"><span class="placeholder">贴一段经典文本，点击"两副眼睛，同场解构"……</span></div>
+    <div class="col-body" id="plainBody"><span class="placeholder">贴一段经典文本，点击下方按钮开始……</span></div>
     <div class="col-meta"><span id="plainStatus">待命</span><span id="plainMeta"></span></div>
   </div>
   <div class="col sde" id="colSde">
     <div class="col-head">
-      <div class="col-title"><span class="dot"></span>SDE 提智 AI · 发生学解构</div>
-      <div class="col-tag">发生学</div>
+      <div class="col-title"><span class="dot"></span>SDE 发生学解构 · 终稿</div>
+      <div class="col-tag" id="stageBadge">自审2次 · 自改2次</div>
     </div>
-    <div class="col-body" id="sdeBody"><span class="placeholder">贴一段经典文本，点击"两副眼睛，同场解构"……</span></div>
+    <div class="col-body" id="sdeBody"><span class="placeholder">贴一段经典文本，点击下方按钮开始……</span></div>
     <div class="col-meta"><span id="sdeStatus">待命</span><span id="sdeMeta"></span></div>
+  </div>
+</div>
+
+<div id="procPanel" style="max-width:1200px;margin:26px auto 0;padding:0 20px;display:none">
+  <div style="background:linear-gradient(135deg,rgba(201,162,39,0.06),rgba(20,16,8,0.3));border:1px solid rgba(201,162,39,0.28);border-radius:14px;padding:20px 22px">
+    <div style="font-size:14px;font-weight:700;color:#E5C86E;margin-bottom:6px">🔬 五步过程回放 · 基底如何自己把稿子磨出来</div>
+    <div style="font-size:12.5px;color:#8B98A5;line-height:1.7;margin-bottom:14px">下面是右栏终稿的完整来路。审稿是基底调转刀口审自己写的东西——它挑出的问题、以及它据此改了什么，都在这里，可以逐段核对。</div>
+    <div id="procStages"></div>
   </div>
 </div>
 
@@ -357,11 +375,11 @@ function plainPrompt(){
 ④ 给出你自己认为最贴切的理解，并说明理由。
 直接开始解读，不要复述用户贴的原文全文（可以引用其中的关键短句）。篇幅约1200-1500字。全程保持学者应有的审慎——不确定的地方要说不确定，不要为了显得深刻而过度引申。`;
 }
-function sdePrompt(neigong){
+function sdeDraftPrompt(neigong){
   return neigong + `
 
 ---
-【本次任务：用SDE发生学解构一段经典】
+【本次任务：用发生学解构一段经典 · 写初稿】
 用户会给你一段经典文本（可能是《道德经》《论语》《圣经》《金刚经》或其他经典的片段，可能附出处）。你的任务，不是像传统注疏那样问"这句话是什么意思"，而是用发生学的方式去追问：这段文字，究竟记录的是一个被传下来的静态教诲，还是一场"发生"留下的断面？
 
 请完成以下工作，直接开始解构，不要复述原文全文（可引用关键短句），不要出现"SDE"这个缩写或任何学派黑话（显露/差异/纠缠这几个字本身可以用，但不要说"SDE三维""SDE本体论"这类招牌词），用这段经典自身的语域说话：
@@ -371,7 +389,43 @@ function sdePrompt(neigong){
 ③ 给出你的改写：把这段经典，用发生学的方式重新讲一遍——不是翻译，是换一副眼睛之后，这段话真正在说什么。
 ④ 用一句朴素的话，给出这次解构的证伪条件——什么样的反例或情况，会让你这次的解构站不住。
 
-篇幅约1200-1500字。`;
+篇幅约 1200-1500 字。`;
+}
+
+function sdeReviewPrompt(neigong, round){
+  return neigong + `
+
+---
+【本次任务：审稿（第${round}轮）· 你审的是你自己刚写的稿】
+用户会给你：一段经典原文 + 一份针对它的发生学解构稿。这份稿子是你自己写的——现在请调转刀口，用最挑剔的眼光审它。
+
+审稿不是夸奖，不是复述，更不是打分。请逐条挑出**具体的、可指认的**问题，每条都要引用稿子里的原话作为证据，并给出**可操作的改法**（改成什么、为什么这样改更对）。重点审这六处：
+
+1. **有没有滑回传统注疏**：它是不是换了几个词，骨子里还在做"这句话是什么意思"的疏解？哪一段最像是伪装成发生学的注疏？
+2. **三维指认是否落到实处**：对显露/差异/纠缠的指认，有没有落到这段经典的**具体文字**上，还是套话——换一段经典也照样能说得通？（后者就是空转，必须点名。）
+3. **"错读成发现"那一刀是否真的落下**：有没有真的具体指出传统读法在哪一步误读了，还是含糊带过、只是宣称"传统读法遮蔽了发生"？
+4. **改写是不是真的换了眼睛**：③的改写，是不是只是把原文翻译成白话，或者把①的分析重说一遍？它有没有交出一个原文表面读不出来的新判断？
+5. **证伪条件是否真的可证伪**：那句证伪条件，是不是"如果这套看法不对那它就不对"式的废话？有没有指向一个具体的、可以设想的反例？
+6. **有没有硬套或编造**：有没有为了套上发生学而曲解原文、或者塞进经典里根本没有的意思？有没有杜撰经典原文、出处或历史事实？
+
+输出格式：直接列出问题清单（每条：问题 → 证据原话 → 具体改法），最后用一句话说出**这份稿子最致命的那一处**。不要写开场白，不要总体夸奖。如果某一处确实做得好、不必改，可以明说"这处保住，不要动"——但不要为了平衡而硬夸。篇幅约 700-1000 字。`;
+}
+
+function sdeRevisePrompt(neigong, round){
+  return neigong + `
+
+---
+【本次任务：据审稿意见改稿（第${round}轮）】
+用户会给你：一段经典原文 + 一份发生学解构稿 + 一份针对这份稿的审稿意见。请据审稿意见，把稿子改一遍。
+
+改稿纪律：
+· **逐条落实**审稿意见里点名的问题——尤其是被指为"最致命"的那一处，必须真的动刀，不能装作改了。
+· 审稿说"这处保住"的地方，**不要动**。
+· **不为改而改**：没被点名、本来就成立的判断和结构，保留原样。改稿是把病灶切掉，不是重写一遍。
+· **绝不编造**：不要为了让论证更顺，杜撰经典原文里没有的字句、不存在的出处、或查不到的历史事实。
+· 输出**完整的改稿全文**（不是修改说明、不是差异对照），保持原稿的四段结构（①三维指认 ②传统读法在哪一步错读 ③发生学改写 ④证伪条件），篇幅仍约 1200-1500 字。
+
+直接输出改稿正文，不要写"根据审稿意见我做了如下修改"这类前言。`;
 }
 
 // ============ 核心：streamChat（国产直连）============
@@ -518,7 +572,44 @@ async function callOverseas(apiKey, model, systemPrompt, userQ, bodyEl, statusEl
   return { text:acc, chars, thinkChars, finish:fin, secs:parseFloat(secs) };
 }
 
-// ============ 主流程 ============
+// ============ 五步过程面板 ============
+const STAGE_META = [
+  {key:'draft',  cls:'draft',  n:'1', title:'初稿 · 发生学解构'},
+  {key:'rev1',   cls:'review', n:'2', title:'审稿一 · 基底调转刀口审自己'},
+  {key:'fix1',   cls:'revise', n:'3', title:'改稿一 · 据审稿意见落实'},
+  {key:'rev2',   cls:'review', n:'4', title:'审稿二 · 再审一遍改后的稿'},
+  {key:'fix2',   cls:'revise', n:'5', title:'终稿 · 第二次改定'},
+];
+function resetProc(){
+  $('procStages').innerHTML=''; $('procPanel').style.display='none';
+}
+function addStage(key, text){
+  const m = STAGE_META.find(x=>x.key===key); if(!m) return;
+  const d=document.createElement('details');
+  d.className='proc-stage '+m.cls;
+  if(key==='fix2') d.open = false;
+  const sum=document.createElement('summary');
+  const nb=document.createElement('span'); nb.className='n'; nb.textContent=m.n;
+  const tt=document.createElement('span'); tt.textContent=m.title;
+  const sz=document.createElement('span'); sz.className='sz'; sz.textContent=text.length+' 字';
+  sum.appendChild(nb); sum.appendChild(tt); sum.appendChild(sz);
+  const body=document.createElement('div'); body.className='pbody'; body.textContent=text;
+  d.appendChild(sum); d.appendChild(body);
+  $('procStages').appendChild(d);
+  $('procPanel').style.display='block';
+}
+function setStageBadge(t){ const b=$('stageBadge'); if(b) b.textContent=t; }
+
+// 字数计数
+function updateCharCount(){
+  const n = classicTextEl.value.length;
+  const el = $('charCount');
+  if(el){ el.textContent = n+' / 500 字'; el.style.color = n>500 ? '#F85149' : (n>450 ? '#E8A33D' : '#8B98A5'); }
+}
+classicTextEl.addEventListener('input', updateCharCount);
+updateCharCount();
+
+// ============ 主流程：左栏一次成稿；右栏 初稿→审→改→审→改 ============
 async function run(){
   hideErr();
   const key=apiKeyEl.value.trim().replace(/^["']|["']$/g,'');
@@ -527,22 +618,71 @@ async function run(){
   const model=modelSel.value;
   if(!key){ showErr('请先填入你的 '+vendorName()+' API Key'); apiKeyEl.focus(); return; }
   if(!text){ showErr('请贴一段经典文本'); classicTextEl.focus(); return; }
+  if(text.length > 500){ showErr('经典文本最长 500 字，当前 '+text.length+' 字——请截取其中最要紧的一段。'); classicTextEl.focus(); return; }
 
   try{ await ensureNeigong(); }catch(e){ showErr(e.message); return; }
 
-  goBtn.disabled=true; goBtn.textContent='⏳ 两副眼睛正在解构中……';
+  goBtn.disabled=true; goBtn.textContent='⏳ 右栏正在跑五步（初稿→审→改→审→改）……';
+  resetProc();
   [plainCell, sdeCell].forEach(c=>{ c.body.innerHTML='<span class="placeholder">已排队，即将开始……</span>'; c.status.innerHTML='<span class="spinner"></span> 排队中'; c.meta.textContent=''; });
 
   const userQ = src ? ('【出处】'+src+'\n【原文】\n'+text) : ('【原文】\n'+text);
+  const N = SDE_BASE;
 
-  const tasks = [
-    streamChat(key, model, plainPrompt(), userQ, plainCell.body, plainCell.status, plainCell.meta, plainCell.col, 4000)
-      .catch(e=>{ showErr('普通AI：'+e.message); plainCell.body.innerHTML='<span class="placeholder">生成失败：'+escTxt(e.message)+'</span>'; plainCell.status.textContent='失败'; return {text:'',chars:0,thinkChars:0,secs:0}; }),
-    streamChat(key, model, sdePrompt(SDE_BASE), userQ, sdeCell.body, sdeCell.status, sdeCell.meta, sdeCell.col, 4000)
-      .catch(e=>{ showErr('SDE解构：'+e.message); sdeCell.body.innerHTML='<span class="placeholder">生成失败：'+escTxt(e.message)+'</span>'; sdeCell.status.textContent='失败'; return {text:'',chars:0,thinkChars:0,secs:0}; })
-  ];
-  await Promise.all(tasks);
-  goBtn.disabled=false; goBtn.textContent='✦ 两副眼睛，同场解构';
+  // 左栏：普通AI 一次成稿（与右栏并行，不等它）
+  const plainTask = streamChat(key, model, plainPrompt(), userQ, plainCell.body, plainCell.status, plainCell.meta, plainCell.col, 4000)
+    .catch(e=>{ showErr('普通AI：'+e.message); plainCell.body.innerHTML='<span class="placeholder">生成失败：'+escTxt(e.message)+'</span>'; plainCell.status.textContent='失败'; return {text:'',chars:0}; });
+
+  // 右栏：五步串行——每一步都要拿上一步的产物当输入，只能一步步来
+  const sdeTask = (async ()=>{
+    // 第1步：初稿
+    setStageBadge('① 初稿生成中');
+    const draft = await streamChat(key, model, sdeDraftPrompt(N), userQ, sdeCell.body, sdeCell.status, sdeCell.meta, sdeCell.col, 4000);
+    if(!draft.text) throw new Error('初稿为空，后续四步无法进行');
+    addStage('draft', draft.text);
+
+    // 第2步：审稿一
+    setStageBadge('② 审稿一（自审）');
+    const rev1Q = userQ + '\n\n【待审的解构稿】\n' + draft.text;
+    const rev1 = await streamChat(key, model, sdeReviewPrompt(N, 1), rev1Q, sdeCell.body, sdeCell.status, sdeCell.meta, sdeCell.col, 2600);
+    if(rev1.text) addStage('rev1', rev1.text);
+
+    // 第3步：改稿一
+    setStageBadge('③ 改稿一');
+    let cur = draft.text;
+    if(rev1.text){
+      const fix1Q = userQ + '\n\n【原解构稿】\n' + draft.text + '\n\n【审稿意见】\n' + rev1.text;
+      const fix1 = await streamChat(key, model, sdeRevisePrompt(N, 1), fix1Q, sdeCell.body, sdeCell.status, sdeCell.meta, sdeCell.col, 4000);
+      if(fix1.text){ cur = fix1.text; addStage('fix1', fix1.text); }
+    }
+
+    // 第4步：审稿二
+    setStageBadge('④ 审稿二（再自审）');
+    const rev2Q = userQ + '\n\n【待审的解构稿】\n' + cur;
+    const rev2 = await streamChat(key, model, sdeReviewPrompt(N, 2), rev2Q, sdeCell.body, sdeCell.status, sdeCell.meta, sdeCell.col, 2600);
+    if(rev2.text) addStage('rev2', rev2.text);
+
+    // 第5步：终稿
+    setStageBadge('⑤ 终稿改定中');
+    if(rev2.text){
+      const fix2Q = userQ + '\n\n【原解构稿】\n' + cur + '\n\n【审稿意见】\n' + rev2.text;
+      const fix2 = await streamChat(key, model, sdeRevisePrompt(N, 2), fix2Q, sdeCell.body, sdeCell.status, sdeCell.meta, sdeCell.col, 4000);
+      if(fix2.text){ cur = fix2.text; addStage('fix2', fix2.text); }
+    }
+    // 右栏最终留在终稿上
+    sdeCell.body.textContent = cur;
+    setStageBadge('✓ 自审2次 · 自改2次');
+    sdeCell.status.textContent = '✓ 五步完成';
+    return { text: cur };
+  })().catch(e=>{
+    showErr('SDE解构：'+e.message);
+    setStageBadge('✗ 中断');
+    sdeCell.status.textContent='失败';
+    return {text:''};
+  });
+
+  await Promise.all([plainTask, sdeTask]);
+  goBtn.disabled=false; goBtn.textContent='✦ 解构这段经典（自审2次·自改2次）';
 }
 goBtn.addEventListener('click', run);
 </script>
