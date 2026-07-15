@@ -514,13 +514,40 @@ function refreshReviewKeyUI(n){
     keyInput.placeholder = vendorName(val) + ' API Key…';
   }
 }
-refreshKeyUI();
 apiKeyEl.addEventListener('input', ()=>localStorage.setItem(keyStoreName(), apiKeyEl.value.trim()));
-modelSel.addEventListener('change', refreshKeyUI);
-reviewModelSel1.addEventListener('change', ()=>refreshReviewKeyUI(1));
-reviewModelSel2.addEventListener('change', ()=>refreshReviewKeyUI(2));
+
+// ============ 记住三个下拉框的选择，不只是Key字符串本身 ============
+// 之前只把每家的Key存了localStorage，但"选了哪个基底写作／哪个基底审第一轮／哪个基底审第二轮"这个选择本身没存——
+// 刷新页面后三个下拉框弹回默认值，审稿基底一旦弹回"跟随写作基底"，那个专属Key输入框就跟着隐藏，
+// 看起来就像"填的Key不见了"（其实Key还在，只是选择丢了、行被藏起来了）。这里把三个选择也存住、开局自动还原。
+const SEL_LS_KEY = 'sde_cd_selectors_v1';
+function saveSelectors(){
+  try{
+    localStorage.setItem(SEL_LS_KEY, JSON.stringify({
+      model: modelSel.value,
+      review1: reviewModelSel1.value,
+      review2: reviewModelSel2.value,
+    }));
+  }catch(e){}
+}
+function restoreSelectors(){
+  let saved = null;
+  try{ saved = JSON.parse(localStorage.getItem(SEL_LS_KEY) || 'null'); }catch(e){}
+  if(!saved) return;
+  // 逐项校验：存的值必须仍是下拉框里真实存在的选项，否则跳过（防止基底下架后选中一个不存在的值）
+  const validOption = (sel, val) => Array.from(sel.options).some(o=>o.value===val);
+  if(saved.model && validOption(modelSel, saved.model)) modelSel.value = saved.model;
+  if(typeof saved.review1==='string' && validOption(reviewModelSel1, saved.review1)) reviewModelSel1.value = saved.review1;
+  if(typeof saved.review2==='string' && validOption(reviewModelSel2, saved.review2)) reviewModelSel2.value = saved.review2;
+}
+restoreSelectors();
+modelSel.addEventListener('change', ()=>{ refreshKeyUI(); saveSelectors(); });
+reviewModelSel1.addEventListener('change', ()=>{ refreshReviewKeyUI(1); saveSelectors(); });
+reviewModelSel2.addEventListener('change', ()=>{ refreshReviewKeyUI(2); saveSelectors(); });
 reviewKeyEl1.addEventListener('input', ()=>{ if(reviewModelSel1.value) localStorage.setItem(keyStoreName(reviewModelSel1.value), reviewKeyEl1.value.trim()); });
 reviewKeyEl2.addEventListener('input', ()=>{ if(reviewModelSel2.value) localStorage.setItem(keyStoreName(reviewModelSel2.value), reviewKeyEl2.value.trim()); });
+// 还原选择之后，才第一次刷新Key相关UI——确保读到的是还原后的选择，而不是浏览器默认的第一个选项
+refreshKeyUI();
 refreshReviewKeyUI(1); refreshReviewKeyUI(2);
 $('keyToggle').addEventListener('click', ()=>{
   apiKeyEl.type = apiKeyEl.type==='password' ? 'text' : 'password';
