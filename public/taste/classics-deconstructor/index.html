@@ -63,6 +63,9 @@ textarea{resize:vertical;min-height:120px;line-height:1.75}
 .col.plain .col-title .dot{width:8px;height:8px;border-radius:50%;background:var(--plain);flex-shrink:0}
 .col.sde .col-title .dot{width:8px;height:8px;border-radius:50%;background:rgba(212,178,94,0.5);flex-shrink:0}
 .col-tag{font-size:10.5px;letter-spacing:0.06em;color:var(--muted);padding:2px 8px;border:1px solid var(--border);border-radius:20px;white-space:nowrap;flex-shrink:0}
+.stage-tag{font-size:10.5px;letter-spacing:0.04em;color:#1a1205;background:var(--gold);border-radius:20px;padding:2px 9px;white-space:nowrap;flex-shrink:0;font-weight:700;display:none}
+.stage-tag.show{display:inline-block}
+.stage-tag.done{background:transparent;color:var(--ok);border:1px solid rgba(63,185,80,0.4)}
 .col-body{padding:16px;font-size:13.5px;line-height:1.85;flex:1;white-space:pre-wrap;word-wrap:break-word;overflow-wrap:break-word;min-height:240px;max-height:560px;overflow-y:auto;color:var(--text)}
 .col-body .placeholder{color:var(--muted);font-style:italic}
 .col.sde .col-body{background:rgba(212,178,94,0.04)}
@@ -267,6 +270,7 @@ footer a{color:var(--gold)}
   <div class="col plain" id="colPlain">
     <div class="col-head">
       <div class="col-title"><span class="dot"></span>传统经学</div>
+      <span class="stage-tag" id="plainStageTag"></span>
       <div class="col-tag">对照组·自审自改</div>
     </div>
     <div class="col-body" id="plainBody"><span class="placeholder">训诂 · 思想脉络 · 注疏史 —— 一篇传统路数的论文</span></div>
@@ -275,6 +279,7 @@ footer a{color:var(--gold)}
   <div class="col sde" id="colSde1">
     <div class="col-head">
       <div class="col-title"><span class="dot"></span>SDE 1</div>
+      <span class="stage-tag" id="sde1StageTag"></span>
       <div class="col-tag">工具：三大方程</div>
     </div>
     <div class="col-body" id="sde1Body"><span class="placeholder">用 S=F(D,E) / D=G(S,E) / E=H(S,D) 解构这段经典 · 自审自改两轮后的终稿</span></div>
@@ -283,6 +288,7 @@ footer a{color:var(--gold)}
   <div class="col sde" id="colSde2">
     <div class="col-head">
       <div class="col-title"><span class="dot"></span>SDE 2</div>
+      <span class="stage-tag" id="sde2StageTag"></span>
       <div class="col-tag">工具：六路径</div>
     </div>
     <div class="col-body" id="sde2Body"><span class="placeholder">先读这段经典的任务DNA、按六路径之一展开解构 · 自审自改两轮后的终稿</span></div>
@@ -291,6 +297,7 @@ footer a{color:var(--gold)}
   <div class="col sde" id="colSde3">
     <div class="col-head">
       <div class="col-title"><span class="dot"></span>SDE 3</div>
+      <span class="stage-tag" id="sde3StageTag"></span>
       <div class="col-tag">工具：123原理</div>
     </div>
     <div class="col-body" id="sde3Body"><span class="placeholder">用 D-E矛盾→S改变→回写 解构这段经典 · 自审自改两轮后的终稿</span></div>
@@ -474,10 +481,26 @@ const apiKeyEl=$('apiKey'), classicTextEl=$('classicText'), sourceInfoEl=$('sour
 const reviewModelSel1=$('reviewModelSel1'), reviewModelSel2=$('reviewModelSel2');
 const reviewKeyRow1=$('reviewKeyRow1'), reviewKeyRow2=$('reviewKeyRow2');
 const reviewKeyEl1=$('reviewKey1'), reviewKeyEl2=$('reviewKey2');
-const plainCell={body:$('plainBody'),status:$('plainStatus'),meta:$('plainMeta'),col:$('colPlain')};
-const sde1Cell={body:$('sde1Body'),status:$('sde1Status'),meta:$('sde1Meta'),col:$('colSde1')};
-const sde2Cell={body:$('sde2Body'),status:$('sde2Status'),meta:$('sde2Meta'),col:$('colSde2')};
-const sde3Cell={body:$('sde3Body'),status:$('sde3Status'),meta:$('sde3Meta'),col:$('colSde3')};
+const plainCell={body:$('plainBody'),status:$('plainStatus'),meta:$('plainMeta'),col:$('colPlain'),stageTag:$('plainStageTag')};
+const sde1Cell={body:$('sde1Body'),status:$('sde1Status'),meta:$('sde1Meta'),col:$('colSde1'),stageTag:$('sde1StageTag')};
+const sde2Cell={body:$('sde2Body'),status:$('sde2Status'),meta:$('sde2Meta'),col:$('colSde2'),stageTag:$('sde2StageTag')};
+const sde3Cell={body:$('sde3Body'),status:$('sde3Status'),meta:$('sde3Meta'),col:$('colSde3'),stageTag:$('sde3StageTag')};
+// 五步阶段名，供 setStage() 统一使用：让用户随时知道"现在跑到哪一步"，而不只是"深度思考中"这种笼统状态
+const STAGE_LABELS = { draft:'①初稿', review1:'②审稿一中', revise1:'③改稿一', review2:'④审稿二中', revise2:'⑤改稿二·终稿' };
+function setStage(cell, key){
+  const tag = cell.stageTag; if(!tag) return;
+  tag.classList.remove('done');
+  tag.textContent = '目前：' + STAGE_LABELS[key];
+  tag.classList.add('show');
+}
+function setStageDone(cell){
+  const tag = cell.stageTag; if(!tag) return;
+  tag.textContent = '✓ 全部完成'; tag.classList.add('show'); tag.classList.add('done');
+}
+function setStageFailed(cell, atKey){
+  const tag = cell.stageTag; if(!tag) return;
+  tag.textContent = '✗ 中断于：' + (STAGE_LABELS[atKey] || '未知阶段'); tag.classList.add('show'); tag.classList.remove('done');
+}
 // 审稿块：复用 streamChat 的签名（body/status/meta/col），meta 与 col 用轻量占位即可
 const noopEl = {textContent:'', innerHTML:'', classList:{add(){},remove(){},toggle(){}}, style:{}, appendChild(){}, scrollTop:0, scrollHeight:0};
 function makeRevCell(n){ return {body:$('rev'+n+'Body'), status:$('rev'+n+'Status'), meta:noopEl, col:noopEl, input:$('rev'+n+'Input')}; }
@@ -1079,7 +1102,10 @@ async function run(){
   $('revBaseLine').textContent = '写作基底：' + vendorName(model)
     + ' · 审稿一基底：' + vendorName(reviewModel1) + (reviewModelSel1.value ? '' : '（同写作基底）')
     + ' · 审稿二基底：' + vendorName(reviewModel2) + (reviewModelSel2.value ? '' : '（同写作基底）');
-  [plainCell, sde1Cell, sde2Cell, sde3Cell].forEach(c=>{ c.body.innerHTML='<span class="placeholder">已排队，即将开始……</span>'; c.status.innerHTML='<span class="spinner"></span> 排队中'; c.meta.textContent=''; });
+  [plainCell, sde1Cell, sde2Cell, sde3Cell].forEach(c=>{
+    c.body.innerHTML='<span class="placeholder">已排队，即将开始……</span>'; c.status.innerHTML='<span class="spinner"></span> 排队中'; c.meta.textContent='';
+    if(c.stageTag){ c.stageTag.textContent=''; c.stageTag.classList.remove('show','done'); }
+  });
   Object.values(revCells).forEach(c=>{
     c.body.innerHTML='<span class="placeholder">等待对应论文初稿完成……</span>'; c.status.textContent='排队中';
     c.input.innerHTML='<span class="placeholder">尚未发起调用</span>';
@@ -1101,7 +1127,9 @@ async function run(){
 
   // 传统经学：现在也走完整的两轮自审自改，规格与 SDE 三链一致，只是审稿人设定不同（没有"工具"这个变量）
   function runPlainChain(paperCell, revA, revB, label, snap){
+    let curStage = 'draft';
     return (async ()=>{
+      setStage(paperCell, 'draft');
       let draft;
       try{
         draft = await streamChat(key, model, plainPrompt(), userQ, paperCell.body, paperCell.status, paperCell.meta, paperCell.col, PAPER_TOKENS);
@@ -1110,12 +1138,14 @@ async function run(){
       snap.draft.status = draft.text ? 'done' : 'failed';
       if(!draft.text){ snap.draft.note='API返回了空文本'; snap.revise1.status='skipped'; snap.revise1.note='初稿为空，未进行'; snap.final.status='skipped'; snap.final.note='初稿为空，未进行'; throw new Error(label+' 初稿为空，自审自改无法进行'); }
 
+      curStage = 'review1'; setStage(paperCell, 'review1');
       const rAInput = userQ + '\n\n【待审的论文】\n' + draft.text;
       const rASys = plainReviewPrompt(1);
       fillRevInput(revA, reviewModel1, rASys, rAInput);
       const rA = await streamChat(reviewKey1, reviewModel1, rASys, rAInput,
         revA.body, revA.status, revA.meta, revA.col, REVIEW_TOKENS);
 
+      curStage = 'revise1'; setStage(paperCell, 'revise1');
       let cur = draft.text;
       if(rA.text){
         const fixA = await streamChat(key, model, plainRevisePrompt(1),
@@ -1127,12 +1157,14 @@ async function run(){
       snap.revise1.status = (cur !== draft.text) ? 'done' : 'failed';
       if(cur === draft.text) snap.revise1.note = '审稿一或改稿一未产出有效文本，沿用初稿';
 
+      curStage = 'review2'; setStage(paperCell, 'review2');
       const rBInput = userQ + '\n\n【待审的论文】\n' + cur;
       const rBSys = plainReviewPrompt(2);
       fillRevInput(revB, reviewModel2, rBSys, rBInput);
       const rB = await streamChat(reviewKey2, reviewModel2, rBSys, rBInput,
         revB.body, revB.status, revB.meta, revB.col, REVIEW_TOKENS);
 
+      curStage = 'revise2'; setStage(paperCell, 'revise2');
       let fin = cur;
       if(rB.text){
         const fixB = await streamChat(key, model, plainRevisePrompt(2),
@@ -1144,11 +1176,13 @@ async function run(){
       snap.final.status = (fin !== cur) ? 'done' : 'failed';
       if(fin === cur) snap.final.note = '审稿二或改稿二未产出有效文本，沿用改稿一';
       paperCell.body.textContent = fin;
+      setStageDone(paperCell);
       return { text: fin };
     })().catch(e=>{
       showErr(label+'：'+e.message);
       paperCell.status.textContent='失败';
       paperCell.body.innerHTML='<span class="placeholder">生成中断：'+escTxt(e.message)+'</span>';
+      setStageFailed(paperCell, curStage);
       return {text:''};
     });
   }
@@ -1158,7 +1192,9 @@ async function run(){
   // tool: 'eq'(三大方程) / 'paths'(六路径) / 'principle'(123原理)；paperCell 是该篇论文最终显示的那一栏
   // 两次审稿分别用 reviewModel1/reviewModel2（默认跟随写作基底，也可各自单独指定）；改稿仍由写作基底(key/model)完成
   function runSdeChain(tool, paperCell, revA, revB, label, snap){
+    let curStage = 'draft';
     return (async ()=>{
+      setStage(paperCell, 'draft');
       let draft;
       try{
         draft = await streamChat(key, model, sdeDraftPrompt(N, tool), userQ, paperCell.body, paperCell.status, paperCell.meta, paperCell.col, PAPER_TOKENS);
@@ -1167,12 +1203,14 @@ async function run(){
       snap.draft.status = draft.text ? 'done' : 'failed';
       if(!draft.text){ snap.draft.note='API返回了空文本'; snap.revise1.status='skipped'; snap.revise1.note='初稿为空，未进行'; snap.final.status='skipped'; snap.final.note='初稿为空，未进行'; throw new Error(label+' 初稿为空，自审自改无法进行'); }
 
+      curStage = 'review1'; setStage(paperCell, 'review1');
       const rAInput = userQ + '\n\n【待审的解构稿】\n' + draft.text;
       const rASys = sdeReviewPrompt(N, 1, tool);
       fillRevInput(revA, reviewModel1, rASys, rAInput);
       const rA = await streamChat(reviewKey1, reviewModel1, rASys, rAInput,
         revA.body, revA.status, revA.meta, revA.col, REVIEW_TOKENS);
 
+      curStage = 'revise1'; setStage(paperCell, 'revise1');
       let cur = draft.text;
       if(rA.text){
         const fixA = await streamChat(key, model, sdeRevisePrompt(N, 1, tool),
@@ -1184,12 +1222,14 @@ async function run(){
       snap.revise1.status = (cur !== draft.text) ? 'done' : 'failed';
       if(cur === draft.text) snap.revise1.note = '审稿一或改稿一未产出有效文本，沿用初稿';
 
+      curStage = 'review2'; setStage(paperCell, 'review2');
       const rBInput = userQ + '\n\n【待审的解构稿】\n' + cur;
       const rBSys = sdeReviewPrompt(N, 2, tool);
       fillRevInput(revB, reviewModel2, rBSys, rBInput);
       const rB = await streamChat(reviewKey2, reviewModel2, rBSys, rBInput,
         revB.body, revB.status, revB.meta, revB.col, REVIEW_TOKENS);
 
+      curStage = 'revise2'; setStage(paperCell, 'revise2');
       let fin = cur;
       if(rB.text){
         const fixB = await streamChat(key, model, sdeRevisePrompt(N, 2, tool),
@@ -1201,11 +1241,13 @@ async function run(){
       snap.final.status = (fin !== cur) ? 'done' : 'failed';
       if(fin === cur) snap.final.note = '审稿二或改稿二未产出有效文本，沿用改稿一';
       paperCell.body.textContent = fin;
+      setStageDone(paperCell);
       return { text: fin };
     })().catch(e=>{
       showErr(label+'：'+e.message);
       paperCell.status.textContent='失败';
       paperCell.body.innerHTML='<span class="placeholder">生成中断：'+escTxt(e.message)+'</span>';
+      setStageFailed(paperCell, curStage);
       return {text:''};
     });
   }
