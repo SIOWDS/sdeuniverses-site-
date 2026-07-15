@@ -189,6 +189,47 @@ footer a{color:var(--gold)}
     <input type="text" id="sourceInfo" placeholder="例如：《道德经》第一章 / 《论语·学而》 / 《马太福音》5:3-5">
   </div>
 
+  <div class="field" id="reviewBaseField">
+    <label>审稿基底设定 <span class="opt" style="color:#8B98A5;font-weight:400">（选填——默认两次审稿都用下面"写作基底"自己审自己；也可以单独指定，比如让另一家基底来审，不只是自己审自己）</span></label>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:8px">
+      <div>
+        <div style="font-size:12px;color:#8B98A5;margin-bottom:6px">审稿一基底</div>
+        <select class="model-select" id="reviewModelSel1" style="width:100%">
+          <option value="">跟随写作基底（自己审自己）</option>
+          <option value="ds:pro">DeepSeek V4 Pro</option>
+          <option value="glm:pro">智谱 GLM-5</option>
+          <option value="kimi:pro">月之暗面 Kimi K2.6</option>
+          <option value="qwen:pro">通义千问 Qwen3.7-Max</option>
+          <option value="minimax:pro">MiniMax M3</option>
+          <option value="gpt:pro">🌐 GPT-5.5</option>
+          <option value="claude:pro">🌐 Claude Opus 4.8</option>
+          <option value="gemini:pro">🌐 Gemini 3.1 Pro</option>
+        </select>
+        <div class="key-row" id="reviewKeyRow1" style="display:none;margin-top:8px">
+          <input type="password" id="reviewKey1" placeholder="sk-..." autocomplete="off" spellcheck="false">
+        </div>
+      </div>
+      <div>
+        <div style="font-size:12px;color:#8B98A5;margin-bottom:6px">审稿二基底</div>
+        <select class="model-select" id="reviewModelSel2" style="width:100%">
+          <option value="">跟随写作基底（自己审自己）</option>
+          <option value="ds:pro">DeepSeek V4 Pro</option>
+          <option value="glm:pro">智谱 GLM-5</option>
+          <option value="kimi:pro">月之暗面 Kimi K2.6</option>
+          <option value="qwen:pro">通义千问 Qwen3.7-Max</option>
+          <option value="minimax:pro">MiniMax M3</option>
+          <option value="gpt:pro">🌐 GPT-5.5</option>
+          <option value="claude:pro">🌐 Claude Opus 4.8</option>
+          <option value="gemini:pro">🌐 Gemini 3.1 Pro</option>
+        </select>
+        <div class="key-row" id="reviewKeyRow2" style="display:none;margin-top:8px">
+          <input type="password" id="reviewKey2" placeholder="sk-..." autocomplete="off" spellcheck="false">
+        </div>
+      </div>
+    </div>
+    <div class="key-hint" style="margin-top:10px">两次审稿分别应用于全部四篇论文（传统经学 + SDE1/2/3）——不是每篇单独设，是统一的"谁来审第一轮、谁来审第二轮"。<b>改稿仍由写作基底自己完成</b>（审稿人挑毛病，作者自己动笔改，符合真实的审稿流程）。选了不同厂商，会在上方多出一个该厂商的 Key 输入框，Key 同样只存本地。</div>
+  </div>
+
   <div class="go-row">
     <button class="btn-go" id="goBtn">✦ 生成四篇论文（传统 · SDE1 · SDE2 · SDE3）</button>
     <select class="model-select" id="modelSel" title="模型">
@@ -420,6 +461,9 @@ function buildPayload(sel, systemPrompt, userQ, maxTokens){
 
 const $ = id => document.getElementById(id);
 const apiKeyEl=$('apiKey'), classicTextEl=$('classicText'), sourceInfoEl=$('sourceInfo'), goBtn=$('goBtn'), modelSel=$('modelSel');
+const reviewModelSel1=$('reviewModelSel1'), reviewModelSel2=$('reviewModelSel2');
+const reviewKeyRow1=$('reviewKeyRow1'), reviewKeyRow2=$('reviewKeyRow2');
+const reviewKeyEl1=$('reviewKey1'), reviewKeyEl2=$('reviewKey2');
 const plainCell={body:$('plainBody'),status:$('plainStatus'),meta:$('plainMeta'),col:$('colPlain')};
 const sde1Cell={body:$('sde1Body'),status:$('sde1Status'),meta:$('sde1Meta'),col:$('colSde1')};
 const sde2Cell={body:$('sde2Body'),status:$('sde2Status'),meta:$('sde2Meta'),col:$('colSde2')};
@@ -432,12 +476,14 @@ const errBox=$('errBox');
 function showErr(m){ errBox.textContent=m; errBox.style.display='block'; }
 function hideErr(){ errBox.style.display='none'; }
 
-function keyStoreName(){
-  const v = parseModel(modelSel.value).vendor;
+// 两个函数都改成接受一个可选的 sel（厂商:档位字符串），不传则默认用主选择器 modelSel.value——
+// 这样写作基底和两个审稿基底可以共用同一套 Key 存取与厂商命名逻辑，不用另写一份。
+function keyStoreName(sel){
+  const v = parseModel(sel || modelSel.value).vendor;
   return v==='glm' ? 'sde_glm_key' : v==='kimi' ? 'sde_kimi_key' : v==='qwen' ? 'sde_qwen_key' : v==='minimax' ? 'sde_minimax_key' : v==='gpt' ? 'sde_gpt_key' : v==='claude' ? 'sde_claude_key' : v==='gemini' ? 'sde_gemini_key' : 'sde_ds_key';
 }
-function vendorName(){
-  const v = parseModel(modelSel.value).vendor;
+function vendorName(sel){
+  const v = parseModel(sel || modelSel.value).vendor;
   return v==='glm' ? '智谱' : v==='kimi' ? '月之暗面 Kimi' : v==='qwen' ? '通义千问' : v==='minimax' ? 'MiniMax (稀宇)' : v==='gpt' ? 'GPT (OpenAI)' : v==='claude' ? 'Claude (Anthropic)' : v==='gemini' ? 'Gemini (Google)' : 'DeepSeek';
 }
 function refreshKeyUI(){
@@ -452,13 +498,34 @@ function refreshKeyUI(){
   else if(v === 'minimax') apiKeyEl.placeholder = 'MiniMax API Key（经中转转发）';
   else if(over) apiKeyEl.placeholder = 'sk-... (境外基底 Key，经中转转发)';
   else apiKeyEl.placeholder = 'sk-...';
+  refreshReviewKeyUI(1); refreshReviewKeyUI(2); // 主基底一变，"是否需要单独填Key"的判断也要跟着重算
+}
+// 审稿一/审稿二基底："跟随写作基底"（空值）或选了跟写作基底同厂商 → 复用主Key，不用单独填；
+// 选了不同厂商 → 才显示一个该厂商专属的Key输入框（自动从本地读取，与本工具/其他SDE工具共用同一套Key存储命名）
+function refreshReviewKeyUI(n){
+  const sel = n===1 ? reviewModelSel1 : reviewModelSel2;
+  const row = n===1 ? reviewKeyRow1 : reviewKeyRow2;
+  const keyInput = n===1 ? reviewKeyEl1 : reviewKeyEl2;
+  const val = sel.value;
+  const needsOwnKey = val !== '' && parseModel(val).vendor !== parseModel(modelSel.value).vendor;
+  row.style.display = needsOwnKey ? 'flex' : 'none';
+  if(needsOwnKey){
+    keyInput.value = localStorage.getItem(keyStoreName(val)) || '';
+    keyInput.placeholder = vendorName(val) + ' API Key…';
+  }
 }
 refreshKeyUI();
 apiKeyEl.addEventListener('input', ()=>localStorage.setItem(keyStoreName(), apiKeyEl.value.trim()));
 modelSel.addEventListener('change', refreshKeyUI);
+reviewModelSel1.addEventListener('change', ()=>refreshReviewKeyUI(1));
+reviewModelSel2.addEventListener('change', ()=>refreshReviewKeyUI(2));
+reviewKeyEl1.addEventListener('input', ()=>{ if(reviewModelSel1.value) localStorage.setItem(keyStoreName(reviewModelSel1.value), reviewKeyEl1.value.trim()); });
+reviewKeyEl2.addEventListener('input', ()=>{ if(reviewModelSel2.value) localStorage.setItem(keyStoreName(reviewModelSel2.value), reviewKeyEl2.value.trim()); });
+refreshReviewKeyUI(1); refreshReviewKeyUI(2);
 $('keyToggle').addEventListener('click', ()=>{
   apiKeyEl.type = apiKeyEl.type==='password' ? 'text' : 'password';
   $('keyToggle').textContent = apiKeyEl.type==='password' ? '显示' : '隐藏';
+
 });
 
 const EXAMPLES = [
@@ -674,7 +741,7 @@ function sdeRevisePrompt(neigong, round, tool){
 // ============ 核心：streamChat（国产直连）============
 async function streamChat(apiKey, model, systemPrompt, userQ, bodyEl, statusEl, metaEl, colEl, maxTokens){
   colEl.classList.add('generating');
-  bodyEl.innerHTML='<span class="placeholder">正在连接 '+vendorName()+'……</span>';
+  bodyEl.innerHTML='<span class="placeholder">正在连接 '+vendorName(model)+'……</span>';
   statusEl.innerHTML='<span class="spinner"></span> 连接中';
   const t0=Date.now();
   if(isOverseas(model)){
@@ -749,7 +816,7 @@ async function callOverseas(apiKey, model, systemPrompt, userQ, bodyEl, statusEl
   else if(vendor === 'minimax'){ headers['Authorization'] = 'Bearer ' + apiKey; headers['x-target-url'] = 'https://api.minimaxi.com/v1/chat/completions'; }
   else if(vendor === 'claude'){ headers['x-api-key'] = apiKey; headers['anthropic-version'] = '2023-06-01'; headers['anthropic-dangerous-direct-browser-access'] = 'true'; headers['x-target-url'] = 'https://api.anthropic.com/v1/messages'; }
   else if(vendor === 'gemini'){ const gm = (tier === 'pro') ? 'gemini-3.1-pro-preview' : 'gemini-2.5-flash'; headers['x-target-url'] = 'https://generativelanguage.googleapis.com/v1beta/models/' + gm + ':streamGenerateContent?alt=sse&key=' + encodeURIComponent(apiKey); }
-  bodyEl.innerHTML='<span class="placeholder">✓ 已连接，'+vendorName()+' 正在启动……<br><span style="font-size:12px;opacity:.7">境外基底经中转、流式返回，请稍候</span></span>';
+  bodyEl.innerHTML='<span class="placeholder">✓ 已连接，'+vendorName(model)+' 正在启动……<br><span style="font-size:12px;opacity:.7">境外基底经中转、流式返回，请稍候</span></span>';
   statusEl.innerHTML='<span class="spinner"></span> 等待响应';
   const cursor=document.createElement('span'); cursor.className='cursor-blink';
   const ac = new AbortController(); const HARD_TIMEOUT_MS = 8*60*1000;
@@ -829,8 +896,8 @@ updateCharCount();
 // 把"基底设定 + 实际输入"写进每个审稿块的可展开面板——这里显示的必须是真正发给基底的那段完整system prompt原文，
 // 不是转述/摘要（之前写的是"完整SDE内功先验(约X千字)+审稿任务说明"这种人话总结，用户指出这不是真正的透明）。
 // 做法：调用处先把 systemPromptText 算出来，同一个变量既传去展示、也传去 streamChat 实际发送——保证"看到的"和"发的"是同一份文本，不会走样。
-function fillRevInput(cell, systemPromptText, userContent){
-  cell.input.innerHTML = '<span class="k">基底：</span>'+escTxt(vendorName())+'\n'
+function fillRevInput(cell, reviewModel, systemPromptText, userContent){
+  cell.input.innerHTML = '<span class="k">基底：</span>'+escTxt(vendorName(reviewModel))+'\n'
     + '<span class="k">系统提示（完整原文，与实际发送给基底的一字不差）：</span>\n'+escTxt(systemPromptText)+'\n\n'
     + '<span class="k">本轮实际输入（原文 + 待审论文全文）：</span>\n'+escTxt(userContent);
 }
@@ -845,11 +912,21 @@ async function run(){
   if(!text){ showErr('请贴一段经典文本'); classicTextEl.focus(); return; }
   if(text.length > 500){ showErr('经典文本最长 500 字，当前 '+text.length+' 字——请截取其中最要紧的一段。'); classicTextEl.focus(); return; }
 
+  // 审稿一/审稿二基底：留空＝跟随写作基底（同厂商，复用主Key）；选了别的厂商＝用户单独填的那把Key
+  const reviewModel1 = reviewModelSel1.value || model;
+  const reviewModel2 = reviewModelSel2.value || model;
+  const reviewKey1 = (reviewModelSel1.value && parseModel(reviewModelSel1.value).vendor !== parseModel(model).vendor) ? reviewKeyEl1.value.trim() : key;
+  const reviewKey2 = (reviewModelSel2.value && parseModel(reviewModelSel2.value).vendor !== parseModel(model).vendor) ? reviewKeyEl2.value.trim() : key;
+  if(!reviewKey1){ showErr('审稿一基底选了 '+vendorName(reviewModel1)+'，请先填入它的 API Key'); reviewKeyEl1.focus(); return; }
+  if(!reviewKey2){ showErr('审稿二基底选了 '+vendorName(reviewModel2)+'，请先填入它的 API Key'); reviewKeyEl2.focus(); return; }
+
   try{ await ensureNeigong(); }catch(e){ showErr(e.message); return; }
 
   goBtn.disabled=true; goBtn.textContent='⏳ 四篇论文同时生成中（每篇独立走完两轮自审自改）……';
   $('revPanel').style.display='block';
-  $('revBaseLine').textContent = '本轮审稿基底：' + vendorName() + '（' + model + '，与四篇论文使用同一顶配基底）';
+  $('revBaseLine').textContent = '写作基底：' + vendorName(model)
+    + ' · 审稿一基底：' + vendorName(reviewModel1) + (reviewModelSel1.value ? '' : '（同写作基底）')
+    + ' · 审稿二基底：' + vendorName(reviewModel2) + (reviewModelSel2.value ? '' : '（同写作基底）');
   [plainCell, sde1Cell, sde2Cell, sde3Cell].forEach(c=>{ c.body.innerHTML='<span class="placeholder">已排队，即将开始……</span>'; c.status.innerHTML='<span class="spinner"></span> 排队中'; c.meta.textContent=''; });
   Object.values(revCells).forEach(c=>{
     c.body.innerHTML='<span class="placeholder">等待对应论文初稿完成……</span>'; c.status.textContent='排队中';
@@ -867,8 +944,8 @@ async function run(){
 
       const rAInput = userQ + '\n\n【待审的论文】\n' + draft.text;
       const rASys = plainReviewPrompt(1);
-      fillRevInput(revA, rASys, rAInput);
-      const rA = await streamChat(key, model, rASys, rAInput,
+      fillRevInput(revA, reviewModel1, rASys, rAInput);
+      const rA = await streamChat(reviewKey1, reviewModel1, rASys, rAInput,
         revA.body, revA.status, revA.meta, revA.col, REVIEW_TOKENS);
 
       let cur = draft.text;
@@ -881,8 +958,8 @@ async function run(){
 
       const rBInput = userQ + '\n\n【待审的论文】\n' + cur;
       const rBSys = plainReviewPrompt(2);
-      fillRevInput(revB, rBSys, rBInput);
-      const rB = await streamChat(key, model, rBSys, rBInput,
+      fillRevInput(revB, reviewModel2, rBSys, rBInput);
+      const rB = await streamChat(reviewKey2, reviewModel2, rBSys, rBInput,
         revB.body, revB.status, revB.meta, revB.col, REVIEW_TOKENS);
 
       let fin = cur;
@@ -905,6 +982,7 @@ async function run(){
 
   // 三篇 SDE 论文各自独立：initial draft → review a → revise → review b → revise，互不依赖、同时跑
   // tool: 'eq'(三大方程) / 'paths'(六路径) / 'principle'(123原理)；paperCell 是该篇论文最终显示的那一栏
+  // 两次审稿分别用 reviewModel1/reviewModel2（默认跟随写作基底，也可各自单独指定）；改稿仍由写作基底(key/model)完成
   function runSdeChain(tool, paperCell, revA, revB, label){
     return (async ()=>{
       const draft = await streamChat(key, model, sdeDraftPrompt(N, tool), userQ, paperCell.body, paperCell.status, paperCell.meta, paperCell.col, PAPER_TOKENS);
@@ -912,8 +990,8 @@ async function run(){
 
       const rAInput = userQ + '\n\n【待审的解构稿】\n' + draft.text;
       const rASys = sdeReviewPrompt(N, 1, tool);
-      fillRevInput(revA, rASys, rAInput);
-      const rA = await streamChat(key, model, rASys, rAInput,
+      fillRevInput(revA, reviewModel1, rASys, rAInput);
+      const rA = await streamChat(reviewKey1, reviewModel1, rASys, rAInput,
         revA.body, revA.status, revA.meta, revA.col, REVIEW_TOKENS);
 
       let cur = draft.text;
@@ -926,8 +1004,8 @@ async function run(){
 
       const rBInput = userQ + '\n\n【待审的解构稿】\n' + cur;
       const rBSys = sdeReviewPrompt(N, 2, tool);
-      fillRevInput(revB, rBSys, rBInput);
-      const rB = await streamChat(key, model, rBSys, rBInput,
+      fillRevInput(revB, reviewModel2, rBSys, rBInput);
+      const rB = await streamChat(reviewKey2, reviewModel2, rBSys, rBInput,
         revB.body, revB.status, revB.meta, revB.col, REVIEW_TOKENS);
 
       let fin = cur;
