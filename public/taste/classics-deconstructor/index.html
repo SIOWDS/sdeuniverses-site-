@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SDE 经典解构器 · 品尝系列 | SDE Universes</title>
-<meta name="description" content="贴一段经典文本——道德经、论语、圣经、佛经，任何经典的片段——普通AI给出传统注疏式解读，SDE提智AI给出发生学式解构，同场对照。八大主流基底任选，用你自己的API Key，浏览器直接跑。">
+<meta name="description" content="贴一段经典文本——道德经、论语、圣经、佛经，任何经典的片段。四篇学术论文同时并行生成：传统经学一篇对照，SDE1/2/3各自独立只用三大方程/六路径/123原理解构，各自完成两轮自审自改。八大主流基底任选（顶配旗舰档），用你自己的API Key，浏览器直接跑。">
 <style>
 :root{
   --bg:#0E1116;--panel:#161B22;--panel2:#1C232C;--border:rgba(255,255,255,0.10);
@@ -58,18 +58,14 @@ textarea{resize:vertical;min-height:120px;line-height:1.75}
 .col{background:var(--panel);border:1px solid var(--border);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;min-height:240px}
 .col.plain{border-top:3px solid var(--plain)}
 .col.sde{border-top:3px solid rgba(212,178,94,0.45)}
-.col.final{border-top:3px solid var(--sde);border-color:rgba(212,178,94,0.4)}
 .col-head{padding:13px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:8px}
 .col-title{font-weight:700;font-size:13.5px;display:flex;align-items:center;gap:8px}
 .col.plain .col-title .dot{width:8px;height:8px;border-radius:50%;background:var(--plain);flex-shrink:0}
 .col.sde .col-title .dot{width:8px;height:8px;border-radius:50%;background:rgba(212,178,94,0.5);flex-shrink:0}
-.col.final .col-title .dot{background:var(--sde)}
 .col-tag{font-size:10.5px;letter-spacing:0.06em;color:var(--muted);padding:2px 8px;border:1px solid var(--border);border-radius:20px;white-space:nowrap;flex-shrink:0}
-.col.final .col-tag{color:var(--gold2);border-color:rgba(212,178,94,0.4)}
 .col-body{padding:16px;font-size:13.5px;line-height:1.85;flex:1;white-space:pre-wrap;word-wrap:break-word;overflow-wrap:break-word;min-height:240px;max-height:560px;overflow-y:auto;color:var(--text)}
 .col-body .placeholder{color:var(--muted);font-style:italic}
 .col.sde .col-body{background:rgba(212,178,94,0.04)}
-.col.final .col-body{background:var(--sde-bg)}
 .col.generating{box-shadow:0 0 0 2px var(--gold), 0 0 20px rgba(212,178,94,0.25);border-color:var(--gold)}
 .col-meta{padding:9px 16px;border-top:1px solid var(--border);font-size:11.5px;color:var(--muted);display:flex;justify-content:space-between;gap:6px}
 .flowhint{max-width:1460px;margin:14px auto 0;padding:0 20px;text-align:center;font-size:12.5px;color:#7A8694;letter-spacing:0.03em}
@@ -126,7 +122,7 @@ footer a{color:var(--gold)}
       </div>
     </div>
     <div style="font-size:12px;color:#8B98A5;line-height:1.7;margin-top:14px">
-      🧬 <b style="color:#B0B8C0">八大主流基底任选（均为顶配旗舰档）</b>：DeepSeek · 智谱GLM · Kimi · 通义千问 · MiniMax · GPT · Claude · Gemini——用你自己的 API Key，全程在浏览器里跑，Key 绝不上传本站服务器。<b style="color:#E8A33D">注意</b>：四篇论文同时并行生成，共 16 路模型调用（传统1路 + 三篇各5路），顶配深度思考档可能要好几分钟，这是它该花的时间。
+      🧬 <b style="color:#B0B8C0">八大主流基底任选（均为顶配旗舰档）</b>：DeepSeek · 智谱GLM · Kimi · 通义千问 · MiniMax · GPT · Claude · Gemini——用你自己的 API Key，全程在浏览器里跑，Key 绝不上传本站服务器。<b style="color:#E8A33D">注意</b>：四篇论文同时并行生成（共 16 路模型调用：传统1路 + 三篇各5路），但每篇 SDE 论文内部的 5 步是<b style="color:#E8A33D">顺序进行</b>的（初稿→审→改→审→改，一步等一步），顶配深度思考档单步就可能 1-2 分钟，<b style="color:#E8A33D">一篇 SDE 论文合计可能要十几分钟</b>，这是自审自改机制该花的时间，请耐心等待、不要中途刷新。
     </div>
   </div>
 </div>
@@ -425,7 +421,7 @@ EXAMPLES.forEach(ex=>{
 
 function escTxt(s){ return String(s).replace(/[<>&]/g, c=>({'<':'&lt;','>':'&gt;','&':'&amp;'}[c])); }
 
-// ============ 两套系统提示：普通AI(传统注疏) vs SDE提智AI(发生学解构) ============
+// ============ 四套系统提示：传统经学(对照) + 三个工具各自独立的SDE解构(draft/review/revise按tool参数化) ============
 function plainPrompt(){
   return `你是一位学养深厚、态度审慎的经典文献研究者，精通中西方经典的原文、版本流变与历代注疏传统。用户会给你一段经典原文（可能附出处）。请就这段文本，写一篇**正式的学术论文**，走传统经学／文献学的路数。
 
@@ -543,7 +539,7 @@ async function streamChat(apiKey, model, systemPrompt, userQ, bodyEl, statusEl, 
   let resp;
   try{
     resp = await fetch(apiUrl(model), { method:'POST', headers:{ 'Content-Type':'application/json', 'Authorization':'Bearer '+apiKey }, body: JSON.stringify(buildPayload(model, systemPrompt, userQ, maxTokens)), signal: ac.signal });
-  }catch(e){ clearTimeout(killer); colEl.classList.remove('generating'); statusEl.textContent='网络错误'; throw new Error(e.name==='AbortError'?'超时：已中止（建议改用快速档或稍后重试）':'网络请求失败：'+e.message); }
+  }catch(e){ clearTimeout(killer); colEl.classList.remove('generating'); statusEl.textContent='网络错误'; throw new Error(e.name==='AbortError'?'超时：已中止（本工具已锁定顶配深度思考档，本就较慢；建议稍后重试）':'网络请求失败：'+e.message); }
   if(!resp.ok){
     let detail=''; try{ const j=await resp.json(); detail = j.error?.message || JSON.stringify(j); }catch(_){ detail = resp.statusText; }
     statusEl.textContent='失败'; bodyEl.innerHTML='<span class="placeholder">调用失败：'+escTxt(detail)+'</span>'; colEl.classList.remove('generating');
@@ -578,7 +574,7 @@ async function streamChat(apiKey, model, systemPrompt, userQ, bodyEl, statusEl, 
     }
   }catch(e){
     clearInterval(waitTimer); clearTimeout(killer); cursor.remove(); colEl.classList.remove('generating');
-    if(e.name==='AbortError'){ if(acc){ statusEl.textContent='✓ 部分完成（超时截断）'; return { text:acc, chars, thinkChars, secs:parseFloat(((Date.now()-t0)/1000).toFixed(1)) }; } statusEl.textContent='超时'; throw new Error('超时：已中止（建议改用快速档或稍后重试）'); }
+    if(e.name==='AbortError'){ if(acc){ statusEl.textContent='✓ 部分完成（超时截断）'; return { text:acc, chars, thinkChars, secs:parseFloat(((Date.now()-t0)/1000).toFixed(1)) }; } statusEl.textContent='超时'; throw new Error('超时：已中止（本工具已锁定顶配深度思考档，本就较慢；建议稍后重试）'); }
     statusEl.textContent='读取中断'; throw new Error('响应读取中断：'+e.message);
   }finally{ clearInterval(waitTimer); clearTimeout(killer); }
   cursor.remove(); colEl.classList.remove('generating');
@@ -677,7 +673,7 @@ function updateCharCount(){
 classicTextEl.addEventListener('input', updateCharCount);
 updateCharCount();
 
-// ============ 主流程：传统解读 + SDE1(初稿) → SDE2(自审自改①) → SDE3(自审自改②·终稿) ============
+// ============ 主流程：传统经学(独立1次成稿) + 三条完全独立并行的SDE链，每条各自完成 draft→review→revise→review→revise ============
 async function run(){
   hideErr();
   const key=apiKeyEl.value.trim().replace(/^["']|["']$/g,'');
