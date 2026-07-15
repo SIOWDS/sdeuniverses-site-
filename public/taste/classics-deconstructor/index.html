@@ -595,32 +595,40 @@ let _reflectLastErr = '';
 // 宁可这一轮不缓存、下次重新判定，也不让一份肤浅的心得永久占住缓存位置。
 function checkReflectionCompleteness(text, sel){
   if(!text) return { ok:false, issues:['心得为空'] };
-  // 四节的起始标记就是 REFLECT_SPEC 里给模型的原始编号——模型据此写作，理应原样或近似复现
-  const markers = ['一、', '二、', '三、', '四、'];
-  const positions = markers.map(m => text.indexOf(m));
-  const issues = [];
-  positions.forEach((pos, i) => { if(pos < 0) issues.push('缺少第'+markers[i]+'节的标记，疑似整节缺失'); });
-  if(issues.length) return { ok:false, issues, sectionLens:null };
-
-  // 逐节切片测长度：第i节 = 从它自己的标记开始，到下一节标记为止（第四节到全文结尾）
-  const sorted = positions.slice().sort((a,b)=>a-b);
-  const sectionLens = [];
-  for(let i=0;i<4;i++){
-    const start = positions[i];
-    const end = (i<3) ? Math.min(...positions.filter(p=>p>start).concat([text.length])) : text.length;
-    sectionLens.push(Math.max(0, end - start));
-  }
-  // 门槛按基底真实输出上限分两档：千问被硬钳在约4800字总量(前三节3400+第四节1400)，其余基底奔7000字(5000+2000)。
-  // 门槛定得比目标宽松很多(目标的4-5折)，只用来抓"明显应付"，不是逼它字字顶格。
   const isQwen = parseModel(sel).vendor === 'qwen';
-  const floor123 = isQwen ? 700 : 900;   // 前三节，每节至少这么多字，三节合计门槛见下
-  const floorTotal123 = isQwen ? 1700 : 2500;
-  const floor4 = isQwen ? 550 : 900;
-  const sum123 = sectionLens[0] + sectionLens[1] + sectionLens[2];
-  if(sum123 < floorTotal123) issues.push('前三节合计仅 '+sum123+' 字，明显低于'+(isQwen?'千问':'该基底')+'应有的篇幅（门槛 '+floorTotal123+' 字），疑似走过场');
-  sectionLens.slice(0,3).forEach((len,i)=>{ if(len < floor123) issues.push('第'+markers[i]+'节仅 '+len+' 字，单节过短，疑似只写了一两句就跳过'); });
-  if(sectionLens[3] < floor4) issues.push('第四节(SDE方法论三件套)仅 '+sectionLens[3]+' 字，低于门槛 '+floor4+' 字——这一节最直接决定解构经典时用不用得上工具，写得太薄形同没写');
-  return { ok: issues.length===0, issues, sectionLens };
+  const target = isQwen ? 4800 : 7000;
+  const issues = [];
+
+  // ① 主闸门：总长。这一条稳、不会误判——基底怎么排版都不影响总字数。
+  //    门槛取目标的七折，只抓"明显没写够"，不是逼它字字顶格。
+  const totalFloor = Math.round(target * 0.7);
+  if(text.length < totalFloor){
+    issues.push('全文仅 ' + text.length + ' 字，明显低于目标篇幅（约' + target + '字，门槛 ' + totalFloor + ' 字），疑似走过场');
+  }
+
+  // ② 附加闸门：第四节篇幅——但【只在能干净认出四节时才判】。
+  //    教训：基底会自由改写标题格式(实测把规格里的【最后的自我提醒】写成 "### 最后的自我提醒"，
+  //    编号也可能写成 "### 一、" / "**一、**" / "第一、" 等等)。之前拿死标记 indexOf('一、') 去卡，
+  //    格式一变就认不出，结果把一篇 11086 字、明显写得很足的好心得误判成"未过"——宁可少判，不可错杀。
+  //    所以：认不全四节就不在分节上做文章，只认总长；认得全才顺带看一眼第四节有没有虎头蛇尾。
+  const re = /^[#*\s>]*(?:第)?([一二三四])\s*[、.．]/gm;
+  const firstPos = {};
+  let m;
+  while((m = re.exec(text)) !== null){ if(!(m[1] in firstPos)) firstPos[m[1]] = m.index; }
+  const keys = ['一','二','三','四'];
+  const allFound = keys.every(k => k in firstPos);
+  if(allFound){
+    const pos = keys.map(k => firstPos[k]);
+    const ascending = pos.every((p,i) => i===0 || p > pos[i-1]);   // 顺序不对(如开头有目录)就不判，避免又一次错杀
+    if(ascending){
+      const s4len = text.length - pos[3];
+      const floor4 = isQwen ? 550 : 900;
+      if(s4len < floor4){
+        issues.push('第四节(SDE方法论三件套)仅 ' + s4len + ' 字，低于门槛 ' + floor4 + ' 字——这一节最直接决定解构经典时用不用得上工具，写得太薄形同没写');
+      }
+    }
+  }
+  return { ok: issues.length===0, issues };
 }
 
 async function getReflection(sel, apiKey, onProgress){
