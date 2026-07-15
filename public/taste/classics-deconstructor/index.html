@@ -140,7 +140,7 @@ footer a{color:var(--gold)}
       </div>
     </div>
     <div style="font-size:12px;color:#8B98A5;line-height:1.7;margin-top:14px">
-      🧬 <b style="color:#B0B8C0">八大主流基底任选（均为顶配旗舰档）</b>：DeepSeek · 智谱GLM · Kimi · 通义千问 · MiniMax · GPT · Claude · Gemini——用你自己的 API Key，全程在浏览器里跑，Key 绝不上传本站服务器。<b style="color:#E8A33D">注意</b>：四篇论文同时并行生成（共 20 路模型调用：每篇各 5 路），但<b style="color:#E8A33D">每篇内部的 5 步是顺序进行</b>的（初稿→审→改→审→改，一步等一步），顶配深度思考档单步就可能 1-2 分钟，<b style="color:#E8A33D">每篇论文合计可能要十几分钟</b>，这是自审自改机制该花的时间，请耐心等待、不要中途刷新。
+      🧬 <b style="color:#B0B8C0">八大主流基底任选（均为顶配旗舰档）</b>：DeepSeek · 智谱GLM · Kimi · 通义千问 · MiniMax · GPT · Claude · Gemini——用你自己的 API Key，全程在浏览器里跑，Key 绝不上传本站服务器。<b style="color:#E8A33D">注意</b>：四篇论文同时并行生成（共 20 路模型调用：每篇各 5 路），但<b style="color:#E8A33D">每篇内部的 5 步是顺序进行</b>的（初稿→审→改→审→改，一步等一步）。顶配深度思考档的"思考过程"跟正文共用同一个篇幅预算，<b style="color:#E8A33D">思考本身可能就要几分钟</b>，单步合计 3-8 分钟很正常，<b style="color:#E8A33D">每篇论文全程可能要二三十分钟</b>——这是深思+自审自改机制该花的时间，请耐心等待、不要中途刷新。
     </div>
   </div>
 </div>
@@ -414,13 +414,16 @@ function isOverseas(sel){ return OVERSEAS.includes(parseModel(sel).vendor); }
 const PROXY_URL = "/api/llm-proxy";
 function apiUrl(sel){ return API_URLS[parseModel(sel).vendor]; }
 
-// 论文类产出：约 4000-5000 中文字 ≈ 6400-8000 tokens（新增第六节"跨域应用"后篇幅上调）。
-// 设 9500 做安全天花板——低于此会把论文腰斩，而按规格"参考文献/证伪条件/应用建议"都写在末尾，
-// 截断＝系统性砍掉最要紧的收尾。【千问例外】其单次输出硬顶 8192，仍会把千问论文钳在约5100字——
-// 这是模型自身上限，非本站限制；其余七家均可放心跑满 4000-5000 字目标。
-const PAPER_TOKENS = 9500;
-// 审稿意见：约 800-1200 字 ≈ 1900 tokens，给 3000 留余量
-const REVIEW_TOKENS = 3000;
+// 论文类产出：目标约 4000-5000 中文字。但实测发现（用户报告：4124字正文被截断+8375字思考尾部+触及token上限），
+// 顶配深思档（reasoning_effort='xhigh'）的"思考过程"跟"正文输出"共用同一个 max_tokens 预算——
+// 思考本身可能消耗上万字，正文还没写够目标字数，预算就被思考吃光了。之前按"目标字数≈token数"估算(8000/9500)完全没算上思考这一块，
+// 是这次截断的直接原因。现在按实测数据反推、留足够冗余：思考+正文合计可能需要 20000+ tokens，设 24000 做安全天花板。
+// 【千问例外】其单次输出硬顶 8192，仍会把千问论文钳在远低于目标的字数——这是模型自身上限，非本站限制。
+const PAPER_TOKENS = 24000;
+// 审稿意见目标约 800-1200 字，但审稿调用同样会经过同一个"思考+正文共享预算"的顶配深思档，
+// 思考同样可能吃掉大头——不重新估算这里，审稿意见比论文短所以还没在实测里炸过，但机制一样，必须同样留够冗余，
+// 否则审稿意见有可能在思考阶段就把预算耗尽、返回空文本（比论文被截断更糟——是"审稿完全没发生"而不是"审稿写了一半"）。
+const REVIEW_TOKENS = 16000;
 
 function buildPayload(sel, systemPrompt, userQ, maxTokens){
   const { vendor, tier } = parseModel(sel);
@@ -452,9 +455,9 @@ function buildPayload(sel, systemPrompt, userQ, maxTokens){
     base.reasoning_effort = (tier === 'pro') ? 'high' : 'medium';
     base.stream_options = { include_usage: true };
   } else if(vendor === 'claude'){
-    return { model: (tier === 'pro') ? 'claude-opus-4-8' : 'claude-sonnet-4-6', max_tokens: Math.min(cap, 9500), stream: true, system: systemPrompt, messages: [{ role:'user', content: userQ }] };
+    return { model: (tier === 'pro') ? 'claude-opus-4-8' : 'claude-sonnet-4-6', max_tokens: Math.min(cap, 24000), stream: true, system: systemPrompt, messages: [{ role:'user', content: userQ }] };
   } else if(vendor === 'gemini'){
-    return { systemInstruction: { parts: [{ text: systemPrompt }] }, contents: [{ role:'user', parts: [{ text: userQ }] }], generationConfig: { maxOutputTokens: Math.min(cap, 9500), temperature: 0.7 } };
+    return { systemInstruction: { parts: [{ text: systemPrompt }] }, contents: [{ role:'user', parts: [{ text: userQ }] }], generationConfig: { maxOutputTokens: Math.min(cap, 24000), temperature: 0.7 } };
   }
   return base;
 }
@@ -779,7 +782,9 @@ async function streamChat(apiKey, model, systemPrompt, userQ, bodyEl, statusEl, 
   let acc='', chars=0;
   const cursor=document.createElement('span'); cursor.className='cursor-blink';
   const ac = new AbortController();
-  const HARD_TIMEOUT_MS = 8*60*1000;
+  // token预算从9500提到24000后(约2.5倍)，思考+正文都可能变长，8分钟的旧超时会在内容还没写完时就把它掐断——
+  // 那样又会制造一种新的截断(超时导致)，而不是解决旧的截断(token导致)。提到15分钟给足生成时间。
+  const HARD_TIMEOUT_MS = 15*60*1000;
   const killer = setTimeout(()=>{ try{ ac.abort(); }catch(_){} }, HARD_TIMEOUT_MS);
   let resp;
   try{
@@ -846,7 +851,7 @@ async function callOverseas(apiKey, model, systemPrompt, userQ, bodyEl, statusEl
   bodyEl.innerHTML='<span class="placeholder">✓ 已连接，'+vendorName(model)+' 正在启动……<br><span style="font-size:12px;opacity:.7">境外基底经中转、流式返回，请稍候</span></span>';
   statusEl.innerHTML='<span class="spinner"></span> 等待响应';
   const cursor=document.createElement('span'); cursor.className='cursor-blink';
-  const ac = new AbortController(); const HARD_TIMEOUT_MS = 8*60*1000;
+  const ac = new AbortController(); const HARD_TIMEOUT_MS = 15*60*1000; // 同上：token预算上调后同步放宽超时
   const killer = setTimeout(()=>{ try{ ac.abort(); }catch(_){} }, HARD_TIMEOUT_MS);
   let gotAnything=false;
   const waitTimer=setInterval(()=>{ if(!gotAnything){ const s=Math.round((Date.now()-t0)/1000); statusEl.innerHTML='<span class="spinner"></span> 等待响应 ('+s+'s)'; } },1000);
