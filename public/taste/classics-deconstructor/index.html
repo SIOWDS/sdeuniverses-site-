@@ -326,7 +326,7 @@ footer a{color:var(--gold)}
 <div class="reflect-panel" id="reflectPanel">
   <div class="reflect-inner">
     <div class="reflect-h"><span>🧠 第一步 · 每个参与基底各自读 SDE 内功、亲手写自己的《从发现到发生》心得</span><span class="reflect-st" id="reflectStatus">待命</span></div>
-    <div class="reflect-desc">这是本工具的<b style="color:#D4DCE4">主功能之一</b>，不是幕后铺垫：<b style="color:#D4DCE4">每个真正干活的基底，都要先自己把内功读进去、用自己的话完整想一遍</b>（约7000字，含三大方程/六路径/123原理的学习心得），再带着这份已内化的认知上阵。<b style="color:#E8A33D">审稿基底若换了别家，它会写自己的那一份</b>——让它读写作基底的心得，那是读别人的读后感，不叫它自己提智。<b style="color:#E8A33D">每次点"生成"都会重新写一遍，不缓存、不复用</b>——同一段内功，基底每次想过的角度都会有细微差异，这份差异会顺着心得传导进三篇论文，让同一段经典每次解构出来的味道也不尽相同。<b style="color:#E8A33D">传统经学那篇是对照组，不注入内功也不注入心得</b>——否则就不成其为对照了。</div>
+    <div class="reflect-desc">这是本工具的<b style="color:#D4DCE4">主功能之一</b>，不是幕后铺垫：<b style="color:#D4DCE4">每个真正干活的基底，都要先自己把内功读进去、用自己的话完整想一遍</b>（约7000字，含三大方程/六路径/123原理的学习心得），再带着这份已内化的认知上阵。<b style="color:#E8A33D">审稿基底、评估基底若换了别家，各写各的那一份</b>——让它读写作基底的心得，那是读别人的读后感，不叫它自己提智。<b style="color:#E8A33D">评估基底尤其不能裸评</b>：它要判的是"SDE创新智商"，没读过内功、没自己想过一遍发生学，拿什么去判一篇论文的差异锐度与不可还原性？<b style="color:#E8A33D">每次点"生成"都会重新写一遍，不缓存、不复用</b>——同一段内功，基底每次想过的角度都会有细微差异，这份差异会顺着心得传导进三篇论文，让同一段经典每次解构出来的味道也不尽相同。<b style="color:#E8A33D">传统经学那篇是对照组，不注入内功也不注入心得</b>——否则就不成其为对照了。</div>
     <div class="reflect-body" id="reflectBody"><span class="placeholder">尚未开始</span></div>
   </div>
 </div>
@@ -1086,8 +1086,11 @@ function plainRevisePrompt(round){
 // ============ SDE 创新智商评估 · 终稿定稿后独立送评一次 ============
 // 提示语忠实按站内 sde-innovation-iq-scoring skill 的方法论写：五维度独立评分(S/D/E/I/F)、
 // 加权综合分、层级判定+锚点对比、扣分句证据、提升路径——七步流程压缩进一次调用，输出标准评分卡格式。
-function iqAssessPrompt(){
-  return `你是 SDE 学派创新智商评分系统的评分员。用户会给你一篇论文全文，请严格按以下方法给出创新智商评分。
+function iqAssessPrompt(neigong){
+  return neigong + `
+
+---
+你是 SDE 学派创新智商评分系统的评分员。用户会给你一篇论文全文，请严格按以下方法给出创新智商评分。
 
 【评分方法 · 五维度独立打分，不许直觉打综合分】
 
@@ -1470,10 +1473,13 @@ async function run(){
   reflectPanel.style.display = 'block';
   reflectStatus.classList.remove('done','failed');
 
-  // 本次真正要用到的基底去重：写作 / 审稿一 / 审稿二（评估基底不参与写论文，无需心得）
+  // 本次真正要用到的基底去重：写作 / 审稿一 / 审稿二 / 评估。
+  // 【评估基底同样要写心得】——它要判的是"SDE创新智商"，是全流程里最需要提智的一环：
+  // 一个没读过内功、没自己想过一遍发生学的基底，拿什么去判断一篇论文的差异锐度与不可还原性？
+  // （早先版本把评估排除在外，理由是"它不写论文"——那是判断错了：评的是SDE，就得先懂SDE。）
   const reflectJobs = [];
   const seenBase = {};
-  [[model, key, '写作'], [reviewModel1, reviewKey1, '审稿一'], [reviewModel2, reviewKey2, '审稿二']].forEach(([m, k, role])=>{
+  [[model, key, '写作'], [reviewModel1, reviewKey1, '审稿一'], [reviewModel2, reviewKey2, '审稿二'], [assessModel, assessKey, '评估']].forEach(([m, k, role])=>{
     if(seenBase[m]) { seenBase[m].roles.push(role); return; }
     seenBase[m] = { model:m, key:k, roles:[role] };
     reflectJobs.push(seenBase[m]);
@@ -1556,7 +1562,7 @@ async function run(){
     iqCell.body.innerHTML = '<span class="placeholder">正在请求 '+escTxt(vendorName(assessModel))+' 评估……</span>';
     try{
       const dummyMeta = { textContent:'' }, dummyCol = { classList:{add(){},remove(){}} };
-      const res = await streamChat(assessKey, assessModel, iqAssessPrompt(), finalText,
+      const res = await streamChat(assessKey, assessModel, iqAssessPrompt(baseFor(assessModel)), finalText,
         iqCell.body, iqCell.status, dummyMeta, dummyCol, REVIEW_TOKENS);
       if(res.text){
         iqCell.body.textContent = res.text;
