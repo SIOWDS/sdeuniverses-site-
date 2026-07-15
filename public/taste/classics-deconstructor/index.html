@@ -826,17 +826,12 @@ updateCharCount();
 
 // ============ 主流程：传统经学(独立1次成稿) + 三条完全独立并行的SDE链，每条各自完成 draft→review→revise→review→revise ============
 // 把"基底设定 + 实际输入"写进每个审稿块的可展开面板——审稿意见之外，用户还能核实这一轮到底喂了什么给基底
-function fillRevInput(cell, round, tool, userContent){
-  const sys = `完整 SDE 内功先验（约${Math.round(SDE_BASE.length/1000)}千字）+《审稿（第${round}轮）》任务说明，工具锁定为 ${TOOL_LABEL[tool]}`;
+// 把"基底设定 + 实际输入"写进每个审稿块的可展开面板——这里显示的必须是真正发给基底的那段完整system prompt原文，
+// 不是转述/摘要（之前写的是"完整SDE内功先验(约X千字)+审稿任务说明"这种人话总结，用户指出这不是真正的透明）。
+// 做法：调用处先把 systemPromptText 算出来，同一个变量既传去展示、也传去 streamChat 实际发送——保证"看到的"和"发的"是同一份文本，不会走样。
+function fillRevInput(cell, systemPromptText, userContent){
   cell.input.innerHTML = '<span class="k">基底：</span>'+escTxt(vendorName())+'\n'
-    + '<span class="k">系统提示：</span>'+escTxt(sys)+'\n\n'
-    + '<span class="k">本轮实际输入（原文 + 待审论文全文）：</span>\n'+escTxt(userContent);
-}
-// 传统经学一栏没有"工具"这个变量，系统提示走独立的审稿人设定，其余记法一致
-function fillRevInputPlain(cell, round, userContent){
-  const sys = `传统经学审稿人设定 +《审稿（第${round}轮）》任务说明`;
-  cell.input.innerHTML = '<span class="k">基底：</span>'+escTxt(vendorName())+'\n'
-    + '<span class="k">系统提示：</span>'+escTxt(sys)+'\n\n'
+    + '<span class="k">系统提示（完整原文，与实际发送给基底的一字不差）：</span>\n'+escTxt(systemPromptText)+'\n\n'
     + '<span class="k">本轮实际输入（原文 + 待审论文全文）：</span>\n'+escTxt(userContent);
 }
 
@@ -871,8 +866,9 @@ async function run(){
       if(!draft.text) throw new Error(label+' 初稿为空，自审自改无法进行');
 
       const rAInput = userQ + '\n\n【待审的论文】\n' + draft.text;
-      fillRevInputPlain(revA, 1, rAInput);
-      const rA = await streamChat(key, model, plainReviewPrompt(1), rAInput,
+      const rASys = plainReviewPrompt(1);
+      fillRevInput(revA, rASys, rAInput);
+      const rA = await streamChat(key, model, rASys, rAInput,
         revA.body, revA.status, revA.meta, revA.col, REVIEW_TOKENS);
 
       let cur = draft.text;
@@ -884,8 +880,9 @@ async function run(){
       }
 
       const rBInput = userQ + '\n\n【待审的论文】\n' + cur;
-      fillRevInputPlain(revB, 2, rBInput);
-      const rB = await streamChat(key, model, plainReviewPrompt(2), rBInput,
+      const rBSys = plainReviewPrompt(2);
+      fillRevInput(revB, rBSys, rBInput);
+      const rB = await streamChat(key, model, rBSys, rBInput,
         revB.body, revB.status, revB.meta, revB.col, REVIEW_TOKENS);
 
       let fin = cur;
@@ -914,8 +911,9 @@ async function run(){
       if(!draft.text) throw new Error(label+' 初稿为空，自审自改无法进行');
 
       const rAInput = userQ + '\n\n【待审的解构稿】\n' + draft.text;
-      fillRevInput(revA, 1, tool, rAInput);
-      const rA = await streamChat(key, model, sdeReviewPrompt(N, 1, tool), rAInput,
+      const rASys = sdeReviewPrompt(N, 1, tool);
+      fillRevInput(revA, rASys, rAInput);
+      const rA = await streamChat(key, model, rASys, rAInput,
         revA.body, revA.status, revA.meta, revA.col, REVIEW_TOKENS);
 
       let cur = draft.text;
@@ -927,8 +925,9 @@ async function run(){
       }
 
       const rBInput = userQ + '\n\n【待审的解构稿】\n' + cur;
-      fillRevInput(revB, 2, tool, rBInput);
-      const rB = await streamChat(key, model, sdeReviewPrompt(N, 2, tool), rBInput,
+      const rBSys = sdeReviewPrompt(N, 2, tool);
+      fillRevInput(revB, rBSys, rBInput);
+      const rB = await streamChat(key, model, rBSys, rBInput,
         revB.body, revB.status, revB.meta, revB.col, REVIEW_TOKENS);
 
       let fin = cur;
