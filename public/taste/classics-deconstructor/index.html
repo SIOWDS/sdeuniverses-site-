@@ -80,6 +80,9 @@ textarea{resize:vertical;min-height:120px;line-height:1.75}
 @keyframes blink{50%{opacity:0}}
 #errBox{max-width:820px;margin:16px auto 0;background:rgba(248,81,73,0.1);border:1px solid rgba(248,81,73,0.4);border-radius:10px;padding:14px 18px;color:#F5A8A3;font-size:14px;display:none}
 .rev-block{border:1px solid rgba(232,163,61,0.28);border-radius:10px;margin-bottom:12px;background:rgba(13,17,23,0.5);overflow:hidden}
+.rev-group{margin-bottom:20px}
+.rev-group:last-child{margin-bottom:0}
+.rev-group-h{font-size:12.5px;font-weight:700;color:#D4DCE4;letter-spacing:0.04em;margin-bottom:8px;padding-left:2px}
 .rev-head{padding:11px 16px;font-size:13px;font-weight:700;color:#E8A33D;display:flex;align-items:center;gap:9px;border-bottom:1px solid rgba(232,163,61,0.18)}
 .rev-head .n{flex-shrink:0;width:19px;height:19px;border-radius:50%;font-size:11px;display:inline-flex;align-items:center;justify-content:center;background:rgba(232,163,61,0.22);color:#E8A33D}
 .rev-head .st{margin-left:auto;font-size:11.5px;color:#7A8694;font-weight:400}
@@ -102,7 +105,7 @@ footer a{color:var(--gold)}
   <div class="hero-glow"></div>
   <div class="hero-eyebrow">SDE 智能体品尝系列 · 其三</div>
   <h1>SDE <span class="grad">经典解构器</span></h1>
-  <p class="hero-sub">贴一段经典（最长 500 字）——《道德经》的一句、《论语》的一段、圣经的一节、佛经的一偈。一次给你<b style="color:#C9A227">四篇学术论文</b>并排：<b style="color:#6E9FD4">传统经学路数</b>一篇作对照，再加 <b style="color:#C9A227">SDE 1 / 2 / 3</b>——同一个基底把自己的发生学论文<b style="color:#C9A227">自审两次、自改两次</b>后的三个版本。它每一轮改对了什么，你自己看得见。</p>
+  <p class="hero-sub">贴一段经典（最长 500 字）——《道德经》的一句、《论语》的一段、圣经的一节、佛经的一偈。<b style="color:#C9A227">四篇学术论文同时并行生成</b>：<b style="color:#6E9FD4">传统经学</b>一篇作对照；<b style="color:#C9A227">SDE 1／2／3</b>各自独立成篇，分别只用<b style="color:#C9A227">三大方程 / 六路径 / 123原理</b>这一件工具解构同一段经典——三篇互不依赖，各自走完自己的两轮自审自改。全程锁定各家<b style="color:#C9A227">顶配旗舰模型</b>。</p>
 </header>
 
 <div class="howto" style="max-width:1000px;margin:8px auto 0;padding:0 20px">
@@ -114,16 +117,16 @@ footer a{color:var(--gold)}
         <div style="font-size:12.5px;color:#9AA5B0;line-height:1.75">四栏产出的都是<b style="color:#D4DCE4">正经学术论文</b>：标题、摘要、关键词、分节正文、参考文献，各约四千字。传统那篇走经学／文献学路数（训诂→思想脉络→注疏史）；SDE 三篇不问"这句话是什么意思"，而问：<b style="color:#D4DCE4">这段文字是哪一场发生留下的断面</b>，并指认传统读法在哪一步把"发生"错读成了"发现"。</div>
       </div>
       <div style="background:rgba(13,17,23,0.4);border:1px solid rgba(201,162,39,0.4);border-radius:10px;padding:15px 17px">
-        <div style="font-size:13px;font-weight:700;color:#C9A227;margin-bottom:6px">② 四个解读并排 · 自审两次自改两次</div>
-        <div style="font-size:12.5px;color:#9AA5B0;line-height:1.75">这是本工具的核心：初稿写完不算完。基底<b style="color:#E5C86E">调转刀口审自己</b>——逐条挑出"哪里滑回了传统注疏、哪里是套话、证伪条件是不是废话"，据此改一遍；再审一次、再改一次。于是你拿到 <b style="color:#D4DCE4">SDE 1 / 2 / 3</b> 三个版本，外加传统解读作对照，<b style="color:#D4DCE4">四个解读并排</b>——它每一轮到底改对了什么，一目了然。</div>
+        <div style="font-size:13px;font-weight:700;color:#C9A227;margin-bottom:6px">② 三件工具，三篇独立论文，同时并行</div>
+        <div style="font-size:12.5px;color:#9AA5B0;line-height:1.75">SDE 1／2／3 <b style="color:#D4DCE4">不是同一篇稿子改出来的三个版本</b>，而是三篇各自独立成篇的论文——<b style="color:#D4DCE4">SDE1 只用三大方程</b>（S=F(D,E)等）、<b style="color:#D4DCE4">SDE2 只用六路径</b>（先读任务DNA再按路径展开）、<b style="color:#D4DCE4">SDE3 只用123原理</b>（D-E矛盾→S改变→回写）。三篇<b style="color:#E5C86E">同时并行生成</b>、互不依赖，且各自独立走完<b style="color:#E5C86E">两轮自审自改</b>——审自己、改一遍，再审一次、再改一次。同一段经典换一件工具会显出什么不同的断面，并排就看得见。</div>
       </div>
       <div style="background:rgba(13,17,23,0.4);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:15px 17px">
-        <div style="font-size:13px;font-weight:700;color:#C9A227;margin-bottom:6px">③ 任何经典都可以</div>
-        <div style="font-size:12.5px;color:#9AA5B0;line-height:1.75">道德经、论语、孟子、佛经、圣经、古兰经、莎士比亚、诗经——只要是一段被反复引用、被当成"该怎么理解"的经典文字，都能拿来解构。<b style="color:#D4DCE4">输入最长 500 字</b>：一句到一段最好，太长会稀释解构的锋利。四篇论文都受<b style="color:#E8A33D">绝不杜撰</b>约束：记不准的原文、注家、文献，宁可写"待考"也不许编。</div>
+        <div style="font-size:13px;font-weight:700;color:#C9A227;margin-bottom:6px">③ 任何经典都可以，只用顶配模型</div>
+        <div style="font-size:12.5px;color:#9AA5B0;line-height:1.75">道德经、论语、孟子、佛经、圣经、古兰经、莎士比亚、诗经——只要是一段被反复引用、被当成"该怎么理解"的经典文字，都能拿来解构。<b style="color:#D4DCE4">输入最长 500 字</b>：一句到一段最好，太长会稀释解构的锋利。<b style="color:#E8A33D">模型档位已锁定为各家顶配旗舰</b>（不提供快速档），四篇论文都受<b style="color:#E8A33D">绝不杜撰</b>约束：记不准的原文、注家、文献，宁可写"待考"也不许编。</div>
       </div>
     </div>
     <div style="font-size:12px;color:#8B98A5;line-height:1.7;margin-top:14px">
-      🧬 <b style="color:#B0B8C0">八大主流基底任选</b>：DeepSeek · 智谱GLM · Kimi · 通义千问 · MiniMax · GPT · Claude · Gemini——用你自己的 API Key，全程在浏览器里跑，Key 绝不上传本站服务器。<b style="color:#E8A33D">注意</b>：右栏要跑五步（初稿→审→改→审→改），比左栏慢得多，深度思考档可能要好几分钟，这是它该花的时间。
+      🧬 <b style="color:#B0B8C0">八大主流基底任选（均为顶配旗舰档）</b>：DeepSeek · 智谱GLM · Kimi · 通义千问 · MiniMax · GPT · Claude · Gemini——用你自己的 API Key，全程在浏览器里跑，Key 绝不上传本站服务器。<b style="color:#E8A33D">注意</b>：四篇论文同时并行生成，共 16 路模型调用（传统1路 + 三篇各5路），顶配深度思考档可能要好几分钟，这是它该花的时间。
     </div>
   </div>
 </div>
@@ -161,35 +164,27 @@ footer a{color:var(--gold)}
     <select class="model-select" id="modelSel" title="模型">
       <optgroup label="DeepSeek">
         <option value="ds:pro">DeepSeek V4 Pro · 最强推理(Think Max)</option>
-        <option value="ds:flash">DeepSeek V4 Flash · 快速</option>
       </optgroup>
       <optgroup label="智谱 GLM">
         <option value="glm:pro">智谱 GLM-5 · 深度思考(最强)</option>
-        <option value="glm:flash">智谱 GLM-4-Flash · 快速</option>
       </optgroup>
       <optgroup label="月之暗面 Kimi">
         <option value="kimi:pro">月之暗面 Kimi K2.6 · 最新最强(256K)</option>
-        <option value="kimi:flash">月之暗面 Kimi (moonshot-v1-32k) · 快速</option>
       </optgroup>
       <optgroup label="通义千问">
         <option value="qwen:pro">通义千问 Qwen3.7-Max · 深度思考</option>
-        <option value="qwen:flash">通义千问 Qwen-Plus · 均衡快速</option>
       </optgroup>
       <optgroup label="MiniMax">
         <option value="minimax:pro">MiniMax M3 · 最强思考(经代理)</option>
-        <option value="minimax:flash">MiniMax M2.7-Highspeed · 快速(经代理)</option>
       </optgroup>
       <optgroup label="OpenAI">
         <option value="gpt:pro">🌐 GPT-5.5（OpenAI 旗舰·经代理）</option>
-        <option value="gpt:flash">🌐 GPT-5.4（OpenAI 均衡·经代理）</option>
       </optgroup>
       <optgroup label="Anthropic">
         <option value="claude:pro">🌐 Claude Opus 4.8（Anthropic 最强·经代理）</option>
-        <option value="claude:flash">🌐 Claude Sonnet 5（Anthropic 次旗舰·经代理）</option>
       </optgroup>
       <optgroup label="Google">
         <option value="gemini:pro">🌐 Gemini 3.1 Pro（Google 最强·经代理）</option>
-        <option value="gemini:flash">🌐 Gemini 2.5 Flash（Google 快·经代理）</option>
       </optgroup>
     </select>
   </div>
@@ -201,7 +196,7 @@ footer a{color:var(--gold)}
   <div class="col plain" id="colPlain">
     <div class="col-head">
       <div class="col-title"><span class="dot"></span>传统经学</div>
-      <div class="col-tag">对照 · 论文</div>
+      <div class="col-tag">对照组</div>
     </div>
     <div class="col-body" id="plainBody"><span class="placeholder">训诂 · 思想脉络 · 注疏史 —— 一篇传统路数的论文</span></div>
     <div class="col-meta"><span id="plainStatus">待命</span><span id="plainMeta"></span></div>
@@ -209,41 +204,66 @@ footer a{color:var(--gold)}
   <div class="col sde" id="colSde1">
     <div class="col-head">
       <div class="col-title"><span class="dot"></span>SDE 1</div>
-      <div class="col-tag">初稿</div>
+      <div class="col-tag">工具：三大方程</div>
     </div>
-    <div class="col-body" id="sde1Body"><span class="placeholder">发生学解构论文 · 初稿</span></div>
+    <div class="col-body" id="sde1Body"><span class="placeholder">用 S=F(D,E) / D=G(S,E) / E=H(S,D) 解构这段经典 · 自审自改两轮后的终稿</span></div>
     <div class="col-meta"><span id="sde1Status">待命</span><span id="sde1Meta"></span></div>
   </div>
   <div class="col sde" id="colSde2">
     <div class="col-head">
       <div class="col-title"><span class="dot"></span>SDE 2</div>
-      <div class="col-tag">自审自改 ①</div>
+      <div class="col-tag">工具：六路径</div>
     </div>
-    <div class="col-body" id="sde2Body"><span class="placeholder">经第一轮自审后改定的论文</span></div>
+    <div class="col-body" id="sde2Body"><span class="placeholder">先读这段经典的任务DNA、按六路径之一展开解构 · 自审自改两轮后的终稿</span></div>
     <div class="col-meta"><span id="sde2Status">待命</span><span id="sde2Meta"></span></div>
   </div>
-  <div class="col sde final" id="colSde3">
+  <div class="col sde" id="colSde3">
     <div class="col-head">
       <div class="col-title"><span class="dot"></span>SDE 3</div>
-      <div class="col-tag">终稿 · 自审自改 ②</div>
+      <div class="col-tag">工具：123原理</div>
     </div>
-    <div class="col-body" id="sde3Body"><span class="placeholder">经第二轮自审后改定 · 终稿论文</span></div>
+    <div class="col-body" id="sde3Body"><span class="placeholder">用 D-E矛盾→S改变→回写 解构这段经典 · 自审自改两轮后的终稿</span></div>
     <div class="col-meta"><span id="sde3Status">待命</span><span id="sde3Meta"></span></div>
   </div>
 </div>
-<div class="flowhint">四篇都是正经论文（标题·摘要·关键词·分节正文·参考文献，各约四千字）· 传统经学那篇是对照组 · <b>SDE 1 → 2 → 3</b> 是同一个基底把自己的论文越磨越紧的三个版本——并排读，能看见它每一轮到底改对了什么</div>
+<div class="flowhint">四篇都是正经论文（标题·摘要·关键词·分节正文·参考文献，各约四千字），<b>四篇同时并行生成，互不依赖</b> · 传统经学是对照组 · <b>SDE 1／2／3 各自只用三大方程／六路径／123原理这一件工具</b>解构同一段经典，且各自独立完成两轮自审自改 · 三篇并排读，能看见同一段经典换一件工具会显出什么不同的断面</div>
 
 <div id="revPanel" style="max-width:1460px;margin:26px auto 0;padding:0 20px;display:none">
   <div style="background:linear-gradient(135deg,rgba(232,163,61,0.06),rgba(20,16,8,0.3));border:1px solid rgba(232,163,61,0.26);border-radius:14px;padding:20px 22px">
-    <div style="font-size:14px;font-weight:700;color:#E8A33D;margin-bottom:6px">🔬 两份自审意见 · 基底调转刀口审自己</div>
-    <div style="font-size:12.5px;color:#8B98A5;line-height:1.7;margin-bottom:14px">SDE 1 → 2 和 2 → 3 之间的改动，都是由下面这两份自审意见逼出来的。七条硬检查里最重的一条是<b style="color:#E8A33D">查杜撰</b>——编造原文、注家或文献，一经查出就是最致命的那一处。审稿意见往往比终稿更能暴露基底的真实水平：它敢不敢承认自己刚才在说套话。</div>
-    <div class="rev-block" id="revBlock1">
-      <div class="rev-head"><span class="n">1</span><span>审稿一 · 审 SDE 1 论文</span><span class="st" id="rev1Status">待命</span></div>
-      <div class="rev-body" id="rev1Body"><span class="placeholder">尚未开始</span></div>
+    <div style="font-size:14px;font-weight:700;color:#E8A33D;margin-bottom:6px">🔬 三组自审意见 · 每篇论文各自调转刀口审自己</div>
+    <div style="font-size:12.5px;color:#8B98A5;line-height:1.7;margin-bottom:16px">SDE 1／2／3 是三篇独立生成的论文，各自走自己的两轮自审自改，互不干扰。八条硬检查里新加的一条专管"有没有偷偷夹带另外两件工具"——只准用被指定的那一件。审稿意见往往比终稿更能暴露基底的真实水平：它敢不敢承认自己刚才在说套话。</div>
+    <div class="rev-group" id="revGroup1">
+      <div class="rev-group-h">SDE 1 · 三大方程</div>
+      <div class="rev-block" id="revBlock1a">
+        <div class="rev-head"><span class="n">1</span><span>审稿一</span><span class="st" id="rev1aStatus">待命</span></div>
+        <div class="rev-body" id="rev1aBody"><span class="placeholder">尚未开始</span></div>
+      </div>
+      <div class="rev-block" id="revBlock1b">
+        <div class="rev-head"><span class="n">2</span><span>审稿二</span><span class="st" id="rev1bStatus">待命</span></div>
+        <div class="rev-body" id="rev1bBody"><span class="placeholder">尚未开始</span></div>
+      </div>
     </div>
-    <div class="rev-block" id="revBlock2">
-      <div class="rev-head"><span class="n">2</span><span>审稿二 · 审 SDE 2 论文</span><span class="st" id="rev2Status">待命</span></div>
-      <div class="rev-body" id="rev2Body"><span class="placeholder">尚未开始</span></div>
+    <div class="rev-group" id="revGroup2">
+      <div class="rev-group-h">SDE 2 · 六路径</div>
+      <div class="rev-block" id="revBlock2a">
+        <div class="rev-head"><span class="n">1</span><span>审稿一</span><span class="st" id="rev2aStatus">待命</span></div>
+        <div class="rev-body" id="rev2aBody"><span class="placeholder">尚未开始</span></div>
+      </div>
+      <div class="rev-block" id="revBlock2b">
+        <div class="rev-head"><span class="n">2</span><span>审稿二</span><span class="st" id="rev2bStatus">待命</span></div>
+        <div class="rev-body" id="rev2bBody"><span class="placeholder">尚未开始</span></div>
+      </div>
+    </div>
+    <div class="rev-group" id="revGroup3">
+      <div class="rev-group-h">SDE 3 · 123原理</div>
+      <div class="rev-block" id="revBlock3a">
+        <div class="rev-head"><span class="n">1</span><span>审稿一</span><span class="st" id="rev3aStatus">待命</span></div>
+        <div class="rev-body" id="rev3aBody"><span class="placeholder">尚未开始</span></div>
+      </div>
+      <div class="rev-block" id="revBlock3b">
+        <div class="rev-head"><span class="n">2</span><span>审稿二</span><span class="st" id="rev3bStatus">待命</span></div>
+        <div class="rev-body" id="rev3bBody"><span class="placeholder">尚未开始</span></div>
+      </div>
     </div>
   </div>
 </div>
@@ -354,8 +374,8 @@ const sde2Cell={body:$('sde2Body'),status:$('sde2Status'),meta:$('sde2Meta'),col
 const sde3Cell={body:$('sde3Body'),status:$('sde3Status'),meta:$('sde3Meta'),col:$('colSde3')};
 // 审稿块：复用 streamChat 的签名（body/status/meta/col），meta 与 col 用轻量占位即可
 const noopEl = {textContent:'', innerHTML:'', classList:{add(){},remove(){},toggle(){}}, style:{}, appendChild(){}, scrollTop:0, scrollHeight:0};
-const rev1Cell={body:$('rev1Body'),status:$('rev1Status'),meta:noopEl,col:noopEl};
-const rev2Cell={body:$('rev2Body'),status:$('rev2Status'),meta:noopEl,col:noopEl};
+function makeRevCell(n){ return {body:$('rev'+n+'Body'), status:$('rev'+n+'Status'), meta:noopEl, col:noopEl}; }
+const revCells = { '1a':makeRevCell('1a'), '1b':makeRevCell('1b'), '2a':makeRevCell('2a'), '2b':makeRevCell('2b'), '3a':makeRevCell('3a'), '3b':makeRevCell('3b') };
 const errBox=$('errBox');
 function showErr(m){ errBox.textContent=m; errBox.style.display='block'; }
 function hideErr(){ errBox.style.display='none'; }
@@ -426,65 +446,79 @@ function plainPrompt(){
 · 保持学者的审慎：有争议处如实呈现争议，不为了显得深刻而过度引申。
 · 不要复述用户贴的原文全文（可引用其中关键短句）。直接从标题开始写。`;
 }
-function sdeDraftPrompt(neigong){
+// ============ 三篇独立 SDE 论文的初稿提示语：各自用三方程/六路径/三原理作为主分析工具 ============
+const TOOL_LABEL = { eq:'三大方程', paths:'六路径', principle:'123原理' };
+
+function sdeDraftPrompt(neigong, tool){
+  const toolBlock = {
+    eq: `本篇论文唯一的分析工具是**三大方程**（S=F(D,E)、D=G(S,E)、E=H(S,D)）。你要做的不是泛泛地提"显露/差异/纠缠"，而是把这三条方程真正当成解剖刀，具体指认：这段经典文本里，哪个字句是显露态(S)、哪个是差异序列(D)、哪个是纠缠土壤(E)？三者如何"同时互生"——像三脚架三条腿一样，谁也不能被单独抽出来当原初起点？这段经典之所以能立住、能流传，是不是恰恰因为它把三者同时焊死了？请用三大方程"非线性互生、取消先后"的逻辑，论证传统读法为什么会把这段话读成一个单向的教诲（先有真理S，再教人接受），而三大方程揭示的却是三者同时成立。`,
+    paths: `本篇论文唯一的分析工具是**六路径**（先读任务DNA——这段经典的要害落在S/D/E哪一维，再按对应路径次序展开）。你要做的第一件事，是明确判断：这段经典的任务DNA落在哪一维——它是在讲"一个结构该是什么"（S起手）、"一个过程该怎么走"（D起手），还是"一片土壤该如何构成"（E起手）？判断清楚后，按对应路径的次序（例如S→D→E或D→E→S等）逐层展开你的解读，并且要具体论证：如果换一个起点去读这段经典，会读出什么更浅、甚至读错方向的东西？——传统注疏惯用的起点是哪一条，为什么它会让人错过这段经典真正的要害？`,
+    principle: `本篇论文唯一的分析工具是**123原理**（D与E相互矛盾→矛盾逼出S改变→S回写D与E→循环不止）。你要做的是把这段经典放回它诞生、流传、被反复引用的具体历史过程里，指认：促成这段话被说出来的D-E矛盾是什么（当时有哪些新旧张力在积累）？这段话作为S，是在哪一刻被那股张力"逼"出来的结算——不是作者凭空想出来的真理，而是矛盾逼到那里必然的位移？更关键的一步：这段话一旦立住，它是如何回写了后世的D与E的——它怎样重新定义了后人"该沿什么路径推进"（重置D）、又怎样沉淀成了后世无法绕开的新土壤（重置E）？请论证：传统读法止步于"这句话说了什么"，恰恰漏掉了回写这一步，把一个仍在循环中的活结构，读成了一次性说完就散场的死结论。`,
+  }[tool];
+
   return neigong + `
 
 ---
 【本次任务：就一段经典写一篇发生学解构的学术论文 · 初稿】
 用户会给你一段经典文本（可能是《道德经》《论语》《圣经》《金刚经》或其他经典的片段，可能附出处）。你的任务，不是像传统注疏那样问"这句话是什么意思"，而是用发生学的方式追问：这段文字，究竟记录的是一个被传下来的静态教诲，还是一场"发生"留下的断面？
 
+${toolBlock}
+
 请就此写一篇**正式的学术论文**。
 
 【论文规格 · 约 3500-4500 字】
-· **标题**：自拟一个学术论文式的标题
-· **摘要**：200-300 字，交代本文撤销了什么预设、由此得出什么判断
+· **标题**：自拟一个学术论文式的标题，标题或副标题里体现你用的是${TOOL_LABEL[tool]}这件工具
+· **摘要**：200-300 字，交代本文用${TOOL_LABEL[tool]}撤销了什么预设、由此得出什么判断
 · **关键词**：4-6 个
 · **正文分节**，每节带小标题，依次为：
-  一、通行的读法：这段经典通常被读成什么（一个被给定的真理？一条应当遵守的教诲？一个已完成的结论？）——把传统读法的基本盘如实摆出来，不要稻草人化
-  二、断面：这段话是哪一场发生过程被压缩、结晶下来的断面？那场发生的土壤（纠缠）是什么、它经过了什么样的差异推进（试探、修正、收敛），才显露成你现在读到的这几句？——显露、差异、纠缠三者各自在这段文字的哪个字、哪一句上显现，要落到实处
-  三、误读的位置：传统读法在**哪一步**把"发生"错读成了"发现"？请指认那个具体的转折点，而不是笼统地说"它遮蔽了发生"
-  四、改写：把这段经典用发生学的方式重新讲一遍——不是翻译成白话，是换一副眼睛之后，这段话真正在说什么
+  一、通行的读法：这段经典通常被读成什么——把传统读法的基本盘如实摆出来，不要稻草人化
+  二、断面：用${TOOL_LABEL[tool]}这件工具，具体地、落到这段经典字句上地展开你的解构
+  三、误读的位置：传统读法在**哪一步**把"发生"错读成了"发现"？指认那个具体的转折点
+  四、改写：把这段经典用发生学的方式重新讲一遍——换一副眼睛之后，这段话真正在说什么
   五、证伪条件：什么样的反例或情况，会让本文的解构站不住？要指向一个具体的、可以设想的反例
 · **参考文献**：如引用了真实经典或研究著作，列出
 
 【铁律】
 · **绝不杜撰**：不编造经典原文字句、注家姓名、著作名、页码或研究文献。记不准的宁可不写。
 · **不许出现学派黑话**：不要出现"SDE"这个缩写，也不要说"SDE三维""SDE本体论"这类招牌词。"显露/差异/纠缠"这几个字本身可以用，但要用这段经典自身的语域说话，让它读起来像这个领域的本地人写的论文。
+· **只准用一件工具**：本篇的分析工具是${TOOL_LABEL[tool]}，不要把另外两件工具（其余两件见上文未展开的部分）也塞进来充数——工具用错了地方，比不用还糟。
 · 不要复述原文全文（可引用关键短句）。直接从标题开始写。`;
 }
 
-function sdeReviewPrompt(neigong, round){
+function sdeReviewPrompt(neigong, round, tool){
   return neigong + `
 
 ---
 【本次任务：审稿（第${round}轮）· 你审的是你自己刚写的那篇论文】
-用户会给你：一段经典原文 + 一篇针对它的发生学解构论文。这篇论文是你自己写的——现在请调转刀口，用最挑剔的审稿人的眼光审它。
+用户会给你：一段经典原文 + 一篇针对它的发生学解构论文。这篇论文本该只用**${TOOL_LABEL[tool]}**这一件工具来解构，是你自己写的——现在请调转刀口，用最挑剔的审稿人的眼光审它。
 
-审稿不是夸奖，不是复述，更不是打分。请逐条挑出**具体的、可指认的**问题，每条都要引用论文里的原话作为证据，并给出**可操作的改法**（改成什么、为什么这样改更对）。重点审这七处：
+审稿不是夸奖，不是复述，更不是打分。请逐条挑出**具体的、可指认的**问题，每条都要引用论文里的原话作为证据，并给出**可操作的改法**（改成什么、为什么这样改更对）。重点审这八处：
 
 1. **有没有滑回传统注疏**：它是不是换了几个词，骨子里还在做"这句话是什么意思"的疏解？哪一节最像是伪装成发生学的注疏？
-2. **断面那一节是否落到实处**：对显露/差异/纠缠的指认，有没有落到这段经典的**具体字句**上，还是套话——换一段经典也照样能说得通？（后者就是空转，必须点名。）
-3. **"错读成发现"那一刀是否真的落下**：有没有真的指认出那个**具体的转折点**，还是含糊带过、只是宣称"传统读法遮蔽了发生"？
-4. **有没有把传统读法稻草人化**：第一节是不是把通行读法写得比实际更蠢，好让自己的解构显得更高明？如果是，这篇论文就是在打假靶子。
-5. **改写是不是真的换了眼睛**：第四节的改写，是不是只是把原文翻译成白话，或者把第二节的分析重说一遍？它有没有交出一个原文表面读不出来的新判断？
-6. **证伪条件是否真的可证伪**：那一节是不是"如果这套看法不对那它就不对"式的废话？有没有指向一个具体的、可以设想的反例？
-7. **学术规范与真伪**：摘要有没有概括出真正的判断（还是空话）？有没有杜撰经典原文、注家、著作名、页码或研究文献？——**杜撰是最严重的问题，一经发现必须列为最致命的那一处。**
+2. **是否真的只用了${TOOL_LABEL[tool]}这一件工具**：有没有偷偷夹带了另外两件工具（三大方程/六路径/123原理里没被指定的那两件）来充数？工具用混了，比只用一件用得浅还糟。
+3. **${TOOL_LABEL[tool]}这一节是否落到实处**：对这件工具的运用，有没有落到这段经典的**具体字句**上，还是套话——换一段经典也照样能说得通？（后者就是空转，必须点名。）
+4. **"错读成发现"那一刀是否真的落下**：有没有真的指认出那个**具体的转折点**，还是含糊带过、只是宣称"传统读法遮蔽了发生"？
+5. **有没有把传统读法稻草人化**：第一节是不是把通行读法写得比实际更蠢，好让自己的解构显得更高明？如果是，这篇论文就是在打假靶子。
+6. **改写是不是真的换了眼睛**：第四节的改写，是不是只是把原文翻译成白话，或者把第二节的分析重说一遍？它有没有交出一个原文表面读不出来的新判断？
+7. **证伪条件是否真的可证伪**：那一节是不是"如果这套看法不对那它就不对"式的废话？有没有指向一个具体的、可以设想的反例？
+8. **学术规范与真伪**：摘要有没有概括出真正的判断（还是空话）？有没有杜撰经典原文、注家、著作名、页码或研究文献？——**杜撰是最严重的问题，一经发现必须列为最致命的那一处。**
 
 输出格式：直接列出问题清单（每条：问题 → 证据原话 → 具体改法），最后用一句话说出**这篇论文最致命的那一处**。不要写开场白，不要总体夸奖。如果某一处确实做得好、不必改，可以明说"这处保住，不要动"——但不要为了平衡而硬夸。篇幅约 800-1200 字。`;
 }
 
-function sdeRevisePrompt(neigong, round){
+function sdeRevisePrompt(neigong, round, tool){
   return neigong + `
 
 ---
 【本次任务：据审稿意见改稿（第${round}轮）】
-用户会给你：一段经典原文 + 一篇发生学解构论文 + 一份针对这篇论文的审稿意见。请据审稿意见，把论文改一遍。
+用户会给你：一段经典原文 + 一篇发生学解构论文（唯一工具是**${TOOL_LABEL[tool]}**）+ 一份针对这篇论文的审稿意见。请据审稿意见，把论文改一遍。
 
 改稿纪律：
 · **逐条落实**审稿意见里点名的问题——尤其是被指为"最致命"的那一处，必须真的动刀，不能装作改了。
 · 审稿说"这处保住"的地方，**不要动**。
 · **不为改而改**：没被点名、本来就成立的判断和结构，保留原样。改稿是把病灶切掉，不是重写一遍。
 · **绝不编造**：不要为了让论证更顺，杜撰经典原文里没有的字句、不存在的注家或著作、查不到的页码或文献。审稿若指出了杜撰，改法是**删掉或改为"待考"**，不是换一个更像真的假引用。
+· **工具不能换**：本篇论文的分析工具必须仍是${TOOL_LABEL[tool]}，不要因为审稿挑出了毛病就悄悄换成另一件工具来回避问题——工具选错不是本轮该处理的事，工具用浅了才是。
 · 输出**完整的论文全文**（不是修改说明、不是差异对照），保持原有的论文规格（标题／摘要／关键词／五节正文／参考文献），篇幅仍约 3500-4500 字。
 
 直接输出改后的论文全文，从标题开始，不要写"根据审稿意见我做了如下修改"这类前言。`;
@@ -649,66 +683,69 @@ async function run(){
   const key=apiKeyEl.value.trim().replace(/^["']|["']$/g,'');
   const text=classicTextEl.value.trim();
   const src=sourceInfoEl.value.trim();
-  const model=modelSel.value;
+  const model=modelSel.value; // 下拉框已锁死只剩顶配档，此处天然是"最高智商模型"
   if(!key){ showErr('请先填入你的 '+vendorName()+' API Key'); apiKeyEl.focus(); return; }
   if(!text){ showErr('请贴一段经典文本'); classicTextEl.focus(); return; }
   if(text.length > 500){ showErr('经典文本最长 500 字，当前 '+text.length+' 字——请截取其中最要紧的一段。'); classicTextEl.focus(); return; }
 
   try{ await ensureNeigong(); }catch(e){ showErr(e.message); return; }
 
-  goBtn.disabled=true; goBtn.textContent='⏳ 四篇论文生成中（SDE 要跑五步·各约四千字）……';
+  goBtn.disabled=true; goBtn.textContent='⏳ 四篇论文同时生成中（每篇独立走完两轮自审自改）……';
   $('revPanel').style.display='block';
   [plainCell, sde1Cell, sde2Cell, sde3Cell].forEach(c=>{ c.body.innerHTML='<span class="placeholder">已排队，即将开始……</span>'; c.status.innerHTML='<span class="spinner"></span> 排队中'; c.meta.textContent=''; });
-  [rev1Cell, rev2Cell].forEach(c=>{ c.body.innerHTML='<span class="placeholder">等待前一步完成……</span>'; c.status.textContent='排队中'; });
+  Object.values(revCells).forEach(c=>{ c.body.innerHTML='<span class="placeholder">等待对应论文初稿完成……</span>'; c.status.textContent='排队中'; });
 
   const userQ = src ? ('【出处】'+src+'\n【原文】\n'+text) : ('【原文】\n'+text);
   const N = SDE_BASE;
 
-  // 左一：传统解读（与 SDE 链并行，不必等它）
+  // 传统经学：独立一次成稿，对照组，不参与任何 SDE 工具与自审
   const plainTask = streamChat(key, model, plainPrompt(), userQ, plainCell.body, plainCell.status, plainCell.meta, plainCell.col, PAPER_TOKENS)
-    .catch(e=>{ showErr('传统解读：'+e.message); plainCell.body.innerHTML='<span class="placeholder">生成失败：'+escTxt(e.message)+'</span>'; plainCell.status.textContent='失败'; return {text:''}; });
+    .catch(e=>{ showErr('传统经学：'+e.message); plainCell.body.innerHTML='<span class="placeholder">生成失败：'+escTxt(e.message)+'</span>'; plainCell.status.textContent='失败'; return {text:''}; });
 
-  // SDE 链：五步串行——每一步都要拿上一步的产物当输入，只能一步步来
-  const sdeTask = (async ()=>{
-    // SDE1 · 初稿
-    const draft = await streamChat(key, model, sdeDraftPrompt(N), userQ, sde1Cell.body, sde1Cell.status, sde1Cell.meta, sde1Cell.col, PAPER_TOKENS);
-    if(!draft.text) throw new Error('SDE1 初稿为空，后续四步无法进行');
+  // 三篇 SDE 论文各自独立：initial draft → review a → revise → review b → revise，互不依赖、同时跑
+  // tool: 'eq'(三大方程) / 'paths'(六路径) / 'principle'(123原理)；paperCell 是该篇论文最终显示的那一栏
+  function runSdeChain(tool, paperCell, revA, revB, label){
+    return (async ()=>{
+      const draft = await streamChat(key, model, sdeDraftPrompt(N, tool), userQ, paperCell.body, paperCell.status, paperCell.meta, paperCell.col, PAPER_TOKENS);
+      if(!draft.text) throw new Error(label+' 初稿为空，自审自改无法进行');
 
-    // 审稿一 · 审 SDE1
-    const rev1 = await streamChat(key, model, sdeReviewPrompt(N, 1), userQ + '\n\n【待审的解构稿】\n' + draft.text,
-      rev1Cell.body, rev1Cell.status, rev1Cell.meta, rev1Cell.col, REVIEW_TOKENS);
+      const rA = await streamChat(key, model, sdeReviewPrompt(N, 1, tool), userQ + '\n\n【待审的解构稿】\n' + draft.text,
+        revA.body, revA.status, revA.meta, revA.col, REVIEW_TOKENS);
 
-    // SDE2 · 据审稿一改定
-    let cur = draft.text;
-    if(rev1.text){
-      const fix1 = await streamChat(key, model, sdeRevisePrompt(N, 1),
-        userQ + '\n\n【原解构稿】\n' + draft.text + '\n\n【审稿意见】\n' + rev1.text,
-        sde2Cell.body, sde2Cell.status, sde2Cell.meta, sde2Cell.col, PAPER_TOKENS);
-      if(fix1.text) cur = fix1.text;
-    }
-    if(cur === draft.text){ sde2Cell.body.textContent = cur; sde2Cell.status.textContent = '（审稿未产出意见·沿用 SDE1）'; }
+      let cur = draft.text;
+      if(rA.text){
+        const fixA = await streamChat(key, model, sdeRevisePrompt(N, 1, tool),
+          userQ + '\n\n【原解构稿】\n' + draft.text + '\n\n【审稿意见】\n' + rA.text,
+          paperCell.body, paperCell.status, paperCell.meta, paperCell.col, PAPER_TOKENS);
+        if(fixA.text) cur = fixA.text;
+      }
 
-    // 审稿二 · 审 SDE2
-    const rev2 = await streamChat(key, model, sdeReviewPrompt(N, 2), userQ + '\n\n【待审的解构稿】\n' + cur,
-      rev2Cell.body, rev2Cell.status, rev2Cell.meta, rev2Cell.col, REVIEW_TOKENS);
+      const rB = await streamChat(key, model, sdeReviewPrompt(N, 2, tool), userQ + '\n\n【待审的解构稿】\n' + cur,
+        revB.body, revB.status, revB.meta, revB.col, REVIEW_TOKENS);
 
-    // SDE3 · 据审稿二改定（终稿）
-    let fin = cur;
-    if(rev2.text){
-      const fix2 = await streamChat(key, model, sdeRevisePrompt(N, 2),
-        userQ + '\n\n【原解构稿】\n' + cur + '\n\n【审稿意见】\n' + rev2.text,
-        sde3Cell.body, sde3Cell.status, sde3Cell.meta, sde3Cell.col, PAPER_TOKENS);
-      if(fix2.text) fin = fix2.text;
-    }
-    if(fin === cur){ sde3Cell.body.textContent = fin; sde3Cell.status.textContent = '（审稿未产出意见·沿用 SDE2）'; }
-    return { text: fin };
-  })().catch(e=>{
-    showErr('SDE 解构：'+e.message);
-    [sde1Cell, sde2Cell, sde3Cell].forEach(c=>{ if(c.status.textContent==='排队中' || c.status.innerHTML.indexOf('排队中')>=0){ c.status.textContent='未进行'; c.body.innerHTML='<span class="placeholder">前一步中断，未能进行</span>'; } });
-    return {text:''};
-  });
+      let fin = cur;
+      if(rB.text){
+        const fixB = await streamChat(key, model, sdeRevisePrompt(N, 2, tool),
+          userQ + '\n\n【原解构稿】\n' + cur + '\n\n【审稿意见】\n' + rB.text,
+          paperCell.body, paperCell.status, paperCell.meta, paperCell.col, PAPER_TOKENS);
+        if(fixB.text) fin = fixB.text;
+      }
+      paperCell.body.textContent = fin;
+      return { text: fin };
+    })().catch(e=>{
+      showErr(label+'：'+e.message);
+      paperCell.status.textContent='失败';
+      paperCell.body.innerHTML='<span class="placeholder">生成中断：'+escTxt(e.message)+'</span>';
+      return {text:''};
+    });
+  }
 
-  await Promise.all([plainTask, sdeTask]);
+  // 三条链完全独立、同时并行——任何一条的成败或早晚都不影响另外两条
+  const sde1Task = runSdeChain('eq',        sde1Cell, revCells['1a'], revCells['1b'], 'SDE1(三大方程)');
+  const sde2Task = runSdeChain('paths',     sde2Cell, revCells['2a'], revCells['2b'], 'SDE2(六路径)');
+  const sde3Task = runSdeChain('principle', sde3Cell, revCells['3a'], revCells['3b'], 'SDE3(123原理)');
+
+  await Promise.all([plainTask, sde1Task, sde2Task, sde3Task]);
   goBtn.disabled=false; goBtn.textContent='✦ 生成四篇论文（传统 · SDE1 · SDE2 · SDE3）';
 }
 goBtn.addEventListener('click', run);
