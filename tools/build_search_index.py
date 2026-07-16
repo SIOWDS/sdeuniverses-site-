@@ -27,6 +27,65 @@ SKIP_URL_SUBSTR = ("/taste/idea-generator/", "/taste/glm-test", "/check/", "/dia
 
 CJK = re.compile(r"[\u4e00-\u9fff]")
 
+
+def _check_stale():
+    """--check：只比对不重建。索引是派生数据，会随内容过期。
+
+    用途：提交前自检，或在别人怀疑「搜不到刚发的东西」时一秒定位。
+    判据：磁盘上该进索引的页面集合，与 manifest 记录的 URL 集合是否一致。
+    退出码 1 = 已过期，需重跑本脚本。
+    """
+    mf = os.path.join(OUT, "manifest.json")
+    if not os.path.exists(mf):
+        print("manifest.json 不存在 —— 索引从未构建", file=sys.stderr)
+        return 1
+    m = json.load(open(mf, encoding="utf-8"))
+    have = {d["u"] for d in m.get("docs", [])}
+
+    # 判据必须与下方主循环的筛选规则完全一致，否则自检会报出一堆假警报：
+    # read.html 是 PDF 阅读器空壳（无独立正文，生成器跳过）；PDF 不单独成文档，
+    # 而是归到同目录的页面 URL。照抄规则，不要另写一套。
+    want = set()
+    for dirpath, dirnames, filenames in os.walk(PUB):
+        dirnames[:] = [d for d in dirnames if d not in SKIP_DIRS]
+        for fn in filenames:
+            if not fn.endswith(".html") or fn == "read.html":
+                continue
+            rel = os.path.relpath(os.path.join(dirpath, fn), PUB)
+            u = canon_url(rel)
+            if any(k in u for k in SKIP_URL_SUBSTR):
+                continue
+            want.add(u)
+
+    missing = sorted(want - have)   # 已发布但未进索引 —— 站内搜不到
+    # 孤立 PDF（同目录无 index.html）由生成器以 PDF 自身 URL 建文档，是合法收录，
+    # 不在 want 里但也不是死链。只报那些磁盘上真的已经没有对应文件的。
+    def _exists(u):
+        rel = u.strip("/")
+        if not rel:
+            return True
+        cand = os.path.join(PUB, rel)
+        return os.path.exists(cand) or os.path.isdir(cand) or os.path.exists(os.path.join(cand, "index.html"))
+    stale = sorted(u for u in (have - want) if not _exists(u))
+
+    print("manifest 构建于 %s · 收录 %d 篇 · 磁盘 %d 篇" % (m.get("built", "?"), len(have), len(want)))
+    if not missing and not stale:
+        print("索引与磁盘一致 ✅")
+        return 0
+    if missing:
+        print("\n❌ 已发布但搜不到（%d 篇）：" % len(missing), file=sys.stderr)
+        for u in missing[:25]:
+            print("   " + u, file=sys.stderr)
+        if len(missing) > 25:
+            print("   …另有 %d 篇" % (len(missing) - 25), file=sys.stderr)
+    if stale:
+        print("\n⚠ 索引里有、磁盘已无（%d 篇）：" % len(stale), file=sys.stderr)
+        for u in stale[:10]:
+            print("   " + u, file=sys.stderr)
+    print("\n→ 请运行：python3 tools/build_search_index.py", file=sys.stderr)
+    return 1
+
+
 def canon_url(relpath):
     u = "/" + relpath.replace(os.sep, "/")
     if u.endswith("/index.html"):
@@ -36,6 +95,11 @@ def canon_url(relpath):
 def section_of(relpath):
     top = relpath.replace(os.sep, "/").split("/")[0]
     return top if top in SECTION_LABELS else "_root"
+
+# --check 在此拦截：canon_url / SKIP_* 已定义，且尚未开始构建
+if "--check" in sys.argv:
+    sys.exit(_check_stale())
+
 
 def clean_text(t):
     t = htmllib.unescape(t)

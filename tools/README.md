@@ -45,3 +45,36 @@ git rebase --continue
 ### 仍然手工的字段
 
 `slug` / `name` / `small` / `enrolled_order` 是学员身份信息，磁盘上推不出来，继续由 `roster.json` 承载——只有新学员报名时才动。生成器只覆盖 `papers` 与 `count`。
+
+---
+
+## build_search_index.py — 重建站内搜索索引
+
+站内搜索（`/search/`）靠 `public/search/manifest.json` + `shard-*.json` 供料。**这些也是派生数据。**
+
+```bash
+python3 tools/build_search_index.py            # 重建（发完任何页面都要跑）
+python3 tools/build_search_index.py --check    # 只比对不重建，过期则退出码 1
+```
+
+### 为什么
+
+跟 roster 是同一个病：内容一变，索引就过期。**发完页面必须在同一 commit 里重建。**
+
+漏掉的后果不是「搜索少几篇」。曾经站上刚立了论文抄袭专栏、发了四篇论文——而在站内搜「抄袭」，那四篇一篇都不出来，因为索引停在发表之前。生成器的 docstring 第一行就写着要重跑，照样被连漏六轮。**这说明它属于流程，不属于记性**，所以现在有了 `--check`：过期与否是一条能跑的命令，不再靠人回忆。
+
+### 新开栏目
+
+要同时在本脚本的 `SECTION_LABELS` 里登记。否则 `section_of()` 落到 `_root`，内容搜得到，但栏目标签显示成「首页与其他」。
+
+### 索引不能被缓存
+
+重建了、读的人拿不到，等于没建。`_headers` 现已给 `/search/` 配了整套 `no-store`，且 `search/index.html` 里两处 fetch 都带 `?v=Date.now()` + `cache:'no-store'`。
+
+**这两道不要拆**：`_headers` 只在部署后生效、对已经缓存住的旧副本无效；`?v=` 才是立刻绕开的那道。页面上显示 286 而仓库是 295，就是只有前者、没有后者的时候发生的。
+
+页面上的篇数/字数（`docN`/`charsN`/`charsQ`）是**运行时从 manifest 读的**，HTML 里写死的数字只是占位符。看到数字不对，先查缓存和 manifest，别去改 HTML。
+
+### --check 的判据
+
+必须与主循环的筛选规则**完全一致**，否则全是假警报：`read.html` 是 PDF 阅读器空壳（无独立正文，跳过）；PDF 不单独成文档，归到同目录的页面 URL；同目录无 index.html 的孤立 PDF 才以自身 URL 建文档。我第一版另写了一套判据，于是报出 66 篇「搜不到」和 29 篇「死链」——全是假的。**照抄规则，不要另写。**
