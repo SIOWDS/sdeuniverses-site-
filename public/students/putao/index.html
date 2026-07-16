@@ -2,41 +2,52 @@
 <html lang="zh-CN"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>葡萄 · 学员专栏 | SDE Universes</title>
-<meta name="description" content="葡萄 · SDE 学员专栏 · Students' Column, SDE Universes">
+<meta name="description" content="葡萄（石奇志）· 语言发生学与意义生成研究 · SDE 学员专栏 · Students' Column, SDE Universes">
 <style>
-:root{--gold:#C9A84C;--gold2:#D4B25E;--ink:#F0E9D8;--ink2:#B8AE96;--bg:#0E0B08;--panel:#171310;--panel2:#1C1712;--line:rgba(201,168,76,0.22);--accent:#8C6A2E}
+:root{--sky:#4FC3F7;--blue:#2196F3;--link:#0A66B2;--btn:#0A66C2;--teal:#14B8A6;--teal2:#0E7C71;--head:#0F2C4A;--text:#1E293B;--muted:#5A6B80;--bg:#F8FCFF;--card:#FFFFFF;--line:rgba(79,195,247,0.40)}
 *{margin:0;padding:0;box-sizing:border-box}
-::selection{background:rgba(201,168,76,0.35)}
-body{background:var(--bg);color:var(--ink);font-family:"Noto Serif SC",Georgia,"Songti SC",serif;line-height:1.9}
+::selection{background:rgba(79,195,247,0.35)}
+body{background:var(--bg);color:var(--text);font-family:"Noto Serif SC",Georgia,"Songti SC",serif;line-height:1.9}
 body.zh .en-only{display:none!important}
 body.en .zh-only{display:none!important}
-nav{position:sticky;top:0;z-index:20;background:rgba(14,11,8,0.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+nav{position:sticky;top:0;z-index:20;background:rgba(248,252,255,0.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
 nav .w{max-width:900px;margin:0 auto;padding:13px 24px;display:flex;justify-content:space-between;align-items:center}
-nav a{color:var(--gold);text-decoration:none;font-size:14px;letter-spacing:0.05em}
+nav a{color:var(--link);text-decoration:none;font-size:14px;letter-spacing:0.05em}
 .nav-right{display:flex;align-items:center;gap:16px}
-.lang-toggle{display:flex;border:1px solid var(--line);border-radius:20px;overflow:hidden}
-.lang-btn{background:transparent;border:none;color:var(--ink2);font-family:inherit;font-size:13px;padding:5px 13px;cursor:pointer;letter-spacing:0.05em}
-.lang-btn.active{background:var(--gold);color:#1A1410;font-weight:700}
+.lang-toggle{display:flex;border:1px solid rgba(33,150,243,0.45);border-radius:20px;overflow:hidden}
+.lang-btn{background:transparent;border:none;color:var(--muted);font-family:inherit;font-size:13px;padding:5px 13px;cursor:pointer;letter-spacing:0.05em}
+.lang-btn.active{background:var(--btn);color:#fff;font-weight:700}
 .level-tag{max-width:820px;margin:0 auto;padding:0 24px;display:flex;align-items:center;gap:14px}
-.level-tag .n{font-size:12px;letter-spacing:0.2em;color:#1A1410;background:var(--gold);border-radius:20px;padding:3px 12px;font-weight:700}
-.level-tag .t{font-size:12px;letter-spacing:0.32em;color:var(--gold)}
+.level-tag .n{font-size:12px;letter-spacing:0.2em;color:#fff;background:var(--btn);border-radius:20px;padding:3px 12px;font-weight:700}
+.level-tag .t{font-size:12px;letter-spacing:0.32em;color:var(--teal2)}
 .level-tag .line{flex:1;height:1px;background:var(--line)}
 .profile{max-width:820px;margin:0 auto;padding:52px 24px 20px;display:flex;gap:34px;align-items:center;flex-wrap:wrap}
-.avatar{width:132px;height:132px;border-radius:50%;flex-shrink:0;background:linear-gradient(160deg,rgba(212,178,94,0.30),rgba(212,178,94,0.06));border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-family:Georgia,serif;font-size:52px;font-weight:800;color:#F5E6BF;position:relative}
-.avatar .ph{font-size:10px;letter-spacing:0.15em;color:var(--ink2);position:absolute;bottom:12px;font-family:"Noto Serif SC",serif}
+.avatar{width:132px;height:132px;border-radius:50%;flex-shrink:0;background:linear-gradient(160deg,#4FC3F7,#2196F3 60%,#0A66C2);border:3px solid #fff;box-shadow:0 12px 34px rgba(15,44,74,0.18);display:flex;align-items:center;justify-content:center;font-family:Georgia,"Noto Serif SC",serif;font-size:50px;font-weight:800;color:#fff}
 .p-info{flex:1;min-width:240px}
-.p-info h1{font-size:clamp(30px,5vw,42px);font-weight:800;color:#F5EFE0;letter-spacing:0.04em;font-family:Georgia,"Noto Serif SC",serif}
-.p-note{font-size:14px;color:var(--ink2);margin-top:6px;letter-spacing:0.04em}
-.p-info .role{font-size:13px;color:var(--accent);letter-spacing:0.2em;margin-top:12px}
-.p-info .bio{font-size:15px;color:#6B6250;line-height:1.9;margin-top:16px;font-style:italic}
+.p-info h1{font-size:clamp(30px,5vw,42px);font-weight:800;color:var(--head);letter-spacing:0.04em;font-family:Georgia,"Noto Serif SC",serif}
+.p-note{font-size:14px;color:var(--muted);margin-top:8px;letter-spacing:0.05em}
+.p-info .role{font-size:13px;color:var(--teal2);letter-spacing:0.2em;margin-top:12px}
+.p-info .tagline{font-size:15.5px;color:var(--link);letter-spacing:0.05em;margin-top:14px;font-family:"Noto Serif SC",Georgia,serif}
+.statement{max-width:820px;margin:0 auto;padding:18px 24px 6px}
+.statement p{font-size:16px;color:var(--text);line-height:2.02;margin-bottom:18px}
+.statement p:last-child{margin-bottom:0}
+.statement b{color:var(--link);font-weight:700}
+.facts{max-width:820px;margin:0 auto;padding:10px 24px 0;display:flex;gap:14px;flex-wrap:wrap}
+.fact{background:var(--card);border:1px solid var(--line);border-left:3px solid var(--sky);border-radius:10px;padding:14px 18px;flex:1;min-width:190px;box-shadow:0 2px 12px rgba(15,44,74,0.05)}
+.fact .k{font-size:11px;letter-spacing:0.24em;color:var(--teal2);margin-bottom:6px}
+.fact .v{font-size:14.5px;color:var(--text);line-height:1.75}
 .works{max-width:820px;margin:0 auto;padding:10px 24px 80px}
-.panel{background:linear-gradient(160deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:16px;padding:40px 30px;text-align:center;margin-top:20px}
-.panel .tag{font-size:12px;letter-spacing:0.34em;color:var(--gold);margin-bottom:14px}
-.panel p{font-size:14.5px;color:var(--ink2);line-height:1.9;max-width:520px;margin:0 auto}
+.works-entry{display:block;text-decoration:none;margin-top:20px}
+.we-card{background:linear-gradient(135deg,#4FC3F7 0%,#2196F3 45%,#0A66C2 100%);border-radius:14px;padding:24px 28px;display:flex;align-items:center;justify-content:space-between;gap:16px;transition:transform .18s,box-shadow .18s;box-shadow:0 6px 20px rgba(15,44,74,0.14)}
+.works-entry:hover .we-card{transform:translateY(-2px);box-shadow:0 14px 34px rgba(15,44,74,0.22)}
+.we-lbl{font-size:12px;letter-spacing:0.3em;color:#E6F6FE;margin-bottom:8px;font-weight:700}
+.we-title{font-size:20px;font-weight:800;color:#fff}
+.we-sub{font-size:13px;color:#E9F6FE;margin-top:7px;line-height:1.7}
+.we-arrow{font-size:30px;color:#fff;flex-shrink:0}
 .back{text-align:center;margin-top:30px}
-.back a{color:var(--gold);text-decoration:none;font-size:14.5px;letter-spacing:0.06em;border-bottom:1px solid rgba(201,168,76,0.4);padding-bottom:2px}
-footer{border-top:1px solid var(--line);margin-top:24px;padding:30px 24px;text-align:center;color:#6B6250;font-size:13px}
-footer a{color:var(--gold);text-decoration:none}
+.back a{color:var(--link);text-decoration:none;font-size:14.5px;letter-spacing:0.06em;border-bottom:1px solid rgba(33,150,243,0.45);padding-bottom:2px}
+footer{border-top:1px solid var(--line);background:#EAF6FE;margin-top:24px;padding:30px 24px;text-align:center;color:var(--muted);font-size:13px}
+footer a{color:var(--link);text-decoration:none}
 @media(max-width:640px){.profile{justify-content:center;text-align:center}.p-info{text-align:center}}
 </style></head>
 <body class="zh">
@@ -52,27 +63,65 @@ footer a{color:var(--gold);text-decoration:none}
   <span class="n">01</span><span class="t zh-only">学 员 介 绍 · PROFILE</span><span class="t en-only">PROFILE</span><span class="line"></span>
 </div>
 <div class="profile">
-  <div class="avatar">葡<span class="ph zh-only">照片待补</span><span class="ph en-only">photo TBA</span></div>
+  <div class="avatar">葡</div>
   <div class="p-info">
     <h1>葡萄</h1>
-    
-    <div class="role zh-only">SDE 学员</div>
-    <div class="role en-only">SDE TRAINEE</div>
-    <p class="bio zh-only">个人简介待补 —— 照片与简介陆续补充。</p>
-    <p class="bio en-only">Bio coming soon — photo and introduction to be added.</p>
+    <div class="p-note zh-only">石奇志 · 郑州大学软件开发专业（2006）· IT 从业十余载</div>
+    <div class="p-note en-only">Shi Qizhi · Software Engineering, Zhengzhou University (2006) · 10+ years in IT</div>
+    <div class="role zh-only">SDE 学员 · 语言发生学与意义生成</div>
+    <div class="role en-only">SDE TRAINEE · GENESIS OF LANGUAGE &amp; MEANING</div>
+    <div class="tagline zh-only">意义不是被发现的结论，而是在互动中发生的事件</div>
+    <div class="tagline en-only">Meaning is not a conclusion to be found, but an event that occurs in interaction</div>
+  </div>
+</div>
+
+<div class="facts">
+  <div class="fact">
+    <div class="k zh-only">研 究 重 心</div><div class="k en-only">FOCUS</div>
+    <div class="v zh-only">语言发生学 · 意义生成 · 生命成长 · 人与世界关系的形成机制</div>
+    <div class="v en-only">Genesis of language · the making of meaning · growth · how the human–world relation forms</div>
+  </div>
+  <div class="fact">
+    <div class="k zh-only">合 著</div><div class="k en-only">CO-AUTHORED</div>
+    <div class="v zh-only">2025 年与王德生博士合著专著《特征纠缠探秘》</div>
+    <div class="v en-only">Into the Entanglement of Features, with Dr. Wang Desheng (2025)</div>
+  </div>
+  <div class="fact">
+    <div class="k zh-only">应 用 领 域</div><div class="k en-only">APPLIED TO</div>
+    <div class="v zh-only">教育 · 神学 · 医学 · 社会分析</div>
+    <div class="v en-only">Education · theology · medicine · social analysis</div>
   </div>
 </div>
 
 <div class="level-tag" style="margin-top:36px">
-  <span class="n">02</span><span class="t zh-only">作 品 与 专 栏 · WORKS</span><span class="t en-only">WORKS &amp; COLUMNS</span><span class="line"></span>
+  <span class="n">02</span><span class="t zh-only">简 述 · STATEMENT</span><span class="t en-only">STATEMENT</span><span class="line"></span>
+</div>
+<div class="statement">
+  <p class="zh-only">葡萄，本名石奇志，2006 年毕业于<b>郑州大学软件开发专业</b>，在 IT 行业工作十余载。2022 年起跟随<b>王德生博士</b>研习本体论，所持的基本判断是：<b>意义并非作为静态结论被发现，而是在主体、关系、语言与事件的互动中逐步发生</b>。研究重心落在语言发生学、意义生成、生命成长，以及人与世界之关系的形成机制——探索主体、互动与客体之间的整体结构，追问情境、关系、语言与行动如何共同促成意义、身份与秩序的形成，并尝试应用于教育、神学、医学及社会分析。</p>
+  <p class="en-only">Putao — Shi Qizhi — graduated in <b>software engineering from Zhengzhou University</b> in 2006 and spent over a decade in the IT industry. Since 2022, studying ontology under <b>Dr. Wang Desheng</b>, the working conviction has been this: <b>meaning is not discovered as a static conclusion; it comes about, step by step, in the interplay of subject, relation, language and event</b>. The research centres on the genesis of language, the making of meaning, the growth of a life, and the mechanisms by which the human–world relation takes shape — tracing the whole structure that binds subject, interaction and object, asking how situation, relation, language and action jointly bring meaning, identity and order into being, and carrying that question into education, theology, medicine and social analysis.</p>
+  <p class="zh-only">由此展开三条线索：其一，从发生、互动与生命成长的角度重新理解文本——文本如何塑造人与群体，而不仅仅传递抽象知识；其二，针对传统教育中的<b>知识灌输、标准答案与评价焦虑</b>，研究以关系、问题、行动和意义生成为中心的新型教育方式，并探讨家庭共学、在家教育与创造力培养；其三，关注人工智能对写作、教育、课程开发、视频制作与知识组织方式的冲击，研究 AI 如何帮助人形成<b>问题意识、结构思维与创造性表达</b>。</p>
+  <p class="en-only">Three lines follow. First, rereading texts through occurrence, interaction and growth — asking how a text forms persons and communities rather than merely conveying abstractions. Second, against the <b>rote transmission, standard answers and evaluative anxiety</b> of conventional schooling, working out an education centred on relation, question, action and the making of meaning — including family co-learning, home education and the cultivation of creativity. Third, tracking what AI is doing to writing, teaching, curriculum design, video-making and the organisation of knowledge — and how it might help a person build <b>a sense for problems, structural thinking and creative expression</b>.</p>
+  <p class="zh-only">工作之外，长期阅读与写作，关注哲学、心理学、教育学、文学及中国传统文化；喜欢跑步、散步、自然观察、摄影与书法，也关注视频创作与数字化内容制作。重视家庭生活、人与人之间的真实交流以及群体的共同成长——愿意通过分享、培训、写作与实践，帮助人建立信仰、恢复行动力、发现生命的意义。所信奉的是：<b>真正的知识不只是被记住的内容，更是在关系、行动和生命经历中发生的意义</b>；致力于连接信仰与现实、思想与实践、教育与成长，使研究能够服务于人，使真理能够进入生活。</p>
+  <p class="en-only">Beyond the work: a long habit of reading and writing across philosophy, psychology, education, literature and the Chinese classical tradition; running, walking, watching the natural world, photography and calligraphy; and an eye on video and digital content. Family life, unfeigned exchange between people, and the growing of a community together all matter here — the hope being, through teaching, writing and practice, to help others find footing for faith, recover the capacity to act, and discover what a life is for. The conviction beneath it all: <b>real knowledge is not only what is remembered, but the meaning that occurs in relationship, in action, and in the living of a life</b> — joining faith to reality, thought to practice, and education to growth, so that research may serve people and truth may enter life.</p>
+</div>
+
+<div class="level-tag" style="margin-top:36px">
+  <span class="n">03</span><span class="t zh-only">作 品 与 专 栏 · WORKS</span><span class="t en-only">WORKS &amp; COLUMNS</span><span class="line"></span>
 </div>
 <div class="works">
-  <div class="panel">
-    <div class="tag zh-only">作 品 陆 续 上 线</div>
-    <div class="tag en-only">WORKS COMING SOON</div>
-    <p class="zh-only">借一双「事物如何发生」的眼，在自己的领域里落笔——把 SDE 作为隐性的引擎，用本行的母语写作。作品通过合宪性审读后，将署名发表于此。</p>
-    <p class="en-only">Borrowing an eye trained on how things come to be, and writing in the native idiom of one’s own field — with SDE as a hidden engine. Once a piece passes its constitutionality review, it will be published here under this name.</p>
-  </div>
+  <a class="works-entry" href="/students/putao/works/">
+    <div class="we-card">
+      <div>
+        <div class="we-lbl zh-only">进 入 作 品</div>
+        <div class="we-lbl en-only">ENTER THE WORKS</div>
+        <div class="we-title zh-only">葡萄 · 四篇文章</div>
+        <div class="we-title en-only">Four papers by Putao</div>
+        <div class="we-sub zh-only">悬置的闸口（延迟认证与多系统借时）· 健康的钟摆从未停在正中（稳态接壤）· 回响与寂静（教育选择的再审视）· 当“程序合规”无法平息愤怒 —— 每篇三种阅读方式</div>
+        <div class="we-sub en-only">The suspended gate · the pendulum that never rests at centre · echo and silence · when “due process” cannot quiet the anger — each in three reading modes</div>
+      </div>
+      <div class="we-arrow">→</div>
+    </div>
+  </a>
   <div class="back"><a href="/students/"><span class="zh-only">← 返回学员专栏名单</span><span class="en-only">← Back to the students roster</span></a></div>
 </div>
 
