@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>论文抄袭专栏 · Plagiarism &amp; Originality | SDE Universes</title>
+<meta name="description" content="抄袭不是偷字，是隐去了「我从谁那里来」这条路径。论文抄袭专栏——关于抄袭如何发生、原创如何被证明的长文合辑。">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#F5EFE0;--card:#FAF6EC;--card2:#F0E8D3;--gold:#8A6817;--text:#2A2315;--text2:#6B5D47;--muted:#98886C;--border:rgba(138,104,23,0.22);--border2:rgba(138,104,23,0.10);--accent:#A32E4E;--accent2:#C04166}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Noto Serif SC','EB Garamond',Georgia,serif;line-height:1.75;overflow-x:hidden}
+body.en{font-family:'EB Garamond','Playfair Display',Georgia,serif}
+body.en .zh-only{display:none}
+body.zh .en-only{display:none}
+a{color:inherit}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;flex-direction:column;padding:0.6rem 3rem 0.5rem;background:rgba(245,239,224,0.9);backdrop-filter:blur(12px);border-bottom:1px solid var(--border2)}
+.nav-logo{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;color:var(--gold);letter-spacing:0.05em;text-decoration:none}
+.nav-links{display:flex;align-items:center;gap:1.6rem}
+.nav-links a{color:var(--text2);text-decoration:none;font-size:0.85rem;letter-spacing:0.1em;transition:color 0.2s}
+.nav-links a:hover{color:var(--accent)}
+.nav-links a.here{color:var(--accent);font-weight:600}
+.lang-toggle{display:flex;background:var(--card);border:1px solid var(--border);border-radius:20px;overflow:hidden}
+.lang-btn{padding:0.3rem 0.8rem;font-size:0.75rem;border:none;background:transparent;color:var(--text2);cursor:pointer;font-family:inherit}
+.lang-btn.active{background:var(--accent);color:#fff;font-weight:600}
+.wrap{max-width:940px;margin:0 auto;padding:0 2rem}
+header.hero{min-height:66vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:9rem 2rem 4rem;position:relative;overflow:hidden}
+.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 70% 55% at 50% 34%,#2E8B5714 0%,transparent 70%)}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(#2E8B570d 1px,transparent 1px),linear-gradient(90deg,#2E8B570d 1px,transparent 1px);background-size:60px 60px;opacity:0.7}
+.eyebrow{position:relative;font-size:0.72rem;letter-spacing:0.28em;color:var(--accent);text-transform:uppercase;margin-bottom:1.4rem}
+.title{position:relative;font-family:'Playfair Display','Noto Serif SC',serif;font-size:clamp(2.6rem,7vw,5rem);font-weight:700;line-height:1.05;color:var(--text)}
+.title .en-only{color:var(--accent)}
+.sub{position:relative;font-size:clamp(1.05rem,2.3vw,1.35rem);color:var(--text2);max-width:640px;margin:1.6rem auto 2rem;font-style:italic;font-weight:300}
+.badge{position:relative;display:inline-flex;align-items:center;gap:0.5rem;background:var(--card);border:1px solid var(--accent);color:var(--accent);border-radius:30px;padding:0.5rem 1.3rem;font-size:0.78rem;letter-spacing:0.14em}
+.badge .dot{width:7px;height:7px;border-radius:50%;background:var(--accent);animation:pulse 1.8s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:0.35;transform:scale(0.85)}50%{opacity:1;transform:scale(1)}}
+section{padding:3.5rem 0}
+.lead{font-size:1.12rem;color:var(--text);line-height:1.95;border-left:3px solid var(--accent);padding:0.2rem 0 0.2rem 1.5rem;margin:0 0 3rem}
+.picks{display:grid;grid-template-columns:repeat(3,1fr);gap:1.4rem}
+.pick{background:var(--card);border:1px solid var(--border2);border-top:3px solid var(--accent);border-radius:6px;padding:1.6rem 1.4rem;transition:transform 0.2s,box-shadow 0.2s}
+.pick:hover{transform:translateY(-3px);box-shadow:0 10px 30px rgba(138,104,23,0.1)}
+.pick h3{font-family:'Playfair Display','Noto Serif SC',serif;font-size:1.12rem;font-weight:600;color:var(--accent);margin-bottom:0.7rem;line-height:1.35}
+.pick p{font-size:0.94rem;color:var(--text2);line-height:1.75}
+.note{margin-top:3rem;text-align:center;background:var(--card2);border:1px dashed var(--accent);border-radius:8px;padding:1.8rem 1.5rem}
+.note p{color:var(--text2);font-size:0.98rem}
+.note b{color:var(--accent)}
+.crosslinks{display:flex;flex-wrap:wrap;gap:0.8rem;justify-content:center;margin-top:1.4rem}
+.crosslinks a{text-decoration:none;font-size:0.86rem;letter-spacing:0.08em;padding:0.5rem 1.1rem;border:1px solid var(--border);border-radius:24px;color:var(--text2);transition:all 0.2s;background:var(--card)}
+.crosslinks a:hover{border-color:var(--accent);color:var(--accent)}
+footer{border-top:1px solid var(--border2);margin-top:4rem;padding:2.5rem 2rem;text-align:center;color:var(--muted);font-size:0.78rem;letter-spacing:0.05em}
+footer a{color:var(--gold);text-decoration:none}
+@media(max-width:640px){
+  nav{padding:0.55rem 1rem 0.45rem}
+  .nav-bar-sub{justify-content:flex-start;gap:1.1rem;overflow-x:auto;padding-bottom:0.15rem}
+  .nav-bar-sub a{font-size:0.92rem}
+  .block{scroll-margin-top:5.5rem}
+  .nav-links{gap:1rem}
+  .nav-links a.sib{display:none}
+  .picks{grid-template-columns:1fr}
+  header.hero{padding:7rem 1.2rem 3rem;min-height:auto}
+}
+
+.block{margin:0 0 3.4rem;scroll-margin-top:6.5rem}
+.block-head{display:flex;align-items:baseline;gap:0.85rem;border-bottom:1px solid var(--border);padding-bottom:0.7rem;margin-bottom:0.9rem}
+.block-num{font-family:'Playfair Display',serif;font-size:1.55rem;font-weight:700;color:var(--accent);line-height:1}
+.block-title{font-family:'Playfair Display','Noto Serif SC',serif;font-size:1.32rem;font-weight:600;color:var(--text);line-height:1.25}
+.block-desc{font-size:0.98rem;color:var(--text2);font-style:italic;margin:0 0 1.4rem;line-height:1.7}
+.art-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.art{display:block;text-decoration:none;background:var(--card);border:1px solid var(--border2);border-left:3px solid var(--accent);border-radius:5px;padding:1.05rem 1.25rem;transition:transform .2s,box-shadow .2s,border-color .2s}
+.art:hover{border-left-color:var(--accent2);transform:translateX(3px);box-shadow:0 6px 20px rgba(138,104,23,.08)}
+.art .k{display:block;font-size:0.71rem;letter-spacing:0.1em;color:var(--accent);text-transform:uppercase;font-weight:600;margin-bottom:0.35rem}
+.art h4{font-family:'Noto Serif SC',serif;font-size:1.05rem;font-weight:600;color:var(--text);margin-bottom:0.4rem;line-height:1.42}
+.art p{font-size:0.9rem;color:var(--text2);line-height:1.68}
+.art .rd{display:inline-block;margin-top:0.55rem;font-size:0.82rem;color:var(--accent);letter-spacing:0.05em}
+.art.feature{grid-column:1 / -1;border-left-width:4px;background:linear-gradient(180deg,var(--card),var(--card2))}
+.art.feature h4{font-size:1.22rem}
+.tailnote{margin-top:1rem;text-align:center;background:var(--card2);border:1px dashed var(--accent);border-radius:8px;padding:1.5rem 1.4rem}
+.tailnote p{color:var(--text2);font-size:0.96rem}.tailnote b{color:var(--accent)}
+.nav-bar-main{display:flex;align-items:center;justify-content:space-between;width:100%}
+.nav-bar-sub{display:flex;align-items:center;justify-content:space-around;width:100%;margin-top:0.5rem;padding-top:0.5rem;border-top:1px solid var(--border2)}
+.nav-bar-sub a{color:var(--text2);text-decoration:none;font-size:1.05rem;font-weight:700;letter-spacing:0.13em;white-space:nowrap;transition:color .2s,opacity .2s}
+.nav-bar-sub a:hover{text-decoration:underline;text-underline-offset:4px;opacity:0.72}
+@media(max-width:640px){.art-grid{grid-template-columns:1fr}}
+.nav-bar-sub a[href="#plg-why"]{color:#A32E4E}
+.nav-bar-sub a[href="#plg-proof"]{color:#8A6817}
+
+/* ── 论文抄袭专栏：燃烧警示 ───────────────────────────
+   字身掐在炭底→正红（最亮档 4.90:1，米底上仍可读）；
+   橙黄只走辉光，不进字色——真烧成橙黄，字就糊在米底上，警示反而失效。 */
+@keyframes plg-burn{
+  0%{background-position:50% 100%}
+  100%{background-position:50% 0%}
+}
+@keyframes plg-flicker{
+  0%,100%{filter:drop-shadow(0 0 1px rgba(198,40,40,.40)) drop-shadow(0 1px 5px rgba(217,58,30,.22))}
+  28%{filter:drop-shadow(0 0 2px rgba(226,59,59,.72)) drop-shadow(0 1px 9px rgba(232,80,30,.40))}
+  46%{filter:drop-shadow(0 0 1px rgba(163,46,78,.50)) drop-shadow(0 1px 4px rgba(217,58,30,.18))}
+  63%{filter:drop-shadow(0 0 3px rgba(226,59,59,.80)) drop-shadow(0 2px 12px rgba(245,124,31,.42))}
+  81%{filter:drop-shadow(0 0 1px rgba(198,40,40,.45)) drop-shadow(0 1px 6px rgba(232,80,30,.24))}
+}
+.burn{
+  background-image:linear-gradient(0deg,
+    #4A0810 0%, #5E0A16 14%, #8C1F33 30%, #A32E4E 46%,
+    #B92B36 62%, #C62828 76%, #A32E4E 90%, #5E0A16 100%);
+  background-size:100% 340%;
+  -webkit-background-clip:text;background-clip:text;
+  color:transparent;-webkit-text-fill-color:transparent;
+  animation:plg-burn 3.6s linear infinite, plg-flicker 1.7s ease-in-out infinite;
+  font-weight:800;
+}
+.burn sup{-webkit-text-fill-color:#A32E4E;color:#A32E4E}
+/* 光敏与前庭敏感：停火，退回静态酒红（对比度 5.99:1） */
+@media(prefers-reduced-motion:reduce){
+  .burn{animation:none;background-image:none;color:#A32E4E;-webkit-text-fill-color:#A32E4E}
+}
+/* 不支持 background-clip:text 的浏览器兜底 */
+@supports not ((-webkit-background-clip:text) or (background-clip:text)){
+  .burn{color:#A32E4E;-webkit-text-fill-color:#A32E4E;background-image:none;animation:plg-flicker 1.7s ease-in-out infinite}
+}
+
+/* 大标题：字号大，WCAG 门槛降至 3:1，橙档（#D93A1E 4.00:1 / #E8501E 3.27:1）可入字，火烧得更旺 */
+.burn-hero{
+  background-image:linear-gradient(0deg,
+    #3A060C 0%, #5E0A16 12%, #8C1F33 26%, #A32E4E 40%,
+    #C62828 56%, #D93A1E 70%, #E8501E 82%, #C62828 92%, #8C1F33 100%);
+  background-size:100% 300%;
+  animation:plg-burn 4.2s linear infinite, plg-flicker 2.1s ease-in-out infinite;
+}
+@media(prefers-reduced-motion:reduce){.burn-hero{background-image:none;color:#A32E4E;-webkit-text-fill-color:#A32E4E}}
+
+/* 选题预告：文章未上站前不链接，避免 404 */
+.art.soon{cursor:default;opacity:.92}
+.art.soon:hover{transform:none;box-shadow:none}
+.soon-rd{color:var(--muted)!important;font-style:italic}
+</style>
+</head>
+<body class="zh">
+
+<nav>
+  <div class="nav-bar-main">
+  <a class="nav-logo" href="/">SDE Universes</a>
+  <div class="nav-links">
+    <a href="/" class="zh-only">首页</a><a href="/" class="en-only">Home</a>
+    <a href="/education/" class="sib zh-only">教育专栏</a><a href="/education/" class="sib en-only">Education</a>
+    <a href="/health/" class="sib zh-only">健康专栏</a><a href="/health/" class="sib en-only">Health</a>
+    <a href="/business/" class="sib zh-only">商业专栏</a><a href="/business/" class="sib en-only">Business</a>
+    <a href="/plagiarism/" class="sib here zh-only burn">论文抄袭专栏</a><a href="/plagiarism/" class="sib here en-only burn">Plagiarism</a>
+    <a href="/discovery-vs-genesis/" class="sib zh-only">发现VS发生</a><a href="/discovery-vs-genesis/" class="sib en-only">Discovery vs Genesis</a>
+    <a href="/ai/" class="sib zh-only">AI专栏</a><a href="/ai/" class="sib en-only">AI</a>
+    <a href="/philosophy/" class="sib zh-only">思想宇宙</a><a href="/philosophy/" class="sib en-only">Philosophy</a>
+    <div class="lang-toggle">
+      <button class="lang-btn active" onclick="setLang('zh')">中</button>
+      <button class="lang-btn" onclick="setLang('en')">EN</button>
+    </div>
+  </div>
+</div>
+  <div class="nav-bar-sub">
+    <a href="#plg-why" class="zh-only">抄袭的发生学</a><a href="#plg-why" class="en-only">How Plagiarism Occurs</a>
+    <a href="#plg-proof" class="zh-only">原创的判据</a><a href="#plg-proof" class="en-only">Criteria of Originality</a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="hero-bg"></div><div class="hero-grid"></div>
+  <div class="eyebrow zh-only">SDE 学科专栏</div><div class="eyebrow en-only">SDE SUBJECT COLUMN</div>
+  <h1 class="title"><span class="zh-only burn burn-hero">论文抄袭专栏</span><span class="en-only burn burn-hero">Plagiarism &amp; Originality</span></h1>
+  <p class="sub zh-only">抄袭不是偷字——查重软件抓得住最笨的抄袭，抓不住最狡猾的。被隐去的从来不是文字，是「我从谁那里来」这条路径。</p><p class="sub en-only">Plagiarism is not the theft of words. Similarity checkers catch the clumsiest and miss the cleverest, because what gets hidden is never the text — it is the lineage.</p>
+  <div class="badge"><span class="dot"></span><span class="zh-only">长文合辑 · 6 篇 / 2 板块 · 持续增补</span><span class="en-only">Essay Collection · 6 pieces / 2 blocks</span></div>
+</header>
+
+<main class="wrap">
+  <section>
+    <div class="block" id="plg-why">
+      <div class="block-head">
+        <span class="block-num"><span class="zh-only">壹</span><span class="en-only">I</span></span>
+        <span class="block-title"><span class="zh-only">抄袭的发生学 · 它为何发生，又为何抓不住</span><span class="en-only">The Genesis of Plagiarism · Why It Happens and Why It Escapes</span></span>
+      </div>
+      <p class="block-desc zh-only">把抄袭当成道德污点，就只能靠事后追责；把它当成一种可分析的发生过程，才能看清它在哪一道工序上必然发生——而那道工序，恰恰是查重软件永远看不见的地方。</p><p class="block-desc en-only">Treat plagiarism as a moral stain and you can only punish it afterwards. Treat it as an analysable process and you can see the exact step at which it becomes inevitable — the step no similarity checker can see.</p>
+      <div class="art-grid">
+        <div class="art soon">
+          <span class="k"><span class="zh-only">抄袭发生学 · 约万字</span><span class="en-only">Genesis of Plagiarism · ~10k words</span></span>
+          <h4><span class="zh-only">抄袭不是偷，是不敢承认自己站在谁的肩上</span><span class="en-only">Plagiarism Is Not Theft — It Is Refusing to Name Whose Shoulders You Stand On</span></h4>
+          <p class="zh-only">把抄袭定义为「偷别人的字」，解释不了最常见的那种抄袭：一个人复述了整套框架、换了全部措辞、一个字没抄，却仍然是抄。真正被隐去的从来不是文字，是那条「我从谁那里来」的路径——而路径一旦被隐去，读者就无法判断这篇文章多说了什么。</p><p class="en-only">Defining plagiarism as stealing words cannot explain its commonest form: reproducing an entire framework in wholly different wording. What gets hidden is never the text but the lineage — and once the lineage is hidden, no reader can tell what the paper added.</p>
+          <span class="rd soon-rd"><span class="zh-only">选题 · 即将发布</span><span class="en-only">Planned · Coming soon</span></span>
+        </div>
+        <div class="art soon">
+          <span class="k"><span class="zh-only">抄袭发生学 · 约万字</span><span class="en-only">Genesis of Plagiarism · ~10k words</span></span>
+          <h4><span class="zh-only">不知道自己有前辈，算不算抄？</span><span class="en-only">If You Never Knew the Field Existed, Is It Still Plagiarism?</span></h4>
+          <p class="zh-only">一个人独立想出了别人三十年前想出的东西，还以为自己是第一个开口的——这在学术上是什么？不是道德问题，是工序问题：它暴露的不是人品，是这个人从未做过对手辨识。而后果与抄袭相同：读者无从知道他多说了什么。</p><p class="en-only">Someone independently arrives at what a field settled thirty years ago, believing they spoke first. This is not a moral failure but a missing step — and its consequence matches plagiarism: no reader can tell what was added.</p>
+          <span class="rd soon-rd"><span class="zh-only">选题 · 即将发布</span><span class="en-only">Planned · Coming soon</span></span>
+        </div>
+        <div class="art soon">
+          <span class="k"><span class="zh-only">抄袭发生学 · 约万字</span><span class="en-only">Genesis of Plagiarism · ~10k words</span></span>
+          <h4><span class="zh-only">洗稿的语法：为什么改写比照抄更难被抓住，也更该被抓住</span><span class="en-only">The Grammar of Laundering: Why Paraphrase Is Harder to Catch and Worse</span></h4>
+          <p class="zh-only">查重软件比对的是字符串，而洗稿改的正是字符串。于是出现一个荒谬的分工：机器抓得住最笨的抄袭，抓不住最狡猾的。真正的判据不在字面重合度，在论证骨架的同构——而骨架无法被查重，只能被读出来。</p><p class="en-only">Similarity software compares strings; laundering rewrites strings. The result is an absurd division of labour: machines catch the clumsiest theft and miss the cleverest. The real criterion is isomorphism of argumentative skeleton — which no checker sees, only a reader does.</p>
+          <span class="rd soon-rd"><span class="zh-only">选题 · 即将发布</span><span class="en-only">Planned · Coming soon</span></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="block" id="plg-proof">
+      <div class="block-head">
+        <span class="block-num"><span class="zh-only">贰</span><span class="en-only">II</span></span>
+        <span class="block-title"><span class="zh-only">原创的判据 · 它能不能被别人算出来</span><span class="en-only">Criteria of Originality · Can Anyone Else Compute It?</span></span>
+      </div>
+      <p class="block-desc zh-only">「我觉得这是原创的」是自陈，不是判据。判据必须能被别人拿去算，且算出来可能是你不想要的答案——一个不会给出坏消息的原创标准，就不是标准。</p><p class="block-desc en-only">"I feel this is original" is self-report, not a criterion. A criterion must be computable by someone else, and must be able to return an answer you did not want — a standard that never brings bad news is not a standard.</p>
+      <div class="art-grid">
+        <div class="art soon">
+          <span class="k"><span class="zh-only">原创的判据 · 约万字</span><span class="en-only">Criteria of Originality · ~10k words</span></span>
+          <h4><span class="zh-only">原创是一道减法：你比最近的邻居多说了什么</span><span class="en-only">Originality Is a Subtraction: What Did You Add to Your Nearest Neighbour?</span></h4>
+          <p class="zh-only">原创不是「我的想法是新的」，那是自陈。原创是一道可以被别人算的减法：找出离你最近的那个已有立场，说清你比他多出的那一寸——多不出来，这篇就不该存在。这道减法之所以少有人做，是因为它经常给出你不想要的答案。</p><p class="en-only">Originality is not the claim that your idea is new — that is self-report. It is a subtraction anyone can compute: name your nearest existing position and state the inch you add. If there is no inch, the paper should not exist. Few run this subtraction because it often returns an unwelcome answer.</p>
+          <span class="rd soon-rd"><span class="zh-only">选题 · 即将发布</span><span class="en-only">Planned · Coming soon</span></span>
+        </div>
+        <div class="art soon">
+          <span class="k"><span class="zh-only">原创的判据 · 约万字</span><span class="en-only">Criteria of Originality · ~10k words</span></span>
+          <h4><span class="zh-only">引用最强的对手，而不是最好打的那个</span><span class="en-only">Cite Your Strongest Opponent, Not the Easiest One</span></h4>
+          <p class="zh-only">一篇论文最能暴露作者诚意的地方，是它选择跟谁交手。挑一个稻草人来打，读者立刻知道这篇没底气；正面写出「这条界线很窄，我欠他机制」，读者反而开始相信你。稻草人不是修辞失误，是一种可被检测的心虚。</p><p class="en-only">Nothing exposes a paper faster than whom it picks a fight with. A straw man tells the reader there is no confidence here; admitting that the line is narrow and that you owe your opponent the mechanism is what makes you credible.</p>
+          <span class="rd soon-rd"><span class="zh-only">选题 · 即将发布</span><span class="en-only">Planned · Coming soon</span></span>
+        </div>
+        <div class="art soon">
+          <span class="k"><span class="zh-only">原创的判据 · 约万字</span><span class="en-only">Criteria of Originality · ~10k words</span></span>
+          <h4><span class="zh-only">谁写的，为什么是一个事实问题，而不是礼节问题</span><span class="en-only">Authorship Is a Question of Fact, Not Courtesy</span></h4>
+          <p class="zh-only">AI 时代让署名问题从礼节退回到事实：一篇文章署谁的名，是关于某个人认知能力的一句陈述，可真可假。给自己写的东西打分、给别人的名字挂自己的产出，都不是失礼，是伪证——而一旦伪证被接受，同一套体系里其余所有的评价就同时失效。</p><p class="en-only">The AI era pushes authorship back from etiquette to fact: a byline is a claim about a person&#39;s cognition, and claims can be false. Scoring your own text, or signing your output with another&#39;s name, is not rudeness but fabricated evidence — and once accepted, every other assessment in the same system goes void.</p>
+          <span class="rd soon-rd"><span class="zh-only">选题 · 即将发布</span><span class="en-only">Planned · Coming soon</span></span>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script>
+function setLang(l){document.body.className=l;document.querySelectorAll('.lang-btn').forEach(function(b){b.classList.toggle('active',(b.textContent==='中'&&l==='zh')||(b.textContent==='EN'&&l==='en'));});document.documentElement.lang=l==='zh'?'zh-CN':'en';}
+</script>
+</body>
+</html>

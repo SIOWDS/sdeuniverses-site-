@@ -92,6 +92,40 @@ footer a{color:var(--gold);text-decoration:none}
 .nav-bar-sub a[href="#edu-learning"]{color:#7A4E9E}
 .nav-bar-sub a[href="#edu-early"]{color:#B03A3A}
 .nav-bar-sub a[href="#edu-paradigm"]{color:#A6791F}
+
+/* ── 论文抄袭专栏：燃烧警示 ───────────────────────────
+   字身掐在炭底→正红（最亮档 4.90:1，米底上仍可读）；
+   橙黄只走辉光，不进字色——真烧成橙黄，字就糊在米底上，警示反而失效。 */
+@keyframes plg-burn{
+  0%{background-position:50% 100%}
+  100%{background-position:50% 0%}
+}
+@keyframes plg-flicker{
+  0%,100%{filter:drop-shadow(0 0 1px rgba(198,40,40,.40)) drop-shadow(0 1px 5px rgba(217,58,30,.22))}
+  28%{filter:drop-shadow(0 0 2px rgba(226,59,59,.72)) drop-shadow(0 1px 9px rgba(232,80,30,.40))}
+  46%{filter:drop-shadow(0 0 1px rgba(163,46,78,.50)) drop-shadow(0 1px 4px rgba(217,58,30,.18))}
+  63%{filter:drop-shadow(0 0 3px rgba(226,59,59,.80)) drop-shadow(0 2px 12px rgba(245,124,31,.42))}
+  81%{filter:drop-shadow(0 0 1px rgba(198,40,40,.45)) drop-shadow(0 1px 6px rgba(232,80,30,.24))}
+}
+.burn{
+  background-image:linear-gradient(0deg,
+    #4A0810 0%, #5E0A16 14%, #8C1F33 30%, #A32E4E 46%,
+    #B92B36 62%, #C62828 76%, #A32E4E 90%, #5E0A16 100%);
+  background-size:100% 340%;
+  -webkit-background-clip:text;background-clip:text;
+  color:transparent;-webkit-text-fill-color:transparent;
+  animation:plg-burn 3.6s linear infinite, plg-flicker 1.7s ease-in-out infinite;
+  font-weight:800;
+}
+.burn sup{-webkit-text-fill-color:#A32E4E;color:#A32E4E}
+/* 光敏与前庭敏感：停火，退回静态酒红（对比度 5.99:1） */
+@media(prefers-reduced-motion:reduce){
+  .burn{animation:none;background-image:none;color:#A32E4E;-webkit-text-fill-color:#A32E4E}
+}
+/* 不支持 background-clip:text 的浏览器兜底 */
+@supports not ((-webkit-background-clip:text) or (background-clip:text)){
+  .burn{color:#A32E4E;-webkit-text-fill-color:#A32E4E;background-image:none;animation:plg-flicker 1.7s ease-in-out infinite}
+}
 </style>
 </head>
 <body class="zh">
@@ -104,6 +138,7 @@ footer a{color:var(--gold);text-decoration:none}
     <a href="/education/" class="sib here zh-only">教育专栏</a><a href="/education/" class="sib here en-only">Education</a>
     <a href="/health/" class="sib zh-only">健康专栏</a><a href="/health/" class="sib en-only">Health</a>
     <a href="/business/" class="sib zh-only">商业专栏</a><a href="/business/" class="sib en-only">Business</a>
+    <a href="/plagiarism/" class="sib zh-only burn">论文抄袭专栏</a><a href="/plagiarism/" class="sib en-only burn">Plagiarism</a>
     <a href="/discovery-vs-genesis/" class="sib zh-only">发现VS发生</a><a href="/discovery-vs-genesis/" class="sib en-only">Discovery vs Genesis</a>
     <a href="/ai/" class="sib zh-only">AI专栏</a><a href="/ai/" class="sib en-only">AI</a>
     <a href="/philosophy/" class="sib zh-only">思想宇宙</a><a href="/philosophy/" class="sib en-only">Philosophy</a>
