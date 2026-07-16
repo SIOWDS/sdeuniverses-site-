@@ -118,13 +118,15 @@ for dp, dns, fns in os.walk(PUB):
         full = os.path.join(dp, fn)
         rel = os.path.relpath(full, PUB)
         if fn.endswith(".html"):
+            if fn == "read.html":
+                continue  # PDF 阅读器空壳：无独立正文，PDF 内容已折叠进目录 URL 文档
             url = canon_url(rel)
             if any(s in url for s in SKIP_URL_SUBSTR):
                 continue
             title, text = html_title_and_text(full)
             d = docs.setdefault(url, {"title": title, "section": section_of(rel), "html": "", "pdf": []})
-            if not d["title"] or d["title"] == "(无标题)":
-                d["title"] = title
+            if title and title != "(无标题)":
+                d["title"] = title  # HTML 标题权威，覆盖 PDF 先到时留下的文件名占位
             d["html"] = (d["html"] + "\n" + text).strip()
         elif fn.endswith(".pdf"):
             # 归到同目录的页面 URL（该目录若有 index.html 则用目录 URL，否则直接指向 PDF）
