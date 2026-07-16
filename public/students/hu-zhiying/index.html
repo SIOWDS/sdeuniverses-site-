@@ -2,9 +2,9 @@
 <html lang="zh-CN"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>胡志英 · 学员专栏 | SDE Universes</title>
-<meta name="description" content="胡志英 · SDE 学员专栏 · Students' Column, SDE Universes">
+<meta name="description" content="胡志英（John Hu）· 约翰英语创始人 · SDE 学员专栏 · Students' Column, SDE Universes">
 <style>
-:root{--gold:#C9A84C;--gold2:#D4B25E;--ink:#F0E9D8;--ink2:#B8AE96;--bg:#0E0B08;--panel:#171310;--panel2:#1C1712;--line:rgba(201,168,76,0.22);--accent:#8C6A2E}
+:root{--gold:#C9A84C;--gold2:#D4B25E;--ink:#F0E9D8;--ink2:#B8AE96;--bg:#0E0B08;--panel:#171310;--panel2:#1C1712;--line:rgba(201,168,76,0.22);--accent:#C9A84C}
 *{margin:0;padding:0;box-sizing:border-box}
 ::selection{background:rgba(201,168,76,0.35)}
 body{background:var(--bg);color:var(--ink);font-family:"Noto Serif SC",Georgia,"Songti SC",serif;line-height:1.9}
@@ -22,22 +22,30 @@ nav a{color:var(--gold);text-decoration:none;font-size:14px;letter-spacing:0.05e
 .level-tag .t{font-size:12px;letter-spacing:0.32em;color:var(--gold)}
 .level-tag .line{flex:1;height:1px;background:var(--line)}
 .profile{max-width:820px;margin:0 auto;padding:52px 24px 20px;display:flex;gap:34px;align-items:center;flex-wrap:wrap}
-.avatar{width:132px;height:132px;border-radius:50%;flex-shrink:0;background:linear-gradient(160deg,rgba(212,178,94,0.30),rgba(212,178,94,0.06));border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-family:Georgia,serif;font-size:52px;font-weight:800;color:#F5E6BF;position:relative}
-.avatar .ph{font-size:10px;letter-spacing:0.15em;color:var(--ink2);position:absolute;bottom:12px;font-family:"Noto Serif SC",serif}
+.p-photo{width:200px;flex:0 0 200px}
+.p-photo img{display:block;width:100%;height:auto;border-radius:14px;border:1px solid var(--line);box-shadow:0 16px 42px rgba(0,0,0,0.5)}
 .p-info{flex:1;min-width:240px}
 .p-info h1{font-size:clamp(30px,5vw,42px);font-weight:800;color:#F5EFE0;letter-spacing:0.04em;font-family:Georgia,"Noto Serif SC",serif}
-.p-note{font-size:14px;color:var(--ink2);margin-top:6px;letter-spacing:0.04em}
+.p-note{font-size:14px;color:var(--ink2);margin-top:8px;letter-spacing:0.05em}
 .p-info .role{font-size:13px;color:var(--accent);letter-spacing:0.2em;margin-top:12px}
-.p-info .bio{font-size:15px;color:#6B6250;line-height:1.9;margin-top:16px;font-style:italic}
+.p-info .tagline{font-size:15.5px;color:var(--gold2);letter-spacing:0.05em;margin-top:14px;font-family:"Noto Serif SC",Georgia,serif}
+.statement{max-width:820px;margin:0 auto;padding:18px 24px 6px}
+.statement p{font-size:16px;color:#DED6BF;line-height:2.02;margin-bottom:18px}
+.statement p:last-child{margin-bottom:0}
+.statement b{color:var(--gold2);font-weight:700}
 .works{max-width:820px;margin:0 auto;padding:10px 24px 80px}
-.panel{background:linear-gradient(160deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:16px;padding:40px 30px;text-align:center;margin-top:20px}
-.panel .tag{font-size:12px;letter-spacing:0.34em;color:var(--gold);margin-bottom:14px}
-.panel p{font-size:14.5px;color:var(--ink2);line-height:1.9;max-width:520px;margin:0 auto}
+.works-entry{display:block;text-decoration:none;margin-top:20px}
+.we-card{background:linear-gradient(135deg,#7A5F26,#3A2C12);border:1px solid #7A5F26;border-radius:14px;padding:24px 28px;display:flex;align-items:center;justify-content:space-between;gap:16px;transition:transform .18s,box-shadow .18s}
+.works-entry:hover .we-card{transform:translateY(-2px);box-shadow:0 12px 30px rgba(0,0,0,0.4)}
+.we-lbl{font-size:12px;letter-spacing:0.3em;color:#F0E1B8;margin-bottom:8px;font-weight:700}
+.we-title{font-size:20px;font-weight:800;color:#FBF4E2}
+.we-sub{font-size:13px;color:#E8DBB4;margin-top:7px;line-height:1.7}
+.we-arrow{font-size:30px;color:#FBF4E2;flex-shrink:0}
 .back{text-align:center;margin-top:30px}
 .back a{color:var(--gold);text-decoration:none;font-size:14.5px;letter-spacing:0.06em;border-bottom:1px solid rgba(201,168,76,0.4);padding-bottom:2px}
 footer{border-top:1px solid var(--line);margin-top:24px;padding:30px 24px;text-align:center;color:#6B6250;font-size:13px}
 footer a{color:var(--gold);text-decoration:none}
-@media(max-width:640px){.profile{justify-content:center;text-align:center}.p-info{text-align:center}}
+@media(max-width:640px){.profile{justify-content:center;text-align:center}.p-info{text-align:center}.p-photo{flex:0 0 168px;width:168px}}
 </style></head>
 <body class="zh">
 <nav><div class="w">
@@ -52,27 +60,45 @@ footer a{color:var(--gold);text-decoration:none}
   <span class="n">01</span><span class="t zh-only">学 员 介 绍 · PROFILE</span><span class="t en-only">PROFILE</span><span class="line"></span>
 </div>
 <div class="profile">
-  <div class="avatar">胡<span class="ph zh-only">照片待补</span><span class="ph en-only">photo TBA</span></div>
+  <div class="p-photo"><img src="hu-zhiying.jpg" alt="胡志英"></div>
   <div class="p-info">
     <h1>胡志英</h1>
-    <div class="p-note">约翰 · John</div>
-    <div class="role zh-only">SDE 学员</div>
-    <div class="role en-only">SDE TRAINEE</div>
-    <p class="bio zh-only">个人简介待补 —— 照片与简介陆续补充。</p>
-    <p class="bio en-only">Bio coming soon — photo and introduction to be added.</p>
+    <div class="p-note zh-only">约翰 · John Hu · 约翰英语创始人 · 攀阁林学院联合创始人</div>
+    <div class="p-note en-only">John Hu · Founder of John English · Co-founder of Pangelin Academy</div>
+    <div class="role zh-only">SDE 学员 · 英语教育者</div>
+    <div class="role en-only">SDE TRAINEE · ENGLISH EDUCATOR</div>
+    <div class="tagline zh-only">从语言习得，走向语言的发生</div>
+    <div class="tagline en-only">From language acquisition toward the genesis of language</div>
   </div>
 </div>
 
 <div class="level-tag" style="margin-top:36px">
-  <span class="n">02</span><span class="t zh-only">作 品 与 专 栏 · WORKS</span><span class="t en-only">WORKS &amp; COLUMNS</span><span class="line"></span>
+  <span class="n">02</span><span class="t zh-only">简 述 · STATEMENT</span><span class="t en-only">STATEMENT</span><span class="line"></span>
+</div>
+<div class="statement">
+  <p class="zh-only">胡志英，<b>约翰英语</b>创始人、<b>攀阁林学院</b>联合创始人，曾任郑州灵答英语执行校长，深耕英语教育与课程创新十三年以上——从一线教师成长为集教学、教研、课程研发、运营与管理于一体的复合型教育工作者。他长期研读并实践以<b>乔姆斯基</b>与<b>克拉申</b>为代表的语言学与语言习得理论，把学术洞见转化为可操作的课堂方法，用以重塑学生的学习体验。</p>
+  <p class="en-only">Hu Zhiying is the founder of <b>John English</b> and a co-founder of <b>Pangelin Academy</b>, and formerly the executive principal of Zhengzhou Lingda English. With over thirteen years in English education and curriculum innovation, he has grown from a frontline teacher into an all-round educator spanning teaching, research, curriculum design, operations and management. He has long studied and practiced the linguistics and language-acquisition theories of <b>Chomsky</b> and <b>Krashen</b>, turning scholarly insight into workable classroom methods that reshape how students learn.</p>
+  <p class="zh-only">在团队带领下，他将美国 K12 全英全科课程 <b>BrainPOP</b> 引入国内，以“家校共学＋翻转课堂”的模式进行本土化落地，赋能上千个普通家庭，让孩子在真实语境中自然习得英语。近年来，他在<b>王德生博士</b>指导下系统研习三视角语言学、321 智慧与语言发生学理论，探索“家校共学—翻转课堂—社群生态”三维协同的创新路径，推动英语教育从知识传授走向<b>语言的生成与创造式学习</b>。</p>
+  <p class="en-only">Leading his team, he brought the American K12 all-English curriculum <b>BrainPOP</b> to China, localizing it through a “home–school co-learning + flipped classroom” model that has empowered thousands of ordinary families to help children acquire English naturally in real contexts. In recent years, under the guidance of <b>Dr. Wang Desheng</b>, he has systematically studied three-perspective linguistics, the 321 framework and a genetic theory of language — exploring a three-way synergy of “home–school co-learning, flipped classroom and community ecology,” and moving English education from the transmission of knowledge toward <b>the generation of language and creative learning</b>.</p>
+</div>
+
+<div class="level-tag" style="margin-top:36px">
+  <span class="n">03</span><span class="t zh-only">作 品 与 专 栏 · WORKS</span><span class="t en-only">WORKS &amp; COLUMNS</span><span class="line"></span>
 </div>
 <div class="works">
-  <div class="panel">
-    <div class="tag zh-only">作 品 陆 续 上 线</div>
-    <div class="tag en-only">WORKS COMING SOON</div>
-    <p class="zh-only">借一双「事物如何发生」的眼，在自己的领域里落笔——把 SDE 作为隐性的引擎，用本行的母语写作。作品通过合宪性审读后，将署名发表于此。</p>
-    <p class="en-only">Borrowing an eye trained on how things come to be, and writing in the native idiom of one’s own field — with SDE as a hidden engine. Once a piece passes its constitutionality review, it will be published here under this name.</p>
-  </div>
+  <a class="works-entry" href="/students/hu-zhiying/works/">
+    <div class="we-card">
+      <div>
+        <div class="we-lbl zh-only">进 入 作 品</div>
+        <div class="we-lbl en-only">ENTER THE WORKS</div>
+        <div class="we-title zh-only">胡志英 · 三篇文章</div>
+        <div class="we-title en-only">Three papers by Hu Zhiying</div>
+        <div class="we-sub zh-only">算法闭环与生物代价（幼少儿英语的神经语言学诊断）· 评价依附性耗竭（多子女家庭教育）· 边界收缩即边疆永失（学术范式的免疫悖论）—— 每篇三种阅读方式</div>
+        <div class="we-sub en-only">The algorithmic closed loop and its biological cost · evaluation-dependent depletion · boundary contraction as permanent frontier loss — each in three reading modes</div>
+      </div>
+      <div class="we-arrow">→</div>
+    </div>
+  </a>
   <div class="back"><a href="/students/"><span class="zh-only">← 返回学员专栏名单</span><span class="en-only">← Back to the students roster</span></a></div>
 </div>
 
