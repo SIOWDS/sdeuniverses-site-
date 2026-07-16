@@ -1,0 +1,208 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+从磁盘重建 public/students/roster.json。
+
+为什么存在这个脚本
+------------------
+roster.json 是**派生数据**：谁发了哪篇、哪天发的、多少字，这些事实已经全部写在
+已发布的页面里了。以前它靠手工维护，于是必然有两种死法：
+
+  1. 漏更 —— 发表提交忘了带上 roster（commit 823c99e / 7-16 那批 / 秦莉今天两条）；
+  2. 撞车 —— 两个 agent 同时改这一个文件，rebase 冲突；手工解冲突时一不小心
+     就把对方的数据整段抹掉（用错 --ours/--theirs 即可，方向极易搞反）。
+
+改成"从磁盘派生"之后，这两种死法一起消失：
+  · 漏更不可能 —— 页面在磁盘上，扫描就能看见，不依赖任何人记得更新；
+  · 撞车可自动化解 —— 论文页各在各的路径、天然不冲突，合并后磁盘已是双方成果的
+    并集；此时只要重跑本脚本，输出就是正确的并集。任选一边收下冲突再重跑即可，
+    绝不会丢数据。
+
+哪些字段仍是手工的
+------------------
+slug / name / small / enrolled_order 是学员身份信息，磁盘上推不出来，继续由
+roster.json 承载（新学员报名时才动）。本脚本只覆盖 papers[] 与 count。
+
+用法
+----
+    python3 tools/build_roster.py            # 重建并写回
+    python3 tools/build_roster.py --check    # 只比对不写（CI/提交前自检，有差异则退出码 1）
+"""
+import json, os, re, subprocess, sys, datetime
+from html.parser import HTMLParser
+
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+STUDENTS = os.path.join(ROOT, 'public', 'students')
+ROSTER = os.path.join(STUDENTS, 'roster.json')
+
+# 索引页约定名：这些目录是"目录页"，不是作品本身
+INDEX_NAMES = {'works', 'submit'}
+
+# 页面骨架：这些标签/类下的文字不算正文字数
+SKIP_TAGS = {'script', 'style', 'nav', 'footer', 'head'}
+SKIP_CLASSES = {
+    'readbar', 'topbar', 'endbox', 'foot-nav', 'navhint', 'side-tap',
+    'lang-toggle', 'rb-modes', 'controls', 'nav-right', 'back', 'modes',
+}
+
+
+class BodyText(HTMLParser):
+    """按标签与 class 跳过骨架，取正文。
+
+    不用正则剥离骨架：`<div class="topbar">.*?</div></div>` 这类写法靠猜嵌套，
+    `.*?` 会停在文档里第一个 `</div></div>`，把正文整段吞掉（黑咖啡那首诗就是
+    这么从 319 字缩成 31 字的）。改为跟踪真实标签深度。
+    """
+
+    def __init__(self):
+        super().__init__(convert_charrefs=True)
+        self.buf = []
+        self.skip_depth = 0     # >0 表示正处在被跳过的子树里
+        self.stack = []         # (tag, 是否是本次跳过的起点)
+
+    def handle_starttag(self, tag, attrs):
+        starts_skip = False
+        if self.skip_depth == 0:
+            cls = dict(attrs).get('class', '') or ''
+            names = set(cls.split())
+            if tag in SKIP_TAGS or (names & SKIP_CLASSES):
+                starts_skip = True
+                self.skip_depth = 1
+        elif tag not in ('br', 'img', 'hr', 'meta', 'link', 'input'):
+            self.skip_depth += 1
+        if tag not in ('br', 'img', 'hr', 'meta', 'link', 'input'):
+            self.stack.append((tag, starts_skip))
+
+    def handle_endtag(self, tag):
+        while self.stack:
+            t, starts = self.stack.pop()
+            if t == tag:
+                if starts:
+                    self.skip_depth = 0
+                elif self.skip_depth > 0:
+                    self.skip_depth -= 1
+                break
+
+    def handle_data(self, data):
+        if self.skip_depth == 0:
+            self.buf.append(data)
+
+    def text(self):
+        return re.sub(r'\s+', '', ''.join(self.buf))
+
+
+
+def is_leaf_item(d):
+    """含 index.html 且其下再无 index.html 子目录 → 一件作品。"""
+    if not os.path.exists(os.path.join(d, 'index.html')):
+        return False
+    for sub in os.listdir(d):
+        p = os.path.join(d, sub)
+        if os.path.isdir(p) and os.path.exists(os.path.join(p, 'index.html')):
+            return False
+    return True
+
+
+def find_items(slug_dir):
+    """返回该学员的全部作品目录（递归，跳过索引页约定名）。"""
+    out = []
+    for name in sorted(os.listdir(slug_dir)):
+        d = os.path.join(slug_dir, name)
+        if not os.path.isdir(d) or name in INDEX_NAMES:
+            continue
+        if is_leaf_item(d):
+            out.append(d)
+        else:
+            # 合集容器（如 qin-li/essays、qin-li/poems）：下潜一层
+            for sub in sorted(os.listdir(d)):
+                sd = os.path.join(d, sub)
+                if os.path.isdir(sd) and sub not in INDEX_NAMES and is_leaf_item(sd):
+                    out.append(sd)
+    return out
+
+
+_git_cache = {}
+
+
+def git_added_date(path):
+    """该文件首次进入仓库的日期——发表日期的兜底来源。"""
+    if path in _git_cache:
+        return _git_cache[path]
+    try:
+        r = subprocess.run(
+            ['git', 'log', '--diff-filter=A', '--follow', '--format=%as', '--', path],
+            cwd=ROOT, capture_output=True, text=True, timeout=30)
+        lines = [l for l in r.stdout.strip().split('\n') if l]
+        d = lines[-1] if lines else None
+    except Exception:
+        d = None
+    _git_cache[path] = d
+    return d
+
+
+def published_date(idx):
+    """优先取页面自报的发表日期（发表规格的强制字段），缺则用 git 首次提交日兜底。"""
+    s = open(idx, encoding='utf-8').read()
+    m = re.search(r'发表于\s*(\d{4})\s*年\s*(\d{1,2})\s*月\s*(\d{1,2})\s*日', s)
+    if m:
+        return f"{m.group(1)}-{int(m.group(2)):02d}-{int(m.group(3)):02d}", 'page'
+    m = re.search(r'Published\s+([A-Z][a-z]{2})\w*\s+(\d{1,2}),\s*(\d{4})', s)
+    if m:
+        mon = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'].index(m.group(1)) + 1
+        return f"{m.group(3)}-{mon:02d}-{int(m.group(2)):02d}", 'page'
+    d = git_added_date(os.path.relpath(idx, ROOT))
+    return d, 'git'
+
+
+def body_chars(idx):
+    """正文字数：跳过骨架后数字符（CJK 一字算一字）。"""
+    p = BodyText()
+    p.feed(open(idx, encoding='utf-8').read())
+    return len(p.text())
+
+
+def build():
+    roster = json.load(open(ROSTER, encoding='utf-8'))
+    for stu in roster['students']:
+        d = os.path.join(STUDENTS, stu['slug'])
+        if not os.path.isdir(d):
+            stu['papers'], stu['count'] = [], 0
+            continue
+        papers = []
+        for item in find_items(d):
+            idx = os.path.join(item, 'index.html')
+            date, src = published_date(idx)
+            if not date:
+                print(f"  ⚠ 无法确定发表日期，跳过: {os.path.relpath(item, STUDENTS)}", file=sys.stderr)
+                continue
+            papers.append({'date': date, 'words': body_chars(idx)})
+        papers.sort(key=lambda p: (p['date'], p['words']), reverse=True)
+        stu['papers'] = papers
+        stu['count'] = len(papers)
+    roster['students'].sort(key=lambda s: s['enrolled_order'])
+    roster['updated'] = datetime.date.today().isoformat()
+    return roster
+
+
+def dump(r):
+    return json.dumps(r, ensure_ascii=False, indent=2) + '\n'
+
+
+if __name__ == '__main__':
+    new = build()
+    text = dump(new)
+    if '--check' in sys.argv:
+        cur = open(ROSTER, encoding='utf-8').read()
+        if cur == text:
+            print('roster.json 与磁盘一致 ✅')
+            sys.exit(0)
+        print('roster.json 与磁盘不一致 ❌ —— 请运行 python3 tools/build_roster.py', file=sys.stderr)
+        old = json.load(open(ROSTER, encoding='utf-8'))
+        om = {s['slug']: s['count'] for s in old['students']}
+        for s in new['students']:
+            if om.get(s['slug']) != s['count']:
+                print(f"  {s['name']}({s['slug']}): roster {om.get(s['slug'])} → 磁盘 {s['count']}", file=sys.stderr)
+        sys.exit(1)
+    open(ROSTER, 'w', encoding='utf-8').write(text)
+    total = sum(s['count'] for s in new['students'])
+    print(f"roster.json 已重建：{len(new['students'])} 名学员 · 作品合计 {total} 件")
