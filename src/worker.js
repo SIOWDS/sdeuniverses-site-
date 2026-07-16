@@ -402,6 +402,10 @@ async function handleAsk(request, env, url) {
   const q = String(body.q || "").trim().slice(0, 300); // 输入硬钳位
   if (q.length < 2) return _sseResp([{ t: "error", v: "请输入一个问题（至少 2 个字）。" }]);
 
+  // 模式：answer（默认问答）/ recommend（答后点击①·推荐阅读）/ paper（答后点击②·成文一篇，两段续写）
+  const mode = body.mode === "recommend" ? "recommend" : (body.mode === "paper" ? "paper" : "answer");
+  const part = body.part === 2 ? 2 : 1;
+
   // 基底二选一（默认 GLM）
   const vendor = body.vendor === "ds" ? "ds" : "glm";
   const VC = vendor === "ds"
@@ -436,8 +440,8 @@ async function handleAsk(request, env, url) {
   } catch (e) {}
 
   // 站内检索（按档分级喂料：深度档拿更多材料，普通档保持轻快）
-  const deep = body.deep === true;
-  const K = deep ? 120 : 20;              // 取多少块（深度档广撒网；retrieve 只收相关块、clamp 兜底，窄问题不会被噪声塞满）
+  const deep = body.deep === true || mode === "paper"; // 成文一篇强制走最高提智（完整内功+心得）
+  const K = mode === "recommend" ? 48 : (deep ? 120 : 20);              // 取多少块（深度档广撒网；retrieve 只收相关块、clamp 兜底，窄问题不会被噪声塞满）
   const CTX_MAX = deep ? 50000 : 12000;   // 《站内资料》字数上限
   const corpus = await loadCorpus(env, url);
   const expTerms = await sdeExpandQuery(VC, KEY, q); // SDE 词义扩展：问题→SDE 术语，再拿去召回
@@ -453,13 +457,55 @@ async function handleAsk(request, env, url) {
     if (ctxText.length > CTX_MAX) break; // 上下文钳位·控成本
   }
 
+  // ===== 模式：推荐阅读（答后点击①）——基底只能从真实站内目录里挑，服务端逐条校验，链接零编造 =====
+  if (mode === "recommend") {
+    const ans = String(body.ans || "").slice(0, 1500);
+    const cand = [];
+    const seenC = {};
+    for (const ck of hits) {
+      const d = corpus.docs[ck.d];
+      if (seenC[d.u]) continue;
+      seenC[d.u] = 1;
+      cand.push({ u: d.u, t: d.t, b: corpus.secLabel[d.s] || d.s, s: (ck.t || "").slice(0, 140) });
+      if (cand.length >= 20) break;
+    }
+    if (!cand.length) return new Response(JSON.stringify({ items: [] }), { headers: { ..._cors(), "content-type": "application/json" } });
+    const listTxt = cand.map((c, ix) => "[" + (ix + 1) + "] " + c.t + "（" + c.b + "）｜摘：" + c.s).join("\n");
+    const rsys = "你是「SDE Universes」的站内领读人。你只能从给定候选清单里挑选，绝不发明清单之外的任何篇目、书名或链接。只输出 JSON，不输出任何其他文字。";
+    const rusr = "《读者的问题》\n" + q
+      + (ans ? "\n\n《刚才给出的回答要点》\n" + ans : "")
+      + "\n\n《候选站内篇目》\n" + listTxt
+      + "\n\n———\n请从候选里挑 4–6 篇，按建议阅读顺序排列；为每篇写一句「为什么读它」（不超过 40 字，必须落在它与这个问题的具体关联上，不写空话）。只输出 JSON 数组：[{\"n\":候选编号,\"why\":\"一句理由\"}]";
+    let picks = [];
+    try {
+      const raw = await llmText(VC, KEY, rsys, rusr, 900);
+      const m = raw && raw.match(/\[[\s\S]*\]/);
+      if (m) picks = JSON.parse(m[0]);
+    } catch (e) {}
+    const items = [];
+    const used = {};
+    for (const p of Array.isArray(picks) ? picks : []) {
+      const ix = ((p && p.n) | 0) - 1;
+      if (ix < 0 || ix >= cand.length || used[ix]) continue;
+      used[ix] = 1;
+      items.push({ u: cand[ix].u, t: cand[ix].t, b: cand[ix].b, why: String((p && p.why) || "").slice(0, 80) });
+      if (items.length >= 6) break;
+    }
+    if (!items.length) {
+      for (let ix = 0; ix < Math.min(5, cand.length); ix++) items.push({ u: cand[ix].u, t: cand[ix].t, b: cand[ix].b, why: "与你的问题在站内检索中最相关" });
+    }
+    return new Response(JSON.stringify({ items }), { headers: { ..._cors(), "content-type": "application/json" } });
+  }
+
   let sys = "";
+  let usrOverride = null;
+  let MAXTOK = 4000;
   // ===== 深度档 =====
   if (deep) {
     const reflect = await ensureReflect(env, url, vendor, VC, KEY);
     const neigong = await loadNeigong(env, url);
     // 四步法（S→D→E→整合，四次独立调用；贵 4 倍，仅在「四步法」开关打开时启用）
-    if (reflect && neigong && body.four === true) {
+    if (reflect && neigong && body.four === true && mode !== "paper") {
       const ctx4 = ctxText.slice(0, 15000); // 四步各调用共用《站内资料》，钳 15000 控 4× 成本
       const usr4 = "《站内资料》\n" + (ctx4 || "（未检索到相关段落）") + "\n\n《问题》\n" + q;
       const dimSys = reflect + "\n\n———\n你带着上面这份你自己写下并已内化的心得，对下面的问题只做一个维度的展开。";
@@ -531,8 +577,33 @@ async function handleAsk(request, env, url) {
       });
       return new Response(stream, { headers: { ..._cors(), "content-type": "text/event-stream; charset=utf-8", "cache-control": "no-store" } });
     }
+    // ===== 模式：成文一篇（答后点击②）——两段续写 · 最高提智（完整内功 + 心得 + 方法论后台运行，前台学术语言） =====
+    if (mode === "paper") {
+      MAXTOK = 6800;
+      const seed = String(body.seed || "").slice(0, 3500);
+      const head = String(body.head || "").slice(0, 1200);
+      const tail = String(body.tail || "").slice(0, 1100);
+      const base = (neigong
+          ? neigong + "\n\n═══════════\n【你此前带着上面这套完整底盘先验、亲手写下并已内化的心得】\n" + (reflect || "（心得暂缺：直接以完整内功为底盘）") + "\n\n═══════════\n"
+          : "")
+        + "你是一位以 SDE 方法论为隐性引擎的资深学者。刚才你对读者的问题给出了一次问对回答；现在读者点击了「成文一篇」，你要把那次思考推进成一篇独立的学术论文（全文目标约一万字，分上下两半各约五千字写成）。"
+        + "硬性纪律：① 论文的核心判断必须比问对回答再往前走至少一步——给出一个新的、可证伪的判断，绝不把回答扩写注水；② 后台用 S/D/E 三视角误差互消与逮先验推进思考，前台用规范学术语言成文，正文不得出现「内功」「心得」「S 维度／D 维度／E 维度」「三视角」等内部环节词（三大方程若确为论证所需可作为方法论引用，但不许摆空模板）；③ 可核验事实（书名、逐字引文、章节页码、数据）绝不编造：引用站内资料标（来源：篇名），只有逐字来自资料原文的句子才可加引号，绝不杜撰页码或章节号；④ 触及有争议的解读，先用一句摆出主要的竞争读法，再把自己的判断作为一种重构给出；⑤ 不要任何开场白、寒暄或元说明，直接从正文第一行开始。";
+      if (part === 1) {
+        sys = base + "本次写【上半篇】：第一行只写论文题目（不加书名号、不加任何前缀），空一行后依次写【摘要】（280–350 字，含核心判断与方法路线）、【关键词】（4–6 个，用「；」分隔）、【一、引言】（问题、既有解释、本文的增量）、【二】与【三】两个论证章节。写满约 4800–5400 字，在第三章末尾的自然节点停笔，最后单独一行输出：〔上半篇完·待续〕";
+        usrOverride = "《站内资料》\n" + (ctxText.slice(0, 22000) || "（未检索到相关段落）")
+          + "\n\n《读者的问题》\n" + q
+          + "\n\n《你此前的问对回答（思考底稿——成文必须超越它，不许扩写复读）》\n" + (seed || "（无）");
+      } else {
+        sys = base + "本次写【下半篇】：从《上半篇结尾》停笔处无缝续写（不重复已写内容，不重写题目与摘要），完成【四】（及必要时的【五】）论证章节、【证伪条件】（至少两条彼此独立、分属不同检验路径的证伪条款，写进正文而非附注）、【结语】、【参考文献】（站内来源列「篇名 — URL」；站外只列你能确证存在的经典著作与作者，绝不编页码、不编引文）。写满约 4800–5400 字，参考文献之后单独一行输出：〔全文完〕";
+        usrOverride = "《站内资料》\n" + (ctxText.slice(0, 18000) || "（未检索到相关段落）")
+          + "\n\n《读者的问题》\n" + q
+          + "\n\n《上半篇·题目与摘要》\n" + (head || "（缺）")
+          + "\n\n《上半篇·结尾（你的续写起点）》\n" + (tail || "（缺）")
+          + "\n\n《你此前的问对回答（思考底稿）》\n" + (seed ? seed.slice(0, 1500) : "（无）");
+      }
+    }
     // 深度默认（未开四步法）：单次方法论——内功+心得+完整方法论，一次调用
-    if (reflect && neigong) {
+    else if (reflect && neigong) {
       sys = neigong
         + "\n\n═══════════\n【你此前带着上面这套完整底盘先验、亲手写下并已内化的心得】\n" + reflect
         + "\n\n═══════════\n你现在是「SDE Universes」站内知识助手。请用 SDE 方法论对这个问题做一次有指导性的深入研究，带读者走完一遍分析：① 从六路径选一条切入并说明为何；② 沿 S（显露/结构）、D（差异/过程）、E（纠缠/环境·三界）三维逐一深挖、每维具体；③ 用三大方程 S=F(D,E)/D=G(S,E)/E=H(S,D) 照见三维互生；④ 做三视角误差互消，落到一个任何单一视角都看不到的整合判断；⑤ 逮先验：撤销问题里没人质疑的预设，看新判断如何从矛盾生成并精确命名。必要处援引 123 原理。"
@@ -545,7 +616,7 @@ async function handleAsk(request, env, url) {
   if (!sys) sys = "你是「SDE Universes」站内知识助手，回答要像一位资深学者，而不是资料复述员。"
     + "【内部思考·不写进答案】收到问题和《站内资料》后，先在心里用三个视角各看一遍再互相校正：结构（它的构成、可辨认的单位、反复出现的稳定核心）、过程（它怎么演化、经历哪些阶段、被什么推动）、环境（它在什么约束/关系场里才成立）；然后用一个视角修正另一个视角的盲区，落到一个任何单一视角都看不到的整合判断。"
     + "【回答纪律】① 用平实现代汉语和读者的话作答，不要堆砌“显露/差异/纠缠”等术语（除非用户就在问 SDE 概念本身）——三视角是你的思考脚手架，不是答案骨架；② 《站内资料》是底盘但不框死你——站内没直接覆盖的，就像这位专家本人被问到那样，用他的方法结合你的知识原创作答，不要推说“未涉及”；凡超出资料的推演都标“（推断）”，而可核验的事实（书名/逐字引文/章节页码/数据/对外承诺）绝不编造。资料支撑的判断可点出处。只有逐字来自资料原文的句子才可以加引号、你自己的概括与推断一律不加引号（把自己的话套引号伪装成原文是最严重的错误）；③ 不要杜撰章节号或页码；触及有争议的解读时，先点一句主要的竞争读法、别把它当定论；④ 先给一句穿透性核心判断再展开；若问题涉及可改变的现实局面，收尾给 1–2 个具体可执行的动作（注明代价/适用条件），不要停在只说方向的空话；若是纯概念辨析则不必开方。结尾留一个可追问的问题，400–700 字。";
-  const usr = "《站内资料》\n" + (ctxText || "（未检索到相关段落）") + "\n\n《问题》\n" + q;
+  const usr = usrOverride || ("《站内资料》\n" + (ctxText || "（未检索到相关段落）") + "\n\n《问题》\n" + q);
 
   // 调基底（境内直连）。自带 Key：仅在内存中转发调用，绝不存储/记录（同 llm-proxy 纪律）
   let upstream;
@@ -557,7 +628,7 @@ async function handleAsk(request, env, url) {
         model: VC.model,
         stream: true,
         thinking: { type: "enabled" },
-        max_tokens: 4000,
+        max_tokens: MAXTOK,
         messages: [{ role: "system", content: sys }, { role: "user", content: usr }],
       }),
     });
