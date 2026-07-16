@@ -8,3 +8,17 @@
   Cache-Control: no-store
 /check/
   Cache-Control: no-store
+
+# 搜索索引：随内容重建而变，绝不能被缓存住。
+# manifest 决定页面显示的篇数/字数，分片是检索语料本身——
+# 缓存了它们，等于索引更新了而读它的人拿不到（286 vs 295 就是这么来的）。
+/search/manifest.json
+  Cache-Control: no-store
+/search/shard-*.json
+  Cache-Control: no-store
+/search/sde-coords.json
+  Cache-Control: no-store
+/search/
+  Cache-Control: no-store
+/search/index.html
+  Cache-Control: no-store
