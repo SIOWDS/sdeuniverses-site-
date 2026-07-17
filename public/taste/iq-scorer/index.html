@@ -420,7 +420,7 @@ F 可证伪性(权重0.15)：怎样会被证伪；找不到→≤100。80口号�
 · 结构与表达规范(权重0.20)：摘要、关键词、章节层次、术语前后一致、学术表达、图表与格式；读者能不能找到东西。
 · 自限与诚实(权重0.20)：有没有交代适用边界与已知局限；有没有把猜想说成发现、把研究设计说成结论、把有争议的数据说成定论、只挑对自己有利的证据。
 论文完善性综合 = 完整性×0.30 + 证据×0.30 + 结构×0.20 + 自限×0.20
-档位：≥90卓越｜80-89优秀｜70-79良好｜60-69合格｜<60待完善
+档位：≥90完备（该有的都有了）｜80-89扎实（小缺口）｜70-79可用（有部件缺失）｜60-69有硬伤（编造文献、错标出处、把未做的实验写成结果——落此档或更低）｜<60不完整
 
 两把尺子测不同的东西，而且**刻意不重叠**：尺子一问"这篇产生了多少新认知物"，尺子二问"这篇作为学术制品做得完不完整"。"选题重不重要""对领域有无贡献"属于尺子一（差异锐度／不可还原性），**尺子二一律不碰**，否则就是同一件事量两遍、还假装是两个独立的分。分别独立判断。
 
@@ -429,7 +429,7 @@ F 可证伪性(权重0.15)：怎样会被证伪；找不到→≤100。80口号�
 【输出格式·严格】把全文读完再评。思考可尽情展开，但最终只输出一个 JSON 对象，不要任何前言/结语/代码围栏。分数一律整数或一位小数：
 {"title":"论文标题(用户给了就用,没给据内容拟≤20字)","wordcount":字数整数,
 "iq":{"dims":{"S":{"score":分,"evidence":"原文证据"},"D":{"score":分,"evidence":"..."},"E":{"score":分,"evidence":"..."},"I":{"score":分,"evidence":"..."},"F":{"score":分,"evidence":"..."}},"composite":创新智商综合一位小数,"level":"层级判定"},
-"paper":{"aspects":{"completeness":{"score":分,"note":"简评"},"evidence":{"score":分,"note":"简评"},"format":{"score":分,"note":"简评"},"candor":{"score":分,"note":"简评"}},"composite":论文完善性综合一位小数,"grade":"档位如:良好 B"},
+"paper":{"aspects":{"completeness":{"score":分,"note":"简评"},"evidence":{"score":分,"note":"简评"},"format":{"score":分,"note":"简评"},"candor":{"score":分,"note":"简评"}},"composite":论文完善性综合一位小数,"grade":"档位如:可用 B"},
 "key_deduction":{"quote":"精确引用的原文扣分句","reason":"为什么扣分"},
 "uplift":{"action":"同时抬高两个分的关键动作,具体可操作"},
 "verdict":"一句话总评(≤40字)"}
@@ -769,7 +769,9 @@ function clampP(v){ return Math.max(0,Math.min(100,v)); }
 function mean(arr){ return arr.reduce((a,b)=>a+b,0)/arr.length; }
 function round1(v){ return Math.round(v*10)/10; }
 function iqTier(s){ if(s<110) return {c:'#8B98A5',bg:'rgba(139,152,165,0.16)',tag:'入门 · 大众区',glow:''}; if(s<135) return {c:'#6E9FD4',bg:'rgba(46,80,144,0.18)',tag:'专业区',glow:''}; if(s<150) return {c:'#D4B25E',bg:'rgba(212,178,94,0.16)',tag:'资深学者区',glow:''}; if(s<158) return {c:'#E5C86E',bg:'rgba(212,178,94,0.22)',tag:'本体论级 · SDE提智达标',glow:'0 0 20px rgba(212,178,94,0.5)'}; return {c:'#B98CFF',bg:'rgba(122,47,224,0.22)',tag:'天才 · 典范级（满级160）',glow:'0 0 22px rgba(122,47,224,0.5)'}; }
-function paperGrade(s){ if(s>=90) return {g:'卓越 A+',c:'#B98CFF'}; if(s>=80) return {g:'优秀 A',c:'#E5C86E'}; if(s>=70) return {g:'良好 B',c:'#D4B25E'}; if(s>=60) return {g:'合格 C',c:'#6E9FD4'}; return {g:'待完善 D',c:'#8B98A5'}; }
+/* 完善性的档位说的是「完不完整」，不是「好不好」——好不好是尺子一的事。
+   90 分不是「卓越」，是「该有的都有了」；这条尺子的高分是底线达成，不是荣誉。 */
+function paperGrade(s){ if(s>=90) return {g:'完备 A+',c:'#B98CFF'}; if(s>=80) return {g:'扎实 A',c:'#E5C86E'}; if(s>=70) return {g:'可用 B',c:'#D4B25E'}; if(s>=60) return {g:'有硬伤 C',c:'#6E9FD4'}; return {g:'不完整 D',c:'#8B98A5'}; }
 
 function radarSVG(dims){
   const order=['S','D','E','I','F'],labels={S:'S 结构',D:'D 差异',E:'E 纠缠',I:'I 不可还原',F:'F 可证伪'};
