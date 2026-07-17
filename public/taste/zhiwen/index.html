@@ -1521,14 +1521,7 @@ async function streamChat(apiKey, model, systemPrompt, userQ, bodyEl, statusEl, 
   return { text:acc, chars, thinkChars, finish:fin, secs:parseFloat(secs) };
 }
 
-// 字数计数
-function updateCharCount(){
-  const n = classicTextEl.value.length;
-  const el = $('charCount');
-  if(el){ el.textContent = n+' / 500 字'; el.style.color = n>500 ? '#F85149' : (n>450 ? '#E8A33D' : '#8B98A5'); }
-}
-classicTextEl.addEventListener('input', updateCharCount);
-updateCharCount();
+// （原经典解构器的字数计数器已移除：本页没有 classicText 元素，这段是复用时带入的死代码，且会在加载时抛 ReferenceError 打断本块脚本）
 
 </script>
 <script>
