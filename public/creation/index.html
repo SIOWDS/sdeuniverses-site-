@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>学术创造专栏 · Academic Creation | SDE Universes</title>
+<meta name="description" content="真正的学术创造如何可能？思想在一个人心里孕育，却在他人手中出生；理论不能自存，它靠被一代代人供养才活着。学术创造专栏——关于创造如何发生、又如何被制度悄悄取消的长文合辑。">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#F5EFE0;--card:#FAF6EC;--card2:#F0E8D3;--gold:#8A6817;--text:#2A2315;--text2:#6B5D47;--muted:#98886C;--border:rgba(138,104,23,0.22);--border2:rgba(138,104,23,0.10);--accent:#2A6B4A;--accent2:#3E8F63}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Noto Serif SC','EB Garamond',Georgia,serif;line-height:1.75;overflow-x:hidden}
+body.en{font-family:'EB Garamond','Playfair Display',Georgia,serif}
+body.en .zh-only{display:none}
+body.zh .en-only{display:none}
+a{color:inherit}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;flex-direction:column;padding:0.6rem 3rem 0.5rem;background:rgba(245,239,224,0.9);backdrop-filter:blur(12px);border-bottom:1px solid var(--border2)}
+.nav-bar-main{display:flex;align-items:center;justify-content:space-between;gap:1rem}
+.nav-logo{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;color:var(--gold);letter-spacing:0.05em;text-decoration:none}
+.nav-links{display:flex;align-items:center;gap:1.6rem}
+.nav-links a{color:var(--text2);text-decoration:none;font-size:0.85rem;letter-spacing:0.1em;transition:color 0.2s}
+.nav-links a:hover{color:var(--accent)}
+.nav-links a.here{color:var(--accent);font-weight:600}
+.nav-bar-sub{display:flex;align-items:center;gap:1.6rem;margin-top:0.5rem;padding-top:0.5rem;border-top:1px solid var(--border2)}
+.nav-bar-sub a{color:var(--text2);text-decoration:none;font-size:1.05rem;font-weight:700;letter-spacing:0.13em;white-space:nowrap;transition:color .2s,opacity .2s}
+.nav-bar-sub a:hover{text-decoration:underline;text-underline-offset:4px;opacity:0.72}
+.nav-bar-sub a[href="#crt-birth"]{color:#2A6B4A}
+.nav-bar-sub a[href="#crt-live"]{color:#8A6817}
+.lang-toggle{display:flex;background:var(--card);border:1px solid var(--border);border-radius:20px;overflow:hidden}
+.lang-btn{padding:0.3rem 0.8rem;font-size:0.75rem;border:none;background:transparent;color:var(--text2);cursor:pointer;font-family:inherit}
+.lang-btn.active{background:var(--accent);color:#fff;font-weight:600}
+.wrap{max-width:940px;margin:0 auto;padding:0 2rem}
+header.hero{min-height:66vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:9rem 2rem 4rem;position:relative;overflow:hidden}
+.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 70% 55% at 50% 34%,#2E8B5718 0%,transparent 70%)}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(#2E8B570d 1px,transparent 1px),linear-gradient(90deg,#2E8B570d 1px,transparent 1px);background-size:60px 60px;opacity:0.7}
+.eyebrow{position:relative;font-size:0.72rem;letter-spacing:0.28em;color:var(--accent);text-transform:uppercase;margin-bottom:1.4rem}
+.title{position:relative;font-family:'Playfair Display','Noto Serif SC',serif;font-size:clamp(2.6rem,7vw,5rem);font-weight:700;line-height:1.05;color:var(--text)}
+.sub{position:relative;font-size:clamp(1.05rem,2.3vw,1.35rem);color:var(--text2);max-width:660px;margin:1.6rem auto 2rem;font-style:italic;font-weight:300}
+.badge{position:relative;display:inline-flex;align-items:center;gap:0.5rem;background:var(--card);border:1px solid var(--accent);color:var(--accent);border-radius:30px;padding:0.5rem 1.3rem;font-size:0.78rem;letter-spacing:0.14em}
+.badge .dot{width:7px;height:7px;border-radius:50%;background:var(--accent);animation:pulse 1.8s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:0.35;transform:scale(0.85)}50%{opacity:1;transform:scale(1)}}
+section{padding:3.5rem 0}
+.lead{font-size:1.12rem;color:var(--text);line-height:1.95;border-left:3px solid var(--accent);padding:0.2rem 0 0.2rem 1.5rem;margin:0 0 3rem}
+.block{margin:0 0 3.4rem;scroll-margin-top:6.5rem}
+.block-head{display:flex;align-items:baseline;gap:0.85rem;border-bottom:1px solid var(--border);padding-bottom:0.7rem;margin-bottom:0.9rem}
+.block-num{font-family:'Playfair Display',serif;font-size:1.55rem;font-weight:700;color:var(--accent);line-height:1}
+.block-title{font-family:'Playfair Display','Noto Serif SC',serif;font-size:1.32rem;font-weight:600;color:var(--text);line-height:1.25}
+.block-desc{font-size:0.98rem;color:var(--text2);font-style:italic;margin:0 0 1.4rem;line-height:1.7}
+.art-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.art{display:block;text-decoration:none;background:var(--card);border:1px solid var(--border2);border-left:3px solid var(--accent);border-radius:5px;padding:1.05rem 1.25rem;transition:transform .2s,box-shadow .2s,border-color .2s}
+.art:hover{border-left-color:var(--accent2);transform:translateX(3px);box-shadow:0 6px 20px rgba(42,107,74,.10)}
+.art .k{display:block;font-size:0.71rem;letter-spacing:0.1em;color:var(--accent);text-transform:uppercase;font-weight:600;margin-bottom:0.35rem}
+.art h4{font-family:'Noto Serif SC',serif;font-size:1.05rem;font-weight:600;color:var(--text);margin-bottom:0.4rem;line-height:1.42}
+.art p{font-size:0.9rem;color:var(--text2);line-height:1.68}
+.art .rd{display:inline-block;margin-top:0.6rem;font-size:0.8rem;color:var(--accent);letter-spacing:0.06em}
+.note{margin-top:3rem;text-align:center;background:var(--card2);border:1px dashed var(--accent);border-radius:8px;padding:1.8rem 1.5rem}
+.note p{color:var(--text2);font-size:0.98rem}
+.note b{color:var(--accent)}
+.crosslinks{display:flex;flex-wrap:wrap;gap:0.8rem;justify-content:center;margin-top:1.4rem}
+.crosslinks a{text-decoration:none;font-size:0.86rem;letter-spacing:0.08em;padding:0.5rem 1.1rem;border:1px solid var(--border);border-radius:24px;color:var(--text2);transition:all 0.2s;background:var(--card)}
+.crosslinks a:hover{border-color:var(--accent);color:var(--accent)}
+footer{border-top:1px solid var(--border2);margin-top:4rem;padding:2.5rem 2rem;text-align:center;color:var(--muted);font-size:0.78rem;letter-spacing:0.05em}
+footer a{color:var(--gold);text-decoration:none}
+@media(max-width:640px){
+  nav{padding:0.55rem 1rem 0.45rem}
+  .nav-bar-sub{justify-content:flex-start;gap:1.1rem;overflow-x:auto;padding-bottom:0.15rem}
+  .nav-bar-sub a{font-size:0.92rem}
+  .block{scroll-margin-top:5.5rem}
+  .nav-links{gap:1rem}
+  .nav-links a.sib{display:none}
+  .art-grid{grid-template-columns:1fr}
+  header.hero{padding:7rem 1.2rem 3rem;min-height:auto}
+}
+</style>
+</head>
+<body class="zh">
+
+<nav>
+  <div class="nav-bar-main">
+  <a class="nav-logo" href="/">SDE Universes</a>
+  <div class="nav-links">
+    <a href="/" class="zh-only">首页</a><a href="/" class="en-only">Home</a>
+    <a href="/education/" class="sib zh-only">教育专栏</a><a href="/education/" class="sib en-only">Education</a>
+    <a href="/health/" class="sib zh-only">健康专栏</a><a href="/health/" class="sib en-only">Health</a>
+    <a href="/business/" class="sib zh-only">商业专栏</a><a href="/business/" class="sib en-only">Business</a>
+    <a href="/creation/" class="sib here zh-only">学术创造专栏</a><a href="/creation/" class="sib here en-only">Academic Creation</a>
+    <a href="/plagiarism/" class="sib zh-only">论文抄袭专栏</a><a href="/plagiarism/" class="sib en-only">Plagiarism</a>
+    <a href="/discovery-vs-genesis/" class="sib zh-only">发现VS发生</a><a href="/discovery-vs-genesis/" class="sib en-only">Discovery vs Genesis</a>
+    <div class="lang-toggle"><button class="lang-btn active" onclick="setLang('zh')">中</button><button class="lang-btn" onclick="setLang('en')">EN</button></div>
+  </div>
+  </div>
+  <div class="nav-bar-sub">
+    <a href="#crt-birth"><span class="zh-only">壹 · 思想如何出生</span><span class="en-only">I · How Thought Is Born</span></a>
+    <a href="#crt-live"><span class="zh-only">贰 · 思想如何活下来</span><span class="en-only">II · How Thought Survives</span></a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="hero-bg"></div><div class="hero-grid"></div>
+  <div class="eyebrow zh-only">SDE 学科专栏</div><div class="eyebrow en-only">SDE SUBJECT COLUMN</div>
+  <h1 class="title"><span class="zh-only">学术创造专栏</span><span class="en-only">Academic Creation</span></h1>
+  <p class="sub zh-only">论文越来越多，能挪动地基的思想越来越少。这不是天才变少了——是思想赖以出生和存活的那几样东西，正被一套没有恶意、只是太有效的制度，一件一件地拿走。</p><p class="sub en-only">More papers, fewer ideas that move the ground. Not because genius has thinned out, but because the few things a thought needs in order to be born and to stay alive are being taken away, one at a time, by an institution that means no harm and is merely very effective.</p>
+  <div class="badge"><span class="dot"></span><span class="zh-only">长文合辑 · 4 篇 / 2 板块 · 持续增补</span><span class="en-only">Essay Collection · 4 pieces / 2 blocks</span></div>
+</header>
+
+<main class="wrap">
+  <section>
+    <p class="lead zh-only">这个专栏与<a href="/plagiarism/" style="color:#A32E4E;text-decoration:none;border-bottom:1px solid rgba(163,46,78,.4)">论文抄袭专栏</a>是同一个问题的两面。那边问：抄袭到底是什么？这边问：真正的创造如何可能？两边最后撞上的是同一堵墙——一套只承认已经凝固为成品的价值、看不见任何仍在生成中的东西的评价制度。抄袭是这堵墙下最刺眼的结算，创造的稀薄是同一堵墙下更安静、也更彻底的那一笔。</p>
+    <p class="lead en-only">This column and the <a href="/plagiarism/" style="color:#A32E4E;text-decoration:none;border-bottom:1px solid rgba(163,46,78,.4)">Plagiarism column</a> are two faces of one question. That side asks what plagiarism really is; this side asks how genuine creation is possible. Both run into the same wall: a system of evaluation that recognises value only once it has hardened into a product, and is blind to anything still in the making. Plagiarism is the loudest settlement at the foot of that wall. The thinning of creation is the quieter, more complete one.</p>
+
+    <div class="block" id="crt-birth">
+      <div class="block-head">
+        <span class="block-num"><span class="zh-only">壹</span><span class="en-only">I</span></span>
+        <span class="block-title"><span class="zh-only">思想如何出生 · 在它还说不清自己是什么的时候</span><span class="en-only">How Thought Is Born · While It Still Cannot Say What It Is</span></span>
+      </div>
+      <p class="block-desc zh-only">一个想法最脆弱的时候，不是它被反驳的时候，是它还没有形状、连想它的人都说不清它是什么的时候。制度在这个时刻要求它说清楚——不是出于恶意，只是因为说不清的东西无法被管理。</p><p class="block-desc en-only">A thought is at its most fragile not when it is refuted but when it has no shape yet — when even the person thinking it cannot say what it is. That is the moment the institution asks it to speak clearly. Not out of malice: what cannot be stated cannot be managed.</p>
+      <div class="art-grid">
+        <a class="art" href="/column/grappling-ecology/">
+          <span class="k"><span class="zh-only">王德生 著 · 约 2.6 万字</span><span class="en-only">by Wang Desheng · ~26k words</span></span>
+          <h4><span class="zh-only">缠斗生态：学术深层发明发生学的一个追问</span><span class="en-only">The Grappling Ecology: A Genetic Inquiry into Deep Invention</span></h4>
+          <p class="zh-only">不是你朝着一个对象去探索——是一个还没到来的东西在追着你跑，逼你反复改造自己，好给它腾出一个能露面的位置。达尔文的二十二年、维特根斯坦禁止记录的对话、陈景润六平方米的小屋，靠的都不是制度的保护，而是制度还没顾上的角落。而这些角落，正在被一件一件地填平。</p><p class="en-only">You are not exploring an object. Something not yet arrived is chasing you, forcing you to reshape yourself until it has room to appear. Darwin's twenty-two years, Wittgenstein's unrecorded conversations, Chen Jingrun's six square metres — none of them was protected by an institution. Each survived in a corner the institution had not got round to. Those corners are being paved over.</p>
+          <span class="rd"><span class="zh-only">读全文 →</span><span class="en-only">Read →</span></span>
+        </a>
+        <a class="art" href="/column/midwifing-thought/">
+          <span class="k"><span class="zh-only">王德生 著 · 约 2.4 万字</span><span class="en-only">by Wang Desheng · ~24k words</span></span>
+          <h4><span class="zh-only">接生思想：学术创造的社会发生机制</span><span class="en-only">Midwifing Thought: The Social Genesis of Academic Creation</span></h4>
+          <p class="zh-only">思想在一个人心里孕育，却必须在他人的手中出生。导师那句"这个太细了，不够撑一个项目"并不刻薄，甚至是负责任的——但它落下的位置，恰好是那团东西还没来得及说出自己是什么的地方。达尔文有胡克和赖尔，那位青年学者只有一个申报书模板。</p><p class="en-only">A thought is conceived in one mind but must be delivered by another's hands. "Too small to carry a grant" is not unkind — it is responsible advice. It simply lands at the exact moment the thing has not yet managed to say what it is. Darwin had Hooker and Lyell. The young scholar had a grant template.</p>
+          <span class="rd"><span class="zh-only">读全文 →</span><span class="en-only">Read →</span></span>
+        </a>
+      </div>
+    </div>
+
+    <div class="block" id="crt-live">
+      <div class="block-head">
+        <span class="block-num"><span class="zh-only">贰</span><span class="en-only">II</span></span>
+        <span class="block-title"><span class="zh-only">思想如何活下来 · 出生只是开始</span><span class="en-only">How Thought Survives · Birth Is Only the Beginning</span></span>
+      </div>
+      <p class="block-desc zh-only">一个理论被造出来之后，它靠什么不死？通常的答案是：靠它自带的素质——真、有用、美——被人识别出来。这个答案把最关键的一件事说反了：理论的命，从来不在它自己手里。</p><p class="block-desc en-only">Once a theory exists, what keeps it from dying? The usual answer: its own qualities — true, useful, beautiful — get recognised. That answer inverts the crucial fact. A theory's life was never in its own hands.</p>
+      <div class="art-grid">
+        <a class="art" href="/column/sustenance/">
+          <span class="k"><span class="zh-only">王德生 著 · 约 2.8 万字</span><span class="en-only">by Wang Desheng · ~28k words</span></span>
+          <h4><span class="zh-only">供养：理论存活的一个被遮蔽条件</span><span class="en-only">Sustenance: A Hidden Condition of a Theory's Survival</span></h4>
+          <p class="zh-only">1854年黎曼讲完，满座没几个人听懂。它没死，是因为此后六十年里，贝尔特拉米、里奇、爱因斯坦各自带着自己的问题从它的裂缝钻进去，用自己的手把它推成了它原本不是的样子。帕森斯的理论没有被驳倒——它是被他自己做完的：每一次把话说尽，都是在拆掉后人能接上去的那个接口。</p><p class="en-only">In 1854 Riemann finished speaking and almost no one had followed. It survived because over the next sixty years Beltrami, Ricci and Einstein each entered through its cracks with problems of their own and pushed it into something it had not been. Parsons was never refuted — he finished himself off: every gap he closed removed a joint a successor could have gripped.</p>
+          <span class="rd"><span class="zh-only">读全文 →</span><span class="en-only">Read →</span></span>
+        </a>
+        <a class="art" href="/column/rhythm-deprivation/">
+          <span class="k"><span class="zh-only">王德生 著 · 约 2.0 万字</span><span class="en-only">by Wang Desheng · ~20k words</span></span>
+          <h4><span class="zh-only">节律剥夺：同质化时钟如何制造认知突变的制度性稀缺</span><span class="en-only">Rhythm Deprivation: How a Single Clock Manufactures Cognitive Scarcity</span></h4>
+          <p class="zh-only">问题从来不在于快。范式内的精细化在快节律里跑得很好。问题在于单一：当所有工作都被塞进同一套以短期可计量性为轴心的时钟，那些需要另一种时间的认知就因为无法在这口钟下证明自己而消失。量子纠缠在成为诺奖之前，当了三十年的"哲学废话"——它活下来，靠的是当年还有那么一块没被这口钟覆盖的地方。</p><p class="en-only">Speed was never the problem; refinement inside a paradigm runs beautifully at speed. Uniformity is. Force every kind of work onto one clock keyed to short-term measurability, and the cognition that needs another kind of time simply vanishes. Entanglement spent thirty years as "philosophical nonsense" before the Nobel — it survived because back then a patch of ground still lay outside that clock.</p>
+          <span class="rd"><span class="zh-only">读全文 →</span><span class="en-only">Read →</span></span>
+        </a>
+      </div>
+    </div>
+
+    <div class="note">
+      <p class="zh-only">四篇长文围绕同一个原初问题：<b>真正的学术创造如何可能？</b>四篇各自独立成立，合起来是一条线——被追着跑（缠斗）、被人接住（接生）、被一代代人推着走（供养）、以及这三件事共同需要的那样东西：<b>一段不被时钟切碎的时间</b>（节律剥夺）。</p>
+      <p class="en-only">Four essays, one root question: <b>how is genuine academic creation possible?</b> Each stands alone; together they form a line — being chased (grappling), being caught (midwifing), being pushed onward by successive hands (sustenance), and the one thing all three require: <b>time that the clock has not cut to pieces</b> (rhythm deprivation).</p>
+      <div class="crosslinks">
+        <a href="/plagiarism/"><span class="zh-only">→ 论文抄袭专栏（同一问题的另一面）</span><span class="en-only">→ Plagiarism column (the other face)</span></a>
+        <a href="/discovery-vs-genesis/"><span class="zh-only">→ 发现 VS 发生</span><span class="en-only">→ Discovery vs Genesis</span></a>
+        <a href="/taste/idea-generator/"><span class="zh-only">→ 金点子发生器</span><span class="en-only">→ Idea Generator</span></a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  © 德麦国际 Demai International · <span class="zh-only">学术创造专栏</span><span class="en-only">Academic Creation Column</span> · <a href="/">sdeuniverses.com</a>
+</footer>
+
+<script>
+function setLang(l){document.body.className=l;document.querySelectorAll('.lang-btn').forEach(function(b){b.classList.toggle('active',(b.textContent==='中'&&l==='zh')||(b.textContent==='EN'&&l==='en'));});document.documentElement.lang=l==='zh'?'zh-CN':'en';}
+</script>
+</body>
+</html>
