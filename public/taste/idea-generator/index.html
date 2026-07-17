@@ -2438,7 +2438,7 @@ function thoughtDeclPara(){
 }
 (function(){ const el=document.getElementById('thoughtDeclBar'); if(el) el.textContent='📖 '+THOUGHT_DECL; })();
 // 构建版本徽章：每次部署改这个 tag——用户一眼能看出浏览器跑的是不是最新代码（根治"改了但没刷到"的排障黑洞）
-const BUILD_TAG = '20260712-1525·GPT思考显影';
+const BUILD_TAG = '20260717-1150·四篇导出改真Word(docx)';
 (function(){ const el=document.getElementById('buildTag'); if(el) el.textContent=BUILD_TAG; })();
 
 // 四篇下载为一个Word
@@ -2448,28 +2448,41 @@ if(fourDlBtn){
     const papers = window._fourPapers; if(!papers) return;
     const q = (window._lastResult && window._lastResult.question) || '';
     const showRev = document.getElementById('showReviewsChk') && document.getElementById('showReviewsChk').checked;
-    let bodyHtml = '<h1 style="text-align:center">四篇学术论文</h1><p style="text-align:center;color:#666">原初问题：'+esc4(q)+'</p>' + THOUGHT_DECL_HTML + '<hr/>';
-    papers.forEach((p,i)=>{
+    const blocks = [];
+    papers.forEach((p)=>{
       if(!p.text) return;
-      bodyHtml += '<h2 style="page-break-before:always">'+esc4(p.title)+'</h2>';
-      bodyHtml += mdToHtml(p.text);
+      blocks.push({ heading:p.title, pageBreak:true });
+      blocks.push({ md:p.text, titleFirst:true });
       // 若勾选了"显示审稿意见"，把这篇的两位审稿意见也写进 Word
       if(showRev && (p.revA || p.revB)){
-        bodyHtml += '<hr/><h3 style="color:#7A2FE0">📝 审稿意见（改稿前）</h3>';
-        if(p.revA){ bodyHtml += '<p><b>审稿人 A · '+esc4(p.revLabelA||'')+'</b></p>' + mdToHtml(p.revA); }
-        if(p.revB){ bodyHtml += '<p><b>审稿人 B · '+esc4(p.revLabelB||'')+'</b></p>' + mdToHtml(p.revB); }
+        blocks.push({ heading:'📝 审稿意见（改稿前）', headingColor:'7A2FE0', headingSize:26 });
+        if(p.revA){ blocks.push({ md:'**审稿人 A · '+(p.revLabelA||'')+'**\n\n'+p.revA }); }
+        if(p.revB){ blocks.push({ md:'**审稿人 B · '+(p.revLabelB||'')+'**\n\n'+p.revB }); }
       }
     });
-    saveWordDoc('四篇学术论文', bodyHtml, '四篇学术论文.doc');
+    saveWordDocx('四篇学术论文', '原初问题：'+q, blocks, '四篇学术论文.docx');
   });
 }
 function esc4(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-// —— 统一的 .doc（Word）保存：HTML 包壳 + BOM + 触发下载（四处导出共用，消除样板重复）——
-function saveWordDoc(title, bodyHtml, filename){
-  const html='<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"><title>'+title+'</title></head><body>'+bodyHtml+'</body></html>';
-  const blob=new Blob(['\ufeff'+html],{type:'application/msword'});
-  const url=URL.createObjectURL(blob); const a=document.createElement('a');
-  a.href=url; a.download=filename; a.click(); URL.revokeObjectURL(url);
+// —— 统一的 .docx（真 Word）保存：docx 库真文档打包 + 触发下载（四处导出共用）——
+// 修错记录：旧版是"HTML 包壳 + application/msword 假 .doc"——明文承诺 Word、实际是 HTML，已废除。
+function saveWordDocx(title, subtitle, blocks, filename){
+  const { Document, Packer, Paragraph, TextRun, AlignmentType } = docx;
+  const children = [
+    new Paragraph({ children:[new TextRun({ text:title, bold:true, size:36, color:'1a1205' })], spacing:{ after:140 }, alignment:AlignmentType.CENTER })
+  ];
+  if(subtitle) children.push(new Paragraph({ children:[new TextRun({ text:subtitle, size:20, color:'666666' })], spacing:{ after:200 }, alignment:AlignmentType.CENTER }));
+  children.push(thoughtDeclPara());
+  (blocks||[]).forEach(b=>{
+    if(b.heading) children.push(new Paragraph({ children:[new TextRun({ text:b.heading, bold:true, size:b.headingSize||30, color:b.headingColor||'1a1205' })], spacing:{ before:260, after:160 }, pageBreakBefore:!!b.pageBreak }));
+    if(b.md) children.push(...mdParas(b.md, { size:24, color:'222222', titleFirst:!!b.titleFirst, titleSize:32, autoHeading:true, justify:false }));
+  });
+  const doc = new Document({ sections:[{ properties:{}, children }] });
+  Packer.toBlob(doc).then(blob=>{
+    const url=URL.createObjectURL(blob); const a=document.createElement('a');
+    a.href=url; a.download=filename; document.body.appendChild(a); a.click();
+    document.body.removeChild(a); URL.revokeObjectURL(url);
+  }).catch(e=>{ alert('生成Word失败：'+e.message); });
 }
 
 
@@ -2545,7 +2558,7 @@ function mdParas(text, opts){
   return paras;
 }
 
-// —— 供 HTML(.doc) 导出：Markdown 文本 → HTML ——
+// —— Markdown 文本 → HTML（仅页面显示用；全部下载通道已改走真 docx，不再用 HTML 冒充 .doc）——
 function mdEscHtml(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function mdInlineHtml(s){
   return mdInlineTokens(s).map(tk=>{
@@ -2683,13 +2696,13 @@ if(upliftDlBtn){
   upliftDlBtn.addEventListener('click', ()=>{
     const papers = window._upliftPapers; if(!papers) return;
     const q = (window._lastResult && window._lastResult.question) || '';
-    let bodyHtml = '<h1 style="text-align:center">第二批 · 发生引擎提升 · 四篇学术论文</h1><p style="text-align:center;color:#666">原初问题：'+esc4(q)+'　·　经三方程·123原理·六路径二次提智</p>' + THOUGHT_DECL_HTML + '<hr/>';
+    const blocks = [];
     papers.forEach((p)=>{
       if(!p.text) return;
-      bodyHtml += '<h2 style="page-break-before:always">'+esc4(p.title)+'</h2>';
-      bodyHtml += mdToHtml(p.text);
+      blocks.push({ heading:p.title, pageBreak:true });
+      blocks.push({ md:p.text, titleFirst:true });
     });
-    saveWordDoc('第二批四篇', bodyHtml, '第二批_发生引擎提升_四篇学术论文.doc');
+    saveWordDocx('第二批 · 发生引擎提升 · 四篇学术论文', '原初问题：'+q+'　·　经三方程·123原理·六路径二次提智', blocks, '第二批_发生引擎提升_四篇学术论文.docx');
   });
 }
 
@@ -2761,13 +2774,13 @@ if(normalizeDlBtn){
   normalizeDlBtn.addEventListener('click', ()=>{
     const papers = window._normalizedPapers; if(!papers) return;
     const q = (window._lastResult && window._lastResult.question) || '';
-    let bodyHtml = '<h1 style="text-align:center">第二批 · 发生引擎提升 · 补规范版 · 四篇学术论文</h1><p style="text-align:center;color:#666">原初问题：'+esc4(q)+'　·　二次提智 + 补规范（真实引注·脚注·参考文献）</p>' + THOUGHT_DECL_HTML + '<hr/>';
+    const blocks = [];
     papers.forEach((pp)=>{
       if(!pp.text) return;
-      bodyHtml += '<h2 style="page-break-before:always">'+esc4(pp.title)+'</h2>';
-      bodyHtml += mdToHtml(pp.text);
+      blocks.push({ heading:pp.title, pageBreak:true });
+      blocks.push({ md:pp.text, titleFirst:true });
     });
-    saveWordDoc('补规范版四篇', bodyHtml, '第二批_补规范版_四篇学术论文.doc');
+    saveWordDocx('第二批 · 发生引擎提升 · 补规范版 · 四篇学术论文', '原初问题：'+q+'　·　二次提智 + 补规范（真实引注·脚注·参考文献）', blocks, '第二批_补规范版_四篇学术论文.docx');
   });
 }
 
@@ -2874,13 +2887,13 @@ if(polishDlBtn){
   polishDlBtn.addEventListener('click', ()=>{
     const papers = window._polishedPapers; if(!papers) return;
     const q = (window._lastResult && window._lastResult.question) || '';
-    let bodyHtml = '<h1 style="text-align:center">最后四篇 · 二次审稿打磨版 · 学术论文</h1><p style="text-align:center;color:#666">原初问题：'+esc4(q)+'　·　补规范 + 二次双审 + 打磨改稿</p>' + THOUGHT_DECL_HTML + '<hr/>';
+    const blocks = [];
     papers.forEach((pp)=>{
       if(!pp.text) return;
-      bodyHtml += '<h2 style="page-break-before:always">'+esc4(pp.title)+'</h2>';
-      bodyHtml += mdToHtml(pp.text);
+      blocks.push({ heading:pp.title, pageBreak:true });
+      blocks.push({ md:pp.text, titleFirst:true });
     });
-    saveWordDoc('最后四篇·打磨版', bodyHtml, '最后四篇_二次审稿打磨版.doc');
+    saveWordDocx('最后四篇 · 二次审稿打磨版 · 学术论文', '原初问题：'+q+'　·　补规范 + 二次双审 + 打磨改稿', blocks, '最后四篇_二次审稿打磨版.docx');
   });
 }
 
