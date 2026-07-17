@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>西方哲学专栏 | Western Philosophy | SDE Universes</title>
+<meta name="description" content="西方哲学专栏——用发生学的刀重读西方哲学：五万字《否定序列》总纲＋解构西方哲学家系列。王德生 · 德麦国际。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=EB+Garamond:wght@400;500&family=Noto+Serif+SC:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#F5EFE0;--card:#FAF6EC;--card2:#F0E8D3;--gold:#8A6817;--text:#2A2315;--text2:#6B5D47;--muted:#98886C;--border:rgba(138,104,23,0.22);--border2:rgba(138,104,23,0.10);--accent:#8C3B32;--accent2:#4A73B8}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Noto Serif SC','EB Garamond',Georgia,serif;line-height:1.75;overflow-x:hidden}
+body.en{font-family:'EB Garamond','Playfair Display',Georgia,serif}
+body.en .zh-only{display:none}
+body.zh .en-only{display:none}
+a{color:inherit}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;flex-direction:column;padding:0.6rem 3rem 0.5rem;background:rgba(245,239,224,0.9);backdrop-filter:blur(12px);border-bottom:1px solid var(--border2)}
+.nav-logo{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;color:var(--gold);letter-spacing:0.05em;text-decoration:none}
+.nav-links{display:flex;align-items:center;gap:1.6rem}
+.nav-links a{color:var(--text2);text-decoration:none;font-size:0.85rem;letter-spacing:0.1em;transition:color 0.2s}
+.nav-links a:hover{color:var(--accent)}
+.nav-links a.here{color:var(--accent);font-weight:600}
+.lang-toggle{display:flex;background:var(--card);border:1px solid var(--border);border-radius:20px;overflow:hidden}
+.lang-btn{padding:0.3rem 0.8rem;font-size:0.75rem;border:none;background:transparent;color:var(--text2);cursor:pointer;font-family:inherit}
+.lang-btn.active{background:var(--accent);color:#fff;font-weight:600}
+.wrap{max-width:940px;margin:0 auto;padding:0 2rem}
+header.hero{min-height:66vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:9rem 2rem 4rem;position:relative;overflow:hidden}
+.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 70% 55% at 50% 34%,#8C3B3214 0%,transparent 70%)}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(#8C3B320d 1px,transparent 1px),linear-gradient(90deg,#8C3B320d 1px,transparent 1px);background-size:60px 60px;opacity:0.7}
+.eyebrow{position:relative;font-size:0.72rem;letter-spacing:0.28em;color:var(--accent);text-transform:uppercase;margin-bottom:1.4rem}
+.title{position:relative;font-family:'Playfair Display','Noto Serif SC',serif;font-size:clamp(2.6rem,7vw,5rem);font-weight:700;line-height:1.05;color:var(--text)}
+.title .en-only{color:var(--accent)}
+.sub{position:relative;font-size:clamp(1.05rem,2.3vw,1.35rem);color:var(--text2);max-width:640px;margin:1.6rem auto 2rem;font-style:italic;font-weight:300}
+.badge{position:relative;display:inline-flex;align-items:center;gap:0.5rem;background:var(--card);border:1px solid var(--accent);color:var(--accent);border-radius:30px;padding:0.5rem 1.3rem;font-size:0.78rem;letter-spacing:0.14em}
+.badge .dot{width:7px;height:7px;border-radius:50%;background:var(--accent);animation:pulse 1.8s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:0.35;transform:scale(0.85)}50%{opacity:1;transform:scale(1)}}
+section{padding:3.5rem 0}
+.lead{font-size:1.12rem;color:var(--text);line-height:1.95;border-left:3px solid var(--accent);padding:0.2rem 0 0.2rem 1.5rem;margin:0 0 3rem}
+.block{margin:0 0 3.4rem;scroll-margin-top:6.5rem}
+.block-head{display:flex;align-items:baseline;gap:0.85rem;border-bottom:1px solid var(--border);padding-bottom:0.7rem;margin-bottom:0.9rem}
+.block-num{font-family:'Playfair Display',serif;font-size:1.55rem;font-weight:700;color:var(--accent);line-height:1}
+.block-title{font-family:'Playfair Display','Noto Serif SC',serif;font-size:1.32rem;font-weight:600;color:var(--text);line-height:1.25}
+.block-desc{font-size:0.98rem;color:var(--text2);font-style:italic;margin:0 0 1.4rem;line-height:1.7}
+.art-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.art{display:block;text-decoration:none;background:var(--card);border:1px solid var(--border2);border-left:3px solid var(--accent);border-radius:5px;padding:1.05rem 1.25rem;transition:transform .2s,box-shadow .2s,border-color .2s}
+.art:hover{border-left-color:var(--accent2);transform:translateX(3px);box-shadow:0 6px 20px rgba(140,59,50,.10)}
+.art .k{display:block;font-size:0.71rem;letter-spacing:0.1em;color:var(--accent);text-transform:uppercase;font-weight:600;margin-bottom:0.35rem}
+.art h4{font-family:'Noto Serif SC',serif;font-size:1.05rem;font-weight:600;color:var(--text);margin-bottom:0.4rem;line-height:1.42}
+.art p{font-size:0.9rem;color:var(--text2);line-height:1.68}
+.art .rd{display:inline-block;margin-top:0.55rem;font-size:0.82rem;color:var(--accent);letter-spacing:0.05em}
+.art.feature{grid-column:1 / -1;border-left-width:4px;background:linear-gradient(180deg,var(--card),var(--card2))}
+.art.feature h4{font-size:1.22rem}
+.tailnote{margin-top:1rem;text-align:center;background:var(--card2);border:1px dashed var(--accent);border-radius:8px;padding:1.5rem 1.4rem}
+.tailnote p{color:var(--text2);font-size:0.96rem}.tailnote b{color:var(--accent)}
+.nav-bar-main{display:flex;align-items:center;justify-content:space-between;width:100%}
+.nav-bar-sub{display:flex;align-items:center;justify-content:space-around;width:100%;margin-top:0.5rem;padding-top:0.5rem;border-top:1px solid var(--border2)}
+.nav-bar-sub a{color:var(--text2);text-decoration:none;font-size:1.05rem;font-weight:700;letter-spacing:0.13em;white-space:nowrap;transition:color .2s,opacity .2s}
+.nav-bar-sub a:hover{text-decoration:underline;text-underline-offset:4px;opacity:0.72}
+.nav-bar-sub a[href="#ai-university"]{color:#2C5F8A}
+.nav-bar-sub a[href="#ai-thinking"]{color:#1B6E7A}
+@media(max-width:640px){
+  nav{padding:0.55rem 1rem 0.45rem}
+  .nav-bar-sub{justify-content:flex-start;gap:1.1rem;overflow-x:auto;padding-bottom:0.15rem}
+  .nav-bar-sub a{font-size:0.92rem}
+  .block{scroll-margin-top:5.5rem}
+  .nav-links{gap:1rem}
+  .nav-links a.sib{display:none}
+  .art-grid{grid-template-columns:1fr}
+  header.hero{padding:7rem 1.2rem 3rem;min-height:auto}
+}
+
+/* ── 论文抄袭专栏：燃烧警示 ───────────────────────────
+   字身掐在炭底→正红（最亮档 4.90:1，米底上仍可读）；
+   橙黄只走辉光，不进字色——真烧成橙黄，字就糊在米底上，警示反而失效。 */
+@keyframes plg-burn{
+  0%{background-position:50% 100%}
+  100%{background-position:50% 0%}
+}
+@keyframes plg-flicker{
+  0%,100%{filter:drop-shadow(0 0 1px rgba(198,40,40,.40)) drop-shadow(0 1px 5px rgba(217,58,30,.22))}
+  28%{filter:drop-shadow(0 0 2px rgba(226,59,59,.72)) drop-shadow(0 1px 9px rgba(232,80,30,.40))}
+  46%{filter:drop-shadow(0 0 1px rgba(163,46,78,.50)) drop-shadow(0 1px 4px rgba(217,58,30,.18))}
+  63%{filter:drop-shadow(0 0 3px rgba(226,59,59,.80)) drop-shadow(0 2px 12px rgba(245,124,31,.42))}
+  81%{filter:drop-shadow(0 0 1px rgba(198,40,40,.45)) drop-shadow(0 1px 6px rgba(232,80,30,.24))}
+}
+.burn{
+  background-image:linear-gradient(0deg,
+    #4A0810 0%, #5E0A16 14%, #8C1F33 30%, #A32E4E 46%,
+    #B92B36 62%, #C62828 76%, #A32E4E 90%, #5E0A16 100%);
+  background-size:100% 340%;
+  -webkit-background-clip:text;background-clip:text;
+  color:transparent;-webkit-text-fill-color:transparent;
+  animation:plg-burn 3.6s linear infinite, plg-flicker 1.7s ease-in-out infinite;
+  font-weight:800;
+}
+.burn sup{-webkit-text-fill-color:#A32E4E;color:#A32E4E}
+/* 光敏与前庭敏感：停火，退回静态酒红（对比度 5.99:1） */
+@media(prefers-reduced-motion:reduce){
+  .burn{animation:none;background-image:none;color:#A32E4E;-webkit-text-fill-color:#A32E4E}
+}
+/* 不支持 background-clip:text 的浏览器兜底 */
+@supports not ((-webkit-background-clip:text) or (background-clip:text)){
+  .burn{color:#A32E4E;-webkit-text-fill-color:#A32E4E;background-image:none;animation:plg-flicker 1.7s ease-in-out infinite}
+}
+</style>
+</head>
+<body class="zh">
+<nav>
+  <div class="nav-bar-main">
+    <a class="nav-logo" href="/">SDE Universes</a>
+    <div class="nav-links">
+      <a href="/" class="zh-only">← 首页</a><a href="/" class="en-only">← Home</a>
+      <a href="/search/" class="zh-only">🔍 搜索</a><a href="/search/" class="en-only">🔍 Search</a>
+      <a href="#latest" class="here zh-only">本期头条</a><a href="#latest" class="here en-only">Today</a>
+      <a href="#archive" class="zh-only">往期头条</a><a href="#archive" class="en-only">Archive</a>
+      <div class="lang-toggle">
+        <button class="lang-btn active" onclick="setLang('zh')">中</button>
+        <button class="lang-btn" onclick="setLang('en')">EN</button>
+      </div>
+    </div>
+  </div>
+</nav>
+<header class="hero">
+  <div class="hero-bg"></div><div class="hero-grid"></div>
+  <div class="eyebrow">SDE UNIVERSES · WESTERN PHILOSOPHY</div>
+  <h1 class="title"><span class="zh-only">西方哲学专栏</span><span class="en-only">Western Philosophy</span></h1>
+  <p class="sub"><span class="zh-only">用发生学的刀重读西方哲学：每一块被宣称"发现"的磐石，都被显形为一场有条件（E）、有路径（D）的发生——总纲一篇，逐人解构，序列常开。</span><span class="en-only">Rereading Western philosophy with the knife of genesis: every claimed discovery unveiled as a conditioned genesis.</span></p>
+  <div class="badge"><span class="dot"></span><span class="zh-only">总纲＋逐人解构 · 持续更新 · 王德生 主笔</span><span class="en-only">Master essay + one-by-one deconstructions · by Wang Desheng</span></div>
+</header>
+<main class="wrap">
+<section id="master">
+  <div class="block">
+    <div class="block-head"><div class="block-num">总纲</div><div class="block-title"><span class="zh-only">五万字总纲 · 否定序列</span><span class="en-only">The Master Essay · Negation Sequence</span></div></div>
+    <div class="art-grid">
+      <a class="art feature" href="/column/negation-sequence/">
+        <span class="k"><span class="zh-only">本栏总纲 · 约五万字 · 十四章 · 三十环节总表 · 三十份SDE猜想 · 三种阅读模式</span><span class="en-only">MASTER ESSAY · ~50K CHARS · 30 LINKS · 30 SDE CONJECTURES</span></span>
+        <h4><span class="zh-only">西方哲学2500年：发生对发现的否定序列</span><span class="en-only">Western Philosophy, 2500 Years: The Negation Sequence of Genesis against Discovery</span></h4>
+        <p><span class="zh-only">三十位哲学家，同一台机器：宣称发现磐石——被解构为发生（E·条件／D·路径显形）——又在自己的叙述里偷运新磐石。每环四步：磐石·显形·偷运·猜想（每人一份500字SDE系统猜想）；另有四条运转规则、磐石后退航线、五种偷运海关名录、三个逃逸测试、仍在岗的免检品清单与证伪条件。支持长文分页、在线翻页PDF与下载。</span><span class="en-only">Thirty philosophers, one machine. Four strokes per link — bedrock, unveiling, smuggling, and an SDE-system conjecture — plus the customs catalogue, escape tests and falsification terms.</span></p>
+        <span class="rd"><span class="zh-only">阅读总纲 →</span><span class="en-only">Read →</span></span>
+      </a>
+    </div>
+  </div>
+</section>
+<section id="series">
+  <div class="block">
+    <div class="block-head"><div class="block-num">解构</div><div class="block-title"><span class="zh-only">解构西方哲学家 · 逐人系列</span><span class="en-only">Deconstructing the Philosophers · One by One</span></div></div>
+    <div class="art-grid">
+      <a class="art" href="/column/plato-idea-genesis/">
+        <span class="k"><span class="zh-only">系列之一 · 柏拉图 · 约一万字</span><span class="en-only">NO.1 · PLATO</span></span>
+        <h4><span class="zh-only">柏拉图的理念，不是被回忆的，而是被发生的</span><span class="en-only">Plato's Ideas: Not Recollected but Generated</span></h4>
+        <p><span class="zh-only">理念不是先在的，是一束被稳定到"符号态封顶"的纠缠；回忆说、洞穴寓言、分有难题，都是发现范式把"稳定"错读成"先在"。</span><span class="en-only">The Idea is a stabilized entanglement misread as pre-existence.</span></p>
+        <span class="rd"><span class="zh-only">阅读 →</span><span class="en-only">Read →</span></span>
+      </a>
+      <a class="art" href="/column/kant-categories-genesis/">
+        <span class="k"><span class="zh-only">系列之二 · 康德 · 约一万字</span><span class="en-only">NO.2 · KANT</span></span>
+        <h4><span class="zh-only">康德的范畴，不是先天的模具，而是沉淀的纠缠</span><span class="en-only">Kant's Categories: Sedimented Entanglement, Not A Priori Molds</span></h4>
+        <p><span class="zh-only">哥白尼式革命只革了一半：打倒了"对象先在"，却把认知框架立成新的先天；因果、时空、物自体、二律背反逐一还原为发生。</span><span class="en-only">The Copernican revolution went only halfway.</span></p>
+        <span class="rd"><span class="zh-only">阅读 →</span><span class="en-only">Read →</span></span>
+      </a>
+      <a class="art" href="/column/nietzsche-perspective-genesis/">
+        <span class="k"><span class="zh-only">系列之三 · 尼采 · 约一万字</span><span class="en-only">NO.3 · NIETZSCHE</span></span>
+        <h4><span class="zh-only">尼采的视角，不是主体选择的，而是发生出来的</span><span class="en-only">Nietzsche's Perspective: Generated, Not Chosen</span></h4>
+        <p><span class="zh-only">"先在"最凶的拆迁队长，留下两根没炸掉的柱子——先在的主体、作为实体的权力意志；视角与主体是同一道差异生出的双生子。</span><span class="en-only">The fiercest demolisher left two pillars standing.</span></p>
+        <span class="rd"><span class="zh-only">阅读 →</span><span class="en-only">Read →</span></span>
+      </a>
+      <a class="art" href="/column/deconstruction-master/">
+        <span class="k"><span class="zh-only">系列全集 · 存档</span><span class="en-only">SERIES ARCHIVE</span></span>
+        <h4><span class="zh-only">解构大师 · 往期全集</span><span class="en-only">Deconstruction Master · Archive</span></h4>
+        <p><span class="zh-only">逐人解构系列的完整存档页——新的一环上线，先在这里陈列。</span><span class="en-only">The full archive of the one-by-one series.</span></p>
+        <span class="rd"><span class="zh-only">进入全集 →</span><span class="en-only">Enter →</span></span>
+      </a>
+    </div>
+  </div>
+</section>
+<div class="tailnote"><span class="zh-only">本栏与「每日头条」「发现VS发生」互通：总纲发表于每日头条（2026-07-17），序列篇同时陈列于发现VS发生专栏。下一环解构对象，正在磨刀。</span><span class="en-only">Cross-listed with Daily Headline and Discovery vs Genesis. The next link is being sharpened.</span></div>
+</main>
+<footer style="border-top:1px solid var(--border2);margin-top:4rem;padding:2.5rem 2rem;text-align:center;color:var(--muted);font-size:0.78rem;letter-spacing:0.05em">
+  <div class="zh-only">SDE Universes · 每日头条专栏 &nbsp;|&nbsp; 德麦国际 · 王德生 &nbsp;|&nbsp; <a href="/" style="color:var(--gold);text-decoration:none">sdeuniverses.com</a></div>
+  <div class="en-only">SDE Universes · Daily Headline &nbsp;|&nbsp; Demai International · Desheng Wang &nbsp;|&nbsp; <a href="/" style="color:var(--gold);text-decoration:none">sdeuniverses.com</a></div>
+</footer>
+<script>
+function setLang(lang){
+  document.body.className=lang;
+  document.querySelectorAll('.lang-btn').forEach(b=>b.classList.toggle('active',(b.textContent==='中'&&lang==='zh')||(b.textContent==='EN'&&lang==='en')));
+  document.documentElement.lang=lang;
+}
+</script>
+</body>
+</html>
