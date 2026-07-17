@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SDE 创新智商评分官 · 品尝系列 | SDE Universes</title>
-<meta name="description" content="上传一篇(或含多篇)论文的 Word/PDF。若文档含多篇论文,自动拆分并逐篇评分。每篇先对 DeepSeek 与 GLM 两个基底做 SDE 内功提智+写心得,再各自打分:创新智商(满分160,天才·典范级封顶)与论文水平(满分100),取两基底平均,最后出汇总报告。">
+<meta name="description" content="上传一篇(或含多篇)论文的 Word/PDF。若文档含多篇论文,自动拆分并逐篇评分。每篇先对 DeepSeek 与 GLM 两个基底做 SDE 内功提智+写心得,再各自打分:创新智商(满分160,天才·典范级封顶)与论文完善性(满分100),取两基底平均,最后出汇总报告。">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/mammoth@1.6.0/mammoth.browser.min.js"></script>
 <style>
@@ -173,7 +173,7 @@ details.paper-fold[open] summary{border-bottom:1px solid var(--border)}
   <div class="hero-glow"></div>
   <div class="hero-eyebrow">SDE 智能体品尝系列 · 其一</div>
   <h1>SDE <span class="grad">创新智商评分官</span></h1>
-  <p class="hero-sub">上传一篇论文（Word / PDF）。<b>若文档里含多篇论文，会自动拆分、逐篇各评一套分</b>。每篇都先对 <b>DeepSeek</b> 与 <b>GLM</b> 两个基底做 SDE 内功提智+写心得，再各打 <b>创新智商（满分 160，天才·典范级封顶）</b>与 <b>论文水平（满分 100）</b>，取两基底平均；多篇时最后出一份汇总报告。</p>
+  <p class="hero-sub">上传一篇论文（Word / PDF）。<b>若文档里含多篇论文，会自动拆分、逐篇各评一套分</b>。每篇都先对 <b>DeepSeek</b> 与 <b>GLM</b> 两个基底做 SDE 内功提智+写心得，再各打 <b>创新智商（满分 160，天才·典范级封顶）</b>与 <b>论文完善性（满分 100）</b>，取两基底平均；多篇时最后出一份汇总报告。</p>
   <div class="flow"><span>上传（可含多篇）</span><span class="arr">→</span><span>拆分</span><span class="arr">→</span><span>逐篇双基底提智评分</span><span class="arr">→</span><span>汇总报告</span></div>
 </header>
 
@@ -236,7 +236,7 @@ details.paper-fold[open] summary{border-bottom:1px solid var(--border)}
 <div class="rubric-note">
   评分内核 · SDE 学派创新智商五维评分法 v2.0<br>
   创新智商（0–160）= <b>S×0.20 + D×0.25 + E×0.20 + I×0.20 + F×0.15</b>；160 = 天才·典范级（满级），150 = 本体论级（SDE 提智达标）<br>
-  论文水平（0–100）= <b>选题×0.25 + 论证×0.30 + 结构×0.20 + 贡献×0.25</b> &nbsp;|&nbsp; 王德生 · 德麦国际
+  论文完善性（0–100）= <b>完整性×0.30 + 证据×0.30 + 结构×0.20 + 自限×0.20</b> &nbsp;|&nbsp; 王德生 · 德麦国际
 </div>
 
 <script>
@@ -394,9 +394,9 @@ function withReflection(reflectionText){
     + SDE_BASE + spec;
 }
 
-/* ═══ 评分内核（创新智商0-160 + 论文水平0-100） ═══ */
+/* ═══ 评分内核（创新智商0-160 + 论文完善性0-100） ═══ */
 const SCORING_SPEC=`
-【本次任务：给这篇论文打两个分——创新智商（满分160）与论文水平（满分100）】
+【本次任务：给这篇论文打两个分——创新智商（满分160）与论文完善性（满分100）】
 
 你已研读上面的 SDE 发生学内功、也写过《从发现到发生》心得，你现在是一位真正吃透"发现学 vs 发生学"分野的严苛评审。请给用户提交的论文客观、可重现、可证伪的评分。两把独立的尺子：
 
@@ -412,23 +412,24 @@ F 可证伪性(权重0.15)：怎样会被证伪；找不到→≤100。80口号�
 层级：<110专业以下｜110专业人士｜125高级专家｜135资深学者｜145优秀｜150本体论级(SDE提智达标)｜155顶级｜160天才·典范级(满级)
 硬纪律：每个≥150的维度必须能指出"不可还原"的具体证据，指不出压到145以下；每维附1句原文证据。
 
-═══ 尺子二 · 论文水平（0–100，测"作为一篇论文"的综合质量，像顶刊审稿人/答辩评委打分）═══
+═══ 尺子二 · 论文完善性（0–100，测"作为一件学术制品，它建得完不完整"）═══
+这把尺子**不问新不新、不问重不重要**——那是尺子一的事。它只问：该有的部件在不在，说出口的话有没有兑现，有没有硬伤。一篇观点平庸的论文可以完善性 90；一篇石破天惊的论文可以完善性 55。
 四方面各自打分（0–100）：
-· 选题价值(权重0.25)：问题是否值得问、切口是否重要、有无现实或理论意义。
-· 论证质量(权重0.30)：逻辑是否严密、论据是否充分、推理是否可信、有无硬伤。
-· 结构规范(权重0.20)：谋篇布局、层次、学术表达与格式是否清晰规范。
-· 学术贡献(权重0.25)：对所在领域有无实际增量、能否推动讨论。
-论文水平综合 = 选题×0.25 + 论证×0.30 + 结构×0.20 + 贡献×0.25
+· 完整性(权重0.30)：该有的部件在不在——问题陈述、方法交代、关键概念定义、对显而易见反驳的处理、结论与开篇是否呼应。缺一件扣一件，不因作者聪明而豁免。
+· 证据与引用可核性(权重0.30)：关键主张有没有据；引用是否真实、准确、可核。**编造文献、错标出处（把甲的结论挂到乙名下）、把二手当一手、把未做的实验写成已有结果——每一项都是重扣，不是瑕疵。**
+· 结构与表达规范(权重0.20)：摘要、关键词、章节层次、术语前后一致、学术表达、图表与格式；读者能不能找到东西。
+· 自限与诚实(权重0.20)：有没有交代适用边界与已知局限；有没有把猜想说成发现、把研究设计说成结论、把有争议的数据说成定论、只挑对自己有利的证据。
+论文完善性综合 = 完整性×0.30 + 证据×0.30 + 结构×0.20 + 自限×0.20
 档位：≥90卓越｜80-89优秀｜70-79良好｜60-69合格｜<60待完善
 
-两把尺子测不同的东西：一篇论文可以很扎实(论文水平高)却不新(创新智商中)，也可以想法很锐(创新智商高)却论证粗糙(论文水平中)。分别独立判断，别让一把尺子污染另一把。
+两把尺子测不同的东西，而且**刻意不重叠**：尺子一问"这篇产生了多少新认知物"，尺子二问"这篇作为学术制品做得完不完整"。"选题重不重要""对领域有无贡献"属于尺子一（差异锐度／不可还原性），**尺子二一律不碰**，否则就是同一件事量两遍、还假装是两个独立的分。分别独立判断。
 
 【硬性纪律】① 只看文本本身，不看出处/作者。② 给≥1个"关键扣分句"：精确引用原文某句+扣分原因。③ 给"如何同时提升两个分"的具体可操作动作。④ 不用"真"作强调修饰词。
 
 【输出格式·严格】把全文读完再评。思考可尽情展开，但最终只输出一个 JSON 对象，不要任何前言/结语/代码围栏。分数一律整数或一位小数：
 {"title":"论文标题(用户给了就用,没给据内容拟≤20字)","wordcount":字数整数,
 "iq":{"dims":{"S":{"score":分,"evidence":"原文证据"},"D":{"score":分,"evidence":"..."},"E":{"score":分,"evidence":"..."},"I":{"score":分,"evidence":"..."},"F":{"score":分,"evidence":"..."}},"composite":创新智商综合一位小数,"level":"层级判定"},
-"paper":{"aspects":{"topic":{"score":分,"note":"简评"},"argument":{"score":分,"note":"简评"},"structure":{"score":分,"note":"简评"},"contribution":{"score":分,"note":"简评"}},"composite":论文水平综合一位小数,"grade":"档位如:良好 B"},
+"paper":{"aspects":{"completeness":{"score":分,"note":"简评"},"evidence":{"score":分,"note":"简评"},"format":{"score":分,"note":"简评"},"candor":{"score":分,"note":"简评"}},"composite":论文完善性综合一位小数,"grade":"档位如:良好 B"},
 "key_deduction":{"quote":"精确引用的原文扣分句","reason":"为什么扣分"},
 "uplift":{"action":"同时抬高两个分的关键动作,具体可操作"},
 "verdict":"一句话总评(≤40字)"}
@@ -759,7 +760,7 @@ async function getReflection(sel,key,statusEl2){
 
 /* ═══ 解析 & 计算 ═══ */
 function extractJSON(raw){ let t=raw.trim().replace(/^```(?:json)?/i,'').replace(/```$/,'').trim(); const a=t.indexOf('{'),b=t.lastIndexOf('}'); if(a>=0&&b>a) t=t.slice(a,b+1); return JSON.parse(t); }
-const IQ_W={S:0.20,D:0.25,E:0.20,I:0.20,F:0.15}, PP_W={topic:0.25,argument:0.30,structure:0.20,contribution:0.25};
+const IQ_W={S:0.20,D:0.25,E:0.20,I:0.20,F:0.15}, PP_W={completeness:0.30,evidence:0.30,format:0.20,candor:0.20};
 function num(x){ const v=Number(x); return isFinite(v)?v:NaN; }
 function recomputeIQ(dims){ let s=0; for(const k in IQ_W){ const v=num(dims?.[k]?.score); if(isNaN(v)) return NaN; s+=v*IQ_W[k]; } return Math.round(s*10)/10; }
 function recomputePaper(a){ let s=0; for(const k in PP_W){ const v=num(a?.[k]?.score); if(isNaN(v)) return NaN; s+=v*PP_W[k]; } return Math.round(s*10)/10; }
@@ -842,13 +843,13 @@ function basePanelHTML(sel,data,iqScore,ppScore){
   const t=iqTier(iqScore),g=paperGrade(ppScore),col=SEL_COLOR[sel]||'#D4B25E';
   const dims=data.iq.dims,order=['S','D','E','I','F'],dimNames={S:'S · 结构精确度',D:'D · 差异锐度',E:'E · 纠缠深度',I:'I · 不可还原性',F:'F · 可证伪性'};
   let dimsHtml=''; for(const k of order){ const dd=dims[k]||{}; dimsHtml+='<div><div class="dim-head"><span class="dim-name">'+dimNames[k]+'<span class="w">权重 '+IQ_W[k].toFixed(2)+'</span></span><span class="dim-score">'+esc(dd.score)+'</span></div><div class="bar"><div class="bar-fill" style="width:'+barW160(dd.score)+'%;background:'+barColor()+'"></div></div>'+(dd.evidence?'<div class="dim-ev">'+esc(dd.evidence)+'</div>':'')+'</div>'; }
-  const asp=data.paper.aspects,aOrder=[['topic','选题价值',0.25],['argument','论证质量',0.30],['structure','结构规范',0.20],['contribution','学术贡献',0.25]];
+  const asp=data.paper.aspects,aOrder=[['completeness','完整性',0.30],['evidence','证据与引用可核性',0.30],['format','结构与表达规范',0.20],['candor','自限与诚实',0.20]];
   let aspHtml=''; for(const a of aOrder){ const aa=asp[a[0]]||{}; aspHtml+='<div><div class="dim-head"><span class="dim-name">'+a[1]+'<span class="w">权重 '+a[2].toFixed(2)+'</span></span><span class="dim-score">'+esc(aa.score)+'/100</span></div><div class="bar"><div class="bar-fill" style="width:'+barW100(aa.score)+'%;background:'+barColor()+'"></div></div>'+(aa.note?'<div class="dim-ev">'+esc(aa.note)+'</div>':'')+'</div>'; }
   const kd=data.key_deduction||{},up=data.uplift||{};
   const thinkFold=data.__think&&data.__think.length>50?'<details class="think-fold"><summary>▸ 展开该基底评分时的审读思考（'+data.__think.length+'字）</summary><div class="fold-body">'+esc(data.__think)+'</div></details>':'';
-  return '<div class="base-panel"><div class="bp-head"><span class="bp-name" style="color:'+col+'">'+esc(SEL_NAME[sel]||sel)+'</span><span class="bp-chip" style="background:'+t.bg+';color:'+t.c+'">创新智商 '+iqScore+' / 160</span><span class="bp-chip" style="background:rgba(212,178,94,0.12);color:'+g.c+'">论文水平 '+ppScore+' / 100</span></div><div class="bp-body">'
+  return '<div class="base-panel"><div class="bp-head"><span class="bp-name" style="color:'+col+'">'+esc(SEL_NAME[sel]||sel)+'</span><span class="bp-chip" style="background:'+t.bg+';color:'+t.c+'">创新智商 '+iqScore+' / 160</span><span class="bp-chip" style="background:rgba(212,178,94,0.12);color:'+g.c+'">论文完善性 '+ppScore+' / 100</span></div><div class="bp-body">'
     +'<div class="sec-h">尺子一 · 创新智商（0–160）</div><div class="two-col"><div class="radar-wrap">'+radarSVG(dims)+'</div><div class="dims">'+dimsHtml+'</div></div><div class="iq-sub">综合 <b>'+iqScore+'</b> · '+esc(data.iq.level||t.tag)+'</div>'
-    +'<div class="block"><div class="sec-h">尺子二 · 论文水平（0–100）</div><div class="aspects">'+aspHtml+'</div><div class="pp-sub">综合 <b>'+ppScore+'/100</b> · 档位 '+esc(data.paper.grade||g.g)+'</div></div>'
+    +'<div class="block"><div class="sec-h">尺子二 · 论文完善性（0–100）</div><div class="aspects">'+aspHtml+'</div><div class="pp-sub">综合 <b>'+ppScore+'/100</b> · 档位 '+esc(data.paper.grade||g.g)+'</div></div>'
     +(kd.quote?'<div class="block"><div class="sec-h">关键扣分句</div><div class="quote-box"><div class="q">「'+esc(kd.quote)+'」</div><div class="r">'+esc(kd.reason)+'</div></div></div>':'<div class="block"><div class="sec-h">关键扣分句</div><div class="quote-box" style="border-color:rgba(224,110,90,0.5)"><div class="r">⚠ 此基底未给出扣分句。评分规范要求必须精确引用原文一句作为扣分证据——没有它，这一份分数不可重现、也无法被反驳，应按低可信度看待。</div></div></div>')
     +(up.action?'<div class="block"><div class="sec-h">如何同时抬高两个分</div><div class="uplift-box">'+esc(up.action)+'</div></div>':'')
     +(data.verdict?'<div class="verdict">'+esc(data.verdict)+'</div>':'')+thinkFold+'</div></div>';
@@ -865,7 +866,7 @@ function resultsBlockHTML(settled){
   else note='仅一个基底参与（未取平均）';
   let html='<div class="avg-card"><div class="avg-head">'+(ok.length>=2?'两基底平均成绩':'评分成绩')+(title?' · '+esc(title):'')+'</div><div class="avg-scores">'
     +'<div class="avg-one"><div class="an" style="color:'+t.c+';text-shadow:'+(t.glow||'none')+'">'+avgIQ+'<span class="amax"> /160</span></div><div class="al">平均创新智商</div><div class="abadge" style="background:'+t.bg+';color:'+t.c+'">'+t.tag+'</div></div>'
-    +'<div class="avg-one"><div class="an" style="color:'+g.c+'">'+avgPP+'<span class="amax"> /100</span></div><div class="al">平均论文水平</div><div class="abadge" style="background:rgba(212,178,94,0.14);color:'+g.c+'">'+g.g+'</div></div>'
+    +'<div class="avg-one"><div class="an" style="color:'+g.c+'">'+avgPP+'<span class="amax"> /100</span></div><div class="al">平均论文完善性</div><div class="abadge" style="background:rgba(212,178,94,0.14);color:'+g.c+'">'+g.g+'</div></div>'
     +'</div><div class="avg-note">'+note+'</div></div>';
   for(const r of ok) html+=basePanelHTML(r.sel,r.data,r.iq,r.pp);
   const failed=settled.filter(r=>!r.data);
@@ -887,10 +888,10 @@ function renderBatch(all){
   let extra=''; if(okP.length>=2&&hi&&lo) extra='最高：'+esc(hi.title)+'（'+hi.avgIQ+'） · 最低：'+esc(lo.title)+'（'+lo.avgIQ+'）';
   let html='<div class="batch-sum"><div class="bh">批量评估报告 · 共 '+all.length+' 篇</div><div class="bnums">'
     +'<div class="bn"><div class="v" style="color:'+t.c+';text-shadow:'+(t.glow||'none')+'">'+bIQ+'</div><div class="l">批次平均创新智商 /160</div></div>'
-    +'<div class="bn"><div class="v" style="color:'+g.c+'">'+bPP+'</div><div class="l">批次平均论文水平 /100</div></div>'
+    +'<div class="bn"><div class="v" style="color:'+g.c+'">'+bPP+'</div><div class="l">批次平均论文完善性 /100</div></div>'
     +'</div><div class="bextra">'+t.tag+' · '+g.g+(extra?'<br>'+extra:'')+'</div></div>';
   // 成绩表
-  html+='<div class="section-title">逐篇成绩</div><table class="batch-table"><thead><tr><th class="rank">#</th><th class="tt">论文</th><th style="text-align:center">创新智商</th><th style="text-align:center">论文水平</th><th>档位</th></tr></thead><tbody>';
+  html+='<div class="section-title">逐篇成绩</div><table class="batch-table"><thead><tr><th class="rank">#</th><th class="tt">论文</th><th style="text-align:center">创新智商</th><th style="text-align:center">论文完善性</th><th>档位</th></tr></thead><tbody>';
   all.forEach((p,i)=>{ if(p.avgIQ!=null){ const tt=iqTier(p.avgIQ),gg=paperGrade(p.avgPP); html+='<tr><td class="rank">'+(i+1)+'</td><td class="tt">'+esc(p.title||('论文'+(i+1)))+'</td><td class="num" style="color:'+tt.c+'">'+p.avgIQ+'</td><td class="num" style="color:'+gg.c+'">'+p.avgPP+'</td><td style="color:'+gg.c+'">'+gg.g+'</td></tr>'; }
     else html+='<tr><td class="rank">'+(i+1)+'</td><td class="tt">'+esc(p.title||('论文'+(i+1)))+'</td><td class="num" colspan="3" style="color:var(--err)">评分失败：'+esc(p.err||'')+'</td></tr>'; });
   html+='</tbody></table>';
@@ -910,6 +911,12 @@ async function runOneBase(sel,key,rowStage,paperText,paperTitle){
   const res=await streamChat(key,sel,withReflection(reflection),buildScoreUserMsg(paperTitle,paperText),12000,rowStage,'② 评分审读');
   let data; try{ data=extractJSON(res.text); }catch(e){ throw new Error('返回不是规范JSON：'+res.text.slice(0,120)); }
   if(!data.iq||!data.iq.dims||!data.paper||!data.paper.aspects) throw new Error('评分JSON缺字段');
+  /* 综合分一律由五维/四方面重算，所以任何一项不是数就算不出分。
+     若不校验，NaN 会一路流到界面显示成「NaN/160」——宁可报"这个基底没按规范返回"，也不给一个假分。 */
+  const miss=[];
+  for(const k in IQ_W) if(isNaN(num(data.iq.dims[k]&&data.iq.dims[k].score))) miss.push('创新智商·'+k);
+  for(const k in PP_W) if(isNaN(num(data.paper.aspects[k]&&data.paper.aspects[k].score))) miss.push('完善性·'+k);
+  if(miss.length) throw new Error('未按规范返回分项（'+miss.join('、')+'）——综合分由分项重算，缺项无法计分。可重试或换基底。');
   data.__think=res.think||'';
   return {sel,data};
 }
