@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>机器犹豫的地方，正是你自由的地方 · 少敏 · 音乐技术 | 学员专栏 · SDE Universes</title>
+<meta name="description" content="机器犹豫的地方，正是你自由的地方：钢琴演奏转录中，模型的低置信度区与演奏者的自由区为何同源 —— 少敏 · 音乐技术 · 发表于2026年7月17日">
+<style>
+:root{--gold:#8A6817;--gold2:#C89117;--ink:#2A2315;--ink2:#5B4F38;--bg:#F5EFE0;--muted:#8A7B54;--line:rgba(138,104,23,0.30);--panel:#EFE7D3;--panel2:#F1EAD8}
+*{margin:0;padding:0;box-sizing:border-box}
+::selection{background:rgba(138,104,23,0.3)}
+body{background:var(--bg);color:var(--ink);font-family:"Noto Serif SC","Songti SC",Georgia,serif;line-height:1.9;background-image:radial-gradient(ellipse at 50% -12%,rgba(138,104,23,0.10),transparent 62%)}
+.readbar{position:sticky;top:0;z-index:20;background:rgba(42,35,21,0.96);backdrop-filter:blur(8px);border-bottom:1px solid rgba(255,255,255,0.14);display:flex;align-items:center;justify-content:space-between;padding:11px 20px;gap:12px;flex-wrap:wrap}
+.readbar .nav-back{color:#E4D6AE;font-size:13px;letter-spacing:0.04em;text-decoration:none}
+.rb-modes{display:flex;gap:8px;flex-wrap:wrap}
+.rb-btn{font-size:13px;padding:6px 14px;border-radius:3px;border:1px solid rgba(255,255,255,0.45);color:#F1E6C4;letter-spacing:0.03em;text-decoration:none}
+.rb-btn.cur{background:#F1E6C4;color:#4A3A10;font-weight:700;border-color:#F1E6C4}
+.essay{max-width:680px;margin:0 auto;padding:52px 24px 20px}
+.head{text-align:center;padding-bottom:8px}
+.head .kicker{font-size:11.5px;letter-spacing:0.4em;color:var(--gold);margin-bottom:20px}
+.head h1{font-size:clamp(26px,4.6vw,38px);font-weight:800;color:#2A2315;letter-spacing:0.03em;line-height:1.45}
+.head .subttl{display:block;font-size:0.46em;font-weight:700;color:#4A3F28;margin-top:16px;line-height:1.6;letter-spacing:0.02em}
+.head .by{font-size:14px;color:var(--ink);letter-spacing:0.2em;margin-top:22px;font-weight:700}
+.head .dateline{font-size:12.5px;color:var(--muted);letter-spacing:0.1em;margin-top:9px}
+.head .rule{width:44px;height:1px;background:var(--gold);opacity:0.6;margin:30px auto 0}
+.abstract{max-width:620px;margin:34px auto 0;background:linear-gradient(160deg,var(--panel2),var(--panel));border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:12px;padding:22px 26px}
+.abstract .lbl{font-size:12px;letter-spacing:0.34em;color:var(--gold);margin-bottom:12px}
+.abstract p{font-size:14.5px;color:var(--ink2);line-height:1.95;letter-spacing:0.01em}
+.kw{max-width:620px;margin:14px auto 0;font-size:13px;color:var(--muted);letter-spacing:0.04em;text-align:center}
+.body{padding-top:12px}
+.sec{margin:52px 0 8px}
+.sec .n{font-size:20px;font-weight:800;color:#2A2315;letter-spacing:0.04em;line-height:1.5}
+.sec .sub{font-size:13.5px;color:var(--gold);letter-spacing:0.14em;margin-top:8px}
+.sec-rule{width:34px;height:1px;background:var(--gold);opacity:0.55;margin:18px 0 26px}
+.body p{font-size:17px;color:var(--ink2);line-height:2.05;margin-bottom:22px;letter-spacing:0.01em;text-align:justify}
+.body p.lead{color:var(--ink)}
+.end-orn{text-align:center;color:var(--gold);opacity:0.65;letter-spacing:0.6em;margin:46px 0 6px;font-size:14px}
+.foot-nav{max-width:680px;margin:0 auto;padding:12px 24px 34px;text-align:center;display:flex;gap:26px;justify-content:center;flex-wrap:wrap}
+.foot-nav a{color:var(--gold);text-decoration:none;font-size:14px;letter-spacing:0.05em;border-bottom:1px solid rgba(138,104,23,0.4);padding-bottom:2px}
+.endbox{background:radial-gradient(ellipse at 50% 40%,#241a10 0%,#1c160b 60%,#140f07 100%);text-align:center;padding:56px 24px;margin-top:40px}
+.endbox .eb-k{font-size:12px;letter-spacing:0.4em;color:#D4B25E;margin-bottom:16px}
+.endbox .eb-t{font-size:clamp(22px,3.4vw,30px);font-weight:700;color:#F3ECD9;letter-spacing:0.08em;margin-bottom:14px}
+.endbox p{color:#CBB98A;max-width:540px;margin:0 auto 26px;font-size:15px;line-height:2}
+.endbox a{display:inline-block;letter-spacing:0.1em;padding:12px 30px;font-size:14.5px;text-decoration:none;border-radius:2px;margin:6px}
+.endbox .primary{background:#D4B25E;color:#150F24;font-weight:700}
+.endbox .ghost{border:1px solid #D4B25E;color:#D4B25E}
+footer{border-top:1px solid var(--line);padding:28px 24px;text-align:center;color:var(--muted);font-size:13px;letter-spacing:0.05em}
+footer a{color:var(--gold);text-decoration:none}
+@media(max-width:640px){.body p{font-size:16px}.essay{padding-top:40px}}
+
+.body p.ref{font-size:14px;line-height:1.9;margin-bottom:10px;padding-left:2em;text-indent:-2em;color:var(--muted)}
+.body p.tick{padding-left:1.5em;text-indent:-1.5em;margin-bottom:8px;color:var(--ink2)}
+.body p.tick:before{content:"—";color:var(--gold);padding-right:.6em;font-weight:700}
+
+.body p.ref{font-size:14px;line-height:1.9;margin-bottom:10px;padding-left:2em;text-indent:-2em;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="readbar">
+  <a class="nav-back" href="/students/shao-min/works/">← 少敏 · 作品</a>
+  <div class="rb-modes">
+    <span class="rb-btn cur">长文阅读</span>
+    <a class="rb-btn" href="read.html">在线 PDF</a>
+    <a class="rb-btn" href="where-the-machine-hesitates.pdf" download>下载 PDF</a>
+  </div>
+</div>
+
+<article class="essay">
+  <div class="head">
+    <div class="kicker">音 乐 技 术 · MUSIC INFORMATION RETRIEVAL</div>
+    <h1>机器犹豫的地方，正是你自由的地方<span class="subttl">钢琴演奏转录的残余地图，与一个惩罚相似的质量指标</span></h1>
+    <div class="by">少 敏</div>
+    <div class="dateline">SDE 学员专栏 · 约九千字 · 发表于2026年7月17日</div>
+    <div class="rule"></div>
+  </div>
+
+  <div class="abstract">
+    <div class="lbl">摘　要</div>
+    <p>一份音符起音 F1 达 0.98 的钢琴转录，可以让教师无话可说：它把学生弹得最像自己的地方，全部整理成了整齐的时值与干净的踏板。本文主张这不是转录不够好，而是质量的定义搞反了方向——这个领域的全部指标（F1、平均绝对误差、感知相似度）都单调地奖励“像”，而对一份要被人拿去用的转录，判准应当相反：<strong>它的质量该用它能让别人生出一段多不像它的新演奏来衡量。</strong>支撑这一判准的是本文的核心判断：<strong>转录模型犹豫的地方，正是演奏者自由的地方</strong>，而且同源——两者都是“音乐是一串离散可分离事件”这个假定失效的区域，它对机器是噪声，对人是全部的音乐。据此，残余地图不是失败的副产品，而是这段音乐允许选择的地方的地图，而现有系统正把它当垃圾扔掉。文章与西格（1958）的规定性／描述性之分划界——他的解药是纪律，本文的是架构；而机器带来了他不可能拥有的第三个对象：逐音置信度，它正是他无法测量的那个东西的测量。又与古德曼（1968）的合规类划界——MusicXML 是他的合规类的一个文件格式实现，F1 是他的完美要求的一个统计实现，而他判为非构成性的那些剩余，是本文的全部主题。工程上给出双轨表征、复合文档、六层保真阶梯与三道责任关口；评价上把可复生性定义为二维判断（相似度 × 可说明性）；最后给出四条证伪路径，其中核心检验可在 ASAP 公开数据集上一个下午跑完。</p>
+  </div>
+  <div class="kw">关键词：残余地图　离散性假定　可复生性　主体复生　双轨表征　自动音乐转录　MusicXML</div>
+
+  <div class="body">
+
+    <div class="sec"><div class="n">引言</div><div class="sub">一个F1为0.98的失败</div></div>
+    <div class="sec-rule"></div>
+    <p class="lead">设想一份转录结果：音符起音 F1 达到 0.98，力度平均绝对误差极小，踏板事件识别准确，谱面整洁，可以直接进打谱软件。按这个领域的全部标准，它是一次成功。</p>
+    <p>把它交给一位钢琴教师，让他据此指导学生。他会发现自己无话可说。</p>
+    <p>不是因为它错了。是因为它对得没有留下任何余地——它把那位学生弹得最有意思的地方、弹得最像他自己的地方，全部整理成了整齐的时值和干净的踏板。谱面上什么都在，唯独没有那个人。</p>
+    <p>本文要论证的是：这不是转录做得还不够好，是<strong>质量的定义搞反了方向</strong>。这个领域的全部指标——F1、平均绝对误差、感知相似度——测的都是同一件事：产物有多像原演奏。而对于一份要被人拿去用的转录，本文主张一个相反的判准：<strong>它的质量，该用它能让别人生出一段多不像它的新演奏来衡量。</strong></p>
+    <p>太像，是失败的一种。</p>
+    <p>支撑这个判准的，是本文的核心判断，它同样反直觉：<strong>转录模型犹豫的地方，正是演奏者自由的地方——而且不是巧合，是同一个原因。</strong>当前的工程实践把模型的置信度当作内部诊断数据，产出时扔掉，只交付最可能的那个答案。它扔掉的，恰恰是唯一有教学价值的东西。</p>
+    <p>全文八节。第一节说明相似度这把尺量错了什么。第二、三节与两个祖先划界——一九五八年的西格已经说了一半；一九六八年的古德曼则把本文的全部主题判为不属于作品，而这个领域在不知情的情况下把他的立场实现成了一个文件格式。第四节给出标本化悖论。第五节论证残余地图为何是自由的地图，这是本文的枢纽。第六节把它落成工程。第七节定义可复生性并给出那个惩罚相似的指标。第八节写明这套判断如何可能失败。</p>
+    <p>先声明一句，它决定了本文的分寸：<strong>本文是一份研究框架与实验设计，不报告已完成的实验结果。</strong>文中的指标、条件与假设属于待验证的设计，不能被表述为已有结论。这不削弱理论主张，只是防止用未来式设计冒充已有证据。第八节的检验一可以在一个公开数据集上、用一个下午跑完，它是本文最该被优先执行的部分。</p>
+
+    <div class="sec"><div class="n">第一节</div><div class="sub">相似度是一把量错了东西的尺</div></div>
+    <div class="sec-rule"></div>
+    <p class="lead">把录音转成乐谱，通常被描述为"从音频中提取乐谱"。这个说法已经预设了一件事：乐谱本来就藏在音频里，算法只需把它找出来。若此说成立，高质量转化就只是更低的错误率、更细的力度、更准的踏板。</p>
+    <p>但演奏不是藏在声波里的乐谱。它是在具体时空里展开的身体事件：手指下沉的速度、腕部释放的时机、踏板半踩的深浅、前一个音的尾振、房间的反射、演奏者对下一句的期待。MusicXML 能记录其中一部分，不能把这个过程原封不动搬进文本。</p>
+    <p>这条链路上至少混着四个不同的问题，它们之间不存在自动等价。<strong>识别问题</strong>：弹了哪些音，何时开始，何时结束。<strong>记谱问题</strong>：这些事件该被组织成什么拍号、小节、声部、连音、装饰音、踏板符号。<strong>诠释问题</strong>：某个偏离标准谱的时值究竟是错误、身体限制，还是表达性选择。<strong>再合成问题</strong>：怎样用新的音源与声学空间重建一段可听的声音。音符识别准确，不等于记谱可读；谱面整洁，不等于表现忠实；表现参数相似，也不等于声音身份相同。</p>
+    <p>一个常见的反驳是：这些只是当前技术不够先进，未来模型可以记录更高分辨率的时间、更丰富的力度曲线、更细的踏板深度。这个反驳对工程误差有效，对表示层之间的结构限制无效。<strong>只要目标格式仍要求把演奏表达为符号对象，系统就必须决定什么算一个可记录单位。</strong>单位可以越划越细，不会因此消失。更要紧的是：提高精度提高的是记录的分辨率，不是记录的方向——<strong>把一把量错了东西的尺刻得更细，量出来的还是错的那个东西。</strong></p>
+    <p>本文因此不追问"怎样无损"，而追问三件事：转化保留了演奏的哪些维度，遗漏了什么；系统通过哪些切分制造可计算对象，又如何把表达性变化写成错误；以及，产物进入教学与再演奏之后，它究竟让下一个人能做什么。</p>
+
+    <div class="sec"><div class="n">第二节</div><div class="sub">一九五八年已经说过一半</div></div>
+    <div class="sec-rule"></div>
+    <p class="lead">本文的第一个祖先，比这个领域的全部技术都早三十年。</p>
+    <p>一九五八年，查尔斯·西格在《规定性与描述性的音乐书写》中指出，音乐书写实践里潜藏着三重危害。第一重是：<strong>假定音乐的完整听觉参数，可以被一个部分的视觉参数——一个只有二维的平面——所表示。</strong>第三重是：未能区分音乐书写的规定性用法与描述性用法，即"一份关于某乐曲该如何被弹响的蓝图"与"一份关于某次演奏实际如何发声的报告"。</p>
+    <p>这两句话，几乎就是本文两个核心构造的内容。"双轨表征"——规范谱负责结构交流、演奏轨负责保存过程——正是西格那条分界的工程实现。任何把它当作新发现的说法都不成立；在民族音乐学里这条分界早已是常识，而且连本文所引的那篇转录综述的作者，也出现在西格那篇论文的引用网络里。</p>
+    <p>所以问题必须换成：<strong>在西格已经说完的地方，还剩下什么？</strong></p>
+    <p>剩下两样，而它们都不是修辞。</p>
+    <p><strong>其一，西格的解药是纪律，本文的解药是架构。</strong>西格说：分清你在用哪一种。这是对写谱的人的要求，靠自觉执行。可当写谱的是一台机器、而使用者是一个看不见机器内部的教师时，自觉无处安放——教师拿到的是一份已经完成的谱，它长得既像蓝图又像报告，没有任何东西告诉他哪一部分是哪一种。本文的主张因此不是"分清"，而是<strong>别选：两个都产出，作为同一个版本化包里两份独立的、互不覆盖的产物</strong>。规范谱里的整齐时值不许抹掉演奏轨里的 rubato，演奏轨里的细碎时间也不许强迫乐谱变得不可读。分清是一种态度，双轨是一个数据契约——后者可以被检查，前者不能。</p>
+    <p><strong>其二，也是要紧的那一样：机器带来了西格不可能拥有的第三个对象。</strong>西格的描述性记谱，仍然是一个人写下的报告。写的人当然知道自己在哪里拿不准，但那份拿不准随着报告的完成而蒸发了，纸上只剩结论。转录模型不同：它<strong>逐音输出自己的置信度</strong>。这是西格的世界里不存在的量——它回答的不是"这段音乐是什么"，而是"证据在哪里不唯一地决定一个答案"。</p>
+    <p>这个差别的分量，第五节才会完全显出来，但可以先说一半：<strong>西格说记谱假定了一个它兑现不了的东西，他没有办法测量那个假定在哪里失效。转录模型的置信度，就是那个测量。</strong>六十八年之后，一句哲学上的抱怨第一次变成了一张逐音的、可计算的地图。</p>
+
+    <div class="sec"><div class="n">第三节</div><div class="sub">一九六八年把本文的主题判为不属于作品</div></div>
+    <div class="sec-rule"></div>
+    <p class="lead">第二个祖先更危险，因为这个领域已经把他的立场实现成了产品，而且不知道自己选了边。</p>
+    <p>一九六八年，纳尔逊·古德曼在《艺术的语言》中给出了音乐作品同一性的经典分析：乐谱定义了一个合规类，一次演奏是否为该作品的实例，取决于它是否完全符合乐谱的规定。他把后果说得毫不含糊：<strong>"最悲惨的、没有实际错误的演奏"是该作品的一个实例，"而最辉煌的、有一个错音的演奏不是"。</strong>他的理由也不是随口：若允许最小的偏离，作品保存的全部保证都将丧失——经由一连串的单音增删改，我们可以从贝多芬第五一路走到《三只瞎老鼠》。</p>
+    <p>现在把这段话与一个技术事实并排看。</p>
+    <p>MusicXML 精确地编码了古德曼所说的那些构成性属性：音高、时值、记谱力度、声部。它把其余一切——触键质地、微时序、踏板的浑浊、声场的粘性——留作"未指定或在限度内可变"。而这个领域的评价体系，是逐音计数、一个错音即一次错误。</p>
+    <p><strong>MusicXML 是古德曼的合规类的一个文件格式实现；F1 是他的完美要求的一个统计实现。</strong>这个领域把一九六八年的一个哲学立场，实现成了一种交换格式和一套指标，并在此后的半个世纪里把它当作中立的工程事实使用。</p>
+    <p>本文与古德曼的分界，不在于说他错了。就他自己的问题——"这还是不是同一部作品"——他的答案有力，那个贝多芬到瞎老鼠的论证站得住。分界在于：<strong>他的问题不是唯一的问题，而这个领域把他对甲问题的答案，当成了对乙问题的答案。</strong></p>
+    <p>甲问题是作品同一性。乙问题是演奏的传承：一个后来者能否凭这份材料，理解前一次演奏在做什么，并据此弹出一段属于他自己的音乐。</p>
+    <p>对甲问题，古德曼把演奏细部判为非构成性的——它们不属于作品。<strong>对乙问题，那些非构成性的剩余，是全部的主题。</strong>一个学生要从老师的录音里学到的，恰恰是古德曼定义上不属于作品的那一堆东西。</p>
+    <p>所以本文不推翻古德曼，本文指出一处错位：<strong>这个领域用一把为"是不是同一部作品"打造的尺，去量"能不能传下去"。</strong>量出来的东西不是错的，只是与要问的事无关。而这把尺量得越准，那处错位就越难被看见——这正是下一节。</p>
+
+    <div class="sec"><div class="n">第四节</div><div class="sub">标本化：越成功越致命</div></div>
+    <div class="sec-rule"></div>
+    <p class="lead">西格把第一重危害描述为一个假定，一个可以被指出、被纠正的错误。本文的判断是：它不是一个静态的错误，而是一个<strong>随技术进步而加剧的回路</strong>。</p>
+    <p>这个回路有四步。第一，为提高演奏的可保存性、可传播性与可比较性，系统必须增强结构化、离散化与标准化。第二，结构化越成功，输出越像一个完整、自足、确定的对象。第三，输出越像完整对象，使用者越容易忘记它的条件性、推断过程与排除项。第四，系统越成功地履行"保存整体"的表面承诺，越彻底地破坏使用者对演奏整体性的认识。</p>
+    <p>压缩成一句：<strong>保存的技术成功，制造了"整体已经被保存"的认识失败。</strong></p>
+    <p>这就是本文与西格的第二处分别。西格诊断的是一个假定；本文诊断的是这个假定的<strong>斜率</strong>——转录做得越好、谱面越干净，那个假定越有说服力，越少有人去查它。一份 F1 为 0.6 的转录骗不了人，它满纸都是可疑之处；一份 F1 为 0.98 的转录几乎无法不骗人，因为它剩下的 0.02 恰恰藏在最需要被看见的地方。<strong>技术进步不是这个问题的解药，是它的燃料。</strong></p>
+    <p>必须立刻区分两件事，否则本文会被读成反结构化。<strong>结构化记录本身是必要的</strong>：没有它，音乐经验无法跨越身体与时间；标准乐谱之所以能传几个世纪，正因为它舍弃了具体声场，保留了可在不同身体中重建的骨架。本文反对的不是整理，是<strong>把整理的结果包装成完整替身</strong>。</p>
+    <p>标准化的压力来自三处，都不是恶意。<strong>不出错</strong>：工程必须控制错误，于是把微时间拉回节拍格，把不稳定音头归入最近音符，把轻微装饰滤掉——这种"不出错"本身制造了一种错误，它把演奏者用来表达意义的变化修正掉了。<strong>不浪费</strong>：算力与存储有限，于是"对目标任务无用"的信息被判为冗余——而琴槌噪声、制音器动作、泛音云与声场粘性，正是音色与质感之所在。<strong>不亏本</strong>：产品必须存活，于是路线指向主流场景——古典钢琴、标准调律、清晰录音；边缘音乐、自由速度、当代技法不是无法处理，是不值得优先处理。更隐蔽的是，商业逻辑会反过来定义技术指标：评价范围之外的变化不再算失败，因为它们没有被纳入问题。</p>
+    <p>三者叠加，输入的是一段带着个人痕迹的声音，输出的是一个干净、合格、可比较、可合成的对象。它并非全无用处，只是不再是那次演奏的延续，而是一具可流通的标本。</p>
+
+    <div class="sec"><div class="n">第五节</div><div class="sub">残余地图：机器的犹豫是自由的地图</div></div>
+    <div class="sec-rule"></div>
+    <p class="lead">现在到本文的枢纽。</p>
+    <p>先问一个纯技术的问题：<strong>一个转录模型在哪里失去置信度？</strong>答案是已知的，任何做过转录的人都能列出来：密集和弦里被遮蔽的内声部；接近听阈的极弱音；踏板重叠处前音尾振与新音的混叠；自由速度段落里失效的拍点网格；时值不唯一的装饰音。</p>
+    <p>再问一个纯音乐的问题：<strong>一个钢琴演奏者在哪里拥有选择？</strong>密集和弦里让哪个声部浮出来；极弱音藏多深；踏板留下多少前一个和声的影子；句法的呼吸在哪里松、在哪里紧；装饰音落在拍上还是拍前。</p>
+    <p><strong>同一批区域。</strong></p>
+    <p>这不是巧合，而它的原因也不是什么神秘的对称。两者共享一个成因：<strong>这些正是"音乐是一串离散、可分离事件"这个假定失效的地方。</strong></p>
+    <p>在这个假定成立的地方——中音区一个响亮、干净、孤立的四分音符——模型几乎不会出错，而演奏者也几乎没有余地：那个音就是那个音，弹法的空间被物理与记谱共同压得很窄。在这个假定失效的地方，声音不再干净地分解为独立可控的事件：和弦里的音互相融合，弱音沉进噪声，踏板把边界抹掉，rubato 让网格失去参照。模型在这里犹豫，是因为声学证据不唯一地决定一个记谱；演奏者在这里自由，是因为演奏的艺术<strong>恰恰就是管理这种不可分离性</strong>——配置发声的重量而不是逐音敲击，在可听与不可听的边缘上工作，控制浑浊的程度而不是消灭浑浊。</p>
+    <p>换句话说：<strong>离散性假定失效的区域，同时是机器的困难区和人的表达区。它对机器是噪声，对人是全部的音乐。</strong></p>
+    <p>由此得到本文对残余地图的重新定义。残余地图记录低置信度音符、多个候选解释、密集和弦、弱音、踏板重叠与无法稳定量化的区域，并把每一项链接回原始音频的时间码。传统上，这类数据是内部诊断信息，产出时被丢弃，系统只交付最可能的那个答案。本文主张：</p>
+    <p><strong>残余地图不是失败的副产品，是这段音乐允许选择的地方的地图；而那是下一个演奏者需要知道的、几乎唯一的一件事。</strong></p>
+    <p>这也补上了第二节留下的那半句。西格说记谱假定了一个它兑现不了的东西，他无法测量那个假定在哪里失效。<strong>转录模型的置信度就是那个测量，而残余地图就是那张地图。</strong>六十八年之后，第一重危害第一次从一句哲学抱怨，变成了一份逐音的、可计算的、可以印在谱子旁边的坐标。</p>
+    <p>一个直接的工程推论：现有系统正把这张地图当垃圾扔掉。它们优化的方向是让地图变小——置信度越高越好，犹豫越少越好。按本文的判断，<strong>它们在系统性地删除唯一有教学价值的那一层</strong>。一个把所有音符都以 0.99 置信度输出的模型，如果它诚实，那说明这段演奏没有自由；如果这段演奏有自由，那它就是在撒谎。</p>
+    <p>这个主张有一个清楚的失败条件，写在第八节的检验一：若模型的低置信度区与不同演奏者的分歧区在真实数据上不相关，本节整节垮掉，残余地图就只是一张信噪比地图，与音乐的自由无关。</p>
+
+    <div class="sec"><div class="n">第六节</div><div class="sub">工程：双轨、复合文档、六层阶梯</div></div>
+    <div class="sec-rule"></div>
+    <p class="lead">把上面的判断落成可实施的东西，需要放弃一个习惯：让单个 .musicxml 文件承担它无法承担的全部责任。</p>
+    <p><strong>最低工程单元是一个版本化转化包</strong>，不是一个文件。它至少包含：原始媒体（固存并计算哈希）、未经破坏性处理的分析音频、未量化的演奏事件、经人工校订的规范 MusicXML、残余地图、标准谱对齐报告、标准回放、表现回放、人工判读记录。每一项都记录输入、模型、参数、版本与哈希，使任何变化都能被追溯到演奏、算法、人工编辑还是渲染。</p>
+    <p><strong>双轨不许互相覆盖。</strong>这是数据契约层面的，不是态度层面的：量化后的音符位置不得写回并替换未量化时间；教师确认不得删除模型原候选；新音源的渲染不得覆盖旧版本而继续沿用同一份听感报告。只要这些对象各有标识与来源链，系统就能回答"这个变化来自演奏、模型、人工还是渲染"，并在发现错误时局部回退。</p>
+    <p><strong>踏板必须三分。</strong>演奏轨里的"连续踏板"只表示踏板控制轨保真，不自动等同于原钢琴的阻尼器运动，更不等同于最终声学效果。MIDI CC64 即使保存 0—127 的连续值，不同钢琴、传感系统与音源的响应曲线也不同。控制轨保真、乐器响应模型保真、声学效果保真是三个量，报告里不许合并。</p>
+    <p><strong>质量是一把阶梯，不是一个分数。</strong>本文固定采用六层，每层各自报告目标、证据与限度。<strong>源完整性</strong>：哈希一致、解码错误、削波比例、有效信噪比、同步误差。<strong>事件准确性</strong>：起音 F1、带终止的音符 F1、力度平均绝对误差、踏板事件 F1、置信度校准误差——并须注明时间容忍窗，慢速抒情作品用固定毫秒阈值与按拍长比例阈值可能得出相反结论，两者都要报。<strong>记谱可用性</strong>：小节结构正确率、拍号调号错误、声部一致性、节奏拼写错误、教师校订操作数与校订时间——校订时间比符号距离更接近真实成本，两个错误数量相同的结果可能因错误集中而产生完全不同的修复负担。<strong>表现保真</strong>：局部速度曲线、相对拍点偏移、和弦内部起音散布、力度轮廓相关、踏板曲线距离——全部须在结构对齐完成之后才能比较，否则位置错配会制造虚假变化。<strong>感知相似</strong>：分开询问自然度、结构正确感、与原演奏相似度、个体特征可辨性、方向一致性，不合并成"像不像"。<strong>可复生性</strong>：下一节定义。</p>
+    <p>六层不可互相替代：音频哈希一致不代表转录正确；音符 F1 高不代表谱面可用；谱面可用不代表演奏个性仍在；盲听相似不代表对齐准确；再演奏受到启发也不证明声音被保存。</p>
+    <p><strong>三道关口，各管一件事。</strong>可记谱关口：模型结果能否形成结构自洽、可被打谱软件解析的候选——通过只意味着格式成立。可评价关口：是否存在版本一致、教师确认的参考，是否完成结构对齐——只有通过之后，才允许报告教育意义上的准确率。可使用关口：教师、演奏者或盲听者是否确认产物满足具体目的。三者分别对应机器可运行、知识可判断、实践可采用，前一道不能替代后一道。</p>
+    <p>没有教师确认且版本对齐的参考谱时，评价状态必须显式标记为 <strong>NOT_EVALUABLE_NO_REFERENCE</strong>。解析通过、渲染通过、下载成功，只证明管线在跑，不证明转录准确，更不等于教师认可。用可运行性遮蔽未知，是这条链路上最容易犯、也最难被发现的错误。</p>
+
+    <div class="sec"><div class="n">第七节</div><div class="sub">可复生性：一个惩罚相似的指标</div></div>
+    <div class="sec-rule"></div>
+    <p class="lead">现在可以给出那个反方向的判准。</p>
+    <p><strong>可复生性</strong>：转化产物在不要求声音身份复制的前提下，使后来者能够恢复原演奏中具有教学或艺术意义的结构关系、表现方向与判断依据，并据此生成具有自身完整性的新演奏的能力。</p>
+    <p>它分三维，彼此不可替代。<strong>结构复生</strong>：作品骨架是否被正确恢复——证据是音高、节奏、声部、段落结构与教师校订。<strong>方向复生</strong>：原演奏的句法与表现牵引是否被后来者接住——证据是速度轮廓、力度方向、踏板控制、专家判断与演奏者陈述。<strong>主体复生</strong>：新演奏是否形成了自身的完整性。</p>
+    <p>第三维是本文与整个指标传统分道的地方，值得把话说死。<strong>在主体复生上，"太像"是一个失败信号。</strong></p>
+    <p>这不是修辞。这个领域的每一个数字——F1、平均绝对误差、感知相似度——都单调地奖励相似：产物越接近原演奏，分越高。主体复生反过来：一段与原演奏高度相似、却说不出为什么这样弹的新演奏，是机械复制，它证明材料只传递了表面，没有传递依据。</p>
+    <p>但这个判准需要一个对称的护栏，否则它会奖励任意的不像。<strong>一段与原演奏很不同、却无法证明与所提供材料有关的优秀新演奏，也不能算在复合文档的功劳里</strong>——那可能只是这位演奏者本来就很好。</p>
+    <p>所以主体复生是一个二维判断，不是一个标量：<strong>相似度 × 可说明性</strong>。目标区域是低相似度加高可说明性——他弹得不像，而且他说得出他读懂了什么、并据此选择了别的。高相似度加低可说明性是机械复制；低相似度加低可说明性是无关；高相似度加高可说明性是理解之后选择了忠实，这也合格，但它是特例而非常态。</p>
+    <p>这里也必须限制"意愿"这个词。系统可以保存<strong>意愿标注及其来源</strong>——演奏者事后陈述、多次演奏的稳定模式、教师的结构解释——但不能宣称已经保存了演奏者的意愿本身。意愿只能作为多源支持的假说存在，不是能从单次声音里直接读出的实体。</p>
+
+    <div class="sec"><div class="n">第八节</div><div class="sub">这套判断如何可能失败</div></div>
+    <div class="sec-rule"></div>
+    <p class="lead">一套关于"看不见的东西"的理论，最方便的活法是永远正确。以下写明本文在什么情形下应当被判为错。</p>
+    <p><strong>检验一 · 犹豫与自由的相关（核心检验，可在公开数据上立刻做）。</strong>第五节的核心主张是：模型的低置信度区与演奏者的自由区是同一批区域。这可以直接测，而且材料现成——ASAP 这类数据集把同一乐谱的多次演奏与音频、MIDI 对齐在一起。设计：其一，在每次演奏的音频上跑转录模型，取逐音置信度；其二，在对齐后的乐谱位置上，计算不同演奏者之间的分歧（微时序方差、力度方差、踏板轮廓距离）；其三，做相关。<strong>预测：模型置信度与演奏者间分歧显著负相关——机器越犹豫的位置，人越分歧。</strong></p>
+    <p><strong>若不相关，第五节整节垮掉</strong>，残余地图退化为一张信噪比地图，与音乐的自由无关，本文的枢纽随之失效。这个检验不需要教师、不需要再演奏者、不需要伦理审查，一个下午即可完成，因此它应当被最先执行。它也可能给出一个中间结果：相关只存在于某些成因（比如踏板重叠成立、极弱音不成立），那将把残余地图从一个整体概念拆成需要分别对待的若干类——这同样是有信息量的失败。</p>
+    <p><strong>检验二 · 聚集而非均匀。</strong>预测：残余的收益集中在低置信度、密集和弦、弱音与复杂踏板区，而非均匀分布全曲。若低置信度音符在全曲上大致均匀散布，残余地图就没有定位价值。</p>
+    <p><strong>检验三 · 分层增量。</strong>四条件逐层增加信息：A 规范谱；B 加人工校订；C 再加演奏轨；D 再加残余地图与证据入口。所有条件使用同一渲染器、音源、混响与响度标准，并控制总学习时间、材料浏览时间与教师介入时间，防止"材料更多"被误判为"结构设计更优"。预测：B 相比 A 降低结构错误与校订成本；C 相比 B 提高方向一致性；D 相比 C 缩短教师定位疑难片段的时间、提高教师间"错误—诠释—不可判定"的分类一致性。<strong>若 C 不提高方向一致性，演奏轨的必要性受到削弱；若 D 不降低定位时间或不提高教师一致性，残余地图的实践主张失败。</strong>本文刻意不采用"合成音频与原录音不可区分"这类几乎不可能触发的失败条件——那种条件混杂了音色、房间与噪声，永远不会开火。</p>
+    <p><strong>检验四 · 相似度的方向。</strong>这是对第七节的直接反驳条件。预测：拿到 D 组材料的再演奏者，其新演奏对原演奏方向的理解应优于 A 组，<strong>而与原演奏的表面相似度不应更高——若更高，可复生性的定义方向就是错的</strong>，材料传递的只是模仿的便利，不是理解的依据。</p>
+    <p><strong>边界声明</strong>，四条。其一，<strong>本文是设计不是结果</strong>：以上全部属于待执行的检验，本文没有跑过其中任何一个。其二，<strong>适用域有限</strong>：本文针对以音高明确的钢琴独奏为中心的链路；室内乐、声乐、预制钢琴与自由即兴涉及更复杂的音源分离与非标准音色，不能套用同一阈值。其三，<strong>残余地图也会成为新的权威</strong>：一张标着"此处自由"的地图，可能反过来暗示"别处不许自由"，因此它必须允许修订与删除错误推断。其四，<strong>主体复生的"自身完整性"最终仍靠人判断</strong>，两位教师可以就此长期分歧；本文能做的只是要求分歧被记录、被报告一致性统计，并允许"不可判定"成为合法类别，而不是把它交给模型伪装成客观。</p>
+
+    <div class="sec"><div class="n">结语</div><div class="sub">把犹豫交出去</div></div>
+    <div class="sec-rule"></div>
+    <p class="lead">回到那份 F1 为 0.98 的转录。</p>
+    <p>它之所以让教师无话可说，不是因为它错了那 0.02，而是因为它把那 0.02 扔了。那 0.02 不是残余的错误，是残余的音乐——它落在密集和弦、弱音、踏板与呼吸上，也就是落在这段演奏之所以是这个人弹的那些地方。</p>
+    <p>现有的系统把置信度当作内部数据，产出时丢弃，只交付最可能的答案。这个习惯有它的道理：用户要一个答案，不要一堆犹豫。但对于一份要被人拿去理解、拿去教、拿去再弹一次的转录，这个习惯扔掉的正是全部价值。</p>
+    <p><strong>高质量不是没有损失，是不让损失隐身。</strong>MusicXML 的最高价值也不在于成为过去声音的密封容器，而在于成为一颗开放的种子：它保存足以交流的骨架，连接尚未被符号吞没的声音证据，并标出那些它自己也无法决定的地方——因为那些地方，正是下一个人可以进去的地方。</p>
+    <p>所以，下一次交付一份转录，值得多做一件事：</p>
+    <p><strong>把机器犹豫的地方，一起交出去。</strong></p>
+
+    <div class="sec"><div class="n">参考文献</div></div>
+    <div class="sec-rule"></div>
+    <p class="ref">Seeger, Charles. "Prescriptive and Descriptive Music-Writing." The Musical Quarterly, 1958, 44(2): 184–195.（规定性／描述性之分与三重危害的提出；重印于 Studies in Musicology 1935–1975, University of California Press, 1977）</p>
+    <p class="ref">Goodman, Nelson. Languages of Art: An Approach to a Theory of Symbols. Indianapolis: Bobbs-Merrill, 1968（2nd ed., Hackett, 1976）.（合规类与完美要求；"最悲惨的无错演奏／最辉煌的错一个音"见 1976 年版第 186 页）</p>
+    <p class="ref">W3C Music Notation Community Group. MusicXML 4.0. W3C Community Group Final Report, 2021.</p>
+    <p class="ref">Benetos, E., Dixon, S., Duan, Z., &amp; Ewert, S. "Automatic Music Transcription: An Overview." IEEE Signal Processing Magazine, 2019, 36(1): 20–30.</p>
+    <p class="ref">Hawthorne, C., Elsen, E., Song, J., et al. "Onsets and Frames: Dual-Objective Piano Transcription." Proceedings of ISMIR, 2018.</p>
+    <p class="ref">Hawthorne, C., Stasyuk, A., Roberts, A., et al. "Enabling Factorized Piano Music Modeling and Generation with the MAESTRO Dataset." Proceedings of ICLR, 2019.</p>
+    <p class="ref">Foscarin, F., McLeod, A., Rigaux, P., Jacquemard, F., &amp; Sakai, M. "ASAP: A Dataset of Aligned Scores and Performances for Piano Transcription." Proceedings of ISMIR, 2020.（本文检验一所用材料）</p>
+    <p class="ref">Cancino-Chacón, C. E., Grachten, M., Goebl, W., &amp; Widmer, G. "Computational Models of Expressive Music Performance: A Comprehensive and Critical Review." Frontiers in Digital Humanities, 2018, 5.</p>
+    <p class="ref">Holzapfel, A., Stylianou, Y., Gedik, A. C., &amp; Bozkurt, B. "Three Dimensions of Pitched Instrument Onset Detection." IEEE Transactions on Audio, Speech, and Language Processing, 2010, 18(6): 1517–1527.</p>
+    <p class="ref">Repp, B. H. "Diversity and Commonality in Music Performance: An Analysis of Timing Microstructure in Schumann's 'Träumerei'." Journal of the Acoustical Society of America, 1992, 92(5): 2546–2568.</p>
+    <p style="margin-top:2.4em;padding-top:1.3em;border-top:1px solid rgba(140,140,140,.28);font-size:.86em;opacity:.72;line-height:1.8">（附注：本文由原稿《个人钢琴演奏的符号转化与可复生性》按提升路径重写；原稿创新智商评估综合分 <strong>129</strong>——结构精确度 134 · 差异锐度 124 · 纠缠深度 126 · 不可还原性 122 · 可证伪性 146。本篇的创新智商<strong>待独立复核后填入</strong>：按学派评分纪律第三条，改写者不为自己的产出评分。学员专栏录取线 140。）</p>
+  <div class="end-orn">· 全 文 完 ·</div>
+  </div>
+</article>
+
+<div class="endbox">
+  <div class="eb-k">把机器犹豫的地方，一起交出去</div>
+  <div class="eb-t">SDE 金点子发生器</div>
+  <p>换一种眼睛去问——同一个问题，九个方向轮番追问，普通基底与提智基底同台对照。带上你自己的疑问，去问下一问。免费，无需注册，浏览器直接用。</p>
+  <a class="primary" href="/taste/idea-generator/">免费品尝金点子发生器 →</a>
+  <a class="ghost" href="/students/shao-min/">← 少敏 · Profile</a>
+</div>
+
+<div class="foot-nav">
+  <a href="/students/shao-min/works/">← 少敏 · 作品</a>
+  <a href="/students/shao-min/rewrite-gauge/">之一 · 改写得越彻底，越像自己的 →</a>
+  <a href="/students/shao-min/">少敏 · Profile</a>
+</div>
+<footer>© 德麦国际 Demai International · 学员专栏 · 少敏 · 机器犹豫的地方 · <a href="/">sdeuniverses.com</a></footer>
+</body></html>
