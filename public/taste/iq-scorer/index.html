@@ -473,6 +473,170 @@ dropEl.addEventListener('click',()=>fileIn.click());
 dropEl.addEventListener('drop',e=>{ const f=e.dataTransfer.files[0]; if(f) handleFile(f); });
 fileIn.addEventListener('change',e=>{ const f=e.target.files[0]; if(f) handleFile(f); });
 function showFile(msg,isErr){ fileInfoEl.innerHTML=msg; fileInfoEl.className='file-info'+(isErr?' err':''); fileInfoEl.style.display='flex'; }
+/* ═══════════════════════════════════════════════════════════════
+   论文解析器 · 结构保真
+   评分的第一维是「结构精确度」。若解析器先把结构铲平，那一维就是在
+   给解析器的损失打分，不是给论文打分。所以这里不取纯文本，取结构。
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── DOCX → Markdown：保住标题层级、粗体、列表、表格 ── */
+const DOCX_STYLE_MAP=[
+  "p[style-name='Title'] => h1:fresh","p[style-name='Subtitle'] => h2:fresh",
+  "p[style-name='标题'] => h1:fresh","p[style-name='副标题'] => h2:fresh",
+  /* 中文 Word/WPS 的样式显示名 */
+  "p[style-name='标题 1'] => h1:fresh","p[style-name='标题 2'] => h2:fresh",
+  "p[style-name='标题 3'] => h3:fresh","p[style-name='标题 4'] => h4:fresh",
+  "p[style-name='标题 5'] => h5:fresh","p[style-name='标题 6'] => h6:fresh",
+  "p[style-name='Abstract'] => blockquote:fresh","p[style-name='摘要'] => blockquote:fresh",
+  "r[style-name='Strong'] => strong","b => strong","i => em"
+];
+function mdEsc(s){ return String(s||'').replace(/\|/g,'\\|').replace(/\s+/g,' ').trim(); }
+function nodeToMd(n,depth){
+  depth=depth||0;
+  if(n.nodeType===3) return n.nodeValue.replace(/\s+/g,' ');
+  if(n.nodeType!==1) return '';
+  const kids=()=>Array.from(n.childNodes).map(c=>nodeToMd(c,depth+1)).join('');
+  const tag=n.tagName.toLowerCase();
+  if(/^h[1-6]$/.test(tag)){ const lv=+tag[1]; const t=kids().trim(); return t?('\n\n'+'#'.repeat(lv)+' '+t+'\n\n'):''; }
+  switch(tag){
+    case 'p': { const t=kids().trim(); return t?('\n\n'+t+'\n\n'):''; }
+    case 'br': return '\n';
+    case 'strong': case 'b': { const t=kids().trim(); return t?('**'+t+'**'):''; }
+    case 'em': case 'i': { const t=kids().trim(); return t?('*'+t+'*'):''; }
+    case 'blockquote': { const t=kids().trim(); return t?('\n\n'+t.split('\n').map(x=>'> '+x).join('\n')+'\n\n'):''; }
+    case 'ul': case 'ol': {
+      const lis=Array.from(n.children).filter(c=>c.tagName.toLowerCase()==='li');
+      const body=lis.map((li,idx)=>{ const t=nodeToMd(li,depth+1).trim(); return t?((tag==='ol'?(idx+1)+'. ':'- ')+t):''; }).filter(Boolean).join('\n');
+      return body?('\n\n'+body+'\n\n'):'';
+    }
+    case 'li': return kids().replace(/\n{2,}/g,' ').trim();
+    case 'table': {
+      const rows=Array.from(n.querySelectorAll('tr')).map(tr=>
+        Array.from(tr.children).map(td=>mdEsc(td.textContent)));
+      if(!rows.length) return '';
+      const w=Math.max.apply(null,rows.map(r=>r.length));
+      const pad=r=>{ const c=r.slice(); while(c.length<w) c.push(''); return '| '+c.join(' | ')+' |'; };
+      const out=[pad(rows[0]),'|'+' --- |'.repeat(w)].concat(rows.slice(1).map(pad));
+      return '\n\n'+out.join('\n')+'\n\n';
+    }
+    case 'a': { const t=kids().trim(); return t; }
+    case 'img': return '';
+    default: return kids();
+  }
+}
+function htmlToMd(html){
+  const doc=new DOMParser().parseFromString('<div id="_r">'+html+'</div>','text/html');
+  let md=nodeToMd(doc.getElementById('_r'));
+  return md.replace(/[ \t]+\n/g,'\n').replace(/\n{3,}/g,'\n\n').trim();
+}
+async function extractDocx(ab){
+  if(!window.mammoth) throw new Error('docx 解析库未加载，请刷新页面');
+  let md='';
+  try{
+    const r=await window.mammoth.convertToHtml({arrayBuffer:ab},{styleMap:DOCX_STYLE_MAP});
+    md=htmlToMd((r&&r.value)||'');
+  }catch(_){ md=''; }
+  /* 兜底：结构化失败就退回纯文本，宁可少结构也不能空手 */
+  if(md.replace(/[\s#*\->|]/g,'').length<50){
+    const r2=await window.mammoth.extractRawText({arrayBuffer:ab});
+    md=((r2&&r2.value)||'').trim();
+  }
+  return md;
+}
+
+/* ── PDF → 版面感知抽取 ── */
+const CJK=/[\u2e80-\u9fff\uf900-\ufaff\uff00-\uffef\u3000-\u303f]/;
+function isCJKEdge(a,b){ return CJK.test(a)&&CJK.test(b); }
+function median(a){ if(!a.length) return 0; const s=a.slice().sort((x,y)=>x-y); return s[s.length>>1]; }
+async function extractPdf(ab,onPage){
+  const pdf=await pdfjsLib.getDocument({data:ab}).promise;
+  const pages=[];
+  for(let i=1;i<=pdf.numPages;i++){
+    if(onPage) onPage(i,pdf.numPages);
+    const pg=await pdf.getPage(i);
+    const vp=pg.getViewport({scale:1});
+    const tc=await pg.getTextContent();
+    /* 1) 按 y 把 item 聚成行（pdf.js 常把一行切成很多 item，中文尤甚） */
+    const lines=[];
+    for(const it of tc.items){
+      if(!it.str||!it.str.trim()) continue;
+      const x=it.transform[4], y=it.transform[5];
+      const fh=Math.abs(it.transform[3])||it.height||10;
+      let L=null;
+      for(const l of lines){ if(Math.abs(l.y-y)<Math.max(1.5,fh*0.45)){ L=l; break; } }
+      if(!L){ L={y:y,h:fh,items:[]}; lines.push(L); }
+      L.items.push({x:x,w:it.width||0,s:it.str});
+      if(fh>L.h) L.h=fh;
+    }
+    /* 2) 行内按 x 排；行按 y 自上而下（PDF 坐标 y 向上） */
+    for(const l of lines) l.items.sort(function(a,b){return a.x-b.x;});
+    lines.sort(function(a,b){ return b.y-a.y; });
+    /* 3) 行内拼接：中文之间绝不插空格，拉丁按真实间距插 */
+    for(const l of lines){
+      let s='';
+      for(let k=0;k<l.items.length;k++){
+        const cur=l.items[k], prev=l.items[k-1];
+        if(prev&&s){
+          const gap=cur.x-(prev.x+prev.w);
+          const last=s[s.length-1], first=cur.s[0];
+          if(!isCJKEdge(last,first)&&gap>l.h*0.16) s+=' ';
+        }
+        s+=cur.s;
+      }
+      l.text=s.replace(/[ \t]{2,}/g,' ').trim();
+      l.x0=l.items.length?l.items[0].x:0;
+      const lastIt=l.items[l.items.length-1];
+      l.x1=lastIt?lastIt.x+lastIt.w:0;
+    }
+    pages.push({n:i,H:vp.height,lines:lines.filter(function(l){return l.text;})});
+  }
+  /* 4) 剥页眉页脚：只看上下 9% 的带；把数字抹掉再比对，
+        这样"第 3 页/第 4 页"会归一成同一条；出现在 ≥40% 页面的判为版式噪声 */
+  const norm=function(t){ return t.replace(/[\d０-９ivxlcIVXLC]+/g,'#').replace(/\s+/g,''); };
+  const tally={};
+  for(const p of pages) for(const l of p.lines){
+    const rel=l.y/p.H;
+    if(rel>0.91||rel<0.09){ const k=norm(l.text); if(k.length>1){ (tally[k]=tally[k]||new Set()).add(p.n); } }
+  }
+  const noise={}; const need=Math.max(3,Math.ceil(pages.length*0.4));
+  for(const k in tally) if(tally[k].size>=need) noise[k]=1;
+  /* 5) 行→段：y 间距大于 1.5 倍行距即分段；已收句的行也断开 */
+  let out='';
+  for(const p of pages){
+    const keep=p.lines.filter(function(l){
+      const rel=l.y/p.H;
+      if((rel>0.91||rel<0.09)&&noise[norm(l.text)]) return false;
+      if((rel>0.93||rel<0.07)&&/^[\s\d\-—–—·.·]{1,12}$/.test(l.text)) return false; /* 光秃秃的页码 */
+      return true;
+    });
+    if(!keep.length) continue;
+    const gaps=[]; for(let k=1;k<keep.length;k++) gaps.push(Math.abs(keep[k-1].y-keep[k].y));
+    const lead=median(gaps)||keep[0].h*1.2;
+    let para='';
+    for(let k=0;k<keep.length;k++){
+      const l=keep[k], prev=keep[k-1];
+      let brk=false;
+      if(prev){
+        const g=Math.abs(prev.y-l.y);
+        if(g>lead*1.5) brk=true;                                  /* 明显空行 */
+        if(/[。！？；：”』】]$/.test(prev.text)&&l.x0>prev.x0+l.h*0.8) brk=true; /* 收句 + 新行缩进 */
+      }
+      if(brk&&para){ out+=para.trim()+'\n\n'; para=''; }
+      if(para){
+        const last=para[para.length-1], first=l.text[0];
+        if(/[A-Za-z]-$/.test(para)&&/^[a-z]/.test(l.text)) para=para.slice(0,-1)+l.text;  /* 拉丁断字接回 */
+        else if(isCJKEdge(last,first)) para+=l.text;                                       /* 中文换行不留空格 */
+        else para+=' '+l.text;
+      } else para=l.text;
+    }
+    if(para.trim()) out+=para.trim()+'\n\n';
+  }
+  /* pdf.js 会给字距拉开的字符自行插空格（署名行、尾饰这类 letter-spacing 排版）。
+     中文正文里两个汉字之间本无空格，收掉它——用前瞻，连锁的"秦 莉 索"才能一次收干净。 */
+  out=out.replace(/([\u2e80-\u9fff])[ \t]+(?=[\u2e80-\u9fff])/g,'$1');
+  return out.replace(/\n{3,}/g,'\n\n').trim();
+}
+
 async function handleFile(f){
   const name=f.name, lo=name.toLowerCase();
   if(f.size>100*1024*1024){ showFile('⚠ 文件超过 100MB（当前 '+(f.size/1048576).toFixed(1)+'MB）。请精简后再试。',true); return; }
@@ -488,16 +652,10 @@ async function handleFile(f){
     const isRtf = b[0]===0x7B&&b[1]===0x5C&&b[2]===0x72&&b[3]===0x74;                       // {\rt → RTF
     let text='';
     if(isZip){
-      if(!window.mammoth) throw new Error('docx 解析库未加载，请刷新页面');
-      const r=await window.mammoth.extractRawText({arrayBuffer:ab}); text=(r&&r.value)||'';
+      text=await extractDocx(ab);
     } else if(isPdf){
       if(!window.pdfjsLib) throw new Error('PDF 解析库未加载，请刷新页面');
-      const pdf=await pdfjsLib.getDocument({data:ab}).promise;
-      for(let i=1;i<=pdf.numPages;i++){
-        if(pdf.numPages>40 && i%20===0) showFile('<span class="spinner"></span> 正在抽取第 '+i+' / '+pdf.numPages+' 页…',false);
-        const pg=await pdf.getPage(i); const tc=await pg.getTextContent();
-        text+=tc.items.map(it=>it.str).join(' ')+'\n\n';
-      }
+      text=await extractPdf(ab,function(i,tot){ if(tot>10&&i%10===0) showFile('<span class="spinner"></span> 正在按版面抽取第 '+i+' / '+tot+' 页…',false); });
     } else if(isOle){
       showFile('⚠ 这是 Word 97-2003 的二进制 .doc（不是 .docx）。浏览器内没有可靠的 .doc 解析器，无法在本机把它读成文字。<br>请在 Word/WPS 里「另存为 → .docx」后重传，或直接把正文粘到下面的框里——两种都不损失任何东西。',true); return;
     } else if(isRtf){
