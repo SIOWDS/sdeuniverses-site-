@@ -1377,7 +1377,7 @@ const REVIEW_TOKENS = 60000;
 function buildPayload(sel, systemPrompt, userQ, maxTokens){
   const { vendor, tier } = parseModel(sel);
   const cap = (typeof maxTokens==='number' && maxTokens>0) ? maxTokens : 4000;
-  const base = { stream: true, messages: [{role:'system',content:systemPrompt},{role:'user',content:userQ}], max_tokens: cap };
+  const base = { stream: false, messages: [{role:'system',content:systemPrompt},{role:'user',content:userQ}], max_tokens: cap };
   if(vendor === 'ds'){
     if(tier === 'pro'){ base.model='deepseek-v4-pro'; base.thinking={type:'enabled'}; base.reasoning_effort='xhigh'; }
     else { base.model='deepseek-v4-flash'; base.thinking={type:'disabled'}; base.temperature=0.7; }
@@ -1399,12 +1399,10 @@ function buildPayload(sel, systemPrompt, userQ, maxTokens){
     }
   } else if(vendor === 'gpt'){
     base.model = (tier === 'pro') ? 'gpt-5.5' : 'gpt-5.4';
-    base.stream = true;
     base.max_completion_tokens = base.max_tokens; delete base.max_tokens;
     base.reasoning_effort = (tier === 'pro') ? 'high' : 'medium';
-    base.stream_options = { include_usage: true };
   } else if(vendor === 'claude'){
-    return { model: (tier === 'pro') ? 'claude-opus-4-8' : 'claude-sonnet-4-6', max_tokens: Math.min(cap, 60000), stream: true, system: systemPrompt, messages: [{ role:'user', content: userQ }] };
+    return { model: (tier === 'pro') ? 'claude-opus-4-8' : 'claude-sonnet-4-6', max_tokens: Math.min(cap, 60000), stream: false, system: systemPrompt, messages: [{ role:'user', content: userQ }] };
   } else if(vendor === 'gemini'){
     return { systemInstruction: { parts: [{ text: systemPrompt }] }, contents: [{ role:'user', parts: [{ text: userQ }] }], generationConfig: { maxOutputTokens: Math.min(cap, 60000), temperature: 0.7 } };
   }
@@ -1420,149 +1418,107 @@ function vendorName(sel){
   return v==='glm' ? '智谱' : v==='kimi' ? '月之暗面 Kimi' : v==='qwen' ? '通义千问' : v==='minimax' ? 'MiniMax (稀宇)' : v==='gpt' ? 'GPT (OpenAI)' : v==='claude' ? 'Claude (Anthropic)' : v==='gemini' ? 'Gemini (Google)' : 'DeepSeek';
 }
 
+// ============ 非流式统一实现：一次请求、一次性整体返回（生产多少文字就是多少） ============
+// 用户裁定：去掉"流式"（SSE 逐字解析）这一整层复杂度——不做打字机效果，
+// 模型在服务端把全文写完、整包 JSON 一次返回，前端只做"发请求 → 等 → 取正文"。
+// 等待期间用秒表告知连接仍活着；深思档一次性返回可能要等数分钟，属正常。
+// 函数名保留 streamChat（全站 7 处调用点与返回结构零改动），实现已是非流式。
+
+function extractFull(vendor, j){
+  // 从各厂商"非流式"完整响应里取：正文 / 思考字数 / 结束原因
+  let text='', think=0, fin='';
+  if(vendor === 'claude'){
+    if(j.type === 'error') throw new Error(j.error?.message || 'Anthropic 接口错误');
+    const blocks = Array.isArray(j.content) ? j.content : [];
+    text = blocks.filter(b=>b && b.type==='text').map(b=>b.text||'').join('');
+    think = blocks.filter(b=>b && b.type==='thinking').map(b=>b.thinking||'').join('').length;
+    const sr = j.stop_reason; if(sr) fin = (sr === 'max_tokens') ? 'length' : sr;
+  } else if(vendor === 'gemini'){
+    const cand = j.candidates && j.candidates[0];
+    const parts = cand && cand.content && cand.content.parts;
+    text = Array.isArray(parts) ? parts.map(p=>p.text||'').join('') : '';
+    const fr = cand && cand.finishReason; if(fr) fin = (fr === 'MAX_TOKENS') ? 'length' : String(fr).toLowerCase();
+    if(!text && j.promptFeedback && j.promptFeedback.blockReason) throw new Error('Gemini 拦截：'+j.promptFeedback.blockReason);
+  } else {
+    // OpenAI 兼容：ds / glm / kimi / qwen / gpt / minimax
+    const ch = j.choices && j.choices[0];
+    const msg = (ch && ch.message) || {};
+    text = msg.content || '';
+    think = (msg.reasoning_content || '').length;
+    if(ch && ch.finish_reason) fin = ch.finish_reason;
+  }
+  // MiniMax（及个别把思考混进正文的基底）：剥掉 <think> 段
+  if(text.indexOf('<think>') >= 0 || text.indexOf('</think>') >= 0){
+    text = text.replace(/<think>[\s\S]*?<\/think>/g, '');
+    const early = text.slice(0, 80);
+    if(early.indexOf('</think>') >= 0){ text = text.slice(text.indexOf('</think>') + 8); }
+    text = text.trim();
+  }
+  return { text, think, fin };
+}
+
 async function streamChat(apiKey, model, systemPrompt, userQ, bodyEl, statusEl, metaEl, colEl, maxTokens){
   colEl.classList.add('generating');
-  bodyEl.innerHTML='<span class="placeholder">正在连接 '+vendorName(model)+'……</span>';
-  statusEl.innerHTML='<span class="spinner"></span> 连接中';
-  const t0=Date.now();
-  if(isOverseas(model)){
-    const r = await callOverseas(apiKey, model, systemPrompt, userQ, bodyEl, statusEl, metaEl, colEl, t0, maxTokens);
-    colEl.classList.remove('generating');
-    return r;
-  }
-  let acc='', chars=0;
-  const cursor=document.createElement('span'); cursor.className='cursor-blink';
+  const { vendor, tier } = parseModel(model);
+  const t0 = Date.now();
+  const deep = (tier === 'pro');
+  bodyEl.innerHTML = '<span class="placeholder">已向 '+vendorName(model)+' 发出请求。非流式模式：模型写完全文后一次性整体返回'+(deep?'（深度思考档通常需 2-15 分钟）':'')+'，生产多少文字就收多少，请保持本页开启……</span>';
+  statusEl.innerHTML = '<span class="spinner"></span> 生成中';
   const ac = new AbortController(); RUN_ABORTS.add(ac);
-  // token预算从9500提到24000后(约2.5倍)，思考+正文都可能变长，8分钟的旧超时会在内容还没写完时就把它掐断——
-  // 那样又会制造一种新的截断(超时导致)，而不是解决旧的截断(token导致)。提到15分钟给足生成时间。
-  const HARD_TIMEOUT_MS = 40*60*1000; // token预算大幅放开后，单次调用可能真的要写很久，超时也必须同步放宽，否则等于把"预算不够被砍"换成"时间不够被中止"
+  const HARD_TIMEOUT_MS = 40*60*1000; // token 预算放开后单次可能真的写很久，超时同步放宽
   const killer = setTimeout(()=>{ try{ ac.abort(); }catch(_){} }, HARD_TIMEOUT_MS);
+  const waitTimer = setInterval(()=>{ const s=Math.round((Date.now()-t0)/1000); const m=Math.floor(s/60); statusEl.innerHTML='<span class="spinner"></span> 生成中 · 已等待 '+(m? m+'分':'')+(s%60)+'秒'; }, 1000);
+
+  const overseas = isOverseas(model);
+  const url = overseas ? PROXY_URL : apiUrl(model);
+  const headers = { 'Content-Type':'application/json' };
+  if(overseas){
+    if(vendor === 'gpt'){ headers['Authorization'] = 'Bearer ' + apiKey; headers['x-target-url'] = 'https://api.openai.com/v1/chat/completions'; }
+    else if(vendor === 'minimax'){ headers['Authorization'] = 'Bearer ' + apiKey; headers['x-target-url'] = 'https://api.minimaxi.com/v1/chat/completions'; }
+    else if(vendor === 'claude'){ headers['x-api-key'] = apiKey; headers['anthropic-version'] = '2023-06-01'; headers['anthropic-dangerous-direct-browser-access'] = 'true'; headers['x-target-url'] = 'https://api.anthropic.com/v1/messages'; }
+    else if(vendor === 'gemini'){ const gm = (tier === 'pro') ? 'gemini-3.1-pro-preview' : 'gemini-2.5-flash'; headers['x-target-url'] = 'https://generativelanguage.googleapis.com/v1beta/models/' + gm + ':generateContent?key=' + encodeURIComponent(apiKey); }
+  } else {
+    headers['Authorization'] = 'Bearer ' + apiKey;
+  }
+
   let resp;
   try{
-    resp = await fetch(apiUrl(model), { method:'POST', headers:{ 'Content-Type':'application/json', 'Authorization':'Bearer '+apiKey }, body: JSON.stringify(buildPayload(model, systemPrompt, userQ, maxTokens)), signal: ac.signal });
-  }catch(e){ clearTimeout(killer); colEl.classList.remove('generating'); statusEl.textContent='网络错误'; throw new Error(e.name==='AbortError'?'超时：已中止（本工具已锁定顶配深度思考档，本就较慢；建议稍后重试）':'网络请求失败：'+e.message); }
+    resp = await fetch(url, { method:'POST', headers, body: JSON.stringify(buildPayload(model, systemPrompt, userQ, maxTokens)), signal: ac.signal });
+  }catch(e){
+    clearInterval(waitTimer); clearTimeout(killer); colEl.classList.remove('generating');
+    statusEl.textContent = '网络错误';
+    throw new Error(e.name==='AbortError' ? '超时：已中止（顶配深思档单次写作确实很慢；建议稍后重试）' : (overseas?'中转请求失败：':'网络请求失败：')+e.message);
+  }
   if(!resp.ok){
-    let detail=''; try{ const j=await resp.json(); detail = j.error?.message || JSON.stringify(j); }catch(_){ detail = resp.statusText; }
-    statusEl.textContent='失败'; bodyEl.innerHTML='<span class="placeholder">调用失败：'+escTxt(detail)+'</span>'; colEl.classList.remove('generating');
+    clearInterval(waitTimer); clearTimeout(killer); colEl.classList.remove('generating');
+    let detail=''; try{ const raw=await resp.text(); try{ const jj=JSON.parse(raw); detail=(jj.error&&(jj.error.message||jj.error.type))||JSON.stringify(jj).slice(0,200); }catch(_){ detail=raw.slice(0,200)||resp.statusText; } }catch(_){ detail=resp.statusText; }
+    statusEl.textContent='失败'; bodyEl.innerHTML='<span class="placeholder">调用失败（'+resp.status+'）：'+escTxt(detail)+'</span>';
     throw new Error('API '+resp.status+'：'+detail);
   }
-  const reader = resp.body.getReader(); const decoder = new TextDecoder();
-  let buf='', thinkChars=0, gotAnything=false, fin='';
-  bodyEl.innerHTML='<span class="placeholder">✓ 已连接，模型正在启动'+(parseModel(model).tier==='pro'?'（深度思考首次响应约需1-2分钟，请稍候）':'')+'……</span>';
-  statusEl.innerHTML='<span class="spinner"></span> 等待响应';
-  const waitTimer = setInterval(()=>{ if(!gotAnything){ const s=Math.round((Date.now()-t0)/1000); statusEl.innerHTML='<span class="spinner"></span> 等待响应 ('+s+'s)'; } }, 1000);
-  try{
-    while(true){
-      const {done,value}=await reader.read(); if(done) break;
-      buf += decoder.decode(value,{stream:true});
-      const lines = buf.split('\n'); buf = lines.pop();
-      for(const line of lines){
-        const s=line.trim();
-        if(!s || s.startsWith(':')) continue;
-        if(!s.startsWith('data:')){ if(s.charAt(0)==='{'){ let je=null; try{ je=JSON.parse(s); }catch(_){ je=null; } if(je && je.error) throw new Error('接口报错：'+(je.error.message||je.error.code||JSON.stringify(je.error).slice(0,180))); } continue; }
-        const data=s.slice(5).trim(); if(data==='[DONE]') continue;
-        try{
-          const j=JSON.parse(data);
-          if(j.error) throw new Error('接口报错：'+(j.error.message || j.error.code || JSON.stringify(j.error).slice(0,180)));
-          if(j.choices && j.choices[0] && j.choices[0].finish_reason) fin = j.choices[0].finish_reason;
-          const d = j.choices?.[0]?.delta || {};
-          const rc = d.reasoning_content || '';
-          if(rc){ gotAnything=true; thinkChars+=rc.length; statusEl.innerHTML='<span class="spinner"></span> 🧠 深度思考中 ('+thinkChars+'字)'; if(!acc){ bodyEl.innerHTML='<span class="placeholder">🧠 模型正在深度思考…</span>'; bodyEl.appendChild(cursor); } }
-          const delta = d.content || '';
-          if(delta){ gotAnything=true; if(!acc){ bodyEl.innerHTML=''; bodyEl.appendChild(cursor); statusEl.innerHTML='<span class="spinner"></span> 生成中'; } acc+=delta; chars+=delta.length; bodyEl.textContent=acc; bodyEl.appendChild(cursor); bodyEl.scrollTop=bodyEl.scrollHeight; }
-        }catch(err){ if(err instanceof SyntaxError){} else { throw err; } }
-      }
-    }
-  }catch(e){
-    clearInterval(waitTimer); clearTimeout(killer); cursor.remove(); colEl.classList.remove('generating');
-    if(e.name==='AbortError'){ if(acc){ statusEl.textContent='✓ 部分完成（超时截断）'; __M(model, systemPrompt, userQ, chars, thinkChars); return { text:acc, chars, thinkChars, secs:parseFloat(((Date.now()-t0)/1000).toFixed(1)) }; } statusEl.textContent='超时'; throw new Error('超时：已中止（本工具已锁定顶配深度思考档，本就较慢；建议稍后重试）'); }
-    statusEl.textContent='读取中断'; throw new Error('响应读取中断：'+e.message);
-  }finally{ clearInterval(waitTimer); clearTimeout(killer); }
-  cursor.remove(); colEl.classList.remove('generating');
+  let j;
+  try{ j = await resp.json(); }
+  catch(e){
+    clearInterval(waitTimer); clearTimeout(killer); colEl.classList.remove('generating');
+    if(e.name==='AbortError'){ statusEl.textContent='超时'; throw new Error('超时：已中止（顶配深思档单次写作确实很慢；建议稍后重试）'); }
+    statusEl.textContent='解析失败'; throw new Error('响应不是合法 JSON（可能被网关截断）：'+e.message);
+  }
+  clearInterval(waitTimer); clearTimeout(killer); colEl.classList.remove('generating');
+  if(j && j.error){ statusEl.textContent='失败'; const msg=j.error.message||j.error.code||JSON.stringify(j.error).slice(0,180); bodyEl.innerHTML='<span class="placeholder">接口报错：'+escTxt(msg)+'</span>'; throw new Error('接口报错：'+msg); }
+  let out;
+  try{ out = extractFull(vendor, j); }
+  catch(e){ statusEl.textContent='失败'; bodyEl.innerHTML='<span class="placeholder">'+escTxt(e.message)+'</span>'; throw e; }
   const secs=((Date.now()-t0)/1000).toFixed(1);
+  const acc = out.text, chars = acc.length, thinkChars = out.think, fin = out.fin;
   if(!acc){
     bodyEl.innerHTML='<span class="placeholder">（模型没有返回正文——可能是 Key 未开通该模型服务、额度不足或被安全策略拦截）</span>';
     statusEl.textContent='空响应'; metaEl.textContent = secs+'s';
     __M(model, systemPrompt, userQ, 0, thinkChars); return { text:'', chars:0, thinkChars, secs:parseFloat(secs) };
   }
+  bodyEl.textContent = acc; bodyEl.scrollTop = 0;
   statusEl.textContent = (fin==='length') ? '⚠ 完成(触及token上限·尾部被截)' : '✓ 完成';
   metaEl.textContent = chars+' 字 · '+secs+'s'+(thinkChars?' · 思考'+thinkChars+'字':'');
-  __M(model, systemPrompt, userQ, chars, thinkChars); return { text:acc, chars, thinkChars, finish:fin, secs:parseFloat(secs) };
-}
-
-// ============ 境外基底：经 /api/llm-proxy 中转 ============
-async function callOverseas(apiKey, model, systemPrompt, userQ, bodyEl, statusEl, metaEl, colEl, t0, maxTokens){
-  const { vendor, tier } = parseModel(model);
-  const payload = buildPayload(model, systemPrompt, userQ, maxTokens);
-  const headers = { 'Content-Type':'application/json' };
-  if(vendor === 'gpt'){ headers['Authorization'] = 'Bearer ' + apiKey; headers['x-target-url'] = 'https://api.openai.com/v1/chat/completions'; }
-  else if(vendor === 'minimax'){ headers['Authorization'] = 'Bearer ' + apiKey; headers['x-target-url'] = 'https://api.minimaxi.com/v1/chat/completions'; }
-  else if(vendor === 'claude'){ headers['x-api-key'] = apiKey; headers['anthropic-version'] = '2023-06-01'; headers['anthropic-dangerous-direct-browser-access'] = 'true'; headers['x-target-url'] = 'https://api.anthropic.com/v1/messages'; }
-  else if(vendor === 'gemini'){ const gm = (tier === 'pro') ? 'gemini-3.1-pro-preview' : 'gemini-2.5-flash'; headers['x-target-url'] = 'https://generativelanguage.googleapis.com/v1beta/models/' + gm + ':streamGenerateContent?alt=sse&key=' + encodeURIComponent(apiKey); }
-  bodyEl.innerHTML='<span class="placeholder">✓ 已连接，'+vendorName(model)+' 正在启动……<br><span style="font-size:12px;opacity:.7">境外基底经中转、流式返回，请稍候</span></span>';
-  statusEl.innerHTML='<span class="spinner"></span> 等待响应';
-  const cursor=document.createElement('span'); cursor.className='cursor-blink';
-  const ac = new AbortController(); RUN_ABORTS.add(ac); const HARD_TIMEOUT_MS = 40*60*1000; // 同上：token预算大幅放开后同步放宽超时
-  const killer = setTimeout(()=>{ try{ ac.abort(); }catch(_){} }, HARD_TIMEOUT_MS);
-  let gotAnything=false;
-  const waitTimer=setInterval(()=>{ if(!gotAnything){ const s=Math.round((Date.now()-t0)/1000); statusEl.innerHTML='<span class="spinner"></span> 等待响应 ('+s+'s)'; } },1000);
-  let resp;
-  try{ resp = await fetch(PROXY_URL, { method:'POST', headers, body: JSON.stringify(payload), signal: ac.signal }); }
-  catch(e){ clearInterval(waitTimer); clearTimeout(killer); statusEl.textContent='网络错误'; bodyEl.innerHTML='<span class="placeholder">中转请求失败：'+e.message+'</span>'; throw new Error(e.name==='AbortError'?'超时，已中止':'代理请求失败：'+e.message); }
-  if(!resp.ok){
-    clearInterval(waitTimer); clearTimeout(killer);
-    let detail=''; try{ const raw=await resp.text(); try{ const j=JSON.parse(raw); detail=j.error?.message||j.error?.type||JSON.stringify(j).slice(0,200); }catch(_){ detail=raw.slice(0,200)||resp.statusText; } }catch(_){ detail=resp.statusText; }
-    statusEl.textContent='失败'; bodyEl.innerHTML='<span class="placeholder">调用失败（'+resp.status+'）：'+escTxt(detail)+'</span>';
-    throw new Error('API '+resp.status+'：'+detail);
-  }
-  const reader = resp.body.getReader(); const decoder = new TextDecoder();
-  let buf='', acc='', chars=0, thinkChars=0, fin='';
-  try{
-    while(true){
-      const {done,value}=await reader.read(); if(done) break;
-      buf += decoder.decode(value,{stream:true});
-      const lines = buf.split('\n'); buf = lines.pop();
-      for(const line of lines){
-        const s=line.trim();
-        if(!s || s.startsWith(':')) continue;
-        if(!s.startsWith('data:')) continue;
-        const data=s.slice(5).trim(); if(data==='[DONE]') continue;
-        let j; try{ j=JSON.parse(data); }catch(_){ continue; }
-        let delta='';
-        if(vendor === 'gpt' || vendor === 'minimax'){
-          const dd = j.choices?.[0]?.delta || {};
-          if(j.choices?.[0]?.finish_reason) fin = j.choices[0].finish_reason;
-          const rc = dd.reasoning_content || '';
-          if(rc){ gotAnything=true; thinkChars+=rc.length; statusEl.innerHTML='<span class="spinner"></span> 🧠 深度思考中 ('+thinkChars+'字)'; if(!acc){ bodyEl.innerHTML='<span class="placeholder">🧠 模型正在深度思考…</span>'; bodyEl.appendChild(cursor); } }
-          delta = dd.content || '';
-        } else if(vendor === 'claude'){
-          if(j.type === 'content_block_delta'){ delta = j.delta?.text || ''; }
-          else if(j.type === 'message_delta'){ const sr = j.delta?.stop_reason; if(sr) fin = (sr === 'max_tokens') ? 'length' : sr; }
-          else if(j.type === 'error'){ throw new Error(j.error?.message || 'Anthropic 流式错误'); }
-        } else if(vendor === 'gemini'){
-          const parts = j.candidates?.[0]?.content?.parts;
-          delta = Array.isArray(parts) ? parts.map(p=>p.text||'').join('') : '';
-          const fr = j.candidates?.[0]?.finishReason; if(fr) fin = (fr === 'MAX_TOKENS') ? 'length' : String(fr).toLowerCase();
-        }
-        if(delta){ gotAnything=true; if(!acc){ bodyEl.innerHTML=''; bodyEl.appendChild(cursor); statusEl.innerHTML='<span class="spinner"></span> 生成中'; } acc+=delta; chars+=delta.length; bodyEl.textContent=acc; bodyEl.appendChild(cursor); bodyEl.scrollTop=bodyEl.scrollHeight; }
-      }
-    }
-  }catch(e){
-    clearInterval(waitTimer); clearTimeout(killer); cursor.remove();
-    if(e.name==='AbortError'){ if(acc){ statusEl.textContent='✓ 部分完成（超时截断）'; __M(model, systemPrompt, userQ, chars, thinkChars); return { text:acc, chars, thinkChars, secs:parseFloat(((Date.now()-t0)/1000).toFixed(1)) }; } statusEl.textContent='超时'; throw new Error('超时，已中止'); }
-    statusEl.textContent='读取中断'; throw new Error('响应读取中断：'+e.message);
-  }finally{ clearInterval(waitTimer); clearTimeout(killer); }
-  cursor.remove();
-  const secs=((Date.now()-t0)/1000).toFixed(1);
-  if(!acc){ bodyEl.innerHTML='<span class="placeholder">（模型没有返回内容，可能被安全策略拦截或额度问题）</span>'; statusEl.textContent='空响应'; metaEl.textContent=secs+'s'; __M(model, systemPrompt, userQ, 0, thinkChars); return { text:'', chars:0, thinkChars:0, secs:parseFloat(secs) }; }
-  if(vendor === 'minimax' && (acc.indexOf('<think>') >= 0 || acc.indexOf('</think>') >= 0)){
-    acc = acc.replace(/<think>[\s\S]*?<\/think>/g, '');
-    const early = acc.slice(0, 80); if(early.indexOf('</think>') >= 0){ acc = acc.slice(acc.indexOf('</think>') + 8); } acc = acc.trim();
-  }
-  bodyEl.textContent = acc;
-  statusEl.textContent = (fin==='length') ? '⚠ 完成(触及token上限·尾部被截)' : '✓ 完成';
-  metaEl.textContent = chars+' 字 · '+secs+'s'+(thinkChars ? ' · 思考'+thinkChars+'字' : '');
-  __M(model, systemPrompt, userQ, chars, thinkChars); return { text:acc, chars, thinkChars, finish:fin, secs:parseFloat(secs) };
+  __M(model, systemPrompt, userQ, chars, thinkChars);
+  return { text:acc, chars, thinkChars, finish:fin, secs:parseFloat(secs) };
 }
 
 // 字数计数
@@ -2249,7 +2205,7 @@ function refreshForgeUI(){
 }
 forgeSel.addEventListener('change', refreshForgeUI);
 
-// ============ 区块与流式落点 ============
+// ============ 区块与输出落点 ============
 function mkBlock(parent, cls, title, openNow){
   const el = document.createElement('div'); el.className = cls;
   const head = document.createElement('div'); head.className='blkHead';
