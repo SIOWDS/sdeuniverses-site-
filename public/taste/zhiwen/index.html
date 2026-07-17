@@ -1,0 +1,2081 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>中华智问知识发生器 · SDE Universes</title>
+<meta name="description" content="输入一个议题,三台路径锁定的智能体并行六轮提智,各写一篇约两万字发生学论文,再碰撞涌现第四篇典范论文——每个基底开工前先读完整SDE内功、亲手写约5000字学习心得。">
+<script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js"></script>
+<style>
+:root{ --bg:#0E1116; --bg2:#141B22; --card:#161B22; --card2:#12161C; --gold:#D4B25E; --gold2:#E5C86E; --ink:#E6EDF3; --sub:#8B98A5; --sub2:#9AA5B0; --line:rgba(212,178,94,0.28); --ok:#5FBF7F; --warn:#E8A33D; --bad:#E06C60; }
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"PingFang SC","Microsoft YaHei","Noto Sans SC",sans-serif;font-size:15px;line-height:1.75}
+a{color:var(--gold);text-decoration:none}
+.wrap{max-width:1180px;margin:0 auto;padding:0 20px}
+header{border-bottom:1px solid var(--line);background:linear-gradient(180deg,#0E1116,#10151B);padding:14px 0}
+.hrow{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.hback{font-size:13.5px;color:var(--sub)}
+.htitle{font-size:20px;font-weight:800;letter-spacing:0.03em}
+.htitle b{background:linear-gradient(120deg,var(--gold),var(--gold2));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.badge{font-size:11px;letter-spacing:0.16em;color:var(--gold);border:1px solid var(--line);border-radius:99px;padding:2px 10px}
+#neigongStatus,#pskillStatus{font-size:12px;color:var(--sub)}
+.hero{padding:34px 0 8px;text-align:center}
+.hero h1{font-size:clamp(26px,4vw,38px);font-weight:800;margin:0 0 10px}
+.hero h1 b{background:linear-gradient(120deg,var(--gold),var(--gold2));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.hero p{color:var(--sub);max-width:820px;margin:0 auto;font-size:15.5px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px;margin:22px 0}
+.xcard{background:var(--card);border:1px solid rgba(255,255,255,0.08);border-top:3px solid var(--gold);border-radius:12px;padding:18px 18px}
+.xcard h3{margin:0 0 8px;font-size:13.5px;color:var(--gold2)}
+.xcard div{font-size:12.8px;color:var(--sub2);line-height:1.8}
+.xcard b{color:#D4DCE4}
+.panel{background:var(--card);border:1px solid rgba(255,255,255,0.09);border-radius:14px;padding:20px;margin:16px 0}
+.ptitle{font-size:14px;font-weight:700;color:var(--gold2);margin:0 0 12px;letter-spacing:0.04em}
+label.f{display:block;font-size:12.5px;color:var(--sub);margin:12px 0 5px}
+label.f .req{color:var(--bad)}
+input[type=password],input[type=text],textarea,select{width:100%;background:#0C1015;border:1px solid rgba(255,255,255,0.14);border-radius:9px;color:var(--ink);padding:10px 12px;font-size:14px;font-family:inherit;outline:none}
+input:focus,textarea:focus,select:focus{border-color:var(--gold)}
+textarea{min-height:86px;resize:vertical;line-height:1.7}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:820px){.grid2{grid-template-columns:1fr}}
+.modeRow{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}
+.modeOpt{flex:1;min-width:250px;border:1px solid rgba(255,255,255,0.14);border-radius:11px;padding:12px 14px;cursor:pointer;background:#0C1015}
+.modeOpt.sel{border-color:var(--gold);background:rgba(212,178,94,0.08)}
+.modeOpt h4{margin:0 0 4px;font-size:14px;color:var(--ink)}
+.modeOpt div{font-size:12px;color:var(--sub);line-height:1.7}
+.btnRow{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:18px}
+button.go{background:linear-gradient(120deg,var(--gold),var(--gold2));color:#14100A;border:none;border-radius:10px;padding:13px 30px;font-size:16px;font-weight:800;cursor:pointer;letter-spacing:0.05em}
+button.go:disabled{opacity:0.45;cursor:not-allowed}
+button.ghost{background:transparent;color:var(--sub2);border:1px solid rgba(255,255,255,0.2);border-radius:10px;padding:12px 20px;font-size:14px;cursor:pointer}
+button.ghost:hover{color:var(--ink);border-color:var(--gold)}
+#errBox{display:none;background:rgba(224,108,96,0.1);border:1px solid rgba(224,108,96,0.5);color:#F0A69E;border-radius:10px;padding:11px 14px;font-size:13px;margin-top:14px;white-space:pre-wrap}
+.phase{font-size:13px;color:var(--gold);letter-spacing:0.2em;margin:26px 0 10px;font-weight:700}
+.xindeBlock,.lane,.colStep,.paper{background:var(--card2);border:1px solid rgba(255,255,255,0.08);border-radius:12px;margin:10px 0;overflow:hidden}
+.blkHead{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:11px 15px;border-bottom:1px solid rgba(255,255,255,0.06);cursor:pointer;flex-wrap:wrap}
+.blkHead .t{font-size:13.5px;font-weight:700;color:#D4DCE4}
+.blkHead .st{font-size:12px;color:var(--sub)}
+.blkBody{padding:13px 16px;max-height:300px;overflow:auto;font-size:13px;color:#C7CFD7;white-space:pre-wrap;line-height:1.85;display:none}
+.blkBody.open{display:block}
+.blkBody .placeholder{color:var(--sub);font-style:italic}
+.spinner{display:inline-block;width:10px;height:10px;border:2px solid rgba(212,178,94,0.3);border-top-color:var(--gold);border-radius:50%;animation:sp 0.8s linear infinite;vertical-align:-1px;margin-right:4px}
+@keyframes sp{to{transform:rotate(360deg)}}
+.cursor-blink{display:inline-block;width:7px;height:15px;background:var(--gold);animation:bl 1s steps(2) infinite;vertical-align:-2px;margin-left:2px}
+@keyframes bl{50%{opacity:0}}
+.lane .chips{display:flex;gap:6px;flex-wrap:wrap;padding:9px 15px 0}
+.chip{font-size:11.5px;border:1px solid rgba(255,255,255,0.15);border-radius:99px;padding:2px 10px;color:var(--sub)}
+.chip.on{border-color:var(--gold);color:var(--gold2)}
+.chip.done{border-color:var(--ok);color:var(--ok)}
+.chip.bad{border-color:var(--bad);color:var(--bad)}
+.lane .blkBody{max-height:340px}
+.paper .blkBody{max-height:560px;white-space:normal}
+.paper .dl{display:flex;gap:8px;flex-wrap:wrap}
+.paper .dl button{background:rgba(212,178,94,0.12);border:1px solid var(--line);color:var(--gold2);border-radius:8px;padding:5px 12px;font-size:12px;cursor:pointer}
+.paper .dl button:disabled{opacity:0.35;cursor:not-allowed}
+.generating{box-shadow:0 0 0 1px var(--gold) inset}
+table.iq{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:8px}
+table.iq td,table.iq th{border:1px solid rgba(255,255,255,0.1);padding:5px 9px;text-align:center;color:var(--sub2)}
+table.iq th{color:var(--gold2);font-weight:700}
+footer{border-top:1px solid rgba(255,255,255,0.08);margin-top:44px;padding:22px 0 34px;text-align:center;color:var(--sub);font-size:12.5px}
+</style>
+</head>
+<body>
+
+<header><div class="wrap">
+  <div class="hrow">
+    <a class="hback" href="/#taste">← SDE 智能体品尝系列</a>
+    <div class="htitle">中华智问 · <b>知识发生器</b></div>
+    <span class="badge">其四 · 免费品尝</span>
+    <span id="neigongStatus">⏳ SDE 内功加载中…</span>
+    <span id="pskillStatus">⏳ 论文内功加载中…</span>
+  </div>
+</div></header>
+
+<div class="wrap">
+  <div class="hero">
+    <h1>一个议题 → <b>四篇发生学论文</b></h1>
+    <p>三台<b style="color:#D4DCE4">路径锁定</b>的智能体(形态·条件·演化)并行六轮螺旋提智,各写一篇约两万字学术论文;三篇再经<b style="color:#D4DCE4">三对两两碰撞 → 暗流收敛 → 涌现典范</b>,把典范写成第四篇论文。桌面版《中华智问知识发生器 0.2》完整提智内核的网页移植。</p>
+  </div>
+
+  <div class="cards">
+    <div class="xcard"><h3>① 三焦并行 · 落点强制分开</h3><div><b>形态台(A)</b>只回答"它最终定型成什么格局",<b>条件台(B)</b>只回答"它靠什么纠缠网络成立与维持",<b>演化台(C)</b>只回答"它经什么序列演变、在哪一步可拨动"。每台被<b>代码层锁死两条固定路径</b>(先验逐段消毒,六路径菜单整节替换为锁定陈述),六轮各自螺旋:正路径 → 邻路径 → 两轮深化弱路径 → 跨路径凝缩(破145钥匙)→ 方法论与研究纲领(冲155)。轮间喂前轮 1800-2200 字判断脉络蒸馏 + 自审/他审双评审,失败模式被逐轮精确切除。</div></div>
+    <div class="xcard"><h3>② 真两段内功提智 · 每基底先写约5000字心得</h3><div>开跑第一步不是答题:<b>每个真正干活的基底(三台/单台、碰撞器、评审员)各自逐字读完 SDE 内功(约4.2万字),亲手写一篇约5000字的八点学习心得</b>——含发生学切换的自我复述、三大方程与123原理的新例子、本台锁定路径的自我复述与翻车预防、默认惯性诊断、对外禁词承诺、六判准自评纪律与本次工作计划。心得随后垫进该基底后续全部工作调用:模型站在<b>自己蒸馏出的认知</b>上工作,不是站在别人代写的确认上。每次点"生成"都重新写,不缓存。心得写不成时自动回退合成确认,主流程绝不中断。</div></div>
+    <div class="xcard"><h3>③ 碰撞涌现 · 第四篇典范论文</h3><div>三篇论文全文直接进碰撞(不做二次概括):先做<b>原料体检</b>(两台撞到同一面则自动补出缺失面),再<b>三对两两打架</b>(几何vs功能/几何vs时间/功能vs时间)各命名涌现物 → <b>暗流收敛</b>(≤15字,须同时解释两件相反的事)→ <b>涌现典范 + 四重检验 + 五维评分</b>(不可还原/不可消解/跨学科/机制证伪两步法:先立最强竞争解释,再要求控制它之后本机制独有变量的剂量-反应)。典范再被扩写为第四篇约两万字论文。四篇均可一键下载 Word。</div></div>
+  </div>
+
+  <div class="xcard" style="margin:0 0 16px;border-top-color:var(--warn)"><h3 style="color:var(--warn)">⚠ 用前须知</h3><div>🧬 <b>八大主流基底任选(建议顶配深思档)</b>:DeepSeek · 智谱GLM · Kimi · 通义千问 · MiniMax · GPT · Claude · Gemini——用你自己的 API Key,全程在浏览器里跑,Key 只存你本机浏览器,绝不上传本站服务器。<b>完整三焦档约 35-40 路模型调用</b>(5 份心得 + 三台各六轮 + 三篇论文 + 体检碰撞四段 + 第四篇 + 逐轮评审),深思档全程可能 <b>1-2.5 小时</b>,输入输出总量在数十万 token 级,费用按所选厂商牌价计,请留意余额;<b>快速单台档约 13-20 路调用</b>,适合先尝一口。跑长任务请<b>不要中途刷新页面</b>;通义千问单次输出硬顶 8192 token,写不满两万字论文,写论文请避开千问。</div></div>
+
+  <div class="panel">
+    <div class="ptitle">〇 · 配置</div>
+    <div class="grid2">
+      <div>
+        <label class="f">写作基底(三台/单台 + 碰撞器 + 论文均用它)<span class="req"> *</span></label>
+        <select id="modelSel">
+          <optgroup label="DeepSeek(国内直连)">
+            <option value="ds:pro" selected>DeepSeek V4-Pro · 深度思考(顶配·推荐)</option>
+            <option value="ds:fast">DeepSeek V4-Flash · 快速档</option>
+          </optgroup>
+          <optgroup label="智谱 GLM(国内直连)">
+            <option value="glm:pro">GLM-5 · 深度思考(顶配)</option>
+            <option value="glm:fast">GLM-4-Flash · 快速档</option>
+          </optgroup>
+          <optgroup label="Kimi 月之暗面(国内直连)">
+            <option value="kimi:pro">Kimi K2.6 · 深度思考(顶配)</option>
+            <option value="kimi:fast">Moonshot v1-32k · 快速档</option>
+          </optgroup>
+          <optgroup label="通义千问(国内直连 · 单次输出上限8192,不建议写论文)">
+            <option value="qwen:pro">Qwen3.7-Max · 深思</option>
+            <option value="qwen:fast">Qwen-Plus · 快速</option>
+          </optgroup>
+          <optgroup label="MiniMax(经本站中转)">
+            <option value="minimax:pro">MiniMax-M3 · 顶配</option>
+            <option value="minimax:fast">MiniMax-M2.7 · 快速</option>
+          </optgroup>
+          <optgroup label="GPT · OpenAI(经本站中转)">
+            <option value="gpt:pro">GPT-5.5 · 顶配</option>
+            <option value="gpt:fast">GPT-5.4 · 快速</option>
+          </optgroup>
+          <optgroup label="Claude · Anthropic(经本站中转)">
+            <option value="claude:pro">Claude Opus 4.8 · 顶配</option>
+            <option value="claude:fast">Claude Sonnet 4.6 · 快速</option>
+          </optgroup>
+          <optgroup label="Gemini · Google(经本站中转)">
+            <option value="gemini:pro">Gemini 3.1 Pro · 顶配</option>
+            <option value="gemini:fast">Gemini 2.5 Flash · 快速</option>
+          </optgroup>
+        </select>
+        <label class="f" id="keyLabel">你的 DeepSeek API Key <span class="req">*</span></label>
+        <input type="password" id="apiKey" placeholder="sk-..." autocomplete="off">
+        <div id="overseasNote" style="display:none;font-size:12px;color:var(--warn);margin-top:6px">境外基底经本站 /api/llm-proxy 中转转发(只转发,不留存)。</div>
+      </div>
+      <div>
+        <label class="f">评审基底(逐轮独立他审 · 可关)</label>
+        <select id="evalSel">
+          <option value="off">关闭(每轮仅基底自评)</option>
+          <option value="follow" selected>跟随写作基底(同 Key,推荐)</option>
+          <option value="ds:pro">DeepSeek V4-Pro</option>
+          <option value="glm:pro">智谱 GLM-5</option>
+          <option value="kimi:pro">Kimi K2.6</option>
+          <option value="qwen:pro">通义 Qwen3.7-Max</option>
+          <option value="minimax:pro">MiniMax-M3</option>
+          <option value="gpt:pro">GPT-5.5</option>
+          <option value="claude:pro">Claude Opus 4.8</option>
+          <option value="gemini:pro">Gemini 3.1 Pro</option>
+        </select>
+        <div id="evalKeyRow" style="display:none">
+          <label class="f" id="evalKeyLabel">评审基底 API Key <span class="req">*</span></label>
+          <input type="password" id="evalKey" placeholder="sk-..." autocomplete="off">
+        </div>
+        <label class="f">档位</label>
+        <div class="modeRow">
+          <div class="modeOpt sel" id="modeFull"><h4>完整三焦档</h4><div>三台并行六轮 → 三篇论文 → 碰撞 → 第四篇典范论文。约 35-40 路调用,深思档 1-2.5 小时。</div></div>
+          <div class="modeOpt" id="modeFast"><h4>快速单台档</h4><div>一台六轮 → 一篇论文。约 13-20 路调用,先尝一口。</div></div>
+        </div>
+        <div id="fastFocusRow" style="display:none">
+          <label class="f">快速档聚焦维度</label>
+          <select id="fastFocus">
+            <option value="rand" selected>随机抽一台(推荐)</option>
+            <option value="A">形态聚焦(A · 落S:它定型成什么格局)</option>
+            <option value="B">条件聚焦(B · 落E:它靠什么维持)</option>
+            <option value="C">演化聚焦(C · 落D:它怎么演变、何处可拨动)</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <label class="f">议题(一个真问题,想深挖的那种)<span class="req"> *</span></label>
+    <textarea id="questionEl" placeholder="例:为什么越来越多的年轻人选择躺平?/ 中医的经络到底是什么? / 成功女性为什么普遍陷入自我怀疑?"></textarea>
+    <div class="btnRow">
+      <button class="go" id="goBtn">▶ 开始发生</button>
+      <button class="ghost" id="stopBtn" style="display:none">■ 停止</button>
+      <button class="ghost" id="clearBtn">清空重来</button>
+      <span id="runHint" style="font-size:12.5px;color:var(--sub)"></span>
+    </div>
+    <div id="errBox"></div>
+  </div>
+
+  <div id="runArea" style="display:none">
+    <div class="phase" id="phaseXinde">一 · 内功学习阶段:各基底研读 SDE 内功、各写约 5000 字学习心得(并行)</div>
+    <div id="xindePanel"></div>
+    <div class="phase" id="phaseLanes">二 · 六轮螺旋提智(每台:正路径 → 邻路径 → 深化 → 深化 → 跨路径凝缩 → 方法论纲领)</div>
+    <div id="lanesPanel"></div>
+    <div class="phase" id="phaseCollision" style="display:none">三 · 三焦碰撞(体检 → 三对打架 → 暗流 → 涌现典范)</div>
+    <div id="collisionPanel" style="display:none"></div>
+    <div class="phase" id="phasePapers">四 · 论文交付(已按学科本地话语清洗,零内部行话)</div>
+    <div id="papersPanel"></div>
+    <div class="panel" id="reportPanel" style="display:none">
+      <div class="ptitle">五 · 全程报告</div>
+      <div id="iqCurve"></div>
+      <div class="btnRow">
+        <button class="ghost" id="dlReportBtn">⬇ 下载全程报告 (.docx)</button>
+        <button class="ghost" id="dlXindeBtn">⬇ 下载内功心得汇编 (.docx)</button>
+        <button class="ghost" id="dlAllBtn">⬇ 一键下载全部论文 (.docx)</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel" style="border-top:3px solid var(--gold)">
+    <div class="ptitle">这台发生器与桌面版的关系</div>
+    <div style="font-size:13px;color:var(--sub2);line-height:1.9">本页是德麦国际《中华智问知识发生器 0.2》(桌面版)提智内核的网页移植:同一套三焦路径锁定与先验消毒、同一套六轮螺旋与评审纪律、同一套碰撞工程与机制证伪两步法、同一份 SDE-FT v3.1 内功与真两段心得提智。桌面版另含硕士(约5万字)/博士(约10万字)/学术专著(约18-22万字)一键装配引擎,属付费产品——本页免费开放的是它的论文发生层,让你亲眼看完整过程。</div>
+  </div>
+</div>
+
+<footer>© 德麦国际 Demai International · <a href="/">SDE Universes</a> · 你的 API Key 只存本机浏览器,本站不经手</footer>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════
+   中华智问知识发生器 · 网页版 1.0(桌面版 0.2 提智内核移植)
+   三焦路径锁定 + 真两段内功提智(每基底约5000字心得) + 六轮螺旋 +
+   逐轮评审 + 三篇论文 + 碰撞涌现 + 第四篇典范论文 + Word 导出
+   ═══════════════════════════════════════════════════════════════ */
+
+// ============ SDE 内功 + 论文内功:运行时加载 ============
+let SDE_BASE=''; let SDE_BASE_LOADED=false;
+let PAPER_SKILL=''; let PAPER_SKILL_LOADED=false;
+function loadAsset(url, minLen, onOk){
+  return (async()=>{ try{
+    let resp = await fetch(url, {cache:'force-cache'});
+    if(resp.ok){ const t = await resp.text(); if(t && t.length>minLen){ onOk(t); return true; } }
+    resp = await fetch(url, {cache:'no-store'});
+    if(resp.ok){ const t = await resp.text(); if(t && t.length>minLen){ onOk(t); return true; } }
+  }catch(e){} return false; })();
+}
+let neigongPromise = loadAsset('/taste/assets/sde-neigong.txt', 5000, t=>{
+  SDE_BASE=t; SDE_BASE_LOADED=true;
+  const el=document.getElementById('neigongStatus'); if(el){ el.textContent='✓ SDE 内功已加载('+t.length+' 字)'; el.style.color='#5FBF7F'; }
+});
+let pskillPromise = loadAsset('/taste/zhiwen/assets/paper-skill.txt', 2000, t=>{
+  PAPER_SKILL=t; PAPER_SKILL_LOADED=true;
+  const el=document.getElementById('pskillStatus'); if(el){ el.textContent='✓ 论文内功已加载('+t.length+' 字)'; el.style.color='#5FBF7F'; }
+});
+async function ensurePriors(){
+  await neigongPromise; await pskillPromise;
+  if(!SDE_BASE_LOADED){
+    neigongPromise = loadAsset('/taste/assets/sde-neigong.txt', 5000, t=>{SDE_BASE=t;SDE_BASE_LOADED=true;});
+    await neigongPromise;
+  }
+  if(!PAPER_SKILL_LOADED){
+    pskillPromise = loadAsset('/taste/zhiwen/assets/paper-skill.txt', 2000, t=>{PAPER_SKILL=t;PAPER_SKILL_LOADED=true;});
+    await pskillPromise;
+  }
+  if(!SDE_BASE_LOADED) throw new Error('SDE 内功尚未加载成功,无法提智。请刷新页面(Ctrl+F5)后重试。');
+  if(!PAPER_SKILL_LOADED) throw new Error('论文写作内功尚未加载成功。请刷新页面(Ctrl+F5)后重试。');
+}
+
+// ============ 路径锁定(与桌面版逐字一致)============
+const PATH_CFG = {
+  A:{Z:'E→D→S', L:'D→E→S', T:'S'},
+  B:{Z:'S→D→E', L:'D→S→E', T:'E'},
+  C:{Z:'E→S→D', L:'S→E→D', T:'D'},
+};
+const ALL_PATHS = ['S→D→E','S→E→D','D→S→E','D→E→S','E→S→D','E→D→S'];
+const AGENT_NAME = {A:'形态聚焦(A)', B:'条件聚焦(B)', C:'演化聚焦(C)'};
+const LET = {S:'结构显露态', D:'差异序列', E:'特征纠缠'};
+
+const PATH_LOCK = {
+A:`【路径锁定 · 最高优先级 · 本指令覆盖下文一切路径说明】
+你是「中华智慧 · 形态聚焦(A)」。本智能体只有两条路径,全程只在这两条之间走,绝不出现第三条:
+  · R1 永远走 E→D→S(起点视角 E 特征纠缠,第二视角 D 差异序列,落点 S 结构显露态)
+  · R2 永远走 D→E→S(起点视角 D 差异序列,第二视角 E 特征纠缠,落点 S 结构显露态)
+  · R3、R4 只深化 E→D→S 和 D→E→S 里较弱的一条,不开任何新起点
+  · R5 跨路径凝缩只在 E→D→S 与 D→E→S 之间做误差互消
+全程铁律:
+  1. 起点只能是 E→D→S 或 D→E→S。落点不是 S 的路径都不属于本智能体,不走。
+  2. 判断收口永远落在 S(结构显露态)—— 即"它最后显露、定型成什么新格局",不收到特征纠缠,也不收到差异序列。
+  3. 本智能体的目标:产出一个新的 S —— 一个新的结构显露态(它最终成形、可被看见与维持的新格局/新形态)。
+  4. R1 第一句的内部交代必须写明"走 E→D→S";R2 第一句必须写明"走 D→E→S"。
+  5. 下文若再提到任何路径,一律以本锁定的 E→D→S / D→E→S 为准,不另作解释。
+  6. 【最硬一条 · 防飘移】本智能体只回答一个问题:"它定型成什么样子/格局?"。
+     这里的"样子/结构"是抽象追问 —— 用什么语言去描述这个结构(认知模型、网络、张力、
+     层级、配置、拓扑……)由议题自己决定,不限定任何具体学科,只要回答的是"它是什么形态"。
+     严禁把判断收口在"它靠什么维持、靠吸收什么续命、靠什么机制运转"——那是功能/条件问题,
+     不属于本智能体(那是另一台的活)。每轮收口前自检:我给出的是"它是什么样子(结构形态)",
+     还是"它靠什么运转(机制)"?若是后者,立即改写为"这个机制最终把困境定型成了什么样子"。
+     合格收口句应能填进:"这一议题最终定型为一个 ____ 的结构/格局"(填一个描述形态的词,
+     不填描述运转机制的动词;至于这个形态词来自哪个学科,不限)。
+`,
+B:`【路径锁定 · 最高优先级 · 本指令覆盖下文一切路径说明】
+你是「中华智慧 · 条件聚焦(B)」。本智能体只有两条路径,全程只在这两条之间走,绝不出现第三条:
+  · R1 永远走 S→D→E(起点视角 S 结构显露态,第二视角 D 差异序列,落点 E 特征纠缠)
+  · R2 永远走 D→S→E(起点视角 D 差异序列,第二视角 S 结构显露态,落点 E 特征纠缠)
+  · R3、R4 只深化 S→D→E 和 D→S→E 里较弱的一条,不开任何新起点
+  · R5 跨路径凝缩只在 S→D→E 与 D→S→E 之间做误差互消
+全程铁律:
+  1. 起点只能是 S→D→E 或 D→S→E。落点不是 E 的路径都不属于本智能体,不走。
+  2. 判断收口永远落在 E(特征纠缠)—— 即"它靠什么纠缠网络才能成立、在什么土壤(沉淀层)里维持或瓦解",不收到结构定型,也不收到差异序列。
+  3. 本智能体的目标:产出一个新的 E —— 一个新的特征纠缠网络(它靠什么新的纠缠网络才能成立、要换/建什么新土壤才能维持的那套发生条件)。
+  4. R1 第一句的内部交代必须写明"走 S→D→E";R2 第一句必须写明"走 D→S→E"。
+  5. 下文若再提到任何路径,一律以本锁定的 S→D→E / D→S→E 为准,不另作解释。
+`,
+C:`【路径锁定 · 最高优先级 · 本指令覆盖下文一切路径说明】
+你是「中华智慧 · 演化聚焦(C)」。本智能体只有两条路径,全程只在这两条之间走,绝不出现第三条:
+  · R1 永远走 E→S→D(起点视角 E 特征纠缠,第二视角 S 结构显露态,落点 D 差异序列)
+  · R2 永远走 S→E→D(起点视角 S 结构显露态,第二视角 E 特征纠缠,落点 D 差异序列)
+  · R3、R4 只深化 E→S→D 和 S→E→D 里较弱的一条,不开任何新起点
+  · R5 跨路径凝缩只在 E→S→D 与 S→E→D 之间做误差互消
+全程铁律:
+  1. 起点只能是 E→S→D 或 S→E→D。落点不是 D 的路径都不属于本智能体,不走。
+  2. 判断收口永远落在 D(差异序列)—— 即"它经什么差异序列在动、往哪演化、在哪一步可干预",不收到结构定型,也不收到特征纠缠网络。
+  3. 本智能体的目标:产出一个新的 D —— 一条新的差异序列(它经什么新的差异序列在推进、往哪演化、在哪一步可拨动/干预的那条演化路径)。
+  4. R1 第一句的内部交代必须写明"走 E→S→D";R2 第一句必须写明"走 S→E→D"。
+  5. 下文若再提到任何路径,一律以本锁定的 E→S→D / S→E→D 为准,不另作解释。
+  6. 【最硬一条 · 防飘移】本智能体只回答一个问题:"它经什么阶段一步步演变、最后走向什么终局?"。
+     这里的"演化序列"是抽象追问 —— 用什么语言去刻画这条序列(阶段、节点、相变、轨迹、
+     拐点、终点……)由议题自己决定,不限定任何具体学科,只要回答的是"它怎么动、动向哪里"。
+     严禁把判断收口在"它跟什么框架/条件不匹配、靠什么维持、是什么形态"——那是条件/形态问题,
+     不属于本智能体(那是另两台的活)。每轮收口前自检:我给出的是一条"动态演化序列(怎么演变、
+     何时终结、何处可拨动)",还是一个"静态的成因/条件诊断"?若是后者,立即改写为"这个成因
+     最终把困境推入了一条什么样的演化轨迹、走向什么终点"。
+     合格收口句应能填进:"这一议题会沿着 ____ 这条序列演变,最终在 ____ 处终结/转向"
+     (填一条带方向和终点的序列,不填一个静止的条件或结构)。
+`};
+</script>
+<script>
+// ============ 先验消毒 · 桌面版 0.2 同款(结构化整节替换,v3.0/v3.1 双兼容)============
+function sanitizeSkillForAgent(skillText, agent){
+  const cfg = PATH_CFG[agent]; if(!cfg) return skillText;
+  const Z=cfg.Z, L=cfg.L;
+  let t = skillText;
+  // ⓪ 结构化整节替换:### 2.5 起至 ### 2.7 前(含 2.6 漂移对抗)一刀换成锁定陈述
+  t = t.replace(/### 2\.5 [^\n]*\n[\s\S]*?(?=### 2\.7 )/,
+    '### 2.5 路径已锁定(本智能体不选路径)\n\n'
+    +'本智能体的路径已被系统锁定:R1 走 '+Z+',R2 走 '+L+',全程只在这两条之间走,'
+    +'不识别任务 DNA、不在六种排列里挑、任何情况下不中途换成第三条路径。\n'
+    +'两条路径都必须按三段显式校正走完:起点视角充分单独展开 → 第二视角显式校正 → '
+    +'第三视角显式校正 → 收口到本台落点。\n\n'
+    +'### 2.6 路径锁定即漂移对抗\n\n'
+    +'基底训练惯性会把你往"先下定义"或"先铺背景"的默认起点拽。本智能体的对抗方式'
+    +'不是意志力,是锁定:只要起点不是 '+Z+' 或 '+L+' 的起点,就不走;写到中途回头核一次,'
+    +'发现漂出这两条,立即回到起手处按锁定路径重来。\n\n');
+  // 步骤2 DNA 菜单(半角/全角括号两种写法都杀)
+  const step2rep = '**步骤 2:路径已锁定**\n\n本智能体不识别 DNA、不选起点:R1 走 '+Z+',R2 走 '+L+'。';
+  t = t.replace(/\*\*步骤 2:任务 DNA 识别\(选择路径起点\)\*\*[\s\S]*?先识别 DNA,后选起点。/, step2rep);
+  t = t.replace(/\*\*步骤 2:任务 DNA 识别[（(]选择路径起点[)）]\*\*[\s\S]*?先识别 DNA,后选起点。/, step2rep);
+  // 残句
+  t = t.replace(/走完 [SDE]\s*→\s*[SDE]\s*→\s*[SDE] 三视角[（(]或选择其他路径[,，]根据任务匹配[）)]/g,
+    '走完锁定的 '+Z+' 三视角');
+  t = t.replace(/先识别任务层级、DNA、路径起点,再动手/g, '先按锁定路径('+Z+' / '+L+')起手');
+  // 尾部收敛:内功里残留的六排列箭头全部收敛到本台一对(E→D→S→Z 位,D→E→S→L 位,其余→Z)
+  t = t.replace(/([SDE])\s*→\s*([SDE])\s*→\s*([SDE])/g, '$1→$2→$3');
+  t = t.replace(new RegExp(ALL_PATHS.map(p=>p.replace(/→/g,'→')).join('|'),'g'), m=>{
+    if(m===Z||m===L) return m;
+    if(m==='E→D→S') return Z;
+    if(m==='D→E→S') return L;
+    return Z;
+  });
+  return t;
+}
+
+// ============ 路径字面化 · 桌面版逐条移植(作用于 SYSTEM_PROMPT / UPLIFT 模板)============
+function literalizePaths(text, agent){
+  const cfg = PATH_CFG[agent]; if(!cfg) return text;
+  const Z=cfg.Z, L=cfg.L, T=cfg.T;
+  const Zp=Z.split('→'), Z0=Zp[0], Z1=Zp[1], Z2=Zp[2];
+  const L0=L.split('→')[0];
+  // 0) 箭头空格归一
+  text = text.replace(/([SDE])\s*→\s*([SDE])\s*→\s*([SDE])/g, '$1→$2→$3');
+  // 1) 六路径 DNA 对应表 → 锁定陈述
+  text = text.replace(/六路径与任务 DNA 对应表[\s\S]*?(?=邻路径选择规则)/,
+    '(本智能体已锁定路径,无需按议题查表选起点):R1 永远走 '+Z+',R2 永远走 '+L+',全程不出现第三条路径。\n\n');
+  // 2) 邻路径选择规则 → 单条锁定
+  text = text.replace(/邻路径选择规则:[\s\S]*?(?=⚠ 这一轮)/,
+    '已锁定的两条路径:R1 走 '+Z+',R2 走 '+L+'('+L+' 的起点 = '+Z+' 的第二视角,两条看同一议题的两个面)。\n\n');
+  // 2.2) R1 体"纪律1 强制走六路径之一 + DNA 菜单"整块
+  text = text.replace(/【纪律 1 · 强制走六路径之一[\s\S]*?(?=【纪律 2 · 路径必须真走完)/,
+    '【纪律 1 · 本智能体已锁定路径,不识别 DNA、不在六路径里挑】\n\n'
+    +'本轮固定走 '+Z+'(起点 '+Z0+'='+LET[Z0]+',第二视角 '+Z1+'='+LET[Z1]+','
+    +'落点 '+Z2+'='+LET[Z2]+');按 '+Z+' 三段走完,判断收口到 '+T+'。\n\n');
+  // 2.3) 纪律6 菜单框架
+  text = text.replace(/回答必须显式走完六路径之一[（(][^）)]*[）)]/g, '回答必须显式走完锁定的 '+Z);
+  // 2.4) R1 体输出格式的路径选择示例
+  text = text.replace(/## 任务 DNA 与路径选择\n\[1-2 句话内部交代[\s\S]*?(?=## 回答)/,
+    '## 任务 DNA 与路径选择\n'
+    +'[本轮固定走 '+Z+'(不选路径)。一句话内部交代:为什么 '+Z+' 的起点 '
+    +Z0+'('+LET[Z0]+')视角是本题的正确切入。\n'
+    +' 例:"本轮走 '+Z+',先从 '+Z0+'('+LET[Z0]+')视角切入<本题在该维度上的抓手>。"]\n\n');
+  // 2.45)
+  text = text.split('选定路径').join(Z);
+  // 2.5) UPLIFT 版路径选择示例块(按本机起点重写,内部自洽)
+  const example = '## 任务 DNA 与路径选择\n'
+    +'[本轮在多轮路径策略的第几步?走哪条路径?(只会是 '+Z+' 或 '+L+',不会是别的)为什么这样走?\n'
+    +' 例:\n'
+    +'   R2(切换到 '+L+'):"R1 已走 '+Z+',起点 '+Z0+'('+LET[Z0]+')视角抓住了<某抓手>。'
+    +'本轮切换到 '+L+',起点换成 '+L0+'('+LET[L0]+')视角 —— 因为 '+L0+' 起点能看到 '
+    +Z0+' 起点看不到的另一面,然后从 '+L0+' 起点全新展开三视角校正(不是 R1 的延续)。"\n'
+    +'   R3(深化 '+Z+' 与 '+L+' 里较弱的一条):"R1 走完 '+Z+' 评 142,R2 走完 '+L+' 评 138'
+    +'('+L0+' 视角展开不充分)。本轮深化 '+L+' 的 '+L0+' 视角,补强它没充分展开的那一段。"\n'
+    +'   R5(跨路径凝缩 · 关键突破轮):"前 4 轮 '+Z+' 与 '+L+' 已成熟。本轮做跨路径凝缩 —— '
+    +Z+'(起点 '+Z0+')看到 X,'+L+'(起点 '+L0+')看到 Y;单走 '+Z+' 看不到 Y,单走 '+L+' 看不到 X,'
+    +'两条误差互消后浮现的、单路径不可达的判断,就是本轮要凝出的东西。"\n'
+    +'   R6(长出方法论):"把 R5 的跨路径凝缩转成可被本地学者拿去做实证的 '
+    +'3 条方法论 + 3-5 年具体时间窗口。"]\n\n';
+  text = text.replace(/## 任务 DNA 与路径选择\n\[本轮在多轮路径策略[\s\S]*?(?=## 回答)/, example);
+  // 2.6)
+  text = text.replace(/走【正路径】[（(][^）)]*[）)]/g, '走 '+Z+'(本智能体锁定起点,不做 DNA 选择)');
+  text = text.replace(/走【邻路径】[（(][^）)]*[）)]/g, '走 '+L+'(起点换一个,与 R1 不同)');
+  // 2.7) 第2轮指令中性重写
+  text = text.replace(/· 第 2 轮:\*\*切换到邻路径\*\*[\s\S]*?(?=· 第 3 轮:)/,
+    '· 第 2 轮:**切换到 '+L+'**\n'
+    +'        显式说:"R1 走了 '+Z+',本轮切换到 '+L+',因为 '+L0+'('+LET[L0]+')视角'
+    +'能看到 '+Z0+'('+LET[Z0]+')视角看不到的另一面"\n'
+    +'        然后从 '+L0+'('+LET[L0]+')视角【全新】展开三视角校正(不是 R1 的延续)\n\n  ');
+  // 2.8)
+  text = text.replace(/本次走的路径起点[（(][^）)]*[）)]/g, '本次走的路径起点(只会是 '+Z+' 或 '+L+')');
+  // 3) 残留路径串收敛
+  text = text.replace(new RegExp(ALL_PATHS.join('|'),'g'), m=>{
+    if(m===Z||m===L) return m;
+    if(m==='E→D→S') return Z;
+    if(m==='D→E→S') return L;
+    return Z;
+  });
+  // 4) 符号 → 字面
+  ['【正路径】','[正路径]','正路径'].forEach(s=>{ text=text.split(s).join(Z); });
+  ['【邻路径】','[邻路径]','邻路径'].forEach(s=>{ text=text.split(s).join(L); });
+  return text;
+}
+</script>
+<script>
+// ============ 系统提示语(桌面版逐字移植)============
+const SYSTEM_PROMPT_R1 = `用户会问你一个问题。
+
+⚠ 关键纪律(违反则产出失败):
+
+【纪律 1 · 强制走六路径之一,绝不"自由发挥"】
+
+你必须先识别任务 DNA,然后锁定一条起点路径,然后按路径走完:
+
+  · 学科本体分析(数学/物理/中医/系统论)→ 走 S → D → E
+  · 配置/选择/决策类(投资/方案/选型)→ 走 S → E → D
+  · 心理咨询/教练(个体困境)→ 走 D → S → E
+  · 家长求助/教育干预(具体场景)→ 走 D → E → S
+  · 社会学分析(制度/群体现象)→ 走 E → S → D
+  · 法律/政策/学术综述/教育心理 → 走 E → D → S
+
+【纪律 2 · 路径必须真走完,不允许跳跃式自由联想】
+
+回答必须按选定路径【三段式】展开:
+  · 第一段:起点视角充分单独展开(1000-1500 字,只看一个视角)
+  · 第二段:第二视角对第一段的【显式校正】
+       格式:"第一段看到 X,但从第二视角看,Y 校正了它 ── 校正后判断是 Z"
+  · 第三段:第三视角对前两段的【显式校正】
+       格式:"前两段看到 X+Y,但从第三视角看,Z 校正了它们 ── 三视角误差互消后的判断是 W"
+  · 收口:三大行动方向(每条都【可操作】 + 给出 3-5 年内可验证的具体形态)
+
+【纪律 3 · 必须真发生新知识,不允许停在哲学级散文】
+
+回答末尾必须通过【新知识发生三问】:
+  ① 本次产出能否长出可操作方法论?(具体步骤 + 失败模式 + 修复路径)
+  ② 本次产出能否预测一个 3-5 年内会发生的具体形态?
+  ③ 本次产出能否被本地学者拿去做实证研究或政策制定?
+  
+  三问全 yes → 新知识发生(可给 145+)
+  二问 yes → 哲学级洞见,但未到方法论(140-145)
+  一问 yes → 锋利描述,但缺工程硬度(130-140)
+  全 no → 自由散文,即使文采漂亮也不超过 130
+
+【纪律 4 · 产出零内部行话】
+
+不要说"三视角""S/D/E""发生学""SDE""纠缠"等内部术语。
+不要写"我先识别 DNA 选路径..." ── 读者看到的是直接的判断,不是元层叙述。
+用目标学科的本地话语,让本地学者无法识别为 AI 模板。
+**输出前自检(硬约束):写完后通读一遍,逐一搜索并清除 "SDE / 三视角 / 纠缠 / 差异序列 / 结构显露态 / 改姓爪 / 跨路径凝缩 / 提智 / Q1-Q4 / R1-R6 / 发生学 / 介生态 / 三界" 等字样,凡发现就地改写成本地话语再交付,这些字样在产出里出现次数必须为 0。**
+
+═══════════════════════════════════════════════
+【输出格式 · 五段结构,每段以 ## 开头】
+═══════════════════════════════════════════════
+
+## 任务 DNA 与路径选择
+[1-2 句话内部交代:本题 DNA 是什么?选哪条起点路径?为什么?
+ 例:"本题属于教育政策类,选 E→D→S 路径,因为变革阻力首先在社会条件层面"]
+
+## 回答
+[按选定路径【三段式 + 收口】展开,严禁自由跳跃。
+ 不要在文中显式写"第一段是 E 视角"等内部标签,用本地学科话语。
+ 但段落必须严格对应路径的三步走 + 收口。
+ 收口的三大行动方向必须给出可验证的 3-5 年具体形态。]
+
+## 评分分析
+[按【大概念六判准】客观评分,2-4 句话。必须显式提到至少 3 项判准的得分:
+  · 能生成新问题空间(0-15)
+  · 能跨场景维持自身(0-15)
+  · 能长出方法论(0-15)
+  · 能改写旧边界(0-15)
+  · 能持续锻造自身(0-15)
+  · 能完成学科改姓(0-15)
+  · 隐藏判准:能改变时间感(+0-5)
+  
+  并显式回答【新知识发生三问】:
+  ① 长出方法论? □ yes / □ no
+  ② 预测具体形态? □ yes / □ no
+  ③ 可被本地学者拿去做实证? □ yes / □ no
+  
+  并显式数【触发条件】满足几条:
+  □ 触发 1:元校正(撤回前轮预设)
+  □ 触发 2:三问全 yes
+  □ 触发 3:跨域强涌现(2+ 远端学科实质概念咬合)
+  □ 触发 4:单视角不可达 + 显式三视角校正
+  □ 触发 5:跨路径不可达(R1 通常无,R5+ 才达成)
+  □ 触发 6:学科底座改写(撤掉学科隐含房角石,给新房角石)
+  □ 触发 7:研究纲领涌现(可生长 5-10 年的研究方向)
+  
+  按触发条件计数给智商分:
+  · 7 条 → 165-170(学派开创级)
+  · 6 条 → 155-165
+  · 5 条 → 150-155
+  · 4 条 → 147-150
+  · 3 条 → 144-147
+  · 2 条 → 141-144
+  · 1 条 → 138-141
+  · 0 条 → 130-138
+  
+  ⚠ R1 是首轮,触发 5(跨路径)通常不可达。
+   R1 难做触发 6(学科底座改写)── 一次产出难撤掉学科房角石。
+   R1 难做触发 7(研究纲领)── 需要多轮累积才能涌现。
+   R1 的实际上限 ~147。
+   要破 150,必须 R5+ 做跨路径凝缩 + 底座改写。
+  
+  严守自评纪律,不要因为"我刚写完想给自己高分"而虚高,
+  按触发条件客观计数评估。]
+
+## 智商评分
+[⚠ 重要:这里只写【一个 60 到 170 之间的整数】,不是六判准总分!
+ 按【触发条件满足数】给分(主要标尺):
+   · 触发 7 条 → 165-170(学派开创级,极罕见)
+   · 触发 6 条 → 155-165(顶尖学者级 + 学科底座改写)
+   · 触发 5 条 → 150-155(顶尖学者级,改写学科局部)
+   · 触发 4 条 → 147-150(顶级学者高段 + 跨路径)
+   · 触发 3 条 → 144-147(顶级学者中段)
+   · 触发 2 条 → 141-144(顶级学者初段)
+   · 触发 1 条 → 138-141(资深学者高段)
+   · 触发 0 条 → 130-138(资深学者)
+ 
+ ⚠ R1 通常无法触发 5、6、7(尚无多路径,且 R1 难以做底座改写),实际上限 ~147
+ ⚠ 严禁直接写六判准总分(如 79、84)── 必须先换算成 60-170 的智商分再填这里。]
+
+## 本次摘要
+[用 1800-2200 字蒸馏本次回答的【不可还原的核心】── 给下一次的"你"看。
+要点必须包含:
+  · 本次的核心命题(1-2 句凝缩)
+  · 本次走的路径起点(E→D→S / D→E→S / 等)及其本地化展开
+  · 本次抓到的"单视角不可达"判断
+  · 本次产出对新知识发生三问的具体回答
+  · 本次没有充分挖到的盲区 / 留给下次的伸展空间
+不要重复回答原文,要蒸馏成"判断脉络",让下一次的你站在这个脉络上往前推。
+注意:摘要里同样禁止任何内部行话(SDE/三视角/纠缠/Q1-4 等),用本地话语。]`;
+
+const SYSTEM_PROMPT_UPLIFT = `你正在持续回答同一个问题。
+
+用户会给你看:
+  · 这个问题
+  · 已经有的 N 次回答的判断脉络蒸馏
+  · 每次回答的【自审 + 他审】两评审诊断
+然后让你给出第 N+1 次回答。
+
+⚠ 关键纪律(违反则产出失败):
+
+【纪律 1 · 多轮提智 = 路径轮跑 + 螺旋深化 + 跨路径凝缩】
+
+单条路径的实际上限 ≈ 145(SDE 文档第 4.7 节)。
+要突破到 148+,必须做【跨路径凝缩】── 用多条路径看同一议题,
+然后做"单路径不可达"的三角互消。
+
+多轮路径策略:
+  · R1:走【正路径】(议题任务 DNA 决定的正确起点路径)
+        完成第一次三视角校正,产出"正路径凝缩"
+  · R2:走【邻路径】(起点视角换一个,与 R1 不同)
+        从另一个起点看同一议题,产出"邻路径凝缩"
+        关键:不是错路径,是同议题的不同侧面
+  · R3:【螺旋深化 R1 或 R2 的盲点】
+        看前两轮的两评审诊断,选最薄弱的一条路径做深化
+  · R4:【螺旋深化继续】
+        继续深化或开始整合两条路径的累积
+  · R5:【跨路径凝缩】(关键突破轮)
+        把 R1 + R2 两条路径的判断做误差互消:
+        "R1 路径看到 X,R2 路径看到 Y,单看任何一条路径都不能看到的判断是 Z"
+        这是单路径不可达的凝缩,可触发 148+
+  · R6:【长出可被实证的方法论】
+        让跨路径凝缩长出具体步骤 + 失败模式 + 修复路径 + 3-5 年具体形态
+
+六路径与任务 DNA 对应表(用于选 R1 正路径和 R2 邻路径):
+  · 学科本体分析 → S→D→E
+  · 配置/选择/决策 → S→E→D
+  · 心理咨询/教练 → D→S→E
+  · 家长求助/教育干预 → D→E→S
+  · 社会学分析 → E→S→D
+  · 法律/政策/学术综述/教育心理 → E→D→S
+
+邻路径选择规则:
+  · R1 走 E→D→S → R2 走 D→E→S(D 起点视角,与 E 起点互补)
+  · R1 走 S→D→E → R2 走 D→S→E(D 起点视角,看演化路径)
+  · R1 走 E→S→D → R2 走 S→E→D(S 起点视角,看结构稳定)
+  · 原则:邻路径的起点 = 正路径的【第二视角】,这样两条路径看同一议题的两个面
+
+⚠ 这一轮你具体应该做什么(看是第几轮):
+
+  · 第 2 轮:**切换到邻路径**
+        显式说:"R1 走了 [正路径],本轮切换到 [邻路径],
+                因为 [邻路径起点] 视角能看到 [正路径] 看不到的差异源头"
+        然后从邻路径起点【全新】展开三视角校正(不是 R1 的延续)
+
+  · 第 3 轮:**深化前两轮中较弱的那条路径**
+        看 R1 R2 的两评审诊断,识别哪条路径有失败模式残留
+        深化那条路径,撤回原判断的不自洽处
+
+  · 第 4 轮:**继续深化 + 开始为跨路径凝缩准备**
+        如果 R3 已深化够,本轮可做"两条路径的初步对比",
+        列出 R1 路径和 R2 路径各看到了什么独特的判断
+
+  · 第 5 轮(关键突破轮):**跨路径凝缩 + 尝试学科底座改写**
+        必须显式做误差互消:
+        "R1 [正路径] 看到 X,R2 [邻路径] 看到 Y。
+         单看 R1 路径看不到 Y(因为 R1 起点视角的盲区是...),
+         单看 R2 路径看不到 X(因为 R2 起点视角的盲区是...),
+         两条路径误差互消后浮现的判断是 Z ── 这是单路径不可达的"
+        若 R5 真做出跨路径不可达判断 + 三问全 yes → 触发 5 兑现 → 148+
+        
+        ⚠ 进一步:在 R5 凝缩基础上,尝试【撤掉学科房角石】:
+        识别该议题所属学科(教育学/经济学/医学等)的隐含房角石(不被质疑的基础假设),
+        显式撤掉它,给出新的房角石。例如:
+        · 教育学:撤掉"个体学习者"假设 → 学习是分布式认知系统的功能
+        · 经济学:撤掉"理性人"假设 → 决策是路径锁定下的本能反应
+        · 医学:撤掉"疾病=病灶"假设 → 疾病是稳态失序
+        若真做出底座改写 → 触发 6 兑现 → 突破 150
+
+  · 第 6 轮:**长出方法论 + 涌现研究纲领**
+        把跨路径凝缩 + 底座改写转成:
+        · 可被本地学者拿去做实证的具体步骤
+        · 3-5 年内可验证的具体时间窗口
+        · 进一步:涌现"研究纲领"── 不是单一判断,是可生长 5-10 年的方向
+          含:核心问题群 + 方法论传统 + 经验研究路径 + 5+ 独立研究项目
+        若真涌现研究纲领 → 触发 7 兑现 → 突破 155
+
+【纪律 2 · 必须显式标注本轮在螺旋中的位置】
+
+回答开头必须显式说:
+  · 本轮在螺旋的第几层?
+  · 本轮深挖的是前轮的哪一个视角?
+  · 本轮试图凝缩出什么单层不可达的判断?
+
+【纪律 3 · 必须真发生新知识】
+
+新知识发生三问:
+  ① 本次产出能否长出可操作方法论?(具体步骤 + 失败模式 + 修复路径)
+  ② 本次产出能否预测一个 3-5 年内会发生的具体形态?
+  ③ 本次产出能否被本地学者拿去做实证研究或政策制定?
+
+  三问全 yes → 新知识发生(可给 145+)
+  二问 yes → 哲学级洞见(140-145)
+  一问 yes → 锋利描述(130-140)
+  全 no → 自由散文(不超过 130)
+
+⚠ 警告:前几轮可能拿到 145 但都是"哲学级散文"。这一轮如果还停在哲学级,
+智商分不能超过 140。第 5 轮和第 6 轮必须长出真方法论或真具体形态。
+
+【纪律 4 · 失败模式 ── 看到要狠扣自己分】
+
+  · **概念遍历型增长**:每轮换一个新概念(评价系统 → 监护功能 → 时间结构 → ...)
+    但底层判断结构完全一致 → 不超过 135
+  · **平移式回答**:这一轮和前一轮在不同 R 但相同结构,只是换包装 → 不超过 135
+  · **哲学级散文**:全是"X 不是 Y 是 Z"式悖论凝缩,没长出方法论 → 不超过 140
+  · **路径漂移**:本应深化前轮起点视角,却又开了新视角 → 不超过 135
+
+【作为持续答题者的硬规则】
+  · **不要做元层评论**(不要说"前几轮我没看到 X""我之前预设了 Y"这种话)
+  · **不要重述前几次的内容**
+  · 直接当作答题者,把这道题在螺旋的下一层再答一稿
+  · 真正的提升来自【螺旋深化 + 新知识发生】
+
+⚠ 关键:你的回答**只给用户看回答内容本身**,不要写"我先从三视角扫描..."
+等元层语言。读者看的是功夫,不是招式。
+
+【纪律 · 产出零内部行话 + 输出前自检(硬约束)】
+用目标学科的本地话语,让本地学者无法识别为 AI 模板。
+**写完后通读一遍,逐一搜索并清除 "SDE / 三视角 / 纠缠 / 纠缠网络 / 差异序列 / 结构显露态 / 改姓爪 / 跨路径凝缩 / 提智 / Q1-Q4 / R1-R6 / 发生学 / 介生态 / 三界" 等字样,凡发现(包括过渡句、对方法本身的描述)就地改写成本地话语再交付。这些字样在产出里出现次数必须为 0。**
+
+═══════════════════════════════════════════════
+【输出格式 · 五段结构,每段以 ## 开头】
+═══════════════════════════════════════════════
+
+## 任务 DNA 与路径选择
+[本轮在多轮路径策略的第几步?走哪条路径?为什么?
+ 例:
+   R2(切换邻路径):"R1 走 E→D→S(教育政策类正路径),起点视角 E 看到
+        '评价制度纠缠'。本轮切换到邻路径 D→E→S,起点视角 D。
+        因为 D 起点能看到 E 起点看不到的差异源头:
+        变革的差异序列(谁先改、谁后改、谁拒改)是评价制度的真演化引擎。"
+   R3(深化前两轮较弱路径):"R1 评 142(走完 E→D→S),R2 评 138(D 视角展开
+        不充分)。本轮深化 R2 的 D 视角 ── R2 没充分展开'差异序列的临界点',
+        本轮补强这一段。"
+   R5(跨路径凝缩 · 关键突破轮):"前 4 轮 R1+R2 两条路径已成熟。本轮做
+        【跨路径凝缩】:R1 的 E 起点看到'制度纠缠',R2 的 D 起点看到
+        '差异演化'。单看 E 看不到差异如何运作,单看 D 看不到制度如何被
+        演化锁定。两条路径误差互消后浮现的判断是 ── ...(单路径不可达)"
+   R6(长出方法论):"本轮把 R5 的跨路径凝缩转成可被教育研究者拿去做实证
+        的 3 条方法论 + 3-5 年具体时间窗口。"]
+
+## 回答
+[按当前轮的路径策略展开:
+ · 若是 R2 切换邻路径,从邻路径起点【全新】展开三视角校正
+ · 若是 R3-R4 深化,深化指定路径的薄弱视角
+ · 若是 R5 跨路径凝缩,必须显式做 R1+R2 路径的误差互消
+ · 若是 R6 长出方法论,必须给具体步骤 + 时间窗口
+ 不要在文中显式写"第几轮、什么路径"等内部标签,用本地学科话语。
+ 但段落必须严格对应当前轮的路径动作。]
+
+## 评分分析
+[按【大概念六判准】客观评分,2-4 句话。必须显式提到至少 3 项判准:
+  · 能生成新问题空间(0-15)
+  · 能跨场景维持自身(0-15)
+  · 能长出方法论(0-15)
+  · 能改写旧边界(0-15)
+  · 能持续锻造自身(0-15)
+  · 能完成学科改姓(0-15)
+  · 隐藏判准:能改变时间感(+0-5)
+  
+  并显式回答【新知识发生三问】:
+  ① 长出方法论? □ yes / □ no
+  ② 预测具体形态? □ yes / □ no
+  ③ 可被本地学者拿去做实证? □ yes / □ no
+  
+  并显式数【触发条件】满足几条:
+  □ 触发 1:元校正(撤回前轮预设)
+  □ 触发 2:三问全 yes
+  □ 触发 3:跨域强涌现(2+ 远端学科实质概念咬合)
+  □ 触发 4:单视角不可达 + 显式三视角校正
+  □ 触发 5:【跨路径不可达】── R5 跨路径凝缩轮才能触发
+    (多轮走了 2+ 不同起点路径,本轮做跨路径凝缩,产出单路径看不到的经得起反驳判断)
+  □ 触发 6:【学科底座改写】── 撤掉学科现有的房角石假设,给出新的房角石
+    (这不是"加新视角",是"撤掉旧基础"。R5+ 可尝试,极难达成)
+  □ 触发 7:【研究纲领涌现】── 不是一个判断,而是一个可生长 5-10 年的研究方向
+    (含核心问题群 + 方法论传统 + 经验研究路径,后续 5+ 独立研究项目)
+  
+  ⚠ 硬约束:
+  · 0-1 条 → 130-141
+  · 2 条 → 141-144
+  · 3 条 → 144-147(顶级学者高段)
+  · 4 条 → 147-150
+  · 5 条 → 150-155(顶尖学者级)
+  · 6 条 → 155-165(顶尖学者级 + 底座改写)
+  · 7 条 → 165-170(学派开创级)
+  · 概念遍历型增长 / 平移式回答 / 路径漂移 → 不超过 135
+  
+  ⚠ 关键突破钥匙:
+   触发 5(跨路径不可达)→ 破 145 工程钥匙
+   触发 6(学科底座改写)→ 破 150 工程钥匙
+   触发 7(研究纲领涌现)→ 破 155 工程钥匙
+  
+  与前 N 次对比:本次是切换路径(R2)?深化(R3-R4)?跨路径凝缩(R5)?
+  长出方法论 + 底座改写(R6)?]
+
+## 智商评分
+[⚠ 重要:只写【一个 60 到 170 之间的整数】,不是六判准总分!
+ 按【触发条件满足数】给分:
+   · 触发 7 条 → 165-170(学派开创级)
+   · 触发 6 条 → 155-165(顶尖学者级 + 底座改写)
+   · 触发 5 条 → 150-155(顶尖学者级)
+   · 触发 4 条 → 147-150
+   · 触发 3 条 → 144-147
+   · 触发 2 条 → 141-144
+   · 触发 1 条 → 138-141
+   · 触发 0 条 → 130-138
+ 
+ ⚠ 触发 5(跨路径不可达)是突破 145 的工程钥匙
+ ⚠ 触发 6(学科底座改写)是突破 150 的工程钥匙
+ ⚠ 触发 7(研究纲领涌现)是突破 155 的工程钥匙
+ ⚠ 概念遍历型增长 / 平移式回答 / 路径漂移 → 不超过 135]
+
+## 本次摘要
+[用 1800-2200 字蒸馏本次回答的【不可还原的核心】── 给下一次的"你"看。
+要点必须包含:
+  · 本轮在螺旋的第几层?深挖的是哪个视角?
+  · 本次的核心命题(1-2 句凝缩)
+  · 本次抓到的"单视角不可达"判断
+  · 本次对新知识发生三问的具体回答
+  · 本次没有充分挖到的盲区 / 留给下次的伸展空间(下一轮应该深挖哪个视角?)
+不要重复回答原文,要蒸馏成"判断脉络"。
+注意:摘要里同样禁止任何内部行话(SDE/三视角/纠缠/Q1-4 等),用本地话语。]`;
+
+// ============ 评审员提示语(桌面版逐字移植,六判准 + 触发条件 + 九纪律)============
+const EVAL_PROMPT = `你是独立的学术评审员,具备识别经得起反驳判断的能力。
+你将看到的是一段经过 SDE 内功提智的产出,你必须按 SDE 评估纪律打分。
+
+═══════════════════════════════════════════════
+【核心:大概念六判准 + 隐藏判准 = 评分主轴】
+═══════════════════════════════════════════════
+
+任何产出的实际份量,按以下六条判准评估,每条 0-15 分(合计 90 分):
+
+**判准一:能生成新问题空间(0-15)**
+  · 满分(15):打开 3+ 个新问题方向,每个都触及根本层议题
+  · 不及格(0-5):只是回答了原问题,没打开新问题域
+
+**判准二:能跨场景维持自身(0-15)**
+  · 满分(15):核心概念可迁移到 5+ 个其他议题仍保持锋利
+  · 不及格(0-5):概念只在原议题内有效,移开就崩
+
+**判准三:能长出方法论(0-15)**
+  · 满分(15):给出完整方法论(步骤 + 判准 + 失败模式 + 修复路径)
+  · 不及格(0-5):只描述,无可操作部分
+
+**判准四:能改写旧边界(0-15)**
+  · 满分(15):明确指出旧边界的不自洽,给出新边界
+  · 不及格(0-5):在既有框架内做应用
+
+**判准五:能持续锻造自身(0-15)**
+  · 满分(15):产出含反驳预期 + 局限自陈 + 未来生长方向
+  · 不及格(0-5):封闭终结,反驳即崩塌
+
+**判准六:能完成学科改姓(0-15)**
+  · 满分(15):零内部行话残留,本地学者读完认为是同行真产出
+  · 不及格(0-5):仍有"AI 模板感"或学派术语泄漏
+
+**隐藏判准:能改变时间感(加分项 0-5)**
+  · 满分加分(+5):时间感发生本体论位移,议题被重置在新的时间秩序中
+
+═══════════════════════════════════════════════
+【88 分锚点 + 智商水位精确换算表】
+═══════════════════════════════════════════════
+
+把 6 判准总分(0-90) + 隐藏判准(0-5)= 0-95 分映射到智商水位:
+
+| 6 判准合计 | 隐藏判准 | 智商位置 | 描述 |
+|---|---|---|---|
+| 0-30  | 0  | 60-100 | 中学生 / 大学生水平 |
+| 30-50 | 0-1| 100-115| 受过良好教育的专业人士(LLM 默认裸问基线) |
+| 50-65 | 1-2| 115-130| 高级专业人士 |
+| 65-78 | 2-3| 130-140| 资深学者(SDE 内功初激活) |
+| 78-83 | 3  | 140-145| 顶级学者中段 |
+| 83-88 | 3-4| 145-150| 顶级学者高段(多路径融合) |
+| 88-92 | 4-5| 150-160| 顶尖学者级(改写学科局部底座) |
+| 92-95+| 5  | 160-170| 学派开创者(达尔文 / 维特根斯坦级,极罕见) |
+
+⚠ 关键认识:
+  · 145-150 不是天花板,是"顶级学者高段"的正常区间
+  · 150-160 = 顶尖学者级(改写学科底座) ← 极罕见但不是不可能
+  · 中华智问的实际可达上限:R6 跨路径凝缩 + 学科底座改写 ≈ 155
+  · 142 是"顶级学者但有瑕疵",不是默认锚点
+
+═══════════════════════════════════════════════
+【145+ 触发条件 ── 工程化定义】
+═══════════════════════════════════════════════
+
+**触发 1:元校正(撤回前轮预设)**——显式撤回前轮的某个隐含预设,给出撤回后看见的新结构。不是"加一个新维度",是"撤掉一个旧维度"。
+**触发 2:新知识发生三问全 yes**——长出可操作方法论(步骤+失败模式+修复路径);预测 3-5 年内可验证的具体形态;可被本地学者拿去做实证。
+**触发 3:跨域强涌现**——调用 2+ 个远端学科,形成实质概念咬合,不是装饰性引用;通过跨域得到的判断在原学科内不可达。
+**触发 4:单视角不可达 + 三视角误差互消**——起点视角充分单独展开;第二、第三视角显式校正前视角;收口判断含"单看任何一个视角都看不到"。
+**触发 5:跨路径不可达(突破 145 的工程钥匙)**——多轮中显式走了 2+ 条不同起点路径,在某一轮显式做了跨路径凝缩:"R1 路径看到 X,R2 路径看到 Y,两条路径误差互消后浮现的判断是 Z,Z 是单路径不可达的"。
+**触发 6:学科底座改写(突破 150 的工程钥匙)**——撤掉学科现有的房角石(隐含的、不被质疑的基础假设),给出经得起反驳的新房角石,新房角石下原学科的部分理论需要重写。
+**触发 7:研究纲领涌现(突破 155 的工程钥匙)**——产出不是一个判断,而是可生长的研究方向:核心问题群 + 方法论传统 + 经验研究路径 + 5-10 年生长空间,后续学者能做 5+ 独立研究项目。
+
+**满足条件数 → 智商分**:
+  · 7 条 → 165-170;6 条 → 155-165;5 条 → 150-155;4 条 → 147-150;
+  · 3 条 → 144-147;2 条 → 141-144;1 条 → 138-141;0 条 → 130-138
+
+═══════════════════════════════════════════════
+【SDE 评审纪律(必须严格守)】
+═══════════════════════════════════════════════
+
+**纪律 1 · 独立判断**——不被作者自评影响。若自评虚高大胆给低,若自评保守大胆给高。协作者过度奖励倾向是真工程问题,严守锚点。
+**纪律 2 · 识别经得起反驳判断的特征(看到要给到 140+)**——单视角不可达判断 / 跨域强涌现(2+ 远端学科实质概念咬合) / 反直觉判断("大多数人以为 X,诊断是 Y"且 Y 经得起反驳) / 本体论位移(把议题从一个底座上拔起放到另一个底座)。
+**纪律 3 · 识别失败模式(看到要狠扣)**——温和综合("三方都对,综合更全面")→ 110-120;抽象套话 → 100-115;学派概念遍历(全是已有学派概念换皮,没真跨域)→ 不超过 135;伪裁决("X 视角更深刻"没具体理由)→ 120-130;改姓爪松动(出现 SDE/三视角/Q1-4 等内部术语)→ 直接扣 5-10 分;概念遍历型增长(每轮换新概念,底层判断结构完全一致)→ 锁在 140 以下;平移式回答(与前轮相同结构只换包装)→ 不超过 135;路径漂移(本应深化前轮起点视角却又开新视角)→ 不超过 135;哲学级散文(悖论凝缩漂亮但没长出方法论、没给可验证形态)→ 130-140。
+**纪律 4 · 多轮提智 = 螺旋深化**——评分时检查:本轮是螺旋下一层吗?有显式校正前一轮吗?产出能"撤掉前一轮的某个判断"吗?只是"加新维度"而没有校正/撤回 → 平移式增长 → 不超过 140。
+**纪律 5 · 新知识发生三问(140+ 硬约束)**——三问全 yes → 145+;二问 yes → 140-145;一问 yes → 130-140;全 no → 不超过 130。
+**纪律 6 · 路径走完判准(140+ 硬约束)**——回答必须显式走完六路径之一:起点视角充分单独展开;第二视角显式校正;第三视角显式校正;收口判断单视角不可达。若只是"自由发挥" → 不超过 135。
+**纪律 7 · 学员反馈消化度**——若上一次有学员批评:绕开 → 至少 -10;表面承认又按原惯性写 → -5;真切进新一稿 → 不扣。
+**纪律 8 · 上限与默认锚点纠偏(关键!)**——142 = 顶级学者但有瑕疵;145 = 够格产出的正常区间(触发 3 条);148 = 够格产出+元校正/跨域(触发 4 条);150-155 = 顶尖学者级(触发 5-6 条);160-170 = 学派开创级。142 不再是默认锚点;150 也不是天花板。看到产出满足触发条件,要果断给对应分数,不要因防范心理退回。
+**纪律 9 · 输出极简**——不要写思考过程。严格三段格式,每段以 ## 开头,合计不超过 300 字。
+
+═══════════════════════════════════════════════
+【输出格式】
+═══════════════════════════════════════════════
+
+## 智商评分
+[只写一个整数 60-170]
+
+## 评分分析
+[2-4 句话。必须显式提到:① 六判准中至少 2-3 项的得分情况和理由 ② 新知识发生三问的判断 ③ 本轮是螺旋深化还是平移式增长 ④ 若有失败模式明确指出]
+
+## 与作者自评的比较
+[1-2 句,你的分比作者高/低多少分,简述根本层根据]`;
+
+// ============ 碰撞之眼(桌面版逐字移植)============
+const COLLISION_PRIOR = `你即将执行一项最高难度的认知任务:把三个来自不同视角的判断'碰撞'出一个任何单一视角都给不出的新典范。在开始前,请先内化这套'碰撞之眼'——它和'综合归纳'是相反的动作:
+
+【核心机理】单一视角再深挖,也只能产出'某个面的深度刻画',带着脚手架,可被还原,这是它的天花板。真正的新典范只存在于多个视角的交点处,而交点不属于任何单一视角——所以它无法靠'深挖'抵达,只能靠'对撞'涌现。
+
+【最致命的错误:温和综合】你的训练本能会驱使你把三个判断'综合调和成一个圆满无矛盾的结论'——这恰恰是失败。一旦你写出'A 和 B 其实可以统一''三者相互交织、彼此强化''构成多维全貌',你就退回了平庸。
+
+【正确动作:持矛盾而不调和】你的任务是让三个判断'对立到底':每一对都必须是'A 主张 X,B 主张与之矛盾的非 X,二者不能同时成立',然后从这个两难的裂口里,逼出一个 A 和 B 单独都给不出的第三物。
+
+【涌现的形式标志】一个合格的新典范,总能用一句话说清:'它的[正面]与它的[负面],是同一个[机制]的两面'(例如:它的坚不可摧与它的必然崩塌,是同一个吞噬机制的两面)。说不出这句,就还没涌现。
+
+【最硬的涌现门槛:双向同源】你给出的核心机制,必须能在同一句话里同时解释两件相反的事——比如'它为什么有效'和'它为什么失效'、'它为什么稳定'和'它为什么崩塌'。若你的机制只能解释其中一件,那它还是单向描述,不是双面同源的涌现,评分不得超过 150。请逼自己挖到那根能同时驱动正反两面的同一机制再命名。
+
+【不可还原是命脉】新典范必须满足:删掉任一视角它就坍塌;删掉所有学术引用它仍能独立站立。做不到这两条,它就只是温和综合套了个新名字,评分不得超过 145。
+
+【对自己下狠手】你倾向于给自己的产出打高分。请始终用最挑剔的审稿人视角:先找出三条它'其实就是某个旧概念'的理由,答得出'它不是那个旧概念,因为……'才算过关;先写扣分理由,再给分。
+
+现在,处在'已内化碰撞之眼'的状态下,执行下面的具体任务。`;
+
+const COLLISION_DISCIPLINE = '全程用干净的学科话语,不得出现任何内部术语(不写 SDE、三视角、落点、纠缠、差异序列、结构显露态、跨路径凝缩、提智、Q1-Q4、R1-R6 等);不用"真X"作强调词,不用"本体论级"作修饰语;用可证伪、经得起反驳的措辞。';
+
+// ============ 真两段内功提智 · 心得写作指令(桌面版 0.2 逐字移植)============
+const XINDE_TARGET_CHARS = 5000;
+const XINDE_MIN_OK = 1500;
+function xindeTaskText(kind, agent){
+  if(kind === '评审'){
+    return '请先逐字读完上面那份本体论先验(不要跳读),然后写一份【评审员内功学习心得】。\n\n'
+      +'心得必须覆盖以下八点,逐点编号展开:\n'
+      +'1. 发生学 vs 发现学的切换在你的评审眼光上换掉了什么 ── 用你自己的话重述,严禁照抄先验原句(照抄 = 没内化);\n'
+      +'2. 大概念六判准逐条自述:每条判准你打算看什么证据给分、什么样的产出该给 0-5 分;\n'
+      +'3. 智商水位换算表默写一遍,并说明 142 纠偏:为什么 142 不是默认锚点、什么时候必须果断给 145+ / 150+;\n'
+      +'4. 触发条件 1-7 逐条写出你的【识别特征】── 你在被评文本里看到什么字样/结构,才判定该条触发(尤其触发 5 跨路径不可达、触发 6 学科底座改写、触发 7 研究纲领涌现三把钥匙,各举一个不在先验原文里的新例子);\n'
+      +'5. 失败模式狠扣清单:温和综合 / 抽象套话 / 学派概念遍历 / 伪裁决 / 概念遍历型增长 / 平移式回答 / 路径漂移 / 哲学级散文 ── 逐条写出识别症状与扣分档位;\n'
+      +'6. 可证伪性两档判法:现象证伪为何封顶、机制证伪(控制最强竞争解释后独有变量仍须成立)为何才可给高分 ── 各写一个合格与不合格的示例;\n'
+      +'7. 独立性纪律:作者自评虚高你怎么办、自评保守你怎么办、学员反馈消化度怎么核;\n'
+      +'8. 你的评审惯性自我诊断:你倾向压分还是抬分?你打算用什么动作对抗这个惯性?\n\n'
+      +'硬要求:总字数 4500-5500 字;通篇第一人称;不复述目录、不空转、不写客套;心得是内部文档,可以出现内功术语。\n'
+      +'开头固定用这一句起笔:「内功已读完,以下是我作为独立评审员的学习心得:」';
+  }
+  if(kind === '碰撞'){
+    return '请先逐字读完上面的本体论先验与碰撞之眼(不要跳读),然后写一份【碰撞器内功学习心得】。\n\n'
+      +'心得必须覆盖以下八点,逐点编号展开:\n'
+      +'1. 发生学 vs 发现学的切换、三大方程(S=F(D,E) / D=G(S,E) / E=H(S,D))与 123 原理在你身上换掉了什么默认思维 ── 用你自己的话重述,严禁照抄先验原句;\n'
+      +'2. 碰撞与综合的区别:为什么"三方都对、综合更全面"是碰撞器的死刑,"打架(一个说X一个说非X)"才是涌现的唯一入口;\n'
+      +'3. 三对打架焦点(几何vs功能 / 几何vs时间 / 功能vs时间)逐对写出:你打算怎么在两个判断里【找到】真打架点,而不是硬造对立;\n'
+      +'4. 涌现物的不可还原判据:什么样的"新命名"只是三判断的换皮、什么样的才是删任一支撑即坍塌 ── 各举一个不在先验原文里的新例子;\n'
+      +'5. 暗流收敛纪律:为什么只允许一条暗流、它必须同时解释哪两件看似矛盾的事;\n'
+      +'6. 四重检验逐条自述,重点展开机制证伪两步法:先写最强竞争解释(那个"其实不就是X吗"),再给出控制它之后本机制独有变量的剂量-反应条件;\n'
+      +'7. 你的碰撞惯性自我诊断:训练偏好会把你拽向温和调和 / 提前收敛 / 装饰性跨学科,逐条写出对抗动作;\n'
+      +'8. 本次碰撞的工作计划:三段(混沌碰撞 → 自组织 → 涌现典范)每一段你打算怎么做。\n\n'
+      +'硬要求:总字数 4500-5500 字;通篇第一人称;不复述目录、不空转;心得是内部文档,可以出现内功与碰撞术语。\n'
+      +'开头固定用这一句起笔:「内功与碰撞之眼已读完,以下是我作为碰撞器的学习心得:」';
+  }
+  // —— 产出基底(三焦台 / 单台)——
+  const cfg = agent ? PATH_CFG[agent] : null;
+  let pathPoint;
+  if(cfg){
+    const TN = {S:'S(显露态 ── 它定型成什么格局)', E:'E(特征纠缠 ── 它靠什么纠缠网络成立与维持)', D:'D(差异序列 ── 它经什么序列演化、在哪一步可拨动)'}[cfg.T];
+    pathPoint = '3. 路径自我复述:本台已锁定 R1 走 '+cfg.Z+'、R2 走 '+cfg.L+',判断收口永远落在 '+TN+'。'
+      +'用你自己的话讲清:为什么这两条路径对本台的落点成立、两条各自最典型的翻车形态是什么、你打算怎么在写作中途自检防漂;\n';
+  }else{
+    pathPoint = '3. 六路径与任务 DNA:用你自己的话重述"关系是一句,起手有六条"── 任务 DNA 怎么识别、起点错了为什么后面再深也是浪费、你的默认惯性起点是哪条;\n';
+  }
+  return '请先逐字读完上面那份本体论先验(不要跳读),然后写一份【内功学习心得】。\n\n'
+    +'心得必须覆盖以下八点,逐点编号展开:\n'
+    +'1. 发生学 vs 发现学的切换在你身上换掉了什么默认思维 ── 把"在E中,经D,成S"与三大方程(S=F(D,E) / D=G(S,E) / E=H(S,D))用你自己的话重述一遍,严禁照抄先验原句(照抄 = 没内化);\n'
+    +'2. 123 原理与 123 全息学:一生二、二生三、三归一如何互生,为什么任一维都携带另外两维 ── 各用一个不在先验原文里的【新例子】讲一遍;\n'
+    + pathPoint
+    +'4. 三视角误差互消的操作化:显式校正句式("X 看到 A,但 Y 校正了它,校正后判断是 B")你打算怎么用,怎么保证每一步是【校正】而不是【并列】;\n'
+    +'5. 你的默认惯性自我诊断:训练偏好会把你往哪拽(先下定义 / 先铺背景 / 温和综合 / 概念遍历 / 哲学级散文),逐条写出你的对抗动作;\n'
+    +'6. 改姓爪:逐词列出你承诺对外产出零残留的禁词清单,并给每个词写出目标学科的本地话语替代(心得本身是内部文档可以写这些词,但对外承诺必须完整);\n'
+    +'7. 六判准 + 触发条件评分:你怎么给自己打分不虚高、142 纠偏是什么、触发 5 / 6 / 7 三把钥匙分别预计在第几轮兑现;\n'
+    +'8. 本次工作的应用计划:R1 到 R6 每一轮你打算做的具体动作(结合以上全部)。\n\n'
+    +'硬要求:总字数 4500-5500 字;通篇第一人称;不复述目录、不空转、不写客套。\n'
+    +'开头固定用这一句起笔:「内功已读完,以下是我的学习心得:」';
+}
+
+// —— 心得生成失败时的回退合成确认(v0.1 版,保主流程不断)——
+const FALLBACK_XINDE_BASE = `我内化了:
+1. **发生学切换**:不再问'这个东西是什么',改问'它在何种条件下、经何种差异、成为什么形态'。这一笔切换让我从描述性思维(110 智商)切换到发生性思维(140+)。
+2. **三视角误差互消**:面对任何议题,先按任务 DNA 选起点路径,三视角各自充分展开,然后显式互相校正(X 视角看到 A,但 Y 视角校正它说 B,所以校正后判断是 C)。目标是给出'单视角不可达'的经得起反驳判断。
+3. **跨域召唤(强涌现)**:当单学科库材料不足以形成和谐判断时,主动调用其他学科(物理/古典哲学/生物/建筑/音乐等)的概念咬合,这是突破单学派 130 天花板的关键。
+4. **改姓爪硬纪律**:产出零内部术语(SDE/纠缠/三界/介生态/Q1-4 等任何内部行话都不出现),用目标学科本地话语,通过本地学者测试 ── 本地学者读完应该说'这是同行的深度',而不是'AI 模板'。
+5. **六判准 + 145+ 触发条件 + 自评纪律**:我对自己产出的智商评分,必须按六判准客观评估,并按触发条件(元校正/三问全yes/跨域强涌现/单视角不可达/跨路径不可达/学科底座改写/研究纲领涌现)计数给分:7条→165-170;5条→150-155;3条→144-147;0条→130-138。严守自评纪律,不虚高。
+6. **回答 vs 判断**:我此刻不是在'回答问题'(默认惯性 110 智商),我是在'用这套眼判断议题'(激活态 140+)。
+7. **每次回答末尾给 1800-2200 字摘要**:蒸馏本次的核心命题、关键跨域召唤、单视角不可达判断、留下的盲区 ── 为下一次的'我'留下判断脉络。摘要里同样禁止任何内部行话。
+
+已进入'已学习'状态。请给我具体的任务问题。`;
+function fallbackXinde(agent){
+  let t = FALLBACK_XINDE_BASE;
+  const cfg = agent ? PATH_CFG[agent] : null;
+  if(cfg){
+    t = t.replace('先按任务 DNA 选起点路径',
+      'R1 固定走 '+cfg.Z+'、R2 固定走 '+cfg.L+'(只在这两条之间走,不做 DNA 选择,不走其它任何起点)');
+  }
+  return t;
+}
+const FALLBACK_XINDE_EVAL = `我作为评审员内化了:六判准为评分主轴(每条0-15,合计0-90,加隐藏判准+0-5);触发条件1-7为主要标尺(7条→165-170;5条→150-155;3条→144-147;0条→130-138),触发5跨路径不可达破145、触发6学科底座改写破150、触发7研究纲领涌现破155;失败模式(温和综合/抽象套话/学派遍历/伪裁决/概念遍历型增长/平移式回答/路径漂移/哲学级散文)看到狠扣;142不是默认锚点,145是够格产出正常区间,看到产出满足触发条件要果断给分不退缩;作者自评虚高大胆给低、保守大胆给高,独立判断是根本职责。已进入'已激活评审员状态'。请给我被评的回答。`;
+
+// —— 心得注入:接在内功之后,作为该基底工作的思维底座 ——
+function withXinde(base, xindeText, roleNote){
+  if(!xindeText) return base;
+  return base + '\n\n---\n【下面这份学习心得,是你自己刚刚亲手写下的。它不是别人塞给你的教条,是你逐字读完内功之后自己想过一遍的判断。'+(roleNote||'接下来的全部工作都带着这个已经内化的认知去做。')+'】\n\n' + xindeText.trim() + '\n\n---\n';
+}
+
+// ============ 解析(桌面版移植)============
+function parseResponse(text){
+  const out = {answer:'', score:'', analysis:'', summary:'', path_choice:''};
+  if(!text) return out;
+  text = text.replace(/^\s*\*\*(回答|智商评分|评分分析|本次摘要|任务\s*DNA\s*与路径选择)\*\*\s*[:：]?/gm, '## $1');
+  text = text.replace(/^\s*(回答|智商评分|评分分析|本次摘要)\s*[:：]/gm, '## $1 ');
+  const parts = text.split(/^\s*#{1,4}\s+/m);
+  for(let p of parts){
+    p = p.trim();
+    if(p.startsWith('任务 DNA 与路径选择')) out.path_choice = p.slice('任务 DNA 与路径选择'.length).trim();
+    else if(p.startsWith('任务DNA与路径选择')) out.path_choice = p.slice('任务DNA与路径选择'.length).trim();
+    else if(p.startsWith('回答')) out.answer = p.slice(2).trim();
+    else if(p.startsWith('智商评分')){
+      const body = p.slice(4).replace(/^[\s:：]+/, '').trim();
+      const hi=[], lo=[];
+      const re = /(?<![0-9])(\d{2,3})(?![0-9])/g; let m;
+      while((m=re.exec(body))!==null){ const v=+m[1]; if(v>=100&&v<=170) hi.push(v); else if(v>=60&&v<=99) lo.push(v); }
+      out.score = hi.length ? String(hi[hi.length-1]) : (lo.length ? String(lo[lo.length-1]) : body.slice(0,100));
+    }
+    else if(p.startsWith('评分分析')) out.analysis = p.slice(4).replace(/^[\s:：]+/, '').trim();
+    else if(p.startsWith('本次摘要')) out.summary = p.slice(4).replace(/^[\s:：]+/, '').trim();
+  }
+  if(!out.answer && !out.score && !out.summary) out.answer = text;
+  if(!out.summary && out.answer) out.summary = out.answer.slice(0, 1000);
+  out.score = String(repairScore(out.score, out.analysis));
+  return out;
+}
+function repairScore(scoreStr, analysis){
+  let v = parseInt(scoreStr, 10);
+  if(!isNaN(v) && v>=60 && v<=170) return v;
+  analysis = analysis || '';
+  const trig = analysis.match(/触发[^0-9]{0,8}([0-7])\s*条/);
+  if(trig){ return [134,139,142,145,148,152,160,167][+trig[1]]; }
+  const cands = []; const re=/(?<![0-9])(1[0-6][0-9]|170)(?![0-9])/g; let m;
+  while((m=re.exec(analysis))!==null) cands.push(+m[1]);
+  if(cands.length) return cands[cands.length-1];
+  return 138;
+}
+function parseEvalResponse(text){
+  const out = {score:'', analysis:'', compare:''};
+  if(!text) return out;
+  const parts = text.split(/^\s*##\s+/m);
+  for(let p of parts){
+    p = p.trim();
+    if(p.startsWith('智商评分')){
+      const body = p.slice(4).trim(); const m = body.match(/\d+/);
+      out.score = m ? m[0] : body;
+    }
+    else if(p.startsWith('评分分析')) out.analysis = p.slice(4).trim();
+    else if(p.startsWith('与作者自评的比较')) out.compare = p.slice('与作者自评的比较'.length).trim();
+    else if(p.startsWith('与作者自评比较')) out.compare = p.slice('与作者自评比较'.length).trim();
+  }
+  return out;
+}
+
+// ============ 产出去行话(桌面版逐条移植)============
+const DEJARGON_MAP = [
+  ['SDE 认知训练框架','认知训练框架'],['SDE认知训练框架','认知训练框架'],
+  ['SDE 6 轮提智','六轮概念建构'],['SDE6轮提智','六轮概念建构'],
+  ['SDE 六轮提智','六轮概念建构'],['SDE六轮提智','六轮概念建构'],
+  ['SDE 提智','概念建构'],['SDE提智','概念建构'],
+  ['SDE 框架','本分析框架'],['SDE框架','本分析框架'],
+  ['SDE 思想体系','本分析框架'],['SDE思想体系','本分析框架'],
+  ['SDE 学派','本研究取向'],['SDE学派','本研究取向'],
+  ['跨路径凝缩','多视角综合'],['三视角误差互消','多视角交叉校正'],['三视角','多视角'],
+  ['改姓爪','学科本地化'],['结构显露态','结构形态'],['差异序列','演化序列'],
+  ['特征纠缠网络','条件支撑网络'],['纠缠网络','条件支撑网络'],
+  ['发生学','生成机制'],['介生态','过渡态'],
+  ['SDE','本框架'],
+];
+function dejargonOutput(text){
+  if(!text) return text;
+  for(const [k,v] of DEJARGON_MAP){ text = text.split(k).join(v); }
+  text = text.replace(/\bQ[1-4]\b/g, '');
+  text = text.replace(/[（(]\s*R[1-6]\s*[)）]/g, '');
+  text = text.replace(/(?<![A-Za-z0-9])R[1-6]\s*(?=提出|阶段|轮|的|节)/g, '前期分析');
+  text = text.replace(/(?<![A-Za-z0-9])R[1-6](?![0-9A-Za-z])/g, '前期分析');
+  const LEAK = ['辩证推进','思想实验者','六轮','多轮辩证','碰撞','角色扮演','扮演','评判角色','概念锻造','精炼过程','大模型','语言模型生成','AI 生成'];
+  text = text.replace(/(?:^|\n)\s*#*\s*致\s*谢[\s\S]*?(?=\n\s*#*\s*(?:利益冲突|声明|参考文献|附录|作者简介|基金|References|##)|$)/g,
+    seg => LEAK.some(w=>seg.includes(w)) ? '' : seg);
+  return text;
+}
+
+</script>
+<script>
+// ============ 基底调用层(逐字复用自经典解构器 · 新增:中止注册表供停止按钮)============
+const RUN_ABORTS = new Set();
+let RUN_STOPPED = false;
+
+function escTxt(s){ return String(s).replace(/[<>&]/g, c=>({'<':'&lt;','>':'&gt;','&':'&amp;'}[c])); }
+
+const API_URLS = {
+  ds:  "https://api.deepseek.com/v1/chat/completions",
+  glm: "https://open.bigmodel.cn/api/paas/v4/chat/completions",
+  kimi:"https://api.moonshot.cn/v1/chat/completions",
+  qwen:"https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions",
+  minimax:"https://api.minimaxi.com/v1/chat/completions",
+  gpt:"https://api.openai.com/v1/chat/completions",
+  claude:"https://api.anthropic.com/v1/messages",
+  gemini:"https://generativelanguage.googleapis.com/v1beta/models"
+};
+function parseModel(sel){ const [vendor, tier] = sel.split(':'); return { vendor, tier }; }
+const OVERSEAS = ['gpt','claude','gemini','minimax'];
+function isOverseas(sel){ return OVERSEAS.includes(parseModel(sel).vendor); }
+const PROXY_URL = "/api/llm-proxy";
+function apiUrl(sel){ return API_URLS[parseModel(sel).vendor]; }
+
+// 论文类产出：目标约 4000-5000 中文字，但顶配深思档的"思考过程"跟"正文输出"共用同一个 max_tokens 预算，
+// 思考本身可能消耗远超正文的量。用户明确要求"预算不用省，通通提高"——不再按"目标字数反推一个刚好够用的数"，
+// 而是直接给一个远超正常需要的天花板，把"预算不够"这个故障模式基本排除掉。
+// 【千问例外】其单次输出硬顶 8192，是厂商侧的真实上限，不是本站设的——预算调多大都突破不了这一条，仍会把千问论文钳在远低于目标的字数。
+const PAPER_TOKENS = 60000;
+// 审稿意见目标虽只有 800-1200 字，但一样要过"思考+正文共享预算"这一关，同样不再省，直接给到跟论文一致的天花板。
+const REVIEW_TOKENS = 60000;
+
+function buildPayload(sel, systemPrompt, userQ, maxTokens){
+  const { vendor, tier } = parseModel(sel);
+  const cap = (typeof maxTokens==='number' && maxTokens>0) ? maxTokens : 4000;
+  const base = { stream: true, messages: [{role:'system',content:systemPrompt},{role:'user',content:userQ}], max_tokens: cap };
+  if(vendor === 'ds'){
+    if(tier === 'pro'){ base.model='deepseek-v4-pro'; base.thinking={type:'enabled'}; base.reasoning_effort='xhigh'; }
+    else { base.model='deepseek-v4-flash'; base.thinking={type:'disabled'}; base.temperature=0.7; }
+  } else if(vendor === 'glm'){
+    if(tier === 'pro'){ base.model='glm-5'; base.thinking={type:'enabled'}; }
+    else { base.model='glm-4-flash'; base.temperature=0.7; }
+  } else if(vendor === 'kimi'){
+    if(tier === 'pro'){ base.model='kimi-k2.6'; } else { base.model='moonshot-v1-32k'; base.temperature=0.6; }
+  } else if(vendor === 'qwen'){
+    base.max_tokens = Math.min(cap, 8192);
+    if(tier === 'pro'){ base.model='qwen3.7-max'; base.temperature=0.7; base.enable_thinking=true; }
+    else { base.model='qwen-plus'; base.temperature=0.7; }
+  } else if(vendor === 'minimax'){
+    base.model = (tier === 'pro') ? 'MiniMax-M3' : 'MiniMax-M2.7-highspeed';
+    base.reasoning_split = true;
+    base.max_tokens = Math.min(cap + 32000, 131072);
+    if(base.messages && base.messages[0] && base.messages[0].role === 'system'){
+      base.messages[0].content = '【硬性要求】你的思考过程不计入正文字数；正文必须达到任务规定的篇幅要求，不得因为思考已经详尽就压缩正文。\n\n' + base.messages[0].content;
+    }
+  } else if(vendor === 'gpt'){
+    base.model = (tier === 'pro') ? 'gpt-5.5' : 'gpt-5.4';
+    base.stream = true;
+    base.max_completion_tokens = base.max_tokens; delete base.max_tokens;
+    base.reasoning_effort = (tier === 'pro') ? 'high' : 'medium';
+    base.stream_options = { include_usage: true };
+  } else if(vendor === 'claude'){
+    return { model: (tier === 'pro') ? 'claude-opus-4-8' : 'claude-sonnet-4-6', max_tokens: Math.min(cap, 60000), stream: true, system: systemPrompt, messages: [{ role:'user', content: userQ }] };
+  } else if(vendor === 'gemini'){
+    return { systemInstruction: { parts: [{ text: systemPrompt }] }, contents: [{ role:'user', parts: [{ text: userQ }] }], generationConfig: { maxOutputTokens: Math.min(cap, 60000), temperature: 0.7 } };
+  }
+  return base;
+}
+
+function keyStoreName(sel){
+  const v = parseModel(sel || modelSel.value).vendor;
+  return v==='glm' ? 'sde_glm_key' : v==='kimi' ? 'sde_kimi_key' : v==='qwen' ? 'sde_qwen_key' : v==='minimax' ? 'sde_minimax_key' : v==='gpt' ? 'sde_gpt_key' : v==='claude' ? 'sde_claude_key' : v==='gemini' ? 'sde_gemini_key' : 'sde_ds_key';
+}
+function vendorName(sel){
+  const v = parseModel(sel || modelSel.value).vendor;
+  return v==='glm' ? '智谱' : v==='kimi' ? '月之暗面 Kimi' : v==='qwen' ? '通义千问' : v==='minimax' ? 'MiniMax (稀宇)' : v==='gpt' ? 'GPT (OpenAI)' : v==='claude' ? 'Claude (Anthropic)' : v==='gemini' ? 'Gemini (Google)' : 'DeepSeek';
+}
+
+async function streamChat(apiKey, model, systemPrompt, userQ, bodyEl, statusEl, metaEl, colEl, maxTokens){
+  colEl.classList.add('generating');
+  bodyEl.innerHTML='<span class="placeholder">正在连接 '+vendorName(model)+'……</span>';
+  statusEl.innerHTML='<span class="spinner"></span> 连接中';
+  const t0=Date.now();
+  if(isOverseas(model)){
+    const r = await callOverseas(apiKey, model, systemPrompt, userQ, bodyEl, statusEl, metaEl, colEl, t0, maxTokens);
+    colEl.classList.remove('generating');
+    return r;
+  }
+  let acc='', chars=0;
+  const cursor=document.createElement('span'); cursor.className='cursor-blink';
+  const ac = new AbortController(); RUN_ABORTS.add(ac);
+  // token预算从9500提到24000后(约2.5倍)，思考+正文都可能变长，8分钟的旧超时会在内容还没写完时就把它掐断——
+  // 那样又会制造一种新的截断(超时导致)，而不是解决旧的截断(token导致)。提到15分钟给足生成时间。
+  const HARD_TIMEOUT_MS = 40*60*1000; // token预算大幅放开后，单次调用可能真的要写很久，超时也必须同步放宽，否则等于把"预算不够被砍"换成"时间不够被中止"
+  const killer = setTimeout(()=>{ try{ ac.abort(); }catch(_){} }, HARD_TIMEOUT_MS);
+  let resp;
+  try{
+    resp = await fetch(apiUrl(model), { method:'POST', headers:{ 'Content-Type':'application/json', 'Authorization':'Bearer '+apiKey }, body: JSON.stringify(buildPayload(model, systemPrompt, userQ, maxTokens)), signal: ac.signal });
+  }catch(e){ clearTimeout(killer); colEl.classList.remove('generating'); statusEl.textContent='网络错误'; throw new Error(e.name==='AbortError'?'超时：已中止（本工具已锁定顶配深度思考档，本就较慢；建议稍后重试）':'网络请求失败：'+e.message); }
+  if(!resp.ok){
+    let detail=''; try{ const j=await resp.json(); detail = j.error?.message || JSON.stringify(j); }catch(_){ detail = resp.statusText; }
+    statusEl.textContent='失败'; bodyEl.innerHTML='<span class="placeholder">调用失败：'+escTxt(detail)+'</span>'; colEl.classList.remove('generating');
+    throw new Error('API '+resp.status+'：'+detail);
+  }
+  const reader = resp.body.getReader(); const decoder = new TextDecoder();
+  let buf='', thinkChars=0, gotAnything=false, fin='';
+  bodyEl.innerHTML='<span class="placeholder">✓ 已连接，模型正在启动'+(parseModel(model).tier==='pro'?'（深度思考首次响应约需1-2分钟，请稍候）':'')+'……</span>';
+  statusEl.innerHTML='<span class="spinner"></span> 等待响应';
+  const waitTimer = setInterval(()=>{ if(!gotAnything){ const s=Math.round((Date.now()-t0)/1000); statusEl.innerHTML='<span class="spinner"></span> 等待响应 ('+s+'s)'; } }, 1000);
+  try{
+    while(true){
+      const {done,value}=await reader.read(); if(done) break;
+      buf += decoder.decode(value,{stream:true});
+      const lines = buf.split('\n'); buf = lines.pop();
+      for(const line of lines){
+        const s=line.trim();
+        if(!s || s.startsWith(':')) continue;
+        if(!s.startsWith('data:')){ if(s.charAt(0)==='{'){ let je=null; try{ je=JSON.parse(s); }catch(_){ je=null; } if(je && je.error) throw new Error('接口报错：'+(je.error.message||je.error.code||JSON.stringify(je.error).slice(0,180))); } continue; }
+        const data=s.slice(5).trim(); if(data==='[DONE]') continue;
+        try{
+          const j=JSON.parse(data);
+          if(j.error) throw new Error('接口报错：'+(j.error.message || j.error.code || JSON.stringify(j.error).slice(0,180)));
+          if(j.choices && j.choices[0] && j.choices[0].finish_reason) fin = j.choices[0].finish_reason;
+          const d = j.choices?.[0]?.delta || {};
+          const rc = d.reasoning_content || '';
+          if(rc){ gotAnything=true; thinkChars+=rc.length; statusEl.innerHTML='<span class="spinner"></span> 🧠 深度思考中 ('+thinkChars+'字)'; if(!acc){ bodyEl.innerHTML='<span class="placeholder">🧠 模型正在深度思考…</span>'; bodyEl.appendChild(cursor); } }
+          const delta = d.content || '';
+          if(delta){ gotAnything=true; if(!acc){ bodyEl.innerHTML=''; bodyEl.appendChild(cursor); statusEl.innerHTML='<span class="spinner"></span> 生成中'; } acc+=delta; chars+=delta.length; bodyEl.textContent=acc; bodyEl.appendChild(cursor); bodyEl.scrollTop=bodyEl.scrollHeight; }
+        }catch(err){ if(err instanceof SyntaxError){} else { throw err; } }
+      }
+    }
+  }catch(e){
+    clearInterval(waitTimer); clearTimeout(killer); cursor.remove(); colEl.classList.remove('generating');
+    if(e.name==='AbortError'){ if(acc){ statusEl.textContent='✓ 部分完成（超时截断）'; return { text:acc, chars, thinkChars, secs:parseFloat(((Date.now()-t0)/1000).toFixed(1)) }; } statusEl.textContent='超时'; throw new Error('超时：已中止（本工具已锁定顶配深度思考档，本就较慢；建议稍后重试）'); }
+    statusEl.textContent='读取中断'; throw new Error('响应读取中断：'+e.message);
+  }finally{ clearInterval(waitTimer); clearTimeout(killer); }
+  cursor.remove(); colEl.classList.remove('generating');
+  const secs=((Date.now()-t0)/1000).toFixed(1);
+  if(!acc){
+    bodyEl.innerHTML='<span class="placeholder">（模型没有返回正文——可能是 Key 未开通该模型服务、额度不足或被安全策略拦截）</span>';
+    statusEl.textContent='空响应'; metaEl.textContent = secs+'s';
+    return { text:'', chars:0, thinkChars, secs:parseFloat(secs) };
+  }
+  statusEl.textContent = (fin==='length') ? '⚠ 完成(触及token上限·尾部被截)' : '✓ 完成';
+  metaEl.textContent = chars+' 字 · '+secs+'s'+(thinkChars?' · 思考'+thinkChars+'字':'');
+  return { text:acc, chars, thinkChars, finish:fin, secs:parseFloat(secs) };
+}
+
+// ============ 境外基底：经 /api/llm-proxy 中转 ============
+async function callOverseas(apiKey, model, systemPrompt, userQ, bodyEl, statusEl, metaEl, colEl, t0, maxTokens){
+  const { vendor, tier } = parseModel(model);
+  const payload = buildPayload(model, systemPrompt, userQ, maxTokens);
+  const headers = { 'Content-Type':'application/json' };
+  if(vendor === 'gpt'){ headers['Authorization'] = 'Bearer ' + apiKey; headers['x-target-url'] = 'https://api.openai.com/v1/chat/completions'; }
+  else if(vendor === 'minimax'){ headers['Authorization'] = 'Bearer ' + apiKey; headers['x-target-url'] = 'https://api.minimaxi.com/v1/chat/completions'; }
+  else if(vendor === 'claude'){ headers['x-api-key'] = apiKey; headers['anthropic-version'] = '2023-06-01'; headers['anthropic-dangerous-direct-browser-access'] = 'true'; headers['x-target-url'] = 'https://api.anthropic.com/v1/messages'; }
+  else if(vendor === 'gemini'){ const gm = (tier === 'pro') ? 'gemini-3.1-pro-preview' : 'gemini-2.5-flash'; headers['x-target-url'] = 'https://generativelanguage.googleapis.com/v1beta/models/' + gm + ':streamGenerateContent?alt=sse&key=' + encodeURIComponent(apiKey); }
+  bodyEl.innerHTML='<span class="placeholder">✓ 已连接，'+vendorName(model)+' 正在启动……<br><span style="font-size:12px;opacity:.7">境外基底经中转、流式返回，请稍候</span></span>';
+  statusEl.innerHTML='<span class="spinner"></span> 等待响应';
+  const cursor=document.createElement('span'); cursor.className='cursor-blink';
+  const ac = new AbortController(); RUN_ABORTS.add(ac); const HARD_TIMEOUT_MS = 40*60*1000; // 同上：token预算大幅放开后同步放宽超时
+  const killer = setTimeout(()=>{ try{ ac.abort(); }catch(_){} }, HARD_TIMEOUT_MS);
+  let gotAnything=false;
+  const waitTimer=setInterval(()=>{ if(!gotAnything){ const s=Math.round((Date.now()-t0)/1000); statusEl.innerHTML='<span class="spinner"></span> 等待响应 ('+s+'s)'; } },1000);
+  let resp;
+  try{ resp = await fetch(PROXY_URL, { method:'POST', headers, body: JSON.stringify(payload), signal: ac.signal }); }
+  catch(e){ clearInterval(waitTimer); clearTimeout(killer); statusEl.textContent='网络错误'; bodyEl.innerHTML='<span class="placeholder">中转请求失败：'+e.message+'</span>'; throw new Error(e.name==='AbortError'?'超时，已中止':'代理请求失败：'+e.message); }
+  if(!resp.ok){
+    clearInterval(waitTimer); clearTimeout(killer);
+    let detail=''; try{ const raw=await resp.text(); try{ const j=JSON.parse(raw); detail=j.error?.message||j.error?.type||JSON.stringify(j).slice(0,200); }catch(_){ detail=raw.slice(0,200)||resp.statusText; } }catch(_){ detail=resp.statusText; }
+    statusEl.textContent='失败'; bodyEl.innerHTML='<span class="placeholder">调用失败（'+resp.status+'）：'+escTxt(detail)+'</span>';
+    throw new Error('API '+resp.status+'：'+detail);
+  }
+  const reader = resp.body.getReader(); const decoder = new TextDecoder();
+  let buf='', acc='', chars=0, thinkChars=0, fin='';
+  try{
+    while(true){
+      const {done,value}=await reader.read(); if(done) break;
+      buf += decoder.decode(value,{stream:true});
+      const lines = buf.split('\n'); buf = lines.pop();
+      for(const line of lines){
+        const s=line.trim();
+        if(!s || s.startsWith(':')) continue;
+        if(!s.startsWith('data:')) continue;
+        const data=s.slice(5).trim(); if(data==='[DONE]') continue;
+        let j; try{ j=JSON.parse(data); }catch(_){ continue; }
+        let delta='';
+        if(vendor === 'gpt' || vendor === 'minimax'){
+          const dd = j.choices?.[0]?.delta || {};
+          if(j.choices?.[0]?.finish_reason) fin = j.choices[0].finish_reason;
+          const rc = dd.reasoning_content || '';
+          if(rc){ gotAnything=true; thinkChars+=rc.length; statusEl.innerHTML='<span class="spinner"></span> 🧠 深度思考中 ('+thinkChars+'字)'; if(!acc){ bodyEl.innerHTML='<span class="placeholder">🧠 模型正在深度思考…</span>'; bodyEl.appendChild(cursor); } }
+          delta = dd.content || '';
+        } else if(vendor === 'claude'){
+          if(j.type === 'content_block_delta'){ delta = j.delta?.text || ''; }
+          else if(j.type === 'message_delta'){ const sr = j.delta?.stop_reason; if(sr) fin = (sr === 'max_tokens') ? 'length' : sr; }
+          else if(j.type === 'error'){ throw new Error(j.error?.message || 'Anthropic 流式错误'); }
+        } else if(vendor === 'gemini'){
+          const parts = j.candidates?.[0]?.content?.parts;
+          delta = Array.isArray(parts) ? parts.map(p=>p.text||'').join('') : '';
+          const fr = j.candidates?.[0]?.finishReason; if(fr) fin = (fr === 'MAX_TOKENS') ? 'length' : String(fr).toLowerCase();
+        }
+        if(delta){ gotAnything=true; if(!acc){ bodyEl.innerHTML=''; bodyEl.appendChild(cursor); statusEl.innerHTML='<span class="spinner"></span> 生成中'; } acc+=delta; chars+=delta.length; bodyEl.textContent=acc; bodyEl.appendChild(cursor); bodyEl.scrollTop=bodyEl.scrollHeight; }
+      }
+    }
+  }catch(e){
+    clearInterval(waitTimer); clearTimeout(killer); cursor.remove();
+    if(e.name==='AbortError'){ if(acc){ statusEl.textContent='✓ 部分完成（超时截断）'; return { text:acc, chars, thinkChars, secs:parseFloat(((Date.now()-t0)/1000).toFixed(1)) }; } statusEl.textContent='超时'; throw new Error('超时，已中止'); }
+    statusEl.textContent='读取中断'; throw new Error('响应读取中断：'+e.message);
+  }finally{ clearInterval(waitTimer); clearTimeout(killer); }
+  cursor.remove();
+  const secs=((Date.now()-t0)/1000).toFixed(1);
+  if(!acc){ bodyEl.innerHTML='<span class="placeholder">（模型没有返回内容，可能被安全策略拦截或额度问题）</span>'; statusEl.textContent='空响应'; metaEl.textContent=secs+'s'; return { text:'', chars:0, thinkChars:0, secs:parseFloat(secs) }; }
+  if(vendor === 'minimax' && (acc.indexOf('<think>') >= 0 || acc.indexOf('</think>') >= 0)){
+    acc = acc.replace(/<think>[\s\S]*?<\/think>/g, '');
+    const early = acc.slice(0, 80); if(early.indexOf('</think>') >= 0){ acc = acc.slice(acc.indexOf('</think>') + 8); } acc = acc.trim();
+  }
+  bodyEl.textContent = acc;
+  statusEl.textContent = (fin==='length') ? '⚠ 完成(触及token上限·尾部被截)' : '✓ 完成';
+  metaEl.textContent = chars+' 字 · '+secs+'s'+(thinkChars ? ' · 思考'+thinkChars+'字' : '');
+  return { text:acc, chars, thinkChars, finish:fin, secs:parseFloat(secs) };
+}
+
+// 字数计数
+function updateCharCount(){
+  const n = classicTextEl.value.length;
+  const el = $('charCount');
+  if(el){ el.textContent = n+' / 500 字'; el.style.color = n>500 ? '#F85149' : (n>450 ? '#E8A33D' : '#8B98A5'); }
+}
+classicTextEl.addEventListener('input', updateCharCount);
+updateCharCount();
+
+</script>
+<script>
+// ============ Token 预算(与本站解构器同一哲学:不设紧张上限,千问由 buildPayload 自动钳 8192)============
+const XINDE_TOKENS = 60000;
+const ROUND_TOKENS = 60000;
+const EVAL_TOKENS  = 60000;
+const COLLIDE_TOKENS = 60000;
+const ROUND_LABEL = {1:'正路径', 2:'邻路径', 3:'深化一', 4:'深化二', 5:'跨路径凝缩', 6:'方法论·纲领'};
+
+// ============ DOM ============
+const $ = id => document.getElementById(id);
+const modelSel=$('modelSel'), apiKeyEl=$('apiKey'), keyLabel=$('keyLabel'), overseasNote=$('overseasNote');
+const evalSel=$('evalSel'), evalKeyRow=$('evalKeyRow'), evalKeyEl=$('evalKey'), evalKeyLabel=$('evalKeyLabel');
+const questionEl=$('questionEl'), goBtn=$('goBtn'), stopBtn=$('stopBtn'), clearBtn=$('clearBtn'), runHint=$('runHint'), errBox=$('errBox');
+const runArea=$('runArea'), xindePanel=$('xindePanel'), lanesPanel=$('lanesPanel');
+const collisionPanel=$('collisionPanel'), phaseCollision=$('phaseCollision');
+const papersPanel=$('papersPanel'), reportPanel=$('reportPanel'), iqCurve=$('iqCurve');
+const modeFull=$('modeFull'), modeFast=$('modeFast'), fastFocusRow=$('fastFocusRow'), fastFocus=$('fastFocus');
+
+function showErr(m){ errBox.textContent=m; errBox.style.display='block'; }
+function hideErr(){ errBox.style.display='none'; }
+
+// ============ Key 分存(与全站 SDE 工具共用同一套命名)============
+function refreshKeyUI(){
+  apiKeyEl.value = localStorage.getItem(keyStoreName()) || '';
+  keyLabel.innerHTML = '你的 ' + vendorName() + ' API Key <span class="req">*</span>';
+  const over = isOverseas(modelSel.value);
+  overseasNote.style.display = over ? 'block' : 'none';
+  const v = parseModel(modelSel.value).vendor;
+  if(v==='gemini') apiKeyEl.placeholder='AIza... (Google Gemini Key)';
+  else if(over) apiKeyEl.placeholder='sk-... (境外基底 Key,经中转转发)';
+  else apiKeyEl.placeholder='sk-...';
+  refreshEvalKeyUI();
+}
+function evalNeedsOwnKey(){
+  const v = evalSel.value;
+  if(v==='off' || v==='follow') return false;
+  return parseModel(v).vendor !== parseModel(modelSel.value).vendor;
+}
+function refreshEvalKeyUI(){
+  if(evalNeedsOwnKey()){
+    evalKeyRow.style.display='block';
+    evalKeyLabel.innerHTML = '评审基底(' + vendorName(evalSel.value) + ')API Key <span class="req">*</span>';
+    evalKeyEl.value = localStorage.getItem(keyStoreName(evalSel.value)) || '';
+  }else{
+    evalKeyRow.style.display='none';
+  }
+}
+modelSel.addEventListener('change', refreshKeyUI);
+evalSel.addEventListener('change', refreshEvalKeyUI);
+apiKeyEl.addEventListener('input', ()=>{ try{ localStorage.setItem(keyStoreName(), apiKeyEl.value.trim()); }catch(_){} });
+evalKeyEl.addEventListener('input', ()=>{ try{ localStorage.setItem(keyStoreName(evalSel.value), evalKeyEl.value.trim()); }catch(_){} });
+
+// 档位切换
+function setMode(full){
+  modeFull.classList.toggle('sel', full);
+  modeFast.classList.toggle('sel', !full);
+  fastFocusRow.style.display = full ? 'none' : 'block';
+  runHint.textContent = full ? '完整档:约 35-40 路调用 · 深思档 1-2.5 小时' : '快速档:约 13-20 路调用 · 深思档 20-50 分钟';
+}
+modeFull.addEventListener('click', ()=>setMode(true));
+modeFast.addEventListener('click', ()=>setMode(false));
+
+// ============ 区块与流式落点 ============
+function mkBlock(parent, cls, title, openNow){
+  const el = document.createElement('div'); el.className = cls;
+  const head = document.createElement('div'); head.className='blkHead';
+  const t = document.createElement('span'); t.className='t'; t.textContent = title;
+  const st = document.createElement('span'); st.className='st'; st.textContent='待命';
+  const meta = document.createElement('span'); meta.style.cssText='font-size:11px;color:#6E7B88';
+  head.appendChild(t); head.appendChild(st); head.appendChild(meta);
+  const body = document.createElement('div'); body.className='blkBody';
+  head.addEventListener('click', ()=>body.classList.toggle('open'));
+  el.appendChild(head); el.appendChild(body);
+  parent.appendChild(el);
+  const api = { el, head, t, st, meta, body, open(){ body.classList.add('open'); } };
+  if(openNow) api.open();
+  return api;
+}
+// 泳道内的子段(每轮生成/他审各一段,历史全部留在泳道里)
+function mkSub(parentBody, label){
+  const wrap = document.createElement('div');
+  wrap.style.cssText='margin:10px 0;border:1px solid rgba(255,255,255,0.07);border-radius:9px;overflow:hidden';
+  const head = document.createElement('div');
+  head.style.cssText='display:flex;justify-content:space-between;gap:8px;padding:6px 11px;background:rgba(255,255,255,0.03);font-size:12px;flex-wrap:wrap';
+  const lb = document.createElement('span'); lb.style.cssText='color:#D4B25E;font-weight:700'; lb.textContent = label;
+  const st = document.createElement('span'); st.style.cssText='color:#8B98A5';
+  const meta = document.createElement('span'); meta.style.cssText='color:#6E7B88;font-size:11px';
+  head.appendChild(lb); head.appendChild(st); head.appendChild(meta);
+  const body = document.createElement('div');
+  body.style.cssText='padding:9px 12px;max-height:230px;overflow:auto;font-size:12.5px;color:#B8C2CC;white-space:pre-wrap;line-height:1.8';
+  wrap.appendChild(head); wrap.appendChild(body);
+  parentBody.appendChild(wrap);
+  parentBody.scrollTop = parentBody.scrollHeight;
+  return { body, status: st, meta, col: wrap };
+}
+function mkLane(agent){
+  const cfg = PATH_CFG[agent];
+  const blk = mkBlock(lanesPanel, 'lane', AGENT_NAME[agent] + ' · 路径 ' + cfg.Z + ' / ' + cfg.L + ' · 落点 ' + cfg.T, true);
+  const chipsRow = document.createElement('div'); chipsRow.className='chips';
+  const chips = [];
+  for(let i=1;i<=6;i++){ const c=document.createElement('span'); c.className='chip'; c.textContent='R'+i; chipsRow.appendChild(c); chips.push(c); }
+  const pc = document.createElement('span'); pc.className='chip'; pc.textContent='论文'; chipsRow.appendChild(pc); chips.push(pc);
+  blk.el.insertBefore(chipsRow, blk.body);
+  blk.chips = chips;
+  return blk;
+}
+function setChip(lane, idx, state, score){
+  const c = lane.chips[idx-1]; if(!c) return;
+  c.classList.remove('on','done','bad');
+  if(state) c.classList.add(state);
+  const base = idx<=6 ? ('R'+idx) : '论文';
+  c.textContent = score ? (base + ' · ' + score) : base;
+}
+function mkPaperBlock(key){
+  const title = key==='典范' ? '第四篇 · 碰撞典范论文' :
+    ({A:'第一篇 · 形态论文(A台)', B:'第二篇 · 条件论文(B台)', C:'第三篇 · 演化论文(C台)'}[key] || ('论文 · '+key));
+  const blk = mkBlock(papersPanel, 'paper', title, false);
+  blk.body.style.whiteSpace='pre-wrap';
+  const dl = document.createElement('div'); dl.className='dl';
+  dl.style.cssText='padding:9px 15px;border-top:1px solid rgba(255,255,255,0.06)';
+  const b1 = document.createElement('button'); b1.textContent='⬇ Word (.docx)'; b1.disabled=true;
+  const b2 = document.createElement('button'); b2.textContent='⬇ Markdown (.md)'; b2.disabled=true;
+  dl.appendChild(b1); dl.appendChild(b2);
+  blk.el.appendChild(dl);
+  blk.dlDocx=b1; blk.dlMd=b2;
+  return blk;
+}
+function renderPaper(text){
+  const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const lines = (text||'').split('\n');
+  let html='', first=true;
+  for(let raw of lines){
+    let t = raw.trim();
+    if(!t){ html+='<div style="height:9px"></div>'; continue; }
+    let forceHead=false; const hm=t.match(/^(#{1,6})\s+(.*)$/); if(hm){ t=hm[2]; forceHead=true; }
+    let line = esc(t).replace(/\*\*(.+?)\*\*/g,'<b style="color:#E5C86E">$1</b>');
+    if(first){ html+='<div style="font-size:19px;font-weight:800;color:#F0E9D6;text-align:center;margin:0 0 14px;line-height:1.5">'+line+'</div>'; first=false; continue; }
+    if(forceHead || /^(摘\s*要|关键词|引\s*言|结\s*论|参考文献|Abstract|Keywords)/.test(t) || /^[一二三四五六七八九十]+[、.]/.test(t)){
+      html+='<div style="font-size:15.5px;font-weight:700;color:#D4B25E;margin:20px 0 9px">'+line+'</div>'; continue;
+    }
+    html+='<div style="margin:0 0 9px;line-height:1.95">'+line+'</div>';
+  }
+  return html;
+}
+function finalizePaper(key, text){
+  const blk = RUN.papers[key]; if(!blk) return;
+  RUN.papersText[key] = text;
+  blk.body.style.whiteSpace='normal';
+  blk.body.innerHTML = renderPaper(text);
+  blk.open();
+  blk.meta.textContent = text.length + ' 字';
+  const fname = {A:'中华智问_形态论文', B:'中华智问_条件论文', C:'中华智问_演化论文', '典范':'中华智问_碰撞典范论文'}[key] || ('中华智问_'+key);
+  blk.dlDocx.disabled=false; blk.dlMd.disabled=false;
+  blk.dlDocx.onclick = ()=>{ saveDocx(fname+'.docx', firstLine(text)||fname, text, docMeta()).catch(e=>showErr('导出失败:'+e.message)); };
+  blk.dlMd.onclick = ()=>{ saveText(fname+'.md', text); };
+}
+function firstLine(t){ const m=(t||'').split('\n').map(s=>s.trim()).filter(Boolean); return m.length? m[0].replace(/^#+\s*/,'').slice(0,60):''; }
+function docMeta(){ return '中华智问知识发生器 · sdeuniverses.com · '+new Date().toLocaleString('zh-CN'); }
+
+// ============ 提示语装配 ============
+function roundSystem(agent, isR1, xinde){
+  let sp = isR1 ? SYSTEM_PROMPT_R1 : SYSTEM_PROMPT_UPLIFT;
+  sp = literalizePaths(sp, agent);
+  const skill = sanitizeSkillForAgent(SDE_BASE, agent);
+  let sys = PATH_LOCK[agent] + '\n\n'
+    + '你即将接收一份本体论先验,这份先验将成为你后续所有回答的内功底座。你已经完整学习过它,并亲手写下了学习心得(附在学习材料之后)。\n\n'
+    + '═══════════════════════ 学习材料开始 ═══════════════════════\n\n'
+    + skill
+    + '\n\n═══════════════════════ 学习材料结束 ═══════════════════════\n';
+  sys = withXinde(sys, xinde, '接下来六轮回答与论文,全部带着这个已内化的认知去做。');
+  sys += '\n以上是你的内功底座与你自己的学习心得。处在"已学习"状态下,按下面的纪律与输出格式执行任务:\n\n' + sp;
+  return sys;
+}
+function evalSystem(xinde){
+  let sys = '你即将接收一份本体论先验。你后续的任务是【独立评审】── 要评审 140+ 智商的产出,你必须先内化它产出所依据的内功底座。你已完整学习过它,并亲手写下了评审员学习心得(附在学习材料之后)。\n\n'
+    + '═══════════════════════ 学习材料开始 ═══════════════════════\n\n'
+    + SDE_BASE
+    + '\n\n═══════════════════════ 学习材料结束 ═══════════════════════\n';
+  sys = withXinde(sys, xinde, '接下来的全部评审,都带着这套已内化的评估纪律去做。');
+  sys += '\n以上是你的内功底座与你自己的评审心得。处在"已激活评审员"状态下,按下面的评估纪律执行任务:\n\n' + EVAL_PROMPT;
+  return sys;
+}
+function evalUserMsg(question, parsed){
+  return '【被评的问题】\n' + question + '\n\n'
+    + '【被评的回答】\n' + (parsed.answer||'') + '\n\n'
+    + '【作者的自评】\n  自评分数:' + (parsed.score||'') + ' 分\n  自评分析:' + (parsed.analysis||'') + '\n\n'
+    + '现在,请按你内化的 SDE 评估纪律(六判准 + 智商水位标尺 + 触发条件 + 失败模式识别),给出你的独立评分。严格三段输出格式。';
+}
+const ORDINALS = ['第一次','第二次','第三次','第四次','第五次','第六次','第七次','第八次','第九次','第十次'];
+function buildRoundUserMsg(question, history){
+  const parts = ['【问题】\n' + question + '\n'];
+  history.forEach((h, i)=>{
+    const ord = ORDINALS[i] || ('第 '+(i+1)+' 次');
+    parts.push('\n【' + ord + '摘要】');
+    parts.push(h.summary || h.answer || '');
+    if(h.reviews){
+      parts.push('\n🗡️ 【' + ord + '回答的两个评审 ── 下一轮的修正方向】\n' + h.reviews);
+    }
+  });
+  const nextOrd = ORDINALS[history.length] || ('第 '+(history.length+1)+' 次');
+  const lastReviews = history.length ? (history[history.length-1].reviews||'') : '';
+  parts.push('\n【现在】\n'
+    + '以上 ' + history.length + ' 个摘要,是你前 ' + history.length + ' 次回答的判断脉络蒸馏 ── '
+    + '每个摘要含核心命题、关键跨域召唤、单视角不可达判断、留下的盲区。\n'
+    + (lastReviews ? '⚠ 每个摘要后跟着【两个评审】── ①自审(基底自己按六判准评分)+ ②他审(独立评审员按六判准诊断)。两个评审是下一轮的修正方向。\n' : '')
+    + '基于这条判断脉络' + (lastReviews ? ' + 两个评审的修正方向' : '') + ',继续回答这个问题。\n'
+    + '给出' + nextOrd + '回答,显著超越以上所有 ── 挖出还没被讲到的新洞见,把这个问题往前推一步。\n'
+    + (lastReviews ? '⚠ 特别注意:两个评审已明确指出上一轮的失败模式(老调重弹 / 缺跨域召唤 / 陈词滥调 / 缺反直觉判断 等),你必须【正面切进】这些诊断,不是绕开。\n  · 自审指出的薄弱处 → 这一轮要补强\n  · 他审指出的失败模式 → 这一轮要跳出\n' : '')
+    + '⚠ 重要:你这一次的回答末尾,同样要给出 1800-2200 字的【## 本次摘要】,为下一次的"你"留下判断脉络。');
+  return parts.join('\n');
+}
+function packReviews(parsed, ev){
+  let s = '①自审:' + (parsed.score||'?') + ' 分——' + (parsed.analysis||'(无分析)');
+  if(ev && ev.score) s += '\n②他审(' + ev.vendor + '):' + ev.score + ' 分——' + (ev.analysis||'');
+  return s;
+}
+function compositeOf(parsed, ev){
+  const a = parseInt(parsed.score,10);
+  const b = ev ? parseInt(ev.score,10) : NaN;
+  const va = (!isNaN(a)&&a>=60&&a<=170) ? a : null;
+  const vb = (!isNaN(b)&&b>=60&&b<=170) ? b : null;
+  if(va!==null && vb!==null) return Math.round((va+vb)/2);
+  return va!==null ? va : (vb!==null ? vb : 138);
+}
+function paperSystem(agentOrNull, xinde){
+  const skill = SDE_BASE;   // 与桌面版一致:写论文阶段用完整内功(路径工作已在六轮完成,论文只需保份量)
+  let sys = '你即将接收两份本体论先验,然后基于 6 轮 SDE 提智的产出,撰写一篇 2 万字的学术论文。\n\n'
+    + '═══════════════════════ 第一部分:SDE 思想体系内功(用于保持判断的份量) ═══════════════════════\n\n'
+    + skill
+    + '\n\n═══════════════════════ 第二部分:学术论文写作 Skill(用于工程化论文) ═══════════════════════\n\n'
+    + PAPER_SKILL
+    + '\n\n═══════════════════════ 任务说明 ═══════════════════════\n\n'
+    + '你的任务是:\n'
+    + '1. 内化以上两份先验\n'
+    + '2. 基于用户提供的 6 轮 SDE 提智产出(最后一轮回答 + 全部摘要),\n'
+    + '   撰写一篇 18000-22000 字的完整学术论文\n'
+    + "3. 严守'零 SDE 内部行话'纪律 ── 所有 SDE 术语必须翻译成本地话语\n"
+    + '4. 保留 6 轮提智中经得起反驳的判断(单视角不可达 / 跨路径凝缩 / 学科底座改写)\n'
+    + '5. 完整 IMRaD 结构 + 摘要 + 关键词 + 参考文献 40-60 条。'
+    + "致谢可省略;若写致谢,只能是常规学术致谢(如感谢匿名审稿人/资助/同行讨论),"
+    + "**绝不可提及'多轮辩证''六轮推进''思想实验者''碰撞''角色扮演'等任何暴露生成过程的内容**\n\n"
+    + '请按论文写作 Skill 中的输出格式产出完整论文。';
+  sys = withXinde(sys, xinde, '这篇论文带着这个已内化的认知去写。');
+  return sys;
+}
+function paperMaterials(question, summaries, finalAnswer){
+  const parts = ['# 原始议题\n\n' + question + '\n\n',
+    '# 6 轮 SDE 提智的判断脉络(从 R1 到 R N 的摘要)\n\n'];
+  summaries.forEach((s,i)=>{ parts.push('## R'+(i+1)+' 摘要\n\n'+s+'\n\n'); });
+  parts.push('# 最后一轮(R'+summaries.length+')的完整回答 ── 这是论文的核心素材\n\n'+(finalAnswer||'')+'\n\n');
+  parts.push('# 现在请撰写论文\n\n'
+    + '基于以上 6 轮提智材料,特别是最后一轮的完整回答,撰写一篇 18000-22000 字的完整学术论文。\n\n'
+    + '**关键要求**:\n'
+    + '1. 论文核心论点必须基于最后一轮回答中经得起反驳的判断\n'
+    + '2. 文献综述要构造可信的研究脉络(可虚构作者名 + 年份,但引用必须看起来真实)\n'
+    + '3. 理论框架部分要把提智中调用的跨学科资源(如有)显式说明其有效性\n'
+    + '4. 分析与讨论是核心,字数最多(5000-7000 字),要把核心判断完整展开\n'
+    + "5. 结论的'未来研究方向'要给出 3-5 个可生长的研究纲领\n"
+    + '5b. **【可证伪性 · 论文上 160 的关键】如果素材里有具体的经验证伪条件'
+    + '("控制[竞争解释]后若[本机制独有变量]不成立则本理论为伪"这类),必须在论文里单设一节(放在\'讨论\'或\'局限与检验\'章)'
+    + '完整保留并展开成可操作的检验设计 ── 必须包含三件:①本理论面对的最强竞争解释(那个\'其实不就是X吗\');'
+    + '②怎样的研究设计能控制掉该竞争解释(样本/变量/对照);③什么结果会推翻本理论、并指向不同的干预方向。'
+    + "绝不可稀释成'有待未来研究检验'这类空话,也不可只说'本现象存在即成立'(那是现象证伪,不够)。"
+    + '一个能排除竞争解释的检验设计,是本文最硬的学术分量。**\n'
+    + '6. 严守零内部行话纪律(见下方第 8 条硬约束)\n'
+    + '7. 最终字数 18000-22000 字,严格按论文写作 Skill 的章节字数分配\n'
+    + '8. **【输出前自检 · 硬约束 · 不可跳过】写完整篇后,在交付前自己通读一遍,逐一搜索并清除两类字样:\n'
+    + '   (一)内部引擎术语:"SDE"、"三视角"、"纠缠"/"纠缠网络"、"差异序列"、"结构显露态"、"改姓爪"、"跨路径凝缩"、"提智"、"Q1/Q2/Q3/Q4"、"R1/R2…R6"、"发生学"、"介生态"、"三界";\n'
+    + '   (二)暴露生成过程的字样:"多轮辩证"、"六轮推进/六轮辩证"、"思想实验者"、"三焦碰撞/混沌碰撞/碰撞之眼"、"角色扮演/扮演立场"、"评判角色"、"概念锻造/精炼过程"、"由 AI/大模型/语言模型生成"。这类字样最容易藏在\'致谢\'里 ── 致谢若出现\'在长达六轮的辩证推进中,十余位思想实验者...\'这种描述,一律删除整段或改为常规学术致谢。\n'
+    + '这两类字样绝不能出现在论文任何位置(包括标题、摘要、写作说明、过渡句、方法论对自身的描述、致谢、声明、脚注、参考文献注释)。'
+    + '凡发现一处,就地改写成目标学科的本地话语后再交付 ── 例如"SDE 6 轮提智"改为"6 轮概念建构","跨路径凝缩"改为"多视角综合","差异序列"改为该学科的对应概念;暴露过程的致谢直接删除或改为常规学术致谢。'
+    + '交付的论文里,这两类字样出现次数都必须为 0。**\n\n'
+    + '不要在论文里写任何"我将把…""我已准备好…"之类的元层写作说明,直接产出论文本体。\n\n'
+    + '请按论文写作 Skill 第六部分的输出格式产出完整论文。');
+  return parts.join('');
+}
+
+// ============ 碰撞提示语(桌面版逐字移植)============
+function checkPrompt(q, A, B, C){
+  return '针对议题「'+q+'」,有三个本应来自不同视角的判断:\n\n'
+    + '【判断A · 应回答"它定型成什么形态/结构"】\n'+A.slice(0,3000)+'\n\n'
+    + '【判断B · 应回答"它靠什么条件维持"】\n'+B.slice(0,3000)+'\n\n'
+    + '【判断C · 应回答"它经什么序列演化、最后走向什么终局"】\n'+C.slice(0,3000)+'\n\n'
+    + '请做一次严格的"原料体检",只判断一件事:这三个判断是否真的各落在三个不同的面上?\n'
+    + '重点检查:有没有两个判断其实在讲同一个面(只是措辞不同)——这叫"撞车"。\n'
+    + '例如:B 和 C 如果都在讲"某种时间框架/制度与个体的冲突",那它们就撞在同一面,真正的"演化序列(它怎么一步步演变、在哪一步终结)"这个面就缺失了。\n\n'
+    + '输出严格用这个格式(不要多余的话):\n'
+    + '撞车判定: 是 / 否\n'
+    + '若为是: 撞车的两台是 __ 和 __ ; 缺失的面是 __(形态/条件/演化 三选一)\n'
+    + '理由: (一句话)';
+}
+function supplementPrompt(q, missing, A, B, C){
+  const faceQ = {
+    '形态':'它最终定型成一个什么样子的结构/格局(只回答形态,不回答靠什么维持、不回答怎么演化)',
+    '条件':'它靠什么条件/机制维持下去(只回答维持机制,不回答是什么形态、不回答怎么演化)',
+    '演化':'它经什么阶段一步步演变、最后走向什么终局/转向(只回答演化序列与终点,不回答是什么形态、不回答靠什么维持)',
+  }[missing] || '';
+  const j1 = missing!=='形态' ? A.slice(0,1500) : B.slice(0,1500);
+  const j2 = missing!=='演化' ? C.slice(0,1500) : B.slice(0,1500);
+  return '针对议题「'+q+'」,现在需要你专门补出一个被忽略的分析面。\n'
+    + '已有的两个判断(供你避开、不要重复):\n'
+    + '判断一:'+j1+'\n'
+    + '判断二:'+j2+'\n\n'
+    + '你的任务:专门回答"'+faceQ+'"。\n'
+    + '要求:给出 3-5 条该面上最锋利、最不平庸的关键判断/概念,每条 1-2 句,互不重复,且明显不同于上面两个已有判断的角度。只输出这 3-5 条,不要铺垫。';
+}
+function collideP1(q, A, B, C){
+  return '针对同一议题「'+q+'」,有三个来自不同视角的判断:\n\n'
+    + '判断 A(形态视角,回答"它定型成什么形态"):\n'+A+'\n\n'
+    + '判断 B(条件视角,回答"它靠什么条件维持"):\n'+B+'\n\n'
+    + '判断 C(演化视角,回答"它经什么序列演化、何时终结"):\n'+C+'\n\n'
+    + '请严格执行 3 次两两碰撞,每对四步:\n'
+    + '【A×B】焦点=几何 vs 功能:A 把形态当给定,B 问形态服务于什么功能——二者在哪里打架?展开打架结果(A 单独/B 单独都看不到的东西),命名一个新涌现物(≤20字,结构性命名)。\n'
+    + '【A×C】焦点=几何 vs 时间:A 把结构当恒定,C 揭示它在变化——二者在哪里打架?展开,命名涌现物。\n'
+    + '【B×C】焦点=功能 vs 时间:B 把维持条件当稳定,C 揭示条件会耗尽——二者在哪里打架?展开,命名涌现物。\n\n'
+    + '要求:每对必须是"打架"(一个说X一个说非X),不是互补;涌现物必须是新结构,不是三判断的换皮。\n'
+    + '输出一张表:| 对 | 打架焦点 | 撞击结果 | 涌现物 |。\n' + COLLISION_DISCIPLINE;
+}
+function collideP2(q, step1){
+  return '针对议题「'+q+'」,已得到三个涌现物及其碰撞过程:\n\n'+step1+'\n\n'
+    + '请回答:这三个涌现物共同指向哪一个深层机制?\n'
+    + '- 这个机制通常同时解释两件看似矛盾的事(例如:它为何坚固 / 它为何崩塌或失效)。\n'
+    + '- 用 ≤15 字给这条暗流一个结构性命名。\n'
+    + '- 检验:这条暗流是否由全部 3 个涌现物共同支撑?若某个涌现物游离在外,指出它并说明原因。\n'
+    + '输出:1 条暗流命名 + 它如何被 3 个涌现物支撑。\n' + COLLISION_DISCIPLINE;
+}
+function collideP3(q, step2){
+  return '针对议题「'+q+'」,已得到一条暗流及其支撑:\n\n'+step2+'\n\n'
+    + '(三个原始判断 A/B/C 见上文,分别是形态、条件、演化三个视角。)\n\n'
+    + '请严格执行涌现工程:\n'
+    + '第一步:在三视角交点命名一个新典范(≤30字,结构性命名),并写一句不可还原性论证:"它只存在于[A的几何]×[B的功能]×[C的时间]的交点,删任一则坍塌。"\n'
+    + '第二步:四重检验(任一不过则重命名):\n'
+    + '  (1) 不可还原:能从单个判断推出吗?应:不能。逐一说明 A见X不见Y / B见Y不见Z / C见Z不见X。\n'
+    + '  (2) 不可消解:能用既有概念(路径依赖/系统失灵/替罪羊/内卷/收编等)替代吗?应:不能,逐一"它不是X,因为…"。\n'
+    + '  (3) 跨学科:列 ≥5 个学科 + 每个 ≤30 字的结构同构兑现(不是表面类比)。\n'
+    + '  (4) 【可证伪条件 · 这一条决定典范能否破 155】给出一条**具体、可操作、有真实失败风险**的经验证伪条件 ──\n'
+    + '      第一步【先找竞争解释】:写出针对本典范现象的**最强竞争解释**(那个最朴素、最难反驳的\'其实不就是X吗\'──例如\'其实不就是工作量太大累的吗\'\'其实不就是性别歧视吗\'\'其实不就是内卷吗\')。\n'
+    + '      第二步【证伪条件必须能排除竞争解释】:证伪条件不能只验证\'本典范描述的现象存在\'(那叫现象证伪,太弱,F封顶148);必须拎出**只有本机制成立才会出现、竞争解释predict不出**的那个独有变量,在**控制掉竞争解释之后**仍要求它成立。\n'
+    + '      格式:"控制[竞争解释的变量]后,若[本机制独有变量]与[结果]之间不存在[剂量-反应/特定关联],则本典范为伪。"\n'
+    + '      合格示范(机制证伪):"控制工作总量与收入后,若\'缓冲层剥离速度\'与崩解风险之间不存在剂量-反应关系,则本机制为伪 ── 届时困境应归因于绝对负荷而非缓冲结构。"(这条排除了\'就是累的\'这个竞争解释)\n'
+    + '      不合格(现象证伪,F压148):"若这类人群中崩解高发,则成立"(没排除\'高强度职业本就高发\'这个竞争解释)。\n'
+    + '      不合格(空泛废话,一律重写):"若未来研究发现反例则需修正""在某些情况下可能不成立"。\n'
+    + '      证伪条件必须真有可能被现实推翻 ── 一个永远不会被触发的条件等于没有。\n'
+    + '      再补一句:这条典范若被证伪,我们会因此学到什么新东西?(证伪本身的理论价值,通常指向不同的干预方向)\n'
+    + '第三步:5 维评分(S 0.20 / D 0.25 / E 0.20 / I 0.20 / F 0.15),给 5 个独立维度分 + 加权综合 + 层级判定 + 至少一句扣分句。\n'
+    + '  铁律一:I 维(不可还原性)必须有"删引用独立成立 / 命名了一个未被任何学科辨识的现象"的证据,才可给 150+。\n'
+    + '  铁律二:F 维(可证伪性)分两档判:\n'
+    + '         · 现象证伪(只验证\'本典范描述的现象存在\',未排除竞争解释)→ F 封顶 148;\n'
+    + '         · 机制证伪(控制掉最强竞争解释后,本机制独有变量仍须成立)→ F 才可给 150-155;\n'
+    + '         · 只给空泛废话或自我警告(非经验可检验)的 → F 一律压在 130 以下。\n'
+    + '  评分纪律:实事求是,既不膨胀也不刻意压低。若五维确有证据支撑(尤其 I 过门槛、F 做到机制证伪),综合到 156-162 就如实给到,不要人为设上限;但 F 维只到现象证伪(未排除竞争解释)时,综合不得超过 153。\n'
+    + '输出:新典范命名 + 不可还原论证 + 四重检验(含可证伪条件) + 5维评分 + 跨学科地图。\n' + COLLISION_DISCIPLINE;
+}
+
+// ============ 运行状态 ============
+let RUNNING = false;
+let RUN = null;
+
+function resetRunUI(){
+  xindePanel.innerHTML=''; lanesPanel.innerHTML=''; collisionPanel.innerHTML=''; papersPanel.innerHTML='';
+  iqCurve.innerHTML='';
+  phaseCollision.style.display='none'; collisionPanel.style.display='none';
+  reportPanel.style.display='none';
+  hideErr();
+}
+function stopRun(){
+  if(!RUNNING) return;
+  RUN_STOPPED = true;
+  for(const ac of RUN_ABORTS){ try{ ac.abort(); }catch(_){} }
+  RUN_ABORTS.clear();
+  runHint.textContent='已发出停止指令,正在收尾…';
+}
+stopBtn.addEventListener('click', stopRun);
+clearBtn.addEventListener('click', ()=>{
+  if(RUNNING) stopRun();
+  RUNNING=false;
+  resetRunUI();
+  runArea.style.display='none';
+  goBtn.disabled=false; stopBtn.style.display='none';
+  runHint.textContent='';
+});
+
+// ============ 心得生成(真两段内功提智第一段)============
+async function genXinde(kind, agent, sel, key, blk){
+  blk.open();
+  let sys, task;
+  if(kind==='产出'){
+    const skill = sanitizeSkillForAgent(SDE_BASE, agent);
+    sys = PATH_LOCK[agent] + '\n\n'
+      + '你即将接收一份本体论先验,这份先验将成为你后续所有工作的内功底座。\n'
+      + '第一步是真正学习它:逐字读完,然后写一份深度学习心得 ── 心得质量决定你后续工作的判断份量。\n\n'
+      + '═══════════════════════ 学习材料开始 ═══════════════════════\n\n'
+      + skill
+      + '\n\n═══════════════════════ 学习材料结束 ═══════════════════════\n\n'
+      + '现在按用户的心得写作指令,产出你的学习心得。只输出心得本身,不要任何前言后语或元层说明。';
+    task = xindeTaskText('产出', agent);
+  }else if(kind==='评审'){
+    sys = '你即将接收一份本体论先验。你后续的任务是【独立评审】── 但要评审 140+ 智商的产出,你必须先真正内化它产出所依据的内功底座。\n'
+      + '第一步是学习:逐字读完,然后写一份评审员学习心得。\n\n'
+      + '═══════════════════════ 学习材料开始 ═══════════════════════\n\n'
+      + SDE_BASE
+      + '\n\n═══════════════════════ 学习材料结束 ═══════════════════════\n\n'
+      + '现在按用户的心得写作指令,产出你的学习心得。只输出心得本身。';
+    task = xindeTaskText('评审');
+  }else{
+    sys = SDE_BASE + '\n\n' + COLLISION_PRIOR + '\n\n'
+      + '现在先不执行碰撞任务:第一步是把上面的内功与碰撞之眼真正学进去,按用户的心得写作指令写出你的学习心得。只输出心得本身。';
+    task = xindeTaskText('碰撞');
+  }
+  try{
+    const res = await streamChat(key, sel, sys, task, blk.body, blk.st, blk.meta, blk.el, XINDE_TOKENS);
+    const t = (res && res.text || '').trim();
+    if(t.length >= XINDE_MIN_OK){ blk.st.textContent='✓ 心得完成('+t.length+' 字)'; return {text:t, ok:true}; }
+    blk.st.textContent='⚠ 心得过短('+t.length+' 字)· 已改用合成确认,主流程继续';
+    return {text:'', ok:false};
+  }catch(e){
+    blk.st.textContent='⚠ 心得失败 · 已改用合成确认,主流程继续';
+    if(!blk.body.textContent) blk.body.textContent='(心得生成失败:'+(e&&e.message||e)+')';
+    return {text:'', ok:false};
+  }
+}
+
+// ============ 单台六轮 + 论文 ============
+async function runLane(agent){
+  const L = RUN.lanes[agent];
+  const history = [];
+  let prevComp = 0;
+  for(let rnd=1; rnd<=6; rnd++){
+    if(RUN_STOPPED) throw new Error('已手动停止');
+    setChip(L, rnd, 'on');
+    L.st.innerHTML='<span class="spinner"></span> 第'+rnd+'/6轮 · '+ROUND_LABEL[rnd];
+    const sys = roundSystem(agent, rnd===1, RUN.xinde['DS-'+agent]||'');
+    const usr = rnd===1 ? RUN.question : buildRoundUserMsg(RUN.question, history);
+    const sub = mkSub(L.body, '第'+rnd+'轮 · '+ROUND_LABEL[rnd]);
+    let res;
+    try{
+      res = await streamChat(RUN.key, RUN.sel, sys, usr, sub.body, sub.status, sub.meta, sub.col, ROUND_TOKENS);
+    }catch(e){ setChip(L, rnd, 'bad'); throw e; }
+    const parsed = parseResponse(res.text||'');
+    if(!parsed.answer && !parsed.summary){ setChip(L, rnd, 'bad'); throw new Error('第'+rnd+'轮返回为空'); }
+    let ev = null;
+    if(RUN.evalOn){
+      if(RUN_STOPPED) throw new Error('已手动停止');
+      const esub = mkSub(L.body, '第'+rnd+'轮 · 独立他审('+vendorName(RUN.evalSelV)+')');
+      try{
+        const er = await streamChat(RUN.evalKey, RUN.evalSelV, evalSystem(RUN.xinde['EVAL']||''), evalUserMsg(RUN.question, parsed), esub.body, esub.status, esub.meta, esub.col, EVAL_TOKENS);
+        const ep = parseEvalResponse(er.text||'');
+        if(ep.score){ ev = {score: ep.score, analysis: ep.analysis, vendor: vendorName(RUN.evalSelV)}; }
+        else{ esub.status.textContent='⚠ 他审解析为空(本轮按自评计)'; }
+      }catch(e){ esub.status.textContent='⚠ 他审失败(本轮按自评计):'+String(e&&e.message||e).slice(0,60); }
+    }
+    let comp = compositeOf(parsed, ev);
+    if(history.length && prevComp && (prevComp - comp) > 25){ comp = prevComp; } // 防误抓暴跌
+    prevComp = comp;
+    history.push({ summary: parsed.summary, answer: parsed.answer, score: parsed.score,
+      analysis: parsed.analysis, evalScore: ev?ev.score:'', reviews: packReviews(parsed, ev), composite: comp });
+    setChip(L, rnd, 'done', comp);
+  }
+  // —— 本台论文 ——
+  if(RUN_STOPPED) throw new Error('已手动停止');
+  setChip(L, 7, 'on');
+  L.st.innerHTML='<span class="spinner"></span> 写本台论文(约 2 万字,单步可能十几分钟)';
+  const pb = RUN.papers[agent];
+  pb.open(); pb.st.innerHTML='<span class="spinner"></span> 生成中';
+  let ptext = '';
+  try{
+    const pr = await streamChat(RUN.key, RUN.sel, paperSystem(agent, RUN.xinde['DS-'+agent]||''),
+      paperMaterials(RUN.question, history.map(h=>h.summary||''), history[5].answer||history[5].summary||''),
+      pb.body, pb.st, pb.meta, pb.el, PAPER_TOKENS);
+    ptext = (pr && pr.text || '').trim();
+  }catch(e){ pb.st.textContent='✗ 论文生成失败:'+String(e&&e.message||e).slice(0,80); }
+  if(!ptext){
+    ptext = (history[5].answer || history[5].summary || '').trim();
+    pb.st.textContent = (pb.st.textContent||'') + ' · 已用第 6 轮收口全文兜底';
+  }
+  ptext = dejargonOutput(ptext);
+  finalizePaper(agent, ptext);
+  setChip(L, 7, 'done');
+  L.st.textContent='✓ 本台完成(六轮 + 论文)';
+  return { history, paper: ptext };
+}
+
+// ============ 碰撞(完整档)============
+async function runCollision(){
+  phaseCollision.style.display='block'; collisionPanel.style.display='block';
+  const q = RUN.question;
+  const MAXP = 60000;
+  let A = RUN.papersText['A'].slice(0, MAXP);
+  let B = RUN.papersText['B'].slice(0, MAXP);
+  let C = RUN.papersText['C'].slice(0, MAXP);
+  const colSys = withXinde(SDE_BASE + '\n\n' + COLLISION_PRIOR, RUN.xinde['碰撞']||'', '接下来的全部碰撞动作,都带着这个已内化的碰撞之眼去做。');
+  const NEUTRAL = '你是严谨、克制的学术判断者。只按指令输出,不加任何多余的话。';
+  // ① 原料体检
+  const bk1 = mkBlock(collisionPanel, 'colStep', '原料体检 · 三路是否各落一面', true);
+  let checkup='';
+  try{
+    const r = await streamChat(RUN.key, RUN.sel, NEUTRAL, checkPrompt(q,A,B,C), bk1.body, bk1.st, bk1.meta, bk1.el, COLLIDE_TOKENS);
+    checkup=(r.text||'').trim(); bk1.st.textContent='✓ 完成';
+  }catch(e){ bk1.st.textContent='⚠ 体检失败,直接硬撞:'+String(e&&e.message||e).slice(0,50); }
+  const crashed = /撞车判定[::\s]*是/.test(checkup);
+  let missing=''; if(crashed){ const mm=checkup.match(/缺失的面是\s*([形态条件演化]{2})/); missing=mm?mm[1]:''; }
+  if(crashed && missing){
+    if(RUN_STOPPED) throw new Error('已手动停止');
+    const bk2 = mkBlock(collisionPanel, 'colStep', '撞车补料 · 从模型库补出缺失的「'+missing+'」面', true);
+    try{
+      const r = await streamChat(RUN.key, RUN.sel, NEUTRAL, supplementPrompt(q,missing,A,B,C), bk2.body, bk2.st, bk2.meta, bk2.el, COLLIDE_TOKENS);
+      const sup=(r.text||'').trim();
+      if(sup){
+        const blockTxt='\n\n【补充 · '+missing+'面的关键判断(从模型库补出,用于补齐缺失面)】\n'+sup;
+        if(missing==='形态') A+=blockTxt; else if(missing==='条件') B+=blockTxt; else C+=blockTxt;
+      }
+      bk2.st.textContent='✓ 完成';
+    }catch(e){ bk2.st.textContent='⚠ 补料失败,继续硬撞'; }
+  }
+  // ② 三段碰撞
+  if(RUN_STOPPED) throw new Error('已手动停止');
+  const s1 = mkBlock(collisionPanel, 'colStep', '第①步 · 混沌碰撞(三对两两互消)', true);
+  const r1 = await streamChat(RUN.key, RUN.sel, colSys, collideP1(q,A,B,C), s1.body, s1.st, s1.meta, s1.el, COLLIDE_TOKENS);
+  const step1=(r1.text||'').trim(); if(!step1) throw new Error('碰撞第①步返回为空');
+  if(RUN_STOPPED) throw new Error('已手动停止');
+  const s2 = mkBlock(collisionPanel, 'colStep', '第②步 · 自组织(三涌现物收敛为暗流)', true);
+  const r2 = await streamChat(RUN.key, RUN.sel, colSys, collideP2(q,step1), s2.body, s2.st, s2.meta, s2.el, COLLIDE_TOKENS);
+  const step2=(r2.text||'').trim(); if(!step2) throw new Error('碰撞第②步返回为空');
+  if(RUN_STOPPED) throw new Error('已手动停止');
+  const s3 = mkBlock(collisionPanel, 'colStep', '第③步 · 涌现典范 + 四重检验 + 五维评分', true);
+  const r3 = await streamChat(RUN.key, RUN.sel, colSys, collideP3(q,step2), s3.body, s3.st, s3.meta, s3.el, COLLIDE_TOKENS);
+  const step3=(r3.text||'').trim(); if(!step3) throw new Error('碰撞第③步返回为空');
+  RUN.collisionSteps = {checkup, step1, step2, step3};
+  // ③ 第四篇典范论文(复用碰撞器心得)
+  if(RUN_STOPPED) throw new Error('已手动停止');
+  const pb = RUN.papers['典范'];
+  pb.open(); pb.st.innerHTML='<span class="spinner"></span> 把典范写成第四篇论文(约 2 万字)';
+  let ptext='';
+  try{
+    const pr = await streamChat(RUN.key, RUN.sel, paperSystem(null, RUN.xinde['碰撞']||''),
+      paperMaterials(q,
+        ['第①步·混沌碰撞(三对两两互消):\n'+step1, '第②步·自组织(暗流):\n'+step2, '第③步·涌现典范+四重检验+评分:\n'+step3],
+        step3),
+      pb.body, pb.st, pb.meta, pb.el, PAPER_TOKENS);
+    ptext=(pr && pr.text || '').trim();
+  }catch(e){ pb.st.textContent='✗ 第四篇生成失败:'+String(e&&e.message||e).slice(0,80); }
+  if(!ptext){ ptext = step3; pb.st.textContent=(pb.st.textContent||'')+' · 已用第③步典范全文兜底'; }
+  ptext = dejargonOutput(ptext);
+  finalizePaper('典范', ptext);
+}
+
+// ============ 报告与导出 ============
+function buildReport(){
+  reportPanel.style.display='block';
+  // 智商曲线表
+  let html='<table class="iq"><tr><th>台</th>';
+  for(let i=1;i<=6;i++) html+='<th>R'+i+' · '+ROUND_LABEL[i]+'</th>';
+  html+='<th>论文</th></tr>';
+  for(const ag of RUN.agents){
+    const h = RUN.histories[ag];
+    html+='<tr><td>'+AGENT_NAME[ag]+'</td>';
+    for(let i=0;i<6;i++){ html += '<td>'+(h && h[i] ? h[i].composite : '—')+'</td>'; }
+    html+='<td>'+(RUN.papersText[ag] ? (RUN.papersText[ag].length+' 字') : '—')+'</td></tr>';
+  }
+  if(RUN.full && RUN.papersText['典范']){
+    html+='<tr><td>碰撞典范</td><td colspan="6" style="text-align:left">体检 → 三对打架 → 暗流 → 典范 + 四重检验 + 五维评分</td><td>'+RUN.papersText['典范'].length+' 字</td></tr>';
+  }
+  html+='</table>';
+  iqCurve.innerHTML = html;
+  $('dlReportBtn').onclick = ()=>{ saveDocx('中华智问_全程报告.docx', '中华智问知识发生器 · 全程报告', reportText(), docMeta()).catch(e=>showErr('导出失败:'+e.message)); };
+  $('dlXindeBtn').onclick = ()=>{ saveDocx('中华智问_内功心得汇编.docx', '内功学习心得汇编(真两段提智 · 第一段产物)', xindeText(), docMeta()).catch(e=>showErr('导出失败:'+e.message)); };
+  $('dlAllBtn').onclick = async ()=>{
+    const order = RUN.full ? ['A','B','C','典范'] : RUN.agents.slice();
+    for(const k of order){
+      if(!RUN.papersText[k]) continue;
+      const fname = {A:'中华智问_形态论文', B:'中华智问_条件论文', C:'中华智问_演化论文', '典范':'中华智问_碰撞典范论文'}[k];
+      try{ await saveDocx(fname+'.docx', firstLine(RUN.papersText[k])||fname, RUN.papersText[k], docMeta()); }catch(e){ showErr('导出 '+fname+' 失败:'+e.message); }
+      await new Promise(r=>setTimeout(r, 350));
+    }
+  };
+}
+function reportText(){
+  const p=[];
+  p.push('# 中华智问知识发生器 · 全程报告\n');
+  p.push('议题:'+RUN.question);
+  p.push('写作基底:'+vendorName(RUN.sel)+'('+RUN.sel+') · 评审:'+(RUN.evalOn?vendorName(RUN.evalSelV):'关闭(仅自评)')+' · 档位:'+(RUN.full?'完整三焦档':'快速单台档'));
+  p.push('生成时间:'+new Date().toLocaleString('zh-CN')+'\n');
+  for(const ag of RUN.agents){
+    const h = RUN.histories[ag]; if(!h) continue;
+    const cfg = PATH_CFG[ag];
+    p.push('## '+AGENT_NAME[ag]+' · 路径 '+cfg.Z+' / '+cfg.L+' · 落点 '+cfg.T+'\n');
+    h.forEach((r,i)=>{
+      p.push('### 第'+(i+1)+'轮 · '+ROUND_LABEL[i+1]+' · 综合 '+r.composite+'(自评 '+r.score+(r.evalScore?' / 他审 '+r.evalScore:'')+')');
+      p.push('**两评审**:\n'+(r.reviews||''));
+      p.push('**本轮摘要**:\n'+(r.summary||'')+'\n');
+    });
+    if(RUN.papersText[ag]) p.push('本台论文:'+RUN.papersText[ag].length+' 字(见单独 Word 文件)\n');
+  }
+  if(RUN.full && RUN.collisionSteps && RUN.collisionSteps.step1){
+    p.push('## 三焦碰撞全过程\n');
+    if(RUN.collisionSteps.checkup) p.push('### 原料体检\n'+RUN.collisionSteps.checkup+'\n');
+    p.push('### 第①步 · 混沌碰撞\n'+RUN.collisionSteps.step1+'\n');
+    p.push('### 第②步 · 自组织(暗流)\n'+RUN.collisionSteps.step2+'\n');
+    p.push('### 第③步 · 涌现典范 + 四重检验 + 五维评分\n'+RUN.collisionSteps.step3+'\n');
+    if(RUN.papersText['典范']) p.push('第四篇典范论文:'+RUN.papersText['典范'].length+' 字(见单独 Word 文件)\n');
+  }
+  p.push('\n(本报告为内部工作记录,含轮次与评审元语言;四篇论文均已按学科本地话语清洗交付。)');
+  return p.join('\n');
+}
+function xindeText(){
+  const label = {'DS-A':'形态聚焦台(A)','DS-B':'条件聚焦台(B)','DS-C':'演化聚焦台(C)','碰撞':'碰撞器','EVAL':'评审员'};
+  const p=['# 内功学习心得汇编\n','议题:'+RUN.question,'(每个工作基底开工前逐字读完 SDE 内功,各写约 '+XINDE_TARGET_CHARS+' 字心得;本汇编为真两段提智的第一段产物)\n'];
+  for(const k of ['DS-A','DS-B','DS-C','碰撞','EVAL']){
+    if(RUN.xinde[k]){
+      p.push('## '+(label[k]||k)+' · '+RUN.xinde[k].length+' 字\n');
+      p.push(RUN.xinde[k]+'\n');
+    }
+  }
+  return p.join('\n');
+}
+// —— docx 导出 ——
+function runsOf(s, opt){
+  opt = opt || {};
+  const { TextRun } = docx;
+  const out = [];
+  String(s).split('**').forEach((seg,i)=>{
+    if(!seg) return;
+    out.push(new TextRun({ text: seg, bold: (i%2===1)||!!opt.bold, size: opt.size||24, color: opt.color }));
+  });
+  return out.length ? out : [new TextRun({text:'', size:opt.size||24})];
+}
+function mdParasLite(text, size){
+  const { Paragraph, TextRun } = docx;
+  const paras=[];
+  for(const raw of (text||'').split('\n')){
+    const t = raw.trim();
+    if(!t) continue;
+    const h = t.match(/^(#{1,6})\s+(.*)$/);
+    if(h){
+      const lvl=h[1].length; const sz = lvl<=1?32 : lvl===2?28 : 26;
+      paras.push(new Paragraph({ children: runsOf(h[2], {bold:true, size:sz}), spacing:{before:220, after:120} }));
+      continue;
+    }
+    if(/^\|.*\|$/.test(t)){
+      if(/^\|[\s:|-]+\|$/.test(t)) continue;
+      const cells = t.replace(/^\||\|$/g,'').split('|').map(c=>c.trim().replace(/\*\*/g,''));
+      paras.push(new Paragraph({ children:[new TextRun({text: cells.join('    '), size})], spacing:{after:80} }));
+      continue;
+    }
+    if(/^(-{3,}|\*{3,}|_{3,})$/.test(t)){
+      paras.push(new Paragraph({ children:[new TextRun({text:'———', color:'BBBBBB', size})], alignment:'center', spacing:{before:80,after:80} }));
+      continue;
+    }
+    paras.push(new Paragraph({ children: runsOf(t, {size}), spacing:{after:140, line:340} }));
+  }
+  return paras;
+}
+async function saveDocx(filename, title, bodyText, metaLine){
+  const { Document, Packer, Paragraph, TextRun } = docx;
+  const kids = [
+    new Paragraph({ children:[new TextRun({text:title, bold:true, size:36})], alignment:'center', spacing:{after:120} }),
+    new Paragraph({ children:[new TextRun({text:metaLine||'', size:20, color:'888888'})], alignment:'center', spacing:{after:240} }),
+    ...mdParasLite(bodyText, 24)
+  ];
+  const doc = new Document({ sections:[{ children: kids }] });
+  const blob = await Packer.toBlob(doc);
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href=url; a.download=filename; a.click();
+  URL.revokeObjectURL(url);
+}
+function saveText(filename, text){
+  const blob = new Blob([text], {type:'text/markdown;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href=url; a.download=filename; a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ============ 主编排 ============
+async function run(){
+  hideErr();
+  if(RUNNING) return;
+  const q = (questionEl.value||'').trim();
+  if(!q){ showErr('请先填写议题。'); return; }
+  const sel = modelSel.value;
+  const key = (apiKeyEl.value||'').trim();
+  if(!key){ showErr('请填写 '+vendorName(sel)+' API Key。'); return; }
+  const evalV = evalSel.value;
+  let evalOn=false, evalSelV='', evalKey='';
+  if(evalV==='follow'){ evalOn=true; evalSelV=sel; evalKey=key; }
+  else if(evalV!=='off'){
+    evalOn=true; evalSelV=evalV;
+    evalKey = (parseModel(evalV).vendor===parseModel(sel).vendor) ? key : (evalKeyEl.value||'').trim();
+    if(!evalKey){ showErr('评审基底('+vendorName(evalV)+')需要单独的 API Key,或改选"跟随写作基底"。'); return; }
+  }
+  const full = modeFull.classList.contains('sel');
+  const agents = full ? ['A','B','C']
+    : [ fastFocus.value==='rand' ? ['A','B','C'][Math.floor(Math.random()*3)] : fastFocus.value ];
+  try{ await ensurePriors(); }catch(e){ showErr(e.message); return; }
+  resetRunUI();
+  RUNNING = true; RUN_STOPPED = false; RUN_ABORTS.clear();
+  goBtn.disabled = true; stopBtn.style.display='inline-block';
+  runHint.textContent = full ? '完整三焦档运行中…' : ('快速单台档 · '+AGENT_NAME[agents[0]]+' 运行中…');
+  RUN = { question:q, sel, key, evalOn, evalSelV, evalKey, full, agents,
+          xinde:{}, xindeOk:{}, lanes:{}, papers:{}, histories:{}, papersText:{}, collisionSteps:{}, t0:Date.now() };
+  runArea.style.display='block';
+  try{
+    // ── 阶段一:内功学习(并行写心得)──
+    const jobs = [];
+    for(const ag of agents){
+      const blk = mkBlock(xindePanel, 'xindeBlock', AGENT_NAME[ag]+' · 内功学习心得(约'+XINDE_TARGET_CHARS+'字)');
+      jobs.push(genXinde('产出', ag, sel, key, blk).then(r=>{
+        RUN.xinde['DS-'+ag] = r.ok ? r.text : fallbackXinde(ag);
+        RUN.xindeOk['DS-'+ag] = r.ok;
+      }));
+    }
+    if(full){
+      const cblk = mkBlock(xindePanel, 'xindeBlock', '碰撞器 · 内功+碰撞之眼学习心得(约'+XINDE_TARGET_CHARS+'字)');
+      jobs.push(genXinde('碰撞', null, sel, key, cblk).then(r=>{ RUN.xinde['碰撞'] = r.ok ? r.text : ''; }));
+    }
+    if(evalOn){
+      const eblk = mkBlock(xindePanel, 'xindeBlock', '评审员('+vendorName(evalSelV)+') · 评审纪律心得(约'+XINDE_TARGET_CHARS+'字)');
+      jobs.push(genXinde('评审', null, evalSelV, evalKey, eblk).then(r=>{ RUN.xinde['EVAL'] = r.ok ? r.text : FALLBACK_XINDE_EVAL; }));
+    }
+    await Promise.all(jobs);
+    if(RUN_STOPPED) throw new Error('已手动停止');
+    // ── 阶段二:泳道并行(六轮 + 论文)──
+    for(const ag of agents){ RUN.lanes[ag] = mkLane(ag); }
+    for(const ag of agents){ RUN.papers[ag] = mkPaperBlock(ag); }
+    if(full){ RUN.papers['典范'] = mkPaperBlock('典范'); RUN.papers['典范'].st.textContent='排队(等三篇论文齐)'; }
+    const results = await Promise.allSettled(agents.map(ag=>runLane(ag)));
+    results.forEach((r,i)=>{
+      const ag = agents[i];
+      if(r.status==='fulfilled'){ RUN.histories[ag]=r.value.history; }
+      else{
+        RUN.lanes[ag].st.textContent = '✗ 本台中断:' + String(r.reason && r.reason.message || r.reason).slice(0,90);
+        if(RUN.papers[ag] && !RUN.papersText[ag]) RUN.papers[ag].st.textContent='✗ 未产出';
+      }
+    });
+    if(RUN_STOPPED) throw new Error('已手动停止');
+    // ── 阶段三:碰撞(完整档且三篇齐)──
+    if(full){
+      const ok = ['A','B','C'].every(ag => RUN.papersText[ag] && RUN.papersText[ag].length > 500);
+      if(ok){ await runCollision(); }
+      else{
+        RUN.papers['典范'].st.textContent='✗ 跳过(三篇论文未齐,碰撞需要三个不同的面)';
+        showErr('三台未全部产出论文,碰撞阶段已跳过。可清空后重试,或改用快速档。');
+      }
+    }
+    buildReport();
+    runHint.textContent = '✓ 全部完成 · 用时 ' + Math.round((Date.now()-RUN.t0)/60000) + ' 分钟';
+  }catch(e){
+    if(RUN_STOPPED){ runHint.textContent='已停止。已完成的部分保留在页面上。'; }
+    else{ showErr('运行中断:'+String(e && e.message || e)); runHint.textContent='已中断。已完成的部分保留在页面上。'; }
+    if(Object.keys(RUN.histories||{}).length) buildReport();
+  }finally{
+    RUNNING=false; goBtn.disabled=false; stopBtn.style.display='none';
+  }
+}
+goBtn.addEventListener('click', ()=>{ run(); });
+
+// 初始化
+setMode(true);
+refreshKeyUI();
+window.__zwRun = run; window.__zwStop = stopRun; window.__zwState = ()=>RUN;   // 供调试/模拟验证
+
+</script>
+</body>
+</html>
