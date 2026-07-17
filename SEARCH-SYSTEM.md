@@ -5,7 +5,7 @@
 
 ## 九、站内搜索系统(v1.1 加入)
 
-**一句话**:两档搜索都在 `/search/`——**Tier1** 前端关键词全文检索(纯客户端,零成本,无需Key);**Tier2** 智能问答(服务端 RAG,`src/worker.js` 的 `/api/ask`,境内基底综合出答案+给出处)。入口挂首页导航 🔍。
+**一句话**:两档搜索都在 `/search/`——**Tier1** 前端关键词全文检索(纯客户端,零成本,无需Key;v2 起为中文 bigram 软匹配+覆盖率加权+匹配度排序与百分比徽章,与 worker 的 retrieve 同路数,不再要求整串连续命中);**Tier2** 智能问答(服务端 RAG,`src/worker.js` 的 `/api/ask`,境内基底综合出答案+给出处)。入口挂首页导航 🔍。
 
 ### A. 索引(地基,必须懂)
 - 位置:`public/search/` = `manifest.json`(元数据+文档列表 docs[{i,u,t,s}]) + `shard-<栏目>.json`(分片正文块 {d,t}) + `sde-coords.json`(SDE坐标,可选,见 D/F)。
