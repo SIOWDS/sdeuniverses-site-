@@ -180,8 +180,8 @@ details.paper-fold[open] summary{border-bottom:1px solid var(--border)}
 <div class="controls">
   <div class="field">
     <label>上传论文 <span class="req">*</span><span class="count" id="count">0 字</span></label>
-    <div class="drop" id="drop"><div class="di">📄</div><div class="dt">点击选择，或把 <b>Word（.docx）/ PDF</b> 文件拖到这里</div><div class="ds">文件在你本机浏览器内解析成文字，不上传 · 也可在下方直接粘贴</div></div>
-    <input type="file" id="fileIn" accept=".docx,.pdf" style="display:none">
+    <div class="drop" id="drop"><div class="di">📄</div><div class="dt">点击选择，或把 <b>Word / PDF</b> 文件拖到这里</div><div class="ds">文件在你本机浏览器内解析成文字，不上传 · 也可在下方直接粘贴</div></div>
+    <input type="file" id="fileIn" accept=".docx,.doc,.pdf" style="display:none">
     <div class="file-info" id="fileInfo"></div>
   </div>
 
@@ -475,20 +475,57 @@ fileIn.addEventListener('change',e=>{ const f=e.target.files[0]; if(f) handleFil
 function showFile(msg,isErr){ fileInfoEl.innerHTML=msg; fileInfoEl.className='file-info'+(isErr?' err':''); fileInfoEl.style.display='flex'; }
 async function handleFile(f){
   const name=f.name, lo=name.toLowerCase();
-  if(!(lo.endsWith('.docx')||lo.endsWith('.pdf'))){ showFile('⚠ 只支持 .docx 或 .pdf 文件（.doc 旧格式请先另存为 .docx）',true); return; }
-  if(f.size>15*1024*1024){ showFile('⚠ 文件超过 15MB，请精简后再试',true); return; }
-  showFile('<span class="spinner"></span> 正在解析 '+name+' …',false);
+  if(f.size>100*1024*1024){ showFile('⚠ 文件超过 100MB（当前 '+(f.size/1048576).toFixed(1)+'MB）。请精简后再试。',true); return; }
+  if(f.size>20*1024*1024){ showFile('<span class="spinner"></span> 正在解析 '+name+'（'+(f.size/1048576).toFixed(0)+'MB，大文件需在本机解压/逐页抽取，请稍候，不要关闭页面）…',false); }
+  else showFile('<span class="spinner"></span> 正在解析 '+name+' …',false);
   try{
+    const ab=await f.arrayBuffer();
+    /* 扩展名会骗人（常见：docx 被改名成 .doc、pdf 被改名成 .txt）。认魔术字节，不认后缀。 */
+    const b=new Uint8Array(ab.slice(0,8));
+    const isZip = b[0]===0x50&&b[1]===0x4B&&b[2]===0x03&&b[3]===0x04;                       // PK.. → OOXML(.docx)
+    const isPdf = b[0]===0x25&&b[1]===0x50&&b[2]===0x44&&b[3]===0x46;                       // %PDF
+    const isOle = b[0]===0xD0&&b[1]===0xCF&&b[2]===0x11&&b[3]===0xE0;                       // OLE2 → Word 97-2003 二进制 .doc
+    const isRtf = b[0]===0x7B&&b[1]===0x5C&&b[2]===0x72&&b[3]===0x74;                       // {\rt → RTF
     let text='';
-    if(lo.endsWith('.docx')){ if(!window.mammoth) throw new Error('docx 解析库未加载，请刷新页面'); const ab=await f.arrayBuffer(); const r=await window.mammoth.extractRawText({arrayBuffer:ab}); text=(r&&r.value)||''; }
-    else { if(!window.pdfjsLib) throw new Error('PDF 解析库未加载，请刷新页面'); const ab=await f.arrayBuffer(); const pdf=await pdfjsLib.getDocument({data:ab}).promise; for(let i=1;i<=pdf.numPages;i++){ const pg=await pdf.getPage(i); const tc=await pg.getTextContent(); text+=tc.items.map(it=>it.str).join(' ')+'\n\n'; } }
+    if(isZip){
+      if(!window.mammoth) throw new Error('docx 解析库未加载，请刷新页面');
+      const r=await window.mammoth.extractRawText({arrayBuffer:ab}); text=(r&&r.value)||'';
+    } else if(isPdf){
+      if(!window.pdfjsLib) throw new Error('PDF 解析库未加载，请刷新页面');
+      const pdf=await pdfjsLib.getDocument({data:ab}).promise;
+      for(let i=1;i<=pdf.numPages;i++){
+        if(pdf.numPages>40 && i%20===0) showFile('<span class="spinner"></span> 正在抽取第 '+i+' / '+pdf.numPages+' 页…',false);
+        const pg=await pdf.getPage(i); const tc=await pg.getTextContent();
+        text+=tc.items.map(it=>it.str).join(' ')+'\n\n';
+      }
+    } else if(isOle){
+      showFile('⚠ 这是 Word 97-2003 的二进制 .doc（不是 .docx）。浏览器内没有可靠的 .doc 解析器，无法在本机把它读成文字。<br>请在 Word/WPS 里「另存为 → .docx」后重传，或直接把正文粘到下面的框里——两种都不损失任何东西。',true); return;
+    } else if(isRtf){
+      showFile('⚠ 这是 RTF 文件。请在 Word/WPS 里另存为 .docx 后重传，或直接粘贴正文。',true); return;
+    } else {
+      showFile('⚠ 认不出这个文件（既不是 .docx、也不是 PDF）。支持：Word .docx（2007 及以后，含 WPS／Mac Word／Google Docs 导出）与 PDF。旧版 .doc 请先另存为 .docx。',true); return;
+    }
     text=text.replace(/\n{3,}/g,'\n\n').trim();
-    if(text.length<20){ showFile('⚠ 解析出的文字太少（可能是扫描版 PDF/纯图片，无法提取文字）。可手动粘贴正文。',true); return; }
+    if(text.length<20){ showFile('⚠ 解析出的文字太少（'+text.length+' 字）。若这是扫描版 PDF／纯图片，里面没有可抽取的文字层，需先做 OCR。也可手动粘贴正文。',true); return; }
     docTextEl.value=text; $('count').textContent=text.length+' 字'; papersQueue=[]; renderQueue();
-    if(!docTitleEl.value){ docTitleEl.value=name.replace(/\.(docx|pdf)$/i,'').slice(0,40); }
-    showFile('✓ 已解析 '+name+' · '+text.length+' 字（如含多篇，请用下方「拆分」）',false);
+    if(!docTitleEl.value){ docTitleEl.value=name.replace(/\.(docx|doc|pdf)$/i,'').slice(0,40); }
+    const warn=lengthWarning(text.length);
+    showFile('✓ 已解析 '+name+' · '+text.length+' 字'+(warn?'<br>'+warn:'（如含多篇，请用下方「拆分」）'), !!warn);
   }catch(e){ showFile('⚠ 解析失败：'+(e.message||e)+'。可手动粘贴正文。',true); }
 }
+
+/* 正文长度把关：评分时 system 里已压着整部内功＋心得＋评分规范，正文是叠在这之上的。
+   超限的表现不是"文件太大"，而是模型那头一句看不懂的报错——所以在这里先说清楚。 */
+function systemChars(){ return (SDE_BASE?SDE_BASE.length:0) + 14000 + (typeof SCORING_SPEC==='string'?SCORING_SPEC.length:0); }
+function lengthWarning(n){
+  const sys=systemChars(), tot=sys+n;
+  if(n<=30000) return '';
+  const tk=Math.round(tot*0.75/1000);
+  return '⚠ 正文 '+n.toLocaleString()+' 字，加上内功与心得，单次送进模型的约 '+tot.toLocaleString()+' 字（≈'+tk+'k tokens）。'
+       + (n>60000 ? '这很可能超出基底单次可接受的长度，评分会失败。' : '这接近上限，深度思考档尤其容易顶满。')
+       + '<br>建议：若文档含多篇，用下方「拆分」逐篇评；若是单篇长文，先取核心章节评。';
+}
+
 
 /* ═══ 通用流式调用 ═══ */
 async function streamChat(apiKey,sel,systemPrompt,userMsg,maxTokens,statusEl2,stageLabel,opts){
