@@ -24,8 +24,11 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;flex-direction:
 .nav-bar-sub{display:flex;align-items:center;gap:1.6rem;margin-top:0.5rem;padding-top:0.5rem;border-top:1px solid var(--border2)}
 .nav-bar-sub a{color:var(--text2);text-decoration:none;font-size:1.05rem;font-weight:700;letter-spacing:0.13em;white-space:nowrap;transition:color .2s,opacity .2s}
 .nav-bar-sub a:hover{text-decoration:underline;text-underline-offset:4px;opacity:0.72}
-.nav-bar-sub a[href="#crt-birth"]{color:#2A6B4A}
-.nav-bar-sub a[href="#crt-live"]{color:#8A6817}
+.nav-bar-sub a.ch-1{color:#8A6817}
+.nav-bar-sub a.ch-2{color:#35558C}
+.nav-bar-sub a.ch-3{color:#17706B}
+.nav-bar-sub a.ch-4{color:#7A4A8C}
+.nav-bar-sub a.ch-5{color:#C0522A}
 .lang-toggle{display:flex;background:var(--card);border:1px solid var(--border);border-radius:20px;overflow:hidden}
 .lang-btn{padding:0.3rem 0.8rem;font-size:0.75rem;border:none;background:transparent;color:var(--text2);cursor:pointer;font-family:inherit}
 .lang-btn.active{background:var(--accent);color:#fff;font-weight:600}
@@ -53,6 +56,20 @@ section{padding:3.5rem 0}
 .art h4{font-family:'Noto Serif SC',serif;font-size:1.05rem;font-weight:600;color:var(--text);margin-bottom:0.4rem;line-height:1.42}
 .art p{font-size:0.9rem;color:var(--text2);line-height:1.68}
 .art .rd{display:inline-block;margin-top:0.6rem;font-size:0.8rem;color:var(--accent);letter-spacing:0.06em}
+.channels{background:var(--card2);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:3.2rem 0 3.6rem}
+.ch-eyebrow{font-size:0.7rem;letter-spacing:0.3em;color:var(--accent);text-transform:uppercase;margin-bottom:0.9rem;text-align:center}
+.ch-h2{font-family:'Playfair Display','Noto Serif SC',serif;font-size:clamp(1.5rem,3.4vw,2rem);font-weight:700;color:var(--text);text-align:center;line-height:1.3;margin-bottom:1.1rem}
+.ch-lead{max-width:720px;margin:0 auto 2.4rem;text-align:center;font-size:1rem;color:var(--text2);line-height:1.85}
+.ch-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(163px,1fr));gap:0.9rem}
+.ch{display:flex;flex-direction:column;text-decoration:none;background:var(--card);border:1px solid var(--border2);border-top:3px solid var(--cc);border-radius:5px;padding:1.15rem 1rem 1rem;transition:transform .2s,box-shadow .2s}
+.ch:hover{transform:translateY(-4px);box-shadow:0 10px 26px rgba(42,35,21,.13)}
+.ch-n{font-family:'Playfair Display',serif;font-size:0.86rem;font-weight:700;color:var(--cc);letter-spacing:0.1em;opacity:.75;margin-bottom:0.4rem}
+.ch h3{font-family:'Noto Serif SC',serif;font-size:1.14rem;font-weight:700;color:var(--cc);margin-bottom:0.55rem;line-height:1.3}
+.ch p{font-size:0.86rem;color:var(--text2);line-height:1.7;flex:1}
+.ch .go{margin-top:0.85rem;font-size:0.78rem;letter-spacing:0.08em;color:var(--cc);font-weight:600}
+.ch-1{--cc:#8A6817}.ch-2{--cc:#35558C}.ch-3{--cc:#17706B}.ch-4{--cc:#7A4A8C}.ch-5{--cc:#C0522A}
+.ch-foot{margin-top:1.7rem;text-align:center;font-size:0.88rem;color:var(--muted)}
+.ch-foot a{color:var(--accent);text-decoration:none;border-bottom:1px solid rgba(42,107,74,.35)}
 .note{margin-top:3rem;text-align:center;background:var(--card2);border:1px dashed var(--accent);border-radius:8px;padding:1.8rem 1.5rem}
 .note p{color:var(--text2);font-size:0.98rem}
 .note b{color:var(--accent)}
@@ -69,6 +86,8 @@ footer a{color:var(--gold);text-decoration:none}
   .nav-links{gap:1rem}
   .nav-links a.sib{display:none}
   .art-grid{grid-template-columns:1fr}
+  .ch-grid{grid-template-columns:1fr 1fr;gap:0.7rem}
+  .channels{padding:2.4rem 0 2.6rem}
   header.hero{padding:7rem 1.2rem 3rem;min-height:auto}
 }
 </style>
@@ -90,8 +109,11 @@ footer a{color:var(--gold);text-decoration:none}
   </div>
   </div>
   <div class="nav-bar-sub">
-    <a href="#crt-birth"><span class="zh-only">壹 · 思想如何出生</span><span class="en-only">I · How Thought Is Born</span></a>
-    <a href="#crt-live"><span class="zh-only">贰 · 思想如何活下来</span><span class="en-only">II · How Thought Survives</span></a>
+    <a href="/creation/paradigm/" class="ch-1"><span class="zh-only">典范论文</span><span class="en-only">Paradigm Papers</span></a>
+    <a href="/creation/thesis/" class="ch-2"><span class="zh-only">学位论文</span><span class="en-only">Degree Theses</span></a>
+    <a href="/creation/journal/" class="ch-3"><span class="zh-only">期刊论文</span><span class="en-only">Journal Papers</span></a>
+    <a href="/creation/research-philosophy/" class="ch-4"><span class="zh-only">科研哲学</span><span class="en-only">Philosophy of Research</span></a>
+    <a href="/creation/creativity/" class="ch-5"><span class="zh-only">创造力</span><span class="en-only">Creativity</span></a>
   </div>
 </nav>
 
@@ -100,8 +122,51 @@ footer a{color:var(--gold);text-decoration:none}
   <div class="eyebrow zh-only">SDE 学科专栏</div><div class="eyebrow en-only">SDE SUBJECT COLUMN</div>
   <h1 class="title"><span class="zh-only">学术创造专栏</span><span class="en-only">Academic Creation</span></h1>
   <p class="sub zh-only">论文越来越多，能挪动地基的思想越来越少。这不是天才变少了——是思想赖以出生和存活的那几样东西，正被一套没有恶意、只是太有效的制度，一件一件地拿走。</p><p class="sub en-only">More papers, fewer ideas that move the ground. Not because genius has thinned out, but because the few things a thought needs in order to be born and to stay alive are being taken away, one at a time, by an institution that means no harm and is merely very effective.</p>
-  <div class="badge"><span class="dot"></span><span class="zh-only">长文合辑 · 4 篇 / 2 板块 · 持续增补</span><span class="en-only">Essay Collection · 4 pieces / 2 blocks</span></div>
+  <div class="badge"><span class="dot"></span><span class="zh-only">五频道 · 长文合辑 4 篇 · 持续增补</span><span class="en-only">Five Channels · 4 essays · Growing</span></div>
 </header>
+
+<section class="channels" id="channels">
+  <div class="wrap">
+    <div class="ch-eyebrow zh-only">五频道</div><div class="ch-eyebrow en-only">FIVE CHANNELS</div>
+    <h2 class="ch-h2"><span class="zh-only">学术创造的五条战线</span><span class="en-only">Five Fronts of Academic Creation</span></h2>
+    <p class="ch-lead zh-only">一篇论文有三种命：进期刊、成学位、变典范。它们不是难度递增的三级台阶，而是三套互不兼容的要求——为其中一种写的东西，通常正好不合另外两种。另外两个频道追的是这三种命共同的前提：知识究竟是怎么被生产出来的（科研哲学），以及生产它的人凭什么还创造得动（创造力）。</p>
+    <p class="ch-lead en-only">A paper has three possible fates: enter a journal, become a degree, turn into a paradigm. These are not three rungs of one ladder but three mutually incompatible sets of demands — what is written for one is usually wrong for the other two. The remaining channels pursue what all three presuppose: how knowledge gets produced at all, and what keeps the people producing it still able to create.</p>
+    <div class="ch-grid">
+      <a class="ch ch-1" href="/creation/paradigm/">
+        <span class="ch-n">01</span>
+        <h3><span class="zh-only">典范论文</span><span class="en-only">Paradigm Papers</span></h3>
+        <p class="zh-only">不看它答得多好——看它出来以后，别人还能不能照原样提问。</p><p class="en-only">Not how well it answers. Whether, afterwards, the question can still be asked the old way.</p>
+        <span class="go"><span class="zh-only">进入频道 →</span><span class="en-only">Enter →</span></span>
+      </a>
+      <a class="ch ch-2" href="/creation/thesis/">
+        <span class="ch-n">02</span>
+        <h3><span class="zh-only">学位论文</span><span class="en-only">Degree Theses</span></h3>
+        <p class="zh-only">一生唯一一次被批准用几年追一个问题。多数人用它证明自己会做研究。</p><p class="en-only">The one time you are granted years to chase a single question. Most spend it proving they can do research.</p>
+        <span class="go"><span class="zh-only">进入频道 →</span><span class="en-only">Enter →</span></span>
+      </a>
+      <a class="ch ch-3" href="/creation/journal/">
+        <span class="ch-n">03</span>
+        <h3><span class="zh-only">期刊论文</span><span class="en-only">Journal Papers</span></h3>
+        <p class="zh-only">守门人从来不是审稿人，是「可被审」这件事本身。</p><p class="en-only">The gatekeeper was never the reviewer. It is reviewability itself.</p>
+        <span class="go"><span class="zh-only">进入频道 →</span><span class="en-only">Enter →</span></span>
+      </a>
+      <a class="ch ch-4" href="/creation/research-philosophy/">
+        <span class="ch-n">04</span>
+        <h3><span class="zh-only">科研哲学</span><span class="en-only">Philosophy of Research</span></h3>
+        <p class="zh-only">不问知识凭什么为真，问它被谁、在什么条件下、以什么代价造出来。</p><p class="en-only">Not what makes knowledge true — by whom, under what conditions, at what cost it gets made.</p>
+        <span class="go"><span class="zh-only">进入频道 →</span><span class="en-only">Enter →</span></span>
+      </a>
+      <a class="ch ch-5" href="/creation/creativity/">
+        <span class="ch-n">05</span>
+        <h3><span class="zh-only">创造力</span><span class="en-only">Creativity</span></h3>
+        <p class="zh-only">它不是一种能力，是一种处境。当成能力，就要去测它、训它、选拔它。</p><p class="en-only">Not a capacity but a predicament. Treat it as a capacity and you will measure, train and select for it.</p>
+        <span class="go"><span class="zh-only">进入频道 →</span><span class="en-only">Enter →</span></span>
+      </a>
+    </div>
+    <p class="ch-foot zh-only">五个频道之下，是本专栏原初的四篇长文合辑 —— <a href="#crt-birth">壹 · 思想如何出生</a> · <a href="#crt-live">贰 · 思想如何活下来</a></p>
+    <p class="ch-foot en-only">Below the channels: this column's original four essays — <a href="#crt-birth">I · How Thought Is Born</a> · <a href="#crt-live">II · How Thought Survives</a></p>
+  </div>
+</section>
 
 <main class="wrap">
   <section>
