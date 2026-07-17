@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>李约瑟之问与答 · 十二篇 | 中华文化与科技创新 · SDE Universes</title>
+<meta name="description" content="李约瑟之问的十二种发生学回答：从解剖提问本身，到中国之路的发生机制，到制度对身体与知域的配置，再到欧洲对照——十二篇长文，一次收齐。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Noto+Serif+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#F5EFE0;--card:#FAF6EC;--card2:#F0E8D3;--gold:#8A6817;--text:#2A2315;--text2:#6B5D47;--muted:#98886C;--border:rgba(138,104,23,0.22);--border2:rgba(138,104,23,0.10);--accent:#9D2933;--accent2:#B8434F}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Noto Serif SC',Georgia,serif;line-height:1.75}
+a{color:inherit}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0.7rem 3rem;background:rgba(245,239,224,0.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border2)}
+.nav-logo{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;color:var(--gold);letter-spacing:0.05em;text-decoration:none}
+.nav-back{color:var(--text2);text-decoration:none;font-size:0.88rem;letter-spacing:0.06em}
+.nav-back:hover{color:var(--accent)}
+.wrap{max-width:940px;margin:0 auto;padding:0 2rem}
+header.hero{min-height:52vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:8rem 2rem 3.4rem;position:relative;overflow:hidden}
+.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 70% 55% at 50% 34%,#9D293314 0%,transparent 70%)}
+.eyebrow{position:relative;font-size:0.72rem;letter-spacing:0.28em;color:var(--accent);text-transform:uppercase;margin-bottom:1.3rem}
+.title{position:relative;font-family:'Noto Serif SC',serif;font-size:clamp(2.1rem,5.8vw,3.8rem);font-weight:700;line-height:1.18;color:var(--text)}
+.sub{position:relative;font-size:clamp(1rem,2.2vw,1.28rem);color:var(--text2);max-width:700px;margin:1.5rem auto 1.8rem;font-style:italic;font-weight:300}
+.badge{position:relative;display:inline-flex;align-items:center;gap:0.5rem;background:var(--card);border:1px solid var(--accent);color:var(--accent);border-radius:30px;padding:0.5rem 1.3rem;font-size:0.78rem;letter-spacing:0.14em}
+section{padding:2.6rem 0 3.4rem}
+.lead{font-size:1.1rem;color:var(--text);line-height:1.95;border-left:3px solid var(--accent);padding:0.2rem 0 0.2rem 1.5rem;margin:0 0 3rem}
+.block{margin:0 0 3.2rem}
+.block-head{display:flex;align-items:baseline;gap:0.85rem;border-bottom:1px solid var(--border);padding-bottom:0.7rem;margin-bottom:0.9rem}
+.block-num{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:700;color:var(--accent);line-height:1}
+.block-title{font-family:'Noto Serif SC',serif;font-size:1.3rem;font-weight:600;color:var(--text)}
+.block-desc{font-size:0.97rem;color:var(--text2);font-style:italic;margin:0 0 1.4rem;line-height:1.7}
+.art-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.art{display:block;text-decoration:none;background:var(--card);border:1px solid var(--border2);border-left:3px solid var(--accent);border-radius:5px;padding:1.05rem 1.25rem;transition:transform .2s,box-shadow .2s}
+.art:hover{border-left-color:var(--accent2);transform:translateX(3px);box-shadow:0 6px 20px rgba(157,41,51,.10)}
+.art .k{display:block;font-size:0.71rem;letter-spacing:0.1em;color:var(--accent);text-transform:uppercase;font-weight:600;margin-bottom:0.35rem}
+.art h4{font-size:1.02rem;font-weight:600;color:var(--text);margin-bottom:0.4rem;line-height:1.45}
+.art p{font-size:0.89rem;color:var(--text2);line-height:1.68}
+.art .rd{display:inline-block;margin-top:0.55rem;font-size:0.82rem;color:var(--accent)}
+.tailnote{margin-top:0.6rem;text-align:center;background:var(--card2);border:1px dashed var(--accent);border-radius:8px;padding:1.4rem}
+.tailnote p{color:var(--text2);font-size:0.94rem;line-height:1.8}
+footer{background:var(--card2);color:var(--muted);text-align:center;padding:26px;font-size:13px}
+footer a{color:var(--accent)}
+@media(max-width:640px){nav{padding:0.6rem 1rem}.art-grid{grid-template-columns:1fr}header.hero{padding:6.5rem 1.2rem 2.6rem;min-height:auto}}
+</style>
+</head>
+<body>
+<nav>
+  <a class="nav-logo" href="/">SDE Universes</a>
+  <a class="nav-back" href="/culture-tech/">← 中华文化与科技创新 · 专栏首页</a>
+</nav>
+<header class="hero">
+  <div class="hero-bg"></div>
+  <div class="eyebrow">子栏目 · SUB-COLUMN 壹</div>
+  <h1 class="title">李约瑟之问与答</h1>
+  <p class="sub">为什么近代科学没有在中国发生？——不给第十三种"缺零件"答案，给十二种发生学的回答。</p>
+  <div class="badge">长文十二篇 · 四组读法 · 每篇附证伪条件</div>
+</header>
+<main class="wrap">
+  <section>
+    <p class="lead">这十二篇论文来自同一场追问：把李约瑟之问放到发生学的手术台上，从十二个不同的切口切进去。它们不互相重复——有的解剖提问本身为何长生不死，有的追踪中国之路实际长出了什么，有的追查制度如何配置身体与感知，有的把镜头转向欧洲问科学如何被逼出、如何存续。每一篇都在结尾给出自己被推翻的条件。合起来读，它们不是十二个答案，而是一张问题的解剖图。</p>
+    <div class="block">
+      <div class="block-head"><span class="block-num">壹</span><span class="block-title">解剖问题本身</span></div>
+      <p class="block-desc">李约瑟之问为何八十年不死？先不急着回答它——先把这个提问本身放上手术台。</p>
+      <div class="art-grid">
+        <a class="art" href="/culture-tech/needham/argument-circulation/">
+          <span class="k">之一 · 约2.0万字</span>
+          <h4>论证环流：一个学术问题生命力再生产的发生学机制——以李约瑟之问为中心</h4>
+          <p>一个预设被反复证伪的提问为何还活着？——说法与数据在同一学术体制内互证互哺，把提问建制化为不可终结的母题。</p>
+          <span class="rd">读全文 →</span>
+        </a>
+        <a class="art" href="/culture-tech/needham/knowledge-ecology-density/">
+          <span class="k">之二 · 约2.9万字</span>
+          <h4>知识生态密度：重审李约瑟之问的发生学根基</h4>
+          <p>不是中国"未能产生科学"，而是欧洲稠密的知识生态迫使西方必须发明"科学"——去做一件在中国从未被需求的事。</p>
+          <span class="rd">读全文 →</span>
+        </a>
+      </div>
+    </div>
+    <div class="block">
+      <div class="block-head"><span class="block-num">贰</span><span class="block-title">中国之路的发生机制</span></div>
+      <p class="block-desc">不问"中国缺了什么"，问"中国实际长出了什么、靠什么自我维持"——四种彼此独立的机制刻画。</p>
+      <div class="art-grid">
+        <a class="art" href="/culture-tech/needham/cognitive-dwelling/">
+          <span class="k">之三 · 约2.3万字</span>
+          <h4>安居于道</h4>
+          <p>不是无力开门，而是安居得太完整，以至于连门的存在都不必看见——反常被阐释弹性消化，退出的需求从未生成。</p>
+          <span class="rd">读全文 →</span>
+        </a>
+        <a class="art" href="/culture-tech/needham/plenitude-and-sealing/">
+          <span class="k">之四 · 约2.6万字</span>
+          <h4>盈满与封缄：晚期帝制中国精英认知趣味的生成与自锁</h4>
+          <p>不是锁住了科学，而是在精英心灵最柔软处，培育出一种不再另行产生科学冲动的饱满人格。</p>
+          <span class="rd">读全文 →</span>
+        </a>
+        <a class="art" href="/culture-tech/needham/sanctification-mechanism/">
+          <span class="k">之五 · 约1.4万字</span>
+          <h4>圣化：一个关于经学-科举体制下认知转化机制的历史发生学考察</h4>
+          <p>不禁止、只消化：《几何原本》如何被制度降维、观念重命名，并在传承断裂中失去自己的后代。</p>
+          <span class="rd">读全文 →</span>
+        </a>
+        <a class="art" href="/culture-tech/needham/structural-redirection/">
+          <span class="k">之六 · 约2.3万字</span>
+          <h4>并非缺失，而是生成：认知冲动的结构性重定向与中国理论科学的未发生</h4>
+          <p>被拒绝供养的认知冲动没有消亡——它们改换对象与语言，寄居在考据的缝隙里，留下与旧解释不相容的经验指纹。</p>
+          <span class="rd">读全文 →</span>
+        </a>
+      </div>
+    </div>
+    <div class="block">
+      <div class="block-head"><span class="block-num">叁</span><span class="block-title">制度如何配置身体与知域</span></div>
+      <p class="block-desc">科举锁死的不是思想，而是身体的技能、感知的边界与求解的通道——四篇制度发生学。</p>
+      <div class="art-grid">
+        <a class="art" href="/culture-tech/needham/body-skill-domestication/">
+          <span class="k">之七 · 约2.4万字</span>
+          <h4>身器驯置：一项关于认知路径之制度性生成的研究——兼论李约瑟之问的身体技能根基</h4>
+          <p>制度锁死文明的最深处，不在塑造"信什么"，而在垄断"会什么"——一部身体技能的制度配置史。</p>
+          <span class="rd">读全文 →</span>
+        </a>
+        <a class="art" href="/culture-tech/needham/knowing-domain-narrowing/">
+          <span class="k">之八 · 约3.1万字</span>
+          <h4>知域收窄：科举制度如何重塑了“什么值得知道”的边界</h4>
+          <p>科举不是堵死通往自然的路，而是在千年尺度上，把那条路从读书人"值得知道"的认知地图上渐次抹去。</p>
+          <span class="rd">读全文 →</span>
+        </a>
+        <a class="art" href="/culture-tech/needham/knowledge-order-lockdown/">
+          <span class="k">之九 · 约3.0万字</span>
+          <h4>知序的闭锁：重审李约瑟之问的另一种可能</h4>
+          <p>王阳明格竹七日而病——求解的弧线为何在起点处就无人接住？知与序之间那种相生相克的张力如何被制度瓦解。</p>
+          <span class="rd">读全文 →</span>
+        </a>
+        <a class="art" href="/culture-tech/needham/plough-and-study-complex/">
+          <span class="k">之十 · 约2.6万字</span>
+          <h4>耕与读之间：重审李约瑟难题的一个认知形态解释</h4>
+          <p>问题不在"有没有"，而在认知劳动往哪去——追踪一个文明级的认知配置形态：耕-读认知复合体。</p>
+          <span class="rd">读全文 →</span>
+        </a>
+      </div>
+    </div>
+    <div class="block">
+      <div class="block-head"><span class="block-num">肆</span><span class="block-title">对照欧洲：科学如何被逼出、如何存续</span></div>
+      <p class="block-desc">把镜头转向另一端——近代科学不是自然长成的，它是被特定历史矛盾逼出来、又被特定缠结养住的。</p>
+      <div class="art-grid">
+        <a class="art" href="/culture-tech/needham/functional-entanglement/">
+          <span class="k">之十一 · 约2.8万字</span>
+          <h4>科学何以存续？——论认知体系的功能性缠结</h4>
+          <p>把问题反过来：现代科学为什么没有崩解？存续韧性不来自内部美德，而来自与社会身体的历史性功能缠结。</p>
+          <span class="rd">读全文 →</span>
+        </a>
+        <a class="art" href="/culture-tech/needham/cognitive-polarization/">
+          <span class="k">之十二 · 约2.6万字</span>
+          <h4>认知极化：重勘李约瑟之问的一个知识发生学框架</h4>
+          <p>"提出新问题"不是人类认知的默认模式——两种文明就"什么值得终身投入"沿相反方向完成了极性偏转。</p>
+          <span class="rd">读全文 →</span>
+        </a>
+      </div>
+    </div>
+    <div class="tailnote"><p>十二篇均由 <b>SDE 金点子发生器</b> 在"李约瑟之问和答案"这一原初问题下产出，经二次双审与三轮打磨后发表。所有论断属思想实验与观点探索，各篇结尾均附可操作的证伪条件——欢迎举证推翻任何一篇。</p></div>
+  </section>
+</main>
+<footer>© 德麦国际 Demai International · 中华文化与科技创新专栏 · <a href="/">sdeuniverses.com</a></footer>
+</body></html>
