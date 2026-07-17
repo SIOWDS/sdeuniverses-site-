@@ -672,17 +672,45 @@ async function handleFile(f){
   }catch(e){ showFile('⚠ 解析失败：'+(e.message||e)+'。可手动粘贴正文。',true); }
 }
 
-/* 正文长度把关：评分时 system 里已压着整部内功＋心得＋评分规范，正文是叠在这之上的。
-   超限的表现不是"文件太大"，而是模型那头一句看不懂的报错——所以在这里先说清楚。 */
+/* ═══ 正文长度把关 ═══
+   评分时 system 里已压着整部内功＋心得＋评分规范（约 4.4 万 tokens），正文是叠在这之上的。
+   超限的表现不是"文件太大"，而是模型那头一句看不懂的报错——所以在这里先把账算给用户看。
+
+   下面这张上下文表核对于 2026-07-17（官方口径）：
+     deepseek-v4-pro / deepseek-v4-flash … 1,000,000（V4 全系）
+     glm-5 ………………………………………………… 202,752
+     glm-4-flash ……………………………………… 131,072（128K）
+   这张表一定会过期，而过期的表比没有表更坏。所以它只用来【提示】，绝不用来【拦截】：
+   算式全部摊开显示，用户自己能对；模型换了、窗口大了，最坏也只是多一句无害的提示。 */
+const CTX_WINDOW={'deepseek-v4-pro':1000000,'deepseek-v4-flash':1000000,'glm-5':202752,'glm-4-flash':131072};
+const CTX_TIERS=[{name:'深度思考档',models:['deepseek-v4-pro','glm-5']},{name:'快速档',models:['deepseek-v4-flash','glm-4-flash']}];
+const SCORE_OUT_TOKENS=12000;
+const CHARS_TO_TOKENS=0.75;   // 中文约 0.7–0.8 token/字；取 0.75，混排英文/数字时略偏保守
+
 function systemChars(){ return (SDE_BASE?SDE_BASE.length:0) + 14000 + (typeof SCORING_SPEC==='string'?SCORING_SPEC.length:0); }
-function lengthWarning(n){
-  const sys=systemChars(), tot=sys+n;
-  if(n<=30000) return '';
-  const tk=Math.round(tot*0.75/1000);
-  return '⚠ 正文 '+n.toLocaleString()+' 字，加上内功与心得，单次送进模型的约 '+tot.toLocaleString()+' 字（≈'+tk+'k tokens）。'
-       + (n>60000 ? '这很可能超出基底单次可接受的长度，评分会失败。' : '这接近上限，深度思考档尤其容易顶满。')
-       + '<br>建议：若文档含多篇，用下方「拆分」逐篇评；若是单篇长文，先取核心章节评。';
+
+/* 返回：哪些模型吃不下这篇。空数组＝都能吃下。 */
+function ctxOverflow(paperChars){
+  const inTok=Math.round((systemChars()+paperChars)*CHARS_TO_TOKENS), need=inTok+SCORE_OUT_TOKENS;
+  const over=[];
+  for(const t of CTX_TIERS) for(const m of t.models){
+    const head=CTX_WINDOW[m]-need;
+    if(head < CTX_WINDOW[m]*0.05) over.push({tier:t.name,model:m,win:CTX_WINDOW[m],head:head});
+  }
+  return {inTok:inTok, need:need, over:over};
 }
+function lengthWarning(n){
+  const r=ctxOverflow(n);
+  if(!r.over.length) return '';
+  const lines=r.over.map(o=>'　· '+o.tier+' 的 '+o.model+'（'+o.win.toLocaleString()+' tokens）'+(o.head<0?'超出 '+(-o.head).toLocaleString():'仅余 '+o.head.toLocaleString())+' tokens');
+  const okTier=CTX_TIERS.find(t=>!t.models.some(m=>r.over.some(o=>o.model===m)));
+  return '⚠ 正文 '+n.toLocaleString()+' 字。加上内功与心得，单次送进模型约 <b>'+r.need.toLocaleString()+' tokens</b>'
+       + '（其中 system 约 '+Math.round(systemChars()*CHARS_TO_TOKENS).toLocaleString()+'、正文约 '+Math.round(n*CHARS_TO_TOKENS).toLocaleString()+'、留给输出 '+SCORE_OUT_TOKENS.toLocaleString()+'）。<br>装不下的基底：<br>'
+       + lines.join('<br>')
+       + (okTier?'<br>→ 改用<b>'+okTier.name+'</b>可评（其模型窗口足够）；':'<br>→ ')
+       + '或用下方「拆分」逐篇评。';
+}
+
 
 
 /* ═══ 通用流式调用 ═══ */
