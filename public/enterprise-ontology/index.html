@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>企业本体论 · Enterprise Ontology | SDE Universes</title>
+<meta name="description" content="企业不是一堆资源、流程与人的集合，而是一个持续把「意义」在差异中重新发生出来的活体。用发生学重审：企业是什么、它靠什么活着、它为什么会死。">
+<meta property="og:title" content="企业本体论 · Enterprise Ontology"><meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.loli.net">
+<link rel="preconnect" href="https://gstatic.loli.net" crossorigin>
+<link href="https://fonts.loli.net/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=EB+Garamond:wght@400;500&family=Noto+Serif+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#F3F1EC;--card:#FBFAF6;--card2:#EAE7DE;--gold:#8A6817;--text:#1F2328;--text2:#55606B;--muted:#8A93A0;--border:rgba(41,66,110,0.20);--border2:rgba(41,66,110,0.09);--accent:#2E4B78;--accent2:#4A6DA0;--ink:#16305A}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Noto Serif SC','EB Garamond',Georgia,serif;line-height:1.78;overflow-x:hidden}
+body.en{font-family:'EB Garamond','Playfair Display',Georgia,serif}
+body.en .zh-only{display:none}
+body.zh .en-only{display:none}
+a{color:inherit}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0.7rem 3rem;background:rgba(243,241,236,0.9);backdrop-filter:blur(12px);border-bottom:1px solid var(--border2)}
+.nav-logo{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;color:var(--gold);letter-spacing:0.05em;text-decoration:none}
+.nav-right{display:flex;align-items:center;gap:1.4rem}
+.nav-right a{color:var(--text2);text-decoration:none;font-size:0.85rem;letter-spacing:0.08em;transition:color 0.2s}
+.nav-right a:hover{color:var(--accent)}
+.lang-toggle{display:flex;background:var(--card);border:1px solid var(--border);border-radius:20px;overflow:hidden}
+.lang-btn{padding:0.3rem 0.8rem;font-size:0.75rem;border:none;background:transparent;color:var(--text2);cursor:pointer;font-family:inherit}
+.lang-btn.active{background:var(--accent);color:#fff;font-weight:600}
+.wrap{max-width:960px;margin:0 auto;padding:0 2rem}
+header.hero{min-height:70vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:9rem 2rem 4rem;position:relative;overflow:hidden}
+.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 72% 56% at 50% 32%,rgba(46,75,120,0.11) 0%,transparent 72%)}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(46,75,120,0.05) 1px,transparent 1px),linear-gradient(90deg,rgba(46,75,120,0.05) 1px,transparent 1px);background-size:58px 58px;opacity:0.8;mask-image:radial-gradient(ellipse 80% 70% at 50% 40%,#000,transparent 78%)}
+.eyebrow{position:relative;font-size:0.72rem;letter-spacing:0.3em;color:var(--accent);text-transform:uppercase;margin-bottom:1.5rem}
+.title{position:relative;font-family:'Playfair Display','Noto Serif SC',serif;font-size:clamp(2.7rem,7.4vw,5.2rem);font-weight:700;line-height:1.06;color:var(--text)}
+.title .en-only{color:var(--accent)}
+.sub{position:relative;font-size:clamp(1.06rem,2.3vw,1.36rem);color:var(--text2);max-width:680px;margin:1.7rem auto 2.1rem;font-style:italic;font-weight:300;line-height:1.7}
+.badge{position:relative;display:inline-flex;align-items:center;gap:0.5rem;background:var(--card);border:1px solid var(--accent);color:var(--accent);border-radius:30px;padding:0.5rem 1.35rem;font-size:0.78rem;letter-spacing:0.14em}
+.badge .dot{width:7px;height:7px;border-radius:50%;background:var(--accent);animation:pulse 1.9s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:0.35;transform:scale(0.85)}50%{opacity:1;transform:scale(1)}}
+section{padding:3.6rem 0}
+.lead{font-size:1.14rem;color:var(--text);line-height:1.98;border-left:3px solid var(--accent);padding:0.3rem 0 0.3rem 1.6rem;margin:0 0 3.2rem}
+.lead b{color:var(--ink);font-weight:600}
+.motif{background:linear-gradient(152deg,#152744,#101d33);border-radius:12px;padding:2.7rem 2.3rem;text-align:center;position:relative;overflow:hidden;margin:0 0 3.4rem}
+.motif .ml{font-size:0.7rem;letter-spacing:0.42em;color:var(--accent2);margin-bottom:1.1rem}
+.motif p{color:#E4EAF2;font-size:1.14rem;line-height:2.02;max-width:730px;margin:0 auto}
+.motif p b{color:#A9C4E8;font-weight:600}
+.sec-head{display:flex;align-items:baseline;gap:0.9rem;border-bottom:1px solid var(--border);padding-bottom:0.7rem;margin-bottom:0.5rem}
+.sec-num{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:700;color:var(--accent)}
+.sec-title{font-family:'Playfair Display','Noto Serif SC',serif;font-size:1.34rem;font-weight:600;color:var(--text)}
+.sec-desc{font-size:0.98rem;color:var(--text2);font-style:italic;margin:0.7rem 0 1.6rem;line-height:1.7}
+.picks{display:grid;grid-template-columns:repeat(3,1fr);gap:1.4rem}
+.pick{display:flex;flex-direction:column;background:var(--card);border:1px solid var(--border2);border-top:3px solid var(--accent);border-radius:6px;padding:1.65rem 1.45rem;transition:transform 0.2s,box-shadow 0.2s}
+.pick.soon{opacity:0.72;border-top-style:dashed}
+.pick:hover{transform:translateY(-3px);box-shadow:0 12px 32px rgba(41,66,110,0.12)}
+.pick .pk{font-size:0.68rem;letter-spacing:0.16em;font-weight:600;color:var(--accent);margin-bottom:0.7rem;text-transform:uppercase}
+.pick h3{font-family:'Playfair Display','Noto Serif SC',serif;font-size:1.14rem;font-weight:600;color:var(--ink);margin-bottom:0.7rem;line-height:1.4}
+.pick p{font-size:0.94rem;color:var(--text2);line-height:1.78;flex:1}
+.pick .rd{display:inline-block;margin-top:1rem;font-size:0.84rem;letter-spacing:0.05em;font-weight:600;color:var(--accent)}
+.pick .tag{display:inline-block;margin-top:1rem;font-size:0.76rem;letter-spacing:0.1em;color:var(--muted)}
+.feature{display:grid;grid-template-columns:1fr;gap:0;background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:1.6rem}
+.feature a.feat-inner{display:grid;grid-template-columns:130px 1fr;text-decoration:none}
+.feat-badge{background:linear-gradient(150deg,#1B3358,#122542);color:#DCE6F2;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:1.6rem 0.8rem;gap:0.4rem}
+.feat-badge .fk{font-size:0.62rem;letter-spacing:0.18em;color:var(--accent2)}
+.feat-badge .fn{font-family:'Playfair Display',serif;font-size:2rem;font-weight:700;line-height:1}
+.feat-body{padding:1.7rem 1.8rem}
+.feat-body .fl{font-size:0.68rem;letter-spacing:0.16em;color:var(--accent);font-weight:600;margin-bottom:0.55rem;text-transform:uppercase}
+.feat-body h3{font-family:'Playfair Display','Noto Serif SC',serif;font-size:1.42rem;font-weight:700;color:var(--ink);margin-bottom:0.7rem;line-height:1.35}
+.feat-body p{font-size:0.98rem;color:var(--text2);line-height:1.85}
+.feat-body .rd{display:inline-block;margin-top:1rem;font-size:0.88rem;font-weight:600;color:var(--accent);letter-spacing:0.04em}
+.note{margin-top:3rem;text-align:center;background:var(--card2);border:1px dashed var(--accent);border-radius:8px;padding:1.9rem 1.6rem}
+.note p{color:var(--text2);font-size:0.98rem;line-height:1.85}
+.note b{color:var(--accent)}
+.crosslinks{display:flex;flex-wrap:wrap;gap:0.8rem;justify-content:center;margin-top:1.5rem}
+.crosslinks a{text-decoration:none;font-size:0.86rem;letter-spacing:0.08em;padding:0.5rem 1.1rem;border:1px solid var(--border);border-radius:24px;color:var(--text2);transition:all 0.2s;background:var(--card)}
+.crosslinks a:hover{border-color:var(--accent);color:var(--accent)}
+footer{border-top:1px solid var(--border2);margin-top:4rem;padding:2.6rem 2rem;text-align:center;color:var(--muted);font-size:0.78rem;letter-spacing:0.05em}
+footer a{color:var(--gold);text-decoration:none}
+@media(max-width:820px){.picks{grid-template-columns:1fr}.feature a.feat-inner{grid-template-columns:1fr}.feat-badge{flex-direction:row;padding:1rem;gap:1rem}}
+@media(max-width:640px){nav{padding:0.6rem 1.1rem}.wrap{padding:0 1.3rem}.title{font-size:2.5rem}}
+</style>
+</head>
+<body class="zh">
+<nav>
+  <a class="nav-logo" href="/">SDE Universes</a>
+  <div class="nav-right">
+    <a href="/" class="zh-only">← 首页</a><a href="/" class="en-only">← Home</a>
+    <a href="/business/" class="zh-only">商业专栏</a><a href="/business/" class="en-only">Business</a>
+    <div class="lang-toggle">
+      <button class="lang-btn active" onclick="setLang('zh')">中</button>
+      <button class="lang-btn" onclick="setLang('en')">EN</button>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="hero-bg"></div><div class="hero-grid"></div>
+  <div class="eyebrow zh-only">德麦国际 · SDE 发生学专论</div><div class="eyebrow en-only">DEMAI · A GENESIS-ONTOLOGY SERIES</div>
+  <h1 class="title"><span class="zh-only">企业本体论</span><span class="en-only">Enterprise Ontology</span></h1>
+  <p class="sub"><span class="zh-only">企业不是一堆资源、流程与人的集合。它是一个持续把「意义」在差异中重新发生出来的活体——它靠什么活着，就会因什么而死。</span><span class="en-only">A firm is not a bundle of resources, processes and people. It is a living body that keeps re-generating meaning through difference — and whatever keeps it alive is also what kills it.</span></p>
+  <div class="badge"><span class="dot"></span><span class="zh-only">六论 · 陆续发表</span><span class="en-only">SIX TREATISES · ROLLING RELEASE</span></div>
+</header>
+
+<section><div class="wrap">
+  <p class="lead"><span class="zh-only">管理学问「企业如何运转得更好」，然后去优化流程、配置资源、激励人。<b>企业本体论问一个更靠前的问题：企业到底是什么样一种存在，以至于它必须持续做某件事才不至于散掉？</b>答案不在资产负债表上。一家公司真正在生产的，从来不只是产品与利润，而是一种让内部所有人愿意继续朝同一个方向使劲的「意义」——这个意义一旦停止被重新发生，再厚的家底也拦不住它涣散。本专栏用发生学，一层层把这件事拆开。</span><span class="en-only">Management asks how a firm runs better, then optimises process, allocates resources, motivates people. Enterprise ontology asks the prior question: what kind of being is a firm, such that it must keep doing something or fall apart? The answer is not on the balance sheet. What a company truly produces is never just products and profit, but a meaning that keeps everyone inside pushing the same way — and once that meaning stops being re-generated, no amount of accumulated assets will hold it together.</span></p>
+
+  <div class="motif">
+    <div class="ml zh-only">总 母 题</div><div class="ml en-only">CORE MOTIF</div>
+    <p class="zh-only">一家企业真正的产品，是让内部所有人「愿意朝同一个方向使劲」的那个意义。<b>组织不靠结构维系，靠意义的持续再发生维系</b>；管理的全部难处，不是把事情安排对，而是让意义在每一次交接、每一次增长、每一次危机中，不被稀释地重新发生一遍。<b>企业不是死于对手，是死于它自己的意义停止了再发生。</b></p>
+    <p class="en-only">A firm's true product is the meaning that makes everyone inside willing to push the same way. An organisation is held together not by structure but by the continual re-generation of meaning; the whole difficulty of management is not arranging things correctly but letting meaning re-occur, undiluted, through every handover, every round of growth, every crisis. A firm dies not from its rivals but from the moment its own meaning stops re-generating.</p>
+  </div>
+
+  <div class="sec-head"><span class="sec-num">01</span><span class="sec-title zh-only">开篇</span><span class="sec-title en-only">Opening</span></div>
+  <p class="sec-desc zh-only">先立一个总判断：企业是什么。以下这篇是整个专栏的地基。</p><p class="sec-desc en-only">First, the founding claim: what a firm is. The piece below is the bedrock of the whole series.</p>
+
+  <div class="feature">
+    <a class="feat-inner" href="/column/enterprise-as-meaning-engine/">
+      <div class="feat-badge"><span class="fk zh-only">开篇导论</span><span class="fk en-only">OPENING</span><span class="fn">I</span></div>
+      <div class="feat-body">
+        <div class="fl zh-only">纲领 · 全专栏地基</div><div class="fl en-only">MANIFESTO · BEDROCK</div>
+        <h3 class="zh-only">企业是一台意义发生机</h3><h3 class="en-only">The Firm as a Meaning Engine</h3>
+        <p class="zh-only">把「企业是资源集合／契约网络／生产函数」这些主流定义逐一放到桌上，指出它们共享同一个盲区：都把「组织为什么没散掉」当成不言自明。本文给出相反的起点——组织随时都在散，是意义的持续再发生每天把它重新拢住；据此重新定义企业、管理、增长与死亡。</p>
+        <p class="en-only">It puts the mainstream definitions — resource bundle, nexus of contracts, production function — on the table and shows they share one blind spot: each takes "why the organisation hasn't fallen apart" as self-evident. This piece starts from the opposite: the organisation is always falling apart, and the continual re-generation of meaning is what re-gathers it every day.</p>
+        <span class="rd zh-only">读开篇导论 →</span><span class="rd en-only">Read the opening →</span>
+      </div>
+    </a>
+  </div>
+
+  <div class="sec-head" style="margin-top:3.4rem"><span class="sec-num">02</span><span class="sec-title zh-only">六论纲目</span><span class="sec-title en-only">The Six Treatises</span></div>
+  <p class="sec-desc zh-only">开篇立起地基之后，六论各钻一个具体的追问。陆续发表。</p><p class="sec-desc en-only">Once the bedrock stands, six treatises each drill one concrete question. Released on a rolling basis.</p>
+
+  <div class="picks">
+    <div class="pick soon">
+      <span class="pk zh-only">论一 · 起源</span><span class="pk en-only">I · ORIGIN</span>
+      <h3 class="zh-only">创始：一家公司是从哪一刻「发生」的</h3><h3 class="en-only">Founding: the moment a firm begins</h3>
+      <p class="zh-only">不是注册那天，也不是拿到第一笔钱那天。一家企业真正诞生于「一群人第一次为同一个意义放弃各自的退路」那一刻——在此之前只是若干人，在此之后才是一个组织。</p><p class="en-only">Not the day of registration, nor the first cheque. A firm is truly born the moment a group first gives up their separate exits for one shared meaning.</p>
+      <span class="tag zh-only">筹备中</span><span class="tag en-only">Coming soon</span>
+    </div>
+    <div class="pick soon">
+      <span class="pk zh-only">论二 · 增长</span><span class="pk en-only">II · GROWTH</span>
+      <h3 class="zh-only">规模：为什么长大常常等于变笨</h3><h3 class="en-only">Scale: why growth so often means getting dumber</h3>
+      <p class="zh-only">每加一层管理，意义就在传递中被稀释一次。增长的真正代价不是成本上升，而是「为什么做这件事」在从上到下的每一次转述中漏气——直到基层只剩动作，没有意义。</p><p class="en-only">Every layer added dilutes meaning in transmission. Growth's true cost is the leak of "why we do this" at each retelling — until the front line is left with motion and no meaning.</p>
+      <span class="tag zh-only">筹备中</span><span class="tag en-only">Coming soon</span>
+    </div>
+    <div class="pick soon">
+      <span class="pk zh-only">论三 · 治理</span><span class="pk en-only">III · GOVERNANCE</span>
+      <h3 class="zh-only">制度：越治理越失控的那道回路</h3><h3 class="en-only">Rules: the loop where more control means less</h3>
+      <p class="zh-only">每一次「加个流程堵住漏洞」，都同时制造了新的可钻空子的接缝。制度不是意义的替代品；当一家公司开始用制度代替意义，它就进入了自我加厚的失控循环。</p><p class="en-only">Every "add a process to plug the gap" creates a new seam to game. Rules are no substitute for meaning; when a firm starts replacing meaning with rules, it enters a self-thickening loop of losing control.</p>
+      <span class="tag zh-only">筹备中</span><span class="tag en-only">Coming soon</span>
+    </div>
+    <div class="pick soon">
+      <span class="pk zh-only">论四 · 人</span><span class="pk en-only">IV · PEOPLE</span>
+      <h3 class="zh-only">激励：钱买得到动作，买不到意义</h3><h3 class="en-only">Incentives: money buys motion, not meaning</h3>
+      <p class="zh-only">纯靠激励维系的组织，员工只在被计量的地方使劲。真正让一个人愿意在没人看见时也做对的，从来不是奖金结构，而是他是否在这份工作里，接通了一个属于他自己的意义。</p><p class="en-only">An organisation held together by incentives alone has people pushing only where they are measured. What makes someone do right when unseen is never the bonus structure but whether the work connects to a meaning of their own.</p>
+      <span class="tag zh-only">筹备中</span><span class="tag en-only">Coming soon</span>
+    </div>
+    <div class="pick soon">
+      <span class="pk zh-only">论五 · 危机</span><span class="pk en-only">V · CRISIS</span>
+      <h3 class="zh-only">转型：企业为什么死于自己的成功</h3><h3 class="en-only">Turning: why firms die of their own success</h3>
+      <p class="zh-only">让一家公司成功的那套意义，会在环境变了之后成为它的枷锁。最难的转型从不是技术或资金，而是让一个组织放弃「曾经让它赢」的那个意义，重新发生一个新的。</p><p class="en-only">The very meaning that made a firm succeed becomes its shackle once the environment shifts. The hardest turn is never technical or financial but letting an organisation give up the meaning that once won, and re-generate a new one.</p>
+      <span class="tag zh-only">筹备中</span><span class="tag en-only">Coming soon</span>
+    </div>
+    <div class="pick soon">
+      <span class="pk zh-only">论六 · 终局</span><span class="pk en-only">VI · ENDING</span>
+      <h3 class="zh-only">消亡：一家企业是怎么「散」的</h3><h3 class="en-only">Dissolution: how a firm comes apart</h3>
+      <p class="zh-only">破产只是法律终点。一家企业真正的死亡，发生在它内部再也没有人相信「我们为什么在一起」的那一刻——之后哪怕账面还活着，它也只是一具还在走流程的空壳。</p><p class="en-only">Bankruptcy is only the legal end. A firm's true death is the moment no one inside still believes "why we are together" — after which, even if the books survive, it is a shell still running procedures.</p>
+      <span class="tag zh-only">筹备中</span><span class="tag en-only">Coming soon</span>
+    </div>
+  </div>
+
+  <div class="note">
+    <p class="zh-only">企业本体论不是又一套管理工具。它先回答「企业是什么」，管理方法才有地基可站。<b>看不清一家公司到底靠什么活着，任何优化都是在给一个方向不明的东西加速。</b></p>
+    <p class="en-only">Enterprise ontology is not another management toolkit. It answers "what a firm is" first, so that methods have bedrock to stand on. Without seeing what actually keeps a company alive, every optimisation merely accelerates something whose direction is unclear.</p>
+    <div class="crosslinks">
+      <a href="/column/enterprise-as-meaning-engine/" class="zh-only">开篇：企业是一台意义发生机 →</a><a href="/column/enterprise-as-meaning-engine/" class="en-only">Opening: The Firm as a Meaning Engine →</a>
+      <a href="/business/" class="zh-only">商业专栏</a><a href="/business/" class="en-only">Business column</a>
+      <a href="/discovery-vs-genesis/" class="zh-only">发现VS发生</a><a href="/discovery-vs-genesis/" class="en-only">Discovery vs Genesis</a>
+    </div>
+  </div>
+</div></section>
+
+<footer>© 德麦国际 · SDE Universes　·　<span class="zh-only">企业本体论专栏 · 王德生</span><span class="en-only">Enterprise Ontology · Wang Desheng</span></footer>
+
+<script>
+function setLang(l){document.body.className=l;document.querySelectorAll('.lang-btn').forEach(b=>b.classList.remove('active'));event.target.classList.add('active');}
+</script>
+</body>
+</html>
