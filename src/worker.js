@@ -54,6 +54,25 @@ export class CommentBox {
     if (request.method !== "POST") return new Response("method", { status: 405 });
     const body = await request.json().catch(() => null);
     if (!body) return Response.json({ ok: false, msg: "请求格式不对。" }, { status: 400 });
+    // —— 名字·网络 一一绑定（只在全局单实例 names-global 上被调用）——
+    // 规则：同一网络（IP哈希）首次发言的名字即被绑定，此后必须沿用同一名字。
+    if (body.op === "claim") {
+      const h = String(body.h || ""), name = String(body.name || "");
+      if (!h || !name) return Response.json({ ok: false, msg: "请求格式不对。" });
+      const bound = await this.ctx.storage.get("nm:" + h);
+      if (!bound) { await this.ctx.storage.put("nm:" + h, name); return Response.json({ ok: true, first: true }); }
+      if (bound === name) return Response.json({ ok: true });
+      return Response.json({ ok: false, bound, msg: "你所在的网络首次发言用的名字是「" + bound + "」，之后请沿用这个名字。" });
+    }
+    if (body.op === "unbind") { // 管理解绑：路由层已验过管理口令；按名字删除全部绑定
+      const name = String(body.name || "");
+      if (!name) return Response.json({ ok: false, msg: "要解绑的名字为空。" });
+      const all = await this.ctx.storage.list({ prefix: "nm:" });
+      const doomed = [];
+      for (const [k, v] of all) if (v === name) doomed.push(k);
+      for (let i = 0; i < doomed.length; i += 128) await this.ctx.storage.delete(doomed.slice(i, i + 128));
+      return Response.json({ ok: true, removed: doomed.length });
+    }
     if (body.op === "del") { // 管理删除：路由层已验过管理口令才会转发到这里
       const cid = String(body.id || "");
       const item = await this.ctx.storage.get("c:" + cid);
@@ -822,21 +841,36 @@ export default {
       if (request.method === "POST") {
         const body = await request.json().catch(() => null);
         if (!body) return Response.json({ ok: false, msg: "请求格式不对。" }, { status: 400 });
-        if (body.op === "del") { // 管理删除：先过 ConfigVault 管理口令
+        if (body.op === "del" || body.op === "unbind") { // 管理操作：先过 ConfigVault 管理口令
           const cv = env.CONFIG_VAULT.get(env.CONFIG_VAULT.idFromName("global"));
           const chk = await (await cv.fetch(new Request("https://do/", { method: "POST", body: JSON.stringify({ op: "checkpass", pass: String(body.pass || "") }) }))).json();
           if (!chk.ok) return Response.json({ ok: false, msg: "管理口令不正确。" }, { status: 403 });
+          if (body.op === "unbind") { // 解绑某名字与网络的绑定（换名/纠错用）
+            const names = env.COMMENTS.get(env.COMMENTS.idFromName("names-global"));
+            return names.fetch(new Request(request.url, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ op: "unbind", name: String(body.name || "") }) }));
+          }
           return box.fetch(new Request(request.url, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ op: "del", id: String(body.id || "") }) }));
         }
+        // 预校验（避免无效发言也把名字绑掉）
+        const clean = (s, n) => String(s || "").replace(/[\u0000-\u0009\u000b-\u001f]/g, "").trim().slice(0, n);
+        const name = clean(body.name, 20), text = clean(body.text, 1000);
+        if (!name) return Response.json({ ok: false, msg: "请先起一个名字。" });
+        if (text.length < 2) return Response.json({ ok: false, msg: "内容太短了。" });
         const ip = request.headers.get("CF-Connecting-IP") || "0";
         const ua = request.headers.get("User-Agent") || "";
         const day = new Date(Date.now() + 8 * 3600 * 1000).toISOString().slice(0, 10);
+        // 名字·网络一一绑定：哈希只含 IP（跨天、跨浏览器持久），与限流指纹分开
+        const nb = await crypto.subtle.digest("SHA-256", new TextEncoder().encode("sde-nm-v1:" + ip));
+        const nh = [...new Uint8Array(nb)].map((b) => b.toString(16).padStart(2, "0")).join("");
+        const names = env.COMMENTS.get(env.COMMENTS.idFromName("names-global"));
+        const claim = await (await names.fetch(new Request("https://do/", { method: "POST", body: JSON.stringify({ op: "claim", h: nh, name }) }))).json();
+        if (!claim.ok) return Response.json({ ok: false, msg: claim.msg || "名字与你的网络不匹配。" }, { status: 409 });
         const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode("sde-cm-v1:" + ip + "|" + ua + "|" + day));
         const fp = [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, "0")).join("");
         return box.fetch(new Request(request.url, {
           method: "POST",
           headers: { "content-type": "application/json", "x-cm-fp": fp, "x-cm-day": day },
-          body: JSON.stringify({ name: body.name, text: body.text, parent: body.parent }),
+          body: JSON.stringify({ name: name, text: text, parent: body.parent }),
         }));
       }
       return new Response("method", { status: 405 });
