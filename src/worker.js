@@ -73,6 +73,17 @@ export class CommentBox {
       for (let i = 0; i < doomed.length; i += 128) await this.ctx.storage.delete(doomed.slice(i, i + 128));
       return Response.json({ ok: true, removed: doomed.length });
     }
+    if (body.op === "reg") { // 内部调用：登记"有过留言"的文章（仅 names-global 实例）
+      const s = String(body.slug || "");
+      if (s) { const cur = (await this.ctx.storage.get("sl:" + s)) || 0; await this.ctx.storage.put("sl:" + s, cur + 1); }
+      return Response.json({ ok: true });
+    }
+    if (body.op === "slugs") { // 管理：列出有过留言的文章及累计发言数（路由层已验口令）
+      const all = await this.ctx.storage.list({ prefix: "sl:" });
+      const out = [];
+      for (const [k, v] of all) out.push({ slug: k.slice(3), posts: v });
+      return Response.json({ ok: true, slugs: out });
+    }
     if (body.op === "del") { // 管理删除：路由层已验过管理口令才会转发到这里
       const cid = String(body.id || "");
       const item = await this.ctx.storage.get("c:" + cid);
@@ -841,13 +852,13 @@ export default {
       if (request.method === "POST") {
         const body = await request.json().catch(() => null);
         if (!body) return Response.json({ ok: false, msg: "请求格式不对。" }, { status: 400 });
-        if (body.op === "del" || body.op === "unbind") { // 管理操作：先过 ConfigVault 管理口令
+        if (body.op === "del" || body.op === "unbind" || body.op === "slugs") { // 管理操作：先过 ConfigVault 管理口令
           const cv = env.CONFIG_VAULT.get(env.CONFIG_VAULT.idFromName("global"));
           const chk = await (await cv.fetch(new Request("https://do/", { method: "POST", body: JSON.stringify({ op: "checkpass", pass: String(body.pass || "") }) }))).json();
           if (!chk.ok) return Response.json({ ok: false, msg: "管理口令不正确。" }, { status: 403 });
-          if (body.op === "unbind") { // 解绑某名字与网络的绑定（换名/纠错用）
+          if (body.op === "unbind" || body.op === "slugs") { // 全局操作走 names-global 实例
             const names = env.COMMENTS.get(env.COMMENTS.idFromName("names-global"));
-            return names.fetch(new Request(request.url, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ op: "unbind", name: String(body.name || "") }) }));
+            return names.fetch(new Request(request.url, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ op: body.op, name: String(body.name || "") }) }));
           }
           return box.fetch(new Request(request.url, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ op: "del", id: String(body.id || "") }) }));
         }
@@ -867,11 +878,19 @@ export default {
         if (!claim.ok) return Response.json({ ok: false, msg: claim.msg || "名字与你的网络不匹配。" }, { status: 409 });
         const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode("sde-cm-v1:" + ip + "|" + ua + "|" + day));
         const fp = [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, "0")).join("");
-        return box.fetch(new Request(request.url, {
+        const resp = await box.fetch(new Request(request.url, {
           method: "POST",
           headers: { "content-type": "application/json", "x-cm-fp": fp, "x-cm-day": day },
           body: JSON.stringify({ name: name, text: text, parent: body.parent }),
         }));
+        const data = await resp.json().catch(() => null);
+        if (data && data.ok) { // 发言成功 → 在全局登记该文章（供管理页发现）
+          await names.fetch(new Request("https://do/", { method: "POST", body: JSON.stringify({ op: "reg", slug }) }));
+        }
+        return new Response(JSON.stringify(data || { ok: false, msg: "服务异常，请稍后再试。" }), {
+          status: data ? resp.status : 500,
+          headers: { "content-type": "application/json", "cache-control": "no-store" },
+        });
       }
       return new Response("method", { status: 405 });
     }

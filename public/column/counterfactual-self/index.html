@@ -651,6 +651,110 @@ footer{border-top:1px solid var(--line);padding:30px 24px;text-align:center;colo
 </section>
 
 </article></div></div>
+
+<!-- 读者讨论区+阅读计数 · sde-talk v2 -->
+<section id="sde-talk">
+<style id="sde-talk-css">
+#sde-talk{max-width:722px;margin:56px auto 40px;padding:0 24px;line-height:1.9;text-align:left}
+#sde-talk .tk-title{font-size:20px;font-weight:800;letter-spacing:.04em;margin:0 0 4px;padding-bottom:12px;border-bottom:2px solid rgba(128,128,128,.3);text-indent:0}
+#sde-talk .tk-title span{font-size:13px;font-weight:400;opacity:.6;letter-spacing:.02em}
+#sde-talk .tk-hint{font-size:13px;opacity:.62;margin:10px 0 18px;text-indent:0}
+#sde-talk .tk-form{background:rgba(128,128,128,.06);border:1px solid rgba(128,128,128,.22);border-radius:8px;padding:16px 16px 12px;margin-bottom:26px}
+#sde-talk input,#sde-talk textarea{display:block;width:100%;box-sizing:border-box;font:inherit;color:inherit;background:rgba(128,128,128,.12);border:1px solid rgba(128,128,128,.3);border-radius:6px;padding:9px 12px;margin:0 0 10px;outline:none}
+#sde-talk textarea{min-height:88px;resize:vertical;line-height:1.8}
+#sde-talk input:focus,#sde-talk textarea:focus{border-color:rgba(128,128,128,.6)}
+#sde-talk .tk-bar{display:flex;justify-content:space-between;align-items:center}
+#sde-talk .tk-note{font-size:12px;opacity:.55}
+#sde-talk button{font:inherit;font-size:14px;letter-spacing:.2em;padding:7px 26px;border-radius:6px;border:1px solid currentColor;background:transparent;color:inherit;cursor:pointer;opacity:.85}
+#sde-talk button:hover{opacity:1}
+#sde-talk button:disabled{opacity:.4;cursor:default}
+#sde-talk #tk-msg{font-size:13px;margin-top:8px;opacity:.75;min-height:1em;text-indent:0}
+#sde-talk #tk-replying{font-size:13px;margin-bottom:8px;opacity:.8}
+#sde-talk #tk-replying a{margin-left:8px;text-decoration:underline;color:inherit;opacity:.7;cursor:pointer}
+#sde-talk .tk-item{border-bottom:1px solid rgba(128,128,128,.18);padding:16px 2px}
+#sde-talk .tk-head{font-size:13px;margin-bottom:5px;text-indent:0}
+#sde-talk .tk-name{font-weight:700}
+#sde-talk .tk-time{opacity:.5;margin-left:10px;font-size:12px}
+#sde-talk .tk-body{white-space:pre-wrap;word-break:break-word;font-size:15.5px;text-indent:0;margin:0}
+#sde-talk .tk-reply{display:inline-block;font-size:12px;margin-top:7px;color:inherit;opacity:.55;text-decoration:none;border-bottom:1px dashed currentColor;cursor:pointer}
+#sde-talk .tk-reply:hover{opacity:.9}
+#sde-talk .tk-sub{margin:12px 0 0 22px;padding:10px 14px;background:rgba(128,128,128,.07);border-left:2px solid rgba(128,128,128,.35);border-radius:0 6px 6px 0}
+#sde-talk .tk-empty{padding:26px 0;text-align:center;opacity:.55;font-size:14px}
+</style>
+<div class="tk-wrap">
+  <h2 class="tk-title">读者讨论区 <span id="tk-count"></span> <span id="sde-pv-wrap">· 本文已被阅读 <span id="sde-pv-n">—</span> 次</span></h2>
+  <p class="tk-hint">起个名字就能发言——向作者提问，或回应其他读者的见解。首次发言的名字会与你的网络绑定，此后请沿用同一名字。发言公开可见，请友善交流。</p>
+  <div class="tk-form">
+    <div id="tk-replying" style="display:none"><span id="tk-replying-to"></span><a id="tk-cancel">取消回复</a></div>
+    <input id="tk-name" maxlength="20" placeholder="你的名字（虚拟名字即可）">
+    <textarea id="tk-text" maxlength="1000" placeholder="你的问题，或你的见解…"></textarea>
+    <div class="tk-bar"><span class="tk-note">最多 1000 字 · 每人每天最多 30 条</span><button id="tk-send">发 言</button></div>
+    <div id="tk-msg"></div>
+  </div>
+  <div id="tk-list"></div>
+</div>
+</section>
+<script id="sde-talk-js">
+(function(){
+var slug="column/counterfactual-self",API="/api/comments?slug="+slug;
+function el(id){return document.getElementById(id)}
+var items=[],parent="";
+function note(s){el("tk-msg").textContent=s}
+function tme(ts){var d=new Date(ts),p=function(x){return (x<10?"0":"")+x};
+return d.getFullYear()+"-"+p(d.getMonth()+1)+"-"+p(d.getDate())+" "+p(d.getHours())+":"+p(d.getMinutes())}
+function head(c){var h=document.createElement("div");h.className="tk-head";
+var n=document.createElement("span");n.className="tk-name";n.textContent=c.name;
+var t=document.createElement("span");t.className="tk-time";t.textContent=tme(c.ts);
+h.appendChild(n);h.appendChild(t);return h}
+function para(s){var p=document.createElement("p");p.className="tk-body";p.textContent=s;return p}
+function render(){
+var list=el("tk-list");list.innerHTML="";
+el("tk-count").textContent="· "+items.length+" 条";
+var tops=items.filter(function(c){return !c.parent}).sort(function(a,b){return b.ts-a.ts});
+var reps={};items.forEach(function(c){if(c.parent){(reps[c.parent]=reps[c.parent]||[]).push(c)}});
+if(!tops.length){var e=document.createElement("div");e.className="tk-empty";e.textContent="还没有留言，来做第一位发言的读者。";list.appendChild(e);return}
+tops.forEach(function(c){
+var box=document.createElement("div");box.className="tk-item";
+box.appendChild(head(c));box.appendChild(para(c.text));
+var rb=document.createElement("a");rb.className="tk-reply";rb.textContent="回复";
+rb.onclick=function(){parent=c.id;el("tk-replying-to").textContent="正在回复 @"+c.name;
+el("tk-replying").style.display="block";el("tk-text").focus();
+el("sde-talk").scrollIntoView({behavior:"smooth"})};
+box.appendChild(rb);
+(reps[c.id]||[]).sort(function(a,b){return a.ts-b.ts}).forEach(function(r){
+var s=document.createElement("div");s.className="tk-sub";s.appendChild(head(r));s.appendChild(para(r.text));box.appendChild(s)});
+list.appendChild(box)});
+}
+el("tk-cancel").onclick=function(){parent="";el("tk-replying").style.display="none"};
+try{var nm=localStorage.getItem("sde_cm_name");if(nm)el("tk-name").value=nm}catch(e){}
+el("tk-send").onclick=function(){
+var name=el("tk-name").value.trim(),text=el("tk-text").value.trim();
+if(!name){note("请先起一个名字。");return}
+if(text.length<2){note("内容太短了。");return}
+var btn=el("tk-send");btn.disabled=true;note("发布中…");
+fetch(API,{method:"POST",headers:{"content-type":"application/json"},
+body:JSON.stringify({name:name,text:text,parent:parent})})
+.then(function(r){return r.json()})
+.then(function(d){btn.disabled=false;
+if(d&&d.ok&&d.item){items.push(d.item);
+try{localStorage.setItem("sde_cm_name",name)}catch(e){}
+el("tk-text").value="";parent="";el("tk-replying").style.display="none";note("已发布。");render()}
+else{note((d&&d.msg)||"发布失败，请稍后再试。")}})
+.catch(function(){btn.disabled=false;note("网络异常，请稍后再试。")})};
+fetch(API).then(function(r){return r.json()})
+.then(function(d){items=(d&&d.items)||[];render()})
+.catch(function(){el("tk-list").textContent="讨论区暂时无法加载，请稍后刷新。"});
+(function(){var pn=el("sde-pv-n");if(!pn)return;
+var k="sde_pv_"+slug,day=new Date(Date.now()+288e5).toISOString().slice(0,10),m="POST";
+try{if(localStorage.getItem(k)===day)m="GET";}catch(e){}
+fetch("/api/pv?slug="+slug,{method:m}).then(function(r){return r.json()})
+.then(function(d){if(d&&typeof d.total==="number"){pn.textContent=d.total.toLocaleString("zh-Hans-CN");
+if(m==="POST"){try{localStorage.setItem(k,day);}catch(e){}}}else{throw 0;}})
+.catch(function(){var w=el("sde-pv-wrap");if(w)w.style.display="none";});
+})();
+})();
+</script>
+
 <div id="pdf" class="panel"><div class="rdr">
   <div class="rdr-bar"><button class="rbtn" id="pv" disabled>‹ 上一页</button>
     <span class="pbox"><input id="pin" type="number" min="1" value="1"> / <span class="ptot" id="ptot">…</span></span>
