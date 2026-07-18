@@ -1,4 +1,23 @@
 // SDE Universes site worker: visit counter + static assets
+
+// ── 讨论区 Google 实名登录（方案B：只认 Google 登录）────────────────
+// 填入王德生在 console.cloud.google.com 创建的 OAuth Web 客户端 ID 即全站生效；
+// 留空 = 休眠，讨论区维持"起名+网络绑定"旧通道。
+const GOOGLE_CLIENT_ID = "";
+// 服务器端校验 Google 登录凭证：只信 Google 签发、只信本站客户端 ID。
+// 只取显示名，不存邮箱、不存 Google ID 原文。
+async function verifyGoogleCredential(cred) {
+  if (!cred || typeof cred !== "string" || cred.length > 4096) return null;
+  try {
+    const r = await fetch("https://oauth2.googleapis.com/tokeninfo?id_token=" + encodeURIComponent(cred));
+    if (!r.ok) return null;
+    const p = await r.json();
+    if (p.aud !== GOOGLE_CLIENT_ID) return null;
+    if (p.iss !== "https://accounts.google.com" && p.iss !== "accounts.google.com") return null;
+    const name = String(p.name || (p.email ? p.email.split("@")[0] : "")).trim().slice(0, 20);
+    return name ? { name } : null;
+  } catch (e) { return null; }
+}
 export class VisitCounter {
   constructor(ctx, env) {
     this.ctx = ctx;
@@ -864,8 +883,17 @@ export default {
         }
         // 预校验（避免无效发言也把名字绑掉）
         const clean = (s, n) => String(s || "").replace(/[\u0000-\u0009\u000b-\u001f]/g, "").trim().slice(0, n);
-        const name = clean(body.name, 20), text = clean(body.text, 1000);
-        if (!name) return Response.json({ ok: false, msg: "请先起一个名字。" });
+        let name;
+        const googleOn = GOOGLE_CLIENT_ID.length > 0;
+        if (googleOn) { // 方案B：只认 Google 登录，发言人 = Google 账号名字
+          const who = await verifyGoogleCredential(body.credential);
+          if (!who) return Response.json({ ok: false, msg: "请先用 Google 账号登录后再发言。" }, { status: 401 });
+          name = clean(who.name, 20);
+        } else {
+          name = clean(body.name, 20);
+          if (!name) return Response.json({ ok: false, msg: "请先起一个名字。" });
+        }
+        const text = clean(body.text, 1000);
         if (text.length < 2) return Response.json({ ok: false, msg: "内容太短了。" });
         const ip = request.headers.get("CF-Connecting-IP") || "0";
         const ua = request.headers.get("User-Agent") || "";
@@ -874,8 +902,10 @@ export default {
         const nb = await crypto.subtle.digest("SHA-256", new TextEncoder().encode("sde-nm-v1:" + ip));
         const nh = [...new Uint8Array(nb)].map((b) => b.toString(16).padStart(2, "0")).join("");
         const names = env.COMMENTS.get(env.COMMENTS.idFromName("names-global"));
-        const claim = await (await names.fetch(new Request("https://do/", { method: "POST", body: JSON.stringify({ op: "claim", h: nh, name }) }))).json();
-        if (!claim.ok) return Response.json({ ok: false, msg: claim.msg || "名字与你的网络不匹配。" }, { status: 409 });
+        if (!googleOn) { // 旧通道才做 IP-名字绑定；Google 实名无需绑定
+          const claim = await (await names.fetch(new Request("https://do/", { method: "POST", body: JSON.stringify({ op: "claim", h: nh, name }) }))).json();
+          if (!claim.ok) return Response.json({ ok: false, msg: claim.msg || "名字与你的网络不匹配。" }, { status: 409 });
+        }
         const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode("sde-cm-v1:" + ip + "|" + ua + "|" + day));
         const fp = [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, "0")).join("");
         const resp = await box.fetch(new Request(request.url, {
