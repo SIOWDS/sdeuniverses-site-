@@ -748,6 +748,7 @@ const books=[
   {id:41, zh:'语言发生学', en:'Language Occurrence', d:'civ', zhDesc:'超越符号与规则的语言学新范式——把语言学从「发现学」转向「发生学」。语言不是符号或规则，而是生命与世界在张力中共同发生的事件。语言是世界的呼吸。（语言发生学，王德生·胡志英）', enDesc:'Language Occurrence. Demai International. Beyond sign and rule — a new paradigm moving linguistics from discovery to occurrence.'},
   {id:42, zh:'大学的终结与重生', en:'The End and Rebirth of the University', d:'edu', zhDesc:'基于GPT的教学和科研之变——GPT不是外部威胁,而是本体显影镜:大学早已「意义节奏缺席」。六编二十六章,从大学的终结到节奏协同大学。在一切都能被生成的时代,只有节奏与判断无法被替代。（大学的终结与重生,王德生）', enDesc:'The End and Rebirth of the University. Demai International. From the ontological end of the university to the Rhythm-Synergy University.'},
   {id:43, zh:'Palantir 的 SDE 解构', en:'An SDE Deconstruction of Palantir', d:'ai', zhDesc:'把 Palantir 从「企业数据语义层／数字孪生」重新界定为固定 S、E 条件下的企业 D3 实现器、企业最优运行智能体——它在秩序态里预测·调度·审批·执行无出其右，却照不见旧秩序如何失效、新秩序如何发生，因而缺少完整的企业发生学智慧。导论加三十五章。（Palantir Ontology 的 SDE 解构，王德生）', enDesc:'An SDE Deconstruction of Palantir Ontology. Demai International. Palantir as an enterprise D3 implementer and optimal-operation agent — masterful in the ordered state, blind to how new enterprise orders are generated.'},
+  {id:44, zh:'SDE 智能体导论', en:'An Introduction to SDE Agents', d:'ai', zhDesc:'从语言模型到发生世界模型的智能体革命——大语言模型不是完整智能，而是世界模型发生的语言材料场：E2 极强、E1 悬空、E3 缺位，信息发生不等于知识发生。由 SDE 本体论指挥语言模型，先为具体问题临时建造三界发生世界模型，再在其中显露新结构；智能体的高阶使命不是完成任务，而是发生新世界。导论加六编二十八章、补论五篇、附录十八篇。（SDE 智能体导论，王德生）', enDesc:'An Introduction to SDE Agents: From Language Models to Genesis World-Models. Demai International. The LLM as material field, the SDE ontology as command system, the human as center of direction — agents that build temporary genesis world-models rather than merely completing tasks.'},
 ];
 // ── RENDER BOOKS
 const filterEl=document.getElementById('booksFilter');
@@ -767,7 +768,7 @@ allDomains.forEach(d=>{
   };
   filterEl.appendChild(btn);
 });
-const COVER_IDS=new Set([1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,20,21,22,23,24,25,26,27,28,29,30,31,32,33,35,36,37,38,39,40,41,42,43]);
+const COVER_IDS=new Set([1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,20,21,22,23,24,25,26,27,28,29,30,31,32,33,35,36,37,38,39,40,41,42,43,44]);
 function renderBooks(){
   const isZh=document.body.classList.contains('zh');
   const filtered=activeDomain==='all'?books:books.filter(b=>b.d===activeDomain);
