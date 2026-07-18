@@ -9,7 +9,11 @@
 
 ### A. 索引(地基,必须懂)
 - 位置:`public/search/` = `manifest.json`(元数据+文档列表 docs[{i,u,t,s}]) + `shard-<栏目>.json`(分片正文块 {d,t}) + `sde-coords.json`(SDE坐标,可选,见 D/F)。
-- 构建:`python3 tools/build_search_index.py` —— 抽 HTML 可见正文 + PDF 正文(`pdftotext -nopgbrk`),chunk 级去重(栏目文章 HTML=PDF 镜像丢弃、专著薄壳保留 PDF),按栏目分片。**内容一变必重跑再提交(铁律8)**。现状约 204 文档 / 5923 块 / 228 万字。
+- 构建:`python3 tools/build_search_index.py` —— 抽 HTML 可见正文 + PDF 正文(`pdftotext -nopgbrk`),chunk 级去重(栏目文章 HTML=PDF 镜像丢弃、专著薄壳保留 PDF),按栏目分片。**规模不写死在本文** —— 它天天在长,写死的数字只会变成下一个骗人的数字(本文上一版把 204 篇/228 万字挂了很久,实际早已三倍于此)。要实数就读 `public/search/manifest.json` 的 `counts` 字段,或跑 `python3 tools/build_search_index.py --check`。
+- **已自动化(2026-07-18):不必再记着手动跑。** `.github/workflows/search-index.yml`:push 改了 `public/**`(排除 `public/search/**`,否则自触发)或两个打标/构建脚本 → GitHub Actions 自动重建索引+坐标 → 自检 → 提交回 main → 触发 Cloudflare 构建。人零操作,约 3 分钟上线。
+  - **为什么挂在 push 上而不是"打开搜索页时"**:索引是派生数据,只有内容变了才过期,而内容只在 push 那一刻变。访客打开搜索页一万次,站里一个字都不会变——挂在"打开"上等于重算一万次同一个结果(且浏览器/Worker 里都没有 pdftotext,更做不了)。对所有访客完全相同的东西 = 预先生成、直接调用(第二铁律第一类)。
+  - 手动仍可跑(本地或 Actions 页面 Run workflow),自检闸门:孤儿块/空块/无正文文档/孤儿坐标键任一出现即失败,坏索引进不了 main;末尾 `--check` 兜底,防生成器与筛选规则漂移。
+  - ⚠️ **改 workflow 文件必须走 GitHub 网页**:GitHub 拒绝无 `workflow` scope 的 PAT 写 `.github/workflows/`,也拒绝其 `actions:write`(手动触发)。**不要为此给 PAT 扩权**——该 PAT 明文存于 skill,加 workflow scope = 该 token 可在仓库跑任意代码。workflow 自身用 GITHUB_TOKEN,与该 PAT 无关。
 
 ### B. Worker 后端(`src/worker.js`)
 - 路由(都在 `env.ASSETS.fetch` 兜底**之前**):`/api/ask`(智能问答 RAG·流式 SSE)、`/api/admin/setkey`·`/api/admin/status`·`/api/admin/clearreflect`(页面配密钥/查状态/重写心得)、原有 `/api/visits`·`/api/llm-proxy`·`/fresh`。
@@ -21,7 +25,10 @@
 
 ### D. 检索侧·两条腿(把"正确=SDE词义"落到检索)
 - **腿1·SDE 词义查询扩展**(`sdeExpandQuery` + `SDE_LEXICON`):检索前让基底把问题翻成 SDE 术语(维度/概念/三界/27宫格位/同义SDE说法),再拿去召回——把"字面不共词、但 SDE 义相关"的文章捞上来(实测"主体性从哪来"→浮出 SIO 导论)。前端显示 `🧭 SDE 词义检索:…`。**意义在查询时解析(意义即发生),不预先冻成向量**。
-- **腿2·SDE 坐标匹配**(`retrieve` + `sde-coords.json`):doc 的 SDE 坐标 ∩ 查询扩展词 → 加分(×2)。**须先跑 `tools/label_sde_coords.py`(用你的Key)给每篇打坐标**;坐标文件不存在时该分支**安全跳过**、退回腿1。**现状：已用规则打标器 label_sde_coords_rules.py 免Key引导激活（160篇、区分性坐标+少量推断）；想要更细的LLM推断坐标，跑 label_sde_coords.py 覆盖即可。**
+- **腿2·SDE 坐标匹配**(`retrieve` + `sde-coords.json`):doc 的 SDE 坐标 ∩ 查询扩展词 → 加分(×2)。**须先跑 `tools/label_sde_coords.py`(用你的Key)给每篇打坐标**;坐标文件不存在时该分支**安全跳过**、退回腿1。**现状：已用规则打标器 label_sde_coords_rules.py 免Key引导激活（覆盖数以 sde-coords.json 实际条目为准，约八成文档；区分性坐标+少量推断）；想要更细的LLM推断坐标，跑 label_sde_coords.py 覆盖即可。**
+- 🔴 **陷阱(吃过亏):`sde-coords.json` 按文档编号(doc index)存,不是按 URL。** 索引一重建,插进去的新文档就把后面所有编号顶掉,旧坐标随即指向错误的文章。2026-07-17 实测:新增 12 篇 → 357 篇里 255 篇编号重排 → 160 条坐标有 67 条挂错了文章(「福柯/权力/话语」从《助产思想》跑到了《测度外壳》头上)。**过期的坐标不是"变钝",是主动把 ×2 加分喂给错的文档——比没有坐标更糟。** 故:**坐标必须与索引同跑同提交,永不拆成两步**(自动化 workflow 里已焊死为相邻两步)。
+- **打标器已知缺陷(未修,待定夺 — 2026-07-18 实测)**:①「教育」「d2」各命中 184/314 篇(59%),一个词覆盖近六成文档时就不再区分任何东西,×2 加分等于白给;②规则表漏了三大主权(命名权/判错权/计算权),《判错权》那篇只拿到「智能体/agi」,博士论文《拒绝装置》拿到的是「教育/d2/语言/符号」。
+- **改规则的判据(2026-07-17 血案)**:oncology 规则曾用裸「转移」做触发词,而本语料里「转移」压倒性地是压力转移/功能转移/话题转移,于是给 15 篇毫无肿瘤内容的文档(含《意义管理学》等三部专著、博士论文、多篇学员论文)挂上癌症坐标——一个肿瘤问题要跟《意义管理学》抢排名。**触发词必须长到是本学科的搭配**(转移癌/远处转移/淋巴结转移/转移灶),单字只在几乎无他用时才可(如「癌」)。改完必须实测:假阳性归零、真阳性不丢。
 - 基础召回:关键词 + 中文 bigram,`retrieve(corpus,q,K,expTerms)`,每篇最多2块;K/CTX 按档分级(普通 15/9千字、深度 120/5万字);四步法各调用 RAG 钳 15000。
 - **打坐标怎么跑**:`export SDE_LABEL_KEY=你的Key && export SDE_LABEL_VENDOR=glm && python3 tools/label_sde_coords.py`(文档级、断点续跑、无第三方依赖)→ 生成 `public/search/sde-coords.json` → 提交推送。
 
@@ -41,7 +48,7 @@
 ### F. 会过期的东西,改了内容记得同步(最容易忘)
 | 改了什么 | 必须同步 |
 |---|---|
-| 发/改文章、上专著 | 重跑 `build_search_index.py`(否则搜不到);再重跑 `label_sde_coords.py`(坐标也旧了) |
+| 发/改文章、上专著 | ~~重跑索引~~ **已自动**(push 即重建索引+坐标,见 A 节)。只在 workflow 失败时才需手动 `build_search_index.py` + `label_sde_coords_rules.py`(两个必须同跑,见 D 节陷阱)。想要 LLM 精度坐标仍需手动跑 `label_sde_coords.py` |
 | 改 `sde-neigong.txt` 或心得字数 | ⚙️ 管理设置「重写心得」(凭口令清缓存,否则旧心得继续复用) |
 | 想换答题基底默认 | GLM-5(默认,中文凝缩,避DeepSeek话题自审)/ DeepSeek(数学严谨) |
 
