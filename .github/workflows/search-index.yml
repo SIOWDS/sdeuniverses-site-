@@ -1,0 +1,102 @@
+# 站内搜索索引 · 自动重建
+#
+# 为什么挂在 push 上而不是"打开搜索页时"：
+#   索引是派生数据，只有内容变了它才会过期，而内容只在 push 那一刻变。
+#   访客打开搜索页一万次，站里一个字都不会变 —— 挂在"打开"上等于重算一万次同一个结果。
+#   对所有访客完全相同的东西 = 预先生成、直接调用（第二铁律第一类）。
+#
+# 因此：push 改了 public/ 下的内容 → 本工作流自动重跑索引与坐标 → 提交回 main
+#       → 触发 Cloudflare 构建 → 上线。人零操作，索引永不过期。
+#
+# 坐标必须与索引同跑，不能拆成两步：sde-coords.json 按文档编号存，
+# 索引一重建编号就重排，旧坐标会把 ×2 检索加分喂给错误的文章 —— 比不打坐标更糟。
+
+name: search-index
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'public/**'
+      - '!public/search/**'          # 排除索引自身，否则本工作流会自我触发
+      - 'tools/build_search_index.py'
+      - 'tools/label_sde_coords_rules.py'
+  workflow_dispatch:                 # 也允许在 Actions 页面手动跑一次
+
+concurrency:
+  group: search-index
+  cancel-in-progress: true           # 连续 push 时只有最后一次的索引有意义
+
+jobs:
+  reindex:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write                # 需要把重建后的索引推回 main
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 装 pdftotext（专著正文靠它抽，缺了 PDF 就进不了索引）
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq poppler-utils
+
+      - name: 重建索引
+        run: python3 tools/build_search_index.py
+
+      - name: 重打 SDE 坐标（必须紧跟重建，编号已重排）
+        run: python3 tools/label_sde_coords_rules.py
+
+      - name: 完整性自检（孤儿块/空块/无正文文档/孤儿坐标键，有一个就失败）
+        run: |
+          python3 - <<'EOF'
+          import json, os, sys
+          SD = 'public/search'
+          man = json.load(open(f'{SD}/manifest.json'))
+          docs = {d['i'] for d in man['docs']}
+          bad = []
+          seen = set()
+          for s in man['sections']:
+              p = f"{SD}/shard-{s['key']}.json"
+              if not os.path.exists(p):
+                  bad.append(f"分片缺失 {p}"); continue
+              for c in json.load(open(p))['chunks']:
+                  seen.add(c['d'])
+                  if c['d'] not in docs: bad.append(f"孤儿块 -> doc {c['d']}")
+                  if not c.get('t', '').strip(): bad.append(f"空块 in {s['key']}")
+          for d in man['docs']:
+              if d['i'] not in seen: bad.append(f"无正文块的文档 {d['u']}")
+          for k in json.load(open(f'{SD}/sde-coords.json')):
+              if int(k) not in docs: bad.append(f"孤儿坐标键 {k}")
+          if bad:
+              print("索引自检失败：", *dict.fromkeys(bad[:20]), sep="\n  ")
+              sys.exit(1)
+          c = man['counts']
+          print(f"自检通过 · {c['docs']} 篇 / {c['chunks']} 块 / {c['chars']:,} 字")
+          EOF
+
+      - name: 有变化就提交回 main
+        run: |
+          if git diff --quiet -- public/search/; then
+            echo "索引已与内容一致，无需提交"
+            exit 0
+          fi
+          git config user.name "sde-index-bot"
+          git config user.email "wangdesheng1234567@gmail.com"
+          git add public/search/
+          git commit -m "Auto-rebuild search index and SDE coordinates for ${GITHUB_SHA::7}
+
+          Content changed, so the index derived from it went stale in the same instant.
+          Rebuilt by .github/workflows/search-index.yml - no human step involved.
+          Coordinates rebuilt in the same commit because sde-coords.json is keyed by
+          doc index: any insertion shifts the numbering and points old coordinates at
+          the wrong articles."
+          # main 可能已前进（并发 push），冲突就 rebase 重试
+          for i in 1 2 3; do
+            git push && exit 0
+            echo "push 被拒（main 已前进），rebase 后重试 $i/3"
+            git pull --rebase origin main
+          done
+          echo "三次推送均失败" && exit 1
+
+      - name: 过期兜底自检（重建后必须不再过期，否则说明筛选规则与生成器脱节）
+        run: python3 tools/build_search_index.py --check
+
