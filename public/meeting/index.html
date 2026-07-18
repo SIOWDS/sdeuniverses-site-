@@ -52,6 +52,13 @@ input.txt:focus{border-color:var(--mtg)}
 #stage iframe{display:block;width:100%;height:min(72vh,640px);border:1px solid var(--border);border-top:none;border-radius:0 0 10px 10px;background:#000}
 .notes{background:var(--card2);border:1px solid var(--border2);border-radius:10px;padding:1.3rem 1.5rem;font-size:0.88rem;color:var(--text2)}
 .notes b{color:var(--text)}
+.mlist{border-top:1px solid var(--border2)}
+.mrow{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:0.85rem 2px;border-bottom:1px solid var(--border2);flex-wrap:wrap}
+.mname{font-weight:800;font-size:1rem}
+.mtag{display:inline-block;margin-left:10px;font-size:0.72rem;font-weight:400;color:var(--mtg);background:var(--mtg-soft);border:1px solid var(--mtg);border-radius:20px;padding:2px 10px;letter-spacing:0.05em}
+.mbtns{display:flex;gap:8px}
+.mbtns .btn{padding:0.5rem 1.2rem;font-size:0.82rem}
+@media(max-width:640px){.mrow{flex-direction:column;align-items:stretch}.mbtns .btn{flex:1}}
 .notes ol{margin:0.4rem 0 0 1.3rem}
 .notes li{margin-bottom:0.45rem}
 footer{border-top:1px solid var(--border2);padding:2rem 24px;text-align:center;font-size:0.75rem;color:var(--muted)}
@@ -84,36 +91,28 @@ footer a{color:var(--gold);text-decoration:none}
   <p class="lead">点击即在本页打开视频教室，支持多人视频、屏幕共享与举手发言。音视频经由 Jitsi Meet 公共服务在浏览器间传输，本站不架设、不经手任何音视频数据。</p>
 
   <div class="room-card">
-    <h3>SDE 大教室（默认）</h3>
-    <p>讲课统一使用这间教室。用 Google 账号一键登录进入，开课时间以下方讨论区的预告为准。</p>
-    <div class="row">
-      <button class="btn" onclick="joinRoom('SDE-Universes-Classroom')">进入 SDE 大教室</button>
-      <button class="btn ghost" onclick="joinRoom('SDE-Universes-Classroom', true)">新窗口打开</button>
+    <h3>会议列表</h3>
+    <p>点会议名字即进入，Google 账号自动登录。开课时间以下方讨论区预告为准。</p>
+    <div class="mlist">
+      <div class="mrow"><div class="mname">SDE 大教室<span class="mtag">讲课主会场</span></div><div class="mbtns"><button class="btn" onclick="joinRoom('SDE-Universes-Classroom')">进入</button><button class="btn ghost" onclick="joinRoom('SDE-Universes-Classroom',true)">新窗口</button></div></div>
+      <div class="mrow"><div class="mname">SDE 答疑室<span class="mtag">课后提问 · 讲师值守</span></div><div class="mbtns"><button class="btn" onclick="joinRoom('SDE-QA-Room')">进入</button><button class="btn ghost" onclick="joinRoom('SDE-QA-Room',true)">新窗口</button></div></div>
+      <div class="mrow"><div class="mname">SDE 讨论室 一<span class="mtag">小组学习</span></div><div class="mbtns"><button class="btn" onclick="joinRoom('SDE-Group-1')">进入</button><button class="btn ghost" onclick="joinRoom('SDE-Group-1',true)">新窗口</button></div></div>
+      <div class="mrow"><div class="mname">SDE 讨论室 二<span class="mtag">小组学习</span></div><div class="mbtns"><button class="btn" onclick="joinRoom('SDE-Group-2')">进入</button><button class="btn ghost" onclick="joinRoom('SDE-Group-2',true)">新窗口</button></div></div>
     </div>
   </div>
 
   <div class="room-card">
-    <h3>自建小教室 / 分组讨论</h3>
-    <p>输入一个教室名（英文或数字），与同学约定同名即可进入同一间教室，适合小组学习。</p>
+    <h3>输入会议号</h3>
+    <p>不在列表里的会议，输入会议号加入：数字号（9–11 位）自动走 Zoom；字母教室名进对应视频教室。</p>
     <div class="row">
-      <input class="txt" id="roomName" maxlength="40" placeholder="教室名，如 sde-group-1">
-      <button class="btn" onclick="joinCustom()">进入教室</button>
-    </div>
-    <div class="hintline">教室名只用字母、数字与连字符；系统会自动加上 SDE- 前缀避免撞名。</div>
-  </div>
-
-  <div class="room-card">
-    <h3>Zoom 通道</h3>
-    <p>如某次课改用 Zoom 进行，讲师会在讨论区发布会议链接或会议号；粘贴链接、或直接输入会议号，一键加入。</p>
-    <div class="row">
-      <input class="txt" id="zoomLink" placeholder="粘贴 Zoom 会议链接，如 https://zoom.us/j/…">
-      <button class="btn" onclick="openZoom()">加入 Zoom 会议</button>
+      <input class="txt" id="meetCode" maxlength="60" placeholder="会议号，如 123 4567 8901 或 sde-group-3">
+      <button class="btn" onclick="joinByCode()">加入会议</button>
     </div>
     <div class="row" style="margin-top:10px">
-      <input class="txt" id="zoomNum" inputmode="numeric" maxlength="14" placeholder="或输入 Zoom 会议号，如 123 4567 8901">
-      <button class="btn ghost" onclick="joinZoomNum()">按会议号加入</button>
+      <input class="txt" id="zoomLink" placeholder="或粘贴 Zoom 会议链接，如 https://zoom.us/j/…">
+      <button class="btn ghost" onclick="openZoom()">按链接加入</button>
     </div>
-    <div class="hintline">两种方式任选其一；如会议设有密码，加入时在 Zoom 提示框里输入即可。</div>
+    <div class="hintline">Zoom 会议如设有密码，加入时在 Zoom 提示框里输入即可。</div>
   </div>
 
   <div id="stage">
@@ -302,11 +301,6 @@ function joinRoom(r, newWin){
   st.className="on";
   st.scrollIntoView({behavior:"smooth",block:"start"});
 }
-function joinCustom(){
-  var v=(document.getElementById("roomName").value||"").trim();
-  if(!slugOk(v)){alert("教室名只能用字母、数字与连字符（1-40位）");return}
-  joinRoom("SDE-"+v);
-}
 function leaveRoom(){
   var st=document.getElementById("stage");
   document.getElementById("stageFrame").innerHTML="";
@@ -316,10 +310,13 @@ function fsStage(){
   var f=document.querySelector("#stageFrame iframe");
   if(f&&f.requestFullscreen)f.requestFullscreen();
 }
-function joinZoomNum(){
-  var v=(document.getElementById("zoomNum").value||"").replace(/[\s-]/g,"");
-  if(!/^\d{9,11}$/.test(v)){alert("会议号是 9-11 位数字，请检查后重试");return}
-  window.open("https://zoom.us/j/"+v,"_blank","noopener");
+function joinByCode(){
+  var v=(document.getElementById("meetCode").value||"").trim();
+  var num=v.replace(/[\s-]/g,"");
+  if(/^\d{9,11}$/.test(num)){window.open("https://zoom.us/j/"+num,"_blank","noopener");return}
+  var r=v.replace(/\s+/g,"-");
+  if(!/^[A-Za-z0-9-]{1,40}$/.test(r)){alert("会议号是 9-11 位数字（Zoom），或字母/数字教室名");return}
+  joinRoom(/^sde-/i.test(r)?r:("SDE-"+r));
 }
 function openZoom(){
   var v=(document.getElementById("zoomLink").value||"").trim();
