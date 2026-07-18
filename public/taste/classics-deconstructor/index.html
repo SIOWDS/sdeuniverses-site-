@@ -161,7 +161,7 @@ footer a{color:var(--gold)}
       </div>
     </div>
     <div style="font-size:12px;color:#8B98A5;line-height:1.7;margin-top:14px">
-      🧬 <b style="color:#B0B8C0">八大主流基底任选（均为顶配旗舰档）</b>：DeepSeek · 智谱GLM · Kimi · 通义千问 · MiniMax · GPT · Claude · Gemini——用你自己的 API Key，全程在浏览器里跑，Key 绝不上传本站服务器。<b style="color:#E8A33D">注意</b>：四篇论文同时并行生成（共 25 路模型调用：1次心得 + 每篇写作5步 + 终稿定稿后各送评一次），但<b style="color:#E8A33D">每篇内部的 5 步是顺序进行</b>的（初稿→审→改→审→改，一步等一步）。篇幅预算已经<b style="color:#E8A33D">大幅放开、不设紧张上限</b>，顶配深度思考档想思考多久就思考多久，<b style="color:#E8A33D">单步可能要十几分钟，每篇论文全程可能要一小时以上</b>——这是把"预算不够被砍"这个故障模式基本排除掉之后必然的代价，请耐心等待、不要中途刷新。
+      🧬 <b style="color:#B0B8C0">八大主流基底任选（均为顶配旗舰档）</b>：DeepSeek · 智谱GLM · Kimi · 通义千问 · MiniMax · GPT · Claude · Gemini——用你自己的 API Key，全程在浏览器里跑，Key 绝不上传本站服务器。<b style="color:#E8A33D">注意</b>：四篇论文同时并行生成（约 27 路模型调用：1次心得 + 每篇写作5步 + 各送评一次 + 三链定稿后 1 次碰撞 + 碰撞篇送评），但<b style="color:#E8A33D">每篇内部的 5 步是顺序进行</b>的（初稿→审→改→审→改，一步等一步）；<b style="color:#E8A33D">碰撞篇在三条 SDE 链全部定稿之后才发起</b>——它拿三篇终稿当原料，试着涌现一个任何一篇单独都到不了的新判断，过不了删除检验（三链是否都真出了力）就诚实报"未涌现"。篇幅预算已经<b style="color:#E8A33D">大幅放开、不设紧张上限</b>，顶配深度思考档想思考多久就思考多久，<b style="color:#E8A33D">单步可能要十几分钟，每篇论文全程可能要一小时以上</b>——这是把"预算不够被砍"这个故障模式基本排除掉之后必然的代价，请耐心等待、不要中途刷新。
     </div>
   </div>
 </div>
@@ -290,8 +290,27 @@ footer a{color:var(--gold)}
     </div>
   </div>
 
+  <div class="field" id="collisionField" style="display:none">
+    <label>第五步 · 碰撞篇 <span class="opt" style="color:#8B98A5;font-weight:400">（三条 SDE 链的终稿相撞，看能不能涌现出一个任何一篇单独都到不了的新判断——过不了四道涌现闸就诚实报"未涌现"，不硬造假典范）</span></label>
+    <div class="paper-card" id="collisionCard" style="margin-top:8px">
+      <div class="paper-card-h">
+        <span>碰撞 · 典范篇</span>
+        <span class="stage-tag" id="stageTagCollision"></span>
+        <span class="paper-meta" id="metaCollision"></span>
+        <span class="paper-status" id="statusCollision">待三链终稿</span>
+      </div>
+      <div class="paper-card-body" id="bodyCollision"><span class="placeholder">等三条 SDE 链全部定稿后，自动发起碰撞……</span></div>
+    </div>
+    <div style="margin-top:12px">
+      <div class="iq-card" id="iqCardCollision">
+        <div class="iq-card-h"><span>碰撞篇 · SDE 创新智商</span><span class="iq-status" id="iqStatusCollision">待碰撞</span></div>
+        <div class="iq-card-body" id="iqBodyCollision"><span class="placeholder">碰撞篇定稿后自动送评（与四篇同一把评估基底、同一标尺）</span></div>
+      </div>
+    </div>
+  </div>
+
   <div class="go-row">
-    <button class="btn-go" id="goBtn">✦ 生成四篇论文（传统 · SDE1 · SDE2 · SDE3）</button>
+    <button class="btn-go" id="goBtn">✦ 生成五篇论文（传统 · SDE1/2/3 · 碰撞篇）</button>
     <select class="model-select" id="modelSel" title="模型">
       <optgroup label="DeepSeek">
         <option value="ds:pro">DeepSeek V4 Pro · 最强推理(Think Max)</option>
@@ -369,7 +388,7 @@ footer a{color:var(--gold)}
     <div class="col-meta"><span id="sde3Status">待命</span><span id="sde3Meta"></span></div>
   </div>
 </div>
-<div class="flowhint">四篇都是正经论文（标题·摘要·关键词·六节分节正文·参考文献，各约四千五百字，末节均为教育/健康/商业中一个具体领域的应用），<b>四篇同时并行生成，互不依赖，且每篇各自独立完成两轮自审自改</b> · 传统经学是对照组(应用接教育) · <b>SDE 1／2／3 各自只用三大方程／六路径／123原理这一件工具</b>解构同一段经典(应用分别接商业/健康/商业) · <b>终稿定稿后各自独立送 SDE 创新智商评估</b>，用评估基底（默认跟随写作基底，建议换一家避免自评膨胀）打出五维度分数 · 四篇并排读，能看见对照组与换一件工具会显出什么不同的断面</div>
+<div class="flowhint">四篇都是正经论文（标题·摘要·关键词·六节分节正文·参考文献，各约四千五百字，末节均为教育/健康/商业中一个具体领域的应用），<b>四篇同时并行生成，互不依赖，且每篇各自独立完成两轮自审自改</b> · 传统经学是对照组(应用接教育) · <b>SDE 1／2／3 各自只用三大方程／六路径／123原理这一件工具</b>解构同一段经典(应用分别接商业/健康/商业) · <b>终稿定稿后各自独立送 SDE 创新智商评估</b>，用评估基底（<b>必须换一家，同基底自评已被强制拦截</b>——它会给自己打高分，分数就不可读）打出五维度分数 · 五篇并排读（含三链相撞涌现的碰撞篇），能看见对照组、换一件工具、以及三件工具合起来会显出什么不同的断面会显出什么不同的断面</div>
 
 <div id="exportSection" style="max-width:1460px;margin:20px auto 0;padding:0 20px;display:none">
   <div style="background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:18px 22px;display:flex;align-items:center;gap:16px;flex-wrap:wrap">
@@ -733,7 +752,9 @@ const iqCells = {
   sde1:  { body:$('iqBodySde1'),  status:$('iqStatusSde1')  },
   sde2:  { body:$('iqBodySde2'),  status:$('iqStatusSde2')  },
   sde3:  { body:$('iqBodySde3'),  status:$('iqStatusSde3')  },
+  collision: { body:$('iqBodyCollision'), status:$('iqStatusCollision') },
 };
+const collisionCell = { body:$('bodyCollision'), status:$('statusCollision'), meta:$('metaCollision'), stageTag:$('stageTagCollision') };
 const plainCell={body:$('plainBody'),status:$('plainStatus'),meta:$('plainMeta'),col:$('colPlain'),stageTag:$('plainStageTag')};
 const sde1Cell={body:$('sde1Body'),status:$('sde1Status'),meta:$('sde1Meta'),col:$('colSde1'),stageTag:$('sde1StageTag')};
 const sde2Cell={body:$('sde2Body'),status:$('sde2Status'),meta:$('sde2Meta'),col:$('colSde2'),stageTag:$('sde2StageTag')};
@@ -868,8 +889,18 @@ async function exportAllPdfs(){
       await new Promise(r=>setTimeout(r, 250)); // 给浏览器喘息时间，降低被当成弹窗轰炸拦截的概率
     }
   }
+  // 碰撞篇：只有终稿一个阶段（它不走 draft/review/revise 那套），单独导一份
+  const cSnap = paperSnapshots.collision;
+  if(cSnap && cSnap.final && cSnap.final.text){
+    exportBtn.textContent = '⏳ 正在导出碰撞篇……'+done+'/'+(total+1);
+    const cMeta = '阶段：碰撞·典范篇（三链终稿相撞的涌现产物）· 状态：'+(cSnap.final.status==='done'?'成功':'未完成')
+      + (cSnap.final.note ? ' · 备注：'+cSnap.final.note : '') + ' · 导出时间：'+new Date().toLocaleString('zh-CN');
+    try{ await exportOnePdf('经典解构·碰撞典范篇', cMeta, cSnap.final.text, '经典解构-碰撞典范篇.pdf', '碰撞'); }
+    catch(e){ showErr('导出碰撞篇失败：'+e.message); }
+    done++;
+  }
   exportBtn.disabled = false;
-  exportBtn.textContent = '✓ 已导出全部 12 份 PDF（可再次点击重新导出）';
+  exportBtn.textContent = '✓ 已导出全部 PDF（可再次点击重新导出）';
 }
 exportBtn.addEventListener('click', ()=>{ exportAllPdfs().catch(e=>showErr('批量导出中断：'+e.message)); });
 function showErr(m){ errBox.textContent=m; errBox.style.display='block'; }
@@ -1184,7 +1215,7 @@ ${toolBlock}
   二、断面：用${TOOL_LABEL[tool]}这件工具，具体地、落到这段经典字句上地展开你的解构
   三、误读的位置：传统读法在**哪一步**把"发生"错读成了"发现"？指认那个具体的转折点
   四、改写：把这段经典用发生学的方式重新讲一遍——换一副眼睛之后，这段话真正在说什么
-  五、证伪条件：什么样的反例或情况，会让本文的解构站不住？要指向一个具体的、可以设想的反例
+  五、证伪条件：什么样的反例或情况，会让本文的解构站不住？这一节按下面三条硬要求写——评分时 F 维度（可证伪性）就看这一节，写空了整篇封顶100分：(1)必须指向一个**具体的、可观察的**落点：一个能被查证的反例、一处能被检验的历史证据、或一个"如果观察到X就说明本文错"的可判定事件；(2)**不接受**"有待未来研究检验""尚需进一步论证"这类把证伪推给别人的空头——要写清楚**谁、用什么材料、怎么就能判定本文对错**；(3)如果这个判定需要时间才能揭晓，就给出一个时间窗（"若N年内未出现X则本文这一条被推翻"），一个不给时间窗的"必然"是不可证伪的
   六、${dom.name}应用：把第二节用${TOOL_LABEL[tool]}拆出来的判断，接到${dom.name}领域一个具体难题上——${dom.hint}。必须写清楚：难题具体是什么、${TOOL_LABEL[tool]}拆出的哪个判断对上了这个难题、对上之后建议怎么做。不能只说"这个工具对${dom.name}很有启发"这类空话，要给出可操作的具体建议。
 · **参考文献**：如引用了真实经典或研究著作，列出
 
@@ -1240,6 +1271,53 @@ ${TOOL_BLOCK[tool]}
 · 输出**完整的论文全文**（不是修改说明、不是差异对照），保持原有的论文规格（标题／摘要／关键词／六节正文，含第六节应用／参考文献），篇幅仍约 4000-5000 字。
 
 直接输出改后的论文全文，从标题开始，不要写"根据审稿意见我做了如下修改"这类前言。`;
+}
+
+// ============ 碰撞层：三条链的终稿不是三篇并排的论文，而是一次涌现的原料 ============
+// 隔壁的三车道引擎(智问)三条道跑的是三个不同的问题，删除检验难判；这里三条链跑的是【同一段经典】、
+// 带【同一份心得】、只换视角(三大方程/六路径/123原理)——碰撞的输入天然更干净，删除检验也天然可判：
+// 某条链的核心概念如果在碰撞产物的机制里一次都没出现，它就是装饰，机械可查。
+function collisionPrompt(neigong){
+  return neigong + `
+
+---
+你面前有三篇论文，是三个不同视角对**同一段经典**的解构：第一篇用"三大方程"、第二篇用"六路径"、第三篇用"123原理"。三篇各自成立，各自也已被审稿打磨过。
+
+现在做一件三篇单独都做不到的事：**让它们相撞，看能不能涌现出一个任何一篇单独到不了的新判断。**
+
+这不是综述，不是把三篇的结论拼起来。综述是加法，涌现是化学反应——三篇相撞后应当出现一个**在任何一篇里都找不到、却又只有三篇合在一起才逼得出来**的结构。
+
+【第一阶 · 混沌碰撞】
+把三篇两两相撞（方程×路径、方程×原理、路径×原理），每一对追问：它们在哪一点上互相冲突、或互相补完了对方的缺口？冲突和补完的**那个接缝处**，往往就是新判断的胚胎。至少找出三个这样的接缝。
+
+【第二阶 · 自组织】
+在这些接缝里，找出一条反复出现的**暗流**——一个三篇都在绕、却都没点破的东西。给它一个名字。这个名字必须是这段经典自己语域里的词，不能是"显露/差异/纠缠"这类招牌话。
+
+【第三阶 · 涌现校验（四道硬闸，缺一不可）】
+你命名的这个新判断，必须逐条通过：
+1. **不可还原**：把它压到≤50字，它能不能被三篇里任何一篇的核心命题1:1替换？能替换，就是假涌现，重来。
+2. **三链全承重**（删除检验）：三条链——方程、路径、原理——是不是每一条都在这个新判断里出了力？如果删掉其中任何一条的贡献，这个新判断还站得住，那说明那条链是装饰，你的碰撞没真的用上它。逐条写清楚：方程贡献了什么、路径贡献了什么、原理贡献了什么，删掉任一条会塌哪里。**任何一条说不清它贡献了什么，就说明这次碰撞失败，老实说失败，不要硬凑。**
+3. **不是拼接**：这个新判断读起来必须是一个东西，不是"三篇分别说了A、B、C"。检验：它有没有一个单一的、能一句话说清的内核？
+4. **可证伪**：这个新判断怎么样会被证伪？给一个具体的、可观察的落点（可查证的反例／可检验的历史证据／"若观察到X则本文错"的可判定事件）。不接受"有待未来研究"这类空头；若需时间揭晓，给出时间窗。
+
+【产出 · 一篇正式的学术论文，约 4000-5000 字】
+· **标题**：自拟，体现这是一次三视角碰撞涌现出的新判断
+· **摘要**：200-300字，说清这个新判断是什么、它为什么三篇单独都到不了
+· **关键词**：4-6个
+· **正文分节**：
+  一、三个视角与各自的边界：三篇分别看到了什么，又各自漏了什么
+  二、三处接缝：两两相撞暴露出的冲突／互补点（第一阶）
+  三、暗流与命名：那个三篇都在绕的东西，给它命名（第二阶）
+  四、涌现校验：逐条兑现上面四道硬闸——尤其第2道，必须写清三条链各自的贡献与"删掉会塌哪里"
+  五、这个新判断能拆开哪个旧问题：接到一个具体难题上，给可操作的判断
+  六、证伪条件：按第4道闸写，带可观察落点、必要时带时间窗
+· **参考文献**：如引用真实经典或研究，列出
+
+【铁律】
+· **绝不杜撰**：不编造原文、注家、著作、页码、文献。记不准宁可不写。
+· **不许出现学派黑话**：不要"SDE"这个缩写，不要"SDE三维/SDE本体论"这类招牌词。"显露/差异/纠缠"这几个字可以用，但要用这段经典自己的语域说话，像这个领域的本地人写的论文。
+· **诚实压倒漂亮**：如果三篇相撞后**没有**涌现出真正的新判断（第三阶四道闸过不了），不要硬造一个假典范。就在正文里说清楚：为什么这次碰撞没有产生不可还原的新结构，三篇更像并列而非化合。一次诚实的"未涌现"，比一个装饰性的假典范有价值得多。
+· 直接从标题开始写。`;
 }
 
 // ============ 核心：streamChat（国产直连）============
@@ -1428,6 +1506,14 @@ async function run(){
   if(!reviewKey1){ showErr('审稿一基底选了 '+vendorName(reviewModel1)+'，请先填入它的 API Key'); reviewKeyEl1.focus(); return; }
   if(!reviewKey2){ showErr('审稿二基底选了 '+vendorName(reviewModel2)+'，请先填入它的 API Key'); reviewKeyEl2.focus(); return; }
   if(!assessKey){ showErr('评估基底选了 '+vendorName(assessModel)+'，请先填入它的 API Key'); assessKeyEl.focus(); return; }
+  // 【硬闸·不许自评】评分纪律第一条：一个基底不能评它自己写的文本——它会给自己打高分，
+  // 而这个工具的整个卖点是量出提智了多少分；量尺一旦由被量的人自己拿着，分数就不可读。
+  // 早先版本允许评估基底留空＝跟随写作基底，还在界面上老实标"（同写作基底）"——那等于把违规做成默认路径再贴个标签。
+  // 现在：评估基底若与写作基底同厂商同型号，直接拒绝运行，要求换一家来评。
+  if(parseModel(assessModel).vendor === parseModel(model).vendor && parseModel(assessModel).tier === parseModel(model).tier){
+    showErr('评分不能自评：评估基底当前与写作基底是同一个（'+vendorName(model)+'），它会给自己打高分。请在"SDE 创新智商评估基底"里换一家（写作用 '+vendorName(model)+'，就换成 Claude／GPT／Gemini 里的另一家来评），这样打出来的分才可读。');
+    assessModelSel.focus(); return;
+  }
 
   try{ await ensureNeigong(); }catch(e){ showErr(e.message); return; }
 
@@ -1449,6 +1535,13 @@ async function run(){
   Object.values(iqCells).forEach(c=>{
     c.body.innerHTML='<span class="placeholder">待终稿……</span>'; c.status.textContent='待终稿'; c.status.classList.remove('done','failed');
   });
+  // 碰撞篇：整块显示出来并复位（它的 IQ 卡已在上面 iqCells 循环里一起清过了）
+  $('collisionField').style.display = 'block';
+  collisionCell.body.innerHTML = '<span class="placeholder">等三条 SDE 链全部定稿后，自动发起碰撞……</span>';
+  collisionCell.status.textContent = '待三链终稿'; collisionCell.meta.textContent = '';
+  collisionCell.stageTag.textContent = ''; collisionCell.stageTag.classList.remove('show','done');
+  iqCells.collision.body.innerHTML = '<span class="placeholder">碰撞篇定稿后自动送评</span>';
+  iqCells.collision.status.textContent = '待碰撞';
   // 每次新一轮生成开始，三阶段快照全部清空重置——导出面板此时立即可用（不必等生成完成），
   // 因为"无论是否成功都要能导出"意味着导出这个动作本身不该依赖生成是否已经跑完。
   paperSnapshots = {
@@ -1713,8 +1806,83 @@ async function run(){
   const sde2Task = runSdeChain('paths',     sde2Cell, revCells['2a'], revCells['2b'], 'SDE2(六路径)', paperSnapshots.sde2);
   const sde3Task = runSdeChain('principle', sde3Cell, revCells['3a'], revCells['3b'], 'SDE3(123原理)', paperSnapshots.sde3);
 
-  await Promise.all([plainTask, sde1Task, sde2Task, sde3Task]);
-  goBtn.disabled=false; goBtn.textContent='✦ 生成四篇论文（传统 · SDE1 · SDE2 · SDE3）';
+  const [_pl, sde1Res, sde2Res, sde3Res] = await Promise.all([plainTask, sde1Task, sde2Task, sde3Task]);
+
+  // ===== 第五步 · 碰撞篇：三条 SDE 链的终稿相撞，试着涌现一个任何一篇单独都到不了的新判断 =====
+  // 只有三条 SDE 链都真的产出了终稿才发起碰撞——传统经学是对照组，不参与碰撞。
+  paperSnapshots.collision = freshSnap('碰撞·典范篇');
+  const sdeFinals = [
+    { tag:'SDE1·三大方程', text:(sde1Res && sde1Res.text) || '' },
+    { tag:'SDE2·六路径',   text:(sde2Res && sde2Res.text) || '' },
+    { tag:'SDE3·123原理',  text:(sde3Res && sde3Res.text) || '' },
+  ];
+  const okFinals = sdeFinals.filter(f => f.text && f.text.length > 200);
+  if(okFinals.length < 3){
+    collisionCell.status.textContent = '未发起（需三链都有终稿，当前 '+okFinals.length+'/3）';
+    collisionCell.body.innerHTML = '<span class="placeholder">碰撞需要三条 SDE 链都产出终稿。本轮只有 '+okFinals.length+' 条成功，碰撞跳过——三篇并排的论文照常可看、可导出。</span>';
+    iqCells.collision.status.textContent = '无碰撞篇·未送评';
+    paperSnapshots.collision.draft.status='skipped'; paperSnapshots.collision.draft.note='三链未全部成功，未发起碰撞';
+    paperSnapshots.collision.final.status='skipped'; paperSnapshots.collision.final.note='三链未全部成功，未发起碰撞';
+  } else {
+    collisionCell.stageTag.textContent = '碰撞中'; collisionCell.stageTag.classList.add('show');
+    collisionCell.status.innerHTML = '<span class="spinner"></span> 三链相撞·涌现中';
+    const collisionInput = okFinals.map((f,idx)=>('【第'+(idx+1)+'篇 · '+f.tag+'】\n'+f.text)).join('\n\n');
+    let collisionText = '';
+    try{
+      const cRes = await streamChat(key, model, collisionPrompt(baseFor(model)), collisionInput,
+        collisionCell.body, collisionCell.status, collisionCell.meta, {classList:{add(){},remove(){}}}, PAPER_TOKENS);
+      collisionText = cRes.text || '';
+    }catch(e){ collisionText=''; collisionCell.status.textContent='碰撞失败：'+e.message; }
+    collisionCell.stageTag.textContent='已完成'; collisionCell.stageTag.classList.add('done');
+    paperSnapshots.collision.draft.text = collisionText;
+    paperSnapshots.collision.draft.status = collisionText ? 'done' : 'failed';
+    paperSnapshots.collision.final.text = collisionText;
+    paperSnapshots.collision.final.status = collisionText ? 'done' : 'failed';
+
+    if(!collisionText){
+      collisionCell.body.innerHTML = '<span class="placeholder">碰撞调用未返回文本——三篇并排的论文不受影响。</span>';
+      iqCells.collision.status.textContent = '碰撞失败·未送评';
+    } else {
+      collisionCell.body.textContent = collisionText;
+      collisionCell.status.textContent = '✓ 碰撞完成';
+
+      // ===== 删除检验（机械词频闸）=====
+      // 碰撞篇声称三条链都出了力。真没出力的话，那条链就是装饰。这里不问模型"你用上三条链了吗"（它会说用上了），
+      // 而是数三条链各自的特征词在碰撞篇里的出现次数——某条链的特征词一次都没出现，就是删除检验没过。
+      // 隔壁智问的三车道删除检验是自评式的(让模型自己说承重了)，那是誓词；这里是词频，可查。
+      const LANE_MARKERS = {
+        'SDE1·三大方程': ['方程','S=F','D=G','E=H','三脚架','互生','焊死','同时'],
+        'SDE2·六路径':   ['路径','六条','E→D→S','E→S→D','D→E→S','D→S→E','S→D→E','S→E→D','切入','从哪一端','启动'],
+        'SDE3·123原理':  ['123','回写','循环','历史过程','流传','被引','再激活','活结构','诞生'],
+      };
+      const laneHits = {};
+      for(const [lane, ms] of Object.entries(LANE_MARKERS)){
+        laneHits[lane] = ms.reduce((n,w)=> n + (collisionText.split(w).length - 1), 0);
+      }
+      const deadLanes = Object.entries(laneHits).filter(([l,n])=> n === 0).map(([l])=>l);
+      const gateNote = document.createElement('div');
+      gateNote.style.cssText = 'margin-top:10px;padding:10px 12px;border-radius:8px;font-size:12.5px;line-height:1.75;'
+        + (deadLanes.length ? 'background:rgba(248,81,73,0.08);border:1px solid rgba(248,81,73,0.4);color:#E8897B'
+                            : 'background:rgba(63,185,80,0.08);border:1px solid rgba(63,185,80,0.4);color:#7FC98A');
+      const hitStr = Object.entries(laneHits).map(([l,n])=> l+'：'+n+' 处特征词').join('　·　');
+      if(deadLanes.length){
+        gateNote.innerHTML = '<b>⚠ 删除检验未过</b>　'+hitStr+'<br>'
+          + '<b>'+deadLanes.join('、')+'</b> 的特征词在碰撞篇里一次都没出现——这条链在这次碰撞里没有真的出力，'
+          + '碰撞更像把三篇拼在一起（加法），而不是化合。按碰撞篇自己的第2道闸，这不是一个站得住的新典范。'
+          + '重跑一次碰撞（或先看看那条链的终稿是不是本身就弱），比留着一个装饰性的假典范有价值。';
+      } else {
+        gateNote.innerHTML = '<b>✓ 删除检验通过</b>　'+hitStr+'<br>'
+          + '三条链的特征词在碰撞篇里都有出现——碰撞至少在字面上用上了三条链。'
+          + '（这是机械词频闸，只能查"有没有用"，查不了"用得深不深"；用得深不深看下面的创新智商评分。）';
+      }
+      collisionCell.body.appendChild(gateNote);
+
+      exportBtn.textContent = '📄 导出当前15份PDF（含碰撞篇，可随时点击）';
+      await runIqAssess('collision', collisionText, '碰撞·典范篇');
+    }
+  }
+
+  goBtn.disabled=false; goBtn.textContent='✦ 生成五篇论文（传统 · SDE1/2/3 · 碰撞篇）';
 }
 goBtn.addEventListener('click', run);
 </script>
