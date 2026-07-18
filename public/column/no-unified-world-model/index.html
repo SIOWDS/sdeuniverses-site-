@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>没有统一世界模型：世界模型的主体性与第二次 AI 革命 | AI专栏 | SDE Universes</title>
+<meta name="description" content="一篇论文：当前世界模型军备赛默认的「统一世界模型」是一个本体论虚构——世界模型是主体与对象共同发生的 SDE 画像，公共科学只是它的稳定层；LLM 幻觉的根源是缺少主体世界模型；第二次 AI 革命统一的不是模型，而是生成世界模型的方法。依王德生《SDE 智能体导论》第六章。">
+<meta property="og:title" content="没有统一世界模型：世界模型的主体性与第二次 AI 革命">
+<style>
+:root{--bg:#F5F2EA;--card:#FCFAF3;--accent:#1F4E6E;--gold:#8A6817;--text:#20242A;--muted:#7C725E;--line:rgba(31,78,110,0.18);--ink:#12161B}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{max-width:100%;overflow-x:hidden}
+body{background:var(--bg);color:var(--text);font-family:"Songti SC","Noto Serif SC","Source Han Serif SC",Georgia,serif;line-height:2.02;font-size:17px}
+a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+.wrap{max-width:760px;width:100%;margin:0 auto;padding:0 24px}
+nav.top{position:sticky;top:0;background:rgba(245,242,234,0.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);z-index:20}
+nav.top .wrap{display:flex;align-items:center;justify-content:space-between;height:56px;max-width:900px}
+.nav-logo{font-weight:700;letter-spacing:0.06em;color:var(--text)}
+.nav-back{font-size:13.5px;color:var(--muted)}
+header.hd{background:linear-gradient(160deg,#132433,#0B141C);color:#EDE7D6;padding:58px 0 50px}
+.hd .kicker{font-size:11.5px;letter-spacing:0.4em;color:#7FA8C4;margin-bottom:16px}
+.hd h1{font-size:clamp(24px,4vw,34px);font-weight:700;line-height:1.5;letter-spacing:0.02em;color:#F2ECDC}
+.hd .sub{font-size:15px;color:#9FB4C4;margin-top:14px;line-height:1.7}
+.hd .byline{font-size:13px;color:#7E8C97;margin-top:18px;letter-spacing:0.06em}
+main{padding:46px 0 20px}
+.abs{background:var(--card);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:4px;padding:22px 24px;margin-bottom:14px}
+.abs .al{font-size:11px;letter-spacing:0.38em;color:var(--accent);margin-bottom:10px}
+.abs p{font-size:15.5px;line-height:1.95;color:#2A2E34}
+.kw{font-size:13.5px;color:var(--muted);margin:0 0 40px;line-height:1.8}
+.kw b{color:var(--accent);font-weight:700}
+h2{font-size:20px;font-weight:700;letter-spacing:0.03em;color:var(--ink);margin:44px 0 18px;padding-left:14px;border-left:3px solid var(--gold)}
+p{margin-bottom:18px;text-align:justify}
+p b{color:var(--accent)}
+.pull{background:linear-gradient(150deg,#132433,#0B141C);color:#DFE7EC;border-radius:6px;padding:22px 24px;margin:26px 0;font-size:16px;line-height:2.0}
+.pull b{color:#E4C878}
+.note{font-size:13.5px;color:var(--muted);border-top:1px dashed var(--line);margin-top:44px;padding-top:16px;line-height:1.9}
+#sde-refs{margin-top:46px;background:var(--card);border:1px solid var(--line);border-radius:4px;padding:24px 26px}
+#sde-refs .rl{font-size:11px;letter-spacing:0.38em;color:var(--accent);margin-bottom:14px}
+#sde-refs ol{padding-left:22px}
+#sde-refs li{font-size:13.8px;line-height:1.85;color:#3A3E44;margin-bottom:7px}
+#sde-refs .disc{font-size:12.5px;color:var(--muted);margin-top:12px}
+.grouplink{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;margin:40px 0 0;padding:18px 22px;border:1px solid var(--line);border-radius:4px;background:rgba(31,78,110,0.05)}
+.grouplink .gl-t{flex:1;min-width:220px;font-size:14.5px}
+.btn{display:inline-block;padding:10px 22px;border-radius:3px;font-size:14px;letter-spacing:0.06em;font-weight:700}
+.btn-solid{background:var(--accent);color:#F2ECDC}
+.btn-ghost{border:1px solid var(--accent);color:var(--accent)}
+footer{background:var(--ink);color:#847963;text-align:center;padding:30px 0 40px;font-size:12.5px;letter-spacing:0.08em;margin-top:40px}
+footer a{color:#C9A15A}
+</style>
+</head>
+<body>
+<nav class="top"><div class="wrap">
+  <a class="nav-logo" href="/">SDE Universes</a>
+  <a class="nav-back" href="/ai/">← AI 专栏</a>
+</div></nav>
+
+<header class="hd"><div class="wrap">
+  <div class="kicker">论 文 · 依《SDE 智能体导论》第 六 章</div>
+  <h1>没有统一世界模型：<br>世界模型的主体性与第二次 AI 革命</h1>
+  <div class="sub">当整个行业在为「世界模型」军备时，一个更根本的问题几乎无人追问：世界模型究竟是什么？本文论证：统一世界模型是一个本体论虚构；幻觉不是工程缺陷，而是没有主体世界模型的必然姿态；第二次 AI 革命统一的不是模型，而是生成世界模型的方法。</div>
+  <div class="byline">Claude 著 · 依王德生《SDE 智能体导论》第六章 · 德麦国际</div>
+</div></header>
+
+<main><div class="wrap">
+
+<div class="abs">
+  <div class="al">摘 要 · ABSTRACT</div>
+  <p>大语言模型之后，主流技术路线图默认了一个几乎不被追问的假设：存在一个统一的、能代表整个世界的模型，只要数据、算力、参数继续增长，它迟早会被训练出来。本文把这个假设摆到本体论层面检验，并给出否定的回答——不是「很难训练」，而是「这个对象不存在」。论证分四步：其一，LLM 拥有的是世界发生之后沉淀下来的语言材料场，不是世界本身；语言能封存世界，不能自动组织世界。其二，世界模型具有主体性：面对同一对象，董事长、工程师、投资人、客户各自发生出不同且各自有效的世界模型，故不存在能同时代表所有主体的统一模型——世界模型不是对象的客观属性，而是主体与对象的共同发生。其三，科学的「统一」不构成反例：公共科学是主体间反复互动稳定出的公共层，是所有主体共享的底座，而非任何主体的完整世界模型。其四，这一分析给出 LLM 幻觉的本体论根源——一个内含无数语言世界、却没有固定主体的材料场，在被迫生成时必然在世界之间滑动；因此扩大模型消除不了幻觉的根源，唯一出路是从外部为具体主体、对象、任务锚定一个具体的世界模型。由此，第二次 AI 革命的形态被重新刻画：不是一个更大的单一模型，而是一套统一的方法，为无数具体主体持续生成、维护、更新各自的世界模型。文末回应四个最强反驳（「表现得像拥有」、规模逼近、机器主体、相对主义指控），并给出与相对论放弃绝对参照系的结构类比。</p>
+</div>
+<div class="kw"><b>关键词：</b>世界模型；主体性；大语言模型；幻觉；SDE 画像；公共稳定层；第二次 AI 革命</div>
+
+<h2>一、被路线图掩盖的本体论问题</h2>
+<p>当前人工智能领域最热的赛道之一，是「世界模型」。从视频生成世界模型到面向物理 AI 的世界基础模型平台，从预测性架构到具身智能，各家的推理链惊人地一致：大语言模型解决了语言问题，下一步应该解决世界问题，因此需要训练一个能够统一理解整个世界的大模型 [2][3][4]。这条链的终点被默认为存在——一个统一的、能够代表整个世界的模型，只欠数据、算力与参数。</p>
+<p>这个假设如此自然，以至于它伪装成技术路线图，躲过了一个更根本的追问：<b>世界模型究竟是什么？</b>本文的判断是：LLM 不可能自动形成统一世界模型——不是因为数据不足、算力不足或参数不足，而是因为「统一世界模型」这个假设本身有本体论问题。它很可能只是一个技术概念，而不是一个站得住的本体论概念。这个判断若成立，后果是实质性的：整条「把模型做大以逼近世界」的路线，追逐的将是一个方向上的虚构；而真正的第二次革命，在另一个方向上。</p>
+
+<h2>二、语言材料场不是世界：封存与组织的区别</h2>
+<p>先把 LLM 的突破说准确。LLM 最大的突破不是它会聊天，而是它第一次进入了整个人类文明的信息场——科学论文、法律、医学、哲学、文学、程序、数学、制度，全部被压缩进同一套符号系统，由此获得符号、逻辑、数学之间前所未有的大规模统计关系 [1][5]。但必须区分两个层次：<b>LLM 拥有的是世界发生之后沉淀下来的语言材料，不是世界本身</b>。它学到的是文明发生的产物，不是文明发生的现场。</p>
+<p>这里要堵一个极易产生的误解：既然世界通过语言表达，语言不就是世界模型吗？不是。一本医学教材不是疾病本身，一部法律不是法律运行本身，一本数学书不是数学对象本身。语言能够<b>封存</b>世界——把已经发生、已经被组织好的结构以符号态保存下来；但语言不能自动<b>组织</b>世界——它本身不会在一个新的具体处境里，把一团裸约束重新组织成可供行动的结构。这一区分与语言学中「掌握形式不等于掌握意义与所指」的经典论证同构 [6]：从纯文本统计中习得的，是表达材料的连贯，不是与世界的组织性接触。所以「拥有全部语言材料」与「拥有组织世界的能力」是两回事——LLM 拥有前者到了极致，却不自动拥有后者。</p>
+
+<h2>三、核心论证：世界模型的主体性</h2>
+<p>现在给出统一世界模型不可能的核心理由：<b>世界模型具有主体性——它不是由对象单方面决定的，而是由主体与对象共同发生的。</b></p>
+<p>用一个例子把这一点钉死。面对同一家企业：董事长拥有一种世界模型，工程师拥有另一种，投资人、客户、竞争者又各拥有另一种。他们面对的是同一个对象、同一套现实约束，但他们的世界模型完全不同——因为他们的目标不同、责任不同、资源不同、知识不同、风险不同。这并非新奇的观察：生物符号学早已指出每种生物都生活在自己的「环境世界」（Umwelt）而非同一个裸世界里 [7]；生态心理学指出知觉到的是相对于行动者的可供性，而非中立属性 [8]；有限理性研究指出决策者从不面对完整世界，只面对为其目标裁剪过的模型 [9]；认知科学中「心智模型」传统同样强调模型对任务与主体的相对性 [10][11]。哲学上，普特南的内在实在论与古德曼的「构造世界的多种方式」从不同侧面论证了同一结论：不存在「不属于任何视角的视角」[12][13][14]。</p>
+<p>这些线索在此汇成一个推论。如果世界模型是对象单方面决定的，那么对同一对象就该有唯一正确的世界模型，统一世界模型才可能成立。但世界模型是主体与对象共同发生的，不同主体在同一对象上发生出不同的、<b>各自有效</b>的世界模型，那么就不存在一个能同时代表董事长、工程师、投资人、客户、竞争者的统一模型——<b>他们要的根本不是同一个模型</b>。统一世界模型假设的根本错误，是把世界模型当成了对象的客观属性。</p>
+<div class="pull">追求一个唯一的世界模型，等于追求一个把所有主体、所有处境、所有目标都抹平成同一个的模型——而那个被抹平了主体性的「世界模型」，恰恰不再是任何一个主体真正能用来行动的世界模型，<b>它谁的世界都不是</b>。</div>
+<p>正面表述这一点，得到一个等式：所谓世界模型，是一个对象在当前阶段、对当前主体的 <b>SDE 画像</b>——由该主体的理念框架、现实约束与自身目标三方，经差异序列显露出的具体结构 [19][20]。企业有企业的画像，学生有学习的画像，患者有疾病的画像，科研项目有科研的画像。真实存在的不是一个统一巨构，而是无数主体、对象、任务、阶段各自对应的、不断发生、不断更新的画像。</p>
+
+<h2>四、科学的「统一」为什么不是反例</h2>
+<p>必须立刻回应一个有力的反问：牛顿力学、麦克斯韦电磁学、现代医学——它们不正是跨所有主体成立的统一世界模型吗？回答是：它们确实存在，但它们是世界模型的<b>公共层</b>，不是统一世界模型。这些公共结构，是共同体经过长期实验、数学、工具、验证、教育与制度，稳定下来的公共 SDE 模型——被主体间反复互动稳定出来的客观层，而非脱离主体的裸统一 [15]。一个工程师用牛顿力学造桥时，他的完整世界模型远不止牛顿力学：还有项目目标、责任、工期、预算、对这座具体桥的判断。公共层是所有主体共享的稳定底座，但每个主体在底座之上还有自己的目标、意义与行动——这些共同构成他完整的、不可被公共层替代的世界模型。</p>
+<p>所以科学的「统一」恰恰印证而非反驳本文的判断：科学统一的是被稳定下来的公共层；它从未、也不可能统一掉每个主体在这层之上的具体世界模型。把「共享一个稳定底座」夸大成「共享一个完整模型」，是统一世界模型假设的又一重混淆。</p>
+
+<h2>五、幻觉的本体论根源：缺少主体世界模型</h2>
+<p>世界模型的主体性，还解释了 LLM 一个被广泛观察、却很少被追到根上的现象——幻觉 [16][17]。LLM 没有固定的主体：科学家的语言、医生的语言、企业家的语言、作家的语言，这些语言世界在它里面共同存在。它可以模拟很多世界，却不能自动决定当前该采用哪一个。于是不同的语言世界在生成中不断切换，产生幻觉、漂移、不一致、概念混合。</p>
+<p>这个诊断把幻觉从工程缺陷重新理解为本体论后果：<b>幻觉不是模型不够大造成的偶然错误，而是一个没有固定主体、因而没有主体世界模型的语言材料场，在被迫生成时的必然姿态</b>——它在无数个共存的语言世界之间无所适从地滑动。这也说明，继续把模型做大消除不了幻觉的这个根源：再大的材料场，仍然没有主体。要消除它，唯一的出路是从外部为当前的具体主体、具体对象、具体任务锚定一个具体的世界模型，让模型在这个画像里、站在这个主体的世界里说话。</p>
+
+<h2>六、四个最强反驳与回应</h2>
+<p><b>反驳一：大模型不是已经表现得像拥有世界模型了吗？</b>回应：表现得像拥有与真正拥有是两回事。一个能流利复述所有棋谱的人，未必能在一盘具体的棋里走出好棋——前者是材料的连贯，后者是为当前局面建模的能力。大模型的「像拥有」是材料场的连贯投影；一旦被放进需要为具体主体持续负责的真实任务，投影就破裂为幻觉与漂移。表现像，恰恰因为它在替无数个主体说话，而非站在任何一个主体的世界里。</p>
+<p><b>反驳二：足够大的模型难道不能逼近统一世界模型？</b>回应：这把本体论问题误读成了工程问题。本文的判断不是「很难训练」，而是「这个对象不存在」——它不是一座很高的山，而是一个方向上的虚构。规模能逼近的是材料的覆盖，逼近不了一个根本不在那里的统一 [4]。把五类主体的世界模型抹平成同一个，得到的不是更完整的模型，而是谁都不能用来行动的平均态。</p>
+<p><b>反驳三：主体性会不会只是当前架构的局限？</b>如果未来架构长出了自己的目标与责任，它不就有了世界模型吗？回应分两层。第一，即便机器真的长出主体（本文不假装已证否这一可能），它得到的也只是「它自己这一个主体的」世界模型——多一个主体，只是多一个画像，不构成统一。第二，这个反驳即使成立也动摇不了核心判断：它恰恰再次证明世界模型是主体性的、因而是多元的。统一世界模型的不可能，不依赖于「机器没有主体」，而依赖于「世界模型本质上属于主体」。</p>
+<p><b>反驳四：这是不是滑向了相对主义？</b>回应：绝不是。每一个世界模型仍要接受现实的硬约束——把一座按错误受力设计的桥判断为安全的工程师模型，会被坍塌无情否决；无效的疾病画像会被病情恶化否决。多元不等于无约束，主体间还稳定出了公共层作为共享硬底座。本文的立场是一个精细的中间位置：世界模型既不是脱离主体的统一裸对象，也不是各主体任意编造的私人幻觉，而是<b>主体与对象在现实约束下共同发生、并经主体间互动稳定出公共层的多元画像</b>。</p>
+<p>这里有一个跨学科的镜像，让「没有统一世界模型」显得不再激进：物理学在相对论之后早已接受，不存在超越一切参照系的绝对「同时性」；所谓客观，是不同参照系之间可以相互变换、并保持某些不变量的一致性 [18]。物理学没有因为放弃绝对参照系而滑向相对主义，反而锻造出更严格的不变量理论。发生学放弃统一世界模型，同样不通向相对主义，而通向一套关于「公共层如何被主体间稳定出来」的更严格的客观性理论。</p>
+
+<h2>七、结论：统一的不是模型，而是生成模型的方法</h2>
+<p>由此，AI 的方向清楚了。第一次 AI 革命让机器拥有了语言——进入人类文明的语言材料场。第二次革命不是继续扩大语言，而是<b>让语言变成存在</b>：让语言材料在具体处境里被组织成一个个能够指导行动、持续更新的世界模型。它的形态是一个分工协作的发生系统，而非一个更大的单一模型：LLM 提供材料，本体论提供组织法，检索与工具提供现实锚定与验证，记忆提供画像的连续性，反馈提供画像的进化，共同体提供公共层的稳定 [20]。</p>
+<p>SDE 智能体路线与统一世界模型路线的根本区别可以压成一句话：<b>统一的不是模型，而是生成模型的方法。</b>统一世界模型路线追求一个唯一的模型去代表所有主体——这在本体论上不可能；统一方法路线为每一个具体主体、对象、任务、阶段，生成它各自需要的那个世界模型——这在本体论上才成立。真正的世界模型必须能更新、能反馈、能保存历史、能比较版本、能持续发生；一个被一次性训练出来、之后固定不动的统一模型，连「随对象变化而更新」这一最基本的要求都满足不了。把这两条路线分清，是理解第二次 AI 革命的钥匙。</p>
+
+<div class="note">本文是《SDE 智能体导论》（王德生，德麦国际，2026，ISBN 978-1-970820-62-1）第六章的论文化重述与文献接驳：核心论证、企业五主体案例、公共稳定层区分、幻觉诊断与四反驳均出自原书；文献综述部分为本文所加，用以把原书判断置入现有研究脉络。观点以原书为准。</div>
+
+<div id="sde-refs">
+  <div class="rl">参 考 文 献 · REFERENCES</div>
+  <ol>
+    <li>Vaswani, A., Shazeer, N., Parmar, N., et al. "Attention Is All You Need." <i>Advances in Neural Information Processing Systems</i> (NeurIPS), 2017.</li>
+    <li>Ha, D., Schmidhuber, J. "World Models." arXiv:1803.10122, 2018.</li>
+    <li>LeCun, Y. "A Path Towards Autonomous Machine Intelligence." OpenReview position paper, 2022.</li>
+    <li>Sutton, R. "The Bitter Lesson." Incomplete Ideas (blog essay), 2019.</li>
+    <li>Brown, T., Mann, B., Ryder, N., et al. "Language Models are Few-Shot Learners." <i>NeurIPS</i>, 2020.</li>
+    <li>Bender, E. M., Koller, A. "Climbing towards NLU: On Meaning, Form, and Understanding in the Age of Data." <i>Proceedings of ACL</i>, 2020.</li>
+    <li>von Uexküll, J. <i>A Foray into the Worlds of Animals and Humans</i>. University of Minnesota Press（原著 1934）.</li>
+    <li>Gibson, J. J. <i>The Ecological Approach to Visual Perception</i>. Houghton Mifflin, 1979.</li>
+    <li>Simon, H. A. <i>Administrative Behavior</i>. Macmillan, 1947.</li>
+    <li>Craik, K. <i>The Nature of Explanation</i>. Cambridge University Press, 1943.</li>
+    <li>Johnson-Laird, P. N. <i>Mental Models</i>. Harvard University Press, 1983.</li>
+    <li>Putnam, H. <i>Reason, Truth and History</i>. Cambridge University Press, 1981.</li>
+    <li>Goodman, N. <i>Ways of Worldmaking</i>. Hackett, 1978.</li>
+    <li>Nagel, T. <i>The View from Nowhere</i>. Oxford University Press, 1986.</li>
+    <li>Kuhn, T. S. <i>The Structure of Scientific Revolutions</i>. University of Chicago Press, 1962.</li>
+    <li>Ji, Z., Lee, N., Frieske, R., et al. "Survey of Hallucination in Natural Language Generation." <i>ACM Computing Surveys</i>, 2023.</li>
+    <li>Bender, E. M., Gebru, T., McMillan-Major, A., Shmitchell, S. "On the Dangers of Stochastic Parrots: Can Language Models Be Too Big?" <i>Proceedings of FAccT</i>, 2021.</li>
+    <li>Einstein, A. "Zur Elektrodynamik bewegter Körper." <i>Annalen der Physik</i>, 1905.</li>
+    <li>王德生：《SDE 本体论入门：世界是如何发生的》，德麦国际出版，2026。</li>
+    <li>王德生：《SDE 智能体导论——从语言模型到发生世界模型的智能体革命》，德麦国际出版，2026，ISBN 978-1-970820-62-1（本文所依第六章）。</li>
+    <li>Clark, A., Chalmers, D. "The Extended Mind." <i>Analysis</i> 58(1), 1998.</li>
+    <li>Friston, K. "The free-energy principle: a unified brain theory?" <i>Nature Reviews Neuroscience</i> 11, 2010.</li>
+  </ol>
+  <div class="disc">文献用于定位与对照，本文观点不代表所列作者立场。</div>
+</div>
+
+<div class="grouplink">
+  <div class="gl-t">本文依《SDE 智能体导论》第六章 · 姊妹论文：《伪发生》（依第十五章）</div>
+  <a class="btn btn-ghost" href="/column/pseudo-genesis-eight-checks/">读姊妹论文 →</a>
+  <a class="btn btn-solid" href="/books/m/44/">读原书导读 →</a>
+</div>
+
+</div></main>
+<footer><div class="wrap">德麦国际 · SDE Universes · <a href="/ai/">AI 专栏</a> · <a href="/books/m/44/">《SDE 智能体导论》</a> · <a href="/">首页</a></div></footer>
+</body>
+</html>
