@@ -69,6 +69,12 @@ section{padding:3.5rem 0}
 .ch .cnt{display:block;margin-top:0.7rem;font-size:0.71rem;letter-spacing:0.05em;color:var(--cc);opacity:.72;font-weight:600}
 .ch .go{margin-top:0.85rem;font-size:0.78rem;letter-spacing:0.08em;color:var(--cc);font-weight:600}
 .ch-1{--cc:#8A6817}.ch-2{--cc:#35558C}.ch-3{--cc:#17706B}.ch-4{--cc:#7A4A8C}.ch-5{--cc:#C0522A}
+.ch-cell{display:flex;flex-direction:column;gap:0.55rem}
+.ch-papers{display:flex;flex-direction:column;gap:0.5rem}
+.ch-paper{display:block;text-decoration:none;background:var(--card);border:1px solid var(--border2);border-left:3px solid var(--cc);border-radius:4px;padding:0.6rem 0.75rem;transition:transform .18s,box-shadow .18s}
+.ch-paper:hover{transform:translateX(3px);box-shadow:0 5px 14px rgba(42,35,21,.10)}
+.ch-paper .pt{font-size:0.86rem;font-weight:700;color:var(--text);line-height:1.45;margin-bottom:0.25rem}
+.ch-paper .pd{font-size:0.74rem;line-height:1.6;color:var(--text2)}
 .ch-foot{margin-top:1.7rem;text-align:center;font-size:0.88rem;color:var(--muted)}
 .ch-foot a{color:var(--accent);text-decoration:none;border-bottom:1px solid rgba(42,107,74,.35)}
 .note{margin-top:3rem;text-align:center;background:var(--card2);border:1px dashed var(--accent);border-radius:8px;padding:1.8rem 1.5rem}
@@ -133,6 +139,7 @@ footer a{color:var(--gold);text-decoration:none}
     <p class="ch-lead zh-only">一篇论文有三种命：进期刊、成学位、变典范。它们不是难度递增的三级台阶，而是三套互不兼容的要求——为其中一种写的东西，通常正好不合另外两种。另外两个频道追的是这三种命共同的前提：知识究竟是怎么被生产出来的（科研哲学），以及生产它的人凭什么还创造得动（创造力）。</p>
     <p class="ch-lead en-only">A paper has three possible fates: enter a journal, become a degree, turn into a paradigm. These are not three rungs of one ladder but three mutually incompatible sets of demands — what is written for one is usually wrong for the other two. The remaining channels pursue what all three presuppose: how knowledge gets produced at all, and what keeps the people producing it still able to create.</p>
     <div class="ch-grid">
+      <div class="ch-cell ch-1">
       <a class="ch ch-1" href="/creation/paradigm/">
         <span class="ch-n">01</span>
         <h3><span class="zh-only">典范论文</span><span class="en-only">Paradigm Papers</span></h3>
@@ -140,6 +147,13 @@ footer a{color:var(--gold);text-decoration:none}
         <span class="cnt"><span class="zh-only">3 篇 · 各约 8000 字</span><span class="en-only">3 papers</span></span>
         <span class="go"><span class="zh-only">进入频道 →</span><span class="en-only">Enter →</span></span>
       </a>
+      <div class="ch-papers">
+        <a class="ch-paper" href="/creation/paradigm/homework-death/"><span class="pt">作业之死</span><span class="pd">学校不是在防作弊——作弊是拿假证据冒充真过程，这里根本没有过程被冒充</span></a>
+        <a class="ch-paper" href="/creation/paradigm/incurable-healthy/"><span class="pt">不可治愈的健康人</span><span class="pd">那个 12% 根本不在这个人身上，它在队列里</span></a>
+        <a class="ch-paper" href="/creation/paradigm/right-to-be-wrong/"><span class="pt">判错权</span><span class="pd">流程是判断的化石，只判得了它见过的错</span></a>
+      </div>
+      </div>
+      <div class="ch-cell ch-2">
       <a class="ch ch-2" href="/creation/thesis/">
         <span class="ch-n">02</span>
         <h3><span class="zh-only">学位论文</span><span class="en-only">Degree Theses</span></h3>
@@ -147,6 +161,13 @@ footer a{color:var(--gold);text-decoration:none}
         <span class="cnt"><span class="zh-only">3 篇 · 硕士范本</span><span class="en-only">3 model theses</span></span>
         <span class="go"><span class="zh-only">进入频道 →</span><span class="en-only">Enter →</span></span>
       </a>
+      <div class="ch-papers">
+        <a class="ch-paper" href="/creation/thesis/edu-load-bearing-difficulty/"><span class="pt">承载性困难</span><span class="pd">验证能力与被外包的能力，是同一样东西</span></a>
+        <a class="ch-paper" href="/creation/thesis/health-displacement-cost/"><span class="pt">挤出代价</span><span class="pd">RCT 测过加进 X，从没测过挤出 X</span></a>
+        <a class="ch-paper" href="/creation/thesis/biz-vetoing-knowledge/"><span class="pt">否决性知识</span><span class="pd">说得出，但编码即失效——显性与默会之外的第三类</span></a>
+      </div>
+      </div>
+      <div class="ch-cell ch-3">
       <a class="ch ch-3" href="/creation/journal/">
         <span class="ch-n">03</span>
         <h3><span class="zh-only">期刊论文</span><span class="en-only">Journal Papers</span></h3>
@@ -154,6 +175,13 @@ footer a{color:var(--gold);text-decoration:none}
         <span class="cnt"><span class="zh-only">3 篇 · CSSCI 形制</span><span class="en-only">3 CSSCI papers</span></span>
         <span class="go"><span class="zh-only">进入频道 →</span><span class="en-only">Enter →</span></span>
       </a>
+      <div class="ch-papers">
+        <a class="ch-paper" href="/creation/journal/edu-specifiability/"><span class="pt">可规格化性</span><span class="pd">评分标准与工程规格，是同一份文本的两次使用</span></a>
+        <a class="ch-paper" href="/creation/journal/health-overjustification/"><span class="pt">过度理由的规模化</span><span class="pd">填补延迟是游戏化全部的正当性，也是它的失效机制</span></a>
+        <a class="ch-paper" href="/creation/journal/biz-rent-dissipation/"><span class="pt">负和的强制投入</span><span class="pd">电力改变生产函数，它改变产出本身</span></a>
+      </div>
+      </div>
+      <div class="ch-cell ch-4">
       <a class="ch ch-4" href="/creation/research-philosophy/">
         <span class="ch-n">04</span>
         <h3><span class="zh-only">科研哲学</span><span class="en-only">Philosophy of Research</span></h3>
@@ -161,6 +189,13 @@ footer a{color:var(--gold);text-decoration:none}
         <span class="cnt"><span class="zh-only">3 篇 · 三条原理</span><span class="en-only">3 principles</span></span>
         <span class="go"><span class="zh-only">进入频道 →</span><span class="en-only">Enter →</span></span>
       </a>
+      <div class="ch-papers">
+        <a class="ch-paper" href="/creation/research-philosophy/cracks-not-gaps/"><span class="pt">裂缝不是空白</span><span class="pd">裂缝的位置上堆满了文献，还是最扎实的那批</span></a>
+        <a class="ch-paper" href="/creation/research-philosophy/mechanism-blindness/"><span class="pt">机制齐全为什么治不好</span><span class="pd">随机化的全部功能，是把 E 消掉</span></a>
+        <a class="ch-paper" href="/creation/research-philosophy/error-cancellation/"><span class="pt">误差互消不是「更全面」</span><span class="pd">随便三个角度偏差同向，是三倍不是三分之一</span></a>
+      </div>
+      </div>
+      <div class="ch-cell ch-5">
       <a class="ch ch-5" href="/creation/creativity/">
         <span class="ch-n">05</span>
         <h3><span class="zh-only">创造力</span><span class="en-only">Creativity</span></h3>
@@ -168,6 +203,12 @@ footer a{color:var(--gold);text-decoration:none}
         <span class="cnt"><span class="zh-only">3 篇 · 复合创新</span><span class="en-only">3 papers</span></span>
         <span class="go"><span class="zh-only">进入频道 →</span><span class="en-only">Enter →</span></span>
       </a>
+      <div class="ch-papers">
+        <a class="ch-paper" href="/creation/creativity/the-seam/"><span class="pt">长在接缝上的能力</span><span class="pd">评价单位是个体，能力载体是复合体，而复合体不能发证</span></a>
+        <a class="ch-paper" href="/creation/creativity/cutting-a-path/"><span class="pt">在约束里裁出一条新路</span><span class="pd">指南普适，恰恰因为它剔除了这个人的全部现实</span></a>
+        <a class="ch-paper" href="/creation/creativity/hundred-ideas/"><span class="pt">一百个点子不等于一个创新</span><span class="pd">16→15.01，提速百分之六。所有人以为是一百倍</span></a>
+      </div>
+      </div>
     </div>
     <p class="ch-foot zh-only">五个频道之下，是本专栏原初的四篇长文合辑 —— <a href="#crt-birth">壹 · 思想如何出生</a> · <a href="#crt-live">贰 · 思想如何活下来</a></p>
     <p class="ch-foot en-only">Below the channels: this column's original four essays — <a href="#crt-birth">I · How Thought Is Born</a> · <a href="#crt-live">II · How Thought Survives</a></p>
