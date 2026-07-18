@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>裂缝不是空白：为什么从文献里长出来的选题撬不动地基 | 学术创造专栏 · 科研哲学 | SDE Universes</title>
+<meta name="description" content="学术训练把选题教成了一门检索技术：读文献，找出"尚无研究探讨"的地方，填上它。这条路径产出了当代学术论文的绝大多数，也解释了为什么产量创纪录而地基纹丝不动。本文区分两种"没有人做过"：空白是地图上没画的区域，填补它让学科更完整；裂缝是地图本身画错的地方，撬开它让学科换一张地图。两者的检索性质相反——">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#F5EFE0;--card:#FAF6EC;--card2:#F0E8D3;--gold:#8A6817;--text:#2A2315;--text2:#544733;--muted:#98886C;--border:rgba(138,104,23,0.22);--border2:rgba(138,104,23,0.10);--accent:#7A4A8C;--accent2:#9E6BB0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Noto Serif SC','EB Garamond',Georgia,serif;line-height:1.95;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:0.7rem 3rem;background:rgba(245,239,224,0.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border2)}
+.nav-logo{font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:700;color:var(--gold);letter-spacing:0.05em;text-decoration:none}
+.nav-links{display:flex;align-items:center;gap:1.5rem}
+.nav-links a{color:var(--text2);text-decoration:none;font-size:0.84rem;letter-spacing:0.09em;transition:color .2s}
+.nav-links a:hover,.nav-links a.here{color:var(--accent)}
+.nav-links a.here{font-weight:700}
+.wrap{max-width:760px;margin:0 auto;padding:0 2rem}
+header.hero{padding:8.5rem 2rem 2.6rem;text-align:center;position:relative;overflow:hidden;border-bottom:1px solid var(--border2)}
+.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 72% 58% at 50% 24%,#7A4A8C1a 0%,transparent 72%)}
+.eyebrow{position:relative;font-size:0.7rem;letter-spacing:0.26em;color:var(--accent);margin-bottom:1.15rem}
+.eyebrow a{color:var(--accent);text-decoration:none;border-bottom:1px solid rgba(0,0,0,.14)}
+h1.art-title{position:relative;font-family:'Noto Serif SC',serif;font-size:clamp(1.75rem,4.1vw,2.55rem);font-weight:700;line-height:1.32;color:var(--text);max-width:830px;margin:0 auto}
+.art-sub{position:relative;font-size:clamp(0.98rem,1.9vw,1.13rem);color:var(--text2);max-width:660px;margin:1.05rem auto 0;font-style:italic;font-weight:300;line-height:1.72}
+.art-meta{position:relative;margin-top:1.5rem;font-size:0.79rem;letter-spacing:0.13em;color:var(--muted)}
+section.body{padding:2.8rem 0 1rem}
+.abs{background:var(--card);border:1px solid var(--border2);border-left:3px solid var(--accent);border-radius:5px;padding:1.4rem 1.6rem;margin-bottom:1rem}
+.abs .l{font-size:0.7rem;letter-spacing:0.24em;color:var(--accent);font-weight:700;margin-bottom:0.6rem}
+.abs p{font-size:0.94rem;line-height:1.88;color:var(--text2);text-align:justify}
+.kw{font-size:0.85rem;color:var(--muted);margin-bottom:2.4rem;letter-spacing:0.02em}
+.kw b{color:var(--accent);font-weight:700;letter-spacing:0.1em}
+.toc{background:var(--card2);border:1px dashed var(--border);border-radius:6px;padding:1.25rem 1.5rem;margin-bottom:3rem}
+.toc .l{font-size:0.7rem;letter-spacing:0.24em;color:var(--accent);font-weight:700;margin-bottom:0.75rem}
+.toc a{display:block;font-size:0.9rem;color:var(--text2);text-decoration:none;padding:0.24rem 0;transition:color .18s,padding-left .18s}
+.toc a:hover{color:var(--accent);padding-left:5px}
+article h2{font-family:'Noto Serif SC',serif;font-size:1.28rem;font-weight:700;color:var(--text);margin:3.1rem 0 1.15rem;padding-bottom:0.5rem;border-bottom:1px solid var(--border2);scroll-margin-top:5.5rem;line-height:1.45}
+article h2::before{content:'';display:inline-block;width:4px;height:0.95em;background:var(--accent);margin-right:0.6rem;vertical-align:-1px;border-radius:2px}
+article p{font-size:1.02rem;line-height:2.05;color:var(--text);margin-bottom:1.15rem;text-align:justify;letter-spacing:0.012em}
+article b{color:var(--text);font-weight:700;background:linear-gradient(transparent 62%,#7A4A8C22 62%)}
+article em{font-style:normal;color:var(--accent);font-weight:600}
+blockquote{margin:1.9rem 0;padding:1.15rem 1.5rem;background:var(--card);border-left:3px solid var(--accent);border-radius:0 5px 5px 0;font-size:1.05rem;line-height:1.9;color:var(--text);font-weight:600}
+hr{border:none;height:1px;background:var(--border2);margin:2.6rem 0}
+.foot-nav{margin:3.4rem 0 0;text-align:center;background:var(--card2);border:1px dashed var(--accent);border-radius:8px;padding:1.6rem 1.4rem}
+.foot-nav .cl{display:flex;flex-wrap:wrap;gap:0.7rem;justify-content:center}
+.foot-nav a{text-decoration:none;font-size:0.85rem;letter-spacing:0.06em;padding:0.48rem 1.05rem;border:1px solid var(--border);border-radius:22px;color:var(--text2);background:var(--card);transition:all .2s}
+.foot-nav a:hover{border-color:var(--accent);color:var(--accent)}
+footer{border-top:1px solid var(--border2);margin-top:3rem;padding:2.4rem 2rem;text-align:center;color:var(--muted);font-size:0.77rem;letter-spacing:0.05em}
+footer a{color:var(--gold);text-decoration:none}
+@media(max-width:640px){
+  nav{padding:0.6rem 1rem}.nav-links{gap:0.9rem}.nav-links a.sib{display:none}
+  header.hero{padding:6.4rem 1.2rem 2rem}
+  .wrap{padding:0 1.25rem}
+  article p{font-size:1rem;line-height:1.98}
+  article h2{font-size:1.16rem;margin:2.5rem 0 1rem}
+}
+</style>
+</head>
+<body>
+<nav>
+  <a class="nav-logo" href="/">SDE Universes</a>
+  <div class="nav-links">
+    <a href="/">首页</a>
+    <a href="/creation/" class="sib">学术创造专栏</a>
+    <a href="/creation/research-philosophy/" class="here">科研哲学</a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="hero-bg"></div>
+  <div class="eyebrow"><a href="/creation/">学术创造专栏</a> · <a href="/creation/research-philosophy/">科研哲学</a></div>
+  <h1 class="art-title">裂缝不是空白：为什么从文献里长出来的选题撬不动地基</h1>
+  <p class="art-sub">"尚无研究考察X在Y情境下的表现"——这句话每年养活几十万篇论文。它指的是地图上没画的地方。而真正值钱的东西，在地图本身画错的地方，那里没有空白，那里挤满了已发表的文献。</p>
+  <div class="art-meta">王德生 著 · 学术创造专栏 · 科研哲学 · 约 6600 字</div>
+</header>
+
+<main class="wrap">
+  <section class="body">
+    <div class="abs">
+      <div class="l">摘 要</div>
+      <p>学术训练把选题教成了一门检索技术：读文献，找出"尚无研究探讨"的地方，填上它。这条路径产出了当代学术论文的绝大多数，也解释了为什么产量创纪录而地基纹丝不动。本文区分两种"没有人做过"：空白是地图上没画的区域，填补它让学科更完整；裂缝是地图本身画错的地方，撬开它让学科换一张地图。两者的检索性质相反——空白可被检索，因为它以"没有文献"的形式存在；裂缝不可被检索，因为它的位置上通常堆满了文献，而且是那个领域最扎实、引用最多的文献。本文给出裂缝的四个深度（术语／方法／结构／本体）、它在被命名之前的四种微弱形式（不适感、命名困难、反复出现的例外、跨学科时无法翻译的尴尬），以及四条可执行的追问。文章进一步论证，生成式模型使填补空白的成本趋近于零，因而空白的市场价值同步趋零——一个只会找空白的研究者，其全部技能正在被一台每小时能找一百个空白的机器接管；而裂缝扫描恰恰是这台机器最做不了的动作，因为裂缝的第一形态是一种不适，而不适必须由一个在场的、被这件事烦了很久的人来承受。文末给出复合工具在裂缝扫描中的正确位置，以及本方法自身的四个失效条件。</p>
+    </div>
+    <div class="kw"><b>关键词</b>　裂缝第一原理；研究空白；选题；学术创新；六爪动作链；抓核；SDE</div>
+    <div class="toc">
+      <div class="l">目 次</div>
+      <a href="#c1">一、地图上的白，与地图本身错了</a><a href="#c2">二、为什么整个学术训练只教找空白</a><a href="#c3">三、裂缝的四个深度</a><a href="#c4">四、裂缝在被命名之前，是一种不适</a><a href="#c5">五、四条追问：把不适逼成裂缝</a><a href="#c6">六、AI 让空白变得一文不值</a><a href="#c7">七、裂缝的五个阶段：什么时候进场</a><a href="#c8">八、复合工具在裂缝扫描里的位置</a><a href="#c9">九、这套东西什么时候失效</a>
+    </div>
+    <article>
+<p>一位博士生的开题报告，第一章第三节，标题是"研究空白"。他写道：现有研究多集中于 A 情境，对 B 情境关注不足；已有文献多采用定量方法，鲜有定性研究；国外研究较为成熟，本土化研究尚待深入。</p>
+<p>这三句话可以套在任何一个学科、任何一个题目上。它们是真的——它确实没人做过。他的导师点头，开题通过。三年后他交出一篇合格的论文，填上了那块空白。</p>
+<p>这篇论文之后，那个领域和之前一模一样，只是文献综述里多了一行。</p>
+<p>这不是他的错，也不是他导师的错。<b>这是他被教会的那套找题方法的正确产物。</b> 那套方法叫检索：读文献，找出没人做过的地方，填上它。它的每一步都对，它的结论——"这里确实没人做过"——是真的。</p>
+<p>问题在于：<b>"没有人做过"有两种，而这套方法只能找到其中一种，而且是不值钱的那一种。</b></p>
+<h2 id="c1">一、地图上的白，与地图本身错了</h2>
+<p>先把两个词分开。</p>
+<blockquote><b>空白（gap）</b>：地图上没有画的区域。地图本身是对的，只是没画完。</blockquote>
+<p>></p>
+<blockquote><b>裂缝（crack）</b>：地图本身画错的地方。那里画满了，画得很细，很好看，而它错了。</blockquote>
+<p>这两者的检索性质完全相反，这是全部要害所在：</p>
+<p><b>空白可以被检索出来。</b> 因为它以"没有文献"的形式存在。你在数据库里搜 A×B，返回零条，空白就在那儿。<b>它的存在方式就是缺席，而缺席是可以被搜索到的。</b></p>
+<p><b>裂缝检索不出来。</b> 因为它的位置上通常<b>堆满了文献</b>——而且往往是那个领域最扎实、引用最多、被写进教科书的那批文献。裂缝不在没人去的地方，它在所有人都站着的那块地板下面。</p>
+<p>这就是为什么"读五百篇文献找选题"这个动作，在原理上只能产出空白。<b>读得越多，你越熟悉那张地图；而裂缝的性质恰恰是：它在地图里不可见——地图若能显示自己哪里画错了，它就已经改过来了。</b></p>
+<p>一个更难堪的推论：<b>你对文献越熟悉，你越不可能发现裂缝。</b> 因为熟悉的意思就是你已经接受了那张地图的画法。那些让新手感到"这里怪怪的"的地方，在你眼里已经变成了"这是本领域的标准处理"。</p>
+<blockquote>专业训练的全部内容，就是把一个人对裂缝的敏感，训练成对地图的熟练。</blockquote>
+<h2 id="c2">二、为什么整个学术训练只教找空白</h2>
+<p>必须先给这套训练一个公道，否则后面的话都是轻浮的。</p>
+<p>空白路径之所以统治学术训练，不是因为有人偷懒，是因为它满足了几个真实的、不可放弃的条件：</p>
+<p><b>它可教。</b>找空白有确定的程序：检索、筛选、比对、定位。这个程序可以写进教材，可以在一个学期里教会一个二十三岁的人。<b>裂缝扫描没有这样的程序</b>——这正是本文后面要面对的最大困难。</p>
+<p><b>它可评。</b>开题委员会可以判断"这个空白是不是真的空白"——查一下就知道。<b>他们无法判断"这个裂缝是不是真的裂缝"</b>，因为如果他们能判断，那说明这个裂缝已经在地图上了，那它就不是裂缝了。</p>
+<p><b>它可控。</b>填补一个空白的工作量是可估算的：这么多样本、这么长时间、这么些经费。<b>撬一条裂缝的工作量不可估算</b>——达尔文用了二十二年，而他开题的时候不知道要用二十二年。</p>
+<p><b>它安全。</b>填补空白的论文一定能写完，一定能发表——它不挑战任何人。<b>撬裂缝的论文可能三年后发现撬错了地方</b>，而一个博士生赔不起三年。</p>
+<p>四条都成立，而且四条都是好理由。<b>这就是为什么这套体制不会自己改：它的每一条约束都是正当的，而它们合起来恰好排除了唯一值钱的那个动作。</b></p>
+<h2 id="c3">三、裂缝的四个深度</h2>
+<p>不是所有裂缝都一样深。按 SDE 的框架，裂缝分四个深度，越往下越少人碰，价值越高：</p>
+<p><b>深度一：术语裂缝。</b>这个领域用的某个词，笨重、含混，或者在关键处失效。症状：这个词每次被用，都要加一个括号解释；不同作者用它指不同的东西，而没有人觉得这是个问题。</p>
+<p><b>深度二：方法裂缝。</b>这个领域的标准方法，在某一类现象上系统性失效，而这类现象被处理成"例外"或"噪声"。症状：论文里反复出现"由于测量限制，本研究未考察……"，而那个未考察的东西每篇论文都在同一个位置未考察。</p>
+<p><b>深度三：结构裂缝。</b>这个领域的理论骨架里有一块不承重的东西，或者两根柱子互相冲突而无人指出。症状：这个领域有一场持续了几十年的争论，双方都很有道理，谁也说服不了谁——<b>长期无法收敛的争论，几乎总是意味着双方共享了一个错误的前提</b>。</p>
+<p><b>深度四：本体裂缝。</b>这个领域关于"它研究的东西是什么"的假设错了。症状：极难察觉，因为这个假设从来没有被写出来过——它太理所当然了，理所当然到没有人觉得它是一个需要被命名的东西。</p>
+<p><b>四个深度里，最值钱的是第四层，也是唯一能换掉整张地图的一层。</b></p>
+<p>举一个本站的例子。学校正在用越来越精密的手段防止学生用机器完成作业。这场战争里，所有人都在同一层作战：更好的检测（术语层：什么算作弊）、更真实的任务（方法层：怎么测）、更细的留痕（方法层）。</p>
+<p><b>而那条本体裂缝是：作业曾经是学习发生过的证据，靠的是一个物理事实——要产出那个显露态，就必须走过那条路径。这个事实持续了两千年，从来没有被写进任何一本教育学教科书，因为它太理所当然了。</b> 现在这个事实没了，指针断了，评价对象蒸发了。</p>
+<p>请注意这条裂缝的位置：<b>它不在任何一处空白上。</b> "AI 对教育的影响"这个方向已经有成千上万篇论文了，密不透风。裂缝就在这堆文献的正下方。</p>
+<h2 id="c4">四、裂缝在被命名之前，是一种不适</h2>
+<p>这是本文最难写、也最要紧的一节。</p>
+<p>裂缝有一个残酷的性质：<b>在它被命名之前，它不以命题的形式存在。</b> 你不可能通过"想一想哪里有裂缝"来找到裂缝——如果你能想出来，那说明它已经有名字了。</p>
+<p>那它以什么形式存在？<b>四种微弱形式，全部是身体性的、前语言的：</b></p>
+<p><b>其一，不适感。</b>读一篇论文，每一步都对，你却觉得哪里不对。你说不出哪里，于是你假定是自己没读懂，于是你放过它。<b>这个"哪里不对"就是裂缝的第一形态，而学术训练教会你的第一件事，就是不信任它。</b></p>
+<p><b>其二，命名困难。</b>你想说一件事，找不到词。你绕了三句话，还是没说准。你最后用了那个领域现成的词，然后感觉丢了点什么。<b>丢掉的那点，就是裂缝。</b> 现成的词之所以接不住它，正因为那个词是按旧地图画的。</p>
+<p><b>其三，反复出现的例外。</b>同一类东西，反复地被处理成"例外""个体差异""测量误差""有待进一步研究"。一次是例外，十次就不是了——<b>一个反复出现在同一位置的例外，是那条裂缝的出口</b>。它每次都从这儿冒出来，每次都被塞回去。</p>
+<p><b>其四，跨学科时无法翻译的尴尬。</b>你跟另一个领域的人讲你的问题，讲不通。不是他笨，是他的地图上没有那个位置。<b>这种翻译失败的位置，往往正是两张地图各自都画错的地方。</b></p>
+<p>四种形式的共同点：<b>它们全部不是判断，它们是承受。</b> 你不是"看出"了裂缝，你是被它硌了很久。</p>
+<p>这就引出本文最重要的一句话：</p>
+<blockquote><b>裂缝扫描不是一个认知动作，是一个承受动作。它要求一个人在一个问题上待得足够久、被硌得足够疼，久到那个不适不能再被"可能是我没读懂"打发掉。</b></blockquote>
+<p>而这恰恰是当代学术训练最不允许的事：<b>三年毕业，五年考核，你没有时间被一件事硌很久。你必须在第一个学期就选好题，而第一个学期你能找到的只有空白。</b></p>
+<h2 id="c5">五、四条追问：把不适逼成裂缝</h2>
+<p>不适不是裂缝，它只是裂缝的信号。要把它逼成一条可定位的裂缝，需要四条追问。这四条是可执行的，尽管它们不是程序：</p>
+<p><b>追问一：旧语言在哪里笨重？</b></p>
+<p>去找那个每次用都要加括号解释的词。去找那个不同作者各说各话而无人觉得是问题的词。<b>笨重不是修辞问题，笨重是那个词接不住它要指的东西——而接不住的原因，是它按旧地图画的。</b></p>
+<p><b>追问二：旧方法在哪里失效？</b></p>
+<p>不是"哪里还没被研究"，是"哪里被研究了但方法在那儿不灵"。去找那些反复出现的"由于测量限制"。</p>
+<p><b>追问三：哪场争论长期不收敛？</b></p>
+<p>这一条是四条里最有效的。一场几十年不收敛的争论，双方都聪明、都有证据、都有道理——那么问题几乎一定不在双方的论证里，<b>问题在他们共享的那个前提里</b>，而那个前提之所以能被共享，正因为双方都没意识到它存在。</p>
+<p>举例：过度诊断的三十年论战，一方说筛出来的东西不该治，一方说该治。双方共享的前提是：<b>那儿有一个病。</b> 而当医学的对象已经从"病"迁移到"风险"时，这个前提本身就没了——<b>风险不是一个可以被过度诊断的病，它根本不是病</b>。这条裂缝三十年没人碰，因为三十年里双方都站在它上面吵架。</p>
+<p><b>追问四：房角石可靠吗？</b></p>
+<p>找出这个领域最不被怀疑的那块石头——写在教科书第一章、所有人都同意、从来没人论证过的那一句。<b>然后问：它凭什么？</b></p>
+<p>这一问最难，因为房角石的定义就是"没有人觉得它需要被问"。找它的办法是反过来：<b>去找那些"这还用问吗"的地方。</b> 凡是让你觉得"这个问题很蠢"的地方，都值得停一下——<b>蠢问题的密度与房角石的位置高度重合</b>。</p>
+<h2 id="c6">六、AI 让空白变得一文不值</h2>
+<p>现在说这件事为什么在今天变得紧迫。</p>
+<p>填补空白的全部技能是：检索、比对、定位、设计、执行、写作。<b>这六项里，有五项已经可以被机器以近乎零成本完成，而且比大多数博士生做得好。</b></p>
+<p>一台模型可以在一小时内给你一百个空白，每一个都是真的空白，每一个都配好了文献依据和研究设计。它们的质量高于中位数开题报告。</p>
+<p><b>于是空白的市场价值趋近于零。</b> 不是因为空白不重要，是因为它不再稀缺。一个只会找空白的研究者，其全部技能正在被一台每小时能找一百个空白的机器接管——<b>而他还在按三年一篇的速度填</b>。</p>
+<p><b>而裂缝扫描恰恰是这台机器最做不了的动作。</b> 理由不是它笨，是第四节那句话：<b>裂缝的第一形态是不适，而不适是一个承受动作。</b> 模型读一万篇论文不会觉得哪里不对——它没有可以被硌到的地方。它可以复述所有已知的争论，它不会因为一场争论持续了三十年而感到烦躁；而正是那份烦躁，才是有人要去看看他们脚下踩着什么的唯一动力。</p>
+<blockquote><b>模型能给你一百个空白，它给不了你一次不适。</b></blockquote>
+<p>这句话是这个时代学术训练必须重写的全部理由。</p>
+<h2 id="c7">七、裂缝的五个阶段：什么时候进场</h2>
+<p>前面讲了怎么找裂缝。还有一个同样要紧、却几乎从没被讨论过的问题：<b>找到了之后，什么时候进场？</b></p>
+<p>裂缝不是静止的，它有五个阶段：</p>
+<p><b>阶段一·微裂。</b>只有个别人感到不适，而且他们说不出为什么。这些人通常被当成想不清楚的人——因为他们确实说不清楚。<b>这个阶段没有任何外部证据表明这里有裂缝</b>，你唯一的凭据是你自己被硌了。</p>
+<p><b>阶段二·扩展。</b>不适开始被说出来，但仍然没有名字。症状是这个领域里开始出现一批"感觉哪里不对"的论文，它们互相不引用，用词各不相同，指的可能是同一件事，而没有人知道。<b>这个阶段最容易被误判为"这个领域有点乱"。</b></p>
+<p><b>阶段三·显裂。</b>有人给了它一个名字。名字一出来，事情立刻变了：原来那些互不相干的不适，忽然被发现是同一件事的不同侧面。<b>命名是这条线上唯一的不连续点——在它之前，裂缝不以命题的形式存在；在它之后，它在地图上了。</b></p>
+<p><b>阶段四·竞争填补。</b>大批人涌进来。每个人都在这条裂缝上做文章，会议开起来，专刊出起来，综述写起来。<b>这个阶段产出的论文最多，而它们几乎全部是空白填补——只不过填的是新地图上的空白。</b></p>
+<p><b>阶段五·新壳形成。</b>新的画法稳定下来，成为常识，写进教科书第一章。<b>然后它自己变成了下一条裂缝的房角石</b>——因为一个成为常识的东西，就是一个不再被问的东西。</p>
+<p>五个阶段给出了进场时机的全部残酷之处：</p>
+<blockquote><b>阶段三进场，你是跟随者——你在填新地图的空白，那件事一台模型一小时能给你一百个。</b></blockquote>
+<blockquote><b>阶段一进场，你要熬很久，而且没有人相信你，包括你自己——因为你说不清楚。</b></blockquote>
+<blockquote><b>而阶段一是唯一能换掉一张地图的位置。</b></blockquote>
+<p>达尔文的二十二年，恰好是从阶段一熬到阶段三的时间。他一八三八年就有了那个东西，一八五九年才出版。这二十二年里他在干什么？他在等那个不适长出一个名字来。<b>而那二十二年，在今天任何一个考核体系里，都是二十二年的零产出。</b></p>
+<p>这里必须防住一个廉价的浪漫化：<b>不是所有在阶段一熬着的人后来都成了达尔文。绝大多数熬在阶段一的人，熬的是自己的无知，而不是裂缝。</b> 第五节的四条追问是唯一的过滤器，而它过滤不干净——<b>这是这件事的真实成本：你必须在无法确知自己是对是错的情况下，投入几年。而这个成本没有任何办法降低，任何声称能降低它的方法，都是在把你推回阶段三。</b></p>
+<h2 id="c8">八、复合工具在裂缝扫描里的位置</h2>
+<p>那么模型在这件事里完全没用吗？不是。它有一个位置，而且是不可替代的位置——<b>只是不在你以为的地方</b>。</p>
+<p><b>它不是找裂缝的人，它是那个把地图铺开的人。</b></p>
+<p>具体说，它能做三件事：</p>
+<p><b>其一，穷尽那张地图。</b>裂缝扫描的前提是你得先知道地图上画了什么——否则你以为的裂缝，可能只是你没读到的一篇论文。这件事以前要花两年，现在要花两天。<b>这是纯赚：它把裂缝扫描的入场券从两年降到两天。</b></p>
+<p><b>其二，把不适逼成可定位的东西。</b>你说"这里怪怪的"，它不会告诉你哪里怪（它不知道），但它可以做一件极有用的事：<b>把这个位置上所有相关的论证、前提、争论摆出来，让你在里面指。</b> 你指不出来，但你能在看到某一句时说"就是这儿"。<b>这就是它的正确用法：它不判断，它把东西摆到你面前，让你的那份不适有地方落。</b></p>
+<p><b>其三，做追问三的苦力。</b>"哪场争论长期不收敛"——这是一个可以被检索的问题！让它去把这个领域三十年里所有久拖不决的论争列出来，然后你一条条看，看哪条让你不舒服。<b>这是模型与人的正确分工：它列，你不舒服。</b></p>
+<p>三件事的共同结构：<b>模型负责穷尽和铺陈，人负责被硌到。</b> 而这个分工不能反过来——一旦你让它替你判断哪条是裂缝，它会给你一个非常有道理的答案，而那个答案一定是从地图里长出来的，因为它只有地图。</p>
+<h2 id="c9">九、这套东西什么时候失效</h2>
+<p>任何把话说尽的东西都是自己做完了自己。四条缝：</p>
+<p><b>其一，不适可能只是无知。</b>"我觉得哪里不对"和"我没读懂"，在当事人那里是同一种感觉。本文把不适抬举成裂缝的第一形态，这有一个直接的滥用后果：<b>每个读不懂论文的人都可以宣称自己感到了本体裂缝。</b> 第五节的四条追问是唯一的过滤器——如果你的不适经不起这四问的逼迫，它就是无知。<b>但这道过滤器守不守得住，我没有把握。</b></p>
+<p><b>其二，久待可能只是路径依赖。</b>本文说裂缝扫描要求一个人在一个问题上待得足够久。而待得久的人，也恰好是最投入于旧地图的人——他二十年的资产全在那张地图上。<b>经验既是裂缝敏感的燃料，也是它最大的污染源，而本文没有给出区分两者的办法。</b></p>
+<p><b>其三，四个深度可能不是四层。</b>术语／方法／结构／本体这个分层，本身也是一张地图，它也可能画错了。本文没有论证为什么恰好是四层，也没有论证这四层是否互斥。<b>这一条我承认是弱的。</b></p>
+<p><b>其四，最深的一条：本文自己是不是只是一个空白？</b></p>
+<p>"研究空白与裂缝的区分"——这个话题有没有人做过？有的。科学哲学里关于范式与常规科学的讨论，早就区分过"解谜"与"革命"。若本文只是把库恩已经说过的话换了两个词，那么本文就是它自己所批判的那种东西：<b>一次熟练的空白填补，只不过填的是"裂缝理论的空白"。</b></p>
+<p>我认为它不是，理由是：库恩描述的是范式转换的历史形态（事后），本文给的是四条可在事前执行的追问（事前）。<b>但这个辩护的分量有多重，不该由我来判——我在这件事上是最没有资格判断的那个人。</b></p>
+<hr>
+<p>回到那位博士生。</p>
+<p>他的三句话——"对 B 情境关注不足""鲜有定性研究""本土化尚待深入"——每一句都是真的。他填的那块空白也是真的空白。他没有任何过错。</p>
+<p>如果有人要为这件事负责，那个人不是他。<b>是那套告诉他"找空白就是选题"的训练，而那套训练在过去一百年里从来没错过——因为在过去，找空白的人本来就少，找到一个就够写三年，而机器还不会找。</b></p>
+<blockquote>现在机器一小时能找一百个。而那套训练还在教一件机器已经做得比人好的事，并且把它当成博士生涯的核心技能来考核。</blockquote>
+<p>></p>
+<blockquote>一个学者最值钱的东西，是他在一件事上被硌了十年之后，还没有学会把那份不适解释掉。而学术训练做的第一件事，恰恰是教会他解释。</blockquote>
+    </article>
+    <div class="foot-nav">
+      <div class="cl">
+        <a href="/creation/research-philosophy/">← 回科研哲学频道</a>
+        <a href="/creation/">← 学术创造专栏</a>
+        <a href="/taste/zhiwen/">→ 中华智问知识发生器</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  © 德麦国际 Demai International · 学术创造专栏 · 科研哲学 · <a href="/">sdeuniverses.com</a>
+</footer>
+</body>
+</html>
