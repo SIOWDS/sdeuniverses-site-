@@ -58,16 +58,16 @@ canvas{display:block;height:100%;width:auto;max-width:100%}
   <div class="prog" id="prog"><div class="fill" id="fill"></div></div>
   <div class="pgrow">
     <button id="prev">‹ 上一页</button>
-    <span><span class="cur" id="cur">1</span> / <span id="tot">20</span></span>
+    <span><span class="cur" id="cur">1</span> / <span id="tot">5</span></span>
     <button id="next">下一页 ›</button>
   </div>
 </div>
-<div class="load" id="load"><div class="sp"></div><div style="font-size:14px">正在展开书页…<br><span style="font-size:12.5px;opacity:.8">20 页 · 首次载入一两秒</span></div></div>
+<div class="load" id="load"><div class="sp"></div><div style="font-size:14px">正在展开书页…<br><span style="font-size:12.5px;opacity:.8">5 页 · 首次载入一两秒</span></div></div>
 <div class="err" id="err" style="display:none"></div>
 <script>
 pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
 var PDF="negative-education.pdf",book=document.getElementById('book'),load=document.getElementById('load'),err=document.getElementById('err');
-var cur=1,total=20,doc=null,rendering=false,dpr=Math.min(window.devicePixelRatio||1,2.2);
+var cur=1,total=5,doc=null,rendering=false,dpr=Math.min(window.devicePixelRatio||1,2.2);
 function sceneH(){return document.querySelector('.scene').clientHeight-44;}
 async function render(n,dir){
   if(!doc||rendering)return; rendering=true;

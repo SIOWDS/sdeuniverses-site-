@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-CN"><head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>黑格尔造出了那台引擎，却把它锁进了一个圆 · 翻页阅读 | SDE Universes</title>
+<title>老子的道，为何物？ · 翻页阅读 | SDE Universes</title>
 <style>
 :root{--accent:#3f5b76;--head:#26303a;--accent2:#8fb3d0;--paper:#fffdf8;--room:#e9e4d8;--room2:#f3efe6;--ink:#2a2620;--mut:#8a8072}
 *{margin:0;padding:0;box-sizing:border-box}
@@ -47,9 +47,9 @@ canvas{display:block;height:100%;width:auto;max-width:100%}
 </head>
 <body>
 <div class="bar">
-  <a class="bk" href="/column/deconstructing-hegel/">‹ 返回文章</a>
-  <div class="ttl">黑格尔造出了那台引擎，却把它锁进了一个圆</div>
-  <a class="dl" href="deconstructing-hegel.pdf" target="_blank">下载 PDF</a>
+  <a class="bk" href="/column/what-is-dao/">‹ 返回文章</a>
+  <div class="ttl">老子的道，为何物？</div>
+  <a class="dl" href="what-is-dao.pdf" target="_blank">下载 PDF</a>
 </div>
 <div class="scene"><div class="book" id="book"></div></div>
 <div class="tapz l" id="tl"><div class="chev">‹</div></div>
@@ -58,16 +58,16 @@ canvas{display:block;height:100%;width:auto;max-width:100%}
   <div class="prog" id="prog"><div class="fill" id="fill"></div></div>
   <div class="pgrow">
     <button id="prev">‹ 上一页</button>
-    <span><span class="cur" id="cur">1</span> / <span id="tot">16</span></span>
+    <span><span class="cur" id="cur">1</span> / <span id="tot">4</span></span>
     <button id="next">下一页 ›</button>
   </div>
 </div>
-<div class="load" id="load"><div class="sp"></div><div style="font-size:14px">正在展开书页…<br><span style="font-size:12.5px;opacity:.8">16 页 · 首次载入一两秒</span></div></div>
+<div class="load" id="load"><div class="sp"></div><div style="font-size:14px">正在展开书页…<br><span style="font-size:12.5px;opacity:.8">4 页 · 首次载入一两秒</span></div></div>
 <div class="err" id="err" style="display:none"></div>
 <script>
 pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
-var PDF="deconstructing-hegel.pdf",book=document.getElementById('book'),load=document.getElementById('load'),err=document.getElementById('err');
-var cur=1,total=16,doc=null,rendering=false,dpr=Math.min(window.devicePixelRatio||1,2.2);
+var PDF="what-is-dao.pdf",book=document.getElementById('book'),load=document.getElementById('load'),err=document.getElementById('err');
+var cur=1,total=4,doc=null,rendering=false,dpr=Math.min(window.devicePixelRatio||1,2.2);
 function sceneH(){return document.querySelector('.scene').clientHeight-44;}
 async function render(n,dir){
   if(!doc||rendering)return; rendering=true;
@@ -114,7 +114,7 @@ window.addEventListener('resize',function(){clearTimeout(window._rz);window._rz=
   }catch(e){
     load.style.display='none';
     err.style.display='flex';
-    err.innerHTML='书页展开失败。你可以<a href="'+PDF+'" target="_blank">直接打开 PDF</a>，或<a href="/column/deconstructing-hegel/">返回文章页</a>阅读长文版。';
+    err.innerHTML='书页展开失败。你可以<a href="'+PDF+'" target="_blank">直接打开 PDF</a>，或<a href="/column/what-is-dao/">返回文章页</a>阅读长文版。';
   }
 })();
 </script>
