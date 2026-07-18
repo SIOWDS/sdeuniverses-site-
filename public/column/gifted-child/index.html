@@ -289,8 +289,11 @@ window.addEventListener('scroll',onScroll,{passive:true});window.addEventListene
 </script>
 <script id="sde-pv-js">
 (function(){var el=document.getElementById("sde-pv-n");if(!el)return;
-fetch("/api/pv?slug=column/gifted-child",{method:"POST"}).then(function(r){return r.json()})
-.then(function(d){if(d&&typeof d.total==="number"){el.textContent=d.total.toLocaleString("zh-Hans-CN");}else{throw 0;}})
+var slug="column/gifted-child",k="sde_pv_"+slug,day=new Date(Date.now()+288e5).toISOString().slice(0,10),m="POST";
+try{if(localStorage.getItem(k)===day)m="GET";}catch(e){}
+fetch("/api/pv?slug="+slug,{method:m}).then(function(r){return r.json()})
+.then(function(d){if(d&&typeof d.total==="number"){el.textContent=d.total.toLocaleString("zh-Hans-CN");
+if(m==="POST"){try{localStorage.setItem(k,day);}catch(e){}}}else{throw 0;}})
 .catch(function(){var w=document.getElementById("sde-pv-wrap");if(w)w.style.display="none";});
 })();
 </script>

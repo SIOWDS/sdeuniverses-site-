@@ -6,8 +6,30 @@ export class VisitCounter {
   async fetch(request) {
     let total = (await this.ctx.storage.get("total")) || 0;
     if (request.method === "POST") {
-      total += 1;
-      await this.ctx.storage.put("total", total);
+      const fp = request.headers.get("x-pv-fp");
+      if (fp) {
+        // 文章阅读计数：同一指纹（IP+UA+日）当天只计一次；跨天先清空昨日指纹再计
+        const day = request.headers.get("x-pv-day") || "";
+        const lastDay = (await this.ctx.storage.get("fpday")) || "";
+        if (day && day !== lastDay) {
+          let old = await this.ctx.storage.list({ prefix: "fp:" });
+          const keys = [...old.keys()];
+          for (let i = 0; i < keys.length; i += 128) {
+            await this.ctx.storage.delete(keys.slice(i, i + 128));
+          }
+          await this.ctx.storage.put("fpday", day);
+        }
+        const seen = await this.ctx.storage.get("fp:" + fp);
+        if (!seen) {
+          await this.ctx.storage.put("fp:" + fp, 1);
+          total += 1;
+          await this.ctx.storage.put("total", total);
+        }
+      } else {
+        // 旧路径（/api/visits 站点总量）：无指纹，逢 POST 即加，行为不变
+        total += 1;
+        await this.ctx.storage.put("total", total);
+      }
     }
     return new Response(JSON.stringify({ total }), {
       headers: {
@@ -696,7 +718,8 @@ export default {
       return env.COUNTER.get(id).fetch(request);
     }
     // /api/pv：每篇文章阅读次数（复用 VisitCounter，一篇一实例，key=pv:<slug>）
-    // GET 只读当前值；POST 自增一次并返回新值。slug 只允许小写字母/数字/连字符/斜杠。
+    // GET 只读当前值；POST 尝试自增：同一 IP+UA 同一天（UTC+8）只计一次。
+    // 隐私纪律：只存 SHA-256 指纹、跨天即删，服务端任何时刻不存在可还原的访客身份。
     if (url.pathname === "/api/pv") {
       const slug = (url.searchParams.get("slug") || "").toLowerCase();
       if (!/^[a-z0-9-]+(\/[a-z0-9-]+)*$/.test(slug) || slug.length > 120) {
@@ -706,6 +729,14 @@ export default {
         });
       }
       const id = env.COUNTER.idFromName("pv:" + slug);
+      if (request.method === "POST") {
+        const ip = request.headers.get("CF-Connecting-IP") || "0";
+        const ua = request.headers.get("User-Agent") || "";
+        const day = new Date(Date.now() + 8 * 3600 * 1000).toISOString().slice(0, 10);
+        const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode("sde-pv-v2:" + ip + "|" + ua + "|" + slug + "|" + day));
+        const fp = [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, "0")).join("");
+        return env.COUNTER.get(id).fetch(new Request(request.url, { method: "POST", headers: { "x-pv-fp": fp, "x-pv-day": day } }));
+      }
       return env.COUNTER.get(id).fetch(request);
     }
     // /api/llm-proxy：境外基底(GPT/Claude/Gemini)纯转发代理。
