@@ -40,6 +40,73 @@ export class VisitCounter {
   }
 }
 
+// ===== 读者讨论区·每篇文章一个实例（key=cm:<slug>）=====
+// 纪律：只存虚拟名+内容+时间；访客指纹只是当日哈希、仅用于限流且跨天即删，绝不存原始 IP。
+export class CommentBox {
+  constructor(ctx, env) { this.ctx = ctx; }
+  async fetch(request) {
+    if (request.method === "GET") {
+      const m = await this.ctx.storage.list({ prefix: "c:", limit: 500 });
+      return new Response(JSON.stringify({ count: m.size, items: [...m.values()] }), {
+        headers: { "content-type": "application/json", "cache-control": "no-store" },
+      });
+    }
+    if (request.method !== "POST") return new Response("method", { status: 405 });
+    const body = await request.json().catch(() => null);
+    if (!body) return Response.json({ ok: false, msg: "请求格式不对。" }, { status: 400 });
+    if (body.op === "del") { // 管理删除：路由层已验过管理口令才会转发到这里
+      const cid = String(body.id || "");
+      const item = await this.ctx.storage.get("c:" + cid);
+      if (!item) return Response.json({ ok: false, msg: "没有这条留言。" });
+      // 连带删除其下的回复
+      const all = await this.ctx.storage.list({ prefix: "c:" });
+      const doomed = ["c:" + cid];
+      for (const [k, v] of all) if (v && v.parent === cid) doomed.push(k);
+      for (let i = 0; i < doomed.length; i += 128) await this.ctx.storage.delete(doomed.slice(i, i + 128));
+      const n = (await this.ctx.storage.get("n")) || 0;
+      await this.ctx.storage.put("n", Math.max(0, n - doomed.length));
+      return Response.json({ ok: true, removed: doomed.length });
+    }
+    // 发言限流：同一访客指纹 10 分钟内 ≤5 条、当天 ≤30 条；指纹跨天清空
+    const fp = request.headers.get("x-cm-fp") || "anon";
+    const day = request.headers.get("x-cm-day") || "";
+    const lastDay = (await this.ctx.storage.get("rlday")) || "";
+    if (day && day !== lastDay) {
+      const old = await this.ctx.storage.list({ prefix: "rl:" });
+      const keys = [...old.keys()];
+      for (let i = 0; i < keys.length; i += 128) await this.ctx.storage.delete(keys.slice(i, i + 128));
+      await this.ctx.storage.put("rlday", day);
+    }
+    const now = Date.now();
+    let hits = (await this.ctx.storage.get("rl:" + fp)) || [];
+    hits = hits.filter((t) => now - t < 86400000);
+    if (hits.filter((t) => now - t < 600000).length >= 5 || hits.length >= 30) {
+      return Response.json({ ok: false, msg: "发言太频繁，请稍后再试。" }, { status: 429 });
+    }
+    // 内容校验：名字 ≤20 字、内容 ≤1000 字；控制字符清除（保留换行）
+    const clean = (s, n) => String(s || "").replace(/[\u0000-\u0009\u000b-\u001f]/g, "").trim().slice(0, n);
+    const name = clean(body.name, 20);
+    const text = clean(body.text, 1000);
+    if (!name) return Response.json({ ok: false, msg: "请先起一个名字。" });
+    if (text.length < 2) return Response.json({ ok: false, msg: "内容太短了。" });
+    const n = (await this.ctx.storage.get("n")) || 0;
+    if (n >= 500) return Response.json({ ok: false, msg: "本篇讨论已满，感谢参与。" });
+    // 一级回复：parent 必须指向一条既有的顶层留言（和微信一致，不做多层嵌套）
+    let parent = String(body.parent || "");
+    if (parent) {
+      const p = await this.ctx.storage.get("c:" + parent);
+      if (!p) return Response.json({ ok: false, msg: "要回复的留言不存在。" });
+      if (p.parent) parent = p.parent; // 对回复点回复 → 归到同一条顶层留言下
+    }
+    const cid = String(now).padStart(14, "0") + "-" + Math.random().toString(36).slice(2, 8);
+    const item = { id: cid, name, text, parent, ts: now };
+    await this.ctx.storage.put("c:" + cid, item);
+    await this.ctx.storage.put("rl:" + fp, [...hits, now]);
+    await this.ctx.storage.put("n", n + 1);
+    return Response.json({ ok: true, item });
+  }
+}
+
 // ===== Tier2 智能问答·按 IP 限流（站方出 Key，必须防刷爆）=====
 export class AskLimiter {
   constructor(ctx, env) { this.ctx = ctx; }
@@ -98,6 +165,11 @@ export class ConfigVault {
       }
       await this.ctx.storage.delete("reflect:" + v);
       return Response.json({ ok: true, msg: "已清空 " + (v || "?") + " 的心得，下次深度提问将重写。" });
+    }
+    if (op === "checkpass") { // 仅 Worker 内部调用：校验管理口令（供评论区管理等复用）
+      const stored = (await this.ctx.storage.get("adminHash")) || "";
+      const ok = !!stored && (await this._hash(String(body.pass || ""))) === stored;
+      return Response.json({ ok });
     }
     if (op === "set") {
       const pass = String(body.pass || ""), key = String(body.key || "");
@@ -738,6 +810,36 @@ export default {
         return env.COUNTER.get(id).fetch(new Request(request.url, { method: "POST", headers: { "x-pv-fp": fp, "x-pv-day": day } }));
       }
       return env.COUNTER.get(id).fetch(request);
+    }
+    // /api/comments：读者讨论区。GET=取某篇全部留言；POST=发言或回复；POST op:del=管理删除（需管理口令）。
+    if (url.pathname === "/api/comments") {
+      const slug = (url.searchParams.get("slug") || "").toLowerCase();
+      if (!/^[a-z0-9-]+(\/[a-z0-9-]+)*$/.test(slug) || slug.length > 120) {
+        return Response.json({ error: "bad slug" }, { status: 400 });
+      }
+      const box = env.COMMENTS.get(env.COMMENTS.idFromName("cm:" + slug));
+      if (request.method === "GET") return box.fetch(request);
+      if (request.method === "POST") {
+        const body = await request.json().catch(() => null);
+        if (!body) return Response.json({ ok: false, msg: "请求格式不对。" }, { status: 400 });
+        if (body.op === "del") { // 管理删除：先过 ConfigVault 管理口令
+          const cv = env.CONFIG_VAULT.get(env.CONFIG_VAULT.idFromName("global"));
+          const chk = await (await cv.fetch(new Request("https://do/", { method: "POST", body: JSON.stringify({ op: "checkpass", pass: String(body.pass || "") }) }))).json();
+          if (!chk.ok) return Response.json({ ok: false, msg: "管理口令不正确。" }, { status: 403 });
+          return box.fetch(new Request(request.url, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ op: "del", id: String(body.id || "") }) }));
+        }
+        const ip = request.headers.get("CF-Connecting-IP") || "0";
+        const ua = request.headers.get("User-Agent") || "";
+        const day = new Date(Date.now() + 8 * 3600 * 1000).toISOString().slice(0, 10);
+        const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode("sde-cm-v1:" + ip + "|" + ua + "|" + day));
+        const fp = [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, "0")).join("");
+        return box.fetch(new Request(request.url, {
+          method: "POST",
+          headers: { "content-type": "application/json", "x-cm-fp": fp, "x-cm-day": day },
+          body: JSON.stringify({ name: body.name, text: body.text, parent: body.parent }),
+        }));
+      }
+      return new Response("method", { status: 405 });
     }
     // /api/llm-proxy：境外基底(GPT/Claude/Gemini)纯转发代理。
     // 解决两件事：①浏览器 CORS 拦截 ②中国大陆无法直连境外 API。
