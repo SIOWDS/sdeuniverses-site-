@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SDE 会议 · 视频讲课与群讨论 | SDE Universes</title>
+<meta name="description" content="SDE 会议专栏：王德生 SDE 讲堂。浏览器直连视频教室，免安装参与讲课；会议讨论区支持课前预告、课后答疑与学员群讨论。">
+<style>
+:root{
+  --bg:#F7F3E9;--surface:#F1EBDC;--card:#FBF8F0;--card2:#F4EEDF;
+  --border:#D8CBAA;--border2:#E4DAC2;
+  --text:#2A2318;--text2:#6B6050;--muted:#9A8F7A;
+  --gold:#8A6817;--gold2:#A8842B;
+  --mtg:#0F766E;--mtg2:#14998F;--mtg-soft:rgba(15,118,110,0.08);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Noto Serif SC',Georgia,'Songti SC',serif;background:var(--bg);color:var(--text);line-height:1.9}
+a{color:var(--mtg)}
+nav{position:sticky;top:0;z-index:50;background:rgba(247,243,233,0.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--border2);padding:0.8rem 2rem;display:flex;justify-content:space-between;align-items:center}
+.nav-logo{font-weight:800;letter-spacing:0.05em;color:var(--gold);text-decoration:none;font-size:1.05rem}
+nav .back{font-size:0.85rem;color:var(--text2);text-decoration:none}
+nav .back:hover{color:var(--mtg)}
+header{max-width:960px;margin:0 auto;padding:4.5rem 24px 2.5rem;text-align:center}
+.eyebrow{font-size:0.72rem;letter-spacing:0.32em;color:var(--mtg);text-transform:uppercase;font-weight:700;margin-bottom:1.1rem}
+h1{font-size:clamp(2rem,5vw,3.2rem);font-weight:800;line-height:1.2;margin-bottom:0.9rem}
+h1 span{color:var(--mtg)}
+.sub{font-size:1.05rem;color:var(--text2);max-width:640px;margin:0 auto}
+.chips{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:1.6rem}
+.chips span{font-size:12.5px;letter-spacing:0.12em;padding:5px 15px;border-radius:20px;border:1px solid var(--mtg);color:var(--mtg);background:var(--mtg-soft)}
+main{max-width:960px;margin:0 auto;padding:0 24px 4rem}
+section.blk{margin:3rem 0}
+.blk-label{font-size:0.7rem;letter-spacing:0.28em;color:var(--mtg);text-transform:uppercase;font-weight:700;display:flex;align-items:center;gap:1rem;margin-bottom:0.6rem}
+.blk-label::after{content:'';flex:1;height:1px;background:var(--border)}
+.blk h2{font-size:1.55rem;font-weight:800;margin-bottom:0.5rem}
+.blk .lead{color:var(--text2);font-size:0.95rem;margin-bottom:1.4rem;max-width:720px}
+.room-card{background:var(--card);border:1px solid var(--border2);border-top:3px solid var(--mtg);border-radius:10px;padding:1.6rem 1.6rem 1.4rem;margin-bottom:1.2rem}
+.room-card h3{font-size:1.1rem;font-weight:800;margin-bottom:0.5rem}
+.room-card p{font-size:0.9rem;color:var(--text2);margin-bottom:1rem}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.btn{display:inline-block;font:inherit;font-size:0.9rem;font-weight:700;letter-spacing:0.08em;padding:0.7rem 1.6rem;border-radius:6px;border:1px solid var(--mtg);background:var(--mtg);color:#F5F1E6;cursor:pointer;text-decoration:none;transition:background 0.2s}
+.btn:hover{background:var(--mtg2)}
+.btn.ghost{background:transparent;color:var(--mtg)}
+.btn.ghost:hover{background:var(--mtg-soft)}
+input.txt{font:inherit;font-size:0.9rem;color:var(--text);background:#fff;border:1px solid var(--border);border-radius:6px;padding:0.65rem 0.9rem;min-width:230px;flex:1;outline:none}
+input.txt:focus{border-color:var(--mtg)}
+.hintline{font-size:0.78rem;color:var(--muted);margin-top:0.7rem}
+#stage{display:none;margin:1.4rem 0 0}
+#stage.on{display:block}
+#stage .stage-bar{display:flex;justify-content:space-between;align-items:center;background:#1E1A12;color:#E8DFC8;border-radius:10px 10px 0 0;padding:0.55rem 1rem;font-size:0.82rem}
+#stage .stage-bar b{letter-spacing:0.06em}
+#stage .stage-bar a{color:#E4C878;text-decoration:none;margin-left:14px;cursor:pointer}
+#stage iframe{display:block;width:100%;height:min(72vh,640px);border:1px solid var(--border);border-top:none;border-radius:0 0 10px 10px;background:#000}
+.notes{background:var(--card2);border:1px solid var(--border2);border-radius:10px;padding:1.3rem 1.5rem;font-size:0.88rem;color:var(--text2)}
+.notes b{color:var(--text)}
+.notes ol{margin:0.4rem 0 0 1.3rem}
+.notes li{margin-bottom:0.45rem}
+footer{border-top:1px solid var(--border2);padding:2rem 24px;text-align:center;font-size:0.75rem;color:var(--muted)}
+footer a{color:var(--gold);text-decoration:none}
+@media(max-width:640px){input.txt{min-width:0;width:100%}.row{flex-direction:column;align-items:stretch}}
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="/">SDE Universes</a>
+  <a class="back" href="/">← 返回首页</a>
+</nav>
+
+<header>
+  <div class="eyebrow">SDE Meeting · Live Classroom</div>
+  <h1>SDE <span>会议</span></h1>
+  <p class="sub">王德生 SDE 讲堂——视频讲课与群讨论两大功能。学生在浏览器里直接进教室听课、提问；讨论区用于课前预告、课后答疑与日常学习交流。</p>
+  <div class="chips">
+    <span>📹 视频讲课</span><span>💬 群讨论</span><span>免安装 · 浏览器直连</span>
+  </div>
+</header>
+
+<main>
+
+<!-- ① 视频讲课 -->
+<section class="blk" id="video">
+  <div class="blk-label">功能一 · Video Lecture</div>
+  <h2>视频教室</h2>
+  <p class="lead">点击即在本页打开视频教室，支持多人视频、屏幕共享与举手发言。音视频经由 Jitsi Meet 公共服务在浏览器间传输，本站不架设、不经手任何音视频数据。</p>
+
+  <div class="room-card">
+    <h3>SDE 大教室（默认）</h3>
+    <p>讲课统一使用这间教室。开课时间以下方讨论区的预告为准，到点进入即可。</p>
+    <div class="row">
+      <button class="btn" onclick="joinRoom('SDE-Universes-Classroom')">进入 SDE 大教室</button>
+      <button class="btn ghost" onclick="joinRoom('SDE-Universes-Classroom', true)">新窗口打开</button>
+    </div>
+  </div>
+
+  <div class="room-card">
+    <h3>自建小教室 / 分组讨论</h3>
+    <p>输入一个教室名（英文或数字），与同学约定同名即可进入同一间教室，适合小组学习。</p>
+    <div class="row">
+      <input class="txt" id="roomName" maxlength="40" placeholder="教室名，如 sde-group-1">
+      <button class="btn" onclick="joinCustom()">进入教室</button>
+    </div>
+    <div class="hintline">教室名只用字母、数字与连字符；系统会自动加上 SDE- 前缀避免撞名。</div>
+  </div>
+
+  <div class="room-card">
+    <h3>Zoom 通道</h3>
+    <p>如某次课改用 Zoom 进行，讲师会在讨论区发布 Zoom 会议链接；把链接粘贴到这里，一键跳转加入。</p>
+    <div class="row">
+      <input class="txt" id="zoomLink" placeholder="粘贴 Zoom 会议链接，如 https://zoom.us/j/…">
+      <button class="btn" onclick="openZoom()">加入 Zoom 会议</button>
+    </div>
+  </div>
+
+  <div id="stage">
+    <div class="stage-bar"><b id="stageName">教室</b><span><a onclick="fsStage()">全屏</a><a onclick="leaveRoom()">退出教室</a></span></div>
+    <div id="stageFrame"></div>
+  </div>
+
+  <div class="notes" style="margin-top:1.4rem">
+    <b>使用须知</b>
+    <ol>
+      <li>首次进入请允许浏览器使用摄像头与麦克风；听课时建议先静音，提问再开麦。</li>
+      <li>教室的首位主持人（讲师）按页面提示登录一次账号即可开启房间；学生无需注册，输名字直接进。</li>
+      <li>开课前请在下方讨论区查看时间预告；上课中的提问也可以直接发在讨论区，讲师会集中回应。</li>
+      <li>音视频服务由第三方（Jitsi / Zoom）提供并遵循其服务条款；本站不录制、不存储任何音视频内容。</li>
+    </ol>
+  </div>
+</section>
+
+<!-- ② 群讨论 -->
+<section class="blk" id="talk-anchor">
+  <div class="blk-label">功能二 · Group Discussion</div>
+  <h2>会议讨论区</h2>
+  <p class="lead">课程预告、课后答疑、学习心得与同学互助都发在这里。起个名字即可发言，支持一级回复。</p>
+</section>
+
+<!-- 读者讨论区+阅读计数 · sde-talk v2 -->
+<section id="sde-talk">
+<style id="sde-talk-css">
+#sde-talk{max-width:722px;margin:56px auto 40px;padding:0 24px;line-height:1.9;text-align:left}
+#sde-talk .tk-title{font-size:20px;font-weight:800;letter-spacing:.04em;margin:0 0 4px;padding-bottom:12px;border-bottom:2px solid rgba(128,128,128,.3);text-indent:0}
+#sde-talk .tk-title span{font-size:13px;font-weight:400;opacity:.6;letter-spacing:.02em}
+#sde-talk .tk-hint{font-size:13px;opacity:.62;margin:10px 0 18px;text-indent:0}
+#sde-talk .tk-form{background:rgba(128,128,128,.06);border:1px solid rgba(128,128,128,.22);border-radius:8px;padding:16px 16px 12px;margin-bottom:26px}
+#sde-talk input,#sde-talk textarea{display:block;width:100%;box-sizing:border-box;font:inherit;color:inherit;background:rgba(128,128,128,.12);border:1px solid rgba(128,128,128,.3);border-radius:6px;padding:9px 12px;margin:0 0 10px;outline:none}
+#sde-talk textarea{min-height:88px;resize:vertical;line-height:1.8}
+#sde-talk input:focus,#sde-talk textarea:focus{border-color:rgba(128,128,128,.6)}
+#sde-talk .tk-bar{display:flex;justify-content:space-between;align-items:center}
+#sde-talk .tk-note{font-size:12px;opacity:.55}
+#sde-talk button{font:inherit;font-size:14px;letter-spacing:.2em;padding:7px 26px;border-radius:6px;border:1px solid currentColor;background:transparent;color:inherit;cursor:pointer;opacity:.85}
+#sde-talk button:hover{opacity:1}
+#sde-talk button:disabled{opacity:.4;cursor:default}
+#sde-talk #tk-msg{font-size:13px;margin-top:8px;opacity:.75;min-height:1em;text-indent:0}
+#sde-talk #tk-replying{font-size:13px;margin-bottom:8px;opacity:.8}
+#sde-talk #tk-replying a{margin-left:8px;text-decoration:underline;color:inherit;opacity:.7;cursor:pointer}
+#sde-talk .tk-item{border-bottom:1px solid rgba(128,128,128,.18);padding:16px 2px}
+#sde-talk .tk-head{font-size:13px;margin-bottom:5px;text-indent:0}
+#sde-talk .tk-name{font-weight:700}
+#sde-talk .tk-time{opacity:.5;margin-left:10px;font-size:12px}
+#sde-talk .tk-body{white-space:pre-wrap;word-break:break-word;font-size:15.5px;text-indent:0;margin:0}
+#sde-talk .tk-reply{display:inline-block;font-size:12px;margin-top:7px;color:inherit;opacity:.55;text-decoration:none;border-bottom:1px dashed currentColor;cursor:pointer}
+#sde-talk .tk-reply:hover{opacity:.9}
+#sde-talk .tk-sub{margin:12px 0 0 22px;padding:10px 14px;background:rgba(128,128,128,.07);border-left:2px solid rgba(128,128,128,.35);border-radius:0 6px 6px 0}
+#sde-talk .tk-empty{padding:26px 0;text-align:center;opacity:.55;font-size:14px}
+</style>
+<div class="tk-wrap">
+  <h2 class="tk-title">会议讨论区 <span id="tk-count"></span> <span id="sde-pv-wrap">· 本页已被访问 <span id="sde-pv-n">—</span> 次</span></h2>
+  <p class="tk-hint">起个名字就能发言——查看开课预告、课后提问，或与同学交流学习心得。首次发言的名字会与你的网络绑定，此后请沿用同一名字。发言公开可见，请友善交流。</p>
+  <div class="tk-form">
+    <div id="tk-replying" style="display:none"><span id="tk-replying-to"></span><a id="tk-cancel">取消回复</a></div>
+    <input id="tk-name" maxlength="20" placeholder="你的名字（虚拟名字即可）">
+    <textarea id="tk-text" maxlength="1000" placeholder="开课预告、提问，或你的学习心得…"></textarea>
+    <div class="tk-bar"><span class="tk-note">最多 1000 字 · 每人每天最多 30 条</span><button id="tk-send">发 言</button></div>
+    <div id="tk-msg"></div>
+  </div>
+  <div id="tk-list"></div>
+</div>
+</section>
+<script id="sde-talk-js">
+(function(){
+var slug="meeting/hall",API="/api/comments?slug="+slug;
+function el(id){return document.getElementById(id)}
+var items=[],parent="";
+function note(s){el("tk-msg").textContent=s}
+function tme(ts){var d=new Date(ts),p=function(x){return (x<10?"0":"")+x};
+return d.getFullYear()+"-"+p(d.getMonth()+1)+"-"+p(d.getDate())+" "+p(d.getHours())+":"+p(d.getMinutes())}
+function head(c){var h=document.createElement("div");h.className="tk-head";
+var n=document.createElement("span");n.className="tk-name";n.textContent=c.name;
+var t=document.createElement("span");t.className="tk-time";t.textContent=tme(c.ts);
+h.appendChild(n);h.appendChild(t);return h}
+function para(s){var p=document.createElement("p");p.className="tk-body";p.textContent=s;return p}
+function render(){
+var list=el("tk-list");list.innerHTML="";
+el("tk-count").textContent="· "+items.length+" 条";
+var tops=items.filter(function(c){return !c.parent}).sort(function(a,b){return b.ts-a.ts});
+var reps={};items.forEach(function(c){if(c.parent){(reps[c.parent]=reps[c.parent]||[]).push(c)}});
+if(!tops.length){var e=document.createElement("div");e.className="tk-empty";e.textContent="还没有留言，来做第一位发言的读者。";list.appendChild(e);return}
+tops.forEach(function(c){
+var box=document.createElement("div");box.className="tk-item";
+box.appendChild(head(c));box.appendChild(para(c.text));
+var rb=document.createElement("a");rb.className="tk-reply";rb.textContent="回复";
+rb.onclick=function(){parent=c.id;el("tk-replying-to").textContent="正在回复 @"+c.name;
+el("tk-replying").style.display="block";el("tk-text").focus();
+el("sde-talk").scrollIntoView({behavior:"smooth"})};
+box.appendChild(rb);
+(reps[c.id]||[]).sort(function(a,b){return a.ts-b.ts}).forEach(function(r){
+var s=document.createElement("div");s.className="tk-sub";s.appendChild(head(r));s.appendChild(para(r.text));box.appendChild(s)});
+list.appendChild(box)});
+}
+el("tk-cancel").onclick=function(){parent="";el("tk-replying").style.display="none"};
+try{var nm=localStorage.getItem("sde_cm_name");if(nm)el("tk-name").value=nm}catch(e){}
+el("tk-send").onclick=function(){
+var name=el("tk-name").value.trim(),text=el("tk-text").value.trim();
+if(!name){note("请先起一个名字。");return}
+if(text.length<2){note("内容太短了。");return}
+var btn=el("tk-send");btn.disabled=true;note("发布中…");
+fetch(API,{method:"POST",headers:{"content-type":"application/json"},
+body:JSON.stringify({name:name,text:text,parent:parent})})
+.then(function(r){return r.json()})
+.then(function(d){btn.disabled=false;
+if(d&&d.ok&&d.item){items.push(d.item);
+try{localStorage.setItem("sde_cm_name",name)}catch(e){}
+el("tk-text").value="";parent="";el("tk-replying").style.display="none";note("已发布。");render()}
+else{note((d&&d.msg)||"发布失败，请稍后再试。")}})
+.catch(function(){btn.disabled=false;note("网络异常，请稍后再试。")})};
+fetch(API).then(function(r){return r.json()})
+.then(function(d){items=(d&&d.items)||[];render()})
+.catch(function(){el("tk-list").textContent="讨论区暂时无法加载，请稍后刷新。"});
+(function(){var pn=el("sde-pv-n");if(!pn)return;
+var k="sde_pv_"+slug,day=new Date(Date.now()+288e5).toISOString().slice(0,10),m="POST";
+try{if(localStorage.getItem(k)===day)m="GET";}catch(e){}
+fetch("/api/pv?slug="+slug,{method:m}).then(function(r){return r.json()})
+.then(function(d){if(d&&typeof d.total==="number"){pn.textContent=d.total.toLocaleString("zh-Hans-CN");
+if(m==="POST"){try{localStorage.setItem(k,day);}catch(e){}}}else{throw 0;}})
+.catch(function(){var w=el("sde-pv-wrap");if(w)w.style.display="none";});
+})();
+})();
+</script>
+
+</main>
+
+<footer>
+  <p>SDE 会议 · SDE Universes</p>
+  <p style="margin-top:6px">© 2026 Demai International Pte. Ltd. · <a href="/">sdeuniverses.com</a></p>
+</footer>
+
+<script>
+function slugOk(s){return /^[A-Za-z0-9-]{1,40}$/.test(s)}
+function roomUrl(r){return "https://meet.jit.si/"+encodeURIComponent(r)+"#config.prejoinConfig.enabled=true"}
+function joinRoom(r, newWin){
+  if(newWin){window.open(roomUrl(r),"_blank","noopener");return}
+  var st=document.getElementById("stage");
+  var fr=document.getElementById("stageFrame");
+  fr.innerHTML="";
+  var f=document.createElement("iframe");
+  f.src=roomUrl(r);
+  f.allow="camera; microphone; fullscreen; display-capture; autoplay; clipboard-write";
+  f.setAttribute("allowfullscreen","");
+  fr.appendChild(f);
+  document.getElementById("stageName").textContent="教室："+r;
+  st.className="on";
+  st.scrollIntoView({behavior:"smooth",block:"start"});
+}
+function joinCustom(){
+  var v=(document.getElementById("roomName").value||"").trim();
+  if(!slugOk(v)){alert("教室名只能用字母、数字与连字符（1-40位）");return}
+  joinRoom("SDE-"+v);
+}
+function leaveRoom(){
+  var st=document.getElementById("stage");
+  document.getElementById("stageFrame").innerHTML="";
+  st.className="";
+}
+function fsStage(){
+  var f=document.querySelector("#stageFrame iframe");
+  if(f&&f.requestFullscreen)f.requestFullscreen();
+}
+function openZoom(){
+  var v=(document.getElementById("zoomLink").value||"").trim();
+  if(!/^https:\/\/([a-z0-9-]+\.)*zoom\.(us|com)\//i.test(v)){alert("请粘贴以 https://zoom.us/ 或 https://…zoom.us/ 开头的会议链接");return}
+  window.open(v,"_blank","noopener");
+}
+</script>
+
+</body>
+</html>
