@@ -3,7 +3,7 @@
 // ── 讨论区 Google 实名登录（方案B：只认 Google 登录）────────────────
 // 填入王德生在 console.cloud.google.com 创建的 OAuth Web 客户端 ID 即全站生效；
 // 留空 = 休眠，讨论区维持"起名+网络绑定"旧通道。
-const GOOGLE_CLIENT_ID = "";
+const GOOGLE_CLIENT_ID = "985037699618-de3smmqf2rer0pfhf4mrtrj3rgahgu5u.apps.googleusercontent.com";
 // 服务器端校验 Google 登录凭证：只信 Google 签发、只信本站客户端 ID。
 // 只取显示名，不存邮箱、不存 Google ID 原文。
 async function verifyGoogleCredential(cred) {
