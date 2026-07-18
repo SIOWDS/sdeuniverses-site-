@@ -300,7 +300,8 @@ var t=document.createElement("span");t.className="tk-time";t.textContent=tme(c.t
 h.appendChild(n);h.appendChild(t);return h}
 function para(s){var p=document.createElement("p");p.className="tk-body";p.textContent=s;return p}
 function replyLink(c){var a=document.createElement("a");a.className="tk-reply";a.textContent="回复";
-a.onclick=function(){parent=c.id;el("tk-replying-to").textContent="回复 "+c.name+"：";
+a.onclick=function(){if(!gcred){note("回复也需要先用 Google 账号登录——请在上方登录。");var g=el("tk-gsi");if(g&&g.scrollIntoView)g.scrollIntoView({behavior:"smooth",block:"center"});return}
+parent=c.id;el("tk-replying-to").textContent="回复 "+c.name+"：";
 el("tk-replying").style.display="block";el("tk-text").focus()};return a}
 function render(){var L=el("tk-list");L.textContent="";
 var tops=items.filter(function(c){return !c.parent});
