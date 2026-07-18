@@ -77,7 +77,7 @@ body{background:linear-gradient(180deg,#fbfdff 0%,#f5f9ff 100%);font-size:18px;l
   <div class="art-series">每日更新 · 教育深度</div>
   <h1 class="art-title">一所学校可以纪律严明、 成绩优秀,却在杀死教育</h1>
   <div class="art-subtitle">——什么是"负向教育"</div>
-  <div class="art-meta">王德生 · 据《SDE教育发生学导论》· 约两万字 · 约 0.9 万字</div>
+  <div class="art-meta">王德生 · 据《SDE教育发生学导论》· 约两万字 · 约 0.9 万字 · <span id="sde-pv-wrap">阅读 <span id="sde-pv-n">—</span> 次</span></div>
 </div>
 <div class="wrap">
 <p>先讲一个真实到几乎每个人都见过的场景。一所学校,纪律严明,成绩优异,升学率年年攀升,管理规范得像一台精密的机器。老师兢兢业业,学生刻苦用功,家长全力配合。从任何一份"办学成果"的报表上看,它都堪称成功。可是,走进这所学校,你会隐隐感到一种说不出的不对劲:孩子们的眼睛里,少了点光;课堂上,很少有人真正因为好奇而提问;所有人都很努力,却很少有人真正快乐。这里高效地生产着分数,却似乎,并不生产热爱。</p>
@@ -229,6 +229,13 @@ function onScroll(){
     links.forEach(function(a,i){a.className=(i===cur?'on':'');});}
 }
 window.addEventListener('scroll',onScroll,{passive:true});window.addEventListener('resize',onScroll);onScroll();
+})();
+</script>
+<script id="sde-pv-js">
+(function(){var el=document.getElementById("sde-pv-n");if(!el)return;
+fetch("/api/pv?slug=column/negative-education",{method:"POST"}).then(function(r){return r.json()})
+.then(function(d){if(d&&typeof d.total==="number"){el.textContent=d.total.toLocaleString("zh-Hans-CN");}else{throw 0;}})
+.catch(function(){var w=document.getElementById("sde-pv-wrap");if(w)w.style.display="none";});
 })();
 </script>
 </body></html>

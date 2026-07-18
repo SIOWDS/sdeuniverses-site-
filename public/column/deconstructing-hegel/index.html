@@ -77,7 +77,7 @@ body{background:linear-gradient(180deg,#fbfdff 0%,#f5f9ff 100%);font-size:18px;l
   <div class="art-series">解 构 大 师 · 第 三 篇</div>
   <h1 class="art-title">黑格尔造出了那台引擎，却把它锁进了一个圆</h1>
   <div class="art-subtitle">——解构黑格尔：最像"发生"的辩证法，与它缺的那一个字</div>
-  <div class="art-meta">王德生 著 · 德麦国际 · 约三万字 · 2026年7月 · 约 3.1 万字</div>
+  <div class="art-meta">王德生 著 · 德麦国际 · 约三万字 · 2026年7月 · 约 3.1 万字 · <span id="sde-pv-wrap">阅读 <span id="sde-pv-n">—</span> 次</span></div>
 </div>
 <div class="wrap">
 <h2>最危险的一次解构：因为他几乎全对</h2>
@@ -416,6 +416,13 @@ function onScroll(){
     links.forEach(function(a,i){a.className=(i===cur?'on':'');});}
 }
 window.addEventListener('scroll',onScroll,{passive:true});window.addEventListener('resize',onScroll);onScroll();
+})();
+</script>
+<script id="sde-pv-js">
+(function(){var el=document.getElementById("sde-pv-n");if(!el)return;
+fetch("/api/pv?slug=column/deconstructing-hegel",{method:"POST"}).then(function(r){return r.json()})
+.then(function(d){if(d&&typeof d.total==="number"){el.textContent=d.total.toLocaleString("zh-Hans-CN");}else{throw 0;}})
+.catch(function(){var w=document.getElementById("sde-pv-wrap");if(w)w.style.display="none";});
 })();
 </script>
 </body></html>

@@ -77,7 +77,7 @@ body{background:linear-gradient(180deg,#fbfdff 0%,#f5f9ff 100%);font-size:18px;l
   <div class="art-series">导师师范文</div>
   <h1 class="art-title">康德的范畴，不是先天的模具，而是沉淀的纠缠</h1>
   <div class="art-subtitle">——认知范畴与认知模型的发生学解构</div>
-  <div class="art-meta">王德生 著 · SDE Universes 今日长文 · 2026年7月 · 约 1.1 万字</div>
+  <div class="art-meta">王德生 著 · SDE Universes 今日长文 · 2026年7月 · 约 1.1 万字 · <span id="sde-pv-wrap">阅读 <span id="sde-pv-n">—</span> 次</span></div>
 </div>
 <div class="wrap">
 <h2>一场只革了一半的革命</h2>
@@ -347,6 +347,13 @@ function onScroll(){
     links.forEach(function(a,i){a.className=(i===cur?'on':'');});}
 }
 window.addEventListener('scroll',onScroll,{passive:true});window.addEventListener('resize',onScroll);onScroll();
+})();
+</script>
+<script id="sde-pv-js">
+(function(){var el=document.getElementById("sde-pv-n");if(!el)return;
+fetch("/api/pv?slug=column/kant-categories-genesis",{method:"POST"}).then(function(r){return r.json()})
+.then(function(d){if(d&&typeof d.total==="number"){el.textContent=d.total.toLocaleString("zh-Hans-CN");}else{throw 0;}})
+.catch(function(){var w=document.getElementById("sde-pv-wrap");if(w)w.style.display="none";});
 })();
 </script>
 </body></html>

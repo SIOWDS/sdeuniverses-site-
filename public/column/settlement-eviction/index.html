@@ -77,7 +77,7 @@ body{background:linear-gradient(180deg,#fbfdff 0%,#f5f9ff 100%);font-size:18px;l
   <div class="art-series">导师师范文 · 由五篇整合而生</div>
   <h1 class="art-title">被逐出的发生</h1>
   <div class="art-subtitle">——论"结算"如何在记录知识的名义下取代知识，与"结算逐出律"</div>
-  <div class="art-meta">王德生 著 · 约 2.9 万字 · 二〇二六年七月</div>
+  <div class="art-meta">王德生 著 · 约 2.9 万字 · 二〇二六年七月 · <span id="sde-pv-wrap">阅读 <span id="sde-pv-n">—</span> 次</span></div>
 </div>
 <div class="wrap">
 <div class="abstract"><div class="ab-lbl">摘 要 · ABSTRACT</div><p>围绕抄袭、原创、学术贡献与AI时代作者身份的讨论，长期分处不同角落、彼此不相往来。本文把其中五个各自成立却隐隐同调的判断——抄袭是网络化集体认知被私有化的截留、原创认证与抄袭是"知识结算"同一动作的两面、可确证的贡献之下垫着不可确证的"幽隐贡献"基底、深层发明所需的"缠斗"被外迫的前置凝结所杀死、大量抄袭的病灶不是"失压"而是"无困"——叠在一起，析出一个任何单独一个都推不出的深层结构：现代学术制度有一个构成性动作，本文称之为"结算"——它在过程于其自身节律中内生地凝结出结果之前，就强制把不可结算的发生基底（集体隐性认知、过程路径、幽隐贡献、缠斗、困惑的发生）冻结为可归属、可确证、可计量的封装产出物。本文的核心判断是：结算并不记录那个发生基底，而是在给出可结算表面的同一瞬间将其逐出——既逐出于视野（产出物中看不见它），也逐出于发生（前置凝结使它未能完成其发生）。而原创、贡献、真问题的本质恰在被逐出的基底之中，故它们随结算的加强而系统性地不可见、不可发生。抄袭、原创危机、AI贡献困境、深层发明稀缺、无困，是同一"结算逐出"动作的五个症状。本文命名一根区分"可结算产出物"与"不可结算发生基底"的辨别维度，凝缩出一个存量无关、以结算强度决定逐出度的判据（逐出算子），完成对学术评价、抄袭研究、知识产权、绩效主义与AI贡献伦理五个领域的元批判，展开跨域兑现并附贯通个案，给出证伪条件并指认它所打开的新研究对象——结算的忠实性，最后把这套判断掉转对准它自己：本文正是由一台知识结算装置产出的，故它逐出了自身的发生。</p></div>
@@ -312,6 +312,13 @@ function onScroll(){
     links.forEach(function(a,i){a.className=(i===cur?'on':'');});}
 }
 window.addEventListener('scroll',onScroll,{passive:true});window.addEventListener('resize',onScroll);onScroll();
+})();
+</script>
+<script id="sde-pv-js">
+(function(){var el=document.getElementById("sde-pv-n");if(!el)return;
+fetch("/api/pv?slug=column/settlement-eviction",{method:"POST"}).then(function(r){return r.json()})
+.then(function(d){if(d&&typeof d.total==="number"){el.textContent=d.total.toLocaleString("zh-Hans-CN");}else{throw 0;}})
+.catch(function(){var w=document.getElementById("sde-pv-wrap");if(w)w.style.display="none";});
 })();
 </script>
 </body></html>

@@ -77,7 +77,7 @@ body{background:linear-gradient(180deg,#fbfdff 0%,#f5f9ff 100%);font-size:18px;l
   <div class="art-series">今 日 长 文 · TODAY'S LONG READ</div>
   <h1 class="art-title">夫子之道：一以贯之</h1>
   <div class="art-subtitle">——那个贯穿一切的"一",究竟是什么?</div>
-  <div class="art-meta">王德生 著 · 关联《一的宪章》《一的原材料库》《一的总装线》三部专著 · 二〇二六年七月 · 约 1.8 万字</div>
+  <div class="art-meta">王德生 著 · 关联《一的宪章》《一的原材料库》《一的总装线》三部专著 · 二〇二六年七月 · 约 1.8 万字 · <span id="sde-pv-wrap">阅读 <span id="sde-pv-n">—</span> 次</span></div>
 </div>
 <div class="wrap">
 <p>《论语》里有一个短得几乎让人错过的场景。孔子有一天忽然对曾参说:"参乎!吾道一以贯之。"——我的道,用一个东西贯穿了始终。曾参应了一声"唯"。孔子走后,别的弟子围上来问:老师说的是什么意思?曾参给出了那句著名的回答:"夫子之道,忠恕而已矣。"</p>
@@ -299,6 +299,13 @@ function onScroll(){
     links.forEach(function(a,i){a.className=(i===cur?'on':'');});}
 }
 window.addEventListener('scroll',onScroll,{passive:true});window.addEventListener('resize',onScroll);onScroll();
+})();
+</script>
+<script id="sde-pv-js">
+(function(){var el=document.getElementById("sde-pv-n");if(!el)return;
+fetch("/api/pv?slug=column/fuzi-yi-yiguanzhi",{method:"POST"}).then(function(r){return r.json()})
+.then(function(d){if(d&&typeof d.total==="number"){el.textContent=d.total.toLocaleString("zh-Hans-CN");}else{throw 0;}})
+.catch(function(){var w=document.getElementById("sde-pv-wrap");if(w)w.style.display="none";});
 })();
 </script>
 </body></html>

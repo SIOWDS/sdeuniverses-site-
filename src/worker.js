@@ -695,6 +695,19 @@ export default {
       const id = env.COUNTER.idFromName("site-total");
       return env.COUNTER.get(id).fetch(request);
     }
+    // /api/pv：每篇文章阅读次数（复用 VisitCounter，一篇一实例，key=pv:<slug>）
+    // GET 只读当前值；POST 自增一次并返回新值。slug 只允许小写字母/数字/连字符/斜杠。
+    if (url.pathname === "/api/pv") {
+      const slug = (url.searchParams.get("slug") || "").toLowerCase();
+      if (!/^[a-z0-9-]+(\/[a-z0-9-]+)*$/.test(slug) || slug.length > 120) {
+        return new Response(JSON.stringify({ error: "bad slug" }), {
+          status: 400,
+          headers: { "content-type": "application/json", "cache-control": "no-store" },
+        });
+      }
+      const id = env.COUNTER.idFromName("pv:" + slug);
+      return env.COUNTER.get(id).fetch(request);
+    }
     // /api/llm-proxy：境外基底(GPT/Claude/Gemini)纯转发代理。
     // 解决两件事：①浏览器 CORS 拦截 ②中国大陆无法直连境外 API。
     // 纪律：只转发、不存储、不记录任何 Key；只放行白名单里的官方 LLM 域名。
