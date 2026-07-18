@@ -104,11 +104,16 @@ footer a{color:var(--gold);text-decoration:none}
 
   <div class="room-card">
     <h3>Zoom 通道</h3>
-    <p>如某次课改用 Zoom 进行，讲师会在讨论区发布 Zoom 会议链接；把链接粘贴到这里，一键跳转加入。</p>
+    <p>如某次课改用 Zoom 进行，讲师会在讨论区发布会议链接或会议号；粘贴链接、或直接输入会议号，一键加入。</p>
     <div class="row">
       <input class="txt" id="zoomLink" placeholder="粘贴 Zoom 会议链接，如 https://zoom.us/j/…">
       <button class="btn" onclick="openZoom()">加入 Zoom 会议</button>
     </div>
+    <div class="row" style="margin-top:10px">
+      <input class="txt" id="zoomNum" inputmode="numeric" maxlength="14" placeholder="或输入 Zoom 会议号，如 123 4567 8901">
+      <button class="btn ghost" onclick="joinZoomNum()">按会议号加入</button>
+    </div>
+    <div class="hintline">两种方式任选其一；如会议设有密码，加入时在 Zoom 提示框里输入即可。</div>
   </div>
 
   <div id="stage">
@@ -310,6 +315,11 @@ function leaveRoom(){
 function fsStage(){
   var f=document.querySelector("#stageFrame iframe");
   if(f&&f.requestFullscreen)f.requestFullscreen();
+}
+function joinZoomNum(){
+  var v=(document.getElementById("zoomNum").value||"").replace(/[\s-]/g,"");
+  if(!/^\d{9,11}$/.test(v)){alert("会议号是 9-11 位数字，请检查后重试");return}
+  window.open("https://zoom.us/j/"+v,"_blank","noopener");
 }
 function openZoom(){
   var v=(document.getElementById("zoomLink").value||"").trim();
