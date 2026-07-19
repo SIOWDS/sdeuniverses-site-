@@ -122,14 +122,16 @@ footer a{color:var(--gold);text-decoration:none}
 
   <!-- 邀请信息卡（开会后出现） -->
   <div class="invite" id="invite" style="display:none">
-    <div class="invite-h">会议已开好 · 把下面的信息发给学生</div>
+    <div class="invite-h">会议已开好 · 把链接发给学员和观众</div>
     <div class="invite-row"><span class="invite-k">会议号</span><b id="inv-room"></b></div>
     <div class="invite-row"><span class="invite-k">邀请链接</span><a id="inv-link" href="#" target="_blank" rel="noopener"></a></div>
     <div class="invite-btns">
       <button class="btn" onclick="enterHosted()">进入会议室（成为主持人）</button>
-      <button class="btn ghost" onclick="copyLink()">复制邀请链接</button>
+      <button class="btn" onclick="shareInvite()">分享 / 发送链接</button>
+      <button class="btn ghost" onclick="copyLink()">复制链接</button>
       <button class="btn ghost" onclick="copyInvite()">复制邀请文字</button>
     </div>
+    <div class="hintline">分享或复制后，发到微信、群、邮件都行；学员和观众用浏览器打开链接即进，无需安装。</div>
     <div class="hintline" id="inv-msg"></div>
   </div>
 
@@ -422,6 +424,15 @@ function copyInvite(){
   var u=inviteUrl(HOSTED_ROOM);
   var t="【SDE 会议邀请】\n会议号："+HOSTED_ROOM+"\n进入链接："+u+"\n用浏览器打开链接即可，无需安装。首次进入请允许摄像头与麦克风。";
   copyText(t,document.getElementById("inv-msg"));
+}
+function shareInvite(){
+  var u=inviteUrl(HOSTED_ROOM);
+  var text="【SDE 会议邀请】\n会议号："+HOSTED_ROOM+"\n进入链接："+u+"\n用浏览器打开链接即可，无需安装。首次进入请允许摄像头与麦克风。";
+  if(navigator.share){navigator.share({title:"SDE 会议邀请",text:"SDE 会议邀请 · 会议号 "+HOSTED_ROOM+"（用浏览器打开链接即进，无需安装）",url:u}).catch(function(){});return;}
+  var m=document.getElementById("inv-msg");
+  var done=function(){if(m)m.textContent="此设备不支持一键发送——已复制邀请（含链接），粘贴到微信/群/邮件发送即可。";};
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(done,function(){fallbackCopy(text,null);done();});}
+  else{fallbackCopy(text,null);done();}
 }
 function scheduleMeet(){
   var topic=(document.getElementById("schTopic").value||"").trim()||"SDE 会议";
