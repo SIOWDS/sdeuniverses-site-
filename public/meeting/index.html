@@ -63,6 +63,15 @@ input.txt:focus{border-color:var(--mtg)}
 .notes li{margin-bottom:0.45rem}
 footer{border-top:1px solid var(--border2);padding:2rem 24px;text-align:center;font-size:0.75rem;color:var(--muted)}
 footer a{color:var(--gold);text-decoration:none}
+.meet-auth{background:var(--mtg-soft);border:1px solid var(--mtg);border-radius:10px;padding:0.9rem 1.2rem;margin:0 0 1.6rem}
+.meet-auth .ma-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.meet-auth .ma-icon{font-size:1.3rem;flex:none}
+.meet-auth .ma-body{flex:1;min-width:200px;font-size:0.88rem;color:var(--text2)}
+.meet-auth .ma-body b{color:var(--text)}
+.meet-auth .ma-body a{margin-left:8px;font-size:0.78rem;opacity:0.65;text-decoration:underline;cursor:pointer;color:var(--mtg)}
+.meet-auth .ma-msg{font-size:0.8rem;color:var(--mtg);margin-top:8px}
+.meet-auth.maflash{animation:maflash 0.9s ease 2}
+@keyframes maflash{0%,100%{background:var(--mtg-soft)}50%{background:rgba(15,118,110,0.22)}}
 .rbanner{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;background:var(--mtg);color:#F5F1E6;border-radius:10px;padding:1rem 1.4rem;margin:0 0 1.8rem;font-size:0.95rem}
 .rbanner b{letter-spacing:0.04em}
 .rbanner .btn{background:#F5F1E6;color:var(--mtg);border-color:#F5F1E6}
@@ -101,6 +110,19 @@ footer a{color:var(--gold);text-decoration:none}
 <div class="rbanner" id="roomBanner" style="display:none">
   <div>有人邀请你加入会议 <b id="rb-room"></b></div>
   <button class="btn" onclick="enterInvited()">进入会议</button>
+</div>
+
+<!-- 统一 Google 登录身份条 -->
+<div class="meet-auth" id="meet-auth">
+  <div class="ma-row">
+    <span class="ma-icon">👤</span>
+    <div class="ma-body">
+      <div id="ma-out" style="display:none">已用 Google 登录 · 进入任何会议都会自动显示为 <b id="ma-name"></b> <a id="ma-signout">退出</a></div>
+      <div id="ma-in">进入会议前，先用 <b>Google 账号</b>登录（自动登录一次即可）——进会议自动带上你的名字，不用在教室里再输入。</div>
+    </div>
+    <span id="ma-gsi"></span>
+  </div>
+  <div class="ma-msg" id="ma-msg"></div>
 </div>
 
 <!-- ⓪ 开设会议（主持人） -->
@@ -187,7 +209,7 @@ footer a{color:var(--gold);text-decoration:none}
   <div class="notes" style="margin-top:1.4rem">
     <b>使用须知</b>
     <ol>
-      <li>进教室时按页面提示<b>用 Google 账号登录</b>——所有人（讲师与学生）统一走 Google 自动登录，登录一次浏览器会记住，下次直接进。</li>
+      <li>在本页顶部用 Google 账号登录一次（自动登录，浏览器会记住）——之后进入任何会议都会自动显示你的 Google 名字，不用在教室里再登录或改名。</li>
       <li>首次进入请允许浏览器使用摄像头与麦克风；听课时建议先静音，提问再开麦。</li><li><b>看不清时：</b>点画面右上角「全屏」，或在教室里双击讲师画面把它设为焦点，都能拿到最清晰的画面。画质会随你的网络自动调整——网络好自动上到高清，网络弱会先保证流畅不卡。</li>
       <li>开课前请在下方讨论区查看时间预告；上课中的提问也可以直接发在讨论区，讲师会集中回应。</li>
       <li>音视频服务由第三方（Jitsi / Zoom）提供并遵循其服务条款；本站不录制、不存储任何音视频内容。</li>
@@ -351,8 +373,10 @@ if(m==="POST"){try{localStorage.setItem(k,day);}catch(e){}}}else{throw 0;}})
 
 <script>
 function slugOk(s){return /^[A-Za-z0-9-]{1,40}$/.test(s)}
-function roomUrl(r){var cfg=["config.prejoinConfig.enabled=true","config.resolution=1080","config.constraints.video.height.ideal=1080","config.constraints.video.height.max=1080","config.constraints.video.height.min=240","config.desktopSharingFrameRate.max=30","config.disableSimulcast=false"].join("&");return "https://meet.jit.si/"+encodeURIComponent(r)+"#"+cfg}
+function roomUrl(r){var cfg=["config.prejoinConfig.enabled=true","config.resolution=1080","config.constraints.video.height.ideal=1080","config.constraints.video.height.max=1080","config.constraints.video.height.min=240","config.desktopSharingFrameRate.max=30","config.disableSimulcast=false"];if(window.SDE_MEET_NAME)cfg.push("userInfo.displayName=%22"+encodeURIComponent(window.SDE_MEET_NAME)+"%22");return "https://meet.jit.si/"+encodeURIComponent(r)+"#"+cfg.join("&")}
+function meetNeedLogin(){var m=document.getElementById("ma-msg");if(m)m.textContent="进入会议前，请先用上方 Google 账号登录——登录后进会议会自动显示你的名字。";var a=document.getElementById("meet-auth");if(a){a.classList.remove("maflash");void a.offsetWidth;a.classList.add("maflash");a.scrollIntoView({behavior:"smooth",block:"center"});}}
 function joinRoom(r, newWin){
+  if(!window.SDE_MEET_NAME){meetNeedLogin();return}
   if(newWin){window.open(roomUrl(r),"_blank","noopener");return}
   var st=document.getElementById("stage");
   var fr=document.getElementById("stageFrame");
@@ -454,6 +478,29 @@ function enterInvited(){if(window.__invitedRoom)joinRoom(window.__invitedRoom);}
     document.getElementById("roomBanner").style.display="flex";
   }
 }catch(e){}})();
+// ===== 统一 Google 登录身份（复用会议讨论区的 GSI，同一账号服务全站）=====
+(function(){
+function el(id){return document.getElementById(id)}
+window.SDE_MEET_NAME="";
+var GCID="985037699618-de3smmqf2rer0pfhf4mrtrj3rgahgu5u.apps.googleusercontent.com",tries=0;
+function readName(){try{var s=JSON.parse(sessionStorage.getItem("sde_gauth")||"null");if(s&&s.exp>Date.now())return s.name||"";}catch(e){}return "";}
+function syncId(){var nm=readName();
+  if(nm){window.SDE_MEET_NAME=nm;var e=el("ma-name");if(e)e.textContent=nm;el("ma-out").style.display="block";el("ma-in").style.display="none";el("ma-msg").textContent="";}
+  else{window.SDE_MEET_NAME="";el("ma-out").style.display="none";el("ma-in").style.display="block";}}
+var so=el("ma-signout");if(so)so.onclick=function(){try{sessionStorage.removeItem("sde_gauth");}catch(e){}try{if(window.google&&google.accounts&&google.accounts.id)google.accounts.id.disableAutoSelect();}catch(e){}syncId();el("ma-msg").textContent="已退出（本页刷新后其它区块同步）。";};
+function boot(){
+  if(window.google&&google.accounts&&google.accounts.id&&window.__sdeGCb){
+    try{google.accounts.id.initialize({client_id:GCID,callback:window.__sdeGCb,auto_select:true});}catch(e){}
+    try{google.accounts.id.renderButton(el("ma-gsi"),{theme:"outline",size:"medium",text:"signin_with",shape:"pill"});}catch(e){}
+    return;
+  }
+  if(tries++>24){var g=el("ma-gsi");if(g)g.textContent="Google 登录组件加载失败，请检查网络后刷新。";return;}
+  setTimeout(boot,250);
+}
+boot();syncId();
+setInterval(syncId,1200);
+window.addEventListener("focus",syncId);
+})();
 </script>
 
 </body>
