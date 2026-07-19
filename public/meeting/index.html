@@ -49,7 +49,7 @@ input.txt:focus{border-color:var(--mtg)}
 #stage .stage-bar{display:flex;justify-content:space-between;align-items:center;background:#1E1A12;color:#E8DFC8;border-radius:10px 10px 0 0;padding:0.55rem 1rem;font-size:0.82rem}
 #stage .stage-bar b{letter-spacing:0.06em}
 #stage .stage-bar a{color:#E4C878;text-decoration:none;margin-left:14px;cursor:pointer}
-#stage iframe{display:block;width:100%;height:min(72vh,640px);border:1px solid var(--border);border-top:none;border-radius:0 0 10px 10px;background:#000}
+#stage iframe{display:block;width:100%;height:min(86vh,900px);border:1px solid var(--border);border-top:none;border-radius:0 0 10px 10px;background:#000}
 .notes{background:var(--card2);border:1px solid var(--border2);border-radius:10px;padding:1.3rem 1.5rem;font-size:0.88rem;color:var(--text2)}
 .notes b{color:var(--text)}
 .mlist{border-top:1px solid var(--border2)}
@@ -124,7 +124,7 @@ footer a{color:var(--gold);text-decoration:none}
     <b>使用须知</b>
     <ol>
       <li>进教室时按页面提示<b>用 Google 账号登录</b>——所有人（讲师与学生）统一走 Google 自动登录，登录一次浏览器会记住，下次直接进。</li>
-      <li>首次进入请允许浏览器使用摄像头与麦克风；听课时建议先静音，提问再开麦。</li>
+      <li>首次进入请允许浏览器使用摄像头与麦克风；听课时建议先静音，提问再开麦。</li><li><b>看不清时：</b>点画面右上角「全屏」，或在教室里双击讲师画面把它设为焦点，都能拿到最清晰的画面。画质会随你的网络自动调整——网络好自动上到高清，网络弱会先保证流畅不卡。</li>
       <li>开课前请在下方讨论区查看时间预告；上课中的提问也可以直接发在讨论区，讲师会集中回应。</li>
       <li>音视频服务由第三方（Jitsi / Zoom）提供并遵循其服务条款；本站不录制、不存储任何音视频内容。</li>
     </ol>
@@ -160,7 +160,7 @@ footer a{color:var(--gold);text-decoration:none}
     <ol>
       <li><b>课前：</b>在「开课预告」和讨论区发布时间与主题（讨论区发言署名请固定，便于学生辨认）。</li>
       <li><b>开房：</b>提前十分钟点「进入 SDE 大教室」，用 Google 账号登录即成为主持人；学生同样用各自 Google 账号自动登录进入。</li>
-      <li><b>课中：</b>用底部工具栏开启屏幕共享放讲义；人多嘈杂时可在参会者面板里一键全员静音，学生举手再开麦。</li>
+      <li><b>课中：</b>用底部工具栏开启屏幕共享放讲义；人多嘈杂时可在参会者面板里一键全员静音，学生举手再开麦。讲义用「屏幕共享」分享（文字按原始分辨率传输，最清晰）；如需更高画质，进「设置 → 视频质量」选到最高档。</li>
       <li><b>安全：</b>如遇陌生人扰乱，可在教室安全选项里给房间加密码，并把密码只发在讨论区。</li>
       <li><b>改用 Zoom：</b>在自己的 Zoom 客户端开会后，把会议链接发到讨论区，学生走上方「Zoom 通道」加入。</li>
     </ol>
@@ -287,7 +287,7 @@ if(m==="POST"){try{localStorage.setItem(k,day);}catch(e){}}}else{throw 0;}})
 
 <script>
 function slugOk(s){return /^[A-Za-z0-9-]{1,40}$/.test(s)}
-function roomUrl(r){return "https://meet.jit.si/"+encodeURIComponent(r)+"#config.prejoinConfig.enabled=true"}
+function roomUrl(r){var cfg=["config.prejoinConfig.enabled=true","config.resolution=1080","config.constraints.video.height.ideal=1080","config.constraints.video.height.max=1080","config.constraints.video.height.min=240","config.desktopSharingFrameRate.max=30","config.disableSimulcast=false"].join("&");return "https://meet.jit.si/"+encodeURIComponent(r)+"#"+cfg}
 function joinRoom(r, newWin){
   if(newWin){window.open(roomUrl(r),"_blank","noopener");return}
   var st=document.getElementById("stage");
