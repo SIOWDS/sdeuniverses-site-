@@ -139,6 +139,10 @@ footer a{color:var(--gold);text-decoration:none}
 #sde-chat .msg.bot .who{color:var(--gold2);font-weight:700}
 #sde-chat .msg.bot .bub{background:#FBF6E9;border-color:var(--gold);color:var(--text)}
 #sde-chat .ch-typing{align-self:flex-start;font-size:0.82rem;color:var(--muted);padding:3px 8px;font-style:italic}
+#sde-chat .ch-wds-bar{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:0.5rem 1rem;background:#FBF6E9;border-bottom:1px solid var(--gold);font-size:0.8rem;color:var(--text2);flex-wrap:wrap}
+#sde-chat .ch-wds-bar b{color:var(--gold2)}
+#sde-chat .ch-wds-ask{font:inherit;font-size:0.78rem;font-weight:700;color:#F5F2E8;background:var(--gold);border:1px solid var(--gold);border-radius:16px;padding:4px 15px;cursor:pointer;flex:none;white-space:nowrap}
+#sde-chat .ch-wds-ask:hover{background:var(--gold2)}
 #sde-chat .msg .tm .ch-recall{color:inherit;opacity:0.7;text-decoration:underline;cursor:pointer}
 #sde-chat .msg .tm .ch-recall:hover{opacity:1}
 #sde-chat .bub.recalled{background:transparent;border:1px dashed var(--border);color:var(--muted);font-style:italic}
@@ -153,8 +157,12 @@ footer a{color:var(--gold);text-decoration:none}
     <span class="ttl">SDE 广场 · 实时群聊</span>
     <span class="ch-status"><span class="dot" id="ch-dot"></span><span id="ch-stat">连接中…</span><span id="ch-online"></span></span>
   </div>
+  <div class="ch-wds-bar">
+    <span>🤖 <b>WDS智能体</b>（王德生 AI 分身）在群里——输入 <b>@WDS</b> 提问，或点右边</span>
+    <button class="ch-wds-ask" id="ch-wds-ask" type="button">问它</button>
+  </div>
   <div class="ch-mid">
-    <div class="ch-scroll" id="ch-scroll"><div class="ch-empty" id="ch-empty">还没有人说话——登录后成为第一个开口的人。</div></div>
+    <div class="ch-scroll" id="ch-scroll"><div class="ch-empty" id="ch-empty">还没有人说话——登录后开口，或向 🤖 WDS智能体 提问。</div></div>
     <div class="ch-newpill" id="ch-newpill" onclick="sdeChatToBottom()">有新消息 ↓</div>
   </div>
   <div class="ch-foot">
@@ -321,6 +329,10 @@ wdsBtn.onclick=function(){
   if(!v){if(!/^@\s*wds/i.test(t.value))t.value="@WDS "+t.value;t.focus();return;}
   if(!/^@\s*wds/i.test(v))t.value="@WDS "+v;
   doSend();
+};})();
+(function(){var a=el("ch-wds-ask");if(!a)return;a.onclick=function(){
+  if(!gcred){note("请先用 Google 账号登录（下方），登录后即可向 WDS智能体 提问。");return;}
+  var t=el("ch-text");if(!/^@\s*wds/i.test(t.value))t.value="@WDS "+t.value;t.focus();
 };})();
 el("ch-send").onclick=doSend;
 var ta=el("ch-text");
