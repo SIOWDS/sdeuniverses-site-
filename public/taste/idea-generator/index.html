@@ -3132,6 +3132,8 @@ if(autoRunBtn){
   if(osBtn){
     osBtn.addEventListener('click', async ()=>{
       const st = $('osStatus'); const setS = (s)=>{ if(st) st.textContent = s||''; };
+      const OS_STAGES = ["六篇三视角对决","涌现新典范","四篇论文初稿","二次 SDE 提智","补规范","二次审稿打磨","存入收件箱"];
+      const osStage = (n, sub)=>{ if(!st) return; var h='<div style="text-align:left;max-width:560px;margin:2px auto 0">'; OS_STAGES.forEach(function(lb,i){ var num=i+1, s=num<n?"done":(num===n?"cur":"todo"); var ic=s==="done"?"✓":(s==="cur"?"◉":"○"); var co=s==="done"?"#5FB878":(s==="cur"?"#E8A33D":"#5A636E"); var fw=s==="cur"?"700":"400"; h+='<div style="display:flex;align-items:flex-start;gap:8px;padding:3px 2px;color:'+co+';font-weight:'+fw+'"><span style="flex:none;width:16px">'+ic+'</span><span>'+num+'. '+lb+(s==="cur"&&sub?('&nbsp;&nbsp;<span style="color:#9AA5B0;font-weight:400">'+sub+'</span>'):'')+(s==="cur"?' <span class="spinner"></span>':'')+'</span></div>'; }); h+='</div>'; if(n>OS_STAGES.length&&sub) h+='<div style="color:#5FB878;font-weight:700;margin-top:8px;text-align:center">'+sub+'</div>'; st.innerHTML=h; };
       const q = ($('osQuestion')&&$('osQuestion').value.trim())||'';
       const model = ($('osModel')&&$('osModel').value)||'';
       const key = ($('osKey')&&$('osKey').value.trim())||'';
@@ -3164,35 +3166,35 @@ if(autoRunBtn){
       osBtn.disabled = true; const ol = osBtn.textContent; osBtn.textContent = '⏳ 全自动跑程中，请勿关闭…';
       try{
         // ① 六篇对决
-        setS('① 六篇三视角对决生成中…'); 
+        osStage(1,'六篇并发·三视角对决…'); 
         window._lastResult = null;
         goBtn.click();
         await waitVar(()=> window._lastResult && window._lastResult.rows && window._lastResult.rows.length>=3);
         // ② 涌现新典范
-        setS('② 涌现新典范中…');
+        osStage(2,'碰撞→暗流→新典范…');
         window._lastEmerge = null;
         $('emergeBtn').click();
         await waitVar(()=> !!window._lastEmerge);
         // ③ 四篇初稿
-        setS('③ 四篇论文初稿生成中（含评审打磨）…');
+        osStage(3,'四篇并发·含评审打磨…');
         $('fourStartBtn').click();
         await waitStage('_fourPapers','fourStartBtn');
         // ④ 二次提智
-        setS('④ 二次 SDE 提智中（发生引擎冲 150）…');
+        osStage(4,'发生引擎冲 150…');
         $('upliftBtn').click();
         await waitStage('_upliftPapers','upliftBtn');
         // ⑤ 补规范
-        setS('⑤ 补规范中（挂真实引注·脚注·参考文献）…');
+        osStage(5,'挂真实引注·脚注·文献…');
         $('normalizeBtn').click();
         await waitStage('_normalizedPapers','normalizeBtn');
         // ⑥ 二次审稿打磨
-        setS('⑥ 二次审稿 + 打磨中（最后四篇）…');
+        osStage(6,'独立双审+主笔打磨…');
         $('polishBtn').click();
         await waitStage('_polishedPapers','polishBtn');
         // ⑦ 存 Inbox
-        setS('⑦ 打磨完成，正在存入收件箱…');
-        await submitPolishedToInbox(pass, student, setS);
-        setS('✓ 全部完成！最后四篇已以「'+student+'」的名字存入收件箱。可关闭此窗口，结果也在下方页面里。');
+        osStage(7,'存入收件箱…');
+        await submitPolishedToInbox(pass, student, function(t){ osStage(7, t); });
+        osStage(8,'✓ 全部完成！最后四篇已以「'+student+'」的名字存入收件箱。可关闭此窗口，结果也在下方页面里。');
       }catch(e){
         setS('✗ 中途出错：'+(e.message||e)+'。已跑出的阶段在下方页面里，可切到互动序列手动继续。');
       }finally{
