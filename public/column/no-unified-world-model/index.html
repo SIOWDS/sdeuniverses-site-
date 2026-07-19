@@ -221,6 +221,45 @@ This paper challenges an assumption embedded in the prevailing AI roadmap: that 
 <blockquote><p>所以这类系统的根本特征，不是它拥有一个统一世界模型，而是它拥有<strong>一套统一的方法，用以生成无数不同的世界模型</strong>。统一世界模型路线追求一个唯一的模型去代表所有主体——这在本体论上不可能；发生学路线追求一套统一的发生方法，去为每一个具体主体、对象、任务、阶段生成它各自需要的那个模型——这在本体论上才成立。<em>统一的不是模型，而是生成模型的方法。</em></p></blockquote>
 <p>最后是本文的边界，必须自己标出来，而不是等人来挑。其一，"发生恰有结构、差异、纠缠三个不可省的维度"是本文所依赖的本体论承诺，它并非不可挑战——是否存在第四维，是一个敞开的问题。其二，"任何可能的架构都长不出自我世界"这个更强的命题，本文不能严格证明，也不假装已经证否；本文严格主张的只是那个较弱的版本（第 7.3 节）。其三，本文提出的新标尺——在裂缝处发生新结构并被共同体稳定——虽可拆成工序，但每道工序的判据仍有待更严格的操作化，尤其是"什么算一次真正的发生"与"什么只是包装过的旧结构"之间的边界，在实践中并非总能当场判定。</p>
 <p>把这三条边界写出来，不是为了给论证留退路，而是因为按本文自己的立场，一个结构的分量应由它能否经受反驳来决定，而不是由它显得多完备来宣布。一篇论证世界是被发生的文章，自己也只能是一次发生——它等着被使用、被检验、被在它该破的地方破掉。</p>
+<style id="sde-material-css">
+.sde-material{max-width:722px;margin:52px auto 0;padding:0 24px 10px;line-height:2.0;text-align:justify;font-size:16.5px}
+.sde-material .mat-tag{text-indent:0;font-size:12px;letter-spacing:.32em;opacity:.62;margin:0 0 8px}
+.sde-material > h2{font-size:21px;font-weight:800;margin:0 0 4px;letter-spacing:.02em;padding-bottom:12px;border-bottom:2px solid rgba(128,128,128,.3);text-indent:0}
+.sde-material h3{font-size:17px;font-weight:700;margin:32px 0 10px;letter-spacing:.01em;text-indent:0}
+.sde-material p{margin:0 0 17px;text-indent:2em}
+.sde-material .mat-lead{text-indent:0;font-size:15px;opacity:.9;background:rgba(128,128,128,.08);border-left:3px solid rgba(128,128,128,.42);padding:15px 19px;margin:16px 0 26px;line-height:1.92}
+.sde-material .mat-box{text-indent:0;font-size:15.5px;background:rgba(128,128,128,.07);border:1px solid rgba(128,128,128,.22);border-radius:5px;padding:15px 19px;margin:0 0 18px;line-height:1.92}
+.sde-material .mat-ref{text-indent:0;font-size:13px;opacity:.7;line-height:1.78;margin:20px 0 0;padding-top:12px;border-top:1px dashed rgba(128,128,128,.32)}
+.sde-material .mat-ref + .mat-ref{border-top:none;padding-top:0;margin-top:10px}
+.sde-material i{font-style:italic}
+@media(max-width:640px){.sde-material{font-size:16px;padding:0 18px 10px}}
+</style>
+<div class="sde-material" id="sde-material">
+<p class="mat-tag">补篇 · 约 3.2 千字</p>
+<h2>材料与论据</h2>
+<p class="mat-lead">正文对当前 AI 路线图下了三个判断：不存在统一世界模型、无主体的 AGI 在结构上不可能、幻觉有本体论根源而非工程 bug。后两条最能被机器学习的经验研究检验。此处把它们对到真实文献上——哪些被强证据支持、哪些需要收窄、哪一条是不可证伪的概念主张。可喜的是，正文的核心直觉多半站得住，只是几处口气要收。</p>
+
+<h3>一、「幻觉消不掉」：有真定理支持，但「扩规模完全无效」是过头话</h3>
+<p><b>支持面（强）。</b>已有严格的理论结果表明，幻觉不是暂时的工程缺陷，而带有数学下界。Kalai 与 Vempala（STOC 2024，《校准的语言模型必然幻觉》）证明：对于「无法从训练数据推断真伪的任意事实」，满足校准条件的模型必然以某个下界的比率产生幻觉——这与 Transformer 架构、数据质量都无关。Xu 等（2024）、Banerjee 等（2025）进一步借停机问题与对角线论证，指出没有可计算模型能普遍地判定真伪。更有 Kalavasis 等（2025）、Kleinberg 与 Mullainathan（2024）证明了一个「一致性—广度」的刚性权衡：要把幻觉率压到某个临界值以下，就必然牺牲输出的多样性、把模型逼入「模式坍缩」。这些恰好支持正文那句「幻觉有更深的根、不是随手能补的 bug」。</p>
+<p><b>但必须收窄的一面。</b>其一，这个下界专门针对「任意的、数据里学不出规律的事实」（如某人的生日）；对有规律可循的内容（拼写、括号匹配），扩大规模确实能把错误压到几乎消失。其二，模型可以「弃权」（回答「我不知道」）——所以严格说，幻觉并非绝对不可避免。OpenAI 团队（Kalai 等 2025，另见 Nature 2026）给出的最新解释是：幻觉在很大程度上是<b>评测激励问题</b>——现行评分奖励「猜」而惩罚「我不知道」，改评分即可显著缓解。其三，因此正文「扩规模也消不掉」是<b>半对</b>：不可约的下界确实存在，但「扩规模＋校准＋检索＋弃权全都没用」是过头话。</p>
+<div class="mat-box">更关键的是「根因」的说法不同。正文把幻觉归于「无固定主体的语言材料场在众多语言世界间滑动」（本体论叙事）；机器学习则把它归于统计（在真伪交错的分布上做密度估计必然出错）、可计算性（真伪普遍不可判定）与激励（评测奖励猜测）。<b>两套叙事其实互补——都在说「这不是随便一个 bug」——但机器学习那套更精确地指出了：哪一类幻觉不可约，哪一类可修。</b></div>
+
+<h3>二、「大模型没有世界模型」：这一条要认真改——它其实是有的，只是不统一</h3>
+<p>这是正文最需要更新的地方。多年来学界为此吵成两派：一派说大模型不过是「随机鹦鹉」（Bender 等 2021），只会拼接表面统计；另一派说它们已在文本里长出了对世界的内部表征。近年的机制可解释性研究，给后一派提供了硬证据：一个只喂棋谱、从不被告知规则的 GPT 变体（Othello-GPT，Li 等 2023），内部竟自发长出了对「棋盘状态」的表征，而且这个表征对它的预测有<b>因果作用</b>（用干预改写这块表征，输出随之改变；Nanda 2023 进一步证明它是线性的）。类似结果在国际象棋、迷宫任务上重现；Gurnee 与 Tegmark（2024）甚至在大模型的激活里读出了空间与时间的坐标表征。</p>
+<div class="mat-box">换句话说，「大模型只是表面统计、没有任何世界表征」这个强命题，已被经验驳倒——它们确实建起了内部的世界表征，而不只是背相关性。<b>正文若坚持「只有语言材料场、没有世界模型」，这一步在证据面前站不住，须改写。</b></div>
+<p><b>但——正文真正的靶子是「统一的世界模型」，而这一点恰恰被证据反过来支持。</b>Vafa 等（2024）发现：一个能在纽约导航得相当不错的模型，其内部「地图」是<b>不自洽</b>的（充满并不存在的街道）；更多研究指出，这些涌现表征是脆弱的、域窄的、是「一大袋启发式」（bag of heuristics），在结构扰动下崩塌，在多步因果推理与状态追踪上频频失败。连主张「要为机器另造世界模型」的 Yann LeCun（2022 的自主智能路线图）也持类似判断：纯文本模型没有可用于规划的、连贯的世界模型。<b>所以精确的说法是：大模型有零碎的、局部的、不连贯的世界表征，却没有一个统一、连贯、跨域一致的世界模型</b>——这正是正文「不存在统一世界模型」要说的，只需把「没有世界模型」精确成「没有<i>统一的</i>世界模型」。</p>
+
+<h3>三、「无主体的 AGI 在结构上不可能」：这是概念主张，不是经验命题</h3>
+<p>这一条与前两条性质不同：它不是一个能拿实验证伪的经验断言，而是一个依赖于「如何定义 AGI／主体／知识创造」的概念-哲学主张。正文自己也诚实标注了「不能严格主张的边界」，这很可取。要让它更有力，应把它明确定位为一个<b>定义性论证</b>（在「AGI＝在裂缝处让新结构第一次发生」这一定义下，无主体便无此发生），并坦承：若换一个「AGI＝任务通用性」的定义，结论未必成立。它的价值在于逼问「我们到底在用哪个 AGI 定义」，而不在于预言机器最终能或不能。</p>
+
+<h3>四、这些材料如何支撑正文</h3>
+<p>收拢来看：正文三判断中，第一条（无统一世界模型）在收窄为「无统一、连贯的世界模型」后，反被最新证据支持；第三条（无主体 AGI）是一个自觉的概念主张，标清定义即可站住；唯有第二条（幻觉本体论根源、扩规模消不掉）需要如实降级——不可约的理论下界成立，但「根源纯属本体论、规模与方法全无用」是过头话，机器学习给的是「统计＋可计算＋激励」的更精确、且部分可修的账。</p>
+<div class="mat-box">用发生学自己的话说：大模型确实在语言材料里结晶出了一些「世界的影子」，但这些影子彼此不连贯、随主体处境而漂移——所以「统一世界模型」更像一个不存在的对象，而非一座还没爬到的高山。<b>这个核心判断，证据是站在正文这边的；需要改的，只是把「没有」换成「没有统一的」，把「消不掉」换成「有不可约的下界、但可被显著压低」。</b></div>
+<p class="mat-ref">材料出处：Kalai A. T. & Vempala S. S., "Calibrated Language Models Must Hallucinate", STOC 2024。 ｜ Kalai A. T., Nachum O., Vempala S. S., Zhang E., "Why Language Models Hallucinate", 2025；及 Nature (2026) 相关论文。 ｜ Xu et al. (2024)、Banerjee et al. (2025) 可计算性论证；Kalavasis et al. (2025)、Kleinberg & Mullainathan (2024) 一致性—广度权衡。 ｜ Li K. et al., "Emergent World Representations..."（Othello-GPT）, ICLR 2023；Nanda et al. (2023) 线性表征。 ｜ Gurnee W. & Tegmark M., "Language Models Represent Space and Time", 2024。 ｜ Vafa et al. (2024) 涌现世界模型的脆弱性；LeCun Y., "A Path Towards Autonomous Machine Intelligence", 2022。 ｜ Bender et al. (2021)「随机鹦鹉」。</p>
+<p class="mat-ref"><b>说明：</b>本补篇为机器学习文献的材料整理；该领域进展极快、诸多结论仍在争论，列出仅供读者对读与查证，不代表定论。</p>
+</div>
+
+
 <p style="margin-top:34px;padding-top:20px;border-top:1px solid rgba(138,104,23,.22);font-size:14.5px;color:#6B6250">本文据《SDE 智能体导论——从语言模型到发生世界模型的智能体革命》（王德生 著，德麦国际出版，2026，ISBN 978-1-970820-62-1）第六章《没有统一世界模型：世界模型的主体性与第二次 AI 革命》与第二十六章《从发现世界到发生世界：六大哲学转变与 AGI 的重新定义》改写成文，并补入文献定位、论证编排与边界声明。原书导读与全文阅读见 <a href="/books/m/44/">专著页</a>。</p>
 </article>
 </div></div>
