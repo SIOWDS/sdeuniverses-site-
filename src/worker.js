@@ -860,6 +860,17 @@ export default {
       }
       return env.COUNTER.get(id).fetch(request);
     }
+    // /api/board：公开只读——列出全站有过留言的文章及累计发言数（论文讨论区首页聚合用）。
+    // 数据本身即公开（讨论全部公开可见），故不设口令；只读、无写入、无个人信息。
+    if (url.pathname === "/api/board" && request.method === "GET") {
+      const names = env.COMMENTS.get(env.COMMENTS.idFromName("names-global"));
+      const r = await names.fetch(new Request("https://do/", { method: "POST", body: JSON.stringify({ op: "slugs" }) }));
+      const d = await r.json().catch(() => null);
+      const slugs = (d && d.ok && Array.isArray(d.slugs)) ? d.slugs : [];
+      return new Response(JSON.stringify({ ok: true, slugs }), {
+        headers: { "content-type": "application/json", "cache-control": "max-age=30" },
+      });
+    }
     // /api/comments：读者讨论区。GET=取某篇全部留言；POST=发言或回复；POST op:del=管理删除（需管理口令）。
     if (url.pathname === "/api/comments") {
       const slug = (url.searchParams.get("slug") || "").toLowerCase();
