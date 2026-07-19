@@ -119,6 +119,16 @@ footer a{color:var(--gold);text-decoration:none}
 #sde-chat .ch-input textarea:focus{border-color:var(--disc)}
 #sde-chat .ch-input button{font:inherit;font-size:0.9rem;font-weight:700;letter-spacing:0.06em;padding:0 1.4rem;height:42px;border-radius:8px;border:1px solid var(--disc);background:var(--disc);color:#F5F2E8;cursor:pointer;white-space:nowrap}
 #sde-chat .ch-input button:disabled{opacity:0.5;cursor:default}
+#sde-chat .ch-emoji-btn{font-size:1.15rem;background:transparent;border:1px solid var(--border);border-radius:8px;height:42px;width:44px;cursor:pointer;flex:none;padding:0;line-height:1}
+#sde-chat .ch-emoji-btn:hover{background:var(--card2)}
+#sde-chat .ch-emoji-panel{display:none;flex-wrap:wrap;gap:2px;max-height:132px;overflow-y:auto;background:var(--card);border:1px solid var(--border2);border-radius:8px;padding:6px;margin-bottom:8px}
+#sde-chat .ch-emoji-panel.on{display:flex}
+#sde-chat .ch-emoji-panel span{font-size:1.25rem;cursor:pointer;padding:3px 5px;border-radius:6px;line-height:1}
+#sde-chat .ch-emoji-panel span:hover{background:var(--card2)}
+#sde-chat .msg .tm .ch-recall{color:inherit;opacity:0.7;text-decoration:underline;cursor:pointer}
+#sde-chat .msg .tm .ch-recall:hover{opacity:1}
+#sde-chat .bub.recalled{background:transparent;border:1px dashed var(--border);color:var(--muted);font-style:italic}
+#sde-chat .msg.mine .bub.recalled{background:transparent;border:1px dashed var(--border);color:var(--muted)}
 #sde-chat .ch-signed{font-size:0.8rem;color:var(--text2);margin-bottom:7px}
 #sde-chat .ch-signed b{color:var(--text)}
 #sde-chat .ch-signed a{margin-left:8px;font-size:0.75rem;opacity:0.6;text-decoration:underline;cursor:pointer}
@@ -136,7 +146,9 @@ footer a{color:var(--gold);text-decoration:none}
   <div class="ch-foot">
     <div class="ch-signed" id="ch-signed" style="display:none">以 <b id="ch-name"></b> 的身份发言 <a id="ch-out">退出</a></div>
     <div class="ch-login" id="ch-login"><span>登录后即可发言：</span><span id="ch-gsi"></span></div>
+    <div class="ch-emoji-panel" id="ch-emoji-panel"></div>
     <div class="ch-input" id="ch-input">
+      <button class="ch-emoji-btn" id="ch-emoji-btn" type="button" title="表情">😊</button>
       <textarea id="ch-text" maxlength="500" placeholder="说点什么…（Enter 发送，Shift+Enter 换行）"></textarea>
       <button id="ch-send">发送</button>
     </div>
@@ -149,7 +161,7 @@ footer a{color:var(--gold);text-decoration:none}
 var ROOM="discussions/hall";
 var WSURL=(location.protocol==="https:"?"wss://":"ws://")+location.host+"/api/chat?room="+encodeURIComponent(ROOM);
 function el(id){return document.getElementById(id)}
-var gcred="",myName="",ws=null,lastId=0,seen={},connected=false,tries=0,usePoll=false,pollT=null,pendingNew=0,everMsg=false;
+var gcred="",myName="",ws=null,lastId=0,seen={},connected=false,tries=0,usePoll=false,pollT=null,pendingNew=0,everMsg=false,nodes={};
 function note(s){el("ch-msg").textContent=s||"";}
 function fmtT(ts){var d=new Date(ts),p=function(x){return(x<10?"0":"")+x},now=new Date();
   if(d.toDateString()===now.toDateString())return p(d.getHours())+":"+p(d.getMinutes());
@@ -157,18 +169,36 @@ function fmtT(ts){var d=new Date(ts),p=function(x){return(x<10?"0":"")+x},now=ne
 function nearBottom(){var s=el("ch-scroll");return s.scrollHeight-s.scrollTop-s.clientHeight<60;}
 function toBottom(){var s=el("ch-scroll");s.scrollTop=s.scrollHeight;pendingNew=0;el("ch-newpill").style.display="none";}
 window.sdeChatToBottom=toBottom;
+function renderRecalled(bub){bub.textContent="[消息已撤回]";bub.className="bub recalled";}
 function addMsg(m){
   if(m.id&&seen[m.id])return; if(m.id){seen[m.id]=1; if(m.id>lastId)lastId=m.id;}
   if(!everMsg){everMsg=true;var e=el("ch-empty");if(e)e.parentNode.removeChild(e);}
   var wasNear=nearBottom(),mine=(m.name===myName&&myName);
   var wrap=document.createElement("div");wrap.className="msg"+(mine?" mine":"");
   var who=document.createElement("div");who.className="who";who.textContent=m.name;
-  var bub=document.createElement("div");bub.className="bub";bub.textContent=m.text;
+  var bub=document.createElement("div");bub.className="bub";
   var tm=document.createElement("div");tm.className="tm";tm.textContent=fmtT(m.ts);
   wrap.appendChild(who);wrap.appendChild(bub);wrap.appendChild(tm);
+  if(m.recalled){renderRecalled(bub);}
+  else{
+    bub.textContent=m.text;
+    if(mine){var age=Date.now()-m.ts;
+      if(age<120000){var rc=document.createElement("a");rc.className="ch-recall";rc.textContent="撤回";
+        rc.onclick=function(){doRecall(m.id);};
+        tm.appendChild(document.createTextNode(" · "));tm.appendChild(rc);
+        setTimeout(function(){if(rc.parentNode)rc.parentNode.removeChild(rc);},120000-age);}
+    }
+  }
+  if(m.id)nodes[m.id]=bub;
   el("ch-scroll").appendChild(wrap);
   if(wasNear||mine){toBottom();}else{pendingNew++;var p=el("ch-newpill");p.textContent="有 "+pendingNew+" 条新消息 ↓";p.style.display="block";}
 }
+function onRecall(id){var bub=nodes[id];if(bub&&!/recalled/.test(bub.className))renderRecalled(bub);}
+function doRecall(id){
+  if(usePoll){fetch("/api/chat?room="+encodeURIComponent(ROOM),{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({credential:gcred,op:"recall",id:id})}).then(function(r){return r.json()}).then(function(d){if(!d||!d.ok)note((d&&d.msg)||"撤回失败。");}).catch(function(){note("网络异常。");});}
+  else{if(!(ws&&connected)){note("正在重连，请稍候…");return;}wsSend({t:"recall",id:id});}
+}
+function insertEmoji(txt){var t=el("ch-text");var s=t.selectionStart||0,en=t.selectionEnd||0,v=t.value;t.value=v.slice(0,s)+txt+v.slice(en);t.selectionStart=t.selectionEnd=s+txt.length;t.focus();t.style.height="42px";t.style.height=Math.min(t.scrollHeight,120)+"px";}
 function setStatus(state){var dot=el("ch-dot"),st=el("ch-stat");
   dot.className="dot"+(state==="online"?" on":state==="offline"?" off":"");
   if(state==="online")st.textContent="实时在线";else if(state==="offline")st.textContent="连接断开，重连中…";else st.textContent="连接中…";}
@@ -193,6 +223,7 @@ function connect(){
     else if(d.t==="msg"){addMsg(d);}
     else if(d.t==="presence"){setOnline(d.online);}
     else if(d.t==="authed"){myName=d.name;note("");}
+    else if(d.t==="recall"){onRecall(d.id);}
     else if(d.t==="err"){if(d.m==="login")note("请先用 Google 账号登录再发言。");else note(d.m||"发送失败。");}
   };
   ws.onclose=function(){connected=false;if(usePoll)return;setStatus("offline");scheduleReconnect();};
@@ -201,7 +232,7 @@ function connect(){
 function scheduleReconnect(){tries++;if(tries>=5){startPoll();return;}setTimeout(connect,Math.min(1000*tries,5000));}
 function startPoll(){
   if(usePoll)return;usePoll=true;setStatus("online");el("ch-stat").textContent="已连接（兼容模式）";
-  function tick(){fetch("/api/chat?room="+encodeURIComponent(ROOM)+"&since="+lastId).then(function(r){return r.json()}).then(function(d){if(d&&d.items)d.items.forEach(addMsg);if(d)setOnline(d.online);}).catch(function(){});}
+  function tick(){fetch("/api/chat?room="+encodeURIComponent(ROOM)+"&since="+lastId).then(function(r){return r.json()}).then(function(d){if(d&&d.items)d.items.forEach(addMsg);if(d&&d.recalls)d.recalls.forEach(onRecall);if(d)setOnline(d.online);}).catch(function(){});}
   tick();pollT=setInterval(tick,3000);
 }
 function doSend(){
@@ -217,6 +248,10 @@ function doSend(){
     wsSend({t:"msg",text:t});el("ch-text").value="";note("");el("ch-text").style.height="42px";
   }
 }
+(function(){var EMOJI="😀 😃 😄 😁 😆 😊 🙂 😉 😍 🥰 😘 😜 🤪 🤔 🤨 😐 😴 😷 😎 🥳 🤗 🙄 😮 😲 😳 😭 😢 😱 😡 🥲 👍 👎 👏 🙏 💪 🤝 👌 ✌️ 🙌 🎉 🔥 💯 ❤️ 💔 ⭐ ✅ ❌ 🌹 ☕ 🍵 🎂 👀".split(" ");var panel=el("ch-emoji-panel"),ebtn=el("ch-emoji-btn");
+EMOJI.forEach(function(e){var s=document.createElement("span");s.textContent=e;s.onclick=function(){insertEmoji(e);};panel.appendChild(s);});
+ebtn.onclick=function(ev){ev.stopPropagation();panel.classList.toggle("on");};
+document.addEventListener("click",function(ev){if(panel.classList.contains("on")&&ev.target!==ebtn&&!panel.contains(ev.target))panel.classList.remove("on");});})();
 el("ch-send").onclick=doSend;
 var ta=el("ch-text");
 ta.addEventListener("keydown",function(e){if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();doSend();}});

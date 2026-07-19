@@ -80,13 +80,14 @@ export class CommentBox {
       if (request.method === "GET") {
         const since = parseInt(_u.searchParams.get("since") || "0", 10) || 0;
         const st = await this.chatRead();
-        return Response.json({ ok: true, items: st.log.filter((m) => m.id > since), last: st.seq, online: this.ctx.getWebSockets().length }, { headers: { "cache-control": "no-store" } });
+        return Response.json({ ok: true, items: st.log.filter((m) => m.id > since), recalls: st.log.filter((m) => m.recalled).map((m) => m.id), last: st.seq, online: this.ctx.getWebSockets().length }, { headers: { "cache-control": "no-store" } });
       }
       if (request.method === "POST") {
         const body = await request.json().catch(() => null);
         if (!body) return Response.json({ ok: false, msg: "请求格式不对。" }, { status: 400 });
         const who = await verifyGoogleCredential(body.credential);
         if (!who) return Response.json({ ok: false, msg: "请先用 Google 账号登录后再发言。" }, { status: 401 });
+        if (body.op === "recall") { const rr = await this.chatRecall(who.name, body.id); return Response.json(rr.ok ? { ok: true } : { ok: false, msg: rr.msg }, { status: rr.ok ? 200 : 400 }); }
         const r = await this.chatAdd(who.name, body.text);
         return Response.json(r.ok ? { ok: true } : { ok: false, msg: r.msg }, { status: r.ok ? 200 : (r.code || 400) });
       }
@@ -211,6 +212,19 @@ export class CommentBox {
     this.broadcast({ t: "msg", id: msg.id, name: msg.name, text: msg.text, ts: msg.ts });
     return { ok: true };
   }
+  async chatRecall(name, id) {
+    id = parseInt(id, 10);
+    let { log } = await this.chatRead();
+    const m = log.find((x) => x.id === id);
+    if (!m) return { ok: false, msg: "消息不存在。" };
+    if (m.name !== name) return { ok: false, msg: "只能撤回自己的消息。" };
+    if (m.recalled) return { ok: true };
+    if (Date.now() - m.ts > 120000) return { ok: false, msg: "超过 2 分钟，不能撤回了。" };
+    m.recalled = true; m.text = "";
+    await this.ctx.storage.put("clog", log);
+    this.broadcast({ t: "recall", id: id });
+    return { ok: true };
+  }
   broadcast(obj) {
     const s = JSON.stringify(obj);
     for (const ws of this.ctx.getWebSockets()) { try { ws.send(s); } catch (e) {} }
@@ -230,6 +244,13 @@ export class CommentBox {
       if (!att.name) { try { ws.send(JSON.stringify({ t: "err", m: "login" })); } catch (e) {} return; }
       const r = await this.chatAdd(att.name, d.text);
       if (!r.ok) { try { ws.send(JSON.stringify({ t: "err", m: r.msg || "发送失败" })); } catch (e) {} }
+      return;
+    }
+    if (d.t === "recall") {
+      const att = ws.deserializeAttachment() || {};
+      if (!att.name) { try { ws.send(JSON.stringify({ t: "err", m: "login" })); } catch (e) {} return; }
+      const r = await this.chatRecall(att.name, d.id);
+      if (!r.ok) { try { ws.send(JSON.stringify({ t: "err", m: r.msg || "撤回失败" })); } catch (e) {} }
       return;
     }
   }
