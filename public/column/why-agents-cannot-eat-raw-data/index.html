@@ -258,6 +258,48 @@ footer{border-top:1px solid var(--line);padding:30px 24px;text-align:center;colo
 <p>桥架好了，天才才配得上你的信任。桥没架，你交出去的不是数据，是风险。</p>
 <hr>
 <p class="editnote"><em>本文是「企业本体论」专栏的方法篇。它从反面回答了一个根本问题：企业智能化，功夫到底该下在哪。答案是——不在那个人人都盯着的大模型上，而在大模型与企业之间，那座沉默、笨重、却真正决定成败的桥上。而那座桥的地基，就是本专栏反复在讲的"企业本体"。</em></p>
+
+<style id="sde-material-css">
+.sde-material{max-width:722px;margin:52px auto 0;padding:0 24px 10px;line-height:2.0;text-align:justify;font-size:16.5px}
+.sde-material .mat-tag{text-indent:0;font-size:12px;letter-spacing:.32em;opacity:.62;margin:0 0 8px}
+.sde-material > h2{font-size:21px;font-weight:800;margin:0 0 4px;letter-spacing:.02em;padding-bottom:12px;border-bottom:2px solid rgba(128,128,128,.3);text-indent:0}
+.sde-material h3{font-size:17px;font-weight:700;margin:32px 0 10px;letter-spacing:.01em;text-indent:0}
+.sde-material p{margin:0 0 17px;text-indent:2em}
+.sde-material .mat-lead{text-indent:0;font-size:15px;opacity:.9;background:rgba(128,128,128,.08);border-left:3px solid rgba(128,128,128,.42);padding:15px 19px;margin:16px 0 26px;line-height:1.92}
+.sde-material .mat-box{text-indent:0;font-size:15.5px;background:rgba(128,128,128,.07);border:1px solid rgba(128,128,128,.22);border-radius:5px;padding:15px 19px;margin:0 0 18px;line-height:1.92}
+.sde-material .mat-ref{text-indent:0;font-size:13px;opacity:.7;line-height:1.78;margin:20px 0 0;padding-top:12px;border-top:1px dashed rgba(128,128,128,.32)}
+.sde-material .mat-ref + .mat-ref{border-top:none;padding-top:0;margin-top:10px}
+.sde-material i{font-style:italic}
+@media(max-width:640px){.sde-material{font-size:16px;padding:0 18px 10px}}
+</style>
+<div class="sde-material" id="sde-material">
+<p class="mat-tag">补篇 · 约 3.0 千字</p>
+<h2>材料与论据</h2>
+<p class="mat-lead">这一篇不像前几篇需要「纠偏」——它讲的八堵墙，几乎每一堵都是 AI 工程界反复记录、有名有姓的真实失败模式；它开的药方（在大模型和数据之间架一座桥），正是整个行业已经收敛到的标准架构。此处把八堵墙对到真实文献上，给出它们的工程学名字，并指出几处该补的分寸——有些墙近两年被垫高了一截，但没有被拆掉。</p>
+
+<h3>一、八堵墙，墙墙都有工程学的真名</h3>
+<p><b>第二堵墙（编故事）＝ 幻觉（hallucination），而且有理论下界。</b>「富强金属 91.2%」这个有零有整的假数字，是幻觉的教科书样本。它不是偶发 bug——Kalai 与 Vempala（STOC 2024）证明，对「训练数据里推不出真伪的事实」，满足校准的模型必然以某个下界的比率编造。而企业内部那些私有数字，恰恰是模型「训练里没见过、推不出」的，所以最容易被编。</p>
+<p><b>第四堵墙（问两次两个答案）＝ 采样的非确定性。</b>大模型默认按概率采样生成，同一问句自然可能给出不同答案。把「温度」调到 0 能大幅收敛，但仍难做到位级确定——所以正文那句「没法当账用的系统」，是对的。<b>第五堵墙（不知道谁能看什么）＝ 模型本身不携带任何权限系统</b>：它对「这个数据谁有权看」一无所知，权限必须由外部的检索／工具层来把守；把定价成本喂进上下文再指望它「自觉不说」，是把保密寄托给一个没有保密概念的东西。<b>第六堵墙（不认识数据之间的线）＝ 缺语义层</b>：模型不天然知道你那几百张表之间的主外键、口径与业务含义，这层「世界的线」得由人定义的语义层／知识图谱喂给它。<b>第七堵墙（失忆）＝ 大模型是无状态的</b>：每次调用都从零开始，「记忆」必须在外部工程出来。</p>
+
+<h3>二、第一堵墙（装不进窗口）——真实，但近两年被垫高了一截</h3>
+<p>正文说「数据根本装不进那个窗口」。这在方向上对，但要补两点分寸。其一，上下文窗口这两年暴涨（Gemini 1.5 约百万 token，GPT-4、Claude 也大幅扩窗），「装不进」已不再是当年那种硬边界。其二，但——<b>就算装得进，也有一个致命现象叫「中间迷失」</b>（Lost in the Middle，Liu 等 2023）：塞进超长上下文时，位于中间的信息会被显著忽略，模型主要盯着开头和结尾。加上 Transformer 成本随长度二次增长、企业数据体量仍远超任何窗口，结论没变：不能把全部数据一股脑塞进去。</p>
+<div class="mat-box">所以第一堵墙更准的说法不是「装不进」，而是「<b>装得进也用不好、还烧钱、且真实企业数据本就超出窗口</b>」——墙是真的，只是它今天是由「中间迷失＋成本＋规模」三块砖砌的，而不再是一道简单的容量上限。</div>
+
+<h3>三、正文开的药方，正是全行业收敛到的标准架构</h3>
+<p>正文说「在大模型和你的数据之间，架一座桥」——这不是一个 SDE 独有的巧思，而是整个行业已经收敛到的主流范式，它有一个名字：<b>检索增强生成（RAG，Lewis 等 2020）</b>。</p>
+<div class="mat-box">RAG 的思路与正文的「桥」几乎一字不差：不让模型只靠自己脑子里的参数记忆，而是<b>先从外部数据库检索出与问题相关的片段，再把这些片段作为依据喂给模型生成</b>——把大模型当「会推理的引擎」，把可信数据留在外部的「账本」里。针对企业的结构化数据（ERP／MES／表），还会叠加语义层、文本转 SQL、工具调用与权限护栏。正文那句「把宝贝用在刀刃上」，正是这套架构的通俗版：模型负责理解与推理，检索与工具负责事实与权限。</div>
+<p>一句公道话：正文的<b>诊断</b>（别把生数据直接喂给大模型）不是危言耸听，而是行业共识；它的<b>药方</b>（架桥）也不是自家偏方，而是主流最佳实践。SDE 的「桥」，是这套 RAG／语义层／工具化范式的一个具体落地——它说对了方向，且和整个行业站在一起。</p>
+
+<h3>四、也要补一句：桥不是万能的</h3>
+<p>为免读者以为「架了桥就高枕无忧」：RAG 也有它的软肋——它擅长事实型问答，却在复杂的多跳推理、跨表聚合上常吃力（简单取 Top-K 相似片段，抓不住复杂意图）；检索本身也会漏检、误检，把错片段喂进去照样会错。所以「桥」不是终点，而是一套需要持续调优（检索质量、语义层维护、护栏测试）的工程。正文把「架桥」讲成方向是对的；真做起来，魔鬼仍在检索与语义那些细节里。</p>
+
+<h3>五、这些材料如何支撑正文</h3>
+<p>收拢来看：这一篇是少见的「几乎不用纠偏」的文章——八堵墙墙墙有真名（幻觉有理论下界、非确定性源于采样、无权限、无语义、无状态），第一堵墙只需补上「窗口虽大但有中间迷失＋成本＋规模」的分寸，而它的药方正是行业标准的 RAG／语义层／工具化架构。</p>
+<div class="mat-box">用发生学自己的话说：大模型是一个「会推理却不长记性、会编瞎话、没有权限概念」的引擎；把整个公司的数据柜钥匙交给它，等于让一个绝顶聪明的失忆者独自看管账本。正确的做法——也是全行业的做法——是让它只负责「理解与推理」，而把「事实、权限、记忆」这些硬约束，交给它身外那座由检索、语义层与工具搭成的桥。<b>正文讲的正是这件事；补篇要补的，只是给这座桥标上它在业界的学名（RAG），并提醒：桥也得天天维护。</b></div>
+<p class="mat-ref">材料出处：检索增强生成——Lewis P. et al., "Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks", NeurIPS, 2020。 ｜ 中间迷失——Liu N. F. et al., "Lost in the Middle: How Language Models Use Long Contexts", TACL, 2023。 ｜ 幻觉理论下界——Kalai A. T. & Vempala S. S., "Calibrated Language Models Must Hallucinate", STOC 2024；Kalai et al., "Why Language Models Hallucinate", 2025。 ｜ 长上下文与 RAG 的成本／取舍——相关综述（2024）。</p>
+<p class="mat-ref"><b>说明：</b>本补篇为机器学习工程的材料整理；该领域进展极快，列出仅供读者对读与查证。</p>
+</div>
+
 </article>
 </div></div>
 
