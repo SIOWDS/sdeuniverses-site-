@@ -364,6 +364,45 @@ footer{border-top:1px solid var(--line);padding:30px 24px;text-align:center;colo
 <p><strong>让机器去做那些做完就算完的事，把那些做完还要有人站出来的事，留给自己。</strong></p>
 <p>然后，去打开那个工具，跑一次。看看它在哪里停下来问你——那个位置，就是留给你的。</p>
 
+
+<style id="sde-material-css">
+.sde-material{max-width:722px;margin:52px auto 0;padding:0 24px 10px;line-height:2.0;text-align:justify;font-size:16.5px}
+.sde-material .mat-tag{text-indent:0;font-size:12px;letter-spacing:.32em;opacity:.62;margin:0 0 8px}
+.sde-material > h2{font-size:21px;font-weight:800;margin:0 0 4px;letter-spacing:.02em;padding-bottom:12px;border-bottom:2px solid rgba(128,128,128,.3);text-indent:0}
+.sde-material h3{font-size:17px;font-weight:700;margin:32px 0 10px;letter-spacing:.01em;text-indent:0}
+.sde-material p{margin:0 0 17px;text-indent:2em}
+.sde-material .mat-lead{text-indent:0;font-size:15px;opacity:.9;background:rgba(128,128,128,.08);border-left:3px solid rgba(128,128,128,.42);padding:15px 19px;margin:16px 0 26px;line-height:1.92}
+.sde-material .mat-box{text-indent:0;font-size:15.5px;background:rgba(128,128,128,.07);border:1px solid rgba(128,128,128,.22);border-radius:5px;padding:15px 19px;margin:0 0 18px;line-height:1.92}
+.sde-material .mat-ref{text-indent:0;font-size:13px;opacity:.7;line-height:1.78;margin:20px 0 0;padding-top:12px;border-top:1px dashed rgba(128,128,128,.32)}
+.sde-material .mat-ref + .mat-ref{border-top:none;padding-top:0;margin-top:10px}
+.sde-material i{font-style:italic}
+@media(max-width:640px){.sde-material{font-size:16px;padding:0 18px 10px}}
+</style>
+<div class="sde-material" id="sde-material">
+<p class="mat-tag">补篇 · 约 3.2 千字</p>
+<h2>材料与论据</h2>
+<p class="mat-lead">这一篇是难得准确、且自觉克制的入门讲解——它对大模型机制、无状态、幻觉、以及「智能体＝大模型＋流程＋记忆＋停顿＋验收」的判断，几乎条条对得上工程界的共识与有名有姓的研究。此处主要做两件事：给它讲对的东西标上学名与出处，再补两处该拧准的分寸。（大模型机制那部分的实证，与本站《没有统一世界模型》《为什么智能体不能吃生数据》同源，此处从简。）</p>
+
+<h3>一、大模型机制：正文讲得准，且各有出处</h3>
+<p>正文说「大模型在预测下一个词，而语法、事实、逻辑、风格是被这个压力逼出来的副产品」——这是准确的；它对幻觉的刻画尤其到位：「幻觉不是故障，是它工作方式的影子，同一台机器同一套原理，既生成惊艳答案也生成假文献」。这与幻觉的理论下界（Kalai & Vempala, STOC 2024：对训练数据推不出真伪的事实，校准模型必然以某比率编造）完全一致——所以正文「具体信源必须自己核一遍」是对的。正文说「它无状态、每次调用都是全新计算、没有记忆」——这也准确；上下文窗口不仅会满，塞长了还有「中间迷失」（Liu 等 2023）。</p>
+<div class="mat-box">正文还很克制地说「预测下一个词不等于鹦鹉学舌……它理解到什么程度学界还在激烈争论，本文不替谁下定论」——这个分寸恰恰是对的：一面有证据表明大模型内部长出了真实的世界表征（Othello-GPT 等），一面这些表征又零碎不连贯。<b>正文没有 overclaim，值得称许。</b></div>
+
+<h3>二、智能体那部分：正文的框架，正是有名有姓的工程范式</h3>
+<p>正文最核心的判断——「智能体不是更聪明的大模型，而是围绕大模型搭起的工程：流程、记忆、停顿、验收」——正是当前工程界对「智能体」的标准理解，且每一块都有对应的研究：</p>
+<div class="mat-box">「把会说接上会做／六步流水线」＝ <b>ReAct</b>（Yao 等 2022）：让模型交错地产出「推理」与「行动（调用工具／查外部环境）」——边推理边行动、边行动边取信息。这几乎就是正文那条流水线的学名。而 ReAct 提出的动机，也正是正文的痛点：纯推理会「幻觉与错误累积」，得靠与外部环境交互来纠。<b>「记忆」</b>＝ 智能体的外部记忆（正因大模型无状态，记忆必须在模型之外工程出来——正文这一点抓得极准）。</div>
+<p>「让另一个模型当裁判」＝「<b>LLM 当裁判</b>」（LLM-as-a-judge，Zheng 等 2023）：用强模型评判其它模型的输出。正文很对地说了它有「限度」——补一句具体的：这种裁判有已知的偏差，如位置偏差、啰嗦偏差、以及「自我偏爱」（更偏袒自己或同族模型的输出）。所以自评有用，但不能替代人的验收。「灵魂在两次停顿／必须由人站的位置」＝ <b>人在环路</b>（human-in-the-loop）与人的监督——这与负责任 AI 的主流实践完全同向。正文把「承担」留给人，是稳的落点。</p>
+
+<h3>三、两处该拧准的分寸</h3>
+<p><b>其一，「能力是被逼出来的副产品」——大方向对，但「能力随规模突然涌现」这个更强的故事有争议。</b>Schaeffer 等（2023，《涌现能力是海市蜃楼吗？》）指出，一些看似「突然涌现」的能力，其实是评测指标不连续造成的假象——换个连续指标，能力是平滑增长的。所以说「逼出副产品」稳妥，说「某个规模一到、能力突然冒出来」要谨慎。</p>
+<p><b>其二，「大脑／带着大脑去上班的人」这个比方——正文自己已诚实预告「它有一处重要的不准确，第十二节会拆」。</b>这个自觉很好：大模型不像人脑那样有统一的自我与持续的记忆，把它拟人化为「一个人」，容易高估它的自主与连贯。正文既用这个比方、又亲手拆它，分寸是稳的。</p>
+
+<h3>四、这些材料如何支撑正文</h3>
+<p>收拢来看：这是一篇少见的「几乎不用纠偏」的入门文——大模型机制（预测下一词、无状态、幻觉即机制之影）条条准确且有实证，智能体框架（流程／记忆／停顿／验收）正是 ReAct、外部记忆、LLM-当裁判、人在环路这一整套有名有姓的工程范式的通俗版。要补的只是两处分寸：涌现的「海市蜃楼」之争，和「拟人比方」的自觉边界（正文自己已预告）。</p>
+<div class="mat-box">用发生学自己的话说：大模型是「会说」的语言器官，智能体是把「会说」接上「会做」的工程身体，而「会承担」只能是人——这个三分，与工程界「LLM ＋ 工具／记忆／规划的智能体 ＋ 人的监督」的共识严丝合缝。<b>正文把一件很容易被术语忽悠的事，讲得既准确又克制；补篇能加的，不过是替它把那些它已讲对的判断，一一署上学界的名字。</b></div>
+<p class="mat-ref">材料出处：智能体框架——Yao S. et al., "ReAct: Synergizing Reasoning and Acting in Language Models", ICLR 2023（arXiv:2210.03629）；Shinn et al. "Reflexion"（2023）。 ｜ LLM 当裁判——Zheng L. et al., "Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena", 2023（位置／啰嗦／自我偏爱偏差）。 ｜ 幻觉——Kalai & Vempala, STOC 2024。 ｜ 长上下文——Liu N. F. et al., "Lost in the Middle", 2023。 ｜ 涌现之争——Wei et al.（2022）对 Schaeffer et al., "Are Emergent Abilities of LLMs a Mirage?", NeurIPS 2023。 ｜ 内部世界表征——Li et al., Othello-GPT, ICLR 2023。</p>
+<p class="mat-ref"><b>说明：</b>本补篇为机器学习工程的材料整理；该领域进展极快，列出仅供读者对读与查证。</p>
+</div>
+
 </article>
 <section id="sde-refs">
 <h3>延伸阅读与参考</h3>
