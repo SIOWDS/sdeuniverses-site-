@@ -15,17 +15,31 @@
   function el(tag, cls, txt) { var e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; }
 
   // —— 正文容器 / 标题 / 正文文本 ——
-  function findBody() {
-    if (CFG.bodyEl) return (typeof CFG.bodyEl === "function" ? CFG.bodyEl() : CFG.bodyEl) || document.body;
-    if (CFG.selector) { var c = q1(CFG.selector); if (c) return c; }
-    return q1("article") || q1("main") || q1(".content") || q1(".article") || document.body;
+  function bodyEls() {
+    if (CFG.bodyEl) { var b = typeof CFG.bodyEl === "function" ? CFG.bodyEl() : CFG.bodyEl; return b ? [b] : [document.body]; }
+    if (CFG.selector) { var ns = document.querySelectorAll(CFG.selector); if (ns.length) return Array.prototype.slice.call(ns); }
+    var one = q1("article") || q1("main") || q1(".content") || q1(".article"); return [one || document.body];
+  }
+  function elText(el) {
+    if (!el) return "";
+    if (el === document.body) {
+      var s = "", ch = el.children;
+      for (var i = 0; i < ch.length; i++) {
+        var c = ch[i], cls = (c.className && typeof c.className === "string") ? c.className : "";
+        if (/^(SCRIPT|STYLE|NAV|FOOTER|HEADER|NOSCRIPT)$/.test(c.tagName)) continue;
+        if (/wdsr-/.test(cls)) continue;
+        s += (c.innerText || c.textContent || "") + "\n";
+      }
+      return s;
+    }
+    return el.innerText || el.textContent || "";
   }
   function docTitle() { var h = q1("h1"); return (CFG.title || (h && h.textContent) || document.title || "").trim().slice(0, 200); }
   function docText() {
     if (typeof CFG.docTextFn === "function") { try { var d = CFG.docTextFn(); if (d) return String(d).slice(0, 12000); } catch (e) {} }
-    var c = findBody();
-    var t = (c && (c.innerText || c.textContent) || "").replace(/\n{3,}/g, "\n\n").trim();
-    return t.slice(0, 12000);
+    var els = bodyEls(), t = "";
+    for (var i = 0; i < els.length; i++) { t += elText(els[i]) + "\n\n"; }
+    return t.replace(/\n{3,}/g, "\n\n").trim().slice(0, 12000);
   }
 
   // —— 样式：显影暗房 ——
@@ -114,8 +128,8 @@
     setTimeout(function () {
       var sel = window.getSelection(); var t = sel && sel.toString().trim();
       if (!t || t.length < 2 || !sel.rangeCount) { selBtn.style.display = "none"; return; }
-      var body = findBody(), node = sel.anchorNode, inBody = false, p = node;
-      while (p) { if (p === body) { inBody = true; break; } p = p.parentNode; }
+      var els = bodyEls(), node = sel.anchorNode, inBody = false;
+      for (var i = 0; i < els.length && !inBody; i++) { var p = node; while (p) { if (p === els[i]) { inBody = true; break; } p = p.parentNode; } }
       if (!inBody) { selBtn.style.display = "none"; return; }
       var r = sel.getRangeAt(0).getBoundingClientRect();
       selBtn.style.left = (window.scrollX + r.left + r.width / 2) + "px";
