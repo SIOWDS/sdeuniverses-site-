@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>把焊死的连接重新问出来 · 焊死的连接 · 教育 | SDE Universes</title>
+<meta name="description" content="把焊死的连接重新问出来 · 实践文">
+<style>
+:root{--sky:#4FC3F7;--blue:#2196F3;--link:#0A66B2;--btn:#0A66C2;--teal:#14B8A6;--teal2:#0E7C71;--head:#0F2C4A;--text:#1E293B;--muted:#5A6B80;--bg:#F8FCFF;--card:#FFFFFF;--line:rgba(79,195,247,0.40)}
+*{margin:0;padding:0;box-sizing:border-box}
+::selection{background:rgba(79,195,247,0.35)}
+body{background:var(--bg);color:var(--text);font-family:"Songti SC","Noto Serif SC",Georgia,serif;line-height:2.0;font-size:17.5px}
+a{color:var(--link);text-decoration:none}
+.readbar{position:sticky;top:0;z-index:20;background:rgba(248,252,255,0.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:11px 20px;gap:12px;flex-wrap:wrap}
+.readbar .nav-back{color:var(--muted);font-size:13px;letter-spacing:0.04em}
+.rb-modes{display:flex;gap:8px;flex-wrap:wrap}
+.rb-btn{font-size:13px;padding:6px 14px;border-radius:3px;border:1px solid rgba(33,150,243,0.45);color:var(--link);letter-spacing:0.03em}
+.rb-btn.cur{background:var(--btn);color:#fff;font-weight:700;border-color:var(--btn)}
+.art{max-width:760px;margin:0 auto;padding:56px 24px 20px;text-align:center}
+.art-series{font-size:12px;letter-spacing:0.36em;color:var(--teal2);margin-bottom:22px}
+.art-title{font-size:clamp(24px,4.2vw,36px);font-weight:800;line-height:1.55;color:var(--head);letter-spacing:0.02em}
+.art-subtitle{font-size:clamp(15px,2.2vw,18px);color:var(--link);margin-top:18px;line-height:1.85;letter-spacing:0.01em}
+.art-meta{margin-top:26px;font-size:13px;color:var(--muted);letter-spacing:0.12em}
+.wrap{max-width:760px;margin:0 auto;padding:26px 24px 60px}
+.abstract{background:var(--card);border:1px solid var(--line);border-left:3px solid var(--sky);padding:22px 26px;margin:20px 0 26px;font-size:15.5px;line-height:1.95;border-radius:4px}
+.abstract .ab-lbl{font-size:12px;letter-spacing:0.3em;color:var(--teal2);margin-bottom:10px}
+.abstract p{color:var(--text);text-align:justify}
+.keywords{font-size:14px;color:var(--muted);letter-spacing:0.02em;margin:0 0 30px;padding-bottom:24px;border-bottom:1px solid var(--line)}
+.keywords strong{color:var(--teal2)}
+.wrap h2{font-size:22px;font-weight:800;color:var(--head);margin:44px 0 18px;letter-spacing:0.02em;padding-top:8px;border-bottom:1px solid var(--line);padding-bottom:8px}
+.wrap h2.notes-head{font-size:20px}
+.wrap h3{font-size:18px;font-weight:700;color:var(--link);margin:30px 0 12px;letter-spacing:0.01em}
+.wrap p{margin-bottom:20px;text-align:justify;color:var(--text);text-indent:2em}
+.wrap p.ref{font-size:14px;line-height:1.7;color:var(--muted);margin-bottom:8px;text-indent:-2em;padding-left:2em;text-align:left}
+.wrap strong{color:var(--link);font-weight:700}
+.endbox{background:linear-gradient(135deg,#2196F3 0%,#0A66C2 55%,#0F2C4A 100%);text-align:center;padding:60px 24px;margin-top:40px;border-radius:4px}
+.endbox .lbl{font-size:12px;letter-spacing:0.4em;color:#BFE7FB;margin-bottom:16px}
+.endbox .big{font-size:clamp(22px,3.4vw,30px);font-weight:700;color:#FFFFFF;letter-spacing:0.06em;margin-bottom:14px}
+.endbox p{color:#DCEEFB;max-width:540px;margin:0 auto 26px;font-size:15px;line-height:1.95}
+.endbox a{display:inline-block;padding:12px 30px;font-size:14.5px;letter-spacing:0.08em;border-radius:2px;margin:5px;text-decoration:none}
+.endbox .solid{background:#FFFFFF;color:#0A66C2;font-weight:700}
+.endbox .ghost{border:1px solid #FFFFFF;color:#FFFFFF}
+footer{background:#EAF6FE;color:var(--muted);text-align:center;padding:30px 24px;font-size:13px;letter-spacing:0.06em;border-top:1px solid var(--line)}
+footer a{color:var(--link)}
+@media(max-width:640px){body{font-size:16.5px}}
+</style><style id="beautify-v1">
+body{background:linear-gradient(180deg,#fbfdff 0%,#f5f9ff 100%);font-size:18px;line-height:2.05}
+.art{padding-top:74px}
+.art-series{color:var(--teal2);font-size:12.5px;letter-spacing:.42em}
+.art-title{font-size:clamp(26px,4.4vw,38px);line-height:1.5;letter-spacing:.015em}
+.art-title::after{content:"";display:block;width:50px;height:3px;background:linear-gradient(90deg,var(--sky),var(--btn));margin:24px auto 0;border-radius:2px}
+.art-subtitle{font-size:clamp(15px,2.1vw,17.5px);color:var(--muted);line-height:1.95}
+.wrap{max-width:722px}
+.wrap h2{font-size:22.5px;margin:56px 0 20px;padding:0;border-bottom:none;position:relative;letter-spacing:.02em}
+.wrap h2::before{content:"";position:absolute;left:0;top:-20px;width:36px;height:3px;background:var(--btn);border-radius:2px}
+.wrap h2::after{content:"";display:block;height:1px;background:linear-gradient(90deg,var(--line),transparent);margin-top:12px}
+.wrap h2.refs-h{font-size:19px}
+.wrap h3{color:var(--link);font-size:18.5px;margin:36px 0 14px}
+.wrap p{margin-bottom:22px;line-height:2.05;letter-spacing:.006em}
+.wrap h2 + p::first-letter{font-size:2.5em;float:left;line-height:.84;color:var(--btn);font-weight:700;margin:.06em .16em 0 0;font-family:Georgia,"Songti SC",serif}
+.wrap p strong{color:var(--head);font-weight:700;background:linear-gradient(transparent 66%,rgba(79,195,247,.34) 0)}
+.abstract{background:linear-gradient(135deg,#f4fbff,#edf6ff);border:1px solid var(--line);border-left:3px solid var(--btn);border-radius:7px;box-shadow:0 8px 26px rgba(15,44,74,.07);padding:26px 30px}
+.abstract .ab-lbl{letter-spacing:.34em}
+.keywords{font-size:14px;padding-bottom:30px;margin-bottom:40px;border-bottom:1px dashed var(--line)}
+.wrap p.ref{font-size:13.5px;line-height:1.75;color:var(--muted)}
+@media(max-width:640px){body{font-size:17px}.wrap{max-width:100%}.wrap h2 + p::first-letter{font-size:2.15em}}
+</style>
+</head>
+<body class="zh">
+<div class="readbar"><a class="nav-back" href="/column/welded-connection/">‹ 返回《看到那个焊死的连接》</a>
+  <div class="rb-modes"><span class="rb-btn cur">📖 长文阅读</span><a class="rb-btn" href="read.html">📄 在线 PDF</a><a class="rb-btn" href="apply-education.pdf" download>⬇ 下载</a></div></div>
+<div class="art"><div class="art-series">焊死的连接 · 教育</div><h1 class="art-title">把焊死的连接重新问出来</h1>
+  <div class="art-subtitle">——一套让老师能当场问出"这是不是你做的、学习有没有在你身上发生"的操作手册</div>
+  <div class="art-meta">只讲方法、技术与操作的实践文 · 约 8 千字 · 延伸自《看到那个焊死的连接》</div></div>
+<div class="wrap">
+<p>这是一份操作手册，不是一篇理论文章。它不讨论"教育的本质是什么"，只回答一个具体问题：当你收到一份作业、一张卷子、一个项目、一篇论文，你怎么知道<strong>这份产出是不是这个学生真做的、学习有没有真的在他身上发生过</strong>。母论文《看到那个焊死的连接》讲了一件事——评价体系有一个"非检验地带"，它只检验产品（成果本身好不好、对不对），却系统性地把"这个成果是不是署名的人真做出来的"排除在检验之外。于是"产品"和"做产品的主体"之间的连接是被<strong>焊死</strong>的：制度默认"署名=真实承担"，从不去问、也没有程序去问"你做过吗"。</p>
+
+<p>在教育里，这条焊死的连接一直存在，只是过去被"抄一份也得花时间、也得看懂"这种摩擦力挡着，没那么致命。AI 时代摩擦力清零了。今天一个学生可以把整份任务原封不动交给基底，几分钟后拿回一份结构完整、逻辑通顺、遣词讲究的完美产出。产品合格，甚至优秀；但能力可能<strong>从未在这个学生身上发生</strong>。而我们的评分制度只焊看那份产出，从头到尾没有一个环节去问"这是不是你做的、你学到了没有"。这不是某个偷懒学生的问题，是制度的结构缺口：我们检验产品，却不检验产品与人的连接。</p>
+
+<p>这份手册要给你的，就是把这条连接重新纳入检验的具体做法。核心不是去当侦探、去抓"真的假的"——那条路走不通，也不该走。核心是母文给出的重构方向：<strong>能力过程可见化</strong>。不是要证明学生作弊，而是要让"能力是否在这个主体身上真实发生"这件事，变成一个可以被问出来、可以被质疑、也可以被学生自己辩护的教学程序。一句话——<strong>不是要看见真的，是要让"是不是在发生"被问出来</strong>。下面全是能落地的东西。</p>
+
+<h2>一、先看清：教育里"焊死的连接"长什么样</h2>
+
+<p>要修一样东西，先得看见它。教育里"焊死的连接"不是抽象概念，它有非常具体的样子：<strong>你手上有产品，你对做产品的过程一无所知，而你的评分只针对产品</strong>。学生交上来一个成果，你打开、判断好不好、给个分数、发回去——整个链条里没有任何一处停下来问"这中间发生了什么、是谁做的、他怎么想到的"。产品和主体之间那道缝，被评分动作一次性焊死了。</p>
+
+<p>下面是三种最典型的场景，你几乎每天都会遇到。</p>
+
+<h3>场景一：完美的作业，空白的学生</h3>
+
+<p>一份作文用词精准、结构工整、观点圆熟，远超这个学生平时的口头表达和随堂反应。你隐约觉得不对，但作业本身挑不出错，评分标准也只让你看"文章好不好"。于是你打了个高分。这就是焊死：<strong>产品的质量替主体做了担保</strong>，而你没有任何程序去核这个担保。第二天课上你随口问他"你这段是怎么想到用这个例子的"，他答不上来——但这个问题不在评分表里，它发生在制度之外，纯靠你的敏感，而且很容易被"别为难学生"劝退。</p>
+
+<h3>场景二：漂亮的项目，说不清的贡献</h3>
+
+<p>小组项目交上来一份精美的报告和演示。你评的是这份成果，四个人拿同一个分。但你不知道谁做了什么、谁只是把名字挂上、谁其实全程没参与。分工碎片化之后，<strong>"署名"和"真实贡献"被一步步剥离</strong>——这正是母文说的机制。产品是集体的，能力却是要长在每个具体的人身上的，而集体产品恰好把"能力在谁身上发生"这个问题彻底盖住了。</p>
+
+<h3>场景三：达标的答案，缺席的过程</h3>
+
+<p>一道需要推理的题，学生直接写出正确的最终答案，中间过程干净得没有一点摸索、试错、涂改的痕迹。传统上"答案对=会了"，但这个等号今天不成立了。正确答案可以被完整地供给，而<strong>得到答案的过程</strong>——那个真正标志"学习发生了"的东西——是空的。你评的是答案，看不见的恰恰是过程。</p>
+
+<p>这三种场景有一个共同结构：<strong>你能拿到的是产品，你评的也是产品，而"这产品和这个人的能力之间到底有没有连接"这件事，既没被问、也没有地方问</strong>。看清这一点，你就不会再把问题误判成"这个学生不老实"。它是制度层面的缺口，得用制度层面的动作去补。</p>
+
+<h2>二、分诊：区分"学习真在发生"与"连接被焊死"</h2>
+
+<p>看清了现象，第二步是学会分诊。注意：分诊的目的<strong>不是给学生贴"诚实/作弊"的标签</strong>，那是审判，不是教学，也基本判不准。分诊是判断另一件事——<strong>这份产出背后，那条"产品—学生"的连接，是活的还是焊死的</strong>。连接是活的，说明学习在发生，你只需正常评价；连接被焊死，说明产品和能力脱钩了，你需要启动重连的程序。</p>
+
+<p>下面是一套逐条的诊断问法。你不用全部用上，挑两三条当场问，看反应。关键不在答案对错，在于<strong>他能不能把这份产出重新"生长"一遍给你看</strong>。</p>
+
+<h3>诊断问法（当场口头，30 秒到 2 分钟）</h3>
+
+<p><strong>问路径，不问结论。</strong>"你先做的哪一部分？后来卡在哪儿了？"——学习真发生的人，脑子里有一条带弯路的路径；连接被焊死的人只有一个平整的成品，说不出弯路，因为他没走过。</p>
+
+<p><strong>问被删掉的版本。</strong>"你有没有哪个想法写了一半又放弃的？为什么放弃？"——真做过的人有"没被采用的方案"，那是思考的副产品；直接拿成品的人没有废稿，因为供给出来的东西不产生废稿。</p>
+
+<p><strong>问一个成品里没写的追问。</strong>随便指着一处："这里如果换成另一种情况，你的结论还成立吗？"——他若真理解，能就地往前推一步；他若只是搬运，会卡在成品的边界上，因为他掌握的只有那份文本本身。</p>
+
+<p><strong>问选择的理由。</strong>"你为什么用这个例子/这个方法，而不是别的？"——真做过的人有取舍，讲得出"我本来想用 A，但 A 有个毛病"；连接焊死的人只能复述结果，给不出取舍。</p>
+
+<p><strong>问用词的落地。</strong>作业里出现一个明显超出他日常水平的词或概念，直接问："这个词你给我用大白话讲一遍，再举个我们班的例子。"——概念真在他身上发生过，他能翻译、能落地；没发生过，他只能重复那个词。</p>
+
+<p>分诊的判读原则很简单：<strong>看他能不能重建过程，而不是看他能不能复述结果</strong>。结果是产品，谁都能持有；过程只属于真正走过的人。如果他三两句就能把弯路、废稿、取舍讲活，连接是通的，放心评价、甚至可以夸他。如果他每一问都退回到"成品上写的那样"，无法往外走一步，那不是他笨——是<strong>产品和他之间没有连接</strong>，这份产出没有经过他。这时候你要做的不是当场戳穿，而是转入第四、第六章的重连程序。</p>
+
+<h2>三、连接是怎么被焊死的</h2>
+
+<p>母文有一个重要判断：这条焊死的连接<strong>不是谁故意的决定，而是一整套结构对冲出来的稳态</strong>。教育里也一样。你要修它，就得先知道是哪几颗螺丝把它焊死的。拆开看，主要是三个机制在起作用。搞清机制，你才知道每一个杠杆该往哪儿使力。</p>
+
+<h3>机制一：只计结果，不看过程</h3>
+
+<p>我们的评分表几乎全部指向最终产出：字数够不够、结构全不全、答案对不对、格式规不规范。<strong>过程不进评价，等于过程不存在</strong>。一件事只要不被检验，它就会被系统性地忽略掉——学生很快学会"我只要把成品做好，中间怎么来的没人管"。于是过程被架空，产品成了唯一被看见的东西，而产品恰恰是最容易与人脱钩的那部分。这是焊死的第一颗螺丝：<strong>评价只聚焦最终文本</strong>，把最能证明"学习发生"的过程排除在外。</p>
+
+<h3>机制二：任务可被平滑外包</h3>
+
+<p>第二颗螺丝，是任务本身的设计让"外包"毫无摩擦。一道题只要满足三个条件，就可以被整份供给出去而不留痕迹：<strong>它有标准解、它不依赖这个学生的具体经历、它不要求任何过程留痕</strong>。"请论述某某的意义"就是这种任务——它对谁都一样，基底当然接得住，而且接得比学生还漂亮。母文讲的"劳动分工碎片化、批量制造证件合格的形式人"，在教育里就是：任务被设计成可以被任何人（或任何基底）无差别完成的形式，于是"谁做的"不再重要，产品与主体的连接自然松脱。任务越通用、越不粘人，连接就焊得越死。</p>
+
+<h3>机制三：无人愿追问</h3>
+
+<p>第三颗螺丝最隐蔽，也最结实：<strong>就算你起了疑，追问的成本高到让人放弃</strong>。你去问"这是不是你自己做的"，要冒得罪学生和家长的风险，要花额外的时间，可能还得面对"你凭什么怀疑我孩子"的对峙；而且一旦你认真追问一个，就等于承认过去那些你没追问的也有问题，动摇的是你自己一路以来的评分。母文说这套制度"自我维持，因为无人愿启动质疑"——在教育里，这就是那个让所有人心照不宣、集体不问的力量。<strong>不问，是最省事、最安全、最不得罪人的选择</strong>，于是大家都不问，连接就永远焊着。</p>
+
+<p>这三颗螺丝要连起来看：结果导向让过程消失，可外包设计让主体消失，无人追问让缺口固定。任何只拧其中一颗的做法都不牢——比如只喊"不许用 AI"，却既不看过程、又不改任务、又没人真去问，连接照样焊死。下一章的四个杠杆，就是分别对着这几颗螺丝下手。</p>
+
+<h2>四、核心重构：把"是不是你做的、你学到没有"重新问出来</h2>
+
+<p>重构的方向只有一个词：<strong>能力过程可见化</strong>。不是去辨认真假，而是让"能力有没有在这个学生身上发生"变成一件<strong>看得见、问得出、能被他自己辩护</strong>的事。下面四个杠杆，每一个都对着上一章的某颗螺丝，每一个都给你能明天就用的具体技术。</p>
+
+<h3>杠杆一：让过程留痕——把看不见的学习变成看得见的证据</h3>
+
+<p>第一颗螺丝是"过程不进评价"，那就让过程产生可评价的痕迹。<strong>不评产品，改评"产品是怎么长出来的"。</strong></p>
+
+<p>具体技术：<strong>要草稿和废稿</strong>。交终稿的同时交至少一版被否掉的思路，并写一句"我为什么放弃它"。真做过的人有废稿，直接供给的人没有。<strong>要过程时间线</strong>。让学生用三五句话记"我先做了什么、卡在哪、怎么过去的"，不要求漂亮，要求真实的弯路。<strong>要修改痕迹</strong>。在支持版本记录的写作工具里，一份从零逐步长起来的文档和一份整段粘贴进来的文档，成长曲线完全不同——你看的不是内容，是它<strong>生长的形状</strong>。<strong>阶段性交付</strong>。把一个大任务拆成"提纲—初稿—终稿"三次交，每次交的都是过程切片，事后无法一次性补齐，因为过程无法回填。</p>
+
+<p>要点：这些痕迹的作用不是抓人，是<strong>让连接显形</strong>。连接是活的，痕迹自然连贯；连接被焊死，痕迹会断裂、会突然从粗糙跳到完美，那个断口就是"是不是在发生"被问出来的地方。</p>
+
+<h3>杠杆二：让任务粘人——把可外包的题改成只有这个学生能做的题</h3>
+
+<p>第二颗螺丝是"任务可被平滑外包"，那就把任务改造得<strong>粘在这个具体的人身上</strong>，让通用供给失效。原则：<strong>越依赖这个学生的独特经历、当下情境、个人选择，越难被整份外包</strong>。</p>
+
+<p>具体技术：<strong>绑经历</strong>。"请分析某现象"改成"结合你自己上周的一次经历分析某现象"——基底不知道他上周经历了什么。<strong>绑现场</strong>。让任务用上今天课堂上刚发生的争论、刚做的实验数据、本地本校的具体情况，这些是外部供给拿不到的原料。<strong>绑选择并要求辩护</strong>。不问"标准答案是什么"，问"在这三个方案里你选哪个，为什么，你放弃的那个错在哪"——供给能给答案，给不了"你的取舍"。<strong>绑口头再生产</strong>。任何书面成果都附一个"当面讲清"的环节，写得出但讲不出，连接就现形了。</p>
+
+<p>要点：改造任务不是加大难度，是<strong>改变任务的类型</strong>——从"任何人都能无差别完成"改成"只有走过这段过程的这个人才能完成"。任务一旦粘人，产品和主体就自动重新连上了，你甚至不用额外去查。</p>
+
+<h3>杠杆三：把追问变成制度，而不是靠某个老师的勇气</h3>
+
+<p>第三颗螺丝是"无人愿追问"，因为追问靠个人、成本高、还得罪人。破法是：<strong>把追问变成对所有人一视同仁的固定程序，而不是针对某个可疑学生的突袭</strong>。这一步是整份手册的枢纽——母文的重构核心正是"让质疑进入一个可被启动的制度程序"。</p>
+
+<p>具体技术：<strong>设常规答辩</strong>。规定"凡重要成果，交完都要用两分钟当面讲一讲你的过程"，人人都讲，讲成常态。这样一来，问一个人不再意味着怀疑他，因为大家都被问；追问的社交成本被制度摊平了。<strong>公开规则</strong>。学期初就把"我们评的是过程和能力，不只是成品，所以会有过程留痕和当面讲述"写清楚、讲明白，让这套追问成为约定而非偷袭，学生和家长都事先知情、事先同意。<strong>标准化问法</strong>。用第二章那套问法做成固定清单，谁都按同一套问，避免"你是不是针对我"。</p>
+
+<p>要点：一旦追问是制度、是常态、是提前说好的规则，那个"无人愿启动质疑"的死结就解开了——因为启动质疑不再需要任何人鼓起勇气、也不再得罪任何人，它只是流程的一部分。</p>
+
+<h3>杠杆四：把 AI 从"替身"改造成"过程里被看见的一步"</h3>
+
+<p>前三个杠杆之外还有一个专门对着 AI 的杠杆。禁止是无效的（第七章会细说），真正有用的是<strong>把基底的使用拉进过程、拉进可见范围，让"用了什么、怎么用的、你在其中做了什么判断"本身成为被评价的东西</strong>。</p>
+
+<p>具体技术：<strong>要求申报</strong>。用了基底就写清楚"我在哪一步用的、让它做了什么、我拿到后改了什么、我为什么不采纳它的某个建议"。<strong>评判断而非评产出</strong>。当基底能生成成品，教学的重心就要上移到"你能不能判断这份成品好不好、能不能挑出它的错、能不能改进它"——把基底的输出当成学生要批判的对象，而不是可以直接上交的答案。<strong>让学生反驳基底</strong>。给一段基底生成的、故意有问题的内容，让学生指出哪里不对、为什么。他驳得动，说明能力在他身上；驳不动，说明他只会接收供给。</p>
+
+<p>要点：这个杠杆的精神和整份手册一致——<strong>不是要判定"用没用 AI"这个真假，而是要让"你在这份产出里到底做了什么、有没有能力发生"被问出来</strong>。用了基底不等于连接断了，关键是他在这个过程里有没有真的进行判断、取舍、改造。把这一步照亮，产品和主体就重新连上了。</p>
+
+<h2>五、课堂 / 学校 / 家庭工具箱</h2>
+
+<p>四个杠杆是原理，这一章给你分场景的现成工具和话术，拿去就能用。</p>
+
+<h3>课堂：老师能当场用的工具与话术</h3>
+
+<p><strong>两分钟过程口述。</strong>收作业时随机或全体，让学生用两分钟讲"你怎么做出来的、卡在哪、怎么过去的"。话术："不用讲结论，就讲你做的过程，越具体越好，包括你走的弯路。"</p>
+
+<p><strong>就地追问一步。</strong>指着成果里的一处，问一个成品没覆盖的追问。话术："这里如果情况变了，你的结论还成立吗？现在推给我听。"</p>
+
+<p><strong>废稿要求。</strong>话术："这次交作业，附上一个你想过但放弃的思路，写一句为什么放弃——放弃得有道理也算分。"这句话把"有过程"变成了被奖励的事。</p>
+
+<p><strong>课堂即时产出。</strong>关键能力留一部分在课堂当场做、当场写、当场说，不带回家。当场发生的过程，供给插不进来。</p>
+
+<p><strong>非对抗话术三句备用。</strong>怀疑时不要说"这是不是你自己做的"（对抗、且判不准），改说：其一，"你这份做得不错，来跟我讲讲你的思路，我想听你怎么想到的"；其二，"我们换个角度往前走一步，你试试"；其三，"这一段我很感兴趣，你多给我讲讲。"——把"审问"转成"请他把过程再生长一遍"，连接是活的自然接得住，是死的自然接不住，你不用戳穿，答案已经出来了。</p>
+
+<h3>学校：制度层面该装的工具</h3>
+
+<p><strong>过程留痕入评分标准。</strong>把"过程证据、当面讲述"正式写进评分表，占一定权重。不进评分表的东西，老师没有底气去要、学生没有动力去留。这是从制度上拧松第一颗螺丝。</p>
+
+<p><strong>重要成果答辩制。</strong>论文、大项目、重要作业设固定的简短答辩环节，全员参加，写成规程。让追问成为制度而非个人行为，拧松第三颗螺丝。</p>
+
+<p><strong>任务设计规范。</strong>给老师一份"粘人任务"改造指引：能绑经历就绑经历、能绑现场就绑现场、能要辩护就要辩护，减少纯通用题。从命题源头拧松第二颗螺丝。</p>
+
+<p><strong>AI 使用申报规范。</strong>全校统一"用了要申报、评判断不评产出"的规则并公开告知，把基底拉进可见范围，而不是假装它不存在。</p>
+
+<h3>家庭：家长能做的与不能做的</h3>
+
+<p><strong>能做：问过程，不问分数。</strong>话术："今天这个是怎么想出来的？""哪一步最难？"——家长每天问过程，等于在家庭里也维护着那条连接。</p>
+
+<p><strong>能做：让孩子讲给你听。</strong>不懂没关系，让他把作业"讲明白"给你，讲得出说明学到了，讲不出你就知道该关注了。</p>
+
+<p><strong>能做：允许并欣赏弯路和废稿。</strong>话术："你放弃的那个想法也很好，说说为什么不用它。"让孩子知道过程本身有价值，他才不会只追求一份漂亮成品。</p>
+
+<p><strong>不能做：替他把产品做完美。</strong>家长代劳和 AI 代劳，对连接的伤害是一样的——产品合格了，能力却没在孩子身上发生。<strong>要帮的是过程，不是产品。</strong></p>
+
+<h2>六、落地流程：从诊断到重建连接</h2>
+
+<p>把上面的东西串成一条你能照着走的路。不用一次全上，按这个顺序推进最省力。</p>
+
+<p><strong>第一步：选一个真需要能力发生的任务。</strong>不是所有作业都值得上这套程序。挑那些"你真正在乎学生学没学到"的关键任务先做，把力气用在刀刃上。</p>
+
+<p><strong>第二步：把任务改粘人。</strong>动手前先用杠杆二改造题目——绑经历、绑现场、绑选择。源头改一次，后面省很多力，因为粘人的任务本身就把大半连接问题挡在门外了。</p>
+
+<p><strong>第三步：提前公开规则。</strong>动手前把"我们评过程和能力、会有留痕和当面讲述"讲清楚，让学生和家长事先知情、事先同意。这一步决定了后面的追问是"约定"还是"突袭"，千万不能省。</p>
+
+<p><strong>第四步：收过程证据，不只收成品。</strong>按杠杆一要草稿、废稿、时间线、修改痕迹或阶段交付。收上来的是过程，不是孤零零一个产品。</p>
+
+<p><strong>第五步：全员做简短过程口述。</strong>按杠杆三，人人两分钟讲过程。全员参加是关键——它把追问的成本摊平，让没有人觉得"被针对"。</p>
+
+<p><strong>第六步：分诊。</strong>用第二章的问法判读：连接是活的（能重建过程）还是焊死的（只能复述结果）。记住判读的是连接，不是人品。</p>
+
+<p><strong>第七步：分流处理。</strong>连接是活的——正常评价，并且明确肯定他的过程，让"好好走过程"这件事被奖励。连接被焊死——<strong>不当场审判、不羞辱</strong>，转入重连：给他一次当面把这份任务的一小块真正做出来、讲出来的机会，把重点从"你是不是骗了我"挪到"我要看着学习在你身上发生一次"。教育的目的是让能力发生，不是定罪。</p>
+
+<p><strong>第八步：把有效的做法固化成常规。</strong>哪套问法好用、哪种留痕要求学生接受度高，留下来，变成你和这个班的固定约定。一旦成为常规，追问就不再需要每次鼓起勇气，那颗最结实的螺丝就长期松着了。</p>
+
+<h2>七、必须避开的误区</h2>
+
+<p>这套东西做歪了，比不做还糟。四条最容易踩的坑，逐一说清。</p>
+
+<h3>误区一：以为禁掉 AI 就够了</h3>
+
+<p>最普遍的误判。"不许用 AI"既管不住（你查不出、也管不了校外），也没触到问题的根。母文说得很清楚：焊死连接的是<strong>制度结构</strong>——只看结果、任务可外包、无人追问。就算真禁掉了基底，这三颗螺丝还在，学生照样可以找人代做、可以抄、可以只交一份没有过程的漂亮成品。<strong>真正要修的是"过程—主体"的连接，不是封堵某个工具。</strong>把注意力全放在"禁没禁住 AI"上，等于盯着一个假问题，放过了真缺口。</p>
+
+<h3>误区二：把过程可见化做成监控</h3>
+
+<p>第二个致命坑。一听"让过程可见"，有人就去装监控、录屏、盯着学生的一举一动，防他作弊。这条路彻底错了，而且会毁掉信任。母文的方向是<strong>让"是不是在发生"被问出来</strong>，是一种<strong>可被学生辩护的检验</strong>——学生有机会讲、有机会证明自己确实做了、确实学到了，这是给他<strong>说话和自证的权利</strong>。监控是反过来的：默认你有罪、剥夺你辩护、把师生变成猫鼠。<strong>过程可见化的主角是学生的讲述和证据，不是老师的摄像头。</strong>一旦变成监控，你收获的是恐惧和更高明的应付，不是学习。</p>
+
+<h3>误区三：把分诊变成审判，急着抓假</h3>
+
+<p>第三个坑，是把"分诊连接"做成了"审判人品"，一心想抓出谁作弊。母文反复强调：<strong>目标不是辨认真假，而是让能力过程可见</strong>。你判不准真假，判错一个学生的代价极大，而且就算判准了，抓出来也不等于他学会了。分诊的落点始终是<strong>连接通不通、要不要重连</strong>，不是"抓不抓得到"。一旦你的心思滑向抓假，你会开始怀疑无辜的人、会伤害信任、会把课堂变成审讯室——而那个真正重要的问题"能力有没有在他身上发生"，反而被你丢掉了。</p>
+
+<h3>误区四：只增加环节，不改评价重心</h3>
+
+<p>第四个坑最隐蔽：你加了口述、加了草稿、加了答辩，一堆新环节，但评分时还是几乎只看成品好不好，过程只是走个形式、不真的算分。这样学生一眼看穿——过程留痕是负担，成品才是命根子，他会继续把力气全砸在把成品做漂亮上，甚至连留痕都外包。<strong>可见化必须真的进入评价重心，让"过程和能力"实打实地占分，让"好好走过程"比"交一份完美成品"更划算。</strong>否则你只是给焊死的连接刷了层新漆，螺丝一颗没松。</p>
+
+<h2>八、一张随身检查清单</h2>
+
+<p>把整份手册压缩成七个问题。收到任何一份重要产出，从上到下问自己一遍。答不上来的地方，就是那条连接还焊着、需要你下手的地方。</p>
+
+<p><strong>第一问：我评的是产品，还是产品和这个学生的连接？</strong>如果我只看了成品好不好，就完全没碰"是不是他做的、他学没学到"——那连接还是焊死的。</p>
+
+<p><strong>第二问：这份产出的过程，我有没有任何证据？</strong>草稿、废稿、时间线、修改痕迹、当面讲述——一样都没有，我就只握着一个可以属于任何人的产品。</p>
+
+<p><strong>第三问：这个任务，能不能被整份外包而不留痕？</strong>如果能，问题不在学生，在我的题目太通用、不够粘人，得回去改。</p>
+
+<p><strong>第四问：他能不能把这份产出重新生长一遍给我看？</strong>能重建过程、讲得出弯路和取舍，连接是活的；只能复述成品，连接被焊死了。</p>
+
+<p><strong>第五问：我的追问，是制度还是靠我一个人的勇气？</strong>如果只有我偶尔凭感觉去问、别人都不问、学生也没被提前告知，这颗螺丝迟早还会焊回去。</p>
+
+<p><strong>第六问：我在做可见化，还是在做监控？</strong>我是给了学生讲述和自证的机会，还是在盯防他、默认他有罪？后者要立刻停。</p>
+
+<p><strong>第七问：说到底，我问出"是不是在他身上发生"了吗？</strong>这是唯一的总问题。如果我从头到尾都在判"产品好不好""是真是假"，而始终没有问出"学习有没有真的在这个人身上发生过"——那我就还停在那条焊死的连接前面，一步都没往前走。</p>
+
+<p>这七问不需要你成为侦探，也不需要你多花几倍的时间。它只要求你把注意力，从那份漂亮的产品上，挪回到做产品的那个具体的人身上——挪回到母文那句话上：<strong>不是要看见真的，是要让"是不是在发生"被问出来。</strong>你每问出一次，就有一条被焊死的连接，重新变成活的。</p>
+</div>
+<div class="endbox"><div class="lbl">这是《看到那个焊死的连接》的一篇应用实践文</div><div class="big">回到母文，看它从何而来</div>
+  <p>本手册的每一步操作，都源自母文的核心机制。读懂母文，这套工具会用得更准。</p>
+  <a class="solid" href="/column/welded-connection/">阅读母文《看到那个焊死的连接》 →</a><a class="ghost" href="/column/">更多长文专栏 →</a></div>
+<footer>© 德麦国际 Demai International · 焊死的连接应用实践 · <a href="/">sdeuniverses.com</a></footer>
+<style id="sde-polish-v1">
+#sde-progress{position:fixed;top:0;left:0;height:3px;width:0;background:var(--link);z-index:99}
+.wrap h2{position:relative;scroll-margin-top:74px}
+.wrap h3{scroll-margin-top:74px}
+.wrap p strong{background:linear-gradient(transparent 74%,rgba(79,195,247,0.28) 0);padding:0 1px}
+.abstract{box-shadow:0 3px 16px rgba(15,44,74,.06)}
+#sde-toc{position:fixed;left:20px;top:112px;width:196px;max-height:calc(100vh - 170px);overflow-y:auto;font-size:12.5px;line-height:1.65;z-index:15;display:none}
+#sde-toc .t-h{font-size:11px;letter-spacing:.32em;color:var(--teal2);margin-bottom:9px}
+#sde-toc a{display:block;color:var(--muted);padding:3px 0 3px 10px;border-left:2px solid rgba(15,44,74,.10);text-decoration:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#sde-toc a.on{color:var(--link);border-left-color:var(--link);font-weight:700}
+@media(min-width:1420px){#sde-toc{display:block}}
+#sde-top{position:fixed;right:22px;bottom:26px;width:42px;height:42px;border-radius:50%;background:var(--btn);color:#fff;border:none;font-size:18px;line-height:1;cursor:pointer;opacity:0;pointer-events:none;transition:opacity .25s;z-index:30;box-shadow:0 4px 14px rgba(15,44,74,.2)}
+#sde-top.show{opacity:.94;pointer-events:auto}
+@media print{.readbar,#sde-toc,#sde-top,#sde-progress,.endbox,footer{display:none!important}body{background:#fff!important}}
+</style>
+<script id="sde-polish-v1-js">
+(function(){
+if(document.getElementById('sde-progress'))return;
+var bar=document.createElement('div');bar.id='sde-progress';document.body.appendChild(bar);
+var top=document.createElement('button');top.id='sde-top';top.textContent='\u2191';top.setAttribute('aria-label','\u56de\u5230\u9876\u90e8');document.body.appendChild(top);
+top.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'});});
+var hs=[].slice.call(document.querySelectorAll('.wrap h2'));
+var toc=null,links=[];
+if(hs.length>=4){
+  toc=document.createElement('nav');toc.id='sde-toc';
+  var lb=document.createElement('div');lb.className='t-h';lb.textContent='\u76ee \u5f55';toc.appendChild(lb);
+  hs.forEach(function(h,i){
+    if(!h.id)h.id='sec-'+(i+1);
+    var a=document.createElement('a');a.href='#'+h.id;
+    a.textContent=h.textContent.replace(/^[\u4e00-\u9fff]{1,3}\u3001/,'');
+    links.push(a);toc.appendChild(a);
+  });
+  document.body.appendChild(toc);
+}
+function onScroll(){
+  var d=document.documentElement,max=d.scrollHeight-window.innerHeight,y=window.scrollY||d.scrollTop;
+  bar.style.width=(max>0?Math.min(100,y/max*100):0)+'%';
+  if(y>600){top.classList.add('show');}else{top.classList.remove('show');}
+  if(toc){var cur=-1;for(var i=0;i<hs.length;i++){if(hs[i].getBoundingClientRect().top<140)cur=i;}
+    links.forEach(function(a,i){a.className=(i===cur?'on':'');});}
+}
+window.addEventListener('scroll',onScroll,{passive:true});window.addEventListener('resize',onScroll);onScroll();
+})();
+</script>
+</body></html>
