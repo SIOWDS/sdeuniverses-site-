@@ -268,103 +268,111 @@
    "papers": [
     {
      "date": "2026-07-17",
-     "words": 13331
-    },
-    {
-     "date": "2026-07-17",
-     "words": 11005
-    },
-    {
-     "date": "2026-07-17",
-     "words": 10596
-    },
-    {
-     "date": "2026-07-17",
-     "words": 9055
-    },
-    {
-     "date": "2026-07-17",
-     "words": 7693
-    },
-    {
-     "date": "2026-07-17",
-     "words": 7251
-    },
-    {
-     "date": "2026-07-17",
-     "words": 7230
-    },
-    {
-     "date": "2026-07-17",
-     "words": 7089
-    },
-    {
-     "date": "2026-07-17",
-     "words": 6382
-    },
-    {
-     "date": "2026-07-17",
-     "words": 266
-    },
-    {
-     "date": "2026-07-17",
-     "words": 221
-    },
-    {
-     "date": "2026-07-17",
-     "words": 145
-    },
-    {
-     "date": "2026-07-14",
-     "words": 14478
-    },
-    {
-     "date": "2026-07-14",
-     "words": 11175
-    },
-    {
-     "date": "2026-07-14",
-     "words": 10325
-    },
-    {
-     "date": "2026-07-14",
-     "words": 9871
-    },
-    {
-     "date": "2026-07-14",
-     "words": 9244
-    },
-    {
-     "date": "2026-07-13",
-     "words": 4016
-    },
-    {
-     "date": "2026-07-13",
-     "words": 754
-    },
-    {
-     "date": "2026-07-13",
-     "words": 223
-    },
-    {
-     "date": "2026-07-13",
-     "words": 162
-    },
-    {
-     "date": "2026-07-13",
-     "words": 128
-    },
-    {
-     "date": "2026-07-13",
-     "words": 125
+     "words": 14262
     },
     {
      "date": "2026-07-14",
      "words": 9307
     },
     {
+     "date": "2026-07-17",
+     "words": 5985
+    },
+    {
+     "date": "2026-07-17",
+     "words": 5987
+    },
+    {
+     "date": "2026-07-17",
+     "words": 5371
+    },
+    {
+     "date": "2026-07-17",
+     "words": 7439
+    },
+    {
+     "date": "2026-07-17",
+     "words": 5964
+    },
+    {
+     "date": "2026-07-17",
+     "words": 14172
+    },
+    {
+     "date": "2026-07-17",
+     "words": 8145
+    },
+    {
+     "date": "2026-07-14",
+     "words": 14879
+    },
+    {
+     "date": "2026-07-17",
+     "words": 8246
+    },
+    {
      "date": "2026-07-13",
      "words": 3714
+    },
+    {
+     "date": "2026-07-14",
+     "words": 10686
+    },
+    {
+     "date": "2026-07-17",
+     "words": 11645
+    },
+    {
+     "date": "2026-07-14",
+     "words": 8516
+    },
+    {
+     "date": "2026-07-14",
+     "words": 10281
+    },
+    {
+     "date": "2026-07-17",
+     "words": 9461
+    },
+    {
+     "date": "2026-07-13",
+     "words": 240,
+     "type": "poem"
+    },
+    {
+     "date": "2026-07-17",
+     "words": 231,
+     "type": "poem"
+    },
+    {
+     "date": "2026-07-13",
+     "words": 178,
+     "type": "poem"
+    },
+    {
+     "date": "2026-07-13",
+     "words": 640,
+     "type": "poem"
+    },
+    {
+     "date": "2026-07-17",
+     "words": 144,
+     "type": "poem"
+    },
+    {
+     "date": "2026-07-13",
+     "words": 141,
+     "type": "poem"
+    },
+    {
+     "date": "2026-07-13",
+     "words": 147,
+     "type": "poem"
+    },
+    {
+     "date": "2026-07-17",
+     "words": 276,
+     "type": "poem"
     }
    ]
   },
@@ -660,5 +668,5 @@
    "papers": []
   }
  ],
- "score_formula": "v1: per-paper 10 * 0.5^(age_days/60) * clamp(sqrt(words/10000),0.6,1.8), summed, plus 4 per distinct active month (cap 20)"
+ "score_formula": "v2: per-paper 10 * 0.5^(age_days/60) * depth, where depth = clamp(sqrt(words/10000),0.6,1.8) for prose and fixed 1.0 for poems (type=poem, weighed as a standard paper), summed, plus 4 per distinct active month (cap 20)"
 }
