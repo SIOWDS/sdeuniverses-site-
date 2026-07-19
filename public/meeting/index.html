@@ -63,6 +63,19 @@ input.txt:focus{border-color:var(--mtg)}
 .notes li{margin-bottom:0.45rem}
 footer{border-top:1px solid var(--border2);padding:2rem 24px;text-align:center;font-size:0.75rem;color:var(--muted)}
 footer a{color:var(--gold);text-decoration:none}
+.rbanner{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;background:var(--mtg);color:#F5F1E6;border-radius:10px;padding:1rem 1.4rem;margin:0 0 1.8rem;font-size:0.95rem}
+.rbanner b{letter-spacing:0.04em}
+.rbanner .btn{background:#F5F1E6;color:var(--mtg);border-color:#F5F1E6}
+.rbanner .btn:hover{background:#fff}
+.invite{background:var(--mtg-soft);border:1px solid var(--mtg);border-radius:10px;padding:1.3rem 1.5rem;margin-bottom:1.2rem}
+.invite-h{font-weight:800;color:var(--mtg);margin-bottom:0.8rem;font-size:1rem}
+.invite-row{display:flex;gap:12px;align-items:baseline;padding:0.35rem 0;flex-wrap:wrap}
+.invite-k{font-size:0.78rem;color:var(--text2);min-width:64px;letter-spacing:0.08em}
+.invite-row b{font-size:1.08rem;letter-spacing:0.04em;word-break:break-all}
+.invite-row a{word-break:break-all;font-size:0.9rem}
+.invite-btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:0.9rem}
+.sch-out{display:none;width:100%;margin-top:12px;min-height:120px;font:inherit;font-size:0.85rem;color:var(--text);background:#fff;border:1px solid var(--border);border-radius:6px;padding:0.7rem 0.9rem;line-height:1.7;resize:vertical;box-sizing:border-box}
+@media(max-width:640px){.invite-btns .btn{flex:1}}
 @media(max-width:640px){input.txt{min-width:0;width:100%}.row{flex-direction:column;align-items:stretch}}
 </style>
 </head>
@@ -83,6 +96,55 @@ footer a{color:var(--gold);text-decoration:none}
 </header>
 
 <main>
+
+<!-- 深链横幅：从邀请链接进来时出现 -->
+<div class="rbanner" id="roomBanner" style="display:none">
+  <div>有人邀请你加入会议 <b id="rb-room"></b></div>
+  <button class="btn" onclick="enterInvited()">进入会议</button>
+</div>
+
+<!-- ⓪ 开设会议（主持人） -->
+<section class="blk" id="host">
+  <div class="blk-label">开设会议 · Host a Meeting</div>
+  <h2>开一个新会议</h2>
+  <p class="lead">像 Zoom 一样：点一下就开一个新会议室，拿到会议号和邀请链接发给学生。谁先进谁就是主持人——可一键静音全员、给房间加密码、管理参会者。音视频经 Jitsi 在浏览器间直传，本站不架设、不经手、不录制。</p>
+
+  <div class="room-card">
+    <h3>立即开会</h3>
+    <p>马上开一个新房间，生成专属会议号与邀请链接。</p>
+    <div class="row">
+      <button class="btn" onclick="hostNow()">立即开会</button>
+      <input class="txt" id="hostName" maxlength="30" placeholder="或给会议起个名字，如 daoism-lecture">
+      <button class="btn ghost" onclick="hostNamed()">用这个名字开</button>
+    </div>
+    <div class="hintline">起名建议用字母/数字（更好念、更好输）；留空则自动生成会议号。</div>
+  </div>
+
+  <!-- 邀请信息卡（开会后出现） -->
+  <div class="invite" id="invite" style="display:none">
+    <div class="invite-h">会议已开好 · 把下面的信息发给学生</div>
+    <div class="invite-row"><span class="invite-k">会议号</span><b id="inv-room"></b></div>
+    <div class="invite-row"><span class="invite-k">邀请链接</span><a id="inv-link" href="#" target="_blank" rel="noopener"></a></div>
+    <div class="invite-btns">
+      <button class="btn" onclick="enterHosted()">进入会议室（成为主持人）</button>
+      <button class="btn ghost" onclick="copyLink()">复制邀请链接</button>
+      <button class="btn ghost" onclick="copyInvite()">复制邀请文字</button>
+    </div>
+    <div class="hintline" id="inv-msg"></div>
+  </div>
+
+  <div class="room-card">
+    <h3>预约会议</h3>
+    <p>先约好时间，把邀请发到讨论区或群里；到点用同一个链接进入即可。</p>
+    <div class="row">
+      <input class="txt" id="schTopic" maxlength="40" placeholder="会议主题，如 SDE 本体论第三讲">
+      <input class="txt" id="schTime" type="datetime-local" style="min-width:210px">
+      <button class="btn ghost" onclick="scheduleMeet()">生成预约邀请</button>
+    </div>
+    <textarea id="schOut" class="sch-out" readonly></textarea>
+    <div class="row" id="schBtns" style="display:none;margin-top:8px"><button class="btn ghost" onclick="copySchedule()">复制预约邀请</button></div>
+  </div>
+</section>
 
 <!-- ① 视频讲课 -->
 <section class="blk" id="video">
@@ -324,6 +386,63 @@ function openZoom(){
   if(!/^https:\/\/([a-z0-9-]+\.)*zoom\.(us|com)\//i.test(v)){alert("请粘贴以 https://zoom.us/ 或 https://…zoom.us/ 开头的会议链接");return}
   window.open(v,"_blank","noopener");
 }
+// ===== 开设会议（主持人）=====
+var HOSTED_ROOM="";
+function genRoom(){var A="abcdefghjkmnpqrstuvwxyz23456789",s="";for(var i=0;i<6;i++)s+=A[Math.floor(Math.random()*A.length)];return "SDE-"+s;}
+function inviteUrl(room){return location.origin+"/meeting/?room="+encodeURIComponent(room);}
+function showInvite(room){
+  HOSTED_ROOM=room;
+  document.getElementById("inv-room").textContent=room;
+  var u=inviteUrl(room),a=document.getElementById("inv-link");
+  a.textContent=u;a.href=u;
+  document.getElementById("inv-msg").textContent="";
+  var card=document.getElementById("invite");card.style.display="block";
+  card.scrollIntoView({behavior:"smooth",block:"center"});
+}
+function hostNow(){showInvite(genRoom());}
+function hostNamed(){
+  var v=(document.getElementById("hostName").value||"").trim();
+  if(!v){hostNow();return;}
+  var slug=v.replace(/\s+/g,"-").replace(/[^A-Za-z0-9\u4e00-\u9fff-]/g,"").replace(/-+/g,"-").replace(/^-|-$/g,"");
+  if(!slug){hostNow();return;}
+  showInvite(/^sde-/i.test(slug)?slug:("SDE-"+slug));
+}
+function enterHosted(){if(HOSTED_ROOM)joinRoom(HOSTED_ROOM);}
+function fallbackCopy(t,msgEl){
+  var ta=document.createElement("textarea");ta.value=t;ta.style.position="fixed";ta.style.opacity="0";document.body.appendChild(ta);ta.focus();ta.select();
+  try{document.execCommand("copy");if(msgEl)msgEl.textContent="已复制。";}catch(e){if(msgEl)msgEl.textContent="复制失败，请手动选中复制。";}
+  document.body.removeChild(ta);
+}
+function copyText(t,msgEl){
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(function(){if(msgEl)msgEl.textContent="已复制。";},function(){fallbackCopy(t,msgEl);});}
+  else fallbackCopy(t,msgEl);
+}
+function copyLink(){copyText(inviteUrl(HOSTED_ROOM),document.getElementById("inv-msg"));}
+function copyInvite(){
+  var u=inviteUrl(HOSTED_ROOM);
+  var t="【SDE 会议邀请】\n会议号："+HOSTED_ROOM+"\n进入链接："+u+"\n用浏览器打开链接即可，无需安装。首次进入请允许摄像头与麦克风。";
+  copyText(t,document.getElementById("inv-msg"));
+}
+function scheduleMeet(){
+  var topic=(document.getElementById("schTopic").value||"").trim()||"SDE 会议";
+  var when=document.getElementById("schTime").value;
+  var room=genRoom(),u=inviteUrl(room);
+  var whenStr=when?when.replace("T"," "):"（时间待定）";
+  var t="【SDE 会议预约】\n主题："+topic+"\n时间："+whenStr+"\n会议号："+room+"\n进入链接："+u+"\n到点用浏览器打开链接即可，无需安装。";
+  var out=document.getElementById("schOut");out.value=t;out.style.display="block";
+  document.getElementById("schBtns").style.display="flex";
+}
+function copySchedule(){copyText(document.getElementById("schOut").value,null);var b=document.querySelector("#schBtns button");if(b){var o=b.textContent;b.textContent="已复制";setTimeout(function(){b.textContent=o;},1500);}}
+// ===== 邀请深链：?room= 进来时提示进入 =====
+function enterInvited(){if(window.__invitedRoom)joinRoom(window.__invitedRoom);}
+(function(){try{
+  var rp=new URLSearchParams(location.search).get("room");
+  if(rp&&/^[A-Za-z0-9\u4e00-\u9fff-]{1,60}$/.test(rp)){
+    window.__invitedRoom=rp;
+    document.getElementById("rb-room").textContent=rp;
+    document.getElementById("roomBanner").style.display="flex";
+  }
+}catch(e){}})();
 </script>
 
 </body>
