@@ -59,6 +59,20 @@ b{color:var(--gold)}
 
 footer{background:var(--ink);color:#8B7E5E;text-align:center;padding:34px 0 44px;font-size:13px;letter-spacing:0.08em}
 footer a{color:#B4A780}
+
+/* ===== 统稿增补 ===== */
+.lead{max-width:720px;margin:0 auto;padding:30px 24px 0}
+.innov{background:linear-gradient(135deg,#9A7B43,#6F5326 60%,#4C3A1A);border-radius:12px;padding:24px 28px;margin:0 0 22px;box-shadow:0 8px 30px rgba(76,58,26,0.25)}
+.innov .lbl{font-size:12px;letter-spacing:0.28em;color:#E8D9B0;margin-bottom:12px;font-weight:700}
+.innov .lbl::before{content:"✦ ";color:#FFE9A8}
+.innov .txt{font-size:16.5px;line-height:1.92;color:#FBF5E6}
+.innov .txt b{color:#FFE6A0;font-weight:700}
+.daodu{background:#FBF6EA;border:1px solid rgba(154,123,67,0.3);border-left:4px solid #9A7B43;border-radius:10px;padding:24px 28px;margin:0 0 6px}
+.daodu .lbl{display:inline-block;font-size:12px;letter-spacing:0.22em;color:#FBF6EA;background:#9A7B43;padding:5px 14px;border-radius:20px;margin-bottom:14px;font-weight:700}
+.daodu h4{font-size:17.5px;color:#4A3618;margin:0 0 16px;font-weight:800}
+.daodu .row{margin:12px 0;line-height:1.88;color:#5A4A30;font-size:15.5px}
+.daodu .row .k{color:#7A5C2A;font-weight:800}
+.hl2{background:rgba(154,123,67,0.16);border-bottom:2px solid #9A7B43;padding:1px 4px;font-weight:700;color:#4A3618;border-radius:2px}
 </style>
 </head>
 <body>
@@ -79,14 +93,26 @@ footer a{color:#B4A780}
     <div class="art-meta">王德生 著 · SDE Universes 专栏 · 三维九宫第八格 · 2026年7月 · 约万字</div>
   </div>
 </header>
-
+<div class="lead">
+<div class="innov">
+  <div class="lbl">这篇文章的思想创新</div>
+  <div class="txt">香农模型是一套"管道模型"——信息像水从发送端流到接收端，管道只负责搬运、不关心水本身是什么。它完美回答了"如何高效无损传输信号"，却<b>刻意绕开了一个更根本的问题：信息作为一样东西，它本身是什么？</b>香农本人清醒地知道自己剥离了"意义"，可后来这个被抽掉意义的"信息"被越用越广。本文把信息还原为三种模态——<b>符号、逻辑、数学</b>，并指出：连"逻辑"，都不止一套。</div>
+</div>
+<div class="daodu">
+  <span class="lbl">导读 · 300字</span>
+  <h4>这篇文章的价值与意义 —— 它能解决你的什么问题</h4>
+<div class="row"><span class="k">理论问题：</span>它把"信息"从香农的纯传输量（剥离意义）扩展为携带意义的三种模态（符号、逻辑、数学），并挑战"逻辑只有一套"的默认——逻辑本身是三界化的。</div>
+<div class="row"><span class="k">现实问题：</span>它提醒你，在一个"信息＝可传输数据"观念泛滥的时代，我们正把"意义"当成可有可无的附加物丢掉——而意义恰恰是信息之所以是信息的核心。</div>
+<div class="row"><span class="k">自我精神问题：</span>当你不再把接收到的信息当成中性的数据流，而追问"它意味着什么、它从哪来、它和我什么关系"，你就从信息的被动管道，变回了意义的主动生成者。</div>
+</div>
+</div>
 <article class="wrap">
 
 <div class="part">
   <div class="part-num">壹 · 一个被跳过的谜</div>
   <h2>信息，真的只是管道里搬运的信号吗</h2>
   <p class="lead">信息是什么？上世纪那位天才香农，给了一个改变世界的答案：信息，是消除不确定性的比特，是能被压缩、被编码、在管道里传输的信号。这个答案精确、强大，撑起了整个数字时代。可它，也漏掉了信息最要命的一面。</p>
-  <p>香农的模型，是一套"管道模型"：信息像水，从一头（发送者）流经管道，到另一头（接收者），管道只负责搬运，不关心水本身是什么。这套模型，对"如何高效、无损地传输信号"这个工程问题，回答得完美无缺。可它有意地、也必须地，绕开了一个更根本的问题：信息，作为一样东西，它本身是什么？它从哪里来？它和意义、和这个世界，是什么关系？</p>
+  <p>香农的模型，是一套"管道模型"：信息像水，从一头（发送者）流经管道，到另一头（接收者），管道只负责搬运，不关心水本身是什么。这套模型，对"如何高效、无损地传输信号"这个工程问题，回答得完美无缺。可它有意地、也必须地，绕开了一个更根本的问题：<span class="hl2">信息，作为一样东西，它本身是什么？</span>它从哪里来？它和意义、和这个世界，是什么关系？</p>
   <p>有意思的是，香农本人对此，比后来许多滥用他理论的人，要清醒得多。他明确说过，他这套理论里的"信息"，是一个纯技术概念，刻意剥离了"意义"——他关心的只是信号如何被可靠地传输，而信号"意味着什么"，不在他的问题之内。这本是一种严谨的自我设限。可后来，这个被抽掉了意义的"信息"，被越用越广，渐渐地，人们开始误以为"信息"就只是比特、就只是可传输的信号，仿佛意义是可有可无的添头。于是我们迎来了一个信息爆炸、却意义稀缺的时代：管道里流淌的比特，前所未有地多；而这些比特，究竟意味着什么、从哪来、朝哪去，反而越来越没人问了。这一格，正是要把那个被抽掉的问题，重新捡回来。</p>
   <p>这一格要给的答案，和管道模型是两条路：<b>信息，不是中性地被搬运的信号，而是上一格那捧土壤（特征纠缠），转过身来、朝着"可把握、可传递"那一面，显示出的一副面孔。</b>纠缠本身，是活的、私有的、浑然一体的；可当它转过来、朝着"能被认住、能被传开"那一面显示自己时，它就成了信息。信息，是纠缠的一种"展示态"。</p>
   <p>而更反常识的是：这副面孔，不是只有一种模样，而是有三种截然不同的模样——符号、逻辑、数学。它们正是我们在显露之维（S2）见过的那三副面孔：粒子、波、场，在这里，作为"信息的三种模态"，再次登场。这一格，就带你看清这三种模样各是什么；并且，会撞见一个足以颠覆你直觉的判断：<b>连"逻辑"，都不是只有一套放之四海而皆准的——每一束纠缠，都有它自己的本地逻辑。</b></p>
