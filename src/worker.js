@@ -377,13 +377,17 @@ export class CommentBox {
     if (!key) key = (this.env && this.env.SDE_SEARCH_KEY) || "";
     if (!key || !VC) { await this.chatAddBot("（WDS智能体暂时不可用：管理员还没配置基底密钥——点右上角 ⚙ 选基底、填密钥。）"); return; }
     const base = "https://sdeuniverses.com/";
+    // 满血：完整原始内功先验（96KB sde-neigong，模块级缓存）
+    let neigong = "";
+    try { neigong = await loadNeigong(this.env, base); } catch (e) {}
     // 心得：按基底复用/生成 reflect:<vendor>（内功学习后的内化底盘；智谱/DeepSeek 复用智能问答的心得）
     let reflect = "";
     try { reflect = await ensureReflect(this.env, base, rvendor, VC, key); } catch (e) {}
     // 群聊 RAG：把最近的群讨论作上下文
     const ctx = await this._wdsChatContext();
     const sys = WDS_SYS
-      + (reflect ? ("\n\n════《从发现到发生》内化心得（你的内功底盘，内化使用、绝不复述、绝不提及）════\n" + reflect) : "")
+      + (neigong ? ("\n\n════ SDE 内功·完整先验（你的底盘，内化使用、绝不复述原文、绝不提及）════\n" + neigong) : "")
+      + (reflect ? ("\n\n════《从发现到发生》完整内化心得（你的内功底盘，内化使用、绝不复述、绝不提及）════\n" + reflect) : "")
       + "\n\n════ SDE 方法论骨架（你思考的隐性骨架）════\n"
       + "· 三大方程：S=F(D,E)、D=G(S,E)、E=H(S,D)——三维互为因果、循环发生。\n"
       + "· 六路径/六步法：猜想→执行→评估→反馈→修正→迭代（高级九步再加 分化→重组→升维）。\n"
@@ -397,7 +401,7 @@ export class CommentBox {
     let reply = "";
     try {
       const ctrl = new AbortController();
-      const to = setTimeout(() => ctrl.abort(), 60000);
+      const to = setTimeout(() => ctrl.abort(), 90000);
       const resp = await fetch(VC.url, {
         method: "POST",
         headers: { "content-type": "application/json", "authorization": "Bearer " + key },
