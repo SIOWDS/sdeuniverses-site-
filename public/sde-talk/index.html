@@ -68,6 +68,7 @@ a{color:var(--accent);text-decoration:none}
 .toolbar .wtool{background:#FBF3E2;border-color:var(--gold)}
 .toolbar .wtool-q{background:#FDF1DE;border-color:#C88A2A}
 .toolbar .wtool-p{background:#E8EEF6;border-color:#2E4B78}
+.toolbar .wtool-d{background:#EAF3EE;border-color:#2A6B4A}
 .emoji-panel{display:none;flex-wrap:wrap;gap:2px;max-height:130px;overflow-y:auto;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:6px;margin-bottom:8px}
 .emoji-panel.on{display:flex}
 .emoji-panel span{font-size:22px;cursor:pointer;padding:3px 5px;border-radius:6px;line-height:1}
@@ -127,6 +128,8 @@ select.cfg-in{appearance:auto;-webkit-appearance:menulist;cursor:pointer}
       <button type="button" class="wtool" id="btn-wds" title="问 WDS · 满血深答">🤖</button>
       <button type="button" class="wtool wtool-q" id="btn-wds-quick" title="问 WDS · 快答（秒回）">⚡</button>
       <button type="button" class="wtool wtool-p" id="btn-paper" title="提炼讨论成论文（PDF）">📝</button>
+      <button type="button" class="wtool wtool-d" id="btn-doc" title="传 PDF/Word 让 WDS 解读+SDE解构">📎</button>
+      <input type="file" id="tk-docfile" accept=".pdf,.docx" style="display:none">
       <input type="file" id="tk-file" accept="image/*" style="display:none">
     </div>
     <div class="inbar">
@@ -286,6 +289,46 @@ function makePaper(){
   }).catch(function(){setP("网络异常，生成失败。请稍后重试。");});
 }
 if(el("btn-paper"))el("btn-paper").onclick=makePaper;
+function loadScript(src){return new Promise(function(res,rej){var s=document.createElement("script");s.src=src;s.onload=res;s.onerror=function(){rej(new Error("组件加载失败，请检查网络"))};document.head.appendChild(s);});}
+async function parseDoc(file){
+  var name=file.name.toLowerCase();
+  var buf=await file.arrayBuffer();
+  if(/\.pdf$/.test(name)){
+    if(!window.pdfjsLib)await loadScript("https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js");
+    pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+    var pdf=await pdfjsLib.getDocument({data:buf}).promise;
+    var t="";
+    for(var i=1;i<=pdf.numPages;i++){var pg=await pdf.getPage(i);var c=await pg.getTextContent();t+=c.items.map(function(x){return x.str}).join(" ")+"\n\n";if(t.length>60000)break;}
+    return t;
+  }
+  if(/\.docx$/.test(name)){
+    if(!window.mammoth)await loadScript("https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js");
+    var r=await mammoth.extractRawText({arrayBuffer:buf});
+    return r.value;
+  }
+  throw new Error("只支持 PDF 和 .docx");
+}
+async function handleDoc(f){
+  var name=f.name.toLowerCase();
+  if(!/\.(pdf|docx)$/.test(name)){note("只支持 PDF 和 Word(.docx)。老的 .doc 请先另存为 .docx。");return;}
+  if(f.size>20*1024*1024){note("文件太大（超过 20MB）。");return;}
+  note("正在解析文档…（首次加载解析组件可能稍慢）");
+  try{
+    var text=await parseDoc(f);
+    text=String(text||"").replace(/[ \t]+\n/g,"\n").replace(/\n{3,}/g,"\n\n").trim();
+    if(text.length<50){note("没解析出文字——可能是扫描件/图片型 PDF（无文字层），无法提取。");return;}
+    note("解析完成，正在请 WDS 解读并做 SDE 解构…（约 30–60 秒）");
+    try{await fetch("/api/chat?room=sde-plaza",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({credential:gcred,text:"📎 上传《"+f.name+"》，请 WDS 解读观点并做 SDE 解构"})});}catch(e){}
+    var r=await fetch("/api/wds/analyze",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({credential:gcred,room:"sde-plaza",filename:f.name,text:text.slice(0,16000)})});
+    var d=await r.json();
+    if(d&&d.ok)note("");else note((d&&d.msg)||"解读失败。");
+  }catch(e){note("处理失败："+((e&&e.message)||e));}
+}
+var docBtn=el("btn-doc"),docFile=el("tk-docfile");
+if(docBtn&&docFile){
+  docBtn.onclick=function(){if(!gcred){note("请先用 Google 账号登录再上传文档。");return;}docFile.click();};
+  docFile.onchange=function(){var f=docFile.files&&docFile.files[0];docFile.value="";if(f)handleDoc(f);};
+}
 if(el("wds-ask"))el("wds-ask").onclick=askWDS;
 function insertEmoji(txt){var t=el("tk-text");var s=t.selectionStart||0,en=t.selectionEnd||0,v=t.value;t.value=v.slice(0,s)+txt+v.slice(en);t.selectionStart=t.selectionEnd=s+txt.length;t.focus();t.style.height="44px";t.style.height=Math.min(t.scrollHeight,120)+"px";}
 (function(){var EMOJI="😀 😃 😄 😁 😆 😊 🙂 😉 😍 🥰 😘 😜 🤪 🤔 🤨 😐 😴 😷 😎 🥳 🤗 🙄 😮 😲 😳 😭 😢 😱 😡 🥲 👍 👎 👏 🙏 💪 🤝 👌 ✌️ 🙌 🎉 🔥 💯 ❤️ 💔 ⭐ ✅ ❌ 🌹 ☕ 🍵 🎂 👀".split(" ");var panel=el("emoji-panel"),ebtn=el("btn-emoji");

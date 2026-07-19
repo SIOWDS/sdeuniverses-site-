@@ -169,6 +169,12 @@ export class CommentBox {
       }
       return new Response("method", { status: 405 });
     }
+    // ===== 内部：发一条 WDS 机器人消息（仅 Worker 内部调用，不对公网暴露）=====
+    if (_u.pathname === "/_bot") {
+      const bb = await request.json().catch(() => ({}));
+      await this.chatAddBot(String(bb.text || ""), bb.tier);
+      return Response.json({ ok: true });
+    }
     // ===== 内部：清空本聊天室（仅 Worker 校验管理口令后调用，不对公网暴露）=====
     if (_u.pathname === "/_clear") {
       try { const imgs = (await this.ctx.storage.get("imgids")) || []; for (const id of imgs) { try { await this.ctx.storage.delete("im:" + id); } catch (e) {} } } catch (e) {}
@@ -360,7 +366,7 @@ export class CommentBox {
     return { ok: true, id: seq };
   }
   async chatAddBot(text, tier) {
-    const t = String(text || "").replace(/[\u0000-\u0009\u000b-\u001f]/g, "").trim().slice(0, 2000);
+    const t = String(text || "").replace(/[\u0000-\u0009\u000b-\u001f]/g, "").trim().slice(0, 6000);
     if (!t) return;
     let { log, seq } = await this.chatRead();
     seq += 1;
@@ -1233,6 +1239,27 @@ export default {
       return env.COUNTER.get(id).fetch(request);
     }
     // /api/chat：实时群聊。WebSocket 升级=实时收发；GET=历史/轮询兜底；POST=轮询兜底发言。转发到 COMMENTS 的 chat:<room> 实例。
+    if (url.pathname === "/api/wds/analyze" && request.method === "POST") {
+      const b = await request.json().catch(() => ({}));
+      const who = await verifyGoogleCredential(b.credential);
+      if (!who) return Response.json({ ok: false, msg: "请先用 Google 账号登录再上传文档。" }, { status: 401 });
+      const room = (b.room || "").toLowerCase();
+      if (!/^[a-z0-9-]+(\/[a-z0-9-]+)*$/.test(room)) return Response.json({ ok: false, msg: "bad room" }, { status: 400 });
+      const text = String(b.text || "").slice(0, 16000);
+      if (text.length < 50) return Response.json({ ok: false, msg: "文档没解析出足够文字。" }, { status: 400 });
+      const filename = String(b.filename || "文档").replace(/[\u0000-\u001f]/g, "").slice(0, 120);
+      const vc = await wdsPaperVC(env);
+      if (!vc) return Response.json({ ok: false, msg: "管理员还没配置基底密钥（点 ⚙ 配置）。" }, { status: 400 });
+      const base = url.origin + "/";
+      const SDEM = "\n\nSDE 方法论：显露 S / 差异序列 D / 特征纠缠 E；三大方程 S=F(D,E)·D=G(S,E)·E=H(S,D)；六路径；意义三律（特征/自由/幸福）；发生学——追问事物为何如此发生，而非如何被发现。";
+      let reflect = ""; try { reflect = await ensureReflect(env, base, vc.rvendor, vc.VC, vc.KEY); } catch (e) {}
+      const sys = "你是 WDS智能体，王德生的 SDE 本体论老师。你要对一篇文章做『观点解读 + SDE 解构』。" + (reflect ? ("\n\n【SDE 内化心得·思考底盘（内化用，别复述）】\n" + reflect) : "") + SDEM + "\n用严谨而犀利的汉语，把 SDE 术语讲透、服务论证，不摆空模板、不注水。";
+      const usr = "【文件名】" + filename + "\n【文章正文（从 PDF/Word 提取，格式可能略乱，请抓主干）】\n" + text + "\n\n请分两节作答：\n一、观点解读：准确复述这篇文章的核心主张、论证脉络，以及它没明说却依赖的隐含前提。\n二、SDE 解构：用发生学与显露S/差异D/纠缠E的视角重新审视——这篇文章把什么当成了『现成的结构/给定的对象』（而它其实是在差异序列与环境纠缠中被显影出来的）？它漏掉了哪个『如何发生』的层次？用三大方程或意义三律照见它的盲区，最后给出一个这篇文章自己看不到的、更深一层的判断。\n约 2000-2800 字，用『一、观点解读』『二、SDE 解构』分节，直接从正文写起，不要开场白。";
+      const out = await llmText(vc.VC, vc.KEY, sys, usr, 4000);
+      if (!out) return Response.json({ ok: false, msg: "解读生成失败，请重试。" }, { status: 502 });
+      try { await env.COMMENTS.get(env.COMMENTS.idFromName("chat:" + room)).fetch(new Request("https://do/_bot", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ text: "【《" + filename + "》· 观点解读与 SDE 解构】\n\n" + out }) })); } catch (e) {}
+      return Response.json({ ok: true });
+    }
     if (url.pathname === "/api/wds/paper" && request.method === "POST") {
       const b = await request.json().catch(() => ({}));
       const who = await verifyGoogleCredential(b.credential);
