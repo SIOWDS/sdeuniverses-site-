@@ -16,11 +16,13 @@
 
   // —— 正文容器 / 标题 / 正文文本 ——
   function findBody() {
+    if (CFG.bodyEl) return (typeof CFG.bodyEl === "function" ? CFG.bodyEl() : CFG.bodyEl) || document.body;
     if (CFG.selector) { var c = q1(CFG.selector); if (c) return c; }
     return q1("article") || q1("main") || q1(".content") || q1(".article") || document.body;
   }
   function docTitle() { var h = q1("h1"); return (CFG.title || (h && h.textContent) || document.title || "").trim().slice(0, 200); }
   function docText() {
+    if (typeof CFG.docTextFn === "function") { try { var d = CFG.docTextFn(); if (d) return String(d).slice(0, 12000); } catch (e) {} }
     var c = findBody();
     var t = (c && (c.innerText || c.textContent) || "").replace(/\n{3,}/g, "\n\n").trim();
     return t.slice(0, 12000);
