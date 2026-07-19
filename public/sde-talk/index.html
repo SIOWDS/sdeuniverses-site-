@@ -70,6 +70,25 @@ a{color:var(--accent);text-decoration:none}
 .emoji-panel.on{display:flex}
 .emoji-panel span{font-size:22px;cursor:pointer;padding:3px 5px;border-radius:6px;line-height:1}
 .emoji-panel span:active{background:#EDEAE2}
+.top .who-wrap{display:flex;align-items:center;gap:10px}
+.top .gear{background:transparent;border:none;color:#9FB6D6;font-size:16px;cursor:pointer;padding:0;line-height:1}
+.top .gear:hover{color:#E6ECF4}
+.cfg-mask{display:none;position:fixed;inset:0;background:rgba(20,25,35,0.55);z-index:100;align-items:center;justify-content:center;padding:20px}
+.cfg-mask.on{display:flex}
+.cfg-box{background:var(--card);border-radius:12px;max-width:400px;width:100%;padding:20px 22px;box-shadow:0 12px 40px rgba(0,0,0,0.3);max-height:90vh;overflow-y:auto}
+.cfg-h{font-size:16px;font-weight:700;color:var(--text);display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.cfg-x{cursor:pointer;color:var(--muted);font-size:15px}
+.cfg-x:hover{color:var(--text)}
+.cfg-status{font-size:12.5px;padding:6px 10px;border-radius:6px;background:var(--panel);color:var(--muted);margin-bottom:10px}
+.cfg-status.ok{color:#2A6B4A}
+.cfg-desc{font-size:12.5px;color:var(--muted);line-height:1.7;margin-bottom:8px}
+.cfg-lb{display:block;font-size:12px;color:var(--muted);margin:8px 0 4px}
+.cfg-in{width:100%;border:1px solid var(--line);border-radius:8px;background:#fff;padding:9px 11px;font-family:inherit;font-size:14px;color:var(--text)}
+.cfg-in:focus{outline:none;border-color:var(--accent)}
+.cfg-save{width:100%;margin-top:14px;background:var(--accent);color:#fff;border:none;border-radius:8px;padding:11px;font-family:inherit;font-size:14px;font-weight:700;letter-spacing:0.05em;cursor:pointer}
+.cfg-save:disabled{opacity:0.5}
+.cfg-msg{font-size:12.5px;margin-top:10px;min-height:16px;line-height:1.6}
+.cfg-note{font-size:11.5px;color:var(--muted);line-height:1.7;margin-top:12px;padding-top:10px;border-top:1px solid var(--line)}
 </style>
 </head>
 <body>
@@ -77,7 +96,7 @@ a{color:var(--accent);text-decoration:none}
 <div class="top">
   <a class="back" href="/">← 首页</a>
   <div class="tt">SDE 讨论<span class="sub"><span class="dot off" id="tk-dot"></span><span id="tk-status">连接中…</span></span></div>
-  <div class="who" id="tk-who"></div>
+  <div class="who-wrap"><span class="who" id="tk-who"></span><button class="gear" id="cfg-open" type="button" title="管理员配置 API">⚙</button></div>
 </div>
 
 <div class="wds-bar">
@@ -274,6 +293,48 @@ ta.addEventListener("input",function(){ta.style.height="44px";ta.style.height=Ma
 pollOnce();
 connectWS();
 document.addEventListener("visibilitychange",function(){if(!document.hidden){if(!ws)connectWS();else pollOnce();}});
+})();
+</script>
+<div class="cfg-mask" id="cfg-mask">
+  <div class="cfg-box">
+    <div class="cfg-h">配置 API 密钥 <span class="cfg-x" id="cfg-close">✕</span></div>
+    <div class="cfg-status" id="cfg-status">检查中…</div>
+    <p class="cfg-desc">这把密钥驱动 <b>WDS智能体</b> 与站内智能问答（GLM）。密钥只存服务端保险箱，浏览器不会回读。</p>
+    <label class="cfg-lb">管理口令</label>
+    <input type="password" class="cfg-in" id="cfg-pass" placeholder="管理口令（首次保存即设定）" autocomplete="off">
+    <label class="cfg-lb">API 密钥</label>
+    <input type="password" class="cfg-in" id="cfg-key" placeholder="粘贴 GLM API Key" autocomplete="off">
+    <button class="cfg-save" id="cfg-save" type="button">保存</button>
+    <div class="cfg-msg" id="cfg-msg"></div>
+    <p class="cfg-note">首次保存时，你填的管理口令即成为此后修改密钥的口令，请牢记；之后更新密钥需用同一口令。</p>
+  </div>
+</div>
+
+<script>
+(function(){
+function el(id){return document.getElementById(id)}
+var mask=el("cfg-mask");if(!mask)return;
+function checkStatus(){var s=el("cfg-status");s.textContent="检查中…";s.className="cfg-status";
+  fetch("/api/admin/status").then(function(r){return r.json()}).then(function(d){
+    if(d&&d.configured){s.textContent="当前：已配置密钥 · WDS智能体 可用";s.className="cfg-status ok";}
+    else{s.textContent="当前：尚未配置密钥 · WDS智能体 待启用";s.className="cfg-status";}
+  }).catch(function(){s.textContent="状态查询失败。";});}
+function openCfg(){mask.classList.add("on");el("cfg-msg").textContent="";checkStatus();}
+function closeCfg(){mask.classList.remove("on");}
+if(el("cfg-open"))el("cfg-open").onclick=openCfg;
+if(el("cfg-close"))el("cfg-close").onclick=closeCfg;
+mask.onclick=function(e){if(e.target===mask)closeCfg();};
+if(el("cfg-save"))el("cfg-save").onclick=function(){
+  var pass=el("cfg-pass").value.trim(),key=el("cfg-key").value.trim(),m=el("cfg-msg");
+  if(pass.length<4){m.style.color="#9D2933";m.textContent="管理口令至少 4 位。";return;}
+  if(key.length<8){m.style.color="#9D2933";m.textContent="API 密钥格式无效（太短）。";return;}
+  el("cfg-save").disabled=true;m.style.color="#7A6F5E";m.textContent="保存中…";
+  fetch("/api/admin/setkey",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({pass:pass,key:key})})
+  .then(function(r){return r.json()}).then(function(d){el("cfg-save").disabled=false;
+    if(d&&d.ok){m.style.color="#2A6B4A";m.textContent=(d.msg||"已保存。")+" WDS智能体 现在可用了。";el("cfg-key").value="";checkStatus();}
+    else{m.style.color="#9D2933";m.textContent=(d&&d.msg)||"保存失败。";}
+  }).catch(function(){el("cfg-save").disabled=false;m.style.color="#9D2933";m.textContent="网络异常，保存失败。";});
+};
 })();
 </script>
 </body>
