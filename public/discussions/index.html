@@ -125,6 +125,14 @@ footer a{color:var(--gold);text-decoration:none}
 #sde-chat .ch-emoji-panel.on{display:flex}
 #sde-chat .ch-emoji-panel span{font-size:1.25rem;cursor:pointer;padding:3px 5px;border-radius:6px;line-height:1}
 #sde-chat .ch-emoji-panel span:hover{background:var(--card2)}
+#sde-chat .ch-img-btn{font-size:1.05rem;background:transparent;border:1px solid var(--border);border-radius:8px;height:42px;width:44px;cursor:pointer;flex:none;padding:0;line-height:1}
+#sde-chat .ch-img-btn:hover{background:var(--card2)}
+#sde-chat .ch-img-btn:disabled{opacity:0.5;cursor:default}
+#sde-chat .bub.bub-img{padding:4px;max-width:100%;overflow:hidden}
+#sde-chat .ch-img{max-width:min(240px,60vw);max-height:280px;border-radius:8px;display:block;cursor:pointer;object-fit:cover}
+#sde-chat .ch-cap{font-size:0.9rem;line-height:1.5;padding:5px 6px 2px;color:var(--text);white-space:pre-wrap;word-break:break-word}
+#sde-chat .msg.mine .bub.bub-img{background:var(--disc)}
+#sde-chat .msg.mine .ch-cap{color:#F5F2E8}
 #sde-chat .msg .tm .ch-recall{color:inherit;opacity:0.7;text-decoration:underline;cursor:pointer}
 #sde-chat .msg .tm .ch-recall:hover{opacity:1}
 #sde-chat .bub.recalled{background:transparent;border:1px dashed var(--border);color:var(--muted);font-style:italic}
@@ -149,6 +157,8 @@ footer a{color:var(--gold);text-decoration:none}
     <div class="ch-emoji-panel" id="ch-emoji-panel"></div>
     <div class="ch-input" id="ch-input">
       <button class="ch-emoji-btn" id="ch-emoji-btn" type="button" title="表情">😊</button>
+      <button class="ch-img-btn" id="ch-img-btn" type="button" title="发图片">🖼️</button>
+      <input type="file" id="ch-file" accept="image/*" style="display:none">
       <textarea id="ch-text" maxlength="500" placeholder="说点什么…（Enter 发送，Shift+Enter 换行）"></textarea>
       <button id="ch-send">发送</button>
     </div>
@@ -181,7 +191,15 @@ function addMsg(m){
   wrap.appendChild(who);wrap.appendChild(bub);wrap.appendChild(tm);
   if(m.recalled){renderRecalled(bub);}
   else{
-    bub.textContent=m.text;
+    if(m.img){
+      bub.className="bub bub-img";
+      var im=document.createElement("img");im.className="ch-img";im.loading="lazy";
+      im.src="/api/chat/img?room="+encodeURIComponent(ROOM)+"&id="+m.id;
+      im.onclick=function(){window.open(im.src,"_blank","noopener");};
+      im.onerror=function(){bub.className="bub";bub.textContent="[图片已过期]";};
+      bub.appendChild(im);
+      if(m.text){var cap=document.createElement("div");cap.className="ch-cap";cap.textContent=m.text;bub.appendChild(cap);}
+    }else{bub.textContent=m.text;}
     if(mine){var age=Date.now()-m.ts;
       if(age<120000){var rc=document.createElement("a");rc.className="ch-recall";rc.textContent="撤回";
         rc.onclick=function(){doRecall(m.id);};
@@ -252,6 +270,38 @@ function doSend(){
 EMOJI.forEach(function(e){var s=document.createElement("span");s.textContent=e;s.onclick=function(){insertEmoji(e);};panel.appendChild(s);});
 ebtn.onclick=function(ev){ev.stopPropagation();panel.classList.toggle("on");};
 document.addEventListener("click",function(ev){if(panel.classList.contains("on")&&ev.target!==ebtn&&!panel.contains(ev.target))panel.classList.remove("on");});})();
+(function(){
+var fileInput=el("ch-file"),imgBtn=el("ch-img-btn");
+if(imgBtn&&fileInput){
+imgBtn.onclick=function(){if(!gcred){note("请先用 Google 账号登录再发图片。");return;}fileInput.click();};
+fileInput.onchange=function(){var f=fileInput.files&&fileInput.files[0];fileInput.value="";if(!f)return;if(!/^image\//.test(f.type)){note("请选择图片文件。");return;}compressAndSend(f);};
+}
+function compressAndSend(file){
+  note("图片处理中…");
+  var img=new Image(),url=URL.createObjectURL(file);
+  img.onload=function(){URL.revokeObjectURL(url);
+    var mx=1000,w=img.width,hh=img.height;
+    if(w>mx||hh>mx){if(w>=hh){hh=Math.round(hh*mx/w);w=mx;}else{w=Math.round(w*mx/hh);hh=mx;}}
+    function draw(sw,sh){var c=document.createElement("canvas");c.width=sw;c.height=sh;var x=c.getContext("2d");x.fillStyle="#fff";x.fillRect(0,0,sw,sh);x.drawImage(img,0,0,sw,sh);return c;}
+    var c=draw(w,hh),q=0.6,data=c.toDataURL("image/jpeg",q);
+    while(data.length>165000&&q>0.35){q-=0.1;data=c.toDataURL("image/jpeg",q);}
+    if(data.length>165000){var c2=draw(Math.round(w*0.7),Math.round(hh*0.7));data=c2.toDataURL("image/jpeg",0.5);}
+    if(data.length>172000){note("这张图压缩后还是太大，换一张小点的吧。");return;}
+    uploadImg(data);
+  };
+  img.onerror=function(){URL.revokeObjectURL(url);note("图片读取失败。");};
+  img.src=url;
+}
+function uploadImg(dataURL){
+  note("图片上传中…");if(imgBtn)imgBtn.disabled=true;
+  fetch("/api/chat/img?room="+encodeURIComponent(ROOM),{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({credential:gcred,data:dataURL,caption:el("ch-text").value.trim()})})
+  .then(function(r){return r.json().then(function(d){return{s:r.status,d:d}})}).then(function(x){if(imgBtn)imgBtn.disabled=false;
+    if(x.d&&x.d.ok){el("ch-text").value="";note("");el("ch-text").style.height="42px";}
+    else if(x.s===401){note("登录已过期，请重新登录。");showLogin();}
+    else note((x.d&&x.d.msg)||"图片发送失败。");
+  }).catch(function(){if(imgBtn)imgBtn.disabled=false;note("网络异常，图片没发出去。");});
+}
+})();
 el("ch-send").onclick=doSend;
 var ta=el("ch-text");
 ta.addEventListener("keydown",function(e){if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();doSend();}});

@@ -75,6 +75,31 @@ export class CommentBox {
       this.broadcastPresence();
       return new Response(null, { status: 101, webSocket: client });
     }
+    // ===== 实时群聊：图片存取（图片单独存 im:<id>，消息只存引用；出图走本端点，浏览器懒加载）=====
+    if (_u.pathname === "/api/chat/img") {
+      if (request.method === "GET") {
+        const id = parseInt(_u.searchParams.get("id") || "0", 10);
+        const bytes = await this.ctx.storage.get("im:" + id);
+        if (!bytes) return new Response("not found", { status: 404 });
+        return new Response(bytes, { headers: { "content-type": "image/jpeg", "cache-control": "public, max-age=31536000, immutable" } });
+      }
+      if (request.method === "POST") {
+        const body = await request.json().catch(() => null);
+        if (!body || !body.data) return Response.json({ ok: false, msg: "请求格式不对。" }, { status: 400 });
+        const who = await verifyGoogleCredential(body.credential);
+        if (!who) return Response.json({ ok: false, msg: "请先用 Google 账号登录后再发图片。" }, { status: 401 });
+        let bytes;
+        try {
+          const b64 = String(body.data).replace(/^data:[^,]*,/, "");
+          const bin = atob(b64);
+          bytes = new Uint8Array(bin.length);
+          for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+        } catch (e) { return Response.json({ ok: false, msg: "图片解析失败。" }, { status: 400 }); }
+        const r = await this.chatAddImage(who.name, body.caption || "", bytes);
+        return Response.json(r.ok ? { ok: true, id: r.id } : { ok: false, msg: r.msg }, { status: r.ok ? 200 : (r.code || 400) });
+      }
+      return new Response("method", { status: 405 });
+    }
     // ===== 实时群聊：HTTP 历史拉取 / 轮询兜底 / POST 发言 =====
     if (_u.pathname === "/api/chat") {
       if (request.method === "GET") {
@@ -224,6 +249,35 @@ export class CommentBox {
     await this.ctx.storage.put("clog", log);
     this.broadcast({ t: "recall", id: id });
     return { ok: true };
+  }
+  async chatAddImage(name, caption, bytes) {
+    const clean = (s, n) => String(s || "").replace(/[\u0000-\u0009\u000b-\u001f]/g, "").trim().slice(0, n);
+    name = clean(name, 20);
+    const cap = clean(caption, 200);
+    if (!name) return { ok: false, msg: "请先登录。", code: 401 };
+    if (!bytes || bytes.byteLength < 1) return { ok: false, msg: "图片为空。" };
+    if (bytes.byteLength > 131072) return { ok: false, msg: "图片太大，请换小一点的（压缩后需小于 128KB）。" };
+    const now = Date.now();
+    const key = "crl:" + name;
+    let hits = (await this.ctx.storage.get(key)) || [];
+    hits = hits.filter((t) => now - t < 86400000);
+    if (hits.length && now - hits[hits.length - 1] < 1500) return { ok: false, msg: "发得太快了，缓一下。", code: 429 };
+    if (hits.length >= 400) return { ok: false, msg: "今天发得够多啦。", code: 429 };
+    let { log, seq } = await this.chatRead();
+    seq += 1;
+    await this.ctx.storage.put("im:" + seq, bytes);
+    let imgs = (await this.ctx.storage.get("imgids")) || [];
+    imgs.push(seq);
+    while (imgs.length > 40) { const old = imgs.shift(); try { await this.ctx.storage.delete("im:" + old); } catch (e) {} }
+    await this.ctx.storage.put("imgids", imgs);
+    const msg = { id: seq, name, text: cap, ts: now, img: 1 };
+    log.push(msg);
+    if (log.length > 300) log = log.slice(-300);
+    await this.ctx.storage.put("clog", log);
+    await this.ctx.storage.put("cseq", seq);
+    await this.ctx.storage.put(key, [...hits, now]);
+    this.broadcast({ t: "msg", id: msg.id, name: msg.name, text: msg.text, ts: msg.ts, img: 1 });
+    return { ok: true, id: seq };
   }
   broadcast(obj) {
     const s = JSON.stringify(obj);
@@ -963,7 +1017,7 @@ export default {
       return env.COUNTER.get(id).fetch(request);
     }
     // /api/chat：实时群聊。WebSocket 升级=实时收发；GET=历史/轮询兜底；POST=轮询兜底发言。转发到 COMMENTS 的 chat:<room> 实例。
-    if (url.pathname === "/api/chat") {
+    if (url.pathname === "/api/chat" || url.pathname === "/api/chat/img") {
       const room = (url.searchParams.get("room") || "").toLowerCase();
       if (!/^[a-z0-9-]+(\/[a-z0-9-]+)*$/.test(room) || room.length > 120) {
         return new Response(JSON.stringify({ ok: false, msg: "bad room" }), { status: 400, headers: { "content-type": "application/json" } });
