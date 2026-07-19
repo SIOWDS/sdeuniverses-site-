@@ -177,6 +177,25 @@ footer a{color:var(--gold);text-decoration:none}
   <p class="lead">点击即在本页打开视频教室，支持多人视频、屏幕共享（放 PPT / 讲义，可共享整个电脑屏幕）、电子白板板书、整堂课录像与举手发言。音视频经由 Jitsi Meet 公共服务在浏览器间传输，本站不架设、不经手任何音视频数据。</p>
 
   <div class="room-card">
+    <h3>教室功能 · 对标 Zoom</h3>
+    <p>Zoom 的常用会议功能这里基本都有，进入教室后在底部工具栏（或教室上方工具条）取用：</p>
+    <ul style="margin:.4rem 0 0;padding-left:1.2em;line-height:1.95">
+      <li>多人音视频，宫格 / 演讲者视图（Tile View）切换</li>
+      <li>屏幕共享：整个电脑屏幕或单个窗口（放 PPT / 讲义）</li>
+      <li>电子白板：教室上方「白板」按钮，多人同屏书写（再点收起）</li>
+      <li>录制：底部「录制」——① 云端录制（连一次 Dropbox，整堂课合成一个视频，邮件发下载链接）；② 本地录制（直接下载到本机，免账号）</li>
+      <li>文字聊天（公聊 / 私聊）、举手、表情反应</li>
+      <li>参会者管理：一键全员静音、把学员设为联席主持人</li>
+      <li>分组讨论（Breakout Rooms）、投票（Polls）——在「参会者 / 聊天」面板</li>
+      <li>入会密码与等候室（Lobby）、一键邀请</li>
+      <li>虚拟背景 / 背景虚化、降噪、画质自动+手动调节</li>
+      <li>直播到 YouTube 等、实时字幕（Closed Captions）</li>
+      <li>实名显示：全站 Google 登录，进会议自动带真名</li>
+    </ul>
+    <div class="hintline">少数 Zoom 项 Jitsi 暂无原生对应：共享屏幕上的实时标注（可用白板替代）、同声传译分轨、美颜；录制按钮仅主持人可见。</div>
+  </div>
+
+  <div class="room-card">
     <h3>会议列表</h3>
     <p>点会议名字即进入，Google 账号自动登录。开课时间以下方讨论区预告为准。</p>
     <div class="mlist">
@@ -396,7 +415,10 @@ function jitsiConfig(){return {
   constraints:{video:{height:{ideal:720,max:720,min:180},frameRate:{ideal:30,max:30,min:15}}},
   desktopSharingFrameRate:{min:5,max:30},
   disableSimulcast:false,
-  whiteboard:{enabled:true}
+  whiteboard:{enabled:true},
+  disablePolls:false,
+  // 显式点亮完整工具栏，对标 Zoom：录制/白板/聊天/举手/表情/分组&投票(参会者面板)/安全(密码&等候室)/虚拟背景/降噪/直播/字幕/画质…
+  toolbarButtons:["microphone","camera","desktop","chat","raisehand","reactions","participants-pane","tileview","select-background","whiteboard","recording","livestreaming","sharedvideo","shareaudio","noisesuppression","closedcaptions","security","invite","videoquality","fullscreen","filmstrip","settings","profile","shortcuts","help","stats","toggle-camera","hangup"]
 };}
 function ensureExtApi(cb){
   if(window.JitsiMeetExternalAPI){cb();return;}
