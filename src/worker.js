@@ -329,17 +329,17 @@ export class CommentBox {
     this.broadcast({ t: "msg", id: msg.id, name: msg.name, text: msg.text, ts: msg.ts, img: 1 });
     return { ok: true, id: seq };
   }
-  async chatAddBot(text) {
+  async chatAddBot(text, tier) {
     const t = String(text || "").replace(/[\u0000-\u0009\u000b-\u001f]/g, "").trim().slice(0, 2000);
     if (!t) return;
     let { log, seq } = await this.chatRead();
     seq += 1;
-    const msg = { id: seq, name: "WDS智能体", text: t, ts: Date.now(), bot: 1 };
+    const msg = { id: seq, name: "WDS智能体", text: t, ts: Date.now(), bot: 1, tier: tier === "quick" ? "quick" : "deep" };
     log.push(msg);
     if (log.length > 300) log = log.slice(-300);
     await this.ctx.storage.put("clog", log);
     await this.ctx.storage.put("cseq", seq);
-    this.broadcast({ t: "msg", id: msg.id, name: msg.name, text: msg.text, ts: msg.ts, bot: 1 });
+    this.broadcast({ t: "msg", id: msg.id, name: msg.name, text: msg.text, ts: msg.ts, bot: 1, tier: msg.tier });
   }
   async _wdsChatContext() {
     try {
@@ -431,7 +431,7 @@ export class CommentBox {
       reply = (j && j.choices && j.choices[0] && j.choices[0].message && j.choices[0].message.content) || "";
     } catch (e) {}
     if (!reply) reply = "（我这会儿没接上，稍后再 @我一次试试。）";
-    await this.chatAddBot(reply);
+    await this.chatAddBot(reply, tier);
   }
   broadcast(obj) {
     const s = JSON.stringify(obj);

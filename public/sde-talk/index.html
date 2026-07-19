@@ -66,6 +66,7 @@ a{color:var(--accent);text-decoration:none}
 .toolbar button{font-family:inherit;font-size:17px;line-height:1;background:var(--card);border:1px solid var(--line);border-radius:8px;width:40px;height:36px;cursor:pointer;padding:0}
 .toolbar button:active{background:#EDEAE2}
 .toolbar .wtool{background:#FBF3E2;border-color:var(--gold)}
+.toolbar .wtool-q{background:#FDF1DE;border-color:#C88A2A}
 .emoji-panel{display:none;flex-wrap:wrap;gap:2px;max-height:130px;overflow-y:auto;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:6px;margin-bottom:8px}
 .emoji-panel.on{display:flex}
 .emoji-panel span{font-size:22px;cursor:pointer;padding:3px 5px;border-radius:6px;line-height:1}
@@ -122,7 +123,8 @@ select.cfg-in{appearance:auto;-webkit-appearance:menulist;cursor:pointer}
     <div class="toolbar">
       <button type="button" id="btn-emoji" title="表情">😊</button>
       <button type="button" id="btn-img" title="发图片">🖼️</button>
-      <button type="button" class="wtool" id="btn-wds" title="问 WDS智能体">🤖</button>
+      <button type="button" class="wtool" id="btn-wds" title="问 WDS · 满血深答">🤖</button>
+      <button type="button" class="wtool wtool-q" id="btn-wds-quick" title="问 WDS · 快答（秒回）">⚡</button>
       <input type="file" id="tk-file" accept="image/*" style="display:none">
     </div>
     <div class="inbar">
@@ -184,9 +186,9 @@ function render(){
     if(dl!==lastDay){lastDay=dl;var dt=document.createElement("div");dt.className="day-tip";var ds=document.createElement("span");ds.textContent=dl;dt.appendChild(ds);stage.appendChild(dt);}
     var mine=(myName&&c.name===myName),bot=(c.bot||c.name==="WDS智能体");
     var row=document.createElement("div");row.className="msg"+(bot?" bot":(mine?" me":""))+(c.recalled?" recalled":"");
-    var av=document.createElement("div");av.className="av";av.style.background=bot?"#8A6817":colorFor(c.name);av.textContent=bot?"🤖":avatarText(c.name);row.appendChild(av);
+    var av=document.createElement("div");av.className="av";av.style.background=bot?"#8A6817":colorFor(c.name);av.textContent=bot?(c.tier==="quick"?"⚡":"🤖"):avatarText(c.name);row.appendChild(av);
     var col=document.createElement("div");col.className="col";
-    var nm=document.createElement("div");nm.className="nm";nm.textContent=c.name;col.appendChild(nm);
+    var nm=document.createElement("div");nm.className="nm";nm.textContent=(bot&&c.tier==="quick")?(c.name+" · 快答"):c.name;col.appendChild(nm);
     var bub=document.createElement("div");bub.className="bub";
     if(c.recalled){var tx=document.createElement("span");tx.textContent="（该消息已撤回）";bub.appendChild(tx);}
     else if(c.img){var im=document.createElement("img");im.className="chat-img";im.loading="lazy";im.src="/api/chat/img?room="+room+"&id="+c.id;im.onclick=function(){window.open(im.src,"_blank","noopener");};bub.appendChild(im);if(c.text){var cap=document.createElement("div");cap.className="chat-cap";cap.textContent=c.text;bub.appendChild(cap);}}
@@ -210,7 +212,7 @@ function connectWS(){
   ws.onmessage=function(ev){
     var d;try{d=JSON.parse(ev.data);}catch(e){return;}
     if(d.t==="history"){msgs=[];lastId=0;ingest(d.items||[]);render();}
-    else if(d.t==="msg"){if(d.bot)typingOn=false;ingest([{id:d.id,name:d.name,text:d.text,ts:d.ts,bot:d.bot,img:d.img}]);render();}
+    else if(d.t==="msg"){if(d.bot)typingOn=false;ingest([{id:d.id,name:d.name,text:d.text,ts:d.ts,bot:d.bot,img:d.img,tier:d.tier}]);render();}
     else if(d.t==="recall"){if(markRecalls([d.id]))render();}
     else if(d.t==="typing"){typingOn=true;render();}
   };
@@ -247,8 +249,10 @@ function doRecall(id){
   fetch("/api/chat?room="+room,{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({credential:gcred,op:"recall",id:id})})
   .then(function(r){return r.json()}).then(function(d){if(d&&d.ok){if(markRecalls([id]))render();}else{note((d&&d.msg)||"撤回失败。");}}).catch(function(){});
 }
-function askWDS(){if(!gcred){note("请先用 Google 账号登录，登录后即可向 WDS智能体 提问。");return;}var t=el("tk-text");if(!/^@\s*wds/i.test(t.value))t.value="@WDS "+t.value;t.focus();}
+function askWDS(){if(!gcred){note("请先用 Google 账号登录，登录后即可向 WDS智能体 提问。");return;}var t=el("tk-text");t.value="@WDS "+t.value.replace(/^@\s*wds\s*(快答)?\s*/i,"");t.focus();}
+function askWDSQuick(){if(!gcred){note("请先用 Google 账号登录，登录后即可向 WDS智能体 提问。");return;}var t=el("tk-text");t.value="@WDS快答 "+t.value.replace(/^@\s*wds\s*(快答)?\s*/i,"");t.focus();}
 if(el("btn-wds"))el("btn-wds").onclick=askWDS;
+if(el("btn-wds-quick"))el("btn-wds-quick").onclick=askWDSQuick;
 if(el("wds-ask"))el("wds-ask").onclick=askWDS;
 function insertEmoji(txt){var t=el("tk-text");var s=t.selectionStart||0,en=t.selectionEnd||0,v=t.value;t.value=v.slice(0,s)+txt+v.slice(en);t.selectionStart=t.selectionEnd=s+txt.length;t.focus();t.style.height="44px";t.style.height=Math.min(t.scrollHeight,120)+"px";}
 (function(){var EMOJI="😀 😃 😄 😁 😆 😊 🙂 😉 😍 🥰 😘 😜 🤪 🤔 🤨 😐 😴 😷 😎 🥳 🤗 🙄 😮 😲 😳 😭 😢 😱 😡 🥲 👍 👎 👏 🙏 💪 🤝 👌 ✌️ 🙌 🎉 🔥 💯 ❤️ 💔 ⭐ ✅ ❌ 🌹 ☕ 🍵 🎂 👀".split(" ");var panel=el("emoji-panel"),ebtn=el("btn-emoji");
