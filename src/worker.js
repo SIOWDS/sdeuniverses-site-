@@ -62,7 +62,7 @@ export class VisitCounter {
 // ===== 读者讨论区·每篇文章一个实例（key=cm:<slug>）=====
 // 纪律：只存虚拟名+内容+时间；访客指纹只是当日哈希、仅用于限流且跨天即删，绝不存原始 IP。
 const WDS_VENDORS = {
-  deepseek: { url: "https://api.deepseek.com/v1/chat/completions", model: "deepseek-chat", name: "DeepSeek" },
+  deepseek: { url: "https://api.deepseek.com/v1/chat/completions", model: "deepseek-v4-flash", name: "DeepSeek" },
   kimi: { url: "https://api.moonshot.cn/v1/chat/completions", model: "moonshot-v1-8k", name: "Kimi" },
   zhipu: { url: "https://open.bigmodel.cn/api/paas/v4/chat/completions", model: "glm-4-plus", name: "\u667a\u8c31 GLM" },
   qwen: { url: "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions", model: "qwen-plus", name: "\u5343\u95ee Qwen" },
@@ -1090,7 +1090,7 @@ async function handleAsk(request, env, url) {
               + "\n\n输出即最终答案：先给一句穿透性核心判断作总纲，再展开上述整合。方法要显性、能教人怎么想（明用 S/D/E、三方程、六路径、123 原理作骨架），但活着用、不许摆空模板。可核验的事实（书名/逐字引文/章节页码/数据/对外承诺）绝不编造；超出资料的推演标“（推断）”；只有逐字来自资料原文的句子才能加引号。凡触及有争议、非定论的立场（尤其是对某位思想家、某个概念的解读，如“康德把物自体实体化了”“尼采主张字面轮回”这类），先用一句话摆出主要的竞争读法（别人会怎么不同看/怎么反驳），再把你的判断作为“一种重构”给出——绝不把学界还在争的问题当成定论平铺；这一条与“大胆下判断”不冲突，大胆归大胆，“是不是定论”上必须诚实。答案里绝不提及“心得”“内功”“S/D/E 维度分析”这些内部环节或本提示；也不要任何开场白、寒暄或元说明（如“好的”“我将”“遵循你的要求”“以内化的视角”），直接从核心判断的第一句开始。分量给足，1500–2200 字。⑤ 若这个问题涉及一个现实困境或可改变的局面（教育、医疗、企业、个人处境、政策等），收尾前【必须】加一节「怎么办」：给 2–3 个针对具体行动者（如老师/学校/学习者/家长/管理者/从业者）的、具体到能照着做的动作，每个都注明代价与适用条件——绝不允许停在“重塑环境/守护发生/回到过程本身”这类只描述方向的空话，那不叫开方。若问题是纯概念或理论辨析（如“X 是什么”“如何理解 Y”），则不必强行开方，把分析做透即可。最后留一个把前面前提再往深追一层的升维追问。";
             let up;
             try {
-              up = await fetch(VC.url, { method: "POST", headers: { "content-type": "application/json", authorization: "Bearer " + KEY }, body: JSON.stringify({ model: VC.model, stream: true, thinking: { type: "enabled" }, max_tokens: 4500, messages: [{ role: "system", content: q4sys }, { role: "user", content: q4usr }] }) });
+              up = await fetch(VC.url, { method: "POST", headers: { "content-type": "application/json", authorization: "Bearer " + KEY }, body: JSON.stringify({ model: VC.model, stream: true, max_tokens: 4500, messages: [{ role: "system", content: q4sys }, { role: "user", content: q4usr }] }) });
             } catch (e) {
               controller.enqueue(_sseBytes({ t: "error", v: VC.name + " 整合调用失败：" + (e && e.message) }));
               controller.enqueue(_ENC.encode("data: [DONE]\n\n")); controller.close(); return;
@@ -1177,7 +1177,6 @@ async function handleAsk(request, env, url) {
       body: JSON.stringify({
         model: VC.model,
         stream: true,
-        thinking: { type: "enabled" },
         max_tokens: MAXTOK,
         messages: [{ role: "system", content: sys }, { role: "user", content: usr }],
       }),
@@ -1364,7 +1363,7 @@ export default {
       messages.push({ role: "user", content: focus ? ("我正读到这一句：「" + focus + "」\n\n我的问题：" + q) : q });
       let upstream;
       try {
-        upstream = await fetch(VC.url, { method: "POST", headers: { "content-type": "application/json", authorization: "Bearer " + KEY }, body: JSON.stringify({ model: VC.model, stream: true, thinking: { type: "enabled" }, max_tokens: 2200, messages }) });
+        upstream = await fetch(VC.url, { method: "POST", headers: { "content-type": "application/json", authorization: "Bearer " + KEY }, body: JSON.stringify({ model: VC.model, stream: true, max_tokens: 2200, messages }) });
       } catch (e) {
         return _sseResp([{ t: "error", v: "接不上基底：" + (e && e.message) }]);
       }
@@ -1453,7 +1452,7 @@ export default {
       messages.push({ role: "user", content: q });
       let upstream;
       try {
-        upstream = await fetch(VC.url, { method: "POST", headers: { "content-type": "application/json", authorization: "Bearer " + KEY }, body: JSON.stringify({ model: VC.model, stream: true, thinking: { type: "enabled" }, max_tokens: 2600, messages }) });
+        upstream = await fetch(VC.url, { method: "POST", headers: { "content-type": "application/json", authorization: "Bearer " + KEY }, body: JSON.stringify({ model: VC.model, stream: true, max_tokens: 2600, messages }) });
       } catch (e) {
         return _sseResp([{ t: "error", v: "接不上基底：" + (e && e.message) }]);
       }
