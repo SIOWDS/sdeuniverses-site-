@@ -76,7 +76,7 @@
     "</div>" +
     "<div class='wdsm-inbar'>" +
       "<div class='wdsm-inwrap'><textarea class='wdsm-in' rows='1' placeholder='问 WDS 任何 SDE 问题，或让它帮你找站里读什么…'></textarea><button class='wdsm-send'>↑</button></div>" +
-      "<div class='wdsm-note'>WDS 会尽力扣着全站内容作答，可核验的书名/引文请以原文为准。无需注册、无需自带 Key。</div>" +
+      "<div class='wdsm-note'>WDS 会尽力扣着全站内容作答，可核验的书名/引文请以原文为准。用你自己的大模型 Key 运行，只存在浏览器本地。</div>" +
     "</div>";
   document.body.appendChild(layer);
 
