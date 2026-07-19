@@ -134,6 +134,75 @@ footer{border-top:1px solid var(--border);text-align:center;padding:30px 20px 44
 </head>
 <body>
 
+<!-- ══ 入口选择层：进金点子先选「互动序列」还是「一次生成」══ -->
+<div id="entryModal" style="position:fixed;inset:0;z-index:9000;background:rgba(8,12,20,0.92);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:22px">
+  <div style="max-width:680px;width:100%;background:linear-gradient(160deg,#141b26,#0e141d);border:1px solid rgba(201,168,76,0.3);border-radius:18px;padding:38px 30px;box-shadow:0 20px 60px rgba(0,0,0,0.5);text-align:center">
+    <div style="font-size:12px;letter-spacing:0.4em;color:#C9A227;margin-bottom:14px">SDE 金点子发生器</div>
+    <div style="font-size:22px;font-weight:700;color:#E8EDF2;margin-bottom:10px">你想怎么用？</div>
+    <div style="font-size:13.5px;color:#9AA5B0;line-height:1.75;margin-bottom:28px">选「互动序列」一步步来、看清每一环；选「一次生成」把信息一次填齐，后台自动跑完全程、直接把最后四篇存进收件箱。</div>
+    <div style="display:flex;gap:16px;flex-wrap:wrap;justify-content:center">
+      <button id="entryInteractive" style="flex:1;min-width:230px;background:linear-gradient(135deg,#1F2A3A,#28374B);color:#E8EDF2;border:1px solid rgba(255,255,255,0.14);border-radius:14px;padding:22px 20px;cursor:pointer;text-align:left">
+        <div style="font-size:17px;font-weight:700;margin-bottom:8px">🔄 互动序列</div>
+        <div style="font-size:12.5px;color:#9AA5B0;line-height:1.7">经典模式。九宫格三视角对决 → 涌现新典范 → 四篇论文 → 提智 → 补规范 → 打磨，每一步你亲手点、亲眼看。适合想理解、想微调的人。</div>
+      </button>
+      <button id="entryOneShot" style="flex:1;min-width:230px;background:linear-gradient(135deg,#8A6414,#C9A227);color:#1a1205;border:none;border-radius:14px;padding:22px 20px;cursor:pointer;text-align:left;box-shadow:0 6px 20px rgba(201,162,39,0.3)">
+        <div style="font-size:17px;font-weight:700;margin-bottom:8px">⚡ 一次生成</div>
+        <div style="font-size:12.5px;color:#3a2c08;line-height:1.7">一次填齐信息（问题·基底·两位审稿人·作者名·投稿密码），点一下，后台自动跑完全程到最后四篇，并存入收件箱。适合只要结果的人。约 40-90 分钟。</div>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 一次生成：精简设置面板 ══ -->
+<div id="oneShotModal" style="position:fixed;inset:0;z-index:8999;background:rgba(8,12,20,0.94);backdrop-filter:blur(6px);display:none;align-items:flex-start;justify-content:center;padding:22px;overflow-y:auto">
+  <div style="max-width:640px;width:100%;background:linear-gradient(160deg,#141b26,#0e141d);border:1px solid rgba(201,168,76,0.3);border-radius:18px;padding:30px 26px;box-shadow:0 20px 60px rgba(0,0,0,0.5);margin:auto">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+      <div style="font-size:19px;font-weight:700;color:#E8EDF2">⚡ 一次生成 · 设置</div>
+      <button id="oneShotBack" style="background:transparent;color:#9AA5B0;border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:6px 12px;cursor:pointer;font-size:12.5px">← 返回选择</button>
+    </div>
+    <div style="font-size:12.5px;color:#9AA5B0;line-height:1.7;margin-bottom:20px">填齐下面几项，点最下方按钮，后台会自动跑完：六篇对决 → 涌现新典范 → 四篇论文 → 二次提智 → 补规范 → 二次审稿打磨，最后以你的作者名存入收件箱。全程约 40-90 分钟，请勿关闭页面。</div>
+
+    <div style="margin-bottom:14px">
+      <label style="display:block;font-size:12.5px;color:#C9A227;font-weight:700;margin-bottom:6px">① 问题（任何领域）</label>
+      <textarea id="osQuestion" rows="2" placeholder="例如：如何理解拖延症？/ 教育的本质是什么？" style="width:100%;padding:10px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.15);background:#0d1117;color:#D4DCE4;font-size:14px;font-family:inherit;resize:vertical"></textarea>
+    </div>
+
+    <div style="margin-bottom:14px">
+      <label style="display:block;font-size:12.5px;color:#C9A227;font-weight:700;margin-bottom:6px">② 主基底（写作/主笔）与 Key</label>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <select id="osModel" style="flex:0 0 auto;padding:9px 11px;border-radius:8px;border:1px solid rgba(255,255,255,0.15);background:#0d1117;color:#D4DCE4;font-size:13px"></select>
+        <input id="osKey" type="password" placeholder="主基底的 API Key" autocomplete="off" style="flex:1;min-width:160px;padding:9px 11px;border-radius:8px;border:1px solid rgba(255,255,255,0.15);background:#0d1117;color:#D4DCE4;font-size:13px">
+      </div>
+    </div>
+
+    <div style="margin-bottom:14px">
+      <label style="display:block;font-size:12.5px;color:#C9A227;font-weight:700;margin-bottom:6px">③ 两位审稿人（须不同基底，各填 Key）</label>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">
+        <select id="osRevA" style="flex:0 0 auto;padding:9px 11px;border-radius:8px;border:1px solid rgba(255,255,255,0.15);background:#0d1117;color:#D4DCE4;font-size:13px"></select>
+        <input id="osRevAKey" type="password" placeholder="审稿人 A 的 Key（与某基底相同可留空）" autocomplete="off" style="flex:1;min-width:160px;padding:9px 11px;border-radius:8px;border:1px solid rgba(255,255,255,0.15);background:#0d1117;color:#D4DCE4;font-size:13px">
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <select id="osRevB" style="flex:0 0 auto;padding:9px 11px;border-radius:8px;border:1px solid rgba(255,255,255,0.15);background:#0d1117;color:#D4DCE4;font-size:13px"></select>
+        <input id="osRevBKey" type="password" placeholder="审稿人 B 的 Key" autocomplete="off" style="flex:1;min-width:160px;padding:9px 11px;border-radius:8px;border:1px solid rgba(255,255,255,0.15);background:#0d1117;color:#D4DCE4;font-size:13px">
+      </div>
+    </div>
+
+    <div style="margin-bottom:20px;display:flex;gap:8px;flex-wrap:wrap">
+      <div style="flex:1;min-width:150px">
+        <label style="display:block;font-size:12.5px;color:#C9A227;font-weight:700;margin-bottom:6px">④ 作者名</label>
+        <input id="osStudent" type="text" maxlength="80" placeholder="你的名字" style="width:100%;padding:9px 11px;border-radius:8px;border:1px solid rgba(255,255,255,0.15);background:#0d1117;color:#D4DCE4;font-size:13px">
+      </div>
+      <div style="flex:1;min-width:150px">
+        <label style="display:block;font-size:12.5px;color:#C9A227;font-weight:700;margin-bottom:6px">⑤ 投稿密码</label>
+        <input id="osPass" type="password" placeholder="投稿密码" autocomplete="off" style="width:100%;padding:9px 11px;border-radius:8px;border:1px solid rgba(255,255,255,0.15);background:#0d1117;color:#D4DCE4;font-size:13px">
+      </div>
+    </div>
+
+    <button id="osRunBtn" style="width:100%;background:linear-gradient(135deg,#8A6414,#C9A227);color:#1a1205;font-weight:700;font-size:15.5px;border:none;border-radius:10px;padding:15px;cursor:pointer;letter-spacing:0.02em;box-shadow:0 6px 20px rgba(201,162,39,0.35)">⚡ 一次生成 · 全自动跑完并存入收件箱</button>
+    <div id="osStatus" style="font-size:13px;color:#D4A845;margin-top:14px;min-height:18px;line-height:1.7;text-align:center"></div>
+  </div>
+</div>
+
 <nav>
   <div class="wrap">
     <a class="nav-logo" href="/">SDE Universes</a>
@@ -3033,6 +3102,114 @@ if(autoRunBtn){
       autoRunBtn.disabled = false;
       autoRunBtn.textContent = oldLabel;
     }
+  });
+}
+
+// ══════ 入口选择：互动序列 / 一次生成 ══════
+(function(){
+  const entryModal = $('entryModal'), oneShotModal = $('oneShotModal');
+  if(!entryModal) return;
+  const showEntry = ()=>{ entryModal.style.display='flex'; oneShotModal.style.display='none'; };
+  const showOneShot = ()=>{
+    entryModal.style.display='none'; oneShotModal.style.display='flex';
+    // 下拉选项从主面板克隆，永远与主面板一致（以后加基底自动同步）
+    try{
+      if($('osModel') && !$('osModel').innerHTML.trim()) $('osModel').innerHTML = modelSel.innerHTML;
+      if($('osRevA') && $('fourRevA') && !$('osRevA').innerHTML.trim()){ $('osRevA').innerHTML = $('fourRevA').innerHTML; $('osRevB').innerHTML = $('fourRevA').innerHTML; }
+      // 带入主面板已填的值
+      if($('osQuestion') && questionEl.value && !$('osQuestion').value) $('osQuestion').value = questionEl.value;
+      if($('osKey') && apiKeyEl.value && !$('osKey').value) $('osKey').value = apiKeyEl.value;
+      if($('osModel') && modelSel.value) $('osModel').value = modelSel.value;
+    }catch(_){}
+  };
+  const closeAll = ()=>{ entryModal.style.display='none'; oneShotModal.style.display='none'; };
+  const bi=$('entryInteractive'); if(bi) bi.addEventListener('click', closeAll);            // 互动序列=关模态，用原页面
+  const bo=$('entryOneShot'); if(bo) bo.addEventListener('click', showOneShot);
+  const bb=$('oneShotBack'); if(bb) bb.addEventListener('click', showEntry);
+
+  // 一次生成：把面板值写进主面板 → 从头驱动全链 → 存 Inbox
+  const osBtn = $('osRunBtn');
+  if(osBtn){
+    osBtn.addEventListener('click', async ()=>{
+      const st = $('osStatus'); const setS = (s)=>{ if(st) st.textContent = s||''; };
+      const q = ($('osQuestion')&&$('osQuestion').value.trim())||'';
+      const model = ($('osModel')&&$('osModel').value)||'';
+      const key = ($('osKey')&&$('osKey').value.trim())||'';
+      const revA = ($('osRevA')&&$('osRevA').value)||'', revAKey = ($('osRevAKey')&&$('osRevAKey').value.trim())||'';
+      const revB = ($('osRevB')&&$('osRevB').value)||'', revBKey = ($('osRevBKey')&&$('osRevBKey').value.trim())||'';
+      const student = ($('osStudent')&&$('osStudent').value.trim())||'';
+      const pass = ($('osPass')&&$('osPass').value.trim())||'';
+      // 校验
+      if(!q){ setS('✗ 请填写问题。'); return; }
+      if(!key){ setS('✗ 请填写主基底的 Key。'); return; }
+      if(!revA || !revB){ setS('✗ 请选好两位审稿人。'); return; }
+      if(revA===revB){ setS('✗ 两位审稿人须用不同基底。'); return; }
+      if(!student){ setS('✗ 请填写作者名。'); return; }
+      if(!pass){ setS('✗ 请填写投稿密码。'); return; }
+      const effRevAKey = keyForVendor(revA, revAKey), effRevBKey = keyForVendor(revB, revBKey);
+      if(!effRevAKey){ setS('✗ 审稿人 A 需要 Key（与主基底不同则须单独填）。'); return; }
+      if(!effRevBKey){ setS('✗ 审稿人 B 需要 Key。'); return; }
+
+      // 把值写进主面板的现有输入框，让现有引擎照常工作
+      questionEl.value = q; apiKeyEl.value = key; modelSel.value = model;
+      if($('fourRevA')) $('fourRevA').value = revA;
+      if($('fourRevAKey')) $('fourRevAKey').value = revAKey;
+      if($('fourRevB')) $('fourRevB').value = revB;
+      if($('fourRevBKey')) $('fourRevBKey').value = revBKey;
+      if($('autoSubStudent')) $('autoSubStudent').value = student;
+      if($('autoSubPass')) $('autoSubPass').value = pass;
+      // 触发一次 model change，让 Key 存到对应厂商槽
+      try{ modelSel.dispatchEvent(new Event('change')); }catch(_){}
+
+      osBtn.disabled = true; const ol = osBtn.textContent; osBtn.textContent = '⏳ 全自动跑程中，请勿关闭…';
+      try{
+        // ① 六篇对决
+        setS('① 六篇三视角对决生成中…'); 
+        window._lastResult = null;
+        goBtn.click();
+        await waitVar(()=> window._lastResult && window._lastResult.rows && window._lastResult.rows.length>=3);
+        // ② 涌现新典范
+        setS('② 涌现新典范中…');
+        window._lastEmerge = null;
+        $('emergeBtn').click();
+        await waitVar(()=> !!window._lastEmerge);
+        // ③ 四篇初稿
+        setS('③ 四篇论文初稿生成中（含评审打磨）…');
+        $('fourStartBtn').click();
+        await waitStage('_fourPapers','fourStartBtn');
+        // ④ 二次提智
+        setS('④ 二次 SDE 提智中（发生引擎冲 150）…');
+        $('upliftBtn').click();
+        await waitStage('_upliftPapers','upliftBtn');
+        // ⑤ 补规范
+        setS('⑤ 补规范中（挂真实引注·脚注·参考文献）…');
+        $('normalizeBtn').click();
+        await waitStage('_normalizedPapers','normalizeBtn');
+        // ⑥ 二次审稿打磨
+        setS('⑥ 二次审稿 + 打磨中（最后四篇）…');
+        $('polishBtn').click();
+        await waitStage('_polishedPapers','polishBtn');
+        // ⑦ 存 Inbox
+        setS('⑦ 打磨完成，正在存入收件箱…');
+        await submitPolishedToInbox(pass, student, setS);
+        setS('✓ 全部完成！最后四篇已以「'+student+'」的名字存入收件箱。可关闭此窗口，结果也在下方页面里。');
+      }catch(e){
+        setS('✗ 中途出错：'+(e.message||e)+'。已跑出的阶段在下方页面里，可切到互动序列手动继续。');
+      }finally{
+        osBtn.disabled = false; osBtn.textContent = ol;
+      }
+    });
+  }
+})();
+// 通用等待：条件成立即 resolve（用于六篇、涌现这类无固定产出变量名的阶段）
+function waitVar(cond, timeoutMs){
+  return new Promise((resolve, reject)=>{
+    const t0 = Date.now();
+    const iv = setInterval(()=>{
+      let ok=false; try{ ok = !!cond(); }catch(_){}
+      if(ok){ clearInterval(iv); resolve(true); return; }
+      if(Date.now()-t0 > (timeoutMs||60*60*1000)){ clearInterval(iv); reject(new Error('该阶段超时未产出')); }
+    }, 1500);
   });
 }
 
