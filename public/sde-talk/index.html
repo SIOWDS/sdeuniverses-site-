@@ -67,6 +67,7 @@ a{color:var(--accent);text-decoration:none}
 .toolbar button:active{background:#EDEAE2}
 .toolbar .wtool{background:#FBF3E2;border-color:var(--gold)}
 .toolbar .wtool-q{background:#FDF1DE;border-color:#C88A2A}
+.toolbar .wtool-p{background:#E8EEF6;border-color:#2E4B78}
 .emoji-panel{display:none;flex-wrap:wrap;gap:2px;max-height:130px;overflow-y:auto;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:6px;margin-bottom:8px}
 .emoji-panel.on{display:flex}
 .emoji-panel span{font-size:22px;cursor:pointer;padding:3px 5px;border-radius:6px;line-height:1}
@@ -118,14 +119,14 @@ select.cfg-in{appearance:auto;-webkit-appearance:menulist;cursor:pointer}
   <div id="tk-compose" style="display:none">
     <div class="signed" id="tk-signed">
       已登录：<b id="tk-gname"></b>　<span class="out" id="tk-gout">退出</span>
-  <button class="wds-ask" id="btn-paper" type="button">📝 提炼成论文</button>
-</div>
+    </div>
     <div class="emoji-panel" id="emoji-panel"></div>
     <div class="toolbar">
       <button type="button" id="btn-emoji" title="表情">😊</button>
       <button type="button" id="btn-img" title="发图片">🖼️</button>
       <button type="button" class="wtool" id="btn-wds" title="问 WDS · 满血深答">🤖</button>
       <button type="button" class="wtool wtool-q" id="btn-wds-quick" title="问 WDS · 快答（秒回）">⚡</button>
+      <button type="button" class="wtool wtool-p" id="btn-paper" title="提炼讨论成论文（PDF）">📝</button>
       <input type="file" id="tk-file" accept="image/*" style="display:none">
     </div>
     <div class="inbar">
