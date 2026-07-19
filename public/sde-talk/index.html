@@ -277,7 +277,20 @@ function makePaper(){
     add(head);
     var parts=pl.parts||[],acc="",idx=0;
     (function nextPart(){
-      if(idx>=parts.length){setP("");try{win.document.title=pl.title;var btn=win.document.createElement("button");btn.className="pdfbtn";btn.textContent="🖨 存为 PDF";btn.onclick=function(){win.print();};win.document.body.appendChild(btn);}catch(x){}return;}
+      if(idx>=parts.length){setP("");try{win.document.title=pl.title;
+        var seedBtn=win.document.createElement("button");seedBtn.className="pdfbtn";seedBtn.style.right="150px";seedBtn.style.background="#8A6817";seedBtn.textContent="📮 发起群讨论";
+        seedBtn.onclick=function(){
+          var seed="📄 刚从讨论里提炼了《"+pl.title+"》，抛几个金点子一起碰：\n";
+          (pl.points||[]).slice(0,4).forEach(function(p,i){seed+=(i+1)+". "+String(p).slice(0,70)+"\n";});
+          seed+="大家来讨论、提升、碰出新观点——回群里聊，@WDS 也可帮碰。讨论充分后再点工具栏 📝，会基于新讨论重出一版。";
+          seed=seed.slice(0,490);
+          seedBtn.disabled=true;seedBtn.textContent="发送中…";
+          fetch(location.origin+"/api/chat?room=sde-plaza",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({credential:gcred,text:seed})})
+          .then(function(r){return r.json()}).then(function(d){seedBtn.textContent=(d&&d.ok)?"✓ 已发到群里，回群讨论吧":"发送失败，重试";if(!(d&&d.ok))seedBtn.disabled=false;})
+          .catch(function(){seedBtn.disabled=false;seedBtn.textContent="📮 发起群讨论";});
+        };
+        win.document.body.appendChild(seedBtn);
+        var btn=win.document.createElement("button");btn.className="pdfbtn";btn.textContent="🖨 存为 PDF";btn.onclick=function(){win.print();};win.document.body.appendChild(btn);}catch(x){}return;}
       setP("正在写第 "+(idx+1)+"/"+parts.length+" 部分：「"+parts[idx].h+"」…（每部分约 20–40 秒，请稍候）");
       fetch(api,{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({credential:gcred,room:"sde-plaza",mode:"part",title:pl.title,points:pl.points,parts:parts,idx:idx,disc:pl.disc,prevBrief:acc.slice(-1200)})})
       .then(function(r){return r.json()}).then(function(pr){
