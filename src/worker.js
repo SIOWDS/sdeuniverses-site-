@@ -76,6 +76,27 @@ async function getActiveVendor(env) {
   } catch (e) {}
   return null;
 }
+async function readDiscussion(env, room) {
+  try {
+    const r = await env.COMMENTS.get(env.COMMENTS.idFromName("chat:" + room)).fetch(new Request("https://do/api/chat?room=" + encodeURIComponent(room) + "&since=0"));
+    const d = await r.json();
+    const items = (d && d.items) || [];
+    const lines = items.filter((m) => !m.recalled && m.text && m.name !== "WDS智能体").map((m) => m.name + "：" + (m.img ? "[图片]" : String(m.text))).filter((s) => s.length < 600);
+    let s = lines.join("\n");
+    if (s.length > 8000) s = s.slice(-8000);
+    return s;
+  } catch (e) { return ""; }
+}
+async function wdsPaperVC(env) {
+  const av = await getActiveVendor(env);
+  if (av) return { VC: { url: WDS_VENDORS[av.vendor].url, model: av.model || WDS_VENDORS[av.vendor].model }, KEY: av.key, rvendor: ({ zhipu: "glm", deepseek: "ds" })[av.vendor] || av.vendor };
+  try {
+    const cv = env.CONFIG_VAULT.get(env.CONFIG_VAULT.idFromName("global"));
+    const r = await (await cv.fetch(new Request("https://cfg.internal/", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ op: "get" }) }))).json();
+    if (r && r.key) return { VC: { url: "https://open.bigmodel.cn/api/paas/v4/chat/completions", model: "glm-5" }, KEY: r.key, rvendor: "glm" };
+  } catch (e) {}
+  return null;
+}
 const WDS_SYS = `你是"WDS智能体"，王德生（Desheng）先生的 AI 分身，SDE 本体论的老师，正在 SDE 学员的讨论群里当场回答学生的提问。
 
 【思想内核·SDE 本体论】
@@ -1212,6 +1233,43 @@ export default {
       return env.COUNTER.get(id).fetch(request);
     }
     // /api/chat：实时群聊。WebSocket 升级=实时收发；GET=历史/轮询兜底；POST=轮询兜底发言。转发到 COMMENTS 的 chat:<room> 实例。
+    if (url.pathname === "/api/wds/paper" && request.method === "POST") {
+      const b = await request.json().catch(() => ({}));
+      const who = await verifyGoogleCredential(b.credential);
+      if (!who) return Response.json({ ok: false, msg: "请先用 Google 账号登录再提炼论文。" }, { status: 401 });
+      const room = (b.room || "").toLowerCase();
+      if (!/^[a-z0-9-]+(\/[a-z0-9-]+)*$/.test(room)) return Response.json({ ok: false, msg: "bad room" }, { status: 400 });
+      const vc = await wdsPaperVC(env);
+      if (!vc) return Response.json({ ok: false, msg: "管理员还没配置基底密钥（点 ⚙ 配置）。" }, { status: 400 });
+      const base = url.origin + "/";
+      const SDEM = "\n\nSDE 方法论（你思考的骨架）：显露 S / 差异序列 D / 特征纠缠 E；三大方程 S=F(D,E)·D=G(S,E)·E=H(S,D)；六路径；意义三律（特征/自由/幸福）；发生学——追问事物为何如此发生，而非如何被发现。";
+      if (b.mode === "plan") {
+        const disc = await readDiscussion(env, room);
+        if (!disc || disc.length < 30) return Response.json({ ok: false, msg: "群里讨论内容太少，先多聊几句再提炼。" }, { status: 400 });
+        let reflect = ""; try { reflect = await ensureReflect(env, base, vc.rvendor, vc.VC, vc.KEY); } catch (e) {}
+        const sys = "你是 SDE 学派的学术编辑，要把一段群讨论提炼成一篇学术论文的骨架。" + (reflect ? ("\n\n【SDE 内化心得·思考底盘（内化用，别复述）】\n" + reflect) : "") + SDEM;
+        const usr = "【群里的讨论】\n" + disc + "\n\n请基于这段讨论：① 总结讨论要点；② 选出 3-5 个最有价值的『金点子』（反直觉的新判断，各一句）；③ 拟一个学术论文标题；④ 给三部分写作大纲（① 引言与金点子提炼 ② 核心论证展开 ③ 结论与展望），每部分一句主旨。\n只输出 JSON、不要任何其他文字：{\"title\":\"标题\",\"points\":[\"金点子1\",\"金点子2\"],\"parts\":[{\"h\":\"部分标题\",\"gist\":\"主旨\"},{\"h\":\"部分标题\",\"gist\":\"主旨\"},{\"h\":\"部分标题\",\"gist\":\"主旨\"}]}";
+        const out = await llmText(vc.VC, vc.KEY, sys, usr, 1600);
+        let j = null; try { j = JSON.parse(String(out).replace(/```json|```/g, "").trim()); } catch (e) {}
+        if (!j || !j.title || !Array.isArray(j.parts) || !j.parts.length) return Response.json({ ok: false, msg: "提纲生成失败，请重试。" }, { status: 502 });
+        return Response.json({ ok: true, title: j.title, points: j.points || [], parts: j.parts, disc: disc.slice(0, 2200) });
+      }
+      if (b.mode === "part") {
+        const title = String(b.title || "").slice(0, 200);
+        const parts = Array.isArray(b.parts) ? b.parts : [];
+        const idx = parseInt(b.idx, 10) || 0;
+        if (!parts[idx]) return Response.json({ ok: false, msg: "bad idx" }, { status: 400 });
+        const points = Array.isArray(b.points) ? b.points.slice(0, 8) : [];
+        const prevBrief = String(b.prevBrief || "").slice(0, 1300);
+        const discBrief = String(b.disc || "").slice(0, 2200);
+        let reflect = ""; try { reflect = await ensureReflect(env, base, vc.rvendor, vc.VC, vc.KEY); } catch (e) {}
+        const sys = "你是 SDE 学派的学者，正在写一篇严谨的学术论文。" + (reflect ? ("\n\n【SDE 内化心得·思考底盘（内化用，别复述）】\n" + reflect) : "") + SDEM + "\n用严谨学术汉语写作：论证扎实、有新判断、不注水、不摆空模板；可用 SDE 概念但要讲透、服务论证。用自然段和简短小标题分层，不要用 #、* 等 markdown 符号。";
+        const usr = "论文标题：" + title + "\n金点子：" + points.join("；") + "\n讨论摘录：" + discBrief + "\n" + (prevBrief ? ("前文已写（摘要）：" + prevBrief + "\n") : "") + "\n现在写【" + parts[idx].h + "】这一部分（主旨：" + (parts[idx].gist || "") + "），约 2800-3400 字。直接从正文写起，不要开场白，不要复述论文标题。";
+        const text = await llmText(vc.VC, vc.KEY, sys, usr, 5000);
+        return Response.json(text ? { ok: true, text } : { ok: false, msg: "本部分生成失败。" }, { status: text ? 200 : 502 });
+      }
+      return Response.json({ ok: false, msg: "bad mode" }, { status: 400 });
+    }
     if (url.pathname === "/api/chat/clear" && request.method === "POST") {
       const b = await request.json().catch(() => ({}));
       const room = (b.room || "").toLowerCase();
