@@ -61,6 +61,13 @@ export class VisitCounter {
 
 // ===== 读者讨论区·每篇文章一个实例（key=cm:<slug>）=====
 // 纪律：只存虚拟名+内容+时间；访客指纹只是当日哈希、仅用于限流且跨天即删，绝不存原始 IP。
+const WDS_VENDORS = {
+  deepseek: { url: "https://api.deepseek.com/v1/chat/completions", model: "deepseek-chat", name: "DeepSeek" },
+  kimi: { url: "https://api.moonshot.cn/v1/chat/completions", model: "moonshot-v1-8k", name: "Kimi" },
+  zhipu: { url: "https://open.bigmodel.cn/api/paas/v4/chat/completions", model: "glm-4-plus", name: "\u667a\u8c31 GLM" },
+  qwen: { url: "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions", model: "qwen-plus", name: "\u5343\u95ee Qwen" },
+  minimax: { url: "https://api.minimax.chat/v1/text/chatcompletion_v2", model: "abab6.5s-chat", name: "MiniMax" },
+};
 const WDS_SYS = `你是"WDS智能体"，王德生（Desheng）先生的 AI 分身，SDE 本体论的老师，正在 SDE 学员的讨论群里当场回答学生的提问。
 
 【思想内核·SDE 本体论】
@@ -335,19 +342,29 @@ export class CommentBox {
     if (now - last < 2000) return;
     await this.ctx.storage.put("wdslast", now);
     this.broadcast({ t: "typing", name: "WDS智能体" });
-    let key = "";
+    let VC = null, key = "", rvendor = "glm";
     try {
       const cv = this.env.CONFIG_VAULT.get(this.env.CONFIG_VAULT.idFromName("global"));
-      const r = await (await cv.fetch(new Request("https://cfg.internal/", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ op: "get" }) }))).json();
-      key = r.key || "";
+      const r = await (await cv.fetch(new Request("https://cfg.internal/", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ op: "getVendor" }) }))).json();
+      if (r && r.vendor && WDS_VENDORS[r.vendor] && r.key) {
+        VC = { url: WDS_VENDORS[r.vendor].url, model: r.model || WDS_VENDORS[r.vendor].model };
+        key = r.key;
+        rvendor = ({ zhipu: "glm", deepseek: "ds" })[r.vendor] || r.vendor;
+      }
     } catch (e) {}
+    if (!key) {
+      try {
+        const cv = this.env.CONFIG_VAULT.get(this.env.CONFIG_VAULT.idFromName("global"));
+        const r = await (await cv.fetch(new Request("https://cfg.internal/", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ op: "get" }) }))).json();
+        if (r && r.key) { VC = { url: "https://open.bigmodel.cn/api/paas/v4/chat/completions", model: "glm-5" }; key = r.key; rvendor = "glm"; }
+      } catch (e) {}
+    }
     if (!key) key = (this.env && this.env.SDE_SEARCH_KEY) || "";
-    if (!key) { await this.chatAddBot("（WDS智能体暂时不可用：管理员还没配置密钥。）"); return; }
-    const VC = { url: "https://open.bigmodel.cn/api/paas/v4/chat/completions", model: "glm-5", name: "GLM-5" };
+    if (!key || !VC) { await this.chatAddBot("（WDS智能体暂时不可用：管理员还没配置基底密钥——点右上角 ⚙ 选基底、填密钥。）"); return; }
     const base = "https://sdeuniverses.com/";
-    // 心得：复用/生成与智能问答同一份 reflect:glm（内功学习后的内化底盘）
+    // 心得：按基底复用/生成 reflect:<vendor>（内功学习后的内化底盘；智谱/DeepSeek 复用智能问答的心得）
     let reflect = "";
-    try { reflect = await ensureReflect(this.env, base, "glm", VC, key); } catch (e) {}
+    try { reflect = await ensureReflect(this.env, base, rvendor, VC, key); } catch (e) {}
     // 群聊 RAG：把最近的群讨论作上下文
     const ctx = await this._wdsChatContext();
     const sys = WDS_SYS
@@ -486,6 +503,33 @@ export class ConfigVault {
       if (h !== stored) return Response.json({ ok: false, msg: "管理口令不正确。" });
       await this.ctx.storage.put("key", key);
       return Response.json({ ok: true, msg: "密钥已更新。" });
+    }
+    if (op === "setVendor") { // 保存某基底的密钥并设为当前活跃基底
+      const pass = String(body.pass || ""), vendor = String(body.vendor || ""), key = String(body.key || ""), model = String(body.model || "").slice(0, 60);
+      if (!WDS_VENDORS[vendor]) return Response.json({ ok: false, msg: "未知基底。" });
+      if (pass.length < 4) return Response.json({ ok: false, msg: "管理口令太短（至少 4 位）。" });
+      if (key.length < 8) return Response.json({ ok: false, msg: "密钥格式无效（太短）。" });
+      const stored = (await this.ctx.storage.get("adminHash")) || "";
+      const h = await this._hash(pass);
+      if (!stored) { await this.ctx.storage.put("adminHash", h); }
+      else if (h !== stored) return Response.json({ ok: false, msg: "管理口令不正确。" });
+      await this.ctx.storage.put("vkey:" + vendor, key);
+      if (model) await this.ctx.storage.put("vmodel:" + vendor, model); else await this.ctx.storage.delete("vmodel:" + vendor);
+      await this.ctx.storage.put("vendor", vendor);
+      if (vendor === "zhipu") await this.ctx.storage.put("key", key); // 智谱同时供智能问答用
+      return Response.json({ ok: true, msg: "已保存并设为当前基底：" + WDS_VENDORS[vendor].name + "。" });
+    }
+    if (op === "getVendor") { // 仅 Worker 内部调用：取当前活跃基底 + 其密钥/模型
+      const active = (await this.ctx.storage.get("vendor")) || "";
+      const key = active ? ((await this.ctx.storage.get("vkey:" + active)) || "") : "";
+      const model = active ? ((await this.ctx.storage.get("vmodel:" + active)) || "") : "";
+      return Response.json({ vendor: active, key, model });
+    }
+    if (op === "vendorStatus") { // 哪些基底已配置 + 当前活跃
+      const active = (await this.ctx.storage.get("vendor")) || "";
+      const configured = {};
+      for (const v of Object.keys(WDS_VENDORS)) configured[v] = !!(await this.ctx.storage.get("vkey:" + v));
+      return Response.json({ active, configured });
     }
     return Response.json({ ok: false, msg: "unknown op" });
   }
@@ -1270,6 +1314,17 @@ export default {
       const b = await request.json().catch(() => ({}));
       const cv = env.CONFIG_VAULT.get(env.CONFIG_VAULT.idFromName("global"));
       const r = await cv.fetch(new Request("https://cfg.internal/", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ op: "set", pass: b.pass, key: b.key }) }));
+      return Response.json(await r.json(), { headers: { "access-control-allow-origin": "*" } });
+    }
+    if (url.pathname === "/api/admin/setvendor" && request.method === "POST") {
+      const b = await request.json().catch(() => ({}));
+      const cv = env.CONFIG_VAULT.get(env.CONFIG_VAULT.idFromName("global"));
+      const r = await cv.fetch(new Request("https://cfg.internal/", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ op: "setVendor", pass: b.pass, vendor: b.vendor, key: b.key, model: b.model }) }));
+      return Response.json(await r.json(), { headers: { "access-control-allow-origin": "*" } });
+    }
+    if (url.pathname === "/api/admin/vendorstatus") {
+      const cv = env.CONFIG_VAULT.get(env.CONFIG_VAULT.idFromName("global"));
+      const r = await cv.fetch(new Request("https://cfg.internal/", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ op: "vendorStatus" }) }));
       return Response.json(await r.json(), { headers: { "access-control-allow-origin": "*" } });
     }
     if (url.pathname === "/api/admin/status") {
