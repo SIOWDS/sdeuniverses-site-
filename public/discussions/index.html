@@ -133,6 +133,12 @@ footer a{color:var(--gold);text-decoration:none}
 #sde-chat .ch-cap{font-size:0.9rem;line-height:1.5;padding:5px 6px 2px;color:var(--text);white-space:pre-wrap;word-break:break-word}
 #sde-chat .msg.mine .bub.bub-img{background:var(--disc)}
 #sde-chat .msg.mine .ch-cap{color:#F5F2E8}
+#sde-chat .ch-wds-btn{font-size:1.05rem;background:#FBF6E9;border:1px solid var(--gold);border-radius:8px;height:42px;width:44px;cursor:pointer;flex:none;padding:0;line-height:1}
+#sde-chat .ch-wds-btn:hover{background:#F5EDD8}
+#sde-chat .msg.bot{align-self:flex-start;align-items:flex-start;max-width:90%}
+#sde-chat .msg.bot .who{color:var(--gold2);font-weight:700}
+#sde-chat .msg.bot .bub{background:#FBF6E9;border-color:var(--gold);color:var(--text)}
+#sde-chat .ch-typing{align-self:flex-start;font-size:0.82rem;color:var(--muted);padding:3px 8px;font-style:italic}
 #sde-chat .msg .tm .ch-recall{color:inherit;opacity:0.7;text-decoration:underline;cursor:pointer}
 #sde-chat .msg .tm .ch-recall:hover{opacity:1}
 #sde-chat .bub.recalled{background:transparent;border:1px dashed var(--border);color:var(--muted);font-style:italic}
@@ -153,12 +159,13 @@ footer a{color:var(--gold);text-decoration:none}
   </div>
   <div class="ch-foot">
     <div class="ch-signed" id="ch-signed" style="display:none">以 <b id="ch-name"></b> 的身份发言 <a id="ch-out">退出</a></div>
-    <div class="ch-login" id="ch-login"><span>登录后即可发言：</span><span id="ch-gsi"></span></div>
+    <div class="ch-login" id="ch-login"><span>登录后即可发言、向 🤖 WDS智能体 提问：</span><span id="ch-gsi"></span></div>
     <div class="ch-emoji-panel" id="ch-emoji-panel"></div>
     <div class="ch-input" id="ch-input">
       <button class="ch-emoji-btn" id="ch-emoji-btn" type="button" title="表情">😊</button>
       <button class="ch-img-btn" id="ch-img-btn" type="button" title="发图片">🖼️</button>
       <input type="file" id="ch-file" accept="image/*" style="display:none">
+      <button class="ch-wds-btn" id="ch-wds-btn" type="button" title="问 WDS智能体">🤖</button>
       <textarea id="ch-text" maxlength="500" placeholder="说点什么…（Enter 发送，Shift+Enter 换行）"></textarea>
       <button id="ch-send">发送</button>
     </div>
@@ -183,9 +190,10 @@ function renderRecalled(bub){bub.textContent="[消息已撤回]";bub.className="
 function addMsg(m){
   if(m.id&&seen[m.id])return; if(m.id){seen[m.id]=1; if(m.id>lastId)lastId=m.id;}
   if(!everMsg){everMsg=true;var e=el("ch-empty");if(e)e.parentNode.removeChild(e);}
-  var wasNear=nearBottom(),mine=(m.name===myName&&myName);
-  var wrap=document.createElement("div");wrap.className="msg"+(mine?" mine":"");
-  var who=document.createElement("div");who.className="who";who.textContent=m.name;
+  var wasNear=nearBottom(),mine=(m.name===myName&&myName),bot=(m.bot||m.name==="WDS智能体");
+  if(bot)hideTyping();
+  var wrap=document.createElement("div");wrap.className="msg"+(bot?" bot":(mine?" mine":""));
+  var who=document.createElement("div");who.className="who";who.textContent=(bot?"🤖 ":"")+m.name;
   var bub=document.createElement("div");bub.className="bub";
   var tm=document.createElement("div");tm.className="tm";tm.textContent=fmtT(m.ts);
   wrap.appendChild(who);wrap.appendChild(bub);wrap.appendChild(tm);
@@ -200,7 +208,7 @@ function addMsg(m){
       bub.appendChild(im);
       if(m.text){var cap=document.createElement("div");cap.className="ch-cap";cap.textContent=m.text;bub.appendChild(cap);}
     }else{bub.textContent=m.text;}
-    if(mine){var age=Date.now()-m.ts;
+    if(mine&&!bot){var age=Date.now()-m.ts;
       if(age<120000){var rc=document.createElement("a");rc.className="ch-recall";rc.textContent="撤回";
         rc.onclick=function(){doRecall(m.id);};
         tm.appendChild(document.createTextNode(" · "));tm.appendChild(rc);
@@ -242,6 +250,7 @@ function connect(){
     else if(d.t==="presence"){setOnline(d.online);}
     else if(d.t==="authed"){myName=d.name;note("");}
     else if(d.t==="recall"){onRecall(d.id);}
+    else if(d.t==="typing"){showTyping();}
     else if(d.t==="err"){if(d.m==="login")note("请先用 Google 账号登录再发言。");else note(d.m||"发送失败。");}
   };
   ws.onclose=function(){connected=false;if(usePoll)return;setStatus("offline");scheduleReconnect();};
@@ -302,6 +311,17 @@ function uploadImg(dataURL){
   }).catch(function(){if(imgBtn)imgBtn.disabled=false;note("网络异常，图片没发出去。");});
 }
 })();
+var typingEl=null;
+function showTyping(){if(!typingEl){typingEl=document.createElement("div");typingEl.className="ch-typing";typingEl.textContent="🤖 WDS智能体 正在思考…";}var near=nearBottom();el("ch-scroll").appendChild(typingEl);if(near)toBottom();}
+function hideTyping(){if(typingEl&&typingEl.parentNode)typingEl.parentNode.removeChild(typingEl);}
+(function(){var wdsBtn=el("ch-wds-btn");if(!wdsBtn)return;
+wdsBtn.onclick=function(){
+  if(!gcred){note("请先用 Google 账号登录再向 WDS智能体提问。");return;}
+  var t=el("ch-text"),v=t.value.trim();
+  if(!v){if(!/^@\s*wds/i.test(t.value))t.value="@WDS "+t.value;t.focus();return;}
+  if(!/^@\s*wds/i.test(v))t.value="@WDS "+v;
+  doSend();
+};})();
 el("ch-send").onclick=doSend;
 var ta=el("ch-text");
 ta.addEventListener("keydown",function(e){if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();doSend();}});
