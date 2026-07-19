@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SDE 讨论 · 群聊 | SDE Universes</title>
+<meta name="description" content="SDE Universes 的公共讨论群——像微信群一样，登录后发消息，人人可见，消息持久保存。围绕 SDE 显露-差异-纠缠本体论、发生学、AI 与各学科的一切，都欢迎来聊。">
+<link rel="preconnect" href="https://fonts.loli.net"><link rel="preconnect" href="https://gstatic.loli.net" crossorigin>
+<link href="https://fonts.loli.net/css2?family=Noto+Serif+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#ECEBE6;--panel:#F3F1EC;--card:#FBFAF6;--accent:#2E4B78;--accent2:#16305A;--gold:#8A6817;--text:#1F2328;--muted:#7A6F5E;--line:rgba(41,66,110,0.16);--me:#95D06A;--me2:#8AC961;--them:#FFFFFF;--sys:#D8D5CC}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{background:var(--bg);color:var(--text);font-family:"Songti SC","Noto Serif SC","Noto Serif CJK SC",Georgia,serif;display:flex;flex-direction:column;height:100dvh;overflow:hidden}
+a{color:var(--accent);text-decoration:none}
+/* ── 顶栏 ── */
+.top{flex:0 0 auto;background:linear-gradient(158deg,#14243F,#0F1B30);color:#E6ECF4;padding:12px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px;box-shadow:0 2px 12px rgba(0,0,0,0.14);z-index:10}
+.top .back{color:#9FB6D6;font-size:13px;white-space:nowrap}
+.top .tt{font-size:16px;font-weight:700;letter-spacing:0.04em;text-align:center;line-height:1.3}
+.top .tt .sub{display:block;font-size:11px;color:#8FB0DA;font-weight:400;letter-spacing:0.12em;margin-top:2px}
+.top .who{font-size:12px;color:#9FB6D6;white-space:nowrap;max-width:120px;overflow:hidden;text-overflow:ellipsis;text-align:right}
+/* ── 消息区 ── */
+.stage{flex:1 1 auto;overflow-y:auto;padding:18px 14px 8px;-webkit-overflow-scrolling:touch}
+.stage .day-tip{text-align:center;margin:6px 0 16px}
+.stage .day-tip span{background:var(--sys);color:#6B6250;font-size:11px;padding:3px 10px;border-radius:4px;letter-spacing:0.05em}
+.loading,.empty{text-align:center;color:var(--muted);padding:40px 20px;font-size:14px;line-height:1.9}
+.spinner{width:32px;height:32px;border:3px solid rgba(46,75,120,0.2);border-top-color:var(--accent);border-radius:50%;margin:0 auto 16px;animation:spin 0.9s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.msg{display:flex;margin-bottom:16px;gap:9px;align-items:flex-start}
+.msg .av{flex:0 0 auto;width:38px;height:38px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#fff;letter-spacing:0}
+.msg .col{display:flex;flex-direction:column;max-width:74%}
+.msg .nm{font-size:12px;color:var(--muted);margin:0 0 4px 2px;letter-spacing:0.02em}
+.msg .bub{position:relative;padding:9px 13px;border-radius:8px;font-size:15.5px;line-height:1.72;word-break:break-word;white-space:pre-wrap;background:var(--them);color:#20242A;box-shadow:0 1px 2px rgba(0,0,0,0.08)}
+.msg .tm{font-size:10.5px;color:#A79E8C;margin:4px 2px 0;letter-spacing:0.03em}
+/* 自己的消息靠右、绿气泡 */
+.msg.me{flex-direction:row-reverse}
+.msg.me .col{align-items:flex-end}
+.msg.me .nm{margin:0 2px 4px 0}
+.msg.me .bub{background:linear-gradient(160deg,var(--me),var(--me2));color:#12300A}
+.msg.me .tm{text-align:right}
+/* 回复引用 */
+.msg .quote{font-size:12.5px;color:#5A6B52;background:rgba(0,0,0,0.05);border-left:2px solid rgba(0,0,0,0.18);padding:4px 8px;border-radius:4px;margin-bottom:6px;line-height:1.5}
+.msg.me .quote{color:#2E4B1E;background:rgba(255,255,255,0.35);border-left-color:rgba(18,48,10,0.3)}
+.msg .reply-btn{font-size:11px;color:var(--muted);cursor:pointer;margin-top:3px;opacity:0.65}
+.msg .reply-btn:hover{opacity:1;text-decoration:underline}
+/* ── 底部输入栏 ── */
+.dock{flex:0 0 auto;background:var(--panel);border-top:1px solid var(--line);padding:10px 12px calc(10px + env(safe-area-inset-bottom));box-shadow:0 -2px 12px rgba(0,0,0,0.06)}
+.replying{display:none;font-size:12.5px;color:var(--accent2);background:var(--card);border:1px solid var(--line);border-radius:6px;padding:6px 10px;margin-bottom:8px;align-items:center;justify-content:space-between}
+.replying .cancel{color:var(--muted);cursor:pointer;font-size:16px;padding:0 4px}
+.signin-row{padding:6px 2px 4px}
+.signin-hint{font-size:12.5px;color:var(--muted);margin-bottom:8px;line-height:1.7}
+.inbar{display:flex;gap:9px;align-items:flex-end}
+.inbar textarea{flex:1 1 auto;resize:none;border:1px solid var(--line);border-radius:8px;background:var(--card);padding:10px 12px;font-family:inherit;font-size:15.5px;line-height:1.5;color:var(--text);max-height:120px;min-height:44px}
+.inbar textarea:focus{outline:none;border-color:var(--accent)}
+.inbar .send{flex:0 0 auto;background:var(--accent);color:#fff;border:none;border-radius:8px;padding:0 20px;height:44px;font-family:inherit;font-size:15px;font-weight:700;letter-spacing:0.06em;cursor:pointer}
+.inbar .send:disabled{opacity:0.4;cursor:not-allowed}
+.signed{display:none;align-items:center;gap:8px;font-size:12px;color:var(--muted);margin-bottom:8px}
+.signed .out{color:var(--accent);cursor:pointer;text-decoration:underline}
+.note{font-size:12px;color:var(--gold);min-height:16px;margin-top:6px;padding-left:2px}
+.gsi{margin:2px 0}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <a class="back" href="/">← 首页</a>
+  <div class="tt">SDE 讨论<span class="sub">公共群聊 · 登录后发言</span></div>
+  <div class="who" id="tk-who"></div>
+</div>
+
+<div class="stage" id="stage">
+  <div class="loading" id="loading"><div class="spinner"></div>正在进入 SDE 讨论群…</div>
+</div>
+
+<div class="dock">
+  <div class="replying" id="tk-replying">
+    <span id="tk-replying-to">回复：</span>
+    <span class="cancel" id="tk-cancel">×</span>
+  </div>
+
+  <!-- 未登录：Google 登录 -->
+  <div class="signin-row" id="tk-gsi-wrap">
+    <div class="signin-hint">本群需登录后发言（消息公开可见、长期保存）。请用 Google 账号登录：</div>
+    <div class="gsi" id="tk-gsi"></div>
+  </div>
+
+  <!-- 已登录：输入栏 -->
+  <div id="tk-compose" style="display:none">
+    <div class="signed" id="tk-signed">
+      已登录：<b id="tk-gname"></b>　<span class="out" id="tk-gout">退出</span>
+    </div>
+    <div class="inbar">
+      <textarea id="tk-text" placeholder="说点什么…（Enter 发送，Shift+Enter 换行）" rows="1"></textarea>
+      <button class="send" id="tk-send">发送</button>
+    </div>
+  </div>
+  <div class="note" id="tk-msg"></div>
+</div>
+
+<script>
+(function(){
+var slug="sde-plaza",API="/api/comments?slug="+slug;
+function el(id){return document.getElementById(id)}
+var items=[],parent="",myName="",firstLoad=true,lastCount=0;
+function note(s){el("tk-msg").textContent=s||""}
+
+/* ── Google 登录（复用全站方案，与讨论区一致）── */
+var GCID="985037699618-de3smmqf2rer0pfhf4mrtrj3rgahgu5u.apps.googleusercontent.com",gcred="";
+try{var st=JSON.parse(sessionStorage.getItem("sde_gauth")||"null");if(st&&st.exp>Date.now()){gcred=st.cred;showSigned(st.name);}}catch(e){}
+function showSigned(n){myName=n;el("tk-gname").textContent=n;el("tk-who").textContent=n;el("tk-compose").style.display="block";el("tk-gsi-wrap").style.display="none";render();}
+function showSignIn(){gcred="";myName="";el("tk-who").textContent="";try{sessionStorage.removeItem("sde_gauth");}catch(e){}el("tk-compose").style.display="none";el("tk-gsi-wrap").style.display="block";render();}
+window.__sdeTalkCb=function(resp){try{var p=JSON.parse(atob(resp.credential.split(".")[1].replace(/-/g,"+").replace(/_/g,"/")));var nm=(p.name||(p.email||"").split("@")[0]||"").slice(0,20);gcred=resp.credential;try{sessionStorage.setItem("sde_gauth",JSON.stringify({cred:gcred,name:nm,exp:Date.now()+50*60*1000}));}catch(e){}showSigned(nm);}catch(e){note("登录信息解析失败，请重试。");}};
+function bootGsi(){if(!(window.google&&google.accounts&&google.accounts.id)){el("tk-gsi").textContent="Google 登录组件加载失败——本群需 Google 账号登录后发言，请检查网络后刷新。";return}
+google.accounts.id.initialize({client_id:GCID,callback:window.__sdeTalkCb,auto_select:true});
+google.accounts.id.renderButton(el("tk-gsi"),{theme:"outline",size:"large",text:"signin_with",shape:"pill",logo_alignment:"left"});}
+(function(){var s=document.createElement("script");s.src="https://accounts.google.com/gsi/client";s.async=true;s.defer=true;s.onload=bootGsi;s.onerror=function(){el("tk-gsi").textContent="无法连接 Google 登录服务——本群需 Google 账号登录后发言。";};document.head.appendChild(s);})();
+el("tk-gout").onclick=showSignIn;
+
+/* ── 工具 ── */
+function tme(ts){var d=new Date(ts),p=function(x){return (x<10?"0":"")+x};return p(d.getHours())+":"+p(d.getMinutes())}
+function dayLabel(ts){var d=new Date(ts),p=function(x){return (x<10?"0":"")+x};return d.getFullYear()+"-"+p(d.getMonth()+1)+"-"+p(d.getDate())}
+var PAL=["#2E4B78","#8A6817","#9D2933","#2A6B4A","#7A4A8C","#1B6E7A","#A0651F","#336699","#8C3B32","#2E8B57"];
+function colorFor(name){var h=0;for(var i=0;i<name.length;i++)h=(h*31+name.charCodeAt(i))%PAL.length;return PAL[h]}
+function avatarText(name){return (name||"?").trim().slice(0,1).toUpperCase()}
+function findText(id){for(var i=0;i<items.length;i++)if(items[i].id===id)return items[i];return null}
+
+/* ── 渲染消息流 ── */
+function render(){
+  var stage=el("stage");
+  if(el("loading"))el("loading").remove();
+  // 记录是否已在底部（决定新消息来了要不要自动滚）
+  var nearBottom=(stage.scrollHeight-stage.scrollTop-stage.clientHeight)<120;
+  stage.textContent="";
+  if(!items.length){var e=document.createElement("div");e.className="empty";e.textContent="群里还没有消息——欢迎第一个开口。";stage.appendChild(e);return;}
+  var sorted=items.slice().sort(function(a,b){return a.ts-b.ts});
+  var lastDay="";
+  sorted.forEach(function(c){
+    var dl=dayLabel(c.ts);
+    if(dl!==lastDay){lastDay=dl;var dt=document.createElement("div");dt.className="day-tip";var ds=document.createElement("span");ds.textContent=dl;dt.appendChild(ds);stage.appendChild(dt);}
+    var mine=(myName&&c.name===myName);
+    var row=document.createElement("div");row.className="msg"+(mine?" me":"");
+    // 头像
+    var av=document.createElement("div");av.className="av";av.style.background=colorFor(c.name);av.textContent=avatarText(c.name);row.appendChild(av);
+    // 内容列
+    var col=document.createElement("div");col.className="col";
+    var nm=document.createElement("div");nm.className="nm";nm.textContent=c.name;col.appendChild(nm);
+    var bub=document.createElement("div");bub.className="bub";
+    if(c.parent){var q=findText(c.parent);if(q){var qd=document.createElement("div");qd.className="quote";qd.textContent=q.name+"："+(q.text.length>40?q.text.slice(0,40)+"…":q.text);bub.appendChild(qd);}}
+    var tx=document.createElement("span");tx.textContent=c.text;bub.appendChild(tx);
+    col.appendChild(bub);
+    var meta=document.createElement("div");meta.className="tm";meta.textContent=tme(c.ts);
+    if(gcred){var rb=document.createElement("span");rb.className="reply-btn";rb.textContent="　回复";rb.onclick=function(){parent=c.id;el("tk-replying-to").textContent="回复 "+c.name+"：";el("tk-replying").style.display="flex";el("tk-text").focus();};meta.appendChild(rb);}
+    col.appendChild(meta);
+    row.appendChild(col);
+    stage.appendChild(row);
+  });
+  if(firstLoad||nearBottom||items.length>lastCount){stage.scrollTop=stage.scrollHeight;}
+  lastCount=items.length;firstLoad=false;
+}
+
+/* ── 拉取消息（首次 + 轮询）── */
+function load(){
+  fetch(API).then(function(r){return r.json()}).then(function(d){
+    var next=d.items||[];
+    // 只有条数变化才重渲染，减少闪烁
+    if(next.length!==items.length){items=next;render();}
+    else if(firstLoad){items=next;render();}
+  }).catch(function(){if(firstLoad){var s=el("stage");s.textContent="";var e=document.createElement("div");e.className="empty";e.textContent="暂时连不上讨论群，请稍后刷新。";s.appendChild(e);}});
+}
+
+/* ── 发送 ── */
+function doSend(){
+  var text=el("tk-text").value.trim();
+  if(!gcred){note("请先用 Google 账号登录。");return;}
+  if(text.length<2){note("内容太短了。");return;}
+  el("tk-send").disabled=true;note("发送中…");
+  fetch(API,{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({credential:gcred,text:text,parent:parent})})
+  .then(function(r){return r.json().then(function(d){return{s:r.status,d:d}})})
+  .then(function(x){el("tk-send").disabled=false;
+    if(x.d&&x.d.ok){el("tk-text").value="";el("tk-text").style.height="44px";parent="";el("tk-replying").style.display="none";note("");
+      if(x.d.item){items.push(x.d.item);render();}else{load();}}
+    else if(x.s===401){note("登录已过期，请重新登录。");showSignIn();}
+    else{note((x.d&&x.d.msg)||"发送失败，请稍后再试。");}})
+  .catch(function(){el("tk-send").disabled=false;note("网络异常，请稍后再试。");});
+}
+el("tk-send").onclick=doSend;
+el("tk-cancel").onclick=function(){parent="";el("tk-replying").style.display="none";};
+// Enter 发送 / Shift+Enter 换行 / 自动增高
+var ta=el("tk-text");
+ta.addEventListener("keydown",function(e){if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();doSend();}});
+ta.addEventListener("input",function(){ta.style.height="44px";ta.style.height=Math.min(ta.scrollHeight,120)+"px";});
+
+/* ── 启动 + 每 5 秒轮询（在底部或有新消息时自动滚）── */
+load();
+setInterval(load,5000);
+// 页面重新可见时立刻刷一次
+document.addEventListener("visibilitychange",function(){if(!document.hidden)load();});
+})();
+</script>
+</body>
+</html>
