@@ -148,6 +148,15 @@ export class CommentBox {
       }
       return new Response("method", { status: 405 });
     }
+    // ===== 内部：清空本聊天室（仅 Worker 校验管理口令后调用，不对公网暴露）=====
+    if (_u.pathname === "/_clear") {
+      try { const imgs = (await this.ctx.storage.get("imgids")) || []; for (const id of imgs) { try { await this.ctx.storage.delete("im:" + id); } catch (e) {} } } catch (e) {}
+      await this.ctx.storage.delete("clog");
+      await this.ctx.storage.delete("cseq");
+      await this.ctx.storage.delete("imgids");
+      this.broadcast({ t: "cleared" });
+      return Response.json({ ok: true });
+    }
     // ===== 实时群聊：HTTP 历史拉取 / 轮询兜底 / POST 发言 =====
     if (_u.pathname === "/api/chat") {
       if (request.method === "GET") {
@@ -1203,6 +1212,16 @@ export default {
       return env.COUNTER.get(id).fetch(request);
     }
     // /api/chat：实时群聊。WebSocket 升级=实时收发；GET=历史/轮询兜底；POST=轮询兜底发言。转发到 COMMENTS 的 chat:<room> 实例。
+    if (url.pathname === "/api/chat/clear" && request.method === "POST") {
+      const b = await request.json().catch(() => ({}));
+      const room = (b.room || "").toLowerCase();
+      if (!/^[a-z0-9-]+(\/[a-z0-9-]+)*$/.test(room) || room.length > 120) return Response.json({ ok: false, msg: "bad room" }, { status: 400 });
+      const cv = env.CONFIG_VAULT.get(env.CONFIG_VAULT.idFromName("global"));
+      const chk = await (await cv.fetch(new Request("https://cfg.internal/", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ op: "checkpass", pass: String(b.pass || "") }) }))).json();
+      if (!chk || !chk.ok) return Response.json({ ok: false, msg: "管理口令不正确。" }, { status: 403 });
+      const r = await env.COMMENTS.get(env.COMMENTS.idFromName("chat:" + room)).fetch(new Request("https://do/_clear", { method: "POST" }));
+      return Response.json(await r.json(), { headers: { "access-control-allow-origin": "*" } });
+    }
     if (url.pathname === "/api/chat" || url.pathname === "/api/chat/img") {
       const room = (url.searchParams.get("room") || "").toLowerCase();
       if (!/^[a-z0-9-]+(\/[a-z0-9-]+)*$/.test(room) || room.length > 120) {

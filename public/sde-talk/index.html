@@ -214,6 +214,7 @@ function connectWS(){
     if(d.t==="history"){msgs=[];lastId=0;ingest(d.items||[]);render();}
     else if(d.t==="msg"){if(d.bot)typingOn=false;ingest([{id:d.id,name:d.name,text:d.text,ts:d.ts,bot:d.bot,img:d.img,tier:d.tier}]);render();}
     else if(d.t==="recall"){if(markRecalls([d.id]))render();}
+    else if(d.t==="cleared"){msgs=[];lastId=0;render();}
     else if(d.t==="typing"){typingOn=true;render();}
   };
   ws.onclose=function(){ws=null;setStatus("重连中…",false);startPolling();setTimeout(function(){if(!ws&&!document.hidden)connectWS();},4000);};
@@ -322,6 +323,12 @@ document.addEventListener("visibilitychange",function(){if(!document.hidden){if(
     <button class="cfg-save" id="cfg-save" type="button">保存并设为当前基底</button>
     <div class="cfg-msg" id="cfg-msg"></div>
     <p class="cfg-note">保存后所选基底即成为 WDS智能体 当前基底；可随时换基底。首次保存时你填的管理口令即成为此后修改的口令，请牢记。默认模型：DeepSeek=deepseek-chat · Kimi=moonshot-v1-8k · 智谱=glm-4-plus · 千问=qwen-plus · MiniMax=abab6.5s-chat（不对可在"模型名"里改）。</p>
+    <div style="margin-top:16px;border-top:1px solid var(--line);padding-top:14px">
+      <div style="font-size:0.85rem;color:var(--text);font-weight:700;margin-bottom:5px">🗑️ 清空讨论区</div>
+      <div style="font-size:0.75rem;color:var(--muted);line-height:1.6;margin-bottom:9px">清空本群全部消息与图片，所有人即时生效，<b>不可恢复</b>。用上方管理口令。</div>
+      <button class="cfg-save" id="cfg-clear" type="button" style="background:#9D2933">清空讨论区（不可恢复）</button>
+      <div class="cfg-msg" id="cfg-clear-msg"></div>
+    </div>
   </div>
 </div>
 
@@ -342,6 +349,17 @@ function closeCfg(){mask.classList.remove("on");}
 if(el("cfg-open"))el("cfg-open").onclick=openCfg;
 if(el("cfg-close"))el("cfg-close").onclick=closeCfg;
 mask.onclick=function(e){if(e.target===mask)closeCfg();};
+if(el("cfg-clear"))el("cfg-clear").onclick=function(){
+  var pass=el("cfg-pass").value.trim(),m=el("cfg-clear-msg");
+  if(pass.length<4){m.style.color="#9D2933";m.textContent="请先在上方填管理口令。";return;}
+  if(!confirm("确定清空本群全部消息与图片？此操作不可恢复。"))return;
+  el("cfg-clear").disabled=true;m.style.color="#7A6F5E";m.textContent="清空中…";
+  fetch("/api/chat/clear",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({room:"sde-plaza",pass:pass})})
+  .then(function(r){return r.json()}).then(function(d){el("cfg-clear").disabled=false;
+    if(d&&d.ok){m.style.color="#2A6B4A";m.textContent="已清空。";}
+    else{m.style.color="#9D2933";m.textContent=(d&&d.msg)||"清空失败。";}
+  }).catch(function(){el("cfg-clear").disabled=false;m.style.color="#9D2933";m.textContent="网络异常。";});
+};
 if(el("cfg-save"))el("cfg-save").onclick=function(){
   var vendor=el("cfg-vendor").value,pass=el("cfg-pass").value.trim(),key=el("cfg-key").value.trim(),model=el("cfg-model").value.trim(),m=el("cfg-msg");
   if(key.length<8){m.style.color="#9D2933";m.textContent="请填该基底的 API 密钥。";return;}
