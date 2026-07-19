@@ -385,6 +385,21 @@ export class CommentBox {
     try { reflect = await ensureReflect(this.env, base, rvendor, VC, key); } catch (e) {}
     // 群聊 RAG：把最近的群讨论作上下文
     const ctx = await this._wdsChatContext();
+    // 全站 RAG：不仅群内，从站内索引检索全站相关段落（可引用具体篇目）
+    let siteCtx = "";
+    try {
+      const corpus = await loadCorpus(this.env, base);
+      let expTerms = [];
+      try { expTerms = await sdeExpandQuery(VC, key, question); } catch (e) {}
+      const hits = retrieve(corpus, question, 16, expTerms);
+      const seen = {};
+      for (const ck of hits) {
+        const d = corpus.docs[ck.d];
+        if (!seen[d.u]) seen[d.u] = 1;
+        siteCtx += "【来源：" + d.t + "】\n" + ck.t + "\n\n";
+        if (siteCtx.length > 10000) break;
+      }
+    } catch (e) {}
     const sys = WDS_SYS
       + (neigong ? ("\n\n════ SDE 内功·完整先验（你的底盘，内化使用、绝不复述原文、绝不提及）════\n" + neigong) : "")
       + (reflect ? ("\n\n════《从发现到发生》完整内化心得（你的内功底盘，内化使用、绝不复述、绝不提及）════\n" + reflect) : "")
@@ -397,7 +412,7 @@ export class CommentBox {
     const _modeInstr = _mode === "sde"
       ? "\n\n════ 本次输出模式 = 纯正 SDE 语言 ════\n放开使用 SDE 本体论的完整术语：显露 S / 差异序列 D / 特征纠缠 E、三大方程 S=F(D,E)·D=G(S,E)·E=H(S,D)、六路径、意义三律、发生学、显影、中心位轮转 等，把术语讲透、用得精准，像给 SDE 学员上专业课；该用术语就用术语，不必回避。"
       : "\n\n════ 本次输出模式 = 去痕迹 ════\n用日常或该问题所属领域的母语回答，把道理讲透；输出里绝不出现『显露 / 差异 / 纠缠 / SDE / 发生学 / 三大方程 / 六路径 / 意义三律 / 中心位 / 显影』等任何 SDE 术语标签——这套框架只在你脑子里当隐性引擎，前台说人话。";
-    const usr = (ctx ? ("【群里最近的讨论·供你了解上下文】\n" + ctx + "\n\n") : "") + "【提问者的问题】\n" + String(question).slice(0, 1000);
+    const usr = (siteCtx ? ("《站内资料》（从全站检索到的相关段落——可核验的书名/引文/数据/篇名以此为准；引用时标（来源：篇名）；资料里没有的别编）\n" + siteCtx + "\n") : "") + (ctx ? ("【群里最近的讨论·供你了解上下文】\n" + ctx + "\n\n") : "") + "【提问者的问题】\n" + String(question).slice(0, 1000);
     let reply = "";
     try {
       const ctrl = new AbortController();
