@@ -1,121 +1,170 @@
 <!DOCTYPE html>
-<html lang="zh-CN"><head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>健康诚实不可计算 · 翻页阅读 | SDE Universes</title>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>在线阅读 · 健康诚实不可计算 | 德麦国际专著</title>
 <style>
-:root{--accent:#3f5b76;--head:#26303a;--accent2:#8fb3d0;--paper:#fffdf8;--room:#e9e4d8;--room2:#f3efe6;--ink:#2a2620;--mut:#8a8072}
+:root{--ink:#1A1410;--gold:#D4B25E;--gold2:#B8901F;--paper:#F5EFE0;--muted:#8B7E5E}
 *{margin:0;padding:0;box-sizing:border-box}
-html,body{height:100%}
-body{background:radial-gradient(120% 120% at 50% 0%,var(--room2) 0%,var(--room) 78%);color:var(--ink);font-family:"Songti SC","Noto Serif SC",Georgia,serif;overflow:hidden;-webkit-font-smoothing:antialiased}
-.bar{position:fixed;top:0;left:0;right:0;z-index:30;height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 18px;gap:14px;background:linear-gradient(rgba(243,239,230,0.92),rgba(243,239,230,0.66));backdrop-filter:blur(10px);border-bottom:1px solid rgba(0,0,0,0.06)}
-.bar .bk{color:var(--mut);text-decoration:none;font-size:13px;letter-spacing:.05em;white-space:nowrap;transition:color .2s}
-.bar .bk:hover{color:var(--accent)}
-.bar .ttl{flex:1;text-align:center;font-size:14px;color:var(--head);letter-spacing:.03em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600}
-.bar .dl{color:var(--accent);text-decoration:none;font-size:12.5px;border:1px solid rgba(10,102,194,.4);padding:5px 13px;border-radius:20px;white-space:nowrap;transition:all .2s}
-.bar .dl:hover{background:var(--accent);color:#fff}
-.scene{position:fixed;top:52px;bottom:70px;left:0;right:0;display:flex;align-items:center;justify-content:center;perspective:2400px;padding:22px 8px}
-.book{position:relative;height:100%;max-height:100%;display:flex;align-items:center;justify-content:center;transform-style:preserve-3d}
-.leaf{position:relative;height:100%;background:var(--paper);border-radius:3px 6px 6px 3px;box-shadow:0 22px 60px rgba(40,30,15,.28),0 4px 14px rgba(40,30,15,.16);overflow:hidden;transform-origin:left center;will-change:transform,opacity}
-.leaf::before{content:"";position:absolute;top:0;bottom:0;left:0;width:26px;background:linear-gradient(90deg,rgba(0,0,0,.10),rgba(0,0,0,0) 70%);pointer-events:none;z-index:3}
-.leaf::after{content:"";position:absolute;top:0;bottom:0;right:0;width:14px;background:linear-gradient(270deg,rgba(0,0,0,.05),transparent);pointer-events:none}
-canvas{display:block;height:100%;width:auto;max-width:100%}
-.leaf.turn-next{animation:tn .52s cubic-bezier(.4,.05,.25,1)}
-.leaf.turn-prev{animation:tp .52s cubic-bezier(.4,.05,.25,1)}
-@keyframes tn{0%{transform:rotateY(0);opacity:1}45%{transform:rotateY(-16deg);box-shadow:-30px 22px 60px rgba(40,30,15,.34)}55%{transform:rotateY(14deg)}100%{transform:rotateY(0);opacity:1}}
-@keyframes tp{0%{transform:rotateY(0)}45%{transform:rotateY(16deg)}55%{transform:rotateY(-14deg)}100%{transform:rotateY(0)}}
-.tapz{position:fixed;top:52px;bottom:70px;width:26%;z-index:12;cursor:pointer;display:flex;align-items:center;opacity:0;transition:opacity .25s}
-.tapz.l{left:0;justify-content:flex-start;padding-left:14px}
-.tapz.r{right:0;justify-content:flex-end;padding-right:14px}
-.tapz:hover{opacity:1}
-.chev{width:44px;height:44px;border-radius:50%;background:rgba(255,253,248,.9);box-shadow:0 6px 18px rgba(40,30,15,.2);display:flex;align-items:center;justify-content:center;color:var(--accent);font-size:22px;line-height:1}
-.dock{position:fixed;bottom:0;left:0;right:0;z-index:30;height:70px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;background:linear-gradient(rgba(243,239,230,0),rgba(243,239,230,.85) 40%)}
-.prog{width:min(560px,74vw);height:4px;background:rgba(0,0,0,.09);border-radius:3px;overflow:hidden;cursor:pointer}
-.prog .fill{height:100%;width:0;background:linear-gradient(90deg,var(--accent2),var(--accent));border-radius:3px;transition:width .35s}
-.pgrow{display:flex;align-items:center;gap:16px;font-size:13px;color:var(--mut);letter-spacing:.04em}
-.pgrow button{background:none;border:none;color:var(--accent);font-size:15px;cursor:pointer;font-family:inherit;padding:2px 8px;border-radius:4px;transition:background .2s}
-.pgrow button:hover:not(:disabled){background:rgba(10,102,194,.1)}
-.pgrow button:disabled{opacity:.3;cursor:default}
-.pgrow .cur{color:var(--head);font-weight:600;font-size:14px}
-.load{position:fixed;inset:52px 0 70px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;color:var(--mut)}
-.sp{width:38px;height:38px;border:3px solid rgba(10,102,194,.22);border-top-color:var(--accent);border-radius:50%;animation:spin .85s linear infinite}
+body{background:#0F0B07;color:var(--paper);font-family:"Songti SC","Noto Serif SC",Georgia,serif;min-height:100vh}
+.topbar{position:sticky;top:0;z-index:20;background:rgba(15,11,7,0.95);backdrop-filter:blur(8px);border-bottom:1px solid rgba(212,178,94,0.25);display:flex;align-items:center;justify-content:space-between;padding:12px 20px;gap:12px;flex-wrap:wrap}
+.tb-title{font-size:15px;color:var(--gold);letter-spacing:0.05em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:46vw}
+.tb-title a{color:var(--muted);text-decoration:none;font-size:13px;margin-right:14px}
+.controls{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.btn{background:rgba(212,178,94,0.12);border:1px solid rgba(212,178,94,0.45);color:var(--gold);padding:7px 16px;border-radius:3px;font-size:14px;cursor:pointer;font-family:inherit;letter-spacing:0.03em}
+.btn:hover:not(:disabled){background:rgba(212,178,94,0.22)}
+.btn:disabled{opacity:0.35;cursor:not-allowed}
+.pagebox{display:flex;align-items:center;gap:6px;font-size:14px;color:var(--paper)}
+.pagebox input{width:56px;background:#1A1410;border:1px solid rgba(212,178,94,0.4);color:var(--gold);padding:6px 8px;border-radius:3px;text-align:center;font-family:inherit;font-size:14px}
+.pagebox .total{color:var(--muted)}
+.zoom{display:flex;align-items:center;gap:4px}
+.zoom .btn{padding:6px 12px}
+.stage{display:flex;justify-content:center;padding:28px 16px 60px;min-height:60vh}
+#page-wrap{position:relative;display:inline-block;line-height:0;box-shadow:0 20px 60px rgba(0,0,0,0.6);background:#fff;border-radius:2px;overflow:hidden}
+canvas{display:block}
+.textLayer{position:absolute;left:0;top:0;overflow:hidden;line-height:1;opacity:1;z-index:3;text-align:initial}
+.textLayer span{color:transparent;position:absolute;white-space:pre;cursor:text;transform-origin:0 0}
+.textLayer ::selection{background:rgba(61,165,165,0.42)}
+.textLayer ::-moz-selection{background:rgba(61,165,165,0.42)}
+.loading{text-align:center;color:var(--muted);padding:80px 20px;font-size:16px}
+.spinner{width:40px;height:40px;border:3px solid rgba(212,178,94,0.25);border-top-color:var(--gold);border-radius:50%;margin:0 auto 20px;animation:spin 0.9s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-.err{position:fixed;inset:52px 0 70px;display:flex;align-items:center;justify-content:center;text-align:center;color:#9a3b3b;padding:30px;line-height:1.9}
-.err a{color:var(--accent)}
-@media(max-width:640px){.bar .ttl{font-size:12.5px}.tapz{width:32%;opacity:.5}.chev{width:38px;height:38px;font-size:19px}}
+.err{text-align:center;color:#E8A0A0;padding:60px 20px;line-height:1.9}
+.err a{color:var(--gold)}
+.navhint{position:fixed;bottom:0;left:0;right:0;text-align:center;padding:10px;font-size:12px;color:var(--muted);background:linear-gradient(transparent,rgba(15,11,7,0.9));pointer-events:none;z-index:15}
+.side-tap{position:fixed;top:64px;bottom:0;width:10%;z-index:5;cursor:pointer}
+.side-tap.left{left:0}.side-tap.right{right:0}
+@media(max-width:640px){.tb-title{font-size:13px;max-width:38vw}.side-tap{width:14%}}
 </style>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 </head>
 <body>
-<div class="bar">
-  <a class="bk" href="/column/honesty-uncomputable/apply-health/">‹ 返回文章</a>
-  <div class="ttl">健康诚实不可计算</div>
-  <a class="dl" href="apply-health.pdf" target="_blank">下载 PDF</a>
-</div>
-<div class="scene"><div class="book" id="book"></div></div>
-<div class="tapz l" id="tl"><div class="chev">‹</div></div>
-<div class="tapz r" id="tr"><div class="chev">›</div></div>
-<div class="dock">
-  <div class="prog" id="prog"><div class="fill" id="fill"></div></div>
-  <div class="pgrow">
-    <button id="prev">‹ 上一页</button>
-    <span><span class="cur" id="cur">1</span> / <span id="tot">1</span></span>
-    <button id="next">下一页 ›</button>
+
+<div class="topbar">
+  <div class="tb-title"><a href="./">← 返回文章</a>健康诚实不可计算</div>
+  <div class="controls">
+    <button class="btn" id="prev" disabled>‹ 上一页</button>
+    <div class="pagebox"><input id="pageInput" type="number" min="1" value="1"><span class="total">/ <span id="totalPages">…</span></span></div>
+    <button class="btn" id="next" disabled>下一页 ›</button>
+    <div class="zoom">
+      <button class="btn" id="zoomOut">−</button>
+      <button class="btn" id="zoomIn">＋</button>
+    </div>
+    <a class="btn" href="apply-health.pdf" target="_blank" style="text-decoration:none">下载 PDF</a>
   </div>
 </div>
-<div class="load" id="load"><div class="sp"></div><div style="font-size:14px">正在展开书页…<br><span style="font-size:12.5px;opacity:.8">首次载入一两秒</span></div></div>
-<div class="err" id="err" style="display:none"></div>
+
+<div class="stage" id="stage">
+  <div id="loading" class="loading"><div class="spinner"></div>正在载入全书…<br><span style="font-size:13px">首次载入需要几秒</span></div>
+  <div id="page-wrap" style="display:none"><canvas id="pdfCanvas"></canvas><div class="textLayer" id="textLayer"></div></div>
+  <div id="error" class="err" style="display:none"></div>
+</div>
+
+<div class="side-tap left" id="tapLeft"></div>
+<div class="side-tap right" id="tapRight"></div>
+<div class="navhint">← → 方向键翻页 · 点击页面两侧翻页 · 选中正文任意一句可问 WDS</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script>
-pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
-var PDF="apply-health.pdf",book=document.getElementById('book'),load=document.getElementById('load'),err=document.getElementById('err');
-var cur=1,total=1,doc=null,rendering=false,dpr=Math.min(window.devicePixelRatio||1,2.2);
-function sceneH(){return document.querySelector('.scene').clientHeight-44;}
-async function render(n,dir){
-  if(!doc||rendering)return; rendering=true;
-  try{
-    var page=await doc.getPage(n);
-    var h=sceneH(),vp0=page.getViewport({scale:1}),scale=h/vp0.height,vp=page.getViewport({scale:scale*dpr});
-    var cv=document.createElement('canvas');cv.width=vp.width;cv.height=vp.height;
-    cv.style.height=h+'px';cv.style.width=(vp.width/dpr)+'px';
-    await page.render({canvasContext:cv.getContext('2d'),viewport:vp}).promise;
-    var leaf=document.createElement('div');leaf.className='leaf';leaf.appendChild(cv);
-    book.innerHTML='';book.appendChild(leaf);
-    if(dir){leaf.classList.add(dir==='next'?'turn-next':'turn-prev');}
-    document.getElementById('cur').textContent=n;
-    document.getElementById('fill').style.width=(total<=1?100:(n-1)/(total-1)*100)+'%';
-    document.getElementById('prev').disabled=(n<=1);
-    document.getElementById('next').disabled=(n>=total);
-  }catch(e){console.error(e);}
-  rendering=false;
+var PDF_URL = "apply-health.pdf";
+var BOOK_TITLE = "健康诚实不可计算";
+pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+
+var pdfDoc=null, pageNum=1, rendering=false, pending=null, baseScale=1.3, currentPageText="";
+var canvas=document.getElementById('pdfCanvas'), ctx=canvas.getContext('2d');
+var pageWrap=document.getElementById('page-wrap'), textLayer=document.getElementById('textLayer');
+var $=function(id){return document.getElementById(id);};
+
+// 自绘文字层：getTextContent + Util.transform 定位透明 span（全 PDF.js 版本稳定），横向按原始字宽校正
+function drawTextLayer(tc, viewport){
+  textLayer.innerHTML='';
+  var frag=document.createDocumentFragment(), fix=[];
+  tc.items.forEach(function(it){
+    if(!it.str) return;
+    var m=pdfjsLib.Util.transform(viewport.transform, it.transform);
+    var fs=Math.hypot(m[2], m[3]);
+    if(!fs) return;
+    var ang=Math.atan2(m[1], m[0]);
+    var sp=document.createElement('span');
+    sp.textContent=it.str;
+    var css='left:'+m[4].toFixed(2)+'px;top:'+(m[5]-fs).toFixed(2)+'px;font-size:'+fs.toFixed(2)+'px;';
+    if(Math.abs(ang)>0.01) css+='transform:rotate('+ang.toFixed(4)+'rad);';
+    sp.style.cssText=css;
+    frag.appendChild(sp);
+    fix.push([sp, it.width*viewport.scale, ang]);
+  });
+  textLayer.appendChild(frag);
+  fix.forEach(function(w){
+    var sp=w[0], target=w[1], ang=w[2];
+    if(!target) return;
+    var real=sp.getBoundingClientRect().width;
+    if(real>1){ var sx=target/real; if(sx>0.1 && sx<10){ sp.style.transform=(Math.abs(ang)>0.01?('rotate('+ang.toFixed(4)+'rad) '):'')+'scaleX('+sx.toFixed(3)+')'; } }
+  });
 }
-function go(n,dir){ if(n<1||n>total||n===cur||rendering)return; cur=n; render(cur,dir); }
-document.getElementById('next').onclick=function(){go(cur+1,'next')};
-document.getElementById('prev').onclick=function(){go(cur-1,'prev')};
-document.getElementById('tr').onclick=function(){go(cur+1,'next')};
-document.getElementById('tl').onclick=function(){go(cur-1,'prev')};
-document.getElementById('prog').onclick=function(e){var r=this.getBoundingClientRect();var p=(e.clientX-r.left)/r.width;go(Math.max(1,Math.min(total,Math.round(p*(total-1))+1)));};
-document.addEventListener('keydown',function(e){
-  if(e.key==='ArrowRight'||e.key===' '||e.key==='PageDown'){e.preventDefault();go(cur+1,'next');}
-  else if(e.key==='ArrowLeft'||e.key==='PageUp'){e.preventDefault();go(cur-1,'prev');}
-  else if(e.key==='Home'){go(1);}else if(e.key==='End'){go(total);}
+
+function render(num){
+  rendering=true;
+  pdfDoc.getPage(num).then(function(page){
+    var avail=($('stage').clientWidth||window.innerWidth)-36;
+    var vp1=page.getViewport({scale:1});
+    var s=baseScale;
+    if(vp1.width*s>avail && avail>120) s=avail/vp1.width;   // 适配容器宽度，避免 CSS 缩放导致文字层错位
+    var vp=page.getViewport({scale:s});
+    var ratio=Math.min(window.devicePixelRatio||1, 2.5);
+    canvas.width=Math.floor(vp.width*ratio); canvas.height=Math.floor(vp.height*ratio);
+    canvas.style.width=vp.width+'px'; canvas.style.height=vp.height+'px';
+    pageWrap.style.width=vp.width+'px'; pageWrap.style.height=vp.height+'px';
+    ctx.setTransform(ratio,0,0,ratio,0,0);
+    page.render({canvasContext:ctx, viewport:vp}).promise.then(function(){
+      return page.getTextContent();
+    }).then(function(tc){
+      currentPageText=tc.items.map(function(i){return i.str;}).join(' ').replace(/\s+/g,' ').trim();
+      drawTextLayer(tc, vp);
+      rendering=false;
+      if(pending!==null){ var p=pending; pending=null; render(p); }
+    });
+    $('pageInput').value=num;
+    $('prev').disabled=(num<=1);
+    $('next').disabled=(num>=pdfDoc.numPages);
+  });
+}
+function queue(num){ if(rendering) pending=num; else render(num); }
+function go(n){ if(!pdfDoc)return; pageNum=Math.min(Math.max(1,n),pdfDoc.numPages); queue(pageNum); window.scrollTo({top:0,behavior:'smooth'}); }
+
+pdfjsLib.getDocument(PDF_URL).promise.then(function(pdf){
+  pdfDoc=pdf;
+  $('totalPages').textContent=pdf.numPages;
+  $('pageInput').max=pdf.numPages;
+  $('loading').style.display='none';
+  $('page-wrap').style.display='inline-block';
+  render(pageNum);
+}).catch(function(err){
+  $('loading').style.display='none';
+  $('error').style.display='block';
+  $('error').innerHTML='全书暂时无法在线载入。<br>你仍可 <a href="'+PDF_URL+'" target="_blank">直接打开 / 下载 PDF</a> 阅读。<br><span style="font-size:12px;color:#8B7E5E">（'+err.message+'）</span>';
 });
-var tsx=0,tsy=0;
-document.querySelector('.scene').addEventListener('touchstart',function(e){tsx=e.touches[0].clientX;tsy=e.touches[0].clientY;},{passive:true});
-document.querySelector('.scene').addEventListener('touchend',function(e){
-  var dx=e.changedTouches[0].clientX-tsx,dy=e.changedTouches[0].clientY-tsy;
-  if(Math.abs(dx)>46&&Math.abs(dx)>Math.abs(dy)){ if(dx<0)go(cur+1,'next'); else go(cur-1,'prev'); }
-},{passive:true});
-window.addEventListener('resize',function(){clearTimeout(window._rz);window._rz=setTimeout(function(){render(cur);},220);});
-(async function(){
-  try{
-    doc=await pdfjsLib.getDocument(PDF).promise; total=doc.numPages;
-    document.getElementById('tot').textContent=total;
-    load.style.display='none';
-    await render(1);
-  }catch(e){
-    load.style.display='none';
-    err.style.display='flex';
-    err.innerHTML='书页展开失败。你可以<a href="'+PDF+'" target="_blank">直接打开 PDF</a>，或<a href="/column/honesty-uncomputable/apply-health/">返回文章页</a>阅读长文版。';
-  }
-})();
+
+$('prev').onclick=function(){go(pageNum-1);};
+$('next').onclick=function(){go(pageNum+1);};
+$('tapLeft').onclick=function(){go(pageNum-1);};
+$('tapRight').onclick=function(){go(pageNum+1);};
+$('pageInput').onchange=function(e){go(parseInt(e.target.value)||1);};
+$('zoomIn').onclick=function(){baseScale=Math.min(baseScale+0.2,3);queue(pageNum);};
+$('zoomOut').onclick=function(){baseScale=Math.max(baseScale-0.2,0.6);queue(pageNum);};
+document.addEventListener('keydown',function(e){
+  if(e.target && (e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA')) return;
+  if(e.key==='ArrowLeft')go(pageNum-1);
+  if(e.key==='ArrowRight')go(pageNum+1);
+});
+window.addEventListener('resize',function(){clearTimeout(window._rz);window._rz=setTimeout(function(){queue(pageNum);},220);});
+
+// —— 接入 WDS 陪读：把「当前页文本 + 页码」喂给助手，文字层让读者能选中某句作焦点 ——
+window.WDS_READ = {
+  title: BOOK_TITLE,
+  bodyEl: function(){ return document.getElementById('page-wrap'); },
+  docTextFn: function(){ return currentPageText ? ('【第 '+pageNum+' 页 / 共 '+(pdfDoc?pdfDoc.numPages:'?')+' 页】\n'+currentPageText) : ''; }
+};
 </script>
-</body></html>
+<script src="/taste/wds-companion/wds-read.js" defer></script>
+</body>
+</html>
