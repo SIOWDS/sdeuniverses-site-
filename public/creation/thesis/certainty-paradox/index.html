@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>现代健康体系的确定性悖论——解释权、关系供给与多源信息协调的主客互动理论 | 学术创造专栏 · 学位论文 | SDE Universes</title>
-<meta name="description" content="本论文提出并操作化&quot;双重同源操作&quot;这一可迁移的生成机制：任何以符号和规则回应人类需求的确定性系统，其有效性与其贫乏化效应是同一次操作必然共现的两面，因而系统在有效运行中持续再生产其赖以存续的匮乏。现代健康体系是这条机制的首个完整实例。"依从却无效"。研究论证，该现象的根源在于试验与现实之间一个未被记账的差异：在试验中，目标行为由研究方供">
+<meta name="description" content="本论文提出并操作化&quot;双重同源操作&quot;这一可迁移的生成机制：任何以符号和规则回应人类需求的确定性系统，其有效性与其贫乏化效应是同一次操作必然共现的两面。现代健康体系是这条机制的首个完整实例。"依从却无效"。研究论证，该现象的根源在于试验与现实之间一个未被记账的差异：在试验中，目标行为由研究方供">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{--bg:#F5EFE0;--card:#FAF6EC;--card2:#F0E8D3;--gold:#8A6817;--text:#2A2315;--text2:#544733;--muted:#98886C;--border:rgba(138,104,23,0.22);--border2:rgba(138,104,23,0.10);--accent:#35558C;--accent2:#4E74B5}
@@ -70,47 +70,51 @@ footer a{color:var(--gold);text-decoration:none}
   article h3{font-size:1.02rem}
 }
 
-.figwrap{margin:2rem 0;text-align:center}
-.figwrap img{max-width:100%;height:auto;border:1px solid var(--border2);border-radius:5px;background:var(--card)}
-.figcap{font-size:0.82rem;color:var(--muted);margin-top:0.6rem;letter-spacing:0.03em}
-article table b{background:none}
-
-/* ── 阅读进度条 ── */
+/* ══ 阅读进度条 ══ */
 .reading-progress{position:fixed;top:0;left:0;height:3px;width:0;background:linear-gradient(90deg,var(--accent),var(--gold));z-index:300;transition:width .12s ease-out}
-/* ── 章首眉标 + 章标题节奏 ── */
+/* ══ 章首眉标 + 章标题节奏 ══ */
 .chap-n{display:block;font-family:'EB Garamond',Georgia,serif;font-size:0.72rem;font-weight:600;letter-spacing:0.24em;color:var(--accent);margin-bottom:0.5rem;opacity:0.9}
 article h2{margin-top:4.2rem;border-bottom:none;padding-bottom:0}
 article h2::after{content:"";display:block;width:46px;height:2px;background:var(--accent);margin-top:0.9rem;border-radius:2px}
 article h2:first-of-type{margin-top:1rem}
-/* ── 分组两栏目录 ── */
-.toc-wrap{background:var(--card2);border:1px solid var(--border);border-radius:9px;padding:1.5rem 1.7rem 1.2rem;margin:1.9rem 0 3.6rem}
-.toc-h{display:flex;justify-content:space-between;align-items:baseline;gap:1rem;margin-bottom:1.1rem;padding-bottom:0.75rem;border-bottom:1px solid var(--border)}
-.toc-hl{font-size:0.74rem;letter-spacing:0.28em;color:var(--accent);font-weight:700}
-.toc-hr{font-size:0.66rem;letter-spacing:0.08em;color:var(--muted);text-align:right}
-.toc2{column-count:2;column-gap:2.8rem}
-.tchap{-webkit-column-break-inside:avoid;break-inside:avoid;page-break-inside:avoid;margin-bottom:1.25rem}
-.tchap .ct{display:block;text-decoration:none;font-weight:700;font-size:0.9rem;color:var(--text);line-height:1.42;padding:0.12rem 0 0.25rem;transition:color .18s}
-.tchap .ct .tc-n{color:var(--accent);font-family:'EB Garamond',Georgia,serif;font-size:0.76rem;letter-spacing:0.06em;margin-right:0.42em;font-weight:700}
-.tchap .ct:hover{color:var(--accent)}
-.tchap .cs{display:block;text-decoration:none;font-size:0.8rem;color:var(--muted);line-height:1.5;padding:0.06rem 0 0.06rem 0.85rem;margin-left:0.12rem;border-left:1px solid var(--border2);transition:color .18s,border-color .18s,padding-left .18s}
-.tchap .cs:hover{color:var(--accent);border-color:var(--accent);padding-left:1.05rem}
-/* ── 斑马表格 ── */
-table tbody tr:nth-child(even) td{background:rgba(138,104,23,0.04)}
-/* ── 回到顶部 ── */
-.totop{position:fixed;bottom:1.9rem;right:1.9rem;width:42px;height:42px;border-radius:50%;background:var(--card);border:1px solid var(--border);color:var(--accent);display:flex;align-items:center;justify-content:center;cursor:pointer;opacity:0;visibility:hidden;transition:opacity .25s,visibility .25s,transform .2s;z-index:200;font-size:1.15rem;line-height:1;box-shadow:0 3px 14px rgba(42,35,21,0.12)}
-.totop.show{opacity:1;visibility:visible}
-.totop:hover{transform:translateY(-3px);border-color:var(--accent)}
-@media(max-width:640px){.toc2{column-count:1;column-gap:0}.toc-wrap{padding:1.2rem 1.2rem 1rem}.totop{bottom:1.2rem;right:1.2rem;width:38px;height:38px}article h2{margin-top:3rem}}
-
-/* ── 图（图题在下）── */
+/* ══ 目录：单栏 · 可折叠 ══ */
+.toc-wrap{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1.6rem 1.9rem 1.7rem;margin:2rem 0 3.6rem}
+.toc-h{display:flex;justify-content:space-between;align-items:center;gap:1rem;margin-bottom:0.5rem;padding-bottom:0.9rem;border-bottom:1.5px solid var(--border)}
+.toc-hl{font-size:0.8rem;letter-spacing:0.34em;color:var(--accent);font-weight:700}
+.toc-toggle{font:inherit;font-size:0.72rem;letter-spacing:0.08em;color:var(--muted);background:none;border:1px solid var(--border);border-radius:16px;padding:0.32rem 0.95rem;cursor:pointer;transition:all .18s;white-space:nowrap}
+.toc-toggle:hover{color:var(--accent);border-color:var(--accent)}
+.toc-list{margin-top:0.2rem}
+.tchap{border-bottom:1px solid var(--border2)}
+.tchap:last-child{border-bottom:none}
+.ct{display:flex;justify-content:space-between;align-items:center;gap:1rem;width:100%;text-align:left;background:none;border:none;font:inherit;cursor:pointer;padding:0.78rem 0;color:var(--text);transition:color .16s}
+.ct:hover{color:var(--accent)}
+a.ct-plain{text-decoration:none}
+.ct-main{font-size:0.99rem;font-weight:700;line-height:1.5}
+.ct-main .tc-n{color:var(--accent);font-family:'EB Garamond',Georgia,serif;font-size:0.82rem;letter-spacing:0.04em;margin-right:0.55em;font-weight:700}
+.ct-meta{display:flex;align-items:center;gap:0.75rem;flex-shrink:0}
+.ct-cnt{font-size:0.68rem;color:var(--muted);letter-spacing:0.06em}
+.chev{font-size:1.15rem;color:var(--muted);line-height:1;transition:transform .24s ease;display:inline-block;transform:rotate(90deg)}
+.tchap:not(.open) .chev{transform:rotate(0deg)}
+.cs-wrap{overflow:hidden;max-height:0;transition:max-height .3s ease}
+.tchap.open .cs-wrap{max-height:44rem}
+.cs{display:block;text-decoration:none;font-size:0.9rem;color:var(--text2);line-height:1.55;padding:0.34rem 0 0.34rem 2.2rem;position:relative;transition:color .16s,padding-left .16s}
+.cs::before{content:"";position:absolute;left:0.6rem;top:0;bottom:0;width:1px;background:var(--border2)}
+.cs:hover{color:var(--accent);padding-left:2.45rem}
+.tchap.open .cs:last-child{padding-bottom:0.85rem}
+/* ══ 图（题在下）· 表（题在上）══ */
 figure.fig{margin:2.3rem 0;text-align:center}
 figure.fig img{max-width:100%;height:auto;border:1px solid var(--border2);border-radius:6px;background:var(--card);box-shadow:0 2px 10px rgba(42,35,21,0.06)}
 figure.fig figcaption{font-size:0.83rem;color:var(--muted);margin-top:0.75rem;letter-spacing:0.02em;line-height:1.5;padding:0 1rem}
-/* ── 表题（表题在上）── */
 .tcap{font-size:0.86rem;font-weight:700;color:var(--accent);letter-spacing:0.03em;margin:2.2rem 0 0.55rem;line-height:1.5}
 .tcap+.tw{margin-top:0}
-/* ── 参考文献标题 ── */
 .refs-h{font-family:'Noto Serif SC',serif;font-size:1.32rem;font-weight:700;color:var(--text);margin:4.2rem 0 1.4rem;padding-bottom:0.55rem;border-bottom:2px solid var(--accent);line-height:1.45}
+/* ══ 斑马表格 ══ */
+table tbody tr:nth-child(even) td{background:rgba(138,104,23,0.04)}
+/* ══ 回到顶部 ══ */
+.totop{position:fixed;bottom:1.9rem;right:1.9rem;width:42px;height:42px;border-radius:50%;background:var(--card);border:1px solid var(--border);color:var(--accent);display:flex;align-items:center;justify-content:center;cursor:pointer;opacity:0;visibility:hidden;transition:opacity .25s,visibility .25s,transform .2s;z-index:200;font-size:1.15rem;line-height:1;box-shadow:0 3px 14px rgba(42,35,21,0.12)}
+.totop.show{opacity:1;visibility:visible}
+.totop:hover{transform:translateY(-3px);border-color:var(--accent)}
+@media(max-width:640px){.toc-wrap{padding:1.3rem 1.3rem 1.2rem}.totop{bottom:1.2rem;right:1.2rem;width:38px;height:38px}article h2{margin-top:3rem}.ct-main{font-size:0.94rem}.ct-cnt{display:none}}
 </style>
 </head>
 <body>
@@ -217,7 +221,7 @@ authority across persons, bodies, technologies, relationships, and
 institutions.</p>
     </div>
     <div class="kw"><b>Keywords</b>　dual-homologous operation; SIO ontology; interpretive solvency; multi-source information coordination; relational provision; compensatory crowding-out; recursive production of scarcity; Diagnosis 3.0</div>
-    <div class="toc-wrap"><div class="toc-h"><span class="toc-hl">目 录</span><span class="toc-hr">Contents · 11 章 + 附录 A–D · 68 节</span></div><nav class="toc2"><div class="tchap"><a class="ct" href="#k1">核心术语与缩略语</a></div><div class="tchap"><a class="ct" href="#k2"><span class="tc-n">第1章</span>导论</a><a class="cs" href="#k3">1.1 研究背景：精密化与不确定性的同步增长</a><a class="cs" href="#k4">1.2 研究对象、核心问题与理论边界</a><a class="cs" href="#k5">1.3 研究命题与分析层次</a><a class="cs" href="#k6">1.4 研究思路、技术路线与论文结构</a><a class="cs" href="#k7">1.5 主要创新与学术贡献</a></div><div class="tchap"><a class="ct" href="#k8"><span class="tc-n">第2章</span>文献综述：从制度批判到生成机制</a><a class="cs" href="#k9">2.1 医疗化、文化医源性与特定反生产性</a><a class="cs" href="#k10">2.2 数字健康、生物医学化与量化主体</a><a class="cs" href="#k11">2.3 全人医学、叙事医学与循证医学批判</a><a class="cs" href="#k12">2.4 社会关系、社会处方与非稳态负荷</a><a class="cs" href="#k13">2.5 系统动力学、转移负担与能力衰减</a><a class="cs" href="#k14">2.6 非西方整体医学的潜在互译资源</a><a class="cs" href="#k15">2.7 共同盲区：被当作既定事实的”需求”与”健康”</a></div><div class="tchap"><a class="ct" href="#k16"><span class="tc-n">第3章</span>研究设计与SIO主客互动分析框架</a><a class="cs" href="#k17">3.1 研究性质：规范性概念建构与可证伪研究纲领</a><a class="cs" href="#k18">3.2 概念分析、历史制度分析与跨学科综合</a><a class="cs" href="#k19">3.3 SIO复合存在物与健康研究的分析单元</a><a class="cs" href="#k20">3.4 形态——条件——演化——碰撞四阶段方法</a><a class="cs" href="#k21">3.5 证伪逻辑、适用边界与研究伦理</a></div><div class="tchap"><a class="ct" href="#k22"><span class="tc-n">第4章</span>形态论：从生物属性到解释权</a><a class="cs" href="#k23">4.1 诊断的基底与核心概念</a><a class="cs" href="#k24">4.2 解释权偿付能力的本体论命题</a><a class="cs" href="#k25">4.3 旧本体论的三块制度肌肉</a><a class="cs" href="#k26">4.4 诊断同义反复与个体纵向漂移</a><a class="cs" href="#k27">4.5 正向内感受、反向内感受与适应性缺口</a><a class="cs" href="#k28">4.6 诊断3.0：从疾病归类到缺口识别</a><a class="cs" href="#k29">4.7 数字健康产业中的解释权审计</a></div><div class="tchap"><a class="ct" href="#k30"><span class="tc-n">第5章</span>条件论：从裁决到翻译</a><a class="cs" href="#k31">5.1 内证据、外证据与功能证据</a><a class="cs" href="#k32">5.2 信息源的不可互译性与协调关系</a><a class="cs" href="#k33">5.3 健康作为持续翻译与校准的动态能力</a><a class="cs" href="#k34">5.4 多源信息协调度与背离模式</a><a class="cs" href="#k35">5.5 为翻译付费：模式识别支付机制</a><a class="cs" href="#k36">5.6 多源信息翻译教育</a></div><div class="tchap"><a class="ct" href="#k37"><span class="tc-n">第6章</span>演化论：关系供给的流失与代偿</a><a class="cs" href="#k38">6.1 六维关系供给的工具性定义</a><a class="cs" href="#k39">6.2 关系供给代偿假说的因果链</a><a class="cs" href="#k40">6.3 管理技术为何被身体吸附</a><a class="cs" href="#k41">6.4 从功能补偿到功能篡夺</a><a class="cs" href="#k42">6.5 非稳态负荷、慢性病终点与阶层边界</a></div><div class="tchap"><a class="ct" href="#k43"><span class="tc-n">第7章</span>碰撞论：代偿性挤出与匮乏的递归生产</a><a class="cs" href="#k44">7.1 与相邻理论的可判定边界</a><a class="cs" href="#k45">7.2 制度锁定层：解释权沉降</a><a class="cs" href="#k46">7.3 需求驱动层：关系真空与确定性引力</a><a class="cs" href="#k47">7.4 能力衰减层：内感受与关系耐受力的挤出</a><a class="cs" href="#k48">7.5 三层耦合与代偿性挤出循环</a><a class="cs" href="#k49">7.6 双重同源操作与匮乏的递归生产</a><a class="cs" href="#k50">7.7 教育、管理、福利与数字治理的跨域映射</a></div><div class="tchap"><a class="ct" href="#k51"><span class="tc-n">第8章</span>综合模型与诊断工具体系</a><a class="cs" href="#k52">8.1 四层理论的SIO统一模型</a><a class="cs" href="#k53">8.2 核心构念及测量工具矩阵</a><a class="cs" href="#k54">8.3 诊断3.0与多源协调的整合流程</a><a class="cs" href="#k55">8.4 干预组合：减管理、关系激活与解释权恢复</a><a class="cs" href="#k56">8.5 理论模型的边界条件</a></div><div class="tchap"><a class="ct" href="#k57"><span class="tc-n">第9章</span>制度应用与政策设计</a><a class="cs" href="#k58">9.1 初级医疗与临床评价</a><a class="cs" href="#k59">9.2 医保支付、商业保险与模式识别付费</a><a class="cs" href="#k60">9.3 数字健康产品与合同中止权</a><a class="cs" href="#k61">9.4 教育、劳动健康与社区关系基础设施</a><a class="cs" href="#k62">9.5 中西医互译与跨文化实施</a></div><div class="tchap"><a class="ct" href="#k63"><span class="tc-n">第10章</span>可证伪检验与十年以上研究纲领</a><a class="cs" href="#k64">10.1 最强竞争解释与理论自我毁灭条件</a><a class="cs" href="#k65">10.2 可穿戴设备、内感受与解释权的纵向检验</a><a class="cs" href="#k66">10.3 关系供给、代偿负荷与非稳态负荷队列</a><a class="cs" href="#k67">10.4 多源协调度的临床预测效度</a><a class="cs" href="#k68">10.5 诊断3.0、减管理处方与关系激活试验</a><a class="cs" href="#k69">10.6 跨域、跨文化与卫生经济学研究项目</a><a class="cs" href="#k70">10.7 数据治理、研究伦理与开放科学</a></div><div class="tchap"><a class="ct" href="#k71"><span class="tc-n">第11章</span>结论与展望</a><a class="cs" href="#k72">11.1 核心结论</a><a class="cs" href="#k73">11.2 理论贡献</a><a class="cs" href="#k74">11.3 实践含义</a><a class="cs" href="#k75">11.4 研究局限</a><a class="cs" href="#k76">11.5 未来展望</a></div><div class="tchap"><a class="ct" href="#k77">附录</a><a class="cs" href="#k78">附录A 解释权审计初步访谈框架</a><a class="cs" href="#k79">附录B RSI与CSTL的初步维度</a><a class="cs" href="#k80">附录C 四篇基础论文与博士论文结构映射</a><a class="cs" href="#k81">附录D 学位论文原创性与使用授权声明（模板）</a></div></nav></div>
+    <div class="toc-wrap"><div class="toc-h"><span class="toc-hl">目 录</span><button class="toc-toggle" id="tocToggle">收起全部</button></div><nav class="toc-list"><div class="tchap"><a class="ct ct-plain" href="#k1"><span class="ct-main">核心术语与缩略语</span></a></div><div class="tchap open"><button class="ct" type="button" aria-expanded="true"><span class="ct-main"><span class="tc-n">第1章</span>导论</span><span class="ct-meta"><span class="ct-cnt">5 节</span><span class="chev">›</span></span></button><div class="cs-wrap"><a class="cs" href="#k3">1.1 研究背景：精密化与不确定性的同步增长</a><a class="cs" href="#k4">1.2 研究对象、核心问题与理论边界</a><a class="cs" href="#k5">1.3 研究命题与分析层次</a><a class="cs" href="#k6">1.4 研究思路、技术路线与论文结构</a><a class="cs" href="#k7">1.5 主要创新与学术贡献</a></div></div><div class="tchap open"><button class="ct" type="button" aria-expanded="true"><span class="ct-main"><span class="tc-n">第2章</span>文献综述：从制度批判到生成机制</span><span class="ct-meta"><span class="ct-cnt">7 节</span><span class="chev">›</span></span></button><div class="cs-wrap"><a class="cs" href="#k9">2.1 医疗化、文化医源性与特定反生产性</a><a class="cs" href="#k10">2.2 数字健康、生物医学化与量化主体</a><a class="cs" href="#k11">2.3 全人医学、叙事医学与循证医学批判</a><a class="cs" href="#k12">2.4 社会关系、社会处方与非稳态负荷</a><a class="cs" href="#k13">2.5 系统动力学、转移负担与能力衰减</a><a class="cs" href="#k14">2.6 非西方整体医学的潜在互译资源</a><a class="cs" href="#k15">2.7 共同盲区：被当作既定事实的”需求”与”健康”</a></div></div><div class="tchap open"><button class="ct" type="button" aria-expanded="true"><span class="ct-main"><span class="tc-n">第3章</span>研究设计与SIO主客互动分析框架</span><span class="ct-meta"><span class="ct-cnt">5 节</span><span class="chev">›</span></span></button><div class="cs-wrap"><a class="cs" href="#k17">3.1 研究性质：规范性概念建构与可证伪研究纲领</a><a class="cs" href="#k18">3.2 概念分析、历史制度分析与跨学科综合</a><a class="cs" href="#k19">3.3 SIO复合存在物与健康研究的分析单元</a><a class="cs" href="#k20">3.4 形态——条件——演化——碰撞四阶段方法</a><a class="cs" href="#k21">3.5 证伪逻辑、适用边界与研究伦理</a></div></div><div class="tchap open"><button class="ct" type="button" aria-expanded="true"><span class="ct-main"><span class="tc-n">第4章</span>形态论：从生物属性到解释权</span><span class="ct-meta"><span class="ct-cnt">7 节</span><span class="chev">›</span></span></button><div class="cs-wrap"><a class="cs" href="#k23">4.1 诊断的基底与核心概念</a><a class="cs" href="#k24">4.2 解释权偿付能力的本体论命题</a><a class="cs" href="#k25">4.3 旧本体论的三块制度肌肉</a><a class="cs" href="#k26">4.4 诊断同义反复与个体纵向漂移</a><a class="cs" href="#k27">4.5 正向内感受、反向内感受与适应性缺口</a><a class="cs" href="#k28">4.6 诊断3.0：从疾病归类到缺口识别</a><a class="cs" href="#k29">4.7 数字健康产业中的解释权审计</a></div></div><div class="tchap open"><button class="ct" type="button" aria-expanded="true"><span class="ct-main"><span class="tc-n">第5章</span>条件论：从裁决到翻译</span><span class="ct-meta"><span class="ct-cnt">6 节</span><span class="chev">›</span></span></button><div class="cs-wrap"><a class="cs" href="#k31">5.1 内证据、外证据与功能证据</a><a class="cs" href="#k32">5.2 信息源的不可互译性与协调关系</a><a class="cs" href="#k33">5.3 健康作为持续翻译与校准的动态能力</a><a class="cs" href="#k34">5.4 多源信息协调度与背离模式</a><a class="cs" href="#k35">5.5 为翻译付费：模式识别支付机制</a><a class="cs" href="#k36">5.6 多源信息翻译教育</a></div></div><div class="tchap open"><button class="ct" type="button" aria-expanded="true"><span class="ct-main"><span class="tc-n">第6章</span>演化论：关系供给的流失与代偿</span><span class="ct-meta"><span class="ct-cnt">5 节</span><span class="chev">›</span></span></button><div class="cs-wrap"><a class="cs" href="#k38">6.1 六维关系供给的工具性定义</a><a class="cs" href="#k39">6.2 关系供给代偿假说的因果链</a><a class="cs" href="#k40">6.3 管理技术为何被身体吸附</a><a class="cs" href="#k41">6.4 从功能补偿到功能篡夺</a><a class="cs" href="#k42">6.5 非稳态负荷、慢性病终点与阶层边界</a></div></div><div class="tchap open"><button class="ct" type="button" aria-expanded="true"><span class="ct-main"><span class="tc-n">第7章</span>碰撞论：代偿性挤出与匮乏的递归生产</span><span class="ct-meta"><span class="ct-cnt">7 节</span><span class="chev">›</span></span></button><div class="cs-wrap"><a class="cs" href="#k44">7.1 与相邻理论的可判定边界</a><a class="cs" href="#k45">7.2 制度锁定层：解释权沉降</a><a class="cs" href="#k46">7.3 需求驱动层：关系真空与确定性引力</a><a class="cs" href="#k47">7.4 能力衰减层：内感受与关系耐受力的挤出</a><a class="cs" href="#k48">7.5 三层耦合与代偿性挤出循环</a><a class="cs" href="#k49">7.6 双重同源操作与匮乏的递归生产</a><a class="cs" href="#k50">7.7 教育、管理、福利与数字治理的跨域映射</a></div></div><div class="tchap open"><button class="ct" type="button" aria-expanded="true"><span class="ct-main"><span class="tc-n">第8章</span>综合模型与诊断工具体系</span><span class="ct-meta"><span class="ct-cnt">5 节</span><span class="chev">›</span></span></button><div class="cs-wrap"><a class="cs" href="#k52">8.1 四层理论的SIO统一模型</a><a class="cs" href="#k53">8.2 核心构念及测量工具矩阵</a><a class="cs" href="#k54">8.3 诊断3.0与多源协调的整合流程</a><a class="cs" href="#k55">8.4 干预组合：减管理、关系激活与解释权恢复</a><a class="cs" href="#k56">8.5 理论模型的边界条件</a></div></div><div class="tchap open"><button class="ct" type="button" aria-expanded="true"><span class="ct-main"><span class="tc-n">第9章</span>制度应用与政策设计</span><span class="ct-meta"><span class="ct-cnt">5 节</span><span class="chev">›</span></span></button><div class="cs-wrap"><a class="cs" href="#k58">9.1 初级医疗与临床评价</a><a class="cs" href="#k59">9.2 医保支付、商业保险与模式识别付费</a><a class="cs" href="#k60">9.3 数字健康产品与合同中止权</a><a class="cs" href="#k61">9.4 教育、劳动健康与社区关系基础设施</a><a class="cs" href="#k62">9.5 中西医互译与跨文化实施</a></div></div><div class="tchap open"><button class="ct" type="button" aria-expanded="true"><span class="ct-main"><span class="tc-n">第10章</span>可证伪检验与十年以上研究纲领</span><span class="ct-meta"><span class="ct-cnt">7 节</span><span class="chev">›</span></span></button><div class="cs-wrap"><a class="cs" href="#k64">10.1 最强竞争解释与理论自我毁灭条件</a><a class="cs" href="#k65">10.2 可穿戴设备、内感受与解释权的纵向检验</a><a class="cs" href="#k66">10.3 关系供给、代偿负荷与非稳态负荷队列</a><a class="cs" href="#k67">10.4 多源协调度的临床预测效度</a><a class="cs" href="#k68">10.5 诊断3.0、减管理处方与关系激活试验</a><a class="cs" href="#k69">10.6 跨域、跨文化与卫生经济学研究项目</a><a class="cs" href="#k70">10.7 数据治理、研究伦理与开放科学</a></div></div><div class="tchap open"><button class="ct" type="button" aria-expanded="true"><span class="ct-main"><span class="tc-n">第11章</span>结论与展望</span><span class="ct-meta"><span class="ct-cnt">5 节</span><span class="chev">›</span></span></button><div class="cs-wrap"><a class="cs" href="#k72">11.1 核心结论</a><a class="cs" href="#k73">11.2 理论贡献</a><a class="cs" href="#k74">11.3 实践含义</a><a class="cs" href="#k75">11.4 研究局限</a><a class="cs" href="#k76">11.5 未来展望</a></div></div><div class="tchap open"><button class="ct" type="button" aria-expanded="true"><span class="ct-main">附录</span><span class="ct-meta"><span class="ct-cnt">4 节</span><span class="chev">›</span></span></button><div class="cs-wrap"><a class="cs" href="#k78">附录A 解释权审计初步访谈框架</a><a class="cs" href="#k79">附录B RSI与CSTL的初步维度</a><a class="cs" href="#k80">附录C 四篇基础论文与博士论文结构映射</a><a class="cs" href="#k81">附录D 学位论文原创性与使用授权声明（模板）</a></div></div></nav></div>
 <article>
 <h2 id="k1">核心术语与缩略语</h2>
 <div class="tcap">表0-1 核心术语与缩略语</div>
@@ -1503,7 +1507,14 @@ var h=document.documentElement.scrollHeight-document.documentElement.clientHeigh
 if(rp)rp.style.width=(h>0?st/h*100:0)+'%';
 if(tt){if(st>600)tt.classList.add('show');else tt.classList.remove('show');}}
 window.addEventListener('scroll',on,{passive:true});
-if(tt)tt.onclick=function(){window.scrollTo({top:0,behavior:'smooth'});};on();})();
+if(tt)tt.onclick=function(){window.scrollTo({top:0,behavior:'smooth'});};on();
+var list=document.querySelector('.toc-list');
+if(list){list.querySelectorAll('button.ct').forEach(function(b){b.addEventListener('click',function(){var c=b.parentElement;c.classList.toggle('open');b.setAttribute('aria-expanded',c.classList.contains('open'));});});
+var tg=document.getElementById('tocToggle');
+if(tg)tg.addEventListener('click',function(){var chaps=list.querySelectorAll('.tchap');var anyClosed=false;chaps.forEach(function(c){if(c.querySelector('.cs-wrap')&&!c.classList.contains('open'))anyClosed=true;});
+chaps.forEach(function(c){if(c.querySelector('.cs-wrap')){if(anyClosed){c.classList.add('open');}else{c.classList.remove('open');}var b=c.querySelector('button.ct');if(b)b.setAttribute('aria-expanded',anyClosed);}});
+tg.textContent=anyClosed?'收起全部':'展开全部';});}
+})();
 </script>
 </body>
 </html>
