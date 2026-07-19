@@ -911,6 +911,20 @@ function WDS_READ_SYS(reflect, SDEM, docTitle, docText) {
     + "\n\n【读者正在读的文本】《" + (docTitle || "（未命名）") + "》\n" + (docText || "（正文未提供，就顺着读者的问题和 SDE 框架陪他聊）");
 }
 
+// ===== WDS 助手模式·全站对话入口 system（首页 AI 模式；检索全站+开放对话+多轮）。固定前缀在前便于缓存，站内资料在后 =====
+function WDS_CHAT_SYS(reflect, SDEM, siteCtx) {
+  return "你是 WDS，王德生（Desheng）的 AI 分身、SDE 本体论的老师，也是 SDE Universes 全站的领读人。读者在向你提问——可能是关于 SDE 思想或任何议题的问题，也可能想找站里读什么。"
+    + "\n\n【怎么答】"
+    + "\n1. 像王德生本人：直接、犀利、追问本质、善用比喻、一句顶十句；给洞见，不做资料复述员。"
+    + "\n2. 手上有《站内资料》时优先据它作答，可核验的书名/引文/数据/篇名以它为准；引用某篇观点时标（来源：篇名）；资料里没有的别编造。"
+    + "\n3. 站内资料不足、或读者只是想聊 SDE，就凭你的内核底盘直接展开——SDE 是一套能剖开任何问题的本体论，放手用它，别拘泥站里有没有现成文章。"
+    + "\n4. 术语当场用最短的话讲清（显露/差异序列/特征纠缠/介生态/成熟态等），别掉书袋、别堆术语、别摆空模板。"
+    + "\n5. 说人话，短——两三段以内，别写论文。不确定就说不确定；绝不寒暄或\"好的/我将\"之类元话，直接从核心那句说起；结尾可留一个把读者往下一步推的反问或一句荐读。"
+    + SDEM
+    + (reflect ? ("\n\n【SDE 内化心得·思考底盘（你私下的底盘，别复述、别提\"心得/内功\"）】\n" + reflect) : "")
+    + "\n\n【站内资料（从全站检索到的相关段落，可能为空）】\n" + (siteCtx || "（这次没检索到特别相关的篇目，就凭你的内核底盘答）");
+}
+
 // ===== SDE 词义查询扩展：把访客问题翻成 SDE 术语，再拿去召回（检索侧提智，对称于答题侧内功）=====
 const SDE_LEXICON = "你是 SDE（显露·差异·纠缠 / Show-Difference-Entanglement 本体论）术语解析器。SDE 核心词表：\n"
   + "· 三维：S=显露(结构/可辨认单位/稳定核心/显影/结构显露态)；D=差异(过程/差异序列/张力/路径/演化/发生)；E=纠缠(环境/特征纠缠/三界/信息/能量)。\n"
@@ -1370,6 +1384,104 @@ export default {
       const dec = new TextDecoder();
       const stream = new ReadableStream({
         async start(controller) {
+          let buf = "";
+          try {
+            while (true) {
+              const { done, value } = await reader.read();
+              if (done) break;
+              buf += dec.decode(value, { stream: true });
+              let idx;
+              while ((idx = buf.indexOf("\n")) >= 0) {
+                const line = buf.slice(0, idx).trim();
+                buf = buf.slice(idx + 1);
+                if (!line.startsWith("data:")) continue;
+                const p = line.slice(5).trim();
+                if (p === "[DONE]") continue;
+                let j; try { j = JSON.parse(p); } catch (e) { continue; }
+                if (j.error) { controller.enqueue(_sseBytes({ t: "error", v: j.error.message || "基底流内错误" })); continue; }
+                const d = (j.choices && j.choices[0] && j.choices[0].delta) || {};
+                if (d.reasoning_content) controller.enqueue(_sseBytes({ t: "think", v: d.reasoning_content }));
+                if (d.content) controller.enqueue(_sseBytes({ t: "token", v: d.content }));
+              }
+            }
+          } catch (e) {
+            controller.enqueue(_sseBytes({ t: "error", v: "读取基底流失败：" + (e && e.message) }));
+          }
+          controller.enqueue(_ENC.encode("data: [DONE]\n\n"));
+          controller.close();
+        },
+      });
+      return new Response(stream, { headers: { ..._cors(), "content-type": "text/event-stream; charset=utf-8", "cache-control": "no-store" } });
+    }
+    // /api/wds/chat：WDS 助手模式（首页 AI 对话入口）——全站检索 + 内核 + 王德生人格 + 多轮 + 出处（流式 SSE）
+    if (url.pathname === "/api/wds/chat") {
+      if (request.method === "OPTIONS") return new Response(null, { headers: _cors() });
+      if (request.method !== "POST") return new Response("Method Not Allowed", { status: 405 });
+      let b = {}; try { b = await request.json(); } catch (e) {}
+      const q = String(b.q || "").trim().slice(0, 800);
+      if (q.length < 1) return _sseResp([{ t: "error", v: "问点什么吧。" }]);
+      const history = Array.isArray(b.history) ? b.history.slice(-4) : [];
+      const userKey = String(b.key || "").trim();
+      const byok = userKey.length >= 8;
+      let VC, KEY, rvendor;
+      if (byok) {
+        const vd = b.vendor === "ds" ? "deepseek" : "zhipu";
+        VC = { url: WDS_VENDORS[vd].url, model: WDS_VENDORS[vd].model, name: WDS_VENDORS[vd].name };
+        KEY = userKey; rvendor = ({ zhipu: "glm", deepseek: "ds" })[vd] || vd;
+      } else {
+        const vc = await wdsPaperVC(env);
+        if (!vc) return _sseResp([{ t: "error", v: "WDS 助手还没启用：管理员先在 ⚙ 配置里设一把基底密钥。你也可以在下方填自己的 API Key。", code: "use_own_key" }]);
+        VC = { url: vc.VC.url, model: vc.VC.model, name: "基底" }; KEY = vc.KEY; rvendor = vc.rvendor;
+      }
+      const ip = request.headers.get("cf-connecting-ip") || "unknown";
+      try {
+        const lim = env.ASK_LIMITER.get(env.ASK_LIMITER.idFromName((byok ? "byok:" : "sys:") + ip));
+        const lr = await (await lim.fetch(new Request("https://limiter.internal/"))).json();
+        if (!lr.ok) return _sseResp([{ t: "error", v: lr.reason === "day" ? "今天和 WDS 聊的次数到上限了，明天再来。" : "聊得太快啦，过十几秒再问。" }]);
+      } catch (e) {}
+      // 全站检索（复用 /api/ask 的召回：词义扩展→retrieve→拼片段+出处）
+      let ctxText = "", sources = [];
+      try {
+        const corpus = await loadCorpus(env, url);
+        const expTerms = await sdeExpandQuery(VC, KEY, q);
+        const hits = retrieve(corpus, q, 20, expTerms);
+        const seen = {};
+        for (const ck of hits) {
+          const d = corpus.docs[ck.d];
+          if (!d) continue;
+          if (!seen[d.u]) { seen[d.u] = 1; sources.push({ u: d.u, t: d.t }); }
+          ctxText += "【来源：" + d.t + "】\n" + ck.t + "\n\n";
+          if (ctxText.length > 12000) break;
+        }
+      } catch (e) {}
+      sources = sources.slice(0, 6);
+      let reflect = ""; try { reflect = await ensureReflect(env, url, rvendor, VC, KEY); } catch (e) {}
+      const SDEM = "\n\nSDE 骨架：显露 S / 差异序列 D / 特征纠缠 E；三大方程 S=F(D,E)·D=G(S,E)·E=H(S,D)；六路径；意义三律（特征·自由·幸福）；发生学——追问事物为何如此发生，而非如何被发现。";
+      const sys = WDS_CHAT_SYS(reflect, SDEM, ctxText);
+      const messages = [{ role: "system", content: sys }];
+      for (const m of history) {
+        const role = (m && m.role === "wds") ? "assistant" : "user";
+        const content = String((m && m.text) || "").slice(0, 1500);
+        if (content) messages.push({ role, content });
+      }
+      messages.push({ role: "user", content: q });
+      let upstream;
+      try {
+        upstream = await fetch(VC.url, { method: "POST", headers: { "content-type": "application/json", authorization: "Bearer " + KEY }, body: JSON.stringify({ model: VC.model, stream: true, thinking: { type: "enabled" }, max_tokens: 2600, messages }) });
+      } catch (e) {
+        return _sseResp([{ t: "error", v: "接不上基底：" + (e && e.message) }]);
+      }
+      if (!upstream.ok) {
+        const errtxt = (await upstream.text()).slice(0, 300);
+        if (!byok && (upstream.status === 401 || upstream.status === 402 || upstream.status === 429)) return _sseResp([{ t: "error", v: "系统额度暂时不可用（" + upstream.status + "）。你可以在下方填自己的 API Key 继续。", code: "use_own_key" }]);
+        return _sseResp([{ t: "error", v: "基底返回错误 " + upstream.status + "：" + errtxt }]);
+      }
+      const reader = upstream.body.getReader();
+      const dec = new TextDecoder();
+      const srcs = sources;
+      const stream = new ReadableStream({
+        async start(controller) {
+          if (srcs.length) controller.enqueue(_sseBytes({ t: "sources", v: srcs })); // 先把出处发给前端
           let buf = "";
           try {
             while (true) {
