@@ -1326,7 +1326,7 @@ export default {
       return Response.json({ ok: false, msg: "bad mode" }, { status: 400 });
     }
     // /api/wds/read：读者边读边聊——扣着当前正在读的正文与选中段，与 WDS 一对一多轮对话（流式 SSE）。
-    // Key 锁服务端（方案B，读者无感，复用 wdsPaperVC/ConfigVault/ensureReflect/AskLimiter）；系统额度不可用可回退读者自带 Key。
+    // 纯 BYOK：读者自带 API Key（body.key，存浏览器本地、绝不用平台的）；无 Key 返回 need_key 且不调基底；复用 ensureReflect/AskLimiter。
     if (url.pathname === "/api/wds/read") {
       if (request.method === "OPTIONS") return new Response(null, { headers: _cors() });
       if (request.method !== "POST") return new Response("Method Not Allowed", { status: 405 });
