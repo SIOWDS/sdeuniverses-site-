@@ -373,9 +373,21 @@ if(m==="POST"){try{localStorage.setItem(k,day);}catch(e){}}}else{throw 0;}})
 
 <script>
 function slugOk(s){return /^[A-Za-z0-9-]{1,40}$/.test(s)}
+// 会议号唯一规范化：固定大写 SDE- 前缀 + 小写主体，字符集/大小写/长度全站统一。
+// Jitsi 房间名区分大小写，四条路径（开会/邀请深链/列表/手输）都必须经过这里，否则会进错房。
+function canonicalRoom(raw){
+  var s=(raw||"").trim();
+  if(!s)return "";
+  s=s.replace(/\s+/g,"-").replace(/[^A-Za-z0-9一-鿿-]/g,"");
+  s=s.replace(/^(sde-)+/i,"").replace(/-+/g,"-").replace(/^-+|-+$/g,"");
+  s=s.toLowerCase().slice(0,50);
+  return s?("SDE-"+s):"";
+}
 function roomUrl(r){var cfg=["config.prejoinConfig.enabled=true","config.resolution=1080","config.constraints.video.height.ideal=1080","config.constraints.video.height.max=1080","config.constraints.video.height.min=240","config.desktopSharingFrameRate.max=30","config.disableSimulcast=false"];if(window.SDE_MEET_NAME)cfg.push("userInfo.displayName=%22"+encodeURIComponent(window.SDE_MEET_NAME)+"%22");return "https://meet.jit.si/"+encodeURIComponent(r)+"#"+cfg.join("&")}
 function meetNeedLogin(){var m=document.getElementById("ma-msg");if(m)m.textContent="进入会议前，请先用上方 Google 账号登录——登录后进会议会自动显示你的名字。";var a=document.getElementById("meet-auth");if(a){a.classList.remove("maflash");void a.offsetWidth;a.classList.add("maflash");a.scrollIntoView({behavior:"smooth",block:"center"});}}
 function joinRoom(r, newWin){
+  r=canonicalRoom(r);
+  if(!r){alert("会议号无效");return}
   if(!window.SDE_MEET_NAME){meetNeedLogin();return}
   if(newWin){window.open(roomUrl(r),"_blank","noopener");return}
   var st=document.getElementById("stage");
@@ -401,11 +413,15 @@ function fsStage(){
 }
 function joinByCode(){
   var v=(document.getElementById("meetCode").value||"").trim();
-  var num=v.replace(/[\s-]/g,"");
-  if(/^\d{9,11}$/.test(num)){window.open("https://zoom.us/j/"+num,"_blank","noopener");return}
-  var r=v.replace(/\s+/g,"-");
-  if(!/^[A-Za-z0-9-]{1,40}$/.test(r)){alert("会议号是 9-11 位数字（Zoom），或字母/数字教室名");return}
-  joinRoom(/^sde-/i.test(r)?r:("SDE-"+r));
+  if(!v){alert("请先输入会议号");return}
+  // 明确的 SDE 教室号（以 SDE- 开头）一律进视频教室，即使主体是数字，避免被误判为 Zoom
+  if(!/^sde-/i.test(v)){
+    var num=v.replace(/[\s-]/g,"");
+    if(/^\d{9,11}$/.test(num)){window.open("https://zoom.us/j/"+num,"_blank","noopener");return}
+  }
+  var room=canonicalRoom(v);
+  if(!room){alert("会议号是 9-11 位数字（Zoom），或教室名（可含中文、字母、数字）");return}
+  joinRoom(room);
 }
 function openZoom(){
   var v=(document.getElementById("zoomLink").value||"").trim();
@@ -429,9 +445,9 @@ function hostNow(){showInvite(genRoom());}
 function hostNamed(){
   var v=(document.getElementById("hostName").value||"").trim();
   if(!v){hostNow();return;}
-  var slug=v.replace(/\s+/g,"-").replace(/[^A-Za-z0-9\u4e00-\u9fff-]/g,"").replace(/-+/g,"-").replace(/^-|-$/g,"");
-  if(!slug){hostNow();return;}
-  showInvite(/^sde-/i.test(slug)?slug:("SDE-"+slug));
+  var room=canonicalRoom(v);
+  if(!room){hostNow();return;}
+  showInvite(room);
 }
 function enterHosted(){if(HOSTED_ROOM)joinRoom(HOSTED_ROOM);}
 function fallbackCopy(t,msgEl){
@@ -472,9 +488,10 @@ function copySchedule(){copyText(document.getElementById("schOut").value,null);v
 function enterInvited(){if(window.__invitedRoom)joinRoom(window.__invitedRoom);}
 (function(){try{
   var rp=new URLSearchParams(location.search).get("room");
-  if(rp&&/^[A-Za-z0-9\u4e00-\u9fff-]{1,60}$/.test(rp)){
-    window.__invitedRoom=rp;
-    document.getElementById("rb-room").textContent=rp;
+  var rpRoom=rp?canonicalRoom(rp):"";
+  if(rpRoom){
+    window.__invitedRoom=rpRoom;
+    document.getElementById("rb-room").textContent=rpRoom;
     document.getElementById("roomBanner").style.display="flex";
   }
 }catch(e){}})();
