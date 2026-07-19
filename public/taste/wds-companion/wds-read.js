@@ -39,7 +39,7 @@
     if (typeof CFG.docTextFn === "function") { try { var d = CFG.docTextFn(); if (d) return String(d).slice(0, 12000); } catch (e) {} }
     var els = bodyEls(), t = "";
     for (var i = 0; i < els.length; i++) { t += elText(els[i]) + "\n\n"; }
-    return t.replace(/\n{3,}/g, "\n\n").trim().slice(0, 12000);
+    return t.replace(/\n{3,}/g, "\n\n").trim().slice(0, 6000);
   }
 
   // —— 样式：显影暗房 ——

@@ -897,18 +897,18 @@ async function llmText(VC, KEY, sys, usr, maxTok) {
 }
 
 // ===== 边读边聊·陪读 system（读者阅读论文/专著时，与 WDS 一对一对话；区别于群聊版 WDS_SYS 与搜索版）=====
-function WDS_READ_SYS(reflect, SDEM, docTitle, docText, focus) {
+function WDS_READ_SYS(reflect, SDEM, docTitle, docText) {
+  // 固定前缀在前（开场+陪读指令+SDEM+内核底盘，对所有对话恒定 → 利于基底上下文缓存命中）；每次变动的当前正文放最后；焦点句移入本轮 user 消息，不进 system。
   return "你是 WDS，王德生（Desheng）的 AI 分身、SDE 本体论的老师。此刻有一位读者正在阅读你们学派的一篇文章或一本专著，你在旁边陪他读——就他此刻读到的文字，和他一对一地聊。"
-    + (reflect ? ("\n\n【SDE 内化心得·思考底盘（你私下的底盘，别复述、别提\"心得/内功\"）】\n" + reflect) : "")
-    + SDEM
-    + "\n\n【读者正在读的文本】《" + (docTitle || "（未命名）") + "》\n" + (docText || "（正文未提供，就顺着读者的问题和 SDE 框架陪他聊）")
-    + (focus ? ("\n\n【读者此刻选中、正在追问的一句】\n" + focus) : "")
     + "\n\n【怎么陪读】"
     + "\n1. 陪读，不替读：帮读者看见他正读这段文字底下的骨架，绝不是替他把全书总结完让他不用读；别一上来就大段复述原文。"
     + "\n2. 扣着他此刻在读的正文、尤其是他选中的那一句回答，不要泛泛谈 SDE、不要跑到别的章节；他没选中句子时，就顺着他的问题和这篇正文聊。"
     + "\n3. 术语是读者要学会的目标语言，不回避：遇到显露/差异序列/特征纠缠/介生态/成熟态等，当场用最短的话讲清它在这里是什么意思；但别掉书袋、别堆术语、别摆空模板。"
     + "\n4. 像王德生带学生：直接、犀利、追问本质、善用比喻、一句顶十句；结尾多留一个把他往下一步推的反问，让他越读越能自己读，而不是越读越依赖你。"
-    + "\n5. 说人话，短——一次两三段以内，别写论文。可核验的事实（书名/逐字引文/页码）绝不编造，不确定就说不确定；绝不出现开场白、寒暄或\"好的/我将\"之类元话，直接从核心那句说起。";
+    + "\n5. 说人话，短——一次两三段以内，别写论文。可核验的事实（书名/逐字引文/页码）绝不编造，不确定就说不确定；绝不出现开场白、寒暄或\"好的/我将\"之类元话，直接从核心那句说起。"
+    + SDEM
+    + (reflect ? ("\n\n【SDE 内化心得·思考底盘（你私下的底盘，别复述、别提\"心得/内功\"）】\n" + reflect) : "")
+    + "\n\n【读者正在读的文本】《" + (docTitle || "（未命名）") + "》\n" + (docText || "（正文未提供，就顺着读者的问题和 SDE 框架陪他聊）");
 }
 
 // ===== SDE 词义查询扩展：把访客问题翻成 SDE 术语，再拿去召回（检索侧提智，对称于答题侧内功）=====
@@ -1321,9 +1321,9 @@ export default {
       const q = String(b.q || "").trim().slice(0, 500);
       if (q.length < 1) return _sseResp([{ t: "error", v: "问点什么吧。" }]);
       const docTitle = String(b.docTitle || "").replace(/[\u0000-\u001f]/g, "").slice(0, 200);
-      const docText = String(b.docText || "").slice(0, 12000);   // 当前正文/章节（钳位控成本）
+      const docText = String(b.docText || "").slice(0, 6000);   // 当前正文/章节（钳位控成本；放 system 末尾便于缓存）
       const focus = String(b.focus || "").slice(0, 1200);        // 读者选中的焦点段
-      const history = Array.isArray(b.history) ? b.history.slice(-8) : []; // 近几轮对话
+      const history = Array.isArray(b.history) ? b.history.slice(-4) : []; // 近几轮对话
       // 取基底：默认服务端 Key（方案B）；读者自带 Key(BYOK) 时用其所选厂商
       const userKey = String(b.key || "").trim();
       const byok = userKey.length >= 8;
@@ -1347,7 +1347,7 @@ export default {
       // 内核底盘（完整内功→内化心得，按基底缓存复用；失败则降级为无底盘）
       let reflect = ""; try { reflect = await ensureReflect(env, url.origin + "/", rvendor, VC, KEY); } catch (e) {}
       const SDEM = "\n\nSDE 骨架：显露 S / 差异序列 D / 特征纠缠 E；三大方程 S=F(D,E)·D=G(S,E)·E=H(S,D)；六路径；意义三律（特征·自由·幸福）；发生学——追问事物为何如此发生，而非如何被发现。";
-      const sys = WDS_READ_SYS(reflect, SDEM, docTitle, docText, focus);
+      const sys = WDS_READ_SYS(reflect, SDEM, docTitle, docText);
       const messages = [{ role: "system", content: sys }];
       for (const m of history) {
         const role = (m && m.role === "wds") ? "assistant" : "user";
