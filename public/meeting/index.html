@@ -386,7 +386,7 @@ function canonicalRoom(raw){
   s=s.toLowerCase().slice(0,50);
   return s?("SDE-"+s):"";
 }
-function roomUrl(r){var cfg=["config.prejoinConfig.enabled=true","config.resolution=1080","config.constraints.video.height.ideal=1080","config.constraints.video.height.max=1080","config.constraints.video.height.min=240","config.desktopSharingFrameRate.max=30","config.disableSimulcast=false","config.whiteboard.enabled=true"];if(window.SDE_MEET_NAME)cfg.push("userInfo.displayName=%22"+encodeURIComponent(window.SDE_MEET_NAME)+"%22");return "https://meet.jit.si/"+encodeURIComponent(r)+"#"+cfg.join("&")}
+function roomUrl(r){var cfg=["config.prejoinConfig.enabled=true","config.resolution=720","config.constraints.video.height.ideal=720","config.constraints.video.height.max=720","config.constraints.video.height.min=180","config.constraints.video.frameRate.ideal=30","config.constraints.video.frameRate.max=30","config.constraints.video.frameRate.min=15","config.desktopSharingFrameRate.min=5","config.desktopSharingFrameRate.max=30","config.disableSimulcast=false","config.whiteboard.enabled=true"];if(window.SDE_MEET_NAME)cfg.push("userInfo.displayName=%22"+encodeURIComponent(window.SDE_MEET_NAME)+"%22");return "https://meet.jit.si/"+encodeURIComponent(r)+"#"+cfg.join("&")}
 function meetNeedLogin(){var m=document.getElementById("ma-msg");if(m)m.textContent="进入会议前，请先用上方 Google 账号登录——登录后进会议会自动显示你的名字。";var a=document.getElementById("meet-auth");if(a){a.classList.remove("maflash");void a.offsetWidth;a.classList.add("maflash");a.scrollIntoView({behavior:"smooth",block:"center"});}}
 function joinRoom(r, newWin){
   r=canonicalRoom(r);
