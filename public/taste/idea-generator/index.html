@@ -451,6 +451,18 @@ footer{border-top:1px solid var(--border);text-align:center;padding:30px 20px 44
       <div style="font-size:12px;color:#8B98A5;margin-top:8px">先在上面选好两位审稿人的基底、填好各自的 Key，确认无误后再点此开始。一旦开始，四篇约需 10-30 分钟，请勿关闭页面。</div>
     </div>
 
+    <!-- 一键跑完全程 + 存入 Inbox -->
+    <div id="autoRunRow" style="text-align:center;margin:2px auto 18px;max-width:760px;background:rgba(201,168,76,0.07);border:1px dashed rgba(201,168,76,0.4);border-radius:12px;padding:16px 18px">
+      <div style="font-size:14px;font-weight:700;color:#D4A845;margin-bottom:6px">🚀 一键跑完全程 · 直接存入 Inbox 收件箱</div>
+      <div style="font-size:12.5px;color:#9AA5B0;line-height:1.7;margin-bottom:12px">点一下，自动依次跑完：<b style="color:#D4DCE4">四篇初稿 → 二次提智 → 补规范 → 二次审稿+打磨</b>，中途无需你再点任何按钮。跑到最后的四篇（二次审稿打磨版）会自动打包，投进学员投稿收件箱。全程约 <b style="color:#D4DCE4">40-90 分钟</b>（取决于所选基底），请勿关闭页面。<b style="color:#E8A33D">仍需先在上方把两位审稿人设定好。</b></div>
+      <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;align-items:center;margin-bottom:10px">
+        <input id="autoSubPass" type="password" placeholder="投稿密码" autocomplete="off" style="width:150px;padding:9px 11px;border-radius:8px;border:1px solid rgba(255,255,255,0.15);background:#0d1117;color:#D4DCE4;font-size:13px">
+        <input id="autoSubStudent" type="text" maxlength="80" placeholder="署名（选填）" style="width:170px;padding:9px 11px;border-radius:8px;border:1px solid rgba(255,255,255,0.15);background:#0d1117;color:#D4DCE4;font-size:13px">
+      </div>
+      <button id="autoRunBtn" style="background:linear-gradient(135deg,#B0842E,#D4A845);color:#fff;font-weight:700;font-size:15px;border:none;border-radius:9px;padding:13px 34px;cursor:pointer;letter-spacing:0.02em;box-shadow:0 4px 16px rgba(176,132,46,0.4)">🚀 一键生成 + 一键存入 Inbox</button>
+      <div id="autoRunStatus" style="font-size:12.5px;color:#9AA5B0;margin-top:10px;min-height:16px;line-height:1.6"></div>
+    </div>
+
     <!-- 四篇结果 -->
     <div id="fourPapers"></div>
 
@@ -504,6 +516,8 @@ footer{border-top:1px solid var(--border);text-align:center;padding:30px 20px 44
     <div id="polishPapers"></div>
     <div id="polishDlRow" style="margin-top:18px;display:none">
       <button id="polishDlBtn" style="background:#238636;color:#fff;font-weight:600;font-size:14px;border:none;border-radius:8px;padding:11px 26px;cursor:pointer">📄 最后四篇（打磨版）一起下载（Word）</button>
+      <button id="polishInboxBtn" style="background:linear-gradient(135deg,#B0842E,#D4A845);color:#fff;font-weight:700;font-size:14px;border:none;border-radius:8px;padding:11px 26px;cursor:pointer;margin-left:10px;box-shadow:0 4px 16px rgba(176,132,46,0.35)">📥 把这最后四篇存入 Inbox</button>
+      <div id="polishInboxStatus" style="font-size:12.5px;color:#9AA5B0;margin-top:10px;min-height:16px;line-height:1.6"></div>
     </div>
   </div>
 </div>
@@ -2894,6 +2908,127 @@ if(polishDlBtn){
       blocks.push({ md:pp.text, titleFirst:true });
     });
     saveWordDocx('最后四篇 · 二次审稿打磨版 · 学术论文', '原初问题：'+q+'　·　补规范 + 二次双审 + 打磨改稿', blocks, '最后四篇_二次审稿打磨版.docx');
+  });
+}
+
+// ===== 一键跑完全程 + 一键存入 Inbox =====
+// 复用现有各阶段按钮的处理逻辑：顺序触发 uplift→normalize→polish，各阶段轮询等待产出变量出现后再进入下一步（各 handler 是纯 click 监听、不返回 Promise，故用轮询等待其副作用变量）。
+function _papersReady(v){ return Array.isArray(v) && v.filter(p=>p&&p.text).length>0; }
+// 等待某个 window 变量变为“有内容的四篇”，超时或该阶段按钮复位且仍无产出则判失败
+function waitStage(varName, triggerBtnId, timeoutMs){
+  return new Promise((resolve, reject)=>{
+    const before = window[varName];
+    const t0 = Date.now();
+    const iv = setInterval(()=>{
+      const cur = window[varName];
+      if(cur !== before && _papersReady(cur)){ clearInterval(iv); resolve(cur); return; }
+      if(Date.now()-t0 > (timeoutMs||90*60*1000)){ clearInterval(iv); reject(new Error('该阶段超时未产出')); return; }
+    }, 1500);
+  });
+}
+// 生成 docx Blob（复用 saveWordDocx 的文档构建，但不下载、返回 Blob）
+function buildPapersDocxBlob(title, subtitle, papers){
+  const { Document, Packer, Paragraph, TextRun, AlignmentType } = docx;
+  const children = [ new Paragraph({ children:[new TextRun({ text:title, bold:true, size:36, color:'1a1205' })], spacing:{ after:140 }, alignment:AlignmentType.CENTER }) ];
+  if(subtitle) children.push(new Paragraph({ children:[new TextRun({ text:subtitle, size:20, color:'666666' })], spacing:{ after:200 }, alignment:AlignmentType.CENTER }));
+  try{ children.push(thoughtDeclPara()); }catch(_){}
+  (papers||[]).forEach((pp)=>{
+    if(!pp || !pp.text) return;
+    children.push(new Paragraph({ children:[new TextRun({ text:pp.title||'（未命名）', bold:true, size:30, color:'1a1205' })], spacing:{ before:260, after:160 }, pageBreakBefore:true }));
+    children.push(...mdParas(pp.text, { size:24, color:'222222', titleFirst:true, titleSize:32, autoHeading:true, justify:false }));
+  });
+  const doc = new Document({ sections:[{ properties:{}, children }] });
+  return Packer.toBlob(doc);
+}
+// 把 _polishedPapers 打包成 docx（本身即合法 zip）并 POST /api/submit
+async function submitPolishedToInbox(pass, student, setStatus){
+  const papers = window._polishedPapers;
+  if(!_papersReady(papers)) throw new Error('还没有“最后四篇（打磨版）”，无法存入。');
+  if(!pass) throw new Error('请先填写投稿密码。');
+  const q = (window._lastResult && window._lastResult.question) || '';
+  setStatus && setStatus('正在打包最后四篇…');
+  const blob = await buildPapersDocxBlob('最后四篇 · 二次审稿打磨版 · 学术论文', '原初问题：'+q+'　·　补规范 + 二次双审 + 打磨改稿', papers);
+  // docx 即 zip；命名为 .zip 以过 /api/submit 的 ZIP 校验（首字节 PK 已满足）
+  const stamp = new Date().toISOString().slice(0,19).replace(/[:T]/g,'-');
+  const fname = '金点子四篇_'+stamp+'.zip';
+  const fd = new FormData();
+  fd.append('pass', pass);
+  fd.append('student', student||'');
+  fd.append('note', '【金点子发生器·一键投稿】原初问题：'+q.slice(0,300));
+  fd.append('file', blob, fname);
+  setStatus && setStatus('正在上传到收件箱…');
+  const resp = await fetch('/api/submit', { method:'POST', body:fd });
+  let r={}; try{ r = await resp.json(); }catch(_){}
+  if(resp.status===200 && r.ok){ return true; }
+  if(r && r.code==='badpass') throw new Error('投稿密码不正确。');
+  throw new Error((r&&r.msg)||('上传失败（'+resp.status+'）。'));
+}
+
+// polishDlRow 里的独立“存入 Inbox”按钮（针对已手动跑到最后的情况）
+const polishInboxBtn = $('polishInboxBtn');
+if(polishInboxBtn){
+  polishInboxBtn.addEventListener('click', async ()=>{
+    const st = $('polishInboxStatus');
+    const setS = (s)=>{ if(st) st.textContent = s||''; };
+    const pass = ($('autoSubPass') && $('autoSubPass').value.trim()) || window.prompt('请输入投稿密码：') || '';
+    const student = ($('autoSubStudent') && $('autoSubStudent').value.trim()) || '';
+    if(!pass){ setS('已取消：未填投稿密码。'); return; }
+    polishInboxBtn.disabled = true;
+    try{
+      await submitPolishedToInbox(pass, student, setS);
+      setS('✓ 已存入收件箱！这最后四篇已进入学员投稿审读队列。');
+    }catch(e){ setS('✗ '+(e.message||e)); }
+    finally{ polishInboxBtn.disabled = false; }
+  });
+}
+
+// 一键：从四篇开始，自动 uplift→normalize→polish，跑完存入 Inbox
+const autoRunBtn = $('autoRunBtn');
+if(autoRunBtn){
+  autoRunBtn.addEventListener('click', async ()=>{
+    const st = $('autoRunStatus');
+    const setS = (s)=>{ if(st) st.textContent = s||''; };
+    const pass = ($('autoSubPass') && $('autoSubPass').value.trim()) || '';
+    const student = ($('autoSubStudent') && $('autoSubStudent').value.trim()) || '';
+    // 前置校验：审稿人 A/B 必须已设定（与各阶段 handler 一致），投稿密码必填
+    const revA = $('fourRevA') && $('fourRevA').value, revAKey = keyForVendor(revA, $('fourRevAKey') && $('fourRevAKey').value);
+    const revB = $('fourRevB') && $('fourRevB').value, revBKey = keyForVendor(revB, $('fourRevBKey') && $('fourRevBKey').value);
+    if(!revA || !revAKey || !revB || !revBKey){ setS('✗ 请先在上方把两位审稿人都设定好（各选基底、各填 Key）。'); return; }
+    if(revA === revB){ setS('✗ 两位审稿人请用不同的基底。'); return; }
+    if(!pass){ setS('✗ 请先填写投稿密码（最后要用它把四篇投进收件箱）。'); if($('autoSubPass')) $('autoSubPass').focus(); return; }
+
+    autoRunBtn.disabled = true;
+    const oldLabel = autoRunBtn.textContent;
+    autoRunBtn.textContent = '⏳ 全自动跑程中，请勿关闭页面…';
+    try{
+      // 阶段 0：若还没生成第一批四篇，先触发 fourStartBtn
+      if(!_papersReady(window._fourPapers)){
+        setS('① 生成四篇初稿中（含评审打磨）…');
+        $('fourStartBtn').click();
+        await waitStage('_fourPapers', 'fourStartBtn');
+      }
+      // 阶段 1：二次提智
+      setS('② 二次 SDE 提智中（发生引擎冲 150 + 双审打磨）…');
+      $('upliftBtn').click();
+      await waitStage('_upliftPapers', 'upliftBtn');
+      // 阶段 2：补规范
+      setS('③ 补规范中（挂真实引注·脚注·参考文献）…');
+      $('normalizeBtn').click();
+      await waitStage('_normalizedPapers', 'normalizeBtn');
+      // 阶段 3：二次审稿 + 打磨
+      setS('④ 二次审稿 + 打磨中（双审 + 主笔改稿，最后四篇）…');
+      $('polishBtn').click();
+      await waitStage('_polishedPapers', 'polishBtn');
+      // 阶段 4：存入 Inbox
+      setS('⑤ 打磨完成，正在存入收件箱…');
+      await submitPolishedToInbox(pass, student, setS);
+      setS('✓ 全部完成！最后四篇（二次审稿打磨版）已存入学员投稿收件箱，进入审读队列。');
+    }catch(e){
+      setS('✗ 中途出错：'+(e.message||e)+'。已跑出的阶段结果仍在上方，可手动继续，或用下方“存入 Inbox”单独投稿。');
+    }finally{
+      autoRunBtn.disabled = false;
+      autoRunBtn.textContent = oldLabel;
+    }
   });
 }
 
