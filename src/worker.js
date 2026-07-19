@@ -1163,7 +1163,7 @@ async function handleAsk(request, env, url) {
 }
 
 export default {
-  async fetch(request, env) {
+  async fetch(request, env, ctx) {
     const url = new URL(request.url);
     // /fresh：永不缓存的首页镜像，用于验证最新版本
     if (url.pathname === "/fresh") {
@@ -1363,7 +1363,15 @@ export default {
       const b = await request.json().catch(() => ({}));
       const cv = env.CONFIG_VAULT.get(env.CONFIG_VAULT.idFromName("global"));
       const r = await cv.fetch(new Request("https://cfg.internal/", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ op: "setVendor", pass: b.pass, vendor: b.vendor, key: b.key, model: b.model }) }));
-      return Response.json(await r.json(), { headers: { "access-control-allow-origin": "*" } });
+      const rj = await r.json();
+      // 配好基底即后台预生成该基底心得（第一次配置就生成、存下、以后复用；已存在则秒返回、不重复生成），这样首个学员提问不用等
+      if (rj && rj.ok && b.vendor && WDS_VENDORS[b.vendor] && b.key && ctx && ctx.waitUntil) {
+        const _rv = ({ zhipu: "glm", deepseek: "ds" })[b.vendor] || b.vendor;
+        const _VC = { url: WDS_VENDORS[b.vendor].url, model: b.model || WDS_VENDORS[b.vendor].model };
+        ctx.waitUntil(ensureReflect(env, request.url, _rv, _VC, b.key).catch(() => {}));
+        rj.msg = (rj.msg || "") + " 已在后台预生成心得（首次约需半分钟，之后复用）。";
+      }
+      return Response.json(rj, { headers: { "access-control-allow-origin": "*" } });
     }
     if (url.pathname === "/api/admin/vendorstatus") {
       const cv = env.CONFIG_VAULT.get(env.CONFIG_VAULT.idFromName("global"));
