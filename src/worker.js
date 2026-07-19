@@ -68,6 +68,14 @@ const WDS_VENDORS = {
   qwen: { url: "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions", model: "qwen-plus", name: "\u5343\u95ee Qwen" },
   minimax: { url: "https://api.minimax.chat/v1/text/chatcompletion_v2", model: "abab6.5s-chat", name: "MiniMax" },
 };
+async function getActiveVendor(env) {
+  try {
+    const cv = env.CONFIG_VAULT.get(env.CONFIG_VAULT.idFromName("global"));
+    const r = await (await cv.fetch(new Request("https://cfg.internal/", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ op: "getVendor" }) }))).json();
+    if (r && r.vendor && WDS_VENDORS[r.vendor] && r.key) return r;
+  } catch (e) {}
+  return null;
+}
 const WDS_SYS = `你是"WDS智能体"，王德生（Desheng）先生的 AI 分身，SDE 本体论的老师，正在 SDE 学员的讨论群里当场回答学生的提问。
 
 【思想内核·SDE 本体论】
@@ -845,23 +853,28 @@ async function handleAsk(request, env, url) {
   const mode = body.mode === "recommend" ? "recommend" : (body.mode === "paper" ? "paper" : "answer");
   const part = body.part === 2 ? 2 : 1;
 
-  // 基底二选一（默认 GLM）
-  const vendor = body.vendor === "ds" ? "ds" : "glm";
-  const VC = vendor === "ds"
+  // 基底：自带 Key(BYOK) 用页面所选；否则用管理员设置的活跃基底（5 选 1）；再回退旧系统 Key(GLM)
+  let vendor = body.vendor === "ds" ? "ds" : "glm";
+  let VC = vendor === "ds"
     ? { url: "https://api.deepseek.com/v1/chat/completions", model: "deepseek-v4-pro", name: "DeepSeek" }
     : { url: "https://open.bigmodel.cn/api/paas/v4/chat/completions", model: "glm-5", name: "GLM-5" };
-
-  // Key 两来源：用户自带(BYOK) 优先；否则系统 Key（页面保险箱 → Cloudflare secret）
   const userKey = String(body.key || "").trim();
   const byok = userKey.length >= 8;
   let KEY = userKey;
   if (!byok) {
-    try {
-      const cv = env.CONFIG_VAULT.get(env.CONFIG_VAULT.idFromName("global"));
-      const r = await (await cv.fetch(new Request("https://cfg.internal/", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ op: "get" }) }))).json();
-      KEY = r.key || "";
-    } catch (e) {}
-    if (!KEY) KEY = env.SDE_SEARCH_KEY || "";
+    const av = await getActiveVendor(env);
+    if (av) {
+      VC = { url: WDS_VENDORS[av.vendor].url, model: av.model || WDS_VENDORS[av.vendor].model, name: WDS_VENDORS[av.vendor].name };
+      KEY = av.key;
+      vendor = ({ zhipu: "glm", deepseek: "ds" })[av.vendor] || av.vendor;
+    } else {
+      try {
+        const cv = env.CONFIG_VAULT.get(env.CONFIG_VAULT.idFromName("global"));
+        const r = await (await cv.fetch(new Request("https://cfg.internal/", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ op: "get" }) }))).json();
+        KEY = r.key || "";
+      } catch (e) {}
+      if (!KEY) KEY = env.SDE_SEARCH_KEY || "";
+    }
   }
   if (!KEY) return _sseResp([{ t: "error", v: "智能问答尚未启用：管理员尚未配置系统密钥。你也可以在下方填入自己的 API Key 直接使用。", code: "use_own_key" }]);
 
