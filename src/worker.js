@@ -1340,21 +1340,14 @@ export default {
       const history = Array.isArray(b.history) ? b.history.slice(-4) : []; // 近几轮对话
       // 取基底：默认服务端 Key（方案B）；读者自带 Key(BYOK) 时用其所选厂商
       const userKey = String(b.key || "").trim();
-      const byok = userKey.length >= 8;
-      let VC, KEY, rvendor;
-      if (byok) {
-        const vd = b.vendor === "ds" ? "deepseek" : "zhipu";
-        VC = { url: WDS_VENDORS[vd].url, model: WDS_VENDORS[vd].model, name: WDS_VENDORS[vd].name };
-        KEY = userKey; rvendor = ({ zhipu: "glm", deepseek: "ds" })[vd] || vd;
-      } else {
-        const vc = await wdsPaperVC(env);
-        if (!vc) return _sseResp([{ t: "error", v: "WDS 助手还没启用：管理员先在 ⚙ 配置里设一把基底密钥。你也可以在下方填自己的 API Key。", code: "use_own_key" }]);
-        VC = { url: vc.VC.url, model: vc.VC.model, name: "基底" }; KEY = vc.KEY; rvendor = vc.rvendor;
-      }
+      if (userKey.length < 8) return _sseResp([{ t: "error", v: "WDS 助手用你自己的 API Key 运行（在设置里填入，只存在你的浏览器本地，与本站无关）。", code: "need_key" }]);
+      const vd = b.vendor === "ds" ? "deepseek" : "zhipu";
+      const VC = { url: WDS_VENDORS[vd].url, model: WDS_VENDORS[vd].model, name: WDS_VENDORS[vd].name };
+      const KEY = userKey, rvendor = ({ zhipu: "glm", deepseek: "ds" })[vd] || vd;
       // 限流（系统额度与自带 Key 各用独立配额桶，不互挤）
       const ip = request.headers.get("cf-connecting-ip") || "unknown";
       try {
-        const lim = env.ASK_LIMITER.get(env.ASK_LIMITER.idFromName((byok ? "byok:" : "sys:") + ip));
+        const lim = env.ASK_LIMITER.get(env.ASK_LIMITER.idFromName("byok:" + ip));
         const lr = await (await lim.fetch(new Request("https://limiter.internal/"))).json();
         if (!lr.ok) return _sseResp([{ t: "error", v: lr.reason === "day" ? "今天和 WDS 聊的次数到上限了，明天再来。" : "聊得太快啦，过十几秒再问。" }]);
       } catch (e) {}
@@ -1377,7 +1370,7 @@ export default {
       }
       if (!upstream.ok) {
         const errtxt = (await upstream.text()).slice(0, 300);
-        if (!byok && (upstream.status === 401 || upstream.status === 402 || upstream.status === 429)) return _sseResp([{ t: "error", v: "系统额度暂时不可用（" + upstream.status + "）。你可以在下方填自己的 API Key 继续。", code: "use_own_key" }]);
+        if (upstream.status === 401 || upstream.status === 402 || upstream.status === 429) return _sseResp([{ t: "error", v: "你的 Key 用不了（" + upstream.status + "）：额度不足或填错了。去设置里检查或换一个。", code: "bad_key" }]);
         return _sseResp([{ t: "error", v: "基底返回错误 " + upstream.status + "：" + errtxt }]);
       }
       const reader = upstream.body.getReader();
@@ -1422,20 +1415,13 @@ export default {
       if (q.length < 1) return _sseResp([{ t: "error", v: "问点什么吧。" }]);
       const history = Array.isArray(b.history) ? b.history.slice(-4) : [];
       const userKey = String(b.key || "").trim();
-      const byok = userKey.length >= 8;
-      let VC, KEY, rvendor;
-      if (byok) {
-        const vd = b.vendor === "ds" ? "deepseek" : "zhipu";
-        VC = { url: WDS_VENDORS[vd].url, model: WDS_VENDORS[vd].model, name: WDS_VENDORS[vd].name };
-        KEY = userKey; rvendor = ({ zhipu: "glm", deepseek: "ds" })[vd] || vd;
-      } else {
-        const vc = await wdsPaperVC(env);
-        if (!vc) return _sseResp([{ t: "error", v: "WDS 助手还没启用：管理员先在 ⚙ 配置里设一把基底密钥。你也可以在下方填自己的 API Key。", code: "use_own_key" }]);
-        VC = { url: vc.VC.url, model: vc.VC.model, name: "基底" }; KEY = vc.KEY; rvendor = vc.rvendor;
-      }
+      if (userKey.length < 8) return _sseResp([{ t: "error", v: "WDS 助手用你自己的 API Key 运行（在设置里填入，只存在你的浏览器本地，与本站无关）。", code: "need_key" }]);
+      const vd = b.vendor === "ds" ? "deepseek" : "zhipu";
+      const VC = { url: WDS_VENDORS[vd].url, model: WDS_VENDORS[vd].model, name: WDS_VENDORS[vd].name };
+      const KEY = userKey, rvendor = ({ zhipu: "glm", deepseek: "ds" })[vd] || vd;
       const ip = request.headers.get("cf-connecting-ip") || "unknown";
       try {
-        const lim = env.ASK_LIMITER.get(env.ASK_LIMITER.idFromName((byok ? "byok:" : "sys:") + ip));
+        const lim = env.ASK_LIMITER.get(env.ASK_LIMITER.idFromName("byok:" + ip));
         const lr = await (await lim.fetch(new Request("https://limiter.internal/"))).json();
         if (!lr.ok) return _sseResp([{ t: "error", v: lr.reason === "day" ? "今天和 WDS 聊的次数到上限了，明天再来。" : "聊得太快啦，过十几秒再问。" }]);
       } catch (e) {}
@@ -1473,7 +1459,7 @@ export default {
       }
       if (!upstream.ok) {
         const errtxt = (await upstream.text()).slice(0, 300);
-        if (!byok && (upstream.status === 401 || upstream.status === 402 || upstream.status === 429)) return _sseResp([{ t: "error", v: "系统额度暂时不可用（" + upstream.status + "）。你可以在下方填自己的 API Key 继续。", code: "use_own_key" }]);
+        if (upstream.status === 401 || upstream.status === 402 || upstream.status === 429) return _sseResp([{ t: "error", v: "你的 Key 用不了（" + upstream.status + "）：额度不足或填错了。去设置里检查或换一个。", code: "bad_key" }]);
         return _sseResp([{ t: "error", v: "基底返回错误 " + upstream.status + "：" + errtxt }]);
       }
       const reader = upstream.body.getReader();
