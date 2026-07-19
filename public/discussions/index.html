@@ -213,6 +213,7 @@ function el(id){return document.getElementById(id)}
 function norm(p){return String(p||"").toLowerCase().replace(/^\/+|\/+$/g,"")}
 var SEC={column:"长文专栏",students:"学员专栏",creation:"学术创造",books:"专著导读",hotspot:"今日热点",plagiarism:"论文抄袭",_root:"站内"};
 var HIDE={"discussions/hall":1,"meeting/hall":1};
+var TESTPAT=/(^|\/)(zzz[-a-z0-9]*|livetest|test|demo|sandbox)$/i;
 var rows=[],expanded=false,titleMap={};
 function humanize(slug){var parts=slug.split("/");return parts[parts.length-1].replace(/-/g," ")}
 function cleanTitle(t){t=String(t||"");var i=t.indexOf(" | ");if(i>0)t=t.slice(0,i);return t.trim()}
@@ -251,7 +252,7 @@ el("agg-more-btn").onclick=function(){expanded=true;render()};
 function loadBoard(){
   fetch("/api/board").then(function(r){return r.json()}).then(function(b){
     var arr=(b&&b.slugs)||[];
-    rows=arr.filter(function(x){return x.slug&&!HIDE[x.slug]&&x.posts>0});
+    rows=arr.filter(function(x){return x.slug&&!HIDE[x.slug]&&!TESTPAT.test(x.slug)&&x.posts>0});
     rows.sort(function(a,b){return b.posts-a.posts});
     render();
   }).catch(function(){el("agg-list").innerHTML='<div class="agg-empty">讨论列表暂时加载不出来，请稍后刷新。</div>';el("agg-stat").textContent="";});
