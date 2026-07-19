@@ -33,7 +33,7 @@ body.en{font-family:'EB Garamond','Playfair Display',Georgia,serif}
 /* ── NAV ── */
 nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;flex-direction:column;padding:0.6rem 3rem 0.55rem;background:rgba(245,239,224,0.88);backdrop-filter:blur(12px);border-bottom:1px solid var(--border2)}
 .nav-bar-main{display:flex;align-items:center;justify-content:space-between;width:100%}
-.nav-bar-sub{display:flex;align-items:center;justify-content:space-around;width:100%;margin-top:0.5rem;padding-top:0.5rem;border-top:1px solid var(--border2)}
+.nav-bar-sub{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:0.55rem 1.5rem;width:100%;margin-top:0.6rem;padding-top:0.7rem;border-top:1px solid var(--border2)}
 .nav-bar-sub a{color:var(--text2);text-decoration:none;font-size:0.9rem;font-weight:600;letter-spacing:0.14em;transition:color 0.2s}
 .nav-bar-sub a:hover{text-decoration:underline;text-underline-offset:4px;opacity:0.78}
 .nav-logo{font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:700;color:var(--gold);letter-spacing:0.05em;text-decoration:none}
@@ -216,7 +216,8 @@ footer{background:var(--bg);border-top:1px solid var(--border2);padding:3rem 2re
 }
 @media(max-width:640px){
   nav{padding:0.6rem 1.5rem}
-  .nav-bar-sub{display:none}
+  .nav-bar-sub{gap:0.4rem 0.9rem;margin-top:0.5rem;padding-top:0.55rem}
+  .nav-bar-sub a{font-size:0.76rem;letter-spacing:0.06em}
   .nav-links{gap:1rem}
   .nav-links a{display:none}
   .nav-links a.primary,.nav-links .lang-toggle,.nav-links .visit-badge{display:flex}
@@ -343,7 +344,7 @@ body.zh .en-only{display:none}
     <a href="/search/" class="primary zh-only" style="border:1px solid var(--gold);border-radius:16px;padding:3px 13px">🔍 搜索</a><a href="/search/" class="primary en-only" style="border:1px solid var(--gold);border-radius:16px;padding:3px 13px">🔍 Search</a>
     <a href="#today-articles" class="zh-only" style="color:#8A6817;font-weight:600">今日文章</a><a href="#today-articles" class="en-only" style="color:#8A6817;font-weight:600">Today's Articles</a>
     <a href="#grid" class="zh-only">SDE三维九宫</a><a href="#grid" class="en-only">Nine Cells</a>
-    <a href="#monograph" class="zh-only">专著栏目</a><a href="#monograph" class="en-only">Monographs</a>
+    <a href="#monograph" class="zh-only">专著栏目</a><a href="#monograph" class="en-only">Monographs</a><a href="#drwang" class="zh-only">王博士与SDE</a><a href="#drwang" class="en-only">Dr. Wang &amp; SDE</a>
     <a href="#master" class="primary zh-only">解构大师</a><a href="#master" class="primary en-only">Deconstruction Master</a>
     <a href="#taste" class="zh-only" style="color:#D4B25E;font-weight:700">🔥 SDE智能体免费品尝</a><a href="#taste" class="en-only" style="color:#D4B25E;font-weight:700">🔥 Free SDE Agent Taste</a>
     <a href="#matrix" class="zh-only">智能体集群</a><a href="#matrix" class="en-only">Agents</a>
