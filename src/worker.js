@@ -64,6 +64,34 @@ export class VisitCounter {
 export class CommentBox {
   constructor(ctx, env) { this.ctx = ctx; }
   async fetch(request) {
+    const _u = new URL(request.url);
+    // ===== 实时群聊：WebSocket 升级（观看无需登录，发言需 Google 登录）=====
+    if (request.headers.get("Upgrade") === "websocket") {
+      const pair = new WebSocketPair();
+      const client = pair[0], server = pair[1];
+      this.ctx.acceptWebSocket(server);
+      const st = await this.chatRead();
+      try { server.send(JSON.stringify({ t: "history", items: st.log.slice(-120), online: this.ctx.getWebSockets().length })); } catch (e) {}
+      this.broadcastPresence();
+      return new Response(null, { status: 101, webSocket: client });
+    }
+    // ===== 实时群聊：HTTP 历史拉取 / 轮询兜底 / POST 发言 =====
+    if (_u.pathname === "/api/chat") {
+      if (request.method === "GET") {
+        const since = parseInt(_u.searchParams.get("since") || "0", 10) || 0;
+        const st = await this.chatRead();
+        return Response.json({ ok: true, items: st.log.filter((m) => m.id > since), last: st.seq, online: this.ctx.getWebSockets().length }, { headers: { "cache-control": "no-store" } });
+      }
+      if (request.method === "POST") {
+        const body = await request.json().catch(() => null);
+        if (!body) return Response.json({ ok: false, msg: "请求格式不对。" }, { status: 400 });
+        const who = await verifyGoogleCredential(body.credential);
+        if (!who) return Response.json({ ok: false, msg: "请先用 Google 账号登录后再发言。" }, { status: 401 });
+        const r = await this.chatAdd(who.name, body.text);
+        return Response.json(r.ok ? { ok: true } : { ok: false, msg: r.msg }, { status: r.ok ? 200 : (r.code || 400) });
+      }
+      return new Response("method", { status: 405 });
+    }
     if (request.method === "GET") {
       const m = await this.ctx.storage.list({ prefix: "c:", limit: 500 });
       return new Response(JSON.stringify({ count: m.size, items: [...m.values()] }), {
@@ -154,6 +182,59 @@ export class CommentBox {
     await this.ctx.storage.put("n", n + 1);
     return Response.json({ ok: true, item });
   }
+  // ===== 实时群聊 helpers（存储键与评论互不干扰；聊天用独立实例 chat:<slug>）=====
+  async chatRead() {
+    const log = (await this.ctx.storage.get("clog")) || [];
+    const seq = (await this.ctx.storage.get("cseq")) || 0;
+    return { log, seq };
+  }
+  async chatAdd(name, rawText) {
+    const clean = (s, n) => String(s || "").replace(/[\u0000-\u0009\u000b-\u001f]/g, "").trim().slice(0, n);
+    name = clean(name, 20);
+    const text = clean(rawText, 500);
+    if (!name) return { ok: false, msg: "请先登录。", code: 401 };
+    if (text.length < 1) return { ok: false, msg: "内容为空。" };
+    const now = Date.now();
+    const key = "crl:" + name;
+    let hits = (await this.ctx.storage.get(key)) || [];
+    hits = hits.filter((t) => now - t < 86400000);
+    if (hits.length && now - hits[hits.length - 1] < 600) return { ok: false, msg: "发得太快了，缓一下。", code: 429 };
+    if (hits.length >= 400) return { ok: false, msg: "今天发得够多啦，明天继续。", code: 429 };
+    let { log, seq } = await this.chatRead();
+    seq += 1;
+    const msg = { id: seq, name, text, ts: now };
+    log.push(msg);
+    if (log.length > 300) log = log.slice(-300);
+    await this.ctx.storage.put("clog", log);
+    await this.ctx.storage.put("cseq", seq);
+    await this.ctx.storage.put(key, [...hits, now]);
+    this.broadcast({ t: "msg", id: msg.id, name: msg.name, text: msg.text, ts: msg.ts });
+    return { ok: true };
+  }
+  broadcast(obj) {
+    const s = JSON.stringify(obj);
+    for (const ws of this.ctx.getWebSockets()) { try { ws.send(s); } catch (e) {} }
+  }
+  broadcastPresence() { this.broadcast({ t: "presence", online: this.ctx.getWebSockets().length }); }
+  async webSocketMessage(ws, message) {
+    let d; try { d = JSON.parse(message); } catch (e) { return; }
+    if (d.t === "auth") {
+      const who = await verifyGoogleCredential(d.cred);
+      if (!who) { try { ws.send(JSON.stringify({ t: "err", m: "login" })); } catch (e) {} return; }
+      ws.serializeAttachment({ name: who.name });
+      try { ws.send(JSON.stringify({ t: "authed", name: who.name })); } catch (e) {}
+      return;
+    }
+    if (d.t === "msg") {
+      const att = ws.deserializeAttachment() || {};
+      if (!att.name) { try { ws.send(JSON.stringify({ t: "err", m: "login" })); } catch (e) {} return; }
+      const r = await this.chatAdd(att.name, d.text);
+      if (!r.ok) { try { ws.send(JSON.stringify({ t: "err", m: r.msg || "发送失败" })); } catch (e) {} }
+      return;
+    }
+  }
+  async webSocketClose(ws, code, reason, wasClean) { try { ws.close(code, reason); } catch (e) {} this.broadcastPresence(); }
+  async webSocketError(ws, error) { this.broadcastPresence(); }
 }
 
 // ===== Tier2 智能问答·按 IP 限流（站方出 Key，必须防刷爆）=====
@@ -859,6 +940,14 @@ export default {
         return env.COUNTER.get(id).fetch(new Request(request.url, { method: "POST", headers: { "x-pv-fp": fp, "x-pv-day": day } }));
       }
       return env.COUNTER.get(id).fetch(request);
+    }
+    // /api/chat：实时群聊。WebSocket 升级=实时收发；GET=历史/轮询兜底；POST=轮询兜底发言。转发到 COMMENTS 的 chat:<room> 实例。
+    if (url.pathname === "/api/chat") {
+      const room = (url.searchParams.get("room") || "").toLowerCase();
+      if (!/^[a-z0-9-]+(\/[a-z0-9-]+)*$/.test(room) || room.length > 120) {
+        return new Response(JSON.stringify({ ok: false, msg: "bad room" }), { status: 400, headers: { "content-type": "application/json" } });
+      }
+      return env.COMMENTS.get(env.COMMENTS.idFromName("chat:" + room)).fetch(request);
     }
     // /api/board：公开只读——列出全站有过留言的文章及累计发言数（论文讨论区首页聚合用）。
     // 数据本身即公开（讨论全部公开可见），故不设口令；只读、无写入、无个人信息。
