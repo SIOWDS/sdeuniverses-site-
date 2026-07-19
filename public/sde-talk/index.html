@@ -52,6 +52,24 @@ a{color:var(--accent);text-decoration:none}
 .signed .out{color:var(--accent);cursor:pointer;text-decoration:underline}
 .note{font-size:12px;color:var(--gold);min-height:16px;margin-top:6px;padding-left:2px}
 .gsi{margin:2px 0}
+.wds-bar{flex:0 0 auto;display:flex;justify-content:space-between;align-items:center;gap:10px;padding:7px 14px;background:#FBF3E2;border-bottom:1px solid var(--gold);font-size:12.5px;color:#6B5A32;flex-wrap:wrap}
+.wds-bar b{color:var(--gold)}
+.wds-ask{font-family:inherit;font-size:12px;font-weight:700;color:#fff;background:var(--gold);border:none;border-radius:14px;padding:4px 14px;cursor:pointer;flex:none;white-space:nowrap}
+.wds-ask:active{opacity:0.85}
+.msg.bot .av{background:var(--gold)!important}
+.msg.bot .bub{background:#FBF3E2;color:#20242A;border:1px solid rgba(138,104,23,0.3)}
+.msg.bot .nm{color:var(--gold);font-weight:700}
+.chat-img{max-width:min(220px,58vw);max-height:260px;border-radius:6px;display:block;cursor:pointer}
+.chat-cap{font-size:14px;line-height:1.5;margin-top:5px;white-space:pre-wrap;word-break:break-word}
+.typing-tip{text-align:left;color:var(--muted);font-size:12.5px;font-style:italic;padding:2px 4px 10px 50px}
+.toolbar{display:flex;gap:8px;margin-bottom:8px}
+.toolbar button{font-family:inherit;font-size:17px;line-height:1;background:var(--card);border:1px solid var(--line);border-radius:8px;width:40px;height:36px;cursor:pointer;padding:0}
+.toolbar button:active{background:#EDEAE2}
+.toolbar .wtool{background:#FBF3E2;border-color:var(--gold)}
+.emoji-panel{display:none;flex-wrap:wrap;gap:2px;max-height:130px;overflow-y:auto;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:6px;margin-bottom:8px}
+.emoji-panel.on{display:flex}
+.emoji-panel span{font-size:22px;cursor:pointer;padding:3px 5px;border-radius:6px;line-height:1}
+.emoji-panel span:active{background:#EDEAE2}
 </style>
 </head>
 <body>
@@ -60,6 +78,11 @@ a{color:var(--accent);text-decoration:none}
   <a class="back" href="/">← 首页</a>
   <div class="tt">SDE 讨论<span class="sub"><span class="dot off" id="tk-dot"></span><span id="tk-status">连接中…</span></span></div>
   <div class="who" id="tk-who"></div>
+</div>
+
+<div class="wds-bar">
+  <span>🤖 <b>WDS智能体</b>（王德生 AI 分身）在群里 · 输入 <b>@WDS</b> 提问</span>
+  <button class="wds-ask" id="wds-ask" type="button">问它</button>
 </div>
 
 <div class="stage" id="stage">
@@ -75,6 +98,13 @@ a{color:var(--accent);text-decoration:none}
     <div class="signed" id="tk-signed">
       已登录：<b id="tk-gname"></b>　<span class="out" id="tk-gout">退出</span>
     </div>
+    <div class="emoji-panel" id="emoji-panel"></div>
+    <div class="toolbar">
+      <button type="button" id="btn-emoji" title="表情">😊</button>
+      <button type="button" id="btn-img" title="发图片">🖼️</button>
+      <button type="button" class="wtool" id="btn-wds" title="问 WDS智能体">🤖</button>
+      <input type="file" id="tk-file" accept="image/*" style="display:none">
+    </div>
     <div class="inbar">
       <textarea id="tk-text" placeholder="说点什么…（Enter 发送，Shift+Enter 换行）" rows="1"></textarea>
       <button class="send" id="tk-send">发送</button>
@@ -87,7 +117,7 @@ a{color:var(--accent);text-decoration:none}
 (function(){
 var room="sde-plaza";
 function el(id){return document.getElementById(id)}
-var msgs=[],myName="",lastId=0,firstRender=true,ws=null,pollTimer=null;
+var msgs=[],myName="",lastId=0,firstRender=true,ws=null,pollTimer=null,typingOn=false;
 function note(s){el("tk-msg").textContent=s||""}
 function setStatus(txt,on){el("tk-status").textContent=txt;el("tk-dot").className="dot"+(on?"":" off");}
 
@@ -132,20 +162,23 @@ function render(){
   msgs.forEach(function(c){
     var dl=dayLabel(c.ts);
     if(dl!==lastDay){lastDay=dl;var dt=document.createElement("div");dt.className="day-tip";var ds=document.createElement("span");ds.textContent=dl;dt.appendChild(ds);stage.appendChild(dt);}
-    var mine=(myName&&c.name===myName);
-    var row=document.createElement("div");row.className="msg"+(mine?" me":"")+(c.recalled?" recalled":"");
-    var av=document.createElement("div");av.className="av";av.style.background=colorFor(c.name);av.textContent=avatarText(c.name);row.appendChild(av);
+    var mine=(myName&&c.name===myName),bot=(c.bot||c.name==="WDS智能体");
+    var row=document.createElement("div");row.className="msg"+(bot?" bot":(mine?" me":""))+(c.recalled?" recalled":"");
+    var av=document.createElement("div");av.className="av";av.style.background=bot?"#8A6817":colorFor(c.name);av.textContent=bot?"🤖":avatarText(c.name);row.appendChild(av);
     var col=document.createElement("div");col.className="col";
     var nm=document.createElement("div");nm.className="nm";nm.textContent=c.name;col.appendChild(nm);
     var bub=document.createElement("div");bub.className="bub";
-    var tx=document.createElement("span");tx.textContent=c.recalled?"（该消息已撤回）":c.text;bub.appendChild(tx);
+    if(c.recalled){var tx=document.createElement("span");tx.textContent="（该消息已撤回）";bub.appendChild(tx);}
+    else if(c.img){var im=document.createElement("img");im.className="chat-img";im.loading="lazy";im.src="/api/chat/img?room="+room+"&id="+c.id;im.onclick=function(){window.open(im.src,"_blank","noopener");};bub.appendChild(im);if(c.text){var cap=document.createElement("div");cap.className="chat-cap";cap.textContent=c.text;bub.appendChild(cap);}}
+    else{var tx=document.createElement("span");tx.textContent=c.text;bub.appendChild(tx);}
     col.appendChild(bub);
     var meta=document.createElement("div");meta.className="tm";meta.textContent=tme(c.ts);
-    if(mine&&!c.recalled&&gcred){var rb=document.createElement("span");rb.className="recall-btn";rb.textContent="　撤回";rb.onclick=function(){doRecall(c.id);};meta.appendChild(rb);}
+    if(mine&&!bot&&!c.recalled&&gcred){var rb=document.createElement("span");rb.className="recall-btn";rb.textContent="　撤回";rb.onclick=function(){doRecall(c.id);};meta.appendChild(rb);}
     col.appendChild(meta);
     row.appendChild(col);
     stage.appendChild(row);
   });
+  if(typingOn){var tp=document.createElement("div");tp.className="typing-tip";tp.textContent="🤖 WDS智能体 正在思考…";stage.appendChild(tp);}
   if(firstRender||nearBottom){stage.scrollTop=stage.scrollHeight;}
   firstRender=false;
 }
@@ -157,8 +190,9 @@ function connectWS(){
   ws.onmessage=function(ev){
     var d;try{d=JSON.parse(ev.data);}catch(e){return;}
     if(d.t==="history"){msgs=[];lastId=0;ingest(d.items||[]);render();}
-    else if(d.t==="msg"){ingest([{id:d.id,name:d.name,text:d.text,ts:d.ts}]);render();}
+    else if(d.t==="msg"){if(d.bot)typingOn=false;ingest([{id:d.id,name:d.name,text:d.text,ts:d.ts,bot:d.bot,img:d.img}]);render();}
     else if(d.t==="recall"){if(markRecalls([d.id]))render();}
+    else if(d.t==="typing"){typingOn=true;render();}
   };
   ws.onclose=function(){ws=null;setStatus("重连中…",false);startPolling();setTimeout(function(){if(!ws&&!document.hidden)connectWS();},4000);};
   ws.onerror=function(){try{ws.close();}catch(e){}};
@@ -193,6 +227,45 @@ function doRecall(id){
   fetch("/api/chat?room="+room,{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({credential:gcred,op:"recall",id:id})})
   .then(function(r){return r.json()}).then(function(d){if(d&&d.ok){if(markRecalls([id]))render();}else{note((d&&d.msg)||"撤回失败。");}}).catch(function(){});
 }
+function askWDS(){if(!gcred){note("请先用 Google 账号登录，登录后即可向 WDS智能体 提问。");return;}var t=el("tk-text");if(!/^@\s*wds/i.test(t.value))t.value="@WDS "+t.value;t.focus();}
+if(el("btn-wds"))el("btn-wds").onclick=askWDS;
+if(el("wds-ask"))el("wds-ask").onclick=askWDS;
+function insertEmoji(txt){var t=el("tk-text");var s=t.selectionStart||0,en=t.selectionEnd||0,v=t.value;t.value=v.slice(0,s)+txt+v.slice(en);t.selectionStart=t.selectionEnd=s+txt.length;t.focus();t.style.height="44px";t.style.height=Math.min(t.scrollHeight,120)+"px";}
+(function(){var EMOJI="😀 😃 😄 😁 😆 😊 🙂 😉 😍 🥰 😘 😜 🤪 🤔 🤨 😐 😴 😷 😎 🥳 🤗 🙄 😮 😲 😳 😭 😢 😱 😡 🥲 👍 👎 👏 🙏 💪 🤝 👌 ✌️ 🙌 🎉 🔥 💯 ❤️ 💔 ⭐ ✅ ❌ 🌹 ☕ 🍵 🎂 👀".split(" ");var panel=el("emoji-panel"),ebtn=el("btn-emoji");
+if(ebtn&&panel){EMOJI.forEach(function(e){var s=document.createElement("span");s.textContent=e;s.onclick=function(){insertEmoji(e);};panel.appendChild(s);});
+ebtn.onclick=function(ev){ev.stopPropagation();panel.classList.toggle("on");};
+document.addEventListener("click",function(ev){if(panel.classList.contains("on")&&ev.target!==ebtn&&!panel.contains(ev.target))panel.classList.remove("on");});}})();
+(function(){var fileInput=el("tk-file"),imgBtn=el("btn-img");
+if(imgBtn&&fileInput){
+imgBtn.onclick=function(){if(!gcred){note("请先用 Google 账号登录再发图片。");return;}fileInput.click();};
+fileInput.onchange=function(){var f=fileInput.files&&fileInput.files[0];fileInput.value="";if(!f)return;if(!/^image\//.test(f.type)){note("请选择图片文件。");return;}compressAndSend(f);};
+}
+function compressAndSend(file){
+  note("图片处理中…");
+  var img=new Image(),url=URL.createObjectURL(file);
+  img.onload=function(){URL.revokeObjectURL(url);
+    var mx=1000,w=img.width,hh=img.height;
+    if(w>mx||hh>mx){if(w>=hh){hh=Math.round(hh*mx/w);w=mx;}else{w=Math.round(w*mx/hh);hh=mx;}}
+    function draw(sw,sh){var c=document.createElement("canvas");c.width=sw;c.height=sh;var x=c.getContext("2d");x.fillStyle="#fff";x.fillRect(0,0,sw,sh);x.drawImage(img,0,0,sw,sh);return c;}
+    var c=draw(w,hh),q=0.6,data=c.toDataURL("image/jpeg",q);
+    while(data.length>165000&&q>0.35){q-=0.1;data=c.toDataURL("image/jpeg",q);}
+    if(data.length>165000){var c2=draw(Math.round(w*0.7),Math.round(hh*0.7));data=c2.toDataURL("image/jpeg",0.5);}
+    if(data.length>172000){note("这张图压缩后还是太大，换一张小点的吧。");return;}
+    uploadImg(data);
+  };
+  img.onerror=function(){URL.revokeObjectURL(url);note("图片读取失败。");};
+  img.src=url;
+}
+function uploadImg(dataURL){
+  note("图片上传中…");if(el("btn-img"))el("btn-img").disabled=true;
+  fetch("/api/chat/img?room="+room,{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({credential:gcred,data:dataURL,caption:el("tk-text").value.trim()})})
+  .then(function(r){return r.json().then(function(d){return{s:r.status,d:d}})}).then(function(x){if(el("btn-img"))el("btn-img").disabled=false;
+    if(x.d&&x.d.ok){el("tk-text").value="";el("tk-text").style.height="44px";note("");if(!ws)pollOnce();}
+    else if(x.s===401){note("登录已过期，请重新登录。");showSignIn();}
+    else note((x.d&&x.d.msg)||"图片发送失败。");
+  }).catch(function(){if(el("btn-img"))el("btn-img").disabled=false;note("网络异常，图片没发出去。");});
+}
+})();
 el("tk-send").onclick=doSend;
 var ta=el("tk-text");
 ta.addEventListener("keydown",function(e){if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();doSend();}});
