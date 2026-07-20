@@ -152,7 +152,7 @@
     a.parentNode.appendChild(box);
   }
 
-  function wdsKeyGet() { try { var k = (localStorage.getItem("sde_wds_key") || "").trim(), v = localStorage.getItem("sde_wds_vendor") || "ds"; return k.length >= 8 ? { key: k, vendor: v } : null; } catch (e) { return null; } }
+  function wdsKeyGet() { try { var k = (localStorage.getItem("sde_wds_key") || "").trim(), v = localStorage.getItem("sde_wds_vendor") || "ds"; if (k.length >= 8) return { key: k, vendor: v }; /* 本入口没存过：借品尝系列等其他智能体已存的 Key，填一处全站通用 */ var d = (localStorage.getItem("sde_ds_key") || "").trim(); if (d.length >= 8) return { key: d, vendor: "ds" }; var g = (localStorage.getItem("sde_glm_key") || "").trim(); if (g.length >= 8) return { key: g, vendor: "glm" }; return null; } catch (e) { return null; } }
   function wdsKeyPanel(onSaved) {
     var cur = wdsKeyGet() || { key: "", vendor: "ds" };
     var m = el("div");
@@ -172,7 +172,7 @@
     m.querySelectorAll(".kv").forEach(function (b) { b.onclick = function () { vend = b.dataset.v; paintV(); }; });
     paintV();
     m.querySelector(".kcancel").onclick = function () { m.remove(); };
-    m.querySelector(".ksave").onclick = function () { var k = kin.value.trim(); if (k.length < 8) { kin.style.borderColor = "#E88"; return; } try { localStorage.setItem("sde_wds_key", k); localStorage.setItem("sde_wds_vendor", vend); } catch (e) {} m.remove(); if (onSaved) onSaved(); };
+    m.querySelector(".ksave").onclick = function () { var k = kin.value.trim(); if (k.length < 8) { kin.style.borderColor = "#E88"; return; } try { localStorage.setItem("sde_wds_key", k); localStorage.setItem("sde_wds_vendor", vend); localStorage.setItem(vend === "glm" ? "sde_glm_key" : "sde_ds_key", k); } catch (e) {} m.remove(); if (onSaved) onSaved(); };
     setTimeout(function () { kin.focus(); }, 60);
   }
 
