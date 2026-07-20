@@ -92,7 +92,9 @@ ok("本场心得优先于全站缓存心得（read + read-paper 两处）", W.sp
 ok("guide 预算三元式在位（30万减文章/资料，陪读收缩式不变）", W.includes("b.guide ? Math.max(60000, WDS_GUIDE_HIST_BUDGET - docText.length - siteCtx.length)") && W.includes("120000 - docText.length - siteCtx.length"));
 ok("长问放宽仅限 guide（4000 vs 500）", W.includes("b.guide ? 4000 : 500"));
 ok("全站 RAG 加强档（K=36 + 接续补捞 + 3 万上限 + 来源回传）",
-  W.includes("retrieve(corpus, q, 36, expTerms)") && W.includes("siteCtx.length > 30000") && W.includes('{ t: "sources", v: siteSrcs }'));
+  W.includes("retrieve(corpus, q, 36, expTerms)") && W.includes("siteCtx.length > (docText ? 12000 : 30000)") && W.includes('{ t: "sources", v: siteSrcs }'));
+ok("读者文章走独立首条消息 + 站内资料让位（07-20 修）",
+  W.includes('content: "这是我提交给你的文章全文，本场对话就围绕它。') && W.includes("全文我已通读完毕") && !W.includes("【读者提交的文章·全文】"));
 ok("万字论文分部检索（K=12 / 8000 上限）", W.includes("retrieve(corpus, pq, 12, [])") && W.includes("partCtx.length > 8000"));
 ok("paperN 夹 3-6，缺省 3 不动陪读", W.includes("Math.max(3, Math.min(6, parseInt(b.paperN, 10) || 3))"));
 ok("三个入口共用 BYOK 配额桶（100/天，12/分）", W.includes("WDS_PER_DAY = 100") && (W.split('idFromName("byok:" + ip)').length - 1) >= 3);

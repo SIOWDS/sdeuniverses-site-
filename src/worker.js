@@ -1024,10 +1024,10 @@ function WDS_DIALOGUE_SYS(reflect, SDEM, siteCtx, artTitle, artText) {
     + SDEM
     + (reflect ? ("\n\n【你本场开工时通读满血内功后亲手写下的学习心得——这是你此刻的思考底盘，答题时真用它，但别向读者复述心得本身】\n" + reflect) : "")
     + "\n\n【怎么用《站内资料》】下面《站内资料》是就本轮问题从 sdeuniverses.com 全站检索到的相关段落。手上有资料时优先据它作答——可核验的书名/引文/数据/篇名以它为准，引用某篇观点时标（来源：篇名）；资料只是弹药，判断仍由方法论工序给出；资料里没有的绝不编造成\"站里说过\"。资料为空就凭方法论与底盘直接答。"
-    + (artText ? "\n\n【怎么用《读者提交的文章》】读者已把一篇文章交给你，本场对话就以它为对象。全文都在你手上（末尾《读者提交的文章》一节），可直接引它的原句、章节、数据。读它不用摘要式复述，而是按方法论工序拆：它在显露什么、它的差异序列往哪走、它与哪些特征纠缠在一起；哪里是它的创新，哪里是它的缝隙与自我封顶。读者没点名文章时也默认这篇是背景，但别硬把每个问题都往文章上拽。" : "")
+    + (artText ? ("\n\n【本场的对象：读者提交的文章《" + (artTitle || "未命名") + "》】读者已把这篇文章全文交给你——它就在本次对话消息的最前面一条里，你已通读。**本场一切回答优先扣着这篇文章**：读者问\"分析这篇文章\"之类时，直接从文章本身说起，引它的原话、它的章节、它的例子和数据，指名道姓地评它；它与《站内资料》冲突时以文章原文为准，站内资料只作旁证与参照。读法不是摘要复述，而是按方法论工序拆：它在显露什么（S）、它的差异序列往哪走（D）、它与哪些特征纠缠（E）；哪里是它真正的创新，哪里是它的缝隙、暗中借来的前提与自我封顶。只有读者明确岔开话题时才可以不谈它。") : "")
     + "\n\n【方法论指引（你回答每一问的工序）】\n" + WDS_METHOD_GUIDE
     + "\n\n【站内资料（从全站检索到的相关段落，可能为空）】\n" + (siteCtx || "（本轮没检索到特别相关的篇目，凭方法论与底盘答）")
-    + (artText ? ("\n\n【读者提交的文章·全文】《" + (artTitle || "（未命名）") + "》\n" + artText) : "");
+;
 }
 
 // ===== WDS 助手模式·全站对话入口 system（首页 AI 模式；检索全站+开放对话+多轮）。固定前缀在前便于缓存，站内资料在后 =====
@@ -1672,7 +1672,7 @@ export default {
             const d = corpus.docs[ck.d]; if (!d) continue;
             if (!seen[d.u]) { seen[d.u] = 1; siteSrcs.push({ u: d.u, t: d.t }); }
             siteCtx += "【来源：" + d.t + "】\n" + ck.t + "\n\n";
-            if (siteCtx.length > 30000) break;
+            if (siteCtx.length > (docText ? 12000 : 30000)) break;   // 读者提交了文章时，站内资料让位，别把文章淹掉
           }
           siteSrcs = siteSrcs.slice(0, 10);
         } catch (e) {}
@@ -1681,7 +1681,13 @@ export default {
       // 历史预算随正文/站内资料篇幅收缩：合计钳在 ~12万字符内，防超长文+百轮对话挤爆基底上下文
       // 陪读：正文+历史 ~12万字符收缩；与WDS对话（guide）：全面记忆——30万字符预算+单条1.2万，正常百轮全量不裁（RAG 的 siteCtx 已计入物理护栏）
       const histBudget = b.guide ? Math.max(60000, WDS_GUIDE_HIST_BUDGET - docText.length - siteCtx.length) : Math.min(WDS_HIST_BUDGET, Math.max(20000, 120000 - docText.length - siteCtx.length));
-      const messages = [{ role: "system", content: sys }, ...packReadHistory(history, histBudget, b.guide ? 12000 : 0)];
+      const messages = [{ role: "system", content: sys }];
+      if (b.guide && docText) {
+        // 读者提交的文章：作为对话最前面的一轮独立消息注入——比塞在 system 末尾（排在3万字站内资料之后）可靠得多
+        messages.push({ role: "user", content: "这是我提交给你的文章全文，本场对话就围绕它。\n\n《" + (docTitle || "未命名") + "》\n\n" + docText });
+        messages.push({ role: "assistant", content: "《" + (docTitle || "未命名") + "》全文我已通读完毕（" + docText.length + " 字符）。接下来你每问一句，我都扣着这篇文章本身答——引它的原话、拆它的显露与差异序列、指出它的创新与缝隙。你问吧。" });
+      }
+      messages.push(...packReadHistory(history, histBudget, b.guide ? 12000 : 0));
       messages.push({ role: "user", content: focus ? ("我正读到这一句：「" + focus + "」\n\n我的问题：" + q) : q });
       let upstream;
       try {

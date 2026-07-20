@@ -16,7 +16,7 @@ ok("页面不引用任何浮层（wds-read.js / wds-mode.js / WDS_READ 配置）
   !PAGE.includes("wds-read.js") && !PAGE.includes("wds-mode.js") && !PAGE.includes("WDS_READ"));
 ok("worker guide 分支在位（带全站RAG siteCtx + 读者文章）", W.includes("b.guide ? WDS_DIALOGUE_SYS(reflect, SDEM, siteCtx, docTitle, docText)"));
 ok("guide 全站检索加强档在位（K=36+接续+3万上限+来源回传）",
-  W.includes("retrieve(corpus, q, 36, expTerms)") && W.includes("siteCtx.length > 30000") && W.includes('{ t: "sources", v: siteSrcs }'));
+  W.includes("retrieve(corpus, q, 36, expTerms)") && W.includes("siteCtx.length > (docText ? 12000 : 30000)") && W.includes('{ t: "sources", v: siteSrcs }'));
 ok("万字论文分部亦带站内资料（GD 检索 K=12 / 8000 上限）",
   W.includes("retrieve(corpus, pq, 12, [])") && W.includes("partCtx.length > 8000"));
 ok("最强档模型钉在 v4-pro / glm-5",
@@ -152,7 +152,10 @@ eval(js);
 
 // —— 输入文章（07-20）——
 ok("worker: WDS_DIALOGUE_SYS 收文章两参", W.includes("function WDS_DIALOGUE_SYS(reflect, SDEM, siteCtx, artTitle, artText)"));
-ok("worker: 文章全文进 system 末尾 + 怎么读的指引", W.includes("【读者提交的文章·全文】") && W.includes("【怎么用《读者提交的文章》】"));
+ok("worker: 文章作为对话首条独立消息注入（不塞 system 末尾）",
+  W.includes('content: "这是我提交给你的文章全文，本场对话就围绕它。') && W.includes("全文我已通读完毕") && !W.includes("【读者提交的文章·全文】"));
+ok("worker: system 里有『本场的对象』读法规矩且压过站内资料", W.includes("【本场的对象：读者提交的文章《") && W.includes("以文章原文为准，站内资料只作旁证"));
+ok("worker: 有文章时站内资料让位 1.2 万", W.includes("siteCtx.length > (docText ? 12000 : 30000)"));
 ok("worker: guide 分支把 docTitle/docText 传进对话 system", W.includes("WDS_DIALOGUE_SYS(reflect, SDEM, siteCtx, docTitle, docText)"));
 ok("worker: 成文档文章上限 guide 6万/陪读 3万且 CTX 无正文时不占位", W.includes("slice(0, GD ? 60000 : 30000)") && W.includes('docText ? ((GD ? "【本场对话讨论的文章（读者提交）】《"'));
 ok("页面: 顶栏有输入文章按钮与文章标记", PAGE.includes('id="bart"') && PAGE.includes('id="artchip"'));
