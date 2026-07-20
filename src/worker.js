@@ -1572,6 +1572,53 @@ export default {
 
       return J({ ok: false, msg: "bad mode" }, 400);
     }
+    // /api/wds/article-sde：用户上传的 Word/PDF 文章（最多 10 篇，浏览器端已解析成纯文字）→ 逐篇「观点解读 + SDE 解构」，≥2 篇可再做跨篇综合。
+    // 纯 BYOK（读者自带 Key，存浏览器本地、绝不用平台的）；非流式 JSON；两个 mode：one（单篇解析）| synth（跨篇综合）。文件本身从不上传，只送提取出的文字。
+    if (url.pathname === "/api/wds/article-sde") {
+      if (request.method === "OPTIONS") return new Response(null, { headers: _cors() });
+      if (request.method !== "POST") return new Response("Method Not Allowed", { status: 405 });
+      let b = {}; try { b = await request.json(); } catch (e) {}
+      const J = (o, st) => Response.json(o, { status: st || 200, headers: _cors() });
+      const userKey = String(b.key || "").trim();
+      if (userKey.length < 8) return J({ ok: false, code: "need_key", msg: "这一步用你自己的 API Key 运行（在上方设置里填入，只存你的浏览器本地）。" }, 400);
+      const vd = b.vendor === "ds" ? "deepseek" : "zhipu";
+      const deep = b.tier !== "fast";   // 缺省深度思考档（DeepSeek v4-pro 思考模式 / GLM-5）；fast=快速档（flash/plus）
+      const VC = deep ? wdsTopVC(vd) : { url: WDS_VENDORS[vd].url, model: WDS_VENDORS[vd].model, name: WDS_VENDORS[vd].name };
+      const KEY = userKey, rvendor = ({ zhipu: "glm", deepseek: "ds" })[vd] || vd;
+      const ip = request.headers.get("cf-connecting-ip") || "unknown";
+      try {
+        const lim = env.ASK_LIMITER.get(env.ASK_LIMITER.idFromName("byok-art:" + ip));
+        const lr = await (await lim.fetch(new Request("https://limiter.internal/?w=20&d=200"))).json();
+        if (!lr.ok) return J({ ok: false, msg: lr.reason === "day" ? "今天这台机器的额度用完了，明天再来。" : "太快啦，过十几秒再试。" }, 429);
+      } catch (e) {}
+      const base = url.origin + "/";
+      let reflect = String(b.reflect || "").slice(0, 14000);
+      if (!reflect) { try { reflect = await ensureReflect(env, base, rvendor, VC, KEY); } catch (e) {} }
+      const SDEM = "\n\nSDE 方法论：显露 S / 差异序列 D / 特征纠缠 E；三大方程 S=F(D,E)·D=G(S,E)·E=H(S,D)；六路径；意义三律（特征/自由/幸福）；发生学——追问事物为何如此发生，而非如何被发现。";
+      const BASE = (reflect ? ("\n\n【SDE 内化心得·思考底盘（内化用，别复述）】\n" + reflect) : "") + SDEM;
+
+      if (b.mode === "one") {
+        const title = String(b.title || "（未命名）").replace(/[\u0000-\u001f]/g, "").slice(0, 200);
+        const text = String(b.text || "").slice(0, 50000);   // 单篇正文上限 5 万字：deepseek-v4-pro 1M 窗口足够，同时把延迟/成本收在合理区间
+        if (text.replace(/\s/g, "").length < 30) return J({ ok: false, msg: "这篇没解析出足够文字（可能是扫描版 PDF／纯图片，需先 OCR，或手动粘贴正文）。" }, 400);
+        const sys = "你是 WDS，王德生的 SDE 本体论老师。你要对一篇文章做『观点解读 + SDE 解构』。" + BASE + "\n用严谨而犀利的汉语，把 SDE 术语讲透、服务论证，不摆空模板、不注水、不写开场白；不要用 #、* 等 markdown 符号，用短小标题与自然段分层。";
+        const usr = "【文件名】《" + title + "》\n【文章正文（从 Word/PDF 提取，格式可能略乱，请抓主干）】\n" + text + "\n\n请分两节作答：\n一、观点解读：准确复述这篇文章的核心主张、论证脉络，以及它没明说却依赖的隐含前提。\n二、SDE 解构：用发生学与显露S／差异序列D／特征纠缠E的视角重新审视——这篇文章把什么当成了『现成的结构／给定的对象』（而它其实是在差异序列与环境纠缠中被显影出来的）？它漏掉了哪个『如何发生／为何如此发生』的层次？用三大方程或意义三律照见它的盲区，最后给出一个这篇文章自己看不到的、更深一层的判断。\n约 2000-2800 字，用『一、观点解读』『二、SDE 解构』分节，直接从正文写起，不要开场白。";
+        const out = await llmText(VC, KEY, sys, usr, deep ? 6500 : 4500);   // 思考档给足头寸，别让正文被推理挤掉
+        return out ? J({ ok: true, text: out }) : J({ ok: false, msg: "解析生成失败，请重试。" }, 502);
+      }
+
+      if (b.mode === "synth") {
+        const items = (Array.isArray(b.items) ? b.items : []).slice(0, 10);
+        const packed = items.map((it, i) => "【文章" + (i + 1) + "：" + String(it.title || "（未命名）").slice(0, 120) + "】\n" + String(it.brief || "").slice(0, 3500)).join("\n\n");
+        if (packed.replace(/\s/g, "").length < 100) return J({ ok: false, msg: "先完成各篇解析，再做跨篇综合。" }, 400);
+        const sys = "你是 SDE 学派的学者，正在为一组文章做『跨篇 SDE 综合』。" + BASE + "\n用严谨而犀利的汉语；把 SDE 术语讲透、服务论证；不摆空模板、不注水、不写开场白；不要用 #、* 等 markdown 符号，用短小标题与自然段分层。";
+        const usr = "下面是对 " + items.length + " 篇文章各自做的『观点解读 + SDE 解构』摘要：\n\n" + packed + "\n\n请基于这几篇（而非逐篇复述）做一份跨篇综合，约 1800-2600 字，分三节：\n一、共绕：这几篇尽管题材各异，在发生学层面共同绕着哪个更深的问题打转？它们各自把什么当成了『现成给定』而漏看了其发生？\n二、张力与互补：它们之间的关键分歧、盲区的错位、以及一篇的显影恰好照亮另一篇盲区之处。\n三、更深一层：用三大方程或意义三律，给出一个任何单篇都看不到、只有把它们并置才涌现出的新判断。\n直接从正文写起，不要开场白。";
+        const out = await llmText(VC, KEY, sys, usr, deep ? 6000 : 4200);
+        return out ? J({ ok: true, text: out }) : J({ ok: false, msg: "综合生成失败，请重试。" }, 502);
+      }
+
+      return J({ ok: false, msg: "bad mode" }, 400);
+    }
     // /api/wds/read：读者边读边聊——扣着当前正在读的正文与选中段，与 WDS 一对一多轮对话（流式 SSE）。
     // 纯 BYOK：读者自带 API Key（body.key，存浏览器本地、绝不用平台的）；无 Key 返回 need_key 且不调基底；复用 ensureReflect/AskLimiter。
     if (url.pathname === "/api/wds/read") {
