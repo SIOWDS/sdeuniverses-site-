@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>第七编　知识DNA编：三层级与三螺旋｜《SIO逻辑学导论》· 专著栏目 | SDE Universes</title>
+<meta name="description" content="本编解释知识为何具有生命性。第26章给出三层级：SIO 层是整体模型，提供稳定框架与公共协作的可复写性；ΔSIO 层是差异生成，异常、阻抗、摩擦与意义断裂构成知识更新的微分元；特征纠缠层是力量来源，使知识能够传播、协作并">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#F5EFE0;--card:#FAF6EC;--card2:#F0E8D3;--gold:#8A6817;--text:#2A2315;--text2:#544733;--muted:#98886C;--border:rgba(138,104,23,0.22);--border2:rgba(138,104,23,0.10);--accent:#C0522A;--accent2:#DB7440}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Noto Serif SC','EB Garamond',Georgia,serif;line-height:1.95;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:0.7rem 3rem;background:rgba(245,239,224,0.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border2)}
+.nav-logo{font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:700;color:var(--gold);letter-spacing:0.05em;text-decoration:none}
+.nav-links{display:flex;align-items:center;gap:1.5rem}
+.nav-links a{color:var(--text2);text-decoration:none;font-size:0.84rem;letter-spacing:0.09em;transition:color .2s}
+.nav-links a:hover,.nav-links a.here{color:var(--accent)}
+.nav-links a.here{font-weight:700}
+.wrap{max-width:760px;margin:0 auto;padding:0 2rem}
+header.hero{padding:8.5rem 2rem 2.6rem;text-align:center;position:relative;overflow:hidden;border-bottom:1px solid var(--border2)}
+.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 72% 58% at 50% 24%,#C0522A1a 0%,transparent 72%)}
+.eyebrow{position:relative;font-size:0.7rem;letter-spacing:0.26em;color:var(--accent);margin-bottom:1.15rem}
+.eyebrow a{color:var(--accent);text-decoration:none;border-bottom:1px solid rgba(0,0,0,.14)}
+h1.art-title{position:relative;font-family:'Noto Serif SC',serif;font-size:clamp(1.75rem,4.1vw,2.55rem);font-weight:700;line-height:1.32;color:var(--text);max-width:830px;margin:0 auto}
+.art-sub{position:relative;font-size:clamp(0.98rem,1.9vw,1.13rem);color:var(--text2);max-width:660px;margin:1.05rem auto 0;font-style:italic;font-weight:300;line-height:1.72}
+.art-meta{position:relative;margin-top:1.5rem;font-size:0.79rem;letter-spacing:0.13em;color:var(--muted)}
+section.body{padding:2.8rem 0 1rem}
+.abs{background:var(--card);border:1px solid var(--border2);border-left:3px solid var(--accent);border-radius:5px;padding:1.4rem 1.6rem;margin-bottom:1rem}
+.abs .l{font-size:0.7rem;letter-spacing:0.24em;color:var(--accent);font-weight:700;margin-bottom:0.6rem}
+.abs p{font-size:0.94rem;line-height:1.88;color:var(--text2);text-align:justify}
+.kw{font-size:0.85rem;color:var(--muted);margin-bottom:2.4rem;letter-spacing:0.02em}
+.kw b{color:var(--accent);font-weight:700;letter-spacing:0.1em}
+.toc{background:var(--card2);border:1px dashed var(--border);border-radius:6px;padding:1.25rem 1.5rem;margin-bottom:3rem}
+.toc .l{font-size:0.7rem;letter-spacing:0.24em;color:var(--accent);font-weight:700;margin-bottom:0.75rem}
+.toc a{display:block;font-size:0.9rem;color:var(--text2);text-decoration:none;padding:0.24rem 0;transition:color .18s,padding-left .18s}
+.toc a:hover{color:var(--accent);padding-left:5px}
+article h2{font-family:'Noto Serif SC',serif;font-size:1.28rem;font-weight:700;color:var(--text);margin:3.1rem 0 1.15rem;padding-bottom:0.5rem;border-bottom:1px solid var(--border2);scroll-margin-top:5.5rem;line-height:1.45}
+article h3{font-family:'Noto Serif SC',serif;font-size:1.06rem;font-weight:700;color:var(--text);margin:2.2rem 0 0.9rem;line-height:1.5}
+article h2::before{content:'';display:inline-block;width:4px;height:0.95em;background:var(--accent);margin-right:0.6rem;vertical-align:-1px;border-radius:2px}
+article p{font-size:1.02rem;line-height:2.05;color:var(--text);margin-bottom:1.15rem;text-align:justify;letter-spacing:0.012em}
+article b{color:var(--text);font-weight:700;background:linear-gradient(transparent 62%,#C0522A22 62%)}
+article em{font-style:normal;color:var(--accent);font-weight:600}
+blockquote{margin:1.9rem 0;padding:1.15rem 1.5rem;background:var(--card);border-left:3px solid var(--accent);border-radius:0 5px 5px 0;font-size:1.05rem;line-height:1.9;color:var(--text);font-weight:600}
+hr{border:none;height:1px;background:var(--border2);margin:2.6rem 0}
+.foot-nav{margin:3.4rem 0 0;text-align:center;background:var(--card2);border:1px dashed var(--accent);border-radius:8px;padding:1.6rem 1.4rem}
+.foot-nav .cl{display:flex;flex-wrap:wrap;gap:0.7rem;justify-content:center}
+.foot-nav a{text-decoration:none;font-size:0.85rem;letter-spacing:0.06em;padding:0.48rem 1.05rem;border:1px solid var(--border);border-radius:22px;color:var(--text2);background:var(--card);transition:all .2s}
+.foot-nav a:hover{border-color:var(--accent);color:var(--accent)}
+footer{border-top:1px solid var(--border2);margin-top:3rem;padding:2.4rem 2rem;text-align:center;color:var(--muted);font-size:0.77rem;letter-spacing:0.05em}
+footer a{color:var(--gold);text-decoration:none}
+@media(max-width:640px){
+  nav{padding:0.6rem 1rem}.nav-links{gap:0.9rem}.nav-links a.sib{display:none}
+  header.hero{padding:6.4rem 1.2rem 2rem}
+  .wrap{padding:0 1.25rem}
+  article p{font-size:1rem;line-height:1.98}
+  article h2{font-size:1.16rem;margin:2.5rem 0 1rem}
+}
+</style>
+
+
+<style>
+:root{--bg:#F3F2EC;--card:#FAF9F4;--card2:#EAE9E0;--gold:#3E4488;--text:#20222B;--text2:#474B5A;--muted:#868A99;--border:rgba(62,68,136,0.22);--border2:rgba(62,68,136,0.10);--accent:#4A54A6;--accent2:#6B76C8}
+.ednote{background:#EFEFF8;border:1px solid rgba(74,84,166,0.28);border-left:3px solid #4A54A6;border-radius:4px;padding:1.05rem 1.2rem;margin:0 0 1.6rem;font-size:0.93rem;line-height:1.85;color:#37453F}
+.ednote .l{font-size:0.72rem;letter-spacing:0.22em;color:#4A54A6;margin-bottom:0.5rem}
+article h3{font-size:1.02rem;font-weight:700;margin:1.9rem 0 0.7rem;color:var(--gold)}
+.chnav{max-width:760px;margin:2.4rem auto 0;padding:1.2rem 2rem 0;display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;font-size:0.86rem;border-top:1px solid var(--border2)}
+.chnav a{color:var(--accent);text-decoration:none}
+.partline{font-size:0.72rem;letter-spacing:0.2em;color:var(--accent);margin-bottom:0.8rem}
+</style>
+
+</head>
+<body>
+<nav>
+  <a class="nav-logo" href="/">SDE Universes</a>
+  <div class="nav-links">
+    <a href="/">首页</a>
+    <a href="/#monograph" class="sib">专著栏目</a>
+    <a href="/books/logic/" class="here">SIO逻辑学导论</a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="hero-bg"></div>
+  <div class="eyebrow"><a href="/#monograph">专著栏目</a> · <a href="/books/logic/">《SIO逻辑学导论》</a></div>
+  <div class="partline">第七编　知识DNA编</div>
+  <h1 class="art-title">三层级与三螺旋</h1>
+  <p class="art-sub">《SIO逻辑学导论》第七编，共 3 章，约 8,003 字。</p>
+  <div class="art-meta">王德生 著 · 《SIO逻辑学导论》第七编 · 约 0.8 万字</div>
+</header>
+
+<style>
+article .li{font-size:0.99rem;line-height:1.95;color:var(--text);margin:0 0 0.5rem;padding-left:1.15rem;position:relative;text-align:justify}
+article .li::before{content:"—";position:absolute;left:0;color:var(--accent);opacity:.55}
+article .lab{font-size:0.86rem;font-weight:700;letter-spacing:0.08em;color:var(--accent);margin:1.5rem 0 0.55rem}
+article h4{font-size:0.99rem;font-weight:700;color:var(--text2);margin:1.5rem 0 0.6rem}
+.gbox{background:var(--card);border:1px solid var(--border2);border-left:3px solid var(--accent2);border-radius:5px;padding:1.15rem 1.35rem;margin:1.9rem 0}
+.gbox .l{font-size:0.7rem;letter-spacing:0.24em;color:var(--accent);font-weight:700;margin-bottom:0.5rem}
+.gbox p{font-size:0.95rem;line-height:1.92;color:var(--text2);margin:0;text-align:justify}
+.addch{background:#FFF8E8;border:1px solid rgba(160,120,20,.3);border-left:3px solid #A07814;border-radius:4px;padding:0.9rem 1.15rem;margin:0 0 1.4rem;font-size:0.88rem;line-height:1.8;color:#5A4A22}
+.addch b{color:#8A6817}
+.reflist{max-width:820px;margin:56px auto 8px;padding:34px 30px;background:#F4F4FA;border:1px solid #D9DAEA;border-radius:6px}
+.reflist h2{font-size:20px;letter-spacing:0.14em;color:#3E4488;margin:0 0 10px}
+.reflist .n{font-size:13.5px;line-height:1.9;color:#7B7F95;margin:0 0 20px}
+.reflist ol{margin:0;padding-left:22px;font-size:14px;line-height:1.85;color:#414455}
+.reflist li{margin:0 0 9px;padding-left:6px}
+</style>
+<main class="wrap">
+  <section class="body">
+    <div class="ednote"><div class="l">编 者 按</div>本编回答一个容易被跳过的问题：知识凭什么能传下去、跑起来、推广开。三层级（整体—差异—力量）借用了积分与微分的隐喻，三螺旋（符号—逻辑—数学）则给出知识生命力的三项必要条件。隐喻是显影工具而非数学论证，读者不必把它当作形式化主张；真正可检验的是"缺失诊断"：缺符号则口号化，缺逻辑则影子化，缺数学则难以工程化。</div>
+    <div class="abs"><div class="l">本 编 提 要</div><p>本编解释知识为何具有生命性。第26章给出三层级：SIO 层是整体模型，提供稳定框架与公共协作的可复写性；ΔSIO 层是差异生成，异常、阻抗、摩擦与意义断裂构成知识更新的微分元；特征纠缠层是力量来源，使知识能够传播、协作并改变行动。第27章给出三螺旋 DNA：符号使知识可见、可存储、可交流，逻辑使知识可推理、可运行、可检验，数学使知识可结构化、可标准化、可普遍化，缺一即病。第28章把三层级与三螺旋落到科学、教育、组织、AI 四个场景的流水线上，并给出三螺旋缺失诊断表。</p></div>
+    <div class="kw"><b>关键词</b>　知识三层级；ΔSIO；特征纠缠；三螺旋DNA；缺失诊断</div>
+    <div class="toc"><div class="l">本编目次</div><a href="#c26">第26章　知识三层级：整体—差异—力量</a><a href="#c27">第27章　三螺旋DNA：符号·逻辑·数学</a><a href="#c28">第28章　四场景流水线：科学、教育、组织、AI</a></div>
+    <article>
+<div class="gbox"><div class="l">编 序</div><p>前六编完成了逻辑救赎的“立宪—清障—建基—归位—原创—行动”。然而，文明的救赎若缺少对“知识本体”的重写，就会在最关键处失去公共性：一方面，原创与行动可能停留为个体经验，难以复写与传承；另一方面，形式规则可能再度越权为本体，把知识误写为静态存量，把学习误写为结论搬运，把教育误写为答案训练。第七编的任务，是把知识从“对象认识”与“命题集合”的旧想象中解放出来，重建为一种具有生命机制的发生学系统，并给出其内核的“DNA结构”。　　本编提出两个核心框架：其一是知识三层级——整体模型、差异生成、力量内核；其二是知识三螺旋DNA——符号、逻辑、数学。三层级回答“知识如何生成、如何更新、如何生长”，三螺旋回答“知识为何能传播、能运行、能普遍化”。这套框架将把第四编的三逻辑之道、第五编的原创机制、第六编的行动哲学，全部重新安置到“知识生命系统”之中：发生之道对应差异生成，发展之道对应动力与扩展，形成之道对应结构成全；原创成为知识DNA的突变与重组，行动成为知识DNA的运行与校准。由此，逻辑不再只是推理学，成为文明知识生命机制的一部分。</p></div>
+<h2 id="c26">第26章　知识三层级：整体—差异—力量</h2>
+<div class="gbox"><div class="l">章 导 语</div><p>传统知识观常把知识理解为“对对象的正确表述”或“命题的集合”。这种理解在稳定区间内看似有效，却无法解释三个关键现象：第一，知识为何会更新与淘汰；第二，知识为何会跨主体传播并改变行动；第三，知识为何会突然发生范式跃迁。若把知识仅当作静态命题存量，这三个现象只能被叙述为偶然历史，而无法进入机制学。　　本章提出知识三层级框架：第一层级是SIO整体模型层——知识作为整体理解框架；第二层级是ΔSIO差异生成层——知识作为局部差异与新问题的源头；第三层级是特征纠缠力量层——知识作为可传播、可运行、可扩展的力量内核。三层级不是三种学派观点，而是同一知识生命在不同尺度上的显影：整体层提供稳定，差异层提供更新，力量层提供传播与行动力。</p></div>
+<h3>26.1 SIO层：整体模型（积分隐喻）</h3>
+<h3>26.1.1 为什么知识首先表现为“整体模型”，而不是“对象标签”</h3>
+<p>人们常说“我认识一棵树”“我知道水会沸腾”，这类表达似乎暗示知识是对客体的描述。然而细究经验结构，所谓“对象知识”往往只是投影：真正被掌握的不是孤立客体，而是主体—互动—客体的整体经验被整合为一个可重复的理解框架。孩子学会“树”这个概念时，记住的不只是形状与颜色，还包括在阳光下的触感、攀爬的经验、被阴影覆盖的安全感，以及语言命名带来的共同体确认。　　因此，知识在最初层面是一种整体模型：它把分散的经验片段整合为“可用的整体理解”。整体模型的关键价值不在于完美准确，而在于可操作：它让主体能够预期、决策与行动，让共同体能够协作、传承与复写。文明之所以能存在，并不依赖于每个个体掌握大量精确命题，而依赖于共同体拥有一组稳定的整体模型，使日常生活与制度秩序能够持续。</p>
+<h3>26.1.2 积分隐喻：整体模型如何由经验片段“积”出来</h3>
+<p>若把差异经验视为微小增量，那么整体模型就像对这些增量进行积分后的结果。所谓积分隐喻，并非数学装饰，而是一条直观的发生链条：经验片段一次次出现，系统并不保存全部细节，而是在重复中抽取稳定差异，最终形成一个概括性的整体框架。　　回忆是典型例证。一个人回忆“学会骑车”的经历，脑中呈现的不是每一次摇晃、每一次摔倒的全部细节，而是被整合后的整体模型：如何保持平衡、如何转弯、如何刹车，以及“我能做到”的自我确认。这个整体模型指导未来行动，具有预测性与稳定性。它不是某条命题，而是一个整体SIO结构的内化模型。　　从文明尺度看，科学理论、制度规范、技术体系都具有整体模型的性质：它们把大量局部差异压缩为统一框架，使共同体能够在复杂世界中获得可重复的协作秩序。整体模型层因此是知识的“稳定骨架”。</p>
+<h3>26.1.3 整体模型的三项结构特征：整体性、稳定性、预测性</h3>
+<p>第一，整体性：整体模型不是碎片堆积，而是结构整合。它提供概念之间、机制之间、行动之间的连贯关系，使“理解”成为可能。第二，稳定性：整体模型能吸收一定范围的差异而不崩溃，形成稳定区间；稳定性不是永恒真理，而是可持续运行的边界。第三，预测性：整体模型不仅解释过去，还能生成对未来的预期，使行动获得方向与节奏。　　需要强调的是：整体模型的稳定性既是知识的力量来源，也是知识的风险来源。若整体模型被神圣化为不可变天条，就会压制差异输入，使知识失去更新能力；当环境变形，模型会以暴雷方式崩塌。因此，整体模型必须与差异层与力量层形成循环：差异层持续提供更新材料，力量层持续提供传播与运行机制。</p>
+<h3>26.1.4 整体模型的误判：把“整体模型”误当作“对象本体”</h3>
+<p>当整体模型运行顺畅时，最常见的误判是把模型当作对象本体：仿佛世界本来就是模型所描述的那样。此误判会引发两类问题。其一是认识论问题：反证被当作噪声，异常被当作错误，差异无法进入发生中段；其二是行动论问题：规则加密取代结构更新，价值口号取代动力机制，最终进入内卷与反噬。　　本书在此强调：整体模型只是一层级——它提供稳定，但不能取消差异；它提供秩序，但不能禁止发生。要避免整体模型本体化，必须进入第二层级：ΔSIO差异生成层，理解知识的真正源头在差异，而不是在模型本身。</p>
+<h3>26.2 ΔSIO层：差异生成（微分隐喻）（开端）</h3>
+<h3>26.2.1 为什么“差异”才是知识更新与创新的起点</h3>
+<p>整体模型解释稳定，但无法解释更新。知识之所以生长，是因为差异不断出现：新的现象、异常数据、执行阻抗、关系摩擦、意义断裂。这些差异并非模型的失败羞耻，而是知识生命的输入源泉。若没有差异，整体模型将永久自洽，知识将退化为复写存量；差异一旦被清扫，发生窗口一旦被关闭，原创能力便结构性衰竭。　　因此，ΔSIO层级所表达的并非“模型之外的杂音”，而是“模型更新的微分元”。下一次输出将继续展开：ΔSIO的严格定义、差异如何稳定化为特征、微分隐喻如何解释局部变化，以及差异如何把整体模型推入新一轮的自组织与涌现。</p>
+<h3>26.2 ΔSIO层：差异生成（微分隐喻）</h3>
+<h4>26.2.2 ΔSIO的定义：整体事件的片段、增量与扰动</h4>
+<p>若SIO层是知识的整体模型层，那么ΔSIO层就是知识的差异生成层。ΔSIO并不是一个抽象符号，而是SIO整体在运行过程中出现的局部增量：它可以是一条异常数据、一种新的摩擦、一段无法安顿的意义断裂，也可以是某个看似微不足道却反复出现的偏差。ΔSIO的本质不是“信息更多”，而是“结构不同”：它使既有模型无法平稳吸收，使既有路径无法顺畅推进，使既有护持无法继续安顿。　　从发生学角度看，ΔSIO有三重含义。第一是片段：整体运行中的一个局部片段被凸显出来，例如某次失败、某次反噬、某次异常反馈。第二是增量：在时间流中出现的局部变化，意味着整体状态发生了不可忽略的偏移。第三是扰动：对既有稳定区间的冲击，使系统不得不进行校准或重写。　　这三重含义共同表明：ΔSIO不是知识体系的外部扰动，而是知识更新的内部发动机。若没有ΔSIO，整体模型将永远停留在既有稳定区间，知识只会复写；而文明史恰恰是ΔSIO不断出现、不断积累、不断逼迫模型重写的历史。</p>
+<h4>26.2.3 微分隐喻：差异层为何对应“局部变化方程”</h4>
+<p>若用积分隐喻描述整体模型的形成，那么用微分隐喻描述差异层就非常自然。微分关注的是局部变化率：在某个点附近，系统如何变化；微分方程关注的是变化关系：变化受哪些因素支配、变化如何推进。ΔSIO正对应这种局部变化单元：它不提供全局框架，却提供全局更新的入口。　　这一隐喻的关键不在数学形式，而在结构直觉：整体模型解释“世界大致如何”，差异层解释“世界为何开始不再如此”。当差异出现，系统并不立刻抛弃整体模型，而是首先在局部范围内试图解释与吸收；吸收失败，差异反复出现，变化率不再可忽略，整体模型才被迫修订。　　因此，ΔSIO层级提供了知识的动态性：它让知识成为可更新的生命系统，而不是静态存量。更重要的是，它解释了为何知识必须与失败、反噬、异常共存：失败与异常不是知识的敌人，而是知识更新的输入端口；反噬不是羞耻，而是变化率信号。一个文明若羞耻化失败、删除异常样本、压制反噬表达，就等于切断ΔSIO输入端口，知识系统必然退化为复写机器，最终陷入内卷与暴雷。</p>
+<h4>26.2.4 差异如何稳定化为特征：从“扰动”到“可命名同一性”</h4>
+<p>ΔSIO并不自动成为知识，差异必须被稳定化为特征才可能进入结构成全。稳定化的三个条件在发生之道中已展开：重复、选择、边界。这里从知识层级角度再次强调：稳定化意味着差异获得“可命名的同一性”。　　差异的重复出现使其从偶然扰动变为结构信号；差异被选择进入复盘体系，使其从噪声变为对象；差异被边界条件界定，使其从模糊感受变为可检验单元。特征因此不是客体自带属性，而是差异稳定化后的意识同一性，它为知识提供“最小结构单位”：一旦特征成立，整体模型就拥有了可更新的材料，形式逻辑也拥有了可成全的对象。　　这一机制也解释了许多学术与社会误区：当差异未稳定化就被强行概念化，概念会漂移；当差异被拒绝进入复盘，模型会僵死；当差异被边界偷换，证据会混装。真正的知识训练不只是背结论，而是训练“差异稳定化能力”：识别可重复差异、建立特征锚点、声明边界与证伪条件。</p>
+<h3>26.3 特征纠缠层：知识力量来源（传播/分享/行动）（上半部分）</h3>
+<h4>26.3.1 为什么知识不仅要“解释”，还必须“有力量”</h4>
+<p>传统知识论往往把知识等同于命题真值：一句话是真的，便构成知识。然而这种定义无法解释一个关键事实：知识不仅描述世界，还改变世界。一个概念能够组织学科，一个模型能够推动技术，一个制度设计能够改变行为，一段叙事能够凝聚共同体。若知识只是命题集合，它为何具有这种传播力与行动力？　　本书在此给出一个发生学回答：知识之所以有力量，源自特征纠缠。特征纠缠并不是诗意比喻，而是结构事实：当多个特征之间形成稳定联结、相互激发并共同被复写时，知识不再是孤立特征，而成为可运行的结构单元。结构单元一旦形成，就会在符号、逻辑与数学的三种模态中交替运行，获得传播、运行与普遍化能力。　　从文明角度看，真正能传播的知识一定不是单个孤立事实，而是一组特征的纠缠网络：它能提供解释框架（整体模型）、能提供可复写程序（形式逻辑）、能提供可执行行动（制度与技术）。特征纠缠因此是知识的“力量层”：它解释了知识如何从理解转为能力，从描述转为改变。</p>
+<h4>26.3.2 特征纠缠的最小结构：相互激发、稳定联结、可复写运行</h4>
+<p>特征纠缠至少包含三项条件。第一是相互激发：一个特征出现会触发另一个特征显影，例如“风险”触发“规则”“保险”“责任”，或“速度”触发“粘度”“反馈”“阈值”。第二是稳定联结：特征之间的触发关系在边界内反复成立，形成可预测连接。第三是可复写运行：特征联结不仅存在于个人直觉中，而被写成概念、模型、流程、公式，使共同体能够复现并在行动中运行。　　这三项条件一旦成立，知识就从“知道”变为“能做”：特征纠缠释放时，行动路径被激发；纠缠固化时，制度与技术得以建立；纠缠扩展时，文明尺度的协作得以形成。　　下一次输出将继续完成26.3后半：知识为何能传播与分享、三螺旋DNA如何从特征纠缠中分化出来，并完成26.4三层循环与章末训练输出。</p>
+<h3>26.3 特征纠缠层：知识力量来源（传播/分享/行动）（下半部分）</h3>
+<h4>26.3.3 传播：知识为何能跨主体复制而不碎裂</h4>
+<p>知识的力量首先表现为传播力：它能够从一个主体进入另一个主体，并在跨主体复制中保持某种同一性。若知识只是私人经验碎片，它在传播中会迅速失真；若知识只是抽象命题，它在传播中会失去行动力。特征纠缠解释了传播的真实机制：知识在传播中被复制的不是“原样内容”，而是“纠缠结构”。　　所谓纠缠结构，是特征之间的触发关系、稳定联结与边界条件。当一个概念被传授时，它不仅是一串符号，更是一组特征联结被激活：听者在符号刺激下产生特征联想、建立触发路径、形成局部自组织。传播因此不是搬运，而是再生：接收者在自身经验系统中重新生成相似的纠缠结构。　　传播能否成功，取决于纠缠结构是否具备三项性质：可见性、可运行性、可定位性。可见性意味着纠缠能通过符号显影；可运行性意味着纠缠能通过推理与操作启动；可定位性意味着纠缠有明确边界条件与证伪信号，避免在不同处境中漂移成无意义口号。若缺少这些性质，传播就会出现两种失败：一种是“口号化传播”，符号被复制但结构未生成；另一种是“碎片化传播”，结构在接收者处被误组装，导致对象域漂移与机制偷换。　　因此，知识传播的本体并不是词语，而是特征纠缠结构；教育的本体也不是讲解，而是帮助接收者在其经验系统中重建纠缠结构。知识DNA的第一层意义，正是在此处显影：知识要能传播，必须能把纠缠结构拆分为可显影、可运行、可结构化的三种模态。</p>
+<h4>26.3.4 分享：知识为何能共享并形成公共秩序</h4>
+<p>传播与分享并不相同。传播可以是单向复制，分享则意味着共同体在同一纠缠结构上形成协作与审计。分享的关键问题是：不同主体如何确认自己在“同一知识结构”上工作，而不是在同名不同物的影子概念上争执。　　特征纠缠在此提供一个公共机制：当纠缠结构被外化为符号表达、被制度化为推理规则、被形式化为结构模型时，共同体便获得公共审计尺度。换言之，分享不是情绪认同，而是结构对齐：同一对象域、同一边界条件、同一证伪纪律。　　分享的发生学意义在于：它把知识从个人能力转写为文明资产。个人可以拥有直觉，但共同体必须拥有可审计程序；个人可以有灵感，但文明必须有可复写机制。特征纠缠越能被公共化，知识就越能成为制度与技术；知识越能成为制度与技术，就越能在现实世界中改变行动。由此，分享不是知识的附属，而是知识生命力的核心环节：没有分享，知识无法成为文明；没有文明，知识无法持续扩展。</p>
+<h4>26.3.5 行动：知识为何能改变行为并产生现实后果</h4>
+<p>知识的第三种力量是行动力：它不仅能被理解与传播，还能组织行动并改变现实。若知识只是命题真值，它没有理由改变行为；改变行为的是一种结构：行动路径被激发、约束配置被调整、意义动力被点火。　　特征纠缠解释行动力的来源：当纠缠结构稳定，符号触发即可激活一组行动联结；当纠缠结构固化，制度与工具即可承载并复制行动；当纠缠结构扩展，协作网络即可放大行动范围。知识之所以能改变现实，是因为它把个体行动从即时反应提升为结构化操作：行动不是凭感觉，而是按结构运行；不是靠口号，而是靠证伪与复盘。　　因此，知识的力量并非玄学，而是纠缠结构的释放：符号释放引发理解与传播，逻辑释放引发推理与检验，数学释放引发结构化与普遍化。三螺旋DNA正是这种释放机制的稳定表达。</p>
+<h3>26.4 三层循环：差异→特征→模型→新差异</h3>
+<h4>26.4.1 循环不是重复，而是生命机制</h4>
+<p>三层级并非静态分区，而是循环机制：差异（ΔSIO）出现并被采集，差异稳定化为特征，特征在纠缠中形成力量结构，力量结构被积分为整体模型；整体模型运行于现实世界，又会遭遇新的差异，从而进入下一轮更新。知识因此不是存量，而是生命：它在稳定与更新之间循环，在护持与突变之间循环。　　这一循环解释了知识为何会“诞生、传播与死亡”。诞生来自差异稳定化与纠缠重组，传播来自纠缠结构的公共化，死亡来自模型稳定区间的边界崩塌：当环境变形或差异积累到阈值，旧模型不再有效，知识必须被更新或被替代。知识死亡并非失败，而是发生学必然：若没有死亡，便没有新生；若没有边界崩塌，便没有范式跃迁。</p>
+<h4>26.4.2 循环的方向控制：避免两种极端</h4>
+<p>三层循环若失控，会走向两种极端。第一种极端是“只模型不差异”：整体模型被神圣化，差异被清扫，知识退化为复写与内卷。第二种极端是“只差异不模型”：差异被无限放大，特征无法稳定，整体模型无法形成，知识退化为碎片与噪声。　　发生学理性要求在二者之间建立循环纪律：模型必须允许差异输入，差异必须被稳定化为特征，特征必须进入可公共化纠缠，纠缠必须在模型中形成可复写结构。此纪律与三公理、三逻辑完全一致：第一公理防止模型本体化，第二公理保护差异进入发生中段，第三公理防止价值越位压制差异；发生之道点火新特征，发展之道推进扩展，形成之道成全结构。</p>
+<h3>训练输出：三层级映射表（把任一知识问题定位在三层级）</h3>
+<p>用途：任何知识困境（学不会、讲不清、做不成、传不动、用不了）先定位在哪一层级失效，再决定修复动作。</p>
+<h3>A. SIO整体模型层（积分层）——失效信号与修复</h3>
+<div class="li">失效信号：碎片化、无框架、无法预测、无法组织行动</div>
+<div class="li">修复动作：建立整体模型（概念框架、机制链条、边界条件、可复写流程）</div>
+<h3>B. ΔSIO差异层（微分层）——失效信号与修复</h3>
+<div class="li">失效信号：无新问题、无异常样本、失败被隐藏、反噬被羞耻化</div>
+<div class="li">修复动作：合法化差异与失败样本，采集ΔSIO，建立特征锚点与证伪条件</div>
+<h3>C. 特征纠缠力量层——失效信号与修复</h3>
+<div class="li">失效信号：知识传不出去、讲不进去、用不出来、做不成协作</div>
+<div class="li">修复动作：建立纠缠结构：符号显影、逻辑运行、数学结构化（进入三螺旋DNA）</div>
+<h3>D. 循环定位（最常见的错配）</h3>
+<div class="li">只做模型不做差异 → 内卷复写</div>
+<div class="li">只做差异不做模型 → 碎片噪声</div>
+<div class="li">只讲符号不讲逻辑 → 口号化</div>
+<div class="li">只讲逻辑不讲边界 → 影子推理</div>
+<div class="li">只讲数学不讲意义 → 空转形式化</div>
+<h2 id="c27">第27章　三螺旋DNA：符号·逻辑·数学</h2>
+<div class="gbox"><div class="l">章 导 语</div><p>若第26章回答“知识如何生成与更新”（整体—差异—力量），第27章回答“知识为何能传播、能运行、能普遍化”。知识若只有整体模型与差异输入，仍可能停留在个人理解或局部经验；要成为文明生命，知识必须获得稳定表达机制与运行机制。本书将这一机制命名为知识的三螺旋DNA：符号、逻辑、数学。三者不是并列工具，而是特征纠缠在三种模态下的显影：符号使知识可见，逻辑使知识可运行，数学使知识可结构化。缺一不可，缺一即病。</p></div>
+<h3>27.1 符号（粒子态）：可见、可存储、可交流</h3>
+<p>符号是知识的“粒子态显影”。它把原本流动的经验与纠缠结构压缩为可见单位：词语、图像、标记、范畴、公式符号、仪式符号。符号的核心功能是三项：可见、可存储、可交流。　　可见意味着知识从内在经验转为可被他者感知的外化对象；可存储意味着知识可以跨时间保存，避免随个体死亡而消散；可交流意味着知识可以跨主体传播，形成共同体共享的材料库。没有符号，知识只存在于个体经验之中；即使真实发生，也无法成为公共资产。　　符号同时也是最容易产生影子化的环节：符号可见性太强，极易被误当作知识本体。于是出现口号化：符号被重复、被动员、被崇拜，但纠缠结构未在接收者内部重建，知识只剩外壳。符号层的健康标准不是“词语是否漂亮”，而是符号是否能激活特征纠缠：能否在接收者处触发可复盘的差异、可稳定的特征、可运行的路径。符号的任务是点亮入口，而不是替代结构。</p>
+<h3>27.2 逻辑（波态）：可推理、可运行、可检验</h3>
+<p>逻辑是知识的“波态运行”。它不是形式规则的自转，而是特征纠缠在推理与检验中的传播：类比、演绎、归纳在对象域纪律下让知识运行起来。逻辑的核心功能是三项：可推理、可运行、可检验。　　可推理意味着知识可以从局部联结推到整体结构，从已知推到未知，形成方向校准；可运行意味着知识可以在行动中被调用，形成可复写的程序；可检验意味着知识允许反证进入并触发修订，从而保持可纠错性。没有逻辑，符号只是材料堆，无法织成网；差异只是扰动，无法稳定成结构；模型只能被背诵，无法被运行。　　逻辑层的最大风险是越权：当逻辑被神圣化为全域宪法，就会以静态必然压死发生窗口，以规则加密消灭差异输入，以叙事免疫取消证伪条件，最终把知识生命转为僵死教条。逻辑层的健康标准因此不是“推理是否严密”这么简单，而是推理是否守住对象域与证伪纪律，是否允许发生与发展留空间。逻辑应当成全结构，而不能替代生成。</p>
+<h3>27.3 数学（场态）：可结构化、可标准化、可普遍化</h3>
+<p>数学是知识的“场态结构化”。它把纠缠结构进一步提升为可计算、可标准化、可普遍化的表达：变量、函数、方程、几何结构、概率模型、优化问题等。数学的核心功能也是三项：可结构化、可标准化、可普遍化。　　可结构化意味着知识从叙事与局部规则提升为可组合的结构体系；可标准化意味着不同主体在统一坐标系下对齐，降低协作摩擦；可普遍化意味着知识能够跨语境迁移，在更大范围内保持稳定区间。没有数学，知识仍可存在，但其扩展速度与精密程度受限；有了数学，知识可以以更高密度被编码、被传播、被工程化。　　数学层的风险在于形式空转：把结构化误当作本体，把标准化误当作真理，把普遍化误当作全域有效。若数学脱离边界条件与发生链条，它会制造一种“高精度幻觉”：模型越精密，世界越被压扁；模型越完美，差异越被清扫；最终模型在边界外失效并以反噬回冲。数学层的健康标准因此是：结构化必须携带边界条件，普遍化必须携带证伪条件，标准化必须服务于意义动力而非替代意义动力。</p>
+<h3>训练输出：三螺旋缺失诊断（缺符号/缺逻辑/缺数学的三类知识病）</h3>
+<div class="li">A. 缺符号（粒子态缺失）</div>
+<div class="li">症状：懂但说不清、会做但教不会、经验无法传承</div>
+<div class="li">处方：建立清晰命名、图式化表达、最小可复写材料库（但避免口号化）</div>
+<div class="li">B. 缺逻辑（波态缺失）</div>
+<div class="li">症状：材料很多但无法织网；讲得热闹但不可检验；协作靠权威而非结构</div>
+<div class="li">处方：建立对象域纪律与证伪条件，让类比/演绎/归纳形成运行回路</div>
+<div class="li">C. 缺数学（场态缺失）</div>
+<div class="li">症状：可以解释但难以工程化；可以局部复写但难以标准化推广</div>
+<div class="li">处方：在边界条件明确时引入结构化表达（变量/函数/模型），并保留失效信号</div>
+<h2 id="c28">第28章　四场景流水线：科学、教育、组织、AI</h2>
+<h3>28.1 科学：差异采集→模型更新</h3>
+<p>科学的发生学流水线是：差异采集（异常与反证）→特征稳定（边界与重复）→纠缠重组（新理论结构）→形式成全（证伪与复写）→数学结构化（标准化与普遍化）。科学之所以能持续跃迁，在于它制度化了失败样本的合法地位，使ΔSIO持续输入，并用三螺旋把新结构公共化。</p>
+<h3>28.2 教育：从答案训练到发生训练</h3>
+<p>教育若只训练复写，会制造聪明而无新生；教育若训练发生，才会培育原创能力。发生训练意味着：让学生学会采集差异、稳定特征、守住对象域、提出证伪条件；形成训练意味着：把理解织成可复写结构；发展训练意味着：在张力中换挡而不靠羞耻推进。教育的目标因此从“会答题”转为“会生题、会改题、会换场”。</p>
+<h3>28.3 组织：从考核优化到改场能力</h3>
+<p>组织若只靠规则加密与指标加压，会把知识DNA压扁为口号与流程，导致规则内卷与张力永动。改场能力意味着：允许失败样本进入复盘，允许反噬成为信号，允许发生窗口生成新结构原型，再用形成之道把原型成全为可复写制度。真正的高绩效组织不是更硬的执行，而是更强的换挡与重写。</p>
+<h3>28.4 AI：生成与解释的分工与边界</h3>
+<p>AI擅长符号生成与结构复写，能够显著放大符号螺旋与部分逻辑螺旋；但真实发生仍依赖差异输入与反噬校准，依赖意义动力的点火与闭合。人机协作的关键不是让AI替代发生，而是让AI服务于成全：帮助结构表达、帮助推理运行、帮助模型结构化，同时由人类与现实后果共同承担差异输入、证伪纪律与改场决断。</p>
+<p>本编重写了知识的生命机制：知识不是静态存量，而是整体模型、差异生成与特征纠缠力量的循环系统；知识之所以能传播、能运行、能普遍化，依赖符号—逻辑—数学三螺旋DNA。三层级解释知识如何生长，三螺旋解释知识为何有力量。由此，前六编的逻辑救赎获得公共落点：发生之道对应差异输入，发展之道对应扩展推进，形成之道对应结构成全；原创是纠缠重组的突变，行动是纠缠运行的校准。下一编将进入时代编：在后学科压力与AI加速下，知识组织方式如何从学科偏置转向发生结构，文明如何在新的工具环境中保持三公理立宪与三逻辑归位。</p>
+    </article>
+  </section>
+</main>
+<section class="reflist">
+<h2>延伸参考文献 · Further References</h2>
+<p class="n">下列文献为本编所涉思想脉络的原典与代表性研究，供读者对读与查证；本书观点不代表所列作者立场。</p>
+<ol>
+<li>Ludwik Fleck, Entstehung und Entwicklung einer wissenschaftlichen Tatsache, Basel: Schwabe, 1935.</li>
+<li>Eugene P. Wigner, "The Unreasonable Effectiveness of Mathematics in the Natural Sciences", Communications on Pure and Applied Mathematics 13(1), 1960.</li>
+<li>Michael Polanyi, The Tacit Dimension, New York: Doubleday, 1966.</li>
+<li>Karl Popper, Objective Knowledge: An Evolutionary Approach, Oxford: Clarendon, 1972.</li>
+<li>Jack Goody, The Domestication of the Savage Mind, Cambridge University Press, 1977.</li>
+<li>Walter J. Ong, Orality and Literacy: The Technologizing of the Word, London: Methuen, 1982.</li>
+<li>Ikujiro Nonaka &amp; Hirotaka Takeuchi, The Knowledge-Creating Company, Oxford University Press, 1995.</li>
+<li>Edwin Hutchins, Cognition in the Wild, Cambridge, MA: MIT Press, 1995.</li>
+</ol>
+</section>
+
+<div class="chnav"><a href="/books/logic/action/">← 第六编 行动编</a><a href="/books/logic/">全书目录 ↑</a><a href="/books/logic/post-discipline/">第八编 时代编 →</a></div>
+
+<!-- 读者讨论区+阅读计数 · sde-talk v3 (Google实名) -->
+<section id="sde-talk">
+<style id="sde-talk-css">
+#sde-talk{max-width:722px;margin:56px auto 40px;padding:0 24px;line-height:1.9;text-align:left}
+#sde-talk .tk-title{font-size:20px;font-weight:800;letter-spacing:.04em;margin:0 0 4px;padding-bottom:12px;border-bottom:2px solid rgba(128,128,128,.3);text-indent:0}
+#sde-talk .tk-title span{font-size:13px;font-weight:400;opacity:.6;letter-spacing:.02em}
+#sde-talk .tk-hint{font-size:13px;opacity:.62;margin:10px 0 18px;text-indent:0}
+#sde-talk .tk-form{background:rgba(128,128,128,.06);border:1px solid rgba(128,128,128,.22);border-radius:8px;padding:16px 16px 12px;margin-bottom:26px}
+#sde-talk input,#sde-talk textarea{display:block;width:100%;box-sizing:border-box;font:inherit;color:inherit;background:rgba(128,128,128,.12);border:1px solid rgba(128,128,128,.3);border-radius:6px;padding:9px 12px;margin:0 0 10px;outline:none}
+#sde-talk textarea{min-height:88px;resize:vertical;line-height:1.8}
+#sde-talk input:focus,#sde-talk textarea:focus{border-color:rgba(128,128,128,.6)}
+#sde-talk .tk-bar{display:flex;justify-content:space-between;align-items:center}
+#sde-talk .tk-note{font-size:12px;opacity:.55}
+#sde-talk button{font:inherit;font-size:14px;letter-spacing:.2em;padding:7px 26px;border-radius:6px;border:1px solid currentColor;background:transparent;color:inherit;cursor:pointer;opacity:.85}
+#sde-talk button:hover{opacity:1}
+#sde-talk button:disabled{opacity:.4;cursor:default}
+#sde-talk #tk-msg{font-size:13px;margin-top:8px;opacity:.75;min-height:1em;text-indent:0}
+#sde-talk #tk-replying{font-size:13px;margin-bottom:8px;opacity:.8}
+#sde-talk #tk-replying a{margin-left:8px;text-decoration:underline;color:inherit;opacity:.7;cursor:pointer}
+#sde-talk .tk-item{border-bottom:1px solid rgba(128,128,128,.18);padding:16px 2px}
+#sde-talk .tk-head{font-size:13px;margin-bottom:5px;text-indent:0}
+#sde-talk .tk-name{font-weight:700}
+#sde-talk .tk-time{opacity:.5;margin-left:10px;font-size:12px}
+#sde-talk .tk-body{white-space:pre-wrap;word-break:break-word;font-size:15.5px;text-indent:0;margin:0}
+#sde-talk .tk-reply{display:inline-block;font-size:12px;margin-top:7px;color:inherit;opacity:.55;text-decoration:none;border-bottom:1px dashed currentColor;cursor:pointer}
+#sde-talk .tk-reply:hover{opacity:.9}
+#sde-talk .tk-sub{margin:12px 0 0 22px;padding:10px 14px;background:rgba(128,128,128,.07);border-left:2px solid rgba(128,128,128,.35);border-radius:0 6px 6px 0}
+#sde-talk .tk-empty{padding:26px 0;text-align:center;opacity:.55;font-size:14px}
+</style>
+<div class="tk-wrap">
+  <h2 class="tk-title">读者讨论区 <span id="tk-count"></span> <span id="sde-pv-wrap">· 本文已被阅读 <span id="sde-pv-n">—</span> 次</span></h2>
+  <p class="tk-hint">用 Google 账号登录即可发言——发言人就是你的 Google 账号名字。发言公开可见，请友善交流。</p>
+  <div class="tk-form" id="tk-gform">
+    <div id="tk-replying" style="display:none"><span id="tk-replying-to"></span><a id="tk-cancel">取消回复</a></div>
+    <div id="tk-signed" style="display:none;font-size:14px;margin-bottom:10px">以 <b id="tk-gname"></b> 的身份发言 <a id="tk-gout" style="margin-left:10px;font-size:12px;opacity:.6;text-decoration:underline;cursor:pointer">退出</a></div>
+    <div id="tk-gsi"></div>
+    <textarea id="tk-text" maxlength="1000" placeholder="你的问题，或你的见解…" style="display:none;margin-top:10px"></textarea>
+    <div class="tk-bar" id="tk-sendbar" style="display:none"><span class="tk-note">最多 1000 字 · 每人每天最多 30 条</span><button id="tk-send">发 言</button></div>
+    <div id="tk-msg"></div>
+  </div>
+  <div id="tk-list"></div>
+</div>
+</section>
+<script id="sde-talk-js">
+(function(){
+var slug="books/logic/knowledge-dna",API="/api/comments?slug="+slug;
+function el(id){return document.getElementById(id)}
+var items=[],parent="";
+function note(s){el("tk-msg").textContent=s}
+var GCID="985037699618-de3smmqf2rer0pfhf4mrtrj3rgahgu5u.apps.googleusercontent.com",gcred="";
+try{var st=JSON.parse(sessionStorage.getItem("sde_gauth")||"null");if(st&&st.exp>Date.now()){gcred=st.cred;showSigned(st.name);}}catch(e){}
+function showSigned(n){el("tk-gname").textContent=n;el("tk-signed").style.display="block";el("tk-gsi").style.display="none";el("tk-text").style.display="block";el("tk-sendbar").style.display="flex";}
+function showSignIn(){gcred="";try{sessionStorage.removeItem("sde_gauth");}catch(e){}el("tk-signed").style.display="none";el("tk-gsi").style.display="block";el("tk-text").style.display="none";el("tk-sendbar").style.display="none";}
+window.__sdeGCb=function(resp){try{var p=JSON.parse(atob(resp.credential.split(".")[1].replace(/-/g,"+").replace(/_/g,"/")));var nm=(p.name||(p.email||"").split("@")[0]||"").slice(0,20);gcred=resp.credential;try{sessionStorage.setItem("sde_gauth",JSON.stringify({cred:gcred,name:nm,exp:Date.now()+50*60*1000}));}catch(e){}showSigned(nm);}catch(e){note("登录信息解析失败，请重试。");}};
+function bootGsi(){if(!(window.google&&google.accounts&&google.accounts.id)){el("tk-gsi").textContent="Google 登录组件加载失败——本讨论区需要 Google 账号登录后发言，请检查网络后刷新。";return}
+google.accounts.id.initialize({client_id:GCID,callback:window.__sdeGCb,auto_select:true});
+google.accounts.id.renderButton(el("tk-gsi"),{theme:"outline",size:"large",text:"signin_with",shape:"pill",logo_alignment:"left"});}
+(function(){var s=document.createElement("script");s.src="https://accounts.google.com/gsi/client";s.async=true;s.defer=true;s.onload=bootGsi;s.onerror=function(){el("tk-gsi").textContent="无法连接 Google 登录服务——本讨论区需要 Google 账号登录后发言。";};document.head.appendChild(s);})();
+el("tk-gout").onclick=showSignIn;
+function tme(ts){var d=new Date(ts),p=function(x){return (x<10?"0":"")+x};
+return d.getFullYear()+"-"+p(d.getMonth()+1)+"-"+p(d.getDate())+" "+p(d.getHours())+":"+p(d.getMinutes())}
+function head(c){var h=document.createElement("div");h.className="tk-head";
+var n=document.createElement("span");n.className="tk-name";n.textContent=c.name;
+var t=document.createElement("span");t.className="tk-time";t.textContent=tme(c.ts);
+h.appendChild(n);h.appendChild(t);return h}
+function para(s){var p=document.createElement("p");p.className="tk-body";p.textContent=s;return p}
+function replyLink(c){var a=document.createElement("a");a.className="tk-reply";a.textContent="回复";
+a.onclick=function(){if(!gcred){note("回复也需要先用 Google 账号登录——请在上方登录。");var g=el("tk-gsi");if(g&&g.scrollIntoView)g.scrollIntoView({behavior:"smooth",block:"center"});return}
+parent=c.id;el("tk-replying-to").textContent="回复 "+c.name+"：";
+el("tk-replying").style.display="block";el("tk-text").focus()};return a}
+function render(){var L=el("tk-list");L.textContent="";
+var tops=items.filter(function(c){return !c.parent});
+el("tk-count").textContent=items.length?"· "+items.length+" 条":"";
+if(!tops.length){var d=document.createElement("div");d.className="tk-empty";d.textContent="还没有发言——欢迎第一个开口。";L.appendChild(d);return}
+tops.forEach(function(c){var it=document.createElement("div");it.className="tk-item";
+it.appendChild(head(c));it.appendChild(para(c.text));it.appendChild(replyLink(c));
+items.filter(function(x){return x.parent===c.id}).forEach(function(x){
+var sb=document.createElement("div");sb.className="tk-sub";sb.appendChild(head(x));sb.appendChild(para(x.text));it.appendChild(sb)});
+L.appendChild(it)})}
+function load(){fetch(API).then(function(r){return r.json()}).then(function(d){items=d.items||[];render()}).catch(function(){})}
+el("tk-cancel").onclick=function(){parent="";el("tk-replying").style.display="none"};
+el("tk-send").onclick=function(){var text=el("tk-text").value.trim();
+if(!gcred){note("请先用 Google 账号登录。");return}
+if(text.length<2){note("内容太短了。");return}
+el("tk-send").disabled=true;note("发送中…");
+fetch(API,{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({credential:gcred,text:text,parent:parent})})
+.then(function(r){return r.json().then(function(d){return{s:r.status,d:d}})})
+.then(function(x){el("tk-send").disabled=false;
+if(x.d&&x.d.ok){el("tk-text").value="";parent="";el("tk-replying").style.display="none";note("已发布。");load()}
+else if(x.s===401){note("登录已过期，请重新登录。");showSignIn()}
+else{note((x.d&&x.d.msg)||"发送失败，请稍后再试。")}})
+.catch(function(){el("tk-send").disabled=false;note("网络异常，请稍后再试。")})};
+load();
+(function(){var pn=el("sde-pv-n");if(!pn)return;
+var day=new Date(Date.now()+8*3600*1000).toISOString().slice(0,10),k="sde_pv_"+slug.replace(/\//g,"_"),m="POST";
+try{if(localStorage.getItem(k)===day)m="GET";}catch(e){}
+fetch("/api/pv?slug="+slug,{method:m}).then(function(r){return r.json()})
+.then(function(d){if(d&&typeof d.total==="number"){pn.textContent=d.total.toLocaleString("zh-Hans-CN");
+if(m==="POST"){try{localStorage.setItem(k,day);}catch(e){}}}else{throw 0;}})
+.catch(function(){var w=el("sde-pv-wrap");if(w)w.style.display="none";});
+})();
+})();
+</script>
+
+<footer>
+  © 德麦国际 Demai International · 专著栏目 · 《SIO逻辑学导论》 · <a href="/">sdeuniverses.com</a>
+</footer>
+
+<script>window.WDS_READ={selector:"article"};</script>
+<script src="/taste/wds-companion/wds-read.js" defer></script>
+
+<script src="/wds-mode.js" defer></script>
+</body>
+</html>

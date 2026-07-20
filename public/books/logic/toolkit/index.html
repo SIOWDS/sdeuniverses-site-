@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>第九编　工具箱编：可执行的逻辑修炼系统｜《SIO逻辑学导论》· 专著栏目 | SDE Universes</title>
+<meta name="description" content="本编将全书的机制转写为可复制的训练工具。第31章给出三公理审计表，分本体审计、发生审计、动力审计三段，各配通用检查项与科研、教育、组织、AI 四类补充项，并规定最小修复路径为本体归位→发生复位→动力归位。第32章给出号位">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#F5EFE0;--card:#FAF6EC;--card2:#F0E8D3;--gold:#8A6817;--text:#2A2315;--text2:#544733;--muted:#98886C;--border:rgba(138,104,23,0.22);--border2:rgba(138,104,23,0.10);--accent:#C0522A;--accent2:#DB7440}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Noto Serif SC','EB Garamond',Georgia,serif;line-height:1.95;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:0.7rem 3rem;background:rgba(245,239,224,0.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border2)}
+.nav-logo{font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:700;color:var(--gold);letter-spacing:0.05em;text-decoration:none}
+.nav-links{display:flex;align-items:center;gap:1.5rem}
+.nav-links a{color:var(--text2);text-decoration:none;font-size:0.84rem;letter-spacing:0.09em;transition:color .2s}
+.nav-links a:hover,.nav-links a.here{color:var(--accent)}
+.nav-links a.here{font-weight:700}
+.wrap{max-width:760px;margin:0 auto;padding:0 2rem}
+header.hero{padding:8.5rem 2rem 2.6rem;text-align:center;position:relative;overflow:hidden;border-bottom:1px solid var(--border2)}
+.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 72% 58% at 50% 24%,#C0522A1a 0%,transparent 72%)}
+.eyebrow{position:relative;font-size:0.7rem;letter-spacing:0.26em;color:var(--accent);margin-bottom:1.15rem}
+.eyebrow a{color:var(--accent);text-decoration:none;border-bottom:1px solid rgba(0,0,0,.14)}
+h1.art-title{position:relative;font-family:'Noto Serif SC',serif;font-size:clamp(1.75rem,4.1vw,2.55rem);font-weight:700;line-height:1.32;color:var(--text);max-width:830px;margin:0 auto}
+.art-sub{position:relative;font-size:clamp(0.98rem,1.9vw,1.13rem);color:var(--text2);max-width:660px;margin:1.05rem auto 0;font-style:italic;font-weight:300;line-height:1.72}
+.art-meta{position:relative;margin-top:1.5rem;font-size:0.79rem;letter-spacing:0.13em;color:var(--muted)}
+section.body{padding:2.8rem 0 1rem}
+.abs{background:var(--card);border:1px solid var(--border2);border-left:3px solid var(--accent);border-radius:5px;padding:1.4rem 1.6rem;margin-bottom:1rem}
+.abs .l{font-size:0.7rem;letter-spacing:0.24em;color:var(--accent);font-weight:700;margin-bottom:0.6rem}
+.abs p{font-size:0.94rem;line-height:1.88;color:var(--text2);text-align:justify}
+.kw{font-size:0.85rem;color:var(--muted);margin-bottom:2.4rem;letter-spacing:0.02em}
+.kw b{color:var(--accent);font-weight:700;letter-spacing:0.1em}
+.toc{background:var(--card2);border:1px dashed var(--border);border-radius:6px;padding:1.25rem 1.5rem;margin-bottom:3rem}
+.toc .l{font-size:0.7rem;letter-spacing:0.24em;color:var(--accent);font-weight:700;margin-bottom:0.75rem}
+.toc a{display:block;font-size:0.9rem;color:var(--text2);text-decoration:none;padding:0.24rem 0;transition:color .18s,padding-left .18s}
+.toc a:hover{color:var(--accent);padding-left:5px}
+article h2{font-family:'Noto Serif SC',serif;font-size:1.28rem;font-weight:700;color:var(--text);margin:3.1rem 0 1.15rem;padding-bottom:0.5rem;border-bottom:1px solid var(--border2);scroll-margin-top:5.5rem;line-height:1.45}
+article h3{font-family:'Noto Serif SC',serif;font-size:1.06rem;font-weight:700;color:var(--text);margin:2.2rem 0 0.9rem;line-height:1.5}
+article h2::before{content:'';display:inline-block;width:4px;height:0.95em;background:var(--accent);margin-right:0.6rem;vertical-align:-1px;border-radius:2px}
+article p{font-size:1.02rem;line-height:2.05;color:var(--text);margin-bottom:1.15rem;text-align:justify;letter-spacing:0.012em}
+article b{color:var(--text);font-weight:700;background:linear-gradient(transparent 62%,#C0522A22 62%)}
+article em{font-style:normal;color:var(--accent);font-weight:600}
+blockquote{margin:1.9rem 0;padding:1.15rem 1.5rem;background:var(--card);border-left:3px solid var(--accent);border-radius:0 5px 5px 0;font-size:1.05rem;line-height:1.9;color:var(--text);font-weight:600}
+hr{border:none;height:1px;background:var(--border2);margin:2.6rem 0}
+.foot-nav{margin:3.4rem 0 0;text-align:center;background:var(--card2);border:1px dashed var(--accent);border-radius:8px;padding:1.6rem 1.4rem}
+.foot-nav .cl{display:flex;flex-wrap:wrap;gap:0.7rem;justify-content:center}
+.foot-nav a{text-decoration:none;font-size:0.85rem;letter-spacing:0.06em;padding:0.48rem 1.05rem;border:1px solid var(--border);border-radius:22px;color:var(--text2);background:var(--card);transition:all .2s}
+.foot-nav a:hover{border-color:var(--accent);color:var(--accent)}
+footer{border-top:1px solid var(--border2);margin-top:3rem;padding:2.4rem 2rem;text-align:center;color:var(--muted);font-size:0.77rem;letter-spacing:0.05em}
+footer a{color:var(--gold);text-decoration:none}
+@media(max-width:640px){
+  nav{padding:0.6rem 1rem}.nav-links{gap:0.9rem}.nav-links a.sib{display:none}
+  header.hero{padding:6.4rem 1.2rem 2rem}
+  .wrap{padding:0 1.25rem}
+  article p{font-size:1rem;line-height:1.98}
+  article h2{font-size:1.16rem;margin:2.5rem 0 1rem}
+}
+</style>
+
+
+<style>
+:root{--bg:#F3F2EC;--card:#FAF9F4;--card2:#EAE9E0;--gold:#3E4488;--text:#20222B;--text2:#474B5A;--muted:#868A99;--border:rgba(62,68,136,0.22);--border2:rgba(62,68,136,0.10);--accent:#4A54A6;--accent2:#6B76C8}
+.ednote{background:#EFEFF8;border:1px solid rgba(74,84,166,0.28);border-left:3px solid #4A54A6;border-radius:4px;padding:1.05rem 1.2rem;margin:0 0 1.6rem;font-size:0.93rem;line-height:1.85;color:#37453F}
+.ednote .l{font-size:0.72rem;letter-spacing:0.22em;color:#4A54A6;margin-bottom:0.5rem}
+article h3{font-size:1.02rem;font-weight:700;margin:1.9rem 0 0.7rem;color:var(--gold)}
+.chnav{max-width:760px;margin:2.4rem auto 0;padding:1.2rem 2rem 0;display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;font-size:0.86rem;border-top:1px solid var(--border2)}
+.chnav a{color:var(--accent);text-decoration:none}
+.partline{font-size:0.72rem;letter-spacing:0.2em;color:var(--accent);margin-bottom:0.8rem}
+</style>
+
+</head>
+<body>
+<nav>
+  <a class="nav-logo" href="/">SDE Universes</a>
+  <div class="nav-links">
+    <a href="/">首页</a>
+    <a href="/#monograph" class="sib">专著栏目</a>
+    <a href="/books/logic/" class="here">SIO逻辑学导论</a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="hero-bg"></div>
+  <div class="eyebrow"><a href="/#monograph">专著栏目</a> · <a href="/books/logic/">《SIO逻辑学导论》</a></div>
+  <div class="partline">第九编　工具箱编</div>
+  <h1 class="art-title">可执行的逻辑修炼系统</h1>
+  <p class="art-sub">《SIO逻辑学导论》第九编，共 4 章，约 3,816 字。</p>
+  <div class="art-meta">王德生 著 · 《SIO逻辑学导论》第九编 · 约 0.4 万字</div>
+</header>
+
+<style>
+article .li{font-size:0.99rem;line-height:1.95;color:var(--text);margin:0 0 0.5rem;padding-left:1.15rem;position:relative;text-align:justify}
+article .li::before{content:"—";position:absolute;left:0;color:var(--accent);opacity:.55}
+article .lab{font-size:0.86rem;font-weight:700;letter-spacing:0.08em;color:var(--accent);margin:1.5rem 0 0.55rem}
+article h4{font-size:0.99rem;font-weight:700;color:var(--text2);margin:1.5rem 0 0.6rem}
+.gbox{background:var(--card);border:1px solid var(--border2);border-left:3px solid var(--accent2);border-radius:5px;padding:1.15rem 1.35rem;margin:1.9rem 0}
+.gbox .l{font-size:0.7rem;letter-spacing:0.24em;color:var(--accent);font-weight:700;margin-bottom:0.5rem}
+.gbox p{font-size:0.95rem;line-height:1.92;color:var(--text2);margin:0;text-align:justify}
+.addch{background:#FFF8E8;border:1px solid rgba(160,120,20,.3);border-left:3px solid #A07814;border-radius:4px;padding:0.9rem 1.15rem;margin:0 0 1.4rem;font-size:0.88rem;line-height:1.8;color:#5A4A22}
+.addch b{color:#8A6817}
+.reflist{max-width:820px;margin:56px auto 8px;padding:34px 30px;background:#F4F4FA;border:1px solid #D9DAEA;border-radius:6px}
+.reflist h2{font-size:20px;letter-spacing:0.14em;color:#3E4488;margin:0 0 10px}
+.reflist .n{font-size:13.5px;line-height:1.9;color:#7B7F95;margin:0 0 20px}
+.reflist ol{margin:0;padding-left:22px;font-size:14px;line-height:1.85;color:#414455}
+.reflist li{margin:0 0 9px;padding-left:6px}
+</style>
+<main class="wrap">
+  <section class="body">
+    <div class="ednote"><div class="l">编 者 按</div>全书的收束编，形态上是清单而非论证：三公理审计表（通用／科研／教育／组织／AI 五版）、号位声明模板、对象域审计四问与偷运句式库、原创流程卡与行动复盘卡。清单的价值在于把纪律外置，使其不依赖当事人的状态；也正因为如此，它有清单方法共同的局限——能拦住已知的失误模式，拦不住未被写进清单的那一类。使用时宜配合第6章的最小动作原则：一次只修最先失守的一环。</div>
+    <div class="abs"><div class="l">本 编 提 要</div><p>本编将全书的机制转写为可复制的训练工具。第31章给出三公理审计表，分本体审计、发生审计、动力审计三段，各配通用检查项与科研、教育、组织、AI 四类补充项，并规定最小修复路径为本体归位→发生复位→动力归位。第32章给出号位声明模板：当前偏置号位、被压缩维度、复位动作、证伪条件四项，配声明与复位句式。第33章给出对象域审计四问——同一 SIO？同一处境？同一价值轴？证伪条件？——并附内因、合、阶段曲折、必然性、正确路线五类偷运句式库与对应追问。第34章给出三逻辑原创流程卡与行动复盘卡，包含问题—假设—矛盾—新实体的循环迭代、小修／大修分界，以及可持续、可换挡、可纠错三项验收指标。</p></div>
+    <div class="kw"><b>关键词</b>　三公理审计表；号位声明；对象域四问；偷运句式库；复盘卡</div>
+    <div class="toc"><div class="l">本编目次</div><a href="#c31">第31章　三公理审计表（通用/科研/教育/组织/AI五版）</a><a href="#c32">第32章　号位声明模板</a><a href="#c33">第33章　对象域审计四问与偷运句式库</a><a href="#c34">第34章　三逻辑原创流程卡与行动复盘卡</a></div>
+    <article>
+<div class="gbox"><div class="l">编 序</div><p>本编将全书从理论、机制与案例收束为可复制的训练工具。工具箱的目标不是提供“更漂亮的话术”，而是提供“更可执行的理性纪律”：在任何讨论、研究、教育、治理与人机协作场景中，都能以同一套检查表与复盘路径阻断对象域漂移、阻断叙事免疫、阻断价值偷运，并把行动带回可证伪、可复盘、可修复的发生学轨道。工具箱不替代思考，而约束思考；不替代创造，而保护发生窗口；不替代行动，而提供换挡协议。其基本原则只有一句：先立宪后运行，先审计后推进，先复位后成全。</p></div>
+<h2 id="c31">第31章　三公理审计表（通用/科研/教育/组织/AI五版）</h2>
+<div class="gbox"><div class="l">章 导 语</div><p>三公理不是抽象信条，而是文明理性的最小宪法；因此工具箱的第一件事不是给技巧，而是给审计。所谓审计，是把“是否立宪”变成可检查项，使任何推理、解释、改革与行动先过三公理门槛。三公理审计的基本结构是三问：本体单位是否归位？发生中段是否存在？动力来源是否归位？若任一不成立，后续所有精巧推理与高强执行都可能只是影子加密。</p></div>
+<h3>31.1 本体审计（公理一）：是否把影子当本体</h3>
+<div class="li">通用检查项（任何场景必问）</div>
+<div class="li">当前讨论的最小对象单位是什么？是否明确为某一类SIO整体事件？</div>
+<div class="li">是否把S/I/O中的某一维度绝对化为本体（主体本体化、互动本体化、客体本体化）？</div>
+<div class="li">是否出现对象域漂移：同词异物、同名异境、同论异域？</div>
+<div class="li">是否发生规则本体化：把流程、指标、定义当作世界本身？</div>
+<div class="li">是否进行了号位声明：当前偏置更偏O/I/S？被压缩维度是什么？</div>
+<div class="lab">快速判定</div>
+<p>若对象域无法稳定界定，或号位不声明，或某一维度被绝对化，则本体审计未通过。</p>
+<p>未通过的典型后果：争论无收敛、方案无落地、反证无效力。</p>
+<div class="lab">科研版补充</div>
+<div class="li">是否把模型当作对象？是否忽略边界条件与失效信号？</div>
+<div class="li">是否把统计规律当作结构必然？是否跨对象域混样本？</div>
+<div class="lab">教育版补充</div>
+<div class="li">是否把答案与分数当作知识本体？是否把复写当作理解？</div>
+<div class="li">是否把“会做题”当作“会发生”？</div>
+<div class="lab">组织版补充</div>
+<div class="li">是否把KPI当作对象本体？是否用考核替代改场？</div>
+<div class="li">是否把制度文本当作现实机制？</div>
+<div class="lab">AI版补充</div>
+<div class="li">是否把生成文本当作真实发生？是否把复写当原创？</div>
+<div class="li">是否把一致回答当真理，而忽略对象域与证伪条件？</div>
+<h3>31.2 发生审计（公理二）：发生中段是否被删除</h3>
+<div class="lab">通用检查项</div>
+<div class="li">当前所称“发现/创新/改革”是否包含发生中段（混沌—自组织—涌现）？</div>
+<div class="li">是否存在差异输入（ΔSIO采集）？差异是否被合法化进入复盘？</div>
+<div class="li">是否存在失败样本？失败是否被羞耻化删除？</div>
+<div class="li">反噬是否被读取为校准信号？还是被道德化压制？</div>
+<div class="li">是否出现“解释强、生成弱”的症状：概念越来越多，新结构越来越少？</div>
+<div class="lab">快速判定</div>
+<p>若只有结论复写、流程执行、口号动员，而无差异采集与失败复盘，则发生审计未通过。</p>
+<p>未通过的典型后果：内卷、烂尾、伪创新、暴雷前的假正常。</p>
+<div class="lab">科研版补充</div>
+<div class="li">是否允许异常数据进入模型修订？还是被当作噪声清扫？</div>
+<div class="li">是否有最小可运行原型（能跑、能复盘、能证伪）？</div>
+<div class="lab">教育版补充</div>
+<div class="li">是否训练学生提出差异、稳定特征、声明边界？还是只训练背结论？</div>
+<div class="lab">组织版补充</div>
+<div class="li">是否允许小规模试错窗口？是否有失败复盘机制？</div>
+<div class="li">是否把反噬当作报警灯，还是当作不忠？</div>
+<div class="lab">AI版补充</div>
+<div class="li">是否把生成当发生？是否忽略现实后果校准？</div>
+<div class="li">是否把模型一致性当作真实证伪？</div>
+<h3>31.3 动力审计（公理三）：价值是否越位为发动机</h3>
+<div class="lab">通用检查项</div>
+<div class="li">推进力主要来自意义动力（创造/自由/幸福），还是来自价值口号（真善美越位）？</div>
+<div class="li">是否用“正确性”压制差异与失败，导致发生窗口关闭？</div>
+<div class="li">是否用“秩序/善”压制张力与转换，导致阈值地下化？</div>
+<div class="li">是否用“优雅/美”清扫不适与混沌，导致新生稀薄？</div>
+<div class="li">是否出现迷动力迹象：外压动员不断加码、疲惫反噬不断加深？</div>
+<div class="lab">快速判定</div>
+<p>若价值在推进中承担发动机角色（口号替代动力），则动力审计未通过。</p>
+<p>未通过的典型后果：越努力越无力、越动员越反噬、越正确越虚无。</p>
+<div class="lab">科研版补充</div>
+<div class="li">是否以发表/排名替代发生窗口治理？</div>
+<div class="li">是否以“正确范式”压制异常与突破？</div>
+<div class="lab">教育版补充</div>
+<div class="li">是否以“正确答案”压制探索与试错？</div>
+<div class="li">是否以纪律压力替代内驱闭合？</div>
+<div class="lab">组织版补充</div>
+<div class="li">是否以绩效惩罚替代换挡治理？</div>
+<div class="li">是否只许优化不许改场？</div>
+<div class="lab">AI版补充</div>
+<div class="li">是否用“对齐正确”替代现实校准与发生链条？</div>
+<div class="li">是否把一致回答当作价值正确性护身符？</div>
+<h3>31.4 最小修复路径（先本体→再发生→后动力）</h3>
+<p>顺序不可倒置：本体不归位，发生无对象；发生不复位，动力无入口；动力不归位，行动必迷动力化。</p>
+<div class="lab">步骤1：本体归位</div>
+<p>明确同一SIO对象域 + 号位声明 + 被压缩维度补足。</p>
+<div class="lab">步骤2：发生复位</div>
+<p>合法化差异与失败样本 + 建立特征锚点与边界条件 + 最小可运行原型。</p>
+<div class="lab">步骤3：动力归位</div>
+<p>价值回护持位（审计/校准）+ 意义三律回发动机位（点火/扩域/闭合）+ 反噬读取协议。</p>
+<p>验收三条：对象域稳定、发生中段可见、动力回路可持续。</p>
+<h2 id="c32">第32章　号位声明模板</h2>
+<div class="gbox"><div class="l">章 导 语</div><p>号位声明是第一公理的可执行形式：承认显影偏置，避免影子越权为本体。它的目的不是“平均关注一切”，而是把偏置显性化，使讨论可复位、可审计、可证伪。号位声明一旦成为常规动作，对象域漂移、概念偷换与叙事免疫会显著下降。</p></div>
+<h3>32.1 当前偏置号位：O/I/S</h3>
+<p>O偏置（对象优先）：关注边界、指标、可重复性、规律与结构化。</p>
+<p>I偏置（互动优先）：关注轨迹、速度、粘度、反馈、摩擦与机制。</p>
+<p>S偏置（意义优先）：关注分布、场域、价值轴、叙事统一与吸附。</p>
+<div class="li">声明句式（标准版）</div>
+<p>当前分析以（O/I/S）为前台显影维度，主要关注________。</p>
+<h3>32.2 被压缩维度：其余两维</h3>
+<div class="lab">压缩识别</div>
+<p>若偏O：通常压缩I（摩擦/传播）与S（意义/价值轴）。</p>
+<p>若偏I：通常压缩O（边界/约束）与S（意义/方向）。</p>
+<p>若偏S：通常压缩O（可审计边界）与I（动力学机制）。</p>
+<div class="lab">声明句式</div>
+<p>该偏置可能压缩了________与________维度，需补足最小信息量以避免本体化。</p>
+<h3>32.3 复位动作：最小信息补足</h3>
+<p>复位不是写长文，而是补足“最小信息量”，让判断回到SIO整体。</p>
+<p>补足O（边界）：资源约束、不可协商边界、可审计指标、稳定区间。</p>
+<p>补足I（动力）：传播路径、反馈回路、粘度来源、摩擦点、阈值信号。</p>
+<p>补足S（意义）：为何值得继续、价值轴与代价界线、吸附力与反噬解释。</p>
+<div class="lab">复位句式</div>
+<p>为复位到SIO整体，补足：O=；I=；S=____（各一句即可）。</p>
+<h3>32.4 证伪条件：撤回判断的触发条件</h3>
+<p>号位声明若无证伪条件，容易滑向叙事免疫；因此必须声明撤回触发条件。</p>
+<div class="lab">证伪句式</div>
+<p>若出现________（反证/反噬/边界变形），则撤回/修订________（对象域界定/因果判断/行动方案）。</p>
+<div class="lab">最小验收</div>
+<p>号位已声明；被压缩维度已补足；证伪条件已给出。</p>
+<h2 id="c33">第33章　对象域审计四问与偷运句式库</h2>
+<div class="gbox"><div class="l">章 导 语</div><p>第二编清障已说明：对象域漂移、概念偷换、价值偷运、叙事免疫与口号替代机制，构成逻辑修炼缺位的五大症状。要在现实讨论与行动中阻断这些症状，最有效的工具就是对象域审计。对象域审计的目的并非挑刺，而是让推理具备最低合法性：同一对象、同一处境、同一价值轴与可证伪条件。四问一旦形成习惯，影子推理与叙事免疫会显著降低，讨论将从口号对抗回到机制生成。</p></div>
+<h3>33.1 同一SIO？（对象是否同一事件结构）</h3>
+<div class="lab">审计要点</div>
+<div class="li">讨论对象是否为同类SIO整体事件？</div>
+<div class="li">是否出现“词同而物异”的对象漂移？</div>
+<div class="li">是否把概念标签当对象单位，而未给出S/I/O结构分解？</div>
+<div class="lab">最小检查动作</div>
+<div class="li">写出一句SIO分解：S__ / I__ / O__</div>
+<p>若无法写出，说明对象域仍停留在影子层，不具备推理资格。</p>
+<h3>33.2 同一处境？（边界条件是否偷换）</h3>
+<div class="lab">审计要点</div>
+<div class="li">时间尺度是否一致？（稳定区间还是变形区间）</div>
+<div class="li">资源与约束是否一致？（成本、制度、边界抵抗）</div>
+<div class="li">互动粘度是否一致？（传播路径、反馈回路、摩擦点）</div>
+<div class="li">是否把A处境成立的结论偷换到B处境？</div>
+<div class="lab">最小检查动作</div>
+<div class="li">写出三条边界：资源边界__；制度边界__；反馈边界__</div>
+<p>若无法写出，说明处境被偷换风险极高。</p>
+<h3>33.3 同一价值轴？（成功定义与代价界线是否明示）</h3>
+<div class="lab">审计要点</div>
+<div class="li">成功是以什么定义？效率、稳定、自由、意义、创造的权重如何？</div>
+<div class="li">哪些代价不可接受？哪些不适必须承认？</div>
+<div class="li">是否出现“应当如此”伪装为“必然如此”的价值偷运？</div>
+<div class="li">是否以价值口号替代动力机制（迷动力化）？</div>
+<div class="lab">最小检查动作</div>
+<div class="li">写出一句价值轴声明：成功=；代价底线=</div>
+<p>若无法写出，方向性无法审计，推理必滑向口号与免疫。</p>
+<h3>33.4 证伪条件？（无证伪则无推理资格）</h3>
+<div class="lab">审计要点</div>
+<div class="li">出现什么现象需要撤回结论？</div>
+<div class="li">失败是否触发修订，还是被叙事吸收为“阶段曲折”？</div>
+<div class="li">是否存在反噬读取协议？反噬是信号还是羞耻？</div>
+<div class="lab">最小检查动作</div>
+<div class="li">写出一句证伪：若出现__，则撤回/修订__</div>
+<p>若无法写出，说明叙事免疫正在形成。</p>
+<h3>33.5 常见偷运句式库（内因/合/阶段曲折/必然/正确路线）</h3>
+<p>目的：不是禁止表达，而是强制机制化。凡出现这些句式，必须追加对象域、边界与证伪条件。</p>
+<div class="lab">A. 内因偷运句式</div>
+<div class="li">“问题的根源在于内部原因/本质矛盾。”审计追问：差异如何出现？发生中段在哪里？证伪条件是什么？</div>
+<div class="lab">B. 合的偷运句式</div>
+<div class="li">“对立统一最终必然走向更高阶段。”审计追问：方向依据是什么？价值轴是什么？代价界线是什么？证伪条件是什么？</div>
+<div class="li">C. 阶段曲折免疫句式</div>
+<div class="li">“暂时困难/阶段性曲折不影响最终胜利。”审计追问：何种失败会迫使修订？何种反噬会触发改场？是否存在撤回条件？</div>
+<div class="li">D. 必然性偷运句式</div>
+<div class="li">“历史必然/大势所趋/不可阻挡。”审计追问：这是静态/动态/场态哪类必然？边界条件是什么？是否偷塞方向？</div>
+<div class="li">E. 正确路线偷运句式</div>
+<div class="li">“唯一正确道路/必须坚持/不容置疑。”审计追问：对象域是否同一？处境是否同一？是否允许证伪？是否压制发生窗口？</div>
+<h2 id="c34">第34章　三逻辑原创流程卡与行动复盘卡</h2>
+<div class="gbox"><div class="l">章 导 语</div><p>第四编给出了三逻辑宪法，第五编给出了原创机制，第六编给出了行动哲学。本章把这些内容压缩为两张卡片：一张是原创流程卡（从问题到新实体），一张是行动复盘卡（小修/大修分界与验收指标）。两张卡的目的只有一个：让发生、发展、形成三道在现实中可启动、可换挡、可验收。</p></div>
+<h3>34.1 问题—假设—矛盾—新实体（循环迭代）</h3>
+<p>对应三逻辑协同：发生点火问题，形成成全假设，发展推进矛盾，发生涌现新实体。</p>
+<div class="lab">步骤1：问题（发生）</div>
+<div class="li">识别裂缝：旧结构在哪失效？ΔSIO差异来自何处（O/I/S）？</div>
+<div class="li">形成特征锚点：重复/选择/边界是否成立？</div>
+<div class="lab">步骤2：假设（形成）</div>
+<div class="li">类比提出候选（机制同构优先）</div>
+<div class="li">演绎给出条件化预测（前提含边界与证伪）</div>
+<div class="li">归纳确认稳定区间（样本干净不混装）</div>
+<div class="li">声明对象域四项：同一SIO/同一处境/同一价值轴/证伪条件</div>
+<div class="lab">步骤3：矛盾（发展）</div>
+<div class="li">张力盘点：摩擦、反噬、阈值信号</div>
+<div class="li">换挡判定：小修可否恢复稳定？是否需要改场？</div>
+<div class="li">防止偷运：必然不等于向上，方向需单独审计</div>
+<div class="li">步骤4：新实体（发生）</div>
+<div class="li">纠缠重组：新连接方式是否出现？</div>
+<div class="li">最小可运行结构：能跑/能复盘/能证伪</div>
+<div class="li">余晖扩展：进入1→N，但保持边界纪律与反噬纪律</div>
+<h3>34.2 小修/大修分界（行动版阈值治理）</h3>
+<div class="lab">小修触发条件</div>
+<div class="li">阈值未跨越：局部卸压仍有效，稳定区间可恢复</div>
+<div class="li">动作：节奏/缓冲/条款调整；失败样本进入复盘；证伪条件恢复</div>
+<div class="lab">大修触发条件</div>
+<div class="li">场态必然性出现：局部修补无效，代价函数陡峭化，反噬频发</div>
+<div class="li">动作：变权/改场/重写规范；保护发生窗口；建立最小新结构原型</div>
+<h3>34.3 验收指标：可持续/可换挡/可纠错</h3>
+<div class="lab">可持续</div>
+<div class="li">动力不再依赖外压动员；意义动力回路能闭合可换挡</div>
+<div class="li">阈值信号可见且有议程；能在暴雷前完成转换可纠错</div>
+<div class="li">证伪条件存在；反证能触发修订；反噬能进入校准而非羞耻化</div>
+<p>本编把全书的文明理性框架固化为可执行工具。三公理审计表提供立宪门槛：先本体、再发生、后动力；号位声明模板提供偏置可见性与复位动作；对象域审计四问提供推理合法性与反偷运机制；原创流程卡与行动复盘卡把三逻辑协同转写为可运行循环，并以小修/大修与三条验收指标确保行动可持续、可换挡、可纠错。至此，逻辑救赎不再只是理念宣言，而成为可复写的文明训练系统：在任何场景中，先审计、再复位、后成全；以差异打开新生，以阈值治理继续，以证伪纪律护持。全书的终极目的也因此明确：通过救赎理性之道——逻辑——使文明在AI时代仍能同时重建确定性、方向性与创造性，并把这种重建从少数人的天才事件转化为共同体的可训练能力。</p>
+    </article>
+  </section>
+</main>
+<section class="reflist">
+<h2>延伸参考文献 · Further References</h2>
+<p class="n">下列文献为本编所涉思想脉络的原典与代表性研究，供读者对读与查证；本书观点不代表所列作者立场。</p>
+<ol>
+<li>Gary Klein, "Performing a Project Premortem", Harvard Business Review, September 2007.</li>
+<li>Atul Gawande, The Checklist Manifesto: How to Get Things Right, New York: Metropolitan Books, 2009.</li>
+<li>Philip E. Tetlock, Expert Political Judgment, Princeton University Press, 2005.</li>
+<li>Daniel Kahneman, Dan Lovallo &amp; Olivier Sibony, "Before You Make That Big Decision…", Harvard Business Review, June 2011.</li>
+<li>Philip E. Tetlock &amp; Dan Gardner, Superforecasting: The Art and Science of Prediction, New York: Crown, 2015.</li>
+<li>John P. A. Ioannidis, "Why Most Published Research Findings Are False", PLoS Medicine 2(8), 2005.</li>
+<li>Open Science Collaboration, "Estimating the Reproducibility of Psychological Science", Science 349(6251), 2015.</li>
+<li>Robert K. Merton, "The Normative Structure of Science" (1942), in The Sociology of Science, University of Chicago Press, 1973.</li>
+</ol>
+</section>
+
+<div class="chnav"><a href="/books/logic/post-discipline/">← 第八编 时代编</a><a href="/books/logic/">全书目录 ↑</a><a href="/books/logic/postscript/">结语与附录 →</a></div>
+
+<!-- 读者讨论区+阅读计数 · sde-talk v3 (Google实名) -->
+<section id="sde-talk">
+<style id="sde-talk-css">
+#sde-talk{max-width:722px;margin:56px auto 40px;padding:0 24px;line-height:1.9;text-align:left}
+#sde-talk .tk-title{font-size:20px;font-weight:800;letter-spacing:.04em;margin:0 0 4px;padding-bottom:12px;border-bottom:2px solid rgba(128,128,128,.3);text-indent:0}
+#sde-talk .tk-title span{font-size:13px;font-weight:400;opacity:.6;letter-spacing:.02em}
+#sde-talk .tk-hint{font-size:13px;opacity:.62;margin:10px 0 18px;text-indent:0}
+#sde-talk .tk-form{background:rgba(128,128,128,.06);border:1px solid rgba(128,128,128,.22);border-radius:8px;padding:16px 16px 12px;margin-bottom:26px}
+#sde-talk input,#sde-talk textarea{display:block;width:100%;box-sizing:border-box;font:inherit;color:inherit;background:rgba(128,128,128,.12);border:1px solid rgba(128,128,128,.3);border-radius:6px;padding:9px 12px;margin:0 0 10px;outline:none}
+#sde-talk textarea{min-height:88px;resize:vertical;line-height:1.8}
+#sde-talk input:focus,#sde-talk textarea:focus{border-color:rgba(128,128,128,.6)}
+#sde-talk .tk-bar{display:flex;justify-content:space-between;align-items:center}
+#sde-talk .tk-note{font-size:12px;opacity:.55}
+#sde-talk button{font:inherit;font-size:14px;letter-spacing:.2em;padding:7px 26px;border-radius:6px;border:1px solid currentColor;background:transparent;color:inherit;cursor:pointer;opacity:.85}
+#sde-talk button:hover{opacity:1}
+#sde-talk button:disabled{opacity:.4;cursor:default}
+#sde-talk #tk-msg{font-size:13px;margin-top:8px;opacity:.75;min-height:1em;text-indent:0}
+#sde-talk #tk-replying{font-size:13px;margin-bottom:8px;opacity:.8}
+#sde-talk #tk-replying a{margin-left:8px;text-decoration:underline;color:inherit;opacity:.7;cursor:pointer}
+#sde-talk .tk-item{border-bottom:1px solid rgba(128,128,128,.18);padding:16px 2px}
+#sde-talk .tk-head{font-size:13px;margin-bottom:5px;text-indent:0}
+#sde-talk .tk-name{font-weight:700}
+#sde-talk .tk-time{opacity:.5;margin-left:10px;font-size:12px}
+#sde-talk .tk-body{white-space:pre-wrap;word-break:break-word;font-size:15.5px;text-indent:0;margin:0}
+#sde-talk .tk-reply{display:inline-block;font-size:12px;margin-top:7px;color:inherit;opacity:.55;text-decoration:none;border-bottom:1px dashed currentColor;cursor:pointer}
+#sde-talk .tk-reply:hover{opacity:.9}
+#sde-talk .tk-sub{margin:12px 0 0 22px;padding:10px 14px;background:rgba(128,128,128,.07);border-left:2px solid rgba(128,128,128,.35);border-radius:0 6px 6px 0}
+#sde-talk .tk-empty{padding:26px 0;text-align:center;opacity:.55;font-size:14px}
+</style>
+<div class="tk-wrap">
+  <h2 class="tk-title">读者讨论区 <span id="tk-count"></span> <span id="sde-pv-wrap">· 本文已被阅读 <span id="sde-pv-n">—</span> 次</span></h2>
+  <p class="tk-hint">用 Google 账号登录即可发言——发言人就是你的 Google 账号名字。发言公开可见，请友善交流。</p>
+  <div class="tk-form" id="tk-gform">
+    <div id="tk-replying" style="display:none"><span id="tk-replying-to"></span><a id="tk-cancel">取消回复</a></div>
+    <div id="tk-signed" style="display:none;font-size:14px;margin-bottom:10px">以 <b id="tk-gname"></b> 的身份发言 <a id="tk-gout" style="margin-left:10px;font-size:12px;opacity:.6;text-decoration:underline;cursor:pointer">退出</a></div>
+    <div id="tk-gsi"></div>
+    <textarea id="tk-text" maxlength="1000" placeholder="你的问题，或你的见解…" style="display:none;margin-top:10px"></textarea>
+    <div class="tk-bar" id="tk-sendbar" style="display:none"><span class="tk-note">最多 1000 字 · 每人每天最多 30 条</span><button id="tk-send">发 言</button></div>
+    <div id="tk-msg"></div>
+  </div>
+  <div id="tk-list"></div>
+</div>
+</section>
+<script id="sde-talk-js">
+(function(){
+var slug="books/logic/toolkit",API="/api/comments?slug="+slug;
+function el(id){return document.getElementById(id)}
+var items=[],parent="";
+function note(s){el("tk-msg").textContent=s}
+var GCID="985037699618-de3smmqf2rer0pfhf4mrtrj3rgahgu5u.apps.googleusercontent.com",gcred="";
+try{var st=JSON.parse(sessionStorage.getItem("sde_gauth")||"null");if(st&&st.exp>Date.now()){gcred=st.cred;showSigned(st.name);}}catch(e){}
+function showSigned(n){el("tk-gname").textContent=n;el("tk-signed").style.display="block";el("tk-gsi").style.display="none";el("tk-text").style.display="block";el("tk-sendbar").style.display="flex";}
+function showSignIn(){gcred="";try{sessionStorage.removeItem("sde_gauth");}catch(e){}el("tk-signed").style.display="none";el("tk-gsi").style.display="block";el("tk-text").style.display="none";el("tk-sendbar").style.display="none";}
+window.__sdeGCb=function(resp){try{var p=JSON.parse(atob(resp.credential.split(".")[1].replace(/-/g,"+").replace(/_/g,"/")));var nm=(p.name||(p.email||"").split("@")[0]||"").slice(0,20);gcred=resp.credential;try{sessionStorage.setItem("sde_gauth",JSON.stringify({cred:gcred,name:nm,exp:Date.now()+50*60*1000}));}catch(e){}showSigned(nm);}catch(e){note("登录信息解析失败，请重试。");}};
+function bootGsi(){if(!(window.google&&google.accounts&&google.accounts.id)){el("tk-gsi").textContent="Google 登录组件加载失败——本讨论区需要 Google 账号登录后发言，请检查网络后刷新。";return}
+google.accounts.id.initialize({client_id:GCID,callback:window.__sdeGCb,auto_select:true});
+google.accounts.id.renderButton(el("tk-gsi"),{theme:"outline",size:"large",text:"signin_with",shape:"pill",logo_alignment:"left"});}
+(function(){var s=document.createElement("script");s.src="https://accounts.google.com/gsi/client";s.async=true;s.defer=true;s.onload=bootGsi;s.onerror=function(){el("tk-gsi").textContent="无法连接 Google 登录服务——本讨论区需要 Google 账号登录后发言。";};document.head.appendChild(s);})();
+el("tk-gout").onclick=showSignIn;
+function tme(ts){var d=new Date(ts),p=function(x){return (x<10?"0":"")+x};
+return d.getFullYear()+"-"+p(d.getMonth()+1)+"-"+p(d.getDate())+" "+p(d.getHours())+":"+p(d.getMinutes())}
+function head(c){var h=document.createElement("div");h.className="tk-head";
+var n=document.createElement("span");n.className="tk-name";n.textContent=c.name;
+var t=document.createElement("span");t.className="tk-time";t.textContent=tme(c.ts);
+h.appendChild(n);h.appendChild(t);return h}
+function para(s){var p=document.createElement("p");p.className="tk-body";p.textContent=s;return p}
+function replyLink(c){var a=document.createElement("a");a.className="tk-reply";a.textContent="回复";
+a.onclick=function(){if(!gcred){note("回复也需要先用 Google 账号登录——请在上方登录。");var g=el("tk-gsi");if(g&&g.scrollIntoView)g.scrollIntoView({behavior:"smooth",block:"center"});return}
+parent=c.id;el("tk-replying-to").textContent="回复 "+c.name+"：";
+el("tk-replying").style.display="block";el("tk-text").focus()};return a}
+function render(){var L=el("tk-list");L.textContent="";
+var tops=items.filter(function(c){return !c.parent});
+el("tk-count").textContent=items.length?"· "+items.length+" 条":"";
+if(!tops.length){var d=document.createElement("div");d.className="tk-empty";d.textContent="还没有发言——欢迎第一个开口。";L.appendChild(d);return}
+tops.forEach(function(c){var it=document.createElement("div");it.className="tk-item";
+it.appendChild(head(c));it.appendChild(para(c.text));it.appendChild(replyLink(c));
+items.filter(function(x){return x.parent===c.id}).forEach(function(x){
+var sb=document.createElement("div");sb.className="tk-sub";sb.appendChild(head(x));sb.appendChild(para(x.text));it.appendChild(sb)});
+L.appendChild(it)})}
+function load(){fetch(API).then(function(r){return r.json()}).then(function(d){items=d.items||[];render()}).catch(function(){})}
+el("tk-cancel").onclick=function(){parent="";el("tk-replying").style.display="none"};
+el("tk-send").onclick=function(){var text=el("tk-text").value.trim();
+if(!gcred){note("请先用 Google 账号登录。");return}
+if(text.length<2){note("内容太短了。");return}
+el("tk-send").disabled=true;note("发送中…");
+fetch(API,{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({credential:gcred,text:text,parent:parent})})
+.then(function(r){return r.json().then(function(d){return{s:r.status,d:d}})})
+.then(function(x){el("tk-send").disabled=false;
+if(x.d&&x.d.ok){el("tk-text").value="";parent="";el("tk-replying").style.display="none";note("已发布。");load()}
+else if(x.s===401){note("登录已过期，请重新登录。");showSignIn()}
+else{note((x.d&&x.d.msg)||"发送失败，请稍后再试。")}})
+.catch(function(){el("tk-send").disabled=false;note("网络异常，请稍后再试。")})};
+load();
+(function(){var pn=el("sde-pv-n");if(!pn)return;
+var day=new Date(Date.now()+8*3600*1000).toISOString().slice(0,10),k="sde_pv_"+slug.replace(/\//g,"_"),m="POST";
+try{if(localStorage.getItem(k)===day)m="GET";}catch(e){}
+fetch("/api/pv?slug="+slug,{method:m}).then(function(r){return r.json()})
+.then(function(d){if(d&&typeof d.total==="number"){pn.textContent=d.total.toLocaleString("zh-Hans-CN");
+if(m==="POST"){try{localStorage.setItem(k,day);}catch(e){}}}else{throw 0;}})
+.catch(function(){var w=el("sde-pv-wrap");if(w)w.style.display="none";});
+})();
+})();
+</script>
+
+<footer>
+  © 德麦国际 Demai International · 专著栏目 · 《SIO逻辑学导论》 · <a href="/">sdeuniverses.com</a>
+</footer>
+
+<script>window.WDS_READ={selector:"article"};</script>
+<script src="/taste/wds-companion/wds-read.js" defer></script>
+
+<script src="/wds-mode.js" defer></script>
+</body>
+</html>
