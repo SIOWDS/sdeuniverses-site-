@@ -3,7 +3,8 @@
  *   <script>window.WDS_READ = { title:'文章标题', selector:'article', room:'sde-plaza' };</script>
  *   <script src="/taste/wds-companion/wds-read.js" defer></script>
  * selector 指向正文容器；缺省自动探测 article / main / .content。
- * Key 锁在服务端（/api/wds/read），读者无需自带、无需登录；限流已在服务端做。 */
+ * 纯 BYOK：读者自带 Key（存浏览器本地）。每台机器每天最多 100 轮，全程对话都记着。
+ * 聊完可一键「总结这场对话」，或提炼成约 5000 字论文并导出 PDF（走 /api/wds/read-paper）。 */
 (function () {
   "use strict";
   if (window.__wdsReadMounted) return;
@@ -76,7 +77,20 @@
     ".wdsr-selbtn b{color:#3DA5A5;font-weight:600}" +
     "@keyframes wdsrFade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}" +
     "@keyframes wdsrBlink{50%{opacity:0}}" +
-    "@media(max-width:520px){.wdsr-panel{width:100vw;max-width:100vw}}";
+    ".wdsr-tools{display:flex;gap:8px;padding:9px 14px;border-bottom:1px solid rgba(255,255,255,.07);flex:none}" +
+    ".wdsr-tool{flex:1;background:rgba(61,165,165,.10);border:1px solid rgba(61,165,165,.32);color:#9FD8D8;border-radius:8px;padding:7px 6px;font:600 12.5px/1.3 inherit;cursor:pointer;transition:background .15s}" +
+    ".wdsr-tool:hover:not(:disabled){background:rgba(61,165,165,.2)}" +
+    ".wdsr-tool:disabled{opacity:.4;cursor:default}" +
+    ".wdsr-doc{position:fixed;inset:0;z-index:100002;background:rgba(10,12,16,.78);display:flex;align-items:center;justify-content:center;padding:18px;font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif}" +
+    ".wdsr-docbox{background:#161B22;border:1px solid rgba(212,178,94,.28);border-radius:14px;max-width:760px;width:100%;max-height:88vh;display:flex;flex-direction:column;overflow:hidden}" +
+    ".wdsr-dochead{padding:16px 20px 12px;border-bottom:1px solid rgba(255,255,255,.08);display:flex;align-items:center;gap:12px;flex:none}" +
+    ".wdsr-doct{flex:1;color:#F5EFE0;font-size:16px;font-weight:700;line-height:1.4}" +
+    ".wdsr-docbody{flex:1;overflow-y:auto;padding:20px 24px;color:#DDE3EA;font-size:15px;line-height:1.9;white-space:pre-wrap;word-break:break-word;font-family:'Songti SC','Noto Serif SC',serif}" +
+    ".wdsr-docfoot{padding:12px 20px 16px;border-top:1px solid rgba(255,255,255,.08);display:flex;gap:9px;justify-content:flex-end;flex:none;flex-wrap:wrap}" +
+    ".wdsr-db{background:none;border:1px solid rgba(255,255,255,.22);color:#C9D1D9;border-radius:8px;padding:9px 15px;font:14px inherit;cursor:pointer}" +
+    ".wdsr-db.pri{background:#D4B25E;border-color:#D4B25E;color:#0F0B07;font-weight:700}" +
+    ".wdsr-prog{color:#7C8798;font-size:12.5px;margin-right:auto;align-self:center}" +
+    "@media(max-width:520px){.wdsr-panel{width:100vw;max-width:100vw}.wdsr-docbody{padding:16px}}";
   var st = el("style"); st.textContent = CSS; document.head.appendChild(st);
 
   // —— DOM ——
@@ -87,6 +101,7 @@
   panel.innerHTML =
     "<div class='wdsr-head'><div class='wdsr-title'><span class='wdsr-dot'></span>WDS 助手</div>" +
     "<div class='wdsr-sub'>陪你读，不替你读</div><button class='wdsr-keybtn' title='设置 API Key' style='position:absolute;right:44px;top:15px;background:none;border:none;color:#7C8798;font-size:15px;cursor:pointer;padding:0'>⚙</button><button class='wdsr-close' aria-label='关闭'>\u00d7</button></div>" +
+    "<div class='wdsr-tools'><button class='wdsr-tool wdsr-sum' disabled>\u603b\u7ed3\u8fd9\u573a\u5bf9\u8bdd</button><button class='wdsr-tool wdsr-pap' disabled>\u751f\u6210 5000 \u5b57\u8bba\u6587</button></div>" +
     "<div class='wdsr-msgs'></div>" +
     "<div class='wdsr-focuswrap'></div>" +
     "<div class='wdsr-inputbar'><textarea class='wdsr-input' rows='2' placeholder='问 WDS，或在正文里选一句\u2026'></textarea><button class='wdsr-send'>问</button></div>";
@@ -96,7 +111,17 @@
   document.body.appendChild(selBtn);
 
   var msgsEl = q1(".wdsr-msgs", panel), inputEl = q1(".wdsr-input", panel), sendEl = q1(".wdsr-send", panel), focusWrap = q1(".wdsr-focuswrap", panel);
-  var history = [], focusSeg = "", streaming = false;
+  var history = [], focusSeg = "", streaming = false, busy = false;
+  var MAX_TURNS = 100;
+  var subEl = q1(".wdsr-sub", panel), sumBtn = q1(".wdsr-sum", panel), papBtn = q1(".wdsr-pap", panel);
+  function turns() { var n = 0; for (var i = 0; i < history.length; i++) if (history[i].role === "reader") n++; return n; }
+  function paintState() {
+    var n = turns();
+    subEl.textContent = n ? ("\u966a\u4f60\u8bfb\uff0c\u4e0d\u66ff\u4f60\u8bfb \u00b7 \u5df2\u8c08 " + n + "/" + MAX_TURNS + " \u8f6e") : "\u966a\u4f60\u8bfb\uff0c\u4e0d\u66ff\u4f60\u8bfb";
+    var ready = n >= 2 && !busy && !streaming;
+    sumBtn.disabled = !ready; papBtn.disabled = !ready;
+    if (n >= MAX_TURNS) { inputEl.disabled = true; sendEl.disabled = true; inputEl.placeholder = "\u8fd9\u573a\u5df2\u8c08\u6ee1 100 \u8f6e\u2014\u2014\u53ef\u4ee5\u603b\u7ed3\u6216\u6210\u6587\u4e86\u3002"; }
+  }
 
   function openPanel() { panel.classList.add("wdsr-open"); fab.style.display = "none"; setTimeout(function () { inputEl.focus(); }, 60); }
   function closePanel() { panel.classList.remove("wdsr-open"); fab.style.display = ""; }
@@ -172,12 +197,14 @@
     var kv = wdsKeyGet(); if (!kv) { wdsKeyPanel(function () { send(); }); return; }
     inputEl.value = "";
     var seg = focusSeg;
+    if (turns() >= MAX_TURNS) { paintState(); return; }
     addMsg("reader", q, seg || null);
     history.push({ role: "reader", text: q });
+    paintState();
     var bubble = addMsg("wds", ""); bubble.classList.add("wdsr-streaming");
     streaming = true; sendEl.disabled = true;
 
-    var payload = { q: q, docTitle: docTitle(), docText: docText(), focus: seg, history: history.slice(-8), key: kv.key, vendor: kv.vendor };
+    var payload = { q: q, docTitle: docTitle(), docText: docText(), focus: seg, history: history, key: kv.key, vendor: kv.vendor };
     if (CFG.room) payload.room = CFG.room;
 
     fetch(API, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(payload) })
@@ -187,7 +214,7 @@
         function finish() {
           bubble.classList.remove("wdsr-streaming");
           if (answer) history.push({ role: "wds", text: answer });
-          streaming = false; sendEl.disabled = false;
+          streaming = false; sendEl.disabled = false; paintState();
         }
         function pump() {
           return reader.read().then(function (r) {
@@ -212,9 +239,128 @@
       .catch(function (e) {
         bubble.classList.remove("wdsr-streaming"); bubble.classList.add("wdsr-err");
         bubble.textContent = "接不上 WDS 了（" + (e && e.message) + "）。检查下网络，或稍后再问\u2014\u2014你刚才那句我记着。";
-        streaming = false; sendEl.disabled = false;
+        streaming = false; sendEl.disabled = false; paintState();
       });
   }
+  // —— 总结 / 成文 / 导出 PDF ——
+  var PAPER_API = CFG.paperApi || "/api/wds/read-paper";
+
+  function post(body) {
+    return fetch(PAPER_API, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) })
+      .then(function (r) { return r.json().catch(function () { return { ok: false, msg: "HTTP " + r.status }; }); });
+  }
+
+  function docModal(title, text, kind) {
+    var m = el("div", "wdsr-doc");
+    m.innerHTML = "<div class='wdsr-docbox'><div class='wdsr-dochead'><div class='wdsr-doct'></div>"
+      + "<button class='wdsr-db dx' aria-label='\u5173\u95ed' style='padding:6px 12px'>\u00d7</button></div>"
+      + "<div class='wdsr-docbody'></div>"
+      + "<div class='wdsr-docfoot'><span class='wdsr-prog'></span>"
+      + "<button class='wdsr-db copy'>\u590d\u5236\u5168\u6587</button>"
+      + "<button class='wdsr-db pri pdf'>\u5bfc\u51fa PDF</button></div></div>";
+    document.body.appendChild(m);
+    var tEl = q1(".wdsr-doct", m), bEl = q1(".wdsr-docbody", m), pEl = q1(".wdsr-prog", m);
+    tEl.textContent = title; bEl.textContent = text || "";
+    function close() { m.remove(); }
+    q1(".dx", m).onclick = close;
+    m.addEventListener("click", function (e) { if (e.target === m) close(); });
+    q1(".copy", m).onclick = function () {
+      var b = q1(".copy", m);
+      var full = tEl.textContent + "\n\n" + bEl.textContent;
+      try { navigator.clipboard.writeText(full); b.textContent = "\u5df2\u590d\u5236"; setTimeout(function () { b.textContent = "\u590d\u5236\u5168\u6587"; }, 1600); } catch (e) {}
+    };
+    q1(".pdf", m).onclick = function () { exportPDF(tEl.textContent, bEl.textContent, kind); };
+    return {
+      setText: function (t) { bEl.textContent = t; },
+      setTitle: function (t) { tEl.textContent = t; },
+      setProg: function (t) { pEl.textContent = t || ""; },
+      close: close
+    };
+  }
+
+  // 导出 PDF：另开窗口排成印刷版，交给浏览器「打印/存为 PDF」——中文字形最稳，无需任何外部库。
+  function exportPDF(title, body, kind) {
+    var w = window.open("", "_blank");
+    if (!w) { alert("\u6d4f\u89c8\u5668\u62e6\u4e86\u5f39\u7a97\uff0c\u8bf7\u5141\u8bb8\u540e\u91cd\u8bd5\u3002"); return; }
+    function esc(s) { return String(s).replace(/[&<>]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]; }); }
+    var paras = String(body).split(/\n{1,}/).filter(function (x) { return x.trim(); });
+    var html = "";
+    for (var i = 0; i < paras.length; i++) {
+      var line = paras[i].trim();
+      // 短行且不以句号收尾 → 当作小标题
+      if (line.length <= 28 && !/[。！？；：.!?]$/.test(line)) html += "<h2>" + esc(line) + "</h2>";
+      else html += "<p>" + esc(line) + "</p>";
+    }
+    var meta = (kind === "paper" ? "\u672c\u6587\u7531 WDS \u52a9\u624b\u4f9d\u636e\u4e00\u573a\u966a\u8bfb\u5bf9\u8bdd\u63d0\u70bc\u800c\u6210" : "WDS \u52a9\u624b \u00b7 \u966a\u8bfb\u5bf9\u8bdd\u603b\u7ed3")
+      + " \u00b7 \u6240\u8bfb\u6587\u672c\u300a" + esc(docTitle()) + "\u300b \u00b7 " + new Date().toLocaleDateString("zh-CN");
+    w.document.write("<!doctype html><html lang='zh-CN'><head><meta charset='utf-8'><title>" + esc(title) + "</title><style>"
+      + "@page{size:A4;margin:22mm 20mm}"
+      + "body{font-family:'Songti SC','Noto Serif SC','SimSun',serif;color:#141A24;line-height:1.95;font-size:11.5pt;margin:0}"
+      + "h1{font-size:19pt;line-height:1.5;text-align:center;margin:0 0 10px;font-weight:700}"
+      + ".meta{text-align:center;color:#6B7684;font-size:9pt;font-family:-apple-system,'PingFang SC',sans-serif;margin-bottom:26px;padding-bottom:14px;border-bottom:1px solid #D8DEE6}"
+      + "h2{font-size:13pt;margin:22px 0 8px;font-weight:700;page-break-after:avoid}"
+      + "p{margin:0 0 11px;text-indent:2em;text-align:justify}"
+      + ".foot{margin-top:30px;padding-top:12px;border-top:1px solid #D8DEE6;color:#8B98A5;font-size:8.5pt;font-family:-apple-system,'PingFang SC',sans-serif;text-align:center;text-indent:0}"
+      + "@media print{.noprint{display:none}}"
+      + ".noprint{position:fixed;top:12px;right:12px;background:#141A24;color:#fff;border:none;border-radius:8px;padding:10px 18px;font:600 14px -apple-system,'PingFang SC',sans-serif;cursor:pointer}"
+      + "</style></head><body>"
+      + "<button class='noprint' onclick='window.print()'>\u6253\u5370 / \u5b58\u4e3a PDF</button>"
+      + "<h1>" + esc(title) + "</h1><div class='meta'>" + meta + "</div>" + html
+      + "<div class='foot'>SDE Universes \u00b7 sdeuniverses.com \u2014\u2014 \u672c\u6587\u4e3a AI \u8f85\u52a9\u751f\u6210\u7684\u9605\u8bfb\u6210\u679c\uff0c\u89c2\u70b9\u4e0e\u5f15\u6587\u8bf7\u81ea\u884c\u6838\u5b9e\u3002</div>"
+      + "</body></html>");
+    w.document.close();
+    setTimeout(function () { try { w.print(); } catch (e) {} }, 700);
+  }
+
+  function needKey(cb) { var kv = wdsKeyGet(); if (!kv) { wdsKeyPanel(function () { cb(wdsKeyGet()); }); return null; } return kv; }
+
+  sumBtn.onclick = function () {
+    var kv = needKey(function (k) { if (k) sumBtn.onclick(); }); if (!kv) return;
+    busy = true; paintState();
+    var dm = docModal("\u6b63\u5728\u603b\u7ed3\u8fd9\u573a\u5bf9\u8bdd\u2026", "", "summary");
+    dm.setProg("\u8c03\u7528\u4f60\u81ea\u5df1\u7684\u57fa\u5e95\u4e2d\u2026");
+    post({ mode: "summary", history: history, docTitle: docTitle(), docText: docText(), key: kv.key, vendor: kv.vendor })
+      .then(function (r) {
+        busy = false; paintState(); dm.setProg("");
+        if (!r.ok) { dm.setTitle("\u6ca1\u80fd\u751f\u6210"); dm.setText(r.msg || "\u8bf7\u91cd\u8bd5\u3002"); if (r.code === "need_key") wdsKeyPanel(function () {}); return; }
+        dm.setTitle("\u672c\u573a\u966a\u8bfb\u603b\u7ed3\u00b7\u300a" + docTitle() + "\u300b");
+        dm.setText(r.text);
+      })
+      .catch(function (e) { busy = false; paintState(); dm.setTitle("\u6ca1\u80fd\u751f\u6210"); dm.setText("\u7f51\u7edc\u51fa\u9519\uff1a" + (e && e.message)); });
+  };
+
+  papBtn.onclick = function () {
+    var kv = needKey(function (k) { if (k) papBtn.onclick(); }); if (!kv) return;
+    busy = true; paintState();
+    var dm = docModal("\u6b63\u5728\u63d0\u70bc\u8bba\u6587\u2026", "", "paper");
+    dm.setProg("\u7b2c 1 \u6b65 / \u5171 4 \u6b65\uff1a\u62df\u9898\u4e0e\u63d0\u7eb2\u2026");
+    var out = "", prev = "", i = 0;
+    post({ mode: "plan", history: history, docTitle: docTitle(), docText: docText(), key: kv.key, vendor: kv.vendor }).then(function (pl) {
+      if (!pl.ok) throw new Error(pl.msg || "\u63d0\u7eb2\u5931\u8d25");
+      dm.setTitle(pl.title);
+      function step() {
+        if (i >= pl.parts.length) {
+          busy = false; paintState(); dm.setProg("\u5171 " + out.replace(/\s/g, "").length + " \u5b57");
+          return;
+        }
+        dm.setProg("\u7b2c " + (i + 2) + " \u6b65 / \u5171 4 \u6b65\uff1a\u6b63\u5728\u5199\u3010" + pl.parts[i].h + "\u3011\u2026");
+        return post({ mode: "part", idx: i, title: pl.title, points: pl.points, parts: pl.parts, convo: pl.convo, prevBrief: prev.slice(-1200), key: kv.key, vendor: kv.vendor, history: history })
+          .then(function (r) {
+            if (!r.ok) throw new Error(r.msg || "\u5206\u8282\u751f\u6210\u5931\u8d25");
+            out += (out ? "\n\n" : "") + pl.parts[i].h + "\n" + r.text;
+            prev = r.text; i++;
+            dm.setText(out);
+            return step();
+          });
+      }
+      return step();
+    }).catch(function (e) {
+      busy = false; paintState(); dm.setProg("");
+      dm.setText(out + (out ? "\n\n" : "") + "\u3010\u751f\u6210\u4e2d\u65ad\uff1a" + (e && e.message) + "\u3002\u5df2\u5199\u597d\u7684\u90e8\u5206\u4ecd\u53ef\u590d\u5236\u6216\u5bfc\u51fa\uff0c\u4e5f\u53ef\u4ee5\u5173\u6389\u91cd\u8bd5\u3002\u3011");
+    });
+  };
+
+  paintState();
   sendEl.onclick = send;
   inputEl.addEventListener("keydown", function (e) { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } });
 })();

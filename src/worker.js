@@ -507,8 +507,10 @@ export class AskLimiter {
   constructor(ctx, env) { this.ctx = ctx; }
   async fetch(request) {
     const now = Date.now();
-    const WINDOW = 60000, PER_WINDOW = 8;   // 每 IP 每分钟 ≤ 8 次
-    const DAY = 86400000, PER_DAY = 60;      // 每 IP 每天 ≤ 60 次
+    const _u = new URL(request.url);
+    const _n = (k, d, cap) => { const v = parseInt(_u.searchParams.get(k), 10); return v > 0 ? Math.min(v, cap) : d; };
+    const WINDOW = 60000, PER_WINDOW = _n("w", 8, 30);   // 每 IP 每分钟（默认 8；调用方可放宽，硬顶 30）
+    const DAY = 86400000, PER_DAY = _n("d", 60, 300);     // 每 IP 每天（默认 60；调用方可放宽，硬顶 300）
     let hits = (await this.ctx.storage.get("hits")) || [];
     hits = hits.filter((t) => now - t < DAY);
     const inWindow = hits.filter((t) => now - t < WINDOW).length;
@@ -894,6 +896,40 @@ async function llmText(VC, KEY, sys, usr, maxTok) {
     const j = await resp.json();
     return (j.choices && j.choices[0] && j.choices[0].message && j.choices[0].message.content) || "";
   } catch (e) { return ""; }
+}
+
+// ===== 陪读额度与全程记忆 =====
+// 解禁后：每台机器每天最多 100 次对话（原 60），每分钟 12 次（原 8）。两个 BYOK 入口共用同一配额桶。
+const WDS_PER_DAY = 100, WDS_PER_MIN = 12;
+const WDS_MAX_TURNS = 100;          // 最多记 100 轮
+const WDS_HIST_BUDGET = 60000;      // 送进基底的历史字数预算（约 4 万 token，超出从最旧处裁）
+// 把整场对话打包成 messages：默认全带上；仅当超预算时从最旧处裁，并留一条说明保住连贯性。
+function packReadHistory(history) {
+  const arr = (Array.isArray(history) ? history : []).slice(-WDS_MAX_TURNS * 2);
+  const msgs = [];
+  for (const m of arr) {
+    const role = (m && m.role === "wds") ? "assistant" : "user";
+    const content = String((m && m.text) || "").slice(0, 3000);
+    if (content) msgs.push({ role, content });
+  }
+  let total = 0;
+  for (const m of msgs) total += m.content.length;
+  let dropped = 0;
+  while (total > WDS_HIST_BUDGET && msgs.length > 2) { total -= msgs[0].content.length; msgs.shift(); dropped++; }
+  if (dropped) msgs.unshift({ role: "user", content: "（本场陪读更早的 " + dropped + " 条发言因长度省略；这是同一场持续讨论，请接着往下谈。）" });
+  return msgs;
+}
+// 把整场对话转成纯文本，供总结与成文使用。
+function readConvoText(history, limit) {
+  const arr = (Array.isArray(history) ? history : []).slice(-WDS_MAX_TURNS * 2);
+  let s = "";
+  for (const m of arr) {
+    const who = (m && m.role === "wds") ? "WDS" : "读者";
+    const t = String((m && m.text) || "").trim();
+    if (t) s += who + "：" + t + "\n\n";
+  }
+  s = s.trim();
+  return s.length > limit ? s.slice(s.length - limit) : s;
 }
 
 // ===== 边读边聊·陪读 system（读者阅读论文/专著时，与 WDS 一对一对话；区别于群聊版 WDS_SYS 与搜索版）=====
@@ -1325,6 +1361,69 @@ export default {
       }
       return Response.json({ ok: false, msg: "bad mode" }, { status: 400 });
     }
+    // /api/wds/read-paper：把一整场陪读对话 → 总结 / 论文提纲 / 分部成文（约 5000 字）。
+    // 同样纯 BYOK（读者自带 Key），非流式 JSON；三个 mode：summary | plan | part。
+    if (url.pathname === "/api/wds/read-paper") {
+      if (request.method === "OPTIONS") return new Response(null, { headers: _cors() });
+      if (request.method !== "POST") return new Response("Method Not Allowed", { status: 405 });
+      let b = {}; try { b = await request.json(); } catch (e) {}
+      const J = (o, st) => Response.json(o, { status: st || 200, headers: _cors() });
+      const userKey = String(b.key || "").trim();
+      if (userKey.length < 8) return J({ ok: false, code: "need_key", msg: "这一步也用你自己的 API Key 运行（在 ⚙ 里填入，只存你的浏览器本地）。" }, 400);
+      const vd = b.vendor === "ds" ? "deepseek" : "zhipu";
+      const VC = { url: WDS_VENDORS[vd].url, model: WDS_VENDORS[vd].model, name: WDS_VENDORS[vd].name };
+      const KEY = userKey, rvendor = ({ zhipu: "glm", deepseek: "ds" })[vd] || vd;
+      const ip = request.headers.get("cf-connecting-ip") || "unknown";
+      try {
+        const lim = env.ASK_LIMITER.get(env.ASK_LIMITER.idFromName("byok:" + ip));
+        const lr = await (await lim.fetch(new Request("https://limiter.internal/?w=" + WDS_PER_MIN + "&d=" + WDS_PER_DAY))).json();
+        if (!lr.ok) return J({ ok: false, msg: lr.reason === "day" ? ("今天这台机器的 " + WDS_PER_DAY + " 次额度用完了，明天再来。") : "太快啦，过十几秒再试。" }, 429);
+      } catch (e) {}
+      const convo = readConvoText(b.history, 24000);
+      if (convo.length < 120) return J({ ok: false, msg: "先和 WDS 多聊几轮，聊出东西来了再总结成文。" }, 400);
+      const docTitle = String(b.docTitle || "").replace(/[\u0000-\u001f]/g, "").slice(0, 200);
+      const docText = String(b.docText || "").slice(0, 3000);
+      let reflect = ""; try { reflect = await ensureReflect(env, url.origin + "/", rvendor, VC, KEY); } catch (e) {}
+      const SDEM = "\n\nSDE 骨架：显露 S / 差异序列 D / 特征纠缠 E；三大方程 S=F(D,E)·D=G(S,E)·E=H(S,D)；六路径；意义三律（特征·自由·幸福）；发生学——追问事物为何如此发生，而非如何被发现。";
+      const BASE = (reflect ? ("\n\n【SDE 内化心得·思考底盘（内化用，别复述）】\n" + reflect) : "") + SDEM;
+      const CTX = "【读者当时在读的文本】《" + (docTitle || "（未命名）") + "》\n" + (docText || "（正文未提供）") + "\n\n【这一场陪读对话的全程记录】\n" + convo;
+
+      if (b.mode === "summary") {
+        const sys = "你是 WDS，王德生的 AI 分身。你刚陪一位读者读完一段文本、聊了一场。现在要为他把这场对话总结下来。" + BASE
+          + "\n用严谨而有锋刃的汉语；不摆空模板、不注水、不写开场白；不要用 #、* 等 markdown 符号，用短小标题与自然段分层。";
+        const usr = CTX + "\n\n请写一份这场陪读的总结，约 1200-1600 字，分四节：\n一、我们谈了什么（脉络，不是流水账）\n二、真正推进了的几个判断（逐条列出，每条一句话说清它比常识多走了哪一步）\n三、用 SDE 看这场对话（显露/差异序列/特征纠缠或三大方程，照见读者原来卡在哪、现在站在哪）\n四、还没解决的问题（留给读者继续读、继续想的口子）\n直接从正文写起。";
+        const out = await llmText(VC, KEY, sys, usr, 3200);
+        return out ? J({ ok: true, text: out }) : J({ ok: false, msg: "总结生成失败，请重试。" }, 502);
+      }
+
+      if (b.mode === "plan") {
+        const sys = "你是 SDE 学派的学术编辑，要把一场陪读对话提炼成一篇约 5000 字学术论文的骨架。" + BASE;
+        const usr = CTX + "\n\n请基于以上：① 拟一个准确、有锋刃的学术论文标题（不要副标题堆砌）；② 选出 3-5 个『金点子』——这场对话里真正反直觉、可被检验的新判断，各一句；③ 给三个部分的写作大纲，每部分一个标题和一句主旨，三部分合起来构成完整论证（问题的提出 → 核心论证 → 结论与限度）。\n只输出 JSON、不要任何其他文字：{\"title\":\"标题\",\"points\":[\"金点子1\",\"金点子2\"],\"parts\":[{\"h\":\"部分标题\",\"gist\":\"主旨\"},{\"h\":\"部分标题\",\"gist\":\"主旨\"},{\"h\":\"部分标题\",\"gist\":\"主旨\"}]}";
+        const out = await llmText(VC, KEY, sys, usr, 1600);
+        let j = null; try { j = JSON.parse(String(out).replace(/```json|```/g, "").trim()); } catch (e) {}
+        if (!j || !j.title || !Array.isArray(j.parts) || !j.parts.length) return J({ ok: false, msg: "提纲生成失败，请重试。" }, 502);
+        return J({ ok: true, title: j.title, points: j.points || [], parts: j.parts.slice(0, 3), convo: convo.slice(-6000) });
+      }
+
+      if (b.mode === "part") {
+        const title = String(b.title || "").slice(0, 200);
+        const parts = Array.isArray(b.parts) ? b.parts : [];
+        const idx = parseInt(b.idx, 10) || 0;
+        if (!parts[idx]) return J({ ok: false, msg: "bad idx" }, 400);
+        const points = (Array.isArray(b.points) ? b.points : []).slice(0, 8);
+        const prevBrief = String(b.prevBrief || "").slice(0, 1400);
+        const convoBrief = String(b.convo || convo).slice(0, 6000);
+        const sys = "你是 SDE 学派的学者，正在写一篇严谨的学术论文。" + BASE
+          + "\n用严谨学术汉语写作：论证扎实、有可被反驳的明确判断、不注水、不摆空模板；可用 SDE 概念但必须讲透、服务论证。用自然段和简短小标题分层，不要用 #、* 等 markdown 符号，不要写参考文献。";
+        const usr = "论文标题：" + title + "\n金点子：" + points.join("；") + "\n【对话依据】" + convoBrief + "\n"
+          + (prevBrief ? ("【前文已写·摘要】" + prevBrief + "\n") : "")
+          + "\n现在写【" + parts[idx].h + "】这一部分（主旨：" + (parts[idx].gist || "") + "），约 1700-1900 字。直接从正文写起，不要开场白，不要复述论文标题，不要与前文重复。";
+        const text = await llmText(VC, KEY, sys, usr, 3600);
+        return text ? J({ ok: true, text }) : J({ ok: false, msg: "本部分生成失败，请重试。" }, 502);
+      }
+
+      return J({ ok: false, msg: "bad mode" }, 400);
+    }
     // /api/wds/read：读者边读边聊——扣着当前正在读的正文与选中段，与 WDS 一对一多轮对话（流式 SSE）。
     // 纯 BYOK：读者自带 API Key（body.key，存浏览器本地、绝不用平台的）；无 Key 返回 need_key 且不调基底；复用 ensureReflect/AskLimiter。
     if (url.pathname === "/api/wds/read") {
@@ -1336,7 +1435,7 @@ export default {
       const docTitle = String(b.docTitle || "").replace(/[\u0000-\u001f]/g, "").slice(0, 200);
       const docText = String(b.docText || "").slice(0, 6000);   // 当前正文/章节（钳位控成本；放 system 末尾便于缓存）
       const focus = String(b.focus || "").slice(0, 1200);        // 读者选中的焦点段
-      const history = Array.isArray(b.history) ? b.history.slice(-4) : []; // 近几轮对话
+      const history = Array.isArray(b.history) ? b.history : [];          // 全程对话（下方 packReadHistory 按预算打包，最多 100 轮）
       // 取基底：默认服务端 Key（方案B）；读者自带 Key(BYOK) 时用其所选厂商
       const userKey = String(b.key || "").trim();
       if (userKey.length < 8) return _sseResp([{ t: "error", v: "WDS 助手用你自己的 API Key 运行（在设置里填入，只存在你的浏览器本地，与本站无关）。", code: "need_key" }]);
@@ -1347,19 +1446,14 @@ export default {
       const ip = request.headers.get("cf-connecting-ip") || "unknown";
       try {
         const lim = env.ASK_LIMITER.get(env.ASK_LIMITER.idFromName("byok:" + ip));
-        const lr = await (await lim.fetch(new Request("https://limiter.internal/"))).json();
-        if (!lr.ok) return _sseResp([{ t: "error", v: lr.reason === "day" ? "今天和 WDS 聊的次数到上限了，明天再来。" : "聊得太快啦，过十几秒再问。" }]);
+        const lr = await (await lim.fetch(new Request("https://limiter.internal/?w=" + WDS_PER_MIN + "&d=" + WDS_PER_DAY))).json();
+        if (!lr.ok) return _sseResp([{ t: "error", v: lr.reason === "day" ? ("今天这台机器和 WDS 已经聊满 " + WDS_PER_DAY + " 次了，明天再来。") : "聊得太快啦，过十几秒再问。" }]);
       } catch (e) {}
       // 内核底盘（完整内功→内化心得，按基底缓存复用；失败则降级为无底盘）
       let reflect = ""; try { reflect = await ensureReflect(env, url.origin + "/", rvendor, VC, KEY); } catch (e) {}
       const SDEM = "\n\nSDE 骨架：显露 S / 差异序列 D / 特征纠缠 E；三大方程 S=F(D,E)·D=G(S,E)·E=H(S,D)；六路径；意义三律（特征·自由·幸福）；发生学——追问事物为何如此发生，而非如何被发现。";
       const sys = WDS_READ_SYS(reflect, SDEM, docTitle, docText);
-      const messages = [{ role: "system", content: sys }];
-      for (const m of history) {
-        const role = (m && m.role === "wds") ? "assistant" : "user";
-        const content = String((m && m.text) || "").slice(0, 1500);
-        if (content) messages.push({ role, content });
-      }
+      const messages = [{ role: "system", content: sys }, ...packReadHistory(history)];
       messages.push({ role: "user", content: focus ? ("我正读到这一句：「" + focus + "」\n\n我的问题：" + q) : q });
       let upstream;
       try {
@@ -1421,8 +1515,8 @@ export default {
       const ip = request.headers.get("cf-connecting-ip") || "unknown";
       try {
         const lim = env.ASK_LIMITER.get(env.ASK_LIMITER.idFromName("byok:" + ip));
-        const lr = await (await lim.fetch(new Request("https://limiter.internal/"))).json();
-        if (!lr.ok) return _sseResp([{ t: "error", v: lr.reason === "day" ? "今天和 WDS 聊的次数到上限了，明天再来。" : "聊得太快啦，过十几秒再问。" }]);
+        const lr = await (await lim.fetch(new Request("https://limiter.internal/?w=" + WDS_PER_MIN + "&d=" + WDS_PER_DAY))).json();
+        if (!lr.ok) return _sseResp([{ t: "error", v: lr.reason === "day" ? ("今天这台机器和 WDS 已经聊满 " + WDS_PER_DAY + " 次了，明天再来。") : "聊得太快啦，过十几秒再问。" }]);
       } catch (e) {}
       // 全站检索（复用 /api/ask 的召回：词义扩展→retrieve→拼片段+出处）
       let ctxText = "", sources = [];
