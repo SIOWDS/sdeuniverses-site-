@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>小说专栏 | Fiction | SDE Universes</title>
+<meta name="description" content="小说专栏——用虚构的故事，装真实的判断。SDE 哲学文学体与小说体：把一个本体论级的判断，写成一段可以读的人物与恩怨。《柏林江湖》（叔本华与黑格尔）、「下帷者」三部曲（董仲舒）。王德生 · 德麦国际。">
+<meta property="og:title" content="小说专栏 | SDE Universes">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F5EFE0; --card:#FAF6EC; --ink:#1A1410; --gold:#8A6817;
+  --wine:#8C2F39; --wine-deep:#6E232C; --text:#2A2315; --muted:#8B7E5E;
+  --border:rgba(138,104,23,0.22); --ink-gold:#D4B25E; --ink-wine:#E0917F;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body.zh .en-only{display:none}
+body.en .zh-only{display:none}
+body{background:var(--bg);color:var(--text);font-family:"Songti SC","Noto Serif SC","Source Han Serif SC",Georgia,serif;line-height:1.9;font-size:17px}
+a{color:var(--wine);text-decoration:none}
+a:hover{text-decoration:underline}
+.w{max-width:860px;margin:0 auto;padding:0 24px}
+nav{position:sticky;top:0;background:rgba(245,239,224,0.93);backdrop-filter:blur(8px);border-bottom:1px solid var(--border);z-index:10}
+nav .w{display:flex;align-items:center;justify-content:space-between;height:60px}
+.nav-logo{font-weight:700;letter-spacing:0.06em;color:var(--text)}
+.nav-r{display:flex;align-items:center;gap:18px}
+.nav-back{font-size:14px;color:var(--muted)}
+.lang-toggle{display:inline-flex;border:1px solid var(--border);border-radius:14px;overflow:hidden}
+.lang-btn{background:transparent;border:none;padding:4px 12px;font-size:13px;color:var(--muted);cursor:pointer;font-family:inherit}
+.lang-btn.active{background:var(--gold);color:#FAF6EC;font-weight:700}
+header.hero{background:var(--ink);color:#EDE4CF;text-align:center;padding:88px 24px 72px;position:relative;overflow:hidden}
+.hero .eyebrow{font-size:12.5px;letter-spacing:0.42em;color:var(--ink-wine);margin-bottom:26px}
+.hero h1{font-size:clamp(30px,5.2vw,50px);font-weight:700;letter-spacing:0.08em;line-height:1.35}
+.hero h1 .en{display:block;font-family:'Playfair Display',serif;font-size:clamp(15px,2.4vw,20px);font-weight:600;font-style:italic;color:var(--ink-gold);letter-spacing:0.06em;margin-top:14px}
+.hero .thesis{margin-top:30px;font-size:clamp(17px,2.8vw,23px);letter-spacing:0.04em;color:#F1E7D2}
+.hero .thesis .found{color:var(--ink-wine)}
+.hero .thesis .seal{color:var(--ink-gold);font-weight:700;letter-spacing:0.14em}
+.hero .arrow{color:var(--muted);margin:0 0.5em}
+.hero .sub{max-width:640px;margin:22px auto 0;font-size:15px;line-height:1.85;color:#B4A780}
+main{padding:8px 0 40px}
+section{margin:48px 0}
+.sec-eyebrow{text-align:center;font-size:12px;letter-spacing:0.4em;color:var(--gold);margin-bottom:8px}
+.sec-title{text-align:center;font-size:22px;font-weight:700;letter-spacing:0.03em;margin-bottom:6px}
+.sec-title .en{display:block;font-family:'Playfair Display',serif;font-style:italic;font-size:15px;color:var(--muted);font-weight:600;margin-top:4px}
+.intro{background:var(--card);border:1px solid var(--border);border-left:3px solid var(--wine);border-radius:7px;padding:24px 28px;margin:0 0 8px;font-size:16px;line-height:1.9;color:var(--text)}
+.novel{display:block;background:linear-gradient(180deg,#FBF3E9,var(--card) 60%);border:1px solid var(--border);border-top:3px solid var(--gold);border-radius:7px;padding:30px 30px;margin-bottom:22px;color:inherit;transition:transform .2s,box-shadow .2s;box-shadow:0 6px 22px rgba(60,44,10,.05)}
+.novel:hover{transform:translateY(-3px);box-shadow:0 12px 30px rgba(60,44,10,.09);text-decoration:none}
+.novel.feature{border:1px solid var(--wine);border-top:3px solid var(--wine);background:linear-gradient(180deg,#FBEDE9,var(--card) 62%)}
+.novel .k{display:block;font-size:12px;letter-spacing:0.22em;font-weight:700;color:var(--wine);margin-bottom:12px}
+.novel .k.g{color:var(--gold)}
+.novel h3{font-size:clamp(20px,3vw,27px);font-weight:700;color:var(--text);line-height:1.42;letter-spacing:0.02em;margin-bottom:4px}
+.novel h3 .en{display:block;font-family:'Playfair Display',serif;font-style:italic;font-size:16px;font-weight:600;color:var(--muted);margin-top:6px;letter-spacing:0.02em}
+.novel p{font-size:15px;line-height:1.85;color:#4a4030;margin:12px 0 14px}
+.novel .meta{font-size:12.5px;letter-spacing:0.06em;color:var(--muted)}
+.novel .go{display:inline-block;margin-top:14px;font-size:14px;font-weight:700;letter-spacing:0.05em;color:var(--wine)}
+.novel.g .go{color:var(--gold)}
+.trilogy-note{background:var(--card);border:1px dashed var(--border);border-radius:7px;padding:18px 24px;margin:6px 0 22px;font-size:14.5px;line-height:1.85;color:var(--muted)}
+.trilogy-note b{color:var(--gold)}
+footer{background:var(--ink);color:#8B7E5E;text-align:center;padding:34px 24px 44px;font-size:13px;letter-spacing:0.06em}
+footer a{color:#B4A780}
+</style>
+</head>
+<body class="zh">
+<nav><div class="w">
+  <a class="nav-logo" href="/">SDE Universes</a>
+  <div class="nav-r">
+    <a class="nav-back" href="/"><span class="zh-only">← 返回首页</span><span class="en-only">← Home</span></a>
+    <div class="lang-toggle" role="group" aria-label="Language">
+      <button class="lang-btn active" onclick="setLang('zh')">中</button>
+      <button class="lang-btn" onclick="setLang('en')">EN</button>
+    </div>
+  </div>
+</div></nav>
+
+<header class="hero">
+  <div class="eyebrow">SDE UNIVERSES · FICTION</div>
+  <h1>小说专栏<span class="en">A Column of Fiction</span></h1>
+  <div class="thesis">
+    <span class="zh-only">用<span class="found">虚构的故事</span><span class="arrow">→</span>装一条<span class="seal">真实的判断</span></span>
+    <span class="en-only">A <span class="found">fictional story</span><span class="arrow">→</span>carrying one <span class="seal">REAL JUDGMENT</span></span>
+  </div>
+  <p class="sub"><span class="zh-only">这里的每一篇，都不是为讲故事而讲故事。它先有一个本体论级的判断，再为这个判断，找一副有血有肉的人物、一段可以读下去的恩怨——让抽象的刀，落在具体的人身上。哲学文学体与小说体，序列常开。</span><span class="en-only">Each piece here begins not with a story but with a judgment — an ontological one — and then finds it a body: characters, a feud, a life you can read. The abstract blade, brought down on a concrete person. Philosophical tales and novels, added over time.</span></p>
+</header>
+
+<main class="w">
+
+<section style="margin-top:40px">
+  <div class="intro">
+    <span class="zh-only"><b style="color:var(--wine)">什么是 SDE 小说体？</b>不是把论文改写成对话，也不是给道理套一层情节的糖衣。它是一种倒过来的写法：先把一个最承重的判断压成一句反直觉的话，再让整篇小说去养活这句话——人物的选择、命运的转折、恩怨的起落，都是这句话在人身上的兑现。读完你记住的是一个人、一场戏；可真正被装进去的，是一台本体论的机器。</span>
+    <span class="en-only"><b style="color:var(--wine)">What is an SDE tale?</b> Not a paper rewritten as dialogue, nor a lesson sugar-coated with plot. It is written backwards: a load-bearing judgment is first compressed into one counter-intuitive line, and then the whole story is built to feed that line — every choice, every reversal, every feud is that judgment paid out in a human life. You remember a person, a drama; what was smuggled in is an ontological machine.</span>
+  </div>
+</section>
+
+<section>
+  <div class="sec-eyebrow"><span class="zh-only">最 新</span><span class="en-only">LATEST</span></div>
+  <div class="sec-title"><span class="zh-only">哲学文学体 · 叔本华与黑格尔</span><span class="en">The Latest — a Philosophical Tale</span></div>
+
+  <a class="novel feature" href="/column/berlin-jianghu/">
+    <span class="k"><span class="zh-only">★ 哲学文学体 · 叔本华 vs 黑格尔 · 发现VS发生 → SDE</span><span class="en-only">★ A PHILOSOPHICAL TALE · SCHOPENHAUER vs HEGEL → SDE</span></span>
+    <h3><span class="zh-only">柏林江湖——叔本华与黑格尔的恩怨录</span><span class="en">Berlin as Jianghu: The Feud of Schopenhauer and Hegel</span></h3>
+    <p><span class="zh-only">1820年代的柏林，叔本华把黑格尔当成必须刺杀的对象，却不知道那台运转了两千五百年的哲学机器，出厂时只有两条腿：巴门尼德的 S 与赫拉克利特的 D，第三条腿 E 从未装上。叔本华握住了 D（意志·波·品行），一条没有河床的河；黑格尔握住了 S（绝对精神·场·德性）——而他的方法本身就是发生：1807年他已亲手写下「没有一样东西可以在它的发生史之外被理解」，替「发现」下了死刑判决书，是整部哲学史里离「发生」最近的一次，却只差最后一口气——他把还在流的河，冻成了终点的冰。一场刺杀，最后照见的不是谁胜谁负，而是「我」如何不再问「我是谁」，而开始问「我如何成为」。</span><span class="en-only">In 1820s Berlin, Schopenhauer treats Hegel as a target to be assassinated, never seeing that the 2,500-year machine they both stand on left the factory with two legs only — Parmenides' S and Heraclitus' D — its third leg E never installed. Schopenhauer grasped D (will · wave · conduct), a river with no bed; Hegel grasped S — and his very method was genesis, the closest anyone ever came, short only one breath.</span></p>
+    <span class="meta"><span class="zh-only">约 2 万字 · 序曲＋八章＋尾声 · 依《西方哲学2500年》与《SDE本体论》 · 2026</span><span class="en-only">~20,000 chars · prologue + 8 chapters + coda · 2026</span></span>
+    <span class="go"><span class="zh-only">阅读全文 →</span><span class="en-only">Read →</span></span>
+  </a>
+</section>
+
+<section>
+  <div class="sec-eyebrow"><span class="zh-only">系 列</span><span class="en-only">A TRILOGY</span></div>
+  <div class="sec-title"><span class="zh-only">「下帷者」三部曲 · 董仲舒</span><span class="en">The "Curtain-Drawer" Trilogy — Dong Zhongshu</span></div>
+
+  <div class="trilogy-note"><span class="zh-only">三篇小说，与专著<b>《一的总装师——董仲舒的 SDE 解构》</b>（专著第45号·约20万字）互为表里：那一本，读他造的系统；这几篇，写造系统的人。</span><span class="en-only">Three tales, the mirror of the monograph <b>The Assembler of the One</b> (Monograph #45): that book reads the system he built; these write the man who built it.</span></div>
+
+  <a class="novel g" href="/column/dong-zhongshu-life/">
+    <span class="k g"><span class="zh-only">小说体 · 董仲舒 · 三部曲之一</span><span class="en-only">A NOVEL · DONG ZHONGSHU · I OF III</span></span>
+    <h3><span class="zh-only">下帷者——董仲舒的一生</span><span class="en">The Curtain-Drawer: A Life of Dong Zhongshu</span></h3>
+    <p><span class="zh-only">写成小说的样子：三年不窥园的少年、帷幕后的宗师、未央宫一夜定两千年的天人三策、事奉两位骄王、一场差点烧死他的高庙火、被亲学生斥为「大愚」的诏狱、下马陵前的两千年。楔子＋十章，in medias res 开场，生平主干严格贴史。</span><span class="en-only">Told as a novel: the boy who did not glance at the garden for three years; the master behind the curtain; one night at Weiyang Palace that fixed two thousand years; a temple fire that nearly killed him; the prison cell where his own student called him a fool. Prologue + ten chapters, opening in medias res, its spine strictly historical.</span></p>
+    <span class="meta"><span class="zh-only">约 2 万字 · 楔子＋十章</span><span class="en-only">~20,000 chars · prologue + 10 chapters</span></span>
+    <span class="go"><span class="zh-only">阅读全文 →</span><span class="en-only">Read →</span></span>
+  </a>
+
+  <a class="novel g" href="/column/dong-zhongshu-critics/">
+    <span class="k g"><span class="zh-only">小说体 · 董仲舒 · 三部曲之三</span><span class="en-only">A NOVEL · DONG ZHONGSHU · III OF III</span></span>
+    <h3><span class="zh-only">被告席上的两千年——董仲舒和批判他的人</span><span class="en">Two Thousand Years in the Dock: Dong Zhongshu and His Critics</span></h3>
+    <p><span class="zh-only">写成一场开了两千年、至今未散庭的审判：从骂他「大愚」的亲学生吕步舒，到王充、柳宗元、刘禹锡、程朱、王夫之、康有为、谭嗣同、鲁迅、顾颉刚，一浪接一浪的批判者轮番上证人席——每一浪砍中他不同的地方，也照出批判者自己。末章平心而论：判词不是有罪无罪，是「承重」。</span><span class="en-only">Staged as a trial that has run for two thousand years and never adjourned: from the student who called him a fool to Wang Chong, Liu Zongyuan, Wang Fuzhi, Kang Youwei, Lu Xun — wave after wave of critics take the stand, each cutting a different part of him and revealing themselves. The final verdict is not guilt or innocence, but load-bearing.</span></p>
+    <span class="meta"><span class="zh-only">约 2 万字 · 十位批判者 · 末章判词</span><span class="en-only">~20,000 chars · ten critics · a closing verdict</span></span>
+    <span class="go"><span class="zh-only">阅读全文 →</span><span class="en-only">Read →</span></span>
+  </a>
+</section>
+
+</main>
+
+<footer><div class="w">© 2026 德麦国际 · SDE Universes · <span class="zh-only">王德生</span><span class="en-only">Wang Desheng</span> · <a href="/discovery-vs-genesis/"><span class="zh-only">发现VS发生</span><span class="en-only">Discovery vs Genesis</span></a> · <a href="/western-philosophy/"><span class="zh-only">西方哲学</span><span class="en-only">Western Philosophy</span></a> · <a href="/"><span class="zh-only">首页</span><span class="en-only">Home</span></a></div></footer>
+
+<script>
+function setLang(lang){
+  document.body.className=lang;
+  document.querySelectorAll('.lang-btn').forEach(function(b){b.classList.toggle('active',(b.textContent==='中'&&lang==='zh')||(b.textContent==='EN'&&lang==='en'));});
+  document.documentElement.lang=lang;
+}
+</script>
+
+<script>window.WDS_READ={selector:"main"};</script>
+<script src="/taste/wds-companion/wds-read.js" defer></script>
+<script src="/wds-mode.js" defer></script>
+</body>
+</html>
