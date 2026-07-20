@@ -938,6 +938,16 @@ async function llmText(VC, KEY, sys, usr, maxTok) {
   } catch (e) { return ""; }
 }
 
+// 宽松解析大模型返回的 JSON：先剥代码围栏直连解析；失败再从首个 { 到末个 } 截取重解析（容忍思考模型偶发的前后缀说明文字）。
+function looseJSON(s) {
+  s = String(s || "").replace(/```json|```/g, "").trim();
+  if (!s) return null;
+  try { return JSON.parse(s); } catch (e) {}
+  const a = s.indexOf("{"), z = s.lastIndexOf("}");
+  if (a >= 0 && z > a) { try { return JSON.parse(s.slice(a, z + 1)); } catch (e) {} }
+  return null;
+}
+
 // ===== 陪读额度与全程记忆 =====
 // 解禁后：每台机器每天最多 100 次对话（原 60），每分钟 12 次（原 8）。两个 BYOK 入口共用同一配额桶。
 const WDS_PER_DAY = 100, WDS_PER_MIN = 12;
@@ -1514,9 +1524,16 @@ export default {
       if (b.mode === "plan") {
         const sys = "你是 SDE 学派的学术编辑，要把一场" + (GD ? "百轮问答" : "陪读对话") + "提炼成一篇约 " + (PN >= 6 ? "一万" : "5000") + " 字学术论文的骨架。" + (GD ? "这篇论文属于《问对WDS》系列——从与 WDS 的对话中练就创新观点、凝成关于 SDE 思想的论文。" : "") + BASE;
         const usr = CTX + "\n\n请基于以上：① 拟一个准确、有锋刃的学术论文标题（不要副标题堆砌）；② 选出 " + (PN >= 6 ? "4-6" : "3-5") + " 个『金点子』——这场对话里真正反直觉、可被检验的新判断，各一句；③ 给 " + (PN >= 6 ? "六" : "三") + " 个部分的写作大纲，每部分一个标题和一句主旨，各部分合起来构成完整论证（问题的提出 → " + (PN >= 6 ? "逐个展开核心判断（可多个部分） → 对最强反驳的回应" : "核心论证") + " → 结论与限度），部分之间不重复。\n只输出 JSON、不要任何其他文字：{\"title\":\"标题\",\"points\":[\"金点子1\",\"金点子2\"],\"parts\":[{\"h\":\"部分标题\",\"gist\":\"主旨\"},{\"h\":\"部分标题\",\"gist\":\"主旨\"},{\"h\":\"部分标题\",\"gist\":\"主旨\"}]}";
-        const out = await llmText(VC, KEY, sys, usr, 1600);
-        let j = null; try { j = JSON.parse(String(out).replace(/```json|```/g, "").trim()); } catch (e) {}
-        if (!j || !j.title || !Array.isArray(j.parts) || !j.parts.length) return J({ ok: false, msg: "提纲生成失败，请重试。" }, 502);
+        // 思考模式（满功率）会先吃掉大量推理 token；提纲 JSON 正文虽短，也必须给足头寸，否则正文被截断→解析失败。max_tokens 只是上限，JSON 写完即停，不额外增耗。
+        const planTok = GD ? 8000 : 2400;
+        const tryPlan = async () => {
+          const out = await llmText(VC, KEY, sys, usr, planTok);
+          const jj = looseJSON(out);
+          return (jj && jj.title && Array.isArray(jj.parts) && jj.parts.length) ? jj : null;
+        };
+        let j = await tryPlan();
+        if (!j) j = await tryPlan();   // 思考模式下 JSON 偶发不达标：服务端自动重试一次，免得把“请重试”甩给用户手动点
+        if (!j) return J({ ok: false, msg: "提纲生成失败，请重试。" }, 502);
         return J({ ok: true, title: j.title, points: j.points || [], parts: j.parts.slice(0, PN), convo: convo.slice(-6000) });
       }
 
