@@ -259,6 +259,8 @@ for f in os.listdir(OUT):
 # 文件名 shard-<sec>-1.json / -2.json …，清单写进 manifest sections[].files；
 # 消费方一律按 s.files（缺省退回 [s.key]）逐文件拉取——切分随每次重建自动进行，
 # 文本再涨十倍也只是文件变多，永远不会撞单文件上限。
+# （消费方包括 .github/workflows/search-index.yml 的完整性自检；它一度按 key 拼
+#   shard-<key>.json，栏目一分片就整片报缺失——凡新增消费方，一律走 s.files。）
 SHARD_MAX = 6 * 1024 * 1024
 
 sections_meta = []
