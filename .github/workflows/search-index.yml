@@ -19,6 +19,7 @@ on:
     paths:
       - 'public/**'
       - '!public/search/**'          # 排除索引自身，否则本工作流会自我触发
+      - '!public/assets/daily-quotes.js'  # 金句池不是检索语料(句子已在其来源文章里被索引)，每日扩充不该触发全量重排
       - 'tools/build_search_index.py'
       - 'tools/label_sde_coords_rules.py'
   workflow_dispatch:                 # 也允许在 Actions 页面手动跑一次
