@@ -97,16 +97,20 @@ ok("读者文章走独立首条消息 + 站内资料让位（07-20 修）",
   W.includes('content: "这是我提交给你的文章全文，本场对话就围绕它。') && W.includes("全文我已通读完毕") && !W.includes("【读者提交的文章·全文】"));
 ok("万字论文分部检索（K=12 / 8000 上限）", W.includes("retrieve(corpus, pq, 12, [])") && W.includes("partCtx.length > 8000"));
 ok("paperN 夹 3-6，缺省 3 不动陪读", W.includes("Math.max(3, Math.min(6, parseInt(b.paperN, 10) || 3))"));
-ok("配额桶分家：chat/read/dlg/ask 各一桶，互不吃额度（07-20 修）",
-  W.includes('function wdsBucket(kind, ip) { return "byok:" + kind + ":" + ip; }')
-  && W.includes('wdsBucket("chat", ip)') && W.includes('wdsBucket("ask", ip)')
-  && (W.split('wdsBucket(b.guide ? "dlg" : "read", ip)').length - 1) === 2
-  && W.includes('wdsBucket("dlg", ip)')
+ok("配额桶分家＋按 Key 计额度：chat/read/dlg/ask 各一桶（07-20 二修）",
+  W.includes("function wdsBucket(kind, ip, key)")
+  && W.includes('wdsBucket("chat", ip, userKey)') && W.includes('wdsBucket("ask", ip, userKey)')
+  && (W.split('wdsBucket(b.guide ? "dlg" : "read", ip, userKey)').length - 1) === 2
+  && W.includes('wdsBucket("dlg", ip, userKey)')
   && !W.includes('idFromName("byok:" + ip)'));
-ok("与WDS对话额度仍 130/20、陪读与全站问答仍 100/12", W.includes("WDS_PER_DAY = 100, WDS_PER_MIN = 12") && W.includes("WDS_DLG_PER_DAY = 130, WDS_DLG_PER_MIN = 20"));
+ok("额度按 Key 哈希分桶，无 Key 才回落 IP（同一出口 IP 多人不再互吃）",
+  W.includes('return "byok:" + kind + ":k" + _lhash') && W.includes('if (k.length >= 8)') && W.includes('return "byok:" + kind + ":" + ip;'));
+ok("额度用尽的提示带服务端真实计数，便于自查",
+  (W.split("(lr.inDay || 0)").length - 1) >= 4 && W.includes("这把 Key 今天在「全站问答」入口已用"));
+ok("BYOK 日额度放宽到限流器硬顶 300（分钟档 20/25 防脚本滥用）", W.includes("WDS_PER_DAY = 300, WDS_PER_MIN = 20") && W.includes("WDS_DLG_PER_DAY = 300, WDS_DLG_PER_MIN = 25"));
 ok("全站问答回传今日真实剩余（quota 事件）并说清是哪一档额度",
   W.includes('{ t: "quota", v: { left: dayLeft, day: WDS_PER_DAY } }') && W.includes("dayLeft = Math.max(0, WDS_PER_DAY - (lr.inDay || 0))")
-  && W.includes("在「全站问答」入口已问满") && W.includes("各有独立额度"));
+  && W.includes("这把 Key 今天在「全站问答」入口已用") && W.includes("各有独立额度"));
 ok("服务端不落 Key（无写库/日志痕迹）", !/localStorage|env\.\w+\.put\([^)]*userKey|console\.log\([^)]*key/i.test(W.split("dialogue-reflect")[1] || ""));
 ok("需 Key / 坏 Key 有独立错误码供前端弹面板", W.includes('code: "need_key"') && W.includes('code: "bad_key"'));
 ok("开工路由有额度与内功可读性双重兜底", W.includes("内功文件暂不可读") && W.includes("心得写得过短"));

@@ -71,3 +71,16 @@ const AskLimiter = eval("(" + cls.replace("export class AskLimiter", "class AskL
   ok(!/history\.slice\(-4\)/.test(readBlock) && /packReadHistory\(history[,)]/.test(readBlock), "陪读端旧的 4 轮截断已移除、改走 packReadHistory");
   ok(/history\.slice\(-4\)/.test(src.slice(src.indexOf('url.pathname === "/api/wds/chat"'))), "首页全站版仍保持原样（本次不改）");
 })();
+
+// ===== 07-20 二修：额度按 Key 分桶（抽出 worker 真函数实测）=====
+(function () {
+  const src = require("fs").readFileSync(__dirname + "/../src/worker.js", "utf8");
+  const g = (name) => { const i = src.indexOf("function " + name); const j = src.indexOf("\nfunction ", i + 1); return src.slice(i, j > 0 ? j : i + 900); };
+  const wdsBucket = new Function(g("_lhash") + "\n" + g("wdsBucket") + "\nreturn wdsBucket;")();
+  const KA = "sk-aaaaaaaaaaaaaaaaaaaa", KB = "sk-bbbbbbbbbbbbbbbbbbbb";
+  ok(wdsBucket("chat", "1.1.1.1", KA) !== wdsBucket("chat", "1.1.1.1", KB), "同一 IP 下两把 Key 分属不同桶（NAT 共享 IP 不再互吃额度）");
+  ok(wdsBucket("chat", "1.1.1.1", KA) === wdsBucket("chat", "9.9.9.9", KA), "同一把 Key 换 IP 仍是同一桶（换网络不能刷额度）");
+  ok(wdsBucket("chat", "1.1.1.1", KA) !== wdsBucket("read", "1.1.1.1", KA), "同一把 Key 的不同入口各一桶");
+  ok(wdsBucket("chat", "1.1.1.1", "") === "byok:chat:1.1.1.1", "没带 Key 时回落按 IP");
+  ok(wdsBucket("chat", "1.1.1.1", KA).indexOf(KA) < 0, "桶名不含 Key 明文（只存哈希）");
+})();
