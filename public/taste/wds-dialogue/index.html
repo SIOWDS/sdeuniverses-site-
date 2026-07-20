@@ -48,6 +48,9 @@
   .m.wds .t{color:var(--ink);max-width:92%}
   .m .t.err{color:#E89A8E}
   .m .t.stream::after{content:'▪';color:var(--qing);margin-left:2px;animation:blink 1s step-end infinite}
+  .srcs{margin-top:8px;font-size:12px;line-height:1.9;color:var(--dim)}
+  .srcs a{display:inline-block;margin:2px 6px 2px 0;padding:2px 9px;border:1px solid var(--line);border-radius:12px;color:var(--qing2);text-decoration:none}
+  .srcs a:hover{border-color:var(--qing)}
   .hello{color:var(--dim);font-size:14px;line-height:1.9;border:1px dashed var(--line);border-radius:12px;padding:16px 18px;max-width:640px;margin:0 auto 8px}
   .hello b{color:var(--qing2)}
   /* 输入栏 */
@@ -101,7 +104,7 @@
     <aside class="guide" id="guide">
       <div class="gm">WDS 回答你时遵循的方法论 · 先读一遍，问题更锋利</div>
       <h2>它靠什么答题：三层分工</h2>
-      <p>底盘三样，样样满血：<b>内功</b>——完整 SDE 本体论先验，它看问题的那双眼；<b>心得</b>——<b>每场对话开工时</b>，它把满血内功真读一遍、当场亲手写下约 5000 字学习笔记（首条消息发出后自动进行，约一两分钟，本场只做一次，写成后可点开查看）——它站在自己刚蒸馏出的认知上答题，不是站在别人代写的确认上；<b>方法论</b>——三大方程、六路径、123原理。分工严格：三大方程管三元<b>是什么关系</b>（静态结构），123原理管这关系<b>如何自我推进</b>（动态引擎），六路径管判断<b>从哪一维起手</b>（操作入口）。</p>
+      <p>底盘四样，样样满血：<b>全站检索</b>——答每一问前先从 sdeuniverses.com 全站语料捞出相关文章段落垫进上下文（强化召回＋多轮接续），可核验的书名、引文、篇名以站内资料为准，出处随答案列出；<b>内功</b>——完整 SDE 本体论先验，它看问题的那双眼；<b>心得</b>——<b>每场对话开工时</b>，它把满血内功真读一遍、当场亲手写下约 5000 字学习笔记（首条消息发出后自动进行，约一两分钟，本场只做一次，写成后可点开查看）——它站在自己刚蒸馏出的认知上答题，不是站在别人代写的确认上；<b>方法论</b>——三大方程、六路径、123原理。分工严格：三大方程管三元<b>是什么关系</b>（静态结构），123原理管这关系<b>如何自我推进</b>（动态引擎），六路径管判断<b>从哪一维起手</b>（操作入口）。</p>
       <h2>三大方程</h2>
       <p><code>S=F(D,E)</code> <code>D=G(S,E)</code> <code>E=H(S,D)</code>。F/G/H 是占位符，不是待解的函数——写成方程只为钉死：每一维都由另外两维共同决定，没有任何一维是独立自变量。这是同时互生，不是循环定义；完整三元是成熟态不是原初态。判断动作：看到任何一维，立刻追问另外两维；凡"归根到底由 X 决定"的单向叙事一律警觉——那是该被撬开的地基。</p>
       <h2>123原理</h2>
@@ -121,7 +124,7 @@
       <p>WDS 答你每一问的工序，<b>起手按问题种类三选一</b>：问"它是什么／什么关系"→ 从<b>三大方程</b>开局互问三维；问"怎么分析／从哪下手／给建议"→ 先认任务 DNA、从<b>六路径</b>开局；问"为什么会这样／怎么演变／为什么卡住"→ 从<b>123原理</b>开局（矛盾→结算→必追回写）。开局只定入口，不封另两件工具，且每一答说得出起手根据。聊到有东西了，点顶栏金色按钮：拟题与提纲之后六个部分逐段写成，约一万字，金点子取自这场对话里真正反直觉、可被检验的新判断。问对了，才算问过。</p>    </aside>
     <div class="chat">
       <div class="msgs" id="msgs">
-        <div class="hello">这里是<b>与WDS对话</b>的高级会话界面。你发出第一问后，WDS 会先做<b>开工仪式</b>：通读满血 SDE 内功、亲手写下约 5000 字心得（约一两分钟，本场只做一次，写成后可点开查看），然后带着这份刚蒸馏出的认知回答你——起手按你问题的种类，从<b>三大方程</b>、<b>六路径</b>或<b>123原理</b>任一开局，并点明起手根据。一场最多 <b>100 轮</b>、全程记住；聊够两轮后，顶栏可<b>总结</b>或<b>凝成一万字论文《问对WDS》</b>（可导出 PDF）。首次使用请点右上 ⚙ 填入你自己的大模型 Key（只存你的浏览器本地，本站不经手）。</div>
+        <div class="hello">这里是<b>与WDS对话</b>的高级会话界面。你发出第一问后，WDS 会先做<b>开工仪式</b>：通读满血 SDE 内功、亲手写下约 5000 字心得（约一两分钟，本场只做一次，写成后可点开查看），然后带着这份刚蒸馏出的认知回答你。答每一问前，它还会<b>检索 sdeuniverses.com 全站</b>（一千五百多万字语料），把相关文章段落连同出处垫进上下文——答完在气泡下方列出本答引用的站内篇目。起手按你问题的种类，从<b>三大方程</b>、<b>六路径</b>或<b>123原理</b>任一开局，并点明起手根据。一场最多 <b>100 轮</b>、全程记住；聊够两轮后，顶栏可<b>总结</b>或<b>凝成一万字论文《问对WDS》</b>（可导出 PDF）。首次使用请点右上 ⚙ 填入你自己的大模型 Key（只存你的浏览器本地，本站不经手）。</div>
       </div>
       <div class="inbar">
         <textarea class="in" id="q" rows="2" placeholder="向 WDS 发问……（Enter 发送，Shift+Enter 换行）"></textarea>
@@ -263,11 +266,19 @@
     fetch(API, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(payload) })
       .then(function (resp) {
         if (!resp.ok || !resp.body) throw new Error("HTTP " + resp.status);
-        var reader = resp.body.getReader(), dec = new TextDecoder(), buf = "", answer = "";
+        var reader = resp.body.getReader(), dec = new TextDecoder(), buf = "", answer = "", srcs = [];
         function pump() {
           return reader.read().then(function (r) {
             if (r.done) {
               bubble.classList.remove("stream");
+              if (answer && srcs.length) {
+                var sb = el("div", "srcs");
+                sb.appendChild(el("span", "", "\u672c\u7b54\u68c0\u7d22\u5230\u7684\u7ad9\u5185\u7bc7\u76ee\uff1a"));
+                for (var si = 0; si < srcs.length && si < 8; si++) {
+                  var a = document.createElement("a"); a.href = srcs[si].u; a.target = "_blank"; a.textContent = srcs[si].t; sb.appendChild(a);
+                }
+                bubble.parentNode.appendChild(sb); msgs.scrollTop = msgs.scrollHeight;
+              }
               if (answer) history.push({ role: "wds", text: answer });
               else { bubble.classList.add("err"); bubble.textContent = bubble.textContent || "\u6ca1\u6536\u5230\u56de\u7b54\uff0c\u8bf7\u91cd\u8bd5\u3002"; history.pop(); }
               streaming = false; goEl.disabled = false; paint();
@@ -282,6 +293,7 @@
               if (p === "[DONE]") continue;
               var j; try { j = JSON.parse(p); } catch (e) { continue; }
               if (j.t === "token" && j.v) { answer += j.v; bubble.textContent = answer; msgs.scrollTop = msgs.scrollHeight; }
+              else if (j.t === "sources") { srcs = Array.isArray(j.v) ? j.v : []; }
               else if (j.t === "think") { if (!answer) bubble.textContent = "\uff08\u601d\u8003\u4e2d\u2026\uff09"; }
               else if (j.t === "error") {
                 bubble.classList.remove("stream"); bubble.classList.add("err");

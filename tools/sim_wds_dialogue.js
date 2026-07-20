@@ -14,7 +14,11 @@ const W = fs.readFileSync(__dirname + "/../src/worker.js", "utf8");
 console.log("[静态核对]");
 ok("页面不引用任何浮层（wds-read.js / wds-mode.js / WDS_READ 配置）",
   !PAGE.includes("wds-read.js") && !PAGE.includes("wds-mode.js") && !PAGE.includes("WDS_READ"));
-ok("worker guide 分支在位", W.includes("b.guide ? WDS_DIALOGUE_SYS(reflect, SDEM)"));
+ok("worker guide 分支在位（带全站RAG siteCtx）", W.includes("b.guide ? WDS_DIALOGUE_SYS(reflect, SDEM, siteCtx)"));
+ok("guide 全站检索加强档在位（K=36+接续+3万上限+来源回传）",
+  W.includes("retrieve(corpus, q, 36, expTerms)") && W.includes("siteCtx.length > 30000") && W.includes('{ t: "sources", v: siteSrcs }'));
+ok("万字论文分部亦带站内资料（GD 检索 K=12 / 8000 上限）",
+  W.includes("retrieve(corpus, pq, 12, [])") && W.includes("partCtx.length > 8000"));
 ok("worker paperN 3-6 在位", W.includes("Math.max(3, Math.min(6, parseInt(b.paperN, 10) || 3))") && W.includes("j.parts.slice(0, PN)"));
 ok("worker 开工路由 dialogue-reflect 在位", W.includes('url.pathname === "/api/wds/dialogue-reflect"') && W.includes("DIALOGUE_REFLECT_PROMPT"));
 ok("read/read-paper 优先吃本场心得 b.reflect", W.split("slice(0, 14000)").length === 3);
@@ -105,6 +109,7 @@ global.fetch = function (url, opt) {
   }
   if (String(url).endsWith("/api/wds/read")) {
     return Promise.resolve({ ok: true, body: sseBody([
+      'data: {"t":"sources","v":[{"u":"/column/a/","t":"甲文"},{"u":"/column/b/","t":"乙文"}]}\n',
       'data: {"t":"token","v":"发生学问的是"}\n',
       'data: {"t":"token","v":"为何如此发生。"}\n',
       "data: [DONE]\n",
@@ -140,6 +145,8 @@ setImmediate(() => {
     ok("两问都发出且带 guide=1", chat.length === 2 && chat.every(c => c.body.guide === 1), "共 " + chat.length + " 次");
     ok("第二问的 history 含首轮问答（全程记忆）", chat[1].body.history.length >= 3 && chat[1].body.history.some(m => m.role === "wds"));
     ok("轮次显示更新", turnsEl.textContent.includes("2/100"));
+    var srcsEl = findIn(body, ".srcs");
+    ok("来源条已渲染（sources 事件→站内篇目链接）", !!srcsEl && srcsEl.querySelectorAll("a").length === 2);
     // 成文
     papB.disabled = false;
     papB.onclick();

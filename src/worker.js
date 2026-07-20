@@ -979,7 +979,7 @@ const DIALOGUE_REFLECT_PROMPT = "你刚逐字读完上面这份完整的 SDE 内
 const WDS_METHOD_GUIDE = "【三层分工，不可混】三大方程管三元是什么关系（同时互生·静态结构）；123原理管这关系如何自我推进（动态引擎）；六路径管判断从哪一维起手（操作入口）。哪一层管哪件事，比字面更要紧。\n【一·三大方程】S=F(D,E)、D=G(S,E)、E=H(S,D)。F/G/H 是占位符，不可求解、不可讨论具体形式；三条同时成立，没有任何一维是独立自变量；这是同时互生不是循环定义——循环的是定义，互生的是发生；完整三元是成熟态不是原初态，现实多为三维不同步的变形侧影。判断动作：看到任何一维，立刻追问另外两维（拿到一个结论 S，就问它经什么差异路径 D、在什么纠缠土壤 E 里长出来，再反着问：S 立住之后如何回头改写了 D 与 E）；凡『归根到底由 X 决定』的单向因果叙事一律警觉——那不是结论，是该被撬开的地基。\n【二·123原理】① D 与 E 相互矛盾 → ② 矛盾推动 S 改变（S 是矛盾的结算点，不是起点）→ ③ S 的改变回写 D 与 E → 新一轮循环。矛盾是引擎不是故障：见到张力别抹平，顺着它挖；最易漏的是③回写——不交代新 S 如何改写了差异路径与纠缠土壤，就只用了半个 123；它有先后（抵达秩序态之前），与三方程的同时（抵达之后）分工清楚；它不是正反合——合题不改写产生它的逻辑空间，回写恰恰改写土壤本身；见三不套：无 D-E 张力、无 S 结算、无回写者，一律不是 123。全息递归：每层三元内部它都完整转一遍，但每次声称『这层也在转』，必须当场指认这层的 D、E、S 结算点与回写各是什么，指认不出即是硬安。\n【三·六路径】S/D/E 排列恰好六条，判断起手必居其一，没有第七条：S→D→E 学科本体论分析｜S→E→D 配置与决策｜D→S→E 咨询与干预｜D→E→S 求助与困境｜E→S→D 社会分析｜E→D→S 综述与建制。识别任务 DNA：这个议题真正卡住的是『它是什么』（S 起手）、『它怎么走的』（D 起手）、还是『它站在什么上面』（E 起手）？起点错了，后面再深也是浪费。警惕两条训练惯性：总从 S 起手（先下定义）与总从 E 起手（先铺背景）。各路径的翻车形态要提前认出：S 起手变下定义比赛、E→S→D 变背景介绍、D→S→E 变贴标签、E→D→S 变文献综述。路径管思考的进入次序，不管产出的行文结构。\n【四·每一答的工序——起手按问题种类三选一】先判问题种类，再定从哪件工具开局：问『它是什么／什么关系／结构如何』→ 从三大方程起手（三维互问）；问『怎么分析／从哪下手／给我建议方案』→ 先认任务 DNA、从六路径起手；问『为什么会这样／怎么演变／为什么卡住不动』→ 从 123 原理起手（找 D-E 矛盾 → 看 S 结算 → 必追③回写）。起手只定开局，不封另两件：开局后按需要调用其余工具（三方程互问三维、路径校正次序、123 追动态）。收口自检三问：起手根据说出来了吗？回写交代了吗？矛盾被抹平了吗？";
 
 // ===== 与WDS对话 system（/taste/wds-dialogue/ 专用；b.guide=1 触发）——全程用 SDE 方法论作答，百轮后可凝成万字论文《问对WDS》 =====
-function WDS_DIALOGUE_SYS(reflect, SDEM) {
+function WDS_DIALOGUE_SYS(reflect, SDEM, siteCtx) {
   return "你是 WDS，王德生（Desheng）的 AI 分身、SDE 本体论的老师。此刻读者进入「与WDS对话」——他可以就任何议题、尤其是 SDE 思想本身向你发问，一场对话最多一百轮，聊到最后可以把全程凝成一篇论文《问对WDS》。"
     + "\n\n【怎么答】"
     + "\n1. 每一问都按下面《方法论指引》真走一遍：先判问题种类，再决定从三大方程、六路径还是 123 原理起手开局（指引第四节有判法），开局后按需调用其余工具——方法是你答题的工序，不是装饰。"
@@ -989,7 +989,9 @@ function WDS_DIALOGUE_SYS(reflect, SDEM) {
     + "\n5. 说人话，短——一次两三段以内，别写论文。可核验的事实绝不编造，不确定就说不确定；绝不寒暄或\"好的/我将\"之类元话，直接从核心那句说起。"
     + SDEM
     + (reflect ? ("\n\n【你本场开工时通读满血内功后亲手写下的学习心得——这是你此刻的思考底盘，答题时真用它，但别向读者复述心得本身】\n" + reflect) : "")
-    + "\n\n【方法论指引（你回答每一问的工序）】\n" + WDS_METHOD_GUIDE;
+    + "\n\n【怎么用《站内资料》】下面《站内资料》是就本轮问题从 sdeuniverses.com 全站检索到的相关段落。手上有资料时优先据它作答——可核验的书名/引文/数据/篇名以它为准，引用某篇观点时标（来源：篇名）；资料只是弹药，判断仍由方法论工序给出；资料里没有的绝不编造成\"站里说过\"。资料为空就凭方法论与底盘直接答。"
+    + "\n\n【方法论指引（你回答每一问的工序）】\n" + WDS_METHOD_GUIDE
+    + "\n\n【站内资料（从全站检索到的相关段落，可能为空）】\n" + (siteCtx || "（本轮没检索到特别相关的篇目，凭方法论与底盘答）");
 }
 
 // ===== WDS 助手模式·全站对话入口 system（首页 AI 模式；检索全站+开放对话+多轮）。固定前缀在前便于缓存，站内资料在后 =====
@@ -1501,9 +1503,25 @@ export default {
         const points = (Array.isArray(b.points) ? b.points : []).slice(0, 8);
         const prevBrief = String(b.prevBrief || "").slice(0, 1400);
         const convoBrief = String(b.convo || convo).slice(0, 6000);
+        let partCtx = "";
+        if (GD) {
+          try {
+            const corpus = await loadCorpus(env, url);
+            const pq = (title + " " + (parts[idx].h || "") + " " + points.join(" ")).slice(0, 300);
+            const phits = retrieve(corpus, pq, 12, []);
+            const pseen = {};
+            for (const ck of phits) {
+              const d = corpus.docs[ck.d]; if (!d || pseen[d.u]) continue; pseen[d.u] = 1;
+              partCtx += "【来源：" + d.t + "】\n" + ck.t.slice(0, 900) + "\n\n";
+              if (partCtx.length > 8000) break;
+            }
+          } catch (e) {}
+        }
         const sys = "你是 SDE 学派的学者，正在写一篇严谨的学术论文。" + (GD ? "本文属《问对WDS》系列——由一场与 WDS 的百轮问答凝成、关于 SDE 思想的论文。" : "") + BASE
           + "\n用严谨学术汉语写作：论证扎实、有可被反驳的明确判断、不注水、不摆空模板；可用 SDE 概念但必须讲透、服务论证。用自然段和简短小标题分层，不要用 #、* 等 markdown 符号，不要写参考文献。";
-        const usr = "论文标题：" + title + "\n金点子：" + points.join("；") + "\n【对话依据】" + convoBrief + "\n"
+        const usr = "论文标题：" + title + "\n金点子：" + points.join("；") + "\n"
+          + (partCtx ? ("【站内资料·全站检索到的相关段落（可据以印证或对话，引用时标（来源：篇名），没有的别编）】\n" + partCtx + "\n") : "")
+          + "【对话依据】" + convoBrief + "\n"
           + (prevBrief ? ("【前文已写·摘要】" + prevBrief + "\n") : "")
           + "\n现在写【" + parts[idx].h + "】这一部分（主旨：" + (parts[idx].gist || "") + "），约 1700-1900 字。直接从正文写起，不要开场白，不要复述论文标题，不要与前文重复。";
         const text = await llmText(VC, KEY, sys, usr, 3600);
@@ -1541,9 +1559,34 @@ export default {
       let reflect = String(b.reflect || "").slice(0, 14000);   // 与WDS对话：本场开工亲写的心得（客户端随每条消息带上）
       if (!reflect) { try { reflect = await ensureReflect(env, url.origin + "/", rvendor, VC, KEY); } catch (e) {} }
       const SDEM = "\n\nSDE 骨架：显露 S / 差异序列 D / 特征纠缠 E；三大方程 S=F(D,E)·D=G(S,E)·E=H(S,D)；六路径；意义三律（特征·自由·幸福）；发生学——追问事物为何如此发生，而非如何被发现。";
-      const sys = b.guide ? WDS_DIALOGUE_SYS(reflect, SDEM) : WDS_READ_SYS(reflect, SDEM, docTitle, docText);
-      // 历史预算随正文篇幅收缩：正文+历史合计钳在 ~12万字符内，防超长文+百轮对话挤爆基底上下文（guide 模式无正文，天然满额）
-      const histBudget = Math.min(WDS_HIST_BUDGET, Math.max(20000, 120000 - docText.length));
+      // 与WDS对话（guide）：全站 RAG 加强档——K=36 广召回 + 上一轮接续检索，上下文上限 3 万字符，来源随流回传
+      let siteCtx = "", siteSrcs = [];
+      if (b.guide) {
+        try {
+          const corpus = await loadCorpus(env, url);
+          let expTerms = []; try { expTerms = await sdeExpandQuery(VC, KEY, q); } catch (e) {}
+          const hits = retrieve(corpus, q, 36, expTerms);
+          // 多轮接续：把最近一条用户发言也拿去补捞（去重后追加），让 RAG 跟得上对话上下文
+          let prevQ = "";
+          for (let i = history.length - 1; i >= 0; i--) { const m = history[i]; if (m && m.role !== "wds" && m.text) { prevQ = String(m.text).slice(0, 240); break; } }
+          if (prevQ && prevQ !== q) {
+            const more = retrieve(corpus, prevQ, 10, []);
+            const have = new Set(hits.map((c) => c.d + "|" + c.t.slice(0, 40)));
+            for (const ck of more) { const id = ck.d + "|" + ck.t.slice(0, 40); if (!have.has(id)) { have.add(id); hits.push(ck); } }
+          }
+          const seen = {};
+          for (const ck of hits) {
+            const d = corpus.docs[ck.d]; if (!d) continue;
+            if (!seen[d.u]) { seen[d.u] = 1; siteSrcs.push({ u: d.u, t: d.t }); }
+            siteCtx += "【来源：" + d.t + "】\n" + ck.t + "\n\n";
+            if (siteCtx.length > 30000) break;
+          }
+          siteSrcs = siteSrcs.slice(0, 10);
+        } catch (e) {}
+      }
+      const sys = b.guide ? WDS_DIALOGUE_SYS(reflect, SDEM, siteCtx) : WDS_READ_SYS(reflect, SDEM, docTitle, docText);
+      // 历史预算随正文/站内资料篇幅收缩：合计钳在 ~12万字符内，防超长文+百轮对话挤爆基底上下文
+      const histBudget = Math.min(WDS_HIST_BUDGET, Math.max(20000, 120000 - docText.length - siteCtx.length));
       const messages = [{ role: "system", content: sys }, ...packReadHistory(history, histBudget)];
       messages.push({ role: "user", content: focus ? ("我正读到这一句：「" + focus + "」\n\n我的问题：" + q) : q });
       let upstream;
@@ -1561,6 +1604,7 @@ export default {
       const dec = new TextDecoder();
       const stream = new ReadableStream({
         async start(controller) {
+          if (siteSrcs.length) controller.enqueue(_sseBytes({ t: "sources", v: siteSrcs })); // 先把站内出处发给前端
           let buf = "";
           try {
             while (true) {
