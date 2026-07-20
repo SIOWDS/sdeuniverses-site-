@@ -54,14 +54,17 @@ jobs:
           docs = {d['i'] for d in man['docs']}
           bad = []
           seen = set()
+          # 大栏目会被生成器切成 books-1 / books-2 …，分片名以 manifest 的 files 为准，
+          # 不能由 key 拼出来（早期版本这样写，栏目一分片自检就整片报缺失）。
           for s in man['sections']:
-              p = f"{SD}/shard-{s['key']}.json"
-              if not os.path.exists(p):
-                  bad.append(f"分片缺失 {p}"); continue
-              for c in json.load(open(p))['chunks']:
-                  seen.add(c['d'])
-                  if c['d'] not in docs: bad.append(f"孤儿块 -> doc {c['d']}")
-                  if not c.get('t', '').strip(): bad.append(f"空块 in {s['key']}")
+              for f in s.get('files') or [s['key']]:
+                  p = f"{SD}/shard-{f}.json"
+                  if not os.path.exists(p):
+                      bad.append(f"分片缺失 {p}"); continue
+                  for c in json.load(open(p))['chunks']:
+                      seen.add(c['d'])
+                      if c['d'] not in docs: bad.append(f"孤儿块 -> doc {c['d']}")
+                      if not c.get('t', '').strip(): bad.append(f"空块 in {f}")
           for d in man['docs']:
               if d['i'] not in seen: bad.append(f"无正文块的文档 {d['u']}")
           for k in json.load(open(f'{SD}/sde-coords.json')):
