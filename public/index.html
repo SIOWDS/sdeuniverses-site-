@@ -47,7 +47,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;flex-direction:
 .col-plg{color:#A32E4E}
 /* ── SDE 智能体 · Token之火 frame (wraps the two agent nav links) ── */
 @property --afang{syntax:'<angle>';initial-value:0deg;inherits:false}
-.agent-fire{position:relative;display:inline-flex;align-items:center;gap:.7rem;padding:5px 15px;margin:0 .15rem;border-radius:13px;--afang:0deg;background:linear-gradient(180deg,#241812 0%,#150E0A 100%)}
+.agent-fire{position:relative;display:inline-flex;flex-direction:column;align-items:center;gap:.2rem;padding:5px 14px;margin:0 .15rem;border-radius:12px;--afang:0deg;background:linear-gradient(180deg,#241812 0%,#150E0A 100%)}
 /* flowing fire ring on the border */
 .agent-fire::after{content:"";position:absolute;inset:0;border-radius:13px;padding:1.7px;background:conic-gradient(from var(--afang,0deg),#ff2e00,#ff8a00,#ffd24d,#fff1b0,#ff7a00,#d4b25e,#3da5a5,#ffb300,#ff2e00);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);mask-composite:exclude;animation:afSpin 4.5s linear infinite;pointer-events:none;z-index:2}
 @keyframes afSpin{to{--afang:360deg}}
@@ -58,12 +58,12 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;flex-direction:
 .agent-fire .af-ember{position:absolute;bottom:1px;width:5px;height:5px;border-radius:1.5px;background:linear-gradient(180deg,#fff1b0,#ff6a00);box-shadow:0 0 7px 1px rgba(255,150,0,.9);opacity:0;pointer-events:none;z-index:1;animation:afEmber 2.6s ease-in infinite}
 @keyframes afEmber{0%{opacity:0;transform:translateY(0) translateX(0) scale(1)}15%{opacity:1}70%{opacity:.9}100%{opacity:0;transform:translateY(-24px) translateX(var(--drift,3px)) scale(.35)}}
 /* the two links — escape the rainbow navFlow, glow on the dark plaque */
-.agent-fire .af-link{animation:none !important;position:relative;z-index:3;font-weight:800 !important;letter-spacing:.03em;white-space:nowrap;text-shadow:0 1px 2px rgba(0,0,0,.55)}
+.agent-fire .af-link{animation:none !important;position:relative;z-index:3;font-weight:800 !important;font-size:.82rem;line-height:1.18;letter-spacing:.03em;white-space:nowrap;text-shadow:0 1px 2px rgba(0,0,0,.55)}
 .agent-fire .af-link.af-taste{color:#FFD466 !important;text-shadow:0 0 12px rgba(255,170,40,.55),0 1px 2px rgba(0,0,0,.6)}
 .agent-fire .af-link.af-wds{color:#82E0D3 !important;text-shadow:0 0 12px rgba(61,165,165,.6),0 1px 2px rgba(0,0,0,.6)}
 .agent-fire .af-link:hover{filter:brightness(1.22);text-decoration:none}
 /* slim flame divider between the two agents */
-.agent-fire .af-div{width:1.5px;height:15px;border-radius:2px;flex:0 0 auto;z-index:3;background:linear-gradient(180deg,transparent,#ffb300 30%,#ff6a00 70%,transparent);box-shadow:0 0 6px rgba(255,140,0,.6)}
+.agent-fire .af-div{width:82%;height:1.5px;border-radius:2px;flex:0 0 auto;z-index:3;background:linear-gradient(90deg,transparent,#ffb300 28%,#ff6a00 72%,transparent);box-shadow:0 0 6px rgba(255,140,0,.6)}
 @media(max-width:640px){.agent-fire{display:none}}
 @media(prefers-reduced-motion:reduce){.agent-fire::after{animation:none}.agent-fire::before{animation:none;opacity:.85}.agent-fire .af-ember{display:none}}
 .lang-toggle{display:flex;background:var(--card);border:1px solid var(--border);border-radius:20px;overflow:hidden;cursor:pointer}
