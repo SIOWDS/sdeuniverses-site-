@@ -1733,8 +1733,15 @@ export default {
         try {
           const corpus = await loadCorpus(env, url);
           let expTerms = []; try { expTerms = await sdeExpandQuery(VC, KEY, q); } catch (e) {}
+          const seen = {};
+          // —— 先调用结构化知识：九库 entity-link → 邻域子图（成体系的判断，而非相似句）——
+          let kbBlock = "";
+          try {
+            const kb = await loadKB(env, url);
+            if (kb) { const r = retrieveKB(kb, corpus, q, expTerms, docText ? 14 : 24); kbBlock = r.block; for (const s of r.srcs) if (!seen[s.u]) { seen[s.u] = 1; siteSrcs.push(s); } }
+          } catch (e) {}
+          // —— 相似句召回：K=36 广召回 + 上一轮接续；KB 命中时收紧字数上限，为结构化知识让出预算 ——
           const hits = retrieve(corpus, q, 36, expTerms);
-          // 多轮接续：把最近一条用户发言也拿去补捞（去重后追加），让 RAG 跟得上对话上下文
           let prevQ = "";
           for (let i = history.length - 1; i >= 0; i--) { const m = history[i]; if (m && m.role !== "wds" && m.text) { prevQ = String(m.text).slice(0, 240); break; } }
           if (prevQ && prevQ !== q) {
@@ -1742,13 +1749,15 @@ export default {
             const have = new Set(hits.map((c) => c.d + "|" + c.t.slice(0, 40)));
             for (const ck of more) { const id = ck.d + "|" + ck.t.slice(0, 40); if (!have.has(id)) { have.add(id); hits.push(ck); } }
           }
-          const seen = {};
+          const chunkCap = Math.max(6000, (docText ? 12000 : 30000) - kbBlock.length);   // 读者提交文章时站内资料让位；KB 命中时为其留出预算
+          let chunkText = "";
           for (const ck of hits) {
             const d = corpus.docs[ck.d]; if (!d) continue;
             if (!seen[d.u]) { seen[d.u] = 1; siteSrcs.push({ u: d.u, t: d.t }); }
-            siteCtx += "【来源：" + d.t + "】\n" + ck.t + "\n\n";
-            if (siteCtx.length > (docText ? 12000 : 30000)) break;   // 读者提交了文章时，站内资料让位，别把文章淹掉
+            chunkText += "【来源：" + d.t + "】\n" + ck.t + "\n\n";
+            if (chunkText.length > chunkCap) break;
           }
+          siteCtx = kbBlock + (kbBlock && chunkText ? "\n【补充 · 站内原文片段】\n" : "") + chunkText;
           siteSrcs = siteSrcs.slice(0, 10);
         } catch (e) {}
       }

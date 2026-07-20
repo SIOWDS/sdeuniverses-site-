@@ -91,8 +91,10 @@ ok("guide 分流 system（对话指引版 vs 陪读版，含读者文章两参�
 ok("本场心得优先于全站缓存心得（read + read-paper 两处）", W.split("slice(0, 14000)").length >= 3);   // 站内另有智能体亦用 14000
 ok("guide 预算三元式在位（30万减文章/资料，陪读收缩式不变）", W.includes("b.guide ? Math.max(60000, WDS_GUIDE_HIST_BUDGET - docText.length - siteCtx.length)") && W.includes("120000 - docText.length - siteCtx.length"));
 ok("长问放宽仅限 guide（4000 vs 500）", W.includes("b.guide ? 4000 : 500"));
-ok("全站 RAG 加强档（K=36 + 接续补捞 + 3 万上限 + 来源回传）",
-  W.includes("retrieve(corpus, q, 36, expTerms)") && W.includes("siteCtx.length > (docText ? 12000 : 30000)") && W.includes('{ t: "sources", v: siteSrcs }'));
+ok("全站 RAG 加强档（K=36 + 接续补捞 + KB留预算的字数上限 + 来源回传）",
+  W.includes("retrieve(corpus, q, 36, expTerms)") && W.includes("(docText ? 12000 : 30000) - kbBlock.length") && W.includes('{ t: "sources", v: siteSrcs }'));
+ok("与WDS对话 RAG 已接九库（guide 块 retrieveKB 邻域子图优先，chunk 让预算）",
+  W.includes("const kb = await loadKB(env, url)") && W.includes("retrieveKB(kb, corpus, q, expTerms, docText ? 14 : 24)") && W.includes("siteCtx = kbBlock +"));
 ok("读者文章走独立首条消息 + 站内资料让位（07-20 修）",
   W.includes('content: "这是我提交给你的文章全文，本场对话就围绕它。') && W.includes("全文我已通读完毕") && !W.includes("【读者提交的文章·全文】"));
 ok("万字论文分部检索（K=12 / 8000 上限）", W.includes("retrieve(corpus, pq, 12, [])") && W.includes("partCtx.length > 8000"));
