@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>「我」专栏 · 我文化：三号位九宫格与三大工程 · SDE Universes</title>
+<style>
+:root{--red:#8A2323;--red2:#6B1717;--gold:#8A6817;--gold2:#B08A2E;--ink:#2C241C;--ink2:#4A4235;--line:rgba(138,35,35,0.16);--paper:#FBF7EE;--card:#FFFDF7;--cream:#F7F2E9}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:"Noto Serif SC","Songti SC",Georgia,serif;line-height:1.75;-webkit-font-smoothing:antialiased}
+a{color:var(--red);text-decoration:none}a:hover{text-decoration:underline}
+.w{max-width:1000px;margin:0 auto;padding:0 24px}
+nav{border-bottom:1px solid var(--line);background:rgba(251,247,238,0.92);position:sticky;top:0;z-index:10;backdrop-filter:saturate(150%) blur(6px)}
+nav .w{display:flex;justify-content:space-between;align-items:center;height:56px}
+.nav-logo{font-size:14px;letter-spacing:0.26em;color:var(--red);font-weight:700}
+.nav-back{font-size:13px;color:var(--ink2)}
+/* hero */
+header.hero{background:radial-gradient(ellipse at 50% 24%,#3A1414 0%,#2A0F0F 52%,#1C0A0A 100%);color:#F6ECE0;padding:74px 24px 62px;text-align:center;border-bottom:1px solid rgba(176,138,46,0.3)}
+.eyebrow{font-size:12px;letter-spacing:0.42em;color:#D9B45B;margin-bottom:20px}
+.big{font-size:clamp(40px,8vw,76px);font-weight:800;letter-spacing:0.1em;line-height:1.08;margin:0}
+.big .q{color:#D9836B}
+.htag{font-size:clamp(15px,2.4vw,19px);color:#E7CFA8;margin-top:20px;letter-spacing:0.04em}
+.hmeta{font-size:12.5px;color:#B78E6E;margin-top:22px;letter-spacing:0.06em}
+.brand-line{width:60px;height:2px;background:linear-gradient(90deg,transparent,#B08A2E,transparent);margin:26px auto 0}
+/* intro */
+.intro{max-width:820px;margin:52px auto 0;padding:0 24px}
+.intro p{font-size:16px;line-height:1.95;color:var(--ink2);text-align:justify;margin:0 0 18px}
+.intro b{color:var(--red)}
+.lead::first-letter{font-size:3.1em;float:left;line-height:0.82;padding:6px 12px 0 0;color:var(--red);font-weight:800}
+/* 九宫格 */
+.grid-sec{max-width:940px;margin:56px auto 0;padding:0 24px}
+.sec-h{text-align:center;margin-bottom:8px}
+.sec-h .zh{font-size:24px;font-weight:800;letter-spacing:0.08em;color:var(--ink)}
+.sec-h .sub{font-size:13.5px;color:#8A7A62;letter-spacing:0.16em;margin-top:8px}
+.matrix{margin-top:30px;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--card);box-shadow:0 8px 30px rgba(138,35,35,0.06)}
+.mrow{display:grid;grid-template-columns:150px 1fr 1fr 1fr;border-bottom:1px solid var(--line)}
+.mrow:last-child{border-bottom:none}
+.mhead{background:#2A0F0F;color:#E7CFA8}
+.mhead .mc{color:#D9B45B;font-weight:700;letter-spacing:0.14em;font-size:13.5px;justify-content:center}
+.mc{padding:16px 14px;border-right:1px solid var(--line);display:flex;flex-direction:column;justify-content:center}
+.mc:last-child{border-right:none}
+.rowlabel{background:var(--cream)}
+.rowlabel .pos{font-size:12px;letter-spacing:0.2em;color:var(--gold2);font-weight:700}
+.rowlabel .eng{font-size:18px;font-weight:800;color:var(--red);margin-top:4px;letter-spacing:0.04em}
+.rowlabel .stab{font-size:12px;color:#8A7A62;margin-top:5px}
+.cell .term{font-size:16px;font-weight:700;color:var(--ink)}
+.cell .gloss{font-size:12.5px;color:#8A7A62;margin-top:4px;line-height:1.6}
+.legend{display:flex;gap:22px;justify-content:center;flex-wrap:wrap;margin-top:20px;font-size:13px;color:#8A7A62}
+.legend b{color:var(--red)}
+/* 文章卡 */
+.arts{max-width:940px;margin:58px auto 0;padding:0 24px}
+.card{display:block;background:var(--card);border:1px solid var(--line);border-left:4px solid var(--red);border-radius:10px;padding:26px 28px;margin-bottom:18px;transition:transform .18s,box-shadow .18s;color:inherit}
+.card:hover{transform:translateY(-3px);box-shadow:0 12px 32px rgba(138,35,35,0.12);text-decoration:none}
+.card.c2{border-left-color:var(--gold2)}
+.card.c4{border-left-color:#7A2E2E;background:linear-gradient(180deg,#FBF1EE,var(--card) 55%)}
+.card .ce{font-size:11.5px;letter-spacing:0.24em;color:var(--gold2);margin-bottom:11px}
+.card.c4 .ce{color:var(--red2)}
+.card h3{margin:0;font-size:clamp(21px,3.4vw,27px);font-weight:800;color:var(--ink);letter-spacing:0.04em;line-height:1.35}
+.card .cs{font-size:14px;color:#8A7A62;margin-top:7px}
+.card .cd{font-size:14.5px;color:var(--ink2);line-height:1.85;margin-top:14px;text-align:justify}
+.card .cd b{color:var(--red)}
+.card .cta{margin-top:16px;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.card .pill{background:var(--red);color:#fff;font-size:13px;font-weight:700;padding:8px 18px;border-radius:6px;letter-spacing:0.03em}
+.card.c2 .pill{background:var(--gold)}
+.card .modes3{font-size:12.5px;color:#A08A6E;letter-spacing:0.02em}
+.card .byline{font-size:12.5px;color:#A08A6E;margin-top:11px}
+/* footer */
+footer{margin-top:64px;border-top:1px solid var(--line);padding:34px 24px;text-align:center;color:#8A7A62;font-size:13px}
+@media(max-width:720px){
+ .mrow{grid-template-columns:1fr}
+ .mc{border-right:none;border-bottom:1px solid var(--line)}
+ .rowlabel{background:#2A0F0F}.rowlabel .eng{color:#E7A48C}.rowlabel .stab{color:#C9A98E}.rowlabel .pos{color:#D9B45B}
+ .mhead{display:none}
+}
+</style>
+</head>
+<body>
+<nav><div class="w"><span class="nav-logo">SDE UNIVERSES</span><a class="nav-back" href="/">← 返回首页</a></div></nav>
+
+<header class="hero">
+  <div class="eyebrow">德麦国际 · SDE 本体论 · 中华文化专著</div>
+  <h1 class="big"><span class="q">「</span>我<span class="q">」</span>专栏</h1>
+  <div class="htag">我文化 = 三号位九宫格文化 · 三大工程协奏 · 一部关于「可继续性」的建造学</div>
+  <div class="hmeta">王德生 著 · 依《SDE 本体论》（显露 · 差异 · 纠缠） · 每篇含网页 / 在线读 PDF / 下载三种阅读方式</div>
+  <div class="brand-line"></div>
+</header>
+
+<section class="intro">
+  <p class="lead">在日常经验里，人情、面子、子孙常被分别当成「情感」「虚荣」「传宗」，各说各话。<b>「我」专栏</b>把它们收进同一副骨架：它们不是三种心理，而是同一台机器的三根主梁——都在回答一个问题：<b>差异不断涌来时，一个共同体凭什么还能继续。</b></p>
+  <p>本专栏采用 SDE 发生学口径：不以先验主体为中心，而以互动复合体（SIO）为中心。在这一口径下，「我」被重写为<b>三号位九宫格的纠缠聚合体</b>——分布（关系 / 影响 / 共存）、场（连接 / 次序 / 结构）、美（统一 / 多样 / 和谐）。九宫格不是概念表，而是共存的操作系统：它决定一个共同体如何安放差异、如何成场运行、如何把稳定化结果固化为公共判准。</p>
+  <p>要建造并稳固这张九宫格，就需要工程。工程不是物质建设，而是一类文明在高频生活中反复调用的<b>稳定化手段</b>——用程序链与符号载体，把一次次差异冲刷写回可继续的稳态。九宫格的三个「分位」，恰由三大工程分别承担；三者失衡或倒置，则由第四篇《病理学》诊断为「递弱代偿」的崩塌链。</p>
+</section>
+
+<section class="grid-sec">
+  <div class="sec-h"><div class="zh">三号位九宫格 · 三大工程分工</div><div class="sub">分 位 × 分 布 · 场 · 美　→　各由一台工程稳定化</div></div>
+  <div class="matrix">
+    <div class="mrow mhead">
+      <div class="mc">分位 · 工程</div>
+      <div class="mc">分布</div><div class="mc">场</div><div class="mc">美</div>
+    </div>
+    <div class="mrow">
+      <div class="mc rowlabel"><div class="pos">一号分位</div><div class="eng">人情工程</div><div class="stab">稳「时」· 让关系不断裂</div></div>
+      <div class="mc cell"><div class="term">关系</div><div class="gloss">把好感固化为可回拉的通道</div></div>
+      <div class="mc cell"><div class="term">连接</div><div class="gloss">关系能成场、能复位</div></div>
+      <div class="mc cell"><div class="term">统一</div><div class="gloss">多年后仍可继续的同一</div></div>
+    </div>
+    <div class="mrow">
+      <div class="mc rowlabel"><div class="pos">二号分位</div><div class="eng">面子工程</div><div class="stab">稳「场」· 让当下不崩</div></div>
+      <div class="mc cell"><div class="term">影响</div><div class="gloss">谁看、谁定分布位置</div></div>
+      <div class="mc cell"><div class="term">次序</div><div class="gloss">礼仪程序链被认可</div></div>
+      <div class="mc cell"><div class="term">多样</div><div class="gloss">差异被安放而非清除</div></div>
+    </div>
+    <div class="mrow">
+      <div class="mc rowlabel"><div class="pos">三号分位</div><div class="eng">子孙工程</div><div class="stab">稳「代」· 让传承不散</div></div>
+      <div class="mc cell"><div class="term">共存</div><div class="gloss">跨代 SIO 的长期共处</div></div>
+      <div class="mc cell"><div class="term">结构</div><div class="gloss">次序、边界与通道可复用</div></div>
+      <div class="mc cell"><div class="term">和谐</div><div class="gloss">矛盾可转化、不断裂</div></div>
+    </div>
+  </div>
+  <div class="legend"><span><b>面子稳场</b>：解决当下可见性与次序的破裂</span><span><b>人情稳时</b>：解决多年之后关系链的断裂</span><span><b>子孙稳代</b>：解决跨代际的结构传承</span></div>
+</section>
+
+<section class="arts">
+  <div class="sec-h" style="margin-bottom:26px"><div class="zh">四篇 · 三工程一病理</div><div class="sub">点击进入 · 每篇含三种阅读方式与精排 PDF</div></div>
+
+  <a class="card" href="/column/renqing/">
+    <div class="ce">一号分位 · 稳「时」· 约 2 万字 · 十一章</div>
+    <h3>「我」文化下的人情工程</h3>
+    <div class="cs">三号位九宫格的一号分位——关系·连接·统一的可继续性建造</div>
+    <div class="cd">人情不是情绪，而是<b>时间维度的续航装置</b>：它让关系在多年后仍能回拉，让连接在冲突后仍能复位。发动机是 E 点火·D 运行·S 固化；两条文化口令被精确定位——「礼尚往来」是 D 序列的最小发动机，「礼轻情义重」是 S 投入的效率判据。终以工程三问验收：关系更稳、连接更顺、统一更强了吗？</div>
+    <div class="cta"><span class="pill">阅读全文 →</span><span class="modes3">📖 网页 · 📄 在线读 PDF · ⬇ 下载</span></div>
+    <div class="byline">王德生 著 · 依《SDE 本体论》</div>
+  </a>
+
+  <a class="card c2" href="/column/face/">
+    <div class="ce">二号分位 · 稳「场」· 约 4 万字 · 十六章</div>
+    <h3>「我」文化与面子工程</h3>
+    <div class="cs">SIO 三号位与 SDE 发生学的本体论重写</div>
+    <div class="cd">面子不是虚荣，而是<b>外场三号位美结构的稳定化结果</b>；自尊心是内场美结构的复位能力，尊容是美结构进入发光态后对场的吸附。从过年、婚礼到企业汇报、国家叙事，同一套 E-D-S 引擎在小我—中我—大我各层级跑通；并诊断 E 锁死 / D 膨胀 / S 空心如何使面子从文明技术退化为代偿内卷。</div>
+    <div class="cta"><span class="pill">阅读全文 →</span><span class="modes3">📖 网页 · 📄 在线读 PDF · ⬇ 下载</span></div>
+    <div class="byline">王德生 著 · 依《SDE 本体论》</div>
+  </a>
+
+  <a class="card" href="/column/lineage/">
+    <div class="ce">三号分位 · 稳「代」· 约 3.5 万字 · 八章</div>
+    <h3>「我文化」下的子孙工程</h3>
+    <div class="cs">共存·结构·和谐的长期建造学</div>
+    <div class="cd">子孙工程要稳的是<b>跨代际的结构传承</b>：共存不是温情而是高难度工程，结构不是等级而是次序·边界·通道，和谐不是沉默而是矛盾可转化。面对迁徙洪流与少子化——冗余消失、回流港失守——本文给出「可回流的远程共存」与「把不断裂变成一种可执行能力」的现代操作系统。</div>
+    <div class="cta"><span class="pill">阅读全文 →</span><span class="modes3">📖 网页 · 📄 在线读 PDF · ⬇ 下载</span></div>
+    <div class="byline">王德生 著 · 依《SDE 本体论》</div>
+  </a>
+
+  <a class="card c4" href="/column/pathology/">
+    <div class="ce">病理与纠偏 · 递弱代偿的崩塌链 · 约 4 万字 · 十二章</div>
+    <h3>我文化的病理学</h3>
+    <div class="cs">人情债务化 · 面子内卷化 · 子孙断裂化——从「可继续性工程」到「递弱代偿」</div>
+    <div class="cd">当三大工程倒置，九宫格便塌陷：人情从互济续航变成<b>不可拒绝系统</b>，面子从稳场工具变成<b>虚荣型荣耀机器</b>，子孙从回流港变成<b>压力源</b>。三病合流为「递弱代偿」的自毁闭环——越补越弱、越修越虚、越撑越塌。终章给出纠偏原则：不靠冷漠断裂，而靠结构复位，把三工程拉回验收标准。</div>
+    <div class="cta"><span class="pill">阅读全文 →</span><span class="modes3">📖 网页 · 📄 在线读 PDF · ⬇ 下载</span></div>
+    <div class="byline">王德生 著 · 依《SDE 本体论》</div>
+  </a>
+</section>
+
+<footer>© 2026 德麦国际 · SDE Universes · 「我」专栏 · <a href="/">返回首页</a></footer>
+</body>
+</html>
