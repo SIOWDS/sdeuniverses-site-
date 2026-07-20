@@ -941,6 +941,9 @@ async function llmText(VC, KEY, sys, usr, maxTok) {
 // ===== 陪读额度与全程记忆 =====
 // 解禁后：每台机器每天最多 100 次对话（原 60），每分钟 12 次（原 8）。两个 BYOK 入口共用同一配额桶。
 const WDS_PER_DAY = 100, WDS_PER_MIN = 12;
+// 与WDS对话（高级会话）单独配额：一整场＝开工 1 + 对话 100 + 总结 1 + 拟题 1 + 分部 6 ＝ 109 次，
+// 共用 100/天会在第 99 轮掐断、走不到万字论文；给 130/天留余量。分钟档提到 20：成文一次连发 7 次调用。
+const WDS_DLG_PER_DAY = 130, WDS_DLG_PER_MIN = 20;
 const WDS_MAX_TURNS = 100;          // 最多记 100 轮
 const WDS_HIST_BUDGET = 60000;      // 送进基底的历史字数预算（约 4 万 token，超出从最旧处裁）
 const WDS_GUIDE_HIST_BUDGET = 300000; // 与WDS对话（高级会话）：全面记忆——每答携带全部对话原文；仅在逼近基底上下文物理上限时才从最旧处裁
@@ -971,7 +974,10 @@ function readConvoText(history, limit) {
     if (t) s += who + "：" + t + "\n\n";
   }
   s = s.trim();
-  return s.length > limit ? s.slice(s.length - limit) : s;
+  if (s.length <= limit) return s;
+  // 超限时不再只留尾部（会静默丢掉开场与中段）：保开头 35% + 结尾 65%，中间明标省略
+  const headN = Math.floor(limit * 0.35), tailN = limit - headN - 80;
+  return s.slice(0, headN) + "\n\n【中间已省略 " + (s.length - headN - tailN) + " 字，这是同一场连续对话的前后两段】\n\n" + s.slice(s.length - tailN);
 }
 
 // ===== 边读边聊·陪读 system（读者阅读论文/专著时，与 WDS 一对一对话；区别于群聊版 WDS_SYS 与搜索版）=====
@@ -1440,8 +1446,8 @@ export default {
       const ip = request.headers.get("cf-connecting-ip") || "unknown";
       try {
         const lim = env.ASK_LIMITER.get(env.ASK_LIMITER.idFromName("byok:" + ip));
-        const lr = await (await lim.fetch(new Request("https://limiter.internal/?w=" + WDS_PER_MIN + "&d=" + WDS_PER_DAY))).json();
-        if (!lr.ok) return J({ ok: false, msg: lr.reason === "day" ? ("今天这台机器的 " + WDS_PER_DAY + " 次额度用完了，明天再来。") : "太快啦，过十几秒再试。" }, 429);
+        const lr = await (await lim.fetch(new Request("https://limiter.internal/?w=" + WDS_DLG_PER_MIN + "&d=" + WDS_DLG_PER_DAY))).json();
+        if (!lr.ok) return J({ ok: false, msg: lr.reason === "day" ? ("今天这台机器的 " + WDS_DLG_PER_DAY + " 次额度用完了，明天再来。") : "太快啦，过十几秒再试。" }, 429);
       } catch (e) {}
       const neigong = await loadNeigong(env, url.origin + "/");
       if (!neigong) return J({ ok: false, msg: "内功文件暂不可读，请稍后重试。" }, 503);
@@ -1480,10 +1486,11 @@ export default {
       const ip = request.headers.get("cf-connecting-ip") || "unknown";
       try {
         const lim = env.ASK_LIMITER.get(env.ASK_LIMITER.idFromName("byok:" + ip));
-        const lr = await (await lim.fetch(new Request("https://limiter.internal/?w=" + WDS_PER_MIN + "&d=" + WDS_PER_DAY))).json();
-        if (!lr.ok) return J({ ok: false, msg: lr.reason === "day" ? ("今天这台机器的 " + WDS_PER_DAY + " 次额度用完了，明天再来。") : "太快啦，过十几秒再试。" }, 429);
+        const _pm = b.guide ? WDS_DLG_PER_MIN : WDS_PER_MIN, _pd = b.guide ? WDS_DLG_PER_DAY : WDS_PER_DAY;
+        const lr = await (await lim.fetch(new Request("https://limiter.internal/?w=" + _pm + "&d=" + _pd))).json();
+        if (!lr.ok) return J({ ok: false, msg: lr.reason === "day" ? ("今天这台机器的 " + _pd + " 次额度用完了，明天再来。") : "太快啦，过十几秒再试。" }, 429);
       } catch (e) {}
-      const convo = readConvoText(b.history, b.guide ? 100000 : 24000);   // 与WDS对话：总结/成文也吃全场原文
+      const convo = readConvoText(b.history, b.guide ? 300000 : 24000);   // 与WDS对话：总结/成文与对话本体同档（30万），全场原文
       if (convo.length < 120) return J({ ok: false, msg: "先和 WDS 多聊几轮，聊出东西来了再总结成文。" }, 400);
       const PN = Math.max(3, Math.min(6, parseInt(b.paperN, 10) || 3));   // 论文部分数：3=约5000字（陪读默认），6=约一万字（与WDS对话）
       const GD = !!b.guide;                                                // 与WDS对话（问对WDS）场景
@@ -1571,8 +1578,9 @@ export default {
       const ip = request.headers.get("cf-connecting-ip") || "unknown";
       try {
         const lim = env.ASK_LIMITER.get(env.ASK_LIMITER.idFromName("byok:" + ip));
-        const lr = await (await lim.fetch(new Request("https://limiter.internal/?w=" + WDS_PER_MIN + "&d=" + WDS_PER_DAY))).json();
-        if (!lr.ok) return _sseResp([{ t: "error", v: lr.reason === "day" ? ("今天这台机器和 WDS 已经聊满 " + WDS_PER_DAY + " 次了，明天再来。") : "聊得太快啦，过十几秒再问。" }]);
+        const _rm = b.guide ? WDS_DLG_PER_MIN : WDS_PER_MIN, _rd = b.guide ? WDS_DLG_PER_DAY : WDS_PER_DAY;
+        const lr = await (await lim.fetch(new Request("https://limiter.internal/?w=" + _rm + "&d=" + _rd))).json();
+        if (!lr.ok) return _sseResp([{ t: "error", v: lr.reason === "day" ? ("今天这台机器和 WDS 已经聊满 " + _rd + " 次了，明天再来。") : "聊得太快啦，过十几秒再问。" }]);
       } catch (e) {}
       // 内核底盘（完整内功→内化心得，按基底缓存复用；失败则降级为无底盘）
       let reflect = String(b.reflect || "").slice(0, 14000);   // 与WDS对话：本场开工亲写的心得（客户端随每条消息带上）

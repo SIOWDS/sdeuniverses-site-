@@ -33,7 +33,7 @@ ok("read/read-paper 优先吃本场心得 b.reflect", W.split("slice(0, 14000)")
 ok("方法论指引起手三选一", W.includes("起手按问题种类三选一"));
 ok("全面记忆预算在位（guide 30万+单条1.2万+长问4000+成文10万）",
   W.includes("WDS_GUIDE_HIST_BUDGET = 300000") && W.includes("b.guide ? WDS_GUIDE_HIST_BUDGET :")
-  && W.includes("histBudget, b.guide ? 12000 : 0") && W.includes("b.guide ? 4000 : 500") && W.includes("b.guide ? 100000 : 24000"));
+  && W.includes("histBudget, b.guide ? 12000 : 0") && W.includes("b.guide ? 4000 : 500") && W.includes("b.guide ? 300000 : 24000"));
 // 功能级：抽出 packReadHistory 实测——guide 预算下 100 轮×2400 字符全量不裁、单条 1.2 万不截
 (function () {
   const m = W.match(/function packReadHistory[\s\S]*?\n}\n/);
