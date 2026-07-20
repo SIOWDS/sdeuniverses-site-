@@ -857,5 +857,8 @@ window.setLang=function(lang){
 };
 (async function(){try{var el=document.getElementById('visitCount');if(!el)return;var c=sessionStorage.getItem('sde_visit_counted');var r=await fetch('/api/visits',{method:c?'GET':'POST'});if(!c)sessionStorage.setItem('sde_visit_counted','1');var d=await r.json();el.textContent=d.total.toLocaleString('zh-Hans-CN');}catch(e){}})();
 </script>
+
+<script>window.WDS_READ={};</script>
+<script src="/taste/wds-companion/wds-read.js" defer></script>
 </body>
 </html>
