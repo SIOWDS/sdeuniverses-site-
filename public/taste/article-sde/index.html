@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>文章 SDE 解析器 · 传 Word/PDF，逐篇 SDE 解构 | SDE Universes</title>
-<meta name="description" content="上传你自己的文章（Word .docx 或 PDF，单篇最大 100MB、最多 10 篇），文件只在你本机解析、绝不上传；WDS 带完整 SDE 内功当底盘，对每篇做『观点解读 + SDE 解构』，多篇时再做一份跨篇 SDE 综合。浏览器直接玩，用你自己的大模型 Key（只存本地）。">
+<title>文章 SDE 解析器 · 缝隙创新法：读出创新与缝隙，造新概念填缝 | SDE Universes</title>
+<meta name="description" content="上传你自己的文章（Word .docx 或 PDF，单篇最大 100MB、最多 10 篇），文件只在你本机解析、绝不上传（扫描版 PDF 可本机 OCR）；WDS 用 SDE 三大工具（三大方程·六路径·123原理）读出每篇的创新与缝隙，再用 SDE 创造发明新概念把缝隙补上——缝隙创新法；多篇时并置涌现出填补共同缝隙的新概念。用你自己的大模型 Key（只存本地）。">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/mammoth@1.6.0/mammoth.browser.min.js"></script>
 <style>
@@ -92,9 +92,9 @@ textarea:focus{outline:none;border-color:var(--gold)}
   <div class="hero-glow"></div>
   <div class="eyebrow">品尝系列 · 其七</div>
   <h1>文章 <span class="grad">SDE 解析器</span></h1>
-  <p class="sub">传你自己的文章（<b>Word .docx / PDF</b>，单篇最大 100MB、最多 10 篇），<b>文件只在你本机解析、绝不上传</b>（连扫描版 PDF 都能本机 OCR 读出）。WDS 带着完整 SDE 内功当底盘，对每篇做「观点解读 + SDE 解构」；多篇时再并置出一份<b>跨篇 SDE 综合</b>。</p>
+  <p class="sub">传你自己的文章（<b>Word .docx / PDF</b>，单篇最大 100MB、最多 10 篇），<b>文件只在你本机解析、绝不上传</b>（连扫描版 PDF 都能本机 OCR 读出）。WDS 用 SDE 三大工具（<b>三大方程 · 六路径 · 123原理</b>）读出每篇的<b>创新与缝隙</b>，再用 SDE 创造<b>发明新概念把缝隙补上</b>——这就是缝隙创新法；多篇时再并置涌现出一个填补共同缝隙的新概念。</p>
   <div class="flow">
-    <span>上传 Word/PDF</span><span class="arr">→</span><span>本机解析</span><span class="arr">→</span><span>逐篇 SDE 解构</span><span class="arr">→</span><span>跨篇综合</span>
+    <span>上传 Word/PDF</span><span class="arr">→</span><span>本机解析</span><span class="arr">→</span><span>读创新与缝隙</span><span class="arr">→</span><span>造新概念填缝</span><span class="arr">→</span><span>跨篇涌现</span>
   </div>
 </header>
 
@@ -147,7 +147,7 @@ textarea:focus{outline:none;border-color:var(--gold)}
   <div class="card">
     <div class="actions">
       <button class="btn" id="goBtn" disabled>开始 SDE 解析</button>
-      <button class="btn ghost" id="synthBtn" style="display:none" disabled>跨篇 SDE 综合</button>
+      <button class="btn ghost" id="synthBtn" style="display:none" disabled>跨篇缝隙创新</button>
       <button class="btn ghost" id="pdfBtn" style="display:none">导出全部 PDF</button>
       <span class="status" id="status"></span>
     </div>
@@ -509,7 +509,7 @@ $("#goBtn").onclick=async function(){
   },3);
   running=false;
   var ok=articles.filter(function(a){return a.status==="done";}).length;
-  setStatus("完成：成功 "+ok+" / "+tot+" 篇。"+(ok>=2?"可再点「跨篇 SDE 综合」把它们并置。":""));
+  setStatus("完成：成功 "+ok+" / "+tot+" 篇。"+(ok>=2?"可再点「跨篇缝隙创新」把它们并置。":""));
   updateBtns(); renderQueue();
 };
 
@@ -558,15 +558,15 @@ function renderResults(){
   var html="";
   shown.forEach(function(a){
     var body;
-    if(a.status==="analyzing"&&!a.result){ body='<div class="r-load"><span class="spinner"></span> WDS 正在解构这篇…</div>'; }
+    if(a.status==="analyzing"&&!a.result){ body='<div class="r-load"><span class="spinner"></span> WDS 正在读创新、扫缝隙、造新概念…</div>'; }
     else body=fmtAnalysis(a.result);
     var btns="";
     if(a.status==="done") btns+='<button class="rbtn" data-copy="'+a.id+'">复制</button>';
     if(a.status==="error") btns+='<button class="rbtn" data-retry="'+a.id+'">重试</button>';
-    html+='<div class="rcard"><div class="rhead"><b>《'+esc(a.title)+'》 · 观点解读与 SDE 解构</b>'+btns+'</div><div class="rbody">'+body+"</div></div>";
+    html+='<div class="rcard"><div class="rhead"><b>《'+esc(a.title)+'》 · SDE 缝隙创新解析</b>'+btns+'</div><div class="rbody">'+body+"</div></div>";
   });
-  if(synthState==="running"){ html+='<div class="rcard synth"><div class="rhead"><b>跨篇 SDE 综合</b></div><div class="rbody"><div class="r-load"><span class="spinner"></span> 正在把各篇并置、寻找共绕与涌现…</div></div></div>'; }
-  else if(synthResult){ html+='<div class="rcard synth"><div class="rhead"><b>跨篇 SDE 综合</b><button class="rbtn" data-copy="__synth">复制</button></div><div class="rbody">'+fmtAnalysis(synthResult)+"</div></div>"; }
+  if(synthState==="running"){ html+='<div class="rcard synth"><div class="rhead"><b>跨篇缝隙创新 · 并置涌现</b></div><div class="rbody"><div class="r-load"><span class="spinner"></span> 正在把各篇并置、寻找共绕与涌现…</div></div></div>'; }
+  else if(synthResult){ html+='<div class="rcard synth"><div class="rhead"><b>跨篇缝隙创新 · 并置涌现</b><button class="rbtn" data-copy="__synth">复制</button></div><div class="rbody">'+fmtAnalysis(synthResult)+"</div></div>"; }
   box.innerHTML=html;
   box.querySelectorAll("[data-copy]").forEach(function(bt){bt.onclick=function(){
     var id=bt.dataset.copy, txt;
@@ -582,15 +582,15 @@ $("#pdfBtn").onclick=function(){
   var done=articles.filter(function(a){return a.status==="done"&&a.result;});
   if(!done.length&&!synthResult){ return; }
   var body="";
-  done.forEach(function(a){ body+="《"+a.title+"》 · 观点解读与 SDE 解构\n\n"+a.result+"\n\n\n"; });
-  if(synthResult){ body+="跨篇 SDE 综合\n\n"+synthResult+"\n"; }
+  done.forEach(function(a){ body+="《"+a.title+"》 · SDE 缝隙创新解析\n\n"+a.result+"\n\n\n"; });
+  if(synthResult){ body+="跨篇缝隙创新 · 并置涌现\n\n"+synthResult+"\n"; }
   var w=window.open("","_blank");
   if(!w){ setStatus("浏览器拦了新窗口，允许弹窗后重试。"); return; }
   var paras=body.split(/\n+/).map(function(s){
     s=s.trim(); if(!s) return "";
     var e=s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
     if(/^《.*》\s*·/.test(s)) return "<h2>"+e+"</h2>";
-    if(s==="跨篇 SDE 综合") return "<h2>"+e+"</h2>";
+    if(s==="跨篇缝隙创新 · 并置涌现") return "<h2>"+e+"</h2>";
     if(s.length<=24&&!/[。！？.?!：]$/.test(s)&&(/^[一二三四五六七八九十]+、/.test(s))) return "<h3>"+e+"</h3>";
     return "<p>"+e+"</p>";
   }).join("");
@@ -607,7 +607,7 @@ $("#pdfBtn").onclick=function(){
     +".noprint{position:fixed;top:12px;right:12px;background:#141A24;color:#fff;border:none;border-radius:8px;padding:10px 18px;font:600 14px -apple-system,'PingFang SC',sans-serif;cursor:pointer}"
     +"</style></head><body>"
     +"<button class='noprint' onclick='window.print()'>打印 / 存为 PDF</button>"
-    +"<h1>文章 SDE 解析</h1><div class='meta'>观点解读 · SDE 解构"+(synthResult?" · 跨篇综合":"")+" · SDE Universes</div>"
+    +"<h1>文章 SDE 解析</h1><div class='meta'>SDE 缝隙创新解析"+(synthResult?" · 跨篇综合":"")+" · SDE Universes</div>"
     +paras
     +"<div class='foot'>由大模型生成，观点供思考参考；可核验事实请以原始文献为准。sdeuniverses.com</div>"
     +"</body></html>");
