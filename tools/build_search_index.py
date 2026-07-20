@@ -255,12 +255,30 @@ for f in os.listdir(OUT):
     if f.startswith("shard-") or f == "manifest.json":
         os.remove(os.path.join(OUT, f))
 
+# Cloudflare 静态资产单文件上限 25MiB。栏目分片超过 SHARD_MAX 即按序切成多个文件，
+# 文件名 shard-<sec>-1.json / -2.json …，清单写进 manifest sections[].files；
+# 消费方一律按 s.files（缺省退回 [s.key]）逐文件拉取——切分随每次重建自动进行，
+# 文本再涨十倍也只是文件变多，永远不会撞单文件上限。
+SHARD_MAX = 6 * 1024 * 1024
+
 sections_meta = []
 for sec, st in sorted(sec_stat.items(), key=lambda kv: -kv[1]["chunks"]):
+    parts, cur, cur_bytes = [], [], 16  # 16 = {"chunks":[]} 外壳底噪
+    for c in shards[sec]:
+        b = len(json.dumps(c, ensure_ascii=False, separators=(",", ":")).encode("utf-8")) + 1
+        if cur and cur_bytes + b > SHARD_MAX:
+            parts.append(cur)
+            cur, cur_bytes = [], 16
+        cur.append(c)
+        cur_bytes += b
+    if cur:
+        parts.append(cur)
+    files = [sec] if len(parts) == 1 else ["%s-%d" % (sec, i + 1) for i in range(len(parts))]
+    for fname, cl in zip(files, parts):
+        with open(os.path.join(OUT, "shard-%s.json" % fname), "w", encoding="utf-8") as f:
+            json.dump({"chunks": cl}, f, ensure_ascii=False, separators=(",", ":"))
     sections_meta.append({"key": sec, "label": SECTION_LABELS.get(sec, sec),
-                          "docs": st["docs"], "chunks": st["chunks"]})
-    with open(os.path.join(OUT, "shard-%s.json" % sec), "w", encoding="utf-8") as f:
-        json.dump({"chunks": shards[sec]}, f, ensure_ascii=False, separators=(",", ":"))
+                          "docs": st["docs"], "chunks": st["chunks"], "files": files})
 
 manifest = {
     "built": datetime.datetime.utcnow().isoformat() + "Z",
@@ -273,8 +291,12 @@ with open(os.path.join(OUT, "manifest.json"), "w", encoding="utf-8") as f:
 
 print("=== 索引构建完成 ===")
 print("文档 %d 篇 | 块 %d 个 | 索引正文 %d 字" % (len(manifest_docs), tot_chunks, tot_chars))
+HARD_CAP = 25 * 1024 * 1024  # Cloudflare 静态资产单文件硬上限（MiB）
 for s in sections_meta:
-    sz = os.path.getsize(os.path.join(OUT, "shard-%s.json" % s["key"]))
-    print("  %-10s doc%4d  块%5d  分片%7.1fKB  (%s)" % (s["key"], s["docs"], s["chunks"], sz / 1024, s["label"]))
+    for fname in s["files"]:
+        p = os.path.join(OUT, "shard-%s.json" % fname)
+        sz = os.path.getsize(p)
+        assert sz < HARD_CAP, "分片超 25MiB 上限：%s（%.1fMB）—— 调小 SHARD_MAX" % (p, sz / 1048576)
+        print("  %-14s doc%4d  块%5d  分片%7.1fKB  (%s)" % (fname, s["docs"], s["chunks"], sz / 1024, s["label"]))
 mz = os.path.getsize(os.path.join(OUT, "manifest.json"))
 print("  manifest.json  %.1fKB" % (mz / 1024))

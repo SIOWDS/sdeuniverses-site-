@@ -795,10 +795,12 @@ async function loadCorpus(env, url) {
   man.sections.forEach((s) => { secLabel[s.key] = s.label; });
   const chunks = [];
   for (const s of man.sections) {
-    try {
-      const sh = await (await env.ASSETS.fetch(new Request(new URL("/search/shard-" + s.key + ".json", url)))).json();
-      for (const c of sh.chunks) chunks.push(c);
-    } catch (e) { /* 单片失败不阻断 */ }
+    for (const f of (s.files || [s.key])) {
+      try {
+        const sh = await (await env.ASSETS.fetch(new Request(new URL("/search/shard-" + f + ".json", url)))).json();
+        for (const c of sh.chunks) chunks.push(c);
+      } catch (e) { /* 单片失败不阻断 */ }
+    }
   }
   CORPUS = { docs: man.docs, secLabel, chunks, coords: await loadCoords(env, url) };
   return CORPUS;

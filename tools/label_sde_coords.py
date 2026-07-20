@@ -58,7 +58,8 @@ man = json.load(open(os.path.join(SD, "manifest.json"), encoding="utf-8"))
 # 拼每篇文本（取前 ~3000 字够打标）
 doctext = {}
 for s in man["sections"]:
-    for c in json.load(open(os.path.join(SD, "shard-%s.json" % s["key"]), encoding="utf-8"))["chunks"]:
+  for fn in s.get("files", [s["key"]]):
+    for c in json.load(open(os.path.join(SD, "shard-%s.json" % fn), encoding="utf-8"))["chunks"]:
         d = c["d"]
         if len(doctext.get(d, "")) < 3200:
             doctext[d] = doctext.get(d, "") + c["t"] + "\n"
