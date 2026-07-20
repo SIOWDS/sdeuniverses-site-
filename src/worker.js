@@ -951,6 +951,9 @@ function looseJSON(s) {
 // ===== 陪读额度与全程记忆 =====
 // 解禁后：每台机器每天最多 100 次对话（原 60），每分钟 12 次（原 8）。两个 BYOK 入口共用同一配额桶。
 const WDS_PER_DAY = 100, WDS_PER_MIN = 12;
+// 配额桶分家：各 BYOK 入口互不吃额度（用户自带 Key、自付费用，限流只为防滥用）。
+// 桶名 byok:<入口>:<ip> —— chat=全站问答 / read=陪读 / dlg=与WDS对话 / ask=搜索问答。
+function wdsBucket(kind, ip) { return "byok:" + kind + ":" + ip; }
 // 与WDS对话（高级会话）单独配额：一整场＝开工 1 + 对话 100 + 总结 1 + 拟题 1 + 分部 6 ＝ 109 次，
 // 共用 100/天会在第 99 轮掐断、走不到万字论文；给 130/天留余量。分钟档提到 20：成文一次连发 7 次调用。
 const WDS_DLG_PER_DAY = 130, WDS_DLG_PER_MIN = 20;
@@ -1098,7 +1101,7 @@ async function handleAsk(request, env, url) {
   // 限流：系统 Key 与自带 Key 各用独立配额桶（自带 Key 用户自付，不与系统额度互挤）
   const ip = request.headers.get("cf-connecting-ip") || "unknown";
   try {
-    const lim = env.ASK_LIMITER.get(env.ASK_LIMITER.idFromName((byok ? "byok:" : "sys:") + ip));
+    const lim = env.ASK_LIMITER.get(env.ASK_LIMITER.idFromName(byok ? wdsBucket("ask", ip) : ("sys:" + ip)));
     const lr = await (await lim.fetch(new Request("https://limiter.internal/"))).json();
     if (!lr.ok) {
       const msg = lr.reason === "day"
@@ -1457,7 +1460,7 @@ export default {
       const VC = wdsTopVC(vd);   // 开工学内功＝最费脑的一步，直接最强档
       const ip = request.headers.get("cf-connecting-ip") || "unknown";
       try {
-        const lim = env.ASK_LIMITER.get(env.ASK_LIMITER.idFromName("byok:" + ip));
+        const lim = env.ASK_LIMITER.get(env.ASK_LIMITER.idFromName(wdsBucket("dlg", ip)));
         const lr = await (await lim.fetch(new Request("https://limiter.internal/?w=" + WDS_DLG_PER_MIN + "&d=" + WDS_DLG_PER_DAY))).json();
         if (!lr.ok) return J({ ok: false, msg: lr.reason === "day" ? ("今天这台机器的 " + WDS_DLG_PER_DAY + " 次额度用完了，明天再来。") : "太快啦，过十几秒再试。" }, 429);
       } catch (e) {}
@@ -1497,7 +1500,7 @@ export default {
       const KEY = userKey, rvendor = ({ zhipu: "glm", deepseek: "ds" })[vd] || vd;
       const ip = request.headers.get("cf-connecting-ip") || "unknown";
       try {
-        const lim = env.ASK_LIMITER.get(env.ASK_LIMITER.idFromName("byok:" + ip));
+        const lim = env.ASK_LIMITER.get(env.ASK_LIMITER.idFromName(wdsBucket(b.guide ? "dlg" : "read", ip)));
         const _pm = b.guide ? WDS_DLG_PER_MIN : WDS_PER_MIN, _pd = b.guide ? WDS_DLG_PER_DAY : WDS_PER_DAY;
         const lr = await (await lim.fetch(new Request("https://limiter.internal/?w=" + _pm + "&d=" + _pd))).json();
         if (!lr.ok) return J({ ok: false, msg: lr.reason === "day" ? ("今天这台机器的 " + _pd + " 次额度用完了，明天再来。") : "太快啦，过十几秒再试。" }, 429);
@@ -1643,10 +1646,10 @@ export default {
       // 限流（系统额度与自带 Key 各用独立配额桶，不互挤）
       const ip = request.headers.get("cf-connecting-ip") || "unknown";
       try {
-        const lim = env.ASK_LIMITER.get(env.ASK_LIMITER.idFromName("byok:" + ip));
+        const lim = env.ASK_LIMITER.get(env.ASK_LIMITER.idFromName(wdsBucket(b.guide ? "dlg" : "read", ip)));
         const _rm = b.guide ? WDS_DLG_PER_MIN : WDS_PER_MIN, _rd = b.guide ? WDS_DLG_PER_DAY : WDS_PER_DAY;
         const lr = await (await lim.fetch(new Request("https://limiter.internal/?w=" + _rm + "&d=" + _rd))).json();
-        if (!lr.ok) return _sseResp([{ t: "error", v: lr.reason === "day" ? ("今天这台机器和 WDS 已经聊满 " + _rd + " 次了，明天再来。") : "聊得太快啦，过十几秒再问。" }]);
+        if (!lr.ok) return _sseResp([{ t: "error", v: lr.reason === "day" ? ("今天这台机器在" + (b.guide ? "「与WDS对话」" : "「陪读」") + "入口已用满 " + _rd + " 次（按本机每日计，与你自己的 Key 无关），明天再来。") : "聊得太快啦，过十几秒再问。" }]);
       } catch (e) {}
       // 内核底盘（完整内功→内化心得，按基底缓存复用；失败则降级为无底盘）
       let reflect = String(b.reflect || "").slice(0, 14000);   // 与WDS对话：本场开工亲写的心得（客户端随每条消息带上）
@@ -1748,10 +1751,12 @@ export default {
       const VC = { url: WDS_VENDORS[vd].url, model: WDS_VENDORS[vd].model, name: WDS_VENDORS[vd].name };
       const KEY = userKey, rvendor = ({ zhipu: "glm", deepseek: "ds" })[vd] || vd;
       const ip = request.headers.get("cf-connecting-ip") || "unknown";
+      let dayLeft = null;
       try {
-        const lim = env.ASK_LIMITER.get(env.ASK_LIMITER.idFromName("byok:" + ip));
+        const lim = env.ASK_LIMITER.get(env.ASK_LIMITER.idFromName(wdsBucket("chat", ip)));
         const lr = await (await lim.fetch(new Request("https://limiter.internal/?w=" + WDS_PER_MIN + "&d=" + WDS_PER_DAY))).json();
-        if (!lr.ok) return _sseResp([{ t: "error", v: lr.reason === "day" ? ("今天这台机器和 WDS 已经聊满 " + WDS_PER_DAY + " 次了，明天再来。") : "聊得太快啦，过十几秒再问。" }]);
+        if (!lr.ok) return _sseResp([{ t: "error", v: lr.reason === "day" ? ("今天这台机器在「全站问答」入口已问满 " + WDS_PER_DAY + " 次（按本机每日计，与你自己的 Key 无关；陪读与「与WDS对话」各有独立额度，不受影响），明天再来。") : "聊得太快啦，过十几秒再问。" }]);
+        dayLeft = Math.max(0, WDS_PER_DAY - (lr.inDay || 0));   // 回传真实日剩余，供前端显示
       } catch (e) {}
       // 全站检索（复用 /api/ask 的召回：词义扩展→retrieve→拼片段+出处）
       let ctxText = "", sources = [];
@@ -1795,6 +1800,7 @@ export default {
       const srcs = sources;
       const stream = new ReadableStream({
         async start(controller) {
+          if (dayLeft !== null) controller.enqueue(_sseBytes({ t: "quota", v: { left: dayLeft, day: WDS_PER_DAY } })); // 今日真实剩余次数
           if (srcs.length) controller.enqueue(_sseBytes({ t: "sources", v: srcs })); // 先把出处发给前端
           let buf = "";
           try {

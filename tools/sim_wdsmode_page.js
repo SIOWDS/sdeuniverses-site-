@@ -84,4 +84,15 @@ T('常规页签改名为返回浏览', normal3 && /返回/.test(normal3.textCont
 normal3.onclick && normal3.onclick();
 T('返回浏览=history.back', e3.navigated==='BACK');
 
+// —— 07-20 配额显示修复（静态核对 public/wds-mode.js）——
+{
+  const S = require("fs").readFileSync(__dirname + "/../public/wds-mode.js", "utf8");
+  const dec = S.replace(/\\u([0-9a-fA-F]{4})/g, (m, h) => String.fromCharCode(parseInt(h, 16)));
+  T("顶栏计数改称「本场剩余」，不再冒充今日额度", dec.includes("本场剩余 100 次") && dec.includes('"本场剩余 " + sessionLeft + " 次"'));
+  T("服务端 quota 事件被消费并写入 dayLeft", dec.includes('j.t === "quota"') && dec.includes("dayLeft = j.v.left"));
+  T("今日额度为 0 时锁输入并说明另两个入口不受影响", dec.includes("dayLeft === 0") && dec.includes("今日本机额度已用完"));
+  T("＋新对话只复位本场，不把今日额度画回满格", dec.includes("dayLeft 不复位"));
+  T("计数带 title 说明本场与今日两义", dec.includes("turnsEl.title"));
+}
+
 console.log(pass+' PASS / '+fail+' FAIL'); process.exit(fail?1:0);

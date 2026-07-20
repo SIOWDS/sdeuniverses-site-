@@ -67,7 +67,7 @@
     "<div class='wdsm-top'>" +
       "<a class='wdsm-brand' href='/'>SDE UNIVERSES</a>" +
       "<div class='wdsm-tabs'><button class='wdsm-tab' data-m='normal'>常规</button><button class='wdsm-tab sel' data-m='wds'>✦ WDS 助手</button></div>" +
-      "<div class='wdsm-top-sp'></div><span class='wdsm-turns' id='wdsmTurns'>剩余 100 次</span>" +
+      "<div class='wdsm-top-sp'></div><span class='wdsm-turns' id='wdsmTurns'>本场剩余 100 次</span>" +
       "<button class='wdsm-keybtn' style='background:none;border:1px solid rgba(212,178,94,.4);color:#D4B25E;font:13px/1 inherit;padding:7px 11px;border-radius:8px;cursor:pointer;margin-right:8px'>⚙ Key</button><button class='wdsm-newbtn'>＋ 新对话</button>" +
     "</div>" +
     "<div class='wdsm-body empty'>" +
@@ -91,8 +91,19 @@
   var sendEl = layer.querySelector(".wdsm-send");
   var history = [], streaming = false;
   var MAX = 100, turnsEl = layer.querySelector(".wdsm-turns");
+  var dayLeft = null;   // 服务端回传的"今日本机剩余次数"（与本场轮次是两回事）
   function turns() { var n = 0; for (var i = 0; i < history.length; i++) if (history[i].role === "reader") n++; return n; }
-  function updTurns() { var n = turns(); if (turnsEl) turnsEl.textContent = "剩余 " + (MAX - n) + " 次"; if (n >= MAX) { inEl.disabled = true; sendEl.disabled = true; inEl.placeholder = "这场已谈满 100 次，点＋新对话重开。"; } }
+  function updTurns() {
+    var n = turns(), sessionLeft = MAX - n;
+    if (turnsEl) {
+      turnsEl.textContent = dayLeft === null ? ("本场剩余 " + sessionLeft + " 次")
+        : ("本场剩余 " + sessionLeft + " 次 · 今日 " + dayLeft + " 次");
+      turnsEl.title = "本场＝这一次对话最多 100 轮（点＋新对话可重开）；今日＝本机每天在「全站问答」入口的额度，陪读与「与WDS对话」各有独立额度。";
+    }
+    if (dayLeft === 0) { inEl.disabled = true; sendEl.disabled = true; inEl.placeholder = "今日本机额度已用完，明天再来（陪读与「与WDS对话」不受影响）。"; return; }
+    if (n >= MAX) { inEl.disabled = true; sendEl.disabled = true; inEl.placeholder = "这场已谈满 100 次，点＋新对话重开。"; }
+    else if (inEl.disabled) { inEl.disabled = false; sendEl.disabled = false; inEl.placeholder = "问 WDS 任何 SDE 问题，或让它帮你找站里读什么…"; }
+  }
 
   var EG = ["SDE 说的“显露”和“结构”有什么不同？", "用 SDE 怎么看慢性病的发生？", "什么是特征纠缠？举个例子", "帮我找几篇入门 SDE 的文章"];
   EG.forEach(function (q) { var b = el("button", "wdsm-eg", q); b.onclick = function () { inEl.value = q; send(); }; egsEl.appendChild(b); });
@@ -110,7 +121,7 @@
   layer.querySelector(".wdsm-keybtn").onclick = function () { wdsKeyPanel(function () {}); };
   layer.querySelector(".wdsm-newbtn").onclick = function () {
     history = []; msgsEl.innerHTML = ""; msgsEl.style.display = "none"; bodyEl.classList.add("empty");
-    inEl.disabled = false; sendEl.disabled = false; inEl.placeholder = "问 WDS 任何 SDE 问题，或让它帮你找站里读什么…"; updTurns();
+    inEl.disabled = false; sendEl.disabled = false; inEl.placeholder = "问 WDS 任何 SDE 问题，或让它帮你找站里读什么…"; updTurns();   // dayLeft 不复位：今日额度按本机计，重开对话不会回满
     layer.querySelector(".wdsm-hero").style.display = ""; inEl.value = ""; inEl.focus();
   };
 
@@ -214,7 +225,8 @@
               var p = line.slice(5).trim();
               if (p === "[DONE]") return finish();
               var j; try { j = JSON.parse(p); } catch (e) { continue; }
-              if (j.t === "sources") { renderSources(a, j.v); }
+              if (j.t === "quota") { if (j.v && typeof j.v.left === "number") { dayLeft = j.v.left; updTurns(); } }
+              else if (j.t === "sources") { renderSources(a, j.v); }
               else if (j.t === "think") { if (!answer && !statusShown) { a.textContent = "◇ WDS 正在想…"; statusShown = true; } }
               else if (j.t === "token") { answer += j.v; a.textContent = answer; a.innerHTML = esc(answer) + "<span class='cur'>▊</span>"; bodyEl.scrollTop = bodyEl.scrollHeight; }
               else if (j.t === "error") { a.className = "wdsm-a wdsm-err"; a.textContent = j.v; if (j.code === "need_key" || j.code === "bad_key") setTimeout(function () { wdsKeyPanel(function () {}); }, 400); }
