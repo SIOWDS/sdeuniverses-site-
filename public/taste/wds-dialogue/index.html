@@ -94,7 +94,7 @@
   <div class="bar">
     <a class="brand" href="/taste/wds-dialogue/"><b>与<i>WDS</i>对话</b><span>问对WDS · 智能体免费区</span></a>
     <button class="tbtn gtog" id="gtog">方法论</button>
-    <span class="turns" id="turns">已谈 0/100 轮</span>
+    <span class="turns" id="turns">剩余 100 次</span>
     <button class="tbtn" id="bsum" disabled>总结这场对话</button>
     <button class="tbtn gold" id="bpap" disabled>凝成一万字论文《问对WDS》</button>
     <button class="kbtn" id="bkey" title="设置 API Key">⚙</button>
@@ -196,7 +196,7 @@
   function turns() { var n = 0; for (var i = 0; i < history.length; i++) if (history[i].role === "reader") n++; return n; }
   function paint() {
     var n = turns();
-    turnsEl.textContent = "\u5df2\u8c08 " + n + "/" + MAX + " \u8f6e";
+    turnsEl.textContent = "剩余 " + (MAX - n) + " 次";
     var ready = n >= 2 && !busy && !streaming;
     sumB.disabled = !ready; papB.disabled = !ready;
     if (n >= MAX) { qEl.disabled = true; goEl.disabled = true; qEl.placeholder = "\u8fd9\u573a\u5df2\u8c08\u6ee1 100 \u8f6e\u2014\u2014\u603b\u7ed3\u6216\u51dd\u6210\u300a\u95ee\u5bf9WDS\u300b\u5427\u3002"; }

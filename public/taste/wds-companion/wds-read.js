@@ -120,7 +120,7 @@
   function paintState() {
     var n = turns();
     var subBase = CFG.subLabel || "\u966a\u4f60\u8bfb\uff0c\u4e0d\u66ff\u4f60\u8bfb";
-    subEl.textContent = n ? (subBase + " \u00b7 \u5df2\u8c08 " + n + "/" + MAX_TURNS + " \u8f6e") : subBase;
+    subEl.textContent = subBase + " · 剩余 " + (MAX_TURNS - n) + " 次";
     var ready = n >= 2 && !busy && !streaming;
     sumBtn.disabled = !ready; papBtn.disabled = !ready;
     if (n >= MAX_TURNS) { inputEl.disabled = true; sendEl.disabled = true; inputEl.placeholder = "\u8fd9\u573a\u5df2\u8c08\u6ee1 100 \u8f6e\u2014\u2014\u53ef\u4ee5\u603b\u7ed3\u6216\u6210\u6587\u4e86\u3002"; }

@@ -23,7 +23,7 @@
     ".wdsm-tab{border:none;background:none;color:#8B98A5;font:600 13px/1 inherit;padding:7px 16px;border-radius:999px;cursor:pointer;white-space:nowrap}" +
     ".wdsm-tab.sel{background:#D4B25E;color:#0F0B07}" +
     ".wdsm-top-sp{flex:1}" +
-    ".wdsm-newbtn{background:none;border:1px solid rgba(212,178,94,.4);color:#D4B25E;font:13px/1 inherit;padding:7px 13px;border-radius:8px;cursor:pointer}" +
+    ".wdsm-newbtn{background:none;border:1px solid rgba(212,178,94,.4);color:#D4B25E;font:13px/1 inherit;padding:7px 13px;border-radius:8px;cursor:pointer}.wdsm-turns{font-size:12.5px;color:#8B98A5;white-space:nowrap;margin-right:12px}" +
     ".wdsm-body{flex:1;overflow-y:auto;display:flex;flex-direction:column}" +
     ".wdsm-body.empty{justify-content:center;align-items:center}" +
     ".wdsm-hero{max-width:680px;width:100%;margin:0 auto;padding:24px;text-align:center}" +
@@ -67,7 +67,7 @@
     "<div class='wdsm-top'>" +
       "<a class='wdsm-brand' href='/'>SDE UNIVERSES</a>" +
       "<div class='wdsm-tabs'><button class='wdsm-tab' data-m='normal'>常规</button><button class='wdsm-tab sel' data-m='wds'>✦ WDS 助手</button></div>" +
-      "<div class='wdsm-top-sp'></div>" +
+      "<div class='wdsm-top-sp'></div><span class='wdsm-turns' id='wdsmTurns'>剩余 100 次</span>" +
       "<button class='wdsm-keybtn' style='background:none;border:1px solid rgba(212,178,94,.4);color:#D4B25E;font:13px/1 inherit;padding:7px 11px;border-radius:8px;cursor:pointer;margin-right:8px'>⚙ Key</button><button class='wdsm-newbtn'>＋ 新对话</button>" +
     "</div>" +
     "<div class='wdsm-body empty'>" +
@@ -90,6 +90,9 @@
   var inEl = layer.querySelector(".wdsm-in");
   var sendEl = layer.querySelector(".wdsm-send");
   var history = [], streaming = false;
+  var MAX = 100, turnsEl = layer.querySelector(".wdsm-turns");
+  function turns() { var n = 0; for (var i = 0; i < history.length; i++) if (history[i].role === "reader") n++; return n; }
+  function updTurns() { var n = turns(); if (turnsEl) turnsEl.textContent = "剩余 " + (MAX - n) + " 次"; if (n >= MAX) { inEl.disabled = true; sendEl.disabled = true; inEl.placeholder = "这场已谈满 100 次，点＋新对话重开。"; } }
 
   var EG = ["SDE 说的“显露”和“结构”有什么不同？", "用 SDE 怎么看慢性病的发生？", "什么是特征纠缠？举个例子", "帮我找几篇入门 SDE 的文章"];
   EG.forEach(function (q) { var b = el("button", "wdsm-eg", q); b.onclick = function () { inEl.value = q; send(); }; egsEl.appendChild(b); });
@@ -107,6 +110,7 @@
   layer.querySelector(".wdsm-keybtn").onclick = function () { wdsKeyPanel(function () {}); };
   layer.querySelector(".wdsm-newbtn").onclick = function () {
     history = []; msgsEl.innerHTML = ""; msgsEl.style.display = "none"; bodyEl.classList.add("empty");
+    inEl.disabled = false; sendEl.disabled = false; inEl.placeholder = "问 WDS 任何 SDE 问题，或让它帮你找站里读什么…"; updTurns();
     layer.querySelector(".wdsm-hero").style.display = ""; inEl.value = ""; inEl.focus();
   };
 
@@ -181,11 +185,12 @@
 
   function send() {
     var q = inEl.value.trim(); if (!q || streaming) return;
+    if (turns() >= MAX) { updTurns(); return; }
     var kv = wdsKeyGet(); if (!kv) { wdsKeyPanel(function () { send(); }); return; }
     inEl.value = ""; inEl.style.height = "auto";
     var a = addTurn(q);
     a.innerHTML = "<span class='cur'>▊</span>";
-    history.push({ role: "reader", text: q });
+    history.push({ role: "reader", text: q }); updTurns();
     streaming = true; sendEl.disabled = true;
     var payload = { q: q, history: history.slice(-4), key: kv.key, vendor: kv.vendor };
     var answer = "", statusShown = false, srcBox = null;
@@ -229,5 +234,6 @@
   inEl.addEventListener("keydown", function (e) { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } });
 
   // 独立页模式：载入即整页打开（浮层自动弹出机制已废除，普通页只保留跳转入口）
+  updTurns();
   if (PAGE) open();
 })();

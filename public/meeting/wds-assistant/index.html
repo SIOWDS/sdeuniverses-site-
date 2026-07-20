@@ -142,6 +142,7 @@ footer a{color:var(--gold);text-decoration:none}
       <textarea class="ta" id="askTa" placeholder="你的问题…（Ctrl+Enter 发送）"></textarea>
       <button class="btn" id="askBtn" onclick="ask()">提 问</button>
     </div>
+    <div class="askturns" id="askTurns" style="font-size:12px;color:#8B98A5;margin:6px 0 0">剩余 100 次</div>
     <div class="statusline" id="askStatus"></div>
   </div>
 
@@ -308,6 +309,8 @@ function buildPayload(sel,messages){
 }
 var chatHistory=[]; // {role,content}
 var busy=false;
+var MAX_QA=100, qaCount=0;
+function updTurns(){ var el=$("askTurns"); if(el) el.textContent="剩余 "+(MAX_QA-qaCount)+" 次"; if(qaCount>=MAX_QA){ var b=$("askBtn"), t=$("askTa"); if(b) b.disabled=true; if(t){ t.disabled=true; t.placeholder="本课已提满 100 次，刷新页面可重开。"; } } }
 function quickAsk(q){ $("askTa").value=q; ask(); }
 function addMsg(role,text){
   var log=$("chatLog");
@@ -323,6 +326,8 @@ function ask(){
   if(!q){ $("askStatus").textContent="请先输入问题。"; return; }
   var key=""; try{ key=localStorage.getItem(keyName())||""; }catch(e){}
   if(!key){ $("askStatus").textContent="请先在上方第一步保存 "+vendorLabel()+" 的 API Key。"; return; }
+  if(qaCount>=MAX_QA){ updTurns(); return; }
+  qaCount++; updTurns();
   busy=true; $("askBtn").disabled=true; $("askTa").value="";
   addMsg("user",q);
   var bodyEl=addMsg("bot","");
@@ -396,7 +401,7 @@ $("askTa").addEventListener("keydown",function(e){ if((e.ctrlKey||e.metaKey)&&e.
   try{ var m=localStorage.getItem("sde_wds_mode"); setMode(m==="scholar"?"scholar":"intro"); }catch(e){ setMode("intro"); }
   try{ var t=JSON.parse(localStorage.getItem("sde_wds_transcript")||"null"); if(Array.isArray(t)) finalLog=t; }catch(e){}
   try{ var n=localStorage.getItem("sde_wds_notes"); if(n) $("notesTa").value=n; }catch(e){}
-  renderTrans(); loadKeyUI();
+  renderTrans(); loadKeyUI(); updTurns();
   if(!SR){ $("listenStatus").textContent="提示：此浏览器不支持语音转写（建议电脑版 Chrome/Edge）；粘贴讲义功能不受影响。"; }
 })();
 </script>
