@@ -61,6 +61,23 @@ export class VisitCounter {
 
 // ===== 读者讨论区·每篇文章一个实例（key=cm:<slug>）=====
 // 纪律：只存虚拟名+内容+时间；访客指纹只是当日哈希、仅用于限流且跨天即删，绝不存原始 IP。
+// 与WDS对话（高级会话）专用：各厂商最强档 + DeepSeek 思考模式满功率
+// DeepSeek V4：deepseek-v4-pro（1.6T/49B激活，1M 上下文）＞ flash；thinking:enabled + reasoning_effort:"max" 为最高推理投入档
+// 注意：思考模式下 temperature/top_p/penalty 全部无效，必须不传
+const WDS_TOP_MODEL = { deepseek: "deepseek-v4-pro", zhipu: "glm-5" };
+function wdsTopVC(vd) {
+  const base = WDS_VENDORS[vd];
+  return { url: base.url, model: WDS_TOP_MODEL[vd] || base.model, name: base.name, top: 1 };
+}
+// 给请求体挂上思考模式（仅 DeepSeek 且处于最强档时）
+function wdsTopBody(VC, body) {
+  if (VC && VC.top && String(VC.url).indexOf("api.deepseek.com") >= 0) {
+    body.thinking = { type: "enabled" };
+    body.reasoning_effort = "max";
+    delete body.temperature; delete body.top_p;
+  }
+  return body;
+}
 const WDS_VENDORS = {
   deepseek: { url: "https://api.deepseek.com/v1/chat/completions", model: "deepseek-v4-flash", name: "DeepSeek" },
   kimi: { url: "https://api.moonshot.cn/v1/chat/completions", model: "moonshot-v1-8k", name: "Kimi" },
@@ -913,7 +930,7 @@ async function llmText(VC, KEY, sys, usr, maxTok) {
     const resp = await fetch(VC.url, {
       method: "POST",
       headers: { "content-type": "application/json", authorization: "Bearer " + KEY },
-      body: JSON.stringify({ model: VC.model, stream: false, max_tokens: maxTok, messages: [{ role: "system", content: sys }, { role: "user", content: usr }] }),
+      body: JSON.stringify(wdsTopBody(VC, { model: VC.model, stream: false, max_tokens: maxTok, messages: [{ role: "system", content: sys }, { role: "user", content: usr }] })),
     });
     if (!resp.ok) return "";
     const j = await resp.json();
@@ -1419,7 +1436,7 @@ export default {
       const userKey = String(b.key || "").trim();
       if (userKey.length < 8) return J({ ok: false, code: "need_key", msg: "开工学习也用你自己的 API Key 运行（在 ⚙ 里填入，只存你的浏览器本地）。" }, 400);
       const vd = b.vendor === "ds" ? "deepseek" : "zhipu";
-      const VC = { url: WDS_VENDORS[vd].url, model: WDS_VENDORS[vd].model, name: WDS_VENDORS[vd].name };
+      const VC = wdsTopVC(vd);   // 开工学内功＝最费脑的一步，直接最强档
       const ip = request.headers.get("cf-connecting-ip") || "unknown";
       try {
         const lim = env.ASK_LIMITER.get(env.ASK_LIMITER.idFromName("byok:" + ip));
@@ -1433,7 +1450,7 @@ export default {
         const resp = await fetch(VC.url, {
           method: "POST",
           headers: { "content-type": "application/json", authorization: "Bearer " + userKey },
-          body: JSON.stringify({ model: VC.model, stream: false, max_tokens: 10000, messages: [{ role: "system", content: neigong }, { role: "user", content: DIALOGUE_REFLECT_PROMPT }] }),
+          body: JSON.stringify(wdsTopBody(VC, { model: VC.model, stream: false, max_tokens: 24000, messages: [{ role: "system", content: neigong }, { role: "user", content: DIALOGUE_REFLECT_PROMPT }] })),
         });
         if (!resp.ok) {
           if (resp.status === 401 || resp.status === 402 || resp.status === 429) return J({ ok: false, code: "bad_key", msg: "你的 Key 用不了（" + resp.status + "）：额度不足或填错了。去 ⚙ 里检查或换一个。" }, 400);
@@ -1458,7 +1475,7 @@ export default {
       const userKey = String(b.key || "").trim();
       if (userKey.length < 8) return J({ ok: false, code: "need_key", msg: "这一步也用你自己的 API Key 运行（在 ⚙ 里填入，只存你的浏览器本地）。" }, 400);
       const vd = b.vendor === "ds" ? "deepseek" : "zhipu";
-      const VC = { url: WDS_VENDORS[vd].url, model: WDS_VENDORS[vd].model, name: WDS_VENDORS[vd].name };
+      const VC = b.guide ? wdsTopVC(vd) : { url: WDS_VENDORS[vd].url, model: WDS_VENDORS[vd].model, name: WDS_VENDORS[vd].name };
       const KEY = userKey, rvendor = ({ zhipu: "glm", deepseek: "ds" })[vd] || vd;
       const ip = request.headers.get("cf-connecting-ip") || "unknown";
       try {
@@ -1547,7 +1564,8 @@ export default {
       const userKey = String(b.key || "").trim();
       if (userKey.length < 8) return _sseResp([{ t: "error", v: "WDS 助手用你自己的 API Key 运行（在设置里填入，只存在你的浏览器本地，与本站无关）。", code: "need_key" }]);
       const vd = b.vendor === "ds" ? "deepseek" : "zhipu";
-      const VC = { url: WDS_VENDORS[vd].url, model: WDS_VENDORS[vd].model, name: WDS_VENDORS[vd].name };
+      // 与WDS对话（guide）走最强档：DeepSeek v4-pro + 思考模式 max；陪读维持轻档保响应速度
+      const VC = b.guide ? wdsTopVC(vd) : { url: WDS_VENDORS[vd].url, model: WDS_VENDORS[vd].model, name: WDS_VENDORS[vd].name };
       const KEY = userKey, rvendor = ({ zhipu: "glm", deepseek: "ds" })[vd] || vd;
       // 限流（系统额度与自带 Key 各用独立配额桶，不互挤）
       const ip = request.headers.get("cf-connecting-ip") || "unknown";
@@ -1593,7 +1611,7 @@ export default {
       messages.push({ role: "user", content: focus ? ("我正读到这一句：「" + focus + "」\n\n我的问题：" + q) : q });
       let upstream;
       try {
-        upstream = await fetch(VC.url, { method: "POST", headers: { "content-type": "application/json", authorization: "Bearer " + KEY }, body: JSON.stringify({ model: VC.model, stream: true, max_tokens: 2200, messages }) });
+        upstream = await fetch(VC.url, { method: "POST", headers: { "content-type": "application/json", authorization: "Bearer " + KEY }, body: JSON.stringify(wdsTopBody(VC, { model: VC.model, stream: true, max_tokens: b.guide ? 8000 : 2200, messages })) });
       } catch (e) {
         return _sseResp([{ t: "error", v: "接不上基底：" + (e && e.message) }]);
       }

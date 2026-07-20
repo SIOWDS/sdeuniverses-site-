@@ -19,6 +19,14 @@ ok("guide 全站检索加强档在位（K=36+接续+3万上限+来源回传）",
   W.includes("retrieve(corpus, q, 36, expTerms)") && W.includes("siteCtx.length > 30000") && W.includes('{ t: "sources", v: siteSrcs }'));
 ok("万字论文分部亦带站内资料（GD 检索 K=12 / 8000 上限）",
   W.includes("retrieve(corpus, pq, 12, [])") && W.includes("partCtx.length > 8000"));
+ok("最强档模型钉在 v4-pro / glm-5",
+  W.includes('const WDS_TOP_MODEL = { deepseek: "deepseek-v4-pro", zhipu: "glm-5" }'));
+ok("思考模式满功率（thinking enabled + reasoning_effort max + 去 temperature）",
+  W.includes('body.thinking = { type: "enabled" }') && W.includes('body.reasoning_effort = "max"') && W.includes("delete body.temperature"));
+ok("三条对话链路都走最强档（开工/对话guide/成文guide）",
+  W.includes("const VC = wdsTopVC(vd);") && W.includes('const VC = b.guide ? wdsTopVC(vd) : { url: WDS_VENDORS[vd].url')
+  && (W.split("b.guide ? wdsTopVC(vd)").length - 1) === 2);
+ok("陪读不被波及（非 guide 仍走 WDS_VENDORS 默认档）", W.includes("wdsTopBody(VC, { model: VC.model, stream: true, max_tokens: b.guide ? 8000 : 2200"));
 ok("worker paperN 3-6 在位", W.includes("Math.max(3, Math.min(6, parseInt(b.paperN, 10) || 3))") && W.includes("j.parts.slice(0, PN)"));
 ok("worker 开工路由 dialogue-reflect 在位", W.includes('url.pathname === "/api/wds/dialogue-reflect"') && W.includes("DIALOGUE_REFLECT_PROMPT"));
 ok("read/read-paper 优先吃本场心得 b.reflect", W.split("slice(0, 14000)").length === 3);
