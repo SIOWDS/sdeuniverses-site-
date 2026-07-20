@@ -926,13 +926,14 @@ async function llmText(VC, KEY, sys, usr, maxTok) {
 const WDS_PER_DAY = 100, WDS_PER_MIN = 12;
 const WDS_MAX_TURNS = 100;          // 最多记 100 轮
 const WDS_HIST_BUDGET = 60000;      // 送进基底的历史字数预算（约 4 万 token，超出从最旧处裁）
+const WDS_GUIDE_HIST_BUDGET = 300000; // 与WDS对话（高级会话）：全面记忆——每答携带全部对话原文；仅在逼近基底上下文物理上限时才从最旧处裁
 // 把整场对话打包成 messages：默认全带上；仅当超预算时从最旧处裁，并留一条说明保住连贯性。
-function packReadHistory(history, budget) {
+function packReadHistory(history, budget, perMsg) {
   const arr = (Array.isArray(history) ? history : []).slice(-WDS_MAX_TURNS * 2);
   const msgs = [];
   for (const m of arr) {
     const role = (m && m.role === "wds") ? "assistant" : "user";
-    const content = String((m && m.text) || "").slice(0, 3000);
+    const content = String((m && m.text) || "").slice(0, perMsg || 3000);
     if (content) msgs.push({ role, content });
   }
   let total = 0;
@@ -1465,7 +1466,7 @@ export default {
         const lr = await (await lim.fetch(new Request("https://limiter.internal/?w=" + WDS_PER_MIN + "&d=" + WDS_PER_DAY))).json();
         if (!lr.ok) return J({ ok: false, msg: lr.reason === "day" ? ("今天这台机器的 " + WDS_PER_DAY + " 次额度用完了，明天再来。") : "太快啦，过十几秒再试。" }, 429);
       } catch (e) {}
-      const convo = readConvoText(b.history, 24000);
+      const convo = readConvoText(b.history, b.guide ? 100000 : 24000);   // 与WDS对话：总结/成文也吃全场原文
       if (convo.length < 120) return J({ ok: false, msg: "先和 WDS 多聊几轮，聊出东西来了再总结成文。" }, 400);
       const PN = Math.max(3, Math.min(6, parseInt(b.paperN, 10) || 3));   // 论文部分数：3=约5000字（陪读默认），6=约一万字（与WDS对话）
       const GD = !!b.guide;                                                // 与WDS对话（问对WDS）场景
@@ -1536,7 +1537,7 @@ export default {
       if (request.method === "OPTIONS") return new Response(null, { headers: _cors() });
       if (request.method !== "POST") return new Response("Method Not Allowed", { status: 405 });
       let b = {}; try { b = await request.json(); } catch (e) {}
-      const q = String(b.q || "").trim().slice(0, 500);
+      const q = String(b.q || "").trim().slice(0, b.guide ? 4000 : 500);   // 与WDS对话：长问不截
       if (q.length < 1) return _sseResp([{ t: "error", v: "问点什么吧。" }]);
       const docTitle = String(b.docTitle || "").replace(/[\u0000-\u001f]/g, "").slice(0, 200);
       const docText = String(b.docText || "").slice(0, 100000);  // 整篇正文（站内最长文章约3.8万汉字全量容纳；专著级PDF取前10万字符；放 system 末尾便于基底前缀缓存）
@@ -1586,8 +1587,9 @@ export default {
       }
       const sys = b.guide ? WDS_DIALOGUE_SYS(reflect, SDEM, siteCtx) : WDS_READ_SYS(reflect, SDEM, docTitle, docText);
       // 历史预算随正文/站内资料篇幅收缩：合计钳在 ~12万字符内，防超长文+百轮对话挤爆基底上下文
-      const histBudget = Math.min(WDS_HIST_BUDGET, Math.max(20000, 120000 - docText.length - siteCtx.length));
-      const messages = [{ role: "system", content: sys }, ...packReadHistory(history, histBudget)];
+      // 陪读：正文+历史 ~12万字符收缩；与WDS对话（guide）：全面记忆——30万字符预算+单条1.2万，正常百轮全量不裁（RAG 的 siteCtx 已计入物理护栏）
+      const histBudget = b.guide ? WDS_GUIDE_HIST_BUDGET : Math.min(WDS_HIST_BUDGET, Math.max(20000, 120000 - docText.length - siteCtx.length));
+      const messages = [{ role: "system", content: sys }, ...packReadHistory(history, histBudget, b.guide ? 12000 : 0)];
       messages.push({ role: "user", content: focus ? ("我正读到这一句：「" + focus + "」\n\n我的问题：" + q) : q });
       let upstream;
       try {

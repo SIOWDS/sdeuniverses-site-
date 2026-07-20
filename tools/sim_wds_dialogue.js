@@ -23,6 +23,20 @@ ok("worker paperN 3-6 在位", W.includes("Math.max(3, Math.min(6, parseInt(b.pa
 ok("worker 开工路由 dialogue-reflect 在位", W.includes('url.pathname === "/api/wds/dialogue-reflect"') && W.includes("DIALOGUE_REFLECT_PROMPT"));
 ok("read/read-paper 优先吃本场心得 b.reflect", W.split("slice(0, 14000)").length === 3);
 ok("方法论指引起手三选一", W.includes("起手按问题种类三选一"));
+ok("全面记忆预算在位（guide 30万+单条1.2万+长问4000+成文10万）",
+  W.includes("WDS_GUIDE_HIST_BUDGET = 300000") && W.includes("b.guide ? WDS_GUIDE_HIST_BUDGET :")
+  && W.includes("histBudget, b.guide ? 12000 : 0") && W.includes("b.guide ? 4000 : 500") && W.includes("b.guide ? 100000 : 24000"));
+// 功能级：抽出 packReadHistory 实测——guide 预算下 100 轮×2400 字符全量不裁、单条 1.2 万不截
+(function () {
+  const m = W.match(/function packReadHistory[\s\S]*?\n}\n/);
+  const fn = new Function("WDS_MAX_TURNS", "WDS_HIST_BUDGET", "return " + m[0].replace(/^function packReadHistory/, "function"))(100, 60000);
+  const hist = [];
+  for (let i = 0; i < 100; i++) { hist.push({ role: "reader", text: "问".repeat(400) }); hist.push({ role: "wds", text: "答".repeat(2000) }); }
+  const packed = fn(hist, 300000, 12000);
+  ok("100 轮×2400字符 全量带上不裁", packed.length === 200 && !/省略/.test(packed[0].content), "实得 " + packed.length + " 条");
+  const one = fn([{ role: "reader", text: "长".repeat(11000) }], 300000, 12000);
+  ok("单条 1.2 万内不截", one[0].content.length === 11000, "实得 " + one[0].content.length);
+})();
 
 // ---------- DOM 桩 ----------
 function mkEl(tag) {
