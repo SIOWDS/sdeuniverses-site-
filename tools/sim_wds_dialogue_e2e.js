@@ -157,7 +157,7 @@ function collect(root, selRaw, out) {
 }
 
 const body = mkEl("body");
-for (const [id, tag] of Object.entries({ msgs: "div", q: "textarea", go: "button", turns: "span", bsum: "button", bpap: "button", bkey: "button", gtog: "button", guide: "aside", bart: "button", artchip: "span" })) {
+for (const [id, tag] of Object.entries({ msgs: "div", q: "textarea", go: "button", turns: "span", bsum: "button", bpap: "button", bkey: "button", gtog: "button", guide: "aside", bart: "button", artchip: "span", bclr: "button" })) {
   const e = mkEl(tag); e.id = id; body.appendChild(e);
 }
 const LS = { _d: {}, getItem(k) { return this._d[k] || null; }, setItem(k, v) { this._d[k] = String(v); } };

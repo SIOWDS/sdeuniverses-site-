@@ -98,7 +98,7 @@ function collect(root, selRaw, out) {
 
 const body = mkEl("body");
 // 页面骨架里脚本会 $ 的节点
-const ids = { msgs: "div", q: "textarea", go: "button", turns: "span", bsum: "button", bpap: "button", bkey: "button", gtog: "button", guide: "aside", bart: "button", artchip: "span" };
+const ids = { msgs: "div", q: "textarea", go: "button", turns: "span", bsum: "button", bpap: "button", bkey: "button", gtog: "button", guide: "aside", bart: "button", artchip: "span", bclr: "button" };
 for (const [id, tag] of Object.entries(ids)) { const e = mkEl(tag); e.id = id; body.appendChild(e); }
 
 global.document = {
@@ -175,6 +175,9 @@ console.log("[输入文章·行为]");
   ok("载入后顶栏显示文章标记", chip.hidden === false);
   ok("超 10 万字符自动截断到 10 万", /100000\u5b57/.test(chip.children.map(c => c.textContent || "").join("")), chip.children.map(c => c.textContent || "").join(""));
 })();
+
+ok("页面: 顶栏有清空对话按钮且只清对话不清心得/文章",
+  PAGE.includes('id="bclr"') && PAGE.includes("function clearChat()") && PAGE.includes("history = [];") && !/clearChat[\s\S]{0,400}xinde = ""/.test(PAGE));
 
 console.log("[独立界面行为]");
 const qEl = findIn(body, "#q"), goEl = findIn(body, "#go"), papB = findIn(body, "#bpap"), turnsEl = findIn(body, "#turns");

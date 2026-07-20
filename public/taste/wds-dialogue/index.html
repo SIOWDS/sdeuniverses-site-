@@ -108,6 +108,7 @@
     <a class="brand" href="/taste/wds-dialogue/"><b>与<i>WDS</i>对话</b><span>问对WDS · 智能体免费区</span></a>
     <button class="tbtn gtog" id="gtog">方法论</button>
     <button class="tbtn" id="bart">＋ 输入文章</button>
+    <button class="tbtn" id="bclr" title="清空对话栏（本场心得与已载入的文章保留）">清空对话</button>
     <span class="artchip" id="artchip" hidden></span>
     <span class="turns" id="turns">剩余 100 次</span>
     <button class="tbtn" id="bsum" disabled>总结这场对话</button>
@@ -157,6 +158,7 @@
   function $(s, r) { return (r || document).querySelector(s); }
   function el(t, c, x) { var e = document.createElement(t); if (c) e.className = c; if (x != null) e.textContent = x; return e; }
   var msgs = $("#msgs"), qEl = $("#q"), goEl = $("#go"), turnsEl = $("#turns"), sumB = $("#bsum"), papB = $("#bpap");
+  var helloEl = $(".hello", msgs);   // 开场白：清空对话栏后原样放回
   var history = [], streaming = false, busy = false;
 
   // —— Key：本智能体自己的界面与存取；键名沿用全站 BYOK 规范（sde_wds_key/vendor），空则借 sde_ds_key / sde_glm_key ——
@@ -315,6 +317,20 @@
     $("#aok", m).onclick = function () { if (setArticle(tit.value, pas.value, st)) setTimeout(close, 700); };
   }
   if ($("#bart")) $("#bart").onclick = artPanel;
+
+  // —— 清空对话栏：只清聊天记录与轮次，本场心得（开工仪式的成果）与已载入的文章都保留，不必重跑开工 ——
+  function clearChat() {
+    if (streaming || busy) return;
+    if (!window.confirm("\u6e05\u7a7a\u5bf9\u8bdd\u680f\uff1f\u5df2\u8c08\u7684 " + turns() + " \u8f6e\u95ee\u7b54\u5c06\u88ab\u6e05\u6389\u4e14\u4e0d\u53ef\u6062\u590d\uff0c\u8f6e\u6b21\u91cd\u65b0\u8ba1\u3002\n\n\u672c\u573a\u5fc3\u5f97\u4e0e\u5df2\u8f7d\u5165\u7684\u6587\u7ae0\u4f1a\u4fdd\u7559\uff0c\u4e0d\u7528\u91cd\u8dd1\u5f00\u5de5\u4eea\u5f0f\u3002")) return;
+    history = [];
+    msgs.innerHTML = "";
+    if (helloEl) msgs.appendChild(helloEl);
+    qEl.disabled = false; goEl.disabled = false;
+    qEl.placeholder = "\u5411 WDS \u53d1\u95ee\u2026\u2026\uff08Enter \u53d1\u9001\uff0cShift+Enter \u6362\u884c\uff09";
+    paint();
+    qEl.focus();
+  }
+  if ($("#bclr")) $("#bclr").onclick = clearChat;
 
   // —— 状态 ——
   function turns() { var n = 0; for (var i = 0; i < history.length; i++) if (history[i].role === "reader") n++; return n; }
