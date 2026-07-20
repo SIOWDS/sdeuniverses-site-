@@ -871,11 +871,18 @@ async function loadNeigong(env, url) {
 }
 const REFLECT_PROMPT = "请用你自己的话，写一篇《从发现到发生》的内化心得（约 5000 字，要写透、写充分）：不要复述方法条目，而是把“追问任何事物是如何发生的（而不是如何被发现的）”这套思维方式，用你自己的理解完整内化一遍；并诚实检视你平时回答问题的默认惯性（例如急于给结论、罗列要点、停在表层描述、把现成关系当起点），说明用这套“发生”的眼光重新看，你该在哪里改变。这篇心得只写给你自己看，写完你就完成了一次自我提智。切记：全文用平实现代汉语，绝不出现“显露/差异/纠缠/发生学/SDE”等任何术语标签。";
 // 第一次提智：让基底带着完整内功、亲手写心得；按基底缓存，只写一次，之后所有深度提问复用
+// 心得三级调用：①isolate 内存（零往返，10 分钟）②vault 持久存储（一次生成全站永久共用）③按需生成并回存。
+// 生成失败负缓存 60 秒：防止 vault 为空时每条消息都烧一遍完整内功的生成调用。
+let REFLECT_MEM = {}; // vendor -> { text, exp }
+const REFLECT_MEM_TTL = 10 * 60 * 1000, REFLECT_FAIL_TTL = 60 * 1000;
 async function ensureReflect(env, url, vendor, VC, KEY) {
+  const now = Date.now();
+  const mem = REFLECT_MEM[vendor];
+  if (mem && now < mem.exp) return mem.text;
   try {
     const cv = env.CONFIG_VAULT.get(env.CONFIG_VAULT.idFromName("global"));
     const r = await (await cv.fetch(new Request("https://cfg.internal/", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ op: "getReflect", vendor }) }))).json();
-    if (r.reflect && r.reflect.length > 500) return r.reflect;
+    if (r.reflect && r.reflect.length > 500) { REFLECT_MEM[vendor] = { text: r.reflect, exp: now + REFLECT_MEM_TTL }; return r.reflect; }
   } catch (e) {}
   const neigong = await loadNeigong(env, url);
   if (!neigong) return "";
@@ -893,6 +900,9 @@ async function ensureReflect(env, url, vendor, VC, KEY) {
       const cv = env.CONFIG_VAULT.get(env.CONFIG_VAULT.idFromName("global"));
       await cv.fetch(new Request("https://cfg.internal/", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ op: "setReflect", vendor, reflect: text }) }));
     } catch (e) {}
+    REFLECT_MEM[vendor] = { text, exp: Date.now() + REFLECT_MEM_TTL };
+  } else {
+    REFLECT_MEM[vendor] = { text: "", exp: Date.now() + REFLECT_FAIL_TTL }; // 负缓存：60 秒内不再重试生成
   }
   return text;
 }
