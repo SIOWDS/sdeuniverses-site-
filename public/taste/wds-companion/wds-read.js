@@ -96,14 +96,14 @@
   var st = el("style"); st.textContent = CSS; document.head.appendChild(st);
 
   // —— DOM ——
-  var fab = el("button", "wdsr-fab"); fab.innerHTML = "<span class='wdsr-dot'></span>问 WDS";
+  var fab = el("button", "wdsr-fab"); fab.innerHTML = "<span class='wdsr-dot'></span>" + (CFG.fabLabel || "问 WDS");
   document.body.appendChild(fab);
 
   var panel = el("div", "wdsr-panel");
   panel.innerHTML =
-    "<div class='wdsr-head'><div class='wdsr-title'><span class='wdsr-dot'></span>WDS 助手</div>" +
-    "<div class='wdsr-sub'>陪你读，不替你读</div><button class='wdsr-keybtn' title='设置 API Key' style='position:absolute;right:44px;top:15px;background:none;border:none;color:#7C8798;font-size:15px;cursor:pointer;padding:0'>⚙</button><button class='wdsr-close' aria-label='关闭'>\u00d7</button></div>" +
-    "<div class='wdsr-tools'><button class='wdsr-tool wdsr-sum' disabled>\u603b\u7ed3\u8fd9\u573a\u5bf9\u8bdd</button><button class='wdsr-tool wdsr-pap' disabled>\u751f\u6210 5000 \u5b57\u8bba\u6587</button></div>" +
+    "<div class='wdsr-head'><div class='wdsr-title'><span class='wdsr-dot'></span>" + (CFG.panelTitle || "WDS 助手") + "</div>" +
+    "<div class='wdsr-sub'>" + (CFG.subLabel || "陪你读，不替你读") + "</div>" + "<button class='wdsr-keybtn' title='设置 API Key' style='position:absolute;right:44px;top:15px;background:none;border:none;color:#7C8798;font-size:15px;cursor:pointer;padding:0'>⚙</button><button class='wdsr-close' aria-label='关闭'>\u00d7</button></div>" +
+    "<div class='wdsr-tools'><button class='wdsr-tool wdsr-sum' disabled>\u603b\u7ed3\u8fd9\u573a\u5bf9\u8bdd</button><button class='wdsr-tool wdsr-pap' disabled>" + (CFG.paperLabel || "\u751f\u6210 5000 \u5b57\u8bba\u6587") + "</button></div>" +
     "<div class='wdsr-msgs'></div>" +
     "<div class='wdsr-focuswrap'></div>" +
     "<div class='wdsr-inputbar'><textarea class='wdsr-input' rows='2' placeholder='问 WDS，或在正文里选一句\u2026'></textarea><button class='wdsr-send'>问</button></div>";
@@ -119,7 +119,8 @@
   function turns() { var n = 0; for (var i = 0; i < history.length; i++) if (history[i].role === "reader") n++; return n; }
   function paintState() {
     var n = turns();
-    subEl.textContent = n ? ("\u966a\u4f60\u8bfb\uff0c\u4e0d\u66ff\u4f60\u8bfb \u00b7 \u5df2\u8c08 " + n + "/" + MAX_TURNS + " \u8f6e") : "\u966a\u4f60\u8bfb\uff0c\u4e0d\u66ff\u4f60\u8bfb";
+    var subBase = CFG.subLabel || "\u966a\u4f60\u8bfb\uff0c\u4e0d\u66ff\u4f60\u8bfb";
+    subEl.textContent = n ? (subBase + " \u00b7 \u5df2\u8c08 " + n + "/" + MAX_TURNS + " \u8f6e") : subBase;
     var ready = n >= 2 && !busy && !streaming;
     sumBtn.disabled = !ready; papBtn.disabled = !ready;
     if (n >= MAX_TURNS) { inputEl.disabled = true; sendEl.disabled = true; inputEl.placeholder = "\u8fd9\u573a\u5df2\u8c08\u6ee1 100 \u8f6e\u2014\u2014\u53ef\u4ee5\u603b\u7ed3\u6216\u6210\u6587\u4e86\u3002"; }
@@ -128,6 +129,7 @@
   function openPanel() { panel.classList.add("wdsr-open"); fab.style.display = "none"; setTimeout(function () { inputEl.focus(); }, 60); }
   function closePanel() { panel.classList.remove("wdsr-open"); fab.style.display = ""; }
   fab.onclick = openPanel; q1(".wdsr-close", panel).onclick = closePanel;
+  if (CFG.auto) { setTimeout(openPanel, 250); }
   q1(".wdsr-keybtn", panel).onclick = function () { wdsKeyPanel(function () {}); };
 
   function addMsg(role, text, focus) {
@@ -208,6 +210,7 @@
 
     var payload = { q: q, docTitle: docTitle(), docText: docText(), focus: seg, history: history, key: kv.key, vendor: kv.vendor };
     if (CFG.room) payload.room = CFG.room;
+    if (CFG.guide) payload.guide = 1;
 
     fetch(API, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(payload) })
       .then(function (resp) {
@@ -248,6 +251,8 @@
   var PAPER_API = CFG.paperApi || "/api/wds/read-paper";
 
   function post(body) {
+    if (CFG.guide) body.guide = 1;
+    if (CFG.paperN) body.paperN = CFG.paperN;
     return fetch(PAPER_API, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) })
       .then(function (r) { return r.json().catch(function () { return { ok: false, msg: "HTTP " + r.status }; }); });
   }
@@ -293,7 +298,7 @@
       if (line.length <= 28 && !/[。！？；：.!?]$/.test(line)) html += "<h2>" + esc(line) + "</h2>";
       else html += "<p>" + esc(line) + "</p>";
     }
-    var meta = (kind === "paper" ? "\u672c\u6587\u7531 WDS \u52a9\u624b\u4f9d\u636e\u4e00\u573a\u966a\u8bfb\u5bf9\u8bdd\u63d0\u70bc\u800c\u6210" : "WDS \u52a9\u624b \u00b7 \u966a\u8bfb\u5bf9\u8bdd\u603b\u7ed3")
+    var meta = (kind === "paper" ? (CFG.paperMeta || "\u672c\u6587\u7531 WDS \u52a9\u624b\u4f9d\u636e\u4e00\u573a\u966a\u8bfb\u5bf9\u8bdd\u63d0\u70bc\u800c\u6210") : (CFG.sumMeta || "WDS \u52a9\u624b \u00b7 \u966a\u8bfb\u5bf9\u8bdd\u603b\u7ed3"))
       + " \u00b7 \u6240\u8bfb\u6587\u672c\u300a" + esc(docTitle()) + "\u300b \u00b7 " + new Date().toLocaleDateString("zh-CN");
     w.document.write("<!doctype html><html lang='zh-CN'><head><meta charset='utf-8'><title>" + esc(title) + "</title><style>"
       + "@page{size:A4;margin:22mm 20mm}"
@@ -335,7 +340,7 @@
     var kv = needKey(function (k) { if (k) papBtn.onclick(); }); if (!kv) return;
     busy = true; paintState();
     var dm = docModal("\u6b63\u5728\u63d0\u70bc\u8bba\u6587\u2026", "", "paper");
-    dm.setProg("\u7b2c 1 \u6b65 / \u5171 4 \u6b65\uff1a\u62df\u9898\u4e0e\u63d0\u7eb2\u2026");
+    dm.setProg("\u7b2c 1 \u6b65\uff1a\u62df\u9898\u4e0e\u63d0\u7eb2\u2026");
     var out = "", prev = "", i = 0;
     post({ mode: "plan", history: history, docTitle: docTitle(), docText: docText(), key: kv.key, vendor: kv.vendor }).then(function (pl) {
       if (!pl.ok) throw new Error(pl.msg || "\u63d0\u7eb2\u5931\u8d25");
@@ -345,7 +350,7 @@
           busy = false; paintState(); dm.setProg("\u5171 " + out.replace(/\s/g, "").length + " \u5b57");
           return;
         }
-        dm.setProg("\u7b2c " + (i + 2) + " \u6b65 / \u5171 4 \u6b65\uff1a\u6b63\u5728\u5199\u3010" + pl.parts[i].h + "\u3011\u2026");
+        dm.setProg("\u7b2c " + (i + 2) + " \u6b65 / \u5171 " + (pl.parts.length + 1) + " \u6b65\uff1a\u6b63\u5728\u5199\u3010" + pl.parts[i].h + "\u3011\u2026");
         return post({ mode: "part", idx: i, title: pl.title, points: pl.points, parts: pl.parts, convo: pl.convo, prevBrief: prev.slice(-1200), key: kv.key, vendor: kv.vendor, history: history })
           .then(function (r) {
             if (!r.ok) throw new Error(r.msg || "\u5206\u8282\u751f\u6210\u5931\u8d25");

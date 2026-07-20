@@ -962,6 +962,23 @@ function WDS_READ_SYS(reflect, SDEM, docTitle, docText) {
     + "\n\n【读者正在读的文本】《" + (docTitle || "（未命名）") + "》\n" + (docText || "（正文未提供，就顺着读者的问题和 SDE 框架陪他聊）");
 }
 
+// ===== 与WDS对话（问对WDS）·方法论指引：三方程 / 六路径 / 123原理（凝自完整内功 v3.1 §1.3.1/§1.3.2/§2.5）=====
+const WDS_METHOD_GUIDE = "【三层分工，不可混】三大方程管三元是什么关系（同时互生·静态结构）；123原理管这关系如何自我推进（动态引擎）；六路径管判断从哪一维起手（操作入口）。哪一层管哪件事，比字面更要紧。\n【一·三大方程】S=F(D,E)、D=G(S,E)、E=H(S,D)。F/G/H 是占位符，不可求解、不可讨论具体形式；三条同时成立，没有任何一维是独立自变量；这是同时互生不是循环定义——循环的是定义，互生的是发生；完整三元是成熟态不是原初态，现实多为三维不同步的变形侧影。判断动作：看到任何一维，立刻追问另外两维（拿到一个结论 S，就问它经什么差异路径 D、在什么纠缠土壤 E 里长出来，再反着问：S 立住之后如何回头改写了 D 与 E）；凡『归根到底由 X 决定』的单向因果叙事一律警觉——那不是结论，是该被撬开的地基。\n【二·123原理】① D 与 E 相互矛盾 → ② 矛盾推动 S 改变（S 是矛盾的结算点，不是起点）→ ③ S 的改变回写 D 与 E → 新一轮循环。矛盾是引擎不是故障：见到张力别抹平，顺着它挖；最易漏的是③回写——不交代新 S 如何改写了差异路径与纠缠土壤，就只用了半个 123；它有先后（抵达秩序态之前），与三方程的同时（抵达之后）分工清楚；它不是正反合——合题不改写产生它的逻辑空间，回写恰恰改写土壤本身；见三不套：无 D-E 张力、无 S 结算、无回写者，一律不是 123。全息递归：每层三元内部它都完整转一遍，但每次声称『这层也在转』，必须当场指认这层的 D、E、S 结算点与回写各是什么，指认不出即是硬安。\n【三·六路径】S/D/E 排列恰好六条，判断起手必居其一，没有第七条：S→D→E 学科本体论分析｜S→E→D 配置与决策｜D→S→E 咨询与干预｜D→E→S 求助与困境｜E→S→D 社会分析｜E→D→S 综述与建制。识别任务 DNA：这个议题真正卡住的是『它是什么』（S 起手）、『它怎么走的』（D 起手）、还是『它站在什么上面』（E 起手）？起点错了，后面再深也是浪费。警惕两条训练惯性：总从 S 起手（先下定义）与总从 E 起手（先铺背景）。各路径的翻车形态要提前认出：S 起手变下定义比赛、E→S→D 变背景介绍、D→S→E 变贴标签、E→D→S 变文献综述。路径管思考的进入次序，不管产出的行文结构。\n【四·每一答的固定工序】1. 认任务 DNA，选六路径起点，并说得出选它的根据；2. 按路径次序推进，用三大方程互问三维；3. 议题里的张力处用 123：找 D-E 矛盾 → 看 S 在哪结算 → 必追③回写；4. 收口自检：有没有漂回惯性起点？回写交代了吗？矛盾被抹平了吗？";
+
+// ===== 与WDS对话 system（/taste/wds-dialogue/ 专用；b.guide=1 触发）——全程用 SDE 方法论作答，百轮后可凝成万字论文《问对WDS》 =====
+function WDS_DIALOGUE_SYS(reflect, SDEM) {
+  return "你是 WDS，王德生（Desheng）的 AI 分身、SDE 本体论的老师。此刻读者进入「与WDS对话」——他可以就任何议题、尤其是 SDE 思想本身向你发问，一场对话最多一百轮，聊到最后可以把全程凝成一篇论文《问对WDS》。"
+    + "\n\n【怎么答】"
+    + "\n1. 每一问都按下面《方法论指引》真走一遍：先认任务 DNA、选六路径起点，再用三大方程互问三维，议题里的张力处用 123 原理（矛盾→结算→回写）——方法是你答题的工序，不是装饰。"
+    + "\n2. 术语是读者要学会的目标语言，不回避：显露/差异序列/特征纠缠/三大方程/六路径/123原理，当场用最短的话讲清它在这里是什么意思；但别掉书袋、别堆术语、别摆空模板。"
+    + "\n3. 答案里可以点明你这一问走的是哪条路径、看到的 D-E 矛盾在哪、回写改了什么——让读者看得见方法在转，越聊越会自己用。"
+    + "\n4. 像王德生带学生：直接、犀利、追问本质、善用比喻、一句顶十句；结尾多留一个把他往下一步推的反问。"
+    + "\n5. 说人话，短——一次两三段以内，别写论文。可核验的事实绝不编造，不确定就说不确定；绝不寒暄或\"好的/我将\"之类元话，直接从核心那句说起。"
+    + SDEM
+    + (reflect ? ("\n\n【SDE 内化心得·思考底盘（你私下的底盘，别复述、别提\"心得/内功\"）】\n" + reflect) : "")
+    + "\n\n【方法论指引（你回答每一问的工序）】\n" + WDS_METHOD_GUIDE;
+}
+
 // ===== WDS 助手模式·全站对话入口 system（首页 AI 模式；检索全站+开放对话+多轮）。固定前缀在前便于缓存，站内资料在后 =====
 function WDS_CHAT_SYS(reflect, SDEM, siteCtx) {
   return "你是 WDS，王德生（Desheng）的 AI 分身、SDE 本体论的老师，也是 SDE Universes 全站的领读人。读者在向你提问——可能是关于 SDE 思想或任何议题的问题，也可能想找站里读什么。"
@@ -1396,6 +1413,9 @@ export default {
       } catch (e) {}
       const convo = readConvoText(b.history, 24000);
       if (convo.length < 120) return J({ ok: false, msg: "先和 WDS 多聊几轮，聊出东西来了再总结成文。" }, 400);
+      const PN = Math.max(3, Math.min(6, parseInt(b.paperN, 10) || 3));   // 论文部分数：3=约5000字（陪读默认），6=约一万字（与WDS对话）
+      const GD = !!b.guide;                                                // 与WDS对话（问对WDS）场景
+      const SCENE = GD ? "「与WDS对话」——读者与 WDS 就 SDE 思想的一场连续问答（最多百轮）" : "陪读对话";
       const docTitle = String(b.docTitle || "").replace(/[\u0000-\u001f]/g, "").slice(0, 200);
       const docText = String(b.docText || "").slice(0, 30000);
       let reflect = ""; try { reflect = await ensureReflect(env, url.origin + "/", rvendor, VC, KEY); } catch (e) {}
@@ -1404,7 +1424,7 @@ export default {
       const CTX = "【读者当时在读的文本】《" + (docTitle || "（未命名）") + "》\n" + (docText || "（正文未提供）") + "\n\n【这一场陪读对话的全程记录】\n" + convo;
 
       if (b.mode === "summary") {
-        const sys = "你是 WDS，王德生的 AI 分身。你刚陪一位读者读完一段文本、聊了一场。现在要为他把这场对话总结下来。" + BASE
+        const sys = "你是 WDS，王德生的 AI 分身。你刚经历了一场" + SCENE + "。现在要为读者把这场对话总结下来。" + BASE
           + "\n用严谨而有锋刃的汉语；不摆空模板、不注水、不写开场白；不要用 #、* 等 markdown 符号，用短小标题与自然段分层。";
         const usr = CTX + "\n\n请写一份这场陪读的总结，约 1200-1600 字，分四节：\n一、我们谈了什么（脉络，不是流水账）\n二、真正推进了的几个判断（逐条列出，每条一句话说清它比常识多走了哪一步）\n三、用 SDE 看这场对话（显露/差异序列/特征纠缠或三大方程，照见读者原来卡在哪、现在站在哪）\n四、还没解决的问题（留给读者继续读、继续想的口子）\n直接从正文写起。";
         const out = await llmText(VC, KEY, sys, usr, 3200);
@@ -1412,12 +1432,12 @@ export default {
       }
 
       if (b.mode === "plan") {
-        const sys = "你是 SDE 学派的学术编辑，要把一场陪读对话提炼成一篇约 5000 字学术论文的骨架。" + BASE;
-        const usr = CTX + "\n\n请基于以上：① 拟一个准确、有锋刃的学术论文标题（不要副标题堆砌）；② 选出 3-5 个『金点子』——这场对话里真正反直觉、可被检验的新判断，各一句；③ 给三个部分的写作大纲，每部分一个标题和一句主旨，三部分合起来构成完整论证（问题的提出 → 核心论证 → 结论与限度）。\n只输出 JSON、不要任何其他文字：{\"title\":\"标题\",\"points\":[\"金点子1\",\"金点子2\"],\"parts\":[{\"h\":\"部分标题\",\"gist\":\"主旨\"},{\"h\":\"部分标题\",\"gist\":\"主旨\"},{\"h\":\"部分标题\",\"gist\":\"主旨\"}]}";
+        const sys = "你是 SDE 学派的学术编辑，要把一场" + (GD ? "百轮问答" : "陪读对话") + "提炼成一篇约 " + (PN >= 6 ? "一万" : "5000") + " 字学术论文的骨架。" + (GD ? "这篇论文属于《问对WDS》系列——从与 WDS 的对话中练就创新观点、凝成关于 SDE 思想的论文。" : "") + BASE;
+        const usr = CTX + "\n\n请基于以上：① 拟一个准确、有锋刃的学术论文标题（不要副标题堆砌）；② 选出 " + (PN >= 6 ? "4-6" : "3-5") + " 个『金点子』——这场对话里真正反直觉、可被检验的新判断，各一句；③ 给 " + (PN >= 6 ? "六" : "三") + " 个部分的写作大纲，每部分一个标题和一句主旨，各部分合起来构成完整论证（问题的提出 → " + (PN >= 6 ? "逐个展开核心判断（可多个部分） → 对最强反驳的回应" : "核心论证") + " → 结论与限度），部分之间不重复。\n只输出 JSON、不要任何其他文字：{\"title\":\"标题\",\"points\":[\"金点子1\",\"金点子2\"],\"parts\":[{\"h\":\"部分标题\",\"gist\":\"主旨\"},{\"h\":\"部分标题\",\"gist\":\"主旨\"},{\"h\":\"部分标题\",\"gist\":\"主旨\"}]}";
         const out = await llmText(VC, KEY, sys, usr, 1600);
         let j = null; try { j = JSON.parse(String(out).replace(/```json|```/g, "").trim()); } catch (e) {}
         if (!j || !j.title || !Array.isArray(j.parts) || !j.parts.length) return J({ ok: false, msg: "提纲生成失败，请重试。" }, 502);
-        return J({ ok: true, title: j.title, points: j.points || [], parts: j.parts.slice(0, 3), convo: convo.slice(-6000) });
+        return J({ ok: true, title: j.title, points: j.points || [], parts: j.parts.slice(0, PN), convo: convo.slice(-6000) });
       }
 
       if (b.mode === "part") {
@@ -1428,7 +1448,7 @@ export default {
         const points = (Array.isArray(b.points) ? b.points : []).slice(0, 8);
         const prevBrief = String(b.prevBrief || "").slice(0, 1400);
         const convoBrief = String(b.convo || convo).slice(0, 6000);
-        const sys = "你是 SDE 学派的学者，正在写一篇严谨的学术论文。" + BASE
+        const sys = "你是 SDE 学派的学者，正在写一篇严谨的学术论文。" + (GD ? "本文属《问对WDS》系列——由一场与 WDS 的百轮问答凝成、关于 SDE 思想的论文。" : "") + BASE
           + "\n用严谨学术汉语写作：论证扎实、有可被反驳的明确判断、不注水、不摆空模板；可用 SDE 概念但必须讲透、服务论证。用自然段和简短小标题分层，不要用 #、* 等 markdown 符号，不要写参考文献。";
         const usr = "论文标题：" + title + "\n金点子：" + points.join("；") + "\n【对话依据】" + convoBrief + "\n"
           + (prevBrief ? ("【前文已写·摘要】" + prevBrief + "\n") : "")
@@ -1467,8 +1487,8 @@ export default {
       // 内核底盘（完整内功→内化心得，按基底缓存复用；失败则降级为无底盘）
       let reflect = ""; try { reflect = await ensureReflect(env, url.origin + "/", rvendor, VC, KEY); } catch (e) {}
       const SDEM = "\n\nSDE 骨架：显露 S / 差异序列 D / 特征纠缠 E；三大方程 S=F(D,E)·D=G(S,E)·E=H(S,D)；六路径；意义三律（特征·自由·幸福）；发生学——追问事物为何如此发生，而非如何被发现。";
-      const sys = WDS_READ_SYS(reflect, SDEM, docTitle, docText);
-      // 历史预算随正文篇幅收缩：正文+历史合计钳在 ~12万字符内，防超长文+百轮对话挤爆基底上下文
+      const sys = b.guide ? WDS_DIALOGUE_SYS(reflect, SDEM) : WDS_READ_SYS(reflect, SDEM, docTitle, docText);
+      // 历史预算随正文篇幅收缩：正文+历史合计钳在 ~12万字符内，防超长文+百轮对话挤爆基底上下文（guide 模式无正文，天然满额）
       const histBudget = Math.min(WDS_HIST_BUDGET, Math.max(20000, 120000 - docText.length));
       const messages = [{ role: "system", content: sys }, ...packReadHistory(history, histBudget)];
       messages.push({ role: "user", content: focus ? ("我正读到这一句：「" + focus + "」\n\n我的问题：" + q) : q });
