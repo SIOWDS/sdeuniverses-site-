@@ -1,7 +1,6 @@
-/* WDS 助手模式 —— 首页 AI 对话入口（类似 Google「AI 模式」）。
- * 在首页引入本脚本即可：<script src="/wds-mode.js" defer></script>
- * 自动在导航里加「✦ WDS 助手」切换、注入全屏对话层；读者可在常规浏览与 WDS 对话间切换。
- * 后端 /api/wds/chat：全站检索 + SDE 内核 + 王德生人格 + 多轮 + 出处；Key 锁服务端，读者无需自带。 */
+/* WDS 助手 —— 全站问答。独立界面在 /taste/wds-chat/（页内置 window.WDSM_PAGE=1 后引入本脚本）。
+ * 其余页面引入本脚本只注入入口（导航「✦ WDS 助手」或右下「✦ 问全站」按钮），点击跳转独立页，不再使用浮层。
+ * 后端 /api/wds/chat：全站检索 + SDE 内核 + 王德生人格 + 多轮 + 出处。 */
 (function () {
   "use strict";
   if (window.__wdsModeMounted) return;
@@ -9,6 +8,8 @@
 
   var API = "/api/wds/chat";
   var LS = "sdeuniverses_wds_mode";
+  var PAGE = !!window.WDSM_PAGE;           // 独立页模式：/taste/wds-chat/ 置此标志
+  var PAGE_URL = "/taste/wds-chat/";       // 全站唯一对话界面（不再用浮层）
   function el(t, c, x) { var e = document.createElement(t); if (c) e.className = c; if (x != null) e.textContent = x; return e; }
   function esc(s) { return String(s).replace(/[&<>]/g, function (m) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;" }[m]; }); }
 
@@ -93,11 +94,14 @@
   var EG = ["SDE 说的“显露”和“结构”有什么不同？", "用 SDE 怎么看慢性病的发生？", "什么是特征纠缠？举个例子", "帮我找几篇入门 SDE 的文章"];
   EG.forEach(function (q) { var b = el("button", "wdsm-eg", q); b.onclick = function () { inEl.value = q; send(); }; egsEl.appendChild(b); });
 
-  function open() { layer.classList.add("on"); document.documentElement.classList.add("wdsm-open"); try { localStorage.setItem(LS, "1"); } catch (e) {} setTimeout(function () { inEl.focus(); }, 80); }
-  function close() { layer.classList.remove("on"); document.documentElement.classList.remove("wdsm-open"); try { localStorage.setItem(LS, "0"); } catch (e) {} }
-  window.wdsMode = function (on) { on === false ? close() : open(); };
+  function open() { layer.classList.add("on"); document.documentElement.classList.add("wdsm-open"); setTimeout(function () { inEl.focus(); }, 80); }
+  function leave() { if (window.history.length > 1) { window.history.back(); } else { window.location.href = "/"; } }
+  function close() { if (PAGE) { leave(); return; } layer.classList.remove("on"); document.documentElement.classList.remove("wdsm-open"); }
+  window.wdsMode = function (on) { on === false ? close() : (PAGE ? open() : (window.location.href = PAGE_URL)); };
+  try { localStorage.removeItem(LS); } catch (e) {}  // 清掉旧的"自动弹出"记忆
 
   layer.querySelectorAll(".wdsm-tab").forEach(function (t) {
+    if (PAGE && t.dataset.m === "normal") t.textContent = "\u2190 \u8fd4\u56de\u6d4f\u89c8";
     t.onclick = function () { if (t.dataset.m === "normal") close(); };
   });
   layer.querySelector(".wdsm-keybtn").onclick = function () { wdsKeyPanel(function () {}); };
@@ -112,8 +116,7 @@
     if (!nav) { mountFab(); return; }
     function mk(cls, label) {
       var a = el("a", cls + " wdsm-navbtn", label);
-      a.href = "#"; a.style.cssText = "border:1px solid var(--gold,#D4B25E);border-radius:16px;padding:3px 13px;background:var(--gold,#D4B25E);color:#0F0B07;font-weight:700";
-      a.onclick = function (e) { e.preventDefault(); open(); };
+      a.href = PAGE_URL; a.style.cssText = "border:1px solid var(--gold,#D4B25E);border-radius:16px;padding:3px 13px;background:var(--gold,#D4B25E);color:#0F0B07;font-weight:700";
       return a;
     }
     var search = nav.querySelector("a[href='/search/']");
@@ -126,10 +129,10 @@
     var b = el("button", "wdsm-fab");
     b.innerHTML = "\u2726 \u95ee\u5168\u7ad9";
     b.title = "WDS \u52a9\u624b \u00b7 \u95ee\u6574\u4e2a\u7f51\u7ad9";
-    b.onclick = function () { open(); };
+    b.onclick = function () { window.location.href = PAGE_URL; };
     document.body.appendChild(b);
   }
-  injectNav();
+  if (!PAGE) injectNav();
 
   inEl.addEventListener("input", function () { inEl.style.height = "auto"; inEl.style.height = Math.min(inEl.scrollHeight, 160) + "px"; });
 
@@ -225,6 +228,6 @@
   sendEl.onclick = send;
   inEl.addEventListener("keydown", function (e) { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } });
 
-  // 记住上次模式：上次在 WDS 模式则自动打开
-  try { if (localStorage.getItem(LS) === "1") open(); } catch (e) {}
+  // 独立页模式：载入即整页打开（浮层自动弹出机制已废除，普通页只保留跳转入口）
+  if (PAGE) open();
 })();
