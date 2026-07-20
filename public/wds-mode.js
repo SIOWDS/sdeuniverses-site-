@@ -54,6 +54,9 @@
     "@keyframes wdsmFade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}" +
     "@keyframes wdsmBlink{50%{opacity:0}}" +
     ".wdsm-navbtn{cursor:pointer}" +
+    ".wdsm-fab{position:fixed;right:22px;bottom:76px;z-index:99996;display:flex;align-items:center;gap:7px;background:#0F0B07;color:#D4B25E;border:1px solid rgba(212,178,94,.55);border-radius:24px;padding:11px 17px;font:600 14px/1 -apple-system,'PingFang SC','Microsoft YaHei',sans-serif;box-shadow:0 6px 24px rgba(15,11,7,.3);cursor:pointer;transition:transform .15s}" +
+    ".wdsm-fab:hover{transform:translateY(-2px)}" +
+    "@media(max-width:520px){.wdsm-fab{padding:10px 14px;font-size:13px}}" +
     "@media(max-width:600px){.wdsm-brand{display:none}.wdsm-tab{padding:7px 12px}}";
   var st = el("style"); st.textContent = CSS; document.head.appendChild(st);
 
@@ -106,7 +109,7 @@
   // —— 注入导航切换按钮 ——
   function injectNav() {
     var nav = document.querySelector(".nav-links");
-    if (!nav) return;
+    if (!nav) { mountFab(); return; }
     function mk(cls, label) {
       var a = el("a", cls + " wdsm-navbtn", label);
       a.href = "#"; a.style.cssText = "border:1px solid var(--gold,#D4B25E);border-radius:16px;padding:3px 13px;background:var(--gold,#D4B25E);color:#0F0B07;font-weight:700";
@@ -117,6 +120,14 @@
     var zh = mk("zh-only", "✦ WDS 助手"), en = mk("en-only", "✦ WDS Mode");
     if (search && search.nextSibling) { nav.insertBefore(zh, search.nextSibling); nav.insertBefore(en, zh.nextSibling); }
     else { nav.appendChild(zh); nav.appendChild(en); }
+  }
+  function mountFab() {
+    if (document.querySelector(".wdsm-fab")) return;
+    var b = el("button", "wdsm-fab");
+    b.innerHTML = "\u2726 \u95ee\u5168\u7ad9";
+    b.title = "WDS \u52a9\u624b \u00b7 \u95ee\u6574\u4e2a\u7f51\u7ad9";
+    b.onclick = function () { open(); };
+    document.body.appendChild(b);
   }
   injectNav();
 
