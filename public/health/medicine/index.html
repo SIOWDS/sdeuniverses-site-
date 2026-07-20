@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>医学频道 · Medicine | 健康专栏 | SDE Universes</title>
+<meta name="description" content="健康专栏下的医学频道：把具体疾病放回组织场与演化的双重坐标里重述，每一条主张标注证据级别，每一篇文末给出可被推翻的判据。首篇为约五万字的癌症整合论文。">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#F5EFE0;--card:#FAF6EC;--card2:#F0E8D3;--gold:#8A6817;--text:#2A2315;--text2:#6B5D47;--muted:#98886C;--border:rgba(138,104,23,0.22);--border2:rgba(138,104,23,0.10);--accent:#1F6E5E;--accent2:#2E9179}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Noto Serif SC','EB Garamond',Georgia,serif;line-height:1.75;overflow-x:hidden}
+body.en{font-family:'EB Garamond','Playfair Display',Georgia,serif}
+body.en .zh-only{display:none}
+body.zh .en-only{display:none}
+a{color:inherit}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;flex-direction:column;padding:0.6rem 3rem 0.5rem;background:rgba(245,239,224,0.9);backdrop-filter:blur(12px);border-bottom:1px solid var(--border2)}
+.nav-bar-main{display:flex;align-items:center;justify-content:space-between;gap:1rem}
+.nav-logo{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;color:var(--gold);letter-spacing:0.05em;text-decoration:none}
+.nav-links{display:flex;align-items:center;gap:1.6rem}
+.nav-links a{color:var(--text2);text-decoration:none;font-size:0.85rem;letter-spacing:0.1em;transition:color 0.2s}
+.nav-links a:hover{color:var(--accent)}
+.nav-links a.here{color:var(--accent);font-weight:600}
+.nav-bar-sub{display:flex;align-items:center;gap:1.6rem;margin-top:0.5rem;padding-top:0.5rem;border-top:1px solid var(--border2)}
+.nav-bar-sub a{color:var(--text2);text-decoration:none;font-size:1.05rem;font-weight:700;letter-spacing:0.13em;white-space:nowrap;transition:color .2s,opacity .2s}
+.nav-bar-sub a:hover{text-decoration:underline;text-underline-offset:4px;opacity:0.72}
+.nav-bar-sub a.ch-1{color:#8A6817}
+.nav-bar-sub a.ch-2{color:#35558C}
+.nav-bar-sub a.ch-3{color:#17706B}
+.nav-bar-sub a.ch-4{color:#7A4A8C}
+.nav-bar-sub a.ch-5{color:#1F6E5E}
+.nav-bar-sub a.here{text-decoration:underline;text-underline-offset:5px}
+.lang-toggle{display:flex;background:var(--card);border:1px solid var(--border);border-radius:20px;overflow:hidden}
+.lang-btn{padding:0.3rem 0.8rem;font-size:0.75rem;border:none;background:transparent;color:var(--text2);cursor:pointer;font-family:inherit}
+.lang-btn.active{background:var(--accent);color:#fff;font-weight:600}
+.wrap{max-width:940px;margin:0 auto;padding:0 2rem}
+header.hero{min-height:60vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:9rem 2rem 3.4rem;position:relative;overflow:hidden}
+.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 70% 55% at 50% 34%,#1F6E5E1c 0%,transparent 70%)}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(#1F6E5E0f 1px,transparent 1px),linear-gradient(90deg,#1F6E5E0f 1px,transparent 1px);background-size:60px 60px;opacity:0.7}
+.eyebrow{position:relative;font-size:0.72rem;letter-spacing:0.28em;color:var(--accent);text-transform:uppercase;margin-bottom:1.3rem}
+.eyebrow a{color:var(--accent);text-decoration:none;border-bottom:1px solid rgba(0,0,0,.14)}
+.title{position:relative;font-family:'Playfair Display','Noto Serif SC',serif;font-size:clamp(2.4rem,6.4vw,4.4rem);font-weight:700;line-height:1.05;color:var(--text)}
+.sub{position:relative;font-size:clamp(1.02rem,2.2vw,1.28rem);color:var(--text2);max-width:680px;margin:1.5rem auto 1.9rem;font-style:italic;font-weight:300}
+.badge{position:relative;display:inline-flex;align-items:center;gap:0.5rem;background:var(--card);border:1px solid var(--accent);color:var(--accent);border-radius:30px;padding:0.5rem 1.3rem;font-size:0.78rem;letter-spacing:0.14em}
+.badge .dot{width:7px;height:7px;border-radius:50%;background:var(--accent);animation:pulse 1.8s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:0.35;transform:scale(0.85)}50%{opacity:1;transform:scale(1)}}
+section{padding:3.2rem 0}
+.lead{font-size:1.1rem;color:var(--text);line-height:1.95;border-left:3px solid var(--accent);padding:0.2rem 0 0.2rem 1.5rem;margin:0 0 3rem}
+.block{margin:0 0 3.2rem;scroll-margin-top:6.5rem}
+.block-head{display:flex;align-items:baseline;gap:0.85rem;border-bottom:1px solid var(--border);padding-bottom:0.7rem;margin-bottom:0.9rem}
+.block-num{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:700;color:var(--accent);line-height:1}
+.block-title{font-family:'Playfair Display','Noto Serif SC',serif;font-size:1.3rem;font-weight:600;color:var(--text);line-height:1.25}
+.block-desc{font-size:0.97rem;color:var(--text2);font-style:italic;margin:0 0 1.4rem;line-height:1.7}
+.art-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.art-grid.one{grid-template-columns:1fr}
+.art{display:block;text-decoration:none;background:var(--card);border:1px solid var(--border2);border-left:3px solid var(--accent);border-radius:5px;padding:1.05rem 1.25rem;transition:transform .2s,box-shadow .2s,border-color .2s}
+.art:hover{border-left-color:var(--accent2);transform:translateX(3px);box-shadow:0 6px 20px rgba(42,35,21,.10)}
+.art .k{display:block;font-size:0.71rem;letter-spacing:0.1em;color:var(--accent);text-transform:uppercase;font-weight:600;margin-bottom:0.35rem}
+.art h4{font-family:'Noto Serif SC',serif;font-size:1.05rem;font-weight:600;color:var(--text);margin-bottom:0.4rem;line-height:1.42}
+.art p{font-size:0.9rem;color:var(--text2);line-height:1.68}
+.art .rd{display:inline-block;margin-top:0.6rem;font-size:0.8rem;color:var(--accent);letter-spacing:0.06em}
+.qlist{list-style:none;counter-reset:q}
+.q{counter-increment:q;position:relative;background:var(--card);border:1px solid var(--border2);border-left:3px solid var(--accent);border-radius:5px;padding:1rem 1.3rem 1rem 3.3rem;margin-bottom:0.75rem}
+.q::before{content:counter(q,decimal-leading-zero);position:absolute;left:1.1rem;top:1.05rem;font-family:'Playfair Display',serif;font-size:0.95rem;font-weight:700;color:var(--accent);opacity:.55}
+.q b{display:block;font-size:1.02rem;color:var(--text);margin-bottom:0.3rem;font-weight:600}
+.q i{display:block;font-size:0.92rem;color:var(--text2);line-height:1.78;font-style:normal}
+.note{margin-top:3rem;text-align:center;background:var(--card2);border:1px dashed var(--accent);border-radius:8px;padding:1.8rem 1.5rem}
+.note p{color:var(--text2);font-size:0.98rem}
+.note b{color:var(--accent)}
+.pend{background:var(--card2);border:1px dashed var(--accent);border-radius:8px;padding:1.5rem 1.6rem;color:var(--text2);font-size:0.96rem;line-height:1.85}
+.pend b{color:var(--accent)}
+.crosslinks{display:flex;flex-wrap:wrap;gap:0.8rem;justify-content:center;margin-top:1.4rem}
+.crosslinks a{text-decoration:none;font-size:0.86rem;letter-spacing:0.08em;padding:0.5rem 1.1rem;border:1px solid var(--border);border-radius:24px;color:var(--text2);transition:all 0.2s;background:var(--card)}
+.crosslinks a:hover{border-color:var(--accent);color:var(--accent)}
+footer{border-top:1px solid var(--border2);margin-top:3rem;padding:2.5rem 2rem;text-align:center;color:var(--muted);font-size:0.78rem;letter-spacing:0.05em}
+footer a{color:var(--gold);text-decoration:none}
+@media(max-width:640px){
+  nav{padding:0.55rem 1rem 0.45rem}
+  .nav-bar-sub{justify-content:flex-start;gap:1.1rem;overflow-x:auto;padding-bottom:0.15rem}
+  .nav-bar-sub a{font-size:0.92rem}
+  .block{scroll-margin-top:5.5rem}
+  .nav-links{gap:1rem}
+  .nav-links a.sib{display:none}
+  .art-grid{grid-template-columns:1fr}
+  header.hero{padding:7rem 1.2rem 2.6rem;min-height:auto}
+}
+</style>
+</head>
+<body class="zh">
+
+<nav>
+  <div class="nav-bar-main">
+  <a class="nav-logo" href="/">SDE Universes</a>
+  <div class="nav-links">
+    <a href="/" class="zh-only">首页</a><a href="/" class="en-only">Home</a>
+    <a href="/health/" class="sib here zh-only">健康专栏</a><a href="/health/" class="sib here en-only">Health</a>
+    <a href="/education/" class="sib zh-only">教育专栏</a><a href="/education/" class="sib en-only">Education</a>
+    <a href="/business/" class="sib zh-only">商业专栏</a><a href="/business/" class="sib en-only">Business</a>
+    <a href="/ai/" class="sib zh-only">AI专栏</a><a href="/ai/" class="sib en-only">AI</a>
+    <div class="lang-toggle"><button class="lang-btn active" onclick="setLang('zh')">中</button><button class="lang-btn" onclick="setLang('en')">EN</button></div>
+  </div>
+  </div>
+  <div class="nav-bar-sub">
+    <a href="/health/" class="ch-1"><span class="zh-only">健康专栏总览</span><span class="en-only">Health Overview</span></a>
+    <a href="/health/medicine/" class="ch-3 here"><span class="zh-only">医学频道</span><span class="en-only">Medicine</span></a>
+    <a href="/health/#hea-quartet" class="ch-2"><span class="zh-only">金点子四篇</span><span class="en-only">Gold-Point Quartet</span></a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="hero-bg"></div><div class="hero-grid"></div>
+  <div class="eyebrow"><a href="/health/"><span class="zh-only">健康专栏</span><span class="en-only">HEALTH COLUMN</span></a> · <span class="zh-only">医学频道</span><span class="en-only">MEDICINE</span></div>
+  <h1 class="title"><span class="zh-only">医学频道</span><span class="en-only">Medicine</span></h1>
+  <p class="sub zh-only">这个频道只放一种文章：把一个具体的病，放回它发生的组织场与它所处的演化过程里重述，然后老老实实标出每一句话的证据级别。</p><p class="sub en-only">One kind of paper only: a specific disease restated within the tissue field where it occurs and the evolutionary process it undergoes — with the evidence grade of every claim marked honestly.</p>
+  <div class="badge"><span class="dot"></span><span class="zh-only">长篇论文 1 篇 · 持续增补</span><span class="en-only">1 long paper · Growing</span></div>
+</header>
+
+<main class="wrap">
+  <section>
+    <p class="lead zh-only">医学里有一种特殊的危险：一个框架的前半段可以是对的，后半段却把人引向伤害。「癌症在机制上不可能被彻底根除」是一句有依据的话；「所以不必追求清除」则是一句会要命的话——因为睾丸生殖细胞瘤、霍奇金淋巴瘤、儿童白血病、可切除的早期实体瘤，恰恰依赖足量、按时、彻底的治疗才能治愈。本频道的写法因此是固定的：<b>每一条主张标注证据级别，每一篇列出本文不主张什么，每一篇给出可被推翻的判据</b>。凡是说得非常肯定、非常有颠覆感、且不需要试验就能理解的结论，本频道一律先怀疑。</p>
+    <p class="lead en-only">Medicine carries a particular danger: a framework whose first half is right can lead, in its second half, to harm. This channel therefore fixes its method — every claim carries an evidence grade, every paper states what it does not claim, and every paper offers a criterion by which it could be overturned.</p>
+
+    <div class="block">
+      <div class="block-head">
+        <span class="block-num"><span class="zh-only">壹</span><span class="en-only">I</span></span>
+        <span class="block-title"><span class="zh-only">肿瘤 · 组织场与演化</span><span class="en-only">Oncology · Field and Evolution</span></span>
+      </div>
+      <p class="block-desc zh-only">把肿瘤从「局部长了一个坏东西」改写为「在一片恶化的组织场里，被选择出来的一支高适应度细胞群」，随后追问一个具体的问题：什么时候应该追求彻底清零，什么时候不该。</p><p class="block-desc en-only">From "a bad thing growing in one place" to "a highly adapted cell population selected within a deteriorating tissue field" — and then a concrete question: when should eradication be pursued, and when not.</p>
+      <div class="art-grid">
+        <a class="art feature" href="/health/medicine/cancer-field-and-evolution/">
+          <span class="k"><span class="zh-only">王德生 著 · 理论综述与假说论文 · 约 4.7 万字</span><span class="en-only">by Wang Desheng · Review &amp; Hypothesis · ~47k chars</span></span>
+          <h4><span class="zh-only">癌症的组织场—演化重构：匮缺、创造性同源与「容差在轨」治疗范式</span><span class="en-only">Cancer Reconstructed: Field, Creative Homology and the Tolerance-Orbit Paradigm</span></h4>
+          <p class="zh-only">全文围绕三条命题展开：<b>土壤先于种子</b>（正常人的皮肤与食管里本就布满携带驱动突变的克隆，突变常见而癌症罕见，中间隔着组织场的筛选）；<b>创造性同源</b>（驱动侵袭、血管新生与免疫逃逸的机制，与胚胎着床、组织修复、免疫受体生成同源——滤泡性淋巴瘤的 t(14;18) 就是 V(D)J 重组的错误产物，产生免疫多样性的酶就是产生这些淋巴瘤的酶）；<b>容差在轨</b>（在清零不可达成时，把目标从最大缓解改为把负荷约束在可容纳的带内、同时保全宿主储备与药物敏感克隆）。<br><br>与流行叙述不同的是，本文把自己的每一块地基都归还给了原主——Paget 1889、Slaughter 1953、Williams 1957、Nowell 1976、Dvorak 1986、Sonnenschein &amp; Soto 的组织组织化场理论、Gatenby 2009 的自适应疗法——并<b>撤回了三条经不起检验的论断</b>，其中包括流传甚广的「人类因大脑耗能而格外易患癌」（与 191 个哺乳动物物种、11 万个体的证据方向相反）。文末列出必须追求彻底清零的八类禁忌情形，以及六条方向与最近邻相反的可裁决预测。</p><p class="en-only">Three propositions: soil precedes seed; the machinery of invasion is homologous with that of implantation, repair and immune diversification; and where eradication is unreachable, constraining burden within a tolerance band beats extremal killing. Each foundation is returned to its original author, three unsupportable claims are retracted, eight absolute contraindications are listed, and six adjudicable predictions are stated.</p>
+          <span class="rd"><span class="zh-only">读全文 →</span><span class="en-only">Read →</span></span>
+        </a>
+      </div>
+    </div>
+
+    <div class="note">
+      <div class="crosslinks">
+        <a href="/health/"><span class="zh-only">← 回健康专栏</span><span class="en-only">← Back to Health</span></a>
+        <a href="/health/#hea-quartet"><span class="zh-only">→ 健康的四道切口</span><span class="en-only">→ Gold-Point Quartet</span></a>
+        <a href="/column/discovery-vs-genesis-health/"><span class="zh-only">→ 健康：发现还是发生？</span><span class="en-only">→ Health: Discovery or Genesis?</span></a>
+        <a href="/"><span class="zh-only">→ 返回首页</span><span class="en-only">→ Home</span></a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  © 德麦国际 Demai International · <span class="zh-only">健康专栏 · 医学频道</span><span class="en-only">Health Column · Medicine</span> · <a href="/">sdeuniverses.com</a>
+</footer>
+
+<script>
+function setLang(l){document.body.className=l;document.querySelectorAll('.lang-btn').forEach(function(b){b.classList.toggle('active',(b.textContent==='中'&&l==='zh')||(b.textContent==='EN'&&l==='en'));});document.documentElement.lang=l==='zh'?'zh-CN':'en';}
+</script>
+
+<script>window.WDS_READ={selector:".wrap"};</script>
+<script src="/taste/wds-companion/wds-read.js" defer></script>
+
+<script src="/wds-mode.js" defer></script>
+</body>
+</html>
