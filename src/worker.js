@@ -807,6 +807,7 @@ function _cors() { return { "access-control-allow-origin": "*", "access-control-
 let CORPUS = null; // 模块级缓存：isolate 内复用，避免每次问答重载 ~15MB 索引
 let CORPUS_CHECKED = 0;
 const CORPUS_TTL = 30 * 1000; // 至多 30 秒对 manifest 复验一次；发新文后即使老 isolate 也能在半分钟内换上新语料
+let KB = null, KB_CHECKED = 0; // 九库结构化知识;复用 CORPUS_TTL 复验节奏,无 KB 时检索安全退回纯 chunk
 async function loadCorpus(env, url) {
   const now = Date.now();
   if (CORPUS && now - CORPUS_CHECKED < CORPUS_TTL) return CORPUS;
@@ -874,6 +875,63 @@ function retrieve(corpus, q, k, expTerms) {
     if (picked.length >= k) break;
   }
   return picked;
+}
+
+// ===== 九库结构化知识检索(调用知识,非相似句) =====
+const KB_TYPE_LABEL = { concept:"概念", proposition:"命题", theory:"理论", evidence:"证据", case:"案例", method:"方法", scholar:"学者", controversy:"争议", version:"版本" };
+const KB_ORDER = ["concept","proposition","theory","evidence","case","method","scholar","controversy","version"];
+const _kbNorm = (s) => String(s).replace(/\s+/g, "").toLowerCase();
+// 装载九库(模块级缓存,复用 CORPUS_TTL);缺文件则返回 null,检索退回纯 chunk
+async function loadKB(env, url) {
+  const now = Date.now();
+  if (KB && now - KB_CHECKED < CORPUS_TTL) return KB;
+  let man;
+  try { man = await (await env.ASSETS.fetch(new Request(new URL("/kb/kb-manifest.json", url)))).json(); }
+  catch (e) { return KB || null; }
+  KB_CHECKED = now;
+  if (KB && KB.built === man.built) return KB;
+  let idx = {}; const byId = {};
+  try { idx = await (await env.ASSETS.fetch(new Request(new URL("/kb/kb-index.json", url)))).json(); } catch (e) { return KB || null; }
+  for (const lib of Object.values(man.libraries || {})) {
+    try { const arr = await (await env.ASSETS.fetch(new Request(new URL("/kb/" + lib.file, url)))).json(); for (const e of arr) byId[e.id] = e; } catch (e) {}
+  }
+  KB = { built: man.built, idx, byId };
+  return KB;
+}
+function kbLink(kb, q, expTerms) {
+  const qn = _kbNorm(q), cand = new Set();
+  for (const key in kb.idx) { if (key.length >= 2 && qn.indexOf(key) >= 0) cand.add(kb.idx[key][1]); }
+  for (const t of (expTerms || [])) {
+    const tn = _kbNorm(t); if (tn.length < 2) continue;
+    if (kb.idx[tn]) { cand.add(kb.idx[tn][1]); continue; }
+    for (const key in kb.idx) { if (key.length >= 3 && (key.indexOf(tn) >= 0 || tn.indexOf(key) >= 0)) cand.add(kb.idx[key][1]); }
+  }
+  return [...cand].filter((id) => kb.byId[id]);
+}
+function kbSubgraph(kb, seedIds, maxEntities) {
+  const picked = new Map(), queue = seedIds.slice();
+  while (queue.length && picked.size < maxEntities) {
+    const id = queue.shift(), e = kb.byId[id];
+    if (!e || picked.has(id)) continue;
+    picked.set(id, e);
+    for (const ids of Object.values(e.links || {})) for (const l of ids) if (!picked.has(l)) queue.push(l);
+  }
+  return picked;
+}
+function retrieveKB(kb, corpus, q, expTerms, budget) {
+  const seeds = kbLink(kb, q, expTerms);
+  if (!seeds.length) return { block: "", srcs: [], n: 0 };
+  const picked = kbSubgraph(kb, seeds, budget || 24);
+  const groups = {}, srcDocs = new Set();
+  for (const e of picked.values()) { (groups[e.type] = groups[e.type] || []).push(e); for (const d of (e.sources || []).slice(0, 3)) srcDocs.add(d); }
+  let block = "【SDE 结构化知识 · 调用自九库(概念→命题→理论→证据→案例→方法→学者→争议,成体系的判断而非相似句)】\n";
+  for (const ty of KB_ORDER) { if (!groups[ty]) continue; for (const e of groups[ty]) {
+    block += (seeds.indexOf(e.id) >= 0 ? "▶" : "·") + KB_TYPE_LABEL[ty] + "｜" + e.name + "：" + e["def"] + "\n";
+    if (e.body && seeds.indexOf(e.id) >= 0) block += "   " + e.body + "\n";
+  } }
+  const srcs = [];
+  for (const d of srcDocs) { const dd = corpus.docs[d]; if (dd) srcs.push({ u: dd.u, t: dd.t }); }
+  return { block, srcs: srcs.slice(0, 8), n: picked.size };
 }
 
 // ===== 深度档·两次内功提智 =====
@@ -1772,20 +1830,30 @@ export default {
         if (!lr.ok) return _sseResp([{ t: "error", v: lr.reason === "day" ? ("这把 Key 今天在「全站问答」入口已用 " + (lr.inDay || 0) + "/" + WDS_PER_DAY + " 次，明天再来（额度按你的 Key 计，陪读与「与WDS对话」各有独立额度）。") : "聊得太快啦，过十几秒再问。" }]);
         dayLeft = Math.max(0, WDS_PER_DAY - (lr.inDay || 0));   // 回传真实日剩余，供前端显示
       } catch (e) {}
-      // 全站检索（复用 /api/ask 的召回：词义扩展→retrieve→拼片段+出处）
+      // 全站检索：先调用结构化知识(九库邻域子图,密/准/省token),再以相似句片段补充
       let ctxText = "", sources = [];
+      const seen = {};
       try {
         const corpus = await loadCorpus(env, url);
         const expTerms = await sdeExpandQuery(VC, KEY, q);
-        const hits = retrieve(corpus, q, 20, expTerms);
-        const seen = {};
+        // —— 结构化调用:entity-link → 邻域子图 ——
+        let kbBlock = "";
+        try {
+          const kb = await loadKB(env, url);
+          if (kb) { const r = retrieveKB(kb, corpus, q, expTerms, 24); kbBlock = r.block; for (const s of r.srcs) if (!seen[s.u]) { seen[s.u] = 1; sources.push(s); } }
+        } catch (e) {}
+        // —— 相似句补充:给 KB 腾预算(20→12,字数上限收紧)——
+        const chunkCap = kbBlock ? 7000 : 12000;
+        const hits = retrieve(corpus, q, kbBlock ? 12 : 20, expTerms);
+        let chunkText = "";
         for (const ck of hits) {
           const d = corpus.docs[ck.d];
           if (!d) continue;
           if (!seen[d.u]) { seen[d.u] = 1; sources.push({ u: d.u, t: d.t }); }
-          ctxText += "【来源：" + d.t + "】\n" + ck.t + "\n\n";
-          if (ctxText.length > 12000) break;
+          chunkText += "【来源：" + d.t + "】\n" + ck.t + "\n\n";
+          if (chunkText.length > chunkCap) break;
         }
+        ctxText = kbBlock + (kbBlock && chunkText ? "\n【补充 · 站内原文片段】\n" : "") + chunkText;
       } catch (e) {}
       sources = sources.slice(0, 6);
       let reflect = ""; try { reflect = await ensureReflect(env, url, rvendor, VC, KEY); } catch (e) {}
