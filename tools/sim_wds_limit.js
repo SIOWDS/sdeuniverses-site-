@@ -68,6 +68,6 @@ const AskLimiter = eval("(" + cls.replace("export class AskLimiter", "class AskL
   ok(/url\.pathname === "\/api\/wds\/read-paper"/.test(src), "新路由 /api/wds/read-paper 已注册");
   ok(/mode === "summary"/.test(src) && /mode === "plan"/.test(src) && /mode === "part"/.test(src), "三个 mode 齐全");
   const readBlock = src.slice(src.indexOf('url.pathname === "/api/wds/read"'), src.indexOf('url.pathname === "/api/wds/chat"'));
-  ok(!/history\.slice\(-4\)/.test(readBlock) && /packReadHistory\(history\)/.test(readBlock), "陪读端旧的 4 轮截断已移除、改走 packReadHistory");
+  ok(!/history\.slice\(-4\)/.test(readBlock) && /packReadHistory\(history[,)]/.test(readBlock), "陪读端旧的 4 轮截断已移除、改走 packReadHistory");
   ok(/history\.slice\(-4\)/.test(src.slice(src.indexOf('url.pathname === "/api/wds/chat"'))), "首页全站版仍保持原样（本次不改）");
 })();

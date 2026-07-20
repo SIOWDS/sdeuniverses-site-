@@ -44,10 +44,32 @@
     } catch (e) { loading = false; }
   }
 
+  /* 整本抽取：后台逐页取文写进 window.__wdsPdfFull，供 WDS 陪读把整篇喂给基底。
+   * 10 万字符封顶（覆盖站内全部文章级 PDF；专著级取前若干章并标注截断）；单页失败下轮 interval 重试。 */
+  var fullDone = false, fullBusy = false;
+  function pullFull(d) {
+    if (fullDone || fullBusy || !d) return;
+    fullBusy = true;
+    var parts = [], tot = 0, i = 1, MAX = 100000;
+    (function next() {
+      if (i > d.numPages) { window.__wdsPdfFull = parts.join("\n\n"); fullDone = true; fullBusy = false; return; }
+      d.getPage(i).then(function (p) { return p.getTextContent(); }).then(function (tc) {
+        var t = "";
+        for (var k = 0; k < tc.items.length; k++) t += tc.items[k].str;
+        t = t.replace(/\s{3,}/g, " ").trim();
+        parts.push("\u3010\u7b2c " + i + " \u9875\u3011\n" + t);
+        tot += t.length;
+        if (tot >= MAX) { parts.push("\u3010\u540e\u7eed\u9875\u56e0\u957f\u5ea6\u622a\u65ad\uff0c\u5171 " + d.numPages + " \u9875\u3011"); window.__wdsPdfFull = parts.join("\n\n"); fullDone = true; fullBusy = false; return; }
+        i++; next();
+      }, function () { fullBusy = false; });
+    })();
+  }
+
   function pull() {
     ensure();
     var d = getDoc();
     if (!d) return;
+    pullFull(d);
     var n = curPage();
     if (n > d.numPages) n = d.numPages;
     if (n === last) return;

@@ -37,10 +37,12 @@
   }
   function docTitle() { var h = q1("h1"); return (CFG.title || (h && h.textContent) || document.title || "").trim().slice(0, 200); }
   function docText() {
-    if (typeof CFG.docTextFn === "function") { try { var d = CFG.docTextFn(); if (d) return String(d).slice(0, 12000); } catch (e) {} }
+    /* 整篇输入：PDF 整本抽取（wds-pdf.js 后台跑完写 __wdsPdfFull）> 页面钩子 > DOM 全文；统一钳位 10 万字符 */
+    if (typeof window.__wdsPdfFull === "string" && window.__wdsPdfFull.length > 200) return window.__wdsPdfFull.slice(0, 100000);
+    if (typeof CFG.docTextFn === "function") { try { var d = CFG.docTextFn(); if (d) return String(d).slice(0, 100000); } catch (e) {} }
     var els = bodyEls(), t = "";
     for (var i = 0; i < els.length; i++) { t += elText(els[i]) + "\n\n"; }
-    return t.replace(/\n{3,}/g, "\n\n").trim().slice(0, 6000);
+    return t.replace(/\n{3,}/g, "\n\n").trim().slice(0, 100000);
   }
 
   // —— 样式：显影暗房 ——

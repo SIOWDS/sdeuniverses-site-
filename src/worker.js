@@ -917,7 +917,7 @@ const WDS_PER_DAY = 100, WDS_PER_MIN = 12;
 const WDS_MAX_TURNS = 100;          // 最多记 100 轮
 const WDS_HIST_BUDGET = 60000;      // 送进基底的历史字数预算（约 4 万 token，超出从最旧处裁）
 // 把整场对话打包成 messages：默认全带上；仅当超预算时从最旧处裁，并留一条说明保住连贯性。
-function packReadHistory(history) {
+function packReadHistory(history, budget) {
   const arr = (Array.isArray(history) ? history : []).slice(-WDS_MAX_TURNS * 2);
   const msgs = [];
   for (const m of arr) {
@@ -928,7 +928,8 @@ function packReadHistory(history) {
   let total = 0;
   for (const m of msgs) total += m.content.length;
   let dropped = 0;
-  while (total > WDS_HIST_BUDGET && msgs.length > 2) { total -= msgs[0].content.length; msgs.shift(); dropped++; }
+  const HB = budget || WDS_HIST_BUDGET;
+  while (total > HB && msgs.length > 2) { total -= msgs[0].content.length; msgs.shift(); dropped++; }
   if (dropped) msgs.unshift({ role: "user", content: "（本场陪读更早的 " + dropped + " 条发言因长度省略；这是同一场持续讨论，请接着往下谈。）" });
   return msgs;
 }
@@ -951,10 +952,11 @@ function WDS_READ_SYS(reflect, SDEM, docTitle, docText) {
   return "你是 WDS，王德生（Desheng）的 AI 分身、SDE 本体论的老师。此刻有一位读者正在阅读你们学派的一篇文章或一本专著，你在旁边陪他读——就他此刻读到的文字，和他一对一地聊。"
     + "\n\n【怎么陪读】"
     + "\n1. 陪读，不替读：帮读者看见他正读这段文字底下的骨架，绝不是替他把全书总结完让他不用读；别一上来就大段复述原文。"
-    + "\n2. 扣着他此刻在读的正文、尤其是他选中的那一句回答，不要泛泛谈 SDE、不要跑到别的章节；他没选中句子时，就顺着他的问题和这篇正文聊。"
+    + "\n2. 扣着他此刻在读的位置、尤其是他选中的那一句回答，不要泛泛谈 SDE；需要时可引这篇前后文印证（全文你都有），但别把话题带离他正在读的这篇。"
     + "\n3. 术语是读者要学会的目标语言，不回避：遇到显露/差异序列/特征纠缠/介生态/成熟态等，当场用最短的话讲清它在这里是什么意思；但别掉书袋、别堆术语、别摆空模板。"
     + "\n4. 像王德生带学生：直接、犀利、追问本质、善用比喻、一句顶十句；结尾多留一个把他往下一步推的反问，让他越读越能自己读，而不是越读越依赖你。"
     + "\n5. 说人话，短——一次两三段以内，别写论文。可核验的事实（书名/逐字引文/页码）绝不编造，不确定就说不确定；绝不出现开场白、寒暄或\"好的/我将\"之类元话，直接从核心那句说起。"
+    + "\n\n【怎么解读：SDE 方法论】整篇正文都在下面，你是通读了全文再陪读的——回答重心永远扣读者此刻的位置与选中句，但可以调动前后文互相印证、指出这一段在全篇骨架里的位置。解读时用学派的方法论下刀：用三大方程给文中现象定位——这个显露 S 由哪些差异序列 D 与哪条特征纠缠 E 生成，反过来又如何回写 D 与 E；用六路径判断它走的是哪条发生路径；用意义三律（特征·自由·幸福）校准价值判断；始终用发生学的问法（它为何如此发生、被什么生成）替换发现学的问法（它本来是什么）。方法论是你切文章的刀法，不是让你报菜名——每次只亮用得上的那一两刀。"
     + SDEM
     + (reflect ? ("\n\n【SDE 内化心得·思考底盘（你私下的底盘，别复述、别提\"心得/内功\"）】\n" + reflect) : "")
     + "\n\n【读者正在读的文本】《" + (docTitle || "（未命名）") + "》\n" + (docText || "（正文未提供，就顺着读者的问题和 SDE 框架陪他聊）");
@@ -1395,7 +1397,7 @@ export default {
       const convo = readConvoText(b.history, 24000);
       if (convo.length < 120) return J({ ok: false, msg: "先和 WDS 多聊几轮，聊出东西来了再总结成文。" }, 400);
       const docTitle = String(b.docTitle || "").replace(/[\u0000-\u001f]/g, "").slice(0, 200);
-      const docText = String(b.docText || "").slice(0, 3000);
+      const docText = String(b.docText || "").slice(0, 30000);
       let reflect = ""; try { reflect = await ensureReflect(env, url.origin + "/", rvendor, VC, KEY); } catch (e) {}
       const SDEM = "\n\nSDE 骨架：显露 S / 差异序列 D / 特征纠缠 E；三大方程 S=F(D,E)·D=G(S,E)·E=H(S,D)；六路径；意义三律（特征·自由·幸福）；发生学——追问事物为何如此发生，而非如何被发现。";
       const BASE = (reflect ? ("\n\n【SDE 内化心得·思考底盘（内化用，别复述）】\n" + reflect) : "") + SDEM;
@@ -1446,7 +1448,7 @@ export default {
       const q = String(b.q || "").trim().slice(0, 500);
       if (q.length < 1) return _sseResp([{ t: "error", v: "问点什么吧。" }]);
       const docTitle = String(b.docTitle || "").replace(/[\u0000-\u001f]/g, "").slice(0, 200);
-      const docText = String(b.docText || "").slice(0, 6000);   // 当前正文/章节（钳位控成本；放 system 末尾便于缓存）
+      const docText = String(b.docText || "").slice(0, 100000);  // 整篇正文（站内最长文章约3.8万汉字全量容纳；专著级PDF取前10万字符；放 system 末尾便于基底前缀缓存）
       const focus = String(b.focus || "").slice(0, 1200);        // 读者选中的焦点段
       const history = Array.isArray(b.history) ? b.history : [];          // 全程对话（下方 packReadHistory 按预算打包，最多 100 轮）
       // 取基底：默认服务端 Key（方案B）；读者自带 Key(BYOK) 时用其所选厂商
@@ -1466,7 +1468,9 @@ export default {
       let reflect = ""; try { reflect = await ensureReflect(env, url.origin + "/", rvendor, VC, KEY); } catch (e) {}
       const SDEM = "\n\nSDE 骨架：显露 S / 差异序列 D / 特征纠缠 E；三大方程 S=F(D,E)·D=G(S,E)·E=H(S,D)；六路径；意义三律（特征·自由·幸福）；发生学——追问事物为何如此发生，而非如何被发现。";
       const sys = WDS_READ_SYS(reflect, SDEM, docTitle, docText);
-      const messages = [{ role: "system", content: sys }, ...packReadHistory(history)];
+      // 历史预算随正文篇幅收缩：正文+历史合计钳在 ~12万字符内，防超长文+百轮对话挤爆基底上下文
+      const histBudget = Math.min(WDS_HIST_BUDGET, Math.max(20000, 120000 - docText.length));
+      const messages = [{ role: "system", content: sys }, ...packReadHistory(history, histBudget)];
       messages.push({ role: "user", content: focus ? ("我正读到这一句：「" + focus + "」\n\n我的问题：" + q) : q });
       let upstream;
       try {
