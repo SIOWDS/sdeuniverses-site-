@@ -787,10 +787,21 @@ function _sseResp(objs) {
 }
 function _cors() { return { "access-control-allow-origin": "*", "access-control-allow-methods": "POST, OPTIONS", "access-control-allow-headers": "content-type" }; }
 
-let CORPUS = null; // 模块级缓存：isolate 内复用，避免每次问答重载 ~6MB 索引
+let CORPUS = null; // 模块级缓存：isolate 内复用，避免每次问答重载 ~15MB 索引
+let CORPUS_CHECKED = 0;
+const CORPUS_TTL = 30 * 1000; // 至多 30 秒对 manifest 复验一次；发新文后即使老 isolate 也能在半分钟内换上新语料
 async function loadCorpus(env, url) {
-  if (CORPUS) return CORPUS;
-  const man = await (await env.ASSETS.fetch(new Request(new URL("/search/manifest.json", url)))).json();
+  const now = Date.now();
+  if (CORPUS && now - CORPUS_CHECKED < CORPUS_TTL) return CORPUS;
+  let man;
+  try {
+    man = await (await env.ASSETS.fetch(new Request(new URL("/search/manifest.json", url)))).json();
+  } catch (e) {
+    if (CORPUS) return CORPUS; // 复验失败：先用旧语料顶着，下个周期再试
+    throw e;
+  }
+  CORPUS_CHECKED = now;
+  if (CORPUS && CORPUS.built === man.built) return CORPUS; // manifest 未变，语料仍新鲜
   const secLabel = {};
   man.sections.forEach((s) => { secLabel[s.key] = s.label; });
   const chunks = [];
@@ -802,7 +813,7 @@ async function loadCorpus(env, url) {
       } catch (e) { /* 单片失败不阻断 */ }
     }
   }
-  CORPUS = { docs: man.docs, secLabel, chunks, coords: await loadCoords(env, url) };
+  CORPUS = { built: man.built, docs: man.docs, secLabel, chunks, coords: await loadCoords(env, url) };
   return CORPUS;
 }
 // SDE 坐标（索引侧打标产物；未打标则为 null，检索自动退回纯词义扩展）
