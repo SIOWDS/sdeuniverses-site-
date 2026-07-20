@@ -4,85 +4,364 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>与WDS对话 · 问对WDS | SDE Universes</title>
-<meta name="description" content="与WDS对话：全程用 SDE 内功、内化心得与方法论（三大方程·六路径·123原理）回答你的每一问，最多一百轮；聊到最后，一键把全场凝成一篇约一万字的论文《问对WDS》。">
+<meta name="description" content="与WDS对话：独立对话界面。全程用 SDE 内功、内化心得与方法论（三大方程·六路径·123原理）回答你的每一问，最多一百轮；聊到最后，一键把全场凝成一篇约一万字的论文《问对WDS》。">
 <style>
-  :root{--paper:#FBFAF7;--text:#1C232E;--slate:#8A94A3;--qing:#3DA5A5;--gold:#C9A227;--line:#E4E0D6}
+  :root{--bg:#0C1F22;--pane:#0F272B;--ink:#E8F0EE;--dim:#8FA8A4;--line:rgba(127,212,200,.14);--qing:#3DA5A5;--qing2:#7FD4C8;--gold:#C9A227;--paper:#FBFAF7}
   *{box-sizing:border-box}
-  body{margin:0;background:var(--paper);color:var(--text);-webkit-font-smoothing:antialiased}
-  .wrap{max-width:660px;margin:0 auto;padding:56px 24px 140px}
-  .eyebrow{font:600 11px/1 -apple-system,'PingFang SC',sans-serif;letter-spacing:3px;color:var(--gold);text-transform:uppercase;margin-bottom:14px}
-  h1{font-family:'Songti SC','Noto Serif SC',serif;font-size:34px;line-height:1.3;font-weight:600;margin:0 0 8px}
-  .meta{color:var(--slate);font:13px/1.7 -apple-system,'PingFang SC',sans-serif;margin-bottom:26px;padding-bottom:18px;border-bottom:1px solid var(--line)}
-  .howto{font:14px/1.85 -apple-system,'PingFang SC',sans-serif;background:rgba(201,162,39,.07);border:1px solid rgba(201,162,39,.3);border-radius:12px;padding:16px 18px;margin:0 0 38px}
-  .howto b{color:#8A6817}
-  article h2{font-family:'Songti SC','Noto Serif SC',serif;font-size:21px;font-weight:600;margin:40px 0 14px;padding-left:10px;border-left:3px solid var(--qing)}
-  article p{font-family:'Songti SC','Noto Serif SC',serif;font-size:17px;line-height:1.95;margin:0 0 20px}
-  article table{width:100%;border-collapse:collapse;font:13.5px/1.7 -apple-system,'PingFang SC',sans-serif;margin:0 0 22px}
-  article th,article td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
-  article th{background:rgba(61,165,165,.07);color:#1C232E;font-weight:600;white-space:nowrap}
-  article code{font-family:'SF Mono',Menlo,monospace;font-size:14.5px;background:rgba(61,165,165,.09);border-radius:4px;padding:1px 6px}
-  .tip{margin-top:34px;color:var(--slate);font:13px/1.7 -apple-system,'PingFang SC',sans-serif;background:rgba(61,165,165,.07);border:1px solid rgba(61,165,165,.25);border-radius:10px;padding:12px 14px}
-  .tip b{color:var(--qing)}
-  .backlink{display:inline-block;margin-top:26px;font:13px/1 -apple-system,'PingFang SC',sans-serif;color:var(--slate);text-decoration:none}
-  .backlink:hover{color:var(--qing)}
+  html,body{height:100%}
+  body{margin:0;background:radial-gradient(ellipse at 50% 0%,#123332 0%,#0C1F22 48%,#081114 100%);color:var(--ink);font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;-webkit-font-smoothing:antialiased}
+  .app{display:flex;flex-direction:column;height:100vh}
+  /* 顶栏 */
+  .bar{flex:none;display:flex;align-items:center;gap:12px;padding:12px 18px;border-bottom:1px solid var(--line);background:rgba(8,17,20,.6);backdrop-filter:blur(6px)}
+  .brand{display:flex;align-items:baseline;gap:10px;text-decoration:none}
+  .brand b{font-family:'Songti SC','Noto Serif SC',serif;font-size:20px;color:var(--ink);letter-spacing:.06em}
+  .brand b i{font-style:normal;color:var(--qing2)}
+  .brand span{font-size:11.5px;color:var(--gold);letter-spacing:.12em}
+  .turns{margin-left:auto;font-size:12.5px;color:var(--dim);white-space:nowrap}
+  .tbtn{background:none;border:1px solid var(--line);color:var(--qing2);border-radius:18px;padding:7px 14px;font:600 12.5px/1 inherit;cursor:pointer;white-space:nowrap}
+  .tbtn:hover{border-color:var(--qing)}
+  .tbtn:disabled{opacity:.38;cursor:default}
+  .tbtn.gold{color:var(--gold);border-color:rgba(201,162,39,.4)}
+  .kbtn{background:none;border:none;color:var(--dim);font-size:17px;cursor:pointer;padding:2px 4px}
+  .home{color:var(--dim);text-decoration:none;font-size:12.5px;white-space:nowrap}
+  .home:hover{color:var(--qing2)}
+  /* 主体：左方法论 右对话 */
+  .main{flex:1;display:flex;min-height:0}
+  .guide{flex:none;width:400px;max-width:38vw;overflow-y:auto;padding:26px 26px 60px;border-right:1px solid var(--line);background:rgba(8,17,20,.35)}
+  .guide h2{font-family:'Songti SC','Noto Serif SC',serif;font-size:17px;font-weight:600;color:var(--qing2);margin:26px 0 10px;padding-left:9px;border-left:3px solid var(--qing)}
+  .guide h2:first-child{margin-top:0}
+  .guide p{font-family:'Songti SC','Noto Serif SC',serif;font-size:14.5px;line-height:1.9;color:#C4D6D2;margin:0 0 14px}
+  .guide table{width:100%;border-collapse:collapse;font-size:12px;line-height:1.6;margin:0 0 14px;color:#C4D6D2}
+  .guide th,.guide td{border:1px solid var(--line);padding:5px 7px;text-align:left;vertical-align:top}
+  .guide th{color:var(--qing2);font-weight:600;white-space:nowrap;background:rgba(61,165,165,.08)}
+  .guide code{font-family:'SF Mono',Menlo,monospace;font-size:12.5px;background:rgba(61,165,165,.12);border-radius:4px;padding:1px 5px;color:var(--qing2)}
+  .guide .gm{font-size:11.5px;color:var(--dim);letter-spacing:.28em;margin-bottom:14px}
+  /* 对话区 */
+  .chat{flex:1;display:flex;flex-direction:column;min-width:0}
+  .msgs{flex:1;overflow-y:auto;padding:26px 8%}
+  .m{margin-bottom:20px;animation:fade .3s ease both}
+  .m .who{font-size:11px;letter-spacing:.2em;color:var(--dim);margin-bottom:5px}
+  .m.wds .who{color:var(--qing)}
+  .m .t{font-size:15.5px;line-height:1.85;white-space:pre-wrap;word-break:break-word}
+  .m.me{display:flex;flex-direction:column;align-items:flex-end}
+  .m.me .t{background:rgba(255,255,255,.06);border:1px solid var(--line);border-radius:12px;padding:10px 14px;max-width:86%;color:#CFDDDA}
+  .m.wds .t{color:var(--ink);max-width:92%}
+  .m .t.err{color:#E89A8E}
+  .m .t.stream::after{content:'▪';color:var(--qing);margin-left:2px;animation:blink 1s step-end infinite}
+  .hello{color:var(--dim);font-size:14px;line-height:1.9;border:1px dashed var(--line);border-radius:12px;padding:16px 18px;max-width:640px;margin:0 auto 8px}
+  .hello b{color:var(--qing2)}
+  /* 输入栏 */
+  .inbar{flex:none;display:flex;gap:10px;align-items:flex-end;padding:14px 8% 20px;border-top:1px solid var(--line);background:rgba(8,17,20,.45)}
+  .in{flex:1;resize:none;background:rgba(255,255,255,.05);color:var(--ink);border:1px solid rgba(127,212,200,.22);border-radius:11px;padding:11px 13px;font-size:15px;font-family:inherit;outline:none;line-height:1.55;max-height:180px}
+  .in::placeholder{color:#5c716e}
+  .in:focus{border-color:var(--qing)}
+  .go{background:linear-gradient(120deg,#3DA5A5,#2E8686);color:#07171A;border:none;border-radius:11px;padding:12px 22px;font:800 15px/1 inherit;cursor:pointer;white-space:nowrap}
+  .go:disabled{opacity:.4;cursor:default}
+  /* 弹窗（Key / 成文） */
+  .veil{position:fixed;inset:0;background:rgba(4,10,12,.72);z-index:60;display:flex;align-items:center;justify-content:center;padding:20px}
+  .box{background:#0F272B;border:1px solid var(--line);border-radius:16px;width:min(560px,94vw);max-height:88vh;display:flex;flex-direction:column;box-shadow:0 20px 70px rgba(0,0,0,.5)}
+  .boxh{flex:none;display:flex;align-items:center;gap:10px;padding:16px 18px;border-bottom:1px solid var(--line)}
+  .boxh b{font-family:'Songti SC','Noto Serif SC',serif;font-size:16.5px;color:var(--ink);flex:1;line-height:1.5}
+  .boxx{background:none;border:none;color:var(--dim);font-size:21px;cursor:pointer;padding:0 2px}
+  .boxb{overflow-y:auto;padding:18px}
+  .boxf{flex:none;display:flex;gap:10px;align-items:center;padding:12px 18px;border-top:1px solid var(--line)}
+  .prog{flex:1;font-size:12.5px;color:var(--dim)}
+  .doct{font-family:'Songti SC','Noto Serif SC',serif;font-size:15px;line-height:2;white-space:pre-wrap;color:#DDE9E6}
+  .doc .box{width:min(760px,96vw)}
+  .kv{display:flex;gap:8px;margin:0 0 12px}
+  .kv button{flex:1;background:none;border:1px solid rgba(212,178,94,.4);color:#E6EDF3;border-radius:9px;padding:9px 0;font:600 13.5px/1 inherit;cursor:pointer}
+  .kin{width:100%;background:rgba(255,255,255,.05);color:var(--ink);border:1px solid rgba(127,212,200,.22);border-radius:9px;padding:10px 12px;font-size:14px;font-family:inherit;outline:none}
+  .kn{font-size:12px;color:var(--dim);line-height:1.7;margin-top:10px}
+  .kn a{color:var(--gold)}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  @keyframes blink{50%{opacity:0}}
+  /* 窄屏：方法论收起为抽屉 */
+  .gtog{display:none}
+  @media(max-width:920px){
+    .guide{position:fixed;left:0;top:0;height:100%;width:min(86vw,400px);max-width:none;z-index:50;transform:translateX(-105%);transition:transform .25s;background:#0B2024;box-shadow:8px 0 40px rgba(0,0,0,.5)}
+    .guide.on{transform:none}
+    .gtog{display:inline-block}
+    .msgs,.inbar{padding-left:16px;padding-right:16px}
+    .brand span{display:none}
+  }
 </style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="eyebrow">智能体免费区 · 品尝系列</div>
-    <h1>与WDS对话</h1>
-    <div class="meta">一个非常简单的智能体：你问，WDS 全程用 SDE 内功＋内化心得＋方法论（三大方程 · 六路径 · 123原理）作答。一场对话最多 <b>100 轮</b>、全程记住；聊到最后，一键把全场凝成一篇约<b>一万字</b>的论文——《<b>问对WDS</b>》，当然，是关于 SDE 的。</div>
-
-    <div class="howto"><b>怎么玩：</b>右侧对话面板已自动打开。① 在 ⚙ 里填你自己的大模型 Key（只存你的浏览器本地，本站不经手）；② 想问什么就问什么——每一问，WDS 都先认路径、再互问三维、张力处走"矛盾→结算→回写"；③ 聊够了（两轮起），点「<b>总结这场对话</b>」或「<b>凝成一万字论文《问对WDS》</b>」，六个部分逐段写成，可复制全文或导出 PDF。下面这篇短文，就是 WDS 回答你时遵循的方法论——先读一遍，问出来的问题会更锋利。</div>
-
-    <article>
-      <h2>它靠什么答题：三层分工</h2>
-      <p>这个智能体的底盘有三样东西。<b>内功</b>：完整的 SDE 本体论先验，约四万字，是它看问题的那双眼。<b>心得</b>：它开工前把内功真读一遍、自己蒸馏出的内化笔记——它站在自己消化出的认知上答题，不是站在别人代写的确认上。<b>方法论</b>：三大方程、六路径、123原理——这是它回答你每一问的工序。三者分工严格：三大方程管三元<b>是什么关系</b>（同时互生的静态结构）；123原理管这关系<b>如何自我推进</b>（动态引擎）；六路径管判断<b>从哪一维起手</b>（操作入口）。哪一层管哪件事，比记住字面更要紧。</p>
-
-      <h2>三大方程：同时互生的静态结构</h2>
-      <p><code>S = F(D, E)</code>　<code>D = G(S, E)</code>　<code>E = H(S, D)</code>。显露态由差异序列与纠缠网络共同生成，差异序列由显露态与纠缠网络共同生成，纠缠网络由显露态与差异序列共同生成。F、G、H 是占位符，不是待解的函数——写成方程只为钉死一件事：<b>每一维都由另外两维共同决定，没有任何一维是独立自变量。</b>这是同时互生，不是循环定义：循环的是定义，互生的是发生，两者不在一个层面。还要记住：完整三元是成熟态，不是原初态——现实中你看到的多半是三维不同步时投下的变形侧影。</p>
-      <p>判断动作只有一条：看到任何一维，立刻追问另外两维。有人递给你一个结论（S），你要问它经什么差异路径（D）、在什么纠缠土壤（E）里长出来；再反着问：它立住之后，如何回头改写了 D 与 E。凡是"归根到底由 X 决定"的单向叙事，一律警觉——那不是结论，是该被撬开的地基。</p>
-
-      <h2>123原理：让关系转起来的动态引擎</h2>
-      <p>① D 与 E 相互矛盾 → ② 矛盾推动 S 改变 → ③ S 的改变回写 D 与 E → 新一轮循环。三笔都要走完。<b>矛盾是引擎，不是故障</b>：在议题里看到张力、拧巴、说不通的地方，那不是系统坏了的证据，是它正要发生什么的证据——顺着它挖，别把它熨平。<b>S 是矛盾的结算点，不是起点</b>：问"这个结构为什么是这样"，正确的问法永远是"什么样的矛盾，结算出了这个显露态"。<b>③的回写最易漏掉</b>：新的显露态一旦立住，会反过来改写差异的路径与纠缠的土壤——它重新定义了什么算问题、什么算证据、谁说话算数。不交代回写，就只用了半个 123。</p>
-      <p>两条边界。其一，它不是正反合：合题不改写产生它的逻辑空间，回写恰恰要改写土壤本身。其二，见三不套：三步走、三要素、三阶段满世界都是，但无 D-E 张力、无 S 结算、无回写者，一律不是 123。</p>
-
-      <h2>六路径：判断从哪一维起手</h2>
-      <p>S/D/E 三维排列组合，恰好六条，没有第七条。起点错了，后面再深也是浪费——所以下笔之前的第一个动作，永远是识别任务 DNA：这个议题真正卡住的，是"它是什么"（从 S 起手）、"它怎么走的"（从 D 起手）、还是"它站在什么上面"（从 E 起手）？</p>
-      <table>
-        <tr><th>路径</th><th>适用</th><th>最典型的翻车方式</th></tr>
-        <tr><td>S→D→E</td><td>学科本体论分析</td><td>变成下定义比赛，始终没碰到它怎么来的</td></tr>
-        <tr><td>S→E→D</td><td>配置 / 选择 / 决策</td><td>变成可行性报告，从不交代怎么执行</td></tr>
-        <tr><td>D→S→E</td><td>咨询 / 教练 / 干预</td><td>刚进过程就贴标签，过程当场关闭</td></tr>
-        <tr><td>D→E→S</td><td>求助 / 困境</td><td>一路陪走，最后没锚出任何结构</td></tr>
-        <tr><td>E→S→D</td><td>社会学分析</td><td>背景铺了大半篇，结构始终没显形</td></tr>
-        <tr><td>E→D→S</td><td>综述 / 法律 / 建制</td><td>排完别人说过的话就完，自己的判断没结算出来</td></tr>
-      </table>
-      <p>还要对自己的惯性设防：一条惯性是总从 S 起手（先下定义，因为最像"专业"），另一条是总从 E 起手（先铺背景，因为最像"扎实"）。路径管思考的进入次序，不管产出的行文结构——眼是眼，文是文。</p>
-
-      <h2>从一百轮对话到《问对WDS》</h2>
-      <p>WDS 答你每一问的固定工序：认任务 DNA、选路径并说得出根据；按路径推进、用三大方程互问三维；张力处走 123 的三笔，必追回写；收口自检有没有漂回惯性起点。它会在答案里点明这一问走的是哪条路径、看到的矛盾在哪——让你看得见方法在转，越聊越会自己用。聊到有东西了，把全场凝成《问对WDS》：拟题与提纲之后六个部分逐段写成，约一万字，金点子来自你们这场对话里真正反直觉、可被检验的新判断。问对了，才算问过。</p>
-    </article>
-
-    <div class="tip">面板不小心关掉了？点右下角 <b>与WDS对话</b> 重新打开。额度：每台机器每天最多 100 轮（与全站 WDS 助手共用）；论文六个部分约需数分钟，中断也不丢——已写好的部分仍可复制或导出。</div>
-    <a class="backlink" href="/#taste">← 返回首页 · 智能体免费区</a>
+<div class="app">
+  <div class="bar">
+    <a class="brand" href="/taste/wds-dialogue/"><b>与<i>WDS</i>对话</b><span>问对WDS · 智能体免费区</span></a>
+    <button class="tbtn gtog" id="gtog">方法论</button>
+    <span class="turns" id="turns">已谈 0/100 轮</span>
+    <button class="tbtn" id="bsum" disabled>总结这场对话</button>
+    <button class="tbtn gold" id="bpap" disabled>凝成一万字论文《问对WDS》</button>
+    <button class="kbtn" id="bkey" title="设置 API Key">⚙</button>
+    <a class="home" href="/#wds-dialogue">← 首页</a>
   </div>
+  <div class="main">
+    <aside class="guide" id="guide">
+      <div class="gm">WDS 回答你时遵循的方法论 · 先读一遍，问题更锋利</div>
+      <h2>它靠什么答题：三层分工</h2>
+      <p>底盘三样：<b>内功</b>——完整 SDE 本体论先验，它看问题的那双眼；<b>心得</b>——它开工前把内功真读一遍、自己蒸馏出的内化笔记；<b>方法论</b>——三大方程、六路径、123原理。分工严格：三大方程管三元<b>是什么关系</b>（静态结构），123原理管这关系<b>如何自我推进</b>（动态引擎），六路径管判断<b>从哪一维起手</b>（操作入口）。</p>
+      <h2>三大方程</h2>
+      <p><code>S=F(D,E)</code> <code>D=G(S,E)</code> <code>E=H(S,D)</code>。F/G/H 是占位符，不是待解的函数——写成方程只为钉死：每一维都由另外两维共同决定，没有任何一维是独立自变量。这是同时互生，不是循环定义；完整三元是成熟态不是原初态。判断动作：看到任何一维，立刻追问另外两维；凡"归根到底由 X 决定"的单向叙事一律警觉——那是该被撬开的地基。</p>
+      <h2>123原理</h2>
+      <p>① D 与 E 相互矛盾 → ② 矛盾推动 S 改变（S 是矛盾的结算点，不是起点）→ ③ S 的改变回写 D 与 E → 新一轮。矛盾是引擎不是故障：见到张力别抹平，顺着它挖；最易漏的是③回写——不交代新显露态如何改写了路径与土壤，就只用了半个 123。它不是正反合（合题不改写土壤，回写恰恰改写土壤）；见三不套：无张力、无结算、无回写者，一律不是 123。</p>
+      <h2>六路径</h2>
+      <table>
+        <tr><th>路径</th><th>适用</th><th>翻车方式</th></tr>
+        <tr><td>S→D→E</td><td>学科本体论分析</td><td>变下定义比赛</td></tr>
+        <tr><td>S→E→D</td><td>配置 / 决策</td><td>变可行性报告</td></tr>
+        <tr><td>D→S→E</td><td>咨询 / 干预</td><td>刚进过程就贴标签</td></tr>
+        <tr><td>D→E→S</td><td>求助 / 困境</td><td>陪走一场没锚出结构</td></tr>
+        <tr><td>E→S→D</td><td>社会分析</td><td>背景铺大半篇</td></tr>
+        <tr><td>E→D→S</td><td>综述 / 建制</td><td>排完别人的话就完</td></tr>
+      </table>
+      <p>三维排列恰好六条，没有第七条。起点错了，后面再深也是浪费——先问：这个议题卡在"它是什么"（S 起）、"它怎么走的"（D 起）、还是"它站在什么上面"（E 起）？并对两条惯性设防：总先下定义、总先铺背景。路径管思考的进入次序，不管行文结构。</p>
+      <h2>从一百轮到《问对WDS》</h2>
+      <p>WDS 答你每一问的固定工序：认任务 DNA、选路径并说得出根据；按路径推进、用三大方程互问三维；张力处走 123 的三笔，必追回写；收口自检有没有漂回惯性起点。聊到有东西了，点顶栏金色按钮：拟题与提纲之后六个部分逐段写成，约一万字，金点子取自这场对话里真正反直觉、可被检验的新判断。问对了，才算问过。</p>
+    </aside>
+    <div class="chat">
+      <div class="msgs" id="msgs">
+        <div class="hello">这里是<b>与WDS对话</b>的独立界面——想问什么就问什么。每一问，WDS 都先认路径、再互问三维、张力处走"矛盾→结算→回写"，并点明它这一步用的是哪把刀。一场最多 <b>100 轮</b>、全程记住；聊够两轮后，顶栏可<b>总结</b>或<b>凝成一万字论文《问对WDS》</b>（可导出 PDF）。首次使用请点右上 ⚙ 填入你自己的大模型 Key（只存你的浏览器本地，本站不经手）。</div>
+      </div>
+      <div class="inbar">
+        <textarea class="in" id="q" rows="2" placeholder="向 WDS 发问……（Enter 发送，Shift+Enter 换行）"></textarea>
+        <button class="go" id="go">问</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+(function () {
+  "use strict";
+  var API = "/api/wds/read", PAPER = "/api/wds/read-paper", MAX = 100, PN = 6;
+  var TITLE = "问对WDS";
+  function $(s, r) { return (r || document).querySelector(s); }
+  function el(t, c, x) { var e = document.createElement(t); if (c) e.className = c; if (x != null) e.textContent = x; return e; }
+  var msgs = $("#msgs"), qEl = $("#q"), goEl = $("#go"), turnsEl = $("#turns"), sumB = $("#bsum"), papB = $("#bpap");
+  var history = [], streaming = false, busy = false;
 
-  <script>window.WDS_READ = {
-    title: "问对WDS",
-    selector: "article",
-    auto: 1,
-    guide: 1,
-    paperN: 6,
-    fabLabel: "与WDS对话",
-    panelTitle: "与WDS对话",
-    subLabel: "问对了，才算问过",
-    paperLabel: "凝成一万字论文《问对WDS》",
-    paperMeta: "《问对WDS》· 本文由一场与 WDS 的对话凝成 · SDE Universes",
-    sumMeta: "与WDS对话 · 全场总结"
-  };</script>
-  <script src="/taste/wds-companion/wds-read.js" defer></script>
+  // —— Key：本智能体自己的界面与存取；键名沿用全站 BYOK 规范（sde_wds_key/vendor），空则借 sde_ds_key / sde_glm_key ——
+  function keyGet() {
+    var k = localStorage.getItem("sde_wds_key") || "", v = localStorage.getItem("sde_wds_vendor") || "ds";
+    if (!k) {
+      if (localStorage.getItem("sde_ds_key")) { k = localStorage.getItem("sde_ds_key"); v = "ds"; }
+      else if (localStorage.getItem("sde_glm_key")) { k = localStorage.getItem("sde_glm_key"); v = "glm"; }
+    }
+    return k && k.length >= 8 ? { key: k, vendor: v } : null;
+  }
+  function keySave(k, v) {
+    localStorage.setItem("sde_wds_key", k); localStorage.setItem("sde_wds_vendor", v);
+    localStorage.setItem(v === "ds" ? "sde_ds_key" : "sde_glm_key", k);
+  }
+  function keyPanel(done) {
+    var vend = localStorage.getItem("sde_wds_vendor") || "ds";
+    var m = el("div", "veil");
+    m.innerHTML = "<div class='box'><div class='boxh'><b>用你自己的 API Key 运行</b><button class='boxx'>\u00d7</button></div>"
+      + "<div class='boxb'><div class='kv'><button data-v='ds'>DeepSeek</button><button data-v='glm'>\u667a\u8c31 GLM</button></div>"
+      + "<input class='kin' type='password' placeholder='\u7c98\u8d34 API Key\uff0c\u53ea\u5b58\u4f60\u7684\u6d4f\u89c8\u5668\u672c\u5730'>"
+      + "<div class='kn' id='klink'></div></div>"
+      + "<div class='boxf'><span class='prog'>\u672c\u7ad9\u4e0d\u7ecf\u624b\u3001\u4e0d\u4e0a\u4f20\u4f60\u7684 Key</span><button class='tbtn' id='ksave'>\u4fdd\u5b58</button></div></div>";
+    document.body.appendChild(m);
+    var kin = $(".kin", m), klink = $("#klink", m);
+    kin.value = localStorage.getItem("sde_wds_key") || "";
+    function paint() {
+      m.querySelectorAll(".kv button").forEach(function (b) {
+        var on = b.dataset.v === vend;
+        b.style.background = on ? "rgba(212,178,94,.2)" : "none";
+        b.style.borderColor = on ? "#D4B25E" : "rgba(212,178,94,.4)";
+      });
+      klink.innerHTML = vend === "ds"
+        ? "\u8fd8\u6ca1\u6709 Key\uff1f\u53bb <a href='https://platform.deepseek.com' target='_blank'>platform.deepseek.com</a> \u7533\u8bf7"
+        : "\u8fd8\u6ca1\u6709 Key\uff1f\u53bb <a href='https://open.bigmodel.cn' target='_blank'>open.bigmodel.cn</a> \u7533\u8bf7";
+    }
+    m.querySelectorAll(".kv button").forEach(function (b) { b.onclick = function () { vend = b.dataset.v; paint(); }; });
+    paint();
+    function close() { m.remove(); }
+    $(".boxx", m).onclick = close;
+    m.addEventListener("click", function (e) { if (e.target === m) close(); });
+    $("#ksave", m).onclick = function () {
+      var k = kin.value.trim();
+      if (k.length < 8) { kin.style.borderColor = "#E89A8E"; return; }
+      keySave(k, vend); close(); if (done) done(true);
+    };
+  }
+  $("#bkey").onclick = function () { keyPanel(null); };
+  function needKey(retry) { var kv = keyGet(); if (kv) return kv; keyPanel(retry); return null; }
 
-<script src="/wds-mode.js" defer></script>
+  // —— 状态 ——
+  function turns() { var n = 0; for (var i = 0; i < history.length; i++) if (history[i].role === "reader") n++; return n; }
+  function paint() {
+    var n = turns();
+    turnsEl.textContent = "\u5df2\u8c08 " + n + "/" + MAX + " \u8f6e";
+    var ready = n >= 2 && !busy && !streaming;
+    sumB.disabled = !ready; papB.disabled = !ready;
+    if (n >= MAX) { qEl.disabled = true; goEl.disabled = true; qEl.placeholder = "\u8fd9\u573a\u5df2\u8c08\u6ee1 100 \u8f6e\u2014\u2014\u603b\u7ed3\u6216\u51dd\u6210\u300a\u95ee\u5bf9WDS\u300b\u5427\u3002"; }
+  }
+  function addMsg(role, text) {
+    var w = el("div", "m " + (role === "wds" ? "wds" : "me"));
+    w.appendChild(el("div", "who", role === "wds" ? "WDS" : "\u4f60"));
+    var t = el("div", "t", text); w.appendChild(t);
+    msgs.appendChild(w); msgs.scrollTop = msgs.scrollHeight;
+    return t;
+  }
+
+  // —— 对话（流式 SSE，走 /api/wds/read 的 guide 模式；独立界面，不复用任何浮层） ——
+  function send() {
+    var q = qEl.value.trim(); if (!q || streaming) return;
+    var kv = needKey(function (ok) { if (ok) send(); }); if (!kv) return;
+    if (turns() >= MAX) { paint(); return; }
+    qEl.value = "";
+    addMsg("reader", q);
+    history.push({ role: "reader", text: q });
+    paint();
+    var bubble = addMsg("wds", ""); bubble.classList.add("stream");
+    streaming = true; goEl.disabled = true; paint();
+    var payload = { q: q, docTitle: TITLE, docText: "", focus: "", history: history, key: kv.key, vendor: kv.vendor, guide: 1 };
+    fetch(API, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(payload) })
+      .then(function (resp) {
+        if (!resp.ok || !resp.body) throw new Error("HTTP " + resp.status);
+        var reader = resp.body.getReader(), dec = new TextDecoder(), buf = "", answer = "";
+        function pump() {
+          return reader.read().then(function (r) {
+            if (r.done) {
+              bubble.classList.remove("stream");
+              if (answer) history.push({ role: "wds", text: answer });
+              else { bubble.classList.add("err"); bubble.textContent = bubble.textContent || "\u6ca1\u6536\u5230\u56de\u7b54\uff0c\u8bf7\u91cd\u8bd5\u3002"; history.pop(); }
+              streaming = false; goEl.disabled = false; paint();
+              return;
+            }
+            buf += dec.decode(r.value, { stream: true });
+            var i;
+            while ((i = buf.indexOf("\n")) >= 0) {
+              var line = buf.slice(0, i).trim(); buf = buf.slice(i + 1);
+              if (!line.startsWith("data:")) continue;
+              var p = line.slice(5).trim();
+              if (p === "[DONE]") continue;
+              var j; try { j = JSON.parse(p); } catch (e) { continue; }
+              if (j.t === "token" && j.v) { answer += j.v; bubble.textContent = answer; msgs.scrollTop = msgs.scrollHeight; }
+              else if (j.t === "think") { if (!answer) bubble.textContent = "\uff08\u601d\u8003\u4e2d\u2026\uff09"; }
+              else if (j.t === "error") {
+                bubble.classList.remove("stream"); bubble.classList.add("err");
+                bubble.textContent = j.v || "\u51fa\u9519\u4e86";
+                if (j.code === "need_key" || j.code === "bad_key") keyPanel(null);
+                history.pop(); streaming = false; goEl.disabled = false; paint();
+              }
+            }
+            return pump();
+          });
+        }
+        return pump();
+      })
+      .catch(function (e) {
+        bubble.classList.remove("stream"); bubble.classList.add("err");
+        bubble.textContent = "\u63a5\u4e0d\u4e0a WDS\uff08" + (e && e.message) + "\uff09\u3002\u68c0\u67e5\u7f51\u7edc\u540e\u91cd\u8bd5\u2014\u2014\u4f60\u521a\u624d\u90a3\u53e5\u6211\u8bb0\u7740\u3002";
+        streaming = false; goEl.disabled = false; paint();
+      });
+  }
+
+  // —— 总结 / 凝成万字论文（独立弹窗 + 印刷 PDF） ——
+  function post(body) {
+    body.guide = 1; body.paperN = PN; body.docTitle = TITLE; body.docText = ""; body.history = history;
+    return fetch(PAPER, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) })
+      .then(function (r) { return r.json().catch(function () { return { ok: false, msg: "HTTP " + r.status }; }); });
+  }
+  function docModal(title, kind) {
+    var m = el("div", "veil doc");
+    m.innerHTML = "<div class='box'><div class='boxh'><b class='dt'></b><button class='boxx'>\u00d7</button></div>"
+      + "<div class='boxb'><div class='doct'></div></div>"
+      + "<div class='boxf'><span class='prog'></span><button class='tbtn copy'>\u590d\u5236\u5168\u6587</button><button class='tbtn gold pdf'>\u5bfc\u51fa PDF</button></div></div>";
+    document.body.appendChild(m);
+    var tE = $(".dt", m), bE = $(".doct", m), pE = $(".prog", m);
+    tE.textContent = title;
+    function close() { m.remove(); }
+    $(".boxx", m).onclick = close;
+    m.addEventListener("click", function (e) { if (e.target === m) close(); });
+    $(".copy", m).onclick = function () {
+      try { navigator.clipboard.writeText(tE.textContent + "\n\n" + bE.textContent); pE.textContent = "\u5df2\u590d\u5236"; } catch (e) {}
+    };
+    $(".pdf", m).onclick = function () { exportPDF(tE.textContent, bE.textContent, kind); };
+    return { setText: function (t) { bE.textContent = t; }, setTitle: function (t) { tE.textContent = t; }, setProg: function (t) { pE.textContent = t || ""; }, close: close };
+  }
+  function exportPDF(title, body, kind) {
+    var w = window.open("", "_blank");
+    if (!w) { alert("\u6d4f\u89c8\u5668\u62e6\u4e86\u65b0\u7a97\u53e3\uff0c\u5141\u8bb8\u5f39\u7a97\u540e\u91cd\u8bd5"); return; }
+    var meta = kind === "paper" ? "\u300a\u95ee\u5bf9WDS\u300b\u00b7 \u672c\u6587\u7531\u4e00\u573a\u4e0e WDS \u7684\u5bf9\u8bdd\u51dd\u6210 \u00b7 SDE Universes" : "\u4e0e WDS \u5bf9\u8bdd \u00b7 \u5168\u573a\u603b\u7ed3 \u00b7 SDE Universes";
+    var paras = body.split(/\n+/).map(function (s) {
+      s = s.trim(); if (!s) return "";
+      var esc = s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      if (s.length <= 24 && !/[\u3002\uff1f\uff01.?!]$/.test(s)) return "<h2>" + esc + "</h2>";
+      return "<p>" + esc + "</p>";
+    }).join("");
+    w.document.write("<!DOCTYPE html><html><head><meta charset='utf-8'><title>" + title.replace(/</g, "&lt;") + "</title><style>"
+      + "@page{size:A4;margin:22mm}"
+      + "body{font-family:'Songti SC','Noto Serif CJK SC','SimSun',serif;color:#111;line-height:2;font-size:12.5pt}"
+      + "h1{font-size:19pt;line-height:1.5;margin:0 0 6pt}"
+      + ".meta{font-size:9.5pt;color:#666;margin:0 0 22pt;padding-bottom:10pt;border-bottom:.6pt solid #999}"
+      + "h2{font-size:13.5pt;margin:18pt 0 6pt}"
+      + "p{margin:0 0 0;text-indent:2em}"
+      + ".foot{margin-top:26pt;padding-top:8pt;border-top:.6pt solid #999;font-size:8.5pt;color:#777}"
+      + "@media print{.noprint{display:none}}"
+      + ".noprint{position:fixed;top:12px;right:12px;background:#141A24;color:#fff;border:none;border-radius:8px;padding:10px 18px;font:600 14px -apple-system,'PingFang SC',sans-serif;cursor:pointer}"
+      + "</style></head><body>"
+      + "<button class='noprint' onclick='window.print()'>\u6253\u5370 / \u5b58\u4e3a PDF</button>"
+      + "<h1>" + title.replace(/</g, "&lt;") + "</h1><div class='meta'>" + meta + "</div>"
+      + paras
+      + "<div class='foot'>\u7531\u5927\u6a21\u578b\u751f\u6210\uff0c\u89c2\u70b9\u4f9b\u601d\u8003\u53c2\u8003\uff1b\u53ef\u6838\u9a8c\u4e8b\u5b9e\u8bf7\u4ee5\u539f\u59cb\u6587\u732e\u4e3a\u51c6\u3002sdeuniverses.com</div>"
+      + "</body></html>");
+    w.document.close();
+    setTimeout(function () { try { w.print(); } catch (e) {} }, 700);
+  }
+  sumB.onclick = function () {
+    var kv = needKey(function (ok) { if (ok) sumB.onclick(); }); if (!kv) return;
+    busy = true; paint();
+    var dm = docModal("\u6b63\u5728\u603b\u7ed3\u8fd9\u573a\u5bf9\u8bdd\u2026", "summary");
+    dm.setProg("\u8c03\u7528\u4f60\u81ea\u5df1\u7684\u57fa\u5e95\u4e2d\u2026");
+    post({ mode: "summary", key: kv.key, vendor: kv.vendor })
+      .then(function (r) {
+        busy = false; paint(); dm.setProg("");
+        if (!r.ok) { dm.setTitle("\u6ca1\u80fd\u751f\u6210"); dm.setText(r.msg || "\u8bf7\u91cd\u8bd5\u3002"); if (r.code === "need_key") keyPanel(null); return; }
+        dm.setTitle("\u4e0e WDS \u5bf9\u8bdd \u00b7 \u5168\u573a\u603b\u7ed3"); dm.setText(r.text);
+      })
+      .catch(function (e) { busy = false; paint(); dm.setTitle("\u6ca1\u80fd\u751f\u6210"); dm.setText("\u7f51\u7edc\u51fa\u9519\uff1a" + (e && e.message)); });
+  };
+  papB.onclick = function () {
+    var kv = needKey(function (ok) { if (ok) papB.onclick(); }); if (!kv) return;
+    busy = true; paint();
+    var dm = docModal("\u6b63\u5728\u51dd\u6210\u300a\u95ee\u5bf9WDS\u300b\u2026", "paper");
+    dm.setProg("\u7b2c 1 \u6b65\uff1a\u62df\u9898\u4e0e\u63d0\u7eb2\u2026");
+    var out = "", prev = "", i = 0;
+    post({ mode: "plan", key: kv.key, vendor: kv.vendor }).then(function (pl) {
+      if (!pl.ok) throw new Error(pl.msg || "\u63d0\u7eb2\u5931\u8d25");
+      dm.setTitle(pl.title);
+      function step() {
+        if (i >= pl.parts.length) {
+          busy = false; paint(); dm.setProg("\u5171 " + out.replace(/\s/g, "").length + " \u5b57 \u00b7 \u53ef\u590d\u5236\u6216\u5bfc\u51fa PDF");
+          return;
+        }
+        dm.setProg("\u7b2c " + (i + 2) + " \u6b65 / \u5171 " + (pl.parts.length + 1) + " \u6b65\uff1a\u6b63\u5728\u5199\u3010" + pl.parts[i].h + "\u3011\u2026");
+        return post({ mode: "part", idx: i, title: pl.title, points: pl.points, parts: pl.parts, convo: pl.convo, prevBrief: prev.slice(-1400), key: kv.key, vendor: kv.vendor })
+          .then(function (r) {
+            if (!r.ok) throw new Error(r.msg || "\u5206\u8282\u751f\u6210\u5931\u8d25");
+            out += (out ? "\n\n" : "") + pl.parts[i].h + "\n" + r.text;
+            prev = r.text; i++;
+            dm.setText(out);
+            return step();
+          });
+      }
+      return step();
+    }).catch(function (e) {
+      busy = false; paint(); dm.setProg("");
+      dm.setText(out + (out ? "\n\n" : "") + "\u3010\u751f\u6210\u4e2d\u65ad\uff1a" + (e && e.message) + "\u3002\u5df2\u5199\u597d\u7684\u90e8\u5206\u4ecd\u53ef\u590d\u5236\u6216\u5bfc\u51fa\uff0c\u4e5f\u53ef\u5173\u6389\u91cd\u8bd5\u3002\u3011");
+    });
+  };
+
+  // —— 输入与抽屉 ——
+  goEl.onclick = send;
+  qEl.addEventListener("keydown", function (e) { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } });
+  $("#gtog").onclick = function () { $("#guide").classList.toggle("on"); };
+  paint();
+})();
+</script>
 </body>
 </html>
