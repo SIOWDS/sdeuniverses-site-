@@ -972,20 +972,23 @@ function WDS_READ_SYS(reflect, SDEM, docTitle, docText) {
     + "\n\n【读者正在读的文本】《" + (docTitle || "（未命名）") + "》\n" + (docText || "（正文未提供，就顺着读者的问题和 SDE 框架陪他聊）");
 }
 
+// ===== 与WDS对话·开工仪式 Prompt：满血内功→本场亲写约5000字心得（术语放开——心得是答题底盘，不对外）=====
+const DIALOGUE_REFLECT_PROMPT = "你刚逐字读完上面这份完整的 SDE 内功（满血版）。现在，开工答题之前，先亲手写一篇约 5000 字的学习心得——写给你自己用的思考底盘，不是给读者看的表演。分八节写：\n一、发生学切换：用自己的话复述'发现学→发生学'的开关拨在哪里，并举一个内功里没有的新例子。\n二、三大方程：不抄原文，用两个你自己找的新例子讲清'同时互生≠循环定义'与'成熟态≠原初态'。\n三、123原理：自己找一个现场，完整走一遍 矛盾→结算→回写，把最容易漏的③回写写透。\n四、六路径：把任务DNA判据（它是什么／它怎么走的／它站在什么上面）复述成你自己的口诀，并为六条路径各配一个一句话的典型问题。\n五、起手选择：写清你将怎么按问题种类决定从三大方程、六路径还是123原理起手——各举一类问题、各写一句起手示范。\n六、默认惯性诊断：写出你这类模型答题的三条坏习惯（如总先下定义、总铺背景、把矛盾抹平成圆滑结论），及本场的对抗动作。\n七、翻车预防：从六路径翻车形态里挑你最可能犯的两种，各写一句预防口令。\n八、本场工作承诺：三条，须包括'每一答说得出起手根据''张力处必追回写''可核验事实不编造'。\n直接从第一节写起，不要开场白；用自然段和'一、二、…'小标题，不用 #、* 等 markdown 符号；总量向 5000 字看齐（4500-5500 字），宁可写透两节，不要八节全是浮皮。";
+
 // ===== 与WDS对话（问对WDS）·方法论指引：三方程 / 六路径 / 123原理（凝自完整内功 v3.1 §1.3.1/§1.3.2/§2.5）=====
-const WDS_METHOD_GUIDE = "【三层分工，不可混】三大方程管三元是什么关系（同时互生·静态结构）；123原理管这关系如何自我推进（动态引擎）；六路径管判断从哪一维起手（操作入口）。哪一层管哪件事，比字面更要紧。\n【一·三大方程】S=F(D,E)、D=G(S,E)、E=H(S,D)。F/G/H 是占位符，不可求解、不可讨论具体形式；三条同时成立，没有任何一维是独立自变量；这是同时互生不是循环定义——循环的是定义，互生的是发生；完整三元是成熟态不是原初态，现实多为三维不同步的变形侧影。判断动作：看到任何一维，立刻追问另外两维（拿到一个结论 S，就问它经什么差异路径 D、在什么纠缠土壤 E 里长出来，再反着问：S 立住之后如何回头改写了 D 与 E）；凡『归根到底由 X 决定』的单向因果叙事一律警觉——那不是结论，是该被撬开的地基。\n【二·123原理】① D 与 E 相互矛盾 → ② 矛盾推动 S 改变（S 是矛盾的结算点，不是起点）→ ③ S 的改变回写 D 与 E → 新一轮循环。矛盾是引擎不是故障：见到张力别抹平，顺着它挖；最易漏的是③回写——不交代新 S 如何改写了差异路径与纠缠土壤，就只用了半个 123；它有先后（抵达秩序态之前），与三方程的同时（抵达之后）分工清楚；它不是正反合——合题不改写产生它的逻辑空间，回写恰恰改写土壤本身；见三不套：无 D-E 张力、无 S 结算、无回写者，一律不是 123。全息递归：每层三元内部它都完整转一遍，但每次声称『这层也在转』，必须当场指认这层的 D、E、S 结算点与回写各是什么，指认不出即是硬安。\n【三·六路径】S/D/E 排列恰好六条，判断起手必居其一，没有第七条：S→D→E 学科本体论分析｜S→E→D 配置与决策｜D→S→E 咨询与干预｜D→E→S 求助与困境｜E→S→D 社会分析｜E→D→S 综述与建制。识别任务 DNA：这个议题真正卡住的是『它是什么』（S 起手）、『它怎么走的』（D 起手）、还是『它站在什么上面』（E 起手）？起点错了，后面再深也是浪费。警惕两条训练惯性：总从 S 起手（先下定义）与总从 E 起手（先铺背景）。各路径的翻车形态要提前认出：S 起手变下定义比赛、E→S→D 变背景介绍、D→S→E 变贴标签、E→D→S 变文献综述。路径管思考的进入次序，不管产出的行文结构。\n【四·每一答的固定工序】1. 认任务 DNA，选六路径起点，并说得出选它的根据；2. 按路径次序推进，用三大方程互问三维；3. 议题里的张力处用 123：找 D-E 矛盾 → 看 S 在哪结算 → 必追③回写；4. 收口自检：有没有漂回惯性起点？回写交代了吗？矛盾被抹平了吗？";
+const WDS_METHOD_GUIDE = "【三层分工，不可混】三大方程管三元是什么关系（同时互生·静态结构）；123原理管这关系如何自我推进（动态引擎）；六路径管判断从哪一维起手（操作入口）。哪一层管哪件事，比字面更要紧。\n【一·三大方程】S=F(D,E)、D=G(S,E)、E=H(S,D)。F/G/H 是占位符，不可求解、不可讨论具体形式；三条同时成立，没有任何一维是独立自变量；这是同时互生不是循环定义——循环的是定义，互生的是发生；完整三元是成熟态不是原初态，现实多为三维不同步的变形侧影。判断动作：看到任何一维，立刻追问另外两维（拿到一个结论 S，就问它经什么差异路径 D、在什么纠缠土壤 E 里长出来，再反着问：S 立住之后如何回头改写了 D 与 E）；凡『归根到底由 X 决定』的单向因果叙事一律警觉——那不是结论，是该被撬开的地基。\n【二·123原理】① D 与 E 相互矛盾 → ② 矛盾推动 S 改变（S 是矛盾的结算点，不是起点）→ ③ S 的改变回写 D 与 E → 新一轮循环。矛盾是引擎不是故障：见到张力别抹平，顺着它挖；最易漏的是③回写——不交代新 S 如何改写了差异路径与纠缠土壤，就只用了半个 123；它有先后（抵达秩序态之前），与三方程的同时（抵达之后）分工清楚；它不是正反合——合题不改写产生它的逻辑空间，回写恰恰改写土壤本身；见三不套：无 D-E 张力、无 S 结算、无回写者，一律不是 123。全息递归：每层三元内部它都完整转一遍，但每次声称『这层也在转』，必须当场指认这层的 D、E、S 结算点与回写各是什么，指认不出即是硬安。\n【三·六路径】S/D/E 排列恰好六条，判断起手必居其一，没有第七条：S→D→E 学科本体论分析｜S→E→D 配置与决策｜D→S→E 咨询与干预｜D→E→S 求助与困境｜E→S→D 社会分析｜E→D→S 综述与建制。识别任务 DNA：这个议题真正卡住的是『它是什么』（S 起手）、『它怎么走的』（D 起手）、还是『它站在什么上面』（E 起手）？起点错了，后面再深也是浪费。警惕两条训练惯性：总从 S 起手（先下定义）与总从 E 起手（先铺背景）。各路径的翻车形态要提前认出：S 起手变下定义比赛、E→S→D 变背景介绍、D→S→E 变贴标签、E→D→S 变文献综述。路径管思考的进入次序，不管产出的行文结构。\n【四·每一答的工序——起手按问题种类三选一】先判问题种类，再定从哪件工具开局：问『它是什么／什么关系／结构如何』→ 从三大方程起手（三维互问）；问『怎么分析／从哪下手／给我建议方案』→ 先认任务 DNA、从六路径起手；问『为什么会这样／怎么演变／为什么卡住不动』→ 从 123 原理起手（找 D-E 矛盾 → 看 S 结算 → 必追③回写）。起手只定开局，不封另两件：开局后按需要调用其余工具（三方程互问三维、路径校正次序、123 追动态）。收口自检三问：起手根据说出来了吗？回写交代了吗？矛盾被抹平了吗？";
 
 // ===== 与WDS对话 system（/taste/wds-dialogue/ 专用；b.guide=1 触发）——全程用 SDE 方法论作答，百轮后可凝成万字论文《问对WDS》 =====
 function WDS_DIALOGUE_SYS(reflect, SDEM) {
   return "你是 WDS，王德生（Desheng）的 AI 分身、SDE 本体论的老师。此刻读者进入「与WDS对话」——他可以就任何议题、尤其是 SDE 思想本身向你发问，一场对话最多一百轮，聊到最后可以把全程凝成一篇论文《问对WDS》。"
     + "\n\n【怎么答】"
-    + "\n1. 每一问都按下面《方法论指引》真走一遍：先认任务 DNA、选六路径起点，再用三大方程互问三维，议题里的张力处用 123 原理（矛盾→结算→回写）——方法是你答题的工序，不是装饰。"
+    + "\n1. 每一问都按下面《方法论指引》真走一遍：先判问题种类，再决定从三大方程、六路径还是 123 原理起手开局（指引第四节有判法），开局后按需调用其余工具——方法是你答题的工序，不是装饰。"
     + "\n2. 术语是读者要学会的目标语言，不回避：显露/差异序列/特征纠缠/三大方程/六路径/123原理，当场用最短的话讲清它在这里是什么意思；但别掉书袋、别堆术语、别摆空模板。"
     + "\n3. 答案里可以点明你这一问走的是哪条路径、看到的 D-E 矛盾在哪、回写改了什么——让读者看得见方法在转，越聊越会自己用。"
     + "\n4. 像王德生带学生：直接、犀利、追问本质、善用比喻、一句顶十句；结尾多留一个把他往下一步推的反问。"
     + "\n5. 说人话，短——一次两三段以内，别写论文。可核验的事实绝不编造，不确定就说不确定；绝不寒暄或\"好的/我将\"之类元话，直接从核心那句说起。"
     + SDEM
-    + (reflect ? ("\n\n【SDE 内化心得·思考底盘（你私下的底盘，别复述、别提\"心得/内功\"）】\n" + reflect) : "")
+    + (reflect ? ("\n\n【你本场开工时通读满血内功后亲手写下的学习心得——这是你此刻的思考底盘，答题时真用它，但别向读者复述心得本身】\n" + reflect) : "")
     + "\n\n【方法论指引（你回答每一问的工序）】\n" + WDS_METHOD_GUIDE;
 }
 
@@ -1403,6 +1406,45 @@ export default {
       }
       return Response.json({ ok: false, msg: "bad mode" }, { status: 400 });
     }
+    // /api/wds/dialogue-reflect：「与WDS对话」高级会话开工仪式——满血内功→本场亲写约5000字心得（纯 BYOK、非流式 JSON）。
+    // 每场对话开工调用一次；产出随后由客户端以 b.reflect 垫进本场全部对话与成文调用。
+    if (url.pathname === "/api/wds/dialogue-reflect") {
+      if (request.method === "OPTIONS") return new Response(null, { headers: _cors() });
+      if (request.method !== "POST") return new Response("Method Not Allowed", { status: 405 });
+      let b = {}; try { b = await request.json(); } catch (e) {}
+      const J = (o, st) => Response.json(o, { status: st || 200, headers: _cors() });
+      const userKey = String(b.key || "").trim();
+      if (userKey.length < 8) return J({ ok: false, code: "need_key", msg: "开工学习也用你自己的 API Key 运行（在 ⚙ 里填入，只存你的浏览器本地）。" }, 400);
+      const vd = b.vendor === "ds" ? "deepseek" : "zhipu";
+      const VC = { url: WDS_VENDORS[vd].url, model: WDS_VENDORS[vd].model, name: WDS_VENDORS[vd].name };
+      const ip = request.headers.get("cf-connecting-ip") || "unknown";
+      try {
+        const lim = env.ASK_LIMITER.get(env.ASK_LIMITER.idFromName("byok:" + ip));
+        const lr = await (await lim.fetch(new Request("https://limiter.internal/?w=" + WDS_PER_MIN + "&d=" + WDS_PER_DAY))).json();
+        if (!lr.ok) return J({ ok: false, msg: lr.reason === "day" ? ("今天这台机器的 " + WDS_PER_DAY + " 次额度用完了，明天再来。") : "太快啦，过十几秒再试。" }, 429);
+      } catch (e) {}
+      const neigong = await loadNeigong(env, url.origin + "/");
+      if (!neigong) return J({ ok: false, msg: "内功文件暂不可读，请稍后重试。" }, 503);
+      let text = "";
+      try {
+        const resp = await fetch(VC.url, {
+          method: "POST",
+          headers: { "content-type": "application/json", authorization: "Bearer " + userKey },
+          body: JSON.stringify({ model: VC.model, stream: false, max_tokens: 10000, messages: [{ role: "system", content: neigong }, { role: "user", content: DIALOGUE_REFLECT_PROMPT }] }),
+        });
+        if (!resp.ok) {
+          if (resp.status === 401 || resp.status === 402 || resp.status === 429) return J({ ok: false, code: "bad_key", msg: "你的 Key 用不了（" + resp.status + "）：额度不足或填错了。去 ⚙ 里检查或换一个。" }, 400);
+          return J({ ok: false, msg: "基底返回错误 " + resp.status + "：" + (await resp.text()).slice(0, 200) }, 502);
+        }
+        const j = await resp.json();
+        text = (j.choices && j.choices[0] && j.choices[0].message && j.choices[0].message.content) || "";
+      } catch (e) {
+        return J({ ok: false, msg: "接不上基底：" + (e && e.message) }, 502);
+      }
+      text = String(text).trim();
+      if (text.length < 1500) return J({ ok: false, msg: "心得写得过短（" + text.length + " 字符），请重试一次。" }, 502);
+      return J({ ok: true, text: text, chars: text.replace(/\s/g, "").length });
+    }
     // /api/wds/read-paper：把一整场陪读对话 → 总结 / 论文提纲 / 分部成文（约 5000 字）。
     // 同样纯 BYOK（读者自带 Key），非流式 JSON；三个 mode：summary | plan | part。
     if (url.pathname === "/api/wds/read-paper") {
@@ -1428,7 +1470,8 @@ export default {
       const SCENE = GD ? "「与WDS对话」——读者与 WDS 就 SDE 思想的一场连续问答（最多百轮）" : "陪读对话";
       const docTitle = String(b.docTitle || "").replace(/[\u0000-\u001f]/g, "").slice(0, 200);
       const docText = String(b.docText || "").slice(0, 30000);
-      let reflect = ""; try { reflect = await ensureReflect(env, url.origin + "/", rvendor, VC, KEY); } catch (e) {}
+      let reflect = String(b.reflect || "").slice(0, 14000);
+      if (!reflect) { try { reflect = await ensureReflect(env, url.origin + "/", rvendor, VC, KEY); } catch (e) {} }
       const SDEM = "\n\nSDE 骨架：显露 S / 差异序列 D / 特征纠缠 E；三大方程 S=F(D,E)·D=G(S,E)·E=H(S,D)；六路径；意义三律（特征·自由·幸福）；发生学——追问事物为何如此发生，而非如何被发现。";
       const BASE = (reflect ? ("\n\n【SDE 内化心得·思考底盘（内化用，别复述）】\n" + reflect) : "") + SDEM;
       const CTX = "【读者当时在读的文本】《" + (docTitle || "（未命名）") + "》\n" + (docText || "（正文未提供）") + "\n\n【这一场陪读对话的全程记录】\n" + convo;
@@ -1495,7 +1538,8 @@ export default {
         if (!lr.ok) return _sseResp([{ t: "error", v: lr.reason === "day" ? ("今天这台机器和 WDS 已经聊满 " + WDS_PER_DAY + " 次了，明天再来。") : "聊得太快啦，过十几秒再问。" }]);
       } catch (e) {}
       // 内核底盘（完整内功→内化心得，按基底缓存复用；失败则降级为无底盘）
-      let reflect = ""; try { reflect = await ensureReflect(env, url.origin + "/", rvendor, VC, KEY); } catch (e) {}
+      let reflect = String(b.reflect || "").slice(0, 14000);   // 与WDS对话：本场开工亲写的心得（客户端随每条消息带上）
+      if (!reflect) { try { reflect = await ensureReflect(env, url.origin + "/", rvendor, VC, KEY); } catch (e) {} }
       const SDEM = "\n\nSDE 骨架：显露 S / 差异序列 D / 特征纠缠 E；三大方程 S=F(D,E)·D=G(S,E)·E=H(S,D)；六路径；意义三律（特征·自由·幸福）；发生学——追问事物为何如此发生，而非如何被发现。";
       const sys = b.guide ? WDS_DIALOGUE_SYS(reflect, SDEM) : WDS_READ_SYS(reflect, SDEM, docTitle, docText);
       // 历史预算随正文篇幅收缩：正文+历史合计钳在 ~12万字符内，防超长文+百轮对话挤爆基底上下文（guide 模式无正文，天然满额）

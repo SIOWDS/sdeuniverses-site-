@@ -16,6 +16,9 @@ ok("页面不引用任何浮层（wds-read.js / wds-mode.js / WDS_READ 配置）
   !PAGE.includes("wds-read.js") && !PAGE.includes("wds-mode.js") && !PAGE.includes("WDS_READ"));
 ok("worker guide 分支在位", W.includes("b.guide ? WDS_DIALOGUE_SYS(reflect, SDEM)"));
 ok("worker paperN 3-6 在位", W.includes("Math.max(3, Math.min(6, parseInt(b.paperN, 10) || 3))") && W.includes("j.parts.slice(0, PN)"));
+ok("worker 开工路由 dialogue-reflect 在位", W.includes('url.pathname === "/api/wds/dialogue-reflect"') && W.includes("DIALOGUE_REFLECT_PROMPT"));
+ok("read/read-paper 优先吃本场心得 b.reflect", W.split("slice(0, 14000)").length === 3);
+ok("方法论指引起手三选一", W.includes("起手按问题种类三选一"));
 
 // ---------- DOM 桩 ----------
 function mkEl(tag) {
@@ -97,6 +100,9 @@ global.TextDecoder = class { decode(v) { return Buffer.from(v).toString("utf8");
 global.fetch = function (url, opt) {
   const b = JSON.parse((opt && opt.body) || "{}");
   calls.push({ url: String(url), body: b });
+  if (String(url).endsWith("/api/wds/dialogue-reflect")) {
+    return Promise.resolve({ json: () => Promise.resolve({ ok: true, text: "心".repeat(4800), chars: 4800 }) });
+  }
   if (String(url).endsWith("/api/wds/read")) {
     return Promise.resolve({ ok: true, body: sseBody([
       'data: {"t":"token","v":"发生学问的是"}\n',
@@ -128,6 +134,9 @@ setImmediate(() => {
   setImmediate(() => {
     const chat = calls.filter(c => c.url.endsWith("/api/wds/read"));
     ok("Key 自动借位（sde_ds_key → 本智能体可用）", chat.length >= 1 && chat[0].body.key === "sk-borrowed-from-idea-gen-1234" && chat[0].body.vendor === "ds");
+    const refl = calls.filter(c => String(c.url).endsWith("/api/wds/dialogue-reflect"));
+    ok("开工仪式恰一次且先于首答", refl.length === 1 && calls.indexOf(refl[0]) < calls.indexOf(chat[0]), "reflect " + refl.length + " 次");
+    ok("每问都垫本场约5000字心得", chat.every(c => typeof c.body.reflect === "string" && c.body.reflect.length >= 4000));
     ok("两问都发出且带 guide=1", chat.length === 2 && chat.every(c => c.body.guide === 1), "共 " + chat.length + " 次");
     ok("第二问的 history 含首轮问答（全程记忆）", chat[1].body.history.length >= 3 && chat[1].body.history.some(m => m.role === "wds"));
     ok("轮次显示更新", turnsEl.textContent.includes("2/100"));
@@ -139,6 +148,7 @@ setImmediate(() => {
       const parts = calls.filter(c => c.body.mode === "part");
       ok("plan 带 paperN=6 + guide=1", plan.length === 1 && plan[0].body.paperN === 6 && plan[0].body.guide === 1);
       ok("六个部分逐一生成", parts.length === 6, "实得 " + parts.length);
+      ok("成文调用亦垫本场心得", plan.concat(parts).every(c => c.body.reflect && c.body.reflect.length >= 4000));
       const doc = findIn(body, ".doct");
       const chars = doc ? doc.textContent.replace(/\s/g, "").length : 0;
       ok("拼出的论文约一万字", chars >= 9000, "实得 " + chars + " 字");
