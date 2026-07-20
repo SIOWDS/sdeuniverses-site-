@@ -926,16 +926,21 @@ async function ensureReflect(env, url, vendor, VC, KEY) {
 
 // 非流式单维调用（四步法的 Q1/Q2/Q3 用；思考关，控延迟）
 async function llmText(VC, KEY, sys, usr, maxTok) {
+  // 超时护栏：思考满档的慢调用若卡住，55s 主动 abort → 返回空串（上层转干净的 502 可重试），避免把 Worker 那次调用拖到平台资源限触发 503
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => { try { ctrl.abort(); } catch (e) {} }, 55000);
   try {
     const resp = await fetch(VC.url, {
       method: "POST",
       headers: { "content-type": "application/json", authorization: "Bearer " + KEY },
       body: JSON.stringify(wdsTopBody(VC, { model: VC.model, stream: false, max_tokens: maxTok, messages: [{ role: "system", content: sys }, { role: "user", content: usr }] })),
+      signal: ctrl.signal,
     });
     if (!resp.ok) return "";
     const j = await resp.json();
     return (j.choices && j.choices[0] && j.choices[0].message && j.choices[0].message.content) || "";
   } catch (e) { return ""; }
+  finally { clearTimeout(timer); }
 }
 
 // 宽松解析大模型返回的 JSON：先剥代码围栏直连解析；失败再从首个 { 到末个 } 截取重解析（容忍思考模型偶发的前后缀说明文字）。
@@ -1512,8 +1517,10 @@ export default {
         const lr = await (await lim.fetch(new Request("https://limiter.internal/?w=" + _pm + "&d=" + _pd))).json();
         if (!lr.ok) return J({ ok: false, msg: lr.reason === "day" ? ("这把 Key 今天已用 " + (lr.inDay || 0) + "/" + _pd + " 次，明天再来。") : "太快啦，过十几秒再试。" }, 429);
       } catch (e) {}
-      const convo = readConvoText(b.history, b.guide ? 300000 : 24000);   // 与WDS对话：总结/成文与对话本体同档（30万），全场原文
-      if (convo.length < 120) return J({ ok: false, msg: "先和 WDS 多聊几轮，聊出东西来了再总结成文。" }, 400);
+      // part 模式只用 b.convo（提纲阶段回传的约6000字摘要），无需把整场（可达30万字）重新拼一遍——省每节调用的内存/CPU，少触平台资源限
+      const _needFullConvo = !(b.mode === "part" && b.convo);
+      const convo = _needFullConvo ? readConvoText(b.history, b.guide ? 300000 : 24000) : "";   // 与WDS对话：总结/成文与对话本体同档（30万），全场原文
+      if (_needFullConvo && convo.length < 120) return J({ ok: false, msg: "先和 WDS 多聊几轮，聊出东西来了再总结成文。" }, 400);
       const PN = Math.max(3, Math.min(6, parseInt(b.paperN, 10) || 3));   // 论文部分数：3=约5000字（陪读默认），6=约一万字（与WDS对话）
       const GD = !!b.guide;                                                // 与WDS对话（问对WDS）场景
       const SCENE = GD ? "「与WDS对话」——读者与 WDS 就 SDE 思想的一场连续问答（最多百轮）" : "陪读对话";
