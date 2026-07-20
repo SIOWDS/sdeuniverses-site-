@@ -857,7 +857,20 @@ body.zh .en-only{display:none}
 <!-- TODAY'S ARTICLES 今日文章 · 大栏目总头 -->
 <!-- 与WDS对话 · 问对WDS（首页中部醒目栏目） -->
 <section id="wds-dialogue" style="position:relative;background:radial-gradient(ellipse at 50% 30%,#123332 0%,#0C1F22 52%,#081114 100%);border-top:1px solid rgba(61,165,165,0.35);border-bottom:1px solid rgba(212,178,94,0.3);padding:78px 24px;text-align:center;overflow:hidden;scroll-margin-top:70px">
+  <style>
+  .wdsd-rays{position:absolute;left:50%;top:50%;width:1700px;height:1700px;transform:translate(-50%,-50%);pointer-events:none;background:repeating-conic-gradient(from 0deg,rgba(212,178,94,0.30) 0deg 2.6deg,rgba(212,178,94,0) 2.6deg 11deg);-webkit-mask-image:radial-gradient(circle at 50% 50%,rgba(0,0,0,0.95) 10%,rgba(0,0,0,0.45) 38%,transparent 66%);mask-image:radial-gradient(circle at 50% 50%,rgba(0,0,0,0.95) 10%,rgba(0,0,0,0.45) 38%,transparent 66%);animation:wdsdSpin 110s linear infinite}
+  .wdsd-halo{position:absolute;left:50%;top:50%;width:1300px;height:900px;transform:translate(-50%,-50%);pointer-events:none;background:radial-gradient(ellipse at 50% 50%,rgba(212,178,94,0.20) 0%,rgba(212,178,94,0.08) 42%,transparent 68%)}
+  .wdsd-oval{position:relative;max-width:1060px;margin:0 auto;border:2px solid rgba(226,192,106,0.9);border-radius:50%;padding:16px;box-shadow:0 0 26px rgba(212,178,94,0.45),0 0 90px rgba(212,178,94,0.22),inset 0 0 30px rgba(212,178,94,0.12);animation:wdsdGlow 5.5s ease-in-out infinite}
+  .wdsd-oval-in{border:1px solid rgba(233,206,132,0.55);border-radius:50%;padding:clamp(48px,7vw,86px) clamp(28px,9vw,122px);background:radial-gradient(ellipse at 50% 32%,#143A38 0%,#0C2226 56%,#08161A 100%);box-shadow:inset 0 0 70px rgba(61,165,165,0.14),inset 0 0 26px rgba(212,178,94,0.08)}
+  @keyframes wdsdSpin{to{transform:translate(-50%,-50%) rotate(360deg)}}
+  @keyframes wdsdGlow{0%,100%{box-shadow:0 0 26px rgba(212,178,94,0.45),0 0 90px rgba(212,178,94,0.22),inset 0 0 30px rgba(212,178,94,0.12)}50%{box-shadow:0 0 40px rgba(226,192,106,0.62),0 0 130px rgba(212,178,94,0.32),inset 0 0 38px rgba(212,178,94,0.18)}}
+  @media(prefers-reduced-motion:reduce){.wdsd-rays,.wdsd-oval{animation:none}}
+  @media(max-width:640px){.wdsd-rays{width:1150px;height:1150px}.wdsd-halo{width:850px;height:760px}.wdsd-oval,.wdsd-oval-in{border-radius:44%/36%}}
+  </style>
   <div style="position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at 18% 20%,rgba(61,165,165,0.14),transparent 42%),radial-gradient(circle at 84% 78%,rgba(212,178,94,0.10),transparent 45%)"></div>
+  <div class="wdsd-rays" aria-hidden="true"></div>
+  <div class="wdsd-halo" aria-hidden="true"></div>
+  <div class="wdsd-oval"><div class="wdsd-oval-in">
   <div style="position:relative;max-width:880px;margin:0 auto">
     <div class="zh-only" style="font-size:12.5px;letter-spacing:0.45em;color:#3DA5A5;margin-bottom:16px">智能体免费区 · 新上线 · 浏览器直接玩</div>
     <div class="en-only" style="font-size:12.5px;letter-spacing:0.45em;color:#3DA5A5;margin-bottom:16px">FREE AGENT ZONE · NEW · RUNS IN YOUR BROWSER</div>
@@ -874,6 +887,7 @@ body.zh .en-only{display:none}
     <div class="zh-only" style="margin-top:18px;font-size:12.5px;color:#5F7A78;letter-spacing:0.05em">用你自己的大模型 Key · 只存你的浏览器本地 · 每天 100 轮 · 论文可导出 PDF</div>
     <div class="en-only" style="margin-top:18px;font-size:12.5px;color:#5F7A78;letter-spacing:0.05em">Your own model key, stored locally · 100 turns/day · export the paper as PDF</div>
   </div>
+  </div></div>
 </section>
 
 <section id="today-articles" style="background:#100E0C;border-bottom:1px solid rgba(212,178,94,0.25);padding:64px 24px 40px;text-align:center;scroll-margin-top:70px">
