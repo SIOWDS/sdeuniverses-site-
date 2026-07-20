@@ -50,7 +50,10 @@ input:focus{outline:none;border-color:var(--gold)}
 .qrow.err{border-color:rgba(248,81,73,0.4)}
 .qname{flex:1;font-size:13.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .qmeta{font-size:12px;color:var(--muted);white-space:nowrap}
-.q-ok{color:var(--ok)}.q-err{color:#FCA5A5}
+.q-ok{color:var(--ok)}.q-err{color:#FCA5A5}.q-warn{color:var(--gold2)}
+.qrow.warn{border-color:rgba(212,178,94,0.45)}
+.qocr{margin-left:8px;background:rgba(212,178,94,0.15);border:1px solid rgba(212,178,94,0.5);border-radius:7px;color:var(--gold2);padding:4px 11px;font-size:12px;cursor:pointer;white-space:nowrap}
+.qocr:hover{background:rgba(212,178,94,0.28)}
 .qdel{background:none;border:1px solid var(--border);border-radius:7px;color:var(--muted);padding:4px 10px;font-size:12px;cursor:pointer;flex-shrink:0}
 .qdel:hover{color:#FCA5A5;border-color:rgba(248,81,73,0.4)}
 .pastebox{margin-top:14px}
@@ -89,7 +92,7 @@ textarea:focus{outline:none;border-color:var(--gold)}
   <div class="hero-glow"></div>
   <div class="eyebrow">品尝系列 · 其七</div>
   <h1>文章 <span class="grad">SDE 解析器</span></h1>
-  <p class="sub">传你自己的文章（<b>Word .docx / PDF</b>，单篇最大 100MB、最多 10 篇），<b>文件只在你本机解析、绝不上传</b>。WDS 带着完整 SDE 内功当底盘，对每篇做「观点解读 + SDE 解构」；多篇时再并置出一份<b>跨篇 SDE 综合</b>。</p>
+  <p class="sub">传你自己的文章（<b>Word .docx / PDF</b>，单篇最大 100MB、最多 10 篇），<b>文件只在你本机解析、绝不上传</b>（连扫描版 PDF 都能本机 OCR 读出）。WDS 带着完整 SDE 内功当底盘，对每篇做「观点解读 + SDE 解构」；多篇时再并置出一份<b>跨篇 SDE 综合</b>。</p>
   <div class="flow">
     <span>上传 Word/PDF</span><span class="arr">→</span><span>本机解析</span><span class="arr">→</span><span>逐篇 SDE 解构</span><span class="arr">→</span><span>跨篇综合</span>
   </div>
@@ -131,7 +134,7 @@ textarea:focus{outline:none;border-color:var(--gold)}
       <div class="ds">支持 Word .docx（2007 及以后，含 WPS／Mac Word／Google Docs 导出）与 PDF · 单篇 ≤ 100MB · 最多 10 篇</div>
     </div>
     <input type="file" id="fileIn" accept=".docx,.pdf" multiple style="display:none">
-    <div class="tip">旧版二进制 .doc、RTF、以及纯图片扫描版 PDF（没有文字层）本机读不出文字——请在 Word/WPS 里「另存为 .docx」，或直接把正文粘到下面。</div>
+    <div class="tip">扫描版／纯图片 PDF（无文字层）会自动识别为「可 OCR」，点该行的「🔍 OCR 提取」即可在本机逐页识别（中英双语，较慢，前 120 页）。旧版二进制 .doc、RTF 请在 Word/WPS 里「另存为 .docx」，或把正文粘到下面。</div>
     <div id="queue" style="display:none"></div>
     <div class="pastebox">
       <div class="lbl" style="margin-top:6px">或粘贴一篇正文</div>
@@ -324,6 +327,48 @@ async function extractPdf(ab,onPage){
   return out.replace(/\n{3,}/g,"\n\n").trim();
 }
 
+/* ═══════════ 扫描版 PDF 的 OCR 兜底（tesseract.js，懒加载，中英双语）══════════
+   全站所有解析器都在"纯图片 PDF（无文字层）"处投降——这里把它接住：
+   逐页把 PDF 渲染成画布，交给 tesseract 识别，让"读不了"变成"什么都能读"。
+   只在用户对某篇点「OCR 提取」时才加载库与语言包，不拖累日常。 */
+var OCR_MAX_PAGES=120;
+var _tessP=null;
+function ensureTesseract(){
+  if(window.Tesseract) return Promise.resolve();
+  if(_tessP) return _tessP;
+  _tessP=new Promise(function(res,rej){
+    var s=document.createElement("script");
+    s.src="https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js";
+    s.onload=function(){res();};
+    s.onerror=function(){_tessP=null;rej(new Error("OCR 库加载失败，检查网络后重试"));};
+    document.head.appendChild(s);
+  });
+  return _tessP;
+}
+async function ocrPdf(file,onPage){
+  await ensureTesseract();
+  var ab=await file.arrayBuffer();
+  var pdf=await pdfjsLib.getDocument({data:ab}).promise;
+  var N=Math.min(pdf.numPages,OCR_MAX_PAGES);
+  var worker=await Tesseract.createWorker(["chi_sim","eng"]);
+  var out="";
+  try{
+    for(var i=1;i<=N;i++){
+      if(onPage) onPage(i,N,pdf.numPages);
+      var pg=await pdf.getPage(i);
+      var vp=pg.getViewport({scale:2});               // 2× 提采样，OCR 更准
+      var cv=document.createElement("canvas");
+      cv.width=vp.width; cv.height=vp.height;
+      await pg.render({canvasContext:cv.getContext("2d"),viewport:vp}).promise;
+      var r=await worker.recognize(cv);
+      out+=(((r&&r.data&&r.data.text)||"").trim())+"\n\n";
+      cv.width=cv.height=0;                            // 及时释放大画布
+    }
+  } finally { try{ await worker.terminate(); }catch(_){} }
+  out=out.replace(/[ \t]{2,}/g," ").replace(/\n{3,}/g,"\n\n").trim();
+  return { text:out, ocrPages:N, totalPages:pdf.numPages };
+}
+
 /* ---- 加文件 ---- */
 var drop=$("#drop"), fileIn=$("#fileIn");
 drop.onclick=function(){fileIn.click();};
@@ -351,14 +396,17 @@ async function addFile(f){
     var isPdf=b[0]===0x25&&b[1]===0x50&&b[2]===0x44&&b[3]===0x46;
     var isOle=b[0]===0xD0&&b[1]===0xCF&&b[2]===0x11&&b[3]===0xE0;
     var isRtf=b[0]===0x7B&&b[1]===0x5C&&b[2]===0x72&&b[3]===0x74;
-    var text="";
+    var text="", wasPdf=false;
     if(isZip){ text=await extractDocx(ab); }
-    else if(isPdf){ if(!window.pdfjsLib) throw new Error("PDF 解析库未加载，请刷新页面"); text=await extractPdf(ab,function(i,tot){ if(tot>10&&i%10===0){ art.err="正在抽取第 "+i+"/"+tot+" 页"; renderQueue(); } }); }
+    else if(isPdf){ wasPdf=true; if(!window.pdfjsLib) throw new Error("PDF 解析库未加载，请刷新页面"); text=await extractPdf(ab,function(i,tot){ if(tot>10&&i%10===0){ art.err="正在抽取第 "+i+"/"+tot+" 页"; renderQueue(); } }); }
     else if(isOle){ art.status="error"; art.err="Word 97-2003 二进制 .doc，本机读不出——请另存为 .docx，或粘贴正文"; renderQueue(); return; }
     else if(isRtf){ art.status="error"; art.err="RTF 文件——请另存为 .docx，或粘贴正文"; renderQueue(); return; }
     else { art.status="error"; art.err="认不出（既不是 .docx 也不是 PDF）"; renderQueue(); return; }
     text=text.replace(/\n{3,}/g,"\n\n").trim();
-    if(text.replace(/\s/g,"").length<20){ art.status="error"; art.err="解析出的文字太少（可能是扫描版/纯图片 PDF，需先 OCR）"; renderQueue(); return; }
+    if(text.replace(/\s/g,"").length<20){
+      if(wasPdf){ art.status="scanned"; art._file=f; art.err="像扫描版／纯图片 PDF（无文字层）"; renderQueue(); return; }   // 不投降：给 OCR 兜底
+      art.status="error"; art.err="解析出的文字太少"; renderQueue(); return;
+    }
     art.text=text; art.chars=text.replace(/\s/g,"").length; art.status="ready"; art.err="";
   }catch(e){ art.status="error"; art.err="解析失败："+(e&&e.message||e); }
   renderQueue();
@@ -374,6 +422,21 @@ $("#addPaste").onclick=function(){
 };
 function removeArticle(id){ articles=articles.filter(function(a){return a.id!==id;}); renderQueue(); renderResults(); }
 
+/* ---- 扫描版 PDF：一键 OCR 提取 ---- */
+async function runOcr(id){
+  var a=articles.filter(function(x){return x.id===id;})[0];
+  if(!a||!a._file||a.status==="ocr") return;
+  a.status="ocr"; a.err="载入 OCR 引擎…"; renderQueue(); updateBtns();
+  try{
+    var r=await ocrPdf(a._file,function(i,tot,all){ a.err="OCR 识别第 "+i+" / "+tot+" 页"+(all>tot?"（共 "+all+" 页，先取前 "+tot+"）":""); renderQueue(); });
+    var t=(r.text||"").trim();
+    if(t.replace(/\s/g,"").length<20){ a.status="scanned"; a.err="OCR 也没识别出文字（图片太糊/实为空白）"; renderQueue(); updateBtns(); return; }
+    a.text=t; a.chars=t.replace(/\s/g,"").length; a.ocrPages=r.ocrPages; a.status="ready"; a.err=""; a._file=null;
+    setStatus("OCR 完成：《"+esc(a.title)+"》识别出 "+a.chars+" 字"+(r.totalPages>r.ocrPages?"（仅前 "+r.ocrPages+"/"+r.totalPages+" 页）":"")+"，可开始解析。");
+  }catch(e){ a.status="scanned"; a.err="OCR 失败："+(e&&e.message||e); }
+  renderQueue(); updateBtns();
+}
+
 /* ---- 渲染队列 ---- */
 function renderQueue(){
   var box=$("#queue");
@@ -383,14 +446,17 @@ function renderQueue(){
   articles.forEach(function(a){
     var meta, cls="";
     if(a.status==="parsing"){ meta='<span class="spinner"></span>'+(a.err?esc(a.err):"解析中"); }
+    else if(a.status==="scanned"){ meta='<span class="q-warn">⚠ '+esc(a.err||"扫描版")+'</span><button class="qocr" data-id="'+a.id+'">🔍 OCR 提取</button>'; cls="warn"; }
+    else if(a.status==="ocr"){ meta='<span class="spinner"></span>'+(a.err?esc(a.err):"OCR 识别中"); }
     else if(a.status==="error"&&!a.text){ meta='<span class="q-err">✕ '+esc(a.err||"解析失败")+"</span>"; cls="err"; }
     else if(a.status==="analyzing"){ meta='<span class="spinner"></span>解析中'; }
     else if(a.status==="done"){ meta='<span class="q-ok">✓ 已解析 · '+a.chars+" 字</span>"; }
-    else { meta='<span class="q-ok">'+a.chars+" 字</span>"; }
+    else { meta='<span class="q-ok">'+a.chars+" 字"+(a.ocrPages?"（OCR "+a.ocrPages+" 页）":"")+"</span>"; }
     html+='<div class="qrow '+cls+'"><div class="qname" title="'+esc(a.title)+'">'+esc(a.title)+'</div><div class="qmeta">'+meta+'</div><button class="qdel" data-id="'+a.id+'">移除</button></div>';
   });
   box.innerHTML=html;
   box.querySelectorAll(".qdel").forEach(function(bt){bt.onclick=function(){if(running) return; removeArticle(bt.dataset.id);};});
+  box.querySelectorAll(".qocr").forEach(function(bt){bt.onclick=function(){if(running) return; runOcr(bt.dataset.id);};});
   updateBtns();
 }
 
