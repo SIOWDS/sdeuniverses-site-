@@ -1627,13 +1627,23 @@ export default {
           try {
             const corpus = await loadCorpus(env, url);
             const pq = (title + " " + (parts[idx].h || "") + " " + points.join(" ")).slice(0, 300);
-            const phits = retrieve(corpus, pq, 12, []);
             const pseen = {};
+            // —— 结构化知识：九库邻域子图（按本部分主旨定位），让成文引到成体系的判断而非仅相似句 ——
+            let kbBlock = "";
+            try {
+              const kb = await loadKB(env, url);
+              if (kb) { const r = retrieveKB(kb, corpus, pq, [], 18); kbBlock = r.block; }
+            } catch (e) {}
+            // —— 相似句补充：K=12；KB 命中时收紧上限为其让预算 ——
+            const pcap = Math.max(3000, 8000 - kbBlock.length);
+            const phits = retrieve(corpus, pq, 12, []);
+            let chunkText = "";
             for (const ck of phits) {
               const d = corpus.docs[ck.d]; if (!d || pseen[d.u]) continue; pseen[d.u] = 1;
-              partCtx += "【来源：" + d.t + "】\n" + ck.t.slice(0, 900) + "\n\n";
-              if (partCtx.length > 8000) break;
+              chunkText += "【来源：" + d.t + "】\n" + ck.t.slice(0, 900) + "\n\n";
+              if (chunkText.length > pcap) break;
             }
+            partCtx = kbBlock + (kbBlock && chunkText ? "\n【补充 · 站内原文片段】\n" : "") + chunkText;
           } catch (e) {}
         }
         const sys = "你是 SDE 学派的学者，正在写一篇严谨的学术论文。" + (GD ? "本文属《问对WDS》系列——由一场与 WDS 的百轮问答凝成、关于 SDE 思想的论文。" : "") + BASE

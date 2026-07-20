@@ -97,7 +97,8 @@ ok("与WDS对话 RAG 已接九库（guide 块 retrieveKB 邻域子图优先，ch
   W.includes("const kb = await loadKB(env, url)") && W.includes("retrieveKB(kb, corpus, q, expTerms, docText ? 14 : 24)") && W.includes("siteCtx = kbBlock +"));
 ok("读者文章走独立首条消息 + 站内资料让位（07-20 修）",
   W.includes('content: "这是我提交给你的文章全文，本场对话就围绕它。') && W.includes("全文我已通读完毕") && !W.includes("【读者提交的文章·全文】"));
-ok("万字论文分部检索（K=12 / 8000 上限）", W.includes("retrieve(corpus, pq, 12, [])") && W.includes("partCtx.length > 8000"));
+ok("万字论文分部检索（K=12 + KB留预算上限）", W.includes("retrieve(corpus, pq, 12, [])") && W.includes("8000 - kbBlock.length"));
+ok("成文分部亦接九库（part 模式 retrieveKB 供结构化判断）", W.includes("retrieveKB(kb, corpus, pq, [], 18)") && W.includes("partCtx = kbBlock +"));
 ok("paperN 夹 3-6，缺省 3 不动陪读", W.includes("Math.max(3, Math.min(6, parseInt(b.paperN, 10) || 3))"));
 ok("配额桶分家＋按 Key 计额度：chat/read/dlg/ask 各一桶（07-20 二修）",
   W.includes("function wdsBucket(kind, ip, key)")
