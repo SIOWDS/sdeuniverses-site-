@@ -87,9 +87,9 @@ ok("非 DeepSeek 不注入 DeepSeek 专属字段", !bGLM.thinking && bGLM.temper
 head("[阶段二] 路由与页面契约");
 ok("三条链路齐备（对话 read / 开工 dialogue-reflect / 成文 read-paper）",
   W.includes('url.pathname === "/api/wds/dialogue-reflect"') && W.includes('url.pathname === "/api/wds/read-paper"') && W.includes('url.pathname === "/api/wds/read"'));
-ok("guide 分流 system（对话指引版 vs 陪读版）", W.includes("b.guide ? WDS_DIALOGUE_SYS(reflect, SDEM, siteCtx)"));
-ok("本场心得优先于全站缓存心得（read + read-paper 两处）", W.split("slice(0, 14000)").length === 3);
-ok("guide 预算三元式在位（30万 vs 陪读收缩式）", W.includes("b.guide ? WDS_GUIDE_HIST_BUDGET :") && W.includes("120000 - docText.length - siteCtx.length"));
+ok("guide 分流 system（对话指引版 vs 陪读版，含读者文章两参）", W.includes("b.guide ? WDS_DIALOGUE_SYS(reflect, SDEM, siteCtx, docTitle, docText)"));
+ok("本场心得优先于全站缓存心得（read + read-paper 两处）", W.split("slice(0, 14000)").length >= 3);   // 站内另有智能体亦用 14000
+ok("guide 预算三元式在位（30万减文章/资料，陪读收缩式不变）", W.includes("b.guide ? Math.max(60000, WDS_GUIDE_HIST_BUDGET - docText.length - siteCtx.length)") && W.includes("120000 - docText.length - siteCtx.length"));
 ok("长问放宽仅限 guide（4000 vs 500）", W.includes("b.guide ? 4000 : 500"));
 ok("全站 RAG 加强档（K=36 + 接续补捞 + 3 万上限 + 来源回传）",
   W.includes("retrieve(corpus, q, 36, expTerms)") && W.includes("siteCtx.length > 30000") && W.includes('{ t: "sources", v: siteSrcs }'));
@@ -155,7 +155,7 @@ function collect(root, selRaw, out) {
 }
 
 const body = mkEl("body");
-for (const [id, tag] of Object.entries({ msgs: "div", q: "textarea", go: "button", turns: "span", bsum: "button", bpap: "button", bkey: "button", gtog: "button", guide: "aside" })) {
+for (const [id, tag] of Object.entries({ msgs: "div", q: "textarea", go: "button", turns: "span", bsum: "button", bpap: "button", bkey: "button", gtog: "button", guide: "aside", bart: "button", artchip: "span" })) {
   const e = mkEl(tag); e.id = id; body.appendChild(e);
 }
 const LS = { _d: {}, getItem(k) { return this._d[k] || null; }, setItem(k, v) { this._d[k] = String(v); } };
@@ -256,7 +256,7 @@ async function ask(text) { qEl.value = text; goEl.onclick(); await flush(25); }
     last.body.history[0].text.indexOf("第一问：什么是发生学") === 0 && last.body.history[1].text.indexOf("第1答") === 0);
   ok("服务端打包后仍 199 条不裁（模型真看到全场）", last.packed.length === 199, last.packed.reduce((s, m) => s + m.content.length, 0) + " 字符");
   ok("服务端所见第一条＝第一问原文（无省略提示）", last.packed[0].content.indexOf("第一问：什么是发生学") === 0 && !/省略/.test(last.packed[0].content));
-  ok("轮次计数走到 100/100", turnsEl.textContent.indexOf("100/100") >= 0, turnsEl.textContent);
+  ok("轮次计数走到满额（剩余 0 次，见 a562f40d 改为剩余式）", /剩余\s*0\s*次/.test(turnsEl.textContent), turnsEl.textContent);
   ok("满 100 轮后输入锁定", qEl.disabled === true && goEl.disabled === true);
   ok("满轮后总结/成文仍可用", sumB.disabled === false && papB.disabled === false);
   const grow = cc.map((c) => JSON.stringify(c.body.history).length);

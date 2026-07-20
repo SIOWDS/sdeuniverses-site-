@@ -14,7 +14,7 @@ const W = fs.readFileSync(__dirname + "/../src/worker.js", "utf8");
 console.log("[静态核对]");
 ok("页面不引用任何浮层（wds-read.js / wds-mode.js / WDS_READ 配置）",
   !PAGE.includes("wds-read.js") && !PAGE.includes("wds-mode.js") && !PAGE.includes("WDS_READ"));
-ok("worker guide 分支在位（带全站RAG siteCtx）", W.includes("b.guide ? WDS_DIALOGUE_SYS(reflect, SDEM, siteCtx)"));
+ok("worker guide 分支在位（带全站RAG siteCtx + 读者文章）", W.includes("b.guide ? WDS_DIALOGUE_SYS(reflect, SDEM, siteCtx, docTitle, docText)"));
 ok("guide 全站检索加强档在位（K=36+接续+3万上限+来源回传）",
   W.includes("retrieve(corpus, q, 36, expTerms)") && W.includes("siteCtx.length > 30000") && W.includes('{ t: "sources", v: siteSrcs }'));
 ok("万字论文分部亦带站内资料（GD 检索 K=12 / 8000 上限）",
@@ -29,10 +29,10 @@ ok("三条对话链路都走最强档（开工/对话guide/成文guide）",
 ok("陪读不被波及（非 guide 仍走 WDS_VENDORS 默认档）", W.includes("wdsTopBody(VC, { model: VC.model, stream: true, max_tokens: b.guide ? 8000 : 2200"));
 ok("worker paperN 3-6 在位", W.includes("Math.max(3, Math.min(6, parseInt(b.paperN, 10) || 3))") && W.includes("j.parts.slice(0, PN)"));
 ok("worker 开工路由 dialogue-reflect 在位", W.includes('url.pathname === "/api/wds/dialogue-reflect"') && W.includes("DIALOGUE_REFLECT_PROMPT"));
-ok("read/read-paper 优先吃本场心得 b.reflect", W.split("slice(0, 14000)").length === 3);
+ok("read/read-paper 优先吃本场心得 b.reflect", W.split("slice(0, 14000)").length >= 3);   // 站内另有智能体也用 14000，故用 >=
 ok("方法论指引起手三选一", W.includes("起手按问题种类三选一"));
 ok("全面记忆预算在位（guide 30万+单条1.2万+长问4000+成文10万）",
-  W.includes("WDS_GUIDE_HIST_BUDGET = 300000") && W.includes("b.guide ? WDS_GUIDE_HIST_BUDGET :")
+  W.includes("WDS_GUIDE_HIST_BUDGET = 300000") && /b\.guide \? Math\.max\(60000, WDS_GUIDE_HIST_BUDGET - docText\.length - siteCtx\.length\)/.test(W)
   && W.includes("histBudget, b.guide ? 12000 : 0") && W.includes("b.guide ? 4000 : 500") && W.includes("b.guide ? 300000 : 24000"));
 // 功能级：抽出 packReadHistory 实测——guide 预算下 100 轮×2400 字符全量不裁、单条 1.2 万不截
 (function () {
@@ -98,7 +98,7 @@ function collect(root, selRaw, out) {
 
 const body = mkEl("body");
 // 页面骨架里脚本会 $ 的节点
-const ids = { msgs: "div", q: "textarea", go: "button", turns: "span", bsum: "button", bpap: "button", bkey: "button", gtog: "button", guide: "aside" };
+const ids = { msgs: "div", q: "textarea", go: "button", turns: "span", bsum: "button", bpap: "button", bkey: "button", gtog: "button", guide: "aside", bart: "button", artchip: "span" };
 for (const [id, tag] of Object.entries(ids)) { const e = mkEl(tag); e.id = id; body.appendChild(e); }
 
 global.document = {
@@ -150,6 +150,29 @@ global.fetch = function (url, opt) {
 const js = PAGE.match(/<script>\n([\s\S]*)\n<\/script>/)[1];
 eval(js);
 
+// —— 输入文章（07-20）——
+ok("worker: WDS_DIALOGUE_SYS 收文章两参", W.includes("function WDS_DIALOGUE_SYS(reflect, SDEM, siteCtx, artTitle, artText)"));
+ok("worker: 文章全文进 system 末尾 + 怎么读的指引", W.includes("【读者提交的文章·全文】") && W.includes("【怎么用《读者提交的文章》】"));
+ok("worker: guide 分支把 docTitle/docText 传进对话 system", W.includes("WDS_DIALOGUE_SYS(reflect, SDEM, siteCtx, docTitle, docText)"));
+ok("worker: 成文档文章上限 guide 6万/陪读 3万且 CTX 无正文时不占位", W.includes("slice(0, GD ? 60000 : 30000)") && W.includes('docText ? ((GD ? "【本场对话讨论的文章（读者提交）】《"'));
+ok("页面: 顶栏有输入文章按钮与文章标记", PAGE.includes('id="bart"') && PAGE.includes('id="artchip"'));
+ok("页面: 客户端解析库到位（pdf.js + mammoth）", PAGE.includes("pdf.js/3.11.174/pdf.min.js") && PAGE.includes("mammoth.browser.min.js"));
+ok("页面: 每问与成文都带文章正文", PAGE.includes('docText: article.text || ""') && PAGE.includes('body.docText = article.text || ""'));
+
+console.log("[输入文章·行为]");
+(function () {
+  const bart = findIn(body, "#bart"), chip = findIn(body, "#artchip");
+  ok("载入前顶栏无文章标记", chip.hidden !== false);
+  bart.onclick();                                        // 打开「给 WDS 一篇文章」面板
+  const veil = body.children[body.children.length - 1];
+  const tit = findIn(veil, "#atit"), pas = findIn(veil, "#apas"), aok = findIn(veil, "#aok"), aclr = findIn(veil, "#aclr");
+  ok("面板四件齐（标题/粘贴框/载入/清除）", !!tit && !!pas && !!aok && !!aclr);
+  tit.value = "测试文章：物是什么"; pas.value = "正".repeat(120000);   // 故意超 10 万字符
+  aok.onclick();
+  ok("载入后顶栏显示文章标记", chip.hidden === false);
+  ok("超 10 万字符自动截断到 10 万", /100000\u5b57/.test(chip.children.map(c => c.textContent || "").join("")), chip.children.map(c => c.textContent || "").join(""));
+})();
+
 console.log("[独立界面行为]");
 const qEl = findIn(body, "#q"), goEl = findIn(body, "#go"), papB = findIn(body, "#bpap"), turnsEl = findIn(body, "#turns");
 
@@ -165,8 +188,9 @@ setImmediate(() => {
     ok("开工仪式恰一次且先于首答", refl.length === 1 && calls.indexOf(refl[0]) < calls.indexOf(chat[0]), "reflect " + refl.length + " 次");
     ok("每问都垫本场约5000字心得", chat.every(c => typeof c.body.reflect === "string" && c.body.reflect.length >= 4000));
     ok("两问都发出且带 guide=1", chat.length === 2 && chat.every(c => c.body.guide === 1), "共 " + chat.length + " 次");
+    ok("每问都把文章全文带上（docText=10万 + docTitle=文章名）", chat.every(c => c.body.docText.length === 100000 && c.body.docTitle.indexOf("测试文章") === 0));
     ok("第二问的 history 含首轮问答（全程记忆）", chat[1].body.history.length >= 3 && chat[1].body.history.some(m => m.role === "wds"));
-    ok("轮次显示更新", turnsEl.textContent.includes("2/100"));
+    ok("轮次显示更新（剩余式计数，见 a562f40d）", turnsEl.textContent.includes("98"));
     var srcsEl = findIn(body, ".srcs");
     ok("来源条已渲染（sources 事件→站内篇目链接）", !!srcsEl && srcsEl.querySelectorAll("a").length === 2);
     // 成文
@@ -177,7 +201,8 @@ setImmediate(() => {
       const parts = calls.filter(c => c.body.mode === "part");
       ok("plan 带 paperN=6 + guide=1", plan.length === 1 && plan[0].body.paperN === 6 && plan[0].body.guide === 1);
       ok("六个部分逐一生成", parts.length === 6, "实得 " + parts.length);
-      ok("成文调用亦垫本场心得", plan.concat(parts).every(c => c.body.reflect && c.body.reflect.length >= 4000));
+      ok("总结/成文亦带文章全文", plan.concat(parts).every(c => (c.body.docText || "").length === 100000));
+    ok("成文调用亦垫本场心得", plan.concat(parts).every(c => c.body.reflect && c.body.reflect.length >= 4000));
       const doc = findIn(body, ".doct");
       const chars = doc ? doc.textContent.replace(/\s/g, "").length : 0;
       ok("拼出的论文约一万字", chars >= 9000, "实得 " + chars + " 字");
