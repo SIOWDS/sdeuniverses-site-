@@ -1590,6 +1590,67 @@ export default {
       const BASE = (reflect ? ("\n\n【SDE 内化心得·思考底盘（内化用，别复述）】\n" + reflect) : "") + SDEM;
       const CTX = (docText ? ((GD ? "【本场对话讨论的文章（读者提交）】《" : "【读者当时在读的文本】《") + (docTitle || "（未命名）") + "》\n" + docText + "\n\n") : "") + (GD ? "【这一场对话的全程记录】\n" : "【这一场陪读对话的全程记录】\n") + convo;
 
+      if (b.mode === "full") {
+        // 单趟流式成文:先把 200 SSE 流交出去,再在流内做 RAG + await 上游把整篇论文一次写完、逐字转发。
+        // 一趟请求=一次 503 机会(而非拟题+六分部+总结七趟),且无 JSON 提纲要解析、无分部接缝。
+        const stream = new ReadableStream({
+          async start(controller) {
+            let _hb = null;
+            const fin = () => { if (_hb) clearInterval(_hb); try { controller.enqueue(_ENC.encode("data: [DONE]\n\n")); controller.close(); } catch (e) {} };
+            _hb = setInterval(() => { try { controller.enqueue(_ENC.encode(": ping\n\n")); } catch (e) {} }, 10000);
+            try {
+              // 全站 RAG:按议题线索取一段结构化知识,整篇一次注入
+              let ragCtx = "";
+              if (GD) {
+                try {
+                  const corpus = await loadCorpus(env, url);
+                  const q = ((docTitle ? docTitle + " " : "") + convo.slice(0, 600)).slice(0, 300);
+                  const seen = {};
+                  let kbBlock = "";
+                  try { const kb = await loadKB(env, url); if (kb) { const r = retrieveKB(kb, corpus, q, [], 24); kbBlock = r.block; } } catch (e) {}
+                  const cap = Math.max(4000, 12000 - kbBlock.length);
+                  const hits = retrieve(corpus, q, 16, []);
+                  let chunkText = "";
+                  for (const ck of hits) { const d = corpus.docs[ck.d]; if (!d || seen[d.u]) continue; seen[d.u] = 1; chunkText += "【来源：" + d.t + "】\n" + ck.t.slice(0, 900) + "\n\n"; if (chunkText.length > cap) break; }
+                  ragCtx = kbBlock + (kbBlock && chunkText ? "\n【补充 · 站内原文片段】\n" : "") + chunkText;
+                } catch (e) {}
+              }
+              const PW = PN >= 6 ? "一万" : "5000";
+              const sys = "你是 SDE 学派的学者，正在写一篇严谨的学术论文。" + (GD ? "本文属《问对WDS》系列——由一场与 WDS 的百轮问答凝成、关于 SDE 思想的论文。" : "") + BASE
+                + "\n用严谨学术汉语写作：论证扎实、有可被反驳的明确判断、不注水、不摆空模板；可用 SDE 概念但必须讲透、服务论证。用自然段和简短小标题分层，不要用 #、* 等 markdown 符号，不要写参考文献。";
+              const usr = CTX + (ragCtx ? ("\n【站内资料·全站检索到的相关段落（可据以印证，引用时标（来源：篇名），没有的别编）】\n" + ragCtx + "\n") : "")
+                + "\n\n现在，请把上面这场对话凝成一篇约 " + PW + " 字的完整学术论文，一气呵成、从头写到尾：\n"
+                + "① 开篇先给一个准确、有锋刃的标题（单独成行）；\n"
+                + "② 正文分 " + (PN >= 6 ? "六" : "三") + " 个部分，每部分一个简短小标题 + 充分展开的论证，各部分构成完整论证链（问题的提出 → 逐个核心判断 → 对最强反驳的回应 → 结论与限度），部分之间不重复、层层递进；\n"
+                + "③ 直接从标题写起，不要开场白、不要目录、不要“以下是”之类的话。";
+              let upstream;
+              try { upstream = await fetch(VC.url, { method: "POST", headers: { "content-type": "application/json", authorization: "Bearer " + KEY }, body: JSON.stringify(wdsTopBody(VC, { model: VC.model, stream: true, max_tokens: (GD && vd === "deepseek") ? 32000 : 8000, messages: [{ role: "system", content: sys }, { role: "user", content: usr }] })) }); }
+              catch (e) { controller.enqueue(_sseBytes({ t: "error", v: "接不上基底：" + (e && e.message) })); return fin(); }
+              if (!upstream.ok) {
+                const errtxt = (await upstream.text()).slice(0, 200);
+                if (upstream.status === 401 || upstream.status === 402 || upstream.status === 429) { controller.enqueue(_sseBytes({ t: "error", v: "你的 Key 用不了（" + upstream.status + "）：额度不足或填错了。", code: "bad_key" })); return fin(); }
+                controller.enqueue(_sseBytes({ t: "error", v: "基底返回错误 " + upstream.status + "：" + errtxt })); return fin();
+              }
+              const reader = upstream.body.getReader(); const dec = new TextDecoder(); let buf = "";
+              while (true) {
+                const { done: rdone, value } = await reader.read(); if (rdone) break;
+                buf += dec.decode(value, { stream: true }); let li;
+                while ((li = buf.indexOf("\n")) >= 0) {
+                  const line = buf.slice(0, li).trim(); buf = buf.slice(li + 1);
+                  if (!line.startsWith("data:")) continue; const p = line.slice(5).trim(); if (p === "[DONE]") continue;
+                  let j; try { j = JSON.parse(p); } catch (e) { continue; }
+                  if (j.error) { controller.enqueue(_sseBytes({ t: "error", v: j.error.message || "基底流内错误" })); continue; }
+                  const d = (j.choices && j.choices[0] && j.choices[0].delta) || {};
+                  if (d.reasoning_content) controller.enqueue(_sseBytes({ t: "think", v: d.reasoning_content }));
+                  if (d.content) controller.enqueue(_sseBytes({ t: "token", v: d.content }));
+                }
+              }
+            } catch (e) { controller.enqueue(_sseBytes({ t: "error", v: "成文出错：" + (e && e.message) + "（可重试）" })); }
+            fin();
+          },
+        });
+        return new Response(stream, { headers: { ..._cors(), "content-type": "text/event-stream; charset=utf-8", "cache-control": "no-store" } });
+      }
       if (b.mode === "summary") {
         const stream = new ReadableStream({
           async start(controller) {
@@ -1957,65 +2018,67 @@ export default {
         if (!lr.ok) return _sseResp([{ t: "error", v: lr.reason === "day" ? ("这把 Key 今天在「全站问答」入口已用 " + (lr.inDay || 0) + "/" + WDS_PER_DAY + " 次，明天再来（额度按你的 Key 计，陪读与「与WDS对话」各有独立额度）。") : "聊得太快啦，过十几秒再问。" }]);
         dayLeft = Math.max(0, WDS_PER_DAY - (lr.inDay || 0));   // 回传真实日剩余，供前端显示
       } catch (e) {}
-      // 全站检索：先调用结构化知识(九库邻域子图,密/准/省token),再以相似句片段补充
-      let ctxText = "", sources = [];
-      const seen = {};
-      try {
-        const corpus = await loadCorpus(env, url);
-        const expTerms = await sdeExpandQuery(VC, KEY, q);
-        // —— 结构化调用:entity-link → 邻域子图 ——
-        let kbBlock = "";
-        try {
-          const kb = await loadKB(env, url);
-          if (kb) { const r = retrieveKB(kb, corpus, q, expTerms, 24); kbBlock = r.block; for (const s of r.srcs) if (!seen[s.u]) { seen[s.u] = 1; sources.push(s); } }
-        } catch (e) {}
-        // —— 相似句补充:给 KB 腾预算(20→12,字数上限收紧)——
-        const chunkCap = kbBlock ? 7000 : 12000;
-        const hits = retrieve(corpus, q, kbBlock ? 12 : 20, expTerms);
-        let chunkText = "";
-        for (const ck of hits) {
-          const d = corpus.docs[ck.d];
-          if (!d) continue;
-          if (!seen[d.u]) { seen[d.u] = 1; sources.push({ u: d.u, t: d.t }); }
-          chunkText += "【来源：" + d.t + "】\n" + ck.t + "\n\n";
-          if (chunkText.length > chunkCap) break;
-        }
-        ctxText = kbBlock + (kbBlock && chunkText ? "\n【补充 · 站内原文片段】\n" : "") + chunkText;
-      } catch (e) {}
-      sources = sources.slice(0, 6);
-      let reflect = ""; try { reflect = await ensureReflect(env, url, rvendor, VC, KEY); } catch (e) {}
-      const SDEM = "\n\nSDE 骨架：显露 S / 差异序列 D / 特征纠缠 E；三大方程 S=F(D,E)·D=G(S,E)·E=H(S,D)；六路径；意义三律（特征·自由·幸福）；发生学——追问事物为何如此发生，而非如何被发现。";
-      const sys = WDS_CHAT_SYS(reflect, SDEM, ctxText);
-      const messages = [{ role: "system", content: sys }];
-      for (const m of history) {
-        const role = (m && m.role === "wds") ? "assistant" : "user";
-        const content = String((m && m.text) || "").slice(0, 1500);
-        if (content) messages.push({ role, content });
-      }
-      messages.push({ role: "user", content: q });
-      let upstream;
-      try {
-        upstream = await fetch(VC.url, { method: "POST", headers: { "content-type": "application/json", authorization: "Bearer " + KEY }, body: JSON.stringify({ model: VC.model, stream: true, max_tokens: 2600, messages }) });
-      } catch (e) {
-        return _sseResp([{ t: "error", v: "接不上基底：" + (e && e.message) }]);
-      }
-      if (!upstream.ok) {
-        const errtxt = (await upstream.text()).slice(0, 300);
-        if (upstream.status === 401 || upstream.status === 402 || upstream.status === 429) return _sseResp([{ t: "error", v: "你的 Key 用不了（" + upstream.status + "）：额度不足或填错了。去设置里检查或换一个。", code: "bad_key" }]);
-        return _sseResp([{ t: "error", v: "基底返回错误 " + upstream.status + "：" + errtxt }]);
-      }
-      const reader = upstream.body.getReader();
-      const dec = new TextDecoder();
-      const srcs = sources;
+      // ── 先出流后干活:先把 200 SSE 流交出去,重活(全站RAG + 内化心得 + await 上游首字节)移入
+      //    stream.start()——避免思考/冷启动在出流前被平台按资源/时间上限杀掉而 503(与 /api/wds/read 同款)。──
       const stream = new ReadableStream({
         async start(controller) {
-          if (dayLeft !== null) controller.enqueue(_sseBytes({ t: "quota", v: { left: dayLeft, day: WDS_PER_DAY } })); // 今日真实剩余次数
-          if (srcs.length) controller.enqueue(_sseBytes({ t: "sources", v: srcs })); // 先把出处发给前端
-          let buf = "";
+          let _hb = null;
+          const fin = () => { if (_hb) clearInterval(_hb); try { controller.enqueue(_ENC.encode("data: [DONE]\n\n")); controller.close(); } catch (e) {} };
+          _hb = setInterval(() => { try { controller.enqueue(_ENC.encode(": ping\n\n")); } catch (e) {} }, 10000);
           try {
+            if (dayLeft !== null) controller.enqueue(_sseBytes({ t: "quota", v: { left: dayLeft, day: WDS_PER_DAY } })); // 今日真实剩余次数
+            // 全站检索：先调用结构化知识(九库邻域子图,密/准/省token),再以相似句片段补充
+            let ctxText = "", sources = [];
+            const seen = {};
+            try {
+              const corpus = await loadCorpus(env, url);
+              const expTerms = await sdeExpandQuery(VC, KEY, q);
+              // —— 结构化调用:entity-link → 邻域子图 ——
+              let kbBlock = "";
+              try {
+                const kb = await loadKB(env, url);
+                if (kb) { const r = retrieveKB(kb, corpus, q, expTerms, 24); kbBlock = r.block; for (const s of r.srcs) if (!seen[s.u]) { seen[s.u] = 1; sources.push(s); } }
+              } catch (e) {}
+              // —— 相似句补充:给 KB 腾预算(20→12,字数上限收紧)——
+              const chunkCap = kbBlock ? 7000 : 12000;
+              const hits = retrieve(corpus, q, kbBlock ? 12 : 20, expTerms);
+              let chunkText = "";
+              for (const ck of hits) {
+                const d = corpus.docs[ck.d];
+                if (!d) continue;
+                if (!seen[d.u]) { seen[d.u] = 1; sources.push({ u: d.u, t: d.t }); }
+                chunkText += "【来源：" + d.t + "】\n" + ck.t + "\n\n";
+                if (chunkText.length > chunkCap) break;
+              }
+              ctxText = kbBlock + (kbBlock && chunkText ? "\n【补充 · 站内原文片段】\n" : "") + chunkText;
+            } catch (e) {}
+            sources = sources.slice(0, 6);
+            if (sources.length) controller.enqueue(_sseBytes({ t: "sources", v: sources })); // 出处先发前端
+            let reflect = ""; try { reflect = await ensureReflect(env, url, rvendor, VC, KEY); } catch (e) {}
+            const SDEM = "\n\nSDE 骨架：显露 S / 差异序列 D / 特征纠缠 E；三大方程 S=F(D,E)·D=G(S,E)·E=H(S,D)；六路径；意义三律（特征·自由·幸福）；发生学——追问事物为何如此发生，而非如何被发现。";
+            const sys = WDS_CHAT_SYS(reflect, SDEM, ctxText);
+            const messages = [{ role: "system", content: sys }];
+            for (const m of history) {
+              const role = (m && m.role === "wds") ? "assistant" : "user";
+              const content = String((m && m.text) || "").slice(0, 1500);
+              if (content) messages.push({ role, content });
+            }
+            messages.push({ role: "user", content: q });
+            let upstream;
+            try {
+              upstream = await fetch(VC.url, { method: "POST", headers: { "content-type": "application/json", authorization: "Bearer " + KEY }, body: JSON.stringify({ model: VC.model, stream: true, max_tokens: 2600, messages }) });
+            } catch (e) { controller.enqueue(_sseBytes({ t: "error", v: "接不上基底：" + (e && e.message) })); return fin(); }
+            if (!upstream.ok) {
+              const errtxt = (await upstream.text()).slice(0, 300);
+              if (upstream.status === 401 || upstream.status === 402 || upstream.status === 429) { controller.enqueue(_sseBytes({ t: "error", v: "你的 Key 用不了（" + upstream.status + "）：额度不足或填错了。去设置里检查或换一个。", code: "bad_key" })); return fin(); }
+              controller.enqueue(_sseBytes({ t: "error", v: "基底返回错误 " + upstream.status + "：" + errtxt })); return fin();
+            }
+            const reader = upstream.body.getReader();
+            const dec = new TextDecoder();
+            let buf = "";
             while (true) {
-              const { done, value } = await reader.read();
-              if (done) break;
+              const { done: rdone, value } = await reader.read();
+              if (rdone) break;
               buf += dec.decode(value, { stream: true });
               let idx;
               while ((idx = buf.indexOf("\n")) >= 0) {
@@ -2032,10 +2095,9 @@ export default {
               }
             }
           } catch (e) {
-            controller.enqueue(_sseBytes({ t: "error", v: "读取基底流失败：" + (e && e.message) }));
+            controller.enqueue(_sseBytes({ t: "error", v: "生成出错：" + (e && e.message) + "（可再问一次）" }));
           }
-          controller.enqueue(_ENC.encode("data: [DONE]\n\n"));
-          controller.close();
+          fin();
         },
       });
       return new Response(stream, { headers: { ..._cors(), "content-type": "text/event-stream; charset=utf-8", "cache-control": "no-store" } });
