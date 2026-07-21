@@ -205,18 +205,24 @@
     streaming = true; sendEl.disabled = true;
     var payload = { q: q, history: history.slice(-4), key: kv.key, vendor: kv.vendor };
     var answer = "", statusShown = false, srcBox = null;
+    var wd = null, timedOut = false;   // 存活看门狗:靠心跳字节喂,45s 无字节判定连接已死
 
     fetch(API, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(payload) })
       .then(function (resp) {
         if (!resp.ok || !resp.body) throw new Error("HTTP " + resp.status);
         var reader = resp.body.getReader(), dec = new TextDecoder(), buf = "";
+        function bumpWd() { clearTimeout(wd); wd = setTimeout(function () { timedOut = true; try { reader.cancel(); } catch (e) {} }, 45000); }
+        bumpWd();
         function finish() {
-          if (answer) { a.textContent = answer; history.push({ role: "wds", text: answer }); }
+          clearTimeout(wd);
+          if (timedOut && !answer) { a.className = "wdsm-a wdsm-err"; a.textContent = "连接像是断了（也许想太久被中间层切了）。稍后再问，你这句我记着。"; }
+          else if (answer) { a.textContent = answer; history.push({ role: "wds", text: answer }); }
           streaming = false; sendEl.disabled = false; bodyEl.scrollTop = bodyEl.scrollHeight;
         }
         function pump() {
           return reader.read().then(function (r) {
             if (r.done) return finish();
+            bumpWd();
             buf += dec.decode(r.value, { stream: true });
             var idx;
             while ((idx = buf.indexOf("\n")) >= 0) {
@@ -237,6 +243,7 @@
         return pump();
       })
       .catch(function (e) {
+        clearTimeout(wd);
         a.className = "wdsm-a wdsm-err";
         a.textContent = "接不上 WDS 了（" + (e && e.message) + "）。稍后再问，你这句我记着。";
         streaming = false; sendEl.disabled = false;
