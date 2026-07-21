@@ -905,10 +905,27 @@ async function ragScan(env, url, q, expTerms, prevQ, k, chunkLimit) {
   const KEEP = Math.max(120, (k || 36) * 4);
   const cut = chunkLimit || 1600;
   let top = [];
-  for (const sec of man.sections) {
+  // RAG_BUDGET：60MB／20 片全扫会顶到平台的单请求资源上限（实测间歇 503）。
+  // 所以先用便宜的信息（篇名 + SDE 坐标，合计不到 200KB）给各版块排个序，把最可能相关的分片排前面，
+  // 再带着时间与体量预算去扫：扫到预算用完就收手。宁可少扫两片，不能整条检索垮掉。
+  const secScore = {};
+  for (const d of man.docs) {
+    const tl = String(d.t || "").toLowerCase();
+    let sc = 0;
+    for (const key of baseKeys) if (tl.indexOf(key) >= 0) sc += 2;
+    for (const key of exp) if (tl.indexOf(key) >= 0) sc += 1.5;
+    if (coords && exp.length) { const dc = coords[d.i]; if (dc) { for (const t of exp) if (dc.has(t)) sc += 1; } }
+    if (sc) secScore[d.s] = (secScore[d.s] || 0) + sc;
+  }
+  const order = man.sections.slice().sort((a, b) => (secScore[b.key] || 0) - (secScore[a.key] || 0));
+  const t0 = Date.now(), MS_BUDGET = 6000, SHARD_BUDGET = 8;
+  let scanned = 0;
+  for (const sec of order) {
     for (const f of (sec.files || [sec.key])) {
+      if (scanned >= SHARD_BUDGET || Date.now() - t0 > MS_BUDGET) break;
       let sh = null;
       try { sh = await (await env.ASSETS.fetch(new Request(new URL("/search/shard-" + f + ".json", url)))).json(); } catch (e) { continue; }
+      scanned++;
       for (const ck of sh.chunks) {
         const tl = ck.t.toLowerCase();
         let sc = 0;
@@ -925,6 +942,7 @@ async function ragScan(env, url, q, expTerms, prevQ, k, chunkLimit) {
   }
   top.sort((a, b) => b.sc - a.sc);
   const perDoc = {}, picked = [];
+  void scanned;
   for (const it of top) {
     perDoc[it.d] = perDoc[it.d] || 0;
     if (perDoc[it.d] >= 2) continue;      // 每篇最多两段，保证来源多样

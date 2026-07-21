@@ -495,6 +495,7 @@ ok("客户端：0 字节或流被切断都自动改用不流式重取（并记�
 ok("worker：与WDS对话这条线根本不再整份装载语料（逐片扫描、扫完就丢）",
   W.includes("RAG_STREAMED_SCAN") && /async function ragScan/.test(W) && /sh = null;/.test(W) && (() => { const i = W.indexOf('url.pathname === "/api/wds/rag"'); const j = W.indexOf("return J({ ok: true", i); return W.slice(i, j).indexOf("loadCorpus") < 0; })());
 ok("worker：候选表有上限，不会随命中数无限涨", /top\.length > KEEP \* 3/.test(W) && /top\.length = KEEP/.test(W));
+ok("worker：扫描带预算且按相关度排序（先用篇名+坐标排版块，再限时限片）", W.includes("RAG_BUDGET") && /MS_BUDGET = 6000/.test(W) && /SHARD_BUDGET = 8/.test(W) && /man\.sections\.slice\(\)\.sort/.test(W));
 ok("每条流的状态变量都在本流内声明（严格模式裸赋值＝当场瘫）", (() => {
   const marker = "async start(controller)";
   let i = -1, bad = 0, n = 0;
