@@ -2027,6 +2027,31 @@ export default {
     // /api/llm-proxy：境外基底(GPT/Claude/Gemini)纯转发代理。
     // 解决两件事：①浏览器 CORS 拦截 ②中国大陆无法直连境外 API。
     // 纪律：只转发、不存储、不记录任何 Key；只放行白名单里的官方 LLM 域名。
+    if (url.pathname === "/api/kb/retrieve") {
+      // 全站结构化检索：给任意智能体一段可注入的 RAG 上下文（九库邻域子图 + 全站语料原文片段）。只读静态语料/九库，无需 Key。
+      if (request.method === "OPTIONS") return new Response(null, { headers: _cors() });
+      if (request.method !== "POST") return new Response("Method Not Allowed", { status: 405 });
+      let b = {}; try { b = await request.json(); } catch (e) {}
+      const q = String(b.q || "").trim().slice(0, 2000);
+      if (q.length < 1) return Response.json({ block: "", srcs: [] }, { headers: _cors() });
+      const budget = Math.max(6, Math.min(40, parseInt(b.budget, 10) || 24));
+      const K = Math.max(4, Math.min(24, parseInt(b.k, 10) || 12));
+      const cap = Math.max(2000, Math.min(16000, parseInt(b.cap, 10) || 9000));
+      try {
+        const corpus = await loadCorpus(env, url);
+        const seen = {}, srcs = [];
+        let kbBlock = "";
+        try { const kb = await loadKB(env, url); if (kb) { const r = retrieveKB(kb, corpus, q, [], budget); kbBlock = r.block; for (const s of r.srcs) if (!seen[s.u]) { seen[s.u] = 1; srcs.push(s); } } } catch (e) {}
+        const cap2 = Math.max(2000, cap - kbBlock.length);
+        const hits = retrieve(corpus, q, K, []);
+        let chunkText = "";
+        for (const ck of hits) { const d = corpus.docs[ck.d]; if (!d || seen[d.u]) continue; seen[d.u] = 1; srcs.push({ u: d.u, t: d.t }); chunkText += "【来源：" + d.t + "】\n" + ck.t + "\n\n"; if (chunkText.length > cap2) break; }
+        const block = (kbBlock || chunkText) ? ("【SDE 全站知识（供作答时调用：来自 sdeuniverses.com 全站语料的结构化判断 + 原文片段；可印证可反驳，勿编造来源）】\n" + kbBlock + (kbBlock && chunkText ? "\n【全站原文片段】\n" : "") + chunkText) : "";
+        return Response.json({ block: block, srcs: srcs.slice(0, 10), n: srcs.length }, { headers: _cors() });
+      } catch (e) {
+        return Response.json({ block: "", srcs: [], error: String(e && e.message) }, { headers: _cors() });
+      }
+    }
     if (url.pathname === "/api/llm-proxy") {
       // 预检
       if (request.method === "OPTIONS") {

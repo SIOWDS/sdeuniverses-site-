@@ -1871,6 +1871,15 @@ function showErr(msg){ errBox.textContent='⚠ '+msg; errBox.style.display='bloc
 function hideErr(){ errBox.style.display='none'; }
 
 // 流式调用基底（所选厂商），token 逐字写入目标元素
+// 全站 RAG：按问题取一段可注入的结构化知识（九库邻域子图 + 全站语料原文片段），供 SDE 金点子作答时调用。无 Key、只读、失败即空串（安全退回原行为）。
+async function sdeKbContext(q){
+  try{
+    const r = await fetch('/api/kb/retrieve', { method:'POST', headers:{'content-type':'application/json'}, body: JSON.stringify({ q: q, k: 12, budget: 24, cap: 9000 }) });
+    if(!r.ok) return '';
+    const j = await r.json();
+    return (j && j.block) ? j.block : '';
+  }catch(e){ return ''; }
+}
 async function streamChat(apiKey, model, systemPrompt, userQ, bodyEl, statusEl, metaEl, maxTokens){
   bodyEl.innerHTML='<span class="placeholder">正在连接 '+vendorName()+'……</span>';
   statusEl.innerHTML='<span class="spinner"></span> 连接中';
@@ -2190,6 +2199,9 @@ async function run(){
 
   // ═══ 第二阶段：六路并行 · 3视角 × (普通AI + SDE金点子) ═══
   //  此时心得已缓存就位——右栏(SDE金点子)直接带着它写；左栏(普通AI)是纯裸基底对照，不用心得。
+  // 全站 RAG：按问题取一次全站结构化知识，注入右栏(SDE金点子)作答，提升创新的语料底盘；左栏保持裸基底对照不注入。
+  let kbCtx=''; try{ kbCtx = await sdeKbContext(q); }catch(e){}
+  const sdeUserQ = kbCtx ? (kbCtx + '\n【现在请针对下面这个问题作答】\n' + q) : q;
   const tasks=[];
   rowEls.forEach((row,i)=>{
     const c = cells[i];
@@ -2201,7 +2213,7 @@ async function run(){
     );
     // 右栏(SDE金点子)：心得已在第一阶段写好并缓存，直接带着它写；心得为空则退回不带心得的常规提智
     tasks.push(
-      streamChat(key, model, sdePrompt(c.dim, c.idx, c.focus, sixReflection), q, row.sde.body, row.sde.status, row.sde.meta)
+      streamChat(key, model, sdePrompt(c.dim, c.idx, c.focus, sixReflection), sdeUserQ, row.sde.body, row.sde.status, row.sde.meta)
         .catch(e=>{ showErr('金点子：'+e.message);
           row.sde.body.innerHTML='<span class="placeholder">生成失败：'+e.message+'</span>';
           row.sde.status.textContent='失败'; return {text:'',chars:0,thinkChars:0,secs:0}; })
