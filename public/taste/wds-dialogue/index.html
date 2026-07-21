@@ -477,6 +477,40 @@
     }
     return attempt(0);
   }
+  // 分部写作走流式（SSE）：先建立连接再逐字收——避免“出流前”被平台上限杀掉而 503；出流前的偶发 5xx 仍退避重试。
+  function postStream(body, onToken) {
+    body.guide = 1; body.paperN = PN; body.docTitle = article.text ? article.title : TITLE; body.docText = article.text || ""; body.history = history; body.reflect = xinde;
+    var delays = [1500, 4000];
+    function attempt(n) {
+      return fetch(PAPER, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) }).then(function (r) {
+        if (!r.ok || !r.body) {
+          if (n < delays.length) return new Promise(function (res) { setTimeout(res, delays[n]); }).then(function () { return attempt(n + 1); });
+          throw new Error("HTTP " + r.status);
+        }
+        var reader = r.body.getReader(), dec = new TextDecoder(), buf = "", text = "", errMsg = "";
+        function pump() {
+          return reader.read().then(function (res) {
+            if (res.done) { if (errMsg && !text) throw new Error(errMsg); return text; }
+            buf += dec.decode(res.value, { stream: true });
+            var idx2;
+            while ((idx2 = buf.indexOf("\n")) >= 0) {
+              var line = buf.slice(0, idx2).trim(); buf = buf.slice(idx2 + 1);
+              if (line.indexOf("data:") !== 0) continue;
+              var pp = line.slice(5).trim();
+              if (pp === "[DONE]") continue;
+              try { var j = JSON.parse(pp); if (j.t === "token") { text += j.v; if (onToken) onToken(text); } else if (j.t === "error") { errMsg = j.v; } } catch (e) {}
+            }
+            return pump();
+          });
+        }
+        return pump();
+      }, function (e) {
+        if (n < delays.length) return new Promise(function (res) { setTimeout(res, delays[n]); }).then(function () { return attempt(n + 1); });
+        throw e;
+      });
+    }
+    return attempt(0);
+  }
   function docModal(title, kind) {
     var m = el("div", "veil doc");
     m.innerHTML = "<div class='box'><div class='boxh'><b class='dt'></b><button class='boxx'>\u00d7</button></div>"
@@ -551,11 +585,11 @@
           return;
         }
         dm.setProg("\u7b2c " + (i + 2) + " \u6b65 / \u5171 " + (pl.parts.length + 1) + " \u6b65\uff1a\u6b63\u5728\u5199\u3010" + pl.parts[i].h + "\u3011\u2026");
-        return postR({ mode: "part", idx: i, title: pl.title, points: pl.points, parts: pl.parts, convo: pl.convo, prevBrief: prev.slice(-1400), key: kv.key, vendor: kv.vendor })
-          .then(function (r) {
-            if (!r.ok) throw new Error(r.msg || "\u5206\u8282\u751f\u6210\u5931\u8d25");
-            out += (out ? "\n\n" : "") + pl.parts[i].h + "\n" + r.text;
-            prev = r.text; i++;
+        var base = out ? (out + "\n\n") : "", head = pl.parts[i].h + "\n";
+        return postStream({ mode: "part", idx: i, title: pl.title, points: pl.points, parts: pl.parts, convo: pl.convo, prevBrief: prev.slice(-1400), key: kv.key, vendor: kv.vendor }, function (partial) { dm.setText(base + head + partial); })
+          .then(function (text) {
+            out = base + head + text;
+            prev = text; i++;
             dm.setText(out);
             return step();
           });

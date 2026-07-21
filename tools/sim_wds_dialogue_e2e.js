@@ -224,7 +224,7 @@ global.fetch = function (url, opt) {
     const parts = []; for (let k = 1; k <= 6; k++) parts.push({ h: "第" + k + "部分 · 小标题", gist: "主旨" + k });
     return Promise.resolve({ json: () => Promise.resolve({ ok: true, title: "问对WDS：一场百轮对话凝成的论文", points: ["金点子甲", "金点子乙", "金点子丙", "金点子丁"], parts, convo: rec.convoSeen.slice(0, 6000) }) });
   }
-  if (b.mode === "part") return Promise.resolve({ json: () => Promise.resolve({ ok: true, text: "正文".repeat(900) }) });
+  if (b.mode === "part") return Promise.resolve({ ok: true, body: sse(['data: {"t":"token","v":"' + "正文".repeat(900) + '"}\n', "data: [DONE]\n"]) });
   if (b.mode === "summary") {
     rec.convoSeen = readConvoText(b.history || [], b.guide ? 300000 : 24000);
     return Promise.resolve({ json: () => Promise.resolve({ ok: true, text: "总结正文".repeat(350) }) });
@@ -291,7 +291,7 @@ async function ask(text) { qEl.value = text; goEl.onclick(); await flush(25); }
   ok("总结弹窗渲染成文", !!dm && findIn(dm, ".doct").textContent.length > 1000);
   dm.remove();
 
-  papB.onclick(); await flush(60);
+  papB.onclick(); await flush(120);
   const plan = calls.filter((c) => c.body.mode === "plan");
   const parts = calls.filter((c) => c.body.mode === "part");
   ok("拟题一次 + 六部分逐段（共七步）", plan.length === 1 && parts.length === 6, "plan " + plan.length + " / part " + parts.length);

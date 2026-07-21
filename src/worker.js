@@ -1622,39 +1622,73 @@ export default {
         const points = (Array.isArray(b.points) ? b.points : []).slice(0, 8);
         const prevBrief = String(b.prevBrief || "").slice(0, 1400);
         const convoBrief = String(b.convo || convo).slice(0, 6000);
-        let partCtx = "";
-        if (GD) {
-          try {
-            const corpus = await loadCorpus(env, url);
-            const pq = (title + " " + (parts[idx].h || "") + " " + points.join(" ")).slice(0, 300);
-            const pseen = {};
-            // —— 结构化知识：九库邻域子图（按本部分主旨定位），让成文引到成体系的判断而非仅相似句 ——
-            let kbBlock = "";
+        // 分部写作走 SSE 流：先把 200 流交出去，再在流内做 RAG 与 await 上游写完——避免非流式在返回前被平台按
+        // 资源/时间上限杀掉而 503（此前“一万字论文运行一段时间后 503”的根因）。出流后慢只退化成流内温和提示。
+        const stream = new ReadableStream({
+          async start(controller) {
+            const fin = () => { try { controller.enqueue(_ENC.encode("data: [DONE]\n\n")); controller.close(); } catch (e) {} };
             try {
-              const kb = await loadKB(env, url);
-              if (kb) { const r = retrieveKB(kb, corpus, pq, [], 18); kbBlock = r.block; }
-            } catch (e) {}
-            // —— 相似句补充：K=12；KB 命中时收紧上限为其让预算 ——
-            const pcap = Math.max(3000, 8000 - kbBlock.length);
-            const phits = retrieve(corpus, pq, 12, []);
-            let chunkText = "";
-            for (const ck of phits) {
-              const d = corpus.docs[ck.d]; if (!d || pseen[d.u]) continue; pseen[d.u] = 1;
-              chunkText += "【来源：" + d.t + "】\n" + ck.t.slice(0, 900) + "\n\n";
-              if (chunkText.length > pcap) break;
+              let partCtx = "";
+              if (GD) {
+                try {
+                  const corpus = await loadCorpus(env, url);
+                  const pq = (title + " " + (parts[idx].h || "") + " " + points.join(" ")).slice(0, 300);
+                  const pseen = {};
+                  // —— 结构化知识：九库邻域子图（按本部分主旨定位），让成文引到成体系的判断而非仅相似句 ——
+                  let kbBlock = "";
+                  try { const kb = await loadKB(env, url); if (kb) { const r = retrieveKB(kb, corpus, pq, [], 18); kbBlock = r.block; } } catch (e) {}
+                  // —— 相似句补充：K=12；KB 命中时收紧上限为其让预算 ——
+                  const pcap = Math.max(3000, 8000 - kbBlock.length);
+                  const phits = retrieve(corpus, pq, 12, []);
+                  let chunkText = "";
+                  for (const ck of phits) { const d = corpus.docs[ck.d]; if (!d || pseen[d.u]) continue; pseen[d.u] = 1; chunkText += "【来源：" + d.t + "】\n" + ck.t.slice(0, 900) + "\n\n"; if (chunkText.length > pcap) break; }
+                  partCtx = kbBlock + (kbBlock && chunkText ? "\n【补充 · 站内原文片段】\n" : "") + chunkText;
+                } catch (e) {}
+              }
+              const sys = "你是 SDE 学派的学者，正在写一篇严谨的学术论文。" + (GD ? "本文属《问对WDS》系列——由一场与 WDS 的百轮问答凝成、关于 SDE 思想的论文。" : "") + BASE
+                + "\n用严谨学术汉语写作：论证扎实、有可被反驳的明确判断、不注水、不摆空模板；可用 SDE 概念但必须讲透、服务论证。用自然段和简短小标题分层，不要用 #、* 等 markdown 符号，不要写参考文献。";
+              const usr = "论文标题：" + title + "\n金点子：" + points.join("；") + "\n"
+                + (partCtx ? ("【站内资料·全站检索到的相关段落（可据以印证或对话，引用时标（来源：篇名），没有的别编）】\n" + partCtx + "\n") : "")
+                + "【对话依据】" + convoBrief + "\n"
+                + (prevBrief ? ("【前文已写·摘要】" + prevBrief + "\n") : "")
+                + "\n现在写【" + parts[idx].h + "】这一部分（主旨：" + (parts[idx].gist || "") + "），约 1700-1900 字。直接从正文写起，不要开场白，不要复述论文标题，不要与前文重复。";
+              let upstream;
+              try {
+                upstream = await fetch(VC.url, { method: "POST", headers: { "content-type": "application/json", authorization: "Bearer " + KEY }, body: JSON.stringify(wdsTopBody(VC, { model: VC.model, stream: true, max_tokens: 3600, messages: [{ role: "system", content: sys }, { role: "user", content: usr }] })) });
+              } catch (e) { controller.enqueue(_sseBytes({ t: "error", v: "接不上基底：" + (e && e.message) })); return fin(); }
+              if (!upstream.ok) {
+                const errtxt = (await upstream.text()).slice(0, 200);
+                if (upstream.status === 401 || upstream.status === 402 || upstream.status === 429) { controller.enqueue(_sseBytes({ t: "error", v: "你的 Key 用不了（" + upstream.status + "）：额度不足或填错了。", code: "bad_key" })); return fin(); }
+                controller.enqueue(_sseBytes({ t: "error", v: "基底返回错误 " + upstream.status + "：" + errtxt })); return fin();
+              }
+              const reader = upstream.body.getReader();
+              const dec = new TextDecoder();
+              let buf = "";
+              while (true) {
+                const { done: rdone, value } = await reader.read();
+                if (rdone) break;
+                buf += dec.decode(value, { stream: true });
+                let li;
+                while ((li = buf.indexOf("\n")) >= 0) {
+                  const line = buf.slice(0, li).trim();
+                  buf = buf.slice(li + 1);
+                  if (!line.startsWith("data:")) continue;
+                  const p = line.slice(5).trim();
+                  if (p === "[DONE]") continue;
+                  let j; try { j = JSON.parse(p); } catch (e) { continue; }
+                  if (j.error) { controller.enqueue(_sseBytes({ t: "error", v: j.error.message || "基底流内错误" })); continue; }
+                  const d = (j.choices && j.choices[0] && j.choices[0].delta) || {};
+                  if (d.reasoning_content) controller.enqueue(_sseBytes({ t: "think", v: d.reasoning_content }));
+                  if (d.content) controller.enqueue(_sseBytes({ t: "token", v: d.content }));
+                }
+              }
+            } catch (e) {
+              controller.enqueue(_sseBytes({ t: "error", v: "本部分生成出错：" + (e && e.message) + "（可重试）" }));
             }
-            partCtx = kbBlock + (kbBlock && chunkText ? "\n【补充 · 站内原文片段】\n" : "") + chunkText;
-          } catch (e) {}
-        }
-        const sys = "你是 SDE 学派的学者，正在写一篇严谨的学术论文。" + (GD ? "本文属《问对WDS》系列——由一场与 WDS 的百轮问答凝成、关于 SDE 思想的论文。" : "") + BASE
-          + "\n用严谨学术汉语写作：论证扎实、有可被反驳的明确判断、不注水、不摆空模板；可用 SDE 概念但必须讲透、服务论证。用自然段和简短小标题分层，不要用 #、* 等 markdown 符号，不要写参考文献。";
-        const usr = "论文标题：" + title + "\n金点子：" + points.join("；") + "\n"
-          + (partCtx ? ("【站内资料·全站检索到的相关段落（可据以印证或对话，引用时标（来源：篇名），没有的别编）】\n" + partCtx + "\n") : "")
-          + "【对话依据】" + convoBrief + "\n"
-          + (prevBrief ? ("【前文已写·摘要】" + prevBrief + "\n") : "")
-          + "\n现在写【" + parts[idx].h + "】这一部分（主旨：" + (parts[idx].gist || "") + "），约 1700-1900 字。直接从正文写起，不要开场白，不要复述论文标题，不要与前文重复。";
-        const text = await llmText(VC, KEY, sys, usr, 3600);
-        return text ? J({ ok: true, text }) : J({ ok: false, msg: "本部分生成失败，请重试。" }, 502);
+            fin();
+          },
+        });
+        return new Response(stream, { headers: { ..._cors(), "content-type": "text/event-stream; charset=utf-8", "cache-control": "no-store" } });
       }
 
       return J({ ok: false, msg: "bad mode" }, 400);
