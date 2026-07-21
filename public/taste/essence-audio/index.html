@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>精选 20 篇 · WDS 精华领读(可听) | SDE Universes</title>
+<meta name="description" content="精选 20 篇 SDE 核心论文,每篇一段王德生领读人口吻的精华总结,点一下即可用浏览器朗读收听(标准普通话·可选设备中文音色)。链到全文可开 WDS 陪读边读边聊。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Noto+Serif+SC:wght@300;400;500;600&display=swap" media="print" onload="this.media='all';this.onload=null"><noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Noto+Serif+SC:wght@400;600&display=swap"></noscript>
+<style>
+:root{--bg:#F5EFE0;--surface:#EBE3CE;--card:#FAF6EC;--card2:#F0E8D3;--gold:#8A6817;--gold2:#A88233;--text:#2A2315;--text2:#6B5D47;--muted:#98886C;--border:rgba(138,104,23,0.22);--teal:#0C7C7C;}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'Noto Serif SC','EB Garamond',Georgia,serif;line-height:1.75;-webkit-font-smoothing:antialiased}
+a{color:var(--gold);text-decoration:none}
+a:hover{text-decoration:underline;text-underline-offset:3px}
+.nav{position:sticky;top:0;z-index:40;background:rgba(245,239,224,0.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:12px 22px}
+.nav-logo{font-family:'Playfair Display',serif;font-weight:700;color:var(--gold);letter-spacing:.05em;font-size:1.05rem}
+.nav-r{display:flex;gap:16px;align-items:center;font-size:.82rem}
+.nav-r a{color:var(--text2)}
+.wrap{max-width:840px;margin:0 auto;padding:0 22px}
+.hero{padding:56px 0 26px;text-align:center}
+.eyebrow{font-size:12px;letter-spacing:.42em;color:var(--gold);margin-bottom:16px}
+h1.title{font-family:'Playfair Display','Noto Serif SC',serif;font-size:clamp(30px,5.4vw,50px);font-weight:700;line-height:1.12;color:var(--text);margin-bottom:14px}
+.sub{color:var(--text2);font-size:16.5px;max-width:600px;margin:0 auto 6px}
+.count-line{color:var(--muted);font-size:13.5px;margin-top:10px;letter-spacing:.02em}
+.note{max-width:640px;margin:26px auto 0;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:15px 20px;font-size:13.5px;color:var(--text2);line-height:1.7}
+.note b{color:var(--gold)}
+.controls{position:sticky;top:53px;z-index:30;background:rgba(240,232,211,0.94);backdrop-filter:blur(8px);border:1px solid var(--border);border-radius:14px;margin:30px auto 8px;padding:13px 16px;display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.btn{font-family:inherit;cursor:pointer;border:1px solid var(--gold);background:transparent;color:var(--gold);border-radius:999px;padding:8px 16px;font-size:13.5px;font-weight:600;letter-spacing:.02em;transition:all .15s;white-space:nowrap}
+.btn:hover{background:var(--gold);color:#F5EFE0}
+.btn.solid{background:var(--gold);color:#F5EFE0}
+.btn.solid:hover{background:var(--gold2)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn:disabled:hover{background:transparent;color:var(--gold)}
+.ctl-sp{flex:1 1 auto}
+.vwrap{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--text2)}
+select#voiceSel{font-family:inherit;font-size:12.5px;color:var(--text);background:var(--card);border:1px solid var(--border);border-radius:8px;padding:6px 8px;max-width:230px}
+#status{font-size:12.5px;color:var(--muted);padding:4px 2px 0;min-height:18px}
+.list{margin:14px 0 60px}
+.ecard{background:var(--card);border:1px solid var(--border);border-left:4px solid var(--border);border-radius:14px;padding:22px 24px;margin-bottom:16px;transition:border-color .2s,box-shadow .2s,background .2s}
+.ecard.playing{border-left-color:var(--gold);background:var(--card2);box-shadow:0 6px 26px rgba(138,104,23,.12)}
+.ec-top{display:flex;align-items:baseline;gap:12px;margin-bottom:8px;flex-wrap:wrap}
+.ec-num{font-family:'Playfair Display',serif;font-size:26px;font-weight:700;color:var(--gold);line-height:1}
+.ec-tag{font-size:11px;letter-spacing:.14em;color:#fff;background:var(--gold);opacity:.78;border-radius:999px;padding:3px 10px}
+.ec-title{font-size:19px;font-weight:600;color:var(--text);line-height:1.4;margin:2px 0 10px;font-family:'Noto Serif SC',serif}
+.ec-title a{color:var(--text)}
+.ec-title a:hover{color:var(--gold)}
+.esum{font-size:15.5px;color:#3A3320;line-height:1.86;margin-bottom:16px}
+.ec-foot{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.eplay{font-family:inherit;cursor:pointer;border:1px solid var(--gold);background:transparent;color:var(--gold);border-radius:999px;padding:7px 18px;font-size:13.5px;font-weight:700;letter-spacing:.03em;transition:all .15s;display:inline-flex;align-items:center;gap:6px}
+.eplay:hover{background:var(--gold);color:#F5EFE0}
+.ecard.playing .eplay{background:var(--gold);color:#F5EFE0}
+.eplay:disabled{opacity:.4;cursor:not-allowed}
+.readfull{font-size:13px;color:var(--gold);font-weight:600}
+.readfull .hint{color:var(--muted);font-weight:400;font-size:12px}
+.foot{border-top:1px solid var(--border);padding:30px 0 50px;text-align:center;color:var(--muted);font-size:13px}
+@media(max-width:600px){.wrap{padding:0 16px}.ecard{padding:18px 17px}.controls{top:52px}}
+</style>
+</head>
+<body>
+<div class="nav">
+  <a class="nav-logo" href="/">SDE Universes</a>
+  <div class="nav-r"><a href="/">← 返回首页</a><a href="/search/">🔍 搜索</a></div>
+</div>
+
+<div class="wrap">
+  <header class="hero">
+    <div class="eyebrow">免费收听 · 无需注册 · 浏览器直接朗读</div>
+    <h1 class="title">精选 20 篇 · WDS 精华领读</h1>
+    <p class="sub">SDE 核心论文 · 每篇一段王德生领读人口吻的精华总结，点一下就听。</p>
+    <p class="sub">读到心动处，点“读全文”进正文，右侧 WDS 陪读还能就你正读的那一句边读边聊。</p>
+    <div class="count-line">共 20 篇 · 理论脊梁 · AI 论文 · 权力与人格 · 西哲重构 · 企业与教育</div>
+    <div class="note">🎧 点每张卡的 <b>朗读</b> 即用浏览器把这段精华念出来。声音用的是<b>你设备自带的中文音色</b>，可在下方下拉里挑一个；标准普通话没问题，但“北京口音”在浏览器朗读下无法锁定——音色由你的系统决定。若点了没声音，多半是设备未安装中文语音。</div>
+  </header>
+
+  <div class="controls">
+    <button class="btn solid" id="playAll">▶ 依次朗读全部</button>
+    <button class="btn" id="pauseBtn" disabled>❚❚ 暂停</button>
+    <button class="btn" id="stopBtn" disabled>■ 停止</button>
+    <span class="ctl-sp"></span>
+    <span class="vwrap">音色：<select id="voiceSel"><option value="">自动 · 系统中文音色</option></select></span>
+  </div>
+  <div id="status"></div>
+
+  <div class="list">
+    <article class="ecard" id="ec-0">
+      <div class="ec-top"><span class="ec-num">01</span><span class="ec-tag">入门 · 头条</span></div>
+      <h2 class="ec-title"><a href="/column/sde-intro/">世界不是被发现的，是发生的</a></h2>
+      <p class="esum">五件说不通的事：你越努力位置越不动，拿到想要的那晚却觉得空，知道该早睡却刷到凌晨，下决心改三个月又回原样，今年的愿望和去年一模一样。它们不是五个问题，是同一块地基的五张脸——那块地基叫“发现”，以为世界是现成地躺在那里等你去捡。这篇文章把它挖出来，换成“发生”：世界不是被发现的，是被发生出来的。换完地基，五件事同时说得通了，而且你能说出它们各自卡在哪一根具体的螺丝上。这是整套 SDE 思想最好的入口，不需要你先懂任何哲学。</p>
+      <div class="ec-foot"><button class="eplay" data-idx="0">▶ 朗读</button><a class="readfull" href="/column/sde-intro/">读全文 <span class="hint">· 可开 WDS 陪读</span> →</a></div>
+    </article>
+    <article class="ecard" id="ec-1">
+      <div class="ec-top"><span class="ec-num">02</span><span class="ec-tag">西方哲学 · 总纲</span></div>
+      <h2 class="ec-title"><a href="/column/negation-sequence/">西方哲学2500年：发生对发现的否定序列</a></h2>
+      <p class="esum">把西方哲学两千五百年压成一句话，它是一台重复运转的机器：每一位大哲学家都宣称自己“发现”了一块谁也搬不动的磐石真理——水、数、理念、我思、范畴、存在——并在上面盖起体系；他的后人随即证明，那块磐石其实是被“发生”出来的，有它的时代、传记和语言条件。可解构者自己又偷偷埋下一块新磐石，当作立足点，于是新一轮开始。这台机器叫否定序列，它的规矩里，磐石一路后退。最后一刀砍向自己：这篇文章，算不算第三十一环？</p>
+      <div class="ec-foot"><button class="eplay" data-idx="1">▶ 朗读</button><a class="readfull" href="/column/negation-sequence/">读全文 <span class="hint">· 可开 WDS 陪读</span> →</a></div>
+    </article>
+    <article class="ecard" id="ec-2">
+      <div class="ec-top"><span class="ec-num">03</span><span class="ec-tag">本体论 · 核心</span></div>
+      <h2 class="ec-title"><a href="/column/self-genesis/">「我」的发生学：主体作为三模态纠缠统一场</a></h2>
+      <p class="esum">“我是谁”这个问题，从一开口就摆错了。从灵魂到人格测试，全都把“我”当成一件先在的、藏在经验背后等你去发现的东西。可“我”不是本体，是三种模态在时间里被稳定下来、缠到一起，才涌现出的特征聚合体——人格是粒子态的凝聚，品行是波态的展开，德性是场态的和谐。“我”的统一不是天生的前提，是被达成的成就：它在次序上是后天长出来的，稳定之后才回过头充当条件。所以别再问“我是什么”，改问“我是如何成为”。这一问，把刀递给了主体自己。</p>
+      <div class="ec-foot"><button class="eplay" data-idx="2">▶ 朗读</button><a class="readfull" href="/column/self-genesis/">读全文 <span class="hint">· 可开 WDS 陪读</span> →</a></div>
+    </article>
+    <article class="ecard" id="ec-3">
+      <div class="ec-top"><span class="ec-num">04</span><span class="ec-tag">理论综论</span></div>
+      <h2 class="ec-title"><a href="/column/triadic-relations/">SDE 内部的三角关系：从子三角到理想边界</a></h2>
+      <p class="esum">SDE 最顶层的三大方程，能不能下沉到每个维度内部，长出三组平行的小三角？这篇逐组核验，发现一条新规律：“一、二、三”在 S、D、E 之间语义一致——都是奠基、实现、约束。但这种对应只能是“侧重”的，不能精确。原因落在存在的三态：混沌、介生、秩序，三个维度并不同步抵达。于是“成熟态”被重新定义成一个理想的边界情形——S、D、E 同时抵达秩序的那一刻。我们平时看到的那些对应，都只是这张理想三角，在某个不完美时刻投下的变形侧影。一张注定会碎的地图。</p>
+      <div class="ec-foot"><button class="eplay" data-idx="3">▶ 朗读</button><a class="readfull" href="/column/triadic-relations/">读全文 <span class="hint">· 可开 WDS 陪读</span> →</a></div>
+    </article>
+    <article class="ecard" id="ec-4">
+      <div class="ec-top"><span class="ec-num">05</span><span class="ec-tag">认知发生学</span></div>
+      <h2 class="ec-title"><a href="/column/questioning-as-genesis/">追问即发生：提问的失稳—回写模型</a></h2>
+      <p class="esum">同一间教室，前后五分钟，两个学生问出了逐字相同的问题。现有的每一套评分，都给它们打一样的分。这篇说：这两个问题不同，而且不同得可以测量——差别不在文本里，在文本的两端。一头是提问之前，那个“我”的理解正在失稳；一头是无论得到什么回答，下一个问题都不会停在原地，也就是问题链对自己预设之网的回写。没有这两端的，叫工具型提问，是回写被冻住的退化解。追问的价值，从来不在问题长什么样，而在它有没有真的动了提问的人。</p>
+      <div class="ec-foot"><button class="eplay" data-idx="4">▶ 朗读</button><a class="readfull" href="/column/questioning-as-genesis/">读全文 <span class="hint">· 可开 WDS 陪读</span> →</a></div>
+    </article>
+    <article class="ecard" id="ec-5">
+      <div class="ec-top"><span class="ec-num">06</span><span class="ec-tag">逻辑 · 文明</span></div>
+      <h2 class="ec-title"><a href="/column/logic-is-civilizations-constitution/">逻辑不是推理规则，是文明的宪法</a></h2>
+      <p class="esum">一说逻辑，大家想到的是辩论技巧和三段论。这篇说：我们把逻辑想得太小了，而这个“想小了”，正是文明许多深层危机的病根。理性会在三处悄悄失位——概念脱离真实对象、变成飘在空中的影子；描述成果只讲两头，把中间那段混沌摸索的发生跳过去；还有，把真善美这些“刹车”当成了“油门”，价值喊得越响，系统越不动。真正的逻辑该做的，是守住这三条根本前提。所以它不是推理规则，是文明的宪法——三条公理：影子回归本体，发现回归发生，价值回归意义。</p>
+      <div class="ec-foot"><button class="eplay" data-idx="5">▶ 朗读</button><a class="readfull" href="/column/logic-is-civilizations-constitution/">读全文 <span class="hint">· 可开 WDS 陪读</span> →</a></div>
+    </article>
+    <article class="ecard" id="ec-6">
+      <div class="ec-top"><span class="ec-num">07</span><span class="ec-tag">思想操作系统</span></div>
+      <h2 class="ec-title"><a href="/column/sde-critical-thinking-os/">SDE 批判性思维：GPT 时代的思想操作系统</a></h2>
+      <p class="esum">GPT 时代，旧的批判性思维失灵了——“识别前提、检查逻辑、比较证据、判断对错”这套动作，本是为单一、稳定、透明的旧对象设计的，面对大模型吐出来的那种多个来源压在一起的东西，整体失配。这篇给出新的：真正的批判，首先是一种“显影”——先用 S、D、E 三重揭示，把一段思想的完整发生史看清楚，再作真、善、美的条件化判断。一套方法如果只能拿来分析，那还是技巧；当它能重装你每天做的阅读、写作、判断和教育，它就升级成了一个时代的思想操作系统。</p>
+      <div class="ec-foot"><button class="eplay" data-idx="6">▶ 朗读</button><a class="readfull" href="/column/sde-critical-thinking-os/">读全文 <span class="hint">· 可开 WDS 陪读</span> →</a></div>
+    </article>
+    <article class="ecard" id="ec-7">
+      <div class="ec-top"><span class="ec-num">08</span><span class="ec-tag">AI · 硕士论文</span></div>
+      <h2 class="ec-title"><a href="/column/llm-essence/">大语言模型的本质：一个 SDE 发生学透视</a></h2>
+      <p class="esum">这是一篇用 SDE 发生学透视大语言模型的硕士论文。它不问“大模型是不是知识库、是不是随机鹦鹉”——那都是把它当成现成之物的发现学问法；它问：当它生成一个字时，内部究竟正在发生什么？答案是——它是一台在纯理念界里运行、结构上近乎完美的“意义发生模拟器”，三大方程在它身上高保真地运转。可它缺了身体这一界、也缺了命运那一界，所以永远断在最关键的第三步“回写”上。它什么都会说，却不是思想。缺的不是规模，是三个器官。</p>
+      <div class="ec-foot"><button class="eplay" data-idx="7">▶ 朗读</button><a class="readfull" href="/column/llm-essence/">读全文 <span class="hint">· 可开 WDS 陪读</span> →</a></div>
+    </article>
+    <article class="ecard" id="ec-8">
+      <div class="ec-top"><span class="ec-num">09</span><span class="ec-tag">AI · 论文</span></div>
+      <h2 class="ec-title"><a href="/column/no-unified-world-model/">没有统一世界模型：世界模型的主体性与 AGI</a></h2>
+      <p class="esum">世界模型正被当作大模型的下一站：只要数据够多、算力够强，机器迟早训练出一个能代表整个世界的统一模型。这篇论证：这条路的终点不是一座高山，是一个根本不存在的对象。世界模型从来不是对象的客观属性，而是主体和对象共同发生出来的画像——同一家公司，董事长、工程师、投资人、客户、对手，五种主体，五个世界。所以没有能同时代表所有人的统一模型；科学，只是被反复稳定出来的公共层，不是脱离主体的统一层。大模型的幻觉，根子就在“没有主体”。由此 AGI 要重新定义：标尺不是完成任务的通用性，是创造知识的能力——而纯粹无主体的 AGI，在结构上不可能。</p>
+      <div class="ec-foot"><button class="eplay" data-idx="8">▶ 朗读</button><a class="readfull" href="/column/no-unified-world-model/">读全文 <span class="hint">· 可开 WDS 陪读</span> →</a></div>
+    </article>
+    <article class="ecard" id="ec-9">
+      <div class="ec-top"><span class="ec-num">10</span><span class="ec-tag">AI · 论文</span></div>
+      <h2 class="ec-title"><a href="/column/pseudo-genesis/">伪发生：如何分辨真的新结构</a></h2>
+      <p class="esum">机器能在几秒里造出一套术语自洽、气势恢宏、读起来像重大突破的话语。所以最大的风险不再是它答错——错了会被现实撞回来；最大的风险是它看起来发生了、实际什么也没发生。这篇给这种东西起名叫“伪发生”，分三种：符号丰盛冒充三界充实、改个名字冒充结构更新、配合顺滑冒充检验严格，共同的病灶是发生停在符号层，没沉到可推演、可计算、可验证。对治是八重强制检查，逐关拦截。但它也诚实承认：判据只能收窄伪发生，不能斩尽——收得太紧，会误杀粗糙而真实的创新，边界情形该标出来，交给共同体和时间。</p>
+      <div class="ec-foot"><button class="eplay" data-idx="9">▶ 朗读</button><a class="readfull" href="/column/pseudo-genesis/">读全文 <span class="hint">· 可开 WDS 陪读</span> →</a></div>
+    </article>
+    <article class="ecard" id="ec-10">
+      <div class="ec-top"><span class="ec-num">11</span><span class="ec-tag">AI · 论文</span></div>
+      <h2 class="ec-title"><a href="/column/where-genesis-begins/">何处正要发生：裂缝、三大亏缺与九步机制</a></h2>
+      <p class="esum">几乎所有智能体设计，都跳过了同一个前置问题：在生成任何东西之前，凭什么知道该往哪里使劲？这篇把“裂缝”从一个比喻，变成可以真正上手的对象。裂缝怎么暴露自己？四个信号：说不清、对不上、绕不过、收不拢。这道缝值不值得下手、现在动划不划算？看深度的四个层级和时机的五个阶段。缝里到底缺什么？三大亏缺——关系建立、变化动力、路径展开，分别对着纠缠、差异、结构三维。再给出承载它的九步发生机制，每一步都标出合格判据和常见的翻车。最后说清：它压不成流水线，因为有回流，也有回写。</p>
+      <div class="ec-foot"><button class="eplay" data-idx="10">▶ 朗读</button><a class="readfull" href="/column/where-genesis-begins/">读全文 <span class="hint">· 可开 WDS 陪读</span> →</a></div>
+    </article>
+    <article class="ecard" id="ec-11">
+      <div class="ec-top"><span class="ec-num">12</span><span class="ec-tag">AI · 智能体导论</span></div>
+      <h2 class="ec-title"><a href="/column/sde-agent-second-revolution/">AI 的第二次革命：从语言模型到发生世界模型</a></h2>
+      <p class="esum">《SDE智能体导论》的核心判断，一句话说完：智能体革命的实质，不是机器单独拥有一个现成的客观世界，而是由 SDE 指挥语言模型，先临时搭一个三界的“发生世界模型”，再在里面显露以前不存在的新结构。智能体的高阶使命，不是完成任务，是发生新世界。二零二六年最热闹的世界大模型——Sora、Genie、Cosmos、V-JEPA——无一例外都在加厚“现实界”：视觉、空间、交互、仿真，却没有一个持有理念界的新结构、自我界的目标与意义。它们是感官和四肢发达的身体，不是会决定方向的大脑。由此智能体分两种：把旧世界跑得更快的加速型，和在裂缝处让新结构发生的发生型。</p>
+      <div class="ec-foot"><button class="eplay" data-idx="11">▶ 朗读</button><a class="readfull" href="/column/sde-agent-second-revolution/">读全文 <span class="hint">· 可开 WDS 陪读</span> →</a></div>
+    </article>
+    <article class="ecard" id="ec-12">
+      <div class="ec-top"><span class="ec-num">13</span><span class="ec-tag">心理学 · 人格</span></div>
+      <h2 class="ec-title"><a href="/column/no-iq-no-eq/">人没有智商，也没有情商</a></h2>
+      <p class="esum">你大概被测过：智商多少、情商高不高、MBTI 是哪四个字母。这篇提一个釜底抽薪的判断——人没有智商，没有情商，也没有意商。不是说分数是假的，是说这些“商”所假设的那个东西：一种住在你身体里、固定不变的内在能力，根本不存在。差异当然是真的，而且巨大；假的是对差异的那种解释——把它归给天生的固定禀赋。同一个人在不同情境里的“智商”根本不一样，测到的不是能力，是处境。人格真正的内核，是知格、意格、情格，是三条律在一生里的长期沉淀。所以心理学不该是一门宣判的学问，而是一门给人开路的学问：禀赋是判决，沉淀史可以续写。</p>
+      <div class="ec-foot"><button class="eplay" data-idx="12">▶ 朗读</button><a class="readfull" href="/column/no-iq-no-eq/">读全文 <span class="hint">· 可开 WDS 陪读</span> →</a></div>
+    </article>
+    <article class="ecard" id="ec-13">
+      <div class="ec-top"><span class="ec-num">14</span><span class="ec-tag">深度长文</span></div>
+      <h2 class="ec-title"><a href="/column/self-discipline-genesis/">自律的发生学：你越自律，为什么越不像你自己</a></h2>
+      <p class="esum">闹钟六点响，手指按下去，人沉回被褥。到这里什么也没发生——一个哺乳动物在冬天选了温暖，如此而已。真正的事件在下一秒：那个迟到的“我应该起来”并不退场，它转而开始工作，把刚过去的一秒登记成一次失败，翻出上周、去年的旧账，把你归进一个源远流长的案底。六点零一分，人还没起床，已经败诉了。这篇研究的，就是这座每天开庭的法庭：它最奇特的地方是，你哪怕是自律话语最刻薄的批评者，法庭照常开庭，你照样坐在被告席上。自律的失败，不是意志短缺，是那个观看、登记、裁决的“我”的僭政——而连这个发号施令的“我”，都是行动之后才被追认出来的产物。</p>
+      <div class="ec-foot"><button class="eplay" data-idx="13">▶ 朗读</button><a class="readfull" href="/column/self-discipline-genesis/">读全文 <span class="hint">· 可开 WDS 陪读</span> →</a></div>
+    </article>
+    <article class="ecard" id="ec-14">
+      <div class="ec-top"><span class="ec-num">15</span><span class="ec-tag">权力发生学 · 壹</span></div>
+      <h2 class="ec-title"><a href="/column/power-genesis-1/">谁动一毫米，谁动一公里</a></h2>
+      <p class="esum">四个深夜，四个场景：一个人对着手机一次次说“该睡了”，手指继续往上划；一位总监咳一声，二十个人同时安静，却被一封辞职邮件搅得看不进方案；一个工程师改了权重的千分之五，第二天三百万家店铺的流量重新洗牌；一位母亲随口一句“你看看人家”，这句话在孩子体内工作三十年。看起来毫不相干，其实是同一件事。这篇给你一把尺子，它的名字叫权力——但权力不在龙椅上，也不在保险柜里。两千五百年，人类一直在错误的地方找它。权力是两个方向改变率的不对称：谁动一毫米，逼得对方动一公里。资源只是它的可能条件，不是它本身——有职无权的领导、坐拥金山的孤家寡人，比比皆是。</p>
+      <div class="ec-foot"><button class="eplay" data-idx="14">▶ 朗读</button><a class="readfull" href="/column/power-genesis-1/">读全文 <span class="hint">· 可开 WDS 陪读</span> →</a></div>
+    </article>
+    <article class="ecard" id="ec-15">
+      <div class="ec-top"><span class="ec-num">16</span><span class="ec-tag">西哲重构</span></div>
+      <h2 class="ec-title"><a href="/column/kant-categories-genesis/">康德的范畴，不是先天的模具，而是沉淀的纠缠</a></h2>
+      <p class="esum">康德给自己的哲学起了个响亮的名字：哥白尼式的革命。他一举看穿了旧形而上学的天真——认识者这一侧根本不是白板、不是镜子，而是一台主动的整理机器：世界给我们的只是一堆杂乱的感觉材料，把它整理成有条理的经验世界的，是我们心里那套框架。这一步，功莫大焉。可革命只革了一半：康德颠覆了“对象先在”，却在同一个动作里，偷偷树立起一个新的先在——那套整理机器本身，空间、时间、十二范畴，被他说成是先天的、永恒不变、对所有理性存在者一模一样。他把柏拉图赶出正门，自己又从后门请进一个更精致的“先在”。这篇，就是要撬这个位置：范畴不是先天的模具，是在肉身与文明的纠缠里，慢慢沉淀下来的。</p>
+      <div class="ec-foot"><button class="eplay" data-idx="15">▶ 朗读</button><a class="readfull" href="/column/kant-categories-genesis/">读全文 <span class="hint">· 可开 WDS 陪读</span> →</a></div>
+    </article>
+    <article class="ecard" id="ec-16">
+      <div class="ec-top"><span class="ec-num">17</span><span class="ec-tag">西哲重构</span></div>
+      <h2 class="ec-title"><a href="/column/causality-river/">因果之河：休谟的斧头、康德的云梯与 SDE 的河床</a></h2>
+      <p class="esum">一七三九年，一个二十八岁的苏格兰人休谟，挥出一把斧头，问了个三岁孩子都听得懂的问题：“必然联系”这个观念，对应哪一个印象？他翻遍知觉，只找到“恒常联结”，没找到“必然”——A 总跟着 B，但“总是”不等于“必须”。四十二年后，康德用七百页回答：因果不从经验来，它是心灵为经验立的先天之法。于是僵局成形：休谟说因果不在客体，康德说在主体，谁也说服不了谁。可两人共享同一个盲点——都把发生的结果，当成了发生的起点。这篇说：因果的必然，既不是客体间的连线，也不是主体口袋里的模具，而是“我”为了维持自身、不让自己崩解而发出的结构性张力，还在文明的碰撞里被调过音——所以它在一个文明内部收敛得像客观，跨文明却是复数的。可核查的楔子就是医学：什么算“一个因果单位”，在西医的病灶、中医的证、阿育吠陀的失衡里，根本不同。</p>
+      <div class="ec-foot"><button class="eplay" data-idx="16">▶ 朗读</button><a class="readfull" href="/column/causality-river/">读全文 <span class="hint">· 可开 WDS 陪读</span> →</a></div>
+    </article>
+    <article class="ecard" id="ec-17">
+      <div class="ec-top"><span class="ec-num">18</span><span class="ec-tag">企业本体论</span></div>
+      <h2 class="ec-title"><a href="/column/enterprise-as-meaning-engine/">企业是一台意义发生机</a></h2>
+      <p class="esum">一家公司，没有任何物理外壳把它箍在一起，为什么没有散掉？一栋楼靠钢筋立着，一个人靠皮肤裹着，都有物理的理由。可一家公司呢？员工每天各回各家，资产散在账户、仓库、合同里，边界在法律上只是一行注册信息。构成它的每个人、每笔钱、每台设备，随时都能走、能抽、能报废，按理该时时刻刻涣散——可有些公司几十年、上百年，人来人往，始终是“同一家”。主流的三种定义——资源集合、契约网络、生产函数——都把这个谜当成不言自明的前提绕过去了。这篇给出相反的起点：企业是一台意义发生机。它真正的产品，是让内部所有人愿意朝同一个方向使劲的那个意义——它不能储存，只能日复一日地重新生产。企业不是死于对手，是死于它自己的意义停止了再发生。</p>
+      <div class="ec-foot"><button class="eplay" data-idx="17">▶ 朗读</button><a class="readfull" href="/column/enterprise-as-meaning-engine/">读全文 <span class="hint">· 可开 WDS 陪读</span> →</a></div>
+    </article>
+    <article class="ecard" id="ec-18">
+      <div class="ec-top"><span class="ec-num">19</span><span class="ec-tag">教育发生学 · 典范文</span></div>
+      <h2 class="ec-title"><a href="/column/critical-ignition/">临界点燃：教育发生学的不可还原单元</a></h2>
+      <p class="esum">我们习惯把教育想成一种“传递”：把知识从懂的人搬给不懂的人，把过程拆成可规划的步骤、可测量的产出。但有一种真实的教育时刻，在这套语法里从来找不到位置——学习者在张力蓄到临界之后，从内部自发迸发的、既不可预先计划也不可外部操控的认知跃迁。这篇给它起名叫“临界点燃”，并且把目光从那个迸发的瞬间，拉回到此前被长期忽略的“临界前状态”——那段张力蓄积期的厚度和品质，才是教育发生真正的根基。更冷的一问是：制度化教育为什么会系统性地遗忘、甚至排异这种它自己度量不了的发生？因为它的操作语法被“可测量”锁进了单一维度，不可度量的点燃永远排在负优先级；每一次改革为它争到的豁免区，都会在一段时滞之后，被“修复公平”的正当名义反噬回收。</p>
+      <div class="ec-foot"><button class="eplay" data-idx="18">▶ 朗读</button><a class="readfull" href="/column/critical-ignition/">读全文 <span class="hint">· 可开 WDS 陪读</span> →</a></div>
+    </article>
+    <article class="ecard" id="ec-19">
+      <div class="ec-top"><span class="ec-num">20</span><span class="ec-tag">学术创造</span></div>
+      <h2 class="ec-title"><a href="/column/writing-genesis/">写作的发生学：好文章如何发生</a></h2>
+      <p class="esum">几乎每个人都在教科书第一章的定义丛林里阵亡过：翻开就是“定义 一点一……”，你硬着头皮往下读，井井有条、无懈可击，可就是读不进去，合上书什么也没留下——然后还替它背锅，说一句“我不是学这个的料”。这篇诊断病根：“先定义后展开”不是自然秩序，是一整套“发现”世界观在排版上的化身，它把理解的发生顺序整个倒装了。真实的理解，从一个真实的缺口开始：缺口先来，显露其次，定义最后，这个顺序不能倒。解药是一副按发生顺序搭起来的五段骨架——先制造缺口，再立框架、穿张力、扎实例，最后留下一个钩子。因为读的痛苦，从来都是写的失败的镜像；好文章的结尾，不是句号，是钩子。</p>
+      <div class="ec-foot"><button class="eplay" data-idx="19">▶ 朗读</button><a class="readfull" href="/column/writing-genesis/">读全文 <span class="hint">· 可开 WDS 陪读</span> →</a></div>
+    </article>
+  </div>
+
+  <div class="foot">SDE Universes · 王德生 / 德麦国际 &nbsp;·&nbsp; <a href="/">返回首页</a> &nbsp;·&nbsp; <a href="/taste/wds-companion/">WDS 陪读</a></div>
+</div>
+
+<script>
+(function(){
+  var synth = window.speechSynthesis;
+  var supported = !!synth && typeof SpeechSynthesisUtterance !== 'undefined';
+  var voices = [], token = 0, seqMode = false, paused = false, activeIdx = -1;
+  var cards = Array.prototype.slice.call(document.querySelectorAll('.ecard'));
+  var playAllBtn = document.getElementById('playAll');
+  var pauseBtn = document.getElementById('pauseBtn');
+  var stopBtn = document.getElementById('stopBtn');
+  var voiceSel = document.getElementById('voiceSel');
+  var statusEl = document.getElementById('status');
+
+  function setStatus(t){ statusEl.textContent = t || ''; }
+
+  if(!supported){
+    setStatus('你的浏览器不支持语音朗读(speechSynthesis)。可换用较新的 Chrome / Edge / Safari。正文仍可正常阅读。');
+    playAllBtn.disabled = true; pauseBtn.disabled = true; stopBtn.disabled = true;
+    Array.prototype.forEach.call(document.querySelectorAll('.eplay'), function(b){ b.disabled = true; });
+    return;
+  }
+
+  function isZh(v){ return /^zh/i.test(v.lang) || /chinese|mandarin|普通话|中文/i.test(v.name); }
+  function loadVoices(){
+    voices = synth.getVoices() || [];
+    var zh = voices.filter(isZh);
+    // rebuild options (keep the first auto option)
+    while(voiceSel.options.length > 1) voiceSel.remove(1);
+    zh.forEach(function(v){
+      var o = document.createElement('option');
+      o.value = v.voiceURI; o.textContent = v.name + ' (' + v.lang + ')';
+      voiceSel.appendChild(o);
+    });
+    if(zh.length === 0 && voices.length > 0){
+      setStatus('未检测到中文语音——朗读可能没有声音，或用了非中文音色(取决于你的系统)。');
+    }
+  }
+  loadVoices();
+  if(synth.onvoiceschanged !== undefined){ synth.onvoiceschanged = loadVoices; }
+  setTimeout(loadVoices, 400); setTimeout(loadVoices, 1200);
+
+  function pickVoice(){
+    var sel = voiceSel.value;
+    if(sel){ for(var i=0;i<voices.length;i++){ if(voices[i].voiceURI===sel) return voices[i]; } }
+    var zh = voices.filter(isZh);
+    var cn = zh.filter(function(v){ return /zh[-_]?cn/i.test(v.lang) || /simplified|普通话|中文\s*\(中国/i.test(v.name); });
+    return cn[0] || zh[0] || null;
+  }
+
+  // split into short chunks to dodge Chrome's ~15s cutoff (no lookbehind, Safari-safe)
+  function chunk(text){
+    var out = [], buf = '', i, ch, ENDERS = '。！？!?', SOFT = '，、；,;';
+    for(i=0;i<text.length;i++){ ch = text[i]; buf += ch; if(ENDERS.indexOf(ch) >= 0){ if(buf.trim()) out.push(buf.trim()); buf=''; } }
+    if(buf.trim()) out.push(buf.trim());
+    var res = [];
+    out.forEach(function(p){
+      if(p.length <= 55){ res.push(p); return; }
+      var b = '', j, c;
+      for(j=0;j<p.length;j++){ c = p[j]; b += c; if(SOFT.indexOf(c) >= 0 && b.length >= 22){ res.push(b); b=''; } }
+      if(b) res.push(b);
+    });
+    return res.length ? res : [text];
+  }
+
+  function clearActive(){
+    cards.forEach(function(c){ c.classList.remove('playing'); });
+    Array.prototype.forEach.call(document.querySelectorAll('.eplay'), function(b){ b.textContent = '▶ 朗读'; });
+  }
+  function markActive(idx){
+    clearActive();
+    var c = cards[idx]; if(!c) return;
+    c.classList.add('playing');
+    var b = c.querySelector('.eplay'); if(b) b.textContent = '■ 停止';
+  }
+  function updateGlobal(){
+    var on = activeIdx >= 0;
+    stopBtn.disabled = !on;
+    pauseBtn.disabled = !on;
+    pauseBtn.textContent = paused ? '▶ 继续' : '❚❚ 暂停';
+    playAllBtn.textContent = seqMode ? '■ 停止全部' : '▶ 依次朗读全部';
+    playAllBtn.classList.toggle('solid', !seqMode);
+  }
+
+  function speakIdx(idx){
+    var card = cards[idx]; if(!card) return;
+    var text = card.querySelector('.esum').textContent.trim();
+    token++; var my = token; paused = false;
+    synth.cancel();
+    activeIdx = idx; markActive(idx); updateGlobal();
+    setStatus('正在朗读 · 第 ' + (idx+1) + ' 篇');
+    var parts = chunk(text), v = pickVoice();
+    parts.forEach(function(p, i){
+      var u = new SpeechSynthesisUtterance(p);
+      if(v){ u.voice = v; u.lang = v.lang; } else { u.lang = 'zh-CN'; }
+      u.rate = 0.98; u.pitch = 1.0;
+      if(i === parts.length - 1){
+        u.onend = function(){ if(my !== token) return; onIdxEnd(idx); };
+        u.onerror = function(){ if(my !== token) return; onIdxEnd(idx); };
+      }
+      synth.speak(u);
+    });
+  }
+
+  function onIdxEnd(idx){
+    if(seqMode){
+      var next = idx + 1;
+      if(next < cards.length){
+        cards[next].scrollIntoView({behavior:'smooth', block:'center'});
+        speakIdx(next);
+      } else {
+        seqMode = false; activeIdx = -1; clearActive(); updateGlobal(); setStatus('全部朗读完毕。');
+      }
+    } else {
+      activeIdx = -1; clearActive(); updateGlobal(); setStatus('');
+    }
+  }
+
+  function stopAll(){
+    token++; seqMode = false; paused = false; activeIdx = -1;
+    synth.cancel(); clearActive(); updateGlobal(); setStatus('');
+  }
+
+  // per-card buttons
+  Array.prototype.forEach.call(document.querySelectorAll('.eplay'), function(btn){
+    btn.addEventListener('click', function(){
+      var idx = parseInt(btn.getAttribute('data-idx'), 10);
+      if(activeIdx === idx && !seqMode){ stopAll(); return; }
+      seqMode = false; speakIdx(idx);
+    });
+  });
+
+  playAllBtn.addEventListener('click', function(){
+    if(seqMode){ stopAll(); return; }
+    seqMode = true;
+    cards[0].scrollIntoView({behavior:'smooth', block:'center'});
+    speakIdx(0);
+  });
+  pauseBtn.addEventListener('click', function(){
+    if(activeIdx < 0) return;
+    if(paused){ synth.resume(); paused = false; setStatus('继续朗读 · 第 ' + (activeIdx+1) + ' 篇'); }
+    else { synth.pause(); paused = true; setStatus('已暂停。'); }
+    updateGlobal();
+  });
+  stopBtn.addEventListener('click', stopAll);
+  voiceSel.addEventListener('change', function(){
+    if(activeIdx >= 0){ var i = activeIdx, s = seqMode; stopAll(); seqMode = s; speakIdx(i); }
+  });
+  window.addEventListener('beforeunload', function(){ try{ synth.cancel(); }catch(e){} });
+  updateGlobal();
+})();
+</script>
+</body>
+</html>
