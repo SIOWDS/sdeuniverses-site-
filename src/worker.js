@@ -846,10 +846,6 @@ function _cors() { return { "access-control-allow-origin": "*", "access-control-
 
 let CORPUS = null; // 模块级缓存：isolate 内复用，避免每次问答重载 ~15MB 索引
 let CORPUS_CHECKED = 0;
-// 用完就放手：全站语料（~15MB 索引，装进内存后是几十兆的对象）常驻会把 isolate 的内存吃到临界，
-// 之后任何一个大请求都可能把整个 isolate 撑爆——表现是"流跑到一半无声中断、连错误都发不出"。
-// 与WDS对话这条线改成"检索完就释放"：多花几秒重装，换答题那一侧的内存干净。站内搜索仍走常驻缓存。
-function freeCorpus() { CORPUS = null; CORPUS_CHECKED = 0; }
 const CORPUS_TTL = 30 * 1000; // 至多 30 秒对 manifest 复验一次；发新文后即使老 isolate 也能在半分钟内换上新语料
 let KB = null, KB_CHECKED = 0; // 九库结构化知识;复用 CORPUS_TTL 复验节奏,无 KB 时检索安全退回纯 chunk
 async function loadCorpus(env, url) {
@@ -886,6 +882,56 @@ async function loadCoords(env, url) {
     for (const k in cj) m[k] = new Set((cj[k] || []).map((t) => String(t).toLowerCase()));
     return Object.keys(m).length ? m : null;
   } catch (e) { return null; }
+}
+// RAG_STREAMED_SCAN：与WDS对话专用的检索。
+// 全站索引现在是 60MB／20 个分片（单片最大 6MB）；旧做法 loadCorpus 把 20 片一次性装进内存再打分，
+// 峰值内存远超单个 isolate 的上限——线上实测子请求会直接被平台判 503（"超出资源上限"），
+// 更早的表现则是答题流跑到一半无声中断。这里改成：**一片一片地扫，扫完就丢，只留下候选段**，
+// 峰值内存＝一个分片＋候选表（几百 KB），召回口径与 retrieve() 保持一致。
+function ragKeys(q, expTerms) {
+  const terms = q.toLowerCase().split(/\s+/).filter(Boolean);
+  const zh = q.replace(/[^\u4e00-\u9fff]/g, "");
+  const grams = [];
+  for (let i = 0; i + 2 <= zh.length; i++) grams.push(zh.slice(i, i + 2));
+  const baseKeys = terms.concat(grams).filter((v, i, a) => v && a.indexOf(v) === i);
+  const exp = (expTerms || []).map((t) => String(t).toLowerCase()).filter((v, i, a) => v && v.length >= 2 && a.indexOf(v) === i && baseKeys.indexOf(v) < 0);
+  return { baseKeys, exp };
+}
+async function ragScan(env, url, q, expTerms, prevQ, k, chunkLimit) {
+  const man = await (await env.ASSETS.fetch(new Request(new URL("/search/manifest.json", url)))).json();
+  const coords = await loadCoords(env, url);
+  const { baseKeys, exp } = ragKeys(q, expTerms);
+  const prev = prevQ && prevQ !== q ? ragKeys(prevQ, []).baseKeys : [];   // 上一轮接续：同一趟里顺带打分，不再多扫一遍
+  const KEEP = Math.max(120, (k || 36) * 4);
+  const cut = chunkLimit || 1600;
+  let top = [];
+  for (const sec of man.sections) {
+    for (const f of (sec.files || [sec.key])) {
+      let sh = null;
+      try { sh = await (await env.ASSETS.fetch(new Request(new URL("/search/shard-" + f + ".json", url)))).json(); } catch (e) { continue; }
+      for (const ck of sh.chunks) {
+        const tl = ck.t.toLowerCase();
+        let sc = 0;
+        for (const key of baseKeys) { const n = tl.split(key).length - 1; if (n) sc += n; }
+        for (const key of exp) { const n = tl.split(key).length - 1; if (n) sc += n * 1.2; }
+        for (const key of prev) { const n = tl.split(key).length - 1; if (n) sc += n * 0.4; }
+        if (q && ck.t.indexOf(q) >= 0) sc += 8;
+        if (coords && exp.length) { const dc = coords[ck.d]; if (dc) { let ov = 0; for (const t of exp) if (dc.has(t)) ov++; if (ov) sc += ov * 2; } }
+        if (sc > 0) top.push({ sc: sc, d: ck.d, t: ck.t.length > cut ? ck.t.slice(0, cut) : ck.t });
+      }
+      sh = null;   // 这一片用完就丢，等着被回收
+      if (top.length > KEEP * 3) { top.sort((a, b) => b.sc - a.sc); top.length = KEEP; }
+    }
+  }
+  top.sort((a, b) => b.sc - a.sc);
+  const perDoc = {}, picked = [];
+  for (const it of top) {
+    perDoc[it.d] = perDoc[it.d] || 0;
+    if (perDoc[it.d] >= 2) continue;      // 每篇最多两段，保证来源多样
+    perDoc[it.d]++; picked.push(it);
+    if (picked.length >= (k || 36)) break;
+  }
+  return { picked: picked, docs: man.docs, coords: coords };
 }
 function retrieve(corpus, q, k, expTerms) {
   const terms = q.toLowerCase().split(/\s+/).filter(Boolean);
@@ -1616,31 +1662,22 @@ export default {
       const prevQ = String(b.prevQ || "").slice(0, 240);
       const chunkLimit = Math.max(200, Math.min(4000, parseInt(b.chunk, 10) || 0));
       try {
-        const corpus = await loadCorpus(env, url);
+        const scan = await ragScan(env, url, q, expTerms, prevQ, K, chunkLimit || 1600);
         const seen = {}, srcs = [];
         let kbBlock = "";
         if (kbn) {
-          try { const kb = await loadKB(env, url); if (kb) { const r = retrieveKB(kb, corpus, q, expTerms, kbn); kbBlock = r.block; for (const sx of r.srcs) if (!seen[sx.u]) { seen[sx.u] = 1; srcs.push(sx); } } } catch (e) {}
-        }
-        const hits = retrieve(corpus, q, K, expTerms);
-        if (prevQ && prevQ !== q) {
-          const more = retrieve(corpus, prevQ, 10, []);
-          const have = new Set(hits.map((c) => c.d + "|" + c.t.slice(0, 40)));
-          for (const ck of more) { const id = ck.d + "|" + ck.t.slice(0, 40); if (!have.has(id)) { have.add(id); hits.push(ck); } }
+          try { const kb = await loadKB(env, url); if (kb) { const r = retrieveKB(kb, { docs: scan.docs }, q, expTerms, kbn); kbBlock = r.block; for (const sx of r.srcs) if (!seen[sx.u]) { seen[sx.u] = 1; srcs.push(sx); } } } catch (e) {}
         }
         const chunkCap = Math.max(4000, cap - kbBlock.length);
         let chunkText = "";
-        for (const ck of hits) {
-          const d = corpus.docs[ck.d]; if (!d) continue;
+        for (const ck of scan.picked) {
+          const d = scan.docs[ck.d]; if (!d) continue;
           if (!seen[d.u]) { seen[d.u] = 1; srcs.push({ u: d.u, t: d.t }); }
-          chunkText += "【来源：" + d.t + "】\n" + (chunkLimit ? ck.t.slice(0, chunkLimit) : ck.t) + "\n\n";
+          chunkText += "【来源：" + d.t + "】\n" + ck.t + "\n\n";
           if (chunkText.length > chunkCap) break;
         }
-        const out = J({ ok: true, ctx: kbBlock + (kbBlock && chunkText ? "\n【补充 · 站内原文片段】\n" : "") + chunkText, srcs: srcs.slice(0, 10) });
-        if (b.free) freeCorpus();   // 与WDS对话专用：检索结果已经拿到手，语料就地释放，别让它压着 isolate
-        return out;
+        return J({ ok: true, ctx: kbBlock + (kbBlock && chunkText ? "\n【补充 · 站内原文片段】\n" : "") + chunkText, srcs: srcs.slice(0, 10) });
       } catch (e) {
-        if (b.free) freeCorpus();
         return J({ ok: false, msg: "检索没接上：" + (e && e.message) }, 502);
       }
     }
@@ -1924,7 +1961,7 @@ export default {
                 // 走 /api/wds/rag 子请求：装语料是 CPU 大户，和写作挤在一个请求里会被平台掐死（RAG_SUBREQUEST）
                 try {
                   const pq = (title + " " + (parts[idx].h || "") + " " + points.join(" ")).slice(0, 300);
-                  const rr = await wdsRag(env, url, { q: pq, k: 12, cap: 8000, kbn: 18, chunk: 900, free: 1 });
+                  const rr = await wdsRag(env, url, { q: pq, k: 12, cap: 8000, kbn: 18, chunk: 900});
                   if (rr.ok) { const jr = await rr.json(); if (jr && jr.ok) partCtx = jr.ctx || ""; }
                 } catch (e) {}
               }
@@ -2088,7 +2125,7 @@ export default {
               let prevQ0 = "";
               for (let i = history.length - 1; i >= 0; i--) { const m = history[i]; if (m && m.role !== "wds" && m.text) { prevQ0 = String(m.text).slice(0, 240); break; } }
               try {
-                const rr = await wdsRag(env, url, { q: q, prevQ: prevQ0, exp: expTerms, k: 36, cap: docText ? 12000 : 30000, kbn: docText ? 14 : 24, free: 1 });
+                const rr = await wdsRag(env, url, { q: q, prevQ: prevQ0, exp: expTerms, k: 36, cap: docText ? 12000 : 30000, kbn: docText ? 14 : 24});
                 _ragWhy = "HTTP " + rr.status;
                 if (rr.ok) { const jr = await rr.json(); if (jr && jr.ok) { siteCtx = jr.ctx || ""; siteSrcs = jr.srcs || []; _ragWhy = ""; } else _ragWhy = (jr && jr.msg) || "返回不可用"; }
                 else _ragWhy = "HTTP " + rr.status + "：" + (await rr.text()).slice(0, 120);

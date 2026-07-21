@@ -92,11 +92,11 @@ ok("本场心得优先于全站缓存心得（read + read-paper 两处）", W.sp
 ok("guide 预算三元式在位（30万减文章/资料，陪读收缩式不变）", W.includes("b.guide ? Math.max(60000, WDS_GUIDE_HIST_BUDGET - docText.length - siteCtx.length)") && W.includes("120000 - docText.length - siteCtx.length"));
 ok("长问放宽仅限 guide（4000 vs 500）", W.includes("b.guide ? 4000 : 500"));
 ok("全站 RAG 加强档（K=36 + 接续补捞 + KB留预算的字数上限 + 来源回传）", W.includes("RAG_SUBREQUEST") && /k: 36, cap: docText \? 12000 : 30000, kbn: docText \? 14 : 24/.test(W) && W.includes("retrieve(corpus, q, K, expTerms)") && W.includes('t: "sources"'));
-ok("与WDS对话 RAG 已接九库（子请求里 retrieveKB 邻域子图优先，chunk 让预算）", W.includes("retrieveKB(kb, corpus, q, expTerms, kbn)") && W.includes("const chunkCap = Math.max(4000, cap - kbBlock.length)"));
+ok("与WDS对话 RAG 已接九库（子请求里 retrieveKB 邻域子图优先，chunk 让预算）", /retrieveKB\(kb, \{ docs: scan\.docs \}, q, expTerms, kbn\)/.test(W) && W.includes("const chunkCap = Math.max(4000, cap - kbBlock.length)"));
 ok("读者文章走独立首条消息 + 站内资料让位（07-20 修）",
   W.includes('content: "这是我提交给你的文章全文，本场对话就围绕它。') && W.includes("全文我已通读完毕") && !W.includes("【读者提交的文章·全文】"));
 ok("万字论文分部检索走子请求（K=12 / cap 8000 / KB 18 / 片段 900）", /k: 12, cap: 8000, kbn: 18, chunk: 900/.test(W));
-ok("成文分部亦接九库（子请求 kbn=18 → retrieveKB）", /kbn: 18/.test(W) && W.includes("retrieveKB(kb, corpus, q, expTerms, kbn)"));
+ok("成文分部亦接九库（子请求 kbn=18 → retrieveKB）", /kbn: 18/.test(W) && /retrieveKB\(kb, \{ docs: scan\.docs \}/.test(W));
 ok("paperN 夹 3-6，缺省 3 不动陪读", W.includes("Math.max(3, Math.min(6, parseInt(b.paperN, 10) || 3))"));
 ok("配额桶分家＋按 Key 计额度：chat/read/dlg/ask 各一桶（07-20 二修）",
   W.includes("function wdsBucket(kind, ip, key)")
@@ -492,7 +492,9 @@ ok("worker：答题空转时回报上游实况（状态/流数据条数/结束�
 ok("worker：答题流末尾发 end 事件（用来区分干净结束与被切断）", /t: "end", v: \{ out:/.test(W));
 ok("客户端：空答时说得出收到了什么（心跳/思考/检索/重答次数）", PAGE.includes("ANSWER_DIAG_UI") && /diag\.beats\+\+/.test(PAGE) && /\\u8fde\\u63a5\\u88ab\\u4e2d\\u9014\\u5207\\u65ad/.test(PAGE));
 ok("客户端：0 字节或流被切断都自动改用不流式重取（并记状态/字节/提示）", PAGE.includes("NOSTREAM_FALLBACK") && PAGE.includes("CUT_FALLBACK") && /else if \(!diag\.bytes \|\| !diag\.sawEnd\)/.test(PAGE) && /diag\.bytes \+=/.test(PAGE) && /r2\.text\(\)/.test(PAGE) && /diag\.lastNote/.test(PAGE));
-ok("worker：与WDS对话这条线检索完即释放语料（不常驻压 isolate）", W.includes("function freeCorpus") && (W.match(/free: 1/g) || []).length === 2 && /if \(b\.free\) freeCorpus\(\)/.test(W));
+ok("worker：与WDS对话这条线根本不再整份装载语料（逐片扫描、扫完就丢）",
+  W.includes("RAG_STREAMED_SCAN") && /async function ragScan/.test(W) && /sh = null;/.test(W) && (() => { const i = W.indexOf('url.pathname === "/api/wds/rag"'); const j = W.indexOf("return J({ ok: true", i); return W.slice(i, j).indexOf("loadCorpus") < 0; })());
+ok("worker：候选表有上限，不会随命中数无限涨", /top\.length > KEEP \* 3/.test(W) && /top\.length = KEEP/.test(W));
 ok("每条流的状态变量都在本流内声明（严格模式裸赋值＝当场瘫）", (() => {
   const marker = "async start(controller)";
   let i = -1, bad = 0, n = 0;
