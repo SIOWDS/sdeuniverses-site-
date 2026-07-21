@@ -117,6 +117,14 @@ ok("全站问答回传今日真实剩余（quota 事件）并说清是哪一档�
 ok("服务端不落 Key（无写库/日志痕迹）", !/localStorage|env\.\w+\.put\([^)]*userKey|console\.log\([^)]*key/i.test(W.split("dialogue-reflect")[1] || ""));
 ok("需 Key / 坏 Key 有独立错误码供前端弹面板", W.includes('code: "need_key"') && W.includes('code: "bad_key"'));
 ok("开工路由有额度与内功可读性双重兜底", W.includes("内功文件暂不可读") && W.includes("心得写得过短"));
+// 内功第二部分：创新智商评估 Skill 随开工仪式一并注入
+ok("内功第二部分有独立加载器且不阻断开工", W.includes("loadInnovationIQ") && W.includes("/taste/assets/sde-innovation-iq.txt") && /const iq = await loadInnovationIQ\([^)]*\); if \(iq\) neigong = neigong \+ "\\n\\n" \+ iq;/.test(W));
+ok("开工心得体例第九节锁住评分硬数字", /九、创新智商这把尺/.test(W) && W.includes("S 0.20／D 0.25／E 0.20／I 0.20／F 0.15") && W.includes("150 本体论级") && W.includes("封顶 145"));
+ok("创新智商正文在站上且口径完整", (function () {
+  var t = require("fs").readFileSync(__dirname + "/../public/taste/assets/sde-innovation-iq.txt", "utf8");
+  var han = (t.match(/[\u4e00-\u9fff]/g) || []).length;
+  return han >= 1800 && han <= 2600 && ["S\u00d70.20 + D\u00d70.25 + E\u00d70.20 + I\u00d70.20 + F\u00d70.15", "150", "160", "\u5c01\u9876 145", "50 \u5b57", "\u4e0d\u8bc4\u81ea\u5df1\u5199\u7684\u6587\u672c", "\u654c\u610f\u62d3\u5bbd"].every(function (k) { return t.indexOf(k) >= 0; });
+})(), "汉字数与七项口径");
 ok("页面零浮层引用（独立界面）", !PAGE.includes("wds-read.js") && !PAGE.includes("wds-mode.js") && !PAGE.includes("WDS_READ"));
 ok("页面渲染全走 textContent（防 XSS 注入）", !/bubble\.innerHTML|\.innerHTML\s*=\s*(answer|r\.text|j\.v)/.test(PAGE));
 ok("首页三处挂载仍在（卡片 / 中部大栏 / 子导航）",
