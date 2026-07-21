@@ -483,7 +483,8 @@ MODE.planFail = null;
 
 head("[阶段十一] 长思考期间的假流式（心跳 + 活数据）");
 ok("worker：全站检索已拆成独立子请求（自带 CPU 预算，失败不连累答题）",
-  W.includes("RAG_SUBREQUEST") && W.includes('url.pathname === "/api/wds/rag"') && (W.match(/new URL\("\/api\/wds\/rag", url\)/g) || []).length === 2);
+  W.includes("RAG_SUBREQUEST") && W.includes('url.pathname === "/api/wds/rag"') && /async function wdsRag/.test(W) && (W.match(/await wdsRag\(env, url/g) || []).length === 2);
+ok("worker：子请求走 SELF 服务绑定，不用会 522 的自请求回环", /env\.SELF && env\.SELF\.fetch/.test(W) && (() => { const cfg = require("fs").readFileSync(__dirname + "/../wrangler.jsonc", "utf8"); return /"binding":\s*"SELF"/.test(cfg) && /"service":\s*"steep-band-faf5"/.test(cfg); })());
 ok("worker：答题里已无内联装语料（loadCorpus 只留在 rag 路由与其它入口）",
   (() => { const i = W.indexOf('url.pathname === "/api/wds/read"'); const j = W.indexOf("new ReadableStream", i); const k = W.indexOf('url.pathname === "/api/wds/chat"', j); return W.slice(j, k).indexOf("loadCorpus") < 0; })());
 ok("worker：检索没接上时如实告诉读者并照常作答", W.includes("站内检索这一问没接上"));
