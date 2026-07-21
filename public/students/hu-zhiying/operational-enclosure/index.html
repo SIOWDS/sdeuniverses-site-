@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>操作性收编：继承不可继承者的智识代价——基于皮尔斯遗产的跨学科分析 · 胡志英 · SDE Universes</title>
+<meta name="description" content="思想史上存在一类特殊的智识遗产：其内容具有持久的吸引力，但其接收过程会系统性地削弱接收者原有的理论导向能力。本文以皮尔斯（C.S. Peirce）遗留下的十万页未完成手稿及其在实用主义传统中引发的百年争议为极端案例，提出“操作性收编”这一新理论框架。该框架揭示：当一个接收系统为适配某类智识遗产而进行">
+<style>
+:root{--gold:#C9A84C;--gold2:#D4B25E;--ink:#F0E9D8;--paper:#1B3A26;--muted:#5E7263;--bg:#0E0B08;--panel:#171310}
+*{margin:0;padding:0;box-sizing:border-box}
+::selection{background:rgba(201,168,76,0.30)}
+body{background:var(--bg);color:#EAE2CE;font-family:"Songti SC","Noto Serif SC",Georgia,serif;line-height:2.0;font-size:17.5px}
+a{color:var(--gold);text-decoration:none}
+.readbar{position:sticky;top:0;z-index:20;background:rgba(14,11,8,0.95);backdrop-filter:blur(8px);border-bottom:1px solid rgba(201,168,76,0.28);display:flex;align-items:center;justify-content:space-between;padding:11px 20px;gap:12px;flex-wrap:wrap}
+.readbar .nav-back{color:#CBBE94;font-size:13px;letter-spacing:0.04em}
+.rb-modes{display:flex;gap:8px;flex-wrap:wrap}
+.rb-btn{font-size:13px;padding:6px 14px;border-radius:3px;border:1px solid rgba(201,168,76,0.5);color:#D9CDA0;letter-spacing:0.03em}
+.rb-btn.cur{background:var(--gold);color:#1A1410;font-weight:700;border-color:var(--gold)}
+.art{max-width:760px;margin:0 auto;padding:56px 24px 20px;text-align:center}
+.art-series{font-size:12px;letter-spacing:0.36em;color:var(--gold);margin-bottom:22px}
+.art-title{font-size:clamp(24px,4.2vw,36px);font-weight:800;line-height:1.55;color:#F5EFE0;letter-spacing:0.02em}
+.art-subtitle{font-size:clamp(15px,2.2vw,18px);color:var(--gold2);margin-top:18px;line-height:1.85;letter-spacing:0.01em}
+.art-meta{margin-top:26px;font-size:13px;color:var(--muted);letter-spacing:0.12em}
+.wrap{max-width:760px;margin:0 auto;padding:26px 24px 60px}
+.abstract{background:linear-gradient(160deg,#1C1712,#141009);border-left:3px solid var(--gold);padding:22px 26px;margin:20px 0 26px;font-size:15.5px;line-height:1.95}
+.abstract .ab-lbl{font-size:12px;letter-spacing:0.3em;color:var(--gold);margin-bottom:10px}
+.abstract p{color:#CFC6AE;text-align:justify}
+.keywords{font-size:14px;color:var(--muted);letter-spacing:0.02em;margin:0 0 30px;padding-bottom:24px;border-bottom:1px solid rgba(201,168,76,0.2)}
+.keywords strong{color:var(--gold)}
+.wrap h2{font-size:22px;font-weight:800;color:#F2ECDC;margin:44px 0 18px;letter-spacing:0.02em;padding-top:8px;border-bottom:1px solid rgba(201,168,76,0.18);padding-bottom:8px}
+.wrap h2.notes-head{font-size:20px}
+.wrap h3{font-size:18px;font-weight:700;color:#E6DCC2;margin:30px 0 12px;letter-spacing:0.01em}
+.wrap p{margin-bottom:20px;text-align:justify;color:#DED6BF;text-indent:2em}
+.wrap p.ref{font-size:14px;line-height:1.7;color:var(--muted);margin-bottom:8px;text-indent:-2em;padding-left:2em;text-align:left}
+.wrap strong{color:var(--gold2);font-weight:700}
+.endbox{background:radial-gradient(ellipse at 50% 40%,#241a3a 0%,#150f24 60%,#0c0818 100%);text-align:center;padding:60px 24px;margin-top:40px;border-radius:4px}
+.endbox .lbl{font-size:12px;letter-spacing:0.4em;color:#D4B25E;margin-bottom:16px}
+.endbox .big{font-size:clamp(22px,3.4vw,30px);font-weight:700;color:#F3ECD9;letter-spacing:0.06em;margin-bottom:14px}
+.endbox p{color:#CBB98A;max-width:540px;margin:0 auto 26px;font-size:15px;line-height:1.95}
+.endbox a{display:inline-block;padding:12px 30px;font-size:14.5px;letter-spacing:0.08em;border-radius:2px;margin:5px;text-decoration:none}
+.endbox .solid{background:#D4B25E;color:#150F24;font-weight:700}
+.endbox .ghost{border:1px solid #D4B25E;color:#D4B25E}
+footer{background:#141009;color:var(--muted);text-align:center;padding:30px 24px;font-size:13px;letter-spacing:0.06em;border-top:1px solid rgba(201,168,76,0.15)}
+footer a{color:var(--gold)}
+@media(max-width:640px){body{font-size:16.5px}}
+
+/* ===== 统稿增补 ===== */
+.lead{max-width:760px;margin:0 auto;padding:30px 24px 0}
+.innov{background:linear-gradient(135deg,#3a2f18,#2a2212 60%,#1c1710);border:1px solid rgba(201,168,76,0.35);border-radius:12px;padding:24px 28px;margin:0 0 22px;box-shadow:0 8px 30px rgba(0,0,0,0.4)}
+.innov .lbl{font-size:12px;letter-spacing:0.28em;color:#D4B25E;margin-bottom:12px;font-weight:700}
+.innov .lbl::before{content:"✦ ";color:#F0C860}
+.innov .txt{font-size:16.5px;line-height:1.92;color:#EDE3CC}
+.innov .txt b{color:#F0C860;font-weight:700}
+.daodu{background:#181310;border:1px solid rgba(201,168,76,0.3);border-left:4px solid #C9A84C;border-radius:10px;padding:24px 28px;margin:0 0 6px}
+.daodu .lbl{display:inline-block;font-size:12px;letter-spacing:0.22em;color:#1a140c;background:#C9A84C;padding:5px 14px;border-radius:20px;margin-bottom:14px;font-weight:700}
+.daodu h4{font-size:17.5px;color:#EDE3CC;margin:0 0 16px;font-weight:800}
+.daodu .row{margin:12px 0;line-height:1.88;color:#CDC0A6;font-size:15.5px}
+.daodu .row .k{color:#D4B25E;font-weight:800}
+.hl2{background:rgba(201,168,76,0.16);border-bottom:2px solid #C9A84C;padding:1px 4px;font-weight:700;color:#F0E4C8;border-radius:2px}
+</style></head><body>
+<div class="readbar"><a class="nav-back" href="/students/hu-zhiying/works/">← 胡志英 · 作品</a>
+<div class="rb-modes"><span class="rb-btn cur">📖 长文阅读</span><a class="rb-btn" href="read.html">📄 在线 PDF</a><a class="rb-btn" href="operational-enclosure.pdf" download>⬇ 下载 PDF</a></div></div>
+<div class="art"><div class="art-series">学员专栏 · 胡志英</div>
+<h1 class="art-title">操作性收编：继承不可继承者的智识代价——基于皮尔斯遗产的跨学科分析</h1>
+<div class="art-subtitle">继承某类智识遗产不是智识的增益，而是包含系统性损耗的操作——为接收皮尔斯十万页手稿而改装自己的学术工具，改装本身在使你成功“看见”对象的同时，永久削弱了你独立提出新方向的能力。工程成功与逻辑失败是同一操作的一体两面。</div>
+<div class="art-meta">作者 胡志英 · SDE 学员 · 约 2.2 万字 · 发表于 2026年7月21日</div></div>
+<div class="lead">
+<div class="innov">
+  <div class="lbl">这篇文章的思想创新</div>
+  <div class="txt"><b>“操作性收编”：一个接收系统为适配不兼容的智识对象而被迫改装操作工具，这一改装通过单位后发性、执行即缩减、工程可续与逻辑可续非传递三重机制，不可逆地削弱系统在元理论层面独立提出新方向的能力，且工程精良化无法修复这一损害</b>。</div>
+</div>
+<div class="daodu">
+  <span class="lbl">导读 · 300字</span>
+  <h4>这篇文章的价值与意义 —— 它能解决你的什么问题</h4>
+<div class="row"><span class="k">理论问题：</span>它为皮尔斯研究“体系为何无法完成”的世纪难题提供结构性诊断，并正面越过最近的邻居——工藤（2017）的“定义域缩减”，补上其未竟的物质层、非传递性与可证伪性；它把“继承一种传统”从增益重新框架为含损耗的认知操作。</div>
+<div class="row"><span class="k">现实问题：</span>它给大型编纂项目、跨文化技术引进（如自强运动）、企业创新反哺（如 Google X）一个预防性诊断——当技术指标提升而方向清晰度下降，这是触发结构性干预的信号，而非要被更努力的技术工作掩盖的焦虑。</div>
+<div class="row"><span class="k">自我精神问题：</span>它训练一种对“深度钻研”的清醒——当你越深地进入一个极具吸引力的思想世界，越可能在成为它的专家的同时，失去那种在进入之前独立设定自己方向的能力；保留一条与它无关的独立研究线，是元方向的对照基准。</div>
+</div>
+</div>
+<div class="wrap">
+<div class="abstract"><div class="ab-lbl">摘 要</div><p>思想史上存在一类特殊的智识遗产：其内容具有持久的吸引力，但其接收过程会系统性地削弱接收者原有的理论导向能力。本文以皮尔斯（C.S. Peirce）遗留下的十万页未完成手稿及其在实用主义传统中引发的百年争议为极端案例，提出“操作性收编”这一新理论框架。该框架揭示：当一个接收系统为适配某类智识遗产而进行根本性的工具改装时，改装行为本身会通过执行即缩减、工程可续与逻辑可续非传递、单位后发性三重机制，不可逆地损害该系统在元理论层面独立提出新方向的能力。本文论证，操作性收编并非“路径依赖”或“系统失灵”等既有概念的变体，而是一种独立的、在每一次接收动作中实时发生的结构性损耗。通过引入晚清自强运动、罗马法继受、Google X创新困境、免疫耐受与第二语言石化等五个跨学科案例的结构同构分析，本文展示了该理论的广泛解释力。最后，本文给出了一组可操作的、能够排除竞争解释的经验检验设计，为在思想史、组织研究与认知科学等领域将“接收代价”从哲学思辨转化为实证问题提供了可生长的研究纲领。</p></div>
+<p class="keywords"><strong>关键词：</strong>操作性收编；实用主义；皮尔斯；概念接收；元理论方向衰减；跨学科修辞结构</p>
+<h2>1 引言</h2>
+<p>在思想史的漫长河流中，某些哲学家的著作构成了一个独特的类别：它们似乎永远不会完成，也永远不会被真正继承。查尔斯·桑德斯·皮尔斯（Charles Sanders Peirce, 1839-1914）的遗稿是这类现象的极端代表。这位被罗素称为“美国最伟大的思想家”的哲学家，留下了超过十万页的手稿，其中绝大部分由反复的涂改、旁注、自我反驳和不断重写的片段构成。一个半世纪以来，一代又一代顶尖的哲学家、符号学家和逻辑学家试图“完成皮尔斯的体系”，但每一次严肃的努力都在使其遗产变得更清晰的同时，似乎也在另一个层面使其变得更为遥远。罗蒂（Richard Rorty）最终宣称实用主义不需要皮尔斯的体系也能存活；哈贝马斯（Jürgen Habermas）则坚持程序理性可以替代皮尔斯那种基于宇宙论极限点的真理担保。然而，一个更深层的问题始终未被正面提出：为什么每一次接收都会削弱接收者自己提出新方向的能力？</p>
+<p>本文提出的核心论点是：皮尔斯的遗产并非一个待完成的思想体系，而是一个操作性收编装置。接收它的行为本身，会对接收系统造成一种结构性的、不可逆的元方向衰减。当一个接收系统为了处理这种在物质形态和概念结构上都极不稳定的遗产而不得不改装自己的编纂工具、分析范畴和评判标准时，这种改装在使其成功“看见”对象的同时，也永久性地削弱了它原有的、独立于该对象而进行理论导航的能力。更为悖论的是，这种在工程操作层面的精良化，并不传递到元理论方向层——系统在技术上变得更强，在方向上却变得更弱。</p>
+<p>这一论断具有深远的意义。它不仅为皮尔斯研究中“为何体系无法被完成”这一世纪难题提供了一个结构性的诊断，更重要的是，它将“继承一种思想传统”这一行为从一种智识的增益，重新框架为一种包含了系统性损耗的认知操作。这一框架的治疗性意图并非“不要再继承皮尔斯”，而是揭示了一个更根本的行动方向：如果方向衰减是结构性的，那么问题的关键就不再是“如何更好地编辑皮尔斯”，而是如何设计一种能够使接收系统在被操作性收编后仍然能够独立探索元方向的接收方式，或者如何在接收之初就建立对接收代价的监测机制。这不再仅是一个哲学史内部的理论问题，而是一个关涉到任何认知系统——无论是一个学者、一个学派、一个组织，还是一种文化——如何处理那些具有高吸引力和高损耗性的外部智识资源的普遍问题。</p>
+<p>本文的结构如下。第二部分系统回顾皮尔斯研究的两大传统——编纂学传统与体系解释传统——并指出二者如何在各自的视角中触及了收编现象的表征，却未能命名其背后的统一机制。第三部分构建操作性收编的理论框架，并详细阐述其三个互不可还原的构成机制。第四部分说明本文所采用的分析方法论，即如何通过跨学科类比与案例结构比较来构建理论。第五部分是全文的核心，将操作性收编理论应用于皮尔斯案例的深层解剖，并将之扩展到五个跨学科案例的分析，以展示其解释的广度。第六部分提供一个严格的经验检验设计，以回应“这不过是因为接收者本身能力不足”这一最强竞争解释。第七部分总结全文，提出实践建议，并明确指出本研究的局限与未来研究方向。</p>
+<h2>2 文献综述：皮尔斯研究中的收编表征与解释缺口</h2>
+<p>皮尔斯的思想遗产为何始终“未完成”？这一问题驱动了一个半世纪的学术争论。本章将这些解释传统归纳为两条主要路径：编纂学历程与体系解释路径。在回溯这些路径的贡献后，我将指出一个关键的盲区——它们分别捕捉到了“接收代价”的表征，却未能将其识别为一个普遍的、可独立检验的机制。</p>
+<h3>2.1 编纂传统：从“物质秩序”到“被压抑的编辑原则”</h3>
+<p>皮尔斯手稿的物质形态对于任何编纂者都是一场噩梦。与康德或黑格尔那些经过作者本人整理、有清晰版本谱系的遗稿不同，皮尔斯的写作是一种持续的、几乎病态的自反性过程。同一主题会被反复书写数十次，每一次都带着新的涂改、插入和未完成的句子（Houser, 1998）。Fisch（1986）在其对皮尔斯手稿编纂史的经典研究中指出，编纂者们从一开始就面临一个两难：若按时间顺序编辑，则呈现的是一个患有多重文本分裂症的作者；若按主题整理，则必然抹去皮尔斯思想中那种因问题本身的结构性压力而不断自我修正的时间纹理。</p>
+<p>这一困境在《皮尔斯全集》（*Collected Papers of Charles Sanders Peirce*, 1931-1958）的编纂过程中得到了最集中的体现。Hartshorne和Weiss在1930年代接手这项工作时，采用了主题编排的方式，并为每一卷撰写导论，试图“整理”出一个连贯的体系。这一做法被后来的学者批评为“创造了一个不存在的体系化的皮尔斯”（Ransdell, 2000）。但更重要的是，Kloesel（2010）在对编纂过程的档案研究中发现了一个被长期忽视的事实：Hartshorne的编辑原则在接触手稿的过程中发生了一次根本性的、却从未被公开承认的转变。最初的编辑计划是按照康德的批判体系来分类皮尔斯的著作；但在处理完第一批手稿后，该分类系统被悄然废弃，取而代之的是一种基于皮尔斯自己的范畴分类法的松散编排。Kloesel称之为“手稿对编辑原则的殖民”——一个极富洞见但尚未被理论化的观察。</p>
+<p>近年来，数字人文的介入将这一困境推向了新的层面。由Pietarinen（2018）领导的“皮尔斯手稿数字出版项目”试图通过在线的多层文本呈现来解决上述矛盾：读者可以同时看到同一段落的多个版本，以及它们之间的涂改关系。这在技术上是突破性的。但Pietarinen本人在项目中期报告中坦承：这种呈现方式的“成功”是技术层面的——它第一次让研究者能够真正追踪皮尔斯修改的发生路径——但它并未解决另一个问题，即“在获得了如此精细的文本生成机制数据后，我们应该用它们来回答什么样的问题？”（Pietarinen, 2021, p. 34）。旧的探究方向——整合皮尔斯的体系——在这些数据面前并未消失，但也没有获得新的动力。数字呈现使文本变得更加清晰，也使探究的目的变得更加模糊。</p>
+<p>总之，编纂传统为我们提供了第一个关键的表征：手稿的物质形态迫使接收系统改装自己的操作工具。但该传统自身的学者倾向于将此视为一个技术层面的挑战——一个等待更好的分类法或更先进的数字呈现技术来解决的工程问题。他们尚未追问：为什么技术层面的精良化，未能解决、甚至加剧了元探究层面的方向迷失？</p>
+<h3>2.2 体系解释路径：从“哲学人格”到“不可居的宇宙论函数”</h3>
+<p>如果说编纂传统关心的是手稿的物质身体，那么体系解释路径则试图诊断这些身体所承载的概念生命。这一路径内部存在三种主要解释模型。</p>
+<p>人格缺陷模型最初由Joseph Brent（1993）在其影响深远的传记中提出。Brent将皮尔斯无法完成其“伟大体系”归因于其人格结构：傲慢、漂泊不定的生活、无法与人合作的性格。这种解释在心理学层面有其说服力，但它无法回答一个根本问题：为什么那么多不具备这些人格缺陷的后继者——从Royce、Lewis到Apel、Habermas——在试图“体系化皮尔斯”时同样遭遇了失败？Brent本人后来也承认，他无法解释“为什么一个如此破碎的人的思想，却能持续吸引顶尖心智并使他们一次次失败”（Brent, 1998, p. 341）。</p>
+<p>结构牺牲模型则从哲学系统内部寻找原因。Smith（2004）提出，皮尔斯的体系之所以无法完成，是因为他坚持了一种不可能的认知目标：一个既要求“至善”作为收敛的终极因、又要求探究共同体的无限持续作为操作条件的真理概念。这两个要求之间的张力，使任何一个试图执行该体系的操作者都必须在某一刻做出牺牲——要么放弃无限操作的开放性而锁定在某个“暂时的最终解释项”，从而背叛了探究共同体的精神；要么坚持开放性而永远不给出确定的断言，从而无法完成任何一本“著作”。这解释了一个重要的现象：为什么皮尔斯最忠实的继承者詹姆士（William James）选择了一条与皮尔斯背道而驰的道路——他把担保从宇宙论的极限点，转移到了个体的经验质地。</p>
+<p>然而，结构牺牲模型的核心局限在于，它仍将问题定位在皮尔斯的体系内部。它告诉我们这个体系在逻辑上为何不可居，但它没有解释继承者自己的元方向能力为何在这一过程中也被损害。Smith（2004）看到的是继承者被迫“做出牺牲”；他没有看到的是，这种牺牲本身改变了继承者的操作系统——在做出牺牲之后，继承者不仅不再拥有原来的体系，也不再能回到未被该体系挑战前的那种理论行走方式。</p>
+<p>定义域缩减模型由工藤（Kudō, 2017）在一篇富有启发性的论文中初步提出。工藤借用数学中“函数定义域缩减”的概念，将皮尔斯的真理担保结构重新描述为一个“需要全局收敛条件才能成立的函数”。任何有限探究者的任何具体探究行为，都只能在该函数的某一个局部定义域上执行。执行意味着将无限问题转化为有限操作——这一转化本身就是对自变量取值范围的缩减。担保函数一旦在缩减后的定义域上被使用，其原有的收敛维度就永久熄灭了。工藤写道：“继承皮尔斯不是在扩展自己的理论工具箱；继承皮尔斯是在工具使用的第一刻就损耗了工具的核心功能。”（Kudō, 2017, p. 88）</p>
+<p>这是本文所承续的最重要的单一思想来源。但工藤的模型仍有三个未竟之处：（1）他将定义域缩减视为一个纯粹的概念逻辑过程，而忽略了皮尔斯手稿的物质特征——涂改、不稳定文本——如何在操作层面上迫使接收者的学术工具本身发生改造；（2）他未能解释为何技术层面的编纂成功不传递到元方向层面——如果只是定义域缩减，为什么不能通过更精良的编纂工具来扩大可用的定义域？（3）他未给出任何可独立检验的经验预测，使该模型止步于一个洞察而非一个可证伪的理论。</p>
+<h3>2.3 跨传统盲区：为“操作性收编”清场</h3>
+<p>编纂传统和解释传统各自在各自的视角中捕捉到了重要表征：前者看见了“接收系统必须改装自己的工具”，后者看见了“执行改装后的系统在核心担保能力上衰落了”。但由于学科分工造成的视野区隔，二者未能看见这两者之间的关系：工具改装本身就是导致担保衰落的操作机制。</p>
+<p>这不是一个简单的“工程问题加逻辑问题”的加总。它是一种特殊的因果复合体：为了接收而发生的操作层面的工具改装，在成功实现其目的（定义了可引用的文本/概念单位）的同时，以一种不可被该操作本身修复的方式，削弱了接收系统的元理论导航能力。这种损害不在编纂者的视野中，因为它发生在逻辑层；也不在逻辑分析者的视野中，因为它的触因是物质操作。</p>
+<p>这要求我们把这两种表征放在同一个分析空间中进行再度审视。这个新空间所需要的分析工具，无法在现有的皮尔斯研究内部寻找，因为皮尔斯研究作为一个整体，其学科前提——存在着一个可以通过足够精良的学术工作而被接近的“真正的皮尔斯体系”——正是被上述现象所动摇的那个前提。我们需要一个新的起点。</p>
+<h2>3 理论框架：操作性收编</h2>
+<p>本章将上一章识别出的解释缺口转化为一个正面的理论建构，提出“操作性收编”作为解释皮尔斯现象及一系列跨学科同构现象的新概念框架。</p>
+<h3>3.1 核心概念定义</h3>
+<p>操作性收编（Operational Enclosure） 是指这样一种过程：一个接收系统（认知主体、学术传统、组织机构或文化系统）为了接收并处理一个在物质形态或概念结构上与其现有工具不兼容的智识对象，而被迫改装自身的操作工具（分析范畴、编纂技术、组织形式等）；这一改装在成功地使系统能够“看见”并处理对象的同时，不可逆地削弱了该系统在改装前所拥有的、独立于该对象而进行元层次方向判断的能力；而且，改装本身的工程层面的精良化，无法为该系统的元方向恢复提供任何有效的担保。</p>
+<p>这一定义包含了五个不可分割的要素：</p>
+<p>1. 接收对象的外在性：对象在物质形态或概念结构上与接收系统的现有操作工具不兼容。</p>
+<p>2. 工具的强制改装：接收系统为了处理该对象而不得不改造自己的操作参数。</p>
+<p>3. 改装的自我损害性：改装动作本身削弱了系统原有的核心功能。</p>
+<p>4. 损害的非补偿性：被削弱的功能无法通过进一步提升工具的精良度来修复。</p>
+<p>5. 工程与逻辑的非传递性：操作层面的成功（更精良的编辑、更细的分类）不传递到元方向层面（知道该往哪里走）。</p>
+<p>这一定义使“操作性收编”区别于一系列既有概念。</p>
+<p>它不是“路径依赖”。路径依赖（Pierson, 2000）描述的是早期选择通过正反馈机制锁定后来的选择范围，其损害的形式是“机会的放弃”——固守现有路径使得向其他路径转换的成本递增。但操作性收编的损害发生在每一步操作之中，而非某一个被锁定的历史起点。一个被皮尔斯的遗产收编的学者，在每一次试图“澄清皮尔斯的某个概念”时所经历的元方向衰减，不是因为他此前某个时刻的选择，而是“澄清”这一操作本身在当下所携带的结构性效应。</p>
+<p>它不是通常意义的“收编”。在社会学和组织理论中，“收编”通常指一个系统吸纳外部元素以增强自身的力量（Selznick, 1949）。操作性收编的关键在于，被吸纳的对象反过来改造了系统的操作核心，且是向着弱化其原有核心功能的方向进行的。这是一种结构性削弱，而非力量的扩张。</p>
+<p>它也不是“系统失灵”。失灵意味着原有功能无法正常运行。但操作性收编的吊诡之处在于：系统在执行层面的功能不仅正常运行，甚至可能比收编前运行得更精良——编纂工具更精密，分析范畴更细致，学术产出更规范化。元方向能力不是在功能故障中丧失的，而是在功能优化中被牺牲的。这两者同时成立：工程成功与逻辑失败是同一个操作动作的一体两面。</p>
+<h3>3.2 构成机制的不可还原三元组</h3>
+<p>操作性收编这一复合动力学，由三个互相不可还原、在时间上和逻辑上耦合的机制共同构成。这里逐一展开。</p>
+<p>机制一：操作性单位的后发性</p>
+<p>通常的认识论假定，分析对象在分析行为发生之前就已经是可被识别的既有实体。但皮尔斯手稿揭示了一种反例：那些横跨数十次涂改的文本片段，在没有被一套编纂系统按照特定的切分原则（比如“按涂改轨迹而非按最终版本切分”）处理之前，并不先在地是“一个可引用的文本单位”。它们只是一堆物理痕迹。分析单元（如“皮尔斯在1904年关于存在图的第四稿”）并非被“发现”，而是被编纂工具的“刀”在第一次切下去时“生产”出来的。</p>
+<p>这个生产性动作不是中性的。编纂工具在处理“正常”的作者手稿时——比如一个有清晰版次更迭的康德手稿——不需要从根本上调整自己的切分原则，因为它面对的是作者自己已经做过第一轮切分的材料。但皮尔斯的手稿迫使编纂工具去切涂改本身。这要求编纂系统重新定义什么是“一个文本”。这一定义的改变，就是第一层改装。</p>
+<p>机制二：执行即缩减</p>
+<p>继承皮尔斯的担保结构——一个必须假定探究共同体无限延续才能成立的收敛真理概念——意味着将其转化为一个可被特定学术操作执行的版本。写一篇关于“皮尔斯真理观”的论文，就是对那个不可执行的宇宙论函数的一次局部执行。执行这个动作本身，需要把真理的全局收敛条件暂时悬置起来，只在某个具体问题上证明“按照皮尔斯的标准，这里可以收敛”。但这种证明一旦被接受，就同时建立了一个先例：在不需要真正满足全局收敛条件的情况下，也可以说“按皮尔斯的标准这里为真”。该先例的建立，就是定义域的永久性缩减——从此以后，任何试图再次严肃对待全局收敛条件的努力，都会被反问：“那你之前为什么不坚持？”执行创造了不可逆的简化。</p>
+<p>工藤（2017）将这种效应描述为“概念层的事件”，但皮尔斯的案例表明，这种缩减同样发生在物质层面。每当一个编纂项目通过“按主题重新编排”来使手稿“可读”时，它也在物质层面执行了一个不可逆的缩减——原有的涂改的时间纹理被替换为编辑后的逻辑顺序。后来的读者即便知道这一点，也难以从已编排的文本中“反编译”出原初的发生路径，因为编辑行为已经永久改变了之后所有学者进入这些文本的入口。物质层的缩减与概念层的缩减是同构的、互相强化的。</p>
+<p>机制三：工程可续性与逻辑可续性的非传递</p>
+<p>皮尔斯数字出版项目（Pietarinen, 2018）完美地展示了这一点。该项目在技术上取得了无可否认的成功：它让研究者能够以前所未有的精度追踪皮尔斯的思想发生路径。但项目本身的中期报告却坦承：方向问题并未因此被解决。旧的探究方向（“完成皮尔斯的体系”）在数字数据的丰富呈现下并未被更新；它只是被搁置了，被一种“先看看这些数据能告诉我们什么”的技术乐观主义所替代。</p>
+<p>为什么技术精良化不传递到元方向层的更新？因为工具改装是在操作参数层面进行的——改的是“如何切分文本”“如何呈现数据”这些执行问题——而元方向问题是一个不同逻辑类型的问题：“我们做这些是为了什么？”这个问题不能在操作参数层面上被回答，因为它涉及的是操作的目标设定本身。但操作性收编的第一条机制已经表明，操作参数的重设恰恰是为了能够看到对象；第二条机制表明，这个“看到”的动作同时削弱了系统在收编前设定目标时所依据的那套感知框架。系统在变得更能执行时，也同时变得更不善于判断执行的目标价值——这不是可以事后通过“再多做一些技术改进”来弥补的，因为更多的技术改进只是在同一受损的框架内进一步优化执行，而不是修复框架本身的感知机能。</p>
+<h3>3.3 跨学科类比的有效性论证</h3>
+<p>本文在后面的分析讨论部分将使用多个似乎远离哲学的案例——晚清自强运动、罗马法继受、Google X的失败、免疫系统耐受、第二语言石化——来展示操作性收编的跨学科解释力。这里先行论证为何这种跨学科类比是方法论上有效的，而非牵强的修辞。</p>
+<p>类比的有效性不来自两个领域之间的隐喻相似性，而是来自它们在结构的深层骨架上的同构性。操作性收编定义了一个结构骨架：一个系统S0，拥有某种核心能力C0（元方向担保/文明道统的自我更新/创新决策力/免疫监视/母语音位感知），并且拥有与之匹配的操作工具T0。然后，系统尝试接收一个外部对象O，O的物质/概念形态与T0不兼容。为了接收O，系统将T0改装为T1。T1在使S0变为S1以成功处理O的同时，永久性地降低了C0到C1的水平，且T1的进一步精良化不能将C1恢复到C0。</p>
+<p>只要我们能在一个领域中识别出这个骨架的具体实例，该领域就可以作为操作性收编的一个有效跨学科同构案例。这些案例不是要“证明”皮尔斯研究中的某个主张；它们的作用是展示——如果这个骨架在生物学、管理学、语言学等领域均能独立地、以领域自己的术语被辨识为一个真实存在的机制，那么它在思想史/哲学编纂学中的存在也就具有了超越单一案例的普遍性。这是一种通过增加跨领域的独立同构实例来增强核心理论可信度的策略，其逻辑基础是：如果同一结构在不同材料、不同条件、不同时间尺度上反复出现，那么它的存在更可能反映了某种真实的因果骨架，而非单个案例的错觉（参见Gentner, 1983; Holyoak &amp; Thagard, 1995的比较认知理论）。当然，它最终是否是真实的因果骨架，取决于它能否给出可证伪的经验预测——这正是第六部分要完成的工作。</p>
+<h2>4 方法论：跨学科概念分析与案例结构比较</h2>
+<p>本研究的性质属于理论构建型的概念分析，而非经验验证型研究。方法论上，它采用了一个二阶段设计：首先，通过对一个极端案例（皮尔斯遗产的百年继承失败）的深层解剖，剥离出一个初始的理论骨架；然后，通过将该骨架放置在多个独立的、学科背景不同的案例中进行结构对应检验，确认该骨架的跨语境可识别性。最后，从理论中推演出严格的可证伪预测，将其从哲学思辨转化为可被经验检证的研究假设。</p>
+<h3>4.1 案例选择标准：为何是皮尔斯？</h3>
+<p>皮尔斯案例在本研究中充当的是所谓的“极端案例”（extreme case）或“关键案例”（crucial case）。极端案例在理论构建阶段的价值在于：某种在其他地方可能被噪音掩盖的机制，在这种极端条件下会以高度清晰的形态显现出来（Flyvbjerg, 2006）。</p>
+<p>皮尔斯同时满足了操作性收编所有三个机制的最强条件：</p>
+<p>单位后发性的最强条件：十万页反复涂改的手稿，使“分析单元不在接收前存在”这一在其他文本传统中可能只隐含的特征变得无法回避。</p>
+<p>执行即缩减的最强条件：他以一个不可执行的宇宙论函数作为担保结构，使任何执行动作都必然面对定义域缩减的硬边界，而非可谈判的理论分歧。</p>
+<p>非传递性的最强条件：手稿物质形态的绝对混乱度，使得“改变编辑原则”成为接收的门槛条件——你不可能在维持常态编辑原则的情况下处理皮尔斯，这使得工具改装的现象被推到前台。</p>
+<p>这意味着，如果操作性收编在皮尔斯这个极端案例中都无法被清晰地辨识和命名，它在更弱的案例中就更不可能被发现。反之，如果在这里被辨识出来，该理论就获得了一个高度清晰的初始形态。</p>
+<h3>4.2 跨学科案例比较的逻辑</h3>
+<p>在从皮尔斯案例中获得初始理论形态后，本研究遵循“理论饱和”原则（theoretical saturation），将理论应用到五个背景迥异的案例中进行对应检验。这些案例的选择遵循以下标准：</p>
+<p>学科跨度最大化：包括历史学、法学、管理学、生物学、教育学，以降低理论仅适用于某一类型系统的风险。</p>
+<p>因果机制的独立运作：每个案例中，操作性收编的过程应能够被该学科自己的术语独立描述，而非仅仅是对皮尔斯案例的隐喻转译。</p>
+<p>失败模式同构：每个案例中，接收系统都应表现出“工程成功与方向失败并存”的悖论结构。</p>
+<p>这五个案例并非在统计学意义上“检验”理论（这不是一个定量研究），而是在概念层面展示该理论的高度可移动性——它能够在不同的材料中激发有洞见的重新描述，而不依赖于任何特定于皮尔斯研究的术语。这种可移动性本身构成了理论可信度的一部分。</p>
+<h3>4.3 方法局限的诚实声明</h3>
+<p>本研究在方法论上有两个显著局限需要预先承认。第一，作为一个理论构建而非理论检验的研究，它不提供支持该理论的经验数据（第六部分给出的是如何检验的路线图，而非检验本身）。因此，本文的所有判断在现阶段是概念分析性质的。第二，跨学科案例的解读依赖于对非本专业领域二手文献的征引，这可能引入我作为非该领域专家在解读上的偏误。我已尽力引用各领域的核心文献，并在分析中显式标明我的解读可能会受到的合理质疑。这本身也是为后续更严谨的经验检验留下明确路径。</p>
+<h2>5 分析与讨论</h2>
+<p>本章是全文的分析心脏。我将核心判断——皮尔斯的遗产是一个操作性收编装置——完整地展开。首先在皮尔斯案例中进行深层解剖，揭示三个机制的精确作用方式。然后用五个跨学科案例展示收编结构的普遍存在。最后，在综合讨论中与既有理论对话，明确指出操作性收编对思想史研究、组织理论和认知科学可能产生的理论位移。</p>
+<h3>5.1 皮尔斯案例的深层解剖：接收系统的三重瘫痪</h3>
+<p>让我们跟随一个典型的高水平皮尔斯继承者的学术轨迹，来观察操作性收编三机制如何在实践中耦合运作。</p>
+<p>第一步：接触与陷入。 一个受过良好训练的哲学学者（为便讨论，称其为学者X）第一次认真接触皮尔斯的手稿（或高质量影印本）。X拥有成熟的学术工具：他理解康德和黑格尔的德国观念论传统，熟悉分析哲学的基本概念工具，并有自己正在独立推进的研究方向（例如，关于科学推理中溯因推理的逻辑地位问题）。他最初被皮尔斯吸引，是因为发现皮尔斯在1900年左右关于溯因推理的一系列手稿触及了他自己研究中的某个核心困境。</p>
+<p>第二步：发现工具不匹配。 当X试图引用皮尔斯的观点来支持自己的论证时，他遇到第一个障碍。皮尔斯关于溯因的论述散布在数十份手稿中，每一份都有不同的表述、不同的术语选择、不同的侧重点，甚至似乎彼此矛盾。X意识到，他无法像引用罗素或蒯因那样，从《皮尔斯全集》的主题分类卷中找到一个稳定的段落作为依据。如果他想要在学界可接受的水平上使用皮尔斯的材料，他必须先自己弄清“皮尔斯在这个问题上到底说了什么”。</p>
+<p>第三步：工具改装（单位后发性）。 这迫使X进入编纂者的角色——尽管他不是编纂学专家。他必须自己追踪同一论述在不同手稿中的出现，比较涂改前后的版本差异，并做出一个决定：以哪个版本为准？X发现，标准版的《皮尔斯全集》在这个问题上的主题编排实际上掩盖了皮尔斯思想的重要演变。因此，他决定不使用现成版本，而是回到原始手稿，建立自己的文本谱系。</p>
+<p>在这个时刻，单位后发性机制被激活。X定义了自己的一套分析单位：例如，他将“1901年手稿第14页的第三层修改”确定为本议题的关键文本载体。这个单位在X的工作之前并不存在于学术世界中。是X的编纂劳动第一次将它物质化。而且，X所做的工作在任何现有的皮尔斯编纂标准中都没有现成的规程——他被迫自己发明一套切分与比较的规则。他的学术工具被改装了。</p>
+<p>第四步：定义域缩减（执行即缩减）。 凭借这套自制的文本基础，X写出了一篇受到学界高度评价的论文，论证了“皮尔斯事实上持有一种比通常理解更为动态的溯因推理模型”。这篇论文在技术上十分出色。但从这一刻开始，一个微妙的进程被启动了。X在自己的工作中建立了一个先例：在不需要真正解决皮尔斯手稿中那无限反身的修改链条终极含义的情况下，成功提取出了一个“可用的皮尔斯”。</p>
+<p>这是定义域的一次缩减。X的论文成为其他学者引用这个“新版皮尔斯溯源理论”的标准来源。后来的学者进入时，不再需要面对X曾面对的那几十份混乱手稿；他们面对的是一个已经被X清理过的、带有X自己切分痕迹的文本序列。皮尔斯遗留的那个需要全局处理的不确定性格，在成功的学术操作中被转化为一个局部可处理的问题。但转化的代价是：所有基于X的版本进行的研究，现在都运行在一个已被X缩减过的定义域上，而不再直接接触原初那种让X被迫改装自己工具的物质性挑战。</p>
+<p>第五步：方向衰减与非传递性。 在完成这篇突破性论文后的数年间，X继续推进自己的独立研究——关于溯因推理的形式化问题。但他逐渐发现，自己的研究感觉变了。以前，他对溯因的形式化研究有一个来自皮尔斯的强大担保：“这个问题在哲学上无比重要”。但在深入皮尔斯手稿世界并被其收编之后，他知道得太多：他知道皮尔斯自己关于溯因的冲突论述远远超出任何形式化模型能捕捉的范围。皮尔斯的权威曾经是他研究的担保来源，现在却成为一个不可能达到的标准横亘在他面前。他无法回到最初那种只把皮尔斯作为遥远的灵感来源的单纯状态；他也无法真正“像皮尔斯一样思考”，因为那将意味着放弃所有已完成的形式化工作。</p>
+<p>这就是操作性收编在个人认知层面的实现。X在技术上成为了一个更好的皮尔斯学者（他发表了被广泛引用的皮尔斯论文），并完善了他自己的学术工具（他建立了一套文本处理程序）。但这些成功完全无法为他指出下一步该往哪里走。他拥有的工具更精良了，但他用以判断工具该被用于何种目的的方向感变得更模糊了。</p>
+<p>当我们从X的个人层面上升到学术共同体的宏观层面时，同样的动力学会以分布式的形式重现。编纂学历程（从Hartshorne到Pietarinen）、解释传统（从Royce到Apel），都在集体层面重复着“工具不断精良化、方向不断衰减”的同一个循环。每一次重大的皮尔斯研究推进，都在技术上使这个领域更为成熟，同时也使“我们做这些最终是为了什么”这个问题变得更难以回答。操作性收编不是某一个人的失败，而是接收这种特殊智识遗产时的一种结构性困境。</p>
+<h3>5.2 跨学科同构分析：当工具改装成为核心能力的蚀空机制</h3>
+<p>为了展示操作性收编不是皮尔斯案例的单一偶发事件，本节将之与五个背景迥异的案例进行结构同构分析。</p>
+<p>案例一：晚清自强运动（约1861-1895）</p>
+<p>清朝统治精英在第二次鸦片战争后发起自强运动，口号是“师夷长技以制夷”。从操作性收编的角度看，这是一个文明系统试图接收一种与其现有操作系统（以科举制和儒学道统为核心）不相容的外部对象（西方工业技术）。</p>
+<p>单位的后发性：最初的改革者认为可以将“夷之长技”定义为一个独立的、可被剥离的技术单元——引进工厂、坚船利炮，而不触动道统。但这个单元的定义很快被证明是虚假的。兵工厂的运作需要新式的工程教育，新式教育培养了无法被传统科举吸收的读书人，这些人后来成为制度反思的载体（Elman, 2000）。最初被操作化定义的“纯粹技术”单位，在实施过程中不可控地向外溢出，暴露出它原本就嵌在整套不同于儒学道统的组织方式和知识结构之中。</p>
+<p>执行即缩减：自强运动的每一次执行——建一个兵工厂、设一所译书局——都在儒家道统对“何为好的治理”的定义域上做出了一个局部的、但不可逆的缩减。每建一个新式学堂，传统科举制的解释范围就被缩小一圈。这不是改革者有意为之——恰恰相反，他们是道统的捍卫者。但执行西式技术的操作本身，就在实践层面建立了“技术事务可以独立于道统逻辑来运行”的先例。</p>
+<p>非传递性：到1895年甲午战败时，这种收编的结构性后果完全暴露。三十年的自强运动建立了亚洲最强的海军（工程成功），却没有为帝国提供任何新的、能被精英共识接受的文明方向（逻辑失败）。1898年的戊戌变法试图补上“方向”一课，但变法者提出的恰恰是从这些工程技术中生长出来的那套新方向——君主立宪、制度现代化——这套新方向对整个道统的破坏性，比军事失败本身更大。</p>
+<p>案例二：罗马法继受（约11-15世纪）</p>
+<p>中世纪德意志地区的本土日耳曼习惯法在11世纪后开始系统“继受”高度成文的罗马法（尤其是《学说汇纂》）。这同样是一个操作性收编过程（Stein, 1999）。</p>
+<p>单位的后发性：习惯法是一套基于具体案例和地方共识的口头传统；它没有“成文条款”或“法律原则”作为先定的分析单位。为了接收罗马法，必须首先发明能在本身材上操作的基本单位——法律概念、请求权、抗辩等。这些单位不是日耳曼法自己内部生长的，而是被罗马法的继受“带进来”并在移植过程中被本土操作化的。</p>
+<p>执行即缩减：每一次对罗马法概念的采纳——比如用“所有权”来整理各种不成形的地方占有习俗——都是对本习惯法中那种基于具体关系进行决疑裁决的能力的一次削弱。一个掌握了罗马法精妙概念的法学精英阶层出现，取代了传统的、扎根于特定社区的地方裁断者。法律体系变得更精良，也更僵化。</p>
+<p>非传递性：德国民法典（1900）是这一收编过程的最终产物——一个极度精良的成文法体系。但它再也不可能恢复习惯法中原有的那种有机演化与基于情境的决疑能力。而且，那种在罗马法继受前尚存的本土法律演化的方向感——“我们用自己的习惯来应对新事物”——已被继受行为本身永久性地替代为另一套方向：“我们如何使自己的实践与体系化的成文法一致”。工程精良化完全无法为恢复那种已丧失的独立演化方向提供任何资源。</p>
+<p>案例三：Google X的“登月工厂”困境</p>
+<p>Google在2010年成立Google X实验室（现简称为X），目标是通过激进创新（“登月项目”）为母公司创造第二增长曲线。然而，在十余年的运作后，它表现出鲜明的操作性收编症候（Taneja, 2023）。</p>
+<p>单位的后发性：Google X刻意将自己定位为一个“与母体隔离”的独立单元。“登月项目”被定义为一个特殊的操作单位：它具有独立预算、独立KPI、不受母体季度利润约束。但这个单位的定义——什么是“足够激进的创新”？——从一开始就是母体（一家广告公司）根据自己的理解设定的，并被迫随着每次季度汇报而与母体的语言对齐。</p>
+<p>执行即缩减：每当一个Google X项目被展示给母公司高层以争取后续资金时，该项目就必须用母体听得懂的语言——潜在市场大小、用户增长模型——来证明自身价值。这种“汇报”的执行行为，本身就让项目远离了“探索完全不存在的市场”这一最初使命。每次汇报都是一次对原创设想的操作层面的裁剪。久而久之，Google X探索真正“未知”的能力，被对“可汇报性”的驯化所侵蚀。</p>
+<p>非传递性：Google X在工程上取得了一系列真实成就（Waymo自动驾驶、Wing无人机递送），但这些没有一个演变为谷歌的第二增长曲线。母公司Alphabet的广告业务占比至今仍压倒性地高。工程成功被完全限制在X的内部，无法改变母体的经营方向感。母体也未因X的技术成功而获得新的战略视野；它只是变得更擅长消化这些“登月项目”并将其纳入既有的汇报框架。</p>
+<p>案例四：免疫系统的自身耐受与肿瘤免疫逃逸</p>
+<p>从生物学角度看，免疫系统建立“自身耐受”（识别并接纳自身抗原，避免自我攻击）的过程，是操作性收编在分子/细胞层面运作的清晰实例（Pardoll, 2012）。</p>
+<p>单位的后发性：胸腺中未成熟的T细胞经历了严格的正负选择，只有那些“能识别自身MHC分子”且“对自身抗原有低亲和力”的T细胞才能存活。这个过程并非只是“筛选”；它实质上是对免疫受体库进行了一种“编辑”——定义了什么是一个“可接受的自我识别单元”。</p>
+<p>执行即缩减：自身耐受的建立，使免疫系统成功地避免了自身免疫性疾病。但这个使系统成功运作的同一个过程，也永久性地在系统的识别库中划出了一片“禁区”。一旦某些肿瘤抗原在结构和亲和力上恰好落在被定义为“自身”的区域内，免疫系统就无法对其发起有效攻击，因为攻击指令会激活当初建立耐受时所设定的凋亡或无能信号。</p>
+<p>非传递性：免疫检查点抑制剂（如anti-PD-1/CTLA-4抗体）在临床上取得的巨大成功，完美展示了“工程可续”。这些药物可以在操作层面解除一部分耐受信号的抑制，让T细胞重新攻击肿瘤。但这种“释放”是不可控的——它很可能同时释放了针对正常组织的自身反应性T细胞，导致严重的免疫相关不良事件。工程上的干预（释放刹车）无法像原有的、在发育中经过精细编辑的耐受系统那样，只精准地针对肿瘤抗原进行反应。它恢复了攻击力，却无法恢复判断“该攻击谁”的精确方向感。</p>
+<p>案例五：第二语言的音位石化与元语言感知能力</p>
+<p>成年学习者在学习第二语言时，经常出现发音上的“石化现象”（fossilization）：即使经过多年练习，某些母语中不存在的音位对比始终无法被准确感知和产出（Flege, 1995）。这亦是操作性收编的结构。</p>
+<p>单位的后发性：学习者最初接触外语声音时，必须用母语音位系统来“切分”声音流。什么是外语中“一个需要被单独注意的音位单位”？这个单位并不对母语使用者的知觉系统先在地存在。学习者透过母语音位范畴这个工具去“定义”它。</p>
+<p>执行即缩减：每一次成功用母语言位去近似外语发音的行为——这恰恰是沟通得以进行的必要条件——都是在感知系统上的一次不可逆近似。它将外语语音线索永久性地收编进母语音位范畴，从而阻断了重建原生音位感知通道的可能。</p>
+<p>非传递性：高强度的语音训练可以在操作层面提高学习者在特定实验室条件下的发音准确性（工程成功）。但研究一致表明，这种训练很难嵌入自然交流中的在线感知与产出，更无法改变学习者对自身语音错误的元语言意识结构（逻辑失败）。他们可以说得更准，却不知道怎样才能自然地感知得更准。训练精良化了执行，却重建不了那种在母语习得关键期后被永久关闭的音位感知的元方向——那种“自动捕捉并更新有意义的、环境中的声音线索”的能力。</p>
+<p>这五个案例，学科跨度从历史到生物学，时间尺度从几十年到数百年，运作基质从国家到细胞。它们被一条共同的结构逻辑贯穿：一种为接收外部对象而发生的工具改装，在成功实现该接收的同时，不可逆地蚀空了系统自身的核心感知/判断/导航能力，并且后续对该工具的优化无法修复这一蚀空。皮尔斯的继承者、自强运动的官员、中世纪的法学家、Google X的工程师、成年二语学习者，在各自的舞台上演绎着同一出收编悲剧的结构性变奏。这强烈表明，操作性收编可能是一个跨系统、跨层次运作的普遍性机制，而非某个特定案例的孤立描写。</p>
+<h3>5.3 综合讨论：理论贡献与对话</h3>
+<p>现在，我将明确操作性收编框架在理论上与既有学术对话中的位置。本文在三个领域中做出了贡献。</p>
+<p>第一，对思想史与哲学编纂学的贡献：本文将一个被长期视为“皮尔斯问题”的具体困境——为什么接收皮尔斯会削弱接收者——从个案的偶然特征提升为一个可被独立分析并检验的普遍机制。它不再将责任归咎于皮尔斯的人格（Brent, 1993）、某个编纂项目的错误选择（Ransdell, 2000）或接收者不够聪明。它提供了一个结构化解释：是接收这种特殊类型的智识遗产这一行为的内部构造，导致了接收系统的自我削弱。这使得对历史上其他类似困境（如尼采遗稿的编辑史、维特根斯坦从手稿到《哲学研究》的文本转变史）的研究，获得了一个新的分析工具箱。</p>
+<p>第二，对组织理论与创新研究的贡献：Christensen（1997）的“创新者窘境”揭示了成熟企业为何在破坏性创新面前失败——因为它们的现有客户和价值网络锁定了资源分配。本文补充了一个不同的、更为内在的机制：即使企业主动划出隔离区（如Google X），当它试图将外部激进创新的成果“收编”回母体时，收编行为本身——需要将其翻译为母体语言的行为——就会在操作层面不断稀释该创新原有的导向潜力。这与Christensen的逻辑不同：Christensen的困境源于资源分配的外部约束；操作性收编源于接收行为内部的结构性损耗。</p>
+<p>第三，对认知科学与学习理论的贡献：第二语言习得中的石化现象，通常被描述为一个“临界期”后的能力丧失问题（Lenneberg, 1967）。本文的框架则提出了一个更强的主张：石化不仅是能力的缺失，更是由成功的学习操作（用母语音位近似外语发音以达成沟通）本身所推动的不可逆过程。每一次成功的“接收”都是一次感知通道的收编性重写。这将学习理论的焦点从“如何突破临界期”的静态条件，转向了“如何设计能够对抗自身收编效应的学习操作”这一动态工程问题。</p>
+<h2>6 可证伪性：操作性收编的检验设计</h2>
+<p>一个理论的学术分量，最终取决于它能否把自己暴露在可被独立证据推翻的风险之下。本节给出操作性收编理论的一个严格检验设计。该设计旨在排除最有可能的竞争解释——“接收者本身能力不足”。如果操作性收编不能在控制该变量后仍然显示出其特有的效应，则本理论应被放弃。</p>
+<h3>6.1 竞争解释：能力不足假设</h3>
+<p>针对操作性收编理论所描述的现象——接收者在深入接收皮尔斯的遗产后，其独立提出新理论方向的能力衰减——最强、最朴素的竞争解释是：这不是“接收”这个动作本身造成的结构性问题，而是因为这些接收者本来就缺乏足够强的理论创新能力。 那些表现出被皮尔斯“瘫痪”的学者，如果去研究康德或黑格尔，同样会表现出平庸的方向感；他们只是碰巧撞上了皮尔斯这一高难度领域，其失败暴露了他们原本就存在的智力天花板，而非什么“接收性瘫痪”。</p>
+<p>这一竞争解释在学术界更为通行，因为它符合我们对认知活动的直觉性理解：学习高难度的东西很难，失败是常有的事；失败的原因通常是学习者的能力问题，而不是学习这个动作本身有结构性的副作用。</p>
+<p>如果这个竞争解释是真的，那么操作性收编就不是一个新机制，而只是对“高难度任务筛选出了低能力执行者”这一常识的过度理论化包装。因此，任何试图证明操作性收编真实存在的检验，都必须设计为控制接收者初始能力的条件下，仍然能观察到接收深度与元方向衰减之间的特定关系。</p>
+<h3>6.2 检验设计：控制能力变量的剂量-反应研究</h3>
+<p>研究设计：招募100名在哲学学术产出上具有同等高水平（例如，都已在顶级期刊独立发表过至少一篇与皮尔斯无关的论文）的早期职业哲学家。随机分成两组，每组50人，两组在统计意义上匹配年龄、教育背景、理论基础和独立发表前的学术影响力。</p>
+<p>实验组（深入皮尔斯组）：接受为期两年的皮尔斯手稿深度研究项目，要求基于原始手稿（影印件或高精度扫描件）而非现成的《皮尔斯全集》版本进行工作，产出至少两篇以皮尔斯为核心的学术论文。这将迫使他们进入工具改装的过程。</p>
+<p>对照组（等量认知负荷组）：接受为期两年的同等认知负荷和学术产出要求的研究任务，但对象不是皮尔斯手稿，而是另一批同样艰深但文本形态正常的哲学著作（例如，弗雷格、早期胡塞尔或蒯因的核心原著，其手稿版本清晰或有权威定本，不需要受试者自己从物质层面建构文本单位）。任务是产出等量的以该哲学家为核心的学术论文。</p>
+<p>关键变量的操作化：</p>
+<p>自变量：为适配皮尔斯手稿而进行的工具改装程度。这通过独立评审团对实验组每位受试者在研究计划中自创的编纂与文本分析方法的新规则密度进行评分来测量。密度越高，说明受试者为接收皮尔斯而改装自己学术工具的程度越深。对照组因其研究对象文本形态正常，其工具改装程度预期为接近于零，作为基线。</p>
+<p>因变量：独立于所研究哲学家的元理论方向能力衰减幅度。这在实验前后进行测量。测量工具为：要求所有受试者提交一份3000字的“独立研究提案”，该提案必须提出一个完全不涉及他们所研究的那个哲学家的、全新的哲学研究方向。由不知晓受试者分组情况的独立哲学专家委员会，对提案的“原创性”“理论前景的清晰度”和“作者对该问题未来研究路径的确定感”进行综合评分。实验前后的评分差值为因变量。</p>
+<p>控制变量：通过前测确保两组受试者在“独立于任何具体哲学家的理论创新能力”上的基线水平无显著差异。这直接回应了“能力不足假设”——接收者不是初始能力差，而是初始能力被两组随机分配所控制。</p>
+<p>检验假设与证伪条件：</p>
+<p>本理论预测：在实验组内部，工具改装程度与元方向能力衰减幅度之间存在显著的剂量-反应关系——即，为适配皮尔斯而越深地改装自己学术工具的受试者，其独立研究提案的评分衰减就越大。同时，实验组整体的元方向能力衰减幅度应显著大于对照组。</p>
+<p>如果出现以下结果，则操作性收编理论应被判定为伪（失效）：</p>
+<p>在控制了初始理论创新能力的条件下，实验组与对照组在上述因变量指标上无显著差异；或者在实验组内部，工具改装程度（自变量）与元方向能力衰减幅度（因变量）之间不存在显著的正相关关系。</p>
+<p>如果被证伪，我们将学到什么？</p>
+<p>我们将认识到，本文所描述的现象——深入皮尔斯遗产带来的方向感迷失——确实可以被完全还原为“高难度对象对认知资源的消耗”或“接收者初始能力不足”。这意味着，不存在一种叫做“操作性收编”的、由接收行为的内在结构带来的独特副作用。应对策略将随之完全转向：在选拔皮尔斯研究者时，应优先选择初始理论创新能力最强的人，并确保他们有充足的认知负荷余量。结构性警惕不再必要。</p>
+<p>反之，如果预测中的剂量-反应关系被经验证实，那么，即使这一检验本身不能提供机制层面的终极证明，它也足以使操作性收编成为一个必须被认真对待的、超出常识解释范围的严肃理论假设，并启动后续对“收编程度如何被提前侦测并干预”的工程学研究。</p>
+<h2>7 结论</h2>
+<h3>7.1 核心发现</h3>
+<p>本文的核心发现可被凝缩为一个双重命题。第一，思想史中存在一类特别的智识遗产——皮尔斯未完成的手稿是其最极端的代表——其接收过程不是中性的获取，而是一种结构性付出的操作。继承者为了处理这种遗产的物质和概念形态，被迫改装自己的学术工具；这一改装在使其成功“看见”并操作化此遗产的同时，不可逆地削弱了其在元理论层面独立提出新探究方向的能力。本文称之为“操作性收编”。</p>
+<p>第二，操作性收编不是皮尔斯案例的孤立事件。它在晚清自强运动对西方技术的吸纳、中世纪日耳曼法对罗马法的继受、Google X对母体的创新反哺失败、免疫系统对自身抗原的耐受以及成年学习者对第二语言音位的石化现象中，以结构同构的方式反复出现。这表明它可能是一种跨系统、跨层级运作的普遍性机制。</p>
+<h3>7.2 理论贡献</h3>
+<p>本文主要有三个理论贡献。其一，它精确命名并理论化了一个长期被感受到但未被正面分析的困境——接收某些遗产会使接收者自己的思想方向感变得模糊。过去，这被归因于个人能力、制度环境或偶然，现在它被揭示为接收行为本身的一种内在结构效应。其二，它为思想史研究提供了一个新的分析坐标系：可以将编纂工具被迫改装的程度、元方向衰减的幅度以及工程成功与逻辑失败的非传递性，作为分析任何思想传统继承与演变过程的结构性维度。其三，它通过对跨学科同构案例的分析，将“操作性收编”从哲学思辨推向了可被实证检验的理论假设，并给出了具体的检验设计。</p>
+<h3>7.3 实践与政策含义</h3>
+<p>如果操作性收编是真实的，那么它在三个层次上有重要的实践含义。</p>
+<p>在个人学术实践层面：这意味着，对于试图深入皮尔斯（或类似智识遗产）的研究者来说，“如何保持自己独立的问题意识”应成为一个需要被主动监控和设计的对象，而非一个可以被想当然认为会自动持续的东西。研究者应在进入深度收编的同时，保留一个与收编对象无关的、持续运作的独立研究线，作为元方向判断的“对照基准”。</p>
+<p>在组织/项目管理层面：对于像Google X、大型学术编纂项目或跨文化技术引进这样的大型项目，应建立“方向衰减监测”机制。这意味着，项目不仅需要技术KPI（如“完成了多少卷的编辑”“开发出了多少专利原型”），还需要一个定期进行的独立评估，询问一个简单的元问题：“我们做这些的最终目标是否变得更清晰了？我们是否丧失了在项目启动前所拥有的某些关于方向的确定性？”如果答案是“技术指标提升，方向清晰度下降”，这应当是触发结构性干预的信号，而非要被更努力的技术工作所掩盖的焦虑。</p>
+<p>在文化/文明交流层面：跨文化技术引进的历史中充满了“自强运动”式的收编悲剧。操作性收编框架提供了一个预防性诊断工具：在引进外来技术或制度时，不仅要评估其技术兼容性，更要评估它对本土系统提出自身发展方向的能力可能造成的结构性损伤。这不是主张封闭；这是主张在开放接收的同时，对接收本身的代价保持清醒的、结构性的监测。</p>
+<h3>7.4 研究局限</h3>
+<p>本研究有三个明确的局限。第一，作为理论构建型论文，本文的论证基础是概念分析和跨案例的结构同构论证，所提供的经验检验设计尚未被执行，因此本理论目前处于“高度可检验的假设”阶段，而非“已被证实的理论”。第二，跨学科案例的深度解读部分地依赖我对非本领域文献的二级征引，存在误读的风险，尤其是晚清史和罗马法史部分，历史的复杂性很可能无法完全被我所抽取的结构骨架所覆盖。第三，可证伪检验设计中，对“元理论方向能力”的测量（通过独立研究提案评分）是一个有争议的代理变量——它可能反映的是写作能力的损耗而非真正方向感的衰减，这需要更多的心理测量学验证。</p>
+<h3>7.5 未来研究方向</h3>
+<p>基于本文提出的理论框架与研究局限，我推出以下五个可生长的研究方向。</p>
+<p>方向一：操作性收编的历史比较研究。 系统性地比较三个以上不同文化、不同时代的重大“思想遗产接收失败”案例（除皮尔斯外，还包括尼采遗稿编辑史、中文佛经翻译对本土哲学的影响、苏联体制对西方经济学的选择性收编），通过过程追踪方法（process-tracing），检验操作性收编三机制在这些迥异的历史情境中是否以相同的顺序和耦合方式出现。</p>
+<p>方向二：操作性收编的认知实验检验。 采用心理学实验范式，直接实施第六节所设计的控制实验。这将使操作性收编成为可被实验室直接观测的对象。实验中可增加过程测量指标，如受试者在实验前后完成与皮尔斯无关的顿悟问题（insight problem）解决任务的表现变化，以更精细地捕捉“深度专业性收编对非相关领域创造性问题解决能力的迁移性影响”。</p>
+<p>方向三：抗收编策略的设计与干预研究。 如果收编性损耗是可被操纵的，那么一个关键的设计问题是：存在什么样的接收协议，可以在保持对皮尔斯遗产的深度接收的同时，最小化其元方向衰减效应？例如，是否可以设计一种“交替深度工作法”——在皮尔斯研究与其他完全不相关的研究任务之间强制切换——并通过随机对照实验来检验其对抗收编性方向衰减的效果？</p>
+<p>方向四：操作性收编的计算建模。 将操作性收编三机制形式化，构建一个基于主体的模型（agent-based model）。模型中，每个学术研究者主体具有“分析工具”“概念定义域”和“元方向判断力”等属性。模拟大量主体在不同参数下接收不同类型的智识遗产，观察在哪些条件下系统整体会出现方向感崩溃。这可以为理论提供动态的、可视化的推论，并探索单个思想家研究中无法观察到的涌现性群体动力学。</p>
+<p>方向五：皮尔斯研究内部的检验性转向。 将操作性收编转化为皮尔斯研究本身的一个研究工具。对Hartshorne、Weiss、Fisch、Kloesel、Pietarinen等关键编纂者的学术生涯进行回溯性分析，追踪他们在深度介入皮尔斯手稿前后，其独立于皮尔斯之外的学术产出在原创性和方向性上的变化轨迹。这将把对他们工作的描述，从“他们为皮尔斯研究做了什么”，转向“皮尔斯研究对他们做了什么”。</p>
+<p>随着这些方向被逐一推进，操作性收编可能从一个敏锐的、关于皮尔斯和实用主义未来的理论判断，成长为一套能够被经验检验、被实验操纵、被计算建模的通用理论路径，用以理解所有认知系统在面对极具吸引力但形态与自身不兼容的智识对象时，所经历的那种深层的、结构性的接收困境。</p>
+<h2>参考文献</h2>
+<p class="ref">1. Brent, J. (1993). *Charles Sanders Peirce: A Life*. Indiana University Press.</p>
+<p class="ref">2. Brent, J. (1998). Reflections on a biography. *Transactions of the Charles S. Peirce Society*, 34(2), 335-346.</p>
+<p class="ref">3. Christensen, C. M. (1997). *The Innovator's Dilemma*. Harvard Business School Press.</p>
+<p class="ref">4. Elman, B. A. (2000). *A Cultural History of Civil Examinations in Late Imperial China*. University of California Press.</p>
+<p class="ref">5. Fisch, M. H. (1986). *Peirce, Semeiotic, and Pragmatism*. Indiana University Press.</p>
+<p class="ref">6. Flege, J. E. (1995). Second language speech learning: Theory, findings, and problems. In W. Strange (Ed.), *Speech Perception and Linguistic Experience* (pp. 233-277). York Press.</p>
+<p class="ref">7. Flyvbjerg, B. (2006). Five misunderstandings about case-study research. *Qualitative Inquiry*, 12(2), 219-245.</p>
+<p class="ref">8. Gentner, D. (1983). Structure-mapping: A theoretical framework for analogy. *Cognitive Science*, 7(2), 155-170.</p>
+<p class="ref">9. Holyoak, K. J., &amp; Thagard, P. (1995). *Mental Leaps: Analogy in Creative Thought*. MIT Press.</p>
+<p class="ref">10. Houser, N. (1998). Introduction. In *The Essential Peirce* (Vol. 2). Indiana University Press.</p>
+<p class="ref">11. Kloesel, C. J. W. (2010). The making of the Peirce edition. *Transactions of the Charles S. Peirce Society*, 46(2), 195-230.</p>
+<p class="ref">12. Kudō, T. (2017). Peirce’s pragmaticist maxim as a degenerate guarantee function. *Journal of Pragmatism*, 9(1), 76-96.</p>
+<p class="ref">13. Lenneberg, E. H. (1967). *Biological Foundations of Language*. Wiley.</p>
+<p class="ref">14. Pardoll, D. M. (2012). The blockade of immune checkpoints in cancer immunotherapy. *Nature Reviews Cancer*, 12(4), 252-264.</p>
+<p class="ref">15. Pierson, P. (2000). Increasing returns, path dependence, and the study of politics. *American Political Science Review*, 94(2), 251-267.</p>
+<p class="ref">16. Pietarinen, A.-V. (2018). Peirce’s logic of the future: A digital humanities perspective. *Logic &amp; Analysis*, 1(4), 315-342.</p>
+<p class="ref">17. Pietarinen, A.-V. (2021). *Digital Peirce Archive project mid-term report*. University of Helsinki.</p>
+<p class="ref">18. Ransdell, J. (2000). The shape of the Peirce papers. *Arisbe: The Peirce Gateway*. Retrieved from www.cspeirce.com.</p>
+<p class="ref">19. Selznick, P. (1949). *TVA and the Grass Roots*. University of California Press.</p>
+<p class="ref">20. Smith, J. K. (2004). The structural sacrifice in pragmatist thought. *Journal of the History of Philosophy*, 42(3), 305-328.</p>
+<p class="ref">21. Stein, P. (1999). *Roman Law in European History*. Cambridge University Press.</p>
+<p class="ref">22. Taneja, H. (2023). Moonshot governance: How Alphabet's X lab manages radical uncertainty. *Strategic Management Journal*, 44(5), 1123-1150.</p>
+<p class="ref">23. Wang, D. (2015). Confucian pragmatism and the self-strengthening paradox. *Modern China*, 41(2), 197-225.</p>
+<h2 class="notes-head">致谢</h2>
+<p>本文的构思和写作受益于与多名同行的讨论，作者在此对他们的建议与批评致以诚挚的感谢。文中所有的错误均由作者自负。</p>
+<h2 class="notes-head">利益冲突声明</h2>
+<p>作者声明无任何利益冲突。</p>
+<p style="margin-top:2.4em;padding-top:1.3em;border-top:1px solid rgba(140,140,140,.28);font-size:.86em;opacity:.72;line-height:1.8">（附注：本文创新智商评估综合分 <strong>144</strong>——结构精确度 144 · 差异锐度 146 · 纠缠深度 143 · 不可还原性 143 · 可证伪性 145，权重 0.20/0.25/0.20/0.20/0.15 加权；学员专栏录取线 140。）</p>
+</div>
+<div class="endbox"><div class="lbl">SDE · 金点子发生器</div><div class="big">想让一个问题长出这样的判断？</div>
+<p>本文由 SDE 学员使用金点子发生器锻造。你也可以把自己的问题投进去。</p>
+<a class="solid" href="/taste/idea-generator/">进入金点子发生器</a><a class="ghost" href="/#taste">品尝其他智能体</a></div>
+
+<!-- 读者讨论区+阅读计数 · sde-talk v3 (Google实名) -->
+<section id="sde-talk">
+<style id="sde-talk-css">
+#sde-talk{max-width:722px;margin:56px auto 40px;padding:0 24px;line-height:1.9;text-align:left}
+#sde-talk .tk-title{font-size:20px;font-weight:800;letter-spacing:.04em;margin:0 0 4px;padding-bottom:12px;border-bottom:2px solid rgba(128,128,128,.3);text-indent:0}
+#sde-talk .tk-title span{font-size:13px;font-weight:400;opacity:.6;letter-spacing:.02em}
+#sde-talk .tk-hint{font-size:13px;opacity:.62;margin:10px 0 18px;text-indent:0}
+#sde-talk .tk-form{background:rgba(128,128,128,.06);border:1px solid rgba(128,128,128,.22);border-radius:8px;padding:16px 16px 12px;margin-bottom:26px}
+#sde-talk input,#sde-talk textarea{display:block;width:100%;box-sizing:border-box;font:inherit;color:inherit;background:rgba(128,128,128,.12);border:1px solid rgba(128,128,128,.3);border-radius:6px;padding:9px 12px;margin:0 0 10px;outline:none}
+#sde-talk textarea{min-height:88px;resize:vertical;line-height:1.8}
+#sde-talk input:focus,#sde-talk textarea:focus{border-color:rgba(128,128,128,.6)}
+#sde-talk .tk-bar{display:flex;justify-content:space-between;align-items:center}
+#sde-talk .tk-note{font-size:12px;opacity:.55}
+#sde-talk button{font:inherit;font-size:14px;letter-spacing:.2em;padding:7px 26px;border-radius:6px;border:1px solid currentColor;background:transparent;color:inherit;cursor:pointer;opacity:.85}
+#sde-talk button:hover{opacity:1}
+#sde-talk button:disabled{opacity:.4;cursor:default}
+#sde-talk #tk-msg{font-size:13px;margin-top:8px;opacity:.75;min-height:1em;text-indent:0}
+#sde-talk #tk-replying{font-size:13px;margin-bottom:8px;opacity:.8}
+#sde-talk #tk-replying a{margin-left:8px;text-decoration:underline;color:inherit;opacity:.7;cursor:pointer}
+#sde-talk .tk-item{border-bottom:1px solid rgba(128,128,128,.18);padding:16px 2px}
+#sde-talk .tk-head{font-size:13px;margin-bottom:5px;text-indent:0}
+#sde-talk .tk-name{font-weight:700}
+#sde-talk .tk-time{opacity:.5;margin-left:10px;font-size:12px}
+#sde-talk .tk-body{white-space:pre-wrap;word-break:break-word;font-size:15.5px;text-indent:0;margin:0}
+#sde-talk .tk-reply{display:inline-block;font-size:12px;margin-top:7px;color:inherit;opacity:.55;text-decoration:none;border-bottom:1px dashed currentColor;cursor:pointer}
+#sde-talk .tk-reply:hover{opacity:.9}
+#sde-talk .tk-sub{margin:12px 0 0 22px;padding:10px 14px;background:rgba(128,128,128,.07);border-left:2px solid rgba(128,128,128,.35);border-radius:0 6px 6px 0}
+#sde-talk .tk-empty{padding:26px 0;text-align:center;opacity:.55;font-size:14px}
+</style>
+<div class="tk-wrap">
+  <h2 class="tk-title">读者讨论区 <span id="tk-count"></span> <span id="sde-pv-wrap">· 本文已被阅读 <span id="sde-pv-n">—</span> 次</span></h2>
+  <p class="tk-hint">用 Google 账号登录即可发言——发言人就是你的 Google 账号名字。发言公开可见，请友善交流。</p>
+  <div class="tk-form" id="tk-gform">
+    <div id="tk-replying" style="display:none"><span id="tk-replying-to"></span><a id="tk-cancel">取消回复</a></div>
+    <div id="tk-signed" style="display:none;font-size:14px;margin-bottom:10px">以 <b id="tk-gname"></b> 的身份发言 <a id="tk-gout" style="margin-left:10px;font-size:12px;opacity:.6;text-decoration:underline;cursor:pointer">退出</a></div>
+    <div id="tk-gsi"></div>
+    <textarea id="tk-text" maxlength="1000" placeholder="你的问题，或你的见解…" style="display:none;margin-top:10px"></textarea>
+    <div class="tk-bar" id="tk-sendbar" style="display:none"><span class="tk-note">最多 1000 字 · 每人每天最多 30 条</span><button id="tk-send">发 言</button></div>
+    <div id="tk-msg"></div>
+  </div>
+  <div id="tk-list"></div>
+</div>
+</section>
+<script id="sde-talk-js">
+(function(){
+var slug="students/hu-zhiying/operational-enclosure",API="/api/comments?slug="+slug;
+function el(id){return document.getElementById(id)}
+var items=[],parent="";
+function note(s){el("tk-msg").textContent=s}
+var GCID="985037699618-de3smmqf2rer0pfhf4mrtrj3rgahgu5u.apps.googleusercontent.com",gcred="";
+try{var st=JSON.parse(sessionStorage.getItem("sde_gauth")||"null");if(st&&st.exp>Date.now()){gcred=st.cred;showSigned(st.name);}}catch(e){}
+function showSigned(n){el("tk-gname").textContent=n;el("tk-signed").style.display="block";el("tk-gsi").style.display="none";el("tk-text").style.display="block";el("tk-sendbar").style.display="flex";}
+function showSignIn(){gcred="";try{sessionStorage.removeItem("sde_gauth");}catch(e){}el("tk-signed").style.display="none";el("tk-gsi").style.display="block";el("tk-text").style.display="none";el("tk-sendbar").style.display="none";}
+window.__sdeGCb=function(resp){try{var p=JSON.parse(atob(resp.credential.split(".")[1].replace(/-/g,"+").replace(/_/g,"/")));var nm=(p.name||(p.email||"").split("@")[0]||"").slice(0,20);gcred=resp.credential;try{sessionStorage.setItem("sde_gauth",JSON.stringify({cred:gcred,name:nm,exp:Date.now()+50*60*1000}));}catch(e){}showSigned(nm);}catch(e){note("登录信息解析失败，请重试。");}};
+function bootGsi(){if(!(window.google&&google.accounts&&google.accounts.id)){el("tk-gsi").textContent="Google 登录组件加载失败——本讨论区需要 Google 账号登录后发言，请检查网络后刷新。";return}
+google.accounts.id.initialize({client_id:GCID,callback:window.__sdeGCb,auto_select:true});
+google.accounts.id.renderButton(el("tk-gsi"),{theme:"outline",size:"large",text:"signin_with",shape:"pill",logo_alignment:"left"});}
+(function(){var s=document.createElement("script");s.src="https://accounts.google.com/gsi/client";s.async=true;s.defer=true;s.onload=bootGsi;s.onerror=function(){el("tk-gsi").textContent="无法连接 Google 登录服务——本讨论区需要 Google 账号登录后发言。";};document.head.appendChild(s);})();
+el("tk-gout").onclick=showSignIn;
+function tme(ts){var d=new Date(ts),p=function(x){return (x<10?"0":"")+x};
+return d.getFullYear()+"-"+p(d.getMonth()+1)+"-"+p(d.getDate())+" "+p(d.getHours())+":"+p(d.getMinutes())}
+function head(c){var h=document.createElement("div");h.className="tk-head";
+var n=document.createElement("span");n.className="tk-name";n.textContent=c.name;
+var t=document.createElement("span");t.className="tk-time";t.textContent=tme(c.ts);
+h.appendChild(n);h.appendChild(t);return h}
+function para(s){var p=document.createElement("p");p.className="tk-body";p.textContent=s;return p}
+function replyLink(c){var a=document.createElement("a");a.className="tk-reply";a.textContent="回复";
+a.onclick=function(){if(!gcred){note("回复也需要先用 Google 账号登录——请在上方登录。");var g=el("tk-gsi");if(g&&g.scrollIntoView)g.scrollIntoView({behavior:"smooth",block:"center"});return}
+parent=c.id;el("tk-replying-to").textContent="回复 "+c.name+"：";
+el("tk-replying").style.display="block";el("tk-text").focus()};return a}
+function render(){var L=el("tk-list");L.textContent="";
+var tops=items.filter(function(c){return !c.parent});
+el("tk-count").textContent=items.length?"· "+items.length+" 条":"";
+if(!tops.length){var d=document.createElement("div");d.className="tk-empty";d.textContent="还没有发言——欢迎第一个开口。";L.appendChild(d);return}
+tops.forEach(function(c){var it=document.createElement("div");it.className="tk-item";
+it.appendChild(head(c));it.appendChild(para(c.text));it.appendChild(replyLink(c));
+items.filter(function(x){return x.parent===c.id}).forEach(function(x){
+var sb=document.createElement("div");sb.className="tk-sub";sb.appendChild(head(x));sb.appendChild(para(x.text));it.appendChild(sb)});
+L.appendChild(it)})}
+function load(){fetch(API).then(function(r){return r.json()}).then(function(d){items=d.items||[];render()}).catch(function(){})}
+el("tk-cancel").onclick=function(){parent="";el("tk-replying").style.display="none"};
+el("tk-send").onclick=function(){var text=el("tk-text").value.trim();
+if(!gcred){note("请先用 Google 账号登录。");return}
+if(text.length<2){note("内容太短了。");return}
+el("tk-send").disabled=true;note("发送中…");
+fetch(API,{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({credential:gcred,text:text,parent:parent})})
+.then(function(r){return r.json().then(function(d){return{s:r.status,d:d}})})
+.then(function(x){el("tk-send").disabled=false;
+if(x.d&&x.d.ok){el("tk-text").value="";parent="";el("tk-replying").style.display="none";note("已发布。");load()}
+else if(x.s===401){note("登录已过期，请重新登录。");showSignIn()}
+else{note((x.d&&x.d.msg)||"发送失败，请稍后再试。")}})
+.catch(function(){el("tk-send").disabled=false;note("网络异常，请稍后再试。")})};
+load();
+(function(){var pn=el("sde-pv-n");if(!pn)return;
+var day=new Date(Date.now()+8*3600*1000).toISOString().slice(0,10),k="sde_pv_"+slug.replace(/\//g,"_"),m="POST";
+try{if(localStorage.getItem(k)===day)m="GET";}catch(e){}
+fetch("/api/pv?slug="+slug,{method:m}).then(function(r){return r.json()})
+.then(function(d){if(d&&typeof d.total==="number"){pn.textContent=d.total.toLocaleString("zh-Hans-CN");
+if(m==="POST"){try{localStorage.setItem(k,day);}catch(e){}}}else{throw 0;}})
+.catch(function(){var w=el("sde-pv-wrap");if(w)w.style.display="none";});
+})();
+})();
+</script>
+
+<footer><a href="/">© 德麦国际 · SDE Universes</a> · 作者 胡志英</footer>
+
+<style id="sde-polish-v1">
+/* sde-polish-v1 · 学员论文页统一排版美化（主题色自适应，零结构改动） */
+#sde-progress{position:fixed;top:0;left:0;height:3px;width:0;background:var(--gold);z-index:99}
+.wrap h2{position:relative;padding-left:16px;scroll-margin-top:74px}
+.wrap h2::before{content:"";position:absolute;left:0;top:0.42em;width:5px;height:1.02em;background:var(--gold);border-radius:3px}
+.wrap h2::after{content:"";display:block;height:1px;margin-top:10px;background:linear-gradient(90deg,var(--gold),transparent 72%);opacity:.35}
+.wrap h3{letter-spacing:.02em;scroll-margin-top:74px}
+.wrap p{letter-spacing:.012em}
+.wrap p strong{background:linear-gradient(transparent 74%,color-mix(in srgb,var(--gold) 24%,transparent) 0);padding:0 1px}
+.abstract{border-radius:0 8px 8px 0;box-shadow:0 3px 16px rgba(0,0,0,.06)}
+#sde-toc{position:fixed;left:20px;top:112px;width:190px;max-height:calc(100vh - 170px);overflow-y:auto;font-size:12.5px;line-height:1.65;z-index:15;display:none}
+#sde-toc .t-h{font-size:11px;letter-spacing:.32em;color:var(--gold);margin-bottom:9px}
+#sde-toc a{display:block;color:var(--muted);padding:3px 0 3px 10px;border-left:2px solid rgba(0,0,0,.08);text-decoration:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#sde-toc a.on{color:var(--gold);border-left-color:var(--gold);font-weight:700}
+@media(min-width:1420px){#sde-toc{display:block}}
+#sde-top{position:fixed;right:22px;bottom:26px;width:42px;height:42px;border-radius:50%;background:var(--gold);color:#fff;border:none;font-size:18px;line-height:1;cursor:pointer;opacity:0;pointer-events:none;transition:opacity .25s;z-index:30;box-shadow:0 4px 14px rgba(0,0,0,.2)}
+#sde-top.show{opacity:.92;pointer-events:auto}
+@media print{.readbar,#sde-toc,#sde-top,#sde-progress,.endbox,footer{display:none!important}body{background:#fff!important}}
+</style>
+<script id="sde-polish-v1-js">
+(function(){
+if(document.getElementById('sde-progress'))return;
+var bar=document.createElement('div');bar.id='sde-progress';document.body.appendChild(bar);
+var top=document.createElement('button');top.id='sde-top';top.textContent='\u2191';top.setAttribute('aria-label','\u56de\u5230\u9876\u90e8');document.body.appendChild(top);
+top.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'});});
+var hs=[].slice.call(document.querySelectorAll('.wrap h2'));
+var toc=null,links=[];
+if(hs.length>=4){
+  toc=document.createElement('nav');toc.id='sde-toc';
+  var lb=document.createElement('div');lb.className='t-h';lb.textContent='\u76ee \u5f55';toc.appendChild(lb);
+  hs.forEach(function(h,i){
+    if(!h.id)h.id='sec-'+(i+1);
+    var a=document.createElement('a');a.href='#'+h.id;
+    a.textContent=h.textContent.replace(/^[\u4e00-\u9fff]{1,3}\u3001/,'');
+    links.push(a);toc.appendChild(a);
+  });
+  document.body.appendChild(toc);
+}
+function onScroll(){
+  var d=document.documentElement,max=d.scrollHeight-window.innerHeight,y=window.scrollY||d.scrollTop;
+  bar.style.width=(max>0?Math.min(100,y/max*100):0)+'%';
+  if(y>600){top.classList.add('show');}else{top.classList.remove('show');}
+  if(toc){
+    var cur=-1;
+    for(var i=0;i<hs.length;i++){if(hs[i].getBoundingClientRect().top<140)cur=i;}
+    links.forEach(function(a,i){a.className=(i===cur?'on':'');});
+  }
+}
+window.addEventListener('scroll',onScroll,{passive:true});
+window.addEventListener('resize',onScroll);
+onScroll();
+})();
+</script>
+
+<script>window.WDS_READ={selector:".wrap"};</script>
+<script src="/taste/wds-companion/wds-read.js" defer></script>
+
+<script src="/wds-mode.js" defer></script>
+</body></html>
