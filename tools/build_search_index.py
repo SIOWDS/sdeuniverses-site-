@@ -209,6 +209,7 @@ for dp, dns, fns in os.walk(PUB):
 # ---- 切块 + 去重（HTML 优先，PDF 补空缺）----
 manifest_docs = []
 shards = {}  # section -> [ {d, t} ]
+per_doc = {}  # LIGHT_INDEX：docIdx -> [块...]，用于写"每篇一个文件"的轻量索引
 tot_chunks = 0
 tot_chars = 0
 sec_stat = {}
@@ -244,6 +245,7 @@ for idx, url in enumerate(url_list):
         sh.append({"d": di, "t": c})
         tot_chunks += 1
         tot_chars += len(c)
+    per_doc[di] = doc_chunks          # LIGHT_INDEX：留一份，稍后按篇写出
     st = sec_stat.setdefault(d["section"], {"docs": 0, "chunks": 0})
     st["docs"] += 1
     st["chunks"] += len(doc_chunks)
@@ -281,6 +283,40 @@ for sec, st in sorted(sec_stat.items(), key=lambda kv: -kv[1]["chunks"]):
             json.dump({"chunks": cl}, f, ensure_ascii=False, separators=(",", ":"))
     sections_meta.append({"key": sec, "label": SECTION_LABELS.get(sec, sec),
                           "docs": st["docs"], "chunks": st["chunks"], "files": files})
+
+# ---- LIGHT_INDEX：轻量两段式检索用的两样东西 ----
+# 背景：整份索引已 60MB／20 片。答题时把它整份装进 Worker 会撞平台资源上限（线上实测 error 1102，
+# 撞坏的 isolate 还会连累随后的请求）。所以另出一套小索引：
+#   keywords.json —— 每篇一行的高频词（约 200KB），先用它把 849 篇筛成十几篇；
+#   doc/<i>.json  —— 每篇自己的块文件，第二段只取选中的那十几篇（合计一两百 KB）。
+# 大分片仍旧写出，站内搜索与旧消费方不受影响。
+DOC_DIR = os.path.join(OUT, "doc")
+if os.path.isdir(DOC_DIR):
+    for f in os.listdir(DOC_DIR):
+        if f.endswith(".json"):
+            os.remove(os.path.join(DOC_DIR, f))
+os.makedirs(DOC_DIR, exist_ok=True)
+
+def _doc_keywords(chunks, topn=64):
+    """每篇取高频中文 bigram + 英文词，作为第一段筛选的依据。"""
+    freq = {}
+    txt = "".join(chunks)[:40000]
+    zh = re.sub(r"[^\u4e00-\u9fff]", " ", txt)
+    for seg in zh.split():
+        for i in range(len(seg) - 1):
+            g = seg[i : i + 2]
+            freq[g] = freq.get(g, 0) + 1
+    for w in re.findall(r"[a-zA-Z]{3,}", txt.lower()):
+        freq[w] = freq.get(w, 0) + 2
+    return [k for k, _ in sorted(freq.items(), key=lambda kv: -kv[1])[:topn]]
+
+kw_rows = []
+for di, chunks in per_doc.items():
+    with open(os.path.join(DOC_DIR, "%d.json" % di), "w", encoding="utf-8") as f:
+        json.dump({"i": di, "c": chunks}, f, ensure_ascii=False, separators=(",", ":"))
+    kw_rows.append({"i": di, "k": _doc_keywords(chunks)})
+with open(os.path.join(OUT, "keywords.json"), "w", encoding="utf-8") as f:
+    json.dump({"rows": kw_rows}, f, ensure_ascii=False, separators=(",", ":"))
 
 manifest = {
     "built": datetime.datetime.utcnow().isoformat() + "Z",

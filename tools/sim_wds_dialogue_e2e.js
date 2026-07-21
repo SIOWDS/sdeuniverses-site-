@@ -494,8 +494,14 @@ ok("客户端：空答时说得出收到了什么（心跳/思考/检索/重答�
 ok("客户端：0 字节或流被切断都自动改用不流式重取（并记状态/字节/提示）", PAGE.includes("NOSTREAM_FALLBACK") && PAGE.includes("CUT_FALLBACK") && /else if \(!diag\.bytes \|\| !diag\.sawEnd\)/.test(PAGE) && /diag\.bytes \+=/.test(PAGE) && /r2\.text\(\)/.test(PAGE) && /diag\.lastNote/.test(PAGE));
 ok("worker：与WDS对话这条线根本不再整份装载语料（逐片扫描、扫完就丢）",
   W.includes("RAG_STREAMED_SCAN") && /async function ragScan/.test(W) && /sh = null;/.test(W) && (() => { const i = W.indexOf('url.pathname === "/api/wds/rag"'); const j = W.indexOf("return J({ ok: true", i); return W.slice(i, j).indexOf("loadCorpus") < 0; })());
-ok("worker：候选表有上限，不会随命中数无限涨", /top\.length > KEEP \* 3/.test(W) && /top\.length = KEEP/.test(W));
-ok("worker：扫描带预算且按相关度排序（先用篇名+坐标排版块，再限时限片）", W.includes("RAG_BUDGET") && /MS_BUDGET = 6000/.test(W) && /SHARD_BUDGET = 8/.test(W) && /man\.sections\.slice\(\)\.sort/.test(W));
+ok("worker：两段式轻量检索（先按关键词选篇，再只读选中篇的块文件，带字节预算）",
+  W.includes("LIGHT_TWO_STAGE") && W.includes("/search/keywords.json") && /\/search\/doc\/" \+ c\.i \+ "\.json/.test(W) && /BYTE_BUDGET = 3000000/.test(W) && /PICK_DOCS = 16/.test(W));
+ok("worker：轻量索引缺失时退回逐片扫描（限时限片，不开天窗）",
+  /async function ragScanShards/.test(W) && /MS_BUDGET = 4000/.test(W) && /SHARD_BUDGET = 3/.test(W) && /if \(!kw \|\| !kw\.rows\) return ragScanShards/.test(W));
+ok("索引侧产出轻量两件套（每篇块文件 + 关键词表）", (() => {
+  const fs = require("fs"), b = fs.readFileSync(__dirname + "/../tools/build_search_index.py", "utf8");
+  return b.includes("LIGHT_INDEX") && b.includes("keywords.json") && b.includes('DOC_DIR') && fs.existsSync(__dirname + "/../public/search/keywords.json") && fs.existsSync(__dirname + "/../public/search/doc/0.json");
+})());
 ok("每条流的状态变量都在本流内声明（严格模式裸赋值＝当场瘫）", (() => {
   const marker = "async start(controller)";
   let i = -1, bad = 0, n = 0;

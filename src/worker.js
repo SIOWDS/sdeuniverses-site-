@@ -897,29 +897,91 @@ function ragKeys(q, expTerms) {
   const exp = (expTerms || []).map((t) => String(t).toLowerCase()).filter((v, i, a) => v && v.length >= 2 && a.indexOf(v) === i && baseKeys.indexOf(v) < 0);
   return { baseKeys, exp };
 }
+// LIGHT_TWO_STAGE：与WDS对话的检索走"两段式轻量索引"，不碰 60MB 的大分片。
+// 为什么必须这样：整份索引装进 Worker 会撞平台单请求资源上限——线上实测子请求直接 error 1102，
+// 而且撞坏的 isolate 会连着几秒里的其它请求一起拖死（表现就是答题流无声中断）。
+//   第一段：manifest(126KB) + keywords(487KB) + coords(51KB) → 给 849 篇打分，选出十几篇；
+//   第二段：只取这十几篇各自的块文件 /search/doc/<i>.json，且带累计字节预算。
+// 合计读入通常不到 2MB，是原来的三十分之一。索引若还没重建（没有 doc/ 与 keywords.json），
+// 自动退回旧的逐片扫描，不至于开天窗。
 async function ragScan(env, url, q, expTerms, prevQ, k, chunkLimit) {
   const man = await (await env.ASSETS.fetch(new Request(new URL("/search/manifest.json", url)))).json();
   const coords = await loadCoords(env, url);
   const { baseKeys, exp } = ragKeys(q, expTerms);
-  const prev = prevQ && prevQ !== q ? ragKeys(prevQ, []).baseKeys : [];   // 上一轮接续：同一趟里顺带打分，不再多扫一遍
-  const KEEP = Math.max(120, (k || 36) * 4);
+  const prev = prevQ && prevQ !== q ? ragKeys(prevQ, []).baseKeys : [];
   const cut = chunkLimit || 1600;
-  let top = [];
-  // RAG_BUDGET：60MB／20 片全扫会顶到平台的单请求资源上限（实测间歇 503）。
-  // 所以先用便宜的信息（篇名 + SDE 坐标，合计不到 200KB）给各版块排个序，把最可能相关的分片排前面，
-  // 再带着时间与体量预算去扫：扫到预算用完就收手。宁可少扫两片，不能整条检索垮掉。
+
+  // —— 第一段：按篇名 + 关键词 + SDE 坐标选篇 ——
+  let kw = null;
+  try { kw = await (await env.ASSETS.fetch(new Request(new URL("/search/keywords.json", url)))).json(); } catch (e) {}
+  if (!kw || !kw.rows) return ragScanShards(env, url, man, coords, baseKeys, exp, prev, k, cut);   // 旧索引：退回逐片扫描
+  const kmap = {};
+  for (const r of kw.rows) kmap[r.i] = r.k || [];
+  const docScore = [];
+  for (const d of man.docs) {
+    const tl = String(d.t || "").toLowerCase();
+    let sc = 0;
+    for (const key of baseKeys) { if (tl.indexOf(key) >= 0) sc += 3; }
+    for (const key of exp) { if (tl.indexOf(key) >= 0) sc += 2; }
+    const ks = kmap[d.i];
+    if (ks && ks.length) {
+      for (const key of baseKeys) if (ks.indexOf(key) >= 0) sc += 1;
+      for (const key of exp) if (ks.indexOf(key) >= 0) sc += 1.2;
+      for (const key of prev) if (ks.indexOf(key) >= 0) sc += 0.4;
+    }
+    if (coords && exp.length) { const dc = coords[d.i]; if (dc) { for (const t of exp) if (dc.has(t)) sc += 1.5; } }
+    if (sc > 0) docScore.push({ i: d.i, sc: sc });
+  }
+  docScore.sort((a, b) => b.sc - a.sc);
+  const PICK_DOCS = 16, BYTE_BUDGET = 3000000;
+  const chosen = docScore.slice(0, PICK_DOCS);
+
+  // —— 第二段：只读选中篇目的块文件，按块打分 ——
+  let top = [], bytes = 0;
+  for (const c of chosen) {
+    if (bytes > BYTE_BUDGET) break;
+    let dj = null;
+    try {
+      const r = await env.ASSETS.fetch(new Request(new URL("/search/doc/" + c.i + ".json", url)));
+      if (!r.ok) continue;
+      const txt = await r.text();
+      bytes += txt.length;
+      dj = JSON.parse(txt);
+    } catch (e) { continue; }
+    for (const t of (dj.c || [])) {
+      const tl = t.toLowerCase();
+      let sc = 0;
+      for (const key of baseKeys) { const n = tl.split(key).length - 1; if (n) sc += n; }
+      for (const key of exp) { const n = tl.split(key).length - 1; if (n) sc += n * 1.2; }
+      for (const key of prev) { const n = tl.split(key).length - 1; if (n) sc += n * 0.4; }
+      if (q && t.indexOf(q) >= 0) sc += 8;
+      if (sc > 0) top.push({ sc: sc + c.sc * 0.2, d: c.i, t: t.length > cut ? t.slice(0, cut) : t });
+    }
+    dj = null;
+  }
+  top.sort((a, b) => b.sc - a.sc);
+  const perDoc = {}, picked = [];
+  for (const it of top) {
+    perDoc[it.d] = perDoc[it.d] || 0;
+    if (perDoc[it.d] >= 2) continue;
+    perDoc[it.d]++; picked.push(it);
+    if (picked.length >= (k || 36)) break;
+  }
+  return { picked: picked, docs: man.docs, coords: coords };
+}
+// 旧路：索引尚未重建时的退路——按版块相关度排序、限时限片地扫大分片。
+async function ragScanShards(env, url, man, coords, baseKeys, exp, prev, k, cut) {
   const secScore = {};
   for (const d of man.docs) {
     const tl = String(d.t || "").toLowerCase();
     let sc = 0;
     for (const key of baseKeys) if (tl.indexOf(key) >= 0) sc += 2;
     for (const key of exp) if (tl.indexOf(key) >= 0) sc += 1.5;
-    if (coords && exp.length) { const dc = coords[d.i]; if (dc) { for (const t of exp) if (dc.has(t)) sc += 1; } }
     if (sc) secScore[d.s] = (secScore[d.s] || 0) + sc;
   }
   const order = man.sections.slice().sort((a, b) => (secScore[b.key] || 0) - (secScore[a.key] || 0));
-  const t0 = Date.now(), MS_BUDGET = 6000, SHARD_BUDGET = 8;
-  let scanned = 0;
+  const t0 = Date.now(), MS_BUDGET = 4000, SHARD_BUDGET = 3;
+  let top = [], scanned = 0;
   for (const sec of order) {
     for (const f of (sec.files || [sec.key])) {
       if (scanned >= SHARD_BUDGET || Date.now() - t0 > MS_BUDGET) break;
@@ -931,21 +993,17 @@ async function ragScan(env, url, q, expTerms, prevQ, k, chunkLimit) {
         let sc = 0;
         for (const key of baseKeys) { const n = tl.split(key).length - 1; if (n) sc += n; }
         for (const key of exp) { const n = tl.split(key).length - 1; if (n) sc += n * 1.2; }
-        for (const key of prev) { const n = tl.split(key).length - 1; if (n) sc += n * 0.4; }
-        if (q && ck.t.indexOf(q) >= 0) sc += 8;
-        if (coords && exp.length) { const dc = coords[ck.d]; if (dc) { let ov = 0; for (const t of exp) if (dc.has(t)) ov++; if (ov) sc += ov * 2; } }
         if (sc > 0) top.push({ sc: sc, d: ck.d, t: ck.t.length > cut ? ck.t.slice(0, cut) : ck.t });
       }
-      sh = null;   // 这一片用完就丢，等着被回收
-      if (top.length > KEEP * 3) { top.sort((a, b) => b.sc - a.sc); top.length = KEEP; }
+      sh = null;
+      if (top.length > 400) { top.sort((a, b) => b.sc - a.sc); top.length = 200; }
     }
   }
   top.sort((a, b) => b.sc - a.sc);
   const perDoc = {}, picked = [];
-  void scanned;
   for (const it of top) {
     perDoc[it.d] = perDoc[it.d] || 0;
-    if (perDoc[it.d] >= 2) continue;      // 每篇最多两段，保证来源多样
+    if (perDoc[it.d] >= 2) continue;
     perDoc[it.d]++; picked.push(it);
     if (picked.length >= (k || 36)) break;
   }
