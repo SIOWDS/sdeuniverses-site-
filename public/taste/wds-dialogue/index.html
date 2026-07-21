@@ -402,16 +402,21 @@
     var kv = keyGet(); if (!kv) { paint(); return; }
     var bubble = addMsg("wds", ""); bubble.classList.add("stream");
     streaming = true; goEl.disabled = true; paint();
+    var wd = null, timedOut = false;   // 存活看门狗:靠心跳字节喂,45s 无任何字节(含 : ping)判定连接已死
     var payload = { q: q, docTitle: article.text ? article.title : TITLE, docText: article.text || "", focus: "", history: history, key: kv.key, vendor: kv.vendor, guide: 1, reflect: xinde };
 
     fetch(API, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(payload) })
       .then(function (resp) {
         if (!resp.ok || !resp.body) throw new Error("HTTP " + resp.status);
         var reader = resp.body.getReader(), dec = new TextDecoder(), buf = "", answer = "", srcs = [], think = "";
+        function bumpWd() { clearTimeout(wd); wd = setTimeout(function () { timedOut = true; try { reader.cancel(); } catch (e) {} }, 45000); }
+        bumpWd();
         function pump() {
           return reader.read().then(function (r) {
             if (r.done) {
+              clearTimeout(wd);
               bubble.classList.remove("stream");
+              if (timedOut && !answer) { bubble.classList.add("err"); bubble.textContent = "连接像是断了（也许想太久被中间层切了）。你刚才那句我记着——再点一下发送，或把问题问得更聚焦些。"; history.pop(); streaming = false; goEl.disabled = false; paint(); return; }
               if (answer && srcs.length) {
                 var sb = el("div", "srcs");
                 sb.appendChild(el("span", "", "\u672c\u7b54\u68c0\u7d22\u5230\u7684\u7ad9\u5185\u7bc7\u76ee\uff1a"));
@@ -425,6 +430,7 @@
               streaming = false; goEl.disabled = false; paint();
               return;
             }
+            bumpWd();
             buf += dec.decode(r.value, { stream: true });
             var i;
             while ((i = buf.indexOf("\n")) >= 0) {
@@ -449,7 +455,7 @@
         return pump();
       })
       .catch(function (e) {
-        bubble.classList.remove("stream"); bubble.classList.add("err");
+        clearTimeout(wd); bubble.classList.remove("stream"); bubble.classList.add("err");
         bubble.textContent = "\u63a5\u4e0d\u4e0a WDS\uff08" + (e && e.message) + "\uff09\u3002\u68c0\u67e5\u7f51\u7edc\u540e\u91cd\u8bd5\u2014\u2014\u4f60\u521a\u624d\u90a3\u53e5\u6211\u8bb0\u7740\u3002";
         streaming = false; goEl.disabled = false; paint();
       });
