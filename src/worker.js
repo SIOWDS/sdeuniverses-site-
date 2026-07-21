@@ -1959,7 +1959,7 @@ export default {
             messages.push({ role: "user", content: focus ? ("我正读到这一句：「" + focus + "」\n\n我的问题：" + q) : q });
             let upstream;
             try {
-              upstream = await fetch(VC.url, { method: "POST", headers: { "content-type": "application/json", authorization: "Bearer " + KEY }, body: JSON.stringify(wdsTopBody(VC, { model: VC.model, stream: true, max_tokens: (b.guide && vd === "deepseek") ? 50000 : (b.guide ? 8000 : 2200), messages })) });
+              upstream = await fetch(VC.url, { method: "POST", headers: { "content-type": "application/json", authorization: "Bearer " + KEY }, body: JSON.stringify(wdsTopBody(VC, { model: VC.model, stream: true, max_tokens: b.guide ? 8000 : 2200, messages })) });
             } catch (e) {
               controller.enqueue(_sseBytes({ t: "error", v: "接不上基底：" + (e && e.message) })); return done();
             }
