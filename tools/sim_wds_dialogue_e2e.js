@@ -400,7 +400,7 @@ async function ask(text) { qEl.value = text; goEl.onclick(); await flush(25); }
 
   head("[阶段九] 论文中断的三道防线（503 退避 / 0 字重试 / 断点续写）");
   const W9 = W, P9 = PAGE;
-  ok("worker：part 空正文守卫 + 加大预算重跑一次", W9.includes("PART_EMPTY_GUARD") && W9.includes("_runPart(6000)") && W9.includes("_runPart(9000)") && W9.includes('code: "empty"'));
+  ok("worker：part 空正文守卫 + 顶格重跑一次", W9.includes("PART_EMPTY_GUARD") && (W9.match(/await _runPart\(\)/g) || []).length === 2 && W9.includes('code: "empty"'));
   ok("worker：part 上游 5xx 归为可重试（soft）而非硬错", /if \(upstream\.status >= 500\) return \{ soft:/.test(W9));
   ok("客户端：退避加长为 2s/6s/15s（plan 与 part 同档）", (P9.match(/delays = \[2000, 6000, 15000\]/g) || []).length >= 2);
   ok("客户端：0 字视为失败并重试（needText）", P9.includes("needText") && /e0\.retryable = 1/.test(P9));
@@ -443,7 +443,10 @@ async function ask(text) { qEl.value = text; goEl.onclick(); await flush(25); }
   dm9.remove(); MODE.partFail = null;
 
   head("[阶段十] 拟题这一步倒下时（提纲生成失败）");
-ok("worker：拟题预算加大 + 第二次卸掉满功率档", W.includes("PLAN_ROBUST") && W.includes("planTok = GD ? 20000") && /genOnce\(GD \? 8000 : 2400, false\)/.test(W) && W.includes("top === false"));
+ok("worker：全线顶格预算，任何一步都不降满功率档", W.includes("WDS_TOK_MAX = 64000") && W.includes("wdsFetchMax") && !W.includes("top === false") && (W.match(/await genOnce\(\)/g) || []).length === 2);
+ok("worker：顶格降档只在基底拒收 max_tokens 时发生", /resp\.status !== 400/.test(W) && W.includes("WDS_TOK_LADDER") && /max\[_ \\\]\?tokens/.test(W) === false);
+ok("worker：答题也补上 0 字自动重答（顶格、满功率）", W.includes("ANSWER_EMPTY_GUARD") && (W.match(/await _runAnswer\(\)/g) || []).length === 2 && W.includes("正在重答"));
+ok("worker：与WDS对话各步全部顶格（心得/答题/总结/拟题/分部）", (W.match(/WDS_TOK_MAX/g) || []).length >= 4 && (W.match(/wdsFetchMax\(VC, KEY/g) || []).length >= 4);
 ok("worker：JSON 不达标时有行文兜底解析", W.includes("function parsePlanText") && /const pick = \(rr\)/.test(W));
 ok("worker：失败原因分种类回报（0 字 / 不可解析）", W.includes("只出了思考、正文 0 字") && W.includes("输出不是可解析的提纲") && W.includes('"plan_fail"'));
 ok("客户端：拟题失败给「重新拟题再试一次」", PAGE.includes("PLAN_RETRY") && /\\u91cd\\u65b0\\u62df\\u9898\\u518d\\u8bd5\\u4e00\\u6b21/.test(PAGE));
