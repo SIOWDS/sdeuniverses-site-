@@ -1459,6 +1459,15 @@ function extractFull(vendor, j){
   return { text, think, fin };
 }
 
+// 全站 RAG：按议题取一段可注入的结构化知识（九库邻域子图 + 全站语料原文片段），供每一轮作答调用。无 Key、只读、失败即空串（安全退回原行为）。
+async function sdeKbContext(q){
+  try{
+    const r = await fetch('/api/kb/retrieve', { method:'POST', headers:{'content-type':'application/json'}, body: JSON.stringify({ q: q, k: 12, budget: 24, cap: 9000 }) });
+    if(!r.ok) return '';
+    const j = await r.json();
+    return (j && j.block) ? j.block : '';
+  }catch(e){ return ''; }
+}
 async function streamChat(apiKey, model, systemPrompt, userQ, bodyEl, statusEl, metaEl, colEl, maxTokens){
   colEl.classList.add('generating');
   const { vendor, tier } = parseModel(model);
@@ -2358,7 +2367,8 @@ function evalUserMsg(question, parsed){
 const ORDINALS = ['第一次','第二次','第三次','第四次','第五次','第六次','第七次','第八次','第九次','第十次'];
 function buildRoundUserMsg(question, history, supplementary){
   supplementary = (supplementary || '').trim();
-  const parts = ['【问题】\n' + question + '\n'];
+  const kb = (RUN && RUN.kbCtx) ? (RUN.kbCtx + '\n') : '';
+  const parts = [kb + '【问题】\n' + question + '\n'];
   history.forEach((h, i)=>{
     const ord = ORDINALS[i] || ('第 '+(i+1)+' 次');
     parts.push('\n【' + ord + '摘要】');
@@ -2793,7 +2803,7 @@ async function runLane(agent, manualMode){
     setChip(L, rnd, 'on');
     L.st.innerHTML='<span class="spinner"></span> 第'+rnd+'/'+maxR+'轮 · '+(ROUND_LABEL[rnd]||'螺旋深化');
     const sys = roundSystem(agent, rnd===1, RUN.xinde['DS-'+agent]||'');
-    const usr = rnd===1 ? RUN.question : buildRoundUserMsg(RUN.question, history, pendingFb);
+    const usr = rnd===1 ? ((RUN.kbCtx ? RUN.kbCtx + '\n【问题】\n' : '') + RUN.question) : buildRoundUserMsg(RUN.question, history, pendingFb);
     const sub = mkSub(L.body, '第'+rnd+'轮 · '+(ROUND_LABEL[rnd]||'螺旋深化'));
     let res;
     try{
@@ -3232,6 +3242,8 @@ async function run(){
               : ('快速单台档 · '+AGENT_NAME[agents[0]]+' 运行中…'));
   RUN = { question:q, sel, key, evalOn: seats.length>0, evals: seats, full, manual, mode, agents, forgeDeg,
           xinde:{}, xindeOk:{}, lanes:{}, papers:{}, histories:{}, papersText:{}, collisionSteps:{}, t0:Date.now() };
+  // 全站 RAG：按议题取一次结构化知识作为作答底盘（内功/评审阶段不注入，仅注入每一轮回答）
+  try{ runHint.textContent = '正在检索全站相关知识作为作答底盘…'; RUN.kbCtx = await sdeKbContext(q); }catch(e){ RUN.kbCtx=''; }
   runArea.style.display='block';
   try{
     // ── 阶段一:内功学习(并行写心得)──
