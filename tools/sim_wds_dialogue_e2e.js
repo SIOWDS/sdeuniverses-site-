@@ -91,7 +91,7 @@ ok("guide 分流 system（对话指引版 vs 陪读版，含读者文章两参�
 ok("本场心得优先于全站缓存心得（read + read-paper 两处）", W.split("slice(0, 14000)").length >= 3);   // 站内另有智能体亦用 14000
 ok("guide 预算三元式在位（30万减文章/资料，陪读收缩式不变）", W.includes("b.guide ? Math.max(60000, WDS_GUIDE_HIST_BUDGET - docText.length - siteCtx.length)") && W.includes("120000 - docText.length - siteCtx.length"));
 ok("长问放宽仅限 guide（4000 vs 500）", W.includes("b.guide ? 4000 : 500"));
-ok("全站 RAG 加强档（K=36 + 接续补捞 + KB留预算的字数上限 + 来源回传）", W.includes("RAG_SUBREQUEST") && /k: 36, cap: docText \? 12000 : 30000, kbn: docText \? 14 : 24/.test(W) && W.includes("retrieve(corpus, q, K, expTerms)") && W.includes('t: "sources"'));
+ok("全站 RAG 加强档（K=36 + 接续补捞 + KB留预算的字数上限 + 来源回传）", W.includes("RAG_SUBREQUEST") && /k: 36, cap: docText \? 12000 : 30000, kbn: docText \? 14 : 24/.test(W) && /ragScan\(env, url, q, expTerms, prevQ, K/.test(W) && W.includes('t: "sources"'));
 ok("与WDS对话 RAG 已接九库（子请求里 retrieveKB 邻域子图优先，chunk 让预算）", /retrieveKB\(kb, \{ docs: scan\.docs \}, q, expTerms, kbn\)/.test(W) && W.includes("const chunkCap = Math.max(4000, cap - kbBlock.length)"));
 ok("读者文章走独立首条消息 + 站内资料让位（07-20 修）",
   W.includes('content: "这是我提交给你的文章全文，本场对话就围绕它。') && W.includes("全文我已通读完毕") && !W.includes("【读者提交的文章·全文】"));
@@ -495,7 +495,9 @@ ok("客户端：0 字节或流被切断都自动改用不流式重取（并记�
 ok("worker：与WDS对话这条线根本不再整份装载语料（逐片扫描、扫完就丢）",
   W.includes("RAG_STREAMED_SCAN") && /async function ragScan/.test(W) && /sh = null;/.test(W) && (() => { const i = W.indexOf('url.pathname === "/api/wds/rag"'); const j = W.indexOf("return J({ ok: true", i); return W.slice(i, j).indexOf("loadCorpus") < 0; })());
 ok("worker：两段式轻量检索（先按关键词选篇，再只读选中篇的块文件，带字节预算）",
-  W.includes("LIGHT_TWO_STAGE") && W.includes("/search/keywords.json") && /\/search\/doc\/" \+ c\.i \+ "\.json/.test(W) && /BYTE_BUDGET = 3000000/.test(W) && /PICK_DOCS = 16/.test(W));
+  W.includes("LIGHT_TWO_STAGE") && W.includes("/search/keywords.json") && /\/search\/doc\/" \+ c\.i \+ "\.json/.test(W) && /o\.budget \|\| 3000000/.test(W) && /o\.pick \|\| 16/.test(W));
+ok("worker：全站再无整份装载语料（loadCorpus 已无人调用，五个入口全走轻量检索）",
+  !/await loadCorpus\(/.test(W) && (W.match(/lightRetrieve\(/g) || []).length >= 6 && !/retrieve\(corpus, q,/.test(W.replace("function retrieve(corpus, q, k, expTerms)", "")));
 ok("worker：轻量索引缺失时退回逐片扫描（限时限片，不开天窗）",
   /async function ragScanShards/.test(W) && /MS_BUDGET = 4000/.test(W) && /SHARD_BUDGET = 3/.test(W) && /if \(!kw \|\| !kw\.rows\) return ragScanShards/.test(W));
 ok("索引侧产出轻量两件套（每篇块文件 + 关键词表）", (() => {

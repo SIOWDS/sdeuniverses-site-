@@ -483,10 +483,10 @@ export class CommentBox {
     // 全站 RAG：不仅群内，从站内索引检索全站相关段落（可引用具体篇目）
     let siteCtx = "";
     try {
-      const corpus = await loadCorpus(this.env, base);
       let expTerms = [];
       if (tier === "deep") { try { expTerms = await sdeExpandQuery(VC, key, q); } catch (e) {} }
-      const hits = retrieve(corpus, q, tier === "deep" ? 16 : 12, expTerms);
+      const _lr = await lightRetrieve(this.env, base, q, expTerms, tier === "deep" ? 16 : 12, 1600, { pick: 14 });
+      const corpus = _lr.corpus, hits = _lr.hits;
       const seen = {};
       const _cap = tier === "deep" ? 10000 : 6500;
       for (const ck of hits) {
@@ -904,7 +904,13 @@ function ragKeys(q, expTerms) {
 //   第二段：只取这十几篇各自的块文件 /search/doc/<i>.json，且带累计字节预算。
 // 合计读入通常不到 2MB，是原来的三十分之一。索引若还没重建（没有 doc/ 与 keywords.json），
 // 自动退回旧的逐片扫描，不至于开天窗。
-async function ragScan(env, url, q, expTerms, prevQ, k, chunkLimit) {
+// 所有"要站内资料"的入口统一走这里。别再用 loadCorpus——那是整份装 60MB，会把 isolate 撑坏，
+// 而 isolate 是同一时刻所有请求共用的：任何一个入口撑坏它，别人的答题、成文、搜索一起陪葬。
+async function lightRetrieve(env, url, q, expTerms, k, cut, opts) {
+  const scan = await ragScan(env, url, q, expTerms || [], "", k, cut || 1600, opts || {});
+  return { hits: scan.picked, corpus: { docs: scan.docs } };
+}
+async function ragScan(env, url, q, expTerms, prevQ, k, chunkLimit, opts) {
   const man = await (await env.ASSETS.fetch(new Request(new URL("/search/manifest.json", url)))).json();
   const coords = await loadCoords(env, url);
   const { baseKeys, exp } = ragKeys(q, expTerms);
@@ -933,7 +939,10 @@ async function ragScan(env, url, q, expTerms, prevQ, k, chunkLimit) {
     if (sc > 0) docScore.push({ i: d.i, sc: sc });
   }
   docScore.sort((a, b) => b.sc - a.sc);
-  const PICK_DOCS = 16, BYTE_BUDGET = 3000000;
+  const o = opts || {};
+  const PICK_DOCS = Math.max(6, Math.min(64, o.pick || 16));
+  const BYTE_BUDGET = Math.max(1000000, Math.min(8000000, o.budget || 3000000));
+  const PER_DOC = Math.max(1, Math.min(4, o.perDoc || 2));
   const chosen = docScore.slice(0, PICK_DOCS);
 
   // —— 第二段：只读选中篇目的块文件，按块打分 ——
@@ -963,7 +972,7 @@ async function ragScan(env, url, q, expTerms, prevQ, k, chunkLimit) {
   const perDoc = {}, picked = [];
   for (const it of top) {
     perDoc[it.d] = perDoc[it.d] || 0;
-    if (perDoc[it.d] >= 2) continue;
+    if (perDoc[it.d] >= PER_DOC) continue;
     perDoc[it.d]++; picked.push(it);
     if (picked.length >= (k || 36)) break;
   }
@@ -1386,10 +1395,10 @@ async function handleAsk(request, env, url) {
   const deep = body.deep === true || mode === "paper"; // 成文一篇强制走最高提智（完整内功+心得）
   const K = mode === "recommend" ? 48 : (deep ? 120 : 20);              // 取多少块（深度档广撒网；retrieve 只收相关块、clamp 兜底，窄问题不会被噪声塞满）
   const CTX_MAX = deep ? 50000 : 12000;   // 《站内资料》字数上限
-  const corpus = await loadCorpus(env, url);
   const expTerms = await sdeExpandQuery(VC, KEY, q); // SDE 词义扩展：问题→SDE 术语，再拿去召回
   const expStr = expTerms.join(" · ");
-  const hits = retrieve(corpus, q, K, expTerms);
+  const _lrA = await lightRetrieve(env, url, q, expTerms, K, 1600, { pick: deep ? 48 : 20, perDoc: deep ? 3 : 2, budget: deep ? 6000000 : 3000000 });
+  const corpus = _lrA.corpus, hits = _lrA.hits;
   const sources = [];
   const seen = {};
   let ctxText = "";
@@ -1867,13 +1876,13 @@ export default {
               let ragCtx = "";
               if (GD) {
                 try {
-                  const corpus = await loadCorpus(env, url);
                   const q = ((docTitle ? docTitle + " " : "") + convo.slice(0, 600)).slice(0, 300);
+                  const _lrS = await lightRetrieve(env, url, q, [], 16, 1600, { pick: 14 });
+                  const corpus = _lrS.corpus, hits = _lrS.hits;
                   const seen = {};
                   let kbBlock = "";
                   try { const kb = await loadKB(env, url); if (kb) { const r = retrieveKB(kb, corpus, q, [], 24); kbBlock = r.block; } } catch (e) {}
                   const cap = Math.max(4000, 12000 - kbBlock.length);
-                  const hits = retrieve(corpus, q, 16, []);
                   let chunkText = "";
                   for (const ck of hits) { const d = corpus.docs[ck.d]; if (!d || seen[d.u]) continue; seen[d.u] = 1; chunkText += "【来源：" + d.t + "】\n" + ck.t.slice(0, 900) + "\n\n"; if (chunkText.length > cap) break; }
                   ragCtx = kbBlock + (kbBlock && chunkText ? "\n【补充 · 站内原文片段】\n" : "") + chunkText;
@@ -2313,8 +2322,9 @@ export default {
             let ctxText = "", sources = [];
             const seen = {};
             try {
-              const corpus = await loadCorpus(env, url);
               const expTerms = await sdeExpandQuery(VC, KEY, q);
+              const _lrC = await lightRetrieve(env, url, q, expTerms, 20, 1600, { pick: 18 });
+              const corpus = _lrC.corpus;
               // —— 结构化调用:entity-link → 邻域子图 ——
               let kbBlock = "";
               try {
@@ -2323,7 +2333,7 @@ export default {
               } catch (e) {}
               // —— 相似句补充:给 KB 腾预算(20→12,字数上限收紧)——
               const chunkCap = kbBlock ? 7000 : 12000;
-              const hits = retrieve(corpus, q, kbBlock ? 12 : 20, expTerms);
+              const hits = _lrC.hits.slice(0, kbBlock ? 12 : 20);
               let chunkText = "";
               for (const ck of hits) {
                 const d = corpus.docs[ck.d];
@@ -2490,12 +2500,13 @@ export default {
       const K = Math.max(4, Math.min(24, parseInt(b.k, 10) || 12));
       const cap = Math.max(2000, Math.min(16000, parseInt(b.cap, 10) || 9000));
       try {
-        const corpus = await loadCorpus(env, url);
+        const _lrK = await lightRetrieve(env, url, q, [], K, 1600, { pick: 16 });
+        const corpus = _lrK.corpus;
         const seen = {}, srcs = [];
         let kbBlock = "";
         try { const kb = await loadKB(env, url); if (kb) { const r = retrieveKB(kb, corpus, q, [], budget); kbBlock = r.block; for (const s of r.srcs) if (!seen[s.u]) { seen[s.u] = 1; srcs.push(s); } } } catch (e) {}
         const cap2 = Math.max(2000, cap - kbBlock.length);
-        const hits = retrieve(corpus, q, K, []);
+        const hits = _lrK.hits;
         let chunkText = "";
         for (const ck of hits) { const d = corpus.docs[ck.d]; if (!d || seen[d.u]) continue; seen[d.u] = 1; srcs.push({ u: d.u, t: d.t }); chunkText += "【来源：" + d.t + "】\n" + ck.t + "\n\n"; if (chunkText.length > cap2) break; }
         const block = (kbBlock || chunkText) ? ("【SDE 全站知识（供作答时调用：来自 sdeuniverses.com 全站语料的结构化判断 + 原文片段；可印证可反驳，勿编造来源）】\n" + kbBlock + (kbBlock && chunkText ? "\n【全站原文片段】\n" : "") + chunkText) : "";
