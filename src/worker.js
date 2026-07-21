@@ -73,6 +73,18 @@ function wdsTopVC(vd) {
 // 与WDS对话全线口径：一律满功率（reasoning_effort=max）＋一律要最大输出预算。
 // 这里的三档不是限制，是“基底不接受这么大的 max_tokens 时”的自动降档（返回 400 且报的是 max_tokens 相关才降），
 // 保证不会因为一个数字不被接受就整条链断掉。
+// FAKE_STREAM：长思考期间的"假流式"——基底还在推演、一个正文字都没有时，
+// 我们每 5 秒往流里塞一个心跳（SSE 注释 + 带活数据的 beat 事件：已跑秒数、已推演字数）。
+// 作用有二：①链路上任何一段（浏览器、边缘、代理）都不会因为"长时间无字节"把连接判死；
+// ②读者看得见它在动，而不是对着一个死掉的转圈。注意：这挡不住上游基底自己超时，那只能靠重跑。
+function wdsBeat(controller, state) {
+  return setInterval(() => {
+    try {
+      controller.enqueue(_ENC.encode(": ping\n\n"));
+      controller.enqueue(_sseBytes({ t: "beat", v: { sec: Math.round((Date.now() - state.t0) / 1000), think: state.think || 0, out: state.out || 0 } }));
+    } catch (e) {}
+  }, 5000);
+}
 const WDS_TOK_MAX = 64000;
 const WDS_TOK_LADDER = [WDS_TOK_MAX, 32000, 12000];
 async function wdsFetchMax(VC, KEY, messages, stream) {
@@ -1360,8 +1372,8 @@ async function handleAsk(request, env, url) {
                 let j; try { j = JSON.parse(p); } catch (e) { continue; }
                 if (j.error) { controller.enqueue(_sseBytes({ t: "error", v: j.error.message || "整合流内错误" })); continue; }
                 const d = (j.choices && j.choices[0] && j.choices[0].delta) || {};
-                if (d.reasoning_content) controller.enqueue(_sseBytes({ t: "think", v: d.reasoning_content }));
-                if (d.content) controller.enqueue(_sseBytes({ t: "token", v: d.content }));
+                if (d.reasoning_content) { if (_st) _st.think += d.reasoning_content.length; controller.enqueue(_sseBytes({ t: "think", v: d.reasoning_content })); }
+                if (d.content) { if (_st) _st.out += d.content.length; controller.enqueue(_sseBytes({ t: "token", v: d.content })); }
               }
             }
           } catch (e) {
@@ -1461,8 +1473,8 @@ async function handleAsk(request, env, url) {
             let j; try { j = JSON.parse(p); } catch (e) { continue; }
             if (j.error) { controller.enqueue(_sseBytes({ t: "error", v: j.error.message || "基底流内错误" })); continue; }
             const d = (j.choices && j.choices[0] && j.choices[0].delta) || {};
-            if (d.reasoning_content) controller.enqueue(_sseBytes({ t: "think", v: d.reasoning_content }));
-            if (d.content) controller.enqueue(_sseBytes({ t: "token", v: d.content }));
+            if (d.reasoning_content) { if (_st) _st.think += d.reasoning_content.length; controller.enqueue(_sseBytes({ t: "think", v: d.reasoning_content })); }
+            if (d.content) { if (_st) _st.out += d.content.length; controller.enqueue(_sseBytes({ t: "token", v: d.content })); }
           }
         }
       } catch (e) {
@@ -1571,7 +1583,7 @@ export default {
       }
       return Response.json({ ok: false, msg: "bad mode" }, { status: 400 });
     }
-    // /api/wds/dialogue-reflect：「与WDS对话」高级会话开工仪式——满血内功→本场亲写约5000字心得（纯 BYOK、非流式 JSON）。
+    // /api/wds/dialogue-reflect：「与WDS对话」高级会话开工仪式——满血内功（本体论先验＋创新智商两部分）→本场亲写约5500字心得（纯 BYOK、SSE 流式＋心跳）。
     // 每场对话开工调用一次；产出随后由客户端以 b.reflect 垫进本场全部对话与成文调用。
     if (url.pathname === "/api/wds/dialogue-reflect") {
       if (request.method === "OPTIONS") return new Response(null, { headers: _cors() });
@@ -1591,25 +1603,45 @@ export default {
       let neigong = await loadNeigong(env, url.origin + "/");
       if (!neigong) return J({ ok: false, msg: "内功文件暂不可读，请稍后重试。" }, 503);
       try { const iq = await loadInnovationIQ(env, url.origin + "/"); if (iq) neigong = neigong + "\n\n" + iq; } catch (e) {}
-      let text = "";
-      try {
-        const resp = await fetch(VC.url, {
-          method: "POST",
-          headers: { "content-type": "application/json", authorization: "Bearer " + userKey },
-          body: JSON.stringify(wdsTopBody(VC, { model: VC.model, stream: false, max_tokens: WDS_TOK_MAX, messages: [{ role: "system", content: neigong }, { role: "user", content: DIALOGUE_REFLECT_PROMPT }] })),
-        });
-        if (!resp.ok) {
-          if (resp.status === 401 || resp.status === 402 || resp.status === 429) return J({ ok: false, code: "bad_key", msg: "你的 Key 用不了（" + resp.status + "）：额度不足或填错了。去 ⚙ 里检查或换一个。" }, 400);
-          return J({ ok: false, msg: "基底返回错误 " + resp.status + "：" + (await resp.text()).slice(0, 200) }, 502);
-        }
-        const j = await resp.json();
-        text = (j.choices && j.choices[0] && j.choices[0].message && j.choices[0].message.content) || "";
-      } catch (e) {
-        return J({ ok: false, msg: "接不上基底：" + (e && e.message) }, 502);
-      }
-      text = String(text).trim();
-      if (text.length < 1500) return J({ ok: false, msg: "心得写得过短（" + text.length + " 字符），请重试一次。" }, 502);
-      return J({ ok: true, text: text, chars: text.replace(/\s/g, "").length });
+      // 开工写心得是全场最长的一次调用（满血内功两部分 + 顶格预算 + 满功率思考），
+      // 原来是非流式：几分钟里链路上一个字节都不流动，最容易被判死。改成 stream-first + 心跳。
+      const stream = new ReadableStream({
+        async start(controller) {
+          let _hb = null, _st = { t0: Date.now(), think: 0, out: 0 };
+          const fin = () => { if (_hb) clearInterval(_hb); try { controller.enqueue(_ENC.encode("data: [DONE]\n\n")); controller.close(); } catch (e) {} };
+          _hb = wdsBeat(controller, _st);
+          let text = "";
+          try {
+            const resp = await wdsFetchMax(VC, userKey, [{ role: "system", content: neigong }, { role: "user", content: DIALOGUE_REFLECT_PROMPT }], true);
+            if (!resp.ok) {
+              const et = (await resp.text()).slice(0, 200);
+              if (resp.status === 401 || resp.status === 402 || resp.status === 429) { controller.enqueue(_sseBytes({ t: "error", v: "你的 Key 用不了（" + resp.status + "）：额度不足或填错了。去 ⚙ 里检查或换一个。", code: "bad_key" })); return fin(); }
+              controller.enqueue(_sseBytes({ t: "error", v: "基底返回错误 " + resp.status + "：" + et })); return fin();
+            }
+            const reader = resp.body.getReader(); const dec = new TextDecoder(); let buf = "";
+            while (true) {
+              const { done: rdone, value } = await reader.read(); if (rdone) break;
+              buf += dec.decode(value, { stream: true }); let li;
+              while ((li = buf.indexOf("\n")) >= 0) {
+                const line = buf.slice(0, li).trim(); buf = buf.slice(li + 1);
+                if (!line.startsWith("data:")) continue; const pp = line.slice(5).trim(); if (pp === "[DONE]") continue;
+                let j; try { j = JSON.parse(pp); } catch (e) { continue; }
+                if (j.error) { controller.enqueue(_sseBytes({ t: "error", v: j.error.message || "基底流内错误" })); continue; }
+                const d = (j.choices && j.choices[0] && j.choices[0].delta) || {};
+                if (d.reasoning_content) { _st.think += d.reasoning_content.length; controller.enqueue(_sseBytes({ t: "think", v: d.reasoning_content })); }
+                if (d.content) { text += d.content; _st.out = text.length; controller.enqueue(_sseBytes({ t: "token", v: d.content })); }
+              }
+            }
+          } catch (e) {
+            controller.enqueue(_sseBytes({ t: "error", v: "接不上基底：" + (e && e.message) })); return fin();
+          }
+          text = String(text).trim();
+          if (text.length < 1500) { controller.enqueue(_sseBytes({ t: "error", v: "心得写得过短（" + text.length + " 字符），请重试一次。" })); return fin(); }
+          controller.enqueue(_sseBytes({ t: "xinde", v: { text: text, chars: text.replace(/\s/g, "").length } }));
+          fin();
+        },
+      });
+      return new Response(stream, { headers: { ..._cors(), "content-type": "text/event-stream; charset=utf-8", "cache-control": "no-store" } });
     }
     // /api/wds/read-paper：把一整场陪读对话 → 总结 / 论文提纲 / 分部成文（约 5000 字）。
     // 同样纯 BYOK（读者自带 Key），非流式 JSON；三个 mode：summary | plan | part。
@@ -1650,9 +1682,10 @@ export default {
         // 一趟请求=一次 503 机会(而非拟题+六分部+总结七趟),且无 JSON 提纲要解析、无分部接缝。
         const stream = new ReadableStream({
           async start(controller) {
-            let _hb = null;
+            let _hb = null, _st = null;
             const fin = () => { if (_hb) clearInterval(_hb); try { controller.enqueue(_ENC.encode("data: [DONE]\n\n")); controller.close(); } catch (e) {} };
-            _hb = setInterval(() => { try { controller.enqueue(_ENC.encode(": ping\n\n")); } catch (e) {} }, 10000);
+            _st = { t0: Date.now(), think: 0, out: 0 };
+            _hb = wdsBeat(controller, _st);
             try {
               // 全站 RAG:按议题线索取一段结构化知识,整篇一次注入
               let ragCtx = "";
@@ -1696,8 +1729,8 @@ export default {
                   let j; try { j = JSON.parse(p); } catch (e) { continue; }
                   if (j.error) { controller.enqueue(_sseBytes({ t: "error", v: j.error.message || "基底流内错误" })); continue; }
                   const d = (j.choices && j.choices[0] && j.choices[0].delta) || {};
-                  if (d.reasoning_content) controller.enqueue(_sseBytes({ t: "think", v: d.reasoning_content }));
-                  if (d.content) controller.enqueue(_sseBytes({ t: "token", v: d.content }));
+                  if (d.reasoning_content) { if (_st) _st.think += d.reasoning_content.length; controller.enqueue(_sseBytes({ t: "think", v: d.reasoning_content })); }
+                  if (d.content) { if (_st) _st.out += d.content.length; controller.enqueue(_sseBytes({ t: "token", v: d.content })); }
                 }
               }
             } catch (e) { controller.enqueue(_sseBytes({ t: "error", v: "成文出错：" + (e && e.message) + "（可重试）" })); }
@@ -1709,9 +1742,10 @@ export default {
       if (b.mode === "summary") {
         const stream = new ReadableStream({
           async start(controller) {
-            let _hb = null;
+            let _hb = null, _st = null;
             const fin = () => { if (_hb) clearInterval(_hb); try { controller.enqueue(_ENC.encode("data: [DONE]\n\n")); controller.close(); } catch (e) {} };
-            _hb = setInterval(() => { try { controller.enqueue(_ENC.encode(": ping\n\n")); } catch (e) {} }, 10000);
+            _st = { t0: Date.now(), think: 0, out: 0 };
+            _hb = wdsBeat(controller, _st);
             try {
               const sys = "你是 WDS，王德生的 AI 分身。你刚经历了一场" + SCENE + "。现在要为读者把这场对话总结下来。" + BASE
                 + "\n用严谨而有锋刃的汉语；不摆空模板、不注水、不写开场白；不要用 #、* 等 markdown 符号，用短小标题与自然段分层。";
@@ -1734,8 +1768,8 @@ export default {
                   let j; try { j = JSON.parse(p); } catch (e) { continue; }
                   if (j.error) { controller.enqueue(_sseBytes({ t: "error", v: j.error.message || "基底流内错误" })); continue; }
                   const d = (j.choices && j.choices[0] && j.choices[0].delta) || {};
-                  if (d.reasoning_content) controller.enqueue(_sseBytes({ t: "think", v: d.reasoning_content }));
-                  if (d.content) controller.enqueue(_sseBytes({ t: "token", v: d.content }));
+                  if (d.reasoning_content) { if (_st) _st.think += d.reasoning_content.length; controller.enqueue(_sseBytes({ t: "think", v: d.reasoning_content })); }
+                  if (d.content) { if (_st) _st.out += d.content.length; controller.enqueue(_sseBytes({ t: "token", v: d.content })); }
                 }
               }
             } catch (e) { controller.enqueue(_sseBytes({ t: "error", v: "总结生成出错：" + (e && e.message) + "（可重试）" })); }
@@ -1748,9 +1782,10 @@ export default {
       if (b.mode === "plan") {
         const stream = new ReadableStream({
           async start(controller) {
-            let _hb = null;
+            let _hb = null, _st = null;
             const fin = () => { if (_hb) clearInterval(_hb); try { controller.enqueue(_ENC.encode("data: [DONE]\n\n")); controller.close(); } catch (e) {} };
-            _hb = setInterval(() => { try { controller.enqueue(_ENC.encode(": ping\n\n")); } catch (e) {} }, 10000);
+            _st = { t0: Date.now(), think: 0, out: 0 };
+            _hb = wdsBeat(controller, _st);
             try {
               const sys = "你是 SDE 学派的学术编辑，要把一场" + (GD ? "百轮问答" : "陪读对话") + "提炼成一篇约 " + (PN >= 6 ? "一万" : "5000") + " 字学术论文的骨架。" + (GD ? "这篇论文属于《问对WDS》系列——从与 WDS 的对话中练就创新观点、凝成关于 SDE 思想的论文。" : "") + BASE;
               const usr = CTX + "\n\n请基于以上：① 拟一个准确、有锋刃的学术论文标题（不要副标题堆砌）；② 选出 " + (PN >= 6 ? "4-6" : "3-5") + " 个『金点子』——这场对话里真正反直觉、可被检验的新判断，各一句；③ 给 " + (PN >= 6 ? "六" : "三") + " 个部分的写作大纲，每部分一个标题和一句主旨，各部分合起来构成完整论证（问题的提出 → " + (PN >= 6 ? "逐个展开核心判断（可多个部分） → 对最强反驳的回应" : "核心论证") + " → 结论与限度），部分之间不重复。\n只输出 JSON、不要任何其他文字：{\"title\":\"标题\",\"points\":[\"金点子1\",\"金点子2\"],\"parts\":[{\"h\":\"部分标题\",\"gist\":\"主旨\"},{\"h\":\"部分标题\",\"gist\":\"主旨\"},{\"h\":\"部分标题\",\"gist\":\"主旨\"}]}";
@@ -1775,7 +1810,7 @@ export default {
                     let j; try { j = JSON.parse(p); } catch (e) { continue; }
                     if (j.error) return { err: j.error.message || "基底流内错误" };
                     const d = (j.choices && j.choices[0] && j.choices[0].delta) || {};
-                    if (d.reasoning_content) controller.enqueue(_sseBytes({ t: "think", v: d.reasoning_content }));
+                    if (d.reasoning_content) { if (_st) _st.think += d.reasoning_content.length; controller.enqueue(_sseBytes({ t: "think", v: d.reasoning_content })); }
                     if (d.content) content += d.content;
                   }
                 }
@@ -1816,9 +1851,10 @@ export default {
         // 资源/时间上限杀掉而 503（此前“一万字论文运行一段时间后 503”的根因）。出流后慢只退化成流内温和提示。
         const stream = new ReadableStream({
           async start(controller) {
-            let _hb = null;
+            let _hb = null, _st = null;
             const fin = () => { if (_hb) clearInterval(_hb); try { controller.enqueue(_ENC.encode("data: [DONE]\n\n")); controller.close(); } catch (e) {} };
-            _hb = setInterval(() => { try { controller.enqueue(_ENC.encode(": ping\n\n")); } catch (e) {} }, 10000);
+            _st = { t0: Date.now(), think: 0, out: 0 };
+            _hb = wdsBeat(controller, _st);
             try {
               let partCtx = "";
               if (GD) {
@@ -1875,8 +1911,8 @@ export default {
                     let j; try { j = JSON.parse(p); } catch (e) { continue; }
                     if (j.error) { if (got) { controller.enqueue(_sseBytes({ t: "error", v: j.error.message || "基底流内错误" })); return { got: got }; } return { soft: j.error.message || "基底流内错误" }; }
                     const d = (j.choices && j.choices[0] && j.choices[0].delta) || {};
-                    if (d.reasoning_content) controller.enqueue(_sseBytes({ t: "think", v: d.reasoning_content }));
-                    if (d.content) { got += d.content.length; controller.enqueue(_sseBytes({ t: "token", v: d.content })); }
+                    if (d.reasoning_content) { if (_st) _st.think += d.reasoning_content.length; controller.enqueue(_sseBytes({ t: "think", v: d.reasoning_content })); }
+                    if (d.content) { got += d.content.length; if (_st) _st.out += d.content.length; controller.enqueue(_sseBytes({ t: "token", v: d.content })); }
                   }
                 }
                 return { got: got };
@@ -1982,7 +2018,8 @@ export default {
         async start(controller) {
           let _hb = null;
           const done = () => { if (_hb) clearInterval(_hb); try { controller.enqueue(_ENC.encode("data: [DONE]\n\n")); controller.close(); } catch (e) {} };
-          _hb = setInterval(() => { try { controller.enqueue(_ENC.encode(": ping\n\n")); } catch (e) {} }, 10000);
+          _st = { t0: Date.now(), think: 0, out: 0 };
+            _hb = wdsBeat(controller, _st);
           try {
             // 内核底盘（完整内功→内化心得，按基底缓存复用；失败则降级为无底盘）
             let reflect = String(b.reflect || "").slice(0, 14000);   // 与WDS对话：本场开工亲写的心得（客户端随每条消息带上）
@@ -2063,8 +2100,8 @@ export default {
                   let j; try { j = JSON.parse(p); } catch (e) { continue; }
                   if (j.error) { if (got) { controller.enqueue(_sseBytes({ t: "error", v: j.error.message || "基底流内错误" })); return { got: got }; } return { soft: j.error.message || "基底流内错误" }; }
                   const d = (j.choices && j.choices[0] && j.choices[0].delta) || {};
-                  if (d.reasoning_content) controller.enqueue(_sseBytes({ t: "think", v: d.reasoning_content }));
-                  if (d.content) { got += d.content.length; controller.enqueue(_sseBytes({ t: "token", v: d.content })); }
+                  if (d.reasoning_content) { if (_st) _st.think += d.reasoning_content.length; controller.enqueue(_sseBytes({ t: "think", v: d.reasoning_content })); }
+                  if (d.content) { got += d.content.length; if (_st) _st.out += d.content.length; controller.enqueue(_sseBytes({ t: "token", v: d.content })); }
                 }
               }
               return { got: got };
@@ -2112,7 +2149,8 @@ export default {
         async start(controller) {
           let _hb = null;
           const fin = () => { if (_hb) clearInterval(_hb); try { controller.enqueue(_ENC.encode("data: [DONE]\n\n")); controller.close(); } catch (e) {} };
-          _hb = setInterval(() => { try { controller.enqueue(_ENC.encode(": ping\n\n")); } catch (e) {} }, 10000);
+          _st = { t0: Date.now(), think: 0, out: 0 };
+            _hb = wdsBeat(controller, _st);
           try {
             if (dayLeft !== null) controller.enqueue(_sseBytes({ t: "quota", v: { left: dayLeft, day: WDS_PER_DAY } })); // 今日真实剩余次数
             // 全站检索：先调用结构化知识(九库邻域子图,密/准/省token),再以相似句片段补充
@@ -2178,8 +2216,8 @@ export default {
                 let j; try { j = JSON.parse(p); } catch (e) { continue; }
                 if (j.error) { controller.enqueue(_sseBytes({ t: "error", v: j.error.message || "基底流内错误" })); continue; }
                 const d = (j.choices && j.choices[0] && j.choices[0].delta) || {};
-                if (d.reasoning_content) controller.enqueue(_sseBytes({ t: "think", v: d.reasoning_content }));
-                if (d.content) controller.enqueue(_sseBytes({ t: "token", v: d.content }));
+                if (d.reasoning_content) { if (_st) _st.think += d.reasoning_content.length; controller.enqueue(_sseBytes({ t: "think", v: d.reasoning_content })); }
+                if (d.content) { if (_st) _st.out += d.content.length; controller.enqueue(_sseBytes({ t: "token", v: d.content })); }
               }
             }
           } catch (e) {

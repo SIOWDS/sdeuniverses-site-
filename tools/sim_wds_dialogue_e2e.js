@@ -207,9 +207,16 @@ global.fetch = function (url, opt) {
   const rec = { url: String(url), body: b };
   calls.push(rec);
   if (rec.url.endsWith("/api/wds/dialogue-reflect")) {
-    if (MODE.reflect === "fail") return Promise.resolve({ json: () => Promise.resolve({ ok: false, msg: "基底返回错误 502" }) });
-    if (MODE.reflect === "needkey") return Promise.resolve({ json: () => Promise.resolve({ ok: false, code: "need_key", msg: "要 Key" }) });
-    return Promise.resolve({ json: () => Promise.resolve({ ok: true, text: REFLECT_TEXT, chars: REFLECT_TEXT.length }) });
+    // 开工仪式已改 SSE：心跳 beat（喂活连接＋活数据）→ think →末尾 xinde 事件带回全文
+    if (MODE.reflect === "fail") return Promise.resolve({ ok: true, body: sse(['data: {"t":"error","v":"基底返回错误 502"}\n', "data: [DONE]\n"]) });
+    if (MODE.reflect === "needkey") return Promise.resolve({ ok: true, body: sse(['data: {"t":"error","v":"要 Key","code":"need_key"}\n', "data: [DONE]\n"]) });
+    return Promise.resolve({ ok: true, body: sse([
+      'data: {"t":"beat","v":{"sec":5,"think":1200,"out":0}}\n',
+      'data: {"t":"think","v":"先把内功过一遍…"}\n',
+      'data: {"t":"beat","v":{"sec":10,"think":4800,"out":0}}\n',
+      'data: {"t":"xinde","v":' + JSON.stringify({ text: REFLECT_TEXT, chars: REFLECT_TEXT.length }) + '}\n',
+      "data: [DONE]\n",
+    ]) });
   }
   if (rec.url.endsWith("/api/wds/read")) {
     // 服务端会做的事：按 guide 预算打包历史 → 记录模型实际所见
@@ -446,7 +453,7 @@ async function ask(text) { qEl.value = text; goEl.onclick(); await flush(25); }
 ok("worker：全线顶格预算，任何一步都不降满功率档", W.includes("WDS_TOK_MAX = 64000") && W.includes("wdsFetchMax") && !W.includes("top === false") && (W.match(/await genOnce\(\)/g) || []).length === 2);
 ok("worker：顶格降档只在基底拒收 max_tokens 时发生", /resp\.status !== 400/.test(W) && W.includes("WDS_TOK_LADDER") && /max\[_ \\\]\?tokens/.test(W) === false);
 ok("worker：答题也补上 0 字自动重答（顶格、满功率）", W.includes("ANSWER_EMPTY_GUARD") && (W.match(/await _runAnswer\(\)/g) || []).length === 2 && W.includes("正在重答"));
-ok("worker：与WDS对话各步全部顶格（心得/答题/总结/拟题/分部）", (W.match(/WDS_TOK_MAX/g) || []).length >= 4 && (W.match(/wdsFetchMax\(VC, KEY/g) || []).length >= 4);
+ok("worker：与WDS对话各步全部顶格（心得/答题/总结/拟题/分部）", (W.match(/wdsFetchMax\(VC, /g) || []).length >= 5 && W.includes("max_tokens: WDS_TOK_LADDER[i]"));
 ok("worker：JSON 不达标时有行文兜底解析", W.includes("function parsePlanText") && /const pick = \(rr\)/.test(W));
 ok("worker：失败原因分种类回报（0 字 / 不可解析）", W.includes("只出了思考、正文 0 字") && W.includes("输出不是可解析的提纲") && W.includes('"plan_fail"'));
 ok("客户端：拟题失败给「重新拟题再试一次」", PAGE.includes("PLAN_RETRY") && /\\u91cd\\u65b0\\u62df\\u9898\\u518d\\u8bd5\\u4e00\\u6b21/.test(PAGE));
@@ -475,6 +482,17 @@ MODE.planFail = null;
     got ? got.title + " / " + got.parts.length + " 部分" : "解析失败");
   ok("兜底解析不乱救：空输出与半截输出一律判失败", pf("") === null && pf("标题：只有标题") === null);
 }
+
+head("[阶段十一] 长思考期间的假流式（心跳 + 活数据）");
+ok("worker：统一心跳 5 秒一发，注释 + 带活数据的 beat", W.includes("FAKE_STREAM") && /function wdsBeat\(controller, state\)/.test(W) && W.includes("}, 5000);") && /t: "beat", v: \{ sec:/.test(W));
+ok("worker：六条流全部换成 wdsBeat（无残留 10 秒旧心跳）", (W.match(/wdsBeat\(controller, _st\)/g) || []).length >= 6 && !W.includes("}, 10000);"));
+ok("worker：beat 里的秒数/推演字数是真计数（转发处累加）", /_st\.think \+= d\.reasoning_content\.length/.test(W) && /_st\.out \+= d\.content\.length/.test(W));
+ok("worker：开工仪式已从非流式改为 stream-first + 心跳", /dialogue-reflect[\s\S]{0,4000}?new ReadableStream/.test(W) && /t: "xinde", v: \{ text: text/.test(W) && !/stream: false, max_tokens: WDS_TOK_MAX/.test(W));
+ok("客户端：开工仪式收 SSE 并把秒数/推演字数画进状态条", PAGE.includes("FAKE_STREAM_UI") && /j\.t === "xinde"/.test(PAGE) && /\\u5df2\\u63a8\\u6f14/.test(PAGE));
+ok("客户端：论文三步都把 beat 画成人话（beatTip）", PAGE.includes("function beatTip") && (PAGE.match(/beatTip\(bv\)/g) || []).length === 3);
+
+// 行为：开工走 SSE 后，本场心得仍完整垫进每一次调用（用真实发出的请求体验证）
+ok("开工走 SSE 后心得仍完整落地并垫进调用", cc.length > 0 && (cc[0].body.reflect || "").length === REFLECT_TEXT.length, ((cc[0] && cc[0].body.reflect) || "").length + " 字符");
 
 console.log("\n=== 汇总：" + pass + " PASS / " + fail + " FAIL / " + warn + " NOTE ===");
   if (fails.length) console.log("失败项：\n - " + fails.join("\n - "));
