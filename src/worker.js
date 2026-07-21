@@ -1591,27 +1591,89 @@ export default {
       const CTX = (docText ? ((GD ? "【本场对话讨论的文章（读者提交）】《" : "【读者当时在读的文本】《") + (docTitle || "（未命名）") + "》\n" + docText + "\n\n") : "") + (GD ? "【这一场对话的全程记录】\n" : "【这一场陪读对话的全程记录】\n") + convo;
 
       if (b.mode === "summary") {
-        const sys = "你是 WDS，王德生的 AI 分身。你刚经历了一场" + SCENE + "。现在要为读者把这场对话总结下来。" + BASE
-          + "\n用严谨而有锋刃的汉语；不摆空模板、不注水、不写开场白；不要用 #、* 等 markdown 符号，用短小标题与自然段分层。";
-        const usr = CTX + "\n\n请写一份这场陪读的总结，约 1200-1600 字，分四节：\n一、我们谈了什么（脉络，不是流水账）\n二、真正推进了的几个判断（逐条列出，每条一句话说清它比常识多走了哪一步）\n三、用 SDE 看这场对话（显露/差异序列/特征纠缠或三大方程，照见读者原来卡在哪、现在站在哪）\n四、还没解决的问题（留给读者继续读、继续想的口子）\n直接从正文写起。";
-        const out = await llmText(VC, KEY, sys, usr, 3200);
-        return out ? J({ ok: true, text: out }) : J({ ok: false, msg: "总结生成失败，请重试。" }, 502);
+        const stream = new ReadableStream({
+          async start(controller) {
+            const fin = () => { try { controller.enqueue(_ENC.encode("data: [DONE]\n\n")); controller.close(); } catch (e) {} };
+            try {
+              const sys = "你是 WDS，王德生的 AI 分身。你刚经历了一场" + SCENE + "。现在要为读者把这场对话总结下来。" + BASE
+                + "\n用严谨而有锋刃的汉语；不摆空模板、不注水、不写开场白；不要用 #、* 等 markdown 符号，用短小标题与自然段分层。";
+              const usr = CTX + "\n\n请写一份这场陪读的总结，约 1200-1600 字，分四节：\n一、我们谈了什么（脉络，不是流水账）\n二、真正推进了的几个判断（逐条列出，每条一句话说清它比常识多走了哪一步）\n三、用 SDE 看这场对话（显露/差异序列/特征纠缠或三大方程，照见读者原来卡在哪、现在站在哪）\n四、还没解决的问题（留给读者继续读、继续想的口子）\n直接从正文写起。";
+              let upstream;
+              try { upstream = await fetch(VC.url, { method: "POST", headers: { "content-type": "application/json", authorization: "Bearer " + KEY }, body: JSON.stringify(wdsTopBody(VC, { model: VC.model, stream: true, max_tokens: 3200, messages: [{ role: "system", content: sys }, { role: "user", content: usr }] })) }); }
+              catch (e) { controller.enqueue(_sseBytes({ t: "error", v: "接不上基底：" + (e && e.message) })); return fin(); }
+              if (!upstream.ok) {
+                const errtxt = (await upstream.text()).slice(0, 200);
+                if (upstream.status === 401 || upstream.status === 402 || upstream.status === 429) { controller.enqueue(_sseBytes({ t: "error", v: "你的 Key 用不了（" + upstream.status + "）：额度不足或填错了。", code: "bad_key" })); return fin(); }
+                controller.enqueue(_sseBytes({ t: "error", v: "基底返回错误 " + upstream.status + "：" + errtxt })); return fin();
+              }
+              const reader = upstream.body.getReader(); const dec = new TextDecoder(); let buf = "";
+              while (true) {
+                const { done: rdone, value } = await reader.read(); if (rdone) break;
+                buf += dec.decode(value, { stream: true }); let li;
+                while ((li = buf.indexOf("\n")) >= 0) {
+                  const line = buf.slice(0, li).trim(); buf = buf.slice(li + 1);
+                  if (!line.startsWith("data:")) continue; const p = line.slice(5).trim(); if (p === "[DONE]") continue;
+                  let j; try { j = JSON.parse(p); } catch (e) { continue; }
+                  if (j.error) { controller.enqueue(_sseBytes({ t: "error", v: j.error.message || "基底流内错误" })); continue; }
+                  const d = (j.choices && j.choices[0] && j.choices[0].delta) || {};
+                  if (d.reasoning_content) controller.enqueue(_sseBytes({ t: "think", v: d.reasoning_content }));
+                  if (d.content) controller.enqueue(_sseBytes({ t: "token", v: d.content }));
+                }
+              }
+            } catch (e) { controller.enqueue(_sseBytes({ t: "error", v: "总结生成出错：" + (e && e.message) + "（可重试）" })); }
+            fin();
+          },
+        });
+        return new Response(stream, { headers: { ..._cors(), "content-type": "text/event-stream; charset=utf-8", "cache-control": "no-store" } });
       }
 
       if (b.mode === "plan") {
-        const sys = "你是 SDE 学派的学术编辑，要把一场" + (GD ? "百轮问答" : "陪读对话") + "提炼成一篇约 " + (PN >= 6 ? "一万" : "5000") + " 字学术论文的骨架。" + (GD ? "这篇论文属于《问对WDS》系列——从与 WDS 的对话中练就创新观点、凝成关于 SDE 思想的论文。" : "") + BASE;
-        const usr = CTX + "\n\n请基于以上：① 拟一个准确、有锋刃的学术论文标题（不要副标题堆砌）；② 选出 " + (PN >= 6 ? "4-6" : "3-5") + " 个『金点子』——这场对话里真正反直觉、可被检验的新判断，各一句；③ 给 " + (PN >= 6 ? "六" : "三") + " 个部分的写作大纲，每部分一个标题和一句主旨，各部分合起来构成完整论证（问题的提出 → " + (PN >= 6 ? "逐个展开核心判断（可多个部分） → 对最强反驳的回应" : "核心论证") + " → 结论与限度），部分之间不重复。\n只输出 JSON、不要任何其他文字：{\"title\":\"标题\",\"points\":[\"金点子1\",\"金点子2\"],\"parts\":[{\"h\":\"部分标题\",\"gist\":\"主旨\"},{\"h\":\"部分标题\",\"gist\":\"主旨\"},{\"h\":\"部分标题\",\"gist\":\"主旨\"}]}";
-        // 思考模式（满功率）会先吃掉大量推理 token；提纲 JSON 正文虽短，也必须给足头寸，否则正文被截断→解析失败。max_tokens 只是上限，JSON 写完即停，不额外增耗。
-        const planTok = GD ? 8000 : 2400;
-        const tryPlan = async () => {
-          const out = await llmText(VC, KEY, sys, usr, planTok);
-          const jj = looseJSON(out);
-          return (jj && jj.title && Array.isArray(jj.parts) && jj.parts.length) ? jj : null;
-        };
-        let j = await tryPlan();
-        if (!j) j = await tryPlan();   // 思考模式下 JSON 偶发不达标：服务端自动重试一次，免得把“请重试”甩给用户手动点
-        if (!j) return J({ ok: false, msg: "提纲生成失败，请重试。" }, 502);
-        return J({ ok: true, title: j.title, points: j.points || [], parts: j.parts.slice(0, PN), convo: convo.slice(-6000) });
+        const stream = new ReadableStream({
+          async start(controller) {
+            const fin = () => { try { controller.enqueue(_ENC.encode("data: [DONE]\n\n")); controller.close(); } catch (e) {} };
+            try {
+              const sys = "你是 SDE 学派的学术编辑，要把一场" + (GD ? "百轮问答" : "陪读对话") + "提炼成一篇约 " + (PN >= 6 ? "一万" : "5000") + " 字学术论文的骨架。" + (GD ? "这篇论文属于《问对WDS》系列——从与 WDS 的对话中练就创新观点、凝成关于 SDE 思想的论文。" : "") + BASE;
+              const usr = CTX + "\n\n请基于以上：① 拟一个准确、有锋刃的学术论文标题（不要副标题堆砌）；② 选出 " + (PN >= 6 ? "4-6" : "3-5") + " 个『金点子』——这场对话里真正反直觉、可被检验的新判断，各一句；③ 给 " + (PN >= 6 ? "六" : "三") + " 个部分的写作大纲，每部分一个标题和一句主旨，各部分合起来构成完整论证（问题的提出 → " + (PN >= 6 ? "逐个展开核心判断（可多个部分） → 对最强反驳的回应" : "核心论证") + " → 结论与限度），部分之间不重复。\n只输出 JSON、不要任何其他文字：{\"title\":\"标题\",\"points\":[\"金点子1\",\"金点子2\"],\"parts\":[{\"h\":\"部分标题\",\"gist\":\"主旨\"},{\"h\":\"部分标题\",\"gist\":\"主旨\"},{\"h\":\"部分标题\",\"gist\":\"主旨\"}]}";
+              const planTok = GD ? 8000 : 2400;
+              const genOnce = async () => {
+                let upstream;
+                try { upstream = await fetch(VC.url, { method: "POST", headers: { "content-type": "application/json", authorization: "Bearer " + KEY }, body: JSON.stringify(wdsTopBody(VC, { model: VC.model, stream: true, max_tokens: planTok, messages: [{ role: "system", content: sys }, { role: "user", content: usr }] })) }); }
+                catch (e) { return { err: "接不上基底：" + (e && e.message) }; }
+                if (!upstream.ok) {
+                  const errtxt = (await upstream.text()).slice(0, 200);
+                  if (upstream.status === 401 || upstream.status === 402 || upstream.status === 429) return { err: "你的 Key 用不了（" + upstream.status + "）：额度不足或填错了。", code: "bad_key" };
+                  return { err: "基底返回错误 " + upstream.status + "：" + errtxt };
+                }
+                const reader = upstream.body.getReader(); const dec = new TextDecoder(); let buf = "", content = "";
+                while (true) {
+                  const { done: rdone, value } = await reader.read(); if (rdone) break;
+                  buf += dec.decode(value, { stream: true }); let li;
+                  while ((li = buf.indexOf("\n")) >= 0) {
+                    const line = buf.slice(0, li).trim(); buf = buf.slice(li + 1);
+                    if (!line.startsWith("data:")) continue; const p = line.slice(5).trim(); if (p === "[DONE]") continue;
+                    let j; try { j = JSON.parse(p); } catch (e) { continue; }
+                    if (j.error) return { err: j.error.message || "基底流内错误" };
+                    const d = (j.choices && j.choices[0] && j.choices[0].delta) || {};
+                    if (d.reasoning_content) controller.enqueue(_sseBytes({ t: "think", v: d.reasoning_content }));
+                    if (d.content) content += d.content;
+                  }
+                }
+                return { content };
+              };
+              let r = await genOnce();
+              let jj = r.content ? looseJSON(r.content) : null;
+              if (!(jj && jj.title && Array.isArray(jj.parts) && jj.parts.length)) {
+                if (r.err) { controller.enqueue(_sseBytes({ t: "error", v: r.err, code: r.code })); return fin(); }
+                r = await genOnce();   // 思考模式下 JSON 偶发不达标：服务端自动重试一次
+                jj = r.content ? looseJSON(r.content) : null;
+                if (!(jj && jj.title && Array.isArray(jj.parts) && jj.parts.length)) { controller.enqueue(_sseBytes({ t: "error", v: r.err || "提纲生成失败，请重试。", code: r.code })); return fin(); }
+              }
+              controller.enqueue(_sseBytes({ t: "plan", v: { title: jj.title, points: jj.points || [], parts: jj.parts.slice(0, PN), convo: convo.slice(-6000) } }));
+            } catch (e) { controller.enqueue(_sseBytes({ t: "error", v: "提纲生成出错：" + (e && e.message) })); }
+            fin();
+          },
+        });
+        return new Response(stream, { headers: { ..._cors(), "content-type": "text/event-stream; charset=utf-8", "cache-control": "no-store" } });
       }
 
       if (b.mode === "part") {

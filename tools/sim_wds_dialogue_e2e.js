@@ -222,12 +222,13 @@ global.fetch = function (url, opt) {
   if (b.mode === "plan") {
     rec.convoSeen = readConvoText(b.history || [], b.guide ? 300000 : 24000);
     const parts = []; for (let k = 1; k <= 6; k++) parts.push({ h: "第" + k + "部分 · 小标题", gist: "主旨" + k });
-    return Promise.resolve({ json: () => Promise.resolve({ ok: true, title: "问对WDS：一场百轮对话凝成的论文", points: ["金点子甲", "金点子乙", "金点子丙", "金点子丁"], parts, convo: rec.convoSeen.slice(0, 6000) }) });
+    const planObj = { title: "问对WDS：一场百轮对话凝成的论文", points: ["金点子甲", "金点子乙", "金点子丙", "金点子丁"], parts, convo: rec.convoSeen.slice(0, 6000) };
+    return Promise.resolve({ ok: true, body: sse(['data: {"t":"plan","v":' + JSON.stringify(planObj) + '}\n', "data: [DONE]\n"]) });
   }
   if (b.mode === "part") return Promise.resolve({ ok: true, body: sse(['data: {"t":"token","v":"' + "正文".repeat(900) + '"}\n', "data: [DONE]\n"]) });
   if (b.mode === "summary") {
     rec.convoSeen = readConvoText(b.history || [], b.guide ? 300000 : 24000);
-    return Promise.resolve({ json: () => Promise.resolve({ ok: true, text: "总结正文".repeat(350) }) });
+    return Promise.resolve({ ok: true, body: sse(['data: {"t":"token","v":"' + "总结正文".repeat(350) + '"}\n', "data: [DONE]\n"]) });
   }
   return Promise.resolve({ json: () => Promise.resolve({ ok: true }) });
 };
@@ -283,7 +284,7 @@ async function ask(text) { qEl.value = text; goEl.onclick(); await flush(25); }
   ok("超过 100 轮不再发出请求", chatCalls().length === 100);
 
   head("[阶段五] 总结与万字论文");
-  sumB.onclick(); await flush(20);
+  sumB.onclick(); await flush(40);
   const sumCall = calls.filter((c) => c.body.mode === "summary")[0];
   ok("总结请求带 guide 与本场心得", !!sumCall && sumCall.body.guide === 1 && (sumCall.body.reflect || "").length >= 4000);
   ok("总结吃到全场原文（非末段摘要）", sumCall.convoSeen.length > 180000 && sumCall.convoSeen.indexOf("第一问：什么是发生学") >= 0, sumCall.convoSeen.length + " 字符");

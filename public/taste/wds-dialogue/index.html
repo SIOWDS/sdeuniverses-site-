@@ -487,10 +487,10 @@
           if (n < delays.length) return new Promise(function (res) { setTimeout(res, delays[n]); }).then(function () { return attempt(n + 1); });
           throw new Error("HTTP " + r.status);
         }
-        var reader = r.body.getReader(), dec = new TextDecoder(), buf = "", text = "", errMsg = "";
+        var reader = r.body.getReader(), dec = new TextDecoder(), buf = "", text = "", errMsg = "", errCode = "";
         function pump() {
           return reader.read().then(function (res) {
-            if (res.done) { if (errMsg && !text) throw new Error(errMsg); return text; }
+            if (res.done) { if (errMsg && !text) { var er = new Error(errMsg); er.code = errCode; throw er; } return text; }
             buf += dec.decode(res.value, { stream: true });
             var idx2;
             while ((idx2 = buf.indexOf("\n")) >= 0) {
@@ -498,7 +498,41 @@
               if (line.indexOf("data:") !== 0) continue;
               var pp = line.slice(5).trim();
               if (pp === "[DONE]") continue;
-              try { var j = JSON.parse(pp); if (j.t === "token") { text += j.v; if (onToken) onToken(text); } else if (j.t === "error") { errMsg = j.v; } } catch (e) {}
+              try { var j = JSON.parse(pp); if (j.t === "token") { text += j.v; if (onToken) onToken(text); } else if (j.t === "error") { errMsg = j.v; errCode = j.code || ""; } } catch (e) {}
+            }
+            return pump();
+          });
+        }
+        return pump();
+      }, function (e) {
+        if (n < delays.length) return new Promise(function (res) { setTimeout(res, delays[n]); }).then(function () { return attempt(n + 1); });
+        throw e;
+      });
+    }
+    return attempt(0);
+  }
+  // 拟题也走流式（SSE）：先建立连接，思考在流内进行，末尾一个 {t:"plan"} 事件带回结构化提纲——避免出流前 503。
+  function postPlanStream(body) {
+    body.guide = 1; body.paperN = PN; body.docTitle = article.text ? article.title : TITLE; body.docText = article.text || ""; body.history = history; body.reflect = xinde;
+    var delays = [1500, 4000];
+    function attempt(n) {
+      return fetch(PAPER, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) }).then(function (r) {
+        if (!r.ok || !r.body) {
+          if (n < delays.length) return new Promise(function (res) { setTimeout(res, delays[n]); }).then(function () { return attempt(n + 1); });
+          throw new Error("HTTP " + r.status);
+        }
+        var reader = r.body.getReader(), dec = new TextDecoder(), buf = "", plan = null, errMsg = "", errCode = "";
+        function pump() {
+          return reader.read().then(function (res) {
+            if (res.done) { if (plan) return plan; return { ok: false, msg: errMsg || "提纲生成失败，请重试。", code: errCode }; }
+            buf += dec.decode(res.value, { stream: true });
+            var idx2;
+            while ((idx2 = buf.indexOf("\n")) >= 0) {
+              var line = buf.slice(0, idx2).trim(); buf = buf.slice(idx2 + 1);
+              if (line.indexOf("data:") !== 0) continue;
+              var pp = line.slice(5).trim();
+              if (pp === "[DONE]") continue;
+              try { var j = JSON.parse(pp); if (j.t === "plan" && j.v) { plan = { ok: true, title: j.v.title, points: j.v.points || [], parts: j.v.parts || [], convo: j.v.convo || "" }; } else if (j.t === "error") { errMsg = j.v; errCode = j.code || ""; } } catch (e) {}
             }
             return pump();
           });
@@ -562,13 +596,12 @@
     busy = true; paint();
     var dm = docModal("\u6b63\u5728\u603b\u7ed3\u8fd9\u573a\u5bf9\u8bdd\u2026", "summary");
     dm.setProg("\u8c03\u7528\u4f60\u81ea\u5df1\u7684\u57fa\u5e95\u4e2d\u2026");
-    postR({ mode: "summary", key: kv.key, vendor: kv.vendor })
-      .then(function (r) {
+    postStream({ mode: "summary", key: kv.key, vendor: kv.vendor }, function (partial) { dm.setText(partial); })
+      .then(function (text) {
         busy = false; paint(); dm.setProg("");
-        if (!r.ok) { dm.setTitle("\u6ca1\u80fd\u751f\u6210"); dm.setText(r.msg || "\u8bf7\u91cd\u8bd5\u3002"); if (r.code === "need_key") keyPanel(null); return; }
-        dm.setTitle("\u4e0e WDS \u5bf9\u8bdd \u00b7 \u5168\u573a\u603b\u7ed3"); dm.setText(r.text);
+        dm.setTitle("\u4e0e WDS \u5bf9\u8bdd \u00b7 \u5168\u573a\u603b\u7ed3"); dm.setText(text);
       })
-      .catch(function (e) { busy = false; paint(); dm.setTitle("\u6ca1\u80fd\u751f\u6210"); dm.setText("\u7f51\u7edc\u51fa\u9519\uff1a" + (e && e.message)); });
+      .catch(function (e) { busy = false; paint(); dm.setProg(""); dm.setTitle("\u6ca1\u80fd\u751f\u6210"); dm.setText("\u751f\u6210\u51fa\u9519\uff1a" + (e && e.message)); if (e && e.code === "need_key") keyPanel(null); });
   };
   papB.onclick = function () {
     var kv = needKey(function (ok) { if (ok) papB.onclick(); }); if (!kv) return;
@@ -576,7 +609,7 @@
     var dm = docModal("\u6b63\u5728\u51dd\u6210\u300a\u95ee\u5bf9WDS\u300b\u2026", "paper");
     dm.setProg("\u7b2c 1 \u6b65\uff1a\u62df\u9898\u4e0e\u63d0\u7eb2\u2026");
     var out = "", prev = "", i = 0;
-    postR({ mode: "plan", key: kv.key, vendor: kv.vendor }).then(function (pl) {
+    postPlanStream({ mode: "plan", key: kv.key, vendor: kv.vendor }).then(function (pl) {
       if (!pl.ok) throw new Error(pl.msg || "\u63d0\u7eb2\u5931\u8d25");
       dm.setTitle(pl.title);
       function step() {
