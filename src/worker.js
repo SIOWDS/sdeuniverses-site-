@@ -906,9 +906,10 @@ function ragKeys(q, expTerms) {
 // 自动退回旧的逐片扫描，不至于开天窗。
 // 所有"要站内资料"的入口统一走这里。别再用 loadCorpus——那是整份装 60MB，会把 isolate 撑坏，
 // 而 isolate 是同一时刻所有请求共用的：任何一个入口撑坏它，别人的答题、成文、搜索一起陪葬。
+function _secLabel(man) { const m = {}; for (const s of (man.sections || [])) m[s.key] = s.label; return m; }
 async function lightRetrieve(env, url, q, expTerms, k, cut, opts) {
   const scan = await ragScan(env, url, q, expTerms || [], "", k, cut || 1600, opts || {});
-  return { hits: scan.picked, corpus: { docs: scan.docs } };
+  return { hits: scan.picked, corpus: { docs: scan.docs, secLabel: scan.secLabel || {}, coords: scan.coords || null } };
 }
 async function ragScan(env, url, q, expTerms, prevQ, k, chunkLimit, opts) {
   const man = await (await env.ASSETS.fetch(new Request(new URL("/search/manifest.json", url)))).json();
@@ -976,7 +977,7 @@ async function ragScan(env, url, q, expTerms, prevQ, k, chunkLimit, opts) {
     perDoc[it.d]++; picked.push(it);
     if (picked.length >= (k || 36)) break;
   }
-  return { picked: picked, docs: man.docs, coords: coords };
+  return { picked: picked, docs: man.docs, coords: coords, secLabel: _secLabel(man) };
 }
 // 旧路：索引尚未重建时的退路——按版块相关度排序、限时限片地扫大分片。
 async function ragScanShards(env, url, man, coords, baseKeys, exp, prev, k, cut) {
@@ -1016,7 +1017,7 @@ async function ragScanShards(env, url, man, coords, baseKeys, exp, prev, k, cut)
     perDoc[it.d]++; picked.push(it);
     if (picked.length >= (k || 36)) break;
   }
-  return { picked: picked, docs: man.docs, coords: coords };
+  return { picked: picked, docs: man.docs, coords: coords, secLabel: _secLabel(man) };
 }
 function retrieve(corpus, q, k, expTerms) {
   const terms = q.toLowerCase().split(/\s+/).filter(Boolean);
