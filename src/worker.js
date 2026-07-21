@@ -1585,6 +1585,51 @@ export default {
       }
       return Response.json({ ok: false, msg: "bad mode" }, { status: 400 });
     }
+    // RAG_SUBREQUEST — /api/wds/rag：把「全站检索」从答题请求里拆出来，单独跑一次。
+    // 冷启动时这一步要把全站索引（十几兆 JSON、上百个分片）装进内存，很吃 CPU；和答题挤在同一个
+    // 请求里，会被平台按单请求 CPU 上限直接掐死——表现就是"流刚开就断、连来源都没发出来、只收到心跳"。
+    // 拆开之后：它有自己的一份 CPU 预算；它失败也只是这一答没有站内资料，不连累答题本身。
+    if (url.pathname === "/api/wds/rag") {
+      if (request.method === "OPTIONS") return new Response(null, { headers: _cors() });
+      if (request.method !== "POST") return new Response("Method Not Allowed", { status: 405 });
+      let b = {}; try { b = await request.json(); } catch (e) {}
+      const J = (o, st) => Response.json(o, { status: st || 200, headers: _cors() });
+      const q = String(b.q || "").slice(0, 2000);
+      if (!q) return J({ ok: false, msg: "no q" }, 400);
+      const expTerms = Array.isArray(b.exp) ? b.exp.slice(0, 40).map((x) => String(x)) : [];
+      const K = Math.max(4, Math.min(48, parseInt(b.k, 10) || 36));
+      const cap = Math.max(2000, Math.min(30000, parseInt(b.cap, 10) || 30000));
+      const kbn = Math.max(0, Math.min(30, parseInt(b.kbn, 10) || 0));
+      const prevQ = String(b.prevQ || "").slice(0, 240);
+      const chunkLimit = Math.max(200, Math.min(4000, parseInt(b.chunk, 10) || 0));
+      try {
+        const corpus = await loadCorpus(env, url);
+        const seen = {}, srcs = [];
+        let kbBlock = "";
+        if (kbn) {
+          try { const kb = await loadKB(env, url); if (kb) { const r = retrieveKB(kb, corpus, q, expTerms, kbn); kbBlock = r.block; for (const sx of r.srcs) if (!seen[sx.u]) { seen[sx.u] = 1; srcs.push(sx); } } } catch (e) {}
+        }
+        const hits = retrieve(corpus, q, K, expTerms);
+        if (prevQ && prevQ !== q) {
+          const more = retrieve(corpus, prevQ, 10, []);
+          const have = new Set(hits.map((c) => c.d + "|" + c.t.slice(0, 40)));
+          for (const ck of more) { const id = ck.d + "|" + ck.t.slice(0, 40); if (!have.has(id)) { have.add(id); hits.push(ck); } }
+        }
+        const chunkCap = Math.max(4000, cap - kbBlock.length);
+        let chunkText = "";
+        for (const ck of hits) {
+          const d = corpus.docs[ck.d]; if (!d) continue;
+          if (!seen[d.u]) { seen[d.u] = 1; srcs.push({ u: d.u, t: d.t }); }
+          chunkText += "【来源：" + d.t + "】\n" + (chunkLimit ? ck.t.slice(0, chunkLimit) : ck.t) + "\n\n";
+          if (chunkText.length > chunkCap) break;
+        }
+        return J({ ok: true, ctx: kbBlock + (kbBlock && chunkText ? "\n【补充 · 站内原文片段】\n" : "") + chunkText, srcs: srcs.slice(0, 10) });
+      } catch (e) {
+        return J({ ok: false, msg: "检索没接上：" + (e && e.message) }, 502);
+      }
+    }
+    // 内部小工具：向自己的 /api/wds/rag 发一次子请求。失败一律吞掉——没有站内资料也要能答。
+    // （不重试：这一步失败通常是冷启动装语料太重，重试只会再撞一次；下一问时语料多半已在内存里。）
     // /api/wds/dialogue-reflect：「与WDS对话」高级会话开工仪式——满血内功（本体论先验＋创新智商两部分）→本场亲写约5500字心得（纯 BYOK、SSE 流式＋心跳）。
     // 每场对话开工调用一次；产出随后由客户端以 b.reflect 垫进本场全部对话与成文调用。
     if (url.pathname === "/api/wds/dialogue-reflect") {
@@ -1860,19 +1905,14 @@ export default {
             try {
               let partCtx = "";
               if (GD) {
+                // 走 /api/wds/rag 子请求：装语料是 CPU 大户，和写作挤在一个请求里会被平台掐死（RAG_SUBREQUEST）
                 try {
-                  const corpus = await loadCorpus(env, url);
                   const pq = (title + " " + (parts[idx].h || "") + " " + points.join(" ")).slice(0, 300);
-                  const pseen = {};
-                  // —— 结构化知识：九库邻域子图（按本部分主旨定位），让成文引到成体系的判断而非仅相似句 ——
-                  let kbBlock = "";
-                  try { const kb = await loadKB(env, url); if (kb) { const r = retrieveKB(kb, corpus, pq, [], 18); kbBlock = r.block; } } catch (e) {}
-                  // —— 相似句补充：K=12；KB 命中时收紧上限为其让预算 ——
-                  const pcap = Math.max(3000, 8000 - kbBlock.length);
-                  const phits = retrieve(corpus, pq, 12, []);
-                  let chunkText = "";
-                  for (const ck of phits) { const d = corpus.docs[ck.d]; if (!d || pseen[d.u]) continue; pseen[d.u] = 1; chunkText += "【来源：" + d.t + "】\n" + ck.t.slice(0, 900) + "\n\n"; if (chunkText.length > pcap) break; }
-                  partCtx = kbBlock + (kbBlock && chunkText ? "\n【补充 · 站内原文片段】\n" : "") + chunkText;
+                  const rr = await fetch(new URL("/api/wds/rag", url), {
+                    method: "POST", headers: { "content-type": "application/json" },
+                    body: JSON.stringify({ q: pq, k: 12, cap: 8000, kbn: 18, chunk: 900 }),
+                  });
+                  if (rr.ok) { const jr = await rr.json(); if (jr && jr.ok) partCtx = jr.ctx || ""; }
                 } catch (e) {}
               }
               const sys = "你是 SDE 学派的学者，正在写一篇严谨的学术论文。" + (GD ? "本文属《问对WDS》系列——由一场与 WDS 的百轮问答凝成、关于 SDE 思想的论文。" : "") + BASE
@@ -2030,36 +2070,17 @@ export default {
             // 与WDS对话（guide）：全站 RAG 加强档——K=36 广召回 + 上一轮接续检索，上下文上限 3 万字符，来源随流回传
             let siteCtx = "", siteSrcs = [];
             if (b.guide) {
+              let expTerms = []; try { expTerms = await sdeExpandQuery(VC, KEY, q); } catch (e) {}
+              let prevQ0 = "";
+              for (let i = history.length - 1; i >= 0; i--) { const m = history[i]; if (m && m.role !== "wds" && m.text) { prevQ0 = String(m.text).slice(0, 240); break; } }
               try {
-                const corpus = await loadCorpus(env, url);
-                let expTerms = []; try { expTerms = await sdeExpandQuery(VC, KEY, q); } catch (e) {}
-                const seen = {};
-                // —— 先调用结构化知识：九库 entity-link → 邻域子图（成体系的判断，而非相似句）——
-                let kbBlock = "";
-                try {
-                  const kb = await loadKB(env, url);
-                  if (kb) { const r = retrieveKB(kb, corpus, q, expTerms, docText ? 14 : 24); kbBlock = r.block; for (const s of r.srcs) if (!seen[s.u]) { seen[s.u] = 1; siteSrcs.push(s); } }
-                } catch (e) {}
-                // —— 相似句召回：K=36 广召回 + 上一轮接续；KB 命中时收紧字数上限，为结构化知识让出预算 ——
-                const hits = retrieve(corpus, q, 36, expTerms);
-                let prevQ = "";
-                for (let i = history.length - 1; i >= 0; i--) { const m = history[i]; if (m && m.role !== "wds" && m.text) { prevQ = String(m.text).slice(0, 240); break; } }
-                if (prevQ && prevQ !== q) {
-                  const more = retrieve(corpus, prevQ, 10, []);
-                  const have = new Set(hits.map((c) => c.d + "|" + c.t.slice(0, 40)));
-                  for (const ck of more) { const id = ck.d + "|" + ck.t.slice(0, 40); if (!have.has(id)) { have.add(id); hits.push(ck); } }
-                }
-                const chunkCap = Math.max(6000, (docText ? 12000 : 30000) - kbBlock.length);   // 读者提交文章时站内资料让位；KB 命中时为其留出预算
-                let chunkText = "";
-                for (const ck of hits) {
-                  const d = corpus.docs[ck.d]; if (!d) continue;
-                  if (!seen[d.u]) { seen[d.u] = 1; siteSrcs.push({ u: d.u, t: d.t }); }
-                  chunkText += "【来源：" + d.t + "】\n" + ck.t + "\n\n";
-                  if (chunkText.length > chunkCap) break;
-                }
-                siteCtx = kbBlock + (kbBlock && chunkText ? "\n【补充 · 站内原文片段】\n" : "") + chunkText;
-                siteSrcs = siteSrcs.slice(0, 10);
+                const rr = await fetch(new URL("/api/wds/rag", url), {
+                  method: "POST", headers: { "content-type": "application/json" },
+                  body: JSON.stringify({ q: q, prevQ: prevQ0, exp: expTerms, k: 36, cap: docText ? 12000 : 30000, kbn: docText ? 14 : 24 }),
+                });
+                if (rr.ok) { const jr = await rr.json(); if (jr && jr.ok) { siteCtx = jr.ctx || ""; siteSrcs = jr.srcs || []; } }
               } catch (e) {}
+              if (!siteSrcs.length) controller.enqueue(_sseBytes({ t: "note", v: "站内检索这一问没接上，先据内功、心得与你给的文章作答" }));
             }
             if (siteSrcs.length) controller.enqueue(_sseBytes({ t: "sources", v: siteSrcs })); // 先把站内出处发给前端
             const sys = b.guide ? WDS_DIALOGUE_SYS(reflect, SDEM, siteCtx, docTitle, docText) : WDS_READ_SYS(reflect, SDEM, docTitle, docText);

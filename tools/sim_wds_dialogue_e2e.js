@@ -91,14 +91,12 @@ ok("guide 分流 system（对话指引版 vs 陪读版，含读者文章两参�
 ok("本场心得优先于全站缓存心得（read + read-paper 两处）", W.split("slice(0, 14000)").length >= 3);   // 站内另有智能体亦用 14000
 ok("guide 预算三元式在位（30万减文章/资料，陪读收缩式不变）", W.includes("b.guide ? Math.max(60000, WDS_GUIDE_HIST_BUDGET - docText.length - siteCtx.length)") && W.includes("120000 - docText.length - siteCtx.length"));
 ok("长问放宽仅限 guide（4000 vs 500）", W.includes("b.guide ? 4000 : 500"));
-ok("全站 RAG 加强档（K=36 + 接续补捞 + KB留预算的字数上限 + 来源回传）",
-  W.includes("retrieve(corpus, q, 36, expTerms)") && W.includes("(docText ? 12000 : 30000) - kbBlock.length") && W.includes('{ t: "sources", v: siteSrcs }'));
-ok("与WDS对话 RAG 已接九库（guide 块 retrieveKB 邻域子图优先，chunk 让预算）",
-  W.includes("const kb = await loadKB(env, url)") && W.includes("retrieveKB(kb, corpus, q, expTerms, docText ? 14 : 24)") && W.includes("siteCtx = kbBlock +"));
+ok("全站 RAG 加强档（K=36 + 接续补捞 + KB留预算的字数上限 + 来源回传）", W.includes("RAG_SUBREQUEST") && /k: 36, cap: docText \? 12000 : 30000, kbn: docText \? 14 : 24/.test(W) && W.includes("retrieve(corpus, q, K, expTerms)") && W.includes('t: "sources"'));
+ok("与WDS对话 RAG 已接九库（子请求里 retrieveKB 邻域子图优先，chunk 让预算）", W.includes("retrieveKB(kb, corpus, q, expTerms, kbn)") && W.includes("const chunkCap = Math.max(4000, cap - kbBlock.length)"));
 ok("读者文章走独立首条消息 + 站内资料让位（07-20 修）",
   W.includes('content: "这是我提交给你的文章全文，本场对话就围绕它。') && W.includes("全文我已通读完毕") && !W.includes("【读者提交的文章·全文】"));
-ok("万字论文分部检索（K=12 + KB留预算上限）", W.includes("retrieve(corpus, pq, 12, [])") && W.includes("8000 - kbBlock.length"));
-ok("成文分部亦接九库（part 模式 retrieveKB 供结构化判断）", W.includes("retrieveKB(kb, corpus, pq, [], 18)") && W.includes("partCtx = kbBlock +"));
+ok("万字论文分部检索走子请求（K=12 / cap 8000 / KB 18 / 片段 900）", /k: 12, cap: 8000, kbn: 18, chunk: 900/.test(W));
+ok("成文分部亦接九库（子请求 kbn=18 → retrieveKB）", /kbn: 18/.test(W) && W.includes("retrieveKB(kb, corpus, q, expTerms, kbn)"));
 ok("paperN 夹 3-6，缺省 3 不动陪读", W.includes("Math.max(3, Math.min(6, parseInt(b.paperN, 10) || 3))"));
 ok("配额桶分家＋按 Key 计额度：chat/read/dlg/ask 各一桶（07-20 二修）",
   W.includes("function wdsBucket(kind, ip, key)")
@@ -484,6 +482,11 @@ MODE.planFail = null;
 }
 
 head("[阶段十一] 长思考期间的假流式（心跳 + 活数据）");
+ok("worker：全站检索已拆成独立子请求（自带 CPU 预算，失败不连累答题）",
+  W.includes("RAG_SUBREQUEST") && W.includes('url.pathname === "/api/wds/rag"') && (W.match(/new URL\("\/api\/wds\/rag", url\)/g) || []).length === 2);
+ok("worker：答题里已无内联装语料（loadCorpus 只留在 rag 路由与其它入口）",
+  (() => { const i = W.indexOf('url.pathname === "/api/wds/read"'); const j = W.indexOf("new ReadableStream", i); const k = W.indexOf('url.pathname === "/api/wds/chat"', j); return W.slice(j, k).indexOf("loadCorpus") < 0; })());
+ok("worker：检索没接上时如实告诉读者并照常作答", W.includes("站内检索这一问没接上"));
 ok("worker：答题空转时回报上游实况（状态/流数据条数/结束原因/首帧）", W.includes("ANSWER_DIAG") && W.includes("_diagLine") && /_diag\.finish = String\(j\.choices\[0\]\.finish_reason\)/.test(W));
 ok("worker：答题流末尾发 end 事件（用来区分干净结束与被切断）", /t: "end", v: \{ out:/.test(W));
 ok("客户端：空答时说得出收到了什么（心跳/思考/检索/重答次数）", PAGE.includes("ANSWER_DIAG_UI") && /diag\.beats\+\+/.test(PAGE) && /\\u8fde\\u63a5\\u88ab\\u4e2d\\u9014\\u5207\\u65ad/.test(PAGE));
