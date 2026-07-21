@@ -999,7 +999,9 @@ async function ragScan(env, url, q, expTerms, prevQ, k, chunkLimit, opts) {
   let top = [], bytes = 0, got = 0;
   for (let i = 0; i < cand.length; i++) {
     if (bytes > BYTE_BUDGET) break;
-    if (i > 0 && i % 8 === 0 && got >= WANT) break;               // 每 8 篇回头看一眼：够了就不再下钻
+    // 每 8 篇回头看一眼：命中量已远超所需（选段时只会取其中一小部分）才停止下钻，
+    // 否则宁可多读两篇——实测过早收手会把资料从 8 千字砍到 4 千字。
+    if (i > 0 && i % 8 === 0 && got >= WANT * 3) break;
     const c = cand[i];
     let dj = null;
     try {

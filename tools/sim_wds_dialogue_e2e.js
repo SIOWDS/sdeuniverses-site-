@@ -497,7 +497,7 @@ ok("worker：与WDS对话这条线根本不再整份装载语料（逐片扫描�
 ok("worker：三层按需下钻（L0 版块 → L1 篇 → L2 段），每层各有入口",
   W.includes("TIERED_SCAN") && W.includes("/search/sections.json") && /"\/search\/kw\/" \+ se \+ "\.json"/.test(W) && /\/search\/doc\/" \+ c\.i \+ "\.json/.test(W) && /o\.budget \|\| 3000000/.test(W) && /o\.pick \|\| 16/.test(W));
 ok("worker：三层都能动态扩展（选不出版块→退回；候选太少→加拉版块；材料够了→停止下钻）",
-  /return ragScanShards\(env, url, man, coords/.test(W) && /docScore\.size < Math\.max\(6, PICK_DOCS \/ 2\)/.test(W) && /i % 8 === 0 && got >= WANT/.test(W));
+  /return ragScanShards\(env, url, man, coords/.test(W) && /docScore\.size < Math\.max\(6, PICK_DOCS \/ 2\)/.test(W) && /i % 8 === 0 && got >= WANT \* 3/.test(W));
 ok("worker：小层文件带缓存与 30 秒复验，段层从不缓存",
   /let TIER = \{ at: 0, l0: null, l1: \{\} \}/.test(W) && /now - TIER\.at > CORPUS_TTL/.test(W) && !/TIER\.l2/.test(W));
 ok("worker：全站再无整份装载语料（loadCorpus 已无人调用，五个入口全走轻量检索）",
