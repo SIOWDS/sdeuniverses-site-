@@ -11,6 +11,12 @@
     "html_handling": "auto-trailing-slash",
     "not_found_handling": "404-page"
   },
+  // 自绑定：让 Worker 能给自己发一次「内部请求」（不出边缘、不走公网）。
+  // 用途＝把最吃 CPU 的全站检索拆出去单独跑，它有自己的一份 CPU 预算，
+  // 不再和答题挤在同一个请求里把流掐死。用 fetch(自己的公网地址) 会 522（自请求回环超时）。
+  "services": [
+    { "binding": "SELF", "service": "steep-band-faf5" }
+  ],
   "durable_objects": {
     "bindings": [
       { "name": "COUNTER", "class_name": "VisitCounter" },

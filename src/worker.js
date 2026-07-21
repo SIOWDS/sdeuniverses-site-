@@ -101,6 +101,15 @@ async function wdsFetchMax(VC, KEY, messages, stream) {
   }
   return resp;
 }
+// RAG_SUBREQUEST 的发车口：走 SELF 服务绑定（Worker 内部调用，不出边缘、自带一份 CPU 预算）。
+// 注意：**不能**用 fetch("https://本站/api/wds/rag") ——那是自请求回环，实测直接 522 超时。
+async function wdsRag(env, url, body) {
+  const req = new Request(new URL("/api/wds/rag", url).toString(), {
+    method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body),
+  });
+  if (env.SELF && env.SELF.fetch) return env.SELF.fetch(req);
+  return fetch(req);   // 没配自绑定时的退路（本地/预览环境）
+}
 function wdsTopBody(VC, body) {
   if (VC && VC.top && String(VC.url).indexOf("api.deepseek.com") >= 0) {
     body.thinking = { type: "enabled" };
@@ -1908,10 +1917,7 @@ export default {
                 // 走 /api/wds/rag 子请求：装语料是 CPU 大户，和写作挤在一个请求里会被平台掐死（RAG_SUBREQUEST）
                 try {
                   const pq = (title + " " + (parts[idx].h || "") + " " + points.join(" ")).slice(0, 300);
-                  const rr = await fetch(new URL("/api/wds/rag", url), {
-                    method: "POST", headers: { "content-type": "application/json" },
-                    body: JSON.stringify({ q: pq, k: 12, cap: 8000, kbn: 18, chunk: 900 }),
-                  });
+                  const rr = await wdsRag(env, url, { q: pq, k: 12, cap: 8000, kbn: 18, chunk: 900 });
                   if (rr.ok) { const jr = await rr.json(); if (jr && jr.ok) partCtx = jr.ctx || ""; }
                 } catch (e) {}
               }
@@ -2075,10 +2081,7 @@ export default {
               let prevQ0 = "";
               for (let i = history.length - 1; i >= 0; i--) { const m = history[i]; if (m && m.role !== "wds" && m.text) { prevQ0 = String(m.text).slice(0, 240); break; } }
               try {
-                const rr = await fetch(new URL("/api/wds/rag", url), {
-                  method: "POST", headers: { "content-type": "application/json" },
-                  body: JSON.stringify({ q: q, prevQ: prevQ0, exp: expTerms, k: 36, cap: docText ? 12000 : 30000, kbn: docText ? 14 : 24 }),
-                });
+                const rr = await wdsRag(env, url, { q: q, prevQ: prevQ0, exp: expTerms, k: 36, cap: docText ? 12000 : 30000, kbn: docText ? 14 : 24 });
                 _ragWhy = "HTTP " + rr.status;
                 if (rr.ok) { const jr = await rr.json(); if (jr && jr.ok) { siteCtx = jr.ctx || ""; siteSrcs = jr.srcs || []; _ragWhy = ""; } else _ragWhy = (jr && jr.msg) || "返回不可用"; }
                 else _ragWhy = "HTTP " + rr.status + "：" + (await rr.text()).slice(0, 120);
