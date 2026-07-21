@@ -911,45 +911,96 @@ async function lightRetrieve(env, url, q, expTerms, k, cut, opts) {
   const scan = await ragScan(env, url, q, expTerms || [], "", k, cut || 1600, opts || {});
   return { hits: scan.picked, corpus: { docs: scan.docs, secLabel: scan.secLabel || {}, coords: scan.coords || null } };
 }
+// TIERED_SCAN：分层级、按需下钻的检索（取代"整份装载"，也取代上一版的一次性两段式）。
+//   L0 版块层 sections.json(39KB) → 先定往哪几个版块找；
+//   L1 篇层  kw/<sec>.json(最大 185KB) → 只读选中版块的，定出候选篇目；
+//   L2 段层  doc/<i>.json → 一轮 8 篇地取，够用就停，不够再取下一轮。
+// 每层都能"动态扩展"：选不出版块就放宽到全站篇层；候选篇太少就多拉两个版块；
+// 资料不够长就再下钻一轮。目标是每次问答只读几百 KB，而不是把 60MB 全搬进来。
+let TIER = { at: 0, l0: null, l1: {} };   // 小文件缓存（合计几百 KB，安全）；30 秒复验一次
+async function tierGet(env, url, path, key) {
+  const now = Date.now();
+  if (now - TIER.at > CORPUS_TTL) { TIER = { at: now, l0: null, l1: {} }; }
+  if (key === "l0" && TIER.l0) return TIER.l0;
+  if (key !== "l0" && TIER.l1[key]) return TIER.l1[key];
+  const r = await env.ASSETS.fetch(new Request(new URL(path, url)));
+  if (!r.ok) return null;
+  const j = await r.json();
+  if (key === "l0") TIER.l0 = j; else TIER.l1[key] = j;
+  return j;
+}
+function _scoreKeys(list, baseKeys, exp, prev) {
+  if (!list || !list.length) return 0;
+  let sc = 0;
+  for (const key of baseKeys) if (list.indexOf(key) >= 0) sc += 1;
+  for (const key of exp) if (list.indexOf(key) >= 0) sc += 1.2;
+  for (const key of prev) if (list.indexOf(key) >= 0) sc += 0.4;
+  return sc;
+}
 async function ragScan(env, url, q, expTerms, prevQ, k, chunkLimit, opts) {
   const man = await (await env.ASSETS.fetch(new Request(new URL("/search/manifest.json", url)))).json();
   const coords = await loadCoords(env, url);
   const { baseKeys, exp } = ragKeys(q, expTerms);
   const prev = prevQ && prevQ !== q ? ragKeys(prevQ, []).baseKeys : [];
   const cut = chunkLimit || 1600;
-
-  // —— 第一段：按篇名 + 关键词 + SDE 坐标选篇 ——
-  let kw = null;
-  try { kw = await (await env.ASSETS.fetch(new Request(new URL("/search/keywords.json", url)))).json(); } catch (e) {}
-  if (!kw || !kw.rows) return ragScanShards(env, url, man, coords, baseKeys, exp, prev, k, cut);   // 旧索引：退回逐片扫描
-  const kmap = {};
-  for (const r of kw.rows) kmap[r.i] = r.k || [];
-  const docScore = [];
-  for (const d of man.docs) {
-    const tl = String(d.t || "").toLowerCase();
-    let sc = 0;
-    for (const key of baseKeys) { if (tl.indexOf(key) >= 0) sc += 3; }
-    for (const key of exp) { if (tl.indexOf(key) >= 0) sc += 2; }
-    const ks = kmap[d.i];
-    if (ks && ks.length) {
-      for (const key of baseKeys) if (ks.indexOf(key) >= 0) sc += 1;
-      for (const key of exp) if (ks.indexOf(key) >= 0) sc += 1.2;
-      for (const key of prev) if (ks.indexOf(key) >= 0) sc += 0.4;
-    }
-    if (coords && exp.length) { const dc = coords[d.i]; if (dc) { for (const t of exp) if (dc.has(t)) sc += 1.5; } }
-    if (sc > 0) docScore.push({ i: d.i, sc: sc });
-  }
-  docScore.sort((a, b) => b.sc - a.sc);
   const o = opts || {};
   const PICK_DOCS = Math.max(6, Math.min(64, o.pick || 16));
   const BYTE_BUDGET = Math.max(1000000, Math.min(8000000, o.budget || 3000000));
   const PER_DOC = Math.max(1, Math.min(4, o.perDoc || 2));
-  const chosen = docScore.slice(0, PICK_DOCS);
+  const SEC_FIRST = Math.max(1, Math.min(9, o.sections || 3));
 
-  // —— 第二段：只读选中篇目的块文件，按块打分 ——
-  let top = [], bytes = 0;
-  for (const c of chosen) {
+  // —— L0：先选版块 ——
+  const l0 = await tierGet(env, url, "/search/sections.json", "l0");
+  if (!l0 || !l0.sections) return ragScanShards(env, url, man, coords, baseKeys, exp, prev, k, cut);
+  const titleHit = {};
+  for (const d of man.docs) {
+    const tl = String(d.t || "").toLowerCase();
+    let sc = 0;
+    for (const key of baseKeys) if (tl.indexOf(key) >= 0) sc += 3;
+    for (const key of exp) if (tl.indexOf(key) >= 0) sc += 2;
+    if (sc) titleHit[d.s] = (titleHit[d.s] || 0) + sc;
+  }
+  const secRank = l0.sections
+    .map((se) => ({ s: se.s, sc: _scoreKeys(se.k, baseKeys, exp, prev) * 1.0 + (titleHit[se.s] || 0) * 0.6 }))
+    .sort((a, b) => b.sc - a.sc);
+
+  // —— L1：只读选中版块的篇层；候选太少就动态放宽 ——
+  const docSec = {}; for (const d of man.docs) docSec[d.i] = d.s;
+  const docScore = new Map();
+  const usedSec = [];
+  const takeSection = async (se) => {
+    if (usedSec.indexOf(se) >= 0) return;
+    usedSec.push(se);
+    const l1 = await tierGet(env, url, "/search/kw/" + se + ".json", se);
+    if (!l1 || !l1.rows) return;
+    for (const r of l1.rows) {
+      let sc = _scoreKeys(r.k, baseKeys, exp, prev);
+      const d = man.docs[r.i];
+      if (d) {
+        const tl = String(d.t || "").toLowerCase();
+        for (const key of baseKeys) if (tl.indexOf(key) >= 0) sc += 3;
+        for (const key of exp) if (tl.indexOf(key) >= 0) sc += 2;
+      }
+      if (coords && exp.length) { const dc = coords[r.i]; if (dc) { for (const t of exp) if (dc.has(t)) sc += 1.5; } }
+      if (sc > 0) docScore.set(r.i, sc);
+    }
+  };
+  for (let i = 0; i < SEC_FIRST && i < secRank.length; i++) await takeSection(secRank[i].s);
+  // 动态放宽：候选篇不足就再拉两个版块，最多把全站版块走一遍
+  for (let i = SEC_FIRST; docScore.size < Math.max(6, PICK_DOCS / 2) && i < secRank.length; i += 2) {
+    await takeSection(secRank[i].s);
+    if (secRank[i + 1]) await takeSection(secRank[i + 1].s);
+  }
+  if (!docScore.size) return { picked: [], docs: man.docs, coords: coords, secLabel: _secLabel(man) };
+  const cand = Array.from(docScore.entries()).map(([i, sc]) => ({ i: i, sc: sc })).sort((a, b) => b.sc - a.sc).slice(0, PICK_DOCS);
+
+  // —— L2：一轮 8 篇地下钻，够用就停 ——
+  const WANT = Math.max(4000, Math.min(30000, o.want || 12000));   // 正文材料想凑够多少字符
+  let top = [], bytes = 0, got = 0;
+  for (let i = 0; i < cand.length; i++) {
     if (bytes > BYTE_BUDGET) break;
+    if (i > 0 && i % 8 === 0 && got >= WANT) break;               // 每 8 篇回头看一眼：够了就不再下钻
+    const c = cand[i];
     let dj = null;
     try {
       const r = await env.ASSETS.fetch(new Request(new URL("/search/doc/" + c.i + ".json", url)));
@@ -965,7 +1016,7 @@ async function ragScan(env, url, q, expTerms, prevQ, k, chunkLimit, opts) {
       for (const key of exp) { const n = tl.split(key).length - 1; if (n) sc += n * 1.2; }
       for (const key of prev) { const n = tl.split(key).length - 1; if (n) sc += n * 0.4; }
       if (q && t.indexOf(q) >= 0) sc += 8;
-      if (sc > 0) top.push({ sc: sc + c.sc * 0.2, d: c.i, t: t.length > cut ? t.slice(0, cut) : t });
+      if (sc > 0) { top.push({ sc: sc + c.sc * 0.2, d: c.i, t: t.length > cut ? t.slice(0, cut) : t }); got += Math.min(t.length, cut); }
     }
     dj = null;
   }

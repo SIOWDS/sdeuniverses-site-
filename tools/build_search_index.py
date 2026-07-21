@@ -310,13 +310,46 @@ def _doc_keywords(chunks, topn=64):
         freq[w] = freq.get(w, 0) + 2
     return [k for k, _ in sorted(freq.items(), key=lambda kv: -kv[1])[:topn]]
 
+# TIERED_INDEX：三层索引。检索时按需下钻，每层只读"够用来选下一层"的那点数据：
+#   L0 /search/sections.json —— 版块层（9 个版块各一朵关键词云，几十 KB），先定"往哪个版块找"；
+#   L1 /search/kw/<sec>.json —— 篇层，按版块切开（最大的一份也只有百来 KB），只读选中版块的；
+#   L2 /search/doc/<i>.json  —— 段层，只读最终选中的那十几篇。
+# 旧的 keywords.json 仍然写出，作为"选不出版块"时的兜底与旧版 worker 的退路。
+KW_DIR = os.path.join(OUT, "kw")
+if os.path.isdir(KW_DIR):
+    for f in os.listdir(KW_DIR):
+        if f.endswith(".json"):
+            os.remove(os.path.join(KW_DIR, f))
+os.makedirs(KW_DIR, exist_ok=True)
+
+doc_sec = {d["i"]: d["s"] for d in manifest_docs}
 kw_rows = []
+kw_by_sec = {}
+sec_cloud = {}
 for di, chunks in per_doc.items():
     with open(os.path.join(DOC_DIR, "%d.json" % di), "w", encoding="utf-8") as f:
         json.dump({"i": di, "c": chunks}, f, ensure_ascii=False, separators=(",", ":"))
-    kw_rows.append({"i": di, "k": _doc_keywords(chunks)})
+    ks = _doc_keywords(chunks)
+    row = {"i": di, "k": ks}
+    kw_rows.append(row)
+    sec = doc_sec.get(di, "_root")
+    kw_by_sec.setdefault(sec, []).append(row)
+    cloud = sec_cloud.setdefault(sec, {})
+    for t in ks:
+        cloud[t] = cloud.get(t, 0) + 1
+
 with open(os.path.join(OUT, "keywords.json"), "w", encoding="utf-8") as f:
     json.dump({"rows": kw_rows}, f, ensure_ascii=False, separators=(",", ":"))
+for sec, rows in kw_by_sec.items():
+    with open(os.path.join(KW_DIR, "%s.json" % sec), "w", encoding="utf-8") as f:
+        json.dump({"rows": rows}, f, ensure_ascii=False, separators=(",", ":"))
+# 版块层：每个版块取最能代表它的 600 个词（按"多少篇文章用到"排序），外加篇数，用于第一层选向
+sections_l0 = []
+for sec, cloud in sec_cloud.items():
+    top = sorted(cloud.items(), key=lambda kv: -kv[1])[:600]
+    sections_l0.append({"s": sec, "n": len(kw_by_sec.get(sec, [])), "k": [t for t, _ in top]})
+with open(os.path.join(OUT, "sections.json"), "w", encoding="utf-8") as f:
+    json.dump({"sections": sections_l0}, f, ensure_ascii=False, separators=(",", ":"))
 
 manifest = {
     "built": datetime.datetime.utcnow().isoformat() + "Z",

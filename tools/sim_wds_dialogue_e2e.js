@@ -494,16 +494,26 @@ ok("客户端：空答时说得出收到了什么（心跳/思考/检索/重答�
 ok("客户端：0 字节或流被切断都自动改用不流式重取（并记状态/字节/提示）", PAGE.includes("NOSTREAM_FALLBACK") && PAGE.includes("CUT_FALLBACK") && /else if \(!diag\.bytes \|\| !diag\.sawEnd\)/.test(PAGE) && /diag\.bytes \+=/.test(PAGE) && /r2\.text\(\)/.test(PAGE) && /diag\.lastNote/.test(PAGE));
 ok("worker：与WDS对话这条线根本不再整份装载语料（逐片扫描、扫完就丢）",
   W.includes("RAG_STREAMED_SCAN") && /async function ragScan/.test(W) && /sh = null;/.test(W) && (() => { const i = W.indexOf('url.pathname === "/api/wds/rag"'); const j = W.indexOf("return J({ ok: true", i); return W.slice(i, j).indexOf("loadCorpus") < 0; })());
-ok("worker：两段式轻量检索（先按关键词选篇，再只读选中篇的块文件，带字节预算）",
-  W.includes("LIGHT_TWO_STAGE") && W.includes("/search/keywords.json") && /\/search\/doc\/" \+ c\.i \+ "\.json/.test(W) && /o\.budget \|\| 3000000/.test(W) && /o\.pick \|\| 16/.test(W));
+ok("worker：三层按需下钻（L0 版块 → L1 篇 → L2 段），每层各有入口",
+  W.includes("TIERED_SCAN") && W.includes("/search/sections.json") && /"\/search\/kw\/" \+ se \+ "\.json"/.test(W) && /\/search\/doc\/" \+ c\.i \+ "\.json/.test(W) && /o\.budget \|\| 3000000/.test(W) && /o\.pick \|\| 16/.test(W));
+ok("worker：三层都能动态扩展（选不出版块→退回；候选太少→加拉版块；材料够了→停止下钻）",
+  /return ragScanShards\(env, url, man, coords/.test(W) && /docScore\.size < Math\.max\(6, PICK_DOCS \/ 2\)/.test(W) && /i % 8 === 0 && got >= WANT/.test(W));
+ok("worker：小层文件带缓存与 30 秒复验，段层从不缓存",
+  /let TIER = \{ at: 0, l0: null, l1: \{\} \}/.test(W) && /now - TIER\.at > CORPUS_TTL/.test(W) && !/TIER\.l2/.test(W));
 ok("worker：全站再无整份装载语料（loadCorpus 已无人调用，五个入口全走轻量检索）",
   !/await loadCorpus\(/.test(W) && (W.match(/lightRetrieve\(/g) || []).length >= 6 && !/retrieve\(corpus, q,/.test(W.replace("function retrieve(corpus, q, k, expTerms)", "")));
-ok("worker：轻量索引缺失时退回逐片扫描（限时限片，不开天窗）",
-  /async function ragScanShards/.test(W) && /MS_BUDGET = 4000/.test(W) && /SHARD_BUDGET = 3/.test(W) && /if \(!kw \|\| !kw\.rows\) return ragScanShards/.test(W));
-ok("索引侧产出轻量两件套（每篇块文件 + 关键词表）", (() => {
-  const fs = require("fs"), b = fs.readFileSync(__dirname + "/../tools/build_search_index.py", "utf8");
-  return b.includes("LIGHT_INDEX") && b.includes("keywords.json") && b.includes('DOC_DIR') && fs.existsSync(__dirname + "/../public/search/keywords.json") && fs.existsSync(__dirname + "/../public/search/doc/0.json");
-})());
+ok("worker：分层索引缺失时退回逐片扫描（限时限片，不开天窗）",
+  /async function ragScanShards/.test(W) && /MS_BUDGET = 4000/.test(W) && /SHARD_BUDGET = 3/.test(W) && /if \(!l0 \|\| !l0\.sections\) return ragScanShards/.test(W));
+ok("索引侧产出三层（版块层/篇层按版块切/段层按篇切），且各层都在盘上且够小", (() => {
+  const fs = require("fs"), path = __dirname + "/../public/search/";
+  const b = fs.readFileSync(__dirname + "/../tools/build_search_index.py", "utf8");
+  if (!b.includes("TIERED_INDEX") || !b.includes("sections.json") || !b.includes("KW_DIR")) return false;
+  if (!fs.existsSync(path + "sections.json") || !fs.existsSync(path + "doc/0.json")) return false;
+  const l0 = fs.statSync(path + "sections.json").size;
+  const kw = fs.readdirSync(path + "kw");
+  const maxKw = Math.max(...kw.map((f) => fs.statSync(path + "kw/" + f).size));
+  return l0 < 200000 && kw.length >= 5 && maxKw < 400000;
+})(), "L0 与 L1 分片体量");
 ok("每条流的状态变量都在本流内声明（严格模式裸赋值＝当场瘫）", (() => {
   const marker = "async start(controller)";
   let i = -1, bad = 0, n = 0;
