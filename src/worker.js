@@ -70,6 +70,25 @@ function wdsTopVC(vd) {
   return { url: base.url, model: WDS_TOP_MODEL[vd] || base.model, name: base.name, top: 1 };
 }
 // 给请求体挂上思考模式（仅 DeepSeek 且处于最强档时）
+// 与WDS对话全线口径：一律满功率（reasoning_effort=max）＋一律要最大输出预算。
+// 这里的三档不是限制，是“基底不接受这么大的 max_tokens 时”的自动降档（返回 400 且报的是 max_tokens 相关才降），
+// 保证不会因为一个数字不被接受就整条链断掉。
+const WDS_TOK_MAX = 64000;
+const WDS_TOK_LADDER = [WDS_TOK_MAX, 32000, 12000];
+async function wdsFetchMax(VC, KEY, messages, stream) {
+  let resp = null;
+  for (let i = 0; i < WDS_TOK_LADDER.length; i++) {
+    resp = await fetch(VC.url, {
+      method: "POST",
+      headers: { "content-type": "application/json", authorization: "Bearer " + KEY },
+      body: JSON.stringify(wdsTopBody(VC, { model: VC.model, stream: !!stream, max_tokens: WDS_TOK_LADDER[i], messages })),
+    });
+    if (resp.ok || resp.status !== 400 || i === WDS_TOK_LADDER.length - 1) return resp;
+    let t = ""; try { t = (await resp.clone().text()).slice(0, 300); } catch (e) {}
+    if (!/max[_ ]?tokens|max[_ ]?completion|too large|exceed|out of range|invalid/i.test(t)) return resp;
+  }
+  return resp;
+}
 function wdsTopBody(VC, body) {
   if (VC && VC.top && String(VC.url).indexOf("api.deepseek.com") >= 0) {
     body.thinking = { type: "enabled" };
@@ -1577,7 +1596,7 @@ export default {
         const resp = await fetch(VC.url, {
           method: "POST",
           headers: { "content-type": "application/json", authorization: "Bearer " + userKey },
-          body: JSON.stringify(wdsTopBody(VC, { model: VC.model, stream: false, max_tokens: 24000, messages: [{ role: "system", content: neigong }, { role: "user", content: DIALOGUE_REFLECT_PROMPT }] })),
+          body: JSON.stringify(wdsTopBody(VC, { model: VC.model, stream: false, max_tokens: WDS_TOK_MAX, messages: [{ role: "system", content: neigong }, { role: "user", content: DIALOGUE_REFLECT_PROMPT }] })),
         });
         if (!resp.ok) {
           if (resp.status === 401 || resp.status === 402 || resp.status === 429) return J({ ok: false, code: "bad_key", msg: "你的 Key 用不了（" + resp.status + "）：额度不足或填错了。去 ⚙ 里检查或换一个。" }, 400);
@@ -1660,7 +1679,7 @@ export default {
                 + "② 正文分 " + (PN >= 6 ? "六" : "三") + " 个部分，每部分一个简短小标题 + 充分展开的论证，各部分构成完整论证链（问题的提出 → 逐个核心判断 → 对最强反驳的回应 → 结论与限度），部分之间不重复、层层递进；\n"
                 + "③ 直接从标题写起，不要开场白、不要目录、不要“以下是”之类的话。";
               let upstream;
-              try { upstream = await fetch(VC.url, { method: "POST", headers: { "content-type": "application/json", authorization: "Bearer " + KEY }, body: JSON.stringify(wdsTopBody(VC, { model: VC.model, stream: true, max_tokens: (GD && vd === "deepseek") ? 32000 : 8000, messages: [{ role: "system", content: sys }, { role: "user", content: usr }] })) }); }
+              try { upstream = await fetch(VC.url, { method: "POST", headers: { "content-type": "application/json", authorization: "Bearer " + KEY }, body: JSON.stringify(wdsTopBody(VC, { model: VC.model, stream: true, max_tokens: WDS_TOK_MAX, messages: [{ role: "system", content: sys }, { role: "user", content: usr }] })) }); }
               catch (e) { controller.enqueue(_sseBytes({ t: "error", v: "接不上基底：" + (e && e.message) })); return fin(); }
               if (!upstream.ok) {
                 const errtxt = (await upstream.text()).slice(0, 200);
@@ -1698,7 +1717,7 @@ export default {
                 + "\n用严谨而有锋刃的汉语；不摆空模板、不注水、不写开场白；不要用 #、* 等 markdown 符号，用短小标题与自然段分层。";
               const usr = CTX + "\n\n请写一份这场陪读的总结，约 1200-1600 字，分四节：\n一、我们谈了什么（脉络，不是流水账）\n二、真正推进了的几个判断（逐条列出，每条一句话说清它比常识多走了哪一步）\n三、用 SDE 看这场对话（显露/差异序列/特征纠缠或三大方程，照见读者原来卡在哪、现在站在哪）\n四、还没解决的问题（留给读者继续读、继续想的口子）\n直接从正文写起。";
               let upstream;
-              try { upstream = await fetch(VC.url, { method: "POST", headers: { "content-type": "application/json", authorization: "Bearer " + KEY }, body: JSON.stringify(wdsTopBody(VC, { model: VC.model, stream: true, max_tokens: 3200, messages: [{ role: "system", content: sys }, { role: "user", content: usr }] })) }); }
+              try { upstream = await wdsFetchMax(VC, KEY, [{ role: "system", content: sys }, { role: "user", content: usr }], true); }
               catch (e) { controller.enqueue(_sseBytes({ t: "error", v: "接不上基底：" + (e && e.message) })); return fin(); }
               if (!upstream.ok) {
                 const errtxt = (await upstream.text()).slice(0, 200);
@@ -1737,11 +1756,9 @@ export default {
               const usr = CTX + "\n\n请基于以上：① 拟一个准确、有锋刃的学术论文标题（不要副标题堆砌）；② 选出 " + (PN >= 6 ? "4-6" : "3-5") + " 个『金点子』——这场对话里真正反直觉、可被检验的新判断，各一句；③ 给 " + (PN >= 6 ? "六" : "三") + " 个部分的写作大纲，每部分一个标题和一句主旨，各部分合起来构成完整论证（问题的提出 → " + (PN >= 6 ? "逐个展开核心判断（可多个部分） → 对最强反驳的回应" : "核心论证") + " → 结论与限度），部分之间不重复。\n只输出 JSON、不要任何其他文字：{\"title\":\"标题\",\"points\":[\"金点子1\",\"金点子2\"],\"parts\":[{\"h\":\"部分标题\",\"gist\":\"主旨\"},{\"h\":\"部分标题\",\"gist\":\"主旨\"},{\"h\":\"部分标题\",\"gist\":\"主旨\"}]}";
               // PLAN_ROBUST：满功率思考会把输出预算吃光（只有思考、正文 0 字 → JSON 解析必失败），
               // 所以拟题给足预算；第二次直接卸掉满功率档（拟题是结构活，不需要 max 思考，且非思考档几乎必出 JSON）。
-              const planTok = GD ? 20000 : 2400;
-              const genOnce = async (budget, top) => {
-                const _VC = top === false ? { url: VC.url, model: VC.model, name: VC.name } : VC;   // 去掉 top 即不注入 thinking/max
+              const genOnce = async () => {
                 let upstream;
-                try { upstream = await fetch(_VC.url, { method: "POST", headers: { "content-type": "application/json", authorization: "Bearer " + KEY }, body: JSON.stringify(wdsTopBody(_VC, { model: _VC.model, stream: true, max_tokens: budget || planTok, messages: [{ role: "system", content: sys }, { role: "user", content: usr }] })) }); }
+                try { upstream = await wdsFetchMax(VC, KEY, [{ role: "system", content: sys }, { role: "user", content: usr }], true); }
                 catch (e) { return { err: "接不上基底：" + (e && e.message) }; }
                 if (!upstream.ok) {
                   const errtxt = (await upstream.text()).slice(0, 200);
@@ -1766,13 +1783,13 @@ export default {
               };
               const okPlan = (o) => !!(o && o.title && Array.isArray(o.parts) && o.parts.length);
               const pick = (rr) => { if (!rr.content) return null; const a = looseJSON(rr.content); return okPlan(a) ? a : parsePlanText(rr.content); };
-              let r = await genOnce(planTok, true);
+              let r = await genOnce();
               let jj = pick(r);
               if (!okPlan(jj)) {
                 if (r.err && r.code === "bad_key") { controller.enqueue(_sseBytes({ t: "error", v: r.err, code: r.code })); return fin(); }
                 const why = r.err ? r.err : (r.content ? "输出不是可解析的提纲" : "只出了思考、正文 0 字");
-                controller.enqueue(_sseBytes({ t: "note", v: "拟题第一次没成（" + why + "），换常规档重试…" }));
-                r = await genOnce(GD ? 8000 : 2400, false);   // 第二次：卸掉满功率，保出稿
+                controller.enqueue(_sseBytes({ t: "note", v: "拟题第一次没成（" + why + "），顶格重来一次…" }));
+                r = await genOnce();   // 第二次：同样满功率顶格重来（不降档）
                 jj = pick(r);
                 if (!okPlan(jj)) {
                   const why2 = r.err ? r.err : (r.content ? "基底两次都没给出可解析的提纲（可重试）" : "基底两次都只出了思考、正文 0 字（可重试）");
@@ -1830,10 +1847,10 @@ export default {
               // PART_EMPTY_GUARD：满功率下思考可能吃光预算、流“干净地”结束却一个正文字都没有
               // （这就是读者看到的“小标题下面空白”）。空正文＝失败，服务端就地重跑一次并加大预算；
               // 两次都空才报 code:"empty" 交客户端（客户端据此再退避重试／断点续写）。
-              const _runPart = async (budget) => {
+              const _runPart = async () => {
                 let upstream;
                 try {
-                  upstream = await fetch(VC.url, { method: "POST", headers: { "content-type": "application/json", authorization: "Bearer " + KEY }, body: JSON.stringify(wdsTopBody(VC, { model: VC.model, stream: true, max_tokens: budget, messages: [{ role: "system", content: sys }, { role: "user", content: usr }] })) });
+                  upstream = await wdsFetchMax(VC, KEY, [{ role: "system", content: sys }, { role: "user", content: usr }], true);
                 } catch (e) { return { hard: "接不上基底：" + (e && e.message) }; }
                 if (!upstream.ok) {
                   const errtxt = (await upstream.text()).slice(0, 200);
@@ -1864,11 +1881,11 @@ export default {
                 }
                 return { got: got };
               };
-              let pr = await _runPart(6000);
+              let pr = await _runPart();
               if (pr.hard) { controller.enqueue(_sseBytes({ t: "error", v: pr.hard, code: pr.code })); return fin(); }
               if (!pr.got) {
                 controller.enqueue(_sseBytes({ t: "note", v: "这一段只出了思考、正文 0 字，正在重写…" }));
-                pr = await _runPart(9000);
+                pr = await _runPart();
                 if (pr.hard) { controller.enqueue(_sseBytes({ t: "error", v: pr.hard, code: pr.code })); return fin(); }
                 if (!pr.got) { controller.enqueue(_sseBytes({ t: "error", v: (pr.soft || "这一段只出了思考、正文 0 字") + "（可重试）", code: "empty" })); return fin(); }
               }
@@ -2018,37 +2035,47 @@ export default {
             }
             messages.push(...packReadHistory(history, histBudget, b.guide ? 12000 : 0));
             messages.push({ role: "user", content: focus ? ("我正读到这一句：「" + focus + "」\n\n我的问题：" + q) : q });
-            let upstream;
-            try {
-              upstream = await fetch(VC.url, { method: "POST", headers: { "content-type": "application/json", authorization: "Bearer " + KEY }, body: JSON.stringify(wdsTopBody(VC, { model: VC.model, stream: true, max_tokens: b.guide ? 8000 : 2200, messages })) });
-            } catch (e) {
-              controller.enqueue(_sseBytes({ t: "error", v: "接不上基底：" + (e && e.message) })); return done();
-            }
-            if (!upstream.ok) {
-              const errtxt = (await upstream.text()).slice(0, 300);
-              if (upstream.status === 401 || upstream.status === 402 || upstream.status === 429) { controller.enqueue(_sseBytes({ t: "error", v: "你的 Key 用不了（" + upstream.status + "）：额度不足或填错了。去设置里检查或换一个。", code: "bad_key" })); return done(); }
-              controller.enqueue(_sseBytes({ t: "error", v: "基底返回错误 " + upstream.status + "：" + errtxt })); return done();
-            }
-            const reader = upstream.body.getReader();
-            const dec = new TextDecoder();
-            let buf = "";
-            while (true) {
-              const { done: rdone, value } = await reader.read();
-              if (rdone) break;
-              buf += dec.decode(value, { stream: true });
-              let idx;
-              while ((idx = buf.indexOf("\n")) >= 0) {
-                const line = buf.slice(0, idx).trim();
-                buf = buf.slice(idx + 1);
-                if (!line.startsWith("data:")) continue;
-                const p = line.slice(5).trim();
-                if (p === "[DONE]") continue;
-                let j; try { j = JSON.parse(p); } catch (e) { continue; }
-                if (j.error) { controller.enqueue(_sseBytes({ t: "error", v: j.error.message || "基底流内错误" })); continue; }
-                const d = (j.choices && j.choices[0] && j.choices[0].delta) || {};
-                if (d.reasoning_content) controller.enqueue(_sseBytes({ t: "think", v: d.reasoning_content }));
-                if (d.content) controller.enqueue(_sseBytes({ t: "token", v: d.content }));
+            // ANSWER_EMPTY_GUARD：顶格预算＋满功率下，思考偶尔会把整份预算吃光、正文 0 字。
+            // 不因此设限，而是就地再跑一遍（仍顶格、仍满功率）——限制留给基底，不留给我们自己。
+            const _runAnswer = async () => {
+              let upstream;
+              try { upstream = await wdsFetchMax(VC, KEY, messages, true); }
+              catch (e) { return { hard: "接不上基底：" + (e && e.message) }; }
+              if (!upstream.ok) {
+                const errtxt = (await upstream.text()).slice(0, 300);
+                if (upstream.status === 401 || upstream.status === 402 || upstream.status === 429) return { hard: "你的 Key 用不了（" + upstream.status + "）：额度不足或填错了。去设置里检查或换一个。", code: "bad_key" };
+                return { hard: "基底返回错误 " + upstream.status + "：" + errtxt };
               }
+              const reader = upstream.body.getReader();
+              const dec = new TextDecoder();
+              let buf = "", got = 0;
+              while (true) {
+                const { done: rdone, value } = await reader.read();
+                if (rdone) break;
+                buf += dec.decode(value, { stream: true });
+                let idx;
+                while ((idx = buf.indexOf("\n")) >= 0) {
+                  const line = buf.slice(0, idx).trim();
+                  buf = buf.slice(idx + 1);
+                  if (!line.startsWith("data:")) continue;
+                  const p = line.slice(5).trim();
+                  if (p === "[DONE]") continue;
+                  let j; try { j = JSON.parse(p); } catch (e) { continue; }
+                  if (j.error) { if (got) { controller.enqueue(_sseBytes({ t: "error", v: j.error.message || "基底流内错误" })); return { got: got }; } return { soft: j.error.message || "基底流内错误" }; }
+                  const d = (j.choices && j.choices[0] && j.choices[0].delta) || {};
+                  if (d.reasoning_content) controller.enqueue(_sseBytes({ t: "think", v: d.reasoning_content }));
+                  if (d.content) { got += d.content.length; controller.enqueue(_sseBytes({ t: "token", v: d.content })); }
+                }
+              }
+              return { got: got };
+            };
+            let ar = await _runAnswer();
+            if (ar.hard) { controller.enqueue(_sseBytes({ t: "error", v: ar.hard, code: ar.code })); return done(); }
+            if (!ar.got) {
+              controller.enqueue(_sseBytes({ t: "note", v: "这一答只出了思考、正文 0 字，正在重答…" }));
+              ar = await _runAnswer();
+              if (ar.hard) { controller.enqueue(_sseBytes({ t: "error", v: ar.hard, code: ar.code })); return done(); }
+              if (!ar.got) controller.enqueue(_sseBytes({ t: "error", v: (ar.soft || "基底两次都只出了思考、正文 0 字") + "（可再问一次）", code: "empty" }));
             }
           } catch (e) {
             controller.enqueue(_sseBytes({ t: "error", v: "生成出错：" + (e && e.message) + "（可再问一次）" }));
