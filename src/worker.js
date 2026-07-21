@@ -955,6 +955,30 @@ async function loadInnovationIQ(env, url) {
   } catch (e) {}
   return NEIGONG_IQ || "";
 }
+// PLAN_ROBUST：拟题的兜底解析。满功率思考下模型常把 JSON 写成行文（或只写出半截），
+// looseJSON 一失败整篇论文就没了——先按行文格式捞一遍，捞得到就照样开工。
+function parsePlanText(t) {
+  if (!t) return null;
+  const lines = String(t).split(/\r?\n/).map((x) => x.trim()).filter(Boolean);
+  let title = "";
+  const points = [], parts = [];
+  for (const ln of lines) {
+    let m = ln.match(/^[#*\s]*(?:论文)?(?:标题|题目)\s*[:：]\s*(.+)$/);
+    if (m && !title) { title = m[1].replace(/^[《"']|[》"']$/g, "").trim(); continue; }
+    m = ln.match(/^[#*\s]*(?:金点子|要点|判断)\s*[0-9一二三四五六①②③④⑤⑥]*\s*[:：、.]\s*(.+)$/);
+    if (m) { points.push(m[1].trim()); continue; }
+    m = ln.match(/^[#*\s]*(?:第\s*([0-9一二三四五六])\s*(?:部分|节)|部分\s*([0-9一二三四五六]))\s*[:：、.]?\s*(.+)$/);
+    if (m) {
+      const body = m[3].trim();
+      const sp = body.split(/\s*(?:——|—|--|\||。主旨[:：]?|主旨[:：])\s*/);
+      parts.push({ h: (sp[0] || body).replace(/^[《"']|[》"']$/g, "").trim().slice(0, 80), gist: (sp.slice(1).join("；") || "").slice(0, 200) });
+      continue;
+    }
+  }
+  if (!title) { const c = lines.find((x) => x.length <= 60 && !/[:：]/.test(x)); if (c) title = c.replace(/^[#*\s《"']+|[》"']+$/g, "").trim(); }
+  if (!title || !parts.length) return null;
+  return { title: title.slice(0, 120), points: points.slice(0, 8), parts: parts };
+}
 const REFLECT_PROMPT = "请用你自己的话，写一篇《从发现到发生》的内化心得（约 5000 字，要写透、写充分）：不要复述方法条目，而是把“追问任何事物是如何发生的（而不是如何被发现的）”这套思维方式，用你自己的理解完整内化一遍；并诚实检视你平时回答问题的默认惯性（例如急于给结论、罗列要点、停在表层描述、把现成关系当起点），说明用这套“发生”的眼光重新看，你该在哪里改变。这篇心得只写给你自己看，写完你就完成了一次自我提智。切记：全文用平实现代汉语，绝不出现“显露/差异/纠缠/发生学/SDE”等任何术语标签。";
 // 第一次提智：让基底带着完整内功、亲手写心得；按基底缓存，只写一次，之后所有深度提问复用
 // 心得三级调用：①isolate 内存（零往返，10 分钟）②vault 持久存储（一次生成全站永久共用）③按需生成并回存。
@@ -1711,10 +1735,13 @@ export default {
             try {
               const sys = "你是 SDE 学派的学术编辑，要把一场" + (GD ? "百轮问答" : "陪读对话") + "提炼成一篇约 " + (PN >= 6 ? "一万" : "5000") + " 字学术论文的骨架。" + (GD ? "这篇论文属于《问对WDS》系列——从与 WDS 的对话中练就创新观点、凝成关于 SDE 思想的论文。" : "") + BASE;
               const usr = CTX + "\n\n请基于以上：① 拟一个准确、有锋刃的学术论文标题（不要副标题堆砌）；② 选出 " + (PN >= 6 ? "4-6" : "3-5") + " 个『金点子』——这场对话里真正反直觉、可被检验的新判断，各一句；③ 给 " + (PN >= 6 ? "六" : "三") + " 个部分的写作大纲，每部分一个标题和一句主旨，各部分合起来构成完整论证（问题的提出 → " + (PN >= 6 ? "逐个展开核心判断（可多个部分） → 对最强反驳的回应" : "核心论证") + " → 结论与限度），部分之间不重复。\n只输出 JSON、不要任何其他文字：{\"title\":\"标题\",\"points\":[\"金点子1\",\"金点子2\"],\"parts\":[{\"h\":\"部分标题\",\"gist\":\"主旨\"},{\"h\":\"部分标题\",\"gist\":\"主旨\"},{\"h\":\"部分标题\",\"gist\":\"主旨\"}]}";
-              const planTok = GD ? 8000 : 2400;
-              const genOnce = async () => {
+              // PLAN_ROBUST：满功率思考会把输出预算吃光（只有思考、正文 0 字 → JSON 解析必失败），
+              // 所以拟题给足预算；第二次直接卸掉满功率档（拟题是结构活，不需要 max 思考，且非思考档几乎必出 JSON）。
+              const planTok = GD ? 20000 : 2400;
+              const genOnce = async (budget, top) => {
+                const _VC = top === false ? { url: VC.url, model: VC.model, name: VC.name } : VC;   // 去掉 top 即不注入 thinking/max
                 let upstream;
-                try { upstream = await fetch(VC.url, { method: "POST", headers: { "content-type": "application/json", authorization: "Bearer " + KEY }, body: JSON.stringify(wdsTopBody(VC, { model: VC.model, stream: true, max_tokens: planTok, messages: [{ role: "system", content: sys }, { role: "user", content: usr }] })) }); }
+                try { upstream = await fetch(_VC.url, { method: "POST", headers: { "content-type": "application/json", authorization: "Bearer " + KEY }, body: JSON.stringify(wdsTopBody(_VC, { model: _VC.model, stream: true, max_tokens: budget || planTok, messages: [{ role: "system", content: sys }, { role: "user", content: usr }] })) }); }
                 catch (e) { return { err: "接不上基底：" + (e && e.message) }; }
                 if (!upstream.ok) {
                   const errtxt = (await upstream.text()).slice(0, 200);
@@ -1737,13 +1764,20 @@ export default {
                 }
                 return { content };
               };
-              let r = await genOnce();
-              let jj = r.content ? looseJSON(r.content) : null;
-              if (!(jj && jj.title && Array.isArray(jj.parts) && jj.parts.length)) {
-                if (r.err) { controller.enqueue(_sseBytes({ t: "error", v: r.err, code: r.code })); return fin(); }
-                r = await genOnce();   // 思考模式下 JSON 偶发不达标：服务端自动重试一次
-                jj = r.content ? looseJSON(r.content) : null;
-                if (!(jj && jj.title && Array.isArray(jj.parts) && jj.parts.length)) { controller.enqueue(_sseBytes({ t: "error", v: r.err || "提纲生成失败，请重试。", code: r.code })); return fin(); }
+              const okPlan = (o) => !!(o && o.title && Array.isArray(o.parts) && o.parts.length);
+              const pick = (rr) => { if (!rr.content) return null; const a = looseJSON(rr.content); return okPlan(a) ? a : parsePlanText(rr.content); };
+              let r = await genOnce(planTok, true);
+              let jj = pick(r);
+              if (!okPlan(jj)) {
+                if (r.err && r.code === "bad_key") { controller.enqueue(_sseBytes({ t: "error", v: r.err, code: r.code })); return fin(); }
+                const why = r.err ? r.err : (r.content ? "输出不是可解析的提纲" : "只出了思考、正文 0 字");
+                controller.enqueue(_sseBytes({ t: "note", v: "拟题第一次没成（" + why + "），换常规档重试…" }));
+                r = await genOnce(GD ? 8000 : 2400, false);   // 第二次：卸掉满功率，保出稿
+                jj = pick(r);
+                if (!okPlan(jj)) {
+                  const why2 = r.err ? r.err : (r.content ? "基底两次都没给出可解析的提纲（可重试）" : "基底两次都只出了思考、正文 0 字（可重试）");
+                  controller.enqueue(_sseBytes({ t: "error", v: why2, code: r.code || "plan_fail" })); return fin();
+                }
               }
               controller.enqueue(_sseBytes({ t: "plan", v: { title: jj.title, points: jj.points || [], parts: jj.parts.slice(0, PN), convo: convo.slice(-6000) } }));
             } catch (e) { controller.enqueue(_sseBytes({ t: "error", v: "提纲生成出错：" + (e && e.message) })); }

@@ -196,7 +196,7 @@ global.TextDecoder = class { decode(v) { return Buffer.from(v).toString("utf8");
 
 // —— 后端桩：按 worker 真实语义处理 payload ——
 const calls = [];
-let MODE = { chatFail: null, reflect: "ok", emptyAnswer: false, partFail: null };   // partFail={idx,kind:"503"|"empty",times:n}
+let MODE = { chatFail: null, reflect: "ok", emptyAnswer: false, partFail: null, planFail: null };   // partFail={idx,kind:"503"|"empty",times:n}
 const REFLECT_TEXT = "心得正文".repeat(1300); // ≈5200 字
 function sse(chunks) {
   let i = 0;
@@ -234,6 +234,11 @@ global.fetch = function (url, opt) {
     return Promise.resolve({ ok: true, body: sse(['data: {"t":"token","v":' + JSON.stringify(paper) + '}\n', "data: [DONE]\n"]) });
   }
   if (b.mode === "plan") {
+    if (MODE.planFail && MODE.planFail.times > 0) {
+      MODE.planFail.times--;
+      if (MODE.planFail.kind === "empty") return Promise.resolve({ ok: true, body: sse(['data: {"t":"think","v":"只想不写"}\n', "data: [DONE]\n"]) });
+      return Promise.resolve({ ok: true, body: sse(['data: {"t":"error","v":"基底两次都只出了思考、正文 0 字（可重试）","code":"plan_fail"}\n', "data: [DONE]\n"]) });
+    }
     rec.convoSeen = readConvoText(b.history || [], b.guide ? 300000 : 24000);
     const parts = []; for (let k = 1; k <= 6; k++) parts.push({ h: "第" + k + "部分 · 小标题", gist: "主旨" + k });
     const planObj = { title: "问对WDS：一场百轮对话凝成的论文", points: ["金点子甲", "金点子乙", "金点子丙", "金点子丁"], parts, convo: rec.convoSeen.slice(0, 6000) };
@@ -437,7 +442,38 @@ async function ask(text) { qEl.value = text; goEl.onclick(); await flush(25); }
   ok("续写不重做已完成的部分", calls.filter((c) => c.body.mode === "part" && c.body.idx === 0).length === 1);
   dm9.remove(); MODE.partFail = null;
 
-  console.log("\n=== 汇总：" + pass + " PASS / " + fail + " FAIL / " + warn + " NOTE ===");
+  head("[阶段十] 拟题这一步倒下时（提纲生成失败）");
+ok("worker：拟题预算加大 + 第二次卸掉满功率档", W.includes("PLAN_ROBUST") && W.includes("planTok = GD ? 20000") && /genOnce\(GD \? 8000 : 2400, false\)/.test(W) && W.includes("top === false"));
+ok("worker：JSON 不达标时有行文兜底解析", W.includes("function parsePlanText") && /const pick = \(rr\)/.test(W));
+ok("worker：失败原因分种类回报（0 字 / 不可解析）", W.includes("只出了思考、正文 0 字") && W.includes("输出不是可解析的提纲") && W.includes('"plan_fail"'));
+ok("客户端：拟题失败给「重新拟题再试一次」", PAGE.includes("PLAN_RETRY") && /\\u91cd\\u65b0\\u62df\\u9898\\u518d\\u8bd5\\u4e00\\u6b21/.test(PAGE));
+
+// 行为：拟题连倒两次 → 出重试按钮 → 点它成功 → 整篇写完
+calls.length = 0; MODE.planFail = { kind: "hard", times: 1 };
+papB.onclick(); await flush(200);
+let dmA = findIn(body, ".doc");
+const rbA = findIn(dmA, ".resume");
+ok("拟题失败后出现「重新拟题」按钮", !!rbA && rbA.style.display !== "none" && /重新拟题/.test(rbA.textContent), rbA ? rbA.textContent : "无按钮");
+ok("拟题失败时把真实原因显示出来", /只出了思考、正文 0 字/.test(findIn(dmA, ".doct").textContent));
+MODE.planFail = null; rbA.onclick(); await flush(200);
+let paperA = findIn(dmA, ".doct").textContent;
+ok("点重新拟题后整篇写完", [1, 2, 3, 4, 5, 6].every((k) => paperA.indexOf("第" + k + "部分") >= 0) && paperA.indexOf("生成中断") < 0, paperA.replace(/\s/g, "").length + " 字");
+dmA.remove();
+
+// 抽出 worker 真 parsePlanText 实测：模型把提纲写成行文（而非 JSON）时能不能救回来
+MODE.planFail = null;
+{
+  const pf = new Function(W.match(/function parsePlanText[\s\S]*?\n}\n/)[0] + "; return parsePlanText;")();
+  let txt = "标题：秩序作为路径限定\n金点子1：规范不是先有共识\n金点子2：秩序是路径限定\n";
+  for (let k = 1; k <= 6; k++) txt += "第" + k + "部分：小标题" + k + " —— 主旨" + k + "\n";
+  const got = pf(txt);
+  ok("提纲写成行文也能解析出来（标题+6部分+金点子）",
+    !!got && got.title === "秩序作为路径限定" && got.parts.length === 6 && got.parts[0].h === "小标题1" && got.parts[0].gist === "主旨1" && got.points.length === 2,
+    got ? got.title + " / " + got.parts.length + " 部分" : "解析失败");
+  ok("兜底解析不乱救：空输出与半截输出一律判失败", pf("") === null && pf("标题：只有标题") === null);
+}
+
+console.log("\n=== 汇总：" + pass + " PASS / " + fail + " FAIL / " + warn + " NOTE ===");
   if (fails.length) console.log("失败项：\n - " + fails.join("\n - "));
   process.exit(fail ? 1 : 0);
 })();

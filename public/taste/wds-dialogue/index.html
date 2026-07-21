@@ -527,7 +527,7 @@
     return attempt(0);
   }
   // 拟题也走流式（SSE）：先建立连接，思考在流内进行，末尾一个 {t:"plan"} 事件带回结构化提纲——避免出流前 503。
-  function postPlanStream(body) {
+  function postPlanStream(body, onNote) {
     body.guide = 1; body.paperN = PN; body.docTitle = article.text ? article.title : TITLE; body.docText = article.text || ""; body.history = history; body.reflect = xinde;
     var delays = [2000, 6000, 15000];
     function attempt(n) {
@@ -547,7 +547,7 @@
               if (line.indexOf("data:") !== 0) continue;
               var pp = line.slice(5).trim();
               if (pp === "[DONE]") continue;
-              try { var j = JSON.parse(pp); if (j.t === "plan" && j.v) { plan = { ok: true, title: j.v.title, points: j.v.points || [], parts: j.v.parts || [], convo: j.v.convo || "" }; } else if (j.t === "error") { errMsg = j.v; errCode = j.code || ""; } } catch (e) {}
+              try { var j = JSON.parse(pp); if (j.t === "plan" && j.v) { plan = { ok: true, title: j.v.title, points: j.v.points || [], parts: j.v.parts || [], convo: j.v.convo || "" }; } else if (j.t === "note") { if (onNote) onNote(j.v); } else if (j.t === "error") { errMsg = j.v; errCode = j.code || ""; } } catch (e) {}
             }
             return pump();
           });
@@ -658,14 +658,24 @@
           busy = true; paint(); dm.setText(out);
           try { step().catch(fail); } catch (e2) { fail(e2); }
         });
+      } else if (!PLAN && !(e && e.code === "need_key")) {
+        dm.setResume("\u91cd\u65b0\u62df\u9898\u518d\u8bd5\u4e00\u6b21", function () {
+          busy = true; paint(); dm.setText("");
+          try { plan().catch(fail); } catch (e2) { fail(e2); }
+        });
       }
       if (e && e.code === "need_key") keyPanel(null);
     }
-    postPlanStream({ mode: "plan", key: KV.key, vendor: KV.vendor }).then(function (pl) {
-      if (!pl.ok) throw new Error(pl.msg || "\u63d0\u7eb2\u5931\u8d25");
-      PLAN = pl; dm.setTitle(pl.title);
-      return step();
-    }).catch(fail);
+    // PLAN_RETRY：拟题这一步本身也会倒（满功率思考吃光预算 → 提纲解析失败），倒了同样给一键重试，不必关掉重开
+    function plan() {
+      dm.setProg("\u7b2c 1 \u6b65\uff1a\u62df\u9898\u4e0e\u63d0\u7eb2\u2026");
+      return postPlanStream({ mode: "plan", key: KV.key, vendor: KV.vendor }, function (n) { dm.setProg(n); }).then(function (pl) {
+        if (!pl.ok) { var er = new Error(pl.msg || "\u63d0\u7eb2\u5931\u8d25"); er.code = pl.code; throw er; }
+        PLAN = pl; dm.setTitle(pl.title);
+        return step();
+      });
+    }
+    plan().catch(fail);
   };
 
   // —— 输入与抽屉 ——
