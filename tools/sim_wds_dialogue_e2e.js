@@ -219,6 +219,12 @@ global.fetch = function (url, opt) {
       "data: [DONE]\n",
     ]) });
   }
+  if (b.mode === "full") {
+    rec.convoSeen = readConvoText(b.history || [], b.guide ? 300000 : 24000);
+    let paper = "先修门框：论X的节律优先性\n";
+    for (let k = 1; k <= 6; k++) paper += "第" + k + "部分 · 小标题\n" + "正文".repeat(800) + "\n\n";
+    return Promise.resolve({ ok: true, body: sse(['data: {"t":"token","v":' + JSON.stringify(paper) + '}\n', "data: [DONE]\n"]) });
+  }
   if (b.mode === "plan") {
     rec.convoSeen = readConvoText(b.history || [], b.guide ? 300000 : 24000);
     const parts = []; for (let k = 1; k <= 6; k++) parts.push({ h: "第" + k + "部分 · 小标题", gist: "主旨" + k });
@@ -293,11 +299,12 @@ async function ask(text) { qEl.value = text; goEl.onclick(); await flush(25); }
   dm.remove();
 
   papB.onclick(); await flush(120);
+  const fullCalls = calls.filter((c) => c.body.mode === "full");
   const plan = calls.filter((c) => c.body.mode === "plan");
   const parts = calls.filter((c) => c.body.mode === "part");
-  ok("拟题一次 + 六部分逐段（共七步）", plan.length === 1 && parts.length === 6, "plan " + plan.length + " / part " + parts.length);
-  ok("拟题亦吃全场原文", plan[0].convoSeen.length > 180000 && plan[0].convoSeen.indexOf("第一问：什么是发生学") >= 0);
-  ok("每部分带 idx / 上一节摘要防重复 / 心得", parts.every((c, i) => c.body.idx === i && (c.body.reflect || "").length >= 4000) && parts.slice(1).every((c) => (c.body.prevBrief || "").length > 0));
+  ok("成文走单趟流式（mode full，不再拆多趟）", fullCalls.length === 1 && plan.length === 0 && parts.length === 0, "full " + fullCalls.length + " / plan " + plan.length + " / part " + parts.length);
+  ok("成文吃全场原文（非末段摘要）", fullCalls[0].convoSeen.length > 180000 && fullCalls[0].convoSeen.indexOf("第一问：什么是发生学") >= 0);
+  ok("成文带 guide 与本场心得", fullCalls[0].body.guide === 1 && (fullCalls[0].body.reflect || "").length >= 4000);
   dm = findIn(body, ".doc");
   const paper = findIn(dm, ".doct").textContent;
   ok("成稿约一万字", paper.replace(/\s/g, "").length >= 9000, paper.replace(/\s/g, "").length + " 字");
