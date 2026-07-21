@@ -2071,6 +2071,7 @@ export default {
             let siteCtx = "", siteSrcs = [];
             if (b.guide) {
               let expTerms = []; try { expTerms = await sdeExpandQuery(VC, KEY, q); } catch (e) {}
+              let _ragWhy = "";
               let prevQ0 = "";
               for (let i = history.length - 1; i >= 0; i--) { const m = history[i]; if (m && m.role !== "wds" && m.text) { prevQ0 = String(m.text).slice(0, 240); break; } }
               try {
@@ -2078,9 +2079,11 @@ export default {
                   method: "POST", headers: { "content-type": "application/json" },
                   body: JSON.stringify({ q: q, prevQ: prevQ0, exp: expTerms, k: 36, cap: docText ? 12000 : 30000, kbn: docText ? 14 : 24 }),
                 });
-                if (rr.ok) { const jr = await rr.json(); if (jr && jr.ok) { siteCtx = jr.ctx || ""; siteSrcs = jr.srcs || []; } }
-              } catch (e) {}
-              if (!siteSrcs.length) controller.enqueue(_sseBytes({ t: "note", v: "站内检索这一问没接上，先据内功、心得与你给的文章作答" }));
+                _ragWhy = "HTTP " + rr.status;
+                if (rr.ok) { const jr = await rr.json(); if (jr && jr.ok) { siteCtx = jr.ctx || ""; siteSrcs = jr.srcs || []; _ragWhy = ""; } else _ragWhy = (jr && jr.msg) || "返回不可用"; }
+                else _ragWhy = "HTTP " + rr.status + "：" + (await rr.text()).slice(0, 120);
+              } catch (e) { _ragWhy = "子请求异常：" + (e && e.message); }
+              if (!siteSrcs.length) controller.enqueue(_sseBytes({ t: "note", v: "站内检索这一问没接上（" + (_ragWhy || "无命中") + "），先据内功、心得与你给的文章作答" }));
             }
             if (siteSrcs.length) controller.enqueue(_sseBytes({ t: "sources", v: siteSrcs })); // 先把站内出处发给前端
             const sys = b.guide ? WDS_DIALOGUE_SYS(reflect, SDEM, siteCtx, docTitle, docText) : WDS_READ_SYS(reflect, SDEM, docTitle, docText);
