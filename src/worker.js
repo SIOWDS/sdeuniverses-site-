@@ -1781,35 +1781,50 @@ export default {
                 + "【对话依据】" + convoBrief + "\n"
                 + (prevBrief ? ("【前文已写·摘要】" + prevBrief + "\n") : "")
                 + "\n现在写【" + parts[idx].h + "】这一部分（主旨：" + (parts[idx].gist || "") + "），约 1700-1900 字。直接从正文写起，不要开场白，不要复述论文标题，不要与前文重复。";
-              let upstream;
-              try {
-                upstream = await fetch(VC.url, { method: "POST", headers: { "content-type": "application/json", authorization: "Bearer " + KEY }, body: JSON.stringify(wdsTopBody(VC, { model: VC.model, stream: true, max_tokens: 3600, messages: [{ role: "system", content: sys }, { role: "user", content: usr }] })) });
-              } catch (e) { controller.enqueue(_sseBytes({ t: "error", v: "接不上基底：" + (e && e.message) })); return fin(); }
-              if (!upstream.ok) {
-                const errtxt = (await upstream.text()).slice(0, 200);
-                if (upstream.status === 401 || upstream.status === 402 || upstream.status === 429) { controller.enqueue(_sseBytes({ t: "error", v: "你的 Key 用不了（" + upstream.status + "）：额度不足或填错了。", code: "bad_key" })); return fin(); }
-                controller.enqueue(_sseBytes({ t: "error", v: "基底返回错误 " + upstream.status + "：" + errtxt })); return fin();
-              }
-              const reader = upstream.body.getReader();
-              const dec = new TextDecoder();
-              let buf = "";
-              while (true) {
-                const { done: rdone, value } = await reader.read();
-                if (rdone) break;
-                buf += dec.decode(value, { stream: true });
-                let li;
-                while ((li = buf.indexOf("\n")) >= 0) {
-                  const line = buf.slice(0, li).trim();
-                  buf = buf.slice(li + 1);
-                  if (!line.startsWith("data:")) continue;
-                  const p = line.slice(5).trim();
-                  if (p === "[DONE]") continue;
-                  let j; try { j = JSON.parse(p); } catch (e) { continue; }
-                  if (j.error) { controller.enqueue(_sseBytes({ t: "error", v: j.error.message || "基底流内错误" })); continue; }
-                  const d = (j.choices && j.choices[0] && j.choices[0].delta) || {};
-                  if (d.reasoning_content) controller.enqueue(_sseBytes({ t: "think", v: d.reasoning_content }));
-                  if (d.content) controller.enqueue(_sseBytes({ t: "token", v: d.content }));
+              // PART_EMPTY_GUARD：满功率下思考可能吃光预算、流“干净地”结束却一个正文字都没有
+              // （这就是读者看到的“小标题下面空白”）。空正文＝失败，服务端就地重跑一次并加大预算；
+              // 两次都空才报 code:"empty" 交客户端（客户端据此再退避重试／断点续写）。
+              const _runPart = async (budget) => {
+                let upstream;
+                try {
+                  upstream = await fetch(VC.url, { method: "POST", headers: { "content-type": "application/json", authorization: "Bearer " + KEY }, body: JSON.stringify(wdsTopBody(VC, { model: VC.model, stream: true, max_tokens: budget, messages: [{ role: "system", content: sys }, { role: "user", content: usr }] })) });
+                } catch (e) { return { hard: "接不上基底：" + (e && e.message) }; }
+                if (!upstream.ok) {
+                  const errtxt = (await upstream.text()).slice(0, 200);
+                  if (upstream.status === 401 || upstream.status === 402 || upstream.status === 429) return { hard: "你的 Key 用不了（" + upstream.status + "）：额度不足或填错了。", code: "bad_key" };
+                  if (upstream.status >= 500) return { soft: "基底返回错误 " + upstream.status + "：" + errtxt };
+                  return { hard: "基底返回错误 " + upstream.status + "：" + errtxt };
                 }
+                const reader = upstream.body.getReader();
+                const dec = new TextDecoder();
+                let buf = "", got = 0;
+                while (true) {
+                  const { done: rdone, value } = await reader.read();
+                  if (rdone) break;
+                  buf += dec.decode(value, { stream: true });
+                  let li;
+                  while ((li = buf.indexOf("\n")) >= 0) {
+                    const line = buf.slice(0, li).trim();
+                    buf = buf.slice(li + 1);
+                    if (!line.startsWith("data:")) continue;
+                    const p = line.slice(5).trim();
+                    if (p === "[DONE]") continue;
+                    let j; try { j = JSON.parse(p); } catch (e) { continue; }
+                    if (j.error) { if (got) { controller.enqueue(_sseBytes({ t: "error", v: j.error.message || "基底流内错误" })); return { got: got }; } return { soft: j.error.message || "基底流内错误" }; }
+                    const d = (j.choices && j.choices[0] && j.choices[0].delta) || {};
+                    if (d.reasoning_content) controller.enqueue(_sseBytes({ t: "think", v: d.reasoning_content }));
+                    if (d.content) { got += d.content.length; controller.enqueue(_sseBytes({ t: "token", v: d.content })); }
+                  }
+                }
+                return { got: got };
+              };
+              let pr = await _runPart(6000);
+              if (pr.hard) { controller.enqueue(_sseBytes({ t: "error", v: pr.hard, code: pr.code })); return fin(); }
+              if (!pr.got) {
+                controller.enqueue(_sseBytes({ t: "note", v: "这一段只出了思考、正文 0 字，正在重写…" }));
+                pr = await _runPart(9000);
+                if (pr.hard) { controller.enqueue(_sseBytes({ t: "error", v: pr.hard, code: pr.code })); return fin(); }
+                if (!pr.got) { controller.enqueue(_sseBytes({ t: "error", v: (pr.soft || "这一段只出了思考、正文 0 字") + "（可重试）", code: "empty" })); return fin(); }
               }
             } catch (e) {
               controller.enqueue(_sseBytes({ t: "error", v: "本部分生成出错：" + (e && e.message) + "（可重试）" }));

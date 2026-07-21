@@ -188,7 +188,7 @@ global.TextDecoder = class { decode(v) { return Buffer.from(v).toString("utf8");
 
 // —— 后端桩：按 worker 真实语义处理 payload ——
 const calls = [];
-let MODE = { chatFail: null, reflect: "ok", emptyAnswer: false };
+let MODE = { chatFail: null, reflect: "ok", emptyAnswer: false, partFail: null };   // partFail={idx,kind:"503"|"empty",times:n}
 const REFLECT_TEXT = "心得正文".repeat(1300); // ≈5200 字
 function sse(chunks) {
   let i = 0;
@@ -231,7 +231,15 @@ global.fetch = function (url, opt) {
     const planObj = { title: "问对WDS：一场百轮对话凝成的论文", points: ["金点子甲", "金点子乙", "金点子丙", "金点子丁"], parts, convo: rec.convoSeen.slice(0, 6000) };
     return Promise.resolve({ ok: true, body: sse(['data: {"t":"plan","v":' + JSON.stringify(planObj) + '}\n', "data: [DONE]\n"]) });
   }
-  if (b.mode === "part") return Promise.resolve({ ok: true, body: sse(['data: {"t":"token","v":"' + "正文".repeat(900) + '"}\n', "data: [DONE]\n"]) });
+  if (b.mode === "part") {
+    const pf = MODE.partFail;
+    if (pf && pf.idx === b.idx && pf.times > 0) {
+      pf.times--;
+      if (pf.kind === "503") return Promise.resolve({ ok: false, status: 503, body: null });
+      return Promise.resolve({ ok: true, body: sse(['data: {"t":"think","v":"只想不写"}\n', "data: [DONE]\n"]) });   // 0 字：只有思考
+    }
+    return Promise.resolve({ ok: true, body: sse(['data: {"t":"token","v":"' + "正文".repeat(900) + '"}\n', "data: [DONE]\n"]) });
+  }
   if (b.mode === "summary") {
     rec.convoSeen = readConvoText(b.history || [], b.guide ? 300000 : 24000);
     return Promise.resolve({ ok: true, body: sse(['data: {"t":"token","v":"' + "总结正文".repeat(350) + '"}\n', "data: [DONE]\n"]) });
@@ -376,6 +384,50 @@ async function ask(text) { qEl.value = text; goEl.onclick(); await flush(25); }
   const t100 = sysApprox + last.packed.reduce((s, m) => s + m.content.length, 0);
   note("首轮单次入参约 " + Math.round(t1 / 1000) + "k 字符；第 100 轮约 " + Math.round(t100 / 1000) + "k 字符（用户自己的 Key）");
   note("整场累计入参粗估 " + Math.round((t1 + t100) / 2 * 100 / 10000) / 100 + " 万×100 轮量级，DeepSeek 前缀缓存可摊薄稳定前缀部分");
+
+  head("[阶段九] 论文中断的三道防线（503 退避 / 0 字重试 / 断点续写）");
+  const W9 = W, P9 = PAGE;
+  ok("worker：part 空正文守卫 + 加大预算重跑一次", W9.includes("PART_EMPTY_GUARD") && W9.includes("_runPart(6000)") && W9.includes("_runPart(9000)") && W9.includes('code: "empty"'));
+  ok("worker：part 上游 5xx 归为可重试（soft）而非硬错", /if \(upstream\.status >= 500\) return \{ soft:/.test(W9));
+  ok("客户端：退避加长为 2s/6s/15s（plan 与 part 同档）", (P9.match(/delays = \[2000, 6000, 15000\]/g) || []).length >= 2);
+  ok("客户端：0 字视为失败并重试（needText）", P9.includes("needText") && /e0\.retryable = 1/.test(P9));
+  ok("客户端：断点续写按钮存在", P9.includes("PAPER_RESUME") && P9.includes("setResume"));
+
+  // 行为①：第 3 部分连撞两次 503，第三次成功 → 全篇仍然写完，不留断口
+  calls.length = 0; MODE.partFail = { idx: 2, kind: "503", times: 2 };
+  papB.onclick(); await flush(200);
+  let dm9 = findIn(body, ".doc");
+  let paper9 = findIn(dm9, ".doct").textContent;
+  ok("503 退避重试后整篇写完（六节齐全、无中断字样）",
+    [1, 2, 3, 4, 5, 6].every((k) => paper9.indexOf("第" + k + "部分") >= 0) && paper9.indexOf("生成中断") < 0,
+    paper9.replace(/\s/g, "").length + " 字");
+  ok("同一部分因 503 重发了 3 次", calls.filter((c) => c.body.mode === "part" && c.body.idx === 2).length === 3);
+  dm9.remove();
+
+  // 行为②：第 2 部分先出 0 字 → 客户端重试，标题下不再留空白
+  calls.length = 0; MODE.partFail = { idx: 1, kind: "empty", times: 1 };
+  papB.onclick(); await flush(200);
+  dm9 = findIn(body, ".doc");
+  paper9 = findIn(dm9, ".doct").textContent;
+  const seg = paper9.split("第2部分 · 小标题")[1] || "";
+  ok("0 字被判为失败并重写，小标题下有正文", seg.replace(/\s/g, "").length > 500, "该节 " + seg.replace(/\s/g, "").length + " 字");
+  dm9.remove();
+
+  // 行为③：第 4 部分持续 503 → 出现「从第 4 部分继续」，点它接着写完
+  calls.length = 0; MODE.partFail = { idx: 3, kind: "503", times: 99 };
+  papB.onclick(); await flush(200);
+  dm9 = findIn(body, ".doc");
+  const rb = findIn(dm9, ".resume");
+  ok("中断后出现断点续写按钮，且标明部分序号", !!rb && rb.style.display !== "none" && /从第 4 部分继续/.test(rb.textContent), rb ? rb.textContent : "无按钮");
+  ok("中断时前 3 部分不丢", [1, 2, 3].every((k) => findIn(dm9, ".doct").textContent.indexOf("第" + k + "部分") >= 0));
+  const planN = calls.filter((c) => c.body.mode === "plan").length;
+  MODE.partFail = null; rb.onclick(); await flush(200);
+  paper9 = findIn(dm9, ".doct").textContent;
+  ok("点继续后从第 4 部分接着写完，且不重新拟题",
+    [1, 2, 3, 4, 5, 6].every((k) => paper9.indexOf("第" + k + "部分") >= 0) && paper9.indexOf("生成中断") < 0 && calls.filter((c) => c.body.mode === "plan").length === planN,
+    paper9.replace(/\s/g, "").length + " 字");
+  ok("续写不重做已完成的部分", calls.filter((c) => c.body.mode === "part" && c.body.idx === 0).length === 1);
+  dm9.remove(); MODE.partFail = null;
 
   console.log("\n=== 汇总：" + pass + " PASS / " + fail + " FAIL / " + warn + " NOTE ===");
   if (fails.length) console.log("失败项：\n - " + fails.join("\n - "));

@@ -33,3 +33,10 @@
 
 /wds-glow.css
   Cache-Control: no-cache
+
+# 与WDS对话：这台智能体在高频迭代，页面本体不能被浏览器/边缘缓存住
+# （否则读者手里跑的是旧版，昨天修掉的毛病今天照样发作）。
+/taste/wds-dialogue/
+  Cache-Control: no-cache
+/taste/wds-dialogue/index.html
+  Cache-Control: no-cache

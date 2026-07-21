@@ -484,9 +484,10 @@
     return attempt(0);
   }
   // 分部写作走流式（SSE）：先建立连接再逐字收——避免“出流前”被平台上限杀掉而 503；出流前的偶发 5xx 仍退避重试。
-  function postStream(body, onToken) {
+  function postStream(body, onToken, needText) {
     body.guide = 1; body.paperN = PN; body.docTitle = article.text ? article.title : TITLE; body.docText = article.text || ""; body.history = history; body.reflect = xinde;
-    var delays = [1500, 4000];
+    // 退避加长（平台 503 常连着来，1.5s/4s 太短，三次全撞在同一阵抖动里）；needText=1 时“0 字”也算失败
+    var delays = [2000, 6000, 15000];
     function attempt(n) {
       return fetch(PAPER, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) }).then(function (r) {
         if (!r.ok || !r.body) {
@@ -496,7 +497,11 @@
         var reader = r.body.getReader(), dec = new TextDecoder(), buf = "", text = "", errMsg = "", errCode = "";
         function pump() {
           return reader.read().then(function (res) {
-            if (res.done) { if (errMsg && !text) { var er = new Error(errMsg); er.code = errCode; throw er; } return text; }
+            if (res.done) {
+              if (errMsg && !text) { var er = new Error(errMsg); er.code = errCode; throw er; }
+              if (needText && !text.replace(/\s/g, "")) { var e0 = new Error("\u6b63\u6587 0 \u5b57"); e0.retryable = 1; throw e0; }
+              return text;
+            }
             buf += dec.decode(res.value, { stream: true });
             var idx2;
             while ((idx2 = buf.indexOf("\n")) >= 0) {
@@ -509,7 +514,11 @@
             return pump();
           });
         }
-        return pump();
+        return pump().catch(function (e) {
+          var soft = e && (e.retryable || e.code === "empty");
+          if (soft && n < delays.length) return new Promise(function (res) { setTimeout(res, delays[n]); }).then(function () { return attempt(n + 1); });
+          throw e;
+        });
       }, function (e) {
         if (n < delays.length) return new Promise(function (res) { setTimeout(res, delays[n]); }).then(function () { return attempt(n + 1); });
         throw e;
@@ -520,7 +529,7 @@
   // 拟题也走流式（SSE）：先建立连接，思考在流内进行，末尾一个 {t:"plan"} 事件带回结构化提纲——避免出流前 503。
   function postPlanStream(body) {
     body.guide = 1; body.paperN = PN; body.docTitle = article.text ? article.title : TITLE; body.docText = article.text || ""; body.history = history; body.reflect = xinde;
-    var delays = [1500, 4000];
+    var delays = [2000, 6000, 15000];
     function attempt(n) {
       return fetch(PAPER, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) }).then(function (r) {
         if (!r.ok || !r.body) {
@@ -555,7 +564,7 @@
     var m = el("div", "veil doc");
     m.innerHTML = "<div class='box'><div class='boxh'><b class='dt'></b><button class='boxx'>\u00d7</button></div>"
       + "<div class='boxb'><div class='doct'></div></div>"
-      + "<div class='boxf'><span class='prog'></span><button class='tbtn copy'>\u590d\u5236\u5168\u6587</button><button class='tbtn gold pdf'>\u5bfc\u51fa PDF</button></div></div>";
+      + "<div class='boxf'><span class='prog'></span><button class='tbtn resume' style='display:none'></button><button class='tbtn copy'>\u590d\u5236\u5168\u6587</button><button class='tbtn gold pdf'>\u5bfc\u51fa PDF</button></div></div>";
     document.body.appendChild(m);
     var tE = $(".dt", m), bE = $(".doct", m), pE = $(".prog", m);
     tE.textContent = title;
@@ -566,7 +575,16 @@
       try { navigator.clipboard.writeText(tE.textContent + "\n\n" + bE.textContent); pE.textContent = "\u5df2\u590d\u5236"; } catch (e) {}
     };
     $(".pdf", m).onclick = function () { exportPDF(tE.textContent, bE.textContent, kind); };
-    return { setText: function (t) { bE.textContent = t; }, setTitle: function (t) { tE.textContent = t; }, setProg: function (t) { pE.textContent = t || ""; }, close: close };
+    var rE = $(".resume", m);
+    return {
+      setText: function (t) { bE.textContent = t; }, setTitle: function (t) { tE.textContent = t; }, setProg: function (t) { pE.textContent = t || ""; }, close: close,
+      // PAPER_RESUME：中断后不必从头重来——留一个“从第 N 部分继续”的按钮，已写好的部分与提纲都在
+      setResume: function (label, fn) {
+        if (!fn) { rE.style.display = "none"; rE.onclick = null; return; }
+        rE.textContent = label; rE.style.display = "";
+        rE.onclick = function () { rE.style.display = "none"; rE.onclick = null; fn(); };
+      },
+    };
   }
   function exportPDF(title, body, kind) {
     var w = window.open("", "_blank");
@@ -610,34 +628,44 @@
       .catch(function (e) { busy = false; paint(); dm.setProg(""); dm.setTitle("\u6ca1\u80fd\u751f\u6210"); dm.setText("\u751f\u6210\u51fa\u9519\uff1a" + (e && e.message)); if (e && e.code === "need_key") keyPanel(null); });
   };
   papB.onclick = function () {
-    var kv = needKey(function (ok) { if (ok) papB.onclick(); }); if (!kv) return;
+    var KV = needKey(function (ok) { if (ok) papB.onclick(); }); if (!KV) return;
     busy = true; paint();
     var dm = docModal("\u6b63\u5728\u51dd\u6210\u300a\u95ee\u5bf9WDS\u300b\u2026", "paper");
     dm.setProg("\u7b2c 1 \u6b65\uff1a\u62df\u9898\u4e0e\u63d0\u7eb2\u2026");
-    var out = "", prev = "", i = 0;
-    postPlanStream({ mode: "plan", key: kv.key, vendor: kv.vendor }).then(function (pl) {
-      if (!pl.ok) throw new Error(pl.msg || "\u63d0\u7eb2\u5931\u8d25");
-      dm.setTitle(pl.title);
-      function step() {
-        if (i >= pl.parts.length) {
-          busy = false; paint(); dm.setProg("\u5171 " + out.replace(/\s/g, "").length + " \u5b57 \u00b7 \u53ef\u590d\u5236\u6216\u5bfc\u51fa PDF");
-          return;
-        }
-        dm.setProg("\u7b2c " + (i + 2) + " \u6b65 / \u5171 " + (pl.parts.length + 1) + " \u6b65\uff1a\u6b63\u5728\u5199\u3010" + pl.parts[i].h + "\u3011\u2026");
-        var base = out ? (out + "\n\n") : "", head = pl.parts[i].h + "\n";
-        return postStream({ mode: "part", idx: i, title: pl.title, points: pl.points, parts: pl.parts, convo: pl.convo, prevBrief: prev.slice(-1400), key: kv.key, vendor: kv.vendor }, function (partial) { dm.setText(base + head + partial); })
-          .then(function (text) {
-            out = base + head + text;
-            prev = text; i++;
-            dm.setText(out);
-            return step();
-          });
+    var out = "", prev = "", i = 0, PLAN = null;
+    function step() {
+      var pl = PLAN;
+      if (i >= pl.parts.length) {
+        busy = false; paint(); dm.setResume(null, null);
+        dm.setProg("\u5171 " + out.replace(/\s/g, "").length + " \u5b57 \u00b7 \u53ef\u590d\u5236\u6216\u5bfc\u51fa PDF");
+        return;
       }
-      return step();
-    }).catch(function (e) {
+      dm.setProg("\u7b2c " + (i + 2) + " \u6b65 / \u5171 " + (pl.parts.length + 1) + " \u6b65\uff1a\u6b63\u5728\u5199\u3010" + pl.parts[i].h + "\u3011\u2026");
+      var base = out ? (out + "\n\n") : "", head = pl.parts[i].h + "\n";
+      return postStream({ mode: "part", idx: i, title: pl.title, points: pl.points, parts: pl.parts, convo: pl.convo, prevBrief: prev.slice(-1400), key: KV.key, vendor: KV.vendor }, function (partial) { dm.setText(base + head + partial); }, 1)
+        .then(function (text) {
+          out = base + head + text;
+          prev = text; i++;
+          dm.setText(out);
+          return step();
+        });
+    }
+    function fail(e) {
       busy = false; paint(); dm.setProg("");
-      dm.setText(out + (out ? "\n\n" : "") + "\u3010\u751f\u6210\u4e2d\u65ad\uff1a" + (e && e.message) + "\u3002\u5df2\u5199\u597d\u7684\u90e8\u5206\u4ecd\u53ef\u590d\u5236\u6216\u5bfc\u51fa\uff0c\u4e5f\u53ef\u5173\u6389\u91cd\u8bd5\u3002\u3011");
-    });
+      dm.setText(out + (out ? "\n\n" : "") + "\u3010\u751f\u6210\u4e2d\u65ad\uff1a" + (e && e.message) + "\u3002\u5df2\u5199\u597d\u7684\u90e8\u5206\u4ecd\u53ef\u590d\u5236\u6216\u5bfc\u51fa\u3002\u3011");
+      if (PLAN && i < PLAN.parts.length) {
+        dm.setResume("\u4ece\u7b2c " + (i + 1) + " \u90e8\u5206\u7ee7\u7eed", function () {
+          busy = true; paint(); dm.setText(out);
+          try { step().catch(fail); } catch (e2) { fail(e2); }
+        });
+      }
+      if (e && e.code === "need_key") keyPanel(null);
+    }
+    postPlanStream({ mode: "plan", key: KV.key, vendor: KV.vendor }).then(function (pl) {
+      if (!pl.ok) throw new Error(pl.msg || "\u63d0\u7eb2\u5931\u8d25");
+      PLAN = pl; dm.setTitle(pl.title);
+      return step();
+    }).catch(fail);
   };
 
   // —— 输入与抽屉 ——
