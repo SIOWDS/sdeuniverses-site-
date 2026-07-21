@@ -484,6 +484,19 @@ MODE.planFail = null;
 }
 
 head("[阶段十一] 长思考期间的假流式（心跳 + 活数据）");
+ok("每条流的状态变量都在本流内声明（严格模式裸赋值＝当场瘫）", (() => {
+  const marker = "async start(controller)";
+  let i = -1, bad = 0, n = 0;
+  while ((i = W.indexOf(marker, i + 1)) >= 0) {
+    const next = W.indexOf(marker, i + 1);
+    const chunk = W.slice(i, next < 0 ? W.length : next); n++;
+    for (const v of ["_st", "_hb"]) {
+      if (!new RegExp("\\b" + v + "\\b").test(chunk)) continue;
+      if (!new RegExp("(?:let|const|var)[^;\\n]*\\b" + v + "\\b").test(chunk)) bad++;
+    }
+  }
+  return n >= 6 && bad === 0;
+})(), "见 tools/check_stream_state.js");
 ok("worker：统一心跳 5 秒一发，注释 + 带活数据的 beat", W.includes("FAKE_STREAM") && /function wdsBeat\(controller, state\)/.test(W) && W.includes("}, 5000);") && /t: "beat", v: \{ sec:/.test(W));
 ok("worker：六条流全部换成 wdsBeat（无残留 10 秒旧心跳）", (W.match(/wdsBeat\(controller, _st\)/g) || []).length >= 6 && !W.includes("}, 10000);"));
 ok("worker：beat 里的秒数/推演字数是真计数（转发处累加）", /_st\.think \+= d\.reasoning_content\.length/.test(W) && /_st\.out \+= d\.content\.length/.test(W));

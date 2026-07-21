@@ -1322,6 +1322,7 @@ async function handleAsk(request, env, url) {
       const Q3 = "请【只从 E 维度·纠缠/环境】展开这个问题，先完全不碰结构与过程：它在三界（现实界/理念界/自我界）各是什么？在什么符号、逻辑、信息与什么能量条件下才得以发生？被什么环境纠缠、约束？分点写透，约 600–900 字。";
       const stream = new ReadableStream({
         async start(controller) {
+          let _st = null;   // 这条流不带心跳，但下面共用的转发行会读 _st——严格模式下未声明即抛错
           const st = (v) => controller.enqueue(_sseBytes({ t: "status", v }));
           controller.enqueue(_sseBytes({ t: "sources", v: sources }));
           if (expStr) controller.enqueue(_sseBytes({ t: "expand", v: expStr }));
@@ -1455,6 +1456,7 @@ async function handleAsk(request, env, url) {
   const dec = new TextDecoder();
   const stream = new ReadableStream({
     async start(controller) {
+      let _st = null;   // 这条流不带心跳，但下面共用的转发行会读 _st——严格模式下未声明即抛错
       controller.enqueue(_sseBytes({ t: "sources", v: sources })); // 先给出处，再流答案
       if (expStr) controller.enqueue(_sseBytes({ t: "expand", v: expStr }));
       let buf = "";
@@ -2018,8 +2020,8 @@ export default {
         async start(controller) {
           let _hb = null;
           const done = () => { if (_hb) clearInterval(_hb); try { controller.enqueue(_ENC.encode("data: [DONE]\n\n")); controller.close(); } catch (e) {} };
-          _st = { t0: Date.now(), think: 0, out: 0 };
-            _hb = wdsBeat(controller, _st);
+          const _st = { t0: Date.now(), think: 0, out: 0 };   // 必须 const/let 声明：ESM 是严格模式，裸赋值当场抛 ReferenceError
+          _hb = wdsBeat(controller, _st);
           try {
             // 内核底盘（完整内功→内化心得，按基底缓存复用；失败则降级为无底盘）
             let reflect = String(b.reflect || "").slice(0, 14000);   // 与WDS对话：本场开工亲写的心得（客户端随每条消息带上）
@@ -2149,8 +2151,8 @@ export default {
         async start(controller) {
           let _hb = null;
           const fin = () => { if (_hb) clearInterval(_hb); try { controller.enqueue(_ENC.encode("data: [DONE]\n\n")); controller.close(); } catch (e) {} };
-          _st = { t0: Date.now(), think: 0, out: 0 };
-            _hb = wdsBeat(controller, _st);
+          const _st = { t0: Date.now(), think: 0, out: 0 };   // 必须 const/let 声明：ESM 是严格模式，裸赋值当场抛 ReferenceError
+          _hb = wdsBeat(controller, _st);
           try {
             if (dayLeft !== null) controller.enqueue(_sseBytes({ t: "quota", v: { left: dayLeft, day: WDS_PER_DAY } })); // 今日真实剩余次数
             // 全站检索：先调用结构化知识(九库邻域子图,密/准/省token),再以相似句片段补充
