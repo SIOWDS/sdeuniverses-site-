@@ -2019,7 +2019,7 @@ export default {
       const stream = new ReadableStream({
         async start(controller) {
           let _hb = null;
-          const done = () => { if (_hb) clearInterval(_hb); try { controller.enqueue(_ENC.encode("data: [DONE]\n\n")); controller.close(); } catch (e) {} };
+          const done = () => { if (_hb) clearInterval(_hb); try { controller.enqueue(_sseBytes({ t: "end", v: { out: (_st && _st.out) || 0, think: (_st && _st.think) || 0, sec: _st ? Math.round((Date.now() - _st.t0) / 1000) : 0 } })); controller.enqueue(_ENC.encode("data: [DONE]\n\n")); controller.close(); } catch (e) {} };
           const _st = { t0: Date.now(), think: 0, out: 0 };   // 必须 const/let 声明：ESM 是严格模式，裸赋值当场抛 ReferenceError
           _hb = wdsBeat(controller, _st);
           try {
@@ -2076,6 +2076,7 @@ export default {
             messages.push({ role: "user", content: focus ? ("我正读到这一句：「" + focus + "」\n\n我的问题：" + q) : q });
             // ANSWER_EMPTY_GUARD：顶格预算＋满功率下，思考偶尔会把整份预算吃光、正文 0 字。
             // 不因此设限，而是就地再跑一遍（仍顶格、仍满功率）——限制留给基底，不留给我们自己。
+            const _diag = { lines: 0, finish: "", status: 0, head: "" };   // ANSWER_DIAG
             const _runAnswer = async () => {
               let upstream;
               try { upstream = await wdsFetchMax(VC, KEY, messages, true); }
@@ -2088,19 +2089,24 @@ export default {
               const reader = upstream.body.getReader();
               const dec = new TextDecoder();
               let buf = "", got = 0;
+              _diag.lines = 0; _diag.finish = ""; _diag.status = upstream.status; _diag.head = "";
               while (true) {
                 const { done: rdone, value } = await reader.read();
                 if (rdone) break;
-                buf += dec.decode(value, { stream: true });
+                const _chunk = dec.decode(value, { stream: true });
+                if (!_diag.head) _diag.head = _chunk.slice(0, 160);   // ANSWER_DIAG：上游头 160 字符，用来判"它到底回了什么"
+                buf += _chunk;
                 let idx;
                 while ((idx = buf.indexOf("\n")) >= 0) {
                   const line = buf.slice(0, idx).trim();
                   buf = buf.slice(idx + 1);
                   if (!line.startsWith("data:")) continue;
+                  _diag.lines++;
                   const p = line.slice(5).trim();
                   if (p === "[DONE]") continue;
                   let j; try { j = JSON.parse(p); } catch (e) { continue; }
                   if (j.error) { if (got) { controller.enqueue(_sseBytes({ t: "error", v: j.error.message || "基底流内错误" })); return { got: got }; } return { soft: j.error.message || "基底流内错误" }; }
+                  if (j.choices && j.choices[0] && j.choices[0].finish_reason) _diag.finish = String(j.choices[0].finish_reason);
                   const d = (j.choices && j.choices[0] && j.choices[0].delta) || {};
                   if (d.reasoning_content) { if (_st) _st.think += d.reasoning_content.length; controller.enqueue(_sseBytes({ t: "think", v: d.reasoning_content })); }
                   if (d.content) { got += d.content.length; if (_st) _st.out += d.content.length; controller.enqueue(_sseBytes({ t: "token", v: d.content })); }
@@ -2108,13 +2114,14 @@ export default {
               }
               return { got: got };
             };
+            const _diagLine = () => "【诊断】上游 " + (_diag.status || "?") + " · 收到 " + (_diag.lines || 0) + " 条流数据 · 思考 " + ((_st && _st.think) || 0) + " 字 · 结束原因 " + (_diag.finish || "未给") + (_diag.head ? (" · 首帧「" + _diag.head.replace(/\s+/g, " ").slice(0, 80) + "」") : "");
             let ar = await _runAnswer();
             if (ar.hard) { controller.enqueue(_sseBytes({ t: "error", v: ar.hard, code: ar.code })); return done(); }
             if (!ar.got) {
               controller.enqueue(_sseBytes({ t: "note", v: "这一答只出了思考、正文 0 字，正在重答…" }));
               ar = await _runAnswer();
               if (ar.hard) { controller.enqueue(_sseBytes({ t: "error", v: ar.hard, code: ar.code })); return done(); }
-              if (!ar.got) controller.enqueue(_sseBytes({ t: "error", v: (ar.soft || "基底两次都只出了思考、正文 0 字") + "（可再问一次）", code: "empty" }));
+              if (!ar.got) controller.enqueue(_sseBytes({ t: "error", v: (ar.soft || "基底两次都没写出正文") + "（可再问一次）\n" + _diagLine(), code: "empty" }));
             }
           } catch (e) {
             controller.enqueue(_sseBytes({ t: "error", v: "生成出错：" + (e && e.message) + "（可再问一次）" }));
