@@ -1593,7 +1593,9 @@ export default {
       if (b.mode === "summary") {
         const stream = new ReadableStream({
           async start(controller) {
-            const fin = () => { try { controller.enqueue(_ENC.encode("data: [DONE]\n\n")); controller.close(); } catch (e) {} };
+            let _hb = null;
+            const fin = () => { if (_hb) clearInterval(_hb); try { controller.enqueue(_ENC.encode("data: [DONE]\n\n")); controller.close(); } catch (e) {} };
+            _hb = setInterval(() => { try { controller.enqueue(_ENC.encode(": ping\n\n")); } catch (e) {} }, 15000);
             try {
               const sys = "你是 WDS，王德生的 AI 分身。你刚经历了一场" + SCENE + "。现在要为读者把这场对话总结下来。" + BASE
                 + "\n用严谨而有锋刃的汉语；不摆空模板、不注水、不写开场白；不要用 #、* 等 markdown 符号，用短小标题与自然段分层。";
@@ -1630,7 +1632,9 @@ export default {
       if (b.mode === "plan") {
         const stream = new ReadableStream({
           async start(controller) {
-            const fin = () => { try { controller.enqueue(_ENC.encode("data: [DONE]\n\n")); controller.close(); } catch (e) {} };
+            let _hb = null;
+            const fin = () => { if (_hb) clearInterval(_hb); try { controller.enqueue(_ENC.encode("data: [DONE]\n\n")); controller.close(); } catch (e) {} };
+            _hb = setInterval(() => { try { controller.enqueue(_ENC.encode(": ping\n\n")); } catch (e) {} }, 15000);
             try {
               const sys = "你是 SDE 学派的学术编辑，要把一场" + (GD ? "百轮问答" : "陪读对话") + "提炼成一篇约 " + (PN >= 6 ? "一万" : "5000") + " 字学术论文的骨架。" + (GD ? "这篇论文属于《问对WDS》系列——从与 WDS 的对话中练就创新观点、凝成关于 SDE 思想的论文。" : "") + BASE;
               const usr = CTX + "\n\n请基于以上：① 拟一个准确、有锋刃的学术论文标题（不要副标题堆砌）；② 选出 " + (PN >= 6 ? "4-6" : "3-5") + " 个『金点子』——这场对话里真正反直觉、可被检验的新判断，各一句；③ 给 " + (PN >= 6 ? "六" : "三") + " 个部分的写作大纲，每部分一个标题和一句主旨，各部分合起来构成完整论证（问题的提出 → " + (PN >= 6 ? "逐个展开核心判断（可多个部分） → 对最强反驳的回应" : "核心论证") + " → 结论与限度），部分之间不重复。\n只输出 JSON、不要任何其他文字：{\"title\":\"标题\",\"points\":[\"金点子1\",\"金点子2\"],\"parts\":[{\"h\":\"部分标题\",\"gist\":\"主旨\"},{\"h\":\"部分标题\",\"gist\":\"主旨\"},{\"h\":\"部分标题\",\"gist\":\"主旨\"}]}";
@@ -1688,7 +1692,9 @@ export default {
         // 资源/时间上限杀掉而 503（此前“一万字论文运行一段时间后 503”的根因）。出流后慢只退化成流内温和提示。
         const stream = new ReadableStream({
           async start(controller) {
-            const fin = () => { try { controller.enqueue(_ENC.encode("data: [DONE]\n\n")); controller.close(); } catch (e) {} };
+            let _hb = null;
+            const fin = () => { if (_hb) clearInterval(_hb); try { controller.enqueue(_ENC.encode("data: [DONE]\n\n")); controller.close(); } catch (e) {} };
+            _hb = setInterval(() => { try { controller.enqueue(_ENC.encode(": ping\n\n")); } catch (e) {} }, 15000);
             try {
               let partCtx = "";
               if (GD) {
@@ -1835,7 +1841,9 @@ export default {
       // 不会在“出流前”被平台按资源/时间上限杀掉而返回 503(此前 503 的根因)。
       const stream = new ReadableStream({
         async start(controller) {
-          const done = () => { try { controller.enqueue(_ENC.encode("data: [DONE]\n\n")); controller.close(); } catch (e) {} };
+          let _hb = null;
+          const done = () => { if (_hb) clearInterval(_hb); try { controller.enqueue(_ENC.encode("data: [DONE]\n\n")); controller.close(); } catch (e) {} };
+          _hb = setInterval(() => { try { controller.enqueue(_ENC.encode(": ping\n\n")); } catch (e) {} }, 15000);
           try {
             // 内核底盘（完整内功→内化心得，按基底缓存复用；失败则降级为无底盘）
             let reflect = String(b.reflect || "").slice(0, 14000);   // 与WDS对话：本场开工亲写的心得（客户端随每条消息带上）
