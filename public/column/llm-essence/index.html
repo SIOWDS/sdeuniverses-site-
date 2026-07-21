@@ -66,28 +66,43 @@ article li{margin:0 0 10px;text-align:justify}
 article blockquote{margin:0 0 22px;padding:12px 22px;background:var(--card);border-left:3px solid var(--gold2);border-radius:0 8px 8px 0;color:#3E4750;font-style:normal}
 article blockquote p{margin:0 0 6px}article blockquote p:last-child{margin:0}
 article hr{display:none}
+/* ── 三种阅读模式：日间 / 护眼 / 夜间 ─────────────────── */
+body.sepia{--bg:#F0E6CF;--card:#F7EFDC;--text:#3E3524;--red2:#5C4A2C;--red:#7A5A22;--muted:#8A7A58;--line:rgba(92,74,44,0.20)}
+body.sepia nav{background:rgba(240,230,207,0.92)}
+body.sepia .deck{color:#5A4E36}
+body.sepia article em{color:#6A5C40}
+body.sepia table.cmp thead th{background:rgba(92,74,44,0.10);color:#5C4A2C}
+body.sepia table.cmp td:first-child{background:rgba(92,74,44,0.05);color:#5C4A2C}
+body.night{--bg:#14171B;--card:#1E2329;--text:#C6CCD1;--red2:#8FBBD6;--red:#7FB4D8;--muted:#8B959F;--line:rgba(150,165,180,0.15)}
+body.night nav{background:rgba(20,23,27,0.92)}
+body.night .deck{color:#B2B9BF}
+body.night article strong{color:#A7CBE1}
+body.night article em{color:#9BA5AF}
+body.night table.cmp thead th{background:rgba(127,180,216,0.13);color:#A7CBE1}
+body.night table.cmp td:first-child{background:rgba(127,180,216,0.06);color:#A7CBE1}
+body.night footer{color:#8B959F}
+/* 模式切换器 */
+.rmode{position:fixed;top:72px;right:18px;z-index:30;display:flex;gap:3px;background:var(--card);border:1px solid var(--line);border-radius:22px;padding:4px;box-shadow:0 3px 14px rgba(0,0,0,0.10)}
+.rmode button{border:none;background:transparent;color:var(--muted);font-family:inherit;font-size:12.5px;padding:6px 11px;border-radius:18px;cursor:pointer;letter-spacing:0.05em;line-height:1}
+.rmode button.on{background:var(--red);color:#fff}
+@media(max-width:640px){.rmode{top:auto;bottom:16px;right:14px;padding:3px}.rmode button{padding:6px 9px;font-size:12px}}
 </style></head><body>
 
 <nav><div class="w"><a class="nav-logo" href="/">SDE Universes</a><a class="nav-back" href="/ai/">&larr; AI 专栏</a></div></nav>
+<div class="rmode" id="rmode" title="阅读模式"><button data-m="light" class="on">日间</button><button data-m="sepia">护眼</button><button data-m="night">夜间</button></div>
 
 <header class="art"><div class="eyebrow">A I 专 栏 &middot; 硕 士 学 位 论 文</div><h1 class="art-title">大语言模型的本质</h1><div class="art-sub">一个 SDE 发生学透视 &middot; The Essence of Large Language Models</div><div class="art-meta">杨建 著 &middot; 导师 王德生 &middot; 依 SDE 发生学本体论 &middot; 二〇二六年<br>全文约五万字 &middot; 科学技术哲学 / 人工智能哲学</div><div class="brand-line"></div></header>
 
 <div id="web" class="panel on"><div class="w"><div class="deck">这是一篇用 SDE 发生学本体论透视大语言模型的硕士学位论文。它不问「大模型是不是知识库、是不是随机鹦鹉」——那都是把它当成现成之物的<strong>发现学</strong>问法；而问：当它生成一个字时，内部究竟正在<strong>发生</strong>什么？答案是——它是一台在纯理念界内部运行、结构上近乎完美的「<strong>意义发生模拟器</strong>」：三大方程 S=F(D,E)、D=G(S,E)、E=H(S,D) 在它身上高保真地运转，却因缺了身体（现实界）与命运（自我界）这两界，永远断在最关键的第 ③ 步「<strong>回写</strong>」上。全文约五万字，从三元解剖、单界之困，到 SDE 思想操作系统与团队 SDE 生命体，最后落在身体、唯一性与思想不可让渡的终极边界。</div>
 <div class="toc"><div class="tl">目 录</div>
 <a href="#c1">第一章　绪论：为何"本质"之问需要新的本体论</a>
-<a href="#c2">第二章　文献综述与批判：发现学范式下的
-LLM 研究及其天花板</a>
-<a href="#c3">第三章　方法论基础：SDE
-发生学本体论的核心框架</a>
-<a href="#c4">第四章　大模型的 SDE
-三元解剖：结构化发生现场</a>
+<a href="#c2">第二章　文献综述与批判：发现学范式下的 LLM 研究及其天花板</a>
+<a href="#c3">第三章　方法论基础：SDE 发生学本体论的核心框架</a>
+<a href="#c4">第四章　大模型的 SDE 三元解剖：结构化发生现场</a>
 <a href="#c5">第五章　单界之困：为何大模型不是"思想"——基于三界厚度的比较研究</a>
-<a href="#c6">第六章　升级之维：SDE
-思想操作系统的设计与实现</a>
-<a href="#c7">第七章　整合
-SDE：从单机智能到团队 SDE 生命体的涌现</a>
-<a href="#c8">第八章　应用与验证：SDE
-操作系统在不同领域的投射</a>
+<a href="#c6">第六章　升级之维：SDE 思想操作系统的设计与实现</a>
+<a href="#c7">第七章　整合 SDE：从单机智能到团队 SDE 生命体的涌现</a>
+<a href="#c8">第八章　应用与验证：SDE 操作系统在不同领域的投射</a>
 <a href="#c9">第九章　终极边界：身体、唯一性与思想的不可让渡</a>
 <a href="#c10">第十章　结论与展望</a>
 <a href="#c11">参考文献</a>
@@ -1576,6 +1591,7 @@ SDE
 <div>SDE Universes &middot; 显露 &middot; 差异 &middot; 纠缠 &nbsp;|&nbsp; 德麦国际 &middot; 王德生 &nbsp;|&nbsp; <a href="/">sdeuniverses.com</a></div>
 </footer>
 
+<script>(function(){var KEY="sde_read_mode",b=document.body,box=document.getElementById("rmode");if(!box)return;function set(m){b.classList.remove("night","sepia");if(m==="night"||m==="sepia")b.classList.add(m);var bs=box.getElementsByTagName("button");for(var i=0;i<bs.length;i++)bs[i].className=(bs[i].getAttribute("data-m")===m?"on":"");try{localStorage.setItem(KEY,m)}catch(e){}}var bs=box.getElementsByTagName("button");for(var i=0;i<bs.length;i++)bs[i].onclick=(function(x){return function(){set(x.getAttribute("data-m"))}})(bs[i]);var saved="light";try{saved=localStorage.getItem(KEY)||"light"}catch(e){}set(saved);})();</script>
 <!-- WDS 陪读浮层 -->
 <script>window.WDS_READ={selector:"article"};</script>
 <script src="/taste/wds-companion/wds-read.js" defer></script>
