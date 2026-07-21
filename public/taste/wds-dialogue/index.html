@@ -440,7 +440,7 @@
       .then(function (resp) {
         if (!resp.ok || !resp.body) throw new Error("HTTP " + resp.status);
         var reader = resp.body.getReader(), dec = new TextDecoder(), buf = "", answer = "", srcs = [], think = "";
-        var diag = { beats: 0, sawEnd: null, notes: 0, t0: Date.now(), status: resp.status, bytes: 0, head: "" };   // ANSWER_DIAG_UI：空答时得说得出"到底收到了什么"
+        var diag = { beats: 0, sawEnd: null, notes: 0, t0: Date.now(), status: resp.status, bytes: 0, head: "", lastNote: "" };   // ANSWER_DIAG_UI：空答时得说得出"到底收到了什么"
         function bumpWd() { clearTimeout(wd); wd = setTimeout(function () { timedOut = true; try { reader.cancel(); } catch (e) {} }, 45000); }
         bumpWd();
         function pump() {
@@ -458,11 +458,11 @@
                 bubble.parentNode.appendChild(sb); msgs.scrollTop = msgs.scrollHeight;
               }
               if (answer) history.push({ role: "wds", text: answer });
-              else if (!diag.bytes) {
+              else if (!diag.bytes || !diag.sawEnd) {   // CUT_FALLBACK：0 字节、或流被中途切断（没收到结束标记）——都改用不流式再取一次
                 // NOSTREAM_FALLBACK：一个字节都没收到＝流被中间层/浏览器吃掉了，不是没生成。
                 // 改用不流式的取法（整份读回来再按同一套 SSE 文本解析），拿得到就照常显示。
                 bubble.classList.remove("err");
-                bubble.textContent = "\uff08\u6d41\u5f0f\u6ca1\u6536\u5230\u6570\u636e\uff0c\u6539\u7528\u4e0d\u6d41\u5f0f\u91cd\u53d6\u4e00\u6b21\u2026\uff09";
+                bubble.textContent = "\uff08\u6d41\u88ab\u5207\u65ad\uff0c\u6539\u7528\u4e0d\u6d41\u5f0f\u91cd\u53d6\u4e00\u6b21\uff08\u6162\uff0c\u8bf7\u7b49\uff09\u2026\uff09";
                 fetch(API, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(payload) })
                   .then(function (r2) { return r2.text().then(function (t2) { return { st: r2.status, t: t2 }; }); })
                   .then(function (o) {
@@ -476,7 +476,7 @@
                     if (ans) { bubble.textContent = ans; history.push({ role: "wds", text: ans }); }
                     else {
                       bubble.classList.add("err");
-                      bubble.textContent = "\u6ca1\u6536\u5230\u56de\u7b54\u3002\u3010\u8bca\u65ad\u3011\u6d41\u5f0f 0 \u5b57\u8282\uff08HTTP " + diag.status + "\uff09\uff1b\u4e0d\u6d41\u5f0f\u91cd\u53d6 HTTP " + o.st + "\u3001\u6536\u5230 " + String(o.t || "").length + " \u5b57\u8282" + (err ? ("\uff1b\u57fa\u5e95\u8bf4\uff1a" + err) : "") + "\u3002\u628a\u8fd9\u884c\u622a\u56fe\u7ed9\u6211\u3002";
+                      bubble.textContent = "\u6ca1\u6536\u5230\u56de\u7b54\u3002\u3010\u8bca\u65ad\u3011\u6d41\u5f0f 0 \u5b57\u8282\uff08HTTP " + diag.status + "\uff09\uff1b\u4e0d\u6d41\u5f0f\u91cd\u53d6 HTTP " + o.st + "\u3001\u6536\u5230 " + String(o.t || "").length + " \u5b57\u8282" + (err ? ("\uff1b\u57fa\u5e95\u8bf4\uff1a" + err) : "") + (diag.lastNote ? ("\uff1b\u63d0\u793a\uff1a" + diag.lastNote) : "") + "\u3002\u628a\u8fd9\u884c\u622a\u56fe\u7ed9\u6211\u3002";
                       history.pop();
                     }
                     streaming = false; goEl.disabled = false; paint();
@@ -493,7 +493,7 @@
                 var sec = diag.sawEnd && diag.sawEnd.sec ? diag.sawEnd.sec : Math.round((Date.now() - diag.t0) / 1000);
                 var why = diag.sawEnd ? (diag.sawEnd.think ? "\u57fa\u5e95\u53ea\u60f3\u4e86\u6ca1\u5199" : "\u57fa\u5e95\u4ec0\u4e48\u90fd\u6ca1\u56de") : "\u8fde\u63a5\u88ab\u4e2d\u9014\u5207\u65ad\uff08\u6ca1\u6536\u5230\u7ed3\u675f\u6807\u8bb0\uff09";
                 bubble.textContent = (bubble.textContent && bubble.textContent.indexOf("\uff08") !== 0 ? bubble.textContent + "\n" : "")
-                  + "\u6ca1\u6536\u5230\u56de\u7b54\u3002\u3010\u8bca\u65ad\u3011" + why + " \u00b7 \u5df2\u8dd1 " + sec + " \u79d2 \u00b7 \u5fc3\u8df3 " + diag.beats + " \u6b21 \u00b7 \u601d\u8003 " + think.replace(/\s/g, "").length + " \u5b57 \u00b7 \u68c0\u7d22 " + srcs.length + " \u7bc7 \u00b7 \u91cd\u7b54 " + diag.notes + " \u6b21 \u00b7 HTTP " + diag.status + " \u00b7 \u6536\u5230 " + diag.bytes + " \u5b57\u8282\u3002\u628a\u8fd9\u884c\u622a\u56fe\u7ed9\u6211\u5c31\u80fd\u5b9a\u4f4d\u3002";
+                  + "\u6ca1\u6536\u5230\u56de\u7b54\u3002\u3010\u8bca\u65ad\u3011" + why + " \u00b7 \u5df2\u8dd1 " + sec + " \u79d2 \u00b7 \u5fc3\u8df3 " + diag.beats + " \u6b21 \u00b7 \u601d\u8003 " + think.replace(/\s/g, "").length + " \u5b57 \u00b7 \u68c0\u7d22 " + srcs.length + " \u7bc7 \u00b7 \u91cd\u7b54 " + diag.notes + " \u6b21 \u00b7 HTTP " + diag.status + " \u00b7 \u6536\u5230 " + diag.bytes + " \u5b57\u8282" + (diag.lastNote ? ("\uff1b\u63d0\u793a\uff1a" + diag.lastNote) : "") + "\u3002\u628a\u8fd9\u884c\u622a\u56fe\u7ed9\u6211\u5c31\u80fd\u5b9a\u4f4d\u3002";
                 history.pop();
               }
               streaming = false; goEl.disabled = false; paint();
@@ -515,7 +515,7 @@
               else if (j.t === "sources") { srcs = Array.isArray(j.v) ? j.v : []; }
               else if (j.t === "think") { think += (j.v || ""); if (!answer) bubble.textContent = "\uff08\u6df1\u601d\u4e2d\u2026\u5df2\u63a8\u6f14 " + think.replace(/\s/g, "").length + " \u5b57\uff09"; }
               else if (j.t === "beat") { diag.beats++; if (!answer && !think && j.v) bubble.textContent = "\uff08\u5df2 " + (j.v.sec || 0) + " \u79d2\uff0c\u57fa\u5e95\u8fd8\u5728\u60f3\u2026\uff09"; }
-              else if (j.t === "note") { diag.notes++; if (!answer) bubble.textContent = "\uff08" + (j.v || "") + "\uff09"; }
+              else if (j.t === "note") { diag.notes++; diag.lastNote = j.v || ""; if (!answer) bubble.textContent = "\uff08" + (j.v || "") + "\uff09"; }
               else if (j.t === "end") { diag.sawEnd = j.v || {}; }
               else if (j.t === "error") {
                 bubble.classList.remove("stream"); bubble.classList.add("err");

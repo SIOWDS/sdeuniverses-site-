@@ -846,6 +846,10 @@ function _cors() { return { "access-control-allow-origin": "*", "access-control-
 
 let CORPUS = null; // 模块级缓存：isolate 内复用，避免每次问答重载 ~15MB 索引
 let CORPUS_CHECKED = 0;
+// 用完就放手：全站语料（~15MB 索引，装进内存后是几十兆的对象）常驻会把 isolate 的内存吃到临界，
+// 之后任何一个大请求都可能把整个 isolate 撑爆——表现是"流跑到一半无声中断、连错误都发不出"。
+// 与WDS对话这条线改成"检索完就释放"：多花几秒重装，换答题那一侧的内存干净。站内搜索仍走常驻缓存。
+function freeCorpus() { CORPUS = null; CORPUS_CHECKED = 0; }
 const CORPUS_TTL = 30 * 1000; // 至多 30 秒对 manifest 复验一次；发新文后即使老 isolate 也能在半分钟内换上新语料
 let KB = null, KB_CHECKED = 0; // 九库结构化知识;复用 CORPUS_TTL 复验节奏,无 KB 时检索安全退回纯 chunk
 async function loadCorpus(env, url) {
@@ -1632,8 +1636,11 @@ export default {
           chunkText += "【来源：" + d.t + "】\n" + (chunkLimit ? ck.t.slice(0, chunkLimit) : ck.t) + "\n\n";
           if (chunkText.length > chunkCap) break;
         }
-        return J({ ok: true, ctx: kbBlock + (kbBlock && chunkText ? "\n【补充 · 站内原文片段】\n" : "") + chunkText, srcs: srcs.slice(0, 10) });
+        const out = J({ ok: true, ctx: kbBlock + (kbBlock && chunkText ? "\n【补充 · 站内原文片段】\n" : "") + chunkText, srcs: srcs.slice(0, 10) });
+        if (b.free) freeCorpus();   // 与WDS对话专用：检索结果已经拿到手，语料就地释放，别让它压着 isolate
+        return out;
       } catch (e) {
+        if (b.free) freeCorpus();
         return J({ ok: false, msg: "检索没接上：" + (e && e.message) }, 502);
       }
     }
@@ -1917,7 +1924,7 @@ export default {
                 // 走 /api/wds/rag 子请求：装语料是 CPU 大户，和写作挤在一个请求里会被平台掐死（RAG_SUBREQUEST）
                 try {
                   const pq = (title + " " + (parts[idx].h || "") + " " + points.join(" ")).slice(0, 300);
-                  const rr = await wdsRag(env, url, { q: pq, k: 12, cap: 8000, kbn: 18, chunk: 900 });
+                  const rr = await wdsRag(env, url, { q: pq, k: 12, cap: 8000, kbn: 18, chunk: 900, free: 1 });
                   if (rr.ok) { const jr = await rr.json(); if (jr && jr.ok) partCtx = jr.ctx || ""; }
                 } catch (e) {}
               }
@@ -2081,7 +2088,7 @@ export default {
               let prevQ0 = "";
               for (let i = history.length - 1; i >= 0; i--) { const m = history[i]; if (m && m.role !== "wds" && m.text) { prevQ0 = String(m.text).slice(0, 240); break; } }
               try {
-                const rr = await wdsRag(env, url, { q: q, prevQ: prevQ0, exp: expTerms, k: 36, cap: docText ? 12000 : 30000, kbn: docText ? 14 : 24 });
+                const rr = await wdsRag(env, url, { q: q, prevQ: prevQ0, exp: expTerms, k: 36, cap: docText ? 12000 : 30000, kbn: docText ? 14 : 24, free: 1 });
                 _ragWhy = "HTTP " + rr.status;
                 if (rr.ok) { const jr = await rr.json(); if (jr && jr.ok) { siteCtx = jr.ctx || ""; siteSrcs = jr.srcs || []; _ragWhy = ""; } else _ragWhy = (jr && jr.msg) || "返回不可用"; }
                 else _ragWhy = "HTTP " + rr.status + "：" + (await rr.text()).slice(0, 120);
