@@ -1601,7 +1601,7 @@ export default {
                 + "\n用严谨而有锋刃的汉语；不摆空模板、不注水、不写开场白；不要用 #、* 等 markdown 符号，用短小标题与自然段分层。";
               const usr = CTX + "\n\n请写一份这场陪读的总结，约 1200-1600 字，分四节：\n一、我们谈了什么（脉络，不是流水账）\n二、真正推进了的几个判断（逐条列出，每条一句话说清它比常识多走了哪一步）\n三、用 SDE 看这场对话（显露/差异序列/特征纠缠或三大方程，照见读者原来卡在哪、现在站在哪）\n四、还没解决的问题（留给读者继续读、继续想的口子）\n直接从正文写起。";
               let upstream;
-              try { upstream = await fetch(VC.url, { method: "POST", headers: { "content-type": "application/json", authorization: "Bearer " + KEY }, body: JSON.stringify(wdsTopBody(VC, { model: VC.model, stream: true, max_tokens: 3200, messages: [{ role: "system", content: sys }, { role: "user", content: usr }] })) }); }
+              try { upstream = await fetch(VC.url, { method: "POST", headers: { "content-type": "application/json", authorization: "Bearer " + KEY }, body: JSON.stringify(wdsTopBody(VC, { model: VC.model, stream: true, max_tokens: (GD && vd === "deepseek") ? 50000 : 3200, messages: [{ role: "system", content: sys }, { role: "user", content: usr }] })) }); }
               catch (e) { controller.enqueue(_sseBytes({ t: "error", v: "接不上基底：" + (e && e.message) })); return fin(); }
               if (!upstream.ok) {
                 const errtxt = (await upstream.text()).slice(0, 200);
@@ -1638,7 +1638,7 @@ export default {
             try {
               const sys = "你是 SDE 学派的学术编辑，要把一场" + (GD ? "百轮问答" : "陪读对话") + "提炼成一篇约 " + (PN >= 6 ? "一万" : "5000") + " 字学术论文的骨架。" + (GD ? "这篇论文属于《问对WDS》系列——从与 WDS 的对话中练就创新观点、凝成关于 SDE 思想的论文。" : "") + BASE;
               const usr = CTX + "\n\n请基于以上：① 拟一个准确、有锋刃的学术论文标题（不要副标题堆砌）；② 选出 " + (PN >= 6 ? "4-6" : "3-5") + " 个『金点子』——这场对话里真正反直觉、可被检验的新判断，各一句；③ 给 " + (PN >= 6 ? "六" : "三") + " 个部分的写作大纲，每部分一个标题和一句主旨，各部分合起来构成完整论证（问题的提出 → " + (PN >= 6 ? "逐个展开核心判断（可多个部分） → 对最强反驳的回应" : "核心论证") + " → 结论与限度），部分之间不重复。\n只输出 JSON、不要任何其他文字：{\"title\":\"标题\",\"points\":[\"金点子1\",\"金点子2\"],\"parts\":[{\"h\":\"部分标题\",\"gist\":\"主旨\"},{\"h\":\"部分标题\",\"gist\":\"主旨\"},{\"h\":\"部分标题\",\"gist\":\"主旨\"}]}";
-              const planTok = GD ? 8000 : 2400;
+              const planTok = (GD && vd === "deepseek") ? 50000 : (GD ? 8000 : 2400);
               const genOnce = async () => {
                 let upstream;
                 try { upstream = await fetch(VC.url, { method: "POST", headers: { "content-type": "application/json", authorization: "Bearer " + KEY }, body: JSON.stringify(wdsTopBody(VC, { model: VC.model, stream: true, max_tokens: planTok, messages: [{ role: "system", content: sys }, { role: "user", content: usr }] })) }); }
@@ -1722,7 +1722,7 @@ export default {
                 + "\n现在写【" + parts[idx].h + "】这一部分（主旨：" + (parts[idx].gist || "") + "），约 1700-1900 字。直接从正文写起，不要开场白，不要复述论文标题，不要与前文重复。";
               let upstream;
               try {
-                upstream = await fetch(VC.url, { method: "POST", headers: { "content-type": "application/json", authorization: "Bearer " + KEY }, body: JSON.stringify(wdsTopBody(VC, { model: VC.model, stream: true, max_tokens: 3600, messages: [{ role: "system", content: sys }, { role: "user", content: usr }] })) });
+                upstream = await fetch(VC.url, { method: "POST", headers: { "content-type": "application/json", authorization: "Bearer " + KEY }, body: JSON.stringify(wdsTopBody(VC, { model: VC.model, stream: true, max_tokens: (GD && vd === "deepseek") ? 50000 : 3600, messages: [{ role: "system", content: sys }, { role: "user", content: usr }] })) });
               } catch (e) { controller.enqueue(_sseBytes({ t: "error", v: "接不上基底：" + (e && e.message) })); return fin(); }
               if (!upstream.ok) {
                 const errtxt = (await upstream.text()).slice(0, 200);
@@ -1898,7 +1898,7 @@ export default {
             messages.push({ role: "user", content: focus ? ("我正读到这一句：「" + focus + "」\n\n我的问题：" + q) : q });
             let upstream;
             try {
-              upstream = await fetch(VC.url, { method: "POST", headers: { "content-type": "application/json", authorization: "Bearer " + KEY }, body: JSON.stringify(wdsTopBody(VC, { model: VC.model, stream: true, max_tokens: b.guide ? 8000 : 2200, messages })) });
+              upstream = await fetch(VC.url, { method: "POST", headers: { "content-type": "application/json", authorization: "Bearer " + KEY }, body: JSON.stringify(wdsTopBody(VC, { model: VC.model, stream: true, max_tokens: (b.guide && vd === "deepseek") ? 50000 : (b.guide ? 8000 : 2200), messages })) });
             } catch (e) {
               controller.enqueue(_sseBytes({ t: "error", v: "接不上基底：" + (e && e.message) })); return done();
             }
