@@ -487,6 +487,7 @@ head("[阶段十一] 长思考期间的假流式（心跳 + 活数据）");
 ok("worker：答题空转时回报上游实况（状态/流数据条数/结束原因/首帧）", W.includes("ANSWER_DIAG") && W.includes("_diagLine") && /_diag\.finish = String\(j\.choices\[0\]\.finish_reason\)/.test(W));
 ok("worker：答题流末尾发 end 事件（用来区分干净结束与被切断）", /t: "end", v: \{ out:/.test(W));
 ok("客户端：空答时说得出收到了什么（心跳/思考/检索/重答次数）", PAGE.includes("ANSWER_DIAG_UI") && /diag\.beats\+\+/.test(PAGE) && /\\u8fde\\u63a5\\u88ab\\u4e2d\\u9014\\u5207\\u65ad/.test(PAGE));
+ok("客户端：流式 0 字节时自动改用不流式重取（并记 HTTP 状态与字节数）", PAGE.includes("NOSTREAM_FALLBACK") && /else if \(!diag\.bytes\)/.test(PAGE) && /diag\.bytes \+=/.test(PAGE) && /r2\.text\(\)/.test(PAGE));
 ok("每条流的状态变量都在本流内声明（严格模式裸赋值＝当场瘫）", (() => {
   const marker = "async start(controller)";
   let i = -1, bad = 0, n = 0;
