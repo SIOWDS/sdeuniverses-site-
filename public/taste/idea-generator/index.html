@@ -149,6 +149,10 @@ footer{border-top:1px solid var(--border);text-align:center;padding:30px 20px 44
         <div style="font-size:17px;font-weight:700;margin-bottom:8px">⚡ 一次生成</div>
         <div style="font-size:12.5px;color:#3a2c08;line-height:1.7">一次填齐信息（问题·基底·两位审稿人·作者名·投稿密码），点一下，后台自动跑完全程到最后四篇，并存入收件箱。适合只要结果的人。约 40-90 分钟。</div>
       </button>
+      <button id="entryBatch" style="flex:1 1 100%;min-width:230px;background:linear-gradient(135deg,#3A2E5A,#4A3A72);color:#EAE4FF;border:1px solid rgba(180,150,255,0.3);border-radius:14px;padding:20px 20px;cursor:pointer;text-align:left;box-shadow:0 6px 20px rgba(120,90,200,0.22)">
+        <div style="font-size:17px;font-weight:700;margin-bottom:8px">📚 批量生成（多题连跑）</div>
+        <div style="font-size:12.5px;color:#C9BEEA;line-height:1.7">一次填多个问题（每行一个，建议 ≤10），基底/审稿人/作者/密码只填一次、全批共用。点一下，后台按「一次生成」的同一全流程<b>逐题跑完并逐题投稿</b>，一题完自动接下一题，中途某题出错自动跳过续跑。适合囤一批问题一次清空。<b>每题约 40-90 分钟，10 题≈半天到一天，全程请勿关闭页面。</b></div>
+      </button>
     </div>
     <div style="margin-top:20px;font-size:13px;line-height:1.7"><a href="/taste/idea-generator/manual/" style="color:#C9A227;text-decoration:underline">📖 第一次来？先读《SDE 金点子：介绍和使用手册》（约五千字）</a></div>
   </div>
@@ -201,6 +205,57 @@ footer{border-top:1px solid var(--border);text-align:center;padding:30px 20px 44
 
     <button id="osRunBtn" style="width:100%;background:linear-gradient(135deg,#8A6414,#C9A227);color:#1a1205;font-weight:700;font-size:15.5px;border:none;border-radius:10px;padding:15px;cursor:pointer;letter-spacing:0.02em;box-shadow:0 6px 20px rgba(201,162,39,0.35)">⚡ 一次生成 · 全自动跑完并存入收件箱</button>
     <div id="osStatus" style="font-size:13px;color:#D4A845;margin-top:14px;min-height:18px;line-height:1.7;text-align:center"></div>
+  </div>
+</div>
+
+<!-- ══ 批量生成：多题连跑设置面板 ══ -->
+<div id="batchModal" style="position:fixed;inset:0;z-index:8999;background:rgba(8,12,20,0.94);backdrop-filter:blur(6px);display:none;align-items:flex-start;justify-content:center;padding:22px;overflow-y:auto">
+  <div style="max-width:660px;width:100%;background:linear-gradient(160deg,#171426,#100e1d);border:1px solid rgba(180,150,255,0.3);border-radius:18px;padding:30px 26px;box-shadow:0 20px 60px rgba(0,0,0,0.5);margin:auto">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+      <div style="font-size:19px;font-weight:700;color:#EAE4FF">📚 批量生成 · 设置</div>
+      <button id="osbBack" style="background:transparent;color:#9AA5B0;border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:6px 12px;cursor:pointer;font-size:12.5px">← 返回选择</button>
+    </div>
+    <div style="font-size:12.5px;color:#B7ADD6;line-height:1.7;margin-bottom:16px">每行一个问题，下面的配置全批共用。点最下方按钮，后台会按「一次生成」的同一全流程逐题跑完（六篇对决 → 涌现新典范 → 四篇论文 → 二次提智 → 补规范 → 二次审稿打磨），每题以你的作者名存入收件箱，跑完一题自动接下一题。<b style="color:#E8A33D">某题中途出错会自动跳过、继续跑后面的题。</b></div>
+    <div style="font-size:12px;color:#E8A33D;line-height:1.6;margin-bottom:20px;background:rgba(232,163,61,0.08);border:1px dashed rgba(232,163,61,0.4);border-radius:10px;padding:10px 12px">⚠️ 每题约 40-90 分钟，10 题合计可能需半天到一天。全程在本页面后台连跑，<b>中途不能关闭或刷新本页面</b>（这是发生器“ Key 不出浏览器”零服务器责任架构的必然代价）。建议先用1-2 题小跨一次跑通再上十题。</div>
+
+    <div style="margin-bottom:14px">
+      <label style="display:block;font-size:12.5px;color:#B98CFF;font-weight:700;margin-bottom:6px">① 问题列表（每行一个，空行自动忽略）</label>
+      <textarea id="osbQuestions" rows="8" placeholder="如何理解拖延症？&#10;教育的本质是什么？&#10;为什么人会对已拥有的东西失去兴趣？&#10;（…每行一题，建议不超过 10 题）" style="width:100%;padding:11px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.15);background:#0d1117;color:#D4DCE4;font-size:14px;font-family:inherit;line-height:1.7;resize:vertical"></textarea>
+    </div>
+
+    <div style="margin-bottom:14px">
+      <label style="display:block;font-size:12.5px;color:#B98CFF;font-weight:700;margin-bottom:6px">② 主基底（写作/主笔）与 Key</label>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <select id="osbModel" style="flex:0 0 auto;padding:9px 11px;border-radius:8px;border:1px solid rgba(255,255,255,0.15);background:#0d1117;color:#D4DCE4;font-size:13px"></select>
+        <input id="osbKey" type="password" placeholder="主基底的 API Key" autocomplete="off" style="flex:1;min-width:160px;padding:9px 11px;border-radius:8px;border:1px solid rgba(255,255,255,0.15);background:#0d1117;color:#D4DCE4;font-size:13px">
+      </div>
+    </div>
+
+    <div style="margin-bottom:14px">
+      <label style="display:block;font-size:12.5px;color:#B98CFF;font-weight:700;margin-bottom:6px">③ 两位审稿人（须不同基底，各填 Key）</label>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">
+        <select id="osbRevA" style="flex:0 0 auto;padding:9px 11px;border-radius:8px;border:1px solid rgba(255,255,255,0.15);background:#0d1117;color:#D4DCE4;font-size:13px"></select>
+        <input id="osbRevAKey" type="password" placeholder="审稿人 A 的 Key（与某基底相同可留空）" autocomplete="off" style="flex:1;min-width:160px;padding:9px 11px;border-radius:8px;border:1px solid rgba(255,255,255,0.15);background:#0d1117;color:#D4DCE4;font-size:13px">
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <select id="osbRevB" style="flex:0 0 auto;padding:9px 11px;border-radius:8px;border:1px solid rgba(255,255,255,0.15);background:#0d1117;color:#D4DCE4;font-size:13px"></select>
+        <input id="osbRevBKey" type="password" placeholder="审稿人 B 的 Key" autocomplete="off" style="flex:1;min-width:160px;padding:9px 11px;border-radius:8px;border:1px solid rgba(255,255,255,0.15);background:#0d1117;color:#D4DCE4;font-size:13px">
+      </div>
+    </div>
+
+    <div style="margin-bottom:20px;display:flex;gap:8px;flex-wrap:wrap">
+      <div style="flex:1;min-width:150px">
+        <label style="display:block;font-size:12.5px;color:#B98CFF;font-weight:700;margin-bottom:6px">④ 作者名（全批共用）</label>
+        <input id="osbStudent" type="text" maxlength="80" placeholder="你的名字" style="width:100%;padding:9px 11px;border-radius:8px;border:1px solid rgba(255,255,255,0.15);background:#0d1117;color:#D4DCE4;font-size:13px">
+      </div>
+      <div style="flex:1;min-width:150px">
+        <label style="display:block;font-size:12.5px;color:#B98CFF;font-weight:700;margin-bottom:6px">⑤ 投稿密码</label>
+        <input id="osbPass" type="password" placeholder="投稿密码" autocomplete="off" style="width:100%;padding:9px 11px;border-radius:8px;border:1px solid rgba(255,255,255,0.15);background:#0d1117;color:#D4DCE4;font-size:13px">
+      </div>
+    </div>
+
+    <button id="osbRunBtn" style="width:100%;background:linear-gradient(135deg,#5A3AA0,#7A4FD0);color:#fff;font-weight:700;font-size:15.5px;border:none;border-radius:10px;padding:15px;cursor:pointer;letter-spacing:0.02em;box-shadow:0 6px 20px rgba(122,79,208,0.35)">📚 批量生成 · 逐题跑完并逐题存入收件箱</button>
+    <div id="osbLog" style="font-size:13px;color:#C9BEEA;margin-top:16px;min-height:18px;line-height:1.7"></div>
   </div>
 </div>
 
@@ -3138,9 +3193,9 @@ if(autoRunBtn){
 
 // ══════ 入口选择：互动序列 / 一次生成 ══════
 (function(){
-  const entryModal = $('entryModal'), oneShotModal = $('oneShotModal');
+  const entryModal = $('entryModal'), oneShotModal = $('oneShotModal'), batchModal = $('batchModal');
   if(!entryModal) return;
-  const showEntry = ()=>{ entryModal.style.display='flex'; oneShotModal.style.display='none'; };
+  const showEntry = ()=>{ entryModal.style.display='flex'; oneShotModal.style.display='none'; if(batchModal) batchModal.style.display='none'; };
   const showOneShot = ()=>{
     entryModal.style.display='none'; oneShotModal.style.display='flex';
     // 下拉选项从主面板克隆，永远与主面板一致（以后加基底自动同步）
@@ -3153,7 +3208,7 @@ if(autoRunBtn){
       if($('osModel') && modelSel.value) $('osModel').value = modelSel.value;
     }catch(_){}
   };
-  const closeAll = ()=>{ entryModal.style.display='none'; oneShotModal.style.display='none'; };
+  const closeAll = ()=>{ entryModal.style.display='none'; oneShotModal.style.display='none'; if(batchModal) batchModal.style.display='none'; };
   const bi=$('entryInteractive'); if(bi) bi.addEventListener('click', closeAll);            // 互动序列=关模态，用原页面
   const bo=$('entryOneShot'); if(bo) bo.addEventListener('click', showOneShot);
   const bb=$('oneShotBack'); if(bb) bb.addEventListener('click', showEntry);
@@ -3233,6 +3288,96 @@ if(autoRunBtn){
       }
     });
   }
+
+  // ── 批量生成接线 ──
+  const showBatch = ()=>{
+    entryModal.style.display='none'; oneShotModal.style.display='none';
+    if(batchModal) batchModal.style.display='flex';
+    try{
+      if($('osbModel') && !$('osbModel').innerHTML.trim()) $('osbModel').innerHTML = modelSel.innerHTML;
+      if($('osbRevA') && $('fourRevA') && !$('osbRevA').innerHTML.trim()){ $('osbRevA').innerHTML = $('fourRevA').innerHTML; $('osbRevB').innerHTML = $('fourRevA').innerHTML; }
+      if($('osbKey') && apiKeyEl.value && !$('osbKey').value) $('osbKey').value = apiKeyEl.value;
+      if($('osbModel') && modelSel.value) $('osbModel').value = modelSel.value;
+    }catch(_){}
+  };
+  const eb=$('entryBatch'); if(eb) eb.addEventListener('click', showBatch);
+  const bbk=$('osbBack'); if(bbk) bbk.addEventListener('click', showEntry);
+
+  const osbBtn = $('osbRunBtn');
+  if(osbBtn){
+    osbBtn.addEventListener('click', async ()=>{
+      const lg = $('osbLog');
+      const setMsg = (s)=>{ if(lg) lg.innerHTML = '<div style="color:#E08A8A">'+s+'</div>'; };
+      const raw = ($('osbQuestions')&&$('osbQuestions').value)||'';
+      const questions = raw.split('\n').map(function(s){return s.trim();}).filter(Boolean);
+      const model = ($('osbModel')&&$('osbModel').value)||'';
+      const key = ($('osbKey')&&$('osbKey').value.trim())||'';
+      const revA = ($('osbRevA')&&$('osbRevA').value)||'', revAKey = ($('osbRevAKey')&&$('osbRevAKey').value.trim())||'';
+      const revB = ($('osbRevB')&&$('osbRevB').value)||'', revBKey = ($('osbRevBKey')&&$('osbRevBKey').value.trim())||'';
+      const student = ($('osbStudent')&&$('osbStudent').value.trim())||'';
+      const pass = ($('osbPass')&&$('osbPass').value.trim())||'';
+      // 校验
+      if(!questions.length){ setMsg('✗ 请至少填一个问题（每行一个）。'); return; }
+      if(questions.length>20){ setMsg('✗ 一次最多 20 题，请分批。'); return; }
+      if(!key){ setMsg('✗ 请填写主基底的 Key。'); return; }
+      if(!revA || !revB){ setMsg('✗ 请选好两位审稿人。'); return; }
+      if(revA===revB){ setMsg('✗ 两位审稿人须用不同基底。'); return; }
+      if(!student){ setMsg('✗ 请填写作者名。'); return; }
+      if(!pass){ setMsg('✗ 请填写投稿密码。'); return; }
+      const effRevAKey = keyForVendor(revA, revAKey), effRevBKey = keyForVendor(revB, revBKey);
+      if(!effRevAKey){ setMsg('✗ 审稿人 A 需要 Key（与主基底不同则须单独填）。'); return; }
+      if(!effRevBKey){ setMsg('✗ 审稿人 B 需要 Key。'); return; }
+
+      // 配置写进主面板（全批共用，只填一次）
+      apiKeyEl.value = key; modelSel.value = model;
+      if($('fourRevA')) $('fourRevA').value = revA;
+      if($('fourRevAKey')) $('fourRevAKey').value = revAKey;
+      if($('fourRevB')) $('fourRevB').value = revB;
+      if($('fourRevBKey')) $('fourRevBKey').value = revBKey;
+      if($('autoSubStudent')) $('autoSubStudent').value = student;
+      if($('autoSubPass')) $('autoSubPass').value = pass;
+      try{ modelSel.dispatchEvent(new Event('change')); }catch(_){}
+
+      const N = questions.length;
+      const state = questions.map(function(q){ return { q:q, s:'todo', note:'' }; });  // todo|run|done|fail
+      const render = (curStage)=>{
+        if(!lg) return;
+        var done=state.filter(function(x){return x.s==='done';}).length;
+        var fail=state.filter(function(x){return x.s==='fail';}).length;
+        var html='<div style="text-align:left;max-width:640px;margin:0 auto">';
+        html+='<div style="font-weight:700;color:#C9BEEA;margin-bottom:8px">进度：'+done+' 完成 · '+fail+' 失败 · 共 '+N+' 题</div>';
+        state.forEach(function(x,i){
+          var ic=x.s==='done'?'✓':(x.s==='fail'?'✗':(x.s==='run'?'◉':'○'));
+          var co=x.s==='done'?'#5FB878':(x.s==='fail'?'#E08A8A':(x.s==='run'?'#E8A33D':'#5A636E'));
+          var fw=x.s==='run'?'700':'400';
+          var q=(x.q||'').replace(/</g,'&lt;').slice(0,42);
+          var tail = x.s==='run' ? (' <span style="color:#9AA5B0;font-weight:400">'+(curStage||'')+'</span> <span class="spinner"></span>')
+                   : (x.note ? (' <span style="color:#9AA5B0;font-weight:400">'+x.note+'</span>') : '');
+          html+='<div style="display:flex;gap:8px;padding:3px 2px;color:'+co+';font-weight:'+fw+'"><span style="flex:none;width:16px">'+ic+'</span><span>'+(i+1)+'. '+q+tail+'</span></div>';
+        });
+        html+='</div>';
+        lg.innerHTML=html;
+      };
+      render('');
+      osbBtn.disabled = true; const ol=osbBtn.textContent; osbBtn.textContent='⏳ 批量跑程中，请勿关闭页面…';
+      for(let i=0;i<N;i++){
+        state[i].s='run'; render('准备…');
+        try{
+          await runIdeaPipelineOnce(questions[i], pass, student, function(t){ render(t); });
+          state[i].s='done'; state[i].note='✓ 已投稿';
+        }catch(e){
+          state[i].s='fail'; state[i].note='✗ 失败：'+((e&&e.message)||e);
+        }
+        render('');
+      }
+      var doneN=state.filter(function(x){return x.s==='done';}).length;
+      var failN=state.filter(function(x){return x.s==='fail';}).length;
+      if(lg){
+        lg.innerHTML += '<div style="margin-top:12px;font-weight:700;color:'+(failN?'#E8A33D':'#5FB878')+';text-align:center">✓ 批量完成：'+doneN+'/'+N+' 题已投稿'+(failN?('，'+failN+' 题失败（见上，可对失败题单独重跑）'):'')+'。可关闭此窗口。</div>';
+      }
+      osbBtn.disabled = false; osbBtn.textContent = ol;
+    });
+  }
 })();
 // 通用等待：条件成立即 resolve（用于六篇、涌现这类无固定产出变量名的阶段）
 function waitVar(cond, timeoutMs){
@@ -3244,6 +3389,44 @@ function waitVar(cond, timeoutMs){
       if(Date.now()-t0 > (timeoutMs||60*60*1000)){ clearInterval(iv); reject(new Error('该阶段超时未产出')); }
     }, 1500);
   });
+}
+
+// 批量用：跑一题的完整七段并投稿。假定主面板配置（主基底/Key/两位审稿人/其 Key）已由调用方设好。
+// 阶段序列与「一次生成」 osRunBtn 逐字一致；每题先 clearResults() 干净重置（归零 _lastResult/_lastEmerge 并清 DOM）。
+// 任一阶段失败则 throw，由批量循环捕捉并标该题失败后续跑。
+async function runIdeaPipelineOnce(question, pass, student, onStage){
+  try{ clearResults(); }catch(_){}
+  questionEl.value = question;
+  // ① 六篇对决
+  onStage && onStage('六篇并发·三视角对决…');
+  window._lastResult = null;
+  goBtn.click();
+  await waitVar(()=> window._lastResult && window._lastResult.rows && window._lastResult.rows.length>=3);
+  // ② 涌现新典范
+  onStage && onStage('碰撞→暗流→新典范…');
+  window._lastEmerge = null;
+  $('emergeBtn').click();
+  await waitVar(()=> !!window._lastEmerge);
+  // ③ 四篇初稿
+  onStage && onStage('四篇并发·含评审打磨…');
+  $('fourStartBtn').click();
+  await waitStage('_fourPapers','fourStartBtn');
+  // ④ 二次提智
+  onStage && onStage('发生引擎冲 150…');
+  $('upliftBtn').click();
+  await waitStage('_upliftPapers','upliftBtn');
+  // ⑤ 补规范
+  onStage && onStage('挂真实引注·脚注·文献…');
+  $('normalizeBtn').click();
+  await waitStage('_normalizedPapers','normalizeBtn');
+  // ⑥ 二次审稿打磨
+  onStage && onStage('独立双审+主笔打磨…');
+  $('polishBtn').click();
+  await waitStage('_polishedPapers','polishBtn');
+  // ⑦ 存 Inbox
+  onStage && onStage('存入收件箱…');
+  await submitPolishedToInbox(pass, student, function(t){ onStage && onStage('投稿：'+t); });
+  return true;
 }
 
 const emergeBtn = $('emergeBtn');
