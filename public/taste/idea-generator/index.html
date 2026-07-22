@@ -247,13 +247,28 @@ footer{border-top:1px solid var(--border);text-align:center;padding:30px 20px 44
       </div>
     </div>
 
+    <div style="margin-bottom:16px">
+      <label style="display:block;font-size:12.5px;color:#B98CFF;font-weight:700;margin-bottom:8px">④ 产出去向</label>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button type="button" id="osbDestSubmit" data-dest="submit" style="flex:1;min-width:180px;padding:11px 12px;border-radius:9px;border:1px solid #7A4FD0;background:rgba(122,79,208,0.22);color:#EAE4FF;cursor:pointer;text-align:left">
+          <div style="font-size:13.5px;font-weight:700">📮 自动投稿到收件箱</div>
+          <div style="font-size:11.5px;color:#C9BEEA;margin-top:2px">跑完每题自动投进学员投稿收件箱（需投稿密码）</div>
+        </button>
+        <button type="button" id="osbDestLocal" data-dest="local" style="flex:1;min-width:180px;padding:11px 12px;border-radius:9px;border:1px solid rgba(255,255,255,0.15);background:#0d1117;color:#D4DCE4;cursor:pointer;text-align:left">
+          <div style="font-size:13.5px;font-weight:700">💾 存到本地文件夹</div>
+          <div style="font-size:11.5px;color:#9AA5B0;margin-top:2px">每题四篇打包成一个 .docx 存进你选的文件夹（不投稿）</div>
+        </button>
+      </div>
+      <div id="osbDestHint" style="font-size:11.5px;color:#9AA5B0;margin-top:7px;line-height:1.6"></div>
+    </div>
+
     <div style="margin-bottom:20px;display:flex;gap:8px;flex-wrap:wrap">
       <div style="flex:1;min-width:150px">
-        <label style="display:block;font-size:12.5px;color:#B98CFF;font-weight:700;margin-bottom:6px">④ 作者名（全批共用）</label>
+        <label style="display:block;font-size:12.5px;color:#B98CFF;font-weight:700;margin-bottom:6px">⑤ 作者名（全批共用）</label>
         <input id="osbStudent" type="text" maxlength="80" placeholder="你的名字" style="width:100%;padding:9px 11px;border-radius:8px;border:1px solid rgba(255,255,255,0.15);background:#0d1117;color:#D4DCE4;font-size:13px">
       </div>
       <div style="flex:1;min-width:150px">
-        <label style="display:block;font-size:12.5px;color:#B98CFF;font-weight:700;margin-bottom:6px">⑤ 投稿密码</label>
+        <label style="display:block;font-size:12.5px;color:#B98CFF;font-weight:700;margin-bottom:6px">⑥ 投稿密码（投稿模式必填 · 本地模式可留空）</label>
         <input id="osbPass" type="password" placeholder="投稿密码" autocomplete="off" style="width:100%;padding:9px 11px;border-radius:8px;border:1px solid rgba(255,255,255,0.15);background:#0d1117;color:#D4DCE4;font-size:13px">
       </div>
     </div>
@@ -3125,6 +3140,32 @@ async function submitPolishedToInbox(pass, student, setStatus){
   throw new Error((r&&r.msg)||('上传失败（'+resp.status+'）。'));
 }
 
+// 批量·本地模式：把 _polishedPapers 打包成 docx，写入用户选的文件夹；浏览器不支持则回退为下载
+async function savePolishedToDir(dirHandle, student, idx, question, setStatus){
+  const papers = window._polishedPapers;
+  if(!_papersReady(papers)) throw new Error('还没有“最后四篇（打磨版）”，无法保存。');
+  setStatus && setStatus('打包 docx…');
+  const q = (window._lastResult && window._lastResult.question) || question || '';
+  const authorLine = student ? ('作者：'+student+'　·　') : '';
+  const blob = await buildPapersDocxBlob('最后四篇 · 二次审稿打磨版 · 学术论文', authorLine+'原初问题：'+q, papers);
+  const num = ('0'+(idx+1)).slice(-2);
+  const safeQ = (question||'').replace(/[^\w\u4e00-\u9fa5]+/g,'_').replace(/^_+|_+$/g,'').slice(0,24);
+  const fname = num+'_'+(safeQ||'金点子')+'.docx';
+  if(dirHandle && dirHandle.getFileHandle){
+    setStatus && setStatus('写入文件夹…');
+    const fh = await dirHandle.getFileHandle(fname, {create:true});
+    const w = await fh.createWritable();
+    await w.write(blob); await w.close();
+    return true;
+  }
+  // 回退：触发浏览器下载到默认下载目录
+  setStatus && setStatus('下载中…');
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href=url; a.download=fname; document.body.appendChild(a); a.click();
+  setTimeout(function(){ try{ URL.revokeObjectURL(url); a.remove(); }catch(_){}} , 4000);
+  return true;
+}
+
 // polishDlRow 里的独立“存入 Inbox”按钮（针对已手动跑到最后的情况）
 const polishInboxBtn = $('polishInboxBtn');
 if(polishInboxBtn){
@@ -3343,6 +3384,29 @@ if(autoRunBtn){
   const _osbAddBtn=$('osbAdd'); if(_osbAddBtn) _osbAddBtn.addEventListener('click', function(){ osbAddRow(''); });
   osbEnsureRows(3);   // 初始 3 行，需要再添加
 
+  // ── 产出去向切换 ──
+  let osbDest='submit';
+  function osbSetDest(d){
+    osbDest=d;
+    var sb=$('osbDestSubmit'), lo=$('osbDestLocal'), hint=$('osbDestHint'), pw=$('osbPass'), rb=$('osbRunBtn');
+    [sb,lo].forEach(function(b){ if(!b) return; var on=b.getAttribute('data-dest')===d;
+      b.style.border=on?'1px solid #7A4FD0':'1px solid rgba(255,255,255,0.15)';
+      b.style.background=on?'rgba(122,79,208,0.22)':'#0d1117';
+      b.style.color=on?'#EAE4FF':'#D4DCE4'; });
+    if(d==='local'){
+      if(hint) hint.innerHTML = (window.showDirectoryPicker ? '点下方按钮后会先让你<b>选一个文件夹</b>，每题的四篇打包成一个 .docx 存进去。' : '你的浏览器不支持选文件夹，将改为逐题<b>下载</b>到默认下载目录。')+' 本地模式无需投稿密码。';
+      if(pw) pw.placeholder='本地模式可留空';
+      if(rb) rb.textContent='💾 批量生成 · 逐题跑完并存入本地文件夹';
+    }else{
+      if(hint) hint.textContent='跑完每题自动投进学员投稿收件箱，需要投稿密码。';
+      if(pw) pw.placeholder='投稿密码';
+      if(rb) rb.textContent='📮 批量生成 · 逐题跑完并逐题投稿';
+    }
+  }
+  var _ds=$('osbDestSubmit'); if(_ds) _ds.addEventListener('click', function(){ osbSetDest('submit'); });
+  var _dl=$('osbDestLocal'); if(_dl) _dl.addEventListener('click', function(){ osbSetDest('local'); });
+  osbSetDest('submit');
+
   const osbBtn = $('osbRunBtn');
   if(osbBtn){
     osbBtn.addEventListener('click', async ()=>{
@@ -3362,7 +3426,7 @@ if(autoRunBtn){
       if(!revA || !revB){ setMsg('✗ 请选好两位审稿人。'); return; }
       if(revA===revB){ setMsg('✗ 两位审稿人须用不同基底。'); return; }
       if(!student){ setMsg('✗ 请填写作者名。'); return; }
-      if(!pass){ setMsg('✗ 请填写投稿密码。'); return; }
+      if(osbDest==='submit' && !pass){ setMsg('✗ 投稿模式需要投稿密码（或改选“存到本地文件夹”）。'); return; }
       const effRevAKey = keyForVendor(revA, revAKey), effRevBKey = keyForVendor(revB, revBKey);
       if(!effRevAKey){ setMsg('✗ 审稿人 A 需要 Key（与主基底不同则须单独填）。'); return; }
       if(!effRevBKey){ setMsg('✗ 审稿人 B 需要 Key。'); return; }
@@ -3377,9 +3441,15 @@ if(autoRunBtn){
       if($('autoSubPass')) $('autoSubPass').value = pass;
       try{ modelSel.dispatchEvent(new Event('change')); }catch(_){}
 
+      // 本地模式：run 按钮点击本身即用户手势，此处即可弹出文件夹选择器
+      let dirHandle=null;
+      if(osbDest==='local' && window.showDirectoryPicker){
+        try{ dirHandle = await window.showDirectoryPicker({mode:'readwrite'}); }
+        catch(e){ setMsg('✗ 未选择文件夹，已取消。'); return; }
+      }
       const N = questions.length;
       const state = questions.map(function(q){ return { q:q, s:'todo', note:'' }; });  // todo|run|done|fail
-      const OSB_STAGES = ['六篇对决','涌现新典范','四篇论文','二次提智','补规范','二次审稿打磨','存入收件箱'];
+      const OSB_STAGES = ['六篇对决','涌现新典范','四篇论文','二次提智','补规范','二次审稿打磨', osbDest==='local'?'存到本地文件夹':'存入收件箱'];
       let curQ=-1, curStage=0, curSub='';
       const render = ()=>{
         if(!lg) return;
@@ -3417,9 +3487,12 @@ if(autoRunBtn){
       osbBtn.disabled = true; const ol=osbBtn.textContent; osbBtn.textContent='⏳ 批量跑程中，请勿关闭页面…';
       for(let i=0;i<N;i++){
         curQ=i; curStage=0; curSub=''; state[i].s='run'; render();
+        const sink = (osbDest==='local')
+          ? (function(setSub){ return savePolishedToDir(dirHandle, student, i, questions[i], setSub); })
+          : (function(setSub){ return submitPolishedToInbox(pass, student, setSub); });
         try{
-          await runIdeaPipelineOnce(questions[i], pass, student, function(idx, sub){ curStage=idx; curSub=sub; render(); });
-          state[i].s='done'; state[i].note='✓ 已投稿';
+          await runIdeaPipelineOnce(questions[i], function(idx, sub){ curStage=idx; curSub=sub; render(); }, sink);
+          state[i].s='done'; state[i].note = osbDest==='local' ? '✓ 已存本地' : '✓ 已投稿';
         }catch(e){
           state[i].s='fail'; state[i].note='✗ 失败：'+((e&&e.message)||e);
         }
@@ -3429,7 +3502,8 @@ if(autoRunBtn){
       var doneN=state.filter(function(x){return x.s==='done';}).length;
       var failN=state.filter(function(x){return x.s==='fail';}).length;
       if(lg){
-        lg.innerHTML += '<div style="margin-top:12px;font-weight:700;color:'+(failN?'#E8A33D':'#5FB878')+';text-align:center">✓ 批量完成：'+doneN+'/'+N+' 题已投稿'+(failN?('，'+failN+' 题失败（见上，可对失败题单独重跑）'):'')+'。可关闭此窗口。</div>';
+        var okWord = osbDest==='local' ? '已存到本地文件夹' : '已投稿';
+        lg.innerHTML += '<div style="margin-top:12px;font-weight:700;color:'+(failN?'#E8A33D':'#5FB878')+';text-align:center">✓ 批量完成：'+doneN+'/'+N+' 题'+okWord+(failN?('，'+failN+' 题失败（见上，可对失败题单独重跑）'):'')+'。可关闭此窗口。</div>';
       }
       osbBtn.disabled = false; osbBtn.textContent = ol;
     });
@@ -3450,7 +3524,7 @@ function waitVar(cond, timeoutMs){
 // 批量用：跑一题的完整七段并投稿。假定主面板配置（主基底/Key/两位审稿人/其 Key）已由调用方设好。
 // 阶段序列与「一次生成」 osRunBtn 逐字一致；每题先 clearResults() 干净重置（归零 _lastResult/_lastEmerge 并清 DOM）。
 // 任一阶段失败则 throw，由批量循环捕捉并标该题失败后续跑。
-async function runIdeaPipelineOnce(question, pass, student, onStage){
+async function runIdeaPipelineOnce(question, onStage, sink){
   try{ clearResults(); }catch(_){}
   questionEl.value = question;
   // ① 六篇对决
@@ -3479,9 +3553,9 @@ async function runIdeaPipelineOnce(question, pass, student, onStage){
   onStage && onStage(6, '独立双审+主笔打磨…');
   $('polishBtn').click();
   await waitStage('_polishedPapers','polishBtn');
-  // ⑦ 存 Inbox
-  onStage && onStage(7, '存入收件箱…');
-  await submitPolishedToInbox(pass, student, function(t){ onStage && onStage(7, '投稿：'+t); });
+  // ⑦ 产出去向：由 sink 决定（投稿收件箱 or 存本地文件夹）
+  onStage && onStage(7, '产出中…');
+  await sink(function(t){ onStage && onStage(7, t); });
   return true;
 }
 
