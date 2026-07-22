@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>文章 SDE 解析器 · 缝隙创新法：读出创新与缝隙，造新概念填缝 | SDE Universes</title>
-<meta name="description" content="上传你自己的文章（Word .docx 或 PDF，单篇最大 100MB、最多 10 篇），文件只在你本机解析、绝不上传（扫描版 PDF 可本机 OCR）；WDS 用 SDE 三大工具（三大方程·六路径·123原理）读出每篇的创新与缝隙，再用 SDE 创造发明新概念把缝隙补上——缝隙创新法；多篇时并置涌现出填补共同缝隙的新概念。用你自己的大模型 Key（只存本地）。">
+<meta name="description" content="上传你自己的文章（Word .docx / PDF / 图片 / 纯文本，单篇最大 100MB、最多 10 篇），文件只在你本机解析、绝不上传（PDF 双栏版面自动还原，扫描页与图片本机 OCR）；WDS 用 SDE 三大工具（三大方程·六路径·123原理）读出每篇的创新与缝隙，再用 SDE 创造发明新概念把缝隙补上——缝隙创新法；多篇时并置涌现出填补共同缝隙的新概念。用你自己的大模型 Key（只存本地）。">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/mammoth@1.6.0/mammoth.browser.min.js"></script>
 <style>
@@ -92,7 +92,7 @@ textarea:focus{outline:none;border-color:var(--gold)}
   <div class="hero-glow"></div>
   <div class="eyebrow">品尝系列 · 其七</div>
   <h1>文章 <span class="grad">SDE 解析器</span></h1>
-  <p class="sub">传你自己的文章（<b>Word .docx / PDF</b>，单篇最大 100MB、最多 10 篇），<b>文件只在你本机解析、绝不上传</b>（连扫描版 PDF 都能本机 OCR 读出）。WDS 用 SDE 三大工具（<b>三大方程 · 六路径 · 123原理</b>）读出每篇的<b>创新与缝隙</b>，再用 SDE 创造<b>发明新概念把缝隙补上</b>——这就是缝隙创新法；多篇时再并置涌现出一个填补共同缝隙的新概念。</p>
+  <p class="sub">传你自己的文章（<b>Word .docx / PDF / 图片 / 纯文本</b>，单篇最大 100MB、最多 10 篇），<b>文件只在你本机解析、绝不上传</b>（PDF <b>双栏版面自动还原</b>、扫描页与图片都能本机 OCR 读出）。WDS 用 SDE 三大工具（<b>三大方程 · 六路径 · 123原理</b>）读出每篇的<b>创新与缝隙</b>，再用 SDE 创造<b>发明新概念把缝隙补上</b>——这就是缝隙创新法；多篇时再并置涌现出一个填补共同缝隙的新概念。</p>
   <div class="flow">
     <span>上传 Word/PDF</span><span class="arr">→</span><span>本机解析</span><span class="arr">→</span><span>读创新与缝隙</span><span class="arr">→</span><span>造新概念填缝</span><span class="arr">→</span><span>跨篇涌现</span>
   </div>
@@ -131,10 +131,10 @@ textarea:focus{outline:none;border-color:var(--gold)}
     <div class="drop" id="drop">
       <div class="di">⧉</div>
       <div class="dt">点这里选文件，或把 Word/PDF 拖进来（可一次多选）</div>
-      <div class="ds">支持 Word .docx（2007 及以后，含 WPS／Mac Word／Google Docs 导出）与 PDF · 单篇 ≤ 100MB · 最多 10 篇</div>
+      <div class="ds">支持 Word .docx · PDF（数字版与扫描版都读）· 图片 png/jpg/webp · 纯文本 .txt/.md · 网页 .html · .rtf　｜　单篇 ≤ 100MB · 最多 10 篇</div>
     </div>
-    <input type="file" id="fileIn" accept=".docx,.pdf" multiple style="display:none">
-    <div class="tip">扫描版／纯图片 PDF（无文字层）会自动识别为「可 OCR」，点该行的「🔍 OCR 提取」即可在本机逐页识别（中英双语，较慢，前 120 页）。旧版二进制 .doc、RTF 请在 Word/WPS 里「另存为 .docx」，或把正文粘到下面。</div>
+    <input type="file" id="fileIn" accept=".docx,.pdf,.txt,.md,.markdown,.html,.htm,.rtf,.png,.jpg,.jpeg,.webp,.bmp,.gif,.tif,.tiff,image/*" multiple style="display:none">
+    <div class="tip">最强本机解析：PDF 自动<b>识别双栏／多栏版面</b>按阅读顺序还原（学术论文不再串行）；数字 PDF 里<b>夹着的扫描页会自动逐页 OCR 混排</b>补回原位；<b>图片</b>直接本机识别成文字。整篇扫描版 PDF（无文字层）会标为「可 OCR」，点该行「🔍 OCR 提取」在本机逐页识别（中英双语，自适应提采样，最多 400 页，较慢）。旧版二进制 .doc 请「另存为 .docx」，或把正文粘到下面。</div>
     <div id="queue" style="display:none"></div>
     <div class="pastebox">
       <div class="lbl" style="margin-top:6px">或粘贴一篇正文</div>
@@ -157,7 +157,7 @@ textarea:focus{outline:none;border-color:var(--gold)}
   <div id="results"></div>
 </main>
 
-<div class="foot">由大模型生成，观点供思考参考；可核验事实请以原始文献为准。文件解析全部在你本机浏览器内完成（PDF.js／mammoth），正文与 API Key 只在你选定基底时发往该基底，本站不留存。sdeuniverses.com</div>
+<div class="foot">由大模型生成，观点供思考参考；可核验事实请以原始文献为准。文件解析全部在你本机浏览器内完成（PDF.js 版面重排／mammoth／tesseract.js 本机 OCR），文件绝不上传；正文与 API Key 只在你选定基底时发往该基底，本站不留存。sdeuniverses.com</div>
 
 <script>
 (function(){
@@ -187,7 +187,7 @@ document.querySelectorAll("#tierSeg button").forEach(function(b){b.onclick=funct
 paintVendor();
 function curKey(){var k=(vendor==="ds"?dsKey.value:glmKey.value).trim();return k.length>=8?{key:k,vendor:vendor}:null;}
 
-/* ═══════════ 文件解析器（结构保真；PDF 版面感知）══════════ */
+/* ═══════════ 文件解析器（最强档：PDF 双栏/多栏版面感知 · 数字页文字层+扫描页自动混排 OCR · DOCX 结构保真 · 纯文本/HTML/RTF/图片全收；全部本机浏览器内完成，绝不上传）══════════ */
 try{ if(window.pdfjsLib) pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js"; }catch(_){}
 var DOCX_STYLE_MAP=[
   "p[style-name='Title'] => h1:fresh","p[style-name='Subtitle'] => h2:fresh",
@@ -246,92 +246,11 @@ async function extractDocx(ab){
 var CJK=/[\u2e80-\u9fff\uf900-\ufaff\uff00-\uffef\u3000-\u303f]/;
 function isCJKEdge(a,b){return CJK.test(a)&&CJK.test(b);}
 function median(a){if(!a.length) return 0;var s=a.slice().sort(function(x,y){return x-y;});return s[s.length>>1];}
-async function extractPdf(ab,onPage){
-  var pdf=await pdfjsLib.getDocument({data:ab}).promise;
-  var pages=[];
-  for(var i=1;i<=pdf.numPages;i++){
-    if(onPage) onPage(i,pdf.numPages);
-    var pg=await pdf.getPage(i);
-    var vp=pg.getViewport({scale:1});
-    var tc=await pg.getTextContent();
-    var lines=[];
-    for(var q=0;q<tc.items.length;q++){
-      var it=tc.items[q];
-      if(!it.str||!it.str.trim()) continue;
-      var x=it.transform[4], y=it.transform[5];
-      var fh=Math.abs(it.transform[3])||it.height||10;
-      var L=null;
-      for(var li=0;li<lines.length;li++){if(Math.abs(lines[li].y-y)<Math.max(1.5,fh*0.45)){L=lines[li];break;}}
-      if(!L){L={y:y,h:fh,items:[]};lines.push(L);}
-      L.items.push({x:x,w:it.width||0,s:it.str});
-      if(fh>L.h) L.h=fh;
-    }
-    for(var a=0;a<lines.length;a++) lines[a].items.sort(function(m,n){return m.x-n.x;});
-    lines.sort(function(m,n){return n.y-m.y;});
-    for(var b=0;b<lines.length;b++){
-      var l=lines[b], s="";
-      for(var k=0;k<l.items.length;k++){
-        var cur=l.items[k], prev=l.items[k-1];
-        if(prev&&s){
-          var gap=cur.x-(prev.x+prev.w);
-          var last=s[s.length-1], first=cur.s[0];
-          if(!isCJKEdge(last,first)&&gap>l.h*0.16) s+=" ";
-        }
-        s+=cur.s;
-      }
-      l.text=s.replace(/[ \t]{2,}/g," ").trim();
-      l.x0=l.items.length?l.items[0].x:0;
-      var lastIt=l.items[l.items.length-1];
-      l.x1=lastIt?lastIt.x+lastIt.w:0;
-    }
-    pages.push({n:i,H:vp.height,lines:lines.filter(function(l){return l.text;})});
-  }
-  var norm=function(t){return t.replace(/[\d０-９ivxlcIVXLC]+/g,"#").replace(/\s+/g,"");};
-  var tally={};
-  for(var p1=0;p1<pages.length;p1++) for(var ll=0;ll<pages[p1].lines.length;ll++){
-    var lo=pages[p1].lines[ll], rel=lo.y/pages[p1].H;
-    if(rel>0.91||rel<0.09){var kk=norm(lo.text);if(kk.length>1){(tally[kk]=tally[kk]||new Set()).add(pages[p1].n);}}
-  }
-  var noise={}, need=Math.max(3,Math.ceil(pages.length*0.4));
-  for(var nk in tally) if(tally[nk].size>=need) noise[nk]=1;
-  var out="";
-  for(var p2=0;p2<pages.length;p2++){
-    var pg2=pages[p2];
-    var keep=pg2.lines.filter(function(l){
-      var rel=l.y/pg2.H;
-      if((rel>0.91||rel<0.09)&&noise[norm(l.text)]) return false;
-      if((rel>0.93||rel<0.07)&&/^[\s\d\-—–—·.·]{1,12}$/.test(l.text)) return false;
-      return true;
-    });
-    if(!keep.length) continue;
-    var gaps=[]; for(var g=1;g<keep.length;g++) gaps.push(Math.abs(keep[g-1].y-keep[g].y));
-    var lead=median(gaps)||keep[0].h*1.2, para="";
-    for(var kx=0;kx<keep.length;kx++){
-      var lk=keep[kx], pk=keep[kx-1], brk=false;
-      if(pk){
-        var gg=Math.abs(pk.y-lk.y);
-        if(gg>lead*1.5) brk=true;
-        if(/[。！？；：”』】]$/.test(pk.text)&&lk.x0>pk.x0+lk.h*0.8) brk=true;
-      }
-      if(brk&&para){out+=para.trim()+"\n\n";para="";}
-      if(para){
-        var lc=para[para.length-1], fc=lk.text[0];
-        if(/[A-Za-z]-$/.test(para)&&/^[a-z]/.test(lk.text)) para=para.slice(0,-1)+lk.text;
-        else if(isCJKEdge(lc,fc)) para+=lk.text;
-        else para+=" "+lk.text;
-      } else para=lk.text;
-    }
-    if(para.trim()) out+=para.trim()+"\n\n";
-  }
-  out=out.replace(/([\u2e80-\u9fff])[ \t]+(?=[\u2e80-\u9fff])/g,"$1");
-  return out.replace(/\n{3,}/g,"\n\n").trim();
-}
 
-/* ═══════════ 扫描版 PDF 的 OCR 兜底（tesseract.js，懒加载，中英双语）══════════
-   全站所有解析器都在"纯图片 PDF（无文字层）"处投降——这里把它接住：
-   逐页把 PDF 渲染成画布，交给 tesseract 识别，让"读不了"变成"什么都能读"。
-   只在用户对某篇点「OCR 提取」时才加载库与语言包，不拖累日常。 */
-var OCR_MAX_PAGES=120;
+/* ── OCR 引擎（懒加载 tesseract；全文 OCR 与「数字 PDF 里夹扫描页」的逐页混排共用一套）──
+   全站所有解析器都在"纯图片 PDF（无文字层）"处投降——这里把它接住：把页面渲染成画布交给 tesseract，
+   让"读不了"变成"什么都能读"。库与语言包只在真的需要识别时才加载，不拖累日常。 */
+var OCR_MAX_PAGES=400;
 var _tessP=null;
 function ensureTesseract(){
   if(window.Tesseract) return Promise.resolve();
@@ -345,6 +264,181 @@ function ensureTesseract(){
   });
   return _tessP;
 }
+// 依页面尺寸自适应采样：长边约 2600px，clamp[2,3.6]——比固定 2× 更清晰、又不撑爆内存
+function pageScale(pg){
+  var vp1=pg.getViewport({scale:1});
+  var lng=Math.max(vp1.width,vp1.height)||800;
+  var s=2600/lng; if(s<2)s=2; if(s>3.6)s=3.6; return s;
+}
+async function renderPageCanvas(pg,scale){
+  var vp=pg.getViewport({scale:scale});
+  var cv=document.createElement("canvas");
+  cv.width=vp.width; cv.height=vp.height;
+  await pg.render({canvasContext:cv.getContext("2d",{willReadFrequently:true}),viewport:vp}).promise;
+  return cv;
+}
+async function ocrCanvas(worker,cv){
+  var r=await worker.recognize(cv);
+  cv.width=cv.height=0;                                   // 及时释放大画布
+  return (((r&&r.data&&r.data.text)||"").trim());
+}
+// 图片文件（png/jpg/webp…）直接 OCR
+async function ocrImage(file){
+  await ensureTesseract();
+  var worker=await Tesseract.createWorker(["chi_sim","eng"]);
+  try{ var r=await worker.recognize(file); return (((r&&r.data&&r.data.text)||"").trim()); }
+  finally{ try{ await worker.terminate(); }catch(_){} }
+}
+
+/* ── PDF 文字层重排：双栏/多栏感知 ── */
+// 单栏 item[] → 行[]（按 y 归行、按 x 排序、非中日韩边界按间隙补空格）
+function itemsToLines(items){
+  var lines=[];
+  for(var q=0;q<items.length;q++){
+    var it=items[q]; if(!it.s||!it.s.trim()) continue;
+    var y=it.y, fh=it.h||10, L=null;
+    for(var li=0;li<lines.length;li++){ if(Math.abs(lines[li].y-y)<Math.max(1.5,fh*0.45)){L=lines[li];break;} }
+    if(!L){L={y:y,h:fh,items:[]};lines.push(L);}
+    L.items.push({x:it.x,w:it.w||0,s:it.s});
+    if(fh>L.h) L.h=fh;
+  }
+  for(var a=0;a<lines.length;a++) lines[a].items.sort(function(m,n){return m.x-n.x;});
+  lines.sort(function(m,n){return n.y-m.y;});
+  for(var b=0;b<lines.length;b++){
+    var l=lines[b], s="";
+    for(var k=0;k<l.items.length;k++){
+      var cur=l.items[k], prev=l.items[k-1];
+      if(prev&&s){
+        var gap=cur.x-(prev.x+prev.w);
+        var last=s[s.length-1], first=cur.s[0];
+        if(!isCJKEdge(last,first)&&gap>l.h*0.16) s+=" ";
+      }
+      s+=cur.s;
+    }
+    l.text=s.replace(/[ \t]{2,}/g," ").trim();
+    l.x0=l.items.length?l.items[0].x:0;
+    var lastIt=l.items[l.items.length-1];
+    l.x1=lastIt?lastIt.x+lastIt.w:0;
+  }
+  return lines.filter(function(l){return l.text;});
+}
+// 页面 item[] → 若检测出中缝空白竖带则拆成左右栏（保守：几乎零跨越+两侧都有实体才拆），否则单栏
+function splitColumns(items,pageW){
+  if(items.length<40) return [items];
+  var xs=[]; for(var i=0;i<items.length;i++){ xs.push(items[i].x); xs.push(items[i].x+(items[i].w||0)); }
+  var minX=Math.min.apply(null,xs), maxX=Math.max.apply(null,xs), span=maxX-minX;
+  if(span<=0) return [items];
+  var best=null, N=items.length;
+  for(var f=0.34;f<=0.66;f+=0.02){
+    var cut=minX+span*f, cross=0, left=0, right=0;
+    for(var k=0;k<N;k++){ var a=items[k].x, b=items[k].x+(items[k].w||0);
+      if(a<cut-2 && b>cut+2) cross++;
+      else if(b<=cut+2) left++; else right++;
+    }
+    if(left>N*0.15 && right>N*0.15 && (!best||cross<best.cross)) best={cut:cut,cross:cross};
+  }
+  if(best && best.cross<=Math.max(2,N*0.02)){
+    var Lc=[],Rc=[];
+    for(var m=0;m<N;m++){ var c=items[m].x+(items[m].w||0)/2; (c<best.cut?Lc:Rc).push(items[m]); }
+    if(Lc.length>12 && Rc.length>12){
+      // 再对右栏试拆一次（三栏论文）——同样保守
+      var r2=splitColumns(Rc,pageW);
+      return [Lc].concat(r2.length>1?r2:[Rc]);
+    }
+  }
+  return [items];
+}
+// 某栏的行[] → 段落文本（沿用行距/缩进/断字启发式）
+function linesToParagraphs(keep){
+  if(!keep.length) return "";
+  var gaps=[]; for(var g=1;g<keep.length;g++) gaps.push(Math.abs(keep[g-1].y-keep[g].y));
+  var lead=median(gaps)||keep[0].h*1.2, para="", out="";
+  for(var kx=0;kx<keep.length;kx++){
+    var lk=keep[kx], pk=keep[kx-1], brk=false;
+    if(pk){
+      var gg=Math.abs(pk.y-lk.y);
+      if(gg>lead*1.5) brk=true;
+      if(/[。！？；：”』】]$/.test(pk.text)&&lk.x0>pk.x0+lk.h*0.8) brk=true;
+    }
+    if(brk&&para){out+=para.trim()+"\n\n";para="";}
+    if(para){
+      var lc=para[para.length-1], fc=lk.text[0];
+      if(/[A-Za-z]-$/.test(para)&&/^[a-z]/.test(lk.text)) para=para.slice(0,-1)+lk.text;
+      else if(isCJKEdge(lc,fc)) para+=lk.text;
+      else para+=" "+lk.text;
+    } else para=lk.text;
+  }
+  if(para.trim()) out+=para.trim()+"\n\n";
+  return out;
+}
+async function extractPdf(ab,onPage){
+  var pdf=await pdfjsLib.getDocument({data:ab}).promise;
+  var NP=pdf.numPages;
+  var pages=[];                      // {n,H,cols:[lines[]],low:bool}
+  for(var i=1;i<=NP;i++){
+    if(onPage) onPage(i,NP,"抽取文字层");
+    var pg=await pdf.getPage(i);
+    var vp=pg.getViewport({scale:1});
+    var tc=await pg.getTextContent();
+    var items=[];
+    for(var q=0;q<tc.items.length;q++){
+      var it=tc.items[q]; if(!it.str||!it.str.trim()) continue;
+      items.push({x:it.transform[4],y:it.transform[5],w:it.width||0,h:Math.abs(it.transform[3])||it.height||10,s:it.str});
+    }
+    var chars=items.reduce(function(s,t){return s+t.s.replace(/\s/g,"").length;},0);
+    if(chars<8){ pages.push({n:i,H:vp.height,cols:[],low:true}); continue; }   // 无（或几乎无）文字层：待混排 OCR
+    var cols=splitColumns(items,vp.width);
+    pages.push({n:i,H:vp.height,cols:cols.map(itemsToLines),low:false});
+  }
+  // 跨页/跨栏统计页眉页脚噪声（相对页高 <9% 或 >91%，且在 ≥40% 页复现）
+  var norm=function(t){return t.replace(/[\d０-９ivxlcIVXLC]+/g,"#").replace(/\s+/g,"");};
+  var tally={};
+  for(var p1=0;p1<pages.length;p1++){ var pp=pages[p1]; if(pp.low) continue;
+    for(var ci=0;ci<pp.cols.length;ci++) for(var ll=0;ll<pp.cols[ci].length;ll++){
+      var lo=pp.cols[ci][ll], rel=lo.y/pp.H;
+      if(rel>0.91||rel<0.09){ var kk=norm(lo.text); if(kk.length>1){(tally[kk]=tally[kk]||new Set()).add(pp.n);} }
+    }
+  }
+  var digital=pages.filter(function(p){return !p.low;}).length;
+  var noise={}, need=Math.max(3,Math.ceil(Math.max(digital,1)*0.4));
+  for(var nk in tally) if(tally[nk].size>=need) noise[nk]=1;
+  var lowN=pages.filter(function(p){return p.low;}).length;
+  // 整篇基本无文字层（>60% 页无文字或全无）→ 不在此静默 OCR（可能几百页、耗时长）；返回空，交给上层"扫描版"手动一键 OCR 流程（带进度与用户确认）
+  var mostlyScanned=(digital===0)||(lowN>NP*0.6);
+  var worker=null, ocrDone=0;
+  async function W(){ if(worker) return worker; await ensureTesseract(); worker=await Tesseract.createWorker(["chi_sim","eng"]); return worker; }
+  var out="";
+  try{
+    for(var p2=0;p2<pages.length;p2++){
+      var P=pages[p2];
+      if(P.low){
+        if(mostlyScanned) continue;                                  // 让上层走手动 OCR
+        // 数字 PDF 里夹的扫描页/图片页：就地逐页 OCR 补回原位（混排）
+        try{
+          if(onPage) onPage(P.n,NP,"OCR 扫描页");
+          var w=await W();
+          var pg2=await pdf.getPage(P.n);
+          var cv=await renderPageCanvas(pg2,pageScale(pg2));
+          var t=await ocrCanvas(w,cv);
+          if(t){ out+=t+"\n\n"; ocrDone++; }
+        }catch(_){}
+        continue;
+      }
+      for(var ci2=0;ci2<P.cols.length;ci2++){
+        var keep=P.cols[ci2].filter(function(l){
+          var rel=l.y/P.H;
+          if((rel>0.91||rel<0.09)&&noise[norm(l.text)]) return false;
+          if((rel>0.93||rel<0.07)&&/^[\s\d\-—–·.·]{1,12}$/.test(l.text)) return false;
+          return true;
+        });
+        out+=linesToParagraphs(keep);
+      }
+    }
+  } finally { if(worker){ try{ await worker.terminate(); }catch(_){} } }
+  out=out.replace(/([\u2e80-\u9fff])[ \t]+(?=[\u2e80-\u9fff])/g,"$1").replace(/\n{3,}/g,"\n\n").trim();
+  return out;   // 空串 = 基本无文字层，交给上层扫描版流程
+}
+// 手动全文 OCR（扫描版一键提取，供 runOcr 用；升级：自适应采样 + 上限 400 页 + 复用单 worker）
 async function ocrPdf(file,onPage){
   await ensureTesseract();
   var ab=await file.arrayBuffer();
@@ -356,19 +450,23 @@ async function ocrPdf(file,onPage){
     for(var i=1;i<=N;i++){
       if(onPage) onPage(i,N,pdf.numPages);
       var pg=await pdf.getPage(i);
-      var vp=pg.getViewport({scale:2});               // 2× 提采样，OCR 更准
-      var cv=document.createElement("canvas");
-      cv.width=vp.width; cv.height=vp.height;
-      await pg.render({canvasContext:cv.getContext("2d"),viewport:vp}).promise;
-      var r=await worker.recognize(cv);
-      out+=(((r&&r.data&&r.data.text)||"").trim())+"\n\n";
-      cv.width=cv.height=0;                            // 及时释放大画布
+      var cv=await renderPageCanvas(pg,pageScale(pg));
+      out+=(await ocrCanvas(worker,cv))+"\n\n";
     }
   } finally { try{ await worker.terminate(); }catch(_){} }
   out=out.replace(/[ \t]{2,}/g," ").replace(/\n{3,}/g,"\n\n").trim();
   return { text:out, ocrPages:N, totalPages:pdf.numPages };
 }
-
+// 纯文本/HTML/RTF 兜底
+function decodeText(ab){ try{ return new TextDecoder("utf-8",{fatal:false}).decode(ab); }catch(_){ try{ return new TextDecoder("gbk").decode(ab); }catch(__){ return ""; } } }
+function stripHtml(s){ try{ var d=new DOMParser().parseFromString(s,"text/html"); d.querySelectorAll("script,style,noscript").forEach(function(n){n.remove();}); return (d.body&&(d.body.innerText||d.body.textContent)||"").replace(/\n{3,}/g,"\n\n").trim(); }catch(_){ return s.replace(/<[^>]+>/g," "); } }
+function stripRtf(s){
+  return s.replace(/\\'[0-9a-fA-F]{2}/g," ")
+          .replace(/\\u-?\d+\??/g," ")
+          .replace(/\\par[d]?/g,"\n").replace(/\\line/g,"\n").replace(/\\tab/g,"\t")
+          .replace(/\\[a-zA-Z]+-?\d* ?/g,"").replace(/[{}]/g,"")
+          .replace(/[ \t]{2,}/g," ").replace(/\n{3,}/g,"\n\n").trim();
+}
 /* ---- 加文件 ---- */
 var drop=$("#drop"), fileIn=$("#fileIn");
 drop.onclick=function(){fileIn.click();};
@@ -387,29 +485,44 @@ function esc(s){return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"
 async function addFile(f){
   if(f.size>MAXSIZE){ pushRow({title:f.name,status:"error",err:"超过 100MB（"+(f.size/1048576).toFixed(1)+"MB）"}); return; }
   var id="a"+(++seq);
-  var art={id:id,title:f.name.replace(/\.(docx|pdf)$/i,"").slice(0,80)||f.name,text:"",chars:0,status:"parsing",result:"",err:""};
+  var art={id:id,title:f.name.replace(/\.(docx|pdf|txt|md|markdown|html?|rtf|png|jpe?g|webp|bmp|gif|tiff?)$/i,"").slice(0,80)||f.name,text:"",chars:0,status:"parsing",result:"",err:""};
   articles.push(art); renderQueue();
   try{
     var ab=await f.arrayBuffer();
-    var b=new Uint8Array(ab.slice(0,8));
+    var b=new Uint8Array(ab.slice(0,12));
     var isZip=b[0]===0x50&&b[1]===0x4B&&b[2]===0x03&&b[3]===0x04;
     var isPdf=b[0]===0x25&&b[1]===0x50&&b[2]===0x44&&b[3]===0x46;
     var isOle=b[0]===0xD0&&b[1]===0xCF&&b[2]===0x11&&b[3]===0xE0;
-    var isRtf=b[0]===0x7B&&b[1]===0x5C&&b[2]===0x72&&b[3]===0x74;
+    var isRtf=b[0]===0x7B&&b[1]===0x5C&&b[2]===0x72&&b[3]===0x74;                 // {\rt
+    var isPng=b[0]===0x89&&b[1]===0x50&&b[2]===0x4E&&b[3]===0x47;
+    var isJpg=b[0]===0xFF&&b[1]===0xD8&&b[2]===0xFF;
+    var isGif=b[0]===0x47&&b[1]===0x49&&b[2]===0x46;
+    var isBmp=b[0]===0x42&&b[1]===0x4D;
+    var isWebp=b[0]===0x52&&b[1]===0x49&&b[2]===0x46&&b[3]===0x46&&b[8]===0x57&&b[9]===0x45&&b[10]===0x42&&b[11]===0x50;
+    var isImg=isPng||isJpg||isGif||isBmp||isWebp||/\.(png|jpe?g|webp|bmp|gif|tiff?)$/i.test(f.name);
     var text="", wasPdf=false;
-    if(isZip){ text=await extractDocx(ab); }
-    else if(isPdf){ wasPdf=true; if(!window.pdfjsLib) throw new Error("PDF 解析库未加载，请刷新页面"); text=await extractPdf(ab,function(i,tot){ if(tot>10&&i%10===0){ art.err="正在抽取第 "+i+"/"+tot+" 页"; renderQueue(); } }); }
-    else if(isOle){ art.status="error"; art.err="Word 97-2003 二进制 .doc，本机读不出——请另存为 .docx，或粘贴正文"; renderQueue(); return; }
-    else if(isRtf){ art.status="error"; art.err="RTF 文件——请另存为 .docx，或粘贴正文"; renderQueue(); return; }
-    else { art.status="error"; art.err="认不出（既不是 .docx 也不是 PDF）"; renderQueue(); return; }
-    text=text.replace(/\n{3,}/g,"\n\n").trim();
-    if(text.replace(/\s/g,"").length<20){
-      if(wasPdf){ art.status="scanned"; art._file=f; art.err="像扫描版／纯图片 PDF（无文字层）"; renderQueue(); return; }   // 不投降：给 OCR 兜底
-      art.status="error"; art.err="解析出的文字太少"; renderQueue(); return;
+    if(isImg){                                                                    // 图片：直接本机 OCR（中英双语）
+      art.status="ocr"; art.err="载入 OCR 引擎，识别图片…"; renderQueue(); updateBtns();
+      try{ text=await ocrImage(f); }catch(e){ art.status="error"; art.err="图片 OCR 失败："+(e&&e.message||e); renderQueue(); updateBtns(); return; }
     }
-    art.text=text; art.chars=text.replace(/\s/g,"").length; art.status="ready"; art.err="";
+    else if(isZip){ text=await extractDocx(ab); }
+    else if(isPdf){ wasPdf=true; if(!window.pdfjsLib) throw new Error("PDF 解析库未加载，请刷新页面"); text=await extractPdf(ab,function(i,tot,phase){ if(tot>6&&i%5===0){ art.err="正在"+(phase||"抽取")+"第 "+i+"/"+tot+" 页"; renderQueue(); } }); }
+    else if(isOle){ art.status="error"; art.err="Word 97-2003 二进制 .doc，本机读不出——请另存为 .docx，或粘贴正文"; renderQueue(); return; }
+    else if(isRtf||/\.rtf$/i.test(f.name)){ text=stripRtf(decodeText(ab)); }
+    else {                                                                        // 纯文本 / Markdown / HTML 兜底
+      var raw=decodeText(ab);
+      if(/\.html?$/i.test(f.name)||/^\s*<(!doctype|html|body|div|p|head)\b/i.test(raw)) text=stripHtml(raw);
+      else if(raw && raw.replace(/\s/g,"").length>=20) text=raw.replace(/\r\n?/g,"\n").replace(/\n{3,}/g,"\n\n").trim();
+      else { art.status="error"; art.err="认不出这个格式（支持 .docx / PDF / 图片 / .txt / .md / .html / .rtf）"; renderQueue(); return; }
+    }
+    text=(text||"").replace(/\n{3,}/g,"\n\n").trim();
+    if(text.replace(/\s/g,"").length<20){
+      if(wasPdf){ art.status="scanned"; art._file=f; art.err="像扫描版／纯图片 PDF（无文字层）"; renderQueue(); updateBtns(); return; }   // 交给一键 OCR
+      art.status="error"; art.err="解析出的文字太少"; renderQueue(); updateBtns(); return;
+    }
+    art.text=text; art.chars=text.replace(/\s/g,"").length; art.status="ready"; art.err=""; art._file=null;
   }catch(e){ art.status="error"; art.err="解析失败："+(e&&e.message||e); }
-  renderQueue();
+  renderQueue(); updateBtns();
 }
 function pushRow(o){ articles.push({id:"a"+(++seq),title:o.title,text:"",chars:0,status:o.status,result:"",err:o.err||""}); renderQueue(); }
 $("#addPaste").onclick=function(){
