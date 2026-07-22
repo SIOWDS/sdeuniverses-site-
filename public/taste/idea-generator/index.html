@@ -219,8 +219,12 @@ footer{border-top:1px solid var(--border);text-align:center;padding:30px 20px 44
     <div style="font-size:12px;color:#E8A33D;line-height:1.6;margin-bottom:20px;background:rgba(232,163,61,0.08);border:1px dashed rgba(232,163,61,0.4);border-radius:10px;padding:10px 12px">⚠️ 每题约 40-90 分钟，10 题合计可能需半天到一天。全程在本页面后台连跑，<b>中途不能关闭或刷新本页面</b>（这是发生器“ Key 不出浏览器”零服务器责任架构的必然代价）。建议先用1-2 题小跨一次跑通再上十题。</div>
 
     <div style="margin-bottom:14px">
-      <label style="display:block;font-size:12.5px;color:#B98CFF;font-weight:700;margin-bottom:6px">① 问题列表（每行一个，空行自动忽略）</label>
-      <textarea id="osbQuestions" rows="8" placeholder="如何理解拖延症？&#10;教育的本质是什么？&#10;为什么人会对已拥有的东西失去兴趣？&#10;（…每行一题，建议不超过 10 题）" style="width:100%;padding:11px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.15);background:#0d1117;color:#D4DCE4;font-size:14px;font-family:inherit;line-height:1.7;resize:vertical"></textarea>
+      <label style="display:block;font-size:12.5px;color:#B98CFF;font-weight:700;margin-bottom:8px">① 问题输入面板（最多 10 个问题，每个问题生成 4 篇论文）</label>
+      <div id="osbSlots"></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:2px;gap:10px;flex-wrap:wrap">
+        <button id="osbAdd" type="button" style="background:transparent;color:#B98CFF;border:1px dashed rgba(180,150,255,0.5);border-radius:8px;padding:7px 14px;cursor:pointer;font-size:13px">➕ 添加问题</button>
+        <span id="osbCount" style="font-size:12.5px;color:#9AA5B0">已填 0 个问题 · 将生成 <b style="color:#C9BEEA">0</b> 篇论文</span>
+      </div>
     </div>
 
     <div style="margin-bottom:14px">
@@ -3303,13 +3307,48 @@ if(autoRunBtn){
   const eb=$('entryBatch'); if(eb) eb.addEventListener('click', showBatch);
   const bbk=$('osbBack'); if(bbk) bbk.addEventListener('click', showEntry);
 
+  // ── 问题输入面板：最多 10 个独立问题槽 ──
+  const OSB_MAX = 10;
+  const osbSlots = $('osbSlots');
+  function osbUpdateCount(){
+    const c=$('osbCount'); if(!c||!osbSlots) return;
+    const n=Array.prototype.slice.call(osbSlots.querySelectorAll('.osb-q')).map(function(i){return i.value.trim();}).filter(Boolean).length;
+    c.innerHTML='已填 '+n+' 个问题 · 将生成 <b style="color:#C9BEEA">'+(n*4)+'</b> 篇论文';
+  }
+  function osbRenumber(){
+    if(!osbSlots) return;
+    const rows=osbSlots.querySelectorAll('.osb-slot');
+    rows.forEach(function(r,i){
+      const num=r.querySelector('.osb-num'); if(num) num.textContent=(i+1);
+      const inp=r.querySelector('.osb-q'); if(inp) inp.placeholder='第 '+(i+1)+' 个问题（任何领域）';
+      const del=r.querySelector('.osb-del'); if(del) del.style.visibility = rows.length>1?'visible':'hidden';
+    });
+    const add=$('osbAdd'); if(add){ const full=rows.length>=OSB_MAX; add.disabled=full; add.style.opacity=full?'0.4':'1'; add.style.cursor=full?'not-allowed':'pointer'; add.textContent=full?'已达 10 个上限':'➕ 添加问题'; }
+    osbUpdateCount();
+  }
+  function osbAddRow(val){
+    if(!osbSlots || osbSlots.querySelectorAll('.osb-slot').length>=OSB_MAX) return;
+    const row=document.createElement('div');
+    row.className='osb-slot'; row.style.cssText='display:flex;gap:8px;align-items:center;margin-bottom:8px';
+    row.innerHTML='<span class="osb-num" style="flex:none;width:20px;text-align:right;color:#B98CFF;font-weight:700;font-size:13px"></span>'
+      +'<input type="text" class="osb-q" maxlength="200" style="flex:1;min-width:0;padding:9px 11px;border-radius:8px;border:1px solid rgba(255,255,255,0.15);background:#0d1117;color:#D4DCE4;font-size:13.5px">'
+      +'<button type="button" class="osb-del" title="删除此问题" style="flex:none;background:transparent;color:#8B98A5;border:1px solid rgba(255,255,255,0.14);border-radius:7px;width:30px;height:30px;cursor:pointer;font-size:13px;line-height:1">\u2715</button>';
+    osbSlots.appendChild(row);
+    const inp=row.querySelector('.osb-q'); if(val) inp.value=val;
+    inp.addEventListener('input', osbUpdateCount);
+    row.querySelector('.osb-del').addEventListener('click', function(){ row.remove(); osbRenumber(); });
+    osbRenumber();
+  }
+  function osbEnsureRows(min){ if(!osbSlots) return; while(osbSlots.querySelectorAll('.osb-slot').length < min) osbAddRow(''); }
+  const _osbAddBtn=$('osbAdd'); if(_osbAddBtn) _osbAddBtn.addEventListener('click', function(){ osbAddRow(''); });
+  osbEnsureRows(3);   // 初始 3 行，需要再添加
+
   const osbBtn = $('osbRunBtn');
   if(osbBtn){
     osbBtn.addEventListener('click', async ()=>{
       const lg = $('osbLog');
       const setMsg = (s)=>{ if(lg) lg.innerHTML = '<div style="color:#E08A8A">'+s+'</div>'; };
-      const raw = ($('osbQuestions')&&$('osbQuestions').value)||'';
-      const questions = raw.split('\n').map(function(s){return s.trim();}).filter(Boolean);
+      const questions = osbSlots ? Array.prototype.slice.call(osbSlots.querySelectorAll('.osb-q')).map(function(i){return i.value.trim();}).filter(Boolean) : [];
       const model = ($('osbModel')&&$('osbModel').value)||'';
       const key = ($('osbKey')&&$('osbKey').value.trim())||'';
       const revA = ($('osbRevA')&&$('osbRevA').value)||'', revAKey = ($('osbRevAKey')&&$('osbRevAKey').value.trim())||'';
@@ -3318,7 +3357,7 @@ if(autoRunBtn){
       const pass = ($('osbPass')&&$('osbPass').value.trim())||'';
       // 校验
       if(!questions.length){ setMsg('✗ 请至少填一个问题（每行一个）。'); return; }
-      if(questions.length>20){ setMsg('✗ 一次最多 20 题，请分批。'); return; }
+      if(questions.length>OSB_MAX){ setMsg('✗ 最多 10 个问题。'); return; }
       if(!key){ setMsg('✗ 请填写主基底的 Key。'); return; }
       if(!revA || !revB){ setMsg('✗ 请选好两位审稿人。'); return; }
       if(revA===revB){ setMsg('✗ 两位审稿人须用不同基底。'); return; }
