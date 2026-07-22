@@ -602,10 +602,10 @@ export class ConfigVault {
       return Response.json({ configured: !!key, hasAdmin: !!adminHash });
     }
     if (op === "getReflect") { // 深度档·按基底缓存的《从发现到发生》心得（内部调用）
-      return Response.json({ reflect: (await this.ctx.storage.get("reflect:" + (body.vendor || ""))) || "" });
+      return Response.json({ reflect: (await this.ctx.storage.get("reflect:v2:" + (body.vendor || ""))) || "" });
     }
     if (op === "setReflect") {
-      await this.ctx.storage.put("reflect:" + (body.vendor || ""), String(body.reflect || ""));
+      await this.ctx.storage.put("reflect:v2:" + (body.vendor || ""), String(body.reflect || ""));
       return Response.json({ ok: true });
     }
     if (op === "clearReflect") { // 重写心得：清掉缓存，下次深度提问重写
@@ -613,11 +613,11 @@ export class ConfigVault {
       if (!stored || (await this._hash(String(body.pass || ""))) !== stored) return Response.json({ ok: false, msg: "管理口令不正确。" });
       const v = String(body.vendor || "");
       if (v === "all") {
-        await this.ctx.storage.delete("reflect:glm");
-        await this.ctx.storage.delete("reflect:ds");
+        await this.ctx.storage.delete("reflect:v2:glm");
+        await this.ctx.storage.delete("reflect:v2:ds");
         return Response.json({ ok: true, msg: "已清空全部基底的心得，下次深度提问将重写。" });
       }
-      await this.ctx.storage.delete("reflect:" + v);
+      await this.ctx.storage.delete("reflect:v2:" + v);
       return Response.json({ ok: true, msg: "已清空 " + (v || "?") + " 的心得，下次深度提问将重写。" });
     }
     if (op === "checkpass") { // 仅 Worker 内部调用：校验管理口令（供评论区管理等复用）
@@ -1208,7 +1208,7 @@ function parsePlanText(t) {
   if (!title || !parts.length) return null;
   return { title: title.slice(0, 120), points: points.slice(0, 8), parts: parts };
 }
-const REFLECT_PROMPT = "请用你自己的话，写一篇《从发现到发生》的内化心得（约 5000 字，要写透、写充分）：不要复述方法条目，而是把“追问任何事物是如何发生的（而不是如何被发现的）”这套思维方式，用你自己的理解完整内化一遍；并诚实检视你平时回答问题的默认惯性（例如急于给结论、罗列要点、停在表层描述、把现成关系当起点），说明用这套“发生”的眼光重新看，你该在哪里改变。这篇心得只写给你自己看，写完你就完成了一次自我提智。切记：全文用平实现代汉语，绝不出现“显露/差异/纠缠/发生学/SDE”等任何术语标签。";
+const REFLECT_PROMPT = "请用你自己的话，写一篇《从发现到发生》的内化心得（约 5000 字，要写透、写充分）：不要复述方法条目，而是把“追问任何事物是如何发生的（而不是如何被发现的）”这套思维方式，用你自己的理解完整内化一遍；并诚实检视你平时回答问题的默认惯性（例如急于给结论、罗列要点、停在表层描述、把现成关系当起点），说明用这套“发生”的眼光重新看，你该在哪里改变。还要专门想透一件容易被跳过的事：当你造出一个新说法、给一个现象起了新名字时，别急着为它得意——先假设“这个说法多半早有人用别的词说过了”，主动想清楚它最像哪两三个已有的说法，再找出它们各自漏掉、而你这个说法正好能补上的那一条分界线；如果找不出这条分界线，那你多半只是给旧东西换了个名字，不算真发现。找到分界线后再逼自己一句：什么样的事实一旦出现，就说明你这个说法是错的？——说不出这一句，它就还没真正站住。这篇心得只写给你自己看，写完你就完成了一次自我提智。切记：全文用平实现代汉语，绝不出现“显露/差异/纠缠/发生学/SDE”等任何术语标签。";
 // 第一次提智：让基底带着完整内功、亲手写心得；按基底缓存，只写一次，之后所有深度提问复用
 // 心得三级调用：①isolate 内存（零往返，10 分钟）②vault 持久存储（一次生成全站永久共用）③按需生成并回存。
 // 生成失败负缓存 60 秒：防止 vault 为空时每条消息都烧一遍完整内功的生成调用。
