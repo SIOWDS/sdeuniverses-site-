@@ -3379,36 +3379,53 @@ if(autoRunBtn){
 
       const N = questions.length;
       const state = questions.map(function(q){ return { q:q, s:'todo', note:'' }; });  // todo|run|done|fail
-      const render = (curStage)=>{
+      const OSB_STAGES = ['六篇对决','涌现新典范','四篇论文','二次提智','补规范','二次审稿打磨','存入收件箱'];
+      let curQ=-1, curStage=0, curSub='';
+      const render = ()=>{
         if(!lg) return;
         var done=state.filter(function(x){return x.s==='done';}).length;
         var fail=state.filter(function(x){return x.s==='fail';}).length;
-        var html='<div style="text-align:left;max-width:640px;margin:0 auto">';
+        // 运行状态条：当前正在生产哪一题、卡在七阶段的哪一段
+        var bar='';
+        if(curQ>=0 && state[curQ] && state[curQ].s==='run'){
+          var qtext=(state[curQ].q||'').replace(/</g,'&lt;').slice(0,60);
+          var si=curStage||1, sname=OSB_STAGES[si-1]||'';
+          var segs='';
+          for(var k=1;k<=7;k++){ var bg=k<si?'#7A4FD0':(k===si?'#B98CFF':'rgba(255,255,255,0.10)'); segs+='<span style="flex:1;height:6px;border-radius:3px;background:'+bg+'"></span>'; }
+          bar='<div style="border:1px solid rgba(180,150,255,0.45);border-radius:12px;padding:14px 16px;margin-bottom:14px;background:linear-gradient(160deg,rgba(90,58,160,0.20),rgba(30,20,50,0.32))">'
+            +'<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:6px"><div style="font-size:13.5px;font-weight:700;color:#EAE4FF">🔄 正在生产 · 第 '+(curQ+1)+' / '+N+' 题</div><div style="font-size:12px;color:#C9BEEA">阶段 '+si+'/7</div></div>'
+            +'<div style="font-size:13.5px;color:#D4DCE4;margin-bottom:10px">「'+qtext+'」</div>'
+            +'<div style="display:flex;gap:4px;margin-bottom:9px">'+segs+'</div>'
+            +'<div style="font-size:13px;color:#E8A33D;font-weight:700">'+si+'. '+sname+' <span style="color:#9AA5B0;font-weight:400">'+(curSub||'')+'</span> <span class="spinner"></span></div>'
+            +'</div>';
+        }
+        var html=bar+'<div style="text-align:left;max-width:640px;margin:0 auto">';
         html+='<div style="font-weight:700;color:#C9BEEA;margin-bottom:8px">进度：'+done+' 完成 · '+fail+' 失败 · 共 '+N+' 题</div>';
         state.forEach(function(x,i){
           var ic=x.s==='done'?'✓':(x.s==='fail'?'✗':(x.s==='run'?'◉':'○'));
           var co=x.s==='done'?'#5FB878':(x.s==='fail'?'#E08A8A':(x.s==='run'?'#E8A33D':'#5A636E'));
           var fw=x.s==='run'?'700':'400';
           var q=(x.q||'').replace(/</g,'&lt;').slice(0,42);
-          var tail = x.s==='run' ? (' <span style="color:#9AA5B0;font-weight:400">'+(curStage||'')+'</span> <span class="spinner"></span>')
+          var tail = x.s==='run' ? ' <span style="color:#9AA5B0;font-weight:400">生产中…</span>'
                    : (x.note ? (' <span style="color:#9AA5B0;font-weight:400">'+x.note+'</span>') : '');
           html+='<div style="display:flex;gap:8px;padding:3px 2px;color:'+co+';font-weight:'+fw+'"><span style="flex:none;width:16px">'+ic+'</span><span>'+(i+1)+'. '+q+tail+'</span></div>';
         });
         html+='</div>';
         lg.innerHTML=html;
       };
-      render('');
+      render();
       osbBtn.disabled = true; const ol=osbBtn.textContent; osbBtn.textContent='⏳ 批量跑程中，请勿关闭页面…';
       for(let i=0;i<N;i++){
-        state[i].s='run'; render('准备…');
+        curQ=i; curStage=0; curSub=''; state[i].s='run'; render();
         try{
-          await runIdeaPipelineOnce(questions[i], pass, student, function(t){ render(t); });
+          await runIdeaPipelineOnce(questions[i], pass, student, function(idx, sub){ curStage=idx; curSub=sub; render(); });
           state[i].s='done'; state[i].note='✓ 已投稿';
         }catch(e){
           state[i].s='fail'; state[i].note='✗ 失败：'+((e&&e.message)||e);
         }
-        render('');
+        render();
       }
+      curQ=-1;
       var doneN=state.filter(function(x){return x.s==='done';}).length;
       var failN=state.filter(function(x){return x.s==='fail';}).length;
       if(lg){
@@ -3437,34 +3454,34 @@ async function runIdeaPipelineOnce(question, pass, student, onStage){
   try{ clearResults(); }catch(_){}
   questionEl.value = question;
   // ① 六篇对决
-  onStage && onStage('六篇并发·三视角对决…');
+  onStage && onStage(1, '六篇并发·三视角对决…');
   window._lastResult = null;
   goBtn.click();
   await waitVar(()=> window._lastResult && window._lastResult.rows && window._lastResult.rows.length>=3);
   // ② 涌现新典范
-  onStage && onStage('碰撞→暗流→新典范…');
+  onStage && onStage(2, '碰撞→暗流→新典范…');
   window._lastEmerge = null;
   $('emergeBtn').click();
   await waitVar(()=> !!window._lastEmerge);
   // ③ 四篇初稿
-  onStage && onStage('四篇并发·含评审打磨…');
+  onStage && onStage(3, '四篇并发·含评审打磨…');
   $('fourStartBtn').click();
   await waitStage('_fourPapers','fourStartBtn');
   // ④ 二次提智
-  onStage && onStage('发生引擎冲 150…');
+  onStage && onStage(4, '发生引擎冲 150…');
   $('upliftBtn').click();
   await waitStage('_upliftPapers','upliftBtn');
   // ⑤ 补规范
-  onStage && onStage('挂真实引注·脚注·文献…');
+  onStage && onStage(5, '挂真实引注·脚注·文献…');
   $('normalizeBtn').click();
   await waitStage('_normalizedPapers','normalizeBtn');
   // ⑥ 二次审稿打磨
-  onStage && onStage('独立双审+主笔打磨…');
+  onStage && onStage(6, '独立双审+主笔打磨…');
   $('polishBtn').click();
   await waitStage('_polishedPapers','polishBtn');
   // ⑦ 存 Inbox
-  onStage && onStage('存入收件箱…');
-  await submitPolishedToInbox(pass, student, function(t){ onStage && onStage('投稿：'+t); });
+  onStage && onStage(7, '存入收件箱…');
+  await submitPolishedToInbox(pass, student, function(t){ onStage && onStage(7, '投稿：'+t); });
   return true;
 }
 
