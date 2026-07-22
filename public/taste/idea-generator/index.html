@@ -192,13 +192,28 @@ footer{border-top:1px solid var(--border);text-align:center;padding:30px 20px 44
       </div>
     </div>
 
+    <div style="margin-bottom:16px">
+      <label style="display:block;font-size:12.5px;color:#C9A227;font-weight:700;margin-bottom:8px">④ 产出去向</label>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button type="button" id="osDestSubmit" data-dest="submit" style="flex:1;min-width:180px;padding:11px 12px;border-radius:9px;border:1px solid #C9A227;background:rgba(201,162,39,0.20);color:#F0E4C0;cursor:pointer;text-align:left">
+          <div style="font-size:13.5px;font-weight:700">📮 自动投稿到收件箱</div>
+          <div style="font-size:11.5px;color:#C9B98A;margin-top:2px">跑完自动投进学员投稿收件箱（需投稿密码）</div>
+        </button>
+        <button type="button" id="osDestLocal" data-dest="local" style="flex:1;min-width:180px;padding:11px 12px;border-radius:9px;border:1px solid rgba(255,255,255,0.15);background:#0d1117;color:#D4DCE4;cursor:pointer;text-align:left">
+          <div style="font-size:13.5px;font-weight:700">💾 存到本地文件夹</div>
+          <div style="font-size:11.5px;color:#9AA5B0;margin-top:2px">四篇打包成一个 .docx 存进你选的文件夹（不投稿）</div>
+        </button>
+      </div>
+      <div id="osDestHint" style="font-size:11.5px;color:#9AA5B0;margin-top:7px;line-height:1.6"></div>
+    </div>
+
     <div style="margin-bottom:20px;display:flex;gap:8px;flex-wrap:wrap">
       <div style="flex:1;min-width:150px">
-        <label style="display:block;font-size:12.5px;color:#C9A227;font-weight:700;margin-bottom:6px">④ 作者名</label>
+        <label style="display:block;font-size:12.5px;color:#C9A227;font-weight:700;margin-bottom:6px">⑤ 作者名</label>
         <input id="osStudent" type="text" maxlength="80" placeholder="你的名字" style="width:100%;padding:9px 11px;border-radius:8px;border:1px solid rgba(255,255,255,0.15);background:#0d1117;color:#D4DCE4;font-size:13px">
       </div>
       <div style="flex:1;min-width:150px">
-        <label style="display:block;font-size:12.5px;color:#C9A227;font-weight:700;margin-bottom:6px">⑤ 投稿密码</label>
+        <label style="display:block;font-size:12.5px;color:#C9A227;font-weight:700;margin-bottom:6px">⑥ 投稿密码（投稿模式必填 · 本地模式可留空）</label>
         <input id="osPass" type="password" placeholder="投稿密码" autocomplete="off" style="width:100%;padding:9px 11px;border-radius:8px;border:1px solid rgba(255,255,255,0.15);background:#0d1117;color:#D4DCE4;font-size:13px">
       </div>
     </div>
@@ -3259,11 +3274,34 @@ if(autoRunBtn){
   const bb=$('oneShotBack'); if(bb) bb.addEventListener('click', showEntry);
 
   // 一次生成：把面板值写进主面板 → 从头驱动全链 → 存 Inbox
+  // ── 一次生成·产出去向切换 ──
+  let osDest='submit';
+  function osSetDest(d){
+    osDest=d;
+    var sb=$('osDestSubmit'), lo=$('osDestLocal'), hint=$('osDestHint'), pw=$('osPass'), rb=$('osRunBtn');
+    [sb,lo].forEach(function(b){ if(!b) return; var on=b.getAttribute('data-dest')===d;
+      b.style.border=on?'1px solid #C9A227':'1px solid rgba(255,255,255,0.15)';
+      b.style.background=on?'rgba(201,162,39,0.20)':'#0d1117';
+      b.style.color=on?'#F0E4C0':'#D4DCE4'; });
+    if(d==='local'){
+      if(hint) hint.innerHTML = (window.showDirectoryPicker ? '点下方按钮后会先让你<b>选一个文件夹</b>，四篇打包成一个 .docx 存进去。' : '你的浏览器不支持选文件夹，将改为<b>下载</b>到默认下载目录。')+' 本地模式无需投稿密码。';
+      if(pw) pw.placeholder='本地模式可留空';
+      if(rb) rb.textContent='💾 一次生成 · 全自动跑完并存入本地文件夹';
+    }else{
+      if(hint) hint.textContent='跑完自动投进学员投稿收件箱，需要投稿密码。';
+      if(pw) pw.placeholder='投稿密码';
+      if(rb) rb.textContent='⚡ 一次生成 · 全自动跑完并存入收件箱';
+    }
+  }
+  var _osds=$('osDestSubmit'); if(_osds) _osds.addEventListener('click', function(){ osSetDest('submit'); });
+  var _osdl=$('osDestLocal'); if(_osdl) _osdl.addEventListener('click', function(){ osSetDest('local'); });
+  osSetDest('submit');
+
   const osBtn = $('osRunBtn');
   if(osBtn){
     osBtn.addEventListener('click', async ()=>{
       const st = $('osStatus'); const setS = (s)=>{ if(st) st.textContent = s||''; };
-      const OS_STAGES = ["六篇三视角对决","涌现新典范","四篇论文初稿","二次 SDE 提智","补规范","二次审稿打磨","存入收件箱"];
+      const OS_STAGES = ["六篇三视角对决","涌现新典范","四篇论文初稿","二次 SDE 提智","补规范","二次审稿打磨", osDest==='local'?"存到本地文件夹":"存入收件箱"];
       const osStage = (n, sub)=>{ if(!st) return; var h='<div style="text-align:left;max-width:560px;margin:2px auto 0">'; OS_STAGES.forEach(function(lb,i){ var num=i+1, s=num<n?"done":(num===n?"cur":"todo"); var ic=s==="done"?"✓":(s==="cur"?"◉":"○"); var co=s==="done"?"#5FB878":(s==="cur"?"#E8A33D":"#5A636E"); var fw=s==="cur"?"700":"400"; h+='<div style="display:flex;align-items:flex-start;gap:8px;padding:3px 2px;color:'+co+';font-weight:'+fw+'"><span style="flex:none;width:16px">'+ic+'</span><span>'+num+'. '+lb+(s==="cur"&&sub?('&nbsp;&nbsp;<span style="color:#9AA5B0;font-weight:400">'+sub+'</span>'):'')+(s==="cur"?' <span class="spinner"></span>':'')+'</span></div>'; }); h+='</div>'; if(n>OS_STAGES.length&&sub) h+='<div style="color:#5FB878;font-weight:700;margin-top:8px;text-align:center">'+sub+'</div>'; st.innerHTML=h; };
       const q = ($('osQuestion')&&$('osQuestion').value.trim())||'';
       const model = ($('osModel')&&$('osModel').value)||'';
@@ -3278,7 +3316,7 @@ if(autoRunBtn){
       if(!revA || !revB){ setS('✗ 请选好两位审稿人。'); return; }
       if(revA===revB){ setS('✗ 两位审稿人须用不同基底。'); return; }
       if(!student){ setS('✗ 请填写作者名。'); return; }
-      if(!pass){ setS('✗ 请填写投稿密码。'); return; }
+      if(osDest==='submit' && !pass){ setS('✗ 投稿模式需要投稿密码（或改选“存到本地文件夹”）。'); return; }
       const effRevAKey = keyForVendor(revA, revAKey), effRevBKey = keyForVendor(revB, revBKey);
       if(!effRevAKey){ setS('✗ 审稿人 A 需要 Key（与主基底不同则须单独填）。'); return; }
       if(!effRevBKey){ setS('✗ 审稿人 B 需要 Key。'); return; }
@@ -3293,6 +3331,13 @@ if(autoRunBtn){
       if($('autoSubPass')) $('autoSubPass').value = pass;
       // 触发一次 model change，让 Key 存到对应厂商槽
       try{ modelSel.dispatchEvent(new Event('change')); }catch(_){}
+
+      // 本地模式：点击手势内弹出文件夹选择器
+      let dirHandle=null;
+      if(osDest==='local' && window.showDirectoryPicker){
+        try{ dirHandle = await window.showDirectoryPicker({mode:'readwrite'}); }
+        catch(e){ setS('✗ 未选择文件夹，已取消。'); return; }
+      }
 
       osBtn.disabled = true; const ol = osBtn.textContent; osBtn.textContent = '⏳ 全自动跑程中，请勿关闭…';
       try{
@@ -3322,10 +3367,16 @@ if(autoRunBtn){
         osStage(6,'独立双审+主笔打磨…');
         $('polishBtn').click();
         await waitStage('_polishedPapers','polishBtn');
-        // ⑦ 存 Inbox
-        osStage(7,'存入收件箱…');
-        await submitPolishedToInbox(pass, student, function(t){ osStage(7, t); });
-        osStage(8,'✓ 全部完成！最后四篇已以「'+student+'」的名字存入收件箱。可关闭此窗口，结果也在下方页面里。');
+        // ⑦ 产出去向：投稿收件箱 or 存本地文件夹
+        osStage(7, osDest==='local'?'存到本地文件夹…':'存入收件箱…');
+        if(osDest==='local'){
+          await savePolishedToDir(dirHandle, student, 0, q, function(t){ osStage(7, t); });
+        }else{
+          await submitPolishedToInbox(pass, student, function(t){ osStage(7, t); });
+        }
+        osStage(8, osDest==='local'
+          ? ('✓ 全部完成！最后四篇已作为一个 .docx '+(dirHandle?'存入你选的文件夹':'下载到默认下载目录')+'。可关闭此窗口，结果也在下方页面里。')
+          : ('✓ 全部完成！最后四篇已以「'+student+'」的名字存入收件箱。可关闭此窗口，结果也在下方页面里。'));
       }catch(e){
         setS('✗ 中途出错：'+(e.message||e)+'。已跑出的阶段在下方页面里，可切到互动序列手动继续。');
       }finally{
