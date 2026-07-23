@@ -62,7 +62,7 @@ canvas{display:block;max-width:100%;height:auto}
 <div class="navhint">← → 方向键翻页 · 点击页面两侧翻页 · 可输入页码跳转</div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script>
-const PDF_URL = "meaning-habitat.pdf";
+const PDF_URL = "meaning-habitat.pdf?v=b1453d6f";
 pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
 let pdfDoc=null, pageNum=1, rendering=false, pending=null, scale=1.3;
 const canvas=document.getElementById('pdfCanvas'), ctx=canvas.getContext('2d');
@@ -111,7 +111,7 @@ document.addEventListener('keydown',e=>{
 });
 </script>
 
-<script>window.WDS_PDF={url:"meaning-habitat.pdf",curSel:"#pageInput",curAttr:"value"};</script>
+<script>window.WDS_PDF={url:"meaning-habitat.pdf?v=b1453d6f",curSel:"#pageInput",curAttr:"value"};</script>
 <script src="/taste/wds-companion/wds-pdf.js" defer></script>
 <script>window.WDS_READ={bodyEl:function(){return document.getElementById("canvas-wrap")||document.body;},docTextFn:function(){return window.__wdsPdfText||"";}};</script>
 <script src="/taste/wds-companion/wds-read.js" defer></script>
