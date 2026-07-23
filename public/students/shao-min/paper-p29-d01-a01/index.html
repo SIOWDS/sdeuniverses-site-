@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>从求胜到生棋：人工智能围棋的本体论条件、判据与共同世界 · 长文阅读 | 学员专栏 · SDE Universes</title>
+<meta name="description" content="从求胜到生棋：人工智能围棋的本体论条件、判据与共同世界 · 作者 少敏 · SDE 学员专栏 · 约 1.1 万字">
+<style>
+:root{--gold:#C9A84C;--gold2:#D4B25E;--ink:#F0E9D8;--paper:#1B3A26;--muted:#5E7263;--bg:#0E0B08;--panel:#171310}
+*{margin:0;padding:0;box-sizing:border-box}
+::selection{background:rgba(201,168,76,0.30)}
+body{background:var(--bg);color:#EAE2CE;font-family:"Songti SC","Noto Serif SC",Georgia,serif;line-height:2.0;font-size:17.5px}
+a{color:var(--gold);text-decoration:none}
+.readbar{position:sticky;top:0;z-index:20;background:rgba(14,11,8,0.95);backdrop-filter:blur(8px);border-bottom:1px solid rgba(201,168,76,0.28);display:flex;align-items:center;justify-content:space-between;padding:11px 20px;gap:12px;flex-wrap:wrap}
+.readbar .nav-back{color:#CBBE94;font-size:13px;letter-spacing:0.04em}
+.rb-modes{display:flex;gap:8px;flex-wrap:wrap}
+.rb-btn{font-size:13px;padding:6px 14px;border-radius:3px;border:1px solid rgba(201,168,76,0.5);color:#D9CDA0;letter-spacing:0.03em}
+.rb-btn.cur{background:var(--gold);color:#1A1410;font-weight:700;border-color:var(--gold)}
+.art{max-width:760px;margin:0 auto;padding:56px 24px 20px;text-align:center}
+.art-series{font-size:12px;letter-spacing:0.36em;color:var(--gold);margin-bottom:22px}
+.art-title{font-size:clamp(24px,4.2vw,36px);font-weight:800;line-height:1.55;color:#F5EFE0;letter-spacing:0.02em}
+.art-subtitle{font-size:clamp(15px,2.2vw,18px);color:var(--gold2);margin-top:18px;line-height:1.85;letter-spacing:0.01em}
+.art-meta{margin-top:26px;font-size:13px;color:var(--muted);letter-spacing:0.12em}
+.wrap{max-width:760px;margin:0 auto;padding:26px 24px 60px}
+.abstract{background:linear-gradient(160deg,#1C1712,#141009);border-left:3px solid var(--gold);padding:22px 26px;margin:20px 0 26px;font-size:15.5px;line-height:1.95}
+.abstract .ab-lbl{font-size:12px;letter-spacing:0.3em;color:var(--gold);margin-bottom:10px}
+.abstract p{color:#CFC6AE;text-align:justify}
+.keywords{font-size:14px;color:var(--muted);letter-spacing:0.02em;margin:0 0 30px;padding-bottom:24px;border-bottom:1px solid rgba(201,168,76,0.2)}
+.keywords strong{color:var(--gold)}
+.wrap h2{font-size:22px;font-weight:800;color:#F2ECDC;margin:44px 0 18px;letter-spacing:0.02em;padding-top:8px;border-bottom:1px solid rgba(201,168,76,0.18);padding-bottom:8px}
+.wrap h2.notes-head{font-size:20px}
+.wrap h3{font-size:18px;font-weight:700;color:#E6DCC2;margin:30px 0 12px;letter-spacing:0.01em}
+.wrap p{margin-bottom:20px;text-align:justify;color:#DED6BF;text-indent:2em}
+.wrap p.ref{font-size:14px;line-height:1.7;color:var(--muted);margin-bottom:8px;text-indent:-2em;padding-left:2em;text-align:left}
+.wrap strong{color:var(--gold2);font-weight:700}
+.endbox{background:radial-gradient(ellipse at 50% 40%,#241a3a 0%,#150f24 60%,#0c0818 100%);text-align:center;padding:60px 24px;margin-top:40px;border-radius:4px}
+.endbox .lbl{font-size:12px;letter-spacing:0.4em;color:#D4B25E;margin-bottom:16px}
+.endbox .big{font-size:clamp(22px,3.4vw,30px);font-weight:700;color:#F3ECD9;letter-spacing:0.06em;margin-bottom:14px}
+.endbox p{color:#CBB98A;max-width:540px;margin:0 auto 26px;font-size:15px;line-height:1.95}
+.endbox a{display:inline-block;padding:12px 30px;font-size:14.5px;letter-spacing:0.08em;border-radius:2px;margin:5px;text-decoration:none}
+.endbox .solid{background:#D4B25E;color:#150F24;font-weight:700}
+.endbox .ghost{border:1px solid #D4B25E;color:#D4B25E}
+footer{background:#141009;color:var(--muted);text-align:center;padding:30px 24px;font-size:13px;letter-spacing:0.06em;border-top:1px solid rgba(201,168,76,0.15)}
+footer a{color:var(--gold)}
+@media(max-width:640px){body{font-size:16.5px}}
+
+/* ===== 统稿增补：思想创新 · 导读300字 · 关键着色 ===== */
+.lead{max-width:760px;margin:0 auto;padding:30px 24px 0}
+.innov{background:linear-gradient(135deg,#3a2f18,#2a2212 60%,#1c1710);border:1px solid rgba(201,168,76,0.35);border-radius:12px;padding:24px 28px;margin:0 0 22px;box-shadow:0 8px 30px rgba(0,0,0,0.4)}
+.innov .lbl{font-size:12px;letter-spacing:0.28em;color:#D4B25E;margin-bottom:12px;font-weight:700}
+.innov .lbl::before{content:"✦ ";color:#F0C860}
+.innov .txt{font-size:16.5px;line-height:1.92;color:#EDE3CC}
+.innov .txt b{color:#F0C860;font-weight:700}
+.daodu{background:#181310;border:1px solid rgba(201,168,76,0.3);border-left:4px solid #C9A84C;border-radius:10px;padding:24px 28px;margin:0 0 6px}
+.daodu .lbl{display:inline-block;font-size:12px;letter-spacing:0.22em;color:#1a140c;background:#C9A84C;padding:5px 14px;border-radius:20px;margin-bottom:14px;font-weight:700}
+.daodu h4{font-size:17.5px;color:#EDE3CC;margin:0 0 16px;font-weight:800;letter-spacing:0.02em}
+.daodu .row{margin:12px 0;line-height:1.88;color:#CDC0A6;font-size:15.5px}
+.daodu .row .k{color:#D4B25E;font-weight:800}
+.hl2{background:rgba(201,168,76,0.16);border-bottom:2px solid #C9A84C;padding:1px 4px;font-weight:700;color:#F0E4C8;border-radius:2px}
+</style><meta name="sde-submission-id" content="P29-D01-A01">
+</head>
+<body>
+<div class="readbar">
+  <a class="nav-back" href="/students/shao-min/works/">‹ 少敏 · 全部作品</a>
+  <div class="rb-modes">
+    <span class="rb-btn cur">📖 长文阅读</span>
+    <a class="rb-btn" href="read.html">📄 在线 PDF</a>
+    <a class="rb-btn" href="paper-p29-d01-a01.pdf" download>⬇ 下载</a>
+  </div>
+</div>
+<header class="art">
+  <div class="art-series">学员专栏 · 少敏</div>
+  <h1 class="art-title">从求胜到生棋：人工智能围棋的本体论条件、判据与共同世界</h1>
+  <div class="art-subtitle">本文讨论一个同时属于人工智能研究、围棋理论与技术文化史的问题：当围棋人工智能不再只是追求胜率最大化，而开始稳定地产生、保存、分化并反向改写自己的棋型系统时，我们是否可以说，一种“人工智能围棋的本体论”正在形成。文章的核心主张是：AI 围棋的本体论，不应被理解为机器像人一样“理解了围棋”，也不应被理解为机器偶然下出了几步人类从未见过的妙手；它应被理解为一种更严格的事件结构，即某些棋型不再只是通向胜利的手段，而成为能够持续生成差异、形成谱系、改写搜索与评价方式、并迫使人类围棋语言重新组织自身的新对象。 文章首先分析现代围棋 AI，尤其是 KataGo 的自对弈与搜索机制，指出其现实工程结构已经远比“单一胜负机器”复杂，包含多种探索、偏差修正与辅助预测机制。</div>
+  <div class="art-meta">作者 少敏 · SDE 学员 · 约 1.1 万字 · 发表于2026年7月24日</div>
+</header>
+<div class="lead">
+<div class="innov">
+  <div class="lbl">这篇文章的思想创新</div>
+  <div class="txt">本文讨论一个同时属于人工智能研究、围棋理论与技术文化史的问题：当围棋人工智能不再只是追求胜率最大化，而开始稳定地产生、保存、分化并反向改写自己的棋型系统时，我们是否可以说，一种“人工智能围棋的本体论”正在形成。文章的核心主张是：AI 围棋的本体论，不应被理解为机器像人一样“理解了围棋”，也不应被理解为机器偶然下出了几步人类从未见过的妙手；它应被理解为一种更严格的事件结构，即某些棋型不再只是通向胜利的手段，而成为能够持续生成差异、形成谱系、改写搜索与评价方式、并迫使人类围棋语言重新组织自身的新对象。 文章首先分析现代围棋 AI，尤其是 KataGo 的自对弈与搜索机制，指出其现实工程结构已经远比“单一胜负机器”复杂，包含多种探索、偏差修正与辅助预测机制。</div>
+</div>
+<div class="daodu">
+  <span class="lbl">导读 · 300字</span>
+  <h4>这篇文章的价值与意义 —— 它能解决你的什么问题</h4>
+<div class="row"><span class="k">理论问题：</span>它在既有理论地图上切出一块新地带——不是“应对失败”（压力-易感），也不是“自体脆弱”（科胡特），而是“全程性经验被制度性拦截”；并正面迎战科胡特、杜威、温尼科特、比昂四位，证明其不可还原。</div><div class="row"><span class="k">现实问题：</span>它解释了为什么那些一路被精心规划、成绩优异、“什么都不缺”的年轻人，会在某个平常的早晨突然起不来——不是被击垮，是从未站过。</div><div class="row"><span class="k">自我精神问题：</span>如果你“表现优异却感觉自己从未真正活过”，这篇会告诉你：问题或许不在你不够坚强，而在你从未被允许亲自搞砸、迷路、再自己走出来。</div>
+</div>
+</div>
+<div class="wrap">
+<div class="abstract"><div class="ab-lbl zh-only">摘要</div><div class="ab-lbl en-only">ABSTRACT</div><p>本文讨论一个同时属于人工智能研究、围棋理论与技术文化史的问题：当围棋人工智能不再只是追求胜率最大化，而开始稳定地产生、保存、分化并反向改写自己的棋型系统时，我们是否可以说，一种“人工智能围棋的本体论”正在形成。文章的核心主张是：AI 围棋的本体论，不应被理解为机器像人一样“理解了围棋”，也不应被理解为机器偶然下出了几步人类从未见过的妙手；它应被理解为一种更严格的事件结构，即某些棋型不再只是通向胜利的手段，而成为能够持续生成差异、形成谱系、改写搜索与评价方式、并迫使人类围棋语言重新组织自身的新对象。文章首先分析现代围棋 AI，尤其是 KataGo 的自对弈与搜索机制，指出其现实工程结构已经远比“单一胜负机器”复杂，包含多种探索、偏差修正与辅助预测机制。其次，本文提出区分“新招法”“新定式”“新对象”的四重判据，即稳定性、不可还原性、回写性与可争议性。再次，本文讨论当 AI 生成的人类暂时无法完整叙述的棋型出现时，它究竟是围棋本体论的扩展，还是一种与人类围棋分叉而行的新语言游戏。最后，文章提出一套可证伪的研究方案，主张以“棋型谱系账本”而非单步胜率分析作为实验单位，以检验何时一种机器产生的棋型真正取得公共存在资格。本文认为，AI 围棋的本体论既不是主观意识问题，也不是纯粹效率问题，而是一个关于“哪些棋型得以存在、如何被保存、怎样迫使共同体改写自己”的生成论问题。只有当某些机器生成的棋型不再仅仅因为更高胜率而重要，而是因为它们开始组织新的关系、新的争论、新的训练方式和新的历史记忆时，我们才有理由说，一种新型围棋本体论正在显露。</p></div>
+<div class="keywords zh-only">关键词：人工智能；围棋；KataGo；本体论；自对弈；棋型谱系；人机共演化</div>
+<p>Abstract</p>
+<p>This article examines a question located at the intersection of artificial intelligence research, Go theory, and the cultural history of technology: when a Go AI system no longer merely maximizes winning probability but begins to stably generate, preserve, differentiate, and recursively rewrite its own repertoire of forms, can we say that an ontology of AI Go is emerging? The central claim is that such an ontology should not be understood as the machine “understanding Go” in a human sense, nor as the accidental discovery of a few surprising moves. Rather, it should be understood as a stricter event-structure in which certain configurations cease to be mere instruments of victory and become new objects capable of generating differences, forming lineages, rewriting search and evaluation procedures, and forcing human Go language to reorganize itself.</p>
+<p>The article first analyzes the self-play and search architecture of contemporary Go AI, especially KataGo, and argues that its engineering reality is already far more complex than that of a single-purpose win-loss machine. It then proposes four criteria for distinguishing a new move, a new joseki, and a new object: stability, irreducibility, rewrite-capacity, and contestability. The article further asks whether AI-generated patterns that remain temporarily difficult for human players to narrate should be regarded as an expansion of Go ontology or as the emergence of a parallel language-game. Finally, it outlines a falsifiable research program centered on a “lineage ledger of board patterns” rather than single-move win-rate analysis. The article concludes that the ontology of AI Go is neither a matter of subjective consciousness nor merely an efficiency issue; it is a generative question concerning which patterns are allowed to exist, how they are preserved, and how they compel a community to rewrite itself.</p>
+<p>Key words: artificial intelligence; Go; KataGo; ontology; self-play; pattern lineage; human-machine coevolution</p>
+<h2>一、引言</h2>
+<p>自 AlphaGo 以来，围棋人工智能早已不再是一次性的技术奇观，而成为重写围棋知识、训练方法与审美标准的重要力量。此后出现的 KataGo 在继承神经网络引导的蒙特卡洛树搜索与自对弈学习路线的同时，又在训练效率、规则泛化、多目标预测与搜索修正方面进行了大量改进，因此成为观察“机器怎样生成棋”的极佳个案。12</p>
+<p>然而，围绕围棋 AI 的讨论长期被两条路径主导。第一条路径问的是“它为什么这么强”，焦点放在算力、搜索、网络结构与训练效率上。第二条路径问的是“它对人类有什么用”，焦点放在复盘辅助、训练价值与职业棋手的接受过程上。这两条路径当然重要，但它们都默认围棋本身是一个已经定义完毕的对象：AI 只是更快地求解它，或者更有效地帮助人理解它。</p>
+<p>本文认为，真正值得提出的第三个问题是：当围棋 AI 稳定地产生人类先前未充分意识到、却又无法轻易忽略的新棋型时，它究竟是在“发现”围棋，还是在“生成”围棋？这个问题的重要性在于，它并不满足于讨论机器是否更强，也不满足于讨论机器是否有用；它转而追问，在机器长期自对弈与搜索之中，围棋内部的存在层次是否正在被重新分配。</p>
+<p>更具体地说，本文关心的不是机器有没有像人一样的主观理解，而是某些棋型为何会从“偶尔出现的变招”上升为“必须被保存、命名、讨论和继承的对象”。如果一种新棋型不仅提高了局部胜率，而且迫使原有定式、评估词汇、布局重心和复盘习惯都发生迁移，那么围棋中的“什么算作有分量的东西”就已经改变了。本体论问题，正是在这里出现：它不再是抽象的形而上学，而是对存在资格的重新分配。</p>
+<p>本文的基本思路是：第一，从 KataGo 的现实方法结构出发，说明现代围棋 AI 已经不只是单一求胜装置；第二，提出一套关于新棋型对象化的最低判据；第三，讨论人类不可完全理解的 AI 棋型究竟以何种方式进入共同世界；第四，为这一主张提出可操作、可证伪的研究方案。文章试图在技术、棋理与哲学三者之间建立一条中介性的分析路径。</p>
+<h2>二、文献综述与问题缺口</h2>
+<p>现有关于围棋 AI 的研究大体可分为三类。第一类是算法与系统研究，重点讨论如何通过神经网络、树搜索和自对弈提高棋力，并以更少计算资源获得更强的学习效率。KataGo 的论文与公开方法文档属于这一类，其贡献在于展示了围棋 AI 可以通过多种训练目标、规则随机化、辅助估计与搜索校正取得大幅提升。12</p>
+<p>第二类是应用与教育研究，关注 AI 如何改变复盘方式、训练效率以及职业与业余棋手的学习路径。这类研究提示我们，围棋 AI 并未让人类棋手停止创新，反而成为重新组织训练与判断的重要外部力量。34</p>
+<p>第三类是技术文化与哲学讨论，通常聚焦于人机对弈如何重塑人们对于直觉、创造力、专家权威与知识生产的理解。这一路径为本文提供了思想背景，但往往在经验层面较粗，不易具体回答“新棋型如何由统计结果转变为结构性对象”这一问题。</p>
+<p>这些研究为本文提供了重要前提，但也留下了一个显著空白。算法研究常把“新下法”视为更优策略的副产物，很少追问这些新下法何以从数值结果变成结构性对象；应用研究更关注人类如何利用 AI，却较少追问 AI 如何迫使围棋语言本身扩容；文化讨论则常停留在“AI 改变了围棋观念”的宏观判断上，缺乏对“改变是如何在棋型层发生的”的细密分析。</p>
+<p>也正因为如此，本文试图补上的不是又一个关于 AI 棋力的说明，而是一套关于“新对象如何获得存在资格”的理论框架。这里的任务不是神秘化机器创新，而是把围棋 AI 已经真实具备的探索、修正、记录和再学习能力，重新表述为一种关于对象生成的条件问题。</p>
+<h2>三、现代围棋 AI 并非单一的求胜机器</h2>
+<p>如果以最简化的方式描述围棋 AI，人们往往会说：它的任务就是赢棋。这一说法并不错误，但它遮蔽了系统内部更关键的事实。围棋 AI 的强大，从来不只在于最后输出一个更高的胜率，更在于它如何在搜索树中安排注意力、如何在诸多变化中分配计算预算、如何把异常局面看成噪音或线索、如何在训练过程中决定哪些样本需要被反复写入。</p>
+<p>KataGo 恰恰展示了这一层结构。其论文指出，该系统在 AlphaZero 路线基础上做了多项改进，包括更丰富的训练目标、更高效的样本利用和对极端局面的专门处理，从而显著加快了自对弈学习。1 更重要的是，公开方法文档显示，KataGo 会同时预测多个辅助价值目标与比分相关目标，还会估计搜索结果的不确定性，并在搜索中根据不确定性动态调整资源分配。2 这说明系统不仅在问“哪一步更可能赢”，也在问“哪些地方还没有被真正看清”。</p>
+<p>同样值得重视的是，KataGo 的探索并非单纯依赖均匀随机噪声。其方法文档列出 shaped Dirichlet noise、policy surprise weighting、subtree value bias correction、uncertainty-weighted playouts 等机制。2 前两者使系统更容易重新接触那些并非主流、但有潜力揭示盲点的变化；后两者则帮助系统识别局部估值中的系统性偏差，并在复杂局面中重新评估搜索分配。换言之，现代围棋 AI 已经在工程上把“盲点”“惊讶”“偏差”变成了学习资源。</p>
+<p>这种技术现实具有重要哲学后果。如果一个系统不仅会选择结果更优的手，而且会持续决定“哪些变化值得被更多看见”，那么它就已经不是简单地对围棋作答，而是在部分地决定围棋内部什么值得存在。也正因如此，本文主张，围棋 AI 的核心问题不应再仅仅写成“如何更好地求胜”，而应补上一句：“如何让新的棋型获得存在资格”。</p>
+<h2>四、从新招法到新对象：本体论的最小定义</h2>
+<p>本文所说的“本体论”，并不是要求机器像哲学家一样给围棋下定义，也不是把一切难懂的新着法浪漫化。这里的本体论有一个更严格、也更接近实践的含义：它关心的是，围棋内部到底哪些东西被承认为“有分量的存在物”。</p>
+<p>在传统语境中，这些存在物包括定式、厚势、模样、先后手、治孤、攻杀、实地、外势、棋形、棋风等。它们并不只是描述性的名词，而是组织注意力、训练判断和安排复盘的工作单位。人类棋手学习围棋，实际上并不是逐手背诵所有可能落子，而是在学习一套“哪些局部值得看、哪些形状值得记、哪些关系值得优先处理”的对象体系。</p>
+<p>因此，判断 AI 是否推动了一种新的围棋本体论，不能只看它是否提高了胜率，也不能只看它是否下出人类前所未见的手。真正要看的，是它是否让某些以前不算数、或尚未稳定成形的东西，开始长期算数。所谓“开始长期算数”，至少意味着三件事：第一，它能被反复识别，而不是偶然出现；第二，它能带出成串的后续变化，而不是孤立奇招；第三，它能迫使原有的对象体系重新安排轻重、边界与关系。</p>
+<p>基于这一点，本文将“新招法”“新定式”“新对象”三者区分开来。新招法是一次局部选择的更新，新定式是若干稳定应对关系的沉淀，而新对象则更进一步：它不仅包括局部应对，还包括一整套后续注意力分配、评估习惯与教学语言的调整。只有当第三层出现时，我们才真正进入本体论问题。</p>
+<h2>五、AI 围棋本体论的四重判据</h2>
+<p>为了避免“本体论”沦为空泛修辞，本文提出四个最低判据，用来区分一般的新变化与真正具有本体论重量的棋型事件。</p>
+<p>### （一）稳定性：它能否跨局面、跨版本、跨随机性地重复出现</p>
+<p>首先，一个候选新棋型必须具有稳定性。没有稳定性，就没有对象，只有噪声。一种落子如果只能在极少数偶然对局、特定随机种子或特定搜索预算下短暂成立，那么它当然值得研究，但还不足以获得对象资格。真正的新对象，必须在外部条件变化时仍然保有可识别的结构核。</p>
+<p>稳定性并不意味着一成不变。相反，一个成熟对象往往有多种变体、不同厚薄取向和若干适用窗口。稳定性要求的不是表面重复，而是结构重复：即便分支改变，我们仍能认出它属于同一个谱系。这也是为什么单步胜率分析不足以承担本体论判断，因为单步分析看见的是某一点的优劣，而不是一整片结构是否开始长期自我维持。</p>
+<p>### （二）不可还原性：它的意义能否完全还原为更高胜率</p>
+<p>第二，一个棋型若可以被完全还原为“它比旧下法多赢了几个百分点”，那么它仍然只是效率问题，而不是本体论问题。所谓不可还原性，不是把对象神秘化，而是说：它的意义不能被单一指标穷尽。它之所以重要，不只是因为赢得更多，还因为它迫使原有关系重新组织。</p>
+<p>例如，若一种新布局并非全局最优，却稳定地把中腹、边地与角部的轻重关系重新编排，使得旧有定式在它面前失去原先的自然性，那么它的意义就已经超出局部胜率。此时，棋型的存在理由不再只是“更强”，而是“它让其他对象的边界和功能一起移动”。这样的对象，才具有本体论厚度。</p>
+<p>### （三）回写性：结果能否反向改写生成条件</p>
+<p>第三，回写性是最关键也最容易被误用的判据。几乎所有强化学习系统都会通过训练回写参数，因此如果只要发生参数更新就算本体论事件，那么标准会被放得过宽。本文所谓回写，指的是更强的情况：一个棋型不只被系统“学会了”，还反过来改变了未来系统如何搜索、比较、保存和讨论类似局面。</p>
+<p>举例说，原先某类局部变化只是搜索树底端的边缘分支；在某个新棋型稳定之后，它开始持续进入主变化候选集合。进一步地，围绕它形成的局面簇，迫使训练样本的抽取标准改变，甚至迫使评估语言新增分类。到这一步，结果已经不只是被系统吸收，而是在反向重组系统的生成条件。只有这样的回写，才足以支撑本体论判断。</p>
+<p>### （四）可争议性：它能否成为跨主体持续工作的边界对象</p>
+<p>第四，真正的新对象必须具备可争议性。可争议性不是要求立刻形成共识，而是要求它足够顽强，以至于不同主体都不能轻易绕开它。一个棋型如果只能在单一模型内部短暂成立，既不能被另一模型复验，也不能被人类棋手、教练、研究者围绕它组织复盘、质疑、教学与再利用，那么它更像系统私语，而非公共对象。</p>
+<p>相反，若一个棋型能够被抽取为局面簇、关键应对、反例集合和失效条件，不同主体虽解释不一，却都必须面对它，那么它就取得了边界对象地位。它进入了共同世界，成为争论的中心而非奇观的边角。这一点对围棋尤为重要，因为围棋从来不是纯规则系统，而是一个由命名、复盘、传承与争论共同维持的知识共同体。</p>
+<h2>六、为什么“多样性”还不够：创新、噪声与对象化的区别</h2>
+<p>一旦谈到 AI 创新，人们最容易想到的方案，是在胜负目标之外再加一个“多样性”或“新颖性”指标。这样做当然可能提升变化空间，但它并不自动导向本体论。原因在于，多样性若只是一个附加奖励，它最终仍会被并入更大的单一目标函数，成为“更好求胜”的附属工具。</p>
+<p>换言之，多样性可以制造更多变化，却不必然制造更多对象。对象化要求的不仅是“走法不一样”，还要求“差异开始组织新的关系”。如果一个系统不断产出罕见步，但这些罕见步既不形成谱系，也不迫使旧有关系重组，那么它们只是扩展了搜索树的表面积，而没有增加围棋世界中的对象密度。</p>
+<p>这里还必须区分对象与噪声。很多人会把“人类看不懂”的东西自动等同于“深刻的新对象”，这是一种常见误解。看不懂可能意味着它太新，也可能意味着它根本没有稳定结构。真正值得重视的，不是神秘感，而是那些即便暂时难以叙述、却持续逼迫系统和共同体改写自身的棋型。只有这样的对象，才不是一阵过眼云烟的奇招风暴。</p>
+<p>因此，本文提出一个更严格的原则：AI 围棋的本体论，不属于“更多花样”，而属于“更高对象密度”。不是变化数量越多越好，而是越多变化能够沉淀成可识别、可继承、可争论、可回写的谱系单位，围棋世界才越真正被改写。</p>
+<h2>七、人类棋手看不懂时，究竟发生了什么</h2>
+<p>一个最尖锐的问题是：如果 AI 生成了某种稳定棋型谱系，但人类暂时无法完整讲清它，甚至无法把它纳入既有棋理语言，那么这还算围棋本体论吗？还是说，它已经变成只属于机器的另一种游戏？</p>
+<p>本文的回答是：人类暂时看不懂，并不取消其本体论地位；但“看不懂”本身也绝不是充分条件。关键不在于人类是否立刻拥有等价叙述，而在于该棋型是否形成了一个不能被绕开的边界对象。只要它能够被重复识别、能够反向改写系统行为、能够迫使其他主体围绕它组织新的问题，那么它就已经进入围棋的共同世界，哪怕这个世界内部的翻译仍然不完整。</p>
+<p>围棋史本来就是这样运作的。许多后来被写进教科书的下法，在最初出现时都不是“被充分理解之后才存在”，而是先以异常的方式逼迫旧语言失灵，然后才慢慢获得新的讲法。换句话说，理解往往是对象存活之后的事，而不是对象出现之前的许可。</p>
+<p>然而，本文不同意把一切机器专属结构都立即命名为“围棋的新本体论”。如果某种棋型谱系只能在单一模型内部有效存在，既无法被抽取为边界对象，也无法进入任何跨主体的复验、争论和再组织流程，那么它更像围棋规则空间中的一种局部方言，而不是共同世界中的新对象。它可能仍然有研究价值，但其公共本体论地位尚未成立。</p>
+<h2>八、人机共同世界：围棋语言如何被迫扩容</h2>
+<p>围棋 AI 的真正力量，不在于给人类发明了一个外部老师，而在于它逼迫人类围棋共同体重写自己的内部语言。已有研究和报道指出，在超级人类围棋 AI 出现之后，职业棋手的着手质量与新颖性都有显著提升，人类围棋的创新行为并未因机器更强而枯竭，反而在与机器的长期互动中获得了新的推动。34</p>
+<p>这一现象的重要性在于，它表明 AI 对围棋的影响不只是“答案输送”，而是一种对象再分配。某些过去不被优先关注的局部关系，如今进入高频讨论；某些过去近乎自然的定式判断，如今开始显得可疑；某些过去只在少数棋风中成立的中腹处理，如今被系统性地重新估值。于是，人类棋手不只是模仿机器，更是在机器逼迫下，重新学习什么叫作“值得看”。</p>
+<p>从这个角度看，围棋本体论从来不是单独属于人类或机器的私产。它更像一个不断扩大的共同世界：人类的命名、讲解、误读、反驳、教学与审美，会反向塑造机器训练的方向；机器产生的盲点修正、极端布局、异常收束和高维联动，又会迫使人类改写自己的实践语法。真正值得研究的，不是“谁拥有围棋”，而是“哪些新对象在两者的长期互动中获得了存在厚度”。</p>
+<h2>九、研究设计：从单步胜率到“棋型谱系账本”</h2>
+<p>如果本文的主张要成为可研究、可失败、可改进的方案，就不能只停留在概念阐释上。为此，本文提出一种面向实验的研究框架：以“棋型谱系账本”代替“单步胜率分析”，把候选新对象作为可追踪、可比较、可验证的研究单位。</p>
+<p>所谓“棋型谱系账本”，至少应记录以下内容：第一，触发局面簇，即某个棋型通常在什么布局、规则、贴目、先后手与厚薄关系中出现；第二，最小差异描述，即它相对既有主流走法到底改变了什么；第三，后续变体树，即其典型应对、衍生分支与失效条件；第四，稳定窗口，即它在不同模型版本、不同搜索预算、不同采样设置下是否仍能维持结构核；第五，回写证据，即其出现后，搜索主变化、训练样本抽取或评估语言是否发生稳定迁移。</p>
+<p>采用这种账本的原因很简单：围棋中的对象从来不是单步存在，而是以谱系形式存在。一个新角部变化如果不能带出后续边地经营、中腹联动和攻守转换，它就难以成为对象。把研究单位从“一手棋”提升为“一套可持续分化的棋型关系”，才能真正接近围棋中的存在结构。</p>
+<p>在实验设计上，本文建议至少设置三组对照。第一组为标准自对弈训练组，其目标仍以常规求胜为主。第二组为“粗粒度多样性组”，即在训练中加入一般性新颖性或多样性激励。第三组为“谱系追踪组”，不仅允许新变化出现，而且显式追踪其稳定性、回写性与可争议性，并将候选谱系写入账本、反复复验。只有当第三组产生的不是“更多奇招”，而是“更多能沉淀为公共对象的棋型谱系”，本文的理论主张才算得到初步支持。</p>
+<h2>十、失败条件与可证伪性</h2>
+<p>任何关于创新与本体论的论证，若不能说明自己何时会失败，最终都只会沦为华丽修辞。本文因此明确提出至少四个失败条件。</p>
+<p>第一，若所谓新棋型只能在单一随机种子、单一模型快照或极窄搜索预算下出现，那么它更可能是偶然噪声，而非对象。第二，若一旦取消人为扶持，这些棋型立即消失，无法继续在系统内部自我维持，那么它们只是外加干预的短期效果。第三，若这些棋型无法预测任何稳定后续变化，只能事后由研究者牵强归纳，那么它们并未形成谱系。第四，若其对系统和共同体的全部影响都能被单一胜率提升充分解释，那么它们仍属于更精细的胜负工程，而非本体论事件。</p>
+<p>这四条失败条件十分重要，因为它们把本文与任何神秘化 AI 创新的说法区分开来。本文并不主张凡是人类没见过的棋都自动神圣，也不主张机器内部出现的复杂结构都应被称为“新本体论”。相反，本文恰恰要求更严格的证据：只有那些既能稳定存在、又能改写后续生成条件、并能进入跨主体工作流的棋型，才值得被视为围棋世界中的新对象。</p>
+<h2>十一、讨论：围棋本体论的重心转移</h2>
+<p>本文所有讨论最终都指向一个更大的转向。在传统围棋理论中，核心问题通常写作“这一步好不好”“这一带厚不厚”“这个转换值不值得”。这些问题不会消失，它们仍然是围棋分析的日常核心。但在人工智能时代，它们之上正在浮现另一层问题：是什么让某些变化有资格被反复看见、保存、命名和继承？换言之，我们不仅需要评估答案，还需要评估对象。</p>
+<p>这并不意味着围棋从竞技转向纯哲学，也不意味着技术研究要放弃精确指标。相反，它意味着我们必须承认：在围棋 AI 的长期运行中，指标、搜索、训练和命名已经共同参与了“存在资格”的分配。一个时代的围棋，不只是由最优着手组成，也由那个时代承认哪些棋型值得长期驻留所组成。</p>
+<p>如果这一判断成立，那么围棋史就可以被重新理解为一部“对象史”：从古典定式到现代布局，从人类创造的厚薄语言到 AI 带来的异常联动，围棋的发展不只是答案的升级，更是对象谱系的扩容。机器在这一历史中的意义，不只是比人算得更深，而是让我们第一次足够清楚地看见：围棋本身一直在通过新对象的产生而改变自己。</p>
+<h2>十二、结论</h2>
+<p>本文试图提出并论证一个中心命题：AI 围棋的本体论，不是机器对围棋发表哲学意见，也不是机器偶然下出了人类看不懂的妙手，而是某些棋型在机器长期自对弈、搜索与训练回写中获得了新的存在资格。为了说明这一点，文章从 KataGo 的现实工程结构出发，指出现代围棋 AI 已经不只是单纯的胜负优化系统，而是一个持续决定“什么值得被更多看见”的生成系统。12</p>
+<p>在此基础上，本文提出了四重判据：稳定性、不可还原性、回写性与可争议性。只有当某个棋型同时满足这四条要求时，它才可能从变招上升为对象，从对象上升为本体论事件。进一步地，文章指出，人类暂时看不懂某些 AI 棋型，并不取消其本体论地位；但若这些棋型不能进入跨主体的复验、争论与再组织流程，它们也尚不足以构成围棋共同世界中的新对象。</p>
+<p>因此，真正值得开展的未来研究，不是继续停留在“AI 有没有创造力”这样的笼统提问上，而是建立一套能够记录、比较和验证棋型谱系的研究制度。只有当我们开始认真追踪“哪些棋得以存在、如何被保存、怎样迫使共同体改写自己”，人工智能围棋的深层问题才会真正显现出来。</p>
+<p>从这个意义上说，围棋 AI 带来的最大震动，也许并不是它战胜了人类，而是它迫使我们承认：围棋从来不只是胜负规则之内的解题游戏，它还是一个不断生产新对象、不断重写自身边界的历史世界。机器使这个世界的演化速度陡然加快，也使其内部结构第一次被如此清楚地照亮。</p>
+<h2>参考文献</h2>
+<p>1 Wu D J. Accelerating Self-Play Learning in Go[EB/OL]. arXiv:1902.10565, 2019.</p>
+<p>2 Wu D J. KataGo Methods[EB/OL]. lightvector/KataGo GitHub Repository Documentation, accessed 2026.</p>
+<p>3 Sparkes M. Humans Have Improved at Go Since AIs Became Best in the World[J/OL]. New Scientist, 2023.</p>
+<p>4 Tayag Y. AI’s Victories in Go Inspire Better Human Game Playing[J/OL]. Scientific American, 2023.</p></div>
+<div class="endbox">
+  <div class="lbl">这篇论文的每一个判断，都是被追问出来的</div>
+  <div class="big">SDE 金点子发生器</div>
+  <p>换一双"事物如何发生"的眼，把一个熟悉的现象拆到承重的接缝。这双眼，你也可以借来一用——同一个问题，九个方向轮番追问，免费，浏览器直接用。</p>
+  <a class="solid" href="/taste/idea-generator/">免费品尝金点子发生器 →</a>
+  <a class="ghost" href="/students/shao-min/works/">少敏 · 更多作品 →</a>
+</div>
+<footer style="text-align:center;padding:30px 24px;font-size:13px;letter-spacing:0.06em">© 2026 德麦国际 · SDE Universes · 学员专栏 · 少敏 · <a href="/students/shao-min/works/">全部作品</a></footer>
+
+<script>window.WDS_READ={selector:".wrap"};</script>
+<script src="/taste/wds-companion/wds-read.js" defer></script>
+
+<script src="/wds-mode.js" defer></script>
+</body></html>

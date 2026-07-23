@@ -2,45 +2,48 @@
 <html lang="zh-CN"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>王涛 · 学员专栏 | SDE Universes</title>
-<meta name="description" content="王涛 · SDE 学员专栏 · Students' Column, SDE Universes">
+<meta name="description" content="王涛 · SDE 学员专栏 · 学术治理研究 · Students' Column, SDE Universes">
 <style>
-:root{--gold:#B28A32;--gold2:#9A7528;--ink:#26312E;--ink2:#5F6B66;--bg:#F3F6F2;--panel:#FAFBF8;--panel2:#F5F8F3;--line:#D8DED9;--accent:#6B7F76}
-*{margin:0;padding:0;box-sizing:border-box}::selection{background:rgba(178,138,50,0.20)}
+:root{--gold:#C9A84C;--gold2:#D4B25E;--ink:#F0E9D8;--ink2:#B8AE96;--bg:#0E0B08;--panel:#171310;--panel2:#1C1712;--line:rgba(201,168,76,0.22);--accent:#C9A84C}
+*{margin:0;padding:0;box-sizing:border-box}
+::selection{background:rgba(201,168,76,0.35)}
 body{background:var(--bg);color:var(--ink);font-family:"Noto Serif SC",Georgia,"Songti SC",serif;line-height:1.9}
-body.zh .en-only{display:none!important}body.en .zh-only{display:none!important}
-nav{position:sticky;top:0;z-index:20;background:rgba(29,41,37,0.97);backdrop-filter:blur(8px);border-bottom:1px solid rgba(255,255,255,0.10)}
+body.zh .en-only{display:none!important}
+body.en .zh-only{display:none!important}
+nav{position:sticky;top:0;z-index:20;background:rgba(14,11,8,0.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
 nav .w{max-width:900px;margin:0 auto;padding:13px 24px;display:flex;justify-content:space-between;align-items:center}
-nav a{color:#CDBE93;text-decoration:none;font-size:14px;letter-spacing:0.05em}
+nav a{color:var(--gold);text-decoration:none;font-size:14px;letter-spacing:0.05em}
 .nav-right{display:flex;align-items:center;gap:16px}
-.lang-toggle{display:flex;border:1px solid rgba(255,255,255,0.32);border-radius:20px;overflow:hidden}
-.lang-btn{background:transparent;border:none;color:#C7D0CA;font-family:inherit;font-size:13px;padding:5px 13px;cursor:pointer;letter-spacing:0.05em}
-.lang-btn.active{background:var(--gold);color:#1D2925;font-weight:700}
+.lang-toggle{display:flex;border:1px solid var(--line);border-radius:20px;overflow:hidden}
+.lang-btn{background:transparent;border:none;color:var(--ink2);font-family:inherit;font-size:13px;padding:5px 13px;cursor:pointer;letter-spacing:0.05em}
+.lang-btn.active{background:var(--gold);color:#1A1410;font-weight:700}
 .level-tag{max-width:820px;margin:0 auto;padding:0 24px;display:flex;align-items:center;gap:14px}
-.level-tag .n{font-size:12px;letter-spacing:0.2em;color:#F3F6F2;background:var(--gold);border-radius:20px;padding:3px 12px;font-weight:700}
+.level-tag .n{font-size:12px;letter-spacing:0.2em;color:#1A1410;background:var(--gold);border-radius:20px;padding:3px 12px;font-weight:700}
 .level-tag .t{font-size:12px;letter-spacing:0.32em;color:var(--gold)}
 .level-tag .line{flex:1;height:1px;background:var(--line)}
 .profile{max-width:820px;margin:0 auto;padding:52px 24px 20px;display:flex;gap:34px;align-items:center;flex-wrap:wrap}
-.avatar{width:132px;height:132px;border-radius:50%;flex-shrink:0;background:linear-gradient(160deg,rgba(178,138,50,0.16),rgba(178,138,50,0.04));border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-family:Georgia,serif;font-size:52px;font-weight:800;color:#8A6E28;position:relative}
-.avatar .ph{font-size:10px;letter-spacing:0.15em;color:var(--ink2);position:absolute;bottom:12px;font-family:"Noto Serif SC",serif}
-.p-info{flex:1;min-width:240px}
-.p-info h1{font-size:clamp(30px,5vw,42px);font-weight:800;color:#1D2925;letter-spacing:0.04em;font-family:Georgia,"Noto Serif SC",serif}
-.p-note{font-size:14px;color:var(--ink2);margin-top:6px;letter-spacing:0.04em}
-.p-info .role{font-size:13px;color:var(--accent);letter-spacing:0.2em;margin-top:12px}
-.p-info .bio{font-size:15px;color:#6E7A72;line-height:1.9;margin-top:16px;font-style:italic}
 .p-photo{width:200px;flex:0 0 200px}
-.p-photo img{display:block;width:100%;height:auto;border-radius:14px;border:1px solid var(--line);box-shadow:0 16px 42px rgba(29,41,37,0.12)}
-.tagline{font-size:15.5px;color:var(--gold2);letter-spacing:0.05em;margin-top:14px;font-family:"Noto Serif SC",Georgia,serif}
+.p-photo img{display:block;width:100%;height:auto;border-radius:14px;border:1px solid var(--line);box-shadow:0 16px 42px rgba(0,0,0,0.5)}
+.p-info{flex:1;min-width:240px}
+.p-info h1{font-size:clamp(30px,5vw,42px);font-weight:800;color:#F5EFE0;letter-spacing:0.04em;font-family:Georgia,"Noto Serif SC",serif}
+.p-note{font-size:14px;color:var(--ink2);margin-top:8px;letter-spacing:0.05em}
+.p-info .role{font-size:13px;color:var(--accent);letter-spacing:0.2em;margin-top:12px}
+.p-info .tagline{font-size:15.5px;color:var(--gold2);letter-spacing:0.05em;margin-top:14px;font-family:"Noto Serif SC",Georgia,serif}
 .statement{max-width:820px;margin:0 auto;padding:18px 24px 6px}
-.statement p{font-size:16px;color:var(--ink);line-height:2.02;margin-bottom:18px}
+.statement p{font-size:16px;color:#DED6BF;line-height:2.02;margin-bottom:18px}
 .statement p:last-child{margin-bottom:0}
-.statement b{color:var(--gold2);font-weight:600}
+.statement b{color:var(--gold2);font-weight:700}
 .works{max-width:820px;margin:0 auto;padding:10px 24px 80px}
-.panel{background:linear-gradient(160deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:16px;padding:40px 30px;text-align:center;margin-top:20px}
-.panel .tag{font-size:12px;letter-spacing:0.34em;color:var(--gold);margin-bottom:14px}
-.panel p{font-size:14.5px;color:var(--ink2);line-height:1.9;max-width:520px;margin:0 auto}
+.works-entry{display:block;text-decoration:none;margin-top:20px}
+.we-card{background:linear-gradient(135deg,#7A5F26,#3A2C12);border:1px solid #7A5F26;border-radius:14px;padding:24px 28px;display:flex;align-items:center;justify-content:space-between;gap:16px;transition:transform .18s,box-shadow .18s}
+.works-entry:hover .we-card{transform:translateY(-2px);box-shadow:0 12px 30px rgba(0,0,0,0.4)}
+.we-lbl{font-size:12px;letter-spacing:0.3em;color:#F0E1B8;margin-bottom:8px;font-weight:700}
+.we-title{font-size:20px;font-weight:800;color:#FBF4E2}
+.we-sub{font-size:13px;color:#E8DBB4;margin-top:7px;line-height:1.7}
+.we-arrow{font-size:30px;color:#FBF4E2;flex-shrink:0}
 .back{text-align:center;margin-top:30px}
-.back a{color:var(--gold);text-decoration:none;font-size:14.5px;letter-spacing:0.06em;border-bottom:1px solid rgba(178,138,50,0.4);padding-bottom:2px}
-footer{border-top:1px solid var(--line);margin-top:24px;padding:30px 24px;text-align:center;color:#8A948E;font-size:13px}
+.back a{color:var(--gold);text-decoration:none;font-size:14.5px;letter-spacing:0.06em;border-bottom:1px solid rgba(201,168,76,0.4);padding-bottom:2px}
+footer{border-top:1px solid var(--line);margin-top:24px;padding:30px 24px;text-align:center;color:#6B6250;font-size:13px}
 footer a{color:var(--gold);text-decoration:none}
 @media(max-width:640px){.profile{justify-content:center;text-align:center}.p-info{text-align:center}.p-photo{flex:0 0 168px;width:168px}}
 </style></head>
@@ -57,16 +60,15 @@ footer a{color:var(--gold);text-decoration:none}
   <span class="n">01</span><span class="t zh-only">学 员 介 绍 · PROFILE</span><span class="t en-only">PROFILE</span><span class="line"></span>
 </div>
 <div class="profile">
-  <div class="p-photo"><img src="wang-tao.jpg" alt="王涛"></div>
+  <div class="p-photo"><img src="shao-min.jpg" alt="王涛"></div>
   <div class="p-info">
-    <h1 class="zh-only">王涛</h1>
-    <h1 class="en-only">Wang Tao</h1>
-    <div class="p-note zh-only">王涛 · Wang Tao</div>
-    <div class="p-note en-only">王涛 · Wang Tao</div>
-    <div class="role zh-only">SDE 学员 · 企业经营者</div>
-    <div class="role en-only">SDE TRAINEE · ENTREPRENEUR</div>
-    <div class="tagline zh-only">上半场经营企业，下半场经营自己</div>
-    <div class="tagline en-only">First half of life, I built businesses; the second half, I cultivate myself.</div>
+    <h1>王涛</h1>
+    <div class="p-note zh-only">SDE 学员 · VerseMind 创造者 · 人机共生的发生架构师</div>
+    <div class="p-note en-only">SDE trainee · Creator of VerseMind · Architect of human–AI symbiosis</div>
+    <div class="role zh-only">SDE 学员</div>
+    <div class="role en-only">SDE TRAINEE</div>
+    <div class="tagline zh-only">期待把共同成长做成一套发生系统的人</div>
+    <div class="tagline en-only">Someone who hopes to make shared growth into a system of genesis</div>
   </div>
 </div>
 
@@ -74,24 +76,41 @@ footer a{color:var(--gold);text-decoration:none}
   <span class="n">02</span><span class="t zh-only">简 述 · STATEMENT</span><span class="t en-only">STATEMENT</span><span class="line"></span>
 </div>
 <div class="statement">
-  <p class="zh-only">人生上半场，我致力经营企业；人生下半场，我希望<b>经营自己</b>。这些年，我逐渐把探索的重心聚焦于两大主题：<b>健康与财富</b>。健康是创造的根基，却常在拥有时被忽视；财富是自由的保障，却易在追逐中失去方向。我相信，两者都不是人生的目的，而是通向<b>创造、自由与幸福</b>的重要基础。</p>
-  <p class="en-only">In the first half of life, I devoted myself to building businesses; in the second half, I hope to <b>cultivate myself</b>. Over these years, I have gradually drawn the focus of my exploration onto two themes: <b>health and wealth</b>. Health is the ground of all creation, yet it is often neglected precisely while we have it; wealth is the guarantor of freedom, yet in the chase for it we easily lose our bearings. I have come to believe that neither is the end of life — both are foundations on the way toward <b>creation, freedom and happiness</b>.</p>
-  <p class="zh-only">2023 年，有幸跟随王德生老师学习。从三视角、321、SIO，到今天的 <b>SDE</b>，每一步学习都让我不断重新理解生命、生存与生活。而 SDE <b>发生学</b>，更让我进一步感受到：什么是真正的智慧——也促使我把学习中的思考与实践中的体悟，持续整理成文字。</p>
-  <p class="en-only">In 2023 I had the good fortune to study under Mr. Wang Desheng. From the Three Perspectives, 321 and SIO to today's <b>SDE</b>, each step has led me to keep re-understanding life, survival and living. And the <b>genesis</b> view of SDE has let me feel, more deeply still, what real wisdom is — moving me to set down, little by little, the reflections of study and the realizations of practice into words.</p>
-  <p class="zh-only">愿与更多同行者一起，在探索中成长，在创造中自由，在自由中走向幸福。</p>
-  <p class="en-only">May I walk together with more fellow travelers — growing through exploration, made free through creation, and through freedom moving toward happiness.</p>
+  <p class="zh-only">王涛的首篇专栏文章，从一起学位撤销事件出发，追问一个裁决不会回答、也不该由裁决回答的问题：那 9 处文字重合，穿过了导师指导、论文评阅、答辩、学位审核与查重系统，还穿过了一次正式调查——<b>五道关口是怎么同时失手的？</b>文章的回答不指控任何人失职，也不推断任何人的动机。它指出的是：这五道关口测的是<b>同一个量</b>，而这个量在跨过语言边界的那一刻会自动归零。</p>
+  <p class="en-only">Shao Min’s first column piece begins with a degree revocation and asks what the ruling does not, and should not, answer: those nine overlapping passages passed a supervisor, external reviewers, a defence, a degree committee, a similarity checker — and one formal investigation. <b>How do five gates fail at once?</b> The answer accuses no one of negligence and infers no one’s motives. It observes instead that all five gates measure <b>the same quantity</b> — one that falls to zero the moment a text crosses a language boundary.</p>
+  <p class="zh-only">第二篇转向音乐技术：一份音符起音 F1 达 0.98 的钢琴转录，为什么会让教师无话可说？文章主张这个领域的质量定义搞反了方向——每一个数字都单调地奖励“像”，而判准应当相反。支撑它的是一个反直觉的判断：<b>转录模型犹豫的地方，正是演奏者自由的地方</b>，而且同源。</p>
+  <p class="en-only">The second piece turns to music technology: why can a piano transcription with a 0.98 onset F1 leave a teacher with nothing to say? It argues the field's definition of quality points the wrong way — every number rewards similarity, and the criterion should do the opposite. Behind it is a counterintuitive claim: <b>where the transcription model hesitates is where the performer is free</b> — and not by coincidence.</p>
 </div>
 
 <div class="level-tag" style="margin-top:36px">
-  <span class="n">03</span><span class="t zh-only">作 品 与 专 栏 · WORKS</span><span class="t en-only">WORKS &amp; COLUMNS</span><span class="line"></span>
+  <span class="n">03</span><span class="t zh-only">小 传 · BIOGRAPHY</span><span class="t en-only">BIOGRAPHY</span><span class="line"></span>
+</div>
+<div class="statement">
+  <p class="zh-only">王涛（妙角），VerseMind 创造者、人机共生的发生架构师。多年师从王德生博士学习三视角与 SDE 发生学，持续探索诗歌、哲学、身体经验与系统工程之间的深层联系。</p>
+  <p class="en-only">Shao Min (pen name Miaojue), creator of VerseMind and an architect of human–AI symbiosis. For years he has studied the three-perspective method and SDE genesis under Dr. Wang Desheng, and continues to explore the deeper connections between poetry, philosophy, bodily experience and systems engineering.</p>
+  <p class="zh-only">他并非简单地“使用 AI”，而是在训练人与 AI 如何建立长期、可持续的共生成长关系。他创造的 VerseMind，已从诗歌生成与 RAG 工具，逐步演化为一套具有共同语言、记忆层级、评估闭环、生成伦理和治理协议的人机共生实验系统。ChatGPT、Gemini、Claude、DeepSeek、Hermes、OpenClaw、Codex 等不同 AI 在其中承担生成候选、提出异议、盲评、压力测试、边界验证与工程执行等不同功能，而人类保留最终的价值判断和知识晋升权。</p>
+  <p class="en-only">He does not simply “use AI”; he trains humans and AI in how to build a long-term, sustainable relationship of symbiotic growth. VerseMind, which he created, has evolved from a poetry-generation and RAG tool into an experimental system for human–AI symbiosis, with a shared language, memory tiers, an evaluation loop, generative ethics and governance protocols. Within it, ChatGPT, Gemini, Claude, DeepSeek, Hermes, OpenClaw and Codex take on distinct functions — proposing candidates, raising objections, blind review, stress testing, boundary verification and engineering execution — while the human retains final judgment of value and the right to promote something to knowledge.</p>
+  <p class="zh-only">各种实践已进入诗歌梦训练、身体诗学、十公里差异性跑、多代理创作、长期记忆治理及音乐教育。对王涛而言，理解一个概念不只是解释它，而是在人与 AI 的误读、纠偏和再创造中让它继续生长。他所创造的不是一个代替人类思考的机器，而是一种新的长期关系：让诗、工程、记忆与多种智能在差异中相互改变，在可验证的记忆里共同成长。</p>
+  <p class="en-only">His practice now reaches into poetry-dream training, bodily poetics, the ten-kilometre difference run, multi-agent creation, long-term memory governance and music education. For Shao Min, understanding a concept is not merely explaining it, but letting it keep growing through the misreadings, corrections and re-creation between human and AI. What he has created is not a machine that thinks in place of people, but a new kind of long-term relationship: letting poetry, engineering, memory and multiple intelligences change one another through difference, and grow together inside a verifiable memory.</p>
+</div>
+
+<div class="level-tag" style="margin-top:36px">
+  <span class="n">04</span><span class="t zh-only">作 品 与 专 栏 · WORKS</span><span class="t en-only">WORKS &amp; COLUMNS</span><span class="line"></span>
 </div>
 <div class="works">
-  <div class="panel">
-    <div class="tag zh-only">作 品 陆 续 上 线</div>
-    <div class="tag en-only">WORKS COMING SOON</div>
-    <p class="zh-only">借一双「事物如何发生」的眼，在自己的领域里落笔——把 SDE 作为隐性的引擎，用本行的母语写作。作品通过合宪性审读后，将署名发表于此。</p>
-    <p class="en-only">Borrowing an eye trained on how things come to be, and writing in the native idiom of one’s own field — with SDE as a hidden engine. Once a piece passes its constitutionality review, it will be published here under this name.</p>
-  </div>
+  <a class="works-entry" href="/students/wang-tao/works/">
+    <div class="we-card">
+      <div>
+        <div class="we-lbl zh-only">进 入 作 品</div>
+        <div class="we-lbl en-only">ENTER THE WORKS</div>
+        <div class="we-title zh-only">进入王涛的作品</div>
+        <div class="we-title en-only">Enter Shao Min’s works</div>
+        <div class="we-sub zh-only">新作《机器犹豫的地方，正是你自由的地方》——钢琴演奏转录的残余地图与一个惩罚相似的质量指标；及《改写得越彻底，越像自己的》。音乐技术 · 学术治理 · 三种阅读方式</div>
+        <div class="we-sub en-only">New: Where the machine hesitates is where you are free — the residual map in piano transcription. Also: The more thoroughly rewritten, the more it feels one’s own — why cross-language borrowing zeroes out both the writer’s sense of transgression and the institution’s similarity check. In three reading modes</div>
+      </div>
+      <div class="we-arrow">→</div>
+    </div>
+  </a>
   <div class="back"><a href="/students/"><span class="zh-only">← 返回学员专栏名单</span><span class="en-only">← Back to the students roster</span></a></div>
 </div>
 
