@@ -1,0 +1,1 @@
+(function(){var slug=document.body.getAttribute('data-student-slug');if(!slug)return;fetch('/students/roster.json').then(function(r){return r.json()}).then(function(d){var s=d.students.find(function(x){return x.slug===slug});if(!s)return;document.querySelectorAll('[data-publication-count]').forEach(function(el){el.textContent=s.count});});})();
