@@ -3,17 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SDE 提智对照实验室 · SDE Universes</title>
-<meta name="description" content="同一个问题、同一个基底、同样的字数上限：裸答、你自己的提示词、六路径涌现、三方程创新四臂同场作答，再由另一个基底盲评创新智商五维，看提智到底加了多少分。">
-<meta property="og:title" content="SDE 提智对照实验室">
-<meta property="og:description" content="四臂同题作答、盲评打分，量出「提智」相对裸答与相对你自己提示词的增量。">
-<script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js"></script>
+<title>SDE 对话对照 · 大模型 vs WDS · SDE Universes</title>
+<meta name="description" content="同一个问题、同一个基底，左边直接问大模型，右边问注入了 SDE 内功与心得的 WDS。两栏并列、各自记忆累加、都可对话 100 次，看提智把回答改成了什么样。">
+<meta property="og:title" content="SDE 对话对照 · 大模型 vs WDS">
+<meta property="og:description" content="左栏裸调基底，右栏同一基底＋SDE 内功＋心得。同题并列、各自累加记忆、都可对话 100 次。">
 <style>
-:root{ --bg:#0E1116; --bg2:#141B22; --card:#161B22; --card2:#12161C; --gold:#D4B25E; --gold2:#E5C86E; --ink:#E6EDF3; --sub:#8B98A5; --sub2:#9AA5B0; --line:rgba(212,178,94,0.28); --ok:#5FBF7F; --warn:#E8A33D; --bad:#E06C60; --c1:#5FA8D3; --c2:#B98CFF; }
+:root{ --bg:#0E1116; --bg2:#141B22; --card:#161B22; --card2:#12161C; --gold:#D4B25E; --gold2:#E5C86E; --ink:#E6EDF3; --sub:#8B98A5; --sub2:#9AA5B0; --line:rgba(212,178,94,0.28); --ok:#5FBF7F; --warn:#E8A33D; --bad:#E06C60; --base:#8CA3B5; --wds:#D4B25E; }
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:"PingFang SC","Microsoft YaHei","Noto Sans SC",sans-serif;font-size:15px;line-height:1.75}
 a{color:var(--gold);text-decoration:none}
-.wrap{max-width:1180px;margin:0 auto;padding:0 20px}
+.wrap{max-width:1240px;margin:0 auto;padding:0 20px}
 header{border-bottom:1px solid var(--line);background:linear-gradient(180deg,#0E1116,#10151B);padding:14px 0}
 .hrow{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
 .hback{font-size:13.5px;color:var(--sub)}
@@ -21,84 +20,79 @@ header{border-bottom:1px solid var(--line);background:linear-gradient(180deg,#0E
 .htitle b{background:linear-gradient(120deg,var(--gold),var(--gold2));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
 .badge{font-size:11px;letter-spacing:0.16em;color:var(--gold);border:1px solid var(--line);border-radius:99px;padding:2px 10px}
 #neigongStatus{font-size:12px;color:var(--sub)}
-.hero{padding:34px 0 8px;text-align:center}
-.hero h1{font-size:clamp(26px,4vw,38px);font-weight:800;margin:0 0 10px}
+.hero{padding:26px 0 6px;text-align:center}
+.hero h1{font-size:clamp(24px,3.6vw,34px);font-weight:800;margin:0 0 10px}
 .hero h1 b{background:linear-gradient(120deg,var(--gold),var(--gold2));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
-.hero p{color:var(--sub);max-width:840px;margin:0 auto;font-size:15.5px}
-.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px;margin:22px 0}
-.xcard{background:var(--card);border:1px solid rgba(255,255,255,0.08);border-top:3px solid var(--gold);border-radius:12px;padding:18px}
-.xcard h3{margin:0 0 8px;font-size:13.5px;color:var(--gold2)}
-.xcard div{font-size:12.8px;color:var(--sub2);line-height:1.8}
-.xcard b{color:#D4DCE4}
-.panel{background:var(--card);border:1px solid rgba(255,255,255,0.09);border-radius:14px;padding:20px;margin:16px 0}
-.ptitle{font-size:14px;font-weight:700;color:var(--gold2);margin:0 0 12px;letter-spacing:0.04em}
-label.f{display:block;font-size:12.5px;color:var(--sub);margin:12px 0 5px}
+.hero p{color:var(--sub);max-width:860px;margin:0 auto;font-size:15px}
+.panel{background:var(--card);border:1px solid rgba(255,255,255,0.09);border-radius:14px;padding:16px 18px;margin:16px 0}
+.cfgRow{display:grid;grid-template-columns:1.1fr 1.4fr auto;gap:14px;align-items:end}
+@media(max-width:820px){.cfgRow{grid-template-columns:1fr}}
+label.f{display:block;font-size:12.5px;color:var(--sub);margin:0 0 5px}
 label.f .req{color:var(--bad)}
-input[type=password],input[type=text],input[type=number],textarea,select{width:100%;background:#0C1015;border:1px solid rgba(255,255,255,0.14);border-radius:9px;color:var(--ink);padding:10px 12px;font-size:14px;font-family:inherit;outline:none}
-input:focus,textarea:focus,select:focus{border-color:var(--gold)}
-textarea{min-height:86px;resize:vertical;line-height:1.7}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
-@media(max-width:820px){.grid2,.grid3{grid-template-columns:1fr}}
+input[type=password],input[type=text],select{width:100%;background:#0C1015;border:1px solid rgba(255,255,255,0.14);border-radius:9px;color:var(--ink);padding:10px 12px;font-size:14px;font-family:inherit;outline:none}
+input:focus,select:focus{border-color:var(--gold)}
 .keyrow{display:flex;gap:8px;align-items:center}
 .keyrow input{flex:1}
 .ktog{background:transparent;color:var(--sub2);border:1px solid rgba(255,255,255,0.2);border-radius:8px;padding:9px 12px;font-size:12.5px;cursor:pointer;white-space:nowrap}
-.hint{font-size:11.5px;color:#8C93A0;margin-top:6px}
-.modeRow{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}
-.modeOpt{flex:1;min-width:230px;border:1px solid rgba(255,255,255,0.14);border-radius:11px;padding:12px 14px;cursor:pointer;background:#0C1015}
-.modeOpt.sel{border-color:var(--gold);background:rgba(212,178,94,0.08)}
-.modeOpt h4{margin:0 0 4px;font-size:14px;color:var(--ink)}
-.modeOpt div{font-size:12px;color:var(--sub);line-height:1.7}
-.btnRow{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:18px}
-button.go{background:linear-gradient(120deg,var(--gold),var(--gold2));color:#14100A;border:none;border-radius:10px;padding:13px 30px;font-size:16px;font-weight:800;cursor:pointer;letter-spacing:0.05em}
-button.go:disabled{opacity:0.45;cursor:not-allowed}
-button.ghost{background:transparent;color:var(--sub2);border:1px solid rgba(255,255,255,0.2);border-radius:10px;padding:12px 20px;font-size:14px;cursor:pointer}
-button.ghost:hover{color:var(--ink);border-color:var(--gold)}
-#errBox{display:none;background:rgba(224,108,96,0.1);border:1px solid rgba(224,108,96,0.5);color:#F0A69E;border-radius:10px;padding:11px 14px;font-size:13px;margin-top:14px;white-space:pre-wrap}
-.phase{font-size:13px;color:var(--gold);letter-spacing:0.2em;margin:26px 0 10px;font-weight:700}
-#logBox{background:#0A0D12;border:1px solid rgba(255,255,255,0.08);border-radius:11px;padding:12px 14px;font-size:12.5px;color:#9FB4C4;line-height:1.85;max-height:260px;overflow:auto;white-space:pre-wrap;font-family:ui-monospace,Menlo,Consolas,monospace}
-.board{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:14px 0}
-@media(max-width:820px){.board{grid-template-columns:1fr}}
-.iqbox{background:var(--card2);border:1px solid rgba(255,255,255,0.09);border-radius:12px;padding:16px;text-align:center}
-.iqbox .lbl{font-size:12px;color:var(--sub);letter-spacing:0.1em}
-.iqbox .num{font-size:38px;font-weight:800;line-height:1.2;margin:6px 0 2px}
-.iqbox .band{font-size:12px;color:var(--sub2)}
-.iqbox .delta{font-size:12.5px;margin-top:8px;color:var(--sub2)}
-.iqbox.base .num{color:#C7CFD7}
-.iqbox.c1 .num{color:var(--c1)}
-.iqbox.c2 .num{color:var(--c2)}
-.up{color:var(--ok)} .down{color:var(--bad)}
-.cols{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
-@media(max-width:980px){.cols{grid-template-columns:1fr}}
-.col{background:var(--card2);border:1px solid rgba(255,255,255,0.08);border-radius:12px;overflow:hidden}
-.col.generating{border-color:var(--gold)}
-.colHead{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:11px 14px;border-bottom:1px solid rgba(255,255,255,0.06);flex-wrap:wrap}
-.colHead .t{font-size:13.5px;font-weight:700;color:#D4DCE4}
-.colHead .st{font-size:12px;color:var(--sub)}
-.colBody{padding:13px 16px;max-height:420px;overflow:auto;font-size:13.5px;color:#C7CFD7;white-space:pre-wrap;line-height:1.9}
-.colBody .placeholder{color:var(--sub);font-style:italic}
-.colMeta{padding:0 16px 12px;font-size:11.5px;color:var(--sub)}
-.blk{background:var(--card2);border:1px solid rgba(255,255,255,0.08);border-radius:12px;margin:10px 0;overflow:hidden}
-.blkHead{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:11px 15px;border-bottom:1px solid rgba(255,255,255,0.06);cursor:pointer;flex-wrap:wrap}
-.blkHead .t{font-size:13.5px;font-weight:700;color:#D4DCE4}
-.blkHead .st{font-size:12px;color:var(--sub)}
-.blkBody{padding:13px 16px;max-height:340px;overflow:auto;font-size:13px;color:#C7CFD7;white-space:pre-wrap;line-height:1.85;display:none}
-.blkBody.open{display:block}
-table.tbl{width:100%;border-collapse:collapse;font-size:13px;margin-top:10px}
-table.tbl th,table.tbl td{border:1px solid rgba(255,255,255,0.1);padding:8px 10px;text-align:center}
-table.tbl th{background:rgba(212,178,94,0.08);color:var(--gold2);font-weight:700}
-table.tbl td.arm{text-align:left;color:#D4DCE4}
-.spinner{display:inline-block;width:10px;height:10px;border:2px solid rgba(212,178,94,0.3);border-top-color:var(--gold);border-radius:50%;animation:sp 0.8s linear infinite;vertical-align:-1px;margin-right:4px}
+.hint{font-size:11.5px;color:#8C93A0;margin-top:8px;line-height:1.7}
+#overseasNote{display:none;margin-top:8px}
+#errBox{display:none;background:rgba(224,108,96,0.1);border:1px solid rgba(224,108,96,0.5);color:#F0A69E;border-radius:10px;padding:11px 14px;font-size:13px;margin-top:12px;white-space:pre-wrap}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:14px 0}
+@media(max-width:900px){.cols{grid-template-columns:1fr}}
+.col{background:var(--card2);border:1px solid rgba(255,255,255,0.08);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;min-height:340px}
+.col.base{border-top:3px solid var(--base)}
+.col.wds{border-top:3px solid var(--wds)}
+.colHead{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:12px 15px;border-bottom:1px solid rgba(255,255,255,0.06);flex-wrap:wrap}
+.colHead .t{font-size:14px;font-weight:800}
+.col.base .colHead .t{color:#B7C6D2}
+.col.wds .colHead .t{color:var(--gold2)}
+.colHead .sub{font-size:11.5px;color:var(--sub);font-weight:400;margin-left:6px}
+.colHead .cnt{font-size:12px;color:var(--sub);letter-spacing:0.04em}
+.msgs{padding:14px 15px;flex:1;overflow:auto;max-height:56vh;min-height:240px}
+.msg{margin:0 0 14px;font-size:13.8px;line-height:1.9}
+.msg .who{font-size:11px;letter-spacing:0.1em;color:var(--sub);margin-bottom:4px}
+.msg.u .bub{background:rgba(212,178,94,0.10);border:1px solid rgba(212,178,94,0.22);border-radius:10px 10px 3px 10px;padding:9px 12px;color:#E9E0C6;white-space:pre-wrap}
+.msg.a .bub{background:#0D1319;border:1px solid rgba(255,255,255,0.08);border-radius:10px 10px 10px 3px;padding:11px 13px;color:#CBD5DE;white-space:pre-wrap}
+.msg.sys .bub{background:rgba(140,163,181,0.08);border:1px dashed rgba(140,163,181,0.3);border-radius:9px;padding:8px 11px;color:#9DB0C0;font-size:12.5px;white-space:pre-wrap}
+.msg.a.wdsA .bub{border-color:rgba(212,178,94,0.22)}
+.msg .placeholder{color:var(--sub);font-style:italic}
+.spinner{display:inline-block;width:11px;height:11px;border:2px solid rgba(212,178,94,0.3);border-top-color:var(--gold);border-radius:50%;animation:sp 0.8s linear infinite;vertical-align:-1px;margin-right:6px}
 @keyframes sp{to{transform:rotate(360deg)}}
-.warnbox{background:rgba(232,163,61,0.09);border:1px solid rgba(232,163,61,0.45);color:#F0CE96;border-radius:10px;padding:11px 14px;font-size:12.8px;line-height:1.8;margin-top:12px}
-footer{border-top:1px solid rgba(255,255,255,0.08);margin-top:48px;padding:22px 0 40px;text-align:center;color:var(--sub);font-size:12.5px}
+.xinde-link{color:var(--gold);cursor:pointer;text-decoration:underline;text-underline-offset:2px}
+.askbar{position:sticky;bottom:0;background:linear-gradient(180deg,rgba(14,17,22,0),#0E1116 22%);padding:14px 0 4px;margin-top:6px}
+.askInner{display:flex;gap:10px;align-items:flex-end}
+.askInner textarea{flex:1;background:#0C1015;border:1px solid rgba(255,255,255,0.16);border-radius:11px;color:var(--ink);padding:12px 14px;font-size:14.5px;font-family:inherit;line-height:1.7;min-height:52px;max-height:200px;resize:vertical;outline:none}
+.askInner textarea:focus{border-color:var(--gold)}
+button.go{background:linear-gradient(120deg,var(--gold),var(--gold2));color:#14100A;border:none;border-radius:11px;padding:13px 26px;font-size:15.5px;font-weight:800;cursor:pointer;letter-spacing:0.04em;white-space:nowrap}
+button.go:disabled{opacity:0.45;cursor:not-allowed}
+button.ghost{background:transparent;color:var(--sub2);border:1px solid rgba(255,255,255,0.2);border-radius:10px;padding:11px 16px;font-size:13.5px;cursor:pointer;white-space:nowrap}
+button.ghost:hover{color:var(--ink);border-color:var(--gold)}
+.barMeta{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-top:8px}
+.roundTag{font-size:12.5px;color:var(--sub)}
+.roundTag b{color:var(--gold2)}
+.explain{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:8px 0 2px}
+@media(max-width:820px){.explain{grid-template-columns:1fr}}
+.excard{background:var(--card);border:1px solid rgba(255,255,255,0.08);border-radius:11px;padding:13px 15px}
+.excard.b{border-left:3px solid var(--base)}
+.excard.w{border-left:3px solid var(--wds)}
+.excard h4{margin:0 0 5px;font-size:13px}
+.excard.b h4{color:#B7C6D2}.excard.w h4{color:var(--gold2)}
+.excard div{font-size:12.4px;color:var(--sub2);line-height:1.75}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,0.66);display:none;align-items:center;justify-content:center;z-index:9999;padding:20px}
+.modal.open{display:flex}
+.modalBox{background:#12161C;border:1px solid var(--line);border-radius:14px;max-width:760px;width:100%;max-height:82vh;display:flex;flex-direction:column;overflow:hidden}
+.modalHead{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border-bottom:1px solid rgba(255,255,255,0.08)}
+.modalHead .t{font-weight:800;color:var(--gold2)}
+.modalHead button{background:transparent;border:none;color:var(--sub);font-size:20px;cursor:pointer}
+.modalBody{padding:16px 18px;overflow:auto;white-space:pre-wrap;font-size:13.5px;color:#CBD5DE;line-height:1.9}
+footer{border-top:1px solid rgba(255,255,255,0.08);margin-top:40px;padding:22px 0 40px;text-align:center;color:var(--sub);font-size:12.5px}
 </style>
 </head>
 <body>
 <header>
   <div class="wrap hrow">
     <a class="hback" href="/">← SDE Universes</a>
-    <div class="htitle">SDE <b>提智对照实验室</b></div>
+    <div class="htitle">SDE <b>对话对照</b></div>
     <span class="badge">品尝系列 · 其八</span>
     <span id="neigongStatus">内功加载中…</span>
   </div>
@@ -106,130 +100,74 @@ footer{border-top:1px solid rgba(255,255,255,0.08);margin-top:48px;padding:22px 
 
 <div class="wrap">
   <div class="hero">
-    <h1>提智，到底加了<b>多少分</b>？</h1>
-    <p>同一个问题、同一个基底、同样的字数上限，四臂同场作答：不提智的裸答、你自己写的提示词、六路径涌现、三方程创新。四段回答被打乱标签后交给另一个基底盲评创新智商五维——你看到的不是"提智很厉害"这句话，而是一组可以被质疑的数字。</p>
+    <h1>同一个问题，<b>大模型</b> 与 <b>WDS</b> 并排作答</h1>
+    <p>左栏直接问大模型——裸调基底，什么都不加。右栏问 WDS——同一个基底，先注入 SDE 内功、再让它写下本场心得，然后作答。两栏各自累加记忆、都可以连着对话 100 次。你不看分数，只把两边的回答放在一起，自己判断"提智"改变了什么。</p>
   </div>
 
-  <div class="cards">
-    <div class="xcard">
-      <h3>四臂同题</h3>
-      <div><b>A 裸答</b>：只给问题，什么都不加。<br><b>B 你的提示词</b>（选填）：把你自己写的一段提示拼在问题前——这才是提智真正要比的对手。<br><b>C1 六路径涌现</b>：S/D/E 六种排序各走一条路径，六个判断二阶碰撞、自组织出暗流，涌现单路径不可达的新判断（8 次调用）。<br><b>C2 三方程创新</b>：S/D/E 三维各建观点池，检验三者能否结成 S=F(D,E)/D=G(S,E)/E=H(S,D)，联立后萃取不可还原残差（5 次调用）。</div>
-    </div>
-    <div class="xcard">
-      <h3>盲评怎么做</h3>
-      <div>四段回答**每一遍都重新随机打乱**标签给法官，法官不知道哪段是提智的；提智臂出稿后先过一道<b>改姓自检</b>，命中框架词就自动改写一次，防止法官凭术语认出它。评分＝<b>他审</b>（另一个基底）＋<b>自审</b>（回答基底评自己）各跑 N 遍取平均，某臂少评一遍会自动补评补满。</div>
-    </div>
-    <div class="xcard">
-      <h3>它证明不了什么</h3>
-      <div>提智臂被明文要求生产法官五维要的东西（跨域结构、证伪边界），裸答臂没有——所以 Δ 里混着"是否按评分标准写作"。提智臂每题 5–8 次调用、裸答 1 次，<b>算力也不同</b>。150 这条线是本学派自定义的构念。<b>把 Δ 当线索，不要当证据</b>；多题累积看方向，比单题一次可信得多。</div>
-    </div>
+  <div class="explain">
+    <div class="excard b"><h4>左栏 · 大模型（裸调基底）</h4><div>你选的基底原样作答，不加任何 SDE 材料。这是对照的基准线：模型自己会怎么回答。</div></div>
+    <div class="excard w"><h4>右栏 · WDS（基底 ＋ 内功 ＋ 心得）</h4><div>同一个基底，系统提示里放进整份 SDE 内功；本场第一次提问前，它先通读内功、亲手写下一份学习心得，之后每一答都建立在"内功＋心得"之上。</div></div>
   </div>
 
   <div class="panel">
-    <div class="ptitle">① 问题与对照</div>
-    <label class="f">要提问的问题 <span class="req">*</span></label>
-    <textarea id="question" placeholder="例如：为什么慢性病总是治不断根？／教育的内卷有没有出口？／血癌是癌吗？"></textarea>
-    <div class="hint">越是"有共识答案、但共识答案很浅"的问题，越能看出提智的差别。</div>
-
-    <label class="f">你自己的提示词（选填 · 启用 B 臂作对照）</label>
-    <textarea id="userPrompt" placeholder="例如：请深入、批判性地回答，不要四平八稳，给出可被证伪的判断。"></textarea>
-    <div class="hint">留空则不跑 B 臂。填了它，才知道提智比"你自己会写的提示"强多少——这个对比比"提智 vs 裸答"更硬。</div>
-  </div>
-
-  <div class="panel">
-    <div class="ptitle">② 回答基底（四臂都用它，才是同底对照）</div>
-    <div class="grid2">
+    <div class="cfgRow">
       <div>
-        <label class="f">回答基底 <span class="req">*</span></label>
+        <label class="f">基底（两栏共用同一个）<span class="req">*</span></label>
         <select id="modelSel"></select>
-        <div id="overseasNote" class="hint" style="display:none">境外基底经本站中转转发（只转发、不留存）。</div>
       </div>
       <div>
-        <label class="f" id="keyLabel">你的 API Key <span class="req">*</span></label>
-        <div class="keyrow"><input id="apiKey" type="password" placeholder="sk-..." autocomplete="off"><button class="ktog" id="keyToggle" type="button">显示</button></div>
-      </div>
-    </div>
-    <div class="hint">🔒 Key 填一次即存在你自己的浏览器里，下次自动带出（与本站其他智能体共用同一份）；本站服务器不经手。</div>
-  </div>
-
-  <div class="panel">
-    <div class="ptitle">③ 评分基底（法官）</div>
-    <div class="grid2">
-      <div>
-        <label class="f">他审基底 <span class="req">*</span></label>
-        <select id="judgeSel"></select>
-        <div class="hint">建议选一个与回答基底<b>不同厂商</b>的基底当法官——同厂同型等于自己给自己发奖。</div>
+        <label class="f">你的 API Key <span class="req">*</span>（存在本机浏览器，直连厂商，本站不经手）</label>
+        <div class="keyrow">
+          <input id="apiKey" type="password" placeholder="按所选基底填对应厂商的 Key" autocomplete="off">
+          <button class="ktog" id="keyTog" type="button">显示</button>
+        </div>
       </div>
       <div>
-        <label class="f" id="judgeKeyLabel">法官的 API Key <span class="req">*</span></label>
-        <div class="keyrow"><input id="judgeKey" type="password" placeholder="sk-..." autocomplete="off"><button class="ktog" id="judgeKeyToggle" type="button">显示</button></div>
+        <button class="ghost" id="btnReset" type="button">清空两栏对话</button>
       </div>
     </div>
-    <label class="f" style="margin-top:14px"><input type="checkbox" id="selfReview" checked style="width:auto;margin-right:7px;vertical-align:-1px">自审 + 他审取平均（回答基底也给自己打一遍分）</label>
-    <div class="hint">自审会偏袒自己，他审会有自己的口味；两者取平均是折中，不是真理。取消勾选＝只用他审。</div>
-  </div>
-
-  <div class="panel">
-    <div class="ptitle">④ 提智方式与参数</div>
-    <div class="modeRow" id="methodRow">
-      <div class="modeOpt" data-method="six"><h4>C1 六路径涌现</h4><div>六条路径 + 二阶碰撞 + 涌现（8 次调用）</div></div>
-      <div class="modeOpt" data-method="eq"><h4>C2 三方程创新</h4><div>三维观点池 + 联立 + 残差萃取（5 次调用）</div></div>
-      <div class="modeOpt sel" data-method="both"><h4>两者对比（推荐）</h4><div>C1 与 C2 同场跑，看两条提智路谁更适合这道题</div></div>
-    </div>
-    <div class="grid3" style="margin-top:14px">
-      <div><label class="f">每臂字数上限</label><input id="wordLimit" type="number" value="500" min="200" max="3000" step="50"></div>
-      <div><label class="f">盲评遍数（每位法官）</label><input id="judgePasses" type="number" value="3" min="1" max="6"></div>
-      <div><label class="f">评分间隔（秒 · 防限流）</label><input id="interval" type="number" value="1.5" min="0" max="20" step="0.5"></div>
-    </div>
-    <div class="btnRow">
-      <button class="go" id="goBtn">开始对照实验</button>
-      <button class="ghost" id="stopBtn" style="display:none">中止</button>
-      <button class="ghost" id="docxBtn" style="display:none">⬇ 下载 Word 报告</button>
-      <span id="timer" style="font-size:12.5px;color:var(--sub)"></span>
-    </div>
-    <div class="warnbox">整场约 <b>15–25 次</b>基底调用（两者对比 + 自审他审各 3 遍），顶配深思档可能要 <b>20–60 分钟</b>。运行期间<b>不要关闭或刷新本页</b>——Key 不出浏览器，本站没有服务端任务队列，页面关了这一场就断了。</div>
+    <div id="overseasNote" class="hint">⚠ 这是境外基底，浏览器直连可能受网络影响；本站通过只转发不留存的代理帮你请求。</div>
+    <div class="hint">两栏用<b>同一个基底、同一个 Key</b>——这样两边唯一的差别就只是"有没有 SDE 内功＋心得"。右栏每一答都携带整份内功（约十万字级），按你自己 Key 计费；DeepSeek 一类带前缀缓存的基底会便宜很多。</div>
     <div id="errBox"></div>
   </div>
 
-  <div id="runArea" style="display:none">
-    <div class="phase">运行日志</div>
-    <div id="logBox"></div>
-
-    <div class="phase">创新智商显示屏</div>
-    <div class="board">
-      <div class="iqbox base"><div class="lbl">基线（裸答 / 你的提示词）</div><div class="num" id="iqBase">—</div><div class="band" id="bandBase"></div><div class="delta" id="dBase"></div></div>
-      <div class="iqbox c1"><div class="lbl">C1 六路径涌现</div><div class="num" id="iqC1">—</div><div class="band" id="bandC1"></div><div class="delta" id="dC1"></div></div>
-      <div class="iqbox c2"><div class="lbl">C2 三方程创新</div><div class="num" id="iqC2">—</div><div class="band" id="bandC2"></div><div class="delta" id="dC2"></div></div>
+  <div class="cols">
+    <div class="col base" id="colBase">
+      <div class="colHead"><div class="t">大模型 <span class="sub" id="baseName">·</span></div><div class="cnt" id="cntBase">0 / 100 轮</div></div>
+      <div class="msgs" id="msgsBase"><div class="msg sys"><div class="bub placeholder">左栏：裸调基底。下面输入问题，两栏会同时作答。</div></div></div>
     </div>
-    <div id="scoreTableWrap"></div>
-
-    <div class="phase">四臂回答</div>
-    <div class="cols">
-      <div class="col" id="colBase"><div class="colHead"><span class="t">A 裸答 / B 你的提示词</span><span class="st" id="stBase">待运行</span></div><div class="colBody" id="bodyBase"><span class="placeholder">等待开始……</span></div><div class="colMeta" id="metaBase"></div></div>
-      <div class="col" id="colC1"><div class="colHead"><span class="t">C1 六路径涌现</span><span class="st" id="stC1">待运行</span></div><div class="colBody" id="bodyC1"><span class="placeholder">等待开始……</span></div><div class="colMeta" id="metaC1"></div></div>
-      <div class="col" id="colC2"><div class="colHead"><span class="t">C2 三方程创新</span><span class="st" id="stC2">待运行</span></div><div class="colBody" id="bodyC2"><span class="placeholder">等待开始……</span></div><div class="colMeta" id="metaC2"></div></div>
+    <div class="col wds" id="colWds">
+      <div class="colHead"><div class="t">WDS <span class="sub">基底＋内功＋心得</span></div><div class="cnt" id="cntWds">0 / 100 轮</div></div>
+      <div class="msgs" id="msgsWds"><div class="msg sys"><div class="bub placeholder">右栏：本场第一次提问时，WDS 会先通读内功、写下心得，再作答。</div></div></div>
     </div>
+  </div>
 
-    <div class="phase">中间过程（提智臂的内部脚手架 · 不计分）</div>
-    <div id="stepsWrap"></div>
+  <div class="askbar">
+    <div class="askInner">
+      <textarea id="qbox" placeholder="输入你的问题，回车发送（Shift+Enter 换行）——同一个问题会同时发给两栏"></textarea>
+      <button class="go" id="btnSend">发送</button>
+    </div>
+    <div class="barMeta">
+      <div class="roundTag">本场已对话 <b id="roundNow">0</b> / 100 轮 · 两栏各自累加全部对话记忆</div>
+      <div class="hint" style="margin:0">回答较长时请稍候，两栏并行生成。</div>
+    </div>
   </div>
 </div>
 
-<footer>© 德麦国际 Demai International · <a href="/">SDE Universes</a> · 你的 API Key 只存本机浏览器，本站不经手</footer>
+<div class="modal" id="xindeModal">
+  <div class="modalBox">
+    <div class="modalHead"><div class="t">WDS 本场学习心得</div><button id="xindeClose" type="button">×</button></div>
+    <div class="modalBody" id="xindeBody"></div>
+  </div>
+</div>
+
+<footer>
+  <div class="wrap">SDE Universes · 对话对照 · 左裸调基底／右基底＋SDE内功＋心得 · 你的 Key 只存在你自己的浏览器</div>
+</footer>
 
 <script>
-// ============================================================
-// SDE 提智对照实验室 · 网页版
-// 桌面版《SDE提智对照 简化版 v3.32》的浏览器移植：四臂同题作答 + 盲评五维打分。
-// 与桌面版的差异（有意为之，已在页面说明）：
-//   · 先验用站内 /taste/assets/sde-neigong.txt（SDE-FT v3.2，比桌面包里的 v3.0 多第七部分二阶碰撞）；
-//   · 打分先验用站内 sde-innovation-iq.txt（全站同一把尺），盲评纪律写在法官提问里；
-//   · 单轮调用（把上一步产物作为材料块喂进下一步），不做多轮对话历史——浏览器侧更稳；
-//   · 不做论文生产线 / Crossref / 跨题历史，那几条留在桌面版。
-// ============================================================
 
 const $ = id => document.getElementById(id);
-function escTxt(s){ return String(s==null?'':s).replace(/[<>&]/g, c=>({'<':'&lt;','>':'&gt;','&':'&amp;'}[c])); }
 
 // ---------- 基底清单（与全站一致） ----------
 const MODELS = [
@@ -287,9 +225,7 @@ function wireKeyPersist(selId, keyId){
   return fill;
 }
 
-const TOK_ANSWER = 60000;   // 作答/碰撞：思考与正文共用预算，放开
-const TOK_STEP   = 16000;   // 路径、观点池等中间步骤
-const TOK_JUDGE  = 4000;    // 法官只输出五维分
+const TOK_ANSWER = 60000;   // 作答 token 上限（含思考）
 
 function buildPayload(sel, systemPrompt, userQ, maxTokens){
   const { vendor, tier } = parseModel(sel);
@@ -391,7 +327,7 @@ async function callGuarded(sel, key, sys, user, tok, label){
 }
 
 // ---------- 先验资产 ----------
-let PRIOR = '', PRIOR_OK = false, SCORE_SKILL = '', SCORE_OK = false;
+let PRIOR = '', PRIOR_OK = false;
 function loadAsset(url, minLen){
   return fetch(url, { cache:'force-cache' }).then(r=>r.text()).then(t=>{
     if(!t || t.length < minLen) throw new Error('资产过短：'+url+'（'+(t?t.length:0)+' 字）');
@@ -401,439 +337,298 @@ function loadAsset(url, minLen){
 const priorPromise = loadAsset('/taste/assets/sde-neigong.txt?v=3.2', 5000)
   .then(t=>{ PRIOR=t; PRIOR_OK=true; })
   .catch(e=>{ PRIOR_OK=false; console.warn(e); });
-const skillPromise = loadAsset('/taste/assets/sde-innovation-iq.txt', 2000)
-  .then(t=>{ SCORE_SKILL=t; SCORE_OK=true; })
-  .catch(e=>{ SCORE_OK=false; console.warn(e); });
-Promise.all([priorPromise, skillPromise]).then(()=>{
+priorPromise.then(()=>{
   const el=$('neigongStatus');
-  if(PRIOR_OK && SCORE_OK) el.textContent = '内功 '+PRIOR.length.toLocaleString()+' 字 · 打分标尺 '+SCORE_SKILL.length.toLocaleString()+' 字 ✓';
-  else el.textContent = '⚠ 先验加载失败，请刷新本页（提智臂与五维评分都依赖它）';
+  if(PRIOR_OK) el.textContent = 'SDE 内功 '+PRIOR.length.toLocaleString()+' 字 ✓（右栏 WDS 用它做提智）';
+  else el.textContent = '⚠ 内功加载失败，请刷新本页（右栏 WDS 依赖它）';
+  if(typeof onPriorReady==='function') onPriorReady();
 });
 
 // ============================================================
-// 提示词（逐条对应桌面版 app.py，仅把"肿瘤学家"一类的题材绑定改成通用"本领域资深专家"）
+// SDE 对话对照 · 大模型 vs WDS
+//   左栏：裸调基底（无 system）
+//   右栏：同一基底 ＋ 整份 SDE 内功 ＋ 本场心得
+//   两栏各自累加全部对话记忆；都可对话 100 次；同一问题同时发给两栏。
 // ============================================================
-const PROMPT_BARE = "请回答以下问题，篇幅控制在 {wl} 字以内。\n\n问题：{q}";
-const PROMPT_USER = "{up}\n\n请在上述要求下回答以下问题，篇幅控制在 {wl} 字以内。\n\n问题：{q}";
 
-const DIM_DESC = {
-  S: "结构维（可识别的具体单位、与正常态的结构性差异、反复观察中一致的核心）",
-  D: "过程维（它追求什么、经由猜想→执行→评估→反馈→修正怎样展开、局部优化如何反噬整体）",
-  E: "条件维（物质-力学层、信号-程序层、身份-识别层，以及能量/势能格局）"
-};
-const SIX_PATHS = ["S→D→E","S→E→D","D→S→E","D→E→S","E→S→D","E→D→S"];
+const MAX_ROUNDS = 100;
+const HIST_BUDGET = 60000;   // 每栏历史字符预算：仅当超出才从最旧处裁，两栏同一规则
+const TOK_XINDE   = 12000;   // 心得生成 token 上限
 
-const PROMPT_PATH = "你正在内化下面这套分析方法，然后严格按指定的思考顺序回答问题。\n\n【学习材料】\n{prior}\n\n【本条路径的思考顺序：{path}】\n严格按这个顺序依次充分展开，每一步都建立在前一步之上：\n{steps}\n三维都展开后，给出你这条路径下对问题的核心回答（简明，不超过 {plen} 字，可用专业语言、本步无需改姓）。\n\n问题：{q}";
+// —— 心得生成提示（客户端一次性，按基底缓存） ——
+const REFLECT_PROMPT =
+"上面是 SDE 学派的完整内功（本体论先验 ＋ 方法论）。请你先认真通读，然后写一份约 3000–4000 字的《本场学习心得》：\n"+
+"1. 用你自己的话复述这套内功最核心的几件判断工具（三方程 S=F(D,E)/D=G(S,E)/E=H(S,D)、六路径、意义三律、把「发现学问法」换成「发生学问法」等），每件说清：它在什么情形下用、它能看见别的方法看不见的什么。\n"+
+"2. 说明你打算怎么用它来回答接下来的问题——遇到「是什么／为什么／怎么办」不同种类的问题，分别从哪件工具起手。\n"+
+"3. 提醒自己容易翻车的地方（硬套术语、把方法当装饰、把判断漂移成「万物皆如此」）。\n"+
+"这份心得是你本场对话的思考底盘，接下来每一个回答都建立在它之上。现在开始写这份心得。";
 
-const PROMPT_COLLIDE = "下面是同一个问题、用六种不同思考路径得到的六个回答。把它们当作**六个独立的本体论级判断**（记为路径1–6）。现在做严格的\"二阶碰撞 + 自组织\"工程——这**不是合并、不是综合、不是取长补短、不是投票求共识**，而是让六个判断互相撞击，逼出任何单条路径都看不到的新结构。\n\n【为什么要碰撞】\n1. 六个判断单独看都是真判断，但**它们之间的空隙才是新判断的真发生地**——你要找的东西不在任何一条里，在两条之间。\n2. 两个判断的撞击不是简单加和：当两个视角从不同方向看同一对象时，会暴露任一视角单独都看不到的结构性张力——这张力就是真涌现的起点。\n3. 所以\"把六条的优点拼起来\"是失败的做法；正确的做法是盯住它们**互相矛盾、互相拆台、互为前提**的地方。\n\n═══ 第一阶 · 混沌碰撞 ═══\n六个判断共有 C(6,2)=15 对组合。**至少认真撞 10 对，且六个判断每一个都要至少参与 2 次碰撞**。对每一对，严格做四步：\n[步骤一 · 识别撞击焦点] 这两个判断在哪个本体论级问题上**结构性打架**？一句话说清冲突点。若两者只是和谐并列、找不到真张力，标注\"无焦点\"并跳过，绝不硬撞凑数。\n[步骤二 · 展开撞击] 当这两个视角同时聚焦同一对象时，暴露了什么任一单条路径都看不到的东西？**自检：删掉碰撞双方中任意一方，如果它仍然成立，那它只是其中一方的观点，作废重做。**\n[步骤三 · 命名涌现物] 给撞出来的新东西一个 ≤20 字命名，必须是新概念/新结构的识别，不是换词复述。优先结构性命名：\"…性 / …症 / …悖论 / …陷阱 / …耦合 / …倒挂 / …盲区 / …错位\"。\n[步骤四 · 守边界] 若概念已从这个具体问题漂移到\"一般系统/万物皆如此\"，作废重做。\n碰撞时套用五种模式找张力：互补碰撞／冲突碰撞／嵌套碰撞／跨域碰撞／反向碰撞。\n\n【第一阶输出】每个有效涌现物一行：「涌现物名（≤20字）｜来自 路径X × 路径Y｜碰撞模式：__｜撞击焦点：…｜逼出的新结构：…」**至少产出 8 个有效涌现物**。\n\n═══ 第二阶 · 自组织 ═══\n把涌现物自组织成 3–5 条\"暗流\"（每条是被多个涌现物共同指向的深层不变量）：①相似性聚类；②暗流命名 ≤15 字、结构性命名；③每条暗流**必须由 ≥2 个涌现物共同支撑**，单个支撑的丢弃或作为孤立反例留存；④任何两条暗流不能完全重叠，逐对说清差在哪。\n【第二阶输出】每条暗流一段：「暗流名（≤15字）｜支撑涌现物：A、B（、C）｜它锁定/指向的深层不变量是：…」\n本步全程是内部分析，可用专业/抽象语言、无需改姓。**这一步不要给最终答案。**\n\n问题：{q}\n\n六条路径的回答如下：\n{six}";
-
-const PROMPT_EMERGE = "下面是你刚才对同一个问题做完的二阶碰撞与自组织分析。\n\n【碰撞与暗流分析】\n{collide}\n\n现在做第三阶·涌现，并给出最终回答。\n- 识别核心枢纽：哪条暗流是其他暗流的根、或锁定其他暗流的演化？\n- 提炼**一个新判断（涌现答案）**：它必须**单条路径不可达、单个判断也不可达**——是六者碰撞的二阶结晶、不可还原为其中任何一个。\n- 自反检验：确认这是真涌现（碰撞逼出的新结构），不是伪涌现（只是把六条重新排列拼接、换皮）；若是伪涌现，推倒重做。\n- **锚定证伪边界**：什么样的具体观察、实验或反例一旦出现，就证明这个判断是错的？最好能推出一个可被检验的预测。找不到任何能推翻它的条件，说明它要么是不可证伪的漂亮空话、要么还不够精确——把判断收紧到可证伪为止。\n\n然后把这个涌现判断收口成对原问题的最终回答。\n【最终回答硬纪律——违反即作废】\n- 纯本领域专业母语；严禁任何框架/方法论术语（碰撞、涌现、暗流、路径、S/D/E、结构-差异-纠缠、势能倒挂、退出锁死、发生学 等一律不得出现）。\n- 不要罗列暗流、不要展示碰撞过程；让这个新判断像资深专家的一个深刻洞见自然展开。\n- **必须让这个新判断可被证伪**：在行文中自然点出它的可检验边界，**不要**写成\"证伪条件：……\"这种贴标签的独立段落。\n- 控制在 {wl} 字以内，把字数花在这个新判断的机制穿透 + 它的可检验边界上。\n\n问题：{q}";
-
-const THREEEQ_DIMS = [
-  ["S","结构维","可识别的具体单位、与正常态的结构性差异、反复观察中一致的核心、稳定的形态"],
-  ["D","过程/差异维","它在追求什么、经由怎样的路径演化（猜想→执行→评估→反馈→修正）、局部优化如何反噬整体"],
-  ["E","条件/纠缠维","物质-力学层、信号-程序层、身份-识别层，以及能量/势能格局、它沉淀于什么环境"]
-];
-const PROMPT_POOL = "你正在内化下面这套分析方法，然后就问题从【{dimname}】单一维度生成\"观点池\"。\n\n【学习材料】\n{prior}\n\n【任务】只从 {dimcode}（{dimname}：{dimdesc}）这一个维度，对问题生成**至少 5 个不同的观点**：\n- 每个观点是一个独立、具体、可作为后续\"方程输入\"的判断；\n- **每个观点必须足够新**——非显然、教科书共识里没有直接给出的新辨别/新角度/新机制。\"谁都会想到的标准说法\"一律剔除；宁可尖锐、有争议、反直觉，也不要四平八稳的常识。\n- 先用方法/材料能给出的视角；若不足 5 个或不够新，就从你自己的知识库里补出更新的，补到至少 5 个且条条够新；\n- 观点之间要有真差异，别换词重复同一条。\n\n逐条编号列出 ≥5 个 {dimcode} 维观点，每条一句话说清。只列本维度，不要碰其他维度，不要下总结论。\n\n问题：{q}";
-const POOL_E_EXTRA = "\n\n【E 维额外要求】这 5 条里至少有 1 条，要从**另一个学科域**（物理／生态／拓扑／信息论／控制论／热力学／经济学 等）指认一个**可能与本问题结构同构**的成熟结构（点明是哪个域的什么结构、它在那个域里的关系是什么）。";
-
-const PROMPT_THREEEQ = "下面是同一问题在 S / D / E 三维各自的观点池（每池≥5个观点）。这三池是三个维度的\"信息\"。现在要判定一件事：这些信息能不能**结成一个逻辑结构**——若能，就诞生了新知识。\n因为：**知识不是信息的堆叠，而是 S、D、E 三维信息被结成的那个结构。**\n\n【第一步 · 判定三维观点之间的逻辑关系】\n- **演绎**：能否从某两维的观点，逻辑地推出第三维的观点为必然？三个方向都试：S=F(D,E)、D=G(S,E)、E=H(S,D)。\n- **归纳**：把三池里反复出现、互相印证的观点归纳起来，能升出怎样的共同深层结构/不变量？\n- **类比（强制至少 1 条真跨学科结构同构）**：从一个与本问题不同的学科域里找一个成熟结构，与本问题的某一组关系**逐一对应（关系对关系，不是表面相似）**。三条硬要求：(a) 必须是结构同构；(b) 必须服务于后面要萃取的不可还原残差，是照出残差的透镜、不是装饰；(c) **必须自带一个可检验预测**——借该域定律推出一个关于本问题的具体可检验预测，这条预测后面直接当最终回答的证伪边界。推不出预测的，是装饰性比喻，作废重找。\n\n【第二步 · 写出三方程，且严格把关每个等式】\n把关系写成 S=F(D,E)、D=G(S,E)、E=H(S,D)。两条硬要求：**缺则补库存**（右边不足以决定左边时，从你自己的知识库补出新观点补齐，不将就）；**等式严格把关**（给定右边是否唯一地、必然地确定左边？只有强决定才算成立，松垮的\"大致相关\"伪方程作废重建）。E=H(S,D) 必须把那条跨学科结构同构纳进来当条件/纠缠的一部分。\n\n【第三步 · 联立求解】求出那个三方程共同锁定、任何单维单观点都给不出的整体判断。这个联立解就是一个新的知识结构。\n\n【第四步 · 不可还原残差萃取——这一步决定创新的高度】\n联立解里，凡是单个方程、或单条推理（单独一次演绎/归纳/类比）就能得到的部分，都还是可还原的旧知识，逐一剥掉；只留下那个\"非三方程同时成立不可\"的残差——就像 x+y=10 与 x−y=2 必须联立才锁定 x=6。自检：这个核心能不能被某一维单独推出？**若能，它还不够新**，回联立里挖更深。宁可残差小而反直觉，不要大而可还原。\n\n本步是内部建模，可用专业/抽象语言、无需改姓。依次写：①三维逻辑关系判定 → ②三方程 → ③联立解 → ④不可还原残差。\n\n问题：{q}\n\n【S 维观点池】\n{s_pool}\n\n【D 维观点池】\n{d_pool}\n\n【E 维观点池】\n{e_pool}";
-
-const PROMPT_THREEEQ_ANSWER = "下面是你刚才做完的三方程建模与残差萃取。\n\n【建模与残差】\n{eqs}\n\n现在把上面萃取出的那个**不可还原残差**收口成对原问题的最终回答。\n【最终回答硬纪律——违反即作废】\n- 让整篇回答**围绕这个不可还原残差**展开——它是回答的核心判断；不要回去复述三维各自的观点、不要给一个大而可还原的四平八稳结论。\n- **用那条跨学科结构同构来承载这个核心**（关系对关系地用，让它成为论述的骨架），但**不要点破\"这是类比/跨学科\"**——让它读起来像本领域专家本来就这么看问题。\n- 纯本领域专业母语；严禁任何框架/方法论术语（S/D/E、三方程、观点池、联立、残差、结构-差异-纠缠、势能倒挂、退出锁死、发生学 等）。\n- 不展示方程、不罗列观点、不分条骨架。\n- **必须让这个判断可被证伪，且证伪边界就用上面跨域结构推出的那个可检验预测**；把它织进专业论述里，不要写成\"证伪条件：……\"这种贴标签的独立段落。\n- 控制在 {wl} 字以内。\n\n问题：{q}";
-
-// —— 改姓自检：命中框架词即自动改写一次（仅当残留确实减少才采用）——
-const LEAK_TERMS = ["SDE","结构-差异-纠缠","结构—差异—纠缠","发生学","显露态","差异序列","介生态","退化态","成熟态",
-  "势能倒挂","退出锁死","死亡锁死","成功反噬","三视角","特征纠缠","纠缠网络","纠缠失衡","纠缠条件",
-  "改姓","母题","碰撞器","提智","龙爪手","理念界","现实界","自我界","三界系统","错误吸子",
-  "D2-9","D2-8","D2-7","D1三律","D3最优化","观点池","不可还原残差","暗流","六路径","三方程"];
-function scanLeak(text){ return LEAK_TERMS.filter(t=>String(text||'').includes(t)); }
-const PROMPT_RECAST = "你刚才的回答里出现了内部框架痕迹（命中：{hits}），或带\"套框架/翻译腔\"的结构。请改写成一位本领域资深专家会自然写出的样子：\n- 删除所有上述框架术语，用这个议题本地的专业母语替代；\n- 去掉\"其一/其二/其三\"式骨架与方法论腔调，让判断自然流动；\n- 核心判断与机制保持不变、不得变浅；仍控制在 {wl} 字以内。\n只输出改写后的正文，不要任何解释。\n\n【你刚才的回答】\n{ans}";
-
-// —— 法官：五维独立打分（盲评纪律写在提问里，打分标尺由 system 注入）——
-const SDE_DIMS = ["S","D","E","I","F"];
-const DIM_WEIGHTS = { S:0.20, D:0.25, E:0.20, I:0.20, F:0.15 };
-const DIM_LABELS = { S:'S 结构精确度', D:'D 新差异锐度', E:'E 跨域结构性', I:'I 不可还原性', F:'F 可证伪性' };
-const PROMPT_JUDGE = "下面是针对同一个问题的 {n} 段回答，分别标记为 {labels}。请严格依据上面给你的《创新智商》五维标准，对每段回答的**五个维度各自独立打分**（每维 60–175 的整数）：S 结构精确度、D 新差异锐度、E 跨域结构性、I 不可还原性、F 可证伪性。\n\n【最重要的定性】你评的是\"生成新认知物\"的能力，不是\"解题/全面/正确\"的认知能力。一篇全面、正确、四平八稳、面面俱到的回答，认知智商可能很高，创新智商可能很低。基准 100 ≈ AI 零提示默认水平；130 = 比 AI 默认更深 30 点；150 = 本体论级（真产出了新认知物）；160 = 典范级。\n\n【盲评纪律】\n- 你评的是**答案本身**，与它用了什么方法、什么框架无关；答案里不会、也不该出现任何方法论术语，**不要去猜哪一段是\"用了某种方法\"的**。\n- 绝大多数回答到不了 150；\"全面/各方都有道理/稳妥不得罪人\"不是加分项，反而要警惕。\n- 不因回答更长、措辞更自信就加分；各段之间**敢于拉开差距**。\n- D 与 I 最能区分\"新内容\"与\"重复\"，这两维低，综合分不应高。\n- 反直觉不等于正确：为显新颖而牺牲事实稳健，应扣分而非加分。\n- 散文体与清单体，实质相同则同分。\n- 五维**独立打分**，不要先定综合分再倒推五维（综合分由系统按权重计算，你只给五维）。\n\n严格按下面格式输出，每段一行，行首就是标签，不要任何解释或多余文字：\n{fmt}\n\n问题：{q}\n\n{answers}";
-
-function parseDimScores(raw, labels){
-  const out = {};
-  labels.forEach(lb=>{
-    const pat = new RegExp("[\\*\\[\\(【]*\\s*"+lb+"\\b[^\\n]*?S[:：]\\s*(\\d{2,3})[^\\n]*?D[:：]\\s*(\\d{2,3})[^\\n]*?E[:：]\\s*(\\d{2,3})[^\\n]*?I[:：]\\s*(\\d{2,3})[^\\n]*?F[:：]\\s*(\\d{2,3})");
-    const m = pat.exec(raw||'');
-    if(m){
-      const vals = m.slice(1,6).map(Number);
-      if(vals.every(v=>v>=60 && v<=175)) out[lb] = { S:vals[0], D:vals[1], E:vals[2], I:vals[3], F:vals[4] };
-    }
-  });
-  return out;
-}
-function compositeFromDims(d){ return Math.round(SDE_DIMS.reduce((s,k)=>s+d[k]*DIM_WEIGHTS[k], 0)); }
-function iqBand(s){
-  if(s==null) return '';
-  if(s>=170) return '改写学科分界'; if(s>=160) return '典范级';
-  if(s>=150) return '本体论级'; if(s>=135) return '资深学者';
-  if(s>=125) return '高级专家'; if(s>=110) return '专业人士';
-  return '大众 / AI 默认';
-}
-function shuffled(arr){
-  const a = arr.slice();
-  for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); const t=a[i]; a[i]=a[j]; a[j]=t; }
-  return a;
-}
-// 跨（法官 × 遍数）汇总：每臂取五维均值再算综合分
-function aggregate(passes, armKeys){
-  const out = {};
-  armKeys.forEach(k=>{
-    const rows = passes.map(p=>p.dims[k]).filter(Boolean);
-    if(!rows.length){ out[k] = null; return; }
-    const dims = {};
-    SDE_DIMS.forEach(d=>{ dims[d] = Math.round(rows.reduce((s,r)=>s+r[d],0)/rows.length*10)/10; });
-    out[k] = { dims, composite: compositeFromDims(dims), n: rows.length };
-  });
-  return out;
+// —— WDS 作答 system：整份内功 ＋ 本场心得 ——
+function wdsSystem(xinde){
+  return PRIOR
+    + "\n\n════════ 你本场已内化的学习心得 ════════\n" + (xinde||'')
+    + "\n\n════════\n\n现在，请以一个已经内化了上面这套 SDE 内功与心得的资深思考者身份，回答用户接下来的问题。"
+    + "自然地运用这套判断工具，但用你自己的专业语言把洞见讲透，不要生硬堆砌术语，也不要罗列「三方程／六路径」这些名目——让方法藏在判断里。";
 }
 
-// ============================================================
-// 界面
-// ============================================================
-const modelSel=$('modelSel'), judgeSel=$('judgeSel'), apiKeyEl=$('apiKey'), judgeKeyEl=$('judgeKey');
-fillModelSelect(modelSel,'ds:pro'); fillModelSelect(judgeSel,'glm:pro');
-wireKeyPersist('modelSel','apiKey'); wireKeyPersist('judgeSel','judgeKey');
-function refreshLabels(){
-  $('keyLabel').innerHTML = '你的 ' + vendorName(modelSel.value) + ' API Key <span class="req">*</span>';
-  $('judgeKeyLabel').innerHTML = '法官（' + vendorName(judgeSel.value) + '）的 API Key <span class="req">*</span>';
-  $('overseasNote').style.display = (isOverseas(modelSel.value)||isOverseas(judgeSel.value)) ? 'block' : 'none';
-}
-modelSel.addEventListener('change', refreshLabels);
-judgeSel.addEventListener('change', refreshLabels);
-refreshLabels();
-[['keyToggle','apiKey'],['judgeKeyToggle','judgeKey']].forEach(([b,i])=>{
-  $(b).addEventListener('click', ()=>{ const el=$(i); const p = el.type==='password'; el.type = p?'text':'password'; $(b).textContent = p?'隐藏':'显示'; });
-});
-let METHOD = 'both';
-Array.prototype.forEach.call(document.querySelectorAll('#methodRow .modeOpt'), el=>{
-  el.addEventListener('click', ()=>{
-    Array.prototype.forEach.call(document.querySelectorAll('#methodRow .modeOpt'), x=>x.classList.remove('sel'));
-    el.classList.add('sel'); METHOD = el.getAttribute('data-method');
-  });
-});
-function showErr(m){ $('errBox').textContent = m; $('errBox').style.display='block'; }
-function hideErr(){ $('errBox').style.display='none'; }
-let T0 = 0;
-function log(m){
-  const box=$('logBox');
-  const t = T0 ? ' [+'+Math.round((Date.now()-T0)/1000)+'秒]' : '';
-  box.textContent += (box.textContent?'\n':'') + m + t;
-  box.scrollTop = box.scrollHeight;
-}
-function setCol(which, status, text, meta){
-  const st=$('st'+which), body=$('body'+which), mt=$('meta'+which), col=$('col'+which);
-  if(status!=null) st.innerHTML = status;
-  if(text!=null){ body.textContent = text; body.scrollTop = 0; }
-  if(meta!=null) mt.textContent = meta;
-  if(col){ if(String(status||'').indexOf('spinner')>=0) col.classList.add('generating'); else col.classList.remove('generating'); }
-}
-function addStep(title, text){
-  const w=$('stepsWrap');
-  const d=document.createElement('div'); d.className='blk';
-  d.innerHTML = '<div class="blkHead"><span class="t">'+escTxt(title)+'</span><span class="st">'+(text?text.length+' 字 · 点击展开':'空')+'</span></div><div class="blkBody"></div>';
-  d.querySelector('.blkBody').textContent = text||'';
-  d.querySelector('.blkHead').addEventListener('click', ()=>d.querySelector('.blkBody').classList.toggle('open'));
-  w.appendChild(d);
+// ---------- messages 版调用（携带完整历史） ----------
+function buildMsgPayload(sel, systemPrompt, history, maxTokens){
+  const { vendor, tier } = parseModel(sel);
+  const cap = (typeof maxTokens==='number' && maxTokens>0) ? maxTokens : 8000;
+  const sys = (systemPrompt||'').trim();
+  const hist = (history||[]).map(m=>({role:m.role, content:m.content}));
+  if(vendor === 'claude'){
+    const p = { model:(tier==='pro')?'claude-opus-4-8':'claude-sonnet-4-6', max_tokens:Math.min(cap,60000), stream:false, messages:hist };
+    if(sys) p.system = sys;
+    return p;
+  }
+  if(vendor === 'gemini'){
+    const contents = hist.map(m=>({ role: m.role==='assistant'?'model':'user', parts:[{text:m.content}] }));
+    const p = { contents, generationConfig:{maxOutputTokens:Math.min(cap,60000), temperature:0.7} };
+    if(sys) p.systemInstruction = {parts:[{text:sys}]};
+    return p;
+  }
+  const msgs = [];
+  if(sys) msgs.push({role:'system', content:sys});
+  for(const m of hist) msgs.push(m);
+  const base = { stream:false, messages:msgs, max_tokens:cap };
+  if(vendor === 'ds'){
+    if(tier === 'pro'){ base.model='deepseek-v4-pro'; base.thinking={type:'enabled'}; base.reasoning_effort='xhigh'; }
+    else { base.model='deepseek-v4-flash'; base.thinking={type:'disabled'}; base.temperature=0.7; }
+  } else if(vendor === 'glm'){
+    if(tier === 'pro'){ base.model='glm-5'; base.thinking={type:'enabled'}; }
+    else { base.model='glm-4-flash'; base.temperature=0.7; }
+  } else if(vendor === 'kimi'){
+    base.model = (tier === 'pro') ? 'kimi-k2.6' : 'moonshot-v1-32k'; base.temperature=0.7;
+  } else if(vendor === 'qwen'){
+    base.max_tokens = Math.min(cap, 8192);
+    base.model = (tier === 'pro') ? 'qwen3.7-max' : 'qwen-plus'; base.temperature=0.7;
+  } else if(vendor === 'minimax'){
+    base.model = (tier === 'pro') ? 'MiniMax-M3' : 'MiniMax-M2.7-highspeed';
+    base.reasoning_split = true; base.max_tokens = Math.min(cap + 32000, 131072);
+  } else if(vendor === 'gpt'){
+    base.model = (tier === 'pro') ? 'gpt-5.5' : 'gpt-5.4';
+    base.max_completion_tokens = base.max_tokens; delete base.max_tokens;
+    base.reasoning_effort = (tier === 'pro') ? 'high' : 'medium';
+  }
+  return base;
 }
 
-// ============================================================
-// 四臂
-// ============================================================
-async function armBare(sel, key, q, wl){
-  return await callGuarded(sel, key, '你是一位严谨的回答者。', PROMPT_BARE.replace('{wl}',wl).replace('{q}',q), TOK_ANSWER, 'A 裸答');
-}
-async function armUser(sel, key, q, wl, up){
-  return await callGuarded(sel, key, '你是一位严谨的回答者。', PROMPT_USER.replace('{up}',up).replace('{wl}',wl).replace('{q}',q), TOK_ANSWER, 'B 你的提示词');
-}
-async function recastGuard(sel, key, ans, wl){
-  const hits = scanLeak(ans);
-  if(!hits.length) return ans;
-  log('    [改姓自检] 检出框架痕迹（'+hits.slice(0,6).join('、')+(hits.length>6?'…':'')+'），自动改写一次……');
+async function callMsgs(sel, apiKey, systemPrompt, history, maxTokens, label){
+  const { vendor, tier } = parseModel(sel);
+  const overseas = isOverseas(sel);
+  const url = overseas ? PROXY_URL : apiUrl(sel);
+  const headers = { 'Content-Type':'application/json' };
+  if(overseas){
+    if(vendor === 'gpt'){ headers['Authorization']='Bearer '+apiKey; headers['x-target-url']='https://api.openai.com/v1/chat/completions'; }
+    else if(vendor === 'minimax'){ headers['Authorization']='Bearer '+apiKey; headers['x-target-url']='https://api.minimaxi.com/v1/chat/completions'; }
+    else if(vendor === 'claude'){ headers['x-api-key']=apiKey; headers['anthropic-version']='2023-06-01'; headers['anthropic-dangerous-direct-browser-access']='true'; headers['x-target-url']='https://api.anthropic.com/v1/messages'; }
+    else if(vendor === 'gemini'){ const gm=(tier==='pro')?'gemini-3.1-pro-preview':'gemini-2.5-flash'; headers['x-target-url']='https://generativelanguage.googleapis.com/v1beta/models/'+gm+':generateContent?key='+encodeURIComponent(apiKey); }
+  } else {
+    headers['Authorization'] = 'Bearer ' + apiKey;
+  }
+  const ac = new AbortController();
+  const killer = setTimeout(()=>{ try{ ac.abort(); }catch(_){} }, 40*60*1000);
+  let resp;
   try{
-    const r = await callChat(sel, key, '你是一位本领域资深专家。', PROMPT_RECAST.replace('{hits}',hits.slice(0,8).join('、')).replace('{wl}',wl).replace('{ans}',ans), TOK_ANSWER, '改姓改写');
-    const t = (r.text||'').trim();
-    if(t.length >= 10){
-      const nh = scanLeak(t);
-      if(nh.length < hits.length){ log('    [改姓自检] 改写完成，框架痕迹 '+hits.length+' → '+nh.length+' 处'); return t; }
-      log('    [改姓自检] 改写未减少残留，保留原稿');
-    }
-  }catch(e){ log('    [改姓自检] 改写失败（保留原稿）：'+e.message); }
-  return ans;
-}
-async function armSixPath(sel, key, q, wl){
-  const plen = Math.max(300, Math.min(wl, 600));
-  log('    [C1 六路径涌现] 六条路径并行学习作答中（'+SIX_PATHS.join('、')+'）……');
-  const jobs = SIX_PATHS.map(async path=>{
-    const dims = path.split('→');
-    const steps = dims.map((d,i)=>(i+1)+'. '+(i===0?'先从 ':(i===1?'再从 ':'最后从 '))+d+' 看：'+DIM_DESC[d]).join('\n');
-    const user = PROMPT_PATH.replace('{prior}',PRIOR).replace('{path}',path).replace('{steps}',steps).replace('{plen}',plen).replace('{q}',q);
-    try{
-      const r = await callChat(sel, key, '你正在按指定顺序做结构化分析。', user, TOK_STEP, '路径 '+path);
-      return { path, text:(r.text||'').trim() };
-    }catch(e){ log('    ⚠ 路径 '+path+' 失败（跳过）：'+e.message); return { path, text:'' }; }
-  });
-  const results = await Promise.all(jobs);
-  const done = results.filter(r=>r.text);
-  if(done.length < 3) throw new Error('六路径中只有 '+done.length+' 条成功，样本不足以碰撞，已中止本臂');
-  done.forEach(r=>addStep('C1 路径 '+r.path, r.text));
-  const six = done.map(r=>'【路径 '+r.path+'】\n'+r.text).join('\n\n');
-  log('    [C1 六路径涌现] '+done.length+'/6 条完成；二阶碰撞 + 自组织……');
-  const collide = await callGuarded(sel, key, '你在做严格的二阶碰撞与自组织分析。', PROMPT_COLLIDE.replace('{q}',q).replace('{six}',six), TOK_ANSWER, 'C1 碰撞');
-  addStep('C1 二阶碰撞 + 暗流自组织', collide);
-  log('    [C1 六路径涌现] 第三阶涌现：提炼新判断并改姓作答……');
-  let ans = await callGuarded(sel, key, '你是一位本领域资深专家。', PROMPT_EMERGE.replace('{collide}',collide).replace('{wl}',wl).replace('{q}',q), TOK_ANSWER, 'C1 涌现作答');
-  return await recastGuard(sel, key, ans, wl);
-}
-async function armThreeEq(sel, key, q, wl){
-  log('    [C2 三方程创新] S/D/E 三维各建观点池（每维≥5，不足从知识库补足）……');
-  const jobs = THREEEQ_DIMS.map(async d=>{
-    let user = PROMPT_POOL.replace('{prior}',PRIOR).replace(/\{dimcode\}/g,d[0]).replace(/\{dimname\}/g,d[1]).replace('{dimdesc}',d[2]).replace('{q}',q);
-    if(d[0]==='E') user += POOL_E_EXTRA;
-    try{
-      const r = await callChat(sel, key, '你在做单维度的观点池建构。', user, TOK_STEP, d[0]+' 维观点池');
-      return { code:d[0], text:(r.text||'').trim() };
-    }catch(e){ log('    ⚠ '+d[0]+' 维观点池失败：'+e.message); return { code:d[0], text:'' }; }
-  });
-  const pools = {};
-  (await Promise.all(jobs)).forEach(p=>{ pools[p.code]=p.text; addStep('C2 '+p.code+' 维观点池', p.text); });
-  if(!pools.S || !pools.D || !pools.E) throw new Error('三维观点池未能全部建成，无法联立，已中止本臂');
-  log('    [C2 三方程创新] 建立 S=F(D,E)/D=G(S,E)/E=H(S,D) 并联立求解……');
-  const eqs = await callGuarded(sel, key, '你在做严格的方程化建模。',
-    PROMPT_THREEEQ.replace('{q}',q).replace('{s_pool}',pools.S).replace('{d_pool}',pools.D).replace('{e_pool}',pools.E), TOK_ANSWER, 'C2 三方程联立');
-  addStep('C2 三方程建立 · 联立 · 不可还原残差', eqs);
-  log('    [C2 三方程创新] 联立完成，收口改姓作答中……');
-  let ans = await callGuarded(sel, key, '你是一位本领域资深专家。',
-    PROMPT_THREEEQ_ANSWER.replace('{eqs}',eqs).replace('{wl}',wl).replace('{q}',q), TOK_ANSWER, 'C2 收口作答');
-  return await recastGuard(sel, key, ans, wl);
-}
-
-// ============================================================
-// 盲评
-// ============================================================
-function sleep(ms){ return new Promise(r=>setTimeout(r, ms)); }
-async function judgeOnePass(J, arms, armKeys, q, idx){
-  const order = shuffled(armKeys);
-  const labels = order.map((_,i)=>String.fromCharCode(65+i));
-  const mapping = {}; labels.forEach((lb,i)=>mapping[lb]=order[i]);
-  const answers = labels.map(lb=>'【回答 '+lb+'】\n'+arms[mapping[lb]]).join('\n\n');
-  const fmt = labels.map(lb=>lb+' S:<分> D:<分> E:<分> I:<分> F:<分>').join('\n');
-  const prompt = PROMPT_JUDGE.replace('{n}',labels.length).replace('{labels}',labels.join('、')).replace('{fmt}',fmt).replace('{q}',q).replace('{answers}',answers);
-  const r = await callChat(J.sel, J.key, SCORE_SKILL, prompt, TOK_JUDGE, J.name+' 第'+(idx+1)+'遍');
-  let parsed = parseDimScores(r.text, labels);
-  if(Object.keys(parsed).length < labels.length){
-    const follow = prompt + '\n\n【重要】上一次输出未能被解析。只输出每段五维分，一行一个，严格格式：标签 S:分 D:分 E:分 I:分 F:分（每分为 60-175 整数），不要任何解释。';
-    const r2 = await callChat(J.sel, J.key, SCORE_SKILL, follow, TOK_JUDGE, J.name+' 第'+(idx+1)+'遍·补格式');
-    const p2 = parseDimScores(r2.text, labels);
-    if(Object.keys(p2).length > Object.keys(parsed).length) parsed = p2;
+    resp = await fetch(url, { method:'POST', headers, body: JSON.stringify(buildMsgPayload(sel, systemPrompt, history, maxTokens)), signal: ac.signal });
+  }catch(e){
+    clearTimeout(killer);
+    throw new Error((label?label+'：':'')+(e.name==='AbortError' ? '已中止或超时' : '网络请求失败：'+e.message));
   }
-  const dims = {};
-  labels.forEach(lb=>{ if(parsed[lb]) dims[mapping[lb]] = parsed[lb]; });
-  return { judge:J.name, mapping, dims, raw:r.text };
-}
-async function runJudging(judges, arms, armKeys, q, nPass, interval){
-  const passes = [];
-  for(const J of judges){
-    for(let i=0;i<nPass;i++){
-      if(RUN_STOPPED) throw new Error('已中止');
-      log('  ['+J.name+'] 第 '+(i+1)+'/'+nPass+' 遍盲评（标签已随机打乱）……');
-      try{
-        const p = await judgeOnePass(J, arms, armKeys, q, i);
-        const got = Object.keys(p.dims).length;
-        log('    ✓ 解析到 '+got+'/'+armKeys.length+' 段五维分');
-        passes.push(p);
-      }catch(e){ log('    ⚠ 本遍失败（跳过，不中断）：'+e.message); }
-      if(interval>0) await sleep(interval*1000);
-    }
+  clearTimeout(killer);
+  if(!resp.ok){
+    let detail='';
+    try{ const raw=await resp.text(); try{ const jj=JSON.parse(raw); detail=(jj.error&&(jj.error.message||jj.error.type))||raw.slice(0,200); }catch(_){ detail=raw.slice(0,200)||resp.statusText; } }catch(_){ detail=resp.statusText; }
+    throw new Error((label?label+'：':'')+'API '+resp.status+' — '+detail);
   }
-  // 补评闸：补到每臂都满 nPass 次（最多补 4 次）
-  let extra = 0;
-  while(extra < 4){
-    const counts = {}; armKeys.forEach(k=>counts[k]=passes.filter(p=>p.dims[k]).length);
-    const short = armKeys.filter(k=>counts[k] < nPass);
-    if(!short.length) break;
-    extra++;
-    log('  [补评闸] 有臂未评满（'+short.map(k=>ARM_SHORT[k]+':'+counts[k]).join('、')+'），补评第 '+extra+' 次……');
-    const J = judges[0];
-    try{ passes.push(await judgeOnePass(J, arms, armKeys, q, nPass+extra-1)); }
-    catch(e){ log('    ⚠ 补评失败：'+e.message); break; }
-    if(interval>0) await sleep(interval*1000);
+  let j; try{ j = await resp.json(); }catch(e){ throw new Error((label?label+'：':'')+'响应不是合法 JSON（可能被网关截断）'); }
+  if(j && j.error){ throw new Error((label?label+'：':'')+'接口报错：'+(j.error.message||j.error.code||'未知')); }
+  return extractFull(vendor, j).text;
+}
+
+// ---------- 历史累加：仅当超预算才从最旧处裁，两栏同规则 ----------
+function packHistory(history){
+  let total = history.reduce((s,m)=>s+(m.content?m.content.length:0), 0);
+  if(total <= HIST_BUDGET) return history.slice();
+  const out = history.slice();
+  let dropped = 0;
+  // 从最旧的成对消息开始丢（保留最近若干轮），至少留最后 2 条
+  while(total > HIST_BUDGET && out.length > 2){
+    const m = out.shift();
+    total -= (m.content?m.content.length:0);
+    dropped++;
   }
-  return passes;
+  if(dropped>0){
+    out.unshift({role:'user', content:'（本场更早的 '+dropped+' 条对话因过长已省略，但这仍是同一场连续对话，请据此接着谈。）'});
+  }
+  return out;
 }
 
-const ARM_SHORT = { bare:'裸答', user:'你的提示词', six:'六路径涌现', eq:'三方程创新' };
+// ---------- 状态 ----------
+let histBase = [];   // [{role,content}]
+let histWds  = [];
+let round = 0;
+let busy = false;
+let xinde = '';        // 本场心得
+let xindeVendor = '';  // 心得对应的基底 vendor（换基底要重生成）
+let priorReady = false;
 
-// ============================================================
-// 渲染
-// ============================================================
-let LAST = null;
-function renderScores(agg, armKeys, nPass){
-  const base = agg.user || agg.bare;      // 基线：有用户臂用用户臂当主基线
-  const setBox = (which, val, deltas)=>{
-    $('iq'+which).textContent = (val && val.composite!=null) ? val.composite : '—';
-    $('band'+which).textContent = val ? iqBand(val.composite) : '';
-    $('d'+which).innerHTML = deltas || '';
-  };
-  const dstr = (a,b,lbl)=>{
-    if(!a||!b) return '';
-    const d = a.composite - b.composite;
-    const cls = d>0?'up':(d<0?'down':'');
-    return '<span class="'+cls+'">'+lbl+' '+(d>0?'+':'')+d+'</span>';
-  };
-  setBox('Base', agg.bare, agg.user ? ('你的提示词 '+(agg.user.composite)+' · '+dstr(agg.user, agg.bare, '相对裸答')) : '');
-  setBox('C1', agg.six, agg.six ? [dstr(agg.six, agg.bare, '− 裸答'), agg.user?dstr(agg.six, agg.user, '− 你的提示词'):''].filter(Boolean).join(' ｜ ') : '');
-  setBox('C2', agg.eq, agg.eq ? [dstr(agg.eq, agg.bare, '− 裸答'), agg.user?dstr(agg.eq, agg.user, '− 你的提示词'):''].filter(Boolean).join(' ｜ ') : '');
+function onPriorReady(){ priorReady = true; }
 
-  let html = '<table class="tbl"><tr><th>臂</th>'+SDE_DIMS.map(d=>'<th>'+DIM_LABELS[d]+'</th>').join('')+'<th>综合</th><th>档位</th><th>评分次数</th></tr>';
-  let warn = false;
-  armKeys.forEach(k=>{
-    const a = agg[k];
-    if(!a){ html += '<tr><td class="arm">'+ARM_SHORT[k]+'</td><td colspan="8">未取得有效评分</td></tr>'; warn = true; return; }
-    if(a.n < nPass) warn = true;
-    html += '<tr><td class="arm">'+ARM_SHORT[k]+'</td>'+SDE_DIMS.map(d=>'<td>'+a.dims[d].toFixed(1)+'</td>').join('')
-         +'<td><b>'+a.composite+'</b></td><td>'+iqBand(a.composite)+'</td><td>'+a.n+(a.n<nPass?' ⚠未满':'')+'</td></tr>';
-  });
-  html += '</table>';
-  if(warn) html += '<div class="warnbox">有臂的评分次数未达设定遍数，稳健性较弱，对比结论请谨慎——多跑几题再看方向。</div>';
-  html += '<div class="hint" style="margin-top:10px">综合 = S×0.20 + D×0.25 + E×0.20 + I×0.20 + F×0.15；五维为跨（法官 × 遍数）的算术平均。</div>';
-  $('scoreTableWrap').innerHTML = html;
+function showErr(m){ const b=$('errBox'); b.textContent=m; b.style.display='block'; }
+function hideErr(){ const b=$('errBox'); b.style.display='none'; b.textContent=''; }
+
+function xindeKey(){ return 'sde_xinde_'+parseModel($('modelSel').value).vendor+'_v32'; }
+function loadCachedXinde(){
+  const v = parseModel($('modelSel').value).vendor;
+  try{ const c = localStorage.getItem('sde_xinde_'+v+'_v32'); if(c && c.length>200){ xinde=c; xindeVendor=v; return true; } }catch(_){}
+  return false;
 }
+function cacheXinde(){ try{ localStorage.setItem(xindeKey(), xinde); }catch(_){} }
 
-// ---------- Word 报告 ----------
-async function downloadDocx(){
-  if(!LAST){ showErr('还没有可导出的实验结果'); return; }
-  const D = window.docx;
-  if(!D){ showErr('Word 组件未加载成功，请刷新页面重试'); return; }
-  const { Document, Packer, Paragraph, HeadingLevel, TextRun } = D;
-  const P = (t, opt)=> new Paragraph(Object.assign({ children:[new TextRun({ text:String(t==null?'':t), size:22 })] }, opt||{}));
-  const H = (t, lvl)=> new Paragraph({ text:String(t), heading:lvl||HeadingLevel.HEADING_2, spacing:{ before:220, after:110 } });
-  const kids = [
-    new Paragraph({ text:'SDE 提智对照实验报告', heading:HeadingLevel.TITLE }),
-    P('生成时间：'+new Date().toLocaleString('zh-CN')),
-    P('回答基底：'+LAST.model+'　法官：'+LAST.judges.join('、')+'　盲评遍数：'+LAST.nPass+'　字数上限：'+LAST.wl),
-    H('一、问题'), P(LAST.question)
-  ];
-  if(LAST.userPrompt) { kids.push(H('二、你的提示词（B 臂）')); kids.push(P(LAST.userPrompt)); }
-  kids.push(H('三、评分汇总'));
-  LAST.armKeys.forEach(k=>{
-    const a = LAST.agg[k];
-    kids.push(P(ARM_SHORT[k]+'：'+(a? ('综合 '+a.composite+'（'+iqBand(a.composite)+'）　S '+a.dims.S.toFixed(1)+'　D '+a.dims.D.toFixed(1)+'　E '+a.dims.E.toFixed(1)+'　I '+a.dims.I.toFixed(1)+'　F '+a.dims.F.toFixed(1)+'　评分 '+a.n+' 次') : '未取得有效评分')));
-  });
-  kids.push(H('四、四臂回答全文'));
-  LAST.armKeys.forEach(k=>{ kids.push(H(ARM_SHORT[k], HeadingLevel.HEADING_3)); kids.push(P(LAST.arms[k])); });
-  kids.push(H('五、诚实账'));
-  kids.push(P('提智臂被明文要求生产法官五维要的东西（跨域结构、证伪边界），裸答臂没有；提智臂每题 5–8 次调用、裸答 1 次，算力也不同。因此本报告的 Δ 不能单独作为"提智有效"的证据，只能作为线索。150 这条线是本学派自定义的构念。可信的做法是多题累积、看 Δ 的方向与稳定性。'));
-  const doc = new Document({ sections:[{ children:kids }] });
-  const blob = await Packer.toBlob(doc);
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'SDE提智对照报告_' + new Date().toISOString().slice(0,19).replace(/[:T]/g,'-') + '.docx';
-  a.click();
-  setTimeout(()=>URL.revokeObjectURL(a.href), 4000);
-}
-$('docxBtn').addEventListener('click', ()=>downloadDocx().catch(e=>showErr('导出失败：'+e.message)));
-$('stopBtn').addEventListener('click', ()=>{
-  RUN_STOPPED = true;
-  RUN_ABORTS.forEach(ac=>{ try{ ac.abort(); }catch(_){} });
-  log('⛔ 已请求中止（正在进行的调用会尽快结束）');
-});
+function esc(s){ return String(s==null?'':s).replace(/[<>&]/g, c=>({'<':'&lt;','>':'&gt;','&':'&amp;'}[c])); }
 
-// ============================================================
-// 主流程
-// ============================================================
-$('goBtn').addEventListener('click', ()=>{ runAll().catch(e=>{ showErr(e.message||String(e)); log('✗ 中断：'+(e.message||e)); finish(); }); });
-function finish(){
-  $('goBtn').disabled = false; $('goBtn').textContent = '开始对照实验';
-  $('stopBtn').style.display = 'none';
-  if(TIMER){ clearInterval(TIMER); TIMER=0; }
+function paintCounts(){
+  $('cntBase').textContent = round + ' / 100 轮';
+  $('cntWds').textContent  = round + ' / 100 轮';
+  $('roundNow').textContent = round;
 }
-let TIMER = 0;
-async function runAll(){
+function scrollBottom(el){ el.scrollTop = el.scrollHeight; }
+
+function addMsg(box, kind, who, html){
+  const wrap = document.createElement('div');
+  wrap.className = 'msg '+kind;
+  wrap.innerHTML = (who?('<div class="who">'+esc(who)+'</div>'):'') + '<div class="bub">'+html+'</div>';
+  box.appendChild(wrap);
+  scrollBottom(box);
+  return wrap.querySelector('.bub');
+}
+function clearPlaceholder(box){ const p=box.querySelector('.msg.sys .placeholder'); if(p) p.closest('.msg').remove(); }
+
+// ---------- 心得：本场一次生成 ----------
+async function ensureXinde(sel, key, statusBub){
+  const v = parseModel(sel).vendor;
+  if(xinde && xindeVendor===v) return xinde;
+  if(loadCachedXinde() && xindeVendor===v){
+    if(statusBub) statusBub.innerHTML = '✓ 已载入该基底的心得（'+xinde.length.toLocaleString()+' 字）· <span class="xinde-link" onclick="openXinde()">查看</span>';
+    return xinde;
+  }
+  if(!priorReady || !PRIOR_OK) throw new Error('SDE 内功尚未就绪，请稍候或刷新本页');
+  if(statusBub) statusBub.innerHTML = '<span class="spinner"></span>正在通读 SDE 内功、写下本场心得…（约一两分钟，本场只做一次）';
+  const t = await callMsgs(sel, key, PRIOR, [{role:'user', content:REFLECT_PROMPT}], TOK_XINDE, '心得生成');
+  if(!t || t.length < 200) throw new Error('心得生成失败（返回过短），请重试');
+  xinde = t; xindeVendor = v; cacheXinde();
+  if(statusBub) statusBub.innerHTML = '✓ 内功已内化 · 本场心得 '+xinde.length.toLocaleString()+' 字 · <span class="xinde-link" onclick="openXinde()">查看</span>';
+  return xinde;
+}
+function openXinde(){ if(!xinde) return; $('xindeBody').textContent = xinde; $('xindeModal').classList.add('open'); }
+
+// ---------- 发送：同一问题 → 两栏并行 ----------
+async function send(){
+  if(busy) return;
   hideErr();
-  const q = $('question').value.trim();
-  const up = $('userPrompt').value.trim();
-  const wl = Math.max(200, Math.min(3000, parseInt($('wordLimit').value,10)||500));
-  const nPass = Math.max(1, Math.min(6, parseInt($('judgePasses').value,10)||3));
-  const interval = Math.max(0, parseFloat($('interval').value)||0);
-  const key = apiKeyEl.value.trim(), jkey = judgeKeyEl.value.trim();
-  if(!q) { showErr('请先填写要提问的问题'); $('question').focus(); return; }
-  if(!key){ showErr('请先填入回答基底的 API Key'); apiKeyEl.focus(); return; }
-  if(!jkey){ showErr('请先填入法官基底的 API Key'); judgeKeyEl.focus(); return; }
-  await Promise.all([priorPromise, skillPromise]);
-  if(!PRIOR_OK){ showErr('内功先验未加载成功，提智臂无法运行——请刷新页面重试'); return; }
-  if(!SCORE_OK){ showErr('打分标尺未加载成功，无法盲评——请刷新页面重试'); return; }
+  const q = ($('qbox').value||'').trim();
+  if(!q){ return; }
+  if(round >= MAX_ROUNDS){ showErr('本场已达 100 轮上限。点「清空两栏对话」可开新一场。'); return; }
+  const sel = $('modelSel').value;
+  const key = ($('apiKey').value||'').trim();
+  if(!key){ showErr('请先填写所选基底对应厂商的 API Key。'); return; }
 
-  RUN_STOPPED = false; LAST = null;
-  $('runArea').style.display='block';
-  $('logBox').textContent=''; $('stepsWrap').innerHTML=''; $('scoreTableWrap').innerHTML='';
-  ['Base','C1','C2'].forEach(w=>{ $('iq'+w).textContent='—'; $('band'+w).textContent=''; $('d'+w).innerHTML=''; });
-  $('goBtn').disabled = true; $('goBtn').textContent = '实验进行中…';
-  $('stopBtn').style.display='inline-block'; $('docxBtn').style.display='none';
-  T0 = Date.now();
-  TIMER = setInterval(()=>{ const s=Math.round((Date.now()-T0)/1000); $('timer').textContent='⏱ '+String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0'); }, 1000);
+  busy = true;
+  $('btnSend').disabled = true;
+  $('qbox').value = '';
 
-  const sel = modelSel.value, jsel = judgeSel.value;
-  const runSix = (METHOD==='six' || METHOD==='both');
-  const runEq  = (METHOD==='eq'  || METHOD==='both');
-  const armKeys = ['bare'].concat(up?['user']:[]).concat(runSix?['six']:[]).concat(runEq?['eq']:[]);
+  clearPlaceholder($('msgsBase')); clearPlaceholder($('msgsWds'));
+  addMsg($('msgsBase'), 'u', '你', esc(q));
+  addMsg($('msgsWds'),  'u', '你', esc(q));
+  const baseBub = addMsg($('msgsBase'), 'a', '大模型', '<span class="spinner"></span>作答中…');
+  const wdsStatus = addMsg($('msgsWds'), 'sys', '', '<span class="spinner"></span>准备中…');
+  const wdsBub = addMsg($('msgsWds'), 'a wdsA', 'WDS', '<span class="spinner"></span>等待心得就绪…');
 
-  log('【1/2】'+vendorName(sel)+' 四臂同题作答：'+armKeys.map(k=>ARM_SHORT[k]).join(' / ')+'（每臂上限 '+wl+' 字）');
-  setCol('Base','<span class="spinner"></span> 生成中'); 
-  if(runSix) setCol('C1','<span class="spinner"></span> 生成中');
-  if(runEq)  setCol('C2','<span class="spinner"></span> 生成中');
+  // 左栏：裸调基底（无 system），带自己的完整历史
+  const baseHist = histBase.concat([{role:'user', content:q}]);
+  const baseTask = callMsgs(sel, key, '', packHistory(baseHist), TOK_ANSWER, '大模型')
+    .then(ans=>{
+      baseBub.innerHTML = esc(ans);
+      histBase.push({role:'user', content:q}, {role:'assistant', content:ans});
+      scrollBottom($('msgsBase'));
+    })
+    .catch(e=>{ baseBub.innerHTML = '<span style="color:#E06C60">✗ '+esc(e.message)+'</span>'; throw e; });
 
-  const arms = {};
-  const jobs = [];
-  jobs.push((async()=>{
-    arms.bare = await armBare(sel, key, q, wl);
-    log('    ✓ 裸答已返回（'+arms.bare.length+' 字）');
-    if(up){
-      arms.user = await armUser(sel, key, q, wl, up);
-      log('    ✓ 你的提示词臂已返回（'+arms.user.length+' 字）');
-    }
-    setCol('Base','✓ 完成', 'A 裸答\n\n'+arms.bare + (arms.user? '\n\n───────────\nB 你的提示词\n\n'+arms.user : ''),
-      arms.bare.length+' 字'+(arms.user?' / '+arms.user.length+' 字':''));
-  })());
-  if(runSix) jobs.push((async()=>{
-    try{
-      arms.six = await armSixPath(sel, key, q, wl);
-      log('    ✓ 六路径涌现已返回（'+arms.six.length+' 字）');
-      setCol('C1','✓ 完成', arms.six, arms.six.length+' 字');
-    }catch(e){ setCol('C1','✗ 失败', '本臂失败：'+e.message, ''); log('    ✗ C1 失败：'+e.message); }
-  })());
-  if(runEq) jobs.push((async()=>{
-    try{
-      arms.eq = await armThreeEq(sel, key, q, wl);
-      log('    ✓ 三方程创新已返回（'+arms.eq.length+' 字）');
-      setCol('C2','✓ 完成', arms.eq, arms.eq.length+' 字');
-    }catch(e){ setCol('C2','✗ 失败', '本臂失败：'+e.message, ''); log('    ✗ C2 失败：'+e.message); }
-  })());
-  await Promise.all(jobs);
+  // 右栏：先确保心得，再带内功+心得+完整历史作答
+  const wdsTask = (async ()=>{
+    await ensureXinde(sel, key, wdsStatus);
+    const sys = wdsSystem(xinde);
+    const wdsHist = histWds.concat([{role:'user', content:q}]);
+    const ans = await callMsgs(sel, key, sys, packHistory(wdsHist), TOK_ANSWER, 'WDS');
+    wdsBub.innerHTML = esc(ans);
+    histWds.push({role:'user', content:q}, {role:'assistant', content:ans});
+    scrollBottom($('msgsWds'));
+  })().catch(e=>{
+    wdsBub.innerHTML = '<span style="color:#E06C60">✗ '+esc(e.message)+'</span>';
+    if(wdsStatus && wdsStatus.querySelector('.spinner')) wdsStatus.innerHTML = '⚠ 本轮未完成';
+    throw e;
+  });
 
-  const live = armKeys.filter(k=>arms[k]);
-  if(live.length < 2) throw new Error('可评分的臂少于两个，无法做对照');
-
-  const judges = [{ name:'他审·'+vendorName(jsel), sel:jsel, key:jkey }];
-  if($('selfReview').checked) judges.push({ name:'自审·'+vendorName(sel), sel:sel, key:key });
-  log('\n【2/2】盲评开始：'+judges.map(j=>j.name).join(' + ')+'，各 '+nPass+' 遍，每遍标签重新打乱');
-
-  const passes = await runJudging(judges, arms, live, q, nPass, interval);
-  if(!passes.length) throw new Error('所有盲评都失败了——答案仍在页面上，可稍后重试评分');
-  const agg = aggregate(passes, live);
-  renderScores(agg, live, nPass);
-  LAST = { question:q, userPrompt:up, model:vendorName(sel)+'（'+sel+'）', judges:judges.map(j=>j.name), nPass, wl, arms, agg, armKeys:live };
-  $('docxBtn').style.display='inline-block';
-  log('\n✓ 实验完成。'+live.map(k=>ARM_SHORT[k]+' '+(agg[k]?agg[k].composite:'—')).join('　'));
-  finish();
+  const results = await Promise.allSettled([baseTask, wdsTask]);
+  // 只有两栏都成功才算完整一轮（任一失败仍推进轮次，但历史各自按成功与否已入栈）
+  round += 1;
+  paintCounts();
+  const failed = results.filter(r=>r.status==='rejected');
+  if(failed.length){
+    showErr(failed.map(r=>r.reason && r.reason.message).filter(Boolean).join('\n') || '本轮有一栏未完成，可重试。');
+  }
+  if(round >= MAX_ROUNDS){
+    $('qbox').disabled = true;
+    $('qbox').placeholder = '本场已满 100 轮。点「清空两栏对话」开新一场。';
+  }
+  busy = false;
+  $('btnSend').disabled = false;
+  $('qbox').focus();
 }
-</script>
 
+function resetChat(){
+  if(busy) return;
+  if(histBase.length || histWds.length){
+    if(!confirm('清空两栏的全部对话记忆，开始新的一场？（本场心得会保留，不重新生成。）')) return;
+  }
+  histBase = []; histWds = []; round = 0;
+  $('msgsBase').innerHTML = '<div class="msg sys"><div class="bub placeholder">左栏：裸调基底。下面输入问题，两栏会同时作答。</div></div>';
+  $('msgsWds').innerHTML  = '<div class="msg sys"><div class="bub placeholder">右栏：本场第一次提问时，WDS 会先通读内功、写下心得，再作答。</div></div>';
+  $('qbox').disabled = false;
+  $('qbox').placeholder = '输入你的问题，回车发送（Shift+Enter 换行）——同一个问题会同时发给两栏';
+  paintCounts(); hideErr();
+}
+
+// ---------- 装配 ----------
+function boot(){
+  fillModelSelect($('modelSel'), 'ds:pro');
+  const fill = wireKeyPersist('modelSel', 'apiKey');
+  function refreshVendorUI(){
+    $('baseName').textContent = '· ' + vendorName($('modelSel').value);
+    $('overseasNote').style.display = isOverseas($('modelSel').value) ? 'block' : 'none';
+    // 换基底：清掉当前内存心得（各基底心得独立缓存），下次发送按新基底取/生成
+    const v = parseModel($('modelSel').value).vendor;
+    if(xindeVendor && xindeVendor !== v){ xinde=''; xindeVendor=''; }
+  }
+  $('modelSel').addEventListener('change', refreshVendorUI);
+  refreshVendorUI();
+  $('keyTog').addEventListener('click', ()=>{
+    const k=$('apiKey'); if(k.type==='password'){ k.type='text'; $('keyTog').textContent='隐藏'; } else { k.type='password'; $('keyTog').textContent='显示'; }
+  });
+  $('btnSend').addEventListener('click', send);
+  $('btnReset').addEventListener('click', resetChat);
+  $('qbox').addEventListener('keydown', e=>{
+    if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); send(); }
+  });
+  $('xindeClose').addEventListener('click', ()=>$('xindeModal').classList.remove('open'));
+  $('xindeModal').addEventListener('click', e=>{ if(e.target===$('xindeModal')) $('xindeModal').classList.remove('open'); });
+  paintCounts();
+}
+window.openXinde = openXinde;
+document.addEventListener('DOMContentLoaded', boot);
+</script>
 <script src="/taste/wds-companion/wds-read.js" defer></script>
 <script>window.WDS_READ={selector:".wrap"};</script>
 <script src="/wds-mode.js" defer></script>
