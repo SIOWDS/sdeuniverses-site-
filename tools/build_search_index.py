@@ -7,6 +7,8 @@ SDE Universes 站内搜索索引构建器
 - 按栏目分片输出到 public/search/
 一份索引同时服务：Tier1 前端关键词搜 + Tier2 Worker 问答检索
 用法：python3 tools/build_search_index.py
+快速同源模式：python3 tools/build_search_index.py --html-only
+保留旧独立PDF：python3 tools/build_search_index.py --reuse-pdf
 每次内容更新后重跑本脚本再提交（索引会随内容过期）。
 """
 import os, re, json, hashlib, subprocess, html as htmllib, datetime, sys
@@ -26,6 +28,8 @@ SKIP_DIRS = {"search"}
 SKIP_URL_SUBSTR = ("/taste/idea-generator/", "/taste/glm-test", "/check/", "/diag/", "/quotes/", "/fresh")
 
 CJK = re.compile(r"[\u4e00-\u9fff]")
+HTML_ONLY = "--html-only" in sys.argv
+REUSE_PDF = "--reuse-pdf" in sys.argv
 
 
 def _check_stale():
@@ -186,6 +190,20 @@ def chunk_text(t, size=420, overlap=40):
     return out
 
 # ---- 收集 ----
+old_pdf_text = {}
+if REUSE_PDF:
+    try:
+        old_manifest = json.load(open(os.path.join(OUT, "manifest.json"), encoding="utf-8"))
+        for record in old_manifest.get("docs", []):
+            if not record.get("u", "").lower().endswith(".pdf"):
+                continue
+            doc_path = os.path.join(OUT, "doc", "%s.json" % record["i"])
+            payload = json.load(open(doc_path, encoding="utf-8"))
+            old_pdf_text[record["u"]] = "\n".join(payload.get("c", []))
+        print("复用独立 PDF 索引文本：%d 篇" % len(old_pdf_text))
+    except Exception as e:
+        print("  ! 无法复用旧 PDF 索引：", e, file=sys.stderr)
+
 docs = {}  # url -> {title, section, html_text, pdf_texts:[...]}
 for dp, dns, fns in os.walk(PUB):
     dns[:] = [d for d in dns if d not in SKIP_DIRS]
@@ -204,17 +222,27 @@ for dp, dns, fns in os.walk(PUB):
                 d["title"] = title  # HTML 标题权威，覆盖 PDF 先到时留下的文件名占位
             d["html"] = (d["html"] + "\n" + text).strip()
         elif fn.endswith(".pdf"):
+            if HTML_ONLY:
+                # 站内长文的 PDF 均由同目录 index.html 生成；发布终检时可跳过
+                # 重复的 PDF 文本抽取。孤立 PDF 留给完整构建模式收录。
+                continue
             # 归到同目录的页面 URL（该目录若有 index.html 则用目录 URL，否则直接指向 PDF）
             reldir = os.path.dirname(rel)
             host_index = os.path.join(dp, "index.html")
             if os.path.exists(host_index):
+                if REUSE_PDF:
+                    # 同目录网页是PDF的发布母本；网页全文已经收录，无需重复解析。
+                    continue
                 url = canon_url(os.path.join(reldir, "index.html"))
             else:
                 url = "/" + rel.replace(os.sep, "/")  # 无壳页 → 直链 PDF
             if any(s in url for s in SKIP_URL_SUBSTR):
                 continue
             d = docs.setdefault(url, {"title": os.path.splitext(fn)[0], "section": section_of(rel), "html": "", "pdf": []})
-            d["pdf"].append(pdf_text(full))
+            if REUSE_PDF and url in old_pdf_text:
+                d["pdf"].append(old_pdf_text[url])
+            else:
+                d["pdf"].append(pdf_text(full))
 
 # ---- 切块 + 去重（HTML 优先，PDF 补空缺）----
 manifest_docs = []
