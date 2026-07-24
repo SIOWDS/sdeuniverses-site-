@@ -12,6 +12,13 @@
       ".sde-publication-list{--pl-gold:#8a6817;--pl-ink:#2a2315;--pl-muted:#786b50;--pl-line:rgba(138,104,23,.25);max-width:920px;margin:46px auto 72px;padding:0 24px;font-family:\"Noto Serif SC\",\"Songti SC\",Georgia,serif;color:var(--pl-ink)}" +
       ".sde-pl-shell{position:relative;overflow:hidden;border:1px solid var(--pl-line);border-radius:20px;background:linear-gradient(145deg,rgba(255,255,255,.7),rgba(239,231,211,.72));box-shadow:0 22px 60px rgba(73,52,10,.08);padding:34px clamp(20px,4vw,42px) 30px}" +
       ".sde-pl-shell:before{content:\"\";position:absolute;inset:0 0 auto;height:4px;background:linear-gradient(90deg,transparent,var(--pl-gold),transparent)}" +
+      ".sde-current-works{--pl-gold:#8a6817;--pl-ink:#2a2315;--pl-muted:#786b50;--pl-line:rgba(138,104,23,.25);max-width:920px;margin:48px auto 26px;padding:0 24px;font-family:\"Noto Serif SC\",\"Songti SC\",Georgia,serif;color:var(--pl-ink)}" +
+      ".sde-cw-shell{position:relative;overflow:hidden;border:1px solid var(--pl-line);border-radius:20px;background:radial-gradient(circle at 90% 10%,rgba(200,145,23,.12),transparent 34%),linear-gradient(145deg,rgba(255,255,255,.76),rgba(239,231,211,.78));box-shadow:0 22px 60px rgba(73,52,10,.08);padding:34px clamp(20px,4vw,42px)}" +
+      ".sde-cw-top{display:flex;justify-content:space-between;align-items:flex-start;gap:20px}.sde-cw-count{flex:none;min-width:96px;text-align:center;border-left:1px solid var(--pl-line);padding-left:22px}.sde-cw-count b{display:block;color:var(--pl-gold);font:700 34px/1 Georgia,serif}.sde-cw-count span{display:block;margin-top:8px;color:var(--pl-muted);font-size:11px;letter-spacing:.12em}" +
+      ".sde-cw-title{margin:9px 0 0;font-size:clamp(25px,4vw,36px);line-height:1.35;letter-spacing:.05em}.sde-cw-lead{margin-top:18px;color:var(--pl-muted);font-size:15px;line-height:2;text-align:justify}" +
+      ".sde-cw-themes{display:flex;flex-wrap:wrap;gap:8px;margin-top:20px}.sde-cw-theme{border:1px solid var(--pl-line);border-radius:99px;padding:5px 11px;color:var(--pl-gold);background:rgba(255,255,255,.45);font-size:11px;letter-spacing:.04em}" +
+      ".sde-cw-featured{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:24px}.sde-cw-featured a{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:76px;border-top:1px solid var(--pl-line);padding:13px 4px;color:var(--pl-ink);text-decoration:none;font-size:13px;font-weight:700;line-height:1.55}.sde-cw-featured a:hover{color:var(--pl-gold)}" +
+      ".sde-cw-action{display:inline-block;margin-top:20px;color:var(--pl-gold);text-decoration:none;font-size:13px;font-weight:700;letter-spacing:.08em;border-bottom:1px solid var(--pl-line);padding-bottom:3px}" +
       ".sde-pl-eyebrow{color:var(--pl-gold);font:700 11px/1.4 Georgia,serif;letter-spacing:.34em;text-transform:uppercase}" +
       ".sde-pl-head{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;margin:11px 0 22px}" +
       ".sde-pl-title{font-size:clamp(26px,4vw,38px);line-height:1.25;margin:0;font-weight:800;letter-spacing:.06em}" +
@@ -28,6 +35,7 @@
       ".sde-pl-kind{display:block;margin-top:5px;color:var(--pl-gold);font-size:10.5px;line-height:1.45;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:.78}" +
       ".sde-pl-arrow{font:18px/1 Georgia,serif;color:var(--pl-gold);text-align:right}" +
       ".sde-pl-empty{padding:28px 0;text-align:center;color:var(--pl-muted);font-size:14px}" +
+      "@media(max-width:700px){.sde-current-works{padding:0 15px}.sde-cw-shell{padding:28px 20px}.sde-cw-featured{grid-template-columns:1fr}.sde-cw-top{align-items:flex-start}.sde-cw-count{min-width:72px;padding-left:14px}.sde-cw-count b{font-size:28px}}" +
       "@media(max-width:600px){.sde-publication-list{padding:0 15px;margin-top:34px}.sde-pl-shell{padding:28px 18px 22px;border-radius:15px}.sde-pl-head{align-items:flex-start;flex-direction:column;gap:7px}.sde-pl-link{grid-template-columns:56px minmax(0,1fr) 16px;gap:8px}.sde-pl-kind{display:none}.sde-pl-summary{font-size:12px;line-height:1.65}.sde-pl-list{max-height:620px}}";
     document.head.appendChild(style);
   }
@@ -44,6 +52,8 @@
 
   function render(student) {
     injectStyles();
+    hideLegacyWorks(student.slug);
+    var currentWorks = renderCurrentWorks(student);
     var section = document.createElement("section");
     section.className = "sde-publication-list";
     section.setAttribute("aria-labelledby", "sde-publication-list-title");
@@ -119,8 +129,80 @@
     }
     draw("");
     var footer = document.querySelector("footer");
-    if (footer && footer.parentNode) footer.parentNode.insertBefore(section, footer);
-    else document.body.appendChild(section);
+    if (footer && footer.parentNode) {
+      footer.parentNode.insertBefore(currentWorks, footer);
+      footer.parentNode.insertBefore(section, footer);
+    } else {
+      document.body.appendChild(currentWorks);
+      document.body.appendChild(section);
+    }
+  }
+
+  function hideLegacyWorks(slug) {
+    if (slug === "qin-li" || slug === "he-lixia") return;
+    var links = Array.prototype.slice.call(
+      document.querySelectorAll('a[href="/students/' + slug + '/works/"],a[href="/students/' + slug + '/works"]')
+    );
+    if (!links.length) return;
+    var first = links[0];
+    var target = first.closest(".panel") || first.closest("a.works-entry") ||
+      first.closest("a.works") || first.closest(".works");
+    if (!target) return;
+    target.hidden = true;
+    var previous = target.previousElementSibling;
+    if (previous && previous.classList.contains("level-tag")) previous.hidden = true;
+  }
+
+  function renderCurrentWorks(student) {
+    var section = document.createElement("section");
+    section.className = "sde-current-works";
+    var shell = document.createElement("div");
+    shell.className = "sde-cw-shell";
+    var top = document.createElement("div");
+    top.className = "sde-cw-top";
+    var heading = document.createElement("div");
+    heading.innerHTML = '<div class="sde-pl-eyebrow">CURRENT WORKS · 作品与专栏</div>' +
+      '<h2 class="sde-cw-title">' + student.name + "的思想现场</h2>";
+    var count = document.createElement("div");
+    count.className = "sde-cw-count";
+    count.innerHTML = "<b>" + student.count + "</b><span>篇已发表</span>";
+    top.appendChild(heading);
+    top.appendChild(count);
+    shell.appendChild(top);
+    var lead = document.createElement("p");
+    lead.className = "sde-cw-lead";
+    lead.textContent = student.promo.lead;
+    shell.appendChild(lead);
+    var themes = document.createElement("div");
+    themes.className = "sde-cw-themes";
+    student.promo.themes.forEach(function (value) {
+      var chip = document.createElement("span");
+      chip.className = "sde-cw-theme";
+      chip.textContent = value;
+      themes.appendChild(chip);
+    });
+    shell.appendChild(themes);
+    var featured = document.createElement("div");
+    featured.className = "sde-cw-featured";
+    student.items.slice(0, 3).forEach(function (item) {
+      var link = document.createElement("a");
+      link.href = item.url;
+      var label = document.createElement("span");
+      label.textContent = item.title;
+      var arrow = document.createElement("span");
+      arrow.textContent = "→";
+      link.appendChild(label);
+      link.appendChild(arrow);
+      featured.appendChild(link);
+    });
+    shell.appendChild(featured);
+    var action = document.createElement("a");
+    action.className = "sde-cw-action";
+    action.href = "#sde-publication-list-title";
+    action.textContent = "查看全部 " + student.count + " 篇作品 →";
+    shell.appendChild(action);
+    section.appendChild(shell);
+    return section;
   }
 
   fetch("/students/publications.json")
