@@ -22,6 +22,7 @@
     .heroin{position:relative;z-index:2;max-width:960px}.eyebrow{font:700 12px/1.4 system-ui,sans-serif;letter-spacing:.42em;color:#ddbd65}
     h1{font-size:clamp(45px,7.5vw,80px);line-height:1.22;letter-spacing:.07em;margin:24px 0 18px;text-wrap:balance}.subtitle{font-size:clamp(20px,2.8vw,29px);color:#d4e5df;letter-spacing:.06em;margin:0 auto 22px}
     .deck{max-width:760px;margin:0 auto;color:#bfc9c4;font-size:17px;line-height:2}.meta{margin-top:30px;color:#d9c68f;font-size:13px;letter-spacing:.12em}
+    .readbar{background:#e8dfcb;border-bottom:1px solid rgba(58,75,72,.18)}.readbar-inner{max-width:980px;margin:auto;padding:16px 24px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:center}.readbar-label{font:700 12px/1.4 system-ui,sans-serif;color:#716d62;letter-spacing:.15em;margin-right:4px}.read-mode{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border:1px solid #427e78;border-radius:4px;color:#296963;text-decoration:none;font:600 14px/1.4 system-ui,sans-serif;letter-spacing:.03em}.read-mode:hover{background:rgba(66,126,120,.1)}.read-mode.current{background:#296963;color:#fff}
     main{max-width:1180px;margin:auto;padding:76px 24px 100px;display:grid;grid-template-columns:230px minmax(0,760px);gap:70px;justify-content:center;align-items:start}
     aside{position:sticky;top:78px;max-height:calc(100vh - 100px);overflow:auto;border-left:1px solid rgba(66,126,120,.35);padding:8px 0 8px 18px}aside b{display:block;font:700 11px/1.4 system-ui,sans-serif;letter-spacing:.28em;color:var(--teal);margin-bottom:12px}aside a{display:block;text-decoration:none;color:#756f63;font-size:12.5px;line-height:1.55;padding:5px 0}aside a:hover{color:#296963}
     article{min-width:0}.abstract{background:var(--card);border:1px solid var(--line);border-top:4px solid var(--teal);padding:30px 34px;margin-bottom:48px;box-shadow:0 15px 35px rgba(43,53,48,.07)}.abstract h2{font-size:15px;margin:0 0 8px;padding:0;border:0;color:var(--teal)}.abstract p{margin:0;font-size:15px}.keywords{margin-top:15px!important;color:var(--muted)}
@@ -32,7 +33,7 @@
     .endnote{margin-top:70px;padding:26px 30px;border:1px solid rgba(197,164,80,.36);background:#ece4d2;color:#5d5545;font-size:14px}footer{background:var(--night);color:#9d978b;text-align:center;padding:34px 20px;font-size:12px;letter-spacing:.08em}
     @media(max-width:900px){main{grid-template-columns:1fr;gap:0;padding-top:45px}aside{position:relative;top:auto;max-height:none;border-left:0;border-bottom:1px solid var(--line);padding:0 0 24px;margin-bottom:36px;columns:2}aside b{column-span:all}h1{letter-spacing:.03em}}
     @media(max-width:620px){.hero{min-height:650px;padding:70px 20px}.navin{padding:12px 16px}main{padding:38px 18px 70px}aside{columns:1}.abstract{padding:24px 21px}article>p{font-size:16px;text-align:left}h2{font-size:25px;margin-top:52px}}
-    @media print{nav,.progress,aside,.anchor{display:none}.hero{min-height:auto;padding:45px 20px;background:#fff;color:#111}.deck,.subtitle,.meta{color:#333}main{display:block;padding:25px}article{max-width:none}}
+    @media print{nav,.progress,.readbar,aside,.anchor{display:none}.hero{min-height:auto;padding:45px 20px;background:#fff;color:#111}.deck,.subtitle,.meta{color:#333}main{display:block;padding:25px}article{max-width:none}}
   </style>
 </head>
 <body>
@@ -47,6 +48,14 @@
       <div class="meta">王德生 · 约23千字 · 2026年7月24日</div>
     </div>
   </header>
+  <section class="readbar" aria-label="三种阅读方式">
+    <div class="readbar-inner">
+      <span class="readbar-label">三种阅读方式</span>
+      <span class="read-mode current">◈ 网页版（本页）</span>
+      <a class="read-mode" href="read.html">▤ PDF 在线阅读</a>
+      <a class="read-mode" href="capability-illusion-institutional-tension.pdf" download>⤓ 下载 PDF</a>
+    </div>
+  </section>
   <main>
     <aside aria-label="文章目录"><b>CONTENTS · 目录</b><a href="#section-01-一">一、问题的提出：为什么“看起来成功”可能成为真正成功的障碍</a><a href="#section-02-二">二、理论基础：从双重S模型到能力感幻觉</a><a href="#section-03-三">三、符号性结算的一般机制：六步阻断链</a><a href="#section-04-四">四、大学排名：从质量测量到指标替代</a><a href="#section-05-五">五、城市品牌：地标、节庆与“创新之城”的提前完成</a><a href="#section-06-六">六、企业创新：专利墙、AI口号与展示型转型</a><a href="#section-07-七">七、历史名人争夺：把过去的联系结算为今天的能力</a><a href="#section-08-八">八、人才政策：引进数量、帽子体系与能力外包</a><a href="#section-09-九">九、国家现代化叙事：里程碑、样板与结构性自证</a><a href="#section-10-十">十、跨领域统一模型：符号代理结算的六种变体</a><a href="#section-11-十一">十一、可测量指标与可证伪命题</a><a href="#section-12-十二">十二、经验研究设计</a><a href="#section-13-十三">十三、治理框架：从符号替代转向发生式结算</a><a href="#section-14-十四">十四、理论讨论：能力感为何比能力不足更危险</a><a href="#section-15-十五">十五、结论：从被宣布的能力到能够再次发生的能力</a><a href="#section-16-十六">十六、相关理论对话：指标、审计、合法性与想象共同体</a><a href="#section-17-十七">十七、形式化模型：能力感、张力与投入的动态关系</a><a href="#section-18-十八">十八、六个领域的深层机制比较</a><a href="#section-19-十九">十九、反驳与边界：并非所有符号成功都会阻断改革</a><a href="#section-20-二十">二十、研究局限与未来方向</a><a href="#section-21-二十一">二十一、面向实践的六类治理工具</a><a href="#section-22-二十二">二十二、三个典型情境的机制演示</a><a href="#section-23-二十三">二十三、SDE视角下的规范原则</a><a href="#section-24-二十四">二十四、从能力崇拜转向发生文明</a><a href="#section-25-二十五">二十五、结语补论：让每一束光都回到它所照亮的土</a></aside>
     <article>

@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>PDF 在线阅读｜能力感的幻觉与制度张力的消散</title>
+  <style>
+    :root{--night:#0d1112;--panel:#132024;--paper:#f4efe4;--gold:#c5a450;--teal:#76b9b0;--muted:#9da9a4}
+    *{box-sizing:border-box}body{margin:0;background:var(--night);color:var(--paper);font-family:"Noto Serif SC","Songti SC",serif;min-height:100vh}
+    .topbar{position:sticky;top:0;z-index:20;background:rgba(13,17,18,.96);border-bottom:1px solid rgba(197,164,80,.3);backdrop-filter:blur(10px);padding:11px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+    .title{color:var(--gold);font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:48vw}.title a{color:var(--muted);text-decoration:none;margin-right:13px;font-size:13px}
+    .controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.btn{display:inline-flex;align-items:center;background:rgba(66,126,120,.12);border:1px solid rgba(118,185,176,.45);color:var(--teal);padding:7px 13px;border-radius:4px;font:14px/1.2 inherit;text-decoration:none;cursor:pointer}.btn:hover:not(:disabled){background:rgba(66,126,120,.24)}.btn:disabled{opacity:.35;cursor:not-allowed}
+    .pagebox{display:flex;align-items:center;gap:5px;color:var(--muted);font-size:13px}.pagebox input{width:54px;background:var(--panel);border:1px solid rgba(118,185,176,.42);color:var(--paper);padding:6px;border-radius:4px;text-align:center}
+    .stage{display:flex;justify-content:center;padding:28px 16px 58px;min-height:75vh}.page-wrap{position:relative;display:none;line-height:0;background:#fff;box-shadow:0 22px 65px rgba(0,0,0,.62)}canvas{display:block}.text-layer{position:absolute;inset:0;overflow:hidden;line-height:1}.text-layer span{position:absolute;color:transparent;white-space:pre;cursor:text;transform-origin:0 0}.text-layer ::selection{background:rgba(66,126,120,.38)}
+    .loading,.error{text-align:center;color:var(--muted);padding:80px 20px;line-height:1.9}.spinner{width:40px;height:40px;border:3px solid rgba(197,164,80,.2);border-top-color:var(--gold);border-radius:50%;margin:0 auto 18px;animation:spin .85s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}.error{display:none;color:#e8abab}.error a{color:var(--gold)}
+    .hint{position:fixed;bottom:0;left:0;right:0;padding:9px;text-align:center;color:var(--muted);font-size:12px;background:linear-gradient(transparent,rgba(13,17,18,.94));pointer-events:none}
+    @media(max-width:680px){.title{max-width:100%;width:100%}.topbar{justify-content:center}.controls{justify-content:center}.stage{padding:18px 8px 52px}}
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="title"><a href="./">← 返回网页版</a>能力感的幻觉与制度张力的消散</div>
+    <div class="controls">
+      <button class="btn" id="prev" disabled>‹ 上一页</button>
+      <div class="pagebox"><input id="pageInput" type="number" min="1" value="1"><span>/ <span id="totalPages">…</span></span></div>
+      <button class="btn" id="next" disabled>下一页 ›</button>
+      <button class="btn" id="zoomOut" aria-label="缩小">−</button>
+      <button class="btn" id="zoomIn" aria-label="放大">＋</button>
+      <a class="btn" href="capability-illusion-institutional-tension.pdf" download>下载 PDF</a>
+    </div>
+  </header>
+  <main class="stage" id="stage">
+    <div class="loading" id="loading"><div class="spinner"></div>正在载入论文 PDF…<br><small>全文 26 页，首次载入需要几秒</small></div>
+    <div class="page-wrap" id="pageWrap"><canvas id="pdfCanvas"></canvas><div class="text-layer" id="textLayer"></div></div>
+    <div class="error" id="error"></div>
+  </main>
+  <div class="hint">← → 方向键翻页 · 可缩放 · 可选中正文文字</div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script>
+    const PDF_URL='capability-illusion-institutional-tension.pdf';
+    pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    let pdfDoc=null,pageNum=1,rendering=false,pending=null,baseScale=1.25,currentPageText='';
+    const $=id=>document.getElementById(id),canvas=$('pdfCanvas'),ctx=canvas.getContext('2d'),pageWrap=$('pageWrap'),textLayer=$('textLayer');
+    function drawTextLayer(content,viewport){
+      textLayer.innerHTML='';const frag=document.createDocumentFragment(),fix=[];
+      content.items.forEach(item=>{if(!item.str)return;const m=pdfjsLib.Util.transform(viewport.transform,item.transform),size=Math.hypot(m[2],m[3]);if(!size)return;const angle=Math.atan2(m[1],m[0]),span=document.createElement('span');span.textContent=item.str;span.style.cssText=`left:${m[4].toFixed(2)}px;top:${(m[5]-size).toFixed(2)}px;font-size:${size.toFixed(2)}px;${Math.abs(angle)>.01?`transform:rotate(${angle}rad);`:''}`;frag.appendChild(span);fix.push([span,item.width*viewport.scale,angle])});
+      textLayer.appendChild(frag);fix.forEach(([span,target,angle])=>{const actual=span.getBoundingClientRect().width;if(target&&actual>1){const scale=target/actual;if(scale>.1&&scale<10)span.style.transform=`${Math.abs(angle)>.01?`rotate(${angle}rad) `:''}scaleX(${scale.toFixed(3)})`}});
+    }
+    async function render(num){
+      rendering=true;const page=await pdfDoc.getPage(num),unit=page.getViewport({scale:1}),available=($('stage').clientWidth||innerWidth)-32,scale=Math.min(baseScale,available/unit.width),viewport=page.getViewport({scale}),ratio=Math.min(devicePixelRatio||1,2.5);
+      canvas.width=Math.floor(viewport.width*ratio);canvas.height=Math.floor(viewport.height*ratio);canvas.style.width=viewport.width+'px';canvas.style.height=viewport.height+'px';pageWrap.style.width=viewport.width+'px';pageWrap.style.height=viewport.height+'px';ctx.setTransform(ratio,0,0,ratio,0,0);
+      await page.render({canvasContext:ctx,viewport}).promise;const content=await page.getTextContent();currentPageText=content.items.map(i=>i.str).join(' ').replace(/\s+/g,' ').trim();drawTextLayer(content,viewport);rendering=false;$('pageInput').value=num;$('prev').disabled=num<=1;$('next').disabled=num>=pdfDoc.numPages;if(pending!==null){const queued=pending;pending=null;render(queued)}
+    }
+    function queue(num){rendering?pending=num:render(num)}function go(num){if(!pdfDoc)return;pageNum=Math.min(Math.max(1,num),pdfDoc.numPages);queue(pageNum);scrollTo({top:0,behavior:'smooth'})}
+    pdfjsLib.getDocument(PDF_URL).promise.then(pdf=>{pdfDoc=pdf;$('totalPages').textContent=pdf.numPages;$('pageInput').max=pdf.numPages;$('loading').style.display='none';pageWrap.style.display='inline-block';render(1)}).catch(error=>{$('loading').style.display='none';$('error').style.display='block';$('error').innerHTML=`PDF 暂时无法在线载入。<br><a href="${PDF_URL}" download>直接下载 PDF 阅读</a><br><small>${error.message}</small>`});
+    $('prev').onclick=()=>go(pageNum-1);$('next').onclick=()=>go(pageNum+1);$('pageInput').onchange=e=>go(parseInt(e.target.value)||1);$('zoomIn').onclick=()=>{baseScale=Math.min(baseScale+.2,3);queue(pageNum)};$('zoomOut').onclick=()=>{baseScale=Math.max(baseScale-.2,.6);queue(pageNum)};
+    addEventListener('keydown',e=>{if(e.target.matches('input,textarea'))return;if(e.key==='ArrowLeft')go(pageNum-1);if(e.key==='ArrowRight')go(pageNum+1)});addEventListener('resize',()=>{clearTimeout(window._resize);window._resize=setTimeout(()=>queue(pageNum),220)});
+    window.WDS_READ={title:'能力感的幻觉与制度张力的消散',bodyEl:()=>pageWrap,docTextFn:()=>currentPageText?`【第 ${pageNum} 页 / 共 ${pdfDoc?pdfDoc.numPages:'?'} 页】\n${currentPageText}`:''};
+  </script>
+  <script src="/taste/wds-companion/wds-read.js" defer></script>
+  <script src="/wds-mode.js" defer></script>
+</body>
+</html>
