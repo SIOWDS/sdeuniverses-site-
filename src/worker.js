@@ -1293,7 +1293,7 @@ function wdsBucket(kind, ip, key) {
 const WDS_DLG_PER_DAY = 300, WDS_DLG_PER_MIN = 25;
 const WDS_MAX_TURNS = 100;          // 最多记 100 轮
 const WDS_HIST_BUDGET = 60000;      // 送进基底的历史字数预算（约 4 万 token，超出从最旧处裁）
-const WDS_GUIDE_HIST_BUDGET = 300000; // 与WDS对话（高级会话）：全面记忆——每答携带全部对话原文；仅在逼近基底上下文物理上限时才从最旧处裁
+const WDS_GUIDE_HIST_BUDGET = 120000; // 与WDS对话（高级会话）：尽量全量记忆——每答携带尽可能多的对话原文；约 8 万 token，留出 system+心得+站内资料的余量，仍溢出时由 CONTEXT_OVERFLOW 逐级砍半（原 30 万字符≈20万token 超过多数基底输入窗，深聊必 400）
 // 把整场对话打包成 messages：默认全带上；仅当超预算时从最旧处裁，并留一条说明保住连贯性。
 function packReadHistory(history, budget, perMsg) {
   const arr = (Array.isArray(history) ? history : []).slice(-WDS_MAX_TURNS * 2);
@@ -1903,7 +1903,7 @@ export default {
       } catch (e) {}
       // part 模式只用 b.convo（提纲阶段回传的约6000字摘要），无需把整场（可达30万字）重新拼一遍——省每节调用的内存/CPU，少触平台资源限
       const _needFullConvo = !(b.mode === "part" && b.convo);
-      const convo = _needFullConvo ? readConvoText(b.history, b.guide ? 300000 : 24000) : "";   // 与WDS对话：总结/成文与对话本体同档（30万），全场原文
+      const convo = _needFullConvo ? readConvoText(b.history, b.guide ? 140000 : 24000) : "";   // 与WDS对话：总结/成文读全场原文，上限 14 万字符≈9万token（readConvoText 已做头35%+尾65%压缩，不丢首尾）——原 30 万超基底输入窗、深聊成文必 400
       if (_needFullConvo && convo.length < 120) return J({ ok: false, msg: "先和 WDS 多聊几轮，聊出东西来了再总结成文。" }, 400);
       const PN = Math.max(3, Math.min(6, parseInt(b.paperN, 10) || 3));   // 论文部分数：3=约5000字（陪读默认），6=约一万字（与WDS对话）
       const GD = !!b.guide;                                                // 与WDS对话（问对WDS）场景
@@ -2274,16 +2274,21 @@ export default {
             if (siteSrcs.length) controller.enqueue(_sseBytes({ t: "sources", v: siteSrcs })); // 先把站内出处发给前端
             const sys = b.guide ? WDS_DIALOGUE_SYS(reflect, SDEM, siteCtx, docTitle, docText) : WDS_READ_SYS(reflect, SDEM, docTitle, docText);
             // 历史预算随正文/站内资料篇幅收缩：合计钳在 ~12万字符内，防超长文+百轮对话挤爆基底上下文
-            // 陪读：正文+历史 ~12万字符收缩；与WDS对话（guide）：全面记忆——30万字符预算+单条1.2万，正常百轮全量不裁（RAG 的 siteCtx 已计入物理护栏）
-            const histBudget = b.guide ? Math.max(60000, WDS_GUIDE_HIST_BUDGET - docText.length - siteCtx.length) : Math.min(WDS_HIST_BUDGET, Math.max(20000, 120000 - docText.length - siteCtx.length));
-            const messages = [{ role: "system", content: sys }];
-            if (b.guide && docText) {
-              // 读者提交的文章：作为对话最前面的一轮独立消息注入——比塞在 system 末尾（排在3万字站内资料之后）可靠得多
-              messages.push({ role: "user", content: "这是我提交给你的文章全文，本场对话就围绕它。\n\n《" + (docTitle || "未命名") + "》\n\n" + docText });
-              messages.push({ role: "assistant", content: "《" + (docTitle || "未命名") + "》全文我已通读完毕（" + docText.length + " 字符）。接下来你每问一句，我都扣着这篇文章本身答——引它的原话、拆它的显露与差异序列、指出它的创新与缝隙。你问吧。" });
-            }
-            messages.push(...packReadHistory(history, histBudget, b.guide ? 12000 : 0));
-            messages.push({ role: "user", content: focus ? ("我正读到这一句：「" + focus + "」\n\n我的问题：" + q) : q });
+            // 陪读：正文+历史 ~12万字符收缩；与WDS对话（guide）：全面记忆——大预算+单条1.2万，正常百轮尽量不裁；
+            //   但基底输入窗口是硬物理上限，深聊会溢出——故预算做成可收缩，溢出时（见 _runAnswer 的 CONTEXT_OVERFLOW 分支）逐级缩小重试。
+            let histBudget = b.guide ? Math.max(60000, WDS_GUIDE_HIST_BUDGET - docText.length - siteCtx.length) : Math.min(WDS_HIST_BUDGET, Math.max(20000, 120000 - docText.length - siteCtx.length));
+            // messages 做成可按当前 histBudget 重建（system + 提交文章两轮 固定，历史与本轮问题随预算变）
+            const _buildMessages = () => {
+              const mm = [{ role: "system", content: sys }];
+              if (b.guide && docText) {
+                mm.push({ role: "user", content: "这是我提交给你的文章全文，本场对话就围绕它。\n\n《" + (docTitle || "未命名") + "》\n\n" + docText });
+                mm.push({ role: "assistant", content: "《" + (docTitle || "未命名") + "》全文我已通读完毕（" + docText.length + " 字符）。接下来你每问一句，我都扣着这篇文章本身答——引它的原话、拆它的显露与差异序列、指出它的创新与缝隙。你问吧。" });
+              }
+              mm.push(...packReadHistory(history, histBudget, b.guide ? 12000 : 0));
+              mm.push({ role: "user", content: focus ? ("我正读到这一句：「" + focus + "」\n\n我的问题：" + q) : q });
+              return mm;
+            };
+            let messages = _buildMessages();
             // ANSWER_EMPTY_GUARD：顶格预算＋满功率下，思考偶尔会把整份预算吃光、正文 0 字。
             // 不因此设限，而是就地再跑一遍（仍顶格、仍满功率）——限制留给基底，不留给我们自己。
             const _diag = { lines: 0, finish: "", status: 0, head: "" };   // ANSWER_DIAG
@@ -2294,6 +2299,11 @@ export default {
               if (!upstream.ok) {
                 const errtxt = (await upstream.text()).slice(0, 300);
                 if (upstream.status === 401 || upstream.status === 402 || upstream.status === 429) return { hard: "你的 Key 用不了（" + upstream.status + "）：额度不足或填错了。去设置里检查或换一个。", code: "bad_key" };
+                // CONTEXT_OVERFLOW：深聊时历史+资料超过基底输入窗口，基底回 400 且报的是上下文/长度过长。
+                // 不直接报错——返回 overflow 让上层把历史预算砍半、重建 messages 重跑。max_tokens 类 400 已由 wdsFetchMax 处理，走不到这里。
+                if (upstream.status === 400 && /context|too long|too large|maximum context|length limit|exceed|输入.*过长|上下文|token/i.test(errtxt) && b.guide && histBudget > 24000) {
+                  return { overflow: true, errtxt: errtxt };
+                }
                 return { hard: "基底返回错误 " + upstream.status + "：" + errtxt };
               }
               const reader = upstream.body.getReader();
@@ -2326,6 +2336,16 @@ export default {
             };
             const _diagLine = () => "【诊断】上游 " + (_diag.status || "?") + " · 收到 " + (_diag.lines || 0) + " 条流数据 · 思考 " + ((_st && _st.think) || 0) + " 字 · 结束原因 " + (_diag.finish || "未给") + (_diag.head ? (" · 首帧「" + _diag.head.replace(/\s+/g, " ").slice(0, 80) + "」") : "");
             let ar = await _runAnswer();
+            // CONTEXT_OVERFLOW 恢复：基底报上下文过长 → 砍半历史预算、重建 messages、重跑（最多 4 级，砍到 24000 仍不行才认输）
+            let _shrinks = 0;
+            while (ar.overflow && histBudget > 24000 && _shrinks < 4) {
+              _shrinks++;
+              histBudget = Math.max(24000, Math.floor(histBudget / 2));
+              controller.enqueue(_sseBytes({ t: "note", v: "这场聊得很长、超出基底一次能读的上限了，正自动收拢较早的对话再答（保留最近的讨论）…" }));
+              messages = _buildMessages();
+              ar = await _runAnswer();
+            }
+            if (ar.overflow) { controller.enqueue(_sseBytes({ t: "error", v: "这场对话太长，即使收拢也超过了基底一次能读的上限。可以点「成文一篇」把它凝成论文，或新开一场继续。", code: "too_long" })); return done(); }
             if (ar.hard) { controller.enqueue(_sseBytes({ t: "error", v: ar.hard, code: ar.code })); return done(); }
             if (!ar.got) {
               controller.enqueue(_sseBytes({ t: "note", v: "这一答只出了思考、正文 0 字，正在重答…" }));
