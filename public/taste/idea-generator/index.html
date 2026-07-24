@@ -190,6 +190,7 @@ footer{border-top:1px solid var(--border);text-align:center;padding:30px 20px 44
         <select id="osRevB" style="flex:0 0 auto;padding:9px 11px;border-radius:8px;border:1px solid rgba(255,255,255,0.15);background:#0d1117;color:#D4DCE4;font-size:13px"></select>
         <input id="osRevBKey" type="password" placeholder="审稿人 B 的 Key" autocomplete="off" style="flex:1;min-width:160px;padding:9px 11px;border-radius:8px;border:1px solid rgba(255,255,255,0.15);background:#0d1117;color:#D4DCE4;font-size:13px">
       </div>
+      <div style="font-size:11.5px;color:#8C93A0;margin-top:6px">🔒 Key 填一次即存在你自己的浏览器里，下次自动带出（含审稿基底）；本站服务器不经手。</div>
     </div>
 
     <div style="margin-bottom:16px">
@@ -260,6 +261,7 @@ footer{border-top:1px solid var(--border);text-align:center;padding:30px 20px 44
         <select id="osbRevB" style="flex:0 0 auto;padding:9px 11px;border-radius:8px;border:1px solid rgba(255,255,255,0.15);background:#0d1117;color:#D4DCE4;font-size:13px"></select>
         <input id="osbRevBKey" type="password" placeholder="审稿人 B 的 Key" autocomplete="off" style="flex:1;min-width:160px;padding:9px 11px;border-radius:8px;border:1px solid rgba(255,255,255,0.15);background:#0d1117;color:#D4DCE4;font-size:13px">
       </div>
+      <div style="font-size:11.5px;color:#8C93A0;margin-top:6px">🔒 Key 填一次即存在你自己的浏览器里，下次自动带出（含审稿基底）；本站服务器不经手。</div>
     </div>
 
     <div style="margin-bottom:16px">
@@ -1959,6 +1961,35 @@ updateReflectChoiceBar();   // 页面加载即按当前基底显示/隐藏心得
   keyEl.addEventListener('input', ()=>localStorage.setItem(storeName(), keyEl.value.trim()));
   fill();
 })('fourRevB','fourRevBKey');
+
+// —— 统一 Key 持久化（2026-07-24）——
+// 规则：任何"基底下拉 + Key 框"的配对都走这一条——填一次就存本机（按厂商分存），
+// 下次打开页面 / 打开弹框 / 切到该厂商时自动带出，不必再输入一遍。
+// 审稿人、评审基底与主笔一视同仁：同一厂商共用同一份 Key，跨工具（智问/经典解构器/评分器）也通用。
+function sdeKeyStoreOf(modelStr){
+  const v = parseModel(modelStr).vendor;
+  return {ds:'sde_ds_key',glm:'sde_glm_key',kimi:'sde_kimi_key',qwen:'sde_qwen_key',minimax:'sde_minimax_key',gpt:'sde_gpt_key',claude:'sde_claude_key',gemini:'sde_gemini_key'}[v] || 'sde_ds_key';
+}
+function wireKeyPersist(selId, keyId){
+  const sel = $(selId), keyEl = $(keyId);
+  if(!sel || !keyEl) return null;
+  const store = ()=>sdeKeyStoreOf(sel.value);
+  const fill = (force)=>{
+    let v=''; try{ v = localStorage.getItem(store()) || ''; }catch(_){}
+    if(force || !(keyEl.value||'').trim()) keyEl.value = v;
+  };
+  if(!keyEl._sdeKeyWired){
+    keyEl._sdeKeyWired = 1;
+    sel.addEventListener('change', ()=>fill(true));
+    keyEl.addEventListener('input', ()=>{
+      const v = (keyEl.value||'').trim();
+      if(!v) return;                       // 清空不删本机存档，避免误清
+      try{ localStorage.setItem(store(), v); }catch(_){}
+    });
+  }
+  fill(false);
+  return fill;
+}
 $('keyToggle').addEventListener('click', ()=>{
   const t = apiKeyEl.type==='password';
   apiKeyEl.type = t?'text':'password';
@@ -3267,6 +3298,8 @@ if(autoRunBtn){
       if($('osKey') && apiKeyEl.value && !$('osKey').value) $('osKey').value = apiKeyEl.value;
       if($('osModel') && modelSel.value) $('osModel').value = modelSel.value;
     }catch(_){}
+    // Key 一次输入、本机保存、下次自动带出（主基底与两位审稿人同规）
+    try{ wireKeyPersist('osModel','osKey'); wireKeyPersist('osRevA','osRevAKey'); wireKeyPersist('osRevB','osRevBKey'); }catch(_){}
   };
   const closeAll = ()=>{ entryModal.style.display='none'; oneShotModal.style.display='none'; if(batchModal) batchModal.style.display='none'; };
   const bi=$('entryInteractive'); if(bi) bi.addEventListener('click', closeAll);            // 互动序列=关模态，用原页面
@@ -3395,6 +3428,7 @@ if(autoRunBtn){
       if($('osbKey') && apiKeyEl.value && !$('osbKey').value) $('osbKey').value = apiKeyEl.value;
       if($('osbModel') && modelSel.value) $('osbModel').value = modelSel.value;
     }catch(_){}
+    try{ wireKeyPersist('osbModel','osbKey'); wireKeyPersist('osbRevA','osbRevAKey'); wireKeyPersist('osbRevB','osbRevBKey'); }catch(_){}
   };
   const eb=$('entryBatch'); if(eb) eb.addEventListener('click', showBatch);
   const bbk=$('osbBack'); if(bbk) bbk.addEventListener('click', showEntry);
@@ -3884,6 +3918,8 @@ function syncReviewKeyUI(){
   set('reviewModelSelA','reviewKeyInputA','reviewKeyLabelA');
   set('reviewModelSelB','reviewKeyInputB','reviewKeyLabelB');
   set('writerModelSel','writerKeyInput','writerKeyLabel');
+  // 三个位子的 Key 也接上"填一次就记住"（输入即存本机，切基底自动带出）
+  try{ wireKeyPersist('reviewModelSelA','reviewKeyInputA'); wireKeyPersist('reviewModelSelB','reviewKeyInputB'); wireKeyPersist('writerModelSel','writerKeyInput'); }catch(_){}
   // 提示：两审稿人同厂 or 审稿人与主笔同厂
   const va=parseModel($('reviewModelSelA').value).vendor;
   const vb=$('reviewModelSelB').value ? parseModel($('reviewModelSelB').value).vendor : null;
