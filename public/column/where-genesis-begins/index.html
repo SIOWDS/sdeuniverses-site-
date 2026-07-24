@@ -65,7 +65,7 @@ footer{border-top:1px solid var(--line);padding:30px 24px;text-align:center;colo
 .abs .abs{margin-top:18px}
 .abs{border-radius:0 6px 6px 0}
 article h3{font-size:17.5px}
-</style></head><body>
+</style><script src="/assets/sde-essential-figures.js?v=20260724c" defer></script></head><body>
 <nav><div class="w"><a class="nav-logo" href="/">SDE Universes</a><a class="nav-back" href="/ai/">← AI 专栏</a><a class="nav-back" href="/books/m/44/">底本 · SDE智能体导论</a></div></nav>
 <header class="art"><div class="eyebrow">论 文 · 之 三 · 据专著第44号改写</div><h1 class="art-title">何处正要发生：裂缝的定位、三大亏缺与九步发生机制</h1><div class="art-sub">把"先造世界再行动"从一句口号，变成有合格判据的工序</div><div class="art-meta">王德生 著 · 德麦国际 · 约 1.2 万字 · 发表于 2026年7月18日 · 三种阅读模式</div><div class="brand-line"></div></header>
 <div class="modes"><div class="w">
@@ -401,9 +401,9 @@ function startPdf(){try{pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdnjs.cl
 function render(num){rendering=true;pdfDoc.getPage(num).then(function(page){var vp=page.getViewport({scale:scale});var ratio=window.devicePixelRatio||1;var cv=$('pcv'),cx=cv.getContext('2d');cv.width=vp.width*ratio;cv.height=vp.height*ratio;cv.style.width=vp.width+'px';cv.style.height=vp.height+'px';cx.setTransform(ratio,0,0,ratio,0,0);page.render({canvasContext:cx,viewport:vp}).promise.then(function(){rendering=false;if(pending!==null){var p=pending;pending=null;render(p);}});});$('pin').value=num;$('pv').disabled=(num<=1);$('nx').disabled=(num>=pdfDoc.numPages);}
 function queue(num){if(rendering){pending=num;}else{render(num);}}
 function go(n){if(!pdfDoc){return;}pageNum=Math.min(Math.max(1,n),pdfDoc.numPages);queue(pageNum);var st=document.querySelector('.rdr-stage');if(st){st.scrollIntoView({block:'nearest'});}}
-$('pv').onclick=function(){go(pageNum-1);};$('nx').onclick=function(){go(pageNum+1);};$('tL').onclick=function(){go(pageNum-1);};$('tR').onclick=function(){go(pageNum+1);};
-$('pin').onchange=function(e){go(parseInt(e.target.value)||1);};$('zi').onclick=function(){scale=Math.min(scale+0.2,3);queue(pageNum);};$('zo').onclick=function(){scale=Math.max(scale-0.2,0.6);queue(pageNum);};
-document.addEventListener('keydown',function(e){if(!$('pdf').classList.contains('on')){return;}if(e.key==='ArrowLeft'){go(pageNum-1);}if(e.key==='ArrowRight'){go(pageNum+1);}});
+var pv=$('pv'),nx=$('nx'),tL=$('tL'),tR=$('tR'),pin=$('pin'),zi=$('zi'),zo=$('zo');
+if(pv&&nx&&tL&&tR&&pin&&zi&&zo){pv.onclick=function(){go(pageNum-1);};nx.onclick=function(){go(pageNum+1);};tL.onclick=function(){go(pageNum-1);};tR.onclick=function(){go(pageNum+1);};pin.onchange=function(e){go(parseInt(e.target.value)||1);};zi.onclick=function(){scale=Math.min(scale+0.2,3);queue(pageNum);};zo.onclick=function(){scale=Math.max(scale-0.2,0.6);queue(pageNum);};}
+document.addEventListener('keydown',function(e){var pdf=$('pdf');if(!pdf||!pdf.classList.contains('on')){return;}if(e.key==='ArrowLeft'){go(pageNum-1);}if(e.key==='ArrowRight'){go(pageNum+1);}});
 </script>
 
 <!-- WDS 陪读浮层 -->
