@@ -85,25 +85,24 @@
   // 清缓存（每题开跑时调用，避免上一题的上下文串味）。
   function clear() { _cache = Object.create(null); }
 
-  // foundation：取全站【长期 100 条总原则 + 中期基本概念/流程/方法】——相对固定的骨架，不随单问变。
-  //  tiers = "long" / "mid" / "long,mid"（默认 long,mid）。会话内缓存（骨架不变，取一次即可）。
-  //  这是"RAG 三层"的中长期两层，与 ctx()/neighbors() 的短期召回互补：骨架垫底 + 当下召回叠上。
+  // foundation：三层「互相关联」下钻——顺着问题从长期总原则→中期条目→具体文章，把骨架+导航到的文章一起取回。
+  //  tiers = "long" / "mid" / "long,mid"（默认 long,mid）。传 q 让它按问题下钻；不传 q 则给通用骨架。
+  //  这是"RAG 三层链"的中长期入口，与 ctx()/neighbors() 的短期段落召回互补：骨架领航 + 短期补证。
   var _foundCache = Object.create(null);
-  async function foundation(tiers) {
+  async function foundation(q, tiers) {
     tiers = tiers || 'long,mid';
-    if (tiers in _foundCache) return _foundCache[tiers];
+    var ck = tiers + '|' + String(q || '');
+    if (ck in _foundCache) return _foundCache[ck];
     try {
       var r = await fetch(EP, {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        // 骨架不依赖具体问题，q 给个占位；短期召回仍可另调 ctx()。这里只要 tiers。
-        body: JSON.stringify({ q: 'SDE', k: 4, budget: 6, cap: 2000, tiers: tiers })
+        body: JSON.stringify({ q: String(q || 'SDE'), k: 8, budget: 6, cap: 3000, tiers: tiers })
       });
-      if (!r.ok) return (_foundCache[tiers] = '');
+      if (!r.ok) return (_foundCache[ck] = '');
       var j = await r.json();
-      // 只取骨架部分：block 里长期/中期在最前，短期在后。这里整体返回（骨架 + 少量短期无害）。
-      return (_foundCache[tiers] = (j && j.block) || '');
-    } catch (e) { return (_foundCache[tiers] = ''); }
+      return (_foundCache[ck] = (j && j.block) || '');
+    } catch (e) { return (_foundCache[ck] = ''); }
   }
 
   w.SDERag = { ctx: ctx, neighbors: neighbors, foundation: foundation, prepend: prepend, clear: clear, _fetch: _fetch };

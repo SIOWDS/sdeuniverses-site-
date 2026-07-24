@@ -849,15 +849,39 @@ let CORPUS_CHECKED = 0;
 const CORPUS_TTL = 30 * 1000; // 至多 30 秒对 manifest 复验一次；发新文后即使老 isolate 也能在半分钟内换上新语料
 let KB = null, KB_CHECKED = 0; // 九库结构化知识;复用 CORPUS_TTL 复验节奏,无 KB 时检索安全退回纯 chunk
 // PYRAMID — 全站 RAG 的长期/中期两层（build_kb_pyramid.py 沉淀，网站更新时点一次重建）：
-//   long.json ≈ 1 万字 100 条总原则；mid.json ≈ 2 万字基本概念/流程/方法。相对固定，缓存复用。
-let PYR = { long: null, mid: null, at: 0 };
+// PYRAMID — 全站 RAG 的三层「互相关联」导航：long.principles[].mids → mid.entries[].id → .docs[].u
+//   相对固定，build_kb_pyramid.py 沉淀，网站更新时点一次重建；缓存复用。
+let PYR = { long: null, mid: null, midById: null, at: 0 };
 async function loadPyramid(env, url) {
   const now = Date.now();
   if (PYR.at && now - PYR.at < CORPUS_TTL) return PYR;
-  PYR = { long: null, mid: null, at: now };
-  try { const r = await env.ASSETS.fetch(new Request(new URL("/kb/long.json", url))); if (r.ok) { const j = await r.json(); if (j && j.text) PYR.long = j.text; } } catch (e) {}
-  try { const r = await env.ASSETS.fetch(new Request(new URL("/kb/mid.json", url))); if (r.ok) { const j = await r.json(); if (j && j.text) PYR.mid = j.text; } } catch (e) {}
+  PYR = { long: null, mid: null, midById: null, at: now };
+  try { const r = await env.ASSETS.fetch(new Request(new URL("/kb/long.json", url))); if (r.ok) { const j = await r.json(); if (j && j.principles) PYR.long = j.principles; } } catch (e) {}
+  try {
+    const r = await env.ASSETS.fetch(new Request(new URL("/kb/mid.json", url)));
+    if (r.ok) { const j = await r.json(); if (j && j.entries) { PYR.mid = j.entries; PYR.midById = Object.create(null); for (const e of j.entries) PYR.midById[e.id] = e; } }
+  } catch (e) {}
   return PYR;
+}
+// 三层下钻：给一段问题，从长期原则里挑最相关的几条 → 顺 mids 进中期条目 → 顺 docs 落到文章。
+// 纯文本词重合打分（长期/中期都是相对固定的小结构，几十条，扫一遍很轻）。返回 {principles, mids, docs}。
+function pyramidDrill(pyr, q, opt) {
+  opt = opt || {};
+  const topP = opt.principles || 6, topM = opt.mids || 8, topD = opt.docs || 10;
+  const terms = String(q || "").toLowerCase().match(/[\u4e00-\u9fff]{2,}|[a-z]{3,}/g) || [];
+  const score = (txt) => { const s = String(txt || "").toLowerCase(); let n = 0; for (const t of terms) if (s.indexOf(t) >= 0) n++; return n; };
+  const outP = [], outMids = Object.create(null), outDocs = [], seenU = Object.create(null);
+  if (pyr.long && pyr.long.length) {
+    const ranked = pyr.long.map((p) => ({ p: p, sc: score(p.text) })).filter((x) => x.sc > 0).sort((a, b) => b.sc - a.sc).slice(0, topP);
+    for (const x of ranked) { outP.push(x.p); for (const mid of (x.p.mids || [])) outMids[mid] = (outMids[mid] || 0) + x.sc; }
+  }
+  // 中期：既收"长期钻下来的"，也直接按问题给中期条目补分（长期没连到、但中期本身相关的）
+  const midScored = [];
+  if (pyr.mid) for (const e of pyr.mid) { const direct = score(e.name) * 2 + score(e.def); const viaLong = outMids[e.id] || 0; const sc = direct + viaLong * 2; if (sc > 0) midScored.push({ e: e, sc: sc }); }
+  midScored.sort((a, b) => b.sc - a.sc);
+  const pickedMids = midScored.slice(0, topM).map((x) => x.e);
+  for (const e of pickedMids) for (const d of (e.docs || [])) { if (d.u && !seenU[d.u]) { seenU[d.u] = 1; outDocs.push({ u: d.u, t: d.t, via: e.name }); } }
+  return { principles: outP, mids: pickedMids, docs: outDocs.slice(0, topD) };
 }
 async function loadCorpus(env, url) {
   const now = Date.now();
@@ -2623,17 +2647,31 @@ export default {
         let chunkText = "";
         for (const ck of hits) { const d = corpus.docs[ck.d]; if (!d || seen[d.u]) continue; seen[d.u] = 1; srcs.push({ u: d.u, t: d.t }); chunkText += "【来源：" + d.t + "】\n" + ck.t + "\n\n"; if (chunkText.length > cap2) break; }
         const block = (kbBlock || chunkText) ? ("【SDE 全站知识（供作答时调用：来自 sdeuniverses.com 全站语料的结构化判断 + 原文片段；可印证可反驳，勿编造来源）】\n" + kbBlock + (kbBlock && chunkText ? "\n【全站原文片段】\n" : "") + chunkText) : "";
-        // TIERS — 可选前置长期/中期两层（相对固定的全站骨架）。client 传 tiers="long" / "long,mid" 才带；不传则只回短期（现状）。
+        // TIERS — 三层「互相关联」导航（可选）。client 传 tiers="long"/"mid"/"long,mid" 时，
+        //   从问题出发：长期原则→中期条目→具体文章 逐层下钻，把最相关的原则骨架＋导航到的文章一起前置。
+        //   不传则只回短期召回（现状不变）。骨架＋导航文章 = 让第三层文章被"顺着原则迅速找到"。
         let tiers = "";
         const wantTiers = String(b.tiers || "");
+        let navDocs = [];
         if (/long|mid/.test(wantTiers)) {
           try {
             const pyr = await loadPyramid(env, url);
-            if (/long/.test(wantTiers) && pyr.long) tiers += "【SDE 全站 · 长期骨架（100 条总原则总原理，最稳定的思想根基）】\n" + pyr.long + "\n\n";
-            if (/mid/.test(wantTiers) && pyr.mid) tiers += "【SDE 全站 · 中期手册（基本概念·基本流程·基本方法）】\n" + pyr.mid + "\n\n";
+            const drill = pyramidDrill(pyr, q, { principles: 6, mids: 8, docs: 10 });
+            if (/long/.test(wantTiers) && drill.principles.length) {
+              tiers += "【SDE 全站·长期骨架（顺着问题选出的总原则，最稳定的思想根基）】\n" + drill.principles.map((p) => (p.n ? (p.n + ". ") : "· ") + p.text).join("\n") + "\n\n";
+            }
+            if (/mid/.test(wantTiers) && drill.mids.length) {
+              tiers += "【SDE 全站·中期条目（这些原则对应的基本概念/方法）】\n" + drill.mids.map((e) => "· " + e.kind + "｜" + e.name + "：" + e.def).join("\n") + "\n\n";
+            }
+            if (drill.docs.length) {
+              navDocs = drill.docs;
+              tiers += "【顺着骨架找到的具体文章（长期→中期→文章 下钻结果，可直接读）】\n" + drill.docs.map((d) => "· " + d.t + "（" + d.u + "）").join("\n") + "\n\n";
+            }
           } catch (e) {}
         }
-        return Response.json({ block: tiers + block, srcs: srcs.slice(0, 10), n: srcs.length, hasLong: /long/.test(wantTiers) && !!(PYR && PYR.long), hasMid: /mid/.test(wantTiers) && !!(PYR && PYR.mid) }, { headers: _cors() });
+        // 把导航到的文章并入 srcs（去重），让前端"迅速进入第三层"
+        for (const d of navDocs) if (!seen[d.u]) { seen[d.u] = 1; srcs.push({ u: d.u, t: d.t }); }
+        return Response.json({ block: tiers + block, srcs: srcs.slice(0, 14), n: srcs.length, hasLong: /long/.test(wantTiers) && !!(PYR && PYR.long), hasMid: /mid/.test(wantTiers) && !!(PYR && PYR.mid), navDocs: navDocs.length }, { headers: _cors() });
       } catch (e) {
         return Response.json({ block: "", srcs: [], error: String(e && e.message) }, { headers: _cors() });
       }
