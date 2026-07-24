@@ -214,9 +214,7 @@ for dp, dns, fns in os.walk(PUB):
             if any(s in url for s in SKIP_URL_SUBSTR):
                 continue
             d = docs.setdefault(url, {"title": os.path.splitext(fn)[0], "section": section_of(rel), "html": "", "pdf": []})
-            # Resolve PDF text after the whole tree is scanned. Most article
-            # PDFs mirror a complete HTML paper and do not need parsing twice.
-            d["pdf"].append(full)
+            d["pdf"].append(pdf_text(full))
 
 # ---- 切块 + 去重（HTML 优先，PDF 补空缺）----
 manifest_docs = []
@@ -229,13 +227,6 @@ sec_stat = {}
 url_list = sorted(docs.keys())
 for idx, url in enumerate(url_list):
     d = docs[url]
-    pdf_paths = d["pdf"]
-    # Parse PDFs only when there is no HTML text. Every hosted paper/book PDF
-    # already has a canonical HTML page in this site; direct PDF-only assets are
-    # the only files that need binary extraction.
-    d["pdf"] = [
-        pdf_text(path) for path in pdf_paths
-    ] if not d["html"] else []
     seen = set()
     doc_chunks = []
     # HTML 先切、登记指纹
