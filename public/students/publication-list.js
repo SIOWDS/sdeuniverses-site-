@@ -24,10 +24,11 @@
       ".sde-pl-link:hover{color:var(--pl-gold);transform:translateX(3px)}" +
       ".sde-pl-num{font:700 12px/1.4 Georgia,\"Noto Serif SC\",serif;color:var(--pl-gold);letter-spacing:.05em;white-space:nowrap}" +
       ".sde-pl-copy{min-width:0}.sde-pl-name{display:block;font-size:15px;font-weight:700;line-height:1.55}" +
-      ".sde-pl-kind{display:block;margin-top:3px;color:var(--pl-muted);font-size:11px;line-height:1.45;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}" +
+      ".sde-pl-summary{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;margin-top:5px;color:var(--pl-muted);font-size:12.5px;line-height:1.7;letter-spacing:.015em}" +
+      ".sde-pl-kind{display:block;margin-top:5px;color:var(--pl-gold);font-size:10.5px;line-height:1.45;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:.78}" +
       ".sde-pl-arrow{font:18px/1 Georgia,serif;color:var(--pl-gold);text-align:right}" +
       ".sde-pl-empty{padding:28px 0;text-align:center;color:var(--pl-muted);font-size:14px}" +
-      "@media(max-width:600px){.sde-publication-list{padding:0 15px;margin-top:34px}.sde-pl-shell{padding:28px 18px 22px;border-radius:15px}.sde-pl-head{align-items:flex-start;flex-direction:column;gap:7px}.sde-pl-link{grid-template-columns:56px minmax(0,1fr) 16px;gap:8px}.sde-pl-kind{display:none}.sde-pl-list{max-height:620px}}";
+      "@media(max-width:600px){.sde-publication-list{padding:0 15px;margin-top:34px}.sde-pl-shell{padding:28px 18px 22px;border-radius:15px}.sde-pl-head{align-items:flex-start;flex-direction:column;gap:7px}.sde-pl-link{grid-template-columns:56px minmax(0,1fr) 16px;gap:8px}.sde-pl-kind{display:none}.sde-pl-summary{font-size:12px;line-height:1.65}.sde-pl-list{max-height:620px}}";
     document.head.appendChild(style);
   }
 
@@ -86,10 +87,14 @@
         var title = document.createElement("span");
         title.className = "sde-pl-name";
         title.textContent = item.title;
+        var summary = document.createElement("span");
+        summary.className = "sde-pl-summary";
+        summary.textContent = item.summary;
         var kind = document.createElement("span");
         kind.className = "sde-pl-kind";
         kind.textContent = item.kind;
         copy.appendChild(title);
+        copy.appendChild(summary);
         copy.appendChild(kind);
         var arrow = document.createElement("span");
         arrow.className = "sde-pl-arrow";
