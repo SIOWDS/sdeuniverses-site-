@@ -868,7 +868,13 @@ async function loadPyramid(env, url) {
 function pyramidDrill(pyr, q, opt) {
   opt = opt || {};
   const topP = opt.principles || 6, topM = opt.mids || 8, topD = opt.docs || 10;
-  const terms = String(q || "").toLowerCase().match(/[\u4e00-\u9fff]{2,}|[a-z]{3,}/g) || [];
+  const raw = String(q || "").toLowerCase();
+  const terms = [];
+  const enWords = raw.match(/[a-z]{3,}/g) || [];
+  for (const w of enWords) terms.push(w);
+  // 中文无空格：把每段连续汉字切成 2 字滑窗（bigram），才能与条目名/定义做子串命中
+  const cjkRuns = raw.match(/[\u4e00-\u9fff]{2,}/g) || [];
+  for (const run of cjkRuns) { for (let i = 0; i + 2 <= run.length; i++) terms.push(run.slice(i, i + 2)); }
   const score = (txt) => { const s = String(txt || "").toLowerCase(); let n = 0; for (const t of terms) if (s.indexOf(t) >= 0) n++; return n; };
   const outP = [], outMids = Object.create(null), outDocs = [], seenU = Object.create(null);
   if (pyr.long && pyr.long.length) {
