@@ -89,6 +89,139 @@ PAPERS = [
     },
 ]
 
+SUPPLEMENTS = {
+    "teaching-as-genesis": {
+        "sections": [
+            ("增补一：从“讲过”到“发生”的证据",
+             "SIO所说的“发生”，可以用课堂中可观察的变化来检验：学生是否提出了新的问题，是否能比较两条解释路径，是否能把概念迁移到陌生情境，是否能说明自己为何改变判断。Freeman等人汇总225项STEM课程研究后发现，主动学习总体上提高考试表现，并降低不及格风险。这并不意味着讲授无效，而是说明单向讲授若缺少提取、讨论、反馈和修正，知识呈现很难自动转化为学生的理解结构。"),
+            ("增补二：一个可复核的课堂案例",
+             "以“城市热岛”为例，教师先展示同一城市不同地表温度数据，不直接给出结论；学生提出解释并标注证据，随后比较“建筑密度”“植被覆盖”“测量时段”等变量。小组提交第一版模型后，教师用反例数据迫使其修订。最后评价的不只是答案，而是模型如何因证据而改变。这个过程对应S—I—O的连续回路：学生带着既有经验进入，对数据与他人解释展开互动，知识对象在修订中获得结构。"),
+        ],
+        "refs": [
+            ("Freeman, S., et al. (2014). Active learning increases student performance in science, engineering, and mathematics. PNAS, 111(23), 8410–8415.", "https://doi.org/10.1073/pnas.1319030111"),
+            ("Black, P., & Wiliam, D. (1998). Assessment and Classroom Learning. Assessment in Education, 5(1), 7–74.", "https://doi.org/10.1080/0969595980050102"),
+            ("Chi, M. T. H., & Wylie, R. (2014). The ICAP Framework. Educational Psychologist, 49(4), 219–243.", "https://doi.org/10.1080/00461520.2014.965823"),
+        ],
+    },
+    "gpt-learning-genesis": {
+        "sections": [
+            ("增补一：把GPT放在学习回路中，而不是答案终点",
+             "GPT最适合承担差异生成器、反例提供者和表达镜子，而不应代替学生作出最终判断。一个完整任务可以分为四步：学生先独立写出初始解释；再让GPT生成两个相互冲突的解释；学生查找来源、标注可证实与不可证实之处；最后提交修订稿和“判断变化记录”。这样，AI输出成为互动材料而非权威答案，学习证据也从成品扩展到问题、比较、核验和修订过程。"),
+            ("增补二：技术应用案例与安全边界",
+             "在历史课讨论工业革命时，学生可要求GPT分别模拟工厂主、童工家庭与公共卫生改革者的观点，再回到统计资料和一手史料核验。教师需要明确：不得上传个人敏感信息；模型生成的引文必须回到出版物核对；不同语言、地域和群体的偏差要被主动测试。UNESCO强调以人的能动性、年龄适宜性、数据保护和教学适切性为中心，这与SIO框架中“主体不能被工具替代”的边界一致。"),
+        ],
+        "refs": [
+            ("Kasneci, E., et al. (2023). ChatGPT for good? On opportunities and challenges of large language models for education. Learning and Individual Differences, 103, 102274.", "https://doi.org/10.1016/j.lindif.2023.102274"),
+            ("UNESCO. (2023). Guidance for Generative AI in Education and Research.", "https://unesdoc.unesco.org/ark:/48223/pf0000386693"),
+            ("Tlili, A., et al. (2023). What if the devil is my guardian angel: ChatGPT as a case study of using chatbots in education. Smart Learning Environments, 10, 15.", "https://doi.org/10.1186/s40561-023-00237-x"),
+        ],
+    },
+    "classroom-as-sio": {
+        "sections": [
+            ("增补一：三种失衡及其诊断",
+             "教师中心的风险不是教师说得多，而是学生没有留下可见的判断活动；学生中心的风险不是学生参与多，而是活动与知识对象脱节；技术中心的风险则是平台数据取代真实理解。诊断时可连续追问三件事：学生正在解释什么对象？互动是否迫使观点改变？最终作品是否保存了改变的证据？只要三者缺一，课堂就可能热闹却没有生成，或严谨却没有主体。"),
+            ("增补二：讲授也可以成为SIO",
+             "SIO并不排斥讲授。以牛顿第三定律为例，教师可用十分钟建立概念边界，随后让学生预测两辆不同质量小车碰撞时的受力关系；学生投票、解释，再观看传感器数据并修正。讲授提供对象结构，预测暴露主体模型，数据和同伴争论构成互动。ICAP框架区分被动、主动、建构和互动投入，为这种课堂层级提供了可比较的经验语言。"),
+        ],
+        "refs": [
+            ("Chi, M. T. H., & Wylie, R. (2014). The ICAP Framework. Educational Psychologist, 49(4), 219–243.", "https://doi.org/10.1080/00461520.2014.965823"),
+            ("Freeman, S., et al. (2014). Active learning increases student performance in STEM. PNAS, 111(23), 8410–8415.", "https://doi.org/10.1073/pnas.1319030111"),
+            ("Black, P., & Wiliam, D. (1998). Assessment and Classroom Learning. Assessment in Education, 5(1), 7–74.", "https://doi.org/10.1080/0969595980050102"),
+        ],
+    },
+    "exam-excellence-creativity": {
+        "sections": [
+            ("增补一：数据不支持“高分必然低创造”",
+             "PISA 2022首次大规模测量15岁学生的创造性思维，任务包括生成、评价和改进多样而原创的想法。结果显示，学业表现与创造性思维可以同时较高；一些教育系统在数学、阅读、科学与创造性思维上均表现突出。因此，本文应当批判的是单一路径和单一评价的长期挤压，而不是把高分学生贴上缺乏创造力的标签。更准确的命题是：当训练持续奖励唯一答案并惩罚试错时，路径依赖风险会上升。"),
+            ("增补二：把创造力纳入可操作评价",
+             "例如语文材料作文可保留基础论证分，同时增加“问题重构”“证据组合”“反方回应”三个维度；科学任务可要求学生提出两种实验方案，并说明各自误差来源。评分不奖励猎奇，而是评价想法是否原创且有效、能否根据反馈改进。这样的双轨评价既保留知识质量，也给差异路径留下制度空间。"),
+        ],
+        "refs": [
+            ("OECD. (2024). PISA 2022 Results (Volume III): Creative Minds, Creative Schools.", "https://doi.org/10.1787/765ee8c2-en"),
+            ("OECD. (2024). New PISA results on creative thinking: Can students think outside the box? PISA in Focus, No. 125.", "https://doi.org/10.1787/b3a46696-en"),
+            ("Amabile, T. M. (1982). Social psychology of creativity: A consensual assessment technique. Journal of Personality and Social Psychology, 43(5), 997–1013.", "https://doi.org/10.1037/0022-3514.43.5.997"),
+        ],
+    },
+    "scores-and-real-world-capability": {
+        "sections": [
+            ("增补一：成绩是证据之一，不是能力全貌",
+             "标准化考试擅长在统一条件下比较特定知识与推理表现，具有可比性和规模优势；它较难直接测量问题定义、长期协作、现实约束下的取舍和成果迭代。因而“高分低能”不宜成为人格判断，而应被改写为测量效度问题：某个分数究竟代表哪些能力，又遗漏了哪些能力？只有把测量对象说清楚，教育改革才不会从迷信分数转向反对一切考试。"),
+            ("增补二：多证据作品档案示例",
+             "一项校园节能任务可以同时产生四类证据：能源数据分析报告，面向校方的方案陈述，小组分工与冲突记录，以及实施后的效果复盘。教师使用公开量规评价知识准确性、问题界定、证据质量、协作和修订。阶段性测验仍用于诊断基础知识，但升学或课程评价不再由单次成绩独占。Black与Wiliam的研究提醒我们，反馈只有真正改变后续教学与学习活动时，才具有形成性意义。"),
+        ],
+        "refs": [
+            ("Black, P., & Wiliam, D. (1998). Assessment and Classroom Learning. Assessment in Education, 5(1), 7–74.", "https://doi.org/10.1080/0969595980050102"),
+            ("OECD. (2024). PISA 2022 Results (Volume III): Creative Minds, Creative Schools.", "https://doi.org/10.1787/765ee8c2-en"),
+            ("Bandura, A. (1977). Self-efficacy: Toward a unifying theory of behavioral change. Psychological Review, 84(2), 191–215.", "https://doi.org/10.1037/0033-295X.84.2.191"),
+        ],
+    },
+    "school-culture-meaning": {
+        "sections": [
+            ("增补一：学校文化存在于关系和制度细节中",
+             "文化不能只从校训和活动照片中判断。更可靠的观察点包括：教师能否公开讨论失败；学生申诉是否得到回应；家长意见如何进入决策；跨学科合作是否获得时间；评价与资源分配是否支持学校宣称的价值。Bryk与Schneider对芝加哥学校的长期研究把“关系信任”视为改进的重要资源，提示文化发生需要角色责任、尊重、能力判断与诚信在日常交换中被反复验证。"),
+            ("增补二：从口号到机制的改造案例",
+             "若学校倡导“创新”，可将其转化为三项机制：每学期设置跨学科真实问题项目；允许教师提交失败案例并获得同伴复盘；学生成果评价同时记录原创性与证据质量。管理层不预设统一作品，而是规定安全、伦理和学术底线。这样，价值不再只是墙上的名词，而成为可以被参与、质疑、选择和共同承担的组织过程。"),
+        ],
+        "refs": [
+            ("Bryk, A. S., & Schneider, B. (2002). Trust in Schools: A Core Resource for Improvement. Russell Sage Foundation.", "https://www.jstor.org/stable/10.7758/9781610440967"),
+            ("Spillane, J. P., Halverson, R., & Diamond, J. B. (2004). Towards a theory of leadership practice. Journal of Curriculum Studies, 36(1), 3–34.", "https://doi.org/10.1080/0022027032000106726"),
+            ("Schein, E. H., & Schein, P. A. (2017). Organizational Culture and Leadership (5th ed.). Wiley.", "https://www.wiley.com/en-us/Organizational+Culture+and+Leadership%2C+5th+Edition-p-9781119212041"),
+        ],
+    },
+    "generative-logic-thinking-aging": {
+        "sections": [
+            ("增补一：逻辑稳定与认知灵活性的区分",
+             "逻辑规则本身并不会造成思维老化；风险来自把特定规则误当作所有情境的唯一入口。认知科学通常把抑制控制、工作记忆和认知灵活性视为执行功能的重要组成。认知灵活性要求人在规则改变、证据冲突或目标转换时更新策略。由此，本文的“路径老化”可以被操作化为：面对反例仍重复旧分类，无法说明规则适用条件，或不能生成替代解释。"),
+            ("增补二：反事实与换框训练",
+             "课堂可采用“三次改写”练习：第一次按既有规则解决；第二次改变一个前提，要求判断原规则是否仍成立；第三次站在不同利益相关者角度重新定义问题。例如讨论城市限车，分别从通勤者、急救系统、商户和气候政策角度建立约束。目的不是否定逻辑，而是让学生看见逻辑依赖前提，并训练在保持论证一致性的同时更换框架。"),
+        ],
+        "refs": [
+            ("Diamond, A. (2013). Executive Functions. Annual Review of Psychology, 64, 135–168.", "https://doi.org/10.1146/annurev-psych-113011-143750"),
+            ("Kuhn, T. S. (1962). The Structure of Scientific Revolutions. University of Chicago Press.", "https://press.uchicago.edu/ucp/books/book/chicago/S/bo13179781.html"),
+            ("Miyake, A., et al. (2000). The unity and diversity of executive functions. Cognitive Psychology, 41(1), 49–100.", "https://doi.org/10.1006/cogp.1999.0734"),
+        ],
+    },
+    "knowledge-genesis-governance": {
+        "sections": [
+            ("增补一：权力分析必须与证据约束同时存在",
+             "知识治理既不能假定制度天然中立，也不能把一切结论都还原成权力效果。同行评议、数据开放、利益冲突披露和可重复性规范，正是把个人声望与证据质量适度分离的制度尝试。2015年开放科学协作项目对100项心理学研究进行重复，推动了关于方法透明、统计功效和发表偏差的持续改革。案例说明：知识共同体能够借助公开检验修订自身，而不是只能在权力结构中循环。"),
+            ("增补二：一个四权分离的治理模型",
+             "研究项目可分别记录问题提出者、数据保管者、分析者与成果发布者，避免同一角色垄断全部解释权；同时预注册关键假设，保存版本化数据与代码，允许合理期限后的复核。涉及地方性或原住民知识时，还必须尊重知识持有者的授权、利益分享和数据治理权。UNESCO开放科学建议把可及性、透明度、多元知识体系与负责任治理同时纳入制度设计。"),
+        ],
+        "refs": [
+            ("Open Science Collaboration. (2015). Estimating the reproducibility of psychological science. Science, 349(6251), aac4716.", "https://doi.org/10.1126/science.aac4716"),
+            ("UNESCO. (2021). Recommendation on Open Science.", "https://www.unesco.org/en/legal-affairs/recommendation-open-science"),
+            ("Merton, R. K. (1973 [1942]). The Normative Structure of Science. In The Sociology of Science. University of Chicago Press.", "https://press.uchicago.edu/ucp/books/book/chicago/S/bo28451565.html"),
+        ],
+    },
+    "gpt-chinese-education-three-worlds": {
+        "sections": [
+            ("增补一：三界重排的课程化表达",
+             "“自我—现实—理念”可以转化为一份课程设计检查表。自我维度要求学生说明立场、经验与判断变化；现实维度要求接触数据、制度约束和真实行动者；理念维度要求形成可讨论的概念、原则或模型。以“家乡河流治理”为例，学生记录个人经验，访谈居民并分析水质资料，再比较公共利益、成本与代际责任。GPT可协助整理访谈主题和生成反方问题，但事实核验与价值承担仍由人完成。"),
+            ("增补二：中华教育不是固定本质，而是开放实践",
+             "文化传统不应被简化成单一性格或文明标签。更可行的做法是把经典文本、地方知识、现代科学与全球议题放入可互证的学习任务中。学生既可解释《论语》中的“学与思”，也可比较认知科学关于提取练习的证据，并讨论二者是否真的对应。这样的课程把传统视为可再解释的资源，而非免于批评的答案，也避免让GPT替代跨语境理解。"),
+        ],
+        "refs": [
+            ("UNESCO. (2023). Guidance for Generative AI in Education and Research.", "https://unesdoc.unesco.org/ark:/48223/pf0000386693"),
+            ("OECD. (2019). OECD Learning Compass 2030.", "https://www.oecd.org/education/2030-project/teaching-and-learning/learning/"),
+            ("Kasneci, E., et al. (2023). ChatGPT for good? Learning and Individual Differences, 103, 102274.", "https://doi.org/10.1016/j.lindif.2023.102274"),
+        ],
+    },
+    "comfort-versus-happiness-education": {
+        "sections": [
+            ("增补一：挑战需要处在支持结构之中",
+             "教育不能把痛苦浪漫化。有效挑战必须同时满足安全、可理解、可选择和可获得支持四个条件。自我决定理论指出，自主、胜任与关系需要的满足与内在动机和福祉密切相关。因此，“不舒服”只有在学生理解任务意义、拥有一定选择、得到可用反馈并能逐步形成胜任感时，才可能转化为成长；羞辱、失控和长期过载只会损害学习。"),
+            ("增补二：安全—挑战—转化的课堂例子",
+             "写作课可以先允许学生在三个主题中选择一个，提交不计分草稿；同伴只按“最有力量的一处”“最需要证据的一处”反馈；学生据此重写，并附上一段修订说明。安全来自草稿不被公开羞辱，挑战来自必须回应真实读者，转化则体现在第二稿和反思中。幸福不是任务消失，而是学生看见自己能够处理原先无法处理的问题。"),
+        ],
+        "refs": [
+            ("Ryan, R. M., & Deci, E. L. (2000). Self-determination theory and the facilitation of intrinsic motivation, social development, and well-being. American Psychologist, 55(1), 68–78.", "https://doi.org/10.1037/0003-066X.55.1.68"),
+            ("Bandura, A. (1977). Self-efficacy: Toward a unifying theory of behavioral change. Psychological Review, 84(2), 191–215.", "https://doi.org/10.1037/0033-295X.84.2.191"),
+            ("Csikszentmihalyi, M. (1990). Flow: The Psychology of Optimal Experience. Harper & Row.", "https://www.worldcat.org/oclc/20220741"),
+        ],
+    },
+}
+
 REPLACEMENTS = {
     "**": "",
     "本书": "本文",
@@ -171,6 +304,11 @@ def clean_text(raw: str) -> list[tuple[str, str]]:
         if not title_seen:
             title_seen = True
             continue
+        # Source PDFs contain several broken or incomplete bibliography exports.
+        # Replace them with the independently verified bibliography above.
+        if line.startswith(("参考文献", "References")):
+            flush()
+            break
         if heading.match(line) and len(line) < 90:
             flush()
             level = "h2" if (
@@ -238,10 +376,33 @@ article{max-width:900px;margin:0 auto;padding:0 26px 80px;font-size:18px}
 article h2{font-size:30px;line-height:1.4;margin:58px 0 20px;padding-bottom:10px;border-bottom:1px solid var(--line);color:#193f50}
 article h3{font-size:22px;line-height:1.45;margin:38px 0 14px;color:#245c72}
 article p{margin:0 0 1.25em;text-align:justify}article ol{padding-left:1.5em;margin:0 0 1.5em}article li{margin:.55em 0}
+.supplement{margin:10px 0 58px;padding:34px;background:#fffaf0;border:1px solid var(--line);border-radius:14px}
+.supplement h2{margin-top:0}.supplement h3:first-of-type{margin-top:18px}
+.verified-refs{margin-top:34px;padding-top:22px;border-top:1px solid var(--line)}
+.verified-refs li{margin:.75em 0}.verified-refs a{overflow-wrap:anywhere}
 .footnav{display:flex;justify-content:space-between;gap:18px;border-top:1px solid var(--line);padding-top:28px;margin-top:60px;font-size:15px}
 footer{text-align:center;border-top:1px solid var(--line);padding:30px;color:var(--muted);font-size:13px}
 @media(max-width:700px){.top{padding:0 18px}.crumb{display:none}.hero{padding-top:48px}article{font-size:17px}.abstract{margin-left:18px;margin-right:18px}.position{margin-left:18px;margin-right:18px}article h2{font-size:26px}}
 """
+
+def supplement_html(paper):
+    supplement = SUPPLEMENTS[paper["slug"]]
+    sections = [
+        f"<h3>{html.escape(title)}</h3><p>{html.escape(text)}</p>"
+        for title, text in supplement["sections"]
+    ]
+    refs = [
+        f'<li>{html.escape(citation)} <a href="{html.escape(url)}" rel="noopener" target="_blank">核验链接 ↗</a></li>'
+        for citation, url in supplement["refs"]
+    ]
+    return (
+        '<section class="supplement"><h2>2026年增补：证据、案例与可检验边界</h2>'
+        + "".join(sections)
+        + '<div class="verified-refs"><h3>本次增补核验文献</h3><ol>'
+        + "".join(refs)
+        + "</ol><p><small>说明：以上条目已按出版社、期刊或国际组织页面核对；"
+        + "“核验链接”指向 DOI 或机构书目页。材料用于支持相关经验命题，不等于对SIO理论整体的实证证明。</small></p></div></section>"
+    )
 
 
 def page_html(paper, body, chars, prev_paper, next_paper):
@@ -264,7 +425,7 @@ def page_html(paper, body, chars, prev_paper, next_paper):
 <div class="meta">王德生 · SIO教育学修订文库 · 2026年7月24日 · 约 {chars:,} 汉字</div></header>
 <section class="abstract"><b>修订摘要</b><p>{html.escape(paper["abstract"])}</p></section>
 <aside class="position"><strong>学术定位：</strong>本文由早期SIO教育学文本整理、校订并重新发表。编辑工作统一了概念、清理了PDF断行与重复表达，并将绝对化判断改写为具有适用边界的理论命题。文中的解释框架属于建构性研究，不替代经验研究与独立复核。</aside>
-<article>{body}<div class="footnav">{prev_link}{next_link}</div></article>
+<article>{supplement_html(paper)}{body}<div class="footnav">{prev_link}{next_link}</div></article>
 <footer>© 德麦国际 Demai International · 教育专栏 · 王德生 · <a href="/">sdeuniverses.com</a></footer>
 </body></html>"""
 
