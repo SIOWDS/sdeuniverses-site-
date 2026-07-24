@@ -161,64 +161,98 @@
   var helloEl = $(".hello", msgs);   // 开场白：清空对话栏后原样放回
   var history = [], streaming = false, busy = false;
 
-  // ─── 滚动摘要记忆（替代"每轮带全场原文"）───────────────────────────
-  //  L1：每答一轮，后台用基底把该轮 Q→A 压成约 200 字，存 localStorage；
-  //  L2：每满 5 段 L1，把这 5 段(约1000字)再压成约 500 字，L1 清空；
-  //  每轮发问只送【L2 + 剩余 L1 摘要】+【最近 3 轮原文】+ 本轮问题，而非全场。
-  //  成文/《问对WDS》仍走 full history（另一个 fetch，见 buildPaperBody）。
-  var SUM = { conv: "", l1: [], l2: [] };
-  var SUM_SUMM = "/api/wds/summarize", SUM_RECENT = 3, SUM_FOLD = 5;
-  function sumKey() { return "sde_wds_dlg_sum"; }
-  function sumLoad() {
-    try { var s = JSON.parse(localStorage.getItem(sumKey()) || "null"); if (s && s.l1 && s.l2) SUM = s; } catch (e) {}
+  // ─── 三层记忆（短期原文 · 中期滚动摘要 · 长期核心观点）─────────────────
+  //  像人的记忆：合计 ~1万字以内就全用原文（第一次就是原文，不压缩）；超了才开始压。
+  //   · 短期：最近 SHORT_KEEP(=3) 轮原文，逐字，永远在最前。
+  //   · 中期：滚动摘要——超阈值时把"滑出短期的最早那轮"压成约 200 字，滚进中期；仍超就继续往前压。
+  //   · 长期：约 500 字的「10 条核心观点」，从全场沉淀，首次跨阈值时生成，之后每再滚 LONG_EVERY(=5) 轮才刷一次（缓慢更新、相对不动）。
+  //  发送次序：长期核心观点 → 中期滚动摘要 → 短期原文 → 本轮问题。
+  //  成文/《问对WDS》仍走 full history（另一个 fetch），写论文要细节。
+  var SUM_SUMM = "/api/wds/summarize";
+  var MEM_BUDGET = 10000;   // 三层合计的软上限（字符）；未超不压缩
+  var SHORT_KEEP = 3;       // 短期保留的原文轮数
+  var LONG_EVERY = 5;       // 长期核心观点每再滚这么多轮刷一次
+  // MEM.mid：中期摘要段数组；MEM.long：长期核心观点(字符串)；MEM.folded：已压进中期的"轮"数；MEM.longAt：上次刷长期时的 folded 值
+  var MEM = { mid: [], long: "", folded: 0, longAt: 0 };
+  function memKey() { return "sde_wds_dlg_mem"; }
+  function memLoad() { try { var s = JSON.parse(localStorage.getItem(memKey()) || "null"); if (s && s.mid) MEM = { mid: s.mid || [], long: s.long || "", folded: s.folded || 0, longAt: s.longAt || 0 }; } catch (e) {} }
+  function memSave() { try { localStorage.setItem(memKey(), JSON.stringify(MEM)); } catch (e) {} }
+  function sumReset() { MEM = { mid: [], long: "", folded: 0, longAt: 0 }; memSave(); }
+  // 把 history 切成"轮"：每轮 = {q, a}（reader 后跟 wds）
+  function asRounds() {
+    var rounds = [];
+    for (var i = 0; i < history.length; i++) {
+      if (history[i].role === "reader") {
+        var a = (history[i + 1] && history[i + 1].role === "wds") ? history[i + 1].text : "";
+        rounds.push({ q: history[i].text, a: a });
+      }
+    }
+    return rounds;
   }
-  function sumSave() { try { localStorage.setItem(sumKey(), JSON.stringify(SUM)); } catch (e) {} }
-  function sumReset() { SUM = { conv: "", l1: [], l2: [] }; sumSave(); }
-  // 供发问用：把滚动摘要拼成一段"此前记忆"文本（L2 在前、剩余 L1 在后）
-  function sumMemoryText() {
+  // 记忆文本：长期 + 中期，拼成一段"此前记忆"。短期原文另走 history 尾部。
+  function memText() {
     var parts = [];
-    if (SUM.l2.length) parts.push(SUM.l2.join("\n"));
-    if (SUM.l1.length) parts.push(SUM.l1.join("\n"));
-    return parts.join("\n").trim();
+    if (MEM.long) parts.push("【长期记忆 · 本场核心观点】\n" + MEM.long);
+    if (MEM.mid.length) parts.push("【中期记忆 · 较早对话的滚动摘要】\n" + MEM.mid.join("\n"));
+    return parts.join("\n\n").trim();
   }
-  // 压缩历史：一条合成的"记忆"消息(assistant) + 最近 SUM_RECENT 轮原文。发给答题端点。
+  // 估算合计字符：长期 + 中期 + 短期(未被压缩的原文轮)
+  function memTotalChars(rounds) {
+    var n = 0; n += MEM.long.length;
+    for (var i = 0; i < MEM.mid.length; i++) n += MEM.mid[i].length;
+    for (var j = MEM.folded; j < rounds.length; j++) n += (rounds[j].q || "").length + (rounds[j].a || "").length;
+    return n;
+  }
+  // 压缩历史：发给答题端点的 history。未超阈值→尽量全原文；超了→长期+中期(合成一条) + 最近 SHORT_KEEP 轮原文。
   function compactHistory() {
-    var mem = sumMemoryText();
+    var rounds = asRounds();
+    var mem = memText();
     var out = [];
-    if (mem) out.push({ role: "wds", text: "【此前对话的滚动记忆（我据此接着谈，不必你重复）】\n" + mem });
-    // 取最近 SUM_RECENT 轮（一轮 = reader+wds 两条，故取尾部 2*N 条）
-    var tail = history.slice(-SUM_RECENT * 2);
-    for (var i = 0; i < tail.length; i++) out.push(tail[i]);
+    if (mem) out.push({ role: "wds", text: mem });
+    // 短期原文：从"已压进中期之后"开始的所有轮。folded=0(未超阈值)→全原文；超阈值折叠后 folded 前移→只剩尾部原文（≥SHORT_KEEP 轮，由折叠时的 canFold 守住）
+    var startRaw = Math.min(MEM.folded, rounds.length);
+    var raw = rounds.slice(startRaw);
+    for (var i = 0; i < raw.length; i++) {
+      if (raw[i].q) out.push({ role: "reader", text: raw[i].q });
+      if (raw[i].a) out.push({ role: "wds", text: raw[i].a });
+    }
     return out;
   }
-  // 后台：把刚结束的这一轮 Q→A 压成 L1；满 5 段则再折成 L2。不阻塞 UI，失败静默。
-  function summarizeExchange(qText, aText) {
-    var kv = keyGet(); if (!kv || !qText || !aText) return;
-    var body = { mode: "l1", vendor: kv.vendor, key: kv.key, text: "读者问：" + qText + "\n\nWDS 答：" + aText };
-    fetch(SUM_SUMM, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) })
-      .then(function (r) { return r.json(); })
-      .then(function (j) {
-        if (!j || !j.summary) return;   // 摘要失败：这轮不进 L1，下次发问该轮仍在"最近3轮原文"里兜底
-        SUM.l1.push(j.summary); sumSave();
-        if (SUM.l1.length >= SUM_FOLD) foldL2();
-      })
-      .catch(function () {});
-  }
-  function foldL2() {
+  // 后台维护：答完一轮后调。只有合计超 MEM_BUDGET 时才把最早的未压轮滚进中期；够长则刷新长期核心观点。不阻塞 UI、失败静默。
+  function summarizeExchange() {
     var kv = keyGet(); if (!kv) return;
-    var five = SUM.l1.slice(0, SUM_FOLD);
-    var body = { mode: "l2", vendor: kv.vendor, key: kv.key, text: five.join("\n\n") };
-    fetch(SUM_SUMM, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) })
-      .then(function (r) { return r.json(); })
-      .then(function (j) {
-        if (!j || !j.summary) return;   // 折叠失败：保留这 5 段 L1，下轮再试折（不丢记忆）
-        SUM.l2.push(j.summary);
-        SUM.l1 = SUM.l1.slice(SUM_FOLD);
-        sumSave();
-      })
-      .catch(function () {});
+    var rounds = asRounds();
+    // 只要合计仍超阈值、且还有"短期之外的轮"可压，就把最早那轮压进中期（一次压一轮，逐步逼近阈值内）
+    function maybeFold() {
+      var rs = asRounds();
+      var canFold = (rs.length - MEM.folded) > SHORT_KEEP;   // 至少给短期留 SHORT_KEEP 轮原文
+      if (memTotalChars(rs) <= MEM_BUDGET || !canFold) { maybeRefreshLong(rs); return; }
+      var r = rs[MEM.folded];
+      var body = { mode: "l1", vendor: kv.vendor, key: kv.key, text: "读者问：" + (r.q || "") + "\n\nWDS 答：" + (r.a || "") };
+      fetch(SUM_SUMM, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) })
+        .then(function (x) { return x.json(); })
+        .then(function (j) {
+          if (!j || !j.summary) { maybeRefreshLong(asRounds()); return; }   // 压缩失败：该轮暂不折，仍在原文里兜底
+          MEM.mid.push(j.summary); MEM.folded++; memSave();
+          maybeFold();   // 可能仍超阈值，继续压下一轮
+        })
+        .catch(function () {});
+    }
+    // 长期核心观点：首次达到"够长"(folded>=LONG_EVERY 或中期已有量)时生成；之后每再滚 LONG_EVERY 轮刷一次
+    function maybeRefreshLong(rs) {
+      var due = (!MEM.long && MEM.folded >= LONG_EVERY) || (MEM.long && (MEM.folded - MEM.longAt) >= LONG_EVERY);
+      if (!due) return;
+      // 长期从全场沉淀：喂中期摘要 + 长期旧观点，让它提炼/更新 10 条核心观点
+      var feed = (MEM.long ? ("已有核心观点：\n" + MEM.long + "\n\n") : "") + "对话滚动摘要：\n" + MEM.mid.join("\n");
+      var body = { mode: "long", vendor: kv.vendor, key: kv.key, text: feed };
+      fetch(SUM_SUMM, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) })
+        .then(function (x) { return x.json(); })
+        .then(function (j) { if (j && j.summary) { MEM.long = j.summary; MEM.longAt = MEM.folded; memSave(); } })
+        .catch(function () {});
+    }
+    maybeFold();
   }
-  sumLoad();
+  memLoad();
 
   // —— Key：本智能体自己的界面与存取；键名沿用全站 BYOK 规范（sde_wds_key/vendor），空则借 sde_ds_key / sde_glm_key ——
   function keyGet() {
@@ -517,7 +551,7 @@
                 }
                 bubble.parentNode.appendChild(sb); msgs.scrollTop = msgs.scrollHeight;
               }
-              if (answer) { history.push({ role: "wds", text: answer }); summarizeExchange(q, answer); }
+              if (answer) { history.push({ role: "wds", text: answer }); summarizeExchange(); }
               else if (!diag.bytes || !diag.sawEnd) {   // CUT_FALLBACK：0 字节、或流被中途切断（没收到结束标记）——都改用不流式再取一次
                 // NOSTREAM_FALLBACK：一个字节都没收到＝流被中间层/浏览器吃掉了，不是没生成。
                 // 改用不流式的取法（整份读回来再按同一套 SSE 文本解析），拿得到就照常显示。
@@ -533,7 +567,7 @@
                       try { var jj = JSON.parse(q2); if (jj.t === "token") ans += jj.v || ""; else if (jj.t === "error") err = jj.v || ""; } catch (e) {}
                     }
                     bubble.classList.remove("stream");
-                    if (ans) { bubble.textContent = ans; history.push({ role: "wds", text: ans }); summarizeExchange(q, ans); }
+                    if (ans) { bubble.textContent = ans; history.push({ role: "wds", text: ans }); summarizeExchange(); }
                     else {
                       bubble.classList.add("err");
                       bubble.textContent = "\u6ca1\u6536\u5230\u56de\u7b54\u3002\u3010\u8bca\u65ad\u3011\u6d41\u5f0f 0 \u5b57\u8282\uff08HTTP " + diag.status + "\uff09\uff1b\u4e0d\u6d41\u5f0f\u91cd\u53d6 HTTP " + o.st + "\u3001\u6536\u5230 " + String(o.t || "").length + " \u5b57\u8282" + (err ? ("\uff1b\u57fa\u5e95\u8bf4\uff1a" + err) : "") + (diag.lastNote ? ("\uff1b\u63d0\u793a\uff1a" + diag.lastNote) : "") + "\u3002\u628a\u8fd9\u884c\u622a\u56fe\u7ed9\u6211\u3002";
