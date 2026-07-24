@@ -11,7 +11,8 @@ body{background:var(--bg);color:var(--paper);font-family:"Songti SC","Noto Serif
 a{color:var(--gold);text-decoration:none}
 .readbar{position:sticky;top:0;z-index:20;background:rgba(233,243,225,0.96);backdrop-filter:blur(8px);border-bottom:1px solid rgba(62,125,80,0.22);display:flex;align-items:center;justify-content:space-between;padding:11px 20px;gap:12px;flex-wrap:wrap}
 .readbar .nav-back{color:var(--muted);font-size:13px;letter-spacing:0.04em}
-.rb-modes{display:flex;gap:8px;flex-wrap:wrap}
+.rb-modes{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.rb-label{font-size:12px;color:#B8A77B;letter-spacing:.12em;margin-right:2px;white-space:nowrap}
 .rb-btn{font-size:13px;padding:6px 14px;border-radius:3px;border:1px solid rgba(62,125,80,0.4);color:var(--gold);letter-spacing:0.03em}
 .rb-btn.cur{background:var(--gold);color:var(--ink);font-weight:700;border-color:var(--gold)}
 .art{max-width:760px;margin:0 auto;padding:56px 24px 20px;text-align:center}
@@ -68,7 +69,8 @@ footer a{color:var(--gold)}
 <body class="zh">
 <div class="readbar">
   <a class="nav-back" href="/students/zhang-qiong/works/">‹ 张琼 · 全部作品</a>
-  <div class="rb-modes">
+  <div class="rb-modes" aria-label="三种阅读方式">
+    <span class="rb-label">三种阅读方式</span>
     <span class="rb-btn cur">📖 长文阅读</span>
     <a class="rb-btn" href="read.html">📄 在线 PDF</a>
     <a class="rb-btn" href="paper-p16-d01-a04.pdf" download>⬇ 下载</a>
