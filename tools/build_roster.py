@@ -36,7 +36,7 @@ STUDENTS = os.path.join(ROOT, 'public', 'students')
 ROSTER = os.path.join(STUDENTS, 'roster.json')
 
 # 索引页约定名：这些目录是"目录页"，不是作品本身
-INDEX_NAMES = {'works', 'submit'}
+INDEX_NAMES = {'works', 'submit', 'starter-template'}
 
 # 页面骨架：这些标签/类下的文字不算正文字数
 SKIP_TAGS = {'script', 'style', 'nav', 'footer', 'head'}
@@ -106,18 +106,40 @@ def is_leaf_item(d):
 def find_items(slug_dir):
     """返回该学员的全部作品目录（递归，跳过索引页约定名）。"""
     out = []
+
+    def walk(d):
+        idx = os.path.join(d, 'index.html')
+        children = [
+            os.path.join(d, name)
+            for name in sorted(os.listdir(d))
+            if name not in INDEX_NAMES and os.path.isdir(os.path.join(d, name))
+        ]
+        indexed_children = [
+            child for child in children
+            if os.path.exists(os.path.join(child, 'index.html'))
+        ]
+
+        if os.path.exists(idx):
+            if not indexed_children:
+                out.append(d)
+            else:
+                # A published paper may also contain application sub-papers.
+                # Count the parent when it carries an article signature; plain
+                # collection pages (for example essays/ and poems/) stay excluded.
+                source = open(idx, encoding='utf-8').read()
+                if (
+                    'sde-submission-id' in source
+                    or re.search(r'class=["\'][^"\']*\breadbar\b', source)
+                ):
+                    out.append(d)
+
+        for child in children:
+            walk(child)
+
     for name in sorted(os.listdir(slug_dir)):
         d = os.path.join(slug_dir, name)
-        if not os.path.isdir(d) or name in INDEX_NAMES:
-            continue
-        if is_leaf_item(d):
-            out.append(d)
-        else:
-            # 合集容器（如 qin-li/essays、qin-li/poems）：下潜一层
-            for sub in sorted(os.listdir(d)):
-                sd = os.path.join(d, sub)
-                if os.path.isdir(sd) and sub not in INDEX_NAMES and is_leaf_item(sd):
-                    out.append(sd)
+        if os.path.isdir(d) and name not in INDEX_NAMES:
+            walk(d)
     return out
 
 
@@ -194,7 +216,7 @@ if __name__ == '__main__':
     if '--check' in sys.argv:
         cur = open(ROSTER, encoding='utf-8').read()
         if cur == text:
-            print('roster.json 与磁盘一致 ✅')
+            print('[OK] roster.json 与磁盘一致')
             sys.exit(0)
         print('roster.json 与磁盘不一致 ❌ —— 请运行 python3 tools/build_roster.py', file=sys.stderr)
         old = json.load(open(ROSTER, encoding='utf-8'))

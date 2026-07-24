@@ -70,7 +70,7 @@ def _check_stale():
 
     print("manifest 构建于 %s · 收录 %d 篇 · 磁盘 %d 篇" % (m.get("built", "?"), len(have), len(want)))
     if not missing and not stale:
-        print("索引与磁盘一致 ✅")
+        print("[OK] 索引与磁盘一致")
         return 0
     if missing:
         print("\n❌ 已发布但搜不到（%d 篇）：" % len(missing), file=sys.stderr)
@@ -131,6 +131,16 @@ def pdf_text(path):
     try:
         r = subprocess.run(["pdftotext", "-nopgbrk", path, "-"], capture_output=True, timeout=180)
         return clean_text(r.stdout.decode("utf-8", "ignore"))
+    except FileNotFoundError:
+        # The desktop/runtime bundle does not always ship the Poppler CLI.
+        # Keep PDF indexing complete by falling back to the bundled pypdf.
+        try:
+            from pypdf import PdfReader
+            reader = PdfReader(path)
+            return clean_text("\n".join(page.extract_text() or "" for page in reader.pages))
+        except Exception as e:
+            print("  ! pdf fail:", path, e, file=sys.stderr)
+            return ""
     except Exception as e:
         print("  ! pdf fail:", path, e, file=sys.stderr)
         return ""
@@ -204,7 +214,9 @@ for dp, dns, fns in os.walk(PUB):
             if any(s in url for s in SKIP_URL_SUBSTR):
                 continue
             d = docs.setdefault(url, {"title": os.path.splitext(fn)[0], "section": section_of(rel), "html": "", "pdf": []})
-            d["pdf"].append(pdf_text(full))
+            # Resolve PDF text after the whole tree is scanned. Most article
+            # PDFs mirror a complete HTML paper and do not need parsing twice.
+            d["pdf"].append(full)
 
 # ---- 切块 + 去重（HTML 优先，PDF 补空缺）----
 manifest_docs = []
@@ -217,6 +229,13 @@ sec_stat = {}
 url_list = sorted(docs.keys())
 for idx, url in enumerate(url_list):
     d = docs[url]
+    pdf_paths = d["pdf"]
+    # Parse PDFs only when there is no HTML text. Every hosted paper/book PDF
+    # already has a canonical HTML page in this site; direct PDF-only assets are
+    # the only files that need binary extraction.
+    d["pdf"] = [
+        pdf_text(path) for path in pdf_paths
+    ] if not d["html"] else []
     seen = set()
     doc_chunks = []
     # HTML 先切、登记指纹

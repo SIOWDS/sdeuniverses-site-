@@ -370,14 +370,14 @@ FILEMAP = {"concept":"concepts","proposition":"propositions","theory":"theories"
 # 二、加载真实语料 → docIdx -> 全文本(用于回链)
 # ============================================================================
 def load_corpus():
-    man = json.load(open(os.path.join(SEARCH, "manifest.json")))
+    man = json.load(open(os.path.join(SEARCH, "manifest.json"), encoding="utf-8"))
     docs = man["docs"]                       # [{i,u,t,s}]
     text_by_doc = {}                         # docIdx -> concat text
     for sec in man["sections"]:
         for f in sec.get("files", [sec["key"]]):
             p = os.path.join(SEARCH, "shard-%s.json" % f)
             if not os.path.exists(p): continue
-            sh = json.load(open(p))
+            sh = json.load(open(p, encoding="utf-8"))
             for c in sh.get("chunks", []):
                 d = c.get("d"); t = c.get("t") or ""
                 if d is None: continue
@@ -501,18 +501,18 @@ def main():
 
     os.makedirs(KBDIR, exist_ok=True)
     for fname, arr in out_files.items():
-        json.dump(arr, open(os.path.join(KBDIR, fname + ".json"), "w"),
+        json.dump(arr, open(os.path.join(KBDIR, fname + ".json"), "w", encoding="utf-8"),
                   ensure_ascii=False, separators=(",", ":"))
-    json.dump(index, open(os.path.join(KBDIR, "kb-index.json"), "w"),
+    json.dump(index, open(os.path.join(KBDIR, "kb-index.json"), "w", encoding="utf-8"),
               ensure_ascii=False, separators=(",", ":"))
     kbman = {"built": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
              "corpus_built": man["built"], "ndocs": ndocs,
              "entities": n_entities, "index_terms": len(index),
              "backlinks": total_backlinks, "libraries": manifest_libs,
              "phase": "A-spine", "note": "canon 脊梁;命题/证据/案例待 Phase B BYOK 挖掘合并"}
-    json.dump(kbman, open(os.path.join(KBDIR, "kb-manifest.json"), "w"),
+    json.dump(kbman, open(os.path.join(KBDIR, "kb-manifest.json"), "w", encoding="utf-8"),
               ensure_ascii=False, indent=1)
-    print("\n✅ 已写 public/kb/ : 9 库 + kb-index.json + kb-manifest.json")
+    print("\n[OK] 已写 public/kb/ : 9 库 + kb-index.json + kb-manifest.json")
 
 if __name__ == "__main__":
     main()
