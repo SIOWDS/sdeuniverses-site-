@@ -1783,6 +1783,32 @@ export default {
       }
       return Response.json({ ok: false, msg: "bad mode" }, { status: 400 });
     }
+    // ROLLING_SUMMARY — /api/wds/summarize：把对话滚动摘要化，替代"每轮带全场原文"。
+    //   mode=l1：把最近一轮问答(Q→A)压成约 200 字要点摘要；
+    //   mode=l2：把 5 段 l1 摘要(约1000字)再压成约 500 字的合并摘要。
+    //   纯 BYOK、非流式、单次 llmText 调用；失败返回空串（前端退回带原文，不影响可用）。
+    if (url.pathname === "/api/wds/summarize") {
+      if (request.method === "OPTIONS") return new Response(null, { headers: _cors() });
+      if (request.method !== "POST") return new Response("Method Not Allowed", { status: 405 });
+      let b = {}; try { b = await request.json(); } catch (e) {}
+      const J = (o, st) => Response.json(o, { status: st || 200, headers: _cors() });
+      const vd = b.vendor === "ds" ? "deepseek" : "zhipu";
+      const VC = { url: WDS_VENDORS[vd].url, model: WDS_VENDORS[vd].model, name: WDS_VENDORS[vd].name };
+      const KEY = String(b.key || "").trim();
+      if (KEY.length < 8) return J({ ok: false, summary: "" }, 200);
+      const mode = b.mode === "l2" ? "l2" : "l1";
+      const text = String(b.text || "").slice(0, 20000);
+      if (!text.trim()) return J({ ok: false, summary: "" }, 200);
+      const sys = mode === "l2"
+        ? "你在为一场持续对话维护滚动记忆。下面是 5 段更早的对话小结（每段约 200 字）。把它们合并压缩成一段约 500 字的连续记忆，保留：谈过的核心问题、已达成的关键判断与命名、还悬着的分歧或待续线索；丢掉寒暄与重复。只输出这段合并摘要本身，用连贯中文，不要分点、不要前言、不要提\"摘要\"二字。"
+        : "你在为一场持续对话维护滚动记忆。下面是最近一轮的问答。把它压成约 200 字的要点小结，保留：读者问的核心、WDS 给出的关键判断与新命名、以及留下的追问或悬念；丢掉客套与铺陈。只输出这段小结本身，用连贯中文，不要分点、不要前言、不要提\"摘要\"二字。";
+      try {
+        const out = await llmText(VC, KEY, sys, text, mode === "l2" ? 900 : 500);
+        return J({ ok: !!out, summary: String(out || "").trim() });
+      } catch (e) {
+        return J({ ok: false, summary: "" }, 200);
+      }
+    }
     // RAG_SUBREQUEST — /api/wds/rag：把「全站检索」从答题请求里拆出来，单独跑一次。
     // 冷启动时这一步要把全站索引（十几兆 JSON、上百个分片）装进内存，很吃 CPU；和答题挤在同一个
     // 请求里，会被平台按单请求 CPU 上限直接掐死——表现就是"流刚开就断、连来源都没发出来、只收到心跳"。
