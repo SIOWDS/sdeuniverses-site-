@@ -848,6 +848,17 @@ let CORPUS = null; // 模块级缓存：isolate 内复用，避免每次问答�
 let CORPUS_CHECKED = 0;
 const CORPUS_TTL = 30 * 1000; // 至多 30 秒对 manifest 复验一次；发新文后即使老 isolate 也能在半分钟内换上新语料
 let KB = null, KB_CHECKED = 0; // 九库结构化知识;复用 CORPUS_TTL 复验节奏,无 KB 时检索安全退回纯 chunk
+// PYRAMID — 全站 RAG 的长期/中期两层（build_kb_pyramid.py 沉淀，网站更新时点一次重建）：
+//   long.json ≈ 1 万字 100 条总原则；mid.json ≈ 2 万字基本概念/流程/方法。相对固定，缓存复用。
+let PYR = { long: null, mid: null, at: 0 };
+async function loadPyramid(env, url) {
+  const now = Date.now();
+  if (PYR.at && now - PYR.at < CORPUS_TTL) return PYR;
+  PYR = { long: null, mid: null, at: now };
+  try { const r = await env.ASSETS.fetch(new Request(new URL("/kb/long.json", url))); if (r.ok) { const j = await r.json(); if (j && j.text) PYR.long = j.text; } } catch (e) {}
+  try { const r = await env.ASSETS.fetch(new Request(new URL("/kb/mid.json", url))); if (r.ok) { const j = await r.json(); if (j && j.text) PYR.mid = j.text; } } catch (e) {}
+  return PYR;
+}
 async function loadCorpus(env, url) {
   const now = Date.now();
   if (CORPUS && now - CORPUS_CHECKED < CORPUS_TTL) return CORPUS;
@@ -2612,7 +2623,17 @@ export default {
         let chunkText = "";
         for (const ck of hits) { const d = corpus.docs[ck.d]; if (!d || seen[d.u]) continue; seen[d.u] = 1; srcs.push({ u: d.u, t: d.t }); chunkText += "【来源：" + d.t + "】\n" + ck.t + "\n\n"; if (chunkText.length > cap2) break; }
         const block = (kbBlock || chunkText) ? ("【SDE 全站知识（供作答时调用：来自 sdeuniverses.com 全站语料的结构化判断 + 原文片段；可印证可反驳，勿编造来源）】\n" + kbBlock + (kbBlock && chunkText ? "\n【全站原文片段】\n" : "") + chunkText) : "";
-        return Response.json({ block: block, srcs: srcs.slice(0, 10), n: srcs.length }, { headers: _cors() });
+        // TIERS — 可选前置长期/中期两层（相对固定的全站骨架）。client 传 tiers="long" / "long,mid" 才带；不传则只回短期（现状）。
+        let tiers = "";
+        const wantTiers = String(b.tiers || "");
+        if (/long|mid/.test(wantTiers)) {
+          try {
+            const pyr = await loadPyramid(env, url);
+            if (/long/.test(wantTiers) && pyr.long) tiers += "【SDE 全站 · 长期骨架（100 条总原则总原理，最稳定的思想根基）】\n" + pyr.long + "\n\n";
+            if (/mid/.test(wantTiers) && pyr.mid) tiers += "【SDE 全站 · 中期手册（基本概念·基本流程·基本方法）】\n" + pyr.mid + "\n\n";
+          } catch (e) {}
+        }
+        return Response.json({ block: tiers + block, srcs: srcs.slice(0, 10), n: srcs.length, hasLong: /long/.test(wantTiers) && !!(PYR && PYR.long), hasMid: /mid/.test(wantTiers) && !!(PYR && PYR.mid) }, { headers: _cors() });
       } catch (e) {
         return Response.json({ block: "", srcs: [], error: String(e && e.message) }, { headers: _cors() });
       }
