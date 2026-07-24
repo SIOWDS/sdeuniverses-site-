@@ -205,7 +205,7 @@
     return section;
   }
 
-  fetch("/students/publications.json")
+  fetch("/students/publications.json?v=20260724-3")
     .then(function (response) {
       if (!response.ok) throw new Error("Publication data unavailable");
       return response.json();
