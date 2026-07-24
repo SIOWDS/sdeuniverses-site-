@@ -163,14 +163,14 @@
 
   // ─── 三层记忆（短期原文 · 中期滚动摘要 · 长期核心观点）─────────────────
   //  像人的记忆：合计 ~1万字以内就全用原文（第一次就是原文，不压缩）；超了才开始压。
-  //   · 短期：最近 SHORT_KEEP(=3) 轮原文，逐字，永远在最前。
+  //   · 短期：尽量多的最近原文，逐字，永远在最前——只受 1 万字上限约束，不是固定 3 轮。
   //   · 中期：滚动摘要——超阈值时把"滑出短期的最早那轮"压成约 200 字，滚进中期；仍超就继续往前压。
   //   · 长期：约 500 字的「10 条核心观点」，从全场沉淀，首次跨阈值时生成，之后每再滚 LONG_EVERY(=5) 轮才刷一次（缓慢更新、相对不动）。
   //  发送次序：长期核心观点 → 中期滚动摘要 → 短期原文 → 本轮问题。
   //  成文/《问对WDS》仍走 full history（另一个 fetch），写论文要细节。
   var SUM_SUMM = "/api/wds/summarize";
-  var MEM_BUDGET = 10000;   // 三层合计的软上限（字符）；未超不压缩
-  var SHORT_KEEP = 3;       // 短期保留的原文轮数
+  var MEM_BUDGET = 10000;   // 三层合计的软上限（字符）；未超不压缩，短期尽量多留原文
+  var SHORT_MIN = 2;        // 短期原文的安全下限——正常由 1 万字上限决定留多少轮，这里只保证极端情况下(单轮极长)至少留最近这么多轮逐字
   var LONG_EVERY = 5;       // 长期核心观点每再滚这么多轮刷一次
   // MEM.mid：中期摘要段数组；MEM.long：长期核心观点(字符串)；MEM.folded：已压进中期的"轮"数；MEM.longAt：上次刷长期时的 folded 值
   var MEM = { mid: [], long: "", folded: 0, longAt: 0 };
@@ -203,13 +203,13 @@
     for (var j = MEM.folded; j < rounds.length; j++) n += (rounds[j].q || "").length + (rounds[j].a || "").length;
     return n;
   }
-  // 压缩历史：发给答题端点的 history。未超阈值→尽量全原文；超了→长期+中期(合成一条) + 最近 SHORT_KEEP 轮原文。
+  // 压缩历史：发给答题端点的 history。未超阈值→尽量全原文；超了→长期+中期(合成一条) + 尽量多的最近原文(受1万字上限)。
   function compactHistory() {
     var rounds = asRounds();
     var mem = memText();
     var out = [];
     if (mem) out.push({ role: "wds", text: mem });
-    // 短期原文：从"已压进中期之后"开始的所有轮。folded=0(未超阈值)→全原文；超阈值折叠后 folded 前移→只剩尾部原文（≥SHORT_KEEP 轮，由折叠时的 canFold 守住）
+    // 短期原文：从"已压进中期之后"开始的所有轮。folded=0(未超阈值)→全原文；超阈值折叠后 folded 前移→只剩尾部原文（短期尽量多留，只在超阈值时才往前压，且至少留 SHORT_MIN 轮）
     var startRaw = Math.min(MEM.folded, rounds.length);
     var raw = rounds.slice(startRaw);
     for (var i = 0; i < raw.length; i++) {
@@ -225,7 +225,7 @@
     // 只要合计仍超阈值、且还有"短期之外的轮"可压，就把最早那轮压进中期（一次压一轮，逐步逼近阈值内）
     function maybeFold() {
       var rs = asRounds();
-      var canFold = (rs.length - MEM.folded) > SHORT_KEEP;   // 至少给短期留 SHORT_KEEP 轮原文
+      var canFold = (rs.length - MEM.folded) > SHORT_MIN;   // 安全下限：至少给短期留 SHORT_MIN 轮原文；正常是"压到合计≤1万就停"，能留多少留多少
       if (memTotalChars(rs) <= MEM_BUDGET || !canFold) { maybeRefreshLong(rs); return; }
       var r = rs[MEM.folded];
       var body = { mode: "l1", vendor: kv.vendor, key: kv.key, text: "读者问：" + (r.q || "") + "\n\nWDS 答：" + (r.a || "") };
