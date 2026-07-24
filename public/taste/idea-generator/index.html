@@ -131,6 +131,7 @@ footer{border-top:1px solid var(--border);text-align:center;padding:30px 20px 44
 <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script src="/taste/assets/sde-rag.js?v=1"></script>
 </head>
 <body>
 
@@ -1686,12 +1687,13 @@ async function getSharedReflection(writeSel, writeKey, onProgress){
   return await _sharedReflection.promise;
 }
 // 二次提智的输入 = 第一批那篇论文全文
-function buildUpliftInput(paperText){
-  return '【待提升的论文全文（第一批·资深学者水平）】\\n\\n' + (paperText||'').trim() + '\\n\\n请对这篇论文执行"发生引擎"二次提升工序，输出以一个从矛盾里结算出来的、不可还原的新命名为核心的完整论文。';
+function buildUpliftInput(paperText, ragCtx){
+  const s = '【待提升的论文全文（第一批·资深学者水平）】\\n\\n' + (paperText||'').trim() + '\\n\\n请对这篇论文执行"发生引擎"二次提升工序，输出以一个从矛盾里结算出来的、不可还原的新命名为核心的完整论文。';
+  return (window.SDERag ? window.SDERag.prepend(ragCtx, s) : s);
 }
 
 // 单个金点子 → 论文写作输入（核心论点 = 这个金点子；其余两个金点子作为可参考的邻近洞察）
-function buildSingleIdeaInput(rows, idx, question){
+function buildSingleIdeaInput(rows, idx, question, ragCtx){
   const marks=['①','②','③'];
   const me = rows[idx] || {};
   let s = '【研究的原初问题】\n' + question + '\n\n';
@@ -1702,25 +1704,25 @@ function buildSingleIdeaInput(rows, idx, question){
     others.forEach(x=>{ s += '\n──── 金点子' + marks[x.i] + '（' + (x.r.view||('视角'+(x.i+1))) + '）────\n' + (x.r.sde||'').trim() + '\n'; });
   }
   s += '\n请把上面标为"核心论点"的那一个金点子，扩写成一篇约一万字的正式学术论文。';
-  return s;
+  return (window.SDERag ? window.SDERag.prepend(ragCtx, s) : s);
 }
 
 // 新典范 → 1万字论文写作输入
-function buildParadigmInput1w(rows, question, emergeText){
+function buildParadigmInput1w(rows, question, emergeText, ragCtx){
   let s = '【研究的原初问题】\n' + question + '\n\n';
   s += '【本篇论文的核心论点：二阶涌现产出的新典范——一个被命名的新结构，连同它的碰撞过程、暗流、五重检验与跨学科地图】\n\n' + (emergeText||'').trim() + '\n\n';
   s += '【三个金点子原文，供你在论文中调用其中的洞察与论证素材】\n';
   (rows||[]).forEach((r,i)=>{ s += '\n──── 金点子' + ['①','②','③'][i] + '（' + (r.view||('视角'+(i+1))) + '）────\n' + (r.sde||'').trim() + '\n'; });
   s += '\n请把上述新典范扩写成一篇约一万字的正式学术论文。';
-  return s;
+  return (window.SDERag ? window.SDERag.prepend(ragCtx, s) : s);
 }
 // 把三篇 SDE 金点子拼成涌现的输入
-function buildEmergeInput(rows, question){
+function buildEmergeInput(rows, question, ragCtx){
   let s = '用户最初的问题是：' + question + '\n\n下面是从三个不同角度追问出来的三个金点子（三篇小论文）。请对它们执行三阶涌现工程。\n';
   rows.forEach((r,i)=>{
     s += '\n════ 金点子' + ['①','②','③'][i] + '（' + (r.view||('视角'+(i+1))) + '）════\n' + (r.sde||'').trim() + '\n';
   });
-  return s;
+  return (window.SDERag ? window.SDERag.prepend(ragCtx, s) : s);
 }
 
 const PLAIN_SYSTEM = `你是一个乐于助人、见识广博的 AI 助手。请针对用户的问题，写成一篇有深度、有见地的小论文（约 4000 字）。
@@ -2610,12 +2612,13 @@ if(fourStartBtn){
       $('reflStatus').textContent = '（跳过）';
     }
 
-    // 四篇的写作输入
+    // 四篇的写作输入（轻注入：带一份站内已有最近邻清单，避免撞已发命名/便于补真实引注）
+    let _fpNbr=''; if(window.SDERag){ try{ _fpNbr = await window.SDERag.neighbors(r.question||''); }catch(_){} }
     const paperDefs = [
-      { title:'论文① · 金点子①（'+(r.rows[0].view||'视角一')+'）', input: buildSingleIdeaInput(r.rows, 0, r.question) },
-      { title:'论文② · 金点子②（'+(r.rows[1].view||'视角二')+'）', input: buildSingleIdeaInput(r.rows, 1, r.question) },
-      { title:'论文③ · 金点子③（'+(r.rows[2].view||'视角三')+'）', input: buildSingleIdeaInput(r.rows, 2, r.question) },
-      { title:'论文④ · 新典范（三金点子涌现）', input: buildParadigmInput1w(r.rows, r.question, em) },
+      { title:'论文① · 金点子①（'+(r.rows[0].view||'视角一')+'）', input: buildSingleIdeaInput(r.rows, 0, r.question, _fpNbr) },
+      { title:'论文② · 金点子②（'+(r.rows[1].view||'视角二')+'）', input: buildSingleIdeaInput(r.rows, 1, r.question, _fpNbr) },
+      { title:'论文③ · 金点子③（'+(r.rows[2].view||'视角三')+'）', input: buildSingleIdeaInput(r.rows, 2, r.question, _fpNbr) },
+      { title:'论文④ · 新典范（三金点子涌现）', input: buildParadigmInput1w(r.rows, r.question, em, _fpNbr) },
     ];
 
     // 建四个结果块（追加在心得块之后，不清空）
@@ -2893,12 +2896,14 @@ if(upliftBtn){
       return { bodyEl: wrap.querySelector('.upCellBody'), statusEl: wrap.querySelector('.upCellStatus'), title:newTitle };
     });
 
+    // 二次提智是"够不够创新/要不要撞已有命名"的判定站 → 强注入全站上下文
+    let _upCtx=''; { const _upq=(window._lastResult && window._lastResult.question)||''; if(window.SDERag && _upq){ try{ _upCtx = await window.SDERag.ctx(_upq); }catch(_){} } }
     // 并发：每篇复用 runOnePaper —— 初稿用发生引擎(upliftPrompt)，然后同样走双审+改稿
     const results = await Promise.allSettled(defs.map((d,i)=>runOnePaper({
       title: cells[i].title,
       draftPrompt: upliftPromptR(ureflection),   // ★ 带《从发现到发生》心得 + 发生引擎冲150
       reflection: ureflection,                    // 审稿人也带心得，用发生学标准把关
-      writeInput: buildUpliftInput(d.src.text),  // 输入 = 第一批那篇全文
+      writeInput: buildUpliftInput(d.src.text, _upCtx),  // 输入 = 第一批那篇全文 + 全站上下文
       bodyEl: cells[i].bodyEl,
       statusEl: cells[i].statusEl,
       writeSel, writeKey,
@@ -3666,7 +3671,8 @@ if(emergeBtn){
     statusEl.textContent = '复用本轮《从发现到发生》心得…';
     const emReflection = await getSharedReflection(model, key);
 
-    const userQ = buildEmergeInput(r.rows, r.question||'');
+    let _emCtx=''; if(window.SDERag){ statusEl.textContent='检索全站相关知识作为涌现底盘…'; try{ _emCtx = await window.SDERag.ctx(r.question||''); }catch(_){} }
+    const userQ = buildEmergeInput(r.rows, r.question||'', _emCtx);
     try{
       const res = await streamChat(key, model, emergePrompt(emReflection), userQ, bodyEl, statusEl, metaEl);
       if(res && res.text){
@@ -4051,6 +4057,7 @@ function clearResults(){
     const sc=row.sde.body.closest('.col'); if(sc){ sc.classList.remove('generating','done-flash'); }
   });
   window._lastResult = null;
+  if(window.SDERag){ try{ window.SDERag.clear(); }catch(_){} }  // 每题/清空时重置全站检索缓存，避免上一题上下文串味
   $('downloadRow').style.display='none';
   if($('effBox')) $('effBox').style.display='none';
   if($('comboBar')) $('comboBar').style.display='none';

@@ -76,6 +76,7 @@ table.iq td,table.iq th{border:1px solid rgba(255,255,255,0.1);padding:5px 9px;t
 table.iq th{color:var(--gold2);font-weight:700}
 footer{border-top:1px solid rgba(255,255,255,0.08);margin-top:44px;padding:22px 0 34px;text-align:center;color:var(--sub);font-size:12.5px}
 </style>
+<script src="/taste/assets/sde-rag.js?v=1"></script>
 </head>
 <body>
 
@@ -1464,6 +1465,8 @@ function extractFull(vendor, j){
 
 // 全站 RAG：按议题取一段可注入的结构化知识（九库邻域子图 + 全站语料原文片段），供每一轮作答调用。无 Key、只读、失败即空串（安全退回原行为）。
 async function sdeKbContext(q){
+  // 统一走全站 RAG 入口（/taste/assets/sde-rag.js）——随网站论文自动生长；失败退回旧的直连 kb/retrieve。
+  if(window.SDERag){ try{ return await window.SDERag.ctx(q); }catch(_){} }
   try{
     const r = await fetch('/api/kb/retrieve', { method:'POST', headers:{'content-type':'application/json'}, body: JSON.stringify({ q: q, k: 12, budget: 24, cap: 9000 }) });
     if(!r.ok) return '';
@@ -2903,10 +2906,14 @@ async function runCollision(){
       bk2.st.textContent='✓ 完成';
     }catch(e){ bk2.st.textContent='⚠ 补料失败,继续硬撞'; }
   }
-  // ② 三段碰撞
+  // ② 三段碰撞（碰撞是第四篇典范的诞生处，最需知道站内已有什么 → 强注入全站上下文；
+  //    复用首轮已取的 RUN.kbCtx，无新调用；缺失则现取一次）
   if(RUN_STOPPED) throw new Error('已手动停止');
+  let _colCtx = RUN.kbCtx || '';
+  if(!_colCtx && window.SDERag){ try{ _colCtx = await window.SDERag.ctx(q); }catch(_){} }
   const s1 = mkBlock(collisionPanel, 'colStep', '第①步 · 混沌碰撞(三对两两互消)', true);
-  const r1 = await streamChat(RUN.key, RUN.sel, colSys, collideP1(q,A,B,C), s1.body, s1.st, s1.meta, s1.el, COLLIDE_TOKENS);
+  const _p1 = window.SDERag ? window.SDERag.prepend(_colCtx, collideP1(q,A,B,C)) : collideP1(q,A,B,C);
+  const r1 = await streamChat(RUN.key, RUN.sel, colSys, _p1, s1.body, s1.st, s1.meta, s1.el, COLLIDE_TOKENS);
   const step1=(r1.text||'').trim(); if(!step1) throw new Error('碰撞第①步返回为空');
   if(RUN_STOPPED) throw new Error('已手动停止');
   const s2 = mkBlock(collisionPanel, 'colStep', '第②步 · 自组织(三涌现物收敛为暗流)', true);
@@ -3246,6 +3253,7 @@ async function run(){
   RUN = { question:q, sel, key, evalOn: seats.length>0, evals: seats, full, manual, mode, agents, forgeDeg,
           xinde:{}, xindeOk:{}, lanes:{}, papers:{}, histories:{}, papersText:{}, collisionSteps:{}, t0:Date.now() };
   // 全站 RAG：按议题取一次结构化知识作为作答底盘（内功/评审阶段不注入，仅注入每一轮回答）
+  if(window.SDERag){ try{ window.SDERag.clear(); }catch(_){} }  // 新一次运行前重置全站检索缓存
   try{ runHint.textContent = '正在检索全站相关知识作为作答底盘…'; RUN.kbCtx = await sdeKbContext(q); }catch(e){ RUN.kbCtx=''; }
   runArea.style.display='block';
   try{
