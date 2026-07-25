@@ -319,6 +319,9 @@ select:focus,input:focus{border-color:var(--accent)}
       </div>
       <span class="drama-tip">字数越多越慢、越耗 token；2 万字很长，可能实际写到 1.5 万左右。</span>
     </div>
+    <div class="dramarow" style="margin-top:10px">
+      <label style="display:flex;align-items:center;gap:7px;font-size:13.5px;cursor:pointer"><input type="checkbox" id="selfCheck" style="accent-color:var(--acc,#7c5cff)"> 生成后自检一遍<span style="color:#889;font-size:12.5px">（对话体生效：按检查清单自查并修订，更慢更耗 token、成品更好）</span></label>
+    </div>
     <div class="row" style="margin-top:12px">
       <button class="btn" id="btnGen" type="button">生成讲解稿 →</button>
       <span id="genStatus" class="statusline"></span>
@@ -984,6 +987,7 @@ function lecSystem(mode, xinde, siteCtx, drama, soloStyle, domain, external, wc)
     + "【长度·硬要求】：整篇对话体讲解稿约 "+LM.words+"（中文），读出来大约 "+LM.min+" 分钟。这是硬指标，写短了算不合格，"+LM.seg+"。"+LM.thickDuo+"开头男主持人用一两句话把今天要讲的文章点出来，结尾女嘉宾用一句话收束。\n"
     + "【输出格式·必须严格遵守，供程序切分与配语气】：每一句发言单独一行；行首先写说话人 `男` 或 `女`，紧跟竖线 `|`、这句话的语气标签、再一个竖线 `|`、这句话的语速档，再一个中文冒号 `：`，然后是内容。语速档三选一：`slow`(放慢·用于沉思/难点/动情/需要回味处)、`normal`(常速)、`fast`(加快·用于激昂/紧张/罗列/推进处)。例：`男|cheerful|fast：你是说……？`、`女|serious|slow：它真正难的地方在于……`。\n"
     + "【语气标签只能从这几个里选，按这句话的语义 / 语句 / 语法来定】：general(中性)、cheerful(欢快·多用于提问和轻松处)、gentle(温柔)、narration-relaxed(舒缓讲述·多用于讲解重点)、serious(严肃·讲难点或下判断)、newscast(播报·陈述事实)、lyrical(抒情·结尾升华)、customerservice(亲切)。【关键要求：语气要有明显变化和对比，不要一味用 narration-relaxed，那样听起来很平】——男主持人的提问、惊讶、调侃用 cheerful；女嘉宾讲到激动人心或正面的点用 cheerful 或 lyrical；讲到严峻 / 尖锐 / 下判断的地方一定用 serious；温情、安慰、收束用 gentle；陈述客观事实用 general 或 newscast；抒情升华用 lyrical。相邻的句子尽量用不同的语气，让整段有起伏。一段对话里至少要出现 4 种不同的语气标签。\n"
+    + "【出稿前最后三查·必须执行】一查口癖：『这个问题问得特别好』『你说得很准』之类捧场话全场最多保留一次，其余删掉、接话直接从内容进。二查结尾：最后必须有一次明白的回望——把整场走过的两三个关键结算点串成一句话（『我们从…出发，先发现…，又被…顶住，最后落到…』的意思）。三查清单与多域段：不许出现『第二个呢？』『第一个领域』式报幕，至少一条要被质疑可行性、被拿具体情况试穿、或被抢答后修正。\n"
     + "不要写旁白、不要写标题、不要用 Markdown、不要加编号。直接从第一行 `男|...：` 开始。";
 }
 
@@ -1229,6 +1233,15 @@ async function generate(){
       : ('请据此，按你的任务与格式要求，写出'+lenPhrase+'的男女对话体讲解稿。'+thickReq+titleReq+'（标题单独一行"标题：…"，之后再从对话第一行开始）；每句单独一行，按 `男|语气|语速：` / `女|语气|语速：` 的三段格式（语气和语速都要写，例 `男|cheerful|fast：`），按语义给每句配。');
     var userMsg='【要讲解的文章标题】'+chosenDoc.title+'\n【目标篇幅】'+lenPhrase+'\n【原文如下】\n\n'+full+'\n\n'+tail;
     var out=await callMsgs(pf.sel, pf.key, sys, [{role:'user', content:userMsg}], maxTok, '讲解稿');
+    if(MODE!=='solo' && $('selfCheck') && $('selfCheck').checked){
+      st.innerHTML='<span class="spinner"></span>基底正在按检查清单自查并修订…（约再一两分钟）';
+      try{
+        var fixed=await callMsgs(pf.sel, pf.key, SELF_CHECK_SYS,
+          [{role:'user', content:'【待自查的对话稿】\n\n'+out+'\n\n请按系统要求逐条自查并输出修订后的完整终稿。'}], maxTok, '自检修订');
+        var okF = fixed && fixed.indexOf('男|')>=0 && fixed.replace(/\s/g,'').length >= out.replace(/\s/g,'').length*0.7;
+        if(okF) out=fixed;                       // 校验不过就用初稿——自检是加分项，不许弄丢成品
+      }catch(eSC){}
+    }
     lastDialogue=out;
     renderDialogue(out);
     st.innerHTML='✓ 已生成（约 '+out.replace(/\s/g,'').length+' 字）'+(truncNote||'')+'· 到第三步开始朗读';
@@ -1404,6 +1417,18 @@ async function synthAllToBlob(){
   }
   return new Blob(parts, {type:'audio/mpeg'});
 }
+/* ===== 自检回路（可选）：生成后让基底按对话发生检查清单自查并修订一轮 ===== */
+var SELF_CHECK_SYS = "你是一位严格的对话稿审校。下面是一份男女对话体讲解稿，请按检查清单逐条自查，凡不合格处直接改写，然后输出修订后的完整终稿。\n"
++ "【检查清单】\n"
++ "1 接话空转：把男的话全删掉、女的话连起来读仍然通顺＝不合格，要让每次接话真正咬住上一句；\n"
++ "2 顶住战：全场必须有至少一轮——男主持人拿出反例或亲身经验、坚持两个来回不松口，女嘉宾被迫换角度维护或当场收窄修正判断；没有就改出一轮，不许全场一问就服；\n"
++ "3 假问题：男主持人的问题若换成『请您继续』毫无损失＝改成带真实卡点的追问（『这跟常识矛盾』『照你说岂不是…』『我身边恰恰不是这样』）；\n"
++ "4 清单段：出现『第二个呢？』式逐条报菜名＝改成至少一条被质疑可行性、被拿具体情况试穿、或被抢答后修正；\n"
++ "5 结尾：最后必须有一次明白的回望，把整场两三个关键结算点串成一句话；开场与结尾立场一字不差＝不合格；\n"
++ "6 口癖：『这个问题问得特别好』『你说得很准』之类捧场话整场最多保留一次，其余删掉、直接从内容接；\n"
++ "7 多领域段：不许『第一个领域』式报幕，改成对比或递进着讲，篇幅有主有次。\n"
++ "【硬规矩】说话人体系与 `男|语气|语速：` 三段行格式、标题行完全保留；总字数不许比原稿少；没毛病的行原样保留；改动处语气语速标签按新语义配；不解释、不加评注，直接从『标题：』那一行开始输出完整终稿。";
+
 /* ===== 响度归一（保存的 MP3 归到约 -16 LUFS，播客发行响度）=====
    纯增益+软限幅：先按门限 RMS 估响度，算增益（上限 +12dB），过 0.85 后 tanh 软压、天花板 0.97，
    然后 lamejs 重编码 48kbps。任何一步失败都回退原始音频——归一是锦上添花，不许弄丢成品。 */
