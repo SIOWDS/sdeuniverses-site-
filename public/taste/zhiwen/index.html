@@ -2332,14 +2332,14 @@ function finalizePaper(key, text){
   blk.body.innerHTML = renderPaper(text);
   blk.open();
   blk.meta.textContent = text.length + ' 字';
-  const fname = {A:'中华智问_形态论文', B:'中华智问_条件论文', C:'中华智问_演化论文', '典范':'中华智问_碰撞典范论文',
-                 '研论': (RUN && RUN.forgeDeg==='专著' ? '中华智问_学术专著' : '中华智问_'+((RUN && RUN.forgeDeg)||'硕士')+'论文')}[key] || ('中华智问_'+key);
+  const fname = {A:'形态论文', B:'条件论文', C:'演化论文', '典范':'碰撞典范论文',
+                 '研论': (RUN && RUN.forgeDeg==='专著' ? '学术专著' : ((RUN && RUN.forgeDeg)||'硕士')+'论文')}[key] || (key+'论文');
   blk.dlDocx.disabled=false; blk.dlMd.disabled=false;
   blk.dlDocx.onclick = ()=>{ saveDocx(fname+'.docx', firstLine(text)||fname, text, docMeta()).catch(e=>showErr('导出失败:'+e.message)); };
   blk.dlMd.onclick = ()=>{ saveText(fname+'.md', text); };
 }
 function firstLine(t){ const m=(t||'').split('\n').map(s=>s.trim()).filter(Boolean); return m.length? m[0].replace(/^#+\s*/,'').slice(0,60):''; }
-function docMeta(){ return '中华智问知识发生器 · sdeuniverses.com · '+new Date().toLocaleString('zh-CN'); }
+function docMeta(){ return 'sdeuniverses.com · '+new Date().toLocaleString('zh-CN'); }
 
 // ============ 提示语装配 ============
 function roundSystem(agent, isR1, xinde){
@@ -3078,14 +3078,14 @@ function buildReport(){
   }
   html+='</table>';
   iqCurve.innerHTML = html + (meterLine.textContent ? ('<div style="margin-top:9px;font-size:12px;color:#8B98A5">'+escTxt(meterLine.textContent)+'</div>') : '');
-  $('dlReportBtn').onclick = ()=>{ saveDocx('中华智问_全程报告.docx', '中华智问知识发生器 · 全程报告', reportText(), docMeta()).catch(e=>showErr('导出失败:'+e.message)); };
-  $('dlXindeBtn').onclick = ()=>{ saveDocx('中华智问_内功心得汇编.docx', '内功学习心得汇编(真两段提智 · 第一段产物)', xindeText(), docMeta()).catch(e=>showErr('导出失败:'+e.message)); };
+  $('dlReportBtn').onclick = ()=>{ saveDocx('全程报告.docx', '全程报告', reportText(), docMeta()).catch(e=>showErr('导出失败:'+e.message)); };
+  $('dlXindeBtn').onclick = ()=>{ saveDocx('内功心得汇编.docx', '内功学习心得汇编(真两段提智 · 第一段产物)', xindeText(), docMeta()).catch(e=>showErr('导出失败:'+e.message)); };
   $('dlAllBtn').onclick = async ()=>{
     const order = (RUN.full ? ['A','B','C','典范'] : RUN.agents.slice()).concat(RUN.papersText['研论'] ? ['研论'] : []);
     for(const k of order){
       if(!RUN.papersText[k]) continue;
-      const fname = {A:'中华智问_形态论文', B:'中华智问_条件论文', C:'中华智问_演化论文', '典范':'中华智问_碰撞典范论文',
-                     '研论': (RUN.forgeDeg==='专著' ? '中华智问_学术专著' : '中华智问_'+(RUN.forgeDeg||'硕士')+'论文')}[k];
+      const fname = {A:'形态论文', B:'条件论文', C:'演化论文', '典范':'碰撞典范论文',
+                     '研论': (RUN.forgeDeg==='专著' ? '学术专著' : (RUN.forgeDeg||'硕士')+'论文')}[k];
       try{ await saveDocx(fname+'.docx', firstLine(RUN.papersText[k])||fname, RUN.papersText[k], docMeta()); }catch(e){ showErr('导出 '+fname+' 失败:'+e.message); }
       await new Promise(r=>setTimeout(r, 350));
     }
