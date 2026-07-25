@@ -865,27 +865,48 @@ async function loadPyramid(env, url) {
 }
 // 三层下钻：给一段问题，从长期原则里挑最相关的几条 → 顺 mids 进中期条目 → 顺 docs 落到文章。
 // 纯文本词重合打分（长期/中期都是相对固定的小结构，几十条，扫一遍很轻）。返回 {principles, mids, docs}。
+// 三层语义下钻：词匹配只负责【进入语义图的入口】，之后沿【离线编纂好的语义连接】走——
+//   长期原则的 mids（我用 SDE 本体论判定"这条原则统摄哪些概念"）、中期条目的 canon links（概念↔理论↔命题的本体论互引）。
+//   即结构由编纂固化，运行时只沿链走、不靠临场词匹配去猜谁连谁。词匹配退回纯兜底（图里一个都没进时）。
 function pyramidDrill(pyr, q, opt) {
   opt = opt || {};
   const topP = opt.principles || 6, topM = opt.mids || 8, topD = opt.docs || 10;
   const raw = String(q || "").toLowerCase();
   const terms = [];
-  const enWords = raw.match(/[a-z]{3,}/g) || [];
-  for (const w of enWords) terms.push(w);
-  // 中文无空格：把每段连续汉字切成 2 字滑窗（bigram），才能与条目名/定义做子串命中
-  const cjkRuns = raw.match(/[\u4e00-\u9fff]{2,}/g) || [];
-  for (const run of cjkRuns) { for (let i = 0; i + 2 <= run.length; i++) terms.push(run.slice(i, i + 2)); }
+  for (const w of (raw.match(/[a-z]{3,}/g) || [])) terms.push(w);
+  for (const run of (raw.match(/[\u4e00-\u9fff]{2,}/g) || [])) { for (let i = 0; i + 2 <= run.length; i++) terms.push(run.slice(i, i + 2)); }
   const score = (txt) => { const s = String(txt || "").toLowerCase(); let n = 0; for (const t of terms) if (s.indexOf(t) >= 0) n++; return n; };
-  const outP = [], outMids = Object.create(null), outDocs = [], seenU = Object.create(null);
+  const midById = pyr.midById || Object.create(null);
+
+  // —— 入口：词匹配只用来"进入图" —— 找到最相关的长期原则 + 直接命中的中期条目 ——
+  const midWeight = Object.create(null);   // mid id -> 累计权重（含语义扩展）
+  const outP = [];
   if (pyr.long && pyr.long.length) {
     const ranked = pyr.long.map((p) => ({ p: p, sc: score(p.text) })).filter((x) => x.sc > 0).sort((a, b) => b.sc - a.sc).slice(0, topP);
-    for (const x of ranked) { outP.push(x.p); for (const mid of (x.p.mids || [])) outMids[mid] = (outMids[mid] || 0) + x.sc; }
+    for (const x of ranked) { outP.push(x.p); for (const mid of (x.p.mids || [])) midWeight[mid] = (midWeight[mid] || 0) + x.sc * 3; }   // 沿长期→中期的编纂连接，权重最高
   }
-  // 中期：既收"长期钻下来的"，也直接按问题给中期条目补分（长期没连到、但中期本身相关的）
-  const midScored = [];
-  if (pyr.mid) for (const e of pyr.mid) { const direct = score(e.name) * 2 + score(e.def); const viaLong = outMids[e.id] || 0; const sc = direct + viaLong * 2; if (sc > 0) midScored.push({ e: e, sc: sc }); }
-  midScored.sort((a, b) => b.sc - a.sc);
-  const pickedMids = midScored.slice(0, topM).map((x) => x.e);
+  if (pyr.mid) for (const e of pyr.mid) { const s = score(e.name) * 2 + score(e.def); if (s > 0) midWeight[e.id] = (midWeight[e.id] || 0) + s; }
+
+  // —— 语义扩展：从已进入的中期条目，沿 canon links 拉入本体论上相连、但问题没字面提到的条目 ——
+  //    这一步是"语义关联"的体现：结构来自编纂好的 links，不是词匹配。
+  const seed = Object.keys(midWeight);
+  for (const id of seed) {
+    const e = midById[id]; if (!e || !e.links) continue;
+    for (const k of Object.keys(e.links)) {
+      const arr = e.links[k]; if (!Array.isArray(arr)) continue;
+      for (const linkedId of arr) if (midById[linkedId]) midWeight[linkedId] = (midWeight[linkedId] || 0) + (midWeight[id] || 1) * 0.4;   // 邻居继承一部分权重，衰减 0.4
+    }
+  }
+
+  // —— 兜底：图里一个都没进（长期未生成 + 中期零命中 + 无 links）——退回纯词匹配给中期条目打分 ——
+  if (!Object.keys(midWeight).length && pyr.mid) {
+    for (const e of pyr.mid) { const s = score(e.name) * 2 + score(e.def); if (s > 0) midWeight[e.id] = s; }
+  }
+
+  // —— 落地：按权重取 top 中期条目，顺 docs 下钻到具体文章 ——
+  const pickedMids = Object.keys(midWeight).map((id) => midById[id]).filter(Boolean)
+    .sort((a, b) => (midWeight[b.id] || 0) - (midWeight[a.id] || 0)).slice(0, topM);
+  const outDocs = [], seenU = Object.create(null);
   for (const e of pickedMids) for (const d of (e.docs || [])) { if (d.u && !seenU[d.u]) { seenU[d.u] = 1; outDocs.push({ u: d.u, t: d.t, via: e.name }); } }
   return { principles: outP, mids: pickedMids, docs: outDocs.slice(0, topD) };
 }
