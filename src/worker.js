@@ -879,13 +879,22 @@ function pyramidDrill(pyr, q, opt) {
   const midById = pyr.midById || Object.create(null);
 
   // —— 入口：词匹配只用来"进入图" —— 找到最相关的长期原则 + 直接命中的中期条目 ——
-  const midWeight = Object.create(null);   // mid id -> 累计权重（含语义扩展）
+  // —— 入口有两种：①基底语义判断（opt.pnums＝基底从长期100条里选中的编号）——语义启动，最纯；
+  //    ②词匹配（无 pnums 时）——传统 RAG 残留，退为兜底。二者都只"进入图"，进图后一律沿编纂链走。
+  const midWeight = Object.create(null);
   const outP = [];
-  if (pyr.long && pyr.long.length) {
+  const pnums = Array.isArray(opt.pnums) ? opt.pnums : null;
+  if (pnums && pyr.long && pyr.long.length) {
+    // 语义启动：基底已判定问题触及这些原则，直接顺它们的 mids 进中期，不做任何词匹配
+    const bynum = Object.create(null); for (const p of pyr.long) bynum[p.n] = p;
+    for (const n of pnums) { const p = bynum[n]; if (p) { outP.push(p); for (const mid of (p.mids || [])) midWeight[mid] = (midWeight[mid] || 0) + 3; } }
+  } else if (pyr.long && pyr.long.length) {
+    // 兜底：词匹配选长期原则
     const ranked = pyr.long.map((p) => ({ p: p, sc: score(p.text) })).filter((x) => x.sc > 0).sort((a, b) => b.sc - a.sc).slice(0, topP);
-    for (const x of ranked) { outP.push(x.p); for (const mid of (x.p.mids || [])) midWeight[mid] = (midWeight[mid] || 0) + x.sc * 3; }   // 沿长期→中期的编纂连接，权重最高
+    for (const x of ranked) { outP.push(x.p); for (const mid of (x.p.mids || [])) midWeight[mid] = (midWeight[mid] || 0) + x.sc * 3; }
   }
-  if (pyr.mid) for (const e of pyr.mid) { const s = score(e.name) * 2 + score(e.def); if (s > 0) midWeight[e.id] = (midWeight[e.id] || 0) + s; }
+  // 中期直接补分（词匹配，仅在无 pnums 或作为补充时给中期条目加分——语义启动模式下这步只是让中期候选更全，不喧宾夺主）
+  if (!pnums && pyr.mid) for (const e of pyr.mid) { const s = score(e.name) * 2 + score(e.def); if (s > 0) midWeight[e.id] = (midWeight[e.id] || 0) + s; }
 
   // —— 语义扩展：从已进入的中期条目，沿 canon links 拉入本体论上相连、但问题没字面提到的条目 ——
   //    这一步是"语义关联"的体现：结构来自编纂好的 links，不是词匹配。
@@ -2653,6 +2662,19 @@ export default {
     // /api/llm-proxy：境外基底(GPT/Claude/Gemini)纯转发代理。
     // 解决两件事：①浏览器 CORS 拦截 ②中国大陆无法直连境外 API。
     // 纪律：只转发、不存储、不记录任何 Key；只放行白名单里的官方 LLM 域名。
+    // PRINCIPLES — 返回长期册 100 条总原则的精简清单（编号+文本），供【智能体基底做语义判断】：
+    //   基底读『问题 + 这 100 条』，判定问题触及哪几条，把编号回传给 kb/retrieve 的 pnums，从而语义启动 RAG。
+    //   只给编号与文本，不给 mids/docs（那是启动后 worker 沿链走的事，基底不需要）。只读静态 long.json，无需 Key。
+    if (url.pathname === "/api/kb/principles") {
+      if (request.method === "OPTIONS") return new Response(null, { headers: _cors() });
+      try {
+        const pyr = await loadPyramid(env, url);
+        const list = (pyr.long || []).map((p) => ({ n: p.n, text: p.text }));
+        return Response.json({ ok: true, count: list.length, principles: list }, { headers: _cors() });
+      } catch (e) {
+        return Response.json({ ok: false, principles: [] }, { headers: _cors() });
+      }
+    }
     if (url.pathname === "/api/kb/retrieve") {
       // 全站结构化检索：给任意智能体一段可注入的 RAG 上下文（九库邻域子图 + 全站语料原文片段）。只读静态语料/九库，无需 Key。
       if (request.method === "OPTIONS") return new Response(null, { headers: _cors() });
@@ -2683,7 +2705,8 @@ export default {
         if (/long|mid/.test(wantTiers)) {
           try {
             const pyr = await loadPyramid(env, url);
-            const drill = pyramidDrill(pyr, q, { principles: 6, mids: 8, docs: 10 });
+            const _pn = Array.isArray(b.pnums) ? b.pnums.map((x) => parseInt(x, 10)).filter((x) => x >= 1 && x <= 200) : null;
+            const drill = pyramidDrill(pyr, q, { principles: 6, mids: 8, docs: 10, pnums: _pn });
             if (/long/.test(wantTiers) && drill.principles.length) {
               tiers += "【SDE 全站·长期骨架（顺着问题选出的总原则，最稳定的思想根基）】\n" + drill.principles.map((p) => (p.n ? (p.n + ". ") : "· ") + p.text).join("\n") + "\n\n";
             }

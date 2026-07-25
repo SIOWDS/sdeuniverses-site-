@@ -105,5 +105,42 @@
     } catch (e) { return (_foundCache[ck] = ''); }
   }
 
-  w.SDERag = { ctx: ctx, neighbors: neighbors, foundation: foundation, prepend: prepend, clear: clear, _fetch: _fetch };
+  // pyramidStart：语义启动 RAG（区别于传统 RAG 的文本相似比对）。
+  //  流程：① 取长期 100 条总原则清单 → ② 让【智能体的基底】读『问题+100条』判定触及哪几条（返回编号）
+  //        → ③ 把编号作为 pnums 交给 kb/retrieve，从这几条原则顺 mids 下钻到中期与文章。
+  //  pickFn(promptText) 由调用方提供：用它自己的基底/Key 跑一次轻调用，返回模型输出的纯文本（内含编号）。
+  //  基底判断失败/没返回编号时，自动退回按 q 的语义链下钻（foundation），不至于开天窗。
+  async function pyramidStart(q, pickFn, tiers) {
+    tiers = tiers || 'long,mid';
+    q = String(q || '').trim();
+    if (!q) return { block: '', pnums: [] };
+    var nums = [];
+    try {
+      var pr = await fetch('/api/kb/principles', { method: 'POST', headers: { 'content-type': 'application/json' }, body: '{}' });
+      if (pr.ok) {
+        var pj = await pr.json();
+        var list = (pj && pj.principles) || [];
+        if (list.length && typeof pickFn === 'function') {
+          var menu = list.map(function (p) { return p.n + '. ' + p.text; }).join('\n');
+          var prompt = '下面是 SDE 本体论的 100 条总原则。读者的问题是：「' + q + '」。\n'
+            + '判断这个问题最直接触及其中哪几条原则（按语义关联，不是字面词匹配）。只输出编号，用逗号分隔，最多 8 个，例如「3,9,37」。不要解释。\n\n' + menu;
+          var out = await pickFn(prompt);
+          nums = (String(out || '').match(/\d+/g) || []).map(function (x) { return parseInt(x, 10); }).filter(function (x) { return x >= 1 && x <= list.length; });
+          // 去重、限 8
+          nums = nums.filter(function (v, i) { return nums.indexOf(v) === i; }).slice(0, 8);
+        }
+      }
+    } catch (e) {}
+    // 用基底选出的编号语义启动；没有编号就退回按 q 下钻
+    try {
+      var body = { q: q, k: 8, budget: 6, cap: 3000, tiers: tiers };
+      if (nums.length) body.pnums = nums;
+      var r = await fetch(EP, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) });
+      if (!r.ok) return { block: '', pnums: nums };
+      var j = await r.json();
+      return { block: (j && j.block) || '', pnums: nums, navDocs: (j && j.navDocs) || 0 };
+    } catch (e) { return { block: '', pnums: nums }; }
+  }
+
+  w.SDERag = { ctx: ctx, neighbors: neighbors, foundation: foundation, pyramidStart: pyramidStart, prepend: prepend, clear: clear, _fetch: _fetch };
 })(window);
