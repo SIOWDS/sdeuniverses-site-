@@ -63,6 +63,12 @@ select:focus,input:focus{border-color:var(--accent)}
 .srcopt.sel{border-color:var(--accent);background:#221a33}
 .cloudcfg{margin-top:10px;padding:12px;background:#0e0b17;border:1px solid var(--line);border-radius:10px}
 .cloudhint{font-size:12px;color:var(--sub);line-height:1.7;margin-bottom:10px}
+.keyguide{background:#120e1f;border:1px solid var(--line);border-radius:9px;padding:10px 12px;margin-bottom:10px}
+.kg-t{font-size:12.5px;font-weight:700;color:var(--gold2);margin-bottom:6px}
+.kg-ol{margin:0;padding-left:18px}
+.kg-ol li{font-size:12.5px;color:var(--ink);line-height:1.85;margin-bottom:6px}
+.kg-tip{font-size:11.5px;color:var(--muted);line-height:1.7;margin-top:6px}
+.dl-link.sec{margin-top:4px}
 .cloudgrid{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px}
 .cf{display:flex;flex-direction:column;gap:3px;flex:1;min-width:150px}
 .cf span{font-size:11.5px;color:var(--muted);font-weight:600}
@@ -149,7 +155,16 @@ select:focus,input:focus{border-color:var(--accent)}
         <label class="srcopt" id="srcCloud"><input type="radio" name="vsrc" value="cloud"><span>☁ 云端音色（几十种·任何设备一致）</span></label>
       </div>
       <div id="cloudCfg" class="cloudcfg" style="display:none">
-        <div class="cloudhint">云端用<b>微软 Azure 语音</b>（400+ 音色、中文男女声几十种，每月 50 万字符免费额度）。这是 BYOK：你自己的密钥只存在浏览器本地、只用来发声，经本站代理转发、不留存。<a href="https://azure.microsoft.com/free/cognitive-services/" target="_blank" rel="noopener" style="color:var(--gold2)">怎么申请免费 Key →</a></div>
+        <div class="cloudhint">云端用<b>微软 Azure 语音</b>（400+ 音色、中文男女声几十种，每月 50 万字符免费额度）。这是 BYOK：你自己的密钥只存在浏览器本地、只用来发声，经本站代理转发、不留存。</div>
+        <div class="keyguide">
+          <div class="kg-t">🔑 没有 Key？三步申请（免费）：</div>
+          <ol class="kg-ol">
+            <li>注册 / 登录 Azure（有免费额度，新用户还送体验金）。<a class="dl-link" href="https://azure.microsoft.com/free/ai-services/" target="_blank" rel="noopener">① 去注册 Azure →</a></li>
+            <li>创建一个「语音服务 Speech」资源（定价层选 <b>Free F0</b> 就够，每月 50 万字符免费）。<a class="dl-link sec" href="https://portal.azure.com/#create/Microsoft.CognitiveServicesSpeechServices" target="_blank" rel="noopener">② 创建 Speech 资源 →</a></li>
+            <li>进资源的「密钥和终结点」页，复制 <b>密钥1</b> 填到下面「Azure 密钥」，把<b>位置/区域</b>（如 eastasia）填到「Azure 区域」。<a class="dl-link sec" href="https://portal.azure.com/#view/Microsoft_Azure_ProjectOxford/CognitiveServicesHub/~/SpeechServices" target="_blank" rel="noopener">③ 打开我的语音资源 →</a></li>
+          </ol>
+          <div class="kg-tip">区域填英文短名（eastasia 东亚 / eastus 美东 / southeastasia 东南亚…），别填中文。填好后点下面「👫男女声对话测试」就能听云端声。</div>
+        </div>
         <div class="cloudgrid">
           <div class="cf"><span>Azure 区域</span><input id="azRegion" type="text" placeholder="如 eastasia / eastus" autocomplete="off"></div>
           <div class="cf"><span>Azure 密钥</span><input id="azKey" type="password" placeholder="Speech 资源的 Key（只存本地）" autocomplete="off"></div>
@@ -158,6 +173,20 @@ select:focus,input:focus{border-color:var(--accent)}
           <div class="cf"><span>♂ 云端男声</span><select id="azVoiceM"></select></div>
           <div class="cf"><span>♀ 云端女声</span><select id="azVoiceF"></select></div>
           <div class="cf"><span>🎙 单人用</span><select id="azVoiceS"></select></div>
+        </div>
+        <div class="cloudgrid">
+          <div class="cf"><span>整体语气（覆盖逐句）</span><select id="azStyle">
+            <option value="">🤖 智能·按语义逐句调（推荐）</option>
+            <option value="general">中性·平稳</option>
+            <option value="narration-relaxed">舒缓讲述</option>
+            <option value="cheerful">欢快</option>
+            <option value="gentle">温柔</option>
+            <option value="serious">严肃</option>
+            <option value="newscast">新闻播报</option>
+            <option value="customerservice">亲切客服</option>
+            <option value="lyrical">抒情</option>
+          </select></div>
+          <div class="cf"><span>语速 <span id="azRateVal">正常</span></span><input id="azRate" type="range" min="-30" max="30" step="5" value="0"></div>
         </div>
       </div>
       <div id="voiceReport" class="vreport" style="margin-top:8px">正在检测本机中文语音…</div>
@@ -582,7 +611,7 @@ function lecSystem(mode, xinde, siteCtx){
       + "你是一位把这篇文章彻底吃透的讲解者，面对完全没读过原文的聪明听众，从头到尾一个人把它讲清楚、讲透、讲得引人入胜。像一篇高级的解读 / 诠释长文，也像一档单人播客娓娓道来。\n"
       + common
       + "【长度与结构】：整篇约 2000 字（中文），读出来大约 5 分钟。开头一两句点出今天要讲的这篇文章、它为什么值得讲；中间按上面四件事层层展开；结尾一句话收束、留个回味。\n"
-      + "【输出格式·必须严格遵守】：连贯的讲解散文，自然分段（段与段之间空一行）。不要出现任何说话人名字或『男：』『女：』之类的对话标记，不要写标题、不要用 Markdown、不要加编号。直接开始讲。";
+      + "【输出格式·必须严格遵守】：连贯的讲解散文，自然分段（段与段之间空一行）。每一段开头可加一个方括号语气标签（按这段的语义决定），例：`[narration-relaxed] 今天要讲的这篇……`。语气标签只能从这几个里选：general、cheerful、gentle、narration-relaxed、serious、newscast、lyrical、customerservice；讲重点用 narration-relaxed、讲难点用 serious、结尾升华可用 lyrical。不写标签的段落按中性处理。不要出现说话人名字或『男：』『女：』，不要写标题、不要用 Markdown、不要加编号。直接开始讲。";
   }
   // duo（男女对话，默认）
   return head
@@ -591,7 +620,9 @@ function lecSystem(mode, xinde, siteCtx){
     + common
     + "【对话感】：女嘉宾讲完一个点，男主持人要用『你是说…？』『这就好比…？』来接、来确认、来追问，让对话真的往前走，而不是各说各话。\n"
     + "【长度】：整篇对话体讲解稿约 2000 字（中文），读出来大约 5 分钟。开头男主持人用一两句话把今天要讲的文章点出来，结尾女嘉宾用一句话收束。\n"
-    + "【输出格式·必须严格遵守，供程序切分男女声】：每一句发言单独一行，行首用 `男：` 或 `女：` 标明说话人（中文冒号），后面紧跟这句话的内容。不要写旁白、不要写标题、不要用 Markdown、不要加编号。直接从第一行 `男：` 开始。";
+    + "【输出格式·必须严格遵守，供程序切分与配语气】：每一句发言单独一行；行首先写说话人 `男` 或 `女`，紧跟一个竖线 `|` 和这句话的语气标签，再一个中文冒号 `：`，然后是内容。例：`男|cheerful：你是说……？`、`女|narration-relaxed：它的核心其实是……`。\n"
+    + "【语气标签只能从这几个里选，按这句话的语义 / 语句 / 语法来定】：general(中性)、cheerful(欢快·多用于提问和轻松处)、gentle(温柔)、narration-relaxed(舒缓讲述·多用于讲解重点)、serious(严肃·讲难点或下判断)、newscast(播报·陈述事实)、lyrical(抒情·结尾升华)、customerservice(亲切)。默认多数句子用 narration-relaxed 或 general；男主持人抛问题多用 cheerful；讲到难点 / 关键论断用 serious；结尾收束可用 gentle 或 lyrical。别每句都夸张，语气要随内容自然变化。\n"
+    + "不要写旁白、不要写标题、不要用 Markdown、不要加编号。直接从第一行 `男|...：` 开始。";
 }
 
 // —— 站内 RAG（复用后端 /api/wds/rag）——
@@ -723,8 +754,8 @@ async function generate(){
     st.innerHTML='<span class="spinner"></span>提智基底正在'+(MODE==='solo'?'把这篇讲成一篇单人解读':'把这篇讲成男女对话')+'…（约一两分钟）';
     var sys=lecSystem(MODE, xinde, rag.ctx);
     var tail=(MODE==='solo')
-      ? '请据此，按你的任务与格式要求，写出约 2000 字的单人讲解散文。直接开始讲，不要任何说话人标记。'
-      : '请据此，按你的任务与格式要求，写出约 2000 字的男女对话体讲解稿。直接从 `男：` 开始。';
+      ? '请据此，按你的任务与格式要求，写出约 2000 字的单人讲解散文，每段按语义在段首标一个方括号语气标签。直接开始讲，不要任何说话人标记。'
+      : '请据此，按你的任务与格式要求，写出约 2000 字的男女对话体讲解稿，每句按 `男|语气：` / `女|语气：` 的格式、按语义给每句配语气标签。直接从第一行开始。';
     var userMsg='【要讲解的文章标题】'+chosenDoc.title+'\n【原文如下】\n\n'+full+'\n\n'+tail;
     var out=await callMsgs(pf.sel, pf.key, sys, [{role:'user', content:userMsg}], 24000, '讲解稿');
     lastDialogue=out;
@@ -741,24 +772,27 @@ async function generate(){
 }
 
 /* ---- 把对话体切成 turns 并渲染 ---- */
+var STYLE_OK={general:1,cheerful:1,gentle:1,'narration-relaxed':1,serious:1,newscast:1,lyrical:1,customerservice:1,sad:1,angry:1,fearful:1,calm:1,assistant:1,chat:1,affectionate:1,embarrassed:1};
+function okStyle(s){ s=(s||'').trim().toLowerCase(); return STYLE_OK[s]?s:''; }
 function parseContent(text, mode){
   var out=[];
   if(mode==='solo'){
-    // 单人：按段落切，每段一条 narrator；段太长再按句切以便高亮/朗读
     var paras=String(text||'').split(/\n\s*\n/).map(function(s){return s.trim();}).filter(Boolean);
     paras.forEach(function(p){
-      // 去掉可能漏出的说话人前缀
+      var st='';
+      var sm=p.match(/^\[\s*([a-zA-Z\-]+)\s*\]\s*/);
+      if(sm){ st=okStyle(sm[1]); p=p.slice(sm[0].length); }
       p=p.replace(/^(男|女|主持人|嘉宾)\s*[：:]\s*/,'');
-      out.push({who:'n', text:p});
+      out.push({who:'n', text:p, style:st});
     });
     return out;
   }
-  // duo：按 男：/女： 切分，无前缀行并入上一条
   var lines=String(text||'').split(/\n+/);
   for(var i=0;i<lines.length;i++){
     var ln=lines[i].trim(); if(!ln) continue;
-    var m=ln.match(/^(男|女)\s*[：:]\s*(.+)$/);
-    if(m){ out.push({who: m[1]==='男'?'m':'f', text:m[2].trim()}); }
+    // 男|style：内容  或  男：内容
+    var m=ln.match(/^(男|女)\s*(?:\|\s*([a-zA-Z\-]+)\s*)?[：:]\s*(.+)$/);
+    if(m){ out.push({who: m[1]==='男'?'m':'f', text:m[3].trim(), style: okStyle(m[2])}); }
     else if(out.length){ out[out.length-1].text += (out[out.length-1].text?' ':'') + ln; }
   }
   return out;
@@ -818,6 +852,8 @@ function azVoiceOf(who){
   var id=who==='m'?($('azVoiceM')&&$('azVoiceM').value):(who==='f'?($('azVoiceF')&&$('azVoiceF').value):($('azVoiceS')&&$('azVoiceS').value));
   return id||'zh-CN-XiaoxiaoNeural';
 }
+function azOverrideStyle(){ return ($('azStyle')&&$('azStyle').value||'').trim(); }  // 空=智能逐句
+function azRatePct(){ var v=parseInt($('azRate')&&$('azRate').value||'0',10)||0; return v; }
 function fillAzureSelects(){
   [['azVoiceM','m'],['azVoiceF','f'],['azVoiceS','f']].forEach(function(pair){
     var sel=$(pair[0]); if(!sel) return; sel.innerHTML='';
@@ -835,10 +871,20 @@ function fillAzureSelects(){
 function xmlEsc(s){ return String(s||'').replace(/[<>&'"]/g,function(c){return{'<':'&lt;','>':'&gt;','&':'&amp;',"'":'&apos;','"':'&quot;'}[c];}); }
 var azAudio=null;
 // 用 Azure 合成并播放一句；成功/失败都回调 done()
-function azureSpeak(text, voiceId, done){
+function buildSsml(text, voiceId, style){
+  var ov=azOverrideStyle();               // 用户手选整体风格（空=用逐句 style）
+  var st=okStyle(ov||style);              // 最终风格
+  var rate=azRatePct();                   // -30..30
+  var inner=xmlEsc(text);
+  if(rate){ inner='<prosody rate="'+(rate>0?'+':'')+rate+'%">'+inner+'</prosody>'; }
+  if(st){ inner='<mstts:express-as style="'+st+'">'+inner+'</mstts:express-as>'; }
+  return '<speak version="1.0" xmlns:mstts="https://www.w3.org/2001/mstts" xml:lang="zh-CN"><voice name="'+voiceId+'">'+inner+'</voice></speak>';
+}
+function azureSpeak(text, voiceId, style, done){
+  if(typeof style==='function'){ done=style; style=''; }  // 兼容旧签名
   var region=azRegion(), key=azKey();
   if(!region || !key){ if($('playErr')){ $('playErr').textContent='请先填 Azure 区域和密钥（或把语音来源切回「系统语音」）。'; $('playErr').style.display='block'; } done(true); return null; }
-  var ssml='<speak version="1.0" xml:lang="zh-CN"><voice name="'+voiceId+'">'+xmlEsc(text)+'</voice></speak>';
+  var ssml=buildSsml(text, voiceId, style);
   var ctrl={aborted:false, audio:null};
   fetch('/api/llm-proxy', {
     method:'POST',
@@ -868,17 +914,19 @@ function azureSpeak(text, voiceId, done){
 }
 // 统一发声：一句话，who=m/f/n，done(err) 回调；按当前来源选系统或云端
 var curCloud=null;
-function speakOne(text, who, sysVoices, done){
+function speakOne(text, who, sysVoices, style, done){
+  if(typeof style==='function'){ done=style; style=''; }  // 兼容旧调用（无 style）
   if(VOICE_SRC==='cloud'){
     var vid=azVoiceOf(who);
-    curCloud=azureSpeak(text, vid, function(err){ curCloud=null; done(err); });
+    curCloud=azureSpeak(text, vid, style, function(err){ curCloud=null; done(err); });
     return;
   }
-  // 系统语音
+  // 系统语音：不支持 style，用音高区分男女；语速跟随整体语速滑块
   var v = who==='m'?sysVoices.m:(who==='f'?sysVoices.f:sysVoices.s);
   var u=new SpeechSynthesisUtterance(text);
   if(v){ u.voice=v; u.lang=v.lang; } else { u.lang='zh-CN'; }
-  u.rate=1.0; u.pitch = who==='m'?0.92:(who==='f'?1.12:1.0);
+  var rp=(typeof azRatePct==='function')?azRatePct():0;
+  u.rate=1.0 + (rp/100); u.pitch = who==='m'?0.92:(who==='f'?1.12:1.0);
   u.onend=function(){ done(false); };
   u.onerror=function(){ done(true); };
   synth.speak(u);
@@ -1034,12 +1082,12 @@ var PREVIEW_SOLO = [
 ];
 // 专用：男女声对话测试脚本（固定一男一女来回，无论当前讲法模式）
 var DIALOGUE_TEST = [
-  {who:'m', text:'来做个男女声对话测试。我是男声，负责主持。'},
-  {who:'f', text:'我是女声，负责讲解。你现在听到的，就是正式开讲时我们俩来回对话的效果。'},
-  {who:'m', text:'比如我会这样追问：你说的这个观点，跟日常生活有什么关系？'},
-  {who:'f', text:'我就会打个比方回答你——就像做饭，火候到了菜才香；道理讲到点子上，人才听得进去。'},
-  {who:'m', text:'一问一答，你一句我一句，是不是像两个人在聊天？'},
-  {who:'f', text:'对。如果这两个声音听着自然、分得清男女，就说明你的设备男女声都装好了。'},
+  {who:'m', style:'cheerful', text:'来做个男女声对话测试。我是男声，负责主持。'},
+  {who:'f', style:'narration-relaxed', text:'我是女声，负责讲解。你现在听到的，就是正式开讲时我们俩来回对话的效果。'},
+  {who:'m', style:'cheerful', text:'比如我会这样追问：你说的这个观点，跟日常生活有什么关系？'},
+  {who:'f', style:'narration-relaxed', text:'我就会打个比方回答你——就像做饭，火候到了菜才香；道理讲到点子上，人才听得进去。'},
+  {who:'m', style:'cheerful', text:'一问一答，你一句我一句，是不是像两个人在聊天？'},
+  {who:'f', style:'gentle', text:'对。如果这两个声音听着自然、分得清男女，就说明你的设备男女声都装好了。'},
   {who:'m', text:'要是听着是同一个声音、分不出男女，就点「安装男女声系统」，按你的设备装上中文男声和女声。'},
   {who:'f', text:'装好之后回来再测一次就行。准备好了，就去下面搜一篇文章，正式开讲。'}
 ];
@@ -1058,7 +1106,7 @@ function previewVoices(){
     var t=script[idx];
     var tag = t.who==='m'?'♂ 男声':(t.who==='f'?'♀ 女声':'🎙 讲解者');
     if($('vtStatus')) $('vtStatus').textContent='试听中 · '+tag; else $('playStatus').textContent='试听中 · '+tag;
-    speakOne(t.text, t.who, {m:vm,f:vf,s:vs}, function(){ if(my!==previewToken) return; idx++; step(); });
+    speakOne(t.text, t.who, {m:vm,f:vf,s:vs}, t.style, function(){ if(my!==previewToken) return; idx++; step(); });
   }
   step();
 }
@@ -1084,7 +1132,7 @@ function dialogueTest(){
     var t=DIALOGUE_TEST[idx];
     $('playStatus') && ($('playStatus').textContent='');
     $('vtStatus').textContent='测试中 · 第 '+(idx+1)+'/'+DIALOGUE_TEST.length+' 句（'+(t.who==='m'?'♂ 男声':'♀ 女声')+'）';
-    speakOne(t.text, t.who, {m:vm,f:vf,s:vf}, function(){ if(my!==previewToken) return; idx++; step(); });
+    speakOne(t.text, t.who, {m:vm,f:vf,s:vf}, t.style, function(){ if(my!==previewToken) return; idx++; step(); });
   }
   step();
 }
@@ -1125,7 +1173,7 @@ function playDialogue(){
     highlight(idx);
     var tag=t.who==='m'?'♂ 男':(t.who==='f'?'♀ 女':'🎙 讲解');
     $('playStatus').textContent='正在朗读 · 第 '+(idx+1)+'/'+turns.length+'（'+tag+'）';
-    speakOne(t.text, t.who, {m:vm,f:vf,s:vs}, function(){ if(my!==playToken) return; idx++; speakNext(); });
+    speakOne(t.text, t.who, {m:vm,f:vf,s:vs}, t.style, function(){ if(my!==playToken) return; idx++; speakNext(); });
   }
   speakNext();
 }
@@ -1211,6 +1259,7 @@ try{
   if($('azKey')){ $('azKey').value=localStorage.getItem('sde_azure_key')||''; $('azKey').addEventListener('input',function(){ try{localStorage.setItem('sde_azure_key',this.value.trim());}catch(_){} }); }
 }catch(_){}
 applyVoiceSrc();
+(function(){ var r=$('azRate'); if(!r) return; function lab(){ var v=parseInt(r.value,10)||0; $('azRateVal').textContent = v===0?'正常':(v>0?('快 +'+v+'%'):('慢 '+v+'%')); } r.addEventListener('input',lab); lab(); })();
 $('btnPreviewStop').addEventListener('click', stopPreview);
 renderVoiceReport();
 
