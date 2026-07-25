@@ -248,7 +248,7 @@ select:focus,input:focus{border-color:var(--accent)}
         <option value="speech">演讲（演讲台口吻·感染力·号召）</option>
       </select>
       <div id="oratorRow" style="display:none;margin-top:8px">
-        <span class="drama-tip" style="display:block;margin-bottom:5px">🎤 想学某位名人的演讲风格？填名字（学他的<b>笔法气势</b>，原创文字、不是模仿声音）。留空＝通用演讲风格。</span>
+        <span class="drama-tip" style="display:block;margin-bottom:5px">🎤 让某位名人来讲这篇文章？填名字——想象<b>他会怎么讲这篇文章的主题</b>，用他的笔法气势承载本文的观点（原创文字、不引原话、不模仿声音）。留空＝通用演讲风格。</span>
         <input id="oratorName" type="text" placeholder="如 丘吉尔 / 马丁·路德·金 / 乔布斯 / 林肯…（可留空）" autocomplete="off" style="width:100%;max-width:520px;background:#0C1015;border:1px solid rgba(255,255,255,0.16);border-radius:8px;color:var(--ink);padding:8px 11px;font-size:13.5px;font-family:inherit">
       </div>
       <span class="drama-tip">同一篇文章，换个文体就是另一种读物。散文抒情、评书热闹、议论雄辩、小说藏理……</span>
@@ -904,7 +904,11 @@ async function generate(){
     if(MODE==='solo' && SOLO_STYLE==='speech'){
       var orator=($('oratorName')&&$('oratorName').value||'').trim();
       if(orator){
-        sys += "\n\n════════ 名人演讲风格════════\n用【"+orator+"】的演讲风格和笔法来写这篇演讲——学他惯用的修辞、句式、节奏、气势和情绪调动方式（比如排比、重复、对仗、比喻、呼告的用法），让整篇读起来有他那种味道。但内容完全是围绕本文章原创的，不要引用或杜撰他的原话，也不要提他的名字，只借他的『笔法』不借他的『话』。";
+        sys += "\n\n════════ 名人演讲风格（必须与本文章内容深度挂钩）════════\n"
+          + "设想：如果由【"+orator+"】亲自站上讲台，来讲这篇文章的思想，他会怎么讲？请以此写这篇演讲——\n"
+          + "①【内容锚定】演讲的骨架仍是这篇文章的中心创新观点、它针对的挑战、它的解决之道、它的应用；不要写成一篇脱离本文的空泛演说，每一段都要落在本文的具体论点上。\n"
+          + "②【笔法移植】用【"+orator+"】惯用的修辞与气质来承载这些论点：他常用的句式、节奏、意象、情绪调动方式（如排比、重复、对仗、设问、呼告等），以及他看待世界的那种角度和关切——想象他会抓住这篇文章里的哪个点来点燃听众、会用什么比方讲给大众听。\n"
+          + "③【红线】文字全部围绕本文原创，不引用也不杜撰他的原话，不提他的名字，不写他的生平；只借他的『讲法』来讲『这篇文章』，不是让他讲他自己的事。";
       }
     }
     var styLabel=(SOLO_STYLE&&$('soloStyle'))?($('soloStyle').options[$('soloStyle').selectedIndex].text.split('（')[0]):'深情解读';
