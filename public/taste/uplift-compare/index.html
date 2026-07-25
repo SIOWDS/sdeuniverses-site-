@@ -65,6 +65,16 @@ input:focus,select:focus{border-color:var(--gold)}
 .askInner textarea:focus{border-color:var(--gold)}
 button.go{background:linear-gradient(120deg,var(--gold),var(--gold2));color:#14100A;border:none;border-radius:11px;padding:13px 26px;font-size:15.5px;font-weight:800;cursor:pointer;letter-spacing:0.04em;white-space:nowrap}
 button.go:disabled{opacity:0.45;cursor:not-allowed}
+.msgs{flex:1}
+.colAsk{display:flex;gap:8px;align-items:flex-end;padding:10px 13px 13px;border-top:1px solid rgba(255,255,255,0.06)}
+.colBox{flex:1;background:#0C1015;border:1px solid rgba(255,255,255,0.14);border-radius:9px;color:var(--ink);padding:9px 11px;font-size:13.5px;font-family:inherit;line-height:1.6;min-height:40px;max-height:150px;resize:vertical;outline:none}
+.colBox:focus{border-color:rgba(255,255,255,0.3)}
+.col.base .colBox:focus{border-color:var(--base)}
+.col.wds .colBox:focus{border-color:var(--wds)}
+.colGo{border:none;border-radius:9px;padding:9px 16px;font-size:13.5px;font-weight:800;cursor:pointer;white-space:nowrap;color:#14100A}
+.col.base .colGo{background:linear-gradient(120deg,#8FB0C8,#B7C6D2)}
+.col.wds .colGo{background:linear-gradient(120deg,var(--gold),var(--gold2))}
+.colGo:disabled{opacity:0.4;cursor:not-allowed}
 button.ghost{background:transparent;color:var(--sub2);border:1px solid rgba(255,255,255,0.2);border-radius:10px;padding:11px 16px;font-size:13.5px;cursor:pointer;white-space:nowrap}
 button.ghost:hover{color:var(--ink);border-color:var(--gold)}
 .barMeta{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-top:8px}
@@ -134,22 +144,24 @@ footer{border-top:1px solid rgba(255,255,255,0.08);margin-top:40px;padding:22px 
   <div class="cols">
     <div class="col base" id="colBase">
       <div class="colHead"><div class="t">大模型 <span class="sub" id="baseName">·</span></div><div class="cnt" id="cntBase">0 / 100 轮</div></div>
-      <div class="msgs" id="msgsBase"><div class="msg sys"><div class="bub placeholder">左栏：裸调基底。下面输入问题，两栏会同时作答。</div></div></div>
+      <div class="msgs" id="msgsBase"><div class="msg sys"><div class="bub placeholder">左栏：裸调基底，不加任何 SDE 材料。在下面单独问它，或用底部「同问两栏」一次发两边。</div></div></div>
+      <div class="colAsk"><textarea id="qboxBase" class="colBox" placeholder="单独问「大模型」这一栏…（回车发送）" rows="2"></textarea><button class="colGo" id="btnBase" type="button">发送</button></div>
     </div>
     <div class="col wds" id="colWds">
       <div class="colHead"><div class="t">WDS <span class="sub">基底＋内功＋心得</span></div><div class="cnt" id="cntWds">0 / 100 轮</div></div>
-      <div class="msgs" id="msgsWds"><div class="msg sys"><div class="bub placeholder">右栏：本场第一次提问时，WDS 会先通读内功、写下心得，再作答。</div></div></div>
+      <div class="msgs" id="msgsWds"><div class="msg sys"><div class="bub placeholder">右栏：本场第一次向 WDS 提问时，它会先通读内功、写下心得，再作答。此后每问都带内功＋心得＋全站检索＋方法论，用你所在学科的本地语言回答。</div></div></div>
+      <div class="colAsk"><textarea id="qboxWds" class="colBox" placeholder="单独问「WDS」这一栏…（回车发送）" rows="2"></textarea><button class="colGo" id="btnWds" type="button">发送</button></div>
     </div>
   </div>
 
   <div class="askbar">
     <div class="askInner">
-      <textarea id="qbox" placeholder="输入你的问题，回车发送（Shift+Enter 换行）——同一个问题会同时发给两栏"></textarea>
-      <button class="go" id="btnSend">发送</button>
+      <textarea id="qbox" placeholder="想拿同一句公平对比两栏？在这里输入，回车一次发给两边（Shift+Enter 换行）"></textarea>
+      <button class="go" id="btnSend">同问两栏</button>
     </div>
     <div class="barMeta">
-      <div class="roundTag">本场已对话 <b id="roundNow">0</b> / 100 轮 · 两栏各自累加全部对话记忆</div>
-      <div class="hint" style="margin:0">回答较长时请稍候，两栏并行生成。</div>
+      <div class="roundTag">大模型 <b id="roundNow">0</b> 轮 · WDS <b id="roundNowW">0</b> 轮 · 各栏独立提问、各自累加记忆 · 每栏上限 100 轮</div>
+      <div class="hint" style="margin:0">两栏各聊各的、各记各的轮次；想公平对比时用「同问两栏」把同一句发两边。</div>
     </div>
   </div>
 </div>
@@ -348,7 +360,7 @@ priorPromise.then(()=>{
 // SDE提智大模型：对话大比拼 · 大模型 vs WDS
 //   左栏：裸调基底（无 system）
 //   右栏：同一基底 ＋ 整份 SDE 内功 ＋ 本场心得
-//   两栏各自累加全部对话记忆；都可对话 100 次；同一问题同时发给两栏。
+//   两栏各自独立提问、各记各的轮次、各累加记忆；底部「同问两栏」把同一句发两边。
 // ============================================================
 
 const MAX_ROUNDS = 100;
@@ -490,8 +502,7 @@ function packHistory(history){
 // ---------- 状态 ----------
 let histBase = [];   // [{role,content}]
 let histWds  = [];
-let round = 0;
-let busy = false;
+let roundBase = 0, roundWds = 0;
 let xinde = '';        // 本场心得
 let xindeVendor = '';  // 心得对应的基底 vendor（换基底要重生成）
 let priorReady = false;
@@ -512,9 +523,10 @@ function cacheXinde(){ try{ localStorage.setItem(xindeKey(), xinde); }catch(_){}
 function esc(s){ return String(s==null?'':s).replace(/[<>&]/g, c=>({'<':'&lt;','>':'&gt;','&':'&amp;'}[c])); }
 
 function paintCounts(){
-  $('cntBase').textContent = round + ' / 100 轮';
-  $('cntWds').textContent  = round + ' / 100 轮';
-  $('roundNow').textContent = round;
+  $('cntBase').textContent = roundBase + ' / 100 轮';
+  $('cntWds').textContent  = roundWds + ' / 100 轮';
+  $('roundNow').textContent = roundBase;
+  var rw = $('roundNowW'); if(rw) rw.textContent = roundWds;
 }
 function scrollBottom(el){ el.scrollTop = el.scrollHeight; }
 
@@ -547,41 +559,54 @@ async function ensureXinde(sel, key, statusBub){
 function openXinde(){ if(!xinde) return; $('xindeBody').textContent = xinde; $('xindeModal').classList.add('open'); }
 
 // ---------- 发送：同一问题 → 两栏并行 ----------
-async function send(){
-  if(busy) return;
-  hideErr();
-  const q = ($('qbox').value||'').trim();
-  if(!q){ return; }
-  if(round >= MAX_ROUNDS){ showErr('本场已达 100 轮上限。点「清空两栏对话」可开新一场。'); return; }
-  const sel = $('modelSel').value;
+// ===== 两栏各自独立的一次问答 =====
+// 左栏：裸调基底（无 system），带自己的历史。右栏：内功+心得+RAG+方法论+自己的历史。
+// 两栏各有独立的 busy 锁与轮次计数——各聊各的；底部「同问两栏」只是把同一句同时喂给两者。
+let busyBase = false, busyWds = false;
+
+function preflight(){
   const key = ($('apiKey').value||'').trim();
-  if(!key){ showErr('请先填写所选基底对应厂商的 API Key。'); return; }
+  if(!key){ showErr('请先填写所选基底对应厂商的 API Key。'); return null; }
+  return { sel: $('modelSel').value, key: key };
+}
 
-  busy = true;
-  $('btnSend').disabled = true;
-  $('qbox').value = '';
-
-  clearPlaceholder($('msgsBase')); clearPlaceholder($('msgsWds'));
+async function askBase(q){
+  if(busyBase) return;
+  if(roundBase >= MAX_ROUNDS){ showErr('左栏已满 100 轮。点「清空两栏对话」可开新一场。'); return; }
+  const pf = preflight(); if(!pf) return;
+  hideErr();
+  busyBase = true; $('btnBase').disabled = true; $('btnSend').disabled = true;
+  clearPlaceholder($('msgsBase'));
   addMsg($('msgsBase'), 'u', '你', esc(q));
-  addMsg($('msgsWds'),  'u', '你', esc(q));
-  const baseBub = addMsg($('msgsBase'), 'a', '大模型', '<span class="spinner"></span>作答中…');
+  const bub = addMsg($('msgsBase'), 'a', '大模型', '<span class="spinner"></span>作答中…');
+  try{
+    const baseHist = histBase.concat([{role:'user', content:q}]);
+    const ans = await callMsgs(pf.sel, pf.key, '', packHistory(baseHist), TOK_ANSWER, '大模型');
+    bub.innerHTML = esc(ans);
+    histBase.push({role:'user', content:q}, {role:'assistant', content:ans});
+    roundBase += 1; paintCounts();
+  }catch(e){
+    bub.innerHTML = '<span style="color:#E06C60">✗ '+esc(e.message)+'</span>';
+    showErr(e.message);
+  }finally{
+    busyBase = false; $('btnBase').disabled = false; $('btnSend').disabled = false;
+    scrollBottom($('msgsBase'));
+    if(roundBase >= MAX_ROUNDS){ $('qboxBase').disabled = true; $('qboxBase').placeholder = '左栏已满 100 轮。'; }
+  }
+}
+
+async function askWds(q){
+  if(busyWds) return;
+  if(roundWds >= MAX_ROUNDS){ showErr('右栏已满 100 轮。点「清空两栏对话」可开新一场。'); return; }
+  const pf = preflight(); if(!pf) return;
+  hideErr();
+  busyWds = true; $('btnWds').disabled = true; $('btnSend').disabled = true;
+  clearPlaceholder($('msgsWds'));
+  addMsg($('msgsWds'), 'u', '你', esc(q));
   const wdsStatus = addMsg($('msgsWds'), 'sys', '', '<span class="spinner"></span>准备中…');
-  const wdsBub = addMsg($('msgsWds'), 'a wdsA', 'WDS', '<span class="spinner"></span>等待心得就绪…');
-
-  // 左栏：裸调基底（无 system），带自己的完整历史
-  const baseHist = histBase.concat([{role:'user', content:q}]);
-  const baseTask = callMsgs(sel, key, '', packHistory(baseHist), TOK_ANSWER, '大模型')
-    .then(ans=>{
-      baseBub.innerHTML = esc(ans);
-      histBase.push({role:'user', content:q}, {role:'assistant', content:ans});
-      scrollBottom($('msgsBase'));
-    })
-    .catch(e=>{ baseBub.innerHTML = '<span style="color:#E06C60">✗ '+esc(e.message)+'</span>'; throw e; });
-
-  // 右栏：先确保心得 → 站内 RAG 检索 → 带内功+心得+方法论+站内资料+完整历史作答
-  const wdsTask = (async ()=>{
-    await ensureXinde(sel, key, wdsStatus);
-    // 站内检索（与「和WDS对话SDE」同一后端）：取上一问做接续检索
+  const bub = addMsg($('msgsWds'), 'a wdsA', 'WDS', '<span class="spinner"></span>等待心得就绪…');
+  try{
+    await ensureXinde(pf.sel, pf.key, wdsStatus);
     wdsStatus.innerHTML = '<span class="spinner"></span>检索站内资料…';
     let prevQ = '';
     for(let i=histWds.length-1;i>=0;i--){ if(histWds[i].role==='user'){ prevQ=String(histWds[i].content).slice(0,240); break; } }
@@ -594,43 +619,38 @@ async function send(){
     }
     const sys = wdsSystem(xinde, rag.ctx);
     const wdsHist = histWds.concat([{role:'user', content:q}]);
-    const ans = await callMsgs(sel, key, sys, packHistory(wdsHist), TOK_ANSWER, 'WDS');
-    wdsBub.innerHTML = esc(ans);
+    const ans = await callMsgs(pf.sel, pf.key, sys, packHistory(wdsHist), TOK_ANSWER, 'WDS');
+    bub.innerHTML = esc(ans);
     histWds.push({role:'user', content:q}, {role:'assistant', content:ans});
+    roundWds += 1; paintCounts();
+  }catch(e){
+    bub.innerHTML = '<span style="color:#E06C60">✗ '+esc(e.message)+'</span>';
+    if(wdsStatus && wdsStatus.querySelector && wdsStatus.querySelector('.spinner')) wdsStatus.innerHTML = '⚠ 本轮未完成';
+    showErr(e.message);
+  }finally{
+    busyWds = false; $('btnWds').disabled = false; $('btnSend').disabled = false;
     scrollBottom($('msgsWds'));
-  })().catch(e=>{
-    wdsBub.innerHTML = '<span style="color:#E06C60">✗ '+esc(e.message)+'</span>';
-    if(wdsStatus && wdsStatus.querySelector('.spinner')) wdsStatus.innerHTML = '⚠ 本轮未完成';
-    throw e;
-  });
+    if(roundWds >= MAX_ROUNDS){ $('qboxWds').disabled = true; $('qboxWds').placeholder = '右栏已满 100 轮。'; }
+  }
+}
 
-  const results = await Promise.allSettled([baseTask, wdsTask]);
-  // 只有两栏都成功才算完整一轮（任一失败仍推进轮次，但历史各自按成功与否已入栈）
-  round += 1;
-  paintCounts();
-  const failed = results.filter(r=>r.status==='rejected');
-  if(failed.length){
-    showErr(failed.map(r=>r.reason && r.reason.message).filter(Boolean).join('\n') || '本轮有一栏未完成，可重试。');
-  }
-  if(round >= MAX_ROUNDS){
-    $('qbox').disabled = true;
-    $('qbox').placeholder = '本场已满 100 轮。点「清空两栏对话」开新一场。';
-  }
-  busy = false;
-  $('btnSend').disabled = false;
-  $('qbox').focus();
+// 底部「同问两栏」：把同一句同时喂给两栏——用于开场公平对比。两栏各自并行、互不等待。
+function askBoth(q){
+  askBase(q);   // 不 await：两栏并行，各自推进
+  askWds(q);
 }
 
 function resetChat(){
-  if(busy) return;
+  if(busyBase || busyWds) return;
   if(histBase.length || histWds.length){
     if(!confirm('清空两栏的全部对话记忆，开始新的一场？（本场心得会保留，不重新生成。）')) return;
   }
-  histBase = []; histWds = []; round = 0;
-  $('msgsBase').innerHTML = '<div class="msg sys"><div class="bub placeholder">左栏：裸调基底。下面输入问题，两栏会同时作答。</div></div>';
+  histBase = []; histWds = []; roundBase = 0; roundWds = 0;
+  ['qboxBase','qboxWds','qbox'].forEach(function(id){ var el=$(id); if(el){ el.disabled=false; } });
+  $('msgsBase').innerHTML = '<div class="msg sys"><div class="bub placeholder">左栏：裸调基底，不加任何 SDE 材料。在下面单独问它，或用底部「同问两栏」一次发两边。</div></div>';
   $('msgsWds').innerHTML  = '<div class="msg sys"><div class="bub placeholder">右栏：本场第一次提问时，WDS 会先通读内功、写下心得，再作答。</div></div>';
   $('qbox').disabled = false;
-  $('qbox').placeholder = '输入你的问题，回车发送（Shift+Enter 换行）——同一个问题会同时发给两栏';
+  $('qbox').placeholder = '想拿同一句公平对比两栏？在这里输入，回车一次发给两边（Shift+Enter 换行）';
   paintCounts(); hideErr();
 }
 
@@ -650,10 +670,17 @@ function boot(){
   $('keyTog').addEventListener('click', ()=>{
     const k=$('apiKey'); if(k.type==='password'){ k.type='text'; $('keyTog').textContent='隐藏'; } else { k.type='password'; $('keyTog').textContent='显示'; }
   });
-  $('btnSend').addEventListener('click', send);
+  function fireBoth(){ const q=($('qbox').value||'').trim(); if(!q) return; $('qbox').value=''; askBoth(q); }
+  $('btnSend').addEventListener('click', fireBoth);
+  function fireBase(){ const q=($('qboxBase').value||'').trim(); if(!q) return; $('qboxBase').value=''; askBase(q); }
+  $('btnBase').addEventListener('click', fireBase);
+  $('qboxBase').addEventListener('keydown', e=>{ if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); fireBase(); } });
+  function fireWds(){ const q=($('qboxWds').value||'').trim(); if(!q) return; $('qboxWds').value=''; askWds(q); }
+  $('btnWds').addEventListener('click', fireWds);
+  $('qboxWds').addEventListener('keydown', e=>{ if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); fireWds(); } });
   $('btnReset').addEventListener('click', resetChat);
   $('qbox').addEventListener('keydown', e=>{
-    if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); send(); }
+    if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); fireBoth(); }
   });
   $('xindeClose').addEventListener('click', ()=>$('xindeModal').classList.remove('open'));
   $('xindeModal').addEventListener('click', e=>{ if(e.target===$('xindeModal')) $('xindeModal').classList.remove('open'); });
