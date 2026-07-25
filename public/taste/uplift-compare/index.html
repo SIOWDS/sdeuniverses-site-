@@ -75,6 +75,17 @@ button.go:disabled{opacity:0.45;cursor:not-allowed}
 .col.base .colGo{background:linear-gradient(120deg,#8FB0C8,#B7C6D2)}
 .col.wds .colGo{background:linear-gradient(120deg,var(--gold),var(--gold2))}
 .colGo:disabled{opacity:0.4;cursor:not-allowed}
+.headRight{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.paperBtns{display:inline-flex;gap:6px}
+.paperBtn{background:transparent;border:1px solid rgba(255,255,255,0.2);color:var(--sub);border-radius:8px;padding:4px 10px;font-size:11.5px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:inherit}
+.paperBtn:hover{border-color:rgba(255,255,255,0.42);color:var(--ink)}
+.col.base .paperBtn:hover{border-color:var(--base);color:var(--base)}
+.col.wds .paperBtn.wds:hover{border-color:var(--wds);color:var(--gold2)}
+.paperBtn:disabled{opacity:0.4;cursor:not-allowed}
+.modalActs{display:flex;align-items:center;gap:8px}
+.miniBtn{background:transparent;border:1px solid rgba(255,255,255,0.22);color:var(--sub);border-radius:7px;padding:4px 11px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit}
+.miniBtn:hover{border-color:var(--gold2);color:var(--gold2)}
+#paperBody{white-space:pre-wrap}
 button.ghost{background:transparent;color:var(--sub2);border:1px solid rgba(255,255,255,0.2);border-radius:10px;padding:11px 16px;font-size:13.5px;cursor:pointer;white-space:nowrap}
 button.ghost:hover{color:var(--ink);border-color:var(--gold)}
 .barMeta{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-top:8px}
@@ -143,12 +154,12 @@ footer{border-top:1px solid rgba(255,255,255,0.08);margin-top:40px;padding:22px 
 
   <div class="cols">
     <div class="col base" id="colBase">
-      <div class="colHead"><div class="t">大模型 <span class="sub" id="baseName">·</span></div><div class="cnt" id="cntBase">0 / 100 轮</div></div>
+      <div class="colHead"><div class="t">大模型 <span class="sub" id="baseName">·</span></div><div class="headRight"><span class="paperBtns"><button class="paperBtn" id="paperBase5" type="button" title="把左栏这场对话总结成约5000字的正式论文">成文·5千字</button><button class="paperBtn" id="paperBase10" type="button" title="把左栏这场对话总结成约1万字的正式论文">1万字</button></span><span class="cnt" id="cntBase">0 / 100 轮</span></div></div>
       <div class="msgs" id="msgsBase"><div class="msg sys"><div class="bub placeholder">左栏：裸调基底，不加任何 SDE 材料。在下面单独问它，或用底部「同问两栏」一次发两边。</div></div></div>
       <div class="colAsk"><textarea id="qboxBase" class="colBox" placeholder="单独问「大模型」这一栏…（回车发送）" rows="2"></textarea><button class="colGo" id="btnBase" type="button">发送</button></div>
     </div>
     <div class="col wds" id="colWds">
-      <div class="colHead"><div class="t">WDS <span class="sub">基底＋内功＋心得</span></div><div class="cnt" id="cntWds">0 / 100 轮</div></div>
+      <div class="colHead"><div class="t">WDS <span class="sub">基底＋内功＋心得＋检索＋方法论</span></div><div class="headRight"><span class="paperBtns"><button class="paperBtn wds" id="paperWds5" type="button" title="把右栏这场对话总结成约5000字的正式论文（用你所在学科的本地语言、不露 SDE 术语）">成文·5千字</button><button class="paperBtn wds" id="paperWds10" type="button" title="把右栏这场对话总结成约1万字的正式论文（学科本地语言、不露术语）">1万字</button></span><span class="cnt" id="cntWds">0 / 100 轮</span></div></div>
       <div class="msgs" id="msgsWds"><div class="msg sys"><div class="bub placeholder">右栏：本场第一次向 WDS 提问时，它会先通读内功、写下心得，再作答。此后每问都带内功＋心得＋全站检索＋方法论，用你所在学科的本地语言回答。</div></div></div>
       <div class="colAsk"><textarea id="qboxWds" class="colBox" placeholder="单独问「WDS」这一栏…（回车发送）" rows="2"></textarea><button class="colGo" id="btnWds" type="button">发送</button></div>
     </div>
@@ -161,7 +172,7 @@ footer{border-top:1px solid rgba(255,255,255,0.08);margin-top:40px;padding:22px 
     </div>
     <div class="barMeta">
       <div class="roundTag">大模型 <b id="roundNow">0</b> 轮 · WDS <b id="roundNowW">0</b> 轮 · 各栏独立提问、各自累加记忆 · 每栏上限 100 轮</div>
-      <div class="hint" style="margin:0">两栏各聊各的、各记各的轮次；想公平对比时用「同问两栏」把同一句发两边。</div>
+      <div class="hint" style="margin:0">两栏各聊各的、各记各的轮次；想公平对比时用「同问两栏」把同一句发两边。　聊完点每栏标题栏的「成文」，可把该栏对话总结成 5 千 / 1 万字的正式论文。</div>
     </div>
   </div>
 </div>
@@ -170,6 +181,12 @@ footer{border-top:1px solid rgba(255,255,255,0.08);margin-top:40px;padding:22px 
   <div class="modalBox">
     <div class="modalHead"><div class="t">WDS 本场学习心得</div><button id="xindeClose" type="button">×</button></div>
     <div class="modalBody" id="xindeBody"></div>
+  </div>
+</div>
+<div class="modal" id="paperModal">
+  <div class="modalBox">
+    <div class="modalHead"><div class="t" id="paperTitle">生成论文</div><div class="modalActs"><button class="miniBtn" id="paperCopy" type="button">复制</button><button class="miniBtn" id="paperDl" type="button">下载 .md</button><button id="paperClose" type="button">×</button></div></div>
+    <div class="modalBody" id="paperBody"></div>
   </div>
 </div>
 
@@ -640,6 +657,68 @@ function askBoth(q){
   askWds(q);
 }
 
+// ===== 总结对话 → 成一篇正式论文（5000 / 10000 字）=====
+// 左栏用普通正式论文体；右栏继承改姓红线：正式论文但零 SDE 术语、用作者所在学科的本地语言。
+let paperBusy = false;
+let lastPaper = { title:'', text:'' };
+
+function paperSystem(isWds, words){
+  const common =
+    '你是一位资深学术作者。下面会给你一整场问答对话的完整记录。你的任务：把这场对话里真正形成的判断、论点与例子，重新组织成一篇结构完整的正式学术论文，约' + words + '字（中文）。'
+    + '\n\n【硬要求】'
+    + '\n1. 正式论文格式：标题、摘要（150–250字）、关键词（4–7个）、引言、若干层级分明的正文章节（用「一、二、三…」编号，需要时带二级小节）、结论。若对话中出现可核验的书名/作者/年份/数据，在文末列「参考文献」，并在正文相应处标注；对话中没出现来源的，不要编造文献。'
+    + '\n2. 这是论文不是对话综述：不要写成"第一轮问了什么、WDS答了什么"，要把内容抽象成命题与论证，用第三人称学术语体，让读者看不出它来自一场对话。'
+    + '\n3. 忠于对话：论文的核心主张、区分、例子必须来自这场对话本身，你只做重组、提炼、补足过渡与学术化表达，不得掺入对话里没有的新观点或新事实。'
+    + '\n4. 字数尽量贴近 ' + words + ' 字，宁可充分展开论证也不要凑字数注水。直接从论文标题开始输出，不要任何开场白或"以下是论文"之类的话。用 Markdown：一级标题用 #，章节用 ##。';
+  const wdsExtra = isWds
+    ? ('\n\n【最高红线·术语本地化，违反即失败】这场对话背后用的是一套名为 SDE 的方法论，但成文时【严禁任何 SDE 内部术语外泄】——绝不许出现：显露／差异序列／特征纠缠／三大方程／S=F(D,E)／六路径／123原理／二阶碰撞／发生学／显影／介生态／意义三律／回写／底盘／成熟态 等一切 SDE 行话与公式。把每一个判断都翻译成【论文所属学科的本地学术语言】写出来（经济学问题就用经济学的话，教育问题就用教育学与心理学的话，以此类推）。读者只应看见一篇本学科里论证扎实的正规论文，看不见任何来自某套外部体系的名目。若你发现自己正要写下上面任何一个词，停下，换成这个学科里意思最接近的本地术语。')
+    : '';
+  return common + wdsExtra;
+}
+
+async function writePaper(col, words){
+  if(paperBusy) return;
+  const hist = col === 'wds' ? histWds : histBase;
+  if(!hist.length){ showErr('这一栏还没有对话可以总结。先聊几轮再成文。'); return; }
+  const pf = preflight(); if(!pf) return;
+  hideErr();
+  paperBusy = true;
+  ['paperBase5','paperBase10','paperWds5','paperWds10'].forEach(function(id){ var b=$(id); if(b) b.disabled=true; });
+  // 打开弹窗显示进度
+  const colName = col === 'wds' ? 'WDS' : '大模型';
+  $('paperTitle').textContent = '正在把「'+colName+'」这场对话写成约 '+words+' 字论文…';
+  $('paperBody').innerHTML = '<span class="spinner"></span>生成中，约一两分钟，请稍候…（论文越长越久）';
+  $('paperModal').classList.add('open');
+  try{
+    // 把整场对话打成一段材料，作为 user 消息
+    const transcript = hist.map(function(m){ return (m.role==='user'?'【提问】':'【回答】') + '\n' + m.content; }).join('\n\n');
+    const sys = paperSystem(col === 'wds', words);
+    const userMsg = '这是需要你写成论文的完整对话记录（共 '+(hist.length/2)+' 轮问答）：\n\n' + transcript + '\n\n请据此写一篇约 '+words+' 字的正式论文。';
+    // 成文预算：按字数放宽 token（1 汉字≈1.6 token，留足思考+正文）
+    const tok = words >= 10000 ? 60000 : 40000;
+    const paper = await callMsgs(pf.sel, pf.key, sys, [{role:'user', content:userMsg}], tok, '成文');
+    lastPaper = { title: colName+'·'+words+'字论文', text: paper };
+    $('paperTitle').textContent = colName+'栏 · 约'+words+'字论文';
+    $('paperBody').textContent = paper;
+  }catch(e){
+    $('paperBody').innerHTML = '<span style="color:#E06C60">✗ 成文失败：'+esc(e.message)+'</span>';
+    showErr(e.message);
+  }finally{
+    paperBusy = false;
+    ['paperBase5','paperBase10','paperWds5','paperWds10'].forEach(function(id){ var b=$(id); if(b) b.disabled=false; });
+  }
+}
+
+function downloadPaper(){
+  if(!lastPaper.text) return;
+  const blob = new Blob([lastPaper.text], { type:'text/markdown;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = lastPaper.title.replace(/[\\/:*?"<>|·]/g,'-') + '.md';
+  document.body.appendChild(a); a.click();
+  setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); }, 100);
+}
+
 function resetChat(){
   if(busyBase || busyWds) return;
   if(histBase.length || histWds.length){
@@ -678,6 +757,16 @@ function boot(){
   function fireWds(){ const q=($('qboxWds').value||'').trim(); if(!q) return; $('qboxWds').value=''; askWds(q); }
   $('btnWds').addEventListener('click', fireWds);
   $('qboxWds').addEventListener('keydown', e=>{ if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); fireWds(); } });
+  // 成文按钮（每栏 5千/1万字两档）
+  $('paperBase5').addEventListener('click', ()=>writePaper('base', 5000));
+  $('paperBase10').addEventListener('click', ()=>writePaper('base', 10000));
+  $('paperWds5').addEventListener('click', ()=>writePaper('wds', 5000));
+  $('paperWds10').addEventListener('click', ()=>writePaper('wds', 10000));
+  // 成文弹窗：复制 / 下载 / 关闭
+  $('paperCopy').addEventListener('click', ()=>{ if(lastPaper.text){ navigator.clipboard.writeText(lastPaper.text).then(()=>{ $('paperCopy').textContent='已复制'; setTimeout(()=>$('paperCopy').textContent='复制',1500); }); } });
+  $('paperDl').addEventListener('click', downloadPaper);
+  $('paperClose').addEventListener('click', ()=>$('paperModal').classList.remove('open'));
+  $('paperModal').addEventListener('click', e=>{ if(e.target===$('paperModal')) $('paperModal').classList.remove('open'); });
   $('btnReset').addEventListener('click', resetChat);
   $('qbox').addEventListener('keydown', e=>{
     if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); fireBoth(); }
