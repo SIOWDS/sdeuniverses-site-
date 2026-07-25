@@ -167,7 +167,7 @@ select:focus,input:focus{border-color:var(--accent)}
         </div>
         <div class="cloudgrid">
           <div class="cf"><span>Azure 区域</span><input id="azRegion" type="text" placeholder="如 eastasia / eastus" autocomplete="off"></div>
-          <div class="cf"><span>Azure 密钥</span><input id="azKey" type="password" placeholder="Speech 资源的 Key（只存本地）" autocomplete="off"></div>
+          <div class="cf"><span>Azure 密钥</span><input id="azKey" type="password" placeholder="Speech 资源的 Key（只存本地）" autocomplete="off"><span id="azSaveHint" style="font-size:11px;color:var(--muted);margin-top:3px">密钥和区域会自动存到你浏览器本地，下次打开自动填好。</span></div>
         </div>
         <div class="cloudgrid">
           <div class="cf"><span>♂ 云端男声</span><select id="azVoiceM"></select></div>
@@ -1223,6 +1223,7 @@ function stopPreview(){ previewToken++; stopAllAudio(); endPreview('已停止试
 
 // 男女声对话测试：固定播放一段男女来回对话（与当前讲法模式无关）
 function dialogueTest(){
+  if(typeof saveAzureCreds==='function') saveAzureCreds(true);
   if(!ttsOK){ $('playErr').textContent='你的浏览器不支持语音朗读，可换用较新的 Chrome / Edge / Safari。'; $('playErr').style.display='block'; return; }
   $('playErr').style.display='none';
   stopAllAudio(); previewToken++; var my=previewToken; previewing=true;
@@ -1359,10 +1360,27 @@ function applyVoiceSrc(){
 Array.prototype.forEach.call(document.querySelectorAll('input[name="vsrc"]'), function(r){
   r.addEventListener('change', function(){ if(this.checked){ VOICE_SRC=this.value; applyVoiceSrc(); } });
 });
-// Azure Key/区域 本地持久化
+// Azure Key/区域 本地持久化（input/change/blur 都存——粘贴也存得住）
+function saveAzureCreds(showTip){
+  try{
+    if($('azRegion')) localStorage.setItem('sde_azure_region', ($('azRegion').value||'').trim());
+    if($('azKey')) localStorage.setItem('sde_azure_key', ($('azKey').value||'').trim());
+    if(showTip && $('azSaveHint')){
+      var k=($('azKey').value||'').trim();
+      $('azSaveHint').textContent = k ? '✓ 已保存到本地（下次打开自动填好）' : '密钥和区域会自动存到你浏览器本地，下次打开自动填好。';
+      $('azSaveHint').style.color = k ? 'var(--gold2)' : 'var(--muted)';
+    }
+  }catch(_){}
+}
 try{
-  if($('azRegion')){ $('azRegion').value=localStorage.getItem('sde_azure_region')||''; $('azRegion').addEventListener('input',function(){ try{localStorage.setItem('sde_azure_region',this.value.trim());}catch(_){} }); }
-  if($('azKey')){ $('azKey').value=localStorage.getItem('sde_azure_key')||''; $('azKey').addEventListener('input',function(){ try{localStorage.setItem('sde_azure_key',this.value.trim());}catch(_){} }); }
+  if($('azRegion')){ $('azRegion').value=localStorage.getItem('sde_azure_region')||''; }
+  if($('azKey')){ $('azKey').value=localStorage.getItem('sde_azure_key')||''; }
+  ['azRegion','azKey'].forEach(function(id){
+    var el=$(id); if(!el) return;
+    ['input','change','blur','paste'].forEach(function(ev){
+      el.addEventListener(ev, function(){ setTimeout(function(){ saveAzureCreds(true); }, ev==='paste'?30:0); });
+    });
+  });
 }catch(_){}
 applyVoiceSrc();
 (function(){ var r=$('azRate'); if(!r) return; function lab(){ var v=parseInt(r.value,10)||0; $('azRateVal').textContent = v===0?'正常':(v>0?('快 +'+v+'%'):('慢 '+v+'%')); } r.addEventListener('input',lab); lab(); })();
