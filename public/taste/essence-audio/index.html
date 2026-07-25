@@ -932,7 +932,9 @@ function lenMeta(wc){
           : wc<=5000  ? '分 3–4 个层次推进，每层都要落到实处'
           : wc<=10000 ? '分 5–7 个层次层层推进，每层都要有新的东西，不许把同一个意思换词重说'
           :             '分 8–12 个层次层层推进，每层都要有新的东西、新的例子；宁可多举实例、多做展开，也不许把同一个意思换词重说来凑字数';
-  return { wc:wc, words:w, min:min, seg:seg };
+  var thickSolo = wc>=10000 ? '这是长篇：每一层都要写厚——关键段落成段展开、多举实例多做推演，单层写到六百字以上很正常；写到一半在心里自查一次字数，发现不够就把当前这一层挖得更深，绝不许提前进入收尾。' : '';
+  var thickDuo  = wc>=10000 ? '这是长篇对话：厚度长在每一轮的来回数上——重点的一轮要打八到十五个来回，嘉宾的关键发言允许连说三五句成段，不许每句一两行就急着换人；写到一半在心里自查一次字数，发现不够就把当前这一轮缠斗得更深，绝不许提前进入收尾。' : '';
+  return { wc:wc, words:w, min:min, seg:seg, thickSolo:thickSolo, thickDuo:thickDuo };
 }
 function lecSystem(mode, xinde, siteCtx, drama, soloStyle, domain, external, wc){
   var LM=lenMeta(wc);
@@ -968,7 +970,7 @@ function lecSystem(mode, xinde, siteCtx, drama, soloStyle, domain, external, wc)
       + "【文体情调】" + ss.tone + "\n"
       + common
       + dramaGuide(drama)
-      + "【长度与结构·硬要求】：整篇约 "+LM.words+"（中文），读出来大约 "+LM.min+" 分钟。这是硬指标，写短了算不合格。开头一两句点出今天要讲的这篇文章、它为什么值得讲；中间按上面那"+TASKN+"层层展开，"+LM.seg+"；结尾一句话收束、留个回味。\n"
+      + "【长度与结构·硬要求】：整篇约 "+LM.words+"（中文），读出来大约 "+LM.min+" 分钟。这是硬指标，写短了算不合格。开头一两句点出今天要讲的这篇文章、它为什么值得讲；中间按上面那"+TASKN+"层层展开，"+LM.seg+"。"+LM.thickSolo+"结尾一句话收束、留个回味。\n"
       + "【输出格式·必须严格遵守】：连贯的讲解散文，自然分段（段与段之间空一行）。每一段开头加一个方括号标签，里面是「语气|语速」，按这段语义决定，例：`[narration-relaxed|normal] 今天要讲的这篇……`、`[serious|slow] 但这里有个难处……`。语气标签只能从这几个里选：general、cheerful、gentle、narration-relaxed、serious、newscast、lyrical；语速档三选一：slow(放慢·沉思/难点/动情/回味)、normal(常速)、fast(加快·激昂/紧张/罗列/推进)。【要有明显变化】：开头点题用 cheerful 或 general、讲严峻/尖锐处用 serious、温情处用 gentle、升华收束用 lyrical，别每段都一个调。不要出现说话人名字或『男：』『女：』，不要写标题、不要用 Markdown、不要加编号。直接开始讲。";
   }
   // duo（男女对话，默认）
@@ -979,7 +981,7 @@ function lecSystem(mode, xinde, siteCtx, drama, soloStyle, domain, external, wc)
     + common
     + dramaGuide(drama)
     + "【对话感】：整场对话按上面的对话发生 Skill 编排——男主持人的每次接话，要么在同一个问题上较真，要么换一个角度追问（『它是怎么来的？』『它凭什么成立？』），让对话真的往前走，而不是各说各话。\n"
-    + "【长度·硬要求】：整篇对话体讲解稿约 "+LM.words+"（中文），读出来大约 "+LM.min+" 分钟。这是硬指标，写短了算不合格，"+LM.seg+"。开头男主持人用一两句话把今天要讲的文章点出来，结尾女嘉宾用一句话收束。\n"
+    + "【长度·硬要求】：整篇对话体讲解稿约 "+LM.words+"（中文），读出来大约 "+LM.min+" 分钟。这是硬指标，写短了算不合格，"+LM.seg+"。"+LM.thickDuo+"开头男主持人用一两句话把今天要讲的文章点出来，结尾女嘉宾用一句话收束。\n"
     + "【输出格式·必须严格遵守，供程序切分与配语气】：每一句发言单独一行；行首先写说话人 `男` 或 `女`，紧跟竖线 `|`、这句话的语气标签、再一个竖线 `|`、这句话的语速档，再一个中文冒号 `：`，然后是内容。语速档三选一：`slow`(放慢·用于沉思/难点/动情/需要回味处)、`normal`(常速)、`fast`(加快·用于激昂/紧张/罗列/推进处)。例：`男|cheerful|fast：你是说……？`、`女|serious|slow：它真正难的地方在于……`。\n"
     + "【语气标签只能从这几个里选，按这句话的语义 / 语句 / 语法来定】：general(中性)、cheerful(欢快·多用于提问和轻松处)、gentle(温柔)、narration-relaxed(舒缓讲述·多用于讲解重点)、serious(严肃·讲难点或下判断)、newscast(播报·陈述事实)、lyrical(抒情·结尾升华)、customerservice(亲切)。【关键要求：语气要有明显变化和对比，不要一味用 narration-relaxed，那样听起来很平】——男主持人的提问、惊讶、调侃用 cheerful；女嘉宾讲到激动人心或正面的点用 cheerful 或 lyrical；讲到严峻 / 尖锐 / 下判断的地方一定用 serious；温情、安慰、收束用 gentle；陈述客观事实用 general 或 newscast；抒情升华用 lyrical。相邻的句子尽量用不同的语气，让整段有起伏。一段对话里至少要出现 4 种不同的语气标签。\n"
     + "不要写旁白、不要写标题、不要用 Markdown、不要加编号。直接从第一行 `男|...：` 开始。";
@@ -1221,9 +1223,10 @@ async function generate(){
       ? ('【标题】本篇标题定为《'+userTitle+'》，请紧扣这个标题来写，并在正文最前面单独一行输出：标题：'+userTitle)
       : '【标题】请你根据成品内容，自拟一个贴切、有吸引力的标题，放在正文最前面单独一行，格式：标题：你起的标题';
     var lenPhrase='约 '+lenMeta(wc).words+'（不少于 '+Math.round(wc*0.85)+' 字）';
+    var thickReq = wc>=10000 ? '这是长篇硬性字数：请把每一层／每一轮写厚（长对话靠单轮多来回、长文章靠单层成段展开），写到中途自查字数，不足就加深当前部分，绝不许提前收尾。' : '';
     var tail=(MODE==='solo')
-      ? ('请据此，按你的任务与【'+styLabel+'】这个文体的写法和情调，写出'+lenPhrase+'的单人朗读作品。'+titleReq+'。标题那一行之后空一行再开始正文；正文分段，段与段之间空一行；每段段首标一个 `[语气|语速]` 方括号标签（语气和语速两段都要写，例 `[serious|slow]`），不要任何说话人标记。')
-      : ('请据此，按你的任务与格式要求，写出'+lenPhrase+'的男女对话体讲解稿。'+titleReq+'（标题单独一行"标题：…"，之后再从对话第一行开始）；每句单独一行，按 `男|语气|语速：` / `女|语气|语速：` 的三段格式（语气和语速都要写，例 `男|cheerful|fast：`），按语义给每句配。');
+      ? ('请据此，按你的任务与【'+styLabel+'】这个文体的写法和情调，写出'+lenPhrase+'的单人朗读作品。'+thickReq+titleReq+'。标题那一行之后空一行再开始正文；正文分段，段与段之间空一行；每段段首标一个 `[语气|语速]` 方括号标签（语气和语速两段都要写，例 `[serious|slow]`），不要任何说话人标记。')
+      : ('请据此，按你的任务与格式要求，写出'+lenPhrase+'的男女对话体讲解稿。'+thickReq+titleReq+'（标题单独一行"标题：…"，之后再从对话第一行开始）；每句单独一行，按 `男|语气|语速：` / `女|语气|语速：` 的三段格式（语气和语速都要写，例 `男|cheerful|fast：`），按语义给每句配。');
     var userMsg='【要讲解的文章标题】'+chosenDoc.title+'\n【目标篇幅】'+lenPhrase+'\n【原文如下】\n\n'+full+'\n\n'+tail;
     var out=await callMsgs(pf.sel, pf.key, sys, [{role:'user', content:userMsg}], maxTok, '讲解稿');
     lastDialogue=out;
@@ -1401,6 +1404,55 @@ async function synthAllToBlob(){
   }
   return new Blob(parts, {type:'audio/mpeg'});
 }
+/* ===== 响度归一（保存的 MP3 归到约 -16 LUFS，播客发行响度）=====
+   纯增益+软限幅：先按门限 RMS 估响度，算增益（上限 +12dB），过 0.85 后 tanh 软压、天花板 0.97，
+   然后 lamejs 重编码 48kbps。任何一步失败都回退原始音频——归一是锦上添花，不许弄丢成品。 */
+async function ensureLame(){
+  if(window.lamejs) return;
+  await loadScript('https://cdnjs.cloudflare.com/ajax/libs/lamejs/1.2.0/lame.min.js');
+  if(!window.lamejs) throw new Error('lamejs 未就绪');
+}
+// 纯数学，可单测：samples(Float32Array) → {out:Int16Array, rmsDb, gainDb}
+function gainLimit(samples, targetDb){
+  var FR=1200, gate=Math.pow(10,-50/20);           // 50ms 帧、-50dB 门限
+  var sum=0, cnt=0;
+  for(var i=0;i+FR<=samples.length;i+=FR){
+    var s2=0; for(var j=i;j<i+FR;j++){ var v=samples[j]; s2+=v*v; }
+    var rms=Math.sqrt(s2/FR);
+    if(rms>gate){ sum+=s2/FR; cnt++; }
+  }
+  var rmsDb = cnt ? 10*Math.log10(sum/cnt) : -70;
+  var gainDb = Math.max(0, Math.min(12, targetDb - rmsDb));   // 只加不减、封顶+12dB
+  var g = Math.pow(10, gainDb/20);
+  var t=0.85, c=0.97, out=new Int16Array(samples.length);
+  for(var k=0;k<samples.length;k++){
+    var y=samples[k]*g, a=Math.abs(y);
+    if(a>t) y=(y<0?-1:1)*(t+(c-t)*Math.tanh((a-t)/(c-t)));
+    out[k]=Math.max(-32768, Math.min(32767, Math.round(y*32767)));
+  }
+  return { out:out, rmsDb:rmsDb, gainDb:gainDb };
+}
+async function normalizeMp3Blob(blob, onStatus){
+  await ensureLame();
+  var ab=await blob.arrayBuffer();
+  var oc=new OfflineAudioContext(1, 24000, 24000);
+  var buf=await oc.decodeAudioData(ab);
+  var ch=buf.getChannelData(0);
+  if(onStatus) onStatus('正在响度归一…');
+  var r=gainLimit(ch, -16);
+  if(r.gainDb<0.5) return null;                     // 已够响，不折腾
+  var enc=new lamejs.Mp3Encoder(1, buf.sampleRate, 48);
+  var parts=[], CH=1152;
+  for(var i=0;i<r.out.length;i+=CH){
+    var d=enc.encodeBuffer(r.out.subarray(i, Math.min(i+CH, r.out.length)));
+    if(d.length) parts.push(d);
+    if(onStatus && (i/CH)%400===0) onStatus('正在响度归一并重编码… '+Math.round(100*i/r.out.length)+'%');
+  }
+  var fin=enc.flush(); if(fin.length) parts.push(fin);
+  var out=new Blob(parts, {type:'audio/mpeg'});
+  if(out.size<10000) throw new Error('编码结果异常');
+  return { blob:out, gainDb:Math.round(r.gainDb*10)/10, fromDb:Math.round(r.rmsDb) };
+}
 var savingNow=false;
 async function saveToDir(){
   if(savingNow) return;
@@ -1414,9 +1466,16 @@ async function saveToDir(){
   try{
     // 音频：仅云端可存
     var mp3=null;
+    var normNote='';
     if(VOICE_SRC==='cloud'){
       try{ mp3=await synthAllToBlob(); }
       catch(e){ $('saveStatus').textContent='音频合成失败：'+(e&&e.message||e)+'（讲解稿仍会保存）'; }
+      if(mp3){
+        try{
+          var nz=await normalizeMp3Blob(mp3, function(s){ $('saveStatus').textContent=s; });
+          if(nz && nz.blob){ mp3=nz.blob; normNote='，已响度归一（'+nz.fromDb+'dB→约-16LUFS，+'+nz.gainDb+'dB）'; }
+        }catch(e2){ normNote='，响度归一失败按原响度保存'; }
+      }
     }
     // 有目录句柄且有权限→写目录；否则回退下载
     var okDir=false;
@@ -1425,12 +1484,12 @@ async function saveToDir(){
     if(okDir && dirHandle){
       await writeToDir(dirHandle, base+'.txt', txtBlob);
       if(mp3) await writeToDir(dirHandle, base+'.mp3', mp3);
-      $('saveStatus').textContent='✓ 已保存到「'+(dirHandle.name||'所选目录')+'」：'+base+'.txt'+(mp3?(' + '+base+'.mp3'):'（系统语音无音频，仅存讲解稿）');
+      $('saveStatus').textContent='✓ 已保存到「'+(dirHandle.name||'所选目录')+'」：'+base+'.txt'+(mp3?(' + '+base+'.mp3'+normNote):'（系统语音无音频，仅存讲解稿）');
     } else {
       // 回退：普通下载
       dlBlob(base+'.txt', txtBlob);
       if(mp3) dlBlob(base+'.mp3', mp3);
-      $('saveStatus').textContent='✓ 已下载到「下载」文件夹：'+base+'.txt'+(mp3?(' + '+base+'.mp3'):(VOICE_SRC==='cloud'?'':'（系统语音无音频，仅存讲解稿；想存音频请切云端）'));
+      $('saveStatus').textContent='✓ 已下载到「下载」文件夹：'+base+'.txt'+(mp3?(' + '+base+'.mp3'+normNote):(VOICE_SRC==='cloud'?'':'（系统语音无音频，仅存讲解稿；想存音频请切云端）'));
     }
   }catch(e){ $('saveStatus').textContent='保存失败：'+(e&&e.message||e); }
   finally{ savingNow=false; $('btnSaveDir').disabled=false; }
