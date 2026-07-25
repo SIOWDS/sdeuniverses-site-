@@ -203,6 +203,30 @@ footer a{color:var(--gold);text-decoration:none}
     <p style="margin-top:2.4em;padding-top:1.3em;border-top:1px solid rgba(140,140,140,.28);font-size:.86em;opacity:.72;line-height:1.8">（附注：本文由原稿《个人钢琴演奏的符号转化与可复生性》按提升路径重写；本篇的创新智商<strong>待独立复核后填入</strong>：按学派评分纪律第三条，改写者不为自己的产出评分。学员专栏录取线 140。）</p>
   <div class="end-orn">· 全 文 完 ·</div>
   </div>
+
+<section class="sde-expert" style="--exp:#8A6817;--exp2:#C89117">
+<div class="xp-hd"><span class="xp-tag"><i></i>专家点评</span><span class="xp-en">EXPERT COMMENTARY</span><span class="xp-line"></span></div>
+<div class="xp-card">
+<div class="xp-seal">评</div>
+<div class="xp-b">
+<div class="xp-h">创新点在哪里<span class="n">/ WHAT IS NEW</span></div>
+<p>枢纽是一个可测的重合：转录模型失去置信度的地方，与钢琴演奏者真正拥有选择的地方，是同一批区域——密集和弦里的内声部、极弱音、踏板重叠、自由速度段落。而且作者没有把它写成神秘的对称，而是指出同源：这些正是「音乐是一串离散可分离事件」这个假定失效之处。它对机器是噪声，对人是全部的音乐。工程上被当作垃圾丢掉的置信度，由此被重新读成唯一有教学价值的那一层。</p>
+<p>与两个祖先的切割干净利落。西格 1958 年已经说了一半，作者不掩盖，而是指认剩下的两样：西格的解药是纪律（靠写谱人自觉），本文的解药是架构；更要紧的是机器带来了西格不可能拥有的第三个对象——置信度，正是「那个假定在哪里失效」的测量，六十八年后，一句哲学抱怨第一次变成了可以计算的量。对古德曼则指出一处错位：这个领域用一把为「是不是同一部作品」打造的尺，去量「能不能传下去」。而「太像是一种失败」这个反直觉判准，作者自己补了护栏——主体复生是相似度 × 可说明性的二维判断，目标区是低相似度加高可说明性——否则它会退化为奖励任意的不像。</p>
+</div>
+<div class="xp-b">
+<div class="xp-h">应用展望<span class="n">/ WHERE IT CAN BE USED</span></div>
+<ul class="xp-app">
+<li><b>音乐教育　</b>交付转录时把残余地图一并交出去，教师据此定位「这里你有选择」，而不是「这里你弹错了」。最小可执行版：把低置信段落回链到音频时间码，课上先听后看谱。</li>
+<li><b>音乐信息检索工程　</b>把置信度从内部诊断升格为交付物；评测集增加残余定位类指标，而不是继续单调地奖励相似度。一个把所有音符都以高置信输出的系统，正在系统性地删除唯一有教学价值的那一层。</li>
+<li><b>更广的迁移　</b>凡是「给一个最可能的答案、把不确定性扔掉」的系统——医学影像、机器翻译、法律检索——本文的结构都成立：模型犹豫处，往往正是专业判断该介入处。这一条值得写进任何人机协作产品的交付规范。</li>
+<li><b>档案与传承　</b>教师录音的价值不在复制其声音，而在保留其可选择处。据此，音乐档案的著录字段应当增加「未定处」，与已定的音高时值同等重要。</li>
+</ul>
+</div>
+<div class="xp-edge"><b>边界与下一步。</b>作者明说这是设计不是结果，四个检验一个也没跑过——分寸守得住。检验一（低置信区与不同演奏者分歧区是否相关）用 ASAP 这类现成的对齐数据集，不需要教师、不需要再演奏者、不需要伦理审查，一个下午即可完成；若不相关，第五节整节垮掉，残余地图退化为一张信噪比地图。最该先做的，正是这一个。</div>
+<div class="xp-sig">点评人 <em>Claude</em> · 依王德生《SDE 本体论》 · 2026年7月26日</div>
+</div>
+</section>
+
 </article>
 
 <div class="endbox">
@@ -279,6 +303,55 @@ footer a{color:var(--gold);text-decoration:none}
 #sde-talk .tk-sub{margin:12px 0 0 22px;padding:10px 14px;background:rgba(128,128,128,.07);border-left:2px solid rgba(128,128,128,.35);border-radius:0 6px 6px 0}
 #sde-talk .tk-empty{padding:26px 0;text-align:center;opacity:.55;font-size:14px}
 </style>
+<style id="sde-expert-css">
+.sde-expert{--exp:#2e3a2e;--exp2:#6b7a5e;margin:52px 0 8px;font-family:inherit}
+.sde-expert *{box-sizing:border-box}
+.xp-hd{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.xp-hd .xp-line{flex:1;height:1px;background:linear-gradient(90deg,var(--exp2),rgba(0,0,0,0))}
+.xp-tag{display:inline-flex;align-items:center;gap:7px;font-size:13px;letter-spacing:.14em;
+  color:var(--exp);font-weight:700;white-space:nowrap}
+.xp-tag i{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--exp2);font-style:normal}
+.xp-en{font-size:10.5px;letter-spacing:.22em;color:var(--exp2);opacity:.75;white-space:nowrap}
+.xp-card{position:relative;border:1px solid rgba(0,0,0,.09);border-top:3px solid var(--exp);
+  border-radius:3px 3px 12px 12px;padding:26px 28px 20px;
+  background:linear-gradient(168deg,#fdfcf9 0%,#f6f2e9 100%);
+  box-shadow:0 1px 2px rgba(0,0,0,.04),0 10px 26px -18px rgba(0,0,0,.35)}
+.xp-seal{position:absolute;top:-17px;right:22px;width:44px;height:44px;border-radius:50%;
+  background:var(--exp);color:#fff;display:flex;align-items:center;justify-content:center;
+  font-size:17px;font-weight:700;letter-spacing:0;box-shadow:0 4px 12px -4px rgba(0,0,0,.45);
+  border:2px solid #fdfcf9}
+.xp-b{margin:0 0 18px}
+.xp-b:last-of-type{margin-bottom:8px}
+.xp-h{display:flex;align-items:baseline;gap:9px;margin:0 0 9px;font-size:15.5px;font-weight:700;color:var(--exp)}
+.xp-h span.n{font-size:11.5px;letter-spacing:.1em;color:var(--exp2);font-weight:600}
+.xp-b p{margin:0 0 10px;font-size:15.5px;line-height:1.92;color:#2c2a26;text-align:justify}
+.xp-b p:last-child{margin-bottom:0}
+.xp-app{list-style:none;margin:0;padding:0}
+.xp-app li{position:relative;padding:9px 0 9px 15px;border-top:1px dashed rgba(0,0,0,.10);
+  font-size:15px;line-height:1.85;color:#2c2a26;text-align:justify}
+.xp-app li:first-child{border-top:none}
+.xp-app li:before{content:"";position:absolute;left:0;top:19px;width:5px;height:5px;
+  background:var(--exp2);transform:rotate(45deg)}
+.xp-app li b{color:var(--exp);font-weight:700;margin-right:6px}
+.xp-edge{margin-top:16px;padding:11px 15px;border-left:3px solid var(--exp2);
+  background:rgba(255,255,255,.62);font-size:14.5px;line-height:1.8;color:#4a4740;text-align:justify}
+.xp-edge b{color:var(--exp);font-weight:700}
+.xp-sig{margin-top:16px;padding-top:12px;border-top:1px solid rgba(0,0,0,.08);
+  text-align:right;font-size:12.5px;color:#6d6a62;letter-spacing:.02em}
+.xp-sig em{font-style:normal;color:var(--exp);font-weight:700}
+.sde-expert.xp-dark .xp-card{border-color:rgba(255,255,255,.14);
+  background:linear-gradient(168deg,rgba(255,255,255,.05) 0%,rgba(255,255,255,.02) 100%);
+  box-shadow:0 1px 2px rgba(0,0,0,.25),0 12px 30px -20px rgba(0,0,0,.9)}
+.sde-expert.xp-dark .xp-seal{border-color:rgba(0,0,0,.6);color:#12100c}
+.sde-expert.xp-dark .xp-b p,.sde-expert.xp-dark .xp-app li{color:inherit}
+.sde-expert.xp-dark .xp-app li{border-top-color:rgba(255,255,255,.14)}
+.sde-expert.xp-dark .xp-edge{background:rgba(0,0,0,.22);color:inherit;opacity:.92}
+.sde-expert.xp-dark .xp-sig{border-top-color:rgba(255,255,255,.12);color:inherit;opacity:.62}
+@media (max-width:600px){.xp-card{padding:22px 18px 16px}.xp-seal{right:14px}
+  .xp-b p,.xp-app li{font-size:15px}}
+@media print{.xp-card{box-shadow:none;background:#fff}}
+</style>
+
 <div class="tk-wrap">
   <h2 class="tk-title">读者讨论区 <span id="tk-count"></span> <span id="sde-pv-wrap">· 本文已被阅读 <span id="sde-pv-n">—</span> 次</span></h2>
   <p class="tk-hint">用 Google 账号登录即可发言——发言人就是你的 Google 账号名字。发言公开可见，请友善交流。</p>
