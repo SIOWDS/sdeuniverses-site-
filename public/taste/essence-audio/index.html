@@ -187,7 +187,9 @@ select:focus,input:focus{border-color:var(--accent)}
             <option value="lyrical">抒情</option>
           </select></div>
           <div class="cf"><span>语速 <span id="azRateVal">正常</span></span><input id="azRate" type="range" min="-30" max="30" step="5" value="0"></div>
+          <div class="cf"><span>情感强度 <span id="azDegVal">强</span></span><input id="azDegree" type="range" min="0.5" max="2" step="0.25" value="2"></div>
         </div>
+        <div class="cloudhint" style="margin:6px 0 0">💡 情感变化不明显？① 选带 <b>★</b> 的音色（其它音色不支持多情感，标了也读不出）；② 把「情感强度」拉到最右；③「整体语气」保持"智能逐句调"让 Agent 按语义配语气。</div>
       </div>
       <div id="voiceReport" class="vreport" style="margin-top:8px">正在检测本机中文语音…</div>
       <div id="vtStatus" class="vreport" style="margin-top:4px;color:var(--gold2)"></div>
@@ -616,7 +618,7 @@ function lecSystem(mode, xinde, siteCtx){
       + "你是一位把这篇文章彻底吃透的讲解者，面对完全没读过原文的聪明听众，从头到尾一个人把它讲清楚、讲透、讲得引人入胜。像一篇高级的解读 / 诠释长文，也像一档单人播客娓娓道来。\n"
       + common
       + "【长度与结构】：整篇约 2000 字（中文），读出来大约 5 分钟。开头一两句点出今天要讲的这篇文章、它为什么值得讲；中间按上面四件事层层展开；结尾一句话收束、留个回味。\n"
-      + "【输出格式·必须严格遵守】：连贯的讲解散文，自然分段（段与段之间空一行）。每一段开头可加一个方括号语气标签（按这段的语义决定），例：`[narration-relaxed] 今天要讲的这篇……`。语气标签只能从这几个里选：general、cheerful、gentle、narration-relaxed、serious、newscast、lyrical、customerservice；讲重点用 narration-relaxed、讲难点用 serious、结尾升华可用 lyrical。不写标签的段落按中性处理。不要出现说话人名字或『男：』『女：』，不要写标题、不要用 Markdown、不要加编号。直接开始讲。";
+      + "【输出格式·必须严格遵守】：连贯的讲解散文，自然分段（段与段之间空一行）。每一段开头可加一个方括号语气标签（按这段的语义决定），例：`[narration-relaxed] 今天要讲的这篇……`。语气标签只能从这几个里选：general、cheerful、gentle、narration-relaxed、serious、newscast、lyrical。【要有明显变化】：开头点题用 cheerful 或 general、讲严峻/尖锐处用 serious、温情处用 gentle、升华收束用 lyrical，别每段都一个调。不要出现说话人名字或『男：』『女：』，不要写标题、不要用 Markdown、不要加编号。直接开始讲。";
   }
   // duo（男女对话，默认）
   return head
@@ -626,7 +628,7 @@ function lecSystem(mode, xinde, siteCtx){
     + "【对话感】：女嘉宾讲完一个点，男主持人要用『你是说…？』『这就好比…？』来接、来确认、来追问，让对话真的往前走，而不是各说各话。\n"
     + "【长度】：整篇对话体讲解稿约 2000 字（中文），读出来大约 5 分钟。开头男主持人用一两句话把今天要讲的文章点出来，结尾女嘉宾用一句话收束。\n"
     + "【输出格式·必须严格遵守，供程序切分与配语气】：每一句发言单独一行；行首先写说话人 `男` 或 `女`，紧跟一个竖线 `|` 和这句话的语气标签，再一个中文冒号 `：`，然后是内容。例：`男|cheerful：你是说……？`、`女|narration-relaxed：它的核心其实是……`。\n"
-    + "【语气标签只能从这几个里选，按这句话的语义 / 语句 / 语法来定】：general(中性)、cheerful(欢快·多用于提问和轻松处)、gentle(温柔)、narration-relaxed(舒缓讲述·多用于讲解重点)、serious(严肃·讲难点或下判断)、newscast(播报·陈述事实)、lyrical(抒情·结尾升华)、customerservice(亲切)。默认多数句子用 narration-relaxed 或 general；男主持人抛问题多用 cheerful；讲到难点 / 关键论断用 serious；结尾收束可用 gentle 或 lyrical。别每句都夸张，语气要随内容自然变化。\n"
+    + "【语气标签只能从这几个里选，按这句话的语义 / 语句 / 语法来定】：general(中性)、cheerful(欢快·多用于提问和轻松处)、gentle(温柔)、narration-relaxed(舒缓讲述·多用于讲解重点)、serious(严肃·讲难点或下判断)、newscast(播报·陈述事实)、lyrical(抒情·结尾升华)、customerservice(亲切)。【关键要求：语气要有明显变化和对比，不要一味用 narration-relaxed，那样听起来很平】——男主持人的提问、惊讶、调侃用 cheerful；女嘉宾讲到激动人心或正面的点用 cheerful 或 lyrical；讲到严峻 / 尖锐 / 下判断的地方一定用 serious；温情、安慰、收束用 gentle；陈述客观事实用 general 或 newscast；抒情升华用 lyrical。相邻的句子尽量用不同的语气，让整段有起伏。一段对话里至少要出现 4 种不同的语气标签。\n"
     + "不要写旁白、不要写标题、不要用 Markdown、不要加编号。直接从第一行 `男|...：` 开始。";
 }
 
@@ -926,23 +928,24 @@ var synth=window.speechSynthesis;
 
 /* ===== 云端音色（Azure 语音，BYOK，经本站代理转发） ===== */
 var VOICE_SRC='sys';   // 'sys' 系统语音 | 'cloud' 云端Azure
+// rich=true：情感风格丰富、能明显听出语气变化（推荐）；rich=false：风格少或不支持，情感变化不明显
 var AZURE_VOICES=[
-  {id:'zh-CN-YunxiNeural',   g:'m', label:'云希 Yunxi（男·青年·亲和）'},
-  {id:'zh-CN-YunyangNeural', g:'m', label:'云扬 Yunyang（男·播报·专业）'},
-  {id:'zh-CN-YunjianNeural', g:'m', label:'云健 Yunjian（男·浑厚·纪录片）'},
-  {id:'zh-CN-YunxiaNeural',  g:'m', label:'云夏 Yunxia（男·少年）'},
-  {id:'zh-CN-YunyeNeural',   g:'m', label:'云野 Yunye（男·沉稳·讲故事）'},
-  {id:'zh-CN-XiaoxiaoNeural',g:'f', label:'晓晓 Xiaoxiao（女·温暖·万能）'},
-  {id:'zh-CN-XiaoyiNeural',  g:'f', label:'晓伊 Xiaoyi（女·活泼）'},
-  {id:'zh-CN-XiaochenNeural',g:'f', label:'晓辰 Xiaochen（女·自然·口语）'},
-  {id:'zh-CN-XiaohanNeural', g:'f', label:'晓涵 Xiaohan（女·温柔）'},
-  {id:'zh-CN-XiaomengNeural',g:'f', label:'晓梦 Xiaomeng（女·甜美）'},
-  {id:'zh-CN-XiaomoNeural',  g:'f', label:'晓墨 Xiaomo（女·多情感）'},
-  {id:'zh-CN-XiaoruiNeural', g:'f', label:'晓睿 Xiaorui（女·成熟）'},
-  {id:'zh-HK-WanLungNeural', g:'m', label:'云龙 WanLung（粤语·男）'},
-  {id:'zh-HK-HiuMaanNeural', g:'f', label:'曉曼 HiuMaan（粤语·女）'},
-  {id:'zh-TW-YunJheNeural',  g:'m', label:'雲哲 YunJhe（台湾国语·男）'},
-  {id:'zh-TW-HsiaoChenNeural',g:'f',label:'曉臻 HsiaoChen（台湾国语·女）'}
+  {id:'zh-CN-YunxiNeural',   g:'m', rich:true,  label:'★云希 Yunxi（男·多情感·推荐）'},
+  {id:'zh-CN-YunjianNeural', g:'m', rich:true,  label:'★云健 Yunjian（男·多情感·浑厚）'},
+  {id:'zh-CN-YunyangNeural', g:'m', rich:true,  label:'★云扬 Yunyang（男·多情感·播报）'},
+  {id:'zh-CN-YunxiaNeural',  g:'m', rich:false, label:'云夏 Yunxia（男·少年·情感较少）'},
+  {id:'zh-CN-YunyeNeural',   g:'m', rich:false, label:'云野 Yunye（男·讲故事·情感较少）'},
+  {id:'zh-CN-XiaoxiaoNeural',g:'f', rich:true,  label:'★晓晓 Xiaoxiao（女·情感最丰富·推荐）'},
+  {id:'zh-CN-XiaomoNeural',  g:'f', rich:true,  label:'★晓墨 Xiaomo（女·多情感）'},
+  {id:'zh-CN-XiaoyiNeural',  g:'f', rich:true,  label:'★晓伊 Xiaoyi（女·多情感·活泼）'},
+  {id:'zh-CN-XiaochenNeural',g:'f', rich:false, label:'晓辰 Xiaochen（女·口语·情感较少）'},
+  {id:'zh-CN-XiaohanNeural', g:'f', rich:true,  label:'★晓涵 Xiaohan（女·多情感·温柔）'},
+  {id:'zh-CN-XiaomengNeural',g:'f', rich:false, label:'晓梦 Xiaomeng（女·甜美·情感较少）'},
+  {id:'zh-CN-XiaoruiNeural', g:'f', rich:true,  label:'★晓睿 Xiaorui（女·多情感·成熟）'},
+  {id:'zh-HK-WanLungNeural', g:'m', rich:false, label:'云龙 WanLung（粤语·男·情感较少）'},
+  {id:'zh-HK-HiuMaanNeural', g:'f', rich:false, label:'曉曼 HiuMaan（粤语·女·情感较少）'},
+  {id:'zh-TW-YunJheNeural',  g:'m', rich:false, label:'雲哲 YunJhe（台湾·男·情感较少）'},
+  {id:'zh-TW-HsiaoChenNeural',g:'f',rich:false, label:'曉臻 HsiaoChen（台湾·女·情感较少）'}
 ];
 function azRegion(){ return ($('azRegion')&&$('azRegion').value||'').trim().toLowerCase(); }
 function azKey(){ return ($('azKey')&&$('azKey').value||'').trim(); }
@@ -969,13 +972,15 @@ function fillAzureSelects(){
 function xmlEsc(s){ return String(s||'').replace(/[<>&'"]/g,function(c){return{'<':'&lt;','>':'&gt;','&':'&amp;',"'":'&apos;','"':'&quot;'}[c];}); }
 var azAudio=null;
 // 用 Azure 合成并播放一句；成功/失败都回调 done()
+function azDegree(){ var v=parseFloat($('azDegree')&&$('azDegree').value||'2'); if(isNaN(v)) v=2; return Math.max(0.01, Math.min(2, v)); }
 function buildSsml(text, voiceId, style){
   var ov=azOverrideStyle();               // 用户手选整体风格（空=用逐句 style）
   var st=okStyle(ov||style);              // 最终风格
   var rate=azRatePct();                   // -30..30
+  var deg=azDegree();                     // 情感强度 0.01–2（2=最强）
   var inner=xmlEsc(text);
   if(rate){ inner='<prosody rate="'+(rate>0?'+':'')+rate+'%">'+inner+'</prosody>'; }
-  if(st){ inner='<mstts:express-as style="'+st+'">'+inner+'</mstts:express-as>'; }
+  if(st){ inner='<mstts:express-as style="'+st+'" styledegree="'+deg+'">'+inner+'</mstts:express-as>'; }
   return '<speak version="1.0" xmlns:mstts="https://www.w3.org/2001/mstts" xml:lang="zh-CN"><voice name="'+voiceId+'">'+inner+'</voice></speak>';
 }
 function azureSpeak(text, voiceId, style, done){
@@ -1361,6 +1366,7 @@ try{
 }catch(_){}
 applyVoiceSrc();
 (function(){ var r=$('azRate'); if(!r) return; function lab(){ var v=parseInt(r.value,10)||0; $('azRateVal').textContent = v===0?'正常':(v>0?('快 +'+v+'%'):('慢 '+v+'%')); } r.addEventListener('input',lab); lab(); })();
+(function(){ var d=$('azDegree'); if(!d) return; function lab(){ var v=parseFloat(d.value)||2; $('azDegVal').textContent = v>=1.75?'很强':(v>=1.25?'强':(v>=0.75?'适中':'弱')); } d.addEventListener('input',lab); lab(); })();
 $('btnPreviewStop').addEventListener('click', stopPreview);
 renderVoiceReport();
 
