@@ -280,7 +280,7 @@ select:focus,input:focus{border-color:var(--accent)}
   <div class="panel stage" id="stagePlay">
     <span class="step-badge">第三步 · 男女双声朗读（约 5 分钟）</span>
     <div class="vpick">
-      <div class="vcol s duoHide" id="soloVoiceWrap" style="display:none"><span>🎙 讲解者声音</span><select id="voiceS"><option value="">自动 · 系统中文音色</option></select></div>
+      <div class="vcol s duoHide" id="soloVoiceWrap" style="display:none"><span>🎙 讲解者声音</span><select id="voiceS"><option value="">自动 · 系统音色（跟随讲解语言）</option></select></div>
       <div class="vcol m duoVoice"><span>♂ 男声（主持人）</span><select id="voiceM"><option value="">自动 · 系统中文男声</option></select></div>
       <div class="vcol f duoVoice"><span>♀ 女声（讲解嘉宾）</span><select id="voiceF"><option value="">自动 · 系统中文女声</option></select></div>
     </div>
@@ -1211,7 +1211,7 @@ function speakOne(text, who, sysVoices, style, done){
   // 系统语音：不支持 style，用音高区分男女；语速跟随整体语速滑块
   var v = who==='m'?sysVoices.m:(who==='f'?sysVoices.f:sysVoices.s);
   var u=new SpeechSynthesisUtterance(text);
-  if(v){ u.voice=v; u.lang=v.lang; } else { u.lang='zh-CN'; }
+  if(v){ u.voice=v; u.lang=v.lang; } else { u.lang=(LANG_META[LANG]||LANG_META.zh).code; }
   var rp=(typeof azRatePct==='function')?azRatePct():0;
   u.rate=1.0 + (rp/100); u.pitch = who==='m'?0.92:(who==='f'?1.12:1.0);
   u.onend=function(){ done(false); };
@@ -1226,11 +1226,19 @@ function stopAllAudio(){
 var ttsOK=!!synth && typeof SpeechSynthesisUtterance!=='undefined';
 var voices=[], playToken=0, playing=false, pausedTTS=false;
 function isZh(v){ return /zh|cmn|chinese/i.test((v.lang||'')+' '+(v.name||'')); }
-function guessFemale(v){ return /female|woman|f\b|婷|婉|晓|小美|美|Xiaoxiao|Yaoyao|Huihui|Tingting|Mei|Female/i.test(v.name||''); }
-function guessMale(v){ return /male|man|云|康|Yunyang|Kangkang|Male/i.test(v.name||''); }
+// 按当前讲解语言过滤系统语音（zh/en/ja/fr）
+function langMatch(v){
+  var s=((v.lang||'')+' '+(v.name||'')).toLowerCase();
+  if(LANG==='en') return /en[-_]|english/.test(s);
+  if(LANG==='ja') return /ja[-_]|jp|japanese|日本/.test(s);
+  if(LANG==='fr') return /fr[-_]|french|français|francais/.test(s);
+  return isZh(v); // zh 默认
+}
+function guessFemale(v){ return /female|woman|f\b|婷|婉|晓|小美|美|Xiaoxiao|Yaoyao|Huihui|Tingting|Mei|Female|Jenny|Aria|Nanami|Denise|Zira|Hazel/i.test(v.name||''); }
+function guessMale(v){ return /male|man|云|康|Yunyang|Kangkang|Male|Guy|David|Mark|Keita|Henri|George/i.test(v.name||''); }
 function loadVoices(){
   voices=(synth&&synth.getVoices())||[];
-  var zh=voices.filter(isZh); var pool=zh.length?zh:voices;
+  var hit=voices.filter(langMatch); var pool=hit.length?hit:voices;
   fillVoiceSel($('voiceM'), pool);
   fillVoiceSel($('voiceF'), pool);
   fillVoiceSel($('voiceS'), pool);
@@ -1239,8 +1247,17 @@ function loadVoices(){
   if(m) $('voiceM').value=m.voiceURI;
   if(f) $('voiceF').value=f.voiceURI;
 
-  if(!zh.length && voices.length){ $('playStatus').textContent='未检测到中文语音，将用系统默认音色朗读。'; }
+  var lm=(LANG_META[LANG]||LANG_META.zh);
+  if(!hit.length && voices.length){ $('playStatus').textContent='本设备没装「'+lm.name+'」语音，系统语音会读不准；建议切「云端音色」用 Azure '+lm.name+' 声。'; }
+  else { $('playStatus').textContent=''; }
   renderVoiceReport();
+}
+function updateVoicePlaceholders(){
+  var lm=(LANG_META[LANG]||LANG_META.zh);
+  [['voiceM','男'],['voiceF','女'],['voiceS','']].forEach(function(pr){
+    var sel=$(pr[0]); if(!sel||!sel.options.length) return;
+    if(sel.options[0].value==='') sel.options[0].textContent='自动 · 系统'+lm.name+(pr[1]?('·'+pr[1]+'声'):'音色');
+  });
 }
 
 /* ===== 声音体检：本机有几种中文男/女声 ===== */
@@ -1558,6 +1575,8 @@ Array.prototype.forEach.call(document.querySelectorAll('input[name="lecLang"]'),
     LANG=this.value;
     ['langZh','langEn','langJa','langFr'].forEach(function(id){ var el=$(id); if(el) el.classList.toggle('sel', id==='lang'+LANG.charAt(0).toUpperCase()+LANG.slice(1)); });
     fillAzureSelects();
+    if(typeof loadVoices==='function') loadVoices();  // 系统语音也跟着换语言
+    updateVoicePlaceholders();
   });
 });
 // Azure Key/区域 本地持久化（input/change/blur 都存——粘贴也存得住）
