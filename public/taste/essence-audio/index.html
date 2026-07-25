@@ -227,6 +227,20 @@ select:focus,input:focus{border-color:var(--accent)}
       <label class="modeopt sel" id="modeSolo"><input type="radio" name="lecmode" value="solo"><span class="mo-t">🎙 单人讲解</span><span class="mo-d">一位讲解者从头讲到尾，像一篇讲透的解读长文</span></label>
       <label class="modeopt" id="modeDuo"><input type="radio" name="lecmode" value="duo" checked><span class="mo-t">🗣 男女对话</span><span class="mo-d">男主持人＋女嘉宾一问一答，做成对话体</span></label>
     </div>
+    <div class="dramarow" id="soloStyleRow" style="display:none">
+      <span class="drama-lbl">✍️ 单人文体 / 风格</span>
+      <select id="soloStyle">
+        <option value="">深情解读（默认·讲透的解读长文）</option>
+        <option value="pingshu">评书（说书人口吻·悬念·"且听下回分解"）</option>
+        <option value="monologue">个人独白（第一人称·内心独白·私密）</option>
+        <option value="argument">议论文（立论·论证·雄辩·有力）</option>
+        <option value="exposition">说明文（客观·清晰·条理·科普）</option>
+        <option value="prose">散文（抒情·优美·形象·文学性）</option>
+        <option value="fiction">小说故事（场景·人物·把道理融进情节）</option>
+        <option value="speech">演讲（演讲台口吻·感染力·号召）</option>
+      </select>
+      <span class="drama-tip">同一篇文章，换个文体就是另一种读物。散文抒情、评书热闹、议论雄辩、小说藏理……</span>
+    </div>
     <div class="dramarow">
       <span class="drama-lbl">🎭 对话戏剧模式</span>
       <select id="dramaMode">
@@ -615,6 +629,43 @@ async function ensureXinde(sel, key, onStatus){
 }
 
 // —— 讲解稿系统提示：提智 + 对话体 + 四要点 + 改姓本地化 ——
+/* ===== 单人讲解·文体/风格：同一篇理论文章，换不同应用文体，变成不同读物 ===== */
+var SOLO_STYLES = {
+  '': {  // 深情解读（默认）
+    persona:'你是一位把这篇文章彻底吃透的讲解者，面对完全没读过原文的聪明听众，从头到尾一个人把它讲清楚、讲透、讲得引人入胜。像一篇高级的解读 / 诠释长文，也像一档单人播客娓娓道来。',
+    tone:'情调：真诚、投入、有温度，既讲清道理又带着讲述者自己的体会。语气标签以 narration-relaxed 为主，动情处 gentle / lyrical，讲到尖锐处 serious。'
+  },
+  pingshu: {  // 评书
+    persona:'你是一位说书先生，用评书的口吻把这篇文章的道理讲成一段书。开场先"话说……"抛出个由头勾住听众，中间一波三折、层层设扣、卖足关子，讲到紧要处停一停、来一句"欲知端的，且听下回分解"式的悬念，再抖开。多用短句、口语、俚白，节奏明快，有醒木一拍的架势。',
+    tone:'情调：热闹、抓人、抑扬顿挫。语气标签多用 cheerful（抛扣、调侃）、serious（紧要关头、下断语）、newscast（交代来龙去脉），起伏要大。'
+  },
+  monologue: {  // 个人独白
+    persona:'你用第一人称"我"，像一个人夜里独自把这篇文章在心里过一遍——不是讲给别人听，是自己跟自己说话。写内心的疑问、动摇、恍然、共鸣，把抽象道理接到"我"真实的困惑和处境上。私密、坦诚，像日记或深夜自白。',
+    tone:'情调：私密、内省、克制而深。语气标签以 gentle / narration-relaxed 为主，触到痛处 serious，释然处 lyrical。别喊口号，越安静越好。'
+  },
+  argument: {  // 议论文
+    persona:'你是在写一篇有力的议论文。开门见山亮出中心论点，然后摆事实、讲道理、层层论证，用"首先 / 其次 / 更关键的是"推进逻辑，预设反方并逐一驳倒，最后收束到一个不容回避的结论。立场鲜明、论证严密、有雄辩的气势。',
+    tone:'情调：清醒、有力、思辨。语气标签以 serious 为主干（下判断、驳论），general 陈述前提，关键论断处可短暂 cheerful 的锋芒。不要煽情，靠逻辑取胜。'
+  },
+  exposition: {  // 说明文
+    persona:'你是在写一篇清晰的科普说明文。目标是把这篇文章的概念、机制、来龙去脉解释得明明白白，让外行也能看懂。多用打比方、下定义、举实例、分条理，按"是什么→为什么→怎么运作→有什么用"的顺序讲，客观、准确、不夹带情绪。',
+    tone:'情调：冷静、清楚、条理分明。语气标签以 general / newscast 为主，narration-relaxed 讲解处，避免大起大落，靠清晰取胜。'
+  },
+  prose: {  // 散文
+    persona:'你是在写一篇抒情散文。不急着讲道理，而是从一个意象、一个场景、一段感受切入，把这篇文章的内核化进优美的文字和形象的比喻里，形散而神不散，读起来有文学的味道和情感的余韵。让思想在诗意中自然浮现。',
+    tone:'情调：优美、抒情、有余韵。语气标签以 lyrical / gentle 为主，narration-relaxed 铺陈，情感自然流动，重意境不重论证。'
+  },
+  fiction: {  // 小说故事
+    persona:'你是在写一个短故事。设一个场景、一两个人物，让这篇文章的道理不是被"讲出来"、而是在情节和人物的遭遇里自己显现——通过冲突、对话、转折，让听众跟着故事走，读完才回味出背后的道理。有画面、有人物、有起伏。',
+    tone:'情调：有画面感、有代入感。语气标签随情节走——铺垫 narration-relaxed、冲突 serious、轻松处 cheerful、动情处 gentle / lyrical，像讲一个故事那样有情绪曲线。'
+  },
+  speech: {  // 演讲
+    persona:'你是站在讲台上做一场演讲。面对台下听众，用有感染力的口吻把这篇文章的思想讲成一场能打动人、能点燃人的演说——开头抓住注意力，中间层层推进、以情带理，善用排比、反问、呼告，结尾升华、发出号召，让人听完想行动。',
+    tone:'情调：昂扬、有感染力、能点燃人。语气标签以 cheerful / serious 交替造势，关键处 lyrical 升华，结尾号召可再拔高。有力量但不空喊。'
+  }
+};
+function soloStyleGuide(key){ return SOLO_STYLES[key] || SOLO_STYLES['']; }
+
 /* ===== 对话戏剧模式：把整篇讲解当成一条情感曲线来编排，情感沿曲线平滑推进 ===== */
 var DRAMA_ARCS = {
   '': null,  // 智能·自动编排（不给固定曲线，让基底自己判断）
@@ -660,7 +711,7 @@ function dramaGuide(mode){
   if(!a) return '';
   return '\n【对话戏剧模式：'+a.name+'】\n'+a.guide+'\n把上面这条情感曲线通篇贯彻到你给每句配的语气标签上，让整段听起来像一条完整的情感曲线，而不是零散的情绪。\n';
 }
-function lecSystem(mode, xinde, siteCtx, drama){
+function lecSystem(mode, xinde, siteCtx, drama, soloStyle){
   var head = PRIOR
     + "\n\n════════ 你本场已内化的学习心得（思考底盘，讲解时真用它，别向听众复述心得本身）════════\n" + (xinde||'')
     + "\n\n════════ 你答/讲每一段的工序（方法论指引）════════\n" + METHOD_GUIDE
@@ -673,9 +724,12 @@ function lecSystem(mode, xinde, siteCtx, drama){
     + "【最高红线·术语本地化，违反即失败】：这套讲解背后用的是一套名为 SDE 的方法论，但对听众【严禁任何 SDE 内部术语外泄】——绝不许出现：显露／差异序列／特征纠缠／三大方程／S=F(D,E)／六路径／123原理／二阶碰撞／发生学／显影／介生态／意义三律／回写／底盘／成熟态 等一切行话与公式。把每个判断都翻译成该学科或日常生活的普通话。听众只应听见把文章讲得特别透的聪明人，听不出任何外部体系的名目。\n";
 
   if(mode==='solo'){
+    var ss = soloStyleGuide(soloStyle);
     return head
-      + "\n\n════════ 你现在的任务：把给定文章做成一篇高级的『单人讲解』════════\n"
-      + "你是一位把这篇文章彻底吃透的讲解者，面对完全没读过原文的聪明听众，从头到尾一个人把它讲清楚、讲透、讲得引人入胜。像一篇高级的解读 / 诠释长文，也像一档单人播客娓娓道来。\n"
+      + "\n\n════════ 你现在的任务：把给定文章改写成一篇单人朗读的作品════════\n"
+      + ss.persona + "\n"
+      + "【面向】完全没读过原文的聪明听众，要把文章讲清楚、讲透、讲得引人入胜。\n"
+      + "【文体情调】" + ss.tone + "\n"
       + common
       + dramaGuide(drama)
       + "【长度与结构】：整篇约 2000 字（中文），读出来大约 5 分钟。开头一两句点出今天要讲的这篇文章、它为什么值得讲；中间按上面四件事层层展开；结尾一句话收束、留个回味。\n"
@@ -725,6 +779,7 @@ var lastDialogue='';          // 生成的对话体全文
 var turns=[];                 // [{who:'m'|'f'|'n', text}]
 var MODE='duo';               // 'solo' 单人 | 'duo' 男女对话
 var DRAMA='';                 // 对话戏剧模式 key（''=智能自动）
+var SOLO_STYLE='';            // 单人文体 key（''=深情解读）
 
 /* ---- 载入检索索引（复用 /search 的 manifest + shards） ---- */
 (function loadIndex(){
@@ -823,9 +878,11 @@ async function generate(){
     var rag=await ragForArticle(chosenDoc.title, full.slice(0,600));
     st.innerHTML='<span class="spinner"></span>提智基底正在'+(MODE==='solo'?'把这篇讲成一篇单人解读':'把这篇讲成男女对话')+'…（约一两分钟）';
     DRAMA=($('dramaMode')&&$('dramaMode').value)||'';
-    var sys=lecSystem(MODE, xinde, rag.ctx, DRAMA);
+    SOLO_STYLE=($('soloStyle')&&$('soloStyle').value)||'';
+    var sys=lecSystem(MODE, xinde, rag.ctx, DRAMA, SOLO_STYLE);
+    var styLabel=(SOLO_STYLE&&$('soloStyle'))?($('soloStyle').options[$('soloStyle').selectedIndex].text.split('（')[0]):'深情解读';
     var tail=(MODE==='solo')
-      ? '请据此，按你的任务与格式要求，写出约 2000 字的单人讲解散文，每段按语义在段首标一个方括号语气标签。直接开始讲，不要任何说话人标记。'
+      ? ('请据此，按你的任务与【'+styLabel+'】这个文体的写法和情调，写出约 2000 字的单人朗读作品，每段按语义在段首标一个方括号语气标签。直接开始，不要任何说话人标记、不要写标题。')
       : '请据此，按你的任务与格式要求，写出约 2000 字的男女对话体讲解稿，每句按 `男|语气：` / `女|语气：` 的格式、按语义给每句配语气标签。直接从第一行开始。';
     var userMsg='【要讲解的文章标题】'+chosenDoc.title+'\n【原文如下】\n\n'+full+'\n\n'+tail;
     var out=await callMsgs(pf.sel, pf.key, sys, [{role:'user', content:userMsg}], 24000, '讲解稿');
@@ -1389,6 +1446,11 @@ function applyMode(){
   $('modeDuo').classList.toggle('sel', !solo);
   // 生成按钮文案
   $('btnGen').textContent = solo ? '生成约 2000 字单人讲解稿 →' : '生成约 2000 字男女对话讲解稿 →';
+  // 单人文体行：只在单人模式显示
+  var sr=$('soloStyleRow'); if(sr) sr.style.display = solo ? 'flex' : 'none';
+  // 戏剧模式行标签：单人叫"情感曲线"，对话叫"对话戏剧"
+  var dl=document.querySelector('.dramarow:not(#soloStyleRow) .drama-lbl');
+  if(dl) dl.textContent = solo ? '🎭 情感曲线模式' : '🎭 对话戏剧模式';
   // 第三步声音选择器显隐
   var sw=$('soloVoiceWrap'); if(sw) sw.style.display = solo ? 'flex' : 'none';
   Array.prototype.forEach.call(document.querySelectorAll('.duoVoice'), function(el){ el.style.display = solo ? 'none' : 'flex'; });
