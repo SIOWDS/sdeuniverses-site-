@@ -132,6 +132,12 @@ select:focus,input:focus{border-color:var(--accent)}
 .modeopt.sel{border-color:var(--accent);background:#221a33}
 .modeopt .mo-t{font-size:14px;font-weight:800;color:var(--ink)}
 .modeopt .mo-d{font-size:12px;color:var(--muted);line-height:1.6}
+.stuchips{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.stuchip{padding:6px 13px;border:1px solid var(--line);border-radius:16px;cursor:pointer;font-size:13.5px;background:var(--card2);transition:border-color .15s,transform .1s;user-select:none}
+.stuchip:hover{border-color:var(--acc,#7c5cff);transform:translateY(-1px)}
+.stuchip.sel{border-color:var(--acc,#7c5cff);background:rgba(124,92,255,.13);font-weight:600}
+.stuchip .n{opacity:.55;font-size:12px;margin-left:4px}
+.stuhead{margin:12px 0 6px;font-size:13.5px;color:var(--mut,#889)}
 </style>
 </head>
 <body>
@@ -231,6 +237,7 @@ select:focus,input:focus{border-color:var(--accent)}
       <span class="srclbl">文章来源</span>
       <label class="srcopt sel" id="srcSite"><input type="radio" name="artSrc" value="site" checked><span>🔍 站内文章（解读 + 应用）</span></label>
       <label class="srcopt" id="srcUpload"><input type="radio" name="artSrc" value="upload"><span>📄 上传文章 Word/PDF（解读 + 解构 + 创新应用）</span></label>
+      <label class="srcopt" id="srcStudents"><input type="radio" name="artSrc" value="students"><span>🎓 学员栏目（选学员 → 选文章）</span></label>
     </div>
     <div id="siteBox">
       <div class="searchrow">
@@ -248,6 +255,11 @@ select:focus,input:focus{border-color:var(--accent)}
       </div>
       <div class="cloudhint" style="margin-top:6px">支持 .docx / .pdf / .txt / .md。文字型 PDF 和 Word 都能解析；扫描图片型 PDF 抽不出文字（会提示）。文章很长时，送进基底解读会按模型上限截取前若干万字，并如实告诉你读了多少。</div>
       <div id="upStatus" class="hint" style="margin-top:6px"></div>
+    </div>
+    <div id="studentsBox" style="display:none">
+      <div id="stuStatus" class="hint">正在整理学员名单…</div>
+      <div id="stuList" class="stuchips"></div>
+      <div id="stuArts"></div>
     </div>
     <div id="chosen" class="chosen"></div>
   </div>
@@ -1008,7 +1020,7 @@ async function fetchArticleText(u){
   if(!r.ok) throw new Error('打不开文章页（'+r.status+'）');
   var html=await r.text();
   var doc=new DOMParser().parseFromString(html,'text/html');
-  var art=doc.querySelector('article')||doc.querySelector('main')||doc.querySelector('.body')||doc.body;
+  var art=doc.querySelector('article')||doc.querySelector('main')||doc.querySelector('.art')||doc.querySelector('.body')||doc.body;
   // 去掉脚本/样式/导航
   art.querySelectorAll('script,style,nav,footer,header,.nav-bar-main,.nav-bar-sub,.agent-strip').forEach(function(n){n.remove();});
   var t=(art.textContent||'').replace(/\s+\n/g,'\n').replace(/\n{3,}/g,'\n\n').trim();
@@ -1107,13 +1119,82 @@ function loadScript(src){
   return _libLoad[src];
 }
 function setArtSrc(v){
-  var up=(v==='upload');
-  $('siteBox').style.display = up?'none':'block';
-  $('uploadBox').style.display = up?'block':'none';
-  ['srcSite','srcUpload'].forEach(function(id){ var el=$(id); if(el) el.classList.toggle('sel', id===(up?'srcUpload':'srcSite')); });
+  var boxes={site:'siteBox',upload:'uploadBox',students:'studentsBox'};
+  var sels ={site:'srcSite',upload:'srcUpload',students:'srcStudents'};
+  Object.keys(boxes).forEach(function(k){
+    var b=$(boxes[k]); if(b) b.style.display=(k===v)?'block':'none';
+    var s=$(sels[k]);  if(s) s.classList.toggle('sel', k===v);
+  });
   // 切来源时清掉已选，避免混淆
   chosenDoc=null; uploadedText='';
   $('chosen').innerHTML=''; $('stageGen').classList.remove('on');
+  if(v==='students') buildStudents();
+}
+
+/* ===== 第三来源：学员栏目（从已载入的 MANIFEST 聚合，无后端） ===== */
+var STU_LIST=null, STU_SEL='';
+function studentData(){
+  if(!MANIFEST) return null;
+  var map={}, order=[];
+  MANIFEST.docs.forEach(function(d){
+    if(d.s!=='students') return;
+    var u=d.u||'';
+    var mi=/^\/students\/([^\/]+)\/$/.exec(u);
+    if(mi){
+      var slug=mi[1], nm=((d.t||'').split('·')[0]||'').trim()||slug;
+      map[slug]=map[slug]||{slug:slug,name:slug,arts:[]}; map[slug].name=nm;
+      if(order.indexOf(slug)<0) order.push(slug);
+      return;
+    }
+    var ma=/^\/students\/([^\/]+)\/[^\/]+\/$/.exec(u);
+    if(ma){
+      var sl=ma[1];
+      map[sl]=map[sl]||{slug:sl,name:sl,arts:[]};
+      if(order.indexOf(sl)<0) order.push(sl);
+      var ct=(d.t||'').split('|')[0].trim();
+      map[sl].arts.push({i:d.i,u:u,s:d.s,t:ct||d.t});
+    }
+  });
+  var list=order.map(function(k){return map[k];}).filter(function(x){return x.arts&&x.arts.length>0;});
+  // 逐段剥掉标题尾部的栏目/装饰段（变体多：长文阅读/学员专栏/作品发表/随笔/学员名…）
+  list.forEach(function(stu){
+    var nm=stu.name.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+    var reTail=new RegExp('\\s*·\\s*(长文阅读|深度阅读|SDE 学员专栏|学员专栏|作品发表|作品|随笔|SDE Universes|SDE 学员|'+nm+')\\s*$');
+    stu.arts.forEach(function(a){
+      var t=a.t;
+      for(var g=0; g<4; g++){ var t2=t.replace(reTail,''); if(t2===t) break; t=t2; }
+      a.t=t.trim()||a.t;
+    });
+  });
+  list.sort(function(a,b){ return b.arts.length-a.arts.length || a.name.localeCompare(b.name,'zh'); });
+  return list;
+}
+function buildStudents(){
+  var stat=$('stuStatus'), listEl=$('stuList');
+  if(!MANIFEST){ stat.textContent='站内索引还在载入，稍等几秒再点一次「学员栏目」…'; return; }
+  if(!STU_LIST) STU_LIST=studentData();
+  if(!STU_LIST||!STU_LIST.length){ stat.textContent='没有在索引里找到学员栏目文章。'; return; }
+  var total=STU_LIST.reduce(function(a,s){return a+s.arts.length;},0);
+  stat.textContent='共 '+STU_LIST.length+' 位学员、'+total+' 篇文章——点学员名，再点文章即选中。';
+  listEl.innerHTML='';
+  STU_LIST.forEach(function(stu){
+    var c=document.createElement('span'); c.className='stuchip'+(stu.slug===STU_SEL?' sel':'');
+    c.innerHTML=esc(stu.name)+'<span class="n">'+stu.arts.length+'</span>';
+    c.onclick=function(){ STU_SEL=stu.slug; buildStudents(); renderStuArts(stu); };
+    listEl.appendChild(c);
+  });
+  if(STU_SEL){ var cur=STU_LIST.filter(function(s){return s.slug===STU_SEL;})[0]; if(cur) renderStuArts(cur, true); }
+}
+function renderStuArts(stu, keep){
+  var box=$('stuArts');
+  if(!keep) box.innerHTML='';
+  box.innerHTML='<div class="stuhead">'+esc(stu.name)+' · '+stu.arts.length+' 篇（点一篇选中，自动进入第二步）</div>';
+  stu.arts.forEach(function(a){
+    var el=document.createElement('div'); el.className='hit';
+    el.innerHTML='<div class="ht">'+esc(a.t)+'</div><div class="hs">学员专栏 · '+esc(stu.name)+' · '+esc(a.u)+'</div>';
+    el.onclick=function(){ chooseDoc({t:a.t, u:a.u, s:'students'}, el); };
+    box.appendChild(el);
+  });
 }
 async function parseDocx(file){
   await loadScript('https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js');
