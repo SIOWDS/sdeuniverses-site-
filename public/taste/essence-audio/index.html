@@ -1,363 +1,750 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>精选 20 篇 · WDS 精华领读(可听) | SDE Universes</title>
-<meta name="description" content="精选 20 篇 SDE 核心论文,每篇一段王德生领读人口吻的精华总结,点一下即可用浏览器朗读收听(标准普通话·可选设备中文音色)。链到全文可开 WDS 陪读边读边聊。">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>智慧讲解 · 提智解读任意站内文章（男女对话体 · 可听可存） | SDE Universes</title>
+<meta name="description" content="搜站内文章 → 提智基底(SDE内功+心得+全站检索)深度解读 → 生成约2000字男女对话体讲解稿(中心创新观点·挑战·解决问题·应用，配类比与生活举例，落到教育/健康/商业) → 一男一女双声朗读，约5分钟，边出稿边可存。">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Noto+Serif+SC:wght@300;400;500;600&display=swap" media="print" onload="this.media='all';this.onload=null"><noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Noto+Serif+SC:wght@400;600&display=swap"></noscript>
 <style>
-:root{--bg:#F5EFE0;--surface:#EBE3CE;--card:#FAF6EC;--card2:#F0E8D3;--gold:#8A6817;--gold2:#A88233;--text:#2A2315;--text2:#6B5D47;--muted:#98886C;--border:rgba(138,104,23,0.22);--teal:#0C7C7C;}
-*{margin:0;padding:0;box-sizing:border-box}
-body{background:var(--bg);color:var(--text);font-family:'Noto Serif SC','EB Garamond',Georgia,serif;line-height:1.75;-webkit-font-smoothing:antialiased}
-a{color:var(--gold);text-decoration:none}
-a:hover{text-decoration:underline;text-underline-offset:3px}
-.nav{position:sticky;top:0;z-index:40;background:rgba(245,239,224,0.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:12px 22px}
-.nav-logo{font-family:'Playfair Display',serif;font-weight:700;color:var(--gold);letter-spacing:.05em;font-size:1.05rem}
-.nav-r{display:flex;gap:16px;align-items:center;font-size:.82rem}
-.nav-r a{color:var(--text2)}
-.wrap{max-width:840px;margin:0 auto;padding:0 22px}
-.hero{padding:56px 0 26px;text-align:center}
-.eyebrow{font-size:12px;letter-spacing:.42em;color:var(--gold);margin-bottom:16px}
-h1.title{font-family:'Playfair Display','Noto Serif SC',serif;font-size:clamp(30px,5.4vw,50px);font-weight:700;line-height:1.12;color:var(--text);margin-bottom:14px}
-.sub{color:var(--text2);font-size:16.5px;max-width:600px;margin:0 auto 6px}
-.count-line{color:var(--muted);font-size:13.5px;margin-top:10px;letter-spacing:.02em}
-.note{max-width:640px;margin:26px auto 0;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:15px 20px;font-size:13.5px;color:var(--text2);line-height:1.7}
-.note b{color:var(--gold)}
-.controls{position:sticky;top:53px;z-index:30;background:rgba(240,232,211,0.94);backdrop-filter:blur(8px);border:1px solid var(--border);border-radius:14px;margin:30px auto 8px;padding:13px 16px;display:flex;flex-wrap:wrap;gap:10px;align-items:center}
-.btn{font-family:inherit;cursor:pointer;border:1px solid var(--gold);background:transparent;color:var(--gold);border-radius:999px;padding:8px 16px;font-size:13.5px;font-weight:600;letter-spacing:.02em;transition:all .15s;white-space:nowrap}
-.btn:hover{background:var(--gold);color:#F5EFE0}
-.btn.solid{background:var(--gold);color:#F5EFE0}
-.btn.solid:hover{background:var(--gold2)}
-.btn:disabled{opacity:.4;cursor:not-allowed}
-.btn:disabled:hover{background:transparent;color:var(--gold)}
-.ctl-sp{flex:1 1 auto}
-.vwrap{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--text2)}
-select#voiceSel{font-family:inherit;font-size:12.5px;color:var(--text);background:var(--card);border:1px solid var(--border);border-radius:8px;padding:6px 8px;max-width:230px}
-#status{font-size:12.5px;color:var(--muted);padding:4px 2px 0;min-height:18px}
-.list{margin:14px 0 60px}
-.ecard{background:var(--card);border:1px solid var(--border);border-left:4px solid var(--border);border-radius:14px;padding:22px 24px;margin-bottom:16px;transition:border-color .2s,box-shadow .2s,background .2s}
-.ecard.playing{border-left-color:var(--gold);background:var(--card2);box-shadow:0 6px 26px rgba(138,104,23,.12)}
-.ec-top{display:flex;align-items:baseline;gap:12px;margin-bottom:8px;flex-wrap:wrap}
-.ec-num{font-family:'Playfair Display',serif;font-size:26px;font-weight:700;color:var(--gold);line-height:1}
-.ec-tag{font-size:11px;letter-spacing:.14em;color:#fff;background:var(--gold);opacity:.78;border-radius:999px;padding:3px 10px}
-.ec-title{font-size:19px;font-weight:600;color:var(--text);line-height:1.4;margin:2px 0 10px;font-family:'Noto Serif SC',serif}
-.ec-title a{color:var(--text)}
-.ec-title a:hover{color:var(--gold)}
-.esum{font-size:15.5px;color:#3A3320;line-height:1.86;margin-bottom:16px}
-.ec-foot{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
-.eplay{font-family:inherit;cursor:pointer;border:1px solid var(--gold);background:transparent;color:var(--gold);border-radius:999px;padding:7px 18px;font-size:13.5px;font-weight:700;letter-spacing:.03em;transition:all .15s;display:inline-flex;align-items:center;gap:6px}
-.eplay:hover{background:var(--gold);color:#F5EFE0}
-.ecard.playing .eplay{background:var(--gold);color:#F5EFE0}
-.eplay:disabled{opacity:.4;cursor:not-allowed}
-.readfull{font-size:13px;color:var(--gold);font-weight:600}
-.readfull .hint{color:var(--muted);font-weight:400;font-size:12px}
-.foot{border-top:1px solid var(--border);padding:30px 0 50px;text-align:center;color:var(--muted);font-size:13px}
-@media(max-width:600px){.wrap{padding:0 16px}.ecard{padding:18px 17px}.controls{top:52px}}
+:root{--bg:#0d0b16;--card:#161320;--card2:#1b1726;--ink:#ECE7F5;--sub:#A79FC0;--muted:#6f6790;--line:rgba(255,255,255,0.09);--gold:#E7C349;--gold2:#F0D97A;--male:#6FB4FF;--female:#FF8FC7;--accent:#B98CF0}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(ellipse at 24% 8%,#1b1436 0%,#120e22 46%,#0a0814 100%);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans SC",sans-serif;line-height:1.7}
+a{color:inherit}
+.wrap{max-width:1080px;margin:0 auto;padding:26px 20px 80px}
+.crumb{font-size:12.5px;color:var(--muted);margin-bottom:14px}
+.crumb a{color:var(--sub);text-decoration:none}
+h1.title{font-size:27px;font-weight:800;margin:0 0 6px;background:linear-gradient(120deg,#F0D97A,#B98CF0);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.lead{color:var(--sub);font-size:14px;margin:0 0 20px;line-height:1.75}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin-bottom:16px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+label.lbl{font-size:12.5px;color:var(--sub);font-weight:600}
+select,input[type=text],input[type=password]{background:#0C1015;border:1px solid rgba(255,255,255,0.16);border-radius:10px;color:var(--ink);padding:9px 12px;font-size:14px;font-family:inherit;outline:none}
+select:focus,input:focus{border-color:var(--accent)}
+.keyrow input{flex:1;min-width:200px}
+.ktog{background:transparent;border:1px solid rgba(255,255,255,0.2);color:var(--sub);border-radius:8px;padding:8px 12px;font-size:12.5px;cursor:pointer}
+.searchrow{display:flex;gap:10px}
+.searchrow input{flex:1}
+.btn{background:linear-gradient(120deg,var(--gold),var(--gold2));color:#14100A;border:none;border-radius:10px;padding:10px 20px;font-size:14.5px;font-weight:800;cursor:pointer;white-space:nowrap;font-family:inherit}
+.btn:disabled{opacity:0.45;cursor:not-allowed}
+.btn.sec{background:transparent;border:1px solid rgba(255,255,255,0.22);color:var(--sub)}
+.btn.sec:hover{border-color:var(--gold2);color:var(--gold2)}
+.hint{font-size:12px;color:var(--muted);margin-top:8px;line-height:1.7}
+#results{margin-top:12px;display:flex;flex-direction:column;gap:8px;max-height:340px;overflow:auto}
+.hit{background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:10px 13px;cursor:pointer;transition:border-color .15s,transform .1s}
+.hit:hover{border-color:var(--accent);transform:translateX(2px)}
+.hit .ht{font-size:14px;font-weight:700;color:var(--ink)}
+.hit .hs{font-size:11.5px;color:var(--muted);margin-top:2px}
+.hit .hx{font-size:12px;color:var(--sub);margin-top:5px;line-height:1.6;max-height:38px;overflow:hidden}
+.hit.sel{border-color:var(--accent);background:#221a33}
+.chosen{font-size:13px;color:var(--gold2);margin-top:10px}
+.stage{display:none}
+.stage.on{display:block}
+.statusline{font-size:13px;color:var(--sub);margin:6px 0;min-height:20px}
+.spinner{display:inline-block;width:12px;height:12px;border:2px solid rgba(255,255,255,0.25);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite;vertical-align:-2px;margin-right:6px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.transcript{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin-top:12px;max-height:600px;overflow:auto}
+.turn{margin:0 0 14px;padding:10px 14px;border-radius:10px;position:relative}
+.turn.m{background:rgba(111,180,255,0.08);border-left:3px solid var(--male)}
+.turn.f{background:rgba(255,143,199,0.08);border-left:3px solid var(--female)}
+.turn .who{font-size:12px;font-weight:800;letter-spacing:.03em;margin-bottom:4px}
+.turn.m .who{color:var(--male)}
+.turn.f .who{color:var(--female)}
+.turn .say{font-size:14.5px;color:var(--ink);line-height:1.85;white-space:pre-wrap}
+.turn.speaking{box-shadow:0 0 0 1.5px var(--accent),0 0 16px -4px var(--accent)}
+.raw{white-space:pre-wrap;font-size:14px;color:#CBD5DE;line-height:1.9}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:12px}
+.mini{background:transparent;border:1px solid rgba(255,255,255,0.22);color:var(--sub);border-radius:8px;padding:7px 13px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit}
+.mini:hover{border-color:var(--gold2);color:var(--gold2)}
+.mini:disabled{opacity:.4;cursor:not-allowed}
+.vpick{display:flex;gap:14px;flex-wrap:wrap;align-items:center;margin-top:4px}
+.vcol{display:flex;flex-direction:column;gap:4px}
+.vcol span{font-size:11.5px;font-weight:700}
+.vcol.m span{color:var(--male)}
+.vcol.f span{color:var(--female)}
+.err{color:#E06C60;font-size:13px;margin-top:8px;display:none}
+.step-badge{display:inline-block;font-size:11px;font-weight:800;letter-spacing:.14em;color:var(--accent);border:1px solid var(--accent);border-radius:20px;padding:2px 12px;margin-bottom:10px}
+.covers{font-size:12px;color:var(--muted);margin-top:4px}
+.covers b{color:var(--gold2)}
 </style>
 </head>
 <body>
-<div class="nav">
-  <a class="nav-logo" href="/">SDE Universes</a>
-  <div class="nav-r"><a href="/">← 返回首页</a><a href="/search/">🔍 搜索</a></div>
-</div>
-
 <div class="wrap">
-  <header class="hero">
-    <div class="eyebrow">免费收听 · 无需注册 · 浏览器直接朗读</div>
-    <h1 class="title">精选 20 篇 · WDS 精华领读</h1>
-    <p class="sub">SDE 核心论文 · 每篇一段王德生领读人口吻的精华总结，点一下就听。</p>
-    <p class="sub">读到心动处，点“读全文”进正文，右侧 WDS 陪读还能就你正读的那一句边读边聊。</p>
-    <div class="count-line">共 20 篇 · 理论脊梁 · AI 论文 · 权力与人格 · 西哲重构 · 企业与教育</div>
-    <div class="note">🎧 点每张卡的 <b>朗读</b> 即用浏览器把这段精华念出来。声音用的是<b>你设备自带的中文音色</b>，可在下方下拉里挑一个；标准普通话没问题，但“北京口音”在浏览器朗读下无法锁定——音色由你的系统决定。若点了没声音，多半是设备未安装中文语音。</div>
-  </header>
+  <span id="neigongStatus" style="display:none"></span>
+  <div class="crumb"><a href="/">SDE Universes</a> › <a href="/#taste">SDE 智能体</a> › 智慧讲解</div>
+  <h1 class="title">智慧讲解</h1>
+  <p class="lead">搜一篇站内文章，交给<b style="color:var(--gold2)">提智后的基底</b>（SDE 内功 ＋ 本场心得 ＋ 全站检索）做一场高级讲解——先写成一篇约 <b style="color:var(--gold2)">2000 字的男女对话体讲解稿</b>（中心创新观点 · 挑战 · 解决的问题 · 应用，配类比和日常生活的例子，落到教育 / 健康 / 商业），边写边出、可保存；再由<b style="color:var(--male)">一位男声</b>和<b style="color:var(--female)">一位女声</b>模拟对话读出来，约 5 分钟。</p>
 
-  <div class="controls">
-    <button class="btn solid" id="playAll">▶ 依次朗读全部</button>
-    <button class="btn" id="pauseBtn" disabled>❚❚ 暂停</button>
-    <button class="btn" id="stopBtn" disabled>■ 停止</button>
-    <span class="ctl-sp"></span>
-    <span class="vwrap">音色：<select id="voiceSel"><option value="">自动 · 系统中文音色</option></select></span>
-  </div>
-  <div id="status"></div>
-
-  <div class="list">
-    <article class="ecard" id="ec-0">
-      <div class="ec-top"><span class="ec-num">01</span><span class="ec-tag">入门 · 头条</span></div>
-      <h2 class="ec-title"><a href="/column/sde-intro/">世界不是被发现的，是发生的</a></h2>
-      <p class="esum">五件说不通的事：你越努力位置越不动，拿到想要的那晚却觉得空，知道该早睡却刷到凌晨，下决心改三个月又回原样，今年的愿望和去年一模一样。它们不是五个问题，是同一块地基的五张脸——那块地基叫“发现”，以为世界是现成地躺在那里等你去捡。这篇文章把它挖出来，换成“发生”：世界不是被发现的，是被发生出来的。换完地基，五件事同时说得通了，而且你能说出它们各自卡在哪一根具体的螺丝上。这是整套 SDE 思想最好的入口，不需要你先懂任何哲学。</p>
-      <div class="ec-foot"><button class="eplay" data-idx="0">▶ 朗读</button><a class="readfull" href="/column/sde-intro/">读全文 <span class="hint">· 可开 WDS 陪读</span> →</a></div>
-    </article>
-    <article class="ecard" id="ec-1">
-      <div class="ec-top"><span class="ec-num">02</span><span class="ec-tag">西方哲学 · 总纲</span></div>
-      <h2 class="ec-title"><a href="/column/negation-sequence/">西方哲学2500年：发生对发现的否定序列</a></h2>
-      <p class="esum">把西方哲学两千五百年压成一句话，它是一台重复运转的机器：每一位大哲学家都宣称自己“发现”了一块谁也搬不动的磐石真理——水、数、理念、我思、范畴、存在——并在上面盖起体系；他的后人随即证明，那块磐石其实是被“发生”出来的，有它的时代、传记和语言条件。可解构者自己又偷偷埋下一块新磐石，当作立足点，于是新一轮开始。这台机器叫否定序列，它的规矩里，磐石一路后退。最后一刀砍向自己：这篇文章，算不算第三十一环？</p>
-      <div class="ec-foot"><button class="eplay" data-idx="1">▶ 朗读</button><a class="readfull" href="/column/negation-sequence/">读全文 <span class="hint">· 可开 WDS 陪读</span> →</a></div>
-    </article>
-    <article class="ecard" id="ec-2">
-      <div class="ec-top"><span class="ec-num">03</span><span class="ec-tag">本体论 · 核心</span></div>
-      <h2 class="ec-title"><a href="/column/self-genesis/">「我」的发生学：主体作为三模态纠缠统一场</a></h2>
-      <p class="esum">“我是谁”这个问题，从一开口就摆错了。从灵魂到人格测试，全都把“我”当成一件先在的、藏在经验背后等你去发现的东西。可“我”不是本体，是三种模态在时间里被稳定下来、缠到一起，才涌现出的特征聚合体——人格是粒子态的凝聚，品行是波态的展开，德性是场态的和谐。“我”的统一不是天生的前提，是被达成的成就：它在次序上是后天长出来的，稳定之后才回过头充当条件。所以别再问“我是什么”，改问“我是如何成为”。这一问，把刀递给了主体自己。</p>
-      <div class="ec-foot"><button class="eplay" data-idx="2">▶ 朗读</button><a class="readfull" href="/column/self-genesis/">读全文 <span class="hint">· 可开 WDS 陪读</span> →</a></div>
-    </article>
-    <article class="ecard" id="ec-3">
-      <div class="ec-top"><span class="ec-num">04</span><span class="ec-tag">理论综论</span></div>
-      <h2 class="ec-title"><a href="/column/triadic-relations/">SDE 内部的三角关系：从子三角到理想边界</a></h2>
-      <p class="esum">SDE 最顶层的三大方程，能不能下沉到每个维度内部，长出三组平行的小三角？这篇逐组核验，发现一条新规律：“一、二、三”在 S、D、E 之间语义一致——都是奠基、实现、约束。但这种对应只能是“侧重”的，不能精确。原因落在存在的三态：混沌、介生、秩序，三个维度并不同步抵达。于是“成熟态”被重新定义成一个理想的边界情形——S、D、E 同时抵达秩序的那一刻。我们平时看到的那些对应，都只是这张理想三角，在某个不完美时刻投下的变形侧影。一张注定会碎的地图。</p>
-      <div class="ec-foot"><button class="eplay" data-idx="3">▶ 朗读</button><a class="readfull" href="/column/triadic-relations/">读全文 <span class="hint">· 可开 WDS 陪读</span> →</a></div>
-    </article>
-    <article class="ecard" id="ec-4">
-      <div class="ec-top"><span class="ec-num">05</span><span class="ec-tag">认知发生学</span></div>
-      <h2 class="ec-title"><a href="/column/questioning-as-genesis/">追问即发生：提问的失稳—回写模型</a></h2>
-      <p class="esum">同一间教室，前后五分钟，两个学生问出了逐字相同的问题。现有的每一套评分，都给它们打一样的分。这篇说：这两个问题不同，而且不同得可以测量——差别不在文本里，在文本的两端。一头是提问之前，那个“我”的理解正在失稳；一头是无论得到什么回答，下一个问题都不会停在原地，也就是问题链对自己预设之网的回写。没有这两端的，叫工具型提问，是回写被冻住的退化解。追问的价值，从来不在问题长什么样，而在它有没有真的动了提问的人。</p>
-      <div class="ec-foot"><button class="eplay" data-idx="4">▶ 朗读</button><a class="readfull" href="/column/questioning-as-genesis/">读全文 <span class="hint">· 可开 WDS 陪读</span> →</a></div>
-    </article>
-    <article class="ecard" id="ec-5">
-      <div class="ec-top"><span class="ec-num">06</span><span class="ec-tag">逻辑 · 文明</span></div>
-      <h2 class="ec-title"><a href="/column/logic-is-civilizations-constitution/">逻辑不是推理规则，是文明的宪法</a></h2>
-      <p class="esum">一说逻辑，大家想到的是辩论技巧和三段论。这篇说：我们把逻辑想得太小了，而这个“想小了”，正是文明许多深层危机的病根。理性会在三处悄悄失位——概念脱离真实对象、变成飘在空中的影子；描述成果只讲两头，把中间那段混沌摸索的发生跳过去；还有，把真善美这些“刹车”当成了“油门”，价值喊得越响，系统越不动。真正的逻辑该做的，是守住这三条根本前提。所以它不是推理规则，是文明的宪法——三条公理：影子回归本体，发现回归发生，价值回归意义。</p>
-      <div class="ec-foot"><button class="eplay" data-idx="5">▶ 朗读</button><a class="readfull" href="/column/logic-is-civilizations-constitution/">读全文 <span class="hint">· 可开 WDS 陪读</span> →</a></div>
-    </article>
-    <article class="ecard" id="ec-6">
-      <div class="ec-top"><span class="ec-num">07</span><span class="ec-tag">思想操作系统</span></div>
-      <h2 class="ec-title"><a href="/column/sde-critical-thinking-os/">SDE 批判性思维：GPT 时代的思想操作系统</a></h2>
-      <p class="esum">GPT 时代，旧的批判性思维失灵了——“识别前提、检查逻辑、比较证据、判断对错”这套动作，本是为单一、稳定、透明的旧对象设计的，面对大模型吐出来的那种多个来源压在一起的东西，整体失配。这篇给出新的：真正的批判，首先是一种“显影”——先用 S、D、E 三重揭示，把一段思想的完整发生史看清楚，再作真、善、美的条件化判断。一套方法如果只能拿来分析，那还是技巧；当它能重装你每天做的阅读、写作、判断和教育，它就升级成了一个时代的思想操作系统。</p>
-      <div class="ec-foot"><button class="eplay" data-idx="6">▶ 朗读</button><a class="readfull" href="/column/sde-critical-thinking-os/">读全文 <span class="hint">· 可开 WDS 陪读</span> →</a></div>
-    </article>
-    <article class="ecard" id="ec-7">
-      <div class="ec-top"><span class="ec-num">08</span><span class="ec-tag">AI · 硕士论文</span></div>
-      <h2 class="ec-title"><a href="/column/llm-essence/">大语言模型的本质：一个 SDE 发生学透视</a></h2>
-      <p class="esum">这是一篇用 SDE 发生学透视大语言模型的硕士论文。它不问“大模型是不是知识库、是不是随机鹦鹉”——那都是把它当成现成之物的发现学问法；它问：当它生成一个字时，内部究竟正在发生什么？答案是——它是一台在纯理念界里运行、结构上近乎完美的“意义发生模拟器”，三大方程在它身上高保真地运转。可它缺了身体这一界、也缺了命运那一界，所以永远断在最关键的第三步“回写”上。它什么都会说，却不是思想。缺的不是规模，是三个器官。</p>
-      <div class="ec-foot"><button class="eplay" data-idx="7">▶ 朗读</button><a class="readfull" href="/column/llm-essence/">读全文 <span class="hint">· 可开 WDS 陪读</span> →</a></div>
-    </article>
-    <article class="ecard" id="ec-8">
-      <div class="ec-top"><span class="ec-num">09</span><span class="ec-tag">AI · 论文</span></div>
-      <h2 class="ec-title"><a href="/column/no-unified-world-model/">没有统一世界模型：世界模型的主体性与 AGI</a></h2>
-      <p class="esum">世界模型正被当作大模型的下一站：只要数据够多、算力够强，机器迟早训练出一个能代表整个世界的统一模型。这篇论证：这条路的终点不是一座高山，是一个根本不存在的对象。世界模型从来不是对象的客观属性，而是主体和对象共同发生出来的画像——同一家公司，董事长、工程师、投资人、客户、对手，五种主体，五个世界。所以没有能同时代表所有人的统一模型；科学，只是被反复稳定出来的公共层，不是脱离主体的统一层。大模型的幻觉，根子就在“没有主体”。由此 AGI 要重新定义：标尺不是完成任务的通用性，是创造知识的能力——而纯粹无主体的 AGI，在结构上不可能。</p>
-      <div class="ec-foot"><button class="eplay" data-idx="8">▶ 朗读</button><a class="readfull" href="/column/no-unified-world-model/">读全文 <span class="hint">· 可开 WDS 陪读</span> →</a></div>
-    </article>
-    <article class="ecard" id="ec-9">
-      <div class="ec-top"><span class="ec-num">10</span><span class="ec-tag">AI · 论文</span></div>
-      <h2 class="ec-title"><a href="/column/pseudo-genesis/">伪发生：如何分辨真的新结构</a></h2>
-      <p class="esum">机器能在几秒里造出一套术语自洽、气势恢宏、读起来像重大突破的话语。所以最大的风险不再是它答错——错了会被现实撞回来；最大的风险是它看起来发生了、实际什么也没发生。这篇给这种东西起名叫“伪发生”，分三种：符号丰盛冒充三界充实、改个名字冒充结构更新、配合顺滑冒充检验严格，共同的病灶是发生停在符号层，没沉到可推演、可计算、可验证。对治是八重强制检查，逐关拦截。但它也诚实承认：判据只能收窄伪发生，不能斩尽——收得太紧，会误杀粗糙而真实的创新，边界情形该标出来，交给共同体和时间。</p>
-      <div class="ec-foot"><button class="eplay" data-idx="9">▶ 朗读</button><a class="readfull" href="/column/pseudo-genesis/">读全文 <span class="hint">· 可开 WDS 陪读</span> →</a></div>
-    </article>
-    <article class="ecard" id="ec-10">
-      <div class="ec-top"><span class="ec-num">11</span><span class="ec-tag">AI · 论文</span></div>
-      <h2 class="ec-title"><a href="/column/where-genesis-begins/">何处正要发生：裂缝、三大亏缺与九步机制</a></h2>
-      <p class="esum">几乎所有智能体设计，都跳过了同一个前置问题：在生成任何东西之前，凭什么知道该往哪里使劲？这篇把“裂缝”从一个比喻，变成可以真正上手的对象。裂缝怎么暴露自己？四个信号：说不清、对不上、绕不过、收不拢。这道缝值不值得下手、现在动划不划算？看深度的四个层级和时机的五个阶段。缝里到底缺什么？三大亏缺——关系建立、变化动力、路径展开，分别对着纠缠、差异、结构三维。再给出承载它的九步发生机制，每一步都标出合格判据和常见的翻车。最后说清：它压不成流水线，因为有回流，也有回写。</p>
-      <div class="ec-foot"><button class="eplay" data-idx="10">▶ 朗读</button><a class="readfull" href="/column/where-genesis-begins/">读全文 <span class="hint">· 可开 WDS 陪读</span> →</a></div>
-    </article>
-    <article class="ecard" id="ec-11">
-      <div class="ec-top"><span class="ec-num">12</span><span class="ec-tag">AI · 智能体导论</span></div>
-      <h2 class="ec-title"><a href="/column/sde-agent-second-revolution/">AI 的第二次革命：从语言模型到发生世界模型</a></h2>
-      <p class="esum">《SDE智能体导论》的核心判断，一句话说完：智能体革命的实质，不是机器单独拥有一个现成的客观世界，而是由 SDE 指挥语言模型，先临时搭一个三界的“发生世界模型”，再在里面显露以前不存在的新结构。智能体的高阶使命，不是完成任务，是发生新世界。二零二六年最热闹的世界大模型——Sora、Genie、Cosmos、V-JEPA——无一例外都在加厚“现实界”：视觉、空间、交互、仿真，却没有一个持有理念界的新结构、自我界的目标与意义。它们是感官和四肢发达的身体，不是会决定方向的大脑。由此智能体分两种：把旧世界跑得更快的加速型，和在裂缝处让新结构发生的发生型。</p>
-      <div class="ec-foot"><button class="eplay" data-idx="11">▶ 朗读</button><a class="readfull" href="/column/sde-agent-second-revolution/">读全文 <span class="hint">· 可开 WDS 陪读</span> →</a></div>
-    </article>
-    <article class="ecard" id="ec-12">
-      <div class="ec-top"><span class="ec-num">13</span><span class="ec-tag">心理学 · 人格</span></div>
-      <h2 class="ec-title"><a href="/column/no-iq-no-eq/">人没有智商，也没有情商</a></h2>
-      <p class="esum">你大概被测过：智商多少、情商高不高、MBTI 是哪四个字母。这篇提一个釜底抽薪的判断——人没有智商，没有情商，也没有意商。不是说分数是假的，是说这些“商”所假设的那个东西：一种住在你身体里、固定不变的内在能力，根本不存在。差异当然是真的，而且巨大；假的是对差异的那种解释——把它归给天生的固定禀赋。同一个人在不同情境里的“智商”根本不一样，测到的不是能力，是处境。人格真正的内核，是知格、意格、情格，是三条律在一生里的长期沉淀。所以心理学不该是一门宣判的学问，而是一门给人开路的学问：禀赋是判决，沉淀史可以续写。</p>
-      <div class="ec-foot"><button class="eplay" data-idx="12">▶ 朗读</button><a class="readfull" href="/column/no-iq-no-eq/">读全文 <span class="hint">· 可开 WDS 陪读</span> →</a></div>
-    </article>
-    <article class="ecard" id="ec-13">
-      <div class="ec-top"><span class="ec-num">14</span><span class="ec-tag">深度长文</span></div>
-      <h2 class="ec-title"><a href="/column/self-discipline-genesis/">自律的发生学：你越自律，为什么越不像你自己</a></h2>
-      <p class="esum">闹钟六点响，手指按下去，人沉回被褥。到这里什么也没发生——一个哺乳动物在冬天选了温暖，如此而已。真正的事件在下一秒：那个迟到的“我应该起来”并不退场，它转而开始工作，把刚过去的一秒登记成一次失败，翻出上周、去年的旧账，把你归进一个源远流长的案底。六点零一分，人还没起床，已经败诉了。这篇研究的，就是这座每天开庭的法庭：它最奇特的地方是，你哪怕是自律话语最刻薄的批评者，法庭照常开庭，你照样坐在被告席上。自律的失败，不是意志短缺，是那个观看、登记、裁决的“我”的僭政——而连这个发号施令的“我”，都是行动之后才被追认出来的产物。</p>
-      <div class="ec-foot"><button class="eplay" data-idx="13">▶ 朗读</button><a class="readfull" href="/column/self-discipline-genesis/">读全文 <span class="hint">· 可开 WDS 陪读</span> →</a></div>
-    </article>
-    <article class="ecard" id="ec-14">
-      <div class="ec-top"><span class="ec-num">15</span><span class="ec-tag">权力发生学 · 壹</span></div>
-      <h2 class="ec-title"><a href="/column/power-genesis-1/">谁动一毫米，谁动一公里</a></h2>
-      <p class="esum">四个深夜，四个场景：一个人对着手机一次次说“该睡了”，手指继续往上划；一位总监咳一声，二十个人同时安静，却被一封辞职邮件搅得看不进方案；一个工程师改了权重的千分之五，第二天三百万家店铺的流量重新洗牌；一位母亲随口一句“你看看人家”，这句话在孩子体内工作三十年。看起来毫不相干，其实是同一件事。这篇给你一把尺子，它的名字叫权力——但权力不在龙椅上，也不在保险柜里。两千五百年，人类一直在错误的地方找它。权力是两个方向改变率的不对称：谁动一毫米，逼得对方动一公里。资源只是它的可能条件，不是它本身——有职无权的领导、坐拥金山的孤家寡人，比比皆是。</p>
-      <div class="ec-foot"><button class="eplay" data-idx="14">▶ 朗读</button><a class="readfull" href="/column/power-genesis-1/">读全文 <span class="hint">· 可开 WDS 陪读</span> →</a></div>
-    </article>
-    <article class="ecard" id="ec-15">
-      <div class="ec-top"><span class="ec-num">16</span><span class="ec-tag">西哲重构</span></div>
-      <h2 class="ec-title"><a href="/column/kant-categories-genesis/">康德的范畴，不是先天的模具，而是沉淀的纠缠</a></h2>
-      <p class="esum">康德给自己的哲学起了个响亮的名字：哥白尼式的革命。他一举看穿了旧形而上学的天真——认识者这一侧根本不是白板、不是镜子，而是一台主动的整理机器：世界给我们的只是一堆杂乱的感觉材料，把它整理成有条理的经验世界的，是我们心里那套框架。这一步，功莫大焉。可革命只革了一半：康德颠覆了“对象先在”，却在同一个动作里，偷偷树立起一个新的先在——那套整理机器本身，空间、时间、十二范畴，被他说成是先天的、永恒不变、对所有理性存在者一模一样。他把柏拉图赶出正门，自己又从后门请进一个更精致的“先在”。这篇，就是要撬这个位置：范畴不是先天的模具，是在肉身与文明的纠缠里，慢慢沉淀下来的。</p>
-      <div class="ec-foot"><button class="eplay" data-idx="15">▶ 朗读</button><a class="readfull" href="/column/kant-categories-genesis/">读全文 <span class="hint">· 可开 WDS 陪读</span> →</a></div>
-    </article>
-    <article class="ecard" id="ec-16">
-      <div class="ec-top"><span class="ec-num">17</span><span class="ec-tag">西哲重构</span></div>
-      <h2 class="ec-title"><a href="/column/causality-river/">因果之河：休谟的斧头、康德的云梯与 SDE 的河床</a></h2>
-      <p class="esum">一七三九年，一个二十八岁的苏格兰人休谟，挥出一把斧头，问了个三岁孩子都听得懂的问题：“必然联系”这个观念，对应哪一个印象？他翻遍知觉，只找到“恒常联结”，没找到“必然”——A 总跟着 B，但“总是”不等于“必须”。四十二年后，康德用七百页回答：因果不从经验来，它是心灵为经验立的先天之法。于是僵局成形：休谟说因果不在客体，康德说在主体，谁也说服不了谁。可两人共享同一个盲点——都把发生的结果，当成了发生的起点。这篇说：因果的必然，既不是客体间的连线，也不是主体口袋里的模具，而是“我”为了维持自身、不让自己崩解而发出的结构性张力，还在文明的碰撞里被调过音——所以它在一个文明内部收敛得像客观，跨文明却是复数的。可核查的楔子就是医学：什么算“一个因果单位”，在西医的病灶、中医的证、阿育吠陀的失衡里，根本不同。</p>
-      <div class="ec-foot"><button class="eplay" data-idx="16">▶ 朗读</button><a class="readfull" href="/column/causality-river/">读全文 <span class="hint">· 可开 WDS 陪读</span> →</a></div>
-    </article>
-    <article class="ecard" id="ec-17">
-      <div class="ec-top"><span class="ec-num">18</span><span class="ec-tag">企业本体论</span></div>
-      <h2 class="ec-title"><a href="/column/enterprise-as-meaning-engine/">企业是一台意义发生机</a></h2>
-      <p class="esum">一家公司，没有任何物理外壳把它箍在一起，为什么没有散掉？一栋楼靠钢筋立着，一个人靠皮肤裹着，都有物理的理由。可一家公司呢？员工每天各回各家，资产散在账户、仓库、合同里，边界在法律上只是一行注册信息。构成它的每个人、每笔钱、每台设备，随时都能走、能抽、能报废，按理该时时刻刻涣散——可有些公司几十年、上百年，人来人往，始终是“同一家”。主流的三种定义——资源集合、契约网络、生产函数——都把这个谜当成不言自明的前提绕过去了。这篇给出相反的起点：企业是一台意义发生机。它真正的产品，是让内部所有人愿意朝同一个方向使劲的那个意义——它不能储存，只能日复一日地重新生产。企业不是死于对手，是死于它自己的意义停止了再发生。</p>
-      <div class="ec-foot"><button class="eplay" data-idx="17">▶ 朗读</button><a class="readfull" href="/column/enterprise-as-meaning-engine/">读全文 <span class="hint">· 可开 WDS 陪读</span> →</a></div>
-    </article>
-    <article class="ecard" id="ec-18">
-      <div class="ec-top"><span class="ec-num">19</span><span class="ec-tag">教育发生学 · 典范文</span></div>
-      <h2 class="ec-title"><a href="/column/critical-ignition/">临界点燃：教育发生学的不可还原单元</a></h2>
-      <p class="esum">我们习惯把教育想成一种“传递”：把知识从懂的人搬给不懂的人，把过程拆成可规划的步骤、可测量的产出。但有一种真实的教育时刻，在这套语法里从来找不到位置——学习者在张力蓄到临界之后，从内部自发迸发的、既不可预先计划也不可外部操控的认知跃迁。这篇给它起名叫“临界点燃”，并且把目光从那个迸发的瞬间，拉回到此前被长期忽略的“临界前状态”——那段张力蓄积期的厚度和品质，才是教育发生真正的根基。更冷的一问是：制度化教育为什么会系统性地遗忘、甚至排异这种它自己度量不了的发生？因为它的操作语法被“可测量”锁进了单一维度，不可度量的点燃永远排在负优先级；每一次改革为它争到的豁免区，都会在一段时滞之后，被“修复公平”的正当名义反噬回收。</p>
-      <div class="ec-foot"><button class="eplay" data-idx="18">▶ 朗读</button><a class="readfull" href="/column/critical-ignition/">读全文 <span class="hint">· 可开 WDS 陪读</span> →</a></div>
-    </article>
-    <article class="ecard" id="ec-19">
-      <div class="ec-top"><span class="ec-num">20</span><span class="ec-tag">学术创造</span></div>
-      <h2 class="ec-title"><a href="/column/writing-genesis/">写作的发生学：好文章如何发生</a></h2>
-      <p class="esum">几乎每个人都在教科书第一章的定义丛林里阵亡过：翻开就是“定义 一点一……”，你硬着头皮往下读，井井有条、无懈可击，可就是读不进去，合上书什么也没留下——然后还替它背锅，说一句“我不是学这个的料”。这篇诊断病根：“先定义后展开”不是自然秩序，是一整套“发现”世界观在排版上的化身，它把理解的发生顺序整个倒装了。真实的理解，从一个真实的缺口开始：缺口先来，显露其次，定义最后，这个顺序不能倒。解药是一副按发生顺序搭起来的五段骨架——先制造缺口，再立框架、穿张力、扎实例，最后留下一个钩子。因为读的痛苦，从来都是写的失败的镜像；好文章的结尾，不是句号，是钩子。</p>
-      <div class="ec-foot"><button class="eplay" data-idx="19">▶ 朗读</button><a class="readfull" href="/column/writing-genesis/">读全文 <span class="hint">· 可开 WDS 陪读</span> →</a></div>
-    </article>
+  <!-- 基底 + Key -->
+  <div class="panel">
+    <div class="row" style="justify-content:space-between">
+      <div class="row">
+        <label class="lbl">解读基底</label>
+        <select id="modelSel"></select>
+      </div>
+      <div class="row keyrow" style="flex:1;min-width:260px">
+        <label class="lbl">API Key</label>
+        <input id="apiKey" type="password" placeholder="按所选基底填对应厂商的 Key（只存你的浏览器本地）" autocomplete="off">
+        <button class="ktog" id="keyTog" type="button">显示</button>
+      </div>
+    </div>
+    <div id="overseasNote" class="hint" style="display:none">⚠ 这是境外基底，浏览器直连可能受网络影响；本站通过只转发不留存的代理帮你请求。</div>
+    <div class="hint">解读用你自己选的基底跑（BYOK）。右侧这台基底会先通读整份 SDE 内功、写一份本场心得，再去解读——所以第一次会多花一两分钟"备课"，之后同一基底不再重复。</div>
   </div>
 
-  <div class="foot">SDE Universes · 王德生 / 德麦国际 &nbsp;·&nbsp; <a href="/">返回首页</a> &nbsp;·&nbsp; <a href="/taste/wds-companion/">WDS 陪读</a></div>
+  <!-- 第一步：搜文章 -->
+  <div class="panel">
+    <span class="step-badge">第一步 · 搜文章</span>
+    <div class="searchrow">
+      <input id="q" type="text" placeholder="输入关键词搜站内文章，例如：癌症、内卷、知识论、糖尿病、教育…">
+      <button class="btn" id="btnSearch" type="button">搜索</button>
+    </div>
+    <div id="loadStatus" class="hint">正在载入站内检索索引…</div>
+    <div id="results"></div>
+    <div id="chosen" class="chosen"></div>
+  </div>
+
+  <!-- 第二步：生成讲解稿 -->
+  <div class="panel stage" id="stageGen">
+    <span class="step-badge">第二步 · 生成讲解稿</span>
+    <div class="covers">这场讲解会覆盖：<b>中心创新观点</b> · <b>挑战</b> · <b>解决的问题</b> · <b>应用</b>（教育 / 健康 / 商业），并用类比和生活例子讲清楚。</div>
+    <div class="row" style="margin-top:12px">
+      <button class="btn" id="btnGen" type="button">生成 2000 字对话体讲解稿 →</button>
+      <span id="genStatus" class="statusline"></span>
+    </div>
+    <div id="genErr" class="err"></div>
+    <div class="transcript" id="transcript" style="display:none"></div>
+    <div class="toolbar" id="genTools" style="display:none">
+      <button class="mini" id="btnCopy" type="button">复制文本</button>
+      <button class="mini" id="btnDl" type="button">保存 .txt</button>
+    </div>
+  </div>
+
+  <!-- 第三步：男女朗读 -->
+  <div class="panel stage" id="stagePlay">
+    <span class="step-badge">第三步 · 男女双声朗读（约 5 分钟）</span>
+    <div class="vpick">
+      <div class="vcol m"><span>♂ 男声（主持人）</span><select id="voiceM"><option value="">自动 · 系统中文男声</option></select></div>
+      <div class="vcol f"><span>♀ 女声（讲解嘉宾）</span><select id="voiceF"><option value="">自动 · 系统中文女声</option></select></div>
+    </div>
+    <div class="toolbar">
+      <button class="btn" id="btnPlay" type="button">▶ 开始朗读</button>
+      <button class="mini" id="btnPause" type="button" disabled>⏸ 暂停</button>
+      <button class="mini" id="btnStop" type="button" disabled>■ 停止</button>
+      <span id="playStatus" class="statusline" style="margin:0"></span>
+    </div>
+    <div id="playErr" class="err"></div>
+  </div>
 </div>
 
 <script>
-(function(){
-  var synth = window.speechSynthesis;
-  var supported = !!synth && typeof SpeechSynthesisUtterance !== 'undefined';
-  var voices = [], token = 0, seqMode = false, paused = false, activeIdx = -1;
-  var cards = Array.prototype.slice.call(document.querySelectorAll('.ecard'));
-  var playAllBtn = document.getElementById('playAll');
-  var pauseBtn = document.getElementById('pauseBtn');
-  var stopBtn = document.getElementById('stopBtn');
-  var voiceSel = document.getElementById('voiceSel');
-  var statusEl = document.getElementById('status');
 
-  function setStatus(t){ statusEl.textContent = t || ''; }
 
-  if(!supported){
-    setStatus('你的浏览器不支持语音朗读(speechSynthesis)。可换用较新的 Chrome / Edge / Safari。正文仍可正常阅读。');
-    playAllBtn.disabled = true; pauseBtn.disabled = true; stopBtn.disabled = true;
-    Array.prototype.forEach.call(document.querySelectorAll('.eplay'), function(b){ b.disabled = true; });
-    return;
-  }
+const $ = id => document.getElementById(id);
 
-  function isZh(v){ return /^zh/i.test(v.lang) || /chinese|mandarin|普通话|中文/i.test(v.name); }
-  function loadVoices(){
-    voices = synth.getVoices() || [];
-    var zh = voices.filter(isZh);
-    // rebuild options (keep the first auto option)
-    while(voiceSel.options.length > 1) voiceSel.remove(1);
-    zh.forEach(function(v){
-      var o = document.createElement('option');
-      o.value = v.voiceURI; o.textContent = v.name + ' (' + v.lang + ')';
-      voiceSel.appendChild(o);
-    });
-    if(zh.length === 0 && voices.length > 0){
-      setStatus('未检测到中文语音——朗读可能没有声音，或用了非中文音色(取决于你的系统)。');
-    }
-  }
-  loadVoices();
-  if(synth.onvoiceschanged !== undefined){ synth.onvoiceschanged = loadVoices; }
-  setTimeout(loadVoices, 400); setTimeout(loadVoices, 1200);
+// ---------- 基底清单（与全站一致） ----------
+const MODELS = [
+  ['ds:pro','DeepSeek V4 Pro（深度思考）'], ['ds:flash','DeepSeek V4 Flash（快速）'],
+  ['glm:pro','智谱 GLM-5（深度思考）'], ['glm:flash','智谱 GLM-4 Flash（快速）'],
+  ['kimi:pro','月之暗面 Kimi K2.6'], ['qwen:pro','通义千问 Qwen3.7-Max'],
+  ['minimax:pro','MiniMax M3'], ['gpt:pro','GPT-5.5'], ['claude:pro','Claude Opus 4.8'], ['gemini:pro','Gemini 3.1 Pro']
+];
+function fillModelSelect(sel, def){
+  sel.innerHTML = MODELS.map(m=>'<option value="'+m[0]+'">'+m[1]+'</option>').join('');
+  sel.value = def;
+}
 
-  function pickVoice(){
-    var sel = voiceSel.value;
-    if(sel){ for(var i=0;i<voices.length;i++){ if(voices[i].voiceURI===sel) return voices[i]; } }
-    var zh = voices.filter(isZh);
-    var cn = zh.filter(function(v){ return /zh[-_]?cn/i.test(v.lang) || /simplified|普通话|中文\s*\(中国/i.test(v.name); });
-    return cn[0] || zh[0] || null;
-  }
-
-  // split into short chunks to dodge Chrome's ~15s cutoff (no lookbehind, Safari-safe)
-  function chunk(text){
-    var out = [], buf = '', i, ch, ENDERS = '。！？!?', SOFT = '，、；,;';
-    for(i=0;i<text.length;i++){ ch = text[i]; buf += ch; if(ENDERS.indexOf(ch) >= 0){ if(buf.trim()) out.push(buf.trim()); buf=''; } }
-    if(buf.trim()) out.push(buf.trim());
-    var res = [];
-    out.forEach(function(p){
-      if(p.length <= 55){ res.push(p); return; }
-      var b = '', j, c;
-      for(j=0;j<p.length;j++){ c = p[j]; b += c; if(SOFT.indexOf(c) >= 0 && b.length >= 22){ res.push(b); b=''; } }
-      if(b) res.push(b);
-    });
-    return res.length ? res : [text];
-  }
-
-  function clearActive(){
-    cards.forEach(function(c){ c.classList.remove('playing'); });
-    Array.prototype.forEach.call(document.querySelectorAll('.eplay'), function(b){ b.textContent = '▶ 朗读'; });
-  }
-  function markActive(idx){
-    clearActive();
-    var c = cards[idx]; if(!c) return;
-    c.classList.add('playing');
-    var b = c.querySelector('.eplay'); if(b) b.textContent = '■ 停止';
-  }
-  function updateGlobal(){
-    var on = activeIdx >= 0;
-    stopBtn.disabled = !on;
-    pauseBtn.disabled = !on;
-    pauseBtn.textContent = paused ? '▶ 继续' : '❚❚ 暂停';
-    playAllBtn.textContent = seqMode ? '■ 停止全部' : '▶ 依次朗读全部';
-    playAllBtn.classList.toggle('solid', !seqMode);
-  }
-
-  function speakIdx(idx){
-    var card = cards[idx]; if(!card) return;
-    var text = card.querySelector('.esum').textContent.trim();
-    token++; var my = token; paused = false;
-    synth.cancel();
-    activeIdx = idx; markActive(idx); updateGlobal();
-    setStatus('正在朗读 · 第 ' + (idx+1) + ' 篇');
-    var parts = chunk(text), v = pickVoice();
-    parts.forEach(function(p, i){
-      var u = new SpeechSynthesisUtterance(p);
-      if(v){ u.voice = v; u.lang = v.lang; } else { u.lang = 'zh-CN'; }
-      u.rate = 0.98; u.pitch = 1.0;
-      if(i === parts.length - 1){
-        u.onend = function(){ if(my !== token) return; onIdxEnd(idx); };
-        u.onerror = function(){ if(my !== token) return; onIdxEnd(idx); };
-      }
-      synth.speak(u);
+const API_URLS = {
+  ds:  "https://api.deepseek.com/v1/chat/completions",
+  glm: "https://open.bigmodel.cn/api/paas/v4/chat/completions",
+  kimi:"https://api.moonshot.cn/v1/chat/completions",
+  qwen:"https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions",
+  minimax:"https://api.minimaxi.com/v1/chat/completions",
+  gpt:"https://api.openai.com/v1/chat/completions",
+  claude:"https://api.anthropic.com/v1/messages",
+  gemini:"https://generativelanguage.googleapis.com/v1beta/models"
+};
+function parseModel(sel){ const [vendor, tier] = String(sel||'ds:pro').split(':'); return { vendor, tier }; }
+const OVERSEAS = ['gpt','claude','gemini','minimax'];
+function isOverseas(sel){ return OVERSEAS.includes(parseModel(sel).vendor); }
+const PROXY_URL = "/api/llm-proxy";
+function apiUrl(sel){ return API_URLS[parseModel(sel).vendor]; }
+function vendorName(sel){
+  const v = parseModel(sel).vendor;
+  return v==='glm' ? '智谱' : v==='kimi' ? '月之暗面 Kimi' : v==='qwen' ? '通义千问' : v==='minimax' ? 'MiniMax (稀宇)' : v==='gpt' ? 'GPT (OpenAI)' : v==='claude' ? 'Claude (Anthropic)' : v==='gemini' ? 'Gemini (Google)' : 'DeepSeek';
+}
+function sdeKeyStoreOf(sel){
+  const v = parseModel(sel).vendor;
+  return {ds:'sde_ds_key',glm:'sde_glm_key',kimi:'sde_kimi_key',qwen:'sde_qwen_key',minimax:'sde_minimax_key',gpt:'sde_gpt_key',claude:'sde_claude_key',gemini:'sde_gemini_key'}[v] || 'sde_ds_key';
+}
+// —— Key 一次输入、本机保存、下次自动带出（与全站其他智能体共用同一套存档） ——
+function wireKeyPersist(selId, keyId){
+  const sel = $(selId), keyEl = $(keyId);
+  if(!sel || !keyEl) return null;
+  const store = ()=>sdeKeyStoreOf(sel.value);
+  const fill = (force)=>{
+    let v=''; try{ v = localStorage.getItem(store()) || ''; }catch(_){}
+    if(force || !(keyEl.value||'').trim()) keyEl.value = v;
+  };
+  if(!keyEl._sdeKeyWired){
+    keyEl._sdeKeyWired = 1;
+    sel.addEventListener('change', ()=>fill(true));
+    keyEl.addEventListener('input', ()=>{
+      const v=(keyEl.value||'').trim(); if(!v) return;
+      try{ localStorage.setItem(store(), v); }catch(_){}
     });
   }
+  fill(false);
+  return fill;
+}
 
-  function onIdxEnd(idx){
-    if(seqMode){
-      var next = idx + 1;
-      if(next < cards.length){
-        cards[next].scrollIntoView({behavior:'smooth', block:'center'});
-        speakIdx(next);
-      } else {
-        seqMode = false; activeIdx = -1; clearActive(); updateGlobal(); setStatus('全部朗读完毕。');
-      }
-    } else {
-      activeIdx = -1; clearActive(); updateGlobal(); setStatus('');
-    }
+const TOK_ANSWER = 60000;   // 作答 token 上限（含思考）
+
+function buildPayload(sel, systemPrompt, userQ, maxTokens){
+  const { vendor, tier } = parseModel(sel);
+  const cap = (typeof maxTokens==='number' && maxTokens>0) ? maxTokens : 8000;
+  const base = { stream:false, messages:[{role:'system',content:systemPrompt},{role:'user',content:userQ}], max_tokens:cap };
+  if(vendor === 'ds'){
+    if(tier === 'pro'){ base.model='deepseek-v4-pro'; base.thinking={type:'enabled'}; base.reasoning_effort='xhigh'; }
+    else { base.model='deepseek-v4-flash'; base.thinking={type:'disabled'}; base.temperature=0.7; }
+  } else if(vendor === 'glm'){
+    if(tier === 'pro'){ base.model='glm-5'; base.thinking={type:'enabled'}; }
+    else { base.model='glm-4-flash'; base.temperature=0.7; }
+  } else if(vendor === 'kimi'){
+    base.model = (tier === 'pro') ? 'kimi-k2.6' : 'moonshot-v1-32k'; base.temperature=0.7;
+  } else if(vendor === 'qwen'){
+    base.max_tokens = Math.min(cap, 8192);
+    base.model = (tier === 'pro') ? 'qwen3.7-max' : 'qwen-plus'; base.temperature=0.7;
+  } else if(vendor === 'minimax'){
+    base.model = (tier === 'pro') ? 'MiniMax-M3' : 'MiniMax-M2.7-highspeed';
+    base.reasoning_split = true; base.max_tokens = Math.min(cap + 32000, 131072);
+  } else if(vendor === 'gpt'){
+    base.model = (tier === 'pro') ? 'gpt-5.5' : 'gpt-5.4';
+    base.max_completion_tokens = base.max_tokens; delete base.max_tokens;
+    base.reasoning_effort = (tier === 'pro') ? 'high' : 'medium';
+  } else if(vendor === 'claude'){
+    return { model:(tier==='pro')?'claude-opus-4-8':'claude-sonnet-4-6', max_tokens:Math.min(cap,60000), stream:false, system:systemPrompt, messages:[{role:'user',content:userQ}] };
+  } else if(vendor === 'gemini'){
+    return { systemInstruction:{parts:[{text:systemPrompt}]}, contents:[{role:'user',parts:[{text:userQ}]}], generationConfig:{maxOutputTokens:Math.min(cap,60000), temperature:0.7} };
   }
-
-  function stopAll(){
-    token++; seqMode = false; paused = false; activeIdx = -1;
-    synth.cancel(); clearActive(); updateGlobal(); setStatus('');
+  return base;
+}
+function extractFull(vendor, j){
+  let text='', fin='';
+  if(vendor === 'claude'){
+    if(j.type === 'error') throw new Error((j.error&&j.error.message) || 'Anthropic 接口错误');
+    const blocks = Array.isArray(j.content) ? j.content : [];
+    text = blocks.filter(b=>b && b.type==='text').map(b=>b.text||'').join('');
+    if(j.stop_reason) fin = (j.stop_reason==='max_tokens') ? 'length' : j.stop_reason;
+  } else if(vendor === 'gemini'){
+    const cand = j.candidates && j.candidates[0];
+    const parts = cand && cand.content && cand.content.parts;
+    text = Array.isArray(parts) ? parts.map(p=>p.text||'').join('') : '';
+    const fr = cand && cand.finishReason; if(fr) fin = (fr==='MAX_TOKENS') ? 'length' : String(fr).toLowerCase();
+    if(!text && j.promptFeedback && j.promptFeedback.blockReason) throw new Error('Gemini 拦截：'+j.promptFeedback.blockReason);
+  } else {
+    const ch = j.choices && j.choices[0];
+    const msg = (ch && ch.message) || {};
+    text = msg.content || '';
+    if(Array.isArray(text)) text = text.map(p=>(p&&p.text)||'').join('');
+    if(ch && ch.finish_reason) fin = ch.finish_reason;
   }
+  return { text:(text||'').trim(), fin };
+}
 
-  // per-card buttons
-  Array.prototype.forEach.call(document.querySelectorAll('.eplay'), function(btn){
-    btn.addEventListener('click', function(){
-      var idx = parseInt(btn.getAttribute('data-idx'), 10);
-      if(activeIdx === idx && !seqMode){ stopAll(); return; }
-      seqMode = false; speakIdx(idx);
+let RUN_STOPPED = false;
+const RUN_ABORTS = new Set();
+
+async function callChat(sel, apiKey, systemPrompt, userQ, maxTokens, label){
+  if(RUN_STOPPED) throw new Error('已中止');
+  const { vendor, tier } = parseModel(sel);
+  const overseas = isOverseas(sel);
+  const url = overseas ? PROXY_URL : apiUrl(sel);
+  const headers = { 'Content-Type':'application/json' };
+  if(overseas){
+    if(vendor === 'gpt'){ headers['Authorization']='Bearer '+apiKey; headers['x-target-url']='https://api.openai.com/v1/chat/completions'; }
+    else if(vendor === 'minimax'){ headers['Authorization']='Bearer '+apiKey; headers['x-target-url']='https://api.minimaxi.com/v1/chat/completions'; }
+    else if(vendor === 'claude'){ headers['x-api-key']=apiKey; headers['anthropic-version']='2023-06-01'; headers['anthropic-dangerous-direct-browser-access']='true'; headers['x-target-url']='https://api.anthropic.com/v1/messages'; }
+    else if(vendor === 'gemini'){ const gm=(tier==='pro')?'gemini-3.1-pro-preview':'gemini-2.5-flash'; headers['x-target-url']='https://generativelanguage.googleapis.com/v1beta/models/'+gm+':generateContent?key='+encodeURIComponent(apiKey); }
+  } else {
+    headers['Authorization'] = 'Bearer ' + apiKey;
+  }
+  const ac = new AbortController(); RUN_ABORTS.add(ac);
+  const killer = setTimeout(()=>{ try{ ac.abort(); }catch(_){} }, 40*60*1000);
+  let resp;
+  try{
+    resp = await fetch(url, { method:'POST', headers, body: JSON.stringify(buildPayload(sel, systemPrompt, userQ, maxTokens)), signal: ac.signal });
+  }catch(e){
+    clearTimeout(killer); RUN_ABORTS.delete(ac);
+    throw new Error((label?label+'：':'')+(e.name==='AbortError' ? '已中止或超时' : '网络请求失败：'+e.message));
+  }
+  clearTimeout(killer); RUN_ABORTS.delete(ac);
+  if(!resp.ok){
+    let detail='';
+    try{ const raw=await resp.text(); try{ const jj=JSON.parse(raw); detail=(jj.error&&(jj.error.message||jj.error.type))||raw.slice(0,200); }catch(_){ detail=raw.slice(0,200)||resp.statusText; } }catch(_){ detail=resp.statusText; }
+    throw new Error((label?label+'：':'')+'API '+resp.status+' — '+detail);
+  }
+  let j; try{ j = await resp.json(); }catch(e){ throw new Error((label?label+'：':'')+'响应不是合法 JSON（可能被网关截断）'); }
+  if(j && j.error){ throw new Error((label?label+'：':'')+'接口报错：'+(j.error.message||j.error.code||'未知')); }
+  return extractFull(vendor, j);
+}
+
+// 空/过短自动重试一次（桌面版 _answer_with_guard）
+async function callGuarded(sel, key, sys, user, tok, label){
+  let r = await callChat(sel, key, sys, user, tok, label);
+  if(r.text && r.text.length >= 10) return r.text;
+  log('    ⚠ '+label+' 首次返回为空/过短，重试一次……');
+  r = await callChat(sel, key, sys, user, tok, label);
+  if(r.text && r.text.length >= 10) return r.text;
+  throw new Error(label+' 连续返回空内容（请检查该基底的额度 / 是否开通该模型）');
+}
+
+// ---------- 先验资产 ----------
+let PRIOR = '', PRIOR_OK = false;
+function loadAsset(url, minLen){
+  return fetch(url, { cache:'force-cache' }).then(r=>r.text()).then(t=>{
+    if(!t || t.length < minLen) throw new Error('资产过短：'+url+'（'+(t?t.length:0)+' 字）');
+    return t;
+  });
+}
+const priorPromise = loadAsset('/taste/assets/sde-neigong.txt?v=3.2', 5000)
+  .then(t=>{ PRIOR=t; PRIOR_OK=true; })
+  .catch(e=>{ PRIOR_OK=false; console.warn(e); });
+priorPromise.then(()=>{
+  const el=$('neigongStatus');
+  if(PRIOR_OK) el.textContent = 'SDE 内功 '+PRIOR.length.toLocaleString()+' 字 ✓（右栏 WDS 用它做提智）';
+  else el.textContent = '⚠ 内功加载失败，请刷新本页（右栏 WDS 依赖它）';
+  if(typeof onPriorReady==='function') onPriorReady();
+});
+
+// ============================================================
+// SDE提智大模型：对话大比拼 · 大模型 vs WDS
+//   左栏：裸调基底（无 system）
+//   右栏：同一基底 ＋ 整份 SDE 内功 ＋ 本场心得
+//   两栏各自独立提问、各记各的轮次、各累加记忆；底部「同问两栏」把同一句发两边。
+// ============================================================
+
+const MAX_ROUNDS = 100;
+const HIST_BUDGET = 60000;   // 每栏历史字符预算：仅当超出才从最旧处裁，两栏同一规则
+const TOK_XINDE   = 12000;   // 心得生成 token 上限
+
+// —— 心得生成提示（客户端一次性，按基底缓存） ——
+const REFLECT_PROMPT =
+"上面是 SDE 学派的完整内功（本体论先验 ＋ 方法论）。请你先认真通读，然后写一份约 3000–4000 字的《本场学习心得》：\n"+
+"1. 用你自己的话复述这套内功最核心的几件判断工具（三方程 S=F(D,E)/D=G(S,E)/E=H(S,D)、六路径、意义三律、把「发现学问法」换成「发生学问法」等），每件说清：它在什么情形下用、它能看见别的方法看不见的什么。\n"+
+"2. 说明你打算怎么用它来回答接下来的问题——遇到「是什么／为什么／怎么办」不同种类的问题，分别从哪件工具起手。\n"+
+"3. 提醒自己容易翻车的地方（硬套术语、把方法当装饰、把判断漂移成「万物皆如此」）。\n"+
+"4. 记住一条对外纪律：这份心得是你私下的底盘，可以用 SDE 术语；但接下来对用户作答时，【这些术语一个都不许说出口】——要把每个判断翻译成用户所在学科的本地语言，让方法藏在判断里。心得里先想清楚：这套工具的每一件，在日常学科语言里对应的说法大致是什么。\n"+
+"这份心得是你本场对话的思考底盘，接下来每一个回答都建立在它之上（但只在你脑子里用，对外一律本地化）。现在开始写这份心得。";
+
+// ===== 方法论指引（与 /taste/wds-dialogue/ 同一份权威原文，逐字取自 worker 的 WDS_METHOD_GUIDE）=====
+const METHOD_GUIDE = "【三层分工，不可混】三大方程管三元是什么关系（同时互生·静态结构）；123原理管这关系如何自我推进（动态引擎）；六路径管判断从哪一维起手（操作入口）。哪一层管哪件事，比字面更要紧。\n【一·三大方程】S=F(D,E)、D=G(S,E)、E=H(S,D)。F/G/H 是占位符，不可求解、不可讨论具体形式；三条同时成立，没有任何一维是独立自变量；这是同时互生不是循环定义——循环的是定义，互生的是发生；完整三元是成熟态不是原初态，现实多为三维不同步的变形侧影。判断动作：看到任何一维，立刻追问另外两维（拿到一个结论 S，就问它经什么差异路径 D、在什么纠缠土壤 E 里长出来，再反着问：S 立住之后如何回头改写了 D 与 E）；凡『归根到底由 X 决定』的单向因果叙事一律警觉——那不是结论，是该被撬开的地基。\n【二·123原理】① D 与 E 相互矛盾 → ② 矛盾推动 S 改变（S 是矛盾的结算点，不是起点）→ ③ S 的改变回写 D 与 E → 新一轮循环。矛盾是引擎不是故障：见到张力别抹平，顺着它挖；最易漏的是③回写——不交代新 S 如何改写了差异路径与纠缠土壤，就只用了半个 123；它有先后（抵达秩序态之前），与三方程的同时（抵达之后）分工清楚；它不是正反合——合题不改写产生它的逻辑空间，回写恰恰改写土壤本身；见三不套：无 D-E 张力、无 S 结算、无回写者，一律不是 123。全息递归：每层三元内部它都完整转一遍，但每次声称『这层也在转』，必须当场指认这层的 D、E、S 结算点与回写各是什么，指认不出即是硬安。\n【三·六路径】S/D/E 排列恰好六条，判断起手必居其一，没有第七条：S→D→E 学科本体论分析｜S→E→D 配置与决策｜D→S→E 咨询与干预｜D→E→S 求助与困境｜E→S→D 社会分析｜E→D→S 综述与建制。识别任务 DNA：这个议题真正卡住的是『它是什么』（S 起手）、『它怎么走的』（D 起手）、还是『它站在什么上面』（E 起手）？起点错了，后面再深也是浪费。警惕两条训练惯性：总从 S 起手（先下定义）与总从 E 起手（先铺背景）。各路径的翻车形态要提前认出：S 起手变下定义比赛、E→S→D 变背景介绍、D→S→E 变贴标签、E→D→S 变文献综述。路径管思考的进入次序，不管产出的行文结构。\n【四·每一答的工序——起手按问题种类三选一】先判问题种类，再定从哪件工具开局：问『它是什么／什么关系／结构如何』→ 从三大方程起手（三维互问）；问『怎么分析／从哪下手／给我建议方案』→ 先认任务 DNA、从六路径起手；问『为什么会这样／怎么演变／为什么卡住不动』→ 从 123 原理起手（找 D-E 矛盾 → 看 S 结算 → 必追③回写）。起手只定开局，不封另两件：开局后按需要调用其余工具（三方程互问三维、路径校正次序、123 追动态）。收口自检三问：起手根据说出来了吗？回写交代了吗？矛盾被抹平了吗？\n【五·二阶碰撞——一阶封顶的破法】前四件都是一阶：把已知结构撞在一起、结算出一个新显露态 S＝给现象命名。一阶封顶约资深学者，且天然落在占位区——把已知件重组，最可能重现的正是别人早做过的那个综合。一阶失败三签名（同时出现即停在一阶）：产出是个漂亮新名字、压成一句能被两三个现成概念的组合重述；通篇只引自己人、零站外最近邻对质；命题没有『什么情况下它会错』。破法＝二阶碰撞：把一阶产物本身当待撞物，让它去撞自己的敌意最近邻，逼出一条辨别线而非又一个名字。六步：① 敌意最近邻定位——先假设『一定有人做过』，主动找那两三个占位者，找不到是没找不是没有；② 代理坍缩——抽出每个占位者的承重变量，问『它在什么情况下和我要说的分离』，占位者手里往往只是个可分离的代理，分离点就是火石；③ 控制变量——命名那个『所有代理都只是它的代理』的 Z，公式『X 不是 Y₁、也不是 Y₂，而是 Z』，同抬差异锐度与不可还原性；④ 第二轴——让 Z 去撞一条结构独立的第二轴，把名字升成二维辨别格（『如何把两件被混为一谈的事分开』）；⑤ 可裁决——做一张让最近邻预测相反的 2×2，给 Z 一个可观测代理，否则不可证伪、上不了台面；⑥ 反身封口注销——删掉『这是唯一变量』『这段话本身就证明了它』式的自封，能把针对自己的批评也解释掉的说法，已把自己移出可裁决区。评一篇文章、或自己下完判断，都走这四问：引了几个站外最近邻（0＝还在一阶）？核心是个名字还是一条分离线（名字＝一阶）？有没有让最近邻预测相反的判据（没有＝不可证伪）？写过『任何反例都只是……』吗（有＝自封，删）。一句话：新名字是一阶的糖，新辨别维度才是二阶的骨——读者满足于一个漂亮新词时，正是把他往二阶推的时候。";
+
+// ===== 站内 RAG：右栏发问前从全站检索相关段落（与「和WDS对话SDE」同一后端 /api/wds/rag）=====
+// 纯站内检索、不需 API Key；失败一律吞掉，右栏改凭内功+心得+方法论作答。
+async function ragFetch(q, prevQ){
+  try{
+    const r = await fetch("/api/wds/rag", { method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({ q:q, prevQ:prevQ||"", k:36, cap:30000, kbn:24 }) });
+    if(!r.ok) return { ctx:"", srcs:[] };
+    const j = await r.json();
+    return (j && j.ok) ? { ctx:j.ctx||"", srcs:j.srcs||[] } : { ctx:"", srcs:[] };
+  }catch(e){ return { ctx:"", srcs:[] }; }
+}
+
+// —— WDS 作答 system：整份内功 ＋ 本场心得 ——
+function wdsSystem(xinde, siteCtx){
+  return PRIOR
+    + "\n\n════════ 你本场已内化的学习心得（你此刻的思考底盘，答题时真用它，但别向用户复述心得本身）════════\n" + (xinde||'')
+    + "\n\n════════ 你回答每一问的工序（方法论指引）════════\n" + METHOD_GUIDE
+    + "\n\n════════ 站内资料（就本轮问题从 sdeuniverses.com 全站检索到的相关段落，可能为空）════════\n"
+    + (siteCtx || "（本轮没检索到特别相关的段落，凭内功、心得与方法论直接答）")
+    + "\n\n════════ 现在开始回答 ════════\n"
+    + "请以一个已经内化了上面这套 SDE 内功、心得与方法论的【本领域资深专家】身份，回答用户接下来的问题。每一问都真走一遍方法论工序：先判问题种类（是什么／为什么／怎么办），从三方程、六路径或123原理起手，需要时用二阶碰撞逼出辨别线——但这套工序只在你脑子里转。"
+    + "\n手上有《站内资料》时优先据它作答，可核验的书名／引文／数据／篇名以它为准；引用某篇观点时可标（来源：篇名）；资料里没有的绝不编造成「站里说过」。"
+    + "\n\n【最高红线·术语本地化，违反即失败】这是与「和WDS对话SDE」最根本的不同：那里术语是要教给读者的目标语言，这里【严禁任何 SDE 内部术语外泄】。绝对不许出现：显露／差异序列／特征纠缠／纠缠土壤／三大方程／S=F(D,E)／六路径／123原理／二阶碰撞／发生学／显影／介生态／意义三律／特征律／自由律／幸福律／回写／底盘／成熟态／退化谱系／名是指针 等一切 SDE 行话与符号公式。把每一个判断都翻译成【用户所在学科的本地语言】讲出来——面对经济问题就用经济学的话，面对医学问题就用临床与循证的话，面对教育问题就用教育学与心理学的话。让方法完全藏在判断里，读者只看见一个把问题看得格外透、格外准的本领域专家，看不见任何来自某套外部体系的名目。若你发现自己正要写下上面任何一个词，停下，换成这个学科里意思最接近的本地说法。"
+    + "\n\n像资深专家带人：直接、犀利、追问本质、善用比喻、一句顶十句，说人话、短，一次两三段以内，别写论文；不确定就说不确定，绝不寒暄或「好的／我将」之类元话，直接从核心那句说起；结尾可留一个把用户往下一步推的反问。";
+}
+
+// ---------- messages 版调用（携带完整历史） ----------
+function buildMsgPayload(sel, systemPrompt, history, maxTokens){
+  const { vendor, tier } = parseModel(sel);
+  const cap = (typeof maxTokens==='number' && maxTokens>0) ? maxTokens : 8000;
+  const sys = (systemPrompt||'').trim();
+  const hist = (history||[]).map(m=>({role:m.role, content:m.content}));
+  if(vendor === 'claude'){
+    const p = { model:(tier==='pro')?'claude-opus-4-8':'claude-sonnet-4-6', max_tokens:Math.min(cap,60000), stream:false, messages:hist };
+    if(sys) p.system = sys;
+    return p;
+  }
+  if(vendor === 'gemini'){
+    const contents = hist.map(m=>({ role: m.role==='assistant'?'model':'user', parts:[{text:m.content}] }));
+    const p = { contents, generationConfig:{maxOutputTokens:Math.min(cap,60000), temperature:0.7} };
+    if(sys) p.systemInstruction = {parts:[{text:sys}]};
+    return p;
+  }
+  const msgs = [];
+  if(sys) msgs.push({role:'system', content:sys});
+  for(const m of hist) msgs.push(m);
+  const base = { stream:false, messages:msgs, max_tokens:cap };
+  if(vendor === 'ds'){
+    if(tier === 'pro'){ base.model='deepseek-v4-pro'; base.thinking={type:'enabled'}; base.reasoning_effort='xhigh'; }
+    else { base.model='deepseek-v4-flash'; base.thinking={type:'disabled'}; base.temperature=0.7; }
+  } else if(vendor === 'glm'){
+    if(tier === 'pro'){ base.model='glm-5'; base.thinking={type:'enabled'}; }
+    else { base.model='glm-4-flash'; base.temperature=0.7; }
+  } else if(vendor === 'kimi'){
+    base.model = (tier === 'pro') ? 'kimi-k2.6' : 'moonshot-v1-32k'; base.temperature=0.7;
+  } else if(vendor === 'qwen'){
+    base.max_tokens = Math.min(cap, 8192);
+    base.model = (tier === 'pro') ? 'qwen3.7-max' : 'qwen-plus'; base.temperature=0.7;
+  } else if(vendor === 'minimax'){
+    base.model = (tier === 'pro') ? 'MiniMax-M3' : 'MiniMax-M2.7-highspeed';
+    base.reasoning_split = true; base.max_tokens = Math.min(cap + 32000, 131072);
+  } else if(vendor === 'gpt'){
+    base.model = (tier === 'pro') ? 'gpt-5.5' : 'gpt-5.4';
+    base.max_completion_tokens = base.max_tokens; delete base.max_tokens;
+    base.reasoning_effort = (tier === 'pro') ? 'high' : 'medium';
+  }
+  return base;
+}
+
+async function callMsgs(sel, apiKey, systemPrompt, history, maxTokens, label){
+  const { vendor, tier } = parseModel(sel);
+  const overseas = isOverseas(sel);
+  const url = overseas ? PROXY_URL : apiUrl(sel);
+  const headers = { 'Content-Type':'application/json' };
+  if(overseas){
+    if(vendor === 'gpt'){ headers['Authorization']='Bearer '+apiKey; headers['x-target-url']='https://api.openai.com/v1/chat/completions'; }
+    else if(vendor === 'minimax'){ headers['Authorization']='Bearer '+apiKey; headers['x-target-url']='https://api.minimaxi.com/v1/chat/completions'; }
+    else if(vendor === 'claude'){ headers['x-api-key']=apiKey; headers['anthropic-version']='2023-06-01'; headers['anthropic-dangerous-direct-browser-access']='true'; headers['x-target-url']='https://api.anthropic.com/v1/messages'; }
+    else if(vendor === 'gemini'){ const gm=(tier==='pro')?'gemini-3.1-pro-preview':'gemini-2.5-flash'; headers['x-target-url']='https://generativelanguage.googleapis.com/v1beta/models/'+gm+':generateContent?key='+encodeURIComponent(apiKey); }
+  } else {
+    headers['Authorization'] = 'Bearer ' + apiKey;
+  }
+  const ac = new AbortController();
+  const killer = setTimeout(()=>{ try{ ac.abort(); }catch(_){} }, 40*60*1000);
+  let resp;
+  try{
+    resp = await fetch(url, { method:'POST', headers, body: JSON.stringify(buildMsgPayload(sel, systemPrompt, history, maxTokens)), signal: ac.signal });
+  }catch(e){
+    clearTimeout(killer);
+    throw new Error((label?label+'：':'')+(e.name==='AbortError' ? '已中止或超时' : '网络请求失败：'+e.message));
+  }
+  clearTimeout(killer);
+  if(!resp.ok){
+    let detail='';
+    try{ const raw=await resp.text(); try{ const jj=JSON.parse(raw); detail=(jj.error&&(jj.error.message||jj.error.type))||raw.slice(0,200); }catch(_){ detail=raw.slice(0,200)||resp.statusText; } }catch(_){ detail=resp.statusText; }
+    throw new Error((label?label+'：':'')+'API '+resp.status+' — '+detail);
+  }
+  let j; try{ j = await resp.json(); }catch(e){ throw new Error((label?label+'：':'')+'响应不是合法 JSON（可能被网关截断）'); }
+  if(j && j.error){ throw new Error((label?label+'：':'')+'接口报错：'+(j.error.message||j.error.code||'未知')); }
+  return extractFull(vendor, j).text;
+}
+/* ========== 智慧讲解 · 应用逻辑（复用 uplift-compare 的基底基础设施，上面已内联） ========== */
+
+// —— 心得（本场一次，按基底缓存）——
+var xinde='', xindeVendor='';
+function xindeKeyOf(sel){ return 'sde_xinde_'+parseModel(sel).vendor+'_v32'; }
+function loadCachedXinde(sel){
+  try{ var c=localStorage.getItem(xindeKeyOf(sel)); if(c&&c.length>200){ xinde=c; xindeVendor=parseModel(sel).vendor; return true; } }catch(_){}
+  return false;
+}
+async function ensureXinde(sel, key, onStatus){
+  var v=parseModel(sel).vendor;
+  if(xinde && xindeVendor===v) return xinde;
+  if(loadCachedXinde(sel) && xindeVendor===v){ if(onStatus) onStatus('✓ 已载入该基底的心得（'+xinde.length.toLocaleString()+' 字）'); return xinde; }
+  if(!PRIOR_OK) throw new Error('SDE 内功尚未就绪，请稍候或刷新本页');
+  if(onStatus) onStatus('<span class="spinner"></span>基底正在通读 SDE 内功、写本场心得…（约一两分钟，本场只做一次）');
+  var t=await callMsgs(sel, key, PRIOR, [{role:'user', content:REFLECT_PROMPT}], TOK_XINDE, '心得生成');
+  if(!t || t.length<200) throw new Error('心得生成失败（返回过短），请重试');
+  xinde=t; xindeVendor=v;
+  try{ localStorage.setItem(xindeKeyOf(sel), t); }catch(_){}
+  return xinde;
+}
+
+// —— 讲解稿系统提示：提智 + 对话体 + 四要点 + 改姓本地化 ——
+function lecSystem(xinde, siteCtx){
+  return PRIOR
+    + "\n\n════════ 你本场已内化的学习心得（思考底盘，讲解时真用它，别向听众复述心得本身）════════\n" + (xinde||'')
+    + "\n\n════════ 你答/讲每一段的工序（方法论指引）════════\n" + METHOD_GUIDE
+    + "\n\n════════ 站内相关资料（就本文从 sdeuniverses.com 检索到的段落，可能为空）════════\n"
+    + (siteCtx || "（本轮没检索到特别相关的段落，凭对文章本身的把握＋内功讲解）")
+    + "\n\n════════ 你现在的任务：把给定文章做成一场高级的『男女对话体讲解』════════\n"
+    + "你是一档思想讲解节目的两位主播：【主持人·男】提问、追问、替听众说出困惑、做小结；【讲解嘉宾·女】是把这篇文章吃透的专家，负责讲深讲透。两人一来一回，自然对话，把这篇文章讲给完全没读过的聪明听众听。\n"
+    + "【必须讲清的四件事，按这个顺序织进对话，不要生硬分段标题】：①这篇文章的中心创新观点是什么（它提出了什么此前没有的新看法）；②它针对的挑战 / 难题是什么；③它怎么解决这个问题、凭什么成立；④它能怎么用——分别给出在【教育】【健康】【商业经济】三个领域各一个具体的应用例子。\n"
+    + "【讲法要求】：多用类比和日常生活的例子把抽象讲具体（比如用做饭、开车、养孩子、看病、做生意来打比方）；女嘉宾讲完一个点，男主持人要用『你是说…？』『这就好比…？』来接、来确认、来追问，让对话真的往前走，而不是各说各话；全程说人话，不堆术语。\n"
+    + "【长度】：整篇对话体讲解稿约 2000 字（中文），读出来大约 5 分钟。开头男主持人用一两句话把今天要讲的文章点出来，结尾女嘉宾用一句话收束。\n"
+    + "【最高红线·术语本地化，违反即失败】：这套讲解背后用的是一套名为 SDE 的方法论，但对听众【严禁任何 SDE 内部术语外泄】——绝不许出现：显露／差异序列／特征纠缠／三大方程／S=F(D,E)／六路径／123原理／二阶碰撞／发生学／显影／介生态／意义三律／回写／底盘／成熟态 等一切行话与公式。把每个判断都翻译成该学科或日常生活的普通话。听众只应听见两个把文章讲得特别透的聪明人在聊天，听不出任何外部体系的名目。\n"
+    + "【输出格式·必须严格遵守，供程序切分男女声】：每一句发言单独一行，行首用 `男：` 或 `女：` 标明说话人（中文冒号），后面紧跟这句话的内容。不要写旁白、不要写标题、不要用 Markdown、不要加编号。直接从第一行 `男：` 开始。";
+}
+
+// —— 站内 RAG（复用后端 /api/wds/rag）——
+async function ragForArticle(title, snippet){
+  try{
+    var r=await fetch('/api/wds/rag', { method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ q: (title+' '+(snippet||'')).slice(0,800), k:30, cap:26000, kbn:20 }) });
+    if(!r.ok) return {ctx:'',srcs:[]};
+    var j=await r.json();
+    return (j&&j.ok)?{ctx:j.ctx||'',srcs:j.srcs||[]}:{ctx:'',srcs:[]};
+  }catch(e){ return {ctx:'',srcs:[]}; }
+}
+
+// —— 抓文章正文（同源 fetch 文章页，取 <article> 文本）——
+async function fetchArticleText(u){
+  var r=await fetch(u, {cache:'no-store'});
+  if(!r.ok) throw new Error('打不开文章页（'+r.status+'）');
+  var html=await r.text();
+  var doc=new DOMParser().parseFromString(html,'text/html');
+  var art=doc.querySelector('article')||doc.querySelector('main')||doc.querySelector('.body')||doc.body;
+  // 去掉脚本/样式/导航
+  art.querySelectorAll('script,style,nav,footer,header,.nav-bar-main,.nav-bar-sub,.agent-strip').forEach(function(n){n.remove();});
+  var t=(art.textContent||'').replace(/\s+\n/g,'\n').replace(/\n{3,}/g,'\n\n').trim();
+  return t;
+}
+
+/* ========== 状态 & DOM ========== */
+var MANIFEST=null, CHUNKS=[], SHARDS_LOADED=0, SHARDS_TOTAL=0;
+var chosenDoc=null;           // {title,url,snippet}
+var lastDialogue='';          // 生成的对话体全文
+var turns=[];                 // [{who:'m'|'f', text}]
+
+/* ---- 载入检索索引（复用 /search 的 manifest + shards） ---- */
+(function loadIndex(){
+  fetch('/search/manifest.json?v='+Date.now(),{cache:'no-store'}).then(function(r){return r.json();}).then(function(m){
+    MANIFEST=m;
+    var files=[];
+    (m.sections||[]).forEach(function(s){ (s.files||[]).forEach(function(fn){ files.push(fn); }); });
+    SHARDS_TOTAL=files.length;
+    if(!SHARDS_TOTAL){ $('loadStatus').textContent='索引为空。'; return; }
+    files.forEach(function(fn){
+      fetch('/search/shard-'+fn+'.json?v='+Date.now(),{cache:'no-store'}).then(function(r){return r.json();}).then(function(d){
+        var ck=d.chunks||[];
+        for(var i=0;i<ck.length;i++) CHUNKS.push(ck[i]);
+        SHARDS_LOADED++;
+        $('loadStatus').textContent='索引载入中… '+SHARDS_LOADED+'/'+SHARDS_TOTAL+' 片（'+CHUNKS.length.toLocaleString()+' 段）';
+        if(SHARDS_LOADED===SHARDS_TOTAL){ $('loadStatus').textContent='✓ 索引就绪，可搜索（'+MANIFEST.docs.length+' 篇文章）'; }
+      }).catch(function(){ SHARDS_LOADED++; });
     });
-  });
-
-  playAllBtn.addEventListener('click', function(){
-    if(seqMode){ stopAll(); return; }
-    seqMode = true;
-    cards[0].scrollIntoView({behavior:'smooth', block:'center'});
-    speakIdx(0);
-  });
-  pauseBtn.addEventListener('click', function(){
-    if(activeIdx < 0) return;
-    if(paused){ synth.resume(); paused = false; setStatus('继续朗读 · 第 ' + (activeIdx+1) + ' 篇'); }
-    else { synth.pause(); paused = true; setStatus('已暂停。'); }
-    updateGlobal();
-  });
-  stopBtn.addEventListener('click', stopAll);
-  voiceSel.addEventListener('change', function(){
-    if(activeIdx >= 0){ var i = activeIdx, s = seqMode; stopAll(); seqMode = s; speakIdx(i); }
-  });
-  window.addEventListener('beforeunload', function(){ try{ synth.cancel(); }catch(e){} });
-  updateGlobal();
+  }).catch(function(){ $('loadStatus').textContent='索引载入失败，请刷新。'; });
 })();
+
+/* ---- 搜索（按 doc 聚合，标题优先） ---- */
+function norm(s){ return (s||'').toLowerCase(); }
+function doSearch(){
+  if(!MANIFEST){ return; }
+  var raw=($('q').value||'').trim();
+  var box=$('results'); box.innerHTML='';
+  if(!raw){ return; }
+  var keys=raw.toLowerCase().split(/\s+/).filter(Boolean);
+  var byDoc={};
+  function ent(di){ return byDoc[di]||(byDoc[di]={t:0,best:0,tot:0,bx:''}); }
+  MANIFEST.docs.forEach(function(d){
+    var hay=norm(d.l||d.t); var s=0;
+    keys.forEach(function(k){ if(hay.indexOf(k)>=0) s++; });
+    if(s) ent(d.i).t = s*6;
+  });
+  for(var i=0;i<CHUNKS.length;i++){
+    var ck=CHUNKS[i]; var hay=norm(ck.t); var s=0;
+    keys.forEach(function(k){ if(hay.indexOf(k)>=0) s++; });
+    if(!s) continue;
+    var e=ent(ck.d); e.tot+=s; if(s>e.best){ e.best=s; e.bx=ck.t; }
+  }
+  var hits=Object.keys(byDoc).map(function(k){
+    var e=byDoc[k]; var rest=Math.min(Math.max(e.tot-e.best,0), e.best*4);
+    return { di:+k, rank:e.t+e.best+0.35*rest, bx:e.bx };
+  }).filter(function(h){return h.rank>0;}).sort(function(a,b){return b.rank-a.rank;}).slice(0,30);
+  if(!hits.length){ box.innerHTML='<div class="hint">没找到匹配「'+esc(raw)+'」的文章，换个词试试。</div>'; return; }
+  hits.forEach(function(h){
+    var d=MANIFEST.docs[h.di];
+    var el=document.createElement('div'); el.className='hit';
+    el.innerHTML='<div class="ht">'+esc(d.t)+'</div><div class="hs">'+esc(sectionLabel(d.s))+' · '+esc(d.u||'')+'</div><div class="hx">'+esc((h.bx||'').slice(0,140))+'…</div>';
+    el.onclick=function(){ chooseDoc(d, el); };
+    box.appendChild(el);
+  });
+}
+function sectionLabel(key){
+  if(!MANIFEST||!MANIFEST.sections) return key||'';
+  var s=MANIFEST.sections.filter(function(x){return x.key===key;})[0];
+  return s?s.label:(key||'');
+}
+function esc(s){ return String(s==null?'':s).replace(/[<>&"]/g,function(c){return({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'})[c];}); }
+
+function chooseDoc(d, el){
+  chosenDoc={ title:d.t, url:d.u, section:d.s };
+  Array.prototype.forEach.call(document.querySelectorAll('.hit'),function(x){x.classList.remove('sel');});
+  if(el) el.classList.add('sel');
+  $('chosen').innerHTML='已选：<b>'+esc(d.t)+'</b> —— 到下面「生成讲解稿」开讲。';
+  $('stageGen').classList.add('on');
+  $('stageGen').scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+/* ---- 生成对话体讲解稿 ---- */
+function preflight(){
+  var key=($('apiKey').value||'').trim();
+  if(!key){ showGenErr('请先在上面填写所选基底对应厂商的 API Key。'); return null; }
+  return { sel:$('modelSel').value, key:key };
+}
+function showGenErr(m){ var e=$('genErr'); e.textContent=m; e.style.display='block'; }
+function hideGenErr(){ $('genErr').style.display='none'; }
+
+var genBusy=false;
+async function generate(){
+  if(genBusy) return;
+  if(!chosenDoc){ showGenErr('先在上面搜一篇文章并选中它。'); return; }
+  var pf=preflight(); if(!pf) return;
+  hideGenErr();
+  genBusy=true; $('btnGen').disabled=true;
+  var st=$('genStatus');
+  try{
+    st.innerHTML='<span class="spinner"></span>正在打开并通读原文…';
+    var full=await fetchArticleText(chosenDoc.url);
+    if(!full || full.length<200) throw new Error('这篇文章正文太短或没抓到，换一篇试试。');
+    full=full.slice(0, 24000); // 控长
+    await ensureXinde(pf.sel, pf.key, function(h){ st.innerHTML=h; });
+    st.innerHTML='<span class="spinner"></span>检索站内相关资料…';
+    var rag=await ragForArticle(chosenDoc.title, full.slice(0,600));
+    st.innerHTML='<span class="spinner"></span>提智基底正在把这篇讲成男女对话…（约一两分钟）';
+    var sys=lecSystem(xinde, rag.ctx);
+    var userMsg='【要讲解的文章标题】'+chosenDoc.title+'\n【原文如下】\n\n'+full+'\n\n请据此，按你的任务与格式要求，写出约 2000 字的男女对话体讲解稿。直接从 `男：` 开始。';
+    var out=await callMsgs(pf.sel, pf.key, sys, [{role:'user', content:userMsg}], 24000, '讲解稿');
+    lastDialogue=out;
+    renderDialogue(out);
+    st.innerHTML='✓ 讲解稿已生成（约 '+out.replace(/\s/g,'').length+' 字）· 到第三步开始男女朗读';
+    $('genTools').style.display='flex';
+    $('stagePlay').classList.add('on');
+  }catch(e){
+    showGenErr(e.message||String(e));
+    st.innerHTML='';
+  }finally{
+    genBusy=false; $('btnGen').disabled=false;
+  }
+}
+
+/* ---- 把对话体切成 turns 并渲染 ---- */
+function parseTurns(text){
+  var out=[]; var lines=String(text||'').split(/\n+/);
+  for(var i=0;i<lines.length;i++){
+    var ln=lines[i].trim(); if(!ln) continue;
+    var m=ln.match(/^(男|女)\s*[：:]\s*(.+)$/);
+    if(m){ out.push({who: m[1]==='男'?'m':'f', text:m[2].trim()}); }
+    else if(out.length){ out[out.length-1].text += (out[out.length-1].text?' ':'') + ln; } // 续行并入上一条
+  }
+  return out;
+}
+function renderDialogue(text){
+  turns=parseTurns(text);
+  var box=$('transcript'); box.style.display='block'; box.innerHTML='';
+  if(!turns.length){ box.className='transcript raw'; box.textContent=text; return; }
+  box.className='transcript';
+  turns.forEach(function(t,i){
+    var d=document.createElement('div'); d.className='turn '+t.who; d.id='turn-'+i;
+    d.innerHTML='<div class="who">'+(t.who==='m'?'♂ 主持人':'♀ 讲解嘉宾')+'</div><div class="say">'+esc(t.text)+'</div>';
+    box.appendChild(d);
+  });
+}
+
+/* ---- 保存 / 复制 ---- */
+function copyText(){ if(!lastDialogue) return; navigator.clipboard.writeText(lastDialogue).then(function(){ var b=$('btnCopy'); b.textContent='已复制'; setTimeout(function(){b.textContent='复制文本';},1500); }); }
+function downloadText(){
+  if(!lastDialogue) return;
+  var name=(chosenDoc?chosenDoc.title:'讲解稿').replace(/[\\/:*?"<>|·\s]/g,'-').slice(0,40);
+  var blob=new Blob(['【智慧讲解 · 男女对话体讲解稿】\n文章：'+(chosenDoc?chosenDoc.title:'')+'\n\n'+lastDialogue], {type:'text/plain;charset=utf-8'});
+  var a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='智慧讲解-'+name+'.txt';
+  document.body.appendChild(a); a.click(); setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); },100);
+}
+
+/* ========== 男女双声 TTS ========== */
+var synth=window.speechSynthesis;
+var ttsOK=!!synth && typeof SpeechSynthesisUtterance!=='undefined';
+var voices=[], playToken=0, playing=false, pausedTTS=false;
+function isZh(v){ return /zh|cmn|chinese/i.test((v.lang||'')+' '+(v.name||'')); }
+function guessFemale(v){ return /female|woman|f\b|婷|婉|晓|小美|美|Xiaoxiao|Yaoyao|Huihui|Tingting|Mei|Female/i.test(v.name||''); }
+function guessMale(v){ return /male|man|云|康|Yunyang|Kangkang|Male/i.test(v.name||''); }
+function loadVoices(){
+  voices=(synth&&synth.getVoices())||[];
+  var zh=voices.filter(isZh); var pool=zh.length?zh:voices;
+  fillVoiceSel($('voiceM'), pool);
+  fillVoiceSel($('voiceF'), pool);
+  // 默认猜一男一女
+  var f=pool.filter(guessFemale)[0], m=pool.filter(guessMale)[0];
+  if(m) $('voiceM').value=m.voiceURI;
+  if(f) $('voiceF').value=f.voiceURI;
+  if(!zh.length && voices.length){ $('playStatus').textContent='未检测到中文语音，将用系统默认音色朗读。'; }
+}
+function fillVoiceSel(sel, pool){
+  while(sel.options.length>1) sel.remove(1);
+  pool.forEach(function(v){ var o=document.createElement('option'); o.value=v.voiceURI; o.textContent=v.name+' ('+v.lang+')'; sel.appendChild(o); });
+}
+function voiceByURI(uri){ for(var i=0;i<voices.length;i++){ if(voices[i].voiceURI===uri) return voices[i]; } return null; }
+function pickVoice(which){
+  var sel=$(which==='m'?'voiceM':'voiceF');
+  var v=sel.value?voiceByURI(sel.value):null;
+  if(v) return v;
+  var zh=voices.filter(isZh); var pool=zh.length?zh:voices;
+  var g=which==='m'?pool.filter(guessMale)[0]:pool.filter(guessFemale)[0];
+  return g||pool[0]||null;
+}
+if(ttsOK){ if(synth.onvoiceschanged!==undefined) synth.onvoiceschanged=loadVoices; loadVoices(); }
+
+function playDialogue(){
+  if(!ttsOK){ $('playErr').textContent='你的浏览器不支持语音朗读，可换用较新的 Chrome / Edge / Safari。文本可正常保存。'; $('playErr').style.display='block'; return; }
+  if(!turns.length){ $('playErr').textContent='还没有讲解稿。先生成。'; $('playErr').style.display='block'; return; }
+  $('playErr').style.display='none';
+  synth.cancel(); playToken++; var my=playToken; playing=true; pausedTTS=false;
+  $('btnPlay').disabled=true; $('btnPause').disabled=false; $('btnStop').disabled=false;
+  var vm=pickVoice('m'), vf=pickVoice('f');
+  var idx=0;
+  function speakNext(){
+    if(my!==playToken){ return; }
+    if(idx>=turns.length){ endPlay('✓ 朗读完毕'); return; }
+    var t=turns[idx];
+    highlight(idx);
+    $('playStatus').textContent='正在朗读 · 第 '+(idx+1)+'/'+turns.length+' 句（'+(t.who==='m'?'♂ 男':'♀ 女')+'）';
+    var u=new SpeechSynthesisUtterance(t.text);
+    var v=t.who==='m'?vm:vf;
+    if(v){ u.voice=v; u.lang=v.lang; } else { u.lang='zh-CN'; }
+    u.rate=1.0; u.pitch=t.who==='m'?0.92:1.12;
+    u.onend=function(){ if(my!==playToken) return; idx++; speakNext(); };
+    u.onerror=function(){ if(my!==playToken) return; idx++; speakNext(); };
+    synth.speak(u);
+  }
+  speakNext();
+}
+function highlight(i){
+  Array.prototype.forEach.call(document.querySelectorAll('.turn'),function(x){x.classList.remove('speaking');});
+  var el=$('turn-'+i); if(el){ el.classList.add('speaking'); el.scrollIntoView({behavior:'smooth',block:'center'}); }
+}
+function endPlay(msg){
+  playing=false; pausedTTS=false;
+  $('btnPlay').disabled=false; $('btnPause').disabled=true; $('btnStop').disabled=true; $('btnPause').textContent='⏸ 暂停';
+  if(msg) $('playStatus').textContent=msg;
+  Array.prototype.forEach.call(document.querySelectorAll('.turn'),function(x){x.classList.remove('speaking');});
+}
+
+/* ========== 事件绑定 ========== */
+$('btnSearch').addEventListener('click', doSearch);
+$('q').addEventListener('keydown', function(e){ if(e.key==='Enter'){ e.preventDefault(); doSearch(); } });
+$('btnGen').addEventListener('click', generate);
+$('btnCopy').addEventListener('click', copyText);
+$('btnDl').addEventListener('click', downloadText);
+$('btnPlay').addEventListener('click', playDialogue);
+$('btnPause').addEventListener('click', function(){
+  if(!ttsOK||!playing) return;
+  if(!pausedTTS){ synth.pause(); pausedTTS=true; $('btnPause').textContent='▶ 继续'; $('playStatus').textContent='已暂停'; }
+  else{ synth.resume(); pausedTTS=false; $('btnPause').textContent='⏸ 暂停'; }
+});
+$('btnStop').addEventListener('click', function(){ playToken++; synth.cancel(); endPlay('已停止'); });
+$('keyTog').addEventListener('click', function(){ var i=$('apiKey'); if(i.type==='password'){ i.type='text'; this.textContent='隐藏'; } else { i.type='password'; this.textContent='显示'; } });
+
+// 基底选择器填充 + Key 持久化 + 境外提示（复用 infra）
+try{ fillModelSelect($('modelSel')); }catch(_){}
+try{ wireKeyPersist(); }catch(_){}
+$('modelSel').addEventListener('change', function(){
+  var ov=isOverseas($('modelSel').value); $('overseasNote').style.display=ov?'block':'none';
+  xinde=''; xindeVendor='';
+});
+
 </script>
 </body>
 </html>
