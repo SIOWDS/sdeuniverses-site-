@@ -67,12 +67,8 @@ select:focus,input:focus{border-color:var(--accent)}
 .rawbody{white-space:pre-wrap;line-height:1.9}
 .dramarow select{background:#0C1015;border:1px solid rgba(255,255,255,0.16);border-radius:8px;color:var(--ink);padding:8px 11px;font-size:13.5px;font-family:inherit;max-width:520px}
 .drama-tip{font-size:11.5px;color:var(--muted);line-height:1.6}
-.authchips{margin-top:8px;display:flex;flex-direction:column;gap:6px;max-width:640px}
-.authchips .agrp{display:flex;flex-wrap:wrap;gap:5px;align-items:center}
-.authchips .aglbl{font-size:11px;color:var(--gold2);font-weight:700;min-width:34px}
-.authchips .achip{font-size:11.5px;padding:3px 9px;border:1px solid rgba(255,255,255,0.16);border-radius:999px;background:#11161C;color:var(--ink);cursor:pointer;transition:.15s}
-.authchips .achip:hover{background:var(--gold2);color:#0C1015;border-color:var(--gold2)}
-.authchips .amore{font-size:11px;color:var(--muted)}
+#authorSel option{padding:2px 0}
+#authorWorkSel:disabled{opacity:.5}
 .srcrow{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:10px}
 .srclbl{font-size:12.5px;color:var(--sub);font-weight:600}
 .srcopt{display:inline-flex;align-items:center;gap:6px;background:var(--card2);border:1.5px solid var(--line);border-radius:10px;padding:8px 12px;cursor:pointer;font-size:12.5px;color:var(--ink)}
@@ -277,12 +273,14 @@ select:focus,input:focus{border-color:var(--accent)}
         <option value="speech">演讲（演讲台口吻·感染力·号召）</option>
       </select>
       <div id="authorRow" style="margin-top:10px">
-        <span class="drama-tip" style="display:block;margin-bottom:5px">✒️ 模仿某位<b>著名作家</b>的文学笔法？填作家名，还可再指定<b>模仿他哪一篇作品</b>的写法（如鲁迅《野草》、海明威《老人与海》）——精准到篇更像。想象他/她来写这篇文章会怎么写（原创文字、不引原话、不署名）。可与任意文体叠加，留空＝不模仿。</span>
-        <input id="authorName" type="text" list="authorList" placeholder="搜索或直接输入作家名，如 鲁迅 / 海明威 / 村上春树 / 加缪…（可留空）" autocomplete="off" style="width:100%;max-width:560px;background:#0C1015;border:1px solid rgba(255,255,255,0.16);border-radius:8px;color:var(--ink);padding:8px 11px;font-size:13.5px;font-family:inherit">
-        <datalist id="authorList"></datalist>
-        <input id="authorWork" type="text" list="workList" placeholder="想模仿他哪篇作品的写法？选或输入篇名，如《野草》《老人与海》…（留空＝整体风格）" autocomplete="off" style="width:100%;max-width:560px;margin-top:6px;background:#0C1015;border:1px solid rgba(255,255,255,0.16);border-radius:8px;color:var(--ink);padding:8px 11px;font-size:13.5px;font-family:inherit">
-        <datalist id="workList"></datalist>
-        <div id="authorChips" class="authchips"></div>
+        <span class="drama-tip" style="display:block;margin-bottom:5px">✒️ 想让这篇讲解带上某位<b>著名作家</b>的笔法？下面第一个下拉里备了 <b>50 位名家</b>（中国 16·欧美 16·日本 9·法国 9，各注笔法特征），选定后第二个下拉会自动列出<b>他/她的代表作</b>，可再指定模仿<b>哪一篇</b>的写法（如鲁迅《野草》、海明威《老人与海》）——精准到篇更像。想象他/她来写这篇文章会怎么写（原创文字、不引原话、不署名）。可与任意文体叠加，留空＝不模仿。</span>
+        <select id="authorSel" style="width:100%;max-width:560px"></select>
+        <select id="authorWorkSel" style="width:100%;max-width:560px;margin-top:6px"></select>
+        <div id="authorTip" class="drama-tip" style="margin-top:6px;min-height:17px;line-height:1.7"></div>
+        <div id="authorCustom" style="display:none;margin-top:6px">
+          <input id="authorName" type="text" placeholder="手动输入作家名（名单之外的也行）" autocomplete="off" style="width:100%;max-width:560px;background:#0C1015;border:1px solid rgba(255,255,255,0.16);border-radius:8px;color:var(--ink);padding:8px 11px;font-size:13.5px;font-family:inherit">
+          <input id="authorWork" type="text" placeholder="手动输入篇名，如 野草 / 老人与海（留空＝整体风格）" autocomplete="off" style="width:100%;max-width:560px;margin-top:6px;background:#0C1015;border:1px solid rgba(255,255,255,0.16);border-radius:8px;color:var(--ink);padding:8px 11px;font-size:13.5px;font-family:inherit">
+        </div>
       </div>
       <span class="drama-tip">同一篇文章，换个文体就是另一种读物。散文抒情、评书热闹、议论雄辩、小说藏理……</span>
     </div>
@@ -698,86 +696,126 @@ async function ensureXinde(sel, key, onStatus){
 }
 
 // —— 讲解稿系统提示：提智 + 对话体 + 四要点 + 改姓本地化 ——
-/* ===== 模仿作家：中/西/日/法 代表名家（chips 显示前若干，datalist 供搜索；手打任意名字也行） ===== */
+/* ===== 模仿作家：50 位名家下拉（中国16·欧美16·日本9·法国9），各带笔法特征与代表作 ===== */
 var WRITERS = {
-  cn: { label:'中', names:['鲁迅','老舍','沈从文','张爱玲','钱钟书','汪曾祺','余华','莫言','王小波','贾平凹','史铁生','木心','阿城','曹雪芹','苏轼','李白','杜甫','朱自清','冰心','巴金','茅盾','萧红','徐志摩','梁实秋','林语堂','周作人','丰子恺','孙犁','迟子建','刘慈欣','三毛','金庸','古龙','席慕蓉','北岛','海子','顾城','食指','舒婷','贾岛'] },
-  west:{ label:'西', names:['海明威','马尔克斯','博尔赫斯','卡尔维诺','卡夫卡','陀思妥耶夫斯基','托尔斯泰','契诃夫','狄更斯','简·奥斯汀','伍尔夫','乔伊斯','福克纳','菲茨杰拉德','塞林格','奥威尔','加缪','萨特','纳博科夫','卡佛','厄普代克','托尼·莫里森','石黑一雄','卡尔维诺','爱伦·坡','王尔德','蒙田','尼采','惠特曼','艾米莉·狄金森','聂鲁达','里尔克','歌德','雨果','巴尔扎克','陀氏','海涅','拜伦','叶芝','博尔赫斯'] },
-  jp: { label:'日', names:['村上春树','夏目漱石','川端康成','三岛由纪夫','太宰治','芥川龙之介','谷崎润一郎','大江健三郎','东野圭吾','宫泽贤治','松尾芭蕉','紫式部','小林一茶','安部公房','远藤周作','吉本芭娜娜','井上靖','司马辽太郎','森鸥外','樋口一叶'] },
-  fr: { label:'法', names:['加缪','萨特','普鲁斯特','福楼拜','巴尔扎克','雨果','司汤达','波德莱尔','兰波','莫泊桑','左拉','纪德','杜拉斯','萨冈','罗曼·罗兰','圣埃克苏佩里','波伏娃','马拉美','魏尔伦','蒙田'] }
+  cn: { label:'中国 · 16 位', list:[
+    {n:'鲁迅',   t:'冷峻反讽，短句如刀，沉痛处不动声色', w:['野草','阿Q正传','狂人日记','朝花夕拾','故乡','孔乙己','药','祝福']},
+    {n:'老舍',   t:'京味白话，幽默里裹着苦，人物一开口就活', w:['骆驼祥子','茶馆','四世同堂','月牙儿','济南的冬天']},
+    {n:'沈从文', t:'清水般的抒情，写景即写人，节制而温润', w:['边城','湘行散记','长河','萧萧']},
+    {n:'张爱玲', t:'华丽而苍凉，比喻精准刻薄，世情入骨', w:['金锁记','倾城之恋','红玫瑰与白玫瑰','半生缘','沉香屑·第一炉香']},
+    {n:'钱钟书', t:'满纸机锋，博喻连发，学问化成俏皮', w:['围城','写在人生边上','管锥编']},
+    {n:'汪曾祺', t:'平淡有味，写吃写草木，闲笔见功夫', w:['受戒','大淖记事','人间草木','昆明的雨']},
+    {n:'余华',   t:'冷静叙述极端处境，简白句子里藏巨痛', w:['活着','许三观卖血记','兄弟','第七天','在细雨中呼喊']},
+    {n:'莫言',   t:'感官爆炸，泥土与魔幻齐飞，语言汪洋', w:['红高粱','丰乳肥臀','檀香刑','生死疲劳','蛙']},
+    {n:'王小波', t:'反讽而自由，一本正经地荒诞，逻辑式冷幽默', w:['黄金时代','沉默的大多数','红拂夜奔','一只特立独行的猪']},
+    {n:'史铁生', t:'向内追问生死与意义，沉静、诚恳、有哲思', w:['我与地坛','病隙碎笔','命若琴弦','务虚笔记']},
+    {n:'木心',   t:'短句成珠，中西掌故信手拈来，孤傲有诗性', w:['文学回忆录','琼美卡随想录','素履之往']},
+    {n:'曹雪芹', t:'细节繁密，人情世故通透，草蛇灰线伏脉千里', w:['红楼梦']},
+    {n:'苏轼',   t:'旷达洒脱，说理化为江月，一气流转', w:['赤壁赋','念奴娇·赤壁怀古','水调歌头·明月几时有']},
+    {n:'朱自清', t:'清丽工整，白描抒情，情都在细节里', w:['背影','荷塘月色','匆匆','春']},
+    {n:'萧红',   t:'稚拙如童眼的乡土回忆，苍凉，句子有痛感', w:['呼兰河传','生死场','小城三月']},
+    {n:'刘慈欣', t:'宏大尺度，硬核设定压人，冷峻的浪漫', w:['三体','流浪地球','球状闪电','乡村教师']}
+  ]},
+  west:{ label:'欧美 · 16 位', list:[
+    {n:'海明威', t:'电报体短句，冰山之下留白，硬朗克制', w:['老人与海','永别了，武器','丧钟为谁而鸣','太阳照常升起','乞力马扎罗的雪']},
+    {n:'马尔克斯', t:'魔幻与日常同温，长句奔涌，宿命感', w:['百年孤独','霍乱时期的爱情','没有人给他写信的上校','枯枝败叶']},
+    {n:'博尔赫斯', t:'迷宫、镜子与无限，博学精短，冷智', w:['小径分岔的花园','沙之书','虚构集','阿莱夫']},
+    {n:'卡尔维诺', t:'轻盈的想象几何学，结构本身就是内容', w:['看不见的城市','树上的男爵','如果在冬夜，一个旅人','分成两半的子爵']},
+    {n:'卡夫卡', t:'把荒诞设定当常识来写，冷静的窒息感', w:['变形记','城堡','审判','饥饿艺术家']},
+    {n:'陀思妥耶夫斯基', t:'灵魂高热的对白，思想在人物身上撕扯', w:['罪与罚','卡拉马佐夫兄弟','白痴','地下室手记']},
+    {n:'托尔斯泰', t:'全景与心理并进，道德追问，宽厚从容', w:['战争与和平','安娜·卡列尼娜','复活','伊凡·伊里奇之死']},
+    {n:'契诃夫', t:'不作评判的白描，小人物的可笑与可怜', w:['套中人','变色龙','第六病室','带小狗的女人']},
+    {n:'狄更斯', t:'街景喧腾，人物夸张鲜活，悲悯又讽刺', w:['双城记','雾都孤儿','远大前程','大卫·科波菲尔']},
+    {n:'奥威尔', t:'明澈如玻璃的散文，批判不绕弯子', w:['1984','动物农场','巴黎伦敦落魄记','我为什么写作']},
+    {n:'卡佛',   t:'极简，日常生活的裂缝，说一半留一半', w:['当我们谈论爱情时我们在谈论什么','大教堂','需要时就给我电话']},
+    {n:'伍尔夫', t:'意识流动，感受的褶皱，句子如水波', w:['到灯塔去','达洛维夫人','一间自己的房间','海浪']},
+    {n:'福克纳', t:'长句缠绕，多声部与时间错置，南方的黏稠', w:['喧哗与骚动','我弥留之际','押沙龙，押沙龙！']},
+    {n:'王尔德', t:'警句翻转，唯美又俏皮，句句可摘录', w:['道林·格雷的画像','快乐王子','认真的重要性','狱中记']},
+    {n:'尼采',   t:'格言体锤击，诗与哲学同炉，锋利的宣告', w:['查拉图斯特拉如是说','善恶的彼岸','悲剧的诞生','快乐的科学']},
+    {n:'蒙田',   t:'随笔的祖师，从「我」出发，自省而宽和', w:['随笔集','论经验','论友谊','论闲逸']}
+  ]},
+  jp: { label:'日本 · 9 位', list:[
+    {n:'村上春树', t:'都市孤独，比喻新奇，爵士乐般的节奏', w:['挪威的森林','海边的卡夫卡','1Q84','奇鸟行状录','世界尽头与冷酷仙境']},
+    {n:'夏目漱石', t:'冷眼观世的幽默与教养，从容不迫', w:['我是猫','心','哥儿','三四郎']},
+    {n:'川端康成', t:'唯美与虚无，物哀，景语即情语', w:['雪国','千只鹤','古都','伊豆的舞女']},
+    {n:'三岛由纪夫', t:'华美精雕，美与毁灭并置，锋利', w:['金阁寺','假面的告白','丰饶之海']},
+    {n:'太宰治', t:'自白式的坦露，脆弱、羞耻与自嘲', w:['人间失格','斜阳','奔跑吧，梅勒斯']},
+    {n:'芥川龙之介', t:'短篇如刃，取材古典，人性冷剖', w:['罗生门','竹林中','地狱变','鼻子']},
+    {n:'谷崎润一郎', t:'官能与阴翳之美，耽溺而细腻', w:['阴翳礼赞','细雪','春琴抄','痴人之爱']},
+    {n:'大江健三郎', t:'沉重的存在追问，晦涩而有力', w:['个人的体验','万延元年的足球队','性的人']},
+    {n:'东野圭吾', t:'结构精巧，反转与人情并重，极好读', w:['白夜行','嫌疑人X的献身','解忧杂货店','恶意']}
+  ]},
+  fr: { label:'法国 · 9 位', list:[
+    {n:'加缪',   t:'冷白的叙述，荒诞中的清醒与反抗', w:['局外人','鼠疫','西西弗神话','堕落']},
+    {n:'萨特',   t:'存在先于本质，思辨嵌进场景，逼问自由', w:['恶心','存在与虚无','禁闭','词语']},
+    {n:'普鲁斯特', t:'长句回旋，记忆的显微镜，感受可以无限细分', w:['追忆似水年华']},
+    {n:'福楼拜', t:'一字不苟，客观冷静，作者退到幕后', w:['包法利夫人','情感教育','萨朗波']},
+    {n:'雨果',   t:'磅礴雄辩，人道激情，排比如潮', w:['悲惨世界','巴黎圣母院','九三年']},
+    {n:'波德莱尔', t:'都市的恶与美，通感意象，颓艳', w:['恶之花','巴黎的忧郁']},
+    {n:'莫泊桑', t:'结尾一击，白描世情，短篇的钟表匠', w:['羊脂球','项链','漂亮朋友','我的叔叔于勒']},
+    {n:'杜拉斯', t:'断裂的短句，欲望与记忆的低语，节奏催眠', w:['情人','广岛之恋','抵挡太平洋的堤坝']},
+    {n:'圣埃克苏佩里', t:'童话外壳下的赤诚哲思，纯净而温柔', w:['小王子','夜航','人的大地']}
+  ]}
 };
-// 各作家的代表作（点选作家后自动列出；手打任意篇名也行、可留空=模仿整体风格）
-var WRITER_WORKS = {
-  '鲁迅':['野草','阿Q正传','狂人日记','朝花夕拾','故乡','孔乙己','药','祝福'],
-  '老舍':['骆驼祥子','茶馆','四世同堂','月牙儿','济南的冬天'],
-  '沈从文':['边城','湘行散记','长河','萧萧'],
-  '张爱玲':['金锁记','倾城之恋','红玫瑰与白玫瑰','半生缘','沉香屑·第一炉香'],
-  '钱钟书':['围城','写在人生边上','管锥编'],
-  '汪曾祺':['受戒','大淖记事','人间草木','昆明的雨'],
-  '余华':['活着','许三观卖血记','兄弟','第七天','在细雨中呼喊'],
-  '莫言':['红高粱','丰乳肥臀','檀香刑','生死疲劳','蛙'],
-  '王小波':['黄金时代','沉默的大多数','红拂夜奔','一只特立独行的猪'],
-  '史铁生':['我与地坛','病隙碎笔','命若琴弦','务虚笔记'],
-  '木心':['文学回忆录','琼美卡随想录','素履之往'],
-  '曹雪芹':['红楼梦'],
-  '苏轼':['赤壁赋','念奴娇·赤壁怀古','水调歌头·明月几时有'],
-  '朱自清':['背影','荷塘月色','匆匆','春'],
-  '萧红':['呼兰河传','生死场','小城三月'],
-  '刘慈欣':['三体','流浪地球','球状闪电','乡村教师'],
-  '海明威':['老人与海','永别了武器','丧钟为谁而鸣','太阳照常升起','乞力马扎罗的雪'],
-  '马尔克斯':['百年孤独','霍乱时期的爱情','没有人给他写信的上校','枯枝败叶'],
-  '博尔赫斯':['小径分岔的花园','沙之书','虚构集','阿莱夫'],
-  '卡尔维诺':['看不见的城市','树上的男爵','如果在冬夜一个旅人','分成两半的子爵'],
-  '卡夫卡':['变形记','城堡','审判','饥饿艺术家'],
-  '陀思妥耶夫斯基':['罪与罚','卡拉马佐夫兄弟','白痴','地下室手记'],
-  '托尔斯泰':['战争与和平','安娜·卡列尼娜','复活','伊凡·伊里奇之死'],
-  '契诃夫':['套中人','变色龙','第六病室','带小狗的女人'],
-  '加缪':['局外人','鼠疫','西西弗神话','堕落'],
-  '奥威尔':['1984','动物农场','巴黎伦敦落魄记'],
-  '卡佛':['当我们谈论爱情时我们在谈论什么','大教堂','需要时就给我电话'],
-  '伍尔夫':['到灯塔去','达洛维夫人','一间自己的房间','海浪'],
-  '福克纳':['喧哗与骚动','我弥留之际','押沙龙押沙龙'],
-  '村上春树':['挪威的森林','海边的卡夫卡','1Q84','奇鸟行状录','世界尽头与冷酷仙境'],
-  '夏目漱石':['我是猫','心','哥儿','三四郎'],
-  '川端康成':['雪国','千只鹤','古都','伊豆的舞女'],
-  '三岛由纪夫':['金阁寺','假面的告白','丰饶之海'],
-  '太宰治':['人间失格','斜阳','奔跑吧梅勒斯'],
-  '芥川龙之介':['罗生门','竹林中','地狱变','鼻子'],
-  '普鲁斯特':['追忆似水年华'],
-  '福楼拜':['包法利夫人','情感教育','萨朗波'],
-  '雨果':['悲惨世界','巴黎圣母院','九三年'],
-  '波德莱尔':['恶之花','巴黎的忧郁'],
-  '莫泊桑':['羊脂球','项链','漂亮朋友','我的叔叔于勒'],
-  '杜拉斯':['情人','广岛之恋','抵挡太平洋的堤坝']
-};
+// 名字 → {t 笔法特征, w 代表作}
+var WRITER_INFO = (function(){
+  var m={};
+  Object.keys(WRITERS).forEach(function(k){ WRITERS[k].list.forEach(function(a){ m[a.n]={t:a.t,w:a.w}; }); });
+  return m;
+})();
+var CUSTOM='__custom__';
 function fillWorks(author){
-  var wl=$('workList'); if(!wl) return;
-  wl.innerHTML='';
-  var works=WRITER_WORKS[author]||[];
-  works.forEach(function(w){ var o=document.createElement('option'); o.value=w; wl.appendChild(o); });
-  // 换作家时清掉不属于新作家的旧选值
-  var wi=$('authorWork');
-  if(wi && wi.value && works.indexOf(wi.value)<0) wi.value='';
+  var ws=$('authorWorkSel'); if(!ws) return;
+  var info=WRITER_INFO[author], works=(info&&info.w)||[];
+  var cur=($('authorWork')&&$('authorWork').value||'').trim();
+  ws.innerHTML='';
+  function opt(v,txt){ var o=document.createElement('option'); o.value=v; o.textContent=txt; ws.appendChild(o); return o; }
+  if(!author){ opt('','（先选作家，再选作品）'); ws.disabled=true; if($('authorWork')) $('authorWork').value=''; return; }
+  ws.disabled=false;
+  opt('','整体风格（不指定单篇）');
+  works.forEach(function(w){ opt(w,'《'+w+'》'); });
+  opt(CUSTOM,'✍️ 其他篇名（手动输入）');
+  ws.value = (cur && works.indexOf(cur)>=0) ? cur : '';
+  if(cur && works.indexOf(cur)<0 && $('authorWork')) $('authorWork').value='';
 }
-function fillAuthorSuggest(){
-  var dl=$('authorList'), box=$('authorChips'); if(!dl||!box) return;
-  dl.innerHTML=''; box.innerHTML='';
+function showAuthorTip(author){
+  var el=$('authorTip'); if(!el) return;
+  var info=WRITER_INFO[author];
+  el.innerHTML = info ? ('<b style="color:var(--gold2)">'+author+'</b>　'+info.t+'　<span style="opacity:.75">代表作 '+info.w.length+' 篇</span>') : '';
+}
+function onAuthorPick(){
+  var sel=$('authorSel'), ai=$('authorName'), box=$('authorCustom');
+  if(!sel||!ai) return;
+  var v=sel.value;
+  if(v===CUSTOM){ if(box) box.style.display='block'; ai.value=''; if($('authorWork')) $('authorWork').value=''; ai.focus(); fillWorks(''); showAuthorTip(''); return; }
+  if(box) box.style.display='none';
+  ai.value=v;
+  if($('authorWork')) $('authorWork').value='';
+  fillWorks(v); showAuthorTip(v);
+}
+function onWorkPick(){
+  var ws=$('authorWorkSel'), wi=$('authorWork'), box=$('authorCustom');
+  if(!ws||!wi) return;
+  if(ws.value===CUSTOM){ if(box) box.style.display='block'; wi.value=''; wi.focus(); return; }
+  wi.value=ws.value;
+}
+function initAuthorPickers(){
+  var sel=$('authorSel'); if(!sel) return;
+  sel.innerHTML='';
+  var o0=document.createElement('option'); o0.value=''; o0.textContent='不模仿任何作家（默认）'; sel.appendChild(o0);
   Object.keys(WRITERS).forEach(function(k){
     var g=WRITERS[k];
-    // datalist：全量供搜索
-    g.names.forEach(function(n){ var o=document.createElement('option'); o.value=n; dl.appendChild(o); });
-    // chips：每组显示前 12 个
-    var row=document.createElement('div'); row.className='agrp';
-    var lb=document.createElement('span'); lb.className='aglbl'; lb.textContent=g.label; row.appendChild(lb);
-    g.names.slice(0,12).forEach(function(n){
-      var c=document.createElement('span'); c.className='achip'; c.textContent=n;
-      c.addEventListener('click', function(){ $('authorName').value=n; fillWorks(n); });
-      row.appendChild(c);
-    });
-    var more=document.createElement('span'); more.className='amore'; more.textContent='…更多可直接输入'; row.appendChild(more);
-    box.appendChild(row);
+    var og=document.createElement('optgroup'); og.label=g.label;
+    g.list.forEach(function(a){ var o=document.createElement('option'); o.value=a.n; o.textContent=a.n+'　—　'+a.t; og.appendChild(o); });
+    sel.appendChild(og);
   });
+  var oc=document.createElement('option'); oc.value=CUSTOM; oc.textContent='✍️ 其他作家（手动输入）'; sel.appendChild(oc);
+  if(!sel.__bound){ sel.__bound=true; sel.addEventListener('change', onAuthorPick); }
+  var ws=$('authorWorkSel');
+  if(ws && !ws.__bound){ ws.__bound=true; ws.addEventListener('change', onWorkPick); }
   var ai=$('authorName');
-  if(ai && !ai.__worksBound){ ai.__worksBound=true; ['change','input'].forEach(function(ev){ ai.addEventListener(ev, function(){ fillWorks((this.value||'').trim()); }); }); }
+  if(ai && !ai.__worksBound){ ai.__worksBound=true; ['change','input'].forEach(function(ev){ ai.addEventListener(ev, function(){ var v=(this.value||'').trim(); fillWorks(v); showAuthorTip(v); }); }); }
+  fillWorks(''); showAuthorTip('');
 }
 
 /* ===== 单人讲解·文体/风格：同一篇理论文章，换不同应用文体，变成不同读物 ===== */
@@ -1829,7 +1867,7 @@ Array.prototype.forEach.call(document.querySelectorAll('input[name="lecmode"]'),
   r.addEventListener('change', function(){ if(this.checked){ MODE=this.value; applyMode(); } });
 });
 if($('soloStyle')) $('soloStyle').addEventListener('change', applyMode);
-fillAuthorSuggest();
+initAuthorPickers();
 // 篇幅选择联动
 Array.prototype.forEach.call(document.querySelectorAll('input[name="lecLen"]'), function(r){
   r.addEventListener('change', function(){
