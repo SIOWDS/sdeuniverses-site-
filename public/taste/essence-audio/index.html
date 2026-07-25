@@ -53,6 +53,31 @@ select:focus,input:focus{border-color:var(--accent)}
 .turn.n{background:rgba(185,140,240,0.06);border-left:3px solid var(--accent)}
 .turn.n .say{font-size:14.5px;line-height:1.9}
 .vcol.s span{color:var(--accent)}
+.voicecheck{margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}
+.vreport{font-size:12.5px;line-height:1.8;color:var(--sub)}
+.vreport b.ok{color:#7FD08A}.vreport b.no{color:#E0A24C}
+.modal-mask{position:fixed;inset:0;background:rgba(6,4,12,.72);display:none;align-items:center;justify-content:center;z-index:999;padding:20px}
+.modal-mask.on{display:flex}
+.modal-box{background:#161320;border:1px solid rgba(185,140,240,.35);border-radius:16px;max-width:640px;width:100%;max-height:86vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.modal-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--line)}
+.modal-title{font-size:16px;font-weight:800;color:var(--ink)}
+.modal-x{background:transparent;border:none;color:var(--sub);font-size:18px;cursor:pointer;padding:2px 8px;border-radius:8px}
+.modal-x:hover{background:rgba(255,255,255,.08)}
+.modal-body{padding:16px 20px;overflow:auto}
+.modal-foot{padding:12px 20px;border-top:1px solid var(--line);display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.os-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.os-tab{background:var(--card2);border:1px solid var(--line);border-radius:8px;padding:6px 13px;font-size:12.5px;font-weight:700;color:var(--sub);cursor:pointer}
+.os-tab.on{border-color:var(--accent);color:var(--gold2);background:#221a33}
+.os-panel{display:none}
+.os-panel.on{display:block}
+.os-panel h4{font-size:14px;color:var(--gold2);margin:0 0 6px}
+.os-panel ol{margin:0 0 12px;padding-left:20px}
+.os-panel li{font-size:13.5px;color:var(--ink);line-height:1.85;margin-bottom:4px}
+.os-panel .tip{font-size:12px;color:var(--muted);line-height:1.7;margin-bottom:12px}
+.dl-link{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(120deg,var(--gold),var(--gold2));color:#14100A;text-decoration:none;font-weight:800;font-size:13px;padding:8px 15px;border-radius:9px;margin:2px 6px 8px 0}
+.dl-link.sec{background:transparent;border:1px solid rgba(255,255,255,.24);color:var(--sub)}
+.voice-names{font-size:12px;color:var(--muted);margin-top:4px;line-height:1.7}
+.voice-names b{color:var(--sub)}
 .turn .say{font-size:14.5px;color:var(--ink);line-height:1.85;white-space:pre-wrap}
 .turn.speaking{box-shadow:0 0 0 1.5px var(--accent),0 0 16px -4px var(--accent)}
 .raw{white-space:pre-wrap;font-size:14px;color:#CBD5DE;line-height:1.9}
@@ -148,6 +173,28 @@ select:focus,input:focus{border-color:var(--accent)}
       <span id="playStatus" class="statusline" style="margin:0"></span>
     </div>
     <div id="playErr" class="err"></div>
+    <div class="voicecheck">
+      <div id="voiceReport" class="vreport">正在检测本机中文语音…</div>
+      <div class="toolbar" style="margin-top:8px">
+        <button class="btn sec" id="btnInstallVoices" type="button">🔊 安装男女声系统</button>
+        <button class="mini" id="btnRescan" type="button">↻ 重新检测</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 安装男女声系统 · 弹窗 -->
+<div class="modal-mask" id="installMask">
+  <div class="modal-box">
+    <div class="modal-head">
+      <div class="modal-title">🔊 安装男女声系统</div>
+      <button class="modal-x" id="installClose" type="button">✕</button>
+    </div>
+    <div class="modal-body" id="installBody"><!-- JS 按系统填充 --></div>
+    <div class="modal-foot">
+      <button class="mini" id="btnRescan2" type="button">↻ 装好了，重新检测</button>
+      <span id="installHint" class="hint" style="margin:0"></span>
+    </div>
   </div>
 </div>
 
@@ -720,8 +767,110 @@ function loadVoices(){
   var f=pool.filter(guessFemale)[0], m=pool.filter(guessMale)[0];
   if(m) $('voiceM').value=m.voiceURI;
   if(f) $('voiceF').value=f.voiceURI;
+
   if(!zh.length && voices.length){ $('playStatus').textContent='未检测到中文语音，将用系统默认音色朗读。'; }
+  renderVoiceReport();
 }
+
+/* ===== 声音体检：本机有几种中文男/女声 ===== */
+function renderVoiceReport(){
+  var el=$('voiceReport'); if(!el) return;
+  var all=(synth&&synth.getVoices())||[];
+  var zh=all.filter(isZh);
+  var males=zh.filter(guessMale), females=zh.filter(guessFemale);
+  if(!all.length){ el.innerHTML='还没读到系统语音（有些浏览器要交互后才加载）。点一下「重新检测」，或先点页面任意处。'; return; }
+  if(!zh.length){
+    el.innerHTML='本机<b class="no">暂未检测到中文语音</b>。可以先用系统默认音色朗读，或点下面「安装男女声系统」按你的设备装上中文男/女声，装完回来「重新检测」。';
+    return;
+  }
+  var mTxt = males.length ? '<b class="ok">'+males.length+' 个中文男声</b>' : '<b class="no">未找到明显的中文男声</b>';
+  var fTxt = females.length ? '<b class="ok">'+females.length+' 个中文女声</b>' : '<b class="no">未找到明显的中文女声</b>';
+  var names = zh.slice(0,8).map(function(v){return v.name;}).join('、');
+  var msg = '本机共 <b class="ok">'+zh.length+' 个中文语音</b>：'+mTxt+' · '+fTxt+'。';
+  if(!males.length || !females.length){ msg += ' 想要一男一女更自然，点「安装男女声系统」再装几个。'; }
+  msg += '<div class="voice-names"><b>已装：</b>'+esc(names)+(zh.length>8?' 等':'')+'</div>';
+  el.innerHTML = msg;
+}
+
+/* ===== 安装男女声系统：按操作系统给官方安装入口 + 步骤 ===== */
+function detectOS(){
+  var ua=(navigator.userAgent||'')+' '+(navigator.platform||'');
+  if(/iPhone|iPad|iPod/i.test(ua)) return 'ios';
+  if(/Android/i.test(ua)) return 'android';
+  if(/Mac/i.test(ua)) return 'mac';
+  if(/Win/i.test(ua)) return 'win';
+  return 'win';
+}
+var OS_GUIDE = {
+  win: { name:'Windows', body:
+    '<h4>Windows 10 / 11 — 添加中文男/女声</h4>'
+    +'<p class="tip">Windows 自带的中文语音里，<b>康康(Kangkang)</b>是男声，<b>慧慧(Huihui)／瑶瑶(Yaoyao)／晓晓(Xiaoxiao)</b>是女声。装好后回本页「重新检测」即可选用。</p>'
+    +'<ol>'
+    +'<li>点下面按钮打开「语音」设置（打不开就手动：设置 → 时间和语言 → 语音）。</li>'
+    +'<li>在「管理语音 / 添加语音」里搜 <b>Chinese (Simplified)</b>，勾选并安装。</li>'
+    +'<li>若只出现一个音色，去「设置 → 时间和语言 → 语言和区域 → 添加语言 → 中文(简体)」，安装时勾上「语音」可选功能，会带来更多男/女声。</li>'
+    +'</ol>'
+    +'<a class="dl-link" href="ms-settings:speech" target="_blank" rel="noopener">打开 Windows 语音设置 →</a>'
+    +'<a class="dl-link sec" href="ms-settings:regionlanguage" target="_blank" rel="noopener">打开 语言设置 →</a>'
+  },
+  mac: { name:'macOS', body:
+    '<h4>macOS — 下载中文男/女声</h4>'
+    +'<p class="tip">macOS 的中文语音里，<b>婷婷(Tingting)</b>等为女声；「增强 / Siri 语音」里能下到更自然的男女声。装好后回本页「重新检测」。</p>'
+    +'<ol>'
+    +'<li>打开「系统设置 → 辅助功能 → 朗读内容」。</li>'
+    +'<li>点「系统声音」右边的「管理声音…」。</li>'
+    +'<li>在列表里找「中文(中国大陆)」，下载你想要的男声和女声（带「增强 / Siri」的更自然）。</li>'
+    +'</ol>'
+    +'<p class="tip">系统设置无法用网页直接跳转，请按上面三步手动打开；这是苹果的安全限制。</p>'
+  },
+  ios: { name:'iPhone / iPad', body:
+    '<h4>iOS / iPadOS — 下载中文语音</h4>'
+    +'<ol>'
+    +'<li>打开「设置 → 辅助功能 → 朗读内容」。</li>'
+    +'<li>点「声音 → 中文」。</li>'
+    +'<li>下载你想要的男声 / 女声（带「增强」的更自然）。</li>'
+    +'</ol>'
+    +'<p class="tip">iOS 出于安全不允许网页跳转系统设置，请按上面三步手动打开。Safari 里语音选项通常较少，装好系统语音后回本页「重新检测」。</p>'
+  },
+  android: { name:'Android', body:
+    '<h4>Android — 安装文字转语音(TTS)中文语音</h4>'
+    +'<ol>'
+    +'<li>打开「设置 → 辅助功能 → 文字转语音输出(TTS)」（部分机型在「系统 → 语言和输入法」下）。</li>'
+    +'<li>选「Google 文字转语音引擎」→「安装语音数据」。</li>'
+    +'<li>找「中文(中国)」，下载男声 / 女声语音包。</li>'
+    +'</ol>'
+    +'<a class="dl-link" href="https://play.google.com/store/apps/details?id=com.google.android.tts" target="_blank" rel="noopener">前往 Google 文字转语音（Play 商店）→</a>'
+    +'<p class="tip">装好后回本页「重新检测」。若浏览器仍只有一个音色，可在 Chrome 里刷新本页再试。</p>'
+  }
+};
+function buildInstallModal(){
+  var body=$('installBody'); if(!body) return;
+  var os=detectOS();
+  var order=['win','mac','ios','android'];
+  var tabs='<div class="os-tabs">'+order.map(function(k){
+    return '<button class="os-tab'+(k===os?' on':'')+'" data-os="'+k+'" type="button">'+OS_GUIDE[k].name+'</button>';
+  }).join('')+'</div>';
+  var panels=order.map(function(k){
+    return '<div class="os-panel'+(k===os?' on':'')+'" data-os="'+k+'">'+OS_GUIDE[k].body+'</div>';
+  }).join('');
+  var note='<p class="tip" style="margin-top:6px">说明：网页无法直接把语音"装进"你的电脑——这是浏览器的安全限制。上面这些是你系统里<b>官方的</b>语音安装入口，点进去几步就能装上中文男 / 女声；装好回来点「重新检测」，新声音会立刻出现在上面的选择框里。这些系统语音是<b>免费</b>的、也不消耗你的 API 额度。</p>';
+  body.innerHTML=tabs+panels+note;
+  Array.prototype.forEach.call(body.querySelectorAll('.os-tab'), function(t){
+    t.addEventListener('click', function(){
+      var k=this.getAttribute('data-os');
+      Array.prototype.forEach.call(body.querySelectorAll('.os-tab'),function(x){x.classList.toggle('on', x===t);});
+      Array.prototype.forEach.call(body.querySelectorAll('.os-panel'),function(p){p.classList.toggle('on', p.getAttribute('data-os')===k);});
+    });
+  });
+}
+function openInstall(){ buildInstallModal(); $('installMask').classList.add('on'); }
+function closeInstall(){ $('installMask').classList.remove('on'); }
+function rescanVoices(){
+  if(synth){ voices=synth.getVoices()||[]; loadVoices(); }
+  renderVoiceReport();
+  var hint=$('installHint'); if(hint){ hint.textContent='已重新检测。'; setTimeout(function(){hint.textContent='';},1800); }
+}
+
 function fillVoiceSel(sel, pool){
   while(sel.options.length>1) sel.remove(1);
   pool.forEach(function(v){ var o=document.createElement('option'); o.value=v.voiceURI; o.textContent=v.name+' ('+v.lang+')'; sel.appendChild(o); });
@@ -815,6 +964,14 @@ Array.prototype.forEach.call(document.querySelectorAll('input[name="lecmode"]'),
   r.addEventListener('change', function(){ if(this.checked){ MODE=this.value; applyMode(); } });
 });
 applyMode();
+
+// 安装男女声系统 · 事件
+$('btnInstallVoices').addEventListener('click', openInstall);
+$('installClose').addEventListener('click', closeInstall);
+$('installMask').addEventListener('click', function(e){ if(e.target===this) closeInstall(); });
+$('btnRescan').addEventListener('click', rescanVoices);
+$('btnRescan2').addEventListener('click', rescanVoices);
+renderVoiceReport();
 
 </script>
 </body>
