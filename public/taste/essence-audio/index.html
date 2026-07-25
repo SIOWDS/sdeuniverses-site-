@@ -56,6 +56,10 @@ select:focus,input:focus{border-color:var(--accent)}
 .voicecheck{margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}
 .voicehdr{font-size:15px;font-weight:800;color:var(--gold2)}
 .voicehdr-sub{font-size:12px;font-weight:500;color:var(--muted);margin-left:6px}
+.dramarow{margin-top:12px;display:flex;flex-direction:column;gap:5px}
+.drama-lbl{font-size:13px;font-weight:700;color:var(--gold2)}
+.dramarow select{background:#0C1015;border:1px solid rgba(255,255,255,0.16);border-radius:8px;color:var(--ink);padding:8px 11px;font-size:13.5px;font-family:inherit;max-width:520px}
+.drama-tip{font-size:11.5px;color:var(--muted);line-height:1.6}
 .srcrow{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:10px}
 .srclbl{font-size:12.5px;color:var(--sub);font-weight:600}
 .srcopt{display:inline-flex;align-items:center;gap:6px;background:var(--card2);border:1.5px solid var(--line);border-radius:10px;padding:8px 12px;cursor:pointer;font-size:12.5px;color:var(--ink)}
@@ -222,6 +226,17 @@ select:focus,input:focus{border-color:var(--accent)}
     <div class="moderow" role="radiogroup" aria-label="讲解形式">
       <label class="modeopt sel" id="modeSolo"><input type="radio" name="lecmode" value="solo"><span class="mo-t">🎙 单人讲解</span><span class="mo-d">一位讲解者从头讲到尾，像一篇讲透的解读长文</span></label>
       <label class="modeopt" id="modeDuo"><input type="radio" name="lecmode" value="duo" checked><span class="mo-t">🗣 男女对话</span><span class="mo-d">男主持人＋女嘉宾一问一答，做成对话体</span></label>
+    </div>
+    <div class="dramarow">
+      <span class="drama-lbl">🎭 对话戏剧模式</span>
+      <select id="dramaMode">
+        <option value="">🤖 智能·按文章内容自动编排（默认）</option>
+        <option value="overpass">经典五幕·矛盾过山车（发生→发展→高峰→解决→消失）</option>
+        <option value="mystery">悬疑揭底（抛疑→追问→揭真相→回味）</option>
+        <option value="debate">激辩到共识（对立→白热化→转折→和解）</option>
+        <option value="calm">平缓叙事（整体舒缓、只在关键处微起伏）</option>
+      </select>
+      <span class="drama-tip">让整篇讲解按一条情感曲线走，起承转合更像一个故事。云端音色下情感起伏最明显。</span>
     </div>
     <div class="row" style="margin-top:12px">
       <button class="btn" id="btnGen" type="button">生成约 2000 字讲解稿 →</button>
@@ -600,7 +615,52 @@ async function ensureXinde(sel, key, onStatus){
 }
 
 // —— 讲解稿系统提示：提智 + 对话体 + 四要点 + 改姓本地化 ——
-function lecSystem(mode, xinde, siteCtx){
+/* ===== 对话戏剧模式：把整篇讲解当成一条情感曲线来编排，情感沿曲线平滑推进 ===== */
+var DRAMA_ARCS = {
+  '': null,  // 智能·自动编排（不给固定曲线，让基底自己判断）
+  overpass: {
+    name:'经典五幕·矛盾过山车',
+    guide:'把这篇讲解编排成一条"矛盾过山车"的情感曲线，分五个阶段，情感一段接一段平滑推进、层层递进，不要忽高忽低乱跳：\n'
+      +'① 平静开场（约前 15%）：general / narration-relaxed 为主，男主持人平和地引出话题，先让听众松弛下来。\n'
+      +'② 矛盾浮现（约 15–35%）：从 narration-relaxed 慢慢转到带一点疑虑的 serious，抛出问题、点出"事情没那么简单"。\n'
+      +'③ 冲突升级（约 35–60%）：serious 为主、间以 cheerful 的追问，语气渐紧，把矛盾一步步推到明面。\n'
+      +'④ 情绪高峰（约 60–75%）：最强烈处——尖锐的 serious 下判断、或激动的 cheerful/lyrical，这是全篇张力顶点。\n'
+      +'⑤ 化解回落 + 余味收尾（约后 25%）：从高峰缓缓落下——先 gentle 安抚、给出出路，最后 lyrical 升华收束，让听众回味。\n'
+      +'关键：相邻阶段之间语气要"过渡"而非"跳变"，比如从高峰的 serious 落到结尾的 lyrical，中间要用 gentle 搭个台阶。'
+  },
+  mystery: {
+    name:'悬疑揭底',
+    guide:'把这篇讲解编排成一条"悬疑揭底"的情感曲线，情感随"谜题→揭晓"平滑收紧再释放：\n'
+      +'① 抛疑（前 20%）：cheerful / general，男主持人好奇地抛出一个反直觉的疑问，勾起兴趣。\n'
+      +'② 层层追问（20–55%）：narration-relaxed 转 serious，一层层往下挖，越挖越紧，制造"还有更深的"的悬念。\n'
+      +'③ 揭真相（55–75%）：情绪顶点——用有力的 serious 揭开核心答案，这是"原来如此"的一刻。\n'
+      +'④ 恍然大悟 + 回味（后 25%）：cheerful 的豁然开朗转 gentle / lyrical 的平静回味，收束。\n'
+      +'关键：悬念要靠语气一点点收紧来营造，别提前把情绪用满。'
+  },
+  debate: {
+    name:'激辩到共识',
+    guide:'把这篇讲解编排成一条"激辩到共识"的情感曲线，男女两人先对立、白热化、再走向和解：\n'
+      +'① 各执一词（前 20%）：general / cheerful，男主持人提出一种常见看法，女嘉宾礼貌地不完全认同，埋下分歧。\n'
+      +'② 针锋相对（20–45%）：serious 渐强，双方各摆理由，语气开始交锋。\n'
+      +'③ 白热化（45–65%）：最强的 serious，分歧推到最尖锐处，这是冲突顶点。\n'
+      +'④ 关键转折（65–80%）：出现一个让双方都停下来的新角度，语气从 serious 松动为 narration-relaxed。\n'
+      +'⑤ 走向和解 + 温情收束（后 20%）：gentle 达成共识、lyrical 收尾。\n'
+      +'关键：交锋要有火气但不失风度，转折要自然，别硬和解。'
+  },
+  calm: {
+    name:'平缓叙事',
+    guide:'把这篇讲解编排成一条"平缓叙事"的情感曲线——整体舒缓、克制，只在真正关键的一两处微微起伏：\n'
+      +'全程以 narration-relaxed / general 为基调，像一位娓娓道来的讲述者；\n'
+      +'只在最核心的论断处短暂升到 serious（一两句即可），在结尾升华处用一次 gentle 或 lyrical；\n'
+      +'其余地方保持平稳，不追求大起大落。适合内容本身冷静、思辨、不适合戏剧化的文章。'
+  }
+};
+function dramaGuide(mode){
+  var a = DRAMA_ARCS[mode||''];
+  if(!a) return '';
+  return '\n【对话戏剧模式：'+a.name+'】\n'+a.guide+'\n把上面这条情感曲线通篇贯彻到你给每句配的语气标签上，让整段听起来像一条完整的情感曲线，而不是零散的情绪。\n';
+}
+function lecSystem(mode, xinde, siteCtx, drama){
   var head = PRIOR
     + "\n\n════════ 你本场已内化的学习心得（思考底盘，讲解时真用它，别向听众复述心得本身）════════\n" + (xinde||'')
     + "\n\n════════ 你答/讲每一段的工序（方法论指引）════════\n" + METHOD_GUIDE
@@ -617,6 +677,7 @@ function lecSystem(mode, xinde, siteCtx){
       + "\n\n════════ 你现在的任务：把给定文章做成一篇高级的『单人讲解』════════\n"
       + "你是一位把这篇文章彻底吃透的讲解者，面对完全没读过原文的聪明听众，从头到尾一个人把它讲清楚、讲透、讲得引人入胜。像一篇高级的解读 / 诠释长文，也像一档单人播客娓娓道来。\n"
       + common
+      + dramaGuide(drama)
       + "【长度与结构】：整篇约 2000 字（中文），读出来大约 5 分钟。开头一两句点出今天要讲的这篇文章、它为什么值得讲；中间按上面四件事层层展开；结尾一句话收束、留个回味。\n"
       + "【输出格式·必须严格遵守】：连贯的讲解散文，自然分段（段与段之间空一行）。每一段开头可加一个方括号语气标签（按这段的语义决定），例：`[narration-relaxed] 今天要讲的这篇……`。语气标签只能从这几个里选：general、cheerful、gentle、narration-relaxed、serious、newscast、lyrical。【要有明显变化】：开头点题用 cheerful 或 general、讲严峻/尖锐处用 serious、温情处用 gentle、升华收束用 lyrical，别每段都一个调。不要出现说话人名字或『男：』『女：』，不要写标题、不要用 Markdown、不要加编号。直接开始讲。";
   }
@@ -625,6 +686,7 @@ function lecSystem(mode, xinde, siteCtx){
     + "\n\n════════ 你现在的任务：把给定文章做成一场高级的『男女对话体讲解』════════\n"
     + "你是一档思想讲解节目的两位主播：【主持人·男】提问、追问、替听众说出困惑、做小结；【讲解嘉宾·女】是把这篇文章吃透的专家，负责讲深讲透。两人一来一回，自然对话，把这篇文章讲给完全没读过的聪明听众听。\n"
     + common
+    + dramaGuide(drama)
     + "【对话感】：女嘉宾讲完一个点，男主持人要用『你是说…？』『这就好比…？』来接、来确认、来追问，让对话真的往前走，而不是各说各话。\n"
     + "【长度】：整篇对话体讲解稿约 2000 字（中文），读出来大约 5 分钟。开头男主持人用一两句话把今天要讲的文章点出来，结尾女嘉宾用一句话收束。\n"
     + "【输出格式·必须严格遵守，供程序切分与配语气】：每一句发言单独一行；行首先写说话人 `男` 或 `女`，紧跟一个竖线 `|` 和这句话的语气标签，再一个中文冒号 `：`，然后是内容。例：`男|cheerful：你是说……？`、`女|narration-relaxed：它的核心其实是……`。\n"
@@ -662,6 +724,7 @@ var chosenDoc=null;           // {title,url,snippet}
 var lastDialogue='';          // 生成的对话体全文
 var turns=[];                 // [{who:'m'|'f'|'n', text}]
 var MODE='duo';               // 'solo' 单人 | 'duo' 男女对话
+var DRAMA='';                 // 对话戏剧模式 key（''=智能自动）
 
 /* ---- 载入检索索引（复用 /search 的 manifest + shards） ---- */
 (function loadIndex(){
@@ -759,7 +822,8 @@ async function generate(){
     st.innerHTML='<span class="spinner"></span>检索站内相关资料…';
     var rag=await ragForArticle(chosenDoc.title, full.slice(0,600));
     st.innerHTML='<span class="spinner"></span>提智基底正在'+(MODE==='solo'?'把这篇讲成一篇单人解读':'把这篇讲成男女对话')+'…（约一两分钟）';
-    var sys=lecSystem(MODE, xinde, rag.ctx);
+    DRAMA=($('dramaMode')&&$('dramaMode').value)||'';
+    var sys=lecSystem(MODE, xinde, rag.ctx, DRAMA);
     var tail=(MODE==='solo')
       ? '请据此，按你的任务与格式要求，写出约 2000 字的单人讲解散文，每段按语义在段首标一个方括号语气标签。直接开始讲，不要任何说话人标记。'
       : '请据此，按你的任务与格式要求，写出约 2000 字的男女对话体讲解稿，每句按 `男|语气：` / `女|语气：` 的格式、按语义给每句配语气标签。直接从第一行开始。';
