@@ -2733,7 +2733,7 @@ export default {
           headers: {
             "access-control-allow-origin": "*",
             "access-control-allow-methods": "POST, OPTIONS",
-            "access-control-allow-headers": "content-type, authorization, x-target-url",
+            "access-control-allow-headers": "content-type, authorization, x-target-url, x-api-key, anthropic-version, anthropic-dangerous-direct-browser-access, ocp-apim-subscription-key, x-microsoft-outputformat, x-tts-ua",
             "access-control-max-age": "86400",
           },
         });
@@ -2749,7 +2749,9 @@ export default {
         "https://generativelanguage.googleapis.com/",
         "https://api.minimaxi.com/",
       ];
-      const ok = ALLOW.some((p) => target.startsWith(p));
+      // Azure 语音合成端点：<region>.tts.speech.microsoft.com（TTS 音频，走同一转发通道，BYOK）
+      const azureTts = /^https:\/\/[a-z0-9-]+\.tts\.speech\.microsoft\.com\//i.test(target);
+      const ok = ALLOW.some((p) => target.startsWith(p)) || azureTts;
       if (!ok) {
         return new Response(
           JSON.stringify({ error: { message: "target url not allowed", type: "proxy_forbidden" } }),
@@ -2769,6 +2771,13 @@ export default {
       if (av) fwdHeaders.set("anthropic-version", av);
       const adb = request.headers.get("anthropic-dangerous-direct-browser-access");
       if (adb) fwdHeaders.set("anthropic-dangerous-direct-browser-access", adb);
+      // Azure 语音合成专用头：订阅密钥 + 输出音频格式
+      const azKey = request.headers.get("ocp-apim-subscription-key");
+      if (azKey) fwdHeaders.set("ocp-apim-subscription-key", azKey);
+      const azFmt = request.headers.get("x-microsoft-outputformat");
+      if (azFmt) fwdHeaders.set("x-microsoft-outputformat", azFmt);
+      const azUa = request.headers.get("x-tts-ua");
+      if (azUa) fwdHeaders.set("user-agent", azUa);
 
       let upstream;
       try {

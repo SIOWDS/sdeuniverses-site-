@@ -56,6 +56,17 @@ select:focus,input:focus{border-color:var(--accent)}
 .voicecheck{margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}
 .voicehdr{font-size:15px;font-weight:800;color:var(--gold2)}
 .voicehdr-sub{font-size:12px;font-weight:500;color:var(--muted);margin-left:6px}
+.srcrow{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:10px}
+.srclbl{font-size:12.5px;color:var(--sub);font-weight:600}
+.srcopt{display:inline-flex;align-items:center;gap:6px;background:var(--card2);border:1.5px solid var(--line);border-radius:10px;padding:8px 12px;cursor:pointer;font-size:12.5px;color:var(--ink)}
+.srcopt input{position:absolute;opacity:0;pointer-events:none}
+.srcopt.sel{border-color:var(--accent);background:#221a33}
+.cloudcfg{margin-top:10px;padding:12px;background:#0e0b17;border:1px solid var(--line);border-radius:10px}
+.cloudhint{font-size:12px;color:var(--sub);line-height:1.7;margin-bottom:10px}
+.cloudgrid{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px}
+.cf{display:flex;flex-direction:column;gap:3px;flex:1;min-width:150px}
+.cf span{font-size:11.5px;color:var(--muted);font-weight:600}
+.cf input,.cf select{background:#0C1015;border:1px solid rgba(255,255,255,0.16);border-radius:8px;color:var(--ink);padding:7px 10px;font-size:13px;font-family:inherit}
 .vreport{font-size:12.5px;line-height:1.8;color:var(--sub)}
 .vreport b.ok{color:#7FD08A}.vreport b.no{color:#E0A24C}
 .modal-mask{position:fixed;inset:0;background:rgba(6,4,12,.72);display:none;align-items:center;justify-content:center;z-index:999;padding:20px}
@@ -132,7 +143,24 @@ select:focus,input:focus{border-color:var(--accent)}
   <div class="panel">
     <div class="voicehdr">🔊 语音（男女声）系统 <span class="voicehdr-sub">先装好中文男 / 女声、试听效果，再去下面生成讲解稿</span></div>
     <div class="voicecheck" style="margin-top:6px;padding-top:0;border-top:none">
-      <div id="voiceReport" class="vreport">正在检测本机中文语音…</div>
+      <div class="srcrow">
+        <span class="srclbl">语音来源</span>
+        <label class="srcopt sel" id="srcSys"><input type="radio" name="vsrc" value="sys" checked><span>💻 系统语音（免费·用你设备已装的）</span></label>
+        <label class="srcopt" id="srcCloud"><input type="radio" name="vsrc" value="cloud"><span>☁ 云端音色（几十种·任何设备一致）</span></label>
+      </div>
+      <div id="cloudCfg" class="cloudcfg" style="display:none">
+        <div class="cloudhint">云端用<b>微软 Azure 语音</b>（400+ 音色、中文男女声几十种，每月 50 万字符免费额度）。这是 BYOK：你自己的密钥只存在浏览器本地、只用来发声，经本站代理转发、不留存。<a href="https://azure.microsoft.com/free/cognitive-services/" target="_blank" rel="noopener" style="color:var(--gold2)">怎么申请免费 Key →</a></div>
+        <div class="cloudgrid">
+          <div class="cf"><span>Azure 区域</span><input id="azRegion" type="text" placeholder="如 eastasia / eastus" autocomplete="off"></div>
+          <div class="cf"><span>Azure 密钥</span><input id="azKey" type="password" placeholder="Speech 资源的 Key（只存本地）" autocomplete="off"></div>
+        </div>
+        <div class="cloudgrid">
+          <div class="cf"><span>♂ 云端男声</span><select id="azVoiceM"></select></div>
+          <div class="cf"><span>♀ 云端女声</span><select id="azVoiceF"></select></div>
+          <div class="cf"><span>🎙 单人用</span><select id="azVoiceS"></select></div>
+        </div>
+      </div>
+      <div id="voiceReport" class="vreport" style="margin-top:8px">正在检测本机中文语音…</div>
       <div id="vtStatus" class="vreport" style="margin-top:4px;color:var(--gold2)"></div>
       <div class="toolbar" style="margin-top:8px">
         <button class="btn" id="btnDlgTest" type="button">👫 男女声对话测试</button>
@@ -763,6 +791,103 @@ function downloadText(){
 
 /* ========== 男女双声 TTS ========== */
 var synth=window.speechSynthesis;
+
+/* ===== 云端音色（Azure 语音，BYOK，经本站代理转发） ===== */
+var VOICE_SRC='sys';   // 'sys' 系统语音 | 'cloud' 云端Azure
+var AZURE_VOICES=[
+  {id:'zh-CN-YunxiNeural',   g:'m', label:'云希 Yunxi（男·青年·亲和）'},
+  {id:'zh-CN-YunyangNeural', g:'m', label:'云扬 Yunyang（男·播报·专业）'},
+  {id:'zh-CN-YunjianNeural', g:'m', label:'云健 Yunjian（男·浑厚·纪录片）'},
+  {id:'zh-CN-YunxiaNeural',  g:'m', label:'云夏 Yunxia（男·少年）'},
+  {id:'zh-CN-YunyeNeural',   g:'m', label:'云野 Yunye（男·沉稳·讲故事）'},
+  {id:'zh-CN-XiaoxiaoNeural',g:'f', label:'晓晓 Xiaoxiao（女·温暖·万能）'},
+  {id:'zh-CN-XiaoyiNeural',  g:'f', label:'晓伊 Xiaoyi（女·活泼）'},
+  {id:'zh-CN-XiaochenNeural',g:'f', label:'晓辰 Xiaochen（女·自然·口语）'},
+  {id:'zh-CN-XiaohanNeural', g:'f', label:'晓涵 Xiaohan（女·温柔）'},
+  {id:'zh-CN-XiaomengNeural',g:'f', label:'晓梦 Xiaomeng（女·甜美）'},
+  {id:'zh-CN-XiaomoNeural',  g:'f', label:'晓墨 Xiaomo（女·多情感）'},
+  {id:'zh-CN-XiaoruiNeural', g:'f', label:'晓睿 Xiaorui（女·成熟）'},
+  {id:'zh-HK-WanLungNeural', g:'m', label:'云龙 WanLung（粤语·男）'},
+  {id:'zh-HK-HiuMaanNeural', g:'f', label:'曉曼 HiuMaan（粤语·女）'},
+  {id:'zh-TW-YunJheNeural',  g:'m', label:'雲哲 YunJhe（台湾国语·男）'},
+  {id:'zh-TW-HsiaoChenNeural',g:'f',label:'曉臻 HsiaoChen（台湾国语·女）'}
+];
+function azRegion(){ return ($('azRegion')&&$('azRegion').value||'').trim().toLowerCase(); }
+function azKey(){ return ($('azKey')&&$('azKey').value||'').trim(); }
+function azVoiceOf(who){
+  var id=who==='m'?($('azVoiceM')&&$('azVoiceM').value):(who==='f'?($('azVoiceF')&&$('azVoiceF').value):($('azVoiceS')&&$('azVoiceS').value));
+  return id||'zh-CN-XiaoxiaoNeural';
+}
+function fillAzureSelects(){
+  [['azVoiceM','m'],['azVoiceF','f'],['azVoiceS','f']].forEach(function(pair){
+    var sel=$(pair[0]); if(!sel) return; sel.innerHTML='';
+    AZURE_VOICES.forEach(function(v){
+      // 男声框只列男，女声框列女，单人框列全部（默认女）
+      if(pair[1]==='m' && v.g!=='m') return;
+      if(pair[1]==='f' && pair[0]==='azVoiceF' && v.g!=='f') return;
+      var o=document.createElement('option'); o.value=v.id; o.textContent=v.label; sel.appendChild(o);
+    });
+  });
+  if($('azVoiceM')) $('azVoiceM').value='zh-CN-YunxiNeural';
+  if($('azVoiceF')) $('azVoiceF').value='zh-CN-XiaoxiaoNeural';
+  if($('azVoiceS')) $('azVoiceS').value='zh-CN-XiaoxiaoNeural';
+}
+function xmlEsc(s){ return String(s||'').replace(/[<>&'"]/g,function(c){return{'<':'&lt;','>':'&gt;','&':'&amp;',"'":'&apos;','"':'&quot;'}[c];}); }
+var azAudio=null;
+// 用 Azure 合成并播放一句；成功/失败都回调 done()
+function azureSpeak(text, voiceId, done){
+  var region=azRegion(), key=azKey();
+  if(!region || !key){ if($('playErr')){ $('playErr').textContent='请先填 Azure 区域和密钥（或把语音来源切回「系统语音」）。'; $('playErr').style.display='block'; } done(true); return null; }
+  var ssml='<speak version="1.0" xml:lang="zh-CN"><voice name="'+voiceId+'">'+xmlEsc(text)+'</voice></speak>';
+  var ctrl={aborted:false, audio:null};
+  fetch('/api/llm-proxy', {
+    method:'POST',
+    headers:{
+      'content-type':'application/ssml+xml',
+      'x-target-url':'https://'+region+'.tts.speech.microsoft.com/cognitiveservices/v1',
+      'ocp-apim-subscription-key':key,
+      'x-microsoft-outputformat':'audio-24khz-48kbitrate-mono-mp3',
+      'x-tts-ua':'sde-wisdom-lecture'
+    },
+    body: ssml
+  }).then(function(r){
+    if(!r.ok) return r.text().then(function(t){ throw new Error('Azure '+r.status+(t?('：'+t.slice(0,80)):'')); });
+    return r.blob();
+  }).then(function(blob){
+    if(ctrl.aborted){ done(false); return; }
+    var urlb=URL.createObjectURL(blob);
+    var a=new Audio(urlb); ctrl.audio=a; azAudio=a;
+    a.onended=function(){ URL.revokeObjectURL(urlb); done(false); };
+    a.onerror=function(){ URL.revokeObjectURL(urlb); done(true); };
+    a.play().catch(function(){ done(true); });
+  }).catch(function(e){
+    if($('playErr')){ $('playErr').textContent='云端发声失败：'+(e&&e.message||e)+'（可切回系统语音）'; $('playErr').style.display='block'; }
+    done(true);
+  });
+  return ctrl;
+}
+// 统一发声：一句话，who=m/f/n，done(err) 回调；按当前来源选系统或云端
+var curCloud=null;
+function speakOne(text, who, sysVoices, done){
+  if(VOICE_SRC==='cloud'){
+    var vid=azVoiceOf(who);
+    curCloud=azureSpeak(text, vid, function(err){ curCloud=null; done(err); });
+    return;
+  }
+  // 系统语音
+  var v = who==='m'?sysVoices.m:(who==='f'?sysVoices.f:sysVoices.s);
+  var u=new SpeechSynthesisUtterance(text);
+  if(v){ u.voice=v; u.lang=v.lang; } else { u.lang='zh-CN'; }
+  u.rate=1.0; u.pitch = who==='m'?0.92:(who==='f'?1.12:1.0);
+  u.onend=function(){ done(false); };
+  u.onerror=function(){ done(true); };
+  synth.speak(u);
+}
+function stopAllAudio(){
+  try{ if(synth) synth.cancel(); }catch(_){}
+  try{ if(azAudio){ azAudio.pause(); azAudio.currentTime=0; } }catch(_){}
+  if(curCloud) curCloud.aborted=true;
+}
 var ttsOK=!!synth && typeof SpeechSynthesisUtterance!=='undefined';
 var voices=[], playToken=0, playing=false, pausedTTS=false;
 function isZh(v){ return /zh|cmn|chinese/i.test((v.lang||'')+' '+(v.name||'')); }
@@ -814,44 +939,55 @@ function detectOS(){
 }
 var OS_GUIDE = {
   win: { name:'Windows', body:
-    '<h4>Windows 10 / 11 — 添加中文男/女声</h4>'
-    +'<p class="tip">Windows 自带的中文语音里，<b>康康(Kangkang)</b>是男声，<b>慧慧(Huihui)／瑶瑶(Yaoyao)／晓晓(Xiaoxiao)</b>是女声。装好后回本页「重新检测」即可选用。</p>'
+    '<h4>Windows 10 / 11 — 添加中文男 / 女声</h4>'
+    +'<p class="tip">装好后回本页「重新检测」即可在选择框里选用。Windows 常见可装的中文声（不同版本略有出入）：<br>'
+    +'<b>男声</b>：云希 Yunxi、云扬 Yunyang、云健 Yunjian、康康 Kangkang<br>'
+    +'<b>女声</b>：晓晓 Xiaoxiao、晓伊 Xiaoyi、晓辰 Xiaochen、慧慧 Huihui、瑶瑶 Yaoyao<br>'
+    +'还可装粤语（zh-HK 晓敏/云龙）、台湾国语（zh-TW 晓臻/云哲）等地区音。</p>'
     +'<ol>'
     +'<li>点下面按钮打开「语音」设置（打不开就手动：设置 → 时间和语言 → 语音）。</li>'
-    +'<li>在「管理语音 / 添加语音」里搜 <b>Chinese (Simplified)</b>，勾选并安装。</li>'
-    +'<li>若只出现一个音色，去「设置 → 时间和语言 → 语言和区域 → 添加语言 → 中文(简体)」，安装时勾上「语音」可选功能，会带来更多男/女声。</li>'
+    +'<li>在「管理语音 / 添加语音」里搜 <b>Chinese</b>，把简体、粤语、台湾国语按需勾选安装——每装一个地区就会多出几个男 / 女声。</li>'
+    +'<li>若只出现一个音色，去「设置 → 时间和语言 → 语言和区域 → 添加语言 → 中文」，安装时勾上「语音」可选功能。</li>'
     +'</ol>'
     +'<a class="dl-link" href="ms-settings:speech" target="_blank" rel="noopener">打开 Windows 语音设置 →</a>'
     +'<a class="dl-link sec" href="ms-settings:regionlanguage" target="_blank" rel="noopener">打开 语言设置 →</a>'
   },
   mac: { name:'macOS', body:
-    '<h4>macOS — 下载中文男/女声</h4>'
-    +'<p class="tip">macOS 的中文语音里，<b>婷婷(Tingting)</b>等为女声；「增强 / Siri 语音」里能下到更自然的男女声。装好后回本页「重新检测」。</p>'
+    '<h4>macOS — 下载中文男 / 女声</h4>'
+    +'<p class="tip">「系统设置 → 辅助功能 → 朗读内容 → 系统声音 → 管理声音」里，中文(中国大陆)可下多款：<br>'
+    +'<b>女声</b>：婷婷 Tingting、美佳 Meijia、Sinji<br>'
+    +'<b>男声 / 其它</b>：Li-Mu、Yu-Shu，以及带「Siri 声音 / 增强」标记的更自然版本（也有男女之分）。<br>'
+    +'尽量选带「增强 / Siri」的，听感明显更好。</p>'
     +'<ol>'
     +'<li>打开「系统设置 → 辅助功能 → 朗读内容」。</li>'
     +'<li>点「系统声音」右边的「管理声音…」。</li>'
-    +'<li>在列表里找「中文(中国大陆)」，下载你想要的男声和女声（带「增强 / Siri」的更自然）。</li>'
+    +'<li>在「中文(中国大陆)」下勾选并下载你想要的男 / 女声（可多下几个换着用）。</li>'
     +'</ol>'
     +'<p class="tip">系统设置无法用网页直接跳转，请按上面三步手动打开；这是苹果的安全限制。</p>'
   },
   ios: { name:'iPhone / iPad', body:
     '<h4>iOS / iPadOS — 下载中文语音</h4>'
+    +'<p class="tip">「设置 → 辅助功能 → 朗读内容 → 声音 → 中文」下可下载多款男 / 女声（婷婷、美佳、Siri 声音等），带「增强」的更自然。</p>'
     +'<ol>'
     +'<li>打开「设置 → 辅助功能 → 朗读内容」。</li>'
     +'<li>点「声音 → 中文」。</li>'
-    +'<li>下载你想要的男声 / 女声（带「增强」的更自然）。</li>'
+    +'<li>下载你想要的男声 / 女声（带「增强」的更自然，可多下几个）。</li>'
     +'</ol>'
     +'<p class="tip">iOS 出于安全不允许网页跳转系统设置，请按上面三步手动打开。Safari 里语音选项通常较少，装好系统语音后回本页「重新检测」。</p>'
   },
   android: { name:'Android', body:
-    '<h4>Android — 安装文字转语音(TTS)中文语音</h4>'
+    '<h4>Android — 换 / 装文字转语音(TTS)引擎</h4>'
+    +'<p class="tip">Android 上「换引擎」就相当于换一整套音色。除了自带的 Google，还能装第三方 TTS 引擎（都是正规应用），装好后在「设置 → 辅助功能 → 文字转语音输出」里选为默认引擎、下载中文语音包，再回本页「重新检测」：</p>'
     +'<ol>'
     +'<li>打开「设置 → 辅助功能 → 文字转语音输出(TTS)」（部分机型在「系统 → 语言和输入法」下）。</li>'
-    +'<li>选「Google 文字转语音引擎」→「安装语音数据」。</li>'
-    +'<li>找「中文(中国)」，下载男声 / 女声语音包。</li>'
+    +'<li>选一个引擎 → 「安装语音数据」→ 找「中文(中国)」下载男 / 女声。</li>'
+    +'<li>想要更多音色就换个引擎再装一套。</li>'
     +'</ol>'
-    +'<a class="dl-link" href="https://play.google.com/store/apps/details?id=com.google.android.tts" target="_blank" rel="noopener">前往 Google 文字转语音（Play 商店）→</a>'
-    +'<p class="tip">装好后回本页「重新检测」。若浏览器仍只有一个音色，可在 Chrome 里刷新本页再试。</p>'
+    +'<a class="dl-link" href="https://play.google.com/store/apps/details?id=com.google.android.tts" target="_blank" rel="noopener">Google 文字转语音 →</a>'
+    +'<a class="dl-link sec" href="https://play.google.com/store/apps/details?id=com.samsung.SMT" target="_blank" rel="noopener">三星 TTS →</a>'
+    +'<a class="dl-link sec" href="https://play.google.com/store/search?q=%E8%AE%AF%E9%A3%9E%E8%AF%AD%E9%9F%B3&c=apps" target="_blank" rel="noopener">讯飞语音引擎 →</a>'
+    +'<a class="dl-link sec" href="https://play.google.com/store/search?q=TTS%20%E4%B8%AD%E6%96%87%E8%AF%AD%E9%9F%B3&c=apps" target="_blank" rel="noopener">在 Play 搜更多中文 TTS →</a>'
+    +'<p class="tip">不同引擎音色差别很大——Google 稳、三星音色多、讯飞中文韵律好。装好后回本页「重新检测」；若浏览器仍只有一个音色，在 Chrome 里刷新本页再试。</p>'
   }
 };
 function buildInstallModal(){
@@ -911,7 +1047,7 @@ var previewToken=0, previewing=false;
 function previewVoices(){
   if(!ttsOK){ $('playErr').textContent='你的浏览器不支持语音朗读，可换用较新的 Chrome / Edge / Safari。'; $('playErr').style.display='block'; return; }
   $('playErr').style.display='none';
-  synth.cancel(); previewToken++; var my=previewToken; previewing=true;
+  stopAllAudio(); previewToken++; var my=previewToken; previewing=true;
   $('btnPreview').disabled=true; $('btnPreviewStop').disabled=false;
   var vm=pickVoice('m'), vf=pickVoice('f'), vs=pickVoice('s');
   var script = (MODE==='solo') ? PREVIEW_SOLO : PREVIEW_DUO;
@@ -922,13 +1058,7 @@ function previewVoices(){
     var t=script[idx];
     var tag = t.who==='m'?'♂ 男声':(t.who==='f'?'♀ 女声':'🎙 讲解者');
     if($('vtStatus')) $('vtStatus').textContent='试听中 · '+tag; else $('playStatus').textContent='试听中 · '+tag;
-    var u=new SpeechSynthesisUtterance(t.text);
-    var v = t.who==='m'?vm:(t.who==='f'?vf:vs);
-    if(v){ u.voice=v; u.lang=v.lang; } else { u.lang='zh-CN'; }
-    u.rate=1.0; u.pitch = t.who==='m'?0.92:(t.who==='f'?1.12:1.0);
-    u.onend=function(){ if(my!==previewToken) return; idx++; step(); };
-    u.onerror=function(){ if(my!==previewToken) return; idx++; step(); };
-    synth.speak(u);
+    speakOne(t.text, t.who, {m:vm,f:vf,s:vs}, function(){ if(my!==previewToken) return; idx++; step(); });
   }
   step();
 }
@@ -938,13 +1068,13 @@ function endPreview(msg){
   var dt=$('btnDlgTest'); if(dt) dt.disabled=false;
   if(msg && $('vtStatus')) $('vtStatus').textContent=msg;
 }
-function stopPreview(){ previewToken++; if(synth) synth.cancel(); endPreview('已停止试听'); }
+function stopPreview(){ previewToken++; stopAllAudio(); endPreview('已停止试听'); }
 
 // 男女声对话测试：固定播放一段男女来回对话（与当前讲法模式无关）
 function dialogueTest(){
   if(!ttsOK){ $('playErr').textContent='你的浏览器不支持语音朗读，可换用较新的 Chrome / Edge / Safari。'; $('playErr').style.display='block'; return; }
   $('playErr').style.display='none';
-  synth.cancel(); previewToken++; var my=previewToken; previewing=true;
+  stopAllAudio(); previewToken++; var my=previewToken; previewing=true;
   $('btnDlgTest').disabled=true; $('btnPreview').disabled=true; $('btnPreviewStop').disabled=false;
   var vm=pickVoice('m'), vf=pickVoice('f');
   var idx=0;
@@ -954,13 +1084,7 @@ function dialogueTest(){
     var t=DIALOGUE_TEST[idx];
     $('playStatus') && ($('playStatus').textContent='');
     $('vtStatus').textContent='测试中 · 第 '+(idx+1)+'/'+DIALOGUE_TEST.length+' 句（'+(t.who==='m'?'♂ 男声':'♀ 女声')+'）';
-    var u=new SpeechSynthesisUtterance(t.text);
-    var v=t.who==='m'?vm:vf;
-    if(v){ u.voice=v; u.lang=v.lang; } else { u.lang='zh-CN'; }
-    u.rate=1.0; u.pitch=t.who==='m'?0.92:1.12;
-    u.onend=function(){ if(my!==previewToken) return; idx++; step(); };
-    u.onerror=function(){ if(my!==previewToken) return; idx++; step(); };
-    synth.speak(u);
+    speakOne(t.text, t.who, {m:vm,f:vf,s:vf}, function(){ if(my!==previewToken) return; idx++; step(); });
   }
   step();
 }
@@ -990,7 +1114,7 @@ function playDialogue(){
   if(!ttsOK){ $('playErr').textContent='你的浏览器不支持语音朗读，可换用较新的 Chrome / Edge / Safari。文本可正常保存。'; $('playErr').style.display='block'; return; }
   if(!turns.length){ $('playErr').textContent='还没有讲解稿。先生成。'; $('playErr').style.display='block'; return; }
   $('playErr').style.display='none';
-  synth.cancel(); playToken++; var my=playToken; playing=true; pausedTTS=false;
+  stopAllAudio(); playToken++; var my=playToken; playing=true; pausedTTS=false;
   $('btnPlay').disabled=true; $('btnPause').disabled=false; $('btnStop').disabled=false;
   var vm=pickVoice('m'), vf=pickVoice('f'), vs=pickVoice('s');
   var idx=0;
@@ -1001,13 +1125,7 @@ function playDialogue(){
     highlight(idx);
     var tag=t.who==='m'?'♂ 男':(t.who==='f'?'♀ 女':'🎙 讲解');
     $('playStatus').textContent='正在朗读 · 第 '+(idx+1)+'/'+turns.length+'（'+tag+'）';
-    var u=new SpeechSynthesisUtterance(t.text);
-    var v=t.who==='m'?vm:(t.who==='f'?vf:vs);
-    if(v){ u.voice=v; u.lang=v.lang; } else { u.lang='zh-CN'; }
-    u.rate=1.0; u.pitch=t.who==='m'?0.92:(t.who==='f'?1.12:1.0);
-    u.onend=function(){ if(my!==playToken) return; idx++; speakNext(); };
-    u.onerror=function(){ if(my!==playToken) return; idx++; speakNext(); };
-    synth.speak(u);
+    speakOne(t.text, t.who, {m:vm,f:vf,s:vs}, function(){ if(my!==playToken) return; idx++; speakNext(); });
   }
   speakNext();
 }
@@ -1031,10 +1149,10 @@ $('btnDl').addEventListener('click', downloadText);
 $('btnPlay').addEventListener('click', playDialogue);
 $('btnPause').addEventListener('click', function(){
   if(!ttsOK||!playing) return;
-  if(!pausedTTS){ synth.pause(); pausedTTS=true; $('btnPause').textContent='▶ 继续'; $('playStatus').textContent='已暂停'; }
-  else{ synth.resume(); pausedTTS=false; $('btnPause').textContent='⏸ 暂停'; }
+  if(!pausedTTS){ if(VOICE_SRC==='cloud'){ try{azAudio&&azAudio.pause();}catch(_){} } else synth.pause(); pausedTTS=true; $('btnPause').textContent='▶ 继续'; $('playStatus').textContent='已暂停'; }
+  else{ if(VOICE_SRC==='cloud'){ try{azAudio&&azAudio.play();}catch(_){} } else synth.resume(); pausedTTS=false; $('btnPause').textContent='⏸ 暂停'; }
 });
-$('btnStop').addEventListener('click', function(){ playToken++; synth.cancel(); endPlay('已停止'); });
+$('btnStop').addEventListener('click', function(){ playToken++; stopAllAudio(); endPlay('已停止'); });
 $('keyTog').addEventListener('click', function(){ var i=$('apiKey'); if(i.type==='password'){ i.type='text'; this.textContent='隐藏'; } else { i.type='password'; this.textContent='显示'; } });
 
 // 基底选择器填充 + Key 持久化 + 境外提示（复用 infra）
@@ -1072,6 +1190,27 @@ $('btnRescan').addEventListener('click', rescanVoices);
 $('btnRescan2').addEventListener('click', rescanVoices);
 $('btnPreview').addEventListener('click', previewVoices);
 $('btnDlgTest').addEventListener('click', dialogueTest);
+
+// —— 语音来源切换（系统 / 云端Azure）——
+function applyVoiceSrc(){
+  var cloud=(VOICE_SRC==='cloud');
+  $('srcSys').classList.toggle('sel', !cloud);
+  $('srcCloud').classList.toggle('sel', cloud);
+  $('cloudCfg').style.display = cloud ? 'block' : 'none';
+  if(cloud && $('azVoiceM') && !$('azVoiceM').options.length) fillAzureSelects();
+  // 云端时体检文案调整
+  if(cloud && $('voiceReport')) $('voiceReport').innerHTML='已切到<b class="ok">云端音色</b>：填好上面的 Azure 区域和密钥，就能用几十种中文男 / 女声，任何设备听感一致。下面的试听 / 对话测试会用云端发声。';
+  else renderVoiceReport();
+}
+Array.prototype.forEach.call(document.querySelectorAll('input[name="vsrc"]'), function(r){
+  r.addEventListener('change', function(){ if(this.checked){ VOICE_SRC=this.value; applyVoiceSrc(); } });
+});
+// Azure Key/区域 本地持久化
+try{
+  if($('azRegion')){ $('azRegion').value=localStorage.getItem('sde_azure_region')||''; $('azRegion').addEventListener('input',function(){ try{localStorage.setItem('sde_azure_region',this.value.trim());}catch(_){} }); }
+  if($('azKey')){ $('azKey').value=localStorage.getItem('sde_azure_key')||''; $('azKey').addEventListener('input',function(){ try{localStorage.setItem('sde_azure_key',this.value.trim());}catch(_){} }); }
+}catch(_){}
+applyVoiceSrc();
 $('btnPreviewStop').addEventListener('click', stopPreview);
 renderVoiceReport();
 
