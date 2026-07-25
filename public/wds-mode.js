@@ -127,6 +127,8 @@
 
   // —— 注入导航切换按钮 ——
   function injectNav() {
+    // 若页面已内置静态入口（.wdsm-static，如首页导航药丸），不再 JS 注入，避免重复
+    if (document.querySelector(".wdsm-static")) return;
     var nav = document.querySelector(".nav-links");
     if (!nav) { mountFab(); return; }
     function mk(cls, label) {
