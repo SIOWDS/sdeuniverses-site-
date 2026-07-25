@@ -247,6 +247,11 @@ select:focus,input:focus{border-color:var(--accent)}
       <button class="mini" id="btnStop" type="button" disabled>■ 停止</button>
       <span id="playStatus" class="statusline" style="margin:0"></span>
     </div>
+    <div class="toolbar" style="margin-top:8px">
+      <button class="btn sec" id="btnSaveDir" type="button">💾 保存到目录</button>
+      <button class="mini" id="btnPickDir" type="button">📁 选择保存目录</button>
+      <span id="saveStatus" class="statusline" style="margin:0"></span>
+    </div>
     <div id="playErr" class="err"></div>
   </div>
 </div>
@@ -823,6 +828,99 @@ function downloadText(){
   document.body.appendChild(a); a.click(); setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); },100);
 }
 
+/* ========== 保存到可选目录（讲解稿 .txt + 云端音频 .mp3） ==========
+ * File System Access API（Chrome/Edge）弹真目录选择器并记住句柄（IndexedDB）；
+ * 不支持的浏览器（Safari/Firefox）回退为普通下载到「下载」文件夹。 */
+var dirHandle=null;
+function fsaSupported(){ return typeof window.showDirectoryPicker==='function'; }
+// —— 极简 IndexedDB 存/取目录句柄 ——
+function idbOpen(){ return new Promise(function(res,rej){ var r=indexedDB.open('sde_lecture',1); r.onupgradeneeded=function(){ r.result.createObjectStore('kv'); }; r.onsuccess=function(){res(r.result);}; r.onerror=function(){rej(r.error);}; }); }
+function idbSet(k,v){ return idbOpen().then(function(db){ return new Promise(function(res,rej){ var t=db.transaction('kv','readwrite'); t.objectStore('kv').put(v,k); t.oncomplete=function(){res();}; t.onerror=function(){rej(t.error);}; }); }); }
+function idbGet(k){ return idbOpen().then(function(db){ return new Promise(function(res,rej){ var t=db.transaction('kv','readonly'); var q=t.objectStore('kv').get(k); q.onsuccess=function(){res(q.result||null);}; q.onerror=function(){rej(q.error);}; }); }); }
+async function ensurePerm(handle){
+  if(!handle||!handle.queryPermission) return false;
+  var opt={mode:'readwrite'};
+  if((await handle.queryPermission(opt))==='granted') return true;
+  return (await handle.requestPermission(opt))==='granted';
+}
+async function pickDir(){
+  if(!fsaSupported()){ $('saveStatus').textContent='此浏览器不支持选目录，将回退为普通下载（Chrome / Edge 可选目录）。'; return null; }
+  try{
+    var h=await window.showDirectoryPicker({mode:'readwrite'});
+    dirHandle=h; try{ await idbSet('dir', h); }catch(_){}
+    $('saveStatus').textContent='✓ 已选目录：'+(h.name||'（已记住）')+'，以后保存直接进这里。';
+    return h;
+  }catch(e){ if(e&&e.name==='AbortError'){ $('saveStatus').textContent='已取消选择。'; } else { $('saveStatus').textContent='选目录失败：'+(e&&e.message||e); } return null; }
+}
+async function restoreDir(){
+  if(!fsaSupported()) return;
+  try{ var h=await idbGet('dir'); if(h){ dirHandle=h; } }catch(_){}
+}
+async function writeToDir(handle, filename, blob){
+  var fh=await handle.getFileHandle(filename, {create:true});
+  var w=await fh.createWritable(); await w.write(blob); await w.close();
+}
+function dlBlob(filename, blob){
+  var a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=filename;
+  document.body.appendChild(a); a.click(); setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); },100);
+}
+// 云端：把整篇讲解稿逐句合成 MP3 并拼成一个 blob（MP3 是帧流，顺序拼接可直接播放）
+async function synthAllToBlob(){
+  if(!turns||!turns.length) return null;
+  var region=azRegion(), key=azKey();
+  if(!region||!key){ throw new Error('云端音频需要先填 Azure 区域和密钥'); }
+  var parts=[];
+  for(var i=0;i<turns.length;i++){
+    var t=turns[i];
+    $('saveStatus').textContent='正在合成音频… '+(i+1)+'/'+turns.length;
+    var vid=azVoiceOf(t.who==='n'?'s':t.who);
+    var ssml=buildSsml(t.text, vid, t.style||'');
+    var r=await fetch('/api/llm-proxy', { method:'POST', headers:{
+      'content-type':'application/ssml+xml',
+      'x-target-url':'https://'+region+'.tts.speech.microsoft.com/cognitiveservices/v1',
+      'ocp-apim-subscription-key':key,
+      'x-microsoft-outputformat':'audio-24khz-48kbitrate-mono-mp3',
+      'x-tts-ua':'sde-wisdom-lecture'
+    }, body: ssml });
+    if(!r.ok){ var tx=await r.text().catch(function(){return'';}); throw new Error('Azure '+r.status+(tx?('：'+tx.slice(0,80)):'')); }
+    parts.push(await r.blob());
+  }
+  return new Blob(parts, {type:'audio/mpeg'});
+}
+var savingNow=false;
+async function saveToDir(){
+  if(savingNow) return;
+  if(!lastDialogue){ $('saveStatus').textContent='还没有讲解稿，先生成。'; return; }
+  savingNow=true; $('btnSaveDir').disabled=true;
+  var name=(chosenDoc?chosenDoc.title:'讲解稿').replace(/[\\/:*?"<>|·\s]/g,'-').slice(0,40);
+  var ts=new Date(); var stamp=ts.getFullYear()+String(ts.getMonth()+1).padStart(2,'0')+String(ts.getDate()).padStart(2,'0')+'-'+String(ts.getHours()).padStart(2,'0')+String(ts.getMinutes()).padStart(2,'0');
+  var base='智慧讲解-'+name+'-'+stamp;
+  var txtBlob=new Blob(['【智慧讲解】\n文章：'+(chosenDoc?chosenDoc.title:'')+'\n讲法：'+(MODE==='solo'?'单人讲解':'男女对话')+'\n时间：'+ts.toLocaleString()+'\n\n'+lastDialogue], {type:'text/plain;charset=utf-8'});
+  try{
+    // 音频：仅云端可存
+    var mp3=null;
+    if(VOICE_SRC==='cloud'){
+      try{ mp3=await synthAllToBlob(); }
+      catch(e){ $('saveStatus').textContent='音频合成失败：'+(e&&e.message||e)+'（讲解稿仍会保存）'; }
+    }
+    // 有目录句柄且有权限→写目录；否则回退下载
+    var okDir=false;
+    if(dirHandle){ okDir=await ensurePerm(dirHandle); if(!okDir){ dirHandle=null; } }
+    if(!okDir && fsaSupported()){ var picked=await pickDir(); okDir=!!picked; }
+    if(okDir && dirHandle){
+      await writeToDir(dirHandle, base+'.txt', txtBlob);
+      if(mp3) await writeToDir(dirHandle, base+'.mp3', mp3);
+      $('saveStatus').textContent='✓ 已保存到「'+(dirHandle.name||'所选目录')+'」：'+base+'.txt'+(mp3?(' + '+base+'.mp3'):'（系统语音无音频，仅存讲解稿）');
+    } else {
+      // 回退：普通下载
+      dlBlob(base+'.txt', txtBlob);
+      if(mp3) dlBlob(base+'.mp3', mp3);
+      $('saveStatus').textContent='✓ 已下载到「下载」文件夹：'+base+'.txt'+(mp3?(' + '+base+'.mp3'):(VOICE_SRC==='cloud'?'':'（系统语音无音频，仅存讲解稿；想存音频请切云端）'));
+    }
+  }catch(e){ $('saveStatus').textContent='保存失败：'+(e&&e.message||e); }
+  finally{ savingNow=false; $('btnSaveDir').disabled=false; }
+}
+
 /* ========== 男女双声 TTS ========== */
 var synth=window.speechSynthesis;
 
@@ -1194,6 +1292,9 @@ $('q').addEventListener('keydown', function(e){ if(e.key==='Enter'){ e.preventDe
 $('btnGen').addEventListener('click', generate);
 $('btnCopy').addEventListener('click', copyText);
 $('btnDl').addEventListener('click', downloadText);
+$('btnSaveDir').addEventListener('click', saveToDir);
+$('btnPickDir').addEventListener('click', pickDir);
+restoreDir();
 $('btnPlay').addEventListener('click', playDialogue);
 $('btnPause').addEventListener('click', function(){
   if(!ttsOK||!playing) return;
