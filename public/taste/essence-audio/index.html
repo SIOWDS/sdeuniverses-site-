@@ -365,6 +365,13 @@ select:focus,input:focus{border-color:var(--accent)}
       <button class="mini" id="btnPickDir" type="button">📁 选择保存目录</button>
       <span id="saveStatus" class="statusline" style="margin:0"></span>
     </div>
+    <div class="toolbar" style="margin-top:8px;flex-wrap:wrap;gap:8px">
+      <input id="applyStudent" type="text" placeholder="投稿人（学员名）" style="width:150px;background:var(--card2);border:1px solid var(--line);border-radius:8px;color:inherit;padding:8px 11px;font-size:13.5px;font-family:inherit">
+      <input id="applyPass" type="password" placeholder="投稿密码" autocomplete="off" style="width:120px;background:var(--card2);border:1px solid var(--line);border-radius:8px;color:inherit;padding:8px 11px;font-size:13.5px;font-family:inherit">
+      <button class="btn sec" id="btnApplySubmit" type="button">📮 应用性投稿</button>
+      <span id="applyStatus" class="statusline" style="margin:0"></span>
+    </div>
+    <div class="cloudhint" style="margin-top:4px">把本次讲解稿打包投进学员投稿箱（云端音色时自动附上 MP3 音频），作为原文的「大众应用与音频」功能扩充——审核后挂到原文页。</div>
     <div id="playErr" class="err"></div>
   </div>
 </div>
@@ -1580,6 +1587,7 @@ async function saveToDir(){
         try{
           var nz=await normalizeMp3Blob(mp3, function(s){ $('saveStatus').textContent=s; });
           if(nz && nz.blob){ mp3=nz.blob; normNote='，已响度归一（'+nz.fromDb+'dB→约-16LUFS，+'+nz.gainDb+'dB）'; }
+          if(mp3){ lastMp3Blob=mp3; lastMp3Text=lastDialogue; }
         }catch(e2){ normNote='，响度归一失败按原响度保存'; }
       }
     }
@@ -1599,6 +1607,73 @@ async function saveToDir(){
     }
   }catch(e){ $('saveStatus').textContent='保存失败：'+(e&&e.message||e); }
   finally{ savingNow=false; $('btnSaveDir').disabled=false; }
+}
+
+/* ===== 应用性投稿：讲解稿(+云端MP3)打包 ZIP 投进学员投稿箱 /api/submit =====
+   复用现有收件流水线(密码服务端校验/25MB上限/私有仓 inbox)，worker 零改动。 */
+var lastMp3Blob=null, lastMp3Text='';   // 最近一次合成(含归一)的 MP3 缓存，稿子没变就复用
+var applyBusy=false;
+async function ensureJSZip(){
+  if(window.JSZip) return;
+  await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js');
+  if(!window.JSZip) throw new Error('打包库未就绪');
+}
+async function applySubmit(){
+  if(applyBusy) return;
+  var st=$('applyStatus');
+  if(!lastDialogue){ st.textContent='还没有讲解稿——先生成，再投稿。'; return; }
+  var student=($('applyStudent').value||'').trim();
+  var pass=$('applyPass').value||'';
+  if(!student){ st.textContent='请填投稿人（学员名）。'; return; }
+  if(!pass){ st.textContent='请填投稿密码。'; return; }
+  applyBusy=true; $('btnApplySubmit').disabled=true;
+  try{
+    localStorage.setItem('sde_apply_student', student);
+    // ① 音频：云端音色才有；稿子没变则复用缓存，否则现场合成+归一；失败只投文稿
+    var mp3=null, mp3Note='仅文稿';
+    if(VOICE_SRC==='cloud'){
+      if(lastMp3Blob && lastMp3Text===lastDialogue){ mp3=lastMp3Blob; }
+      else{
+        try{
+          st.textContent='正在合成音频…';
+          mp3=await synthAllToBlob();
+          try{ var nz=await normalizeMp3Blob(mp3, function(s){ st.textContent=s; }); if(nz&&nz.blob) mp3=nz.blob; }catch(e2){}
+          if(mp3){ lastMp3Blob=mp3; lastMp3Text=lastDialogue; }
+        }catch(eA){ mp3=null; }
+      }
+      if(mp3 && mp3.size>23*1024*1024){ mp3=null; mp3Note='音频超25MB上限，只投文稿'; }
+      else if(mp3){ mp3Note='含音频'; }
+      else if(mp3Note==='仅文稿'){ mp3Note='音频合成失败，只投文稿'; }
+    }
+    // ② 打包 ZIP：讲解稿.txt + 音频.mp3 + 投稿说明.json
+    st.textContent='正在打包…';
+    await ensureJSZip();
+    var ts=new Date(); var stamp=ts.getFullYear()+String(ts.getMonth()+1).padStart(2,'0')+String(ts.getDate()).padStart(2,'0')+'-'+String(ts.getHours()).padStart(2,'0')+String(ts.getMinutes()).padStart(2,'0');
+    var nice=((lastTitle||(chosenDoc?chosenDoc.title:'讲解稿'))).replace(/[\\/:*?"<>|·\s]/g,'-').slice(0,40);
+    var zip=new JSZip();
+    zip.file('讲解稿-'+nice+'.txt', reHead()+lastDialogue);
+    if(mp3) zip.file('音频-'+nice+'.mp3', mp3);
+    zip.file('投稿说明.json', JSON.stringify({
+      type:'应用性投稿（大众应用与音频扩充）', 投稿人:student,
+      原文标题:(chosenDoc?chosenDoc.title:''), 原文链接:(chosenDoc&&chosenDoc.url)?chosenDoc.url:'（上传的站外文章）',
+      讲法:(MODE==='solo'?'单人讲解':'男女对话'), 目标篇幅:curWc(), 语言:LANG,
+      成品标题:(lastTitle||''), 含音频:!!mp3, 生成时间:new Date().toISOString()
+    }, null, 2));
+    var blob=await zip.generateAsync({type:'blob', compression:'DEFLATE', compressionOptions:{level:6}});
+    if(blob.size>25*1024*1024) throw new Error('打包后超过 25MB 上限，试试较短篇幅或系统语音（不含音频）再投。');
+    // ③ 投递
+    st.textContent='正在投递到投稿箱…';
+    var fd=new FormData();
+    fd.append('pass', pass); fd.append('student', student);
+    fd.append('note', ('应用性投稿｜原文《'+(chosenDoc?chosenDoc.title:'')+'》'+((chosenDoc&&chosenDoc.url)?('（'+chosenDoc.url+'）'):'（站外上传）')+'｜'+(MODE==='solo'?'单人':'对话')+'｜'+mp3Note).slice(0,500));
+    fd.append('file', new File([blob], 'apply-'+stamp+'.zip', {type:'application/zip'}));
+    var r=await fetch('/api/submit', {method:'POST', body:fd});
+    var j=await r.json().catch(function(){return {ok:false,msg:'响应异常'};});
+    if(j.ok){ st.textContent='✓ 已投递（'+mp3Note+'）——将作为原文的应用扩充进入审核。'; $('applyPass').value=''; }
+    else if(j.code==='badpass'){ st.textContent='密码不正确。'; }
+    else{ st.textContent='投递失败：'+(j.msg||('HTTP '+r.status)); }
+  }catch(e){ st.textContent='投稿失败：'+(e&&e.message||e); }
+  finally{ applyBusy=false; $('btnApplySubmit').disabled=false; }
 }
 
 /* ========== 男女双声 TTS ========== */
@@ -2046,6 +2121,8 @@ $('btnGen').addEventListener('click', generate);
 $('btnCopy').addEventListener('click', copyText);
 $('btnDl').addEventListener('click', downloadText);
 $('btnSaveDir').addEventListener('click', saveToDir);
+$('btnApplySubmit').addEventListener('click', applySubmit);
+(function(){ var v=localStorage.getItem('sde_apply_student')||''; if(v&&$('applyStudent')) $('applyStudent').value=v; })();
 $('btnPickDir').addEventListener('click', pickDir);
 restoreDir();
 $('btnPlay').addEventListener('click', playDialogue);
