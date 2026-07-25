@@ -1180,7 +1180,24 @@ async function saveToDir(){
   var name=((lastTitle||(chosenDoc?chosenDoc.title:'讲解稿'))).replace(/[\\/:*?"<>|·\s]/g,'-').slice(0,40);
   var ts=new Date(); var stamp=ts.getFullYear()+String(ts.getMonth()+1).padStart(2,'0')+String(ts.getDate()).padStart(2,'0')+'-'+String(ts.getHours()).padStart(2,'0')+String(ts.getMinutes()).padStart(2,'0');
   var base='智慧讲解-'+name+'-'+stamp;
-  var txtBlob=new Blob(['【智慧讲解】\n文章：'+(chosenDoc?chosenDoc.title:'')+'\n讲法：'+(MODE==='solo'?'单人讲解':'男女对话')+'\n时间：'+ts.toLocaleString()+'\n\n'+lastDialogue], {type:'text/plain;charset=utf-8'});
+  // —— 组装文件头：记下这次「再创」的完整信息 ——
+  var langName=(LANG_META[LANG]||LANG_META.zh).name;
+  var styleName = (MODE==='solo' && typeof $('soloStyle')!=='undefined' && $('soloStyle')) ? ($('soloStyle').options[$('soloStyle').selectedIndex].text.split('（')[0]) : '';
+  var lenSel=document.querySelector('input[name="lecLen"]:checked');
+  var lenTxt=lenSel? (lenSel.value+' 字') : '';
+  var auth=($('authorName')&&$('authorName').value||'').trim();
+  var wrk=($('authorWork')&&$('authorWork').value||'').trim().replace(/^[《<]|[》>]$/g,'');
+  var authLine = auth ? ('\n模仿作家：'+auth+(wrk?('《'+wrk+'》'):'')) : '';
+  var head='【智慧讲解和再创】'
+    + '\n标题：'+(lastTitle||'（未命名）')
+    + '\n原文：'+(chosenDoc?chosenDoc.title:'')
+    + '\n语言：'+langName
+    + '\n讲法：'+(MODE==='solo'?('单人讲解'+(styleName?('·'+styleName):'')):'男女对话')
+    + (lenTxt?('\n篇幅：'+lenTxt):'')
+    + authLine
+    + '\n时间：'+ts.toLocaleString()
+    + '\n\n';
+  var txtBlob=new Blob([head+lastDialogue], {type:'text/plain;charset=utf-8'});
   try{
     // 音频：仅云端可存
     var mp3=null;
