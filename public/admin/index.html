@@ -17,10 +17,33 @@ a.card .t{font-size:17px;font-weight:700;color:#E6EDF3}
 a.card .d{font-size:13px;color:#8B98A5;margin-top:6px}
 a.card .ic{font-size:22px;margin-bottom:8px}
 .back{font-size:13px;color:#8B98A5}
+/* 口令门 */
+#gate{position:fixed;inset:0;background:#0E1116;display:flex;align-items:center;justify-content:center;z-index:99}
+#gate .box{background:#161B22;border:1px solid rgba(212,178,94,0.3);border-radius:14px;padding:30px 28px;width:min(400px,90vw);text-align:center}
+#gate h2{margin:0 0 6px;font-size:19px}
+#gate h2 b{color:#D4B25E}
+#gate p{color:#8B98A5;font-size:12.5px;margin:0 0 18px;line-height:1.7}
+#gate input{width:100%;background:#0C1015;border:1px solid rgba(255,255,255,0.14);border-radius:9px;color:#E6EDF3;padding:11px 13px;font-size:15px;outline:none;text-align:center;letter-spacing:0.1em}
+#gate input:focus{border-color:#D4B25E}
+#gate button{margin-top:12px;width:100%;background:linear-gradient(120deg,#D4B25E,#E5C86E);color:#1a1206;border:none;border-radius:9px;padding:11px;font-size:15px;font-weight:700;cursor:pointer}
+#gate .err{color:#E06C60;font-size:12.5px;margin-top:10px;min-height:16px}
+#gate .note{color:#6B7580;font-size:11px;margin-top:14px;line-height:1.6}
+#content{display:none}
 </style>
 </head>
 <body>
-<div class="wrap">
+<div id="gate">
+  <div class="box">
+    <h2>SDE Universes · <b>管理区</b></h2>
+    <p>此区仅供网站维护。请输入管理口令。</p>
+    <input id="gpass" type="password" placeholder="管理口令" autocomplete="current-password">
+    <button id="gbtn">进入</button>
+    <div class="err" id="gerr"></div>
+    <div class="note">提示：这是前端口令，只用于挡住随手访问，不是强安全防护。真正的敏感操作（改仓库、部署）不在本页面进行。</div>
+  </div>
+</div>
+
+<div class="wrap" id="content">
   <a class="back" href="/">← 首页</a>
   <h1 style="margin-top:14px">SDE Universes · <b>管理</b></h1>
   <p class="sub">网站内部工具。仅供维护使用。</p>
@@ -37,5 +60,21 @@ a.card .ic{font-size:22px;margin-bottom:8px}
     <div class="d">站内讨论区的内容管理。</div>
   </a>
 </div>
+
+<script>
+(function(){
+  var PASS='SDE2013', SKEY='sde_admin_ok';
+  function pass(){ document.getElementById('gate').style.display='none'; document.getElementById('content').style.display='block'; }
+  try{ if(sessionStorage.getItem(SKEY)==='1'){ pass(); return; } }catch(_){}
+  var inp=document.getElementById('gpass'), btn=document.getElementById('gbtn'), err=document.getElementById('gerr');
+  function tryIn(){
+    if((inp.value||'')===PASS){ try{ sessionStorage.setItem(SKEY,'1'); }catch(_){} pass(); }
+    else { err.textContent='口令不对'; inp.value=''; inp.focus(); }
+  }
+  btn.addEventListener('click', tryIn);
+  inp.addEventListener('keydown', function(e){ if(e.key==='Enter') tryIn(); });
+  inp.focus();
+})();
+</script>
 </body>
 </html>
