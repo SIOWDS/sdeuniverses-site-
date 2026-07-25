@@ -54,6 +54,8 @@ select:focus,input:focus{border-color:var(--accent)}
 .turn.n .say{font-size:14.5px;line-height:1.9}
 .vcol.s span{color:var(--accent)}
 .voicecheck{margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}
+.voicehdr{font-size:15px;font-weight:800;color:var(--gold2)}
+.voicehdr-sub{font-size:12px;font-weight:500;color:var(--muted);margin-left:6px}
 .vreport{font-size:12.5px;line-height:1.8;color:var(--sub)}
 .vreport b.ok{color:#7FD08A}.vreport b.no{color:#E0A24C}
 .modal-mask{position:fixed;inset:0;background:rgba(6,4,12,.72);display:none;align-items:center;justify-content:center;z-index:999;padding:20px}
@@ -126,6 +128,20 @@ select:focus,input:focus{border-color:var(--accent)}
     <div class="hint">解读用你自己选的基底跑（BYOK）。右侧这台基底会先通读整份 SDE 内功、写一份本场心得，再去解读——所以第一次会多花一两分钟"备课"，之后同一基底不再重复。</div>
   </div>
 
+  <!-- 语音（男女声）系统：一进页面即可用，先装好声音再讲解 -->
+  <div class="panel">
+    <div class="voicehdr">🔊 语音（男女声）系统 <span class="voicehdr-sub">先装好中文男 / 女声、试听效果，再去下面生成讲解稿</span></div>
+    <div class="voicecheck" style="margin-top:6px;padding-top:0;border-top:none">
+      <div id="voiceReport" class="vreport">正在检测本机中文语音…</div>
+      <div class="toolbar" style="margin-top:8px">
+        <button class="btn sec" id="btnPreview" type="button">🎧 试听 30 秒</button>
+        <button class="btn sec" id="btnInstallVoices" type="button">🔊 安装男女声系统</button>
+        <button class="mini" id="btnRescan" type="button">↻ 重新检测</button>
+        <button class="mini" id="btnPreviewStop" type="button" disabled>■ 停止试听</button>
+      </div>
+    </div>
+  </div>
+
   <!-- 第一步：搜文章 -->
   <div class="panel">
     <span class="step-badge">第一步 · 搜文章</span>
@@ -173,15 +189,6 @@ select:focus,input:focus{border-color:var(--accent)}
       <span id="playStatus" class="statusline" style="margin:0"></span>
     </div>
     <div id="playErr" class="err"></div>
-    <div class="voicecheck">
-      <div id="voiceReport" class="vreport">正在检测本机中文语音…</div>
-      <div class="toolbar" style="margin-top:8px">
-        <button class="btn sec" id="btnPreview" type="button">🎧 试听 30 秒</button>
-        <button class="btn sec" id="btnInstallVoices" type="button">🔊 安装男女声系统</button>
-        <button class="mini" id="btnRescan" type="button">↻ 重新检测</button>
-        <button class="mini" id="btnPreviewStop" type="button" disabled>■ 停止试听</button>
-      </div>
-    </div>
   </div>
 </div>
 
