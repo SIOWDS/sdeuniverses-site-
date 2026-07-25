@@ -254,9 +254,11 @@ select:focus,input:focus{border-color:var(--accent)}
         <option value="speech">演讲（演讲台口吻·感染力·号召）</option>
       </select>
       <div id="authorRow" style="margin-top:10px">
-        <span class="drama-tip" style="display:block;margin-bottom:5px">✒️ 模仿某位<b>著名作家</b>的文学笔法？填名字——想象<b>他/她来写这篇文章会怎么写</b>（原创文字、不引原话、不署他的名）。可与上面任意文体叠加，留空＝不模仿。</span>
+        <span class="drama-tip" style="display:block;margin-bottom:5px">✒️ 模仿某位<b>著名作家</b>的文学笔法？填作家名，还可再指定<b>模仿他哪一篇作品</b>的写法（如鲁迅《野草》、海明威《老人与海》）——精准到篇更像。想象他/她来写这篇文章会怎么写（原创文字、不引原话、不署名）。可与任意文体叠加，留空＝不模仿。</span>
         <input id="authorName" type="text" list="authorList" placeholder="搜索或直接输入作家名，如 鲁迅 / 海明威 / 村上春树 / 加缪…（可留空）" autocomplete="off" style="width:100%;max-width:560px;background:#0C1015;border:1px solid rgba(255,255,255,0.16);border-radius:8px;color:var(--ink);padding:8px 11px;font-size:13.5px;font-family:inherit">
         <datalist id="authorList"></datalist>
+        <input id="authorWork" type="text" list="workList" placeholder="想模仿他哪篇作品的写法？选或输入篇名，如《野草》《老人与海》…（留空＝整体风格）" autocomplete="off" style="width:100%;max-width:560px;margin-top:6px;background:#0C1015;border:1px solid rgba(255,255,255,0.16);border-radius:8px;color:var(--ink);padding:8px 11px;font-size:13.5px;font-family:inherit">
+        <datalist id="workList"></datalist>
         <div id="authorChips" class="authchips"></div>
       </div>
       <span class="drama-tip">同一篇文章，换个文体就是另一种读物。散文抒情、评书热闹、议论雄辩、小说藏理……</span>
@@ -656,6 +658,59 @@ var WRITERS = {
   jp: { label:'日', names:['村上春树','夏目漱石','川端康成','三岛由纪夫','太宰治','芥川龙之介','谷崎润一郎','大江健三郎','东野圭吾','宫泽贤治','松尾芭蕉','紫式部','小林一茶','安部公房','远藤周作','吉本芭娜娜','井上靖','司马辽太郎','森鸥外','樋口一叶'] },
   fr: { label:'法', names:['加缪','萨特','普鲁斯特','福楼拜','巴尔扎克','雨果','司汤达','波德莱尔','兰波','莫泊桑','左拉','纪德','杜拉斯','萨冈','罗曼·罗兰','圣埃克苏佩里','波伏娃','马拉美','魏尔伦','蒙田'] }
 };
+// 各作家的代表作（点选作家后自动列出；手打任意篇名也行、可留空=模仿整体风格）
+var WRITER_WORKS = {
+  '鲁迅':['野草','阿Q正传','狂人日记','朝花夕拾','故乡','孔乙己','药','祝福'],
+  '老舍':['骆驼祥子','茶馆','四世同堂','月牙儿','济南的冬天'],
+  '沈从文':['边城','湘行散记','长河','萧萧'],
+  '张爱玲':['金锁记','倾城之恋','红玫瑰与白玫瑰','半生缘','沉香屑·第一炉香'],
+  '钱钟书':['围城','写在人生边上','管锥编'],
+  '汪曾祺':['受戒','大淖记事','人间草木','昆明的雨'],
+  '余华':['活着','许三观卖血记','兄弟','第七天','在细雨中呼喊'],
+  '莫言':['红高粱','丰乳肥臀','檀香刑','生死疲劳','蛙'],
+  '王小波':['黄金时代','沉默的大多数','红拂夜奔','一只特立独行的猪'],
+  '史铁生':['我与地坛','病隙碎笔','命若琴弦','务虚笔记'],
+  '木心':['文学回忆录','琼美卡随想录','素履之往'],
+  '曹雪芹':['红楼梦'],
+  '苏轼':['赤壁赋','念奴娇·赤壁怀古','水调歌头·明月几时有'],
+  '朱自清':['背影','荷塘月色','匆匆','春'],
+  '萧红':['呼兰河传','生死场','小城三月'],
+  '刘慈欣':['三体','流浪地球','球状闪电','乡村教师'],
+  '海明威':['老人与海','永别了武器','丧钟为谁而鸣','太阳照常升起','乞力马扎罗的雪'],
+  '马尔克斯':['百年孤独','霍乱时期的爱情','没有人给他写信的上校','枯枝败叶'],
+  '博尔赫斯':['小径分岔的花园','沙之书','虚构集','阿莱夫'],
+  '卡尔维诺':['看不见的城市','树上的男爵','如果在冬夜一个旅人','分成两半的子爵'],
+  '卡夫卡':['变形记','城堡','审判','饥饿艺术家'],
+  '陀思妥耶夫斯基':['罪与罚','卡拉马佐夫兄弟','白痴','地下室手记'],
+  '托尔斯泰':['战争与和平','安娜·卡列尼娜','复活','伊凡·伊里奇之死'],
+  '契诃夫':['套中人','变色龙','第六病室','带小狗的女人'],
+  '加缪':['局外人','鼠疫','西西弗神话','堕落'],
+  '奥威尔':['1984','动物农场','巴黎伦敦落魄记'],
+  '卡佛':['当我们谈论爱情时我们在谈论什么','大教堂','需要时就给我电话'],
+  '伍尔夫':['到灯塔去','达洛维夫人','一间自己的房间','海浪'],
+  '福克纳':['喧哗与骚动','我弥留之际','押沙龙押沙龙'],
+  '村上春树':['挪威的森林','海边的卡夫卡','1Q84','奇鸟行状录','世界尽头与冷酷仙境'],
+  '夏目漱石':['我是猫','心','哥儿','三四郎'],
+  '川端康成':['雪国','千只鹤','古都','伊豆的舞女'],
+  '三岛由纪夫':['金阁寺','假面的告白','丰饶之海'],
+  '太宰治':['人间失格','斜阳','奔跑吧梅勒斯'],
+  '芥川龙之介':['罗生门','竹林中','地狱变','鼻子'],
+  '普鲁斯特':['追忆似水年华'],
+  '福楼拜':['包法利夫人','情感教育','萨朗波'],
+  '雨果':['悲惨世界','巴黎圣母院','九三年'],
+  '波德莱尔':['恶之花','巴黎的忧郁'],
+  '莫泊桑':['羊脂球','项链','漂亮朋友','我的叔叔于勒'],
+  '杜拉斯':['情人','广岛之恋','抵挡太平洋的堤坝']
+};
+function fillWorks(author){
+  var wl=$('workList'); if(!wl) return;
+  wl.innerHTML='';
+  var works=WRITER_WORKS[author]||[];
+  works.forEach(function(w){ var o=document.createElement('option'); o.value=w; wl.appendChild(o); });
+  // 换作家时清掉不属于新作家的旧选值
+  var wi=$('authorWork');
+  if(wi && wi.value && works.indexOf(wi.value)<0) wi.value='';
+}
 function fillAuthorSuggest(){
   var dl=$('authorList'), box=$('authorChips'); if(!dl||!box) return;
   dl.innerHTML=''; box.innerHTML='';
@@ -668,12 +723,14 @@ function fillAuthorSuggest(){
     var lb=document.createElement('span'); lb.className='aglbl'; lb.textContent=g.label; row.appendChild(lb);
     g.names.slice(0,12).forEach(function(n){
       var c=document.createElement('span'); c.className='achip'; c.textContent=n;
-      c.addEventListener('click', function(){ $('authorName').value=n; });
+      c.addEventListener('click', function(){ $('authorName').value=n; fillWorks(n); });
       row.appendChild(c);
     });
     var more=document.createElement('span'); more.className='amore'; more.textContent='…更多可直接输入'; row.appendChild(more);
     box.appendChild(row);
   });
+  var ai=$('authorName');
+  if(ai && !ai.__worksBound){ ai.__worksBound=true; ['change','input'].forEach(function(ev){ ai.addEventListener(ev, function(){ fillWorks((this.value||'').trim()); }); }); }
 }
 
 /* ===== 单人讲解·文体/风格：同一篇理论文章，换不同应用文体，变成不同读物 ===== */
@@ -938,13 +995,16 @@ async function generate(){
     var sys=lecSystem(MODE, xinde, rag.ctx, DRAMA, SOLO_STYLE);
     if(MODE==='solo'){
       var author=($('authorName')&&$('authorName').value||'').trim();
+      var work=($('authorWork')&&$('authorWork').value||'').trim().replace(/^[《<]|[》>]$/g,'');
       if(author){
         var verb = (SOLO_STYLE==='speech') ? '来讲这篇文章' : '来写这篇文章';
+        var whose = work ? ('【'+author+'】《'+work+'》那样的写法') : ('【'+author+'】标志性的文学笔法');
+        var srcref = work ? ('特别贴近《'+work+'》的语言质感、句式与节奏、意象与修辞、结构与语调') : ('他/她惯用的语言质感、句式与节奏、意象与修辞、结构方式、以及看待世界的那种眼光与关切');
         sys += "\n\n════════ 模仿作家笔法（必须与本文章内容深度挂钩）════════\n"
-          + "设想：如果由【"+author+"】"+verb+"，会怎么写？请以此完成——\n"
+          + "设想：如果由"+whose+"来"+(SOLO_STYLE==='speech'?'讲':'写')+"这篇文章，会怎么呈现？请以此完成——\n"
           + "①【内容锚定】骨架仍是这篇文章的中心创新观点、它针对的挑战、它的解决之道、它的应用；不要写成一篇脱离本文的空泛文字，每一段都要落在本文的具体论点上，也仍要遵守上面选定文体的写法。\n"
-          + "②【笔法移植】用【"+author+"】标志性的文学笔法来承载这些论点：他/她惯用的语言质感、句式与节奏、意象与修辞、结构方式、以及看待世界的那种眼光与关切——想象他/她会抓住这篇文章里的哪个点、用什么样的笔触来写给读者。\n"
-          + "③【红线】文字全部围绕本文原创，不引用也不杜撰他/她的原话或原作段落，不署他/她的名字，不写其生平；只借其『写法/笔法』来写『这篇文章』，不是让他/她写自己的作品。";
+          + "②【笔法移植】用"+whose+"来承载这些论点——"+srcref+"；想象作者会抓住这篇文章里的哪个点、用什么样的笔触来写给读者。"+(work?("注意是学《"+work+"》那一篇的写法气质，而不是泛泛的作者印象。"):"")+"\n"
+          + "③【红线】文字全部围绕本文原创，不引用也不杜撰他/她的原话或原作段落，不复述该作品的情节人物，不署他/她的名字，不写其生平；只借其『写法/笔法』来写『这篇文章』，不是让他/她写自己的作品。";
       }
     }
     var styLabel=(SOLO_STYLE&&$('soloStyle'))?($('soloStyle').options[$('soloStyle').selectedIndex].text.split('（')[0]):'深情解读';
