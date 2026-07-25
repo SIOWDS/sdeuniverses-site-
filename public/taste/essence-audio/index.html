@@ -153,6 +153,14 @@ select:focus,input:focus{border-color:var(--accent)}
   <div class="panel">
     <div class="voicehdr">🔊 语音（男女声）系统 <span class="voicehdr-sub">先装好中文男 / 女声、试听效果，再去下面生成讲解稿</span></div>
     <div class="voicecheck" style="margin-top:6px;padding-top:0;border-top:none">
+      <div class="srcrow" style="margin-bottom:10px">
+        <span class="srclbl">🌐 讲解语言</span>
+        <label class="srcopt sel" id="langZh"><input type="radio" name="lecLang" value="zh" checked><span>🇨🇳 中文</span></label>
+        <label class="srcopt" id="langEn"><input type="radio" name="lecLang" value="en"><span>🇬🇧 English</span></label>
+        <label class="srcopt" id="langJa"><input type="radio" name="lecLang" value="ja"><span>🇯🇵 日本語</span></label>
+        <label class="srcopt" id="langFr"><input type="radio" name="lecLang" value="fr"><span>🇫🇷 Français</span></label>
+      </div>
+      <div class="cloudhint" style="margin:-4px 0 10px">选了语言，讲解稿就用那种语言写、朗读也用该语言的音色（英/日/法音色需云端 Azure；系统语音要看你设备有没有装该语言）。</div>
       <div class="srcrow">
         <span class="srclbl">语音来源</span>
         <label class="srcopt sel" id="srcSys"><input type="radio" name="vsrc" value="sys" checked><span>💻 系统语音（免费·用你设备已装的）</span></label>
@@ -239,6 +247,10 @@ select:focus,input:focus{border-color:var(--accent)}
         <option value="fiction">小说故事（场景·人物·把道理融进情节）</option>
         <option value="speech">演讲（演讲台口吻·感染力·号召）</option>
       </select>
+      <div id="oratorRow" style="display:none;margin-top:8px">
+        <span class="drama-tip" style="display:block;margin-bottom:5px">🎤 想学某位名人的演讲风格？填名字（学他的<b>笔法气势</b>，原创文字、不是模仿声音）。留空＝通用演讲风格。</span>
+        <input id="oratorName" type="text" placeholder="如 丘吉尔 / 马丁·路德·金 / 乔布斯 / 林肯…（可留空）" autocomplete="off" style="width:100%;max-width:520px;background:#0C1015;border:1px solid rgba(255,255,255,0.16);border-radius:8px;color:var(--ink);padding:8px 11px;font-size:13.5px;font-family:inherit">
+      </div>
       <span class="drama-tip">同一篇文章，换个文体就是另一种读物。散文抒情、评书热闹、议论雄辩、小说藏理……</span>
     </div>
     <div class="dramarow">
@@ -711,12 +723,21 @@ function dramaGuide(mode){
   if(!a) return '';
   return '\n【对话戏剧模式：'+a.name+'】\n'+a.guide+'\n把上面这条情感曲线通篇贯彻到你给每句配的语气标签上，让整段听起来像一条完整的情感曲线，而不是零散的情绪。\n';
 }
+function langDirective(){
+  var m = LANG_META[LANG] || LANG_META.zh;
+  if(LANG==='zh') return "";  // 中文为默认，无需额外指令
+  return "\n\n════════ 语言要求（最高优先级）════════\n"
+    + "整篇讲解稿必须用【" + m.writeIn + "】写作和讲述——所有讲解内容、举例、对话都用 " + m.writeIn + "，就像一位以 " + m.writeIn + " 为母语的讲解者在讲。"
+    + "唯一例外：程序用的格式标记（说话人前缀 `男`/`女`、竖线 `|`、语气标签如 cheerful/serious、方括号 `[style]`、中文冒号 `：`）保持原样不翻译，只有冒号后面的正文用 " + m.writeIn + "。"
+    + "不要中外夹杂，不要加译文对照，直接用 " + m.writeIn + " 讲。\n";
+}
 function lecSystem(mode, xinde, siteCtx, drama, soloStyle){
   var head = PRIOR
     + "\n\n════════ 你本场已内化的学习心得（思考底盘，讲解时真用它，别向听众复述心得本身）════════\n" + (xinde||'')
     + "\n\n════════ 你答/讲每一段的工序（方法论指引）════════\n" + METHOD_GUIDE
     + "\n\n════════ 站内相关资料（就本文从 sdeuniverses.com 检索到的段落，可能为空）════════\n"
-    + (siteCtx || "（本轮没检索到特别相关的段落，凭对文章本身的把握＋内功讲解）");
+    + (siteCtx || "（本轮没检索到特别相关的段落，凭对文章本身的把握＋内功讲解）")
+    + langDirective();
 
   var common =
       "【必须讲清的四件事，按这个顺序讲，不要生硬分段标题】：①这篇文章的中心创新观点是什么（它提出了什么此前没有的新看法）；②它针对的挑战 / 难题是什么；③它怎么解决这个问题、凭什么成立；④它能怎么用——分别给出在【教育】【健康】【商业经济】三个领域各一个具体的应用例子。\n"
@@ -880,6 +901,12 @@ async function generate(){
     DRAMA=($('dramaMode')&&$('dramaMode').value)||'';
     SOLO_STYLE=($('soloStyle')&&$('soloStyle').value)||'';
     var sys=lecSystem(MODE, xinde, rag.ctx, DRAMA, SOLO_STYLE);
+    if(MODE==='solo' && SOLO_STYLE==='speech'){
+      var orator=($('oratorName')&&$('oratorName').value||'').trim();
+      if(orator){
+        sys += "\n\n════════ 名人演讲风格════════\n用【"+orator+"】的演讲风格和笔法来写这篇演讲——学他惯用的修辞、句式、节奏、气势和情绪调动方式（比如排比、重复、对仗、比喻、呼告的用法），让整篇读起来有他那种味道。但内容完全是围绕本文章原创的，不要引用或杜撰他的原话，也不要提他的名字，只借他的『笔法』不借他的『话』。";
+      }
+    }
     var styLabel=(SOLO_STYLE&&$('soloStyle'))?($('soloStyle').options[$('soloStyle').selectedIndex].text.split('（')[0]):'深情解读';
     var tail=(MODE==='solo')
       ? ('请据此，按你的任务与【'+styLabel+'】这个文体的写法和情调，写出约 2000 字的单人朗读作品，每段按语义在段首标一个方括号语气标签。直接开始，不要任何说话人标记、不要写标题。')
@@ -1050,24 +1077,59 @@ var synth=window.speechSynthesis;
 /* ===== 云端音色（Azure 语音，BYOK，经本站代理转发） ===== */
 var VOICE_SRC='sys';   // 'sys' 系统语音 | 'cloud' 云端Azure
 // rich=true：情感风格丰富、能明显听出语气变化（推荐）；rich=false：风格少或不支持，情感变化不明显
-var AZURE_VOICES=[
-  {id:'zh-CN-YunxiNeural',   g:'m', rich:true,  label:'★云希 Yunxi（男·多情感·推荐）'},
-  {id:'zh-CN-YunjianNeural', g:'m', rich:true,  label:'★云健 Yunjian（男·多情感·浑厚）'},
-  {id:'zh-CN-YunyangNeural', g:'m', rich:true,  label:'★云扬 Yunyang（男·多情感·播报）'},
-  {id:'zh-CN-YunxiaNeural',  g:'m', rich:false, label:'云夏 Yunxia（男·少年·情感较少）'},
-  {id:'zh-CN-YunyeNeural',   g:'m', rich:false, label:'云野 Yunye（男·讲故事·情感较少）'},
-  {id:'zh-CN-XiaoxiaoNeural',g:'f', rich:true,  label:'★晓晓 Xiaoxiao（女·情感最丰富·推荐）'},
-  {id:'zh-CN-XiaomoNeural',  g:'f', rich:true,  label:'★晓墨 Xiaomo（女·多情感）'},
-  {id:'zh-CN-XiaoyiNeural',  g:'f', rich:true,  label:'★晓伊 Xiaoyi（女·多情感·活泼）'},
-  {id:'zh-CN-XiaochenNeural',g:'f', rich:false, label:'晓辰 Xiaochen（女·口语·情感较少）'},
-  {id:'zh-CN-XiaohanNeural', g:'f', rich:true,  label:'★晓涵 Xiaohan（女·多情感·温柔）'},
-  {id:'zh-CN-XiaomengNeural',g:'f', rich:false, label:'晓梦 Xiaomeng（女·甜美·情感较少）'},
-  {id:'zh-CN-XiaoruiNeural', g:'f', rich:true,  label:'★晓睿 Xiaorui（女·多情感·成熟）'},
-  {id:'zh-HK-WanLungNeural', g:'m', rich:false, label:'云龙 WanLung（粤语·男·情感较少）'},
-  {id:'zh-HK-HiuMaanNeural', g:'f', rich:false, label:'曉曼 HiuMaan（粤语·女·情感较少）'},
-  {id:'zh-TW-YunJheNeural',  g:'m', rich:false, label:'雲哲 YunJhe（台湾·男·情感较少）'},
-  {id:'zh-TW-HsiaoChenNeural',g:'f',rich:false, label:'曉臻 HsiaoChen（台湾·女·情感较少）'}
-];
+var AZURE_VOICES_BY_LANG = {
+  zh: [
+    {id:'zh-CN-YunxiNeural',   g:'m', rich:true,  label:'★云希 Yunxi（男·多情感·推荐）'},
+    {id:'zh-CN-YunjianNeural', g:'m', rich:true,  label:'★云健 Yunjian（男·多情感·浑厚）'},
+    {id:'zh-CN-YunyangNeural', g:'m', rich:true,  label:'★云扬 Yunyang（男·多情感·播报）'},
+    {id:'zh-CN-YunxiaNeural',  g:'m', rich:false, label:'云夏 Yunxia（男·少年·情感较少）'},
+    {id:'zh-CN-YunyeNeural',   g:'m', rich:false, label:'云野 Yunye（男·讲故事·情感较少）'},
+    {id:'zh-CN-XiaoxiaoNeural',g:'f', rich:true,  label:'★晓晓 Xiaoxiao（女·情感最丰富·推荐）'},
+    {id:'zh-CN-XiaomoNeural',  g:'f', rich:true,  label:'★晓墨 Xiaomo（女·多情感）'},
+    {id:'zh-CN-XiaoyiNeural',  g:'f', rich:true,  label:'★晓伊 Xiaoyi（女·多情感·活泼）'},
+    {id:'zh-CN-XiaohanNeural', g:'f', rich:true,  label:'★晓涵 Xiaohan（女·多情感·温柔）'},
+    {id:'zh-CN-XiaoruiNeural', g:'f', rich:true,  label:'★晓睿 Xiaorui（女·多情感·成熟）'},
+    {id:'zh-CN-XiaochenNeural',g:'f', rich:false, label:'晓辰 Xiaochen（女·口语·情感较少）'},
+    {id:'zh-HK-WanLungNeural', g:'m', rich:false, label:'云龙 WanLung（粤语·男）'},
+    {id:'zh-HK-HiuMaanNeural', g:'f', rich:false, label:'曉曼 HiuMaan（粤语·女）'},
+    {id:'zh-TW-YunJheNeural',  g:'m', rich:false, label:'雲哲 YunJhe（台湾·男）'},
+    {id:'zh-TW-HsiaoChenNeural',g:'f',rich:false, label:'曉臻 HsiaoChen（台湾·女）'}
+  ],
+  en: [
+    {id:'en-US-GuyNeural',     g:'m', rich:true,  label:'★Guy（M·multi-emotion·recommended）'},
+    {id:'en-US-AndrewNeural',  g:'m', rich:true,  label:'★Andrew（M·warm·conversational）'},
+    {id:'en-US-DavisNeural',   g:'m', rich:true,  label:'★Davis（M·multi-emotion）'},
+    {id:'en-US-TonyNeural',    g:'m', rich:false, label:'Tony（M）'},
+    {id:'en-US-JennyNeural',   g:'f', rich:true,  label:'★Jenny（F·multi-emotion·recommended）'},
+    {id:'en-US-AriaNeural',    g:'f', rich:true,  label:'★Aria（F·multi-emotion·newscast）'},
+    {id:'en-US-NancyNeural',   g:'f', rich:true,  label:'★Nancy（F·multi-emotion）'},
+    {id:'en-GB-RyanNeural',    g:'m', rich:false, label:'Ryan（M·British）'},
+    {id:'en-GB-SoniaNeural',   g:'f', rich:false, label:'Sonia（F·British）'}
+  ],
+  ja: [
+    {id:'ja-JP-KeitaNeural',   g:'m', rich:false, label:'圭太 Keita（男声）'},
+    {id:'ja-JP-DaichiNeural',  g:'m', rich:false, label:'大智 Daichi（男声）'},
+    {id:'ja-JP-NanamiNeural',  g:'f', rich:false, label:'七海 Nanami（女声）'},
+    {id:'ja-JP-AoiNeural',     g:'f', rich:false, label:'葵 Aoi（女声）'},
+    {id:'ja-JP-MayuNeural',    g:'f', rich:false, label:'真夕 Mayu（女声）'}
+  ],
+  fr: [
+    {id:'fr-FR-HenriNeural',   g:'m', rich:false, label:'Henri（homme）'},
+    {id:'fr-FR-AlainNeural',   g:'m', rich:false, label:'Alain（homme）'},
+    {id:'fr-FR-DeniseNeural',  g:'f', rich:false, label:'Denise（femme）'},
+    {id:'fr-FR-EloiseNeural',  g:'f', rich:false, label:'Éloïse（femme）'},
+    {id:'fr-FR-VivienneMultilingualNeural', g:'f', rich:false, label:'Vivienne（femme·HD）'}
+  ]
+};
+// LANG_META：语言默认男女音色 + 该语言 BCP-47（写讲稿+SSML xml:lang）
+var LANG_META = {
+  zh: { code:'zh-CN', name:'中文', m:'zh-CN-YunxiNeural',  f:'zh-CN-XiaoxiaoNeural', writeIn:'简体中文' },
+  en: { code:'en-US', name:'English', m:'en-US-GuyNeural', f:'en-US-JennyNeural',    writeIn:'English' },
+  ja: { code:'ja-JP', name:'日本語', m:'ja-JP-KeitaNeural', f:'ja-JP-NanamiNeural',   writeIn:'日本語' },
+  fr: { code:'fr-FR', name:'Français', m:'fr-FR-HenriNeural', f:'fr-FR-DeniseNeural', writeIn:'français' }
+};
+var LANG='zh';   // 当前语言
+function azVoices(){ return AZURE_VOICES_BY_LANG[LANG] || AZURE_VOICES_BY_LANG.zh; }
 function azRegion(){ return ($('azRegion')&&$('azRegion').value||'').trim().toLowerCase(); }
 function azKey(){ return ($('azKey')&&$('azKey').value||'').trim(); }
 function azVoiceOf(who){
@@ -1077,18 +1139,18 @@ function azVoiceOf(who){
 function azOverrideStyle(){ return ($('azStyle')&&$('azStyle').value||'').trim(); }  // 空=智能逐句
 function azRatePct(){ var v=parseInt($('azRate')&&$('azRate').value||'0',10)||0; return v; }
 function fillAzureSelects(){
-  [['azVoiceM','m'],['azVoiceF','f'],['azVoiceS','f']].forEach(function(pair){
+  var list=azVoices(), meta=LANG_META[LANG]||LANG_META.zh;
+  [['azVoiceM','m'],['azVoiceF','f'],['azVoiceS','all']].forEach(function(pair){
     var sel=$(pair[0]); if(!sel) return; sel.innerHTML='';
-    AZURE_VOICES.forEach(function(v){
-      // 男声框只列男，女声框列女，单人框列全部（默认女）
-      if(pair[1]==='m' && v.g!=='m') return;
-      if(pair[1]==='f' && pair[0]==='azVoiceF' && v.g!=='f') return;
+    list.forEach(function(v){
+      if(pair[1]==='m' && v.g!=='m') return;   // 男声框只列男
+      if(pair[1]==='f' && v.g!=='f') return;   // 女声框只列女
       var o=document.createElement('option'); o.value=v.id; o.textContent=v.label; sel.appendChild(o);
     });
   });
-  if($('azVoiceM')) $('azVoiceM').value='zh-CN-YunxiNeural';
-  if($('azVoiceF')) $('azVoiceF').value='zh-CN-XiaoxiaoNeural';
-  if($('azVoiceS')) $('azVoiceS').value='zh-CN-XiaoxiaoNeural';
+  if($('azVoiceM')) $('azVoiceM').value=meta.m;
+  if($('azVoiceF')) $('azVoiceF').value=meta.f;
+  if($('azVoiceS')) $('azVoiceS').value=meta.f;
 }
 function xmlEsc(s){ return String(s||'').replace(/[<>&'"]/g,function(c){return{'<':'&lt;','>':'&gt;','&':'&amp;',"'":'&apos;','"':'&quot;'}[c];}); }
 var azAudio=null;
@@ -1102,7 +1164,8 @@ function buildSsml(text, voiceId, style){
   var inner=xmlEsc(text);
   if(rate){ inner='<prosody rate="'+(rate>0?'+':'')+rate+'%">'+inner+'</prosody>'; }
   if(st){ inner='<mstts:express-as style="'+st+'" styledegree="'+deg+'">'+inner+'</mstts:express-as>'; }
-  return '<speak version="1.0" xmlns:mstts="https://www.w3.org/2001/mstts" xml:lang="zh-CN"><voice name="'+voiceId+'">'+inner+'</voice></speak>';
+  var lc=(LANG_META[LANG]||LANG_META.zh).code;
+  return '<speak version="1.0" xmlns:mstts="https://www.w3.org/2001/mstts" xml:lang="'+lc+'"><voice name="'+voiceId+'">'+inner+'</voice></speak>';
 }
 function azureSpeak(text, voiceId, style, done){
   if(typeof style==='function'){ done=style; style=''; }  // 兼容旧签名
@@ -1448,6 +1511,7 @@ function applyMode(){
   $('btnGen').textContent = solo ? '生成约 2000 字单人讲解稿 →' : '生成约 2000 字男女对话讲解稿 →';
   // 单人文体行：只在单人模式显示
   var sr=$('soloStyleRow'); if(sr) sr.style.display = solo ? 'flex' : 'none';
+  var orow=$('oratorRow'); if(orow) orow.style.display = (solo && $('soloStyle') && $('soloStyle').value==='speech') ? 'block' : 'none';
   // 戏剧模式行标签：单人叫"情感曲线"，对话叫"对话戏剧"
   var dl=document.querySelector('.dramarow:not(#soloStyleRow) .drama-lbl');
   if(dl) dl.textContent = solo ? '🎭 情感曲线模式' : '🎭 对话戏剧模式';
@@ -1461,6 +1525,7 @@ function applyMode(){
 Array.prototype.forEach.call(document.querySelectorAll('input[name="lecmode"]'), function(r){
   r.addEventListener('change', function(){ if(this.checked){ MODE=this.value; applyMode(); } });
 });
+if($('soloStyle')) $('soloStyle').addEventListener('change', applyMode);  // 切文体时更新名人输入框显隐
 applyMode();
 
 // 安装男女声系统 · 事件
@@ -1485,6 +1550,15 @@ function applyVoiceSrc(){
 }
 Array.prototype.forEach.call(document.querySelectorAll('input[name="vsrc"]'), function(r){
   r.addEventListener('change', function(){ if(this.checked){ VOICE_SRC=this.value; applyVoiceSrc(); } });
+});
+// 语言切换：改 LANG、高亮、重填音色下拉
+Array.prototype.forEach.call(document.querySelectorAll('input[name="lecLang"]'), function(r){
+  r.addEventListener('change', function(){
+    if(!this.checked) return;
+    LANG=this.value;
+    ['langZh','langEn','langJa','langFr'].forEach(function(id){ var el=$(id); if(el) el.classList.toggle('sel', id==='lang'+LANG.charAt(0).toUpperCase()+LANG.slice(1)); });
+    fillAzureSelects();
+  });
 });
 // Azure Key/区域 本地持久化（input/change/blur 都存——粘贴也存得住）
 function saveAzureCreds(showTip){
