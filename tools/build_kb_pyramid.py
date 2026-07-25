@@ -75,11 +75,44 @@ def build_mid():
                 "links": e.get("links", {}),        # 保留 canon 内部互链（中期条目之间也能跳）
                 "docs": docs,
             })
+    # 语义借链：有的条目（多为命题）自身 sources 空、没有直接文章；但它通过 links 连着有文章的概念/理论。
+    #   顺着编纂好的 links 借来相连条目的代表文章——这是语义关联（沿本体论连接借），不是词匹配。
+    by_id = {e["id"]: e for e in entries}
+    borrowed = 0
+    for e in entries:
+        if e["docs"]:
+            continue
+        links = e.get("links") or {}
+        got = []
+        seen = set()
+        for k in links:
+            arr = links[k]
+            if not isinstance(arr, list):
+                continue
+            for lid in arr:
+                tgt = by_id.get(lid)
+                if not tgt or not tgt["docs"]:
+                    continue
+                for d in tgt["docs"]:
+                    if d["u"] not in seen:
+                        seen.add(d["u"])
+                        got.append({"u": d["u"], "t": d["t"], "via": tgt["name"]})
+                    if len(got) >= DOCS_PER_ENTRY:
+                        break
+                if len(got) >= DOCS_PER_ENTRY:
+                    break
+            if len(got) >= DOCS_PER_ENTRY:
+                break
+        if got:
+            e["docs"] = got
+            e["borrowed"] = True   # 标记：文章是顺 links 借来的，非自身 sources
+            borrowed += 1
+
     obj = {"built": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
            "count": len(entries), "entries": entries}
     json.dump(obj, open(os.path.join(KBDIR, "mid.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=0)
     total_docs = sum(len(x["docs"]) for x in entries)
-    print("  ✓ mid.json：%d 个中期条目，挂 %d 条文章链接" % (len(entries), total_docs))
+    print("  ✓ mid.json：%d 个中期条目，挂 %d 条文章链接（其中 %d 条经语义 links 借链补全）" % (len(entries), total_docs, borrowed))
     return entries
 
 
@@ -112,30 +145,33 @@ LONG_SYS = """你是 SDE（显露 Show·差异 Difference·纠缠 Entanglement�
 
 
 def build_long(mid_entries):
+    """长期册 = Claude 人工编纂的 100 条总原则（读 sde_long_principles.py），非基底自动生成。
+    纲领：三层的连接/次序/结构由 Claude 编纂，软件只做校验与落盘。"""
     if not mid_entries:
         print("中期为空，先建中期。", file=sys.stderr); return
-    # 给 LLM 的清单：id｜类型｜名称：定义
-    lines = ["%s｜%s｜%s：%s" % (e["id"], e["kind"], e["name"], e["def"]) for e in mid_entries]
-    digest = "\n".join(lines)
-    valid_ids = set(e["id"] for e in mid_entries)
-    print("长期：喂 %d 个中期条目（%d 字），调基底沉淀 100 条总原则并连线…" % (len(mid_entries), len(digest)))
-    raw = call(LONG_SYS, "【中期条目清单】\n" + digest, 16000)
-    raw = re.sub(r"^```(json)?|```$", "", raw.strip(), flags=re.M).strip()
     try:
-        obj = json.loads(raw)
-        principles = obj.get("principles", obj if isinstance(obj, list) else [])
+        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+        from sde_long_principles import PRINCIPLES
     except Exception as ex:
-        print("长期返回解析失败：%s\n前 200 字：%s" % (ex, raw[:200]), file=sys.stderr); return
-    # 清洗：只保留合法 mid id
-    clean = []
-    for p in principles:
-        mids = [m for m in (p.get("mids") or []) if m in valid_ids]
-        clean.append({"n": p.get("n"), "text": str(p.get("text", "")).strip(), "mids": mids})
+        print("读不到人工编纂源 sde_long_principles.py：%s" % ex, file=sys.stderr); return
+    valid_ids = set(e["id"] for e in mid_entries)
+    clean, dropped = [], []
+    for n, text, mids in PRINCIPLES:
+        good = [m for m in mids if m in valid_ids]
+        dropped.extend([m for m in mids if m not in valid_ids])
+        clean.append({"n": n, "text": text.strip(), "mids": good})
     linked = sum(1 for p in clean if p["mids"])
+    covered = set()
+    for p in clean:
+        covered.update(p["mids"])
+    uncovered = sorted(valid_ids - covered)
     out = {"built": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
-           "count": len(clean), "principles": clean}
+           "count": len(clean), "authored": "Claude (SDE 本体论人工编纂)", "principles": clean}
     json.dump(out, open(os.path.join(KBDIR, "long.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=0)
-    print("  ✓ long.json：%d 条原则，其中 %d 条连到了中期条目" % (len(clean), linked))
+    print("  ✓ long.json：%d 条原则（人工编纂），%d 条连到中期条目" % (len(clean), linked))
+    if dropped:
+        print("    ⚠ 非法 mid id（已剔除）：", sorted(set(dropped)))
+    print("    中期覆盖：%d/%d 被统摄，未覆盖 %d 个%s" % (len(covered), len(valid_ids), len(uncovered), ("：" + str(uncovered)) if uncovered else ""))
 
 
 if __name__ == "__main__":
@@ -146,7 +182,5 @@ if __name__ == "__main__":
     if do_mid or do_long:
         mid_entries = build_mid()   # 纯组装，无需 Key
     if do_long:
-        if not KEY:
-            print("缺 SDE_LABEL_KEY（建长期要调基底）。中期已建好。", file=sys.stderr); sys.exit(1)
-        build_long(mid_entries)
+        build_long(mid_entries)     # 人工编纂源，无需 Key
     print("完成。三层链：long.principles[].mids → mid.entries[].id → mid.entries[].docs[].u")
