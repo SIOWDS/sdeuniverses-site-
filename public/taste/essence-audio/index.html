@@ -371,7 +371,7 @@ select:focus,input:focus{border-color:var(--accent)}
       <button class="btn sec" id="btnApplySubmit" type="button">📮 应用性投稿</button>
       <span id="applyStatus" class="statusline" style="margin:0"></span>
     </div>
-    <div class="cloudhint" style="margin-top:4px">把本次讲解稿打包投进学员投稿箱（云端音色时自动附上 MP3 音频），作为原文的「大众应用与音频」功能扩充——审核后挂到原文页。</div>
+    <div class="cloudhint" style="margin-top:4px">把本次讲解稿连同 <b>Azure 情感音频 MP3</b> 打包投进学员投稿箱，作为原文的「大众应用与音频」功能扩充——审核后挂到原文页。<b>必须用云端音色</b>（页首「语音系统」切云端并填密钥），没有情感音频不能投。</div>
     <div id="playErr" class="err"></div>
   </div>
 </div>
@@ -1622,6 +1622,7 @@ async function applySubmit(){
   if(applyBusy) return;
   var st=$('applyStatus');
   if(!lastDialogue){ st.textContent='还没有讲解稿——先生成，再投稿。'; return; }
+  if(VOICE_SRC!=='cloud'){ st.textContent='应用性投稿必须附 Azure 情感音频——请在页首「语音系统」切到云端音色（填好区域和密钥）后再投。'; return; }
   var student=($('applyStudent').value||'').trim();
   var pass=$('applyPass').value||'';
   if(!student){ st.textContent='请填投稿人（学员名）。'; return; }
@@ -1629,22 +1630,17 @@ async function applySubmit(){
   applyBusy=true; $('btnApplySubmit').disabled=true;
   try{
     localStorage.setItem('sde_apply_student', student);
-    // ① 音频：云端音色才有；稿子没变则复用缓存，否则现场合成+归一；失败只投文稿
-    var mp3=null, mp3Note='仅文稿';
-    if(VOICE_SRC==='cloud'){
-      if(lastMp3Blob && lastMp3Text===lastDialogue){ mp3=lastMp3Blob; }
-      else{
-        try{
-          st.textContent='正在合成音频…';
-          mp3=await synthAllToBlob();
-          try{ var nz=await normalizeMp3Blob(mp3, function(s){ st.textContent=s; }); if(nz&&nz.blob) mp3=nz.blob; }catch(e2){}
-          if(mp3){ lastMp3Blob=mp3; lastMp3Text=lastDialogue; }
-        }catch(eA){ mp3=null; }
-      }
-      if(mp3 && mp3.size>23*1024*1024){ mp3=null; mp3Note='音频超25MB上限，只投文稿'; }
-      else if(mp3){ mp3Note='含音频'; }
-      else if(mp3Note==='仅文稿'){ mp3Note='音频合成失败，只投文稿'; }
+    // ① 音频：应用性投稿必须附 Azure 情感音频——稿子没变复用缓存，否则现场合成+归一；合成失败/超限一律不许投
+    var mp3=null, mp3Note='含音频';
+    if(lastMp3Blob && lastMp3Text===lastDialogue){ mp3=lastMp3Blob; }
+    else{
+      st.textContent='正在合成 Azure 情感音频…';
+      mp3=await synthAllToBlob();   // 失败直接抛错→外层 catch 显示原因，不投
+      try{ var nz=await normalizeMp3Blob(mp3, function(s){ st.textContent=s; }); if(nz&&nz.blob) mp3=nz.blob; }catch(e2){}
+      if(mp3){ lastMp3Blob=mp3; lastMp3Text=lastDialogue; }
     }
+    if(!mp3) throw new Error('Azure 音频合成失败——应用性投稿必须附情感音频，本次未投递。');
+    if(mp3.size>23*1024*1024) throw new Error('音频约 '+Math.round(mp3.size/1048576)+'MB，超过投稿 25MB 上限——换较短篇幅重新生成后再投（应用性投稿必须附音频，不能只投文稿）。');
     // ② 打包 ZIP：讲解稿.txt + 音频.mp3 + 投稿说明.json
     st.textContent='正在打包…';
     await ensureJSZip();
@@ -1657,7 +1653,7 @@ async function applySubmit(){
       type:'应用性投稿（大众应用与音频扩充）', 投稿人:student,
       原文标题:(chosenDoc?chosenDoc.title:''), 原文链接:(chosenDoc&&chosenDoc.url)?chosenDoc.url:'（上传的站外文章）',
       讲法:(MODE==='solo'?'单人讲解':'男女对话'), 目标篇幅:curWc(), 语言:LANG,
-      成品标题:(lastTitle||''), 含音频:!!mp3, 生成时间:new Date().toISOString()
+      成品标题:(lastTitle||''), 含音频:true, 音频:'Azure情感音频(已响度归一)', 生成时间:new Date().toISOString()
     }, null, 2));
     var blob=await zip.generateAsync({type:'blob', compression:'DEFLATE', compressionOptions:{level:6}});
     if(blob.size>25*1024*1024) throw new Error('打包后超过 25MB 上限，试试较短篇幅或系统语音（不含音频）再投。');
