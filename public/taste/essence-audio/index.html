@@ -673,7 +673,7 @@ async function callMsgs(sel, apiKey, systemPrompt, history, maxTokens, label){
   if(j && j.error){ throw new Error((label?label+'：':'')+'接口报错：'+(j.error.message||j.error.code||'未知')); }
   return extractFull(vendor, j).text;
 }
-/* ========== 智慧讲解 · 应用逻辑（复用 uplift-compare 的基底基础设施，上面已内联） ========== */
+/* ========== 智慧讲解和再创 · 应用逻辑（复用 uplift-compare 的基底基础设施，上面已内联） ========== */
 
 // —— 心得（本场一次，按基底缓存）——
 var xinde='', xindeVendor='';
@@ -908,7 +908,21 @@ function langDirective(){
     + "唯一例外：程序用的格式标记（说话人前缀 `男`/`女`、竖线 `|`、语气标签如 cheerful/serious、方括号 `[style]`、中文冒号 `：`）保持原样不翻译，只有冒号后面的正文用 " + m.writeIn + "。"
     + "不要中外夹杂，不要加译文对照，直接用 " + m.writeIn + " 讲。\n";
 }
-function lecSystem(mode, xinde, siteCtx, drama, soloStyle, domain, external){
+// —— 篇幅 → 字数/时长/结构档：系统提示、用户提示、UI 徽章共用一个口径，防三处打架 ——
+function curWc(){ return parseInt((document.querySelector('input[name="lecLen"]:checked')||{}).value||'2000',10)||2000; }
+function lenMeta(wc){
+  wc=parseInt(wc,10)||2000;
+  var w = wc>=10000 ? (wc/10000)+' 万字' : wc+' 字';
+  var min = Math.max(4, Math.round(wc/300));   // 中文朗读约 300 字/分钟
+  var seg = wc<=2000  ? '一气呵成，不必分小节'
+          : wc<=5000  ? '分 3–4 个层次推进，每层都要落到实处'
+          : wc<=10000 ? '分 5–7 个层次层层推进，每层都要有新的东西，不许把同一个意思换词重说'
+          :             '分 8–12 个层次层层推进，每层都要有新的东西、新的例子；宁可多举实例、多做展开，也不许把同一个意思换词重说来凑字数';
+  return { wc:wc, words:w, min:min, seg:seg };
+}
+function lecSystem(mode, xinde, siteCtx, drama, soloStyle, domain, external, wc){
+  var LM=lenMeta(wc);
+  var TASKN = external ? '六件事' : '四件事';
   var head = PRIOR
     + "\n\n════════ 你本场已内化的学习心得（思考底盘，讲解时真用它，别向听众复述心得本身）════════\n" + (xinde||'')
     + "\n\n════════ 你答/讲每一段的工序（方法论指引）════════\n" + METHOD_GUIDE
@@ -940,7 +954,7 @@ function lecSystem(mode, xinde, siteCtx, drama, soloStyle, domain, external){
       + "【文体情调】" + ss.tone + "\n"
       + common
       + dramaGuide(drama)
-      + "【长度与结构】：整篇约 2000 字（中文），读出来大约 5 分钟。开头一两句点出今天要讲的这篇文章、它为什么值得讲；中间按上面四件事层层展开；结尾一句话收束、留个回味。\n"
+      + "【长度与结构·硬要求】：整篇约 "+LM.words+"（中文），读出来大约 "+LM.min+" 分钟。这是硬指标，写短了算不合格。开头一两句点出今天要讲的这篇文章、它为什么值得讲；中间按上面那"+TASKN+"层层展开，"+LM.seg+"；结尾一句话收束、留个回味。\n"
       + "【输出格式·必须严格遵守】：连贯的讲解散文，自然分段（段与段之间空一行）。每一段开头加一个方括号标签，里面是「语气|语速」，按这段语义决定，例：`[narration-relaxed|normal] 今天要讲的这篇……`、`[serious|slow] 但这里有个难处……`。语气标签只能从这几个里选：general、cheerful、gentle、narration-relaxed、serious、newscast、lyrical；语速档三选一：slow(放慢·沉思/难点/动情/回味)、normal(常速)、fast(加快·激昂/紧张/罗列/推进)。【要有明显变化】：开头点题用 cheerful 或 general、讲严峻/尖锐处用 serious、温情处用 gentle、升华收束用 lyrical，别每段都一个调。不要出现说话人名字或『男：』『女：』，不要写标题、不要用 Markdown、不要加编号。直接开始讲。";
   }
   // duo（男女对话，默认）
@@ -950,7 +964,7 @@ function lecSystem(mode, xinde, siteCtx, drama, soloStyle, domain, external){
     + common
     + dramaGuide(drama)
     + "【对话感】：女嘉宾讲完一个点，男主持人要用『你是说…？』『这就好比…？』来接、来确认、来追问，让对话真的往前走，而不是各说各话。\n"
-    + "【长度】：整篇对话体讲解稿约 2000 字（中文），读出来大约 5 分钟。开头男主持人用一两句话把今天要讲的文章点出来，结尾女嘉宾用一句话收束。\n"
+    + "【长度·硬要求】：整篇对话体讲解稿约 "+LM.words+"（中文），读出来大约 "+LM.min+" 分钟。这是硬指标，写短了算不合格，"+LM.seg+"。开头男主持人用一两句话把今天要讲的文章点出来，结尾女嘉宾用一句话收束。\n"
     + "【输出格式·必须严格遵守，供程序切分与配语气】：每一句发言单独一行；行首先写说话人 `男` 或 `女`，紧跟竖线 `|`、这句话的语气标签、再一个竖线 `|`、这句话的语速档，再一个中文冒号 `：`，然后是内容。语速档三选一：`slow`(放慢·用于沉思/难点/动情/需要回味处)、`normal`(常速)、`fast`(加快·用于激昂/紧张/罗列/推进处)。例：`男|cheerful|fast：你是说……？`、`女|serious|slow：它真正难的地方在于……`。\n"
     + "【语气标签只能从这几个里选，按这句话的语义 / 语句 / 语法来定】：general(中性)、cheerful(欢快·多用于提问和轻松处)、gentle(温柔)、narration-relaxed(舒缓讲述·多用于讲解重点)、serious(严肃·讲难点或下判断)、newscast(播报·陈述事实)、lyrical(抒情·结尾升华)、customerservice(亲切)。【关键要求：语气要有明显变化和对比，不要一味用 narration-relaxed，那样听起来很平】——男主持人的提问、惊讶、调侃用 cheerful；女嘉宾讲到激动人心或正面的点用 cheerful 或 lyrical；讲到严峻 / 尖锐 / 下判断的地方一定用 serious；温情、安慰、收束用 gentle；陈述客观事实用 general 或 newscast；抒情升华用 lyrical。相邻的句子尽量用不同的语气，让整段有起伏。一段对话里至少要出现 4 种不同的语气标签。\n"
     + "不要写旁白、不要写标题、不要用 Markdown、不要加编号。直接从第一行 `男|...：` 开始。";
@@ -1168,7 +1182,8 @@ async function generate(){
     DRAMA=($('dramaMode')&&$('dramaMode').value)||'';
     SOLO_STYLE=($('soloStyle')&&$('soloStyle').value)||'';
     var APPDOMAIN=($('appDomain')&&$('appDomain').value)||'';
-    var sys=lecSystem(MODE, xinde, rag.ctx, DRAMA, SOLO_STYLE, APPDOMAIN, isExt);
+    var wc=curWc();
+    var sys=lecSystem(MODE, xinde, rag.ctx, DRAMA, SOLO_STYLE, APPDOMAIN, isExt, wc);
     if(MODE==='solo'){
       var author=($('authorName')&&$('authorName').value||'').trim();
       var work=($('authorWork')&&$('authorWork').value||'').trim().replace(/^[《<]|[》>]$/g,'');
@@ -1184,17 +1199,16 @@ async function generate(){
       }
     }
     var styLabel=(SOLO_STYLE&&$('soloStyle'))?($('soloStyle').options[$('soloStyle').selectedIndex].text.split('（')[0]):'深情解读';
-    var wc=parseInt((document.querySelector('input[name="lecLen"]:checked')||{}).value||'2000',10);
     var TOKmap={2000:24000, 5000:48000, 10000:80000, 20000:130000};
     var maxTok=TOKmap[wc]||24000;
     var userTitle=($('lecTitle')&&$('lecTitle').value||'').trim();
     var titleReq = userTitle
       ? ('【标题】本篇标题定为《'+userTitle+'》，请紧扣这个标题来写，并在正文最前面单独一行输出：标题：'+userTitle)
       : '【标题】请你根据成品内容，自拟一个贴切、有吸引力的标题，放在正文最前面单独一行，格式：标题：你起的标题';
-    var lenPhrase='约 '+wc+' 字';
+    var lenPhrase='约 '+lenMeta(wc).words+'（不少于 '+Math.round(wc*0.85)+' 字）';
     var tail=(MODE==='solo')
-      ? ('请据此，按你的任务与【'+styLabel+'】这个文体的写法和情调，写出'+lenPhrase+'的单人朗读作品。'+titleReq+'。标题那一行之后空一行再开始正文；正文每段按语义在段首标一个方括号语气标签，不要任何说话人标记。')
-      : ('请据此，按你的任务与格式要求，写出'+lenPhrase+'的男女对话体讲解稿。'+titleReq+'（标题单独一行"标题：…"，之后再从对话第一行开始）；每句按 `男|语气：` / `女|语气：` 的格式、按语义给每句配语气标签。');
+      ? ('请据此，按你的任务与【'+styLabel+'】这个文体的写法和情调，写出'+lenPhrase+'的单人朗读作品。'+titleReq+'。标题那一行之后空一行再开始正文；正文分段，段与段之间空一行；每段段首标一个 `[语气|语速]` 方括号标签（语气和语速两段都要写，例 `[serious|slow]`），不要任何说话人标记。')
+      : ('请据此，按你的任务与格式要求，写出'+lenPhrase+'的男女对话体讲解稿。'+titleReq+'（标题单独一行"标题：…"，之后再从对话第一行开始）；每句单独一行，按 `男|语气|语速：` / `女|语气|语速：` 的三段格式（语气和语速都要写，例 `男|cheerful|fast：`），按语义给每句配。');
     var userMsg='【要讲解的文章标题】'+chosenDoc.title+'\n【目标篇幅】'+lenPhrase+'\n【原文如下】\n\n'+full+'\n\n'+tail;
     var out=await callMsgs(pf.sel, pf.key, sys, [{role:'user', content:userMsg}], maxTok, '讲解稿');
     lastDialogue=out;
@@ -1217,7 +1231,14 @@ function okRate(r){ r=(r||'').trim().toLowerCase(); return (r==='slow'||r==='fas
 function parseContent(text, mode){
   var out=[];
   if(mode==='solo'){
-    var paras=String(text||'').split(/\n\s*\n/).map(function(s){return s.trim();}).filter(Boolean);
+    var paras=[];
+    String(text||'').split(/\n\s*\n/).forEach(function(b){
+      // 模型常只用单换行分段：块内若还有以 [语气] 开头的行，按这些行再切一次，
+      // 否则整篇会塌成一条，后面的 [serious|slow] 标签会被当正文念出来
+      b.split(/\n(?=\s*\[\s*[a-zA-Z\-]+\s*(?:\|[^\]\n]*)?\]\s*)/).forEach(function(s){
+        s=s.trim(); if(s) paras.push(s);
+      });
+    });
     paras.forEach(function(p){
       var st='', rt='';
       // [style] 或 [style|rate]（rate=slow/fast/normal）
@@ -1226,7 +1247,7 @@ function parseContent(text, mode){
       p=p.replace(/^(男|女|主持人|嘉宾)\s*[：:]\s*/,'');
       out.push({who:'n', text:p, style:st, rate:rt});
     });
-    return out;
+    return chunkTurns(out);
   }
   var lines=String(text||'').split(/\n+/);
   for(var i=0;i<lines.length;i++){
@@ -1236,6 +1257,26 @@ function parseContent(text, mode){
     if(m){ out.push({who: m[1]==='男'?'m':'f', text:m[4].trim(), style: okStyle(m[2]), rate: okRate(m[3])}); }
     else if(out.length){ out[out.length-1].text += (out[out.length-1].text?' ':'') + ln; }
   }
+  return chunkTurns(out);
+}
+// 单条太长 → 按句末切成多条（沿用同一 who/style/rate）：高亮更细，
+// 也避免云端 Azure 单次合成的文本过长（20000 字档一段可能上千字）
+var MAX_TURN=700;
+function chunkTurns(list){
+  var out=[];
+  (list||[]).forEach(function(t){
+    var txt=t.text||'';
+    if(txt.length<=MAX_TURN){ if(txt) out.push(t); return; }
+    var sents=txt.replace(/\n+/g,' ').match(/[^。！？；!?;]*[。！？；!?;]+|[^。！？；!?;]+$/g)||[txt];
+    var parts=[];
+    sents.forEach(function(s){ while(s.length>MAX_TURN){ parts.push(s.slice(0,MAX_TURN)); s=s.slice(MAX_TURN); } if(s) parts.push(s); });
+    var buf='';
+    parts.forEach(function(s){
+      if(buf && (buf+s).length>MAX_TURN){ out.push({who:t.who,text:buf,style:t.style,rate:t.rate}); buf=s; }
+      else buf+=s;
+    });
+    if(buf) out.push({who:t.who,text:buf,style:t.style,rate:t.rate});
+  });
   return out;
 }
 var lastTitle='';
@@ -1261,11 +1302,28 @@ function renderDialogue(text){
 
 /* ---- 保存 / 复制 ---- */
 function copyText(){ if(!lastDialogue) return; navigator.clipboard.writeText(lastDialogue).then(function(){ var b=$('btnCopy'); b.textContent='已复制'; setTimeout(function(){b.textContent='复制文本';},1500); }); }
+// 这次「再创」的完整元数据文件头（下载与保存到目录共用一份，防两处走样）
+function reHead(){
+  var langName=(LANG_META[LANG]||LANG_META.zh).name;
+  var styleName=(MODE==='solo'&&$('soloStyle'))?($('soloStyle').options[$('soloStyle').selectedIndex].text.split('（')[0]):'';
+  var lenSel=document.querySelector('input[name="lecLen"]:checked');
+  var auth=($('authorName')&&$('authorName').value||'').trim();
+  var wrk=($('authorWork')&&$('authorWork').value||'').trim().replace(/^[《<]|[》>]$/g,'');
+  return '【智慧讲解和再创】'
+    + '\n标题：'+(lastTitle||'（未命名）')
+    + '\n原文：'+(chosenDoc?chosenDoc.title:'')
+    + '\n语言：'+langName
+    + '\n讲法：'+(MODE==='solo'?('单人讲解'+(styleName?('·'+styleName):'')):'男女对话')
+    + (lenSel?('\n篇幅：'+lenSel.value+' 字'):'')
+    + (auth?('\n模仿作家：'+auth+(wrk?('《'+wrk+'》'):'')):'')
+    + '\n时间：'+new Date().toLocaleString()
+    + '\n\n';
+}
 function downloadText(){
   if(!lastDialogue) return;
   var name=((lastTitle||(chosenDoc?chosenDoc.title:'讲解稿'))).replace(/[\\/:*?"<>|·\s]/g,'-').slice(0,40);
-  var blob=new Blob(['【智慧讲解 · 男女对话体讲解稿】\n文章：'+(chosenDoc?chosenDoc.title:'')+'\n\n'+lastDialogue], {type:'text/plain;charset=utf-8'});
-  var a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='智慧讲解-'+name+'.txt';
+  var blob=new Blob([reHead()+lastDialogue], {type:'text/plain;charset=utf-8'});
+  var a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='智慧讲解和再创-'+name+'.txt';
   document.body.appendChild(a); a.click(); setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); },100);
 }
 
@@ -1335,24 +1393,8 @@ async function saveToDir(){
   savingNow=true; $('btnSaveDir').disabled=true;
   var name=((lastTitle||(chosenDoc?chosenDoc.title:'讲解稿'))).replace(/[\\/:*?"<>|·\s]/g,'-').slice(0,40);
   var ts=new Date(); var stamp=ts.getFullYear()+String(ts.getMonth()+1).padStart(2,'0')+String(ts.getDate()).padStart(2,'0')+'-'+String(ts.getHours()).padStart(2,'0')+String(ts.getMinutes()).padStart(2,'0');
-  var base='智慧讲解-'+name+'-'+stamp;
-  // —— 组装文件头：记下这次「再创」的完整信息 ——
-  var langName=(LANG_META[LANG]||LANG_META.zh).name;
-  var styleName = (MODE==='solo' && typeof $('soloStyle')!=='undefined' && $('soloStyle')) ? ($('soloStyle').options[$('soloStyle').selectedIndex].text.split('（')[0]) : '';
-  var lenSel=document.querySelector('input[name="lecLen"]:checked');
-  var lenTxt=lenSel? (lenSel.value+' 字') : '';
-  var auth=($('authorName')&&$('authorName').value||'').trim();
-  var wrk=($('authorWork')&&$('authorWork').value||'').trim().replace(/^[《<]|[》>]$/g,'');
-  var authLine = auth ? ('\n模仿作家：'+auth+(wrk?('《'+wrk+'》'):'')) : '';
-  var head='【智慧讲解和再创】'
-    + '\n标题：'+(lastTitle||'（未命名）')
-    + '\n原文：'+(chosenDoc?chosenDoc.title:'')
-    + '\n语言：'+langName
-    + '\n讲法：'+(MODE==='solo'?('单人讲解'+(styleName?('·'+styleName):'')):'男女对话')
-    + (lenTxt?('\n篇幅：'+lenTxt):'')
-    + authLine
-    + '\n时间：'+ts.toLocaleString()
-    + '\n\n';
+  var base='智慧讲解和再创-'+name+'-'+stamp;
+  var head=reHead();
   var txtBlob=new Blob([head+lastDialogue], {type:'text/plain;charset=utf-8'});
   try{
     // 音频：仅云端可存
@@ -1690,14 +1732,14 @@ function rescanVoices(){
 
 /* ===== 试听 30 秒：用当前所选声音念一小段示范，先听听效果 ===== */
 var PREVIEW_DUO = [
-  {who:'m', text:'欢迎来到智慧讲解，先听听我们俩的声音效果。'},
+  {who:'m', text:'欢迎来到智慧讲解和再创，先听听我们俩的声音效果。'},
   {who:'f', text:'我负责把文章讲透。正式开讲时，我会用生活里的例子，把复杂的道理讲成大白话。'},
   {who:'m', text:'我负责替你追问——遇到不好懂的地方，替听众问一句：这到底什么意思？'},
   {who:'f', text:'再抽象的观点，我都会配个做饭、开车、看病的比方，让你一下就懂。'},
   {who:'m', text:'觉得声音满意，就去搜篇文章正式开始；想换声音，点旁边安装按钮。'}
 ];
 var PREVIEW_SOLO = [
-  {who:'n', text:'欢迎来到智慧讲解。这段三十秒的试听，是让你先感受一下讲解者的声音。'},
+  {who:'n', text:'欢迎来到智慧讲解和再创。这段三十秒的试听，是让你先感受一下讲解者的声音。'},
   {who:'n', text:'正式开讲时，我会像一位把文章彻底读透的人，从头到尾把它讲清楚、讲透。'},
   {who:'n', text:'再抽象的道理，我都会配上做饭、开车、看病这样的生活例子，让你听着不费劲。'},
   {who:'n', text:'如果这个声音你听着舒服，就去搜一篇文章，我们正式开始；想换个音色，点旁边的安装按钮就行。'}
@@ -1861,7 +1903,8 @@ function applyMode(){
   Array.prototype.forEach.call(document.querySelectorAll('.duoVoice'), function(el){ el.style.display = solo ? 'none' : 'flex'; });
   // 第三步标题
   var badge=document.querySelector('#stagePlay .step-badge');
-  if(badge) badge.textContent = solo ? '第三步 · 单声朗读（约 5 分钟）' : '第三步 · 男女双声朗读（约 5 分钟）';
+  var mm=lenMeta(curWc()).min;
+  if(badge) badge.textContent = (solo ? '第三步 · 单声朗读（约 ' : '第三步 · 男女双声朗读（约 ') + mm + ' 分钟）';
 }
 Array.prototype.forEach.call(document.querySelectorAll('input[name="lecmode"]'), function(r){
   r.addEventListener('change', function(){ if(this.checked){ MODE=this.value; applyMode(); } });
@@ -1872,13 +1915,11 @@ initAuthorPickers();
 Array.prototype.forEach.call(document.querySelectorAll('input[name="lecLen"]'), function(r){
   r.addEventListener('change', function(){
     Array.prototype.forEach.call(document.querySelectorAll('.lenopt'), function(l){ var inp=l.querySelector('input'); l.classList.toggle('sel', !!(inp&&inp.checked)); });
-    updateGenLabel();
+    applyMode();   // 连带刷新第三步徽章的时长
   });
 });
 function updateGenLabel(){
-  var wc=(document.querySelector('input[name="lecLen"]:checked')||{}).value||'2000';
-  var txt = wc==='10000'?'1 万字':(wc==='20000'?'2 万字':(wc+' 字'));
-  var b=$('btnGen'); if(b) b.textContent='生成约 '+txt+(MODE==='solo'?'单人讲解稿 →':'讲解稿 →');
+  var b=$('btnGen'); if(b) b.textContent='生成约 '+lenMeta(curWc()).words+(MODE==='solo'?'单人讲解稿 →':'讲解稿 →');
 }
 updateGenLabel();
 applyMode();
