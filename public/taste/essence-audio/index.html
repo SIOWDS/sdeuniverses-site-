@@ -133,11 +133,13 @@ select:focus,input:focus{border-color:var(--accent)}
     <div class="voicehdr">🔊 语音（男女声）系统 <span class="voicehdr-sub">先装好中文男 / 女声、试听效果，再去下面生成讲解稿</span></div>
     <div class="voicecheck" style="margin-top:6px;padding-top:0;border-top:none">
       <div id="voiceReport" class="vreport">正在检测本机中文语音…</div>
+      <div id="vtStatus" class="vreport" style="margin-top:4px;color:var(--gold2)"></div>
       <div class="toolbar" style="margin-top:8px">
-        <button class="btn sec" id="btnPreview" type="button">🎧 试听 30 秒</button>
+        <button class="btn" id="btnDlgTest" type="button">👫 男女声对话测试</button>
+        <button class="btn sec" id="btnPreview" type="button">🎧 按当前讲法试听</button>
         <button class="btn sec" id="btnInstallVoices" type="button">🔊 安装男女声系统</button>
         <button class="mini" id="btnRescan" type="button">↻ 重新检测</button>
-        <button class="mini" id="btnPreviewStop" type="button" disabled>■ 停止试听</button>
+        <button class="mini" id="btnPreviewStop" type="button" disabled>■ 停止</button>
       </div>
     </div>
   </div>
@@ -894,6 +896,17 @@ var PREVIEW_SOLO = [
   {who:'n', text:'再抽象的道理，我都会配上做饭、开车、看病这样的生活例子，让你听着不费劲。'},
   {who:'n', text:'如果这个声音你听着舒服，就去搜一篇文章，我们正式开始；想换个音色，点旁边的安装按钮就行。'}
 ];
+// 专用：男女声对话测试脚本（固定一男一女来回，无论当前讲法模式）
+var DIALOGUE_TEST = [
+  {who:'m', text:'来做个男女声对话测试。我是男声，负责主持。'},
+  {who:'f', text:'我是女声，负责讲解。你现在听到的，就是正式开讲时我们俩来回对话的效果。'},
+  {who:'m', text:'比如我会这样追问：你说的这个观点，跟日常生活有什么关系？'},
+  {who:'f', text:'我就会打个比方回答你——就像做饭，火候到了菜才香；道理讲到点子上，人才听得进去。'},
+  {who:'m', text:'一问一答，你一句我一句，是不是像两个人在聊天？'},
+  {who:'f', text:'对。如果这两个声音听着自然、分得清男女，就说明你的设备男女声都装好了。'},
+  {who:'m', text:'要是听着是同一个声音、分不出男女，就点「安装男女声系统」，按你的设备装上中文男声和女声。'},
+  {who:'f', text:'装好之后回来再测一次就行。准备好了，就去下面搜一篇文章，正式开讲。'}
+];
 var previewToken=0, previewing=false;
 function previewVoices(){
   if(!ttsOK){ $('playErr').textContent='你的浏览器不支持语音朗读，可换用较新的 Chrome / Edge / Safari。'; $('playErr').style.display='block'; return; }
@@ -908,7 +921,7 @@ function previewVoices(){
     if(idx>=script.length){ endPreview('✓ 试听结束'); return; }
     var t=script[idx];
     var tag = t.who==='m'?'♂ 男声':(t.who==='f'?'♀ 女声':'🎙 讲解者');
-    $('playStatus').textContent='试听中 · '+tag;
+    if($('vtStatus')) $('vtStatus').textContent='试听中 · '+tag; else $('playStatus').textContent='试听中 · '+tag;
     var u=new SpeechSynthesisUtterance(t.text);
     var v = t.who==='m'?vm:(t.who==='f'?vf:vs);
     if(v){ u.voice=v; u.lang=v.lang; } else { u.lang='zh-CN'; }
@@ -922,9 +935,40 @@ function previewVoices(){
 function endPreview(msg){
   previewing=false;
   $('btnPreview').disabled=false; $('btnPreviewStop').disabled=true;
-  if(msg) $('playStatus').textContent=msg;
+  var dt=$('btnDlgTest'); if(dt) dt.disabled=false;
+  if(msg && $('vtStatus')) $('vtStatus').textContent=msg;
 }
 function stopPreview(){ previewToken++; if(synth) synth.cancel(); endPreview('已停止试听'); }
+
+// 男女声对话测试：固定播放一段男女来回对话（与当前讲法模式无关）
+function dialogueTest(){
+  if(!ttsOK){ $('playErr').textContent='你的浏览器不支持语音朗读，可换用较新的 Chrome / Edge / Safari。'; $('playErr').style.display='block'; return; }
+  $('playErr').style.display='none';
+  synth.cancel(); previewToken++; var my=previewToken; previewing=true;
+  $('btnDlgTest').disabled=true; $('btnPreview').disabled=true; $('btnPreviewStop').disabled=false;
+  var vm=pickVoice('m'), vf=pickVoice('f');
+  var idx=0;
+  function step(){
+    if(my!==previewToken) return;
+    if(idx>=DIALOGUE_TEST.length){ endTest('✓ 男女声对话测试结束'); return; }
+    var t=DIALOGUE_TEST[idx];
+    $('playStatus') && ($('playStatus').textContent='');
+    $('vtStatus').textContent='测试中 · 第 '+(idx+1)+'/'+DIALOGUE_TEST.length+' 句（'+(t.who==='m'?'♂ 男声':'♀ 女声')+'）';
+    var u=new SpeechSynthesisUtterance(t.text);
+    var v=t.who==='m'?vm:vf;
+    if(v){ u.voice=v; u.lang=v.lang; } else { u.lang='zh-CN'; }
+    u.rate=1.0; u.pitch=t.who==='m'?0.92:1.12;
+    u.onend=function(){ if(my!==previewToken) return; idx++; step(); };
+    u.onerror=function(){ if(my!==previewToken) return; idx++; step(); };
+    synth.speak(u);
+  }
+  step();
+}
+function endTest(msg){
+  previewing=false;
+  $('btnDlgTest').disabled=false; $('btnPreview').disabled=false; $('btnPreviewStop').disabled=true;
+  if(msg && $('vtStatus')) $('vtStatus').textContent=msg;
+}
 
 function fillVoiceSel(sel, pool){
   while(sel.options.length>1) sel.remove(1);
@@ -1027,6 +1071,7 @@ $('installMask').addEventListener('click', function(e){ if(e.target===this) clos
 $('btnRescan').addEventListener('click', rescanVoices);
 $('btnRescan2').addEventListener('click', rescanVoices);
 $('btnPreview').addEventListener('click', previewVoices);
+$('btnDlgTest').addEventListener('click', dialogueTest);
 $('btnPreviewStop').addEventListener('click', stopPreview);
 renderVoiceReport();
 
