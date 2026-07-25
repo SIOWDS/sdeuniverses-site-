@@ -176,8 +176,10 @@ select:focus,input:focus{border-color:var(--accent)}
     <div class="voicecheck">
       <div id="voiceReport" class="vreport">正在检测本机中文语音…</div>
       <div class="toolbar" style="margin-top:8px">
+        <button class="btn sec" id="btnPreview" type="button">🎧 试听 30 秒</button>
         <button class="btn sec" id="btnInstallVoices" type="button">🔊 安装男女声系统</button>
         <button class="mini" id="btnRescan" type="button">↻ 重新检测</button>
+        <button class="mini" id="btnPreviewStop" type="button" disabled>■ 停止试听</button>
       </div>
     </div>
   </div>
@@ -871,6 +873,52 @@ function rescanVoices(){
   var hint=$('installHint'); if(hint){ hint.textContent='已重新检测。'; setTimeout(function(){hint.textContent='';},1800); }
 }
 
+/* ===== 试听 30 秒：用当前所选声音念一小段示范，先听听效果 ===== */
+var PREVIEW_DUO = [
+  {who:'m', text:'欢迎来到智慧讲解，先听听我们俩的声音效果。'},
+  {who:'f', text:'我负责把文章讲透。正式开讲时，我会用生活里的例子，把复杂的道理讲成大白话。'},
+  {who:'m', text:'我负责替你追问——遇到不好懂的地方，替听众问一句：这到底什么意思？'},
+  {who:'f', text:'再抽象的观点，我都会配个做饭、开车、看病的比方，让你一下就懂。'},
+  {who:'m', text:'觉得声音满意，就去搜篇文章正式开始；想换声音，点旁边安装按钮。'}
+];
+var PREVIEW_SOLO = [
+  {who:'n', text:'欢迎来到智慧讲解。这段三十秒的试听，是让你先感受一下讲解者的声音。'},
+  {who:'n', text:'正式开讲时，我会像一位把文章彻底读透的人，从头到尾把它讲清楚、讲透。'},
+  {who:'n', text:'再抽象的道理，我都会配上做饭、开车、看病这样的生活例子，让你听着不费劲。'},
+  {who:'n', text:'如果这个声音你听着舒服，就去搜一篇文章，我们正式开始；想换个音色，点旁边的安装按钮就行。'}
+];
+var previewToken=0, previewing=false;
+function previewVoices(){
+  if(!ttsOK){ $('playErr').textContent='你的浏览器不支持语音朗读，可换用较新的 Chrome / Edge / Safari。'; $('playErr').style.display='block'; return; }
+  $('playErr').style.display='none';
+  synth.cancel(); previewToken++; var my=previewToken; previewing=true;
+  $('btnPreview').disabled=true; $('btnPreviewStop').disabled=false;
+  var vm=pickVoice('m'), vf=pickVoice('f'), vs=pickVoice('s');
+  var script = (MODE==='solo') ? PREVIEW_SOLO : PREVIEW_DUO;
+  var idx=0;
+  function step(){
+    if(my!==previewToken) return;
+    if(idx>=script.length){ endPreview('✓ 试听结束'); return; }
+    var t=script[idx];
+    var tag = t.who==='m'?'♂ 男声':(t.who==='f'?'♀ 女声':'🎙 讲解者');
+    $('playStatus').textContent='试听中 · '+tag;
+    var u=new SpeechSynthesisUtterance(t.text);
+    var v = t.who==='m'?vm:(t.who==='f'?vf:vs);
+    if(v){ u.voice=v; u.lang=v.lang; } else { u.lang='zh-CN'; }
+    u.rate=1.0; u.pitch = t.who==='m'?0.92:(t.who==='f'?1.12:1.0);
+    u.onend=function(){ if(my!==previewToken) return; idx++; step(); };
+    u.onerror=function(){ if(my!==previewToken) return; idx++; step(); };
+    synth.speak(u);
+  }
+  step();
+}
+function endPreview(msg){
+  previewing=false;
+  $('btnPreview').disabled=false; $('btnPreviewStop').disabled=true;
+  if(msg) $('playStatus').textContent=msg;
+}
+function stopPreview(){ previewToken++; if(synth) synth.cancel(); endPreview('已停止试听'); }
+
 function fillVoiceSel(sel, pool){
   while(sel.options.length>1) sel.remove(1);
   pool.forEach(function(v){ var o=document.createElement('option'); o.value=v.voiceURI; o.textContent=v.name+' ('+v.lang+')'; sel.appendChild(o); });
@@ -971,6 +1019,8 @@ $('installClose').addEventListener('click', closeInstall);
 $('installMask').addEventListener('click', function(e){ if(e.target===this) closeInstall(); });
 $('btnRescan').addEventListener('click', rescanVoices);
 $('btnRescan2').addEventListener('click', rescanVoices);
+$('btnPreview').addEventListener('click', previewVoices);
+$('btnPreviewStop').addEventListener('click', stopPreview);
 renderVoiceReport();
 
 </script>
