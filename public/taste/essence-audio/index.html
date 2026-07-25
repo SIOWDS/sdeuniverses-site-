@@ -60,6 +60,12 @@ select:focus,input:focus{border-color:var(--accent)}
 .drama-lbl{font-size:13px;font-weight:700;color:var(--gold2)}
 .dramarow select{background:#0C1015;border:1px solid rgba(255,255,255,0.16);border-radius:8px;color:var(--ink);padding:8px 11px;font-size:13.5px;font-family:inherit;max-width:520px}
 .drama-tip{font-size:11.5px;color:var(--muted);line-height:1.6}
+.authchips{margin-top:8px;display:flex;flex-direction:column;gap:6px;max-width:640px}
+.authchips .agrp{display:flex;flex-wrap:wrap;gap:5px;align-items:center}
+.authchips .aglbl{font-size:11px;color:var(--gold2);font-weight:700;min-width:34px}
+.authchips .achip{font-size:11.5px;padding:3px 9px;border:1px solid rgba(255,255,255,0.16);border-radius:999px;background:#11161C;color:var(--ink);cursor:pointer;transition:.15s}
+.authchips .achip:hover{background:var(--gold2);color:#0C1015;border-color:var(--gold2)}
+.authchips .amore{font-size:11px;color:var(--muted)}
 .srcrow{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:10px}
 .srclbl{font-size:12.5px;color:var(--sub);font-weight:600}
 .srcopt{display:inline-flex;align-items:center;gap:6px;background:var(--card2);border:1.5px solid var(--line);border-radius:10px;padding:8px 12px;cursor:pointer;font-size:12.5px;color:var(--ink)}
@@ -247,9 +253,11 @@ select:focus,input:focus{border-color:var(--accent)}
         <option value="fiction">小说故事（场景·人物·把道理融进情节）</option>
         <option value="speech">演讲（演讲台口吻·感染力·号召）</option>
       </select>
-      <div id="oratorRow" style="display:none;margin-top:8px">
-        <span class="drama-tip" style="display:block;margin-bottom:5px">🎤 让某位名人来讲这篇文章？填名字——想象<b>他会怎么讲这篇文章的主题</b>，用他的笔法气势承载本文的观点（原创文字、不引原话、不模仿声音）。留空＝通用演讲风格。</span>
-        <input id="oratorName" type="text" placeholder="如 丘吉尔 / 马丁·路德·金 / 乔布斯 / 林肯…（可留空）" autocomplete="off" style="width:100%;max-width:520px;background:#0C1015;border:1px solid rgba(255,255,255,0.16);border-radius:8px;color:var(--ink);padding:8px 11px;font-size:13.5px;font-family:inherit">
+      <div id="authorRow" style="margin-top:10px">
+        <span class="drama-tip" style="display:block;margin-bottom:5px">✒️ 模仿某位<b>著名作家</b>的文学笔法？填名字——想象<b>他/她来写这篇文章会怎么写</b>（原创文字、不引原话、不署他的名）。可与上面任意文体叠加，留空＝不模仿。</span>
+        <input id="authorName" type="text" list="authorList" placeholder="搜索或直接输入作家名，如 鲁迅 / 海明威 / 村上春树 / 加缪…（可留空）" autocomplete="off" style="width:100%;max-width:560px;background:#0C1015;border:1px solid rgba(255,255,255,0.16);border-radius:8px;color:var(--ink);padding:8px 11px;font-size:13.5px;font-family:inherit">
+        <datalist id="authorList"></datalist>
+        <div id="authorChips" class="authchips"></div>
       </div>
       <span class="drama-tip">同一篇文章，换个文体就是另一种读物。散文抒情、评书热闹、议论雄辩、小说藏理……</span>
     </div>
@@ -641,6 +649,33 @@ async function ensureXinde(sel, key, onStatus){
 }
 
 // —— 讲解稿系统提示：提智 + 对话体 + 四要点 + 改姓本地化 ——
+/* ===== 模仿作家：中/西/日/法 代表名家（chips 显示前若干，datalist 供搜索；手打任意名字也行） ===== */
+var WRITERS = {
+  cn: { label:'中', names:['鲁迅','老舍','沈从文','张爱玲','钱钟书','汪曾祺','余华','莫言','王小波','贾平凹','史铁生','木心','阿城','曹雪芹','苏轼','李白','杜甫','朱自清','冰心','巴金','茅盾','萧红','徐志摩','梁实秋','林语堂','周作人','丰子恺','孙犁','迟子建','刘慈欣','三毛','金庸','古龙','席慕蓉','北岛','海子','顾城','食指','舒婷','贾岛'] },
+  west:{ label:'西', names:['海明威','马尔克斯','博尔赫斯','卡尔维诺','卡夫卡','陀思妥耶夫斯基','托尔斯泰','契诃夫','狄更斯','简·奥斯汀','伍尔夫','乔伊斯','福克纳','菲茨杰拉德','塞林格','奥威尔','加缪','萨特','纳博科夫','卡佛','厄普代克','托尼·莫里森','石黑一雄','卡尔维诺','爱伦·坡','王尔德','蒙田','尼采','惠特曼','艾米莉·狄金森','聂鲁达','里尔克','歌德','雨果','巴尔扎克','陀氏','海涅','拜伦','叶芝','博尔赫斯'] },
+  jp: { label:'日', names:['村上春树','夏目漱石','川端康成','三岛由纪夫','太宰治','芥川龙之介','谷崎润一郎','大江健三郎','东野圭吾','宫泽贤治','松尾芭蕉','紫式部','小林一茶','安部公房','远藤周作','吉本芭娜娜','井上靖','司马辽太郎','森鸥外','樋口一叶'] },
+  fr: { label:'法', names:['加缪','萨特','普鲁斯特','福楼拜','巴尔扎克','雨果','司汤达','波德莱尔','兰波','莫泊桑','左拉','纪德','杜拉斯','萨冈','罗曼·罗兰','圣埃克苏佩里','波伏娃','马拉美','魏尔伦','蒙田'] }
+};
+function fillAuthorSuggest(){
+  var dl=$('authorList'), box=$('authorChips'); if(!dl||!box) return;
+  dl.innerHTML=''; box.innerHTML='';
+  Object.keys(WRITERS).forEach(function(k){
+    var g=WRITERS[k];
+    // datalist：全量供搜索
+    g.names.forEach(function(n){ var o=document.createElement('option'); o.value=n; dl.appendChild(o); });
+    // chips：每组显示前 12 个
+    var row=document.createElement('div'); row.className='agrp';
+    var lb=document.createElement('span'); lb.className='aglbl'; lb.textContent=g.label; row.appendChild(lb);
+    g.names.slice(0,12).forEach(function(n){
+      var c=document.createElement('span'); c.className='achip'; c.textContent=n;
+      c.addEventListener('click', function(){ $('authorName').value=n; });
+      row.appendChild(c);
+    });
+    var more=document.createElement('span'); more.className='amore'; more.textContent='…更多可直接输入'; row.appendChild(more);
+    box.appendChild(row);
+  });
+}
+
 /* ===== 单人讲解·文体/风格：同一篇理论文章，换不同应用文体，变成不同读物 ===== */
 var SOLO_STYLES = {
   '': {  // 深情解读（默认）
@@ -901,14 +936,15 @@ async function generate(){
     DRAMA=($('dramaMode')&&$('dramaMode').value)||'';
     SOLO_STYLE=($('soloStyle')&&$('soloStyle').value)||'';
     var sys=lecSystem(MODE, xinde, rag.ctx, DRAMA, SOLO_STYLE);
-    if(MODE==='solo' && SOLO_STYLE==='speech'){
-      var orator=($('oratorName')&&$('oratorName').value||'').trim();
-      if(orator){
-        sys += "\n\n════════ 名人演讲风格（必须与本文章内容深度挂钩）════════\n"
-          + "设想：如果由【"+orator+"】亲自站上讲台，来讲这篇文章的思想，他会怎么讲？请以此写这篇演讲——\n"
-          + "①【内容锚定】演讲的骨架仍是这篇文章的中心创新观点、它针对的挑战、它的解决之道、它的应用；不要写成一篇脱离本文的空泛演说，每一段都要落在本文的具体论点上。\n"
-          + "②【笔法移植】用【"+orator+"】惯用的修辞与气质来承载这些论点：他常用的句式、节奏、意象、情绪调动方式（如排比、重复、对仗、设问、呼告等），以及他看待世界的那种角度和关切——想象他会抓住这篇文章里的哪个点来点燃听众、会用什么比方讲给大众听。\n"
-          + "③【红线】文字全部围绕本文原创，不引用也不杜撰他的原话，不提他的名字，不写他的生平；只借他的『讲法』来讲『这篇文章』，不是让他讲他自己的事。";
+    if(MODE==='solo'){
+      var author=($('authorName')&&$('authorName').value||'').trim();
+      if(author){
+        var verb = (SOLO_STYLE==='speech') ? '来讲这篇文章' : '来写这篇文章';
+        sys += "\n\n════════ 模仿作家笔法（必须与本文章内容深度挂钩）════════\n"
+          + "设想：如果由【"+author+"】"+verb+"，会怎么写？请以此完成——\n"
+          + "①【内容锚定】骨架仍是这篇文章的中心创新观点、它针对的挑战、它的解决之道、它的应用；不要写成一篇脱离本文的空泛文字，每一段都要落在本文的具体论点上，也仍要遵守上面选定文体的写法。\n"
+          + "②【笔法移植】用【"+author+"】标志性的文学笔法来承载这些论点：他/她惯用的语言质感、句式与节奏、意象与修辞、结构方式、以及看待世界的那种眼光与关切——想象他/她会抓住这篇文章里的哪个点、用什么样的笔触来写给读者。\n"
+          + "③【红线】文字全部围绕本文原创，不引用也不杜撰他/她的原话或原作段落，不署他/她的名字，不写其生平；只借其『写法/笔法』来写『这篇文章』，不是让他/她写自己的作品。";
       }
     }
     var styLabel=(SOLO_STYLE&&$('soloStyle'))?($('soloStyle').options[$('soloStyle').selectedIndex].text.split('（')[0]):'深情解读';
@@ -1532,7 +1568,7 @@ function applyMode(){
   $('btnGen').textContent = solo ? '生成约 2000 字单人讲解稿 →' : '生成约 2000 字男女对话讲解稿 →';
   // 单人文体行：只在单人模式显示
   var sr=$('soloStyleRow'); if(sr) sr.style.display = solo ? 'flex' : 'none';
-  var orow=$('oratorRow'); if(orow) orow.style.display = (solo && $('soloStyle') && $('soloStyle').value==='speech') ? 'block' : 'none';
+  var arow=$('authorRow'); if(arow) arow.style.display = solo ? 'block' : 'none';
   // 戏剧模式行标签：单人叫"情感曲线"，对话叫"对话戏剧"
   var dl=document.querySelector('.dramarow:not(#soloStyleRow) .drama-lbl');
   if(dl) dl.textContent = solo ? '🎭 情感曲线模式' : '🎭 对话戏剧模式';
@@ -1546,7 +1582,8 @@ function applyMode(){
 Array.prototype.forEach.call(document.querySelectorAll('input[name="lecmode"]'), function(r){
   r.addEventListener('change', function(){ if(this.checked){ MODE=this.value; applyMode(); } });
 });
-if($('soloStyle')) $('soloStyle').addEventListener('change', applyMode);  // 切文体时更新名人输入框显隐
+if($('soloStyle')) $('soloStyle').addEventListener('change', applyMode);
+fillAuthorSuggest();
 applyMode();
 
 // 安装男女声系统 · 事件
