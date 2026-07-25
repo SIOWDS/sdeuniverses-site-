@@ -24,6 +24,7 @@ select:focus,input:focus{border-color:var(--accent)}
 .keyrow input{flex:1;min-width:200px}
 .ktog{background:transparent;border:1px solid rgba(255,255,255,0.2);color:var(--sub);border-radius:8px;padding:8px 12px;font-size:12.5px;cursor:pointer}
 .searchrow{display:flex;gap:10px}
+.uprow{display:flex;align-items:center;flex-wrap:wrap;gap:8px}
 .searchrow input{flex:1}
 .btn{background:linear-gradient(120deg,var(--gold),var(--gold2));color:#14100A;border:none;border-radius:10px;padding:10px 20px;font-size:14.5px;font-weight:800;cursor:pointer;white-space:nowrap;font-family:inherit}
 .btn:disabled{opacity:0.45;cursor:not-allowed}
@@ -227,15 +228,31 @@ select:focus,input:focus{border-color:var(--accent)}
     </div>
   </div>
 
-  <!-- 第一步：搜文章 -->
+  <!-- 第一步：选文章（站内搜 / 站外上传） -->
   <div class="panel">
-    <span class="step-badge">第一步 · 搜文章</span>
-    <div class="searchrow">
-      <input id="q" type="text" placeholder="输入关键词搜站内文章，例如：癌症、内卷、知识论、糖尿病、教育…">
-      <button class="btn" id="btnSearch" type="button">搜索</button>
+    <span class="step-badge">第一步 · 选文章</span>
+    <div class="srcrow" style="margin-bottom:12px">
+      <span class="srclbl">文章来源</span>
+      <label class="srcopt sel" id="srcSite"><input type="radio" name="artSrc" value="site" checked><span>🔍 站内文章（解读 + 应用）</span></label>
+      <label class="srcopt" id="srcUpload"><input type="radio" name="artSrc" value="upload"><span>📄 上传文章 Word/PDF（解读 + 解构 + 创新应用）</span></label>
     </div>
-    <div id="loadStatus" class="hint">正在载入站内检索索引…</div>
-    <div id="results"></div>
+    <div id="siteBox">
+      <div class="searchrow">
+        <input id="q" type="text" placeholder="输入关键词搜站内文章，例如：癌症、内卷、知识论、糖尿病、教育…">
+        <button class="btn" id="btnSearch" type="button">搜索</button>
+      </div>
+      <div id="loadStatus" class="hint">正在载入站内检索索引…</div>
+      <div id="results"></div>
+    </div>
+    <div id="uploadBox" style="display:none">
+      <div class="uprow">
+        <input id="fileInput" type="file" accept=".docx,.pdf,.txt,.md" style="display:none">
+        <button class="btn" id="btnPickFile" type="button">📎 选择 Word / PDF / TXT 文件</button>
+        <span id="upName" class="hint" style="margin-left:6px"></span>
+      </div>
+      <div class="cloudhint" style="margin-top:6px">支持 .docx / .pdf / .txt / .md。文字型 PDF 和 Word 都能解析；扫描图片型 PDF 抽不出文字（会提示）。文章很长时，送进基底解读会按模型上限截取前若干万字，并如实告诉你读了多少。</div>
+      <div id="upStatus" class="hint" style="margin-top:6px"></div>
+    </div>
     <div id="chosen" class="chosen"></div>
   </div>
 
@@ -853,7 +870,7 @@ function langDirective(){
     + "唯一例外：程序用的格式标记（说话人前缀 `男`/`女`、竖线 `|`、语气标签如 cheerful/serious、方括号 `[style]`、中文冒号 `：`）保持原样不翻译，只有冒号后面的正文用 " + m.writeIn + "。"
     + "不要中外夹杂，不要加译文对照，直接用 " + m.writeIn + " 讲。\n";
 }
-function lecSystem(mode, xinde, siteCtx, drama, soloStyle, domain){
+function lecSystem(mode, xinde, siteCtx, drama, soloStyle, domain, external){
   var head = PRIOR
     + "\n\n════════ 你本场已内化的学习心得（思考底盘，讲解时真用它，别向听众复述心得本身）════════\n" + (xinde||'')
     + "\n\n════════ 你答/讲每一段的工序（方法论指引）════════\n" + METHOD_GUIDE
@@ -866,9 +883,13 @@ function lecSystem(mode, xinde, siteCtx, drama, soloStyle, domain){
     ? ("④它能怎么用——【全篇重点落在【"+DOM[domain]+"】这一个领域】：把这篇文章的道理具体应用到"+DOM[domain]+"里，给出这个领域内多个（至少两三个）真实、具体、贴地的应用场景与例子，讲透在"+DOM[domain]+"中怎么用、能改变什么；类比和例子也尽量都取自"+DOM[domain]+"。")
     : "④它能怎么用——分别给出在【教育】【健康】【商业经济】三个领域各一个具体的应用例子。";
   var introTitle=(typeof chosenDoc!=='undefined'&&chosenDoc&&chosenDoc.title)?chosenDoc.title:'原文';
+  var introVerb = external ? '解读、解构与创新应用' : '解读与应用';
+  var tasks = external
+    ? ("【必须讲清的六件事，按这个顺序，不要生硬分段标题】：①这篇文章在讲什么、它的中心观点是什么（先把原文老老实实讲清楚）；②它针对的挑战 / 难题是什么；③【解构】用更底层的眼光把它拆开——它其实依赖哪些没有明说的前提和隐藏支柱？它的机制到底怎么运转？它有哪些没看到的盲区、边界或说不通的地方？（这一步要显出比原作者更透的洞察，但仍用大白话，不许露任何方法论行话）；④它自己给出的解决之道、凭什么成立；⑤【创新应用】基于上面的解构，提出原作者没想到的新用法、新场景、新做法"+((domain&&DOM[domain])?("，并【全篇重点落在【"+DOM[domain]+"】这一个领域】，给该领域多个具体的创新应用"):"——分别落到【教育】【健康】【商业经济】给出有新意的应用")+"；⑥一句话收束它最大的价值与局限。")
+    : ("【必须讲清的四件事，按这个顺序讲，不要生硬分段标题】：①这篇文章的中心创新观点是什么（它提出了什么此前没有的新看法）；②它针对的挑战 / 难题是什么；③它怎么解决这个问题、凭什么成立；"+app4+"");
   var common =
-      "【开头引言·必写】：正文（或对话）最开头，先用一两句大白话交代——本篇是对《"+introTitle+"》这篇文章的解读与应用，它大致在讲一件什么事、为什么值得一听，让完全没读过原文、也没专业背景的普通人立刻明白来龙去脉，再往下展开。\n"
-      + "【必须讲清的四件事，按这个顺序讲，不要生硬分段标题】：①这篇文章的中心创新观点是什么（它提出了什么此前没有的新看法）；②它针对的挑战 / 难题是什么；③它怎么解决这个问题、凭什么成立；"+app4+"\n"
+      "【开头引言·必写】：正文（或对话）最开头，先用一两句大白话交代——本篇是对《"+introTitle+"》这篇文章的"+introVerb+"，它大致在讲一件什么事、为什么值得一听，让完全没读过原文、也没专业背景的普通人立刻明白来龙去脉，再往下展开。\n"
+      + tasks + "\n"
       + "【讲法要求】：多用类比和日常生活的例子把抽象讲具体（比如用做饭、开车、养孩子、看病、做生意来打比方）；全程说人话，不堆术语，让没读过原文的普通人也能听明白。\n"
     + "【最高红线·术语本地化，违反即失败】：这套讲解背后用的是一套名为 SDE 的方法论，但对听众【严禁任何 SDE 内部术语外泄】——绝不许出现：显露／差异序列／特征纠缠／三大方程／S=F(D,E)／六路径／123原理／二阶碰撞／发生学／显影／介生态／意义三律／回写／底盘／成熟态 等一切行话与公式。把每个判断都翻译成该学科或日常生活的普通话。听众只应听见把文章讲得特别透的聪明人，听不出任何外部体系的名目。\n";
 
@@ -992,12 +1013,83 @@ function sectionLabel(key){
 function esc(s){ return String(s==null?'':s).replace(/[<>&"]/g,function(c){return({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'})[c];}); }
 
 function chooseDoc(d, el){
-  chosenDoc={ title:d.t, url:d.u, section:d.s };
+  chosenDoc={ title:d.t, url:d.u, section:d.s, external:false };
+  uploadedText='';
   Array.prototype.forEach.call(document.querySelectorAll('.hit'),function(x){x.classList.remove('sel');});
   if(el) el.classList.add('sel');
   $('chosen').innerHTML='已选：<b>'+esc(d.t)+'</b> —— 到下面「生成讲解稿」开讲。';
   $('stageGen').classList.add('on');
   $('stageGen').scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+/* ===== 站外文章上传：Word / PDF / TXT 解析 ===== */
+var uploadedText='';
+var _libLoad={};
+function loadScript(src){
+  if(_libLoad[src]) return _libLoad[src];
+  _libLoad[src]=new Promise(function(res,rej){
+    var s=document.createElement('script'); s.src=src; s.onload=res; s.onerror=function(){ rej(new Error('加载解析库失败：'+src)); };
+    document.head.appendChild(s);
+  });
+  return _libLoad[src];
+}
+function setArtSrc(v){
+  var up=(v==='upload');
+  $('siteBox').style.display = up?'none':'block';
+  $('uploadBox').style.display = up?'block':'none';
+  ['srcSite','srcUpload'].forEach(function(id){ var el=$(id); if(el) el.classList.toggle('sel', id===(up?'srcUpload':'srcSite')); });
+  // 切来源时清掉已选，避免混淆
+  chosenDoc=null; uploadedText='';
+  $('chosen').innerHTML=''; $('stageGen').classList.remove('on');
+}
+async function parseDocx(file){
+  await loadScript('https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js');
+  var buf=await file.arrayBuffer();
+  var r=await window.mammoth.extractRawText({arrayBuffer:buf});
+  return (r&&r.value||'').trim();
+}
+async function parsePdf(file){
+  await loadScript('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js');
+  if(window.pdfjsLib){ window.pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js'; }
+  var buf=await file.arrayBuffer();
+  var pdf=await window.pdfjsLib.getDocument({data:buf}).promise;
+  var out=[];
+  for(var i=1;i<=pdf.numPages;i++){
+    var page=await pdf.getPage(i);
+    var tc=await page.getTextContent();
+    out.push(tc.items.map(function(it){return it.str;}).join(' '));
+    if(i%20===0 && $('upStatus')) $('upStatus').innerHTML='正在解析 PDF… 第 '+i+' / '+pdf.numPages+' 页';
+  }
+  return out.join('\n').trim();
+}
+async function handleFile(file){
+  if(!file) return;
+  var name=file.name||'', low=name.toLowerCase();
+  $('upName').textContent=name+'（'+Math.round(file.size/1024)+' KB）';
+  var us=$('upStatus'); us.innerHTML='<span class="spinner"></span>正在用解析器读取文件…';
+  try{
+    var text='';
+    if(/\.docx$/.test(low)) text=await parseDocx(file);
+    else if(/\.pdf$/.test(low)) text=await parsePdf(file);
+    else if(/\.(txt|md)$/.test(low)) text=(await file.text()).trim();
+    else if(/\.doc$/.test(low)) throw new Error('旧版 .doc 无法在网页里解析，请另存为 .docx 再上传。');
+    else throw new Error('不支持的格式，请上传 .docx / .pdf / .txt / .md。');
+    if(!text || text.length<100){
+      if(/\.pdf$/.test(low)) throw new Error('这个 PDF 抽不出文字（很可能是扫描图片型 PDF）。请换成文字版 PDF 或 Word。');
+      throw new Error('没读到足够文字（正文太短或为空）。');
+    }
+    uploadedText=text;
+    var title=name.replace(/\.(docx|pdf|txt|md|doc)$/i,'').trim()||'上传的文章';
+    chosenDoc={ title:title, url:null, section:'上传', external:true };
+    var wc=text.replace(/\s/g,'').length;
+    us.innerHTML='✓ 已解析：约 '+wc.toLocaleString()+' 字。到下面「生成」——站外文章会做<b>解读 + 解构 + 创新应用</b>。';
+    $('chosen').innerHTML='已选（上传）：<b>'+esc(title)+'</b> · 约 '+wc.toLocaleString()+' 字 —— 到下面开始生成。';
+    $('stageGen').classList.add('on');
+    $('stageGen').scrollIntoView({behavior:'smooth',block:'nearest'});
+  }catch(e){
+    uploadedText=''; chosenDoc=null;
+    us.innerHTML='<span style="color:#ff8a8a">✗ '+esc(e.message||String(e))+'</span>';
+  }
 }
 
 /* ---- 生成对话体讲解稿 ---- */
@@ -1019,9 +1111,18 @@ async function generate(){
   var st=$('genStatus');
   try{
     st.innerHTML='<span class="spinner"></span>正在打开并通读原文…';
-    var full=await fetchArticleText(chosenDoc.url);
-    if(!full || full.length<200) throw new Error('这篇文章正文太短或没抓到，换一篇试试。');
-    full=full.slice(0, 24000); // 控长
+    var isExt=!!(chosenDoc&&chosenDoc.external);
+    var full, truncNote='';
+    if(isExt){
+      full=uploadedText||'';
+      if(!full || full.length<100) throw new Error('上传的文章没解析到正文，请重新上传。');
+      var CAP=48000; // 送进基底的上限（约 3-4 万字，视模型而定）
+      if(full.length>CAP){ truncNote='（原文约 '+full.replace(/\s/g,'').length.toLocaleString()+' 字，超出模型单次可读上限，本次只读了前约 '+Math.round(CAP/10000)+' 万字）'; full=full.slice(0,CAP); }
+    } else {
+      full=await fetchArticleText(chosenDoc.url);
+      if(!full || full.length<200) throw new Error('这篇文章正文太短或没抓到，换一篇试试。');
+      full=full.slice(0, 24000); // 控长
+    }
     await ensureXinde(pf.sel, pf.key, function(h){ st.innerHTML=h; });
     st.innerHTML='<span class="spinner"></span>检索站内相关资料…';
     var rag=await ragForArticle(chosenDoc.title, full.slice(0,600));
@@ -1029,7 +1130,7 @@ async function generate(){
     DRAMA=($('dramaMode')&&$('dramaMode').value)||'';
     SOLO_STYLE=($('soloStyle')&&$('soloStyle').value)||'';
     var APPDOMAIN=($('appDomain')&&$('appDomain').value)||'';
-    var sys=lecSystem(MODE, xinde, rag.ctx, DRAMA, SOLO_STYLE, APPDOMAIN);
+    var sys=lecSystem(MODE, xinde, rag.ctx, DRAMA, SOLO_STYLE, APPDOMAIN, isExt);
     if(MODE==='solo'){
       var author=($('authorName')&&$('authorName').value||'').trim();
       var work=($('authorWork')&&$('authorWork').value||'').trim().replace(/^[《<]|[》>]$/g,'');
@@ -1060,7 +1161,7 @@ async function generate(){
     var out=await callMsgs(pf.sel, pf.key, sys, [{role:'user', content:userMsg}], maxTok, '讲解稿');
     lastDialogue=out;
     renderDialogue(out);
-    st.innerHTML='✓ 讲解稿已生成（约 '+out.replace(/\s/g,'').length+' 字）· 到第三步开始男女朗读';
+    st.innerHTML='✓ 已生成（约 '+out.replace(/\s/g,'').length+' 字）'+(truncNote||'')+'· 到第三步开始朗读';
     $('genTools').style.display='flex';
     $('stagePlay').classList.add('on');
   }catch(e){
@@ -1675,6 +1776,12 @@ function endPlay(msg){
 /* ========== 事件绑定 ========== */
 $('btnSearch').addEventListener('click', doSearch);
 $('q').addEventListener('keydown', function(e){ if(e.key==='Enter'){ e.preventDefault(); doSearch(); } });
+// 来源切换（站内/上传）
+Array.prototype.forEach.call(document.querySelectorAll('input[name="artSrc"]'), function(r){
+  r.addEventListener('change', function(){ if(this.checked) setArtSrc(this.value); });
+});
+if($('btnPickFile')) $('btnPickFile').addEventListener('click', function(){ $('fileInput').click(); });
+if($('fileInput')) $('fileInput').addEventListener('change', function(){ if(this.files&&this.files[0]) handleFile(this.files[0]); });
 $('btnGen').addEventListener('click', generate);
 $('btnCopy').addEventListener('click', copyText);
 $('btnDl').addEventListener('click', downloadText);
