@@ -351,25 +351,21 @@ async function loadAvatars(){
   if(!hgKey()){ $('keyStatus').textContent='请先填 HeyGen API Key。'; return; }
   $('keyStatus').innerHTML='<span class="spinner"></span>载入分身中…';
   var avatars=[];
+  // 最优先：v3 数字分身 looks —— 这才是 v3 avatar_v 出片要用的 avatar_id
+  var v3=await hgCall('GET','/v3/avatars/looks?avatar_type=digital_twin&ownership=private',null,12000);
+  if(v3.ok && v3.j && v3.j.data){
+    var looks=v3.j.data.avatar_looks||v3.j.data.looks||(Array.isArray(v3.j.data)?v3.j.data:[]);
+    if(Array.isArray(looks)) looks.forEach(function(l){ if(l.id) avatars.push({id:l.id, name:'⭐ '+(l.name||l.look_name||'我的数字分身')+'（数字分身·V3）', mine:true, v3:true}); });
+  }
   // 主：/v2/avatars（含你训练的 Instant Avatar），15秒超时
   var av=await hgCall('GET','/v2/avatars',null,15000);
-  if(av.err){ $('keyStatus').textContent='载入分身失败：'+av.err+'（确认 API Key 正确、网络能连 HeyGen）'; return; }
-  if(!av.ok){ $('keyStatus').textContent='HeyGen 返回错误 '+av.status+'：'+((av.j&&av.j.error&&(av.j.error.message||av.j.error))||'（多半是 API Key 无效）'); return; }
+  if(av.err && !avatars.length){ $('keyStatus').textContent='载入分身失败：'+av.err+'（确认 API Key 正确、网络能连 HeyGen）'; return; }
+  if(av.ok===false && !avatars.length){ $('keyStatus').textContent='HeyGen 返回错误 '+av.status+'：'+((av.j&&av.j.error&&(av.j.error.message||av.j.error))||'（多半是 API Key 无效）'); return; }
   if(av.j && av.j.data){
-    (av.j.data.avatars||[]).forEach(function(a){ avatars.push({id:a.avatar_id, name:a.avatar_name||a.avatar_id, mine:false}); });
+    (av.j.data.avatars||[]).forEach(function(a){ if(!avatars.some(function(x){return x.id===a.avatar_id;})) avatars.push({id:a.avatar_id, name:a.avatar_name||a.avatar_id, mine:false}); });
     (av.j.data.talking_photos||[]).forEach(function(p){ avatars.push({id:p.talking_photo_id, name:'📷 '+(p.talking_photo_name||p.talking_photo_id), mine:true}); });
   }
-  $('keyStatus').innerHTML='<span class="spinner"></span>已拿到 '+avatars.length+' 个分身，载入你训练的分身与声音…';
-
-  // 补充：avatar_group.list（你训练的数字分身，可能慢）——独立超时，失败不影响
-  var grp=await hgCall('GET','/v2/avatar_group.list?include_public=false',null,12000);
-  if(grp.ok && grp.j && grp.j.data){
-    var groups=grp.j.data.avatar_group_list||grp.j.data||[];
-    if(Array.isArray(groups)) groups.forEach(function(g){
-      if(g.id && !avatars.some(function(x){return x.id===g.id;})) avatars.unshift({id:g.id, name:'⭐ '+(g.name||g.id)+'（我训练的）', mine:true});
-    });
-  }
-  var selA=$('hgAvatar'); selA.innerHTML='';
+  $('keyStatus').innerHTML='<span class="spinner"></span>已拿到 '+avatars.length+' 个分身，载入声音…';
   if(!avatars.length){ selA.innerHTML='<option value="">未找到分身——请确认已训练 Avatar V</option>'; }
   else { avatars.sort(function(a,b){return (b.mine?1:0)-(a.mine?1:0);}); avatars.forEach(function(a){ var o=document.createElement('option'); o.value=a.id; o.textContent=a.name; selA.appendChild(o); }); }
 
@@ -554,12 +550,12 @@ async function genVideo(){
   if(script.length>4800){ script=script.slice(0,4800); $('videoErr').textContent='注意：讲稿较长，已截到前 4800 字（HeyGen 单条上限）。如需完整，可分两段出。'; }
   var vTitle=(chosenDoc&&chosenDoc.title||'SDE 视频课').replace(/[\u0000-\u001f]/g,'').slice(0,120);
   // v3 建视频；分身用 avatar_v 引擎（数字分身）。若失败降级 v2。
-  var vid=null, e3='', e2='';
+  var vid=null, e3='', e2='', usedV3=false;
   try{
     var body={ type:'avatar', avatar_id:avatarId, engine:{type:'avatar_v'}, script:script, voice_id:voiceId, resolution:'1080p', aspect_ratio:'auto', title:vTitle };
     var r=await hgCall('POST','/v3/videos',body,30000);
-    if(r.ok && r.j && r.j.data && (r.j.data.video_id||r.j.data.id)){ vid=r.j.data.video_id||r.j.data.id; }
-    else if(r.j && (r.j.video_id||r.j.id)){ vid=r.j.video_id||r.j.id; }
+    if(r.ok && r.j && r.j.data && (r.j.data.video_id||r.j.data.id)){ vid=r.j.data.video_id||r.j.data.id; usedV3=true; }
+    else if(r.j && (r.j.video_id||r.j.id)){ vid=r.j.video_id||r.j.id; usedV3=true; }
     else { e3=(r.err)||(r.j&&r.j.error&&(r.j.error.message||r.j.error.code||r.j.error))||('HTTP '+r.status); }
     // v2 兜底（v3 不认这个分身/引擎时）
     if(!vid){
@@ -576,18 +572,21 @@ async function genVideo(){
     $('btnVideo').disabled=false; return;
   }
 
-  // 轮询状态
+  // 轮询状态：v3 建的走 GET /v3/videos/{id}；v2 建的走 /v1/video_status.get
   $('videoStatus').innerHTML='<span class="spinner"></span>HeyGen 渲染中（几分钟，请勿关闭）…';
   var t0=Date.now(), url='';
   while(true){
-    if(Date.now()-t0>20*60*1000){ $('videoStatus').textContent='等待超时（20分钟）。可稍后到 HeyGen 后台查看该视频。'; break; }
+    if(Date.now()-t0>20*60*1000){ $('videoStatus').textContent='等待超时（20分钟）。可稍后到 HeyGen 后台查看该视频，或点“下载”重试。'; break; }
     await new Promise(function(r){setTimeout(r,8000);});
-    var s=await hgCall('GET','/v1/video_status.get?video_id='+encodeURIComponent(vid),null,15000);
+    var s = usedV3
+      ? await hgCall('GET','/v3/videos/'+encodeURIComponent(vid),null,15000)
+      : await hgCall('GET','/v1/video_status.get?video_id='+encodeURIComponent(vid),null,15000);
     if(s.err){ continue; }   // 单次查询超时/抖动→下一轮再查，不中断
-    var st=(s.j&&s.j.data&&s.j.data.status)||'';
-    if(st==='completed'){ url=(s.j.data.video_url||s.j.data.video_url_caption||''); break; }
-    if(st==='failed'){ $('videoErr').textContent='HeyGen 渲染失败：'+((s.j.data&&s.j.data.error&&(s.j.data.error.message||s.j.data.error))||'未知'); break; }
-    $('videoStatus').innerHTML='<span class="spinner"></span>HeyGen '+(st||'处理')+'…';
+    var d=(s.j&&s.j.data)||{};
+    var st=d.status||'';
+    if(st==='completed'){ url=(d.video_url||d.captioned_video_url||d.video_url_caption||''); break; }   // 优先无字幕的干净版
+    if(st==='failed'){ $('videoErr').textContent='HeyGen 渲染失败：'+(d.failure_message||(d.error&&(d.error.message||d.error))||'未知（可到 HeyGen 后台查看该视频的错误）'); break; }
+    $('videoStatus').innerHTML='<span class="spinner"></span>HeyGen '+(st==='pending'?'排队中':(st==='processing'?'渲染中':(st||'处理')))+'…';
   }
   if(url){
     $('player').src=url;
