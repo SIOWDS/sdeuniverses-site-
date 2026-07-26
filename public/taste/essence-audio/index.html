@@ -1796,7 +1796,7 @@ async function applySubmit(){
 }
 
 /* ===== 第四步：数字人视频（Azure Avatar 批量合成 · BYOK · 一句一任务 → 顺序连播） ===== */
-var AV_CLIPS=[], avBusy=false, avPlayIdx=-1;
+var AV_CLIPS=[], avBusy=false, avPlayIdx=-1, AV_TOTAL=0, AV_GENERATING=false, avWaiting=false;   // 边生成边播
 function avOn(){ var c=$('avEnable'); return !!(c&&c.checked); }
 function updateAvatarStage(){
   var p=$('stageAvatar'); if(p) p.classList.toggle('on', avOn());
@@ -1965,6 +1965,7 @@ async function avatarGenerate(){
     }
     // 单循环调度：优先递交（还有没提交的就提交一个），否则轮询一个最久没查的在飞任务；
     // 每个动作都过 gate，所以全程严格单请求、按节奏放行。
+    AV_TOTAL=jobs.length; AV_GENERATING=true; avWaiting=false;   // 边生成边播：后面还有段在来
     // 真串行·完整优先：提交一个 → 轮询到它彻底渲染完（Succeeded/Failed）→ 才提交下一个。
     // 任意时刻云端只有 1 段在处理，先攥住一个完整成品，宁慢勿悬。
     while(si<jobs.length){
@@ -1984,12 +1985,16 @@ async function avatarGenerate(){
           refreshStat('第 '+(si+1)+'/'+jobs.length+' 段渲染中…（完成才发下一段）');
         }
         // 这一段成了 → 立刻能连播已完成的部分
-        if(job.state==='done'){ AV_CLIPS=jobs.filter(function(j){return j.state==='done';}).sort(function(a,b){return a.i-b.i;}); if(AV_CLIPS.length===1){ renderAvatarPlayer(); } }
+        if(job.state==='done'){
+          AV_CLIPS=jobs.filter(function(j){return j.state==='done';}).sort(function(a,b){return a.i-b.i;});
+          if(AV_CLIPS.length===1){ renderAvatarPlayer(); }            // 第一段好→播放器亮、自动开播
+          else { refreshClipList(); if(avWaiting){ avWaiting=false; avPlay(avPlayIdx+1); } }  // 新段可点；播放器在等→续上
+        }
       }
       si++;
     }
     if(stallGuard()){ jobs.forEach(function(j){ if(j.state==='running'){ j.state='failed'; j.err='密钥失效，停止'; } }); }
-    if(stallGuard()){ jobs.forEach(function(j){ if(j.state==='running'){ j.state='failed'; j.err='密钥失效，停止'; } }); }
+    AV_GENERATING=false;   // 后续段全部落定，播放到结尾即真"完毕"
     AV_CLIPS=jobs.filter(function(j){return j.state==='done';}).sort(function(a,b){return a.i-b.i;});
     var fails=jobs.filter(function(j){return j.state==='failed';});
     if(!AV_CLIPS.length) throw new Error('没有任何片段合成成功。'+(fails[0]?('首个错误：'+fails[0].err):''));
@@ -2004,8 +2009,8 @@ async function avatarGenerate(){
   }catch(e){ er.textContent=String(e&&e.message||e); st.textContent=''; }
   finally{ avBusy=false; $('btnAvatarGen').disabled=false; }
 }
-function renderAvatarPlayer(){
-  var wrap=$('avPlayerWrap'), list=$('avClips'); wrap.style.display='block'; list.innerHTML='';
+function refreshClipList(){
+  var list=$('avClips'); if(!list) return; list.innerHTML='';
   AV_CLIPS.forEach(function(c,idx){
     var a=document.createElement('a'); a.className='mini'; a.style.textDecoration='none';
     a.textContent=(c.who==='m'?'👨':'👩')+' 第'+(idx+1)+'段';
@@ -2015,6 +2020,14 @@ function renderAvatarPlayer(){
     var box=document.createElement('span'); box.style.display='inline-flex'; box.style.gap='3px'; box.style.alignItems='center';
     box.appendChild(a); box.appendChild(d); list.appendChild(box);
   });
+  if(AV_GENERATING && AV_CLIPS.length<AV_TOTAL){                    // 生成中：显示"还有N段在渲染"占位
+    var more=document.createElement('span'); more.className='hint'; more.style.opacity='.6';
+    more.textContent='　+'+(AV_TOTAL-AV_CLIPS.length)+' 段渲染中…'; list.appendChild(more);
+  }
+}
+function renderAvatarPlayer(){
+  var wrap=$('avPlayerWrap'); wrap.style.display='block';
+  refreshClipList();
   var whoSet={}; AV_CLIPS.forEach(function(c){whoSet[c.who==='m'?'m':'f']=1;});
   if(!(whoSet.m&&whoSet.f) && $('avLayout')){ $('avLayout').value='single'; }   // 单说话人的稿(单人讲解)双窗没意义
   applyAvLayout();
@@ -2074,7 +2087,11 @@ function avPlay(idx, noAuto){
   };
   if(!noAuto){ v.play().catch(function(){}); }
   else { v.onloadeddata=function(){ try{ v.currentTime=0.05; v.pause(); }catch(e){} }; }   // 未播先定格首帧，不黑屏
-  v.onended=function(){ if(avPlayIdx+1<AV_CLIPS.length) avPlay(avPlayIdx+1); else $('avNow').textContent='✓ 连播完毕（'+AV_CLIPS.length+' 段）'; };
+  v.onended=function(){
+    if(avPlayIdx+1<AV_CLIPS.length){ avPlay(avPlayIdx+1); }
+    else if(AV_GENERATING && AV_CLIPS.length<AV_TOTAL){ avWaiting=true; $('avNow').textContent='⏳ 已播 '+AV_CLIPS.length+'/'+AV_TOTAL+' 段，下一段渲染好会自动接上…'; }
+    else { $('avNow').textContent='✓ 连播完毕（'+AV_CLIPS.length+(AV_TOTAL>AV_CLIPS.length?('/'+AV_TOTAL):'')+' 段）'; }
+  };
 }
 
 /* ========== 男女双声 TTS ========== */
