@@ -194,6 +194,9 @@ video{width:100%;border-radius:10px;background:#000;display:block}
   <!-- 第四步：出视频 -->
   <div class="panel">
     <h2><span class="step-n">4</span> 生成数字人视频课</h2>
+    <div class="keyguide" style="margin-bottom:12px">
+      HeyGen 按视频<b>分钟数</b>从你的额度扣费，工具会<b>自动挑最省的出片方式</b>：数字分身若支持标准清晰档（Avatar III）约 <b>$1/分钟</b>；仅支持高逼真档（Avatar IV/V）约 <b>$4/分钟</b>；照片分身约 $3/分钟。<b>点下面按钮后会先弹出预计时长与花费，确认才扣费出片。</b>一条几分钟的课，标准档通常几美元。
+    </div>
     <div class="row">
       <button class="btn" id="btnVideo" type="button" disabled>用我的分身讲这一课</button>
       <span id="videoStatus" class="status" style="margin:0"></span>
@@ -214,6 +217,7 @@ var $=function(id){return document.getElementById(id);};
 var PROXY="/api/llm-proxy";
 var HG="https://api.heygen.com";
 var chosenDoc=null, MANIFEST=null, CHUNKS=[], SHARDS_LOADED=0, SHARDS_TOTAL=0;
+var LAST_VID=null, LAST_USEDV3=false;   // 上一次出片的视频ID/接口，供超时后「再查一次结果」取回已渲染的片子
 var AVATARS=[];   // 载入的分身清单，出片时据此判断真人分身 / 照片分身
 
 /* ============ 第零步：浏览器就地录制（摄像头 / 麦克风） ============ */
@@ -370,7 +374,7 @@ async function loadAvatars(){
   var v3=await hgCall('GET','/v3/avatars/looks?avatar_type=digital_twin&ownership=private',null,12000);
   if(v3.ok && v3.j && v3.j.data){
     var looks=v3.j.data.avatar_looks||v3.j.data.looks||(Array.isArray(v3.j.data)?v3.j.data:[]);
-    if(Array.isArray(looks)) looks.forEach(function(l){ if(l.id) avatars.push({id:l.id, name:'⭐ '+(l.name||l.look_name||'我的数字分身')+'（数字分身·V3）', mine:true, v3:true}); });
+    if(Array.isArray(looks)) looks.forEach(function(l){ if(l.id) avatars.push({id:l.id, name:'⭐ '+(l.name||l.look_name||'我的数字分身')+'（数字分身）', mine:true, v3:true, eng:(l.supported_api_engines||l.supported_engines||null)}); });
   }
   // 主：/v2/avatars（含你训练的 Instant Avatar），15秒超时
   var av=await hgCall('GET','/v2/avatars',null,15000);
@@ -584,30 +588,51 @@ async function genVideo(){
   if(!voiceId){ $('videoErr').textContent='请先选择声音。'; return; }
   if(!script){ $('videoErr').textContent='讲课稿为空，先生成或填写讲稿。'; return; }
   $('videoErr').textContent='';
-  $('btnVideo').disabled=true;
-  $('videoStatus').innerHTML='<span class="spinner"></span>提交到 HeyGen…';
 
   // HeyGen 脚本硬上限约 5000 字符，超了会被拒——截断并提示
   if(script.length>4800){ script=script.slice(0,4800); $('videoErr').textContent='注意：讲稿较长，已截到前 4800 字（HeyGen 单条上限）。如需完整，可分两段出。'; }
   var vTitle=(chosenDoc&&chosenDoc.title||'SDE 视频课').replace(/[\u0000-\u001f]/g,'').slice(0,120);
-  // v3 建视频；分身用 avatar_v 引擎（数字分身）。若失败降级 v2。
-  var vid=null, e3='', e2='', usedV3=false;
-  // 照片分身(talking photo)不是真人分身，v3 的 avatar_v 引擎不收，必须走 v2 的 talking_photo 通道
+
   var meta=null; for(var mi=0;mi<AVATARS.length;mi++){ if(AVATARS[mi].id===avatarId){ meta=AVATARS[mi]; break; } }
   var isTP=!!(meta&&meta.tp);
+
+  // ── 选最便宜的可用出片方式 ─────────────────────────────
+  // Avatar III 数字分身 = $1/min（走 v2，最便宜）；Avatar IV/V 数字分身 = $4/min（走 v3，最逼真）。
+  // HeyGen 规定：只能用分身 supported_api_engines 里列出的引擎，没列的会被拒——所以据此挑，不硬选。
+  var engs=(meta&&meta.eng)||null;   // 该分身支持的引擎数组；null=载入时没拿到（老接口/公共分身）
+  var hasIII = engs ? engs.indexOf('avatar_iii')>=0 : false;
+  var plan;   // {rate:每分钟美元, label:档位说明, mode:'v3'|'v2iii'|'v2tp'}
+  if(isTP)          plan={rate:3.0, label:'照片分身', mode:'v2tp'};       // photo avatar，v2 talking_photo
+  else if(hasIII)   plan={rate:1.0, label:'标准清晰（Avatar III，最省）', mode:'v2iii'}; // $1/min
+  else              plan={rate:4.0, label:'高逼真（Avatar IV/V）', mode:'v3'};           // 分身只支持贵引擎时
+
+  // 估时长：中文口播约 240 字/分钟，据讲稿字数推算，下限 0.5 分钟
+  var mins=Math.max(0.5, script.replace(/\s/g,'').length/240);
+  var estUSD=(mins*plan.rate);
+  var estTxt='本次用【'+plan.label+'】，约 '+mins.toFixed(1)+' 分钟视频，预计花费约 US$'+estUSD.toFixed(2)
+    + '（按 HeyGen 官方 $'+plan.rate.toFixed(0)+'/分钟，实际以生成秒数结算）。\n\n确定要出片并扣费吗？';
+  if(!window.confirm(estTxt)){ $('videoStatus').textContent='已取消，未扣费。'; return; }
+  // ─────────────────────────────────────────────────────
+
+  $('btnVideo').disabled=true;
+  $('videoStatus').innerHTML='<span class="spinner"></span>提交到 HeyGen…';
+  var vid=null, e3='', e2='', usedV3=false;
   try{
-    if(!isTP){
-      var body={ type:'avatar', avatar_id:avatarId, engine:{type:'avatar_v'}, script:script, voice_id:voiceId, resolution:'1080p', aspect_ratio:'auto', title:vTitle };
+    // 只有支持贵引擎的数字分身才走 v3（avatar_iv 是 v3 默认，最稳）；其余全走 v2
+    if(plan.mode==='v3'){
+      var body={ type:'avatar', avatar_id:avatarId, engine:{type:'avatar_iv'}, script:script, voice_id:voiceId, resolution:'1080p', aspect_ratio:'auto', title:vTitle };
       var r=await hgCall('POST','/v3/videos',body,30000);
       if(r.ok && r.j && r.j.data && (r.j.data.video_id||r.j.data.id)){ vid=r.j.data.video_id||r.j.data.id; usedV3=true; }
       else if(r.j && (r.j.video_id||r.j.id)){ vid=r.j.video_id||r.j.id; usedV3=true; }
       else { e3=(r.err)||(r.j&&r.j.error&&(r.j.error.message||r.j.error.code||r.j.error))||('HTTP '+r.status); }
-    } else { e3='照片分身走 v2 通道'; }
-    // v2 兜底（v3 不认这个分身/引擎时）；照片分身直接走这条
+    } else { e3=(plan.mode==='v2iii'?'走 v2 Avatar III 省钱通道':'照片分身走 v2 通道'); }
+    // v2 通道：Avatar III 数字分身（$1/min）、照片分身，以及 v3 被拒时的兜底
     if(!vid){
-      $('videoStatus').innerHTML='<span class="spinner"></span>'+(isTP?'提交照片分身到 HeyGen…':'换一种方式提交…');
+      $('videoStatus').innerHTML='<span class="spinner"></span>'+(plan.mode==='v2iii'?'以标准清晰档提交…':(isTP?'提交照片分身到 HeyGen…':'换一种方式提交…'));
       var ch=isTP?{type:'talking_photo',talking_photo_id:avatarId}:{type:'avatar',avatar_id:avatarId,avatar_style:'normal'};
+      // v2 数字分身出片指定 Avatar III 引擎（省钱档）；照片分身无需指定
       var b2={ video_inputs:[{ character:ch, voice:{type:'text',input_text:script,voice_id:voiceId} }], dimension:{width:1920,height:1080} };
+      if(plan.mode==='v2iii'){ b2.video_inputs[0].character.avatar_engine='avatar_iii'; }
       var r2=await hgCall('POST','/v2/video/generate',b2,30000);
       if(r2.j && r2.j.data && r2.j.data.video_id) vid=r2.j.data.video_id;
       else { e2=(r2.err)||(r2.j&&r2.j.error&&(r2.j.error.message||r2.j.error.code||r2.j.error))||('HTTP '+r2.status); }
@@ -620,11 +645,18 @@ async function genVideo(){
   }
 
   // 轮询状态：v3 建的走 GET /v3/videos/{id}；v2 建的走 /v1/video_status.get
+  LAST_VID=vid; LAST_USEDV3=usedV3;   // 存下来，超时后还能手动再查，别让已扣费的片子取不回
   $('videoStatus').innerHTML='<span class="spinner"></span>HeyGen 渲染中（几分钟，请勿关闭）…';
   var t0=Date.now(), url='';
   while(true){
-    if(Date.now()-t0>20*60*1000){ $('videoStatus').textContent='等待超时（20分钟）。可稍后到 HeyGen 后台查看该视频，或点“下载”重试。'; break; }
+    if(Date.now()-t0>20*60*1000){
+      // 超时不放弃：视频多半还在渲染，保留 ID 给「再查一次」用，别让花了钱的片子取不回来
+      $('videoStatus').innerHTML='已等 20 分钟仍在渲染（Avatar IV 高峰期偶尔较慢）。视频没丢，仍在 HeyGen 出片——过几分钟点下面「再查一次结果」即可取回，或到 HeyGen 后台查看。';
+      showRecheck();
+      $('btnVideo').disabled=false; return;
+    }
     await new Promise(function(r){setTimeout(r,8000);});
+    var mm=Math.floor((Date.now()-t0)/60000), ss=Math.floor((Date.now()-t0)/1000)%60;
     var s = usedV3
       ? await hgCall('GET','/v3/videos/'+encodeURIComponent(vid),null,15000)
       : await hgCall('GET','/v1/video_status.get?video_id='+encodeURIComponent(vid),null,15000);
@@ -632,8 +664,8 @@ async function genVideo(){
     var d=(s.j&&s.j.data)||{};
     var st=d.status||'';
     if(st==='completed'){ url=(d.video_url||d.captioned_video_url||d.video_url_caption||''); break; }   // 优先无字幕的干净版
-    if(st==='failed'){ $('videoErr').textContent='HeyGen 渲染失败：'+(d.failure_message||(d.error&&(d.error.message||d.error))||'未知（可到 HeyGen 后台查看该视频的错误）'); break; }
-    $('videoStatus').innerHTML='<span class="spinner"></span>HeyGen '+(st==='pending'?'排队中':(st==='processing'?'渲染中':(st||'处理')))+'…';
+    if(st==='failed'){ $('videoErr').textContent='HeyGen 渲染失败：'+(d.failure_message||(d.error&&(d.error.message||d.error))||'未知（可到 HeyGen 后台查看该视频的错误）'); $('videoStatus').textContent=''; $('btnVideo').disabled=false; break; }
+    $('videoStatus').innerHTML='<span class="spinner"></span>HeyGen '+(st==='pending'?'排队中':(st==='processing'?'渲染中':(st||'处理')))+'…（已 '+mm+' 分 '+ss+' 秒，勿关闭）';
   }
   if(url){
     $('player').src=url;
@@ -644,6 +676,44 @@ async function genVideo(){
     try{ $('player').play().catch(function(){}); }catch(e){}
   }
   $('btnVideo').disabled=false;
+}
+
+/* ============ 超时后手动再查：把已渲染好的片子取回来（视频没丢，只是页面等超时了） ============ */
+function showRecheck(){
+  if(document.getElementById('btnRecheck')) return;   // 已存在则不重复加
+  var wrap=$('playerWrap');
+  var b=document.createElement('button');
+  b.id='btnRecheck'; b.className='btn'; b.type='button'; b.textContent='🔄 再查一次结果';
+  b.style.marginTop='10px';
+  b.addEventListener('click', recheckVideo);
+  // 插在出片按钮那一行后面
+  $('videoStatus').parentNode.parentNode.insertBefore(b, $('videoStatus').parentNode.nextSibling);
+}
+async function recheckVideo(){
+  if(!LAST_VID){ $('videoStatus').textContent='没有可查询的视频。'; return; }
+  var b=$('btnRecheck'); if(b) b.disabled=true;
+  $('videoErr').textContent='';
+  $('videoStatus').innerHTML='<span class="spinner"></span>正在向 HeyGen 查询这条视频的最新状态…';
+  var s = LAST_USEDV3
+    ? await hgCall('GET','/v3/videos/'+encodeURIComponent(LAST_VID),null,15000)
+    : await hgCall('GET','/v1/video_status.get?video_id='+encodeURIComponent(LAST_VID),null,15000);
+  if(s.err){ $('videoStatus').textContent='查询超时，网络抖动，请再点一次「再查一次结果」。'; if(b) b.disabled=false; return; }
+  var d=(s.j&&s.j.data)||{}, st=d.status||'';
+  if(st==='completed'){
+    var url=(d.video_url||d.captioned_video_url||d.video_url_caption||'');
+    if(url){
+      $('player').src=url; $('dlLink').href=url; $('playerWrap').style.display='block';
+      $('videoStatus').textContent='✓ 视频课已生成'; $('videoDone').textContent='链接来自 HeyGen，尽快下载保存。';
+      try{ $('player').play().catch(function(){}); }catch(e){}
+      if(b) b.style.display='none';
+    } else { $('videoStatus').textContent='已完成但未拿到播放地址，请到 HeyGen 后台下载。'; if(b) b.disabled=false; }
+  } else if(st==='failed'){
+    $('videoStatus').textContent=''; $('videoErr').textContent='HeyGen 渲染失败：'+(d.failure_message||'到 HeyGen 后台查看错误详情');
+    if(b) b.style.display='none';
+  } else {
+    $('videoStatus').innerHTML='<span class="spinner"></span>HeyGen 仍在'+(st==='pending'?'排队':'渲染')+'中（'+(st||'处理')+'）——再等几分钟点一次「再查一次结果」。';
+    if(b) b.disabled=false;
+  }
 }
 
 /* ============ 门禁 ============ */
