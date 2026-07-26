@@ -1873,7 +1873,7 @@ async function avatarGenerate(){
       if(r.status===409 || emsg.indexOf('already exist')>=0 || emsg.indexOf('duplicate')>=0){ job.state='running'; submitted++; return; }
       if(r.status===429||r.status>=500||r.status===0){
         AV_SLOW=true; job.retries=(job.retries||0)+1;
-        if(job.retries<=6){ si--; return; }                 // 退回该段，主循环慢速重发（至多6次）
+        if(job.retries<=6){ job.state='pending'; return; }   // 保持 pending，主循环 continue 慢速重发（至多6次）
         job.state='failed'; failedSubmit++; job.err='多次限流仍无法提交(429)'; if(!firstErr) firstErr=job.err; return;
       }
       job.state='failed'; failedSubmit++;
@@ -1965,28 +1965,30 @@ async function avatarGenerate(){
     }
     // 单循环调度：优先递交（还有没提交的就提交一个），否则轮询一个最久没查的在飞任务；
     // 每个动作都过 gate，所以全程严格单请求、按节奏放行。
-    var pollCursor=0;
-    while(si<jobs.length || jobs.some(function(j){return j.state==='running';})){
+    // 真串行·完整优先：提交一个 → 轮询到它彻底渲染完（Succeeded/Failed）→ 才提交下一个。
+    // 任意时刻云端只有 1 段在处理，先攥住一个完整成品，宁慢勿悬。
+    while(si<jobs.length){
       if(stallGuard()) break;
-      if(AV_SLOW){ AV_SLOW=false; RATE=Math.max(2, Math.round(RATE*0.6)); reqGap=Math.round(60000/RATE); refreshStat('限流→降速到每分钟'+RATE+'个'); }   // 吃过429→温和退一档(下限2),不死降到1
-      if(si<jobs.length){
-        // 还有待提交 → 提交一个（submitOne 自己不过 gate，这里替它排队）
-        await gate();
-        var job=jobs[si]; si++;
-        refreshStat('提交第 '+si+' 段');
-        await submitOneRaw(job);         // 见下：不含自旋等待的单发版
-        if(job.state==='running'){ job.subAt=Date.now(); }
-      } else {
-        // 全部提交完 → 专心轮询在飞任务
-        var running=jobs.filter(function(j){return j.state==='running';});
-        if(!running.length) break;
-        var job2=running[pollCursor % running.length]; pollCursor++;
-        await pollJob(job2);
+      var job=jobs[si];
+      refreshStat('提交第 '+(si+1)+'/'+jobs.length+' 段…');
+      await gate();
+      await submitOneRaw(job);
+      if(job.state==='pending'){ continue; }        // 被 429 退回(si 已回退)→重发同一段
+      if(job.state==='running'){
+        job.subAt=Date.now();
+        // 死等这一段渲染完
+        while(job.state==='running'){
+          await sleep(6000);
+          await pollJob(job);
+          if(job.subAt && Date.now()-job.subAt>12*60*1000){ job.state='failed'; job.err='单段渲染超时(12分钟)'; }
+          refreshStat('第 '+(si+1)+'/'+jobs.length+' 段渲染中…（完成才发下一段）');
+        }
+        // 这一段成了 → 立刻能连播已完成的部分
+        if(job.state==='done'){ AV_CLIPS=jobs.filter(function(j){return j.state==='done';}).sort(function(a,b){return a.i-b.i;}); if(AV_CLIPS.length===1){ renderAvatarPlayer(); } }
       }
-      // 超时保护
-      jobs.forEach(function(j){ if(j.state==='running' && j.subAt && Date.now()-j.subAt>12*60*1000){ j.state='failed'; j.err='单段渲染超时(12分钟)'; } });
-      refreshStat();
+      si++;
     }
+    if(stallGuard()){ jobs.forEach(function(j){ if(j.state==='running'){ j.state='failed'; j.err='密钥失效，停止'; } }); }
     if(stallGuard()){ jobs.forEach(function(j){ if(j.state==='running'){ j.state='failed'; j.err='密钥失效，停止'; } }); }
     AV_CLIPS=jobs.filter(function(j){return j.state==='done';}).sort(function(a,b){return a.i-b.i;});
     var fails=jobs.filter(function(j){return j.state==='failed';});
