@@ -132,7 +132,8 @@ fetch('/students/roster.json?v='+Date.now(),{cache:'no-store'}).then(function(r)
       var ageDays = Math.max(0,(now-d.getTime())/86400000);
       var recency = Math.pow(0.5, ageDays/60);           // 60天半衰期：越近的发表，权重越高
       var depth;
-      if(p.type==='poem'){ depth = 1.0; }                  // 诗歌与论文同权：按一篇标准论文计，不做篇幅折扣
+      if(p.weight>0){ depth = p.weight; }                  // 页面自报权重：长篇专著/小说按“相当于 N 篇标准论文”计
+      else if(p.type==='poem'){ depth = 1.0; }             // 诗歌与论文同权：按一篇标准论文计，不做篇幅折扣
       else{
         depth = Math.sqrt((p.words||8000)/10000);
         depth = Math.max(0.6, Math.min(1.8, depth));       // 散文/论文按篇幅深度加权，双端封顶

@@ -176,6 +176,28 @@ def published_date(idx):
     return d, 'git'
 
 
+def paper_weight(idx):
+    """页面自报的计分权重（相当于几篇标准论文）。
+
+    为什么放在页面里：roster.json 是派生数据，每次内容 push 都由本脚本从磁盘重建，
+    手写进 roster 的字段必被覆盖。长篇专著/小说这类"一件顶多篇"的作品，权重必须与
+    页面同在，才能在自动重建后存活。
+
+        <meta name="sde:paper-weight" content="20">
+    """
+    s = open(idx, encoding='utf-8').read()
+    m = re.search(r'<meta\s+name=["\']sde:paper-weight["\']\s+content=["\']([\d.]+)["\']', s)
+    if not m:
+        return None
+    try:
+        w = float(m.group(1))
+    except ValueError:
+        return None
+    if w <= 0 or w > 100:      # 明显写错的挡掉，不让它污染排名
+        return None
+    return int(w) if w == int(w) else w
+
+
 def body_chars(idx):
     """正文字数：跳过骨架后数字符（CJK 一字算一字）。"""
     p = BodyText()
@@ -197,7 +219,11 @@ def build():
             if not date:
                 print(f"  ⚠ 无法确定发表日期，跳过: {os.path.relpath(item, STUDENTS)}", file=sys.stderr)
                 continue
-            papers.append({'date': date, 'words': body_chars(idx)})
+            rec = {'date': date, 'words': body_chars(idx)}
+            w = paper_weight(idx)
+            if w is not None:
+                rec['weight'] = w
+            papers.append(rec)
         papers.sort(key=lambda p: (p['date'], p['words']), reverse=True)
         stu['papers'] = papers
         stu['count'] = len(papers)
