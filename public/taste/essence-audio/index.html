@@ -2081,10 +2081,17 @@ function avPlay(idx, noAuto){
     v=$('avVideo'); v.src=c.url;
   }
   // 字随声走：按播放进度比例逐字点亮（Azure 批量不吐词级时间戳，比例流动已很贴近）
-  v.ontimeupdate=function(){
-    if(!cap||!v.duration) return;
-    var k=Math.max(0, Math.min(c.text.length, Math.round(c.text.length*(v.currentTime/v.duration)+1)));
+  function paintCap(frac){
+    if(!cap) return;
+    frac=Math.max(0, Math.min(1, frac));
+    var k=Math.max(0, Math.min(c.text.length, Math.round(c.text.length*frac)+1));
     cap.innerHTML=spk+'<span style="color:var(--acc,#a78bfa)">'+esc(c.text.slice(0,k))+'</span><span style="opacity:.45">'+esc(c.text.slice(k))+'</span>';
+  }
+  v.ontimeupdate=function(){
+    if(!cap) return;
+    var d=v.duration;
+    if(d && isFinite(d) && d>0){ paintCap(v.currentTime/d); }        // 有有效时长→按进度点亮
+    else if(c.text){ paintCap(v.currentTime/Math.max(1,c.text.length*0.18)); }  // 时长未就绪→按约0.18秒/字估算
   };
   if(!noAuto){ v.play().catch(function(){}); }
   else { v.onloadeddata=function(){ try{ v.currentTime=0.05; v.pause(); }catch(e){} }; }   // 未播先定格首帧，不黑屏
