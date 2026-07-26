@@ -527,7 +527,12 @@ async function callBase(sys, user, maxTok){
     body={contents:[{role:'user',parts:[{text:user}]}],systemInstruction:{parts:[{text:sys}]},generationConfig:{maxOutputTokens:Math.min(8000,maxTok),temperature:0.8}};
     parse=function(j){return j&&j.candidates&&j.candidates[0]&&j.candidates[0].content&&j.candidates[0].content.parts&&j.candidates[0].content.parts.map(function(p){return p.text||'';}).join('');};
   }
-  var r=await fetch(url,{method:'POST',headers:headers,body:JSON.stringify(body)});
+  var ac=new AbortController();
+  var killer=setTimeout(function(){ try{ac.abort();}catch(e){} }, 60000);
+  var r;
+  try{ r=await fetch(url,{method:'POST',headers:headers,body:JSON.stringify(body),signal:ac.signal}); }
+  catch(e){ clearTimeout(killer); throw new Error(e&&e.name==='AbortError'?'生成超时（60秒），基底响应太慢，重试或换个基底':(e&&e.message||String(e))); }
+  clearTimeout(killer);
   var j=null; try{ j=await r.json(); }catch(e){ throw new Error('响应非法 JSON'); }
   if(!r.ok || (j&&j.error)){ throw new Error('基底报错 '+r.status+'：'+((j&&j.error&&(j.error.message||j.error.code||j.error))||r.statusText)); }
   return parse(j)||'';
@@ -545,19 +550,25 @@ async function genVideo(){
   $('btnVideo').disabled=true;
   $('videoStatus').innerHTML='<span class="spinner"></span>提交到 HeyGen…';
 
+  // HeyGen 脚本硬上限约 5000 字符，超了会被拒——截断并提示
+  if(script.length>4800){ script=script.slice(0,4800); $('videoErr').textContent='注意：讲稿较长，已截到前 4800 字（HeyGen 单条上限）。如需完整，可分两段出。'; }
+  var vTitle=(chosenDoc&&chosenDoc.title||'SDE 视频课').replace(/[\u0000-\u001f]/g,'').slice(0,120);
   // v3 建视频；分身用 avatar_v 引擎（数字分身）。若失败降级 v2。
-  var vid=null;
+  var vid=null, e3='', e2='';
   try{
-    var body={ type:'avatar', avatar_id:avatarId, engine:{type:'avatar_v'}, script:script, voice_id:voiceId, resolution:'1080p', aspect_ratio:'auto', title:(chosenDoc&&chosenDoc.title||'SDE 视频课') };
-    var r=await hgCall('POST','/v3/videos',body);
+    var body={ type:'avatar', avatar_id:avatarId, engine:{type:'avatar_v'}, script:script, voice_id:voiceId, resolution:'1080p', aspect_ratio:'auto', title:vTitle };
+    var r=await hgCall('POST','/v3/videos',body,30000);
     if(r.ok && r.j && r.j.data && (r.j.data.video_id||r.j.data.id)){ vid=r.j.data.video_id||r.j.data.id; }
     else if(r.j && (r.j.video_id||r.j.id)){ vid=r.j.video_id||r.j.id; }
-    // v2 兜底
+    else { e3=(r.err)||(r.j&&r.j.error&&(r.j.error.message||r.j.error.code||r.j.error))||('HTTP '+r.status); }
+    // v2 兜底（v3 不认这个分身/引擎时）
     if(!vid){
+      $('videoStatus').innerHTML='<span class="spinner"></span>换一种方式提交…';
       var b2={ video_inputs:[{ character:{type:'avatar',avatar_id:avatarId,avatar_style:'normal'}, voice:{type:'text',input_text:script,voice_id:voiceId} }], dimension:{width:1920,height:1080} };
-      var r2=await hgCall('POST','/v2/video/generate',b2);
+      var r2=await hgCall('POST','/v2/video/generate',b2,30000);
       if(r2.j && r2.j.data && r2.j.data.video_id) vid=r2.j.data.video_id;
-      if(!vid){ throw new Error((r.j&&r.j.error&&(r.j.error.message||r.j.error))||(r2.j&&r2.j.error&&(r2.j.error.message||r2.j.error))||('HTTP '+r.status)); }
+      else { e2=(r2.err)||(r2.j&&r2.j.error&&(r2.j.error.message||r2.j.error.code||r2.j.error))||('HTTP '+r2.status); }
+      if(!vid){ throw new Error('v3:'+(e3||'?')+' ｜ v2:'+(e2||'?')); }
     }
   }catch(e){
     $('videoStatus').textContent='';
@@ -571,7 +582,8 @@ async function genVideo(){
   while(true){
     if(Date.now()-t0>20*60*1000){ $('videoStatus').textContent='等待超时（20分钟）。可稍后到 HeyGen 后台查看该视频。'; break; }
     await new Promise(function(r){setTimeout(r,8000);});
-    var s=await hgCall('GET','/v1/video_status.get?video_id='+encodeURIComponent(vid),null);
+    var s=await hgCall('GET','/v1/video_status.get?video_id='+encodeURIComponent(vid),null,15000);
+    if(s.err){ continue; }   // 单次查询超时/抖动→下一轮再查，不中断
     var st=(s.j&&s.j.data&&s.j.data.status)||'';
     if(st==='completed'){ url=(s.j.data.video_url||s.j.data.video_url_caption||''); break; }
     if(st==='failed'){ $('videoErr').textContent='HeyGen 渲染失败：'+((s.j.data&&s.j.data.error&&(s.j.data.error.message||s.j.data.error))||'未知'); break; }
