@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>狮城荣耀 · 在线翻页阅读 | 专著栏目 · SDE Universes</title>
+<meta name="description" content="狮城荣耀 · 斐索（秦莉）著 · 412 页全书在线翻页阅读。按卷章跳转，键盘左右翻页。不提供下载。">
+<style>
+:root{
+  --ground:#12160E; --ground2:#191E13; --plate:#1D2317;
+  --laterite:#A8763C; --laterite2:#C79350;
+  --parade:#EFEBDF; --khaki:#8A8B70; --khaki2:#6E7059; --ord:#C4382E;
+  --rule:rgba(168,118,60,0.26);
+  --disp:"Arial Narrow","Helvetica Neue Condensed","PingFang SC","Hiragino Sans GB",sans-serif;
+  --body:"Noto Serif SC","Songti SC",Georgia,serif;
+  --util:ui-monospace,SFMono-Regular,"Menlo",monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--ground);color:var(--parade);font-family:var(--body);min-height:100vh;
+  background-image:radial-gradient(120% 50% at 50% -8%, rgba(168,118,60,0.10), transparent 62%)}
+a{color:var(--laterite2);text-decoration:none}
+a:focus-visible,button:focus-visible,select:focus-visible{outline:2px solid var(--laterite2);outline-offset:2px}
+
+.bar{position:sticky;top:0;z-index:30;background:rgba(18,22,14,0.94);backdrop-filter:blur(9px);
+  border-bottom:1px solid var(--rule)}
+.bar .w{max-width:1180px;margin:0 auto;padding:10px 20px;display:flex;align-items:center;
+  justify-content:space-between;gap:12px;flex-wrap:wrap}
+.bar .back{font-family:var(--disp);font-size:13px;letter-spacing:.14em}
+.bar .ttl{font-family:var(--disp);font-size:13px;letter-spacing:.26em;color:var(--laterite)}
+.tools{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+select,button{font-family:var(--disp);font-size:13px;letter-spacing:.06em;background:var(--ground2);
+  color:var(--parade);border:1px solid var(--rule);padding:7px 11px;cursor:pointer}
+select{max-width:15em}
+button:hover:not(:disabled),select:hover{border-color:var(--laterite);color:var(--laterite2)}
+button:disabled{opacity:.34;cursor:default}
+.pageno{font-family:var(--util);font-size:13px;color:var(--khaki);font-variant-numeric:tabular-nums;
+  min-width:7.5em;text-align:center}
+.pageno b{color:var(--laterite2);font-weight:600}
+
+.stage{max-width:1180px;margin:0 auto;padding:26px 20px 12px;position:relative}
+.paper{background:#EFEBDF;box-shadow:0 26px 66px rgba(0,0,0,0.62);margin:0 auto;width:fit-content;
+  border:1px solid rgba(168,118,60,0.22)}
+canvas{display:block;max-width:100%;height:auto}
+.tap{position:absolute;top:26px;bottom:12px;width:16%;cursor:pointer;background:transparent;border:0}
+.tap.l{left:0}.tap.r{right:0}
+.tap:hover{background:linear-gradient(90deg,rgba(168,118,60,0.10),transparent)}
+.tap.r:hover{background:linear-gradient(270deg,rgba(168,118,60,0.10),transparent)}
+
+.foot{max-width:1180px;margin:0 auto;padding:6px 20px 40px;display:flex;justify-content:space-between;
+  gap:14px;flex-wrap:wrap;align-items:center}
+.hint{font-family:var(--util);font-size:11.5px;letter-spacing:.10em;color:var(--khaki2);line-height:1.7}
+.nodl{font-family:var(--util);font-size:11.5px;letter-spacing:.12em;color:var(--khaki2);
+  border-left:2px solid var(--khaki2);padding-left:10px}
+.load{text-align:center;padding:70px 20px;color:var(--khaki);font-family:var(--disp);letter-spacing:.2em;font-size:13px}
+@media (max-width:640px){ .tap{display:none} .bar .ttl{display:none} }
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style></head>
+<body>
+
+<div class="bar"><div class="w">
+  <a class="back" href="index.html">‹ 返回书页</a>
+  <span class="ttl">狮城荣耀 · 斐索</span>
+  <div class="tools">
+    <select id="jump" aria-label="跳到卷或章"></select>
+    <button id="prev" aria-label="上一页">‹ 上一页</button>
+    <span class="pageno"><b id="cur">–</b> / <span id="tot">412</span></span>
+    <button id="next" aria-label="下一页">下一页 ›</button>
+    <button id="zin" aria-label="放大">＋</button>
+    <button id="zout" aria-label="缩小">－</button>
+  </div>
+</div></div>
+
+<div class="stage">
+  <button class="tap l" id="tapL" aria-label="上一页"></button>
+  <button class="tap r" id="tapR" aria-label="下一页"></button>
+  <div id="load" class="load">正在载入全书 412 页…</div>
+  <div class="paper" id="paper" hidden><canvas id="cv"></canvas></div>
+</div>
+
+<div class="foot">
+  <p class="hint">键盘 ← → 翻页 · 点击页面两侧空白翻页 · 上方下拉可直接跳到任一卷章</p>
+  <p class="nodl">本书仅提供在线阅读，不提供下载</p>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>
+(function(){
+  "use strict";
+  // 与学员专栏侧共用同一份 PDF，不在本目录再存一份 5.8MB
+  var SRC = "/students/qin-li/lion-city-glory/lcg.pdf";
+  pdfjsLib.GlobalWorkerOptions.workerSrc =
+    "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+
+  // 卷章与起始页取自定稿目录
+  var TOC = [
+    ["卷", "第一卷　海岛的菜鸟风暴", 1],
+    ["章", "第一章　局外人的第一天", 2], ["章", "第二章　深夜五公里", 14],
+    ["章", "第三章　鸡腿的温度", 23], ["章", "第四章　战场不分贵贱", 33],
+    ["章", "第五章　初代 SDE 与黑夜演习", 43], ["章", "第六章　二十四公里与白衣启航", 62],
+    ["卷", "第二卷　军官学校的信任雷区", 85],
+    ["章", "第七章　陆、海、空的下马威", 86], ["章", "第八章　澳洲荒野与外部尊重", 94],
+    ["章", "第九章　蓬莱雷区", 107], ["章", "第十章　算法误判", 124],
+    ["章", "第十一章　圣诞后的眼泪", 142], ["章", "第十二章　肩膀上的第一颗星", 156],
+    ["卷", "第三卷　本土风云：黑金天网", 173],
+    ["章", "第十三章　新官上任的小大人", 174], ["章", "第十四章　商场里的异动", 186],
+    ["章", "第十五章　绝密报告", 194], ["章", "第十六章　圣海沙收网", 208],
+    ["章", "第十七章　第七本护照与西海岸口袋阵", 221], ["章", "第十八章　授勋与行囊里的责任", 235],
+    ["卷", "第四卷　澜塔惊魂：跨国救援", 251],
+    ["章", "第十九章　三万英尺的相遇", 252], ["章", "第二十章　霓虹魔窟", 264],
+    ["章", "第二十一章　澜京雨夜的合法边界", 279], ["章", "第二十二章　暗夜审讯", 296],
+    ["章", "第二十三章　渤湾废弃仓库", 308], ["章", "第二十四章　天网黎明", 323],
+    ["卷", "第五卷　荣耀卸甲，奔向未来", 336],
+    ["章", "第二十五章　使馆灯火", 337], ["章", "第二十六章　归营之后", 351],
+    ["章", "第二十七章　最后一批新兵", 363], ["章", "第二十八章　ORD 那一天", 378],
+    ["章", "第二十九章　山城火锅与新的互动", 388], ["章", "第三十章　下一站，星辰大海", 398]
+  ];
+
+  var $ = function(id){ return document.getElementById(id); };
+  var doc = null, page = 1, busy = false, queued = null, scale = 1.3;
+  var cv = $("cv"), ctx = cv.getContext("2d");
+
+  var jump = $("jump");
+  jump.appendChild(new Option("跳到卷 / 章…", ""));
+  TOC.forEach(function(t){
+    var o = new Option((t[0] === "卷" ? "" : "　") + t[1] + "　p" + t[2], String(t[2]));
+    jump.appendChild(o);
+  });
+
+  function render(n){
+    busy = true;
+    doc.getPage(n).then(function(pg){
+      var vp = pg.getViewport({ scale: scale });
+      var dpr = Math.min(window.devicePixelRatio || 1, 2);
+      cv.width = Math.floor(vp.width * dpr);
+      cv.height = Math.floor(vp.height * dpr);
+      cv.style.width = Math.floor(vp.width) + "px";
+      cv.style.height = Math.floor(vp.height) + "px";
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      return pg.render({ canvasContext: ctx, viewport: vp }).promise;
+    }).then(function(){
+      busy = false;
+      if (queued !== null){ var q = queued; queued = null; render(q); }
+    });
+    $("cur").textContent = n;
+    $("prev").disabled = (n <= 1);
+    $("next").disabled = (doc && n >= doc.numPages);
+  }
+  function queue(n){ if (busy) queued = n; else render(n); }
+  function go(n){
+    if (!doc) return;
+    n = Math.max(1, Math.min(n, doc.numPages));
+    if (n === page) return;
+    page = n; queue(page);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  $("prev").onclick = function(){ go(page - 1); };
+  $("next").onclick = function(){ go(page + 1); };
+  $("tapL").onclick = function(){ go(page - 1); };
+  $("tapR").onclick = function(){ go(page + 1); };
+  $("zin").onclick  = function(){ scale = Math.min(scale + 0.2, 2.6); queue(page); };
+  $("zout").onclick = function(){ scale = Math.max(scale - 0.2, 0.6); queue(page); };
+  jump.onchange = function(){ if (this.value) go(parseInt(this.value, 10)); this.selectedIndex = 0; };
+  document.addEventListener("keydown", function(e){
+    if (/^(INPUT|SELECT|TEXTAREA)$/.test(e.target.tagName)) return;
+    if (e.key === "ArrowLeft")  go(page - 1);
+    if (e.key === "ArrowRight") go(page + 1);
+  });
+
+  pdfjsLib.getDocument(SRC).promise.then(function(pdf){
+    doc = pdf;
+    $("tot").textContent = pdf.numPages;
+    $("load").hidden = true;
+    $("paper").hidden = false;
+    render(page);
+  }).catch(function(err){
+    $("load").textContent = "全书载入失败，请刷新重试。";
+    if (window.console) console.error(err);
+  });
+})();
+</script>
+<script src="/wds-mode.js" defer></script>
+</body></html>
