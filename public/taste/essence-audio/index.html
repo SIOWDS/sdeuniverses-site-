@@ -1822,6 +1822,7 @@ async function avatarGenerate(){
     var si=1, active=0, submitted=0, failedSubmit=0, firstErr='';   // 从第2句起提交(第1句由探针承担;探针失败时下方会重置)
     function sleep(ms){ return new Promise(function(r){setTimeout(r,ms);}); }
     var AV_NOCROP=false;   // 探针发现裁切被拒→本场自动降级全幅
+    var AV_SLOW=false;     // 吃到过 429 → 后续提交降并发为1、启动间隔加大,不再硬顶闸门
     function avCfgOf(job){
       var cfg={ talkingAvatarCharacter:job.character, talkingAvatarStyle:job.style, videoFormat:'mp4', videoCodec:'h264', bitrateKbps:1500, subtitleType:'hard_embedded', backgroundColor:(($('avScene')&&$('avScene').value)||'#FFFFFFFF') };
       if(!AV_NOCROP && (($('avCrop')&&$('avCrop').value)||'half')==='half'){ cfg.videoCrop={ topLeft:{x:480,y:0}, bottomRight:{x:1440,y:1080} }; }
@@ -1840,6 +1841,7 @@ async function avatarGenerate(){
         var emsg=((r.j&&r.j.error&&(r.j.error.message||r.j.error.code))||r.tx||'').toLowerCase();
         if(r.status===409 || emsg.indexOf('already exist')>=0 || emsg.indexOf('duplicate')>=0){ job.state='running'; submitted++; return; }
         // 429/5xx/网络错 → 退避重试；其余直接判败
+        if(r.status===429) AV_SLOW=true;
         if((r.status===429||r.status>=500||r.status===0) && attempt<4){
           st.textContent='提交任务被限流，第 '+attempt+' 次退避重试…（'+(submitted+failedSubmit)+'/'+jobs.length+'）';
           await sleep(2000*attempt);
@@ -1879,7 +1881,8 @@ async function avatarGenerate(){
     else { si=0; }                                                             // 探针没立住(429/5xx到这)→第一句照常走批量
     await new Promise(function(done){
       function pump(){
-        if(active<2 && si<jobs.length){
+        var lim=AV_SLOW?1:2, gap=AV_SLOW?1500:350;
+        if(active<lim && si<jobs.length){
           (function(job){
             active++;
             submitOne(job).finally(function(){
@@ -1888,7 +1891,7 @@ async function avatarGenerate(){
               pump();
             });
           })(jobs[si++]);
-          setTimeout(pump, 350);   // 启动间隔，避免突发限流
+          setTimeout(pump, gap);   // 启动间隔：常态350ms,吃过429后1.5s
           return;
         }
         if(si>=jobs.length && active===0) done();
