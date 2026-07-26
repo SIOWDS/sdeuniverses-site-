@@ -386,46 +386,43 @@ select:focus,input:focus{border-color:var(--accent)}
   <div class="panel stage" id="stageAvatar">
     <span class="step-badge">第四步 · 数字人对话视频（可选）</span>
     <div class="cloudhint" style="margin-bottom:10px">对话稿逐句直驱 <b>Azure 数字人</b>：男句男形象、女句女形象，声音与情感和音频版完全一致。S0 资源名和密钥在页首「🔊 语音系统」勾选「🎬 生成数字人视频」处填写。</div>
-    <div class="row" style="flex-wrap:wrap;gap:8px;margin-top:8px">
-      <span class="drama-lbl">👨 男形象</span>
-      <select id="avMale" style="background:var(--card2);border:1px solid var(--line);border-radius:8px;color:inherit;padding:8px 10px;font-size:13.5px;font-family:inherit">
-        <option value="harry|business" selected>Harry · 商务</option>
-        <option value="harry|casual">Harry · 休闲</option>
-        <option value="harry|youthful">Harry · 青春</option>
-        <option value="jeff|business">Jeff · 商务</option>
-        <option value="jeff|formal">Jeff · 正装</option>
-        <option value="max|business">Max · 商务</option>
-        <option value="max|casual">Max · 休闲</option>
-        <option value="max|formal">Max · 正装</option>
-      </select>
-      <span class="drama-lbl">👩 女形象</span>
-      <select id="avFemale" style="background:var(--card2);border:1px solid var(--line);border-radius:8px;color:inherit;padding:8px 10px;font-size:13.5px;font-family:inherit">
-        <option value="lisa|graceful-sitting" selected>Lisa · 优雅坐姿</option>
-        <option value="lisa|casual-sitting">Lisa · 休闲坐姿</option>
-        <option value="lisa|graceful-standing">Lisa · 优雅站姿</option>
-        <option value="lisa|technical-sitting">Lisa · 讲解坐姿</option>
-        <option value="lori|casual">Lori · 休闲</option>
-        <option value="lori|graceful">Lori · 优雅</option>
-        <option value="lori|formal">Lori · 正装</option>
-        <option value="meg|business">Meg · 商务</option>
-        <option value="meg|formal">Meg · 正装</option>
-      </select>
-    </div>
-    <div class="row" style="flex-wrap:wrap;gap:8px;margin-top:8px">
-      <span class="drama-lbl">🖼 画面布局</span>
-      <select id="avLayout" style="background:var(--card2);border:1px solid var(--line);border-radius:8px;color:inherit;padding:8px 10px;font-size:13.5px;font-family:inherit">
-        <option value="news" selected>📺 双人同框 · 演播室（新闻联播式，男左女右+节目条）</option>
-        <option value="face">🪞 双人同框 · 面对面（访谈式，右侧镜像相向）</option>
-        <option value="single">🎥 单人全屏 · 纪录片（说谁切谁）</option>
-      </select>
-      <span class="drama-lbl">🏙 场景</span>
-      <select id="avScene" style="background:var(--card2);border:1px solid var(--line);border-radius:8px;color:inherit;padding:8px 10px;font-size:13.5px;font-family:inherit">
-        <option value="#1B3A6BFF" selected>演播室深蓝</option>
-        <option value="#F3EDE2FF">暖米访谈室</option>
-        <option value="#FFFFFFFF">纯白</option>
-        <option value="#10131CFF">深空黑</option>
-      </select>
-      <span class="hint" style="margin:0">场景在生成前选（烧进视频）；布局随时可切。</span>
+    <div class="keyguide" style="margin:0 0 4px">
+      <div style="font-weight:700;font-size:14.5px;margin-bottom:2px">🎬 视频设计</div>
+      <div class="hint" style="margin:0 0 10px">人物形象与场景背景在<b>生成前</b>定（烧进视频）；画面布局<b>随时可切</b>（生成后也能换着看）。</div>
+      <div class="cloudgrid">
+        <div class="cf"><span>👨 男形象（主持人）</span><select id="avMale" style="width:100%;background:var(--card,#161a2b);border:1px solid var(--line);border-radius:8px;color:inherit;padding:8px 10px;font-size:13.5px;font-family:inherit">
+          <option value="harry|business" selected>Harry · 商务</option>
+          <option value="harry|casual">Harry · 休闲</option>
+          <option value="harry|youthful">Harry · 青春</option>
+          <option value="jeff|business">Jeff · 商务</option>
+          <option value="jeff|formal">Jeff · 正装</option>
+          <option value="max|business">Max · 商务</option>
+          <option value="max|casual">Max · 休闲</option>
+          <option value="max|formal">Max · 正装</option>
+        </select></div>
+        <div class="cf"><span>👩 女形象（嘉宾）</span><select id="avFemale" style="width:100%;background:var(--card,#161a2b);border:1px solid var(--line);border-radius:8px;color:inherit;padding:8px 10px;font-size:13.5px;font-family:inherit">
+          <option value="lisa|graceful-sitting" selected>Lisa · 优雅坐姿</option>
+          <option value="lisa|casual-sitting">Lisa · 休闲坐姿</option>
+          <option value="lisa|graceful-standing">Lisa · 优雅站姿</option>
+          <option value="lisa|technical-sitting">Lisa · 讲解坐姿</option>
+          <option value="lori|casual">Lori · 休闲</option>
+          <option value="lori|graceful">Lori · 优雅</option>
+          <option value="lori|formal">Lori · 正装</option>
+          <option value="meg|business">Meg · 商务</option>
+          <option value="meg|formal">Meg · 正装</option>
+        </select></div>
+        <div class="cf"><span>🖼 画面布局（随时可切）</span><select id="avLayout" style="width:100%;background:var(--card,#161a2b);border:1px solid var(--line);border-radius:8px;color:inherit;padding:8px 10px;font-size:13.5px;font-family:inherit">
+          <option value="news" selected>📺 双人同框 · 演播室（男左女右+节目条）</option>
+          <option value="face">🪞 双人同框 · 面对面（右侧镜像相向）</option>
+          <option value="single">🎥 单人全屏 · 纪录片（说谁切谁）</option>
+        </select></div>
+        <div class="cf"><span>🏙 场景背景（生成前选，烧进视频）</span><select id="avScene" style="width:100%;background:var(--card,#161a2b);border:1px solid var(--line);border-radius:8px;color:inherit;padding:8px 10px;font-size:13.5px;font-family:inherit">
+          <option value="#1B3A6BFF" selected>演播室深蓝</option>
+          <option value="#F3EDE2FF">暖米访谈室</option>
+          <option value="#FFFFFFFF">纯白</option>
+          <option value="#10131CFF">深空黑</option>
+        </select></div>
+      </div>
     </div>
     <div class="row" style="margin-top:10px">
       <button class="btn" id="btnAvatarGen" type="button">🎬 生成数字人视频</button>
