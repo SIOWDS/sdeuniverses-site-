@@ -91,7 +91,7 @@ video{width:100%;border-radius:10px;background:#000;display:block}
         </div>
         <div id="micStatus" class="status" style="margin-top:6px"></div>
         <audio id="micPlayback" controls style="display:none;width:100%;margin-top:8px"></audio>
-        <a id="micDownload" class="btn2" style="display:none;margin-top:8px" download="我的声音-HeyGen克隆.webm">⬇ 下载声音样本</a>
+        <a id="micDownload" class="btn2" style="display:none;margin-top:8px" download="我的声音-HeyGen克隆.wav">⬇ 下载声音样本（WAV）</a>
       </div>
     </div>
     <div class="tip" style="margin-top:10px">录好下载后：自拍视频拿去 HeyGen 训练 <b>Avatar V</b> 分身；声音样本拿去 <b>AI Studio → Voice → Instant Voice Cloning</b> 克隆你的声音。详细步骤见下一步。</div>
@@ -269,13 +269,16 @@ function micStartRec(){
   var mime=pickMime(['audio/webm;codecs=opus','audio/webm','audio/mp4','audio/ogg']);
   try{ micRec=new MediaRecorder(micStream, mime?{mimeType:mime}:undefined); }catch(e){ micRec=new MediaRecorder(micStream); }
   micRec.ondataavailable=function(ev){ if(ev.data&&ev.data.size) micChunks.push(ev.data); };
-  micRec.onstop=function(){
-    var blob=new Blob(micChunks,{type:micChunks[0]&&micChunks[0].type||'audio/webm'});
-    var url=URL.createObjectURL(blob);
+  micRec.onstop=async function(){
+    var raw=new Blob(micChunks,{type:micChunks[0]&&micChunks[0].type||'audio/webm'});
+    $('micStatus').innerHTML='<span class="spinner"></span>转换成 WAV 格式（HeyGen 通用）…';
+    var wavBlob=null;
+    try{ wavBlob=await blobToWav(raw); }catch(e){ wavBlob=null; }
+    var out=wavBlob||raw, ext=wavBlob?'wav':'webm';
+    var url=URL.createObjectURL(out);
     $('micPlayback').src=url; $('micPlayback').style.display='block';
-    var ext=(blob.type.indexOf('mp4')>=0)?'m4a':(blob.type.indexOf('ogg')>=0?'ogg':'webm');
     $('micDownload').href=url; $('micDownload').download='我的声音-HeyGen克隆.'+ext; $('micDownload').style.display='inline-block';
-    $('micStatus').textContent='✓ 录音完成（'+(blob.size/1024/1024).toFixed(1)+'MB），可下载后到 HeyGen 克隆声音。';
+    $('micStatus').textContent='✓ 录音完成（'+(out.size/1024/1024).toFixed(1)+'MB · '+ext.toUpperCase()+'），下载后到 HeyGen 上传克隆——'+(wavBlob?'WAV 格式 HeyGen 一定能收':'（转换失败，若上传被拒请换个浏览器）');
   };
   micRec.start(); $('btnMicRec').disabled=true; $('btnMicStop').disabled=false;
   micT0=Date.now();
@@ -286,6 +289,26 @@ function micStartRec(){
   },500);
 }
 function micStopRec(){ if(micRec&&micRec.state!=='inactive') micRec.stop(); $('btnMicRec').disabled=false; $('btnMicStop').disabled=true; if(micTimer){clearInterval(micTimer);micTimer=null;} }
+
+// 把录制的音频（webm/opus）解码后编码成标准 WAV —— HeyGen 一定能收
+async function blobToWav(blob){
+  var ab=await blob.arrayBuffer();
+  var ctx=new (window.AudioContext||window.webkitAudioContext)();
+  var audioBuf=await ctx.decodeAudioData(ab);
+  ctx.close && ctx.close();
+  var numCh=Math.min(1, audioBuf.numberOfChannels)||1;   // 单声道足够，文件更小
+  var ch0=audioBuf.getChannelData(0);
+  var sr=audioBuf.sampleRate, len=ch0.length;
+  var buffer=new ArrayBuffer(44+len*2), view=new DataView(buffer);
+  function wstr(off,s){ for(var i=0;i<s.length;i++) view.setUint8(off+i,s.charCodeAt(i)); }
+  wstr(0,'RIFF'); view.setUint32(4,36+len*2,true); wstr(8,'WAVE');
+  wstr(12,'fmt '); view.setUint32(16,16,true); view.setUint16(20,1,true); view.setUint16(22,1,true);
+  view.setUint32(24,sr,true); view.setUint32(28,sr*2,true); view.setUint16(32,2,true); view.setUint16(34,16,true);
+  wstr(36,'data'); view.setUint32(40,len*2,true);
+  var off=44;
+  for(var i=0;i<len;i++){ var s=Math.max(-1,Math.min(1,ch0[i])); view.setInt16(off, s<0?s*0x8000:s*0x7FFF, true); off+=2; }
+  return new Blob([view],{type:'audio/wav'});
+}
 
 // 取一段文章当录音提词
 var micTimer=null, micT0=0;
