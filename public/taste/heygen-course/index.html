@@ -210,6 +210,29 @@ video{width:100%;border-radius:10px;background:#000;display:block}
       </div>
     </div>
   </div>
+
+  <!-- 第五步：取回已经出好的视频（下载不用在 HeyGen 网页点、不碰它的 Upgrade 收费墙） -->
+  <div class="panel">
+    <h2><span class="step-n">5</span> 取回已出好的视频（下载）</h2>
+    <div class="keyguide" style="margin-bottom:12px">
+      已经在 HeyGen 出过的视频，<b>不用在 HeyGen 网页点下载</b>（那里会要你升级付费）。把该视频在 HeyGen 后台的链接粘到下面，点「取回并下载」——本工具用你第 1 步填的密钥，直接从 HeyGen 取到<b>视频文件本身</b>供你保存。<br>
+      链接长这样：<span style="color:var(--gold2)">app.heygen.com/videos/……-<b>一串32位编号</b></span>，把整条链接粘进来即可（也可只粘那串编号）。
+    </div>
+    <label>HeyGen 视频链接 或 视频ID</label>
+    <input id="fetchVidInput" type="text" placeholder="粘贴 app.heygen.com/videos/... 链接，或直接粘 32 位视频ID" autocomplete="off">
+    <div class="row" style="margin-top:10px">
+      <button class="btn" id="btnFetchVid" type="button">取回并下载</button>
+      <span id="fetchVidStatus" class="status" style="margin:0"></span>
+    </div>
+    <div class="err" id="fetchVidErr"></div>
+    <div id="fetchVidWrap" style="display:none;margin-top:14px">
+      <video id="fetchVidPlayer" controls playsinline></video>
+      <div class="row" style="margin-top:10px">
+        <a id="fetchVidDl" class="btn" href="#" target="_blank" rel="noopener" download>⬇ 下载这个视频</a>
+        <span class="tip" style="margin:0">点上面按钮开始下载；若浏览器只是打开了视频，在视频上右键→「视频另存为」即可。</span>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -716,6 +739,51 @@ async function recheckVideo(){
   }
 }
 
+/* ============ 取回已出好的视频（第5步）：不碰 HeyGen 网页付费墙 ============ */
+function extractVidId(s){
+  s=(s||'').trim();
+  // 从链接末段取 ID：优先 32 位十六进制（v3/v2 视频ID都是这种）
+  var m=s.match(/([0-9a-f]{32})/i);
+  if(m) return m[1];
+  // 退而求其次：URL 最后一段
+  var parts=s.split(/[\/?#]/).filter(Boolean);
+  return parts.length?parts[parts.length-1]:s;
+}
+async function fetchExistingVideo(){
+  var raw=$('fetchVidInput').value;
+  var vid=extractVidId(raw);
+  $('fetchVidErr').textContent='';
+  if(!hgKey()){ $('fetchVidErr').textContent='请先在第 1 步填 HeyGen API Key。'; return; }
+  if(!vid){ $('fetchVidErr').textContent='没识别到视频链接或ID，请把 HeyGen 后台那条视频的完整链接粘进来。'; return; }
+  var b=$('btnFetchVid'); b.disabled=true;
+  $('fetchVidStatus').innerHTML='<span class="spinner"></span>正在从 HeyGen 取视频（ID: '+vid.slice(0,8)+'…）…';
+  // v3 建的视频走 GET /v3/videos/{id}，v2 建的走 /v1/video_status.get —— 两个都试
+  var url='', st='', tried=[];
+  var s1=await hgCall('GET','/v3/videos/'+encodeURIComponent(vid),null,15000);
+  if(s1.j && s1.j.data){ var d1=s1.j.data; st=d1.status||''; if(st==='completed') url=(d1.video_url||d1.captioned_video_url||d1.video_url_caption||''); tried.push('v3:'+(st||s1.status)); }
+  if(!url){
+    var s2=await hgCall('GET','/v1/video_status.get?video_id='+encodeURIComponent(vid),null,15000);
+    if(s2.j && s2.j.data){ var d2=s2.j.data; var st2=d2.status||''; if(st2==='completed') url=(d2.video_url||d2.video_url_caption||''); if(!st) st=st2; tried.push('v1:'+(st2||s2.status)); }
+  }
+  b.disabled=false;
+  if(url){
+    $('fetchVidPlayer').src=url;
+    $('fetchVidDl').href=url;
+    // 用 ID 做个像样的下载文件名
+    $('fetchVidDl').download='SDE视频课-'+vid.slice(0,8)+'.mp4';
+    $('fetchVidWrap').style.display='block';
+    $('fetchVidStatus').textContent='✓ 取到了！点下面「下载这个视频」保存（链接有时效，尽快下）。';
+    try{ $('fetchVidPlayer').play().catch(function(){}); }catch(e){}
+  } else if(st==='processing'||st==='pending'){
+    $('fetchVidStatus').textContent='这条视频 HeyGen 还在'+(st==='pending'?'排队':'渲染')+'中，过几分钟再点「取回并下载」。';
+  } else if(st==='failed'){
+    $('fetchVidStatus').textContent=''; $('fetchVidErr').textContent='HeyGen 显示这条视频渲染失败了。';
+  } else {
+    $('fetchVidStatus').textContent='';
+    $('fetchVidErr').textContent='没取到视频地址（'+(tried.join(' ｜ ')||'无响应')+'）。确认：①密钥和出这条片的是同一个；②链接/ID 正确。若仍不行，把这行提示截图发我。';
+  }
+}
+
 /* ============ 门禁 ============ */
 function refreshGates(){
   $('btnScript').disabled = !chosenDoc;
@@ -740,6 +808,8 @@ $('script').addEventListener('input', refreshGates);
 $('hgAvatar').addEventListener('change', refreshGates);
 $('hgVoice').addEventListener('change', refreshGates);
 $('hgKey').addEventListener('input', refreshGates);
+$('btnFetchVid').addEventListener('click', fetchExistingVideo);
+$('fetchVidInput').addEventListener('keydown', function(e){ if(e.key==='Enter') fetchExistingVideo(); });
 </script>
 </body>
 </html>
