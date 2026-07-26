@@ -443,8 +443,8 @@ select:focus,input:focus{border-color:var(--accent)}
       <div id="avSingleWrap"><video id="avVideo" controls playsinline style="width:100%;max-height:420px;background:#000;border-radius:10px"></video></div>
       <div id="avDuoWrap" style="display:none;position:relative;border-radius:10px;overflow:hidden;background:#000;cursor:pointer" title="点击暂停 / 续播">
         <div style="display:flex;gap:2px">
-          <video id="avVidM" playsinline muted style="width:calc(50% - 1px);display:block;background:#000"></video>
-          <video id="avVidF" playsinline muted style="width:calc(50% - 1px);display:block;background:#000"></video>
+          <video id="avVidM" playsinline style="width:calc(50% - 1px);display:block;background:#000"></video>
+          <video id="avVidF" playsinline style="width:calc(50% - 1px);display:block;background:#000"></video>
         </div>
         <div id="avLower" style="position:absolute;left:0;right:0;bottom:0;background:linear-gradient(90deg,rgba(14,20,40,.94),rgba(14,20,40,.75));color:#fff;padding:8px 14px;font-size:14px;display:flex;gap:10px;align-items:center">
           <span style="background:var(--acc,#7c5cff);color:#fff;font-size:12px;padding:2px 8px;border-radius:4px;white-space:nowrap">SDE 讲堂</span>
@@ -455,6 +455,7 @@ select:focus,input:focus{border-color:var(--accent)}
       <div id="avCaption" style="margin-top:8px;padding:10px 14px;background:var(--card2);border:1px solid var(--line);border-radius:10px;font-size:15px;line-height:1.75;min-height:1.5em"></div>
       <div class="row" style="margin-top:8px;gap:8px">
         <button class="mini" id="btnAvPlayAll" type="button">▶ 从头连播</button>
+        <button class="mini" id="btnAvDiag" type="button">🔍 诊断音频</button>
         <span id="avNow" class="hint" style="margin:0"></span>
       </div>
       <div id="avClips" style="margin-top:8px;display:flex;flex-wrap:wrap;gap:6px"></div>
@@ -2055,7 +2056,8 @@ function avPlay(idx, noAuto){
     if(!otherPrev){ otherPrev = AV_CLIPS.filter(function(x){return x.who!==c.who;})[0]; }
     if(other && otherPrev && other.__primed!==otherPrev.url && other.paused!==false){ avPrimeSide(other, otherPrev); }
     try{ other && other.pause(); }catch(e){}
-    mine.__primed=c.url; mine.muted=false; mine.volume=1; mine.src=c.url; v=mine;
+    if(other){ other.muted=true; }                       // 对面侧永远静音
+    mine.__primed=c.url; mine.muted=false; mine.volume=1; mine.src=c.url; v=mine;   // 说话侧出声
     $('avLowerTitle').textContent=(lastTitle||'');
     $('avLowerWho').textContent=(c.who==='m'?'主持人':'嘉宾')+' · 第 '+(idx+1)+'/'+AV_CLIPS.length+' 段';
   } else {
@@ -2521,6 +2523,33 @@ $('btnDl').addEventListener('click', downloadText);
 $('btnSaveDir').addEventListener('click', saveToDir);
 $('btnApplySubmit').addEventListener('click', applySubmit);
 $('btnAvatarGen').addEventListener('click', avatarGenerate);
+$('btnAvDiag') && $('btnAvDiag').addEventListener('click', async function(){
+  if(!AV_CLIPS.length){ $('avNow').textContent='还没有视频段可诊断。'; return; }
+  var c=AV_CLIPS[Math.max(0,avPlayIdx)];
+  $('avNow').textContent='正在拉取第 '+(Math.max(0,avPlayIdx)+1)+' 段视频分析音轨…';
+  try{
+    var resp=await fetch(c.url); var blob=await resp.blob();
+    var url=URL.createObjectURL(blob);
+    // 用隐藏 audio 元素探测能否解码出声音
+    var probe=document.createElement('video'); probe.src=url; probe.muted=false; probe.volume=1;
+    probe.onloadedmetadata=function(){
+      var dur=probe.duration;
+      // 尝试 Web Audio 分析是否有音轨（部分浏览器 mozHasAudio/webkitAudioDecodedByteCount）
+      var hasAudio = (typeof probe.mozHasAudio!=='undefined') ? probe.mozHasAudio
+                   : (typeof probe.webkitAudioDecodedByteCount!=='undefined') ? null
+                   : null;
+      var sz=(blob.size/1024/1024).toFixed(1);
+      var msg='第 '+(Math.max(0,avPlayIdx)+1)+' 段：时长 '+(dur?dur.toFixed(1)+'秒':'未知')+' · '+sz+'MB';
+      if(hasAudio===true) msg+=' · ✓ 含音轨（浏览器已确认）';
+      else if(hasAudio===false) msg+=' · ✗ 视频本身无音轨！';
+      else msg+=' · 音轨：本浏览器无法直接确认，可点“下载本段”用播放器验证';
+      // 播一小段测试出声
+      probe.currentTime=0; probe.play().then(function(){ setTimeout(function(){ probe.pause(); URL.revokeObjectURL(url); },1500); }).catch(function(){});
+      $('avNow').textContent=msg;
+    };
+    probe.onerror=function(){ $('avNow').textContent='视频解码失败，可能下载不完整或格式问题。'; URL.revokeObjectURL(url); };
+  }catch(e){ $('avNow').textContent='诊断失败：'+(e&&e.message||e); }
+});
 $('btnAvPlayAll').addEventListener('click', function(){
   avPlay(0);
   var v0=(avLayoutMode&&avLayoutMode()!=='single')?((AV_CLIPS[0]&&AV_CLIPS[0].who==='m')?$('avVidM'):$('avVidF')):$('avVideo');
