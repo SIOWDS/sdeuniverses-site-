@@ -1830,7 +1830,7 @@ async function avatarGenerate(){
                character:av.character, style:av.style, state:'pending', url:'', err:'' };
     });
     // ① 提交(并发5)
-    var si=1, active=0, submitted=0, failedSubmit=0, firstErr='';   // 从第2句起提交(第1句由探针承担;探针失败时下方会重置)
+    var si=1, submitted=0, failedSubmit=0, firstErr='';   // 从第2句起提交(第1句由探针承担;探针失败时会重置为0)
     function sleep(ms){ return new Promise(function(r){setTimeout(r,ms);}); }
     var AV_NOCROP=false;   // 探针发现裁切被拒→本场自动降级全幅
     var AV_SLOW=false;     // 吃到过 429 → 后续提交降并发为1、启动间隔加大,不再硬顶闸门
@@ -1890,25 +1890,12 @@ async function avatarGenerate(){
     }
     if(pr.ok){ jobs[0].id=probe.id; jobs[0].state='running'; submitted++; }   // 探针=第一句，进常规轮询
     else { si=0; }                                                             // 探针没立住(429/5xx到这)→第一句照常走批量
-    await new Promise(function(done){
-      function pump(){
-        var lim=AV_SLOW?1:2, gap=AV_SLOW?1500:350;
-        if(active<lim && si<jobs.length){
-          (function(job){
-            active++;
-            submitOne(job).finally(function(){
-              active--;
-              st.textContent='提交任务 '+(submitted+failedSubmit)+'/'+jobs.length+'…'+(firstErr?('｜首个失败：'+firstErr.slice(0,70)):'');
-              pump();
-            });
-          })(jobs[si++]);
-          setTimeout(pump, gap);   // 启动间隔：常态350ms,吃过429后1.5s
-          return;
-        }
-        if(si>=jobs.length && active===0) done();
-      }
-      pump();
-    });
+    // 严格串行：一次只提交一个任务，做完歇口气再下一个（限流后歇更久）
+    for(; si<jobs.length; si++){
+      await submitOne(jobs[si]);
+      st.textContent='提交任务 '+(submitted+failedSubmit)+'/'+jobs.length+'（逐个提交）…'+(firstErr?('｜首个失败：'+firstErr.slice(0,70)):'');
+      if(si+1<jobs.length) await sleep(AV_SLOW?2000:500);
+    }
     if(submitted===0) throw new Error('全部任务提交失败：'+(jobs[0].err||'未知原因'));
     // ② 轮询(每6秒一轮,总限30分钟)
     var t0=Date.now();
