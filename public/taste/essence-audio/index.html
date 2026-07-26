@@ -1782,26 +1782,46 @@ async function avatarGenerate(){
                character:av.character, style:av.style, state:'pending', url:'', err:'' };
     });
     // ① 提交(并发5)
-    var si=0, active=0, submitted=0, failedSubmit=0;
+    var si=0, active=0, submitted=0, failedSubmit=0, firstErr='';
+    function sleep(ms){ return new Promise(function(r){setTimeout(r,ms);}); }
+    async function submitOne(job){
+      for(var attempt=1; attempt<=4; attempt++){
+        var r;
+        try{
+          r=await avatarCall('PUT','/avatar/batchsyntheses/'+job.id+'?api-version=2024-08-01',{
+            inputKind:'SSML', inputs:[{content:job.ssml}],
+            avatarConfig:{ talkingAvatarCharacter:job.character, talkingAvatarStyle:job.style, videoFormat:'mp4', videoCodec:'h264', bitrateKbps:1500 }
+          });
+        }catch(e){ r={ok:false,status:0,j:null,tx:String(e&&e.message||e)}; }
+        if(r.ok){ job.state='running'; submitted++; return; }
+        // 429/5xx/网络错 → 退避重试；其余直接判败
+        if((r.status===429||r.status>=500||r.status===0) && attempt<4){
+          st.textContent='提交任务被限流，第 '+attempt+' 次退避重试…（'+(submitted+failedSubmit)+'/'+jobs.length+'）';
+          await sleep(2000*attempt);
+          continue;
+        }
+        job.state='failed'; failedSubmit++;
+        job.err=(r.j&&r.j.error&&(r.j.error.message||r.j.error.code))||(r.tx&&r.tx.slice(0,100))||('HTTP '+r.status);
+        if(r.status===401||r.status===403) job.err+='（密钥无效，或该资源不是 S0 档／该区域未开放数字人）';
+        if(r.status===404) job.err+='（端点不对：核对资源名/区域）';
+        if(r.status===429) job.err+='（限流：任务太密）';
+        if(!firstErr) firstErr=job.err;
+        return;
+      }
+    }
     await new Promise(function(done){
       function pump(){
-        while(active<5 && si<jobs.length){
+        if(active<2 && si<jobs.length){
           (function(job){
             active++;
-            avatarCall('PUT','/avatar/batchsyntheses/'+job.id+'?api-version=2024-08-01',{
-              inputKind:'SSML', inputs:[{content:job.ssml}],
-              avatarConfig:{ talkingAvatarCharacter:job.character, talkingAvatarStyle:job.style, videoFormat:'mp4', videoCodec:'h264', bitrateKbps:1500 }
-            }).then(function(r){
-              if(r.ok){ job.state='running'; submitted++; }
-              else{
-                job.state='failed'; failedSubmit++;
-                job.err=(r.j&&r.j.error&&(r.j.error.message||r.j.error.code))||('HTTP '+r.status);
-                if(r.status===401||r.status===403) job.err+='（密钥无效，或该资源不是 S0 档／该区域未开放数字人）';
-                if(r.status===404) job.err+='（端点不对：核对资源名/区域）';
-              }
-            }).catch(function(e){ job.state='failed'; failedSubmit++; job.err=String(e&&e.message||e); })
-            .finally(function(){ active--; st.textContent='提交任务 '+(submitted+failedSubmit)+'/'+jobs.length+'…'; pump(); });
+            submitOne(job).finally(function(){
+              active--;
+              st.textContent='提交任务 '+(submitted+failedSubmit)+'/'+jobs.length+'…'+(firstErr?('｜首个失败：'+firstErr.slice(0,70)):'');
+              pump();
+            });
           })(jobs[si++]);
+          setTimeout(pump, 350);   // 启动间隔，避免突发限流
+          return;
         }
         if(si>=jobs.length && active===0) done();
       }
@@ -1825,12 +1845,14 @@ async function avatarGenerate(){
       }
       var doneN=jobs.filter(function(j){return j.state==='done';}).length;
       var failN=jobs.filter(function(j){return j.state==='failed';}).length;
-      st.textContent='数字人合成中… 完成 '+doneN+'/'+jobs.length+(failN?('（失败 '+failN+'）'):'')+' · 预计成片约 '+estMin+' 分钟，请耐心等（每段排队渲染）';
+      var fj=jobs.filter(function(j){return j.state==='failed'&&j.err;})[0];
+      st.textContent='数字人合成中… 完成 '+doneN+'/'+jobs.length+(failN?('（失败 '+failN+'）'):'')+' · 预计成片约 '+estMin+' 分钟，请耐心等（每段排队渲染）'+(fj?('｜失败原因：'+fj.err.slice(0,80)):'');
     }
     AV_CLIPS=jobs.filter(function(j){return j.state==='done';}).sort(function(a,b){return a.i-b.i;});
     var fails=jobs.filter(function(j){return j.state==='failed';});
     if(!AV_CLIPS.length) throw new Error('没有任何片段合成成功。'+(fails[0]?('首个错误：'+fails[0].err):''));
-    st.textContent='✓ 完成 '+AV_CLIPS.length+'/'+jobs.length+' 段'+(fails.length?('（'+fails.length+' 段失败，连播时跳过）'):'')+' · 按视频秒数计费已发生';
+    if(fails.length) console.warn('avatar 失败明细:', fails.map(function(f){return f.i+':'+f.err;}));
+    st.textContent='✓ 完成 '+AV_CLIPS.length+'/'+jobs.length+' 段'+(fails.length?('（'+fails.length+' 段失败，连播跳过｜原因：'+(fails[0].err||'').slice(0,70)+'）'):'')+' · 按视频秒数计费已发生';
     renderAvatarPlayer();
   }catch(e){ er.textContent=String(e&&e.message||e); st.textContent=''; }
   finally{ avBusy=false; $('btnAvatarGen').disabled=false; }
