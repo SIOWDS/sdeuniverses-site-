@@ -407,28 +407,42 @@ async function loadAvatars(){
 function norm(s){ return (s||'').toLowerCase(); }
 function doSearch(){
   if(!MANIFEST){ return; }
-  var q=norm($('q').value.trim()); if(!q){ $('results').innerHTML=''; return; }
-  var scored=[];
-  MANIFEST.docs.forEach(function(d,di){
-    var t=norm(d.title||''); var s=0;
-    if(t.indexOf(q)>=0) s+=100;
-    q.split(/\s+/).forEach(function(w){ if(w&&t.indexOf(w)>=0) s+=20; });
-    if(s>0) scored.push({di:di, s:s, d:d});
-  });
-  scored.sort(function(a,b){return b.s-a.s;});
+  var raw=($('q').value||'').trim();
   var box=$('results'); box.innerHTML='';
-  scored.slice(0,20).forEach(function(x){
+  if(!raw){ return; }
+  var keys=raw.toLowerCase().split(/\s+/).filter(Boolean);
+  var byDoc={};
+  function ent(di){ return byDoc[di]||(byDoc[di]={t:0,best:0,tot:0,bx:''}); }
+  // 搜标题
+  MANIFEST.docs.forEach(function(d,di){
+    var hay=norm((d.l||'')+' '+(d.t||'')); var s=0;
+    keys.forEach(function(k){ if(hay.indexOf(k)>=0) s++; });
+    if(s) ent(di).t = s*6;
+  });
+  // 搜正文分片
+  for(var i=0;i<CHUNKS.length;i++){
+    var ck=CHUNKS[i]; var hay=norm(ck.t||''); var s=0;
+    keys.forEach(function(k){ if(hay.indexOf(k)>=0) s++; });
+    if(!s) continue;
+    var e=ent(ck.d); e.tot+=s; if(s>e.best){ e.best=s; e.bx=ck.t; }
+  }
+  var hits=Object.keys(byDoc).map(function(k){
+    var e=byDoc[k]; var rest=Math.min(Math.max(e.tot-e.best,0), e.best*4);
+    return { di:+k, rank:e.t+e.best+0.35*rest, bx:e.bx };
+  }).filter(function(h){return h.rank>0;}).sort(function(a,b){return b.rank-a.rank;}).slice(0,25);
+  if(!hits.length){ box.innerHTML='<div class="tip">没找到匹配「'+esc(raw)+'」的文章，换个词试试。</div>'; return; }
+  hits.forEach(function(h){
+    var d=MANIFEST.docs[h.di];
     var el=document.createElement('div'); el.className='hit';
-    el.innerHTML='<div class="ht">'+esc(x.d.title||'(无题)')+'</div><div class="hs">'+esc(x.d.url||'')+'</div>';
-    el.onclick=function(){ chooseDoc(x.d); };
+    el.innerHTML='<div class="ht">'+esc(d.t||'(无题)')+'</div><div class="hs">'+esc(d.u||'')+'</div>';
+    el.onclick=function(){ chooseDoc(d); };
     box.appendChild(el);
   });
-  if(!scored.length) box.innerHTML='<div class="tip">没找到匹配的文章。</div>';
 }
 function chooseDoc(d){
-  chosenDoc=d;
+  chosenDoc={ t:(d.t||d.title||''), u:(d.u||d.url||''), title:(d.t||d.title||''), url:(d.u||d.url||'') };
   $('chosen').style.display='block';
-  $('chosen').innerHTML='✓ 已选：<b>'+esc(d.title||'')+'</b><br><span class="tip">'+esc(d.url||'')+'</span>';
+  $('chosen').innerHTML='✓ 已选：<b>'+esc(chosenDoc.t)+'</b><br><span class="tip">'+esc(chosenDoc.u)+'</span>';
   $('results').innerHTML='';
   refreshGates();
 }
