@@ -196,8 +196,9 @@ select:focus,input:focus{border-color:var(--accent)}
           <div class="cf"><span>Azure 区域</span><input id="azRegion" type="text" placeholder="如 eastasia / eastus" autocomplete="off"></div>
           <div class="cf"><span>Azure 密钥</span><input id="azKey" type="password" placeholder="Speech 资源的 Key（只存本地）" autocomplete="off"><span id="azSaveHint" style="font-size:11px;color:var(--muted);margin-top:3px">密钥和区域会自动存到你浏览器本地，下次打开自动填好。</span></div>
         </div>
-        <div style="margin-top:10px">
-          <label style="display:flex;align-items:center;gap:7px;font-size:13.5px;cursor:pointer"><input type="checkbox" id="avEnable" style="accent-color:var(--acc,#7c5cff)"> 🎬 生成数字人视频<span style="color:#889;font-size:12.5px">（可选；需另一个 <b>Standard S0</b> 档语音资源，免费 F0 不行；按视频秒数计费约 $1.44/6 分钟）</span></label>
+        <div class="keyguide" style="margin-top:12px">
+          <label style="display:flex;align-items:center;gap:8px;font-size:14.5px;font-weight:700;cursor:pointer"><input type="checkbox" id="avEnable" style="accent-color:var(--acc,#7c5cff);width:16px;height:16px"> 🎬 数字人视频（可选）</label>
+          <div class="hint" style="margin:6px 0 0">勾选后：下面填视频专用密钥，页面下方会出现「第四步 · 数字人对话视频」（含 🎬 视频设计：形象/布局/场景）。需另一个 <b>Standard S0</b> 档语音资源（免费 F0 不行），按视频秒数计费约 $1.44/6 分钟。</div>
           <div id="avCfg" class="cloudgrid" style="display:none;margin-top:8px">
             <div class="cf"><span>视频·S0 资源名或区域</span><input id="avEndpoint" type="text" placeholder="如 southeastasia 或 sdeavatar" autocomplete="off"></div>
             <div class="cf"><span>视频·S0 密钥</span><input id="avKey" type="password" placeholder="S0 资源的 Key（只存本地）" autocomplete="off"><span id="avCredHint" style="font-size:11px;color:var(--muted);margin-top:3px">和音频密钥一样只存你浏览器本地。数字人仅部分区域开放，推荐 southeastasia。</span></div>
@@ -1755,8 +1756,7 @@ async function applySubmit(){
 var AV_CLIPS=[], avBusy=false, avPlayIdx=-1;
 function avOn(){ var c=$('avEnable'); return !!(c&&c.checked); }
 function updateAvatarStage(){
-  var on = avOn() && !!lastDialogue;
-  var p=$('stageAvatar'); if(p) p.classList.toggle('on', on);
+  var p=$('stageAvatar'); if(p) p.classList.toggle('on', avOn());
 }
 var AV_REGIONS={southeastasia:1,eastasia:1,westus2:1,westeurope:1,northeurope:1,swedencentral:1,eastus:1,eastus2:1,southcentralus:1,westus:1,japaneast:1,koreacentral:1,australiaeast:1,centralindia:1,uksouth:1,francecentral:1,brazilsouth:1,canadacentral:1};
 function avatarHost(v){
@@ -2407,6 +2407,7 @@ if($('avLayout')) $('avLayout').addEventListener('change', function(){ if(AV_CLI
       $('avCfg').style.display = en.checked?'grid':'none';
       updateAvatarStage();
     });
+    updateAvatarStage();   // 载入即按记住的开关状态显出第四步
   }
   var ep=$('avEndpoint'), k=$('avKey');
   if(ep){ ep.value=localStorage.getItem('sde_avatar_ep')||''; ['input','change','blur','paste'].forEach(function(ev){ ep.addEventListener(ev, function(){ localStorage.setItem('sde_avatar_ep', ep.value.trim()); $('avCredHint').textContent='✓ 已保存到本地'; }); }); }
