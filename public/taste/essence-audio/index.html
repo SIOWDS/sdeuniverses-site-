@@ -417,6 +417,10 @@ select:focus,input:focus{border-color:var(--accent)}
           <option value="face">🪞 双人同框 · 面对面（右侧镜像相向）</option>
           <option value="single">🎥 单人全屏 · 纪录片（说谁切谁）</option>
         </select></div>
+        <div class="cf"><span>✂️ 画幅（生成前选，烧进视频）</span><select id="avCrop" style="width:100%;background:var(--card,#161a2b);border:1px solid var(--line);border-radius:8px;color:inherit;padding:8px 10px;font-size:13.5px;font-family:inherit">
+          <option value="half" selected>同框优化 · 每人裁中央半幅（两窗拼成一整幅演播室）</option>
+          <option value="full">全幅 · 每人完整宽画面（单人全屏布局最佳）</option>
+        </select></div>
         <div class="cf"><span>🏙 场景背景（生成前选，烧进视频）</span><select id="avScene" style="width:100%;background:var(--card,#161a2b);border:1px solid var(--line);border-radius:8px;color:inherit;padding:8px 10px;font-size:13.5px;font-family:inherit">
           <option value="#1B3A6BFF" selected>演播室深蓝</option>
           <option value="#F3EDE2FF">暖米访谈室</option>
@@ -432,7 +436,7 @@ select:focus,input:focus{border-color:var(--accent)}
     <div id="avErr" class="err"></div>
     <div id="avPlayerWrap" style="display:none;margin-top:12px">
       <div id="avSingleWrap"><video id="avVideo" controls playsinline style="width:100%;max-height:420px;background:#000;border-radius:10px"></video></div>
-      <div id="avDuoWrap" style="display:none;position:relative;border-radius:10px;overflow:hidden;background:#000">
+      <div id="avDuoWrap" style="display:none;position:relative;border-radius:10px;overflow:hidden;background:#000;cursor:pointer" title="点击暂停 / 续播">
         <div style="display:flex;gap:2px">
           <video id="avVidM" playsinline muted style="width:calc(50% - 1px);display:block;background:#000"></video>
           <video id="avVidF" playsinline muted style="width:calc(50% - 1px);display:block;background:#000"></video>
@@ -1821,7 +1825,11 @@ async function avatarGenerate(){
         try{
           r=await avatarCall('PUT','/avatar/batchsyntheses/'+job.id+'?api-version=2024-08-01',{
             inputKind:'SSML', inputs:[{content:job.ssml}],
-            avatarConfig:{ talkingAvatarCharacter:job.character, talkingAvatarStyle:job.style, videoFormat:'mp4', videoCodec:'h264', bitrateKbps:1500, subtitleType:'hard_embedded', backgroundColor:(($('avScene')&&$('avScene').value)||'#FFFFFFFF') }
+            avatarConfig:(function(){
+                var cfg={ talkingAvatarCharacter:job.character, talkingAvatarStyle:job.style, videoFormat:'mp4', videoCodec:'h264', bitrateKbps:1500, subtitleType:'hard_embedded', backgroundColor:(($('avScene')&&$('avScene').value)||'#FFFFFFFF') };
+                if((($('avCrop')&&$('avCrop').value)||'half')==='half'){ cfg.videoCrop={ topLeft:{x:480,y:0}, bottomRight:{x:1440,y:1080} }; }  // 1920 中央半幅→两窗拼成一整幅
+                return cfg;
+              })()
           });
         }catch(e){ r={ok:false,status:0,j:null,tx:String(e&&e.message||e)}; }
         if(r.ok){ job.state='running'; submitted++; return; }
@@ -1959,6 +1967,7 @@ function avPlay(idx, noAuto){
     cap.innerHTML=spk+'<span style="color:var(--acc,#a78bfa)">'+esc(c.text.slice(0,k))+'</span><span style="opacity:.45">'+esc(c.text.slice(k))+'</span>';
   };
   if(!noAuto){ v.play().catch(function(){}); }
+  else { v.onloadeddata=function(){ try{ v.currentTime=0.05; v.pause(); }catch(e){} }; }   // 未播先定格首帧，不黑屏
   v.onended=function(){ if(avPlayIdx+1<AV_CLIPS.length) avPlay(avPlayIdx+1); else $('avNow').textContent='✓ 连播完毕（'+AV_CLIPS.length+' 段）'; };
 }
 
@@ -2413,6 +2422,12 @@ $('btnApplySubmit').addEventListener('click', applySubmit);
 $('btnAvatarGen').addEventListener('click', avatarGenerate);
 $('btnAvPlayAll').addEventListener('click', function(){ avPlay(0); });
 if($('avLayout')) $('avLayout').addEventListener('change', function(){ if(AV_CLIPS.length){ applyAvLayout(); avPlay(Math.max(0,avPlayIdx), true); } });
+if($('avDuoWrap')) $('avDuoWrap').addEventListener('click', function(){
+  if(!AV_CLIPS.length||avPlayIdx<0) return;
+  var c=AV_CLIPS[avPlayIdx], v=(c.who==='m')?$('avVidM'):$('avVidF');
+  if(!v) return;
+  if(v.paused){ v.play().catch(function(){}); } else { v.pause(); }
+});
 (function(){
   var en=$('avEnable');
   if(en){
