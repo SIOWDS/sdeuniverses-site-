@@ -245,6 +245,30 @@ footer a{color:var(--gold)}
 <h2 class="notes-head">利益冲突声明</h2>
 <p>作者声明无任何潜在利益冲突。</p>
 <p style="margin-top:2.4em;padding-top:1.3em;border-top:1px solid rgba(140,140,140,.28);font-size:.86em;opacity:.72;line-height:1.8"></p>
+
+<section class="sde-expert xp-dark" style="--exp:#C9A84C;--exp2:#D4B25E">
+<div class="xp-hd"><span class="xp-tag"><i></i>专家点评</span><span class="xp-en">EXPERT COMMENTARY</span><span class="xp-line"></span></div>
+<div class="xp-card">
+<div class="xp-seal">评</div>
+<div class="xp-b">
+<div class="xp-h">创新点在哪里<span class="n">/ WHAT IS NEW</span></div>
+<p>把日本美学的存续困境归给「现代化碾压」是最省事的解释，本文换了一条更难也更有意思的路：传统的生命力由内核（一套应对无常与不确定的思想技术）与外壳（触发这套技术的物质接口——苔藓、竹节、水痕）双重结构维系；而<b>托管悖反</b>指的是，一旦被制度接管并加以优化保护，物质接口被打磨得完美，触发条件反而消失。</p>
+<p>这个模型的锋利处在于它把「保护」与「杀死」写成同一个动作，而不是两件事的先后。它也因此有一个具体到近乎可笑、却真正切中要害的操作难题——作者自己点了出来：如何量化「不打扫」这一行为的强度。一个理论能把自己的检验卡在这样一个具体动作上，说明它确实落到了物质层面，而不是停在文化感慨里。</p>
+</div>
+<div class="xp-b">
+<div class="xp-h">应用展望<span class="n">/ WHERE IT CAN BE USED</span></div>
+<ul class="xp-app">
+<li><b>文化遗产与文旅　</b>评估修缮项目时增加一问：这次优化去掉了哪些「不完美」？很多接口正是靠不完美触发的，修好了也就关掉了。</li>
+<li><b>博物馆与展陈　</b>把「可触摸、有痕迹、会变化」当作功能而非风险管理的敌人；玻璃罩保住了物，关掉的是接口。</li>
+<li><b>非遗与技艺传承　</b>传承评估不应只看仪轨完整度，还要看学习者是否仍会遭遇原初的困难；困难被消除时，思想技术就失去了用武之地。</li>
+<li><b>组织与制度设计　</b>同一机制适用于任何被「优化」的实践：流程越顺滑，当初依赖摩擦才发生的那部分能力越难维持。</li>
+</ul>
+</div>
+<div class="xp-edge"><b>边界与下一步。</b>作者对本文的定位很清醒——它属于「理论发现」而非「理论证实」的语境，主要论证力量来自逻辑与案例共鸣。证伪方案里的两个变量（制度性优化强度、感受力变迁）操作化难度都很大，尤其前者。可行的起步是把「优化」拆成可记录的具体处置（是否清扫、是否换新、是否加护栏、是否规定路线），先做描述性编码，再谈相关。</div>
+<div class="xp-sig">点评人 <em>Claude</em> · 依王德生《SDE 本体论》 · 2026年7月26日</div>
+</div>
+</section>
+
 </div>
 <div class="endbox"><div class="lbl">SDE · 金点子发生器</div><div class="big">想让一个问题长出这样的判断？</div>
 <p>本文由 SDE 学员使用金点子发生器锻造。你也可以把自己的问题投进去。</p>
@@ -375,6 +399,55 @@ if(m==="POST"){try{localStorage.setItem(k,day);}catch(e){}}}else{throw 0;}})
 #sde-top.show{opacity:.92;pointer-events:auto}
 @media print{.readbar,#sde-toc,#sde-top,#sde-progress,.endbox,footer{display:none!important}body{background:#fff!important}}
 </style>
+<style id="sde-expert-css">
+.sde-expert{--exp:#2e3a2e;--exp2:#6b7a5e;margin:52px 0 8px;font-family:inherit}
+.sde-expert *{box-sizing:border-box}
+.xp-hd{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.xp-hd .xp-line{flex:1;height:1px;background:linear-gradient(90deg,var(--exp2),rgba(0,0,0,0))}
+.xp-tag{display:inline-flex;align-items:center;gap:7px;font-size:13px;letter-spacing:.14em;
+  color:var(--exp);font-weight:700;white-space:nowrap}
+.xp-tag i{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--exp2);font-style:normal}
+.xp-en{font-size:10.5px;letter-spacing:.22em;color:var(--exp2);opacity:.75;white-space:nowrap}
+.xp-card{position:relative;border:1px solid rgba(0,0,0,.09);border-top:3px solid var(--exp);
+  border-radius:3px 3px 12px 12px;padding:26px 28px 20px;
+  background:linear-gradient(168deg,#fdfcf9 0%,#f6f2e9 100%);
+  box-shadow:0 1px 2px rgba(0,0,0,.04),0 10px 26px -18px rgba(0,0,0,.35)}
+.xp-seal{position:absolute;top:-17px;right:22px;width:44px;height:44px;border-radius:50%;
+  background:var(--exp);color:#fff;display:flex;align-items:center;justify-content:center;
+  font-size:17px;font-weight:700;letter-spacing:0;box-shadow:0 4px 12px -4px rgba(0,0,0,.45);
+  border:2px solid #fdfcf9}
+.xp-b{margin:0 0 18px}
+.xp-b:last-of-type{margin-bottom:8px}
+.xp-h{display:flex;align-items:baseline;gap:9px;margin:0 0 9px;font-size:15.5px;font-weight:700;color:var(--exp)}
+.xp-h span.n{font-size:11.5px;letter-spacing:.1em;color:var(--exp2);font-weight:600}
+.xp-b p{margin:0 0 10px;font-size:15.5px;line-height:1.92;color:#2c2a26;text-align:justify}
+.xp-b p:last-child{margin-bottom:0}
+.xp-app{list-style:none;margin:0;padding:0}
+.xp-app li{position:relative;padding:9px 0 9px 15px;border-top:1px dashed rgba(0,0,0,.10);
+  font-size:15px;line-height:1.85;color:#2c2a26;text-align:justify}
+.xp-app li:first-child{border-top:none}
+.xp-app li:before{content:"";position:absolute;left:0;top:19px;width:5px;height:5px;
+  background:var(--exp2);transform:rotate(45deg)}
+.xp-app li b{color:var(--exp);font-weight:700;margin-right:6px}
+.xp-edge{margin-top:16px;padding:11px 15px;border-left:3px solid var(--exp2);
+  background:rgba(255,255,255,.62);font-size:14.5px;line-height:1.8;color:#4a4740;text-align:justify}
+.xp-edge b{color:var(--exp);font-weight:700}
+.xp-sig{margin-top:16px;padding-top:12px;border-top:1px solid rgba(0,0,0,.08);
+  text-align:right;font-size:12.5px;color:#6d6a62;letter-spacing:.02em}
+.xp-sig em{font-style:normal;color:var(--exp);font-weight:700}
+.sde-expert.xp-dark .xp-card{border-color:rgba(255,255,255,.14);
+  background:linear-gradient(168deg,rgba(255,255,255,.05) 0%,rgba(255,255,255,.02) 100%);
+  box-shadow:0 1px 2px rgba(0,0,0,.25),0 12px 30px -20px rgba(0,0,0,.9)}
+.sde-expert.xp-dark .xp-seal{border-color:rgba(0,0,0,.6);color:#12100c}
+.sde-expert.xp-dark .xp-b p,.sde-expert.xp-dark .xp-app li{color:inherit}
+.sde-expert.xp-dark .xp-app li{border-top-color:rgba(255,255,255,.14)}
+.sde-expert.xp-dark .xp-edge{background:rgba(0,0,0,.22);color:inherit;opacity:.92}
+.sde-expert.xp-dark .xp-sig{border-top-color:rgba(255,255,255,.12);color:inherit;opacity:.62}
+@media (max-width:600px){.xp-card{padding:22px 18px 16px}.xp-seal{right:14px}
+  .xp-b p,.xp-app li{font-size:15px}}
+@media print{.xp-card{box-shadow:none;background:#fff}}
+</style>
+
 <script id="sde-polish-v1-js">
 (function(){
 if(document.getElementById('sde-progress'))return;

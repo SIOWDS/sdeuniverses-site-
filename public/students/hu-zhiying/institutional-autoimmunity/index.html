@@ -257,6 +257,30 @@ footer a{color:var(--gold)}
 <h2 class="notes-head">致谢</h2>
 <p>本文的构思受益于与多位匿名审稿人的建设性对话，以及在社会学理论与组织研究交叉研讨会上同行学者们提出的宝贵批评。文责自负。</p>
 <p style="margin-top:2.4em;padding-top:1.3em;border-top:1px solid rgba(140,140,140,.28);font-size:.86em;opacity:.72;line-height:1.8"></p>
+
+<section class="sde-expert xp-dark" style="--exp:#C9A84C;--exp2:#D4B25E">
+<div class="xp-hd"><span class="xp-tag"><i></i>专家点评</span><span class="xp-en">EXPERT COMMENTARY</span><span class="xp-line"></span></div>
+<div class="xp-card">
+<div class="xp-seal">评</div>
+<div class="xp-b">
+<div class="xp-h">创新点在哪里<span class="n">/ WHAT IS NEW</span></div>
+<p>「制度性自体免疫」处理的是一个真实而少被正面回答的问题：为什么某些旨在保护脆弱者、修复创伤的干预制度，会<b>在忠实执行自身规则的过程中</b>走向内源性崩溃。本文的回答不诉诸资源短缺、外部敌意或执行者动机，而指向一个更根本的错配——当制度试图用高度可操作化的工程构件去修复一个本质上不可操作的领域时，它的精密本身就成了自我攻击。</p>
+<p>「防御即攻击」这个模型的价值在于它把三层串起来：微观互动的自噬、中观的俘获动力学、宏观的法理悖论。而它最重要的一句判断是——<b>这套结构存在的每一分精确性，都是对它所保护之物的持续消耗</b>。这一句同时给出了政策含义的方向：常规建议是「把规则做得更细」，而按本文机制，那恰恰是加速消耗的动作。</p>
+</div>
+<div class="xp-b">
+<div class="xp-h">应用展望<span class="n">/ WHERE IT CAN BE USED</span></div>
+<ul class="xp-app">
+<li><b>社会服务与救助制度　</b>评估表越细，越要同时测量受助者的自述空间被压缩了多少。精确性与保护效果在本文机制里是负相关的。</li>
+<li><b>儿童保护与心理服务　</b>把「不可操作化的部分」写进制度设计而不是留白：明确哪些判断由现场专业人员承担、且不进入量化考核。</li>
+<li><b>公共政策　</b>当一项修复性政策连年加码却效果递减时，先检查是不是这类错配，而不是继续加码。</li>
+<li><b>组织内部　</b>同一警告适用于任何用流程去修复信任的尝试：流程可以保障动作，不能生产信任，而它会消耗现场判断的余地。</li>
+</ul>
+</div>
+<div class="xp-edge"><b>边界与下一步。</b>文中把免疫学的细胞因子风暴作结构性移植，作为分析模型可以，但读者应把它当作形式同构而非生理事实。证伪设计选择排除「资源损耗」假说，方向正确；关键仍是那个尚未操作化的自变量——「工程化精确度」，若能编成可打分的制度文本量表（条款密度、可裁量空间、留白比例），本文就具备了被检验的条件。</div>
+<div class="xp-sig">点评人 <em>Claude</em> · 依王德生《SDE 本体论》 · 2026年7月26日</div>
+</div>
+</section>
+
 </div>
 <div class="endbox"><div class="lbl">SDE · 金点子发生器</div><div class="big">想让一个问题长出这样的判断？</div>
 <p>本文由 SDE 学员使用金点子发生器锻造。你也可以把自己的问题投进去。</p>
@@ -387,6 +411,55 @@ if(m==="POST"){try{localStorage.setItem(k,day);}catch(e){}}}else{throw 0;}})
 #sde-top.show{opacity:.92;pointer-events:auto}
 @media print{.readbar,#sde-toc,#sde-top,#sde-progress,.endbox,footer{display:none!important}body{background:#fff!important}}
 </style>
+<style id="sde-expert-css">
+.sde-expert{--exp:#2e3a2e;--exp2:#6b7a5e;margin:52px 0 8px;font-family:inherit}
+.sde-expert *{box-sizing:border-box}
+.xp-hd{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.xp-hd .xp-line{flex:1;height:1px;background:linear-gradient(90deg,var(--exp2),rgba(0,0,0,0))}
+.xp-tag{display:inline-flex;align-items:center;gap:7px;font-size:13px;letter-spacing:.14em;
+  color:var(--exp);font-weight:700;white-space:nowrap}
+.xp-tag i{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--exp2);font-style:normal}
+.xp-en{font-size:10.5px;letter-spacing:.22em;color:var(--exp2);opacity:.75;white-space:nowrap}
+.xp-card{position:relative;border:1px solid rgba(0,0,0,.09);border-top:3px solid var(--exp);
+  border-radius:3px 3px 12px 12px;padding:26px 28px 20px;
+  background:linear-gradient(168deg,#fdfcf9 0%,#f6f2e9 100%);
+  box-shadow:0 1px 2px rgba(0,0,0,.04),0 10px 26px -18px rgba(0,0,0,.35)}
+.xp-seal{position:absolute;top:-17px;right:22px;width:44px;height:44px;border-radius:50%;
+  background:var(--exp);color:#fff;display:flex;align-items:center;justify-content:center;
+  font-size:17px;font-weight:700;letter-spacing:0;box-shadow:0 4px 12px -4px rgba(0,0,0,.45);
+  border:2px solid #fdfcf9}
+.xp-b{margin:0 0 18px}
+.xp-b:last-of-type{margin-bottom:8px}
+.xp-h{display:flex;align-items:baseline;gap:9px;margin:0 0 9px;font-size:15.5px;font-weight:700;color:var(--exp)}
+.xp-h span.n{font-size:11.5px;letter-spacing:.1em;color:var(--exp2);font-weight:600}
+.xp-b p{margin:0 0 10px;font-size:15.5px;line-height:1.92;color:#2c2a26;text-align:justify}
+.xp-b p:last-child{margin-bottom:0}
+.xp-app{list-style:none;margin:0;padding:0}
+.xp-app li{position:relative;padding:9px 0 9px 15px;border-top:1px dashed rgba(0,0,0,.10);
+  font-size:15px;line-height:1.85;color:#2c2a26;text-align:justify}
+.xp-app li:first-child{border-top:none}
+.xp-app li:before{content:"";position:absolute;left:0;top:19px;width:5px;height:5px;
+  background:var(--exp2);transform:rotate(45deg)}
+.xp-app li b{color:var(--exp);font-weight:700;margin-right:6px}
+.xp-edge{margin-top:16px;padding:11px 15px;border-left:3px solid var(--exp2);
+  background:rgba(255,255,255,.62);font-size:14.5px;line-height:1.8;color:#4a4740;text-align:justify}
+.xp-edge b{color:var(--exp);font-weight:700}
+.xp-sig{margin-top:16px;padding-top:12px;border-top:1px solid rgba(0,0,0,.08);
+  text-align:right;font-size:12.5px;color:#6d6a62;letter-spacing:.02em}
+.xp-sig em{font-style:normal;color:var(--exp);font-weight:700}
+.sde-expert.xp-dark .xp-card{border-color:rgba(255,255,255,.14);
+  background:linear-gradient(168deg,rgba(255,255,255,.05) 0%,rgba(255,255,255,.02) 100%);
+  box-shadow:0 1px 2px rgba(0,0,0,.25),0 12px 30px -20px rgba(0,0,0,.9)}
+.sde-expert.xp-dark .xp-seal{border-color:rgba(0,0,0,.6);color:#12100c}
+.sde-expert.xp-dark .xp-b p,.sde-expert.xp-dark .xp-app li{color:inherit}
+.sde-expert.xp-dark .xp-app li{border-top-color:rgba(255,255,255,.14)}
+.sde-expert.xp-dark .xp-edge{background:rgba(0,0,0,.22);color:inherit;opacity:.92}
+.sde-expert.xp-dark .xp-sig{border-top-color:rgba(255,255,255,.12);color:inherit;opacity:.62}
+@media (max-width:600px){.xp-card{padding:22px 18px 16px}.xp-seal{right:14px}
+  .xp-b p,.xp-app li{font-size:15px}}
+@media print{.xp-card{box-shadow:none;background:#fff}}
+</style>
+
 <script id="sde-polish-v1-js">
 (function(){
 if(document.getElementById('sde-progress'))return;
