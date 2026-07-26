@@ -1997,8 +1997,10 @@ async function avatarGenerate(){
         // 这一段成了 → 立刻能连播已完成的部分
         if(job.state==='done'){
           AV_CLIPS=jobs.filter(function(j){return j.state==='done';}).sort(function(a,b){return a.i-b.i;});
-          if(AV_CLIPS.length===1){ renderAvatarPlayer(); }            // 第一段好→播放器亮、自动开播
-          else { refreshClipList(); if(avWaiting){ avWaiting=false; avPlay(avPlayIdx+1); } }  // 新段可点；播放器在等→续上
+          try{
+            if(AV_CLIPS.length===1){ renderAvatarPlayer(); }            // 第一段好→播放器亮、自动开播
+            else { refreshClipList(); if(avWaiting){ avWaiting=false; avPlay(avPlayIdx+1); } }  // 新段可点；播放器在等→续上
+          }catch(uiErr){ console.warn('播放器刷新出错(不影响继续生成):', uiErr); }   // UI 抛错绝不中断生成循环
         }
       }
       si++;
@@ -2016,8 +2018,15 @@ async function avatarGenerate(){
       er.textContent='失败原因（前'+Math.min(3,tops.length)+'种）：'+tops.slice(0,3).join('　｜　');
     }
     renderAvatarPlayer();
-  }catch(e){ er.textContent=String(e&&e.message||e); st.textContent=''; }
-  finally{ avBusy=false; $('btnAvatarGen').disabled=false; }
+  }catch(e){
+    var em=(e&&e.message)||String(e);
+    var where=(e&&e.stack)?String(e.stack).split('\n')[1]||'':'';
+    er.textContent='生成中断：'+em+(where?('　['+where.trim().slice(0,80)+']'):'');
+    st.textContent='已出 '+AV_CLIPS.length+' 段后中断（上面是原因）';
+    console.error('avatarGenerate 中断:', e);
+    if(AV_CLIPS.length){ try{ renderAvatarPlayer(); }catch(e2){} }   // 已出的段仍可看
+  }
+  finally{ avBusy=false; $('btnAvatarGen').disabled=false; AV_GENERATING=false; }
 }
 function refreshClipList(){
   var list=$('avClips'); if(!list) return; list.innerHTML='';
