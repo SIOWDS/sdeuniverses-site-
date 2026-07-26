@@ -2733,7 +2733,7 @@ export default {
           headers: {
             "access-control-allow-origin": "*",
             "access-control-allow-methods": "POST, OPTIONS",
-            "access-control-allow-headers": "content-type, authorization, x-target-url, x-api-key, anthropic-version, anthropic-dangerous-direct-browser-access, ocp-apim-subscription-key, x-microsoft-outputformat, x-tts-ua",
+            "access-control-allow-headers": "content-type, authorization, x-target-url, x-api-key, anthropic-version, anthropic-dangerous-direct-browser-access, ocp-apim-subscription-key, x-microsoft-outputformat, x-tts-ua, x-target-method",
             "access-control-max-age": "86400",
           },
         });
@@ -2751,7 +2751,9 @@ export default {
       ];
       // Azure 语音合成端点：<region>.tts.speech.microsoft.com（TTS 音频，走同一转发通道，BYOK）
       const azureTts = /^https:\/\/[a-z0-9-]+\.tts\.speech\.microsoft\.com\//i.test(target);
-      const ok = ALLOW.some((p) => target.startsWith(p)) || azureTts;
+      // Azure 数字人批量合成：<资源名>.cognitiveservices.azure.com 或 <区域>.api.cognitive.microsoft.com，仅 /avatar/batchsyntheses 路径
+      const azureAvatar = /^https:\/\/[a-z0-9-]+\.(cognitiveservices\.azure\.com|api\.cognitive\.microsoft\.com)\/avatar\/batchsyntheses(\/|\?|$)/i.test(target);
+      const ok = ALLOW.some((p) => target.startsWith(p)) || azureTts || azureAvatar;
       if (!ok) {
         return new Response(
           JSON.stringify({ error: { message: "target url not allowed", type: "proxy_forbidden" } }),
@@ -2779,12 +2781,16 @@ export default {
       const azUa = request.headers.get("x-tts-ua");
       if (azUa) fwdHeaders.set("user-agent", azUa);
 
+      // 仅数字人端点允许改写方法(批量合成需 PUT/GET/DELETE)；其余一律 POST
+      let fwdMethod = "POST";
+      const xm = (request.headers.get("x-target-method") || "").toUpperCase();
+      if (azureAvatar && (xm === "GET" || xm === "PUT" || xm === "DELETE")) fwdMethod = xm;
       let upstream;
       try {
         upstream = await fetch(target, {
-          method: "POST",
+          method: fwdMethod,
           headers: fwdHeaders,
-          body: request.body,
+          body: (fwdMethod === "GET" || fwdMethod === "DELETE") ? null : request.body,
         });
       } catch (e) {
         return new Response(

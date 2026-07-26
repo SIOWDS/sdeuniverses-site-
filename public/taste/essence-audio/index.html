@@ -374,6 +374,56 @@ select:focus,input:focus{border-color:var(--accent)}
     <div class="cloudhint" style="margin-top:4px">把本次讲解稿连同 <b>Azure 情感音频 MP3</b> 打包投进学员投稿箱，作为原文的「大众应用与音频」功能扩充——审核后挂到原文页。<b>必须用云端音色</b>（页首「语音系统」切云端并填密钥），没有情感音频不能投。</div>
     <div id="playErr" class="err"></div>
   </div>
+
+  <!-- 第四步：数字人视频（Azure Avatar 批量合成，BYOK） -->
+  <div class="panel stage" id="stageAvatar">
+    <span class="step-badge">第四步 · 数字人对话视频（可选）</span>
+    <div class="cloudhint" style="margin-bottom:10px">用 <b>Azure 数字人（Text to Speech Avatar）</b>把这场讲解做成视频：对话稿逐句直驱数字人，男句男形象、女句女形象，声音与情感和音频版完全一致。<b>硬前提</b>：需要一个 <b>Standard S0</b> 档的 Speech 资源（免费 F0 不含数字人，且仅部分区域开放，推荐 Southeast Asia）；按视频秒数计费（约 $1.44 / 6 分钟视频，语音字符费另计）。</div>
+    <div class="row" style="flex-wrap:wrap;gap:8px">
+      <input id="avEndpoint" type="text" placeholder="S0 资源名（或区域如 southeastasia）" style="width:230px;background:var(--card2);border:1px solid var(--line);border-radius:8px;color:inherit;padding:8px 11px;font-size:13.5px;font-family:inherit">
+      <input id="avKey" type="password" placeholder="S0 密钥" autocomplete="off" style="width:150px;background:var(--card2);border:1px solid var(--line);border-radius:8px;color:inherit;padding:8px 11px;font-size:13.5px;font-family:inherit">
+      <span id="avCredHint" class="hint" style="margin:0"></span>
+    </div>
+    <div class="row" style="flex-wrap:wrap;gap:8px;margin-top:8px">
+      <span class="drama-lbl">👨 男形象</span>
+      <select id="avMale" style="background:var(--card2);border:1px solid var(--line);border-radius:8px;color:inherit;padding:8px 10px;font-size:13.5px;font-family:inherit">
+        <option value="harry|business" selected>Harry · 商务</option>
+        <option value="harry|casual">Harry · 休闲</option>
+        <option value="harry|youthful">Harry · 青春</option>
+        <option value="jeff|business">Jeff · 商务</option>
+        <option value="jeff|formal">Jeff · 正装</option>
+        <option value="max|business">Max · 商务</option>
+        <option value="max|casual">Max · 休闲</option>
+        <option value="max|formal">Max · 正装</option>
+      </select>
+      <span class="drama-lbl">👩 女形象</span>
+      <select id="avFemale" style="background:var(--card2);border:1px solid var(--line);border-radius:8px;color:inherit;padding:8px 10px;font-size:13.5px;font-family:inherit">
+        <option value="lisa|graceful-sitting" selected>Lisa · 优雅坐姿</option>
+        <option value="lisa|casual-sitting">Lisa · 休闲坐姿</option>
+        <option value="lisa|graceful-standing">Lisa · 优雅站姿</option>
+        <option value="lisa|technical-sitting">Lisa · 讲解坐姿</option>
+        <option value="lori|casual">Lori · 休闲</option>
+        <option value="lori|graceful">Lori · 优雅</option>
+        <option value="lori|formal">Lori · 正装</option>
+        <option value="meg|business">Meg · 商务</option>
+        <option value="meg|formal">Meg · 正装</option>
+      </select>
+    </div>
+    <div class="row" style="margin-top:10px">
+      <button class="btn" id="btnAvatarGen" type="button">🎬 生成数字人视频</button>
+      <span id="avStatus" class="statusline" style="margin:0"></span>
+    </div>
+    <div id="avErr" class="err"></div>
+    <div id="avPlayerWrap" style="display:none;margin-top:12px">
+      <video id="avVideo" controls playsinline style="width:100%;max-height:420px;background:#000;border-radius:10px"></video>
+      <div class="row" style="margin-top:8px;gap:8px">
+        <button class="mini" id="btnAvPlayAll" type="button">▶ 从头连播</button>
+        <span id="avNow" class="hint" style="margin:0"></span>
+      </div>
+      <div id="avClips" style="margin-top:8px;display:flex;flex-wrap:wrap;gap:6px"></div>
+      <div class="cloudhint" style="margin-top:6px">片段按对话顺序自动连播（一句一段，男女形象交替）；每段可单独下载（链接约 31 天内有效，尽快保存）。</div>
+    </div>
+  </div>
 </div>
 
 <!-- 安装男女声系统 · 弹窗 -->
@@ -1335,6 +1385,8 @@ async function generate(){
     st.innerHTML='✓ 已生成（约 '+out.replace(/\s/g,'').length+' 字）'+(truncNote||'')+'· 到第三步开始朗读';
     $('genTools').style.display='flex';
     $('stagePlay').classList.add('on');
+    $('stageAvatar').classList.add('on');
+    AV_CLIPS=[]; if($('avPlayerWrap')) $('avPlayerWrap').style.display='none'; if($('avStatus')) $('avStatus').textContent=''; if($('avErr')) $('avErr').textContent='';
   }catch(e){
     showGenErr(e.message||String(e));
     st.innerHTML='';
@@ -1670,6 +1722,132 @@ async function applySubmit(){
     else{ st.textContent='投递失败：'+(j.msg||('HTTP '+r.status)); }
   }catch(e){ st.textContent='投稿失败：'+(e&&e.message||e); }
   finally{ applyBusy=false; $('btnApplySubmit').disabled=false; }
+}
+
+/* ===== 第四步：数字人视频（Azure Avatar 批量合成 · BYOK · 一句一任务 → 顺序连播） ===== */
+var AV_CLIPS=[], avBusy=false, avPlayIdx=-1;
+var AV_REGIONS={southeastasia:1,eastasia:1,westus2:1,westeurope:1,northeurope:1,swedencentral:1,eastus:1,eastus2:1,southcentralus:1,westus:1,japaneast:1,koreacentral:1,australiaeast:1,centralindia:1,uksouth:1,francecentral:1,brazilsouth:1,canadacentral:1};
+function avatarHost(v){
+  v=(v||'').trim().toLowerCase().replace(/^https?:\/\//,'').replace(/\/.*$/,'');
+  if(!v) return '';
+  if(v.indexOf('.')>=0) return v;                                   // 已是完整主机名
+  if(AV_REGIONS[v]) return v+'.api.cognitive.microsoft.com';        // 区域名
+  return v+'.cognitiveservices.azure.com';                          // 资源名(自定义子域)
+}
+function avatarSel(who){
+  // 男句男形象、女句女形象；solo 按所选朗读音色的性别挑
+  var g = who==='m' ? 'm' : who==='f' ? 'f' : (function(){
+    var vid=azVoiceOf(who==='n'?'s':who);
+    var hit=(azVoices()||[]).filter(function(x){return x.id===vid;})[0];
+    return (hit&&hit.g)||'f';
+  })();
+  var v=$( g==='m' ? 'avMale' : 'avFemale').value.split('|');
+  return { character:v[0], style:v[1] };
+}
+async function avatarCall(method, path, bodyObj){
+  var host=avatarHost($('avEndpoint').value), key=($('avKey').value||'').trim();
+  var hd={ 'x-target-url':'https://'+host+path, 'x-target-method':method,
+           'ocp-apim-subscription-key':key, 'x-tts-ua':'sde-avatar' };
+  if(bodyObj) hd['content-type']='application/json';
+  var r=await fetch('/api/llm-proxy', { method:'POST', headers:hd, body: bodyObj?JSON.stringify(bodyObj):null });
+  var tx=await r.text();
+  var j=null; try{ j=JSON.parse(tx); }catch(e){}
+  return { ok:r.ok, status:r.status, j:j, tx:tx };
+}
+async function avatarGenerate(){
+  if(avBusy) return;
+  var st=$('avStatus'), er=$('avErr'); er.textContent='';
+  if(!turns||!turns.length){ st.textContent='先在第二步生成讲解稿。'; return; }
+  var host=avatarHost($('avEndpoint').value), key=($('avKey').value||'').trim();
+  if(!host||!key){ st.textContent='请先填 S0 资源名（或区域）和密钥——注意数字人需要 Standard S0 档，免费 F0 不行。'; return; }
+  avBusy=true; $('btnAvatarGen').disabled=true;
+  AV_CLIPS=[]; $('avPlayerWrap').style.display='none';
+  try{
+    var totalChars=turns.reduce(function(a,t){return a+t.text.replace(/\s/g,'').length;},0);
+    var estMin=Math.max(1,Math.round(totalChars/300));
+    var runTag='sde'+Date.now().toString(36);
+    var jobs=turns.map(function(t,i){
+      var vid=azVoiceOf(t.who==='n'?'s':t.who);
+      var av=avatarSel(t.who);
+      return { i:i, who:t.who, text:t.text, id:runTag+'-'+i,
+               ssml:buildSsml(t.text, vid, t.style||'', effRatePct(t.rate)),
+               character:av.character, style:av.style, state:'pending', url:'', err:'' };
+    });
+    // ① 提交(并发5)
+    var si=0, active=0, submitted=0, failedSubmit=0;
+    await new Promise(function(done){
+      function pump(){
+        while(active<5 && si<jobs.length){
+          (function(job){
+            active++;
+            avatarCall('PUT','/avatar/batchsyntheses/'+job.id+'?api-version=2024-08-01',{
+              inputKind:'SSML', inputs:[{content:job.ssml}],
+              avatarConfig:{ talkingAvatarCharacter:job.character, talkingAvatarStyle:job.style, videoFormat:'mp4', videoCodec:'h264', bitrateKbps:1500 }
+            }).then(function(r){
+              if(r.ok){ job.state='running'; submitted++; }
+              else{
+                job.state='failed'; failedSubmit++;
+                job.err=(r.j&&r.j.error&&(r.j.error.message||r.j.error.code))||('HTTP '+r.status);
+                if(r.status===401||r.status===403) job.err+='（密钥无效，或该资源不是 S0 档／该区域未开放数字人）';
+                if(r.status===404) job.err+='（端点不对：核对资源名/区域）';
+              }
+            }).catch(function(e){ job.state='failed'; failedSubmit++; job.err=String(e&&e.message||e); })
+            .finally(function(){ active--; st.textContent='提交任务 '+(submitted+failedSubmit)+'/'+jobs.length+'…'; pump(); });
+          })(jobs[si++]);
+        }
+        if(si>=jobs.length && active===0) done();
+      }
+      pump();
+    });
+    if(submitted===0) throw new Error('全部任务提交失败：'+(jobs[0].err||'未知原因'));
+    // ② 轮询(每6秒一轮,总限30分钟)
+    var t0=Date.now();
+    while(jobs.some(function(j){return j.state==='running';})){
+      if(Date.now()-t0>30*60*1000){ jobs.forEach(function(j){ if(j.state==='running'){ j.state='failed'; j.err='超时'; } }); break; }
+      await new Promise(function(r){setTimeout(r,6000);});
+      var running=jobs.filter(function(j){return j.state==='running';});
+      for(var k=0;k<running.length;k+=5){
+        await Promise.all(running.slice(k,k+5).map(function(job){
+          return avatarCall('GET','/avatar/batchsyntheses/'+job.id+'?api-version=2024-08-01',null).then(function(r){
+            var sst=r.j&&r.j.status;
+            if(sst==='Succeeded'){ job.state='done'; job.url=(r.j.outputs&&r.j.outputs.result)||''; if(!job.url){ job.state='failed'; job.err='无输出'; } }
+            else if(sst==='Failed'){ job.state='failed'; job.err=(r.j.properties&&r.j.properties.error&&r.j.properties.error.message)||'合成失败'; }
+          }).catch(function(){});
+        }));
+      }
+      var doneN=jobs.filter(function(j){return j.state==='done';}).length;
+      var failN=jobs.filter(function(j){return j.state==='failed';}).length;
+      st.textContent='数字人合成中… 完成 '+doneN+'/'+jobs.length+(failN?('（失败 '+failN+'）'):'')+' · 预计成片约 '+estMin+' 分钟，请耐心等（每段排队渲染）';
+    }
+    AV_CLIPS=jobs.filter(function(j){return j.state==='done';}).sort(function(a,b){return a.i-b.i;});
+    var fails=jobs.filter(function(j){return j.state==='failed';});
+    if(!AV_CLIPS.length) throw new Error('没有任何片段合成成功。'+(fails[0]?('首个错误：'+fails[0].err):''));
+    st.textContent='✓ 完成 '+AV_CLIPS.length+'/'+jobs.length+' 段'+(fails.length?('（'+fails.length+' 段失败，连播时跳过）'):'')+' · 按视频秒数计费已发生';
+    renderAvatarPlayer();
+  }catch(e){ er.textContent=String(e&&e.message||e); st.textContent=''; }
+  finally{ avBusy=false; $('btnAvatarGen').disabled=false; }
+}
+function renderAvatarPlayer(){
+  var wrap=$('avPlayerWrap'), list=$('avClips'); wrap.style.display='block'; list.innerHTML='';
+  AV_CLIPS.forEach(function(c,idx){
+    var a=document.createElement('a'); a.className='mini'; a.style.textDecoration='none';
+    a.textContent=(c.who==='m'?'👨':'👩')+' 第'+(idx+1)+'段';
+    a.href='javascript:void(0)'; a.onclick=function(){ avPlay(idx); };
+    var d=document.createElement('a'); d.className='hint'; d.textContent='↓'; d.title='下载本段';
+    d.href=c.url; d.target='_blank'; d.rel='noopener';
+    var box=document.createElement('span'); box.style.display='inline-flex'; box.style.gap='3px'; box.style.alignItems='center';
+    box.appendChild(a); box.appendChild(d); list.appendChild(box);
+  });
+  avPlay(0,true);
+}
+function avPlay(idx, noAuto){
+  if(idx<0||idx>=AV_CLIPS.length) return;
+  avPlayIdx=idx;
+  var v=$('avVideo'), c=AV_CLIPS[idx];
+  $('avNow').textContent='第 '+(idx+1)+' / '+AV_CLIPS.length+' 段 · '+(c.who==='m'?'男':'女')+'：'+c.text.slice(0,42)+'…';
+  v.src=c.url;
+  if(!noAuto){ v.play().catch(function(){}); }
+  v.onended=function(){ if(avPlayIdx+1<AV_CLIPS.length) avPlay(avPlayIdx+1); else $('avNow').textContent='✓ 连播完毕（'+AV_CLIPS.length+' 段）'; };
 }
 
 /* ========== 男女双声 TTS ========== */
@@ -2118,6 +2296,13 @@ $('btnCopy').addEventListener('click', copyText);
 $('btnDl').addEventListener('click', downloadText);
 $('btnSaveDir').addEventListener('click', saveToDir);
 $('btnApplySubmit').addEventListener('click', applySubmit);
+$('btnAvatarGen').addEventListener('click', avatarGenerate);
+$('btnAvPlayAll').addEventListener('click', function(){ avPlay(0); });
+(function(){
+  var ep=$('avEndpoint'), k=$('avKey');
+  if(ep){ ep.value=localStorage.getItem('sde_avatar_ep')||''; ['input','change','blur','paste'].forEach(function(ev){ ep.addEventListener(ev, function(){ localStorage.setItem('sde_avatar_ep', ep.value.trim()); $('avCredHint').textContent='✓ 已保存到本地'; }); }); }
+  if(k){ k.value=localStorage.getItem('sde_avatar_key')||''; ['input','change','blur','paste'].forEach(function(ev){ k.addEventListener(ev, function(){ localStorage.setItem('sde_avatar_key', k.value.trim()); $('avCredHint').textContent='✓ 已保存到本地'; }); }); }
+})();
 (function(){ var v=localStorage.getItem('sde_apply_student')||''; if(v&&$('applyStudent')) $('applyStudent').value=v; })();
 $('btnPickDir').addEventListener('click', pickDir);
 restoreDir();
