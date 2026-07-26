@@ -1964,6 +1964,22 @@ async function avatarGenerate(){
     AV_TOTAL=jobs.length; AV_GENERATING=true; avWaiting=false;   // 边生成边播：后面还有段在来
     // 真串行·完整优先：提交一个 → 轮询到它彻底渲染完（Succeeded/Failed）→ 才提交下一个。
     // 任意时刻云端只有 1 段在处理，先攥住一个完整成品，宁慢勿悬。
+    // ⚠ 探针段(= 第1段 / 主持人开场)也必须在这里轮询到落定：它由探针提交、state 被直接置 running，
+    //   而主循环从 si=1 起、且只轮询自己刚提交的那一段 → 它会永远停在 running，
+    //   既进不了 AV_CLIPS(只收 done)、也不计入 fails(只收 failed)，整段被静默丢弃。
+    if(jobs[0] && jobs[0].state==='running'){
+      jobs[0].subAt=Date.now();
+      while(jobs[0].state==='running'){
+        await sleep(6000);
+        await pollJob(jobs[0]);
+        if(jobs[0].subAt && Date.now()-jobs[0].subAt>12*60*1000){ jobs[0].state='failed'; jobs[0].err='单段渲染超时(12分钟)'; }
+        refreshStat('第 1/'+jobs.length+' 段渲染中…（完成才发下一段）');
+      }
+      if(jobs[0].state==='done'){
+        AV_CLIPS=jobs.filter(function(j){return j.state==='done';}).sort(function(a,b){return a.i-b.i;});
+        try{ renderAvatarPlayer(); }catch(uiErr){ console.warn('播放器刷新出错(不影响继续生成):', uiErr); }
+      }
+    }
     while(si<jobs.length){
       if(stallGuard()) break;
       var job=jobs[si];
@@ -1992,6 +2008,8 @@ async function avatarGenerate(){
       si++;
     }
     if(stallGuard()){ jobs.forEach(function(j){ if(j.state==='running'){ j.state='failed'; j.err='密钥失效，停止'; } }); }
+    // 兜底：循环结束后不允许任何一段还停在 running——否则它既不算成功也不算失败，会被静默丢掉。
+    jobs.forEach(function(j){ if(j.state==='running'){ j.state='failed'; j.err=j.err||('第'+(j.i+1)+'段未轮询到结果(调度遗漏)'); } });
     AV_GENERATING=false;   // 后续段全部落定，播放到结尾即真"完毕"
     AV_CLIPS=jobs.filter(function(j){return j.state==='done';}).sort(function(a,b){return a.i-b.i;});
     var fails=jobs.filter(function(j){return j.state==='failed';});
