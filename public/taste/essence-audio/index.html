@@ -421,6 +421,10 @@ select:focus,input:focus{border-color:var(--accent)}
           <option value="half" selected>同框优化 · 每人裁中央半幅（两窗拼成一整幅演播室）</option>
           <option value="full">全幅 · 每人完整宽画面（单人全屏布局最佳）</option>
         </select></div>
+        <div class="cf"><span>💬 画面字幕（烧进视频）</span><select id="avBurnSub" style="width:100%;background:var(--card,#161a2b);border:1px solid var(--line);border-radius:8px;color:inherit;padding:8px 10px;font-size:13.5px;font-family:inherit">
+          <option value="none" selected>不烧字幕 · 画面干净（推荐 · 网页下方仍有流动字幕与总结）</option>
+          <option value="hard_embedded">烧全文字幕 · 下载mp4自带（半幅布局下两侧可能被裁切）</option>
+        </select></div>
         <div class="cf"><span>🏙 场景背景（生成前选，烧进视频）</span><select id="avScene" style="width:100%;background:var(--card,#161a2b);border:1px solid var(--line);border-radius:8px;color:inherit;padding:8px 10px;font-size:13.5px;font-family:inherit">
           <option value="#1B3A6BFF" selected>演播室深蓝</option>
           <option value="#F3EDE2FF">暖米访谈室</option>
@@ -447,6 +451,7 @@ select:focus,input:focus{border-color:var(--accent)}
           <video id="avVidM" playsinline style="width:calc(50% - 1px);display:block;background:#000"></video>
           <video id="avVidF" playsinline style="width:calc(50% - 1px);display:block;background:#000"></video>
         </div>
+        <div id="avSummary" style="position:absolute;left:0;right:0;bottom:52px;text-align:center;pointer-events:none;display:none"><span style="display:inline-block;background:rgba(10,14,28,.82);color:#fff;font-size:20px;font-weight:700;letter-spacing:.5px;padding:7px 20px;border-radius:8px;box-shadow:0 2px 12px rgba(0,0,0,.4);max-width:86%;line-height:1.35"></span></div>
         <div id="avLower" style="position:absolute;left:0;right:0;bottom:0;background:linear-gradient(90deg,rgba(14,20,40,.94),rgba(14,20,40,.75));color:#fff;padding:8px 14px;font-size:14px;display:flex;gap:10px;align-items:center">
           <span style="background:var(--acc,#7c5cff);color:#fff;font-size:12px;padding:2px 8px;border-radius:4px;white-space:nowrap">SDE 讲堂</span>
           <b id="avLowerTitle" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></b>
@@ -1113,7 +1118,7 @@ function lecSystem(mode, xinde, siteCtx, drama, soloStyle, domain, external, wc)
     + dramaGuide(drama)
     + "【对话感】：整场对话按上面的对话发生 Skill 编排——男主持人的每次接话，要么在同一个问题上较真，要么换一个角度追问（『它是怎么来的？』『它凭什么成立？』），让对话真的往前走，而不是各说各话。\n"
     + "【长度·硬要求】：整篇对话体讲解稿约 "+LM.words+"（中文），读出来大约 "+LM.min+" 分钟。这是硬指标，写短了算不合格，"+LM.seg+"。【发言厚度·铁律】全场发言总次数 "+LM.turnsDuo+" 次；**每一次发言 "+LM.perAvg+" 字上下，任何一次发言不得少于 "+LM.perMin+" 字**——写完每次发言自己数一遍，不够 "+LM.perMin+" 字就继续说下去再换人。全场只允许最多 3 次短追问（主持人一两句的反问）作为例外。严禁一句话就换人、把对话切成乒乓短打；发言次数超出 "+LM.turnsDuo+" 上限＝不合格。"+LM.thickDuo+"开头男主持人用一两句话把今天要讲的文章点出来，结尾女嘉宾用一句话收束。\n"
-    + "【输出格式·必须严格遵守，供程序切分与配语气】：每一次发言单独一行（一次发言=一个人连续说的整段话，"+LM.perAvg+" 字上下、不少于 "+LM.perMin+" 字；不许把一段话拆成多行）；行首先写说话人 `男` 或 `女`，紧跟竖线 `|`、这句话的语气标签、再一个竖线 `|`、这句话的语速档，再一个中文冒号 `：`，然后是内容。语速档三选一：`slow`(放慢·用于沉思/难点/动情/需要回味处)、`normal`(常速)、`fast`(加快·用于激昂/紧张/罗列/推进处)。例：`男|cheerful|fast：你是说……？`、`女|serious|slow：它真正难的地方在于……`。\n"
+    + "【输出格式·必须严格遵守，供程序切分与配语气】：每一次发言单独一行（一次发言=一个人连续说的整段话，"+LM.perAvg+" 字上下、不少于 "+LM.perMin+" 字；不许把一段话拆成多行）；行首先写说话人 `男` 或 `女`，紧跟竖线 `|`、这句话的语气标签、再一个竖线 `|`、这句话的语速档，再一个中文冒号 `：`，然后是内容。语速档三选一：`slow`(放慢·用于沉思/难点/动情/需要回味处)、`normal`(常速)、`fast`(加快·用于激昂/紧张/罗列/推进处)。例：`男|cheerful|fast：你是说……？`、`女|serious|slow：它真正难的地方在于……`。每一行发言的最末尾，再追加一个用【】括起来的该段要点总结（不超过16字、像电视字卡标题、提炼这段最核心的一句），例：`女|serious|normal：它真正难的地方在于分类失效……【AI击穿了分类】`。这个【】总结只用于画面字卡，不会被朗读。\n"
     + "【语气标签只能从这几个里选，按这句话的语义 / 语句 / 语法来定】：general(中性)、cheerful(欢快·多用于提问和轻松处)、gentle(温柔)、narration-relaxed(舒缓讲述·多用于讲解重点)、serious(严肃·讲难点或下判断)、newscast(播报·陈述事实)、lyrical(抒情·结尾升华)、customerservice(亲切)。【关键要求：语气要有明显变化和对比，不要一味用 narration-relaxed，那样听起来很平】——男主持人的提问、惊讶、调侃用 cheerful；女嘉宾讲到激动人心或正面的点用 cheerful 或 lyrical；讲到严峻 / 尖锐 / 下判断的地方一定用 serious；温情、安慰、收束用 gentle；陈述客观事实用 general 或 newscast；抒情升华用 lyrical。相邻的句子尽量用不同的语气，让整段有起伏。一段对话里至少要出现 4 种不同的语气标签。\n"
     + "【出稿前最后三查·必须执行】一查口癖：『这个问题问得特别好』『你说得很准』之类捧场话全场最多保留一次，其余删掉、接话直接从内容进。二查结尾：最后必须有一次明白的回望——把整场走过的两三个关键结算点串成一句话（『我们从…出发，先发现…，又被…顶住，最后落到…』的意思）。三查清单与多域段：不许出现『第二个呢？』『第一个领域』式报幕，至少一条要被质疑可行性、被拿具体情况试穿、或被抢答后修正。\n"
     + "不要写旁白、不要写标题、不要用 Markdown、不要加编号。直接从第一行 `男|...：` 开始。";
@@ -1437,7 +1442,7 @@ async function generate(){
     var thickReq = wc>=10000 ? '这是长篇硬性字数：请把每一层／每一轮写厚（长对话靠单轮多来回、长文章靠单层成段展开），写到中途自查字数，不足就加深当前部分，绝不许提前收尾。' : '';
     var tail=(MODE==='solo')
       ? ('请据此，按你的任务与【'+styLabel+'】这个文体的写法和情调，写出'+lenPhrase+'的单人朗读作品。'+thickReq+titleReq+'。标题那一行之后空一行再开始正文；正文分段，段与段之间空一行；每段段首标一个 `[语气|语速]` 方括号标签（语气和语速两段都要写，例 `[serious|slow]`），不要任何说话人标记。')
-      : ('请据此，按你的任务与格式要求，写出'+lenPhrase+'的男女对话体讲解稿（全场发言 '+lenMeta(wc).turnsDuo+' 次、每次 '+lenMeta(wc).perAvg+' 字上下且不少于 '+lenMeta(wc).perMin+' 字连说成段，不许一句一行打乒乓；上下两段必须严格逻辑语义承接——每次换人都接住上一段的具体词句，按对话打磨Skill的承接三式来）。'+thickReq+titleReq+'（标题单独一行"标题：…"，之后再从对话第一行开始）；每句单独一行，按 `男|语气|语速：` / `女|语气|语速：` 的三段格式（语气和语速都要写，例 `男|cheerful|fast：`），按语义给每句配。');
+      : ('请据此，按你的任务与格式要求，写出'+lenPhrase+'的男女对话体讲解稿（全场发言 '+lenMeta(wc).turnsDuo+' 次、每次 '+lenMeta(wc).perAvg+' 字上下且不少于 '+lenMeta(wc).perMin+' 字连说成段，不许一句一行打乒乓；上下两段必须严格逻辑语义承接——每次换人都接住上一段的具体词句，按对话打磨Skill的承接三式来）。'+thickReq+titleReq+'（标题单独一行"标题：…"，之后再从对话第一行开始）；每句单独一行，按 `男|语气|语速：` / `女|语气|语速：` 的三段格式（语气和语速都要写，例 `男|cheerful|fast：`），按语义给每句配；每行发言末尾再加一个【…】要点总结（≤16字，画面字卡用，不朗读）。');
     var userMsg='【要讲解的文章标题】'+chosenDoc.title+'\n【目标篇幅】'+lenPhrase+'\n【原文如下】\n\n'+full+'\n\n'+tail;
     var out=await callMsgs(pf.sel, pf.key, sys, [{role:'user', content:userMsg}], maxTok, '讲解稿');
     if(MODE!=='solo' && $('selfCheck') && $('selfCheck').checked){
@@ -1494,7 +1499,12 @@ function parseContent(text, mode){
     var ln=lines[i].trim(); if(!ln) continue;
     // 男|style：内容  或  男|style|rate：内容  或  男：内容
     var m=ln.match(/^(男|女)\s*(?:\|\s*([a-zA-Z\-]+)\s*)?(?:\|\s*([a-zA-Z]+)\s*)?[：:]\s*(.+)$/);
-    if(m){ out.push({who: m[1]==='男'?'m':'f', text:m[4].trim(), style: okStyle(m[2]), rate: okRate(m[3])}); }
+    if(m){
+      var body=m[4].trim(), summary='';
+      var sm2=body.match(/【([^】]{1,20})】\s*$/);            // 抽行尾【总结】
+      if(sm2){ summary=sm2[1].trim(); body=body.slice(0,sm2.index).trim(); }
+      out.push({who: m[1]==='男'?'m':'f', text:body, style: okStyle(m[2]), rate: okRate(m[3]), summary:summary});
+    }
     else if(out.length){ out[out.length-1].text += (out[out.length-1].text?' ':'') + ln; }
   }
   return chunkTurns(out);
@@ -1506,16 +1516,16 @@ function chunkTurns(list){
   var out=[];
   (list||[]).forEach(function(t){
     var txt=t.text||'';
-    if(txt.length<=MAX_TURN){ if(txt) out.push(t); return; }
+    if(txt.length<=MAX_TURN){ if(txt) out.push(t); return; }   // 短发言整体保留(含 summary)
     var sents=txt.replace(/\n+/g,' ').match(/[^。！？；!?;]*[。！？；!?;]+|[^。！？；!?;]+$/g)||[txt];
     var parts=[];
     sents.forEach(function(s){ while(s.length>MAX_TURN){ parts.push(s.slice(0,MAX_TURN)); s=s.slice(MAX_TURN); } if(s) parts.push(s); });
     var buf='';
     parts.forEach(function(s){
-      if(buf && (buf+s).length>MAX_TURN){ out.push({who:t.who,text:buf,style:t.style,rate:t.rate}); buf=s; }
+      if(buf && (buf+s).length>MAX_TURN){ out.push({who:t.who,text:buf,style:t.style,rate:t.rate,summary:t.summary}); buf=s; }
       else buf+=s;
     });
-    if(buf) out.push({who:t.who,text:buf,style:t.style,rate:t.rate});
+    if(buf) out.push({who:t.who,text:buf,style:t.style,rate:t.rate,summary:t.summary});
   });
   return out;
 }
@@ -1860,7 +1870,7 @@ async function avatarGenerate(){
     var AV_NOCROP=false;   // 探针发现裁切被拒→本场自动降级全幅
     var AV_SLOW=false;     // 吃到过 429 → 后续提交降并发为1、启动间隔加大,不再硬顶闸门
     function avCfgOf(job){
-      var cfg={ talkingAvatarCharacter:job.character, talkingAvatarStyle:job.style, videoFormat:'mp4', videoCodec:'h264', bitrateKbps:1500, subtitleType:'hard_embedded', backgroundColor:(($('avScene')&&$('avScene').value)||'#FFFFFFFF') };
+      var cfg={ talkingAvatarCharacter:job.character, talkingAvatarStyle:job.style, videoFormat:'mp4', videoCodec:'h264', bitrateKbps:1500, subtitleType:(($('avBurnSub')&&$('avBurnSub').value)||'none'), backgroundColor:(($('avScene')&&$('avScene').value)||'#FFFFFFFF') };
       if(!AV_NOCROP && (($('avCrop')&&$('avCrop').value)||'half')==='half'){ cfg.videoCrop={ topLeft:{x:480,y:0}, bottomRight:{x:1440,y:1080} }; }
       return cfg;
     }
@@ -2079,6 +2089,13 @@ function avPlay(idx, noAuto){
     $('avLowerWho').textContent=(c.who==='m'?'主持人':'嘉宾')+' · 第 '+(idx+1)+'/'+AV_CLIPS.length+' 段';
   } else {
     v=$('avVideo'); v.src=c.url;
+  }
+  // 画面总结字卡（我们自己叠的一句要点，替代会被裁切的烧录字幕）
+  var sumEl=$('avSummary');
+  if(sumEl){
+    var sTxt=(c.summary||'').trim();
+    if(sTxt){ sumEl.querySelector('span').textContent=sTxt; sumEl.style.display='block'; }
+    else { sumEl.style.display='none'; }
   }
   // 字随声走：按播放进度比例逐字点亮（Azure 批量不吐词级时间戳，比例流动已很贴近）
   function paintCap(frac){
