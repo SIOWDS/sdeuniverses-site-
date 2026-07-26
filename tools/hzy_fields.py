@@ -21,7 +21,7 @@ BLOCK_ID = "hzy-fields"
 # 领域定义：(名称, 一行研究关切, [slug...])
 FIELDS = [
     ("生成机理与存在论基底",
-     "事物、边界与形态最初如何被逼出来——她这一簇写得最晚，也最深",
+     "事物、边界与形态最初如何被逼出来——他这一簇写得最晚，也最深",
      ["erosion-precedes-genesis", "conceptual-autophagy", "presencing",
       "collisional-extrusion", "pressure-differential-strata", "suture-point"]),
     ("主体性、认知与人机之别",
