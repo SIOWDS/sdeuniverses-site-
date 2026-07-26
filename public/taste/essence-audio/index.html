@@ -429,8 +429,9 @@ select:focus,input:focus{border-color:var(--accent)}
         </select></div>
         <div class="cf"><span>⚡ 递交节奏（防限流）</span><select id="avRate" style="width:100%;background:var(--card,#161a2b);border:1px solid var(--line);border-radius:8px;color:inherit;padding:8px 10px;font-size:13.5px;font-family:inherit">
           <option value="2">稳（每分钟 2 个 · 最不易限流）</option>
-          <option value="3" selected>平衡（每分钟 3 个 · 推荐）</option>
-          <option value="5">快（每分钟 5 个 · 配额够时更快）</option>
+          <option value="3">平衡（每分钟 3 个）</option>
+          <option value="6" selected>快（每分钟 6 个 · 约10分钟递交60段，在飞并行渲染）</option>
+          <option value="10">很快（每分钟 10 个 · 配额充足时最快，可能触发限流自动降速）</option>
         </select></div>
       </div>
     </div>
@@ -1967,7 +1968,7 @@ async function avatarGenerate(){
     var pollCursor=0;
     while(si<jobs.length || jobs.some(function(j){return j.state==='running';})){
       if(stallGuard()) break;
-      if(AV_SLOW && RATE>1){ RATE=1; reqGap=60000; }   // 吃过429→整体降到每分钟1请求
+      if(AV_SLOW){ AV_SLOW=false; RATE=Math.max(2, Math.round(RATE*0.6)); reqGap=Math.round(60000/RATE); refreshStat('限流→降速到每分钟'+RATE+'个'); }   // 吃过429→温和退一档(下限2),不死降到1
       if(si<jobs.length){
         // 还有待提交 → 提交一个（submitOne 自己不过 gate，这里替它排队）
         await gate();
