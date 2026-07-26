@@ -2056,6 +2056,7 @@ function avPrimeSide(v, clip){  // 先把该侧首帧摆上台（静音定格，
 }
 function avPlay(idx, noAuto){
   if(idx<0||idx>=AV_CLIPS.length) return;
+  avWaiting=false;
   avPlayIdx=idx;
   var c=AV_CLIPS[idx], duo=avLayoutMode()!=='single';
   applyAvLayout();
