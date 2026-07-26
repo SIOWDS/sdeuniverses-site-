@@ -61,7 +61,8 @@ video{width:100%;border-radius:10px;background:#000;display:block}
       <!-- 自拍视频 -->
       <div style="background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:14px">
         <div style="font-size:13px;font-weight:700;margin-bottom:8px">🎥 录自拍视频（训练形象分身）</div>
-        <div class="tip" style="margin-top:0;margin-bottom:8px">正脸对着镜头，光线充足、背景干净，录约 15–30 秒，自然说几句话。</div>
+        <div class="tip" style="margin-top:0;margin-bottom:8px">正脸对着镜头，光线充足、背景干净。<b>对着镜头自然说话录 15–30 秒</b>——可照着下方声音区取的那段文章念，边说边有自然的表情和口型，训出的分身更生动。</div>
+        <div id="camPromptText" style="display:none;background:#0C0A14;border:1px solid var(--line);border-radius:8px;padding:10px 12px;font-size:14px;line-height:1.9;max-height:120px;overflow:auto;margin-bottom:8px"></div>
         <video id="camPreview" muted playsinline style="width:100%;aspect-ratio:16/9;object-fit:cover;background:#000;border-radius:8px"></video>
         <div class="row" style="margin-top:8px">
           <button class="btn2" id="btnCamStart" type="button">开启摄像头</button>
@@ -215,7 +216,7 @@ var HG="https://api.heygen.com";
 var chosenDoc=null, MANIFEST=null, CHUNKS=[], SHARDS_LOADED=0, SHARDS_TOTAL=0;
 
 /* ============ 第零步：浏览器就地录制（摄像头 / 麦克风） ============ */
-var camStream=null, camRec=null, camChunks=[], micStream=null, micRec=null, micChunks=[], micRAF=null, micAudioCtx=null;
+var camStream=null, camRec=null, camChunks=[], micStream=null, micRec=null, micChunks=[], micRAF=null, micAudioCtx=null, camTimer=null, camT0=0;
 function pickMime(kinds){ for(var i=0;i<kinds.length;i++){ if(window.MediaRecorder&&MediaRecorder.isTypeSupported&&MediaRecorder.isTypeSupported(kinds[i])) return kinds[i]; } return ''; }
 
 // 摄像头
@@ -241,9 +242,14 @@ function camStartRec(){
     $('camStatus').textContent='✓ 录制完成（'+(blob.size/1024/1024).toFixed(1)+'MB），可下载后上传 HeyGen 训练 Avatar V。';
   };
   camRec.start(); $('btnCamRec').disabled=true; $('btnCamStop').disabled=false;
-  $('camStatus').innerHTML='<span class="spinner"></span>录制中…（15–30 秒即可）';
+  camT0=Date.now();
+  camTimer=setInterval(function(){
+    var s=Math.floor((Date.now()-camT0)/1000);
+    var hint=(s<15)?'（至少录 15 秒）':(s<30?'（够了，30 秒左右最佳）':'（时长很好，可以停了）');
+    $('camStatus').innerHTML='<span class="spinner"></span>录制中… '+s+' 秒 '+hint;
+  },500);
 }
-function camStopRec(){ if(camRec&&camRec.state!=='inactive') camRec.stop(); $('btnCamRec').disabled=false; $('btnCamStop').disabled=true; }
+function camStopRec(){ if(camRec&&camRec.state!=='inactive') camRec.stop(); $('btnCamRec').disabled=false; $('btnCamStop').disabled=true; if(camTimer){clearInterval(camTimer);camTimer=null;} }
 
 // 麦克风
 async function micOpen(){
@@ -294,7 +300,8 @@ async function loadPrompt(){
   if(lastStop>300) seg=seg.slice(0,lastStop+1);
   $('promptText').textContent=seg;
   $('promptText').style.display='block';
-  $('promptHint').textContent='照着念这段（约 '+seg.length+' 字，念完约 1–2 分钟正好）';
+  var cp=$('camPromptText'); if(cp){ cp.textContent=seg; cp.style.display='block'; }   // 自拍也用同一段当提词
+  $('promptHint').textContent='照着念这段（约 '+seg.length+' 字，念完约 1–2 分钟正好；自拍录 15–30 秒念开头几句即可）';
 }
 
 /* ============ HeyGen：调用封装（经本站代理，BYOK） ============ */
