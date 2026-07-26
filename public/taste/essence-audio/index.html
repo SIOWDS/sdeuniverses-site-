@@ -417,10 +417,6 @@ select:focus,input:focus{border-color:var(--accent)}
           <option value="face">🪞 双人同框 · 面对面（右侧镜像相向）</option>
           <option value="single">🎥 单人全屏 · 纪录片（说谁切谁）</option>
         </select></div>
-        <div class="cf"><span>✂️ 画幅（生成前选，烧进视频）</span><select id="avCrop" style="width:100%;background:var(--card,#161a2b);border:1px solid var(--line);border-radius:8px;color:inherit;padding:8px 10px;font-size:13.5px;font-family:inherit">
-          <option value="half" selected>同框优化 · 每人裁中央半幅（两窗拼成一整幅演播室）</option>
-          <option value="full">全幅 · 每人完整宽画面（单人全屏布局最佳）</option>
-        </select></div>
         <div class="cf"><span>💬 画面字幕（烧进视频）</span><select id="avBurnSub" style="width:100%;background:var(--card,#161a2b);border:1px solid var(--line);border-radius:8px;color:inherit;padding:8px 10px;font-size:13.5px;font-family:inherit">
           <option value="none" selected>不烧字幕 · 画面干净（推荐 · 网页下方仍有流动字幕与总结）</option>
           <option value="hard_embedded">烧全文字幕 · 下载mp4自带（半幅布局下两侧可能被裁切）</option>
@@ -448,8 +444,8 @@ select:focus,input:focus{border-color:var(--accent)}
       <div id="avSingleWrap"><video id="avVideo" controls playsinline style="width:100%;max-height:420px;background:#000;border-radius:10px"></video></div>
       <div id="avDuoWrap" style="display:none;position:relative;border-radius:10px;overflow:hidden;background:#000;cursor:pointer" title="点击暂停 / 续播">
         <div style="display:flex;gap:2px">
-          <video id="avVidM" playsinline style="width:calc(50% - 1px);display:block;background:#000"></video>
-          <video id="avVidF" playsinline style="width:calc(50% - 1px);display:block;background:#000"></video>
+          <video id="avVidM" playsinline style="width:calc(50% - 1px);aspect-ratio:16/9;object-fit:cover;object-position:center;display:block;background:#000"></video>
+          <video id="avVidF" playsinline style="width:calc(50% - 1px);aspect-ratio:16/9;object-fit:cover;object-position:center;display:block;background:#000"></video>
         </div>
         <div id="avSummary" style="position:absolute;left:0;right:0;bottom:52px;text-align:center;pointer-events:none;display:none"><span style="display:inline-block;background:rgba(10,14,28,.82);color:#fff;font-size:20px;font-weight:700;letter-spacing:.5px;padding:7px 20px;border-radius:8px;box-shadow:0 2px 12px rgba(0,0,0,.4);max-width:86%;line-height:1.35"></span></div>
         <div id="avLower" style="position:absolute;left:0;right:0;bottom:0;background:linear-gradient(90deg,rgba(14,20,40,.94),rgba(14,20,40,.75));color:#fff;padding:8px 14px;font-size:14px;display:flex;gap:10px;align-items:center">
@@ -1867,11 +1863,10 @@ async function avatarGenerate(){
     // ① 提交(并发5)
     var si=1, submitted=0, failedSubmit=0, firstErr='';   // 从第2句起提交(第1句由探针承担;探针失败时会重置为0)
     function sleep(ms){ return new Promise(function(r){setTimeout(r,ms);}); }
-    var AV_NOCROP=false;   // 探针发现裁切被拒→本场自动降级全幅
     var AV_SLOW=false;     // 吃到过 429 → 后续提交降并发为1、启动间隔加大,不再硬顶闸门
     function avCfgOf(job){
       var cfg={ talkingAvatarCharacter:job.character, talkingAvatarStyle:job.style, videoFormat:'mp4', videoCodec:'h264', bitrateKbps:1500, subtitleType:(($('avBurnSub')&&$('avBurnSub').value)||'none'), backgroundColor:(($('avScene')&&$('avScene').value)||'#FFFFFFFF') };
-      if(!AV_NOCROP && (($('avCrop')&&$('avCrop').value)||'half')==='half'){ cfg.videoCrop={ topLeft:{x:480,y:0}, bottomRight:{x:1440,y:1080} }; }
+      // 不再用 videoCrop 硬裁（会把居中的烧录字幕两头砍掉）；同框改由播放器端 CSS 缩放取中实现，字幕零砍断。
       return cfg;
     }
     async function submitOneRaw(job){   // 单发版：不在内部自旋重试；429 只置降速旗，失败/成功都立即返回
@@ -1929,16 +1924,7 @@ async function avatarGenerate(){
     var pr=await tryProbe();
     if(!pr.ok && pr.status!==429 && pr.status<500){
       var pmsg=(pr.j&&pr.j.error&&(pr.j.error.message||pr.j.error.code))||(pr.tx&&pr.tx.slice(0,200))||('HTTP '+pr.status);
-      if(!AV_NOCROP && (($('avCrop')&&$('avCrop').value)||'half')==='half'){
-        AV_NOCROP=true; probe.id=runTag+'-p2';
-        st.textContent='探针被拒（'+pmsg.slice(0,60)+'），疑似画幅裁切不被支持——改全幅再探…';
-        pr=await tryProbe();
-        if(pr.ok){ er.textContent='注意：该区域/形象不接受画幅裁切，本场已自动改为全幅画面。'; }
-      }
-      if(!pr.ok && pr.status!==429 && pr.status<500){
-        var pmsg2=(pr.j&&pr.j.error&&(pr.j.error.message||pr.j.error.code))||(pr.tx&&pr.tx.slice(0,200))||('HTTP '+pr.status);
-        throw new Error('配置被 Azure 拒绝，未消耗额度。原话：'+pmsg2+((pr.status===401||pr.status===403)?'（密钥无效，或资源不是 S0 档/该区域未开放数字人）':''));
-      }
+      throw new Error('配置被 Azure 拒绝，未消耗额度。原话：'+pmsg+((pr.status===401||pr.status===403)?'（密钥无效，或资源不是 S0 档/该区域未开放数字人）':''));
     }
     if(pr.ok){ jobs[0].id=probe.id; jobs[0].state='running'; submitted++; }   // 探针=第一句，进常规轮询
     else { si=0; }                                                             // 探针没立住(429/5xx到这)→第一句照常走批量
