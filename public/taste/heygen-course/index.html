@@ -76,7 +76,12 @@ video{width:100%;border-radius:10px;background:#000;display:block}
       <!-- 声音 -->
       <div style="background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:14px">
         <div style="font-size:13px;font-weight:700;margin-bottom:8px">🎙 录声音样本（克隆你的嗓音）</div>
-        <div class="tip" style="margin-top:0;margin-bottom:8px">安静房间，清楚地念一段你平时讲课的话，录约 30 秒–2 分钟，越自然越像。</div>
+        <div class="tip" style="margin-top:0;margin-bottom:8px">照着一段 SDE 文章念，克隆出的声音最贴近你讲课的样子。<b>念满 1–2 分钟（约 300–500 字 / 3–4 段）</b>最稳，最少 30 秒。</div>
+        <div class="row" style="margin-bottom:8px">
+          <button class="btn2" id="btnPrompt" type="button">取一段文章当提词</button>
+          <span class="tip" id="promptHint" style="margin:0">先在下面第 2 步选一篇文章，再点这里</span>
+        </div>
+        <div id="promptText" style="display:none;background:#0C0A14;border:1px solid var(--line);border-radius:8px;padding:12px 14px;font-size:15px;line-height:2;max-height:200px;overflow:auto;margin-bottom:10px"></div>
         <div id="micMeter" style="height:8px;background:#0C0A14;border-radius:5px;overflow:hidden;margin-bottom:8px"><div id="micBar" style="height:100%;width:0;background:var(--acc);transition:width .08s"></div></div>
         <div class="row">
           <button class="btn2" id="btnMicStart" type="button">开启麦克风</button>
@@ -267,9 +272,30 @@ function micStartRec(){
     $('micStatus').textContent='✓ 录音完成（'+(blob.size/1024/1024).toFixed(1)+'MB），可下载后到 HeyGen 克隆声音。';
   };
   micRec.start(); $('btnMicRec').disabled=true; $('btnMicStop').disabled=false;
-  $('micStatus').innerHTML='<span class="spinner"></span>录音中…（30 秒–2 分钟，自然地讲）';
+  micT0=Date.now();
+  micTimer=setInterval(function(){
+    var s=Math.floor((Date.now()-micT0)/1000);
+    var hint=(s<30)?'（至少录 30 秒）':(s<60?'（够了，建议再念到 1 分钟以上更稳）':'（时长很好，可以停了）');
+    $('micStatus').innerHTML='<span class="spinner"></span>录音中… '+s+' 秒 '+hint;
+  },500);
 }
-function micStopRec(){ if(micRec&&micRec.state!=='inactive') micRec.stop(); $('btnMicRec').disabled=false; $('btnMicStop').disabled=true; }
+function micStopRec(){ if(micRec&&micRec.state!=='inactive') micRec.stop(); $('btnMicRec').disabled=false; $('btnMicStop').disabled=true; if(micTimer){clearInterval(micTimer);micTimer=null;} }
+
+// 取一段文章当录音提词
+var micTimer=null, micT0=0;
+async function loadPrompt(){
+  if(!chosenDoc){ $('promptHint').textContent='请先在下面第 2 步选一篇文章'; return; }
+  $('promptHint').innerHTML='<span class="spinner"></span>取文章中…';
+  var full=await fetchArticleText(chosenDoc.url);
+  if(!full){ $('promptHint').textContent='取文章失败，换一篇或手动念。'; return; }
+  // 取开头约 500 字（够念 1–2 分钟），按句号断到整句
+  var seg=full.slice(0,520);
+  var lastStop=Math.max(seg.lastIndexOf('。'),seg.lastIndexOf('！'),seg.lastIndexOf('？'));
+  if(lastStop>300) seg=seg.slice(0,lastStop+1);
+  $('promptText').textContent=seg;
+  $('promptText').style.display='block';
+  $('promptHint').textContent='照着念这段（约 '+seg.length+' 字，念完约 1–2 分钟正好）';
+}
 
 /* ============ HeyGen：调用封装（经本站代理，BYOK） ============ */
 function hgKey(){ return ($('hgKey')&&$('hgKey').value||'').trim(); }
@@ -533,6 +559,7 @@ $('btnCamStop').addEventListener('click', camStopRec);
 $('btnMicStart').addEventListener('click', micOpen);
 $('btnMicRec').addEventListener('click', micStartRec);
 $('btnMicStop').addEventListener('click', micStopRec);
+$('btnPrompt').addEventListener('click', loadPrompt);
 $('btnLoadAvatars').addEventListener('click', loadAvatars);
 $('btnSearch').addEventListener('click', doSearch);
 $('q').addEventListener('keydown', function(e){ if(e.key==='Enter') doSearch(); });
