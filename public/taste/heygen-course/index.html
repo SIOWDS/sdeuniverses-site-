@@ -214,13 +214,16 @@ var $=function(id){return document.getElementById(id);};
 var PROXY="/api/llm-proxy";
 var HG="https://api.heygen.com";
 var chosenDoc=null, MANIFEST=null, CHUNKS=[], SHARDS_LOADED=0, SHARDS_TOTAL=0;
+var AVATARS=[];   // 载入的分身清单，出片时据此判断真人分身 / 照片分身
 
 /* ============ 第零步：浏览器就地录制（摄像头 / 麦克风） ============ */
 var camStream=null, camRec=null, camChunks=[], micStream=null, micRec=null, micChunks=[], micRAF=null, micAudioCtx=null, camTimer=null, camT0=0;
+function stopTracks(st){ try{ if(st&&st.getTracks) st.getTracks().forEach(function(t){ try{t.stop();}catch(e){} }); }catch(e){} }
 function pickMime(kinds){ for(var i=0;i<kinds.length;i++){ if(window.MediaRecorder&&MediaRecorder.isTypeSupported&&MediaRecorder.isTypeSupported(kinds[i])) return kinds[i]; } return ''; }
 
 // 摄像头
 async function camOpen(){
+  if(camStream){ $('camStatus').textContent='摄像头已在开启状态，点「开始录制」。'; return; }
   try{
     camStream=await navigator.mediaDevices.getUserMedia({video:{width:{ideal:1280},height:{ideal:720},facingMode:'user'},audio:true});
     $('camPreview').srcObject=camStream; $('camPreview').play().catch(function(){});
@@ -239,7 +242,11 @@ function camStartRec(){
     $('camPlayback').src=url; $('camPlayback').style.display='block';
     var ext=(blob.type.indexOf('mp4')>=0)?'mp4':'webm';
     $('camDownload').href=url; $('camDownload').download='我的自拍-HeyGen形象.'+ext; $('camDownload').style.display='inline-block';
-    $('camStatus').textContent='✓ 录制完成（'+(blob.size/1024/1024).toFixed(1)+'MB），可下载后上传 HeyGen 训练 Avatar V。';
+    // 录完立即释放摄像头/麦克风，别让指示灯一直亮着
+    stopTracks(camStream); camStream=null;
+    try{ $('camPreview').srcObject=null; }catch(e){}
+    $('btnCamRec').disabled=true; $('btnCamStop').disabled=true;
+    $('camStatus').textContent='✓ 录制完成（'+(blob.size/1024/1024).toFixed(1)+'MB），摄像头已关闭。可下载后上传 HeyGen 训练 Avatar V；要重录请再点「开启摄像头」。';
   };
   camRec.start(); $('btnCamRec').disabled=true; $('btnCamStop').disabled=false;
   camT0=Date.now();
@@ -249,10 +256,11 @@ function camStartRec(){
     $('camStatus').innerHTML='<span class="spinner"></span>录制中… '+s+' 秒 '+hint;
   },500);
 }
-function camStopRec(){ if(camRec&&camRec.state!=='inactive') camRec.stop(); $('btnCamRec').disabled=false; $('btnCamStop').disabled=true; if(camTimer){clearInterval(camTimer);camTimer=null;} }
+function camStopRec(){ if(camRec&&camRec.state!=='inactive') camRec.stop(); $('btnCamRec').disabled=true; $('btnCamStop').disabled=true; if(camTimer){clearInterval(camTimer);camTimer=null;} }
 
 // 麦克风
 async function micOpen(){
+  if(micStream){ $('micStatus').textContent='麦克风已在开启状态，点「开始录音」。'; return; }
   try{
     micStream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true}});
     $('btnMicRec').disabled=false; $('micStatus').textContent='麦克风已开启，点「开始录音」。';
@@ -271,6 +279,12 @@ function micStartRec(){
   micRec.ondataavailable=function(ev){ if(ev.data&&ev.data.size) micChunks.push(ev.data); };
   micRec.onstop=async function(){
     var raw=new Blob(micChunks,{type:micChunks[0]&&micChunks[0].type||'audio/webm'});
+    // 先释放麦克风与电平表（解码转 WAV 不需要它们还开着）
+    if(micRAF){ try{cancelAnimationFrame(micRAF);}catch(e){} micRAF=null; }
+    try{ if(micAudioCtx&&micAudioCtx.close) micAudioCtx.close(); }catch(e){} micAudioCtx=null;
+    $('micBar').style.width='0';
+    stopTracks(micStream); micStream=null;
+    $('btnMicRec').disabled=true; $('btnMicStop').disabled=true;
     $('micStatus').innerHTML='<span class="spinner"></span>转换成 WAV 格式（HeyGen 通用）…';
     var wavBlob=null;
     try{ wavBlob=await blobToWav(raw); }catch(e){ wavBlob=null; }
@@ -278,7 +292,7 @@ function micStartRec(){
     var url=URL.createObjectURL(out);
     $('micPlayback').src=url; $('micPlayback').style.display='block';
     $('micDownload').href=url; $('micDownload').download='我的声音-HeyGen克隆.'+ext; $('micDownload').style.display='inline-block';
-    $('micStatus').textContent='✓ 录音完成（'+(out.size/1024/1024).toFixed(1)+'MB · '+ext.toUpperCase()+'），下载后到 HeyGen 上传克隆——'+(wavBlob?'WAV 格式 HeyGen 一定能收':'（转换失败，若上传被拒请换个浏览器）');
+    $('micStatus').textContent='✓ 录音完成（'+(out.size/1024/1024).toFixed(1)+'MB · '+ext.toUpperCase()+'），麦克风已关闭。下载后到 HeyGen 上传克隆——'+(wavBlob?'WAV 格式 HeyGen 一定能收':'（转换失败，若上传被拒请换个浏览器）')+'要重录请再点「开启麦克风」。';
   };
   micRec.start(); $('btnMicRec').disabled=true; $('btnMicStop').disabled=false;
   micT0=Date.now();
@@ -288,14 +302,15 @@ function micStartRec(){
     $('micStatus').innerHTML='<span class="spinner"></span>录音中… '+s+' 秒 '+hint;
   },500);
 }
-function micStopRec(){ if(micRec&&micRec.state!=='inactive') micRec.stop(); $('btnMicRec').disabled=false; $('btnMicStop').disabled=true; if(micTimer){clearInterval(micTimer);micTimer=null;} }
+function micStopRec(){ if(micRec&&micRec.state!=='inactive') micRec.stop(); $('btnMicRec').disabled=true; $('btnMicStop').disabled=true; if(micTimer){clearInterval(micTimer);micTimer=null;} }
 
 // 把录制的音频（webm/opus）解码后编码成标准 WAV —— HeyGen 一定能收
 async function blobToWav(blob){
   var ab=await blob.arrayBuffer();
   var ctx=new (window.AudioContext||window.webkitAudioContext)();
-  var audioBuf=await ctx.decodeAudioData(ab);
-  ctx.close && ctx.close();
+  var audioBuf;
+  try{ audioBuf=await ctx.decodeAudioData(ab); }
+  finally{ try{ ctx.close && ctx.close(); }catch(e){} }   // 解码失败也要关掉，否则每失败一次泄漏一个 AudioContext
   var numCh=Math.min(1, audioBuf.numberOfChannels)||1;   // 单声道足够，文件更小
   var ch0=audioBuf.getChannelData(0);
   var sr=audioBuf.sampleRate, len=ch0.length;
@@ -363,9 +378,11 @@ async function loadAvatars(){
   if(av.ok===false && !avatars.length){ $('keyStatus').textContent='HeyGen 返回错误 '+av.status+'：'+((av.j&&av.j.error&&(av.j.error.message||av.j.error))||'（多半是 API Key 无效）'); return; }
   if(av.j && av.j.data){
     (av.j.data.avatars||[]).forEach(function(a){ if(!avatars.some(function(x){return x.id===a.avatar_id;})) avatars.push({id:a.avatar_id, name:a.avatar_name||a.avatar_id, mine:false}); });
-    (av.j.data.talking_photos||[]).forEach(function(p){ avatars.push({id:p.talking_photo_id, name:'📷 '+(p.talking_photo_name||p.talking_photo_id), mine:true}); });
+    (av.j.data.talking_photos||[]).forEach(function(p){ if(!avatars.some(function(x){return x.id===p.talking_photo_id;})) avatars.push({id:p.talking_photo_id, name:'📷 '+(p.talking_photo_name||p.talking_photo_id)+'（照片分身）', mine:true, tp:true}); });
   }
   $('keyStatus').innerHTML='<span class="spinner"></span>已拿到 '+avatars.length+' 个分身，载入声音…';
+  AVATARS=avatars;
+  var selA=$('hgAvatar'); selA.innerHTML='';          // 必须先清掉占位项「先载入…」，否则 value 恒为空、出片按钮永远灰
   if(!avatars.length){ selA.innerHTML='<option value="">未找到分身——请确认已训练 Avatar V</option>'; }
   else { avatars.sort(function(a,b){return (b.mine?1:0)-(a.mine?1:0);}); avatars.forEach(function(a){ var o=document.createElement('option'); o.value=a.id; o.textContent=a.name; selA.appendChild(o); }); }
 
@@ -399,7 +416,12 @@ async function loadAvatars(){
         SHARDS_LOADED++;
         $('loadStatus').textContent='索引载入中… '+SHARDS_LOADED+'/'+SHARDS_TOTAL+' 片';
         if(SHARDS_LOADED===SHARDS_TOTAL){ $('loadStatus').textContent='✓ 索引就绪（'+MANIFEST.docs.length+' 篇文章），可搜索'; }
-      }).catch(function(){ SHARDS_LOADED++; });
+      }).catch(function(){
+        SHARDS_LOADED++;
+        if(SHARDS_LOADED===SHARDS_TOTAL) $('loadStatus').textContent=CHUNKS.length
+          ? ('✓ 索引就绪（部分分片载入失败，仅影响正文搜索深度）')
+          : ('正文索引载入失败，只能按标题搜索——刷新页面可重试。');
+      });
     });
   }).catch(function(){ $('loadStatus').textContent='索引载入失败，请刷新。'; });
 })();
@@ -523,11 +545,11 @@ async function callBase(sys, user, maxTok){
   var url, headers={'Content-Type':'application/json'}, body, parse;
   if(vendor==='deepseek'){
     url='https://api.deepseek.com/v1/chat/completions'; headers['Authorization']='Bearer '+key;
-    body={model:'deepseek-chat',messages:[{role:'system',content:sys},{role:'user',content:user}],max_tokens:Math.min(8000,maxTok),temperature:0.8};
+    body={model:'deepseek-v4-pro',thinking:{type:'disabled'},messages:[{role:'system',content:sys},{role:'user',content:user}],max_tokens:Math.min(8000,maxTok),temperature:0.8};
     parse=function(j){return j&&j.choices&&j.choices[0]&&j.choices[0].message&&j.choices[0].message.content;};
   } else if(vendor==='glm'){
     url='https://open.bigmodel.cn/api/paas/v4/chat/completions'; headers['Authorization']='Bearer '+key;
-    body={model:'glm-4-plus',messages:[{role:'system',content:sys},{role:'user',content:user}],max_tokens:Math.min(8000,maxTok),temperature:0.8};
+    body={model:'glm-5',messages:[{role:'system',content:sys},{role:'user',content:user}],max_tokens:Math.min(8000,maxTok),temperature:0.8};
     parse=function(j){return j&&j.choices&&j.choices[0]&&j.choices[0].message&&j.choices[0].message.content;};
   } else if(vendor==='gpt'){
     url=PROXY; headers['x-target-url']='https://api.openai.com/v1/chat/completions'; headers['Authorization']='Bearer '+key;
@@ -543,10 +565,10 @@ async function callBase(sys, user, maxTok){
     parse=function(j){return j&&j.candidates&&j.candidates[0]&&j.candidates[0].content&&j.candidates[0].content.parts&&j.candidates[0].content.parts.map(function(p){return p.text||'';}).join('');};
   }
   var ac=new AbortController();
-  var killer=setTimeout(function(){ try{ac.abort();}catch(e){} }, 60000);
+  var killer=setTimeout(function(){ try{ac.abort();}catch(e){} }, 120000);
   var r;
   try{ r=await fetch(url,{method:'POST',headers:headers,body:JSON.stringify(body),signal:ac.signal}); }
-  catch(e){ clearTimeout(killer); throw new Error(e&&e.name==='AbortError'?'生成超时（60秒），基底响应太慢，重试或换个基底':(e&&e.message||String(e))); }
+  catch(e){ clearTimeout(killer); throw new Error(e&&e.name==='AbortError'?'生成超时（120秒），基底响应太慢，重试或换个基底':(e&&e.message||String(e))); }
   clearTimeout(killer);
   var j=null; try{ j=await r.json(); }catch(e){ throw new Error('响应非法 JSON'); }
   if(!r.ok || (j&&j.error)){ throw new Error('基底报错 '+r.status+'：'+((j&&j.error&&(j.error.message||j.error.code||j.error))||r.statusText)); }
@@ -570,16 +592,22 @@ async function genVideo(){
   var vTitle=(chosenDoc&&chosenDoc.title||'SDE 视频课').replace(/[\u0000-\u001f]/g,'').slice(0,120);
   // v3 建视频；分身用 avatar_v 引擎（数字分身）。若失败降级 v2。
   var vid=null, e3='', e2='', usedV3=false;
+  // 照片分身(talking photo)不是真人分身，v3 的 avatar_v 引擎不收，必须走 v2 的 talking_photo 通道
+  var meta=null; for(var mi=0;mi<AVATARS.length;mi++){ if(AVATARS[mi].id===avatarId){ meta=AVATARS[mi]; break; } }
+  var isTP=!!(meta&&meta.tp);
   try{
-    var body={ type:'avatar', avatar_id:avatarId, engine:{type:'avatar_v'}, script:script, voice_id:voiceId, resolution:'1080p', aspect_ratio:'auto', title:vTitle };
-    var r=await hgCall('POST','/v3/videos',body,30000);
-    if(r.ok && r.j && r.j.data && (r.j.data.video_id||r.j.data.id)){ vid=r.j.data.video_id||r.j.data.id; usedV3=true; }
-    else if(r.j && (r.j.video_id||r.j.id)){ vid=r.j.video_id||r.j.id; usedV3=true; }
-    else { e3=(r.err)||(r.j&&r.j.error&&(r.j.error.message||r.j.error.code||r.j.error))||('HTTP '+r.status); }
-    // v2 兜底（v3 不认这个分身/引擎时）
+    if(!isTP){
+      var body={ type:'avatar', avatar_id:avatarId, engine:{type:'avatar_v'}, script:script, voice_id:voiceId, resolution:'1080p', aspect_ratio:'auto', title:vTitle };
+      var r=await hgCall('POST','/v3/videos',body,30000);
+      if(r.ok && r.j && r.j.data && (r.j.data.video_id||r.j.data.id)){ vid=r.j.data.video_id||r.j.data.id; usedV3=true; }
+      else if(r.j && (r.j.video_id||r.j.id)){ vid=r.j.video_id||r.j.id; usedV3=true; }
+      else { e3=(r.err)||(r.j&&r.j.error&&(r.j.error.message||r.j.error.code||r.j.error))||('HTTP '+r.status); }
+    } else { e3='照片分身走 v2 通道'; }
+    // v2 兜底（v3 不认这个分身/引擎时）；照片分身直接走这条
     if(!vid){
-      $('videoStatus').innerHTML='<span class="spinner"></span>换一种方式提交…';
-      var b2={ video_inputs:[{ character:{type:'avatar',avatar_id:avatarId,avatar_style:'normal'}, voice:{type:'text',input_text:script,voice_id:voiceId} }], dimension:{width:1920,height:1080} };
+      $('videoStatus').innerHTML='<span class="spinner"></span>'+(isTP?'提交照片分身到 HeyGen…':'换一种方式提交…');
+      var ch=isTP?{type:'talking_photo',talking_photo_id:avatarId}:{type:'avatar',avatar_id:avatarId,avatar_style:'normal'};
+      var b2={ video_inputs:[{ character:ch, voice:{type:'text',input_text:script,voice_id:voiceId} }], dimension:{width:1920,height:1080} };
       var r2=await hgCall('POST','/v2/video/generate',b2,30000);
       if(r2.j && r2.j.data && r2.j.data.video_id) vid=r2.j.data.video_id;
       else { e2=(r2.err)||(r2.j&&r2.j.error&&(r2.j.error.message||r2.j.error.code||r2.j.error))||('HTTP '+r2.status); }
@@ -621,7 +649,7 @@ async function genVideo(){
 /* ============ 门禁 ============ */
 function refreshGates(){
   $('btnScript').disabled = !chosenDoc;
-  var ready = hgKey() && $('hgAvatar').value && ($('script').value||'').trim();
+  var ready = hgKey() && $('hgAvatar').value && $('hgVoice').value && ($('script').value||'').trim();
   $('btnVideo').disabled = !ready;
 }
 
@@ -640,6 +668,7 @@ $('btnScript').addEventListener('click', genScript);
 $('btnVideo').addEventListener('click', genVideo);
 $('script').addEventListener('input', refreshGates);
 $('hgAvatar').addEventListener('change', refreshGates);
+$('hgVoice').addEventListener('change', refreshGates);
 $('hgKey').addEventListener('input', refreshGates);
 </script>
 </body>
