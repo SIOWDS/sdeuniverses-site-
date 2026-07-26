@@ -1042,13 +1042,15 @@ function lenMeta(wc){
   return { wc:wc, words:w, min:min, seg:seg, thickSolo:thickSolo, thickDuo:thickDuo, turnsDuo:turnsDuo };
 }
 function lecSystem(mode, xinde, siteCtx, drama, soloStyle, domain, external, wc){
+  var ragDuty = (siteCtx&&siteCtx.trim()) ? "【站内资料使用纪律】上面的站内相关资料是全站检索的结果：讲解中至少两处要把本文与站内相邻思想连起来讲（同一问题站里别的文章怎么看、本文往前推了什么），让听众感到这是一片思想土壤里长出的一篇；引用观点可提『这个站里有篇文章讲过…』，但资料里没有的绝不编造成站里说过。\n" : "";
   var LM=lenMeta(wc);
   var TASKN = external ? '六件事' : '四件事';
   var head = PRIOR
     + "\n\n════════ 你本场已内化的学习心得（思考底盘，讲解时真用它，别向听众复述心得本身）════════\n" + (xinde||'')
     + "\n\n════════ 你答/讲每一段的工序（方法论指引）════════\n" + METHOD_GUIDE
-    + "\n\n════════ 站内相关资料（就本文从 sdeuniverses.com 检索到的段落，可能为空）════════\n"
+    + "\n\n════════ 站内相关资料（就本文从 sdeuniverses.com 全站检索到的段落——这是本站的思想土壤，讲解必须扎在里面）════════\n"
     + (siteCtx || "（本轮没检索到特别相关的段落，凭对文章本身的把握＋内功讲解）")
+    + "\n" + ragDuty
     + langDirective();
 
   var DOM={ edu:'教育', health:'健康', biz:'商业经济' };
@@ -1095,13 +1097,20 @@ function lecSystem(mode, xinde, siteCtx, drama, soloStyle, domain, external, wc)
 
 // —— 站内 RAG（复用后端 /api/wds/rag）——
 async function ragForArticle(title, snippet){
-  try{
+  async function once(){
     var r=await fetch('/api/wds/rag', { method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify({ q: (title+' '+(snippet||'')).slice(0,800), k:30, cap:26000, kbn:20 }) });
-    if(!r.ok) return {ctx:'',srcs:[]};
+    if(!r.ok) throw new Error('rag http '+r.status);
     var j=await r.json();
-    return (j&&j.ok)?{ctx:j.ctx||'',srcs:j.srcs||[]}:{ctx:'',srcs:[]};
-  }catch(e){ return {ctx:'',srcs:[]}; }
+    if(!(j&&j.ok)) throw new Error('rag not ok');
+    return {ctx:j.ctx||'', srcs:j.srcs||[]};
+  }
+  try{ return await once(); }
+  catch(e1){
+    await new Promise(function(r){setTimeout(r,1200);});          // 站内RAG是硬要求：失败退避重试一次
+    try{ return await once(); }
+    catch(e2){ return {ctx:'', srcs:[], failed:true}; }
+  }
 }
 
 // —— 抓文章正文（同源 fetch 文章页，取 <article> 文本）——
@@ -1369,8 +1378,10 @@ async function generate(){
       full=full.slice(0, 24000); // 控长
     }
     await ensureXinde(pf.sel, pf.key, function(h){ st.innerHTML=h; });
-    st.innerHTML='<span class="spinner"></span>检索站内相关资料…';
+    st.innerHTML='<span class="spinner"></span>检索 SDE 全站相关资料…';
     var rag=await ragForArticle(chosenDoc.title, full.slice(0,600));
+    if(rag.failed){ showGenErr('站内 RAG 检索两次都失败（网络或服务波动）——本次讲解将缺少全站相关思想的印证，建议稍后重新生成。'); }
+    else { st.innerHTML='<span class="spinner"></span>✓ 站内检索到 '+ (rag.srcs?rag.srcs.length:0) +' 篇相关文章的资料，开始生成…'; }
     st.innerHTML='<span class="spinner"></span>提智基底正在'+(MODE==='solo'?'把这篇讲成一篇单人解读':'把这篇讲成男女对话')+'…（约一两分钟）';
     DRAMA=($('dramaMode')&&$('dramaMode').value)||'';
     SOLO_STYLE=($('soloStyle')&&$('soloStyle').value)||'';
