@@ -53,10 +53,15 @@ video{width:100%;border-radius:10px;background:#000;display:block}
   <div class="panel">
     <h2><span class="step-n">1</span> 连接你的 HeyGen 账户</h2>
     <div class="keyguide">
-      本工具用你自己的 HeyGen 密钥出片（<b>BYOK</b>，密钥只在你浏览器与 HeyGen 之间转发，本站不存储）。<br>
-      ① 去 <a href="https://app.heygen.com/settings?nav=API" target="_blank" rel="noopener">HeyGen 设置 → API</a> 复制 API Key；<br>
-      ② 先在 HeyGen 用一段 15 秒自拍训练好你的<b>数字分身（Digital Twin / Avatar）</b>；<br>
-      ③ 填入下面，点「载入我的分身」。计费由 HeyGen 按视频分钟数从你的额度扣（约 $1/分钟起）。
+      本工具用你自己的 HeyGen 密钥出片（<b>BYOK</b>，密钥只在你浏览器与 HeyGen 之间转发，本站不存储）。出片前，先在 HeyGen 官网准备好三样东西：<br><br>
+      <b>① 训练你的数字分身（形象）</b><br>
+      登录 <a href="https://app.heygen.com" target="_blank" rel="noopener">HeyGen</a> → Avatars（头像）→ Create → <b>Avatar V</b>，对着摄像头录一段约 15 秒的自拍（正脸、光线充足、背景干净——背景会保留在视频里，不满意要手动删）。等它训练好，就有了你的形象分身。<br><br>
+      <b>② 克隆你的声音（让分身用你自己的嗓音讲课）</b><br>
+      进 <b>AI Studio → Voice（声音）→ + New Voice → Create New Voice → Instant Voice Cloning</b>：勾选那句授权协议（同意用你的录音生成合成声音）→ 上传一段<b>你自己说话的清晰录音</b>（安静房间、好一点的麦克风，约 <b>30 秒到 2 分钟</b>，说得越自然越像；中文课就用中文录、内容尽量贴近讲课口吻）→ 处理几秒即得你的声音克隆。不满意可点「Improve this voice」调相似度/风格/稳定度。<br>
+      <span style="color:var(--muted)">小贴士：声音质量决定成片质量——录得清楚、内容贴近真实讲课，克隆才像你本人。若中文效果不理想，可在 voice 设置里选 multilingual v2 模型。</span><br><br>
+      <b>③ 复制 API Key</b><br>
+      去 <a href="https://app.heygen.com/settings?nav=API" target="_blank" rel="noopener">设置 → API</a> 复制 API Key，填入下面，点「载入我的分身与声音」——你训好的形象和克隆声音都会出现在下面的下拉里，选你自己的那份即可。<br><br>
+      计费由 HeyGen 按视频分钟数从你的额度扣：<b>标准约 $1/分钟，最逼真的 Avatar IV 约 $4/分钟</b>（$5 起充，用多少扣多少）。
     </div>
     <label>HeyGen API Key</label>
     <input id="hgKey" type="password" placeholder="粘贴你的 HeyGen API Key" autocomplete="off">
@@ -70,7 +75,7 @@ video{width:100%;border-radius:10px;background:#000;display:block}
         <select id="hgAvatar"><option value="">先载入…</option></select>
       </div>
       <div>
-        <label>声音</label>
+        <label>声音（选你克隆的那份＝用你自己的嗓音）</label>
         <select id="hgVoice"><option value="">先载入…</option></select>
       </div>
     </div>
