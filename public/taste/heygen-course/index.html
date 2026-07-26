@@ -406,10 +406,12 @@ async function loadAvatars(){
 
 function norm(s){ return (s||'').toLowerCase(); }
 function doSearch(){
-  if(!MANIFEST){ return; }
+  if(!MANIFEST){ $('results').innerHTML='<div class="tip">索引还没载入好，稍等两三秒再搜。</div>'; return; }
   var raw=($('q').value||'').trim();
   var box=$('results'); box.innerHTML='';
   if(!raw){ return; }
+  // 索引未就绪提示（正文分片还没载完时，先只搜标题也能用）
+  var indexReady=(SHARDS_TOTAL>0 && SHARDS_LOADED>=SHARDS_TOTAL);
   var keys=raw.toLowerCase().split(/\s+/).filter(Boolean);
   var byDoc={};
   function ent(di){ return byDoc[di]||(byDoc[di]={t:0,best:0,tot:0,bx:''}); }
@@ -430,7 +432,10 @@ function doSearch(){
     var e=byDoc[k]; var rest=Math.min(Math.max(e.tot-e.best,0), e.best*4);
     return { di:+k, rank:e.t+e.best+0.35*rest, bx:e.bx };
   }).filter(function(h){return h.rank>0;}).sort(function(a,b){return b.rank-a.rank;}).slice(0,25);
-  if(!hits.length){ box.innerHTML='<div class="tip">没找到匹配「'+esc(raw)+'」的文章，换个词试试。</div>'; return; }
+  if(!hits.length){
+    box.innerHTML='<div class="tip">没找到匹配「'+esc(raw)+'」的文章'+(indexReady?'，换个词试试。':'（正文索引还在载入 '+SHARDS_LOADED+'/'+SHARDS_TOTAL+' 片，等一会儿再搜）')+'</div>';
+    return;
+  }
   hits.forEach(function(h){
     var d=MANIFEST.docs[h.di];
     var el=document.createElement('div'); el.className='hit';
