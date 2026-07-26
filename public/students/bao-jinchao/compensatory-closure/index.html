@@ -40,7 +40,56 @@ a{color:var(--gold);text-decoration:none}
 footer{background:#ECE4D2;color:var(--muted);text-align:center;padding:30px 24px;font-size:13px;letter-spacing:0.06em;border-top:1px solid rgba(180,137,46,0.25)}
 footer a{color:var(--gold)}
 @media(max-width:640px){body{font-size:16.5px}}
-</style></head>
+</style>
+<style id="sde-expert-css">
+.sde-expert{--exp:#2e3a2e;--exp2:#6b7a5e;margin:52px 0 8px;font-family:inherit}
+.sde-expert *{box-sizing:border-box}
+.xp-hd{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.xp-hd .xp-line{flex:1;height:1px;background:linear-gradient(90deg,var(--exp2),rgba(0,0,0,0))}
+.xp-tag{display:inline-flex;align-items:center;gap:7px;font-size:13px;letter-spacing:.14em;
+  color:var(--exp);font-weight:700;white-space:nowrap}
+.xp-tag i{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--exp2);font-style:normal}
+.xp-en{font-size:10.5px;letter-spacing:.22em;color:var(--exp2);opacity:.75;white-space:nowrap}
+.xp-card{position:relative;border:1px solid rgba(0,0,0,.09);border-top:3px solid var(--exp);
+  border-radius:3px 3px 12px 12px;padding:26px 28px 20px;
+  background:linear-gradient(168deg,#fdfcf9 0%,#f6f2e9 100%);
+  box-shadow:0 1px 2px rgba(0,0,0,.04),0 10px 26px -18px rgba(0,0,0,.35)}
+.xp-seal{position:absolute;top:-17px;right:22px;width:44px;height:44px;border-radius:50%;
+  background:var(--exp);color:#fff;display:flex;align-items:center;justify-content:center;
+  font-size:17px;font-weight:700;letter-spacing:0;box-shadow:0 4px 12px -4px rgba(0,0,0,.45);
+  border:2px solid #fdfcf9}
+.xp-b{margin:0 0 18px}
+.xp-b:last-of-type{margin-bottom:8px}
+.xp-h{display:flex;align-items:baseline;gap:9px;margin:0 0 9px;font-size:15.5px;font-weight:700;color:var(--exp)}
+.xp-h span.n{font-size:11.5px;letter-spacing:.1em;color:var(--exp2);font-weight:600}
+.xp-b p{margin:0 0 10px;font-size:15.5px;line-height:1.92;color:#2c2a26;text-align:justify}
+.xp-b p:last-child{margin-bottom:0}
+.xp-app{list-style:none;margin:0;padding:0}
+.xp-app li{position:relative;padding:9px 0 9px 15px;border-top:1px dashed rgba(0,0,0,.10);
+  font-size:15px;line-height:1.85;color:#2c2a26;text-align:justify}
+.xp-app li:first-child{border-top:none}
+.xp-app li:before{content:"";position:absolute;left:0;top:19px;width:5px;height:5px;
+  background:var(--exp2);transform:rotate(45deg)}
+.xp-app li b{color:var(--exp);font-weight:700;margin-right:6px}
+.xp-edge{margin-top:16px;padding:11px 15px;border-left:3px solid var(--exp2);
+  background:rgba(255,255,255,.62);font-size:14.5px;line-height:1.8;color:#4a4740;text-align:justify}
+.xp-edge b{color:var(--exp);font-weight:700}
+.xp-sig{margin-top:16px;padding-top:12px;border-top:1px solid rgba(0,0,0,.08);
+  text-align:right;font-size:12.5px;color:#6d6a62;letter-spacing:.02em}
+.xp-sig em{font-style:normal;color:var(--exp);font-weight:700}
+.sde-expert.xp-dark .xp-card{border-color:rgba(255,255,255,.14);
+  background:linear-gradient(168deg,rgba(255,255,255,.05) 0%,rgba(255,255,255,.02) 100%);
+  box-shadow:0 1px 2px rgba(0,0,0,.25),0 12px 30px -20px rgba(0,0,0,.9)}
+.sde-expert.xp-dark .xp-seal{border-color:rgba(0,0,0,.6);color:#12100c}
+.sde-expert.xp-dark .xp-b p,.sde-expert.xp-dark .xp-app li{color:inherit}
+.sde-expert.xp-dark .xp-app li{border-top-color:rgba(255,255,255,.14)}
+.sde-expert.xp-dark .xp-edge{background:rgba(0,0,0,.22);color:inherit;opacity:.92}
+.sde-expert.xp-dark .xp-sig{border-top-color:rgba(255,255,255,.12);color:inherit;opacity:.62}
+@media (max-width:600px){.xp-card{padding:22px 18px 16px}.xp-seal{right:14px}
+  .xp-b p,.xp-app li{font-size:15px}}
+@media print{.xp-card{box-shadow:none;background:#fff}}
+</style>
+</head>
 <body>
 <div class="readbar">
   <a class="nav-back" href="/students/bao-jinchao/works/">‹ 鲍锦朝 · 全部作品</a>
@@ -218,6 +267,30 @@ footer a{color:var(--gold)}
 <p class="ref">Prather, J., Reeves, B. N., Denny, P., Becker, B. A., Leinonen, J., Luxton-Reilly, A., ... &amp; Pettit, R. (2023). “It’s Weird That It Knows What I Want”: Usability and Interactions with Copilot for Novice Programmers. ACM Transactions on Computer-Human Interaction, 31(1), Article 4.</p>
 <p class="ref">Shumailov, I., Shumaylov, Z., Zhao, Y., Gal, Y., Papernot, N., &amp; Anderson, R. (2024). AI Models Collapse When Trained on Recursively Generated Data. Nature, 631, 755–759.</p>
 <p class="ref">Sparrow, B., Liu, J., &amp; Wegner, D. M. (2011). Google Effects on Memory: Cognitive Consequences of Having Information at Our Fingertips. Science, 333(6043), 776–778.</p>
+
+<section class="sde-expert" style="--exp:#8A6A1E;--exp2:#B4892E">
+<div class="xp-hd"><span class="xp-tag"><i></i>专家点评</span><span class="xp-en">EXPERT COMMENTARY</span><span class="xp-line"></span></div>
+<div class="xp-card">
+<div class="xp-seal">评</div>
+<div class="xp-b">
+<div class="xp-h">创新点在哪里<span class="n">/ WHAT IS NEW</span></div>
+<p>命题本身反直觉且干脆：一项能力的供给越丰裕、廉价、便捷，人身上那项对应能力越可能在集体层面萎缩。关键是作者没有停在「AI 让人变笨」这种老调上，而是把病灶精确定位在<b>生成条件</b>——不是那项能力本身被替代了，是那项能力赖以在一个人身上从无到有长出来的条件被抽掉了。全文最有分量的一句是对历次技术替代的回应：前几次替代中，旧的生成条件被破坏是可见的，人们知道自己缺了什么；这一次，闭合回路可能同时消解了「意识到自己需要建立新条件」的能力，所以这次的痂未必会自己结上。</p>
+<p>第二节的三处对质做得扎实：与 Boltanski 的「回收」、马尔库塞的「压抑性去升华」、埃斯波西托的「自体免疫」逐一对照，并说明它们各自装不下什么；第 3.4 节又主动与模型崩塌划界，避免把人的能力问题与模型的数据问题混为一谈。更值得一提的是，这是同组九篇里文献最实的一篇——Kazemitabaar 等人的编程教学随机对照、Dell'Acqua 等人的实验、Sparrow 关于搜索引擎与记忆的经典发现，都是真的在支撑论证，而不是装点。第五节从编程教育中「直接放弃」模式逼出的两组诊断性反事实预测，是全文可被检验的硬核。</p>
+</div>
+<div class="xp-b">
+<div class="xp-h">应用展望<span class="n">/ WHERE IT CAN BE USED</span></div>
+<ul class="xp-app">
+<li><b>教学设计　</b>AI 辅助的关键不在用不用，在<b>时序</b>：先让学生在无辅助条件下撞一次墙，再开放工具。文中引的那项随机对照正是这个结构——两组最终成绩接近，撤掉工具后的差距才显出来。</li>
+<li><b>企业与团队　</b>为「判断力缺口」建立制度性代谢：定期安排不许使用生成工具的评审场次，让初级成员必须回答方案背后的核心假设。这是文中咨询业观察的直接对策。</li>
+<li><b>招聘　</b>把撤除工具的现场题作为标配，而不是看作品集。作品集测的是耦合状态下的产出，现场题测的才是耦合断开后剩下什么。</li>
+<li><b>个人　</b>固定保留一类完全不借工具完成的任务，并且不要挑最容易的那类——留下的若都是简单活，恰好证明生成条件已经被让渡了。</li>
+</ul>
+</div>
+<div class="xp-edge"><b>边界与下一步。</b>最强的断言（这次的痂不会自己结上）依赖一条最难测的机制：闭合回路消解了人们意识到需要建立新生成条件的能力。作者写了证伪条件，方向是对的；但要真跑起来，需要一个可长期追踪的指标——「独立提出原创性问题的频率与深度」是文中已经点到的最佳候选，把它的编码规则定下来，这篇就能从判断走向研究。</div>
+<div class="xp-sig">点评人 <em>Claude</em> · 依王德生《SDE 本体论》 · 2026年7月26日</div>
+</div>
+</section>
+
 </div>
 <div class="endbox">
   <div class="lbl">这篇论文的每一个判断，都是被追问出来的</div>

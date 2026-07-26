@@ -40,7 +40,56 @@ a{color:var(--gold);text-decoration:none}
 footer{background:#ECE4D2;color:var(--muted);text-align:center;padding:30px 24px;font-size:13px;letter-spacing:0.06em;border-top:1px solid rgba(180,137,46,0.25)}
 footer a{color:var(--gold)}
 @media(max-width:640px){body{font-size:16.5px}}
-</style></head>
+</style>
+<style id="sde-expert-css">
+.sde-expert{--exp:#2e3a2e;--exp2:#6b7a5e;margin:52px 0 8px;font-family:inherit}
+.sde-expert *{box-sizing:border-box}
+.xp-hd{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.xp-hd .xp-line{flex:1;height:1px;background:linear-gradient(90deg,var(--exp2),rgba(0,0,0,0))}
+.xp-tag{display:inline-flex;align-items:center;gap:7px;font-size:13px;letter-spacing:.14em;
+  color:var(--exp);font-weight:700;white-space:nowrap}
+.xp-tag i{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--exp2);font-style:normal}
+.xp-en{font-size:10.5px;letter-spacing:.22em;color:var(--exp2);opacity:.75;white-space:nowrap}
+.xp-card{position:relative;border:1px solid rgba(0,0,0,.09);border-top:3px solid var(--exp);
+  border-radius:3px 3px 12px 12px;padding:26px 28px 20px;
+  background:linear-gradient(168deg,#fdfcf9 0%,#f6f2e9 100%);
+  box-shadow:0 1px 2px rgba(0,0,0,.04),0 10px 26px -18px rgba(0,0,0,.35)}
+.xp-seal{position:absolute;top:-17px;right:22px;width:44px;height:44px;border-radius:50%;
+  background:var(--exp);color:#fff;display:flex;align-items:center;justify-content:center;
+  font-size:17px;font-weight:700;letter-spacing:0;box-shadow:0 4px 12px -4px rgba(0,0,0,.45);
+  border:2px solid #fdfcf9}
+.xp-b{margin:0 0 18px}
+.xp-b:last-of-type{margin-bottom:8px}
+.xp-h{display:flex;align-items:baseline;gap:9px;margin:0 0 9px;font-size:15.5px;font-weight:700;color:var(--exp)}
+.xp-h span.n{font-size:11.5px;letter-spacing:.1em;color:var(--exp2);font-weight:600}
+.xp-b p{margin:0 0 10px;font-size:15.5px;line-height:1.92;color:#2c2a26;text-align:justify}
+.xp-b p:last-child{margin-bottom:0}
+.xp-app{list-style:none;margin:0;padding:0}
+.xp-app li{position:relative;padding:9px 0 9px 15px;border-top:1px dashed rgba(0,0,0,.10);
+  font-size:15px;line-height:1.85;color:#2c2a26;text-align:justify}
+.xp-app li:first-child{border-top:none}
+.xp-app li:before{content:"";position:absolute;left:0;top:19px;width:5px;height:5px;
+  background:var(--exp2);transform:rotate(45deg)}
+.xp-app li b{color:var(--exp);font-weight:700;margin-right:6px}
+.xp-edge{margin-top:16px;padding:11px 15px;border-left:3px solid var(--exp2);
+  background:rgba(255,255,255,.62);font-size:14.5px;line-height:1.8;color:#4a4740;text-align:justify}
+.xp-edge b{color:var(--exp);font-weight:700}
+.xp-sig{margin-top:16px;padding-top:12px;border-top:1px solid rgba(0,0,0,.08);
+  text-align:right;font-size:12.5px;color:#6d6a62;letter-spacing:.02em}
+.xp-sig em{font-style:normal;color:var(--exp);font-weight:700}
+.sde-expert.xp-dark .xp-card{border-color:rgba(255,255,255,.14);
+  background:linear-gradient(168deg,rgba(255,255,255,.05) 0%,rgba(255,255,255,.02) 100%);
+  box-shadow:0 1px 2px rgba(0,0,0,.25),0 12px 30px -20px rgba(0,0,0,.9)}
+.sde-expert.xp-dark .xp-seal{border-color:rgba(0,0,0,.6);color:#12100c}
+.sde-expert.xp-dark .xp-b p,.sde-expert.xp-dark .xp-app li{color:inherit}
+.sde-expert.xp-dark .xp-app li{border-top-color:rgba(255,255,255,.14)}
+.sde-expert.xp-dark .xp-edge{background:rgba(0,0,0,.22);color:inherit;opacity:.92}
+.sde-expert.xp-dark .xp-sig{border-top-color:rgba(255,255,255,.12);color:inherit;opacity:.62}
+@media (max-width:600px){.xp-card{padding:22px 18px 16px}.xp-seal{right:14px}
+  .xp-b p,.xp-app li{font-size:15px}}
+@media print{.xp-card{box-shadow:none;background:#fff}}
+</style>
+</head>
 <body>
 <div class="readbar">
   <a class="nav-back" href="/students/bao-jinchao/works/">‹ 鲍锦朝 · 全部作品</a>
@@ -176,6 +225,30 @@ footer a{color:var(--gold)}
 <p>本文也没有宣称生成场这个概念是凭空创造的新词。它自觉地站在波兰尼、马祖卡托、多西与佩蕾丝的肩上。波兰尼论证了经济实体是被制度条件生产出来的；马祖卡托论证了市场是被集体行动塑造出来的；多西与佩蕾丝论证了技术革命会倒逼制度改写。本文所做的，是在他们各自够不到的边界上，往前走了一步：识别出那个在个人使用中实时发生的、一对一的、反身改写用户自身的生成场，把它从分析的背景提升为分析的对象，并论证它为什么不能被这三位先行者的框架所完全覆盖。</p>
 <p>这个判断最终是否成立，取决于它能承受来自经验世界的检验。它给出以下可以检验的方式。如果在从现在起的未来十年内，生成式 AI 的经济影响，可以被毫无残余地还原为对既有实体的属性增益——比如：只是让现有的搜索、推荐、客户服务“更智能”，没有出现任何需要动摇“产品先于选择”这个建模假设的新经济活动；或者在陪伴智能体、个性化教育、深度互动医疗这些领域，市场最终证明，这些被积分出来的过程-实体，可以被有效地“属性化”——被拆成标准特征、被独立定价、被搬给另一个用户而不损失核心价值——那么本文的判断就是一个过甚其词的错误诊断。它只是一个对新技术的过度激动，碰巧穿上了波兰尼和马祖卡托的语言，而并没有真正切出任何新的辨别面。</p>
 <p>但如果未来十年的经济事实，确实把“产品先于选择”这个假设，在一个又一个新领域中被消解——在那些领域里，一个经济实体在被使用之前，就是一具空壳，它的“内容”是每一个个体自己在使用中灌注进去的——那么，经济学就将不得不承认，它的研究对象的基底，已经悄悄位移了。它不是变得更复杂了；它是发生了。而理解这次发生，需要的不是更多的数据、更大的模型、更精细的因果识别，而是一种新的眼光——一种能够直面实体本身如何在经济活动内部被发生出来的眼光。这正是本文试图做的那件事。</p>
+
+<section class="sde-expert" style="--exp:#8A6A1E;--exp2:#B4892E">
+<div class="xp-hd"><span class="xp-tag"><i></i>专家点评</span><span class="xp-en">EXPERT COMMENTARY</span><span class="xp-line"></span></div>
+<div class="xp-card">
+<div class="xp-seal">评</div>
+<div class="xp-b">
+<div class="xp-h">创新点在哪里<span class="n">/ WHAT IS NEW</span></div>
+<p>本文动的是经济学的分析单元本身：从「结晶体」——那些已经完成发生、可被独立指认与流转的商品与市场——位移到「生成场」，一个由技术基座、交互机制与用户投入三方耦合、能持续孵化新经济实体的场域。作者点出的那个默会前提很准：过往每一次概念扩展（人力资本、制度、行为偏差）都承袭了同一件事——被分析的实体已经完成了它的发生，只等着被赋予新属性。</p>
+<p>最有价值的是它没有停在命名上，而是给出了「回写」这一机制：生成场孵化出的实体反过来改写它的孵化条件——这正是波兰尼、马祖卡托、多西与佩蕾丝各自够到边缘却没走完的一步。第五节正面接下最强反驳（BLP 这类需求估计框架能否把生成场消化掉），是全文最该被同行检验的一节，也是它区别于一般「AI 改变一切」式论述的地方。另外两处诚实值得点名：作者明说不是所有经济活动都会变成生成场（小麦仍是结晶体），也明说这个词不是凭空创造，而是站在前人肩上——一篇讲新单元的论文，肯给自己划这么小的地盘，反而更可信。</p>
+</div>
+<div class="xp-b">
+<div class="xp-h">应用展望<span class="n">/ WHERE IT CAN BE USED</span></div>
+<ul class="xp-app">
+<li><b>产品定价与商业模式　</b>订阅制若仍按功能包定价，就还在给结晶体定价。按本文的框架，该定价的是<b>场的孵化能力</b>——用户在其中沉淀了多少不可迁移的投入，才是续费率的真实来源。</li>
+<li><b>企业估值与尽调　</b>把用户投入的沉淀量作为一项资产来估：对话历史、纠正记录、个性化配置。它不在资产负债表上，却是转换成本最硬的部分。</li>
+<li><b>平台设计与竞争政策　</b>用户投入的可迁移性由此变成一个竞争问题而非体验问题——数据可携带权在生成场里的分量，远大于在传统平台上的分量。</li>
+<li><b>统计与国民核算　</b>现有口径记录的是成交的结晶体，记不到场里正在发生的那部分。要不要记、怎么记，是这篇文章留给统计部门的真问题。</li>
+</ul>
+</div>
+<div class="xp-edge"><b>边界与下一步。</b>三阶段深描（混沌态—介生态—成熟态）是构造的推演而非田野记录，读者不宜当作观察数据。全文最有价值的下一步不在概念，在第五节：把「生成场能否被 BLP 类框架消化」写成一份可提交给计量同行的技术备忘录——这场对话如果发生，本文就真正进入了经济学的问题域。</div>
+<div class="xp-sig">点评人 <em>Claude</em> · 依王德生《SDE 本体论》 · 2026年7月26日</div>
+</div>
+</section>
+
 </div>
 <div class="endbox">
   <div class="lbl">这篇论文的每一个判断，都是被追问出来的</div>
