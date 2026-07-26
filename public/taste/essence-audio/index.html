@@ -1908,35 +1908,37 @@ async function avatarGenerate(){
     }
     if(pr.ok){ jobs[0].id=probe.id; jobs[0].state='running'; submitted++; }   // 探针=第一句，进常规轮询
     else { si=0; }                                                             // 探针没立住(429/5xx到这)→第一句照常走批量
-    // 严格串行：一次只提交一个任务，做完歇口气再下一个（限流后歇更久）
-    for(; si<jobs.length; si++){
-      await submitOne(jobs[si]);
-      st.textContent='提交任务 '+(submitted+failedSubmit)+'/'+jobs.length+'（逐个提交）…'+(firstErr?('｜首个失败：'+firstErr.slice(0,70)):'');
-      if(si+1<jobs.length) await sleep(AV_SLOW?6000:1000);   // 吃过429后6秒一个(≈每分钟10个,贴住疑似配额)
-    }
-    if(submitted===0) throw new Error('全部任务提交失败：'+(jobs[0].err||'未知原因'));
-    // ② 轮询(每6秒一轮,总限30分钟)
-    var t0=Date.now();
-    while(jobs.some(function(j){return j.state==='running';})){
-      if(Date.now()-t0>30*60*1000){ jobs.forEach(function(j){ if(j.state==='running'){ j.state='failed'; j.err='超时'; } }); break; }
-      await new Promise(function(r){setTimeout(r,6000);});
-      var running=jobs.filter(function(j){return j.state==='running';});
-      for(var k=0;k<running.length;k+=5){
-        await Promise.all(running.slice(k,k+5).map(function(job){
-          return avatarCall('GET','/avatar/batchsyntheses/'+job.id+'?api-version=2024-08-01',null).then(function(r){
-            if(r.status===401||r.status===403){ job.state='failed'; job.err='密钥失效或权限变更(HTTP '+r.status+')'; job.authDead=1; return; }
-            if(r.status===404){ job.state='failed'; job.err='任务丢失(404)'; return; }
-            var sst=r.j&&r.j.status;
-            if(sst==='Succeeded'){ job.state='done'; job.url=(r.j.outputs&&r.j.outputs.result)||''; if(!job.url){ job.state='failed'; job.err='无输出'; } }
-            else if(sst==='Failed'){ job.state='failed'; job.err=(r.j.properties&&r.j.properties.error&&r.j.properties.error.message)||'合成失败'; }
-          }).catch(function(){});
-        }));
+    // 真·一进一出：发一个 → 等它渲染出结果 → 再发下一个。任何时刻云端只有一个任务，
+    // 每分钟请求数被"渲染时长"自然节流，配额再小也撞不上。
+    async function pollOne(job){          // 提交成功后，轮询到 Succeeded/Failed
+      var t0=Date.now();
+      while(true){
+        if(Date.now()-t0>10*60*1000){ job.state='failed'; job.err='单段超时(10分钟)'; return; }
+        await sleep(6000);
+        var r;
+        try{ r=await avatarCall('GET','/avatar/batchsyntheses/'+job.id+'?api-version=2024-08-01',null); }
+        catch(e){ continue; }   // 轮询偶发网络错→下一轮再试
+        if(r.status===401||r.status===403){ job.state='failed'; job.err='密钥失效或权限变更(HTTP '+r.status+')'; job.authDead=1; return; }
+        if(r.status===404){ job.state='failed'; job.err='任务丢失(404)'; return; }
+        var sst=r.j&&r.j.status;
+        if(sst==='Succeeded'){ job.state='done'; job.url=(r.j.outputs&&r.j.outputs.result)||''; if(!job.url){ job.state='failed'; job.err='无输出'; } return; }
+        if(sst==='Failed'){ job.state='failed'; job.err=(r.j.properties&&r.j.properties.error&&r.j.properties.error.message)||'合成失败'; return; }
+        // 仍 NotStarted/Running → 继续等
+        st.textContent='第 '+(doneSoFar()+failSoFar()+1)+'/'+jobs.length+' 段渲染中…（一进一出：这段出结果才发下一段）';
       }
-      if(jobs.some(function(j){return j.authDead;})){ jobs.forEach(function(j){ if(j.state==='running'){ j.state='failed'; j.err='密钥失效，停止等待'; } }); break; }
-      var doneN=jobs.filter(function(j){return j.state==='done';}).length;
-      var failN=jobs.filter(function(j){return j.state==='failed';}).length;
-      var fj=jobs.filter(function(j){return j.state==='failed'&&j.err;})[0];
-      st.textContent='数字人合成中… 完成 '+doneN+'/'+jobs.length+(failN?('（失败 '+failN+'）'):'')+' · 预计成片约 '+estMin+' 分钟，请耐心等（每段排队渲染）'+(fj?('｜失败原因：'+fj.err.slice(0,80)):'');
+    }
+    function doneSoFar(){ return jobs.filter(function(j){return j.state==='done';}).length; }
+    function failSoFar(){ return jobs.filter(function(j){return j.state==='failed';}).length; }
+
+    for(; si<jobs.length; si++){
+      var job=jobs[si];
+      st.textContent='提交第 '+(si+1)+'/'+jobs.length+' 段…'+(firstErr?('｜首个失败：'+firstErr.slice(0,60)):'');
+      await submitOne(job);                 // 内含 429 退避重试
+      if(job.state==='running'){ await pollOne(job); }   // 等这一段真正跑完
+      if(job.authDead){ jobs.slice(si+1).forEach(function(j){ j.state='failed'; j.err='密钥失效，停止'; }); break; }
+      var dN=doneSoFar(), fN=failSoFar();
+      st.textContent='已完成 '+dN+'/'+jobs.length+' 段'+(fN?('（失败 '+fN+'）'):'')+' · 继续下一段…';
+      if(si+1<jobs.length) await sleep(600);   // 出结果后再发下一个，云端始终单任务，几乎不会限流
     }
     AV_CLIPS=jobs.filter(function(j){return j.state==='done';}).sort(function(a,b){return a.i-b.i;});
     var fails=jobs.filter(function(j){return j.state==='failed';});
