@@ -49,6 +49,48 @@ video{width:100%;border-radius:10px;background:#000;display:block}
   <h1>🎬 SDE 数字人视频造 <span class="pill">真人分身讲课</span></h1>
   <div class="sub">选一篇 SDE 文章 → 由 SDE 基底＋全站检索生成一份讲课稿 → 用你在 HeyGen 训练好的<b>真人数字分身</b>把它讲成视频课。老师训练一次分身，之后任意文章都能自动出课。</div>
 
+  <!-- 第零步：就地录制素材（浏览器直接录，下载后上传 HeyGen） -->
+  <div class="panel">
+    <h2><span class="step-n">0</span> 就地录制素材（可选，全在浏览器完成）</h2>
+    <div class="keyguide">
+      还没有 HeyGen 账户？先去 <a href="https://app.heygen.com/login" target="_blank" rel="noopener"><b>注册 / 登录 HeyGen（点这里）</b></a>（免费档也能试）。<br>
+      下面两个录制器直接用你电脑的摄像头和麦克风录素材，录完<b>下载成文件</b>，再到 HeyGen 上传训练——不用装任何软件。首次点开会请求摄像头/麦克风权限，请允许。
+    </div>
+
+    <div class="grid2">
+      <!-- 自拍视频 -->
+      <div style="background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:14px">
+        <div style="font-size:13px;font-weight:700;margin-bottom:8px">🎥 录自拍视频（训练形象分身）</div>
+        <div class="tip" style="margin-top:0;margin-bottom:8px">正脸对着镜头，光线充足、背景干净，录约 15–30 秒，自然说几句话。</div>
+        <video id="camPreview" muted playsinline style="width:100%;aspect-ratio:16/9;object-fit:cover;background:#000;border-radius:8px"></video>
+        <div class="row" style="margin-top:8px">
+          <button class="btn2" id="btnCamStart" type="button">开启摄像头</button>
+          <button class="btn2" id="btnCamRec" type="button" disabled>● 开始录制</button>
+          <button class="btn2" id="btnCamStop" type="button" disabled>■ 停止</button>
+        </div>
+        <div id="camStatus" class="status" style="margin-top:6px"></div>
+        <video id="camPlayback" controls playsinline style="display:none;width:100%;margin-top:8px;border-radius:8px"></video>
+        <a id="camDownload" class="btn2" style="display:none;margin-top:8px" download="我的自拍-HeyGen形象.webm">⬇ 下载自拍视频</a>
+      </div>
+
+      <!-- 声音 -->
+      <div style="background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:14px">
+        <div style="font-size:13px;font-weight:700;margin-bottom:8px">🎙 录声音样本（克隆你的嗓音）</div>
+        <div class="tip" style="margin-top:0;margin-bottom:8px">安静房间，清楚地念一段你平时讲课的话，录约 30 秒–2 分钟，越自然越像。</div>
+        <div id="micMeter" style="height:8px;background:#0C0A14;border-radius:5px;overflow:hidden;margin-bottom:8px"><div id="micBar" style="height:100%;width:0;background:var(--acc);transition:width .08s"></div></div>
+        <div class="row">
+          <button class="btn2" id="btnMicStart" type="button">开启麦克风</button>
+          <button class="btn2" id="btnMicRec" type="button" disabled>● 开始录音</button>
+          <button class="btn2" id="btnMicStop" type="button" disabled>■ 停止</button>
+        </div>
+        <div id="micStatus" class="status" style="margin-top:6px"></div>
+        <audio id="micPlayback" controls style="display:none;width:100%;margin-top:8px"></audio>
+        <a id="micDownload" class="btn2" style="display:none;margin-top:8px" download="我的声音-HeyGen克隆.webm">⬇ 下载声音样本</a>
+      </div>
+    </div>
+    <div class="tip" style="margin-top:10px">录好下载后：自拍视频拿去 HeyGen 训练 <b>Avatar V</b> 分身；声音样本拿去 <b>AI Studio → Voice → Instant Voice Cloning</b> 克隆你的声音。详细步骤见下一步。</div>
+  </div>
+
   <!-- 第一步：HeyGen 密钥 -->
   <div class="panel">
     <h2><span class="step-n">1</span> 连接你的 HeyGen 账户</h2>
@@ -166,6 +208,68 @@ var $=function(id){return document.getElementById(id);};
 var PROXY="/api/llm-proxy";
 var HG="https://api.heygen.com";
 var chosenDoc=null, MANIFEST=null, CHUNKS=[], SHARDS_LOADED=0, SHARDS_TOTAL=0;
+
+/* ============ 第零步：浏览器就地录制（摄像头 / 麦克风） ============ */
+var camStream=null, camRec=null, camChunks=[], micStream=null, micRec=null, micChunks=[], micRAF=null, micAudioCtx=null;
+function pickMime(kinds){ for(var i=0;i<kinds.length;i++){ if(window.MediaRecorder&&MediaRecorder.isTypeSupported&&MediaRecorder.isTypeSupported(kinds[i])) return kinds[i]; } return ''; }
+
+// 摄像头
+async function camOpen(){
+  try{
+    camStream=await navigator.mediaDevices.getUserMedia({video:{width:{ideal:1280},height:{ideal:720},facingMode:'user'},audio:true});
+    $('camPreview').srcObject=camStream; $('camPreview').play().catch(function(){});
+    $('btnCamRec').disabled=false; $('camStatus').textContent='摄像头已开启，点「开始录制」。';
+  }catch(e){ $('camStatus').textContent='无法打开摄像头：'+(e&&e.message||e)+'（请在浏览器允许摄像头权限）'; }
+}
+function camStartRec(){
+  if(!camStream) return;
+  camChunks=[];
+  var mime=pickMime(['video/webm;codecs=vp9,opus','video/webm;codecs=vp8,opus','video/webm','video/mp4']);
+  try{ camRec=new MediaRecorder(camStream, mime?{mimeType:mime}:undefined); }catch(e){ camRec=new MediaRecorder(camStream); }
+  camRec.ondataavailable=function(ev){ if(ev.data&&ev.data.size) camChunks.push(ev.data); };
+  camRec.onstop=function(){
+    var blob=new Blob(camChunks,{type:camChunks[0]&&camChunks[0].type||'video/webm'});
+    var url=URL.createObjectURL(blob);
+    $('camPlayback').src=url; $('camPlayback').style.display='block';
+    var ext=(blob.type.indexOf('mp4')>=0)?'mp4':'webm';
+    $('camDownload').href=url; $('camDownload').download='我的自拍-HeyGen形象.'+ext; $('camDownload').style.display='inline-block';
+    $('camStatus').textContent='✓ 录制完成（'+(blob.size/1024/1024).toFixed(1)+'MB），可下载后上传 HeyGen 训练 Avatar V。';
+  };
+  camRec.start(); $('btnCamRec').disabled=true; $('btnCamStop').disabled=false;
+  $('camStatus').innerHTML='<span class="spinner"></span>录制中…（15–30 秒即可）';
+}
+function camStopRec(){ if(camRec&&camRec.state!=='inactive') camRec.stop(); $('btnCamRec').disabled=false; $('btnCamStop').disabled=true; }
+
+// 麦克风
+async function micOpen(){
+  try{
+    micStream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true}});
+    $('btnMicRec').disabled=false; $('micStatus').textContent='麦克风已开启，点「开始录音」。';
+    // 电平表
+    micAudioCtx=new (window.AudioContext||window.webkitAudioContext)();
+    var src=micAudioCtx.createMediaStreamSource(micStream), an=micAudioCtx.createAnalyser(); an.fftSize=512; src.connect(an);
+    var data=new Uint8Array(an.frequencyBinCount);
+    (function loop(){ an.getByteFrequencyData(data); var s=0; for(var i=0;i<data.length;i++) s+=data[i]; var avg=s/data.length; $('micBar').style.width=Math.min(100,avg*1.6)+'%'; micRAF=requestAnimationFrame(loop); })();
+  }catch(e){ $('micStatus').textContent='无法打开麦克风：'+(e&&e.message||e)+'（请允许麦克风权限）'; }
+}
+function micStartRec(){
+  if(!micStream) return;
+  micChunks=[];
+  var mime=pickMime(['audio/webm;codecs=opus','audio/webm','audio/mp4','audio/ogg']);
+  try{ micRec=new MediaRecorder(micStream, mime?{mimeType:mime}:undefined); }catch(e){ micRec=new MediaRecorder(micStream); }
+  micRec.ondataavailable=function(ev){ if(ev.data&&ev.data.size) micChunks.push(ev.data); };
+  micRec.onstop=function(){
+    var blob=new Blob(micChunks,{type:micChunks[0]&&micChunks[0].type||'audio/webm'});
+    var url=URL.createObjectURL(blob);
+    $('micPlayback').src=url; $('micPlayback').style.display='block';
+    var ext=(blob.type.indexOf('mp4')>=0)?'m4a':(blob.type.indexOf('ogg')>=0?'ogg':'webm');
+    $('micDownload').href=url; $('micDownload').download='我的声音-HeyGen克隆.'+ext; $('micDownload').style.display='inline-block';
+    $('micStatus').textContent='✓ 录音完成（'+(blob.size/1024/1024).toFixed(1)+'MB），可下载后到 HeyGen 克隆声音。';
+  };
+  micRec.start(); $('btnMicRec').disabled=true; $('btnMicStop').disabled=false;
+  $('micStatus').innerHTML='<span class="spinner"></span>录音中…（30 秒–2 分钟，自然地讲）';
+}
+function micStopRec(){ if(micRec&&micRec.state!=='inactive') micRec.stop(); $('btnMicRec').disabled=false; $('btnMicStop').disabled=true; }
 
 /* ============ HeyGen：调用封装（经本站代理，BYOK） ============ */
 function hgKey(){ return ($('hgKey')&&$('hgKey').value||'').trim(); }
@@ -423,6 +527,12 @@ function refreshGates(){
 }
 
 /* 绑定 */
+$('btnCamStart').addEventListener('click', camOpen);
+$('btnCamRec').addEventListener('click', camStartRec);
+$('btnCamStop').addEventListener('click', camStopRec);
+$('btnMicStart').addEventListener('click', micOpen);
+$('btnMicRec').addEventListener('click', micStartRec);
+$('btnMicStop').addEventListener('click', micStopRec);
 $('btnLoadAvatars').addEventListener('click', loadAvatars);
 $('btnSearch').addEventListener('click', doSearch);
 $('q').addEventListener('keydown', function(e){ if(e.key==='Enter') doSearch(); });
