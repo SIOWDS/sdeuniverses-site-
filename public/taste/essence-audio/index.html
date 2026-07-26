@@ -411,13 +411,40 @@ select:focus,input:focus{border-color:var(--accent)}
         <option value="meg|formal">Meg · 正装</option>
       </select>
     </div>
+    <div class="row" style="flex-wrap:wrap;gap:8px;margin-top:8px">
+      <span class="drama-lbl">🖼 画面布局</span>
+      <select id="avLayout" style="background:var(--card2);border:1px solid var(--line);border-radius:8px;color:inherit;padding:8px 10px;font-size:13.5px;font-family:inherit">
+        <option value="news" selected>📺 双人同框 · 演播室（新闻联播式，男左女右+节目条）</option>
+        <option value="face">🪞 双人同框 · 面对面（访谈式，右侧镜像相向）</option>
+        <option value="single">🎥 单人全屏 · 纪录片（说谁切谁）</option>
+      </select>
+      <span class="drama-lbl">🏙 场景</span>
+      <select id="avScene" style="background:var(--card2);border:1px solid var(--line);border-radius:8px;color:inherit;padding:8px 10px;font-size:13.5px;font-family:inherit">
+        <option value="#1B3A6BFF" selected>演播室深蓝</option>
+        <option value="#F3EDE2FF">暖米访谈室</option>
+        <option value="#FFFFFFFF">纯白</option>
+        <option value="#10131CFF">深空黑</option>
+      </select>
+      <span class="hint" style="margin:0">场景在生成前选（烧进视频）；布局随时可切。</span>
+    </div>
     <div class="row" style="margin-top:10px">
       <button class="btn" id="btnAvatarGen" type="button">🎬 生成数字人视频</button>
       <span id="avStatus" class="statusline" style="margin:0"></span>
     </div>
     <div id="avErr" class="err"></div>
     <div id="avPlayerWrap" style="display:none;margin-top:12px">
-      <video id="avVideo" controls playsinline style="width:100%;max-height:420px;background:#000;border-radius:10px"></video>
+      <div id="avSingleWrap"><video id="avVideo" controls playsinline style="width:100%;max-height:420px;background:#000;border-radius:10px"></video></div>
+      <div id="avDuoWrap" style="display:none;position:relative;border-radius:10px;overflow:hidden;background:#000">
+        <div style="display:flex;gap:2px">
+          <video id="avVidM" playsinline muted style="width:calc(50% - 1px);display:block;background:#000"></video>
+          <video id="avVidF" playsinline muted style="width:calc(50% - 1px);display:block;background:#000"></video>
+        </div>
+        <div id="avLower" style="position:absolute;left:0;right:0;bottom:0;background:linear-gradient(90deg,rgba(14,20,40,.94),rgba(14,20,40,.75));color:#fff;padding:8px 14px;font-size:14px;display:flex;gap:10px;align-items:center">
+          <span style="background:var(--acc,#7c5cff);color:#fff;font-size:12px;padding:2px 8px;border-radius:4px;white-space:nowrap">SDE 讲堂</span>
+          <b id="avLowerTitle" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></b>
+          <span id="avLowerWho" style="margin-left:auto;white-space:nowrap;opacity:.85"></span>
+        </div>
+      </div>
       <div id="avCaption" style="margin-top:8px;padding:10px 14px;background:var(--card2);border:1px solid var(--line);border-radius:10px;font-size:15px;line-height:1.75;min-height:1.5em"></div>
       <div class="row" style="margin-top:8px;gap:8px">
         <button class="mini" id="btnAvPlayAll" type="button">▶ 从头连播</button>
@@ -1791,7 +1818,7 @@ async function avatarGenerate(){
         try{
           r=await avatarCall('PUT','/avatar/batchsyntheses/'+job.id+'?api-version=2024-08-01',{
             inputKind:'SSML', inputs:[{content:job.ssml}],
-            avatarConfig:{ talkingAvatarCharacter:job.character, talkingAvatarStyle:job.style, videoFormat:'mp4', videoCodec:'h264', bitrateKbps:1500, subtitleType:'hard_embedded' }
+            avatarConfig:{ talkingAvatarCharacter:job.character, talkingAvatarStyle:job.style, videoFormat:'mp4', videoCodec:'h264', bitrateKbps:1500, subtitleType:'hard_embedded', backgroundColor:(($('avScene')&&$('avScene').value)||'#FFFFFFFF') }
           });
         }catch(e){ r={ok:false,status:0,j:null,tx:String(e&&e.message||e)}; }
         if(r.ok){ job.state='running'; submitted++; return; }
@@ -1869,22 +1896,57 @@ function renderAvatarPlayer(){
     var box=document.createElement('span'); box.style.display='inline-flex'; box.style.gap='3px'; box.style.alignItems='center';
     box.appendChild(a); box.appendChild(d); list.appendChild(box);
   });
+  applyAvLayout();
+  if(avLayoutMode()!=='single'){
+    avPrimeSide($('avVidM'), AV_CLIPS.filter(function(x){return x.who==='m';})[0]);
+    avPrimeSide($('avVidF'), AV_CLIPS.filter(function(x){return x.who!=='m';})[0]);
+  }
   avPlay(0,true);
+}
+function avLayoutMode(){ var s=$('avLayout'); return (s&&s.value)||'news'; }
+function applyAvLayout(){
+  var duo = avLayoutMode()!=='single';
+  $('avSingleWrap').style.display = duo?'none':'block';
+  $('avDuoWrap').style.display   = duo?'block':'none';
+  var vF=$('avVidF');
+  if(vF) vF.style.transform = (avLayoutMode()==='face') ? 'scaleX(-1)' : 'none';
+  var lw=$('avLower'); if(lw) lw.style.display = (avLayoutMode()==='news') ? 'flex' : 'none';
+}
+function avPrimeSide(v, clip){  // 先把该侧首帧摆上台（静音定格，等开口）
+  if(!v||!clip||v.__primed===clip.url) return;
+  v.__primed=clip.url; v.src=clip.url;
+  v.onloadeddata=function(){ try{ v.currentTime=0.05; v.pause(); }catch(e){} };
 }
 function avPlay(idx, noAuto){
   if(idx<0||idx>=AV_CLIPS.length) return;
   avPlayIdx=idx;
-  var v=$('avVideo'), c=AV_CLIPS[idx];
+  var c=AV_CLIPS[idx], duo=avLayoutMode()!=='single';
+  applyAvLayout();
   $('avNow').textContent='第 '+(idx+1)+' / '+AV_CLIPS.length+' 段';
   var cap=$('avCaption'), spk='<b>'+(c.who==='m'?'👨 主持人':'👩 嘉宾')+'</b>　';
   if(cap) cap.innerHTML=spk+'<span style="opacity:.45">'+esc(c.text)+'</span>';
+  var v;
+  if(duo){
+    var mine = (c.who==='m') ? $('avVidM') : $('avVidF');
+    var other= (c.who==='m') ? $('avVidF') : $('avVidM');
+    // 对面那位：定格在其最近一句（或未开口时定格其第一句首帧）
+    var otherPrev=null;
+    for(var k2=idx-1;k2>=0;k2--){ if(AV_CLIPS[k2].who!==c.who){ otherPrev=AV_CLIPS[k2]; break; } }
+    if(!otherPrev){ otherPrev = AV_CLIPS.filter(function(x){return x.who!==c.who;})[0]; }
+    if(other && otherPrev && other.__primed!==otherPrev.url && other.paused!==false){ avPrimeSide(other, otherPrev); }
+    try{ other && other.pause(); }catch(e){}
+    mine.__primed=c.url; mine.muted=false; mine.src=c.url; v=mine;
+    $('avLowerTitle').textContent=(lastTitle||'');
+    $('avLowerWho').textContent=(c.who==='m'?'主持人':'嘉宾')+' · 第 '+(idx+1)+'/'+AV_CLIPS.length+' 段';
+  } else {
+    v=$('avVideo'); v.src=c.url;
+  }
   // 字随声走：按播放进度比例逐字点亮（Azure 批量不吐词级时间戳，比例流动已很贴近）
   v.ontimeupdate=function(){
     if(!cap||!v.duration) return;
     var k=Math.max(0, Math.min(c.text.length, Math.round(c.text.length*(v.currentTime/v.duration)+1)));
     cap.innerHTML=spk+'<span style="color:var(--acc,#a78bfa)">'+esc(c.text.slice(0,k))+'</span><span style="opacity:.45">'+esc(c.text.slice(k))+'</span>';
   };
-  v.src=c.url;
   if(!noAuto){ v.play().catch(function(){}); }
   v.onended=function(){ if(avPlayIdx+1<AV_CLIPS.length) avPlay(avPlayIdx+1); else $('avNow').textContent='✓ 连播完毕（'+AV_CLIPS.length+' 段）'; };
 }
@@ -2337,6 +2399,7 @@ $('btnSaveDir').addEventListener('click', saveToDir);
 $('btnApplySubmit').addEventListener('click', applySubmit);
 $('btnAvatarGen').addEventListener('click', avatarGenerate);
 $('btnAvPlayAll').addEventListener('click', function(){ avPlay(0); });
+if($('avLayout')) $('avLayout').addEventListener('change', function(){ if(AV_CLIPS.length){ applyAvLayout(); avPlay(Math.max(0,avPlayIdx), true); } });
 (function(){
   var en=$('avEnable');
   if(en){
