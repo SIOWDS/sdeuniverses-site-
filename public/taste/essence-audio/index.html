@@ -1343,6 +1343,7 @@ function hideGenErr(){ $('genErr').style.display='none'; }
 var genBusy=false;
 async function generate(){
   if(genBusy) return;
+  if(avBusy){ showGenErr('数字人视频正在合成中——等它完成，或刷新页面后再重新生成讲解稿。'); return; }
   if(!chosenDoc){ showGenErr('先在上面搜一篇文章并选中它。'); return; }
   var pf=preflight(); if(!pf) return;
   hideGenErr();
@@ -1793,11 +1794,16 @@ async function avatarGenerate(){
   if(!avOn()){ st.textContent='先在页首「🔊 语音系统」勾选「🎬 生成数字人视频」。'; return; }
   var host=avatarHost($('avEndpoint').value), key=($('avKey').value||'').trim();
   if(!host||!key){ st.textContent='请在页首「🔊 语音系统」的数字人区填 S0 资源名（或区域）和密钥——注意需 Standard S0 档，免费 F0 不行。'; return; }
+  if($('azVoiceM') && !$('azVoiceM').options.length) fillAzureSelects();   // 从未切过云端时选择器为空，先填充
   avBusy=true; $('btnAvatarGen').disabled=true;
   AV_CLIPS=[]; $('avPlayerWrap').style.display='none';
   try{
     var totalChars=turns.reduce(function(a,t){return a+t.text.replace(/\s/g,'').length;},0);
     var estMin=Math.max(1,Math.round(totalChars/300));
+    if(estMin>=20 || turns.length>=90){
+      var estUsd=(estMin*0.24).toFixed(1);
+      if(!window.confirm('这场视频约 '+estMin+' 分钟、'+turns.length+' 个片段，预计费用约 $'+estUsd+'（从 Azure 额度扣）。确定生成？')){ st.textContent='已取消。'; avBusy=false; $('btnAvatarGen').disabled=false; return; }
+    }
     var runTag='sde'+Date.now().toString(36);
     var jobs=turns.map(function(t,i){
       var vid=azVoiceOf(t.who==='n'?'s':t.who);
@@ -1819,6 +1825,9 @@ async function avatarGenerate(){
           });
         }catch(e){ r={ok:false,status:0,j:null,tx:String(e&&e.message||e)}; }
         if(r.ok){ job.state='running'; submitted++; return; }
+        // 幂等：上一次尝试其实已建成（响应丢失后重试撞"已存在"）→ 视为提交成功，交给轮询
+        var emsg=((r.j&&r.j.error&&(r.j.error.message||r.j.error.code))||r.tx||'').toLowerCase();
+        if(r.status===409 || emsg.indexOf('already exist')>=0 || emsg.indexOf('duplicate')>=0){ job.state='running'; submitted++; return; }
         // 429/5xx/网络错 → 退避重试；其余直接判败
         if((r.status===429||r.status>=500||r.status===0) && attempt<4){
           st.textContent='提交任务被限流，第 '+attempt+' 次退避重试…（'+(submitted+failedSubmit)+'/'+jobs.length+'）';
@@ -1862,12 +1871,15 @@ async function avatarGenerate(){
       for(var k=0;k<running.length;k+=5){
         await Promise.all(running.slice(k,k+5).map(function(job){
           return avatarCall('GET','/avatar/batchsyntheses/'+job.id+'?api-version=2024-08-01',null).then(function(r){
+            if(r.status===401||r.status===403){ job.state='failed'; job.err='密钥失效或权限变更(HTTP '+r.status+')'; job.authDead=1; return; }
+            if(r.status===404){ job.state='failed'; job.err='任务丢失(404)'; return; }
             var sst=r.j&&r.j.status;
             if(sst==='Succeeded'){ job.state='done'; job.url=(r.j.outputs&&r.j.outputs.result)||''; if(!job.url){ job.state='failed'; job.err='无输出'; } }
             else if(sst==='Failed'){ job.state='failed'; job.err=(r.j.properties&&r.j.properties.error&&r.j.properties.error.message)||'合成失败'; }
           }).catch(function(){});
         }));
       }
+      if(jobs.some(function(j){return j.authDead;})){ jobs.forEach(function(j){ if(j.state==='running'){ j.state='failed'; j.err='密钥失效，停止等待'; } }); break; }
       var doneN=jobs.filter(function(j){return j.state==='done';}).length;
       var failN=jobs.filter(function(j){return j.state==='failed';}).length;
       var fj=jobs.filter(function(j){return j.state==='failed'&&j.err;})[0];
@@ -1893,6 +1905,8 @@ function renderAvatarPlayer(){
     var box=document.createElement('span'); box.style.display='inline-flex'; box.style.gap='3px'; box.style.alignItems='center';
     box.appendChild(a); box.appendChild(d); list.appendChild(box);
   });
+  var whoSet={}; AV_CLIPS.forEach(function(c){whoSet[c.who==='m'?'m':'f']=1;});
+  if(!(whoSet.m&&whoSet.f) && $('avLayout')){ $('avLayout').value='single'; }   // 单说话人的稿(单人讲解)双窗没意义
   applyAvLayout();
   if(avLayoutMode()!=='single'){
     avPrimeSide($('avVidM'), AV_CLIPS.filter(function(x){return x.who==='m';})[0]);
@@ -2011,7 +2025,9 @@ function azRegion(){ return ($('azRegion')&&$('azRegion').value||'').trim().toLo
 function azKey(){ return ($('azKey')&&$('azKey').value||'').trim(); }
 function azVoiceOf(who){
   var id=who==='m'?($('azVoiceM')&&$('azVoiceM').value):(who==='f'?($('azVoiceF')&&$('azVoiceF').value):($('azVoiceS')&&$('azVoiceS').value));
-  return id||'zh-CN-XiaoxiaoNeural';
+  if(id) return id;
+  var meta=LANG_META[LANG]||LANG_META.zh;          // 兜底按当前语言+性别，而不是一律中文女声
+  return who==='m' ? meta.m : meta.f;
 }
 function azOverrideStyle(){ return ($('azStyle')&&$('azStyle').value||'').trim(); }  // 空=智能逐句
 function azRatePct(){ var v=parseInt($('azRate')&&$('azRate').value||'0',10)||0; return v; }
