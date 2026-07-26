@@ -38,6 +38,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0            # build_roster 的发表日期兜底靠 git 首次提交日；
+                                    # 浅克隆下只有一个提交，缺“发表于”戳的页面会被
+                                    # 统一压成运行当天，虚高活跃分与排名。
 
       - name: 装 pdftotext（专著正文靠它抽，缺了 PDF 就进不了索引）
         run: sudo apt-get update -qq && sudo apt-get install -y -qq poppler-utils
