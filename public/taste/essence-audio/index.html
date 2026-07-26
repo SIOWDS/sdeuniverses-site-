@@ -1912,7 +1912,7 @@ async function avatarGenerate(){
     for(; si<jobs.length; si++){
       await submitOne(jobs[si]);
       st.textContent='提交任务 '+(submitted+failedSubmit)+'/'+jobs.length+'（逐个提交）…'+(firstErr?('｜首个失败：'+firstErr.slice(0,70)):'');
-      if(si+1<jobs.length) await sleep(AV_SLOW?2000:500);
+      if(si+1<jobs.length) await sleep(AV_SLOW?6000:1000);   // 吃过429后6秒一个(≈每分钟10个,贴住疑似配额)
     }
     if(submitted===0) throw new Error('全部任务提交失败：'+(jobs[0].err||'未知原因'));
     // ② 轮询(每6秒一轮,总限30分钟)
