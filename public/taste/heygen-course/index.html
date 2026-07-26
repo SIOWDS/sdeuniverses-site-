@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SDE 数字人视频造 · SDE Universes</title>
+<style>
+:root{--bg:#0d0b16;--card:#161320;--card2:#1b1726;--ink:#ECE7F5;--sub:#A79FC0;--muted:#6f6790;--line:rgba(255,255,255,0.09);--gold:#E7C349;--gold2:#F0D97A;--acc:#B98CF0}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;line-height:1.6}
+.wrap{max-width:1000px;margin:0 auto;padding:26px 20px 90px}
+h1{font-size:24px;margin:0 0 4px}
+.sub{color:var(--sub);font-size:13.5px;margin-bottom:22px}
+.crumb{font-size:12.5px;color:var(--muted);margin-bottom:14px}
+.crumb a{color:var(--muted);text-decoration:none}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin-bottom:16px}
+.panel h2{font-size:15px;margin:0 0 12px;display:flex;align-items:center;gap:8px}
+.step-n{display:inline-flex;width:22px;height:22px;border-radius:50%;background:var(--acc);color:#140f22;font-size:12px;font-weight:800;align-items:center;justify-content:center}
+label{display:block;font-size:12px;color:var(--muted);font-weight:600;margin:10px 0 4px}
+input[type=text],input[type=password],select,textarea{width:100%;background:#0C0A14;border:1px solid var(--line);border-radius:8px;color:inherit;padding:9px 11px;font-size:13.5px;font-family:inherit}
+textarea{min-height:120px;resize:vertical;line-height:1.7}
+.btn{background:var(--gold);color:#140f06;border:none;border-radius:10px;padding:10px 18px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn2{background:transparent;border:1px solid var(--line);color:var(--ink);border-radius:10px;padding:9px 15px;font-size:13px;cursor:pointer;font-family:inherit}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.tip{font-size:11.5px;color:var(--muted);line-height:1.7;margin-top:6px}
+.status{font-size:12.5px;color:var(--sub);margin-top:10px;min-height:18px}
+.err{font-size:12.5px;color:#ff9b9b;margin-top:8px;min-height:16px}
+#results{margin-top:10px;display:flex;flex-direction:column;gap:7px;max-height:300px;overflow:auto}
+.hit{background:var(--card2);border:1px solid var(--line);border-radius:9px;padding:9px 12px;cursor:pointer}
+.hit:hover{border-color:var(--acc)}
+.hit .ht{font-size:13.5px;font-weight:600}
+.hit .hs{font-size:11.5px;color:var(--muted);margin-top:2px}
+.chosen{background:rgba(185,140,240,.12);border:1px solid var(--acc);border-radius:9px;padding:9px 12px;font-size:13px;margin-top:8px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.spinner{display:inline-block;width:13px;height:13px;border:2px solid rgba(255,255,255,.25);border-top-color:var(--acc);border-radius:50%;animation:spin .7s linear infinite;vertical-align:-2px;margin-right:6px}
+@keyframes spin{to{transform:rotate(360deg)}}
+video{width:100%;border-radius:10px;background:#000;display:block}
+.keyguide{background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:12px 14px;font-size:12px;color:var(--sub);line-height:1.8;margin-bottom:12px}
+.keyguide b{color:var(--gold2)}
+.keyguide a{color:var(--acc)}
+.pill{display:inline-block;font-size:11px;background:rgba(231,195,73,.15);color:var(--gold2);border-radius:20px;padding:2px 10px;margin-left:6px}
+@media(max-width:640px){.grid2{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="crumb"><a href="/">SDE Universes</a> › 品尝系列 › SDE 数字人视频造</div>
+  <h1>🎬 SDE 数字人视频造 <span class="pill">真人分身讲课</span></h1>
+  <div class="sub">选一篇 SDE 文章 → 由 SDE 基底＋全站检索生成一份讲课稿 → 用你在 HeyGen 训练好的<b>真人数字分身</b>把它讲成视频课。老师训练一次分身，之后任意文章都能自动出课。</div>
+
+  <!-- 第一步：HeyGen 密钥 -->
+  <div class="panel">
+    <h2><span class="step-n">1</span> 连接你的 HeyGen 账户</h2>
+    <div class="keyguide">
+      本工具用你自己的 HeyGen 密钥出片（<b>BYOK</b>，密钥只在你浏览器与 HeyGen 之间转发，本站不存储）。<br>
+      ① 去 <a href="https://app.heygen.com/settings?nav=API" target="_blank" rel="noopener">HeyGen 设置 → API</a> 复制 API Key；<br>
+      ② 先在 HeyGen 用一段 15 秒自拍训练好你的<b>数字分身（Digital Twin / Avatar）</b>；<br>
+      ③ 填入下面，点「载入我的分身」。计费由 HeyGen 按视频分钟数从你的额度扣（约 $1/分钟起）。
+    </div>
+    <label>HeyGen API Key</label>
+    <input id="hgKey" type="password" placeholder="粘贴你的 HeyGen API Key" autocomplete="off">
+    <div class="row" style="margin-top:10px">
+      <button class="btn2" id="btnLoadAvatars" type="button">载入我的分身与声音</button>
+      <span id="keyStatus" class="status" style="margin:0"></span>
+    </div>
+    <div class="grid2" style="margin-top:10px">
+      <div>
+        <label>数字分身（形象）</label>
+        <select id="hgAvatar"><option value="">先载入…</option></select>
+      </div>
+      <div>
+        <label>声音</label>
+        <select id="hgVoice"><option value="">先载入…</option></select>
+      </div>
+    </div>
+    <div class="tip">找不到分身？确认你已在 HeyGen 训练过 Digital Twin/Avatar。这里会列出你账户里可用的形象与声音。</div>
+  </div>
+
+  <!-- 第二步：选文章 -->
+  <div class="panel">
+    <h2><span class="step-n">2</span> 选一篇 SDE 文章</h2>
+    <div class="row">
+      <input id="q" type="text" placeholder="搜索站内文章标题 / 关键词…" style="flex:1;min-width:220px">
+      <button class="btn2" id="btnSearch" type="button">搜索</button>
+    </div>
+    <div id="loadStatus" class="status">索引载入中…</div>
+    <div id="results"></div>
+    <div id="chosen" class="chosen" style="display:none"></div>
+  </div>
+
+  <!-- 第三步：生成讲课稿 -->
+  <div class="panel">
+    <h2><span class="step-n">3</span> 生成讲课稿</h2>
+    <div class="keyguide">
+      讲课稿由你选的 AI 基底生成（<b>BYOK</b>，密钥只在你浏览器与该基底之间转发）。选一个你有额度的基底、填它的 API Key。
+    </div>
+    <div class="grid2">
+      <div>
+        <label>生成基底</label>
+        <select id="baseSel">
+          <option value="deepseek">DeepSeek（国内直连 · 推荐）</option>
+          <option value="glm">智谱 GLM（国内直连）</option>
+          <option value="gpt">OpenAI GPT</option>
+          <option value="claude">Anthropic Claude</option>
+          <option value="gemini">Google Gemini</option>
+        </select>
+      </div>
+      <div>
+        <label>基底 API Key</label>
+        <input id="baseKey" type="password" placeholder="粘贴所选基底的 API Key" autocomplete="off">
+      </div>
+    </div>
+    <div class="grid2" style="margin-top:4px">
+      <div>
+        <label>篇幅</label>
+        <select id="lenSel">
+          <option value="900">短（约 900 字 · 约 3 分钟）</option>
+          <option value="1600" selected>中（约 1600 字 · 约 5 分钟）</option>
+          <option value="2600">长（约 2600 字 · 约 8 分钟）</option>
+        </select>
+      </div>
+      <div>
+        <label>讲课口吻</label>
+        <select id="toneSel">
+          <option value="lecture" selected>老师讲课 · 深入浅出</option>
+          <option value="keynote">主题演讲 · 有感染力</option>
+          <option value="storytell">娓娓道来 · 讲故事式</option>
+        </select>
+      </div>
+    </div>
+    <div class="row" style="margin-top:12px">
+      <button class="btn" id="btnScript" type="button" disabled>生成讲课稿</button>
+      <span id="scriptStatus" class="status" style="margin:0"></span>
+    </div>
+    <label style="margin-top:12px">讲课稿（可手动微调后再出视频）</label>
+    <textarea id="script" placeholder="生成的讲课稿会出现在这里，你可以直接修改。"></textarea>
+    <div class="tip" id="scriptMeta"></div>
+  </div>
+
+  <!-- 第四步：出视频 -->
+  <div class="panel">
+    <h2><span class="step-n">4</span> 生成数字人视频课</h2>
+    <div class="row">
+      <button class="btn" id="btnVideo" type="button" disabled>用我的分身讲这一课</button>
+      <span id="videoStatus" class="status" style="margin:0"></span>
+    </div>
+    <div class="err" id="videoErr"></div>
+    <div id="playerWrap" style="display:none;margin-top:14px">
+      <video id="player" controls playsinline></video>
+      <div class="row" style="margin-top:10px">
+        <a id="dlLink" class="btn2" href="#" target="_blank" rel="noopener" download>⬇ 下载视频</a>
+        <span class="tip" id="videoDone" style="margin:0"></span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+var $=function(id){return document.getElementById(id);};
+var PROXY="/api/llm-proxy";
+var HG="https://api.heygen.com";
+var chosenDoc=null, MANIFEST=null, CHUNKS=[], SHARDS_LOADED=0, SHARDS_TOTAL=0;
+
+/* ============ HeyGen：调用封装（经本站代理，BYOK） ============ */
+function hgKey(){ return ($('hgKey')&&$('hgKey').value||'').trim(); }
+async function hgCall(method, path, body){
+  var headers={'x-target-url':HG+path,'x-api-key':hgKey()};
+  if(method!=='POST') headers['x-target-method']=method;
+  if(body) headers['content-type']='application/json';
+  var r=await fetch(PROXY,{method:'POST',headers:headers,body:body?JSON.stringify(body):undefined});
+  var j=null; try{ j=await r.json(); }catch(e){}
+  return {ok:r.ok,status:r.status,j:j};
+}
+
+/* 载入分身与声音 */
+async function loadAvatars(){
+  if(!hgKey()){ $('keyStatus').textContent='请先填 HeyGen API Key。'; return; }
+  $('keyStatus').innerHTML='<span class="spinner"></span>载入中…';
+  try{
+    // 分身：优先数字分身(digital twin)，也列普通 avatar
+    var av=await hgCall('GET','/v3/avatars/looks?ownership=private',null);
+    var avatars=[];
+    if(av.ok && av.j && av.j.data){
+      var looks=av.j.data.avatar_looks||av.j.data.looks||av.j.data||[];
+      if(Array.isArray(looks)) looks.forEach(function(l){ avatars.push({id:l.id||l.avatar_id||l.look_id, name:l.name||l.look_name||l.id}); });
+    }
+    // 兜底：v2 avatars
+    if(!avatars.length){
+      var av2=await hgCall('GET','/v2/avatars',null);
+      if(av2.ok && av2.j && av2.j.data){
+        var list=av2.j.data.avatars||[];
+        list.forEach(function(a){ avatars.push({id:a.avatar_id, name:a.avatar_name||a.avatar_id}); });
+      }
+    }
+    var selA=$('hgAvatar'); selA.innerHTML='';
+    if(!avatars.length){ selA.innerHTML='<option value="">未找到分身——请先在 HeyGen 训练</option>'; }
+    else avatars.forEach(function(a){ var o=document.createElement('option'); o.value=a.id; o.textContent=a.name; selA.appendChild(o); });
+
+    // 声音
+    var vc=await hgCall('GET','/v2/voices',null);
+    var selV=$('hgVoice'); selV.innerHTML='';
+    var voices=(vc.ok && vc.j && vc.j.data && vc.j.data.voices)||[];
+    if(!voices.length){ selV.innerHTML='<option value="">未找到声音</option>'; }
+    else voices.slice(0,300).forEach(function(v){ var o=document.createElement('option'); o.value=v.voice_id; o.textContent=(v.language||'')+' · '+(v.name||v.voice_id)+(v.gender?(' ('+v.gender+')'):''); selV.appendChild(o); });
+    // 默认挑一个中文声音
+    for(var i=0;i<selV.options.length;i++){ if(/chinese|中文|zh/i.test(selV.options[i].textContent)){ selV.selectedIndex=i; break; } }
+
+    $('keyStatus').textContent='✓ 已载入 '+avatars.length+' 个分身、'+voices.length+' 个声音';
+    refreshGates();
+  }catch(e){ $('keyStatus').textContent='载入失败：'+(e&&e.message||e); }
+}
+
+/* ============ 站内文章索引（复用全站搜索索引） ============ */
+(function loadIndex(){
+  fetch('/search/manifest.json?v='+Date.now(),{cache:'no-store'}).then(function(r){return r.json();}).then(function(m){
+    MANIFEST=m;
+    var files=[];
+    (m.sections||[]).forEach(function(s){ (s.files||[]).forEach(function(fn){ files.push(fn); }); });
+    SHARDS_TOTAL=files.length;
+    if(!SHARDS_TOTAL){ $('loadStatus').textContent='索引为空。'; return; }
+    files.forEach(function(fn){
+      fetch('/search/shard-'+fn+'.json?v='+Date.now(),{cache:'no-store'}).then(function(r){return r.json();}).then(function(d){
+        (d.chunks||[]).forEach(function(c){ CHUNKS.push(c); });
+        SHARDS_LOADED++;
+        $('loadStatus').textContent='索引载入中… '+SHARDS_LOADED+'/'+SHARDS_TOTAL+' 片';
+        if(SHARDS_LOADED===SHARDS_TOTAL){ $('loadStatus').textContent='✓ 索引就绪（'+MANIFEST.docs.length+' 篇文章），可搜索'; }
+      }).catch(function(){ SHARDS_LOADED++; });
+    });
+  }).catch(function(){ $('loadStatus').textContent='索引载入失败，请刷新。'; });
+})();
+
+function norm(s){ return (s||'').toLowerCase(); }
+function doSearch(){
+  if(!MANIFEST){ return; }
+  var q=norm($('q').value.trim()); if(!q){ $('results').innerHTML=''; return; }
+  var scored=[];
+  MANIFEST.docs.forEach(function(d,di){
+    var t=norm(d.title||''); var s=0;
+    if(t.indexOf(q)>=0) s+=100;
+    q.split(/\s+/).forEach(function(w){ if(w&&t.indexOf(w)>=0) s+=20; });
+    if(s>0) scored.push({di:di, s:s, d:d});
+  });
+  scored.sort(function(a,b){return b.s-a.s;});
+  var box=$('results'); box.innerHTML='';
+  scored.slice(0,20).forEach(function(x){
+    var el=document.createElement('div'); el.className='hit';
+    el.innerHTML='<div class="ht">'+esc(x.d.title||'(无题)')+'</div><div class="hs">'+esc(x.d.url||'')+'</div>';
+    el.onclick=function(){ chooseDoc(x.d); };
+    box.appendChild(el);
+  });
+  if(!scored.length) box.innerHTML='<div class="tip">没找到匹配的文章。</div>';
+}
+function chooseDoc(d){
+  chosenDoc=d;
+  $('chosen').style.display='block';
+  $('chosen').innerHTML='✓ 已选：<b>'+esc(d.title||'')+'</b><br><span class="tip">'+esc(d.url||'')+'</span>';
+  $('results').innerHTML='';
+  refreshGates();
+}
+function esc(s){ return String(s||'').replace(/[<>&"]/g,function(c){return{'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c];}); }
+
+async function fetchArticleText(u){
+  try{
+    var r=await fetch(u,{cache:'no-store'}); var html=await r.text();
+    var doc=new DOMParser().parseFromString(html,'text/html');
+    var el=doc.querySelector('article')||doc.querySelector('main')||doc.querySelector('.art')||doc.querySelector('.body')||doc.body;
+    var t=(el&&el.textContent||'').replace(/\s+/g,' ').trim();
+    return t.slice(0,30000);
+  }catch(e){ return ''; }
+}
+
+/* 站内 RAG */
+async function ragForArticle(title, snippet){
+  try{
+    var r=await fetch('/api/wds/rag',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({q:(title+' '+(snippet||'')).slice(0,800),k:24,cap:20000,kbn:16})});
+    if(!r.ok) return {ctx:'',srcs:[]};
+    var j=await r.json();
+    return (j&&j.ok)?{ctx:j.ctx||'',srcs:j.srcs||[]}:{ctx:'',srcs:[]};
+  }catch(e){ return {ctx:'',srcs:[]}; }
+}
+
+/* ============ 生成讲课稿（调基底，经 llm-proxy；用站内代理默认基底） ============ */
+var SCRIPT_TEXT='';
+async function genScript(){
+  if(!chosenDoc){ return; }
+  $('btnScript').disabled=true;
+  $('scriptStatus').innerHTML='<span class="spinner"></span>读取原文…';
+  var full=await fetchArticleText(chosenDoc.url);
+  if(!full){ $('scriptStatus').textContent='读取原文失败，换一篇或重试。'; $('btnScript').disabled=false; return; }
+  $('scriptStatus').innerHTML='<span class="spinner"></span>检索 SDE 全站相关资料…';
+  var rag=await ragForArticle(chosenDoc.title, full.slice(0,600));
+  $('scriptStatus').innerHTML='<span class="spinner"></span>✓ 检索到 '+(rag.srcs?rag.srcs.length:0)+' 篇 · 生成讲课稿中（约半分钟）…';
+
+  var wc=parseInt($('lenSel').value,10)||1600;
+  var tone=$('toneSel').value;
+  var toneGuide={
+    lecture:'像一位深入浅出的老师在讲台上讲课：先用一个生活化的入口把听众带进来，再一层层把这篇文章的核心洞见讲透，多用"你有没有发现""我们换个角度想"这样的引导语，讲到关键处停一停、强调一下。',
+    keynote:'像一场有感染力的主题演讲：开场就抛出一个让人心头一震的判断，中间用有力的例子和对比推进，语气笃定、有节奏，结尾升华到一个让人记住的句子。',
+    storytell:'娓娓道来、讲故事式：把这篇文章的道理编织进一个叙述里，像跟朋友聊天一样自然，有起伏、有停顿、有"后来呢"的悬念感。'
+  }[tone]||'';
+
+  var sys='你是 SDE（王德生／德麦国际）学派的资深讲者，要把一篇 SDE 文章讲成一堂对着镜头的口播视频课。\n'
+    +'【讲法】'+toneGuide+'\n'
+    +'【SDE 站内资料——这是本站的思想土壤，讲解要扎在里面】\n'+(rag.ctx||'（未检索到特别相关的段落，凭对文章本身的把握讲）')+'\n'
+    +'【要求】①这是给一个人对着镜头讲的口播稿，不是对话、没有说话人标记、没有小标题、没有 Markdown、没有编号，就是一段可以照着念的连贯讲稿；'
+    +'②约 '+wc+' 个汉字；③讲解至少两处把本文与站内相邻思想连起来（"这让我想到站里另一篇讲过…"），但资料里没有的绝不编造成"站里说过"；'
+    +'④开头一句话把今天要讲的文章点出来，结尾一句话收束、留个回味；⑤直接开始讲，不要任何前言。';
+  var userQ='请把下面这篇 SDE 文章讲成一堂口播视频课。\n\n文章标题：'+chosenDoc.title+'\n\n文章正文：\n'+full;
+
+  try{
+    var text=await callBase(sys, userQ, Math.round(wc*2.2));
+    if(!text){ throw new Error('生成为空（检查基底额度/密钥）'); }
+    SCRIPT_TEXT=text.trim();
+    $('script').value=SCRIPT_TEXT;
+    $('scriptMeta').textContent='约 '+SCRIPT_TEXT.length+' 字 · 站内检索 '+(rag.srcs?rag.srcs.length:0)+' 篇。可直接修改文本，再点下面出视频。';
+    $('scriptStatus').textContent='✓ 讲课稿已生成';
+  }catch(e){
+    $('scriptStatus').textContent='生成失败：'+(e&&e.message||e);
+  }
+  $('btnScript').disabled=false;
+  refreshGates();
+}
+
+/* 调基底：国内(DeepSeek/GLM)直连；境外(GPT/Claude/Gemini)走 llm-proxy。BYOK */
+async function callBase(sys, user, maxTok){
+  var vendor=$('baseSel').value, key=($('baseKey').value||'').trim();
+  if(key.length<8) throw new Error('请先填所选基底的 API Key');
+  var url, headers={'Content-Type':'application/json'}, body, parse;
+  if(vendor==='deepseek'){
+    url='https://api.deepseek.com/v1/chat/completions'; headers['Authorization']='Bearer '+key;
+    body={model:'deepseek-chat',messages:[{role:'system',content:sys},{role:'user',content:user}],max_tokens:Math.min(8000,maxTok),temperature:0.8};
+    parse=function(j){return j&&j.choices&&j.choices[0]&&j.choices[0].message&&j.choices[0].message.content;};
+  } else if(vendor==='glm'){
+    url='https://open.bigmodel.cn/api/paas/v4/chat/completions'; headers['Authorization']='Bearer '+key;
+    body={model:'glm-4-plus',messages:[{role:'system',content:sys},{role:'user',content:user}],max_tokens:Math.min(8000,maxTok),temperature:0.8};
+    parse=function(j){return j&&j.choices&&j.choices[0]&&j.choices[0].message&&j.choices[0].message.content;};
+  } else if(vendor==='gpt'){
+    url=PROXY; headers['x-target-url']='https://api.openai.com/v1/chat/completions'; headers['Authorization']='Bearer '+key;
+    body={model:'gpt-4o',messages:[{role:'system',content:sys},{role:'user',content:user}],max_tokens:Math.min(8000,maxTok),temperature:0.8};
+    parse=function(j){return j&&j.choices&&j.choices[0]&&j.choices[0].message&&j.choices[0].message.content;};
+  } else if(vendor==='claude'){
+    url=PROXY; headers['x-target-url']='https://api.anthropic.com/v1/messages'; headers['x-api-key']=key; headers['anthropic-version']='2023-06-01'; headers['anthropic-dangerous-direct-browser-access']='true';
+    body={model:'claude-sonnet-4-6',max_tokens:Math.min(8000,maxTok),system:sys,messages:[{role:'user',content:user}]};
+    parse=function(j){return j&&j.content&&j.content[0]&&j.content[0].text;};
+  } else { // gemini
+    url=PROXY; headers['x-target-url']='https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key='+encodeURIComponent(key);
+    body={contents:[{role:'user',parts:[{text:user}]}],systemInstruction:{parts:[{text:sys}]},generationConfig:{maxOutputTokens:Math.min(8000,maxTok),temperature:0.8}};
+    parse=function(j){return j&&j.candidates&&j.candidates[0]&&j.candidates[0].content&&j.candidates[0].content.parts&&j.candidates[0].content.parts.map(function(p){return p.text||'';}).join('');};
+  }
+  var r=await fetch(url,{method:'POST',headers:headers,body:JSON.stringify(body)});
+  var j=null; try{ j=await r.json(); }catch(e){ throw new Error('响应非法 JSON'); }
+  if(!r.ok || (j&&j.error)){ throw new Error('基底报错 '+r.status+'：'+((j&&j.error&&(j.error.message||j.error.code||j.error))||r.statusText)); }
+  return parse(j)||'';
+}
+
+/* ============ 出视频（HeyGen Digital Twin） ============ */
+async function genVideo(){
+  var script=($('script').value||'').trim();
+  var avatarId=$('hgAvatar').value, voiceId=$('hgVoice').value;
+  if(!hgKey()){ $('videoErr').textContent='请先填 HeyGen API Key。'; return; }
+  if(!avatarId){ $('videoErr').textContent='请先载入并选择你的数字分身。'; return; }
+  if(!voiceId){ $('videoErr').textContent='请先选择声音。'; return; }
+  if(!script){ $('videoErr').textContent='讲课稿为空，先生成或填写讲稿。'; return; }
+  $('videoErr').textContent='';
+  $('btnVideo').disabled=true;
+  $('videoStatus').innerHTML='<span class="spinner"></span>提交到 HeyGen…';
+
+  // v3 建视频；分身用 avatar_v 引擎（数字分身）。若失败降级 v2。
+  var vid=null;
+  try{
+    var body={ type:'avatar', avatar_id:avatarId, engine:{type:'avatar_v'}, script:script, voice_id:voiceId, resolution:'1080p', aspect_ratio:'auto', title:(chosenDoc&&chosenDoc.title||'SDE 视频课') };
+    var r=await hgCall('POST','/v3/videos',body);
+    if(r.ok && r.j && r.j.data && (r.j.data.video_id||r.j.data.id)){ vid=r.j.data.video_id||r.j.data.id; }
+    else if(r.j && (r.j.video_id||r.j.id)){ vid=r.j.video_id||r.j.id; }
+    // v2 兜底
+    if(!vid){
+      var b2={ video_inputs:[{ character:{type:'avatar',avatar_id:avatarId,avatar_style:'normal'}, voice:{type:'text',input_text:script,voice_id:voiceId} }], dimension:{width:1920,height:1080} };
+      var r2=await hgCall('POST','/v2/video/generate',b2);
+      if(r2.j && r2.j.data && r2.j.data.video_id) vid=r2.j.data.video_id;
+      if(!vid){ throw new Error((r.j&&r.j.error&&(r.j.error.message||r.j.error))||(r2.j&&r2.j.error&&(r2.j.error.message||r2.j.error))||('HTTP '+r.status)); }
+    }
+  }catch(e){
+    $('videoStatus').textContent='';
+    $('videoErr').textContent='提交失败：'+(e&&e.message||e);
+    $('btnVideo').disabled=false; return;
+  }
+
+  // 轮询状态
+  $('videoStatus').innerHTML='<span class="spinner"></span>HeyGen 渲染中（几分钟，请勿关闭）…';
+  var t0=Date.now(), url='';
+  while(true){
+    if(Date.now()-t0>20*60*1000){ $('videoStatus').textContent='等待超时（20分钟）。可稍后到 HeyGen 后台查看该视频。'; break; }
+    await new Promise(function(r){setTimeout(r,8000);});
+    var s=await hgCall('GET','/v1/video_status.get?video_id='+encodeURIComponent(vid),null);
+    var st=(s.j&&s.j.data&&s.j.data.status)||'';
+    if(st==='completed'){ url=(s.j.data.video_url||s.j.data.video_url_caption||''); break; }
+    if(st==='failed'){ $('videoErr').textContent='HeyGen 渲染失败：'+((s.j.data&&s.j.data.error&&(s.j.data.error.message||s.j.data.error))||'未知'); break; }
+    $('videoStatus').innerHTML='<span class="spinner"></span>HeyGen '+(st||'处理')+'…';
+  }
+  if(url){
+    $('player').src=url;
+    $('dlLink').href=url;
+    $('playerWrap').style.display='block';
+    $('videoStatus').textContent='✓ 视频课已生成';
+    $('videoDone').textContent='链接来自 HeyGen，尽快下载保存。';
+    try{ $('player').play().catch(function(){}); }catch(e){}
+  }
+  $('btnVideo').disabled=false;
+}
+
+/* ============ 门禁 ============ */
+function refreshGates(){
+  $('btnScript').disabled = !chosenDoc;
+  var ready = hgKey() && $('hgAvatar').value && ($('script').value||'').trim();
+  $('btnVideo').disabled = !ready;
+}
+
+/* 绑定 */
+$('btnLoadAvatars').addEventListener('click', loadAvatars);
+$('btnSearch').addEventListener('click', doSearch);
+$('q').addEventListener('keydown', function(e){ if(e.key==='Enter') doSearch(); });
+$('btnScript').addEventListener('click', genScript);
+$('btnVideo').addEventListener('click', genVideo);
+$('script').addEventListener('input', refreshGates);
+$('hgAvatar').addEventListener('change', refreshGates);
+$('hgKey').addEventListener('input', refreshGates);
+</script>
+</body>
+</html>

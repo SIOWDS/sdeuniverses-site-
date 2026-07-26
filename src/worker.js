@@ -2753,7 +2753,9 @@ export default {
       const azureTts = /^https:\/\/[a-z0-9-]+\.tts\.speech\.microsoft\.com\//i.test(target);
       // Azure 数字人批量合成：<资源名>.cognitiveservices.azure.com 或 <区域>.api.cognitive.microsoft.com，仅 /avatar/batchsyntheses 路径
       const azureAvatar = /^https:\/\/[a-z0-9-]+\.(cognitiveservices\.azure\.com|api\.cognitive\.microsoft\.com)\/avatar\/batchsyntheses(\/|\?|$)/i.test(target);
-      const ok = ALLOW.some((p) => target.startsWith(p)) || azureTts || azureAvatar;
+      // HeyGen 真人数字分身：api.heygen.com（建视频 /v3/videos、查状态、列分身/声音）+ upload.heygen.com（传素材），BYOK 经 x-api-key
+      const heygen = /^https:\/\/(api|upload)\.heygen\.com\//i.test(target);
+      const ok = ALLOW.some((p) => target.startsWith(p)) || azureTts || azureAvatar || heygen;
       if (!ok) {
         return new Response(
           JSON.stringify({ error: { message: "target url not allowed", type: "proxy_forbidden" } }),
@@ -2785,6 +2787,7 @@ export default {
       let fwdMethod = "POST";
       const xm = (request.headers.get("x-target-method") || "").toUpperCase();
       if (azureAvatar && (xm === "GET" || xm === "PUT" || xm === "DELETE")) fwdMethod = xm;
+      if (heygen && (xm === "GET" || xm === "PUT" || xm === "DELETE")) fwdMethod = xm;   // HeyGen 查状态/列分身用 GET
       let upstream;
       try {
         upstream = await fetch(target, {
