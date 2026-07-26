@@ -320,37 +320,51 @@ async function loadAvatars(){
   if(!hgKey()){ $('keyStatus').textContent='请先填 HeyGen API Key。'; return; }
   $('keyStatus').innerHTML='<span class="spinner"></span>载入中…';
   try{
-    // 分身：优先数字分身(digital twin)，也列普通 avatar
-    var av=await hgCall('GET','/v3/avatars/looks?ownership=private',null);
-    var avatars=[];
+    var avatars=[], mine=[], pub=[];
+    // 主：/v2/avatars 列出所有分身（含你训练的 Instant Avatar / 数字分身），返回 data.avatars[]
+    var av=await hgCall('GET','/v2/avatars',null);
     if(av.ok && av.j && av.j.data){
-      var looks=av.j.data.avatar_looks||av.j.data.looks||av.j.data||[];
-      if(Array.isArray(looks)) looks.forEach(function(l){ avatars.push({id:l.id||l.avatar_id||l.look_id, name:l.name||l.look_name||l.id}); });
+      var list=av.j.data.avatars||[];
+      list.forEach(function(a){
+        var item={id:a.avatar_id, name:a.avatar_name||a.avatar_id, mine:(a.premium===false&&/instant|custom/i.test((a.avatar_name||'')+ (a.type||'')))||false};
+        avatars.push(item);
+      });
+      // talking_photos（照片数字人）也可用
+      var tp=av.j.data.talking_photos||[];
+      tp.forEach(function(p){ avatars.push({id:p.talking_photo_id, name:'📷 '+(p.talking_photo_name||p.talking_photo_id), mine:true}); });
     }
-    // 兜底：v2 avatars
-    if(!avatars.length){
-      var av2=await hgCall('GET','/v2/avatars',null);
-      if(av2.ok && av2.j && av2.j.data){
-        var list=av2.j.data.avatars||[];
-        list.forEach(function(a){ avatars.push({id:a.avatar_id, name:a.avatar_name||a.avatar_id}); });
-      }
+    // 补充：Avatar Groups（你训练的数字分身通常在这里，含 consent/status）
+    var grp=await hgCall('GET','/v2/avatar_group.list?include_public=false',null);
+    if(grp.ok && grp.j && grp.j.data){
+      var groups=grp.j.data.avatar_group_list||grp.j.data||[];
+      if(Array.isArray(groups)) groups.forEach(function(g){
+        if(g.id && !avatars.some(function(x){return x.id===g.id;})) avatars.unshift({id:g.id, name:'⭐ '+(g.name||g.id)+'（我训练的）', mine:true});
+      });
     }
     var selA=$('hgAvatar'); selA.innerHTML='';
-    if(!avatars.length){ selA.innerHTML='<option value="">未找到分身——请先在 HeyGen 训练</option>'; }
-    else avatars.forEach(function(a){ var o=document.createElement('option'); o.value=a.id; o.textContent=a.name; selA.appendChild(o); });
+    if(!avatars.length){ selA.innerHTML='<option value="">未找到分身——请先在 HeyGen 训练 Avatar V，或确认 API Key 正确</option>'; }
+    else {
+      // 我训练的排前面
+      avatars.sort(function(a,b){ return (b.mine?1:0)-(a.mine?1:0); });
+      avatars.forEach(function(a){ var o=document.createElement('option'); o.value=a.id; o.textContent=(a.mine&&a.name.indexOf('⭐')<0&&a.name.indexOf('📷')<0?'⭐ ':'')+a.name; selA.appendChild(o); });
+    }
 
     // 声音
     var vc=await hgCall('GET','/v2/voices',null);
     var selV=$('hgVoice'); selV.innerHTML='';
     var voices=(vc.ok && vc.j && vc.j.data && vc.j.data.voices)||[];
-    if(!voices.length){ selV.innerHTML='<option value="">未找到声音</option>'; }
-    else voices.slice(0,300).forEach(function(v){ var o=document.createElement('option'); o.value=v.voice_id; o.textContent=(v.language||'')+' · '+(v.name||v.voice_id)+(v.gender?(' ('+v.gender+')'):''); selV.appendChild(o); });
-    // 默认挑一个中文声音
-    for(var i=0;i<selV.options.length;i++){ if(/chinese|中文|zh/i.test(selV.options[i].textContent)){ selV.selectedIndex=i; break; } }
+    if(!voices.length){ selV.innerHTML='<option value="">未找到声音——确认 API Key 正确</option>'; }
+    else {
+      // 你克隆的声音(非公共)排前面
+      voices.sort(function(a,b){ return ((a.support_pause===undefined&&!a.premium)?0:1)-((b.support_pause===undefined&&!b.premium)?0:1); });
+      voices.slice(0,300).forEach(function(v){ var o=document.createElement('option'); o.value=v.voice_id; o.textContent=(v.language||'')+' · '+(v.name||v.voice_id)+(v.gender?(' ('+v.gender+')'):''); selV.appendChild(o); });
+      // 默认挑中文
+      for(var i=0;i<selV.options.length;i++){ if(/chinese|中文|zh|mandarin/i.test(selV.options[i].textContent)){ selV.selectedIndex=i; break; } }
+    }
 
-    $('keyStatus').textContent='✓ 已载入 '+avatars.length+' 个分身、'+voices.length+' 个声音';
+    $('keyStatus').textContent='✓ 已载入 '+avatars.length+' 个分身、'+voices.length+' 个声音（你训练的排在最前，标 ⭐/📷）';
     refreshGates();
-  }catch(e){ $('keyStatus').textContent='载入失败：'+(e&&e.message||e); }
+  }catch(e){ $('keyStatus').textContent='载入失败：'+(e&&e.message||e)+'（确认 API Key 正确、且已在 HeyGen 训练分身）'; }
 }
 
 /* ============ 站内文章索引（复用全站搜索索引） ============ */
