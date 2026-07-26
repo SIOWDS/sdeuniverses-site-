@@ -1819,19 +1819,20 @@ async function avatarGenerate(){
                character:av.character, style:av.style, state:'pending', url:'', err:'' };
     });
     // ① 提交(并发5)
-    var si=0, active=0, submitted=0, failedSubmit=0, firstErr='';
+    var si=1, active=0, submitted=0, failedSubmit=0, firstErr='';   // 从第2句起提交(第1句由探针承担;探针失败时下方会重置)
     function sleep(ms){ return new Promise(function(r){setTimeout(r,ms);}); }
+    var AV_NOCROP=false;   // 探针发现裁切被拒→本场自动降级全幅
+    function avCfgOf(job){
+      var cfg={ talkingAvatarCharacter:job.character, talkingAvatarStyle:job.style, videoFormat:'mp4', videoCodec:'h264', bitrateKbps:1500, subtitleType:'hard_embedded', backgroundColor:(($('avScene')&&$('avScene').value)||'#FFFFFFFF') };
+      if(!AV_NOCROP && (($('avCrop')&&$('avCrop').value)||'half')==='half'){ cfg.videoCrop={ topLeft:{x:480,y:0}, bottomRight:{x:1440,y:1080} }; }
+      return cfg;
+    }
     async function submitOne(job){
       for(var attempt=1; attempt<=4; attempt++){
         var r;
         try{
           r=await avatarCall('PUT','/avatar/batchsyntheses/'+job.id+'?api-version=2024-08-01',{
-            inputKind:'SSML', inputs:[{content:job.ssml}],
-            avatarConfig:(function(){
-                var cfg={ talkingAvatarCharacter:job.character, talkingAvatarStyle:job.style, videoFormat:'mp4', videoCodec:'h264', bitrateKbps:1500, subtitleType:'hard_embedded', backgroundColor:(($('avScene')&&$('avScene').value)||'#FFFFFFFF') };
-                if((($('avCrop')&&$('avCrop').value)||'half')==='half'){ cfg.videoCrop={ topLeft:{x:480,y:0}, bottomRight:{x:1440,y:1080} }; }  // 1920 中央半幅→两窗拼成一整幅
-                return cfg;
-              })()
+            inputKind:'SSML', inputs:[{content:job.ssml}], avatarConfig:avCfgOf(job)
           });
         }catch(e){ r={ok:false,status:0,j:null,tx:String(e&&e.message||e)}; }
         if(r.ok){ job.state='running'; submitted++; return; }
@@ -1853,6 +1854,29 @@ async function avatarGenerate(){
         return;
       }
     }
+    // —— 探针：先发 1 个任务定生死，失败当场亮 Azure 原话；裁切被拒则自动降级全幅重试 ——
+    st.textContent='先发 1 个探针任务验证配置…';
+    var probe={ id:runTag+'-p', ssml:jobs[0].ssml, character:jobs[0].character, style:jobs[0].style };
+    async function tryProbe(){
+      try{ return await avatarCall('PUT','/avatar/batchsyntheses/'+probe.id+'?api-version=2024-08-01',{ inputKind:'SSML', inputs:[{content:probe.ssml}], avatarConfig:avCfgOf(probe) }); }
+      catch(e){ return {ok:false,status:0,j:null,tx:String(e&&e.message||e)}; }
+    }
+    var pr=await tryProbe();
+    if(!pr.ok && pr.status!==429 && pr.status<500){
+      var pmsg=(pr.j&&pr.j.error&&(pr.j.error.message||pr.j.error.code))||(pr.tx&&pr.tx.slice(0,200))||('HTTP '+pr.status);
+      if(!AV_NOCROP && (($('avCrop')&&$('avCrop').value)||'half')==='half'){
+        AV_NOCROP=true; probe.id=runTag+'-p2';
+        st.textContent='探针被拒（'+pmsg.slice(0,60)+'），疑似画幅裁切不被支持——改全幅再探…';
+        pr=await tryProbe();
+        if(pr.ok){ er.textContent='注意：该区域/形象不接受画幅裁切，本场已自动改为全幅画面。'; }
+      }
+      if(!pr.ok && pr.status!==429 && pr.status<500){
+        var pmsg2=(pr.j&&pr.j.error&&(pr.j.error.message||pr.j.error.code))||(pr.tx&&pr.tx.slice(0,200))||('HTTP '+pr.status);
+        throw new Error('配置被 Azure 拒绝，未消耗额度。原话：'+pmsg2+((pr.status===401||pr.status===403)?'（密钥无效，或资源不是 S0 档/该区域未开放数字人）':''));
+      }
+    }
+    if(pr.ok){ jobs[0].id=probe.id; jobs[0].state='running'; submitted++; }   // 探针=第一句，进常规轮询
+    else { si=0; }                                                             // 探针没立住(429/5xx到这)→第一句照常走批量
     await new Promise(function(done){
       function pump(){
         if(active<2 && si<jobs.length){
@@ -1899,7 +1923,12 @@ async function avatarGenerate(){
     var fails=jobs.filter(function(j){return j.state==='failed';});
     if(!AV_CLIPS.length) throw new Error('没有任何片段合成成功。'+(fails[0]?('首个错误：'+fails[0].err):''));
     if(fails.length) console.warn('avatar 失败明细:', fails.map(function(f){return f.i+':'+f.err;}));
-    st.textContent='✓ 完成 '+AV_CLIPS.length+'/'+jobs.length+' 段'+(fails.length?('（'+fails.length+' 段失败，连播跳过｜原因：'+(fails[0].err||'').slice(0,70)+'）'):'')+' · 按视频秒数计费已发生';
+    st.textContent='✓ 完成 '+AV_CLIPS.length+'/'+jobs.length+' 段'+(fails.length?('（'+fails.length+' 段失败，连播跳过）'):'')+' · 按视频秒数计费已发生';
+    if(fails.length){
+      var seen={},tops=[];
+      fails.forEach(function(f2){ var e2=(f2.err||'').slice(0,90); if(!seen[e2]){seen[e2]=1;tops.push(e2);} });
+      er.textContent='失败原因（前'+Math.min(3,tops.length)+'种）：'+tops.slice(0,3).join('　｜　');
+    }
     renderAvatarPlayer();
   }catch(e){ er.textContent=String(e&&e.message||e); st.textContent=''; }
   finally{ avBusy=false; $('btnAvatarGen').disabled=false; }
