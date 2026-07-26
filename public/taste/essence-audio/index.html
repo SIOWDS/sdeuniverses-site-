@@ -1876,7 +1876,14 @@ function avPlay(idx, noAuto){
   avPlayIdx=idx;
   var v=$('avVideo'), c=AV_CLIPS[idx];
   $('avNow').textContent='第 '+(idx+1)+' / '+AV_CLIPS.length+' 段';
-  var cap=$('avCaption'); if(cap) cap.innerHTML='<b>'+(c.who==='m'?'👨 主持人':'👩 嘉宾')+'</b>　'+esc(c.text);
+  var cap=$('avCaption'), spk='<b>'+(c.who==='m'?'👨 主持人':'👩 嘉宾')+'</b>　';
+  if(cap) cap.innerHTML=spk+'<span style="opacity:.45">'+esc(c.text)+'</span>';
+  // 字随声走：按播放进度比例逐字点亮（Azure 批量不吐词级时间戳，比例流动已很贴近）
+  v.ontimeupdate=function(){
+    if(!cap||!v.duration) return;
+    var k=Math.max(0, Math.min(c.text.length, Math.round(c.text.length*(v.currentTime/v.duration)+1)));
+    cap.innerHTML=spk+'<span style="color:var(--acc,#a78bfa)">'+esc(c.text.slice(0,k))+'</span><span style="opacity:.45">'+esc(c.text.slice(k))+'</span>';
+  };
   v.src=c.url;
   if(!noAuto){ v.play().catch(function(){}); }
   v.onended=function(){ if(avPlayIdx+1<AV_CLIPS.length) avPlay(avPlayIdx+1); else $('avNow').textContent='✓ 连播完毕（'+AV_CLIPS.length+' 段）'; };
