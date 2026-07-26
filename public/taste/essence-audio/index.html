@@ -2018,7 +2018,10 @@ function renderAvatarPlayer(){
     avPrimeSide($('avVidM'), AV_CLIPS.filter(function(x){return x.who==='m';})[0]);
     avPrimeSide($('avVidF'), AV_CLIPS.filter(function(x){return x.who!=='m';})[0]);
   }
-  avPlay(0,true);
+  // 自动从头连播（有声音、有画面、字幕流动）；浏览器可能拦截自动播放→提示点“从头连播”
+  avPlay(0);
+  var v0=(avLayoutMode()!=='single')?((AV_CLIPS[0].who==='m')?$('avVidM'):$('avVidF')):$('avVideo');
+  if(v0){ var pr=v0.play(); if(pr&&pr.catch){ pr.catch(function(){ if($('avNow')) $('avNow').textContent='▶ 点上方“从头连播”开始播放（含声音）'; }); } }
 }
 function avLayoutMode(){ var s=$('avLayout'); return (s&&s.value)||'news'; }
 function applyAvLayout(){
@@ -2052,7 +2055,7 @@ function avPlay(idx, noAuto){
     if(!otherPrev){ otherPrev = AV_CLIPS.filter(function(x){return x.who!==c.who;})[0]; }
     if(other && otherPrev && other.__primed!==otherPrev.url && other.paused!==false){ avPrimeSide(other, otherPrev); }
     try{ other && other.pause(); }catch(e){}
-    mine.__primed=c.url; mine.muted=false; mine.src=c.url; v=mine;
+    mine.__primed=c.url; mine.muted=false; mine.volume=1; mine.src=c.url; v=mine;
     $('avLowerTitle').textContent=(lastTitle||'');
     $('avLowerWho').textContent=(c.who==='m'?'主持人':'嘉宾')+' · 第 '+(idx+1)+'/'+AV_CLIPS.length+' 段';
   } else {
@@ -2518,7 +2521,11 @@ $('btnDl').addEventListener('click', downloadText);
 $('btnSaveDir').addEventListener('click', saveToDir);
 $('btnApplySubmit').addEventListener('click', applySubmit);
 $('btnAvatarGen').addEventListener('click', avatarGenerate);
-$('btnAvPlayAll').addEventListener('click', function(){ avPlay(0); });
+$('btnAvPlayAll').addEventListener('click', function(){
+  avPlay(0);
+  var v0=(avLayoutMode&&avLayoutMode()!=='single')?((AV_CLIPS[0]&&AV_CLIPS[0].who==='m')?$('avVidM'):$('avVidF')):$('avVideo');
+  if(v0){ v0.muted=false; var pr=v0.play(); if(pr&&pr.catch) pr.catch(function(){}); }
+});
 if($('avLayout')) $('avLayout').addEventListener('change', function(){ if(AV_CLIPS.length){ applyAvLayout(); avPlay(Math.max(0,avPlayIdx), true); } });
 if($('avDuoWrap')) $('avDuoWrap').addEventListener('click', function(){
   if(!AV_CLIPS.length||avPlayIdx<0) return;
