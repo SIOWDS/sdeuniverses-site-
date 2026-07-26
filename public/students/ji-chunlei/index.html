@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>季春雷 · 学员专栏 | SDE Universes</title>
+<meta name="description" content="季春雷 · SDE 预备学员 · Students' Column, SDE Universes">
+<style>
+:root{--gold:#C9A84C;--gold2:#D4B25E;--ink:#F0E9D8;--ink2:#B8AE96;--bg:#0E0B08;--panel:#171310;--panel2:#1C1712;--line:rgba(201,168,76,0.22);--accent:#8C6A2E}
+*{margin:0;padding:0;box-sizing:border-box}
+::selection{background:rgba(201,168,76,0.35)}
+body{background:var(--bg);color:var(--ink);font-family:"Noto Serif SC",Georgia,"Songti SC",serif;line-height:1.9}
+body.zh .en-only{display:none!important}
+body.en .zh-only{display:none!important}
+nav{position:sticky;top:0;z-index:20;background:rgba(14,11,8,0.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+nav .w{max-width:900px;margin:0 auto;padding:13px 24px;display:flex;justify-content:space-between;align-items:center}
+nav a{color:var(--gold);text-decoration:none;font-size:14px;letter-spacing:0.05em}
+.nav-right{display:flex;align-items:center;gap:16px}
+.lang-toggle{display:flex;border:1px solid var(--line);border-radius:20px;overflow:hidden}
+.lang-btn{background:transparent;border:none;color:var(--ink2);font-family:inherit;font-size:13px;padding:5px 13px;cursor:pointer;letter-spacing:0.05em}
+.lang-btn.active{background:var(--gold);color:#1A1410;font-weight:700}
+.level-tag{max-width:820px;margin:0 auto;padding:0 24px;display:flex;align-items:center;gap:14px}
+.level-tag .n{font-size:12px;letter-spacing:0.2em;color:#1A1410;background:var(--gold);border-radius:20px;padding:3px 12px;font-weight:700}
+.level-tag .t{font-size:12px;letter-spacing:0.32em;color:var(--gold)}
+.level-tag .line{flex:1;height:1px;background:var(--line)}
+.profile{max-width:820px;margin:0 auto;padding:52px 24px 20px;display:flex;gap:34px;align-items:center;flex-wrap:wrap}
+.avatar{width:132px;height:132px;border-radius:50%;flex-shrink:0;background:linear-gradient(160deg,rgba(212,178,94,0.30),rgba(212,178,94,0.06));border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-family:Georgia,serif;font-size:52px;font-weight:800;color:#F5E6BF;position:relative}
+.avatar .ph{font-size:10px;letter-spacing:0.15em;color:var(--ink2);position:absolute;bottom:12px;font-family:"Noto Serif SC",serif}
+.p-info{flex:1;min-width:240px}
+.p-info h1{font-size:clamp(30px,5vw,42px);font-weight:800;color:#F5EFE0;letter-spacing:0.04em;font-family:Georgia,"Noto Serif SC",serif}
+.p-note{font-size:14px;color:var(--ink2);margin-top:6px;letter-spacing:0.04em}
+.p-info .role{font-size:13px;color:var(--accent);letter-spacing:0.2em;margin-top:12px}
+.p-info .bio{font-size:15px;color:#6B6250;line-height:1.9;margin-top:16px;font-style:italic}
+.works{max-width:820px;margin:0 auto;padding:10px 24px 80px}
+.panel{background:linear-gradient(160deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:16px;padding:40px 30px;text-align:center;margin-top:20px}
+.panel .tag{font-size:12px;letter-spacing:0.34em;color:var(--gold);margin-bottom:14px}
+.panel p{font-size:14.5px;color:var(--ink2);line-height:1.9;max-width:520px;margin:0 auto}
+.back{text-align:center;margin-top:30px}
+.back a{color:var(--gold);text-decoration:none;font-size:14.5px;letter-spacing:0.06em;border-bottom:1px solid rgba(201,168,76,0.4);padding-bottom:2px}
+footer{border-top:1px solid var(--line);margin-top:24px;padding:30px 24px;text-align:center;color:#6B6250;font-size:13px}
+footer a{color:var(--gold);text-decoration:none}
+@media(max-width:640px){.profile{justify-content:center;text-align:center}.p-info{text-align:center}}
+</style>
+<style id="ambient-field">
+body{background:radial-gradient(1250px 820px at 6% -12%, rgba(202,132,102,0.170), transparent 62%),radial-gradient(1050px 900px at 112% 8%, rgba(212,152,132,0.130), transparent 58%),radial-gradient(1200px 1050px at 50% 118%, rgba(202,132,102,0.100), transparent 60%),var(--bg, var(--paper, #0E0B08)) !important;background-attachment:fixed !important}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:9998;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");background-size:160px 160px;opacity:0.055;mix-blend-mode:soft-light}
+</style>
+</head>
+<body class="zh" data-student-slug="ji-chunlei">
+<nav><div class="w">
+  <a href="/">SDE Universes</a>
+  <div class="nav-right">
+    <a href="/students/"><span class="zh-only">← 学员专栏</span><span class="en-only">← Students</span></a>
+    <div class="lang-toggle"><button class="lang-btn active" onclick="setLang('zh')">中</button><button class="lang-btn" onclick="setLang('en')">EN</button></div>
+  </div>
+</div></nav><div class="sde-count-badge" style="text-align:center;color:#8a6817;font-size:13px;letter-spacing:.12em;margin:10px auto">已发表 <b data-publication-count>32</b> 篇</div>
+
+<div class="level-tag" style="padding-top:40px">
+  <span class="n">01</span><span class="t zh-only">学 员 介 绍 · PROFILE</span><span class="t en-only">PROFILE</span><span class="line"></span>
+</div>
+<div class="profile">
+  <div class="avatar">季</div>
+  <div class="p-info">
+    <h1>季春雷</h1>
+    <div class="role zh-only">SDE 预备学员</div>
+    <div class="role en-only">SDE PREPARATORY TRAINEE</div>
+    <p class="bio zh-only">季春雷 · SDE 预备学员。十篇论文分两簇：一簇追问教育里那些不可被看见的过程如何被时间结构与评价体系挤出（静息窗口、三股绳、藏息、认知冗余、无痕生长）；一簇追问意义为何不在未来的回报里（在场范式、亲体冷凝、动词我、不可预制的空缺、主体性代偿）。十篇共用同一个撤销动作：把“那个东西还在、只是缺量”换成“它的发生条件从未成立，或已被取消”。</p>
+    <p class="bio en-only">Ji Chunlei · SDE preparatory trainee. Ten papers in two clusters: how education's unobservable processes are squeezed out by time structure and evaluation, and why meaning is not located in future returns. All ten perform the same reversal — from "it is still there, only diminished" to "its conditions of occurrence never held."</p>
+  </div>
+</div>
+
+<div class="level-tag">
+  <span class="n">02</span><span class="t zh-only">最 新 作 品 · LATEST WORKS</span><span class="t en-only">LATEST WORKS</span><span class="line"></span>
+</div>
+<div class="works">
+    <div class="work">
+      <span class="chip">之十 · 教育哲学与教育史</span>
+      <h2><a href="/students/ji-chunlei/traceless-growth/" style="color:inherit;text-decoration:none">无痕生长：论教育如何被偷走它的内核</a></h2>
+      <p class="hook">当代教育真正的损失，不是分数替代了教育的功能，而是在分数登顶之前就已发生的一次更隐蔽的偷换：把一种不可指认、不可计量的内在发生，换成了可以被看见、被记录、被比较的可见标记。</p>
+      <div class="meta">约 2.0 万字 · 11 页 · 发表于2026年7月26日</div>
+      <div class="modes">
+        <a class="m primary" href="/students/ji-chunlei/traceless-growth/">📖 长文阅读</a>
+        <a class="m ghost" href="/students/ji-chunlei/traceless-growth/read.html">📄 在线 PDF</a>
+        <a class="m ghost" href="/students/ji-chunlei/traceless-growth/traceless-growth.pdf" download>⬇ 下载 PDF</a>
+      </div>
+    </div>
+    <div class="work">
+      <span class="chip">之九 · 社会存在论与治理研究</span>
+      <h2><a href="/students/ji-chunlei/subjectivity-compensation/" style="color:inherit;text-decoration:none">主体性代偿：一个关于“自我”如何被绕过的生成机制分析</a></h2>
+      <p class="hook">那个问号不是因为你缺了什么，恰恰相反，可能是因为一切都太齐全了。当代社会不是在摧毁一个已有的自我，而是通过提供零摩擦的外部代理，使那个需要亲自承担不可逆选择才能被激活的主体性，从生存的必要条件变成了一个可被完美绕过的可选配件。</p>
+      <div class="meta">约 2.7 万字 · 14 页 · 发表于2026年7月26日</div>
+      <div class="modes">
+        <a class="m primary" href="/students/ji-chunlei/subjectivity-compensation/">📖 长文阅读</a>
+        <a class="m ghost" href="/students/ji-chunlei/subjectivity-compensation/read.html">📄 在线 PDF</a>
+        <a class="m ghost" href="/students/ji-chunlei/subjectivity-compensation/subjectivity-compensation.pdf" download>⬇ 下载 PDF</a>
+      </div>
+    </div>
+    <div class="work">
+      <span class="chip">之八 · 存在论与组织社会学</span>
+      <h2><a href="/students/ji-chunlei/unprefabricated-vacancy/" style="color:inherit;text-decoration:none">当世界需要一个尚未成形的你：“不可代偿”之前的一个更沉默的生成前提</a></h2>
+      <p class="hook">“意义必须通过不可代偿的自我卷入才能发生”已成为有力判断。本文追问那个启动键本身：当代意义危机最沉默的一层，不是“我不愿投入”，而是世界给出的需求早已被标准化为不需要我这张脸的需求。</p>
+      <div class="meta">约 1.8 万字 · 10 页 · 发表于2026年7月26日</div>
+      <div class="modes">
+        <a class="m primary" href="/students/ji-chunlei/unprefabricated-vacancy/">📖 长文阅读</a>
+        <a class="m ghost" href="/students/ji-chunlei/unprefabricated-vacancy/read.html">📄 在线 PDF</a>
+        <a class="m ghost" href="/students/ji-chunlei/unprefabricated-vacancy/unprefabricated-vacancy.pdf" download>⬇ 下载 PDF</a>
+      </div>
+    </div>
+    <div class="work">
+      <span class="chip">之七 · 存在论与主体性研究</span>
+      <h2><a href="/students/ji-chunlei/verb-self/" style="color:inherit;text-decoration:none">动词我的未发动：生命意义危机的生成论重构</a></h2>
+      <p class="hook">我们太习惯说“我失去了意义”，却从未怀疑那个说“我”的东西本身是不是一个既成实体。意义危机可能根本不是“我缺了什么”，而是那个能去制造意义的动词我，从未在自己的生命中被真实地发动过。</p>
+      <div class="meta">约 2.0 万字 · 11 页 · 发表于2026年7月26日</div>
+      <div class="modes">
+        <a class="m primary" href="/students/ji-chunlei/verb-self/">📖 长文阅读</a>
+        <a class="m ghost" href="/students/ji-chunlei/verb-self/read.html">📄 在线 PDF</a>
+        <a class="m ghost" href="/students/ji-chunlei/verb-self/verb-self.pdf" download>⬇ 下载 PDF</a>
+      </div>
+    </div>
+    <div class="work">
+      <span class="chip">之六 · 代际社会学与意义传递</span>
+      <h2><a href="/students/ji-chunlei/parental-condensation/" style="color:inherit;text-decoration:none">亲体冷凝：意义代际传递如何被核算逻辑冻结为结构性不育</a></h2>
+      <p class="hook">主流解释都在同一条延长线上做加法：缺陪伴时长、缺教育投入、缺文化共识。它们共享一个未经审查的预设——传递的介质还在，只是供给不足。本文论证相反的情形：核算每进入一寸共存，那一寸活介质就冻一寸。</p>
+      <div class="meta">约 2.0 万字 · 11 页 · 发表于2026年7月26日</div>
+      <div class="modes">
+        <a class="m primary" href="/students/ji-chunlei/parental-condensation/">📖 长文阅读</a>
+        <a class="m ghost" href="/students/ji-chunlei/parental-condensation/read.html">📄 在线 PDF</a>
+        <a class="m ghost" href="/students/ji-chunlei/parental-condensation/parental-condensation.pdf" download>⬇ 下载 PDF</a>
+      </div>
+    </div>
+    <div class="work">
+      <span class="chip">之五 · 存在论与代际伦理</span>
+      <h2><a href="/students/ji-chunlei/not-in-the-legacy/" style="color:inherit;text-decoration:none">不在遗产里：论生育意义从转移模型到在场生成的存在论转换</a></h2>
+      <p class="hook">北欧的反例说明，条件变好并未带来生育意愿回升。本文论证：深层根源不是付不起代价，而是那套判断“什么才算有意义”的概念工具——遗产范式——系统性地过滤掉了这件事真正产生意义的方式。</p>
+      <div class="meta">约 2.0 万字 · 10 页 · 发表于2026年7月26日</div>
+      <div class="modes">
+        <a class="m primary" href="/students/ji-chunlei/not-in-the-legacy/">📖 长文阅读</a>
+        <a class="m ghost" href="/students/ji-chunlei/not-in-the-legacy/read.html">📄 在线 PDF</a>
+        <a class="m ghost" href="/students/ji-chunlei/not-in-the-legacy/not-in-the-legacy.pdf" download>⬇ 下载 PDF</a>
+      </div>
+    </div>
+    <div class="work">
+      <span class="chip">之四 · 教育哲学与教育伦理</span>
+      <h2><a href="/students/ji-chunlei/sheltered-latency/" style="color:inherit;text-decoration:none">被展示的与不可展示的之间：一项未被命名的教育责任</a></h2>
+      <p class="hook">对“过度展示”的批评深刻却不彻底：它反对用可展示性定义成长，却用另一套人本主义指标接管了解释权。本文撤销“教育者知道好的成长长什么样”这一预设，从暴露的缝隙中逼出一个此前未被命名的责任形态——藏息。</p>
+      <div class="meta">约 1.8 万字 · 10 页 · 发表于2026年7月26日</div>
+      <div class="modes">
+        <a class="m primary" href="/students/ji-chunlei/sheltered-latency/">📖 长文阅读</a>
+        <a class="m ghost" href="/students/ji-chunlei/sheltered-latency/read.html">📄 在线 PDF</a>
+        <a class="m ghost" href="/students/ji-chunlei/sheltered-latency/sheltered-latency.pdf" download>⬇ 下载 PDF</a>
+      </div>
+    </div>
+    <div class="work">
+      <span class="chip">之三 · 认知科学与制度设计</span>
+      <h2><a href="/students/ji-chunlei/cognitive-redundancy/" style="color:inherit;text-decoration:none">认知冗余的制度建构：重估阅读行为在“外部信号供给中断”时代的文明功能</a></h2>
+      <p class="hook">“不读书”今天早已不是需要被矫正的个人失败，而是被一套以即时反馈闭环为引擎的内容工业持续生产和维护的生理性默认状态。本文把“为什么要读书”从道德劝说改写为一个可被公共制度识别、测量和保护的冗余设计问题。</p>
+      <div class="meta">约 2.3 万字 · 12 页 · 发表于2026年7月26日</div>
+      <div class="modes">
+        <a class="m primary" href="/students/ji-chunlei/cognitive-redundancy/">📖 长文阅读</a>
+        <a class="m ghost" href="/students/ji-chunlei/cognitive-redundancy/read.html">📄 在线 PDF</a>
+        <a class="m ghost" href="/students/ji-chunlei/cognitive-redundancy/cognitive-redundancy.pdf" download>⬇ 下载 PDF</a>
+      </div>
+    </div>
+    <div class="work">
+      <span class="chip">之二 · 教育哲学与课堂微观分析</span>
+      <h2><a href="/students/ji-chunlei/three-strand-cord/" style="color:inherit;text-decoration:none">三股绳：教学环节如何拆解了认知本身的不可分结构</a></h2>
+      <p class="hook">越忠实地把怀特海的节奏转化为“浪漫导入—精确训练—综合展示”，儿童的好奇心就越是系统性地熄灭。本文撤销“三态可分先后”这一前提：课堂环节的伤害不是切断了一条转化链，而是沿时间轴把同一根三股绳劈成了三根彼此脱力的单索。</p>
+      <div class="meta">约 1.8 万字 · 10 页 · 发表于2026年7月26日</div>
+      <div class="modes">
+        <a class="m primary" href="/students/ji-chunlei/three-strand-cord/">📖 长文阅读</a>
+        <a class="m ghost" href="/students/ji-chunlei/three-strand-cord/read.html">📄 在线 PDF</a>
+        <a class="m ghost" href="/students/ji-chunlei/three-strand-cord/three-strand-cord.pdf" download>⬇ 下载 PDF</a>
+      </div>
+    </div>
+    <div class="work">
+      <span class="chip">之一 · 教育神经科学与课堂时间社会学</span>
+      <h2><a href="/students/ji-chunlei/resting-window/" style="color:inherit;text-decoration:none">静息窗口的消逝：小学课堂时间结构、评价内化与深度阅读能力的隐性衰退</a></h2>
+      <p class="hook">家庭藏书、阅读课时与推广活动都在增长，儿童的自主深度阅读却在系统性衰退。本文提出：真正的断点是课堂以15-20分钟为单位的环节切换频率，持续高于大脑完成一次意义建构所需的最短静息窗口；而每一次成人善意的撤出，都被垂直与水平两面的评价压力自动填回。</p>
+      <div class="meta">约 2.1 万字 · 12 页 · 发表于2026年7月26日</div>
+      <div class="modes">
+        <a class="m primary" href="/students/ji-chunlei/resting-window/">📖 长文阅读</a>
+        <a class="m ghost" href="/students/ji-chunlei/resting-window/read.html">📄 在线 PDF</a>
+        <a class="m ghost" href="/students/ji-chunlei/resting-window/resting-window.pdf" download>⬇ 下载 PDF</a>
+      </div>
+    </div>
+  <div class="back"><a href="/students/ji-chunlei/works/">查看全部 10 篇作品 →</a></div>
+</div>
+
+<footer>
+  <span class="zh-only">© 德麦国际 Demai International · 学员专栏 · <a href="/">sdeuniverses.com</a></span>
+  <span class="en-only">© Demai International · Students’ Column · <a href="/">sdeuniverses.com</a></span>
+</footer>
+<script>
+function setLang(l){document.body.className=l;document.querySelectorAll('.lang-btn').forEach(function(b){b.classList.toggle('active',(b.textContent==='中'&&l==='zh')||(b.textContent==='EN'&&l==='en'));});document.documentElement.lang=l==='zh'?'zh-CN':'en';}
+</script>
+
+<script>window.WDS_READ={};</script>
+<script src="/taste/wds-companion/wds-read.js" defer></script>
+
+<script src="/wds-mode.js" defer></script>
+
+<script src="/students/publication-list.js?v=20260724-3" defer></script>
+</body></html>
