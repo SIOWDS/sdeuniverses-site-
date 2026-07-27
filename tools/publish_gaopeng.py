@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-"""秦莉四篇（爱的发生学 · 二次审稿打磨版） · 建页 + PDF + 三种读法。
+"""高鹏四篇（公法二元原则 · 打磨版） · 建页 + PDF + 三种读法。
 
-用法： python3 tools/publish_qinli5.py --src /home/claude/ql5
-<head> 从秦莉自己的既有论文页复制，主题天然一致（暖金／米色）。
+用法： python3 tools/publish_gaopeng.py --src /home/claude/gp5
+<head> 从高鹏自己的既有论文页复制，主题天然一致。
 roster.json 的 papers/count 由 build_roster.py 派生，本脚本不碰。
 """
 import argparse
@@ -14,90 +14,58 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from qinli5_meta import PAPERS, STUDENTS, PUBDATE_CN
-from qinli5_supp import NOTES, REFERENCES
+from gaopeng_meta import PAPERS, STUDENTS, PUBDATE_CN
+from gaopeng_supp import NOTES, REFERENCES
 
 ROOT = Path(__file__).resolve().parents[1]
 STU = ROOT / "public" / "students"
 CN = "零一二三四五六七八九十"
 
 RENAME = [
-    # 招牌词 → 爱的哲学／关系心理学的本地说法（长词在前，避免被短词吃掉）
-    ("爱的发生学领域", "爱的生成研究领域"),
-    ("爱的发生学动力", "爱的生成动力"),
-    ("爱的发生学起点", "爱的生成起点"),
-    ("爱的发生学", "爱的生成机制"),
-    ("发生学独特性", "生成层面的独特性"),
-    ("发生学的范式", "生成分析的范式"),
-    ("发生学的框架", "生成分析的框架"),
-    ("发生学的姿态", "生成分析的姿态"),
-    ("发生学而非", "生成分析而非"),
-    ("发生学降格", "生成分析降格"),
-    ("发生学论文", "生成分析论文"),
-    ("发生学语言", "生成分析的语言"),
-    ("发生学框架", "生成分析框架"),
-    ("发生学分析", "生成机制分析"),
-    ("发生学解剖", "生成机制解剖"),
-    ("发生学动力", "生成动力"),
-    ("发生学起点", "生成起点"),
-    ("发生学追问", "生成追问"),
-    ("发生学空地", "生成空地"),
-    ("发生学事件", "生成事件"),
-    ("发生学体验", "生成体验"),
-    ("发生学结构", "生成结构"),
-    ("发生学过程", "生成过程"),
-    ("发生学领域", "生成研究领域"),
-    ("发生学前提", "生成前提"),
-    ("发生学地位", "生成层面的地位"),
-    ("发生学层面", "生成层面"),
-    ("发生学间距", "生成间距"),
-    ("发生学机制", "生成机制"),
+    ("权利发生学", "权利的生成机制"),
+    ("发生学案例研究", "生成机制的案例研究"),
+    ("发生学的次序", "生成的次序"),
+    ("发生学的角度", "生成的角度"),
+    ("发生学不承认", "生成分析不承认"),
+    ("发生学必须做", "生成分析必须做"),
+    ("发生学必须追", "生成分析必须追"),
+    ("发生学地理解", "在生成层面理解"),
+    ("发生学最核心", "生成层面最核心"),
+    ("发生学中的土", "生成分析中的土"),
+    ("发生学意味的", "生成意味的"),
+    ("发生学分量", "生成层面的分量"),
+    ("发生学深掘", "生成层面的深掘"),
     ("发生学叙事", "生成叙事"),
-    ("发生学全貌", "生成全貌"),
-    ("发生学本质", "生成本质"),
-    ("发生学肌理", "生成肌理"),
-    ("发生学厚度", "生成厚度"),
-    ("发生学位置", "生成层面的位置"),
-    ("发生学诊断", "生成层面的诊断"),
-    ("发生学裂隙", "生成裂隙"),
-    ("发生学意义", "生成层面的意义"),
-    ("发生学现场", "生成现场"),
-    ("发生学指认", "生成层面的指认"),
-    ("发生学面目", "生成面目"),
-    ("发生学坐标", "生成坐标"),
-    ("发生学身份", "生成地位"),
-    ("发生学意义上", "生成层面上"),
-    ("发生学假说", "生成假说"),
-    ("发生学悖论", "生成悖论"),
-    ("发生学角度", "生成的角度"),
-    ("发生学底盘", "生成底盘"),
-    ("动力发生学", "生成动力学"),
+    ("发生学命题", "生成命题"),
+    ("发生学条件", "生成条件"),
+    ("发生学源头", "生成源头"),
+    ("发生学步骤", "生成步骤"),
+    ("发生学轨迹", "生成轨迹"),
+    ("发生学链条", "生成链条"),
+    ("发生学前提", "生成前提"),
+    ("发生学追问", "生成层面的追问"),
+    ("发生学展开", "生成层面的展开"),
+    ("发生学现象", "生成现象"),
+    ("发生学命名", "生成层面的命名"),
     ("发生学上的", "生成层面的"),
     ("发生学上看", "生成层面看"),
     ("发生学上", "生成层面上"),
     ("发生学的", "生成层面的"),
-    ("发生学：", "生成分析："),
     ("发生学；", "生成机制；"),
     ("发生学", "生成分析"),
-    # 「发生 vs 发现」是内部对置，学科读者不解其意
-    ("发现学的范式", "把结论当起点的范式"),
-    ("发现学话语", "成果回溯的话语"),
-    ("发现学的遗风", "定义先行的遗风"),
+    ("发现学立场", "把结论当起点的立场"),
+    ("发现学解读", "把结论当起点的解读"),
+    ("发现学根本预设", "定义先行的根本预设"),
+    ("发现学的危险", "滑回定义先行的危险"),
+    ("发现学的姿势", "定义先行的姿势"),
+    ("发现学的：", "定义先行的："),
     ("发现学在此处的逗留", "定义先行在此处的逗留"),
     ("发现学的残余", "定义先行的残余"),
-    # 其余招牌词
+    ("发现学的遗风", "定义先行的遗风"),
+    ("发现学", "定义先行"),
     ("本体论级别", "存在论层级"),
+    ("本体论暴政", "存在论暴政"),
     ("本体论", "存在论"),
-    ("结构显露的条件", "结构维持的条件"),
-    ("才会显露", "才会显现"),
-    ("存在土壤与差异序列共同运作", "存在土壤与持续的差异刺激共同运作"),
-    ("回写重组", "重述与重组"),
-    ("进行回写", "进行重述"),
-    ("回写层", "沉淀层"),
-    ("回写、基底增厚", "沉淀、底子增厚"),
-    ("回写与路径生长", "沉淀与路径生长"),
-    ("回写", "沉淀"),
-    ("基底增厚", "底子增厚"),
     ("裂缝", "裂隙"),
     ("纠缠", "交织"),
     ("显露", "显现"),
@@ -105,9 +73,7 @@ RENAME = [
 
 # (源篇号, 类型, 锚, 替换)
 CLEANUP = [
-    # 副标题已进 meta 的 subtitle 字段，正文首行不再重复
-    ("Q1", "drop", "——对“粒子-波-场”三态论的自我扬弃与纵深推进", ""),
-    ("Q2", "drop", "——为什么最深切的爱的意念喂养不出爱本身，以及那个比“裁决”更底层的动作", ""),
+    ("A2", "drop", "——从“冗余辩护”到“际遇担当”：权力清单批判的存在论深掘", ""),
 ]
 
 
@@ -251,12 +217,13 @@ def render_page(paper, css, abstract, keywords, blocks):
     for tag, line in blocks:
         body.append(f'<p class="ref">{strongify(line)}</p>' if tag == "ref"
                     else f"<{tag}>{strongify(line)}</{tag}>")
-    body.append('<h2 class="supphead">本次深化说明</h2>')
-    body.append('<section class="supp"><p class="supptip">本批的深化未另起附录，'
-                '而是直接织入正文相应位置——补上的最近邻各自成为新的小节，并与前后论证交叉引用，'
-                '拆成附录会断掉论证链。以下说明改动落在哪里、为什么。</p>'
+    body.append('<h2 class="supphead">本次打磨说明</h2>')
+    body.append('<section class="supp"><p class="supptip">本批的打磨未另起附录，'
+                '而是就地改在原文出问题的那一句、那一段上——事实错处直接更正，'
+                '不可核的材料换成可被真正去测的预测，被放跑的最近邻补成新的一段。'
+                '以下逐条说明改动落在哪里、为什么。</p>'
                 f'<p>{strongify(NOTES[paper["slug"]])}</p></section>')
-    body.append("<h2>本次深化所核验的文献</h2>")
+    body.append("<h2>本次打磨所核验的文献</h2>")
     for label, url in REFERENCES[paper["slug"]]:
         inner = (f'<a href="{html.escape(url)}" target="_blank" rel="noopener">{html.escape(label)}</a>'
                  if url else html.escape(label))
@@ -281,11 +248,11 @@ def render_page(paper, css, abstract, keywords, blocks):
   <div class="art-series">学员专栏 · {st["name"]} · {html.escape(paper["kind"])}</div>
   <h1 class="art-title">{html.escape(paper["title"])}</h1>
   <div class="art-subtitle">{html.escape(paper["subtitle"])}</div>
-  <div class="art-meta">作者 {st["name"]} · {st["role"]} · 约 {paper["wan"]} 万字 · 发表于{PUBDATE_CN} · 深化增补版</div>
+  <div class="art-meta">作者 {st["name"]} · {st["role"]} · 约 {paper["wan"]} 万字 · 发表于{PUBDATE_CN} · 打磨版</div>
 </header>
 <div class="wrap">
 {absbox}{kwbox}<div class="scorebox"><b>SDE 创新智商：{paper["old_score"]} → {paper["score"]}</b>
-<p>本批四篇评分排名第 {paper["rank"]}。打磨走外科手术式定点修改，只动审稿记下的扣分点——跨域形式锚定、证伪条件的可操作化、材料来源口径、论证循环与分层判据——作者的核心判断与结构一律不动。提升后分数为编辑自评，待独立复评。</p></div>
+<p>本批四篇评分排名第 {paper["rank"]}。打磨走外科手术式定点修改，只动审稿记下的扣分点——两处可核验事实的更正、不可核经验材料的口径修正、证伪条件的可操作化，以及被放跑的最近邻——作者的核心判断与章节结构一律不动。提升后分数为编辑自评，待独立复评。</p></div>
 {''.join(body)}
 <div class="endbox"><p>三种读法 · 网页长文 · 在线 PDF 翻页 · PDF 下载</p>
 <p><a href="/students/{sl}/works/">返回 {st["name"]} 全部作品 →</a></p></div>
@@ -320,10 +287,10 @@ def render_print(paper, abstract, keywords, blocks):
     for tag, line in blocks:
         body.append(f'<p class="ref">{strongify(line)}</p>' if tag == "ref"
                     else f"<{tag}>{strongify(line)}</{tag}>")
-    body.append('<h2>本次深化说明</h2>')
-    body.append(f'<div class="supp"><p class="tip">深化内容已内联于正文，此处说明改动落点。</p>'
+    body.append('<h2>本次打磨说明</h2>')
+    body.append(f'<div class="supp"><p class="tip">改动已就地落在正文，此处逐条说明落点与理由。</p>'
                 f'<p>{strongify(NOTES[paper["slug"]])}</p></div>')
-    body.append("<h2>本次深化所核验的文献</h2>")
+    body.append("<h2>本次打磨所核验的文献</h2>")
     for label, _ in REFERENCES[paper["slug"]]:
         body.append(f'<p class="ref">{html.escape(label)}</p>')
     return f"""<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8">
@@ -397,7 +364,7 @@ def main():
         print(f'  第{paper["rank"]} {sid}→{sl}/{paper["slug"]:24s} '
               f'{chars:>6d}字 {pages:>3d}页 作者文献{refs:>3d}条 {numlabel(sl, paper["num"])}')
 
-    (ROOT / "tools" / "qinli5_report.json").write_text(json.dumps(
+    (ROOT / "tools" / "gaopeng_report.json").write_text(json.dumps(
         {"papers": [{k: p[k] for k in ("src", "rank", "student", "num", "slug", "title",
                                        "kind", "hook", "wan", "pages", "old_score", "score")}
                     for p in PAPERS]}, ensure_ascii=False, indent=2), encoding="utf-8")
