@@ -22,7 +22,33 @@ PUBDATE = "2026年7月27日"
 
 PAPERS = [
     {
-        "no": 1, "slug": "taken-out",
+        "no": 1, "slug": "power-to-stop", "href": "/column/power-to-stop/",
+        "title": "能停下来，是因为不必交代",
+        "sub": "终止能力，就是不被显现地存在的能力",
+        "score": 145,
+        "hook": "我们默认「结束」是自然发生的——柴烧完了，火就灭了。这个想象是错的："
+                "结束是一套单独的本事，可以在开始的那一套完好无损的情况下独自坏掉。"
+                "一件事能自己停下来，条件是停下来那一刻它不欠任何人一个交代；"
+                "当它必须持续证明自己值得继续，它就再也没有办法结束——只能一直跑，跑到某样东西耗尽为止。"
+                "从一块两年不消的疤，到一个砍不掉的项目，到一片长得过于整齐的森林。",
+        "sources": [
+            ("自律杀死自己：最痛苦的悖论",
+             "/education/ai-era/self-execution/", "教育 · 自我管理",
+             "自律的毁灭性不来自程度过高，而来自记录从「怎样把事做好」变成「我是否配成为这种人」。"),
+            ("关不掉的病：终止失败作为一个病族",
+             "/health/medicine/termination-failure/", "健康 · 临床医学",
+             "结束不是开始的耗尽，而是另一套可以单独坏掉的独立程序。"),
+            ("审计性剥离：论创新识别如何从价值发生的完整体中切走骨",
+             "/students/hu-zhiying/audit-excision/", "商业 · 组织理论",
+             "守护装置为了自证，必须把靠不可见而存活的探索照亮、命名——保护即照亮，照亮即切割。"),
+        ],
+        "clash": "健康那篇说终止是一套需要被专门执行的程序，教育那篇说裁决层根本给不出终止指令；"
+                 "商业那篇说保护必然伤害被保护者，而另两篇的解法都指向「要有人接住」；"
+                 "健康那篇要更好的指标，教育那篇说测量这个动作本身就在改变被测的东西。",
+        "wan": "1.2", "pages": 11, "external": True,
+    },
+    {
+        "no": 2, "slug": "taken-out",
         "title": "一拿出来，就不是它了",
         "sub": "为什么最要紧的那些东西，不能被证明、不能被交接，也不能被占有",
         "score": 148,
@@ -47,6 +73,8 @@ PAPERS = [
                  "第一篇把「没法证明」当困境，第三篇把「不被识别」当目标。",
     },
 ]
+
+CN_NUM = {1: "一", 2: "二", 3: "三", 4: "四", 5: "五", 6: "六", 7: "七", 8: "八", 9: "九", 10: "十"}
 
 BANNED = ("SDE", "发生学", "发现学", "发生论", "本体论", "显露", "纠缠", "裂缝",
           "差异序列", "特征纠缠", "金点子", "创新智商", "母题", "不可还原")
@@ -188,7 +216,7 @@ PAGE = """<!DOCTYPE html>
   <a class="rb-btn" href="{slug}.pdf" download>⬇ 下载 PDF</a></div>
 </div>
 <header class="art">
-  <div class="art-series">典范文专栏 · 之{no}</div>
+  <div class="art-series">典范文专栏 · 之{no_cn}</div>
   <h1 class="art-title">{title}</h1>
   <div class="art-sub">{sub}</div>
   <div class="art-meta">{author} 著 · 约 {wan} 万字 · {pages} 页 · 发表于{pub}</div>
@@ -298,14 +326,14 @@ def main():
     chars = len(re.sub(r"<[^>]+>|\s", "", body))
     wan = f"{chars / 10000:.1f}"
 
-    p = PAPERS[0]
+    p = [x for x in PAPERS if not x.get("external")][0]
     out = COL / p["slug"]
     out.mkdir(parents=True, exist_ok=True)
 
     tmp = Path("/tmp/paradigm.html")
     tmp.write_text(f"""<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8">
 <title>{html.escape(p["title"])}</title><style>{PRINT_CSS}</style></head><body>
-<div class="cover"><div class="eyebrow">SDE UNIVERSES · 典 范 文 专 栏 · 之{p["no"]}</div>
+<div class="cover"><div class="eyebrow">SDE UNIVERSES · 典 范 文 专 栏 · 之{CN_NUM[p["no"]]}</div>
 <h1>{html.escape(p["title"])}</h1><p class="epi">{html.escape(p["sub"])}</p>
 <div class="by"><b>{AUTHOR}</b> 著　·　{PUBDATE}</div></div>
 {body}
@@ -327,7 +355,7 @@ def main():
     toc_html = "".join(f'<a href="#{cid}">{html.escape(t)}</a>' for cid, t in toc)
 
     page = PAGE.format(title=html.escape(p["title"]), desc=html.escape(p["hook"][:190]),
-                       css=PAGE_CSS, slug=p["slug"], no=p["no"], sub=html.escape(p["sub"]),
+                       css=PAGE_CSS, slug=p["slug"], no_cn=CN_NUM[p["no"]], sub=html.escape(p["sub"]),
                        author=AUTHOR, wan=wan, pages=pages, pub=PUBDATE,
                        hook=html.escape(p["hook"]), toc=toc_html, body=body,
                        clash=html.escape(p["clash"]), srcs=srcs)
@@ -342,13 +370,15 @@ def main():
                                                slug=p["slug"]), encoding="utf-8")
 
     items = "".join(
-        f'<a class="item" href="/paradigm/{x["slug"]}/"><div class="n">之{x["no"]} · 创新智商 {x["score"]}</div>'
+        f'<a class="item" href="{x.get("href", "/paradigm/" + x["slug"] + "/")}">'
+        f'<div class="n">之{CN_NUM[x["no"]]} · 创新智商 {x["score"]}</div>'
         f'<h2>{html.escape(x["title"])}</h2><p class="sub">{html.escape(x["sub"])}</p>'
         f'<p class="hk">{html.escape(x["hook"])}</p>'
         f'<div class="trio">'
         + "".join(f'<div><b>{html.escape(k)}</b>{html.escape(t)}</div>' for t, _, k, _ in x["sources"])
-        + f'</div><div class="meta">约 {wan} 万字 · {pages} 页 · 三种读法 · 作者 {AUTHOR} · 发表于{PUBDATE}</div></a>'
-        for x in PAPERS)
+        + f'</div><div class="meta">约 {x.get("wan", wan)} 万字 · {x.get("pages", pages)} 页 · '
+          f'三种读法 · 作者 {AUTHOR} · 发表于{PUBDATE}</div></a>'
+        for x in sorted(PAPERS, key=lambda z: z["no"]))
     idx = INDEX.format(items=items)
     for tag in ("div", "body", "html", "header", "footer", "main", "nav", "a"):
         o = len(re.findall(rf"<{tag}[\s>]", idx)); c = idx.count(f"</{tag}>")
