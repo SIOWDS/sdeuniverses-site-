@@ -43,11 +43,15 @@ SOURCES = [
      "被授予一个无威胁的次级身份，意外地换来了一块不被严格审查的生长空间。"),
 ]
 
-SIBLING = ("本栏之一《一拿出来，就不是它了》与本篇挨得很近，但切的不是同一刀：那一篇讲的是"
-           "「取出来」——一样东西被证明、被交接、被占有时会发生什么；本篇讲的是「记下来」——"
-           "一样东西被登记、被担保、被考核时会发生什么。取出来是空间上的搬动，记下来是时间上的留痕，"
-           "两者常常同时发生，但可以分开：一件事可以被完整记录而从不被取出（本篇第十一节那个"
-           "「记录但不打断」的设计就是干这个的），也可以被取出而从不被记录。两篇可对照读。")
+SIBLING = ("本栏之三《账本记不下的那样东西》与本篇是同一条线上的两半，必须说清楚，否则读者会以为是重复。"
+           "那一篇做的是**记录端**：账本能记下「做了什么」，记不下「有人为此把自己搭进去了」，"
+           "以及为什么一旦写进要求就不再是自愿的。本篇不重走这一步，本篇做的是**转移端**——"
+           "那样东西既然真的存在，它是从谁身上到谁身上的：谁少了一块，那一块在谁身上变成了厚度，"
+           "为什么两边的账本都不记这一笔，以及它需要什么条件才划得动。"
+           "两篇共用了《存押》作为源文之一，因此画家那个例子的形状会有些像，这是同源，不是巧合。"
+           "合起来读是完整的，各自读则各缺一半。"
+           "本栏之一《一拿出来，就不是它了》切的是另一刀：「取出来」是空间上的搬动，「记下来」是时间上的留痕，"
+           "两者常同时发生但可以分开——本篇第十一节那个「记录但不打断」的设计，就是用来把这两样分开检验的。")
 
 
 def strongify(s: str) -> str:
@@ -97,9 +101,9 @@ def build_page(body: str, toc, pages: int) -> str:
     t = re.sub(r'<h1 class="art-title">.*?</h1>', f'<h1 class="art-title">{TITLE}</h1>', t, flags=re.S)
     t = re.sub(r'<p class="art-sub">.*?</p>', f'<p class="art-sub">{SUB}</p>', t, flags=re.S)
     t = re.sub(r'<div class="art-meta">.*?</div>',
-               f'<div class="art-meta">Claude 著 · 约 2.0 万字 · {pages} 页 · 发表于{PUBDATE}</div>', t, flags=re.S)
+               f'<div class="art-meta">王德生 ＋ Claude · 约 2.2 万字 · {pages} 页 · 三种阅读方式 · 发表于{PUBDATE}</div>', t, flags=re.S)
     t = re.sub(r'<div class="art-series">.*?</div>',
-               '<div class="art-series">典 范 文 专 栏 · 之 二</div>', t, flags=re.S)
+               '<div class="art-series">每 日 必 读 · 典 范 文 · 之 六</div>', t, flags=re.S)
     # deck
     t = re.sub(r'<div class="deck">.*?</div>', f'<div class="deck">{strongify(DECK)}</div>', t, flags=re.S)
     # toc
@@ -109,7 +113,7 @@ def build_page(body: str, toc, pages: int) -> str:
     # 正文：toc 结束到 src 开始之间整段换掉
     i = t.index('<div class="toc">'); i = t.index("</div>", t.index(links)) + 6
     j = t.index('<div class="src">')
-    t = t[:i] + "\n" + body + f'\n<hr>\n<h2 id="sib">附：与本栏之一的关系</h2><p>{strongify(SIBLING)}</p>\n' + t[j:]
+    t = t[:i] + "\n" + body + f'\n<hr>\n<h2 id="sib">附：与本栏另外两篇的关系</h2><p>{strongify(SIBLING)}</p>\n' + t[j:]
     # 来源盒
     ones = "".join(
         f'<a class="one" href="{u}"><div class="k">{html.escape(k)}</div>'
@@ -137,11 +141,11 @@ p{{margin:0 0 9pt;text-align:justify}} hr{{border:0;border-top:1px solid #ddd;ma
 .src{{border:1px solid #bbb;padding:10pt 12pt;margin:0 0 16pt;font-size:10.5pt;background:#fafafa}}
 .src ol{{margin:6pt 0;padding-left:16pt}}</style></head><body>
 <h1>{TITLE}</h1><div class="sub">{SUB}</div>
-<div class="by">Claude　·　{PUBDATE}　·　SDE Universes 典范文专栏 · 之二</div>
+<div class="by">王德生 ＋ Claude　·　{PUBDATE}　·　SDE Universes 每日必读 · 典范文 · 之六</div>
 <div class="src"><b>本篇由这三篇撞成</b><ol>{''.join(
     f'<li>《{ti}》—— {k}：{g}</li>' for k, ti, u, g in SOURCES)}</ol>{strongify(COLLIDE)}</div>
 {body}
-<hr><h2>附：与本栏之一的关系</h2><p>{strongify(SIBLING)}</p>
+<hr><h2>附：与本栏另外两篇的关系</h2><p>{strongify(SIBLING)}</p>
 </body></html>"""
 
 
