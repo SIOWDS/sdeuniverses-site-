@@ -5,6 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>来自学员专栏 · 健康 | SDE Universes</title>
 <meta name="description" content="五十篇由 SDE 学员写成的健康文章：身体的感知主权、慢性病与照护、抑郁的发生条件，以及中医这门靠在场判断活着的技艺。">
+<link rel="canonical" href="https://sdeuniverses.com/health/from-students/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="SDE Universes">
+<meta property="og:title" content="来自学员专栏 · 健康 | SDE Universes">
+<meta property="og:description" content="五十篇由 SDE 学员写成的健康文章：身体的感知主权、慢性病与照护、抑郁的发生条件，以及中医这门靠在场判断活着的技艺。">
+<meta property="og:url" content="https://sdeuniverses.com/health/from-students/">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="来自学员专栏 · 健康">
+<meta name="twitter:description" content="五十篇由 SDE 学员写成的健康文章：身体的感知主权、慢性病与照护、抑郁的发生条件，以及中医这门靠在场判断活着的技艺。">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=EB+Garamond:wght@400;500&family=Noto+Serif+SC:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -31,7 +40,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;flex-direction:
 .nav-bar-sub a{color:var(--text2);text-decoration:none;font-size:1.02rem;font-weight:700;letter-spacing:0.1em;white-space:nowrap;transition:color .2s,opacity .2s}
 .nav-bar-sub a:hover{text-decoration:underline;text-underline-offset:4px;opacity:0.72}
 .wrap{max-width:940px;margin:0 auto;padding:0 2rem}
-header.hero{min-height:56vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:9rem 2rem 3.4rem;position:relative;overflow:hidden}
+header.hero{min-height:52vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:9rem 2rem 3rem;position:relative;overflow:hidden}
 .hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 70% 55% at 50% 34%,#2E8B5714 0%,transparent 70%)}
 .hero-grid{position:absolute;inset:0;background-image:linear-gradient(#2E8B570d 1px,transparent 1px),linear-gradient(90deg,#2E8B570d 1px,transparent 1px);background-size:60px 60px;opacity:0.7}
 .eyebrow{position:relative;font-size:0.72rem;letter-spacing:0.28em;color:var(--accent);text-transform:uppercase;margin-bottom:1.4rem}
@@ -41,9 +50,22 @@ header.hero{min-height:56vh;display:flex;flex-direction:column;align-items:cente
 .badge{position:relative;display:inline-flex;align-items:center;gap:0.5rem;background:var(--card);border:1px solid var(--accent);color:var(--accent);border-radius:30px;padding:0.5rem 1.3rem;font-size:0.78rem;letter-spacing:0.14em}
 .badge .dot{width:7px;height:7px;border-radius:50%;background:var(--accent);animation:pulse 1.8s ease-in-out infinite}
 @keyframes pulse{0%,100%{opacity:0.35;transform:scale(0.85)}50%{opacity:1;transform:scale(1)}}
-section{padding:2.6rem 0}
-.lead{font-size:1.08rem;color:var(--text);line-height:1.95;border-left:3px solid var(--accent);padding:0.2rem 0 0.2rem 1.5rem;margin:0 0 2.6rem}
+section{padding:2.4rem 0}
+.lead{font-size:1.08rem;color:var(--text);line-height:1.95;border-left:3px solid var(--accent);padding:0.2rem 0 0.2rem 1.5rem;margin:0 0 2rem}
+/* ── 作者筛选条 ───────────────────────────── */
+.aubar{background:var(--card);border:1px solid var(--border2);border-radius:8px;padding:1rem 1.1rem 0.9rem;margin:0 0 2.4rem}
+.aubar-head{display:flex;align-items:baseline;justify-content:space-between;gap:1rem;margin-bottom:0.7rem;flex-wrap:wrap}
+.aubar-t{font-size:0.82rem;letter-spacing:0.16em;color:var(--accent);font-weight:600}
+.aubar-n{font-size:0.8rem;color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:0.45rem}
+.chip{font-family:inherit;font-size:0.86rem;line-height:1.5;color:var(--text2);background:var(--bg);border:1px solid var(--border);border-radius:20px;padding:0.28rem 0.8rem;cursor:pointer;transition:all .18s}
+.chip:hover{border-color:var(--accent);color:var(--accent)}
+.chip.on{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+.chip .n{opacity:0.7;font-size:0.78em;margin-left:0.25em}
+.auhome{margin-top:0.75rem;font-size:0.88rem;color:var(--text2)}
+.auhome a{color:var(--accent);border-bottom:1px solid var(--border);text-decoration:none}
 .block{margin:0 0 3.2rem;scroll-margin-top:6.5rem}
+.block.off{display:none}
 .block-head{display:flex;align-items:baseline;gap:0.85rem;border-bottom:1px solid var(--border);padding-bottom:0.7rem;margin-bottom:0.9rem}
 .block-num{font-family:'Playfair Display',serif;font-size:1.55rem;font-weight:700;color:var(--accent);line-height:1}
 .block-title{font-family:'Playfair Display','Noto Serif SC',serif;font-size:1.28rem;font-weight:600;color:var(--text);line-height:1.25}
@@ -51,6 +73,7 @@ section{padding:2.6rem 0}
 .art-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
 .art{display:block;text-decoration:none;background:var(--card);border:1px solid var(--border2);border-left:3px solid var(--accent);border-radius:5px;padding:1.05rem 1.25rem;transition:transform .2s,box-shadow .2s,border-color .2s}
 .art:hover{border-left-color:var(--accent2);transform:translateX(3px);box-shadow:0 6px 20px rgba(138,104,23,.08)}
+.art.off{display:none}
 .art .k{display:block;font-size:0.73rem;letter-spacing:0.06em;color:var(--accent);font-weight:600;margin-bottom:0.35rem}
 .art h4{font-family:'Noto Serif SC',serif;font-size:1.03rem;font-weight:600;color:var(--text);margin-bottom:0.4rem;line-height:1.42}
 .art p{font-size:0.89rem;color:var(--text2);line-height:1.66}
@@ -60,6 +83,14 @@ section{padding:2.6rem 0}
 .crosslinks{display:flex;flex-wrap:wrap;gap:0.8rem;justify-content:center;margin-top:1.4rem}
 .crosslinks a{text-decoration:none;font-size:0.86rem;letter-spacing:0.08em;padding:0.5rem 1.1rem;border:1px solid var(--border);border-radius:24px;color:var(--text2);transition:all 0.2s;background:var(--card)}
 .crosslinks a:hover{border-color:var(--accent);color:var(--accent)}
+.sibs{display:flex;flex-wrap:wrap;gap:0.9rem;justify-content:center;margin:2.4rem 0 0}
+.sibs a{flex:1 1 240px;max-width:320px;text-decoration:none;background:var(--card);border:1px solid var(--border2);border-top:3px solid var(--accent);border-radius:6px;padding:1rem 1.1rem;transition:transform .2s,box-shadow .2s}
+.sibs a:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(138,104,23,.1)}
+.sibs .st{font-size:0.98rem;font-weight:600;color:var(--text);margin-bottom:0.25rem}
+.sibs .sd{font-size:0.84rem;color:var(--text2);line-height:1.6}
+#totop{position:fixed;right:1.4rem;bottom:1.4rem;z-index:90;width:42px;height:42px;border-radius:50%;border:1px solid var(--border);background:var(--card);color:var(--accent);font-size:1rem;cursor:pointer;opacity:0;pointer-events:none;transition:opacity .25s;font-family:inherit}
+#totop.show{opacity:0.92;pointer-events:auto}
+#totop:hover{background:var(--accent);color:#fff}
 footer{border-top:1px solid var(--border2);margin-top:3.4rem;padding:2.5rem 2rem;text-align:center;color:var(--muted);font-size:0.78rem;letter-spacing:0.05em}
 footer a{color:var(--gold);text-decoration:none}
 @media(max-width:640px){
@@ -69,7 +100,7 @@ footer a{color:var(--gold);text-decoration:none}
   .nav-links{gap:1rem}
   .nav-links a.sib{display:none}
   .art-grid{grid-template-columns:1fr}
-  header.hero{padding:7rem 1.2rem 2.6rem;min-height:auto}
+  header.hero{padding:7rem 1.2rem 2.4rem;min-height:auto}
 }
 </style>
 </head>
@@ -92,11 +123,11 @@ footer a{color:var(--gold);text-decoration:none}
   </div>
 </div>
   <div class="nav-bar-sub">
-    <a href="#grp-1">身体的主权</a>
-    <a href="#grp-2">慢性病、照护与临床认知</a>
-    <a href="#grp-3">抑郁、心理与自我技术</a>
-    <a href="#grp-4">中医、技艺与另一种医学知识</a>
-    <a href="#grp-5">身体、锻炼与可操作的健康手册</a>
+    <a href="#grp-1" class="zh-only">身体的主权</a><a href="#grp-1" class="en-only">The Body</a>
+    <a href="#grp-2" class="zh-only">慢性病、照护与临床认知</a><a href="#grp-2" class="en-only">Chronic Care</a>
+    <a href="#grp-3" class="zh-only">抑郁、心理与自我技术</a><a href="#grp-3" class="en-only">Depression</a>
+    <a href="#grp-4" class="zh-only">中医、技艺与另一种医学知识</a><a href="#grp-4" class="en-only">Chinese Medicine</a>
+    <a href="#grp-5" class="zh-only">身体、锻炼与可操作的健康手册</a><a href="#grp-5" class="en-only">Handbooks</a>
   </div>
 </nav>
 
@@ -105,7 +136,7 @@ footer a{color:var(--gold);text-decoration:none}
   <div class="eyebrow zh-only">频道 · 来自学员专栏</div><div class="eyebrow en-only">CHANNEL · FROM THE STUDENT COLUMN</div>
   <h1 class="title"><span class="zh-only">来自学员专栏 · 健康</span><span class="en-only">From the Student Column · Health</span></h1>
   <p class="sub zh-only">五十篇由 SDE 学员写成的健康文章：身体的感知主权、慢性病与照护、抑郁的发生条件，以及中医这门靠在场判断活着的技艺。</p><p class="sub en-only">Fifty essays on health and the body by students of the SDE school.</p>
-  <div class="badge"><span class="dot"></span><span class="zh-only">精选 50 篇 / 5 组 · 持续增补</span><span class="en-only">50 selected pieces / 5 sets</span></div>
+  <div class="badge"><span class="dot"></span><span class="zh-only">精选 50 篇 / 5 组 / 8 位作者 · 持续增补</span><span class="en-only">50 pieces / 5 sets / 8 authors</span></div>
 </header>
 
 <main class="wrap">
@@ -113,68 +144,88 @@ footer a{color:var(--gold);text-decoration:none}
     <p class="lead zh-only">这里的每一篇都不是本栏编辑部写的，而是 <a href="/students/" style="color:var(--accent);border-bottom:1px solid var(--border)">学员专栏</a>里那些一边工作一边写作的人写的——教师、医生、律师、创业者、父母、建筑师。他们用同一套发生学的刀法，各自切进自己最熟的那块地。本频道从学员专栏五百余篇作品中，为健康专栏挑出五十篇，按五组编排；点标题即进入原文，评论与评分都在原页。</p>
     <p class="lead en-only">Every piece below was written not by this column's editors but by the practitioners of the <a href="/students/" style="color:var(--accent);border-bottom:1px solid var(--border)">Student Column</a> — teachers, clinicians, lawyers, founders, parents, architects. Fifty are selected here from over five hundred. <b>The essays themselves are in Chinese.</b></p>
 
+    <div class="aubar">
+      <div class="aubar-head">
+        <span class="aubar-t zh-only">按作者筛选</span><span class="aubar-t en-only">FILTER BY AUTHOR</span>
+        <span class="aubar-n" id="aucount"></span>
+      </div>
+      <div class="chips" id="chips">
+        <button class="chip on" data-au="all"><span class="zh-only">全部</span><span class="en-only">All</span><span class="n">50</span></button>
+        <button class="chip" data-au="hu-min">胡敏<span class="n">23</span></button>
+        <button class="chip" data-au="kong-fanhe">孔凡鹤<span class="n">12</span></button>
+        <button class="chip" data-au="qin-li">秦莉<span class="n">5</span></button>
+        <button class="chip" data-au="zhang-qiong">张琼<span class="n">3</span></button>
+        <button class="chip" data-au="chen-xiaoyan">陈晓艳<span class="n">3</span></button>
+        <button class="chip" data-au="putao">葡萄<span class="n">2</span></button>
+        <button class="chip" data-au="hu-zhiying">胡志英<span class="n">1</span></button>
+        <button class="chip" data-au="yang-yong">阳涌<span class="n">1</span></button>
+      </div>
+      <div class="auhome" id="auhome" hidden></div>
+    </div>
+
     <div class="block" id="grp-1">
       <div class="block-head">
         <span class="block-num">壹</span>
-        <span class="block-title">身体的主权 · 感知如何被指标接管</span>
+        <span class="block-title"><span class="zh-only">身体的主权 · 感知如何被指标接管</span><span class="en-only">Sovereignty over the Body</span></span>
       </div>
-      <p class="block-desc">「指标正常，人却在坏。」这一组问的是同一件事：当身体感受的定义权被交给量表与设备，那个还能自己判断冷热、饿饱、累与不累的能力，去哪儿了。</p>
+      <p class="block-desc zh-only">「指标正常，人却在坏。」这一组问的是同一件事：当身体感受的定义权被交给量表与设备，那个还能自己判断冷热、饿饱、累与不累的能力，去哪儿了。</p>
+      <p class="block-desc en-only">The numbers are normal and the person is deteriorating. When the right to define what the body feels is handed to scales and devices, where does the capacity to judge one's own state go?</p>
       <div class="art-grid">
-        <a class="art" href="/students/hu-min/felt-sense-sovereignty/">
+        <a class="art" href="/students/hu-min/felt-sense-sovereignty/" data-au="hu-min">
           <span class="k">胡敏　·　断裂与意义</span>
           <h4>体认主权：身体感受的定义权如何被制度性捕获</h4>
           <p>母亲为何连&quot;我到底累不累&quot;都不确定？对身体感受的解释权被交换协议捕获——与梅洛-庞蒂&quot;身体图式&quot;、福柯&quot;身体规训&quot;双重划界。</p>
           <span class="rd">读全文 →</span>
         </a>
-        <a class="art" href="/students/hu-min/bodily-self-disablement/">
+        <a class="art" href="/students/hu-min/bodily-self-disablement/" data-au="hu-min">
           <span class="k">胡敏　·　身体自失能 · 感知判断</span>
           <h4>身体自失能：感知判断的闲置性萎缩</h4>
           <p>这篇文章的思想创新 本文从一个被习惯遮蔽的裂口出发，追问事情究竟如何发生。 导读 · 300字 这篇文章的价值与意义 —— 它能解决你的什么问题 理论问题：它在既有理论地图上切出一块新地带——不是“应对失败”（压力-……</p>
           <span class="rd">读全文 →</span>
         </a>
-        <a class="art" href="/students/hu-min/paper-p46-d01-a03/">
+        <a class="art" href="/students/hu-min/paper-p46-d01-a03/" data-au="hu-min">
           <span class="k">胡敏　·　证身 · 身体信号的不合语法性</span>
           <h4>证身：为什么身体信号需要被翻译成对错才能被听到</h4>
           <p>本文提出并论证一个核心判断：当代人与身体断裂的根源，并不在于外部指标系统“替代”了内部感受——这是一个已被充分诊断的现象——而在于一个更深层、更不易被察觉的结构的建立：身体信号本身的不合语法性，被当作了一种需要被纠正……</p>
           <span class="rd">读全文 →</span>
         </a>
-        <a class="art" href="/students/hu-min/paper-p46-d01-a02/">
+        <a class="art" href="/students/hu-min/paper-p46-d01-a02/" data-au="hu-min">
           <span class="k">胡敏　·　身体知识 · 饥饿性校准</span>
           <h4>饥饿性校准：当身体知识的生成条件被系统填平之后</h4>
           <p>当代健康行为领域存在一个顽固的悖论：健康知识的渗透率和自我管理工具的覆盖率持续攀升，透支身体直至崩溃的现象并未缩减。本文提出一个发生学追问：当一个人“知道”健康重要却无法“在乎”身体时，那个断裂点到底在哪里？</p>
           <span class="rd">读全文 →</span>
         </a>
-        <a class="art" href="/students/hu-min/paper-p46-d01-a04/">
+        <a class="art" href="/students/hu-min/paper-p46-d01-a04/" data-au="hu-min">
           <span class="k">胡敏　·　身体陪伴 · 管理意图</span>
           <h4>陪身体坐一会儿：当健康不再是一场需要被管理的事</h4>
           <p>现代人前所未有地在乎健康。这份在乎——从穿戴设备的数据追踪到饮食方案的精密计算——几乎被完整地编码为一种管理工程。既有批判通常归咎于过度管理、指标异化或消费主义收编，但它们共享同一个从未被质疑的先验——在乎健康天然意……</p>
           <span class="rd">读全文 →</span>
         </a>
-        <a class="art" href="/students/hu-min/body-time-sovereignty/">
+        <a class="art" href="/students/hu-min/body-time-sovereignty/" data-au="hu-min">
           <span class="k">胡敏　·　断裂与意义</span>
           <h4>身体时间主权：照护危机中被代偿系统接管的时间生成源</h4>
           <p>&quot;给予更多支持&quot;为何加深照护者耗竭？代偿系统在给予的同时接管了身体自行生成时间节律的官能——与罗萨&quot;时间异化&quot;划出&quot;生成源在内还是在外&quot;的判决线。</p>
           <span class="rd">读全文 →</span>
         </a>
-        <a class="art" href="/students/zhang-qiong/somatic-trust/">
+        <a class="art" href="/students/zhang-qiong/somatic-trust/" data-au="zhang-qiong">
           <span class="k">张琼　·　身体社会学与认知生态</span>
           <h4>体信的拆卸：为什么“更知道”让我们“更不会”管理体重</h4>
           <p>减肥知识空前普及、监控技术空前精密，长期成功率却始终低迷。本文不问“方法哪里要修正”，而问“为什么在数十年批评之后，用外部数字替代内部信号的逻辑反而日益精密”，由此提出“体信迁移”：不是信任被磨损，而是信任的操作语法……</p>
           <span class="rd">读全文 →</span>
         </a>
-        <a class="art" href="/students/qin-li/essays/bypass-attainment/">
+        <a class="art" href="/students/qin-li/essays/bypass-attainment/" data-au="qin-li">
           <span class="k">秦莉　·　医学哲学 · 新作 · PHILOSOPHY OF …</span>
           <h4>指标正常，人却在坏</h4>
           <p>健康判准的旁路结构——空、乱、虚为何是同一种病的三个签名。血压 130/80，三种药，肾在退，爬两层楼要停一次——病历上写着“控制良好”。问题不在判准不准，在判准可以被绕过：判准记录到达点，不记录到达方式，而结局追随……</p>
           <span class="rd">读全文 →</span>
         </a>
-        <a class="art" href="/students/kong-fanhe/embodied-knowing/">
+        <a class="art" href="/students/kong-fanhe/embodied-knowing/" data-au="kong-fanhe">
           <span class="k">孔凡鹤　·　自我认知与教育社会学</span>
           <h4>体认的退场：当社会评价全面接管自我感知之后</h4>
           <p>在“教育焦虑”“自主性丧失”“阶层再生产”被反复讨论之后，本文辨别出一个尚未被精确命名的辨别面——体认，以及它在社会评价全面接管儿童日常之后的系统性退场。</p>
           <span class="rd">读全文 →</span>
         </a>
-        <a class="art" href="/students/putao/homeostatic-junction/">
+        <a class="art" href="/students/putao/homeostatic-junction/" data-au="putao">
           <span class="k">葡萄　·　健康与稳态</span>
           <h4>健康的钟摆从未停在正中</h4>
           <p>若焦虑本身即致病源，为何极低焦虑者的死亡风险反而高于中度焦虑者？本文论证这一J形悖论刺穿的是一个根隐喻——健康被想象成可被稳定占据的位置。作者代之以&quot;稳态接壤&quot;：健康不落在任何正确位置的坐标上，而落在每一次状态切换时……</p>
@@ -186,65 +237,66 @@ footer a{color:var(--gold);text-decoration:none}
     <div class="block" id="grp-2">
       <div class="block-head">
         <span class="block-num">贰</span>
-        <span class="block-title">慢性病、照护与临床认知</span>
+        <span class="block-title"><span class="zh-only">慢性病、照护与临床认知</span><span class="en-only">Chronic Illness, Care and Clinical Cognition</span></span>
       </div>
-      <p class="block-desc">慢性病管理最成功的地方，往往正是它最危险的地方：指标复常了，人却把「感觉自己」这件事外包了出去。照护也一样——制度替人担下了不可分的责任之后，会发生什么。</p>
+      <p class="block-desc zh-only">慢性病管理最成功的地方，往往正是它最危险的地方：指标复常了，人却把「感觉自己」这件事外包了出去。照护也一样——制度替人担下了不可分的责任之后，会发生什么。</p>
+      <p class="block-desc en-only">Where chronic-disease management succeeds most, it is often most dangerous: the metrics return to normal while the patient outsources the act of sensing themselves.</p>
       <div class="art-grid">
-        <a class="art" href="/students/hu-min/clinical-cognitive-substitution/">
+        <a class="art" href="/students/hu-min/clinical-cognitive-substitution/" data-au="hu-min">
           <span class="k">胡敏　·　新作 · 健康与医学认识论 · 深化增补版</span>
           <h4>指标体系下的身体：论慢性病管理中的一种认知替代机制</h4>
           <p>指标正常并不等于身体重新可感。本文提出“临床认知替代”，分析第一人称身体判断如何在精准管理中被长期闲置，并给出局部交还的制度路径。</p>
           <span class="rd">读全文 →</span>
         </a>
-        <a class="art" href="/students/hu-min/paper-p48-d01-a01/">
+        <a class="art" href="/students/hu-min/paper-p48-d01-a01/" data-au="hu-min">
           <span class="k">胡敏　·　临床认知替代 · 指标治理</span>
           <h4>裂隙：指标复常之后的身体</h4>
           <p>这篇文章的思想创新 本文从一个被惯常解释遮蔽的裂口出发，追问事情究竟如何发生。 导读 · 300字 这篇文章的价值与意义 —— 它能解决你的什么问题 理论问题：它在既有理论地图上切出一块新地带——不是“应对失败”（压……</p>
           <span class="rd">读全文 →</span>
         </a>
-        <a class="art" href="/students/hu-min/paper-p48-d01-a02/">
+        <a class="art" href="/students/hu-min/paper-p48-d01-a02/" data-au="hu-min">
           <span class="k">胡敏　·　代偿性盲感 · 照看式托管</span>
           <h4>被悬置的感知：慢性病治理中“代偿性盲感”的发生与健康主体性的重组</h4>
           <p>当代慢性病临床中存在一个难以被既有批判话语捕获的沉默地带：患者在生化指标全部达标后，主观感受却持续恶化，而医患双方往往共同放弃了对这一裂隙的追问。本文追问的是，这一沉默地带如何从一套看似无害的制度安排中发生出来。</p>
           <span class="rd">读全文 →</span>
         </a>
-        <a class="art" href="/students/hu-min/paper-p48-d01-a03/">
+        <a class="art" href="/students/hu-min/paper-p48-d01-a03/" data-au="hu-min">
           <span class="k">胡敏　·　裁决力溃塌 · 慢性病自我管理</span>
           <h4>当“正确”耗尽裁决：慢性病照护中的低效冗余与能动性再生产</h4>
           <p>本文从慢性病自我管理中一个反复出现的临床谜题出发——为什么一群依从性极高、生理指标控制近乎完美的患者，反而呈现出弥漫性的心理耗竭与能动性的深层衰减——提出并论证“裁决力溃塌”这一核心判断。</p>
           <span class="rd">读全文 →</span>
         </a>
-        <a class="art" href="/students/hu-min/paper-p48-d01-a04/">
+        <a class="art" href="/students/hu-min/paper-p48-d01-a04/" data-au="hu-min">
           <span class="k">胡敏　·　慢性病康复 · 回响面</span>
           <h4>静默的回响面：当身体无人倾听</h4>
           <p>慢性病临床中长期存在一类被反复报告却未被充分概念化的现象：患者的生化指标已稳定在正常区间，其身体功能与生命体验却远未恢复。既有批判——无论来自医学体制分析、规训权力理论还是功绩社会诊断——几乎都共享同一个未经审查的预……</p>
           <span class="rd">读全文 →</span>
         </a>
-        <a class="art" href="/students/kong-fanhe/institutional-compensation/">
+        <a class="art" href="/students/kong-fanhe/institutional-compensation/" data-au="kong-fanhe">
           <span class="k">孔凡鹤　·　照护社会学与发生学</span>
           <h4>制度代偿的悖论：当制度替人承担了不可分责任</h4>
           <p>信任的生长前提不是“制度保障”，而是“制度代为承担不可分责任”。从卢曼、贝克的风险与信任传统出发，剖析制度代偿为何既是信任的前提又是它的陷阱。</p>
           <span class="rd">读全文 →</span>
         </a>
-        <a class="art" href="/students/kong-fanhe/puzzle-without-box/">
+        <a class="art" href="/students/kong-fanhe/puzzle-without-box/" data-au="kong-fanhe">
           <span class="k">孔凡鹤　·　照护社会学与发生学</span>
           <h4>拼图没收盒子：制度化设计移除了判断得以发生的前提条件</h4>
           <p>母亲被制度赋予决定谁能抱孩子的权责，却被同一套制度移除了做决定所需的感知信息。命名“拼图没收盒子”，论证制度格式与整全判断所需信息在本体论上不兼容。</p>
           <span class="rd">读全文 →</span>
         </a>
-        <a class="art" href="/students/kong-fanhe/care-disembodiment/">
+        <a class="art" href="/students/kong-fanhe/care-disembodiment/" data-au="kong-fanhe">
           <span class="k">孔凡鹤　·　照护社会学与发生学</span>
           <h4>照护的实体性离身：当制度成功运转，照护行为从人格内核脱钩</h4>
           <p>制度越成功，照护越不需要照护者作为整全的人在场。命名“照护的实体性离身”，与嵌入性、身心分离、内在动机、胜任感、在场、异化六个概念严格切割。</p>
           <span class="rd">读全文 →</span>
         </a>
-        <a class="art" href="/students/chen-xiaoyan/positional-being/">
+        <a class="art" href="/students/chen-xiaoyan/positional-being/" data-au="chen-xiaoyan">
           <span class="k">陈晓艳　·　位置性存有的优先性</span>
           <h4>被捧起的灰——论养老照护中“位置性存有”的优先性</h4>
           <p>智慧养老在最善意的运作中，正把失智老人从“人”的位子上轻轻拂去。本文命名“位置性存有”，在列维纳斯“面孔”、海德格尔“此在”、安提戈涅“无条件义务”三大传统同时失效的裂口处将它逼出，论证它逻辑上优先于“善”与“美”。</p>
           <span class="rd">读全文 →</span>
         </a>
-        <a class="art" href="/students/chen-xiaoyan/residual-trace/">
+        <a class="art" href="/students/chen-xiaoyan/residual-trace/" data-au="chen-xiaoyan">
           <span class="k">陈晓艳　·　残迹与善意填充</span>
           <h4>被照料得很好的空无：AI养老无法抵达的一个存在层位</h4>
           <p>“精准匹配”养老的批评都停在“替代自主性/叙事”，却共享“珍贵的东西都能被事先指认”这一未审前提。本文命名“残迹”：未被选中、未被完成、未被记住却构成生命质感的暗物质。</p>
@@ -256,65 +308,66 @@ footer a{color:var(--gold);text-decoration:none}
     <div class="block" id="grp-3">
       <div class="block-head">
         <span class="block-num">叁</span>
-        <span class="block-title">抑郁、心理与自我技术</span>
+        <span class="block-title"><span class="zh-only">抑郁、心理与自我技术</span><span class="en-only">Depression, the Psyche and Technologies of the Self</span></span>
       </div>
-      <p class="block-desc">抑郁不只是化学失衡，也不只是想不开。这一组把它放回发生条件里看：被善意绕过的生成权、被颠倒的日常赋值、以及那些复制了自我耗竭逻辑的「自我关怀」。</p>
+      <p class="block-desc zh-only">抑郁不只是化学失衡，也不只是想不开。这一组把它放回发生条件里看：被善意绕过的生成权、被颠倒的日常赋值、以及那些复制了自我耗竭逻辑的「自我关怀」。</p>
+      <p class="block-desc en-only">Neither mere chemistry nor mere despondency: depression read back into its conditions of occurrence — including the self-care that reproduces self-exhaustion.</p>
       <div class="art-grid">
-        <a class="art" href="/students/hu-min/generative-void/">
+        <a class="art" href="/students/hu-min/generative-void/" data-au="hu-min">
           <span class="k">胡敏　·　抑郁发生学 · 代理性善意</span>
           <h4>发生性空洞：被善意系统绕过的生命生成权</h4>
           <p>当代抑郁的主流解释都预设“应对力本该存在、只是被压垮”。本文提出「发生性空洞」：困惑被预判、试错被优化、承受被外包，个体从未被嵌入“发生者”的行动位，“我能从无到有地发生”的底层确信从未形成。</p>
           <span class="rd">读全文 →</span>
         </a>
-        <a class="art" href="/students/hu-min/hollowed-existence/">
+        <a class="art" href="/students/hu-min/hollowed-existence/" data-au="hu-min">
           <span class="k">胡敏　·　抑郁与存在感 · 善意清创</span>
           <h4>空洞的回声：抑郁症与存在感的当代溃散</h4>
           <p>主流“退出通道”理论解释了社会如何把人逼到生病，却答不出：为什么被接住、“好起来了”的人仍空洞？本文提出「存在感空壳化」：善意清创削弱“把痛苦转化为意义”的能力，使意义内化/关系确认/时间锚定三环节停摆。</p>
           <span class="rd">读全文 →</span>
         </a>
-        <a class="art" href="/students/hu-min/psychic-ledger/">
+        <a class="art" href="/students/hu-min/psychic-ledger/" data-au="hu-min">
           <span class="k">胡敏　·　抑郁发生学 · 心理积分</span>
           <h4>当日常赋值被颠倒——心理积分过程的扭曲与一种当代身心崩溃的发生</h4>
           <p>一个“没理由出事”的人，为何在极普通的早晨突然起不来？本文提出「心理积分」：维持日常生命感的微观赋值过程被三规则协同扭曲、从正向累积颠倒为负向耗散，「积分归零」是维持“意愿”的最低正效价输入被断流。</p>
           <span class="rd">读全文 →</span>
         </a>
-        <a class="art" href="/students/hu-min/downside-deprivation/">
+        <a class="art" href="/students/hu-min/downside-deprivation/" data-au="hu-min">
           <span class="k">胡敏　·　抑郁新典范 · 劣性潜能</span>
           <h4>劣性潜能的剥夺：抑郁症时代流行的发生学机制</h4>
           <p>当制度同时发出“你必须更好”与“你不可能自己变得更好”，被剥夺的是什么？本文提出「劣性潜能剥夺」：“走向更坏的自由”被效率逻辑经代理（试错空间）与弃置（承接网络）同步清除，个体长不出“不被一次失败定义”的存在论厚度。</p>
           <span class="rd">读全文 →</span>
         </a>
-        <a class="art" href="/students/hu-min/self-care-paradox/">
+        <a class="art" href="/students/hu-min/self-care-paradox/" data-au="hu-min">
           <span class="k">胡敏　·　社会理论与自我技术</span>
           <h4>自愈成疾：当自我关怀复制了自我耗竭的逻辑</h4>
           <p>旨在治愈耗竭的“自我关怀”，为什么反而复制了制造耗竭的那套逻辑？本文命名“自愈成疾悖论”：自愈方案与绩效社会共享同一套底层语法——项目化、流程化、数据裁定。</p>
           <span class="rd">读全文 →</span>
         </a>
-        <a class="art" href="/students/hu-min/genetic-borrowing/">
+        <a class="art" href="/students/hu-min/genetic-borrowing/" data-au="hu-min">
           <span class="k">胡敏　·　成瘾机制与发生学</span>
           <h4>成瘾的悖论：一个“发生学租借”的解释</h4>
           <p>为什么长期成瘾者戒断后极易复发，且复发常伴随生命方向感的整体塌陷？主流三大范式都答不透这个锁死性难题。本文命名“发生学租借成瘾悖论”，用内外双引擎耦合、即时反馈路径锁定、发生学真空三重论证，解剖转机中最脆弱的一环，并……</p>
           <span class="rd">读全文 →</span>
         </a>
-        <a class="art" href="/students/hu-min/recovery-to-adaptation/">
+        <a class="art" href="/students/hu-min/recovery-to-adaptation/" data-au="hu-min">
           <span class="k">胡敏　·　治理术与实践漂移</span>
           <h4>当恢复变成适应：正念运动机制反转的解剖</h4>
           <p>正念如何从松动控制的疗法，变成加固控制的绩效工具？本文追踪正念运动四十年间的三次功能位移，借治理术、误识与“批判吸收”定位这场漂移，并以AA十二步骤如何构成对功能漂移的程序化干扰作对照，给出一个可被检验的假说及其边界……</p>
           <span class="rd">读全文 →</span>
         </a>
-        <a class="art" href="/students/kong-fanhe/signal-filtering/">
+        <a class="art" href="/students/kong-fanhe/signal-filtering/" data-au="kong-fanhe">
           <span class="k">孔凡鹤　·　精神医学 · 抑郁复发</span>
           <h4>作为治愈的创伤：抑郁治疗精细化与复发机制的概念重构</h4>
           <p>急性期治疗有现代医学最坚实的实证根基，复发率却顽固地高达 40%-60%——为何治疗在它最成功的维度上太成功，反而制造了新的脆弱？本文命名“治疗精细化的信号滤除”，把复发前兆的失踪归于“复位程序”被治疗成功期滤除，配……</p>
           <span class="rd">读全文 →</span>
         </a>
-        <a class="art" href="/students/kong-fanhe/dual-axis-assembly/">
+        <a class="art" href="/students/kong-fanhe/dual-axis-assembly/" data-au="kong-fanhe">
           <span class="k">孔凡鹤　·　临床心理学 · 改变机制</span>
           <h4>心理装置的双轴自组装：从“知晓”到“生成”的临床路径</h4>
           <p>她能准确说出回避模式与童年被忽视的关联，理性上完全认同不必再这样，可伴侣一沉默，她的身体在认知介入前就已崩溃——“我知道不合理，但我就是控制不住”。</p>
           <span class="rd">读全文 →</span>
         </a>
-        <a class="art" href="/students/kong-fanhe/psychic-microinstitution/">
+        <a class="art" href="/students/kong-fanhe/psychic-microinstitution/" data-au="kong-fanhe">
           <span class="k">孔凡鹤　·　心理治疗 · 制度理论</span>
           <h4>心理微制度论：论心理治疗从“个体修补”到“制度更替”的范式转移</h4>
           <p>旧反应凭什么在每个具体情境中，都能战胜那个已被认识、被认可、甚至被练习过的新反应？本文拒绝“意志力薄弱/练习不足”的解释，命名“心理微制度”（具规则/角色/叙事/执行/环境殖民五组件），把 Scott 制度三支柱严格……</p>
@@ -326,65 +379,66 @@ footer a{color:var(--gold);text-decoration:none}
     <div class="block" id="grp-4">
       <div class="block-head">
         <span class="block-num">肆</span>
-        <span class="block-title">中医、技艺与另一种医学知识</span>
+        <span class="block-title"><span class="zh-only">中医、技艺与另一种医学知识</span><span class="en-only">Chinese Medicine and Another Kind of Medical Knowledge</span></span>
       </div>
-      <p class="block-desc">一门靠「在场判断」活着的医学，一旦被要求可复制、可标准化、可审计，它会怎样在成功中冷却下来？这一组从辨证论治一直谈到新加坡的中医制度化。</p>
+      <p class="block-desc zh-only">一门靠「在场判断」活着的医学，一旦被要求可复制、可标准化、可审计，它会怎样在成功中冷却下来？这一组从辨证论治一直谈到新加坡的中医制度化。</p>
+      <p class="block-desc en-only">A medicine that lives on situated judgement, asked to be reproducible, standardised and auditable — how it cools down inside its own success.</p>
       <div class="art-grid">
-        <a class="art" href="/students/hu-min/resonance-of-pattern-change/">
+        <a class="art" href="/students/hu-min/resonance-of-pattern-change/" data-au="hu-min">
           <span class="k">胡敏　·　辨证论治 · 参变回响</span>
           <h4>参变回响：中医辨证论治的本体论重述</h4>
           <p>中医辨证论治的科学化困局百年未解。本文的诊断起点不在于“方法不够精致”，而在于既往所有路径——无论是验证诊疗产物还是记录认知过程——共享着一个未经审查的预设：将诊疗的根本事件理解为发生在医者头脑内部的“认知主体对客观……</p>
           <span class="rd">读全文 →</span>
         </a>
-        <a class="art" href="/students/hu-min/paper-p47-d01-a02/">
+        <a class="art" href="/students/hu-min/paper-p47-d01-a02/" data-au="hu-min">
           <span class="k">胡敏　·　中医传承 · 对题发生</span>
           <h4>对题发生——中医传承中被逼出的生成革命</h4>
           <p>近百年来，围绕中医科学化的争论始终在同一个未曾言明的预设上打转：双方都假定中医的传承是一个传递“知识”或“经验”的过程——分歧只在于这知识能否被科学验证、这经验能否被标准化表达。</p>
           <span class="rd">读全文 →</span>
         </a>
-        <a class="art" href="/students/hu-min/paper-p47-d01-a03/">
+        <a class="art" href="/students/hu-min/paper-p47-d01-a03/" data-au="hu-min">
           <span class="k">胡敏　·　中医个体化诊疗 · 辨证论治</span>
           <h4>复现土：判断离开现场之后，何以再发生</h4>
           <p>中医个体化诊疗的可复制性困境已持续近一个世纪。既有解释将其归因于默会知识的不可言传、制度免疫的抵抗或技术手段的不足。本文论证，这一困境的根源藏在一个从未被认真质疑的预设之中：判断力被当作了可提取、可传递的实体。</p>
           <span class="rd">读全文 →</span>
         </a>
-        <a class="art" href="/students/hu-min/paper-p47-d01-a04/">
+        <a class="art" href="/students/hu-min/paper-p47-d01-a04/" data-au="hu-min">
           <span class="k">胡敏　·　中医科学化 · 护盾热寂</span>
           <h4>技艺的活性如何被自身的守护冷却：一个“护盾热寂”假说</h4>
           <p>这篇文章的思想创新 本文从一个被惯常解释遮蔽的裂口出发，追问事情究竟如何发生。 导读 · 300字 这篇文章的价值与意义 —— 它能解决你的什么问题 理论问题：它在既有理论地图上切出一块新地带——不是“应对失败”（压……</p>
           <span class="rd">读全文 →</span>
         </a>
-        <a class="art" href="/students/hu-min/experience-bifurcation/">
+        <a class="art" href="/students/hu-min/experience-bifurcation/" data-au="hu-min">
           <span class="k">胡敏　·　认知载体与AI时代权威</span>
           <h4>经验的两种生成：中医认知的载体分化与AI时代的知识权威重构</h4>
           <p>AI时代中医的危机，被普遍误诊为“不够科学”。本文提出：真正的挑战是认知载体的分化——“核心经验”同时活在两种不可通约的载体里，临场生发的身心过程与沉淀于文字的符号痕迹，而机器学习只能放大后者，从而系统性改写谁有资格……</p>
           <span class="rd">读全文 →</span>
         </a>
-        <a class="art" href="/students/qin-li/institutional-funeral/">
+        <a class="art" href="/students/qin-li/institutional-funeral/" data-au="qin-li">
           <span class="k">秦莉　·　卫生政策与制度分析 · 金点子四篇</span>
           <h4>制度殡葬与暗门翻转：新加坡对《黄帝内经》应用的终局诊断</h4>
           <p>新加坡把《黄帝内经》里能被公共卫生预算翻译的部分留下，把辨证论治的核心能力交给一批将在十五年内退场的老中医——功能层、保存层、意义层三层自持，使这场殡葬高效运转，且无人认为它是殡葬。但结构里有一道暗门：若脉诊仪、动态处方与承认个体纵向因果的新证据范式抢在退场之前跨过等效性临界点，殡葬会整体翻转为孵化器。文中给出三个可检验信号与一个可证伪命题。</p>
           <span class="rd">读全文 →</span>
         </a>
-        <a class="art" href="/students/qin-li/self-locking-loop/">
+        <a class="art" href="/students/qin-li/self-locking-loop/" data-au="qin-li">
           <span class="k">秦莉　·　卫生政策与制度分析 · 金点子四篇</span>
           <h4>自锁闭环与能力恢复轨迹：新加坡中医制度化的排斥机制与一种新证据类型的构造</h4>
           <p>中医拿不到独立诊断权，是因为缺证据；而证据恰恰无法在旧标准内部被生产出来——排斥因此自己养活自己。破解的办法不是更努力地在旧标准里自证，而是造一种旧标准从未要求、因而也从未设防的新证据：能力恢复轨迹曲线。难在制度沙盒本身也卡在同构的闭环里，本文给出用旧制度的成本逻辑三重重框定的过关方案。</p>
           <span class="rd">读全文 →</span>
         </a>
-        <a class="art" href="/students/qin-li/six-gates/">
+        <a class="art" href="/students/qin-li/six-gates/" data-au="qin-li">
           <span class="k">秦莉　·　卫生政策与制度分析 · 金点子四篇</span>
           <h4>功能评估的阶梯：新加坡中医药制度演化的六重门径</h4>
           <p>中医药从「被允许存在的养生辅助」走向「被需要的功能评估组件」，中间隔着六道闸门。哪一道卡住，整条演化就锁死在「制度宣称已整合、临床操作照旧」的僵持态。本文用历史制度主义与科学知识社会学拆解每道门前制度沉积、认知裂缝、信息增益与权力博弈的拉锯，并给出六项可被行政直接操作的解锁工具。</p>
           <span class="rd">读全文 →</span>
         </a>
-        <a class="art" href="/students/qin-li/reverse-production/">
+        <a class="art" href="/students/qin-li/reverse-production/" data-au="qin-li">
           <span class="k">秦莉　·　卫生政策与制度分析 · 金点子四篇</span>
           <h4>边缘的逆生产：制度化排斥逻辑下功能权威的意外生成</h4>
           <p>被制度归入「补充替代」的一方，通常的出路是争取承认。本文写的是另一条路：放弃求承认，转去体系的功能缺口上自建实体，供给体系急需却无法自产的公共品，反过来让对方产生依赖，最终在核心规则的制定中拿到共决权。作者把它命名为「功能权威的逆生产」，并与五个理论最近邻逐一交锋、给出可证伪的检验设计。</p>
           <span class="rd">读全文 →</span>
         </a>
-        <a class="art" href="/students/hu-zhiying/provisioning-of-the-good/">
+        <a class="art" href="/students/hu-zhiying/provisioning-of-the-good/" data-au="hu-zhiying">
           <span class="k">胡志英　·　传统知识与现代性</span>
           <h4>善的供养：传统饮食知识在现代厨房中的认知闭合</h4>
           <p>以阴阳五行为代表的传统饮食知识在现代厨房中的根本困境，既不是它在认识论上无效，也不是它在文化上虚构，而是一种结构性锁定：现代性为知识的“善”——赋予意义、秩序与身份认同的能力——提供了一条独立于其“真”的社会再生产链条。当一套话语的外壳之存续不再依赖其操作内核在实践中的有效性，善的供养便悄然取代了真的淬炼。这一闭合的隐蔽处恰在于：它由信仰者的真诚信奉所维系。</p>
@@ -396,65 +450,66 @@ footer a{color:var(--gold);text-decoration:none}
     <div class="block" id="grp-5">
       <div class="block-head">
         <span class="block-num">伍</span>
-        <span class="block-title">身体、锻炼与可操作的健康手册</span>
+        <span class="block-title"><span class="zh-only">身体、锻炼与可操作的健康手册</span><span class="en-only">The Body, Exercise and Practical Handbooks</span></span>
       </div>
-      <p class="block-desc">最后一组把话说回日常：锻炼究竟在修什么，生殖系统的病变要放回哪一片场里读，以及五份写给普通人的健康操作手册——它们不替代医疗，只负责把判断还给你自己。</p>
+      <p class="block-desc zh-only">最后一组把话说回日常：锻炼究竟在修什么，生殖系统的病变要放回哪一片场里读，以及五份写给普通人的健康操作手册——它们不替代医疗，只负责把判断还给你自己。</p>
+      <p class="block-desc en-only">What exercise actually repairs, where reproductive pathology belongs, and five handbooks for ordinary readers. None of it replaces medical care.</p>
       <div class="art-grid">
-        <a class="art" href="/students/kong-fanhe/domesticated-body/">
+        <a class="art" href="/students/kong-fanhe/domesticated-body/" data-au="kong-fanhe">
           <span class="k">孔凡鹤　·　新作 · 身体与锻炼 · 全球校订版</span>
           <h4>驯体：锻炼作为“修复惯性”的悬搁与身体胜任感的发生</h4>
           <p>SDE Universes · 学员专栏 · 2026年7月24日 · sdeuniverses.com</p>
           <span class="rd">读全文 →</span>
         </a>
-        <a class="art" href="/students/kong-fanhe/selective-body-genesis/">
+        <a class="art" href="/students/kong-fanhe/selective-body-genesis/" data-au="kong-fanhe">
           <span class="k">孔凡鹤　·　新作 · 身体与锻炼 · 全球校订版</span>
           <h4>当身体不再是一台待修的机器：论锻炼中的“抉择性身体发生”</h4>
           <p>SDE Universes · 学员专栏 · 2026年7月24日 · sdeuniverses.com</p>
           <span class="rd">读全文 →</span>
         </a>
-        <a class="art" href="/students/kong-fanhe/dark-side-of-repair/">
+        <a class="art" href="/students/kong-fanhe/dark-side-of-repair/" data-au="kong-fanhe">
           <span class="k">孔凡鹤　·　新作 · 运动心理与身体文化 · 全球创新榜</span>
           <h4>修复的暗面：锻炼如何蜕变为对感受的慢性剥夺</h4>
           <p>当代社会中的跑步、瑜伽、力量训练等锻炼实践，被广泛赋予“赎回身体主权”“对抗异化”的解放性叙事。本文推进一个比现有批判更底层的诊断：这些实践的自我反噬风险，其最深驱动力并不来自叙事的虚伪或指标的诱惑，而是来自身体感受……</p>
           <span class="rd">读全文 →</span>
         </a>
-        <a class="art" href="/students/kong-fanhe/paper-p30-d01-a01/">
+        <a class="art" href="/students/kong-fanhe/paper-p30-d01-a01/" data-au="kong-fanhe">
           <span class="k">孔凡鹤　·　女性生殖癌变 · 息壤</span>
           <h4>息壤：女性生殖癌变的一种生成机制</h4>
           <p>主流肿瘤学将女性生殖系统癌变定位为细胞随机突变的累积性“故障”，这一叙事在分子层面自洽，却无法正面回应一组愈演愈烈的经验事实：为什么这些癌变在当代女性身上发生得越来越早、越来越普遍，并且牢固地与未育、晚育、长期精神高……</p>
           <span class="rd">读全文 →</span>
         </a>
-        <a class="art" href="/students/kong-fanhe/paper-p30-d01-a04/">
+        <a class="art" href="/students/kong-fanhe/paper-p30-d01-a04/" data-au="kong-fanhe">
           <span class="k">孔凡鹤　·　主权代谢 · 生殖系统癌变</span>
           <h4>主权代谢：女性生殖与乳腺病变的一种生成论重释——从外部张力场到内部代谢特区的裁决、增生与耗竭</h4>
           <p>当代女性乳腺癌与子宫内膜癌的发病率持续攀升。本文指出，现有病因学框架系统性地遗漏了一个关键的病理发生环节：在癌细胞被“检出”之前的漫长岁月中，女性的身体并非被动承受外部压力的冲击，而是在一段可追溯的生命史中，逐层丧失……</p>
           <span class="rd">读全文 →</span>
         </a>
-        <a class="art" href="/students/zhang-qiong/suspension-is-receptivity/apply-health/">
+        <a class="art" href="/students/zhang-qiong/suspension-is-receptivity/apply-health/" data-au="zhang-qiong">
           <span class="k">张琼　·　应用实践 · 正式发表</span>
           <h4>腾出空间，让身体自己复苏：撤回&quot;过度施为&quot;的健康操作手册</h4>
           <p>这是一份操作手册，不是一篇养生道理。它假设你已经接受了一个判断：真正的休息、真正的放松、身体真正的复苏——那种整个人重新缓过来、重新有了活力的状态——从来不是被&quot;生产&quot;或&quot;优化&quot;出来的。它是不期然而然地到来的。</p>
           <span class="rd">读全文 →</span>
         </a>
-        <a class="art" href="/students/zhang-qiong/generative-tolerance/apply-health/">
+        <a class="art" href="/students/zhang-qiong/generative-tolerance/apply-health/" data-au="zhang-qiong">
           <span class="k">张琼　·　应用实践 · 正式发表</span>
           <h4>恢复对&quot;笨拙摸索&quot;的容限：拆掉健康评价多面体的操作手册</h4>
           <p>这是一份操作手册，不是一篇养生道理。它假设你已经接受了一个判断：一个人在探索&quot;什么样的生活方式、饮食、运动真正适合自己&quot;时，最深的困境，不是&quot;不够自律&quot;，而是一件更根本的事——他身处的整个健康-数据-比较的环境，正在……</p>
           <span class="rd">读全文 →</span>
         </a>
-        <a class="art" href="/students/yang-yong/value-closure/apply-health/">
+        <a class="art" href="/students/yang-yong/value-closure/apply-health/" data-au="yang-yong">
           <span class="k">阳涌　·　应用实践 · 正式发表</span>
           <h4>让一个对自己身体有真正在乎的人诞生：破除&quot;价值闭合&quot;的健康操作手册</h4>
           <p>这是一份操作手册，不是一篇养生道理。它假设你已经接受了一个判断：一个人和自己身体的关系里，最深的问题，不是&quot;不懂健康知识&quot;，而是一个更根本的东西——他可能从未真正形成过属于自己的、对身体的在乎，从未搞清&quot;健康对我到底……</p>
           <span class="rd">读全文 →</span>
         </a>
-        <a class="art" href="/students/putao/constitutive-timing/apply-health/">
+        <a class="art" href="/students/putao/constitutive-timing/apply-health/" data-au="putao">
           <span class="k">葡萄　·　应用实践 · 正式发表</span>
           <h4>让自我照护能力真正长出来：从&quot;指标达标&quot;到&quot;重建构成时序&quot;的健康操作手册</h4>
           <p>这是一份操作手册，不是一篇养生道理。它假设你已经接受了一个判断：一个人照顾好自己身体的能力——读懂身体信号、自己调整饮食作息、在反馈里摸索出对自己有效的判断——能不能长出来，不由你懂多少健康知识（存量）决定，而由这些……</p>
           <span class="rd">读全文 →</span>
         </a>
-        <a class="art" href="/students/chen-xiaoyan/dark-competence/apply-health/">
+        <a class="art" href="/students/chen-xiaoyan/dark-competence/apply-health/" data-au="chen-xiaoyan">
           <span class="k">陈晓艳　·　应用实践 · 正式发表</span>
           <h4>养护身体的暗能力：守住&quot;不被评价的时间生态&quot;的健康操作手册</h4>
           <p>这是一份操作手册，不是一篇养生道理。它假设你已经接受了一个判断：在照顾自己身体这件事上，人也有两种截然不同的能力。一种是明能力——那些能被清楚衡量、清楚评分的健康技能（照着协议执行、把各项指标做达标、按标准建议操作）……</p>
@@ -474,20 +529,589 @@ footer a{color:var(--gold);text-decoration:none}
         <a href="/" class="zh-only">返回首页</a><a href="/" class="en-only">Home</a>
       </div>
     </div>
+
+    <div class="sibs">
+      <a href="/education/from-students/">
+        <div class="st"><span class="zh-only">来自学员专栏 · 教育</span><span class="en-only">From the Student Column · Education</span></div>
+        <div class="sd"><span class="zh-only">五十篇学员文章：学习如何发生、教师的判断、评价制度与 AI 时代的大学。</span><span class="en-only">Fifty student essays on learning, teachers' judgement and the AI-era university.</span></div>
+      </a>
+      <a href="/business/from-students/">
+        <div class="st"><span class="zh-only">来自学员专栏 · 商业</span><span class="en-only">From the Student Column · Business</span></div>
+        <div class="sd"><span class="zh-only">五十篇学员文章：AI 时代的价值、组织病理、创业的死因、消费社会那笔生意。</span><span class="en-only">Fifty student essays on value after AI, organisational pathology and venture failure.</span></div>
+      </a>
+    </div>
   </section>
 </main>
+
+<button id="totop" title="回到顶部" aria-label="回到顶部">↑</button>
 
 <footer>
   <div class="zh-only">SDE Universes · 显露 · 差异 · 纠缠 &nbsp;|&nbsp; 德麦国际 · 王德生 &nbsp;|&nbsp; <a href="/">sdeuniverses.com</a></div>
   <div class="en-only">SDE Universes · Show · Difference · Entanglement &nbsp;|&nbsp; Demai International · Desheng Wang &nbsp;|&nbsp; <a href="/">sdeuniverses.com</a></div>
 </footer>
 
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@type": "CollectionPage",
+ "name": "来自学员专栏 · 健康",
+ "description": "五十篇由 SDE 学员写成的健康文章：身体的感知主权、慢性病与照护、抑郁的发生条件，以及中医这门靠在场判断活着的技艺。",
+ "url": "https://sdeuniverses.com/health/from-students/",
+ "isPartOf": {
+  "@type": "WebSite",
+  "name": "SDE Universes",
+  "url": "https://sdeuniverses.com/"
+ },
+ "mainEntity": {
+  "@type": "ItemList",
+  "numberOfItems": 50,
+  "itemListElement": [
+   {
+    "@type": "ListItem",
+    "position": 1,
+    "url": "https://sdeuniverses.com/students/hu-min/felt-sense-sovereignty/",
+    "name": "体认主权：身体感受的定义权如何被制度性捕获",
+    "author": {
+     "@type": "Person",
+     "name": "胡敏"
+    }
+   },
+   {
+    "@type": "ListItem",
+    "position": 2,
+    "url": "https://sdeuniverses.com/students/hu-min/bodily-self-disablement/",
+    "name": "身体自失能：感知判断的闲置性萎缩",
+    "author": {
+     "@type": "Person",
+     "name": "胡敏"
+    }
+   },
+   {
+    "@type": "ListItem",
+    "position": 3,
+    "url": "https://sdeuniverses.com/students/hu-min/paper-p46-d01-a03/",
+    "name": "证身：为什么身体信号需要被翻译成对错才能被听到",
+    "author": {
+     "@type": "Person",
+     "name": "胡敏"
+    }
+   },
+   {
+    "@type": "ListItem",
+    "position": 4,
+    "url": "https://sdeuniverses.com/students/hu-min/paper-p46-d01-a02/",
+    "name": "饥饿性校准：当身体知识的生成条件被系统填平之后",
+    "author": {
+     "@type": "Person",
+     "name": "胡敏"
+    }
+   },
+   {
+    "@type": "ListItem",
+    "position": 5,
+    "url": "https://sdeuniverses.com/students/hu-min/paper-p46-d01-a04/",
+    "name": "陪身体坐一会儿：当健康不再是一场需要被管理的事",
+    "author": {
+     "@type": "Person",
+     "name": "胡敏"
+    }
+   },
+   {
+    "@type": "ListItem",
+    "position": 6,
+    "url": "https://sdeuniverses.com/students/hu-min/body-time-sovereignty/",
+    "name": "身体时间主权：照护危机中被代偿系统接管的时间生成源",
+    "author": {
+     "@type": "Person",
+     "name": "胡敏"
+    }
+   },
+   {
+    "@type": "ListItem",
+    "position": 7,
+    "url": "https://sdeuniverses.com/students/zhang-qiong/somatic-trust/",
+    "name": "体信的拆卸：为什么“更知道”让我们“更不会”管理体重",
+    "author": {
+     "@type": "Person",
+     "name": "张琼"
+    }
+   },
+   {
+    "@type": "ListItem",
+    "position": 8,
+    "url": "https://sdeuniverses.com/students/qin-li/essays/bypass-attainment/",
+    "name": "指标正常，人却在坏",
+    "author": {
+     "@type": "Person",
+     "name": "秦莉"
+    }
+   },
+   {
+    "@type": "ListItem",
+    "position": 9,
+    "url": "https://sdeuniverses.com/students/kong-fanhe/embodied-knowing/",
+    "name": "体认的退场：当社会评价全面接管自我感知之后",
+    "author": {
+     "@type": "Person",
+     "name": "孔凡鹤"
+    }
+   },
+   {
+    "@type": "ListItem",
+    "position": 10,
+    "url": "https://sdeuniverses.com/students/putao/homeostatic-junction/",
+    "name": "健康的钟摆从未停在正中",
+    "author": {
+     "@type": "Person",
+     "name": "葡萄"
+    }
+   },
+   {
+    "@type": "ListItem",
+    "position": 11,
+    "url": "https://sdeuniverses.com/students/hu-min/clinical-cognitive-substitution/",
+    "name": "指标体系下的身体：论慢性病管理中的一种认知替代机制",
+    "author": {
+     "@type": "Person",
+     "name": "胡敏"
+    }
+   },
+   {
+    "@type": "ListItem",
+    "position": 12,
+    "url": "https://sdeuniverses.com/students/hu-min/paper-p48-d01-a01/",
+    "name": "裂隙：指标复常之后的身体",
+    "author": {
+     "@type": "Person",
+     "name": "胡敏"
+    }
+   },
+   {
+    "@type": "ListItem",
+    "position": 13,
+    "url": "https://sdeuniverses.com/students/hu-min/paper-p48-d01-a02/",
+    "name": "被悬置的感知：慢性病治理中“代偿性盲感”的发生与健康主体性的重组",
+    "author": {
+     "@type": "Person",
+     "name": "胡敏"
+    }
+   },
+   {
+    "@type": "ListItem",
+    "position": 14,
+    "url": "https://sdeuniverses.com/students/hu-min/paper-p48-d01-a03/",
+    "name": "当“正确”耗尽裁决：慢性病照护中的低效冗余与能动性再生产",
+    "author": {
+     "@type": "Person",
+     "name": "胡敏"
+    }
+   },
+   {
+    "@type": "ListItem",
+    "position": 15,
+    "url": "https://sdeuniverses.com/students/hu-min/paper-p48-d01-a04/",
+    "name": "静默的回响面：当身体无人倾听",
+    "author": {
+     "@type": "Person",
+     "name": "胡敏"
+    }
+   },
+   {
+    "@type": "ListItem",
+    "position": 16,
+    "url": "https://sdeuniverses.com/students/kong-fanhe/institutional-compensation/",
+    "name": "制度代偿的悖论：当制度替人承担了不可分责任",
+    "author": {
+     "@type": "Person",
+     "name": "孔凡鹤"
+    }
+   },
+   {
+    "@type": "ListItem",
+    "position": 17,
+    "url": "https://sdeuniverses.com/students/kong-fanhe/puzzle-without-box/",
+    "name": "拼图没收盒子：制度化设计移除了判断得以发生的前提条件",
+    "author": {
+     "@type": "Person",
+     "name": "孔凡鹤"
+    }
+   },
+   {
+    "@type": "ListItem",
+    "position": 18,
+    "url": "https://sdeuniverses.com/students/kong-fanhe/care-disembodiment/",
+    "name": "照护的实体性离身：当制度成功运转，照护行为从人格内核脱钩",
+    "author": {
+     "@type": "Person",
+     "name": "孔凡鹤"
+    }
+   },
+   {
+    "@type": "ListItem",
+    "position": 19,
+    "url": "https://sdeuniverses.com/students/chen-xiaoyan/positional-being/",
+    "name": "被捧起的灰——论养老照护中“位置性存有”的优先性",
+    "author": {
+     "@type": "Person",
+     "name": "陈晓艳"
+    }
+   },
+   {
+    "@type": "ListItem",
+    "position": 20,
+    "url": "https://sdeuniverses.com/students/chen-xiaoyan/residual-trace/",
+    "name": "被照料得很好的空无：AI养老无法抵达的一个存在层位",
+    "author": {
+     "@type": "Person",
+     "name": "陈晓艳"
+    }
+   },
+   {
+    "@type": "ListItem",
+    "position": 21,
+    "url": "https://sdeuniverses.com/students/hu-min/generative-void/",
+    "name": "发生性空洞：被善意系统绕过的生命生成权",
+    "author": {
+     "@type": "Person",
+     "name": "胡敏"
+    }
+   },
+   {
+    "@type": "ListItem",
+    "position": 22,
+    "url": "https://sdeuniverses.com/students/hu-min/hollowed-existence/",
+    "name": "空洞的回声：抑郁症与存在感的当代溃散",
+    "author": {
+     "@type": "Person",
+     "name": "胡敏"
+    }
+   },
+   {
+    "@type": "ListItem",
+    "position": 23,
+    "url": "https://sdeuniverses.com/students/hu-min/psychic-ledger/",
+    "name": "当日常赋值被颠倒——心理积分过程的扭曲与一种当代身心崩溃的发生",
+    "author": {
+     "@type": "Person",
+     "name": "胡敏"
+    }
+   },
+   {
+    "@type": "ListItem",
+    "position": 24,
+    "url": "https://sdeuniverses.com/students/hu-min/downside-deprivation/",
+    "name": "劣性潜能的剥夺：抑郁症时代流行的发生学机制",
+    "author": {
+     "@type": "Person",
+     "name": "胡敏"
+    }
+   },
+   {
+    "@type": "ListItem",
+    "position": 25,
+    "url": "https://sdeuniverses.com/students/hu-min/self-care-paradox/",
+    "name": "自愈成疾：当自我关怀复制了自我耗竭的逻辑",
+    "author": {
+     "@type": "Person",
+     "name": "胡敏"
+    }
+   },
+   {
+    "@type": "ListItem",
+    "position": 26,
+    "url": "https://sdeuniverses.com/students/hu-min/genetic-borrowing/",
+    "name": "成瘾的悖论：一个“发生学租借”的解释",
+    "author": {
+     "@type": "Person",
+     "name": "胡敏"
+    }
+   },
+   {
+    "@type": "ListItem",
+    "position": 27,
+    "url": "https://sdeuniverses.com/students/hu-min/recovery-to-adaptation/",
+    "name": "当恢复变成适应：正念运动机制反转的解剖",
+    "author": {
+     "@type": "Person",
+     "name": "胡敏"
+    }
+   },
+   {
+    "@type": "ListItem",
+    "position": 28,
+    "url": "https://sdeuniverses.com/students/kong-fanhe/signal-filtering/",
+    "name": "作为治愈的创伤：抑郁治疗精细化与复发机制的概念重构",
+    "author": {
+     "@type": "Person",
+     "name": "孔凡鹤"
+    }
+   },
+   {
+    "@type": "ListItem",
+    "position": 29,
+    "url": "https://sdeuniverses.com/students/kong-fanhe/dual-axis-assembly/",
+    "name": "心理装置的双轴自组装：从“知晓”到“生成”的临床路径",
+    "author": {
+     "@type": "Person",
+     "name": "孔凡鹤"
+    }
+   },
+   {
+    "@type": "ListItem",
+    "position": 30,
+    "url": "https://sdeuniverses.com/students/kong-fanhe/psychic-microinstitution/",
+    "name": "心理微制度论：论心理治疗从“个体修补”到“制度更替”的范式转移",
+    "author": {
+     "@type": "Person",
+     "name": "孔凡鹤"
+    }
+   },
+   {
+    "@type": "ListItem",
+    "position": 31,
+    "url": "https://sdeuniverses.com/students/hu-min/resonance-of-pattern-change/",
+    "name": "参变回响：中医辨证论治的本体论重述",
+    "author": {
+     "@type": "Person",
+     "name": "胡敏"
+    }
+   },
+   {
+    "@type": "ListItem",
+    "position": 32,
+    "url": "https://sdeuniverses.com/students/hu-min/paper-p47-d01-a02/",
+    "name": "对题发生——中医传承中被逼出的生成革命",
+    "author": {
+     "@type": "Person",
+     "name": "胡敏"
+    }
+   },
+   {
+    "@type": "ListItem",
+    "position": 33,
+    "url": "https://sdeuniverses.com/students/hu-min/paper-p47-d01-a03/",
+    "name": "复现土：判断离开现场之后，何以再发生",
+    "author": {
+     "@type": "Person",
+     "name": "胡敏"
+    }
+   },
+   {
+    "@type": "ListItem",
+    "position": 34,
+    "url": "https://sdeuniverses.com/students/hu-min/paper-p47-d01-a04/",
+    "name": "技艺的活性如何被自身的守护冷却：一个“护盾热寂”假说",
+    "author": {
+     "@type": "Person",
+     "name": "胡敏"
+    }
+   },
+   {
+    "@type": "ListItem",
+    "position": 35,
+    "url": "https://sdeuniverses.com/students/hu-min/experience-bifurcation/",
+    "name": "经验的两种生成：中医认知的载体分化与AI时代的知识权威重构",
+    "author": {
+     "@type": "Person",
+     "name": "胡敏"
+    }
+   },
+   {
+    "@type": "ListItem",
+    "position": 36,
+    "url": "https://sdeuniverses.com/students/qin-li/institutional-funeral/",
+    "name": "制度殡葬与暗门翻转：新加坡对《黄帝内经》应用的终局诊断",
+    "author": {
+     "@type": "Person",
+     "name": "秦莉"
+    }
+   },
+   {
+    "@type": "ListItem",
+    "position": 37,
+    "url": "https://sdeuniverses.com/students/qin-li/self-locking-loop/",
+    "name": "自锁闭环与能力恢复轨迹：新加坡中医制度化的排斥机制与一种新证据类型的构造",
+    "author": {
+     "@type": "Person",
+     "name": "秦莉"
+    }
+   },
+   {
+    "@type": "ListItem",
+    "position": 38,
+    "url": "https://sdeuniverses.com/students/qin-li/six-gates/",
+    "name": "功能评估的阶梯：新加坡中医药制度演化的六重门径",
+    "author": {
+     "@type": "Person",
+     "name": "秦莉"
+    }
+   },
+   {
+    "@type": "ListItem",
+    "position": 39,
+    "url": "https://sdeuniverses.com/students/qin-li/reverse-production/",
+    "name": "边缘的逆生产：制度化排斥逻辑下功能权威的意外生成",
+    "author": {
+     "@type": "Person",
+     "name": "秦莉"
+    }
+   },
+   {
+    "@type": "ListItem",
+    "position": 40,
+    "url": "https://sdeuniverses.com/students/hu-zhiying/provisioning-of-the-good/",
+    "name": "善的供养：传统饮食知识在现代厨房中的认知闭合",
+    "author": {
+     "@type": "Person",
+     "name": "胡志英"
+    }
+   },
+   {
+    "@type": "ListItem",
+    "position": 41,
+    "url": "https://sdeuniverses.com/students/kong-fanhe/domesticated-body/",
+    "name": "驯体：锻炼作为“修复惯性”的悬搁与身体胜任感的发生",
+    "author": {
+     "@type": "Person",
+     "name": "孔凡鹤"
+    }
+   },
+   {
+    "@type": "ListItem",
+    "position": 42,
+    "url": "https://sdeuniverses.com/students/kong-fanhe/selective-body-genesis/",
+    "name": "当身体不再是一台待修的机器：论锻炼中的“抉择性身体发生”",
+    "author": {
+     "@type": "Person",
+     "name": "孔凡鹤"
+    }
+   },
+   {
+    "@type": "ListItem",
+    "position": 43,
+    "url": "https://sdeuniverses.com/students/kong-fanhe/dark-side-of-repair/",
+    "name": "修复的暗面：锻炼如何蜕变为对感受的慢性剥夺",
+    "author": {
+     "@type": "Person",
+     "name": "孔凡鹤"
+    }
+   },
+   {
+    "@type": "ListItem",
+    "position": 44,
+    "url": "https://sdeuniverses.com/students/kong-fanhe/paper-p30-d01-a01/",
+    "name": "息壤：女性生殖癌变的一种生成机制",
+    "author": {
+     "@type": "Person",
+     "name": "孔凡鹤"
+    }
+   },
+   {
+    "@type": "ListItem",
+    "position": 45,
+    "url": "https://sdeuniverses.com/students/kong-fanhe/paper-p30-d01-a04/",
+    "name": "主权代谢：女性生殖与乳腺病变的一种生成论重释——从外部张力场到内部代谢特区的裁决、增生与耗竭",
+    "author": {
+     "@type": "Person",
+     "name": "孔凡鹤"
+    }
+   },
+   {
+    "@type": "ListItem",
+    "position": 46,
+    "url": "https://sdeuniverses.com/students/zhang-qiong/suspension-is-receptivity/apply-health/",
+    "name": "腾出空间，让身体自己复苏：撤回\"过度施为\"的健康操作手册",
+    "author": {
+     "@type": "Person",
+     "name": "张琼"
+    }
+   },
+   {
+    "@type": "ListItem",
+    "position": 47,
+    "url": "https://sdeuniverses.com/students/zhang-qiong/generative-tolerance/apply-health/",
+    "name": "恢复对\"笨拙摸索\"的容限：拆掉健康评价多面体的操作手册",
+    "author": {
+     "@type": "Person",
+     "name": "张琼"
+    }
+   },
+   {
+    "@type": "ListItem",
+    "position": 48,
+    "url": "https://sdeuniverses.com/students/yang-yong/value-closure/apply-health/",
+    "name": "让一个对自己身体有真正在乎的人诞生：破除\"价值闭合\"的健康操作手册",
+    "author": {
+     "@type": "Person",
+     "name": "阳涌"
+    }
+   },
+   {
+    "@type": "ListItem",
+    "position": 49,
+    "url": "https://sdeuniverses.com/students/putao/constitutive-timing/apply-health/",
+    "name": "让自我照护能力真正长出来：从\"指标达标\"到\"重建构成时序\"的健康操作手册",
+    "author": {
+     "@type": "Person",
+     "name": "葡萄"
+    }
+   },
+   {
+    "@type": "ListItem",
+    "position": 50,
+    "url": "https://sdeuniverses.com/students/chen-xiaoyan/dark-competence/apply-health/",
+    "name": "养护身体的暗能力：守住\"不被评价的时间生态\"的健康操作手册",
+    "author": {
+     "@type": "Person",
+     "name": "陈晓艳"
+    }
+   }
+  ]
+ }
+}
+</script>
 <script>
 function setLang(lang){
   document.body.className=lang;
   document.querySelectorAll('.lang-btn').forEach(b=>b.classList.toggle('active',(b.textContent==='中'&&lang==='zh')||(b.textContent==='EN'&&lang==='en')));
   document.documentElement.lang=lang;
+  if(window.__reapply)window.__reapply();
 }
+(function(){
+  var AU={"hu-min": {"name": "胡敏", "n": 23}, "zhang-qiong": {"name": "张琼", "n": 3}, "qin-li": {"name": "秦莉", "n": 5}, "kong-fanhe": {"name": "孔凡鹤", "n": 12}, "putao": {"name": "葡萄", "n": 2}, "chen-xiaoyan": {"name": "陈晓艳", "n": 3}, "hu-zhiying": {"name": "胡志英", "n": 1}, "yang-yong": {"name": "阳涌", "n": 1}};
+  var arts=[].slice.call(document.querySelectorAll('.art'));
+  var blocks=[].slice.call(document.querySelectorAll('.block'));
+  var cnt=document.getElementById('aucount');
+  var home=document.getElementById('auhome');
+  var cur='all';
+  function apply(au){
+    var n=0;
+    arts.forEach(function(a){
+      var on=(au==='all'||a.dataset.au===au);
+      a.classList.toggle('off',!on); if(on)n++;
+    });
+    blocks.forEach(function(b){
+      b.classList.toggle('off',!b.querySelector('.art:not(.off)'));
+    });
+    var en=document.body.className==='en';
+    cnt.textContent=(au==='all')?'':(en?('Showing '+n+' of 50'):('显示 '+n+' / 50'));
+    if(au==='all'||!AU[au]){ home.hidden=true; home.innerHTML=''; }
+    else { home.hidden=false;
+      home.innerHTML=en
+        ?('Showing <b>'+AU[au].name+'</b> only ('+AU[au].n+' here)　<a href="/students/'+au+'/">All their work in the Student Column →</a>')
+        :('只看 <b>'+AU[au].name+'</b>（本频道 '+AU[au].n+' 篇）　<a href="/students/'+au+'/">看 '+AU[au].name+' 在学员专栏的全部作品 →</a>'); }
+    cur=au;
+  }
+  document.getElementById('chips').addEventListener('click',function(e){
+    var b=e.target.closest('.chip'); if(!b)return;
+    [].slice.call(this.querySelectorAll('.chip')).forEach(function(x){x.classList.toggle('on',x===b);});
+    apply(b.dataset.au);
+  });
+  window.__reapply=function(){apply(cur);};
+  var t=document.getElementById('totop');
+  t.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'});});
+  addEventListener('scroll',function(){t.classList.toggle('show',scrollY>700);},{passive:true});
+})();
 </script>
 </body>
 </html>

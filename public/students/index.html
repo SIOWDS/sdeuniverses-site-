@@ -41,6 +41,16 @@ nav a{color:var(--gold);text-decoration:none;font-size:14px;letter-spacing:0.05e
 .cta a{display:inline-block;margin:6px;padding:12px 28px;border-radius:8px;text-decoration:none;font-size:14.5px;letter-spacing:0.04em}
 .cta .primary{background:var(--gold);color:#1A1410;font-weight:700}
 .cta .ghost{border:1px solid rgba(201,168,76,0.45);color:var(--gold)}
+.chn{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:26px}
+.chn a{display:block;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px 18px;text-decoration:none;transition:border-color .15s,transform .15s}
+.chn a:hover{border-color:rgba(201,168,76,0.6);transform:translateY(-2px)}
+.chn .cl{font-size:10.5px;letter-spacing:0.26em;color:var(--accent);margin-bottom:7px}
+.chn .ct{font-size:16px;color:#F5EFE0;font-weight:700;margin-bottom:5px}
+.chn .cd{font-size:12.8px;color:var(--ink2);line-height:1.72}
+.chn-head{text-align:center;margin-top:44px}
+.chn-head .tag{font-size:12px;letter-spacing:0.34em;color:var(--gold);margin-bottom:8px}
+.chn-head .sub{font-size:14px;color:var(--ink2);line-height:1.85;max-width:640px;margin:0 auto}
+@media(max-width:640px){.chn{grid-template-columns:1fr}}
 footer{border-top:1px solid var(--line);margin-top:40px;padding:30px 24px;text-align:center;color:#6B6250;font-size:13px}
 footer a{color:var(--gold);text-decoration:none}
 </style></head>
@@ -69,6 +79,33 @@ footer a{color:var(--gold);text-decoration:none}
     <div style="font-size:18px;font-weight:700;color:#F5EFE0;line-height:1.4;margin-bottom:6px">从学员理论，落成五大领域实践：教育 · 健康 · 商业 · 艺术 · 科研</div>
     <div style="font-size:13.5px;color:var(--ink2);line-height:1.75">把学员论文里的理论判断，提炼成一线可操作的方法·技术·器具·资源预备，五篇各约5000字、配真实案例。<span style="color:var(--gold)">王德生 + Claude　读三篇 →</span></div>
   </a>
+  <div class="chn-head">
+    <div class="tag zh-only">学 员 作 品 · 进 入 三 大 学 科 专 栏</div>
+    <div class="tag en-only">STUDENT WORK · NOW IN THREE SUBJECT COLUMNS</div>
+    <div class="sub zh-only">学员的文章不再只留在本栏。教育、健康、商业三个学科专栏各开一个「来自学员专栏」频道，每栏精选五十篇、按五组编排，并可按作者筛选。</div>
+    <div class="sub en-only">Student essays no longer stay in this column alone. Education, Health and Business each host a “From the Student Column” channel — fifty pieces apiece, in five sets, filterable by author.</div>
+  </div>
+  <div class="chn">
+    <a href="/education/from-students/">
+      <div class="cl">EDUCATION · 50</div>
+      <div class="ct"><span class="zh-only">教育专栏 · 学员频道</span><span class="en-only">Education · Student Channel</span></div>
+      <div class="cd zh-only">学习如何发生 · 教师的判断与经验 · 评价制度如何反噬教育 · 家庭亲子与青少年 · 大学、AI 与未来的教育</div>
+      <div class="cd en-only">How learning occurs · teachers’ judgement · assessment · family and adolescence · the AI-era university</div>
+    </a>
+    <a href="/health/from-students/">
+      <div class="cl">HEALTH · 50</div>
+      <div class="ct"><span class="zh-only">健康专栏 · 学员频道</span><span class="en-only">Health · Student Channel</span></div>
+      <div class="cd zh-only">身体的主权 · 慢性病照护与临床认知 · 抑郁心理与自我技术 · 中医与另一种医学知识 · 锻炼与五份操作手册</div>
+      <div class="cd en-only">Sovereignty over the body · chronic care · depression · Chinese medicine · exercise and five handbooks</div>
+    </a>
+    <a href="/business/from-students/">
+      <div class="cl">BUSINESS · 50</div>
+      <div class="ct"><span class="zh-only">商业专栏 · 学员频道</span><span class="en-only">Business · Student Channel</span></div>
+      <div class="cd zh-only">AI 时代的经济学 · 组织的病理 · 创业与小微企业 · 消费劳动与财富分化 · 操作手册与治理边界</div>
+      <div class="cd en-only">Economics after cheap generation · organisational pathology · ventures · consumption · handbooks</div>
+    </a>
+  </div>
+
   <div class="roster-head">
     <div class="tag zh-only">首 批 学 员 · 接 龙 报 名 中</div>
     <div class="tag en-only">FIRST COHORT · SIGN-UP IN PROGRESS</div>
