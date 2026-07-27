@@ -30,6 +30,7 @@ PANEL, LINE = "#F1EAD8", "rgba(138,104,23,0.30)"
 KIND = {
     "卫生政策与制度分析 · 金点子四篇": "学术论文",
     "艺术哲学 · 金点子四篇": "学术论文",
+    "爱的生成机制 · 金点子四篇": "学术论文",
     "创作理论 · 美学生成研究": "学术论文",
     "随 笔": "文学作品",
     "诗 选": "文学作品",
@@ -167,6 +168,13 @@ def fix_pubs(items):
     return len(add), en["count"]
 
 
+CN10 = "零一二三四五六七八九十"
+
+
+def cn(n):
+    return CN10[n] if n <= 10 else "十" + CN10[n - 10]
+
+
 def main():
     s, order, items = parse()
     rows = []
@@ -189,7 +197,7 @@ def main():
     block = f"""<div id="{BLOCK}" style="max-width:860px;margin:26px auto 8px;padding:0 24px">
 <div style="border:1px solid {LINE};border-radius:12px;padding:24px 26px 20px;background:{PANEL}">
   <div style="color:{GOLD};letter-spacing:.18em;font-size:13px;margin-bottom:8px">作 品 分 布 · WORKS BY GROUP</div>
-  <p style="font-size:14px;line-height:1.9;margin:0 0 18px;color:{INK}">共 {n_tot} 篇、约 {w_tot:.1f} 万字，分六组：学术论文 {n_paper} 篇，文学作品 {n_lit} 篇（诗、随笔与长篇小说）。本表只统计篇数、占比与体量——诗与随笔不适用为理论论文设计的创新智商量具，故不计分；已评分的论文，其分数仍标在各自条目上。</p>
+  <p style="font-size:14px;line-height:1.9;margin:0 0 18px;color:{INK}">共 {n_tot} 篇、约 {w_tot:.1f} 万字，分{cn(len(rows))}组：学术论文 {n_paper} 篇，文学作品 {n_lit} 篇（诗、随笔与长篇小说）。本表只统计篇数、占比与体量——诗与随笔不适用为理论论文设计的创新智商量具，故不计分；已评分的论文，其分数仍标在各自条目上。</p>
   {table(rows, n_tot, w_tot)}
   <div style="margin-top:26px;padding-top:20px;border-top:1px solid {LINE}">
     <div style="color:{INK2};font-size:12.5px;letter-spacing:.06em;margin-bottom:10px">作 品 分 布 统 计</div>
