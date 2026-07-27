@@ -68,7 +68,7 @@
       "<a class='wdsm-brand' href='/'>SDE UNIVERSES</a>" +
       "<div class='wdsm-tabs'><button class='wdsm-tab' data-m='normal'>常规</button><button class='wdsm-tab sel' data-m='wds'>✦ WDS 助手</button></div>" +
       "<div class='wdsm-top-sp'></div><span class='wdsm-turns' id='wdsmTurns'>本场剩余 100 次</span>" +
-      "<button class='wdsm-keybtn' style='background:none;border:1px solid rgba(212,178,94,.4);color:#D4B25E;font:13px/1 inherit;padding:7px 11px;border-radius:8px;cursor:pointer;margin-right:8px'>⚙ Key</button><button class='wdsm-newbtn'>＋ 新对话</button>" +
+      "<button class='wdsm-histbtn' title='本机对话记录' style='display:none;background:none;border:1px solid rgba(212,178,94,.4);color:#D4B25E;font:13px/1 inherit;padding:7px 11px;border-radius:8px;cursor:pointer;margin-right:8px'>↺ 历史</button><button class='wdsm-keybtn' style='background:none;border:1px solid rgba(212,178,94,.4);color:#D4B25E;font:13px/1 inherit;padding:7px 11px;border-radius:8px;cursor:pointer;margin-right:8px'>⚙ Key</button><button class='wdsm-newbtn'>＋ 新对话</button>" +
     "</div>" +
     "<div class='wdsm-body empty'>" +
       "<div class='wdsm-hero'>" +
@@ -90,6 +90,27 @@
   var inEl = layer.querySelector(".wdsm-in");
   var sendEl = layer.querySelector(".wdsm-send");
   var history = [], streaming = false;
+
+  // —— 本机对话记录（IndexedDB，见 /assets/wds-store.js）——
+  var stApi = null, stSess = null, stBooting = false;
+  function stMakeSession() {
+    if (!stApi) return;
+    stSess = stApi.session({ agent: "wds-chat", scope: "", scopeLabel: "" });
+  }
+  function stBoot() {
+    if (stApi !== null || stBooting) return;
+    stBooting = true;
+    function go() {
+      if (!window.WDSStore) { stApi = false; return; }
+      window.WDSStore.load(function (a) { stApi = a || false; if (stApi) { stMakeSession(); stShowBtn(); } });
+    }
+    if (window.WDSStore) { go(); return; }
+    var sc = document.createElement("script");
+    sc.src = "/assets/wds-store.js"; sc.async = true;
+    sc.onload = go; sc.onerror = function () { stApi = false; };
+    document.head.appendChild(sc);
+  }
+  function stSave(h) { if (stSess && h && h.length) stSess.save(h); }
   var MAX = 100, turnsEl = layer.querySelector(".wdsm-turns");
   var dayLeft = null;   // 服务端回传的"今日本机剩余次数"（与本场轮次是两回事）
   function turns() { var n = 0; for (var i = 0; i < history.length; i++) if (history[i].role === "reader") n++; return n; }
@@ -108,7 +129,7 @@
   var EG = ["SDE 说的“显露”和“结构”有什么不同？", "用 SDE 怎么看慢性病的发生？", "什么是特征纠缠？举个例子", "帮我找几篇入门 SDE 的文章"];
   EG.forEach(function (q) { var b = el("button", "wdsm-eg", q); b.onclick = function () { inEl.value = q; send(); }; egsEl.appendChild(b); });
 
-  function open() { layer.classList.add("on"); document.documentElement.classList.add("wdsm-open"); setTimeout(function () { inEl.focus(); }, 80); }
+  function open() { stBoot(); layer.classList.add("on"); document.documentElement.classList.add("wdsm-open"); setTimeout(function () { inEl.focus(); }, 80); }
   function leave() { if (window.history.length > 1) { window.history.back(); } else { window.location.href = "/"; } }
   function close() { if (PAGE) { leave(); return; } layer.classList.remove("on"); document.documentElement.classList.remove("wdsm-open"); }
   window.wdsMode = function (on) { on === false ? close() : (PAGE ? open() : (window.location.href = PAGE_URL)); };
@@ -120,7 +141,7 @@
   });
   layer.querySelector(".wdsm-keybtn").onclick = function () { wdsKeyPanel(function () {}); };
   layer.querySelector(".wdsm-newbtn").onclick = function () {
-    history = []; msgsEl.innerHTML = ""; msgsEl.style.display = "none"; bodyEl.classList.add("empty");
+    history = []; if (stSess) stSess.reset(); msgsEl.innerHTML = ""; msgsEl.style.display = "none"; bodyEl.classList.add("empty");
     inEl.disabled = false; sendEl.disabled = false; inEl.placeholder = "问 WDS 任何 SDE 问题，或让它帮你找站里读什么…"; updTurns();   // dayLeft 不复位：今日额度按本机计，重开对话不会回满
     layer.querySelector(".wdsm-hero").style.display = ""; inEl.value = ""; inEl.focus();
   };
@@ -153,6 +174,26 @@
 
   inEl.addEventListener("input", function () { inEl.style.height = "auto"; inEl.style.height = Math.min(inEl.scrollHeight, 160) + "px"; });
 
+  function stShowBtn() {
+    var b = layer.querySelector(".wdsm-histbtn"); if (!b) return;
+    b.style.display = "";
+    b.onclick = function () {
+      if (!stApi) return;
+      stApi.openPanel({ agent: "wds-chat", theme: "dark", onRestore: stRestore });
+    };
+  }
+  function stRestore(rec) {
+    history = []; msgsEl.innerHTML = "";
+    var a = null;
+    (rec.turns || []).forEach(function (t) {
+      if (!t || !t.text) return;
+      if (t.role === "reader") { a = addTurn(t.text); a.textContent = ""; history.push({ role: "reader", text: t.text }); }
+      else { if (a) a.textContent = t.text; history.push({ role: "wds", text: t.text }); }
+    });
+    if (stSess) stSess.adopt(rec);
+    inEl.disabled = false; sendEl.disabled = false; updTurns();
+    bodyEl.scrollTop = bodyEl.scrollHeight;
+  }
   function addTurn(q) {
     bodyEl.classList.remove("empty");
     layer.querySelector(".wdsm-hero").style.display = "none";
@@ -203,7 +244,7 @@
     inEl.value = ""; inEl.style.height = "auto";
     var a = addTurn(q);
     a.innerHTML = "<span class='cur'>▊</span>";
-    history.push({ role: "reader", text: q }); updTurns();
+    history.push({ role: "reader", text: q }); updTurns(); stSave(history);
     streaming = true; sendEl.disabled = true;
     var payload = { q: q, history: history.slice(-4), key: kv.key, vendor: kv.vendor };
     var answer = "", statusShown = false, srcBox = null;
@@ -218,7 +259,7 @@
         function finish() {
           clearTimeout(wd);
           if (timedOut && !answer) { a.className = "wdsm-a wdsm-err"; a.textContent = "连接像是断了（也许想太久被中间层切了）。稍后再问，你这句我记着。"; }
-          else if (answer) { a.textContent = answer; history.push({ role: "wds", text: answer }); }
+          else if (answer) { a.textContent = answer; history.push({ role: "wds", text: answer }); stSave(history); }
           streaming = false; sendEl.disabled = false; bodyEl.scrollTop = bodyEl.scrollHeight;
         }
         function pump() {

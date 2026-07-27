@@ -102,7 +102,7 @@
   var panel = el("div", "wdsr-panel");
   panel.innerHTML =
     "<div class='wdsr-head'><div class='wdsr-title'><span class='wdsr-dot'></span>" + (CFG.panelTitle || "WDS 助手") + "</div>" +
-    "<div class='wdsr-sub'>" + (CFG.subLabel || "陪你读，不替你读") + "</div>" + "<button class='wdsr-keybtn' title='设置 API Key' style='position:absolute;right:44px;top:15px;background:none;border:none;color:#7C8798;font-size:15px;cursor:pointer;padding:0'>⚙</button><button class='wdsr-close' aria-label='关闭'>\u00d7</button></div>" +
+    "<div class='wdsr-sub'>" + (CFG.subLabel || "陪你读，不替你读") + "</div>" + "<button class='wdsr-histbtn' title='本机对话记录' style='display:none;position:absolute;right:72px;top:15px;background:none;border:none;color:#7C8798;font-size:15px;cursor:pointer;padding:0'>↺</button><button class='wdsr-keybtn' title='设置 API Key' style='position:absolute;right:44px;top:15px;background:none;border:none;color:#7C8798;font-size:15px;cursor:pointer;padding:0'>⚙</button><button class='wdsr-close' aria-label='关闭'>\u00d7</button></div>" +
     "<div class='wdsr-tools'><button class='wdsr-tool wdsr-sum' disabled>\u603b\u7ed3\u8fd9\u573a\u5bf9\u8bdd</button><button class='wdsr-tool wdsr-pap' disabled>" + (CFG.paperLabel || "\u751f\u6210 5000 \u5b57\u8bba\u6587") + "</button></div>" +
     "<div class='wdsr-msgs'></div>" +
     "<div class='wdsr-focuswrap'></div>" +
@@ -114,6 +114,47 @@
 
   var msgsEl = q1(".wdsr-msgs", panel), inputEl = q1(".wdsr-input", panel), sendEl = q1(".wdsr-send", panel), focusWrap = q1(".wdsr-focuswrap", panel);
   var history = [], focusSeg = "", streaming = false, busy = false;
+
+  // —— 本机对话记录（IndexedDB，见 /assets/wds-store.js）——
+  var stApi = null, stSess = null, stBooting = false;
+  function stMakeSession() {
+    if (!stApi) return;
+    stSess = stApi.session({ agent: "wds-read", scope: location.pathname, scopeLabel: (docTitle() || document.title || "").slice(0, 40) });
+  }
+  function stBoot() {
+    if (stApi !== null || stBooting) return;
+    stBooting = true;
+    function go() {
+      if (!window.WDSStore) { stApi = false; return; }
+      window.WDSStore.load(function (a) { stApi = a || false; if (stApi) { stMakeSession(); stShowBtn(); } });
+    }
+    if (window.WDSStore) { go(); return; }
+    var sc = document.createElement("script");
+    sc.src = "/assets/wds-store.js"; sc.async = true;
+    sc.onload = go; sc.onerror = function () { stApi = false; };
+    document.head.appendChild(sc);
+  }
+  function stSave(h) { if (stSess && h && h.length) stSess.save(h); }
+
+  function stShowBtn() {
+    var b = q1(".wdsr-histbtn", panel); if (!b) return;
+    b.style.display = "";
+    b.onclick = function () {
+      if (!stApi) return;
+      stApi.openPanel({ agent: "wds-read", theme: "dark", onRestore: stRestore });
+    };
+  }
+  function stRestore(rec) {
+    history = []; msgsEl.innerHTML = "";
+    (rec.turns || []).forEach(function (t) {
+      if (!t || !t.text) return;
+      addMsg(t.role === "reader" ? "reader" : "wds", t.text);
+      history.push({ role: t.role, text: t.text });
+    });
+    if (stSess) stSess.adopt(rec);
+    paintState();
+    msgsEl.scrollTop = msgsEl.scrollHeight;
+  }
   var MAX_TURNS = 100;
   var subEl = q1(".wdsr-sub", panel), sumBtn = q1(".wdsr-sum", panel), papBtn = q1(".wdsr-pap", panel);
   function turns() { var n = 0; for (var i = 0; i < history.length; i++) if (history[i].role === "reader") n++; return n; }
@@ -128,7 +169,7 @@
 
   function openPanel() { panel.classList.add("wdsr-open"); fab.style.display = "none"; setTimeout(function () { inputEl.focus(); }, 60); }
   function closePanel() { panel.classList.remove("wdsr-open"); fab.style.display = ""; }
-  fab.onclick = openPanel; q1(".wdsr-close", panel).onclick = closePanel;
+  fab.onclick = function () { stBoot(); openPanel(); }; q1(".wdsr-close", panel).onclick = closePanel;
   if (CFG.auto) { setTimeout(openPanel, 250); }
   q1(".wdsr-keybtn", panel).onclick = function () { wdsKeyPanel(function () {}); };
 
@@ -204,6 +245,7 @@
     if (turns() >= MAX_TURNS) { paintState(); return; }
     addMsg("reader", q, seg || null);
     history.push({ role: "reader", text: q });
+    stSave(history);
     paintState();
     var bubble = addMsg("wds", ""); bubble.classList.add("wdsr-streaming");
     streaming = true; sendEl.disabled = true;
@@ -218,7 +260,7 @@
         var reader = resp.body.getReader(), dec = new TextDecoder(), buf = "", answer = "", statusShown = false;
         function finish() {
           bubble.classList.remove("wdsr-streaming");
-          if (answer) history.push({ role: "wds", text: answer });
+          if (answer) { history.push({ role: "wds", text: answer }); stSave(history); }
           streaming = false; sendEl.disabled = false; paintState();
         }
         function pump() {
