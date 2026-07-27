@@ -2,7 +2,7 @@
 <html lang="zh-CN"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>高于涵 · 学员专栏 | SDE Universes</title>
-<meta name="description" content="高于涵 · SDE 学员专栏 · Students' Column, SDE Universes">
+<meta name="description" content="高于涵 · SDE 学员 · Students' Column, SDE Universes">
 <style>
 :root{--gold:#C9A84C;--gold2:#D4B25E;--ink:#F0E9D8;--ink2:#B8AE96;--bg:#0E0B08;--panel:#171310;--panel2:#1C1712;--line:rgba(201,168,76,0.22);--accent:#8C6A2E}
 *{margin:0;padding:0;box-sizing:border-box}
@@ -38,42 +38,84 @@ nav a{color:var(--gold);text-decoration:none;font-size:14px;letter-spacing:0.05e
 footer{border-top:1px solid var(--line);margin-top:24px;padding:30px 24px;text-align:center;color:#6B6250;font-size:13px}
 footer a{color:var(--gold);text-decoration:none}
 @media(max-width:640px){.profile{justify-content:center;text-align:center}.p-info{text-align:center}}
-</style></head>
-<body class="zh">
+</style>
+<style id="ambient-field">
+body{background:radial-gradient(1250px 820px at 6% -12%, rgba(202,132,102,0.170), transparent 62%),radial-gradient(1050px 900px at 112% 8%, rgba(212,152,132,0.130), transparent 58%),radial-gradient(1200px 1050px at 50% 118%, rgba(202,132,102,0.100), transparent 60%),var(--bg, var(--paper, #0E0B08)) !important;background-attachment:fixed !important}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:9998;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");background-size:160px 160px;opacity:0.055;mix-blend-mode:soft-light}
+</style>
+</head>
+<body class="zh" data-student-slug="gao-yuhan">
 <nav><div class="w">
   <a href="/">SDE Universes</a>
   <div class="nav-right">
     <a href="/students/"><span class="zh-only">← 学员专栏</span><span class="en-only">← Students</span></a>
     <div class="lang-toggle"><button class="lang-btn active" onclick="setLang('zh')">中</button><button class="lang-btn" onclick="setLang('en')">EN</button></div>
   </div>
-</div></nav>
+</div></nav><div class="sde-count-badge" style="text-align:center;color:#8a6817;font-size:13px;letter-spacing:.12em;margin:10px auto">已发表 <b data-publication-count>40</b> 篇</div>
 
 <div class="level-tag" style="padding-top:40px">
   <span class="n">01</span><span class="t zh-only">学 员 介 绍 · PROFILE</span><span class="t en-only">PROFILE</span><span class="line"></span>
 </div>
 <div class="profile">
-  <div class="avatar">高<span class="ph zh-only">照片待补</span><span class="ph en-only">photo TBA</span></div>
+  <div class="avatar">高</div>
   <div class="p-info">
     <h1>高于涵</h1>
-    
     <div class="role zh-only">SDE 学员</div>
     <div class="role en-only">SDE TRAINEE</div>
-    <p class="bio zh-only">个人简介待补 —— 照片与简介陆续补充。</p>
-    <p class="bio en-only">Bio coming soon — photo and introduction to be added.</p>
+    <p class="bio zh-only">高于涵 · SDE 学员。首批四篇同问一个原初问题：什么是董仲舒的“未善论”。四篇沿同一条线索推进——把“性如禾、善如米”这句定义读作一次工序装配，然后逐层追问它减掉了什么：被擦掉的守望姿势（善，在未完成中）、断裂处自我催生的第三种道德（隙生之德）、接收端被切除的解码能力（回路的断裂），以及这台机器持续产出的不是善而是“未善”（未善的代价）。四篇共用同一个撤销动作：把“善需要被加工到位”换成“加工权本身取消了你作为判断者的资格”。</p>
+    <p class="bio en-only">Gao Yuhan · SDE trainee. A first set of four papers on Dong Zhongshu's doctrine that human nature is "not yet good." Each reads the canonical simile — nature is the grain, goodness the milled rice — as the assembly of a procedure, then asks what the assembly subtracted: the stance of watching, moral genesis in the rupture, the severed circuit at the receiving end, and a machine whose real output is not goodness but its perpetual deferral.</p>
   </div>
 </div>
 
-<div class="level-tag" style="margin-top:36px">
-  <span class="n">02</span><span class="t zh-only">作 品 与 专 栏 · WORKS</span><span class="t en-only">WORKS &amp; COLUMNS</span><span class="line"></span>
+<div class="level-tag">
+  <span class="n">02</span><span class="t zh-only">最 新 作 品 · LATEST WORKS</span><span class="t en-only">LATEST WORKS</span><span class="line"></span>
 </div>
 <div class="works">
-  <div class="panel">
-    <div class="tag zh-only">作 品 陆 续 上 线</div>
-    <div class="tag en-only">WORKS COMING SOON</div>
-    <p class="zh-only">借一双「事物如何发生」的眼，在自己的领域里落笔——把 SDE 作为隐性的引擎，用本行的母语写作。作品通过合宪性审读后，将署名发表于此。</p>
-    <p class="en-only">Borrowing an eye trained on how things come to be, and writing in the native idiom of one’s own field — with SDE as a hidden engine. Once a piece passes its constitutionality review, it will be published here under this name.</p>
-  </div>
-  <div class="back"><a href="/students/"><span class="zh-only">← 返回学员专栏名单</span><span class="en-only">← Back to the students roster</span></a></div>
+    <div class="work">
+      <span class="chip">之四 · 政治哲学与中国思想史</span>
+      <h2><a href="/students/gao-yuhan/goodness-as-process/" style="color:inherit;text-decoration:none">未善的代价：当“成为好人”变成一道工序</a></h2>
+      <p class="hook">董仲舒把善做成一道必须由唯一工位执行的工序，靠三道锁焊死：说法锁定义权、道理锁解释权、谱系锁更替权。本文论证这台机器的真正产物不是善而是“未善”——它把完整的人定义为“原料”，从而取消了个体作为善之认证者的资格。取消资格与遗漏不同：遗漏可以靠改进工序来补，取消资格不能——工序越精密，资格被窃取得越彻底。</p>
+      <div class="meta">约 2.6 万字 · 13 页 · 发表于2026年7月27日</div>
+      <div class="modes">
+        <a class="m primary" href="/students/gao-yuhan/goodness-as-process/">📖 长文阅读</a>
+        <a class="m ghost" href="/students/gao-yuhan/goodness-as-process/read.html">📄 在线 PDF</a>
+        <a class="m ghost" href="/students/gao-yuhan/goodness-as-process/goodness-as-process.pdf" download>⬇ 下载 PDF</a>
+      </div>
+    </div>
+    <div class="work">
+      <span class="chip">之三 · 中国思想史与制度分析</span>
+      <h2><a href="/students/gao-yuhan/severed-circuit/" style="color:inherit;text-decoration:none">道德程序的装配与感知回路的切除</a></h2>
+      <p class="hook">帝国道德程序为了可公度化，在装配时做了一次减法：切断善与内在证言的联系、用宇宙论密封被教化者的发声位、用禾—米之喻抹除加工的不可逆代价、用反求诸己把剩余痛感引流回自噬。本文把感知拆为产生、传输、解码三层，论证断裂只发生在解码层——因而你无法通过改良通道来治愈失明。</p>
+      <div class="meta">约 2.7 万字 · 14 页 · 发表于2026年7月27日</div>
+      <div class="modes">
+        <a class="m primary" href="/students/gao-yuhan/severed-circuit/">📖 长文阅读</a>
+        <a class="m ghost" href="/students/gao-yuhan/severed-circuit/read.html">📄 在线 PDF</a>
+        <a class="m ghost" href="/students/gao-yuhan/severed-circuit/severed-circuit.pdf" download>⬇ 下载 PDF</a>
+      </div>
+    </div>
+    <div class="work">
+      <span class="chip">之二 · 中国思想史与伦理学</span>
+      <h2><a href="/students/gao-yuhan/moral-genesis-in-the-gap/" style="color:inherit;text-decoration:none">隙生之德：在教化断裂处被逼出的另一种道德</a></h2>
+      <p class="hook">当顶端的操作者失效、整个教化链条从源头断裂时，善的发生是否只能陷入虚无？本文以明清之际方以智为深描案例，逼出隙生之德的三个结构性条件：断裂的清醒识别、碎片的亲身拼合、苦难逼出的不可绕行决断。最锋利的一刀落在：方以智的剃度在气节传统内部恰恰会被判为“失节”——守与生不是程度之别，是动词之别。</p>
+      <div class="meta">约 2.4 万字 · 13 页 · 发表于2026年7月27日</div>
+      <div class="modes">
+        <a class="m primary" href="/students/gao-yuhan/moral-genesis-in-the-gap/">📖 长文阅读</a>
+        <a class="m ghost" href="/students/gao-yuhan/moral-genesis-in-the-gap/read.html">📄 在线 PDF</a>
+        <a class="m ghost" href="/students/gao-yuhan/moral-genesis-in-the-gap/moral-genesis-in-the-gap.pdf" download>⬇ 下载 PDF</a>
+      </div>
+    </div>
+    <div class="work">
+      <span class="chip">之一 · 中国思想史与伦理学</span>
+      <h2><a href="/students/gao-yuhan/the-watching-stance/" style="color:inherit;text-decoration:none">善，在未完成中——董仲舒“性未善”的重判</a></h2>
+      <p class="hook">从董仲舒每擦掉一笔旧的可能，那个被擦掉之物的轮廓就清晰一分。三道凹痕拼在一起，呈现出同一个形状：一种不预设终点却承担全部照护责任的共在姿势。本文将其命名为“守望”，并论证它不是无为、不是消极自由、不是消极教育、不是牧领权力、也不是本真操持——它的要害在于保持被守望者在共在中的未知性。</p>
+      <div class="meta">约 1.6 万字 · 10 页 · 发表于2026年7月27日</div>
+      <div class="modes">
+        <a class="m primary" href="/students/gao-yuhan/the-watching-stance/">📖 长文阅读</a>
+        <a class="m ghost" href="/students/gao-yuhan/the-watching-stance/read.html">📄 在线 PDF</a>
+        <a class="m ghost" href="/students/gao-yuhan/the-watching-stance/the-watching-stance.pdf" download>⬇ 下载 PDF</a>
+      </div>
+    </div>
+  <div class="back"><a href="/students/gao-yuhan/works/">查看全部 4 篇作品 →</a></div>
 </div>
 
 <footer>
@@ -88,4 +130,6 @@ function setLang(l){document.body.className=l;document.querySelectorAll('.lang-b
 <script src="/taste/wds-companion/wds-read.js" defer></script>
 
 <script src="/wds-mode.js" defer></script>
+
+<script src="/students/publication-list.js?v=20260724-3" defer></script>
 </body></html>
