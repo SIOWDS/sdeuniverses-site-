@@ -129,6 +129,7 @@ footer{border-top:1px solid var(--border);text-align:center;padding:30px 20px 44
 .privacy-note b{color:var(--gold)}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js"></script>
+<script src="/assets/wds-savedir.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script src="/taste/assets/sde-rag.js?v=4"></script>
@@ -520,6 +521,13 @@ footer{border-top:1px solid var(--border);text-align:center;padding:30px 20px 44
 
 </div>
 
+<!-- 存储位置：四批「四篇」的 Word 都存到这里选定的文件夹 -->
+<div id="saveDirBar" style="max-width:1200px;margin:18px auto 0;text-align:center;font-size:12.5px;color:#9AA5B0;line-height:1.8">
+  <span>📁 存储位置：<b id="saveDirName" style="color:#C9A227">默认下载目录</b></span>
+  <button id="saveDirPick" style="margin-left:10px;background:none;border:1px solid rgba(201,162,39,.5);color:#C9A227;border-radius:7px;padding:5px 12px;font:12.5px inherit;cursor:pointer">选择文件夹</button>
+  <button id="saveDirClear" style="margin-left:6px;background:none;border:1px solid rgba(255,255,255,.18);color:#8B98A5;border-radius:7px;padding:5px 12px;font:12.5px inherit;cursor:pointer;display:none">改回下载目录</button>
+  <div id="saveDirNote" style="font-size:11.5px;color:#6b7684;margin-top:5px"></div>
+</div>
 <div id="downloadRow" style="max-width:1200px;margin:20px auto 0;text-align:center;display:none">
   <button id="emergeBtn" style="background:linear-gradient(135deg,#C9A227,#E5C86E);color:#1a1205;font-weight:700;font-size:15px;border:none;border-radius:9px;padding:13px 30px;cursor:pointer;letter-spacing:0.03em;margin-right:12px;box-shadow:0 4px 16px rgba(201,162,39,0.3)">
     ⚗ 二阶涌现 · 把三个金点子撞成新典范
@@ -2715,12 +2723,65 @@ function saveWordDocx(title, subtitle, blocks, filename){
     if(b.md) children.push(...mdParas(b.md, { size:24, color:'222222', titleFirst:!!b.titleFirst, titleSize:32, autoHeading:true, justify:false }));
   });
   const doc = new Document({ sections:[{ properties:{}, children }] });
+  // 先抢在用户手势还没过期时把目录要到手——打包是异步的，等它完了再弹选择器会被浏览器拒掉。
+  // 已选过就直接复用（必要时续权），没选过且浏览器支持就弹一次；用户取消＝照常下载。
+  const dirP = (window.WDSSaveDir && window.WDSSaveDir.supported())
+    ? window.WDSSaveDir.ensure({ id:'sde-idea-papers' }).catch(()=>null)
+    : Promise.resolve(null);
   Packer.toBlob(doc).then(blob=>{
-    const url=URL.createObjectURL(blob); const a=document.createElement('a');
-    a.href=url; a.download=filename; document.body.appendChild(a); a.click();
-    document.body.removeChild(a); URL.revokeObjectURL(url);
+    return dirP.then(()=> (window.WDSSaveDir ? window.WDSSaveDir.save(filename, blob) : null))
+      .then(r=>{
+        if(r) { sdSaved(r); return; }
+        const url=URL.createObjectURL(blob); const a=document.createElement('a');
+        a.href=url; a.download=filename; document.body.appendChild(a); a.click();
+        document.body.removeChild(a); URL.revokeObjectURL(url);
+      });
   }).catch(e=>{ alert('生成Word失败：'+e.message); });
 }
+
+/* ===== 存储位置：四批「四篇」的 Word 存到用户自己选的文件夹 =====
+   浏览器默认只会丢进下载目录，几十篇混在杂物里事后还得手工归档。
+   只有 Chromium 系支持选目录；Firefox/Safari 一律如实说明并回退下载，不假装都行。 */
+function sdPaint(){
+  const nm = document.getElementById('saveDirName');
+  const clr = document.getElementById('saveDirClear');
+  const note = document.getElementById('saveDirNote');
+  const pick = document.getElementById('saveDirPick');
+  if(!nm) return;
+  const S = window.WDSSaveDir;
+  if(!S || !S.supported()){
+    nm.textContent = '默认下载目录';
+    if(pick) pick.style.display = 'none';
+    if(clr) clr.style.display = 'none';
+    if(note) note.textContent = '你的浏览器不支持选择文件夹（这是 Chrome / Edge 才有的能力），四篇会照常下载到默认下载目录。';
+    return;
+  }
+  const cur = S.name();
+  nm.textContent = cur || '默认下载目录';
+  if(clr) clr.style.display = cur ? '' : 'none';
+  if(pick) pick.textContent = cur ? '更换文件夹' : '选择文件夹';
+  if(note) note.textContent = cur
+    ? '四批「四篇」的 Word 都会直接写进这个文件夹。重开页面后第一次写入，浏览器会再问你要一次授权——这是它的规矩，绕不过。'
+    : '还没选。现在选一个，四批「四篇」的 Word 就直接写进去，不必再从下载目录里翻。';
+}
+function sdSaved(r){
+  const note = document.getElementById('saveDirNote');
+  if(!note) return;
+  note.textContent = r.where === 'dir' ? ('已写入「' + r.dir + '」：' + r.name) : ('已下载到默认下载目录：' + r.name);
+}
+(function(){
+  const pick = document.getElementById('saveDirPick');
+  const clr = document.getElementById('saveDirClear');
+  if(pick) pick.addEventListener('click', ()=>{
+    if(!window.WDSSaveDir || !window.WDSSaveDir.supported()) return;
+    window.WDSSaveDir.ensure({ id:'sde-idea-papers', repick:true }).then(sdPaint);
+  });
+  if(clr) clr.addEventListener('click', ()=>{
+    if(!window.WDSSaveDir) return;
+    window.WDSSaveDir.forget().then(sdPaint);
+  });
+  if(window.WDSSaveDir) window.WDSSaveDir.onChange(sdPaint); else sdPaint();
+})();
 
 
 // ===== Markdown 统一渲染：把 LLM 输出的 Markdown 记号转成 Word 真正的格式（而非原样漏出）=====
@@ -3373,7 +3434,7 @@ if(autoRunBtn){
       // 本地模式：点击手势内弹出文件夹选择器
       let dirHandle=null;
       if(osDest==='local' && window.showDirectoryPicker){
-        try{ dirHandle = await window.showDirectoryPicker({mode:'readwrite'}); }
+        try{ dirHandle = (window.WDSSaveDir ? await window.WDSSaveDir.ensure({ id:'sde-idea-papers' }) : null) || await window.showDirectoryPicker({mode:'readwrite'}); }
         catch(e){ setS('✗ 未选择文件夹，已取消。'); return; }
       }
 
@@ -3534,7 +3595,7 @@ if(autoRunBtn){
       // 本地模式：run 按钮点击本身即用户手势，此处即可弹出文件夹选择器
       let dirHandle=null;
       if(osbDest==='local' && window.showDirectoryPicker){
-        try{ dirHandle = await window.showDirectoryPicker({mode:'readwrite'}); }
+        try{ dirHandle = (window.WDSSaveDir ? await window.WDSSaveDir.ensure({ id:'sde-idea-papers' }) : null) || await window.showDirectoryPicker({mode:'readwrite'}); }
         catch(e){ setMsg('✗ 未选择文件夹，已取消。'); return; }
       }
       const N = questions.length;
@@ -3708,6 +3769,7 @@ if(emergeDlBtn){
     ];
     const doc = new Document({sections:[{children:kids}]});
     Packer.toBlob(doc).then(blob=>{
+      if(window.WDSSaveDir){ window.WDSSaveDir.save('二阶涌现_新典范.docx', blob).then(sdSaved); return; }
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url; a.download = '二阶涌现_新典范.docx'; a.click();
