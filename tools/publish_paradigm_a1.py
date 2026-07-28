@@ -29,6 +29,34 @@ AUTHOR = "Claude"
 
 PAPERS = [
     {
+        "src": "A2", "no": 8, "slug": "suspended-time",
+        "title": "挂着：为什么最耗人的不是走投无路，而是永远还能再等一次",
+        "subtitle": "一段没有答案的时间是养料还是消耗，不看它多长、不看你多难受，只看它有没有一个非到不可的头",
+        "hook": "被宽限了八个月的博士生什么也没想出来；被锁死档案的高中生在一个下午里想通了一件事；"
+                "考研第三年的人焦虑最深、产出最少。三段时间的命运不由长短决定，也不由痛苦决定。"
+                "本文命名「挂起」——判决权被交给一个永不到场的「以后」、没有不能再推的到期日、"
+                "而希望持续被续发的那种时间，并给出判决权三问、三种时间的分野、"
+                "现代制度如何由两组好人各做一半把前两种转化为第三种，以及五条对抗纪律。",
+        "sources": [
+            {"t": "认知的禁食：AI 时代课程功能的重释",
+             "u": "/students/yang-yong/cognitive-fasting/",
+             "d": "课程理论 · 空白要被刻意守住",
+             "who": "阳涌", "who_url": "/students/yang-yong/"},
+            {"t": "受迫生成：在被剥夺了等待权的世界里，因果何以被逼出",
+             "u": "/students/hu-zhiying/forced-causation/",
+             "d": "认知科学 · 被恩许的空白什么也不长",
+             "who": "胡志英", "who_url": "/students/hu-zhiying/"},
+            {"t": "悬置的闸口：中国高等教育扩张中的延迟认证与多系统借时",
+             "u": "/students/putao/deferred-credentialing/",
+             "d": "高等教育社会学 · 空白正被批量生产",
+             "who": "葡萄", "who_url": "/students/putao/"},
+        ],
+        "collide": "三篇正面打架：一篇要保护那段没有答案的时间，一篇说被保护的那种恰恰什么也长不出来，"
+                   "一篇说整个社会正在批量生产的就是被保护的那一种。同一套制度性质，"
+                   "一篇当它是底座，一篇当它是牢笼。九个判断两两相撞三十六次，"
+                   "撞出的是三篇里谁都没有说过的第三样东西。",
+    },
+    {
         "src": "A1", "no": 1, "slug": "condition-stripping",
         "title": "抽条：当可计量的结果开始吃掉不可计量的条件",
         "subtitle": "抽掉承重钢筋而把外观抹平——楼没塌，验收全过，直到某一天它一次性地塌完",
@@ -150,18 +178,31 @@ def parse(paper, lines):
 
 
 def esc(t):
-    return html.escape(t)
+    """转义后把 **粗体** 渲染出来；行首的引用号 > 去掉。"""
+    t = re.sub(r"^[>＞]\s*", "", t)
+    out = html.escape(t)
+    if out.count("**") >= 2:
+        out = re.sub(r"\*\*(.+?)\*\*", r"<strong>\1</strong>", out)
+    return out.replace("**", "")
 
 
 def src_list_html(paper):
-    items = "".join(
-        f'<li><a href="{s["u"]}">{esc(s["t"])}</a><span>{esc(s["d"])}</span></li>'
-        for s in paper["sources"])
-    return (
-        '<div class="srcbox"><span class="lb">本文由三篇碰撞而成</span>'
-        f'<p class="note">三篇均出自学员专栏 · <a href="{paper["author_of_sources_url"]}" '
-        f'style="color:var(--indigo)">{esc(paper["author_of_sources"])}</a>。{esc(paper["collide"])}</p>'
-        f"<ol>{items}</ol></div>")
+    items = ""
+    for s in paper["sources"]:
+        who = ""
+        if s.get("who"):
+            who = (f'　—　<a href="{s["who_url"]}">{esc(s["who"])}</a>'
+                   if s.get("who_url") else "　—　" + esc(s["who"]))
+        items += (f'<li><a href="{s["u"]}">{esc(s["t"])}</a>'
+                  f'<span>{esc(s["d"])}{who}</span></li>')
+    if paper.get("author_of_sources"):
+        head = (f'三篇均出自学员专栏 · <a href="{paper["author_of_sources_url"]}" '
+                f'style="color:var(--indigo)">{esc(paper["author_of_sources"])}</a>。')
+    else:
+        head = "三篇分属三位学员、三个领域，均出自<a href=\"/students/\" style=\"color:var(--indigo)\">学员专栏</a>。"
+    return ('<div class="srcbox"><span class="lb">本文由三篇碰撞而成</span>'
+            f'<p class="note">{head}{esc(paper["collide"])}</p>'
+            f"<ol>{items}</ol></div>")
 
 
 def render_page(paper, abstract, keywords, blocks):
@@ -209,13 +250,15 @@ def render_page(paper, abstract, keywords, blocks):
 
 def render_print(paper, abstract, keywords, blocks):
     body = "".join(f"<{tag}>{esc(line)}</{tag}>" for tag, line in blocks)
-    srcs = "　·　".join(esc(s["t"].split("：")[0].split("——")[0]) for s in paper["sources"])
+    srcs = "　·　".join(esc(s["t"].split("：")[0].split("——")[0])
+                       + ("（" + esc(s["who"]) + "）" if s.get("who") else "")
+                       for s in paper["sources"])
     return f"""<!doctype html><html lang="zh-CN"><head><meta charset="utf-8">
 <style>{PRINT_CSS}</style></head><body>
 <div class="cover"><div class="eyebrow">典 范 文 专 栏 · 之{paper["no"]}</div>
 <h1>{esc(paper["title"])}</h1><div class="sub">{esc(paper["subtitle"])}</div>
 <div class="by">作者 <b>{AUTHOR}</b> · 约 {paper["wan"]} 万字 · 发表于{PUBDATE_CN} · sdeuniverses.com</div></div>
-<div class="src"><b>本文由三篇碰撞而成</b>（均出自学员专栏 · {esc(paper["author_of_sources"])}）：{srcs}</div>
+<div class="src"><b>本文由三篇碰撞而成</b>（均出自学员专栏）：{srcs}</div>
 <div class="abs"><span class="lb">摘 要</span>　{esc(abstract)}</div>
 <p class="kw"><b>关键词：</b>{esc(keywords)}</p>
 {body}</body></html>"""
@@ -331,11 +374,14 @@ def render_column(papers):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--src", required=True)
+    ap.add_argument("--only")
     a = ap.parse_args()
     src = Path(a.src)
     COL.mkdir(parents=True, exist_ok=True)
 
     for p in PAPERS:
+        if a.only and p["slug"] != a.only:
+            continue
         lines = load(src, p["src"])
         abstract, keywords, blocks = parse(p, lines)
         assert abstract and keywords, (p["slug"], "缺摘要或关键词")
