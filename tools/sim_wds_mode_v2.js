@@ -107,8 +107,10 @@ function sseBody(events) {
   return { getReader: () => ({ read: () => Promise.resolve(cancelled || i >= chunks.length ? { done: true } : { done: false, value: chunks[i++] }), cancel: () => { cancelled = true; } }) };
 }
 let LAST_PAYLOAD = null, ROUTE = {};
+let JSON_ROUTE = {};
 const fetchMock = (url, opt) => {
   LAST_PAYLOAD = JSON.parse(opt.body);
+  if (JSON_ROUTE[url]) { const j = JSON_ROUTE[url]; return Promise.resolve({ ok: true, status: 200, json: () => Promise.resolve(typeof j === "function" ? j(LAST_PAYLOAD) : j) }); }
   const ev = ROUTE[url] || [];
   return Promise.resolve({ ok: true, status: 200, body: sseBody(typeof ev === "function" ? ev(LAST_PAYLOAD) : ev) });
 };
@@ -163,11 +165,15 @@ inEl.value = "什么是特征纠缠？";
 sendEl.click();
 ok(!!document.body.querySelector(".kin"), "弹出 Key 面板");
 const kp = document.body.children[document.body.children.length - 1];
+ok(kp.querySelectorAll(".kv").length === 5, "设置面板列出五家基底，实得 " + kp.querySelectorAll(".kv").length);
+ok(!!kp.querySelector(".kmod"), "有型号覆盖输入框");
+ok(!!kp.querySelector(".ktest"), "有连通测试按钮");
+kp.querySelectorAll(".kv").find((b) => b.getAttribute("data-v") === "glm").click();
 kp.querySelector(".kin").value = "sk-test-1234567890";
-kp.querySelectorAll(".kv").find((b) => b.dataset.v === "glm").click();
 kp.querySelector(".ksave").click();
-ok(store["sde_wds_key"] === "sk-test-1234567890" && store["sde_wds_vendor"] === "glm", "Key 已保存");
-ok(store["sde_glm_key"] === "sk-test-1234567890", "同步写入 sde_glm_key（联网搜索用同一把）");
+ok(store["sde_wds_vendor"] === "glm", "选中的基底已存");
+ok(store["sde_glm_key"] === "sk-test-1234567890", "Key 按家分存到 sde_glm_key（联网搜索用同一把）");
+ok(!store["sde_kimi_key"], "没有把这把 Key 误写进别家的槽位");
 
 console.log("④ 正常一轮（含 sources / web / think / beat / token / Markdown）");
 ROUTE["/api/wds/chat"] = [
@@ -323,6 +329,34 @@ ROUTE["/api/wds/chat"] = [
   t3.dispatch("click", { target: refs[1] });
   ok(webLinks[1].className.indexOf("wdsm-flash") >= 0, "点 [W2] 让第二条站外来源闪一下");
   ok(webLinks[0].className.indexOf("wdsm-flash") < 0, "没有误闪第一条");
+
+  console.log("⑰ 五家基底：分存、切换、型号覆盖、连通测试");
+  layer.querySelector(".wdsm-keybtn").click();
+  const kp2 = document.body.children[document.body.children.length - 1];
+  const vBtns = kp2.querySelectorAll(".kv");
+  ok(vBtns.map((b) => b.getAttribute("data-v")).join(",") === "ds,glm,kimi,qwen,mm", "五家短码齐全且有序");
+  ok(vBtns.find((b) => b.getAttribute("data-v") === "glm").textContent.indexOf("✓") > 0, "已填 Key 的那家打了勾");
+  vBtns.find((b) => b.getAttribute("data-v") === "kimi").click();
+  const kp2b = document.body.children[document.body.children.length - 1];
+  ok(kp2b.querySelector(".kin").value === "", "切到 Kimi 后 Key 框是空的（不串号）");
+  kp2b.querySelector(".kin").value = "sk-kimi-abcdefgh";
+  kp2b.querySelector(".kmod").value = "kimi-k2.6";
+  JSON_ROUTE["/api/wds/ping"] = { ok: true, model: "kimi-k2.6", vendor: "kimi" };
+  kp2b.querySelector(".ktest").click();
+  await new Promise((r) => setTimeout(r, 60));
+  ok(LAST_PAYLOAD.vendor === "kimi" && LAST_PAYLOAD.model === "kimi-k2.6", "测试请求带对了厂商与型号");
+  ok(kp2b.querySelector(".kres").textContent.indexOf("kimi-k2.6") >= 0, "测试结果回显型号");
+  kp2b.querySelector(".ksave").click();
+  ok(store["sde_kimi_key"] === "sk-kimi-abcdefgh", "Kimi 的 Key 存进自己的槽");
+  ok(store["sde_glm_key"] === "sk-test-1234567890", "智谱那把没有被覆盖");
+  ok(store["sde_wds_model_kimi"] === "kimi-k2.6", "型号覆盖已存");
+  delete JSON_ROUTE["/api/wds/ping"];
+  ROUTE["/api/wds/chat"] = [{ t: "token", v: "好。" }];
+  inEl.value = "换家问问";
+  await new Promise((res) => { sendEl.click(); setTimeout(res, 220); });
+  ok(LAST_PAYLOAD.vendor === "kimi" && LAST_PAYLOAD.key === "sk-kimi-abcdefgh", "对话已切到 Kimi");
+  ok(LAST_PAYLOAD.model === "kimi-k2.6", "对话带上型号覆盖");
+  ok(LAST_PAYLOAD.skey === "sk-test-1234567890", "联网搜索仍走智谱那把，与对话用哪家无关");
 
   console.log("⑭ 新对话复位");
   layer.querySelector(".wdsm-newbtn").click();

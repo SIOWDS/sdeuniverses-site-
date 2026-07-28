@@ -64,7 +64,8 @@ export class VisitCounter {
 // 与WDS对话（高级会话）专用：各厂商最强档 + DeepSeek 思考模式满功率
 // DeepSeek V4：deepseek-v4-pro（1.6T/49B激活，1M 上下文）＞ flash；thinking:enabled + reasoning_effort:"max" 为最高推理投入档
 // 注意：思考模式下 temperature/top_p/penalty 全部无效，必须不传
-const WDS_TOP_MODEL = { deepseek: "deepseek-v4-pro", zhipu: "glm-5" };
+// 深度档型号（满血）。Kimi K3 与 MiniMax M2.x 的思考是常开的，没有单独的开关参数。
+const WDS_TOP_MODEL = { deepseek: "deepseek-v4-pro", zhipu: "glm-5", kimi: "kimi-k3", qwen: "qwen3.7-max", minimax: "MiniMax-M3" };
 function wdsTopVC(vd) {
   const base = WDS_VENDORS[vd];
   return { url: base.url, model: WDS_TOP_MODEL[vd] || base.model, name: base.name, top: 1 };
@@ -111,20 +112,41 @@ async function wdsRag(env, url, body) {
   return fetch(req);   // 没配自绑定时的退路（本地/预览环境）
 }
 function wdsTopBody(VC, body) {
-  if (VC && VC.top && String(VC.url).indexOf("api.deepseek.com") >= 0) {
+  if (!VC || !VC.top) return body;
+  const u = String(VC.url);
+  if (u.indexOf("api.deepseek.com") >= 0) {
     body.thinking = { type: "enabled" };
     body.reasoning_effort = "max";
     delete body.temperature; delete body.top_p;
+  } else if (u.indexOf("open.bigmodel.cn") >= 0) {
+    body.thinking = { type: "enabled" };
+  } else if (u.indexOf("dashscope.aliyuncs.com") >= 0) {
+    body.enable_thinking = true;               // 千问用的是这个名字，不是 thinking
   }
+  // Kimi K3 与 MiniMax M2.x/M3：思考常开、无开关参数，塞了反而可能被判非法字段——什么都不加。
   return body;
 }
+// 五家基底。全部走各自的 OpenAI 兼容 chat/completions，由 Worker 服务端转发（不是浏览器直连，所以无 CORS 问题）。
+// ⚠️ 型号会过时：各家改名/下线的节奏比本站快得多，所以读者可在设置里覆盖 model（见 wdsPickModel），
+//    真过时了不必等改代码。默认值核对于 2026-07-28。
 const WDS_VENDORS = {
-  deepseek: { url: "https://api.deepseek.com/v1/chat/completions", model: "deepseek-v4-flash", name: "DeepSeek" },
-  kimi: { url: "https://api.moonshot.cn/v1/chat/completions", model: "moonshot-v1-8k", name: "Kimi" },
-  zhipu: { url: "https://open.bigmodel.cn/api/paas/v4/chat/completions", model: "glm-4-plus", name: "\u667a\u8c31 GLM" },
-  qwen: { url: "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions", model: "qwen-plus", name: "\u5343\u95ee Qwen" },
-  minimax: { url: "https://api.minimax.chat/v1/text/chatcompletion_v2", model: "abab6.5s-chat", name: "MiniMax" },
+  deepseek: { url: "https://api.deepseek.com/v1/chat/completions", model: "deepseek-v4-flash", name: "DeepSeek", apply: "platform.deepseek.com" },
+  zhipu: { url: "https://open.bigmodel.cn/api/paas/v4/chat/completions", model: "glm-5-air", name: "\u667a\u8c31 GLM", apply: "open.bigmodel.cn" },
+  kimi: { url: "https://api.moonshot.cn/v1/chat/completions", model: "kimi-k2.6", name: "Kimi", apply: "platform.moonshot.cn" },
+  qwen: { url: "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions", model: "qwen-plus", name: "\u5343\u95ee Qwen", apply: "bailian.console.aliyun.com" },
+  minimax: { url: "https://api.minimax.io/v1/chat/completions", model: "MiniMax-M2.7", name: "MiniMax", apply: "platform.minimax.io" },
 };
+// 前端短码 ↔ 基底键。未知一律落 zhipu（老前端只发 ds/其它两种值，这样不会断）。
+const WDS_VMAP = { ds: "deepseek", glm: "zhipu", kimi: "kimi", qwen: "qwen", mm: "minimax" };
+const WDS_VSHORT = { deepseek: "ds", zhipu: "glm", kimi: "kimi", qwen: "qwen", minimax: "mm" };
+function wdsVendorOf(v) { return WDS_VMAP[String(v || "").toLowerCase()] || "zhipu"; }
+function wdsShort(vd) { return WDS_VSHORT[vd] || "glm"; }
+// 读者自填的型号覆盖默认值。只放行像模型名的字符串，别让它变成往上游注入别的东西的口子。
+function wdsPickModel(vd, want, top) {
+  const w = String(want || "").trim();
+  if (w && w.length <= 60 && /^[A-Za-z0-9._:\/-]+$/.test(w)) return w;
+  return (top ? (WDS_TOP_MODEL[vd] || WDS_VENDORS[vd].model) : WDS_VENDORS[vd].model);
+}
 async function getActiveVendor(env) {
   try {
     const cv = env.CONFIG_VAULT.get(env.CONFIG_VAULT.idFromName("global"));
@@ -1950,7 +1972,7 @@ export default {
       if (request.method !== "POST") return new Response("Method Not Allowed", { status: 405 });
       let b = {}; try { b = await request.json(); } catch (e) {}
       const J = (o, st) => Response.json(o, { status: st || 200, headers: _cors() });
-      const vd = b.vendor === "ds" ? "deepseek" : "zhipu";
+      const vd = wdsVendorOf(b.vendor);
       const VC = { url: WDS_VENDORS[vd].url, model: WDS_VENDORS[vd].model, name: WDS_VENDORS[vd].name };
       const KEY = String(b.key || "").trim();
       if (KEY.length < 8) return J({ ok: false, summary: "" }, 200);
@@ -2017,7 +2039,7 @@ export default {
       const J = (o, st) => Response.json(o, { status: st || 200, headers: _cors() });
       const userKey = String(b.key || "").trim();
       if (userKey.length < 8) return J({ ok: false, code: "need_key", msg: "开工学习也用你自己的 API Key 运行（在 ⚙ 里填入，只存你的浏览器本地）。" }, 400);
-      const vd = b.vendor === "ds" ? "deepseek" : "zhipu";
+      const vd = wdsVendorOf(b.vendor);
       const VC = wdsTopVC(vd);   // 开工学内功＝最费脑的一步，直接最强档
       const ip = request.headers.get("cf-connecting-ip") || "unknown";
       try {
@@ -2077,9 +2099,9 @@ export default {
       const J = (o, st) => Response.json(o, { status: st || 200, headers: _cors() });
       const userKey = String(b.key || "").trim();
       if (userKey.length < 8) return J({ ok: false, code: "need_key", msg: "这一步也用你自己的 API Key 运行（在 ⚙ 里填入，只存你的浏览器本地）。" }, 400);
-      const vd = b.vendor === "ds" ? "deepseek" : "zhipu";
+      const vd = wdsVendorOf(b.vendor);
       const VC = b.guide ? wdsTopVC(vd) : { url: WDS_VENDORS[vd].url, model: WDS_VENDORS[vd].model, name: WDS_VENDORS[vd].name };
-      const KEY = userKey, rvendor = ({ zhipu: "glm", deepseek: "ds" })[vd] || vd;
+      const KEY = userKey, rvendor = wdsShort(vd);
       const ip = request.headers.get("cf-connecting-ip") || "unknown";
       try {
         const lim = env.ASK_LIMITER.get(env.ASK_LIMITER.idFromName(wdsBucket(b.guide ? "dlg" : "read", ip, userKey)));
@@ -2362,10 +2384,10 @@ export default {
       const J = (o, st) => Response.json(o, { status: st || 200, headers: _cors() });
       const userKey = String(b.key || "").trim();
       if (userKey.length < 8) return J({ ok: false, code: "need_key", msg: "这一步用你自己的 API Key 运行（在上方设置里填入，只存你的浏览器本地）。" }, 400);
-      const vd = b.vendor === "ds" ? "deepseek" : "zhipu";
+      const vd = wdsVendorOf(b.vendor);
       const deep = b.tier !== "fast";   // 缺省深度思考档（DeepSeek v4-pro 思考模式 / GLM-5）；fast=快速档（flash/plus）
       const VC = deep ? wdsTopVC(vd) : { url: WDS_VENDORS[vd].url, model: WDS_VENDORS[vd].model, name: WDS_VENDORS[vd].name };
-      const KEY = userKey, rvendor = ({ zhipu: "glm", deepseek: "ds" })[vd] || vd;
+      const KEY = userKey, rvendor = wdsShort(vd);
       const ip = request.headers.get("cf-connecting-ip") || "unknown";
       try {
         const lim = env.ASK_LIMITER.get(env.ASK_LIMITER.idFromName("byok-art:" + ip));
@@ -2415,10 +2437,10 @@ export default {
       // 取基底：默认服务端 Key（方案B）；读者自带 Key(BYOK) 时用其所选厂商
       const userKey = String(b.key || "").trim();
       if (userKey.length < 8) return _sseResp([{ t: "error", v: "WDS 助手用你自己的 API Key 运行（在设置里填入，只存在你的浏览器本地，与本站无关）。", code: "need_key" }]);
-      const vd = b.vendor === "ds" ? "deepseek" : "zhipu";
+      const vd = wdsVendorOf(b.vendor);
       // 与WDS对话（guide）走最强档：DeepSeek v4-pro + 思考模式 max；陪读维持轻档保响应速度
       const VC = b.guide ? wdsTopVC(vd) : { url: WDS_VENDORS[vd].url, model: WDS_VENDORS[vd].model, name: WDS_VENDORS[vd].name };
-      const KEY = userKey, rvendor = ({ zhipu: "glm", deepseek: "ds" })[vd] || vd;
+      const KEY = userKey, rvendor = wdsShort(vd);
       // 限流（系统额度与自带 Key 各用独立配额桶，不互挤）
       const ip = request.headers.get("cf-connecting-ip") || "unknown";
       try {
@@ -2557,12 +2579,13 @@ export default {
       const history = Array.isArray(b.history) ? b.history.slice(-4) : [];
       const userKey = String(b.key || "").trim();
       if (userKey.length < 8) return _sseResp([{ t: "error", v: "WDS 助手用你自己的 API Key 运行（在设置里填入，只存在你的浏览器本地，与本站无关）。", code: "need_key" }]);
-      const vd = b.vendor === "ds" ? "deepseek" : "zhipu";
+      const vd = wdsVendorOf(b.vendor);
       // 深度思考档：满血基底＋满功率思考＋方法论工序＋加大站内检索预算。教训：满功率必须配"有界预算＋小任务"，
       // 所以这里只把 max_tokens 提到 6000（不是几万），要更长让读者点「继续」。
       const deep = b.mode === "deep";
       const wantWeb = !!b.web;                                  // 联网开关
       const skey = String(b.skey || "").trim();                 // 读者的智谱 Key（专供联网搜索；没有就退到管理员 Key）
+      const umodel = String(b.model || "").trim();              // 读者自填的型号覆盖（各家型号会过时，留个自救口）
       // 附件：读者在自己浏览器里解析出的正文（文件本身从不上传到本站）。总量钳位，深度档给多一些。
       const DOC_CAP = deep ? 20000 : 12000;
       let docCtx = "";
@@ -2578,8 +2601,8 @@ export default {
       }
       const about = String(b.about || "").trim().slice(0, 1200);   // 读者写的自定义指令
       const lang = b.lang === "en" ? "en" : "zh";                 // 界面语言：决定用哪种语言作答
-      const VC = deep ? wdsTopVC(vd) : { url: WDS_VENDORS[vd].url, model: WDS_VENDORS[vd].model, name: WDS_VENDORS[vd].name };
-      const KEY = userKey, rvendor = ({ zhipu: "glm", deepseek: "ds" })[vd] || vd;
+      const VC = { url: WDS_VENDORS[vd].url, model: wdsPickModel(vd, umodel, deep), name: WDS_VENDORS[vd].name, top: deep ? 1 : 0 };
+      const KEY = userKey, rvendor = wdsShort(vd);
       const ip = request.headers.get("cf-connecting-ip") || "unknown";
       let dayLeft = null;
       try {
@@ -2688,6 +2711,34 @@ export default {
       });
       return new Response(stream, { headers: { ..._cors(), "content-type": "text/event-stream; charset=utf-8", "cache-control": "no-store" } });
     }
+    // /api/wds/ping：只验一次「这把 Key + 这个型号 + 这家地址」通不通，不产内容、不进检索、不计对话额度。
+    // 存在的理由很实在：各家型号改名下线的节奏比本站改代码快，读者得能自己当场验证，而不是对着一句"基底返回错误"猜。
+    if (url.pathname === "/api/wds/ping") {
+      if (request.method === "OPTIONS") return new Response(null, { headers: _cors() });
+      if (request.method !== "POST") return new Response("Method Not Allowed", { status: 405 });
+      let b = {}; try { b = await request.json(); } catch (e) {}
+      const vd = wdsVendorOf(b.vendor);
+      const key = String(b.key || "").trim();
+      if (key.length < 8) return Response.json({ ok: false, code: "need_key", msg: "先填这家的 Key。" }, { headers: _cors() });
+      const model = wdsPickModel(vd, String(b.model || ""), !!b.deep);
+      const ctrl = new AbortController();
+      const timer = setTimeout(() => { try { ctrl.abort(); } catch (e) {} }, 25000);
+      try {
+        const r = await fetch(WDS_VENDORS[vd].url, {
+          method: "POST",
+          headers: { "content-type": "application/json", authorization: "Bearer " + key },
+          body: JSON.stringify({ model, stream: false, max_tokens: 16, messages: [{ role: "user", content: "ping" }] }),
+          signal: ctrl.signal,
+        });
+        if (r.ok) return Response.json({ ok: true, vendor: vd, model, name: WDS_VENDORS[vd].name }, { headers: _cors() });
+        const txt = (await r.text()).slice(0, 300);
+        const code = (r.status === 401 || r.status === 403) ? "bad_key" : (r.status === 402 ? "no_credit" : (r.status === 404 || /model/i.test(txt) ? "bad_model" : "http"));
+        return Response.json({ ok: false, code, status: r.status, model, msg: txt }, { headers: _cors() });
+      } catch (e) {
+        return Response.json({ ok: false, code: "net", model, msg: (e && e.message) || "connect failed" }, { headers: _cors() });
+      } finally { clearTimeout(timer); }
+    }
+
     // /api/wds/websearch：独立的联网搜索端点（供各智能体复用；不调基底，只返回搜索结果）
     if (url.pathname === "/api/wds/websearch") {
       if (request.method === "OPTIONS") return new Response(null, { headers: _cors() });
@@ -2709,9 +2760,9 @@ export default {
       if (!turns.length) return _sseResp([{ t: "error", v: "这场还没有可成文的内容。" }]);
       const userKey = String(b.key || "").trim();
       if (userKey.length < 8) return _sseResp([{ t: "error", v: "成文用你自己的 API Key 运行（在 ⚙ Key 里填入，只存在你的浏览器本地）。", code: "need_key" }]);
-      const vd = b.vendor === "ds" ? "deepseek" : "zhipu";
-      const VC = wdsTopVC(vd);                 // 成文＝最费脑的一步，直接最强档
-      const KEY = userKey, rvendor = ({ zhipu: "glm", deepseek: "ds" })[vd] || vd;
+      const vd = wdsVendorOf(b.vendor);
+      const VC = { url: WDS_VENDORS[vd].url, model: wdsPickModel(vd, String(b.model || ""), 1), name: WDS_VENDORS[vd].name, top: 1 };  // 成文＝最费脑的一步，直接最强档
+      const KEY = userKey, rvendor = wdsShort(vd);
       const ip = request.headers.get("cf-connecting-ip") || "unknown";
       try {
         const lim = env.ASK_LIMITER.get(env.ASK_LIMITER.idFromName(wdsBucket("chat", ip, userKey)));

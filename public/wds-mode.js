@@ -100,6 +100,11 @@
       linkGlm: "还没有 Key？去 <a href='https://open.bigmodel.cn' target='_blank' style='color:#C9A227'>open.bigmodel.cn</a> 申请（联网搜索也用这把）",
       attOld: "这台浏览器解析不了文件（内核太旧）", attLoading: "正在装解析器…", attNoLoad: "解析器没装上，刷新再试", attErr: "附件出错：",
       noSpeak: "此浏览器不支持朗读",
+      setVendorH: "选一家基底", setModelH: "型号（可空）",
+      setModelP: "留空就用默认型号。各家改名或下线时，你可以自己填一个当下有效的型号，不必等本站改代码。",
+      setTest: "测试连通", testing: "正在测…",
+      testOk: "通了 · ", testBadKey: "Key 不对或没权限", testNoCredit: "余额不足", testBadModel: "型号不对：这家现在没有这个型号", testNet: "连不上这家的接口", testFail: "没通 · ",
+      applyAt: "申请 Key：",
     },
     en: {
       tabNormal: "Browse", tabBack: "\u2190 Back to site", tabWds: "\u2726 WDS",
@@ -144,6 +149,11 @@
       linkGlm: "No key yet? Get one at <a href='https://open.bigmodel.cn' target='_blank' style='color:#C9A227'>open.bigmodel.cn</a> (web search uses it too)",
       attOld: "This browser can't parse files (engine too old)", attLoading: "Loading the parser…", attNoLoad: "Parser didn't load — refresh and retry", attErr: "Attachment error: ",
       noSpeak: "This browser can't read aloud",
+      setVendorH: "Pick a model provider", setModelH: "Model (optional)",
+      setModelP: "Leave it blank for the default. When a provider renames or retires a model, put a working model name here yourself — you don't have to wait for this site to ship a change.",
+      setTest: "Test connection", testing: "Testing…",
+      testOk: "Connected · ", testBadKey: "Key rejected, or no permission", testNoCredit: "Out of credit", testBadModel: "No such model at this provider right now", testNet: "Couldn't reach this provider", testFail: "Failed · ",
+      applyAt: "Get a key: ",
     },
   };
   function langInit() {
@@ -663,39 +673,112 @@
     setTimeout(function () { URL.revokeObjectURL(a.href); if (a.parentNode) a.parentNode.removeChild(a); }, 800);
   }
 
-  function wdsKeyGet() { try { var k = (localStorage.getItem("sde_wds_key") || "").trim(), v = localStorage.getItem("sde_wds_vendor") || "ds"; if (k.length >= 8) return { key: k, vendor: v }; var d = (localStorage.getItem("sde_ds_key") || "").trim(); if (d.length >= 8) return { key: d, vendor: "ds" }; var g = (localStorage.getItem("sde_glm_key") || "").trim(); if (g.length >= 8) return { key: g, vendor: "glm" }; return null; } catch (e) { return null; } }
+  /* ── 五家基底。短码与后端 WDS_VMAP 对齐；Key 按家分存，互不覆盖。
+     ds/glm 沿用旧键名（金点子发生器等其它工具也读这两个），新三家另起键名。 ── */
+  var VENDORS = [
+    { v: "ds", name: "DeepSeek", ks: "sde_ds_key", apply: "https://platform.deepseek.com" },
+    { v: "glm", name: "智谱 GLM", ks: "sde_glm_key", apply: "https://open.bigmodel.cn" },
+    { v: "kimi", name: "Kimi", ks: "sde_kimi_key", apply: "https://platform.moonshot.cn" },
+    { v: "qwen", name: "千问 Qwen", ks: "sde_qwen_key", apply: "https://bailian.console.aliyun.com" },
+    { v: "mm", name: "MiniMax", ks: "sde_mm_key", apply: "https://platform.minimax.io" },
+  ];
+  function vinfo(v) { for (var i = 0; i < VENDORS.length; i++) if (VENDORS[i].v === v) return VENDORS[i]; return VENDORS[0]; }
+  function vkeyGet(v) { try { return (localStorage.getItem(vinfo(v).ks) || "").trim(); } catch (e) { return ""; } }
+  function vkeySet(v, k) { try { localStorage.setItem(vinfo(v).ks, k); } catch (e) {} }
+  function vmodelGet(v) { try { return (localStorage.getItem("sde_wds_model_" + v) || "").trim(); } catch (e) { return ""; } }
+  function vmodelSet(v, m) { try { if (m) localStorage.setItem("sde_wds_model_" + v, m); else localStorage.removeItem("sde_wds_model_" + v); } catch (e) {} }
+
+  // 先看当前选中的那家有没有 Key；没有就按顺序找第一把能用的，并把选中项挪过去（免得读者被卡在一家空档上）
+  function wdsKeyGet() {
+    try {
+      var v = localStorage.getItem("sde_wds_vendor") || "ds";
+      var k = vkeyGet(v);
+      if (k.length < 8) { var legacy = (localStorage.getItem("sde_wds_key") || "").trim(); if (legacy.length >= 8) { k = legacy; vkeySet(v, legacy); } }
+      if (k.length >= 8) return { key: k, vendor: v, model: vmodelGet(v) };
+      for (var i = 0; i < VENDORS.length; i++) {
+        var kk = vkeyGet(VENDORS[i].v);
+        if (kk.length >= 8) return { key: kk, vendor: VENDORS[i].v, model: vmodelGet(VENDORS[i].v) };
+      }
+      return null;
+    } catch (e) { return null; }
+  }
   // 联网搜索走智谱通道：优先用读者本地存过的智谱 Key；没有就交给后端退到管理员 Key。
   function wdsSearchKey() { try { return (localStorage.getItem("sde_glm_key") || "").trim(); } catch (e) { return ""; } }
   function wdsKeyPanel(onSaved) {
     var cur = wdsKeyGet() || { key: "", vendor: "ds" };
+    var vend = cur.vendor;
     var m = el("div");
-    m.style.cssText = "position:fixed;inset:0;z-index:100004;background:rgba(10,8,5,.72);display:flex;align-items:center;justify-content:center;padding:20px;font-family:-apple-system,'PingFang SC',sans-serif";
-    m.innerHTML = "<div style='max-width:400px;width:100%;background:#161B22;border:1px solid rgba(212,178,94,.3);border-radius:16px;padding:26px'>"
-      + "<div style='font-size:15px;font-weight:700;color:#F5EFE0;margin:16px 0 6px'>" + esc(t("setKeyH")) + "</div>"
+    m.style.cssText = "position:fixed;inset:0;z-index:100004;background:rgba(10,8,5,.72);display:flex;align-items:center;justify-content:center;padding:20px;font-family:-apple-system,'PingFang SC',sans-serif;overflow-y:auto";
+    var IN = "width:100%;box-sizing:border-box;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);border-radius:9px;padding:11px;color:#F5EFE0;font:14px inherit;outline:none";
+    m.innerHTML = "<div style='max-width:440px;width:100%;background:#161B22;border:1px solid rgba(212,178,94,.3);border-radius:16px;padding:26px;margin:auto'>"
       + "<div style='font-size:17px;font-weight:700;color:#F5EFE0;margin-bottom:8px'>" + esc(t("setTitle")) + "</div>"
-      + "<div style='font-size:13px;color:#8B98A5;line-height:1.7;margin-bottom:18px'>" + t("setKeyP") + "</div>"
-      + "<div style='display:flex;gap:8px;margin-bottom:14px'><button class='kv' data-v='ds' style='flex:1;padding:9px;border-radius:9px;border:1px solid rgba(212,178,94,.4);background:none;color:#E8E4DA;cursor:pointer;font:13px inherit'>DeepSeek</button><button class='kv' data-v='glm' style='flex:1;padding:9px;border-radius:9px;border:1px solid rgba(212,178,94,.4);background:none;color:#E8E4DA;cursor:pointer;font:13px inherit'>智谱 GLM</button></div>"
-      + "<input class='kin' type='password' placeholder='" + esc(t("setKeyPh")) + "' style='width:100%;box-sizing:border-box;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);border-radius:9px;padding:11px;color:#F5EFE0;font:14px inherit;outline:none;margin-bottom:10px'>"
-      + "<div class='klink' style='font-size:12px;color:#6b7684;line-height:1.6;margin-bottom:16px'></div>"
+      + "<div style='font-size:13px;color:#8B98A5;line-height:1.7;margin-bottom:16px'>" + t("setKeyP") + "</div>"
+      + "<div style='font-size:14px;font-weight:700;color:#F5EFE0;margin-bottom:8px'>" + esc(t("setVendorH")) + "</div>"
+      + "<div class='kvs' style='display:flex;flex-wrap:wrap;gap:7px;margin-bottom:14px'></div>"
+      + "<input class='kin' type='password' style='" + IN + ";margin-bottom:8px'>"
+      + "<div class='klink' style='font-size:12px;color:#6b7684;line-height:1.6;margin-bottom:14px'></div>"
+      + "<div style='font-size:13.5px;font-weight:700;color:#F5EFE0;margin-bottom:5px'>" + esc(t("setModelH")) + "</div>"
+      + "<div style='font-size:12px;color:#6b7684;line-height:1.6;margin-bottom:8px'>" + esc(t("setModelP")) + "</div>"
+      + "<input class='kmod' type='text' style='" + IN + ";margin-bottom:10px'>"
+      + "<div style='display:flex;gap:8px;align-items:center;margin-bottom:18px'>"
+      + "<button class='ktest' style='background:none;border:1px solid rgba(61,165,165,.55);color:#8ED0D0;border-radius:9px;padding:8px 13px;font:13px inherit;cursor:pointer'>" + esc(t("setTest")) + "</button>"
+      + "<span class='kres' style='font-size:12.5px;color:#8B98A5;flex:1;line-height:1.5'></span></div>"
       + "<div style='border-top:1px solid rgba(255,255,255,.1);padding-top:15px;margin-bottom:16px'>"
       + "<div style='font-size:14px;font-weight:700;color:#F5EFE0;margin-bottom:6px'>" + esc(t("setAboutH")) + "</div>"
       + "<div style='font-size:12.5px;color:#8B98A5;line-height:1.65;margin-bottom:9px'>" + esc(t("setAboutP")) + "</div>"
-      + "<textarea class='kabout' rows='3' placeholder='" + esc(t("setAboutPh")) + "' style='width:100%;box-sizing:border-box;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);border-radius:9px;padding:10px;color:#F5EFE0;font:13.5px/1.6 inherit;outline:none;resize:vertical'></textarea>"
+      + "<textarea class='kabout' rows='3' style='" + IN + ";font:13.5px/1.6 inherit;resize:vertical'></textarea>"
       + "</div>"
-      + "<div style='display:flex;gap:8px'><button class='ksave' style='flex:1;background:#D4B25E;color:#0F0B07;border:none;border-radius:9px;padding:11px;font:700 14px inherit;cursor:pointer'>" + esc(t("setSave")) + "</button><button class='kcancel' style='background:none;border:1px solid rgba(255,255,255,.2);color:#8B98A5;border-radius:9px;padding:11px 16px;font:14px inherit;cursor:pointer'>" + esc(t("setCancel")) + "</button></div>"
+      + "<div style='display:flex;gap:8px'><button class='ksave' style='flex:1;background:#D4B25E;color:#0F0B07;border:none;border-radius:9px;padding:11px;font:700 14px inherit;cursor:pointer'>" + esc(t("setSave")) + "</button>"
+      + "<button class='kcancel' style='background:none;border:1px solid rgba(255,255,255,.2);color:#8B98A5;border-radius:9px;padding:11px 16px;font:14px inherit;cursor:pointer'>" + esc(t("setCancel")) + "</button></div>"
       + "</div>";
     document.body.appendChild(m);
-    var vend = cur.vendor, kin = m.querySelector(".kin"), klink = m.querySelector(".klink"), kab = m.querySelector(".kabout");
-    kin.value = cur.key; kab.value = aboutGet();
-    function paintV() { m.querySelectorAll(".kv").forEach(function (b) { var on = b.dataset.v === vend; b.style.background = on ? "rgba(212,178,94,.2)" : "none"; b.style.borderColor = on ? "#D4B25E" : "rgba(212,178,94,.4)"; }); klink.innerHTML = vend === "ds" ? t("linkDs") : t("linkGlm"); }
-    m.querySelectorAll(".kv").forEach(function (b) { b.onclick = function () { vend = b.dataset.v; paintV(); }; });
-    paintV();
+    var kin = m.querySelector(".kin"), kmod = m.querySelector(".kmod"), klink = m.querySelector(".klink");
+    var kab = m.querySelector(".kabout"), kres = m.querySelector(".kres"), kvs = m.querySelector(".kvs");
+    kin.placeholder = t("setKeyPh"); kmod.placeholder = "";
+    kab.placeholder = t("setAboutPh"); kab.value = aboutGet();
+
+    // 切一家＝换一套（Key／型号／申请链接都跟着换）。切走前先把当前这家的输入存进内存，免得手滑丢掉。
+    var draft = {};
+    VENDORS.forEach(function (x) { draft[x.v] = { k: vkeyGet(x.v), mo: vmodelGet(x.v) }; });
+    function stash() { draft[vend] = { k: kin.value.trim(), mo: kmod.value.trim() }; }
+    function paintV() {
+      kvs.innerHTML = "";
+      VENDORS.forEach(function (x) {
+        var b = el("button", "kv", x.name + (draft[x.v].k.length >= 8 ? " ✓" : ""));
+        b.setAttribute("data-v", x.v);
+        var on = x.v === vend;
+        b.style.cssText = "padding:8px 12px;border-radius:9px;border:1px solid " + (on ? "#D4B25E" : "rgba(212,178,94,.35)")
+          + ";background:" + (on ? "rgba(212,178,94,.2)" : "none") + ";color:#E8E4DA;cursor:pointer;font:13px inherit";
+        b.onclick = function () { stash(); vend = x.v; load(); };
+        kvs.appendChild(b);
+      });
+      klink.innerHTML = esc(t("applyAt")) + "<a href='" + vinfo(vend).apply + "' target='_blank' rel='noopener' style='color:#C9A227'>" + esc(vinfo(vend).apply.replace(/^https:\/\//, "")) + "</a>";
+    }
+    function load() { kin.value = draft[vend].k; kmod.value = draft[vend].mo; kres.textContent = ""; paintV(); }
+    load();
+
+    m.querySelector(".ktest").onclick = function () {
+      stash();
+      var k = draft[vend].k;
+      if (k.length < 8) { kres.style.color = "#E8A8A0"; kres.textContent = t("setKeyPh"); return; }
+      kres.style.color = "#8B98A5"; kres.textContent = t("testing");
+      fetch("/api/wds/ping", { method: "POST", headers: { "content-type": "application/json" },
+        body: JSON.stringify({ vendor: vend, key: k, model: draft[vend].mo, deep: thinkMode === "deep" }) })
+        .then(function (r) { return r.json(); })
+        .then(function (j) {
+          if (j && j.ok) { kres.style.color = "#8ED0D0"; kres.textContent = t("testOk") + j.model; return; }
+          var why = ({ bad_key: t("testBadKey"), no_credit: t("testNoCredit"), bad_model: t("testBadModel"), net: t("testNet") })[j && j.code] || (t("testFail") + ((j && j.status) || "?"));
+          kres.style.color = "#E8A8A0"; kres.textContent = why;
+        })
+        .catch(function (e) { kres.style.color = "#E8A8A0"; kres.textContent = t("testNet"); });
+    };
     m.querySelector(".kcancel").onclick = function () { m.remove(); };
     m.querySelector(".ksave").onclick = function () {
-      var k = kin.value.trim();
+      stash();
       try { localStorage.setItem(LS_ABOUT, kab.value.trim().slice(0, 1200)); } catch (e) {}   // 自定义指令可单独存，不必先有 Key
-      if (k.length < 8) { kin.style.borderColor = "#E88"; return; }
-      try { localStorage.setItem("sde_wds_key", k); localStorage.setItem("sde_wds_vendor", vend); localStorage.setItem(vend === "glm" ? "sde_glm_key" : "sde_ds_key", k); } catch (e) {}
+      VENDORS.forEach(function (x) { if (draft[x.v].k.length >= 8) vkeySet(x.v, draft[x.v].k); vmodelSet(x.v, draft[x.v].mo); });
+      if (draft[vend].k.length < 8) { kin.style.borderColor = "#E88"; return; }
+      try { localStorage.setItem("sde_wds_vendor", vend); localStorage.setItem("sde_wds_key", draft[vend].k); } catch (e) {}
       m.remove(); if (onSaved) onSaved();
     };
     setTimeout(function () { kin.focus(); }, 60);
@@ -713,7 +796,7 @@
     history.push({ role: "reader", text: q }); updTurns(); stSave(history);
     streaming = true; stoppedByUser = false;
     sendEl.textContent = "■"; sendEl.classList.add("stop"); sendEl.title = "停止生成";
-    var payload = { q: q, history: history.slice(-4), key: kv.key, vendor: kv.vendor, mode: thinkMode, web: webOn ? 1 : 0, skey: wdsSearchKey(), about: aboutGet(), lang: LANG };
+    var payload = { q: q, history: history.slice(-4), key: kv.key, vendor: kv.vendor, model: kv.model || "", mode: thinkMode, web: webOn ? 1 : 0, skey: wdsSearchKey(), about: aboutGet(), lang: LANG };
     if (atts.length) {
       payload.docs = atts.map(function (d) { return { n: d.name, t: d.text }; });
       var attNames = atts.map(function (d) { return d.name; });
@@ -914,7 +997,7 @@
     if (existing) { text = existing; done(); return; }
     out.innerHTML = "<span class='cur'>▊</span>";
 
-    fetch(API_DISTILL, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ kind: kind, history: history, key: kv.key, vendor: kv.vendor, lang: LANG }) })
+    fetch(API_DISTILL, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ kind: kind, history: history, key: kv.key, vendor: kv.vendor, model: kv.model || "", lang: LANG }) })
       .then(function (resp) {
         if (!resp.ok || !resp.body) throw new Error("HTTP " + resp.status);
         var reader = resp.body.getReader(); dr = reader;
