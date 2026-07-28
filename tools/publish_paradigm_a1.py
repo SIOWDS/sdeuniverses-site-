@@ -118,6 +118,18 @@ border-radius:7px;padding:20px 26px;margin:26px 0}
 h2{font-size:22px;margin:38px 0 14px;padding-left:12px;border-left:4px solid var(--indigo);line-height:1.5}
 p{margin:0 0 15px;text-align:justify}
 strong{color:var(--cinnabar)}
+#pbar{position:fixed;top:0;left:0;height:3px;width:0;background:var(--cinnabar);z-index:99}
+#totop{position:fixed;right:22px;bottom:26px;width:42px;height:42px;border-radius:50%;border:1px solid var(--line);
+background:var(--card);color:var(--indigo);font-size:16px;cursor:pointer;display:none;font-family:inherit;z-index:60}
+#totop:hover{background:var(--indigo);color:var(--paper)}
+.deck{background:var(--card);border:1px solid var(--line);border-left:3px solid var(--cinnabar);
+border-radius:9px;padding:20px 26px;margin:26px 0 8px;font-size:15.5px;line-height:2;color:var(--ink);text-align:justify}
+.toc{background:var(--card);border:1px solid var(--line);border-radius:11px;padding:20px 26px;margin:22px 0 44px}
+.toc .tl{font-size:11.5px;letter-spacing:.4em;color:var(--cinnabar);margin-bottom:12px}
+.toc a{display:block;padding:7px 0;color:var(--ink2);font-size:15px;text-decoration:none;border-bottom:1px dashed rgba(43,76,126,.14)}
+.toc a:last-child{border-bottom:0}
+.toc a:hover{color:var(--cinnabar)}
+h2{scroll-margin-top:70px}
 .endbox{text-align:center;border-top:1px solid var(--line);margin-top:52px;padding:36px 20px;color:var(--ink2)}
 .endbox a{color:var(--indigo);text-decoration:none}
 footer{text-align:center;border-top:1px solid var(--line);padding:30px;color:var(--ink2);font-size:12px}
@@ -165,7 +177,7 @@ def parse(paper, lines):
     abstract = keywords = ""
     blocks = []
     for line in lines:
-        if re.fullmatch(r"摘要[：:]?", line):
+        if re.fullmatch(r"(摘要|导语)[：:]?", line):
             abstract = "__NEXT__"; continue
         if abstract == "__NEXT__":
             abstract = line; continue
@@ -206,9 +218,16 @@ def src_list_html(paper):
 
 
 def render_page(paper, abstract, keywords, blocks):
-    body = "".join(f"<{tag}>{esc(line)}</{tag}>" for tag, line in blocks)
+    body, toc, n = "", "", 0
+    for tag, line in blocks:
+        if tag == "h2":
+            n += 1
+            body += f'<h2 id="s{n}">{esc(line)}</h2>'
+            toc += f'<a href="#s{n}">{esc(line)}</a>'
+        else:
+            body += f"<p>{esc(line)}</p>"
+    toc = f'<div class="toc"><div class="tl">目 录</div>{toc}</div>'
     slug = paper["slug"]
-    kwline = f'<p class="kw"><b>关键词：</b>{esc(keywords)}</p>' if keywords else ""
     return f"""<!DOCTYPE html>
 <html lang="zh-CN"><head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -236,14 +255,24 @@ def render_page(paper, abstract, keywords, blocks):
   <div class="art-subtitle">{esc(paper["subtitle"])}</div>
   <div class="art-meta">作者 {AUTHOR} · 约 {paper["wan"]} 万字 · {paper["pages"]} 页 · 发表于{PUBDATE_CN}</div>
 </header>
+<div id="pbar"></div>
 <div class="wrap">
-{src_list_html(paper)}
-<div class="abstract"><span class="lb">摘 要</span><p>{esc(abstract)}</p>{kwline}</div>
+<div class="deck">{esc(abstract)}</div>
+{toc}
 {body}
+{src_list_html(paper)}
 <div class="endbox"><p>三种读法 · 网页长文 · 在线 PDF 翻页 · PDF 下载</p>
 <p><a href="/paradigm/">返回典范文专栏 →</a></p></div>
 </div>
 <footer>© 德麦国际 Demai International · 典范文专栏 · <a href="/">sdeuniverses.com</a></footer>
+<button id="totop" aria-label="回到顶部">↑</button>
+<script>
+(function(){{var b=document.getElementById('pbar'),t=document.getElementById('totop');
+function u(){{var d=document.documentElement,h=d.scrollHeight-d.clientHeight;
+b.style.width=(h>0?(d.scrollTop/h*100):0)+'%';t.style.display=d.scrollTop>700?'block':'none';}}
+addEventListener('scroll',u,{{passive:true}});u();
+t.onclick=function(){{scrollTo({{top:0,behavior:'smooth'}});}};}})();
+</script>
 <script src="/wds-mode.js" defer></script>
 </body></html>"""
 
@@ -384,7 +413,7 @@ def main():
             continue
         lines = load(src, p["src"])
         abstract, keywords, blocks = parse(p, lines)
-        assert abstract and keywords, (p["slug"], "缺摘要或关键词")
+        assert abstract, (p["slug"], "缺导语")
         body_chars = sum(len(l) for _, l in blocks) + len(abstract)
         p["wan"] = f"{body_chars/10000:.1f}"
 
