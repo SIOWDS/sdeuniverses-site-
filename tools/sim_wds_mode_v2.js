@@ -1,0 +1,238 @@
+/* 模拟验证 public/wds-mode.js v2：mock document/localStorage/fetch，跑完整流程。
+ * 覆盖：加载 → 模式切换 → 发送(假 SSE: quota/sources/web/think/beat/token) → Markdown 渲染
+ *      → 停止 → 重答/改问回滚 → 成文 distill 流 → 导出 → Key 面板。
+ * 用法：node tools/sim_wds_mode_v2.js
+ */
+"use strict";
+const fs = require("fs");
+let FAILS = 0, PASS = 0;
+function ok(c, m) { if (c) { PASS++; console.log("  PASS " + m); } else { FAILS++; console.log("  FAIL " + m); } }
+
+/* ---------- 极简 DOM ---------- */
+function mkClassList(node) {
+  return {
+    add(c) { const s = new Set(node.className.split(/\s+/).filter(Boolean)); s.add(c); node.className = [...s].join(" "); },
+    remove(c) { node.className = node.className.split(/\s+/).filter((x) => x && x !== c).join(" "); },
+    toggle(c) { if (this.contains(c)) { this.remove(c); return false; } this.add(c); return true; },
+    contains(c) { return node.className.split(/\s+/).includes(c); },
+  };
+}
+class Node {
+  constructor(tag) {
+    this.tagName = String(tag || "div").toUpperCase(); this.children = []; this.childNodes = this.children;
+    this.className = ""; this.style = { cssText: "", setProperty() {} }; this.dataset = {};
+    this._text = ""; this._html = ""; this.attrs = {}; this.parentNode = null; this._listeners = {};
+    this.classList = mkClassList(this);
+  }
+  get firstChild() { return this.children[0] || null; }
+  get lastChild() { return this.children[this.children.length - 1] || null; }
+  get nextSibling() { if (!this.parentNode) return null; const i = this.parentNode.children.indexOf(this); return this.parentNode.children[i + 1] || null; }
+  set textContent(v) { this._text = String(v); this.children.length = 0; this._html = ""; }
+  get textContent() { if (this._text) return this._text; return this.children.map((c) => c.textContent).join(""); }
+  set innerHTML(v) { this._html = String(v); this.children.length = 0; this._text = ""; this._parse(String(v)); }
+  get innerHTML() { return this._html; }
+  _parse(html) { // 只把带 class 的标签抽成子节点，够选择器用
+    const re = /<(\w+)([^>]*)>/g; let m;
+    while ((m = re.exec(html))) {
+      const n = new Node(m[1]); const at = m[2];
+      const cm = at.match(/class='([^']*)'/) || at.match(/class="([^"]*)"/); if (cm) n.className = cm[1];
+      const dm = at.match(/data-m='([^']*)'/); if (dm) n.dataset.m = dm[1];
+      const dk = at.match(/data-k='([^']*)'/); if (dk) n.dataset.k = dk[1];
+      const dv = at.match(/data-v='([^']*)'/); if (dv) n.dataset.v = dv[1];
+      const idm = at.match(/id='([^']*)'/); if (idm) n.attrs.id = idm[1];
+      n.parentNode = this; this.children.push(n);
+    }
+  }
+  appendChild(c) { c.parentNode = this; this.children.push(c); return c; }
+  insertBefore(c, ref) { const i = this.children.indexOf(ref); c.parentNode = this; if (i < 0) this.children.push(c); else this.children.splice(i, 0, c); return c; }
+  removeChild(c) { const i = this.children.indexOf(c); if (i >= 0) this.children.splice(i, 1); c.parentNode = null; return c; }
+  remove() { if (this.parentNode) this.parentNode.removeChild(this); }
+  contains(n) { if (n === this) return true; return this.children.some((c) => c.contains(n)); }
+  setAttribute(k, v) { this.attrs[k] = String(v); if (k === "class") this.className = String(v); }
+  getAttribute(k) { if (k === "class") return this.className; if (k.slice(0, 5) === "data-") return this.dataset[k.slice(5)] ?? this.attrs[k] ?? null; return this.attrs[k] ?? null; }
+  addEventListener(t, f) { (this._listeners[t] = this._listeners[t] || []).push(f); }
+  removeEventListener(t, f) { if (this._listeners[t]) this._listeners[t] = this._listeners[t].filter((x) => x !== f); }
+  dispatch(t, ev) { (this._listeners[t] || []).forEach((f) => f(ev || {})); }
+  getBoundingClientRect() { return { top: 10, bottom: 40, left: 20, right: 90, width: 70, height: 30 }; }
+  click() { if (this.onclick) this.onclick({ currentTarget: this, target: this }); }
+  _all(out) { out.push(this); this.children.forEach((c) => c._all(out)); return out; }
+  _match(sel) {
+    if (sel.startsWith(".")) return this.className.split(/\s+/).includes(sel.slice(1));
+    if (sel.startsWith("#")) return this.attrs.id === sel.slice(1);
+    if (sel.startsWith("[") || sel.includes("[")) { const m = sel.match(/^(\w*)\[([^=\]]+)='([^']*)'\]$/); if (m) return (!m[1] || this.tagName === m[1].toUpperCase()) && this.getAttribute(m[2]) === m[3]; return false; }
+    return this.tagName === sel.toUpperCase();
+  }
+  querySelector(sel) { return this._all([]).slice(1).find((n) => n._match(sel)) || null; }
+  querySelectorAll(sel) { const r = this._all([]).slice(1).filter((n) => n._match(sel)); r.forEach = Array.prototype.forEach.bind(r); return r; }
+  focus() {}
+  select() {}
+  get scrollHeight() { return 40; }
+  set scrollTop(v) { this._st = v; }
+  get scrollTop() { return this._st || 0; }
+}
+const head = new Node("head"), body = new Node("body");
+const document = {
+  head, body,
+  createElement: (t) => new Node(t),
+  createTextNode: (t) => { const n = new Node("#text"); n.textContent = t; return n; },
+  querySelector: (s) => head.querySelector(s) || body.querySelector(s),
+  querySelectorAll: (s) => body.querySelectorAll(s),
+  documentElement: new Node("html"),
+  addEventListener() {}, removeEventListener() {}, execCommand() { return true; },
+};
+const store = {};
+const localStorage = { getItem: (k) => (k in store ? store[k] : null), setItem: (k, v) => { store[k] = String(v); }, removeItem: (k) => { delete store[k]; } };
+
+/* ---------- 假 SSE ---------- */
+function sseBody(events) {
+  const enc = new TextEncoder();
+  const chunks = events.map((e) => enc.encode("data: " + JSON.stringify(e) + "\n\n"));
+  chunks.push(enc.encode("data: [DONE]\n\n"));
+  let i = 0, cancelled = false;
+  return { getReader: () => ({ read: () => Promise.resolve(cancelled || i >= chunks.length ? { done: true } : { done: false, value: chunks[i++] }), cancel: () => { cancelled = true; } }) };
+}
+let LAST_PAYLOAD = null, ROUTE = {};
+const fetchMock = (url, opt) => {
+  LAST_PAYLOAD = JSON.parse(opt.body);
+  const ev = ROUTE[url] || [];
+  return Promise.resolve({ ok: true, status: 200, body: sseBody(typeof ev === "function" ? ev(LAST_PAYLOAD) : ev) });
+};
+let DOWNLOADS = [];
+const window = {
+  __wdsModeMounted: false, WDSM_PAGE: 1, history: { length: 2, back() {} },
+  location: { href: "/taste/wds-chat/", pathname: "/taste/wds-chat/" }, innerWidth: 1200,
+};
+global.window = window; global.document = document; global.localStorage = localStorage;
+global.fetch = fetchMock;
+const navMock = { clipboard: { writeText() {} } };
+Object.defineProperty(global, "navigator", { value: navMock, configurable: true, writable: true });
+global.TextDecoder = require("util").TextDecoder; global.TextEncoder = require("util").TextEncoder;
+global.Blob = function (parts) { this.parts = parts; };
+global.URL = { createObjectURL: (b) => { DOWNLOADS.push(b.parts.join("")); return "blob:x"; }, revokeObjectURL() {} };
+global.alert = (m) => { console.log("  [alert] " + m); };
+window.document = document; window.localStorage = localStorage; window.fetch = fetchMock;
+
+/* ---------- 载入被测脚本 ---------- */
+const src = fs.readFileSync("/home/claude/site/public/wds-mode.js", "utf8");
+console.log("① 载入脚本");
+try { new Function("window", "document", "localStorage", "fetch", "navigator", "TextDecoder", "Blob", "URL", "alert", "setTimeout", "clearTimeout", "Date", src)(
+  window, document, localStorage, fetchMock, navMock, global.TextDecoder, global.Blob, global.URL, global.alert, setTimeout, clearTimeout, Date); ok(true, "脚本加载无异常"); }
+catch (e) { ok(false, "脚本加载抛错：" + e.message + "\n" + e.stack); process.exit(1); }
+
+const layer = document.body.querySelector(".wdsm-layer");
+ok(!!layer, "对话层已挂载");
+const inEl = layer.querySelector(".wdsm-in"), sendEl = layer.querySelector(".wdsm-send");
+const modes = layer.querySelectorAll(".wdsm-mode");
+ok(modes.length === 3, "模式条三个按钮（标准/深度/联网），实得 " + modes.length);
+ok(!!layer.querySelector(".wdsm-distbtn"), "成文按钮存在");
+
+console.log("② 模式切换");
+const deepBtn = modes.find((b) => b.getAttribute("data-k") === "deep");
+const webBtn = modes.find((b) => b.getAttribute("data-k") === "web");
+deepBtn.click(); ok(store["sde_wds_thinkmode"] === "deep", "深度档已存本地");
+ok(deepBtn.classList.contains("on"), "深度档按钮高亮");
+webBtn.click(); ok(store["sde_wds_web"] === "1", "联网开关已存本地");
+const stdBtn = modes.find((b) => b.getAttribute("data-k") === "std");
+stdBtn.click(); ok(store["sde_wds_thinkmode"] === "std" && !deepBtn.classList.contains("on"), "切回标准档，深度取消高亮（互斥）");
+ok(webBtn.classList.contains("on"), "联网是独立开关，不被档位切换清掉");
+deepBtn.click();
+
+console.log("③ 无 Key 时应弹 Key 面板而不是发请求");
+inEl.value = "什么是特征纠缠？";
+sendEl.click();
+ok(!!document.body.querySelector(".kin"), "弹出 Key 面板");
+const kp = document.body.children[document.body.children.length - 1];
+kp.querySelector(".kin").value = "sk-test-1234567890";
+kp.querySelectorAll(".kv").find((b) => b.dataset.v === "glm").click();
+kp.querySelector(".ksave").click();
+ok(store["sde_wds_key"] === "sk-test-1234567890" && store["sde_wds_vendor"] === "glm", "Key 已保存");
+ok(store["sde_glm_key"] === "sk-test-1234567890", "同步写入 sde_glm_key（联网搜索用同一把）");
+
+console.log("④ 正常一轮（含 sources / web / think / beat / token / Markdown）");
+ROUTE["/api/wds/chat"] = [
+  { t: "quota", v: { left: 297, day: 300 } },
+  { t: "sources", v: [{ u: "/column/a/", t: "站内篇甲" }] },
+  { t: "web", v: [{ u: "https://x.com/1", t: "站外条目", m: "某媒体", d: "2026-07-01" }] },
+  { t: "think", v: "先看这件事是从哪条路径发生的…" },
+  { t: "beat", v: { sec: 3, think: 18, out: 0 } },
+  { t: "token", v: "## 一句话判断\n\n**显露**不是结构，是 " },
+  { t: "token", v: "结构*被看见*的那一刻。\n\n- 第一点 [W1]\n- 第二点\n\n> 引用一句\n" },
+];
+(async () => {
+  await new Promise((r) => setTimeout(r, 200));      // 等保存 Key 时自动触发的那次 send 跑完
+  layer.querySelector(".wdsm-newbtn").click();        // 清场，只留下面这一轮
+  inEl.value = "什么是特征纠缠？";
+  await new Promise((res) => { sendEl.click(); setTimeout(res, 260); });
+  ok(LAST_PAYLOAD && LAST_PAYLOAD.mode === "deep", "payload 带 mode=deep");
+  ok(LAST_PAYLOAD && LAST_PAYLOAD.web === 1, "payload 带 web=1");
+  ok(LAST_PAYLOAD && LAST_PAYLOAD.skey === "sk-test-1234567890", "payload 带 skey（联网搜索 Key）");
+
+  const msgs = layer.querySelector(".wdsm-msgs");
+  ok(msgs.children.length === 1, "生成了一轮，实得 " + msgs.children.length);
+  const turn = msgs.children[0];
+  const ans = turn.querySelector(".wdsm-a");
+  const html = ans.innerHTML;
+  ok(html.includes("<h3>") || html.includes("<h4>"), "Markdown 标题被渲染");
+  ok(html.includes("<strong>显露</strong>"), "粗体被渲染");
+  ok(html.includes("<em>被看见</em>"), "斜体被渲染");
+  ok(html.includes("<ul>") && html.includes("<li>"), "无序列表被渲染");
+  ok(html.includes("<blockquote>"), "引用被渲染");
+  ok(html.includes("wdsm-ref"), "[W1] 角标被渲染");
+  ok(!html.includes("<script"), "没有把模型输出当 HTML 执行（已转义）");
+  ok(!!turn.querySelector(".wdsm-think"), "思考面板已出现");
+  const srcBoxes = turn.querySelectorAll(".wdsm-src");
+  ok(srcBoxes.length === 2, "站内 + 站外两块来源，实得 " + srcBoxes.length);
+  ok(srcBoxes.some((b) => b.className.includes("wdsm-web")), "站外来源块带 wdsm-web 样式");
+  ok(!!turn.querySelector(".wdsm-acts"), "操作行（复制/重答/改问）已挂出");
+  ok(sendEl.textContent === "↑" && !sendEl.classList.contains("stop"), "结束后发送键复位");
+  ok(layer.querySelector(".wdsm-turns").textContent.includes("今日 297"), "日额度已回显");
+
+  console.log("⑤ 思考面板可展开");
+  const th = turn.querySelector(".wdsm-think");
+  th.querySelector(".wdsm-think-h").click();
+  ok(th.classList.contains("on"), "点开思考面板");
+  ok(th.querySelector(".wdsm-think-c").textContent.includes("哪条路径"), "思考正文可见");
+
+  console.log("⑥ 改问：回滚这一轮");
+  turn.querySelectorAll(".wdsm-act").find((b) => b.textContent.includes("改问")).click();
+  ok(msgs.children.length === 0, "DOM 已回滚，实得 " + msgs.children.length);
+  ok(inEl.value === "什么是特征纠缠？", "问题已回填输入框");
+
+  console.log("⑦ 停止生成");
+  ROUTE["/api/wds/chat"] = [{ t: "token", v: "刚开个头" }, { t: "token", v: "……" }];
+  inEl.value = "再问一句";
+  sendEl.click();
+  ok(sendEl.classList.contains("stop"), "生成中发送键变停止键");
+  sendEl.click();  // 停止
+  await new Promise((r) => setTimeout(r, 200));
+  ok(!sendEl.classList.contains("stop"), "停止后发送键复位");
+
+  console.log("⑧ 成文（distill）");
+  ROUTE["/api/wds/distill"] = [{ t: "beat", v: { sec: 2, think: 9 } }, { t: "token", v: "# 报告标题\n\n结论：一句话。" }];
+  layer.querySelector(".wdsm-distbtn").click();
+  const menu = document.body.querySelector(".wdsm-menu");
+  ok(!!menu, "成文菜单弹出");
+  ok(menu.children.length === 4, "菜单四项（报告/成文/提纲/导出），实得 " + menu.children.length);
+  menu.children[0].click();
+  await new Promise((r) => setTimeout(r, 220));
+  const dist = document.body.querySelector(".wdsm-dist");
+  ok(!!dist, "成文面板出现");
+  ok(LAST_PAYLOAD.kind === "report" && Array.isArray(LAST_PAYLOAD.history), "distill payload 正确");
+  ok(dist.querySelector(".wdsm-a").innerHTML.includes("<h3>"), "成文内容按 Markdown 渲染");
+  dist.querySelector(".dx").click();
+  ok(!document.body.querySelector(".wdsm-dist"), "成文面板可关闭");
+
+  console.log("⑨ 导出本场");
+  DOWNLOADS = [];
+  layer.querySelector(".wdsm-distbtn").click();
+  const menu2 = document.body.querySelector(".wdsm-menu");
+  menu2.children[3].click();
+  ok(DOWNLOADS.length === 1 && DOWNLOADS[0].includes("与 WDS 的对话"), "导出了 Markdown 文件");
+
+  console.log("⑩ 新对话复位");
+  layer.querySelector(".wdsm-newbtn").click();
+  ok(layer.querySelector(".wdsm-msgs").children.length === 0, "新对话已清空");
+
+  console.log("\n===== " + PASS + " PASS / " + FAILS + " FAIL =====");
+  process.exit(FAILS ? 1 : 0);
+})();
