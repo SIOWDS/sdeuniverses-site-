@@ -621,7 +621,7 @@
                     if (ans) { bubble.textContent = ans; history.push({ role: "wds", text: ans }); stSave(history); summarizeExchange(); }
                     else {
                       bubble.classList.add("err");
-                      bubble.textContent = "没收到回答。【诊断】流式收到 " + diag.bytes + " 字节（HTTP " + diag.status + "，" + (diag.sawEnd ? "有结束标记" : "被中途切断") + "，停在「" + (diag.stage || "未知") + "」）；不流式重取 HTTP " + o.st + "、收到 " + String(o.t || "").length + " 字节" + (err ? ("；基底说：" + err) : "") + (diag.lastNote ? ("；提示：" + diag.lastNote) : "") + "。把这行截图给我。";
+                      bubble.textContent = "没收到回答。【诊断】流式收到 " + diag.bytes + " 字节 · 跑了 " + Math.round((Date.now() - diag.t0) / 1000) + " 秒 · 思考 " + think.replace(/\s/g, "").length + " 字（HTTP " + diag.status + "，" + (diag.sawEnd ? "有结束标记" : "被中途切断") + "，停在「" + (diag.stage || "未知") + "」）；不流式重取 HTTP " + o.st + "、收到 " + String(o.t || "").length + " 字节" + (err ? ("；基底说：" + err) : "") + (diag.lastNote ? ("；提示：" + diag.lastNote) : "") + "。把这行截图给我。";
                       history.pop();
                     }
                     streaming = false; goEl.disabled = false; paint();

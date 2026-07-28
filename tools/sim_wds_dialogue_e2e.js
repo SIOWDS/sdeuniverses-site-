@@ -476,15 +476,17 @@ async function ask(text) { qEl.value = text; goEl.onclick(); await flush(25); }
 // （拿到骨架才谈得上后面六个部分，而六个部分依然满功率写）。答题、分部成文一律不降。
 ok("worker：拟题第一次仍满功率（不预先降档）", /let r = await genOnce\(\);/.test(W));
 ok("worker：只有第一次没成，第二次才卸满功率并压短上下文", /genOnce\(\{ noThink: true, usr: usrLite \}\)/.test(W) && /o\.noThink \? \{ url: VC\.url/.test(W));
-ok("worker：答题与分部成文不降档（降的只有拟题的第二次）", !/noThink/.test(W.slice(W.indexOf("const PART_FIRST_MS"))) && W.includes("WDS_TOK_MAX = 64000"));
+ok("worker：分部成文不降档", !/noThink/.test(W.slice(W.indexOf("const PART_FIRST_MS"), W.indexOf("let pr = await _runPart()"))) && W.includes("WDS_TOK_MAX = 64000"));
+ok("worker：答题只在「长篇请求且第一次一个字没写出来」时才卸档（且长度不减）", /_runAnswer\(_retryTok, !!askLen\)/.test(W) && /const uVC = noThink \?/.test(W));
 ok("worker：顶格降档只在基底拒收 max_tokens 时发生", /resp\.status !== 400/.test(W) && W.includes("WDS_TOK_LADDER") && /max\[_ \\\]\?tokens/.test(W) === false);
 // 【口径已改，别再按"全线顶格"验】1790b958 推翻了四修的"一律顶格"：满功率档的预算给多大，它就想多久，
 // 给到几万就会一路想到超过平台上限、被杀在思考里（流干净结束、正文 0 字）。所以满功率档必须有界，
 // 空答重试还要再降一档——这与"不给答题设限"不冲突：降的是"想多久"，不是"能写多长"。
-ok("worker：答题的 0 字自动重答仍在，且重答必降档", W.includes("ANSWER_EMPTY_GUARD") && /_runAnswer\(WDS_TOK_RETRY\)/.test(W) && W.includes("降档重答"));
-ok("worker：满功率档的预算有界（8000 起、重答 4000），绝不回到 64000", /WDS_TOK_SAFE = 8000, WDS_TOK_RETRY = 4000/.test(W) && /_runAnswer\(WDS_TOK_SAFE\)/.test(W));
+ok("worker：答题的 0 字自动重答仍在，且按问题种类换打法", W.includes("ANSWER_EMPTY_GUARD") && /const _retryTok = askLen \? tokWant : WDS_TOK_RETRY;/.test(W) && /_runAnswer\(_retryTok, !!askLen\)/.test(W));
+ok("worker：常规问答仍是 8000 起、重答 4000（不回到 64000）", /WDS_TOK_SAFE = 8000, WDS_TOK_RETRY = 4000/.test(W) && /askLen \? Math\.min\(32000/.test(W));
+ok("worker：只有读者明确要长篇时才放大预算（且有 32000 上限）", /Math\.min\(32000, Math\.max\(WDS_TOK_SAFE, Math\.round\(askLen \* 1\.8\)\)\)/.test(W) && /function wdsAskLen/.test(W));
 ok("worker：非满功率档不受牵连，仍走 64000 阶梯", W.includes("WDS_TOK_MAX = 64000") && W.includes("return WDS_TOK_LADDER;"));
-ok("worker：与WDS对话各步都走统一发车口 wdsFetchMax", (W.match(/wdsFetchMax\(VC, /g) || []).length >= 5 && W.includes("max_tokens: ladder[i]"));
+ok("worker：与WDS对话各步都走统一发车口 wdsFetchMax", (W.match(/wdsFetchMax\((?:VC|uVC), /g) || []).length >= 4 && W.includes("max_tokens: ladder[i]"));
 ok("worker：JSON 不达标时有行文兜底解析", W.includes("function parsePlanText") && /const pick = \(rr\)/.test(W));
 ok("worker：失败原因分种类回报（0 字 / 不可解析）", W.includes("只出了思考、正文 0 字") && W.includes("输出不是可解析的提纲") && W.includes('"plan_fail"'));
 ok("客户端：拟题失败给「重新拟题再试一次」", PAGE.includes("PLAN_RETRY") && /\\u91cd\\u65b0\\u62df\\u9898\\u518d\\u8bd5\\u4e00\\u6b21/.test(PAGE));
@@ -570,7 +572,7 @@ ok("客户端：论文三步都把 beat 画成人话（beatTip）", PAGE.include
   head("[阶段十二] 答题前的准备不许烧光整个请求的时钟（34da38ca）");
 ok("worker：词表扩展卸掉满功率档（配菜不占正菜的时间）", /const LC = \(VC && VC\.top\) \? \{ url: VC\.url, model: VC\.model, name: VC\.name \} : VC;/.test(W));
 ok("worker：词表扩展自带短截止，且远小于原来的 55 秒", /const SDE_EXPAND_MS = (\d+);/.test(W) && Number((W.match(/const SDE_EXPAND_MS = (\d+)/) || [])[1]) <= 10000);
-ok("worker：答题调用终于有时钟（首帧 + 总时长两级护栏）", /ANS_FIRST_MS = \d+, ANS_TOTAL_MS = \d+/.test(W) && /wdsFetchMax\(VC, KEY, messages, true, tokWant, _ac\.signal\)/.test(W));
+ok("worker：答题调用终于有时钟（首帧 + 总时长两级护栏，总时长按长篇分档）", /ANS_FIRST_MS = \d+, ANS_TOTAL_MS = askLen \? \d+ : \d+/.test(W) && /wdsFetchMax\(uVC, KEY, messages, true, tokWant, _ac\.signal\)/.test(W));
 ok("worker：wdsFetchMax 收得下 AbortSignal 且不影响老调用点", /async function wdsFetchMax\(VC, KEY, messages, stream, want, signal\)/.test(W) && W.includes("signal: signal || undefined"));
 ok("worker：中途断线时已写出的正文不丢", /if \(got\) \{ controller\.enqueue\(_sseBytes\(\{ t: "note"/.test(W) && W.includes("断在半路"));
 ok("worker：站内检索 5xx 重打一次、4xx 立刻认输", /for \(let _try = 0; _try < 2; _try\+\+\)/.test(W) && W.includes("if (rr.status < 500) break;"));

@@ -174,6 +174,22 @@ const WDS_VENDORS = {
 // 前端短码 ↔ 基底键。未知一律落 zhipu（老前端只发 ds/其它两种值，这样不会断）。
 const WDS_VMAP = { ds: "deepseek", glm: "zhipu", kimi: "kimi", qwen: "qwen", mm: "minimax" };
 const WDS_VSHORT = { deepseek: "ds", zhipu: "glm", kimi: "kimi", qwen: "qwen", minimax: "mm" };
+// LONG_ASK：读者这一问要的是"答一段话"还是"写一篇"？两者对预算与口径的要求完全不同。
+// 不识别它，就会出现最难看的那种失败：读者写"先写 8000 字"，而我们给的 max_tokens 是 8000（约等于 8000 汉字的极限），
+// 同时 system 里还写着"一次两三段以内、别写论文"——两条指令互相打架，基底就在思考里反复权衡、
+// 想上几万字却一个正文字都不落，最后被平台掐断。返回 0 表示常规问答。
+function wdsAskLen(q) {
+  const s = String(q || "");
+  let want = 0;
+  const m1 = s.match(/([0-9]{3,6})\s*(?:个)?字/);
+  if (m1) want = parseInt(m1[1], 10);
+  const cn = { 一: 1, 两: 2, 二: 2, 三: 3, 四: 4, 五: 5, 六: 6, 七: 7, 八: 8, 九: 9, 十: 10 };
+  const m2 = s.match(/([一两二三四五六七八九十])\s*万\s*(?:多)?字/);
+  if (m2) want = Math.max(want, (cn[m2[1]] || 1) * 10000);
+  else if (/万\s*字/.test(s)) want = Math.max(want, 10000);
+  if (!want && /(详细展开|详尽|长文|写长一点|完整地写|全文写|扩写|通篇改写)/.test(s)) want = 3000;
+  return want >= 1200 ? Math.min(want, 20000) : 0;   // 1200 字以下按常规问答走；单次上限 2 万字，再长该走「继续」或成文流程
+}
 function wdsVendorOf(v) { return WDS_VMAP[String(v || "").toLowerCase()] || "zhipu"; }
 function wdsShort(vd) { return WDS_VSHORT[vd] || "glm"; }
 // 读者自填的型号覆盖默认值。只放行像模型名的字符串，别让它变成往上游注入别的东西的口子。
@@ -2592,6 +2608,12 @@ export default {
             _st.stage = "基底作答";
             if (siteSrcs.length) controller.enqueue(_sseBytes({ t: "sources", v: siteSrcs })); // 先把站内出处发给前端
             const sys = b.guide ? WDS_DIALOGUE_SYS(reflect, SDEM, siteCtx, docTitle, docText) : WDS_READ_SYS(reflect, SDEM, docTitle, docText);
+            // LONG_ASK 落地：读者要长篇时，①预算按要的字数给（8000 token 装不下 8000 汉字）；
+            // ②当轮明确解除 system 里"一次两三段以内、别写论文"那一条，否则两条指令打架、它只会在思考里空转；
+            // ③叮嘱它别在思考里打草稿、直接落笔——写出来的每一个字都留得住（中途断线也不丢），写不完读者说「继续」。
+            const askLen = b.guide ? wdsAskLen(q) : 0;
+            const LONGASK = askLen ? ("\n\n【本轮特别指令 · 覆盖上面《怎么答》第 5 条】我这一问明确要一篇约 " + askLen + " 字的长篇。这一轮不受「一次两三段以内」的约束：直接连续写下去，写到约 " + askLen + " 字；不要先写提纲、不要说「我将／好的」、不要问我要不要继续；别在心里反复打草稿，边想边落笔——写出来的部分都会留住，万一没写完我会说「继续」，你接着往下写就行。") : "";
+            const tokWant = askLen ? Math.min(32000, Math.max(WDS_TOK_SAFE, Math.round(askLen * 1.8))) : WDS_TOK_SAFE;
             // 历史预算随正文/站内资料篇幅收缩：合计钳在 ~12万字符内，防超长文+百轮对话挤爆基底上下文
             // 陪读：正文+历史 ~12万字符收缩；与WDS对话（guide）：全面记忆——大预算+单条1.2万，正常百轮尽量不裁；
             //   但基底输入窗口是硬物理上限，深聊会溢出——故预算做成可收缩，溢出时（见 _runAnswer 的 CONTEXT_OVERFLOW 分支）逐级缩小重试。
@@ -2604,7 +2626,7 @@ export default {
                 mm.push({ role: "assistant", content: "《" + (docTitle || "未命名") + "》全文我已通读完毕（" + docText.length + " 字符）。接下来你每问一句，我都扣着这篇文章本身答——引它的原话、拆它的显露与差异序列、指出它的创新与缝隙。你问吧。" });
               }
               mm.push(...packReadHistory(history, histBudget, b.guide ? 12000 : 0));
-              mm.push({ role: "user", content: focus ? ("我正读到这一句：「" + focus + "」\n\n我的问题：" + q) : q });
+              mm.push({ role: "user", content: (focus ? ("我正读到这一句：「" + focus + "」\n\n我的问题：" + q) : q) + LONGASK });
               return mm;
             };
             let messages = _buildMessages();
@@ -2615,15 +2637,16 @@ export default {
             // Worker 就一直等到被平台掐掉，流里既没有 error 也没有 end，客户端只能干说"没收到回答"。
             // 分两级：①首帧护栏——连思考都不给一个字，判它卡住，掐断并按"空答"降档重来；
             //        ②总时长护栏——已经在写就保住写出来的部分，没写就如实报出来。
-            const ANS_FIRST_MS = 60000, ANS_TOTAL_MS = 180000;
-            const _runAnswer = async (tokWant) => {
+            const ANS_FIRST_MS = 60000, ANS_TOTAL_MS = askLen ? 300000 : 180000;   // 写长篇本来就久，总时长跟着放宽
+            const _runAnswer = async (tokWant, noThink) => {
+              const uVC = noThink ? { url: VC.url, model: VC.model, name: VC.name } : VC;   // 去掉 top 即卸满功率（见 wdsTopBody）
               let upstream;
               const _ac = new AbortController();
               let _cut = "";
               let _t1 = setTimeout(() => { _cut = "首帧"; try { _ac.abort(); } catch (e) {} }, ANS_FIRST_MS);
               const _t2 = setTimeout(() => { _cut = _cut || "总时长"; try { _ac.abort(); } catch (e) {} }, ANS_TOTAL_MS);
               const _clear = () => { try { clearTimeout(_t1); } catch (e) {} try { clearTimeout(_t2); } catch (e) {} };
-              try { upstream = await wdsFetchMax(VC, KEY, messages, true, tokWant, _ac.signal); }
+              try { upstream = await wdsFetchMax(uVC, KEY, messages, true, tokWant, _ac.signal); }
               catch (e) { _clear(); return _cut ? { soft: "基底 " + ANS_FIRST_MS / 1000 + " 秒内一个字都没回（已掐断重来）" } : { hard: "接不上基底：" + (e && e.message) }; }
               if (!upstream.ok) {
                 _clear();
@@ -2674,7 +2697,7 @@ export default {
               return { got: got };
             };
             const _diagLine = () => "【诊断】上游 " + (_diag.status || "?") + " · 收到 " + (_diag.lines || 0) + " 条流数据 · 思考 " + ((_st && _st.think) || 0) + " 字 · 答题前的准备烧了 " + ((_st && _st.pre) || 0) + " 秒 · 结束原因 " + (_diag.finish || "未给") + (_diag.head ? (" · 首帧「" + _diag.head.replace(/\s+/g, " ").slice(0, 80) + "」") : "");
-            let ar = await _runAnswer(WDS_TOK_SAFE);
+            let ar = await _runAnswer(tokWant);
             // CONTEXT_OVERFLOW 恢复：基底报上下文过长 → 砍半历史预算、重建 messages、重跑（最多 4 级，砍到 24000 仍不行才认输）
             let _shrinks = 0;
             while (ar.overflow && histBudget > 24000 && _shrinks < 4) {
@@ -2687,10 +2710,12 @@ export default {
             if (ar.overflow) { controller.enqueue(_sseBytes({ t: "error", v: "这场对话太长，即使收拢也超过了基底一次能读的上限。可以点「成文一篇」把它凝成论文，或新开一场继续。", code: "too_long" })); return done(); }
             if (ar.hard) { controller.enqueue(_sseBytes({ t: "error", v: ar.hard, code: ar.code })); return done(); }
             if (!ar.got) {
-              // 重答必须**降预算**，不能原样再来一遍——同一个预算只会把同一个坑再踩一次。
-              // 预算砍半＝逼它早点收住思考、开始写正文，这是唯一被实测证明有效的杠杆。
-              controller.enqueue(_sseBytes({ t: "note", v: "这一答只出了思考、正文 0 字，正在降档重答…" }));
-              ar = await _runAnswer(WDS_TOK_RETRY);
+              // 重答不能原样再来一遍——同一个打法只会把同一个坑再踩一次。但"降什么"要看这一问是哪一种：
+              //  · 常规问答：降预算＝逼它早点收住思考、开始写正文（1790b958 实测有效的杠杆）；
+              //  · 长篇请求：降预算等于砍掉正文长度，那不是解药——改成**卸掉满功率档**保住长度（拟题那一步同理，已验证有效）。
+              const _retryTok = askLen ? tokWant : WDS_TOK_RETRY;
+              controller.enqueue(_sseBytes({ t: "note", v: askLen ? "这一答想了很久却一个正文字都没落，正换个打法重写（不开思考档、长度不减）…" : "这一答只出了思考、正文 0 字，正在降档重答…" }));
+              ar = await _runAnswer(_retryTok, !!askLen);
               if (ar.hard) { controller.enqueue(_sseBytes({ t: "error", v: ar.hard, code: ar.code })); return done(); }
               if (!ar.got) controller.enqueue(_sseBytes({ t: "error", v: (ar.soft || "基底两次都没写出正文") + "（可再问一次）\n" + _diagLine(), code: "empty" }));
             }

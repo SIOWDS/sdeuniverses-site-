@@ -63,8 +63,11 @@ function tail() {
   console.log("\n[三] 首帧 / 总时长两级护栏");
   const ans = src.slice(src.indexOf("// ANSWER_DEADLINE"), src.indexOf("const _diagLine ="));
   const first = Number((ans.match(/ANS_FIRST_MS = (\d+)/) || [])[1]);
-  const total = Number((ans.match(/ANS_TOTAL_MS = (\d+)/) || [])[1]);
-  ok(first > 0 && total > first, "两级护栏都在且总时长大于首帧：首帧 " + first / 1000 + "s / 总 " + total / 1000 + "s");
+  // 总时长现在是随"读者要不要长篇"分档的：askLen ? 300000 : 180000
+  const tot = ans.match(/ANS_TOTAL_MS = askLen \? (\d+) : (\d+)/) || [];
+  const totLong = Number(tot[1]), totNorm = Number(tot[2]);
+  ok(first > 0 && totNorm > first && totLong > totNorm,
+     "两级护栏都在，且总时长分档：首帧 " + first / 1000 + "s / 常规 " + totNorm / 1000 + "s / 长篇 " + totLong / 1000 + "s");
   ok(/_ac\.signal/.test(ans), "护栏的 signal 确实交给了 wdsFetchMax");
   ok(/clearTimeout\(_t1\);\s+\/\/ 首帧到了/.test(ans), "收到第一帧就撤掉首帧护栏——正常的长思考不会被误杀");
   ok(/if \(got\) \{ controller\.enqueue\(_sseBytes\(\{ t: "note"/.test(ans), "中途断线时已写出的正文一个字都不丢（发 note 而非丢弃）");
@@ -137,6 +140,26 @@ function tail() {
     const page3 = fs.readFileSync("/home/claude/site/public/taste/wds-dialogue/index.html", "utf8");
     ok(/XINDE_RETRY/.test(page3) && /点这一行可以重来一次开工/.test(page3), "客户端：开工失败可一键重试，不必刷新整页");
     ok(!/刷新页面可重试开工仪式/.test(page3), "旧的「刷新页面」指引已去掉——刷新会丢掉整场对话");
+
+    /* ── ⑧ 读者要长篇时，预算与口径都得跟着变 ── */
+    console.log("\n[八] 读者说「先写 8000 字」时");
+    const lenSeg = src.slice(src.indexOf("// LONG_ASK"), src.indexOf("function wdsVendorOf"));
+    const askLen = new Function(lenSeg + "\nreturn wdsAskLen;")();
+    ok(askLen("按照这个进行修改和完善文章，先写 8000字") === 8000, "认得出「先写 8000字」");
+    ok(askLen("写一万字") === 10000 && askLen("两万字的论文") === 20000, "认得出中文数字的万字");
+    ok(askLen("评估这篇文章") === 0 && askLen("写 800 字") === 0, "常规问答与短要求一律判 0，不误伤");
+    ok(askLen("请详细展开") === 3000, "没给数字但明说要长的，按 3000 字起");
+    ok(askLen("写一百万字") <= 20000, "单次上限 2 万字，再长该走「继续」或成文流程");
+
+    const ansSeg = src.slice(src.indexOf("const askLen = b.guide ? wdsAskLen(q)"), src.indexOf("let histBudget"));
+    ok(/Math\.min\(32000, Math\.max\(WDS_TOK_SAFE, Math\.round\(askLen \* 1\.8\)\)\)/.test(ansSeg), "预算按要的字数给（8000 token 装不下 8000 汉字）");
+    ok(/覆盖上面《怎么答》第 5 条/.test(ansSeg) && /不受「一次两三段以内」的约束/.test(ansSeg), "当轮明确解除 system 里那条「别写论文」，否则两条指令打架");
+    ok(/别在心里反复打草稿，边想边落笔/.test(ansSeg), "叮嘱它直接落笔，别把时间全花在思考里");
+    ok(/LONGASK\) \}\);/.test(src) || /\+ LONGASK/.test(src), "覆盖指令挂在每轮 user 消息上（不污染可缓存的固定前缀）");
+    ok(/ANS_TOTAL_MS = askLen \? 300000 : 180000/.test(src), "写长篇时总时长护栏跟着放宽");
+    ok(/const _retryTok = askLen \? tokWant : WDS_TOK_RETRY;/.test(src) && /_runAnswer\(_retryTok, !!askLen\)/.test(src), "长篇重答不砍长度、改卸满功率；常规问答仍是降预算");
+    const page4 = fs.readFileSync("/home/claude/site/public/taste/wds-dialogue/index.html", "utf8");
+    ok(/跑了 " \+ Math\.round\(\(Date\.now\(\) - diag\.t0\) \/ 1000\)/.test(page4), "被切断的诊断行现在说得出跑了几秒（用来量平台到底在第几秒掐）");
 
     console.log("\n===== " + P + " PASS / " + F + " FAIL =====");
     process.exit(F ? 1 : 0);
