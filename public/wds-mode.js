@@ -13,6 +13,7 @@
   var LS = "sdeuniverses_wds_mode";
   var LS_MODE = "sde_wds_thinkmode";      // "std" | "deep"
   var LS_WEB = "sde_wds_web";             // "1" | "0"
+  var LS_LANG = "sde_wds_lang";           // "zh" | "en"
   var PAGE = !!window.WDSM_PAGE;
   var PAGE_URL = "/taste/wds-chat/";
   function el(t, c, x) { var e = document.createElement(t); if (c) e.className = c; if (x != null) e.textContent = x; return e; }
@@ -34,7 +35,7 @@
         .replace(/\*\*([^*\n]+)\*\*/g, "<strong>$1</strong>")
         .replace(/(^|[^*])\*([^*\n]+)\*/g, "$1<em>$2</em>")
         .replace(/\[([^\]\n]+)\]\((https?:\/\/[^)\s]+|\/[^)\s]*)\)/g, "<a href=\"$2\" target=\"_blank\" rel=\"noopener\">$1</a>")
-        .replace(/\[W(\d{1,2})\]/g, "<sup class=\"wdsm-ref\">W$1</sup>");
+        .replace(/\[W(\d{1,2})\]/g, "<sup class=\"wdsm-ref\" data-w=\"$1\">W$1</sup>");
     }
     for (var i = 0; i < lines.length; i++) {
       var L = lines[i], m;
@@ -53,6 +54,106 @@
     html = html.replace(/\u0000CODE(\d+)\u0000/g, function (_, n) { return "<pre><code>" + codes[+n] + "</code></pre>"; });
     return html;
   }
+
+
+  /* ── 中英双语。站上其余页面用 body.className = "zh"|"en" 切换，这里沿用同一口径，
+     再叠一层 localStorage 记忆（助手是独立页，没有站点的语言按钮可继承）。 ── */
+  var TXT = {
+    zh: {
+      tabNormal: "常规", tabBack: "\u2190 返回浏览", tabWds: "\u2726 WDS 助手",
+      bDistill: "\u270e 成文", bHist: "\u21ba 历史", bSet: "\u2699 设置", bNew: "\uff0b 新对话",
+      heroSub: "王德生的 AI 分身 · SDE 本体论老师<br>检索全站文章与专著，也能直接和你对谈 SDE",
+      egs: ["SDE 说的“显露”和“结构”有什么不同？", "用 SDE 怎么看慢性病的发生？", "什么是特征纠缠？举个例子", "帮我找几篇入门 SDE 的文章"],
+      mAtt: "\ud83d\udcce 附件", mStd: "\u26a1 标准", mDeep: "\u25c8 深度思考", mWeb: "\ud83c\udf10 联网",
+      tipStd: "快答档，够用且省", tipDeep: "满血基底＋满功率思考＋SDE 全内功与方法论工序，慢但深", tipWeb: " · 已开联网（需智谱 Key）",
+      ph: "问 WDS 任何 SDE 问题，或让它帮你找站里读什么…",
+      note: "WDS 会尽力扣着全站内容作答，可核验的书名/引文请以原文为准。用你自己的大模型 Key 运行，只存在浏览器本地。",
+      left: "本场剩余 ", times: " 次", today: " 次 · 今日 ", turnsTitle: "本场＝这一次对话最多 100 轮（点＋新对话可重开）；今日＝本机每天在「全站问答」入口的额度，陪读与「与WDS对话」各有独立额度。",
+      dayOut: "今日本机额度已用完，明天再来（陪读与「与WDS对话」不受影响）。",
+      sessFull: "这场已谈满 100 次，点＋新对话重开。",
+      srcSite: "站内来源", srcWeb: "站外来源 · 联网搜索", followsH: "接着可以问",
+      aCopy: "\u29c9 复制", aCopied: "已复制", aRead: "\ud83d\udd0a 朗读", aStop: "\u23f9 停止", aRegen: "\u21bb 重答", aEdit: "\u270e 改问",
+      thinking: "正在想…", thought: "已思考 ", chars: " 字（点开看）", expand: "展开", collapse: "收起",
+      stopped: "（你按了停止）", stoppedOnly: "（已停止）",
+      errDead: "连接像是断了（也许想太久被中间层切了）。稍后再问，你这句我记着。",
+      errNet: "接不上 WDS 了（", errNetEnd: "）。稍后再问，你这句我记着。",
+      webNeedKey: "联网没跑起来：需要一把智谱 Key（在 ⚙ 设置里填智谱，同一把即可）。",
+      webBadKey: "联网没跑起来：这把智谱 Key 用不了（额度或权限）。",
+      webNone: "联网这次没搜到东西，先按站内资料答。",
+      kReport: "对话报告", kReportS: "结论 · 谈了什么 · 立住的判断 · 未解决 · 下一步",
+      kEssay: "提炼成文", kEssayS: "锻成一篇独立成立的文章，约三千字",
+      kOutline: "写作提纲", kOutlineS: "母题 + 章节骨架，照着就能写",
+      mExport: "\u2913 导出本场对话", mExportS: "Markdown 文件，存到本机",
+      mDhist: "\u21ba 成文记录", mDhistS: "取回以前存下的报告与文章",
+      needTalk: "先聊几句，再来成文。",
+      dWorking: "正在锻…", dDone: "完成 · ", dFail: "失败", dEmpty: "（没有产出内容，可再试一次）",
+      dCopy: "\u29c9 复制", dDl: "\u2913 存为 .md", dSave: "\u2338 存到本机", dSaved: "已存",
+      dNoStore: "本机存不了（浏览器禁用了本地存储）",
+      convoTitle: "与 WDS 的对话", errNoOut: "成文没接上（",
+      setTitle: "设置", setKeyH: "用你自己的 API Key",
+      setKeyP: "WDS 助手用你自己的大模型 Key 运行。<b style=\"color:#C9A227\">Key 只存在你的浏览器本地，不会上传本站</b>，随时可清除。联网搜索走智谱通道，填一把智谱 Key 即可同时用于对话与联网。",
+      setAboutH: "自定义指令（可空）",
+      setAboutP: "写一句你是谁、在做什么、想让 WDS 怎么答你。以后每次提问都会带上，不必再重复交代。也只存在你本机。",
+      setAboutPh: "例：我是中学生物老师，正在把 SDE 用到备课上。答我时多举课堂能直接用的例子，术语讲一遍就够。",
+      setKeyPh: "粘贴你的 API Key", setSave: "保存并开始", setCancel: "取消",
+      linkDs: "还没有 Key？去 <a href='https://platform.deepseek.com' target='_blank' style='color:#C9A227'>platform.deepseek.com</a> 申请",
+      linkGlm: "还没有 Key？去 <a href='https://open.bigmodel.cn' target='_blank' style='color:#C9A227'>open.bigmodel.cn</a> 申请（联网搜索也用这把）",
+      attOld: "这台浏览器解析不了文件（内核太旧）", attLoading: "正在装解析器…", attNoLoad: "解析器没装上，刷新再试", attErr: "附件出错：",
+      noSpeak: "此浏览器不支持朗读",
+    },
+    en: {
+      tabNormal: "Browse", tabBack: "\u2190 Back to site", tabWds: "\u2726 WDS",
+      bDistill: "\u270e Write up", bHist: "\u21ba History", bSet: "\u2699 Settings", bNew: "\uff0b New chat",
+      heroSub: "Wang Desheng's AI counterpart · a teacher of the SDE ontology<br>It searches the whole site, and it will also just think with you",
+      egs: ["What separates Show from structure in SDE?", "How would SDE read the onset of a chronic disease?", "What is entanglement of features? Give an example.", "Point me at a few pieces to start with"],
+      mAtt: "\ud83d\udcce Attach", mStd: "\u26a1 Standard", mDeep: "\u25c8 Deep", mWeb: "\ud83c\udf10 Web",
+      tipStd: "Fast tier — enough for most questions, and cheap",
+      tipDeep: "Top model at full reasoning power, the whole SDE groundwork and its method stages. Slow, but it digs.",
+      tipWeb: " · Web search on (needs a Zhipu key)",
+      ph: "Ask WDS anything about SDE, or ask it what to read here…",
+      note: "WDS answers from what is actually on this site. Check titles and quotations against the originals. It runs on your own model key, kept only in this browser.",
+      left: "", times: " left this session", today: " left this session · ", turnsTitle: "Session = up to 100 turns in this chat (start a new one to reset). Today = this key's daily allowance on the site-wide entrance; the reading companion has its own.",
+      dayOut: "Today's allowance for this key is used up. Come back tomorrow.",
+      sessFull: "This chat has hit 100 turns. Start a new one.",
+      srcSite: "ON-SITE SOURCES", srcWeb: "WEB SOURCES", followsH: "ASK NEXT",
+      aCopy: "\u29c9 Copy", aCopied: "Copied", aRead: "\ud83d\udd0a Read", aStop: "\u23f9 Stop", aRegen: "\u21bb Retry", aEdit: "\u270e Edit",
+      thinking: "Thinking…", thought: "Thought for ", chars: " chars (open)", expand: "open", collapse: "close",
+      stopped: "(you stopped it)", stoppedOnly: "(stopped)",
+      errDead: "The connection dropped — it may have thought too long and been cut. Try again in a moment; your question is still here.",
+      errNet: "Couldn't reach WDS (", errNetEnd: "). Try again shortly.",
+      webNeedKey: "Web search didn't run: it needs a Zhipu key (put one in ⚙ Settings — the same key works for both).",
+      webBadKey: "Web search didn't run: that Zhipu key won't work (quota or permissions).",
+      webNone: "Web search found nothing this time; answering from the site instead.",
+      kReport: "Conversation report", kReportS: "Verdict · what was covered · what held · what didn't · next",
+      kEssay: "Forge into an essay", kEssayS: "A piece that stands on its own, about 3,000 words",
+      kOutline: "Writing outline", kOutlineS: "A motif plus a chapter skeleton you can write from",
+      mExport: "\u2913 Export this chat", mExportS: "A Markdown file, saved to your machine",
+      mDhist: "\u21ba Saved write-ups", mDhistS: "Pull back reports and essays you kept",
+      needTalk: "Talk a while first, then write it up.",
+      dWorking: "Forging…", dDone: "Done · ", dFail: "Failed", dEmpty: "(nothing came out — try again)",
+      dCopy: "\u29c9 Copy", dDl: "\u2913 Save .md", dSave: "\u2338 Keep on this device", dSaved: "Kept",
+      dNoStore: "Can't keep it here (local storage is disabled)",
+      convoTitle: "A conversation with WDS", errNoOut: "The write-up didn't connect (",
+      setTitle: "Settings", setKeyH: "Use your own API key",
+      setKeyP: "WDS runs on your own model key. <b style=\"color:#C9A227\">The key stays in this browser and is never sent to this site</b>; clear it whenever you like. Web search goes through Zhipu, so one Zhipu key covers both chat and search.",
+      setAboutH: "Custom instructions (optional)",
+      setAboutP: "A line about who you are, what you're working on, and how you want WDS to answer. It rides along with every question from then on. Also kept only on this device.",
+      setAboutPh: "e.g. I teach secondary-school biology and I'm bringing SDE into my lesson planning. Give me examples I can use in class; one pass on the terminology is enough.",
+      setKeyPh: "Paste your API key", setSave: "Save and start", setCancel: "Cancel",
+      linkDs: "No key yet? Get one at <a href='https://platform.deepseek.com' target='_blank' style='color:#C9A227'>platform.deepseek.com</a>",
+      linkGlm: "No key yet? Get one at <a href='https://open.bigmodel.cn' target='_blank' style='color:#C9A227'>open.bigmodel.cn</a> (web search uses it too)",
+      attOld: "This browser can't parse files (engine too old)", attLoading: "Loading the parser…", attNoLoad: "Parser didn't load — refresh and retry", attErr: "Attachment error: ",
+      noSpeak: "This browser can't read aloud",
+    },
+  };
+  function langInit() {
+    try { var v = localStorage.getItem(LS_LANG); if (v === "zh" || v === "en") return v; } catch (e) {}
+    try { if (/\ben\b/.test((document.body && document.body.className) || "") || (document.documentElement.lang || "") === "en") return "en"; } catch (e) {}
+    try { if (/^en/i.test((navigator && navigator.language) || "")) return "en"; } catch (e) {}
+    return "zh";
+  }
+  var LANG = langInit();
+  function t(k) { var d = TXT[LANG] || TXT.zh; return (k in d) ? d[k] : TXT.zh[k]; }
 
   var CSS =
     ".wdsm-open{overflow:hidden}" +
@@ -92,7 +193,10 @@
     ".wdsm-a hr{border:none;border-top:1px solid rgba(255,255,255,.12);margin:1.2em 0}" +
     ".wdsm-a a{color:#C9A227}" +
     ".wdsm-a strong{color:#F5EFE0}" +
-    ".wdsm-ref{color:#3DA5A5;font-size:10.5px;padding:0 1px}" +
+    ".wdsm-ref{color:#3DA5A5;font-size:10.5px;padding:0 2px;cursor:pointer;border-bottom:1px dotted rgba(61,165,165,.6)}" +
+    ".wdsm-ref:hover{color:#8ED0D0}" +
+    ".wdsm-flash{animation:wdsmFlash 1.4s ease}" +
+    "@keyframes wdsmFlash{0%,100%{background:transparent}25%,60%{background:rgba(61,165,165,.22)}}" +
     ".wdsm-a .cur{color:#3DA5A5;animation:wdsmBlink 1s step-end infinite}" +
     ".wdsm-think{margin-bottom:10px;border:1px solid rgba(255,255,255,.1);border-radius:10px;background:rgba(255,255,255,.03);overflow:hidden}" +
     ".wdsm-think-h{display:flex;align-items:center;gap:8px;padding:8px 12px;cursor:pointer;color:#8B98A5;font-size:12.5px;user-select:none}" +
@@ -155,31 +259,32 @@
   layer.innerHTML =
     "<div class='wdsm-top'>" +
       "<a class='wdsm-brand' href='/'>SDE UNIVERSES</a>" +
-      "<div class='wdsm-tabs'><button class='wdsm-tab' data-m='normal'>常规</button><button class='wdsm-tab sel' data-m='wds'>✦ WDS 助手</button></div>" +
+      "<div class='wdsm-tabs'><button class='wdsm-tab' data-m='normal'></button><button class='wdsm-tab sel' data-m='wds'></button></div>" +
       "<div class='wdsm-top-sp'></div><span class='wdsm-turns' id='wdsmTurns'>本场剩余 100 次</span>" +
-      "<button class='wdsm-tbtn wdsm-distbtn' title='把这场对话锻成报告/文章/提纲'>✎ 成文</button>" +
-      "<button class='wdsm-tbtn wdsm-histbtn' title='本机对话记录' style='display:none'>↺ 历史</button>" +
-      "<button class='wdsm-tbtn wdsm-keybtn'>⚙ 设置</button><button class='wdsm-newbtn'>＋ 新对话</button>" +
+      "<button class='wdsm-tbtn wdsm-langbtn' title='中文 / English'>EN</button>" +
+      "<button class='wdsm-tbtn wdsm-distbtn'></button>" +
+      "<button class='wdsm-tbtn wdsm-histbtn' style='display:none'></button>" +
+      "<button class='wdsm-tbtn wdsm-keybtn'></button><button class='wdsm-newbtn'></button>" +
     "</div>" +
     "<div class='wdsm-body empty'>" +
       "<div class='wdsm-hero'>" +
         "<h1 class='wdsm-h1'>问 <span class='dot'>WDS</span></h1>" +
-        "<div class='wdsm-sub'>王德生的 AI 分身 · SDE 本体论老师<br>检索全站文章与专著，也能直接和你对谈 SDE</div>" +
+        "<div class='wdsm-sub'></div>" +
         "<div class='wdsm-egs'></div>" +
       "</div>" +
       "<div class='wdsm-msgs' style='display:none'></div>" +
     "</div>" +
     "<div class='wdsm-inbar'>" +
       "<div class='wdsm-modes'>" +
-        "<button class='wdsm-mode wdsm-attbtn' title='带一份文件来问（在你本机解析，文件不上传）'>📎 附件</button>" +
-        "<button class='wdsm-mode' data-k='std'>⚡ 标准</button>" +
-        "<button class='wdsm-mode' data-k='deep'>◈ 深度思考</button>" +
-        "<button class='wdsm-mode' data-k='web'>🌐 联网</button>" +
+        "<button class='wdsm-mode wdsm-attbtn'></button>" +
+        "<button class='wdsm-mode' data-k='std'></button>" +
+        "<button class='wdsm-mode' data-k='deep'></button>" +
+        "<button class='wdsm-mode' data-k='web'></button>" +
         "<span class='wdsm-mode-tip'></span>" +
       "</div>" +
       "<div class='wdsm-atts' style='display:none'></div>" +
-      "<div class='wdsm-inwrap'><textarea class='wdsm-in' rows='1' placeholder='问 WDS 任何 SDE 问题，或让它帮你找站里读什么…'></textarea><button class='wdsm-send'>↑</button></div>" +
-      "<div class='wdsm-note'>WDS 会尽力扣着全站内容作答，可核验的书名/引文请以原文为准。用你自己的大模型 Key 运行，只存在浏览器本地。</div>" +
+      "<div class='wdsm-inwrap'><textarea class='wdsm-in' rows='1'></textarea><button class='wdsm-send'>↑</button></div>" +
+      "<div class='wdsm-note'></div>" +
     "</div>";
   document.body.appendChild(layer);
 
@@ -189,6 +294,28 @@
   var inEl = layer.querySelector(".wdsm-in");
   var sendEl = layer.querySelector(".wdsm-send");
   var tipEl = layer.querySelector(".wdsm-mode-tip");
+  // 语言只重刷"外壳"（按钮/提示/示例）；已经生成的回答保持它当时的语言——重译旧答既不诚实也没必要。
+  function applyLang() {
+    var q = function (sel) { return layer.querySelector(sel); };
+    q(".wdsm-tab[data-m='normal']").textContent = PAGE ? t("tabBack") : t("tabNormal");
+    q(".wdsm-tab[data-m='wds']").textContent = t("tabWds");
+    q(".wdsm-distbtn").textContent = t("bDistill");
+    q(".wdsm-histbtn").textContent = t("bHist");
+    q(".wdsm-keybtn").textContent = t("bSet");
+    q(".wdsm-newbtn").textContent = t("bNew");
+    q(".wdsm-langbtn").textContent = LANG === "zh" ? "EN" : "中";
+    q(".wdsm-sub").innerHTML = t("heroSub");
+    q(".wdsm-attbtn").textContent = t("mAtt");
+    q(".wdsm-mode[data-k='std']").textContent = t("mStd");
+    q(".wdsm-mode[data-k='deep']").textContent = t("mDeep");
+    q(".wdsm-mode[data-k='web']").textContent = t("mWeb");
+    q(".wdsm-note").textContent = t("note");
+    if (!inEl.disabled) inEl.placeholder = t("ph");
+    egsEl.innerHTML = "";
+    t("egs").forEach(function (x) { var b = el("button", "wdsm-eg", x); b.onclick = function () { inEl.value = x; send(); }; egsEl.appendChild(b); });
+    paintModes(); updTurns();
+    try { document.documentElement.lang = LANG; } catch (e) {}
+  }
   var history = [], streaming = false, curReader = null, stoppedByUser = false;
 
   // —— 模式（深度思考 / 联网），存本地，跨会话记住 ——
@@ -202,8 +329,7 @@
       var on = (k === "web") ? webOn : (thinkMode === k);
       if (on) bs[i].classList.add("on"); else bs[i].classList.remove("on");
     }
-    tipEl.textContent = (thinkMode === "deep" ? "满血基底＋满功率思考＋SDE 全内功与方法论工序，慢但深" : "快答档，够用且省")
-      + (webOn ? " · 已开联网（需智谱 Key）" : "");
+    tipEl.textContent = (thinkMode === "deep" ? t("tipDeep") : t("tipStd")) + (webOn ? t("tipWeb") : "");
   }
   (function () {
     var bs = layer.querySelectorAll(".wdsm-mode");
@@ -250,7 +376,7 @@
   attBtn.onclick = function () {
     if (streaming) return;
     function go(A) {
-      if (!A) { attStatus("这台浏览器解析不了文件（内核太旧）", 1); return; }
+      if (!A) { attStatus(t("attOld"), 1); return; }
       A.pick({
         multiple: true,
         onProgress: function (name, phase, a, b) { attStatus(name + " \u00b7 " + phase + (b > 1 ? " " + a + "/" + b : "") + "\u2026"); },
@@ -265,14 +391,14 @@
           w.appendChild(el("b", null, bad.map(function (f) { return f.name + "：" + f.msg; }).join("；")));
           attsEl.appendChild(w);
         }
-      }).catch(function (e) { attStatus("附件出错：" + ((e && e.message) || "未知"), 1); });
+      }).catch(function (e) { attStatus(t("attErr") + ((e && e.message) || "?"), 1); });
     }
     if (window.WDSAttach) { window.WDSAttach.load(go); return; }
-    attStatus("正在装解析器\u2026");
+    attStatus(t("attLoading"));
     var sc = document.createElement("script");
     sc.src = "/assets/wds-attach.js"; sc.async = true;
-    sc.onload = function () { if (window.WDSAttach) window.WDSAttach.load(go); else attStatus("解析器没装上，刷新再试", 1); };
-    sc.onerror = function () { attStatus("解析器没装上，刷新再试", 1); };
+    sc.onload = function () { if (window.WDSAttach) window.WDSAttach.load(go); else attStatus(t("attNoLoad"), 1); };
+    sc.onerror = function () { attStatus(t("attNoLoad"), 1); };
     document.head.appendChild(sc);
   };
 
@@ -306,17 +432,15 @@
   function updTurns() {
     var n = turns(), sessionLeft = MAX - n;
     if (turnsEl) {
-      turnsEl.textContent = dayLeft === null ? ("本场剩余 " + sessionLeft + " 次")
-        : ("本场剩余 " + sessionLeft + " 次 · 今日 " + dayLeft + " 次");
-      turnsEl.title = "本场＝这一次对话最多 100 轮（点＋新对话可重开）；今日＝本机每天在「全站问答」入口的额度，陪读与「与WDS对话」各有独立额度。";
+      turnsEl.textContent = dayLeft === null ? (t("left") + sessionLeft + t("times"))
+        : (t("left") + sessionLeft + t("today") + dayLeft + (LANG === "zh" ? " 次" : " today"));
+      turnsEl.title = t("turnsTitle");
     }
-    if (dayLeft === 0) { inEl.disabled = true; sendEl.disabled = true; inEl.placeholder = "今日本机额度已用完，明天再来（陪读与「与WDS对话」不受影响）。"; return; }
-    if (n >= MAX) { inEl.disabled = true; sendEl.disabled = true; inEl.placeholder = "这场已谈满 100 次，点＋新对话重开。"; }
-    else if (inEl.disabled) { inEl.disabled = false; sendEl.disabled = false; inEl.placeholder = "问 WDS 任何 SDE 问题，或让它帮你找站里读什么…"; }
+    if (dayLeft === 0) { inEl.disabled = true; sendEl.disabled = true; inEl.placeholder = t("dayOut"); return; }
+    if (n >= MAX) { inEl.disabled = true; sendEl.disabled = true; inEl.placeholder = t("sessFull"); }
+    else if (inEl.disabled) { inEl.disabled = false; sendEl.disabled = false; inEl.placeholder = t("ph"); }
   }
 
-  var EG = ["SDE 说的“显露”和“结构”有什么不同？", "用 SDE 怎么看慢性病的发生？", "什么是特征纠缠？举个例子", "帮我找几篇入门 SDE 的文章"];
-  EG.forEach(function (q) { var b = el("button", "wdsm-eg", q); b.onclick = function () { inEl.value = q; send(); }; egsEl.appendChild(b); });
 
   function open() { stBoot(); layer.classList.add("on"); document.documentElement.classList.add("wdsm-open"); setTimeout(function () { inEl.focus(); }, 80); }
   function leave() { if (window.history.length > 1) { window.history.back(); } else { window.location.href = "/"; } }
@@ -324,14 +448,18 @@
   window.wdsMode = function (on) { on === false ? close() : (PAGE ? open() : (window.location.href = PAGE_URL)); };
   try { localStorage.removeItem(LS); } catch (e) {}  // 清掉旧的"自动弹出"记忆
 
-  layer.querySelectorAll(".wdsm-tab").forEach(function (t) {
-    if (PAGE && t.dataset.m === "normal") t.textContent = "\u2190 \u8fd4\u56de\u6d4f\u89c8";
-    t.onclick = function () { if (t.dataset.m === "normal") close(); };
+  layer.querySelectorAll(".wdsm-tab").forEach(function (tb) {
+    tb.onclick = function () { if (tb.dataset.m === "normal") close(); };
   });
   layer.querySelector(".wdsm-keybtn").onclick = function () { wdsKeyPanel(function () {}); };
+  layer.querySelector(".wdsm-langbtn").onclick = function () {
+    LANG = LANG === "zh" ? "en" : "zh";
+    try { localStorage.setItem(LS_LANG, LANG); } catch (e) {}
+    applyLang();
+  };
   layer.querySelector(".wdsm-newbtn").onclick = function () {
     history = []; if (stSess) stSess.reset(); msgsEl.innerHTML = ""; msgsEl.style.display = "none"; bodyEl.classList.add("empty");
-    inEl.disabled = false; sendEl.disabled = false; inEl.placeholder = "问 WDS 任何 SDE 问题，或让它帮你找站里读什么…"; updTurns();   // dayLeft 不复位：今日额度按本机计
+    inEl.disabled = false; sendEl.disabled = false; inEl.placeholder = t("ph"); updTurns();   // dayLeft 不复位：今日额度按本机计
     layer.querySelector(".wdsm-hero").style.display = ""; inEl.value = ""; inEl.focus();
   };
 
@@ -383,6 +511,27 @@
     bodyEl.scrollTop = bodyEl.scrollHeight;
   }
 
+  // 点正文里的 [W1] → 滚到这一轮的第 1 条站外来源并闪一下。
+  // 用事件委托挂在整轮上：正文每次重绘都会换掉 innerHTML，逐个绑事件会一直丢。
+  function bindRefs(cell) {
+    if (cell.refsBound) return;
+    cell.refsBound = 1;
+    cell.turn.addEventListener("click", function (e) {
+      var el2 = e.target;
+      if (!el2 || !el2.className || String(el2.className).indexOf("wdsm-ref") < 0) return;
+      var n = parseInt(el2.getAttribute("data-w"), 10);
+      var box = cell.turn.querySelector(".wdsm-web");
+      if (!box || !n) return;
+      var links = box.querySelectorAll(".wdsm-src-a");
+      var hit = links[n - 1];
+      if (!hit) return;
+      try { hit.scrollIntoView({ block: "nearest", behavior: "smooth" }); } catch (e2) {}
+      hit.classList.remove("wdsm-flash");
+      void hit.offsetWidth;                 // 强制重排，否则连点两次不会重放动画
+      hit.classList.add("wdsm-flash");
+    });
+  }
+
   function addTurn(q) {
     bodyEl.classList.remove("empty");
     layer.querySelector(".wdsm-hero").style.display = "none";
@@ -392,7 +541,7 @@
     var a = el("div", "wdsm-a"); turn.appendChild(a);
     msgsEl.appendChild(turn);
     bodyEl.scrollTop = bodyEl.scrollHeight;
-    return { turn: turn, a: a, q: q, think: null, thinkC: null, thinkL: null, acts: null, follows: null };
+    return { turn: turn, a: a, q: q, think: null, thinkC: null, thinkL: null, acts: null, follows: null, refsBound: 0 };
   }
 
   // —— 思考过程折叠面板（默认收起，可点开看它到底怎么想的）——
@@ -400,11 +549,11 @@
     if (cell.think) return cell.think;
     var box = el("div", "wdsm-think");
     var head = el("div", "wdsm-think-h");
-    var ic = el("span", null, "◇"), lb = el("span", "tl", "正在想…"), sp = el("span"), tg = el("span", "tg", "展开");
+    var ic = el("span", null, "◇"), lb = el("span", "tl", t("thinking")), sp = el("span"), tg = el("span", "tg", t("expand"));
     sp.style.flex = "1"; tg.style.fontSize = "11px";
     head.appendChild(ic); head.appendChild(lb); head.appendChild(sp); head.appendChild(tg);
     var cont = el("div", "wdsm-think-c");
-    head.onclick = function () { box.classList.toggle("on"); tg.textContent = box.classList.contains("on") ? "收起" : "展开"; };
+    head.onclick = function () { box.classList.toggle("on"); tg.textContent = box.classList.contains("on") ? t("collapse") : t("expand"); };
     box.appendChild(head); box.appendChild(cont);
     cell.turn.insertBefore(box, cell.a);
     cell.think = box; cell.thinkC = cont; cell.thinkL = lb;
@@ -414,7 +563,7 @@
   function renderSources(cell, srcs, kind) {
     if (!srcs || !srcs.length) return;
     var box = el("div", "wdsm-src" + (kind === "web" ? " wdsm-web" : ""));
-    box.appendChild(el("div", "wdsm-src-h", kind === "web" ? "站外来源 · 联网搜索" : "站内来源"));
+    box.appendChild(el("div", "wdsm-src-h", kind === "web" ? t("srcWeb") : t("srcSite")));
     srcs.forEach(function (s, i) {
       var l = el("a", "wdsm-src-a");
       l.href = s.u; l.textContent = (kind === "web" ? "[W" + (i + 1) + "] " : "") + (s.t || s.u);
@@ -426,13 +575,14 @@
       box.appendChild(l);
     });
     cell.turn.appendChild(box);
+    if (kind === "web") bindRefs(cell);
   }
 
   // —— 追问建议：由后端在正文写完后补一次便宜档产出，点一下就直接问出去 ——
   function renderFollows(cell, qs) {
     if (!qs || !qs.length || cell.follows) return;
     var box = el("div", "wdsm-follows");
-    box.appendChild(el("div", "wdsm-follows-h", "接着可以问"));
+    box.appendChild(el("div", "wdsm-follows-h", t("followsH")));
     qs.slice(0, 3).forEach(function (t) {
       var b = el("button", "wdsm-follow", t);
       b.onclick = function () { if (!streaming) send(t); };
@@ -445,8 +595,8 @@
   var speaking = null;
   function speak(text, btn) {
     var S = window.speechSynthesis;
-    if (!S) { btn.textContent = "此浏览器不支持朗读"; return; }
-    if (speaking) { S.cancel(); var ob = speaking.btn; speaking = null; if (ob) ob.textContent = "🔊 朗读"; if (ob === btn) return; }
+    if (!S) { btn.textContent = t("noSpeak"); return; }
+    if (speaking) { S.cancel(); var ob = speaking.btn; speaking = null; if (ob) ob.textContent = t("aRead"); if (ob === btn) return; }
     // 按句切块：Chrome 对单段超长文本约十几秒会截断，切碎了逐句排队才读得完。
     // 手写切分而非 lookbehind 正则——老 Safari 解析到 (?<=) 会当场报语法错，整个脚本一起死。
     var raw = String(text).replace(/[#*>`]/g, ""), chunks = [], cur = "", ENDS = "。！？；\n.!?;";
@@ -458,13 +608,13 @@
     if (!chunks.length) return;
     var i = 0;
     speaking = { btn: btn };
-    btn.textContent = "⏹ 停止";
+    btn.textContent = t("aStop");
     function next() {
-      if (!speaking || i >= chunks.length) { if (speaking) { speaking = null; btn.textContent = "🔊 朗读"; } return; }
+      if (!speaking || i >= chunks.length) { if (speaking) { speaking = null; btn.textContent = t("aRead"); } return; }
       var u = new SpeechSynthesisUtterance(chunks[i++]);
       u.lang = "zh-CN"; u.rate = 1;
       u.onend = next;
-      u.onerror = function () { speaking = null; btn.textContent = "🔊 朗读"; };
+      u.onerror = function () { speaking = null; btn.textContent = t("aRead"); };
       S.speak(u);
     }
     next();
@@ -474,13 +624,13 @@
   function mountActs(cell, text) {
     if (cell.acts && cell.acts.parentNode) cell.acts.parentNode.removeChild(cell.acts);
     var row = el("div", "wdsm-acts");
-    var cp = el("button", "wdsm-act", "⧉ 复制");
-    cp.onclick = function () { copyText(text); cp.textContent = "已复制"; setTimeout(function () { cp.textContent = "⧉ 复制"; }, 1400); };
-    var rg = el("button", "wdsm-act", "↻ 重答");
+    var cp = el("button", "wdsm-act", t("aCopy"));
+    cp.onclick = function () { copyText(text); cp.textContent = t("aCopied"); setTimeout(function () { cp.textContent = t("aCopy"); }, 1400); };
+    var rg = el("button", "wdsm-act", t("aRegen"));
     rg.onclick = function () { if (streaming) return; var q = cell.q; rollbackTo(cell); send(q); };
-    var ed = el("button", "wdsm-act", "✎ 改问");
+    var ed = el("button", "wdsm-act", t("aEdit"));
     ed.onclick = function () { if (streaming) return; var q = cell.q; rollbackTo(cell); inEl.value = q; inEl.focus(); inEl.style.height = "auto"; inEl.style.height = Math.min(inEl.scrollHeight, 160) + "px"; };
-    var sp = el("button", "wdsm-act", "🔊 朗读");
+    var sp = el("button", "wdsm-act", t("aRead"));
     sp.onclick = function () { speak(text, sp); };
     row.appendChild(cp); row.appendChild(sp); row.appendChild(rg); row.appendChild(ed);
     cell.turn.appendChild(row); cell.acts = row;
@@ -521,22 +671,23 @@
     var m = el("div");
     m.style.cssText = "position:fixed;inset:0;z-index:100004;background:rgba(10,8,5,.72);display:flex;align-items:center;justify-content:center;padding:20px;font-family:-apple-system,'PingFang SC',sans-serif";
     m.innerHTML = "<div style='max-width:400px;width:100%;background:#161B22;border:1px solid rgba(212,178,94,.3);border-radius:16px;padding:26px'>"
-      + "<div style='font-size:17px;font-weight:700;color:#F5EFE0;margin-bottom:8px'>设置</div>"
-      + "<div style='font-size:13px;color:#8B98A5;line-height:1.7;margin-bottom:18px'>WDS 助手用你自己的大模型 Key 运行。<b style=\"color:#C9A227\">Key 只存在你的浏览器本地，不会上传本站</b>，随时可清除。联网搜索走智谱通道，填一把智谱 Key 即可同时用于对话与联网。</div>"
+      + "<div style='font-size:15px;font-weight:700;color:#F5EFE0;margin:16px 0 6px'>" + esc(t("setKeyH")) + "</div>"
+      + "<div style='font-size:17px;font-weight:700;color:#F5EFE0;margin-bottom:8px'>" + esc(t("setTitle")) + "</div>"
+      + "<div style='font-size:13px;color:#8B98A5;line-height:1.7;margin-bottom:18px'>" + t("setKeyP") + "</div>"
       + "<div style='display:flex;gap:8px;margin-bottom:14px'><button class='kv' data-v='ds' style='flex:1;padding:9px;border-radius:9px;border:1px solid rgba(212,178,94,.4);background:none;color:#E8E4DA;cursor:pointer;font:13px inherit'>DeepSeek</button><button class='kv' data-v='glm' style='flex:1;padding:9px;border-radius:9px;border:1px solid rgba(212,178,94,.4);background:none;color:#E8E4DA;cursor:pointer;font:13px inherit'>智谱 GLM</button></div>"
-      + "<input class='kin' type='password' placeholder='粘贴你的 API Key' style='width:100%;box-sizing:border-box;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);border-radius:9px;padding:11px;color:#F5EFE0;font:14px inherit;outline:none;margin-bottom:10px'>"
+      + "<input class='kin' type='password' placeholder='" + esc(t("setKeyPh")) + "' style='width:100%;box-sizing:border-box;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);border-radius:9px;padding:11px;color:#F5EFE0;font:14px inherit;outline:none;margin-bottom:10px'>"
       + "<div class='klink' style='font-size:12px;color:#6b7684;line-height:1.6;margin-bottom:16px'></div>"
       + "<div style='border-top:1px solid rgba(255,255,255,.1);padding-top:15px;margin-bottom:16px'>"
-      + "<div style='font-size:14px;font-weight:700;color:#F5EFE0;margin-bottom:6px'>自定义指令（可空）</div>"
-      + "<div style='font-size:12.5px;color:#8B98A5;line-height:1.65;margin-bottom:9px'>写一句你是谁、在做什么、想让 WDS 怎么答你。以后每次提问都会带上，不必再重复交代。也只存在你本机。</div>"
-      + "<textarea class='kabout' rows='3' placeholder='例：我是中学生物老师，正在把 SDE 用到备课上。答我时多举课堂能直接用的例子，术语讲一遍就够。' style='width:100%;box-sizing:border-box;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);border-radius:9px;padding:10px;color:#F5EFE0;font:13.5px/1.6 inherit;outline:none;resize:vertical'></textarea>"
+      + "<div style='font-size:14px;font-weight:700;color:#F5EFE0;margin-bottom:6px'>" + esc(t("setAboutH")) + "</div>"
+      + "<div style='font-size:12.5px;color:#8B98A5;line-height:1.65;margin-bottom:9px'>" + esc(t("setAboutP")) + "</div>"
+      + "<textarea class='kabout' rows='3' placeholder='" + esc(t("setAboutPh")) + "' style='width:100%;box-sizing:border-box;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);border-radius:9px;padding:10px;color:#F5EFE0;font:13.5px/1.6 inherit;outline:none;resize:vertical'></textarea>"
       + "</div>"
-      + "<div style='display:flex;gap:8px'><button class='ksave' style='flex:1;background:#D4B25E;color:#0F0B07;border:none;border-radius:9px;padding:11px;font:700 14px inherit;cursor:pointer'>保存并开始</button><button class='kcancel' style='background:none;border:1px solid rgba(255,255,255,.2);color:#8B98A5;border-radius:9px;padding:11px 16px;font:14px inherit;cursor:pointer'>取消</button></div>"
+      + "<div style='display:flex;gap:8px'><button class='ksave' style='flex:1;background:#D4B25E;color:#0F0B07;border:none;border-radius:9px;padding:11px;font:700 14px inherit;cursor:pointer'>" + esc(t("setSave")) + "</button><button class='kcancel' style='background:none;border:1px solid rgba(255,255,255,.2);color:#8B98A5;border-radius:9px;padding:11px 16px;font:14px inherit;cursor:pointer'>" + esc(t("setCancel")) + "</button></div>"
       + "</div>";
     document.body.appendChild(m);
     var vend = cur.vendor, kin = m.querySelector(".kin"), klink = m.querySelector(".klink"), kab = m.querySelector(".kabout");
     kin.value = cur.key; kab.value = aboutGet();
-    function paintV() { m.querySelectorAll(".kv").forEach(function (b) { var on = b.dataset.v === vend; b.style.background = on ? "rgba(212,178,94,.2)" : "none"; b.style.borderColor = on ? "#D4B25E" : "rgba(212,178,94,.4)"; }); klink.innerHTML = vend === "ds" ? "还没有 Key？去 <a href='https://platform.deepseek.com' target='_blank' style='color:#C9A227'>platform.deepseek.com</a> 申请" : "还没有 Key？去 <a href='https://open.bigmodel.cn' target='_blank' style='color:#C9A227'>open.bigmodel.cn</a> 申请（联网搜索也用这把）"; }
+    function paintV() { m.querySelectorAll(".kv").forEach(function (b) { var on = b.dataset.v === vend; b.style.background = on ? "rgba(212,178,94,.2)" : "none"; b.style.borderColor = on ? "#D4B25E" : "rgba(212,178,94,.4)"; }); klink.innerHTML = vend === "ds" ? t("linkDs") : t("linkGlm"); }
     m.querySelectorAll(".kv").forEach(function (b) { b.onclick = function () { vend = b.dataset.v; paintV(); }; });
     paintV();
     m.querySelector(".kcancel").onclick = function () { m.remove(); };
@@ -562,7 +713,7 @@
     history.push({ role: "reader", text: q }); updTurns(); stSave(history);
     streaming = true; stoppedByUser = false;
     sendEl.textContent = "■"; sendEl.classList.add("stop"); sendEl.title = "停止生成";
-    var payload = { q: q, history: history.slice(-4), key: kv.key, vendor: kv.vendor, mode: thinkMode, web: webOn ? 1 : 0, skey: wdsSearchKey(), about: aboutGet() };
+    var payload = { q: q, history: history.slice(-4), key: kv.key, vendor: kv.vendor, mode: thinkMode, web: webOn ? 1 : 0, skey: wdsSearchKey(), about: aboutGet(), lang: LANG };
     if (atts.length) {
       payload.docs = atts.map(function (d) { return { n: d.name, t: d.text }; });
       var attNames = atts.map(function (d) { return d.name; });
@@ -584,7 +735,7 @@
     function endUI() {
       streaming = false; curReader = null;
       sendEl.textContent = "↑"; sendEl.classList.remove("stop"); sendEl.title = "";
-      if (cell.thinkL && thinkTxt) cell.thinkL.textContent = "已思考 " + thinkTxt.length + " 字（点开看）";
+      if (cell.thinkL && thinkTxt) cell.thinkL.textContent = t("thought") + thinkTxt.length + t("chars");
       updTurns();
       bodyEl.scrollTop = bodyEl.scrollHeight;
     }
@@ -600,13 +751,13 @@
           clearTimeout(wd);
           if (answer) {
             cell.a.innerHTML = mdRender(answer);
-            if (stoppedByUser) { var n = el("div", null, "（你按了停止）"); n.style.cssText = "color:#6b7684;font-size:12px;margin-top:8px"; cell.a.appendChild(n); }
+            if (stoppedByUser) { var n = el("div", null, t("stopped")); n.style.cssText = "color:#6b7684;font-size:12px;margin-top:8px"; cell.a.appendChild(n); }
             history.push({ role: "wds", text: answer }); stSave(history); mountActs(cell, answer);
           } else if (timedOut) {
             cell.a.className = "wdsm-a plain wdsm-err";
-            cell.a.textContent = "连接像是断了（也许想太久被中间层切了）。稍后再问，你这句我记着。";
+            cell.a.textContent = t("errDead");
           } else if (stoppedByUser) {
-            cell.a.className = "wdsm-a plain"; cell.a.textContent = "（已停止）";
+            cell.a.className = "wdsm-a plain"; cell.a.textContent = t("stoppedOnly");
           }
           endUI();
         }
@@ -626,14 +777,13 @@
               else if (j.t === "sources") { if (!srcDone) { srcDone = true; renderSources(cell, j.v, "site"); } }
               else if (j.t === "web") { renderSources(cell, j.v, "web"); }
               else if (j.t === "webfail") {
-                var why = j.v === "need_search_key" ? "联网没跑起来：需要一把智谱 Key（在 ⚙ Key 里填智谱，同一把即可）。"
-                  : (j.v === "bad_search_key" ? "联网没跑起来：这把智谱 Key 用不了（额度或权限）。" : "联网这次没搜到东西，先按站内资料答。");
+                var why = j.v === "need_search_key" ? t("webNeedKey") : (j.v === "bad_search_key" ? t("webBadKey") : t("webNone"));
                 var w = el("div", null, "🌐 " + why);
                 w.style.cssText = "color:#8B7B5E;font-size:12.5px;margin:2px 0 10px";
                 cell.turn.insertBefore(w, cell.a);
               }
-              else if (j.t === "think") { thinkTxt += j.v; thinkBox(cell); cell.thinkC.textContent = thinkTxt; if (!answer) cell.thinkL.textContent = "正在想…（" + thinkTxt.length + " 字）"; }
-              else if (j.t === "beat") { if (!answer && cell.think && j.v) cell.thinkL.textContent = "正在想…（" + (j.v.sec || 0) + " 秒 · " + (j.v.think || 0) + " 字）"; }
+              else if (j.t === "think") { thinkTxt += j.v; thinkBox(cell); cell.thinkC.textContent = thinkTxt; if (!answer) cell.thinkL.textContent = t("thinking") + " " + thinkTxt.length; }
+              else if (j.t === "beat") { if (!answer && cell.think && j.v) cell.thinkL.textContent = t("thinking") + " " + (j.v.sec || 0) + "s · " + (j.v.think || 0); }
               else if (j.t === "follow") { renderFollows(cell, j.v); }
               else if (j.t === "token") { answer += j.v; paint(); }
               else if (j.t === "error") { cell.a.className = "wdsm-a plain wdsm-err"; cell.a.textContent = j.v; if (j.code === "need_key" || j.code === "bad_key") setTimeout(function () { wdsKeyPanel(function () {}); }, 400); }
@@ -645,7 +795,7 @@
       })
       .catch(function (e) {
         clearTimeout(wd);
-        if (!stoppedByUser) { cell.a.className = "wdsm-a plain wdsm-err"; cell.a.textContent = "接不上 WDS 了（" + (e && e.message) + "）。稍后再问，你这句我记着。"; }
+        if (!stoppedByUser) { cell.a.className = "wdsm-a plain wdsm-err"; cell.a.textContent = t("errNet") + (e && e.message) + t("errNetEnd"); }
         else if (answer) { cell.a.innerHTML = mdRender(answer); history.push({ role: "wds", text: answer }); stSave(history); mountActs(cell, answer); }
         endUI();
       });
@@ -657,28 +807,31 @@
   inEl.addEventListener("keydown", function (e) { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); if (!streaming) send(); } });
 
   /* ── 成文：把整场对话锻成 报告 / 文章 / 提纲，或直接导出 ── */
-  var KINDS = {
-    report: { t: "对话报告", sub: "结论 · 谈了什么 · 立住的判断 · 未解决 · 下一步" },
-    essay: { t: "提炼成文", sub: "锻成一篇独立成立的文章，约三千字" },
-    outline: { t: "写作提纲", sub: "母题 + 章节骨架，照着就能写" },
-  };
+  function kindT(k) { return t(({ report: "kReport", essay: "kEssay", outline: "kOutline" })[k]); }
+  function kindS(k) { return t(({ report: "kReportS", essay: "kEssayS", outline: "kOutlineS" })[k]); }
+  var KIND_KEYS = ["report", "essay", "outline"];
   layer.querySelector(".wdsm-distbtn").onclick = function (ev) {
     var old = document.querySelector(".wdsm-menu");
     if (old) { old.parentNode.removeChild(old); return; }
-    if (!history.length) { alert("先聊几句，再来成文。"); return; }
+    if (!history.length) { alert(t("needTalk")); return; }
     var menu = el("div", "wdsm-menu");
-    Object.keys(KINDS).forEach(function (k) {
+    KIND_KEYS.forEach(function (k) {
       var b = el("button");
-      b.appendChild(document.createTextNode(KINDS[k].t));
-      b.appendChild(el("span", "sub", KINDS[k].sub));
+      b.appendChild(document.createTextNode(kindT(k)));
+      b.appendChild(el("span", "sub", kindS(k)));
       b.onclick = function () { if (menu.parentNode) menu.parentNode.removeChild(menu); distill(k); };
       menu.appendChild(b);
     });
     var dl = el("button");
-    dl.appendChild(document.createTextNode("⤓ 导出本场对话"));
-    dl.appendChild(el("span", "sub", "Markdown 文件，存到本机"));
+    dl.appendChild(document.createTextNode(t("mExport")));
+    dl.appendChild(el("span", "sub", t("mExportS")));
     dl.onclick = function () { if (menu.parentNode) menu.parentNode.removeChild(menu); exportSession(); };
     menu.appendChild(dl);
+    var dh = el("button");
+    dh.appendChild(document.createTextNode(t("mDhist")));
+    dh.appendChild(el("span", "sub", t("mDhistS")));
+    dh.onclick = function () { if (menu.parentNode) menu.parentNode.removeChild(menu); openDistillHistory(); };
+    menu.appendChild(dh);
     document.body.appendChild(menu);
     var r = ev.currentTarget.getBoundingClientRect();
     menu.style.top = (r.bottom + 8) + "px";
@@ -690,30 +843,78 @@
     }, 30);
   };
   function sessionMd() {
-    var out = "# 与 WDS 的对话\n\n> " + new Date().toLocaleString("zh-CN") + " · sdeuniverses.com\n\n";
+    var out = "# " + t("convoTitle") + "\n\n> " + new Date().toLocaleString() + " · sdeuniverses.com\n\n";
     history.forEach(function (m) { out += (m.role === "reader" ? "**我：**" : "**WDS：**") + "\n\n" + m.text + "\n\n---\n\n"; });
     return out;
   }
-  function exportSession() { download("WDS对话-" + new Date().toISOString().slice(0, 10) + ".md", sessionMd()); }
+  function exportSession() { download("WDS-" + new Date().toISOString().slice(0, 10) + ".md", sessionMd()); }
 
-  function distill(kind) {
-    var kv = wdsKeyGet(); if (!kv) { wdsKeyPanel(function () { distill(kind); }); return; }
+  /* ── 成文落本机：和对话记录共用 IndexedDB，但另立一个 agent，两个历史面板互不混。 ── */
+  function distSave(label, text, cb) {
+    function go(A) {
+      if (!A) { cb(false); return; }
+      try {
+        var sess = A.session({ agent: "wds-distill", scope: "", scopeLabel: label });
+        sess.save([{ role: "reader", text: label + " · " + new Date().toLocaleString() },
+                   { role: "wds", text: text }]);
+        sess.reset();
+        cb(true);
+      } catch (e) { cb(false); }
+    }
+    if (window.WDSStore) { window.WDSStore.load(go); return; }
+    var sc = document.createElement("script");
+    sc.src = "/assets/wds-store.js"; sc.async = true;
+    sc.onload = function () { if (window.WDSStore) window.WDSStore.load(go); else cb(false); };
+    sc.onerror = function () { cb(false); };
+    document.head.appendChild(sc);
+  }
+  function openDistillHistory() {
+    function go(A) {
+      if (!A) { alert(t("dNoStore")); return; }
+      A.openPanel({
+        agent: "wds-distill", theme: "dark",
+        onRestore: function (rec) {
+          var body = "", head = rec.scopeLabel || rec.title || "";
+          (rec.turns || []).forEach(function (x) { if (x && x.role === "wds") body = x.text; });
+          if (body) distill("report", body, head);
+        },
+      });
+    }
+    if (window.WDSStore) { window.WDSStore.load(go); return; }
+    var sc = document.createElement("script");
+    sc.src = "/assets/wds-store.js"; sc.async = true;
+    sc.onload = function () { if (window.WDSStore) window.WDSStore.load(go); else alert(t("dNoStore")); };
+    sc.onerror = function () { alert(t("dNoStore")); };
+    document.head.appendChild(sc);
+  }
+
+  // 成文面板。第三个参数给「成文记录」复用：直接把存下的正文摊开，不再调基底。
+  function distill(kind, existing, title) {
+    var kv = existing ? {} : wdsKeyGet();
+    if (!existing && !kv) { wdsKeyPanel(function () { distill(kind); }); return; }
     var wrap = el("div", "wdsm-dist");
     wrap.innerHTML = "<div class='wdsm-dist-box'>"
-      + "<div class='wdsm-dist-top'><span class='wdsm-dist-t'>" + esc(KINDS[kind].t) + "</span>"
-      + "<span class='dst' style='color:#8B98A5;font-size:12px;flex:1'>正在锻…</span>"
-      + "<button class='wdsm-tbtn dcp'>⧉ 复制</button><button class='wdsm-tbtn ddl'>⤓ 存为 .md</button><button class='wdsm-tbtn dx' style='margin-right:0'>✕</button></div>"
+      + "<div class='wdsm-dist-top'><span class='wdsm-dist-t'>" + esc(title || kindT(kind)) + "</span>"
+      + "<span class='dst' style='color:#8B98A5;font-size:12px;flex:1'>" + esc(t("dWorking")) + "</span>"
+      + "<button class='wdsm-tbtn dsv'></button><button class='wdsm-tbtn dcp'></button><button class='wdsm-tbtn ddl'></button><button class='wdsm-tbtn dx' style='margin-right:0'>✕</button></div>"
       + "<div class='wdsm-dist-c'><div class='wdsm-a'></div></div></div>";
     document.body.appendChild(wrap);
     var out = wrap.querySelector(".wdsm-a"), stat = wrap.querySelector(".dst");
     var text = "", dr = null, lastP = 0;
-    function done() { out.innerHTML = text ? mdRender(text) : "（没有产出内容，可再试一次）"; stat.textContent = text ? ("完成 · " + text.length + " 字") : "没出内容"; }
+    var svBtn = wrap.querySelector(".dsv"), cpBtn = wrap.querySelector(".dcp"), dlBtn = wrap.querySelector(".ddl");
+    svBtn.textContent = t("dSave"); cpBtn.textContent = t("dCopy"); dlBtn.textContent = t("dDl");
+    function done() { out.innerHTML = text ? mdRender(text) : esc(t("dEmpty")); stat.textContent = text ? (t("dDone") + text.length) : t("dFail"); }
     wrap.querySelector(".dx").onclick = function () { try { if (dr) dr.cancel(); } catch (e) {} wrap.parentNode.removeChild(wrap); };
-    wrap.querySelector(".dcp").onclick = function () { copyText(text); };
-    wrap.querySelector(".ddl").onclick = function () { download("WDS-" + kind + "-" + new Date().toISOString().slice(0, 10) + ".md", text); };
+    cpBtn.onclick = function () { copyText(text); cpBtn.textContent = t("aCopied"); setTimeout(function () { cpBtn.textContent = t("dCopy"); }, 1400); };
+    dlBtn.onclick = function () { download("WDS-" + kind + "-" + new Date().toISOString().slice(0, 10) + ".md", text); };
+    svBtn.onclick = function () {
+      if (!text) return;
+      distSave(kindT(kind), text, function (ok) { svBtn.textContent = ok ? t("dSaved") : t("dNoStore"); });
+    };
+    if (existing) { text = existing; done(); return; }
     out.innerHTML = "<span class='cur'>▊</span>";
 
-    fetch(API_DISTILL, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ kind: kind, history: history, key: kv.key, vendor: kv.vendor }) })
+    fetch(API_DISTILL, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ kind: kind, history: history, key: kv.key, vendor: kv.vendor, lang: LANG }) })
       .then(function (resp) {
         if (!resp.ok || !resp.body) throw new Error("HTTP " + resp.status);
         var reader = resp.body.getReader(); dr = reader;
@@ -730,18 +931,19 @@
               if (p === "[DONE]") { done(); return; }
               var j; try { j = JSON.parse(p); } catch (e) { continue; }
               if (j.t === "token") { text += j.v; if (Date.now() - lastP > 130) { lastP = Date.now(); out.innerHTML = mdRender(text) + "<span class='cur'>▊</span>"; } }
-              else if (j.t === "beat") { if (!text && j.v) stat.textContent = "正在想…（" + (j.v.sec || 0) + " 秒 · " + (j.v.think || 0) + " 字）"; }
-              else if (j.t === "error") { out.className = "wdsm-a plain wdsm-err"; out.textContent = j.v; stat.textContent = "失败"; if (j.code === "need_key" || j.code === "bad_key") setTimeout(function () { wdsKeyPanel(function () {}); }, 400); }
+              else if (j.t === "beat") { if (!text && j.v) stat.textContent = t("thinking") + " " + (j.v.sec || 0) + "s · " + (j.v.think || 0); }
+              else if (j.t === "error") { out.className = "wdsm-a plain wdsm-err"; out.textContent = j.v; stat.textContent = t("dFail"); if (j.code === "need_key" || j.code === "bad_key") setTimeout(function () { wdsKeyPanel(function () {}); }, 400); }
             }
             return pump();
           });
         }
         return pump();
       })
-      .catch(function (e) { out.className = "wdsm-a plain wdsm-err"; out.textContent = "成文没接上（" + (e && e.message) + "）。稍后再试。"; stat.textContent = "失败"; });
+      .catch(function (e) { out.className = "wdsm-a plain wdsm-err"; out.textContent = t("errNoOut") + (e && e.message) + ")"; stat.textContent = t("dFail"); });
   }
 
   // 独立页模式：载入即整页打开
+  applyLang();          // 顶栏/示例/提示/占位全部由这里上文案——上面的 HTML 骨架是空壳
   updTurns();
   if (PAGE) open();
 })();

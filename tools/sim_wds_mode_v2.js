@@ -31,15 +31,16 @@ class Node {
   get textContent() { if (this._text) return this._text; return this.children.map((c) => c.textContent).join(""); }
   set innerHTML(v) { this._html = String(v); this.children.length = 0; this._text = ""; this._parse(String(v)); }
   get innerHTML() { return this._html; }
-  _parse(html) { // 只把带 class 的标签抽成子节点，够选择器用
+  _parse(html) { // 把标签抽成子节点并通吃属性（单双引号都认），够选择器与 getAttribute 用
     const re = /<(\w+)([^>]*)>/g; let m;
     while ((m = re.exec(html))) {
       const n = new Node(m[1]); const at = m[2];
-      const cm = at.match(/class='([^']*)'/) || at.match(/class="([^"]*)"/); if (cm) n.className = cm[1];
-      const dm = at.match(/data-m='([^']*)'/); if (dm) n.dataset.m = dm[1];
-      const dk = at.match(/data-k='([^']*)'/); if (dk) n.dataset.k = dk[1];
-      const dv = at.match(/data-v='([^']*)'/); if (dv) n.dataset.v = dv[1];
-      const idm = at.match(/id='([^']*)'/); if (idm) n.attrs.id = idm[1];
+      const ar = /([\w-]+)=(?:'([^']*)'|"([^"]*)")/g; let a;
+      while ((a = ar.exec(at))) {
+        const k = a[1], v = a[2] !== undefined ? a[2] : a[3];
+        if (k === "class") n.className = v;
+        else { n.attrs[k] = v; if (k.slice(0, 5) === "data-") n.dataset[k.slice(5)] = v; }
+      }
       n.parentNode = this; this.children.push(n);
     }
   }
@@ -56,11 +57,25 @@ class Node {
   getBoundingClientRect() { return { top: 10, bottom: 40, left: 20, right: 90, width: 70, height: 30 }; }
   click() { if (this.onclick) this.onclick({ currentTarget: this, target: this }); }
   _all(out) { out.push(this); this.children.forEach((c) => c._all(out)); return out; }
-  _match(sel) {
-    if (sel.startsWith(".")) return this.className.split(/\s+/).includes(sel.slice(1));
-    if (sel.startsWith("#")) return this.attrs.id === sel.slice(1);
-    if (sel.startsWith("[") || sel.includes("[")) { const m = sel.match(/^(\w*)\[([^=\]]+)='([^']*)'\]$/); if (m) return (!m[1] || this.tagName === m[1].toUpperCase()) && this.getAttribute(m[2]) === m[3]; return false; }
-    return this.tagName === sel.toUpperCase();
+  _match(sel) {   // 支持复合选择器：tag / .cls / #id / [a='v'] 任意组合，如 .wdsm-tab[data-m='normal']
+    const re = /^([a-zA-Z][\w-]*)?((?:[.#][\w-]+)*)((?:\[[^\]]+\])*)$/;
+    const m = sel.match(re);
+    if (!m) return false;
+    if (m[1] && this.tagName !== m[1].toUpperCase()) return false;
+    const parts = m[2] ? m[2].match(/[.#][\w-]+/g) || [] : [];
+    for (const p of parts) {
+      if (p[0] === ".") { if (!this.className.split(/\s+/).includes(p.slice(1))) return false; }
+      else if (this.attrs.id !== p.slice(1)) return false;
+    }
+    const attrs = m[3] ? m[3].match(/\[[^\]]+\]/g) || [] : [];
+    for (const a of attrs) {
+      const am = a.match(/^\[([^=\]]+)(?:=['"]?([^'"\]]*)['"]?)?\]$/);
+      if (!am) return false;
+      const v = this.getAttribute(am[1]);
+      if (am[2] === undefined) { if (v == null) return false; }
+      else if (v !== am[2]) return false;
+    }
+    return true;
   }
   querySelector(sel) { return this._all([]).slice(1).find((n) => n._match(sel)) || null; }
   querySelectorAll(sel) { const r = this._all([]).slice(1).filter((n) => n._match(sel)); r.forEach = Array.prototype.forEach.bind(r); return r; }
@@ -219,7 +234,7 @@ ROUTE["/api/wds/chat"] = [
   layer.querySelector(".wdsm-distbtn").click();
   const menu = document.body.querySelector(".wdsm-menu");
   ok(!!menu, "成文菜单弹出");
-  ok(menu.children.length === 4, "菜单四项（报告/成文/提纲/导出），实得 " + menu.children.length);
+  ok(menu.children.length === 5, "菜单五项（报告/成文/提纲/导出/成文记录），实得 " + menu.children.length);
   menu.children[0].click();
   await new Promise((r) => setTimeout(r, 220));
   const dist = document.body.querySelector(".wdsm-dist");
@@ -275,6 +290,39 @@ ROUTE["/api/wds/chat"] = [
   ok(LAST_PAYLOAD.docs && LAST_PAYLOAD.docs.length === 1 && LAST_PAYLOAD.docs[0].n === "讲稿.pdf", "payload 带上附件正文");
   ok(LAST_PAYLOAD.about === "我是中学生物老师。", "payload 带上自定义指令");
   ok(layer.querySelector(".wdsm-atts").children.length === 0, "附件发出后从输入区摘掉，不会赖着重复发");
+
+  console.log("⑮ 中英切换");
+  const langBtn = layer.querySelector(".wdsm-langbtn");
+  ok(langBtn.textContent === "EN", "默认中文，按钮显示 EN");
+  langBtn.click();
+  ok(store["sde_wds_lang"] === "en", "语言已存本地");
+  ok(langBtn.textContent === "中", "切到英文后按钮显示 中");
+  ok(layer.querySelector(".wdsm-mode[data-k='deep']").textContent === "\u25c8 Deep", "档位按钮已英化");
+  ok(inEl.placeholder.indexOf("Ask WDS") === 0, "输入框占位已英化");
+  ok(layer.querySelectorAll(".wdsm-eg").length === 4, "英文示例问题已重铺");
+  ROUTE["/api/wds/chat"] = [{ t: "token", v: "In English." }];
+  inEl.value = "hello";
+  await new Promise((res) => { sendEl.click(); setTimeout(res, 200); });
+  ok(LAST_PAYLOAD.lang === "en", "payload 带 lang=en（后端据此决定作答语言）");
+  langBtn.click();
+  ok(store["sde_wds_lang"] === "zh" && langBtn.textContent === "EN", "切回中文");
+
+  console.log("⑯ [W1] 角标点击定位站外来源");
+  layer.querySelector(".wdsm-newbtn").click();
+  ROUTE["/api/wds/chat"] = [
+    { t: "web", v: [{ u: "https://a.com", t: "甲文", m: "甲媒", d: "2026-07-01" }, { u: "https://b.com", t: "乙文" }] },
+    { t: "token", v: "据甲文所述 [W1]，另见乙文 [W2]。" },
+  ];
+  inEl.value = "查一下";
+  await new Promise((res) => { sendEl.click(); setTimeout(res, 220); });
+  const t3 = layer.querySelector(".wdsm-msgs").lastChild;
+  const refs = t3.querySelectorAll(".wdsm-ref");
+  ok(refs.length === 2, "两个角标已渲染，实得 " + refs.length);
+  ok(refs[1].getAttribute("data-w") === "2", "角标带 data-w 序号");
+  const webLinks = t3.querySelector(".wdsm-web").querySelectorAll(".wdsm-src-a");
+  t3.dispatch("click", { target: refs[1] });
+  ok(webLinks[1].className.indexOf("wdsm-flash") >= 0, "点 [W2] 让第二条站外来源闪一下");
+  ok(webLinks[0].className.indexOf("wdsm-flash") < 0, "没有误闪第一条");
 
   console.log("⑭ 新对话复位");
   layer.querySelector(".wdsm-newbtn").click();

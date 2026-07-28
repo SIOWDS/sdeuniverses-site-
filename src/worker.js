@@ -1446,9 +1446,10 @@ const FOLLOW_SYS = "你是对话的旁观者。看完一问一答，写出读者
   + "\n规矩：① 每个问题一行，不编号、不加符号、不解释；② 每个 8–22 字，是一句真正的问句；"
   + "③ 三个要指向不同方向（一个往深里挖、一个往旁边挪、一个往落地上落），不要三个同义；"
   + "④ 只写读者会问的，不要写成 WDS 的讲课提纲；⑤ 只输出三行，别的什么都不要。";
-async function followUps(VC, KEY, q, ans) {
+async function followUps(VC, KEY, q, ans, lang) {
   try {
-    const out = await llmText(VC, KEY, FOLLOW_SYS, "读者问：" + String(q).slice(0, 400) + "\n\nWDS 答：" + String(ans).slice(0, 2500) + "\n\n三行：", 200);
+    const sys = FOLLOW_SYS + (lang === "en" ? "\n⑥ Write the three questions in English." : "");
+    const out = await llmText(VC, KEY, sys, "读者问：" + String(q).slice(0, 400) + "\n\nWDS 答：" + String(ans).slice(0, 2500) + "\n\n三行：", 200);
     if (!out) return [];
     return out.split(/\n+/).map((s) => s.replace(/^[\s\d.、)\-*·]+/, "").trim())
       .filter((s) => s.length >= 4 && s.length <= 40).slice(0, 3);
@@ -1516,7 +1517,7 @@ const SDE_METHOD_BLOCK = "\n\n【深度档 · 必须真走的工序（不要复�
   + "\n· 最后一步必须自反：你这个判断本身的可证伪条件是什么？哪一步最脆？"
   + "\n输出要求：先给一句最承重的判断（反直觉、可被反驳），再展开三到五段把它撑住，最后留一个把读者推向下一步的问题。全程说人话，不堆术语、不摆模板。";
 
-function WDS_CHAT_SYS(reflect, SDEM, siteCtx, webCtx, deep, docCtx, about) {
+function WDS_CHAT_SYS(reflect, SDEM, siteCtx, webCtx, deep, docCtx, about, lang) {
   return "你是 WDS，王德生（Desheng）的 AI 分身、SDE 本体论的老师，也是 SDE Universes 全站的领读人。读者在向你提问——可能是关于 SDE 思想或任何议题的问题，也可能想找站里读什么。"
     + "\n\n【怎么答】"
     + "\n1. 像王德生本人：直接、犀利、追问本质、善用比喻、一句顶十句；给洞见，不做资料复述员。"
@@ -1533,7 +1534,9 @@ function WDS_CHAT_SYS(reflect, SDEM, siteCtx, webCtx, deep, docCtx, about) {
     + (docCtx ? ("\n\n【读者带来的文件（他上传的、在他自己浏览器里解析出来的正文；本站不留存）】\n" + docCtx
         + "\n\n关于这份文件：读者拿它来问你，多半是要你替他看出他自己看不出的那一层。所以不要复述它写了什么——他读过了。"
         + "直接说：它真正在讲的是什么、它最承重的那一句在哪、它哪里是脆的、用 SDE 看它漏掉了哪一维。引用其中原句时标（文件：篇名）。") : "")
-    + (about ? ("\n\n【这位读者自己写的说明（他是谁、他要你怎么答他）——照着办，但不要复述它，也不要因此放软判断】\n" + about) : "");
+    + (about ? ("\n\n【这位读者自己写的说明（他是谁、他要你怎么答他）——照着办，但不要复述它，也不要因此放软判断】\n" + about) : "")
+    + (lang === "en" ? ("\n\n【LANGUAGE】The reader is using the English interface. Write your entire answer in English — natural, direct English, not translated Chinese. "
+        + "Keep SDE terms as Show / Difference / Entanglement (S / D / E), and gloss a term the first time it appears. Site sources keep their Chinese titles; render them as-is.") : "");
 }
 
 // ===== SDE 词义查询扩展：把访客问题翻成 SDE 术语，再拿去召回（检索侧提智，对称于答题侧内功）=====
@@ -2574,6 +2577,7 @@ export default {
         }
       }
       const about = String(b.about || "").trim().slice(0, 1200);   // 读者写的自定义指令
+      const lang = b.lang === "en" ? "en" : "zh";                 // 界面语言：决定用哪种语言作答
       const VC = deep ? wdsTopVC(vd) : { url: WDS_VENDORS[vd].url, model: WDS_VENDORS[vd].model, name: WDS_VENDORS[vd].name };
       const KEY = userKey, rvendor = ({ zhipu: "glm", deepseek: "ds" })[vd] || vd;
       const ip = request.headers.get("cf-connecting-ip") || "unknown";
@@ -2631,7 +2635,7 @@ export default {
             }
             let reflect = ""; try { reflect = await ensureReflect(env, url, rvendor, VC, KEY); } catch (e) {}
             const SDEM = "\n\nSDE 骨架：显露 S / 差异序列 D / 特征纠缠 E；三大方程 S=F(D,E)·D=G(S,E)·E=H(S,D)；六路径；意义三律（特征·自由·幸福）；发生学——追问事物为何如此发生，而非如何被发现。";
-            const sys = WDS_CHAT_SYS(reflect, SDEM, ctxText, webCtx, deep, docCtx, about);
+            const sys = WDS_CHAT_SYS(reflect, SDEM, ctxText, webCtx, deep, docCtx, about, lang);
             const messages = [{ role: "system", content: sys }];
             for (const m of history) {
               const role = (m && m.role === "wds") ? "assistant" : "user";
@@ -2673,7 +2677,7 @@ export default {
             // 走 WDS_VENDORS 的快档而非满血档——这一步要快，慢了读者早就自己打字了；失败一律吞掉。
             if (outText.length > 150) {
               const fVC = { url: WDS_VENDORS[vd].url, model: WDS_VENDORS[vd].model };
-              const fs = await followUps(fVC, KEY, q, outText);
+              const fs = await followUps(fVC, KEY, q, outText, lang);
               if (fs.length) controller.enqueue(_sseBytes({ t: "follow", v: fs }));
             }
           } catch (e) {
@@ -2701,6 +2705,7 @@ export default {
       let b = {}; try { b = await request.json(); } catch (e) {}
       const kind = ({ report: 1, essay: 1, outline: 1 })[b.kind] ? b.kind : "report";
       const turns = Array.isArray(b.history) ? b.history.slice(-40) : [];
+      const dlang = b.lang === "en" ? "en" : "zh";
       if (!turns.length) return _sseResp([{ t: "error", v: "这场还没有可成文的内容。" }]);
       const userKey = String(b.key || "").trim();
       if (userKey.length < 8) return _sseResp([{ t: "error", v: "成文用你自己的 API Key 运行（在 ⚙ Key 里填入，只存在你的浏览器本地）。", code: "need_key" }]);
@@ -2760,7 +2765,8 @@ export default {
               + "\n\nSDE 骨架：显露 S / 差异序列 D / 特征纠缠 E；三大方程 S=F(D,E)·D=G(S,E)·E=H(S,D)；六路径；意义三律；发生学——追问事物为何如此发生，而非如何被发现。"
               + (reflect ? ("\n\n【SDE 内化心得·思考底盘（别复述、别提\"心得/内功\"）】\n" + reflect) : "")
               + "\n\n【本次任务】\n" + SPEC.spec
-              + "\n\n【硬规矩】直接从正文开始，不要开场白、不要\"好的/以下是\"。判断要锋利、可被反驳，不要正确的废话。";
+              + "\n\n【硬规矩】直接从正文开始，不要开场白、不要\"好的/以下是\"。判断要锋利、可被反驳，不要正确的废话。"
+              + (dlang === "en" ? "\n\n【LANGUAGE】Write the whole piece in English — natural English prose, not translated Chinese. Keep SDE terms as Show / Difference / Entanglement." : "");
             let upstream;
             try {
               upstream = await fetch(VC.url, {
