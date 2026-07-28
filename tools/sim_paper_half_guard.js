@@ -32,8 +32,10 @@ function makeHalf() {
     calls++;
     return step.err ? Promise.reject(new Error(step.err)) : Promise.resolve(step.text);
   };
-  const fn = new Function("document", "streamPaper", seg + "\nreturn paperHalf;");
-  return fn(stub, streamPaper);
+  /* 2026-07-29：状态行目标改成可切换的 GEN_STAT（成文一篇与打磨修改共用这台续写机），
+     所以桩里要把它一并喂进去——真页面里它是顶层变量。 */
+  const fn = new Function("document", "streamPaper", "GEN_STAT", seg + "\nreturn paperHalf;");
+  return fn(stub, streamPaper, "paperStat");
 }
 
 const LONG = "字".repeat(2000);
@@ -83,7 +85,7 @@ t("下半篇收尾标记被剥掉", () => { plan = [{ text: LONG + "\n〔全文�
   ok(h.indexOf(".catch(function(){ return ''; })") > 0, "doPaper：下半篇彻底失败也不丢上半篇（吞成空串继续出稿）");
   ok(h.indexOf("halfOnly=(String(p2c||'').length<1200)") > 0, "doPaper：按下半篇实际长度判定 halfOnly");
   ok(h.indexOf("buildPdf(full, halfOnly)") > 0, "doPaper：halfOnly 一路传进 PDF 排版");
-  ok(/function buildPdf\(text, halfOnly\)/.test(h), "buildPdf：接收 halfOnly");
+  ok(/function buildPdf\(text, halfOnly, opt\)/.test(h), "buildPdf：接收 halfOnly（并已参数化给打磨稿复用）");
   ok(h.indexOf("⚠ 未完成稿 · 下半篇生成中断") > 0, "buildPdf：未完成稿在 PDF 首页有红色警示带");
   ok(h.indexOf("缺：第二轴与二维辨别格、可裁决判据、证伪条件、结语与参考文献") > 0, "警示带写清缺了哪几项（读者据此不按完稿评阅）");
   ok(h.indexOf("请勿按完整论文评阅或引用") > 0, "警示带写明不得按完整论文评阅");
