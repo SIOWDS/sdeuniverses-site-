@@ -90,6 +90,11 @@
       dWorking: "正在锻…", dDone: "完成 · ", dFail: "失败", dEmpty: "（没有产出内容，可再试一次）",
       dCopy: "\u29c9 复制", dDl: "\u2913 存为 .md", dSave: "\u2338 存到本机", dSaved: "已存",
       dNoStore: "本机存不了（浏览器禁用了本地存储）",
+      dDir: "\u{1F4C1} 存到目录", dDirPick: "\u{1F4C1} 选择保存目录", dDirPickS: "成文面板里的「存到目录」会写到这里",
+      dDirNone: "还没选目录", dDirSaved: "已存到 ", dDirWait: "正在写入…",
+      dDirNoApi: "这个浏览器不支持选目录（Chrome / Edge 支持），已改为普通下载。",
+      dDirDenied: "没拿到这个目录的写入权限——请再选一次。",
+      dDirFail: "写不进去（",
       convoTitle: "与 WDS 的对话", errNoOut: "成文没接上（",
       setTitle: "设置", setKeyH: "用你自己的 API Key",
       setKeyP: "WDS 助手用你自己的大模型 Key 运行。<b style=\"color:#C9A227\">Key 只存在你的浏览器本地，不会上传本站</b>，随时可清除。联网搜索走智谱通道，填一把智谱 Key 即可同时用于对话与联网。",
@@ -153,6 +158,11 @@
       dWorking: "Forging…", dDone: "Done · ", dFail: "Failed", dEmpty: "(nothing came out — try again)",
       dCopy: "\u29c9 Copy", dDl: "\u2913 Save .md", dSave: "\u2338 Keep on this device", dSaved: "Kept",
       dNoStore: "Can't keep it here (local storage is disabled)",
+      dDir: "\u{1F4C1} Save to folder", dDirPick: "\u{1F4C1} Choose save folder", dDirPickS: "Where the forge panel writes its files",
+      dDirNone: "No folder chosen yet", dDirSaved: "Saved to ", dDirWait: "Writing…",
+      dDirNoApi: "This browser can't pick folders (Chrome / Edge can) — falling back to a normal download.",
+      dDirDenied: "No write permission for that folder — please choose it again.",
+      dDirFail: "Couldn't write it (",
       convoTitle: "A conversation with WDS", errNoOut: "The write-up didn't connect (",
       setTitle: "Settings", setKeyH: "Use your own API key",
       setKeyP: "WDS runs on your own model key. <b style=\"color:#C9A227\">The key stays in this browser and is never sent to this site</b>; clear it whenever you like. Web search goes through Zhipu, so one Zhipu key covers both chat and search.",
@@ -767,6 +777,106 @@
     try { document.execCommand("copy"); } catch (e2) {}
     ta.parentNode.removeChild(ta);
   }
+  /* ── 存到用户自选目录（File System Access API）────────────────────────────────
+     浏览器不许网页随便往硬盘写东西，唯一的正路是让**用户自己点一次目录**授权。
+     目录句柄能存进 IndexedDB 长期复用（localStorage 存不了句柄，只能存字符串）。
+     开页时先把句柄读进内存，因为 requestPermission 必须发生在点击这一下之内——
+     等点了再去异步读 IndexedDB，用户手势就过期了，权限弹窗会被浏览器拒掉。
+     Chrome / Edge 支持；Firefox / Safari 没有这个 API，一律回退成普通下载。 ── */
+  var DIRH = null, DIRDB = "wds-fs", DIRSTORE = "h", DIRKEY = "distill-dir";
+  function dirIdb(cb) {
+    try {
+      var rq = indexedDB.open(DIRDB, 1);
+      rq.onupgradeneeded = function () { try { rq.result.createObjectStore(DIRSTORE); } catch (e) {} };
+      rq.onsuccess = function () { cb(rq.result); };
+      rq.onerror = function () { cb(null); };
+    } catch (e) { cb(null); }
+  }
+  function dirLoad(cb) {
+    dirIdb(function (db) {
+      if (!db) { cb(null); return; }
+      try {
+        var g = db.transaction(DIRSTORE, "readonly").objectStore(DIRSTORE).get(DIRKEY);
+        g.onsuccess = function () { cb(g.result || null); };
+        g.onerror = function () { cb(null); };
+      } catch (e) { cb(null); }
+    });
+  }
+  function dirStore(hd, cb) {
+    dirIdb(function (db) {
+      if (!db) { cb && cb(false); return; }
+      try {
+        var tx = db.transaction(DIRSTORE, "readwrite");
+        tx.objectStore(DIRSTORE).put(hd, DIRKEY);
+        tx.oncomplete = function () { cb && cb(true); };
+        tx.onerror = function () { cb && cb(false); };
+      } catch (e) { cb && cb(false); }
+    });
+  }
+  function dirSupported() { return typeof window.showDirectoryPicker === "function"; }
+  function dirName() { return DIRH && DIRH.name ? DIRH.name : ""; }
+  function dirPick(cb) {   // 必须在点击事件里同步调用
+    if (!dirSupported()) { cb(null, "noapi"); return; }
+    try {
+      window.showDirectoryPicker({ id: "wds-distill", mode: "readwrite", startIn: "documents" })
+        .then(function (hd) { DIRH = hd; dirStore(hd); cb(hd, ""); })
+        .catch(function () { cb(null, "cancel"); });
+    } catch (e) { cb(null, "noapi"); }
+  }
+  // 已经选过就直接用（必要时就地要一次权限）；没选过就当场弹目录选择器。
+  function dirEnsure(cb) {
+    if (!dirSupported()) { cb(null, "noapi"); return; }
+    if (!DIRH) { dirPick(cb); return; }
+    var opt = { mode: "readwrite" };
+    try {
+      DIRH.queryPermission(opt).then(function (st) {
+        if (st === "granted") { cb(DIRH, ""); return; }
+        DIRH.requestPermission(opt).then(function (st2) {
+          if (st2 === "granted") cb(DIRH, ""); else cb(null, "denied");
+        }).catch(function () { cb(null, "denied"); });
+      }).catch(function () { cb(null, "denied"); });
+    } catch (e) { cb(null, "denied"); }
+  }
+  function safeName(s) { return String(s || "").replace(/[\\/:*?"<>|\r\n\t]/g, "").replace(/\s+/g, " ").trim().slice(0, 40); }
+  function stampName() {
+    var d = new Date(), p2 = function (n) { return (n < 10 ? "0" : "") + n; };
+    return "" + d.getFullYear() + p2(d.getMonth() + 1) + p2(d.getDate()) + "-" + p2(d.getHours()) + p2(d.getMinutes());
+  }
+  // 同名不覆盖：撞名就加 -2 -3…（成文常常反复重写，覆盖掉上一稿是最容易被骂的那种"贴心"）
+  function dirWrite(hd, name, text, cb) {
+    var dot = name.lastIndexOf("."), base = dot > 0 ? name.slice(0, dot) : name, ext = dot > 0 ? name.slice(dot) : "";
+    function attempt(n) {
+      var nm = n === 1 ? (base + ext) : (base + "-" + n + ext);
+      hd.getFileHandle(nm, { create: false })
+        .then(function () { if (n < 50) attempt(n + 1); else cb(false, "too many"); })
+        .catch(function () {
+          hd.getFileHandle(nm, { create: true })
+            .then(function (fh) { return fh.createWritable(); })
+            .then(function (w) { return w.write(text).then(function () { return w.close(); }); })
+            .then(function () { cb(true, nm); })
+            .catch(function (e) { cb(false, (e && e.message) || "write failed"); });
+        });
+    }
+    attempt(1);
+  }
+  // 统一入口：选好目录就写进去，没有 API 就退回普通下载——任何情况下读者都拿得到文件。
+  function saveToDir(name, text, say) {
+    if (!dirSupported()) { say(t("dDirNoApi")); download(name, text); return; }
+    say(t("dDirWait"));
+    dirEnsure(function (hd, why) {
+      if (!hd) {
+        if (why === "denied") say(t("dDirDenied"));
+        else if (why === "noapi") { say(t("dDirNoApi")); download(name, text); }
+        else say("");
+        return;
+      }
+      dirWrite(hd, name, text, function (ok, info) {
+        say(ok ? (t("dDirSaved") + dirName() + "/" + info) : (t("dDirFail") + info + "）"));
+      });
+    });
+  }
+  dirLoad(function (hd) { if (hd) DIRH = hd; });   // 开页就把句柄读进内存，好让点击那一下能直接要权限
+
   function download(name, text) {
     var b = new Blob([text], { type: "text/markdown;charset=utf-8" });
     var a = document.createElement("a"); a.href = URL.createObjectURL(b); a.download = name;
@@ -1196,6 +1306,15 @@
     dl.appendChild(el("span", "sub", t("mExportS")));
     dl.onclick = function () { if (menu.parentNode) menu.parentNode.removeChild(menu); exportSession(); };
     menu.appendChild(dl);
+    var pd = el("button");
+    pd.appendChild(document.createTextNode(t("dDirPick")));
+    pd.appendChild(el("span", "sub", dirName() ? (t("dDirSaved") + dirName()) : (dirSupported() ? t("dDirPickS") : t("dDirNoApi"))));
+    pd.onclick = function () {
+      if (menu.parentNode) menu.parentNode.removeChild(menu);
+      if (!dirSupported()) { alert(t("dDirNoApi")); return; }
+      dirPick(function (hd) { if (hd) alert(t("dDirSaved") + hd.name); });
+    };
+    menu.appendChild(pd);
     var dh = el("button");
     dh.appendChild(document.createTextNode(t("mDhist")));
     dh.appendChild(el("span", "sub", t("mDhistS")));
@@ -1265,13 +1384,22 @@
     wrap.innerHTML = "<div class='wdsm-dist-box'>"
       + "<div class='wdsm-dist-top'><span class='wdsm-dist-t'>" + esc(title || kindT(kind)) + "</span>"
       + "<span class='dst' style='color:#8B98A5;font-size:12px;flex:1'>" + esc(t("dWorking")) + "</span>"
-      + "<button class='wdsm-tbtn dsv'></button><button class='wdsm-tbtn dcp'></button><button class='wdsm-tbtn ddl'></button><button class='wdsm-tbtn dx' style='margin-right:0'>✕</button></div>"
+      + "<button class='wdsm-tbtn dsv'></button><button class='wdsm-tbtn dcp'></button><button class='wdsm-tbtn ddir'></button><button class='wdsm-tbtn ddl'></button><button class='wdsm-tbtn dx' style='margin-right:0'>✕</button></div>"
       + "<div class='wdsm-dist-c'><div class='wdsm-a'></div></div></div>";
     document.body.appendChild(wrap);
     var out = wrap.querySelector(".wdsm-a"), stat = wrap.querySelector(".dst");
     var text = "", dr = null, lastP = 0;
-    var svBtn = wrap.querySelector(".dsv"), cpBtn = wrap.querySelector(".dcp"), dlBtn = wrap.querySelector(".ddl");
+    var svBtn = wrap.querySelector(".dsv"), cpBtn = wrap.querySelector(".dcp"), dlBtn = wrap.querySelector(".ddl"), dirBtn = wrap.querySelector(".ddir");
     svBtn.textContent = t("dSave"); cpBtn.textContent = t("dCopy"); dlBtn.textContent = t("dDl");
+    dirBtn.textContent = t("dDir");
+    dirBtn.title = dirName() ? (t("dDirSaved") + dirName()) : t("dDirNone");
+    dirBtn.onclick = function () {
+      if (!text) return;
+      saveToDir("WDS-" + safeName(title || kindT(kind)) + "-" + stampName() + ".md", text, function (msg) {
+        if (msg) stat.textContent = msg;
+        dirBtn.title = dirName() ? (t("dDirSaved") + dirName()) : t("dDirNone");
+      });
+    };
     function done() { out.innerHTML = text ? mdRender(text) : esc(t("dEmpty")); stat.textContent = text ? (t("dDone") + text.length) : t("dFail"); }
     wrap.querySelector(".dx").onclick = function () { try { if (dr) dr.cancel(); } catch (e) {} wrap.parentNode.removeChild(wrap); };
     cpBtn.onclick = function () { copyText(text); cpBtn.textContent = t("aCopied"); setTimeout(function () { cpBtn.textContent = t("dCopy"); }, 1400); };

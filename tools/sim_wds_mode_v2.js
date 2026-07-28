@@ -288,7 +288,8 @@ ROUTE["/api/wds/chat"] = [
   layer.querySelector(".wdsm-distbtn").click();
   const menu = document.body.querySelector(".wdsm-menu");
   ok(!!menu, "成文菜单弹出");
-  ok(menu.children.length === 5, "菜单五项（报告/成文/提纲/导出/成文记录），实得 " + menu.children.length);
+  // 菜单在「选择保存目录」加入后是六项：报告/成文/提纲 ＋ 导出 ＋ 选目录 ＋ 成文记录
+  ok(menu.children.length === 6, "菜单六项（报告/成文/提纲/导出/选目录/成文记录），实得 " + menu.children.length);
   menu.children[0].click();
   await new Promise((r) => setTimeout(r, 220));
   const dist = document.body.querySelector(".wdsm-dist");
