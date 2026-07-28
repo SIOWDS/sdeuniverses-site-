@@ -5,7 +5,9 @@
 const fs = require("fs");
 const src = fs.readFileSync("/home/claude/site/src/worker.js", "utf8");
 
-const a = src.indexOf('if (mode === "paper") {');
+/* 2026-07-29：paper 分支已与 polish 共用同一段 base（内功+心得+自检规程 v3 零重复），
+   入口条件因此变成 paper||polish；本脚本仍只测 mode="paper" 那条路。 */
+const a = src.indexOf('if (mode === "paper" || mode === "polish") {');
 const b = src.indexOf("// 深度默认（未开四步法）");
 if (a < 0 || b < 0 || b <= a) { console.log("FAIL 抠不出 paper 块（锚点变了，先改本脚本）"); process.exit(1); }
 const seg = src.slice(a, b);
