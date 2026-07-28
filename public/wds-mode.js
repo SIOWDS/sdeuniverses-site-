@@ -71,7 +71,8 @@
       left: "本场剩余 ", times: " 次", today: " 次 · 今日 ", turnsTitle: "本场＝这一次对话最多 100 轮（点＋新对话可重开）；今日＝本机每天在「全站问答」入口的额度，陪读与「与WDS对话」各有独立额度。",
       dayOut: "今日本机额度已用完，明天再来（陪读与「与WDS对话」不受影响）。",
       sessFull: "这场已谈满 100 次，点＋新对话重开。",
-      srcSite: "站内来源", srcWeb: "站外来源 · 联网搜索", followsH: "接着可以问",
+      srcSite: "站内文献", srcWeb: "站外来源 · 联网搜索", followsH: "接着可以问",
+      srcN: " 篇", toBot: "回到最新",
       aCopy: "\u29c9 复制", aCopied: "已复制", aRead: "\ud83d\udd0a 朗读", aStop: "\u23f9 停止", aRegen: "\u21bb 重答", aEdit: "\u270e 改问",
       thinking: "正在想…", thought: "已思考 ", chars: " 字（点开看）", expand: "展开", collapse: "收起",
       stopped: "（你按了停止）", stoppedOnly: "（已停止）",
@@ -134,6 +135,7 @@
       dayOut: "Today's allowance for this key is used up. Come back tomorrow.",
       sessFull: "This chat has hit 100 turns. Start a new one.",
       srcSite: "ON-SITE SOURCES", srcWeb: "WEB SOURCES", followsH: "ASK NEXT",
+      srcN: "", toBot: "Jump to latest",
       aCopy: "\u29c9 Copy", aCopied: "Copied", aRead: "\ud83d\udd0a Read", aStop: "\u23f9 Stop", aRegen: "\u21bb Retry", aEdit: "\u270e Edit",
       thinking: "Thinking…", thought: "Thought for ", chars: " chars (open)", expand: "open", collapse: "close",
       stopped: "(you stopped it)", stoppedOnly: "(stopped)",
@@ -213,9 +215,9 @@
     ".wdsm-egs{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:22px}" +
     ".wdsm-eg{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);color:#C9D1D9;border-radius:12px;padding:10px 14px;font-size:13.5px;cursor:pointer;text-align:left;transition:border-color .15s}" +
     ".wdsm-eg:hover{border-color:rgba(212,178,94,.5)}" +
-    ".wdsm-msgs{max-width:760px;width:100%;margin:0 auto;padding:26px 20px 10px}" +
-    ".wdsm-turn{margin-bottom:26px;animation:wdsmFade .3s ease both}" +
-    ".wdsm-q{text-align:right;margin-bottom:14px}" +
+    ".wdsm-msgs{max-width:768px;width:100%;margin:0 auto;padding:34px 24px 56px}" +
+    ".wdsm-turn{margin-bottom:46px;animation:wdsmFade .3s ease both}" +
+    ".wdsm-q{text-align:right;margin-bottom:22px}" +
     ".wdsm-q span{display:inline-block;text-align:left;background:rgba(212,178,94,.13);color:#F5EFE0;padding:10px 14px;border-radius:14px 14px 4px 14px;font-size:15px;line-height:1.6;max-width:85%}" +
     ".wdsm-a{font-size:15.5px;line-height:1.85;color:#E8E4DA;word-break:break-word}" +
     ".wdsm-a.plain{white-space:pre-wrap}" +
@@ -244,13 +246,17 @@
     ".wdsm-turn:hover .wdsm-acts{opacity:1}" +
     ".wdsm-act{background:none;border:1px solid rgba(255,255,255,.14);color:#8B98A5;font:12px/1 inherit;padding:6px 10px;border-radius:7px;cursor:pointer}" +
     ".wdsm-act:hover{border-color:rgba(212,178,94,.5);color:#D4B25E}" +
-    ".wdsm-src{margin-top:14px;border-top:1px solid rgba(255,255,255,.08);padding-top:12px}" +
-    ".wdsm-src-h{font-size:11px;letter-spacing:1px;color:#8B98A5;margin-bottom:8px}" +
+    ".wdsm-src{margin-top:22px;border-top:1px solid rgba(255,255,255,.08);padding-top:12px}" +
+    ".wdsm-src-h{font-size:11px;letter-spacing:1px;color:#8B98A5;display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none;padding:2px 0}" +
+    ".wdsm-src-h:hover{color:#B9C3CE}.wdsm-src-h .sg{margin-left:auto;color:#6f7b88}" +
+    ".wdsm-src-l{display:none;margin-top:6px}.wdsm-src.on .wdsm-src-l{display:block}" +
     ".wdsm-src-a{display:block;color:#C9A227;font-size:13.5px;text-decoration:none;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.05)}" +
     ".wdsm-src-a:hover{color:#D4B25E;text-decoration:underline}" +
     ".wdsm-web .wdsm-src-a{color:#6FB3B3}.wdsm-web .wdsm-src-a:hover{color:#8ED0D0}" +
     ".wdsm-web-m{color:#5f6a7a;font-size:11.5px;margin-left:6px}" +
-    ".wdsm-inbar{flex:none;border-top:1px solid rgba(212,178,94,.18);padding:12px 20px 14px;background:#0F0B07}" +
+    ".wdsm-inbar{flex:none;position:relative;border-top:1px solid rgba(212,178,94,.18);padding:12px 20px 14px;background:#0F0B07}" +
+    ".wdsm-tobot{position:absolute;top:-46px;left:50%;transform:translateX(-50%);width:34px;height:34px;border-radius:50%;border:1px solid rgba(212,178,94,.35);background:rgba(15,11,7,.94);color:#D4B25E;font-size:15px;line-height:1;cursor:pointer;z-index:6;box-shadow:0 4px 14px rgba(0,0,0,.45)}" +
+    ".wdsm-tobot:hover{border-color:#D4B25E;color:#F0D48A}" +
     ".wdsm-modes{max-width:760px;margin:0 auto 9px;display:flex;gap:7px;align-items:center;flex-wrap:wrap}" +
     ".wdsm-mode{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.13);color:#8B98A5;font:12.5px/1 inherit;padding:7px 12px;border-radius:999px;cursor:pointer;white-space:nowrap}" +
     ".wdsm-mode.on{background:rgba(212,178,94,.16);border-color:#D4B25E;color:#E9C766}" +
@@ -293,7 +299,7 @@
     ".wdsm-fab{position:fixed;right:22px;bottom:76px;z-index:99996;display:flex;align-items:center;gap:7px;background:#0F0B07;color:#D4B25E;border:1px solid rgba(212,178,94,.55);border-radius:24px;padding:11px 17px;font:600 14px/1 -apple-system,'PingFang SC','Microsoft YaHei',sans-serif;box-shadow:0 6px 24px rgba(15,11,7,.3);cursor:pointer;transition:transform .15s}" +
     ".wdsm-fab:hover{transform:translateY(-2px)}" +
     "@media(max-width:520px){.wdsm-fab{padding:10px 14px;font-size:13px}}" +
-    "@media(max-width:600px){.wdsm-brand{display:none}.wdsm-tab{padding:7px 12px}.wdsm-turns{display:none}.wdsm-mode{padding:6px 10px;font-size:12px}}";
+    "@media(max-width:600px){.wdsm-brand{display:none}.wdsm-tab{padding:7px 12px}.wdsm-turns{display:none}.wdsm-mode{padding:6px 10px;font-size:12px}.wdsm-msgs{padding:24px 16px 42px}.wdsm-turn{margin-bottom:34px}}";
   var st = el("style"); st.textContent = CSS; document.head.appendChild(st);
 
   // —— 全屏对话层 ——
@@ -317,6 +323,7 @@
       "<div class='wdsm-msgs' style='display:none'></div>" +
     "</div>" +
     "<div class='wdsm-inbar'>" +
+      "<button class='wdsm-tobot' style='display:none'>↓</button>" +
       "<div class='wdsm-modes'>" +
         "<button class='wdsm-mode wdsm-attbtn'></button>" +
         "<button class='wdsm-mode' data-k='std'></button>" +
@@ -336,6 +343,18 @@
   var msgsEl = layer.querySelector(".wdsm-msgs");
   var inEl = layer.querySelector(".wdsm-in");
   var sendEl = layer.querySelector(".wdsm-send");
+
+  // —— 跟随滚动（学 Claude / GPT）：只有读者本来就贴在底部时才自动跟，
+  // 一旦手动往上翻就松手（不再把人拽回去），改用右下的「回到最新」回去。
+  var toBotEl = layer.querySelector(".wdsm-tobot"), stick = true;
+  function atBottom() { return bodyEl.scrollHeight - bodyEl.scrollTop - bodyEl.clientHeight < 90; }
+  function scrollBottom(smooth) {
+    try { bodyEl.scrollTo({ top: bodyEl.scrollHeight, behavior: smooth ? "smooth" : "auto" }); }
+    catch (e) { bodyEl.scrollTop = bodyEl.scrollHeight; }
+  }
+  function setStick(on) { stick = !!on; if (toBotEl) toBotEl.style.display = stick ? "none" : "block"; }
+  bodyEl.addEventListener("scroll", function () { setStick(atBottom()); }, { passive: true });
+  if (toBotEl) { toBotEl.onclick = function () { setStick(true); scrollBottom(1); }; }
   var tipEl = layer.querySelector(".wdsm-mode-tip");
   // 语言只重刷"外壳"（按钮/提示/示例）；已经生成的回答保持它当时的语言——重译旧答既不诚实也没必要。
   function applyLang() {
@@ -598,6 +617,7 @@
       var n = parseInt(el2.getAttribute("data-w"), 10);
       var box = cell.turn.querySelector(".wdsm-web");
       if (!box || !n) return;
+      box.classList.add("on");            // 来源默认收着，点引用时先张开再滚过去
       var links = box.querySelectorAll(".wdsm-src-a");
       var hit = links[n - 1];
       if (!hit) return;
@@ -616,7 +636,12 @@
     var qd = el("div", "wdsm-q"); var qs = el("span"); qs.textContent = q; qd.appendChild(qs); turn.appendChild(qd);
     var a = el("div", "wdsm-a"); turn.appendChild(a);
     msgsEl.appendChild(turn);
-    bodyEl.scrollTop = bodyEl.scrollHeight;
+    // 学 Claude / GPT：新的一问顶到视野上沿，下面先留出一屏空白，
+    // 答案就地长出来而不把画面一直往下抽；留白只给最后一轮。
+    var all = msgsEl.querySelectorAll(".wdsm-turn");
+    for (var ti = 0; ti < all.length - 1; ti++) all[ti].style.minHeight = "";
+    turn.style.minHeight = Math.max(0, bodyEl.clientHeight - 88) + "px";
+    setStick(true); scrollBottom();
     return { turn: turn, a: a, q: q, think: null, thinkC: null, thinkL: null, acts: null, follows: null, refsBound: 0 };
   }
 
@@ -636,10 +661,18 @@
     return box;
   }
 
+  // 来源列表不在流里当场画，而是等正文写完再由 flushSrcs 调过来（读者先看到回答）；
+  // 默认收成一行，点开才展开，不抢正文的版面。
   function renderSources(cell, srcs, kind) {
-    if (!srcs || !srcs.length) return;
+    if (!srcs || !srcs.length) return null;
     var box = el("div", "wdsm-src" + (kind === "web" ? " wdsm-web" : ""));
-    box.appendChild(el("div", "wdsm-src-h", kind === "web" ? t("srcWeb") : t("srcSite")));
+    var head = el("div", "wdsm-src-h");
+    head.appendChild(el("span", null, (kind === "web" ? t("srcWeb") : t("srcSite")) + " · " + srcs.length + t("srcN")));
+    var tg = el("span", "sg", t("expand"));
+    head.appendChild(tg);
+    head.onclick = function () { box.classList.toggle("on"); tg.textContent = box.classList.contains("on") ? t("collapse") : t("expand"); };
+    box.appendChild(head);
+    var list = el("div", "wdsm-src-l");
     srcs.forEach(function (s, i) {
       var l = el("a", "wdsm-src-a");
       l.href = s.u; l.textContent = (kind === "web" ? "[W" + (i + 1) + "] " : "") + (s.t || s.u);
@@ -648,10 +681,12 @@
         var meta = [s.m, s.d].filter(Boolean).join(" · ");
         if (meta) l.appendChild(el("span", "wdsm-web-m", meta));
       }
-      box.appendChild(l);
+      list.appendChild(l);
     });
-    cell.turn.appendChild(box);
+    box.appendChild(list);
+    if (cell.follows) cell.turn.insertBefore(box, cell.follows); else cell.turn.appendChild(box);
     if (kind === "web") bindRefs(cell);
+    return box;
   }
 
   // —— 追问建议：由后端在正文写完后补一次便宜档产出，点一下就直接问出去 ——
@@ -1050,6 +1085,11 @@
       cell.turn.insertBefore(tag, cell.a);
     }
     var answer = "", srcDone = false, thinkTxt = "", lastPaint = 0;
+    var pendSite = null, pendWeb = null;                 // 来源先收着，等正文写完再渲染
+    function flushSrcs() {
+      if (pendSite) { renderSources(cell, pendSite, "site"); pendSite = null; }
+      if (pendWeb) { renderSources(cell, pendWeb, "web"); pendWeb = null; }
+    }
     var wd = null, timedOut = false;   // 存活看门狗:靠心跳字节喂,45s 无字节判定连接已死
 
     function paint() {
@@ -1057,14 +1097,15 @@
       if (now - lastPaint < 110) return;
       lastPaint = now;
       cell.a.innerHTML = mdRender(answer) + "<span class='cur'>▊</span>";
-      bodyEl.scrollTop = bodyEl.scrollHeight;
+      if (stick) scrollBottom();
     }
     function endUI() {
       streaming = false; curReader = null;
       sendEl.textContent = "↑"; sendEl.classList.remove("stop"); sendEl.title = "";
       if (cell.thinkL && thinkTxt) cell.thinkL.textContent = t("thought") + thinkTxt.length + t("chars");
+      flushSrcs();                                        // 出错/中途停下时也把收着的来源补上
       updTurns();
-      bodyEl.scrollTop = bodyEl.scrollHeight;
+      if (stick) scrollBottom();
     }
 
     fetch(API, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(payload) })
@@ -1079,6 +1120,7 @@
           if (answer) {
             cell.a.innerHTML = mdRender(answer);
             if (stoppedByUser) { var n = el("div", null, t("stopped")); n.style.cssText = "color:#6b7684;font-size:12px;margin-top:8px"; cell.a.appendChild(n); }
+            flushSrcs();                                  // 先正文，后文献
             history.push({ role: "wds", text: answer }); stSave(history); mountActs(cell, answer);
           } else if (timedOut) {
             cell.a.className = "wdsm-a plain wdsm-err";
@@ -1101,8 +1143,8 @@
               if (p === "[DONE]") return finish();
               var j; try { j = JSON.parse(p); } catch (e) { continue; }
               if (j.t === "quota") { if (j.v && typeof j.v.left === "number") { dayLeft = j.v.left; updTurns(); } }
-              else if (j.t === "sources") { if (!srcDone) { srcDone = true; renderSources(cell, j.v, "site"); } }
-              else if (j.t === "web") { renderSources(cell, j.v, "web"); }
+              else if (j.t === "sources") { if (!srcDone) { srcDone = true; pendSite = j.v; } }
+              else if (j.t === "web") { pendWeb = j.v; }
               else if (j.t === "webfail") {
                 var why = j.v === "need_search_key" ? t("webNeedKey") : (j.v === "bad_search_key" ? t("webBadKey") : t("webNone"));
                 var w = el("div", null, "🌐 " + why);
