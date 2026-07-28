@@ -105,6 +105,12 @@
       setTest: "测试连通", testing: "正在测…",
       testOk: "通了 · ", testBadKey: "Key 不对或没权限", testNoCredit: "余额不足", testBadModel: "型号不对：这家现在没有这个型号", testNet: "连不上这家的接口", testFail: "没通 · ",
       applyAt: "申请 Key：",
+      micIdle: "说话输入", micListen: "在听…（再点一下结束）", micRec: "录音中 ", micStop: "点一下结束",
+      micWorking: "正在转文字…", micNoApi: "这台设备用不了语音输入", micDenied: "没拿到麦克风权限——浏览器地址栏里放行一下",
+      micShort: "太短了，没听清", micEmpty: "没听出内容，再说一次",
+      micNeedKey: "语音转写走智谱通道，先在 ⚙ 设置里填一把智谱 Key（与联网搜索同一把）。",
+      micSwitch: "浏览器自带的听写在你这边连不上，已改用录音转写（需智谱 Key）。",
+      micFail: "语音没成：",
     },
     en: {
       tabNormal: "Browse", tabBack: "\u2190 Back to site", tabWds: "\u2726 WDS",
@@ -154,6 +160,12 @@
       setTest: "Test connection", testing: "Testing…",
       testOk: "Connected · ", testBadKey: "Key rejected, or no permission", testNoCredit: "Out of credit", testBadModel: "No such model at this provider right now", testNet: "Couldn't reach this provider", testFail: "Failed · ",
       applyAt: "Get a key: ",
+      micIdle: "Speak", micListen: "Listening… (tap again to finish)", micRec: "Recording ", micStop: "tap to finish",
+      micWorking: "Transcribing…", micNoApi: "Voice input isn't available on this device", micDenied: "No microphone permission — allow it from the address bar",
+      micShort: "Too short to catch", micEmpty: "Nothing came through — say it again",
+      micNeedKey: "Transcription goes through Zhipu; put a Zhipu key in ⚙ Settings first (the same one web search uses).",
+      micSwitch: "The browser's own dictation can't reach its service from here, so recording-based transcription is used instead (needs a Zhipu key).",
+      micFail: "Voice input failed: ",
     },
   };
   function langInit() {
@@ -242,6 +254,12 @@
     ".wdsm-inwrap{max-width:760px;margin:0 auto;display:flex;gap:10px;align-items:flex-end;background:rgba(255,255,255,.06);border:1px solid rgba(212,178,94,.3);border-radius:16px;padding:8px 8px 8px 16px}" +
     ".wdsm-in{flex:1;resize:none;background:none;border:none;outline:none;color:#F5EFE0;font:15px/1.6 inherit;max-height:160px;padding:6px 0}" +
     ".wdsm-in::placeholder{color:#5f6a7a}" +
+    ".wdsm-mic{flex:none;background:none;border:1px solid rgba(212,178,94,.35);color:#C9A227;border-radius:11px;width:40px;height:40px;font-size:17px;cursor:pointer;line-height:1}" +
+    ".wdsm-mic:hover{background:rgba(212,178,94,.12)}" +
+    ".wdsm-mic.on{background:#B4453E;border-color:#B4453E;color:#F5EFE0;animation:wdsmPulse 1.3s ease-in-out infinite}" +
+    ".wdsm-mic:disabled{opacity:.45;cursor:default}" +
+    "@keyframes wdsmPulse{50%{box-shadow:0 0 0 6px rgba(180,69,62,.18)}}" +
+    ".wdsm-micbar{max-width:760px;margin:7px auto 0;text-align:center;color:#C9A227;font-size:12.5px;min-height:16px}" +
     ".wdsm-send{flex:none;background:#D4B25E;color:#0F0B07;border:none;border-radius:11px;width:40px;height:40px;font-size:18px;cursor:pointer;font-weight:700}" +
     ".wdsm-send:disabled{background:rgba(212,178,94,.35);cursor:default}" +
     ".wdsm-send.stop{background:#B4453E;color:#F5EFE0}" +
@@ -293,7 +311,8 @@
         "<span class='wdsm-mode-tip'></span>" +
       "</div>" +
       "<div class='wdsm-atts' style='display:none'></div>" +
-      "<div class='wdsm-inwrap'><textarea class='wdsm-in' rows='1'></textarea><button class='wdsm-send'>↑</button></div>" +
+      "<div class='wdsm-inwrap'><textarea class='wdsm-in' rows='1'></textarea><button class='wdsm-mic'>🎙</button><button class='wdsm-send'>↑</button></div>" +
+      "<div class='wdsm-micbar'></div>" +
       "<div class='wdsm-note'></div>" +
     "</div>";
   document.body.appendChild(layer);
@@ -320,6 +339,7 @@
     q(".wdsm-mode[data-k='deep']").textContent = t("mDeep");
     q(".wdsm-mode[data-k='web']").textContent = t("mWeb");
     q(".wdsm-note").textContent = t("note");
+    q(".wdsm-mic").title = t("micIdle");
     if (!inEl.disabled) inEl.placeholder = t("ph");
     egsEl.innerHTML = "";
     t("egs").forEach(function (x) { var b = el("button", "wdsm-eg", x); b.onclick = function () { inEl.value = x; send(); }; egsEl.appendChild(b); });
@@ -783,6 +803,110 @@
     };
     setTimeout(function () { kin.focus(); }, 60);
   }
+
+  /* ── 语音输入：两条通道，先试浏览器自带的听写，走不通就落到录音转写 ──
+     记住选择（sde_wds_asr），免得每次都先撞一次墙。 */
+  var LS_ASR = "sde_wds_asr";
+  var micEl = layer.querySelector(".wdsm-mic"), micBar = layer.querySelector(".wdsm-micbar");
+  var micState = "idle", micSess = null, micBase = "", micTimer = null;
+  function asrPref() { try { var v = localStorage.getItem(LS_ASR); return (v === "web" || v === "glm") ? v : ""; } catch (e) { return ""; } }
+  function asrSet(v) { try { localStorage.setItem(LS_ASR, v); } catch (e) {} }
+  function micSay(msg, warn) { micBar.textContent = msg || ""; micBar.style.color = warn ? "#E8A8A0" : "#C9A227"; }
+  function micReset() {
+    micState = "idle"; micSess = null;
+    clearInterval(micTimer); micTimer = null;
+    micEl.classList.remove("on"); micEl.disabled = false; micEl.textContent = "🎙"; micEl.title = t("micIdle");
+  }
+  // micBase 只记"开口之前输入框里已有的字"，全程不变——
+  // 因为 Web Speech 的 onresult(final) 与 onend 会把同一段最终文本给两次，
+  // 若每次都把 micBase 更新成当前值，第二次就会把这段话重复贴一遍。
+  function micPut(txt, keepGoing) {
+    if (!txt) return;
+    inEl.value = (micBase ? micBase.replace(/\s*$/, "") + " " : "") + txt;
+    inEl.style.height = "auto"; inEl.style.height = Math.min(inEl.scrollHeight, 160) + "px";
+    if (!keepGoing) inEl.focus();
+  }
+  function micLoad(cb) {
+    if (window.WDSVoice) { window.WDSVoice.load(cb); return; }
+    var sc = document.createElement("script");
+    sc.src = "/assets/wds-voice.js"; sc.async = true;
+    sc.onload = function () { if (window.WDSVoice) window.WDSVoice.load(cb); else cb(null); };
+    sc.onerror = function () { cb(null); };
+    document.head.appendChild(sc);
+  }
+  function micStartWeb(V) {
+    micState = "web"; micEl.classList.add("on"); micEl.textContent = "■"; micEl.title = t("micStop");
+    micSay(t("micListen"));
+    micSess = V.startWeb({
+      lang: LANG,
+      onText: function (fin, interim) { micPut(fin + interim, !!interim); },
+      onEnd: function (fin) { micPut(fin); micReset(); micSay(""); },
+      onError: function (code) {
+        // 这两个错基本等于"这条通道在你这边不通"，直接改道，并记住
+        if (code === "network" || code === "service-not-allowed" || code === "start_failed" || code === "unsupported") {
+          asrSet("glm"); micReset(); micSay(t("micSwitch"), 1);
+          setTimeout(function () { micLoad(function (V2) { if (V2) micStartRec(V2); }); }, 700);
+          return;
+        }
+        micReset();
+        micSay(code === "not-allowed" ? t("micDenied") : (code === "no-speech" ? t("micEmpty") : t("micFail") + code), 1);
+      },
+    });
+    if (micSess) asrSet("web");
+  }
+  function micStartRec(V) {
+    if (!wdsSearchKey()) { micSay(t("micNeedKey"), 1); micReset(); return; }
+    micState = "rec"; micEl.classList.add("on"); micEl.textContent = "■"; micEl.title = t("micStop");
+    micSay(t("micRec") + "0s · " + t("micStop"));
+    var t0 = Date.now();
+    V.startRec({ onFull: function () { if (micState === "rec") micEl.click(); } })
+      .then(function (rec) {
+        if (micState !== "rec") { rec.cancel(); return; }
+        micSess = rec;
+        micTimer = setInterval(function () {
+          micSay(t("micRec") + Math.round((Date.now() - t0) / 1000) + "s · " + t("micStop"));
+        }, 400);
+      })
+      .catch(function (e) {
+        micReset();
+        var m = (e && e.message) || "";
+        micSay(/denied|NotAllowed/i.test(m) ? t("micDenied") : (/no_mic_api|no_audio_api/.test(m) ? t("micNoApi") : t("micFail") + m), 1);
+      });
+  }
+  function micFinishRec() {
+    var rec = micSess;
+    clearInterval(micTimer); micTimer = null;
+    micState = "work"; micEl.disabled = true; micEl.classList.remove("on"); micEl.textContent = "…";
+    micSay(t("micWorking"));
+    if (!rec) { micReset(); micSay(""); return; }
+    rec.stop().then(function (r) {
+      return fetch("/api/wds/asr", { method: "POST", headers: { "content-type": "application/json" },
+        body: JSON.stringify({ audio: r.b64, key: wdsSearchKey(), lang: LANG }) }).then(function (x) { return x.json(); });
+    }).then(function (j) {
+      micReset();
+      if (j && j.ok && j.text) { micPut(j.text); micSay(""); return; }
+      var code = (j && j.code) || "empty";
+      micSay(({ need_key: t("micNeedKey"), bad_key: t("testBadKey"), no_credit: t("testNoCredit"), empty: t("micEmpty"), net: t("testNet") })[code] || (t("micFail") + code), 1);
+    }).catch(function (e) {
+      micReset();
+      var m = (e && e.message) || "";
+      micSay(m === "too_short" ? t("micShort") : t("micFail") + m, 1);
+    });
+  }
+  micEl.onclick = function () {
+    if (streaming) return;
+    if (micState === "web") { if (micSess) micSess.stop(); micReset(); micSay(""); return; }
+    if (micState === "rec") { micFinishRec(); return; }
+    if (micState === "work") return;
+    micBase = inEl.value;
+    micSay("…");
+    micLoad(function (V) {
+      if (!V) { micSay(t("micNoApi"), 1); return; }
+      var pref = asrPref();
+      if (pref === "glm" || (!pref && !V.canWeb()) || (pref === "web" && !V.canWeb())) { micStartRec(V); return; }
+      micStartWeb(V);
+    });
+  };
 
   // ── 发送 ──
   function send(forceQ) {

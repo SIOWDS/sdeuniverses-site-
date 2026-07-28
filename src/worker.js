@@ -2711,6 +2711,50 @@ export default {
       });
       return new Response(stream, { headers: { ..._cors(), "content-type": "text/event-stream; charset=utf-8", "cache-control": "no-store" } });
     }
+    // /api/wds/asr：语音转文字。读者在浏览器里录音、编成 16k 单声道 WAV，这里转发给 GLM-ASR。
+    // 通道固定走智谱（与联网搜索同一把 Key），因为五家里只有它有现成的转写接口；用哪家对话不影响这里。
+    // 音频不落盘、不留存，转完即弃。
+    if (url.pathname === "/api/wds/asr") {
+      if (request.method === "OPTIONS") return new Response(null, { headers: _cors() });
+      if (request.method !== "POST") return new Response("Method Not Allowed", { status: 405 });
+      let b = {}; try { b = await request.json(); } catch (e) {}
+      let key = String(b.key || "").trim();
+      if (key.length < 8) key = await _adminGlmKey(env);
+      if (key.length < 8) return Response.json({ ok: false, code: "need_key" }, { headers: _cors() });
+      const b64 = String(b.audio || "");
+      if (b64.length < 100) return Response.json({ ok: false, code: "no_audio" }, { headers: _cors() });
+      if (b64.length > 12000000) return Response.json({ ok: false, code: "too_big" }, { headers: _cors() });
+      let bytes;
+      try {
+        const bin = atob(b64);
+        bytes = new Uint8Array(bin.length);
+        for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+      } catch (e) { return Response.json({ ok: false, code: "bad_audio" }, { headers: _cors() }); }
+      const ctrl = new AbortController();
+      const timer = setTimeout(() => { try { ctrl.abort(); } catch (e) {} }, 40000);
+      try {
+        const fd = new FormData();
+        fd.append("file", new Blob([bytes], { type: "audio/wav" }), "speech.wav");
+        fd.append("model", "glm-asr");
+        fd.append("stream", "false");
+        const r = await fetch("https://open.bigmodel.cn/api/paas/v4/audio/transcriptions", {
+          method: "POST", headers: { authorization: "Bearer " + key }, body: fd, signal: ctrl.signal,
+        });
+        if (!r.ok) {
+          const txt = (await r.text()).slice(0, 300);
+          const code = (r.status === 401 || r.status === 403) ? "bad_key" : (r.status === 402 ? "no_credit" : "http");
+          return Response.json({ ok: false, code, status: r.status, msg: txt }, { headers: _cors() });
+        }
+        const j = await r.json();
+        // 智谱这个接口返回的是 chat.completion 形状（content 里才是转写文本）；也兼容 OpenAI 风格的 text 字段
+        const text = String((j && j.text) || (j && j.choices && j.choices[0] && j.choices[0].message && j.choices[0].message.content) || "").trim();
+        if (!text) return Response.json({ ok: false, code: "empty" }, { headers: _cors() });
+        return Response.json({ ok: true, text }, { headers: _cors() });
+      } catch (e) {
+        return Response.json({ ok: false, code: "net", msg: (e && e.message) || "" }, { headers: _cors() });
+      } finally { clearTimeout(timer); }
+    }
+
     // /api/wds/ping：只验一次「这把 Key + 这个型号 + 这家地址」通不通，不产内容、不进检索、不计对话额度。
     // 存在的理由很实在：各家型号改名下线的节奏比本站改代码快，读者得能自己当场验证，而不是对着一句"基底返回错误"猜。
     if (url.pathname === "/api/wds/ping") {

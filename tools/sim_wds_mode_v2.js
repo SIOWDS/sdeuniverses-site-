@@ -132,6 +132,21 @@ global.URL = { createObjectURL: (b) => { DOWNLOADS.push(b.parts.join("")); retur
 global.alert = (m) => { console.log("  [alert] " + m); };
 window.document = document; window.localStorage = localStorage; window.fetch = fetchMock;
 window.speechSynthesis = speechMock;
+let WEB_ASR_ERR = null;            // 置成 "network" 可模拟大陆网络下 Web Speech 不通
+let REC_MADE = 0;
+window.WDSVoice = {
+  load(cb) {
+    cb({
+      canWeb: () => true, MAX_SEC: 60,
+      startWeb(o) {
+        if (WEB_ASR_ERR) { setTimeout(() => o.onError(WEB_ASR_ERR), 0); return null; }
+        setTimeout(() => { o.onText("显露和结构", ""); o.onEnd("显露和结构有什么不同"); }, 10);
+        return { stop() {}, abort() {} };
+      },
+      startRec(o) { REC_MADE++; return Promise.resolve({ cancel() {}, stop: () => Promise.resolve({ b64: "x".repeat(200), sec: 3 }) }); },
+    });
+  },
+};
 window.WDSAttach = { load(cb) { cb({ pick(o) { if (o.onProgress) o.onProgress("讲稿.pdf", "抽取", 1, 1); const r = [{ name: "讲稿.pdf", text: "这是一份讲稿的正文。".repeat(20), note: "12 页" }]; r.failed = [{ name: "旧稿.doc", msg: "旧版 .doc 读不了" }]; return Promise.resolve(r); } }); } };
 
 /* ---------- 载入被测脚本 ---------- */
@@ -357,6 +372,36 @@ ROUTE["/api/wds/chat"] = [
   ok(LAST_PAYLOAD.vendor === "kimi" && LAST_PAYLOAD.key === "sk-kimi-abcdefgh", "对话已切到 Kimi");
   ok(LAST_PAYLOAD.model === "kimi-k2.6", "对话带上型号覆盖");
   ok(LAST_PAYLOAD.skey === "sk-test-1234567890", "联网搜索仍走智谱那把，与对话用哪家无关");
+
+  console.log("⑱ 语音输入");
+  layer.querySelector(".wdsm-newbtn").click();
+  const mic = layer.querySelector(".wdsm-mic");
+  ok(!!mic, "麦克风按钮存在");
+  inEl.value = "";
+  mic.click();
+  await new Promise((r) => setTimeout(r, 60));
+  ok(inEl.value === "显露和结构有什么不同", "浏览器听写结果落进输入框");
+  ok(store["sde_wds_asr"] === "web", "记住了走浏览器通道");
+  ok(mic.textContent === "🎙" && !mic.className.includes("on"), "听写结束后按钮复位");
+
+  console.log("⑲ 浏览器通道不通时自动改道录音转写");
+  WEB_ASR_ERR = "network";
+  store["sde_wds_asr"] = "web";
+  inEl.value = "";
+  REC_MADE = 0;
+  mic.click();
+  await new Promise((r) => setTimeout(r, 60));
+  ok(store["sde_wds_asr"] === "glm", "已记住改走录音转写通道");
+  ok(layer.querySelector(".wdsm-micbar").textContent.length > 0, "把改道原因告诉了读者，没有静默");
+  await new Promise((r) => setTimeout(r, 800));
+  ok(REC_MADE === 1, "自动接上了录音通道，实得 " + REC_MADE);
+  JSON_ROUTE["/api/wds/asr"] = { ok: true, text: "这是录音转写出来的句子" };
+  mic.click();                              // 结束录音 → 转写
+  await new Promise((r) => setTimeout(r, 80));
+  ok(LAST_PAYLOAD.key === "sk-test-1234567890", "转写用的是智谱那把 Key（与联网同一把）");
+  ok(inEl.value === "这是录音转写出来的句子", "转写结果落进输入框");
+  delete JSON_ROUTE["/api/wds/asr"];
+  WEB_ASR_ERR = null;
 
   console.log("⑭ 新对话复位");
   layer.querySelector(".wdsm-newbtn").click();
