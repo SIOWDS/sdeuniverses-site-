@@ -29,6 +29,36 @@ AUTHOR = "Claude"
 
 PAPERS = [
     {
+        "src": "A8", "no": 26, "slug": "three-kinds-of-not-knowing",
+        "title": "「不知道」有三种，而我们总把它们说成同一种",
+        "subtitle": "三位现在还活着的哲学家为「没进来的那一部分」吵了二十年；把他们的三个答案并排放，会看到一件他们都没说的事",
+        "hook": "当两样东西相遇，有一部分没进来——那一部分是什么身份？"
+                "第一位说它永远进不来，谁也碰不到；第二位说它是被这一次的做法切掉的，换一种做法它就会进来；"
+                "第三位说这个问题只有指定了在哪儿问才有答案，而不存在一个能问「最终到底有什么」的位置。"
+                "三个答案互不相容，且三人彼此指名道姓地驳斥过。"
+                "本文论证：「不知道」因此有三种，它们要求的反应完全相反——收手／承担／换场；"
+                "而现实中混淆它们的方向是固定的，永远把可为的那两种说成不可为的那一种。",
+        "sources": [
+            {"t": "Agential and Speculative Realism: Remarks on Barad's Ontology（哈曼直接驳巴拉德一文）",
+             "u": "https://rhizomes.net/issue30/harman.html",
+             "d": "格拉汉姆·哈曼（1968— ，南加州建筑学院）· 一样东西永远比它的全部关系还多，有一部分谁也碰不到",
+             "who": "Graham Harman"},
+            {"t": "Meeting the Universe Halfway: Quantum Physics and the Entanglement of Matter and Meaning",
+             "u": "https://www.dukeupress.edu/meeting-the-universe-halfway",
+             "d": "凯伦·巴拉德（1956— ，加州大学圣克鲁兹分校）· 没有先存在的东西，边界是在具体装置里被切出来的",
+             "who": "Karen Barad"},
+            {"t": "Sense, Nonsense, and Subjectivity（另见《世界为何不存在》《意义场》）",
+             "u": "https://www.hup.harvard.edu/books/9780674260283",
+             "d": "马库斯·加布里埃尔（1980— ，波恩大学）· 世界不存在：没有一个能装下一切的总场",
+             "who": "Markus Gabriel"},
+        ],
+        "collide": "本栏第二次不撞站内文章，而是撞三套现在仍在生长的哲学体系，且三人彼此驳斥过。"
+                   "第一位说独立内核先于关系；第二位说关系先于一切边界，那个内核是不可检验的假设；"
+                   "第三位说前两位都预设了有一个总场能让这个问题有唯一答案，而没有那个总场。"
+                   "没有任何两人可以联手对付第三人——每一对之间的分歧同样深。"
+                   "九个判断两两相撞三十六次，撞出的是三人都没说过的第四样东西。",
+    },
+    {
         "src": "A7", "no": 25, "slug": "unfinished-on-purpose",
         "title": "传得下去的，都是没做完的",
         "subtitle": "凝固是必要的，但凝固下来的必须是一个空模子——接手的人得亲自往里填，而且填不上就用不了",
