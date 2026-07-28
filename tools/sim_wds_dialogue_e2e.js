@@ -47,18 +47,30 @@ function makeSession(turns, qLen, aLen) {
   }
   return h;
 }
-const real = makeSession(100, 120, 1800);
+// 【契约已随 699efdd6 改过，断言同步】原设计是"百轮一条不裁"（预算 30 万字符），
+// 实测深聊必撞基底输入窗（400 context too long），故预算下调到 12 万并配 CONTEXT_OVERFLOW 逐级砍半。
+// 所以现在的正确契约是两条，不是一条：①预算之内一条不裁、逐字在场；②超预算从最旧处裁且**明标省略**，绝不静默丢。
+const fits = makeSession(40, 120, 1800);   // ≈7.7 万字符，稳在 12 万预算之内
+const packedFits = packReadHistory(fits, GUIDE_BUDGET, GUIDE_PERMSG);
+ok("预算之内全量携带（80 条一条不裁）", packedFits.length === 80, packedFits.length + " 条 / " + packedFits.reduce((s, m) => s + m.content.length, 0) + " 字符");
+ok("预算之内时第 1 轮原文逐字在场", packedFits[0].content.indexOf("第1问：") === 0 && !/省略/.test(packedFits[0].content));
+ok("角色映射正确（reader→user / wds→assistant）", packedFits[0].role === "user" && packedFits[1].role === "assistant");
+ok("顺序保持不倒置", packedFits[packedFits.length - 1].content.indexOf("第40答") === 0);
+
+const real = makeSession(100, 120, 1800);   // ≈19.2 万字符，必然超出 12 万预算
 const packedReal = packReadHistory(real, GUIDE_BUDGET, GUIDE_PERMSG);
-ok("百轮真实体量全量携带（200 条一条不裁）", packedReal.length === 200, packedReal.length + " 条 / " + packedReal.reduce((s, m) => s + m.content.length, 0) + " 字符");
-ok("第 1 轮原文在第 100 轮时仍逐字在场", packedReal[0].content.indexOf("第1问：") === 0 && !/省略/.test(packedReal[0].content));
-ok("角色映射正确（reader→user / wds→assistant）", packedReal[0].role === "user" && packedReal[1].role === "assistant");
-ok("顺序保持不倒置", packedReal[198].content.indexOf("第100问") === 0);
+const totalReal = packedReal.reduce((s, m) => s + m.content.length, 0);
+ok("百轮真实体量超预算时确实收拢", totalReal <= GUIDE_BUDGET + 200 && packedReal.length < 200, totalReal + " 字符 / " + packedReal.length + " 条");
+ok("收拢从最旧处开始，且明标省略（不静默丢）", /省略/.test(packedReal[0].content));
+ok("最近一轮永远逐字在场", packedReal[packedReal.length - 1].content.indexOf("第100答") === 0);
+ok("历史预算低于基底输入窗（深聊必 400 的教训不许回退）", GUIDE_BUDGET > 0 && GUIDE_BUDGET <= 200000, "WDS_GUIDE_HIST_BUDGET = " + GUIDE_BUDGET);
+ok("仍留着 CONTEXT_OVERFLOW 这条退路（预算不够时逐级砍半重跑）", W.includes("CONTEXT_OVERFLOW") && /return \{ overflow: true/.test(W));
 
 // 极限：每条顶格 12000 字符 → 应触发预算裁剪且插省略提示
 const extreme = makeSession(100, 11900, 11900);
 const packedEx = packReadHistory(extreme, GUIDE_BUDGET, GUIDE_PERMSG);
 const totalEx = packedEx.reduce((s, m) => s + m.content.length, 0);
-ok("极限场（每条顶格）触发预算护栏且不超 30 万", totalEx <= GUIDE_BUDGET + 200, totalEx + " 字符 / " + packedEx.length + " 条");
+ok("极限场（每条顶格）触发预算护栏", totalEx <= GUIDE_BUDGET + 200, totalEx + " 字符 / " + packedEx.length + " 条");
 ok("裁剪时插入连贯性提示、保留最新轮次", /省略/.test(packedEx[0].content) && packedEx[packedEx.length - 1].content.indexOf("第100答") === 0);
 ok("单条 1.2 万以内不截断", packReadHistory([{ role: "reader", text: "长".repeat(11999) }], GUIDE_BUDGET, GUIDE_PERMSG)[0].content.length === 11999);
 ok("单条超 1.2 万才截", packReadHistory([{ role: "reader", text: "长".repeat(13000) }], GUIDE_BUDGET, GUIDE_PERMSG)[0].content.length === GUIDE_PERMSG);
@@ -79,7 +91,9 @@ const bPlain = wdsTopBody({ url: "https://api.deepseek.com/v1/chat/completions" 
 const bGLM = wdsTopBody({ url: "https://open.bigmodel.cn/api/paas/v4/chat/completions", top: 1 }, { model: "glm-5", temperature: 0.7 });
 ok("DeepSeek 顶配开思考且清温度", bDS.thinking && bDS.thinking.type === "enabled" && bDS.reasoning_effort === "max" && bDS.temperature === undefined);
 ok("非顶配不动（陪读保持轻档）", !bPlain.thinking && bPlain.temperature === 0.7);
-ok("非 DeepSeek 不注入 DeepSeek 专属字段", !bGLM.thinking && bGLM.temperature === 0.7);
+// 1657b119 起五家基底各按各家的名字开思考：GLM 也该开 thinking，但 reasoning_effort 是 DeepSeek 专属，不许串门。
+ok("GLM 顶配按自家名字开思考", !!bGLM.thinking && bGLM.thinking.type === "enabled");
+ok("DeepSeek 专属字段不串到别家（reasoning_effort 只归 DeepSeek）", bGLM.reasoning_effort === undefined && bGLM.temperature === 0.7);
 
 // ============================================================
 // 阶段二：路由与页面契约静态核对
@@ -89,7 +103,7 @@ ok("三条链路齐备（对话 read / 开工 dialogue-reflect / 成文 read-pap
   W.includes('url.pathname === "/api/wds/dialogue-reflect"') && W.includes('url.pathname === "/api/wds/read-paper"') && W.includes('url.pathname === "/api/wds/read"'));
 ok("guide 分流 system（对话指引版 vs 陪读版，含读者文章两参）", W.includes("b.guide ? WDS_DIALOGUE_SYS(reflect, SDEM, siteCtx, docTitle, docText)"));
 ok("本场心得优先于全站缓存心得（read + read-paper 两处）", W.split("slice(0, 14000)").length >= 3);   // 站内另有智能体亦用 14000
-ok("guide 预算三元式在位（30万减文章/资料，陪读收缩式不变）", W.includes("b.guide ? Math.max(60000, WDS_GUIDE_HIST_BUDGET - docText.length - siteCtx.length)") && W.includes("120000 - docText.length - siteCtx.length"));
+ok("guide 预算三元式在位（12万减文章/资料，陪读收缩式不变）", W.includes("b.guide ? Math.max(60000, WDS_GUIDE_HIST_BUDGET - docText.length - siteCtx.length)") && W.includes("120000 - docText.length - siteCtx.length"));
 ok("长问放宽仅限 guide（4000 vs 500）", W.includes("b.guide ? 4000 : 500"));
 ok("全站 RAG 加强档（K=36 + 接续补捞 + KB留预算的字数上限 + 来源回传）", W.includes("RAG_SUBREQUEST") && /k: 36, cap: docText \? 12000 : 30000, kbn: docText \? 14 : 24/.test(W) && /ragScan\(env, url, q, expTerms, prevQ, K/.test(W) && W.includes('t: "sources"'));
 ok("与WDS对话 RAG 已接九库（子请求里 retrieveKB 邻域子图优先，chunk 让预算）", /retrieveKB\(kb, \{ docs: scan\.docs \}, q, expTerms, kbn\)/.test(W) && W.includes("const chunkCap = Math.max(4000, cap - kbBlock.length)"));
@@ -184,7 +198,12 @@ for (const [id, tag] of Object.entries({ msgs: "div", q: "textarea", go: "button
 }
 const LS = { _d: {}, getItem(k) { return this._d[k] || null; }, setItem(k, v) { this._d[k] = String(v); } };
 let printWindows = [];
-global.document = { body, createElement: mkEl, querySelector: (s) => findIn(body, s), querySelectorAll: (s) => { const r = []; collect(body, s, r); return r; } };
+// head 是后来页面动态加载 /assets/wds-store.js（历史面板）时才用到的：桩里没有它，stBoot 就在 appendChild 上崩。
+// 给一个最小可用的 head：能被 appendChild，且脚本节点的 onerror 会被触发 → 走"没有历史面板"的降级分支，
+// 与真实浏览器里加载失败时的行为一致，不需要把整个 wds-store.js 也仿出来。
+const docHead = mkEl("head");
+docHead.appendChild = function (node) { docHead.children.push(node); setImmediate(() => { try { node.onerror && node.onerror(); } catch (e) {} }); return node; };
+global.document = { body, head: docHead, createElement: mkEl, querySelector: (s) => findIn(body, s), querySelectorAll: (s) => { const r = []; collect(body, s, r); return r; } };
 global.localStorage = LS;
 try { Object.defineProperty(global, "navigator", { value: { clipboard: { writeText() {} } }, configurable: true, writable: true }); } catch (e) {}
 global.alert = () => {};
@@ -305,8 +324,11 @@ async function ask(text) { qEl.value = text; goEl.onclick(); await flush(25); }
   ok("末轮客户端携带全部对话（199 条：100 问 + 99 答）", last.body.history.length === 199, last.body.history.length + " 条");
   ok("末轮第 1 轮问答仍逐字在场（客户端未裁）",
     last.body.history[0].text.indexOf("第一问：什么是发生学") === 0 && last.body.history[1].text.indexOf("第1答") === 0);
-  ok("服务端打包后仍 199 条不裁（模型真看到全场）", last.packed.length === 199, last.packed.reduce((s, m) => s + m.content.length, 0) + " 字符");
-  ok("服务端所见第一条＝第一问原文（无省略提示）", last.packed[0].content.indexOf("第一问：什么是发生学") === 0 && !/省略/.test(last.packed[0].content));
+  // 客户端一条不裁（上面那两条已验），服务端则按 12 万预算收拢——这是 699efdd6 之后的正确分工：
+  // 全场原文留在客户端与成文流程，送进基底的那一份必须落在输入窗之内。
+  const lastChars = last.packed.reduce((s, m) => s + m.content.length, 0);
+  ok("服务端打包落在历史预算之内（模型不会被撑爆）", lastChars <= GUIDE_BUDGET + 200, lastChars + " 字符 / " + last.packed.length + " 条");
+  ok("收拢时明标省略，且最近几轮逐字在场", /省略/.test(last.packed[0].content) && last.packed[last.packed.length - 1].content.indexOf("第100问") === 0);
   ok("轮次计数走到满额（剩余 0 次，见 a562f40d 改为剩余式）", /剩余\s*0\s*次/.test(turnsEl.textContent), turnsEl.textContent);
   ok("满 100 轮后输入锁定", qEl.disabled === true && goEl.disabled === true);
   ok("满轮后总结/成文仍可用", sumB.disabled === false && papB.disabled === false);
@@ -450,8 +472,13 @@ async function ask(text) { qEl.value = text; goEl.onclick(); await flush(25); }
   head("[阶段十] 拟题这一步倒下时（提纲生成失败）");
 ok("worker：全线顶格预算，任何一步都不降满功率档", W.includes("WDS_TOK_MAX = 64000") && W.includes("wdsFetchMax") && !W.includes("top === false") && (W.match(/await genOnce\(\)/g) || []).length === 2);
 ok("worker：顶格降档只在基底拒收 max_tokens 时发生", /resp\.status !== 400/.test(W) && W.includes("WDS_TOK_LADDER") && /max\[_ \\\]\?tokens/.test(W) === false);
-ok("worker：答题也补上 0 字自动重答（顶格、满功率）", W.includes("ANSWER_EMPTY_GUARD") && (W.match(/await _runAnswer\(\)/g) || []).length === 2 && W.includes("正在重答"));
-ok("worker：与WDS对话各步全部顶格（心得/答题/总结/拟题/分部）", (W.match(/wdsFetchMax\(VC, /g) || []).length >= 5 && W.includes("max_tokens: WDS_TOK_LADDER[i]"));
+// 【口径已改，别再按"全线顶格"验】1790b958 推翻了四修的"一律顶格"：满功率档的预算给多大，它就想多久，
+// 给到几万就会一路想到超过平台上限、被杀在思考里（流干净结束、正文 0 字）。所以满功率档必须有界，
+// 空答重试还要再降一档——这与"不给答题设限"不冲突：降的是"想多久"，不是"能写多长"。
+ok("worker：答题的 0 字自动重答仍在，且重答必降档", W.includes("ANSWER_EMPTY_GUARD") && /_runAnswer\(WDS_TOK_RETRY\)/.test(W) && W.includes("降档重答"));
+ok("worker：满功率档的预算有界（8000 起、重答 4000），绝不回到 64000", /WDS_TOK_SAFE = 8000, WDS_TOK_RETRY = 4000/.test(W) && /_runAnswer\(WDS_TOK_SAFE\)/.test(W));
+ok("worker：非满功率档不受牵连，仍走 64000 阶梯", W.includes("WDS_TOK_MAX = 64000") && W.includes("return WDS_TOK_LADDER;"));
+ok("worker：与WDS对话各步都走统一发车口 wdsFetchMax", (W.match(/wdsFetchMax\(VC, /g) || []).length >= 5 && W.includes("max_tokens: ladder[i]"));
 ok("worker：JSON 不达标时有行文兜底解析", W.includes("function parsePlanText") && /const pick = \(rr\)/.test(W));
 ok("worker：失败原因分种类回报（0 字 / 不可解析）", W.includes("只出了思考、正文 0 字") && W.includes("输出不是可解析的提纲") && W.includes('"plan_fail"'));
 ok("客户端：拟题失败给「重新拟题再试一次」", PAGE.includes("PLAN_RETRY") && /\\u91cd\\u65b0\\u62df\\u9898\\u518d\\u8bd5\\u4e00\\u6b21/.test(PAGE));
@@ -533,6 +560,17 @@ ok("worker：beat 里的秒数/推演字数是真计数（转发处累加）", /
 ok("worker：开工仪式已从非流式改为 stream-first + 心跳", /dialogue-reflect[\s\S]{0,4000}?new ReadableStream/.test(W) && /t: "xinde", v: \{ text: text/.test(W) && !/stream: false, max_tokens: WDS_TOK_MAX/.test(W));
 ok("客户端：开工仪式收 SSE 并把秒数/推演字数画进状态条", PAGE.includes("FAKE_STREAM_UI") && /j\.t === "xinde"/.test(PAGE) && /\\u5df2\\u63a8\\u6f14/.test(PAGE));
 ok("客户端：论文三步都把 beat 画成人话（beatTip）", PAGE.includes("function beatTip") && (PAGE.match(/beatTip\(bv\)/g) || []).length === 3);
+
+  head("[阶段十二] 答题前的准备不许烧光整个请求的时钟（34da38ca）");
+ok("worker：词表扩展卸掉满功率档（配菜不占正菜的时间）", /const LC = \(VC && VC\.top\) \? \{ url: VC\.url, model: VC\.model, name: VC\.name \} : VC;/.test(W));
+ok("worker：词表扩展自带短截止，且远小于原来的 55 秒", /const SDE_EXPAND_MS = (\d+);/.test(W) && Number((W.match(/const SDE_EXPAND_MS = (\d+)/) || [])[1]) <= 10000);
+ok("worker：答题调用终于有时钟（首帧 + 总时长两级护栏）", /ANS_FIRST_MS = \d+, ANS_TOTAL_MS = \d+/.test(W) && /wdsFetchMax\(VC, KEY, messages, true, tokWant, _ac\.signal\)/.test(W));
+ok("worker：wdsFetchMax 收得下 AbortSignal 且不影响老调用点", /async function wdsFetchMax\(VC, KEY, messages, stream, want, signal\)/.test(W) && W.includes("signal: signal || undefined"));
+ok("worker：中途断线时已写出的正文不丢", /if \(got\) \{ controller\.enqueue\(_sseBytes\(\{ t: "note"/.test(W) && W.includes("断在半路"));
+ok("worker：站内检索 5xx 重打一次、4xx 立刻认输", /for \(let _try = 0; _try < 2; _try\+\+\)/.test(W) && W.includes("if (rr.status < 500) break;"));
+ok("worker：每一阶段随心跳回传（下次报障一眼可判时间烧在哪）", W.includes('stage: state.stage || ""') && W.includes('_st.stage = "扩展检索词"') && W.includes('_st.stage = "站内检索"') && W.includes('_st.stage = "基底作答"'));
+ok("worker：准备阶段耗时进了 end 与诊断行", /pre: \(_st && _st\.pre\) \|\| 0/.test(W) && W.includes("答题前的准备烧了 "));
+ok("客户端：等待气泡显示当前阶段，诊断行如实报字节与卡点", /已 " \+ \(j\.v\.sec \|\| 0\) \+ " 秒 · "/.test(PAGE) && /流式收到 " \+ diag\.bytes \+ " 字节/.test(PAGE) && PAGE.includes("被中途切断"));
 
 // 行为：开工走 SSE 后，本场心得仍完整垫进每一次调用（用真实发出的请求体验证）
 ok("开工走 SSE 后心得仍完整落地并垫进调用", cc.length > 0 && (cc[0].body.reflect || "").length === REFLECT_TEXT.length, ((cc[0] && cc[0].body.reflect) || "").length + " 字符");
