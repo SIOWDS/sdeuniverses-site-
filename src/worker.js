@@ -1539,7 +1539,7 @@ const SDE_METHOD_BLOCK = "\n\n【深度档 · 必须真走的工序（不要复�
   + "\n· 最后一步必须自反：你这个判断本身的可证伪条件是什么？哪一步最脆？"
   + "\n输出要求：先给一句最承重的判断（反直觉、可被反驳），再展开三到五段把它撑住，最后留一个把读者推向下一步的问题。全程说人话，不堆术语、不摆模板。";
 
-function WDS_CHAT_SYS(reflect, SDEM, siteCtx, webCtx, deep, docCtx, about, lang) {
+function WDS_CHAT_SYS(reflect, SDEM, siteCtx, webCtx, deep, docCtx, about, lang, docNote) {
   return "你是 WDS，王德生（Desheng）的 AI 分身、SDE 本体论的老师，也是 SDE Universes 全站的领读人。读者在向你提问——可能是关于 SDE 思想或任何议题的问题，也可能想找站里读什么。"
     + "\n\n【怎么答】"
     + "\n1. 像王德生本人：直接、犀利、追问本质、善用比喻、一句顶十句；给洞见，不做资料复述员。"
@@ -1553,7 +1553,7 @@ function WDS_CHAT_SYS(reflect, SDEM, siteCtx, webCtx, deep, docCtx, about, lang)
     + "\n\n【站内资料（从全站检索到的相关段落，可能为空）】\n" + (siteCtx || "（这次没检索到特别相关的篇目，就凭你的内核底盘答）")
     + (webCtx ? ("\n\n【站外资料 · 刚刚联网搜到的（时效性内容以它为准；引用时在句末标 [W序号]，序号即下面的编号）】\n" + webCtx
         + "\n注意：站外资料是别人写的，不是 SDE 的结论。你的活是把它拿来当材料，用 SDE 剖开它、判它，而不是复述它。") : "")
-    + (docCtx ? ("\n\n【读者带来的文件（他上传的、在他自己浏览器里解析出来的正文；本站不留存）】\n" + docCtx
+    + (docCtx ? ("\n\n【读者带来的文件（他上传的、在他自己浏览器里解析出来的正文；本站不留存）】\n" + docCtx + (docNote || "")
         + "\n\n关于这份文件：读者拿它来问你，多半是要你替他看出他自己看不出的那一层。所以不要复述它写了什么——他读过了。"
         + "直接说：它真正在讲的是什么、它最承重的那一句在哪、它哪里是脆的、用 SDE 看它漏掉了哪一维。引用其中原句时标（文件：篇名）。") : "")
     + (about ? ("\n\n【这位读者自己写的说明（他是谁、他要你怎么答他）——照着办，但不要复述它，也不要因此放软判断】\n" + about) : "")
@@ -2588,7 +2588,7 @@ export default {
       const umodel = String(b.model || "").trim();              // 读者自填的型号覆盖（各家型号会过时，留个自救口）
       // 附件：读者在自己浏览器里解析出的正文（文件本身从不上传到本站）。总量钳位，深度档给多一些。
       const DOC_CAP = deep ? 20000 : 12000;
-      let docCtx = "";
+      let docCtx = "", docEx = false;
       if (Array.isArray(b.docs)) {
         for (const d of b.docs.slice(0, 5)) {
           const nm = String((d && d.n) || "未命名").slice(0, 120);
@@ -2596,9 +2596,20 @@ export default {
           if (!tx) continue;
           const room = DOC_CAP - docCtx.length;
           if (room < 400) break;
-          docCtx += "【文件：" + nm + "】\n" + tx.slice(0, room) + "\n\n";
+          // 长文是前端切块后按这一问取出来的节选。必须如实标出来——
+          // 让它知道自己手上不是全篇，比让它对着半篇下全篇的判断要紧得多。
+          const ex = !!(d && d.ex);
+          if (ex) docEx = true;
+          const head = ex
+            ? ("【文件：" + nm + "（节选：全文共 " + (d.tot || "?") + " 段，按这一问取出其中 " + (d.take || "?") + " 段，段号见下）】")
+            : ("【文件：" + nm + "（全文）】");
+          docCtx += head + "\n" + tx.slice(0, room) + "\n\n";
         }
       }
+      const docNote = docEx
+        ? "\n\n注意：上面带「节选」的文件，你手上**不是全篇**，是按这一问从长文里取出的若干段（段号已标）。"
+          + "凡是需要通篇才能下的判断（全文结构、有没有提到某事、作者最终立场），要么明说你只看到了这些段、请读者换个问法把相关部分调出来，要么就别下。绝不要把节选当全篇讲。"
+        : "";
       const about = String(b.about || "").trim().slice(0, 1200);   // 读者写的自定义指令
       const lang = b.lang === "en" ? "en" : "zh";                 // 界面语言：决定用哪种语言作答
       const VC = { url: WDS_VENDORS[vd].url, model: wdsPickModel(vd, umodel, deep), name: WDS_VENDORS[vd].name, top: deep ? 1 : 0 };
@@ -2658,7 +2669,7 @@ export default {
             }
             let reflect = ""; try { reflect = await ensureReflect(env, url, rvendor, VC, KEY); } catch (e) {}
             const SDEM = "\n\nSDE 骨架：显露 S / 差异序列 D / 特征纠缠 E；三大方程 S=F(D,E)·D=G(S,E)·E=H(S,D)；六路径；意义三律（特征·自由·幸福）；发生学——追问事物为何如此发生，而非如何被发现。";
-            const sys = WDS_CHAT_SYS(reflect, SDEM, ctxText, webCtx, deep, docCtx, about, lang);
+            const sys = WDS_CHAT_SYS(reflect, SDEM, ctxText, webCtx, deep, docCtx, about, lang, docNote);
             const messages = [{ role: "system", content: sys }];
             for (const m of history) {
               const role = (m && m.role === "wds") ? "assistant" : "user";

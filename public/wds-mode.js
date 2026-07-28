@@ -111,6 +111,7 @@
       micNeedKey: "语音转写走智谱通道，先在 ⚙ 设置里填一把智谱 Key（与联网搜索同一把）。",
       micSwitch: "浏览器自带的听写在你这边连不上，已改用本机转写（免费、离线）。",
       micFail: "语音没成：",
+      attFull: "全文常驻本场", attIdx: "按问题取段", attSegs: " 段", attStay: "附件会跟着这一场对话，直到你去掉它或开新对话",
       micLocal: "本机转写（免费）", micDl: "首次要下载模型 ",
       micLocalAsk: "本机转写完全免费、不用任何 Key，音频也不出这台机器。代价是首次要下载约 80 MB 的模型（之后浏览器会记住，不再重下），没有独立显卡的机器转一句话可能要等十几秒。现在下吗？",
       micLocalWait: "本机识别中…（第一次慢些）", micLocalNo: "本机转写在这台设备上跑不起来",
@@ -172,6 +173,7 @@
       micNeedKey: "Transcription goes through Zhipu; put a Zhipu key in ⚙ Settings first (the same one web search uses).",
       micSwitch: "The browser's own dictation can't reach its service from here, so on-device transcription is used instead (free, offline).",
       micFail: "Voice input failed: ",
+      attFull: "kept in full for this chat", attIdx: "excerpted per question", attSegs: " segments", attStay: "Attachments stay with this conversation until you remove them or start a new one",
       micLocal: "On-device (free)", micDl: "Downloading the model ",
       micLocalAsk: "On-device transcription is free, needs no key, and the audio never leaves this machine. The cost is a one-time download of about 80 MB (the browser keeps it afterwards), and on a machine without a discrete GPU a sentence may take ten-odd seconds. Download it now?",
       micLocalWait: "Transcribing on this device… (the first run is slower)", micLocalNo: "On-device transcription can't run on this device",
@@ -392,15 +394,40 @@
   /* ── 附件：在读者自己浏览器里解析，文件绝不上传本站 ── */
   var attsEl = layer.querySelector(".wdsm-atts");
   var attBtn = layer.querySelector(".wdsm-attbtn");
-  var atts = [];        // [{name,text,note}]
+  var atts = [];        // [{name,text,note,chunks?}]；chunks 存在＝这篇走"按问题取段"
+  var FULL_MAX = 20000; // 单篇全带的上限；超了切块
+  // 每轮临发前才装配：全带的原样给，取段的按这一问现挑。
+  // 预算与后端一致（标准 12000 / 深度 20000），装不下时全体降级为取段——宁可都取段，也不要前几篇挤掉后几篇。
+  function docsForQuery(q) {
+    if (!atts.length) return null;
+    var B = (thinkMode === "deep" ? 20000 : 12000);
+    var fulls = [], idxs = [];
+    atts.forEach(function (d) { (d.chunks ? idxs : fulls).push(d); });
+    var sumFull = 0;
+    fulls.forEach(function (d) { sumFull += d.text.length; });
+    if (sumFull > B) { idxs = atts.slice(); fulls = []; sumFull = 0; }   // 全带装不下 → 全部转取段
+    var left = Math.max(B - sumFull, 0);
+    var per = idxs.length ? Math.floor(left / idxs.length) : 0;
+    var out = [];
+    fulls.forEach(function (d) { out.push({ n: d.name, t: d.text }); });
+    idxs.forEach(function (d) {
+      var ch = d.chunks || (window.WDSAttach && window.WDSAttach.api.chunk(d.text));
+      if (!ch) { out.push({ n: d.name, t: d.text.slice(0, per) }); return; }
+      var r = window.WDSAttach.api.selectChunks(ch, q, Math.max(per, 1200));
+      out.push({ n: d.name, t: r.text, ex: 1, tot: r.total, take: r.take });
+    });
+    return out;
+  }
   function paintAtts() {
     attsEl.innerHTML = "";
     if (!atts.length) { attsEl.style.display = "none"; return; }
     attsEl.style.display = "";
+    attsEl.title = t("attStay");
     atts.forEach(function (d, i) {
       var chip = el("div", "wdsm-att");
       chip.appendChild(el("b", null, d.name));
-      chip.appendChild(el("i", null, (d.note ? d.note + " \u00b7 " : "") + d.text.length + " 字"));
+      var how = d.chunks ? (t("attIdx") + "（" + d.chunks.length + t("attSegs") + "）") : t("attFull");
+      chip.appendChild(el("i", null, (d.note ? d.note + " \u00b7 " : "") + d.text.length + " 字 \u00b7 " + how));
       var x = el("button", null, "\u00d7"); x.title = "去掉这个附件";
       x.onclick = function () { atts.splice(i, 1); paintAtts(); };
       chip.appendChild(x);
@@ -423,7 +450,13 @@
         multiple: true,
         onProgress: function (name, phase, a, b) { attStatus(name + " \u00b7 " + phase + (b > 1 ? " " + a + "/" + b : "") + "\u2026"); },
       }).then(function (docs) {
-        (docs || []).forEach(function (d) { if (atts.length < 5) atts.push(d); });
+        (docs || []).forEach(function (d) {
+          if (atts.length >= 5) return;
+          // 短文全带常驻；超过这个长度就切块，改成按问题取段——
+          // 硬切前 N 字最糟的地方不是漏内容，是模型不知道自己漏了，会对着半篇下全篇的判断。
+          if (d.text.length > FULL_MAX && A.chunk) d.chunks = A.chunk(d.text);
+          atts.push(d);
+        });
         paintAtts();
         var bad = docs && docs.failed;
         if (bad && bad.length) {
@@ -501,6 +534,7 @@
   };
   layer.querySelector(".wdsm-newbtn").onclick = function () {
     history = []; if (stSess) stSess.reset(); msgsEl.innerHTML = ""; msgsEl.style.display = "none"; bodyEl.classList.add("empty");
+    atts = []; paintAtts();                          // 附件跟着这一场，新开一场就该清干净
     inEl.disabled = false; sendEl.disabled = false; inEl.placeholder = t("ph"); updTurns();   // dayLeft 不复位：今日额度按本机计
     layer.querySelector(".wdsm-hero").style.display = ""; inEl.value = ""; inEl.focus();
   };
@@ -1006,11 +1040,12 @@
     streaming = true; stoppedByUser = false;
     sendEl.textContent = "■"; sendEl.classList.add("stop"); sendEl.title = "停止生成";
     var payload = { q: q, history: history.slice(-4), key: kv.key, vendor: kv.vendor, model: kv.model || "", mode: thinkMode, web: webOn ? 1 : 0, skey: wdsSearchKey(), about: aboutGet(), lang: LANG };
-    if (atts.length) {
-      payload.docs = atts.map(function (d) { return { n: d.name, t: d.text }; });
-      var attNames = atts.map(function (d) { return d.name; });
-      atts = []; paintAtts();                       // 附件属于这一问：发出去就从输入区摘掉
-      var tag = el("div", null, "📎 " + attNames.join("、"));
+    var packed = docsForQuery(q);
+    if (packed) {
+      payload.docs = packed;                        // 附件常驻本场：每轮都带，长文按这一问现取段
+      var tag = el("div", null, "📎 " + packed.map(function (d) {
+        return d.n + (d.ex ? "（" + d.take + "/" + d.tot + t("attSegs") + "）" : "");
+      }).join("、"));
       tag.style.cssText = "text-align:right;color:#6f8f8f;font-size:12px;margin:-8px 0 12px";
       cell.turn.insertBefore(tag, cell.a);
     }

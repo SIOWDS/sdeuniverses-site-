@@ -186,7 +186,55 @@
     });
   }
 
-  var API = { pick: pick, parseFile: parseFile, MAX_CHARS: MAX_CHARS };
+  /* ── 长文切块与按问题取段 ──
+     全在浏览器里算，不额外调基底、不产生费用。
+     中文没有空格可切词，所以用**字符二元组**做重合度，比按词切稳当得多。 */
+  var CHUNK = 700, OVERLAP = 100;
+  function chunk(text) {
+    var t = String(text || ""), out = [], i = 0, n = 0;
+    while (i < t.length) {
+      var end = Math.min(i + CHUNK, t.length);
+      // 尽量切在句末，别把一句话拦腰截断
+      if (end < t.length) {
+        var win = t.slice(end - 120, end), p = Math.max(win.lastIndexOf("。"), win.lastIndexOf("！"), win.lastIndexOf("？"), win.lastIndexOf("\n"));
+        if (p > 20) end = end - 120 + p + 1;
+      }
+      out.push({ i: n++, t: t.slice(i, end) });
+      if (end >= t.length) break;
+      i = Math.max(end - OVERLAP, i + 1);
+    }
+    return out;
+  }
+  function bigrams(s) {
+    var c = String(s || "").replace(/[\s\p{P}]+/gu, ""), set = Object.create(null);
+    for (var i = 0; i + 1 < c.length; i++) set[c.slice(i, i + 2)] = 1;
+    return set;
+  }
+  // 按问题挑段：始终先给开头（让它知道这是篇什么），再按重合度补相关段，最后按原文顺序排好
+  function selectChunks(chunks, query, budget) {
+    if (!chunks.length) return { text: "", take: 0, total: 0 };
+    var q = bigrams(query), qn = 0, k;
+    for (k in q) qn++;
+    var scored = chunks.map(function (c) {
+      var b = bigrams(c.t), hit = 0, x;
+      for (x in q) if (b[x]) hit++;
+      return { c: c, s: qn ? hit / Math.sqrt(c.t.length + 40) : 0 };
+    });
+    scored.sort(function (a, b) { return b.s - a.s; });
+    var picked = {}, used = 0;
+    picked[0] = 1; used += chunks[0].t.length;                 // 开头永远带上
+    for (var j = 0; j < scored.length && used < budget; j++) {
+      var ci = scored[j].c.i;
+      if (picked[ci] || scored[j].s <= 0) continue;
+      if (used + scored[j].c.t.length > budget) continue;
+      picked[ci] = 1; used += scored[j].c.t.length;
+    }
+    var idxs = Object.keys(picked).map(Number).sort(function (a, b) { return a - b; });
+    var text = idxs.map(function (i) { return "〔第 " + (i + 1) + " 段 / 共 " + chunks.length + " 段〕\n" + chunks[i].t; }).join("\n\n");
+    return { text: text, take: idxs.length, total: chunks.length };
+  }
+
+  var API = { pick: pick, parseFile: parseFile, MAX_CHARS: MAX_CHARS, chunk: chunk, selectChunks: selectChunks };
   window.WDSAttach = {
     load: function (cb) {
       var okEnv = !!(window.FileReader && window.Promise);

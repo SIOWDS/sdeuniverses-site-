@@ -159,7 +159,28 @@ window.WDSVoice = {
     });
   },
 };
-window.WDSAttach = { load(cb) { cb({ pick(o) { if (o.onProgress) o.onProgress("讲稿.pdf", "抽取", 1, 1); const r = [{ name: "讲稿.pdf", text: "这是一份讲稿的正文。".repeat(20), note: "12 页" }]; r.failed = [{ name: "旧稿.doc", msg: "旧版 .doc 读不了" }]; return Promise.resolve(r); } }); } };
+let PICK_DOCS = null;
+{
+  // 直接把真模块跑起来，chunk/selectChunks 用的就是线上那份实现，不另写一份假的
+  const realSrc = fs.readFileSync("/home/claude/site/public/assets/wds-attach.js", "utf8");
+  const shim = { FileReader: function () {}, Blob: function () {}, navigator: navMock };
+  new Function("window", "document", "navigator", "FileReader", "Promise", realSrc)(window, document, navMock, shim.FileReader, Promise);
+  const realApi = window.WDSAttach.api;
+  window.WDSAttach = {
+    api: realApi,
+    load(cb) {
+      cb({
+        chunk: realApi.chunk, selectChunks: realApi.selectChunks,
+        pick(o) {
+          if (o.onProgress) o.onProgress("讲稿.pdf", "抽取", 1, 1);
+          const r = PICK_DOCS || [{ name: "讲稿.pdf", text: "这是一份讲稿的正文。".repeat(20), note: "12 页" }];
+          r.failed = PICK_DOCS ? [] : [{ name: "旧稿.doc", msg: "旧版 .doc 读不了" }];
+          return Promise.resolve(r);
+        },
+      });
+    },
+  };
+}
 
 /* ---------- 载入被测脚本 ---------- */
 const src = fs.readFileSync("/home/claude/site/public/wds-mode.js", "utf8");
@@ -322,7 +343,31 @@ ROUTE["/api/wds/chat"] = [
   await new Promise((res) => { sendEl.click(); setTimeout(res, 220); });
   ok(LAST_PAYLOAD.docs && LAST_PAYLOAD.docs.length === 1 && LAST_PAYLOAD.docs[0].n === "讲稿.pdf", "payload 带上附件正文");
   ok(LAST_PAYLOAD.about === "我是中学生物老师。", "payload 带上自定义指令");
-  ok(layer.querySelector(".wdsm-atts").children.length === 0, "附件发出后从输入区摘掉，不会赖着重复发");
+  ok(layer.querySelector(".wdsm-atts").children.length >= 1, "附件发出后仍常驻本场（第二句还问得下去）");
+  ROUTE["/api/wds/chat"] = [{ t: "token", v: "第三段说的是…" }];
+  inEl.value = "第三段什么意思";
+  await new Promise((res) => { sendEl.click(); setTimeout(res, 200); });
+  ok(LAST_PAYLOAD.docs && LAST_PAYLOAD.docs.length === 1, "追问时文件仍在手上，不用重传");
+
+  console.log("⑬b 长文自动转「按问题取段」");
+  layer.querySelector(".wdsm-newbtn").click();
+  ok(layer.querySelector(".wdsm-atts").children.length === 0, "新对话把附件清干净了");
+  // 要超过 FULL_MAX(20000) 才会转取段，所以这份得够长（约 3.6 万字）
+  const longText = Array.from({ length: 90 }, (_, i) =>
+    "第" + (i + 1) + "节。" + (i === 41 ? "这一节专讲特征纠缠在慢性病里的位置。" : "这里讲些别的内容以拉长篇幅。") + "补白".repeat(200)).join("\n");
+  PICK_DOCS = [{ name: "长论文.docx", text: longText, note: "Word" }];
+  layer.querySelector(".wdsm-attbtn").click();
+  await new Promise((r) => setTimeout(r, 60));
+  ok(layer.querySelectorAll(".wdsm-att")[0].textContent.includes("按问题取段"), "附件条如实标出这篇是取段不是全带");
+  ROUTE["/api/wds/chat"] = [{ t: "token", v: "好。" }];
+  inEl.value = "特征纠缠在慢性病里怎么定位";
+  await new Promise((res) => { sendEl.click(); setTimeout(res, 220); });
+  const dd = LAST_PAYLOAD.docs[0];
+  ok(dd.ex === 1 && dd.tot > 1, "长文标了节选与总段数（" + dd.take + "/" + dd.tot + "）");
+  ok(dd.t.length <= 12000, "取段后没有超出标准档预算，实得 " + dd.t.length);
+  ok(dd.t.indexOf("第 1 段") >= 0, "开头永远带上，让它知道这是篇什么");
+  ok(dd.t.indexOf("特征纠缠在慢性病里的位置") >= 0, "按问题真的把相关那一节取出来了");
+  PICK_DOCS = null;
 
   console.log("⑮ 中英切换");
   const langBtn = layer.querySelector(".wdsm-langbtn");
