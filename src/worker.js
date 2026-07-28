@@ -82,7 +82,7 @@ function wdsBeat(controller, state) {
   return setInterval(() => {
     try {
       controller.enqueue(_ENC.encode(": ping\n\n"));
-      controller.enqueue(_sseBytes({ t: "beat", v: { sec: Math.round((Date.now() - state.t0) / 1000), think: state.think || 0, out: state.out || 0 } }));
+      controller.enqueue(_sseBytes({ t: "beat", v: { sec: Math.round((Date.now() - state.t0) / 1000), think: state.think || 0, out: state.out || 0, stage: state.stage || "" } }));
     } catch (e) {}
   }, 5000);
 }
@@ -99,7 +99,7 @@ function wdsLadder(VC, want) {
   if (VC && VC.top) { const a = want || WDS_TOK_SAFE; return [a, Math.min(6000, a), Math.min(WDS_TOK_RETRY, a)]; }
   return WDS_TOK_LADDER;
 }
-async function wdsFetchMax(VC, KEY, messages, stream, want) {
+async function wdsFetchMax(VC, KEY, messages, stream, want, signal) {
   const ladder = wdsLadder(VC, want);
   let resp = null;
   for (let i = 0; i < ladder.length; i++) {
@@ -107,6 +107,7 @@ async function wdsFetchMax(VC, KEY, messages, stream, want) {
       method: "POST",
       headers: { "content-type": "application/json", authorization: "Bearer " + KEY },
       body: JSON.stringify(wdsTopBody(VC, { model: VC.model, stream: !!stream, max_tokens: ladder[i], messages })),
+      signal: signal || undefined,   // 上层给的时钟护栏：上游卡死时由它掐断，别把整个请求拖到平台上限被无声杀掉
     });
     if (resp.ok || resp.status !== 400 || i === ladder.length - 1) return resp;
     let t = ""; try { t = (await resp.clone().text()).slice(0, 300); } catch (e) {}
@@ -1352,10 +1353,11 @@ async function ensureReflect(env, url, vendor, VC, KEY) {
 }
 
 // 非流式单维调用（四步法的 Q1/Q2/Q3 用；思考关，控延迟）
-async function llmText(VC, KEY, sys, usr, maxTok) {
-  // 超时护栏：思考满档的慢调用若卡住，55s 主动 abort → 返回空串（上层转干净的 502 可重试），避免把 Worker 那次调用拖到平台资源限触发 503
+async function llmText(VC, KEY, sys, usr, maxTok, msTimeout) {
+  // 超时护栏：思考满档的慢调用若卡住，到点主动 abort → 返回空串（上层转干净的 502 可重试），避免把 Worker 那次调用拖到平台资源限触发 503。
+  // 缺省 55s 是给"正菜"用的；配菜类调用（词表扩展等）必须自己传一个短得多的值，见 SDE_EXPAND_MS。
   const ctrl = new AbortController();
-  const timer = setTimeout(() => { try { ctrl.abort(); } catch (e) {} }, 55000);
+  const timer = setTimeout(() => { try { ctrl.abort(); } catch (e) {} }, msTimeout || 55000);
   try {
     const resp = await fetch(VC.url, {
       method: "POST",
@@ -1580,8 +1582,15 @@ const SDE_LEXICON = "你是 SDE（显露·差异·纠缠 / Show-Difference-Entan
   + "· SIO 27宫格：O=一号位=客体，I=二号位=互动，S=三号位=主体(最后才显影/最后才亮)；C⊗M⊗V=内容⊗方法⊗价值。\n"
   + "· 核心概念：发生(相对于发现)、显影、名是指针、特征纠缠、中心位轮转、意义三律(特征律/自由律/幸福律)、三大方程 S=F(D,E)/D=G(S,E)/E=H(S,D)、六路径、123原理、底盘与回写、成熟态与退化谱系、解构、裂缝、约束性发生、反身的发生不可自我封顶。\n"
   + "任务：把用户问题解析成一串【最能帮助在 SDE 语料里检索到相关内容】的具体术语——包括它触及的维度(S/D/E)、相关核心概念、可能落在的三界或宫格位、以及同义/近义的 SDE 说法。只输出术语本身，用顿号分隔，8–20 个，不要解释、不要整句、不要泛词（如“事物/问题/研究”）。";
-async function sdeExpandQuery(VC, KEY, q) {
-  const out = await llmText(VC, KEY, SDE_LEXICON, "用户问题：" + q + "\n\n请只输出 SDE 检索术语（顿号分隔）：", 300);
+// 【硬教训 · 别再犯】满功率（reasoning_effort=max）对"要求结构化短输出"的调用是毒——它先把时间花在推演上，
+// 而这一步只是给检索多几个同义词：是配菜，不是正菜。它却和答题共用同一个请求的时钟，
+// 一旦它慢慢想上四五十秒，答题还没开口，整个请求就已经贴着平台上限了（流被无声掐断、既无 error 也无正文——就是那个"没收到回答"）。
+// 所以这里**一律卸掉满功率档**（去掉 VC.top，wdsTopBody 便不注入 thinking/reasoning_effort），再给一个短截止；
+// 超时就空手回来——没有扩展词，站内检索照样跑。
+const SDE_EXPAND_MS = 6000;
+async function sdeExpandQuery(VC, KEY, q, ms) {
+  const LC = (VC && VC.top) ? { url: VC.url, model: VC.model, name: VC.name } : VC;
+  const out = await llmText(LC, KEY, SDE_LEXICON, "用户问题：" + q + "\n\n请只输出 SDE 检索术语（顿号分隔）：", 300, ms || SDE_EXPAND_MS);
   if (!out) return [];
   return out.replace(/\n/g, "、").split(/[、,，;；\s]+/).map((s) => s.trim()).filter((s) => s.length >= 2 && s.length <= 12).slice(0, 24);
 }
@@ -2468,8 +2477,8 @@ export default {
       const stream = new ReadableStream({
         async start(controller) {
           let _hb = null;
-          const done = () => { if (_hb) clearInterval(_hb); try { controller.enqueue(_sseBytes({ t: "end", v: { out: (_st && _st.out) || 0, think: (_st && _st.think) || 0, sec: _st ? Math.round((Date.now() - _st.t0) / 1000) : 0 } })); controller.enqueue(_ENC.encode("data: [DONE]\n\n")); controller.close(); } catch (e) {} };
-          const _st = { t0: Date.now(), think: 0, out: 0 };   // 必须 const/let 声明：ESM 是严格模式，裸赋值当场抛 ReferenceError
+          const done = () => { if (_hb) clearInterval(_hb); try { controller.enqueue(_sseBytes({ t: "end", v: { out: (_st && _st.out) || 0, think: (_st && _st.think) || 0, sec: _st ? Math.round((Date.now() - _st.t0) / 1000) : 0, pre: (_st && _st.pre) || 0, stage: (_st && _st.stage) || "" } })); controller.enqueue(_ENC.encode("data: [DONE]\n\n")); controller.close(); } catch (e) {} };
+          const _st = { t0: Date.now(), think: 0, out: 0, pre: 0, stage: "准备" };   // 必须 const/let 声明：ESM 是严格模式，裸赋值当场抛 ReferenceError
           _hb = wdsBeat(controller, _st);
           try {
             // 内核底盘（完整内功→内化心得，按基底缓存复用；失败则降级为无底盘）
@@ -2479,18 +2488,34 @@ export default {
             // 与WDS对话（guide）：全站 RAG 加强档——K=36 广召回 + 上一轮接续检索，上下文上限 3 万字符，来源随流回传
             let siteCtx = "", siteSrcs = [];
             if (b.guide) {
-              let expTerms = []; try { expTerms = await sdeExpandQuery(VC, KEY, q); } catch (e) {}
+              // ANSWER_CLOCK：出流之后、答题之前的每一步都要**限时并打标**。
+              // 打标是为了下次报障能一眼看出时间烧在哪一段（心跳里带 stage，读者截图即证据）；
+              // 限时是因为这些前置活儿与答题共用同一个请求的时钟——它们慢，答题就没时间开口。
+              _st.stage = "扩展检索词";
+              let expTerms = []; try { expTerms = await sdeExpandQuery(VC, KEY, q, SDE_EXPAND_MS); } catch (e) {}
+              _st.stage = "站内检索";
               let _ragWhy = "";
               let prevQ0 = "";
               for (let i = history.length - 1; i >= 0; i--) { const m = history[i]; if (m && m.role !== "wds" && m.text) { prevQ0 = String(m.text).slice(0, 240); break; } }
-              try {
-                const rr = await wdsRag(env, url, { q: q, prevQ: prevQ0, exp: expTerms, k: 36, cap: docText ? 12000 : 30000, kbn: docText ? 14 : 24});
-                _ragWhy = "HTTP " + rr.status;
-                if (rr.ok) { const jr = await rr.json(); if (jr && jr.ok) { siteCtx = jr.ctx || ""; siteSrcs = jr.srcs || []; _ragWhy = ""; } else _ragWhy = (jr && jr.msg) || "返回不可用"; }
-                else _ragWhy = "HTTP " + rr.status + "：" + (await rr.text()).slice(0, 120);
-              } catch (e) { _ragWhy = "子请求异常：" + (e && e.message); }
+              const _ragBody = { q: q, prevQ: prevQ0, exp: expTerms, k: 36, cap: docText ? 12000 : 30000, kbn: docText ? 14 : 24 };
+              // 检索走 SELF 服务绑定，偶发 5xx（子请求被平台拒收）是常态而非我方逻辑错——它很便宜（实测 0.15 秒），直接再打一次。
+              for (let _try = 0; _try < 2; _try++) {
+                try {
+                  const rr = await wdsRag(env, url, _ragBody);
+                  if (rr.ok) {
+                    const jr = await rr.json();
+                    if (jr && jr.ok) { siteCtx = jr.ctx || ""; siteSrcs = jr.srcs || []; _ragWhy = ""; break; }
+                    _ragWhy = (jr && jr.msg) || "返回不可用";
+                    break;
+                  }
+                  _ragWhy = "HTTP " + rr.status + "：" + (await rr.text()).slice(0, 120);
+                  if (rr.status < 500) break;
+                } catch (e) { _ragWhy = "子请求异常：" + (e && e.message); }
+              }
               if (!siteSrcs.length) controller.enqueue(_sseBytes({ t: "note", v: "站内检索这一问没接上（" + (_ragWhy || "无命中") + "），先据内功、心得与你给的文章作答" }));
             }
+            _st.pre = Math.round((Date.now() - _st.t0) / 1000);   // 前置阶段一共烧了几秒（写进 end / 诊断行）
+            _st.stage = "基底作答";
             if (siteSrcs.length) controller.enqueue(_sseBytes({ t: "sources", v: siteSrcs })); // 先把站内出处发给前端
             const sys = b.guide ? WDS_DIALOGUE_SYS(reflect, SDEM, siteCtx, docTitle, docText) : WDS_READ_SYS(reflect, SDEM, docTitle, docText);
             // 历史预算随正文/站内资料篇幅收缩：合计钳在 ~12万字符内，防超长文+百轮对话挤爆基底上下文
@@ -2512,11 +2537,22 @@ export default {
             // ANSWER_EMPTY_GUARD：顶格预算＋满功率下，思考偶尔会把整份预算吃光、正文 0 字。
             // 不因此设限，而是就地再跑一遍（仍顶格、仍满功率）——限制留给基底，不留给我们自己。
             const _diag = { lines: 0, finish: "", status: 0, head: "" };   // ANSWER_DIAG
+            // ANSWER_DEADLINE：答题这一次调用必须有时钟。此前它一个超时都没有——上游只要迟迟不吐字，
+            // Worker 就一直等到被平台掐掉，流里既没有 error 也没有 end，客户端只能干说"没收到回答"。
+            // 分两级：①首帧护栏——连思考都不给一个字，判它卡住，掐断并按"空答"降档重来；
+            //        ②总时长护栏——已经在写就保住写出来的部分，没写就如实报出来。
+            const ANS_FIRST_MS = 60000, ANS_TOTAL_MS = 180000;
             const _runAnswer = async (tokWant) => {
               let upstream;
-              try { upstream = await wdsFetchMax(VC, KEY, messages, true, tokWant); }
-              catch (e) { return { hard: "接不上基底：" + (e && e.message) }; }
+              const _ac = new AbortController();
+              let _cut = "";
+              let _t1 = setTimeout(() => { _cut = "首帧"; try { _ac.abort(); } catch (e) {} }, ANS_FIRST_MS);
+              const _t2 = setTimeout(() => { _cut = _cut || "总时长"; try { _ac.abort(); } catch (e) {} }, ANS_TOTAL_MS);
+              const _clear = () => { try { clearTimeout(_t1); } catch (e) {} try { clearTimeout(_t2); } catch (e) {} };
+              try { upstream = await wdsFetchMax(VC, KEY, messages, true, tokWant, _ac.signal); }
+              catch (e) { _clear(); return _cut ? { soft: "基底 " + ANS_FIRST_MS / 1000 + " 秒内一个字都没回（已掐断重来）" } : { hard: "接不上基底：" + (e && e.message) }; }
               if (!upstream.ok) {
+                _clear();
                 const errtxt = (await upstream.text()).slice(0, 300);
                 if (upstream.status === 401 || upstream.status === 402 || upstream.status === 429) return { hard: "你的 Key 用不了（" + upstream.status + "）：额度不足或填错了。去设置里检查或换一个。", code: "bad_key" };
                 // CONTEXT_OVERFLOW：深聊时历史+资料超过基底输入窗口，基底回 400 且报的是上下文/长度过长。
@@ -2530,9 +2566,11 @@ export default {
               const dec = new TextDecoder();
               let buf = "", got = 0;
               _diag.lines = 0; _diag.finish = ""; _diag.status = upstream.status; _diag.head = "";
+              try {
               while (true) {
                 const { done: rdone, value } = await reader.read();
                 if (rdone) break;
+                clearTimeout(_t1);   // 首帧到了，撤掉首帧护栏；此后只受总时长护栏管
                 const _chunk = dec.decode(value, { stream: true });
                 if (!_diag.head) _diag.head = _chunk.slice(0, 160);   // ANSWER_DIAG：上游头 160 字符，用来判"它到底回了什么"
                 buf += _chunk;
@@ -2552,9 +2590,16 @@ export default {
                   if (d.content) { got += d.content.length; if (_st) _st.out += d.content.length; controller.enqueue(_sseBytes({ t: "token", v: d.content })); }
                 }
               }
+              } catch (e) {
+                _clear();
+                // 流中途断（被我方护栏掐断，或上游自己断的）：已经写出来的正文一个字都不许丢。
+                if (got) { controller.enqueue(_sseBytes({ t: "note", v: "基底那边的连接断在半路，这一答只写到这里——可以说「继续」接着往下。" })); return { got: got }; }
+                return { soft: _cut ? ("基底" + (_cut === "首帧" ? (" " + ANS_FIRST_MS / 1000 + " 秒内一个字都没回") : ("超过 " + ANS_TOTAL_MS / 1000 + " 秒还没写完")) + "（已掐断）") : ("基底连接中断：" + (e && e.message)) };
+              }
+              _clear();
               return { got: got };
             };
-            const _diagLine = () => "【诊断】上游 " + (_diag.status || "?") + " · 收到 " + (_diag.lines || 0) + " 条流数据 · 思考 " + ((_st && _st.think) || 0) + " 字 · 结束原因 " + (_diag.finish || "未给") + (_diag.head ? (" · 首帧「" + _diag.head.replace(/\s+/g, " ").slice(0, 80) + "」") : "");
+            const _diagLine = () => "【诊断】上游 " + (_diag.status || "?") + " · 收到 " + (_diag.lines || 0) + " 条流数据 · 思考 " + ((_st && _st.think) || 0) + " 字 · 答题前的准备烧了 " + ((_st && _st.pre) || 0) + " 秒 · 结束原因 " + (_diag.finish || "未给") + (_diag.head ? (" · 首帧「" + _diag.head.replace(/\s+/g, " ").slice(0, 80) + "」") : "");
             let ar = await _runAnswer(WDS_TOK_SAFE);
             // CONTEXT_OVERFLOW 恢复：基底报上下文过长 → 砍半历史预算、重建 messages、重跑（最多 4 级，砍到 24000 仍不行才认输）
             let _shrinks = 0;
