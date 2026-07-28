@@ -19,6 +19,7 @@ TPL = ROOT / "public" / "paradigm" / "taken-out" / "index.html"
 PUBDATE = "2026年7月27日"
 
 PAPERS = [{
+<<<<<<< HEAD
     "slug": "discriminative-competence",
     "src": Path("/home/claude/confluence/discriminative-competence.md"),
     "title": "选择听谁，本身就是一次判断",
@@ -57,6 +58,44 @@ PAPERS = [{
          "列维主张「智性自主」是对一种执行管理德性的误导性命名，应改称智性互赖，"
          "并表示一旦把互赖理解妥当就完全不需要再设一个自主的德性；"
          "该支还带着「自己做研究」在若干领域可靠地把人带离真理的经验代价。"),
+=======
+    "slug": "binding-fails-where-needed",
+    "src": Path("/home/claude/confluence/binding-fails-where-needed.md"),
+    "title": "约束在最需要它的地方失效",
+    "sub": "论自我约束装置的效力与需求的负相关，及其作为定价装置的重新定位",
+    "cross": "政治学 × 经济学 × 法学",
+    "no": "之五",
+    "deck": ("宪法、司法审查、央行独立性、议会对财政的否决权，共同的承诺是：让掌权者不能做他本来能做的事。"
+             "而三个领域各自最强的结果——可信承诺命题所依据的利率证据在后续检验中瓦解、"
+             "委托的可信性取决于委托安排之外的否决者结构、"
+             "反对司法审查的核心论证明确建立在「社会已有良好运转的民主制度」这一前提之上——"
+             "合起来指向一个三家都没提出的结论：约束的效力从不由装置自身提供，"
+             "因此它与对它的需求呈负相关。本文据此把自我约束装置从禁止装置重新定位为定价装置，"
+             "并给出四项替代性评价指标。"),
+    "clash": ("第一家明确把「靠声誉」判为不可行，主张真正的约束必须是「不给违约留下余地的规则」；"
+              "第二家的结果恰恰是委托的可信性取决于规则之外的政治结构；"
+              "第三家则主张最著名的宪法约束装置之一找不到证据表明它更好地保护了权利，"
+              "且即使有好结果，它在程序上也是不正当的——而后果论与程序论这两套评价标准互不兼容。"),
+    "sources": [
+        ("政治学 · 制度与可信承诺",
+         "诺思-温格斯特命题及其证据的后续检验 —— Constitutions and Commitment (JEH 49:4, 1989) "
+         "与 Clark 1996、Quinn 2001、Stasavage 2002、Sussman & Yafeh 2006 的质疑",
+         "https://www.cambridge.org/core/journals/journal-of-economic-history/article/abs/constitutions-and-commitment-the-evolution-of-institutions-governing-public-choice-in-seventeenthcentury-england/2C4D944F5CDDCEBAA6321C7BFF0D2E7A",
+         "该文明确把统治者可信承诺的两条路径二分，判声誉路径不可行，"
+         "而把制度路径表述为「被约束于一套不给违约留下余地的规则」；"
+         "而作为其主要经验支撑的利率断点，在后续检验中未能成立、部分反向。"),
+        ("经济学 · 规则、相机抉择与委托的限度",
+         "Kydland & Prescott 1977 与 Keefer & Stasavage《委托的限度》(APSR 97:3, 2003)",
+         "https://www.cambridge.org/core/journals/american-political-science-review/article/abs/limits-of-delegation-veto-players-central-bank-independence-and-the-credibility-of-monetary-policy/6C1D0BC5F0E2F6D0C0F8E3C2E8D4B6A1",
+         "把货币政策委托给独立央行，其可信性并不由该委托安排本身提供，"
+         "而取决于该政治体系中否决者的数量与结构——即取决于安排之外的权力分布。"),
+        ("法学 · 司法审查的正当性",
+         "Waldron《反对司法审查的核心论证》(Yale LJ 115:6, 2006) 与 Fallon 2008 的回应",
+         "https://www.yalelawjournal.org/article/the-core-of-the-case-against-judicial-review",
+         "两条论证：没有理由认为权利经由司法审查比经由立法机关得到更好保护；"
+         "且抛开结果，它在程序上剥夺了多数的自治权。"
+         "而该论证明确建立在「社会具有良好运转的民主制度、多数公民认真对待权利」这一前提之上。"),
+>>>>>>> 437980adb (Add the fifth Confluence essay: political science, economics and law each evaluate the same kind of device — one that makes a power-holder unable to do what it otherwise could — and their strongest results converge on something none of them states, that such a device never supplies its own force, so it fails hardest where it is needed most)
     ],
 }]
 
