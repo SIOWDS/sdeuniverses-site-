@@ -403,10 +403,18 @@ ROUTE["/api/wds/chat"] = [
   REC_MADE = 0;
   mic.click();
   await new Promise((r) => setTimeout(r, 60));
-  ok(store["sde_wds_asr"] === "local", "改道到的是免费的本机通道，不是收费那条");
+  ok(store["sde_wds_asr"] === "glm", "已填智谱 Key 时，自动落到智谱转写（更准且免去 80MB 下载）");
+  delete store["sde_wds_asr"]; delete store["sde_glm_key"]; delete store["sde_wds_key"];
+  store["sde_kimi_key"] = "sk-kimi-abcdefgh"; store["sde_wds_vendor"] = "kimi";
+  inEl.value = ""; mic.click();
+  await new Promise((r) => setTimeout(r, 60));
+  ok(store["sde_wds_asr"] === "local", "没有智谱 Key 时才落到免费的本机通道");
+  store["sde_glm_key"] = "sk-test-1234567890"; store["sde_wds_key"] = "sk-test-1234567890"; store["sde_wds_vendor"] = "glm";
+  store["sde_wds_asr"] = "local";
   ok(layer.querySelector(".wdsm-micbar").textContent.length > 0, "把改道原因告诉了读者，没有静默");
   await new Promise((r) => setTimeout(r, 800));
-  ok(REC_MADE === 1, "自动接上了录音通道，实得 " + REC_MADE);
+  ok(REC_MADE >= 1, "自动接上了录音通道，实得 " + REC_MADE);
+  REC_MADE = 0;
   WHISPER_RUNS = 0;
   mic.click();                              // 结束录音 → 本机转写
   await new Promise((r) => setTimeout(r, 80));

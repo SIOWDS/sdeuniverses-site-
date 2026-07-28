@@ -115,7 +115,8 @@
       micLocalAsk: "本机转写完全免费、不用任何 Key，音频也不出这台机器。代价是首次要下载约 80 MB 的模型（之后浏览器会记住，不再重下），没有独立显卡的机器转一句话可能要等十几秒。现在下吗？",
       micLocalWait: "本机识别中…（第一次慢些）", micLocalNo: "本机转写在这台设备上跑不起来",
       micChanH: "语音输入走哪条", micChanAuto: "自动", micChanWeb: "浏览器听写", micChanLocal: "本机（免费）", micChanGlm: "智谱转写",
-      micChanP: "自动＝先试浏览器自带的听写，连不上就用本机转写。本机转写免费、离线；智谱转写最准，按 0.06 元/分钟计在你自己的 Key 上。",
+      micChanP: "自动＝先试浏览器自带的听写；连不上时，你若已填了智谱 Key 就用智谱转写（最准，约 0.06 元/分钟计在你自己的 Key 上），没填就用本机转写（免费、离线，首次下 80MB）。",
+      micSwitchGlm: "浏览器自带的听写在你这边连不上，已改用智谱转写（用你自己那把 Key，约 0.06 元/分钟）。",
     },
     en: {
       tabNormal: "Browse", tabBack: "\u2190 Back to site", tabWds: "\u2726 WDS",
@@ -175,7 +176,8 @@
       micLocalAsk: "On-device transcription is free, needs no key, and the audio never leaves this machine. The cost is a one-time download of about 80 MB (the browser keeps it afterwards), and on a machine without a discrete GPU a sentence may take ten-odd seconds. Download it now?",
       micLocalWait: "Transcribing on this device… (the first run is slower)", micLocalNo: "On-device transcription can't run on this device",
       micChanH: "Voice input channel", micChanAuto: "Auto", micChanWeb: "Browser dictation", micChanLocal: "On-device (free)", micChanGlm: "Zhipu",
-      micChanP: "Auto tries the browser's own dictation first and falls back to on-device. On-device is free and offline; Zhipu is the most accurate and bills about ¥0.06 a minute to your own key.",
+      micChanP: "Auto tries the browser's own dictation first. If it can't connect, it uses Zhipu when you already have a Zhipu key (most accurate, about ¥0.06 a minute on your own key), and on-device transcription when you don't (free and offline, 80MB the first time).",
+      micSwitchGlm: "The browser's own dictation can't reach its service from here, so Zhipu transcription is used instead (your own key, about ¥0.06 a minute).",
     },
   };
   function langInit() {
@@ -846,6 +848,10 @@
   // 通道：auto（默认）/ web / local / glm。auto 记住上次实际走通的那条。
   function asrPref() { try { var v = localStorage.getItem(LS_ASR); return (v === "web" || v === "glm" || v === "local") ? v : ""; } catch (e) { return ""; } }
   function asrChan() { try { var v = localStorage.getItem("sde_wds_asr_chan") || "auto"; return v === "auto" ? (asrPref() || "web") : v; } catch (e) { return "web"; } }
+  // 自动模式下，浏览器听写走不通时该落到哪条：
+  // 已经填了智谱 Key 的人（多半就是拿智谱当对话基底的人）直接用智谱——更准，且省掉 80MB 下载；
+  // 没填的人才走本机。不主动替没交过 Key 的人花钱，也不让交过 Key 的人白等下载。
+  function autoFallback() { return wdsSearchKey() ? "glm" : "local"; }
   function asrSet(v) { try { localStorage.setItem(LS_ASR, v); } catch (e) {} }
   function micSay(msg, warn) { micBar.textContent = msg || ""; micBar.style.color = warn ? "#E8A8A0" : "#C9A227"; }
   function micReset() {
@@ -880,8 +886,9 @@
       onError: function (code) {
         // 这两个错基本等于"这条通道在你这边不通"，直接改道，并记住
         if (code === "network" || code === "service-not-allowed" || code === "start_failed" || code === "unsupported") {
-          asrSet("local"); micReset(); micSay(t("micSwitch"), 1);   // 改道到免费的本机通道，不是收费那条
-          setTimeout(function () { if (!localOkAsked()) return; micLoad(function (V2) { if (V2) micStartRec(V2); }); }, 700);
+          var nx = autoFallback();
+          asrSet(nx); micReset(); micSay(nx === "glm" ? t("micSwitchGlm") : t("micSwitch"), 1);
+          setTimeout(function () { if (nx === "local" && !localOkAsked()) return; micLoad(function (V2) { if (V2) micStartRec(V2); }); }, 700);
           return;
         }
         micReset();
@@ -980,7 +987,7 @@
       if (!V) { micSay(t("micNoApi"), 1); return; }
       var ch = asrChan();
       if (ch === "web" && V.canWeb()) { micStartWeb(V); return; }
-      if (ch === "web") ch = "local";                       // 想走浏览器听写但这浏览器没有 → 落本机
+      if (ch === "web") ch = autoFallback();                 // 想走浏览器听写但这浏览器没有 → 按上面的规矩落
       if (ch === "local" && !localOkAsked()) return;         // 首次要先问一句再下 80MB
       micStartRec(V);
     });
