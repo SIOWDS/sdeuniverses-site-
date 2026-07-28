@@ -12,12 +12,16 @@ const b = src.indexOf("// 深度默认（未开四步法）");
 if (a < 0 || b < 0 || b <= a) { console.log("FAIL 抠不出 paper 块（锚点变了，先改本脚本）"); process.exit(1); }
 const seg = src.slice(a, b);
 
-function build(part) {
-  const fn = new Function("part", "body", "q", "ctxText", "neigong", "reflect",
+function build(part, body) {
+  const fn = new Function("part", "body", "q", "ctxText", "neigong", "reflect", "originQ", "hist", "histTxt",
     'const mode = "paper"; let MAXTOK = 0, sys = "", usrOverride = "";\n' + seg + "\nreturn { MAXTOK, sys, usrOverride };");
-  return fn(part, { seed: "S".repeat(50), head: "H", tail: "T" }, "问题", "资料", "内功正文", "心得正文");
+  return fn(part, Object.assign({ seed: "S".repeat(50), head: "H", tail: "T" }, body || {}),
+    "问题", "资料", "内功正文", "心得正文", "缘起之问", [], "");
 }
 const P1 = build(1), P2 = build(2);
+/* 带《论文入口资料》的那条路（十轮问对提炼后走的就是它） */
+const B1 = build(1, { brief: "入口资料正文".repeat(10), qlist: "1. 第一问\n2. 第二问" });
+const B2 = build(2, { brief: "入口资料正文".repeat(10) });
 
 let P = 0, F = 0;
 const ok = (c, m) => { c ? (P++, console.log("  PASS " + m)) : (F++, console.log("  FAIL " + m)); };
@@ -151,6 +155,23 @@ both("再按机制加查第二族", "二：第二机制族在位");
 });
 both("illusio", "二：布尔迪厄的 illusio 被点名（只拆 habitus 不算拆完）");
 both("只拆惯习 habitus 与迟滞效应 hysteresis 就宣布布尔迪厄失语", "二：点破只拆 habitus 的漏牌");
+
+/* —— 十轮问对 → 论文入口资料（2026-07-29 新增）—— */
+ok(!P1.sys.includes("论文入口资料"), "无入口资料时：不许凭空提《论文入口资料》（单轮问对仍走老路）");
+ok(P1.sys.includes("刚才你对读者的问题给出了一次问对回答"), "无入口资料时：开场仍是单轮口径");
+ok(B1.sys.includes("你与读者刚刚完成了一场连续多轮的问对"), "有入口资料时：开场改成多轮口径");
+ok(B1.sys.includes("它是清单，不是参考"), "入口资料被定性为必须逐条兑现的清单");
+ok(B1.sys.includes("至少两位要在正文里指名道姓正面交手"), "第五栏未交手的最近邻：硬性配额两位");
+ok(B1.sys.includes("其中至少一位是外文占位者"), "未交手最近邻里必须有外文占位者");
+ok(B1.sys.includes("第四栏"), "第四栏分离点被点名要求进正文");
+ok(B1.sys.includes("第六栏（尚未解决的张力）必须逐条正面处理"), "第六栏张力必须正面处理");
+ok(B1.sys.includes("一律不得当作已证实的事实去支撑被解释项"), "第八栏证据等级：自引/未核验不得当事实");
+ok(B1.sys.includes("把它扩写成文即为不合格"), "入口资料只是入口，禁止扩写成文");
+ok(B1.usrOverride.includes("《论文入口资料（十轮问对的提炼——这是清单，逐条兑现）》"), "上半篇：入口资料进 user 消息");
+ok(B1.usrOverride.includes("《这场问对走过的路（问题清单）》"), "上半篇：问题清单进 user 消息");
+ok(B1.usrOverride.includes("《缘起之问》"), "上半篇：缘起之问进 user 消息");
+ok(B2.usrOverride.includes("《论文入口资料"), "下半篇：仍拿着同一份清单");
+ok(!P1.usrOverride.includes("论文入口资料"), "无入口资料时：user 消息里不出现空标题");
 
 console.log("\n===== " + P + " PASS / " + F + " FAIL =====");
 process.exit(F ? 1 : 0);

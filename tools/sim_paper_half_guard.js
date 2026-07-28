@@ -80,8 +80,8 @@ t("下半篇收尾标记被剥掉", () => { plan = [{ text: LONG + "\n〔全文�
   ok(!!threw2 && calls === 2, "两次都报错 → 抛给调用方（上半篇彻底失败才终止）");
 
   /* ===== 二、doPaper / buildPdf 的源码契约 ===== */
-  ok(/paperHalf\(1,\{seed:[^}]*\},600,'上半篇'\)/.test(h), "doPaper：上半篇走 paperHalf，最短 600 字");
-  ok(/paperHalf\(2,\{[^}]*\},1200,'下半篇'\)/.test(h), "doPaper：下半篇走 paperHalf，最短 1200 字");
+  ok(/paperHalf\(1,\s*seed1\s*,\s*600,\s*'上半篇'\)/.test(h), "doPaper：上半篇走 paperHalf，最短 600 字");
+  ok(/paperHalf\(2,\s*seed2\s*,\s*1200,\s*'下半篇'\)/.test(h), "doPaper：下半篇走 paperHalf，最短 1200 字");
   ok(h.indexOf(".catch(function(){ return ''; })") > 0, "doPaper：下半篇彻底失败也不丢上半篇（吞成空串继续出稿）");
   ok(h.indexOf("halfOnly=(String(p2c||'').length<1200)") > 0, "doPaper：按下半篇实际长度判定 halfOnly");
   ok(h.indexOf("buildPdf(full, halfOnly)") > 0, "doPaper：halfOnly 一路传进 PDF 排版");
