@@ -126,7 +126,8 @@
             var sec = total / rate;
             if (sec < 0.4) return Promise.reject(new Error("too_short"));
             var ds = downsample(all, rate, OUT_RATE);
-            return Promise.resolve({ b64: toB64(encodeWav(ds, OUT_RATE)), sec: sec });
+            // b64（WAV）给云端转写用；pcm（16k Float32）给本机 Whisper 直接吃，省一次解码
+            return Promise.resolve({ b64: toB64(encodeWav(ds, OUT_RATE)), pcm: ds, sec: sec });
           },
         };
       });

@@ -132,6 +132,18 @@ global.URL = { createObjectURL: (b) => { DOWNLOADS.push(b.parts.join("")); retur
 global.alert = (m) => { console.log("  [alert] " + m); };
 window.document = document; window.localStorage = localStorage; window.fetch = fetchMock;
 window.speechSynthesis = speechMock;
+let WHISPER_OK = true, WHISPER_RUNS = 0, CONFIRMED = true;
+global.confirm = () => CONFIRMED;
+window.confirm = global.confirm;
+window.WDSWhisper = {
+  load(cb) {
+    cb(WHISPER_OK ? {
+      prepare(o) { if (o.onProgress) { o.onProgress(40, "x"); o.onProgress(100, ""); } return Promise.resolve(); },
+      transcribe(pcm, lang) { WHISPER_RUNS++; return Promise.resolve("本机转写出来的句子"); },
+      dispose() {},
+    } : null);
+  },
+};
 let WEB_ASR_ERR = null;            // 置成 "network" 可模拟大陆网络下 Web Speech 不通
 let REC_MADE = 0;
 window.WDSVoice = {
@@ -143,7 +155,7 @@ window.WDSVoice = {
         setTimeout(() => { o.onText("显露和结构", ""); o.onEnd("显露和结构有什么不同"); }, 10);
         return { stop() {}, abort() {} };
       },
-      startRec(o) { REC_MADE++; return Promise.resolve({ cancel() {}, stop: () => Promise.resolve({ b64: "x".repeat(200), sec: 3 }) }); },
+      startRec(o) { REC_MADE++; return Promise.resolve({ cancel() {}, stop: () => Promise.resolve({ b64: "x".repeat(200), pcm: new Float32Array(16000), sec: 3 }) }); },
     });
   },
 };
@@ -391,16 +403,29 @@ ROUTE["/api/wds/chat"] = [
   REC_MADE = 0;
   mic.click();
   await new Promise((r) => setTimeout(r, 60));
-  ok(store["sde_wds_asr"] === "glm", "已记住改走录音转写通道");
+  ok(store["sde_wds_asr"] === "local", "改道到的是免费的本机通道，不是收费那条");
   ok(layer.querySelector(".wdsm-micbar").textContent.length > 0, "把改道原因告诉了读者，没有静默");
   await new Promise((r) => setTimeout(r, 800));
   ok(REC_MADE === 1, "自动接上了录音通道，实得 " + REC_MADE);
-  JSON_ROUTE["/api/wds/asr"] = { ok: true, text: "这是录音转写出来的句子" };
-  mic.click();                              // 结束录音 → 转写
+  WHISPER_RUNS = 0;
+  mic.click();                              // 结束录音 → 本机转写
   await new Promise((r) => setTimeout(r, 80));
-  ok(LAST_PAYLOAD.key === "sk-test-1234567890", "转写用的是智谱那把 Key（与联网同一把）");
-  ok(inEl.value === "这是录音转写出来的句子", "转写结果落进输入框");
+  ok(WHISPER_RUNS === 1, "走的是本机 Whisper，没有把音频发出去");
+  ok(inEl.value === "本机转写出来的句子", "本机转写结果落进输入框");
+
+  console.log("⑳ 明确选智谱通道时才发音频");
+  store["sde_wds_asr_chan"] = "glm";
+  inEl.value = "";
+  mic.click();
+  await new Promise((r) => setTimeout(r, 60));
+  JSON_ROUTE["/api/wds/asr"] = { ok: true, text: "云端转写出来的句子" };
+  WHISPER_RUNS = 0;
+  mic.click();
+  await new Promise((r) => setTimeout(r, 80));
+  ok(WHISPER_RUNS === 0 && LAST_PAYLOAD.key === "sk-test-1234567890", "选了智谱才走云端，用的是那把 Key");
+  ok(inEl.value === "云端转写出来的句子", "云端转写结果落进输入框");
   delete JSON_ROUTE["/api/wds/asr"];
+  store["sde_wds_asr_chan"] = "auto";
   WEB_ASR_ERR = null;
 
   console.log("⑭ 新对话复位");

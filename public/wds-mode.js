@@ -109,8 +109,13 @@
       micWorking: "正在转文字…", micNoApi: "这台设备用不了语音输入", micDenied: "没拿到麦克风权限——浏览器地址栏里放行一下",
       micShort: "太短了，没听清", micEmpty: "没听出内容，再说一次",
       micNeedKey: "语音转写走智谱通道，先在 ⚙ 设置里填一把智谱 Key（与联网搜索同一把）。",
-      micSwitch: "浏览器自带的听写在你这边连不上，已改用录音转写（需智谱 Key）。",
+      micSwitch: "浏览器自带的听写在你这边连不上，已改用本机转写（免费、离线）。",
       micFail: "语音没成：",
+      micLocal: "本机转写（免费）", micDl: "首次要下载模型 ",
+      micLocalAsk: "本机转写完全免费、不用任何 Key，音频也不出这台机器。代价是首次要下载约 80 MB 的模型（之后浏览器会记住，不再重下），没有独立显卡的机器转一句话可能要等十几秒。现在下吗？",
+      micLocalWait: "本机识别中…（第一次慢些）", micLocalNo: "本机转写在这台设备上跑不起来",
+      micChanH: "语音输入走哪条", micChanAuto: "自动", micChanWeb: "浏览器听写", micChanLocal: "本机（免费）", micChanGlm: "智谱转写",
+      micChanP: "自动＝先试浏览器自带的听写，连不上就用本机转写。本机转写免费、离线；智谱转写最准，按 0.06 元/分钟计在你自己的 Key 上。",
     },
     en: {
       tabNormal: "Browse", tabBack: "\u2190 Back to site", tabWds: "\u2726 WDS",
@@ -164,8 +169,13 @@
       micWorking: "Transcribing…", micNoApi: "Voice input isn't available on this device", micDenied: "No microphone permission — allow it from the address bar",
       micShort: "Too short to catch", micEmpty: "Nothing came through — say it again",
       micNeedKey: "Transcription goes through Zhipu; put a Zhipu key in ⚙ Settings first (the same one web search uses).",
-      micSwitch: "The browser's own dictation can't reach its service from here, so recording-based transcription is used instead (needs a Zhipu key).",
+      micSwitch: "The browser's own dictation can't reach its service from here, so on-device transcription is used instead (free, offline).",
       micFail: "Voice input failed: ",
+      micLocal: "On-device (free)", micDl: "Downloading the model ",
+      micLocalAsk: "On-device transcription is free, needs no key, and the audio never leaves this machine. The cost is a one-time download of about 80 MB (the browser keeps it afterwards), and on a machine without a discrete GPU a sentence may take ten-odd seconds. Download it now?",
+      micLocalWait: "Transcribing on this device… (the first run is slower)", micLocalNo: "On-device transcription can't run on this device",
+      micChanH: "Voice input channel", micChanAuto: "Auto", micChanWeb: "Browser dictation", micChanLocal: "On-device (free)", micChanGlm: "Zhipu",
+      micChanP: "Auto tries the browser's own dictation first and falls back to on-device. On-device is free and offline; Zhipu is the most accurate and bills about ¥0.06 a minute to your own key.",
     },
   };
   function langInit() {
@@ -744,6 +754,11 @@
       + "<button class='ktest' style='background:none;border:1px solid rgba(61,165,165,.55);color:#8ED0D0;border-radius:9px;padding:8px 13px;font:13px inherit;cursor:pointer'>" + esc(t("setTest")) + "</button>"
       + "<span class='kres' style='font-size:12.5px;color:#8B98A5;flex:1;line-height:1.5'></span></div>"
       + "<div style='border-top:1px solid rgba(255,255,255,.1);padding-top:15px;margin-bottom:16px'>"
+      + "<div style='font-size:14px;font-weight:700;color:#F5EFE0;margin-bottom:6px'>" + esc(t("micChanH")) + "</div>"
+      + "<div style='font-size:12.5px;color:#8B98A5;line-height:1.65;margin-bottom:9px'>" + esc(t("micChanP")) + "</div>"
+      + "<div class='kchs' style='display:flex;flex-wrap:wrap;gap:7px'></div>"
+      + "</div>"
+      + "<div style='border-top:1px solid rgba(255,255,255,.1);padding-top:15px;margin-bottom:16px'>"
       + "<div style='font-size:14px;font-weight:700;color:#F5EFE0;margin-bottom:6px'>" + esc(t("setAboutH")) + "</div>"
       + "<div style='font-size:12.5px;color:#8B98A5;line-height:1.65;margin-bottom:9px'>" + esc(t("setAboutP")) + "</div>"
       + "<textarea class='kabout' rows='3' style='" + IN + ";font:13.5px/1.6 inherit;resize:vertical'></textarea>"
@@ -777,6 +792,25 @@
     function load() { kin.value = draft[vend].k; kmod.value = draft[vend].mo; kres.textContent = ""; paintV(); }
     load();
 
+    // 语音输入通道
+    var kchs = m.querySelector(".kchs");
+    var chCur = "auto";
+    try { chCur = localStorage.getItem("sde_wds_asr_chan") || "auto"; } catch (e) {}
+    var CHS = [["auto", "micChanAuto"], ["web", "micChanWeb"], ["local", "micChanLocal"], ["glm", "micChanGlm"]];
+    function paintCh() {
+      kchs.innerHTML = "";
+      CHS.forEach(function (c) {
+        var b = el("button", "kch", t(c[1]));
+        b.setAttribute("data-c", c[0]);
+        var on = c[0] === chCur;
+        b.style.cssText = "padding:7px 12px;border-radius:9px;border:1px solid " + (on ? "#3DA5A5" : "rgba(61,165,165,.3)")
+          + ";background:" + (on ? "rgba(61,165,165,.18)" : "none") + ";color:#CDECEC;cursor:pointer;font:12.5px inherit";
+        b.onclick = function () { chCur = c[0]; try { localStorage.setItem("sde_wds_asr_chan", chCur); } catch (e) {} paintCh(); };
+        kchs.appendChild(b);
+      });
+    }
+    paintCh();
+
     m.querySelector(".ktest").onclick = function () {
       stash();
       var k = draft[vend].k;
@@ -809,7 +843,9 @@
   var LS_ASR = "sde_wds_asr";
   var micEl = layer.querySelector(".wdsm-mic"), micBar = layer.querySelector(".wdsm-micbar");
   var micState = "idle", micSess = null, micBase = "", micTimer = null;
-  function asrPref() { try { var v = localStorage.getItem(LS_ASR); return (v === "web" || v === "glm") ? v : ""; } catch (e) { return ""; } }
+  // 通道：auto（默认）/ web / local / glm。auto 记住上次实际走通的那条。
+  function asrPref() { try { var v = localStorage.getItem(LS_ASR); return (v === "web" || v === "glm" || v === "local") ? v : ""; } catch (e) { return ""; } }
+  function asrChan() { try { var v = localStorage.getItem("sde_wds_asr_chan") || "auto"; return v === "auto" ? (asrPref() || "web") : v; } catch (e) { return "web"; } }
   function asrSet(v) { try { localStorage.setItem(LS_ASR, v); } catch (e) {} }
   function micSay(msg, warn) { micBar.textContent = msg || ""; micBar.style.color = warn ? "#E8A8A0" : "#C9A227"; }
   function micReset() {
@@ -844,8 +880,8 @@
       onError: function (code) {
         // 这两个错基本等于"这条通道在你这边不通"，直接改道，并记住
         if (code === "network" || code === "service-not-allowed" || code === "start_failed" || code === "unsupported") {
-          asrSet("glm"); micReset(); micSay(t("micSwitch"), 1);
-          setTimeout(function () { micLoad(function (V2) { if (V2) micStartRec(V2); }); }, 700);
+          asrSet("local"); micReset(); micSay(t("micSwitch"), 1);   // 改道到免费的本机通道，不是收费那条
+          setTimeout(function () { if (!localOkAsked()) return; micLoad(function (V2) { if (V2) micStartRec(V2); }); }, 700);
           return;
         }
         micReset();
@@ -854,8 +890,37 @@
     });
     if (micSess) asrSet("web");
   }
+  // 本机 Whisper：起 worker → 首次下模型 → 转写。全程免费、离线，音频不出这台机器。
+  var LS_OKDL = "sde_wds_whisper_ok";
+  function whisperLoad(cb) {
+    if (window.WDSWhisper) { window.WDSWhisper.load(cb); return; }
+    var sc = document.createElement("script");
+    sc.src = "/assets/wds-whisper.js"; sc.async = true;
+    sc.onload = function () { if (window.WDSWhisper) window.WDSWhisper.load(cb); else cb(null); };
+    sc.onerror = function () { cb(null); };
+    document.head.appendChild(sc);
+  }
+  function micLocalDo(pcm) {
+    micState = "work"; micEl.disabled = true; micEl.classList.remove("on"); micEl.textContent = "…";
+    whisperLoad(function (W) {
+      if (!W) { micReset(); micSay(t("micLocalNo"), 1); return; }
+      micSay(t("micDl") + "0%");
+      W.prepare({ lang: LANG, onProgress: function (pct) { micSay(pct >= 100 ? t("micLocalWait") : (t("micDl") + pct + "%")); } })
+        .then(function () { try { localStorage.setItem(LS_OKDL, "1"); } catch (e) {} micSay(t("micLocalWait")); return W.transcribe(pcm, LANG); })
+        .then(function (txt) {
+          micReset();
+          if (txt) { micPut(txt); micSay(""); } else micSay(t("micEmpty"), 1);
+        })
+        .catch(function (e) {
+          micReset();
+          var m = (e && e.message) || "";
+          micSay(/^model|^lib|^worker/.test(m) ? t("micLocalNo") + "（" + m.split(":")[0] + "）" : t("micFail") + m, 1);
+        });
+    });
+  }
   function micStartRec(V) {
-    if (!wdsSearchKey()) { micSay(t("micNeedKey"), 1); micReset(); return; }
+    // 走本机通道时不需要任何 Key；只有明确要用智谱那条才检查 Key
+    if (asrChan() === "glm" && !wdsSearchKey()) { micSay(t("micNeedKey"), 1); micReset(); return; }
     micState = "rec"; micEl.classList.add("on"); micEl.textContent = "■"; micEl.title = t("micStop");
     micSay(t("micRec") + "0s · " + t("micStop"));
     var t0 = Date.now();
@@ -880,9 +945,12 @@
     micSay(t("micWorking"));
     if (!rec) { micReset(); micSay(""); return; }
     rec.stop().then(function (r) {
+      // 录完了才分流：本机免费通道拿 PCM 自己算，智谱通道把 WAV 发出去
+      if (asrChan() !== "glm") { micLocalDo(r.pcm); return null; }
       return fetch("/api/wds/asr", { method: "POST", headers: { "content-type": "application/json" },
         body: JSON.stringify({ audio: r.b64, key: wdsSearchKey(), lang: LANG }) }).then(function (x) { return x.json(); });
     }).then(function (j) {
+      if (j === null) return;
       micReset();
       if (j && j.ok && j.text) { micPut(j.text); micSay(""); return; }
       var code = (j && j.code) || "empty";
@@ -893,6 +961,14 @@
       micSay(m === "too_short" ? t("micShort") : t("micFail") + m, 1);
     });
   }
+  // 80MB 不是小数目，第一次必须问一句，问过就记住
+  function localOkAsked() {
+    try { if (localStorage.getItem(LS_OKDL) === "1") return true; } catch (e) {}
+    if (window.confirm(t("micLocalAsk"))) { try { localStorage.setItem(LS_OKDL, "1"); } catch (e) {} return true; }
+    micReset(); micSay("");
+    return false;
+  }
+
   micEl.onclick = function () {
     if (streaming) return;
     if (micState === "web") { if (micSess) micSess.stop(); micReset(); micSay(""); return; }
@@ -902,9 +978,11 @@
     micSay("…");
     micLoad(function (V) {
       if (!V) { micSay(t("micNoApi"), 1); return; }
-      var pref = asrPref();
-      if (pref === "glm" || (!pref && !V.canWeb()) || (pref === "web" && !V.canWeb())) { micStartRec(V); return; }
-      micStartWeb(V);
+      var ch = asrChan();
+      if (ch === "web" && V.canWeb()) { micStartWeb(V); return; }
+      if (ch === "web") ch = "local";                       // 想走浏览器听写但这浏览器没有 → 落本机
+      if (ch === "local" && !localOkAsked()) return;         // 首次要先问一句再下 80MB
+      micStartRec(V);
     });
   };
 
