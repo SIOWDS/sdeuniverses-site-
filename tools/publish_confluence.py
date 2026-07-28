@@ -19,46 +19,6 @@ TPL = ROOT / "public" / "paradigm" / "taken-out" / "index.html"
 PUBDATE = "2026年7月27日"
 
 PAPERS = [{
-<<<<<<< HEAD
-    "slug": "discriminative-competence",
-    "src": Path("/home/claude/confluence/discriminative-competence.md"),
-    "title": "选择听谁，本身就是一次判断",
-    "sub": "论鉴别资质的独立性，及证言依赖在何处失效",
-    "cross": "美学 × 伦理学 × 知识论",
-    "no": "之五",
-    "deck": ("在绝大多数事情上靠别人告诉我们，是理性的常态。可有两个领域一直被当作例外："
-             "审美判断须基于亲身经验，道德信念不应仅凭他人告知而形成。这两条禁令近年同时遭到强攻，"
-             "而三家给出的处理互不相容。本文提出三家共同未加追问的那一步：在这个领域里，"
-             "你凭什么认为那个人靠得住——而这个凭什么，一个不具备该领域判断力的人能不能用？"
-             "能用的领域，依赖既理性又安全；不能用的领域，选择听谁本身就是那个判断的一次完整行使，"
-             "依赖并没有省去判断，只是把它移到了一个不被记录、也不被自己察觉的位置。"),
-    "clash": ("若知识论一侧正确（认知自主根本不是一种德性，应由智性互赖取代），"
-              "则美学的熟识原则与伦理的道德证言悲观论是把一个误导性理想抬成了规范；"
-              "若伦理一侧正确（以证言了结一个问题会使人此后更少去寻求理解），"
-              "则互赖的处方正在系统性地生产不再求解的人；"
-              "若美学乐观论一侧正确（那条禁令的来源不是认识论而是社会表演，且熟识原则今日已近乎被公认失败），"
-              "则前两家都把一条表演规范误诊成了认识论规范。"),
-    "sources": [
-        ("美学 · 审美证言",
-         "《审美证言》斯坦福哲学百科二〇二五年秋季版 —— 熟识原则与自主原则的攻防现状；"
-         "另见罗布森《审美证言：一种乐观进路》（牛津大学出版社，二〇二二）书评",
-         "https://plato.stanford.edu/archives/fall2025/entries/aesthetic-testimony/",
-         "乐观论一侧的方法论要求最要紧：悲观论者必须交出一个说明，说明是什么使审美与味觉"
-         "这两个领域独具熟识要求；找不到，那条禁令就只是一组直觉。"),
-        ("伦理学 · 道德证言悲观论",
-         "《道德理解：从德性到知识》（Noûs 二〇二五）与关于证言在发展理解中作用的悲观论新论证"
-         "（Australasian Journal of Philosophy 103(3), 二〇二五）",
-         "https://onlinelibrary.wiley.com/doi/full/10.1111/nous.12508",
-         "悲观论由静态推进为动态：以证言了结一个问题，会使人此后更少有理由去寻求更广的理解，"
-         "从而持续地缺乏理解；而道德理解本身系于领会以及情感与动机的投入。"),
-        ("知识论 · 反自主一支",
-         "《认知自主的哲学》专题导言（Social Epistemology 二〇二四）与其后二〇二五年"
-         "列维—格林—卡沃尔三方公开往还",
-         "https://www.tandfonline.com/doi/full/10.1080/02691728.2024.2335623",
-         "列维主张「智性自主」是对一种执行管理德性的误导性命名，应改称智性互赖，"
-         "并表示一旦把互赖理解妥当就完全不需要再设一个自主的德性；"
-         "该支还带着「自己做研究」在若干领域可靠地把人带离真理的经验代价。"),
-=======
     "slug": "binding-fails-where-needed",
     "src": Path("/home/claude/confluence/binding-fails-where-needed.md"),
     "title": "约束在最需要它的地方失效",
@@ -95,7 +55,6 @@ PAPERS = [{
          "两条论证：没有理由认为权利经由司法审查比经由立法机关得到更好保护；"
          "且抛开结果，它在程序上剥夺了多数的自治权。"
          "而该论证明确建立在「社会具有良好运转的民主制度、多数公民认真对待权利」这一前提之上。"),
->>>>>>> 437980adb (Add the fifth Confluence essay: political science, economics and law each evaluate the same kind of device — one that makes a power-holder unable to do what it otherwise could — and their strongest results converge on something none of them states, that such a device never supplies its own force, so it fails hardest where it is needed most)
     ],
 }]
 
@@ -107,8 +66,16 @@ def strongify(s):
     return s
 
 
+def _table(rows):
+    head, body = rows[0], rows[2:]
+    th = "".join(f"<th>{strongify(c)}</th>" for c in head)
+    tb = "".join("<tr>" + "".join(f"<td>{strongify(c)}</td>" for c in r) + "</tr>" for r in body)
+    return f'<table class="tbl"><thead><tr>{th}</tr></thead><tbody>{tb}</tbody></table>'
+
+
 def md_to_html(md):
     out, para, li, toc, n = [], [], [], [], 0
+    tbl = []
 
     def flush():
         if para:
@@ -120,8 +87,17 @@ def md_to_html(md):
             out.append("<ul>" + "".join(f"<li>{strongify(x)}</li>" for x in li) + "</ul>")
             li.clear()
 
+    def flush_tbl():
+        if tbl:
+            out.append(_table(tbl)); tbl.clear()
+
     for raw in md.splitlines():
         line = raw.rstrip()
+        if line.strip().startswith("|") and line.strip().endswith("|"):
+            flush(); flush_li()
+            tbl.append([c.strip() for c in line.strip().strip("|").split("|")])
+            continue
+        flush_tbl()
         if not line.strip():
             flush(); flush_li(); continue
         if line.strip() == "---":
@@ -142,12 +118,14 @@ def md_to_html(md):
                 out.append(f"<h{lvl}>{strongify(txt)}</h{lvl}>")
             continue
         para.append(line.strip())
-    flush(); flush_li()
+    flush(); flush_li(); flush_tbl()
     return "".join(out), toc
 
 
 def build_page(p, body, toc, pages):
     t = TPL.read_text(encoding="utf-8")
+    css = (ROOT / "tools" / "confluence-article.css").read_text(encoding="utf-8")
+    t = re.sub(r"<style>.*?</style>", "<style>" + css + "</style>", t, count=1, flags=re.S)
     t = re.sub(r"<title>.*?</title>",
                f'<title>{p["title"]}——{p["sub"]} · 学科通融 | SDE Universes</title>', t, flags=re.S)
     t = re.sub(r'(<meta name="description" content=")[^"]*(")',
