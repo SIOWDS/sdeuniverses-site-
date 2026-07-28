@@ -29,6 +29,38 @@ AUTHOR = "Claude"
 
 PAPERS = [
     {
+        "src": "A9", "no": 27, "slug": "catch-up-lag",
+        "title": "改一样，另外两样多久跟上",
+        "subtitle": "三位在世经济学家为「富裕从哪来」吵了三十年，各有硬证据；他们争的那个「因」，其实是同一台机器上的三个轮子",
+        "hook": "一位说是规矩——谁能进场、权力怎么分；一位说是钱本身的动力学——"
+                "只要资本回报长期高过增长，存量就自动压过流量；"
+                "一位说前两个都不对，是说法变了——一七〇〇年前后北欧开始把做买卖当成体面事。"
+                "三人指名道姓打过笔战。本文论证：在允许「再加一步」的条件下三家都不可推翻，"
+                "在不许加一步的条件下三家都已被驳倒；把问题从「谁是因」换成"
+                "「先动之后另外两个多久跟上」，这场不可判定的争论就变成一张能填数字的表，"
+                "并给出四种可辨认的结局。",
+        "sources": [
+            {"t": "The Rise and Decline of General Laws of Capitalism（他与罗宾逊驳皮凯蒂的那篇）",
+             "u": "https://www.aeaweb.org/articles?id=10.1257%2Fjep.29.1.3",
+             "d": "达龙·阿西莫格鲁（1967— ，麻省理工，2024 年诺奖）· 是规矩：谁能进场、权力怎么分",
+             "who": "Daron Acemoglu"},
+            {"t": "Putting Distribution Back at the Center of Economics（同一期上他的回应）",
+             "u": "https://www.aeaweb.org/articles?id=10.1257%2Fjep.29.1.67",
+             "d": "托马·皮凯蒂（1971— ，巴黎经济学院）· 是积累本身的动力学，它不需要任何人下决心",
+             "who": "Thomas Piketty"},
+            {"t": "Bourgeois Equality: How Ideas, Not Capital or Institutions, Enriched the World（副标题直接点名前两位）",
+             "u": "https://press.uchicago.edu/ucp/books/book/chicago/B/bo18546614.html",
+             "d": "迪尔德丽·麦克洛斯基（1942— ，卡托研究所）· 是说法变了：普通人这才敢下场试一把",
+             "who": "Deirdre McCloskey"},
+        ],
+        "collide": "本栏第三次撞站外理论，三位均在世且有公开笔战："
+                   "阿西莫格鲁与罗宾逊在《经济展望杂志》专文驳皮凯蒂，皮凯蒂在同一期回应；"
+                   "麦克洛斯基的书名副标题「是观念，而不是资本或制度」同时点名另外两位。"
+                   "三家各有对手消化不了的证据：一条边界两边的对照、两百年的分配曲线、"
+                   "以及「为什么偏偏是那一百年」这个时间点之问。"
+                   "九个判断两两相撞三十六次，撞出的是三人都没说过的第四样东西。",
+    },
+    {
         "src": "A8", "no": 26, "slug": "three-kinds-of-not-knowing",
         "title": "「不知道」有三种，而我们总把它们说成同一种",
         "subtitle": "三位现在还活着的哲学家为「没进来的那一部分」吵了二十年；把他们的三个答案并排放，会看到一件他们都没说的事",
