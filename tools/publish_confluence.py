@@ -19,37 +19,39 @@ TPL = ROOT / "public" / "paradigm" / "taken-out" / "index.html"
 PUBDATE = "2026年7月27日"
 
 PAPERS = [{
-    "slug": "measurable-face",
-    "src": Path("/home/claude/confluence/measurable-face.md"),
-    "title": "能被量的那一面",
-    "sub": "为什么一件事最容易被看见的地方，往往正好不是它长东西的地方",
-    "score": 152,
-    "cross": "教育学 × 再生医学 × 行为公共政策",
-    "deck": ("三拨互不相识的人正在各自的领域里吵架：一拨吵学东西该让人费劲还是该让人轻松，"
-             "一拨吵治病该修零件还是该改目标，一拨吵想让人过得好该改人还是该改规则。"
-             "三场架给出三个互相排斥的答案，而三边都各自发现了同一件事却都以为那是自己领域的病——"
-             "你能测到的那个东西，跟你真正想要的那个东西，方向常常是反的。"
-             "本文追出这件事怎么一步步接管一个系统的治理方式，给出四道工序、"
-             "十个行当里的真两难，以及四条可以让自己失败的判据。"),
-    "clash": ("第一家说要在单元这一层动手而且要加阻力；第二家说别在单元这一层动手、"
-              "单元自己有目标；第三家说在这一层讨论本身就是被推动的分心。"
-              "三家两两冲突，各自的证据都硬，各自的批评都打在对方软处。"),
+    "slug": "before-measurement",
+    "src": Path("/home/claude/confluence/before-measurement.md"),
+    "title": "认不出来的东西，争不出结果",
+    "sub": "为什么有些架吵一百年也吵不完，而且吵的人全都在认真做实验",
+    "score": 155,
+    "cross": "意识科学 × 代谢医学 × 人工智能评估",
+    "no": "之二",
+    "deck": ("三场架正在打，凶到其中一场有一百多人联名说对方不算科学。"
+             "一场吵人为什么有意识，一场吵人为什么会胖，一场吵机器是不是真在思考。"
+             "把三场架的形状画出来会看到同一个东西：双方都同意发生了什么，"
+             "分歧在于这件事该被算作什么——而这一步在任何测量开始之前就已经做完了，"
+             "做的时候手上一份数据也没有。本文由此给出一条判断、三个可随身带的问题、"
+             "十一个行当里的同一件事，以及四条可以让自己失败的判据。"),
+    "clash": ("第一场里双方事先签字接受被推翻，结果两边核心预测都没活下来，两边都不认输；"
+              "第二场把因果箭头整个掉了头——一边说吃多了才胖，一边说脂肪被锁进去才导致吃多；"
+              "第三场同一次停止输出，一边读作能力崩溃，一边读作明智止损，"
+              "而反驳论文的共同作者是一个模型本身。"),
     "sources": [
-        ("教育学 · 学习与记忆",
-         "可取用困难框架与失用新论（Bjork & Bjork），对阵认知负荷理论（Sweller 一系）",
-         "https://pubmed.ncbi.nlm.nih.gov/39641213/",
-         "难度不是要克服的成本，难度就是那个起作用的动作本身；而人对「我学会了没有」的判断系统性地是反的。"
-         "两家的正面比较见 Pyke、Lunau、Javadi 2024，《Quarterly Journal of Experimental Psychology》。"),
-        ("医学 · 再生与形态发生",
-         "集体智能与生物电界面（Michael Levin），《身体的多尺度智慧》2025",
-         "https://onlinelibrary.wiley.com/doi/10.1002/bies.202400196",
-         "当前生物医学几乎全是自下而上瞄准分子硬件；细胞群是有目标的求解者，"
-         "杠杆在改写共享的目标状态，而接口的价值不在于它最根本，在于它可读可写。"),
-        ("商业经济与公共政策 · 行为科学",
-         "个体框架与系统框架之辩（Chater & Loewenstein），《Behavioral and Brain Sciences》",
-         "https://www.ssrn.com/abstract=4046264",
-         "个体层干预的效果一直低于预期；把问题定义在个体层这个动作本身是被利益方推动的；"
-         "而随机对照试验的要求，大幅限制了能被纳入考虑的政策范围。Cass Sunstein 对最后一条有力反驳。"),
+        ("意识科学 · 神经科学与心灵哲学",
+         "全局神经工作空间理论对阵整合信息理论 —— Cogitate 预注册对抗实验，《Nature》2025，642(8066):133-142",
+         "https://www.nature.com/articles/s41586-025-08888-1",
+         "两百五十六名参与者、三种脑成像、中立第三方主持，双方事先写好什么算自己被推翻；"
+         "结果两边的核心预测都没活下来，而两边都保留了「被测的操作方式不等于理论本身」这个退路。"),
+        ("代谢医学 · 肥胖病因学",
+         "能量平衡模型对阵碳水化合物-胰岛素模型 —— 因果方向的反转",
+         "https://royalsocietypublishing.org/rstb/article/378/1888/20220211/109323/Carbohydrate-insulin-model-does-the-conventional",
+         "同一个观察事实——胖的人吃得多——一边读作原因，一边读作结果。"
+         "而中立的评估指出，两套模型在它们想要解释的东西上根本不是同一件事。"),
+        ("人工智能 · 推理能力评估",
+         "《思考的幻觉》对阵《思考的幻觉的幻觉》—— 同一批数据的两种读法",
+         "https://arxiv.org/html/2507.01231v1",
+         "一边读作推理能力的固有崩溃，一边读作输出格子塞满了；"
+         "改掉输出方式之后，原来「完全失败」的十五盘汉诺塔被正确解出。"),
     ],
 }]
 
@@ -107,7 +109,7 @@ def build_page(p, body, toc, pages):
     t = re.sub(r'(<meta name="description" content=")[^"]*(")',
                lambda m: m.group(1) + html.escape(p["deck"][:190], quote=True) + m.group(2), t)
     t = re.sub(r'<div class="art-series">.*?</div>',
-               f'<div class="art-series">学 科 通 融 · 之 一 · {html.escape(p["cross"])}</div>', t, flags=re.S)
+               f'<div class="art-series">学 科 通 融 · {p["no"]} · {html.escape(p["cross"])}</div>', t, flags=re.S)
     t = re.sub(r'<h1 class="art-title">.*?</h1>', f'<h1 class="art-title">{p["title"]}</h1>', t, flags=re.S)
     t = re.sub(r'<p class="art-sub">.*?</p>', f'<p class="art-sub">{p["sub"]}</p>', t, flags=re.S)
     t = re.sub(r'<div class="art-meta">.*?</div>',
@@ -149,7 +151,7 @@ p{{margin:0 0 9pt;text-align:justify}} hr{{border:0;border-top:1px solid #ddd;ma
 .src{{border:1px solid #bbb;padding:10pt 12pt;margin:0 0 16pt;font-size:10.5pt;background:#fafafa}}
 .src ol{{margin:6pt 0;padding-left:16pt}}</style></head><body>
 <h1>{p["title"]}</h1><div class="sub">{p["sub"]}</div>
-<div class="by">王德生 ＋ Claude　·　{PUBDATE}　·　SDE Universes 学科通融 · 之一</div>
+<div class="by">王德生 ＋ Claude　·　{PUBDATE}　·　SDE Universes 学科通融 · {p["no"]}</div>
 <div class="src"><b>本篇由三个学科的理论体系撞成</b>（{p["cross"]}）<ol>{''.join(
     f'<li>{k}：{ti}　—— {g}</li>' for k, ti, u, g in p["sources"])}</ol>{strongify(p["clash"])}</div>
 {body}</body></html>"""
@@ -223,7 +225,27 @@ def main():
         n = len(re.sub(r"<[^>]+>", "", body))
         built.append((p, round(n / 10000, 1), pages))
         print(f'  {p["slug"]}: {n} 字 · {pages} 页 · 目录 {len(toc)} 节 · 来源 {len(p["sources"])} 家')
-    (CF / "index.html").write_text(build_index(built), encoding="utf-8")
+    idx = CF / "index.html"
+    if idx.exists() and "measurable-face" in idx.read_text(encoding="utf-8"):
+        old = idx.read_text(encoding="utf-8")
+        for p, wan, pages in built:
+            if f'/confluence/{p["slug"]}/' in old:
+                continue
+            ones = "".join(f'<div><b>{html.escape(k)}</b><a href="{u}">{html.escape(ti)}</a></div>'
+                           for k, ti, u, g in p["sources"])
+            card = (f'<div class="item"><div class="n">{p["no"]} · 三学科交叉：{html.escape(p["cross"])}</div>'
+                    f'<h2><a href="/confluence/{p["slug"]}/">{html.escape(p["title"])}</a></h2>'
+                    f'<p class="sub">{html.escape(p["sub"])}</p>'
+                    f'<p class="hk">{html.escape(p["deck"])}</p>'
+                    f'<div class="trio">{ones}</div>'
+                    f'<a class="rdmore" href="/confluence/{p["slug"]}/">读全文 →</a>'
+                    f'<div class="meta">约 {wan} 万字 · {pages} 页 · 三种读法 · '
+                    f'作者 王德生 ＋ Claude · 发表于{PUBDATE} · 三家来源均为站外公开文献</div></div>\n')
+            old = old.replace("</main>", card + "</main>", 1)
+        idx.write_text(old, encoding="utf-8")
+        print("  已并入既有索引")
+    else:
+        idx.write_text(build_index(built), encoding="utf-8")
     print(f"学科通融建成：/confluence/ · {len(built)} 篇")
 
 
