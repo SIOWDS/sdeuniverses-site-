@@ -21,6 +21,19 @@ body.sde-read .lead {
   padding-right: 24px;
 }
 
+/* 通栏标题带（header.hero，38 页，其中 10 页带背景）：
+   带子本身保持通栏——底纹不能被切断——只把里面的字收进同一条版心，
+   这样标题与正文左右对齐。 */
+body.sde-read header.hero {
+  padding-left: max(20px, 4vw);
+  padding-right: max(20px, 4vw);
+}
+body.sde-read header.hero > * {
+  max-width: 760px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
 /* —— 2. 字号与行高：收敛到站内多数派（17.5px / 2.0）—— */
 body.sde-read {
   font-size: 17.5px;
