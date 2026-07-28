@@ -134,12 +134,13 @@ T('返回浏览=history.back', e3.navigated==='BACK');
   // ── 成文：存到用户自选目录（File System Access API）──
   T("成文面板多了「存到目录」按钮", dec.includes("wdsm-tbtn ddir") && dec.includes('dirBtn.textContent = t("dDir")'));
   T("下拉菜单里能选/换目录，并显示当前目录", dec.includes('t("dDirPick")') && dec.includes("dirPick(function (hd)") && dec.includes('dirName() ? (t("dDirSaved") + dirName())'));
-  T("目录句柄存进 IndexedDB（localStorage 存不了句柄）", dec.includes('DIRDB = "wds-fs"') && dec.includes("objectStore(DIRSTORE).put(hd, DIRKEY)"));
-  T("开页就把句柄读进内存（否则点击那一下要不到权限）", /dirLoad\(function \(hd\) \{ if \(hd\) DIRH = hd; \}\)/.test(dec));
-  T("复用目录时先查权限、不行再当场要一次", dec.includes("queryPermission(opt)") && dec.includes("requestPermission(opt)"));
-  T("不支持的浏览器回退成普通下载，不让读者空手", dec.includes('say(t("dDirNoApi")); download(name, text)'));
-  T("同名不覆盖，撞名自动加序号", dec.includes("getFileHandle(nm, { create: false })") && dec.includes('base + "-" + n + ext'));
-  T("文件名里的非法字符被清掉", /function safeName/.test(dec) && dec.includes('replace(/\\s+/g, " ")'));
+  // 目录逻辑本身只有一份，在 /assets/wds-savedir.js，由 tools/sim_wds_savedir.js 行为实测；这里只验"确实委托出去了"
+  T("目录实现委托给全站共用的 wds-savedir，本文件不再自写一套", dec.includes("/assets/wds-savedir.js") && !dec.includes('DIRDB = "wds-fs"') && !dec.includes("showDirectoryPicker"));
+  T("脚本一开始就把它拉进来（点击那一刻句柄要已在内存里）", dec.includes("SAVEDIR_SRC") && dec.includes("sc.src = SAVEDIR_SRC"));
+  T("启用撞名顺延，反复成文不覆盖上一稿", dec.includes("noOverwrite: true"));
+  T("拿不到模块时退回普通下载，读者不空手", dec.includes('if (!A || !A.supported()) { say(t("dDirNoApi")); download(name, text); return; }'));
+  T("导出本场对话也走同一个目录", dec.includes("function exportSession") && dec.includes('saveToDir("WDS-" + safeName(t("convoTitle"))'));
+  T("菜单动作有浮动提示条（菜单里没有状态栏可写）", dec.includes("wdsm-toast") && dec.includes("function toast(msg)"));
   T("中英两套文案都齐（dDir/dDirPick/dDirNoApi/dDirDenied）", ["dDir:", "dDirPick:", "dDirNoApi:", "dDirDenied:", "dDirSaved:"].every(function (k) { return (dec.split(k).length - 1) >= 2; }));
 }
 

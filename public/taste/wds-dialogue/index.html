@@ -162,6 +162,35 @@
   var helloEl = $(".hello", msgs);   // 开场白：清空对话栏后原样放回
   var history = [], streaming = false, busy = false;
 
+  /* —— 存到用户自选目录 ——
+     实现在全站共用的 /assets/wds-savedir.js（window.WDSSaveDir），成文页与金点子发生器同用一份。
+     必须**尽早**加载：目录句柄要在点击那一刻已经在内存里，否则 requestPermission 拿不到用户手势、
+     浏览器会拒掉授权弹窗。这里只做加载与文案，不再自己写一套。 */
+  (function () {
+    if (window.WDSSaveDir) return;
+    var sc = document.createElement("script");
+    sc.src = "/assets/wds-savedir.js?v=20260728a"; sc.async = true;
+    document.head.appendChild(sc);
+  })();
+  function sdApi() { return window.WDSSaveDir || null; }
+  function sdName() { var A = sdApi(); return A ? A.name() : ""; }
+  // 把一份文稿写进目录；没选过就当场问一次，不支持或写不进去一律回退成普通下载——不让人空手。
+  function saveDoc(fname, text, say) {
+    var A = sdApi();
+    if (!A || !A.supported()) {
+      say("这个浏览器不支持选目录（Chrome / Edge 支持），已改为普通下载。");
+      var b = new Blob([text], { type: "text/markdown;charset=utf-8" });
+      var a = document.createElement("a"); a.href = URL.createObjectURL(b); a.download = fname;
+      document.body.appendChild(a); a.click();
+      setTimeout(function () { try { URL.revokeObjectURL(a.href); a.remove(); } catch (e) {} }, 3000);
+      return;
+    }
+    say("正在写入…");
+    A.save(fname, new Blob([text], { type: "text/markdown;charset=utf-8" }), { silent: false, noOverwrite: true, id: "wds-dialogue" })
+      .then(function (r) { say(r && r.where === "dir" ? ("已存到 " + r.dir + "/" + r.name) : "已下载 " + ((r && r.name) || fname)); })
+      .catch(function (e) { say("写不进去（" + ((e && e.message) || "write failed") + "）"); });
+  }
+
   // —— 本机对话记录（IndexedDB，见 /assets/wds-store.js）——
   var stApi = null, stSess = null, stBooting = false;
   function stMakeSession() {
@@ -799,7 +828,7 @@
     var m = el("div", "veil doc");
     m.innerHTML = "<div class='box'><div class='boxh'><b class='dt'></b><button class='boxx'>\u00d7</button></div>"
       + "<div class='boxb'><div class='doct'></div></div>"
-      + "<div class='boxf'><span class='prog'></span><button class='tbtn resume' style='display:none'></button><button class='tbtn copy'>\u590d\u5236\u5168\u6587</button><button class='tbtn gold pdf'>\u5bfc\u51fa PDF</button></div></div>";
+      + "<div class='boxf'><span class='prog'></span><button class='tbtn resume' style='display:none'></button><button class='tbtn savedir'>\u{1F4C1} \u5b58\u5230\u76ee\u5f55</button><button class='tbtn copy'>\u590d\u5236\u5168\u6587</button><button class='tbtn gold pdf'>\u5bfc\u51fa PDF</button></div></div>";
     document.body.appendChild(m);
     var tE = $(".dt", m), bE = $(".doct", m), pE = $(".prog", m);
     tE.textContent = title;
@@ -810,6 +839,18 @@
       try { navigator.clipboard.writeText(tE.textContent + "\n\n" + bE.textContent); pE.textContent = "\u5df2\u590d\u5236"; } catch (e) {}
     };
     $(".pdf", m).onclick = function () { exportPDF(tE.textContent, bE.textContent, kind); };
+    var sdB = $(".savedir", m);
+    sdB.title = sdName() ? ("现在存到：" + sdName()) : "还没选目录，点一下会让你选";
+    sdB.onclick = function () {
+      var body = bE.textContent;
+      if (!body) { pE.textContent = "还没有内容可存"; return; }
+      var nm = (sdApi() ? sdApi().safeName(tE.textContent) : "WDS") || "WDS";
+      var st = sdApi() ? sdApi().stamp() : String(Date.now());
+      saveDoc("WDS-" + nm + "-" + st + ".md", "# " + tE.textContent + "\n\n" + body, function (msg) {
+        pE.textContent = msg;
+        sdB.title = sdName() ? ("现在存到：" + sdName()) : "还没选目录，点一下会让你选";
+      });
+    };
     var rE = $(".resume", m);
     return {
       setText: function (t) { bE.textContent = t; }, setTitle: function (t) { tE.textContent = t; }, setProg: function (t) { pE.textContent = t || ""; }, close: close,

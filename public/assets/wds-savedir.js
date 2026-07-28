@@ -111,15 +111,30 @@
     return { where: "download", name: fname, dir: "" };
   }
 
+  // 撞名时另取一个名字（原名 → 原名-2 → 原名-3…）。**opt-in**：只有调用方传 noOverwrite 才启用，
+  // 免得改掉已有调用方的行为。给"同一产出反复重写"的场景用——静默盖掉上一稿是最坏的那种"贴心"。
+  function freeName(h, fname) {
+    var dot = fname.lastIndexOf("."), base = dot > 0 ? fname.slice(0, dot) : fname, ext = dot > 0 ? fname.slice(dot) : "";
+    function attempt(n) {
+      var nm = n === 1 ? (base + ext) : (base + "-" + n + ext);
+      return h.getFileHandle(nm, { create: false })
+        .then(function () { return n < 50 ? attempt(n + 1) : nm; })
+        .catch(function () { return nm; });        // 取不到＝这个名字还空着，就用它
+    }
+    return attempt(1);
+  }
   // 写文件。有目录就写目录，没有（或不支持、或用户取消、或写失败）一律回退成普通下载——绝不因为存不进目录就丢了产出。
   function save(fname, blob, opts) {
-    return ensure(Object.assign({ silent: true }, opts || {})).then(function (h) {
+    var o = opts || {};
+    return ensure(Object.assign({ silent: true }, o)).then(function (h) {
       if (!h) return download(fname, blob);
-      return h.getFileHandle(fname, { create: true })
-        .then(function (fh) { return fh.createWritable(); })
-        .then(function (w) { return w.write(blob).then(function () { return w.close(); }); })
-        .then(function () { return { where: "dir", name: fname, dir: name() }; })
-        .catch(function () { return download(fname, blob); });
+      return (o.noOverwrite ? freeName(h, fname) : Promise.resolve(fname)).then(function (nm) {
+        return h.getFileHandle(nm, { create: true })
+          .then(function (fh) { return fh.createWritable(); })
+          .then(function (w) { return w.write(blob).then(function () { return w.close(); }); })
+          .then(function () { return { where: "dir", name: nm, dir: name() }; })
+          .catch(function () { return download(fname, blob); });
+      });
     });
   }
 
@@ -130,6 +145,15 @@
     ensure: ensure,
     save: save,
     forget: function () { handle = null; fire(); return idbDel(); },
+    // 文件名清洗：Windows 不认 \ / : * ? " < > |，顺手折叠空白并截短，免得各调用方各写一遍
+    safeName: function (s, max) {
+      var v = String(s || "").replace(/[\\/:*?"<>|\r\n\t]/g, "").replace(/\s+/g, " ").trim();
+      return v.slice(0, max || 40);
+    },
+    stamp: function () {
+      var d = new Date(), p = function (n) { return (n < 10 ? "0" : "") + n; };
+      return "" + d.getFullYear() + p(d.getMonth() + 1) + p(d.getDate()) + "-" + p(d.getHours()) + p(d.getMinutes());
+    },
     onChange: function (f) { listeners.push(f); try { f(name()); } catch (e) {} },
   };
   load();

@@ -298,6 +298,7 @@
     ".wdsm-menu button{display:block;width:100%;text-align:left;background:none;border:none;color:#E8E4DA;font:13.5px/1.5 inherit;padding:9px 12px;border-radius:8px;cursor:pointer}" +
     ".wdsm-menu button:hover{background:rgba(212,178,94,.14);color:#F5EFE0}" +
     ".wdsm-menu .sub{display:block;color:#6b7684;font-size:11.5px;margin-top:2px}" +
+    ".wdsm-toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%);z-index:100003;max-width:min(560px,88vw);background:#161B22;border:1px solid rgba(212,178,94,.34);border-radius:10px;color:#E8E4DA;font:13px/1.6 inherit;padding:10px 16px;box-shadow:0 10px 30px rgba(0,0,0,.5);opacity:1;transition:opacity .5s}" +
     ".wdsm-dist{position:fixed;inset:0;z-index:100003;background:rgba(10,8,5,.78);display:flex;align-items:center;justify-content:center;padding:20px}" +
     ".wdsm-dist-box{max-width:820px;width:100%;max-height:88vh;background:#12100C;border:1px solid rgba(212,178,94,.32);border-radius:18px;display:flex;flex-direction:column;overflow:hidden}" +
     ".wdsm-dist-top{flex:none;display:flex;align-items:center;gap:8px;padding:14px 18px;border-bottom:1px solid rgba(255,255,255,.09)}" +
@@ -777,105 +778,56 @@
     try { document.execCommand("copy"); } catch (e2) {}
     ta.parentNode.removeChild(ta);
   }
-  /* ── 存到用户自选目录（File System Access API）────────────────────────────────
-     浏览器不许网页随便往硬盘写东西，唯一的正路是让**用户自己点一次目录**授权。
-     目录句柄能存进 IndexedDB 长期复用（localStorage 存不了句柄，只能存字符串）。
-     开页时先把句柄读进内存，因为 requestPermission 必须发生在点击这一下之内——
-     等点了再去异步读 IndexedDB，用户手势就过期了，权限弹窗会被浏览器拒掉。
-     Chrome / Edge 支持；Firefox / Safari 没有这个 API，一律回退成普通下载。 ── */
-  var DIRH = null, DIRDB = "wds-fs", DIRSTORE = "h", DIRKEY = "distill-dir";
-  function dirIdb(cb) {
-    try {
-      var rq = indexedDB.open(DIRDB, 1);
-      rq.onupgradeneeded = function () { try { rq.result.createObjectStore(DIRSTORE); } catch (e) {} };
-      rq.onsuccess = function () { cb(rq.result); };
-      rq.onerror = function () { cb(null); };
-    } catch (e) { cb(null); }
-  }
-  function dirLoad(cb) {
-    dirIdb(function (db) {
-      if (!db) { cb(null); return; }
-      try {
-        var g = db.transaction(DIRSTORE, "readonly").objectStore(DIRSTORE).get(DIRKEY);
-        g.onsuccess = function () { cb(g.result || null); };
-        g.onerror = function () { cb(null); };
-      } catch (e) { cb(null); }
-    });
-  }
-  function dirStore(hd, cb) {
-    dirIdb(function (db) {
-      if (!db) { cb && cb(false); return; }
-      try {
-        var tx = db.transaction(DIRSTORE, "readwrite");
-        tx.objectStore(DIRSTORE).put(hd, DIRKEY);
-        tx.oncomplete = function () { cb && cb(true); };
-        tx.onerror = function () { cb && cb(false); };
-      } catch (e) { cb && cb(false); }
-    });
-  }
-  function dirSupported() { return typeof window.showDirectoryPicker === "function"; }
-  function dirName() { return DIRH && DIRH.name ? DIRH.name : ""; }
-  function dirPick(cb) {   // 必须在点击事件里同步调用
-    if (!dirSupported()) { cb(null, "noapi"); return; }
-    try {
-      window.showDirectoryPicker({ id: "wds-distill", mode: "readwrite", startIn: "documents" })
-        .then(function (hd) { DIRH = hd; dirStore(hd); cb(hd, ""); })
-        .catch(function () { cb(null, "cancel"); });
-    } catch (e) { cb(null, "noapi"); }
-  }
-  // 已经选过就直接用（必要时就地要一次权限）；没选过就当场弹目录选择器。
-  function dirEnsure(cb) {
-    if (!dirSupported()) { cb(null, "noapi"); return; }
-    if (!DIRH) { dirPick(cb); return; }
-    var opt = { mode: "readwrite" };
-    try {
-      DIRH.queryPermission(opt).then(function (st) {
-        if (st === "granted") { cb(DIRH, ""); return; }
-        DIRH.requestPermission(opt).then(function (st2) {
-          if (st2 === "granted") cb(DIRH, ""); else cb(null, "denied");
-        }).catch(function () { cb(null, "denied"); });
-      }).catch(function () { cb(null, "denied"); });
-    } catch (e) { cb(null, "denied"); }
-  }
-  function safeName(s) { return String(s || "").replace(/[\\/:*?"<>|\r\n\t]/g, "").replace(/\s+/g, " ").trim().slice(0, 40); }
+  /* ── 存到用户自选目录 ──────────────────────────────────────────────────────
+     实现不在这里：全站共用 /assets/wds-savedir.js（window.WDSSaveDir），金点子发生器等
+     也用同一份。这里只做三件事：尽早把它拉进来（目录句柄要在点击那一刻已在内存里，
+     否则 requestPermission 拿不到用户手势）、把结果译成本页文案、没有它就退回普通下载。 ── */
+  var SAVEDIR_SRC = "/assets/wds-savedir.js?v=20260728a";
+  function dirApi() { return window.WDSSaveDir || null; }
+  function dirSupported() { var A = dirApi(); return !!(A && A.supported()); }
+  function dirName() { var A = dirApi(); return A ? A.name() : ""; }
+  (function loadSaveDir() {
+    if (window.WDSSaveDir) return;
+    var sc = document.createElement("script");
+    sc.src = SAVEDIR_SRC; sc.async = true;
+    document.head.appendChild(sc);
+  })();
+  function safeName(s) { var A = dirApi(); return A ? A.safeName(s) : String(s || "").replace(/[\\/:*?"<>|\r\n\t]/g, "").replace(/\s+/g, " ").trim().slice(0, 40); }
   function stampName() {
+    var A = dirApi(); if (A) return A.stamp();
     var d = new Date(), p2 = function (n) { return (n < 10 ? "0" : "") + n; };
     return "" + d.getFullYear() + p2(d.getMonth() + 1) + p2(d.getDate()) + "-" + p2(d.getHours()) + p2(d.getMinutes());
   }
-  // 同名不覆盖：撞名就加 -2 -3…（成文常常反复重写，覆盖掉上一稿是最容易被骂的那种"贴心"）
-  function dirWrite(hd, name, text, cb) {
-    var dot = name.lastIndexOf("."), base = dot > 0 ? name.slice(0, dot) : name, ext = dot > 0 ? name.slice(dot) : "";
-    function attempt(n) {
-      var nm = n === 1 ? (base + ext) : (base + "-" + n + ext);
-      hd.getFileHandle(nm, { create: false })
-        .then(function () { if (n < 50) attempt(n + 1); else cb(false, "too many"); })
-        .catch(function () {
-          hd.getFileHandle(nm, { create: true })
-            .then(function (fh) { return fh.createWritable(); })
-            .then(function (w) { return w.write(text).then(function () { return w.close(); }); })
-            .then(function () { cb(true, nm); })
-            .catch(function (e) { cb(false, (e && e.message) || "write failed"); });
-        });
-    }
-    attempt(1);
+  // 让用户当场选/换目录（必须在点击事件里同步调用）
+  function dirPick(cb) {
+    var A = dirApi();
+    if (!A || !A.supported()) { cb(null, "noapi"); return; }
+    A.ensure({ repick: true, id: "wds-distill" }).then(function (h) { cb(h || null, h ? "" : "cancel"); });
   }
-  // 统一入口：选好目录就写进去，没有 API 就退回普通下载——任何情况下读者都拿得到文件。
+  // 统一入口：选好目录就写进去，没有就退回普通下载——任何情况下读者都拿得到文件。
   function saveToDir(name, text, say) {
-    if (!dirSupported()) { say(t("dDirNoApi")); download(name, text); return; }
+    var A = dirApi();
+    if (!A || !A.supported()) { say(t("dDirNoApi")); download(name, text); return; }
     say(t("dDirWait"));
-    dirEnsure(function (hd, why) {
-      if (!hd) {
-        if (why === "denied") say(t("dDirDenied"));
-        else if (why === "noapi") { say(t("dDirNoApi")); download(name, text); }
-        else say("");
-        return;
-      }
-      dirWrite(hd, name, text, function (ok, info) {
-        say(ok ? (t("dDirSaved") + dirName() + "/" + info) : (t("dDirFail") + info + "）"));
-      });
-    });
+    // silent:false —— 没选过目录时就地弹选择器（这一步仍在点击的手势里）
+    A.save(name, new Blob([text], { type: "text/markdown;charset=utf-8" }), { silent: false, noOverwrite: true, id: "wds-distill" })
+      .then(function (r) {
+        if (!r) { say(t("dDirFail") + "unknown）"); return; }
+        say(r.where === "dir" ? (t("dDirSaved") + r.dir + "/" + r.name) : t("dDirNoApi"));
+      })
+      .catch(function (e) { say(t("dDirFail") + ((e && e.message) || "write failed") + "）"); });
   }
-  dirLoad(function (hd) { if (hd) DIRH = hd; });   // 开页就把句柄读进内存，好让点击那一下能直接要权限
+
+  // 菜单里的动作没有状态栏可写，给一条会自己消失的浮动提示
+  function toast(msg) {
+    if (!msg) return;
+    var old = document.querySelector(".wdsm-toast");
+    if (old && old.parentNode) old.parentNode.removeChild(old);
+    var d = el("div", "wdsm-toast", msg);
+    document.body.appendChild(d);
+    setTimeout(function () { d.style.opacity = "0"; }, 2600);
+    setTimeout(function () { if (d.parentNode) d.parentNode.removeChild(d); }, 3200);
+  }
 
   function download(name, text) {
     var b = new Blob([text], { type: "text/markdown;charset=utf-8" });
@@ -1335,7 +1287,10 @@
     history.forEach(function (m) { out += (m.role === "reader" ? "**我：**" : "**WDS：**") + "\n\n" + m.text + "\n\n---\n\n"; });
     return out;
   }
-  function exportSession() { download("WDS-" + new Date().toISOString().slice(0, 10) + ".md", sessionMd()); }
+  // 导出本场对话：和成文共用同一个目录——选过目录就写进去，没选过就当场问一次，都不行才普通下载。
+  function exportSession() {
+    saveToDir("WDS-" + safeName(t("convoTitle")) + "-" + stampName() + ".md", sessionMd(), toast);
+  }
 
   /* ── 成文落本机：和对话记录共用 IndexedDB，但另立一个 agent，两个历史面板互不混。 ── */
   function distSave(label, text, cb) {
