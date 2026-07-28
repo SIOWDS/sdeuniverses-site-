@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>杂质身份的三种授予机制：论"清除"在不同系统类型中的非同一性 | 学术创造专栏 · 学位论文 | SDE Universes</title>
+<meta name="description" content="「清除不该在此的成分」被普遍当作一个语义单一的操作，争论只在清什么、清多少。本研究撤销这一前提：是不是杂质不是被清除物的属性，而是一次身份授予的结果。据授予者不同，可分规格授予、遭遇授予、位置授予三种互不还原的机制——清除相应地是减法、是校准材料的连带移除、或是一次必然的功能位置重排。">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#F5EFE0;--card:#FAF6EC;--card2:#F0E8D3;--gold:#8A6817;--text:#2A2315;--text2:#544733;--muted:#98886C;--border:rgba(138,104,23,0.22);--border2:rgba(138,104,23,0.10);--accent:#35558C;--accent2:#4E74B5}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Noto Serif SC','EB Garamond',Georgia,serif;line-height:1.95;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:0.7rem 3rem;background:rgba(245,239,224,0.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border2)}
+.nav-logo{font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:700;color:var(--gold);letter-spacing:0.05em;text-decoration:none}
+.nav-links{display:flex;align-items:center;gap:1.5rem}
+.nav-links a{color:var(--text2);text-decoration:none;font-size:0.84rem;letter-spacing:0.09em;transition:color .2s}
+.nav-links a:hover,.nav-links a.here{color:var(--accent)}
+.nav-links a.here{font-weight:700}
+.wrap{max-width:780px;margin:0 auto;padding:0 2rem}
+header.hero{padding:8.5rem 2rem 2.6rem;text-align:center;position:relative;overflow:hidden;border-bottom:1px solid var(--border2)}
+.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 72% 58% at 50% 24%,#35558C1a 0%,transparent 72%)}
+.eyebrow{position:relative;font-size:0.7rem;letter-spacing:0.26em;color:var(--accent);margin-bottom:1.1rem}
+.eyebrow a{color:var(--accent);text-decoration:none;border-bottom:1px solid rgba(0,0,0,.14)}
+h1.art-title{position:relative;font-family:'Noto Serif SC',serif;font-size:clamp(1.6rem,3.7vw,2.3rem);font-weight:700;line-height:1.4;color:var(--text);max-width:820px;margin:0 auto}
+.title-en{position:relative;font-family:'EB Garamond',Georgia,serif;font-size:clamp(0.9rem,1.7vw,1.05rem);color:var(--text2);max-width:700px;margin:0.85rem auto 0;font-style:italic;line-height:1.5}
+.art-sub{position:relative;font-size:clamp(0.95rem,1.8vw,1.08rem);color:var(--text2);max-width:670px;margin:1.15rem auto 0;font-style:italic;font-weight:300;line-height:1.75}
+.degree{position:relative;display:inline-block;margin-top:1.4rem;padding:0.4rem 1.1rem;border:1px solid var(--accent);border-radius:20px;font-size:0.75rem;letter-spacing:0.14em;color:var(--accent)}
+.art-meta{position:relative;margin-top:0.85rem;font-size:0.78rem;letter-spacing:0.13em;color:var(--muted)}
+section.body{padding:2.8rem 0 1rem}
+.abs{background:var(--card);border:1px solid var(--border2);border-left:3px solid var(--accent);border-radius:5px;padding:1.4rem 1.6rem;margin-bottom:0.9rem}
+.abs .l{font-size:0.7rem;letter-spacing:0.24em;color:var(--accent);font-weight:700;margin-bottom:0.6rem}
+.abs p{font-size:0.93rem;line-height:1.9;color:var(--text2);text-align:justify}
+.abs.en p{font-family:'EB Garamond',Georgia,serif;font-size:0.95rem;line-height:1.75}
+.kw{font-size:0.84rem;color:var(--muted);margin-bottom:1.5rem}
+.kw b{color:var(--accent);font-weight:700;letter-spacing:0.08em}
+.toc{background:var(--card2);border:1px dashed var(--border);border-radius:6px;padding:1.3rem 1.6rem;margin:1.6rem 0 3rem}
+.toc .l{font-size:0.7rem;letter-spacing:0.24em;color:var(--accent);font-weight:700;margin-bottom:0.8rem}
+.toc a{display:block;text-decoration:none;padding:0.2rem 0;transition:color .18s,padding-left .18s;color:var(--text2)}
+.toc a.t2{font-size:0.92rem;font-weight:700;margin-top:0.45rem}
+.toc a.t3{font-size:0.85rem;padding-left:1.5rem;color:var(--muted)}
+.toc a:hover{color:var(--accent);padding-left:5px}
+.toc a.t3:hover{padding-left:1.8rem}
+article h2{font-family:'Noto Serif SC',serif;font-size:1.32rem;font-weight:700;color:var(--text);margin:3.3rem 0 1.2rem;padding-bottom:0.55rem;border-bottom:2px solid var(--accent);scroll-margin-top:5.5rem;line-height:1.45}
+article h3{font-family:'Noto Serif SC',serif;font-size:1.08rem;font-weight:700;color:var(--accent);margin:2.2rem 0 0.9rem;scroll-margin-top:5.5rem;line-height:1.5}
+article p{font-size:1.01rem;line-height:2.05;color:var(--text);margin-bottom:1.1rem;text-align:justify;letter-spacing:0.012em}
+article b{color:var(--text);font-weight:700;background:linear-gradient(transparent 62%,#35558C22 62%)}
+article em{font-style:normal;color:var(--accent);font-weight:600}
+blockquote{margin:1.8rem 0;padding:1.1rem 1.45rem;background:var(--card);border-left:3px solid var(--accent);border-radius:0 5px 5px 0;font-size:1.03rem;line-height:1.9;color:var(--text);font-weight:600}
+hr{border:none;height:1px;background:var(--border2);margin:2.5rem 0}
+.tw{overflow-x:auto;margin:1.6rem 0}
+table{border-collapse:collapse;width:100%;font-size:0.88rem;background:var(--card)}
+th,td{border:1px solid var(--border2);padding:0.6rem 0.8rem;text-align:left;line-height:1.7;vertical-align:top}
+th{background:#35558C15;font-weight:700;color:var(--accent);white-space:nowrap}
+.refs{margin-top:1rem}
+.refs ol{padding-left:1.4rem}
+.refs li{font-size:0.85rem;line-height:1.8;color:var(--text2);margin-bottom:0.5rem;padding-left:0.3rem}
+.foot-nav{margin:3.2rem 0 0;text-align:center;background:var(--card2);border:1px dashed var(--accent);border-radius:8px;padding:1.6rem 1.4rem}
+.foot-nav .cl{display:flex;flex-wrap:wrap;gap:0.7rem;justify-content:center}
+.foot-nav a{text-decoration:none;font-size:0.85rem;letter-spacing:0.06em;padding:0.48rem 1.05rem;border:1px solid var(--border);border-radius:22px;color:var(--text2);background:var(--card);transition:all .2s}
+.foot-nav a:hover{border-color:var(--accent);color:var(--accent)}
+footer{border-top:1px solid var(--border2);margin-top:3rem;padding:2.4rem 2rem;text-align:center;color:var(--muted);font-size:0.77rem;letter-spacing:0.05em}
+footer a{color:var(--gold);text-decoration:none}
+@media(max-width:640px){
+  nav{padding:0.6rem 1rem}.nav-links{gap:0.9rem}.nav-links a.sib{display:none}
+  header.hero{padding:6.4rem 1.2rem 2rem}
+  .wrap{padding:0 1.25rem}
+  article p{font-size:1rem;line-height:1.98}
+  article h2{font-size:1.18rem;margin:2.6rem 0 1rem}
+  article h3{font-size:1.02rem}
+}
+</style>
+</head>
+<body>
+<nav>
+  <a class="nav-logo" href="/">SDE Universes</a>
+  <div class="nav-links">
+    <a href="/">首页</a>
+    <a href="/creation/" class="sib">学术创造专栏</a>
+    <a href="/creation/thesis/" class="here">学位论文</a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="hero-bg"></div>
+  <div class="eyebrow"><a href="/creation/">学术创造专栏</a> · <a href="/creation/thesis/">学位论文</a></div>
+  <h1 class="art-title">杂质身份的三种授予机制：论"清除"在不同系统类型中的非同一性</h1>
+  <p class="title-en">Three Modes of Assigning Impurity: On the Non-Identity of "Removal" Across System Types</p>
+  <p class="art-sub">半导体工艺先把硅提纯到十一个九，再把杂质精确地放回去；免疫学发现环境过于洁净的后果不是免疫力下降而是免疫系统认错人；而同一种细菌在胃里致癌、在食管那一端却是保护性的。三个领域对同一个动作给出互不相容的评价——问题不在谁错，在它们共同隐去了什么。</p>
+  <div class="degree">理论建构型论文 · 跨学科（材料工程 · 免疫学 · 临床微生物学 · 组织研究）</div>
+  <div class="art-meta">王德生 ＋ Claude 著 · 学术创造专栏 · 学位论文频道 · 概念建构型 · 约 1.9 万字</div>
+</header>
+
+<div style="max-width:780px;margin:1.6rem auto -1.2rem;padding:0 2rem;text-align:center">
+  <a href="/creation/pdf/impurity-assignment.pdf" download style="display:inline-block;font-size:0.82rem;letter-spacing:0.06em;color:var(--accent);text-decoration:none;border:1px solid var(--border);border-radius:20px;padding:0.4rem 1.1rem;background:var(--card)">⬇ 下载 PDF · A4 学术版 · 24 页</a>
+</div>
+
+<main class="wrap">
+  <section class="body">
+        <div class="abs">
+      <div class="l">摘 要</div>
+      <p>"清除不该在此的成分"是治理、工程、临床与组织管理共享的基础动作，而现有研究把它当作一个语义单一的操作来处理：争论集中在清什么、清多少、清得是否彻底，从未追问清除本身在不同类型的系统中是否是同一件事。本研究提出：<b>"是不是杂质"不是被清除物的属性，而是一次身份授予的结果</b>；据授予者的不同，可区分三种互不还原的机制——<b>规格授予</b>（身份由外部事先给定的规格决定）、<b>遭遇授予</b>（身份由系统自身在与外界的反复碰撞中习得）、<b>位置授予</b>（身份由被清除物此刻所处的功能位置决定）。三种授予对应三种性质不同的清除：在规格授予下清除是减法，其成立条件是运行环境可被事前穷举；在遭遇授予下清除同时移除了系统赖以建立分类的校准材料，其后果不是能力衰减而是<b>误判</b>——过度清洁环境中的免疫失调表现为过敏与自身免疫的上升而非感染易感性的上升，此即其可检验的判别标志；在位置授予下清除必然是<b>重排</b>而非减法，被腾出的功能位置将被接管，而接管者尚未获得名称，故每一轮成功的清除都使下一轮问题的可命名程度下降。研究进一步论证，三类系统的误配不是认知失误而是<b>交代结构</b>的产物：清除方案具备完成时刻、可数成绩与当期可见性，观察方案三者皆无，故在任何需要向上交代的场合，规格型办法对另外两类具有系统性的竞争优势。本文与打地鼠效应、生态位、意外后果、破窗理论、最小干预原则、系统思维六个邻近论述逐一划界，给出三问判别程序与一项低成本粗筛，并提出七项可证伪预测。</p>
+    </div>
+    <div class="kw"><b>关键词</b>　身份授予；清除的非同一性；校准材料；功能位置重排；命名衰减；交代结构；跨类型误配</div>
+    <div class="abs en">
+      <div class="l">ABSTRACT</div>
+      <p>Removing what does not belong is a foundational move shared by governance, engineering, clinical practice and organisational management, yet the literature treats it as a semantically uniform operation: debate concentrates on what to remove, how much, and how thoroughly, never on whether removal is the same act across different types of system. This study argues that impurity is not a property of the thing removed but the outcome of an act of identity assignment, and distinguishes three mutually irreducible modes: specification-assigned (identity fixed ex ante by an external specification), encounter-assigned (identity learned by the system itself through repeated collision with its environment), and position-assigned (identity determined by the functional position the item currently occupies). Each mode makes removal a different act. Under specification assignment removal is subtraction, and its validity rests on the exhaustive enumerability of the operating environment. Under encounter assignment removal simultaneously deletes the calibration material by which the system builds its classifications; the consequence is not weakened capacity but misclassification — the immunological signature of over-clean environments is a rise in allergy and autoimmunity rather than in susceptibility to pathogens, and this divergence supplies the testable discriminator. Under position assignment removal is necessarily reshuffling rather than subtraction: the vacated functional position is taken over, and the successor is as yet unnamed, so each successful round of removal lowers the nameability of the next round's problem. The study further argues that cross-type misapplication is not a cognitive failure but a product of accountability structure: removal offers a completion moment, a countable result and same-period visibility, while observation offers none of the three, giving specification-type methods a systematic competitive advantage wherever an account must be rendered upward. The account is demarcated against six neighbouring notions, a three-question diagnostic and a low-cost screen are supplied, and seven falsifiable predictions are stated.</p>
+    </div>
+
+<article>
+
+<h2>一、问题的形态：一个动作，三种互不相容的评价</h2>
+
+<h3>1.1 一个不曾被追问的操作</h3>
+
+<p>在几乎所有以"改善"为目标的实践里，第一个被采取的动作是同一个：把不该在里面的东西清掉。生产线上的杂质、体内的病原、组织中的不合格者、信息环境中的违规内容、日程中的无效时间——对象各异，动作同形。</p>
+
+<p>关于这个动作，既有讨论的重心一律落在<b>对象</b>与<b>程度</b>上：该清哪些、限值定在何处、清得是否彻底、有无误伤。这些追问都有价值，但它们共享一个未经审视的前提：</p>
+
+<p class="pull">清除是一个语义单一的操作；它在不同的系统中，只是对象不同，动作本身是同一件事。</p>
+
+<p>本研究的出发点，是撤销这个前提。</p>
+
+<h3>1.2 三个领域给出的三种互不相容的评价</h3>
+
+<p>把三个成熟领域对同一动作的判断并置，会看到它们不是侧重不同，而是<b>相互否定</b>。</p>
+
+<p><b>其一，材料工程：清除是必要的，且应当彻底。</b>半导体制造的第一道工序是把多晶硅提纯到极高纯度——区熔提纯可将杂质浓度压到十亿分之一以下的量级；任何残留都可能使整片晶圆失效。而紧接着的第二道工序是<b>把杂质按精确的浓度、深度与位置重新引入</b>：掺入硼或磷，使本征硅由近乎绝缘转为可控导电。两道工序表面相悖，实则同构——它们共同表达的判断是：<b>纯度的意义不在于"其中没有非目标成分"，而在于"其中只有被规格指定的成分"</b>。控制是全部。</p>
+
+<p><b>其二，免疫学：清除过度会使系统丧失分类能力。</b>二十世纪后半叶，富裕城市化社会中过敏、自身免疫病与炎症性肠病同时快速上升，其速度无法由遗传变化解释。早期的卫生假说（Strachan, 1989）将其归因于感染机会的减少，但该版本很快遭遇反例：若干真正的传染病并不降低过敏风险，部分反而抬高。后续的"老朋友"假说（Rook, 2003; 2023）提出了更精确的表述：起作用的并非微生物暴露的总量，而是人类在演化史中与之长期共处、必须被容忍的一批特定生物——它们是<b>免疫调节回路的诱导者</b>，参与调节性 T 细胞等抑制机制的建立。其后果因此不是免疫强度的下降，而是<b>免疫调节的失灵</b>：该起反应时起不来，不该起反应时关不掉。</p>
+
+<p><b>其三，临床微生物学：好坏并非被清除物的属性。</b>幽门螺杆菌提供了一个方向明确相反的案例。它是非贲门胃腺癌确立的风险因素，根除治疗可使该风险大幅下降；而同一细菌与巴雷特食管、食管腺癌呈负相关，其定植亦与儿童哮喘负相关（Blaser, 2008）。机制解释是一致的：它引起的胃黏膜萎缩降低胃酸分泌，而胃酸反流正是食管腺癌的主要通路——<b>使它在胃部致病的同一属性，正是使它在食管端具备保护作用的属性</b>。关于根除是否抬高食管腺癌风险的争论持续二十年未决：有队列报告根除后巴雷特食管的标化发病比显著升高（Doorakkers 等, 2020），而近年一项覆盖五个西方国家的多国队列未发现食管腺癌上升。</p>
+
+<h3>1.3 冲突的形态</h3>
+
+<p>三者的关系值得精确刻画，因为它决定了本研究的问题形态。</p>
+
+<table class="tbl">
+<tr><th>领域</th><th>对清除的判断</th><th>"杂质"是什么</th></tr>
+<tr><td>材料工程</td><td>清至极限，而后按规格重新引入</td><td>规格之外的成分</td></tr>
+<tr><td>免疫学</td><td>过度清除使分类无法建立</td><td>系统赖以学习的材料</td></tr>
+<tr><td>临床微生物学</td><td>该问题本身预设了不存在的分类</td><td>非属性，而是位置的函数</td></tr>
+</table>
+
+<p>前两者对<b>清除的彻底程度</b>这一变量赋予相反的符号；第三者则否认该变量所依附的分类具有实在性。这是一种比"侧重不同"强得多的冲突形态：三方各自拥有可核查的证据基础，因而问题不在于孰是孰非，而在于<b>三者共同隐去了什么</b>。</p>
+
+<h3>1.4 本研究的主张</h3>
+
+<p>本研究提出：三者共同隐去的，是<b>身份的授予者</b>。</p>
+
+<p class="pull">"是不是杂质"不是被清除物的属性，而是一次身份授予的结果。授予者不同，"清除"这一动作的性质随之不同——它可以是减法，可以是校准材料的连带移除，也可以是一次功能位置的重排。三者不可互相还原。</p>
+
+<p>下文第二节完成不可还原性的硬校验，第三节界定三种授予机制，第四至六节分别展开，第七节处理跨类型误用，第八节论证误用为何不会自行纠正，第九节以三次并列演算给出经验形态，第十节回应五项反驳，第十二节给出边界与可证伪条件。</p>
+
+<hr class="rule">
+
+<h2>二、不可还原性的硬校验：与六个既有论述的正面辨别</h2>
+
+<p>一个新概念若能被既有概念一比一替换，它就没有提供理论增益，只完成了一次重新命名。本节与六个最强的邻近论述逐一交锋。</p>
+
+<h3>2.1 与打地鼠效应／水床效应</h3>
+
+<p>这是距离最近的一个。其表述为：压制某一处的行为，它会在另一处出现；治理一种渠道，活动转向另一种渠道。</p>
+
+<p>两处差别是决定性的。</p>
+
+<p><b>其一，转移的主体不同。</b>打地鼠描述的是<b>同一个主体</b>更换位置——那只地鼠仍是它，只是换了一个洞。本研究所述的重排是<b>另一个主体</b>接管了位置，并因占据该位置而开始承担原主体的功能。前者是逃逸，后者是<b>继承</b>。二者的观察后果不同：逃逸情形下，被治理对象的可识别特征保持不变，跨域追踪可行；继承情形下，接管者与被清除者可以毫无共同特征，任何基于原对象特征的追踪都会落空。</p>
+
+<p><b>其二，是否需要意图。</b>打地鼠机制依赖行为主体的规避反应，因而其对策（提高规避成本、扩大覆盖面、联合执法）在逻辑上成立。而位置重排<b>不需要任何意图</b>：微生物群落的位置接管中没有规避者，生态位的填补中没有博弈者。针对规避设计的全部对策对无意图的重排无效。</p>
+
+<h3>2.2 与生态位</h3>
+
+<p>生态位（Hutchinson, 1957）确实处理了"位置"这一维度，本研究与之有明显的概念血缘。</p>
+
+<p>差别在于两点。第一，生态位是<b>描述性</b>概念，用以刻画物种在系统中占据的功能位置，它不提供关于干预的判据——它无法回答"在何种条件下清除是减法、在何种条件下是重排"，因为它的适用域（生态系统）本就整体属于位置授予型，该问题在其内部不成为问题。第二，本研究的增量在于<b>把位置授予与另外两种授予并置，并给出跨类型的判别程序</b>：一个组织、一份临床判断力、一片晶圆分别属于哪一类，这一问在生态位概念内无法提出。</p>
+
+<h3>2.3 与意外后果</h3>
+
+<p>"一切社会行动皆有非预期后果"（Merton, 1936）是一个正确而低信息量的命题：它不分类型、不给方向、不提供准备的依据。</p>
+
+<p>本研究给出的是有结构的表述：在规格授予型系统中，此类后果<b>几乎不出现</b>（这正是工程实践得以可靠的原因）；在遭遇授予型系统中，后果<b>方向固定</b>——表现为过度反应而非反应不足；在位置授予型系统中，后果<b>形式固定</b>——表现为功能位置被接管，且接管者的可命名程度低于被清除者。有方向、有形式，才谈得上事前准备。</p>
+
+<h3>2.4 与破窗理论</h3>
+
+<p>破窗理论（Wilson & Kelling, 1982）是"清理小失序"在公共领域最具影响力的理论依据，且其动作正是清除，故必须正面处理。</p>
+
+<p>本研究不否定它，而是<b>划出其成立范围</b>。破窗理论所处理的失序具备一份可枚举的清单（碎窗、涂鸦、垃圾），清除即减法，且清除动作本身构成所要传递的信号——就此而言它运行于规格授予层，在该层上其逻辑自洽。</p>
+
+<p>而它遭受最多批评的那些应用，几乎无例外地发生在它被推入位置授予层之时：清理某一类人群、某一类经营形态、某一类聚集。此时被清除者本身承担着某种功能，位置将被接管，而接管者的可见性低于前者。由此得到一条明确的使用边界：<b>凡被清理对象本身承担某种功能者，即已越出破窗理论的适用范围</b>，无论其外观多么符合"失序"的描述。</p>
+
+<h3>2.5 与最小干预原则</h3>
+
+<p>医学、生态与法律实践中通行的谨慎原则与本研究方向一致，但它是一种<b>态度</b>而非判据：它对三类系统一体地要求克制。</p>
+
+<p>而本研究给出的判断与之部分冲突：<b>在规格授予型系统中，克制是错误的</b>——手术室的无菌、药品的纯度限值、检查单的执行，此处犹豫本身即是代价。一条对所有类型一体适用的原则，等于没有分辨力。更实际的差别在于方向：最小干预告诉行动者"少动"，本研究告诉行动者<b>动之前应当提出的那一问</b>，以及三个答案各自对应的处置。</p>
+
+<h3>2.6 与系统思维</h3>
+
+<p>"看到关联""考虑整体"同样正确而含糊，其结构问题与最小干预一致：它未说明何时不需要。</p>
+
+<p>按本研究，<b>规格授予型系统中确实不需要</b>：晶圆中的一个铁原子不需要被放回系统关联中理解，它就是杂质。把系统思维施用于该层，只会使一件本可清晰处置的事失去可操作性。</p>
+
+<h3>2.7 校验结论</h3>
+
+<p>六个邻近论述中，三个（打地鼠、生态位、破窗）与本研究的位置授予层部分重叠而不覆盖，两个（最小干预、系统思维）是不分层的态度性主张，一个（意外后果）是无结构的一般命题。<b>没有任何一个能覆盖"授予者决定清除性质"这一辨别面</b>，尤其没有一个能同时容纳"在某一类系统中应当彻底清除"与"在另一类系统中清除必然是重排"这两个判断。</p>
+
+<hr class="rule">
+
+<h2>三、概念界定：身份授予的三种机制</h2>
+
+<h3>3.1 授予（assignment）</h3>
+
+<p>本文所称<b>授予</b>，指某一成分被判定为"不属于此系统"这一身份的确立过程。该过程的关键在于：它是一个<b>关系性事件</b>，而非对被判定物内在性质的读取。同一成分在不同授予下可获得相反身份，且不发生任何自身变化。</p>
+
+<p>需要与两个近义词区分。<b>分类</b>指把对象归入既有类别，预设类别体系已存在；<b>标注</b>指为对象附加标记，预设标记与对象可分离。授予比二者更靠前：<b>它设立那个使"杂质"这一类别得以成立的关系</b>。</p>
+
+<h3>3.2 三种授予机制</h3>
+
+<p><b>规格授予（specification assignment）。</b>身份由一份外部的、事先写定的规格决定：规格之内为允许，之外为杂质。其成立的必要条件是<b>运行环境可被事前穷举</b>——系统将要遭遇的情况在设计阶段已被完整列出，系统在运行中不需要习得任何新的分类。半导体制造、药品质量控制、飞行前检查、财务对账属于此类。</p>
+
+<p><b>遭遇授予（encounter assignment）。</b>不存在事先的规格，身份由系统自身在与外界的反复碰撞中习得：反复遭遇而未产生损害者被归入"无须反应"，产生损害者被归入"须反应"。其成立的必要条件是<b>存在足量的、系统事先不知其无害的接触</b>。免疫系统的自我—非我判别、临床工作者的异常识别、组织对风险信号的敏感度属于此类。</p>
+
+<p><b>位置授予（position assignment）。</b>身份既非由规格给定，亦非由系统习得，而由被判定物此刻所占据的功能位置决定。同一成分移至另一位置，其身份可以翻转。微生物群落、生态系统、产业链、组织内的人际结构属于此类。</p>
+
+<h3>3.3 三者的相互关系</h3>
+
+<p>三种授予不是同一连续谱上的三段，这一点须加强调，因为它是本研究最易被误读之处。</p>
+
+<p>若视为连续谱，则三者可依"环境可指定程度"由高到低排列，规格授予为高端、位置授予为低端。这一读法在前两者之间大致成立，在通向第三者时垮塌：<b>位置授予的特征不是可指定程度更低，而是身份可以在不发生任何自身变化的情况下转移到另一成分身上</b>。这是一个关于<b>身份归属</b>的性质，不是关于<b>确定性高低</b>的性质。前二者讨论"我们能不能事先说清什么算杂质"，第三者讨论"杂质这个身份属于谁"。</p>
+
+<h3>3.5 三种授予的可观察指标</h3>
+
+<p>为使三分具备操作性，需给出各自的可观察指标，而非仅依赖概念定义。</p>
+
+<table class="tbl">
+<tr><th>授予机制</th><th>可观察指标</th><th>反面指标</th></tr>
+<tr><td>规格授予</td><td>存在一份成文的、可被第三方核对的允许／禁止清单；事故后的标准动作是修订该清单</td><td>清单存在但历次事故均不在其上</td></tr>
+<tr><td>遭遇授予</td><td>系统的判别标准随运行历史而变；同一输入在不同时期得到不同处置，且该变化可被从业者说明</td><td>标准由外部给定且从不因运行经验而调整</td></tr>
+<tr><td>位置授予</td><td>同一成分移至系统内另一位置后，其被评价的性质发生翻转</td><td>成分的性质在任何位置上保持一致</td></tr>
+</table>
+
+<p>三项指标彼此独立，故一个系统可在多项上同时为真——这正是 3.4 所述叠加情形的操作性表述。指标间的冲突不构成矛盾，而提示该系统的不同层面分属不同类型，应分层处置。</p>
+
+<h3>3.4 三类系统的叠加</h3>
+
+<p>现实系统通常在不同层面上分属不同类型。以一所医院为例：手术室的无菌管理属规格授予；临床判断力的养成属遭遇授予；科室间的人员结构属位置授予。三层共处一栋建筑之内。</p>
+
+<p>这一事实是第七节所论误配的结构性来源：<b>管理者往往以同一套方法处理三层</b>，而所选者通常是规格型方法，因为它最成熟、最可执行、最易验收。</p>
+
+<hr class="rule">
+
+<h2>四、机制一：规格授予下的清除——减法及其成立条件</h2>
+
+<h3>4.1 掺杂工序的理论意义</h3>
+
+<p>半导体工艺中的掺杂常被作为"杂质有益"的悖论来援引，这一援引是错误的，且其错误具有教益。</p>
+
+<p>被引入的硼与磷<b>在该语境中不是杂质</b>：它们具有规格规定的浓度、深度与分布。它们与"意外混入的一粒铁"在化学上同为非硅原子，在授予上却分属两类。由此可将规格授予的定义精确化：</p>
+
+<p class="pull">杂质并非"非目标成分"，而是"<b>规格之外</b>的成分"。该定义成立的前提，是存在一份完整的规格。</p>
+
+<h3>4.2 成立条件与失败模式</h3>
+
+<p>规格授予的成立条件已在 3.2 给出：运行环境可事前穷举。其唯一的失败模式因而是<b>规格不全</b>——某一有害成分未被写入清单。其对策相应地也是闭合的：事故发生后修订规格。这是一套自洽且成熟的工艺，本研究对其内部无所增益。</p>
+
+<p>需要指出的只有一点：<b>该套方法不携带"我不适用于何处"的说明</b>。它在自身域内从未失手，这使其向外扩张缺乏内生的制动。第七、八节所论的误配，其动力正来源于此。</p>
+
+<h3>4.3 一个用以自查的问题</h3>
+
+<p>判断某系统是否属于规格授予型，最可靠的方式不是询问从业者的判断，而是检视其历史：</p>
+
+<p><b>过去两至三年内发生的意外，有多少事先列在清单之上？</b>多数在清单之上（问题在执行）→ 规格型；多数不在清单之上，且每次事故后的动作是"向清单增列一条"→ <b>该系统不属规格型，但正以规格型方式运行</b>。这是第七节所述第一种误配的标准形态。</p>
+
+<hr class="rule">
+
+<h2>五、机制二：遭遇授予下的清除——校准材料的连带移除</h2>
+
+<h3>5.1 通俗表述的错误及其可检验后果</h3>
+
+<p>"环境过于清洁导致免疫力下降"是该领域研究在公共传播中最常见的版本，而它与证据不符。</p>
+
+<p>若后果是强度下降，则过度清洁环境中成长的人群应表现出对病原的易感性上升。实际观察到的是<b>过敏、自身免疫病与炎症性肠病的上升</b>——三者均为反应过度而非反应不足的疾患。</p>
+
+<p>这一分歧不是措辞之争，它提供了本机制最重要的<b>判别标志</b>：</p>
+
+<p class="pull">遭遇授予型系统在校准材料被过度清除后，其表现不是迟钝，而是<b>误判</b>——它开始对无害之物施加反应。</p>
+
+<p>两种表述给出方向相反的可检验预测，因而是可裁决的。</p>
+
+<h3>5.2 校准材料的定义与不可替代性</h3>
+
+<p>本文将遭遇授予型系统赖以建立分类的那批接触称为<b>校准材料</b>。其定义性特征有三：数量足够、确实无害、<b>而系统事先不知其无害</b>。第三条是关键，它同时解释了一个反直觉的经验事实。</p>
+
+<p>该事实是：将相关微生物制成制剂补充回去，其效果显著弱于其原本存在于环境之中。既有解释多诉诸菌株构成、定植窗口或剂型限制，这些解释在具体层面成立，但存在一个更靠前的结构性理由：</p>
+
+<p class="pull">补充制剂是<b>被设计过的</b>——它已构成一份经筛选、纯化、剂量确定的清单，即已转化为规格授予型的对象。而遭遇授予型系统需要习得的，恰是<b>应对未列于任何清单之物</b>的能力。以清单训练"处理清单外情况"的能力，在结构上不可能实现。</p>
+
+<p>这一推论可脱离免疫学语境而一般化，并在第七节用于解释组织层面的对应失败。</p>
+
+<h3>5.3 一个自我加强的循环</h3>
+
+<p>该机制的危险性不止于后果本身，还在于其后果的<b>常规读法会诱导进一步的同向动作</b>。</p>
+
+<p>一个长期未遭遇异常的团队，在首次遭遇轻度异常时会表现出过度反应。管理者对此的自然判断是"环境仍不够可控"，随之采取的动作是进一步压缩异常输入。而这恰是加深校准材料匮乏的动作。</p>
+
+<p>循环的每一步都合乎其局部理性，且中间不存在任何一处可被指认为错误的决定——这是本研究反复出现的结构特征，第八节将说明其制度根源。</p>
+
+<hr class="rule">
+
+<h2>六、机制三：位置授予下的清除——重排与命名衰减</h2>
+
+<h3>6.1 清除的对象与清除的效果不在同一层</h3>
+
+<p>位置授予型系统的定义性特征是：成分的作用取决于其周围有何物。由此直接得到本机制的核心命题：</p>
+
+<p class="pull">被清除的是一个<b>具体成分</b>，被改变的是一张<b>位置表</b>。而位置不会保持空缺。</p>
+
+<p>幽门螺杆菌案例中，根除所带来的不止是"少了一种细菌"，还包括胃酸水平的改变，而胃酸水平连接着食管端的风险结构。此非副作用清单中的一条：<b>它就是该清除动作在位置授予型系统中的本体</b>。</p>
+
+<h3>6.2 命名衰减</h3>
+
+<p>接管发生之后，还有一层后果，本文称之为<b>命名衰减</b>（decay of nameability）。</p>
+
+<p>被清除者通常是<b>最易被识别的那一个</b>——正因其易于识别，它才成为首个目标：它有名称、有明确特征、有成熟的检测手段。而接管者尚未被研究、尚无名称、尚无检测方法。因此：</p>
+
+<p class="pull">每一轮成功的清除，都使下一轮问题的可命名程度下降。这不是清除不彻底的后果，恰是清除彻底的后果。</p>
+
+<p>该命题给出一项可查的预测：在位置授予型系统中，连续多轮治理之后，从业者对问题的描述精度将单调下降——首轮对象有清晰名称，次轮需费力描述，数轮之后普遍出现"现在的问题很难讲清楚"这类表述。而此时的常规反应是加大对"新形态"的研究投入；该反应本身无误，但<b>在结构上永远滞后一轮</b>，因为研究要求对象已具形态，而形态需待其长成。</p>
+
+<h3>6.3 增加同样是重排</h3>
+
+<p>位置授予型系统中还有一个方向相反、且更少被注意的推论：<b>引入一个新成分，同样是一次重排</b>。</p>
+
+<p>引入新流程、新岗位、新指标、新工具时，通常只计算其自身收益，很少追问它将占据谁的位置。而这一侧比清除更隐蔽：清除至少留下一个明确消失的对象，人们尚记得清除了什么；<b>增加不产生任何缺口，它只是使别的成分逐渐失去位置</b>。</p>
+
+<p>一个组织增设一套汇报流程，未清退任何人，但原有的"顺路交代一句"这一沟通位置被占满——它并未被禁止，只是不再有时间。若干月后出现"信息传递变慢"的观感，而几乎无人会将其与那套流程相联系，因为该流程未删除任何事物。</p>
+
+<p>就本研究的完整性而言，此处必须承认一处失衡：<b>本文的绝大部分篇幅用于"清除"一侧，而现实中的多数重排来自"增加"一侧</b>。其原因是结构性的——减法有明确对象，加法没有，而有对象者易于研究。这一失衡在第十一节被列为本研究的公开局限。</p>
+<hr class="rule">
+
+<h2>七、跨类型误用：三种误配及其固定形状</h2>
+
+<p>三种授予各自成立于自身域内。实践中的多数失败并非源于三者本身，而源于<b>跨类型误用</b>。本节给出三种误配的固定形状与最小对策。</p>
+
+<h3>7.1 误配一：以规格型方法处理遭遇型系统（最常见）</h3>
+
+<p><b>形状。</b>将判断写为规程；将规程细化至覆盖全部已知情况；要求严格执行；遭遇规程之外的情况时无人具备处置能力；结论为规程仍不够细。</p>
+
+<p><b>其普遍性的来源。</b>该路径的首轮几乎总是有效——已知情况本占绝对多数，故规程化确实立即改善了平均水平。其代价只在遭遇规程外情况时兑现，而彼时通常已隔数年，且当初决策者多已不在该岗位。<b>收益即期而可见，代价延迟而不可归因</b>，这构成一个稳定的正反馈。</p>
+
+<p><b>与 5.2 的连接。</b>该误配的深层机制正是校准材料的移除：严格执行本身即是把"系统事先不知其无害的接触"从流程中剔除。因而它的后果符合 5.1 给出的判别标志——不是执行者变得迟钝，而是他们在遭遇异常时反应失准（对无关小事过度紧张，对真正的危险信号迟钝）。</p>
+
+<p><b>最小对策。</b>不是废止规程（规程本身具有高价值），而是<b>在规程之外明确保留一类"允许自行判断"的情况，并要求将处置过程记录以供后来者查阅</b>。保留的比例不重要，其存在与否才重要——因为它是该系统中唯一仍在产生校准材料的环节。</p>
+
+<h3>7.2 误配二：以规格型方法处理位置型系统</h3>
+
+<p><b>形状。</b>将一个互相牵制的系统当作一份成分清单处理：清退某类经营形态、某类人员、某类内容。每一项均清晰、可执行、可统计。</p>
+
+<p><b>其普遍性的来源。</b>位置型分析在决策场合中<b>无法与之竞争</b>：它给不出可计量的产出。"清退三百家不合格商户"与"该位置可能被谁填补尚不确定"这两句陈述在任何评审会上的说服力不对称，而这一不对称与双方的正确性无关。</p>
+
+<p><b>最小对策。</b>不是不清，而是<b>在方案中增设"该位置将被谁填补"一栏，并要求其答案具体</b>。答不出并不构成禁止执行的理由，但"答不出"这一事实本身须被记录——因为若干月后出现的接管者，只有对照该栏方能被辨认。此处再次体现本研究处方的一贯形式：所有对策均被写成可交付的条目，其理由见第八节。</p>
+
+<h3>7.3 误配三：以位置型思路处理规格型系统（少见但危险）</h3>
+
+<p><b>形状。</b>在本应按规格清除之处，以"它可能另有作用""系统需要多样性"为由延宕。</p>
+
+<p><b>其危险性。</b>该误配的辩护词在修辞上优于对方——指出"事情很复杂"永远比"照规程办"显得更具洞察，而在规格型系统中，照规程办才是正确的。手术室的无菌、药品的限值、急性中毒的处置，此处的延宕直接以生命为代价。</p>
+
+<p><b>识别方法。</b>提出一个具体性检验：<b>能否说出它在哪一个具体位置上发挥何种具体作用？</b>能说出者，可能确属位置型；仅能泛泛陈述"总有它的道理"者，即为误配三，而它通常只是不愿动手的托词。</p>
+
+<h3>7.4 三种误配的共同来源</h3>
+
+<p>三者并置可见一个共同点：<b>它们均非源于无知，而源于某一类方法在特定组织条件下更易被通过</b>。这一判断构成下一节的主题。</p>
+
+<hr class="rule">
+
+<h2>八、为什么误配不会自行纠正：交代结构的不对称</h2>
+
+<h3>8.1 三项不对称</h3>
+
+<p>清除方案相对于观察方案，具备三项后者完全不具备的属性：</p>
+
+<p><b>其一，明确的完成时刻。</b>清除有"清完了"这一时点，观察没有。</p>
+
+<p><b>其二，可数的成绩。</b>清除产出"清除了多少"这一数字，观察产出"尚未出现异常"这一非事件。</p>
+
+<p><b>其三，当期可见的效果。</b>清除的效果在当期即可被验收，观察的效果须待若干周期。</p>
+
+<p>三项属性恰好是任何向上交代所要求的三项。因此：</p>
+
+<p class="pull">在需要向上交代的场合，清除方案对观察方案具有系统性优势。这一优势与两者的正确性无关——<b>不是清除更有道理，是清除更好交代</b>。</p>
+
+<h3>8.2 对本研究处方形式的约束</h3>
+
+<p>上述判断反过来严格约束了本研究可以提出何种对策。既然误配的根源是交代结构，则：</p>
+
+<p class="pull">凡不能被写成一栏、交上去、并被追问的做法，皆无法存活于第一次进度压力。</p>
+
+<p>这解释了为何第七节与第十一节给出的全部对策均采取"增设一栏""写入方案""留存记录"这一形式。此非对记录形式的偏好，而是<b>唯有可被交代之物方能存续</b>这一约束的直接产物。</p>
+
+<h3>8.3 一个推论：认识提升不构成对策</h3>
+
+<p>由 8.1 可直接推出：以"提高认识""加强培训"为路径的干预对本研究所述误配无效。因为误配并非源于决策者不了解位置型系统的复杂性，而源于<b>了解之后仍无法在交代结构中兑现这一了解</b>。</p>
+
+<p>这一推论亦为本研究提供了一项可证伪条件，见第十二节第七条。</p>
+
+<hr class="rule">
+
+<h2>九、三次并列演算：同一动作，三类系统</h2>
+
+<p>本节以同一形式的动作——"清除一个反复出问题的成分"——在三类系统中各演一次，并附一例制度层面的同构放大，以给出经验形态。</p>
+
+<h3>9.1 生产线（规格授予）</h3>
+
+<p>某批次产品持续不合格，追溯至某种来料杂质超标。更换供应商，问题消失。</p>
+
+<p><b>动作性质：</b>减法。规格规定该杂质限值，来料超限，清除后达标。</p>
+
+<p><b>后续：</b>无后续。除非规格另有缺项，而那属于另一事件。</p>
+
+<p>此例值得记取，因为<b>我们关于"解决问题"的全部直觉正来源于此类系统</b>——干净、彻底、可验收、不反弹。而该直觉的养成环境，恰是三类中范围最窄的那一类。</p>
+
+<h3>9.2 年轻医师（遭遇授予）</h3>
+
+<p>某年轻医师判断失误率偏高。带教方式调整为：将其全部拿不准的病例上转，仅由其处理明确者。失误率随即降至零。</p>
+
+<p><b>动作性质：</b>被清除的是"其可能出错的机会"。而在遭遇授予型系统中，出错机会与建立分类的机会是<b>同一事物</b>——分类正是通过反复遭遇"形似而非"的情形而建立的。</p>
+
+<p><b>后续：</b>数年后，其在标准病例上表现无懈可击，而在非典型情形下呈现两种并存的缺陷——对轻微异常过度紧张，对真正的危险信号反应迟钝。该形态与 5.1 的判别标志完全一致。</p>
+
+<p><b>常规解释与其失效：</b>通行的解释是"经验不足，仍需带教"。若带教方式不变，延长时间不改变结果——<b>缺的不是时间，是材料</b>。</p>
+
+<h3>9.3 团队（位置授予）</h3>
+
+<p>某成员在会议上持续提出反对意见，项目推进缓慢。将其调离后，会议效率与决议通过率显著上升。</p>
+
+<p><b>动作性质：</b>被清除的是一个人，被改变的是一张位置表。"提出反对"这一功能位置有三种去向：由次一位倾向于提出异议者接管（其表达更为审慎，因而更难被注意）；被分摊至多人（每人各承担少许，因而任何单条均不足以中止议程）；或位置消失（所有人习得该位置的后果，无人再占据）。</p>
+
+<p><b>后续：</b>会议记录改善，决议通过率上升，返工率于半年后上升。而后两者之间的关联几乎不会被建立——中间隔着半年，且返工具有上百种可解释原因。</p>
+
+<h3>9.4 一项治理措施（位置授予，制度层面）</h3>
+
+<p>某类经营形态被判定为影响市容与秩序，予以清退。清退后街面观感改善，相关投诉下降，该项治理按其验收标准完成。</p>
+
+<p><b>动作性质：</b>被清除的是若干具体经营者，被改变的是该街区"提供日常低价需求"这一功能位置的占据者。该位置不会空缺：或由租金承受能力更强、与街区关系更浅的业态填补，或由不在监管视野内的形态填补。</p>
+
+<p><b>后续与命名衰减：</b>若由前者填补，数年后出现的是"街区活力下降"这类难以归因的观感；若由后者填补，则新形态因不具备既有分类而难以被指认，下一轮治理的对象须先经过一段"说不清是什么"的时期方能成形。两种去向均符合 6.2 的预测。</p>
+
+<p>此例的价值在于它同时具备三项特征：动作有明确的执行者与完成时刻；当期验收指标全面改善；而后续变化与该动作之间的因果链在实践中几乎无法被建立。它是 9.3 在制度层面的同构放大。</p>
+
+<h3>9.5 四例并置</h3>
+
+<table class="tbl">
+<tr><th></th><th>生产线</th><th>年轻医师</th><th>团队</th></tr>
+<tr><td>清除对象</td><td>一种来料</td><td>出错的机会</td><td>一个人</td></tr>
+<tr><td>实际改变</td><td>成分表</td><td><b>校准材料</b></td><td><b>位置表</b></td></tr>
+<tr><td>当期效果</td><td>良好</td><td>良好（失误归零）</td><td>良好（效率上升）</td></tr>
+<tr><td>后续</td><td>无</td><td>过度紧张与迟钝并存</td><td>异议转入不可见状态</td></tr>
+<tr><td>因果可指认性</td><td>高</td><td>低</td><td>极低</td></tr>
+</table>
+
+<p>倒数第二行与最末行是本节的要点：<b>三个动作在当期均属成功——非近似成功，而是按各自验收标准的彻底成功</b>；差异全部落于验收之后，且沿表格自左向右单调降低可指认性。</p>
+
+<p class="pull">因此，三类系统中最不应实施的那两次清除，其当期成绩单与第一次并无二致，甚至更为可观。</p>
+
+<hr class="rule">
+
+<h2>十、正面回应五项反驳</h2>
+
+<h3>10.1 "三分法只是程度差异的粗糙表述"</h3>
+
+<p>此为最强反驳。若三类可被还原为"环境可指定程度"这一连续变量，则本研究只是给一个连续谱贴了三个标签。</p>
+
+<p><b>回应见 3.3：</b>该还原在前两类之间大致成立，在通向第三类时垮塌。位置授予的特征不是可指定程度更低，而是<b>身份可在被判定物不发生任何自身变化的情况下转移至另一成分</b>。这是关于身份归属的性质，与确定性高低不属同一维度。判别方法是操作性的：<b>把它移至另一位置，其性质是否翻转</b>？翻转者为位置型，无论其环境可指定程度如何。</p>
+
+<h3>10.2 "免疫学证据不足以支撑一般结论"</h3>
+
+<p>老朋友假说本身仍在发展中，其机制细节存在争论，以之推出跨领域的一般命题是否过度？</p>
+
+<p><b>回应：</b>本研究所借用的不是该假说的机制解释，而是其<b>现象与方向</b>：过度清洁环境中上升的是反应过度类疾患而非易感性。这一方向性事实在流行病学层面较为稳固，且独立于哪一派机制解释最终胜出。第十一节第二条正是以此方向为可证伪条件。</p>
+
+<h3>10.3 "幽门螺杆菌的例证已被近年证据削弱"</h3>
+
+<p>确实如此，且本研究不回避。</p>
+
+<p><b>回应：</b>本研究使用该案例所依赖的，是"同一细菌在胃与食管两端相关方向相反"这一点，该点无争议；<b>而非</b>"根除将抬高食管腺癌"这一点，该点有争议且近年多国队列的结果站在本研究叙事的反面。两者不是同一命题。本研究的位置授予概念只需前者，不需后者。此处的处理原则见第十二节末的自反声明。</p>
+
+<h3>10.4 "这将为不作为提供智性上的辩护"</h3>
+
+<p>这是本研究最需防范的实践风险。第七节第三种误配已正面处理：以位置型思路处理规格型系统是危险的，且其辩护词在修辞上优于对方。</p>
+
+<p><b>回应中的检验：</b>提出具体性检验（能否指出具体位置与具体作用）与意图检验（是在为该成分辩护，还是在为清除之后作准备）。二者均不通过者，即非位置型分析，而是含糊其辞。</p>
+
+<h3>10.5 "现实中的清除并非一个动作"</h3>
+
+<p>此项反驳本研究无法反驳，只能承认。</p>
+
+<p>现实中的清除极少是一个可被指认的动作，它通常是一连串小决定的累积：本批不合格、此人调离、该类内容下架、这段时间排满。没有任何一次构成"清除"，而合起来即是。</p>
+
+<p>这对本研究的处方是致命的：第七节与第十一节的全部对策——增设一栏、分批实施、留观察窗口——均预设存在一个可被安上流程的明确时点。对累积式清除，这些对策一条也不适用。能给出的只有一句：<b>累积式清除只在回看时可辨，因而该回看必须被专门安排，否则不会发生</b>；而如何为一件没有触发点的事安排流程，本研究答不出。此为本研究最大的公开空白，列入第十二节局限。</p>
+
+<hr class="rule">
+
+<h2>十一、研究设计：三项可执行的检验</h2>
+
+<p>本研究属概念建构型，不报告已完成的经验检验。为使其主张可被独立裁决，本节给出三项设计，均以现有条件可执行为约束。</p>
+
+<h3>11.1 设计一：分类一致性检验（对应可证伪条件第一条）</h3>
+
+<p><b>目的：</b>检验第三节三问是否构成可操作的判别程序。</p>
+
+<p><b>方法：</b>选取十五至二十个真实系统的书面描述（每份三百至五百字，涵盖工程、临床、教育、组织、公共治理五个域，且不含本研究的任何术语）。招募三组编码者：具本研究背景者、仅接受三问程序训练者、未受训者。三组独立分类，计算组内与组间一致性。</p>
+
+<p><b>裁决标准：</b>受训组的组内一致性若不显著高于未受训组，则三问不构成有效程序，本研究的实践主张落空。此外，若受训组一致性高而与具背景组的判断系统性偏离，则提示三问未能捕捉概念本身。</p>
+
+<p><b>成本：</b>一日内可完成。这是本研究成本最低、也最应优先执行的一项。</p>
+
+<h3>11.2 设计二：命名衰减的档案检验（对应第五条）</h3>
+
+<p><b>目的：</b>检验 6.2 的命名衰减命题。</p>
+
+<p><b>方法：</b>选取三至五个已持续治理十年以上的领域，调取其历年的正式文件与行业刊物，按年度抽取对治理对象的描述段落。以两项指标编码：<b>对象具名率</b>（描述中出现专有名称的比例）与<b>描述长度</b>（界定该对象所需的字数）。若命名衰减成立，则具名率随治理轮次单调下降，而描述长度单调上升。</p>
+
+<p><b>裁决标准：</b>若两项指标无趋势，或呈相反趋势，则命名衰减命题错误。</p>
+
+<p><b>混杂控制：</b>需区分"对象确实更难命名"与"文书风格趋于笼统"这两种来源。控制方式为同期抽取同一机构对<b>非治理对象</b>的描述作为基线；若基线同步笼统化，则观察到的趋势归因于文书风格而非命名衰减。</p>
+
+<h3>11.3 设计三：留白规程的对照实施（对应第七条）</h3>
+
+<p><b>目的：</b>检验 7.1 的最小对策是否有效，并同时检验第八节"误配源于交代结构"的判断。</p>
+
+<p><b>方法：</b>在同一机构内选取条件相近的两组作业单元。实验组在既有规程之外，明确保留一类"允许自行判断"的情况，并要求记录处置过程；对照组维持原状。第三组作为交代结构对照：同样保留自行判断类别，但<b>不要求记录、不纳入任何汇报</b>。</p>
+
+<p><b>观测指标：</b>十二至十八个月后，三组在遭遇规程外情况时的处置质量；以及第三组的留白规定是否仍在实际执行。</p>
+
+<p><b>裁决标准：</b>若实验组与对照组无差异，则 7.1 的对策无效。若实验组优于对照组，<b>而第三组的留白规定已名存实亡</b>，则第八节关于"唯有可被交代之物方能存续"的判断得到支持；若第三组同样存续良好，则该判断被削弱——而这将解除本研究对处方形式的全部约束，其理论后果大于该项对策本身。</p>
+
+<h3>11.4 三项设计的关系</h3>
+
+<p>三项设计分别针对本研究的三个层次：设计一检验<b>分类是否可用</b>，设计二检验<b>机制是否为真</b>，设计三同时检验<b>对策是否有效</b>与<b>对策形式的理由是否成立</b>。三者可独立执行，其结论亦独立成立——设计一失败并不使设计二的结论无效，反之亦然。</p>
+
+<hr class="rule">
+
+<h2>十二、经验边界、局限与可证伪条件</h2>
+
+<h3>12.1 四条不适用边界</h3>
+
+<p><b>其一，紧急与高危场合按规格型处置。</b>后果不可逆、时间不允许且已有成熟规格者，引入本框架具有实际危险——它会为延宕提供智性上的正当理由。</p>
+
+<p><b>其二，存在于任何相关位置上皆有害之物。</b>本研究不为其提供豁免。判别方式是老实的：<b>能否找出其发挥正面作用的具体位置</b>？找不出者，按规格型处置。</p>
+
+<p><b>其三，本研究不构成保留低效成分的理由。</b>检验见 10.4。</p>
+
+<p><b>其四，三类判别本身可能出错。</b>第三节的三问不是精确仪器，多数系统的答案介于两者之间。判错的代价不对称：将规格型误判为位置型导致该清不清；将位置型误判为规格型导致清后被接管。本研究无法消除该误差，仅能提供一条经验路径：<b>检视意外的来源</b>（4.3）。</p>
+
+<h3>12.2 三项局限</h3>
+
+<p><b>局限一：三类界线远比本文的表述模糊。</b>为使三分法可操作，本文将"运行环境能否被完整列举"处理为可作是否判断的问题；实际上它是连续的，且多数系统落于中段。第三节三问是粗筛而非量尺。</p>
+
+<p><b>局限二：本研究未处理时间维度。</b>一个系统可由一类转为另一类：随着规程成熟，原本依赖现场判断的工种向规格型移动；而原本规格清晰的领域在遭遇未见情形时退回遭遇型。该转换过程本文未着一字，而它可能是最要紧的部分。</p>
+
+<p><b>局限三：本研究的篇幅严重偏向"清除"一侧。</b>见 6.3。现实中多数重排来自增加，而本文九成篇幅用于减法，其原因是结构性的——减法有对象，加法没有。</p>
+
+<h3>12.3 七项可证伪条件</h3>
+
+<ol class="falsify">
+<li><b>三分不可操作。</b>若若干具专业背景者分别以第三节三问对同一批系统分类，结果无法达成一致，则该三分不可用，本研究全部实践主张随之落空。<b>此项检验成本极低。</b></li>
+<li><b>过度清洁的后果是易感性上升而非误判。</b>若在高度清洁环境中成长的人群，其感染性疾病易感性的上升幅度显著超过过敏与自身免疫病，则 5.1 的核心推论不成立，通俗表述才是正确的。</li>
+<li><b>经设计的补充与自然接触等效。</b>若经筛选的微生物制剂在建立免疫调节上与自然环境接触效果相当，则"经设计的材料仅训练设计内能力"这一推论不成立——而该推论是本研究由免疫学侧抽出的关键一步。</li>
+<li><b>功能位置不被填补。</b>若在位置授予型系统中清除某成分后，其功能位置长期保持空缺而无接管者，则第六节整节不成立。</li>
+<li><b>可命名程度不下降。</b>若连续多轮治理之后，问题的可描述性未下降——从业者仍能如首轮般清晰陈述问题——则 6.2 的命名衰减命题错误。<b>此项可用任一治理逾十年领域的档案直接查验。</b></li>
+<li><b>分批与一次性清除无差异。</b>若在位置授予型系统中，分批清除与一次性清除在"能否识别接管者"上无差异，则 7.2 与第十一节设计三相应落空。</li>
+<li><b>认识提升即可纠正误配。</b>若以培训与宣导为主的干预能够稳定改变组织在三类系统上的方法选择，则第八节"误配源于交代结构而非认知"的判断错误，本研究对处方形式的全部约束随之解除。</li>
+</ol>
+
+<h3>12.4 本研究不主张什么</h3>
+
+<p>本研究不主张减少清理，不主张不洁优于清洁，不主张一切干预皆有害。它只主张一件事：<b>"是不是杂质"是一次身份授予的结果，而授予者之别决定了"清除"究竟是减法、是校准材料的连带移除，还是一次功能位置的重排。</b>其余全部内容皆由此一句推出。</p>
+
+<h3>12.5 自反声明</h3>
+
+<p>本研究本身即是一次提纯：它将三个领域各自杂乱、互相牵扯且存在争议的材料，整理为一套整洁的三分法。按其自身判断，该整理将腾出位置——那些不易归入三格的现象，将连同本文的整洁一并被清除，而接管该解释位置的将是这套三分法本身，包括它并不胜任的部分。</p>
+
+<p>据此，本文将被整理动作扫除的部分原样列出：</p>
+
+<p class="ledger">其一，第 1.2 节将幽门螺杆菌根除争议压缩为一句陈述，而该争议中<b>近年覆盖五国的多国队列未发现食管腺癌上升，其证据方向与本文叙事相反</b>；本文仍使用该案例，仅因"同一细菌在胃与食管两端方向相反"这一点无争议，二者不可混同。其二，三类界线是连续谱而非三格（12.2）。其三，本文未处理类型转换的时间维度（12.2）。其四，本文的篇幅严重偏向减法一侧（6.3）。其五，现实中的清除多为累积式而非单次动作，本文对此无解（10.5）。</p>
+
+<p>另附一条被否决的构造及其否决理由：本研究曾尝试将三类合并为"环境可指定程度"这一连续变量，该构造在推进至 6.2 的命名衰减时垮塌——因为那一步陈述的是身份的转移，而非程度的高低。正是这一否决，逼出了"授予"这一概念。</p>
+
+<hr class="rule">
+
+<h2>十三、结论：从"清什么"到"谁在授予"</h2>
+
+<p>本研究的结论可收束为三句。</p>
+
+<p><b>其一，清除不是一个语义单一的动作。</b>在规格授予下它是减法；在遭遇授予下它同时移除了系统建立分类所需的校准材料；在位置授予下它必然是一次功能位置的重排。三者不可互相还原，亦不可由"程度差异"统一。</p>
+
+<p><b>其二，三者的判别在动手之前即可完成，且成本极低。</b>问三句话：这套系统将要面对的情况能否事前列全；它是否需要在运行中修正自身的判断标准；其中成分的作用是否取决于周围有何物。更快的粗筛是检视过去数年的意外——它们当初是否列在清单之上。</p>
+
+<p><b>其三，误配的根源在交代结构而非认知，故对策的形式受此约束。</b>清除具备完成时刻、可数成绩与当期可见性，观察三者皆无。因此一切有效对策必须能被写成一栏、交上去、并被追问；不能如此者，皆无法存续。</p>
+
+<p>最后需要指出本研究在应用上最易被扭曲的一处：<b>其判据的正当用法是施于自身即将采取的动作，而非用以阻止他人</b>。"你是否考虑过该位置将被谁填补"这一问可使任何方案停滞，而提出者不承担任何代价。其有效的用法只有一种：在自己动手之前提出这一问；答不出者，先清一半，观察半年——由此将一个不可逆的动作转为一次可读的实验。</p>
+
+<hr class="rule">
+
+<h2>注 释</h2>
+
+<p class="ref">[1] 本文所称"提纯至十一个九"指区熔提纯（zone refining）在电子级多晶硅上可达的杂质浓度量级，属工艺常识性表述，非精确指标；掺杂浓度依器件类型差异极大，文中"十亿分之几"仅为量级示意。</p>
+<p class="ref">[2] 卫生假说与"老朋友"假说的关系在文献中有多种梳理方式，本文采用 Rook 的表述路径，即将后者视为对前者的机制性修正而非替代。</p>
+<p class="ref">[3] 幽门螺杆菌与食管腺癌关系的争论涉及混杂因素控制、随访期长度与萎缩不可逆性等多重技术分歧，本文不介入该争论，仅使用其无争议的部分，理由见 10.3 与 11.5。</p>
+<p class="ref">[4] 本文所称"校准材料"为新提出的概念，与免疫学中的"免疫调节诱导物"部分重叠但不等同：后者指特定生物类群，前者指该类群在系统分类建立中所承担的功能角色，因而可脱离生物学语境使用。</p>
+<p class="ref">[5] 第九节三例中，生产线一例为工艺常见情形之概括，医师与团队两例为综合多个同型情形的构造性示例，非特定个案的实录，其功能是展示机制形态而非提供证据。</p>
+
+<hr class="rule">
+
+<h2>参考文献</h2>
+
+<p class="ref">Blaser, M. J. (2008). Disappearing microbiota: <i>Helicobacter pylori</i> protection against esophageal adenocarcinoma. <i>Cancer Prevention Research</i>, 1(5), 308–311.</p>
+<p class="ref">Doorakkers, E., Lagergren, J., Engstrand, L., & Brusselaers, N. (2020). Reflux oesophagitis after eradication of <i>Helicobacter pylori</i>: A population-based cohort study. <i>Helicobacter</i>, 25, e12688.</p>
+<p class="ref">Hardin, G. (1968). The tragedy of the commons. <i>Science</i>, 162(3859), 1243–1248.</p>
+<p class="ref">Hutchinson, G. E. (1957). Concluding remarks. <i>Cold Spring Harbor Symposia on Quantitative Biology</i>, 22, 415–427.</p>
+<p class="ref">Illich, I. (1975). <i>Medical Nemesis: The Expropriation of Health</i>. London: Calder & Boyars.</p>
+<p class="ref">Merton, R. K. (1936). The unanticipated consequences of purposive social action. <i>American Sociological Review</i>, 1(6), 894–904.</p>
+<p class="ref">Pfann, W. G. (1958). <i>Zone Melting</i>. New York: John Wiley & Sons.</p>
+<p class="ref">Rook, G. A. W., Martinelli, R., & Brunet, L. R. (2003). Innate immune responses to mycobacteria and the downregulation of atopic responses. <i>Current Opinion in Allergy and Clinical Immunology</i>, 3(5), 337–342.</p>
+<p class="ref">Rook, G. A. W. (2023). The old friends hypothesis: Evolution, immunoregulation and essential microbial inputs. <i>Frontiers in Allergy</i>, 4, 1220481.</p>
+<p class="ref">Scott, J. C. (1998). <i>Seeing Like a State</i>. New Haven: Yale University Press.</p>
+<p class="ref">Strachan, D. P. (1989). Hay fever, hygiene, and household size. <i>British Medical Journal</i>, 299(6710), 1259–1260.</p>
+<p class="ref">Wilson, J. Q., & Kelling, G. L. (1982). Broken windows: The police and neighborhood safety. <i>The Atlantic Monthly</i>, 249(3), 29–38.</p>
+<p class="ref">王德生（2026）。《谁说它是杂质》。每日必读·典范文之二十二，SDE Universes。（本文的普及版本，二者结论一致而论证形式不同。）</p>
+
+</article>
+
+    <div class="foot-nav">
+      <div class="cl">
+        <a href="/creation/pdf/impurity-assignment.pdf" download style="border-color:var(--accent);color:var(--accent);font-weight:700">⬇ 下载 PDF · 24 页</a>
+        <a href="/creation/thesis/">← 回学位论文频道</a>
+        <a href="/creation/">← 学术创造专栏</a>
+        <a href="/taste/zhiwen/">→ 中华智问知识发生器</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+
+<!-- 参考文献 · sde-refs v1 -->
+<section id="sde-refs" style="max-width:820px;margin:56px auto 8px;padding:34px 30px;background:#FBF8F0;border:1px solid #E2D8C2;border-radius:6px">
+  <h2 style="font-size:20px;letter-spacing:0.14em;color:#7A5C1E;margin:0 0 10px">延伸参考文献 · Further References</h2>
+  <p style="font-size:13.5px;line-height:1.9;color:#A08A5C;margin:0 0 20px">下列文献为本文所涉思想脉络的原典与代表性研究，供读者对读与查证；与文中已引文献不重复，本文观点不代表所列作者立场。</p>
+  <ol style="margin:0;padding-left:22px;font-size:14px;line-height:1.85;color:#4A4335">
+    <li style="margin:0 0 9px;padding-left:6px">Karl Popper, The Logic of Scientific Discovery (1934/1959), London: Routledge；中译《科学发现的逻辑》，查汝强等译，中国美术学院出版社，2008。</li>
+    <li style="margin:0 0 9px;padding-left:6px">Karl Popper, Conjectures and Refutations, London: Routledge, 1963；中译《猜想与反驳》，傅季重等译，上海译文出版社，1986。</li>
+    <li style="margin:0 0 9px;padding-left:6px">Imre Lakatos, The Methodology of Scientific Research Programmes, Cambridge University Press, 1978.</li>
+    <li style="margin:0 0 9px;padding-left:6px">Thomas S. Kuhn, The Structure of Scientific Revolutions, University of Chicago Press, 1962；中译《科学革命的结构》，北京大学出版社，2003。</li>
+    <li style="margin:0 0 9px;padding-left:6px">Paul Feyerabend, Against Method, London: New Left Books, 1975；中译《反对方法》，周昌忠译，上海译文出版社，1992。</li>
+    <li style="margin:0 0 9px;padding-left:6px">Nancy Cartwright, How the Laws of Physics Lie, Oxford: Clarendon, 1983.</li>
+    <li style="margin:0 0 9px;padding-left:6px">Nancy Cartwright & Jeremy Hardie, Evidence-Based Policy: A Practical Guide to Doing It Better, Oxford University Press, 2012.</li>
+    <li style="margin:0 0 9px;padding-left:6px">Judea Pearl, Causality: Models, Reasoning, and Inference, 2nd ed., Cambridge University Press, 2009.</li>
+    <li style="margin:0 0 9px;padding-left:6px">Judea Pearl & Dana Mackenzie, The Book of Why, New York: Basic Books, 2018；中译《为什么》，江生、于华译，中信出版社，2019。</li>
+    <li style="margin:0 0 9px;padding-left:6px">Donald B. Rubin, "Estimating Causal Effects of Treatments in Randomized and Nonrandomized Studies", Journal of Educational Psychology, Vol. 66 (1974).</li>
+    <li style="margin:0 0 9px;padding-left:6px">Ray Pawson & Nick Tilley, Realistic Evaluation, London: Sage, 1997（机制-情境-结果）。</li>
+    <li style="margin:0 0 9px;padding-left:6px">Roy Bhaskar, A Realist Theory of Science, Leeds: Leeds Books, 1975（批判实在论）。</li>
+    <li style="margin:0 0 9px;padding-left:6px">Peter Hedström & Petri Ylikoski, "Causal Mechanisms in the Social Sciences", Annual Review of Sociology, Vol. 36 (2010).</li>
+    <li style="margin:0 0 9px;padding-left:6px">Robert K. Merton, "On Sociological Theories of the Middle Range", in Social Theory and Social Structure, New York: Free Press, 1968.</li>
+    <li style="margin:0 0 9px;padding-left:6px">Barney G. Glaser & Anselm L. Strauss, The Discovery of Grounded Theory, Chicago: Aldine, 1967.</li>
+    <li style="margin:0 0 9px;padding-left:6px">Andrew H. Van de Ven, Engaged Scholarship: A Guide for Organizational and Social Research, Oxford University Press, 2007.</li>
+    <li style="margin:0 0 9px;padding-left:6px">John P. A. Ioannidis, "Why Most Published Research Findings Are False", PLoS Medicine, Vol. 2 (2005).</li>
+    <li style="margin:0 0 9px;padding-left:6px">Open Science Collaboration, "Estimating the Reproducibility of Psychological Science", Science, Vol. 349 (2015).</li>
+    <li style="margin:0 0 9px;padding-left:6px">Herbert A. Simon, Administrative Behavior, New York: Macmillan, 1947（有限理性）。</li>
+    <li style="margin:0 0 9px;padding-left:6px">Herbert A. Simon, The Sciences of the Artificial, 3rd ed., Cambridge, MA: MIT Press, 1996.</li>
+    <li style="margin:0 0 9px;padding-left:6px">Richard M. Cyert & James G. March, A Behavioral Theory of the Firm, Englewood Cliffs: Prentice-Hall, 1963.</li>
+    <li style="margin:0 0 9px;padding-left:6px">Michael T. Hannan & John Freeman, "Structural Inertia and Organizational Change", American Sociological Review, Vol. 49 (1984).</li>
+  </ol>
+</section>
+
+
+<!-- 读者讨论区+阅读计数 · sde-talk v3 (Google实名) -->
+<section id="sde-talk">
+<style id="sde-talk-css">
+#sde-talk{max-width:722px;margin:56px auto 40px;padding:0 24px;line-height:1.9;text-align:left}
+#sde-talk .tk-title{font-size:20px;font-weight:800;letter-spacing:.04em;margin:0 0 4px;padding-bottom:12px;border-bottom:2px solid rgba(128,128,128,.3);text-indent:0}
+#sde-talk .tk-title span{font-size:13px;font-weight:400;opacity:.6;letter-spacing:.02em}
+#sde-talk .tk-hint{font-size:13px;opacity:.62;margin:10px 0 18px;text-indent:0}
+#sde-talk .tk-form{background:rgba(128,128,128,.06);border:1px solid rgba(128,128,128,.22);border-radius:8px;padding:16px 16px 12px;margin-bottom:26px}
+#sde-talk input,#sde-talk textarea{display:block;width:100%;box-sizing:border-box;font:inherit;color:inherit;background:rgba(128,128,128,.12);border:1px solid rgba(128,128,128,.3);border-radius:6px;padding:9px 12px;margin:0 0 10px;outline:none}
+#sde-talk textarea{min-height:88px;resize:vertical;line-height:1.8}
+#sde-talk input:focus,#sde-talk textarea:focus{border-color:rgba(128,128,128,.6)}
+#sde-talk .tk-bar{display:flex;justify-content:space-between;align-items:center}
+#sde-talk .tk-note{font-size:12px;opacity:.55}
+#sde-talk button{font:inherit;font-size:14px;letter-spacing:.2em;padding:7px 26px;border-radius:6px;border:1px solid currentColor;background:transparent;color:inherit;cursor:pointer;opacity:.85}
+#sde-talk button:hover{opacity:1}
+#sde-talk button:disabled{opacity:.4;cursor:default}
+#sde-talk #tk-msg{font-size:13px;margin-top:8px;opacity:.75;min-height:1em;text-indent:0}
+#sde-talk #tk-replying{font-size:13px;margin-bottom:8px;opacity:.8}
+#sde-talk #tk-replying a{margin-left:8px;text-decoration:underline;color:inherit;opacity:.7;cursor:pointer}
+#sde-talk .tk-item{border-bottom:1px solid rgba(128,128,128,.18);padding:16px 2px}
+#sde-talk .tk-head{font-size:13px;margin-bottom:5px;text-indent:0}
+#sde-talk .tk-name{font-weight:700}
+#sde-talk .tk-time{opacity:.5;margin-left:10px;font-size:12px}
+#sde-talk .tk-body{white-space:pre-wrap;word-break:break-word;font-size:15.5px;text-indent:0;margin:0}
+#sde-talk .tk-reply{display:inline-block;font-size:12px;margin-top:7px;color:inherit;opacity:.55;text-decoration:none;border-bottom:1px dashed currentColor;cursor:pointer}
+#sde-talk .tk-reply:hover{opacity:.9}
+#sde-talk .tk-sub{margin:12px 0 0 22px;padding:10px 14px;background:rgba(128,128,128,.07);border-left:2px solid rgba(128,128,128,.35);border-radius:0 6px 6px 0}
+#sde-talk .tk-empty{padding:26px 0;text-align:center;opacity:.55;font-size:14px}
+</style>
+<div class="tk-wrap">
+  <h2 class="tk-title">读者讨论区 <span id="tk-count"></span> <span id="sde-pv-wrap">· 本文已被阅读 <span id="sde-pv-n">—</span> 次</span></h2>
+  <p class="tk-hint">用 Google 账号登录即可发言——发言人就是你的 Google 账号名字。发言公开可见，请友善交流。</p>
+  <div class="tk-form" id="tk-gform">
+    <div id="tk-replying" style="display:none"><span id="tk-replying-to"></span><a id="tk-cancel">取消回复</a></div>
+    <div id="tk-signed" style="display:none;font-size:14px;margin-bottom:10px">以 <b id="tk-gname"></b> 的身份发言 <a id="tk-gout" style="margin-left:10px;font-size:12px;opacity:.6;text-decoration:underline;cursor:pointer">退出</a></div>
+    <div id="tk-gsi"></div>
+    <textarea id="tk-text" maxlength="1000" placeholder="你的问题，或你的见解…" style="display:none;margin-top:10px"></textarea>
+    <div class="tk-bar" id="tk-sendbar" style="display:none"><span class="tk-note">最多 1000 字 · 每人每天最多 30 条</span><button id="tk-send">发 言</button></div>
+    <div id="tk-msg"></div>
+  </div>
+  <div id="tk-list"></div>
+</div>
+</section>
+<script id="sde-talk-js">
+(function(){
+var slug="creation/thesis/biz-vetoing-knowledge",API="/api/comments?slug="+slug;
+function el(id){return document.getElementById(id)}
+var items=[],parent="";
+function note(s){el("tk-msg").textContent=s}
+var GCID="985037699618-de3smmqf2rer0pfhf4mrtrj3rgahgu5u.apps.googleusercontent.com",gcred="";
+try{var st=JSON.parse(sessionStorage.getItem("sde_gauth")||"null");if(st&&st.exp>Date.now()){gcred=st.cred;showSigned(st.name);}}catch(e){}
+function showSigned(n){el("tk-gname").textContent=n;el("tk-signed").style.display="block";el("tk-gsi").style.display="none";el("tk-text").style.display="block";el("tk-sendbar").style.display="flex";}
+function showSignIn(){gcred="";try{sessionStorage.removeItem("sde_gauth");}catch(e){}el("tk-signed").style.display="none";el("tk-gsi").style.display="block";el("tk-text").style.display="none";el("tk-sendbar").style.display="none";}
+window.__sdeGCb=function(resp){try{var p=JSON.parse(atob(resp.credential.split(".")[1].replace(/-/g,"+").replace(/_/g,"/")));var nm=(p.name||(p.email||"").split("@")[0]||"").slice(0,20);gcred=resp.credential;try{sessionStorage.setItem("sde_gauth",JSON.stringify({cred:gcred,name:nm,exp:Date.now()+50*60*1000}));}catch(e){}showSigned(nm);}catch(e){note("登录信息解析失败，请重试。");}};
+function bootGsi(){if(!(window.google&&google.accounts&&google.accounts.id)){el("tk-gsi").textContent="Google 登录组件加载失败——本讨论区需要 Google 账号登录后发言，请检查网络后刷新。";return}
+google.accounts.id.initialize({client_id:GCID,callback:window.__sdeGCb,auto_select:true});
+google.accounts.id.renderButton(el("tk-gsi"),{theme:"outline",size:"large",text:"signin_with",shape:"pill",logo_alignment:"left"});}
+(function(){var s=document.createElement("script");s.src="https://accounts.google.com/gsi/client";s.async=true;s.defer=true;s.onload=bootGsi;s.onerror=function(){el("tk-gsi").textContent="无法连接 Google 登录服务——本讨论区需要 Google 账号登录后发言。";};document.head.appendChild(s);})();
+el("tk-gout").onclick=showSignIn;
+function tme(ts){var d=new Date(ts),p=function(x){return (x<10?"0":"")+x};
+return d.getFullYear()+"-"+p(d.getMonth()+1)+"-"+p(d.getDate())+" "+p(d.getHours())+":"+p(d.getMinutes())}
+function head(c){var h=document.createElement("div");h.className="tk-head";
+var n=document.createElement("span");n.className="tk-name";n.textContent=c.name;
+var t=document.createElement("span");t.className="tk-time";t.textContent=tme(c.ts);
+h.appendChild(n);h.appendChild(t);return h}
+function para(s){var p=document.createElement("p");p.className="tk-body";p.textContent=s;return p}
+function replyLink(c){var a=document.createElement("a");a.className="tk-reply";a.textContent="回复";
+a.onclick=function(){if(!gcred){note("回复也需要先用 Google 账号登录——请在上方登录。");var g=el("tk-gsi");if(g&&g.scrollIntoView)g.scrollIntoView({behavior:"smooth",block:"center"});return}
+parent=c.id;el("tk-replying-to").textContent="回复 "+c.name+"：";
+el("tk-replying").style.display="block";el("tk-text").focus()};return a}
+function render(){var L=el("tk-list");L.textContent="";
+var tops=items.filter(function(c){return !c.parent});
+el("tk-count").textContent=items.length?"· "+items.length+" 条":"";
+if(!tops.length){var d=document.createElement("div");d.className="tk-empty";d.textContent="还没有发言——欢迎第一个开口。";L.appendChild(d);return}
+tops.forEach(function(c){var it=document.createElement("div");it.className="tk-item";
+it.appendChild(head(c));it.appendChild(para(c.text));it.appendChild(replyLink(c));
+items.filter(function(x){return x.parent===c.id}).forEach(function(x){
+var sb=document.createElement("div");sb.className="tk-sub";sb.appendChild(head(x));sb.appendChild(para(x.text));it.appendChild(sb)});
+L.appendChild(it)})}
+function load(){fetch(API).then(function(r){return r.json()}).then(function(d){items=d.items||[];render()}).catch(function(){})}
+el("tk-cancel").onclick=function(){parent="";el("tk-replying").style.display="none"};
+el("tk-send").onclick=function(){var text=el("tk-text").value.trim();
+if(!gcred){note("请先用 Google 账号登录。");return}
+if(text.length<2){note("内容太短了。");return}
+el("tk-send").disabled=true;note("发送中…");
+fetch(API,{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({credential:gcred,text:text,parent:parent})})
+.then(function(r){return r.json().then(function(d){return{s:r.status,d:d}})})
+.then(function(x){el("tk-send").disabled=false;
+if(x.d&&x.d.ok){el("tk-text").value="";parent="";el("tk-replying").style.display="none";note("已发布。");load()}
+else if(x.s===401){note("登录已过期，请重新登录。");showSignIn()}
+else{note((x.d&&x.d.msg)||"发送失败，请稍后再试。")}})
+.catch(function(){el("tk-send").disabled=false;note("网络异常，请稍后再试。")})};
+load();
+(function(){var pn=el("sde-pv-n");if(!pn)return;
+var day=new Date(Date.now()+8*3600*1000).toISOString().slice(0,10),k="sde_pv_"+slug.replace(/\//g,"_"),m="POST";
+try{if(localStorage.getItem(k)===day)m="GET";}catch(e){}
+fetch("/api/pv?slug="+slug,{method:m}).then(function(r){return r.json()})
+.then(function(d){if(d&&typeof d.total==="number"){pn.textContent=d.total.toLocaleString("zh-Hans-CN");
+if(m==="POST"){try{localStorage.setItem(k,day);}catch(e){}}}else{throw 0;}})
+.catch(function(){var w=el("sde-pv-wrap");if(w)w.style.display="none";});
+})();
+})();
+</script>
+
+<footer>
+  © 德麦国际 Demai International · 学术创造专栏 · 学位论文 · <a href="/">sdeuniverses.com</a>
+</footer>
+
+<script>window.WDS_READ={selector:"article"};</script>
+<script src="/taste/wds-companion/wds-read.js" defer></script>
+
+<script src="/wds-mode.js" defer></script>
+</body>
+</html>
