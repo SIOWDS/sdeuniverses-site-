@@ -19,7 +19,9 @@ SLUG = "swapped-out"
 OUT = COL / SLUG
 SKELETON = COL / "who-says-its-wrong" / "index.html"
 
-NO_CN = "二十一"
+# 序号不再手写：发布时向 tools/paradigm_ordinal.py 的台账领一个，
+# 领号以"推上去成功"为准，因此两条线并行也不会撞（详见该模块顶部说明）。
+NO_CN = None  # 由 claim() 填
 TITLE = "它不是坏掉的，是被一样一样换掉的"
 SUB = "为什么最要紧的那种东西，死的时候外面一点也看不出来"
 BYLINE = "王德生 ＋ Claude"
@@ -133,9 +135,16 @@ iframe{{width:100%;height:calc(100% - 56px);border:0;display:block}}</style></he
 
 
 def main():
+    global NO_CN
     ap = argparse.ArgumentParser()
     ap.add_argument("--src", required=True)
+    ap.add_argument("--ordinal", help="手动指定中文序号，跳过领号（补发/重建时用）")
     a = ap.parse_args()
+    if a.ordinal:
+        NO_CN = a.ordinal
+    else:
+        from paradigm_ordinal import claim
+        _, NO_CN = claim(SLUG, title=TITLE)
     md = Path(a.src).read_text(encoding="utf-8")
     body, toc = convert(md)
     chars = len(re.sub(r"<[^>]+>|\s", "", body))
