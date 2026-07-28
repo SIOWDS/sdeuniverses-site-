@@ -56,26 +56,35 @@ PAPERS = [{
 
 def strongify(s):
     s = html.escape(s, quote=False)
-    return re.sub(r"\*\*(.+?)\*\*", r"<b>\1</b>", s)
+    s = re.sub(r"\*\*(.+?)\*\*", r"<b>\1</b>", s)
+    s = re.sub(r"(?<!\*)\*([^*\n]+?)\*(?!\*)", r"<i>\1</i>", s)   # 期刊名用斜体
+    return s
 
 
 def md_to_html(md):
-    out, para, toc, n = [], [], [], 0
+    out, para, li, toc, n = [], [], [], [], 0
 
     def flush():
         if para:
             out.append("<p>" + strongify(" ".join(para)) + "</p>")
             para.clear()
 
+    def flush_li():
+        if li:
+            out.append("<ul>" + "".join(f"<li>{strongify(x)}</li>" for x in li) + "</ul>")
+            li.clear()
+
     for raw in md.splitlines():
         line = raw.rstrip()
         if not line.strip():
-            flush(); continue
+            flush(); flush_li(); continue
         if line.strip() == "---":
-            flush(); out.append("<hr>"); continue
+            flush(); flush_li(); out.append("<hr>"); continue
+        if line.startswith("- "):
+            flush(); li.append(line[2:].strip()); continue
         m = re.match(r"^(#{1,4})\s+(.*)$", line)
         if m:
-            flush()
+            flush(); flush_li()
             lvl, txt = len(m.group(1)), m.group(2).strip()
             if lvl == 1:
                 continue
@@ -87,7 +96,7 @@ def md_to_html(md):
                 out.append(f"<h{lvl}>{strongify(txt)}</h{lvl}>")
             continue
         para.append(line.strip())
-    flush()
+    flush(); flush_li()
     return "".join(out), toc
 
 
@@ -102,7 +111,7 @@ def build_page(p, body, toc, pages):
     t = re.sub(r'<h1 class="art-title">.*?</h1>', f'<h1 class="art-title">{p["title"]}</h1>', t, flags=re.S)
     t = re.sub(r'<p class="art-sub">.*?</p>', f'<p class="art-sub">{p["sub"]}</p>', t, flags=re.S)
     t = re.sub(r'<div class="art-meta">.*?</div>',
-               f'<div class="art-meta">王德生 ＋ Claude · 约 2.0 万字 · {pages} 页 · '
+               f'<div class="art-meta">王德生 ＋ Claude · 约 2.4 万字 · {pages} 页 · '
                f'三种阅读方式 · 发表于{PUBDATE}</div>', t, flags=re.S)
     t = re.sub(r'<div class="deck">.*?</div>', f'<div class="deck">{strongify(p["deck"])}</div>', t, flags=re.S)
     links = "".join(f'<a href="#{i}">{html.escape(x)}</a>' for i, x in toc)
