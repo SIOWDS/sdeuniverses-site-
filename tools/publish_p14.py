@@ -19,7 +19,7 @@ SLUG = "swapped-out"
 OUT = COL / SLUG
 SKELETON = COL / "who-says-its-wrong" / "index.html"
 
-NO_CN = "十九"
+NO_CN = "二十一"
 TITLE = "它不是坏掉的，是被一样一样换掉的"
 SUB = "为什么最要紧的那种东西，死的时候外面一点也看不出来"
 BYLINE = "王德生 ＋ Claude"
@@ -67,7 +67,7 @@ def convert(md):
     lines, out, toc, n, i = md.split("\n"), [], [], 0, 0
     while i < len(lines):
         ln = lines[i].rstrip()
-        m = re.match(r"^###\s+[一二三四五六七八九十]+、(.+)$", ln)
+        m = re.match(r"^###\s+(?:[一二三四五六七八九十]+、|附[一二]、)(.+)$", ln)
         if m:
             n += 1
             toc.append((f"s{n}", m.group(1)))
@@ -234,7 +234,7 @@ t.onclick=function(){{scrollTo({{top:0,behavior:'smooth'}});}};}})();
     trio = "".join(
         f'<div><b>{html.escape(k)}</b><a href="{u}">{html.escape(t)}</a></div>'
         for k, u, t, _ in SOURCES)
-    item = (f'<div class="item"><div class="n">之十九 · 三学科交叉：过程哲学 × 艺术接受研究 × 法哲学</div>\n'
+    item = (f'<div class="item"><div class="n">之二十一 · 三学科交叉：过程哲学 × 艺术接受研究 × 法哲学</div>\n'
             f'<h2><a href="/paradigm/{SLUG}/">{html.escape(TITLE)}</a></h2>\n'
             f'<p class="sub">{html.escape(SUB)}</p>\n'
             f'<p class="hk">{html.escape(DECK)}</p>\n'
