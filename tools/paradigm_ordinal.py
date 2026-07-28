@@ -99,7 +99,8 @@ def claim(slug, title="", push=True, retries=4):
     for attempt in range(1, retries + 1):
         if push:
             _git("pull", "--rebase", "-q", check=False)
-        led = load_ledger() or scan_index()
+        # 台账与栏目页并起来看：另一条线若没接入，台账会落后，只看台账会重号
+        led = {**scan_index(), **load_ledger()}
         for n, s in led.items():
             if s == slug:
                 return n, to_cn(n)          # 已领过，幂等返回
@@ -186,7 +187,7 @@ def main():
     ap.add_argument("--no-push", action="store_true")
     a = ap.parse_args()
     if a.backfill:
-        idx = scan_index()
+        idx = {**scan_index(), **load_ledger()}
         assert idx, "栏目页读不到任何条目"
         save_ledger(idx)
         print(f"台账已用栏目页现状初始化：{len(idx)} 条，之一 … 之{to_cn(max(idx))}")
