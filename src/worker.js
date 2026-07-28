@@ -88,15 +88,27 @@ function wdsBeat(controller, state) {
 }
 const WDS_TOK_MAX = 64000;
 const WDS_TOK_LADDER = [WDS_TOK_MAX, 32000, 12000];
-async function wdsFetchMax(VC, KEY, messages, stream) {
+// 【满功率的硬约束 —— 这是吃过亏的，别再往上调】
+// reasoning_effort=max 的基底，**思考时长随 max_tokens 水涨船高**：预算给得越大，它想得越久。
+// 给到几万，它会一路想到超过平台单请求时长上限被杀在思考阶段——流干净结束、正文 0 字、不报任何错。
+// 所以满功率档的首发预算必须有界。8000 是实测唯一能稳定出正文的量级；要更长，用「继续」或拆多趟，
+// 绝不能靠把这个数字调大。空答重试还要再降一档，逼它早点停下思考开始写。
+const WDS_TOK_SAFE = 8000, WDS_TOK_RETRY = 4000;
+function wdsLadder(VC, want) {
+  // 满功率档：有界起步，再降两档（降的是"想多久"，不是"能写多长"）
+  if (VC && VC.top) { const a = want || WDS_TOK_SAFE; return [a, Math.min(6000, a), Math.min(WDS_TOK_RETRY, a)]; }
+  return WDS_TOK_LADDER;
+}
+async function wdsFetchMax(VC, KEY, messages, stream, want) {
+  const ladder = wdsLadder(VC, want);
   let resp = null;
-  for (let i = 0; i < WDS_TOK_LADDER.length; i++) {
+  for (let i = 0; i < ladder.length; i++) {
     resp = await fetch(VC.url, {
       method: "POST",
       headers: { "content-type": "application/json", authorization: "Bearer " + KEY },
-      body: JSON.stringify(wdsTopBody(VC, { model: VC.model, stream: !!stream, max_tokens: WDS_TOK_LADDER[i], messages })),
+      body: JSON.stringify(wdsTopBody(VC, { model: VC.model, stream: !!stream, max_tokens: ladder[i], messages })),
     });
-    if (resp.ok || resp.status !== 400 || i === WDS_TOK_LADDER.length - 1) return resp;
+    if (resp.ok || resp.status !== 400 || i === ladder.length - 1) return resp;
     let t = ""; try { t = (await resp.clone().text()).slice(0, 300); } catch (e) {}
     if (!/max[_ ]?tokens|max[_ ]?completion|too large|exceed|out of range|invalid/i.test(t)) return resp;
   }
@@ -2159,7 +2171,7 @@ export default {
                 + "② 正文分 " + (PN >= 6 ? "六" : "三") + " 个部分，每部分一个简短小标题 + 充分展开的论证，各部分构成完整论证链（问题的提出 → 逐个核心判断 → 对最强反驳的回应 → 结论与限度），部分之间不重复、层层递进；\n"
                 + "③ 直接从标题写起，不要开场白、不要目录、不要“以下是”之类的话。";
               let upstream;
-              try { upstream = await fetch(VC.url, { method: "POST", headers: { "content-type": "application/json", authorization: "Bearer " + KEY }, body: JSON.stringify(wdsTopBody(VC, { model: VC.model, stream: true, max_tokens: WDS_TOK_MAX, messages: [{ role: "system", content: sys }, { role: "user", content: usr }] })) }); }
+              try { upstream = await fetch(VC.url, { method: "POST", headers: { "content-type": "application/json", authorization: "Bearer " + KEY }, body: JSON.stringify(wdsTopBody(VC, { model: VC.model, stream: true, max_tokens: WDS_TOK_SAFE, messages: [{ role: "system", content: sys }, { role: "user", content: usr }] })) }); }
               catch (e) { controller.enqueue(_sseBytes({ t: "error", v: "接不上基底：" + (e && e.message) })); return fin(); }
               if (!upstream.ok) {
                 const errtxt = (await upstream.text()).slice(0, 200);
@@ -2500,9 +2512,9 @@ export default {
             // ANSWER_EMPTY_GUARD：顶格预算＋满功率下，思考偶尔会把整份预算吃光、正文 0 字。
             // 不因此设限，而是就地再跑一遍（仍顶格、仍满功率）——限制留给基底，不留给我们自己。
             const _diag = { lines: 0, finish: "", status: 0, head: "" };   // ANSWER_DIAG
-            const _runAnswer = async () => {
+            const _runAnswer = async (tokWant) => {
               let upstream;
-              try { upstream = await wdsFetchMax(VC, KEY, messages, true); }
+              try { upstream = await wdsFetchMax(VC, KEY, messages, true, tokWant); }
               catch (e) { return { hard: "接不上基底：" + (e && e.message) }; }
               if (!upstream.ok) {
                 const errtxt = (await upstream.text()).slice(0, 300);
@@ -2543,7 +2555,7 @@ export default {
               return { got: got };
             };
             const _diagLine = () => "【诊断】上游 " + (_diag.status || "?") + " · 收到 " + (_diag.lines || 0) + " 条流数据 · 思考 " + ((_st && _st.think) || 0) + " 字 · 结束原因 " + (_diag.finish || "未给") + (_diag.head ? (" · 首帧「" + _diag.head.replace(/\s+/g, " ").slice(0, 80) + "」") : "");
-            let ar = await _runAnswer();
+            let ar = await _runAnswer(WDS_TOK_SAFE);
             // CONTEXT_OVERFLOW 恢复：基底报上下文过长 → 砍半历史预算、重建 messages、重跑（最多 4 级，砍到 24000 仍不行才认输）
             let _shrinks = 0;
             while (ar.overflow && histBudget > 24000 && _shrinks < 4) {
@@ -2556,8 +2568,10 @@ export default {
             if (ar.overflow) { controller.enqueue(_sseBytes({ t: "error", v: "这场对话太长，即使收拢也超过了基底一次能读的上限。可以点「成文一篇」把它凝成论文，或新开一场继续。", code: "too_long" })); return done(); }
             if (ar.hard) { controller.enqueue(_sseBytes({ t: "error", v: ar.hard, code: ar.code })); return done(); }
             if (!ar.got) {
-              controller.enqueue(_sseBytes({ t: "note", v: "这一答只出了思考、正文 0 字，正在重答…" }));
-              ar = await _runAnswer();
+              // 重答必须**降预算**，不能原样再来一遍——同一个预算只会把同一个坑再踩一次。
+              // 预算砍半＝逼它早点收住思考、开始写正文，这是唯一被实测证明有效的杠杆。
+              controller.enqueue(_sseBytes({ t: "note", v: "这一答只出了思考、正文 0 字，正在降档重答…" }));
+              ar = await _runAnswer(WDS_TOK_RETRY);
               if (ar.hard) { controller.enqueue(_sseBytes({ t: "error", v: ar.hard, code: ar.code })); return done(); }
               if (!ar.got) controller.enqueue(_sseBytes({ t: "error", v: (ar.soft || "基底两次都没写出正文") + "（可再问一次）\n" + _diagLine(), code: "empty" }));
             }
