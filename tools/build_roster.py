@@ -222,6 +222,10 @@ def build():
                 print(f"  ⚠ 无法确定发表日期，跳过: {os.path.relpath(item, STUDENTS)}", file=sys.stderr)
                 continue
             rec = {'date': date, 'words': body_chars(idx)}
+            # 诗歌与论文同权：排名公式给 type=poem 记 depth 1.0，不按篇幅折算。
+            # 站上的约定是诗歌收在该生的 poems/ 目录下。
+            if os.path.basename(os.path.dirname(item)) == 'poems':
+                rec['type'] = 'poem'
             w = paper_weight(idx)
             if w is not None:
                 rec['weight'] = w
