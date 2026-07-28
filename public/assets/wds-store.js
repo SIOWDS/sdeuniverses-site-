@@ -78,6 +78,15 @@
   /* ---------- 数据操作 ---------- */
 
   function put(rec) { return tx("readwrite", function (os) { os.put(rec); }); }
+  // 重命名一场。session.flush() 里是 `if (!rec.title)` 才自动起名，所以人工改过的名字不会被冲掉；
+  // 但正在进行中的那一场在内存里还留着旧 title，要等下次进面板才看得到——这是可接受的偏差。
+  function rename(id, title) {
+    return get(id).then(function (r) {
+      if (!r) return null;
+      r.title = String(title || "").trim().slice(0, 80) || r.title;
+      return put(r).then(function () { return r.title; });
+    });
+  }
   function get(id) { return tx("readonly", function (os) { return req(os.get(id)); }); }
   function remove(id) { return tx("readwrite", function (os) { os.delete(id); }); }
 
@@ -229,6 +238,8 @@
       ".wdsst-x{background:none;border:none;font-size:22px;line-height:1;cursor:pointer;color:inherit;opacity:.55;padding:0}" +
       ".wdsst-x:hover{opacity:1}" +
       ".wdsst-note{padding:9px 16px;font-size:12px;line-height:1.7;opacity:.6;border-bottom:1px solid rgba(128,128,128,.14);flex:none}" +
+      ".wdsst-srch{padding:9px 16px;border-bottom:1px solid rgba(128,128,128,.14);flex:none}" +
+      ".wdsst-q{width:100%;box-sizing:border-box;background:rgba(128,128,128,.12);border:1px solid rgba(128,128,128,.25);border-radius:8px;padding:7px 10px;color:inherit;font:13px inherit;outline:none}" +
       ".wdsst-list{overflow-y:auto;padding:6px 0;flex:1;min-height:80px}" +
       ".wdsst-it{display:flex;align-items:center;gap:10px;padding:11px 16px;cursor:pointer;border-bottom:1px solid rgba(128,128,128,.09)}" +
       ".wdsst-it:hover{background:rgba(128,128,128,.09)}" +
@@ -254,6 +265,7 @@
       "<div class='wdsst-box " + (dark ? "wdsst-dark" : "wdsst-light") + "'>" +
         "<div class='wdsst-hd'><b>对话历史</b><span class='wdsst-sp'></span><button class='wdsst-x' aria-label='关闭'>×</button></div>" +
         "<div class='wdsst-note'>只存在你这台设备的浏览器里，不上传、不同步。清除浏览器数据会一并删除。</div>" +
+        "<div class='wdsst-srch'><input class='wdsst-q' type='search' placeholder='搜标题…'></div>" +
         "<div class='wdsst-list'></div>" +
         "<div class='wdsst-ft'><button class='wdsst-btn wdsst-exp'>导出全部</button><span class='wdsst-sp'></span><button class='wdsst-btn wdsst-danger wdsst-clr'>清空本智能体</button></div>" +
       "</div>";
@@ -263,11 +275,18 @@
     mask.querySelector(".wdsst-x").onclick = close;
     mask.onclick = function (e) { if (e.target === mask) close(); };
 
+    var qEl = mask.querySelector(".wdsst-q");
+    var kw = "";
+    qEl.oninput = function () { kw = qEl.value.trim().toLowerCase(); paint(); };
     function paint() {
       list(cfg.agent, cfg.scopeOnly ? cfg.scope : undefined).then(function (metas) {
         listEl.innerHTML = "";
+        var total = metas.length;
+        if (kw) metas = metas.filter(function (m) { return ((m.title || "") + " " + (m.scopeLabel || "")).toLowerCase().indexOf(kw) >= 0; });
         if (!metas.length) {
-          listEl.innerHTML = "<div class='wdsst-empty'>还没有存下的对话。<br>聊上一轮，这里就会出现。</div>";
+          listEl.innerHTML = total
+            ? "<div class='wdsst-empty'>这 " + total + " 场里没有叫这个名字的。</div>"
+            : "<div class='wdsst-empty'>还没有存下的对话。<br>聊上一轮，这里就会出现。</div>";
           return;
         }
         metas.forEach(function (m) {
@@ -279,6 +298,15 @@
             + (m.scopeLabel ? " · " + m.scopeLabel : "");
           main.appendChild(t); main.appendChild(s); it.appendChild(main);
 
+          var rn = document.createElement("button");
+          rn.className = "wdsst-act"; rn.title = "重命名"; rn.textContent = "✎";
+          rn.onclick = function (e) {
+            e.stopPropagation();
+            var v = prompt("给这一场改个名字：", m.title || "");
+            if (v === null) return;
+            rename(m.id, v).then(paint).catch(function () {});
+          };
+          it.appendChild(rn);
           var dl = document.createElement("button");
           dl.className = "wdsst-act"; dl.title = "导出这一场"; dl.textContent = "↓";
           dl.onclick = function (e) { e.stopPropagation(); exportOne(m.id); };
@@ -320,6 +348,7 @@
     list: list,
     get: get,
     remove: remove,
+    rename: rename,
     clear: clear,
     openPanel: openPanel,
     exportOne: exportOne,

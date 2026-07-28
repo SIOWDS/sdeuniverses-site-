@@ -105,12 +105,17 @@ const window = {
 global.window = window; global.document = document; global.localStorage = localStorage;
 global.fetch = fetchMock;
 const navMock = { clipboard: { writeText() {} } };
+let SPOKEN = [];
+global.SpeechSynthesisUtterance = function (t) { this.text = t; };
+const speechMock = { speak(u) { SPOKEN.push(u.text); if (u.onend) setTimeout(u.onend, 0); }, cancel() {} };
 Object.defineProperty(global, "navigator", { value: navMock, configurable: true, writable: true });
 global.TextDecoder = require("util").TextDecoder; global.TextEncoder = require("util").TextEncoder;
 global.Blob = function (parts) { this.parts = parts; };
 global.URL = { createObjectURL: (b) => { DOWNLOADS.push(b.parts.join("")); return "blob:x"; }, revokeObjectURL() {} };
 global.alert = (m) => { console.log("  [alert] " + m); };
 window.document = document; window.localStorage = localStorage; window.fetch = fetchMock;
+window.speechSynthesis = speechMock;
+window.WDSAttach = { load(cb) { cb({ pick(o) { if (o.onProgress) o.onProgress("讲稿.pdf", "抽取", 1, 1); const r = [{ name: "讲稿.pdf", text: "这是一份讲稿的正文。".repeat(20), note: "12 页" }]; r.failed = [{ name: "旧稿.doc", msg: "旧版 .doc 读不了" }]; return Promise.resolve(r); } }); } };
 
 /* ---------- 载入被测脚本 ---------- */
 const src = fs.readFileSync("/home/claude/site/public/wds-mode.js", "utf8");
@@ -122,8 +127,9 @@ catch (e) { ok(false, "脚本加载抛错：" + e.message + "\n" + e.stack); pro
 const layer = document.body.querySelector(".wdsm-layer");
 ok(!!layer, "对话层已挂载");
 const inEl = layer.querySelector(".wdsm-in"), sendEl = layer.querySelector(".wdsm-send");
-const modes = layer.querySelectorAll(".wdsm-mode");
-ok(modes.length === 3, "模式条三个按钮（标准/深度/联网），实得 " + modes.length);
+const modes = layer.querySelectorAll(".wdsm-mode").filter((b) => b.getAttribute("data-k"));
+ok(modes.length === 3, "模式条三个档位按钮（标准/深度/联网），实得 " + modes.length);
+ok(!!layer.querySelector(".wdsm-attbtn"), "附件按钮存在（借 .wdsm-mode 样式但无 data-k，不参与档位互斥）");
 ok(!!layer.querySelector(".wdsm-distbtn"), "成文按钮存在");
 
 console.log("② 模式切换");
@@ -157,6 +163,7 @@ ROUTE["/api/wds/chat"] = [
   { t: "beat", v: { sec: 3, think: 18, out: 0 } },
   { t: "token", v: "## 一句话判断\n\n**显露**不是结构，是 " },
   { t: "token", v: "结构*被看见*的那一刻。\n\n- 第一点 [W1]\n- 第二点\n\n> 引用一句\n" },
+  { t: "follow", v: ["那退化谱系怎么算？", "这在教学里怎么落地？", "有没有反例？"] },
 ];
 (async () => {
   await new Promise((r) => setTimeout(r, 200));      // 等保存 Key 时自动触发的那次 send 跑完
@@ -229,7 +236,47 @@ ROUTE["/api/wds/chat"] = [
   menu2.children[3].click();
   ok(DOWNLOADS.length === 1 && DOWNLOADS[0].includes("与 WDS 的对话"), "导出了 Markdown 文件");
 
-  console.log("⑩ 新对话复位");
+  console.log("⑪ 追问建议与朗读");
+  ROUTE["/api/wds/chat"] = [
+    { t: "token", v: "一句足够长的回答，用来触发操作行与追问建议的渲染，" + "再补一些字。".repeat(10) },
+    { t: "follow", v: ["那退化谱系怎么算？", "这在教学里怎么落地？", "有没有反例？"] },
+  ];
+  inEl.value = "再来一问";
+  await new Promise((res) => { sendEl.click(); setTimeout(res, 260); });
+  const t2 = layer.querySelector(".wdsm-msgs").lastChild;
+  const fbox = t2.querySelector(".wdsm-follows");
+  ok(!!fbox, "追问建议已渲染");
+  ok(t2.querySelectorAll(".wdsm-follow").length === 3, "三个追问 chip");
+  const spBtn = t2.querySelectorAll(".wdsm-act").find((b) => b.textContent.includes("朗读"));
+  ok(!!spBtn, "朗读按钮存在");
+  SPOKEN = []; spBtn.click();
+  await new Promise((r) => setTimeout(r, 60));
+  ok(SPOKEN.length >= 2, "朗读按句切块排队，实得 " + SPOKEN.length + " 句");
+
+  console.log("⑫ 自定义指令");
+  layer.querySelector(".wdsm-keybtn").click();
+  const sp2 = document.body.children[document.body.children.length - 1];
+  ok(!!sp2.querySelector(".kabout"), "设置面板有自定义指令输入框");
+  sp2.querySelector(".kabout").value = "我是中学生物老师。";
+  sp2.querySelector(".kin").value = "sk-test-1234567890";
+  sp2.querySelector(".ksave").click();
+  ok(store["sde_wds_about"] === "我是中学生物老师。", "自定义指令已存本地");
+
+  console.log("⑬ 附件");
+  layer.querySelector(".wdsm-attbtn").click();
+  await new Promise((r) => setTimeout(r, 60));
+  const chips = layer.querySelectorAll(".wdsm-att");
+  ok(chips.length >= 2, "附件条渲染（含失败提示），实得 " + chips.length);
+  ok(chips.some((c) => c.textContent.includes("讲稿.pdf")), "解析成功的文件挂上了");
+  ok(chips.some((c) => c.textContent.includes("旧版 .doc 读不了")), "解析失败的文件给了原因，不静默");
+  ROUTE["/api/wds/chat"] = [{ t: "token", v: "看完了。" }];
+  inEl.value = "帮我看看这份稿子";
+  await new Promise((res) => { sendEl.click(); setTimeout(res, 220); });
+  ok(LAST_PAYLOAD.docs && LAST_PAYLOAD.docs.length === 1 && LAST_PAYLOAD.docs[0].n === "讲稿.pdf", "payload 带上附件正文");
+  ok(LAST_PAYLOAD.about === "我是中学生物老师。", "payload 带上自定义指令");
+  ok(layer.querySelector(".wdsm-atts").children.length === 0, "附件发出后从输入区摘掉，不会赖着重复发");
+
+  console.log("⑭ 新对话复位");
   layer.querySelector(".wdsm-newbtn").click();
   ok(layer.querySelector(".wdsm-msgs").children.length === 0, "新对话已清空");
 

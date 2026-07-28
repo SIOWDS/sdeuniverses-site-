@@ -115,6 +115,16 @@
     ".wdsm-mode{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.13);color:#8B98A5;font:12.5px/1 inherit;padding:7px 12px;border-radius:999px;cursor:pointer;white-space:nowrap}" +
     ".wdsm-mode.on{background:rgba(212,178,94,.16);border-color:#D4B25E;color:#E9C766}" +
     ".wdsm-mode-tip{color:#5f6a7a;font-size:11.5px;margin-left:2px}" +
+    ".wdsm-atts{max-width:760px;margin:0 auto 8px;display:flex;gap:7px;flex-wrap:wrap}" +
+    ".wdsm-att{display:flex;align-items:center;gap:7px;background:rgba(61,165,165,.12);border:1px solid rgba(61,165,165,.4);color:#9FD4D4;border-radius:9px;padding:6px 9px;font-size:12.5px;max-width:100%}" +
+    ".wdsm-att b{font-weight:600;color:#CDECEC;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}" +
+    ".wdsm-att i{font-style:normal;color:#6f8f8f;font-size:11.5px}" +
+    ".wdsm-att button{background:none;border:none;color:#7fb0b0;cursor:pointer;font-size:14px;line-height:1;padding:0 2px}" +
+    ".wdsm-att button:hover{color:#E88}" +
+    ".wdsm-follows{margin-top:14px;display:flex;flex-wrap:wrap;gap:8px}" +
+    ".wdsm-follow{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.13);color:#A9B4C0;border-radius:999px;padding:7px 13px;font:13px/1 inherit;cursor:pointer;text-align:left}" +
+    ".wdsm-follow:hover{border-color:rgba(212,178,94,.55);color:#E9C766}" +
+    ".wdsm-follows-h{width:100%;font-size:11px;letter-spacing:1px;color:#5f6a7a;margin-bottom:2px}" +
     ".wdsm-inwrap{max-width:760px;margin:0 auto;display:flex;gap:10px;align-items:flex-end;background:rgba(255,255,255,.06);border:1px solid rgba(212,178,94,.3);border-radius:16px;padding:8px 8px 8px 16px}" +
     ".wdsm-in{flex:1;resize:none;background:none;border:none;outline:none;color:#F5EFE0;font:15px/1.6 inherit;max-height:160px;padding:6px 0}" +
     ".wdsm-in::placeholder{color:#5f6a7a}" +
@@ -149,7 +159,7 @@
       "<div class='wdsm-top-sp'></div><span class='wdsm-turns' id='wdsmTurns'>本场剩余 100 次</span>" +
       "<button class='wdsm-tbtn wdsm-distbtn' title='把这场对话锻成报告/文章/提纲'>✎ 成文</button>" +
       "<button class='wdsm-tbtn wdsm-histbtn' title='本机对话记录' style='display:none'>↺ 历史</button>" +
-      "<button class='wdsm-tbtn wdsm-keybtn'>⚙ Key</button><button class='wdsm-newbtn'>＋ 新对话</button>" +
+      "<button class='wdsm-tbtn wdsm-keybtn'>⚙ 设置</button><button class='wdsm-newbtn'>＋ 新对话</button>" +
     "</div>" +
     "<div class='wdsm-body empty'>" +
       "<div class='wdsm-hero'>" +
@@ -161,11 +171,13 @@
     "</div>" +
     "<div class='wdsm-inbar'>" +
       "<div class='wdsm-modes'>" +
+        "<button class='wdsm-mode wdsm-attbtn' title='带一份文件来问（在你本机解析，文件不上传）'>📎 附件</button>" +
         "<button class='wdsm-mode' data-k='std'>⚡ 标准</button>" +
         "<button class='wdsm-mode' data-k='deep'>◈ 深度思考</button>" +
         "<button class='wdsm-mode' data-k='web'>🌐 联网</button>" +
         "<span class='wdsm-mode-tip'></span>" +
       "</div>" +
+      "<div class='wdsm-atts' style='display:none'></div>" +
       "<div class='wdsm-inwrap'><textarea class='wdsm-in' rows='1' placeholder='问 WDS 任何 SDE 问题，或让它帮你找站里读什么…'></textarea><button class='wdsm-send'>↑</button></div>" +
       "<div class='wdsm-note'>WDS 会尽力扣着全站内容作答，可核验的书名/引文请以原文为准。用你自己的大模型 Key 运行，只存在浏览器本地。</div>" +
     "</div>";
@@ -186,6 +198,7 @@
     var bs = layer.querySelectorAll(".wdsm-mode");
     for (var i = 0; i < bs.length; i++) {
       var k = bs[i].getAttribute("data-k");
+      if (!k) continue;                        // 附件按钮借了 .wdsm-mode 的样式，但不是档位，跳过
       var on = (k === "web") ? webOn : (thinkMode === k);
       if (on) bs[i].classList.add("on"); else bs[i].classList.remove("on");
     }
@@ -198,6 +211,7 @@
       (function (b) {
         b.onclick = function () {
           var k = b.getAttribute("data-k");
+          if (!k) return;                      // 同上：附件按钮另有自己的 onclick
           if (k === "web") { webOn = !webOn; try { localStorage.setItem(LS_WEB, webOn ? "1" : "0"); } catch (e) {} }
           else { thinkMode = k; try { localStorage.setItem(LS_MODE, k); } catch (e) {} }
           paintModes();
@@ -206,6 +220,65 @@
     }
   })();
   paintModes();
+
+  /* ── 附件：在读者自己浏览器里解析，文件绝不上传本站 ── */
+  var attsEl = layer.querySelector(".wdsm-atts");
+  var attBtn = layer.querySelector(".wdsm-attbtn");
+  var atts = [];        // [{name,text,note}]
+  function paintAtts() {
+    attsEl.innerHTML = "";
+    if (!atts.length) { attsEl.style.display = "none"; return; }
+    attsEl.style.display = "";
+    atts.forEach(function (d, i) {
+      var chip = el("div", "wdsm-att");
+      chip.appendChild(el("b", null, d.name));
+      chip.appendChild(el("i", null, (d.note ? d.note + " \u00b7 " : "") + d.text.length + " 字"));
+      var x = el("button", null, "\u00d7"); x.title = "去掉这个附件";
+      x.onclick = function () { atts.splice(i, 1); paintAtts(); };
+      chip.appendChild(x);
+      attsEl.appendChild(chip);
+    });
+  }
+  function attStatus(msg, bad) {
+    attsEl.style.display = "";
+    attsEl.innerHTML = "";
+    var chip = el("div", "wdsm-att");
+    if (bad) { chip.style.borderColor = "rgba(230,140,130,.5)"; chip.style.color = "#E8A8A0"; }
+    chip.appendChild(el("b", null, msg));
+    attsEl.appendChild(chip);
+  }
+  attBtn.onclick = function () {
+    if (streaming) return;
+    function go(A) {
+      if (!A) { attStatus("这台浏览器解析不了文件（内核太旧）", 1); return; }
+      A.pick({
+        multiple: true,
+        onProgress: function (name, phase, a, b) { attStatus(name + " \u00b7 " + phase + (b > 1 ? " " + a + "/" + b : "") + "\u2026"); },
+      }).then(function (docs) {
+        (docs || []).forEach(function (d) { if (atts.length < 5) atts.push(d); });
+        paintAtts();
+        var bad = docs && docs.failed;
+        if (bad && bad.length) {
+          attsEl.style.display = "";
+          var w = el("div", "wdsm-att");
+          w.style.borderColor = "rgba(230,140,130,.5)"; w.style.color = "#E8A8A0";
+          w.appendChild(el("b", null, bad.map(function (f) { return f.name + "：" + f.msg; }).join("；")));
+          attsEl.appendChild(w);
+        }
+      }).catch(function (e) { attStatus("附件出错：" + ((e && e.message) || "未知"), 1); });
+    }
+    if (window.WDSAttach) { window.WDSAttach.load(go); return; }
+    attStatus("正在装解析器\u2026");
+    var sc = document.createElement("script");
+    sc.src = "/assets/wds-attach.js"; sc.async = true;
+    sc.onload = function () { if (window.WDSAttach) window.WDSAttach.load(go); else attStatus("解析器没装上，刷新再试", 1); };
+    sc.onerror = function () { attStatus("解析器没装上，刷新再试", 1); };
+    document.head.appendChild(sc);
+  };
+
+  /* ── 自定义指令：读者自己写「我是谁 / 你该怎么答我」，每轮随问题带上 ── */
+  var LS_ABOUT = "sde_wds_about";
+  function aboutGet() { try { return (localStorage.getItem(LS_ABOUT) || "").trim(); } catch (e) { return ""; } }
 
   // —— 本机对话记录（IndexedDB，见 /assets/wds-store.js）——
   var stApi = null, stSess = null, stBooting = false;
@@ -319,7 +392,7 @@
     var a = el("div", "wdsm-a"); turn.appendChild(a);
     msgsEl.appendChild(turn);
     bodyEl.scrollTop = bodyEl.scrollHeight;
-    return { turn: turn, a: a, q: q, think: null, thinkC: null, thinkL: null, acts: null };
+    return { turn: turn, a: a, q: q, think: null, thinkC: null, thinkL: null, acts: null, follows: null };
   }
 
   // —— 思考过程折叠面板（默认收起，可点开看它到底怎么想的）——
@@ -355,6 +428,48 @@
     cell.turn.appendChild(box);
   }
 
+  // —— 追问建议：由后端在正文写完后补一次便宜档产出，点一下就直接问出去 ——
+  function renderFollows(cell, qs) {
+    if (!qs || !qs.length || cell.follows) return;
+    var box = el("div", "wdsm-follows");
+    box.appendChild(el("div", "wdsm-follows-h", "接着可以问"));
+    qs.slice(0, 3).forEach(function (t) {
+      var b = el("button", "wdsm-follow", t);
+      b.onclick = function () { if (!streaming) send(t); };
+      box.appendChild(b);
+    });
+    cell.turn.appendChild(box); cell.follows = box;
+  }
+
+  // —— 朗读：走浏览器自带的语音合成，免 Key 即点即读；音色由读者系统决定，锁不住口音 ——
+  var speaking = null;
+  function speak(text, btn) {
+    var S = window.speechSynthesis;
+    if (!S) { btn.textContent = "此浏览器不支持朗读"; return; }
+    if (speaking) { S.cancel(); var ob = speaking.btn; speaking = null; if (ob) ob.textContent = "🔊 朗读"; if (ob === btn) return; }
+    // 按句切块：Chrome 对单段超长文本约十几秒会截断，切碎了逐句排队才读得完。
+    // 手写切分而非 lookbehind 正则——老 Safari 解析到 (?<=) 会当场报语法错，整个脚本一起死。
+    var raw = String(text).replace(/[#*>`]/g, ""), chunks = [], cur = "", ENDS = "。！？；\n.!?;";
+    for (var ci = 0; ci < raw.length; ci++) {
+      cur += raw.charAt(ci);
+      if (ENDS.indexOf(raw.charAt(ci)) >= 0) { if (cur.trim()) chunks.push(cur.trim()); cur = ""; }
+    }
+    if (cur.trim()) chunks.push(cur.trim());
+    if (!chunks.length) return;
+    var i = 0;
+    speaking = { btn: btn };
+    btn.textContent = "⏹ 停止";
+    function next() {
+      if (!speaking || i >= chunks.length) { if (speaking) { speaking = null; btn.textContent = "🔊 朗读"; } return; }
+      var u = new SpeechSynthesisUtterance(chunks[i++]);
+      u.lang = "zh-CN"; u.rate = 1;
+      u.onend = next;
+      u.onerror = function () { speaking = null; btn.textContent = "🔊 朗读"; };
+      S.speak(u);
+    }
+    next();
+  }
+
   // —— 每答下方的操作行：复制 / 重答 / 改问 ——
   function mountActs(cell, text) {
     if (cell.acts && cell.acts.parentNode) cell.acts.parentNode.removeChild(cell.acts);
@@ -365,7 +480,9 @@
     rg.onclick = function () { if (streaming) return; var q = cell.q; rollbackTo(cell); send(q); };
     var ed = el("button", "wdsm-act", "✎ 改问");
     ed.onclick = function () { if (streaming) return; var q = cell.q; rollbackTo(cell); inEl.value = q; inEl.focus(); inEl.style.height = "auto"; inEl.style.height = Math.min(inEl.scrollHeight, 160) + "px"; };
-    row.appendChild(cp); row.appendChild(rg); row.appendChild(ed);
+    var sp = el("button", "wdsm-act", "🔊 朗读");
+    sp.onclick = function () { speak(text, sp); };
+    row.appendChild(cp); row.appendChild(sp); row.appendChild(rg); row.appendChild(ed);
     cell.turn.appendChild(row); cell.acts = row;
   }
   // 回滚：把这一轮及其之后的 DOM 与 history 一起去掉（重答/改问共用）
@@ -404,21 +521,32 @@
     var m = el("div");
     m.style.cssText = "position:fixed;inset:0;z-index:100004;background:rgba(10,8,5,.72);display:flex;align-items:center;justify-content:center;padding:20px;font-family:-apple-system,'PingFang SC',sans-serif";
     m.innerHTML = "<div style='max-width:400px;width:100%;background:#161B22;border:1px solid rgba(212,178,94,.3);border-radius:16px;padding:26px'>"
-      + "<div style='font-size:17px;font-weight:700;color:#F5EFE0;margin-bottom:8px'>用你自己的 API Key</div>"
+      + "<div style='font-size:17px;font-weight:700;color:#F5EFE0;margin-bottom:8px'>设置</div>"
       + "<div style='font-size:13px;color:#8B98A5;line-height:1.7;margin-bottom:18px'>WDS 助手用你自己的大模型 Key 运行。<b style=\"color:#C9A227\">Key 只存在你的浏览器本地，不会上传本站</b>，随时可清除。联网搜索走智谱通道，填一把智谱 Key 即可同时用于对话与联网。</div>"
       + "<div style='display:flex;gap:8px;margin-bottom:14px'><button class='kv' data-v='ds' style='flex:1;padding:9px;border-radius:9px;border:1px solid rgba(212,178,94,.4);background:none;color:#E8E4DA;cursor:pointer;font:13px inherit'>DeepSeek</button><button class='kv' data-v='glm' style='flex:1;padding:9px;border-radius:9px;border:1px solid rgba(212,178,94,.4);background:none;color:#E8E4DA;cursor:pointer;font:13px inherit'>智谱 GLM</button></div>"
       + "<input class='kin' type='password' placeholder='粘贴你的 API Key' style='width:100%;box-sizing:border-box;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);border-radius:9px;padding:11px;color:#F5EFE0;font:14px inherit;outline:none;margin-bottom:10px'>"
-      + "<div class='klink' style='font-size:12px;color:#6b7684;line-height:1.6;margin-bottom:18px'></div>"
+      + "<div class='klink' style='font-size:12px;color:#6b7684;line-height:1.6;margin-bottom:16px'></div>"
+      + "<div style='border-top:1px solid rgba(255,255,255,.1);padding-top:15px;margin-bottom:16px'>"
+      + "<div style='font-size:14px;font-weight:700;color:#F5EFE0;margin-bottom:6px'>自定义指令（可空）</div>"
+      + "<div style='font-size:12.5px;color:#8B98A5;line-height:1.65;margin-bottom:9px'>写一句你是谁、在做什么、想让 WDS 怎么答你。以后每次提问都会带上，不必再重复交代。也只存在你本机。</div>"
+      + "<textarea class='kabout' rows='3' placeholder='例：我是中学生物老师，正在把 SDE 用到备课上。答我时多举课堂能直接用的例子，术语讲一遍就够。' style='width:100%;box-sizing:border-box;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);border-radius:9px;padding:10px;color:#F5EFE0;font:13.5px/1.6 inherit;outline:none;resize:vertical'></textarea>"
+      + "</div>"
       + "<div style='display:flex;gap:8px'><button class='ksave' style='flex:1;background:#D4B25E;color:#0F0B07;border:none;border-radius:9px;padding:11px;font:700 14px inherit;cursor:pointer'>保存并开始</button><button class='kcancel' style='background:none;border:1px solid rgba(255,255,255,.2);color:#8B98A5;border-radius:9px;padding:11px 16px;font:14px inherit;cursor:pointer'>取消</button></div>"
       + "</div>";
     document.body.appendChild(m);
-    var vend = cur.vendor, kin = m.querySelector(".kin"), klink = m.querySelector(".klink");
-    kin.value = cur.key;
+    var vend = cur.vendor, kin = m.querySelector(".kin"), klink = m.querySelector(".klink"), kab = m.querySelector(".kabout");
+    kin.value = cur.key; kab.value = aboutGet();
     function paintV() { m.querySelectorAll(".kv").forEach(function (b) { var on = b.dataset.v === vend; b.style.background = on ? "rgba(212,178,94,.2)" : "none"; b.style.borderColor = on ? "#D4B25E" : "rgba(212,178,94,.4)"; }); klink.innerHTML = vend === "ds" ? "还没有 Key？去 <a href='https://platform.deepseek.com' target='_blank' style='color:#C9A227'>platform.deepseek.com</a> 申请" : "还没有 Key？去 <a href='https://open.bigmodel.cn' target='_blank' style='color:#C9A227'>open.bigmodel.cn</a> 申请（联网搜索也用这把）"; }
     m.querySelectorAll(".kv").forEach(function (b) { b.onclick = function () { vend = b.dataset.v; paintV(); }; });
     paintV();
     m.querySelector(".kcancel").onclick = function () { m.remove(); };
-    m.querySelector(".ksave").onclick = function () { var k = kin.value.trim(); if (k.length < 8) { kin.style.borderColor = "#E88"; return; } try { localStorage.setItem("sde_wds_key", k); localStorage.setItem("sde_wds_vendor", vend); localStorage.setItem(vend === "glm" ? "sde_glm_key" : "sde_ds_key", k); } catch (e) {} m.remove(); if (onSaved) onSaved(); };
+    m.querySelector(".ksave").onclick = function () {
+      var k = kin.value.trim();
+      try { localStorage.setItem(LS_ABOUT, kab.value.trim().slice(0, 1200)); } catch (e) {}   // 自定义指令可单独存，不必先有 Key
+      if (k.length < 8) { kin.style.borderColor = "#E88"; return; }
+      try { localStorage.setItem("sde_wds_key", k); localStorage.setItem("sde_wds_vendor", vend); localStorage.setItem(vend === "glm" ? "sde_glm_key" : "sde_ds_key", k); } catch (e) {}
+      m.remove(); if (onSaved) onSaved();
+    };
     setTimeout(function () { kin.focus(); }, 60);
   }
 
@@ -434,7 +562,15 @@
     history.push({ role: "reader", text: q }); updTurns(); stSave(history);
     streaming = true; stoppedByUser = false;
     sendEl.textContent = "■"; sendEl.classList.add("stop"); sendEl.title = "停止生成";
-    var payload = { q: q, history: history.slice(-4), key: kv.key, vendor: kv.vendor, mode: thinkMode, web: webOn ? 1 : 0, skey: wdsSearchKey() };
+    var payload = { q: q, history: history.slice(-4), key: kv.key, vendor: kv.vendor, mode: thinkMode, web: webOn ? 1 : 0, skey: wdsSearchKey(), about: aboutGet() };
+    if (atts.length) {
+      payload.docs = atts.map(function (d) { return { n: d.name, t: d.text }; });
+      var attNames = atts.map(function (d) { return d.name; });
+      atts = []; paintAtts();                       // 附件属于这一问：发出去就从输入区摘掉
+      var tag = el("div", null, "📎 " + attNames.join("、"));
+      tag.style.cssText = "text-align:right;color:#6f8f8f;font-size:12px;margin:-8px 0 12px";
+      cell.turn.insertBefore(tag, cell.a);
+    }
     var answer = "", srcDone = false, thinkTxt = "", lastPaint = 0;
     var wd = null, timedOut = false;   // 存活看门狗:靠心跳字节喂,45s 无字节判定连接已死
 
@@ -498,6 +634,7 @@
               }
               else if (j.t === "think") { thinkTxt += j.v; thinkBox(cell); cell.thinkC.textContent = thinkTxt; if (!answer) cell.thinkL.textContent = "正在想…（" + thinkTxt.length + " 字）"; }
               else if (j.t === "beat") { if (!answer && cell.think && j.v) cell.thinkL.textContent = "正在想…（" + (j.v.sec || 0) + " 秒 · " + (j.v.think || 0) + " 字）"; }
+              else if (j.t === "follow") { renderFollows(cell, j.v); }
               else if (j.t === "token") { answer += j.v; paint(); }
               else if (j.t === "error") { cell.a.className = "wdsm-a plain wdsm-err"; cell.a.textContent = j.v; if (j.code === "need_key" || j.code === "bad_key") setTimeout(function () { wdsKeyPanel(function () {}); }, 400); }
             }

@@ -1439,6 +1439,22 @@ function WDS_DIALOGUE_SYS(reflect, SDEM, siteCtx, artTitle, artText) {
 }
 
 // ===== WDS 助手模式·全站对话入口 system（首页 AI 模式；检索全站+开放对话+多轮）。固定前缀在前便于缓存，站内资料在后 =====
+// ===== 追问建议 =====
+// 正文写完后再花一次便宜档（不开思考、不进检索）问一句"接着该问什么"。
+// 硬要求：必须是【读者会想问的下一句】，不是【WDS 想讲的下一段】——后者是自说自话，前者才是把人往前推。
+const FOLLOW_SYS = "你是对话的旁观者。看完一问一答，写出读者最可能接着问的三个问题。"
+  + "\n规矩：① 每个问题一行，不编号、不加符号、不解释；② 每个 8–22 字，是一句真正的问句；"
+  + "③ 三个要指向不同方向（一个往深里挖、一个往旁边挪、一个往落地上落），不要三个同义；"
+  + "④ 只写读者会问的，不要写成 WDS 的讲课提纲；⑤ 只输出三行，别的什么都不要。";
+async function followUps(VC, KEY, q, ans) {
+  try {
+    const out = await llmText(VC, KEY, FOLLOW_SYS, "读者问：" + String(q).slice(0, 400) + "\n\nWDS 答：" + String(ans).slice(0, 2500) + "\n\n三行：", 200);
+    if (!out) return [];
+    return out.split(/\n+/).map((s) => s.replace(/^[\s\d.、)\-*·]+/, "").trim())
+      .filter((s) => s.length >= 4 && s.length <= 40).slice(0, 3);
+  } catch (e) { return []; }
+}
+
 // ===== 联网搜索（站外资料）=====
 // 通道优先级：① 读者自己的智谱 GLM Key（同一把 Key 直接调 /api/paas/v4/web_search，无需另配、读者自付）
 //            ② 管理员在 ⚙配置页存的智谱 Key（ConfigVault op:get 的 key 字段，设智谱基底时会同步写入）
@@ -1500,7 +1516,7 @@ const SDE_METHOD_BLOCK = "\n\n【深度档 · 必须真走的工序（不要复�
   + "\n· 最后一步必须自反：你这个判断本身的可证伪条件是什么？哪一步最脆？"
   + "\n输出要求：先给一句最承重的判断（反直觉、可被反驳），再展开三到五段把它撑住，最后留一个把读者推向下一步的问题。全程说人话，不堆术语、不摆模板。";
 
-function WDS_CHAT_SYS(reflect, SDEM, siteCtx, webCtx, deep) {
+function WDS_CHAT_SYS(reflect, SDEM, siteCtx, webCtx, deep, docCtx, about) {
   return "你是 WDS，王德生（Desheng）的 AI 分身、SDE 本体论的老师，也是 SDE Universes 全站的领读人。读者在向你提问——可能是关于 SDE 思想或任何议题的问题，也可能想找站里读什么。"
     + "\n\n【怎么答】"
     + "\n1. 像王德生本人：直接、犀利、追问本质、善用比喻、一句顶十句；给洞见，不做资料复述员。"
@@ -1513,7 +1529,11 @@ function WDS_CHAT_SYS(reflect, SDEM, siteCtx, webCtx, deep) {
     + (deep ? SDE_METHOD_BLOCK : "")
     + "\n\n【站内资料（从全站检索到的相关段落，可能为空）】\n" + (siteCtx || "（这次没检索到特别相关的篇目，就凭你的内核底盘答）")
     + (webCtx ? ("\n\n【站外资料 · 刚刚联网搜到的（时效性内容以它为准；引用时在句末标 [W序号]，序号即下面的编号）】\n" + webCtx
-        + "\n注意：站外资料是别人写的，不是 SDE 的结论。你的活是把它拿来当材料，用 SDE 剖开它、判它，而不是复述它。") : "");
+        + "\n注意：站外资料是别人写的，不是 SDE 的结论。你的活是把它拿来当材料，用 SDE 剖开它、判它，而不是复述它。") : "")
+    + (docCtx ? ("\n\n【读者带来的文件（他上传的、在他自己浏览器里解析出来的正文；本站不留存）】\n" + docCtx
+        + "\n\n关于这份文件：读者拿它来问你，多半是要你替他看出他自己看不出的那一层。所以不要复述它写了什么——他读过了。"
+        + "直接说：它真正在讲的是什么、它最承重的那一句在哪、它哪里是脆的、用 SDE 看它漏掉了哪一维。引用其中原句时标（文件：篇名）。") : "")
+    + (about ? ("\n\n【这位读者自己写的说明（他是谁、他要你怎么答他）——照着办，但不要复述它，也不要因此放软判断】\n" + about) : "");
 }
 
 // ===== SDE 词义查询扩展：把访客问题翻成 SDE 术语，再拿去召回（检索侧提智，对称于答题侧内功）=====
@@ -2540,6 +2560,20 @@ export default {
       const deep = b.mode === "deep";
       const wantWeb = !!b.web;                                  // 联网开关
       const skey = String(b.skey || "").trim();                 // 读者的智谱 Key（专供联网搜索；没有就退到管理员 Key）
+      // 附件：读者在自己浏览器里解析出的正文（文件本身从不上传到本站）。总量钳位，深度档给多一些。
+      const DOC_CAP = deep ? 20000 : 12000;
+      let docCtx = "";
+      if (Array.isArray(b.docs)) {
+        for (const d of b.docs.slice(0, 5)) {
+          const nm = String((d && d.n) || "未命名").slice(0, 120);
+          const tx = String((d && d.t) || "").trim();
+          if (!tx) continue;
+          const room = DOC_CAP - docCtx.length;
+          if (room < 400) break;
+          docCtx += "【文件：" + nm + "】\n" + tx.slice(0, room) + "\n\n";
+        }
+      }
+      const about = String(b.about || "").trim().slice(0, 1200);   // 读者写的自定义指令
       const VC = deep ? wdsTopVC(vd) : { url: WDS_VENDORS[vd].url, model: WDS_VENDORS[vd].model, name: WDS_VENDORS[vd].name };
       const KEY = userKey, rvendor = ({ zhipu: "glm", deepseek: "ds" })[vd] || vd;
       const ip = request.headers.get("cf-connecting-ip") || "unknown";
@@ -2597,7 +2631,7 @@ export default {
             }
             let reflect = ""; try { reflect = await ensureReflect(env, url, rvendor, VC, KEY); } catch (e) {}
             const SDEM = "\n\nSDE 骨架：显露 S / 差异序列 D / 特征纠缠 E；三大方程 S=F(D,E)·D=G(S,E)·E=H(S,D)；六路径；意义三律（特征·自由·幸福）；发生学——追问事物为何如此发生，而非如何被发现。";
-            const sys = WDS_CHAT_SYS(reflect, SDEM, ctxText, webCtx, deep);
+            const sys = WDS_CHAT_SYS(reflect, SDEM, ctxText, webCtx, deep, docCtx, about);
             const messages = [{ role: "system", content: sys }];
             for (const m of history) {
               const role = (m && m.role === "wds") ? "assistant" : "user";
@@ -2616,7 +2650,7 @@ export default {
             }
             const reader = upstream.body.getReader();
             const dec = new TextDecoder();
-            let buf = "";
+            let buf = "", outText = "";
             while (true) {
               const { done: rdone, value } = await reader.read();
               if (rdone) break;
@@ -2632,8 +2666,15 @@ export default {
                 if (j.error) { controller.enqueue(_sseBytes({ t: "error", v: j.error.message || "基底流内错误" })); continue; }
                 const d = (j.choices && j.choices[0] && j.choices[0].delta) || {};
                 if (d.reasoning_content) { if (_st) _st.think += d.reasoning_content.length; controller.enqueue(_sseBytes({ t: "think", v: d.reasoning_content })); }
-                if (d.content) { if (_st) _st.out += d.content.length; controller.enqueue(_sseBytes({ t: "token", v: d.content })); }
+                if (d.content) { if (_st) _st.out += d.content.length; outText += d.content; controller.enqueue(_sseBytes({ t: "token", v: d.content })); }
               }
+            }
+            // 追问建议：正文已经吐完（读者已在读了），再花一次便宜档补三个「接着可以问什么」。
+            // 走 WDS_VENDORS 的快档而非满血档——这一步要快，慢了读者早就自己打字了；失败一律吞掉。
+            if (outText.length > 150) {
+              const fVC = { url: WDS_VENDORS[vd].url, model: WDS_VENDORS[vd].model };
+              const fs = await followUps(fVC, KEY, q, outText);
+              if (fs.length) controller.enqueue(_sseBytes({ t: "follow", v: fs }));
             }
           } catch (e) {
             controller.enqueue(_sseBytes({ t: "error", v: "生成出错：" + (e && e.message) + "（可再问一次）" }));
