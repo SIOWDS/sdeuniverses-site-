@@ -94,6 +94,11 @@ const WDS_TOK_LADDER = [WDS_TOK_MAX, 32000, 12000];
 // 所以满功率档的首发预算必须有界。8000 是实测唯一能稳定出正文的量级；要更长，用「继续」或拆多趟，
 // 绝不能靠把这个数字调大。空答重试还要再降一档，逼它早点停下思考开始写。
 const WDS_TOK_SAFE = 8000, WDS_TOK_RETRY = 4000;
+// 【例外，且必须是例外】开工写心得是**真的长文**——提示语要的就是约 5000-6000 汉字，
+// 而上面那条 8000 是给"答一段话"定的。8000 装不下一篇五千字心得（何况思考还要占），
+// 于是它只会写不完或干脆写不出来（读者看到的"开工学习没出稿"）。所以它自带预算，
+// 且**只有它**能例外：判据是"输出本身就该有几千字"，不是"我希望它想得久一点"。
+const WDS_TOK_REFLECT = 32000, WDS_TOK_REFLECT_RETRY = 16000;
 function wdsLadder(VC, want) {
   // 满功率档：有界起步，再降两档（降的是"想多久"，不是"能写多长"）
   if (VC && VC.top) { const a = want || WDS_TOK_SAFE; return [a, Math.min(6000, a), Math.min(WDS_TOK_RETRY, a)]; }
@@ -1350,11 +1355,18 @@ async function ensureReflect(env, url, vendor, VC, KEY) {
   if (!neigong) return "";
   let text = "";
   try {
-    const resp = await fetch(VC.url, {
-      method: "POST",
-      headers: { "content-type": "application/json", authorization: "Bearer " + KEY },
-      body: JSON.stringify({ model: VC.model, stream: false, max_tokens: 6000, messages: [{ role: "system", content: neigong }, { role: "user", content: REFLECT_PROMPT }] }),
-    });
+    // 这一步会在答题流里被调用（本场没有开工心得时的兜底），卡住就又把答题那次的时钟烧掉——必须有超时。
+    const _ac = new AbortController();
+    const _to = setTimeout(() => { try { _ac.abort(); } catch (e) {} }, 45000);
+    let resp;
+    try {
+      resp = await fetch(VC.url, {
+        method: "POST",
+        headers: { "content-type": "application/json", authorization: "Bearer " + KEY },
+        body: JSON.stringify({ model: VC.model, stream: false, max_tokens: 6000, messages: [{ role: "system", content: neigong }, { role: "user", content: REFLECT_PROMPT }] }),
+        signal: _ac.signal,
+      });
+    } finally { clearTimeout(_to); }
     if (resp.ok) { const j = await resp.json(); text = (j.choices && j.choices[0] && j.choices[0].message && j.choices[0].message.content) || ""; }
   } catch (e) {}
   if (text && text.length > 500) {
@@ -2096,32 +2108,50 @@ export default {
           const fin = () => { if (_hb) clearInterval(_hb); try { controller.enqueue(_ENC.encode("data: [DONE]\n\n")); controller.close(); } catch (e) {} };
           _hb = wdsBeat(controller, _st);
           let text = "";
-          try {
-            const resp = await wdsFetchMax(VC, userKey, [{ role: "system", content: neigong }, { role: "user", content: DIALOGUE_REFLECT_PROMPT }], true);
+          // REFLECT_CLOCK：这是全场最长的一次调用，此前**既没有时钟、预算又被全局的 8000 压住**——
+          // 写不完就无声断掉，读者只看到"开工学习没出稿"。现在：戴时钟、给足预算、写不出来就降一档再来一次。
+          const _runReflect = async (budget) => {
+            const clk = wdsClock(90000, 360000);
+            let resp;
+            try { resp = await wdsFetchMax(VC, userKey, [{ role: "system", content: neigong }, { role: "user", content: DIALOGUE_REFLECT_PROMPT }], true, budget, clk.signal); }
+            catch (e) { clk.stop(); return { err: clk.cut ? clk.why("基底") : ("接不上基底：" + (e && e.message)) }; }
             if (!resp.ok) {
+              clk.stop();
               const et = (await resp.text()).slice(0, 200);
-              if (resp.status === 401 || resp.status === 402 || resp.status === 429) { controller.enqueue(_sseBytes({ t: "error", v: "你的 Key 用不了（" + resp.status + "）：额度不足或填错了。去 ⚙ 里检查或换一个。", code: "bad_key" })); return fin(); }
-              controller.enqueue(_sseBytes({ t: "error", v: "基底返回错误 " + resp.status + "：" + et })); return fin();
+              if (resp.status === 401 || resp.status === 402 || resp.status === 429) return { err: "你的 Key 用不了（" + resp.status + "）：额度不足或填错了。去 ⚙ 里检查或换一个。", code: "bad_key" };
+              return { err: "基底返回错误 " + resp.status + "：" + et };
             }
             const reader = resp.body.getReader(); const dec = new TextDecoder(); let buf = "";
-            while (true) {
-              const { done: rdone, value } = await reader.read(); if (rdone) break;
-              buf += dec.decode(value, { stream: true }); let li;
-              while ((li = buf.indexOf("\n")) >= 0) {
-                const line = buf.slice(0, li).trim(); buf = buf.slice(li + 1);
-                if (!line.startsWith("data:")) continue; const pp = line.slice(5).trim(); if (pp === "[DONE]") continue;
-                let j; try { j = JSON.parse(pp); } catch (e) { continue; }
-                if (j.error) { controller.enqueue(_sseBytes({ t: "error", v: j.error.message || "基底流内错误" })); continue; }
-                const d = (j.choices && j.choices[0] && j.choices[0].delta) || {};
-                if (d.reasoning_content) { _st.think += d.reasoning_content.length; controller.enqueue(_sseBytes({ t: "think", v: d.reasoning_content })); }
-                if (d.content) { text += d.content; _st.out = text.length; controller.enqueue(_sseBytes({ t: "token", v: d.content })); }
+            try {
+              while (true) {
+                const { done: rdone, value } = await reader.read(); if (rdone) break;
+                clk.firstFrame();
+                buf += dec.decode(value, { stream: true }); let li;
+                while ((li = buf.indexOf("\n")) >= 0) {
+                  const line = buf.slice(0, li).trim(); buf = buf.slice(li + 1);
+                  if (!line.startsWith("data:")) continue; const pp = line.slice(5).trim(); if (pp === "[DONE]") continue;
+                  let j; try { j = JSON.parse(pp); } catch (e) { continue; }
+                  if (j.error) { clk.stop(); return { err: j.error.message || "基底流内错误" }; }
+                  const d = (j.choices && j.choices[0] && j.choices[0].delta) || {};
+                  if (d.reasoning_content) { _st.think += d.reasoning_content.length; controller.enqueue(_sseBytes({ t: "think", v: d.reasoning_content })); }
+                  if (d.content) { text += d.content; _st.out = text.length; controller.enqueue(_sseBytes({ t: "token", v: d.content })); }
+                }
               }
-            }
-          } catch (e) {
-            controller.enqueue(_sseBytes({ t: "error", v: "接不上基底：" + (e && e.message) })); return fin();
-          }
+            } catch (e) { clk.stop(); return { err: clk.cut ? clk.why("基底") : ("基底连接中断：" + (e && e.message)) }; }
+            clk.stop();
+            return { ok: 1 };
+          };
+          let rf = await _runReflect(WDS_TOK_REFLECT);
           text = String(text).trim();
-          if (text.length < 1500) { controller.enqueue(_sseBytes({ t: "error", v: "心得写得过短（" + text.length + " 字符），请重试一次。" })); return fin(); }
+          if (rf.code === "bad_key") { controller.enqueue(_sseBytes({ t: "error", v: rf.err, code: rf.code })); return fin(); }
+          if (text.length < 1500) {
+            // 第一次没写够：降一档预算重来一次（这一步的产出是本场所有回答的底盘，值得再试一趟）
+            controller.enqueue(_sseBytes({ t: "note", v: "开工第一次没写够（" + (rf.err || (text.length + " 字符")) + "），降一档再写一次…" }));
+            text = ""; _st.out = 0;
+            rf = await _runReflect(WDS_TOK_REFLECT_RETRY);
+            text = String(text).trim();
+          }
+          if (text.length < 1500) { controller.enqueue(_sseBytes({ t: "error", v: "心得两次都没写成（" + (rf.err || (text.length + " 字符，太短")) + "），可以点上面那行重试一次。" })); return fin(); }
           controller.enqueue(_sseBytes({ t: "xinde", v: { text: text, chars: text.replace(/\s/g, "").length } }));
           fin();
         },

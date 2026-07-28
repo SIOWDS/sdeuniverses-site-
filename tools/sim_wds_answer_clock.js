@@ -121,6 +121,23 @@ function tail() {
     ok(cc.signal.aborted === true, "行为实测：signal 确实进入 aborted");
     ok(/一个字都没回（已掐断）$/.test(cc.why("基底")), "行为实测：说得出人话的原因——" + cc.why("基底"));
     cc.stop();
+
+    /* ── ⑦ 开工写心得：预算回归 + 时钟 + 降档重试 ── */
+    console.log("\n[七] 开工写心得（全场最长的一次调用）");
+    const R1 = Number((src.match(/WDS_TOK_REFLECT = (\d+)/) || [])[1]);
+    const R2 = Number((src.match(/WDS_TOK_REFLECT_RETRY = (\d+)/) || [])[1]);
+    ok(R1 > 8000 && R2 > 0 && R2 < R1, "心得有自己的预算且明显大于答题的 8000（" + R1 + " → 重试 " + R2 + "）");
+    const refSeg = src.slice(src.indexOf("// REFLECT_CLOCK"), src.indexOf("controller.enqueue(_sseBytes({ t: \"xinde\""));
+    ok(/const _runReflect = async \(budget\)/.test(refSeg), "开工抽成可重跑的一趟");
+    ok(/wdsFetchMax\(VC, userKey, \[[^\]]*\], true, budget, clk\.signal\)/.test(refSeg), "开工把预算与时钟都交给了发车口");
+    ok(/wdsClock\(90000, 360000\)/.test(refSeg), "开工的时钟给得比别处宽（它本来就要写几千字）");
+    ok(/_runReflect\(WDS_TOK_REFLECT\)/.test(refSeg) && /_runReflect\(WDS_TOK_REFLECT_RETRY\)/.test(refSeg), "写不够就降一档再写一次");
+    ok(/rf\.code === "bad_key"/.test(refSeg), "Key 不能用属硬错，不做无谓重试");
+    ok(/ok\(a\)|signal: _ac\.signal/.test(src) && /clearTimeout\(_to\)/.test(src), "ensureReflect 的裸 fetch 也有了超时（它会在答题流里被调用）");
+    const page3 = fs.readFileSync("/home/claude/site/public/taste/wds-dialogue/index.html", "utf8");
+    ok(/XINDE_RETRY/.test(page3) && /点这一行可以重来一次开工/.test(page3), "客户端：开工失败可一键重试，不必刷新整页");
+    ok(!/刷新页面可重试开工仪式/.test(page3), "旧的「刷新页面」指引已去掉——刷新会丢掉整场对话");
+
     console.log("\n===== " + P + " PASS / " + F + " FAIL =====");
     process.exit(F ? 1 : 0);
   });

@@ -541,7 +541,16 @@
           st.onclick = showXinde;
         } else {
           st.classList.add("err");
-          st.textContent = "\u5f00\u5de5\u5b66\u4e60\u6ca1\u5b8c\u6210\uff08" + (r.msg || "\u672a\u77e5\u539f\u56e0") + "\uff09\u2014\u2014\u672c\u573a\u5148\u7528\u65e2\u6709\u5185\u5316\u5e95\u76d8\u4f5c\u7b54\uff1b\u5237\u65b0\u9875\u9762\u53ef\u91cd\u8bd5\u5f00\u5de5\u4eea\u5f0f\u3002";
+          st.textContent = "开工学习没完成（" + (r.msg || "未知原因") + "）——本场先用既有内化底盘作答。点这一行可以重来一次开工，不必刷新页面（刷新会丢掉这场对话）。";
+          st.style.cursor = "pointer";
+          st.onclick = function () {   // XINDE_RETRY：重试开工，不必刷新整页
+            if (streaming) return;
+            st.onclick = null; st.style.cursor = "";
+            var w = st.parentNode;   // addMsg 返回的是气泡里的文本节点，整条消息是它的父节点
+            if (w && w.parentNode) w.parentNode.removeChild(w);
+            xinde = ""; xindeTried = false;
+            learnFirst(function () { paint(); });
+          };
           if (r.code === "need_key" || r.code === "bad_key") keyPanel(null);
         }
         paint(); done();

@@ -128,7 +128,8 @@ ok("全站问答回传今日真实剩余（quota 事件）并说清是哪一档�
   && W.includes("这把 Key 今天在「全站问答」入口已用") && W.includes("各有独立额度"));
 ok("服务端不落 Key（无写库/日志痕迹）", !/localStorage|env\.\w+\.put\([^)]*userKey|console\.log\([^)]*key/i.test(W.split("dialogue-reflect")[1] || ""));
 ok("需 Key / 坏 Key 有独立错误码供前端弹面板", W.includes('code: "need_key"') && W.includes('code: "bad_key"'));
-ok("开工路由有额度与内功可读性双重兜底", W.includes("内功文件暂不可读") && W.includes("心得写得过短"));
+ok("开工路由有额度与内功可读性双重兜底", W.includes("内功文件暂不可读") && W.includes("心得两次都没写成"));
+ok("开工写不够时先降档重写一次，两次都不成才报错", W.includes("降一档再写一次") && /_runReflect\(WDS_TOK_REFLECT_RETRY\)/.test(W));
 // 内功第二部分：创新智商评估 Skill 随开工仪式一并注入
 ok("内功第二部分有独立加载器且不阻断开工", W.includes("loadInnovationIQ") && W.includes("/taste/assets/sde-innovation-iq.txt") && /const iq = await loadInnovationIQ\([^)]*\); if \(iq\) neigong = neigong \+ "\\n\\n" \+ iq;/.test(W));
 ok("开工心得体例第九节锁住评分硬数字", /九、创新智商这把尺/.test(W) && W.includes("S 0.20／D 0.25／E 0.20／I 0.20／F 0.15") && W.includes("150 本体论级") && W.includes("封顶 145"));
