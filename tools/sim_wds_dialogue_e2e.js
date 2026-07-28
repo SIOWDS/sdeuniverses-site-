@@ -470,7 +470,12 @@ async function ask(text) { qEl.value = text; goEl.onclick(); await flush(25); }
   dm9.remove(); MODE.partFail = null;
 
   head("[阶段十] 拟题这一步倒下时（提纲生成失败）");
-ok("worker：全线顶格预算，任何一步都不降满功率档", W.includes("WDS_TOK_MAX = 64000") && W.includes("wdsFetchMax") && !W.includes("top === false") && (W.match(/await genOnce\(\)/g) || []).length === 2);
+// 【口径再改一次，注明原委】四修定过"任何一步都不降满功率档"，但拟题是"对着十几万字记录产出一份 JSON 骨架"，
+// 正是满功率最容易空转的那类任务。现在的分寸是：**第一次仍满功率**（保住质量），**只有第一次没成时第二次才卸档**
+// （拿到骨架才谈得上后面六个部分，而六个部分依然满功率写）。答题、分部成文一律不降。
+ok("worker：拟题第一次仍满功率（不预先降档）", /let r = await genOnce\(\);/.test(W));
+ok("worker：只有第一次没成，第二次才卸满功率并压短上下文", /genOnce\(\{ noThink: true, usr: usrLite \}\)/.test(W) && /o\.noThink \? \{ url: VC\.url/.test(W));
+ok("worker：答题与分部成文不降档（降的只有拟题的第二次）", !/noThink/.test(W.slice(W.indexOf("const PART_FIRST_MS"))) && W.includes("WDS_TOK_MAX = 64000"));
 ok("worker：顶格降档只在基底拒收 max_tokens 时发生", /resp\.status !== 400/.test(W) && W.includes("WDS_TOK_LADDER") && /max\[_ \\\]\?tokens/.test(W) === false);
 // 【口径已改，别再按"全线顶格"验】1790b958 推翻了四修的"一律顶格"：满功率档的预算给多大，它就想多久，
 // 给到几万就会一路想到超过平台上限、被杀在思考里（流干净结束、正文 0 字）。所以满功率档必须有界，

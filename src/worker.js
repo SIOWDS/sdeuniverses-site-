@@ -115,6 +115,23 @@ async function wdsFetchMax(VC, KEY, messages, stream, want, signal) {
   }
   return resp;
 }
+// WDS_CLOCK：给任何一次"出流之后 await 上游"的调用配一副时钟。
+// 没有它，上游只要迟迟不吐字，Worker 就一直等到被平台掐掉——流里既无 error 也无 end，
+// 客户端只能干说"没收到回答""提纲生成失败"。有了它，卡住变成一条说得出原因、可重试的失败。
+// 两级：首帧（连思考都没有一个字）与总时长（写到一半停住）。收到第一帧就撤首帧那级，正常的长思考不会被误杀。
+// 注：答题路径 /api/wds/read 里有一份等价的内联实现（ANSWER_DEADLINE），下次动那段时并过来。
+function wdsClock(firstMs, totalMs) {
+  const ac = new AbortController();
+  const st = { cut: "", signal: ac.signal };
+  st.t1 = setTimeout(() => { st.cut = "首帧"; try { ac.abort(); } catch (e) {} }, firstMs);
+  st.t2 = setTimeout(() => { st.cut = st.cut || "总时长"; try { ac.abort(); } catch (e) {} }, totalMs);
+  st.firstFrame = () => { try { clearTimeout(st.t1); } catch (e) {} };
+  st.stop = () => { try { clearTimeout(st.t1); } catch (e) {} try { clearTimeout(st.t2); } catch (e) {} };
+  st.why = (what) => st.cut === "首帧"
+    ? (what + "在 " + Math.round(firstMs / 1000) + " 秒内一个字都没回（已掐断）")
+    : (what + "超过 " + Math.round(totalMs / 1000) + " 秒还没写完（已掐断）");
+  return st;
+}
 // RAG_SUBREQUEST 的发车口：走 SELF 服务绑定（Worker 内部调用，不出边缘、自带一份 CPU 预算）。
 // 注意：**不能**用 fetch("https://本站/api/wds/rag") ——那是自请求回环，实测直接 522 超时。
 async function wdsRag(env, url, body) {
@@ -2252,36 +2269,49 @@ export default {
           async start(controller) {
             let _hb = null, _st = null;
             const fin = () => { if (_hb) clearInterval(_hb); try { controller.enqueue(_ENC.encode("data: [DONE]\n\n")); controller.close(); } catch (e) {} };
-            _st = { t0: Date.now(), think: 0, out: 0 };
+            _st = { t0: Date.now(), think: 0, out: 0, stage: "拟题与提纲" };
             _hb = wdsBeat(controller, _st);
             try {
               const sys = "你是 SDE 学派的学术编辑，要把一场" + (GD ? "百轮问答" : "陪读对话") + "提炼成一篇约 " + (PN >= 6 ? "一万" : "5000") + " 字学术论文的骨架。" + (GD ? "这篇论文属于《问对WDS》系列——从与 WDS 的对话中练就创新观点、凝成关于 SDE 思想的论文。" : "") + BASE;
               const usr = CTX + "\n\n请基于以上：① 拟一个准确、有锋刃的学术论文标题（不要副标题堆砌）；② 选出 " + (PN >= 6 ? "4-6" : "3-5") + " 个『金点子』——这场对话里真正反直觉、可被检验的新判断，各一句；③ 给 " + (PN >= 6 ? "六" : "三") + " 个部分的写作大纲，每部分一个标题和一句主旨，各部分合起来构成完整论证（问题的提出 → " + (PN >= 6 ? "逐个展开核心判断（可多个部分） → 对最强反驳的回应" : "核心论证") + " → 结论与限度），部分之间不重复。\n只输出 JSON、不要任何其他文字：{\"title\":\"标题\",\"points\":[\"金点子1\",\"金点子2\"],\"parts\":[{\"h\":\"部分标题\",\"gist\":\"主旨\"},{\"h\":\"部分标题\",\"gist\":\"主旨\"},{\"h\":\"部分标题\",\"gist\":\"主旨\"}]}";
-              // PLAN_ROBUST：满功率思考会把输出预算吃光（只有思考、正文 0 字 → JSON 解析必失败），
-              // 所以拟题给足预算；第二次直接卸掉满功率档（拟题是结构活，不需要 max 思考，且非思考档几乎必出 JSON）。
-              const genOnce = async () => {
+              // PLAN_ROBUST：拟题要的是一份 JSON 骨架——典型的"结构化短输出"，而满功率思考对它是毒：
+              // 它会对着十几万字的全场记录慢慢推演，把时间烧完却一个正文字都没写，JSON 解析必失败。
+              // 三道防线：①每次调用都戴时钟（卡住就掐断、说得出原因，而不是无声死掉）；
+              //          ②第二次卸掉满功率档（拟题是结构活，非思考档几乎必出 JSON）；
+              //          ③第二次同时把上下文压小——第一次若是被时钟掐断的，原样再喂一遍只会再撞一次同一堵墙。
+              const PLAN_FIRST_MS = 90000, PLAN_TOTAL_MS = 240000;
+              const genOnce = async (opt) => {
+                const o = opt || {};
+                const uVC = o.noThink ? { url: VC.url, model: VC.model, name: VC.name } : VC;   // 去掉 top 标记即卸满功率（见 wdsTopBody）
+                const uUsr = o.usr || usr;
+                const clk = wdsClock(PLAN_FIRST_MS, PLAN_TOTAL_MS);
                 let upstream;
-                try { upstream = await wdsFetchMax(VC, KEY, [{ role: "system", content: sys }, { role: "user", content: usr }], true); }
-                catch (e) { return { err: "接不上基底：" + (e && e.message) }; }
+                try { upstream = await wdsFetchMax(uVC, KEY, [{ role: "system", content: sys }, { role: "user", content: uUsr }], true, undefined, clk.signal); }
+                catch (e) { clk.stop(); return { err: clk.cut ? clk.why("基底") : ("接不上基底：" + (e && e.message)) }; }
                 if (!upstream.ok) {
+                  clk.stop();
                   const errtxt = (await upstream.text()).slice(0, 200);
                   if (upstream.status === 401 || upstream.status === 402 || upstream.status === 429) return { err: "你的 Key 用不了（" + upstream.status + "）：额度不足或填错了。", code: "bad_key" };
                   return { err: "基底返回错误 " + upstream.status + "：" + errtxt };
                 }
                 const reader = upstream.body.getReader(); const dec = new TextDecoder(); let buf = "", content = "";
-                while (true) {
-                  const { done: rdone, value } = await reader.read(); if (rdone) break;
-                  buf += dec.decode(value, { stream: true }); let li;
-                  while ((li = buf.indexOf("\n")) >= 0) {
-                    const line = buf.slice(0, li).trim(); buf = buf.slice(li + 1);
-                    if (!line.startsWith("data:")) continue; const p = line.slice(5).trim(); if (p === "[DONE]") continue;
-                    let j; try { j = JSON.parse(p); } catch (e) { continue; }
-                    if (j.error) return { err: j.error.message || "基底流内错误" };
-                    const d = (j.choices && j.choices[0] && j.choices[0].delta) || {};
-                    if (d.reasoning_content) { if (_st) _st.think += d.reasoning_content.length; controller.enqueue(_sseBytes({ t: "think", v: d.reasoning_content })); }
-                    if (d.content) content += d.content;
+                try {
+                  while (true) {
+                    const { done: rdone, value } = await reader.read(); if (rdone) break;
+                    clk.firstFrame();
+                    buf += dec.decode(value, { stream: true }); let li;
+                    while ((li = buf.indexOf("\n")) >= 0) {
+                      const line = buf.slice(0, li).trim(); buf = buf.slice(li + 1);
+                      if (!line.startsWith("data:")) continue; const p = line.slice(5).trim(); if (p === "[DONE]") continue;
+                      let j; try { j = JSON.parse(p); } catch (e) { continue; }
+                      if (j.error) { clk.stop(); return { err: j.error.message || "基底流内错误" }; }
+                      const d = (j.choices && j.choices[0] && j.choices[0].delta) || {};
+                      if (d.reasoning_content) { if (_st) _st.think += d.reasoning_content.length; controller.enqueue(_sseBytes({ t: "think", v: d.reasoning_content })); }
+                      if (d.content) content += d.content;
+                    }
                   }
-                }
+                } catch (e) { clk.stop(); return content ? { content } : { err: clk.cut ? clk.why("基底") : ("基底连接中断：" + (e && e.message)) }; }
+                clk.stop();
                 return { content };
               };
               const okPlan = (o) => !!(o && o.title && Array.isArray(o.parts) && o.parts.length);
@@ -2291,8 +2321,11 @@ export default {
               if (!okPlan(jj)) {
                 if (r.err && r.code === "bad_key") { controller.enqueue(_sseBytes({ t: "error", v: r.err, code: r.code })); return fin(); }
                 const why = r.err ? r.err : (r.content ? "输出不是可解析的提纲" : "只出了思考、正文 0 字");
-                controller.enqueue(_sseBytes({ t: "note", v: "拟题第一次没成（" + why + "），顶格重来一次…" }));
-                r = await genOnce();   // 第二次：同样满功率顶格重来（不降档）
+                controller.enqueue(_sseBytes({ t: "note", v: "拟题第一次没成（" + why + "），换个打法再来一次（不开思考档、把记录压短）…" }));
+                // 第二次换打法：卸满功率 + 上下文压到三分之一。拟题只是骨架，拿到骨架才谈得上后面六个部分——
+                // 六个部分仍然是满功率写的，这里降的只是"拟骨架"这一步。
+                const usrLite = usr.length > 60000 ? (usr.slice(0, 30000) + "\n\n【中间已省略，这是同一场连续对话的前后两段】\n\n" + usr.slice(-30000)) : usr;
+                r = await genOnce({ noThink: true, usr: usrLite });
                 jj = pick(r);
                 if (!okPlan(jj)) {
                   const why2 = r.err ? r.err : (r.content ? "基底两次都没给出可解析的提纲（可重试）" : "基底两次都只出了思考、正文 0 字（可重试）");
@@ -2321,7 +2354,7 @@ export default {
           async start(controller) {
             let _hb = null, _st = null;
             const fin = () => { if (_hb) clearInterval(_hb); try { controller.enqueue(_ENC.encode("data: [DONE]\n\n")); controller.close(); } catch (e) {} };
-            _st = { t0: Date.now(), think: 0, out: 0 };
+            _st = { t0: Date.now(), think: 0, out: 0, stage: "写第 " + (idx + 1) + " 部分" };
             _hb = wdsBeat(controller, _st);
             try {
               let partCtx = "";
@@ -2343,12 +2376,15 @@ export default {
               // PART_EMPTY_GUARD：满功率下思考可能吃光预算、流“干净地”结束却一个正文字都没有
               // （这就是读者看到的“小标题下面空白”）。空正文＝失败，服务端就地重跑一次并加大预算；
               // 两次都空才报 code:"empty" 交客户端（客户端据此再退避重试／断点续写）。
+              const PART_FIRST_MS = 90000, PART_TOTAL_MS = 300000;
               const _runPart = async () => {
                 let upstream;
+                const clk = wdsClock(PART_FIRST_MS, PART_TOTAL_MS);   // 与拟题同理：没时钟就会被平台无声掐死
                 try {
-                  upstream = await wdsFetchMax(VC, KEY, [{ role: "system", content: sys }, { role: "user", content: usr }], true);
-                } catch (e) { return { hard: "接不上基底：" + (e && e.message) }; }
+                  upstream = await wdsFetchMax(VC, KEY, [{ role: "system", content: sys }, { role: "user", content: usr }], true, undefined, clk.signal);
+                } catch (e) { clk.stop(); return clk.cut ? { soft: clk.why("基底") } : { hard: "接不上基底：" + (e && e.message) }; }
                 if (!upstream.ok) {
+                  clk.stop();
                   const errtxt = (await upstream.text()).slice(0, 200);
                   if (upstream.status === 401 || upstream.status === 402 || upstream.status === 429) return { hard: "你的 Key 用不了（" + upstream.status + "）：额度不足或填错了。", code: "bad_key" };
                   if (upstream.status >= 500) return { soft: "基底返回错误 " + upstream.status + "：" + errtxt };
@@ -2357,24 +2393,32 @@ export default {
                 const reader = upstream.body.getReader();
                 const dec = new TextDecoder();
                 let buf = "", got = 0;
-                while (true) {
-                  const { done: rdone, value } = await reader.read();
-                  if (rdone) break;
-                  buf += dec.decode(value, { stream: true });
-                  let li;
-                  while ((li = buf.indexOf("\n")) >= 0) {
-                    const line = buf.slice(0, li).trim();
-                    buf = buf.slice(li + 1);
-                    if (!line.startsWith("data:")) continue;
-                    const p = line.slice(5).trim();
-                    if (p === "[DONE]") continue;
-                    let j; try { j = JSON.parse(p); } catch (e) { continue; }
-                    if (j.error) { if (got) { controller.enqueue(_sseBytes({ t: "error", v: j.error.message || "基底流内错误" })); return { got: got }; } return { soft: j.error.message || "基底流内错误" }; }
-                    const d = (j.choices && j.choices[0] && j.choices[0].delta) || {};
-                    if (d.reasoning_content) { if (_st) _st.think += d.reasoning_content.length; controller.enqueue(_sseBytes({ t: "think", v: d.reasoning_content })); }
-                    if (d.content) { got += d.content.length; if (_st) _st.out += d.content.length; controller.enqueue(_sseBytes({ t: "token", v: d.content })); }
+                try {
+                  while (true) {
+                    const { done: rdone, value } = await reader.read();
+                    if (rdone) break;
+                    clk.firstFrame();
+                    buf += dec.decode(value, { stream: true });
+                    let li;
+                    while ((li = buf.indexOf("\n")) >= 0) {
+                      const line = buf.slice(0, li).trim();
+                      buf = buf.slice(li + 1);
+                      if (!line.startsWith("data:")) continue;
+                      const p = line.slice(5).trim();
+                      if (p === "[DONE]") continue;
+                      let j; try { j = JSON.parse(p); } catch (e) { continue; }
+                      if (j.error) { clk.stop(); if (got) { controller.enqueue(_sseBytes({ t: "error", v: j.error.message || "基底流内错误" })); return { got: got }; } return { soft: j.error.message || "基底流内错误" }; }
+                      const d = (j.choices && j.choices[0] && j.choices[0].delta) || {};
+                      if (d.reasoning_content) { if (_st) _st.think += d.reasoning_content.length; controller.enqueue(_sseBytes({ t: "think", v: d.reasoning_content })); }
+                      if (d.content) { got += d.content.length; if (_st) _st.out += d.content.length; controller.enqueue(_sseBytes({ t: "token", v: d.content })); }
+                    }
                   }
+                } catch (e) {
+                  clk.stop();
+                  if (got) { controller.enqueue(_sseBytes({ t: "note", v: "这一部分写到一半断了，已写好的留着——可以点「从第 N 部分继续」接上。" })); return { got: got }; }
+                  return { soft: clk.cut ? clk.why("基底") : ("基底连接中断：" + (e && e.message)) };
                 }
+                clk.stop();
                 return { got: got };
               };
               let pr = await _runPart();

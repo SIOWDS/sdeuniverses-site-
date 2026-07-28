@@ -698,8 +698,8 @@
   // 心跳→人话：思考期间没有正文，就把"已跑几秒、推演了多少字"显示出来，让人看得见它在动
   function beatTip(v) {
     if (!v) return "\u2026";
-    var s = "\uff08\u5df2 " + (v.sec || 0) + " \u79d2";
-    if (v.out) s += "\uff0c\u5df2\u5199 " + v.out + " \u5b57";
+    var s = "（" + (v.stage ? (v.stage + " · ") : "") + "已 " + (v.sec || 0) + " 秒";
+    if (v.out) s += "，已写 " + v.out + " 字";
     else if (v.think) s += "\uff0c\u6df1\u601d\u63a8\u6f14 " + v.think + " \u5b57";
     return s + "\uff09\u2026";
   }
@@ -756,9 +756,16 @@
           throw new Error("HTTP " + r.status);
         }
         var reader = r.body.getReader(), dec = new TextDecoder(), buf = "", plan = null, errMsg = "", errCode = "";
+        var pdiag = { bytes: 0, beats: 0, think: 0, t0: Date.now() };   // PLAN_DIAG：空手而归时得说得出到底收到了什么
         function pump() {
           return reader.read().then(function (res) {
-            if (res.done) { if (plan) return plan; return { ok: false, msg: errMsg || "提纲生成失败，请重试。", code: errCode }; }
+            if (res.done) {
+              if (plan) return plan;
+              if (errMsg) return { ok: false, msg: errMsg, code: errCode };
+              // 既没有提纲也没有一句错误说明＝流被中途掐断（服务端每条失败分支都会发 error）
+              return { ok: false, code: errCode, msg: "拟题这一步的连接被中途切断（收到 " + pdiag.bytes + " 字节 · 心跳 " + pdiag.beats + " 次 · 思考 " + pdiag.think + " 字 · 已跑 " + Math.round((Date.now() - pdiag.t0) / 1000) + " 秒），没收到结束标记。可以点下面的按钮再试一次" };
+            }
+            pdiag.bytes += (res.value && res.value.length) || 0;
             buf += dec.decode(res.value, { stream: true });
             var idx2;
             while ((idx2 = buf.indexOf("\n")) >= 0) {
@@ -766,7 +773,7 @@
               if (line.indexOf("data:") !== 0) continue;
               var pp = line.slice(5).trim();
               if (pp === "[DONE]") continue;
-              try { var j = JSON.parse(pp); if (j.t === "plan" && j.v) { plan = { ok: true, title: j.v.title, points: j.v.points || [], parts: j.v.parts || [], convo: j.v.convo || "" }; } else if (j.t === "note") { if (onNote) onNote(j.v); } else if (j.t === "beat") { if (onBeat) onBeat(j.v); } else if (j.t === "error") { errMsg = j.v; errCode = j.code || ""; } } catch (e) {}
+              try { var j = JSON.parse(pp); if (j.t === "plan" && j.v) { plan = { ok: true, title: j.v.title, points: j.v.points || [], parts: j.v.parts || [], convo: j.v.convo || "" }; } else if (j.t === "note") { if (onNote) onNote(j.v); } else if (j.t === "beat") { pdiag.beats++; if (j.v && j.v.think) pdiag.think = j.v.think; if (onBeat) onBeat(j.v); } else if (j.t === "error") { errMsg = j.v; errCode = j.code || ""; } } catch (e) {}
             }
             return pump();
           });

@@ -88,6 +88,40 @@ function tail() {
   ok(/流式收到 " \+ diag\.bytes \+ " 字节/.test(page), "诊断行如实报收到多少字节（不再一律写「流式 0 字节」）");
   ok(/被中途切断/.test(page) && /停在「/.test(page), "诊断行说得出是干净结束还是被切断、停在哪一段");
 
-  console.log("\n===== " + P + " PASS / " + F + " FAIL =====");
-  process.exit(F ? 1 : 0);
+  /* ── ⑥ 论文两步（拟题 / 分部）也必须戴同一副时钟 ── */
+  console.log("\n[六] 凝成论文的两步也戴上时钟");
+  const clkSrc = src.slice(src.indexOf("function wdsClock"), src.indexOf("// RAG_SUBREQUEST 的发车口"));
+  const box2 = new Function(clkSrc + "\nreturn { wdsClock };")();
+  const c = box2.wdsClock(50, 200);
+  ok(!!c.signal && typeof c.firstFrame === "function" && typeof c.stop === "function", "wdsClock 给出 signal / 首帧撤销 / 停表三件套");
+  const done = new Promise((res) => setTimeout(() => res(c), 120));
+
+  const planSeg = src.slice(src.indexOf("// PLAN_ROBUST"), src.indexOf('const okPlan ='));
+  ok(/const PLAN_FIRST_MS = \d+, PLAN_TOTAL_MS = \d+/.test(planSeg), "拟题有首帧与总时长两级护栏");
+  ok(/wdsFetchMax\(uVC, KEY, \[[^\]]*\], true, undefined, clk\.signal\)/.test(planSeg), "拟题把时钟交给了发车口");
+  ok(/o\.noThink \? \{ url: VC\.url, model: VC\.model, name: VC\.name \} : VC/.test(planSeg), "拟题第二次可卸掉满功率档（拟题是结构活）");
+  ok(/clk\.firstFrame\(\)/.test(planSeg), "收到第一帧就撤首帧护栏");
+  const planRetry = src.slice(src.indexOf('拟题第一次没成'), src.indexOf('controller.enqueue(_sseBytes({ t: "plan"'));
+  ok(/genOnce\(\{ noThink: true, usr: usrLite \}\)/.test(planRetry), "第二次换打法：卸满功率 + 压短上下文");
+  ok(/usr\.length > 60000 \?/.test(planRetry) && /中间已省略/.test(planRetry), "压短时保头尾并明标省略，不静默丢");
+
+  const partSeg = src.slice(src.indexOf("const PART_FIRST_MS"), src.indexOf("let pr = await _runPart()"));
+  ok(/const PART_FIRST_MS = \d+, PART_TOTAL_MS = \d+/.test(partSeg), "分部成文同样两级护栏");
+  ok(/wdsFetchMax\(VC, KEY, \[[^\]]*\], true, undefined, clk\.signal\)/.test(partSeg), "分部把时钟交给了发车口");
+  ok(/写到一半断了/.test(partSeg), "分部中途断线时已写好的不丢");
+
+  const page2 = fs.readFileSync("/home/claude/site/public/taste/wds-dialogue/index.html", "utf8");
+  ok(/PLAN_DIAG/.test(page2) && /拟题这一步的连接被中途切断/.test(page2), "客户端：拟题空手而归时说得出收到了什么");
+  ok(!/msg: errMsg \|\| "提纲生成失败，请重试。"/.test(page2), "不再一律回一句没有信息量的「提纲生成失败」");
+  ok(/v\.stage \? \(v\.stage \+ " · "\) : ""/.test(page2), "论文进度条也显示当前在哪一步");
+  ok(/stage: "拟题与提纲"/.test(src) && /stage: "写第 " \+ \(idx \+ 1\) \+ " 部分"/.test(src), "服务端给论文两条流打了阶段标");
+
+  return done.then((cc) => {
+    ok(cc.cut === "首帧", "行为实测：过了首帧时限而没有第一帧，时钟判定为「首帧」并已 abort");
+    ok(cc.signal.aborted === true, "行为实测：signal 确实进入 aborted");
+    ok(/一个字都没回（已掐断）$/.test(cc.why("基底")), "行为实测：说得出人话的原因——" + cc.why("基底"));
+    cc.stop();
+    console.log("\n===== " + P + " PASS / " + F + " FAIL =====");
+    process.exit(F ? 1 : 0);
+  });
 }
