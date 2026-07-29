@@ -5,8 +5,15 @@
 #   访客打开搜索页一万次，站里一个字都不会变 —— 挂在"打开"上等于重算一万次同一个结果。
 #   对所有访客完全相同的东西 = 预先生成、直接调用（第二铁律第一类）。
 #
-# 因此：push 改了 public/ 下的内容 → 本工作流自动重跑索引与坐标 → 提交回 main
-#       → 触发 Cloudflare 构建 → 上线。人零操作，索引永不过期。
+# 【2026-07-29 改】上面这套"push 即重建"跑了两个月，代价浮出水面：索引是 218MB 的生成物，
+#   每重建一次就整份重排，git 只能一版一版存。2202 个提交里 1027 个是它，仓库涨到 4GB、
+#   每天再涨 250-780MB，眼看撞 GitHub 的 5GB 硬线。而**索引只有最后一版有用**——
+#   前面每一版在被下一版取代的那一秒就作废了，却永远留在历史里。
+#   故改为**只在下令时重建**：Actions 页面点 Run workflow，或发文攒够一批再跑一次。
+#   代价是新文章要等你跑一次才进站内搜索；换来的是仓库停止膨胀。
+#   （根治是把索引搬出 git 走 R2，读取侧已上线 commit e5d2753，写入侧待办。）
+#
+# 学员排名不跟着停：roster.json 只有 126KB，churn 可忽略，已拆到 roster.yml 继续随 push 自动跑。
 #
 # 坐标必须与索引同跑，不能拆成两步：sde-coords.json 按文档编号存，
 # 索引一重建编号就重排，旧坐标会把 ×2 检索加分喂给错误的文章 —— 比不打坐标更糟。
@@ -14,17 +21,7 @@
 name: search-index
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'public/**'
-      - '!public/search/**'          # 排除索引自身，否则本工作流会自我触发
-      - '!public/students/roster.json' # 名单统计由本工作流派生，排除自身提交避免二次空跑
-      - '!public/assets/daily-quotes.js'  # 金句池不是检索语料(句子已在其来源文章里被索引)，每日扩充不该触发全量重排
-      - 'tools/build_roster.py'
-      - 'tools/build_search_index.py'
-      - 'tools/label_sde_coords_rules.py'
-  workflow_dispatch:                 # 也允许在 Actions 页面手动跑一次
+  workflow_dispatch:                 # 唯一入口：Actions 页面 → search-index → Run workflow
 
 concurrency:
   group: search-index
@@ -45,9 +42,6 @@ jobs:
 
       - name: 装 pdftotext（专著正文靠它抽，缺了 PDF 就进不了索引）
         run: sudo apt-get update -qq && sudo apt-get install -y -qq poppler-utils
-
-      - name: 重建学员发表数与排名数据
-        run: python3 tools/build_roster.py
 
       - name: 重建索引
         run: python3 tools/build_search_index.py
@@ -88,18 +82,18 @@ jobs:
 
       - name: 有变化就提交回 main
         run: |
-          if git diff --quiet -- public/students/roster.json public/search/; then
-            echo "学员统计与搜索索引均已和内容一致，无需提交"
+          if git diff --quiet -- public/search/; then
+            echo "搜索索引已和内容一致，无需提交"
             exit 0
           fi
           git config user.name "sde-index-bot"
           git config user.email "wangdesheng1234567@gmail.com"
-          git add public/students/roster.json public/search/
-          git commit -m "Auto-rebuild student rankings and search index for ${GITHUB_SHA::7}
+          git add public/search/
+          git commit -m "Rebuild search index on request (${GITHUB_SHA::7})
 
-          Content changed, so student counts, rankings and the search index derived
-          from it went stale in the same instant. Rebuilt by the publication workflow
-          with no human step involved.
+          Run by hand rather than on every push: the index is 218MB of generated data
+          and only its latest version is ever of use, so rebuilding it 60-190 times a
+          day was writing hundreds of megabytes of already-dead versions into history.
           Coordinates rebuilt in the same commit because sde-coords.json is keyed by
           doc index: any insertion shifts the numbering and points old coordinates at
           the wrong articles."
@@ -113,6 +107,5 @@ jobs:
 
       - name: 过期兜底自检（重建后必须不再过期，否则说明筛选规则与生成器脱节）
         run: |
-          python3 tools/build_roster.py --check
           python3 tools/build_search_index.py --check
 

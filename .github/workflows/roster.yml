@@ -1,0 +1,63 @@
+# 学员发表数与排名 · 自动重建
+#
+# 2026-07-29 从 search-index.yml 拆出来。原先两件事挂在同一个工作流上：
+# 重建索引（218MB 生成物）与重建排名（126KB）。索引每次重排都往 git 历史里
+# 压进一份很快作废的副本，2202 个提交里 1027 个是它，仓库涨到 4GB；排名那 126KB
+# 则完全无害。把重的那件改成"下令才跑"（search-index.yml），轻的这件留在自动档——
+# 学员看到的发表数与活跃分照旧随发文即时更新，一步没退。
+#
+# 与索引的耦合已经断干净：sde-coords.json 按文档编号存、必须与索引同跑，那两步都留在
+# search-index.yml 里；roster.json 只从磁盘上的页面派生，跟索引编号无关。
+
+name: roster
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'public/students/**'
+      - '!public/students/roster.json'   # 本工作流自己的产物，排除以免自我触发
+      - 'tools/build_roster.py'
+  workflow_dispatch:
+
+concurrency:
+  group: roster
+  cancel-in-progress: true
+
+jobs:
+  roster:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0            # ⚠️ 不能改成浅克隆。build_roster.py 的 published_date()
+                                    # 在页面没写"发表于"时靠 git 首次提交日兜底；浅克隆下
+                                    # 只看得见一个提交，缺戳的页面会被统一压成运行当天，
+                                    # 凭空拉高 recency 与活跃分、打乱排名。
+
+      - name: 重建学员发表数与排名数据
+        run: python3 tools/build_roster.py
+
+      - name: 有变化就提交回 main
+        run: |
+          if git diff --quiet -- public/students/roster.json; then
+            echo "排名已和内容一致，无需提交"
+            exit 0
+          fi
+          git config user.name "sde-index-bot"
+          git config user.email "wangdesheng1234567@gmail.com"
+          git add public/students/roster.json
+          git commit -m "Rebuild student rankings for ${GITHUB_SHA::7}
+
+          Publication counts and activity scores are derived from what is on disk,
+          so they go stale the instant an article lands. 126KB, rebuilt on every push."
+          # main 可能已前进（并发 push），冲突就 rebase 重试
+          for i in 1 2 3; do
+            git push && exit 0
+            echo "push 被拒（main 已前进），rebase 后重试 $i/3"
+            git pull --rebase origin main
+          done
+          echo "三次推送均失败" && exit 1
