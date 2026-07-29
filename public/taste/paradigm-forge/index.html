@@ -1335,6 +1335,19 @@ function needKey(){
   try{ localStorage.setItem(keyStoreName(), k); }catch(_){ }
   return k;
 }
+/* 所有对基底的直连调用都走这里：空答（<30 非空白字）就降档重来一趟。
+   降的是"想多久"不是"能写多长"——满功率把时间全烧在思考上、正文 0 字，是这台机器最常见的失败。 */
+async function askStream(system, prompt, box, statEl, metaEl, tok, label){
+  const key = needKey(); if(!key) throw new Error('缺 Key');
+  let r = await streamChat(key, modelSel.value, system, prompt, box, statEl, metaEl, tok);
+  if(!r.text || r.text.replace(/\s/g,'').length < 30){
+    note('「'+(label||'这一趟')+'」没写出正文，降档重来一次。');
+    if(statEl) statEl.innerHTML = '<span class="spinner"></span> 空答，降档重试';
+    const p2 = '【上一趟只顾着想、没写出正文。这一趟别铺陈，直接把结果写出来，短一点没关系。】\n\n' + prompt;
+    r = await streamChat(key, modelSel.value, system, p2, box, statEl, metaEl, Math.min(3000, tok));
+  }
+  return r;
+}
 async function callStage(id, prompt, tok, system){
   const p = panels[id];
   openStage(id);
@@ -1466,9 +1479,8 @@ async function doWarmup(){
       '③ 这一段对"让三篇文章互撞出一条新判断"这件事有什么用：≤4 条。',
       '', '【原文】', chunks[k]
     ].join('\n');
-    const r = await streamChat(key, modelSel.value,
-      '你在内化 SDE 本体论与方法论，为接下来的二阶碰撞作业打底盘。只写心得，不发表感想。',
-      cp, box, p.stat, p.meta, 3000);
+    const r = await askStream('你在内化 SDE 本体论与方法论，为接下来的二阶碰撞作业打底盘。只写心得，不发表感想。',
+      cp, box, p.stat, p.meta, 3000, '内功第'+(k+1)+'段');
     parts.push('【第'+(k+1)+'段】\n' + (r.text||''));
   }
   setStat('warmup', '<span class="spinner"></span> 合成心得总纲', 'run');
@@ -1480,15 +1492,23 @@ async function doWarmup(){
     '三、碰撞心法转写——选源、抽脊、命名、涌现、划界各自的硬纪律；',
     '四、本次作业的十条铁律——每条一句、可执行，其中至少四条是"不许做什么"。',
     '不许写"我将""我会"这类表态，直接写内容。',
-    '', parts.join('\n\n'),
-    '', '【二阶碰撞心法】', HEART || '（未取到）'
+    '', parts.map(x=>x.slice(0, 1600)).join('\n\n')
   ].join('\n');
+  // 心法不塞进这一趟：它已逐格全文注入，重复塞只会把这一趟撑成"大任务＋满功率"，正文更容易吐不出来
   const box2 = document.createElement('div'); box2.className='out'; box2.style.marginTop='8px';
   p.out.parentNode.insertBefore(box2, p.out.nextSibling);
-  const m = await streamChat(key, modelSel.value,
-    '你在把读完的心得压成一份可执行的作业底盘。要密、要硬、不要客套。',
-    mp, box2, p.stat, p.meta, 4000);
+  const m = await askStream('你在把读完的心得压成一份可执行的作业底盘。要密、要硬、不要客套。',
+    mp, box2, p.stat, p.meta, 3600, '心得总纲');
   ST.xinde = m.text || '';
+  if(ST.xinde.replace(/\s/g,'').length < 200){
+    // 合成这一趟两次都没出正文：分段心得已经读出来了，直接拿它当底盘，不能白读一遍内功
+    ST.xinde = parts.map(x=>x.slice(0, 1200)).join('\n\n');
+    note('心得总纲没合成出来，改用分段心得当底盘。');
+    setStat('warmup', '⚠ 总纲未合成 · 用分段心得当底盘（'+ST.xinde.replace(/\s/g,'').length+' 字）', 'done');
+    ST.out.warmup = ST.xinde;
+    try{ localStorage.setItem(sig, ST.xinde); }catch(_){ }
+    return ST.xinde;
+  }
   ST.out.warmup = ST.xinde;
   try{ localStorage.setItem(sig, ST.xinde); }catch(_){ }
   setStat('warmup', '✓ 读完 '+chunks.length+' 段内功 · 心得 '+ST.xinde.replace(/\s/g,'').length+' 字', 'done');
@@ -1510,7 +1530,7 @@ async function doSelect(){
   for(let r = ST.tried.length; r < limit; r++){
     if(ST.abort) throw new Error('已停下');
     setStat('select', '<span class="spinner"></span> 第 '+(r+1)+' 轮提名', 'run');
-    const nom = await streamChat(key, modelSel.value, sdeSystem(), promptFor('select'), p.out, p.stat, p.meta, 3000);
+    const nom = await askStream(sdeSystem(), promptFor('select'), p.out, p.stat, p.meta, 3000, '第'+(r+1)+'轮提名');
     const trio = parseSeed(nom.text||'');
     if(!trio){
       ST.tried.push({ trio:[0,0,0], score:0, why:'这一轮没给出可读的编号' });
@@ -1520,9 +1540,8 @@ async function doSelect(){
     const dup = ST.tried.some(x => x.trio.slice().sort().join()===trio.slice().sort().join());
     ST.__pending = trio;
     setStat('select', '<span class="spinner"></span> 第 '+(r+1)+' 轮验收 #'+trio.join(' #'), 'run');
-    const ver = await streamChat(key, modelSel.value,
-      '你是碰撞种子的验收员，只验不提名。宁可判低，不许放互补的组合过去。', promptFor('verify'),
-      p.out, p.stat, p.meta, 1200);
+    const ver = await askStream('你是碰撞种子的验收员，只验不提名。宁可判低，不许放互补的组合过去。', promptFor('verify'),
+      p.out, p.stat, p.meta, 1200, '第'+(r+1)+'轮验收');
     const v = parseVerdict(ver.text||'');
     const sc = (v.score==null ? 0 : v.score) - (dup ? 3 : 0) - (v.same==='高' ? 2 : 0);
     transcript.push('第 '+(r+1)+' 轮 #'+trio.join(' #')+'　烈度 '+(v.score==null?'?':v.score)+'/10　同源度 '+(v.same||'?')+'　'+v.why);
@@ -1576,7 +1595,7 @@ async function doWrite(){
     '末章给一条写死日期的赌注。只输出目录，不写正文。',
     '', head
   ].join('\n');
-  const o = await streamChat(key, modelSel.value, writerSystem(), outlineP, p.out, p.stat, p.meta, 3000);
+  const o = await askStream(writerSystem(), outlineP, p.out, p.stat, p.meta, 3000, '列目录');
   ST.outline = o.text||'';
   const chapters = ST.outline.split('\n').map(x=>x.trim()).filter(x=>/^[一二三四五六七八九十]+[、.]/.test(x) || /^\d+[、.]/.test(x));
   const total = chapters.length || 16;
@@ -1598,7 +1617,7 @@ async function doWrite(){
     ].join('\n');
     const box = document.createElement('div'); box.className='out'; box.style.marginTop='8px';
     p.out.parentNode.insertBefore(box, p.out.nextSibling);
-    const r = await streamChat(key, modelSel.value, writerSystem(), cp, box, p.stat, p.meta, 4000);
+    const r = await askStream(writerSystem(), cp, box, p.stat, p.meta, 4000, '第'+(k+1)+'–'+Math.min(k+step,total)+'章');
     ST.article += (ST.article? '\n\n':'') + (r.text||'');
   }
   ST.out.write = ST.article;
@@ -1913,7 +1932,7 @@ $('dlEngine').addEventListener('click', ()=>{
 });
 
 /* ===================== 起 ===================== */
-const BUILD_TAG = '20260729-0636·v1';
+const BUILD_TAG = '20260729-0708·v1';
 (function(){ const el=$('buildTag'); if(el) el.textContent='构建 '+BUILD_TAG; })();
 loadData();
 </script>

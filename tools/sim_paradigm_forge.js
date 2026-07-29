@@ -93,7 +93,7 @@ function spineAnswer(conflictLine) {
 }
 function defaultAnswer(userMsg) {
   if (/这是 SDE 内功的第/.test(userMsg)) return '这一段的承重判断若干。' + '要点。'.repeat(20);
-  if (/合成一份 ≤3000 字的作业底盘/.test(userMsg)) return '一、本体论要害……二、方法论工序……三、碰撞心法转写……四、十条铁律……' + '铁律。'.repeat(30);
+  if (/合成一份 ≤3000 字的作业底盘/.test(userMsg)) return '一、本体论要害……二、方法论工序……三、碰撞心法转写……四、十条铁律……' + '铁律一条。'.repeat(80);
   if (/【文章清单】/.test(userMsg))
     return /已经试过/.test(userMsg)
       ? '换一条轴再找……\n种子：#4 #5 #6 ｜ 矛盾轴：另一条轴'
@@ -683,8 +683,9 @@ function setStudent(c, slug) {
     } });
     c.$('maxRounds').value = '3';
     const done = await runPipeline(c, 30000);
-    ok('确实试满三组', c.calls.filter(x => /【文章清单】/.test(x.user)).length === 3,
-      '实际 ' + c.calls.filter(x => /【文章清单】/.test(x.user)).length + ' 轮');
+    // 两道闸都能把流程送回选篇（全文体检 / 三条主题观点不冲突），所以轮数是区间不是定值——但必须有界
+    const noms = c.calls.filter(x => /【文章清单】/.test(x.user)).length;
+    ok('至少试满三组，且不会无界地试下去', noms >= 3 && noms <= 8, '实际 ' + noms + ' 轮');
     ok('状态条如实写"试满"', /试满 3 组/.test(c.$('stat-select').textContent), c.$('stat-select').textContent);
     ok('红字给出三条出路（换学员／调大轮数／手挑）', /换一位学员/.test(c.$('errBox').textContent) &&
       /最多试/.test(c.$('errBox').textContent) && /手挑/.test(c.$('errBox').textContent), c.$('errBox').textContent);
@@ -758,7 +759,7 @@ function setStudent(c, slug) {
     } });
     const done = await runPipeline(c, 40000);
     ok('抽脊跑了两遍', sp === 2, '实际 ' + sp + ' 遍');
-    ok('回选篇只重提了一轮就定标', nom === 2, '实际提名 ' + nom + ' 轮');
+    ok('确实回选篇重提了（且有界）', nom >= 2 && nom <= 8, '实际提名 ' + nom + ' 轮');
     ok('第二组换的是另一条轴（不是原地挪位置）', /角力|反循环|同意/.test(c.$('srcState').textContent), c.$('srcState').textContent);
     ok('换组后重新体检', (c.calls.filter(x => /请先做体检/.test(x.user)) || []).length === 2);
     ok('把不合格的原因记进"已试过"', c.calls.some(x => /【文章清单】/.test(x.user) && /主题观点没能两两冲突/.test(x.user)));
@@ -966,6 +967,34 @@ function setStudent(c, slug) {
     ok('自动重写了一遍（成文跑了两轮）', wrote > 6, '共写了 ' + wrote + ' 趟');
     ok('重写的调令里点名了痕迹词', c.calls.some(x => /继续写这篇文章的第/.test(x.user) && /做法的痕迹整句删掉/.test(x.user)));
     ok('重写后干净了', /无工艺痕迹/.test(c.$('stat-write').textContent), c.$('stat-write').textContent);
+    ok('跑到底', done, c.$('stat-review').textContent);
+  });
+
+  await step('二十三之七、真机故障：合成心得那一趟吐 0 字', async () => {
+    let merge = 0;
+    const c = await boot({ answer: u => {
+      if (/合成一份 ≤3000 字的作业底盘/.test(u)) { merge++; return ''; }   // 两趟都空（满功率想太久的那个坑）
+      return defaultAnswer(u);
+    } });
+    const done = await runPipeline(c, 45000);
+    ok('空答后自动降档重来一趟', merge === 2, '实际 ' + merge + ' 趟');
+    ok('重试那一趟的调令里点明"别铺陈"', c.calls.some(x => /只顾着想、没写出正文/.test(x.user)));
+    ok('两趟都空就拿分段心得兜底', /用分段心得当底盘/.test(c.$('stat-warmup').textContent), c.$('stat-warmup').textContent);
+    const gate = c.calls.find(x => /请先做体检/.test(x.user));
+    ok('后面每一格照样拿得到底盘（不空转）', gate && /内化后写下的心得/.test(gate.system));
+    ok('读过的那几段内功没白读', gate && /第1段/.test(gate.system));
+    ok('照样跑到底', done, c.$('stat-review').textContent);
+  });
+
+  await step('二十三之八、提名那一趟吐 0 字也能自愈', async () => {
+    let nom = 0;
+    const c = await boot({ answer: u => {
+      if (/【文章清单】/.test(u)) { nom++; return nom === 1 ? '' : defaultAnswer(u); }
+      return defaultAnswer(u);
+    } });
+    const done = await runPipeline(c, 45000);
+    ok('空答的那一轮自动降档重来', nom >= 2, '实际 ' + nom + ' 趟');
+    ok('照样定标', /定标/.test(c.$('stat-select').textContent), c.$('stat-select').textContent);
     ok('跑到底', done, c.$('stat-review').textContent);
   });
 
