@@ -169,7 +169,7 @@ select.model-select{max-width:340px}
     <div id="mA" class="srcbox">
       <label class="lbl">学员</label>
       <select id="stuSel"></select>
-      <div class="small" style="margin:8px 0" id="autoNote">这位学员的全部文章会交给基底：它提名三篇 → 当场验打架烈度 → 不过就换一组重提，<b>一直找到三个种子为止</b>。</div>
+      <div class="small" style="margin:8px 0" id="autoNote">随机抽定一篇 A → 找与 A 对立的 B（本人栏找不到就扩到其他学员、再到全站长文）→ 再找<b>同时顶住 A 和 B</b> 的 C（同样逐级放宽）。三层都没有，才由知识库举一个真实第三方，<b>再没有才自造</b>——自造是最后手段。</div>
       <div class="small" style="margin:6px 0;color:var(--muted)">内化那一格走<b>快速档</b>（压缩活，快而稳）；碰撞与成文全程<b>满功率</b>。</div>
       <div class="row" style="margin:6px 0">
         <label class="small" style="display:flex;gap:6px;align-items:center">最多试
@@ -763,7 +763,7 @@ const MAX_SRC = 12000;        // 每个源喂进去的正文上限（字符）
 const TOK_HARD = 8000;        // 满功率档的硬上限——踩过两次，别再调大
 const STAGES = [
   {id:'warmup',  n:'内化',     hint:'把十万字内功与碰撞心法分块读完，写成一份心得当底盘', tok:3000},
-  {id:'select',  n:'选篇',     hint:'让基底从这位学员的文章里挑三篇互相打架的', tok:4000},
+  {id:'select',  n:'选篇',     hint:'随机 A → 找对立 B → 找同时顶两篇的 C，逐级放宽范围', tok:4000},
   {id:'gate',    n:'体检',     hint:'它们真的在打架吗（三道闸）',        tok:4000},
   {id:'spine',   n:'抽脊',     hint:'每篇抽三条最硬的话，共九条',        tok:TOK_HARD},
   {id:'collide', n:'混沌碰撞', hint:'跨篇两两对撞，二十七对',            tok:TOK_HARD},
@@ -1024,124 +1024,270 @@ function srcBlock(limit){
 function prevList(){
   return PARADIGMS.slice(0,60).map(x=>'· '+x.t+(x.d?('　—— '+x.d.slice(0,50)):'')).join('\n');
 }
-function stuListBlock(){
-  const st = curStudent();
-  return (st.items||[]).slice(0,80).map((x,i)=>
-    '#'+(i+1)+'　'+x.title + (x.kind?('　〔'+x.kind+'〕'):'') + (x.summary?('\n　　'+String(x.summary).slice(0,160)):'')
-  ).join('\n');
-}
-/* 读一组种子。四层兜底：
-   ① 「种子：」那一行上的数字（#3 / 第3篇 / 3 都认）② 全文里的 #数字
-   ③ 末尾几行里任何一行凑够三个数字 ④ 正文里点到的文章标题反查编号
-   真机第一轮就栽在这上面：模型思考了 61 秒、正文写了，却没按格式写编号。 */
-function parseSeed(txt, items){
-  const t = txt || '';
-  const N = (items && items.length) ? items.length : 999;
-  const ok = ns => { const u = []; ns.forEach(v=>{ if(v>=1 && v<=N && u.indexOf(v)<0) u.push(v); }); return u; };
-  const nums = s => (String(s).match(/\d+/g) || []).map(x=>parseInt(x,10));
-
-  const line = /种子[^\n]*[:：][^\n]*/.exec(t) || /选定[^\n]*[:：][^\n]*/.exec(t);
-  if(line){ const u = ok(nums(line[0])); if(u.length >= 3) return u.slice(0,3); }
-
-  const hash = ok((t.match(/#\s*\d+/g) || []).map(x=>parseInt(x.replace(/\D/g,''),10)));
-  if(hash.length >= 3) return hash.slice(0,3);
-
-  const tail = t.slice(-800).split('\n');
-  for(let k=tail.length-1; k>=0; k--){ const u = ok(nums(tail[k])); if(u.length >= 3) return u.slice(0,3); }
-
-  if(items && items.length){
-    const hit = [];
-    items.forEach((it,k)=>{
-      const ti = String(it.title||'').replace(/[《》「」"']/g,'').trim();
-      if(!ti || hit.indexOf(k+1) >= 0) return;
-      // 带书名号的短标题也认（《角力》）；裸标题要够长才认，免得两三个字到处误配
-      const quoted = t.indexOf('《'+ti+'》') >= 0 || t.indexOf('「'+ti+'」') >= 0 || t.indexOf('"'+ti+'"') >= 0;
-      if(quoted || (ti.length >= 4 && t.indexOf(ti) >= 0)) hit.push(k+1);
-    });
-    if(hit.length >= 3) return hit.slice(0,3);
-  }
-  return null;
-}
-/* 读验收员的两行读数 */
 function parseVerdict(txt){
   const s = /烈度[^\n]*?(\d+)\s*\/\s*10/.exec(txt||'') || /烈度[：:]\s*(\d+)/.exec(txt||'');
   const g = /同源度[：:]\s*(高|中|低)/.exec(txt||'');
   const w = /判词[：:]\s*([^\n]+)/.exec(txt||'');
   return { score: s ? parseInt(s[1],10) : null, same: g ? g[1] : '', why: (w ? w[1] : (txt||'').replace(/\s+/g,' ').slice(0,60)).trim() };
 }
-async function loadTrio(trio){
-  const st = curStudent(), items = st.items||[];
-  if(!trio) throw new Error('基底没给出可用的三篇——勾上「我自己挑三篇」手动选，或换一位学员。');
-  const picked = trio.map(n=>items[n-1]).filter(Boolean);
-  if(picked.length!==3) throw new Error('基底给的编号超出清单范围（'+trio.join('/')+'），换一位学员或改手挑。');
-  const out = [];
-  for(const it of picked) out.push({ title: it.title, url: it.url, author: st.name, text: await pullText(it.url) });
-  if(new Set(out.map(x=>x.url)).size!==3) throw new Error('基底挑的三篇有重复。');
-  ST.sources = out; ST.seed = trio;
-  ST.spineRows = []; ST.conflict = '';        // 换了组，旧观点卡片作废
-  $('srcState').textContent = '种子：'+out.map(s=>s.title.slice(0,12)).join(' × ');
+
+/* ================= 候选池：跨范围选篇的统一寻址 =================
+   候选 = {gid,title,url,kind,summary,author,scope}
+   gid 全局唯一（本人 L#／他人 P#／全站 W#），基底与程序都认它，不靠下标。 */
+function poolSelf(){
+  const st=curStudent();
+  return (st.items||[]).map((it,i)=>({gid:'L'+(i+1),title:it.title,url:it.url,
+    kind:it.kind||'',summary:it.summary||'',author:st.name,scope:'self'}));
+}
+function poolPeers(){
+  const cur=($('stuSel')||{}).value, out=[];
+  (STUDENTS||[]).forEach(s=>{ if(s.slug===cur) return;
+    (s.items||[]).forEach(it=>out.push({gid:'P'+out.length,title:it.title,url:it.url,
+      kind:it.kind||'',summary:it.summary||'',author:s.name,scope:'peer'})); });
+  return out;
+}
+function poolSite(){
+  return (CATALOG||[]).filter(x=>x.c!=='每日必读'&&x.c!=='学科通融').map((x,i)=>({
+    gid:'W'+i,title:x.t,url:x.u,kind:x.c||'',summary:(x.d||''),author:'',scope:'site'}));
+}
+/* 范围级别：0 仅本人 · 1 +他人 · 2 +全站 */
+function poolAt(level){
+  let p=poolSelf();
+  if(level>=1) p=p.concat(poolPeers());
+  if(level>=2) p=p.concat(poolSite());
+  return p;
+}
+const SCOPE_CN={self:'本人栏',peer:'其他学员',site:'全站长文'};
+const RUNG_CN=['本人栏','其他学员','全站长文'];
+function poolByGid(gid){ return poolAt(2).find(x=>x.gid===gid)||null; }
+/* 清单交给基底（gid 打头，程序按 gid 回读） */
+function poolListBlock(pool,cap){
+  return pool.slice(0,cap||200).map(x=>
+    x.gid+'　'+x.title+(x.kind?('　〔'+x.kind+'〕'):'')+(x.author?('　/'+x.author):'')+
+    (x.summary?('\n　　'+String(x.summary).slice(0,150)):'')).join('\n');
+}
+/* 从回答里读一个 gid（tag=B/C）。明说没有→''；读不出→null */
+function parseGid(txt,tag,pool,exclude){
+  const t=txt||'', ex=(exclude||[]), norm=s=>String(s).toUpperCase().replace(/\s+/g,'');
+  const ok=g=>g&&ex.indexOf(g)<0&&pool.some(x=>x.gid===g);
+  const line=new RegExp('(?:^|\\n)[\\s*>·]*'+tag+'\\s*[：:][^\\n]*').exec(t);
+  if(line){
+    const gs=(line[0].match(/[LPW]\s*\d+/gi)||[]).map(norm).filter(ok);
+    if(gs.length) return gs[0];
+    if(/无|没有|找不到|不存在/.test(line[0])) return '';
+  }
+  const tail=((t.slice(-700).match(/[LPW]\s*\d+/gi))||[]).map(norm).filter(ok);
+  if(tail.length) return tail[tail.length-1];
+  for(const x of pool){ if(ex.indexOf(x.gid)>=0) continue;
+    const ti=String(x.title||'').replace(/[《》「」"']/g,'').trim();
+    if(ti&&(t.indexOf('《'+ti+'》')>=0||(ti.length>=4&&t.indexOf(ti)>=0))) return x.gid; }
+  if(/找不到|没有|无法|不存在/.test(t.slice(-300))) return '';
+  return null;
+}
+/* 随机抽一个本人栏 gid（避开已当过 A 的） */
+function randSelfGid(usedGids){
+  const self=poolSelf().filter(x=>(usedGids||[]).indexOf(x.gid)<0);
+  if(!self.length) return null;
+  return self[Math.floor(Math.random()*self.length)].gid;
+}
+/* 取候选正文装成源 */
+async function srcOfGid(gid){
+  const x=poolByGid(gid);
+  if(!x) throw new Error('候选号超出范围（'+gid+'）');
+  return {title:x.title,url:x.url,author:x.author,scope:x.scope,text:await pullText(x.url)};
+}
+function selLog(html){
+  const p=panels.select; if(!p) return;
+  let log=p.el.querySelector('.sel-log');
+  if(!log){ log=document.createElement('div'); log.className='sel-log small'; log.style.marginTop='8px'; p.out.parentNode.insertBefore(log,p.out.nextSibling); }
+  log.innerHTML+='<div>'+html+'</div>';
+}
+/* 已试过的对子/三元组，回灌下一轮 */
+function triedBlock(){
+  if(!ST.tried.length) return '';
+  return '\n【已经试过、被判不合格的】\n'+ST.tried.map((x,k)=>'· '+((x.gids&&x.gids.length)?(x.gids.join(' × ')+'　'+x.score+'/10'):'（没给可读编号，不算数）')+'　'+x.why).join('\n')+
+    '\n上面这些别再提，也别只换一个就交差。';
+}
+/* 发生学"对立"判据，三处调令共用 */
+function sdeOppositeBlock(){
+  return [
+    '【什么叫"对立"——按发生学判，不按字面判】',
+    '不是找反义词，也不是比两篇说法顺不顺。要问的是：**同一件事，两篇把它的发生归给了不能同时成立的东西。**五种任一种成立即算对立：',
+    '　Ⅰ **目标同、路径互斥**——两篇要同一个结果，给的组织方式不能同时执行；',
+    '　Ⅱ **同一个显露、归因相反**——同一个现象，一篇说是这组条件养出来的，另一篇说恰是这组条件毁掉的；',
+    '　Ⅲ **一篇的约束正是另一篇的病因**——甲当作必须守住的条件，在乙的分析里正是病根；',
+    '　Ⅳ **中心位对调**——同一个三角里，一篇拿它当原因、另一篇拿它当结果（谁解释谁反过来了）；',
+    '　Ⅴ **结局判反**——同一条路走下去，一篇判它长本事，另一篇判它耗散、内卷或空转。',
+    '两种假对立别捡：**字面相反而其实不相干**（两篇要的根本不是同一件事，那是各说各的）；**同一个词各指一件事却没说清各指什么**（说得清才算张力，说不清只是含混）。',
+    '',
+    '【挑哪一篇：先往外跨】',
+    '① 首选**领域不同**的——一篇讲人、一篇讲机器，一篇讲课堂、一篇讲制度；跨得越远，撞出来的越不可能是复述；',
+    '② 其次是**主题不同**的；',
+    '③ 同一个主题也可以，但那时对立点必须落到上面五条里的一条，不能只说"两篇都在讲理解"——那是同源，不是对立。'
+  ].join('\n');
+}
+
+async function loadTrio(gids){
+  if(!gids || gids.length!==3) throw new Error('没凑齐三个源——重跑本格，或勾上「我自己挑三篇」。');
+  const out=[];
+  for(const g of gids) out.push(await srcOfGid(g));
+  if(new Set(out.map(x=>x.url)).size!==3) throw new Error('三个源里有重复。');
+  ST.sources=out; ST.seed=gids;
+  ST.spineRows=[]; ST.conflict='';
+  $('srcState').textContent='种子：'+out.map(s=>s.title.slice(0,12)).join(' × ');
   renderTrio();
   return out;
 }
+
 function promptFor(id){
   const O = ST.out;
-  if(id==='select') return [
-    '下面是学员「'+(curStudent().name||'')+'」在本站的全部文章（编号·标题·门类·摘要）。',
-    '你的任务不是挑三篇最好的，是**提名三篇互相打架的**做种子。',
-    '',
-    '【先记住怎么收尾】回答的最后一行必须是：　种子：#3 #17 #42 ｜ 矛盾轴：一句话',
-    '　　编号只写清单里的那个数字，形如 #3；不要写书名、不要只写标题、不要加粗、不要放进表格、不要写"第三篇"。',
-    '　　这一行没写对，整轮作废重来——你思考多久都不算数。',
-    '',
-    '判据（按重要性排）：',
-    '① **结局对立**最优先——三方对同一件事给了相反的处方或相反的命运判断；',
-    '② 打架点必须能用一句话说清；说不清的多半是"侧重不同"，那是互补，不算；',
-    '③ 三篇的题材可以差得很远，只要它们在同一个问题上不相容；题材相近而结论一致的，一律不选；',
-    '④ 避开三篇讲同一件事的三个侧面——那会在共享零件上空撞。',
-    '',
-    '【这是同一位作者的文集，务必读这一段】',
-    '同一个人的文章通常互相支持、共用一套框架，**你几乎找不到立场对立的三篇**——别去找了，那不是这里该找的东西。',
-    '要找的是**内部张力**，下面四种任一种都算，按由强到弱：',
-    'Ⅰ **一篇的处方，正是另一篇诊断出的病因**（甲说要多做 X，乙的分析里 X 恰恰是病根）；',
-    'Ⅱ **同一个动作／同一个变量，在两篇里被给了相反的评价**（同一个"撤"，一篇当作德，一篇当作灾）；',
-    'Ⅲ **适用条件互斥**——两篇各自成立，但它们要求的条件不能同时满足；',
-    'Ⅳ **同一个词在两篇里其实指着两件事**，而作者把它们当成同一件。',
-    '这四种都不需要作者本人自相矛盾——他很可能从未把这两篇放在一起看过。**你的活就是把它们放到一起。**',
-    (ST.tried.length ? ('\n【已经试过、被判不合格的组合】\n' +
-      ST.tried.map((x,k)=>'· 第'+(k+1)+'轮 '+(x.trio && x.trio.length ? ('#'+x.trio.join(' #')+'　烈度 '+x.score+'/10') : '（没按格式给编号，这一轮不算数）')+'　'+x.why).join('\n') +
-      '\n不许再提上面任何一组，也不许只换一篇就交差——上面几组说明你原来那条矛盾轴不成立，请换一条轴重新找。') : ''),
-    '',
-    '先写清三件事，再给结论：',
-    '　· 三篇各自的**主题观点**（每篇一句，≤40 字，是这篇真正主张的那一条，不是它的题材）；',
-    '　· **两两冲突**：a×b、a×c、b×c 各一句，说明两条主题观点为什么不能同时成立',
-    '　　（判准只有一条：若这条成立，那条就不成立。两条能并存的，一律不算冲突）；',
-    '　· 这一组为什么不是"侧重不同"——并**从冲突的两篇里各摘一句原话**摆出来（每句 ≤20 字）。摘不出原话的，多半是你替作者想出来的冲突，换一组。',
-    '三对里只要有一对其实相容，这一组就不合格，请另找一组再交。',
-    '【最后一行必须是这个形状，供程序读取，不要加粗、不要放进表格】',
-    '种子：#3 #17 #42 ｜ 矛盾轴：一句话',
-    '',
-    '【文章清单】',
-    stuListBlock()
-  ].filter(Boolean).join('\n');
+  if(id==='pickB'){
+    const A=poolByGid(ST.aGid)||{}, pool=ST.__pool||[];
+    return [
+      '第一篇 A 已经**随机抽定**（来自这位学员的专栏），不许更换。',
+      '',
+      '【A（已定，随机抽出）】',
+      A.gid+'　'+(A.title||'?')+(A.kind?('　〔'+A.kind+'〕'):'')+(A.author?('　/'+A.author):'')+'\n　　'+String(A.summary||'').slice(0,220),
+      '',
+      '你的任务只有一件：从下面清单里挑出**一篇与 A 最对立的** B。',
+      '判准只有一条：**若 A 的主张成立，B 的主张就不成立。**两条能并存的，不叫对立。',
+      (ST.__rung>0 ? ('\n（这一层找的是 **'+RUNG_CN[ST.__rung]+'** 的文章——本人栏里没找到能顶 A 的，往外扩了一层。跨作者、跨学科反而更容易真打架。）') : ''),
+      '',
+      sdeOppositeBlock(),
+      triedBlock(),
+      '',
+      '先写清四件事，再收尾：',
+      '　· A 的主题观点（≤40 字，判断句）；',
+      '　· B 的主题观点（≤40 字，判断句）；',
+      '　· 它们为什么不能同时成立（一句话；说不清就是没找对）；',
+      '　· 从两篇里**各摘一句原话**顶着（每句 ≤20 字）——摘不出的多半是你替作者想出来的冲突，换一篇。',
+      '【最后一行必须是这个形状，供程序读取，写候选号（形如 B：L7 / B：P23 / B：W15），不要写标题、不要加粗、不要放进表格】',
+      'B：L7',
+      '',
+      '【可选篇目】',
+      poolListBlock(pool)
+    ].filter(Boolean).join('\n');
+  }
+
+  if(id==='verifyPair'){
+    const pr=(ST.__pending2||[]).map(g=>poolByGid(g)||{});
+    return [
+      '你是对子验收员，不是提名者。下面两篇被提名做碰撞底座，你只做一件事：判它们到底顶不顶得上。',
+      '',
+      pr.map((x,i)=>(i?'B ':'A ')+(x.gid||'')+'　'+(x.title||'?')+(x.kind?('　〔'+x.kind+'〕'):'')+(x.author?('　/'+x.author):'')+'\n　　'+String(x.summary||'').slice(0,180)).join('\n'),
+      '',
+      '打分规矩（硬约束，别客气）：',
+      '· 两篇只是侧重不同／各说一面 → 烈度 ≤4，那是互补不是矛盾；',
+      '· **对立按发生学判，不按字面判**——同一件事被归给了不能同时成立的东西才算。五种任一种成立即可给 ≥6：',
+      '　 Ⅰ 目标同而路径互斥 → 7；Ⅱ 同一个显露被归因给相反的条件 → 8；Ⅲ 一篇的约束正是另一篇的病因 → 8；',
+      '　 Ⅳ 中心位对调（谁解释谁反过来） → 7；Ⅴ 同一条路被判了相反的结局 → 8。',
+      '· **字面相反而其实不相干**（两篇要的根本不是同一件事）→ ≤4；提名者摘不出两句互相顶撞的原话 → 一律 ≤4。',
+      '· 打架点你自己一句话说不清 → 烈度 ≤5。',
+      '· **门类不同不扣分，反而是好事**——跨领域正是要的；同门类也不加分，只看它们在同一件事上相不相容。',
+      '你不是来鼓励提名者的。宁可判低，也别放一对互补的过去。',
+      '',
+      '【输出：先两行主题观点，再两行读数】',
+      '主题A：…… ｜ 主题B：……',
+      '烈度：X/10 ｜ 打架点：一句话（说不清就写"说不清"）',
+      '判词：一句话说明为什么是这个分；不过的话，指出该往哪个方向另找'
+    ].join('\n');
+  }
+
+  if(id==='pickC'){
+    const P=ST.pair||{}, A=poolByGid(P.aGid)||{}, B=poolByGid(P.bGid)||{}, pool=ST.__pool||[];
+    return [
+      '【已经立住的对子——不许更换】',
+      'A '+(A.gid||'')+'　'+(A.title||'?')+(A.author?('　/'+A.author):'')+'　主题观点：'+(P.ta||'（见摘要）'),
+      '　　'+String(A.summary||'').slice(0,180),
+      'B '+(B.gid||'')+'　'+(B.title||'?')+(B.author?('　/'+B.author):'')+'　主题观点：'+(P.tb||'（见摘要）'),
+      '　　'+String(B.summary||'').slice(0,180),
+      'A×B 的打架点：'+(P.why||'（见上）'),
+      '',
+      '你的任务：从下面清单里挑出**同时与 A 和 B 都对立**的第三篇 C。',
+      (ST.__crung>0 ? ('（这一层找的是 **'+RUNG_CN[ST.__crung]+'** 的文章——更近的范围里没有能同时顶两篇的，往外扩了一层。）') : ''),
+      '· C 不是站在 A 那边打 B，也不是站在 B 那边打 A——**它要让 A 和 B 同时不成立**；',
+      '· 最有力的一种 C 是**取消这个变量**：它说 A 与 B 争的那件事根本不是决定性的，或者他们共享的那个前提不成立；',
+      '· 三篇讲同一件事的三个侧面，会在共享零件上空撞，不算。',
+      '',
+      sdeOppositeBlock(),
+      (ST.badC&&ST.badC.length ? ('\n【这几篇已经当过 C 且没通过，别再提】'+ST.badC.join(' ')) : ''),
+      '',
+      '先写：C 的主题观点（≤40 字）· C×A 为什么不能同时成立（一句）· C×B 为什么不能同时成立（一句）· 从 C 里摘一句原话（≤20 字）。',
+      '**这一层里实在没有，就诚实写「C：无」并说清缺的是哪一类主张**——下一层还会往外找，不必硬凑。',
+      '【最后一行必须是这个形状，供程序读取，写候选号】',
+      'C：L42　（找不到就写　C：无）',
+      '',
+      '【可选篇目】',
+      poolListBlock(pool)
+    ].filter(Boolean).join('\n');
+  }
+
+  if(id==='pickCKB'){
+    const P=ST.pair||{}, A=poolByGid(P.aGid)||{}, B=poolByGid(P.bGid)||{};
+    return [
+      '【已经立住的对子——不许更换】',
+      'A　'+(A.title||'?')+'　主题观点：'+(P.ta||''),
+      '　　'+String(A.summary||'').slice(0,180),
+      'B　'+(B.title||'?')+'　主题观点：'+(P.tb||''),
+      '　　'+String(B.summary||'').slice(0,180),
+      'A×B 的打架点：'+(P.why||''),
+      '',
+      '站内（本人栏＋其他学员＋全站长文）都翻遍了，没有能同时顶住这一对的第三方。',
+      '现在**从你自己的知识库里举一个真实存在的**——某位学者的理论、某项研究、某个已发表的论点，让 A 与 B **同时不成立**（最有力的是取消他们共享的那个前提）。',
+      '硬要求：',
+      '· 必须**真实存在、可查证**：给得出提出者与出处（作者 · 篇名或书名 · 年份）；记不准就换一个，**绝不允许编造文献**；',
+      '· 它要让 A、B 同时失效，不是给这场争论作背景介绍；',
+      '· 用**你自己的话**转述，超过二十字的原话一律不要。',
+      '举不出可靠的真东西，就只写一行「出处：无」——下一步会由你自己造一条，别在这里编。',
+      '',
+      '【输出格式，逐项写全】',
+      '出处：作者《篇名或书名》年份',
+      '主题观点：一句 ≤40 字的判断句',
+      '支撑观点甲：≤40 字（结果层）　支撑观点乙：≤40 字（路径层）　支撑观点丙：≤40 字（条件层）',
+      '与A的冲突：一句　｜　与B的冲突：一句',
+      '转述：500–800 字，把它的论证说到能被反驳的程度。'
+    ].join('\n');
+  }
+
+  if(id==='makeC'){
+    const P=ST.pair||{}, A=poolByGid(P.aGid)||{}, B=poolByGid(P.bGid)||{};
+    return [
+      '站内没有、你的知识库里也举不出可靠的真第三方。**到这一步，才由你自己造一个。这是最后手段。**',
+      '',
+      'A　'+(A.title||'?')+'　主题观点：'+(P.ta||''),
+      '　　'+String(A.summary||'').slice(0,200),
+      'B　'+(B.title||'?')+'　主题观点：'+(P.tb||''),
+      '　　'+String(B.summary||'').slice(0,200),
+      'A×B 的打架点：'+(P.why||''),
+      '',
+      '造法（这不是折中，也不是综合）：',
+      '· 造一条让 **A 与 B 同时失效**的判断；最有力的一种是**取消他们共享的那个前提**；',
+      '· 必须是一条能被反驳的判断，不是一句正确的废话；',
+      '· 不许写成"两者各有道理、要辩证看待"——那种句子对任何一对都成立，等于没造。',
+      '',
+      '【输出格式，逐项写全】',
+      '标题：一句 ≤20 字的短题（不要加书名号）',
+      '主题观点：一句 ≤40 字的判断句',
+      '支撑观点甲：≤40 字（结果层）　支撑观点乙：≤40 字（路径层）　支撑观点丙：≤40 字（条件层）',
+      '与A的冲突：一句　｜　与B的冲突：一句',
+      '立论：600–900 字，含一个具体现场、一条可检验的推论、一条证伪条件。'
+    ].join('\n');
+  }
 
   if(id==='verify'){
-    const items = curStudent().items||[];
-    const trio = ST.__pending || [];
+    const d3=(ST.__pending||[]).map(x=> x.gid?x:(poolByGid(x)||{title:x&&x.title,summary:x&&x.summary,author:x&&x.author}));
     return [
       '你是验收员，不是提名者。下面三篇被提名做碰撞种子，你只做一件事：判它们到底打不打架。',
       '',
-      trio.map(n=>{ const it=items[n-1]||{}; return '#'+n+'　'+(it.title||'?')+(it.kind?('　〔'+it.kind+'〕'):'')+'\n　　'+String(it.summary||'').slice(0,160); }).join('\n'),
+      d3.map((x,i)=>'源'+(i+1)+'　'+(x.title||'?')+(x.kind?('　〔'+x.kind+'〕'):'')+(x.author?('　/'+x.author):'')+'\n　　'+String(x.summary||'').slice(0,160)).join('\n'),
       '',
       '打分规矩（硬约束，别客气）：',
       '· 三方只是侧重不同／各说一面 → 烈度 ≤4，那是互补不是矛盾；',
-      '· 三方对同一件事给了相反的处方或相反的命运判断（结局对立）→ 烈度 ≥7；',
-      '· **同一位作者的文集**：不要求立场对立，下面四种张力任一种成立即可给 ≥6——',
-      '　 Ⅰ 一篇的处方正是另一篇诊断出的病因 → 8；Ⅱ 同一个动作／变量被给了相反评价 → 8；',
-      '　 Ⅲ 两篇的适用条件互斥、不能同时满足 → 7；Ⅳ 同一个词在两篇里其实指两件事 → 6；',
-      '　 但提名者若摘不出两句互相顶撞的原话，一律 ≤4——那多半是他替作者想出来的冲突。',
-      '· 打架点你自己一句话说不清 → 烈度 ≤5；',
-      '· 三篇其实是同一件事的三个侧面 → 同源度判"高"；',
-      '· 你自己写不出三条彼此不能同时成立的主题观点 → 烈度 ≤4（写得出就把三条写在判词前面）。',
+      '· **对立按发生学判，不按字面判**——同一件事被归给了不能同时成立的东西才算。五种任一种成立即可给 ≥6：',
+      '　 Ⅰ 目标同而路径互斥 → 7；Ⅱ 同一个显露被归因给相反的条件 → 8；Ⅲ 一篇的约束正是另一篇的病因 → 8；',
+      '　 Ⅳ 中心位对调（谁解释谁反过来） → 7；Ⅴ 同一条路被判了相反的结局 → 8。',
+      '· **字面相反而其实不相干** → ≤4；三方各说各的一面、拼不出一条共同的争点 → 同源度判"高"。',
+      '· **门类不同不扣分，反而是好事**；同门类也不加分。',
       '你不是来鼓励提名者的。宁可判低，也别放一组互补的过去——放过去的代价是后面十道工序全部空转。',
       '',
       '【输出：先三行主题观点，再两行读数】',
@@ -1456,7 +1602,9 @@ async function runStage(i){
       // 三条主题观点里有一对其实相容 —— 底盘不成立，回选篇另找（复用种子搜索的"已试过"记账）
       if(ST.mode==='A' && !ST.manual && ST.outer < 2){
         ST.outer++;
-        if(ST.seed) ST.tried.push({ trio: ST.seed, score: 0, why: '三条主题观点没能两两冲突：'+ST.conflict });
+        if(ST.seed) ST.tried.push({ gids: ST.seed, score: 0, why: '三条主题观点没能两两冲突：'+ST.conflict });
+        if(ST.seed && ST.seed[2] && ST.seed[2]!=='(造)'){ ST.badC=ST.badC||[]; ST.badC.push(ST.seed[2]); }  // 这一篇当过 C 且底盘不成立，别再提
+        if(!ST.forged) ST.pair=null;   // 回选篇：真文章第三方失败，重找对子/第三篇；自造/知识库的不回退
         note('主题观点没能两两冲突，回选篇另找一组。');
         showErr('三条主题观点里有一对其实相容（'+ST.conflict+'）——回选篇另找一组，从体检重来（第 '+ST.outer+' 次，最多两次）。');
         setStat('spine', '回选篇重找…', 'run');
@@ -1474,7 +1622,9 @@ async function runStage(i){
       // 摘要层看着能打，全文层却不打——把体检判词记进"已试过"，回选篇接着找
       if(ST.mode==='A' && !ST.manual && ST.outer < 2){
         ST.outer++;
-        if(ST.seed) ST.tried.push({ trio: ST.seed, score: sc, why: '全文体检只给 '+sc+'/10（摘要层看走眼）' });
+        if(ST.seed) ST.tried.push({ gids: ST.seed, score: sc, why: '全文体检只给 '+sc+'/10（摘要层看走眼）' });
+        if(ST.seed && ST.seed[2] && ST.seed[2]!=='(造)'){ ST.badC=ST.badC||[]; ST.badC.push(ST.seed[2]); }
+        if(!ST.forged) ST.pair=null;
         showErr('全文体检只给 '+sc+'/10——这一组摘要层看着能打、正文里不打。回选篇接着找（第 '+ST.outer+' 次，最多两次）。');
         setStat('gate', '回选篇重找…', 'run');
         await doSelect();
@@ -1574,62 +1724,166 @@ async function doWarmup(){
 }
 
 async function doSelect(){
-  const p = panels.select;
+  const p=panels.select;
   openStage('select');
-  const key = needKey(); if(!key) throw new Error('缺 Key');
-  const maxR = parseInt(($('maxRounds')||{}).value || '6', 10);
-  let log = p.el.querySelector('.sel-log');
-  if(!log){ log = document.createElement('div'); log.className='sel-log small'; log.style.marginTop='8px'; p.out.parentNode.insertBefore(log, p.out.nextSibling); }
-  if(!ST.tried.length) log.innerHTML = '';
-  let transcript = [];
-  // 回头再找时（全文体检不过）总要再给几轮，否则第一次就把额度用光、第二次进来无事可做
-  const limit = Math.max(maxR, ST.tried.length + 2);
+  const key=needKey(); if(!key) throw new Error('缺 Key');
+  const maxR=parseInt(($('maxRounds')||{}).value||'6',10);
+  if(!ST.tried.length){ const l=p.el.querySelector('.sel-log'); if(l) l.innerHTML=''; }
+  let transcript=[];
+  ST.usedA=ST.usedA||[]; ST.badC=ST.badC||[];
+  const limit=Math.max(maxR, ST.tried.length+2);
+  let cFail=0, lastC='';
 
-  for(let r = ST.tried.length; r < limit; r++){
+  for(let r=ST.tried.length; r<limit; r++){
     if(ST.abort) throw new Error('已停下');
-    setStat('select', '<span class="spinner"></span> 第 '+(r+1)+' 轮提名', 'run');
-    const nom = await askStream(sdeSystem(), promptFor('select'), p.out, p.stat, p.meta, 3000, '第'+(r+1)+'轮提名');
-    const trio = parseSeed(nom.text||'', (curStudent().items||[]));
-    if(!trio){
-      ST.tried.push({ trio:[], score:0, why:'这一轮没按格式给编号，作废重提' });
-      log.innerHTML += '<div>第 '+(r+1)+' 轮：没读出编号（正文写了但没按格式收尾），重提。</div>';
+
+    /* ① 没有对子 → 随机定 A，逐级找与它对立的 B */
+    if(!ST.pair){
+      let aGid,bGid,swapped=false;
+      if(ST.__swap){ aGid=ST.__swap[0]; bGid=ST.__swap[1]; ST.__swap=null; swapped=true; ST.aGid=aGid; }
+      else {
+        aGid=randSelfGid(ST.usedA);
+        if(!aGid){ selLog('这位学员的篇目已经全部当过 A 了。'); break; }
+        ST.usedA.push(aGid); ST.aGid=aGid;
+        // B 逐级放宽：0 本人栏 → 1 +他人 → 2 +全站
+        bGid=null;
+        for(let rung=0; rung<=2 && !bGid; rung++){
+          ST.__rung=rung;
+          ST.__pool=poolAt(rung).filter(x=>x.gid!==aGid);
+          setStat('select','<span class="spinner"></span> 第 '+(r+1)+' 轮 · A '+aGid+' → 在'+RUNG_CN[rung]+'找对立的 B','run');
+          const nb=await askStream(sdeSystem(), promptFor('pickB'), p.out, p.stat, p.meta, 2600, '第'+(r+1)+'轮找B·'+RUNG_CN[rung]);
+          bGid=parseGid(nb.text||'', 'B', ST.__pool, [aGid]);
+          if(bGid==='') { if(rung<2) selLog('第 '+(r+1)+' 轮：'+RUNG_CN[rung]+'里没有能顶 A 的，往外扩一层。'); bGid=null; continue; }
+          if(bGid===null){ break; } // 读不出编号：这一轮作废
+        }
+        if(!bGid){
+          ST.tried.push({ gids:[aGid], score:0, why:'A '+aGid+' 三层都没找出对立的 B（或没给可读编号）' });
+          selLog('第 '+(r+1)+' 轮：A '+aGid+' —— 没找出 B，换一篇 A 重来。');
+          continue;
+        }
+      }
+      ST.__pending2=[aGid,bGid];
+      setStat('select','<span class="spinner"></span> 第 '+(r+1)+' 轮 · 验对子 '+aGid+'×'+bGid,'run');
+      const vb=await askStream('你是对子验收员，只验两篇顶不顶得上，不许提名。宁可判低。', promptFor('verifyPair'),
+        p.out, p.stat, p.meta, 900, '第'+(r+1)+'轮验对子');
+      const v2=parseVerdict(vb.text||'');
+      const sc2=(v2.score==null?0:v2.score);
+      const ta=/主题A[：:]\s*([^｜\n|]+)/.exec(vb.text||''), tb=/主题B[：:]\s*([^｜\n|]+)/.exec(vb.text||'');
+      const bx=poolByGid(bGid)||{};
+      transcript.push('第 '+(r+1)+' 轮 对子 '+aGid+'×'+bGid+'　烈度 '+sc2+'/10　'+v2.why);
+      selLog('第 '+(r+1)+' 轮：'+(swapped?'回退换对子 ':'')+aGid+'×'+bGid+'（'+(SCOPE_CN[bx.scope]||'')+'）　对子烈度 <b>'+sc2+'/10</b>　'+escTxt(v2.why));
+      const pr={ aGid:aGid, bGid:bGid, why:v2.why, ta:(ta?ta[1].trim():''), tb:(tb?tb[1].trim():''), sc:sc2 };
+      if(!ST.bestPair || sc2>ST.bestPair.sc) ST.bestPair=pr;
+      ST.tried.push({ gids:[aGid,bGid], score:sc2, why:'对子 '+sc2+'/10：'+v2.why });
+      if(sc2<6) continue;
+      ST.pair=pr; cFail=0; lastC='';
+      selLog('<span style="color:var(--ok)">✓ 对子立住（'+sc2+'/10），接下来找同时顶住这两篇的第三篇。</span>');
       continue;
     }
-    const dup = ST.tried.some(x => x.trio.slice().sort().join()===trio.slice().sort().join());
-    ST.__pending = trio;
-    setStat('select', '<span class="spinner"></span> 第 '+(r+1)+' 轮验收 #'+trio.join(' #'), 'run');
-    const ver = await askStream('你是碰撞种子的验收员，只验不提名。宁可判低，不许放互补的组合过去。', promptFor('verify'),
-      p.out, p.stat, p.meta, 1200, '第'+(r+1)+'轮验收');
-    const v = parseVerdict(ver.text||'');
-    const sc = (v.score==null ? 0 : v.score) - (dup ? 3 : 0) - (v.same==='高' ? 2 : 0);
-    transcript.push('第 '+(r+1)+' 轮 #'+trio.join(' #')+'　烈度 '+(v.score==null?'?':v.score)+'/10　同源度 '+(v.same||'?')+'　'+v.why);
-    log.innerHTML += '<div>第 '+(r+1)+' 轮：#'+trio.join(' #')+'　烈度 <b>'+(v.score==null?'?':v.score)+'/10</b>　同源度 '+(v.same||'?')+
-      (dup?'　<span style="color:var(--warn)">（提了重复组合，扣分）</span>':'')+'　'+escTxt(v.why)+'</div>';
-    if(!ST.best || sc > ST.best.sc) ST.best = { trio, sc, v };
-    ST.tried.push({ trio, score:(v.score==null?0:v.score), why:v.why });
-    if(v.score !== null && v.score >= 6 && v.same !== '高' && !dup){
-      ST.seedScore = v.score;
-      ST.out.select = transcript.join('\n');
-      log.innerHTML += '<div style="color:var(--ok)">✓ 第 '+(r+1)+' 轮定标：烈度 '+v.score+'/10，取全文。</div>';
-      setStat('select', '✓ 第 '+(r+1)+' 轮定标 · 烈度 '+v.score+'/10', 'done');
-      await loadTrio(trio);
-      hideErr();
-      return ST.out.select;
+
+    /* ② 有对子 → 逐级找 C（本人→他人→全站→知识库→自造） */
+    let cGid=null;
+    for(let rung=0; rung<=2 && !cGid; rung++){
+      ST.__crung=rung;
+      ST.__pool=poolAt(rung).filter(x=>x.gid!==ST.pair.aGid && x.gid!==ST.pair.bGid && ST.badC.indexOf(x.gid)<0);
+      setStat('select','<span class="spinner"></span> 第 '+(r+1)+' 轮 · 在'+RUNG_CN[rung]+'找同时顶住 '+ST.pair.aGid+'×'+ST.pair.bGid+' 的 C','run');
+      const nc=await askStream(sdeSystem(), promptFor('pickC'), p.out, p.stat, p.meta, 2600, '第'+(r+1)+'轮找C·'+RUNG_CN[rung]);
+      cGid=parseGid(nc.text||'', 'C', ST.__pool, [ST.pair.aGid, ST.pair.bGid].concat(ST.badC));
+      if(cGid===''){ if(rung<2) selLog('第 '+(r+1)+' 轮：'+RUNG_CN[rung]+'里没有能同时顶两篇的 C，往外扩一层。'); cGid=null; continue; }
+      if(cGid===null) break;
     }
+
+    if(cGid){
+      const trio=[ST.pair.aGid, ST.pair.bGid, cGid]; lastC=cGid;
+      ST.__pending=trio;
+      const cx=poolByGid(cGid)||{};
+      setStat('select','<span class="spinner"></span> 第 '+(r+1)+' 轮 · 三方验收 '+trio.join(' '),'run');
+      const ver=await askStream('你是碰撞种子的验收员，只验不提名。宁可判低，不许放互补的组合过去。', promptFor('verify'),
+        p.out, p.stat, p.meta, 1200, '第'+(r+1)+'轮验收');
+      const v=parseVerdict(ver.text||'');
+      const sc=(v.score==null?0:v.score)-(v.same==='高'?2:0);
+      transcript.push('第 '+(r+1)+' 轮 '+trio.join(' ')+'　烈度 '+(v.score==null?'?':v.score)+'/10　同源度 '+(v.same||'?')+'　'+v.why);
+      selLog('第 '+(r+1)+' 轮：+C '+cGid+'（'+(SCOPE_CN[cx.scope]||'')+'）　三方烈度 <b>'+(v.score==null?'?':v.score)+'/10</b>　同源度 '+(v.same||'?')+'　'+escTxt(v.why));
+      if(!ST.best || sc>ST.best.sc) ST.best={ gids:trio, sc:sc, v:v };
+      ST.tried.push({ gids:trio, score:(v.score==null?0:v.score), why:v.why });
+      if(v.score!==null && v.score>=6 && v.same!=='高'){
+        ST.seedScore=v.score; ST.out.select=transcript.join('\n');
+        selLog('<span style="color:var(--ok)">✓ 第 '+(r+1)+' 轮定标：烈度 '+v.score+'/10，取全文。</span>');
+        setStat('select','✓ 第 '+(r+1)+' 轮定标 · 烈度 '+v.score+'/10','done');
+        await loadTrio(trio); hideErr(); return ST.out.select;
+      }
+      ST.badC.push(cGid); cFail++;
+      if(cFail>=2){ ST.__swap=[ST.pair.aGid, cGid]; ST.pair=null; selHint('这一对连着两次没撞出合格的三方，回退：改用 A×C 当新对子。'); }
+      continue;
+    }
+
+    /* ③ 三层文章都没有 C → 先知识库、再自造（都不占学员篇目） */
+    cFail++;
+    ST.tried.push({ gids:[ST.pair.aGid, ST.pair.bGid], score:0, why:'站内三层都找不出第三方（第 '+cFail+' 次）' });
+    selLog('第 '+(r+1)+' 轮：本人栏／其他学员／全站都没有能同时顶两篇的 C。');
+    const kb=await findCInKB(transcript);
+    if(kb) return kb;
+    const md=await forgeC(transcript);
+    return md;
   }
-  // 试满了还没定标：取试过的里面最好的一组，如实说清
-  if(!ST.best || !ST.best.trio) throw new Error('试了 '+ST.tried.length+' 组都没读出可用编号——重跑本格，或勾上「我自己挑三篇」。');
-  const n = ST.tried.length;
-  ST.seedScore = ST.best.v.score==null ? 0 : ST.best.v.score;
-  ST.out.select = transcript.join('\n');
-  log.innerHTML += '<div style="color:var(--warn)">试满 '+n+' 组仍没有一组过 6/10，取其中最好的一组（'+ST.seedScore+'/10）继续。</div>';
-  setStat('select', '⚠ 试满 '+n+' 组 · 最好 '+ST.seedScore+'/10', 'done');
-  showErr('试了 '+n+' 组都不够打架，最好的一组只有 '+ST.seedScore+'/10。已用它继续跑，但成品破 150 的机会不大。'+
-    '一个人的文集常常整片朝同一个方向，本来就难打架——最有效的一步是改用「B · 三人各一篇」（跨作者跨领域，结构上容易得多）；'+
-    '其次是把"最多试"调大、换一位学员，或勾手挑自己指定三篇。');
-  await loadTrio(ST.best.trio);
+
+  /* 试满：先取勉强能用的一组，没有则退到知识库→自造 */
+  if(ST.best && ST.best.gids && ST.best.sc>=5){
+    const n=ST.tried.length; ST.seedScore=ST.best.v.score==null?0:ST.best.v.score; ST.out.select=transcript.join('\n');
+    selHint('试满 '+n+' 轮没有一组过 6/10，取其中最好的一组（'+ST.seedScore+'/10）继续。');
+    setStat('select','⚠ 试满 '+n+' 轮 · 最好 '+ST.seedScore+'/10','done');
+    showErr('试了 '+n+' 轮都不够打架，最好的一组只有 '+ST.seedScore+'/10。已用它继续跑，但成品破 150 的机会不大。改用「B · 三人各一篇」（跨作者跨领域）通常更省事；也可把"最多试"调大、换一位学员，或勾手挑。');
+    await loadTrio(ST.best.gids); return ST.out.select;
+  }
+  if(!ST.pair && ST.bestPair) ST.pair=ST.bestPair;
+  if(!ST.pair) throw new Error('试了 '+ST.tried.length+' 轮，连一对能顶得上的都没立住——重跑本格、换一位学员，或勾上「我自己挑三篇」。');
+  const kb=await findCInKB(transcript);
+  if(kb) return kb;
+  return await forgeC(transcript);
+}
+
+/* 知识库找第三方（真实存在，非自造）。成了就装源返回 select 输出；否则 null */
+async function findCInKB(transcript){
+  const p=panels.select;
+  setStat('select','<span class="spinner"></span> 站内没有第三方 · 从大模型知识库里找一个真实的','run');
+  const m=await askStream(sdeSystem(), promptFor('pickCKB'), p.out, p.stat, p.meta, 2200, '知识库找第三方');
+  const txt=m.text||'';
+  if(/出处[：:]\s*无/.test(txt) || txt.replace(/\s/g,'').length<200){ selLog('知识库里也举不出可靠的真第三方。'); return null; }
+  const src=/出处[：:]\s*([^\n]+)/.exec(txt);
+  const title='（知识库）'+((src?src[1]:'').replace(/[《》]/g,'').trim().slice(0,26) || '让两篇同时失效的一个已有论点');
+  return await installForged(transcript, title, txt, 'kb');
+}
+
+/* 最后手段：自造一条对立判断当第三个源 */
+async function forgeC(transcript){
+  const p=panels.select;
+  setStat('select','<span class="spinner"></span> 站内与知识库都没有 · 最后手段：自造一个对立面','run');
+  const m=await askStream(sdeSystem(), promptFor('makeC'), p.out, p.stat, p.meta, 2400, '自造第三方');
+  const txt=m.text||'';
+  if(txt.replace(/\s/g,'').length<200) throw new Error('第三方没造出来（产出太短）——重跑本格，或勾上「我自己挑三篇」。');
+  const t=/标题[：:]\s*([^\n]+)/.exec(txt);
+  const title='（自造）'+((t?t[1]:'').replace(/[《》]/g,'').trim().slice(0,20) || '让两篇同时失效的那条判断');
+  return await installForged(transcript, title, txt, 'forge');
+}
+
+/* 把知识库/自造的第三方装成第三个源，跑通下游 */
+async function installForged(transcript, title, txt, kind){
+  const out=[ await srcOfGid(ST.pair.aGid), await srcOfGid(ST.pair.bGid), { title:title, url:'', author:'', scope:kind, text:txt } ];
+  ST.sources=out; ST.seed=[ST.pair.aGid, ST.pair.bGid, '(造)'];
+  ST.forged=kind; ST.spineRows=[]; ST.conflict=''; ST.seedScore=6;
+  ST.out.select=(transcript||[]).join('\n')+'\n第三方'+(kind==='kb'?'取自大模型知识库':'由基底自造')+'：'+title;
+  $('srcState').textContent='种子：'+out.map(s=>s.title.slice(0,12)).join(' × ');
+  renderTrio();
+  selLog('<span style="color:var(--warn)">'+(kind==='kb'?'站内找不到第三方，第三个源取自大模型知识库（真实论点）。':'站内与知识库都没有，第三个源由基底自造——这是最后手段。')+'</span>');
+  setStat('select', (kind==='kb'?'⚠ 第三方取自知识库 · ':'⚠ 第三方自造 · ')+title, 'done');
+  showErr((kind==='kb'
+    ? '这一组的第三篇不是站内文章，是大模型从知识库里举的一个真实论点（已要求给出处、禁止编造）。'
+    : '这一组的第三篇是基底自己造的——站内三层与知识库都没有能同时顶住那两篇的第三方，才走到这一步。')+
+    '成品照跑，但来源不全是站内文章，发表前请自行确认是否合规。想要三个源都是站内真文章，改用「B · 三人各一篇」通常最省事。');
   return ST.out.select;
 }
+
+function selHint(s){ selLog('<span style="color:var(--warn)">'+s+'</span>'); }
 
 async function doWrite(){
   const id='write', p=panels[id];
@@ -1784,7 +2038,7 @@ goBtn.addEventListener('click', async ()=>{
 $('stopBtn').addEventListener('click', ()=>{ ST.abort = true; });
 $('resetBtn').addEventListener('click', ()=>{
   ST.out = {}; ST.article=''; ST.outline=''; ST.score=null; ST.sources=[];
-  ST.tried=[]; ST.seed=null; ST.seedScore=0; ST.outer=0; ST.best=null;   // 心得不清：它按内功+基底缓存，重跑不必重内化
+  ST.tried=[]; ST.seed=null; ST.seedScore=0; ST.outer=0; ST.best=null; ST.pair=null; ST.bestPair=null; ST.usedA=[]; ST.badC=[]; ST.__swap=null; ST.forged=false;   // 心得不清：它按内功+基底缓存，重跑不必重内化
   ST.redoFrom=null; ST.rounds=0; ST.termRetry=0; ST.termFix=null; ST.notes=[];
   ST.spineRows=[]; ST.conflict='';
   $('trioCard').classList.add('hidden'); $('trioBox').innerHTML=''; $('trioConflict').innerHTML='';
@@ -1992,7 +2246,7 @@ $('dlEngine').addEventListener('click', ()=>{
 });
 
 /* ===================== 起 ===================== */
-const BUILD_TAG = '20260729-0728·v1';
+const BUILD_TAG = '20260729-1539·v1';
 (function(){ const el=$('buildTag'); if(el) el.textContent='构建 '+BUILD_TAG; })();
 loadData();
 </script>
