@@ -74,7 +74,7 @@ ok(W.indexOf("const hist = (Array.isArray(body.hist) ? body.hist : []).slice(-10
 ok(/\.slice\(0, 2600\) \}\)\)/.test(W) || W.indexOf('a: String((t && t.a) || "").trim().slice(0, 2600)') > 0, "worker：单轮答案钳到 2600 字");
 ok(W.indexOf("const roundNo = hist.length + 1;") > 0, "worker：算得出这是第几轮");
 ok(W.indexOf("const originQ = hist.length ? hist[0].q : q;") > 0, "worker：缘起之问 = 第一轮的问题");
-ok(W.indexOf('const rq = mode === "distill"') > 0, "worker：检索用问句按模式分流");
+ok(W.indexOf('const rq = _lightDeep') > 0, "worker：检索用问句按模式分流（distill 与碰撞/提炼同走 _lightDeep）");
 ok(W.indexOf('(hist.length ? (q + " " + originQ.slice(0, 40)) : q)') > 0, "worker：连续问对时把缘起之问并进召回（治指代式短问漂走）");
 ok(W.indexOf("lightRetrieve(env, url, rq, expTerms, K,") > 0, "worker：召回真的用了 rq，而不是裸 q");
 ok(W.indexOf("sdeExpandQuery(VC, KEY, rq)") > 0, "worker：词义扩展也用 rq");
@@ -100,8 +100,8 @@ ok(W.indexOf('if (mode === "distill") {') > 0, "worker：distill 块在位");
 ok(W.indexOf("只写这场问对里确实出现过的内容，一个字也不许编") > 0, "distill：禁编造（唯一例外是「应当交手而未交手」那一栏）");
 ok(W.indexOf("〔一手来源〕〔站内自引〕〔未核验〕") > 0, "distill：经验材料必须标证据等级");
 ok(W.indexOf("本场问对未产出") > 0, "distill：没长出来的栏目要如实留白，不许拿话填满");
-ok(W.indexOf('mode === "distill" ? 40 :') > 0, "distill：检索档下调到 40 块（装内功但不广撒网，控成本）");
-ok(W.indexOf('mode === "distill" ? 14000 :') > 0, "distill：《站内资料》钳到 14000 字");
+ok(W.indexOf('_lightDeep ? 40 :') > 0, "distill/碰撞/提炼：检索档下调到 40 块（装内功但不广撒网，控成本）");
+ok(W.indexOf('_lightDeep ? 14000 :') > 0, "distill/碰撞/提炼：《站内资料》钳到 14000 字");
 
 console.log("\n===== " + P + " PASS / " + F + " FAIL =====");
 process.exit(F ? 1 : 0);

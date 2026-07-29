@@ -90,7 +90,8 @@ ok(/当场交出执行结果|真跑的结果/.test(poBlk), "F：承诺的检验�
 ok(/〔上半篇完·待续〕/.test(poBlk) && /〔全文完〕/.test(poBlk), "上下半篇的收尾标记齐备");
 
 console.log("— 七、路由与守卫 —");
-ok(/_MODES = \{ recommend: 1, paper: 1, iq: 1, polish: 1 \}/.test(wk), "四个模式都在白名单里");
+/* 2026-07-29：涌现流水线又加了 collide 与 synth，白名单从四个长到七个 */
+ok(/_MODES = \{ recommend: 1, paper: 1, iq: 1, polish: 1, distill: 1, collide: 1, synth: 1 \}/.test(wk), "七个模式都在白名单里（iq 与 polish 仍在）");
 ok(/mode === "paper" \|\| mode === "polish"/.test(wk), "polish 复用成文分支（内功+心得+自检规程 v3 零重复）");
 ok(/mode !== "paper" && mode !== "polish"/.test(wk), "四步法分支不会劫持 polish");
 ok(/deep = body\.deep === true \|\| mode === "paper" \|\| mode === "polish"/.test(wk), "polish 走深度档，iq 不走");
