@@ -19,38 +19,38 @@ TPL = ROOT / "public" / "paradigm" / "taken-out" / "index.html"
 PUBDATE = "2026年7月27日"
 
 PAPERS = [{
-    "slug": "suture-to-death",
-    "src": Path("/home/claude/confluence/suture-to-death.md"),
-    "title": "缝合致死",
-    "sub": "论成功系统的内生衰亡与「存活落差」的消除机制——为什么一个制度、组织或传统最危险的时刻，不是它失败之时，而是它按自身标准「健康极了」之时",
-    "cross": "法学 × 组织理论 × 文化传承",
-    "no": "之八",
-    "deck": ("一个制度、组织或传统的内部衰亡，通常被诊断为能力耗尽或治理失败。本文从三个分属不同领域、"
-             "且在同一问题上互相排斥的判断出发——法律的死是不再生长而非被推翻、组织死于自身的成功、"
-             "技艺的效能与磨损同源——论证一个三家各自都到不了的结论：一个系统赖以存活的，"
-             "是一道始终未被消解的内部落差（「存活落差」）；而追求成功、标准化、可复制传承这些健康措施，"
-             "在结构上都是对这道落差的缝合。由此得到一个可检验的判断：**系统最危险的时刻不是它失败之时，"
-             "而是它按自身标准「健康极了」之时**——它不是死于失败，而是死于每一件旨在让它更成功、更可传承的正确之事。"
-             "本文进一步论证：这一判断不能被古德哈特定律还原，反而**收编**它——把病灶从「度量的品质」上移到「度量这一固定动作本身」，"
-             "从而使一门既承认「度量会腐蚀所监测之物」、又开出「更好的度量」为药方的治理科学，显出一处它自身看不见的内在矛盾。"),
-    "clash": ("三家在「内生衰亡的致死机制在哪里」这同一问题上给出互相排斥的答案："
-              "第一家说致死的是外部的技术性缝合动作，系统不被干预则那道落差会自我维持、法律自会活着；"
-              "第二家说致死的恰是系统自身的成功——没有外敌、没有腐败，它把自己标准化死了；"
-              "第三家说致死的是为延续而做的复制，产生效能的动作与磨损效能的动作同源。"
-              "若第一家对，成功与复制就不该是元凶；若后两家对，「不干预即自续」的图景便是幻觉。三者不能同时为真。"),
+    "slug": "individuation-genesis",
+    "src": Path("/home/claude/confluence/individuation-genesis.md"),
+    "title": "个体化的生成",
+    "sub": "论符号学、逻辑学与数学三门形式学科当今三大对立理论，如何是同一个「基本单元凭什么是它自己」问题的三个侧面",
+    "cross": "符号学 × 逻辑学 × 数学",
+    "no": "之九",
+    "deck": ("符号学、逻辑学、数学通常被当作三门各有地基的独立学科。本文指出，三门学科当今各自最前沿、"
+             "且互相排斥的三个判断，其实是同一个问题的三个侧面：一个基本单元——一个符号、一条有效推理、一个数——凭什么是它自己？"
+             "本文论证：同一性既非被发现的内在实体、亦非纯差异结构的副产品、更非无，"
+             "而是**一束关系经差异呈现、被指称接住的生成事件**；三门学科不是三个争地基的领域，"
+             "而是对同一场个体化生成行使的三种权能——命名、判错、计算。"
+             "三大对立由此成为一条个体化律的三个侧面，三门学科各自最硬的难题"
+             "——数学的贝纳塞拉夫非唯一性、符号学的解释项难题、逻辑多元论的坍缩问题——被统一为同一处症结的三种发作，"
+             "由此打开一门此前不存在的交叉学科：**个体化生成论**。"),
+    "clash": ("三家在「基本单元的同一性从何而来」这同一问题上给出互斥答案："
+              "生物符号学说同一性/意义是真实的、有根的（根在活的解释关系里）；"
+              "逻辑多元论与反例外论说没有唯一、先验、普遍的有效性判准（多元、可修、或无）；"
+              "单价基础说同一性纯是结构关系、无内在实体（同构即同一）。"
+              "三者不能同时为真——有根的实在、无唯一判准、纯粹的关系，彼此互相拆台。"),
     "sources": [
-        ("法学 · 高鹏","裂隙自续：为什么法律的死不是被推翻，而是不再生长",
-         "https://sdeuniverses.com/students/gao-peng/fissure-self-continuation/",
-         "法律的死不需要等到法条被废除：内部那道道义感知与成文条文之间的落差有不依赖外部守护者的自我维持能力，"
-         "只要不被技术性理由强行缝合，就会在每次适用中重新暴露、逼出校准；法律的活正活在这道落差被反复暴露、反复回应之中。"),
-        ("组织理论 · 金华","守护者的悖论：组织成功如何将认知判断力孕育为寄生于自身的他者",
-         "https://sdeuniverses.com/students/jin-hua/allo-metabolism/",
-         "一类组织没有外敌、没有腐败，按自身健康标准看健康极了，却在关键绩效指标臻于极致时突然丧失应对无先例问题的能力"
-         "——衰亡定位在系统自身的成功，而非成功的不足。"),
-        ("文化传承 · 胡志英","自我复制的悖论：精神实践效能衰减的内生机制",
-         "https://sdeuniverses.com/students/hu-zhiying/efficacy-attrition/",
-         "精神性技艺（以讲究仪轨的传统技艺为典型）的核心效能，在被成功制度化、精确复制传承的过程中系统性衰退，"
-         "且无法归咎于继任者能力或环境变迁；提出「效能与磨损同源」——产生效能的机制与磨损它的机制是同一个。"),
+        ("符号学 · 生物符号学",
+         "Theses on Biosemiotics: Prolegomena to a Theoretical Biology (Kull, Deacon, Emmeche, Hoffmeyer, Stjernfelt, 2009)",
+         "https://doi.org/10.1007/s12304-009-9050-8",
+         "符号过程是真实的自然事实，凡有生命进行解释处即有意义；借皮尔斯三元符号观强调解释项是不可还原的真实环节、不必预设外部解释者——意义有根，根在活的解释关系之中，不可还原为纯差异结构。"),
+        ("逻辑学 · 逻辑多元论与反例外论",
+         "Logical Pluralism (Stanford Encyclopedia of Philosophy); Beall & Restall, Logical Pluralism (OUP 2006); Hjortland, Anti-Exceptionalism about Logic (Phil. Studies 2017)",
+         "https://plato.stanford.edu/entries/logical-pluralism/",
+         "对逻辑一元论（只有一种正确逻辑）的挑战：多元论主张不止一种正确的后承关系，反例外论主张逻辑并无先验例外地位、方法论上与经验科学连续、可被修正——没有唯一、先验、普遍的有效性判准。"),
+        ("数学 · 单价基础 / 同伦类型论",
+         "Homotopy Type Theory: Univalent Foundations of Mathematics (The Univalent Foundations Program, 2013); Voevodsky 单价公理; Awodey; Tsementzis 2017",
+         "https://homotopytypetheory.org/book/",
+         "单价公理推出「同构即同一」（isomorphic structures are identical），数学对象没有结构之外的内在同一性；这是对物质性集合论基础的正面挑战，并消解了「2 究竟是哪个集合」的贝纳塞拉夫困境。"),
     ],
 }]
 
@@ -131,7 +131,7 @@ def build_page(p, body, toc, pages):
     t = re.sub(r'<h1 class="art-title">.*?</h1>', f'<h1 class="art-title">{p["title"]}</h1>', t, flags=re.S)
     t = re.sub(r'<p class="art-sub">.*?</p>', f'<p class="art-sub">{p["sub"]}</p>', t, flags=re.S)
     t = re.sub(r'<div class="art-meta">.*?</div>',
-               f'<div class="art-meta">王德生 ＋ Claude · 约 1.8 万字 · {pages} 页 · '
+               f'<div class="art-meta">王德生 ＋ Claude · 约 1.6 万字 · {pages} 页 · '
                f'三种阅读方式 · 发表于{PUBDATE}</div>', t, flags=re.S)
     t = re.sub(r'<div class="deck">.*?</div>', f'<div class="deck">{strongify(p["deck"])}</div>', t, flags=re.S)
     links = "".join(f'<a href="#{i}">{html.escape(x)}</a>' for i, x in toc)
@@ -145,9 +145,9 @@ def build_page(p, body, toc, pages):
         f'<div class="t">{html.escape(ti)}</div><div class="g">{html.escape(g)}</div></a>'
         for k, ti, u, g in p["sources"])
     t = re.sub(r'<div class="src">.*?</div>\s*(?=<div class="endbox">)',
-               f'<div class="src"><div class="sl">这一篇由哪三个领域的论文撞成</div>'
+               f'<div class="src"><div class="sl">这一篇由哪三个学科的理论体系撞成</div>'
                f'<p class="sd">{strongify(p["clash"])}　'
-               f'三家均为 SDE 学员论文，链接直达原文，可自行核对。</p>{ones}</div>\n', t, flags=re.S)
+               f'三家均为站外的公开文献，链接直达原始出处，可自行核对。</p>{ones}</div>\n', t, flags=re.S)
     t = t.replace("‹ 典范文专栏", "‹ 学科通融").replace("返回典范文专栏 →", "返回学科通融 →")
     t = t.replace("典范文专栏 · 作者 Claude ·", "学科通融 · 作者 王德生 ＋ Claude ·")
     assert t.count("<html") == 1 and t.count("</html>") == 1
@@ -197,7 +197,7 @@ def build_index(built):
                   f'<div class="trio">{ones}</div>'
                   f'<a class="rdmore" href="/confluence/{p["slug"]}/">读全文 →</a>'
                   f'<div class="meta">约 {wan} 万字 · {pages} 页 · 三种读法 · '
-                  f'作者 王德生 ＋ Claude · 发表于{PUBDATE} · 三家来源均为 SDE 学员论文，链接可核对</div></div>\n')
+                  f'作者 王德生 ＋ Claude · 发表于{PUBDATE} · 三家来源均为站外公开文献</div></div>\n')
     return f"""{head}
 <body>
 <nav><div class="navin"><a href="/">SDE Universes</a><a href="/paradigm/">每日必读 →</a></div></nav>
@@ -261,7 +261,7 @@ def main():
                     f'<div class="trio">{ones}</div>'
                     f'<a class="rdmore" href="/confluence/{p["slug"]}/">读全文 →</a>'
                     f'<div class="meta">约 {wan} 万字 · {pages} 页 · 三种读法 · '
-                    f'作者 王德生 ＋ Claude · 发表于{PUBDATE} · 三家来源均为 SDE 学员论文，链接可核对</div></div>\n')
+                    f'作者 王德生 ＋ Claude · 发表于{PUBDATE} · 三家来源均为站外公开文献</div></div>\n')
             old = old.replace("</main>", card + "</main>", 1)
         idx.write_text(old, encoding="utf-8")
         print("  已并入既有索引")
