@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SDE 碰撞出典范 · 品尝系列 | SDE Universes</title>
+<meta name="description" content="选三个源——一位学员的三篇、三位学员各一篇、站上三个学科的长文，或你自己粘进来的三篇——让它们两两对撞，撞出一句谁单看都说不出的判断，并写成一篇两万字。七大基底任选，用你自己的 API Key。">
+<meta property="og:title" content="SDE 碰撞出典范 · 品尝系列">
+<meta property="og:description" content="三篇文章，撞出谁单看都说不出的那一句，并写成一篇。">
+<style>
+:root{
+  --bg:#0E1116;--panel:#161B22;--panel2:#1C232C;--border:rgba(255,255,255,0.10);
+  --text:#E6EDF3;--muted:#8B98A5;--gold:#D4B25E;--gold2:#E5C86E;
+  --red:#C4643E;--red2:#DD7A52;--blue:#6E9FD4;
+  --ok:#3FB950;--err:#F85149;--warn:#D29922;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,"PingFang SC","Microsoft YaHei","Segoe UI",sans-serif;line-height:1.7;min-height:100vh}
+a{color:var(--gold2);text-decoration:none}a:hover{text-decoration:underline}
+.wrap{max-width:1160px;margin:0 auto;padding:0 20px}
+nav{border-bottom:1px solid var(--border);background:rgba(14,17,22,0.9);backdrop-filter:blur(8px);position:sticky;top:0;z-index:20}
+nav .wrap{display:flex;align-items:center;justify-content:space-between;height:58px}
+.nav-logo{font-weight:700;letter-spacing:0.04em;color:var(--text);font-size:16px}
+.nav-back{font-size:14px;color:var(--muted)}
+header.hero{text-align:center;padding:48px 20px 24px;position:relative;overflow:hidden}
+.hero-glow{position:absolute;left:50%;top:18%;transform:translateX(-50%);width:520px;height:260px;background:radial-gradient(ellipse,rgba(196,100,62,0.16),transparent 70%);pointer-events:none}
+.hero-eyebrow{font-size:12px;letter-spacing:0.4em;color:var(--red2);margin-bottom:16px;position:relative}
+h1{font-size:clamp(26px,5vw,42px);font-weight:800;letter-spacing:0.02em;position:relative;line-height:1.3}
+h1 .grad{background:linear-gradient(120deg,var(--red2),var(--gold2));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.hero-sub{color:var(--muted);font-size:clamp(14px,2vw,17px);margin-top:14px;max-width:660px;margin-left:auto;margin-right:auto;position:relative}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:18px;margin:16px 0}
+.card h2{font-size:16px;letter-spacing:0.04em;margin-bottom:12px;color:var(--gold2)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+label.lbl{font-size:13px;color:var(--muted);display:block;margin-bottom:6px}
+input[type=text],input[type=password],select,textarea{background:var(--panel2);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:9px 11px;font-size:14px;font-family:inherit;width:100%}
+textarea{line-height:1.6;resize:vertical}
+select.model-select{max-width:340px}
+.btn{background:linear-gradient(120deg,var(--red),#9C4B2E);color:#fff;border:none;border-radius:8px;padding:10px 18px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.ghost{background:transparent;border:1px solid var(--border);color:var(--muted);font-weight:500;padding:7px 12px;font-size:13px}
+.btn.ghost:hover{color:var(--text);border-color:var(--gold)}
+.req{color:var(--err)}
+.modes{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin-bottom:14px}
+.mode{border:1px solid var(--border);border-radius:10px;padding:11px 13px;cursor:pointer;background:var(--panel2)}
+.mode.on{border-color:var(--red2);box-shadow:0 0 0 1px var(--red2) inset}
+.mode b{display:block;font-size:14px;margin-bottom:3px}
+.mode span{font-size:12px;color:var(--muted);line-height:1.5}
+.srcbox{margin-top:12px}
+.srcrow{display:grid;grid-template-columns:26px 1fr;gap:10px;align-items:start;margin-bottom:10px}
+.srcnum{width:26px;height:26px;border-radius:50%;background:var(--panel2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--muted);margin-top:6px}
+.pill{display:inline-block;font-size:11px;padding:2px 8px;border-radius:20px;border:1px solid var(--border);color:var(--muted);margin-right:6px}
+.pill.ok{color:var(--ok);border-color:rgba(63,185,80,.4)}
+.pill.err{color:var(--err);border-color:rgba(248,81,73,.4)}
+.pill.warn{color:var(--warn);border-color:rgba(210,153,34,.4)}
+.stage{border:1px solid var(--border);border-radius:12px;margin:12px 0;background:var(--panel);overflow:hidden}
+.stage.done{border-color:rgba(63,185,80,.35)}
+.stage.run{border-color:var(--red2)}
+.st-head{display:flex;align-items:center;gap:10px;padding:12px 16px;cursor:pointer;background:var(--panel2)}
+.st-idx{width:24px;height:24px;border-radius:50%;background:rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--muted);flex:0 0 auto}
+.st-name{font-weight:600;font-size:14px}
+.st-hint{font-size:12px;color:var(--muted);flex:1}
+.st-status{font-size:12px;color:var(--muted);white-space:nowrap}
+.st-body{display:none;padding:14px 16px;border-top:1px solid var(--border)}
+.stage.open .st-body{display:block}
+.out{white-space:pre-wrap;font-size:13.5px;line-height:1.75;max-height:420px;overflow:auto;background:#0B0E12;border:1px solid var(--border);border-radius:8px;padding:12px;color:#D8E2EC}
+.out .placeholder{color:var(--muted)}
+.st-tools{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.spinner{display:inline-block;width:10px;height:10px;border:2px solid rgba(255,255,255,.2);border-top-color:var(--red2);border-radius:50%;animation:spin .8s linear infinite;vertical-align:-1px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.cursor-blink{display:inline-block;width:7px;height:14px;background:var(--red2);animation:blink 1s step-end infinite;vertical-align:-2px}
+@keyframes blink{50%{opacity:0}}
+.errbox{display:none;background:rgba(248,81,73,.12);border:1px solid rgba(248,81,73,.4);color:#FFB4AE;border-radius:8px;padding:11px 14px;margin:12px 0;font-size:13.5px}
+.savebar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:13px;color:var(--muted);margin-top:10px}
+.foot{color:var(--muted);font-size:12.5px;text-align:center;padding:30px 20px 50px;line-height:1.9}
+.hidden{display:none!important}
+.small{font-size:12.5px;color:var(--muted)}
+.scorebig{font-size:34px;font-weight:800;color:var(--gold2)}
+.gradebar{height:6px;border-radius:4px;background:var(--panel2);overflow:hidden;margin:8px 0}
+.gradebar i{display:block;height:100%;background:linear-gradient(90deg,var(--red),var(--gold2))}
+</style>
+</head>
+<body>
+<nav><div class="wrap">
+  <div class="nav-logo">SDE Universes</div>
+  <div class="nav-back"><a href="/">← 回首页</a> · <a href="/taste/idea-generator/">金点子发生器</a></div>
+</div></nav>
+
+<header class="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-eyebrow">品 尝 系 列 · 二 阶 碰 撞</div>
+  <h1>SDE <span class="grad">碰撞出典范</span></h1>
+  <p class="hero-sub">选三个源，让它们两两对撞——撞出一句三个源单看都说不出的判断，再写成一篇两万字。<br>这是「每日必读」与「学科通融」两个栏目背后的那道工序。</p>
+</header>
+
+<div class="wrap">
+
+  <div id="errBox" class="errbox"></div>
+
+  <!-- ① 基底与 Key -->
+  <div class="card">
+    <h2>① 用哪个基底</h2>
+    <div class="row">
+      <div style="flex:1;min-width:280px">
+        <label class="lbl">基底（模型）</label>
+        <!--@MODELSEL@-->
+      </div>
+      <div style="flex:2;min-width:280px">
+        <label class="lbl" id="keyLabel">你的 DeepSeek API Key <span class="req">*</span></label>
+        <input type="password" id="apiKey" placeholder="sk-… 只存在你自己的浏览器里，本站不经手">
+      </div>
+    </div>
+    <div class="small" id="overseasNote" style="display:none;margin-top:8px"></div>
+    <div class="savebar">
+      <span>📁 存储位置：<b id="saveDirName">默认下载目录</b></span>
+      <button class="btn ghost" id="saveDirPick">选择文件夹</button>
+      <button class="btn ghost" id="saveDirClear" style="display:none">改回下载目录</button>
+      <span class="small" id="saveDirNote"></span>
+    </div>
+  </div>
+
+  <!-- ② 选三个源 -->
+  <div class="card">
+    <h2>② 选三个源</h2>
+    <div class="modes" id="modes">
+      <div class="mode on" data-mode="A"><b>A · 一人三篇</b><span>同一位学员专栏里的三篇（同一个人自己跟自己打架）</span></div>
+      <div class="mode" data-mode="B"><b>B · 三人各一篇</b><span>三位学员、三个领域（已发篇目里最出成绩的一类）</span></div>
+      <div class="mode" data-mode="C"><b>C · 站上三长文</b><span>三个学科的站上长文</span></div>
+      <div class="mode" data-mode="F"><b>F · 自由投喂</b><span>你自己粘三篇进来（站外理论也走这里）</span></div>
+    </div>
+
+    <div id="mA" class="srcbox">
+      <label class="lbl">学员</label>
+      <select id="stuSel"></select>
+      <div class="small" style="margin:8px 0">从下面勾三篇（勾第四篇会把最早的一篇顶掉）</div>
+      <div id="stuList" style="max-height:260px;overflow:auto;border:1px solid var(--border);border-radius:8px;padding:8px"></div>
+    </div>
+
+    <div id="mB" class="srcbox hidden"></div>
+    <div id="mC" class="srcbox hidden"></div>
+
+    <div id="mF" class="srcbox hidden">
+      <div class="small" style="margin-bottom:8px">三个源各粘一段：第一行当标题，其余当正文（每篇建议 2000 字以上；站外理论可粘论文摘要＋核心论证）。</div>
+      <textarea id="f1" rows="5" placeholder="第一个源：标题&#10;正文……"></textarea>
+      <div style="height:8px"></div>
+      <textarea id="f2" rows="5" placeholder="第二个源：标题&#10;正文……"></textarea>
+      <div style="height:8px"></div>
+      <textarea id="f3" rows="5" placeholder="第三个源：标题&#10;正文……"></textarea>
+    </div>
+
+    <div class="row" style="margin-top:14px">
+      <button class="btn" id="goBtn">开始碰撞</button>
+      <button class="btn ghost" id="stopBtn" style="display:none">停下</button>
+      <button class="btn ghost" id="resetBtn">清空重来</button>
+      <label class="small" style="display:flex;gap:6px;align-items:center;margin-left:6px">
+        <input type="checkbox" id="engineChk" style="width:auto"> 引擎室视图（显示 SDE 母语工序）
+      </label>
+      <span class="small" id="srcState"></span>
+    </div>
+  </div>
+
+  <!-- ③ 流水线 -->
+  <div id="pipeline"></div>
+
+  <!-- ④ 交付 -->
+  <div class="card" id="deliver" style="display:none">
+    <h2>④ 交付</h2>
+    <div class="row">
+      <button class="btn" id="dlDocx">下载终稿（Word）</button>
+      <button class="btn ghost" id="dlPack">下载发布包（.md）</button>
+      <button class="btn ghost" id="dlEngine">下载全过程（引擎室 .md）</button>
+    </div>
+    <div class="small" id="dlNote" style="margin-top:8px"></div>
+  </div>
+
+</div>
+
+<div class="foot">
+  这台机器把「每日必读」（站内碰撞）与「学科通融」（站外碰撞）的人工工序封装成产品。<br>
+  产出默认署 <b>王德生 ＋ Claude</b>；正文对读者一律不出现学派术语。<br>
+  <span id="buildTag" class="small"></span>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js"></script>
+<script src="/assets/wds-savedir.js"></script>
+<script>
+/* ===================== 多厂商基底引擎（与金点子发生器同源，由 tools/build_forge_page.py 注入） ===================== */
+/*@VENDORS@*/
+
+/* ===================== DOM ===================== */
+const $ = id => document.getElementById(id);
+const apiKeyEl=$('apiKey'), modelSel=$('modelSel'), goBtn=$('goBtn'), errBox=$('errBox');
+
+function keyStoreName(){
+  const v = parseModel(modelSel.value).vendor;
+  return v==='glm' ? 'sde_glm_key' : v==='kimi' ? 'sde_kimi_key' : v==='qwen' ? 'sde_qwen_key' : v==='minimax' ? 'sde_minimax_key' : v==='gpt' ? 'sde_gpt_key' : v==='claude' ? 'sde_claude_key' : v==='gemini' ? 'sde_gemini_key' : 'sde_ds_key';
+}
+function vendorName(){
+  const v = parseModel(modelSel.value).vendor;
+  return v==='glm' ? '智谱' : v==='kimi' ? '月之暗面 Kimi' : v==='qwen' ? '通义千问' : v==='minimax' ? 'MiniMax (稀宇)' : v==='gpt' ? 'GPT (OpenAI)' : v==='claude' ? 'Claude (Anthropic)' : v==='gemini' ? 'Gemini (Google)' : 'DeepSeek';
+}
+function refreshKeyUI(){
+  apiKeyEl.value = localStorage.getItem(keyStoreName()) || '';
+  const lbl=$('keyLabel'); if(lbl) lbl.innerHTML = '你的 ' + vendorName() + ' API Key <span class="req">*</span>';
+  const note=$('overseasNote');
+  if(note){
+    if(isOverseas(modelSel.value)){ note.style.display='block'; note.textContent='境外基底经本站中转（解决浏览器跨域），Key 仍只存在你自己的浏览器里。'; }
+    else note.style.display='none';
+  }
+}
+modelSel.addEventListener('change', refreshKeyUI);
+apiKeyEl.addEventListener('change', ()=>{ try{ localStorage.setItem(keyStoreName(), apiKeyEl.value.trim()); }catch(_){ } });
+apiKeyEl.addEventListener('blur',   ()=>{ try{ localStorage.setItem(keyStoreName(), apiKeyEl.value.trim()); }catch(_){ } });
+refreshKeyUI();
+
+function showErr(msg){ errBox.textContent='⚠ '+msg; errBox.style.display='block'; try{ errBox.scrollIntoView({behavior:'smooth',block:'center'}); }catch(_){ } }
+function hideErr(){ errBox.style.display='none'; }
+
+/* 全站 RAG：失败即空串，安全退回 */
+async function kbCtx(q){
+  // 契约与金点子发生器一致：/api/kb/retrieve 返回 {block}。无 Key、只读、失败即空串（安全退回）。
+  try{
+    const r = await fetch('/api/kb/retrieve', { method:'POST', headers:{'content-type':'application/json'},
+      body: JSON.stringify({ q:q, k:12, budget:24, cap:9000 }) });
+    if(!r.ok) return '';
+    const j = await r.json();
+    return (j && j.block) ? j.block : '';
+  }catch(e){ return ''; }
+}
+
+/* ===================== 流式调用（与金点子发生器同源） ===================== */
+/*@STREAM@*/
+
+/* ===================== SDE 内功 ===================== */
+/* 页面自带的凝缩内功：即使 sde-neigong.txt 取不到也不至于空转（金点子发生器在这种情况下会直接中止，
+   本页选择降级——碰撞的承重在三个源的正文，不全在内功）。取到完整内功则追加在后面。 */
+const SDE_CORE = [
+'【SDE 本体论·凝缩】',
+'S＝显露（Show）：一个东西当下显露出来的样子，不是它的"结构"。D＝差异序列：把它组织成这个样子的那条路径（D1 意义目标／D2 路径组织／D3 优化约束）。E＝特征纠缠：它得以如此显露所纠缠的条件场（E1 三界／E2 信息三模态／E3 能量三状态）。',
+'三大方程互生，无单一原初起点：S=F(D,E) · D=G(S,E) · E=H(S,D)。123 原理是有先后的时序循环——每一轮总有一个先动，故"谁是因"常是问错的问题，可改问"先动的那一样，另外两样多久跟上"。',
+'四结局诊断：跃迁／内卷／轮回／耗散。',
+'意义三律：特征律·自由律·幸福律。',
+'方法纪律：三视角误差互消（同一对象从 S/D/E 三面各取一条，三条互相纠错）；反身的发生不可自我封顶（任何判断都要问它对自己适不适用）。',
+'武器锻造第一律·去母体化：对读者的成品里不许出现本学派术语，SDE 只作隐性引擎。'
+].join('\n');
+let NEIGONG = '';
+(async function loadNeigong(){
+  try{
+    const r = await fetch('/taste/assets/sde-neigong.txt', {cache:'force-cache'});
+    if(!r.ok) return;
+    const t = await r.text();
+    if(t && t.length > 5000) NEIGONG = t;
+  }catch(e){ }
+})();
+function sdeSystem(extra){
+  return [
+    '你是 SDE 二阶碰撞引擎，为德麦国际 SDE 学派工作。',
+    SDE_CORE,
+    NEIGONG ? ('【完整内功（节选自 sde-neigong.txt）】\n' + NEIGONG.slice(0, 24000)) : '',
+    '通用纪律：① 不给自己打分、不自盖典范章；② 宁可如实写"这一对无焦点"，也不许用"也""并且"强行联系；③ 命名要结构性命名，不要描述性命名；④ 不用"真"作强调修饰。',
+    extra || ''
+  ].filter(Boolean).join('\n\n');
+}
+
+/* ===================== 术语零容忍（对读者的成品） ===================== */
+const TERMS = ['SDE','显露','显露态','差异序列','特征纠缠','本体论','发生学','三大方程','六路径','九步法','介生态','显影','回写','底盘','纠缠维度','意义三律','四结局诊断','去母体化','改姓','龙爪手','金点子','德麦'];
+function termHits(text){
+  const t = text || '';
+  const hits = [];
+  TERMS.forEach(w=>{ const n = t.split(w).length - 1; if(n>0) hits.push(w+'×'+n); });
+  return hits;
+}
+
+/* ===================== 工序表 ===================== */
+const MAX_SRC = 12000;        // 每个源喂进去的正文上限（字符）
+const TOK_HARD = 8000;        // 满功率档的硬上限——踩过两次，别再调大
+const STAGES = [
+  {id:'gate',    n:'体检',     hint:'它们真的在打架吗（三道闸）',        tok:4000},
+  {id:'spine',   n:'抽脊',     hint:'每篇抽三条最硬的话，共九条',        tok:TOK_HARD},
+  {id:'collide', n:'混沌碰撞', hint:'跨篇两两对撞，二十七对',            tok:TOK_HARD},
+  {id:'expand',  n:'扩候选',   hint:'先铺开成五个候选判断，不急着收',    tok:TOK_HARD},
+  {id:'collide2',n:'候选互撞', hint:'五个候选再互撞，十对',              tok:TOK_HARD},
+  {id:'selforg', n:'自组织',   hint:'撞出来的东西自己抱团，成暗流',      tok:6000},
+  {id:'emerge',  n:'涌现',     hint:'收敛成一句谁单看都说不出的话',      tok:TOK_HARD},
+  {id:'demarc',  n:'近邻划界', hint:'与既有说法逐一划清界线',            tok:TOK_HARD},
+  {id:'write',   n:'成文',     hint:'写成一篇两万字（分趟写）',          tok:4000},
+  {id:'review',  n:'评审',     hint:'创新智商 · 不到 150 点名回炉',      tok:4000}
+];
+const ST = { mode:'A', sources:[], out:{}, outline:'', article:'', score:null, running:false, abort:false };
+
+/* ===================== 面板 ===================== */
+const panels = {};
+(function buildPanels(){
+  const host = $('pipeline');
+  STAGES.forEach((s,i)=>{
+    const el = document.createElement('div');
+    el.className = 'stage'; el.id = 'stage-'+s.id;
+    el.innerHTML =
+      '<div class="st-head"><div class="st-idx">'+(i+1)+'</div>'+
+      '<div class="st-name">'+s.n+'</div><div class="st-hint">'+s.hint+'</div>'+
+      '<div class="st-status" id="stat-'+s.id+'">待命</div></div>'+
+      '<div class="st-body"><div class="out" id="out-'+s.id+'"><span class="placeholder">还没跑到这一格。</span></div>'+
+      '<div class="st-tools">'+
+        '<button class="btn ghost" data-act="rerun" data-id="'+s.id+'">重跑本格</button>'+
+        '<button class="btn ghost" data-act="edit"  data-id="'+s.id+'">编辑产物</button>'+
+        '<button class="btn ghost" data-act="cont"  data-id="'+s.id+'">从这里继续往下</button>'+
+        '<span class="small" id="meta-'+s.id+'"></span>'+
+      '</div></div>';
+    host.appendChild(el);
+    panels[s.id] = { el, out: el.querySelector('#out-'+s.id), stat: el.querySelector('#stat-'+s.id), meta: el.querySelector('#meta-'+s.id) };
+    el.querySelector('.st-head').addEventListener('click', ()=> el.classList.toggle('open'));
+  });
+  host.addEventListener('click', async ev=>{
+    const b = ev.target.closest('button[data-act]'); if(!b) return;
+    ev.stopPropagation();
+    const id = b.getAttribute('data-id'), act = b.getAttribute('data-act');
+    const i = STAGES.findIndex(s=>s.id===id);
+    if(act==='rerun'){ await runFrom(i, i); }
+    else if(act==='cont'){ await runFrom(i, STAGES.length-1); }
+    else if(act==='edit'){
+      const p = panels[id];
+      if(p.editing){ ST.out[id] = p.ta.value; p.out.textContent = ST.out[id]; p.editing=false; p.ta.remove(); b.textContent='编辑产物'; }
+      else{
+        const ta = document.createElement('textarea'); ta.rows=14; ta.value = ST.out[id]||'';
+        p.out.parentNode.insertBefore(ta, p.out.nextSibling);
+        p.ta = ta; p.editing = true; b.textContent='存回这一格';
+      }
+    }
+  });
+})();
+function setStat(id, html, cls){
+  const p = panels[id]; if(!p) return;
+  p.stat.innerHTML = html;
+  p.el.classList.remove('run','done');
+  if(cls) p.el.classList.add(cls);
+}
+function openStage(id){ const p=panels[id]; if(p) p.el.classList.add('open'); }
+
+/* 引擎室开关：默认只把成文与评审两格展开，工序格收起 */
+$('engineChk').addEventListener('change', e=>{
+  const on = e.target.checked;
+  STAGES.forEach(s=>{
+    if(['write','review'].includes(s.id)) return;
+    panels[s.id].el.classList.toggle('open', on);
+  });
+});
+
+/* ===================== 选源 ===================== */
+let CATALOG = [], STUDENTS = [], PARADIGMS = [];
+async function loadData(){
+  try{
+    const r = await fetch('/taste/paradigm-forge/catalog.json');
+    if(r.ok){ const j = await r.json(); CATALOG = j.items||[]; PARADIGMS = CATALOG.filter(x=>x.c==='每日必读'||x.c==='学科通融'); }
+  }catch(e){ }
+  try{
+    const r2 = await fetch('/students/publications.json');
+    if(r2.ok){ const j2 = await r2.json(); STUDENTS = j2.students||[]; }
+  }catch(e){ }
+  renderMode();
+}
+function optionsFor(items, val, txt){
+  return items.map(x=>'<option value="'+val(x)+'">'+txt(x).replace(/</g,'&lt;')+'</option>').join('');
+}
+function renderMode(){
+  ['A','B','C','F'].forEach(m=> $('m'+m).classList.toggle('hidden', m!==ST.mode));
+  if(ST.mode==='A' && STUDENTS.length){
+    const sel = $('stuSel');
+    if(!sel.options.length){
+      sel.innerHTML = optionsFor(STUDENTS, s=>s.slug, s=>s.name+'（'+(s.items||[]).length+' 篇）');
+      sel.addEventListener('change', renderStuList);
+    }
+    renderStuList();
+  }
+  if(ST.mode==='B'){
+    const host=$('mB');
+    if(!host.dataset.built){
+      host.innerHTML = [0,1,2].map(i=>
+        '<div class="srcrow"><div class="srcnum">'+(i+1)+'</div><div>'+
+        '<select id="bStu'+i+'" style="margin-bottom:6px"></select>'+
+        '<select id="bArt'+i+'"></select></div></div>').join('');
+      host.dataset.built='1';
+      [0,1,2].forEach(i=>{
+        const ss=$('bStu'+i);
+        ss.innerHTML = optionsFor(STUDENTS, s=>s.slug, s=>s.name);
+        ss.selectedIndex = Math.min(i, STUDENTS.length-1);
+        ss.addEventListener('change', ()=> fillB(i));
+        fillB(i);
+      });
+    }
+  }
+  if(ST.mode==='C'){
+    const host=$('mC');
+    if(!host.dataset.built){
+      host.innerHTML = '<div class="small" style="margin-bottom:8px">从站上长文里挑三篇——挑观点互相打架的，不是挑分数最高的。</div>' +
+        [0,1,2].map(i=>'<div class="srcrow"><div class="srcnum">'+(i+1)+'</div><div>'+
+        '<input type="text" id="cQ'+i+'" placeholder="打关键词筛（如：睡眠 / 创造 / 自信）" style="margin-bottom:6px">'+
+        '<select id="cSel'+i+'"></select></div></div>').join('');
+      host.dataset.built='1';
+      [0,1,2].forEach(i=>{
+        fillC(i,'');
+        $('cQ'+i).addEventListener('input', e=> fillC(i, e.target.value.trim()));
+      });
+    }
+  }
+  updateSrcState();
+}
+function fillB(i){
+  const slug = $('bStu'+i).value;
+  const st = STUDENTS.find(s=>s.slug===slug) || {items:[]};
+  $('bArt'+i).innerHTML = optionsFor(st.items||[], x=>x.url, x=>x.title);
+}
+function fillC(i, q){
+  let list = CATALOG;
+  if(q) list = CATALOG.filter(x=> (x.t+' '+(x.d||'')).indexOf(q) >= 0);
+  list = list.slice(0, 300);
+  const sel = $('cSel'+i);
+  const keep = sel.value;
+  sel.innerHTML = optionsFor(list, x=>x.u, x=>'['+x.c+'] '+x.t);
+  if(keep && list.some(x=>x.u===keep)) sel.value = keep;
+  else if(list.length) sel.selectedIndex = Math.min(i*3, list.length-1);
+}
+let stuPicked = [];
+function renderStuList(){
+  const slug = $('stuSel').value;
+  const st = STUDENTS.find(s=>s.slug===slug) || {items:[]};
+  stuPicked = [];
+  $('stuList').innerHTML = (st.items||[]).map(x=>
+    '<label style="display:block;font-size:13px;margin:4px 0;cursor:pointer">'+
+    '<input type="checkbox" style="width:auto;margin-right:6px" data-url="'+x.url+'" data-title="'+String(x.title).replace(/"/g,'&quot;')+'">'+
+    String(x.title).replace(/</g,'&lt;')+'</label>').join('') || '<span class="small">这位作者暂无可选篇目。</span>';
+  $('stuList').querySelectorAll('input[type=checkbox]').forEach(cb=>{
+    cb.addEventListener('change', ()=>{
+      if(cb.checked){ stuPicked.push(cb); if(stuPicked.length>3){ const old=stuPicked.shift(); old.checked=false; } }
+      else stuPicked = stuPicked.filter(x=>x!==cb);
+      updateSrcState();
+    });
+  });
+  updateSrcState();
+}
+function updateSrcState(){
+  let n = 0;
+  if(ST.mode==='A') n = stuPicked.length;
+  else if(ST.mode==='B') n = [0,1,2].filter(i=>$('bArt'+i) && $('bArt'+i).value).length;
+  else if(ST.mode==='C') n = [0,1,2].filter(i=>$('cSel'+i) && $('cSel'+i).value).length;
+  else n = [1,2,3].filter(i=>($('f'+i).value||'').trim().length>200).length;
+  $('srcState').textContent = '已选 '+n+' / 3 个源';
+  return n;
+}
+$('modes').addEventListener('click', e=>{
+  const m = e.target.closest('.mode'); if(!m) return;
+  ST.mode = m.getAttribute('data-mode');
+  $('modes').querySelectorAll('.mode').forEach(x=>x.classList.toggle('on', x===m));
+  renderMode();
+});
+
+/* 站内正文抓取：同源 fetch → 去掉脚本/导航/尾栏 → 纯文本 */
+async function pullText(url){
+  const r = await fetch(url, {cache:'no-cache'});
+  if(!r.ok) throw new Error('取不到正文（'+r.status+'）：'+url);
+  const html = await r.text();
+  const doc = new DOMParser().parseFromString(html, 'text/html');
+  doc.querySelectorAll('script,style,nav,footer,form,noscript,.endbox,.pnbar,.rdbar,.readbar').forEach(e=>e.remove());
+  const main = doc.querySelector('article') || doc.querySelector('.wrap') || doc.querySelector('main') || doc.body;
+  const t = ((main && main.textContent) || '').replace(/\s+/g,' ').trim();
+  if(t.length < 800) throw new Error('这一篇抓到的正文太短（'+t.length+' 字），换一篇或改用自由投喂：'+url);
+  return t.slice(0, MAX_SRC);
+}
+async function collectSources(){
+  const out = [];
+  if(ST.mode==='A'){
+    if(stuPicked.length!==3) throw new Error('模式 A 要正好勾三篇。');
+    const name = ($('stuSel').selectedOptions[0]||{}).textContent || '';
+    for(const cb of stuPicked){
+      const url = cb.getAttribute('data-url');
+      out.push({ title: cb.getAttribute('data-title'), url, author: name.split('（')[0], text: await pullText(url) });
+    }
+  } else if(ST.mode==='B'){
+    for(const i of [0,1,2]){
+      const url = $('bArt'+i).value;
+      const title = ($('bArt'+i).selectedOptions[0]||{}).textContent||'';
+      const author = ($('bStu'+i).selectedOptions[0]||{}).textContent||'';
+      if(!url) throw new Error('模式 B 的第 '+(i+1)+' 个源还没选。');
+      out.push({ title, url, author, text: await pullText(url) });
+    }
+  } else if(ST.mode==='C'){
+    for(const i of [0,1,2]){
+      const url = $('cSel'+i).value;
+      const title = ($('cSel'+i).selectedOptions[0]||{}).textContent||'';
+      if(!url) throw new Error('模式 C 的第 '+(i+1)+' 个源还没选。');
+      out.push({ title, url, author:'', text: await pullText(url) });
+    }
+  } else {
+    for(const i of [1,2,3]){
+      const raw = ($('f'+i).value||'').trim();
+      if(raw.length < 200) throw new Error('自由投喂的第 '+i+' 个源太短（至少两百字）。');
+      const nl = raw.indexOf('\n');
+      out.push({ title: (nl>0? raw.slice(0,nl) : ('源 '+i)).trim().slice(0,60), url:'', author:'', text: raw.slice(0, MAX_SRC) });
+    }
+  }
+  if(new Set(out.map(x=>x.url||x.title)).size !== 3) throw new Error('三个源不能重复。');
+  return out;
+}
+
+/* ===================== 调令 ===================== */
+function srcBlock(limit){
+  return ST.sources.map((s,i)=>
+    '【源'+(i+1)+'】'+s.title + (s.author?('（'+s.author+'）'):'') + (s.url?('　'+s.url):'') + '\n' +
+    s.text.slice(0, limit||MAX_SRC)).join('\n\n————\n\n');
+}
+function prevList(){
+  return PARADIGMS.slice(0,60).map(x=>'· '+x.t+(x.d?('　—— '+x.d.slice(0,50)):'')).join('\n');
+}
+function promptFor(id){
+  const O = ST.out;
+  if(id==='gate') return [
+    '下面是三个待碰撞的源。请先做体检，走三道闸，任一道不过就直说"建议换源"并说明换哪一个、换成什么方向的。',
+    '',
+    '【闸一 · 矛盾烈度】0–10 打分，≥6 才放行。',
+    '  · 三方打架的那一点，能不能用一句话说清？说不清就是互补不是矛盾。',
+    '  · 有没有【结局对立】——三方对同一件事判了相反的命运或相反的处方？有就加分，这是产量最高的对撞轴。',
+    '  · 每一方有没有一条对手消化不了的证据？',
+    '【闸二 · 去同脊】判"同源度：高/中/低"，并列出三方共享的零件清单。框架不同而零件同源，会在共享区空撞、换皮。',
+    '【闸三 · 避重】下面是本站已发的同类文章清单。若本次撞出的方向极可能与其中某篇同族，点名是哪一篇，并给出"要么换源、要么必须与它划界"的处置。',
+    '',
+    '【已发清单】',
+    prevList() || '（暂无）',
+    '',
+    '【输出格式】',
+    '闸一：分数 X/10 ｜ 打架点一句话：…… ｜ 结局对立：有/无（说明） ｜ 三方各自的硬证据：……',
+    '闸二：同源度 高/中/低 ｜ 共享零件：…… ｜ 建议把撞点移到哪里',
+    '闸三：最近的已发篇目：…… ｜ 处置：换源／必须划界',
+    '总判：放行 / 换源（一句话理由）',
+    '',
+    '【三个源】',
+    srcBlock(3000)
+  ].join('\n');
+
+  if(id==='spine') return [
+    '从三个源里各抽三条最承重的判断，共九条。',
+    '每一篇的三条必须来自三个不同视角，且互相纠错：',
+    '  ① 它显露出来的是什么（结果层）',
+    '  ② 它靠哪条路径被组织成这样（路径层）',
+    '  ③ 它在什么条件里才成立（条件层）',
+    '每条 ≤40 字，必须是判断句、不是主题词；每条后面附一句原文依据（可摘录不超过十五字）。',
+    '编号规则：源1 的三条编为 1a/1b/1c，源2 为 2a/2b/2c，源3 为 3a/3b/3c。',
+    '',
+    '【三个源】',
+    srcBlock()
+  ].join('\n');
+
+  if(id==='collide') return [
+    '下面是九条承重判断。请执行跨篇两两对撞。',
+    '同一篇内部的对（1a×1b 之类）一律作废不做，只做跨篇的 27 对。',
+    '每一对走四步：',
+    '一、撞击焦点：这两条在什么问题上打架？一句话。是"打架"不是"互补"。优先找【结局对立】。若无焦点，写"无焦点"，作废，不许强行联系。',
+    '二、展开撞击：两条同时看同一对象时，暴露了哪一样单看任一条都看不见的东西？',
+    '三、命名涌现物：≤20 字，结构性命名（…性／…症／…悖论／…陷阱／…耦合），不许是原判断的换皮。',
+    '四、守边界：对象有没有漂移？漂了就重做。',
+    '',
+    '【输出】先给表格：| 对 | 焦点 | 撞击 | 涌现物 |，最后统计有效涌现物数量、并点出最锋利的三个。',
+    '',
+    '【九条】',
+    O.spine || ''
+  ].join('\n');
+
+  if(id==='expand') return [
+    '下面是碰撞产出的涌现物。先别收敛——把它们铺开成【五个候选判断】。',
+    '要求：五个候选彼此之间不许同脊（不许是同一条判断的五种说法）；每个候选写清：命名（≤20字）／一句话判断／它由哪几个涌现物支撑／它单独看还缺什么。',
+    '若材料只撑得起三四个，如实说，不要凑数。',
+    '',
+    '【涌现物】',
+    O.collide || ''
+  ].join('\n');
+
+  if(id==='collide2') return [
+    '下面是五个候选判断。请执行第二阶对撞：C(5,2)=10 对。',
+    '优先对撞轴：结局对立（两个候选对同一件事给了相反的处方）／主因互斥（两个候选把同一结果归给互不相容的原因）。无焦点即作废。',
+    '每对给出：焦点一句话 ＋ 撞出的二阶涌现物（结构性命名 ≤20字）＋ 它为什么单看任一候选都到不了。',
+    '',
+    '【五候选】',
+    O.expand || ''
+  ].join('\n');
+
+  if(id==='selforg') return [
+    '下面是二阶涌现物。请做自组织聚类：',
+    '一、哪些涌现物指向同一个深层不变量？用"结构性消失／锁定机制／双面性／演化路径／伪解决／时间结构"这几种模式各过一遍。',
+    '二、每条暗流命名 ≤15 字，结构性命名（…流／…轴／…机制）。',
+    '三、每条暗流必须有 ≥2 个涌现物支撑；只有一个支撑的丢掉，或作为反例单独留着。',
+    '四、任两条暗流之间必须有真差异，用两句话说清差别在哪。',
+    '暗流通常 1–3 条。若材料偏薄，如实说"只撑得起一条"，不许硬凑。',
+    '',
+    '【二阶涌现物】',
+    O.collide2 || ''
+  ].join('\n');
+
+  if(id==='emerge') return [
+    '下面是暗流。请执行涌现：',
+    '一、识别核心枢纽：哪条暗流是其他暗流的根？哪条锁定其他暗流的演化？用文字画出它们的关系。',
+    '二、提炼出【一条判断】：命名 ≤30 字，必须单源不可达、单候选不可达。',
+    '三、五重检验，任一不过就回第二步重做：',
+    '  (1) 不可还原：能从任一单个源推导出来吗？（应：不能，并说明为什么三个源各自到不了）',
+    '  (2) 不可消解：能用既有概念替代吗？点名最像的那一个，说清差在哪。',
+    '  (3) 跨学科：给 ≥5 个学科的兑现，每个 ≤30 字，不许表面类比。',
+    '  (4) 自反：它对它自己、对这个专栏、对提出它的这套方法适用吗？若答"我们的方法是完美的"，本判断作废。',
+    '  (5) 反噬预言：按它设计的干预会不会适得其反？给不出反噬预言的多半是单向描述、不是涌现。',
+    '四、给 4–8 条证伪条件，其中至少一条要低成本可实做（说清怎么做、看什么读数）。',
+    '五、给一条写死日期的赌注（形如"到某年某月，若某事没有发生，本判断作废"）。',
+    '你不给自己打分。',
+    '',
+    '【暗流】', O.selforg || '',
+    '', '【五候选（备查）】', (O.expand||'').slice(0, 3000)
+  ].join('\n');
+
+  if(id==='demarc') return [
+    '下面是撞出来的判断。请把它与既有说法逐一划清界线——这一步决定它是不是换皮。',
+    '要求：选 6–10 个最容易被读者混为一谈的既有概念（学界成名概念优先，也可包括本站已发的近邻篇目），逐一写：',
+    '  · 那个概念讲的是什么（一句话，公允）',
+    '  · 本判断讲的是什么',
+    '  · 判据差在哪（必须落到一个可分辨的差别上，不许停在"侧重不同"）',
+    '并在最后指出：其中哪一个是最近的邻居、为什么本判断仍不可被它吸收。',
+    '',
+    '【本判断】', O.emerge || '',
+    '', (window.__KB ? ('【站内可参照的近邻材料】\n'+window.__KB) : '')
+  ].join('\n');
+
+  if(id==='review') return [
+    '你是评审，不是作者。对下面这篇文章按 SDE 创新智商五维打分（每维 0–170，给总分）：',
+    'S 结构显露 ｜ D 路径组织 ｜ E 纠缠厚度 ｜ I 不可还原度 ｜ F 可证伪度。',
+    '反膨胀铁律（硬约束，必须执行）：',
+    '  · 没有与既有概念逐一划界的，I 封顶 130；',
+    '  · 没有可证伪条件的，F 封顶 130；',
+    '  · 跨学科兑现少于五个的，E 封顶 132；',
+    '  · 正文出现学派术语（如"显露""特征纠缠""发生学"等）的，总分直接减 8。',
+    '输出格式（第一行必须是这个形状，供程序读取）：',
+    '总分：XXX',
+    '五维：S=… D=… E=… I=… F=…',
+    '判级：……',
+    '若总分 < 150：必须点名回炉到哪一道工序（体检／抽脊／混沌碰撞／扩候选／候选互撞／自组织／涌现／近邻划界／成文），并给一句具体动作。',
+    '再给三条"最该补的一刀"。',
+    '',
+    '【待评文章】',
+    (ST.article || '').slice(0, 24000)
+  ].join('\n');
+
+  return '';
+}
+
+/* 成文用的系统提示：改姓，SDE 只作隐性引擎 */
+function writerSystem(){
+  return [
+    '你在为一个面向普通读者的专栏写文章。',
+    sdeSystem(),
+    '',
+    '【本次输出的硬规矩，违反即作废重写】',
+    '① 正文不得出现任何学派术语：不许出现 SDE、显露、差异序列、特征纠缠、本体论、发生学、三大方程、六路径、介生态、显影、回写、底盘 等词；',
+    '② 普通人必须读得懂：长句不超过 90 字，不用学术引注，不掉书袋；',
+    '③ 论点要硬，语气要平——不喊口号、不用排比煽情、不写"我们必须"；',
+    '④ 每一章都要有具体的场景或例子，不许整章都是抽象论断；',
+    '⑤ 不许出现"综上所述""总而言之"这类过渡废话。'
+  ].join('\n');
+}
+
+/* ===================== 跑 ===================== */
+function needKey(){
+  const k = (apiKeyEl.value||'').trim();
+  if(!k){ showErr('先填 '+vendorName()+' 的 API Key。'); return null; }
+  try{ localStorage.setItem(keyStoreName(), k); }catch(_){ }
+  return k;
+}
+async function callStage(id, prompt, tok, system){
+  const p = panels[id];
+  openStage(id);
+  setStat(id, '<span class="spinner"></span> 运行中', 'run');
+  const key = needKey(); if(!key) throw new Error('缺 Key');
+  const r = await streamChat(key, modelSel.value, system || sdeSystem(), prompt, p.out, p.stat, p.meta, tok);
+  ST.out[id] = r.text || '';
+  setStat(id, '✓ '+ (r.chars||0) +' 字 · '+ (r.secs||0) +'s', 'done');
+  return ST.out[id];
+}
+
+async function runStage(i){
+  const s = STAGES[i];
+  if(s.id==='write') return await doWrite();
+  if(s.id==='demarc'){
+    try{ window.__KB = await kbCtx(((ST.out.emerge||'').slice(0,600))); }catch(e){ window.__KB=''; }
+  }
+  const sys = (s.id==='review') ? '你是严格的评审，只评不写。不许恭维，不许给"很有启发"这类空话。' : sdeSystem();
+  const txt = await callStage(s.id, promptFor(s.id), s.tok, sys);
+  if(s.id==='gate'){
+    const m = txt.match(/闸一[：:]\s*分数\s*(\d+)/) || txt.match(/(\d+)\s*\/\s*10/);
+    const sc = m ? parseInt(m[1],10) : null;
+    if(sc !== null && sc < 6) showErr('闸一只给了 '+sc+'/10——三个源多半是互补不是打架。可以照旧往下跑，但成品破 150 的机会不大，建议换源。');
+    else hideErr();
+  }
+  if(s.id==='review'){
+    const m = txt.match(/总分[：:]\s*(\d{2,3})/);
+    ST.score = m ? parseInt(m[1],10) : null;
+    renderScore();
+  }
+  return txt;
+}
+
+async function doWrite(){
+  const id='write', p=panels[id];
+  openStage(id);
+  setStat(id, '<span class="spinner"></span> 列目录', 'run');
+  const key = needKey(); if(!key) throw new Error('缺 Key');
+  const head = [
+    '【撞出来的判断】', ST.out.emerge||'',
+    '', '【与既有说法的划界】', (ST.out.demarc||'').slice(0,6000),
+    '', '【三个源】', ST.sources.map((s,i)=>(i+1)+'. '+s.title+(s.url?('　'+s.url):'')).join('\n')
+  ].join('\n');
+
+  // 一、目录
+  const outlineP = [
+    '按下面的材料，列一份文章目录：15–22 章，每章一行，形如「一、章名 —— 这一章要落哪一件事（≤20字）」。',
+    '结构要求：前两章把现象摆出来（用具体场景，不许先给结论）；中段给机制与判据；',
+    '必须各留一章给：与最近的既有说法划界／不适用的边界／证伪条件／自反（本文自己是不是它所描述的东西的标本）。',
+    '末章给一条写死日期的赌注。只输出目录，不写正文。',
+    '', head
+  ].join('\n');
+  const o = await streamChat(key, modelSel.value, writerSystem(), outlineP, p.out, p.stat, p.meta, 3000);
+  ST.outline = o.text||'';
+  const chapters = ST.outline.split('\n').map(x=>x.trim()).filter(x=>/^[一二三四五六七八九十]+[、.]/.test(x) || /^\d+[、.]/.test(x));
+  const total = chapters.length || 16;
+
+  // 二、分趟写（每趟三章）
+  ST.article = '';
+  const step = 3;
+  for(let k=0; k<total; k+=step){
+    if(ST.abort) throw new Error('已停下');
+    const part = chapters.slice(k, k+step);
+    setStat(id, '<span class="spinner"></span> 写第 '+(k+1)+'–'+Math.min(k+step,total)+' 章 / 共 '+total, 'run');
+    const tail = ST.article.slice(-700);
+    const cp = [
+      '继续写这篇文章的第 '+(k+1)+' 到第 '+Math.min(k+step,total)+' 章。每章 1000–1400 字，直接写正文，不要复述目录、不要写"接下来"。',
+      '这几章是：', part.join('\n') || '（按目录顺次）',
+      '', '【全文目录（供定位，不要照抄）】', ST.outline,
+      '', '【已写正文的结尾（接着往下写，别重复）】', tail || '（这是开头）',
+      '', head
+    ].join('\n');
+    const box = document.createElement('div'); box.className='out'; box.style.marginTop='8px';
+    p.out.parentNode.insertBefore(box, p.out.nextSibling);
+    const r = await streamChat(key, modelSel.value, writerSystem(), cp, box, p.stat, p.meta, 4000);
+    ST.article += (ST.article? '\n\n':'') + (r.text||'');
+  }
+  ST.out.write = ST.article;
+  const hits = termHits(ST.article);
+  const words = ST.article.replace(/\s/g,'').length;
+  setStat(id, '✓ '+words+' 字 '+(hits.length? ('· ⚠ 术语残留 '+hits.join('、')) : '· 术语零残留'), 'done');
+  if(hits.length){
+    showErr('正文里还留着学派术语：'+hits.join('、')+'。点「重跑本格」重写，或用「编辑产物」手工改掉——这一条是上站硬门槛。');
+  }
+  $('deliver').style.display='';
+  return ST.article;
+}
+
+function renderScore(){
+  const p = panels.review;
+  if(ST.score==null) return;
+  const bad = ST.score < 150;
+  setStat('review', (bad?'⚠ ':'✓ ')+'创新智商 '+ST.score, bad? 'run':'done');
+  const note = document.createElement('div');
+  note.className = 'small'; note.style.marginTop='8px';
+  note.innerHTML = bad
+    ? '不到 150。评审已点名回炉工序——回到那一格点「重跑本格」，再点「从这里继续往下」。'
+    : '过线。可以进交付了。';
+  p.out.parentNode.appendChild(note);
+}
+
+async function runFrom(a, b){
+  if(ST.running) return;
+  ST.running = true; ST.abort = false;
+  goBtn.disabled = true; $('stopBtn').style.display='';
+  try{
+    for(let i=a; i<=b; i++){
+      if(ST.abort) break;
+      await runStage(i);
+    }
+  }catch(e){
+    if(String(e.message||e) !== '已停下') showErr(e.message||String(e));
+    setStat(STAGES[Math.min(a,STAGES.length-1)].id, '中断');
+  }finally{
+    ST.running = false; goBtn.disabled = false; $('stopBtn').style.display='none';
+  }
+}
+
+goBtn.addEventListener('click', async ()=>{
+  hideErr();
+  if(ST.running) return;
+  if(!needKey()) return;
+  goBtn.disabled = true;
+  try{
+    goBtn.textContent = '取三个源的正文……';
+    ST.sources = await collectSources();
+    $('srcState').textContent = '三个源已就位：'+ST.sources.map(s=>s.title.slice(0,12)).join(' × ');
+  }catch(e){
+    showErr(e.message||String(e)); goBtn.disabled=false; goBtn.textContent='开始碰撞'; return;
+  }
+  goBtn.textContent = '开始碰撞';
+  goBtn.disabled = false;
+  await runFrom(0, STAGES.length-1);
+});
+$('stopBtn').addEventListener('click', ()=>{ ST.abort = true; });
+$('resetBtn').addEventListener('click', ()=>{
+  ST.out = {}; ST.article=''; ST.outline=''; ST.score=null; ST.sources=[];
+  STAGES.forEach(s=>{
+    panels[s.id].out.innerHTML = '<span class="placeholder">还没跑到这一格。</span>';
+    setStat(s.id, '待命');
+    panels[s.id].el.querySelectorAll('.out').forEach((el,i)=>{ if(i>0) el.remove(); });
+  });
+  $('deliver').style.display='none';
+  hideErr();
+});
+
+/* ===================== 存储位置 ===================== */
+function sdPaint(){
+  const nm=$('saveDirName'), clr=$('saveDirClear'), note=$('saveDirNote'), pick=$('saveDirPick');
+  if(!nm) return;
+  const S = window.WDSSaveDir;
+  if(!S || !S.supported()){
+    nm.textContent='默认下载目录';
+    if(pick) pick.style.display='none';
+    if(clr) clr.style.display='none';
+    if(note) note.textContent='你的浏览器不支持选择文件夹（这是 Chrome / Edge 才有的能力），产出会照常下载到默认下载目录。';
+    return;
+  }
+  const cur = S.name();
+  nm.textContent = cur || '默认下载目录';
+  if(clr) clr.style.display = cur ? '' : 'none';
+  if(pick) pick.textContent = cur ? '更换文件夹' : '选择文件夹';
+  if(note) note.textContent = cur ? '这一次碰撞的所有产出都会直接写进这个文件夹。' : '还没选。选一个，产出就不必再从下载目录里翻。';
+}
+function sdSaved(r){
+  const note=$('saveDirNote'); if(!note) return;
+  note.textContent = r.where==='dir' ? ('已写入「'+r.dir+'」：'+r.name) : ('已下载到默认下载目录：'+r.name);
+}
+(function(){
+  const pick=$('saveDirPick'), clr=$('saveDirClear');
+  if(pick) pick.addEventListener('click', ()=>{
+    if(!window.WDSSaveDir || !window.WDSSaveDir.supported()) return;
+    window.WDSSaveDir.ensure({id:'sde-paradigm-forge', repick:true}).then(sdPaint);
+  });
+  if(clr) clr.addEventListener('click', ()=>{ if(window.WDSSaveDir) window.WDSSaveDir.forget().then(sdPaint); });
+  if(window.WDSSaveDir) window.WDSSaveDir.onChange(sdPaint); else sdPaint();
+})();
+
+/* ===================== 导出 ===================== */
+/*@MD@*/
+
+function saveBlob(filename, blob){
+  const dirP = (window.WDSSaveDir && window.WDSSaveDir.supported())
+    ? window.WDSSaveDir.ensure({id:'sde-paradigm-forge'}).catch(()=>null)
+    : Promise.resolve(null);
+  return dirP.then(()=> (window.WDSSaveDir ? window.WDSSaveDir.save(filename, blob) : null))
+    .then(r=>{
+      if(r){ sdSaved(r); return; }
+      const url=URL.createObjectURL(blob); const a=document.createElement('a');
+      a.href=url; a.download=filename; document.body.appendChild(a); a.click();
+      document.body.removeChild(a); URL.revokeObjectURL(url);
+    });
+}
+function srcFooterMd(){
+  return ['', '## 三篇来源', ''].concat(ST.sources.map((s,i)=>
+    (i+1)+'. '+s.title + (s.author?('（'+s.author+'）'):'') + (s.url? ('　'+location.origin+s.url) : '')
+  )).join('\n');
+}
+$('dlDocx').addEventListener('click', ()=>{
+  if(!ST.article){ showErr('还没有终稿。'); return; }
+  const { Document, Packer, Paragraph, TextRun, AlignmentType } = docx;
+  const title = (ST.article.split('\n')[0]||'碰撞出的典范').replace(/^#+\s*/,'').slice(0,50);
+  const children = [
+    new Paragraph({ children:[new TextRun({text:title, bold:true, size:36, color:'1a1205'})], alignment:AlignmentType.CENTER, spacing:{after:140} }),
+    new Paragraph({ children:[new TextRun({text:'王德生 ＋ Claude　·　由 SDE 碰撞出典范生成（基底：'+vendorName()+'）', size:18, color:'888888'})], alignment:AlignmentType.CENTER, spacing:{after:220} })
+  ];
+  children.push(...mdParas(ST.article, {size:24, color:'222222', autoHeading:true}));
+  children.push(...mdParas(srcFooterMd(), {size:22, color:'444444', autoHeading:true}));
+  const doc = new Document({ sections:[{ properties:{}, children }] });
+  const dirP = (window.WDSSaveDir && window.WDSSaveDir.supported())
+    ? window.WDSSaveDir.ensure({id:'sde-paradigm-forge'}).catch(()=>null) : Promise.resolve(null);
+  Packer.toBlob(doc).then(blob=>
+    dirP.then(()=> (window.WDSSaveDir ? window.WDSSaveDir.save('碰撞出典范_'+title.slice(0,12)+'.docx', blob) : null))
+      .then(r=>{
+        if(r){ sdSaved(r); return; }
+        const url=URL.createObjectURL(blob); const a=document.createElement('a');
+        a.href=url; a.download='碰撞出典范_'+title.slice(0,12)+'.docx';
+        document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+      })
+  ).catch(e=> showErr('生成 Word 失败：'+e.message));
+});
+$('dlPack').addEventListener('click', ()=>{
+  if(!ST.article){ showErr('还没有终稿。'); return; }
+  const title = (ST.article.split('\n')[0]||'碰撞出的典范').replace(/^#+\s*/,'').slice(0,50);
+  const fm = ['---',
+    'title: '+title,
+    'author: 王德生 ＋ Claude',
+    'mode: '+ST.mode,
+    'model: '+modelSel.value,
+    'iq_self: '+(ST.score==null?'未评':ST.score),
+    'sources:'].concat(ST.sources.map(s=>'  - '+(s.url||'(投喂)')+'　'+s.title)).concat(['---','']).join('\n');
+  const body = [fm, ST.article, srcFooterMd(), '', '## 与既有说法的划界', '', ST.out.demarc||''].join('\n');
+  saveBlob('发布包_'+title.slice(0,12)+'.md', new Blob([body], {type:'text/markdown'}));
+});
+$('dlEngine').addEventListener('click', ()=>{
+  const parts = ['# 引擎室全过程', '', '基底：'+modelSel.value+'　模式：'+ST.mode, srcFooterMd(), ''];
+  STAGES.forEach((s,i)=>{ parts.push('## '+(i+1)+'. '+s.n+'（'+s.hint+'）', '', ST.out[s.id]||'（未跑）', ''); });
+  saveBlob('引擎室_'+new Date().toISOString().slice(0,10)+'.md', new Blob([parts.join('\n')], {type:'text/markdown'}));
+});
+
+/* ===================== 起 ===================== */
+const BUILD_TAG = '@BUILDTAG@';
+(function(){ const el=$('buildTag'); if(el) el.textContent='构建 '+BUILD_TAG; })();
+loadData();
+</script>
+</body>
+</html>
