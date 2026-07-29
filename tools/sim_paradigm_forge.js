@@ -769,17 +769,39 @@ function setStudent(c, slug) {
     ok('零抛错', c.errors.length === 0, c.errors.slice(0, 2).join(' ｜ '));
   });
 
-  await step('十七之十、发布包要带三篇的观点', async () => {
+  await step('十七之十、观点是中间产物：看得见，但不进成品', async () => {
     const c = await boot({ withSaveDir: true });
     await runPipeline(c, 30000);
-    c.click('#dlPack'); await sleep(400);
+    c.click('#dlPack'); c.click('#dlEngine'); await sleep(500);
     const pack = c.saved.find(x => /发布包_/.test(x.name));
-    ok('发布包写了主题观点', pack && pack.text && /主题观点：/.test(pack.text),
-      pack && pack.text ? '有 ' + (pack.text.match(/主题观点：/g) || []).length + ' 条' : '(没取到)');
-    ok('三篇的主题观点都在', pack && pack.text && (pack.text.match(/- 主题观点：/g) || []).length === 3);
-    ok('九条支撑都在', pack && pack.text && (pack.text.match(/- 支撑[abc]：/g) || []).length === 9,
-      pack && pack.text ? ((pack.text.match(/- 支撑[abc]：/g) || []).length + ' 条') : '');
-    ok('冲突校验也写进去了', pack && pack.text && /三条主题观点的冲突校验/.test(pack.text));
+    const eng = c.saved.find(x => /引擎室_/.test(x.name));
+    ok('成品（发布包）里没有主题观点', pack && pack.text && !/主题观点/.test(pack.text),
+      pack && pack.text ? '出现 ' + (pack.text.match(/主题观点/g) || []).length + ' 次' : '(没取到)');
+    ok('成品里也没有支撑观点', pack && pack.text && !/- 支撑[abc]：/.test(pack.text));
+    ok('成品仍列三篇来源（栏目规矩）', pack && pack.text && /## 三篇来源/.test(pack.text) &&
+      (pack.text.match(/https?:\/\/[^\s]*\/students\//g) || []).length === 3);
+    ok('引擎室存档里三条主题观点齐全', eng && eng.text && (eng.text.match(/- 主题观点：/g) || []).length === 3,
+      eng && eng.text ? ((eng.text.match(/- 主题观点：/g) || []).length + ' 条') : '(没取到)');
+    ok('引擎室存档里九条支撑齐全', eng && eng.text && (eng.text.match(/- 支撑[abc]：/g) || []).length === 9,
+      eng && eng.text ? ((eng.text.match(/- 支撑[abc]：/g) || []).length + ' 条') : '');
+    ok('引擎室注明这是中间产物', eng && eng.text && /中间产物，不进成品/.test(eng.text));
+    ok('冲突校验只留在引擎室', eng && eng.text && /三条主题观点的冲突校验/.test(eng.text) &&
+      pack && !/冲突校验/.test(pack.text));
+  });
+
+  await step('十七之十一、中间那一块可以就地取用', async () => {
+    const c = await boot({ withSaveDir: true });
+    ok('卡片上写明它不进成品', /不会写进成品文章/.test(c.$('trioCard').textContent));
+    ok('还没跑时点复制会如实说没内容', (function(){
+      c.click('#trioCopy'); return /还没有可复制/.test(c.$('trioNote').textContent);
+    })(), c.$('trioNote').textContent);
+    await runPipeline(c, 30000);
+    c.click('#trioDl'); await sleep(400);
+    const f = c.saved.find(x => /三篇与观点_/.test(x.name));
+    ok('能单独存成 .md', !!f, JSON.stringify(c.saved.map(x => x.name)));
+    ok('存出来的就是三篇与九条观点', f && f.text && (f.text.match(/- 支撑[abc]：/g) || []).length === 9,
+      f && f.text ? ((f.text.match(/- 支撑[abc]：/g) || []).length + ' 条') : '(没取到)');
+    ok('零抛错', c.errors.length === 0, c.errors.slice(0, 2).join(' ｜ '));
   });
 
   await step('十八、停下（跑到一半中止）', async () => {

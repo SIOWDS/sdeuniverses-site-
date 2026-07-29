@@ -182,8 +182,14 @@ select.model-select{max-width:340px}
   <!-- ③ 撞的是这三篇 -->
   <div class="card hidden" id="trioCard">
     <h2>③ 撞的是这三篇（每篇：一个主题观点 ＋ 三个支撑观点）</h2>
+    <div class="small" style="margin-bottom:10px">这一块是**中间产物**：给你看清撞的是什么、底盘硬不硬。它不会写进成品文章（成品只列三篇来源链接）。</div>
     <div id="trioBox"></div>
     <div class="small" id="trioConflict" style="margin-top:10px"></div>
+    <div class="st-tools" style="margin-top:10px">
+      <button class="btn ghost" id="trioCopy">复制这一块</button>
+      <button class="btn ghost" id="trioDl">存成 .md</button>
+      <span class="small" id="trioNote"></span>
+    </div>
   </div>
 
   <!-- ④ 流水线 -->
@@ -276,22 +282,32 @@ const SDE_CORE = [
 '方法纪律：三视角误差互消（同一对象从 S/D/E 三面各取一条，三条互相纠错）；反身的发生不可自我封顶（任何判断都要问它对自己适不适用）。',
 '武器锻造第一律·去母体化：对读者的成品里不许出现本学派术语，SDE 只作隐性引擎。'
 ].join('\n');
-let NEIGONG = '';
-(async function loadNeigong(){
-  try{
-    const r = await fetch('/taste/assets/sde-neigong.txt', {cache:'force-cache'});
-    if(!r.ok) return;
-    const t = await r.text();
-    if(t && t.length > 5000) NEIGONG = t;
-  }catch(e){ }
+let NEIGONG = '', HEART = '', IQRUB = '';
+const ASSETS_READY = (async function loadAssets(){
+  async function grab(u, min){
+    try{ const r = await fetch(u, {cache:'force-cache'}); if(!r.ok) return '';
+      const s = await r.text(); return (s && s.length > (min||500)) ? s : ''; }catch(e){ return ''; }
+  }
+  NEIGONG = await grab('/taste/assets/sde-neigong.txt', 5000);   // 全文，不截断（约 10.6 万字符）
+  HEART   = await grab('/taste/assets/sde-collide-heart.txt', 1000);
+  IQRUB   = await grab('/taste/assets/sde-innovation-iq.txt', 1000);
 })();
 function sdeSystem(extra){
   return [
     '你是 SDE 二阶碰撞引擎，为德麦国际 SDE 学派工作。',
     SDE_CORE,
-    NEIGONG ? ('【完整内功（节选自 sde-neigong.txt）】\n' + NEIGONG.slice(0, 24000)) : '',
+    ST.xinde ? ('【你自己内化后写下的心得（本次作业的引擎底盘，按它办事）】\n' + ST.xinde) : '',
+    HEART ? ('【SDE 二阶碰撞心法（工序纪律，逐条照办）】\n' + HEART) : '',
     '通用纪律：① 不给自己打分、不自盖典范章；② 宁可如实写"这一对无焦点"，也不许用"也""并且"强行联系；③ 命名要结构性命名，不要描述性命名；④ 不用"真"作强调修饰。',
     extra || ''
+  ].filter(Boolean).join('\n\n');
+}
+/* 评审那一趟另配：评分标尺全文 ＋ 心法（好判有没有走完工序） */
+function reviewSystem(){
+  return [
+    '你是严格的评审，只评不写。不许恭维，不许给"很有启发"这类空话。',
+    IQRUB ? ('【SDE 创新智商评分标尺（全文，按它打分）】\n' + IQRUB) : '',
+    HEART ? ('【二阶碰撞心法（据此判它有没有真的走完工序）】\n' + HEART) : ''
   ].filter(Boolean).join('\n\n');
 }
 
@@ -321,7 +337,7 @@ const STAGES = [
   {id:'review',  n:'评审',     hint:'创新智商 · 不到 150 点名回炉',      tok:4000}
 ];
 const ST = { mode:'A', sources:[], out:{}, outline:'', article:'', score:null, running:false, abort:false,
-             manual:false, tried:[], seed:null, seedScore:0, outer:0, best:null,
+             manual:false, tried:[], seed:null, seedScore:0, outer:0, best:null, xinde:'',
              redoFrom:null, rounds:0, termRetry:0, termFix:null, notes:[],
              spineRows:[], conflict:'' };
 
@@ -914,7 +930,7 @@ async function runStage(i){
   if(s.id==='demarc'){
     try{ window.__KB = await kbCtx(((ST.out.emerge||'').slice(0,600))); }catch(e){ window.__KB=''; }
   }
-  const sys = (s.id==='review') ? '你是严格的评审，只评不写。不许恭维，不许给"很有启发"这类空话。' : sdeSystem();
+  const sys = (s.id==='review') ? reviewSystem() : sdeSystem();
   const txt = await callStage(s.id, promptFor(s.id), s.tok, sys);
   if(s.id==='spine'){
     ST.spineRows = parseSpine(txt);
@@ -1175,7 +1191,7 @@ goBtn.addEventListener('click', async ()=>{
 $('stopBtn').addEventListener('click', ()=>{ ST.abort = true; });
 $('resetBtn').addEventListener('click', ()=>{
   ST.out = {}; ST.article=''; ST.outline=''; ST.score=null; ST.sources=[];
-  ST.tried=[]; ST.seed=null; ST.seedScore=0; ST.outer=0; ST.best=null;
+  ST.tried=[]; ST.seed=null; ST.seedScore=0; ST.outer=0; ST.best=null;   // 心得不清：它按内功+基底缓存，重跑不必重内化
   ST.redoFrom=null; ST.rounds=0; ST.termRetry=0; ST.termFix=null; ST.notes=[];
   ST.spineRows=[]; ST.conflict='';
   $('trioCard').classList.add('hidden'); $('trioBox').innerHTML=''; $('trioConflict').innerHTML='';
@@ -1236,15 +1252,24 @@ function saveBlob(filename, blob){
       document.body.removeChild(a); URL.revokeObjectURL(url);
     });
 }
+/* 成品页脚：只列三篇来源（栏目规矩要求可点开核对）。
+   主题观点与九条支撑是**中间产物**——页面上看得见、引擎室存档里留着，但不进成品。 */
 function srcFooterMd(){
-  const lines = ['', '## 三篇来源与它们的观点', ''];
+  return ['', '## 三篇来源', ''].concat(ST.sources.map((s,i)=>
+    (i+1)+'. '+s.title + (s.author?('（'+s.author+'）'):'') + (s.url? ('　'+location.origin+s.url) : '')
+  )).join('\n');
+}
+/* 三篇的主题观点与支撑观点：只给引擎室存档与页面卡片用 */
+function trioMd(){
+  if(!ST.sources.length) return '';
+  const lines = ['', '## 三篇与它们的观点（中间产物，不进成品）', ''];
   ST.sources.forEach((s,i)=>{
     lines.push((i+1)+'. '+s.title + (s.author?('（'+s.author+'）'):'') + (s.url? ('　'+location.origin+s.url) : ''));
     const r = (ST.spineRows||[]).find(x=>x.n===i+1);
     if(r){
       if(r.thesis) lines.push('   - 主题观点：'+r.thesis);
       r.supports.forEach((x,k)=> lines.push('   - 支撑'+'abc'[k]+'：'+x));
-    }
+    } else lines.push('   -（观点未抽出）');
   });
   if(ST.conflict) lines.push('', '三条主题观点的冲突校验：'+ST.conflict);
   return lines.join('\n');
@@ -1285,8 +1310,20 @@ $('dlPack').addEventListener('click', ()=>{
   const body = [fm, ST.article, srcFooterMd(), '', '## 与既有说法的划界', '', ST.out.demarc||''].join('\n');
   saveBlob('发布包_'+title.slice(0,12)+'.md', new Blob([body], {type:'text/markdown'}));
 });
+$('trioCopy').addEventListener('click', ()=>{
+  const s = trioMd();
+  if(!s){ $('trioNote').textContent = '还没有可复制的内容。'; return; }
+  const done = ()=>{ $('trioNote').textContent = '已复制。'; };
+  if(navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(s).then(done).catch(()=>{ $('trioNote').textContent='复制失败，用「存成 .md」。'; });
+  else $('trioNote').textContent = '这个浏览器不给复制，用「存成 .md」。';
+});
+$('trioDl').addEventListener('click', ()=>{
+  const s = trioMd();
+  if(!s){ $('trioNote').textContent = '还没有可存的内容。'; return; }
+  saveBlob('三篇与观点_'+new Date().toISOString().slice(0,10)+'.md', new Blob([s], {type:'text/markdown'}));
+});
 $('dlEngine').addEventListener('click', ()=>{
-  const parts = ['# 引擎室全过程', '', '基底：'+modelSel.value+'　模式：'+ST.mode, srcFooterMd(), ''];
+  const parts = ['# 引擎室全过程', '', '基底：'+modelSel.value+'　模式：'+ST.mode, srcFooterMd(), trioMd(), ''];
   STAGES.forEach((s,i)=>{ parts.push('## '+(i+1)+'. '+s.n+'（'+s.hint+'）', '', ST.out[s.id]||'（未跑）', ''); });
   saveBlob('引擎室_'+new Date().toISOString().slice(0,10)+'.md', new Blob([parts.join('\n')], {type:'text/markdown'}));
 });
