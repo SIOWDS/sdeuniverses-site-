@@ -74,6 +74,11 @@ select.model-select{max-width:340px}
 .foot{color:var(--muted);font-size:12.5px;text-align:center;padding:30px 20px 50px;line-height:1.9}
 .hidden{display:none!important}
 .small{font-size:12.5px;color:var(--muted)}
+.trio-row{border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:10px;background:var(--panel2)}
+.trio-row h4{font-size:14.5px;color:var(--text);margin-bottom:4px}
+.trio-row .th{font-size:14px;color:var(--gold2);margin:8px 0;line-height:1.65}
+.trio-row ol{margin:0 0 0 20px;font-size:13.5px;color:#C9D4DE;line-height:1.75}
+.trio-row .src{font-size:12px;color:var(--muted)}
 .scorebig{font-size:34px;font-weight:800;color:var(--gold2)}
 .gradebar{height:6px;border-radius:4px;background:var(--panel2);overflow:hidden;margin:8px 0}
 .gradebar i{display:block;height:100%;background:linear-gradient(90deg,var(--red),var(--gold2))}
@@ -174,7 +179,14 @@ select.model-select{max-width:340px}
     </div>
   </div>
 
-  <!-- ③ 流水线 -->
+  <!-- ③ 撞的是这三篇 -->
+  <div class="card hidden" id="trioCard">
+    <h2>③ 撞的是这三篇（每篇：一个主题观点 ＋ 三个支撑观点）</h2>
+    <div id="trioBox"></div>
+    <div class="small" id="trioConflict" style="margin-top:10px"></div>
+  </div>
+
+  <!-- ④ 流水线 -->
   <div id="pipeline"></div>
 
   <!-- ④ 交付 -->
@@ -310,7 +322,8 @@ const STAGES = [
 ];
 const ST = { mode:'A', sources:[], out:{}, outline:'', article:'', score:null, running:false, abort:false,
              manual:false, tried:[], seed:null, seedScore:0, outer:0, best:null,
-             redoFrom:null, rounds:0, termRetry:0, termFix:null, notes:[] };
+             redoFrom:null, rounds:0, termRetry:0, termFix:null, notes:[],
+             spineRows:[], conflict:'' };
 
 /* ===================== 面板 ===================== */
 const panels = {};
@@ -587,7 +600,9 @@ async function loadTrio(trio){
   for(const it of picked) out.push({ title: it.title, url: it.url, author: st.name, text: await pullText(it.url) });
   if(new Set(out.map(x=>x.url)).size!==3) throw new Error('基底挑的三篇有重复。');
   ST.sources = out; ST.seed = trio;
+  ST.spineRows = []; ST.conflict = '';        // 换了组，旧观点卡片作废
   $('srcState').textContent = '种子：'+out.map(s=>s.title.slice(0,12)).join(' × ');
+  renderTrio();
   return out;
 }
 function promptFor(id){
@@ -605,7 +620,12 @@ function promptFor(id){
       ST.tried.map((x,k)=>'· 第'+(k+1)+'轮 #'+x.trio.join(' #')+'　烈度 '+x.score+'/10　判词：'+x.why).join('\n') +
       '\n不许再提上面任何一组，也不许只换一篇就交差——上面几组说明你原来那条矛盾轴不成立，请换一条轴重新找。') : ''),
     '',
-    '先用两三句说明这一组为什么互相不相容（不是侧重不同），再给结论。',
+    '先写清三件事，再给结论：',
+    '　· 三篇各自的**主题观点**（每篇一句，≤40 字，是这篇真正主张的那一条，不是它的题材）；',
+    '　· **两两冲突**：a×b、a×c、b×c 各一句，说明两条主题观点为什么不能同时成立',
+    '　　（判准只有一条：若这条成立，那条就不成立。两条能并存的，一律不算冲突）；',
+    '　· 这一组为什么不是"侧重不同"。',
+    '三对里只要有一对其实相容，这一组就不合格，请另找一组再交。',
     '【最后一行必须是这个形状，供程序读取，不要加粗、不要放进表格】',
     '种子：#3 #17 #42 ｜ 矛盾轴：一句话',
     '',
@@ -625,10 +645,12 @@ function promptFor(id){
       '· 三方只是侧重不同／各说一面 → 烈度 ≤4，那是互补不是矛盾；',
       '· 三方对同一件事给了相反的处方或相反的命运判断（结局对立）→ 烈度 ≥7；',
       '· 打架点你自己一句话说不清 → 烈度 ≤5；',
-      '· 三篇其实是同一件事的三个侧面 → 同源度判"高"。',
+      '· 三篇其实是同一件事的三个侧面 → 同源度判"高"；',
+      '· 你自己写不出三条彼此不能同时成立的主题观点 → 烈度 ≤4（写得出就把三条写在判词前面）。',
       '你不是来鼓励提名者的。宁可判低，也别放一组互补的过去——放过去的代价是后面十道工序全部空转。',
       '',
-      '【输出就两行】',
+      '【输出：先三行主题观点，再两行读数】',
+      '主题1：…… ｜ 主题2：…… ｜ 主题3：……（写不出就写"写不出"）',
       '烈度：X/10 ｜ 同源度：高/中/低 ｜ 打架点：一句话（说不清就写"说不清"）',
       '判词：一句话说明为什么是这个分；不过的话，指出该往哪个方向另找'
     ].join('\n');
@@ -658,22 +680,38 @@ function promptFor(id){
   ].join('\n');
 
   if(id==='spine') return [
-    '从三个源里各抽三条最承重的判断，共九条。',
-    '每一篇的三条必须来自三个不同视角，且互相纠错：',
-    '  ① 它显露出来的是什么（结果层）',
-    '  ② 它靠哪条路径被组织成这样（路径层）',
-    '  ③ 它在什么条件里才成立（条件层）',
-    '每条 ≤40 字，必须是判断句、不是主题词；每条后面附一句原文依据（可摘录不超过十五字）。',
-    '**三条之间必须互不包含**：不许一条是另一条的特例、推论或换一种说法；三条各自被推翻时，另两条应当仍能成立。',
-    '写完三条后加一行自检：逐对说明它们为什么互不包含（a×b、a×c、b×c）。有包含关系的，重写那一条。',
-    '编号规则：源1 的三条编为 1a/1b/1c，源2 为 2a/2b/2c，源3 为 3a/3b/3c。',
+    '给这三篇各做一张卡片：**一个主题观点 ＋ 三个支撑观点**。',
+    '',
+    '主题观点：这篇文章真正主张的那一条，≤40 字，必须是判断句（"什么是怎样的""该怎么做"），不是题材、不是内容概括。',
+    '支撑观点：撑起这条主题的三条独立理由，各 ≤40 字，也必须是判断句。三条来自三个不同视角、互相纠错：',
+    '  ① 它显露出来的是什么（结果层）　② 它靠哪条路径被组织成这样（路径层）　③ 它在什么条件里才成立（条件层）',
+    '**三条支撑必须互不包含**：不许一条是另一条的特例、推论或换一种说法；任一条被推翻时，另两条应当仍能成立。',
+    '每条支撑后面附一句原文依据（摘录不超过十五字）。',
+    '',
+    '【输出格式，逐源一块，程序要读，别改字段名，别加粗】',
+    '【源1】《标题》',
+    '主题观点：……',
+    '支撑观点 1a：……　〔依据：……〕',
+    '支撑观点 1b：……　〔依据：……〕',
+    '支撑观点 1c：……　〔依据：……〕',
+    '互不包含自检：a×b …… ｜ a×c …… ｜ b×c ……',
+    '（源2 用 2a/2b/2c，源3 用 3a/3b/3c，格式相同）',
+    '',
+    '【三块写完后必须给这四行——这是本工序的验收】',
+    '冲突 1×2：一句话，说明两条主题观点为什么不能同时成立',
+    '冲突 1×3：一句话',
+    '冲突 2×3：一句话',
+    '主题冲突：三对全冲突　／　不成立（点名哪一对其实相容，并说明它们为什么可以一起成立）',
+    '判准只有一条：若这条成立、那条就不成立，才算冲突；两条能并存的，一律判为不成立。',
+    '不要为了交差硬说成冲突——判为不成立，机器会自动回去另找三篇，这比硬撑省事得多。',
     '',
     '【三个源】',
     srcBlock()
   ].join('\n');
 
   if(id==='collide') return [
-    '下面是九条承重判断。请执行跨篇两两对撞。',
+    '下面是三篇的主题观点与九条支撑观点。三条主题观点彼此冲突，这是本次碰撞的底盘；',
+    '现在要撞的是**九条支撑观点**：跨篇 3×3，共 27 对。',
     '同一篇内部的对（1a×1b 之类）一律作废不做，只做跨篇的 27 对。',
     '每一对走四步：',
     '一、撞击焦点：这两条在什么问题上打架？一句话。是"打架"不是"互补"。优先找【结局对立】。若无焦点，写"无焦点"，作废，不许强行联系。',
@@ -683,7 +721,7 @@ function promptFor(id){
     '',
     '【输出】先给表格：| 对 | 焦点 | 撞击 | 涌现物 |，最后统计有效涌现物数量、并点出最锋利的三个。',
     '',
-    '【九条】',
+    '【三篇的主题观点与九条支撑观点】',
     O.spine || ''
   ].join('\n');
 
@@ -784,6 +822,53 @@ function writerSystem(){
   ].join('\n');
 }
 
+/* ============ 抽脊产物的结构化读出：主题观点 ＋ 三支撑 ＋ 冲突校验 ============ */
+function parseSpine(txt){
+  const rows = [];
+  const parts = (txt||'').split(/【\s*源\s*([123])\s*】/).slice(1);
+  for(let i=0; i+1<parts.length; i+=2){
+    const n = parseInt(parts[i],10), body = parts[i+1];
+    const th = (body.match(/主题观点[：:]\s*([^\n]+)/) || [])[1] || '';
+    const sup = [];
+    const re = /支撑观点[^：:\n]{0,8}[：:]\s*([^\n]+)/g;
+    let m;
+    while((m = re.exec(body)) && sup.length < 3) sup.push(m[1].trim());
+    rows.push({ n: n, thesis: th.trim(), supports: sup });
+  }
+  return rows;
+}
+function conflictLine(txt){
+  const m = (txt||'').match(/主题冲突[：:]\s*([^\n]+)/);
+  return m ? m[1].trim() : '';
+}
+/* true=三对全冲突 · false=有一对相容 · null=没写这一行（不判死，只提示） */
+function conflictOK(txt){
+  const l = conflictLine(txt);
+  if(!l) return null;
+  return !/不成立|不冲突|相容/.test(l);
+}
+function renderTrio(){
+  const box = $('trioBox'), card = $('trioCard');
+  if(!box || !card) return;
+  if(!ST.sources.length){ card.classList.add('hidden'); return; }
+  card.classList.remove('hidden');
+  box.innerHTML = ST.sources.map((s,i)=>{
+    const r = (ST.spineRows||[]).find(x=>x.n===i+1);
+    const head = '<h4>源'+(i+1)+'　'+escTxt(s.title||'')+'</h4>' +
+      '<div class="src">'+(s.author?escTxt(s.author)+'　':'')+(s.url?('<a href="'+s.url+'" target="_blank" rel="noopener">读原文</a>'):'投喂')+'</div>';
+    if(!r) return '<div class="trio-row">'+head+'<div class="small" style="margin-top:8px">观点还没抽出来（跑到「抽脊」那一格才有）。</div></div>';
+    return '<div class="trio-row">'+head+
+      '<div class="th">主题观点：'+escTxt(r.thesis||'（没读出来，看抽脊那一格原文）')+'</div>'+
+      '<ol>'+(r.supports.length ? r.supports.map(x=>'<li>'+escTxt(x)+'</li>').join('')
+                                : '<li>（三条支撑没读出来，看抽脊那一格原文）</li>')+'</ol></div>';
+  }).join('');
+  const l = ST.conflict || '';
+  const good = conflictOK(ST.out.spine||'');
+  $('trioConflict').innerHTML = l
+    ? ('三条主题观点的冲突校验：<b style="color:'+(good===false?'var(--err)':'var(--ok)')+'">'+escTxt(l)+'</b>')
+    : '';
+}
+
 /* ===================== 跑 ===================== */
 function needKey(){
   const k = (apiKeyEl.value||'').trim();
@@ -831,6 +916,26 @@ async function runStage(i){
   }
   const sys = (s.id==='review') ? '你是严格的评审，只评不写。不许恭维，不许给"很有启发"这类空话。' : sdeSystem();
   const txt = await callStage(s.id, promptFor(s.id), s.tok, sys);
+  if(s.id==='spine'){
+    ST.spineRows = parseSpine(txt);
+    ST.conflict = conflictLine(txt);
+    renderTrio();
+    if(ST.spineRows.length !== 3) note('抽脊格只读出 '+ST.spineRows.length+' 块结构，卡片以原文为准。');
+    if(conflictOK(txt) === false){
+      // 三条主题观点里有一对其实相容 —— 底盘不成立，回选篇另找（复用种子搜索的"已试过"记账）
+      if(ST.mode==='A' && !ST.manual && ST.outer < 2){
+        ST.outer++;
+        if(ST.seed) ST.tried.push({ trio: ST.seed, score: 0, why: '三条主题观点没能两两冲突：'+ST.conflict });
+        note('主题观点没能两两冲突，回选篇另找一组。');
+        showErr('三条主题观点里有一对其实相容（'+ST.conflict+'）——回选篇另找一组，从体检重来（第 '+ST.outer+' 次，最多两次）。');
+        setStat('spine', '回选篇重找…', 'run');
+        await doSelect();
+        ST.redoFrom = STAGES.findIndex(x=>x.id==='gate');
+        return txt;
+      }
+      showErr('三条主题观点没能两两冲突：'+ST.conflict+'。碰撞照跑，但底盘不硬——换一位学员或改手挑会更实在。');
+    }
+  }
   if(s.id==='gate'){
     const m = txt.match(/闸一[：:]\s*分数\s*(\d+)/) || txt.match(/(\d+)\s*\/\s*10/);
     const sc = m ? parseInt(m[1],10) : null;
@@ -1035,8 +1140,9 @@ async function deliver(){
     '成品 '+words+' 字',
     ST.score==null ? '评审未读到分数' : ('创新智商 '+ST.score+(ST.score>=150?'（过线）':'（未过线，已回炉 '+ST.rounds+' 轮）')),
     hits.length ? ('⚠ 术语残留：'+hits.join('、')) : '术语零残留',
-    ST.mode==='A' && !ST.manual ? ('三个种子由基底找（试了 '+ST.tried.length+' 组，定标烈度 '+ST.seedScore+'/10）') : '三篇由你指定'
-  ];
+    ST.mode==='A' && !ST.manual ? ('三个种子由基底找（试了 '+ST.tried.length+' 组，定标烈度 '+ST.seedScore+'/10）') : '三篇由你指定',
+    ST.conflict ? ('主题冲突：'+ST.conflict) : ''
+  ].filter(Boolean);
   $('doneBanner').innerHTML = '✓ 跑完了。' + bits.join('　·　') +
     (ST.notes.length ? ('<br><span style="color:var(--muted)">中途自动修了：'+ST.notes.join('　')+'</span>') : '');
   progress(STAGES.length-1, '完成');
@@ -1071,6 +1177,8 @@ $('resetBtn').addEventListener('click', ()=>{
   ST.out = {}; ST.article=''; ST.outline=''; ST.score=null; ST.sources=[];
   ST.tried=[]; ST.seed=null; ST.seedScore=0; ST.outer=0; ST.best=null;
   ST.redoFrom=null; ST.rounds=0; ST.termRetry=0; ST.termFix=null; ST.notes=[];
+  ST.spineRows=[]; ST.conflict='';
+  $('trioCard').classList.add('hidden'); $('trioBox').innerHTML=''; $('trioConflict').innerHTML='';
   $('runbar').classList.add('hidden'); $('doneBanner').innerHTML='';
   STAGES.forEach(s=>{
     panels[s.id].out.innerHTML = '<span class="placeholder">还没跑到这一格。</span>';
@@ -1129,9 +1237,17 @@ function saveBlob(filename, blob){
     });
 }
 function srcFooterMd(){
-  return ['', '## 三篇来源', ''].concat(ST.sources.map((s,i)=>
-    (i+1)+'. '+s.title + (s.author?('（'+s.author+'）'):'') + (s.url? ('　'+location.origin+s.url) : '')
-  )).join('\n');
+  const lines = ['', '## 三篇来源与它们的观点', ''];
+  ST.sources.forEach((s,i)=>{
+    lines.push((i+1)+'. '+s.title + (s.author?('（'+s.author+'）'):'') + (s.url? ('　'+location.origin+s.url) : ''));
+    const r = (ST.spineRows||[]).find(x=>x.n===i+1);
+    if(r){
+      if(r.thesis) lines.push('   - 主题观点：'+r.thesis);
+      r.supports.forEach((x,k)=> lines.push('   - 支撑'+'abc'[k]+'：'+x));
+    }
+  });
+  if(ST.conflict) lines.push('', '三条主题观点的冲突校验：'+ST.conflict);
+  return lines.join('\n');
 }
 $('dlDocx').addEventListener('click', ()=>{
   if(!ST.article){ showErr('还没有终稿。'); return; }

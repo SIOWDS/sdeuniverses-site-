@@ -76,11 +76,27 @@ const ARTICLE_HTML = '<html><head><title>假文章</title></head><body><nav>导�
   '<script>console.log(1)<\/script><footer>页脚</footer></body></html>';
 const SHORT_HTML = '<html><body><article>太短。</article></body></html>';
 
+function spineAnswer(conflictLine) {
+  const blk = n => ['【源' + n + '】《假文章' + n + '》',
+    '主题观点：第' + n + '篇主张的那一条判断，够长够像判断句。',
+    '支撑观点 ' + n + 'a：结果层的理由，独立成立。　〔依据：原文若干字〕',
+    '支撑观点 ' + n + 'b：路径层的理由，独立成立。　〔依据：原文若干字〕',
+    '支撑观点 ' + n + 'c：条件层的理由，独立成立。　〔依据：原文若干字〕',
+    '互不包含自检：a×b 不同层 ｜ a×c 不同层 ｜ b×c 不同层'].join('\n');
+  return [blk(1), blk(2), blk(3),
+    '冲突 1×2：一个说该撤手，一个说撤手是灾，不能同时成立。',
+    '冲突 1×3：一个说留白养人，一个说留白什么也长不出。',
+    '冲突 2×3：两条处方相反。',
+    '主题冲突：' + (conflictLine || '三对全冲突')].join('\n\n');
+}
 function defaultAnswer(userMsg) {
   if (/【文章清单】/.test(userMsg))
-    return '这三篇在"撤手"上给了相反的处方……\n种子：#1 #2 #3 ｜ 矛盾轴：同一个"撤"字的三种相反评价';
+    return /已经试过/.test(userMsg)
+      ? '换一条轴再找……\n种子：#4 #5 #6 ｜ 矛盾轴：另一条轴'
+      : '这三篇在"撤手"上给了相反的处方……\n种子：#1 #2 #3 ｜ 矛盾轴：同一个"撤"字的三种相反评价';
   if (/你是验收员/.test(userMsg))
     return '烈度：8/10 ｜ 同源度：低 ｜ 打架点：撤手到底是德是灾\n判词：三方对同一个动作给了相反的处方';
+  if (/一个主题观点/.test(userMsg) && /支撑观点/.test(userMsg)) return spineAnswer('三对全冲突');
   if (/列一份文章目录/.test(userMsg))
     return Array.from({ length: 16 }, (_, i) => '第' + (i + 1) + '章、章名' + (i + 1) + ' —— 落一件事').join('\n');
   if (/继续写这篇文章的第/.test(userMsg)) return '章节正文。'.repeat(60);
@@ -310,15 +326,27 @@ function setStudent(c, slug) {
     ok('体检写死三道闸', gate && /闸一/.test(gate.user) && /闸二/.test(gate.user) && /闸三/.test(gate.user));
     ok('体检把已发清单垫进去（避重）', gate && /已发清单/.test(gate.user));
     ok('体检优先找结局对立', gate && /结局对立/.test(gate.user));
-    const spine = f(/各抽三条最承重的判断/);
+    const spine = f(/一个主题观点/);
     ok('抽脊要三视角各一条', spine && /结果层[\s\S]*路径层[\s\S]*条件层/.test(spine.user));
-    ok('抽脊规定了 1a\/1b\/1c 编号', spine && /1a\/1b\/1c/.test(spine.user));
-    ok('抽脊要求三条互不包含', spine && /互不包含/.test(spine.user));
-    ok('抽脊要求逐对自检包含关系', spine && /a×b、a×c、b×c/.test(spine.user));
-    const col = f(/跨篇两两对撞/);
+    ok('抽脊要"一个主题观点 ＋ 三个支撑观点"', spine && /一个主题观点/.test(spine.user) && /三个支撑观点/.test(spine.user));
+    ok('抽脊规定了机读字段与 1a/1b/1c 编号', spine && /支撑观点 1a/.test(spine.user) && /2a\/2b\/2c/.test(spine.user));
+    ok('抽脊要求三条支撑互不包含', spine && /互不包含/.test(spine.user));
+    ok('抽脊要求逐对自检包含关系', spine && /a×b …… ｜ a×c/.test(spine.user));
+    ok('抽脊要求三条主题两两冲突并给四行验收',
+      spine && /冲突 1×2/.test(spine.user) && /冲突 1×3/.test(spine.user) && /冲突 2×3/.test(spine.user) && /主题冲突：三对全冲突/.test(spine.user) && /不成立（点名哪一对其实相容/.test(spine.user));
+    ok('抽脊把冲突判准写死（若这条成立那条就不成立）', spine && /若这条成立、那条就不成立/.test(spine.user));
+    ok('抽脊明说宁可判不成立也别硬撑', spine && /不要为了交差硬说成冲突/.test(spine.user));
+    const nom = f(/【文章清单】/);
+    ok('提名就要交三条主题观点与两两冲突', nom && /主题观点/.test(nom.user) && /两两冲突/.test(nom.user));
+    ok('提名写明"一对相容就不合格"', nom && /只要有一对其实相容/.test(nom.user));
+    const vf = cA.calls.find(x => /你是验收员/.test(x.user));
+    ok('验收员也要写三条主题观点', vf && /主题1/.test(vf.user));
+    ok('验收员写不出三条互斥主题就压分', vf && /写不出三条彼此不能同时成立的主题观点/.test(vf.user));
+    const col = f(/跨篇 3×3/);
     ok('碰撞写死同篇内部作废', col && /同一篇内部的对[\s\S]*一律作废/.test(col.user));
     ok('碰撞要求无焦点即作废、不许强行联系', col && /无焦点/.test(col.user) && /不许强行联系/.test(col.user));
     ok('碰撞要求结构性命名 ≤20 字', col && /≤20 字/.test(col.user));
+    ok('碰撞撞的是九条支撑、主题冲突当底盘', col && /三条主题观点彼此冲突，这是本次碰撞的底盘/.test(col.user) && /九条支撑观点/.test(col.user));
     const exp = f(/五个候选判断/);
     ok('扩候选要求候选间不同脊、不凑数', exp && /不许同脊/.test(exp.user) && /不要凑数/.test(exp.user));
     const c2 = f(/第二阶对撞/);
@@ -698,6 +726,62 @@ function setStudent(c, slug) {
     ok('没有硬撑着往下跑', c.$('stat-gate').textContent === '待命');
   });
 
+  await step('十七之七、三篇与它们的观点要出现在页面上', async () => {
+    const c = await boot();
+    const done = await runPipeline(c, 30000);
+    ok('跑得完', done);
+    ok('三篇卡片亮出来了', !c.$('trioCard').classList.contains('hidden'));
+    const rows = c.doc.querySelectorAll('#trioBox .trio-row');
+    ok('正好三块', rows.length === 3, '实际 ' + rows.length);
+    ok('每块都有主题观点', Array.from(rows).every(r => /主题观点：第\d篇主张的那一条判断/.test(r.textContent)));
+    ok('每块都有三条支撑', Array.from(rows).every(r => r.querySelectorAll('ol li').length === 3),
+      Array.from(rows).map(r => r.querySelectorAll('ol li').length).join(','));
+    ok('三条支撑分别来自结果层/路径层/条件层', /结果层[\s\S]*路径层[\s\S]*条件层/.test(rows[0].textContent));
+    ok('每块都链回原文', Array.from(rows).every(r => !!r.querySelector('a[href^="/students/"]')));
+    ok('冲突校验行亮出来', /三对全冲突/.test(c.$('trioConflict').textContent), c.$('trioConflict').textContent);
+    ok('横幅也带上主题冲突', /主题冲突：三对全冲突/.test(c.$('doneBanner').textContent), c.$('doneBanner').textContent);
+  });
+
+  await step('十七之八、三条主题观点没能两两冲突 → 自动回选篇另找', async () => {
+    let sp = 0, nom = 0;
+    const c = await boot({ answer: u => {
+      if (/一个主题观点/.test(u)) { sp++; return spineAnswer(sp === 1 ? '不成立（源1 与源3 其实相容，两条能一起成立）' : '三对全冲突'); }
+      if (/【文章清单】/.test(u)) { nom++; }
+      return defaultAnswer(u);
+    } });
+    const done = await runPipeline(c, 40000);
+    ok('抽脊跑了两遍', sp === 2, '实际 ' + sp + ' 遍');
+    ok('回选篇只重提了一轮就定标', nom === 2, '实际提名 ' + nom + ' 轮');
+    ok('第二组换的是另一条轴（不是原地挪位置）', /角力|反循环|同意/.test(c.$('srcState').textContent), c.$('srcState').textContent);
+    ok('换组后重新体检', (c.calls.filter(x => /请先做体检/.test(x.user)) || []).length === 2);
+    ok('把不合格的原因记进"已试过"', c.calls.some(x => /【文章清单】/.test(x.user) && /主题观点没能两两冲突/.test(x.user)));
+    ok('最终冲突校验是通过的', /三对全冲突/.test(c.$('trioConflict').textContent), c.$('trioConflict').textContent);
+    ok('照样跑到底', done, c.$('stat-review').textContent);
+  });
+
+  await step('十七之九、抽脊没按格式写时不炸（卡片如实说没读出来）', async () => {
+    const c = await boot({ answer: u => /一个主题观点/.test(u)
+      ? '我觉得这三篇分别讲了三件事，写成一段话就好。'.repeat(8) : defaultAnswer(u) });
+    const done = await runPipeline(c, 30000);
+    ok('照样跑到底', done, c.$('stat-review').textContent);
+    ok('卡片退回三篇标题（不空白）', c.doc.querySelectorAll('#trioBox .trio-row').length === 3);
+    ok('如实说观点没抽出来', /观点还没抽出来|没读出来/.test(c.$('trioBox').textContent));
+    ok('零抛错', c.errors.length === 0, c.errors.slice(0, 2).join(' ｜ '));
+  });
+
+  await step('十七之十、发布包要带三篇的观点', async () => {
+    const c = await boot({ withSaveDir: true });
+    await runPipeline(c, 30000);
+    c.click('#dlPack'); await sleep(400);
+    const pack = c.saved.find(x => /发布包_/.test(x.name));
+    ok('发布包写了主题观点', pack && pack.text && /主题观点：/.test(pack.text),
+      pack && pack.text ? '有 ' + (pack.text.match(/主题观点：/g) || []).length + ' 条' : '(没取到)');
+    ok('三篇的主题观点都在', pack && pack.text && (pack.text.match(/- 主题观点：/g) || []).length === 3);
+    ok('九条支撑都在', pack && pack.text && (pack.text.match(/- 支撑[abc]：/g) || []).length === 9,
+      pack && pack.text ? ((pack.text.match(/- 支撑[abc]：/g) || []).length + ' 条') : '');
+    ok('冲突校验也写进去了', pack && pack.text && /三条主题观点的冲突校验/.test(pack.text));
+  });
+
   await step('十八、停下（跑到一半中止）', async () => {
     const c = await boot({ slow: 40 });   // 每个 chunk 40ms，好让"停下"有机会插进去
     pickModeA(c); c.$('apiKey').value = 'sk-fake'; c.click('#goBtn');
@@ -720,7 +804,7 @@ function setStudent(c, slug) {
     pickModeA(c);
     const done = await runPipeline(c);
     ok('照样跑得完（不像发生器那样直接中止）', done, c.$('stat-review').textContent);
-    const spine = c.calls.find(x => /各抽三条最承重的判断/.test(x.user));
+    const spine = c.calls.find(x => /一个主题观点/.test(x.user));
     ok('system 里仍带页面自带的凝缩内功', spine && /SDE 本体论·凝缩/.test(spine.system));
     ok('没有把取不到的内功塞成空节', spine && !/完整内功/.test(spine.system));
   });
