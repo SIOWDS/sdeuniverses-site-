@@ -997,7 +997,7 @@ async function loadCorpus(env, url) {
   if (CORPUS && now - CORPUS_CHECKED < CORPUS_TTL) return CORPUS;
   let man;
   try {
-    man = await (await env.ASSETS.fetch(new Request(new URL("/search/manifest.json", url)))).json();
+    man = await (await idxFetch(env, url, "/search/manifest.json")).json();
   } catch (e) {
     if (CORPUS) return CORPUS; // 复验失败：先用旧语料顶着，下个周期再试
     throw e;
@@ -1010,7 +1010,7 @@ async function loadCorpus(env, url) {
   for (const s of man.sections) {
     for (const f of (s.files || [s.key])) {
       try {
-        const sh = await (await env.ASSETS.fetch(new Request(new URL("/search/shard-" + f + ".json", url)))).json();
+        const sh = await (await idxFetch(env, url, "/search/shard-" + f + ".json")).json();
         for (const c of sh.chunks) chunks.push(c);
       } catch (e) { /* 单片失败不阻断 */ }
     }
@@ -1021,7 +1021,7 @@ async function loadCorpus(env, url) {
 // SDE 坐标（索引侧打标产物；未打标则为 null，检索自动退回纯词义扩展）
 async function loadCoords(env, url) {
   try {
-    const cj = await (await env.ASSETS.fetch(new Request(new URL("/search/sde-coords.json", url)))).json();
+    const cj = await (await idxFetch(env, url, "/search/sde-coords.json")).json();
     const m = {};
     for (const k in cj) m[k] = new Set((cj[k] || []).map((t) => String(t).toLowerCase()));
     return Object.keys(m).length ? m : null;
@@ -1062,12 +1062,28 @@ async function lightRetrieve(env, url, q, expTerms, k, cut, opts) {
 // 每层都能"动态扩展"：选不出版块就放宽到全站篇层；候选篇太少就多拉两个版块；
 // 资料不够长就再下钻一轮。目标是每次问答只读几百 KB，而不是把 60MB 全搬进来。
 let TIER = { at: 0, l0: null, l1: {} };   // 小文件缓存（合计几百 KB，安全）；30 秒复验一次
+// IDX_KEYS：允许从 R2 供给的索引数据文件。**只认生成物**——
+// /search/index.html 是搜索页本身，永远留在仓库里，不在此列。
+const IDX_KEYS = /^search\/(?:manifest|sections|keywords|sde-coords)\.json$|^search\/shard-[A-Za-z0-9_.-]+\.json$|^search\/(?:doc|kw)\/[A-Za-z0-9_.-]+\.json$/;
+// idxFetch：Worker 自己读索引的唯一入口。env.ASSETS.fetch 是绕过本 Worker 路由的，
+// 所以公网那条 R2 路由帮不到内部调用——内部必须自己先问一次桶。
+// 落空/出错一律回落 ASSETS，迁移期两边并存，任何一片都不会因为搬到一半而读不到。
+async function idxFetch(env, url, path) {
+  const key = path.replace(/^\//, "").split("?")[0];
+  if (env.PDFS && IDX_KEYS.test(key)) {
+    try {
+      const obj = await env.PDFS.get(key);
+      if (obj) return new Response(obj.body, { status: 200, headers: { "content-type": "application/json; charset=utf-8" } });
+    } catch (e) { /* 落到 ASSETS */ }
+  }
+  return env.ASSETS.fetch(new Request(new URL(path, url)));
+}
 async function tierGet(env, url, path, key) {
   const now = Date.now();
   if (now - TIER.at > CORPUS_TTL) { TIER = { at: now, l0: null, l1: {} }; }
   if (key === "l0" && TIER.l0) return TIER.l0;
   if (key !== "l0" && TIER.l1[key]) return TIER.l1[key];
-  const r = await env.ASSETS.fetch(new Request(new URL(path, url)));
+  const r = await idxFetch(env, url, path);
   if (!r.ok) return null;
   const j = await r.json();
   if (key === "l0") TIER.l0 = j; else TIER.l1[key] = j;
@@ -1082,7 +1098,7 @@ function _scoreKeys(list, baseKeys, exp, prev) {
   return sc;
 }
 async function ragScan(env, url, q, expTerms, prevQ, k, chunkLimit, opts) {
-  const man = await (await env.ASSETS.fetch(new Request(new URL("/search/manifest.json", url)))).json();
+  const man = await (await idxFetch(env, url, "/search/manifest.json")).json();
   const coords = await loadCoords(env, url);
   const { baseKeys, exp } = ragKeys(q, expTerms);
   const prev = prevQ && prevQ !== q ? ragKeys(prevQ, []).baseKeys : [];
@@ -1149,7 +1165,7 @@ async function ragScan(env, url, q, expTerms, prevQ, k, chunkLimit, opts) {
     const c = cand[i];
     let dj = null;
     try {
-      const r = await env.ASSETS.fetch(new Request(new URL("/search/doc/" + c.i + ".json", url)));
+      const r = await idxFetch(env, url, "/search/doc/" + c.i + ".json");
       if (!r.ok) continue;
       const txt = await r.text();
       bytes += txt.length;
@@ -1193,7 +1209,7 @@ async function ragScanShards(env, url, man, coords, baseKeys, exp, prev, k, cut)
     for (const f of (sec.files || [sec.key])) {
       if (scanned >= SHARD_BUDGET || Date.now() - t0 > MS_BUDGET) break;
       let sh = null;
-      try { sh = await (await env.ASSETS.fetch(new Request(new URL("/search/shard-" + f + ".json", url)))).json(); } catch (e) { continue; }
+      try { sh = await (await idxFetch(env, url, "/search/shard-" + f + ".json")).json(); } catch (e) { continue; }
       scanned++;
       for (const ck of sh.chunks) {
         const tl = ck.t.toLowerCase();
@@ -3740,6 +3756,34 @@ export default {
         }
       } catch (e) { /* R2 出任何岔子都不许让读者看不到文章：直接落到下面的 ASSETS */ }
     }
+    // ===== R2_IDX：搜索索引数据从 R2 供给，URL 一个字都不改 =====
+    // 与上面 PDF 那段的三点不同，都是索引"会变"带来的：
+    // ① **不加 immutable、不进边缘缓存**——PDF 是死的，索引每次发文都重建。
+    //    搜索页取分片时本来就带 ?v=Date.now() + cache:'no-store'，每次都是新 URL，
+    //    边缘缓存命不中还白占空间；索引拿旧的比慢更糟，所以这里干脆不缓存。
+    // ② 不需要 Range——都是整份 JSON。
+    // ③ 只认 IDX_KEYS 列出的生成物；/search/index.html 是页面，照旧走 ASSETS。
+    if ((request.method === "GET" || request.method === "HEAD") && env.PDFS && url.pathname.startsWith("/search/")) {
+      const _k = decodeURIComponent(url.pathname.slice(1));
+      if (IDX_KEYS.test(_k)) {
+        try {
+          const obj = await env.PDFS.get(_k, { onlyIf: request.headers });
+          if (obj) {
+            const h = new Headers();
+            obj.writeHttpMetadata(h);
+            h.set("etag", obj.httpEtag);
+            h.set("content-type", "application/json; charset=utf-8");
+            h.set("cache-control", "no-cache");
+            h.set("x-served-from", "r2");
+            if (!("body" in obj)) return new Response(null, { status: 304, headers: h });
+            h.set("content-length", String(obj.size));
+            return request.method === "HEAD"
+              ? new Response(null, { status: 200, headers: h })
+              : new Response(obj.body, { status: 200, headers: h });
+          }
+        } catch (e) { /* 桶里没有或出岔子：静默回落 ASSETS，迁移期两边并存 */ }
+      }
+    }
     // R2_MIGRATE：把学员 PDF 从仓库（ASSETS）搬进 R2。**在边缘上自己搬**——
     // 不经过任何人的机器、不需要 Cloudflare API Token，几百兆不必来回穿网。
     // 一次一小批、可重复跑（已在的默认跳过），失败的那几个下次单独再来。
@@ -3754,14 +3798,20 @@ export default {
         const p = String(p0);
         // 源与目标都钉死在学员 PDF 上：这个口子只能把仓库里已有的学员 PDF 搬进 R2，
         // 不能拿它往桶里塞任意内容（口令是前端级的，能力必须收窄到无害）。
-        if (!/^students\/[A-Za-z0-9._\-\/]+\.pdf$/i.test(p) || p.indexOf("..") >= 0) { out.push({ p: p, ok: false, msg: "路径不在允许范围" }); continue; }
+        // 允许两类：学员 PDF，与 IDX_KEYS 列出的索引生成物。别的一律不许往桶里塞。
+        const _isIdx = IDX_KEYS.test(p);
+        if ((!/^students\/[A-Za-z0-9._\-\/]+\.pdf$/i.test(p) && !_isIdx) || p.indexOf("..") >= 0) { out.push({ p: p, ok: false, msg: "路径不在允许范围" }); continue; }
         try {
           if (!b.force) { const hd = await env.PDFS.head(p); if (hd) { out.push({ p: p, ok: true, skip: 1, size: hd.size }); continue; } }
           const r = await env.ASSETS.fetch(new Request(new URL("/" + p, url)));
           if (!r.ok) { out.push({ p: p, ok: false, msg: "仓库里取不到：" + r.status }); continue; }
           const buf = await r.arrayBuffer();
-          if (!buf || buf.byteLength < 1000) { out.push({ p: p, ok: false, msg: "取回的字节数不对：" + (buf ? buf.byteLength : 0) }); continue; }
-          await env.PDFS.put(p, buf, { httpMetadata: { contentType: "application/pdf", cacheControl: "public, max-age=31536000, immutable" } });
+          // 索引里有小到几百字节的分片（如 shard-plagiarism），门槛不能按 PDF 的 1000 字节一刀切。
+          const _min = _isIdx ? 2 : 1000;
+          if (!buf || buf.byteLength < _min) { out.push({ p: p, ok: false, msg: "取回的字节数不对：" + (buf ? buf.byteLength : 0) }); continue; }
+          await env.PDFS.put(p, buf, _isIdx
+            ? { httpMetadata: { contentType: "application/json; charset=utf-8", cacheControl: "no-cache" } }
+            : { httpMetadata: { contentType: "application/pdf", cacheControl: "public, max-age=31536000, immutable" } });
           const hd2 = await env.PDFS.head(p);
           out.push({ p: p, ok: !!hd2 && hd2.size === buf.byteLength, size: buf.byteLength, r2: hd2 ? hd2.size : 0 });
         } catch (e) { out.push({ p: p, ok: false, msg: (e && e.message) || "put 失败" }); }
