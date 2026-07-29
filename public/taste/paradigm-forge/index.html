@@ -741,6 +741,14 @@ function reviewSystem(){
 }
 
 /* ===================== 术语零容忍（对读者的成品） ===================== */
+/* 成品里不许留"这篇文章是怎么做出来的"的痕迹——工艺词一律不进正文 */
+const TRACE = ['碰撞','对撞','撞出','涌现','暗流','矛盾轴','候选判断','二阶','三个源','三篇来源','三篇文章',
+               '本文综合','这三篇','五重检验','三视角','近邻划界','本文的方法','本文所用的方法','本文采用的方法'];
+function traceHits(text){
+  const s = text || '', out = [];
+  TRACE.forEach(w=>{ const n = s.split(w).length - 1; if(n>0) out.push(w+'×'+n); });
+  return out;
+}
 const TERMS = ['SDE','显露','显露态','差异序列','特征纠缠','本体论','发生学','三大方程','六路径','九步法','介生态','显影','回写','底盘','纠缠维度','意义三律','四结局诊断','去母体化','改姓','龙爪手','金点子','德麦'];
 function termHits(text){
   const t = text || '';
@@ -753,6 +761,7 @@ function termHits(text){
 const MAX_SRC = 12000;        // 每个源喂进去的正文上限（字符）
 const TOK_HARD = 8000;        // 满功率档的硬上限——踩过两次，别再调大
 const STAGES = [
+  {id:'warmup',  n:'内化',     hint:'把十万字内功与碰撞心法分块读完，写成一份心得当底盘', tok:3000},
   {id:'select',  n:'选篇',     hint:'让基底从这位学员的文章里挑三篇互相打架的', tok:4000},
   {id:'gate',    n:'体检',     hint:'它们真的在打架吗（三道闸）',        tok:4000},
   {id:'spine',   n:'抽脊',     hint:'每篇抽三条最硬的话，共九条',        tok:TOK_HARD},
@@ -797,7 +806,7 @@ const panels = {};
     ev.stopPropagation();
     const id = b.getAttribute('data-id'), act = b.getAttribute('data-act');
     const i = STAGES.findIndex(s=>s.id===id);
-    if(act==='rerun'){ await runFrom(i, i); }
+    if(act==='rerun'){ if(id==='warmup') ST.reWarm = true; await runFrom(i, i); }
     else if(act==='cont'){ await runFrom(i, STAGES.length-1); }
     else if(act==='edit'){
       const p = panels[id];
@@ -1260,6 +1269,11 @@ function writerSystem(){
     '',
     '【本次输出的硬规矩，违反即作废重写】',
     '① 正文不得出现任何学派术语：不许出现 SDE、显露、差异序列、特征纠缠、本体论、发生学、三大方程、六路径、介生态、显影、回写、底盘 等词；',
+    '①之二 **成品里不许留下这篇文章是怎么做出来的痕迹**：不许提三篇来源、不许说"本文综合了三种观点""通过对比三个领域""这三篇文章"；',
+    '　　也不许出现碰撞、对撞、撞出、涌现、暗流、矛盾轴、候选、二阶、三视角、五重检验、近邻划界这类工艺词。',
+    '　　判断要像它本来就长在这门学科里一样自己站住：论点自持、证据自足、来路不必交代。读者只该看见结论与论证，看不见车间。',
+    '　　与既有说法划清界线的那一章照写，但要写成"这与某某说的不是一回事"，不是"本文与近邻的划界"。',
+    '　　自反那一章照写，但写的是这条判断对本文自己适不适用，不是这套方法对自己适不适用。',
     '② 普通人必须读得懂：长句不超过 90 字，不用学术引注，不掉书袋；',
     '③ 论点要硬，语气要平——不喊口号、不用排比煽情、不写"我们必须"；',
     '④ 每一章都要有具体的场景或例子，不许整章都是抽象论断；',
@@ -1351,6 +1365,7 @@ function backStageFrom(txt){
 }
 async function runStage(i){
   const s = STAGES[i];
+  if(s.id==='warmup') return await doWarmup();
   if(s.id==='select'){
     if(ST.mode!=='A' || ST.manual){ setStat('select', '跳过（源已指定）'); ST.out.select=''; return ''; }
     return await doSelect();
@@ -1415,6 +1430,71 @@ async function runStage(i){
 
 /* 选篇：提名 → 验收 → 不过就换一组重提，一直找到三个种子为止。
    只读标题与摘要，每轮很便宜；只有定标的那一组才去取全文。 */
+async function doWarmup(){
+  const p = panels.warmup;
+  openStage('warmup');
+  await ASSETS_READY;
+  const sig = 'sde_forge_xinde_' + NEIGONG.length + '-' + HEART.length + '_' + modelSel.value;
+  if(!ST.reWarm){
+    let cached = ''; try{ cached = localStorage.getItem(sig) || ''; }catch(_){ }
+    if(cached){
+      ST.xinde = cached; ST.out.warmup = cached;
+      p.out.textContent = cached;
+      setStat('warmup', '✓ 用本机已内化的心得（'+cached.length+' 字，重跑本格可重内化）', 'done');
+      return cached;
+    }
+  }
+  ST.reWarm = false;
+  const key = needKey(); if(!key) throw new Error('缺 Key');
+  if(!NEIGONG){
+    ST.xinde = ''; ST.out.warmup = '';
+    setStat('warmup', '⚠ 内功没取到，退回页面自带的凝缩内功', 'done');
+    return '';
+  }
+  const CH = 26000, chunks = [];
+  for(let i=0; i<NEIGONG.length; i+=CH) chunks.push(NEIGONG.slice(i, i+CH));
+  const parts = [];
+  for(let k=0; k<chunks.length; k++){
+    if(ST.abort) throw new Error('已停下');
+    setStat('warmup', '<span class="spinner"></span> 读内功 '+(k+1)+'/'+chunks.length, 'run');
+    const box = document.createElement('div'); box.className='out'; box.style.marginTop='8px';
+    p.out.parentNode.insertBefore(box, p.out.nextSibling);
+    const cp = [
+      '这是 SDE 内功的第 '+(k+1)+'/'+chunks.length+' 段。读完写心得，不复述、不举例、不客套。',
+      '① 这一段里最承重的判断：≤8 条，每条一句话。',
+      '② 可以直接照办的工序纪律：≤6 条。',
+      '③ 这一段对"让三篇文章互撞出一条新判断"这件事有什么用：≤4 条。',
+      '', '【原文】', chunks[k]
+    ].join('\n');
+    const r = await streamChat(key, modelSel.value,
+      '你在内化 SDE 本体论与方法论，为接下来的二阶碰撞作业打底盘。只写心得，不发表感想。',
+      cp, box, p.stat, p.meta, 3000);
+    parts.push('【第'+(k+1)+'段】\n' + (r.text||''));
+  }
+  setStat('warmup', '<span class="spinner"></span> 合成心得总纲', 'run');
+  const mp = [
+    '下面是你分 '+chunks.length+' 段读完 SDE 内功后写的心得，另附二阶碰撞心法。',
+    '把它们合成一份 ≤3000 字的作业底盘，分四部分：',
+    '一、本体论要害——做判断时靠什么看（不是定义，是看法）；',
+    '二、方法论工序——可照办的那些（三视角误差互消、六路径、123 的时序性、四结局诊断等，只留能用上的）；',
+    '三、碰撞心法转写——选源、抽脊、命名、涌现、划界各自的硬纪律；',
+    '四、本次作业的十条铁律——每条一句、可执行，其中至少四条是"不许做什么"。',
+    '不许写"我将""我会"这类表态，直接写内容。',
+    '', parts.join('\n\n'),
+    '', '【二阶碰撞心法】', HEART || '（未取到）'
+  ].join('\n');
+  const box2 = document.createElement('div'); box2.className='out'; box2.style.marginTop='8px';
+  p.out.parentNode.insertBefore(box2, p.out.nextSibling);
+  const m = await streamChat(key, modelSel.value,
+    '你在把读完的心得压成一份可执行的作业底盘。要密、要硬、不要客套。',
+    mp, box2, p.stat, p.meta, 4000);
+  ST.xinde = m.text || '';
+  ST.out.warmup = ST.xinde;
+  try{ localStorage.setItem(sig, ST.xinde); }catch(_){ }
+  setStat('warmup', '✓ 读完 '+chunks.length+' 段内功 · 心得 '+ST.xinde.replace(/\s/g,'').length+' 字', 'done');
+  return ST.xinde;
+}
+
 async function doSelect(){
   const p = panels.select;
   openStage('select');
@@ -1480,17 +1560,19 @@ async function doWrite(){
   const fix = ST.termFix;
   ST.termFix = null;
   const head = [
-    fix ? ('【上一稿的问题：正文里混进了这些学派术语——'+fix.join('、')+'。这一稿一个都不许出现，全部换成大白话，别把句子改软。】') : '',
-    '【撞出来的判断】', ST.out.emerge||'',
-    '', '【与既有说法的划界】', (ST.out.demarc||'').slice(0,6000),
-    '', '【三个源】', ST.sources.map((s,i)=>(i+1)+'. '+s.title+(s.url?('　'+s.url):'')).join('\n')
+    fix ? ('【上一稿的问题：正文里留了这些不该有的东西——'+fix.join('、')+'。这一稿一个都不许出现：学派术语换成大白话，做法的痕迹整句删掉或改写成就事论事的说法，别把句子改软。】') : '',
+    '【要写的那条判断】', ST.out.emerge||'',
+    '', '【与既有说法的分界（写成"这与某某说的不是一回事"，不要写成方法论）】', (ST.out.demarc||'').slice(0,6000),
+    '', '【可用的素材：底下这些判断可以用，但**不许在正文里交代它们的出处**，也不许说它们来自几篇文章】',
+    (ST.out.spine||'').slice(0,4000)
   ].join('\n');
 
   // 一、目录
   const outlineP = [
     '按下面的材料，列一份文章目录：15–22 章，每章一行，形如「一、章名 —— 这一章要落哪一件事（≤20字）」。',
     '结构要求：前两章把现象摆出来（用具体场景，不许先给结论）；中段给机制与判据；',
-    '必须各留一章给：与最近的既有说法划界／不适用的边界／证伪条件／自反（本文自己是不是它所描述的东西的标本）。',
+    '必须各留一章给：与最近的既有说法划清界线／不适用的边界／证伪条件／自反（本文自己是不是它所描述的东西的标本）。',
+    '**不许出现"三篇来源""方法说明""研究方法""如何得出本文判断"这类章目**——成品里不留做法的痕迹。',
     '末章给一条写死日期的赌注。只输出目录，不写正文。',
     '', head
   ].join('\n');
@@ -1520,18 +1602,21 @@ async function doWrite(){
     ST.article += (ST.article? '\n\n':'') + (r.text||'');
   }
   ST.out.write = ST.article;
-  const hits = termHits(ST.article);
+  const terms = termHits(ST.article), traces = traceHits(ST.article);
+  const hits = terms.concat(traces);
   const words = ST.article.replace(/\s/g,'').length;
-  setStat(id, '✓ '+words+' 字 '+(hits.length? ('· ⚠ 术语残留 '+hits.join('、')) : '· 术语零残留'), 'done');
+  setStat(id, '✓ '+words+' 字 '+(hits.length
+    ? ('· ⚠ '+(terms.length?('术语残留 '+terms.join('、')):'')+(terms.length&&traces.length?' ｜ ':'')+(traces.length?('工艺痕迹 '+traces.join('、')):''))
+    : '· 术语零残留 · 无工艺痕迹'), 'done');
   if(hits.length){
     if(ST.termRetry < 1){
       ST.termRetry++; ST.termFix = hits;
-      note('正文里混进了学派术语（'+hits.join('、')+'），自动改姓重写一遍。');
-      showErr('正文里混进了学派术语：'+hits.join('、')+'——正在自动改姓重写一遍。');
+      note('正文里留了'+(terms.length?'学派术语':'')+(terms.length&&traces.length?'与':'')+(traces.length?'做法的痕迹':'')+'（'+hits.join('、')+'），自动重写一遍。');
+      showErr('正文里留了痕迹：'+hits.join('、')+'——正在自动重写一遍。');
       ST.redoFrom = STAGES.findIndex(s=>s.id==='write');
       return ST.article;
     }
-    showErr('改写一遍之后仍有术语残留：'+hits.join('、')+'。用「编辑产物」手工改掉——这一条是上站硬门槛。');
+    showErr('重写一遍之后仍有残留：'+hits.join('、')+'。用「编辑产物」手工改掉——这一条是上站硬门槛。');
   }
   $('deliver').style.display='';
   return ST.article;
@@ -1828,7 +1913,7 @@ $('dlEngine').addEventListener('click', ()=>{
 });
 
 /* ===================== 起 ===================== */
-const BUILD_TAG = '20260729-0628·v1';
+const BUILD_TAG = '20260729-0636·v1';
 (function(){ const el=$('buildTag'); if(el) el.textContent='构建 '+BUILD_TAG; })();
 loadData();
 </script>

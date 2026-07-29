@@ -74,6 +74,8 @@ const STUDENTS = {
 const ARTICLE_HTML = '<html><head><title>假文章</title></head><body><nav>导航</nav>' +
   '<article>' + '这是一篇假的站内文章正文。'.repeat(120) + '</article>' +
   '<script>console.log(1)<\/script><footer>页脚</footer></body></html>';
+// 6 万字符 → 26000 一段，正好 3 段，便于数
+const FAKE_NEIGONG = 'SDE 内功正文段落。'.repeat(6000).slice(0, 60000);
 const SHORT_HTML = '<html><body><article>太短。</article></body></html>';
 
 function spineAnswer(conflictLine) {
@@ -90,6 +92,8 @@ function spineAnswer(conflictLine) {
     '主题冲突：' + (conflictLine || '三对全冲突')].join('\n\n');
 }
 function defaultAnswer(userMsg) {
+  if (/这是 SDE 内功的第/.test(userMsg)) return '这一段的承重判断若干。' + '要点。'.repeat(20);
+  if (/合成一份 ≤3000 字的作业底盘/.test(userMsg)) return '一、本体论要害……二、方法论工序……三、碰撞心法转写……四、十条铁律……' + '铁律。'.repeat(30);
   if (/【文章清单】/.test(userMsg))
     return /已经试过/.test(userMsg)
       ? '换一条轴再找……\n种子：#4 #5 #6 ｜ 矛盾轴：另一条轴'
@@ -147,7 +151,9 @@ async function boot(opts) {
 
       if (url.indexOf('catalog.json') >= 0) return opts.catalogFail ? BAD(404) : J(CATALOG);
       if (url.indexOf('publications.json') >= 0) return opts.catalogFail ? BAD(404) : J(STUDENTS);
-      if (url.indexOf('sde-neigong.txt') >= 0) return opts.neigongFail ? BAD(404) : T('SDE 内功正文。'.repeat(900));
+      if (url.indexOf('sde-neigong.txt') >= 0) return opts.neigongFail ? BAD(404) : T(FAKE_NEIGONG);
+      if (url.indexOf('sde-collide-heart.txt') >= 0) return T('二阶碰撞心法：先找矛盾再找高分。'.repeat(80));
+      if (url.indexOf('sde-innovation-iq.txt') >= 0) return T('创新智商评分标尺：五维 S/D/E/I/F。'.repeat(80));
       if (url.indexOf('/api/kb/retrieve') >= 0) return opts.kbFail ? BAD(500) : J({ block: '【站内材料】假的检索块' });
       if (url.indexOf('chat/completions') >= 0 || url.indexOf('/api/llm-proxy') >= 0) {
         const body = JSON.parse(init.body);
@@ -241,9 +247,10 @@ function setStudent(c, slug) {
 
   const c1 = await boot();
   await step('一、页面起得来（静态结构）', async () => {
-    ok('十一道工序面板都在', c1.doc.querySelectorAll('.stage').length === 11, '实际 ' + c1.doc.querySelectorAll('.stage').length);
-    ok('第一格就是选篇（不必用户自己会挑）', c1.doc.querySelectorAll('.stage')[0].id === 'stage-select');
-    ok('工序顺序正确', ['select','gate','spine','collide','expand','collide2','selforg','emerge','demarc','write','review']
+    ok('十二道工序面板都在', c1.doc.querySelectorAll('.stage').length === 12, '实际 ' + c1.doc.querySelectorAll('.stage').length);
+    ok('第一格是内化、第二格是选篇', c1.doc.querySelectorAll('.stage')[0].id === 'stage-warmup' &&
+      c1.doc.querySelectorAll('.stage')[1].id === 'stage-select');
+    ok('工序顺序正确', ['warmup','select','gate','spine','collide','expand','collide2','selforg','emerge','demarc','write','review']
       .every((id, i) => c1.doc.querySelectorAll('.stage')[i].id === 'stage-' + id));
     ok('八家基底都在选择器里', ['ds:pro','glm:pro','kimi:pro','qwen:pro','minimax:pro','gpt:pro','claude:pro','gemini:pro']
       .every(v => !!c1.doc.querySelector('option[value="' + v + '"]')));
@@ -494,7 +501,7 @@ function setStudent(c, slug) {
     a.$('apiKey').value = 'sk-fake'; a.click('#goBtn');
     await waitFor(() => a.$('errBox').style.display === 'block', 6000);
     ok('404 时如实报"取不到正文"', /取不到正文/.test(a.$('errBox').textContent), a.$('errBox').textContent);
-    ok('只跑到选篇就停（没往下烧 Token）', a.calls.length <= 2, '实际 ' + a.calls.length + ' 趟');
+    ok('只跑到选篇就停（没往下烧 Token）', a.calls.length <= 6, '实际 ' + a.calls.length + ' 趟（内化四趟＋提名＋验收）');
 
     const b = await boot({ articleShort: true });
     b.$('apiKey').value = 'sk-fake'; b.click('#goBtn');
@@ -543,7 +550,7 @@ function setStudent(c, slug) {
     ok('成文重写了一遍（目录出了两次）', round === 2, '实际 ' + round + ' 次');
     ok('重写时把违规词带回去点名', c.calls.some(x => /上一稿的问题[\s\S]*显露/.test(x.user)));
     ok('改完术语零残留', /术语零残留/.test(c.$('stat-write').textContent), c.$('stat-write').textContent);
-    ok('横幅记下了自动修的这一笔', /自动改姓重写/.test(c.$('doneBanner').textContent), c.$('doneBanner').textContent);
+    ok('横幅记下了自动修的这一笔', /自动重写/.test(c.$('doneBanner').textContent), c.$('doneBanner').textContent);
   });
 
   await step('十六之二、改写一遍仍带术语就不再空转', async () => {
@@ -552,7 +559,7 @@ function setStudent(c, slug) {
     const done = await runPipeline(c, 30000);
     ok('跑得完（不静默失败）', done);
     ok('只重写一次就收手', (c.calls.filter(x => /列一份文章目录/.test(x.user)) || []).length === 2);
-    ok('如实说要手工改', /仍有术语残留/.test(c.$('errBox').textContent), c.$('errBox').textContent);
+    ok('如实说要手工改', /仍有残留/.test(c.$('errBox').textContent), c.$('errBox').textContent);
     ok('横幅把术语残留亮出来', /术语残留/.test(c.$('doneBanner').textContent));
   });
 
@@ -570,8 +577,8 @@ function setStudent(c, slug) {
     const done = await runPipeline(c, 40000);
     ok('评审跑了两轮', rv === 2, '实际 ' + rv + ' 轮');
     ok('回炉回到了评审点名的那一格（近邻划界）',
-      (c.calls.filter(x => /划清界线/.test(x.user)) || []).length === 2,
-      (c.calls.filter(x => /划清界线/.test(x.user)) || []).length + ' 次');
+      (c.calls.filter(x => /逐一划清界线/.test(x.user)) || []).length === 2,
+      (c.calls.filter(x => /逐一划清界线/.test(x.user)) || []).length + ' 次');
     ok('第二轮读出 152', /创新智商 152/.test(c.$('stat-review').textContent), c.$('stat-review').textContent);
     ok('横幅写明过线', /过线/.test(c.$('doneBanner').textContent), c.$('doneBanner').textContent);
     ok('横幅记下回炉这一笔', /回炉/.test(c.$('doneBanner').textContent));
@@ -868,7 +875,7 @@ function setStudent(c, slug) {
       pack && pack.text ? pack.text.slice(0, 60).replace(/\n/g, '⏎') : '(没取到内容)');
     ok('发布包附了三篇来源与划界', pack && pack.text && /## 三篇来源/.test(pack.text) && /与既有说法的划界/.test(pack.text));
     const eng = c.saved.find(x => /引擎室_/.test(x.name));
-    ok('引擎室 md 十一格俱全', eng && eng.text && (eng.text.match(/\n## \d+\./g) || []).length === 11,
+    ok('引擎室 md 十二格俱全', eng && eng.text && (eng.text.match(/\n## \d+\./g) || []).length === 12,
       eng && eng.text ? ((eng.text.match(/\n## \d+\./g) || []).length + ' 格') : '(没取到内容)');
     c.click('#dlDocx'); await sleep(400);
     ok('Word 也写进了目录', c.saved.some(x => /\.docx$/.test(x.name)));
@@ -887,11 +894,89 @@ function setStudent(c, slug) {
     ok('零抛错', c.errors.length === 0, c.errors.slice(0, 2).join(' ｜ '));
   });
 
+  await step('二十三之二、内化：十万字内功分块读完，写成心得当底盘', async () => {
+    const c = await boot();
+    const done = await runPipeline(c, 40000);
+    const chunkCalls = c.calls.filter(x => /这是 SDE 内功的第/.test(x.user));
+    ok('内功被分块读完（6 万字符 → 3 段）', chunkCalls.length === 3, '实际 ' + chunkCalls.length + ' 段');
+    ok('每一段读的是不同的原文', new Set(chunkCalls.map(x => x.user.slice(-200))).size === 3);
+    ok('末了合成一份心得总纲', c.calls.some(x => /合成一份 ≤3000 字的作业底盘/.test(x.user)));
+    ok('心得总纲要求分四部分含十条铁律', c.calls.some(x => /本次作业的十条铁律/.test(x.user)));
+    ok('状态条报出读了几段', /读完 3 段内功/.test(c.$('stat-warmup').textContent), c.$('stat-warmup').textContent);
+    const gate = c.calls.find(x => /请先做体检/.test(x.user));
+    ok('心得进了后面每一格的 system', gate && /你自己内化后写下的心得/.test(gate.system));
+    ok('碰撞心法也全文进了 system', gate && /二阶碰撞心法/.test(gate.system));
+    const engine = c.calls.filter(x => !/内功的第|作业底盘|你是验收员|你是评审/.test(x.user));
+    ok('工序格无一例外都带着心得', engine.length >= 6 && engine.every(x => /内化后写下的心得/.test(x.system)),
+      engine.filter(x => !/内化后写下的心得/.test(x.system)).length + ' 格没带');
+    const rv = c.calls.find(x => /你是评审/.test(x.user));
+    ok('评审那一趟另配评分标尺全文', rv && /创新智商评分标尺/.test(rv.system));
+    ok('跑到底', done, c.$('stat-review').textContent);
+  });
+
+  await step('二十三之三、心得按本机缓存，重跑不再重内化；重跑本格才重内化', async () => {
+    const c = await boot();
+    await runPipeline(c, 40000);
+    const n1 = c.calls.filter(x => /这是 SDE 内功的第/.test(x.user)).length;
+    c.click('#resetBtn'); await sleep(80);
+    c.calls.length = 0;
+    await runPipeline(c, 40000);
+    ok('第二遍不再读内功（用缓存的心得）', c.calls.filter(x => /这是 SDE 内功的第/.test(x.user)).length === 0);
+    ok('状态条如实说用的是缓存', /用本机已内化的心得/.test(c.$('stat-warmup').textContent), c.$('stat-warmup').textContent);
+    ok('第一遍确实读过（不是从没读）', n1 === 3, '第一遍读了 ' + n1 + ' 段');
+    c.calls.length = 0;
+    c.click('#stage-warmup button[data-act="rerun"]');
+    await waitFor(() => c.calls.filter(x => /这是 SDE 内功的第/.test(x.user)).length >= 3, 20000);
+    ok('点「重跑本格」会强制重内化', c.calls.filter(x => /这是 SDE 内功的第/.test(x.user)).length === 3);
+  });
+
+  await step('二十三之四、内功取不到时退回凝缩内功（不空转）', async () => {
+    const c = await boot({ neigongFail: true });
+    const done = await runPipeline(c, 40000);
+    ok('如实说明退回', /退回页面自带的凝缩内功/.test(c.$('stat-warmup').textContent), c.$('stat-warmup').textContent);
+    ok('一段内功都没读', c.calls.filter(x => /这是 SDE 内功的第/.test(x.user)).length === 0);
+    const gate = c.calls.find(x => /请先做体检/.test(x.user));
+    ok('system 里仍有凝缩内功与心法', gate && /SDE 本体论·凝缩/.test(gate.system) && /二阶碰撞心法/.test(gate.system));
+    ok('照样跑得完', done, c.$('stat-review').textContent);
+  });
+
+  await step('二十三之五、成品不许留碰撞创新的痕迹', async () => {
+    const c = await boot();
+    await runPipeline(c, 40000);
+    const wr = c.calls.find(x => /继续写这篇文章的第/.test(x.user));
+    ok('成文 system 明令不留做法痕迹', wr && /不许留下这篇文章是怎么做出来的痕迹/.test(wr.system));
+    ok('点名禁掉工艺词', wr && /碰撞、对撞、撞出、涌现、暗流/.test(wr.system));
+    ok('要求判断像本来就长在这门学科里', wr && /来路不必交代/.test(wr.system));
+    ok('划界那章要写成"这与某某说的不是一回事"', wr && /不是一回事/.test(wr.system));
+    ok('给写手的素材不带出处', wr && /不许在正文里交代它们的出处/.test(wr.user) && !/https?:\/\//.test(wr.user.split('【可用的素材')[1] || ''));
+    const outline = c.calls.find(x => /列一份文章目录/.test(x.user));
+    ok('目录里禁掉"方法说明""三篇来源"这类章目', outline && /不许出现"三篇来源""方法说明"/.test(outline.user));
+    ok('干净成品报"无工艺痕迹"', /无工艺痕迹/.test(c.$('stat-write').textContent), c.$('stat-write').textContent);
+  });
+
+  await step('二十三之六、正文带了工艺词就自动重写一遍', async () => {
+    let wrote = 0;
+    const c = await boot({ answer: u => {
+      if (/继续写这篇文章的第/.test(u)) { wrote++;
+        return wrote <= 6 ? ('这一章说明三篇文章碰撞之后涌现出的暗流。'.repeat(20)) : ('干净的正文。'.repeat(60)); }
+      return defaultAnswer(u);
+    } });
+    const done = await runPipeline(c, 50000);
+    ok('工艺痕迹被逮住', /工艺痕迹/.test(c.$('stat-write').textContent) || /无工艺痕迹/.test(c.$('stat-write').textContent));
+    ok('自动重写了一遍（成文跑了两轮）', wrote > 6, '共写了 ' + wrote + ' 趟');
+    ok('重写的调令里点名了痕迹词', c.calls.some(x => /继续写这篇文章的第/.test(x.user) && /做法的痕迹整句删掉/.test(x.user)));
+    ok('重写后干净了', /无工艺痕迹/.test(c.$('stat-write').textContent), c.$('stat-write').textContent);
+    ok('跑到底', done, c.$('stat-review').textContent);
+  });
+
   await step('二十四、术语闸本身', async () => {
     const c = await boot();
     ok('能抓出多词', c.win.termHits('这里有显露、特征纠缠和发生学。').length >= 3);
     ok('干净文本零命中', c.win.termHits('账本记不下的那样东西。').length === 0);
     ok('计数写在结果里', /×2/.test(c.win.termHits('发生学与发生学').join(',')));
+    ok('痕迹闸能抓工艺词', c.win.traceHits('这三篇文章碰撞后涌现出暗流。').length >= 3,
+      JSON.stringify(c.win.traceHits('这三篇文章碰撞后涌现出暗流。')));
+    ok('正常论证不误伤', c.win.traceHits('账本记不下的那样东西，与古德哈特定律不是一回事。').length === 0);
   });
 
   await step('二十五、全程零运行时错误', async () => {
