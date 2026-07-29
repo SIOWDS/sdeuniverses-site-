@@ -22,12 +22,23 @@
 name: search-index
 
 on:
+  # 【2026-07-29 二改】索引改上 R2 之后，"每次 push 重建"当初被砍掉的那个理由
+  #   （每次重建都往 git 里写 218MB 速朽副本）已经不存在，故恢复 push 触发。
+  #   新文章 push 完几分钟就进站内搜索，不必再等到凌晨。
+  push:
+    branches: [main]
+    paths-ignore:
+      # 这三类改动不影响索引内容，跑一次是白烧 1590 次 R2 写操作。
+      # roster.json 尤其要排除：roster.yml 每次 push 都会重建它并回推一个 commit，
+      # 那个 commit 又是一次 push —— 不排除就等于每次推送触发两遍。
+      - 'public/students/roster.json'
+      - 'public/search/**'
+      - '.github/**'
   schedule:
-    # 每天 18:00 UTC = 次日 02:00 新加坡时间。挑站上最静的时段，
-    # 撞不上任何人发文，重建完当天白天就已在线。
-    # GitHub 的定时任务在整点高峰会被排队推迟几分钟到几十分钟，对每天一次的活儿无所谓。
+    # 保留每天一次做兜底：push 触发有 paths-ignore 和并发取消，
+    # 万一某次内容变更被漏掉或被后来的 push 挤掉，凌晨这一趟会补上。
     - cron: '0 18 * * *'
-  workflow_dispatch:                 # 想提前跑：Actions 页面 → search-index → Run workflow
+  workflow_dispatch:                 # 想立刻跑：Actions 页面 → search-index → Run workflow
 
 concurrency:
   group: search-index
@@ -42,9 +53,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0            # build_roster 的发表日期兜底靠 git 首次提交日；
-                                    # 浅克隆下只有一个提交，缺“发表于”戳的页面会被
-                                    # 统一压成运行当天，虚高活跃分与排名。
+          fetch-depth: 1            # 本工作流只读工作树：build_search_index.py 与
+                                    # label_sde_coords_rules.py 都不碰 git 历史
+                                    # （前者的 subprocess 只用来调 pdftotext）。
+                                    # 拉全史要十三分钟——那是 roster.yml 的需求，
+                                    # 它靠首次提交日兜底发表日期，那边必须留 fetch-depth: 0。
 
       - name: 装 pdftotext（专著正文靠它抽，缺了 PDF 就进不了索引）
         run: sudo apt-get update -qq && sudo apt-get install -y -qq poppler-utils
@@ -114,11 +127,18 @@ jobs:
             --endpoint-url "$EP" --delete --exclude "index.html" --only-show-errors
           echo "线上那份已更新"
 
-          # 快照不加 --delete，也不覆盖既有日期；保留期交给桶上的 Object Lifecycle Rule
+          # 快照每天只留一份：键名按日期，同一天跑第二次也只是把同一批键覆盖一遍，
+          # 留不下新东西，却要再烧 1590 次写操作。所以 push 触发的那些跑不留快照，
+          # 只有定时和手动跑才留。
+          # 不加 --delete，也不覆盖别的日期；保留期交给桶上的 Object Lifecycle Rule
           # （search-snap/ 前缀 30 天过期）。这是 git 缺的那个能力：能忘。
-          aws s3 sync public/search/ "$B/search-snap/$SNAP/" \
-            --endpoint-url "$EP" --exclude "index.html" --only-show-errors
-          echo "快照 search-snap/$SNAP/ 已留存"
+          if [ "${GITHUB_EVENT_NAME}" = "push" ]; then
+            echo "push 触发，跳过快照（当日快照由凌晨那趟留）"
+          else
+            aws s3 sync public/search/ "$B/search-snap/$SNAP/" \
+              --endpoint-url "$EP" --exclude "index.html" --only-show-errors
+            echo "快照 search-snap/$SNAP/ 已留存"
+          fi
 
       - name: 核对桶里的对象数与本地分片数一致
         env:
