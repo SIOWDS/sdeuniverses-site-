@@ -1030,6 +1030,27 @@ function setStudent(c, slug) {
     ok('第二轮照样定标', /定标/.test(c.$('stat-select').textContent), c.$('stat-select').textContent);
   });
 
+  await step('二十三之十、同一位作者的文集：判据换成"内部张力"', async () => {
+    const c = await boot();
+    await runPipeline(c, 45000);
+    const nom = c.calls.find(x => /【文章清单】/.test(x.user));
+    ok('提名调令明说"几乎找不到立场对立的三篇"', nom && /几乎找不到立场对立的三篇/.test(nom.user));
+    ok('给出四种内部张力', nom && /处方，正是另一篇诊断出的病因/.test(nom.user) &&
+      /相反的评价/.test(nom.user) && /适用条件互斥/.test(nom.user) && /其实指着两件事/.test(nom.user));
+    ok('要求从两篇各摘一句原话', nom && /各摘一句原话/.test(nom.user));
+    const ver = c.calls.find(x => /你是验收员/.test(x.user));
+    ok('验收标尺给同作者单开一档', ver && /同一位作者的文集/.test(ver.user) && /任一种成立即可给 ≥6/.test(ver.user));
+    ok('摘不出原话一律 ≤4', ver && /摘不出两句互相顶撞的原话，一律 ≤4/.test(ver.user));
+  });
+
+  await step('二十三之十一、整片朝一个方向时，要指路去 B 模式', async () => {
+    const c = await boot({ answer: u => /你是验收员/.test(u) ? verifyBad(4) : defaultAnswer(u) });
+    c.$('maxRounds').value = '3';
+    await runPipeline(c, 45000);
+    ok('红字点名改用 B 模式', /改用「B · 三人各一篇」/.test(c.$('errBox').textContent), c.$('errBox').textContent);
+    ok('也说清了为什么（一个人的文集整片朝一个方向）', /整片朝同一个方向/.test(c.$('errBox').textContent));
+  });
+
   await step('二十四、术语闸本身', async () => {
     const c = await boot();
     ok('能抓出多词', c.win.termHits('这里有显露、特征纠缠和发生学。').length >= 3);
