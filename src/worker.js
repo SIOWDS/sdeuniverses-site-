@@ -1398,7 +1398,7 @@ async function ensureReflect(env, url, vendor, VC, KEY) {
 }
 
 // 非流式单维调用（四步法的 Q1/Q2/Q3 用；思考关，控延迟）
-async function llmText(VC, KEY, sys, usr, maxTok, msTimeout) {
+async function llmText(VC, KEY, sys, usr, maxTok, msTimeout, stat) {
   // 超时护栏：思考满档的慢调用若卡住，到点主动 abort → 返回空串（上层转干净的 502 可重试），避免把 Worker 那次调用拖到平台资源限触发 503。
   // 缺省 55s 是给"正菜"用的；配菜类调用（词表扩展等）必须自己传一个短得多的值，见 SDE_EXPAND_MS。
   const ctrl = new AbortController();
@@ -1410,6 +1410,7 @@ async function llmText(VC, KEY, sys, usr, maxTok, msTimeout) {
       body: JSON.stringify(wdsTopBody(VC, { model: VC.model, stream: false, max_tokens: maxTok, messages: [{ role: "system", content: sys }, { role: "user", content: usr }] })),
       signal: ctrl.signal,
     });
+    if (stat) stat.status = resp.status;   // 可选回执：让调用方分得清"Key 不能用"与"基底没写出来"（不传就与从前完全一样）
     if (!resp.ok) return "";
     const j = await resp.json();
     return (j.choices && j.choices[0] && j.choices[0].message && j.choices[0].message.content) || "";
@@ -2330,7 +2331,11 @@ export default {
         : "你在为一位读者维护他的【长期记忆】。下面是他与 WDS 的一整场对话记录。把它压成一条可被日后检索到的记忆条目。\n只输出 JSON，不要任何其他文字：{\"gist\":\"一句话主旨，不超过 40 字\",\"keys\":[\"关键词\",\"…\"],\"points\":\"约 300 字要点\",\"stance\":\"这位读者本人在这场里的关切与立场，不超过 60 字\"}\nkeys 给 8-16 个检索用关键词：概念名、人名书名、领域名、以及这场里出现的新命名，宁可具体不要笼统。\npoints 写这三样：谈的是什么问题、达成了哪些关键判断与新命名、还悬着什么没解决；丢掉寒暄与铺陈，用连贯中文，不分点。\n凡这场里没谈过的，一个字都不要补。";
       const usr = mode === "profile" ? ("【历次对话摘要】\n" + text) : ((b.title ? ("【这场对话的标题】" + String(b.title).slice(0, 120) + "\n") : "") + "【对话记录】\n" + text);
       try {
-        const out = await llmText(VC, KEY, sys, usr, mode === "profile" ? 1800 : 1600, MEMO_MS);
+        const _stat = {};
+        const out = await llmText(VC, KEY, sys, usr, mode === "profile" ? 1800 : 1600, MEMO_MS, _stat);
+        // Key 用不了是**硬错**：不报清楚的话，一次批量更新会拿同一把坏 Key 连撞几十场，每场都回一句"再点一次"。
+        if (_stat.status === 401 || _stat.status === 402 || _stat.status === 429)
+          return J({ ok: false, code: "bad_key", msg: "你的 Key 用不了（" + _stat.status + "）：额度不足或填错了。去 ⚙ 里检查或换一个——已经做好的记忆不会丢。" }, 400);
         const j = looseJSON(out);
         if (!j) return J({ ok: false, msg: "这一条没提炼出来（基底没给出可用结果），可以再点一次。" }, 502);
         if (mode === "profile") {

@@ -33,7 +33,9 @@ console.log("\n[一] 词表扩展是配菜，不许占答题的时钟");
   ok(/ms \|\| SDE_EXPAND_MS/.test(fnSrc), "sdeExpandQuery 把截止时间传进了 llmText");
   const ms = Number((src.match(/const SDE_EXPAND_MS = (\d+)/) || [])[1]);
   ok(ms > 0 && ms <= 10000, "SDE_EXPAND_MS = " + ms + " 毫秒（必须远小于原来的 55000）");
-  ok(/async function llmText\(VC, KEY, sys, usr, maxTok, msTimeout\)/.test(src), "llmText 收得下自定义超时");
+  // 2026-07-29：llmText 尾部又加了一个**可选**的状态回执参数 stat（给用户RAG分辨"Key 用不了"用）。
+  // 断言跟着放宽到"msTimeout 之后可以再有可选参数"，但仍钉死 msTimeout 这一位——它是这条护栏的命根子。
+  ok(/async function llmText\(VC, KEY, sys, usr, maxTok, msTimeout(?:, \w+)?\)/.test(src), "llmText 收得下自定义超时");
   ok(/msTimeout \|\| 55000/.test(src), "llmText 不传就仍是 55 秒，别的调用点不受影响");
   const calls = src.match(/sdeExpandQuery\(VC, (?:KEY|key), q[^)]*\)/g) || [];
   ok(calls.length >= 2, "站内共 " + calls.length + " 处调用词表扩展");

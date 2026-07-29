@@ -482,7 +482,8 @@
         var meta = todo[i++];
         say("第 " + i + "/" + todo.length + " 场：《" + (meta.title || "未命名") + "》…");
         umOne(meta, kv).then(function (r) {
-          if (r.ok) done++; else { fail++; if (r.code === "rate") { UM.stop = true; say("被限流了：" + (r.msg || "")); } }
+          // 限流与 Key 用不了都是**硬错**：立刻停下并说明，不拿同一把坏 Key 连撞几十场
+          if (r.ok) done++; else { fail++; if (r.code === "rate" || r.code === "bad_key") { UM.stop = true; say(r.msg || "更新中断了。"); } }
           setTimeout(step, 120);   // 稍微错开，别把限流器打满
         });
       })();
