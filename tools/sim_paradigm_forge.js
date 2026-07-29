@@ -77,8 +77,10 @@ const ARTICLE_HTML = '<html><head><title>假文章</title></head><body><nav>导�
 const SHORT_HTML = '<html><body><article>太短。</article></body></html>';
 
 function defaultAnswer(userMsg) {
-  if (/挑三篇\*\*互相打架\*\*的|挑三篇互相打架/.test(userMsg) || /【文章清单】/.test(userMsg))
-    return '逐条判断……\n候选一：#1 #2 #3 ｜ 矛盾轴：同一个"撤"字的三种相反评价\n候选二：#4 #5 #6 ｜ 矛盾轴：另一组\n候选三：#1 #4 #6 ｜ 矛盾轴：再一组';
+  if (/【文章清单】/.test(userMsg))
+    return '这三篇在"撤手"上给了相反的处方……\n种子：#1 #2 #3 ｜ 矛盾轴：同一个"撤"字的三种相反评价';
+  if (/你是验收员/.test(userMsg))
+    return '烈度：8/10 ｜ 同源度：低 ｜ 打架点：撤手到底是德是灾\n判词：三方对同一个动作给了相反的处方';
   if (/列一份文章目录/.test(userMsg))
     return Array.from({ length: 16 }, (_, i) => '第' + (i + 1) + '章、章名' + (i + 1) + ' —— 落一件事').join('\n');
   if (/继续写这篇文章的第/.test(userMsg)) return '章节正文。'.repeat(60);
@@ -89,6 +91,14 @@ function defaultAnswer(userMsg) {
 function gateOK() {
   return '闸一：分数 8/10 ｜ 打架点一句话：三方对同一件事判了相反的处方 ｜ 结局对立：有 ｜ 三方各自的硬证据：各有一条\n' +
     '闸二：同源度 低 ｜ 共享零件：无 ｜ 建议撞点：落在处方相反那一处\n闸三：最近的已发篇目：无 ｜ 处置：可发\n总判：放行';
+}
+function verifyOK(sc) {
+  return '烈度：' + sc + '/10 ｜ 同源度：低 ｜ 打架点：三方对同一个动作给了相反的处方\n' +
+    '判词：结局对立，三方各自都有对手消化不了的证据，够打。';
+}
+function verifyBad(sc) {
+  return '烈度：' + sc + '/10 ｜ 同源度：中 ｜ 打架点：说不清\n' +
+    '判词：这三篇只是侧重不同、各说一面，属于互补；换一条轴去找处方相反的那一类。';
 }
 function gateBad(score) {
   return '闸一：分数 ' + score + '/10 ｜ 打架点一句话：其实是侧重不同 ｜ 结局对立：无 ｜ 三方各自的硬证据：说不上来\n' +
@@ -257,8 +267,11 @@ function setStudent(c, slug) {
   await step('四、模式 A（基底选篇 → 跑完十一道工序）', async () => {
     const done = await runPipeline(cA);
     ok('十一格全部跑完', done, '停在 ' + cA.$('stat-review').textContent);
-    ok('选篇格报出候选组数', /给了 3 组候选/.test(cA.$('stat-select').textContent), cA.$('stat-select').textContent);
-    ok('选中的三篇已就位', /第 1 组：留白 × 伪生 × 撤土/.test(cA.$('srcState').textContent), cA.$('srcState').textContent);
+    ok('选篇格报出第几轮定标与烈度', /第 1 轮定标 · 烈度 8\/10/.test(cA.$('stat-select').textContent), cA.$('stat-select').textContent);
+    ok('种子三篇已就位', /种子：留白 × 伪生 × 撤土/.test(cA.$('srcState').textContent), cA.$('srcState').textContent);
+    ok('一轮定标就只花两趟（提名+验收）',
+      cA.calls.filter(x => /【文章清单】/.test(x.user)).length === 1 &&
+      cA.calls.filter(x => /你是验收员/.test(x.user)).length === 1);
     ['gate','spine','collide','expand','collide2','selforg','emerge','demarc'].forEach(id =>
       ok('  ' + id + ' 出了结果', /✓/.test(cA.$('stat-' + id).textContent), cA.$('stat-' + id).textContent));
     ok('成文格给出了字数', /字/.test(cA.$('stat-write').textContent), cA.$('stat-write').textContent);
@@ -286,8 +299,13 @@ function setStudent(c, slug) {
     ok('选篇带上门类与摘要（好判打架点）', sel && /〔发展心理学〕/.test(sel.user) && /撤手是德/.test(sel.user));
     ok('选篇写明"不是挑三篇最好的"', sel && /不是挑三篇最好的/.test(sel.user));
     ok('选篇把结局对立列为首要判据', sel && /结局对立.*最优先|\*\*结局对立\*\*最优先/.test(sel.user));
-    ok('选篇要求给三组候选并规定机读格式', sel && /三组候选/.test(sel.user) && /候选一：#3 #17 #42/.test(sel.user));
-    ok('选篇明令不许凑数', sel && /不要凑数/.test(sel.user));
+    ok('选篇规定了机读格式', sel && /种子：#3 #17 #42/.test(sel.user));
+    const ver = f(/你是验收员/);
+    ok('验收是独立一趟、只验不提名', ver && /只验不提名/.test(ver.system));
+    ok('验收硬约束：互补 ≤4、结局对立 ≥7', ver && /烈度 ≤4/.test(ver.user) && /烈度 ≥7/.test(ver.user));
+    ok('验收被明确要求宁可判低', ver && /宁可判低/.test(ver.user));
+    ok('验收只要两行读数', ver && /烈度：X\/10/.test(ver.user) && /判词：/.test(ver.user));
+    ok('验收调令里带的是三篇的标题与摘要', ver && /留白/.test(ver.user) && /撤手是德/.test(ver.user));
     const gate = f(/请先做体检/);
     ok('体检写死三道闸', gate && /闸一/.test(gate.user) && /闸二/.test(gate.user) && /闸三/.test(gate.user));
     ok('体检把已发清单垫进去（避重）', gate && /已发清单/.test(gate.user));
@@ -448,7 +466,7 @@ function setStudent(c, slug) {
     a.$('apiKey').value = 'sk-fake'; a.click('#goBtn');
     await waitFor(() => a.$('errBox').style.display === 'block', 6000);
     ok('404 时如实报"取不到正文"', /取不到正文/.test(a.$('errBox').textContent), a.$('errBox').textContent);
-    ok('只跑到选篇就停（没往下烧 Token）', a.calls.length === 1, '实际 ' + a.calls.length + ' 趟');
+    ok('只跑到选篇就停（没往下烧 Token）', a.calls.length <= 2, '实际 ' + a.calls.length + ' 趟');
 
     const b = await boot({ articleShort: true });
     b.$('apiKey').value = 'sk-fake'; b.click('#goBtn');
@@ -463,12 +481,22 @@ function setStudent(c, slug) {
     ok('三个源重复时被拦', /不能重复/.test(d.$('errBox').textContent), d.$('errBox').textContent);
   });
 
-  await step('十五、闸一低分要告警（不阻断，但要说清）', async () => {
-    const c = await boot({ answer: u => /请先做体检/.test(u) ? gateBad(3) : defaultAnswer(u) });
-    pickModeA(c); c.$('apiKey').value = 'sk-fake'; c.click('#goBtn');
-    await waitFor(() => /闸一只给了/.test(c.$('errBox').textContent), 8000);
-    ok('低分时明确提示"多半是互补不是打架"', /闸一只给了 3\/10/.test(c.$('errBox').textContent), c.$('errBox').textContent);
-    ok('提示了下一步该怎么办', /建议换一位学员或改手挑/.test(c.$('errBox').textContent), c.$('errBox').textContent);
+  await step('十五、全文体检始终低分：回选篇重找两次就收手', async () => {
+    let nom = 0;
+    const c = await boot({ answer: u => {
+      if (/【文章清单】/.test(u)) { nom++;
+        const sets = [[1,2,3],[4,5,6],[1,4,6],[2,3,5]];
+        return '这一组……' + '理由若干。'.repeat(6) + '\n种子：#' + sets[(nom - 1) % 4].join(' #') + ' ｜ 矛盾轴：轴' + nom; }
+      if (/你是验收员/.test(u)) return verifyOK(8);
+      if (/请先做体检/.test(u)) return gateBad(3);
+      return defaultAnswer(u);
+    } });
+    const done = await runPipeline(c, 45000);
+    ok('摘要层过了、全文层不过，就回选篇重找', nom >= 2, '提名了 ' + nom + ' 轮');
+    ok('最多回两次（第三次不再回头）', nom === 3, '提名了 ' + nom + ' 轮');
+    ok('末了如实说"多半是互补"', /闸一只给了 3\/10/.test(c.$('errBox').textContent), c.$('errBox').textContent);
+    ok('给出下一步（换学员或手挑）', /建议换一位学员或改手挑/.test(c.$('errBox').textContent));
+    ok('不阻断，照样跑完', done, c.$('stat-review').textContent);
   });
 
   await step('十六、成文带术语：自动改姓重写一次', async () => {
@@ -575,37 +603,99 @@ function setStudent(c, slug) {
     })());
   });
 
-  await step('十七之三、基底给不出可读编号时说人话', async () => {
-    const c = await boot({ answer: u => /【文章清单】/.test(u) ? '我觉得这几篇都不错，可惜没法编号。' : defaultAnswer(u) });
-    c.$('apiKey').value = 'sk-fake'; c.click('#goBtn');
-    await waitFor(() => c.$('errBox').style.display === 'block', 6000);
-    ok('提示重跑本格或改手挑', /勾上「我自己挑三篇」/.test(c.$('errBox').textContent), c.$('errBox').textContent);
-    ok('没有硬撑着往下跑', c.$('stat-gate').textContent === '待命');
-  });
-
-  await step('十七之四、第一组不够打架就自动换下一组', async () => {
-    let gateCall = 0;
+  await step('十七之三、一直找到三个种子为止（第一轮不过就换一组重提）', async () => {
+    let nom = 0, ver = 0;
     const c = await boot({ answer: u => {
-      if (/请先做体检/.test(u)) {
-        gateCall++;
-        return gateCall === 1 ? gateBad(3) : gateOK();
-      }
+      if (/【文章清单】/.test(u)) { nom++; return '理由若干。'.repeat(6) + '\n种子：#' +
+        (nom === 1 ? '1 #2 #3' : '4 #5 #6') + ' ｜ 矛盾轴：轴' + nom; }
+      if (/你是验收员/.test(u)) { ver++; return ver === 1
+        ? '烈度：4/10 ｜ 同源度：中 ｜ 打架点：说不清\n判词：这三篇只是侧重不同，换一条轴去找处方相反的，别在同一批里挪位置'
+        : verifyOK(8); }
       return defaultAnswer(u);
     } });
-    const done = await runPipeline(c, 25000);
-    ok('自动换到第 2 组', /第 2 组：角力 × 反循环 × 同意/.test(c.$('srcState').textContent), c.$('srcState').textContent);
-    ok('换组这件事有明说', /自动换第 2 组重验/.test(c.$('errBox').textContent) || /自动换/.test(c.$('errBox').textContent), c.$('errBox').textContent);
-    ok('体检跑了两趟（换完重验）', gateCall === 2, '实际 ' + gateCall + ' 趟');
-    ok('换完照样跑到底', done, c.$('stat-review').textContent);
-    ok('第二组的三篇进了后续调令', c.calls.some(x => /角力/.test(x.user) && /同意/.test(x.user)));
+    const done = await runPipeline(c, 30000);
+    ok('提名了两轮', nom === 2, '实际 ' + nom + ' 轮');
+    ok('每轮都验了一次', ver === 2, '实际 ' + ver + ' 次');
+    ok('第二轮定标', /第 2 轮定标 · 烈度 8\/10/.test(c.$('stat-select').textContent), c.$('stat-select').textContent);
+    ok('定标的是第二组', /种子：角力 × 反循环 × 同意/.test(c.$('srcState').textContent), c.$('srcState').textContent);
+    const nom2 = c.calls.filter(x => /【文章清单】/.test(x.user))[1];
+    ok('第二轮提名带上了"已经试过"清单', nom2 && /已经试过、被判不合格的组合/.test(nom2.user));
+    ok('把上一轮的判词原样交回去', nom2 && /只是侧重不同/.test(nom2.user));
+    ok('明令不许只换一篇就交差', nom2 && /不许只换一篇就交差/.test(nom2.user));
+    ok('搜寻过程逐轮记在页面上', (c.$('out-select').parentNode.querySelector('.sel-log').textContent.match(/第 \d 轮/g) || []).length >= 2);
+    ok('跑到底', done, c.$('stat-review').textContent);
   });
 
-  await step('十七之五、三组全不打架时不再空转（最多换两次）', async () => {
-    const c = await boot({ answer: u => /请先做体检/.test(u) ? gateBad(2) : defaultAnswer(u) });
+  await step('十七之四、烈度够但同源度高，也不算定标', async () => {
+    let ver = 0, nom = 0;
+    const c = await boot({ answer: u => {
+      if (/【文章清单】/.test(u)) { nom++; return '理由若干。'.repeat(6) + '\n种子：#' +
+        (nom === 1 ? '1 #2 #3' : '4 #5 #6') + ' ｜ 矛盾轴：轴' + nom; }
+      if (/你是验收员/.test(u)) { ver++; return ver === 1
+        ? '烈度：8/10 ｜ 同源度：高 ｜ 打架点：像在打架\n判词：其实是同一件事的三个侧面'
+        : '烈度：7/10 ｜ 同源度：低 ｜ 打架点：处方相反\n判词：可以'; }
+      return defaultAnswer(u);
+    } });
+    await runPipeline(c, 30000);
+    ok('同源度高的那组不定标，继续找', ver >= 2, '只验了 ' + ver + ' 次');
+    ok('最终定标在第二轮', /第 2 轮定标/.test(c.$('stat-select').textContent), c.$('stat-select').textContent);
+  });
+
+  await step('十七之五、试满上限还没找到，就取最好的一组并说清', async () => {
+    const c = await boot({ answer: u => {
+      if (/你是验收员/.test(u)) return verifyBad(4);
+      return defaultAnswer(u);
+    } });
+    c.$('maxRounds').value = '3';
     const done = await runPipeline(c, 30000);
-    ok('换到第 3 组就收手', /第 3 组/.test(c.$('srcState').textContent), c.$('srcState').textContent);
-    ok('最后如实劝换学员或改手挑', /建议换一位学员或改手挑/.test(c.$('errBox').textContent), c.$('errBox').textContent);
-    ok('不阻断——照样能跑完给你看', done, c.$('stat-review').textContent);
+    ok('确实试满三组', c.calls.filter(x => /【文章清单】/.test(x.user)).length === 3,
+      '实际 ' + c.calls.filter(x => /【文章清单】/.test(x.user)).length + ' 轮');
+    ok('状态条如实写"试满"', /试满 3 组/.test(c.$('stat-select').textContent), c.$('stat-select').textContent);
+    ok('红字给出三条出路（换学员／调大轮数／手挑）', /换一位学员/.test(c.$('errBox').textContent) &&
+      /最多试/.test(c.$('errBox').textContent) && /手挑/.test(c.$('errBox').textContent), c.$('errBox').textContent);
+    ok('不阻断，照样跑完给你看', done, c.$('stat-review').textContent);
+  });
+
+  await step('十七之六之二、提名重复的组合要被扣分、不许拿来定标', async () => {
+    let ver = 0;
+    const c = await boot({ answer: u => {
+      if (/【文章清单】/.test(u)) return '就这一组。' .repeat(6) + '\n种子：#1 #2 #3 ｜ 矛盾轴：甲';  // 每轮都提同一组
+      if (/你是验收员/.test(u)) { ver++; return ver === 1 ? verifyBad(4) : verifyOK(9); }
+      return defaultAnswer(u);
+    } });
+    c.$('maxRounds').value = '3';
+    await runPipeline(c, 40000);
+    const log = c.$('out-select').parentNode.querySelector('.sel-log').textContent;
+    ok('重复组合被标出来', /提了重复组合/.test(log), log.slice(0, 160));
+    ok('重复的那组即便打了 9 分也不定标', !/定标/.test(c.$('stat-select').textContent), c.$('stat-select').textContent);
+    ok('最后如实说"试满"并取最好的一组', /试满/.test(c.$('stat-select').textContent));
+  });
+
+  await step('十七之七、摘要层看走眼：全文体检不过就回选篇再找', async () => {
+    let gate = 0, nom = 0;
+    const c = await boot({ answer: u => {
+      if (/【文章清单】/.test(u)) { nom++; return '理由若干。'.repeat(6) + '\n种子：#' +
+        (nom === 1 ? '1 #2 #3' : '4 #5 #6') + ' ｜ 矛盾轴：轴' + nom; }
+      if (/你是验收员/.test(u)) return verifyOK(8);
+      if (/请先做体检/.test(u)) { gate++; return gate === 1 ? gateBad(3) : gateOK(); }
+      return defaultAnswer(u);
+    } });
+    const done = await runPipeline(c, 35000);
+    ok('体检不过时回选篇又找了一轮', nom === 2, '提名了 ' + nom + ' 轮');
+    ok('体检跑了两趟', gate === 2, '实际 ' + gate + ' 趟');
+    ok('红字说清是"摘要层看走眼"', /摘要层看走眼|回选篇接着找/.test(c.$('errBox').textContent), c.$('errBox').textContent);
+    const nom2 = c.calls.filter(x => /【文章清单】/.test(x.user))[1];
+    ok('全文体检的判词也进了下一轮提名', nom2 && /全文体检只给 3\/10/.test(nom2.user));
+    ok('换完跑到底', done, c.$('stat-review').textContent);
+  });
+
+  await step('十七之八、基底始终给不出编号时说人话', async () => {
+    const c = await boot({ answer: u => /【文章清单】/.test(u) ? '我觉得这几篇都不错，可惜没法编号。' : defaultAnswer(u) });
+    c.$('maxRounds').value = '3';
+    c.$('apiKey').value = 'sk-fake'; c.click('#goBtn');
+    await waitFor(() => c.$('errBox').style.display === 'block', 15000);
+    ok('提示重跑本格或改手挑', /勾上「我自己挑三篇」/.test(c.$('errBox').textContent), c.$('errBox').textContent);
+    ok('没有硬撑着往下跑', c.$('stat-gate').textContent === '待命');
   });
 
   await step('十八、停下（跑到一半中止）', async () => {

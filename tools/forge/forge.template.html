@@ -131,7 +131,13 @@ select.model-select{max-width:340px}
     <div id="mA" class="srcbox">
       <label class="lbl">学员</label>
       <select id="stuSel"></select>
-      <div class="small" style="margin:8px 0" id="autoNote">这位学员的全部文章会交给基底，由它挑三篇互相打架的——挑完当场验：不够打架就自动换下一组。</div>
+      <div class="small" style="margin:8px 0" id="autoNote">这位学员的全部文章会交给基底：它提名三篇 → 当场验打架烈度 → 不过就换一组重提，<b>一直找到三个种子为止</b>。</div>
+      <div class="row" style="margin:6px 0">
+        <label class="small" style="display:flex;gap:6px;align-items:center">最多试
+          <select id="maxRounds" style="width:auto;padding:4px 8px"><option>3</option><option selected>6</option><option>10</option></select> 组
+        </label>
+        <span class="small">每一轮只读标题与摘要，很便宜；只有定标的那一组才去取全文</span>
+      </div>
       <label class="small" style="display:flex;gap:6px;align-items:center;margin:8px 0">
         <input type="checkbox" id="manualChk" style="width:auto"> 我自己挑三篇（不用基底选）
       </label>
@@ -303,7 +309,7 @@ const STAGES = [
   {id:'review',  n:'评审',     hint:'创新智商 · 不到 150 点名回炉',      tok:4000}
 ];
 const ST = { mode:'A', sources:[], out:{}, outline:'', article:'', score:null, running:false, abort:false,
-             manual:false, candidates:[], trioIdx:0, swaps:0,
+             manual:false, tried:[], seed:null, seedScore:0, outer:0, best:null,
              redoFrom:null, rounds:0, termRetry:0, termFix:null, notes:[] };
 
 /* ===================== 面板 ===================== */
@@ -556,60 +562,78 @@ function stuListBlock(){
     '#'+(i+1)+'　'+x.title + (x.kind?('　〔'+x.kind+'〕'):'') + (x.summary?('\n　　'+String(x.summary).slice(0,120)):'')
   ).join('\n');
 }
-/* 从选篇产物里读出三组候选。宽松解析：先认「候选X：#a #b #c」，认不到就退回抓前三个 # 数字 */
-function parseTrios(txt){
-  const out = [];
-  const re = /候选[^\n]*?[:：][^\n]*?#\s*(\d+)[^\d]{1,12}#\s*(\d+)[^\d]{1,12}#\s*(\d+)/g;
-  let m;
-  while((m = re.exec(txt||''))){
-    const trio = [m[1],m[2],m[3]].map(x=>parseInt(x,10));
-    if(new Set(trio).size===3) out.push(trio);
-  }
-  if(!out.length){
-    const nums = (txt||'').match(/#\s*\d+/g) || [];
-    const trio = [];
-    nums.forEach(x=>{ const v=parseInt(x.replace(/[^\d]/g,''),10); if(trio.indexOf(v)<0 && trio.length<3) trio.push(v); });
-    if(trio.length===3) out.push(trio);
-  }
-  return out;
+/* 读一组种子。宽松：先认「种子：#a #b #c」，认不到就退回抓文中前三个不重复的 # 数字 */
+function parseSeed(txt){
+  const m = /种子[^\n]*?[:：][^\n]*?#\s*(\d+)[^\d]{1,12}#\s*(\d+)[^\d]{1,12}#\s*(\d+)/.exec(txt||'');
+  if(m){ const trio=[m[1],m[2],m[3]].map(x=>parseInt(x,10)); if(new Set(trio).size===3) return trio; }
+  const nums = (txt||'').match(/#\s*\d+/g) || [];
+  const trio = [];
+  nums.forEach(x=>{ const v=parseInt(x.replace(/[^\d]/g,''),10); if(trio.indexOf(v)<0 && trio.length<3) trio.push(v); });
+  return trio.length===3 ? trio : null;
 }
-async function loadTrio(k){
+/* 读验收员的两行读数 */
+function parseVerdict(txt){
+  const s = /烈度[^\n]*?(\d+)\s*\/\s*10/.exec(txt||'') || /烈度[：:]\s*(\d+)/.exec(txt||'');
+  const g = /同源度[：:]\s*(高|中|低)/.exec(txt||'');
+  const w = /判词[：:]\s*([^\n]+)/.exec(txt||'');
+  return { score: s ? parseInt(s[1],10) : null, same: g ? g[1] : '', why: (w ? w[1] : (txt||'').replace(/\s+/g,' ').slice(0,60)).trim() };
+}
+async function loadTrio(trio){
   const st = curStudent(), items = st.items||[];
-  const trio = ST.candidates[k];
   if(!trio) throw new Error('基底没给出可用的三篇——勾上「我自己挑三篇」手动选，或换一位学员。');
   const picked = trio.map(n=>items[n-1]).filter(Boolean);
   if(picked.length!==3) throw new Error('基底给的编号超出清单范围（'+trio.join('/')+'），换一位学员或改手挑。');
   const out = [];
   for(const it of picked) out.push({ title: it.title, url: it.url, author: st.name, text: await pullText(it.url) });
   if(new Set(out.map(x=>x.url)).size!==3) throw new Error('基底挑的三篇有重复。');
-  ST.sources = out;
-  $('srcState').textContent = '第 '+(k+1)+' 组：'+out.map(s=>s.title.slice(0,12)).join(' × ');
+  ST.sources = out; ST.seed = trio;
+  $('srcState').textContent = '种子：'+out.map(s=>s.title.slice(0,12)).join(' × ');
   return out;
 }
 function promptFor(id){
   const O = ST.out;
   if(id==='select') return [
     '下面是学员「'+(curStudent().name||'')+'」在本站的全部文章（编号·标题·门类·摘要）。',
-    '你的任务不是挑三篇最好的，是挑三篇**互相打架**的。',
+    '你的任务不是挑三篇最好的，是**提名三篇互相打架的**做种子。',
     '',
     '判据（按重要性排）：',
     '① **结局对立**最优先——三方对同一件事给了相反的处方或相反的命运判断；',
     '② 打架点必须能用一句话说清；说不清的多半是"侧重不同"，那是互补，不算；',
     '③ 三篇的题材可以差得很远，只要它们在同一个问题上不相容；题材相近而结论一致的，一律不选；',
-    '④ 尽量避开三篇讲的是同一件事的三个侧面（那会在共享零件上空撞）。',
+    '④ 避开三篇讲同一件事的三个侧面——那会在共享零件上空撞。',
+    (ST.tried.length ? ('\n【已经试过、被判不合格的组合】\n' +
+      ST.tried.map((x,k)=>'· 第'+(k+1)+'轮 #'+x.trio.join(' #')+'　烈度 '+x.score+'/10　判词：'+x.why).join('\n') +
+      '\n不许再提上面任何一组，也不许只换一篇就交差——上面几组说明你原来那条矛盾轴不成立，请换一条轴重新找。') : ''),
     '',
-    '先逐条说明你的判断，再给**三组候选**，按打架烈度从高到低。',
-    '每组都要写清：这三篇在哪一点上不相容 ＋ 为什么它们不是互补。',
-    '',
-    '【输出的最后三行必须是这个形状，供程序读取，不要加粗、不要放进表格】',
-    '候选一：#3 #17 #42 ｜ 矛盾轴：一句话',
-    '候选二：#5 #9 #21 ｜ 矛盾轴：一句话',
-    '候选三：#2 #11 #30 ｜ 矛盾轴：一句话',
-    '（这位学员的文章若实在凑不出三组，宁可只给一组或两组，不要凑数。）',
+    '先用两三句说明这一组为什么互相不相容（不是侧重不同），再给结论。',
+    '【最后一行必须是这个形状，供程序读取，不要加粗、不要放进表格】',
+    '种子：#3 #17 #42 ｜ 矛盾轴：一句话',
     '',
     '【文章清单】',
     stuListBlock()
-  ].join('\n');
+  ].filter(Boolean).join('\n');
+
+  if(id==='verify'){
+    const items = curStudent().items||[];
+    const trio = ST.__pending || [];
+    return [
+      '你是验收员，不是提名者。下面三篇被提名做碰撞种子，你只做一件事：判它们到底打不打架。',
+      '',
+      trio.map(n=>{ const it=items[n-1]||{}; return '#'+n+'　'+(it.title||'?')+(it.kind?('　〔'+it.kind+'〕'):'')+'\n　　'+String(it.summary||'').slice(0,160); }).join('\n'),
+      '',
+      '打分规矩（硬约束，别客气）：',
+      '· 三方只是侧重不同／各说一面 → 烈度 ≤4，那是互补不是矛盾；',
+      '· 三方对同一件事给了相反的处方或相反的命运判断（结局对立）→ 烈度 ≥7；',
+      '· 打架点你自己一句话说不清 → 烈度 ≤5；',
+      '· 三篇其实是同一件事的三个侧面 → 同源度判"高"。',
+      '你不是来鼓励提名者的。宁可判低，也别放一组互补的过去——放过去的代价是后面十道工序全部空转。',
+      '',
+      '【输出就两行】',
+      '烈度：X/10 ｜ 同源度：高/中/低 ｜ 打架点：一句话（说不清就写"说不清"）',
+      '判词：一句话说明为什么是这个分；不过的话，指出该往哪个方向另找'
+    ].join('\n');
+  }
+
   if(id==='gate') return [
     '下面是三个待碰撞的源。请先做体检，走三道闸，任一道不过就直说"建议换源"并说明换哪一个、换成什么方向的。',
     '',
@@ -799,13 +823,7 @@ async function runStage(i){
   const s = STAGES[i];
   if(s.id==='select'){
     if(ST.mode!=='A' || ST.manual){ setStat('select', '跳过（源已指定）'); ST.out.select=''; return ''; }
-    const txt = await callStage('select', promptFor('select'), s.tok, sdeSystem());
-    ST.candidates = parseTrios(txt);
-    ST.trioIdx = 0; ST.swaps = 0;
-    if(!ST.candidates.length) throw new Error('基底没给出可读的三篇编号——重跑本格，或勾上「我自己挑三篇」。');
-    setStat('select', '✓ 给了 '+ST.candidates.length+' 组候选', 'done');
-    await loadTrio(0);
-    return txt;
+    return await doSelect();
   }
   if(s.id==='write') return await doWrite();
   if(s.id==='demarc'){
@@ -817,12 +835,13 @@ async function runStage(i){
     const m = txt.match(/闸一[：:]\s*分数\s*(\d+)/) || txt.match(/(\d+)\s*\/\s*10/);
     const sc = m ? parseInt(m[1],10) : null;
     if(sc !== null && sc < 6){
-      // 自动换组：基底自己挑的三篇没撑住闸一，就换它给的下一组，最多换两次
-      if(ST.mode==='A' && !ST.manual && ST.candidates.length > ST.trioIdx+1 && ST.swaps < 2){
-        ST.swaps++; ST.trioIdx++;
-        showErr('第 '+ST.trioIdx+' 组只拿到 '+sc+'/10，自动换第 '+(ST.trioIdx+1)+' 组重验（最多换两次）。');
-        setStat('gate', '换第 '+(ST.trioIdx+1)+' 组…', 'run');
-        await loadTrio(ST.trioIdx);
+      // 摘要层看着能打，全文层却不打——把体检判词记进"已试过"，回选篇接着找
+      if(ST.mode==='A' && !ST.manual && ST.outer < 2){
+        ST.outer++;
+        if(ST.seed) ST.tried.push({ trio: ST.seed, score: sc, why: '全文体检只给 '+sc+'/10（摘要层看走眼）' });
+        showErr('全文体检只给 '+sc+'/10——这一组摘要层看着能打、正文里不打。回选篇接着找（第 '+ST.outer+' 次，最多两次）。');
+        setStat('gate', '回选篇重找…', 'run');
+        await doSelect();
         return await runStage(i);
       }
       showErr('闸一只给了 '+sc+'/10——三个源多半是互补不是打架。可以照旧往下跑，但成品破 150 的机会不大，建议换一位学员或改手挑。');
@@ -842,6 +861,65 @@ async function runStage(i){
     }
   }
   return txt;
+}
+
+/* 选篇：提名 → 验收 → 不过就换一组重提，一直找到三个种子为止。
+   只读标题与摘要，每轮很便宜；只有定标的那一组才去取全文。 */
+async function doSelect(){
+  const p = panels.select;
+  openStage('select');
+  const key = needKey(); if(!key) throw new Error('缺 Key');
+  const maxR = parseInt(($('maxRounds')||{}).value || '6', 10);
+  let log = p.el.querySelector('.sel-log');
+  if(!log){ log = document.createElement('div'); log.className='sel-log small'; log.style.marginTop='8px'; p.out.parentNode.insertBefore(log, p.out.nextSibling); }
+  if(!ST.tried.length) log.innerHTML = '';
+  let transcript = [];
+  // 回头再找时（全文体检不过）总要再给几轮，否则第一次就把额度用光、第二次进来无事可做
+  const limit = Math.max(maxR, ST.tried.length + 2);
+
+  for(let r = ST.tried.length; r < limit; r++){
+    if(ST.abort) throw new Error('已停下');
+    setStat('select', '<span class="spinner"></span> 第 '+(r+1)+' 轮提名', 'run');
+    const nom = await streamChat(key, modelSel.value, sdeSystem(), promptFor('select'), p.out, p.stat, p.meta, 3000);
+    const trio = parseSeed(nom.text||'');
+    if(!trio){
+      ST.tried.push({ trio:[0,0,0], score:0, why:'这一轮没给出可读的编号' });
+      log.innerHTML += '<div>第 '+(r+1)+' 轮：没读出编号，重提。</div>';
+      continue;
+    }
+    const dup = ST.tried.some(x => x.trio.slice().sort().join()===trio.slice().sort().join());
+    ST.__pending = trio;
+    setStat('select', '<span class="spinner"></span> 第 '+(r+1)+' 轮验收 #'+trio.join(' #'), 'run');
+    const ver = await streamChat(key, modelSel.value,
+      '你是碰撞种子的验收员，只验不提名。宁可判低，不许放互补的组合过去。', promptFor('verify'),
+      p.out, p.stat, p.meta, 1200);
+    const v = parseVerdict(ver.text||'');
+    const sc = (v.score==null ? 0 : v.score) - (dup ? 3 : 0) - (v.same==='高' ? 2 : 0);
+    transcript.push('第 '+(r+1)+' 轮 #'+trio.join(' #')+'　烈度 '+(v.score==null?'?':v.score)+'/10　同源度 '+(v.same||'?')+'　'+v.why);
+    log.innerHTML += '<div>第 '+(r+1)+' 轮：#'+trio.join(' #')+'　烈度 <b>'+(v.score==null?'?':v.score)+'/10</b>　同源度 '+(v.same||'?')+
+      (dup?'　<span style="color:var(--warn)">（提了重复组合，扣分）</span>':'')+'　'+escTxt(v.why)+'</div>';
+    if(!ST.best || sc > ST.best.sc) ST.best = { trio, sc, v };
+    ST.tried.push({ trio, score:(v.score==null?0:v.score), why:v.why });
+    if(v.score !== null && v.score >= 6 && v.same !== '高' && !dup){
+      ST.seedScore = v.score;
+      ST.out.select = transcript.join('\n');
+      log.innerHTML += '<div style="color:var(--ok)">✓ 第 '+(r+1)+' 轮定标：烈度 '+v.score+'/10，取全文。</div>';
+      setStat('select', '✓ 第 '+(r+1)+' 轮定标 · 烈度 '+v.score+'/10', 'done');
+      await loadTrio(trio);
+      hideErr();
+      return ST.out.select;
+    }
+  }
+  // 试满了还没定标：取试过的里面最好的一组，如实说清
+  if(!ST.best || !ST.best.trio) throw new Error('试了 '+ST.tried.length+' 组都没读出可用编号——重跑本格，或勾上「我自己挑三篇」。');
+  const n = ST.tried.length;
+  ST.seedScore = ST.best.v.score==null ? 0 : ST.best.v.score;
+  ST.out.select = transcript.join('\n');
+  log.innerHTML += '<div style="color:var(--warn)">试满 '+n+' 组仍没有一组过 6/10，取其中最好的一组（'+ST.seedScore+'/10）继续。</div>';
+  setStat('select', '⚠ 试满 '+n+' 组 · 最好 '+ST.seedScore+'/10', 'done');
+  showErr('试了 '+n+' 组都不够打架，最好的一组只有 '+ST.seedScore+'/10。已用它继续跑，但成品破 150 的机会不大——换一位学员、或把"最多试"调大、或勾手挑自己指定三篇，都比硬跑强。');
+  await loadTrio(ST.best.trio);
+  return ST.out.select;
 }
 
 async function doWrite(){
@@ -957,7 +1035,7 @@ async function deliver(){
     '成品 '+words+' 字',
     ST.score==null ? '评审未读到分数' : ('创新智商 '+ST.score+(ST.score>=150?'（过线）':'（未过线，已回炉 '+ST.rounds+' 轮）')),
     hits.length ? ('⚠ 术语残留：'+hits.join('、')) : '术语零残留',
-    ST.mode==='A' && !ST.manual ? ('三篇由基底挑（第 '+(ST.trioIdx+1)+' 组）') : '三篇由你指定'
+    ST.mode==='A' && !ST.manual ? ('三个种子由基底找（试了 '+ST.tried.length+' 组，定标烈度 '+ST.seedScore+'/10）') : '三篇由你指定'
   ];
   $('doneBanner').innerHTML = '✓ 跑完了。' + bits.join('　·　') +
     (ST.notes.length ? ('<br><span style="color:var(--muted)">中途自动修了：'+ST.notes.join('　')+'</span>') : '');
@@ -991,7 +1069,7 @@ goBtn.addEventListener('click', async ()=>{
 $('stopBtn').addEventListener('click', ()=>{ ST.abort = true; });
 $('resetBtn').addEventListener('click', ()=>{
   ST.out = {}; ST.article=''; ST.outline=''; ST.score=null; ST.sources=[];
-  ST.candidates=[]; ST.trioIdx=0; ST.swaps=0;
+  ST.tried=[]; ST.seed=null; ST.seedScore=0; ST.outer=0; ST.best=null;
   ST.redoFrom=null; ST.rounds=0; ST.termRetry=0; ST.termFix=null; ST.notes=[];
   $('runbar').classList.add('hidden'); $('doneBanner').innerHTML='';
   STAGES.forEach(s=>{
