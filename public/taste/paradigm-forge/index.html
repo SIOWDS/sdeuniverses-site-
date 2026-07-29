@@ -1051,12 +1051,17 @@ function poolSite(){
   return (CATALOG||[]).filter(x=>x.c!=='每日必读'&&x.c!=='学科通融').map((x,i)=>({
     gid:'W'+i,title:x.t,url:x.u,kind:x.c||'',summary:(x.d||''),author:'',scope:'site'}));
 }
-/* 范围级别：0 仅本人 · 1 +他人 · 2 +全站 */
+/* 累加池（0 仅本人 · 1 +他人 · 2 +全站）——只给 poolByGid 做全集查找用 */
 function poolAt(level){
   let p=poolSelf();
   if(level>=1) p=p.concat(poolPeers());
   if(level>=2) p=p.concat(poolSite());
   return p;
+}
+/* 阶梯池：**每一层只给那一层**（0 只本人栏 · 1 只其他学员 · 2 只全站长文）。
+   选 B/选 C 用这个——这样"往外扩一层"是真的往外，不会再把本人栏的文章留在池里让基底挑回去。 */
+function poolDelta(rung){
+  return rung===0 ? poolSelf() : rung===1 ? poolPeers() : poolSite();
 }
 const SCOPE_CN={self:'本人栏',peer:'其他学员',site:'全站长文'};
 const RUNG_CN=['本人栏','其他学员','全站长文'];
@@ -1757,8 +1762,8 @@ async function doSelect(){
       for(let rung=0; rung<=3 && !locked && !ST.abort; rung++){
         ST.__rung=rung;
         if(rung<=2){
-          ST.__pool=poolAt(rung).filter(x=>x.gid!==aGid && triedB.indexOf(x.gid)<0);
-          if(!ST.__pool.length){ continue; }
+          ST.__pool=poolDelta(rung).filter(x=>x.gid!==aGid && triedB.indexOf(x.gid)<0);
+          if(!ST.__pool.length){ if(rung<3) selLog('第 '+(r+1)+' 轮：'+RUNG_CN[rung]+'这一层没有可选的，往外扩一层。'); continue; }
           setStat('select','<span class="spinner"></span> 第 '+(r+1)+' 轮 · A '+aGid+' → 在'+RUNG_CN[rung]+'找对立的 B','run');
           const nb=await askStream(sdeSystem(), promptFor('pickB'), p.out, p.stat, p.meta, 2600, '第'+(r+1)+'轮找B·'+RUNG_CN[rung]);
           const bGid=parseGid(nb.text||'', 'B', ST.__pool, [aGid].concat(triedB));
@@ -1789,7 +1794,8 @@ async function doSelect(){
     let cGid=null;
     for(let rung=0; rung<=2 && !cGid; rung++){
       ST.__crung=rung;
-      ST.__pool=poolAt(rung).filter(x=>x.gid!==ST.pair.aGid && x.gid!==ST.pair.bGid && ST.badC.indexOf(x.gid)<0);
+      ST.__pool=poolDelta(rung).filter(x=>x.gid!==ST.pair.aGid && x.gid!==ST.pair.bGid && ST.badC.indexOf(x.gid)<0);
+      if(!ST.__pool.length){ if(rung<2) selLog('第 '+(r+1)+' 轮：'+RUNG_CN[rung]+'这一层没有可选的 C，往外扩一层。'); continue; }
       const bTagC=isGid(ST.pair.bGid)?ST.pair.bGid:'（'+(SCOPE_CN[asSrc(ST.pair.bGid).scope]||'库')+'）';
       setStat('select','<span class="spinner"></span> 第 '+(r+1)+' 轮 · 在'+RUNG_CN[rung]+'找同时顶住 '+ST.pair.aGid+'×'+bTagC+' 的 C','run');
       const nc=await askStream(sdeSystem(), promptFor('pickC'), p.out, p.stat, p.meta, 2600, '第'+(r+1)+'轮找C·'+RUNG_CN[rung]);
@@ -2309,7 +2315,7 @@ $('dlEngine').addEventListener('click', ()=>{
 });
 
 /* ===================== 起 ===================== */
-const BUILD_TAG = '20260729-1641·v1';
+const BUILD_TAG = '20260729-2203·v1';
 (function(){ const el=$('buildTag'); if(el) el.textContent='构建 '+BUILD_TAG; })();
 loadData();
 </script>
