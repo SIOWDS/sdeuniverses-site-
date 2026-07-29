@@ -118,8 +118,8 @@ footer a{color:var(--gold);text-decoration:none}
     <div class="sub zh-only">接龙持续进行，人数不设上限——每一位学员的作品，通过合宪性审读后，都将署名在此陆续发表。</div>
     <div class="sub en-only">Sign-up is ongoing with no cap on numbers — every trainee’s work, once it passes a constitutionality review, will be published here under their name.</div>
   </div>
-  <div class="roster-note zh-only">编号按"发表活跃度分数"自动排序（近期发表权重更高、篇幅更扎实加分、持续多月发表额外加分），每次发表新文章即时更新 · 并列按报名顺序</div>
-  <div class="roster-note en-only">Numbering auto-ranks by a publishing-activity score (recent pieces weighted higher, substantial length adds weight, sustained multi-month publishing adds a bonus) — updates the instant a new piece is published · ties by sign-up order</div>
+  <div class="roster-note zh-only">编号按四维加权分自动排序：<b>活跃度 40%</b>（以三天为一个窗口计一次活跃，同一天连发多篇不按篇数叠加；近期权重更高、持续多月额外加分）· <b>发表篇数 20%</b> · <b>总字数 15%</b> · <b>创新度 25%</b>（只采用独立盲评分，样本少的向全站均值收缩，暂无盲评分的按全站均值计、不罚不奖）。每次发表新文章即时更新 · 并列按报名顺序</div>
+  <div class="roster-note en-only">Ranked by a four-part weighted score: <b>activity 40%</b> (counted in three-day windows, so a single-day batch does not stack per piece; recent work weighted higher, sustained months add a bonus) · <b>number of pieces 20%</b> · <b>total length 15%</b> · <b>innovation 25%</b> (blind scores only, shrunk toward the site mean when the sample is small; unscored students take the site mean, neither penalised nor rewarded). Updates the instant a new piece is published · ties by sign-up order</div>
   <div class="roster" id="roster">
     <div class="stu-loading zh-only">名单加载中…</div>
     <div class="stu-loading en-only">Loading roster…</div>
@@ -164,29 +164,61 @@ function setLang(l){document.body.className=l;document.querySelectorAll('.lang-b
 fetch('/students/roster.json?v='+Date.now(),{cache:'no-store'}).then(function(r){return r.json();}).then(function(data){
   var students = data.students.slice();
   var now = Date.now();
+  function depth(x){
+    if(x.weight>0) return x.weight;                      // 长篇专著/小说按页面自报权重计
+    if(x.type==='poem') return 1.0;                      // 诗歌与论文同权
+    return Math.max(0.6, Math.min(1.8, Math.sqrt((x.words||8000)/10000)));
+  }
+  // ① 活跃分：以「三天窗口」为一次活跃事件（同一天连发十篇 ≈ 三天内发十篇），
+  //    窗口内按开方递减，避免突击一天压过持续数月；60 天半衰期。
   function activityScore(papers){
     if(!papers || !papers.length) return 0;
-    var total = 0;
-    var months = {};
-    papers.forEach(function(p){
-      var d = new Date(p.date+'T00:00:00Z');
-      var ageDays = Math.max(0,(now-d.getTime())/86400000);
-      var recency = Math.pow(0.5, ageDays/60);           // 60天半衰期：越近的发表，权重越高
-      var depth;
-      if(p.weight>0){ depth = p.weight; }                  // 页面自报权重：长篇专著/小说按“相当于 N 篇标准论文”计
-      else if(p.type==='poem'){ depth = 1.0; }             // 诗歌与论文同权：按一篇标准论文计，不做篇幅折扣
-      else{
-        depth = Math.sqrt((p.words||8000)/10000);
-        depth = Math.max(0.6, Math.min(1.8, depth));       // 散文/论文按篇幅深度加权，双端封顶
-      }
-      total += 10 * recency * depth;
-      months[p.date.slice(0,7)] = true;
+    var days=[]; papers.forEach(function(p){ if(days.indexOf(p.date)<0) days.push(p.date); });
+    days.sort();
+    var buckets=[], cur=[];
+    days.forEach(function(d){
+      if(cur.length && (Date.parse(d)-Date.parse(cur[0]))/86400000>=3){ buckets.push(cur); cur=[]; }
+      cur.push(d);
     });
-    var monthCount = Object.keys(months).length;
-    total += Math.min(20, 4*monthCount);                   // 持续多月发表的连续性加分，封顶20
-    return total;
+    if(cur.length) buckets.push(cur);
+    var total=0, months={};
+    buckets.forEach(function(b){
+      var ps=papers.filter(function(p){ return b.indexOf(p.date)>=0; });
+      var age=Math.max(0,(now-Date.parse(b[b.length-1]+'T00:00:00Z'))/86400000);
+      var sum=ps.reduce(function(a,p){ return a+depth(p); },0);
+      total += 16*Math.pow(0.5, age/60)*Math.sqrt(sum);
+      ps.forEach(function(p){ months[p.date.slice(0,7)]=true; });
+    });
+    return total + Math.min(20, 4*Object.keys(months).length);   // 持续多月发表的连续性加分
   }
-  students.forEach(function(s){ s.score = activityScore(s.papers); });
+  students.forEach(function(s){
+    s.score_act   = activityScore(s.papers);
+    s.score_chars = (s.papers||[]).reduce(function(a,p){ return a+(p.words||0); },0);
+    var bl = (s.papers||[]).filter(function(p){ return p.iq_kind==='blind'; });
+    s.iqN = bl.length;
+    s.iqRaw = bl.length ? bl.reduce(function(a,p){ return a+p.iq; },0)/bl.length : null;
+  });
+  // ④ 创新度：只采用独立盲评（iq_kind==='blind'）；样本少的向全站均值收缩，
+  //    四篇代表七十三篇不该与三十六篇代表六十六篇等价；完全没有盲评分的取全站均值，不罚不奖。
+  var allIQ=[];
+  students.forEach(function(s){ (s.papers||[]).forEach(function(p){ if(p.iq_kind==='blind') allIQ.push(p.iq); }); });
+  var gmIQ = allIQ.length ? allIQ.reduce(function(a,b){ return a+b; },0)/allIQ.length : 138;
+  var K = 10;
+  students.forEach(function(s){
+    s.iqShrunk = (s.iqN*(s.iqRaw===null?gmIQ:s.iqRaw) + K*gmIQ)/(s.iqN+K);
+  });
+  // 四维归一后加权：活跃 0.40 · 篇数 0.20 · 字数 0.15 · 创新度 0.25
+  function maxOf(f){ return Math.max.apply(null, students.map(f)) || 1; }
+  var mA=maxOf(function(s){ return s.score_act; }),
+      mC=maxOf(function(s){ return Math.sqrt(s.count); }),
+      mW=maxOf(function(s){ return Math.sqrt(s.score_chars); });
+  students.forEach(function(s){
+    var A=100*s.score_act/mA,
+        C=100*Math.sqrt(s.count)/mC,
+        W=100*Math.sqrt(s.score_chars)/mW,
+        Q=100*Math.max(0, Math.min(1, (s.iqShrunk-125)/25));
+    s.score = 0.40*A + 0.20*C + 0.15*W + 0.25*Q;
+  });
   var prep = students.filter(function(s){ return s.status==='preliminary'; });
   students = students.filter(function(s){ return s.status!=='preliminary'; });
   students.sort(function(a,b){

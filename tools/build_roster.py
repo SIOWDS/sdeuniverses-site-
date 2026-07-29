@@ -200,6 +200,36 @@ def paper_weight(idx):
     return int(w) if w == int(w) else w
 
 
+def paper_iq(idx):
+    """页面自报的 SDE 创新智商分及其口径。
+
+    与 sde:paper-weight 同理：roster.json 是派生数据，手写字段必被本脚本覆盖，
+    所以分数只能从页面里抽。全站现有三种写法，口径不同，必须分开标：
+
+        「SDE 创新智商 136 → 打磨目标 146」  前者=原稿盲评，后者=打磨目标（不计分）
+        「本文的盲评分为 132」               盲评
+        「SDE 创新智商 138（原稿盲评…）」    盲评
+        「SDE 创新智商：149」               旧 Codex 单值，口径不明 → legacy，不进排名
+
+    返回 (分数, 口径) 或 (None, None)。排名公式只采用 kind == 'blind'。
+    """
+    s = open(idx, encoding='utf-8').read()
+    t = re.sub(r'<[^>]+>', '', s)
+    m = re.search(r'创新智商[：:\s]*(\d{3})\s*(?:→|-&gt;|->)', t)
+    if m:
+        return int(m.group(1)), 'blind'
+    m = re.search(r'盲评分为\s*(\d{3})', t)
+    if m:
+        return int(m.group(1)), 'blind'
+    m = re.search(r'创新智商[：:\s]*(\d{3})\s*[（(]\s*原稿盲评', t)
+    if m:
+        return int(m.group(1)), 'blind'
+    m = re.search(r'创新智商[：:\s]*(\d{3})', t)
+    if m:
+        return int(m.group(1)), 'legacy'
+    return None, None
+
+
 def body_chars(idx):
     """正文字数：跳过骨架后数字符（CJK 一字算一字）。"""
     p = BodyText()
@@ -221,7 +251,11 @@ def build():
             if not date:
                 print(f"  ⚠ 无法确定发表日期，跳过: {os.path.relpath(item, STUDENTS)}", file=sys.stderr)
                 continue
-            rec = {'date': date, 'words': body_chars(idx)}
+            rec = {'slug': os.path.relpath(item, STUDENTS).replace(os.sep, '/'),
+                   'date': date, 'words': body_chars(idx)}
+            iq, kind = paper_iq(idx)
+            if iq is not None and 80 <= iq <= 175:
+                rec['iq'], rec['iq_kind'] = iq, kind
             # 诗歌与论文同权：排名公式给 type=poem 记 depth 1.0，不按篇幅折算。
             # 站上的约定是诗歌收在该生的 poems/ 目录下。
             if os.path.basename(os.path.dirname(item)) == 'poems':
