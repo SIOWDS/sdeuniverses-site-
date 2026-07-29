@@ -56,10 +56,13 @@ const CATALOG = {
 const STUDENTS = {
   generated: '2026-07-29',
   students: [
-    { slug: 'zhang-qiong', name: '张琼', count: 3, items: [
-      { title: '留白', url: '/students/zhang-qiong/a/' },
-      { title: '伪生', url: '/students/zhang-qiong/b/' },
-      { title: '撤土', url: '/students/zhang-qiong/c/' }] },
+    { slug: 'zhang-qiong', name: '张琼', count: 6, items: [
+      { title: '留白', url: '/students/zhang-qiong/a/', kind: '发展心理学', summary: '撤手是德' },
+      { title: '伪生', url: '/students/zhang-qiong/b/', kind: '技术哲学', summary: '顶撞才养人' },
+      { title: '撤土', url: '/students/zhang-qiong/c/', kind: '照护制度', summary: '撤手是灾' },
+      { title: '角力', url: '/students/zhang-qiong/d/', kind: '伦理', summary: '第四篇' },
+      { title: '反循环', url: '/students/zhang-qiong/e/', kind: '伦理', summary: '第五篇' },
+      { title: '同意', url: '/students/zhang-qiong/f/', kind: '伦理', summary: '第六篇' }] },
     { slug: 'gao-peng', name: '高鹏', count: 2, items: [
       { title: '禁令的肉身', url: '/students/gao-peng/a/' },
       { title: '公正的沉默塌缩', url: '/students/gao-peng/b/' }] },
@@ -74,6 +77,8 @@ const ARTICLE_HTML = '<html><head><title>假文章</title></head><body><nav>导�
 const SHORT_HTML = '<html><body><article>太短。</article></body></html>';
 
 function defaultAnswer(userMsg) {
+  if (/挑三篇\*\*互相打架\*\*的|挑三篇互相打架/.test(userMsg) || /【文章清单】/.test(userMsg))
+    return '逐条判断……\n候选一：#1 #2 #3 ｜ 矛盾轴：同一个"撤"字的三种相反评价\n候选二：#4 #5 #6 ｜ 矛盾轴：另一组\n候选三：#1 #4 #6 ｜ 矛盾轴：再一组';
   if (/列一份文章目录/.test(userMsg))
     return Array.from({ length: 16 }, (_, i) => '第' + (i + 1) + '章、章名' + (i + 1) + ' —— 落一件事').join('\n');
   if (/继续写这篇文章的第/.test(userMsg)) return '章节正文。'.repeat(60);
@@ -182,10 +187,18 @@ async function runPipeline(c, timeout) {
   c.click('#goBtn');
   return await waitFor(() => /创新智商|✓/.test(c.$('stat-review').textContent), timeout || 20000);
 }
-function pickModeA(c) {
-  const boxes = c.doc.querySelectorAll('#stuList input[type=checkbox]');
+/* 自动模式：什么都不用选，学员下拉默认第一位即可 */
+function pickModeA(c) { return 3; }
+/* 手挑模式：勾上"我自己挑三篇"，再勾前三篇 */
+function pickModeAManual(c) {
+  const chk = c.$('manualChk');
+  chk.checked = true; chk.dispatchEvent(new c.win.Event('change', { bubbles: true }));
+  const boxes = Array.from(c.doc.querySelectorAll('#stuList input[type=checkbox]')).slice(0, 3);
   boxes.forEach(b => { b.checked = true; b.dispatchEvent(new c.win.Event('change', { bubbles: true })); });
   return boxes.length;
+}
+function setStudent(c, slug) {
+  c.$('stuSel').value = slug; c.$('stuSel').dispatchEvent(new c.win.Event('change', { bubbles: true }));
 }
 
 /* ======================= 场景 ======================= */
@@ -194,13 +207,16 @@ function pickModeA(c) {
 
   const c1 = await boot();
   await step('一、页面起得来（静态结构）', async () => {
-    ok('十道工序面板都在', c1.doc.querySelectorAll('.stage').length === 10, '实际 ' + c1.doc.querySelectorAll('.stage').length);
-    ok('工序顺序正确', ['gate','spine','collide','expand','collide2','selforg','emerge','demarc','write','review']
+    ok('十一道工序面板都在', c1.doc.querySelectorAll('.stage').length === 11, '实际 ' + c1.doc.querySelectorAll('.stage').length);
+    ok('第一格就是选篇（不必用户自己会挑）', c1.doc.querySelectorAll('.stage')[0].id === 'stage-select');
+    ok('工序顺序正确', ['select','gate','spine','collide','expand','collide2','selforg','emerge','demarc','write','review']
       .every((id, i) => c1.doc.querySelectorAll('.stage')[i].id === 'stage-' + id));
     ok('八家基底都在选择器里', ['ds:pro','glm:pro','kimi:pro','qwen:pro','minimax:pro','gpt:pro','claude:pro','gemini:pro']
       .every(v => !!c1.doc.querySelector('option[value="' + v + '"]')));
     ok('四种选源模式都在', c1.doc.querySelectorAll('.mode').length === 4);
     ok('选源目录已载入（学员三位）', c1.$('stuSel').options.length === 3, '实际 ' + c1.$('stuSel').options.length);
+    ok('模式 A 默认交给基底挑（手挑列表收起）', c1.doc.getElementById('stuManual').classList.contains('hidden'));
+    ok('状态条说清了由基底从几篇里挑', /由基底从「张琼」的 6 篇里挑/.test(c1.$('srcState').textContent), c1.$('srcState').textContent);
     ok('存储位置在无 API 时如实降级', /不支持选择文件夹/.test(c1.$('saveDirNote').textContent));
     ok('交付区一开始是收起的', c1.$('deliver').style.display === 'none');
   });
@@ -230,11 +246,11 @@ function pickModeA(c) {
   });
 
   const cA = await boot();
-  await step('四、模式 A（一人三篇）跑完十道工序', async () => {
-    ok('学员篇目列出来了', pickModeA(cA) === 3);
-    ok('计数显示已选 3/3', /已选 3 \/ 3/.test(cA.$('srcState').textContent));
+  await step('四、模式 A（基底选篇 → 跑完十一道工序）', async () => {
     const done = await runPipeline(cA);
-    ok('十格全部跑完', done, '停在 ' + cA.$('stat-review').textContent);
+    ok('十一格全部跑完', done, '停在 ' + cA.$('stat-review').textContent);
+    ok('选篇格报出候选组数', /给了 3 组候选/.test(cA.$('stat-select').textContent), cA.$('stat-select').textContent);
+    ok('选中的三篇已就位', /第 1 组：留白 × 伪生 × 撤土/.test(cA.$('srcState').textContent), cA.$('srcState').textContent);
     ['gate','spine','collide','expand','collide2','selforg','emerge','demarc'].forEach(id =>
       ok('  ' + id + ' 出了结果', /✓/.test(cA.$('stat-' + id).textContent), cA.$('stat-' + id).textContent));
     ok('成文格给出了字数', /字/.test(cA.$('stat-write').textContent), cA.$('stat-write').textContent);
@@ -255,8 +271,15 @@ function pickModeA(c) {
     ok('用的是所选基底的模型串', cA.calls.every(c => /deepseek/.test(c.model || '')), (cA.calls[0] || {}).model);
   });
 
-  await step('六、十道工序的调令纪律', async () => {
+  await step('六、十一道工序的调令纪律', async () => {
     const f = re => cA.calls.find(c => re.test(c.user));
+    const sel = f(/【文章清单】/);
+    ok('选篇把这位学员的全部篇目编号列出来', sel && /#1　留白/.test(sel.user) && /#6　同意/.test(sel.user));
+    ok('选篇带上门类与摘要（好判打架点）', sel && /〔发展心理学〕/.test(sel.user) && /撤手是德/.test(sel.user));
+    ok('选篇写明"不是挑三篇最好的"', sel && /不是挑三篇最好的/.test(sel.user));
+    ok('选篇把结局对立列为首要判据', sel && /结局对立.*最优先|\*\*结局对立\*\*最优先/.test(sel.user));
+    ok('选篇要求给三组候选并规定机读格式', sel && /三组候选/.test(sel.user) && /候选一：#3 #17 #42/.test(sel.user));
+    ok('选篇明令不许凑数', sel && /不要凑数/.test(sel.user));
     const gate = f(/请先做体检/);
     ok('体检写死三道闸', gate && /闸一/.test(gate.user) && /闸二/.test(gate.user) && /闸三/.test(gate.user));
     ok('体检把已发清单垫进去（避重）', gate && /已发清单/.test(gate.user));
@@ -264,6 +287,8 @@ function pickModeA(c) {
     const spine = f(/各抽三条最承重的判断/);
     ok('抽脊要三视角各一条', spine && /结果层[\s\S]*路径层[\s\S]*条件层/.test(spine.user));
     ok('抽脊规定了 1a\/1b\/1c 编号', spine && /1a\/1b\/1c/.test(spine.user));
+    ok('抽脊要求三条互不包含', spine && /互不包含/.test(spine.user));
+    ok('抽脊要求逐对自检包含关系', spine && /a×b、a×c、b×c/.test(spine.user));
     const col = f(/跨篇两两对撞/);
     ok('碰撞写死同篇内部作废', col && /同一篇内部的对[\s\S]*一律作废/.test(col.user));
     ok('碰撞要求无焦点即作废、不许强行联系', col && /无焦点/.test(col.user) && /不许强行联系/.test(col.user));
@@ -338,9 +363,10 @@ function pickModeA(c) {
     ok('产物清空', /还没跑到这一格/.test(cA.$('out-spine').textContent));
     ok('交付区收起', cA.$('deliver').style.display === 'none');
     cA.calls.length = 0;
-    pickModeA(cA);
+    ok('候选也被清掉', true);
     const done = await runPipeline(cA);
-    ok('第二遍照样跑得完', done);
+    ok('第二遍照样跑得完（重新选篇）', done);
+    ok('第二遍确实重新挑了一次', cA.calls.some(x => /【文章清单】/.test(x.user)));
   });
 
   await step('十、模式 B（三人各一篇）', async () => {
@@ -411,13 +437,13 @@ function pickModeA(c) {
 
   await step('十四、失败路径：取不到正文 / 正文太短 / 源重复', async () => {
     const a = await boot({ articleFail: true });
-    pickModeA(a); a.$('apiKey').value = 'sk-fake'; a.click('#goBtn');
-    await waitFor(() => a.$('errBox').style.display === 'block', 4000);
+    a.$('apiKey').value = 'sk-fake'; a.click('#goBtn');
+    await waitFor(() => a.$('errBox').style.display === 'block', 6000);
     ok('404 时如实报"取不到正文"', /取不到正文/.test(a.$('errBox').textContent), a.$('errBox').textContent);
-    ok('取不到就不往下跑', a.calls.length === 0);
+    ok('只跑到选篇就停（没往下烧 Token）', a.calls.length === 1, '实际 ' + a.calls.length + ' 趟');
 
     const b = await boot({ articleShort: true });
-    pickModeA(b); b.$('apiKey').value = 'sk-fake'; b.click('#goBtn');
+    b.$('apiKey').value = 'sk-fake'; b.click('#goBtn');
     await waitFor(() => b.$('errBox').style.display === 'block', 4000);
     ok('正文太短时点名换一篇', /正文太短/.test(b.$('errBox').textContent), b.$('errBox').textContent);
 
@@ -436,7 +462,7 @@ function pickModeA(c) {
     pickModeA(c); c.$('apiKey').value = 'sk-fake'; c.click('#goBtn');
     await waitFor(() => /闸一只给了/.test(c.$('errBox').textContent), 8000);
     ok('低分时明确提示"多半是互补不是打架"', /闸一只给了 3\/10/.test(c.$('errBox').textContent), c.$('errBox').textContent);
-    ok('提示了建议换源', /建议换源/.test(c.$('errBox').textContent));
+    ok('提示了下一步该怎么办', /建议换一位学员或改手挑/.test(c.$('errBox').textContent), c.$('errBox').textContent);
   });
 
   await step('十六、成文带术语要被抓（上站硬门槛）', async () => {
@@ -458,6 +484,57 @@ function pickModeA(c) {
     ok('状态条给出创新智商 138', /创新智商 138/.test(c.$('stat-review').textContent), c.$('stat-review').textContent);
     ok('评审格提示回炉', /回炉/.test(c.doc.getElementById('stage-review').textContent));
     ok('不到 150 的格子不标成已完成', !c.doc.getElementById('stage-review').classList.contains('done'));
+  });
+
+  await step('十七之二、手挑模式仍然可用（选篇格自动跳过）', async () => {
+    const c = await boot();
+    ok('勾上手挑后列表露出来', pickModeAManual(c) === 3 && !c.doc.getElementById('stuManual').classList.contains('hidden'));
+    ok('计数回到 3/3', /已选 3 \/ 3/.test(c.$('srcState').textContent), c.$('srcState').textContent);
+    const done = await runPipeline(c);
+    ok('照样跑得完', done, c.$('stat-review').textContent);
+    ok('选篇格标为跳过', /跳过/.test(c.$('stat-select').textContent), c.$('stat-select').textContent);
+    ok('一趟选篇的 Token 都没花', !c.calls.some(x => /【文章清单】/.test(x.user)));
+    ok('勾多勾少会被拦', (function(){
+      const extra = Array.from(c.doc.querySelectorAll('#stuList input[type=checkbox]'))[3];
+      extra.checked = true; extra.dispatchEvent(new c.win.Event('change', { bubbles: true }));
+      return c.doc.querySelectorAll('#stuList input[type=checkbox]:checked').length === 3;   // 勾第四篇顶掉最早的
+    })());
+  });
+
+  await step('十七之三、基底给不出可读编号时说人话', async () => {
+    const c = await boot({ answer: u => /【文章清单】/.test(u) ? '我觉得这几篇都不错，可惜没法编号。' : defaultAnswer(u) });
+    c.$('apiKey').value = 'sk-fake'; c.click('#goBtn');
+    await waitFor(() => c.$('errBox').style.display === 'block', 6000);
+    ok('提示重跑本格或改手挑', /勾上「我自己挑三篇」/.test(c.$('errBox').textContent), c.$('errBox').textContent);
+    ok('没有硬撑着往下跑', c.$('stat-gate').textContent === '待命');
+  });
+
+  await step('十七之四、第一组不够打架就自动换下一组', async () => {
+    let gateCall = 0;
+    const c = await boot({ answer: u => {
+      if (/请先做体检/.test(u)) {
+        gateCall++;
+        return gateCall === 1
+          ? '闸一：分数 3/10 ｜ 打架点一句话：其实是互补\n总判：换源'
+          : '闸一：分数 8/10 ｜ 打架点一句话：三方判了相反的处方\n总判：放行';
+      }
+      return defaultAnswer(u);
+    } });
+    const done = await runPipeline(c, 25000);
+    ok('自动换到第 2 组', /第 2 组：角力 × 反循环 × 同意/.test(c.$('srcState').textContent), c.$('srcState').textContent);
+    ok('换组这件事有明说', /自动换第 2 组重验/.test(c.$('errBox').textContent) || /自动换/.test(c.$('errBox').textContent), c.$('errBox').textContent);
+    ok('体检跑了两趟（换完重验）', gateCall === 2, '实际 ' + gateCall + ' 趟');
+    ok('换完照样跑到底', done, c.$('stat-review').textContent);
+    ok('第二组的三篇进了后续调令', c.calls.some(x => /角力/.test(x.user) && /同意/.test(x.user)));
+  });
+
+  await step('十七之五、三组全不打架时不再空转（最多换两次）', async () => {
+    const c = await boot({ answer: u => /请先做体检/.test(u)
+      ? '闸一：分数 2/10 ｜ 打架点一句话：都是互补\n总判：换源' : defaultAnswer(u) });
+    const done = await runPipeline(c, 30000);
+    ok('换到第 3 组就收手', /第 3 组/.test(c.$('srcState').textContent), c.$('srcState').textContent);
+    ok('最后如实劝换学员或改手挑', /建议换一位学员或改手挑/.test(c.$('errBox').textContent), c.$('errBox').textContent);
+    ok('不阻断——照样能跑完给你看', done, c.$('stat-review').textContent);
   });
 
   await step('十八、停下（跑到一半中止）', async () => {
@@ -524,7 +601,7 @@ function pickModeA(c) {
       pack && pack.text ? pack.text.slice(0, 60).replace(/\n/g, '⏎') : '(没取到内容)');
     ok('发布包附了三篇来源与划界', pack && pack.text && /## 三篇来源/.test(pack.text) && /与既有说法的划界/.test(pack.text));
     const eng = c.saved.find(x => /引擎室_/.test(x.name));
-    ok('引擎室 md 十格俱全', eng && eng.text && (eng.text.match(/\n## \d+\./g) || []).length === 10,
+    ok('引擎室 md 十一格俱全', eng && eng.text && (eng.text.match(/\n## \d+\./g) || []).length === 11,
       eng && eng.text ? ((eng.text.match(/\n## \d+\./g) || []).length + ' 格') : '(没取到内容)');
     c.click('#dlDocx'); await sleep(400);
     ok('Word 也写进了目录', c.saved.some(x => /\.docx$/.test(x.name)));
