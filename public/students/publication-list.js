@@ -42,6 +42,17 @@
 
   function chineseNumber(value) {
     var digits = ["零", "一", "二", "三", "四", "五", "六", "七", "八", "九"];
+    // 百位以上必须单独处理：原先只写到两位数，作品过百之后 Math.floor(value/10)
+    // 会取到 digits[10] === undefined，列单上就出现「之undefined十七」。
+    if (value >= 100) {
+      var hundreds = Math.floor(value / 100);
+      var rest = value % 100;
+      var head = digits[hundreds] + "百";
+      if (rest === 0) return head;                                  // 100 → 一百
+      if (rest < 10) return head + "零" + digits[rest];             // 107 → 一百零七
+      var t = Math.floor(rest / 10), o = rest % 10;                 // 117 → 一百一十七
+      return head + digits[t] + "十" + (o ? digits[o] : "");
+    }
     if (value < 10) return digits[value];
     if (value === 10) return "十";
     if (value < 20) return "十" + digits[value % 10];
