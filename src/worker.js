@@ -3676,6 +3676,84 @@ export default {
       const rr = await box.fetch(new Request("https://sub.internal/", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ op: "status" }) }));
       return _subJson(await rr.json(), { "access-control-allow-origin": "*" });
     }
+    // ===== R2_PDF：学员 PDF 从 R2 供给，URL 一个字都不改 =====
+    // 为什么走这条路而不是"把链接改成 R2 域名"：660 篇学员 PDF 被两处引用——文章页的下载链，
+    // 与 read.html 里 PDF.js 的 getDocument()，**都是相对文件名**。改链要动 1300 多个页面，
+    // 每动一次都可能把某篇的阅读器改瞎；而在这里拦截，页面一行都不用改，旧链接、外链、收藏全不断。
+    //
+    // 三条要紧的：
+    // ① **必须支持 Range** —— PDF.js 对大文件是分块取的，不给 accept-ranges/206 会退化成整份下载甚至读不出；
+    //    R2 的 get() 可以直接吃 request.headers，由它解析 Range 与 If-None-Match。
+    // ② **R2 落空就静默放行到 ASSETS** —— 迁移期间两边并存：已上传的走 R2，没上传的照旧走仓库，
+    //    任何一篇都不会因为迁移做到一半而 404。桶还没绑定时（env.PDFS 不存在）整段等于不存在。
+    // ③ 只认 /students/**.pdf —— 别的目录不在这次迁移范围内。
+    if ((request.method === "GET" || request.method === "HEAD") && env.PDFS && /^\/students\/[^?]+\.pdf$/i.test(url.pathname)) {
+      try {
+        const key = decodeURIComponent(url.pathname.slice(1));
+        const obj = await env.PDFS.get(key, { range: request.headers, onlyIf: request.headers });
+        if (obj) {
+          const h = new Headers();
+          obj.writeHttpMetadata(h);
+          h.set("etag", obj.httpEtag);
+          h.set("accept-ranges", "bytes");
+          if (!h.get("content-type")) h.set("content-type", "application/pdf");
+          h.set("cache-control", "public, max-age=31536000, immutable");
+          h.set("x-served-from", "r2");
+          if (!("body" in obj)) return new Response(null, { status: 304, headers: h });   // onlyIf 不满足＝没变，回 304
+          if (obj.range && obj.range.offset !== undefined) {
+            const st = obj.range.offset, ln = obj.range.length === undefined ? (obj.size - st) : obj.range.length;
+            h.set("content-range", "bytes " + st + "-" + (st + ln - 1) + "/" + obj.size);
+            h.set("content-length", String(ln));
+            return new Response(request.method === "HEAD" ? null : obj.body, { status: 206, headers: h });
+          }
+          h.set("content-length", String(obj.size));
+          return new Response(request.method === "HEAD" ? null : obj.body, { status: 200, headers: h });
+        }
+      } catch (e) { /* R2 出任何岔子都不许让读者看不到文章：直接落到下面的 ASSETS */ }
+    }
+    // R2_MIGRATE：把学员 PDF 从仓库（ASSETS）搬进 R2。**在边缘上自己搬**——
+    // 不经过任何人的机器、不需要 Cloudflare API Token，几百兆不必来回穿网。
+    // 一次一小批、可重复跑（已在的默认跳过），失败的那几个下次单独再来。
+    if (url.pathname === "/api/admin/r2-migrate" && request.method === "POST") {
+      let b = {}; try { b = await request.json(); } catch (e) {}
+      const J = (o, st) => Response.json(o, { status: st || 200, headers: _cors() });
+      if (String(b.pass || "") !== "SDE2013") return J({ ok: false, msg: "口令不对。" }, 401);
+      if (!env.PDFS) return J({ ok: false, msg: "还没绑定 R2 桶（wrangler.jsonc 里的 PDFS）。" }, 400);
+      const paths = (Array.isArray(b.paths) ? b.paths : []).slice(0, 25);
+      const out = [];
+      for (const p0 of paths) {
+        const p = String(p0);
+        // 源与目标都钉死在学员 PDF 上：这个口子只能把仓库里已有的学员 PDF 搬进 R2，
+        // 不能拿它往桶里塞任意内容（口令是前端级的，能力必须收窄到无害）。
+        if (!/^students\/[A-Za-z0-9._\-\/]+\.pdf$/i.test(p) || p.indexOf("..") >= 0) { out.push({ p: p, ok: false, msg: "路径不在允许范围" }); continue; }
+        try {
+          if (!b.force) { const hd = await env.PDFS.head(p); if (hd) { out.push({ p: p, ok: true, skip: 1, size: hd.size }); continue; } }
+          const r = await env.ASSETS.fetch(new Request(new URL("/" + p, url)));
+          if (!r.ok) { out.push({ p: p, ok: false, msg: "仓库里取不到：" + r.status }); continue; }
+          const buf = await r.arrayBuffer();
+          if (!buf || buf.byteLength < 1000) { out.push({ p: p, ok: false, msg: "取回的字节数不对：" + (buf ? buf.byteLength : 0) }); continue; }
+          await env.PDFS.put(p, buf, { httpMetadata: { contentType: "application/pdf", cacheControl: "public, max-age=31536000, immutable" } });
+          const hd2 = await env.PDFS.head(p);
+          out.push({ p: p, ok: !!hd2 && hd2.size === buf.byteLength, size: buf.byteLength, r2: hd2 ? hd2.size : 0 });
+        } catch (e) { out.push({ p: p, ok: false, msg: (e && e.message) || "put 失败" }); }
+      }
+      return J({ ok: true, done: out });
+    }
+    // R2_CHECK：核对某几个 key 在不在桶里、大小对不对（删仓库文件之前必须逐个过这一关）。
+    if (url.pathname === "/api/admin/r2-check" && request.method === "POST") {
+      let b = {}; try { b = await request.json(); } catch (e) {}
+      const J = (o, st) => Response.json(o, { status: st || 200, headers: _cors() });
+      if (String(b.pass || "") !== "SDE2013") return J({ ok: false, msg: "口令不对。" }, 401);
+      if (!env.PDFS) return J({ ok: false, msg: "还没绑定 R2 桶。" }, 400);
+      const paths = (Array.isArray(b.paths) ? b.paths : []).slice(0, 200);
+      const out = [];
+      for (const p0 of paths) {
+        const p = String(p0);
+        try { const hd = await env.PDFS.head(p); out.push({ p: p, in: !!hd, size: hd ? hd.size : 0 }); }
+        catch (e) { out.push({ p: p, in: false, size: 0 }); }
+      }
+      return J({ ok: true, n: out.length, hit: out.filter((x) => x.in).length, done: out });
+    }
     // Everything else: serve static assets (with configured html/404 handling)
     const resp = await env.ASSETS.fetch(request);
     const ct = resp.headers.get("content-type") || "";
