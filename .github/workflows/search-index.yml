@@ -37,7 +37,7 @@ jobs:
   reindex:
     runs-on: ubuntu-latest
     permissions:
-      contents: write                # 需要把重建后的索引推回 main
+      contents: read                 # 索引改上 R2，不再推回 main
 
     steps:
       - uses: actions/checkout@v4
@@ -86,37 +86,60 @@ jobs:
           print(f"自检通过 · {c['docs']} 篇 / {c['chunks']} 块 / {c['chars']:,} 字")
           EOF
 
-      - name: 有变化就提交回 main
-        run: |
-          if git diff --quiet -- public/search/; then
-            echo "搜索索引已和内容一致，无需提交"
-            exit 0
-          fi
-          git config user.name "sde-index-bot"
-          git config user.email "wangdesheng1234567@gmail.com"
-          git add public/search/
-          git commit -m "Rebuild search index on request (${GITHUB_SHA::7})
-
-          Run by hand rather than on every push: the index is 218MB of generated data
-          and only its latest version is ever of use, so rebuilding it 60-190 times a
-          day was writing hundreds of megabytes of already-dead versions into history.
-          Coordinates rebuilt in the same commit because sde-coords.json is keyed by
-          doc index: any insertion shifts the numbering and points old coordinates at
-          the wrong articles."
-          # main 可能已前进（并发 push），冲突就 rebase 重试
-          for i in 1 2 3; do
-            git push && exit 0
-            echo "push 被拒（main 已前进），rebase 后重试 $i/3"
-            git pull --rebase origin main
-          done
-          echo "三次推送均失败" && exit 1
-
-      # 【待办 · 写入侧】等仓库 secrets 里有了 R2 写权限的 Cloudflare token，本工作流改为：
-      #   自检通过 → 上传 search/（覆盖，线上读这份）+ search-snap/<日期>/（当次快照，不覆盖）
-      #   → 不再 git commit 索引。次序不能反：坏索引必须在到桶之前被自检拦下，快照是第二道保险。
-      #   快照保留期交给 R2 的 Object Lifecycle Rules（search-snap/ 前缀设 30 天过期），
-      #   自己到期消失，不用写清理代码——这正是 git 缺的那个能力：能忘。
       - name: 过期兜底自检（重建后必须不再过期，否则说明筛选规则与生成器脱节）
-        run: |
-          python3 tools/build_search_index.py --check
+        run: python3 tools/build_search_index.py --check
 
+      # ===== 写入侧：索引不再进 git，改上 R2 =====
+      # 次序是硬的：上面两道自检全过，才允许碰桶。坏索引进了桶就是线上答案被污染，
+      # 而 R2 一旦有 search/ 前缀的对象就永远压过 ASSETS，回滚只能靠快照。
+      # 凭证是 Object Read & Write、只绑 sdeuniverses-pdf 的 R2 令牌，建不了桶也删不了桶。
+      - name: 上传索引到 R2（search/ 覆盖 + search-snap/<日期>/ 快照）
+        env:
+          AWS_ACCESS_KEY_ID:     ${{ secrets.R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: auto
+          # AWS CLI v2.23 起默认给每次 PUT 打 x-amz-checksum-CRC64NVME 头，R2 对没实现的
+          # 校验算法会回 501 NotImplemented。when_required = 只在协议要求时才算，关掉这层默认。
+          AWS_REQUEST_CHECKSUM_CALCULATION: when_required
+          AWS_RESPONSE_CHECKSUM_VALIDATION: when_required
+        run: |
+          set -euo pipefail
+          EP=https://d3ea22f828ce19cf113a457ceba2c930.r2.cloudflarestorage.com
+          B=s3://sdeuniverses-pdf
+          SNAP=$(date -u +%F)
+
+          # index.html 是搜索页面本身，照旧走 ASSETS，绝不能进桶
+          # （IDX_KEYS 也不认它，进了也读不到，只会白占空间）
+          aws s3 sync public/search/ "$B/search/" \
+            --endpoint-url "$EP" --delete --exclude "index.html" --only-show-errors
+          echo "线上那份已更新"
+
+          # 快照不加 --delete，也不覆盖既有日期；保留期交给桶上的 Object Lifecycle Rule
+          # （search-snap/ 前缀 30 天过期）。这是 git 缺的那个能力：能忘。
+          aws s3 sync public/search/ "$B/search-snap/$SNAP/" \
+            --endpoint-url "$EP" --exclude "index.html" --only-show-errors
+          echo "快照 search-snap/$SNAP/ 已留存"
+
+      - name: 核对桶里的对象数与本地分片数一致
+        env:
+          AWS_ACCESS_KEY_ID:     ${{ secrets.R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: auto
+          AWS_REQUEST_CHECKSUM_CALCULATION: when_required
+          AWS_RESPONSE_CHECKSUM_VALIDATION: when_required
+        run: |
+          set -euo pipefail
+          EP=https://d3ea22f828ce19cf113a457ceba2c930.r2.cloudflarestorage.com
+          LOCAL=$(find public/search -type f -name '*.json' | wc -l)
+          REMOTE=$(aws s3 ls s3://sdeuniverses-pdf/search/ --recursive \
+                     --endpoint-url "$EP" | grep -c '\.json$')
+          echo "本地 $LOCAL 个 json · 桶里 $REMOTE 个"
+          [ "$LOCAL" -eq "$REMOTE" ] || { echo "对象数不一致，上传不完整"; exit 1; }
+          # 抓一个必存在的文件回读，确认它在桶里是完整可解析的（防止传上去的是半截文件）
+          aws s3 cp s3://sdeuniverses-pdf/search/manifest.json /tmp/m.json \
+            --endpoint-url "$EP" --only-show-errors
+          python3 -c 'import json;c=json.load(open("/tmp/m.json"))["counts"];print("回读 manifest 成功 ·",c["docs"],"篇 /",c["chunks"],"块")'
+
+      # 【下一步】确认本工作流连续跑通后，再把 public/search/ 从 git 里删掉
+      #   （现在留着只作过渡期兜底：桶里没有对象时 Worker 会静默回落 ASSETS）。
+      #   删掉工作树只是止血，历史里那 1027 个旧版本要另挑静默窗口用 filter-repo 按路径剔除。
