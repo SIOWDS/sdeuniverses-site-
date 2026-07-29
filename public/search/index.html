@@ -1,0 +1,1485 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>站内搜索 · SDE Universes</title>
+<meta name="description" content="SDE Universes 站内搜索 · 关键词全文检索 + 智能问答 · 检索德麦国际 915+ 篇文章与专著">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<style>
+:root{
+  --bg:#F5EFE0; --surface:#EBE3CE; --card:#FAF6EC; --card2:#F0E8D3;
+  --gold:#8A6817; --gold2:#A88233; --text:#2A2315; --text2:#6B5D47;
+  --muted:#98886C; --border:rgba(138,104,23,0.22); --border2:rgba(138,104,23,0.10);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:'Noto Serif SC','EB Garamond',Georgia,serif;line-height:1.7;-webkit-font-smoothing:antialiased}
+a{color:var(--gold);text-decoration:none}
+.en-only{display:none}
+body.en .zh-only{display:none}
+body.en .en-only{display:inline}
+body.en .en-only.block{display:block}
+
+nav{display:flex;align-items:center;justify-content:space-between;padding:16px 28px;border-bottom:1px solid var(--border);background:var(--card);position:sticky;top:0;z-index:20}
+.nav-logo{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;color:var(--gold);letter-spacing:0.05em}
+.nav-right{display:flex;align-items:center;gap:16px;font-size:0.85rem}
+.nav-right a{color:var(--text2)}
+.lang-toggle{display:flex;border:1px solid var(--border);border-radius:16px;overflow:hidden}
+.lang-btn{padding:4px 12px;font-size:0.72rem;border:none;background:transparent;color:var(--text2);cursor:pointer;font-family:inherit}
+.lang-btn.active{background:var(--gold);color:#F5EFE0;font-weight:600}
+
+.wrap{max-width:820px;margin:0 auto;padding:38px 20px 90px}
+.eyebrow{font-size:0.7rem;letter-spacing:0.32em;color:var(--gold);text-transform:uppercase;font-weight:600;text-align:center}
+h1{font-family:'Playfair Display',serif;font-size:clamp(2rem,5vw,3rem);font-weight:700;text-align:center;margin:12px 0 6px}
+.sub{text-align:center;color:var(--text2);font-size:0.98rem;margin-bottom:26px}
+.sub b{color:var(--gold)}
+
+/* 模式切换 */
+.modes{display:flex;gap:8px;justify-content:center;margin-bottom:20px}
+.mode-btn{padding:9px 20px;border:1px solid var(--border);background:var(--card);color:var(--text2);border-radius:22px;cursor:pointer;font-family:inherit;font-size:0.9rem;transition:all .18s;font-weight:600}
+.mode-btn.active{background:var(--gold);color:#F5EFE0;border-color:var(--gold);box-shadow:0 3px 12px rgba(138,104,23,0.28)}
+
+/* 搜索框 */
+.searchbox{display:flex;gap:8px;background:var(--card);border:1.5px solid var(--border);border-radius:14px;padding:6px 6px 6px 18px;box-shadow:0 4px 20px rgba(138,104,23,0.10);transition:border-color .2s}
+.searchbox:focus-within{border-color:var(--gold)}
+.searchbox input{flex:1;border:none;background:transparent;font-size:1.05rem;color:var(--text);font-family:inherit;outline:none;min-width:0}
+.searchbox input::placeholder{color:var(--muted)}
+.go-btn{padding:10px 22px;background:var(--gold);color:#FAF6EC;border:none;border-radius:10px;cursor:pointer;font-family:inherit;font-size:0.95rem;font-weight:600;white-space:nowrap}
+.go-btn:hover{background:var(--gold2)}
+.go-btn:disabled{opacity:.5;cursor:default}
+
+.status{font-size:0.8rem;color:var(--muted);margin:12px 2px;min-height:18px}
+
+/* 栏目筛选 */
+.chips{display:flex;flex-wrap:wrap;gap:7px;margin:14px 0 4px}
+.chip{padding:5px 13px;border:1px solid var(--border);background:var(--card);border-radius:16px;font-size:0.78rem;color:var(--text2);cursor:pointer;transition:all .15s}
+.chip.active{background:var(--gold);color:#F5EFE0;border-color:var(--gold)}
+
+/* 结果 */
+.results{margin-top:18px}
+.res{display:block;background:var(--card);border:1px solid var(--border2);border-left:3px solid var(--gold);border-radius:10px;padding:15px 18px;margin-bottom:11px;transition:transform .12s,box-shadow .2s,border-color .2s}
+.res:hover{transform:translateX(3px);box-shadow:0 4px 16px rgba(138,104,23,0.12);border-left-color:var(--gold2)}
+.res-top{display:flex;align-items:center;gap:9px;margin-bottom:5px;flex-wrap:wrap}
+.res-title{font-size:1.06rem;font-weight:700;color:var(--text)}
+.res-badge{font-size:0.68rem;letter-spacing:0.06em;padding:2px 9px;border-radius:10px;background:var(--surface);color:var(--gold);border:1px solid var(--border2)}
+.res-snip{font-size:0.9rem;color:var(--text2);line-height:1.65}
+.res-snip mark, .ans mark{background:rgba(168,130,51,0.28);color:var(--text);padding:0 1px;border-radius:2px}
+.res-url{font-size:0.72rem;color:var(--muted);margin-top:6px;word-break:break-all}
+.empty{text-align:center;color:var(--muted);padding:40px 10px;font-size:0.95rem}
+
+/* 智能问答 */
+/* 智能问答·基底与密钥来源选择 */
+.ask-controls{display:flex;flex-wrap:wrap;gap:18px;margin:12px 2px 0}
+.ctl-group{display:flex;align-items:center;gap:6px}
+.ctl-label{font-size:0.76rem;color:var(--muted);letter-spacing:0.05em}
+.seg{padding:5px 13px;border:1px solid var(--border);background:var(--card);color:var(--text2);border-radius:14px;cursor:pointer;font-family:inherit;font-size:0.8rem;transition:all .15s}
+.seg.active{background:var(--gold);color:#F5EFE0;border-color:var(--gold)}
+#ownKeyRow{margin:10px 2px 0}
+#ownKeyRow input{width:100%;box-sizing:border-box;padding:9px 13px;border:1px solid var(--border);border-radius:9px;font-family:inherit;font-size:0.88rem;background:#fff;color:var(--text)}
+
+.ask-hint{font-size:0.82rem;color:var(--text2);background:var(--card2);border:1px solid var(--border2);border-radius:10px;padding:11px 15px;margin:14px 0 4px;line-height:1.6}
+.ask-hint b{color:var(--gold)}
+.ans-wrap{margin-top:20px;display:none}
+.ans-wrap.show{display:block}
+.ans-label{font-size:0.72rem;letter-spacing:0.2em;color:var(--gold);text-transform:uppercase;font-weight:600;margin-bottom:8px}
+.ans{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px 22px;font-size:1.02rem;line-height:1.85;white-space:pre-wrap;min-height:40px}
+.think{font-size:0.8rem;color:var(--muted);font-style:italic;margin-bottom:10px;min-height:0}
+.sources{margin-top:16px}
+.sources-label{font-size:0.72rem;letter-spacing:0.16em;color:var(--text2);text-transform:uppercase;font-weight:600;margin-bottom:8px}
+.src{display:block;font-size:0.86rem;padding:8px 13px;background:var(--card2);border:1px solid var(--border2);border-radius:8px;margin-bottom:6px;color:var(--text)}
+.src:hover{border-color:var(--gold)}
+.src .s-badge{font-size:0.66rem;color:var(--gold);margin-right:7px}
+.blink::after{content:"▋";color:var(--gold);animation:bk 1s steps(2) infinite;margin-left:1px}
+@keyframes bk{0%,50%{opacity:1}50.01%,100%{opacity:0}}
+.err{color:#B23B3B;font-size:0.9rem;padding:14px;background:#FBEDED;border:1px solid #E8C4C4;border-radius:10px}
+.foot{text-align:center;color:var(--muted);font-size:0.75rem;margin-top:40px;line-height:1.7}
+
+/* ===== 答后双点击：推荐阅读 / 成文一篇 ===== */
+.askacts{display:none;gap:10px;flex-wrap:wrap;align-items:center;margin-top:16px;padding-top:14px;border-top:1px dashed rgba(138,104,23,0.35)}
+.askacts.show{display:flex}
+.actbtn{display:inline-block;font-size:0.85rem;padding:8px 16px;border:1px solid var(--gold,#8A6817);border-radius:8px;color:var(--gold,#8A6817);background:transparent;cursor:pointer;text-decoration:none;letter-spacing:0.02em;font-family:inherit}
+.actbtn:hover{background:rgba(138,104,23,0.08)}
+.actbtn[disabled]{opacity:0.45;cursor:not-allowed}
+.actbtn.solidbtn{background:var(--gold,#8A6817);color:#fff}
+.act-hint{font-size:0.72rem;color:var(--muted,#8a8a8a)}
+#recoBox{margin-top:12px}
+#recoBox .reco-label{font-size:0.78rem;letter-spacing:0.14em;color:var(--gold,#8A6817);margin:6px 0 8px}
+a.reco{display:block;padding:10px 13px;border:1px solid rgba(138,104,23,0.28);border-radius:8px;margin:8px 0;text-decoration:none;color:inherit}
+a.reco:hover{border-color:var(--gold,#8A6817);background:rgba(138,104,23,0.05)}
+a.reco .rt{font-weight:700;font-size:0.92rem}
+a.reco .rw{font-size:0.8rem;color:var(--muted,#8a8a8a);margin-top:3px;line-height:1.55}
+.paper-wrap{display:none;margin-top:20px;padding-top:16px;border-top:1px dashed rgba(138,104,23,0.35)}
+.paper-wrap.show{display:block}
+.paper-prog{display:flex;align-items:center;gap:14px;margin-top:10px}
+.pp-bar{flex:1;height:8px;border-radius:6px;background:rgba(138,104,23,0.14);overflow:hidden}
+.pp-fill{height:100%;width:0;border-radius:6px;background:linear-gradient(90deg,#C9A227,#8A6817);transition:width .45s ease}
+.pp-fill.run{background:linear-gradient(90deg,#C9A227,#8A6817,#C9A227);background-size:200% 100%;animation:pp-slide 1.5s linear infinite}
+@keyframes pp-slide{0%{background-position:0 0}100%{background-position:-200% 0}}
+.pp-num{font-size:0.86rem;color:var(--gold,#8A6817);font-variant-numeric:tabular-nums;white-space:nowrap;min-width:88px;text-align:right}
+.pdf-acts{display:none;gap:10px;margin-top:12px;flex-wrap:wrap;align-items:center}
+.pdf-acts.show{display:flex}
+</style>
+</head>
+<body>
+<nav>
+  <a class="nav-logo" href="/">SDE Universes</a>
+  <div class="nav-right">
+    <a href="/"><span class="zh-only">← 返回首页</span><span class="en-only">← Home</span></a>
+    <div class="lang-toggle">
+      <button class="lang-btn active" id="lz" onclick="setLang('zh')">中</button>
+      <button class="lang-btn" id="le" onclick="setLang('en')">EN</button>
+    </div>
+  </div>
+</nav>
+
+<div class="wrap">
+  <div class="eyebrow">SDE Universes</div>
+  <h1><span class="zh-only">站内搜索</span><span class="en-only">Search</span></h1>
+  <p class="sub">
+    <span class="zh-only">全文索引 <b id="indexN">91,609</b> 条 · 覆盖 <b id="docN">1,145</b> 篇文章与专著</span>
+    <span class="en-only"><b id="indexNe">91,609</b> full-text index entries · <b id="docNe">1,145</b> documents</span>
+  </p>
+
+  <div class="modes">
+    <button class="mode-btn active" id="mKw" onclick="setMode('kw')">
+      <span class="zh-only">🔍 关键词检索</span><span class="en-only">🔍 Keyword</span>
+    </button>
+    <button class="mode-btn" id="mAsk" onclick="setMode('ask')">
+      <span class="zh-only">🧠 智能问答</span><span class="en-only">🧠 Ask SDE</span>
+    </button>
+  </div>
+
+  <!-- ========== Tier 1 关键词 ========== -->
+  <div id="kwPane">
+    <div class="searchbox">
+      <input id="q" type="search" autocomplete="off"
+             placeholder="输入关键词，如：纠缠 / 发生 / 显露 / 自律 / 尼采…">
+      <button class="go-btn" id="goKw" onclick="doSearch()"><span class="zh-only">搜索</span><span class="en-only">Search</span></button>
+    </div>
+    <div class="chips" id="chips"></div>
+    <div class="status" id="kwStatus"></div>
+    <div class="results" id="results"></div>
+  </div>
+
+  <!-- ========== Tier 2 智能问答 ========== -->
+  <div id="askPane" style="display:none">
+    <div class="searchbox">
+      <input id="qa" type="search" autocomplete="off"
+             placeholder="用你自己的话问一个问题，如：SDE 说的‘显露’和结构有什么不同？">
+      <button class="go-btn" id="goAsk" onclick="doAsk()"><span class="zh-only">提问</span><span class="en-only">Ask</span></button>
+    </div>
+    <div class="ask-controls">
+      <div class="ctl-group">
+        <span class="ctl-label"><span class="zh-only">基底</span><span class="en-only">Model</span></span>
+        <button class="seg active" id="vGlm" onclick="setVendor('glm')">GLM-5</button>
+        <button class="seg" id="vDs" onclick="setVendor('ds')">DeepSeek</button>
+      </div>
+      <div class="ctl-group">
+        <span class="ctl-label"><span class="zh-only">密钥</span><span class="en-only">Key</span></span>
+        <button class="seg active" id="kSys" onclick="setKeyMode('sys')"><span class="zh-only">系统</span><span class="en-only">System</span></button>
+        <button class="seg" id="kOwn" onclick="setKeyMode('own')"><span class="zh-only">自带 Key</span><span class="en-only">My key</span></button>
+      </div>
+      <div class="ctl-group">
+        <span class="ctl-label"><span class="zh-only">深度</span><span class="en-only">Depth</span></span>
+        <button class="seg" id="deepBtn" onclick="toggleDeep()"><span class="zh-only">🔬 深度回答</span><span class="en-only">🔬 Deep</span></button>
+        <button class="seg" id="fourBtn" onclick="toggleFour()" style="display:none"><span class="zh-only">四步法</span><span class="en-only">4-step</span></button>
+        <button class="seg" id="triBtn" onclick="toggleTri()"><span class="zh-only">🌀 涌现档 · 每轮三观点</span><span class="en-only">🌀 Three views</span></button>
+      </div>
+    </div>
+    <div id="deepHint" style="display:none;font-size:0.78rem;color:var(--gold);margin:9px 2px 0;line-height:1.6">🔬 深度模式：基底先内化内功写心得，再用 <b>SDE 方法论</b>（六路径→S/D/E→三方程→误差互消→逮先验）做一次有指导性的深入研究，现实问题还会给可执行的「怎么办」。默认<b>单次调用</b>（较慢、较费 token，建议自带 Key）。<br>点「四步法」→ 升级为 <b>S/D/E 四次独立调用</b>的完整误差互消（最深，但慢 4 倍、贵 4 倍，只在要冲满时用）。</div>
+    <div id="emergeHint" style="display:none;font-size:0.78rem;color:var(--gold);margin:8px 2px 0;line-height:1.6">🌀 涌现档：每一轮不再给一篇答案，而是给<b>三个彼此有分歧的观点</b>（写完就停，不许调和——张力要留给碰撞）。问够 2–10 轮后点「二阶碰撞」：系统<b>随机抽三种不同撞法各撞出一个典范</b>，再用创新智商<b>背靠背盲评择优</b>，最后做<b>综合提炼</b>作为论文入口。全程每次调用都装内功＋心得＋方法论；一轮完整涌现约 17–18 次调用，很费 token，建议自带 Key。</div>
+    <div id="ownKeyRow" style="display:none">
+      <input id="userKey" type="password" autocomplete="off" placeholder="填入你的 DeepSeek / 智谱 API Key（仅存本机浏览器，不上传服务器保存）">
+    </div>
+    <div class="ask-hint">
+      <span class="zh-only">🧠 智能问答会先在<b>全站文章与专著</b>里检索相关段落，再由 SDE 基底综合成答案，并在下方给出<b>原文出处</b>。答案由 AI 生成，请对照出处核实。</span>
+      <span class="en-only">Retrieves passages from the site's <b>articles and monographs</b>, then an SDE base model composes an answer with <b>sources</b> below. AI-generated — verify against sources.</span>
+    </div>
+    <div id="turnBar" style="display:none;font-size:0.78rem;color:var(--gold);margin:10px 2px 0;line-height:1.7">
+      <span class="zh-only">🧵 连续问对 · 第 <b id="turnNo">1</b> / 10 轮：每一轮都带着前面几轮的上下文，问题会被一层层逼深。满 2 轮后可「提炼精华」，把整场问对收成万字论文的入口资料。</span>
+      <span class="en-only">🧵 Threaded Q&amp;A · turn <b id="turnNoE">1</b>/10 — each turn carries the earlier ones. After 2 turns you can distill the thread into a paper brief.</span>
+      <b style="cursor:pointer;margin-left:6px;text-decoration:underline" onclick="resetThread()"><span class="zh-only">🧹 清空重来</span><span class="en-only">Reset</span></b>
+    </div>
+    <div id="threadBox" style="display:none;margin-top:16px"></div>
+    <div class="ans-wrap" id="ansWrap">
+      <div class="ans-label"><span class="zh-only">SDE 宇宙的回答</span><span class="en-only">Answer</span></div>
+      <div class="think" id="thinkBar"></div>
+      <div id="sdeExpand" style="font-size:0.75rem;color:var(--muted);margin-bottom:8px;line-height:1.5"></div>
+      <div class="ans" id="ans"></div>
+      <div class="askacts" id="askActs">
+        <button class="actbtn" id="btnReco" onclick="doRecommend()">📖 <span class="zh-only">推荐阅读 · 站内领读</span><span class="en-only">Reading picks</span></button>
+        <button class="actbtn" id="btnEmerge" onclick="doEmerge()">🌀 <span class="zh-only">二阶碰撞 · 三典范择优 → 综合提炼</span><span class="en-only">Collide → 3 paradigms → synthesis</span></button>
+        <button class="actbtn" id="btnDistill" onclick="doDistill()">🧪 <span class="zh-only">提炼精华 · 整场问对 → 论文入口资料</span><span class="en-only">Distill → paper brief</span></button>
+        <button class="actbtn" id="btnPaper" onclick="doPaper()">📝 <span class="zh-only">成文一篇 · 万字论文 → PDF</span><span class="en-only">Write a paper → PDF</span></button>
+        <button class="actbtn" id="btnIq" onclick="doIq()">🎯 <span class="zh-only">创新智商评估 · 五维盲评</span><span class="en-only">Innovation IQ</span></button>
+        <button class="actbtn" id="btnPolish" onclick="doPolish()">🛠 <span class="zh-only">打磨修改 · 目标 135+</span><span class="en-only">Polish → 135+</span></button>
+        <span class="act-hint" style="width:100%"><span class="zh-only">🌀 涌现路线：开「涌现档」→ 连问 2–10 轮（每轮三观点）→「二阶碰撞」三典范择优 → 自动综合提炼 →「成文一篇」。🧵 常规路线：可连问 10 轮，每轮都带着前面的上下文；问够了先「提炼精华」，再「成文一篇」——论文水平主要由这份入口资料决定。</span><span class="en-only">🧵 Up to 10 threaded turns → distill → write. The brief is what lifts the paper.</span></span>
+        <span class="act-hint"><span class="zh-only">「成文一篇」= 两次深度写作 · 约 3–6 分钟 · 建议自带 Key　|　评估约 1 分钟 · 打磨约 4–7 分钟</span><span class="en-only">Paper = 2 deep calls · 3–6 min　|　IQ ≈ 1 min · Polish ≈ 4–7 min</span></span>
+        <span class="act-hint" style="width:100%;margin-top:2px"><span class="zh-only">🎯 与 🛠 默认作用于刚生成的论文；也可 <b style="cursor:pointer;color:var(--gold)" onclick="toggleIqSrc()">粘贴任意一篇文章</b> 来评、来改。</span><span class="en-only">Works on the generated paper, or <b style="cursor:pointer;color:var(--gold)" onclick="toggleIqSrc()">paste your own text</b>.</span></span>
+      </div>
+      <div id="iqSrcRow" style="display:none;margin-top:10px">
+        <textarea id="iqSrc" rows="5" placeholder="把要评估／打磨的文章正文粘贴到这里（留空则用刚生成的论文）。第一行会被当作标题。"
+          style="width:100%;box-sizing:border-box;padding:11px 13px;border:1px solid var(--border);border-radius:9px;font-family:inherit;font-size:0.86rem;line-height:1.7;background:var(--card);color:var(--text);resize:vertical"></textarea>
+      </div>
+      <div id="recoBox"></div>
+      <div class="paper-wrap" id="emergeWrap">
+        <div class="ans-label"><span class="zh-only">二阶碰撞 · 三个候选典范</span><span class="en-only">Second-order collision</span></div>
+        <div class="think" id="emergeStat"></div>
+        <div id="emergeBox"></div>
+        <div class="pdf-acts" id="emergeActs">
+          <button class="actbtn" onclick="doEmerge(true)">🎲 <span class="zh-only">换碰撞方式重来一次</span><span class="en-only">Re-collide</span></button>
+        </div>
+      </div>
+      <div class="paper-wrap" id="briefWrap">
+        <div class="ans-label"><span class="zh-only">论文入口资料 · 整场问对的提炼</span><span class="en-only">Paper brief · distilled from the thread</span></div>
+        <div class="think" id="briefStat"></div>
+        <div class="ans" id="briefBox"></div>
+      </div>
+      <div class="paper-wrap" id="paperWrap">
+        <div class="ans-label"><span class="zh-only">成文一篇 · 基底独立论文</span><span class="en-only">Generated paper</span></div>
+        <div class="think" id="paperStat"></div>
+        <div class="paper-prog" id="paperProg">
+          <div class="pp-bar"><div class="pp-fill" id="ppFill"></div></div>
+          <div class="pp-num"><span id="ppChars">0</span> <span class="zh-only">字</span><span class="en-only">chars</span></div>
+        </div>
+        <div class="pdf-acts" id="pdfActs">
+          <a class="actbtn solidbtn" id="pdfRead" target="_blank" rel="noopener">📄 <span class="zh-only">PDF 在线阅读</span><span class="en-only">Read PDF online</span></a>
+          <a class="actbtn" id="pdfDl">⬇ <span class="zh-only">下载 PDF</span><span class="en-only">Download PDF</span></a>
+        </div>
+      </div>
+      <div class="paper-wrap" id="iqWrap">
+        <div class="ans-label"><span class="zh-only">SDE 创新智商 · 独立盲评</span><span class="en-only">Innovation IQ · blind review</span></div>
+        <div class="think" id="iqStat"></div>
+        <div id="iqCard"></div>
+      </div>
+      <div class="paper-wrap" id="polishWrap">
+        <div class="ans-label"><span class="zh-only">打磨修改稿 · 目标创新智商 135+</span><span class="en-only">Polished draft</span></div>
+        <div class="think" id="polishStat"></div>
+        <div class="paper-prog" id="polishProg">
+          <div class="pp-bar"><div class="pp-fill" id="ppFill2"></div></div>
+          <div class="pp-num"><span id="ppChars2">0</span> <span class="zh-only">字</span><span class="en-only">chars</span></div>
+        </div>
+        <div class="pdf-acts" id="polishActs">
+          <a class="actbtn solidbtn" id="polishRead" target="_blank" rel="noopener">📄 <span class="zh-only">PDF 在线阅读</span><span class="en-only">Read PDF</span></a>
+          <a class="actbtn" id="polishDl">⬇ <span class="zh-only">下载 PDF</span><span class="en-only">Download</span></a>
+          <button class="actbtn" onclick="doIq(true)">🎯 <span class="zh-only">对打磨稿复评</span><span class="en-only">Re-score</span></button>
+        </div>
+      </div>
+      <div class="sources" id="sources"></div>
+
+    </div>
+  </div>
+
+  <!-- ⚙️ 管理设置：页面直接配置基底密钥（免进 Cloudflare） -->
+  <div style="text-align:center;margin-top:34px">
+    <span onclick="toggleAdmin()" style="cursor:pointer;color:var(--muted);font-size:0.74rem;letter-spacing:0.1em">⚙️ <span class="zh-only">管理设置</span><span class="en-only">Admin</span></span>
+  </div>
+  <div id="adminPanel" style="display:none;max-width:440px;margin:14px auto 0;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px">
+    <div style="font-size:0.9rem;color:var(--text);font-weight:700;margin-bottom:3px">智能问答 · 基底与密钥</div>
+    <div id="adminStatus" style="font-size:0.78rem;color:var(--muted);margin-bottom:12px">检查中…</div>
+    <select id="admVendor" style="width:100%;box-sizing:border-box;padding:9px 12px;margin-bottom:8px;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:0.9rem;background:#fff;color:var(--text)cursor:pointer">
+      <option value="deepseek">DeepSeek</option>
+      <option value="kimi">Kimi（月之暗面）</option>
+      <option value="zhipu">智谱 GLM</option>
+      <option value="qwen">千问 Qwen（通义）</option>
+      <option value="minimax">MiniMax</option>
+    </select>
+    <input id="admKey" type="password" autocomplete="off" placeholder="所选基底的 API 密钥"
+      style="width:100%;box-sizing:border-box;padding:9px 12px;margin-bottom:8px;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:0.9rem;background:#fff;color:var(--text)">
+    <input id="admModel" type="text" autocomplete="off" placeholder="模型名（可选，留空用默认）"
+      style="width:100%;box-sizing:border-box;padding:9px 12px;margin-bottom:8px;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:0.9rem;background:#fff;color:var(--text)">
+    <input id="admPass" type="password" autocomplete="off" placeholder="管理口令（首次填写即设定）"
+      style="width:100%;box-sizing:border-box;padding:9px 12px;margin-bottom:8px;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:0.9rem;background:#fff;color:var(--text)margin-bottom:10px">
+    <button onclick="saveKey()" id="admSave"
+      style="width:100%;padding:10px;background:var(--gold);color:#FAF6EC;border:none;border-radius:8px;cursor:pointer;font-family:inherit;font-size:0.92rem;font-weight:600">保存并设为当前基底</button>
+    <div id="admMsg" style="font-size:0.82rem;margin-top:10px;min-height:18px"></div>
+    <div style="font-size:0.7rem;color:var(--muted);margin-top:8px;line-height:1.6">选一个国内大模型作基底，填它的密钥。密钥只存服务端、访客永不接触；首次填写的口令即管理口令，请牢记。所选基底同时供 WDS智能体 使用；设置后访客可零门槛提问，费用计入该密钥。默认模型：DeepSeek=deepseek-chat·Kimi=moonshot-v1-8k·智谱=glm-4-plus·千问=qwen-plus·MiniMax=abab6.5s-chat（不对可在"模型名"改）。</div>
+    <div style="margin-top:16px;border-top:1px solid var(--border2);padding-top:14px">
+      <div style="font-size:0.85rem;color:var(--text);font-weight:600;margin-bottom:6px">🔬 深度档 · 重写心得</div>
+      <div style="font-size:0.72rem;color:var(--muted);margin-bottom:9px;line-height:1.6">心得按基底缓存复用。改了内功或心得字数后，旧心得仍在用；清掉后下次深度提问会按当前设置重写（约 20–40 秒）。需上方管理口令。</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <button onclick="clearReflect('glm')" class="seg">重写 GLM 心得</button>
+        <button onclick="clearReflect('ds')" class="seg">重写 DeepSeek</button>
+        <button onclick="clearReflect('all')" class="seg">全部</button>
+      </div>
+      <div id="clrMsg" style="font-size:0.8rem;margin-top:9px;min-height:16px"></div>
+    </div>
+  </div>
+
+  <div class="foot">
+    <span class="zh-only">显露 · 差异 · 纠缠　|　德麦国际 · SDE Universes</span>
+    <span class="en-only">Show · Difference · Entanglement　|　Demai International</span>
+  </div>
+</div>
+
+<script>
+/* ---------------- 语言 ---------------- */
+function setLang(l){
+  document.body.classList.toggle('en', l==='en');
+  document.documentElement.lang = l==='en'?'en':'zh';
+  document.getElementById('lz').classList.toggle('active', l!=='en');
+  document.getElementById('le').classList.toggle('active', l==='en');
+  try{ localStorage.setItem('sde_lang', l); }catch(e){}
+}
+try{ if(localStorage.getItem('sde_lang')==='en') setLang('en'); }catch(e){}
+
+/* ---------------- 模式切换 ---------------- */
+function setMode(m){
+  var kw = m==='kw';
+  document.getElementById('kwPane').style.display = kw?'block':'none';
+  document.getElementById('askPane').style.display = kw?'none':'block';
+  document.getElementById('mKw').classList.toggle('active', kw);
+  document.getElementById('mAsk').classList.toggle('active', !kw);
+  (kw?document.getElementById('q'):document.getElementById('qa')).focus();
+}
+
+/* ================= Tier 1 前端关键词检索 ================= */
+var MANIFEST=null, CHUNKS=[], shardsLoaded=0, shardsTotal=0, activeSection='';
+
+function esc(s){ return s.replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+fetch('/search/manifest.json?v='+Date.now(),{cache:'no-store'}).then(r=>r.json()).then(m=>{
+  MANIFEST=m;
+  m.docs.forEach(function(d){ d.l=d.t.toLowerCase(); });
+  (function(){
+    var docs = m.counts.docs, chunks = m.counts.chunks;
+    var fmt = function(n){ return Number(n||0).toLocaleString('en-US'); };
+    var set = function(id, v){ var el = document.getElementById(id); if (el) el.textContent = v; };
+    set('indexN', fmt(chunks));
+    set('indexNe', fmt(chunks));
+    set('docN', fmt(docs));
+    set('docNe', fmt(docs));
+  })();
+  // 栏目筛选 chips
+  var ch = document.getElementById('chips');
+  var all = document.createElement('span');
+  all.className='chip active'; all.textContent='全部 '+m.counts.docs;
+  all.onclick=()=>{ activeSection=''; markChip(all); doSearch(); };
+  ch.appendChild(all);
+  m.sections.forEach(s=>{
+    var c=document.createElement('span');
+    c.className='chip'; c.textContent=s.label+' '+s.docs;
+    c.onclick=()=>{ activeSection=s.key; markChip(c); doSearch(); };
+    ch.appendChild(c);
+  });
+  // 后台并行拉全部分片（大栏目在构建端按体积切成多文件，清单在 s.files；无该字段退回 [s.key]）
+  var shardFiles=[];
+  m.sections.forEach(s=>{ (s.files||[s.key]).forEach(f=>shardFiles.push(f)); });
+  shardsTotal = shardFiles.length;
+  shardFiles.forEach(fn=>{
+    fetch('/search/shard-'+fn+'.json?v='+Date.now(),{cache:'no-store'}).then(r=>r.json()).then(d=>{
+      for(var i=0;i<d.chunks.length;i++){ d.chunks[i].l=d.chunks[i].t.toLowerCase(); CHUNKS.push(d.chunks[i]); }
+      shardsLoaded++;
+      updateLoadStatus();
+      var q=document.getElementById('q').value.trim();
+      if(q) doSearch();               // 新分片到位后重跑当前查询
+    }).catch(()=>{ shardsLoaded++; updateLoadStatus(); });
+  });
+}).catch(e=>{
+  document.getElementById('kwStatus').textContent='索引加载失败，请刷新重试。';
+});
+
+function markChip(el){
+  document.querySelectorAll('#chips .chip').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+}
+function updateLoadStatus(){
+  var st=document.getElementById('kwStatus');
+  if(shardsLoaded<shardsTotal){
+    st.textContent='全文索引载入中… '+shardsLoaded+'/'+shardsTotal+'（标题已可搜）';
+  } else if(!document.getElementById('q').value.trim()){
+    st.textContent='索引就绪 · 共 '+(MANIFEST?MANIFEST.counts.chunks:0)+' 段可检索。';
+  }
+}
+
+function highlight(text, terms){
+  var out=esc(text);
+  terms.forEach(t=>{
+    if(!t) return;
+    var re=new RegExp('('+t.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','gi');
+    out=out.replace(re,'<mark>$1</mark>');
+  });
+  return out;
+}
+
+/* 查询分析：中文连写没有空格分词，整串 indexOf 就是"完全匹配"病根。
+   拆法与 worker 侧 retrieve 同一路数：中文连续段→二元组(bigram)软匹配，
+   拉丁/数字→整词；runs 保留用户可见词段，用于整段短语加分与高亮。 */
+function analyzeQuery(raw){
+  var runs=[], keys=[], seen={};
+  function addKey(k){ if(k && !seen[k]){ seen[k]=1; keys.push(k); } }
+  raw.toLowerCase().split(/\s+/).forEach(function(tok){
+    if(!tok) return;
+    var zh=tok.match(/[\u4e00-\u9fff]+/g)||[];
+    var la=tok.match(/[a-z0-9][a-z0-9.\-]*/g)||[];
+    zh.forEach(function(run){
+      if(run.length>=2){ runs.push(run); for(var i=0;i+2<=run.length;i++) addKey(run.slice(i,i+2)); }
+      else addKey(run);
+    });
+    la.forEach(function(w){ runs.push(w); addKey(w); });
+  });
+  return { runs:runs, keys:keys, full:raw.toLowerCase() };
+}
+function countCap(hay, key, cap){ // 出现次数，封顶 cap（防单块刷屏）
+  var n=0, p=hay.indexOf(key);
+  while(p>=0 && n<cap){ n++; p=hay.indexOf(key, p+key.length); }
+  return n;
+}
+/* 软打分：覆盖率(命中了多少个查询要素)是主信号，词频是次信号，
+   整段/整串连续命中给短语加分。返回 0 表示噪声级、应丢弃。 */
+function softScore(lowerText, Q){
+  var hitKeys=0, tf=0;
+  for(var i=0;i<Q.keys.length;i++){
+    var n=countCap(lowerText, Q.keys[i], 3);
+    if(n){ hitKeys++; tf+=n; }
+  }
+  if(!hitKeys) return 0;
+  var coverage=hitKeys/Q.keys.length;
+  var sc=tf*(0.25+0.75*coverage);
+  for(var j=0;j<Q.runs.length;j++){ if(Q.runs[j].length>=2 && lowerText.indexOf(Q.runs[j])>=0) sc+=3; }
+  if(Q.full.length>=2 && lowerText.indexOf(Q.full)>=0) sc+=8;
+  return sc<0.9 ? 0 : sc; // 噪声地板：孤零零一个二元组蹭一下不算命中
+}
+
+function doSearch(){
+  if(!MANIFEST) return;
+  var raw=document.getElementById('q').value.trim();
+  var box=document.getElementById('results');
+  if(!raw){ box.innerHTML=''; updateLoadStatus(); return; }
+  var Q=analyzeQuery(raw);
+  if(!Q.keys.length){ box.innerHTML=''; updateLoadStatus(); return; }
+
+  // 按 doc 聚合：{title, best, total, bestText}
+  var byDoc={};
+  function docOk(di){ return !activeSection || MANIFEST.docs[di].s===activeSection; }
+  function ent(di){ return byDoc[di]||(byDoc[di]={title:0,best:0,total:0,bestText:''}); }
+
+  // 标题命中（强加权：标题短，命中即高相关）
+  MANIFEST.docs.forEach(d=>{
+    if(!docOk(d.i)) return;
+    var s=softScore(d.l||d.t.toLowerCase(), Q);
+    if(s) ent(d.i).title = s*6;
+  });
+
+  // 正文块命中（软匹配，不再要求整串连续出现）
+  for(var i=0;i<CHUNKS.length;i++){
+    var ck=CHUNKS[i]; var di=ck.d;
+    if(!docOk(di)) continue;
+    var sc=softScore(ck.l||ck.t.toLowerCase(), Q);
+    if(!sc) continue;
+    var e=ent(di);
+    e.total+=sc;
+    if(sc>e.best){ e.best=sc; e.bestText=ck.t; }
+  }
+
+  /* 排序键 = 标题分 + 最佳块 + 0.35×其余块（封顶4×最佳，防大部头以量取胜） */
+  var hits=Object.keys(byDoc).map(function(k){
+    var e=byDoc[k];
+    var rest=Math.min(Math.max(e.total-e.best,0), e.best*4);
+    return { di:+k, rank:e.title+e.best+0.35*rest, best:e.bestText };
+  }).filter(h=>h.rank>0).sort((a,b)=>b.rank-a.rank).slice(0,40);
+
+  if(!hits.length){
+    box.innerHTML='<div class="empty">没有找到匹配「'+esc(raw)+'」的内容。<br>换个词试试，或到 🧠 智能问答里用整句提问。</div>';
+    document.getElementById('kwStatus').textContent='';
+    return;
+  }
+  var top=hits[0].rank;
+  hits.forEach(h=>{ h.pct=Math.max(1, Math.round(100*h.rank/top)); });
+  document.getElementById('kwStatus').textContent='命中 '+hits.length+' 篇 · 按匹配度排序' +
+      (shardsLoaded<shardsTotal?'（索引仍在载入，结果可能增加）':'');
+
+  var html='';
+  var hlTerms=Q.runs.length?Q.runs:Q.keys;
+  hits.forEach(h=>{
+    var d=MANIFEST.docs[h.di];
+    var label=(MANIFEST.sections.find(s=>s.key===d.s)||{}).label||d.s;
+    var snip=h.best||'';
+    // 把片段窗口对准首个命中词段（找不到整段就退到二元组）
+    if(snip){
+      var sl=snip.toLowerCase(), pos=999999;
+      hlTerms.forEach(t=>{ var p=sl.indexOf(t); if(p>=0&&p<pos)pos=p; });
+      if(pos===999999){ Q.keys.forEach(t=>{ var p=sl.indexOf(t); if(p>=0&&p<pos)pos=p; }); }
+      if(pos>60 && pos<999999){ snip='…'+snip.slice(pos-40); }
+      if(snip.length>200) snip=snip.slice(0,200)+'…';
+    }
+    html+='<a class="res" href="'+esc(d.u)+'">'
+        + '<div class="res-top"><span class="res-title">'+highlight(d.t,hlTerms)+'</span>'
+        + '<span class="res-badge">'+esc(label)+'</span>'
+        + '<span class="res-badge">匹配 '+h.pct+'%</span></div>'
+        + (snip?'<div class="res-snip">'+highlight(snip,hlTerms)+'</div>':'')
+        + '<div class="res-url">'+esc(d.u)+'</div></a>';
+  });
+  box.innerHTML=html;
+}
+
+document.getElementById('q').addEventListener('input', debounce(doSearch, 160));
+document.getElementById('q').addEventListener('keydown', e=>{ if(e.key==='Enter') doSearch(); });
+function debounce(fn,ms){ var t; return function(){ clearTimeout(t); t=setTimeout(fn,ms); }; }
+
+/* ================= Tier 2 智能问答（打 Worker /api/ask） ================= */
+/* ---- 基底 & 密钥来源选择 ---- */
+var vendor='glm', keyMode='sys';
+function setVendor(v){
+  vendor=v;
+  document.getElementById('vGlm').classList.toggle('active', v==='glm');
+  document.getElementById('vDs').classList.toggle('active', v==='ds');
+  try{ localStorage.setItem('sde_ask_vendor', v); var kel=document.getElementById('userKey'), ck=localStorage.getItem(askKeyName(v)); if(ck && kel && !kel.value) kel.value=ck; }catch(e){}
+}
+function setKeyMode(m){
+  keyMode=m;
+  document.getElementById('kSys').classList.toggle('active', m==='sys');
+  document.getElementById('kOwn').classList.toggle('active', m==='own');
+  document.getElementById('ownKeyRow').style.display=(m==='own')?'block':'none';
+  try{ localStorage.setItem('sde_ask_keymode', m); }catch(e){}
+  if(m==='own' && document.getElementById('askPane').style.display!=='none') document.getElementById('userKey').focus();
+}
+/* 深度档默认打开：整条涌现流水线的每一次调用都要装「内功＋心得＋SDE方法论」＝高超智慧。
+   关掉它，十轮问对攒下来的就是裸答，后面碰撞与提炼做得再好也是在沙子上盖楼。
+   仍保留开关：纯查证式的一句话提问不必每次都烧一遍内功。 */
+var deepOn=true, fourOn=false, triOn=false;
+function toggleDeep(){
+  deepOn=!deepOn;
+  document.getElementById('deepBtn').classList.toggle('active', deepOn);
+  document.getElementById('deepHint').style.display=deepOn?'block':'none';
+  var fb=document.getElementById('fourBtn');
+  fb.style.display=deepOn?'inline-block':'none';
+  if(!deepOn){ fourOn=false; fb.classList.remove('active'); }
+}
+function toggleTri(){
+  triOn=!triOn;
+  document.getElementById('triBtn').classList.toggle('active', triOn);
+  if(triOn && !deepOn) toggleDeep();   // 三观点必须在高超智慧档上产出，否则撞不出东西
+  var e=document.getElementById('emergeHint'); if(e) e.style.display=triOn?'block':'none';
+}
+function toggleFour(){
+  fourOn=!fourOn;
+  document.getElementById('fourBtn').classList.toggle('active', fourOn);
+}
+function flashAsk(msg){
+  var wrap=document.getElementById('ansWrap'); wrap.classList.add('show');
+  var ansEl=document.getElementById('ans'); ansEl.className='ans'; ansEl.innerHTML='<div class="err">'+esc(msg)+'</div>';
+  document.getElementById('sources').innerHTML=''; document.getElementById('thinkBar').textContent='';
+}
+/* 与品尝系列/WDS助手共用同一套本地键名：在任何一个智能体填过 Key，其余入口自动获得 */
+function askKeyName(v){ return v==='ds' ? 'sde_ds_key' : 'sde_glm_key'; }
+document.getElementById('userKey').addEventListener('input', function(){ try{ var k=this.value.trim(); localStorage.setItem('sde_user_key', k); localStorage.setItem(askKeyName(vendor), k); }catch(e){} });
+(function restoreAsk(){
+  try{
+    if(localStorage.getItem('sde_ask_vendor')==='ds') setVendor('ds');
+    var kel=document.getElementById('userKey');
+    var uk=localStorage.getItem('sde_user_key'); if(uk) kel.value=uk;
+    if(!kel.value){
+      var ck=localStorage.getItem(askKeyName(vendor));
+      if(!ck){ var ov=(vendor==='ds')?'glm':'ds', ok2=localStorage.getItem(askKeyName(ov)); if(ok2){ setVendor(ov); ck=ok2; } }
+      if(ck){ kel.value=ck; if(!localStorage.getItem('sde_ask_keymode')) setKeyMode('own'); }
+    }
+    if(localStorage.getItem('sde_ask_keymode')==='own') setKeyMode('own');
+  }catch(e){}
+})();
+
+var asking=false, papering=false, lastQ='', lastAns='';
+/* ===== 连续问对（最多十轮）→ 提炼 → 论文入口资料 =====
+   服务端零状态：整场问对存在这个页面的内存里，每次提问原样带上去（body.hist）。
+   刷新即清空，这是刻意的——问对是一次性的思想现场，不做跨会话存储，
+   与「用户 Key 只在本机」是同一条纪律。 */
+var MAXTURNS=10;
+var turns=[];      // [{q,a}] 已完成的轮次
+var brief='';      // 提炼出的《论文入口资料》
+var distilling=false;
+function originQ(){ return turns.length ? turns[0].q : lastQ; }
+/* 上下文预算：最近两轮给全文，更早的逐层压到 500 字。
+   十轮全量塞进去会把单轮的 token 烧光，而真正要保真的永远是最近两轮——
+   更早的轮次，留住它把问题推到哪儿就够了。 */
+function buildHist(full){
+  var out=[];
+  for(var i=0;i<turns.length;i++){
+    var back=turns.length-1-i;
+    var lim = full ? 2600 : (back<2 ? 1600 : 500);
+    out.push({q:turns[i].q, a:(turns[i].a||'').slice(0,lim)});
+  }
+  return out;
+}
+function updateTurnBar(){
+  var bar=document.getElementById('turnBar');
+  if(!bar) return;
+  var n=Math.min(turns.length+1, MAXTURNS);
+  var e1=document.getElementById('turnNo'), e2=document.getElementById('turnNoE');
+  if(e1) e1.textContent=n; if(e2) e2.textContent=n;
+  bar.style.display = turns.length ? 'block' : 'none';
+  var bd=document.getElementById('btnDistill');
+  if(bd) bd.style.display = (turns.length>=2) ? 'inline-flex' : 'none';
+}
+function toggleTurn(i){
+  var e=document.getElementById('turnBody'+i);
+  if(e) e.style.display = (e.style.display==='none' ? 'block' : 'none');
+}
+function renderThread(){
+  var box=document.getElementById('threadBox');
+  var prev=turns.slice(0,-1);
+  if(!prev.length){ box.style.display='none'; box.innerHTML=''; return; }
+  var out='<div class="ans-label"><span class="zh-only">此前的问对 · '+prev.length+' 轮（点标题展开）</span><span class="en-only">Earlier turns · '+prev.length+'</span></div>';
+  for(var i=0;i<prev.length;i++){
+    out+='<div style="border:1px solid var(--border);border-radius:9px;margin-bottom:8px;background:var(--card);overflow:hidden">'
+      +'<div style="padding:10px 13px;cursor:pointer;font-size:0.87rem;font-weight:600;line-height:1.6" onclick="toggleTurn('+i+')">'
+      +'<span style="color:var(--gold)">第 '+(i+1)+' 轮</span> · '+esc(prev[i].q)+'</div>'
+      +'<div id="turnBody'+i+'" style="display:none;padding:0 13px 12px;font-size:0.84rem;line-height:1.85;white-space:pre-wrap;color:var(--muted)">'+esc(prev[i].a||'')+'</div>'
+      +'</div>';
+  }
+  box.innerHTML=out; box.style.display='block';
+}
+function resetThread(){
+  if(turns.length && !confirm('清空这场问对（共 '+turns.length+' 轮）与已提炼的入口资料？')) return;
+  turns=[]; brief=''; lastAns=''; lastQ='';
+  document.getElementById('threadBox').style.display='none';
+  document.getElementById('briefWrap').classList.remove('show');
+  document.getElementById('briefBox').textContent='';
+  document.getElementById('briefStat').textContent='';
+  /* 涌现现场也要一起清：牌堆不清，新题目的第一次碰撞会抽到上一题剩下的那三种撞法 */
+  briefKind='distill'; paradigms=[]; emergeUsed=[];
+  document.getElementById('emergeWrap').classList.remove('show');
+  document.getElementById('emergeActs').classList.remove('show');
+  document.getElementById('emergeBox').innerHTML='';
+  document.getElementById('emergeStat').textContent='';
+  document.getElementById('ansWrap').classList.remove('show');
+  document.getElementById('askActs').classList.remove('show');
+  updateTurnBar();
+}
+function doAsk(){
+  if(asking) return;
+  var q=document.getElementById('qa').value.trim();
+  if(!q){ document.getElementById('qa').focus(); return; }
+  var uk=(keyMode==='own')?document.getElementById('userKey').value.trim():'';
+  if(keyMode==='own' && !uk){ document.getElementById('userKey').focus(); flashAsk('请先填入你的 API Key，或切回「系统」。'); return; }
+  if(turns.length>=MAXTURNS){ flashAsk('这场问对已满 '+MAXTURNS+' 轮。请先「提炼精华」成论文入口资料，或「清空重来」。'); return; }
+  asking=true;
+  lastQ=q; lastAns='';
+  document.getElementById('askActs').classList.remove('show');
+  document.getElementById('recoBox').innerHTML='';
+  document.getElementById('paperWrap').classList.remove('show');
+  document.getElementById('pdfActs').classList.remove('show');
+  var goBtn=document.getElementById('goAsk'); goBtn.disabled=true;
+  var wrap=document.getElementById('ansWrap'); wrap.classList.add('show');
+  var ansEl=document.getElementById('ans'); ansEl.className='ans blink'; ansEl.textContent='';
+  var thinkEl=document.getElementById('thinkBar'); thinkEl.textContent='';
+  if(deepOn) thinkEl.textContent='🔬 内功提智·深度作答中（首次每个基底要先写心得，约 20–40 秒）…';
+  var srcEl=document.getElementById('sources'); srcEl.innerHTML='';
+  document.getElementById('sdeExpand').textContent='';
+  var acc='', thinkChars=0;
+
+  fetch('/api/ask',{
+    method:'POST',
+    headers:{'content-type':'application/json'},
+    body:JSON.stringify(Object.assign({q:q,vendor:vendor}, turns.length?{hist:buildHist(false)}:{}, uk?{key:uk}:{}, deepOn?{deep:true}:{}, (deepOn&&fourOn)?{four:true}:{}, triOn?{tri:true}:{}))
+  }).then(resp=>{
+    if(!resp.ok && resp.status!==200){
+      return resp.text().then(t=>{ throw new Error('HTTP '+resp.status+' '+t.slice(0,200)); });
+    }
+    var reader=resp.body.getReader(), dec=new TextDecoder(), buf='';
+    function pump(){
+      return reader.read().then(({done,value})=>{
+        if(done){ finishAsk(ansEl); return; }
+        buf+=dec.decode(value,{stream:true});
+        var lines=buf.split('\n'); buf=lines.pop();
+        for(var i=0;i<lines.length;i++){
+          var s=lines[i].trim();
+          if(!s || !s.startsWith('data:')) continue;
+          var payload=s.slice(5).trim();
+          if(payload==='[DONE]'){ continue; }
+          var j; try{ j=JSON.parse(payload); }catch(e){ continue; }
+          if(j.t==='token'){ acc+=j.v; lastAns=acc; ansEl.textContent=acc; }
+          else if(j.t==='status'){ thinkEl.textContent=j.v; }
+          else if(j.t==='think'){ thinkChars+=(j.v||'').length; thinkEl.textContent='🧠 深度思考中（'+thinkChars+' 字）…'; }
+          else if(j.t==='sources'){ renderSources(j.v); }
+          else if(j.t==='expand'){ document.getElementById('sdeExpand').textContent='🧭 SDE 词义检索：'+j.v; }
+          else if(j.t==='error'){ ansEl.className='ans'; ansEl.innerHTML='<div class="err">'+esc(j.v)+'</div>'; if(j.code==='use_own_key'){ setKeyMode('own'); } }
+        }
+        return pump();
+      });
+    }
+    return pump();
+  }).catch(e=>{
+    ansEl.className='ans';
+    ansEl.innerHTML='<div class="err">请求失败：'+esc(e.message||String(e))+'</div>';
+  }).finally(()=>{
+    asking=false; goBtn.disabled=false;
+    document.getElementById('thinkBar').textContent='';
+  });
+}
+function finishAsk(ansEl){
+  ansEl.className='ans';
+  if(lastAns && lastAns.length>60){
+    document.getElementById('askActs').classList.add('show');
+    /* 本轮入档：只有真答出来的才算一轮，报错/空答不占轮次 */
+    turns.push({q:lastQ, a:lastAns});
+    renderThread(); updateTurnBar();
+  }
+}
+
+/* ===== 答后点击①：推荐阅读（链接全部来自服务端校验过的真实站内目录） ===== */
+function doRecommend(){
+  if(!lastQ || !lastAns) return;
+  var btn=document.getElementById('btnReco'); btn.disabled=true;
+  var box=document.getElementById('recoBox');
+  box.innerHTML='<div class="reco-label">📖 领读中…（基底正在从站内目录里为你挑选）</div>';
+  var uk=(keyMode==='own')?document.getElementById('userKey').value.trim():'';
+  fetch('/api/ask',{
+    method:'POST',
+    headers:{'content-type':'application/json'},
+    body:JSON.stringify(Object.assign({mode:'recommend',q:lastQ,ans:lastAns.slice(0,1500),vendor:vendor}, uk?{key:uk}:{}))
+  }).then(r=>r.json()).then(j=>{
+    var items=(j&&j.items)||[];
+    if(!items.length){ box.innerHTML='<div class="reco-label">站内暂未检索到值得推荐的相关篇目。</div>'; return; }
+    var out='<div class="reco-label">📖 推 荐 阅 读 · 点 击 进 入</div>';
+    items.forEach(function(it,ix){
+      out+='<a class="reco" href="'+esc(it.u)+'" target="_blank" rel="noopener">'
+        +'<div class="rt">'+(ix+1)+' · '+esc(it.t)+' <span class="s-badge">'+esc(it.b||'')+'</span></div>'
+        +(it.why?'<div class="rw">'+esc(it.why)+'</div>':'')
+        +'</a>';
+    });
+    box.innerHTML=out;
+  }).catch(e=>{
+    box.innerHTML='<div class="reco-label">推荐失败：'+esc(e.message||String(e))+'</div>';
+  }).finally(()=>{ btn.disabled=false; });
+}
+
+/* ===== 答后点击②：提炼精华（整场问对 → 论文入口资料）=====
+   这是整条产线的枢纽。十轮问对如果直接丢给成文，基底只会挑最后一轮扩写；
+   先收成一份带栏目的入口资料（承重命题、分离点、未交手的最近邻、张力、证据等级），
+   成文那一步才有一份能逐条兑现的清单，而不是一段情绪饱满的底稿。 */
+function doDistill(){
+  if(asking || papering || distilling) return;
+  if(turns.length<2){ flashAsk('至少完成两轮问对，再提炼。'); return; }
+  var uk=(keyMode==='own')?document.getElementById('userKey').value.trim():'';
+  if(keyMode==='own' && !uk){ document.getElementById('userKey').focus(); flashAsk('请先填入你的 API Key，或切回「系统」。'); return; }
+  distilling=true;
+  var btn=document.getElementById('btnDistill'); btn.disabled=true;
+  var wrap=document.getElementById('briefWrap'); wrap.classList.add('show');
+  var stat=document.getElementById('briefStat');
+  var box=document.getElementById('briefBox'); box.textContent=''; box.className='ans blink';
+  stat.textContent='🧪 正在把 '+turns.length+' 轮问对提炼成论文入口资料（约 40–90 秒）…';
+  var acc='';
+  fetch('/api/ask',{
+    method:'POST',
+    headers:{'content-type':'application/json'},
+    body:JSON.stringify(Object.assign({mode:'distill',q:originQ(),hist:buildHist(true),vendor:vendor}, uk?{key:uk}:{}))
+  }).then(function(resp){
+    if(!resp.ok && resp.status!==200){ return resp.text().then(function(t){ throw new Error('HTTP '+resp.status+' '+t.slice(0,180)); }); }
+    var reader=resp.body.getReader(), dec=new TextDecoder(), buf='';
+    return new Promise(function(resolve,reject){
+      function pump(){
+        reader.read().then(function(r){
+          if(r.done){ resolve(); return; }
+          buf+=dec.decode(r.value,{stream:true});
+          var lines=buf.split('\n'); buf=lines.pop();
+          for(var i=0;i<lines.length;i++){
+            var s=lines[i].trim();
+            if(!s || !s.startsWith('data:')) continue;
+            var payload=s.slice(5).trim();
+            if(payload==='[DONE]') continue;
+            var j; try{ j=JSON.parse(payload); }catch(e){ continue; }
+            if(j.t==='token'){ acc+=j.v; box.textContent=acc; }
+            else if(j.t==='status'){ stat.textContent=j.v; }
+            else if(j.t==='think'){ stat.textContent='🧠 提炼中·深度思考…'; }
+            else if(j.t==='error'){ reject(new Error(j.v||'基底返回错误')); return; }
+          }
+          pump();
+        }).catch(reject);
+      }
+      pump();
+    });
+  }).then(function(){
+    box.className='ans';
+    brief=acc.trim(); briefKind='distill';
+    if(brief.length<300){ stat.textContent='⚠ 提炼产出过短（'+brief.length+' 字），请重试；本次不作为论文入口。'; brief=''; return; }
+    stat.textContent='✓ 论文入口资料已就绪（'+brief.length+' 字，出自 '+turns.length+' 轮问对）· 现在点「成文一篇」，论文将以它为起点逐条兑现。';
+  }).catch(function(e){
+    box.className='ans';
+    stat.textContent='✗ 提炼失败：'+(e.message||String(e));
+  }).finally(function(){
+    distilling=false; btn.disabled=false;
+  });
+}
+
+/* ===== 答后点击②：成文一篇（两段续写 · 最高提智）→ PDF 在线阅读 / 下载 ===== */
+var paperAll='';
+/* 成文一篇与打磨修改共用这台两段续写机：状态行、进度条、字数计都按 GEN_* 切换目标元素，
+   不许再把 'paperStat' 写死——写死的那一版会让打磨稿的进度打在成文稿的状态行上。 */
+var GEN_STAT='paperStat', GEN_FILL='ppFill', GEN_CHARS='ppChars';
+function genTarget(stat, fill, chars){ GEN_STAT=stat; GEN_FILL=fill; GEN_CHARS=chars; }
+function streamPaper(part, extra){
+  var uk=(keyMode==='own')?document.getElementById('userKey').value.trim():'';
+  var stat=document.getElementById(GEN_STAT);
+  return fetch('/api/ask',{
+    method:'POST',
+    headers:{'content-type':'application/json'},
+    body:JSON.stringify(Object.assign({mode:(extra&&extra.gmode)||'paper',part:part,q:originQ(),vendor:vendor}, uk?{key:uk}:{}, extra||{}))
+  }).then(function(resp){
+    if(!resp.ok && resp.status!==200){
+      return resp.text().then(function(t){ throw new Error('HTTP '+resp.status+' '+t.slice(0,180)); });
+    }
+    var reader=resp.body.getReader(), dec=new TextDecoder(), buf='', pacc='', thinkChars=0;
+    return new Promise(function(resolve,reject){
+      function pump(){
+        reader.read().then(function(r){
+          if(r.done){ resolve(pacc); return; }
+          buf+=dec.decode(r.value,{stream:true});
+          var lines=buf.split('\n'); buf=lines.pop();
+          for(var i=0;i<lines.length;i++){
+            var s=lines[i].trim();
+            if(!s || !s.startsWith('data:')) continue;
+            var payload=s.slice(5).trim();
+            if(payload==='[DONE]') continue;
+            var j; try{ j=JSON.parse(payload); }catch(e){ continue; }
+            if(j.t==='token'){ pacc+=j.v; setProg(paperAll.length+pacc.length); }
+            else if(j.t==='status'){ stat.textContent=j.v; }
+            else if(j.t==='think'){ thinkChars+=(j.v||'').length; stat.textContent='🧠 第'+(part===1?'一':'二')+'段·深度思考中（'+thinkChars+' 字）…'; }
+            else if(j.t==='error'){ reject(new Error(j.v||'基底返回错误')); return; }
+          }
+          pump();
+        }).catch(reject);
+      }
+      pump();
+    });
+  });
+}
+/* 进度条：万字论文的总长事先并不知道，所以生成中走不确定态（跑马条 + 真实字数），
+   只在完成时才给确定的 100%。假装知道进度的进度条是骗人的。 */
+function setProg(chars, running){
+  var f=document.getElementById(GEN_FILL), n=document.getElementById(GEN_CHARS);
+  if(!f||!n) return;
+  n.textContent=(chars||0).toLocaleString();
+  if(running){ f.classList.add('run'); f.style.width='100%'; }
+  else { f.classList.remove('run'); f.style.width='100%'; }
+}
+/* 上/下半篇各带一次自动重试。万字论文要跑两次调用，任一次网络抖动或基底空转，
+   都会让另一半白写。旧版只给上半篇做了长度守卫：下半篇返回空串时会被静默拼成
+   「✓ 全文完成」，PDF 里只有上半篇——读者看不出少了第二轴、可裁决判据、证伪条件
+   与参考文献，拿去评阅就是按半篇打分。宁可重试一次、宁可在封面上写「未完成稿」，
+   也不许悄悄交半篇。 */
+function paperHalf(part, extra, minLen, label, attempt){
+  attempt = attempt || 1;
+  var stat=document.getElementById(GEN_STAT);
+  return streamPaper(part, extra).then(function(txt){
+    var c=String(txt||'').replace(/〔上半篇完·待续〕\s*$/,'').replace(/〔全文完〕\s*$/,'').trim();
+    if(c.length>=minLen || attempt>=2) return c;
+    stat.textContent='… '+label+'产出过短（'+c.length+' 字），基底可能中断，正在重试…';
+    return paperHalf(part, extra, minLen, label, attempt+1);
+  }, function(err){
+    if(attempt>=2) throw err;
+    stat.textContent='… '+label+'出错（'+((err&&err.message)||err)+'），正在重试…';
+    return paperHalf(part, extra, minLen, label, attempt+1);
+  });
+}
+function doPaper(){
+  if(papering || asking) return;
+  if(!lastQ || !lastAns){ flashAsk('请先完成一次问答再成文。'); return; }
+  var uk=(keyMode==='own')?document.getElementById('userKey').value.trim():'';
+  if(keyMode==='own' && !uk){ document.getElementById('userKey').focus(); flashAsk('请先填入你的 API Key，或切回「系统」。'); return; }
+  papering=true;
+  genTarget('paperStat','ppFill','ppChars');
+  var btn=document.getElementById('btnPaper'); btn.disabled=true;
+  var wrap=document.getElementById('paperWrap'); wrap.classList.add('show');
+  document.getElementById('pdfActs').classList.remove('show');
+  var stat=document.getElementById('paperStat');
+  paperAll=''; setProg(0, true);
+  var halfOnly=false;
+  stat.textContent='📝 上半篇写作中（内功+心得已装载，万字长文分两段完成，请勿关闭页面）…';
+  /* 有入口资料就以它为起点（清单式），没有就退回单轮底稿（老路径不变） */
+  var qlist=turns.map(function(t,i){ return (i+1)+'. '+t.q; }).join('\n').slice(0,900);
+  var seed1 = brief ? {seed:lastAns.slice(0,1200), brief:brief.slice(0,9000), qlist:qlist, briefKind:briefKind} : {seed:lastAns.slice(0,3500)};
+  paperHalf(1,seed1,600,'上半篇').then(function(p1c){
+    if(p1c.length<600) throw new Error('上半篇产出过短（'+p1c.length+' 字），重试一次后仍未成功，请稍后再点一次。');
+    paperAll=p1c+'\n\n';
+    setProg(paperAll.length, true);
+    var cut=p1c.indexOf('【一、');
+    var head=(cut>80?p1c.slice(0,cut):p1c.slice(0,1200)).slice(0,1200);
+    var tail=p1c.slice(-1000);
+    stat.textContent='📝 下半篇续写中（含第二轴、可裁决判据、证伪条件与参考文献）…';
+    /* 下半篇彻底失败也不丢上半篇：拿空串继续，由 halfOnly 一路标到 PDF 封面上 */
+    var seed2 = {seed:lastAns.slice(0,1500),head:head,tail:tail};
+    if(brief) seed2.brief=brief.slice(0,5000);
+    return paperHalf(2,seed2,1200,'下半篇').catch(function(){ return ''; });
+  }).then(function(p2c){
+    halfOnly=(String(p2c||'').length<1200);
+    var full=(paperAll+p2c).trim();
+    paperAll=full;
+    setProg(full.length, true);
+    stat.textContent=(halfOnly?'⚠ 下半篇两次均未生成，正在按「未完成稿」排版 PDF':'🖨 论文完成（'+full.length+' 字）· 正在排版 PDF')+'（约 10–25 秒）…';
+    return buildPdf(full, halfOnly);
+  }).then(function(){
+    setProg(paperAll.length, false);
+    stat.textContent = halfOnly
+      ? '⚠ 仅上半篇完成 · '+paperAll.length+' 字 · 本稿缺第二轴与二维辨别格、可裁决判据、证伪条件、结语与参考文献，PDF 首页已标注「未完成稿」。请再点一次「成文一篇」。'
+      : '✓ 全文完成 · '+paperAll.length+' 字 · PDF 已就绪，可在线阅读或下载。';
+  }).catch(function(e){
+    setProg(paperAll.length, false);
+    stat.textContent='✗ '+(e.message||String(e));
+  }).finally(function(){
+    papering=false; btn.disabled=false;
+  });
+}
+function loadHtml2pdf(){
+  return new Promise(function(res,rej){
+    if(window.html2pdf) return res();
+    var s=document.createElement('script');
+    s.src='https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
+    s.onload=function(){ res(); };
+    s.onerror=function(){ rej(new Error('PDF 引擎加载失败（网络原因），正文仍可直接阅读')); };
+    document.head.appendChild(s);
+  });
+}
+/* ===== Markdown 兜底（排版v3）=====
+   基底偶尔会吐 Markdown（下半篇尤其明显：# 标题、**加粗**、|竖线表格|、--- 分隔线）。
+   旧渲染器只认【】与「一、」两种标题，其余一律当正文 esc 掉，于是这些标记原样印进了 PDF。
+   规程 v2 已在 system prompt 里禁用 Markdown；这里再补一层「不信任模型输出」的兜底：
+   ① 分隔线与表格分隔行整行丢弃；② # / ** / __ / <br> / | 就地归一；③ # 开头与 4.1 式编号都算标题。
+   三个函数刻意做成顶层具名函数，好让 tools/sim_paper_pdf_render.js 抠出来单测。 */
+function mdSkip(L){
+  return /^\s*(-{3,}|\*{3,}|_{3,})\s*$/.test(L) || /^\|[\s:|.-]*\|$/.test(L);
+}
+function mdClean(L){
+  return String(L)
+    .replace(/^\s*#{1,6}\s*/,'')
+    .replace(/\*\*(.+?)\*\*/g,'$1').replace(/__(.+?)__/g,'$1')
+    .replace(/<br\s*\/?>/gi,' ')
+    .replace(/^\s*\|\s*/,'').replace(/\s*\|\s*$/,'').replace(/\s*\|\s*/g,' ｜ ')
+    .replace(/\*\*/g,'').replace(/\s+/g,' ')
+    .replace(/([\u4e00-\u9fa5，。；：、「」『』——])\s+(?=[\u4e00-\u9fa5])/g,'$1')
+    .trim();
+}
+function isPaperHead(raw,L){
+  if(/^\s*#{1,6}\s/.test(raw)) return true;
+  if(/^【[^】]{1,14}】/.test(L)) return true;
+  if(/^[一二三四五六七八九十]{1,3}、/.test(L)) return true;
+  if(L.length<=40 && /^\d{1,2}(\.\d{1,2}){1,2}[\s　]*\S/.test(L)) return true;
+  return false;
+}
+function buildPdf(text, halfOnly, opt){
+  opt = opt || {};
+  var _eyebrow = opt.eyebrow || 'SDE UNIVERSES · 智 能 问 对 · 成 文 一 篇';
+  var _fnTag = opt.fnTag || 'paper';
+  var _readId = opt.readId || 'pdfRead', _dlId = opt.dlId || 'pdfDl', _actsId = opt.actsId || 'pdfActs';
+  return loadHtml2pdf().then(function(){
+    var lines=text.split('\n');
+    var title=(lines[0]||'成文一篇').trim().replace(/^[#＃\s]+/,'').slice(0,64)||'成文一篇';
+    /* 藏与渲染必须分两层：html2pdf 会把 from() 元素连内联样式一起克隆，
+       若把 left:-10000px 写在元素自身上，克隆体在渲染窗口里仍在屏外，
+       html2canvas 画出来就是整页空白（即「PDF 无内容」的病根）。
+       第二课（07-17）：html2canvas 的画布平移是 translate(-x+scrollX, -y+scrollY)，
+       x/y 取活文档里 html2pdf 容器的视口坐标（容器在全屏 overlay 里水平居中），
+       内容却按克隆 iframe 的布局来画。旧配置 windowWidth:794 让克隆视口≠真实视口，
+       居中偏移对不上 → 左边被切掉 (视口宽-794)/2 像素；scrollY 默认取页面滚动量，
+       而容器是 fixed 的根本没滚 → 内容整体下移一屏多 → 前几页空白、论文结尾掉出画布。
+       解法：scrollX/scrollY 归零 + 不设 windowWidth（克隆视口=真实视口，几何对称抵消）。 */
+    var wrap=document.createElement('div');
+    wrap.style.cssText='position:fixed;left:-10000px;top:0;width:794px;overflow:hidden;pointer-events:none';
+    var el=document.createElement('div');
+    el.style.cssText='width:794px;box-sizing:border-box;padding:52px 58px;background:#ffffff;color:#1a1a1a;font-family:"Noto Serif SC","Songti SC","SimSun",serif;line-height:1.92;font-size:14px';
+    var inner='<div style="font-size:10px;letter-spacing:0.32em;color:#8A6817;margin-bottom:14px">'+esc(_eyebrow)+'</div>'
+      +'<div style="font-size:22px;font-weight:800;line-height:1.5;margin-bottom:10px;color:#1E1A10">'+esc(title)+'</div>'
+      +'<div style="font-size:11px;color:#6b5e44;border-bottom:2px solid #B5860F;padding-bottom:12px;margin-bottom:18px">SDE 基底独立成文 · '+new Date().toLocaleDateString('zh-CN')+' · 缘起之问：'+esc(originQ().slice(0,64))+(turns.length>1?('（'+turns.length+' 轮问对提炼）'):'')+' · 排版v3</div>';
+    if(halfOnly){
+      inner+='<div style="border:1.5px solid #B23B2E;background:#FDF3F1;color:#8E2C22;padding:10px 13px;margin-bottom:18px;font-size:12px;line-height:1.75">⚠ 未完成稿 · 下半篇生成中断，本稿只有上半篇。缺：第二轴与二维辨别格、可裁决判据、证伪条件、结语与参考文献。请勿按完整论文评阅或引用。</div>';
+    }
+    for(var i=1;i<lines.length;i++){
+      var raw=lines[i].trim();
+      if(!raw || mdSkip(raw)) continue;
+      var L=mdClean(raw);
+      if(!L) continue;
+      if(isPaperHead(raw,L)){
+        inner+='<div style="font-size:16px;font-weight:800;margin:18px 0 8px;padding-left:9px;border-left:3.5px solid #B5860F;color:#1E1A10;page-break-inside:avoid">'+esc(L)+'</div>';
+      } else {
+        inner+='<p style="text-indent:2em;text-align:justify;margin:0 0 9px;page-break-inside:avoid">'+esc(L)+'</p>';
+      }
+    }
+    el.innerHTML=inner;
+    wrap.appendChild(el);
+    document.body.appendChild(wrap);
+    var fn='SDE-'+_fnTag+'-'+new Date().toISOString().slice(0,10)+'.pdf';
+    return html2pdf().set({
+      margin:[13,0,15,0],
+      filename:fn,
+      image:{type:'jpeg',quality:0.92},
+      html2canvas:{scale:2,useCORS:true,scrollX:0,scrollY:0},
+      jsPDF:{unit:'mm',format:'a4',orientation:'portrait'},
+      pagebreak:{mode:['css','legacy']}
+    }).from(el).toContainer().then(function(){
+      /* v2 保险杠：html2pdf 的渲染容器默认在全屏 overlay 里水平居中，
+         活文档与克隆文档各按各的视口宽算"居中"，视口一不同就左右错位。
+         把容器钉在 (0,0) 后，活/克隆两侧坐标恒为 0，裁剪原点与内容原点
+         无条件重合——与视口宽、滚动条、系统缩放全部无关。
+         内联样式会随克隆一起复制，故只需改这一处活容器。 */
+      var cs=document.querySelectorAll('.html2pdf__container');
+      var c=cs[cs.length-1];
+      if(c){ c.style.left='0'; c.style.right='auto'; c.style.margin='0'; }
+    }).outputPdf('blob').then(function(blob){
+      document.body.removeChild(wrap);
+      var u=URL.createObjectURL(blob);
+      var r=document.getElementById(_readId); r.href=u;
+      var d=document.getElementById(_dlId); d.href=u; d.download=fn;
+      document.getElementById(_actsId).classList.add('show');
+    }).catch(function(e){
+      if(wrap.parentNode) document.body.removeChild(wrap);
+      throw e;
+    });
+  });
+}
+/* ================= 答后点击③：SDE 创新智商 · 独立盲评 =================
+   三条铁律照搬评分体系源本：
+   ① 不评自己写的文本 —— 来稿一律以「匿名来稿」送评，服务端不告诉评分者它出自谁手；
+      同一基底既写又评时，卡片上必须自报「同基底自评·非独立认证」，不许冒充认证分。
+   ② 综合分由系统算，不由基底手算 —— 源本示范卡把 27+35+26+27+21.75 手写成 138（实为
+      136.75≈137），铁律因此立成「综合分必须脚本算」。下面 iqComposite/pyRound/iqLevel
+      是 scripts/score.py 的逐字复刻，含 Python round() 的银行家舍入（.5 进偶数）：
+      同一组五维分，页面与脚本必须给出同一个数，差一分就是两把尺子。
+   ③ 每维必附一句逐字引自原文的证据句 —— 拿不出证据句的维度分，在卡上标红。 */
+var iqCard=null, iqing=false, polishing=false, polishAll='', iqSrcOpen=false;
+var IQ_W={S:0.20,D:0.25,E:0.20,I:0.20,F:0.15};
+var IQ_LEVELS=[[80,'大众水平（普通人随口可说）'],[100,'受过高校训练（知识总结型）≈ 基底零提示语默认水平'],[110,'专业人士（领域内熟练）'],[125,'高级专家（领域内有独立判断）'],[135,'资深学者'],[145,'优秀的资深学者产出'],[150,'★ 本体论级阈值（SDE 提智达标）'],[155,'混沌碰撞后的典型金点子'],[160,'★ 典范级阈值（双学科诞生）'],[165,'顶级金点子（命名了未被命名的现象）'],[170,'改写学科分界（极少数）'],[175,'文明级发生学']];
+function iqComposite(d){ return d.S*IQ_W.S+d.D*IQ_W.D+d.E*IQ_W.E+d.I*IQ_W.I+d.F*IQ_W.F; }
+function pyRound(x){ var f=Math.floor(x), r=x-f; if(Math.abs(r-0.5)<1e-9) return (f%2===0)?f:f+1; return Math.round(x); }
+function iqLevel(s){ var n=IQ_LEVELS[0][1]; for(var i=0;i<IQ_LEVELS.length;i++){ if(s>=IQ_LEVELS[i][0]) n=IQ_LEVELS[i][1]; else break; } return n; }
+function iqNum(v){ var n=parseInt(v,10); if(!isFinite(n)) return 0; return Math.max(0,Math.min(200,n)); }
+function toggleIqSrc(){
+  iqSrcOpen=!iqSrcOpen;
+  document.getElementById('iqSrcRow').style.display=iqSrcOpen?'block':'none';
+  if(iqSrcOpen) document.getElementById('iqSrc').focus();
+}
+function iqSourceText(){
+  var el=document.getElementById('iqSrc');
+  var t=(el&&el.value||'').trim();
+  return t || polishAll || paperAll || '';
+}
+/* 基底偶尔会在 JSON 外面套一层围栏或寒暄；不信任模型输出，取第一个 { 到最后一个 } */
+function parseIqJson(raw){
+  var s=String(raw||'').replace(/```json/gi,'').replace(/```/g,'').trim();
+  var a=s.indexOf('{'), b=s.lastIndexOf('}');
+  if(a<0||b<=a) throw new Error('评分基底没有返回可解析的评分卡');
+  return JSON.parse(s.slice(a,b+1));
+}
+function iqBar(score, gate){
+  var pct=Math.max(0,Math.min(100,(score-80)/95*100));
+  var col=gate&&score<120?'#B23B2E':(score>=150?'#2E7D32':'#B5860F');
+  return '<div style="height:6px;background:rgba(138,104,23,0.13);border-radius:3px;overflow:hidden;margin-top:5px">'
+    +'<div style="height:100%;width:'+pct.toFixed(1)+'%;background:'+col+'"></div></div>';
+}
+function renderIqCard(j, meta){
+  var dims=['S','D','E','I','F'];
+  var names={S:'S 结构精确度',D:'D 差异锐度',E:'E 纠缠深度',I:'I 不可还原性',F:'F 可证伪性'};
+  var d={}; dims.forEach(function(k){ d[k]=iqNum(j[k]&&j[k].score); });
+  var total=pyRound(iqComposite(d));
+  var nar=null, narTotal=null;
+  if(j.narrow){ nar={}; dims.forEach(function(k){ nar[k]=iqNum(j.narrow[k]); });
+    if(dims.every(function(k){return nar[k]>0;})) narTotal=pyRound(iqComposite(nar)); }
+  var big=(total>=150?'#2E7D32':(total>=135?'#B5860F':'#6b5e44'));
+  var o='<div style="border:1px solid var(--border);border-radius:12px;padding:18px 18px 14px;background:var(--card);margin-top:6px">';
+  o+='<div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;border-bottom:2px solid #B5860F;padding-bottom:10px;margin-bottom:12px">'
+    +'<div style="font-size:2.1rem;font-weight:800;color:'+big+';line-height:1">'+total+'</div>'
+    +'<div style="font-size:0.82rem;color:var(--text2)">'+esc(iqLevel(total))+'</div>'
+    +(narTotal!==null?'<div style="font-size:0.74rem;color:var(--muted);margin-left:auto">收窄口径 '+narTotal+'　·　语料风险敞口 '+(narTotal-total)+' 分</div>':'')+'</div>';
+  if(j.title) o+='<div style="font-size:0.9rem;font-weight:700;margin-bottom:10px">'+esc(String(j.title).slice(0,90))+'</div>';
+  dims.forEach(function(k){
+    var it=j[k]||{}, gate=(k==='I'||k==='F');
+    var ev=String(it.evidence||'').trim();
+    o+='<div style="margin-bottom:11px">'
+      +'<div style="display:flex;justify-content:space-between;font-size:0.83rem"><span>'+names[k]+'<span style="color:var(--muted);font-size:0.72rem">　权重 '+IQ_W[k].toFixed(2)+(gate?' · 闸门':'')+'</span></span>'
+      +'<b style="color:'+(gate&&d[k]<120?'#B23B2E':'inherit')+'">'+d[k]+(nar?'<span style="color:var(--muted);font-weight:400;font-size:0.74rem"> ／收窄 '+nar[k]+'</span>':'')+'</b></div>'
+      +iqBar(d[k],gate)
+      +(it.why?'<div style="font-size:0.78rem;color:var(--text2);margin-top:5px;line-height:1.65">'+esc(String(it.why).slice(0,300))+'</div>':'')
+      +(ev?'<div style="font-size:0.75rem;color:var(--muted);margin-top:3px;line-height:1.6;border-left:2px solid rgba(138,104,23,0.4);padding-left:8px">证据：'+esc(ev.slice(0,220))+'</div>'
+          :'<div style="font-size:0.75rem;color:#B23B2E;margin-top:3px">⚠ 本维未给证据句 —— 按评分铁律，这一维的分不可采信。</div>')
+      +'</div>';
+  });
+  var gateMsg=[];
+  if(d.I<120) gateMsg.push('闸门维 I='+d.I+' &lt;120：一票否决，上不了本体论级（150），再高的 D 也救不回来。');
+  if(d.F<120) gateMsg.push('闸门维 F='+d.F+' &lt;120：一票否决，上不了本体论级（150）。');
+  dims.forEach(function(k){ if(d[k]<120&&k!=='I'&&k!=='F') gateMsg.push('维度 '+k+'='+d[k]+' &lt;120：拖累综合分。'); });
+  if(gateMsg.length) o+='<div style="background:#FDF3F1;border:1px solid #E3B9B2;color:#8E2C22;border-radius:8px;padding:9px 12px;font-size:0.78rem;line-height:1.7;margin:4px 0 12px">⛔ '+gateMsg.join('<br>⛔ ')+'</div>';
+  var nb=(j.neighbors||[]).slice(0,10);
+  if(nb.length){
+    var un=nb.filter(function(x){return !x.handled;}).length;
+    o+='<div style="font-size:0.83rem;font-weight:700;margin:14px 0 6px">敌意最近邻 · 谁已经占了这块地　<span style="font-weight:400;color:'+(un?'#B23B2E':'#2E7D32')+';font-size:0.76rem">'+(un?un+' 位未在正文交手 → 直接压 I':'全部已在正文交手')+'</span></div>';
+    nb.forEach(function(x){
+      o+='<div style="font-size:0.78rem;color:var(--text2);line-height:1.65;margin-bottom:4px">'
+        +(x.handled?'<span style="color:#2E7D32">✓</span> ':'<span style="color:#B23B2E">✗</span> ')
+        +'<b>'+esc(String(x.name||'').slice(0,60))+'</b>：'+esc(String(x.overlap||'').slice(0,200))+'</div>';
+    });
+  }
+  var dd=(j.deductions||[]).slice(0,8);
+  if(dd.length){
+    o+='<div style="font-size:0.83rem;font-weight:700;margin:14px 0 6px">关键扣分（每条都是打磨时要清的账）</div>';
+    dd.forEach(function(x){
+      o+='<div style="font-size:0.78rem;color:var(--text2);line-height:1.65;margin-bottom:6px">'
+        +'<span style="color:var(--gold);font-weight:700">['+esc(String(x.dim||'').slice(0,2))+']</span> '
+        +(x.from&&x.to?'<span style="color:var(--muted)">'+iqNum(x.from)+'→'+iqNum(x.to)+'</span> ':'')
+        +esc(String(x.why||'').slice(0,220))
+        +(x.quote?'<div style="color:var(--muted);border-left:2px solid rgba(178,59,46,0.45);padding-left:8px;margin-top:2px">原文「'+esc(String(x.quote).slice(0,180))+'」</div>':'')
+        +'</div>';
+    });
+  }
+  var up=(j.upgrades||[]).slice(0,8);
+  if(up.length){
+    o+='<div style="font-size:0.83rem;font-weight:700;margin:14px 0 6px">提升路径</div>';
+    up.forEach(function(x){
+      o+='<div style="font-size:0.78rem;color:var(--text2);line-height:1.65;margin-bottom:4px">→ <span style="color:var(--gold);font-weight:700">['+esc(String(x.dim||'').slice(0,2))+']</span> '
+        +esc(String(x.action||'').slice(0,260))+(x.gain?'<span style="color:var(--muted)">（'+esc(String(x.gain).slice(0,20))+'）</span>':'')+'</div>';
+    });
+  }
+  if(j.verdict) o+='<div style="font-size:0.8rem;color:var(--text);line-height:1.7;margin-top:12px;padding-top:10px;border-top:1px dashed rgba(138,104,23,0.35)">'+esc(String(j.verdict).slice(0,400))+'</div>';
+  o+='<div style="font-size:0.71rem;color:var(--muted);line-height:1.7;margin-top:10px">'
+    +'参照语料：'+esc(String(j.corpus||'未声明').slice(0,220))+'<br>'
+    +'评分基底：'+esc(meta.scorer||'—')+'　·　评分日期：'+new Date().toLocaleDateString('zh-CN')+'　·　'
+    +(meta.selfEval?'<b style="color:#B23B2E">同基底自评 · 非独立认证</b>':'独立盲评')
+    +'<br>分数是文本与一片参照语料之间的关系，不是文本的属性；新颖有半衰期，本卡是一张快照，不作认证分使用。</div>';
+  o+='</div>';
+  document.getElementById('iqCard').innerHTML=o;
+  iqCard={raw:j,dims:d,total:total,src:String(meta.src||'').slice(0,120)};
+  return total;
+}
+/* 打磨用的作业单：把评分卡压成一段纯文本喂给基底（卡片是给人看的，这段是给基底看的） */
+function iqCardText(){
+  if(!iqCard) return '';
+  var j=iqCard.raw, d=iqCard.dims;
+  var t='综合分 '+iqCard.total+'（S'+d.S+' D'+d.D+' E'+d.E+' I'+d.I+' F'+d.F+'）· '+iqLevel(iqCard.total)+'\n';
+  ['S','D','E','I','F'].forEach(function(k){ if(j[k]&&j[k].why) t+='['+k+'='+d[k]+'] '+String(j[k].why).slice(0,220)+'\n'; });
+  var un=(j.neighbors||[]).filter(function(x){return !x.handled;});
+  if(un.length){ t+='\n【未在正文交手的占位者——本次必须逐一请进正文指名交手，并各写一句可裁决差异】\n';
+    un.forEach(function(x){ t+='· '+String(x.name||'').slice(0,60)+'：'+String(x.overlap||'').slice(0,200)+'\n'; }); }
+  if((j.deductions||[]).length){ t+='\n【必须逐条清账的扣分记录】\n';
+    j.deductions.forEach(function(x){ t+='· ['+(x.dim||'')+'] 原文「'+String(x.quote||'').slice(0,150)+'」：'+String(x.why||'').slice(0,200)+'\n'; }); }
+  if((j.upgrades||[]).length){ t+='\n【指定提升动作】\n';
+    j.upgrades.forEach(function(x){ t+='· ['+(x.dim||'')+'] '+String(x.action||'').slice(0,260)+'（'+(x.gain||'')+'）\n'; }); }
+  return t;
+}
+function doIq(onPolished){
+  if(iqing||polishing||papering||asking) return;
+  var text=onPolished===true?(polishAll||''):iqSourceText();
+  if(!text || text.length<200){
+    if(!iqSrcOpen) toggleIqSrc();
+    flashAsk('先「成文一篇」，或把要评的文章（至少 200 字）粘贴到下面的框里。'); return;
+  }
+  var uk=(keyMode==='own')?document.getElementById('userKey').value.trim():'';
+  if(keyMode==='own' && !uk){ document.getElementById('userKey').focus(); flashAsk('请先填入你的 API Key，或切回「系统」。'); return; }
+  iqing=true;
+  var btn=document.getElementById('btnIq'); btn.disabled=true;
+  var wrap=document.getElementById('iqWrap'); wrap.classList.add('show');
+  var stat=document.getElementById('iqStat');
+  document.getElementById('iqCard').innerHTML='';
+  stat.textContent='🎯 盲评中：五维独立打分 + 敌意拓宽（这一步会去找「这个想法在哪儿其实已经有了」）…';
+  var acc='';
+  fetch('/api/ask',{
+    method:'POST',headers:{'content-type':'application/json'},
+    body:JSON.stringify(Object.assign({mode:'iq',q:lastQ||'创新智商评估',text:text.slice(0,26000),vendor:vendor}, uk?{key:uk}:{}))
+  }).then(function(resp){
+    var reader=resp.body.getReader(), dec=new TextDecoder(), buf='', tk=0;
+    return new Promise(function(res,rej){
+      (function pump(){
+        reader.read().then(function(r){
+          if(r.done){ res(acc); return; }
+          buf+=dec.decode(r.value,{stream:true});
+          var lines=buf.split('\n'); buf=lines.pop();
+          for(var i=0;i<lines.length;i++){
+            var s=lines[i].trim();
+            if(!s||!s.startsWith('data:')) continue;
+            var pl=s.slice(5).trim(); if(pl==='[DONE]') continue;
+            var j; try{ j=JSON.parse(pl); }catch(e){ continue; }
+            if(j.t==='token'){ acc+=j.v; tk+=j.v.length; stat.textContent='🎯 盲评中…（已产出 '+tk+' 字）'; }
+            else if(j.t==='think'){ stat.textContent='🧠 盲评·深度比对中（正在把承重命题压到 50 字，去查它能不能被现成概念一比一替换）…'; }
+            else if(j.t==='error'){ rej(new Error(j.v||'评分基底返回错误')); return; }
+          }
+          pump();
+        }).catch(rej);
+      })();
+    });
+  }).then(function(raw){
+    var j=parseIqJson(raw);
+    var tot=renderIqCard(j,{scorer:(vendor==='ds'?'DeepSeek':'GLM-5'),selfEval:true,src:text});
+    stat.textContent='✓ 盲评完成 · 综合分 '+tot+'（由页面按固定权重计算，非基底手算）。'
+      +(tot<135?'　距 135 还差 '+(135-tot)+' 分 —— 可直接点「🛠 打磨修改」，评分卡会作为作业单交给基底。':'　已达 135 线。');
+  }).catch(function(e){
+    stat.textContent='✗ '+(e.message||String(e));
+  }).finally(function(){ iqing=false; btn.disabled=false; });
+}
+/* ================= 答后点击④：打磨修改（目标 135+） ================= */
+function doPolish(){
+  if(polishing||iqing||papering||asking) return;
+  var src=iqSourceText();
+  if(!src || src.length<200){
+    if(!iqSrcOpen) toggleIqSrc();
+    flashAsk('先「成文一篇」，或把要打磨的文章粘贴到下面的框里。'); return;
+  }
+  var uk=(keyMode==='own')?document.getElementById('userKey').value.trim():'';
+  if(keyMode==='own' && !uk){ document.getElementById('userKey').focus(); flashAsk('请先填入你的 API Key，或切回「系统」。'); return; }
+  polishing=true;
+  genTarget('polishStat','ppFill2','ppChars2');
+  var btn=document.getElementById('btnPolish'); btn.disabled=true;
+  var wrap=document.getElementById('polishWrap'); wrap.classList.add('show');
+  document.getElementById('polishActs').classList.remove('show');
+  var stat=document.getElementById('polishStat');
+  /* 只认「评的就是这一篇」的评分卡：拿 A 篇的作业单去改 B 篇，会把改稿引到别人的毛病上 */
+  var card=(iqCard && iqCard.src===src.slice(0,120))?iqCardText():'';
+  polishAll=''; setProg(0,true);
+  var halfOnly=false;
+  stat.textContent=(card?'🛠 按评分卡打磨上半篇':'🛠 打磨上半篇（未评分，按目标五维自查）')+'（力气按 I＞F＞E＞S＞D 分配，请勿关闭页面）…';
+  paperHalf(1,{gmode:'polish',card:card,orig:src},900,'上半篇').then(function(p1){
+    if(p1.length<900) throw new Error('上半篇产出过短（'+p1.length+' 字），重试一次后仍未成功，请稍后再点一次。');
+    polishAll=p1+'\n\n'; setProg(polishAll.length,true);
+    var cut=p1.indexOf('【一、'); if(cut<0) cut=p1.indexOf('一、');
+    var head=(cut>80?p1.slice(0,cut):p1.slice(0,1200)).slice(0,1200);
+    var tail=p1.slice(-1000);
+    stat.textContent='🛠 打磨下半篇（第二轴、可裁决判据、两条证伪条款与当场执行的检验、结语、参考文献）…';
+    return paperHalf(2,{gmode:'polish',card:card,orig:src,head:head,tail:tail},1200,'下半篇').catch(function(){ return ''; });
+  }).then(function(p2){
+    halfOnly=(String(p2||'').length<1200);
+    polishAll=(polishAll+p2).trim();
+    setProg(polishAll.length,true);
+    stat.textContent=(halfOnly?'⚠ 下半篇两次均未生成，正在按「未完成稿」排版':'🖨 打磨完成（'+polishAll.length+' 字）· 正在排版 PDF')+'（约 10–25 秒）…';
+    return buildPdf(polishAll, halfOnly, {eyebrow:'SDE UNIVERSES · 智 能 问 对 · 打 磨 修 改 稿', fnTag:'polished', readId:'polishRead', dlId:'polishDl', actsId:'polishActs'});
+  }).then(function(){
+    setProg(polishAll.length,false);
+    stat.textContent=halfOnly
+      ? '⚠ 仅上半篇完成 · '+polishAll.length+' 字 · 缺第二轴、判据、证伪条件与参考文献，PDF 首页已标注「未完成稿」。请再点一次。'
+      : '✓ 打磨稿完成 · '+polishAll.length+' 字 · 建议接着点「🎯 对打磨稿复评」看这一轮抬了几分（同一把尺子前后对比才作数）。';
+  }).catch(function(e){
+    setProg(polishAll.length,false);
+    stat.textContent='✗ '+(e.message||String(e));
+  }).finally(function(){
+    polishing=false; btn.disabled=false; genTarget('paperStat','ppFill','ppChars');
+  });
+}
+/* ================= 涌现流水线：十轮三观点 → 二阶碰撞 → 三典范择优 → 综合提炼 =================
+   规格（王德生 2026-07-29）：每次调用基底都装「SDE内功＋心得＋SDE方法论」＝高超智慧；
+   十轮对话（不必用完），每轮三个观点；三观点做二阶碰撞涌现新典范；对典范做创新检查，
+   不够创新就随机改变碰撞方式再来一次，或碰撞三次出三个典范比较择优；最后的综合提炼最要紧。
+
+   为什么碰三次而不是一次：一次碰撞只能证明「这种撞法撞出了这个」，撞不出更好的也无从知道。
+   三条不同撞法各出一个典范，再用同一把尺子（创新智商盲评）背靠背打分，才谈得上择优。
+   为什么盲评这一环不装内功：评分者一旦被 SDE 语言装载就会对术语密集的文本过敏性加分，
+   那正是评分体系自己点名的「过度通胀」——检查环节的职责是挑刺，不是造新。 */
+var EMERGE_WAYS=[
+  [1,'两两对撞'],[2,'三方共撞·取共同分离点'],[3,'一个当待撞物·两个当敌意最近邻'],
+  [4,'换承重层级'],[5,'换母学科'],[6,'反向撞·先立否定式']
+];
+var emerging=false, emergeUsed=[], paradigms=[];
+/* 入口资料有两种来源、栏目结构不同（提炼档九栏／涌现档十栏），成文时要按来源发指令 */
+var briefKind='distill';
+function wayName(n){ for(var i=0;i<EMERGE_WAYS.length;i++) if(EMERGE_WAYS[i][0]===n) return EMERGE_WAYS[i][1]; return '第'+n+'式'; }
+/* 随机不放回：六种撞法用完才允许重复，这样「换方式重来」才是真的换了方式 */
+function pickWays(n){
+  var pool=EMERGE_WAYS.map(function(w){return w[0];}).filter(function(w){ return emergeUsed.indexOf(w)<0; });
+  if(pool.length<n){ emergeUsed=[]; pool=EMERGE_WAYS.map(function(w){return w[0];}); }
+  var out=[];
+  while(out.length<n && pool.length){ var i=Math.floor(Math.random()*pool.length); out.push(pool.splice(i,1)[0]); }
+  emergeUsed=emergeUsed.concat(out);
+  return out;
+}
+function viewsText(){
+  return turns.map(function(t,i){ return '〔第'+(i+1)+'轮〕问：'+t.q+'\n'+t.a; }).join('\n\n').slice(0,20000);
+}
+/* 一台通用的 SSE 收集器：碰撞、盲评、综合提炼三环共用，不再各写一份 pump */
+function sseCollect(payload, onStat){
+  var uk=(keyMode==='own')?document.getElementById('userKey').value.trim():'';
+  var acc='';
+  return fetch('/api/ask',{method:'POST',headers:{'content-type':'application/json'},
+    body:JSON.stringify(Object.assign({vendor:vendor}, payload, uk?{key:uk}:{}))
+  }).then(function(resp){
+    if(!resp.ok && resp.status!==200){ return resp.text().then(function(t){ throw new Error('HTTP '+resp.status+' '+t.slice(0,180)); }); }
+    var reader=resp.body.getReader(), dec=new TextDecoder(), buf='';
+    return new Promise(function(res,rej){
+      (function pump(){
+        reader.read().then(function(r){
+          if(r.done){ res(acc); return; }
+          buf+=dec.decode(r.value,{stream:true});
+          var lines=buf.split('\n'); buf=lines.pop();
+          for(var i=0;i<lines.length;i++){
+            var s=lines[i].trim(); if(!s||!s.startsWith('data:')) continue;
+            var pl=s.slice(5).trim(); if(pl==='[DONE]') continue;
+            var j; try{ j=JSON.parse(pl); }catch(e){ continue; }
+            if(j.t==='token'){ acc+=j.v; if(onStat) onStat(acc.length,false); }
+            else if(j.t==='think'){ if(onStat) onStat(acc.length,true); }
+            else if(j.t==='error'){ rej(new Error(j.v||'基底返回错误')); return; }
+          }
+          pump();
+        }).catch(rej);
+      })();
+    });
+  });
+}
+function paradigmName(t){
+  var first=String(t||'').split('\n')[0].trim().replace(/^[#＃\s]+/,'');
+  return first.slice(0,40)||'（未命名典范）';
+}
+function renderParadigms(sel){
+  var o='';
+  paradigms.forEach(function(p,ix){
+    var win=(sel===ix);
+    o+='<div style="border:1px solid '+(win?'#B5860F':'var(--border)')+';border-radius:11px;padding:13px 15px;margin-bottom:10px;background:var(--card)'+(win?';box-shadow:0 2px 12px rgba(138,104,23,0.18)':'')+'">'
+      +'<div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap">'
+      +'<b style="font-size:0.93rem">'+(win?'★ ':'')+esc(paradigmName(p.text))+'</b>'
+      +'<span style="font-size:0.72rem;color:var(--muted)">碰撞方式：'+esc(wayName(p.way))+'</span>'
+      +(p.total?'<span style="margin-left:auto;font-size:1.15rem;font-weight:800;color:'+(p.total>=135?'#B5860F':'var(--text2)')+'">'+p.total+'</span>':'')
+      +'</div>'
+      +(p.dims?'<div style="font-size:0.74rem;color:var(--muted);margin-top:3px">S'+p.dims.S+' D'+p.dims.D+' E'+p.dims.E+' I'+p.dims.I+' F'+p.dims.F+'　·　'+esc(iqLevel(p.total))+'</div>':'')
+      +(p.verdict?'<div style="font-size:0.77rem;color:var(--text2);line-height:1.65;margin-top:6px">'+esc(String(p.verdict).slice(0,240))+'</div>':'')
+      +'<div style="font-size:0.76rem;color:var(--text2);line-height:1.75;margin-top:7px;max-height:'+(win?'none':'7.5em')+';overflow:hidden;white-space:pre-wrap">'+esc(p.text.slice(0,win?4000:420))+'</div>'
+      +'</div>';
+  });
+  document.getElementById('emergeBox').innerHTML=o;
+}
+/* 全程返回 promise：整条链要可被等待、可被串接（干跑要跑它，日后"碰撞完自动成文"也要接它）。
+   守卫路径也返回 promise，调用方不必分辨"没跑"和"跑了但没接住"。 */
+function doEmerge(again){
+  if(emerging||asking||papering||distilling||iqing||polishing) return Promise.resolve();
+  if(turns.length<2){ flashAsk('至少完成两轮问对再碰撞——一轮的三个观点撞不出二阶。'); return Promise.resolve(); }
+  var uk=(keyMode==='own')?document.getElementById('userKey').value.trim():'';
+  if(keyMode==='own' && !uk){ document.getElementById('userKey').focus(); flashAsk('请先填入你的 API Key，或切回「系统」。'); return Promise.resolve(); }
+  emerging=true;
+  var btn=document.getElementById('btnEmerge'); btn.disabled=true;
+  document.getElementById('emergeWrap').classList.add('show');
+  document.getElementById('emergeActs').classList.remove('show');
+  var stat=document.getElementById('emergeStat');
+  paradigms=[];
+  document.getElementById('emergeBox').innerHTML='';
+  var ways=pickWays(3), vt=viewsText(), oq=originQ();
+  /* 没开涌现档跑出来的轮次里没有三观点，撞的其实是三份单答案——能撞，但撞不出该有的张力。
+     只警告不拦路：用户可能是明知故犯（拿旧线程试一把），拦了反而添堵。 */
+  var triRounds=turns.filter(function(t){ return /观点二[：:]/.test(t.a||''); }).length;
+  if(triRounds<2) flashAsk('提示：这些轮次不是在「🌀 涌现档」下产出的，里面没有三观点可撞——照样能跑，但张力会弱很多。建议开涌现档再问两轮。');
+  /* 三路碰撞串行跑：并行会同时点燃三份内功，配额桶第一时间就把后两路挡回来 */
+  var chain=Promise.resolve();
+  ways.forEach(function(w,ix){
+    chain=chain.then(function(){
+      stat.textContent='🌀 第 '+(ix+1)+'/3 路碰撞中（'+wayName(w)+'）…每一路都装内功＋心得＋方法论，约 40–80 秒';
+      return sseCollect({mode:'collide',q:oq,origin:oq,views:vt,way:w},function(n,think){
+        stat.textContent=(think?'🧠 ':'🌀 ')+'第 '+(ix+1)+'/3 路碰撞（'+wayName(w)+'）'+(think?'·深度思考中':'·已产出 '+n+' 字')+'…';
+      }).then(function(t){
+        t=String(t||'').trim();
+        if(t.length>200){ paradigms.push({way:w,text:t}); renderParadigms(-1); }
+      },function(){ /* 单路失败不拖垮另外两路 */ });
+    });
+  });
+  return chain.then(function(){
+    if(!paradigms.length) throw new Error('三路碰撞均未产出，请稍后再试。');
+    /* 创新检查：同一把尺子背靠背盲评，评分者裸机（不装内功） */
+    var c2=Promise.resolve();
+    paradigms.forEach(function(p,ix){
+      c2=c2.then(function(){
+        stat.textContent='🎯 创新检查 '+(ix+1)+'/'+paradigms.length+'（独立盲评，评分者不装内功）…';
+        return sseCollect({mode:'iq',q:oq,text:p.text},function(n){
+          stat.textContent='🎯 创新检查 '+(ix+1)+'/'+paradigms.length+'…（'+n+' 字）';
+        }).then(function(raw){
+          try{
+            var j=parseIqJson(raw);
+            var d={S:iqNum(j.S&&j.S.score),D:iqNum(j.D&&j.D.score),E:iqNum(j.E&&j.E.score),I:iqNum(j.I&&j.I.score),F:iqNum(j.F&&j.F.score)};
+            p.dims=d; p.total=pyRound(iqComposite(d)); p.verdict=j.verdict||''; p.card=j;
+          }catch(e){ p.total=0; }
+          renderParadigms(-1);
+        },function(){ p.total=0; });
+      });
+    });
+    return c2;
+  }).then(function(){
+    /* 择优：同尺子下取最高分；分数相同取先撞出来的那个 */
+    var best=0;
+    paradigms.forEach(function(p,ix){ if((p.total||0)>(paradigms[best].total||0)) best=ix; });
+    renderParadigms(best);
+    var bt=paradigms[best].total||0;
+    document.getElementById('emergeActs').classList.add('show');
+    var others=paradigms.filter(function(p,ix){ return ix!==best; })
+      .map(function(p){ return '〔碰撞方式：'+wayName(p.way)+'　创新智商 '+(p.total||'未评')+'〕\n'+p.text.slice(0,3200); }).join('\n\n———\n\n');
+    var cards=paradigms.map(function(p,ix){
+      if(!p.card) return '〔'+wayName(p.way)+'〕未评分。';
+      var j=p.card, d=p.dims;
+      var un=(j.neighbors||[]).filter(function(x){return !x.handled;}).map(function(x){return x.name;}).join('、');
+      var de=(j.deductions||[]).map(function(x){return '['+(x.dim||'')+']'+String(x.why||'').slice(0,120);}).join('；');
+      return '〔'+wayName(p.way)+(ix===best?'·胜出':'')+'〕综合 '+p.total+'（S'+d.S+' D'+d.D+' E'+d.E+' I'+d.I+' F'+d.F+'）\n'
+        +'扣分：'+(de||'未给')+'\n未交手的最近邻：'+(un||'未列')+'\n总评：'+String(j.verdict||'').slice(0,160);
+    }).join('\n\n');
+    stat.textContent='✓ 三路已撞完，胜出「'+paradigmName(paradigms[best].text)+'」（'+wayName(paradigms[best].way)+'，创新智商 '+bt+'）'
+      +(bt<135?'　—— 未过 135，可点「🎲 换碰撞方式重来一次」再撞三路；也可直接往下走。':'')
+      +'　正在做最终综合提炼…';
+    var wrap=document.getElementById('briefWrap'); wrap.classList.add('show');
+    var bstat=document.getElementById('briefStat'), box=document.getElementById('briefBox');
+    box.textContent=''; box.className='ans blink';
+    bstat.textContent='🧬 最终综合提炼中（整条产线最要紧的一步：收拢胜出典范、回收落选零件、把评分卡短板转成论文作业）…';
+    return sseCollect({mode:'synth',q:oq,origin:oq,hist:buildHist(true),winner:paradigms[best].text,others:others,cards:cards},
+      function(n,think){ if(!think) bstat.textContent='🧬 最终综合提炼中…（'+n+' 字）'; })
+      .then(function(t){
+        box.className='ans'; box.textContent=String(t||'').trim();
+        brief=String(t||'').trim(); briefKind='synth';
+        if(brief.length<300){ bstat.textContent='⚠ 综合提炼产出过短（'+brief.length+' 字），本次不作为论文入口，请重试。'; brief=''; return; }
+        bstat.textContent='✓ 综合提炼完成（'+brief.length+' 字）· 出自 '+turns.length+' 轮问对 → '+paradigms.length+' 个候选典范 → 择优 → 提炼。现在点「成文一篇」，论文将以它为起点逐条兑现。';
+      });
+  }).catch(function(e){
+    stat.textContent='✗ '+(e.message||String(e));
+  }).finally(function(){ emerging=false; btn.disabled=false; });
+}
+function renderSources(list){
+  var el=document.getElementById('sources');
+  if(!list || !list.length){ el.innerHTML=''; return; }
+  var h='<div class="sources-label">'+(document.body.classList.contains('en')?'Sources':'原文出处')+'</div>';
+  list.forEach(s=>{
+    h+='<a class="src" href="'+esc(s.u)+'"><span class="s-badge">'+esc(s.b||'')+'</span>'+esc(s.t||s.u)+'</a>';
+  });
+  el.innerHTML=h;
+}
+document.getElementById('qa').addEventListener('keydown', e=>{ if(e.key==='Enter') doAsk(); });
+
+/* ================= ⚙️ 管理设置：页面直配基底密钥 ================= */
+var adminOpen=false;
+function clearReflect(vendor){
+  var pass=document.getElementById('admPass').value.trim();
+  var msg=document.getElementById('clrMsg');
+  if(!pass){ msg.style.color='#B23B3B'; msg.textContent='请先在上方填入管理口令。'; document.getElementById('admPass').focus(); return; }
+  msg.style.color='var(--muted)'; msg.textContent='处理中…';
+  fetch('/api/admin/clearreflect',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({pass:pass,vendor:vendor})})
+    .then(r=>r.json()).then(j=>{ msg.style.color=j.ok?'#2E7D32':'#B23B3B'; msg.textContent=j.msg||(j.ok?'已清空':'失败'); })
+    .catch(e=>{ msg.style.color='#B23B3B'; msg.textContent='请求失败：'+(e.message||e); });
+}
+function toggleAdmin(){
+  adminOpen=!adminOpen;
+  document.getElementById('adminPanel').style.display=adminOpen?'block':'none';
+  if(adminOpen) checkAdminStatus();
+}
+var VN_ADM={deepseek:'DeepSeek',kimi:'Kimi',zhipu:'智谱 GLM',qwen:'千问 Qwen',minimax:'MiniMax'};
+/* deepOn 默认 true，开机要把按钮/提示/四步法入口一并同步成打开态，否则开关状态与实际发出的请求对不上 */
+(function syncDeepUI(){
+  var b=document.getElementById('deepBtn'); if(!b) return;
+  b.classList.toggle('active', deepOn);
+  var hint=document.getElementById('deepHint'); if(hint) hint.style.display=deepOn?'block':'none';
+  var fb=document.getElementById('fourBtn'); if(fb) fb.style.display=deepOn?'inline-block':'none';
+})();
+function checkAdminStatus(){
+  var el=document.getElementById('adminStatus');
+  fetch('/api/admin/vendorstatus').then(r=>r.json()).then(j=>{
+    if(j.active){ var cfg=Object.keys(j.configured||{}).filter(function(v){return j.configured[v]}).map(function(v){return VN_ADM[v]||v});
+      el.innerHTML='<span style="color:#2E7D32">● 已启用</span>　当前基底：'+(VN_ADM[j.active]||j.active)+'　已配置：'+(cfg.join('、')||'无');
+      var sel=document.getElementById('admVendor'); if(sel)sel.value=j.active; }
+    else{ el.innerHTML='<span style="color:#B26A00">● 未启用</span>　请选基底并设置密钥。'; }
+  }).catch(()=>{ el.textContent='状态检查失败。'; });
+}
+function saveKey(){
+  var vendor=document.getElementById('admVendor').value;
+  var pass=document.getElementById('admPass').value.trim();
+  var key=document.getElementById('admKey').value.trim();
+  var model=document.getElementById('admModel').value.trim();
+  var msg=document.getElementById('admMsg');
+  if(!key){ msg.style.color='#B23B3B'; msg.textContent='请填该基底的 API 密钥。'; return; }
+  if(!pass){ msg.style.color='#B23B3B'; msg.textContent='请填管理口令。'; return; }
+  var btn=document.getElementById('admSave'); btn.disabled=true; btn.textContent='保存中…';
+  fetch('/api/admin/setvendor',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({pass:pass,vendor:vendor,key:key,model:model})})
+    .then(r=>r.json()).then(j=>{
+      msg.style.color=j.ok?'#2E7D32':'#B23B3B'; msg.textContent=j.msg||(j.ok?'已保存':'保存失败');
+      if(j.ok){ document.getElementById('admKey').value=''; document.getElementById('admModel').value=''; checkAdminStatus(); }
+    }).catch(e=>{ msg.style.color='#B23B3B'; msg.textContent='请求失败：'+(e.message||e); })
+    .finally(()=>{ btn.disabled=false; btn.textContent='保存并设为当前基底'; });
+}
+</script>
+
+<script>window.WDS_READ={selector:".wrap"};</script>
+<script src="/taste/wds-companion/wds-read.js" defer></script>
+
+<script src="/wds-mode.js" defer></script>
+</body>
+</html>
