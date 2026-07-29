@@ -118,8 +118,8 @@ footer a{color:var(--gold);text-decoration:none}
     <div class="sub zh-only">接龙持续进行，人数不设上限——每一位学员的作品，通过合宪性审读后，都将署名在此陆续发表。</div>
     <div class="sub en-only">Sign-up is ongoing with no cap on numbers — every trainee’s work, once it passes a constitutionality review, will be published here under their name.</div>
   </div>
-  <div class="roster-note zh-only">编号按四维加权分自动排序：<b>活跃度 40%</b>（以三天为一个窗口计一次活跃，同一天连发多篇不按篇数叠加；近期权重更高、持续多月额外加分）· <b>发表篇数 20%</b> · <b>总字数 15%</b> · <b>创新度 25%</b>（只采用独立盲评分，样本少的向全站均值收缩，暂无盲评分的按全站均值计、不罚不奖）。每次发表新文章即时更新 · 并列按报名顺序</div>
-  <div class="roster-note en-only">Ranked by a four-part weighted score: <b>activity 40%</b> (counted in three-day windows, so a single-day batch does not stack per piece; recent work weighted higher, sustained months add a bonus) · <b>number of pieces 20%</b> · <b>total length 15%</b> · <b>innovation 25%</b> (blind scores only, shrunk toward the site mean when the sample is small; unscored students take the site mean, neither penalised nor rewarded). Updates the instant a new piece is published · ties by sign-up order</div>
+  <div class="roster-note zh-only">编号按四维加权分自动排序：<b>活跃度 40%</b>（以三天为一个窗口计一次活跃，同一天连发多篇不按篇数叠加；近期权重更高、持续多月额外加分）· <b>发表篇数 20%</b> · <b>创新度 25%</b>（只采用独立盲评分）· <b>领域广度 15%</b>（一级领域分布的有效领域数）。后两维样本少的向全站均值收缩，暂无数据的按均值计、不罚不奖。每次发表新文章即时更新 · 并列按报名顺序</div>
+  <div class="roster-note en-only">Ranked by four weighted parts: <b>activity 40%</b> (counted in three-day windows, so a single-day batch does not stack per piece) · <b>number of pieces 20%</b> · <b>innovation 25%</b> (blind scores only) · <b>disciplinary breadth 15%</b> (effective number of primary fields). The last two are shrunk toward the site mean when the sample is small; students without data take the mean, neither penalised nor rewarded. Updates the instant a new piece is published · ties by sign-up order</div>
   <div class="roster" id="roster">
     <div class="stu-loading zh-only">名单加载中…</div>
     <div class="stu-loading en-only">Loading roster…</div>
@@ -192,11 +192,18 @@ fetch('/students/roster.json?v='+Date.now(),{cache:'no-store'}).then(function(r)
     return total + Math.min(20, 4*Object.keys(months).length);   // 持续多月发表的连续性加分
   }
   students.forEach(function(s){
-    s.score_act   = activityScore(s.papers);
-    s.score_chars = (s.papers||[]).reduce(function(a,p){ return a+(p.words||0); },0);
+    s.score_act = activityScore(s.papers);
     var bl = (s.papers||[]).filter(function(p){ return p.iq_kind==='blind'; });
     s.iqN = bl.length;
     s.iqRaw = bl.length ? bl.reduce(function(a,p){ return a+p.iq; },0)/bl.length : null;
+    // 领域广度＝一级领域分布的「有效领域数」exp(熵)。用熵不用标签数：
+    // 五十篇均匀落在四个领域，比七十篇集中在一个领域却写了四十九个自造标签更广。
+    var fc={}, fn=0;
+    (s.papers||[]).forEach(function(p){ if(p.field){ fc[p.field]=(fc[p.field]||0)+1; fn++; } });
+    var H=0;
+    Object.keys(fc).forEach(function(k){ var q=fc[k]/fn; H-=q*Math.log(q); });
+    s.fieldsN = fn;
+    s.breadthRaw = fn ? Math.exp(H) : null;
   });
   // ④ 创新度：只采用独立盲评（iq_kind==='blind'）；样本少的向全站均值收缩，
   //    四篇代表七十三篇不该与三十六篇代表六十六篇等价；完全没有盲评分的取全站均值，不罚不奖。
@@ -207,17 +214,24 @@ fetch('/students/roster.json?v='+Date.now(),{cache:'no-store'}).then(function(r)
   students.forEach(function(s){
     s.iqShrunk = (s.iqN*(s.iqRaw===null?gmIQ:s.iqRaw) + K*gmIQ)/(s.iqN+K);
   });
+  // 广度同样收缩：四篇文章落在四个领域不等于比五十篇跨四个领域更广
+  var bAll=students.filter(function(s){ return s.breadthRaw!==null; }).map(function(s){ return s.breadthRaw; });
+  var gmB = bAll.length ? bAll.reduce(function(a,b){ return a+b; },0)/bAll.length : 3;
+  students.forEach(function(s){
+    var n=s.fieldsN||0;
+    s.breadth = (n*(s.breadthRaw===null?gmB:s.breadthRaw) + K*gmB)/(n+K);
+  });
   // 四维归一后加权：活跃 0.40 · 篇数 0.20 · 字数 0.15 · 创新度 0.25
   function maxOf(f){ return Math.max.apply(null, students.map(f)) || 1; }
   var mA=maxOf(function(s){ return s.score_act; }),
       mC=maxOf(function(s){ return Math.sqrt(s.count); }),
-      mW=maxOf(function(s){ return Math.sqrt(s.score_chars); });
+      mB=maxOf(function(s){ return s.breadth; });
   students.forEach(function(s){
     var A=100*s.score_act/mA,
         C=100*Math.sqrt(s.count)/mC,
-        W=100*Math.sqrt(s.score_chars)/mW,
-        Q=100*Math.max(0, Math.min(1, (s.iqShrunk-125)/25));
-    s.score = 0.40*A + 0.20*C + 0.15*W + 0.25*Q;
+        Q=100*Math.max(0, Math.min(1, (s.iqShrunk-125)/25)),
+        B=100*s.breadth/mB;
+    s.score = 0.40*A + 0.20*C + 0.25*Q + 0.15*B;
   });
   var prep = students.filter(function(s){ return s.status==='preliminary'; });
   students = students.filter(function(s){ return s.status!=='preliminary'; });

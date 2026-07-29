@@ -200,6 +200,24 @@ def paper_weight(idx):
     return int(w) if w == int(w) else w
 
 
+try:
+    from classify_fields import classify as _classify_field
+except ImportError:                                   # 与本文件同目录，CI 里以 tools/ 为 cwd 之外调用时兜底
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    from classify_fields import classify as _classify_field
+
+
+def paper_field(idx):
+    """把这篇归入一张固定的一级领域表（见 tools/classify_fields.py）。
+
+    为什么不用页面眉题里的学科标签：那是每篇自造的长复合标签，不是分类——
+    高鹏 74 篇能产出 49 个「领域」，而黄倩盈、胡敏、张琼的眉题里根本没有学科字段。
+    按标签数算广度会得出与事实相反的结论，所以改由标题＋关键词＋摘要归类。
+    """
+    f, _n = _classify_field(idx)
+    return f
+
+
 def paper_iq(idx):
     """页面自报的 SDE 创新智商分及其口径。
 
@@ -256,6 +274,9 @@ def build():
             iq, kind = paper_iq(idx)
             if iq is not None and 80 <= iq <= 175:
                 rec['iq'], rec['iq_kind'] = iq, kind
+            fld = paper_field(idx)
+            if fld:
+                rec['field'] = fld
             # 诗歌与论文同权：排名公式给 type=poem 记 depth 1.0，不按篇幅折算。
             # 站上的约定是诗歌收在该生的 poems/ 目录下。
             if os.path.basename(os.path.dirname(item)) == 'poems':
