@@ -789,6 +789,7 @@ function promptFor(id){
       '',
       sdeOppositeBlock(),
       (ST.badC&&ST.badC.length ? ('\n【这几篇已经当过 C 且没通过，别再提】'+ST.badC.join(' ')) : ''),
+      triedBlock(),
       '',
       '先写：C 的主题观点（≤40 字）· C×A 为什么不能同时成立（一句）· C×B 为什么不能同时成立（一句）· 从 C 里摘一句原话（≤20 字）。',
       '**这一层里实在没有，就诚实写「C：无」并说清缺的是哪一类主张**——下一层还会往外找，不必硬凑。',
@@ -1181,10 +1182,9 @@ async function runStage(i){
       if(ST.mode==='A' && !ST.manual && ST.outer < 2){
         ST.outer++;
         if(ST.seed) ST.tried.push({ gids: ST.seed, score: 0, why: '三条主题观点没能两两冲突：'+ST.conflict });
-        if(ST.seed && ST.seed[2] && ST.seed[2]!=='(造)'){ ST.badC=ST.badC||[]; ST.badC.push(ST.seed[2]); }  // 这一篇当过 C 且底盘不成立，别再提
-        if(!ST.forged) ST.pair=null;   // 回选篇：真文章第三方失败，重找对子/第三篇；自造/知识库的不回退
-        note('主题观点没能两两冲突，回选篇另找一组。');
-        showErr('三条主题观点里有一对其实相容（'+ST.conflict+'）——回选篇另找一组，从体检重来（第 '+ST.outer+' 次，最多两次）。');
+        if(ST.seed && ST.seed[2] && ST.seed[2]!=='(造)'){ ST.badC=ST.badC||[]; ST.badC.push(ST.seed[2]); }  // 这一篇当过 C 且底盘不成立，别再提；对子保住，只另找 C
+        note('主题观点没能两两冲突，保住这对 A、B，另找一条 C。');
+        showErr('三条主题观点里有一对其实相容（'+ST.conflict+'）——保住这对 A、B，另找一条 C，从体检重来（第 '+ST.outer+' 次，最多两次）。');
         setStat('spine', '回选篇重找…', 'run');
         await doSelect();
         ST.redoFrom = STAGES.findIndex(x=>x.id==='gate');
@@ -1201,9 +1201,8 @@ async function runStage(i){
       if(ST.mode==='A' && !ST.manual && ST.outer < 2){
         ST.outer++;
         if(ST.seed) ST.tried.push({ gids: ST.seed, score: sc, why: '全文体检只给 '+sc+'/10（摘要层看走眼）' });
-        if(ST.seed && ST.seed[2] && ST.seed[2]!=='(造)'){ ST.badC=ST.badC||[]; ST.badC.push(ST.seed[2]); }
-        if(!ST.forged) ST.pair=null;
-        showErr('全文体检只给 '+sc+'/10——这一组摘要层看着能打、正文里不打。回选篇接着找（第 '+ST.outer+' 次，最多两次）。');
+        if(ST.seed && ST.seed[2] && ST.seed[2]!=='(造)'){ ST.badC=ST.badC||[]; ST.badC.push(ST.seed[2]); }  // 对子保住，只把这条 C 记坏、另找
+        showErr('全文体检只给 '+sc+'/10——这一组摘要层看着能打、正文里不打。保住这对 A、B，另找一条 C（第 '+ST.outer+' 次，最多两次）。');
         setStat('gate', '回选篇重找…', 'run');
         await doSelect();
         return await runStage(i);
@@ -1310,21 +1309,17 @@ async function doSelect(){
   let transcript=[];
   ST.usedA=ST.usedA||[]; ST.badC=ST.badC||[];
   const limit=Math.max(maxR, ST.tried.length+2);
-  let cFail=0, lastC='';
+
+  // 对子已经立住（外环把某个 C 打回来重找时会走到这里）：不重挑对子，咬定它接着找 C。
+  if(ST.pair && !ST.forged) return await findCForPair(transcript);
 
   for(let r=ST.tried.length; r<limit; r++){
     if(ST.abort) throw new Error('已停下');
 
     /* ① 没有对子 → 随机定一篇 A（固定），逐级放宽范围找与它对立的 B。
-       关键：对子**不够硬**（<6）也往外扩，不重新换 A；本人栏→他人→全站→基底库四层都配不到，才换 A。 */
+       对子**不够硬**（<6）也往外扩，不重新换 A；本人栏→他人→全站→基底库四层都配不到，才换 A。
+       一旦某对 ≥6 立住，立刻咬定它去找 C（findCForPair），不再回到这个循环换对子。 */
     if(!ST.pair){
-      // 回退换来的对子（A×上一个C候选）：直接验，不走 B 阶梯
-      if(ST.__swap){
-        const aGid=ST.__swap[0], bDesc=ST.__swap[1]; ST.__swap=null; ST.aGid=aGid;
-        const pr=await tryPair(aGid, bDesc, r, transcript, true);
-        if(pr){ ST.pair=pr; cFail=0; lastC=''; }
-        continue;
-      }
       const aGid=randSelfGid(ST.usedA);
       if(!aGid){ selLog('这位学员的篇目已经全部当过 A 了。'); break; }
       ST.usedA.push(aGid); ST.aGid=aGid;
@@ -1356,72 +1351,62 @@ async function doSelect(){
         selLog('第 '+(r+1)+' 轮：A '+aGid+' 四层（本人栏／其他学员／全站／知识库）都配不到够硬的对立面，换一篇 A。');
         continue;
       }
-      ST.pair=locked; cFail=0; lastC='';
-      selLog('<span style="color:var(--ok)">✓ 对子立住（'+locked.sc+'/10，B 来自'+(SCOPE_CN[asSrc(locked.bGid).scope]||'')+'），接下来找同时顶住这两篇的第三篇。</span>');
-      continue;
+      ST.pair=locked;
+      selLog('<span style="color:var(--ok)">✓ 对子立住（'+locked.sc+'/10，B 来自'+(SCOPE_CN[asSrc(locked.bGid).scope]||'')+'）。这对已经够硬，咬定它——本人栏／其他学员／全站／知识库一路找 C，最后没有就自己造，绝不再换这对。</span>');
+      return await findCForPair(transcript);
     }
-
-    /* ② 有对子 → 逐级找 C（本人→他人→全站→知识库→自造） */
-    let cGid=null;
-    for(let rung=0; rung<=2 && !cGid; rung++){
-      ST.__crung=rung;
-      ST.__pool=poolDelta(rung).filter(x=>x.gid!==ST.pair.aGid && x.gid!==ST.pair.bGid && ST.badC.indexOf(x.gid)<0);
-      if(!ST.__pool.length){ if(rung<2) selLog('第 '+(r+1)+' 轮：'+RUNG_CN[rung]+'这一层没有可选的 C，往外扩一层。'); continue; }
-      const bTagC=isGid(ST.pair.bGid)?ST.pair.bGid:'（'+(SCOPE_CN[asSrc(ST.pair.bGid).scope]||'库')+'）';
-      setStat('select','<span class="spinner"></span> 第 '+(r+1)+' 轮 · 在'+RUNG_CN[rung]+'找同时顶住 '+ST.pair.aGid+'×'+bTagC+' 的 C','run');
-      const nc=await askStream(sdeSystem(), promptFor('pickC'), p.out, p.stat, p.meta, 2600, '第'+(r+1)+'轮找C·'+RUNG_CN[rung]);
-      cGid=parseGid(nc.text||'', 'C', ST.__pool, [ST.pair.aGid].concat(isGid(ST.pair.bGid)?[ST.pair.bGid]:[]).concat(ST.badC));
-      if(cGid===''){ if(rung<2) selLog('第 '+(r+1)+' 轮：'+RUNG_CN[rung]+'里没有能同时顶两篇的 C，往外扩一层。'); cGid=null; continue; }
-      if(cGid===null) break;
-    }
-
-    if(cGid){
-      const trio=[ST.pair.aGid, ST.pair.bGid, cGid]; lastC=cGid;   // bGid 可能是源对象
-      ST.__pending=trio;
-      const cx=poolByGid(cGid)||{};
-      const trioTag=trio.map(d=>isGid(d)?d:'（'+(SCOPE_CN[asSrc(d).scope]||'库')+'）').join(' ');
-      setStat('select','<span class="spinner"></span> 第 '+(r+1)+' 轮 · 三方验收 '+trioTag,'run');
-      const ver=await askStream('你是碰撞种子的验收员，只验不提名。宁可判低，不许放互补的组合过去。', promptFor('verify'),
-        p.out, p.stat, p.meta, 1200, '第'+(r+1)+'轮验收');
-      const v=parseVerdict(ver.text||'');
-      const sc=(v.score==null?0:v.score)-(v.same==='高'?2:0);
-      transcript.push('第 '+(r+1)+' 轮 '+trioTag+'　烈度 '+(v.score==null?'?':v.score)+'/10　同源度 '+(v.same||'?')+'　'+v.why);
-      selLog('第 '+(r+1)+' 轮：+C '+cGid+'（'+(SCOPE_CN[cx.scope]||'')+'）　三方烈度 <b>'+(v.score==null?'?':v.score)+'/10</b>　同源度 '+(v.same||'?')+'　'+escTxt(v.why));
-      if(!ST.best || sc>ST.best.sc) ST.best={ gids:trio, sc:sc, v:v };
-      ST.tried.push({ gids:trio, score:(v.score==null?0:v.score), why:v.why });
-      if(v.score!==null && v.score>=6 && v.same!=='高'){
-        ST.seedScore=v.score; ST.out.select=transcript.join('\n');
-        selLog('<span style="color:var(--ok)">✓ 第 '+(r+1)+' 轮定标：烈度 '+v.score+'/10，取全文。</span>');
-        setStat('select','✓ 第 '+(r+1)+' 轮定标 · 烈度 '+v.score+'/10','done');
-        await loadTrio(trio); hideErr(); return ST.out.select;
-      }
-      ST.badC.push(cGid); cFail++;
-      if(cFail>=2){ ST.__swap=[ST.pair.aGid, cGid]; ST.pair=null; selHint('这一对连着两次没撞出合格的三方，回退：改用 A×C 当新对子。'); }
-      continue;
-    }
-
-    /* ③ 三层文章都没有 C → 先知识库、再自造（都不占学员篇目） */
-    cFail++;
-    ST.tried.push({ gids:[ST.pair.aGid, isGid(ST.pair.bGid)?ST.pair.bGid:'(库)'], score:0, why:'站内三层都找不出第三方（第 '+cFail+' 次）' });
-    selLog('第 '+(r+1)+' 轮：本人栏／其他学员／全站都没有能同时顶两篇的 C。');
-    const kb=await findCInKB(transcript);
-    if(kb) return kb;
-    const md=await forgeC(transcript);
-    return md;
   }
 
-  /* 试满：先取勉强能用的一组，没有则退到知识库→自造 */
-  if(ST.best && ST.best.gids && ST.best.sc>=5){
-    const n=ST.tried.length; ST.seedScore=ST.best.v.score==null?0:ST.best.v.score; ST.out.select=transcript.join('\n');
-    selHint('试满 '+n+' 轮没有一组过 6/10，取其中最好的一组（'+ST.seedScore+'/10）继续。');
-    setStat('select','⚠ 试满 '+n+' 轮 · 最好 '+ST.seedScore+'/10','done');
-    showErr('试了 '+n+' 轮都不够打架，最好的一组只有 '+ST.seedScore+'/10。已用它继续跑，但成品破 150 的机会不大。改用「B · 三人各一篇」（跨作者跨领域）通常更省事；也可把"最多试"调大、换一位学员，或勾手挑。');
-    await loadTrio(ST.best.gids); return ST.out.select;
-  }
-  if(!ST.pair && ST.bestPair) ST.pair=ST.bestPair;
+  /* 一轮都没立住任何对子：取顶得最凶的那一对，照样咬定它把 C 找出来 */
+  if(!ST.pair && ST.bestPair){ ST.pair=ST.bestPair; selHint('没有一对过 6/10，取顶得最凶的一对（'+ST.bestPair.sc+'/10）继续找 C。'); }
   if(!ST.pair) throw new Error('试了 '+ST.tried.length+' 轮，连一对能顶得上的都没立住——重跑本格、换一位学员，或勾上「我自己挑三篇」。');
+  return await findCForPair(transcript);
+}
+
+/* 对子（A×B，已 ≥6 或取的最凶一对）立住后，咬定它把 C 找出来：
+   本人栏 → 其他学员 → 全站长文（各一次）→ 知识库（真实论点）→ 自造。**永不换这对 A、B。**
+   外环体检把某个 C 打回来时，把它记进 ST.badC 再进本函数，就会自动跳过、另找一条 C。 */
+async function findCForPair(transcript){
+  const p=panels.select;
+  const aGid=ST.pair.aGid, bDesc=ST.pair.bGid;
+  const bTagC=isGid(bDesc)?bDesc:'（'+(SCOPE_CN[asSrc(bDesc).scope]||'库')+'）';
+  // ① 三层文章，各一次；不合格记 badC，往外扩，不回头动 A、B
+  for(let rung=0; rung<=2 && !ST.abort; rung++){
+    ST.__crung=rung;
+    ST.__pool=poolDelta(rung).filter(x=>x.gid!==aGid && !(isGid(bDesc)&&x.gid===bDesc) && ST.badC.indexOf(x.gid)<0);
+    if(!ST.__pool.length){ if(rung<2) selLog(RUNG_CN[rung]+'这一层没有可选的 C，往外扩一层。'); continue; }
+    setStat('select','<span class="spinner"></span> 在'+RUNG_CN[rung]+'找同时顶住 '+aGid+'×'+bTagC+' 的 C','run');
+    const nc=await askStream(sdeSystem(), promptFor('pickC'), p.out, p.stat, p.meta, 2600, '找C·'+RUNG_CN[rung]);
+    const cGid=parseGid(nc.text||'', 'C', ST.__pool, [aGid].concat(isGid(bDesc)?[bDesc]:[]).concat(ST.badC));
+    if(cGid===''){ if(rung<2) selLog(RUNG_CN[rung]+'里没有能同时顶两篇的 C，往外扩一层。'); continue; }
+    if(cGid===null){ if(rung<2) selLog(RUNG_CN[rung]+'这一层没读出 C 编号，往外扩一层。'); continue; }
+    const trio=[aGid, bDesc, cGid];
+    ST.__pending=trio;
+    const cx=poolByGid(cGid)||{};
+    const trioTag=trio.map(d=>isGid(d)?d:'（'+(SCOPE_CN[asSrc(d).scope]||'库')+'）').join(' ');
+    setStat('select','<span class="spinner"></span> 三方验收 '+trioTag,'run');
+    const ver=await askStream('你是碰撞种子的验收员，只验不提名。宁可判低，不许放互补的组合过去。', promptFor('verify'),
+      p.out, p.stat, p.meta, 1200, '三方验收·'+RUNG_CN[rung]);
+    const v=parseVerdict(ver.text||'');
+    const sc=(v.score==null?0:v.score)-(v.same==='高'?2:0);
+    transcript.push(trioTag+'　烈度 '+(v.score==null?'?':v.score)+'/10　同源度 '+(v.same||'?')+'　'+v.why);
+    selLog('+C '+cGid+'（'+(SCOPE_CN[cx.scope]||'')+'）　三方烈度 <b>'+(v.score==null?'?':v.score)+'/10</b>　同源度 '+(v.same||'?')+'　'+escTxt(v.why));
+    if(!ST.best || sc>ST.best.sc) ST.best={ gids:trio, sc:sc, v:v };
+    ST.tried.push({ gids:trio, score:(v.score==null?0:v.score), why:v.why });
+    if(v.score!==null && v.score>=6 && v.same!=='高'){
+      ST.seedScore=v.score; ST.out.select=transcript.join('\n');
+      selLog('<span style="color:var(--ok)">✓ 定标：烈度 '+v.score+'/10，取全文。</span>');
+      setStat('select','✓ 定标 · 烈度 '+v.score+'/10','done');
+      await loadTrio(trio); hideErr(); return ST.out.select;
+    }
+    ST.badC.push(cGid);
+    selLog('这条 C 撞出来还是不够硬，记下不再用，往外扩一层再找。');
+  }
+  // ② 三层文章都没撞出合格的 C → 知识库举一个真实的第三方
+  selLog('本人栏／其他学员／全站都没撞出够硬的第三方，去知识库找一个真实的。');
   const kb=await findCInKB(transcript);
   if(kb) return kb;
+  // ③ 最后手段：自造
   return await forgeC(transcript);
 }
 

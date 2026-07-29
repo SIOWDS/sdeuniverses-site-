@@ -782,19 +782,22 @@ function setStudent(c, slug) {
     ok('跑到底', done, c.$('stat-review').textContent);
   });
 
-  await step('十七之六之二、第三方连着两次不合格 → 回退，改用 A×C 当新对子', async () => {
-    let nc = 0, ver = 0;
+  await step('十七之六之二、第三方连着不合格 → 咬定对子不换，escalate 到知识库/自造', async () => {
+    let nc = 0, ver = 0, kb = 0;
     const c = await boot({ answer: u => {
       if (/你的任务：从下面清单里挑出/.test(u)) { nc++; return pickC(firstFreeC(u)); }
-      if (/你是验收员/.test(u)) { ver++; return ver <= 2 ? verifyBad(4) : verifyOK(8); }
+      if (/你是验收员/.test(u) && !/你是对子验收员/.test(u)) { ver++; return verifyBad(4); }  // 每个三方都判低
+      if (/从你自己的知识库里举一个真实存在的/.test(u)) { kb++; return kbAnswer(); }          // 知识库能举出
       return defaultAnswer(u);
     } });
     c.$('maxRounds').value = '10';
     const done = await runPipeline(c, 45000);
     const log = c.$('out-select').parentNode.querySelector('.sel-log').textContent;
-    ok('连着两次不合格就回退', /回退/.test(log), log.slice(0, 240));
-    ok('回退用的是 A×上一个 C 当新对子', /改用 A×C 当新对子/.test(log));
-    ok('回退后仍能继续', done, c.$('stat-review').textContent);
+    ok('对子立住后咬定它，绝不回退换对子', !/回退/.test(log) && !/改用 A×C/.test(log), log.slice(0, 200));
+    ok('三层文章都不合格就往外扩', nc >= 1 && (log.match(/往外扩一层/g) || []).length >= 1, '找 C ' + nc + ' 次');
+    ok('文章都不行就退到知识库找真实第三方', kb >= 1, '知识库调用 ' + kb + ' 次');
+    ok('最终用知识库来的 C 定标', /知识库/.test(c.$('srcState').textContent), c.$('srcState').textContent);
+    ok('跑到底', done, c.$('stat-review').textContent);
   });
 
   await step('十七之七、摘要层看走眼：全文体检不过就回选篇再找', async () => {
@@ -805,11 +808,11 @@ function setStudent(c, slug) {
       return defaultAnswer(u);
     } });
     const done = await runPipeline(c, 35000);
-    ok('体检不过时回选篇又找了一次第三篇', nc === 2, '找了 ' + nc + ' 次 C');
+    ok('体检不过时保住对子、只另找 C', nc >= 2, '找了 ' + nc + ' 次 C');
     ok('体检跑了两趟', gate === 2, '实际 ' + gate + ' 趟');
-    ok('红字如实交代这一段', /摘要层看走眼|回选篇接着找|全文体检/.test(c.$('errBox').textContent), c.$('errBox').textContent);
-    ok('全文体检的判词回灌进了下一轮选篇调令',
-      c.calls.some(x => (/【A（已定，随机抽出）】/.test(x.user) || /你的任务：从下面清单里挑出/.test(x.user)) && /全文体检只给 3\/10/.test(x.user)));
+    ok('红字如实交代这一段', /摘要层看走眼|回选篇接着找|全文体检|另找一条 C/.test(c.$('errBox').textContent), c.$('errBox').textContent);
+    ok('全文体检的判词回灌进了找 C 的调令',
+      c.calls.some(x => /你的任务：从下面清单里挑出/.test(x.user) && /全文体检只给 3\/10/.test(x.user)));
     ok('换完跑到底', done, c.$('stat-review').textContent);
   });
 
@@ -855,8 +858,8 @@ function setStudent(c, slug) {
     ok('确实回选篇重找了（且有界）', nom >= 1 && nom <= 8, '实际回选篇找 C ' + nom + ' 次');
     ok('第二组换了第三篇', (c.$('srcState').textContent.match(/×/g) || []).length === 2, c.$('srcState').textContent);
     ok('换组后重新体检', (c.calls.filter(x => /请先做体检/.test(x.user)) || []).length === 2);
-    ok('把不合格的原因记进"已试过"（回灌进下一轮选篇调令）',
-      c.calls.some(x => (/【A（已定，随机抽出）】/.test(x.user) || /你的任务：从下面清单里挑出/.test(x.user)) && /主题观点没能两两冲突/.test(x.user)));
+    ok('把不合格的原因记进"已试过"（回灌进找 C 的调令）',
+      c.calls.some(x => /你的任务：从下面清单里挑出/.test(x.user) && /主题观点没能两两冲突/.test(x.user)));
     ok('最终冲突校验是通过的', /三对全冲突/.test(c.$('trioConflict').textContent), c.$('trioConflict').textContent);
     ok('照样跑到底', done, c.$('stat-review').textContent);
   });
