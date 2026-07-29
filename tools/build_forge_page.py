@@ -60,6 +60,33 @@ def main():
         assert mark in t, "模板里少了占位符 " + mark
         t = t.replace(mark, val, 1)
 
+    # 外借代码的依赖自检：抄来的块里调用、而页面又没定义的函数 —— 踩过 escTxt 那一次
+    borrowed = vendors + "\n" + stream + "\n" + md
+    # 先剥注释与字符串，否则 CSS 里的 rgba( 、提示语里的 tokens( 会被当成函数调用
+    code = re.sub(r"/\*.*?\*/", " ", borrowed, flags=re.S)
+    code = re.sub(r"//[^\n]*", " ", code)
+    code = re.sub(r"'(?:\\.|[^'\\])*'", "''", code)
+    code = re.sub(r'"(?:\\.|[^"\\])*"', '""', code)
+    code = re.sub(r"`(?:\\.|[^`\\])*`", "``", code)
+    # 正则字面量也要剥（/__([^_]+)__/ 里的 __ 会被当成函数名）
+    code = re.sub(r"(?<![\w)\]])/(?:\\.|\[[^\]]*\]|[^/\\\n])+/[gimsuy]*", " RE ", code)
+    called = set(re.findall(r"(?<![.\w$])([A-Za-z_$][\w$]*)\s*\(", code))
+    defined = set(re.findall(r"function\s+([A-Za-z_$][\w$]*)\s*\(", t)) \
+        | set(re.findall(r"(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=", t))
+    for grp in re.findall(r"(?:const|let|var)\s*\{([^}]*)\}\s*=", t):   # 解构出来的（docx 那几个）
+        defined |= {x.strip().split(':')[-1].strip() for x in grp.split(',') if x.strip()}
+    builtin = {
+        "if", "for", "while", "switch", "catch", "return", "typeof", "function", "new",
+        "String", "Number", "Boolean", "Object", "Array", "Math", "JSON", "Date", "Promise",
+        "Error", "RegExp", "Set", "Map", "parseInt", "parseFloat", "isNaN", "fetch", "atob",
+        "setTimeout", "setInterval", "clearTimeout", "clearInterval", "encodeURIComponent",
+        "decodeURIComponent", "TextDecoder", "TextEncoder", "AbortController", "Blob", "URL",
+        "requestAnimationFrame", "structuredClone", "queueMicrotask",
+    }
+    missing = sorted(x for x in called if x not in defined and x not in builtin)
+    assert not missing, ("抄来的引擎块用到了页面没定义的函数：%s —— 把它们一并抄过来，"
+                         "否则只在少见分支（如空响应）才炸" % ", ".join(missing))
+
     # 标签配对自检（div/script/style/select 开闭数一致）
     for tagname in ["div", "script", "style", "select", "textarea"]:
         o = len(re.findall(r"<%s[\s>]" % tagname, t))

@@ -82,9 +82,17 @@ function defaultAnswer(userMsg) {
   if (/列一份文章目录/.test(userMsg))
     return Array.from({ length: 16 }, (_, i) => '第' + (i + 1) + '章、章名' + (i + 1) + ' —— 落一件事').join('\n');
   if (/继续写这篇文章的第/.test(userMsg)) return '章节正文。'.repeat(60);
-  if (/你是评审/.test(userMsg)) return '总分：152\n五维：S=150 D=151 E=152 I=153 F=150\n判级：典范级';
-  if (/请先做体检/.test(userMsg)) return '闸一：分数 8/10 ｜ 打架点一句话：三方对同一件事判了相反的处方\n闸二：同源度 低\n闸三：无近邻\n总判：放行';
-  return '产物：一段假的工序输出。';
+  if (/你是评审/.test(userMsg)) return '总分：152\n五维：S=150 D=151 E=152 I=153 F=150\n判级：典范级\n最该补的一刀：' + '再往下切一层。'.repeat(6);
+  if (/请先做体检/.test(userMsg)) return gateOK();
+  return '产物：一段假的工序输出。'.repeat(6);
+}
+function gateOK() {
+  return '闸一：分数 8/10 ｜ 打架点一句话：三方对同一件事判了相反的处方 ｜ 结局对立：有 ｜ 三方各自的硬证据：各有一条\n' +
+    '闸二：同源度 低 ｜ 共享零件：无 ｜ 建议撞点：落在处方相反那一处\n闸三：最近的已发篇目：无 ｜ 处置：可发\n总判：放行';
+}
+function gateBad(score) {
+  return '闸一：分数 ' + score + '/10 ｜ 打架点一句话：其实是侧重不同 ｜ 结局对立：无 ｜ 三方各自的硬证据：说不上来\n' +
+    '闸二：同源度 高 ｜ 共享零件：同一套框架\n闸三：与已发篇目同族\n总判：换源';
 }
 function sseFor(text) {
   const out = ['data: ' + JSON.stringify({ choices: [{ delta: { reasoning_content: '思考…' } }] }) + '\n\n'];
@@ -456,34 +464,100 @@ function setStudent(c, slug) {
   });
 
   await step('十五、闸一低分要告警（不阻断，但要说清）', async () => {
-    const c = await boot({ answer: u => /请先做体检/.test(u)
-      ? '闸一：分数 3/10 ｜ 打架点一句话：其实是互补\n闸二：同源度 高\n闸三：无\n总判：换源'
-      : defaultAnswer(u) });
+    const c = await boot({ answer: u => /请先做体检/.test(u) ? gateBad(3) : defaultAnswer(u) });
     pickModeA(c); c.$('apiKey').value = 'sk-fake'; c.click('#goBtn');
     await waitFor(() => /闸一只给了/.test(c.$('errBox').textContent), 8000);
     ok('低分时明确提示"多半是互补不是打架"', /闸一只给了 3\/10/.test(c.$('errBox').textContent), c.$('errBox').textContent);
     ok('提示了下一步该怎么办', /建议换一位学员或改手挑/.test(c.$('errBox').textContent), c.$('errBox').textContent);
   });
 
-  await step('十六、成文带术语要被抓（上站硬门槛）', async () => {
-    const c = await boot({ answer: u => /继续写这篇文章的第/.test(u)
-      ? '这一章讲显露与特征纠缠，还引了发生学。'.repeat(20) : defaultAnswer(u) });
-    pickModeA(c);
-    const done = await runPipeline(c);
-    ok('流程照样走完（不静默失败）', done);
-    ok('成文格标出术语残留', /术语残留/.test(c.$('stat-write').textContent), c.$('stat-write').textContent);
-    ok('红字点名是哪些词', /显露/.test(c.$('errBox').textContent) && /特征纠缠/.test(c.$('errBox').textContent), c.$('errBox').textContent);
-    ok('说明这是上站硬门槛', /硬门槛/.test(c.$('errBox').textContent));
+  await step('十六、成文带术语：自动改姓重写一次', async () => {
+    let round = 0;
+    const c = await boot({ answer: u => {
+      if (/继续写这篇文章的第/.test(u)) {
+        return /上一稿的问题/.test(u)
+          ? '这一章改用大白话，讲的是账本记不下的那样东西。'.repeat(20)
+          : '这一章讲显露与特征纠缠，还引了发生学。'.repeat(20);
+      }
+      if (/列一份文章目录/.test(u)) { round++; }
+      return defaultAnswer(u);
+    } });
+    const done = await runPipeline(c, 30000);
+    ok('跑得完', done, c.$('stat-review').textContent);
+    ok('成文重写了一遍（目录出了两次）', round === 2, '实际 ' + round + ' 次');
+    ok('重写时把违规词带回去点名', c.calls.some(x => /上一稿的问题[\s\S]*显露/.test(x.user)));
+    ok('改完术语零残留', /术语零残留/.test(c.$('stat-write').textContent), c.$('stat-write').textContent);
+    ok('横幅记下了自动修的这一笔', /自动改姓重写/.test(c.$('doneBanner').textContent), c.$('doneBanner').textContent);
   });
 
-  await step('十七、评审不到 150 要点名回炉', async () => {
-    const c = await boot({ answer: u => /你是评审/.test(u)
-      ? '总分：138\n五维：S=140 D=139 E=132 I=130 F=130\n判级：偏低\n回炉：近邻划界' : defaultAnswer(u) });
-    pickModeA(c);
-    await runPipeline(c);
-    ok('状态条给出创新智商 138', /创新智商 138/.test(c.$('stat-review').textContent), c.$('stat-review').textContent);
-    ok('评审格提示回炉', /回炉/.test(c.doc.getElementById('stage-review').textContent));
-    ok('不到 150 的格子不标成已完成', !c.doc.getElementById('stage-review').classList.contains('done'));
+  await step('十六之二、改写一遍仍带术语就不再空转', async () => {
+    const c = await boot({ answer: u => /继续写这篇文章的第/.test(u)
+      ? '这一章讲显露与特征纠缠，还引了发生学。'.repeat(20) : defaultAnswer(u) });
+    const done = await runPipeline(c, 30000);
+    ok('跑得完（不静默失败）', done);
+    ok('只重写一次就收手', (c.calls.filter(x => /列一份文章目录/.test(x.user)) || []).length === 2);
+    ok('如实说要手工改', /仍有术语残留/.test(c.$('errBox').textContent), c.$('errBox').textContent);
+    ok('横幅把术语残留亮出来', /术语残留/.test(c.$('doneBanner').textContent));
+  });
+
+  await step('十七、评审不到 150：自动回炉，第二轮过线', async () => {
+    let rv = 0;
+    const c = await boot({ answer: u => {
+      if (/你是评审/.test(u)) {
+        rv++;
+        return rv === 1
+          ? '总分：138\n五维：S=140 D=139 E=132 I=130 F=130\n判级：偏低\n若总分<150：回炉到「近邻划界」，把最近的邻居再切一刀。'
+          : '总分：152\n五维：S=150 D=151 E=152 I=153 F=150\n判级：典范级';
+      }
+      return defaultAnswer(u);
+    } });
+    const done = await runPipeline(c, 40000);
+    ok('评审跑了两轮', rv === 2, '实际 ' + rv + ' 轮');
+    ok('回炉回到了评审点名的那一格（近邻划界）',
+      (c.calls.filter(x => /划清界线/.test(x.user)) || []).length === 2,
+      (c.calls.filter(x => /划清界线/.test(x.user)) || []).length + ' 次');
+    ok('第二轮读出 152', /创新智商 152/.test(c.$('stat-review').textContent), c.$('stat-review').textContent);
+    ok('横幅写明过线', /过线/.test(c.$('doneBanner').textContent), c.$('doneBanner').textContent);
+    ok('横幅记下回炉这一笔', /回炉/.test(c.$('doneBanner').textContent));
+    ok('跑完了', done);
+  });
+
+  await step('十七之一、评审两轮都不过线就收手（不无限回炉）', async () => {
+    let rv = 0;
+    const c = await boot({ answer: u => {
+      if (/你是评审/.test(u)) { rv++; return '总分：138\n五维：S=140 D=139 E=132 I=130 F=130\n判级：偏低\n回炉：涌现'; }
+      return defaultAnswer(u);
+    } });
+    await runPipeline(c, 45000);
+    ok('最多回炉两轮（评审三次）', rv === 3, '实际评审 ' + rv + ' 次');
+    ok('回炉去的是评审点名的涌现格',
+      (c.calls.filter(x => /五重检验/.test(x.user)) || []).length === 3,
+      (c.calls.filter(x => /五重检验/.test(x.user)) || []).length + ' 次');
+    ok('横幅如实说没过线', /未过线/.test(c.$('doneBanner').textContent), c.$('doneBanner').textContent);
+  });
+
+  await step('十七之六、一趟空答自动降档重来', async () => {
+    let n = 0;
+    const c = await boot({ answer: u => {
+      if (/五重检验/.test(u)) { n++; return n === 1 ? '' : defaultAnswer(u); }
+      return defaultAnswer(u);
+    } });
+    const done = await runPipeline(c, 30000);
+    ok('空答那一格重来了一次', n === 2, '实际 ' + n + ' 次');
+    const em = c.calls.filter(x => /五重检验/.test(x.user));
+    ok('重来的那趟降了档（≤4000）', em.length === 2 && em[1].max_tokens <= 4000, em.map(x => x.max_tokens).join('→'));
+    ok('照样跑到底', done);
+    ok('横幅记下这一笔', /降档/.test(c.$('doneBanner').textContent), c.$('doneBanner').textContent);
+
+    // 不只是"空"要重来——短到不成产物（<30 字）也要重来，否则一句"好的"会被当成合格产物往下传
+    let k = 0;
+    const c2 = await boot({ answer: u => {
+      if (/自组织聚类/.test(u)) { k++; return k === 1 ? '好的，我明白了。' : defaultAnswer(u); }
+      return defaultAnswer(u);
+    } });
+    const done2 = await runPipeline(c2, 30000);
+    ok('短到不成产物的那趟也重来了', k === 2, '实际 ' + k + ' 次');
+    ok('重来后照样跑到底', done2);
   });
 
   await step('十七之二、手挑模式仍然可用（选篇格自动跳过）', async () => {
@@ -514,9 +588,7 @@ function setStudent(c, slug) {
     const c = await boot({ answer: u => {
       if (/请先做体检/.test(u)) {
         gateCall++;
-        return gateCall === 1
-          ? '闸一：分数 3/10 ｜ 打架点一句话：其实是互补\n总判：换源'
-          : '闸一：分数 8/10 ｜ 打架点一句话：三方判了相反的处方\n总判：放行';
+        return gateCall === 1 ? gateBad(3) : gateOK();
       }
       return defaultAnswer(u);
     } });
@@ -529,8 +601,7 @@ function setStudent(c, slug) {
   });
 
   await step('十七之五、三组全不打架时不再空转（最多换两次）', async () => {
-    const c = await boot({ answer: u => /请先做体检/.test(u)
-      ? '闸一：分数 2/10 ｜ 打架点一句话：都是互补\n总判：换源' : defaultAnswer(u) });
+    const c = await boot({ answer: u => /请先做体检/.test(u) ? gateBad(2) : defaultAnswer(u) });
     const done = await runPipeline(c, 30000);
     ok('换到第 3 组就收手', /第 3 组/.test(c.$('srcState').textContent), c.$('srcState').textContent);
     ok('最后如实劝换学员或改手挑', /建议换一位学员或改手挑/.test(c.$('errBox').textContent), c.$('errBox').textContent);

@@ -154,13 +154,17 @@ select.model-select{max-width:340px}
     </div>
 
     <div class="row" style="margin-top:14px">
-      <button class="btn" id="goBtn">开始碰撞</button>
+      <button class="btn" id="goBtn">一键跑 · 挑三篇 → 碰撞 → 成文 → 评审</button>
       <button class="btn ghost" id="stopBtn" style="display:none">停下</button>
       <button class="btn ghost" id="resetBtn">清空重来</button>
       <label class="small" style="display:flex;gap:6px;align-items:center;margin-left:6px">
         <input type="checkbox" id="engineChk" style="width:auto"> 引擎室视图（显示 SDE 母语工序）
       </label>
       <span class="small" id="srcState"></span>
+    </div>
+    <div id="runbar" class="hidden" style="margin-top:14px">
+      <div class="gradebar"><i id="runfill" style="width:0%"></i></div>
+      <div class="small" id="runtext"></div>
     </div>
   </div>
 
@@ -170,12 +174,16 @@ select.model-select{max-width:340px}
   <!-- ④ 交付 -->
   <div class="card" id="deliver" style="display:none">
     <h2>④ 交付</h2>
+    <div id="doneBanner" class="small" style="margin-bottom:12px"></div>
     <div class="row">
       <button class="btn" id="dlDocx">下载终稿（Word）</button>
       <button class="btn ghost" id="dlPack">下载发布包（.md）</button>
       <button class="btn ghost" id="dlEngine">下载全过程（引擎室 .md）</button>
     </div>
     <div class="small" id="dlNote" style="margin-top:8px"></div>
+    <label class="small" style="display:flex;gap:6px;align-items:center;margin-top:10px">
+      <input type="checkbox" id="autoSaveChk" style="width:auto" checked> 跑完自动存盘（只在你选了文件夹时生效）
+    </label>
   </div>
 
 </div>
@@ -218,6 +226,8 @@ apiKeyEl.addEventListener('change', ()=>{ try{ localStorage.setItem(keyStoreName
 apiKeyEl.addEventListener('blur',   ()=>{ try{ localStorage.setItem(keyStoreName(), apiKeyEl.value.trim()); }catch(_){ } });
 refreshKeyUI();
 
+/* 借来的流式块会用到它（金点子发生器里定义在别处，抄块时不会跟过来——2026-07-29 被空响应场景逮到） */
+function escTxt(s){ return String(s||'').replace(/[<>&]/g, c=>({'<':'&lt;','>':'&gt;','&':'&amp;'}[c])); }
 function showErr(msg){ errBox.textContent='⚠ '+msg; errBox.style.display='block'; try{ errBox.scrollIntoView({behavior:'smooth',block:'center'}); }catch(_){ } }
 function hideErr(){ errBox.style.display='none'; }
 
@@ -293,7 +303,8 @@ const STAGES = [
   {id:'review',  n:'评审',     hint:'创新智商 · 不到 150 点名回炉',      tok:4000}
 ];
 const ST = { mode:'A', sources:[], out:{}, outline:'', article:'', score:null, running:false, abort:false,
-             manual:false, candidates:[], trioIdx:0, swaps:0 };
+             manual:false, candidates:[], trioIdx:0, swaps:0,
+             redoFrom:null, rounds:0, termRetry:0, termFix:null, notes:[] };
 
 /* ===================== 面板 ===================== */
 const panels = {};
@@ -342,6 +353,14 @@ function setStat(id, html, cls){
   if(cls) p.el.classList.add(cls);
 }
 function openStage(id){ const p=panels[id]; if(p) p.el.classList.add('open'); }
+function note(s){ ST.notes.push(s); const el=$('runtext'); if(el) el.textContent = s; }
+function progress(i, extra){
+  const bar=$('runbar'), fill=$('runfill'), txt=$('runtext');
+  if(!bar) return;
+  bar.classList.remove('hidden');
+  fill.style.width = Math.round((i/STAGES.length)*100)+'%';
+  txt.textContent = '第 '+(i+1)+'/'+STAGES.length+' 格 · '+STAGES[i].n+'　'+STAGES[i].hint + (extra?('　—— '+extra):'');
+}
 
 /* 引擎室开关：默认只把成文与评审两格展开，工序格收起 */
 $('engineChk').addEventListener('change', e=>{
@@ -753,12 +772,29 @@ async function callStage(id, prompt, tok, system){
   openStage(id);
   setStat(id, '<span class="spinner"></span> 运行中', 'run');
   const key = needKey(); if(!key) throw new Error('缺 Key');
-  const r = await streamChat(key, modelSel.value, system || sdeSystem(), prompt, p.out, p.stat, p.meta, tok);
+  let r = await streamChat(key, modelSel.value, system || sdeSystem(), prompt, p.out, p.stat, p.meta, tok);
+  // 空答＝多半是满功率把时间烧在思考上被杀。重答的意义是降档（降的是"想多久"，不是"能写多长"）
+  if(!r.text || r.text.replace(/\s/g,'').length < 30){
+    note('「'+id+'」第一趟没写出正文，自动降档重来一次。');
+    setStat(id, '<span class="spinner"></span> 空答，降档重试', 'run');
+    r = await streamChat(key, modelSel.value, system || sdeSystem(), prompt, p.out, p.stat, p.meta, Math.min(4000, tok));
+  }
   ST.out[id] = r.text || '';
   setStat(id, '✓ '+ (r.chars||0) +' 字 · '+ (r.secs||0) +'s', 'done');
   return ST.out[id];
 }
 
+/* 从评审文字里读出该回哪一格；读不出就回「近邻划界」——历次经验里这一格最常是短板 */
+const BACK_MAP = [['体检','gate'],['抽脊','spine'],['混沌碰撞','collide'],['碰撞','collide'],
+  ['扩候选','expand'],['候选互撞','collide2'],['自组织','selforg'],['涌现','emerge'],
+  ['近邻划界','demarc'],['划界','demarc'],['成文','write']];
+function backStageFrom(txt){
+  const seg = (txt||'').split(/回炉|回到/).slice(1).join(' ');
+  for(const [word, id] of BACK_MAP){
+    if(seg.indexOf(word) >= 0) return STAGES.findIndex(s=>s.id===id);
+  }
+  return STAGES.findIndex(s=>s.id==='demarc');
+}
 async function runStage(i){
   const s = STAGES[i];
   if(s.id==='select'){
@@ -797,6 +833,13 @@ async function runStage(i){
     const m = txt.match(/总分[：:]\s*(\d{2,3})/);
     ST.score = m ? parseInt(m[1],10) : null;
     renderScore();
+    if(ST.score !== null && ST.score < 150 && ST.rounds < 2){
+      ST.rounds++;
+      const back = backStageFrom(txt);
+      note('第 '+ST.rounds+' 轮回炉：'+ST.score+' 分，从「'+STAGES[back].n+'」重跑。');
+      showErr('创新智商 '+ST.score+'，不到 150——自动回炉：从「'+STAGES[back].n+'」重跑（第 '+ST.rounds+'/2 轮）。');
+      ST.redoFrom = back;
+    }
   }
   return txt;
 }
@@ -806,7 +849,10 @@ async function doWrite(){
   openStage(id);
   setStat(id, '<span class="spinner"></span> 列目录', 'run');
   const key = needKey(); if(!key) throw new Error('缺 Key');
+  const fix = ST.termFix;
+  ST.termFix = null;
   const head = [
+    fix ? ('【上一稿的问题：正文里混进了这些学派术语——'+fix.join('、')+'。这一稿一个都不许出现，全部换成大白话，别把句子改软。】') : '',
     '【撞出来的判断】', ST.out.emerge||'',
     '', '【与既有说法的划界】', (ST.out.demarc||'').slice(0,6000),
     '', '【三个源】', ST.sources.map((s,i)=>(i+1)+'. '+s.title+(s.url?('　'+s.url):'')).join('\n')
@@ -850,7 +896,14 @@ async function doWrite(){
   const words = ST.article.replace(/\s/g,'').length;
   setStat(id, '✓ '+words+' 字 '+(hits.length? ('· ⚠ 术语残留 '+hits.join('、')) : '· 术语零残留'), 'done');
   if(hits.length){
-    showErr('正文里还留着学派术语：'+hits.join('、')+'。点「重跑本格」重写，或用「编辑产物」手工改掉——这一条是上站硬门槛。');
+    if(ST.termRetry < 1){
+      ST.termRetry++; ST.termFix = hits;
+      note('正文里混进了学派术语（'+hits.join('、')+'），自动改姓重写一遍。');
+      showErr('正文里混进了学派术语：'+hits.join('、')+'——正在自动改姓重写一遍。');
+      ST.redoFrom = STAGES.findIndex(s=>s.id==='write');
+      return ST.article;
+    }
+    showErr('改写一遍之后仍有术语残留：'+hits.join('、')+'。用「编辑产物」手工改掉——这一条是上站硬门槛。');
   }
   $('deliver').style.display='';
   return ST.article;
@@ -871,19 +924,50 @@ function renderScore(){
 
 async function runFrom(a, b){
   if(ST.running) return;
-  ST.running = true; ST.abort = false;
+  ST.running = true; ST.abort = false; ST.redoFrom = null;
   goBtn.disabled = true; $('stopBtn').style.display='';
+  let guard = 0;
   try{
-    for(let i=a; i<=b; i++){
+    let i = a;
+    while(i <= b){
       if(ST.abort) break;
+      if(++guard > STAGES.length * 4) throw new Error('回炉次数异常，已停下以免空转。');
+      progress(i);
       await runStage(i);
+      if(ST.redoFrom !== null && ST.redoFrom !== undefined){   // 自动回炉／自动改姓
+        i = ST.redoFrom; ST.redoFrom = null; continue;
+      }
+      i++;
     }
+    if(!ST.abort && b === STAGES.length-1 && ST.article) await deliver();
   }catch(e){
     if(String(e.message||e) !== '已停下') showErr(e.message||String(e));
     setStat(STAGES[Math.min(a,STAGES.length-1)].id, '中断');
   }finally{
     ST.running = false; goBtn.disabled = false; $('stopBtn').style.display='none';
   }
+}
+
+/* 跑完就交付：亮横幅、滚到成品；选了文件夹的话直接存盘，不必再点 */
+async function deliver(){
+  $('deliver').style.display='';
+  const words = ST.article.replace(/\s/g,'').length;
+  const hits = termHits(ST.article);
+  const bits = [
+    '成品 '+words+' 字',
+    ST.score==null ? '评审未读到分数' : ('创新智商 '+ST.score+(ST.score>=150?'（过线）':'（未过线，已回炉 '+ST.rounds+' 轮）')),
+    hits.length ? ('⚠ 术语残留：'+hits.join('、')) : '术语零残留',
+    ST.mode==='A' && !ST.manual ? ('三篇由基底挑（第 '+(ST.trioIdx+1)+' 组）') : '三篇由你指定'
+  ];
+  $('doneBanner').innerHTML = '✓ 跑完了。' + bits.join('　·　') +
+    (ST.notes.length ? ('<br><span style="color:var(--muted)">中途自动修了：'+ST.notes.join('　')+'</span>') : '');
+  progress(STAGES.length-1, '完成');
+  const auto = $('autoSaveChk') && $('autoSaveChk').checked;
+  const hasDir = window.WDSSaveDir && window.WDSSaveDir.supported() && window.WDSSaveDir.name();
+  if(auto && hasDir){
+    try{ $('dlDocx').click(); $('dlPack').click(); $('dlEngine').click(); }catch(e){ }
+  }
+  try{ $('deliver').scrollIntoView({behavior:'smooth', block:'start'}); }catch(e){ }
 }
 
 goBtn.addEventListener('click', async ()=>{
@@ -897,9 +981,10 @@ goBtn.addEventListener('click', async ()=>{
     if(ST.sources.length) $('srcState').textContent = '三个源已就位：'+ST.sources.map(s=>s.title.slice(0,12)).join(' × ');
     else $('srcState').textContent = '交给基底挑三篇…';
   }catch(e){
-    showErr(e.message||String(e)); goBtn.disabled=false; goBtn.textContent='开始碰撞'; return;
+    showErr(e.message||String(e)); goBtn.disabled=false;
+    goBtn.textContent='一键跑 · 挑三篇 → 碰撞 → 成文 → 评审'; return;
   }
-  goBtn.textContent = '开始碰撞';
+  goBtn.textContent = '一键跑 · 挑三篇 → 碰撞 → 成文 → 评审';
   goBtn.disabled = false;
   await runFrom(0, STAGES.length-1);
 });
@@ -907,6 +992,8 @@ $('stopBtn').addEventListener('click', ()=>{ ST.abort = true; });
 $('resetBtn').addEventListener('click', ()=>{
   ST.out = {}; ST.article=''; ST.outline=''; ST.score=null; ST.sources=[];
   ST.candidates=[]; ST.trioIdx=0; ST.swaps=0;
+  ST.redoFrom=null; ST.rounds=0; ST.termRetry=0; ST.termFix=null; ST.notes=[];
+  $('runbar').classList.add('hidden'); $('doneBanner').innerHTML='';
   STAGES.forEach(s=>{
     panels[s.id].out.innerHTML = '<span class="placeholder">还没跑到这一格。</span>';
     setStat(s.id, '待命');
