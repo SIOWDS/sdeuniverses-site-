@@ -998,6 +998,38 @@ function setStudent(c, slug) {
     ok('跑到底', done, c.$('stat-review').textContent);
   });
 
+  await step('二十三之九、真机故障：提名不按格式给编号（四层兜底逐个验）', async () => {
+    // ① 写成「第3篇」而不是 #3
+    const a = await boot({ answer: u => /【文章清单】/.test(u)
+      ? ('理由若干。'.repeat(8) + '\n种子：第1篇、第2篇、第3篇 ｜ 矛盾轴：撤手的三种评价') : defaultAnswer(u) });
+    await runPipeline(a, 45000);
+    ok('「第N篇」这种写法也认', /定标/.test(a.$('stat-select').textContent), a.$('stat-select').textContent);
+    ok('认出来的是前三篇', /种子：留白 × 伪生 × 撤土/.test(a.$('srcState').textContent), a.$('srcState').textContent);
+
+    // ② 通篇不写编号，只点名标题
+    const b = await boot({ answer: u => /【文章清单】/.test(u)
+      ? ('我选《角力》《反循环》《同意》这三篇，它们在同一件事上给了相反的处方。'.repeat(3)) : defaultAnswer(u) });
+    await runPipeline(b, 45000);
+    ok('只点标题也能靠反查救回来', /定标/.test(b.$('stat-select').textContent), b.$('stat-select').textContent);
+    ok('反查到的正是那三篇', /角力/.test(b.$('srcState').textContent) && /同意/.test(b.$('srcState').textContent),
+      b.$('srcState').textContent);
+
+    // ③ 真的什么都没给：作废重提，且回灌的话要说人话
+    let nom = 0;
+    const c = await boot({ answer: u => {
+      if (/【文章清单】/.test(u)) { nom++; return nom === 1
+        ? '这几篇都不错，我说不好选哪三篇。'.repeat(4) : defaultAnswer(u); }
+      return defaultAnswer(u);
+    } });
+    await runPipeline(c, 45000);
+    const log = c.$('out-select').parentNode.querySelector('.sel-log').textContent;
+    ok('这一轮作废并重提', /没读出编号/.test(log), log.slice(0, 120));
+    const nom2 = c.calls.filter(x => /【文章清单】/.test(x.user))[1];
+    ok('回灌的话说人话（不是 #0 #0 #0）', nom2 && /没按格式给编号，这一轮不算数/.test(nom2.user) && !/#0/.test(nom2.user));
+    ok('格式要求提到了调令最前面', nom2 && /先记住怎么收尾/.test(nom2.user));
+    ok('第二轮照样定标', /定标/.test(c.$('stat-select').textContent), c.$('stat-select').textContent);
+  });
+
   await step('二十四、术语闸本身', async () => {
     const c = await boot();
     ok('能抓出多词', c.win.termHits('这里有显露、特征纠缠和发生学。').length >= 3);
