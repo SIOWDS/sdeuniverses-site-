@@ -3688,8 +3688,27 @@ export default {
     //    任何一篇都不会因为迁移做到一半而 404。桶还没绑定时（env.PDFS 不存在）整段等于不存在。
     // ③ 只认 /students/**.pdf —— 别的目录不在这次迁移范围内。
     if ((request.method === "GET" || request.method === "HEAD") && env.PDFS && /^\/students\/[^?]+\.pdf$/i.test(url.pathname)) {
+      const _key = decodeURIComponent(url.pathname.slice(1));
+      const _hasRange = !!request.headers.get("range");
+      // ④ **必须自己加一层边缘缓存** —— 这是从"静态资源"换到"Worker+R2"最容易踩空的一脚：
+      //    静态资源本来就铺在 Cloudflare 边缘上；而 Worker 用 R2 binding 读出来的响应**不会自动进 CDN 缓存**，
+      //    不做这层，每一次点开 PDF 都要回桶所在的那个区域取一趟，读者那边就是肉眼可见的变慢。
+      //    做法：无 Range 的整份请求走 caches.default（命中即边缘出，连 R2 都不碰）；带 Range 的直接问 R2
+      //    （R2 原生按段取，很便宜；而且 206 本来也存不进 Cache API）。
+      const _cache = (typeof caches !== "undefined" && caches.default) ? caches.default : null;
+      const _ck = new Request(url.origin + url.pathname, { method: "GET" });
+      if (_cache && !_hasRange) {
+        try {
+          const hit = await _cache.match(_ck);
+          if (hit) {
+            const hh = new Headers(hit.headers);
+            hh.set("x-served-from", "edge");
+            return new Response(request.method === "HEAD" ? null : hit.body, { status: hit.status, headers: hh });
+          }
+        } catch (e) {}
+      }
       try {
-        const key = decodeURIComponent(url.pathname.slice(1));
+        const key = _key;
         const obj = await env.PDFS.get(key, { range: request.headers, onlyIf: request.headers });
         if (obj) {
           const h = new Headers();
@@ -3707,7 +3726,12 @@ export default {
             return new Response(request.method === "HEAD" ? null : obj.body, { status: 206, headers: h });
           }
           h.set("content-length", String(obj.size));
-          return new Response(request.method === "HEAD" ? null : obj.body, { status: 200, headers: h });
+          const resp = new Response(obj.body, { status: 200, headers: h });
+          // 整份取到手了：留一份在边缘，下一位读者就不必再回桶。放 waitUntil 里，不占这次响应的时间。
+          if (_cache && !_hasRange && request.method === "GET") {
+            try { ctx.waitUntil(_cache.put(_ck, resp.clone())); } catch (e) {}
+          }
+          return request.method === "HEAD" ? new Response(null, { status: 200, headers: h }) : resp;
         }
       } catch (e) { /* R2 出任何岔子都不许让读者看不到文章：直接落到下面的 ASSETS */ }
     }

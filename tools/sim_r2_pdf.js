@@ -28,7 +28,14 @@ console.log("\n[一] 供给：R2 优先、落空回落、URL 不变");
      "R2 落空时既不自己回 404、也不在这里终结请求——落到函数末尾原有的 ASSETS 分支（两边并存的关键）");
   const tail = W.slice(W.indexOf("// Everything else: serve static assets"));
   ok(/const resp = await env\.ASSETS\.fetch\(request\);/.test(tail), "原有的静态资源兜底分支一字未动");
-  ok(/x-served-from", "r2"/.test(seg), "从 R2 出去的响应带个记号，线上一眼看得出走的哪条路");
+  ok(/x-served-from", "r2"/.test(seg) && /x-served-from", "edge"/.test(seg), "响应带记号（r2 / edge），线上一眼看得出这一次走的哪条路");
+  // ——最容易踩空的一脚：Worker 用 R2 binding 读出来的响应**不会自动进 CDN 缓存**（静态资源本来就在边缘上）。
+  // 没有这层，每次点开 PDF 都要回桶所在区域取一趟，读者那边就是肉眼可见的变慢。
+  ok(/caches\.default/.test(seg) && /_cache\.match\(_ck\)/.test(seg), "无 Range 的整份请求先问边缘缓存（命中就连 R2 都不碰）");
+  ok(/ctx\.waitUntil\(_cache\.put\(_ck, resp\.clone\(\)\)\)/.test(seg), "整份取到手后把副本留在边缘，且放 waitUntil 里、不占这次响应的时间");
+  ok(/if \(_cache && !_hasRange && request\.method === "GET"\)/.test(seg), "只缓存 GET 的整份 200——206 本来也存不进 Cache API");
+  ok(/new Request\(url\.origin \+ url\.pathname, \{ method: "GET" \}\)/.test(seg), "缓存键只取 URL（不把 Range 头带进键里，免得每个分段各占一条）");
+  ok(/typeof caches !== "undefined" && caches\.default/.test(seg), "Cache API 不可用时自动降级，不报错");
 }
 
 console.log("\n[二] 搬运：在边缘自己搬，能力收窄到无害");
