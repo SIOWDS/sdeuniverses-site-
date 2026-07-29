@@ -610,7 +610,7 @@ function setStudent(c, slug) {
     const em = c.calls.filter(x => /五重检验/.test(x.user));
     ok('重来的那趟降了档（≤4000）', em.length === 2 && em[1].max_tokens <= 4000, em.map(x => x.max_tokens).join('→'));
     ok('照样跑到底', done);
-    ok('横幅记下这一笔', /降档/.test(c.$('doneBanner').textContent), c.$('doneBanner').textContent);
+    ok('横幅记下这一笔', /降预算|快速档|自动修了/.test(c.$('doneBanner').textContent), c.$('doneBanner').textContent);
 
     // 不只是"空"要重来——短到不成产物（<30 字）也要重来，否则一句"好的"会被当成合格产物往下传
     let k = 0;
@@ -977,8 +977,9 @@ function setStudent(c, slug) {
       return defaultAnswer(u);
     } });
     const done = await runPipeline(c, 45000);
-    ok('空答后自动降档重来一趟', merge === 2, '实际 ' + merge + ' 趟');
-    ok('重试那一趟的调令里点明"别铺陈"', c.calls.some(x => /只顾着想、没写出正文/.test(x.user)));
+    ok('快速档空答后用满功率补一趟', merge === 2, '实际 ' + merge + ' 趟');
+    ok('两趟用的是不同档位', new Set(c.calls.filter(x => /合成一份/.test(x.user)).map(x => x.model)).size === 2,
+      c.calls.filter(x => /合成一份/.test(x.user)).map(x => x.model).join(','));
     ok('两趟都空就拿分段心得兜底', /用分段心得当底盘/.test(c.$('stat-warmup').textContent), c.$('stat-warmup').textContent);
     const gate = c.calls.find(x => /请先做体检/.test(x.user));
     ok('后面每一格照样拿得到底盘（不空转）', gate && /内化后写下的心得/.test(gate.system));
@@ -1049,6 +1050,34 @@ function setStudent(c, slug) {
     await runPipeline(c, 45000);
     ok('红字点名改用 B 模式', /改用「B · 三人各一篇」/.test(c.$('errBox').textContent), c.$('errBox').textContent);
     ok('也说清了为什么（一个人的文集整片朝一个方向）', /整片朝同一个方向/.test(c.$('errBox').textContent));
+  });
+
+  await step('二十三之十二、档位分工：内化走快速档，碰撞与成文满功率', async () => {
+    const c = await boot();
+    await runPipeline(c, 45000);
+    const warm = c.calls.filter(x => /内功的第|合成一份/.test(x.user));
+    ok('内化那几趟走的是快速档', warm.length >= 4 && warm.every(x => /flash/.test(x.model || '')),
+      Array.from(new Set(warm.map(x => x.model))).join(','));
+    const think = c.calls.filter(x => /请先做体检|五重检验|继续写这篇文章的第|【文章清单】/.test(x.user));
+    ok('碰撞与成文全程满功率', think.length >= 4 && think.every(x => /pro/.test(x.model || '')),
+      Array.from(new Set(think.map(x => x.model))).join(','));
+  });
+
+  await step('二十三之十三、满功率连空两趟就换快速档（真机的老坑）', async () => {
+    let gate = 0;
+    const c = await boot({ answer: u => {
+      if (/请先做体检/.test(u)) { gate++; return gate <= 2 ? '' : gateOK(); }   // 前两趟只思考不出正文
+      return defaultAnswer(u);
+    } });
+    const done = await runPipeline(c, 45000);
+    ok('体检打了三趟', gate === 3, '实际 ' + gate + ' 趟');
+    const calls = c.calls.filter(x => /请先做体检/.test(x.user));
+    ok('前两趟满功率、第三趟换快速档', /pro/.test(calls[0].model) && /pro/.test(calls[1].model) && /flash/.test(calls[2].model),
+      calls.map(x => x.model).join(' → '));
+    ok('第三趟的调令里叫它别长考', /不要长考/.test(calls[2].user));
+    ok('横幅记下了中途自动修过', /自动修了/.test(c.$('doneBanner').textContent), c.$('doneBanner').textContent);
+    ok('体检那一格最终有产出', /✓/.test(c.$('stat-gate').textContent), c.$('stat-gate').textContent);
+    ok('照样跑到底', done, c.$('stat-review').textContent);
   });
 
   await step('二十四、术语闸本身', async () => {

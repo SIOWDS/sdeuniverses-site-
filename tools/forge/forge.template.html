@@ -137,6 +137,7 @@ select.model-select{max-width:340px}
       <label class="lbl">学员</label>
       <select id="stuSel"></select>
       <div class="small" style="margin:8px 0" id="autoNote">这位学员的全部文章会交给基底：它提名三篇 → 当场验打架烈度 → 不过就换一组重提，<b>一直找到三个种子为止</b>。</div>
+      <div class="small" style="margin:6px 0;color:var(--muted)">内化那一格走<b>快速档</b>（压缩活，快而稳）；碰撞与成文全程<b>满功率</b>。</div>
       <div class="row" style="margin:6px 0">
         <label class="small" style="display:flex;gap:6px;align-items:center">最多试
           <select id="maxRounds" style="width:auto;padding:4px 8px"><option>3</option><option selected>6</option><option>10</option></select> 组
@@ -948,14 +949,37 @@ function needKey(){
 }
 /* 所有对基底的直连调用都走这里：空答（<30 非空白字）就降档重来一趟。
    降的是"想多久"不是"能写多长"——满功率把时间全烧在思考上、正文 0 字，是这台机器最常见的失败。 */
+function flashModel(){ return parseModel(modelSel.value).vendor + ':flash'; }
+/* 内化是"把十万字压成心得"的压缩活，不是思考活：默认就走快速档，快、稳、不烧长考；
+   出不来才回头用满功率试一趟（跟 askStream 反着来）。 */
+async function askFast(system, prompt, box, statEl, metaEl, tok, label){
+  const key = needKey(); if(!key) throw new Error('缺 Key');
+  let r = await streamChat(key, flashModel(), system, prompt, box, statEl, metaEl, tok);
+  if(emptyOut(r)){
+    note('「'+(label||'这一趟')+'」快速档没出正文，用满功率补一趟。');
+    if(statEl) statEl.innerHTML = '<span class="spinner"></span> 改用满功率补跑';
+    r = await streamChat(key, modelSel.value, system, prompt, box, statEl, metaEl, Math.min(3000, tok));
+  }
+  return r;
+}
+function emptyOut(r){ return !r || !r.text || r.text.replace(/\s/g,'').length < 30; }
+/* 所有对基底的直连调用都走这里，三次机会：
+   ① 满功率原样跑 ② 同一档降预算＋"别铺陈" ③ **换同厂商快速档（关思考）**
+   真机反复证明：吃掉整趟的是"想多久"，不是"能写多长"——只降预算救不回来，必须把思考关掉。 */
 async function askStream(system, prompt, box, statEl, metaEl, tok, label){
   const key = needKey(); if(!key) throw new Error('缺 Key');
   let r = await streamChat(key, modelSel.value, system, prompt, box, statEl, metaEl, tok);
-  if(!r.text || r.text.replace(/\s/g,'').length < 30){
-    note('「'+(label||'这一趟')+'」没写出正文，降档重来一次。');
-    if(statEl) statEl.innerHTML = '<span class="spinner"></span> 空答，降档重试';
+  if(emptyOut(r)){
+    note('「'+(label||'这一趟')+'」没写出正文，降预算重来一次。');
+    if(statEl) statEl.innerHTML = '<span class="spinner"></span> 空答，降预算重试';
     const p2 = '【上一趟只顾着想、没写出正文。这一趟别铺陈，直接把结果写出来，短一点没关系。】\n\n' + prompt;
     r = await streamChat(key, modelSel.value, system, p2, box, statEl, metaEl, Math.min(3000, tok));
+  }
+  if(emptyOut(r)){
+    note('「'+(label||'这一趟')+'」两趟都没出正文，改用快速档（关思考）跑一趟。');
+    if(statEl) statEl.innerHTML = '<span class="spinner"></span> 改用快速档';
+    const p3 = '【前两趟都只在思考、没交出正文。这一趟不要长考，直接写结果。】\n\n' + prompt;
+    r = await streamChat(key, flashModel(), system, p3, box, statEl, metaEl, Math.min(3000, tok));
   }
   return r;
 }
@@ -963,14 +987,8 @@ async function callStage(id, prompt, tok, system){
   const p = panels[id];
   openStage(id);
   setStat(id, '<span class="spinner"></span> 运行中', 'run');
-  const key = needKey(); if(!key) throw new Error('缺 Key');
-  let r = await streamChat(key, modelSel.value, system || sdeSystem(), prompt, p.out, p.stat, p.meta, tok);
-  // 空答＝多半是满功率把时间烧在思考上被杀。重答的意义是降档（降的是"想多久"，不是"能写多长"）
-  if(!r.text || r.text.replace(/\s/g,'').length < 30){
-    note('「'+id+'」第一趟没写出正文，自动降档重来一次。');
-    setStat(id, '<span class="spinner"></span> 空答，降档重试', 'run');
-    r = await streamChat(key, modelSel.value, system || sdeSystem(), prompt, p.out, p.stat, p.meta, Math.min(4000, tok));
-  }
+  // 三次机会全在 askStream 里：满功率 → 降预算 → 换快速档（关思考）
+  const r = await askStream(system || sdeSystem(), prompt, p.out, p.stat, p.meta, tok, id);
   ST.out[id] = r.text || '';
   setStat(id, '✓ '+ (r.chars||0) +' 字 · '+ (r.secs||0) +'s', 'done');
   return ST.out[id];
@@ -1058,7 +1076,7 @@ async function doWarmup(){
   const p = panels.warmup;
   openStage('warmup');
   await ASSETS_READY;
-  const sig = 'sde_forge_xinde_' + NEIGONG.length + '-' + HEART.length + '_' + modelSel.value;
+  const sig = 'sde_forge_xinde_' + NEIGONG.length + '-' + HEART.length + '_' + parseModel(modelSel.value).vendor;
   if(!ST.reWarm){
     let cached = ''; try{ cached = localStorage.getItem(sig) || ''; }catch(_){ }
     if(cached){
@@ -1090,7 +1108,7 @@ async function doWarmup(){
       '③ 这一段对"让三篇文章互撞出一条新判断"这件事有什么用：≤4 条。',
       '', '【原文】', chunks[k]
     ].join('\n');
-    const r = await askStream('你在内化 SDE 本体论与方法论，为接下来的二阶碰撞作业打底盘。只写心得，不发表感想。',
+    const r = await askFast('你在内化 SDE 本体论与方法论，为接下来的二阶碰撞作业打底盘。只写心得，不发表感想。',
       cp, box, p.stat, p.meta, 3000, '内功第'+(k+1)+'段');
     parts.push('【第'+(k+1)+'段】\n' + (r.text||''));
   }
@@ -1103,12 +1121,12 @@ async function doWarmup(){
     '三、碰撞心法转写——选源、抽脊、命名、涌现、划界各自的硬纪律；',
     '四、本次作业的十条铁律——每条一句、可执行，其中至少四条是"不许做什么"。',
     '不许写"我将""我会"这类表态，直接写内容。',
-    '', parts.map(x=>x.slice(0, 1600)).join('\n\n')
+    '', parts.map(x=>x.slice(0, 1000)).join('\n\n')
   ].join('\n');
   // 心法不塞进这一趟：它已逐格全文注入，重复塞只会把这一趟撑成"大任务＋满功率"，正文更容易吐不出来
   const box2 = document.createElement('div'); box2.className='out'; box2.style.marginTop='8px';
   p.out.parentNode.insertBefore(box2, p.out.nextSibling);
-  const m = await askStream('你在把读完的心得压成一份可执行的作业底盘。要密、要硬、不要客套。',
+  const m = await askFast('你在把读完的心得压成一份可执行的作业底盘。要密、要硬、不要客套。',
     mp, box2, p.stat, p.meta, 3600, '心得总纲');
   ST.xinde = m.text || '';
   if(ST.xinde.replace(/\s/g,'').length < 200){
