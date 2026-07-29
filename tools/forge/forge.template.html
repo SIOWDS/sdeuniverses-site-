@@ -332,6 +332,7 @@ function termHits(text){
 /* ===================== 工序表 ===================== */
 const MAX_SRC = 12000;        // 每个源喂进去的正文上限（字符）
 const TOK_HARD = 8000;        // 满功率档的硬上限——踩过两次，别再调大
+const WRITE_TOK = 32000;      // 成文单趟预算：一次写完两万字。DeepSeek/境外/M系/Kimi 吃得满；GLM/千问被各自 8192 钳住会截断（用户已知并接受）
 const STAGES = [
   {id:'warmup',  n:'内化',     hint:'把十万字内功与碰撞心法分块读完，写成一份心得当底盘', tok:3000},
   {id:'select',  n:'选篇',     hint:'随机 A → 找对立 B → 找同时顶两篇的 C，逐级放宽范围', tok:4000},
@@ -343,7 +344,7 @@ const STAGES = [
   {id:'selforg', n:'自组织',   hint:'撞出来的东西自己抱团，成暗流',      tok:6000},
   {id:'emerge',  n:'涌现',     hint:'收敛成一句谁单看都说不出的话',      tok:TOK_HARD},
   {id:'demarc',  n:'近邻划界', hint:'与既有说法逐一划清界线',            tok:TOK_HARD},
-  {id:'write',   n:'成文',     hint:'写成一篇两万字（分趟写）',          tok:4000},
+  {id:'write',   n:'成文',     hint:'一趟写完整篇两万字（不分段）',          tok:4000},
   {id:'review',  n:'评审',     hint:'创新智商 · 不到 150 点名回炉',      tok:4000}
 ];
 const ST = { mode:'A', sources:[], out:{}, outline:'', article:'', score:null, running:false, abort:false,
@@ -1546,31 +1547,32 @@ async function doWrite(){
   const chapters = ST.outline.split('\n').map(x=>x.trim()).filter(x=>/^[一二三四五六七八九十]+[、.]/.test(x) || /^\d+[、.]/.test(x));
   const total = chapters.length || 16;
 
-  // 二、分趟写（每趟三章）
+  // 二、一趟写完整篇（不分段）。DeepSeek 一趟能吐两万字；输出封顶的基底（GLM/千问 8192）会被截断，状态条如实标出
   ST.article = '';
-  const step = 3;
-  for(let k=0; k<total; k+=step){
-    if(ST.abort) throw new Error('已停下');
-    const part = chapters.slice(k, k+step);
-    setStat(id, '<span class="spinner"></span> 写第 '+(k+1)+'–'+Math.min(k+step,total)+' 章 / 共 '+total, 'run');
-    const tail = ST.article.slice(-700);
-    const cp = [
-      '继续写这篇文章的第 '+(k+1)+' 到第 '+Math.min(k+step,total)+' 章。每章 1000–1400 字，直接写正文，不要复述目录、不要写"接下来"。',
-      '这几章是：', part.join('\n') || '（按目录顺次）',
-      '', '【全文目录（供定位，不要照抄）】', ST.outline,
-      '', '【已写正文的结尾（接着往下写，别重复）】', tail || '（这是开头）',
-      '', head
-    ].join('\n');
-    const box = document.createElement('div'); box.className='out'; box.style.marginTop='8px';
-    p.out.parentNode.insertBefore(box, p.out.nextSibling);
-    const r = await askStream(writerSystem(), cp, box, p.stat, p.meta, 4000, '第'+(k+1)+'–'+Math.min(k+step,total)+'章');
-    ST.article += (ST.article? '\n\n':'') + (r.text||'');
-  }
+  setStat(id, '<span class="spinner"></span> 按目录一趟写完整篇（约两万字）', 'run');
+  const cp = [
+    '照下面的目录，把整篇文章**一次写完**，从第一章到最后一章，一气呵成。',
+    '· 每章 1000–1400 字，全篇约两万字；直接写正文，章名可作小标题，不要复述目录、不要写"接下来""下一章"。',
+    '· 中途不要停下来征求意见、不要写"（未完待续）"，直接把最后一章也写完。',
+    '', '【全文目录（照这个顺序写，写全，别跳章）】', ST.outline,
+    '', head
+  ].join('\n');
+  const r = await askStream(writerSystem(), cp, p.out, p.stat, p.meta, WRITE_TOK, '整篇一趟');
+  ST.article = r.text||'';
   ST.out.write = ST.article;
+  // 单趟输出可能被基底的 max_tokens 钳断（GLM/千问 8192 尤其明显）——字数太少或末尾没收尾就如实提示，不当它是完稿
+  const wc = ST.article.replace(/\s/g,'').length;
+  const lastCh = (ST.article.trim().slice(-1) || '');
+  const cutish = (wc < 8000 && !/[。！？」』）】…]/.test(lastCh)) || wc < 3000;
+  if(cutish){
+    ST.truncated = true;
+    note('这一趟只写出 '+wc+' 字'+(/[。！？」』）】…]/.test(lastCh)?'':'、且末尾像是被截断')+'——多半是这个基底一次输出的上限（如 GLM／千问封顶约一万一千字）。想要完整两万字，换 DeepSeek 这类能一次长输出的基底重跑本格。');
+    showErr('正文疑似被截断：只有 '+wc+' 字。换 DeepSeek 这类支持长输出的基底、点「重跑本格」可写完整篇；也可用「编辑产物」自行补全。');
+  } else { ST.truncated = false; }
   const terms = termHits(ST.article), traces = traceHits(ST.article);
   const hits = terms.concat(traces);
   const words = ST.article.replace(/\s/g,'').length;
-  setStat(id, '✓ '+words+' 字 '+(hits.length
+  setStat(id, (ST.truncated?'⚠ ':'✓ ')+words+' 字'+(ST.truncated?'（疑似被截断）':'')+' '+(hits.length
     ? ('· ⚠ '+(terms.length?('术语残留 '+terms.join('、')):'')+(terms.length&&traces.length?' ｜ ':'')+(traces.length?('工艺痕迹 '+traces.join('、')):''))
     : '· 术语零残留 · 无工艺痕迹'), 'done');
   if(hits.length){

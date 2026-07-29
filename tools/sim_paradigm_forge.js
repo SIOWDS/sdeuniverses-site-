@@ -105,7 +105,7 @@ function defaultAnswer(userMsg) {
   if (/一个主题观点/.test(userMsg) && /支撑观点/.test(userMsg)) return spineAnswer('三对全冲突');
   if (/列一份文章目录/.test(userMsg))
     return Array.from({ length: 16 }, (_, i) => '第' + (i + 1) + '章、章名' + (i + 1) + ' —— 落一件事').join('\n');
-  if (/继续写这篇文章的第/.test(userMsg)) return '章节正文。'.repeat(60);
+  if (/照下面的目录，把整篇文章/.test(userMsg)) return '正文若干句，够长，末尾有句号。'.repeat(700);
   if (/你是评审/.test(userMsg)) return '总分：152\n五维：S=150 D=151 E=152 I=153 F=150\n判级：典范级\n最该补的一刀：' + '再往下切一层。'.repeat(6);
   if (/请先做体检/.test(userMsg)) return gateOK();
   return '产物：一段假的工序输出。'.repeat(6);
@@ -370,11 +370,13 @@ function setStudent(c, slug) {
   });
 
   await step('五、预算纪律（满功率档的硬上限）', async () => {
-    const over = cA.calls.filter(c => c.max_tokens > 8000);
-    ok('没有任何一趟超过 8000', over.length === 0, over.map(c => c.max_tokens).join(','));
-    const w = cA.calls.filter(c => /继续写这篇文章的第/.test(c.user));
-    ok('成文分趟写（≥4 趟）', w.length >= 4, '实际 ' + w.length + ' 趟');
-    ok('成文每趟 ≤4000', w.every(c => c.max_tokens <= 4000));
+    // 成文那一趟是单趟长输出（32000），其余工序仍钳在 8000
+    const over = cA.calls.filter(c => c.max_tokens > 8000 && !/照下面的目录，把整篇文章/.test(c.user));
+    ok('成文之外没有任何一趟超过 8000', over.length === 0, over.map(c => c.max_tokens).join(','));
+    const w = cA.calls.filter(c => /照下面的目录，把整篇文章/.test(c.user));
+    ok('成文一趟写完整篇（不分段）', w.length === 1, '实际 ' + w.length + ' 趟');
+    ok('成文单趟预算够两万字（32000）', w[0] && w[0].max_tokens === 32000, w[0] && w[0].max_tokens);
+    ok('成文调令明令一次写完、别中途停', w[0] && /一次写完/.test(w[0].user) && /不要写"（未完待续）"|直接把最后一章也写完/.test(w[0].user));
     ok('体检那趟是 4000', (cA.calls.find(c => /请先做体检/.test(c.user)) || {}).max_tokens === 4000);
     ok('自组织那趟是 6000', (cA.calls.find(c => /自组织聚类/.test(c.user)) || {}).max_tokens === 6000);
     ok('用的是所选基底的模型串', cA.calls.every(c => /deepseek/.test(c.model || '')), (cA.calls[0] || {}).model);
@@ -435,11 +437,11 @@ function setStudent(c, slug) {
     const de = f(/划清界线/);
     ok('划界要 6–10 个近邻并落到可分辨判据', de && /6–10 个/.test(de.user) && /判据差在哪/.test(de.user));
     ok('划界把站内检索块垫了进去', de && /站内可参照的近邻材料/.test(de.user));
-    const wr = f(/继续写这篇文章的第/);
+    const wr = f(/照下面的目录，把整篇文章/);
     ok('成文 system 写死术语零容忍', wr && /不得出现任何学派术语/.test(wr.system));
     ok('成文 system 要求长句 ≤90 字', wr && /长句不超过 90 字/.test(wr.system));
     ok('成文调令要求直接写正文、不复述目录', wr && /不要复述目录/.test(wr.user));
-    ok('成文把已写结尾垫进去防重复', wr && /已写正文的结尾/.test(wr.user));
+    ok('成文调令带上目录、要求写全别跳章', wr && /照这个顺序写，写全，别跳章/.test(wr.user));
     ok('成文与工序用的是两套 system', wr && spine && wr.system !== spine.system);
     const rv = f(/你是评审/);
     ok('评审独立一趟、system 说明只评不写', rv && /只评不写/.test(rv.system));
@@ -459,7 +461,7 @@ function setStudent(c, slug) {
     cA.click('#stage-demarc button[data-act="cont"]');
     await waitFor(() => /创新智商/.test(cA.$('stat-review').textContent) && cA.calls.length > 3, 20000);
     const kinds = cA.calls.map(x => /划清界线/.test(x.user) ? 'demarc'
-      : (/继续写这篇文章的第|列一份文章目录/.test(x.user) ? 'write'
+      : (/照下面的目录，把整篇文章|列一份文章目录/.test(x.user) ? 'write'
       : (/你是评审/.test(x.user) ? 'review' : 'other')));
     ok('「从这里继续」只跑划界→成文→评审', kinds.length > 3 && kinds.every(x => ['demarc','write','review'].includes(x)),
       Array.from(new Set(kinds)).join(','));
@@ -602,10 +604,10 @@ function setStudent(c, slug) {
   await step('十六、成文带术语：自动改姓重写一次', async () => {
     let round = 0;
     const c = await boot({ answer: u => {
-      if (/继续写这篇文章的第/.test(u)) {
+      if (/照下面的目录，把整篇文章/.test(u)) {
         return /上一稿的问题/.test(u)
-          ? '这一章改用大白话，讲的是账本记不下的那样东西。'.repeat(20)
-          : '这一章讲显露与特征纠缠，还引了发生学。'.repeat(20);
+          ? '这一段改用大白话，讲的是账本记不下的那样东西，末尾有句号。'.repeat(200)
+          : '这一段讲显露与特征纠缠，还引了发生学，末尾有句号。'.repeat(200);
       }
       if (/列一份文章目录/.test(u)) { round++; }
       return defaultAnswer(u);
@@ -619,8 +621,8 @@ function setStudent(c, slug) {
   });
 
   await step('十六之二、改写一遍仍带术语就不再空转', async () => {
-    const c = await boot({ answer: u => /继续写这篇文章的第/.test(u)
-      ? '这一章讲显露与特征纠缠，还引了发生学。'.repeat(20) : defaultAnswer(u) });
+    const c = await boot({ answer: u => /照下面的目录，把整篇文章/.test(u)
+      ? '这一段讲显露与特征纠缠，还引了发生学，末尾有句号。'.repeat(200) : defaultAnswer(u) });
     const done = await runPipeline(c, 30000);
     ok('跑得完（不静默失败）', done);
     ok('只重写一次就收手', (c.calls.filter(x => /列一份文章目录/.test(x.user)) || []).length === 2);
@@ -983,7 +985,7 @@ function setStudent(c, slug) {
     ok('GPT 通道跑得完', done, c.$('stat-review').textContent);
     ok('走的是本站代理', c.calls.length > 0 && c.calls.every(x => /llm-proxy/.test(x.url)), (c.calls[0] || {}).url);
     ok('带了目标地址头', c.calls[0] && /openai\.com/.test(c.calls[0].headers['x-target-url'] || ''));
-    ok('预算同样不超 8000', c.calls.every(x => x.max_tokens <= 8000));
+    ok('预算同样不超 8000（成文单趟除外）', c.calls.every(x => x.max_tokens <= 8000 || /照下面的目录，把整篇文章/.test(x.user)));
     ok('零抛错', c.errors.length === 0, c.errors.slice(0, 2).join(' ｜ '));
   });
 
@@ -1036,7 +1038,7 @@ function setStudent(c, slug) {
   await step('二十三之五、成品不许留碰撞创新的痕迹', async () => {
     const c = await boot();
     await runPipeline(c, 40000);
-    const wr = c.calls.find(x => /继续写这篇文章的第/.test(x.user));
+    const wr = c.calls.find(x => /照下面的目录，把整篇文章/.test(x.user));
     ok('成文 system 明令不留做法痕迹', wr && /不许留下这篇文章是怎么做出来的痕迹/.test(wr.system));
     ok('点名禁掉工艺词', wr && /碰撞、对撞、撞出、涌现、暗流/.test(wr.system));
     ok('要求判断像本来就长在这门学科里', wr && /来路不必交代/.test(wr.system));
@@ -1050,14 +1052,14 @@ function setStudent(c, slug) {
   await step('二十三之六、正文带了工艺词就自动重写一遍', async () => {
     let wrote = 0;
     const c = await boot({ answer: u => {
-      if (/继续写这篇文章的第/.test(u)) { wrote++;
-        return wrote <= 6 ? ('这一章说明三篇文章碰撞之后涌现出的暗流。'.repeat(20)) : ('干净的正文。'.repeat(60)); }
+      if (/照下面的目录，把整篇文章/.test(u)) { wrote++;
+        return wrote === 1 ? ('这一段说明三篇文章碰撞之后涌现出的暗流，末尾有句号。'.repeat(200)) : ('干净的正文，末尾有句号。'.repeat(300)); }
       return defaultAnswer(u);
     } });
     const done = await runPipeline(c, 50000);
     ok('工艺痕迹被逮住', /工艺痕迹/.test(c.$('stat-write').textContent) || /无工艺痕迹/.test(c.$('stat-write').textContent));
-    ok('自动重写了一遍（成文跑了两轮）', wrote > 6, '共写了 ' + wrote + ' 趟');
-    ok('重写的调令里点名了痕迹词', c.calls.some(x => /继续写这篇文章的第/.test(x.user) && /做法的痕迹整句删掉/.test(x.user)));
+    ok('自动重写了一遍（成文跑了两趟）', wrote === 2, '共写了 ' + wrote + ' 趟');
+    ok('重写的调令里点名了痕迹词', c.calls.some(x => /照下面的目录，把整篇文章/.test(x.user) && /做法的痕迹整句删掉/.test(x.user)));
     ok('重写后干净了', /无工艺痕迹/.test(c.$('stat-write').textContent), c.$('stat-write').textContent);
     ok('跑到底', done, c.$('stat-review').textContent);
   });
@@ -1148,7 +1150,7 @@ function setStudent(c, slug) {
     const warm = c.calls.filter(x => /内功的第|合成一份/.test(x.user));
     ok('内化那几趟走的是快速档', warm.length >= 4 && warm.every(x => /flash/.test(x.model || '')),
       Array.from(new Set(warm.map(x => x.model))).join(','));
-    const think = c.calls.filter(x => /请先做体检|五重检验|继续写这篇文章的第|【文章清单】/.test(x.user));
+    const think = c.calls.filter(x => /请先做体检|五重检验|照下面的目录，把整篇文章|【A（已定，随机抽出）】/.test(x.user));
     ok('碰撞与成文全程满功率', think.length >= 4 && think.every(x => /pro/.test(x.model || '')),
       Array.from(new Set(think.map(x => x.model))).join(','));
   });
