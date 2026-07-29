@@ -80,6 +80,29 @@
   .kn a{color:var(--gold)}
   /* 输入文章 */
   .artchip{display:inline-flex;align-items:center;gap:7px;max-width:280px;font-size:12px;color:var(--gold);border:1px solid rgba(201,162,39,.4);border-radius:14px;padding:4px 10px}
+  /* 用户RAG（记忆更新）面板 */
+  .mbadge{font-style:normal;display:inline-block;margin-left:6px;min-width:16px;padding:1px 5px;border-radius:9px;background:var(--gold);color:#0B1F23;font-size:10.5px;font-weight:700;line-height:1.4}
+  .mem .box{width:min(680px,96vw)}
+  .memhd{font-size:12.5px;color:var(--dim);line-height:1.75;margin-bottom:12px}
+  .memhd b{color:var(--qing2)}
+  .memrow{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
+  .memprog{font-size:12px;color:var(--dim);flex:1;min-width:140px}
+  .memprof{border:1px solid var(--line);border-radius:10px;padding:11px 13px;margin-bottom:12px;font-size:13px;line-height:1.85;color:var(--ink);white-space:pre-wrap}
+  .memprof .pl{display:block;font-size:11.5px;color:var(--gold);letter-spacing:.5px;margin-bottom:5px}
+  .memit{border-top:1px solid var(--line);padding:11px 2px}
+  .memit .mt{display:flex;gap:8px;align-items:flex-start}
+  .memit .mn{flex:1;min-width:0;font-size:13.5px;color:var(--ink);line-height:1.6}
+  .memit .mm{font-size:11.5px;color:var(--dim);margin-top:3px}
+  .memit .mg{font-size:12.5px;color:var(--qing2);margin-top:5px;line-height:1.7}
+  .memit .mp{font-size:12.5px;color:var(--dim);margin-top:6px;line-height:1.8;white-space:pre-wrap;display:none}
+  .memit.on .mp{display:block}
+  .memit .mx{background:none;border:none;color:var(--dim);cursor:pointer;font-size:14px;line-height:1;padding:2px 4px;flex:none}
+  .memit .mx:hover{color:var(--gold)}
+  .memstale{color:var(--gold);font-size:11px;border:1px solid rgba(201,162,39,.4);border-radius:8px;padding:1px 6px;margin-left:6px}
+  .memsw{display:flex;gap:14px;align-items:center;flex-wrap:wrap;font-size:12.5px;color:var(--dim);border-top:1px solid var(--line);padding-top:11px;margin-top:4px}
+  .memsw label{display:inline-flex;gap:6px;align-items:center;cursor:pointer}
+  .memsw select{background:#0B1F23;color:var(--ink);border:1px solid var(--line);border-radius:7px;padding:3px 6px;font:inherit;font-size:12px}
+  .memnote{font-size:11.5px;color:var(--dim);line-height:1.75;margin-top:10px;opacity:.85}
   .artchip i{font-style:normal;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .artchip button{background:none;border:none;color:var(--dim);font-size:15px;line-height:1;cursor:pointer;padding:0}
   .arow{display:flex;gap:8px;align-items:center;margin:0 0 10px;flex-wrap:wrap}
@@ -110,6 +133,7 @@
     <button class="tbtn" id="bart">＋ 输入文章</button>
     <button class="tbtn" id="bclr" title="清空对话栏（本场心得与已载入的文章保留）">清空对话</button>
     <button class="tbtn" id="bhist" title="本机对话记录" hidden>↺ 历史</button>
+    <button class="tbtn" id="bmem" title="用户RAG系统更新：把本机全部历史对话摘要成可检索的长期记忆" hidden>⌾ 记忆更新<i class="mbadge" id="mbadge" hidden></i></button>
     <span class="artchip" id="artchip" hidden></span>
     <span class="turns" id="turns">剩余 100 次</span>
     <button class="tbtn" id="bsum" disabled>总结这场对话</button>
@@ -142,7 +166,7 @@
       <p>WDS 答你每一问的工序，<b>起手按问题种类三选一</b>：问"它是什么／什么关系"→ 从<b>三大方程</b>开局互问三维；问"怎么分析／从哪下手／给建议"→ 先认任务 DNA、从<b>六路径</b>开局；问"为什么会这样／怎么演变／为什么卡住"→ 从<b>123原理</b>开局（矛盾→结算→必追回写）。开局只定入口，不封另两件工具，且每一答说得出起手根据。聊到有东西了，点顶栏金色按钮：拟题与提纲之后六个部分逐段写成，约一万字，金点子取自这场对话里真正反直觉、可被检验的新判断。问对了，才算问过。</p>    </aside>
     <div class="chat">
       <div class="msgs" id="msgs">
-        <div class="hello"><b>与WDS对话SDE 的用途，是带你学习 SDE 思想体系、并把它用成能上手的智慧应用</b>——不是闲聊，而是带着你自己的真问题，在一问一答里把这套本体论学通、用活。<br>这里是<b>与WDS对话SDE</b>的高级会话界面。你发出第一问后，WDS 会先做<b>开工仪式</b>：通读满血 SDE 内功（本体论先验 ＋ 创新智商评估两部分）、亲手写下约 5500 字心得（约一两分钟，本场只做一次，写成后可点开查看），然后带着这份刚蒸馏出的认知回答你。答每一问前，它还会<b>检索 sdeuniverses.com 全站</b>（一千五百多万字语料），把相关文章段落连同出处垫进上下文——答完在气泡下方列出本答引用的站内篇目。起手按你问题的种类，从<b>三大方程</b>、<b>六路径</b>或<b>123原理</b>任一开局，并点明起手根据。一场最多 <b>100 轮</b>、<b>全面记忆</b>——每一答都携带此前<b>全部对话原文</b>（不裁剪、不摘要，问与答逐字带上）；聊够两轮后，顶栏可<b>总结</b>或<b>凝成一万字论文《问对WDS》</b>（可导出 PDF）。本智能体跑在 <b>DeepSeek-V4-Pro 思考模式（max 档）</b>——每一答都先内部推演再落笔，比普通问答慢一些，深度换速度。想让 WDS 读<b>你自己的文章</b>：点顶栏<b>「＋ 输入文章」</b>——上传 .docx/.pdf/.txt/.md、贴一条站内文章链接、或直接把正文粘进去（上限约 5 万汉字，文件只在你本机解析、不上传本站）；载入后它<b>每一答都带着这篇全文</b>，总结与万字论文也会带上它。<br>首次使用请点右上 ⚙ 填入你自己的大模型 Key（只存你的浏览器本地，本站不经手）。</div>
+        <div class="hello"><b>与WDS对话SDE 的用途，是带你学习 SDE 思想体系、并把它用成能上手的智慧应用</b>——不是闲聊，而是带着你自己的真问题，在一问一答里把这套本体论学通、用活。<br>这里是<b>与WDS对话SDE</b>的高级会话界面。你发出第一问后，WDS 会先做<b>开工仪式</b>：通读满血 SDE 内功（本体论先验 ＋ 创新智商评估两部分）、亲手写下约 5500 字心得（约一两分钟，本场只做一次，写成后可点开查看），然后带着这份刚蒸馏出的认知回答你。答每一问前，它还会<b>检索 sdeuniverses.com 全站</b>（一千五百多万字语料），把相关文章段落连同出处垫进上下文——答完在气泡下方列出本答引用的站内篇目。起手按你问题的种类，从<b>三大方程</b>、<b>六路径</b>或<b>123原理</b>任一开局，并点明起手根据。一场最多 <b>100 轮</b>、<b>全面记忆</b>——每一答都携带此前<b>全部对话原文</b>（不裁剪、不摘要，问与答逐字带上）；聊够两轮后，顶栏可<b>总结</b>或<b>凝成一万字论文《问对WDS》</b>（可导出 PDF）。本智能体跑在 <b>DeepSeek-V4-Pro 思考模式（max 档）</b>——每一答都先内部推演再落笔，比普通问答慢一些，深度换速度。想让 WDS 读<b>你自己的文章</b>：点顶栏<b>「＋ 输入文章」</b>——上传 .docx/.pdf/.txt/.md、贴一条站内文章链接、或直接把正文粘进去（上限约 5 万汉字，文件只在你本机解析、不上传本站）；载入后它<b>每一答都带着这篇全文</b>，总结与万字论文也会带上它。<br>首次使用请点右上 ⚙ 填入你自己的大模型 Key（只存你的浏览器本地，本站不经手）。想让它<b>记得你以往几场谈过什么</b>：点顶栏<b>「⌾ 记忆更新」</b>——它会把你本机每一场历史对话各写成一条摘要、再提炼出一份你的画像，此后每问一句都会按这一问从中挑出最相关的几条垫进上下文（摘要与画像同样只存你本机）。</div>
       </div>
       <div class="inbar">
         <textarea class="in" id="q" rows="2" placeholder="向 WDS 发问……（Enter 发送，Shift+Enter 换行）"></textarea>
@@ -202,7 +226,7 @@
     stBooting = true;
     function go() {
       if (!window.WDSStore) { stApi = false; return; }
-      window.WDSStore.load(function (a) { stApi = a || false; if (stApi) { stMakeSession(); stShowBtn(); } });
+      window.WDSStore.load(function (a) { stApi = a || false; if (stApi) { stMakeSession(); stShowBtn(); umShowBtn(); } });
     }
     if (window.WDSStore) { go(); return; }
     var sc = document.createElement("script");
@@ -210,7 +234,11 @@
     sc.onload = go; sc.onerror = function () { stApi = false; };
     document.head.appendChild(sc);
   }
-  function stSave(h) { if (stSess && h && h.length) stSess.save(h); }
+  // 每轮落盘后顺手刷一下"待更新"角标：这一场又长了，记忆就该提醒你更新
+  function stSave(h) {
+    if (stSess && h && h.length) stSess.save(h);
+    if (stApi && UM.ready) setTimeout(function () { umLoad(function () {}); }, 900);
+  }
   function stShowBtn() {
     var b = $("#bhist"); if (!b) return;
     b.hidden = false;
@@ -231,7 +259,270 @@
     msgs.scrollTop = msgs.scrollHeight;
   }
 
+  // ═══ 用户RAG系统（全局记忆）══════════════════════════════════════════
+  //  「历史」存的是每一场的**原文**，只有你点开才看得到；这里做的是另一件事：
+  //  把本机每一场历史对话各压成一条摘要（主旨/关键词/要点/你的立场），再从全部摘要提炼一份「你的画像」，
+  //  合起来就是一个**属于你自己的 RAG**。此后每问一句，页面在本机按这一问挑出最相关的几条，
+  //  连同画像垫进当轮提问——于是跨场对话之间它有了记性，而不只是一场之内的百轮记忆。
+  //
+  //  三条不能破的规矩：
+  //  ① 摘要与画像**只存在你这台机器的 IndexedDB 里**，与对话原文同一个仓、同样不上传本站；
+  //     生成摘要时对话原文随你自己的 Key 发往你选的基底（与平常问答同一条路），本站不经手、不落盘。
+  //  ② **手动更新，不偷跑**——每条摘要都要花你自己 Key 的一次调用，什么时候更新由你按按钮决定。
+  //  ③ 检索在本机做（纯字符串打分，不联网、不发第二次调用），只把挑中的那几条送出去。
+  var MEMO_API = "/api/wds/memo";
+  var MEMO_IN = 24000;      // 单场喂给摘要的字符上限（与服务端 MEMO_IN_MAX 对齐；超长取头尾、中间明标省略）
+  var UMEM_CAP = 6000;      // 每答垫进去的记忆总量上限（与服务端 UMEM_MAX 对齐）
+  var UM = { memos: [], metas: [], profile: "", pkeys: [], ready: false, running: false, stop: false };
+
+  function umOn() { return localStorage.getItem("sde_wds_umem_on") !== "0"; }
+  function umTopK() { var k = parseInt(localStorage.getItem("sde_wds_umem_k"), 10); return (k >= 1 && k <= 6) ? k : 3; }
+  function umFp(m) { return String(m.n || 0) + ":" + String(m.updatedAt || 0); }
+  // 待更新 = 够长(至少一问一答)、且还没有摘要或摘要对应的是旧版本的那些场
+  function umPending() {
+    var have = {}; UM.memos.forEach(function (r) { have[r.id] = r; });
+    return UM.metas.filter(function (m) {
+      if ((m.n || 0) < 2) return false;
+      var r = have[m.id];
+      return !r || r.fp !== umFp(m);
+    });
+  }
+  function umBadge() {
+    var b = $("#mbadge"); if (!b) return;
+    var n = UM.ready ? umPending().length : 0;
+    if (n > 0) { b.textContent = String(n); b.hidden = false; } else { b.hidden = true; }
+  }
+  function umLoad(then) {
+    if (!stApi) { if (then) then(); return; }
+    Promise.all([stApi.memoList("wds-dialogue"), stApi.list("wds-dialogue"), stApi.kvGet("profile:wds-dialogue")])
+      .then(function (r) {
+        UM.memos = r[0] || []; UM.metas = r[1] || [];
+        var p = r[2] || null;
+        UM.profile = (p && p.text) || ""; UM.pkeys = (p && p.keys) || [];
+        UM.ready = true; umBadge();
+        if (then) then();
+      })
+      .catch(function () { UM.ready = true; if (then) then(); });
+  }
+
+  /* —— 本机检索：中文按二元组打分，关键词命中另加权。纯函数，便于模拟脚本直接验行为。—— */
+  function umNorm(s) { return String(s || "").toLowerCase().replace(/[\s\u3000-\u303f\uff00-\uff0f\uff1a-\uff20！-～,.;:!?()\[\]"'`~\-—…·]/g, ""); }
+  function umGrams(s) {
+    var t = umNorm(s), g = {}, i;
+    for (i = 0; i + 2 <= t.length; i++) g[t.slice(i, i + 2)] = 1;
+    return g;
+  }
+  function umScore(q, rec) {
+    var qg = umGrams(q), keys = Object.keys(qg);
+    if (!keys.length) return 0;
+    var body = umNorm((rec.title || "") + (rec.gist || "") + (rec.points || "") + (rec.stance || "") + (rec.keys || []).join(""));
+    var hit = 0, i;
+    for (i = 0; i < keys.length; i++) if (body.indexOf(keys[i]) >= 0) hit++;
+    var s = hit / keys.length;
+    var qn = umNorm(q), bonus = 0;
+    (rec.keys || []).forEach(function (k) { var kk = umNorm(k); if (kk.length >= 2 && qn.indexOf(kk) >= 0) bonus += 0.35; });
+    return s + Math.min(1, bonus);
+  }
+  // 挑出最相关的几条。**排除当前这一场**——它的原文已经逐字在上下文里，再塞一遍摘要只是浪费预算。
+  function umPick(q, list, k, excludeId) {
+    var scored = (list || [])
+      .filter(function (r) { return r && r.id !== excludeId && (r.gist || r.points); })
+      .map(function (r) { return { r: r, s: umScore(q, r) }; })
+      .filter(function (x) { return x.s > 0.08; });
+    scored.sort(function (a, b) { return b.s - a.s || (b.r.updatedAt || 0) - (a.r.updatedAt || 0); });
+    return scored.slice(0, k || 3).map(function (x) { return x.r; });
+  }
+  // 组装垫进当轮提问的那段文本；硬截在 UMEM_CAP，宁可少给也不许挤掉本场对话
+  function umRecall(q) {
+    if (!umOn() || !UM.ready) return "";
+    var out = [];
+    if (UM.profile) out.push("· 关于我（从我历次对话里提炼）：" + UM.profile.slice(0, 600));
+    var picked = umPick(q, UM.memos, umTopK(), stSess ? stSess.id() : "");
+    picked.forEach(function (r, i) {
+      var when = stApi ? stApi.stamp(r.updatedAt || r.madeAt || Date.now()) : "";
+      out.push("· 第 " + (i + 1) + " 条《" + (r.title || "未命名对话") + "》（" + when + "）：" + (r.gist || "") + (r.points ? ("\n  要点：" + r.points) : ""));
+    });
+    if (!out.length) return "";
+    var s = out.join("\n");
+    return s.length > UMEM_CAP ? s.slice(0, UMEM_CAP) + "…（余下略）" : s;
+  }
+
+  /* —— 更新：逐场调 /api/wds/memo。顺序做、可中断、已做过的跳过；一场失败只丢那一场。—— */
+  function umConvoText(rec) {
+    var body = (rec.turns || []).map(function (t) {
+      return (t.role === "reader" ? "【我】\n" : "【WDS】\n") + (t.text || "");
+    }).join("\n\n");
+    if (body.length <= MEMO_IN) return body;
+    var head = Math.round(MEMO_IN * 0.6), tail = MEMO_IN - head;
+    return body.slice(0, head) + "\n\n……（中间省略 " + (body.length - MEMO_IN) + " 字符）……\n\n" + body.slice(body.length - tail);
+  }
+  function umOne(meta, kv) {
+    return stApi.get(meta.id).then(function (rec) {
+      if (!rec) return { ok: false, msg: "这一场已经不在本机了" };
+      return fetch(MEMO_API, {
+        method: "POST", headers: { "content-type": "application/json" },
+        body: JSON.stringify({ mode: "one", key: kv.key, vendor: kv.vendor, title: rec.title || "", text: umConvoText(rec) })
+      }).then(function (r) { return r.json(); }).then(function (j) {
+        if (!j || !j.ok) return { ok: false, msg: (j && j.msg) || "没提炼出来", code: j && j.code };
+        return stApi.memoPut({
+          id: meta.id, agent: "wds-dialogue", title: rec.title || "", updatedAt: meta.updatedAt, n: meta.n,
+          fp: umFp(meta), gist: j.gist || "", keys: j.keys || [], points: j.points || "", stance: j.stance || ""
+        }).then(function () { return { ok: true }; });
+      }).catch(function (e) { return { ok: false, msg: (e && e.message) || "网络没接上" }; });
+    });
+  }
+  function umRefreshProfile(kv, say) {
+    var feed = UM.memos.slice(0, 60).map(function (r) {
+      return "《" + (r.title || "未命名") + "》：" + (r.gist || "") + (r.keys && r.keys.length ? ("｜关键词：" + r.keys.join("、")) : "") + (r.stance ? ("｜我的立场：" + r.stance) : "");
+    }).join("\n");
+    if (!feed.trim()) { say("还没有可提炼画像的记忆条目。"); return Promise.resolve(); }
+    say("正在提炼你的画像…");
+    return fetch(MEMO_API, {
+      method: "POST", headers: { "content-type": "application/json" },
+      body: JSON.stringify({ mode: "profile", key: kv.key, vendor: kv.vendor, text: feed.slice(0, MEMO_IN) })
+    }).then(function (r) { return r.json(); }).then(function (j) {
+      if (!j || !j.ok || !j.profile) { say("画像这次没提炼成（" + ((j && j.msg) || "空结果") + "），可以再点一次。"); return; }
+      UM.profile = j.profile; UM.pkeys = j.keys || [];
+      return stApi.kvSet("profile:wds-dialogue", { text: j.profile, keys: j.keys || [], at: Date.now() })
+        .then(function () { say("画像已更新。"); });
+    }).catch(function (e) { say("画像更新出错：" + ((e && e.message) || "")); });
+  }
+
+  function umPanel() {
+    if (!stApi) return;
+    var kv0 = keyGet();
+    var m = el("div", "veil mem");
+    m.innerHTML = "<div class='box'><div class='boxh'><b class='dt'>用户RAG系统 · 全局记忆</b><button class='boxx'>\u00d7</button></div>"
+      + "<div class='boxb'><div class='memhd'></div>"
+      + "<div class='memrow'><button class='tbtn gold mgo'>开始更新</button><button class='tbtn mprof'>重新提炼画像</button>"
+      + "<button class='tbtn mexp'>导出记忆</button><span class='memprog'></span></div>"
+      + "<div class='mprofbox'></div><div class='mlist'></div>"
+      + "<div class='memsw'><label><input type='checkbox' class='msw'> 答题时启用我的记忆</label>"
+      + "<label>每答垫入 <select class='mk'><option value='1'>1</option><option value='2'>2</option><option value='3'>3</option><option value='4'>4</option><option value='5'>5</option></select> 条</label>"
+      + "<span class='memsp' style='flex:1'></span><button class='tbtn mclr'>清空记忆</button></div>"
+      + "<div class='memnote'>摘要与画像只存在你这台设备的浏览器里，不上传本站、不同步。更新时对话原文随你自己的 Key 发往你选的基底（与平常问答同一条路），本站不经手。删除某一场对话时，它对应的那条记忆会一并删除；被系统自动淘汰的旧对话（超过 60 场）则只丢原文、记忆仍留着。</div>"
+      + "</div></div>";
+    document.body.appendChild(m);
+    var hdE = $(".memhd", m), pgE = $(".memprog", m), lsE = $(".mlist", m), pfE = $(".mprofbox", m);
+    var goB = $(".mgo", m), prB = $(".mprof", m);
+    function close() { UM.stop = true; m.remove(); }
+    $(".boxx", m).onclick = close;
+    m.addEventListener("click", function (e) { if (e.target === m) close(); });
+    function say(t) { pgE.textContent = t || ""; }
+
+    var swE = $(".msw", m); swE.checked = umOn();
+    swE.onchange = function () { localStorage.setItem("sde_wds_umem_on", swE.checked ? "1" : "0"); };
+    var kE = $(".mk", m); kE.value = String(umTopK());
+    kE.onchange = function () { localStorage.setItem("sde_wds_umem_k", kE.value); };
+
+    function paintHead() {
+      var pend = umPending().length;
+      hdE.innerHTML = "本机共 <b>" + UM.metas.length + "</b> 场对话，其中 <b>" + UM.memos.length + "</b> 场已入记忆"
+        + (pend ? ("，<b>" + pend + "</b> 场待更新（新对话，或聊过之后又长了）") : "，全部是最新的")
+        + "。每更新一条＝花你自己 Key 的一次调用。";
+      goB.textContent = pend ? ("开始更新（" + pend + " 场）") : "全部已是最新";
+      goB.disabled = !pend || UM.running;
+    }
+    function paintProfile() {
+      pfE.innerHTML = "";
+      if (!UM.profile) return;
+      var d = el("div", "memprof");
+      d.appendChild(el("span", "pl", "你的画像"));
+      d.appendChild(document.createTextNode(UM.profile));
+      pfE.appendChild(d);
+    }
+    function paintList() {
+      lsE.innerHTML = "";
+      if (!UM.memos.length) { lsE.appendChild(el("div", "memhd", "还没有记忆条目。点「开始更新」，它会把你本机的历史对话逐场读一遍、各写一条摘要。")); return; }
+      var have = {}; UM.metas.forEach(function (x) { have[x.id] = x; });
+      UM.memos.forEach(function (r) {
+        var it = el("div", "memit");
+        var top = el("div", "mt");
+        var mn = el("div", "mn");
+        mn.appendChild(document.createTextNode(r.title || "未命名对话"));
+        var cur = have[r.id];
+        if (cur && r.fp !== umFp(cur)) mn.appendChild(el("span", "memstale", "待更新"));
+        if (!cur) mn.appendChild(el("span", "memstale", "原文已淘汰"));
+        var mm = el("div", "mm", (stApi.stamp(r.updatedAt || r.madeAt) || "") + " · " + Math.ceil((r.n || 0) / 2) + " 轮"
+          + (r.keys && r.keys.length ? (" · " + r.keys.slice(0, 6).join("、")) : ""));
+        mn.appendChild(mm);
+        top.appendChild(mn);
+        var x = el("button", "mx", "\uD83D\uDDD1");
+        x.title = "删除这一条记忆";
+        x.onclick = function (e) {
+          e.stopPropagation();
+          if (!window.confirm("删掉这一条记忆？（原对话不受影响）")) return;
+          stApi.memoDel(r.id).then(function () { umLoad(function () { paintHead(); paintList(); }); }).catch(function () {});
+        };
+        top.appendChild(x);
+        it.appendChild(top);
+        if (r.gist) it.appendChild(el("div", "mg", r.gist));
+        if (r.points) it.appendChild(el("div", "mp", r.points + (r.stance ? ("\n我的立场：" + r.stance) : "")));
+        it.onclick = function () { it.classList.toggle("on"); };
+        lsE.appendChild(it);
+      });
+    }
+
+    goB.onclick = function () {
+      if (UM.running) { UM.stop = true; say("正在停…"); return; }
+      var kv = keyGet();
+      if (!kv) { say("先点右上 ⚙ 填入你自己的大模型 Key——更新记忆也用你的 Key 运行。"); return; }
+      var todo = umPending();
+      if (!todo.length) return;
+      UM.running = true; UM.stop = false; goB.textContent = "停止"; goB.disabled = false;
+      var i = 0, done = 0, fail = 0;
+      (function step() {
+        if (UM.stop || i >= todo.length) {
+          UM.running = false;
+          umLoad(function () { paintHead(); paintList(); });
+          say("本次更新：成功 " + done + " 条" + (fail ? ("，失败 " + fail + " 条") : "") + (UM.stop ? "（已停止，剩下的下次接着做）" : "") + "。"
+            + (done && !UM.profile ? " 建议再点一次「重新提炼画像」。" : ""));
+          return;
+        }
+        var meta = todo[i++];
+        say("第 " + i + "/" + todo.length + " 场：《" + (meta.title || "未命名") + "》…");
+        umOne(meta, kv).then(function (r) {
+          if (r.ok) done++; else { fail++; if (r.code === "rate") { UM.stop = true; say("被限流了：" + (r.msg || "")); } }
+          setTimeout(step, 120);   // 稍微错开，别把限流器打满
+        });
+      })();
+    };
+    prB.onclick = function () {
+      var kv = keyGet();
+      if (!kv) { say("先点右上 ⚙ 填入你自己的大模型 Key。"); return; }
+      umRefreshProfile(kv, say).then(function () { paintProfile(); umBadge(); });
+    };
+    $(".mexp", m).onclick = function () {
+      var blob = { site: "sdeuniverses.com", agent: "wds-dialogue", exportedAt: new Date().toISOString(), profile: UM.profile, memos: UM.memos };
+      try {
+        var b = new Blob([JSON.stringify(blob, null, 2)], { type: "application/json;charset=utf-8" });
+        var a = document.createElement("a"); a.href = URL.createObjectURL(b);
+        a.download = "WDS用户记忆-" + new Date().toISOString().slice(0, 10) + ".json";
+        document.body.appendChild(a); a.click();
+        setTimeout(function () { try { URL.revokeObjectURL(a.href); a.remove(); } catch (e) {} }, 3000);
+        say("已导出。");
+      } catch (e) { say("导出失败。"); }
+    };
+    $(".mclr", m).onclick = function () {
+      if (!window.confirm("清空本机的全部记忆条目与画像？（历史对话原文不受影响，可以重新更新）")) return;
+      stApi.memoClear("wds-dialogue")
+        .then(function () { return stApi.kvSet("profile:wds-dialogue", null); })
+        .then(function () { umLoad(function () { UM.profile = ""; paintHead(); paintProfile(); paintList(); say("已清空。"); }); })
+        .catch(function () { say("清空没成功。"); });
+    };
+
+    if (!kv0) say("还没填 Key——更新记忆也用你自己的 Key 运行（右上 ⚙）。");
+    umLoad(function () { paintHead(); paintProfile(); paintList(); });
+  }
+  function umShowBtn() {
+    var b = $("#bmem"); if (!b) return;
+    b.hidden = false;
+    b.onclick = umPanel;
+    umLoad(function () {});
+  }
+
   // ─── 三层记忆（短期原文 · 中期滚动摘要 · 长期核心观点）─────────────────
+
   //  像人的记忆：合计 ~1万字以内就全用原文（第一次就是原文，不压缩）；超了才开始压。
   //   · 短期：尽量多的最近原文，逐字，永远在最前——只受 1 万字上限约束，不是固定 3 轮。
   //   · 中期：滚动摘要——超阈值时把"滑出短期的最早那轮"压成约 200 字，滚进中期；仍超就继续往前压。
@@ -608,7 +899,9 @@
     var bubble = addMsg("wds", ""); bubble.classList.add("stream");
     streaming = true; goEl.disabled = true; paint();
     var wd = null, timedOut = false;   // 存活看门狗:靠心跳字节喂,45s 无任何字节(含 : ping)判定连接已死
-    var payload = { q: q, docTitle: article.text ? article.title : TITLE, docText: article.text || "", focus: "", history: compactHistory(), key: kv.key, vendor: kv.vendor, guide: 1, reflect: xinde };
+    // USER_RAG：在本机按这一问挑出最相关的几条历史对话记忆（跨场记性）。挑选与打分全在浏览器里做，
+    // 不发第二次调用；关掉开关、或还没更新过记忆时它就是空串，与从前完全一样。
+    var payload = { q: q, docTitle: article.text ? article.title : TITLE, docText: article.text || "", focus: "", history: compactHistory(), key: kv.key, vendor: kv.vendor, guide: 1, reflect: xinde, umem: umRecall(q) };
 
     fetch(API, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(payload) })
       .then(function (resp) {

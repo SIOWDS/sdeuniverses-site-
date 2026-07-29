@@ -103,7 +103,8 @@ ok("三条链路齐备（对话 read / 开工 dialogue-reflect / 成文 read-pap
   W.includes('url.pathname === "/api/wds/dialogue-reflect"') && W.includes('url.pathname === "/api/wds/read-paper"') && W.includes('url.pathname === "/api/wds/read"'));
 ok("guide 分流 system（对话指引版 vs 陪读版，含读者文章两参）", W.includes("b.guide ? WDS_DIALOGUE_SYS(reflect, SDEM, siteCtx, docTitle, docText)"));
 ok("本场心得优先于全站缓存心得（read + read-paper 两处）", W.split("slice(0, 14000)").length >= 3);   // 站内另有智能体亦用 14000
-ok("guide 预算三元式在位（12万减文章/资料，陪读收缩式不变）", W.includes("b.guide ? Math.max(60000, WDS_GUIDE_HIST_BUDGET - docText.length - siteCtx.length)") && W.includes("120000 - docText.length - siteCtx.length"));
+// 2026-07-29 用户RAG上线后，guide 预算式多减一项 UMEM.length（跨场记忆也占上下文，必须一起钳住）；陪读那条不变。
+ok("guide 预算四元式在位（12万减文章/资料/长期记忆，陪读收缩式不变）", W.includes("b.guide ? Math.max(60000, WDS_GUIDE_HIST_BUDGET - docText.length - siteCtx.length - UMEM.length)") && W.includes("120000 - docText.length - siteCtx.length"));
 ok("长问放宽仅限 guide（4000 vs 500）", W.includes("b.guide ? 4000 : 500"));
 ok("全站 RAG 加强档（K=36 + 接续补捞 + KB留预算的字数上限 + 来源回传）", W.includes("RAG_SUBREQUEST") && /k: 36, cap: docText \? 12000 : 30000, kbn: docText \? 14 : 24/.test(W) && /ragScan\(env, url, q, expTerms, prevQ, K/.test(W) && W.includes('t: "sources"'));
 ok("与WDS对话 RAG 已接九库（子请求里 retrieveKB 邻域子图优先，chunk 让预算）", /retrieveKB\(kb, \{ docs: scan\.docs \}, q, expTerms, kbn\)/.test(W) && W.includes("const chunkCap = Math.max(4000, cap - kbBlock.length)"));

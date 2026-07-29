@@ -1443,6 +1443,16 @@ function wdsBucket(kind, ip, key) {
 // 与WDS对话（高级会话）单独配额：一整场＝开工 1 + 对话 100 + 总结 1 + 拟题 1 + 分部 6 ＝ 109 次，
 // 共用 100/天会在第 99 轮掐断、走不到万字论文；给 130/天留余量。分钟档提到 20：成文一次连发 7 次调用。
 const WDS_DLG_PER_DAY = 300, WDS_DLG_PER_MIN = 25;
+// 用户RAG（记忆更新）单独一个桶：一次"全量更新"可能连做几十场，走对话桶会把当天的问答额度吃光。
+// 记忆是离线的批活儿，慢一点没关系，但不能因为它把人当天不能再聊天。
+const WDS_MEMO_PER_DAY = 400, WDS_MEMO_PER_MIN = 30;
+// 一场对话喂进去做摘要的上限（字符）；超长的场由客户端"取头尾、中间明标省略"后再送来。
+const MEMO_IN_MAX = 24000;
+// 摘要这一步的短截止：它是配菜不是正菜，卡住就跳过这一条、继续下一场，不许拖死整批。
+const MEMO_MS = 45000;
+// 每答垫进去的长期记忆上限（字符）。为什么要有硬上限：本场原文已经吃掉 12 万预算的大头，
+// 跨场记忆再无节制地灌，只会把本场对话挤出上下文——记性不能以牺牲现场为代价。
+const UMEM_MAX = 6000;
 const WDS_MAX_TURNS = 100;          // 最多记 100 轮
 const WDS_HIST_BUDGET = 60000;      // 送进基底的历史字数预算（约 4 万 token，超出从最旧处裁）
 const WDS_GUIDE_HIST_BUDGET = 120000; // 与WDS对话（高级会话）：尽量全量记忆——每答携带尽可能多的对话原文；约 8 万 token，留出 system+心得+站内资料的余量，仍溢出时由 CONTEXT_OVERFLOW 逐级砍半（原 30 万字符≈20万token 超过多数基底输入窗，深聊必 400）
@@ -2288,6 +2298,53 @@ export default {
         return J({ ok: false, summary: "" }, 200);
       }
     }
+    // USER_RAG — /api/wds/memo：把读者本机的**一整场历史对话**压成一条可检索的记忆条目（mode=one），
+    // 或把已有的全部条目再提炼成一份**用户画像**（mode=profile）。二者共同构成「用户RAG系统」：
+    // 答题前由客户端在本机按当前问题挑出最相关的几条，垫进当轮提问——于是跨场对话之间有了记性。
+    //
+    // 三条纪律（都是吃过亏才写下的）：
+    // ① **这是结构化短输出，绝不许跑满功率档**——满功率会把整份预算烧在推演上、正文 0 字（十二修/十三修同一族的病）。
+    //    所以这里用不带 top 标记的 VC，且预算按"它本来该写多长"给：一条摘要约 400 字 → 1600 token 足矣。
+    // ② **自带短截止**（MEMO_MS=45s）：一次更新可能连做几十场，任何一场卡住都不许把整批拖死。
+    // ③ **摘要只回给客户端、本站一个字不落盘**——记忆存在读者自己浏览器的 IndexedDB 里，与站上其他 BYOK 入口同一架构。
+    if (url.pathname === "/api/wds/memo") {
+      if (request.method === "OPTIONS") return new Response(null, { headers: _cors() });
+      if (request.method !== "POST") return new Response("Method Not Allowed", { status: 405 });
+      let b = {}; try { b = await request.json(); } catch (e) {}
+      const J = (o, st) => Response.json(o, { status: st || 200, headers: _cors() });
+      const KEY = String(b.key || "").trim();
+      if (KEY.length < 8) return J({ ok: false, code: "need_key", msg: "更新记忆也用你自己的 API Key 运行（在 ⚙ 里填入，只存你的浏览器本地）。" }, 400);
+      const vd = wdsVendorOf(b.vendor);
+      const VC = { url: WDS_VENDORS[vd].url, model: WDS_VENDORS[vd].model, name: WDS_VENDORS[vd].name };   // 降档：见纪律①
+      const ip = request.headers.get("cf-connecting-ip") || "unknown";
+      try {
+        const lim = env.ASK_LIMITER.get(env.ASK_LIMITER.idFromName(wdsBucket("memo", ip, KEY)));
+        const lr = await (await lim.fetch(new Request("https://limiter.internal/?w=" + WDS_MEMO_PER_MIN + "&d=" + WDS_MEMO_PER_DAY))).json();
+        if (!lr.ok) return J({ ok: false, code: "rate", msg: lr.reason === "day" ? ("这把 Key 今天已更新 " + (lr.inDay || 0) + "/" + WDS_MEMO_PER_DAY + " 条记忆，明天再续（记忆额度与对话额度分开计）。") : "更新得太快了，过十几秒再继续——已经做好的不会丢。" }, 429);
+      } catch (e) {}
+      const mode = b.mode === "profile" ? "profile" : "one";
+      const text = String(b.text || "").slice(0, MEMO_IN_MAX);
+      if (!text.trim()) return J({ ok: false, msg: "没有可摘要的内容。" }, 400);
+      const sys = mode === "profile"
+        ? "你在为一位读者维护他的【长期记忆画像】。下面是他与 WDS 历次对话的逐条摘要。请提炼出这位读者本人的画像：他反复关心的问题域、他自己的立场与判断（不是 WDS 的）、他已经掌握的概念、他悬而未决的困惑、他提问的习惯路数。\n只输出 JSON，不要任何其他文字：{\"profile\":\"约 400 字的连贯画像，第二人称写成'你…'\",\"keys\":[\"关键词\",\"…\"]}\nkeys 给 10-16 个最能代表他关切的词（概念名、领域名、他自造的说法都算）。"
+        : "你在为一位读者维护他的【长期记忆】。下面是他与 WDS 的一整场对话记录。把它压成一条可被日后检索到的记忆条目。\n只输出 JSON，不要任何其他文字：{\"gist\":\"一句话主旨，不超过 40 字\",\"keys\":[\"关键词\",\"…\"],\"points\":\"约 300 字要点\",\"stance\":\"这位读者本人在这场里的关切与立场，不超过 60 字\"}\nkeys 给 8-16 个检索用关键词：概念名、人名书名、领域名、以及这场里出现的新命名，宁可具体不要笼统。\npoints 写这三样：谈的是什么问题、达成了哪些关键判断与新命名、还悬着什么没解决；丢掉寒暄与铺陈，用连贯中文，不分点。\n凡这场里没谈过的，一个字都不要补。";
+      const usr = mode === "profile" ? ("【历次对话摘要】\n" + text) : ((b.title ? ("【这场对话的标题】" + String(b.title).slice(0, 120) + "\n") : "") + "【对话记录】\n" + text);
+      try {
+        const out = await llmText(VC, KEY, sys, usr, mode === "profile" ? 1800 : 1600, MEMO_MS);
+        const j = looseJSON(out);
+        if (!j) return J({ ok: false, msg: "这一条没提炼出来（基底没给出可用结果），可以再点一次。" }, 502);
+        if (mode === "profile") {
+          return J({ ok: true, profile: String(j.profile || "").slice(0, 1200), keys: (Array.isArray(j.keys) ? j.keys : []).slice(0, 20).map((x) => String(x).slice(0, 24)) });
+        }
+        const gist = String(j.gist || "").slice(0, 120);
+        const points = String(j.points || "").slice(0, 1200);
+        if (!gist && !points) return J({ ok: false, msg: "这一条提炼出来是空的，可以再点一次。" }, 502);
+        return J({ ok: true, gist: gist, points: points, stance: String(j.stance || "").slice(0, 160),
+                   keys: (Array.isArray(j.keys) ? j.keys : []).slice(0, 20).map((x) => String(x).slice(0, 24)) });
+      } catch (e) {
+        return J({ ok: false, msg: "更新这一条时出错：" + (e && e.message) }, 502);
+      }
+    }
     // RAG_SUBREQUEST — /api/wds/rag：把「全站检索」从答题请求里拆出来，单独跑一次。
     // 冷启动时这一步要把全站索引（十几兆 JSON、上百个分片）装进内存，很吃 CPU；和答题挤在同一个
     // 请求里，会被平台按单请求 CPU 上限直接掐死——表现就是"流刚开就断、连来源都没发出来、只收到心跳"。
@@ -2842,13 +2899,19 @@ export default {
             // LONG_ASK 落地：读者要长篇时，①预算按要的字数给（8000 token 装不下 8000 汉字）；
             // ②当轮明确解除 system 里"一次两三段以内、别写论文"那一条，否则两条指令打架、它只会在思考里空转；
             // ③叮嘱它别在思考里打草稿、直接落笔——写出来的每一个字都留得住（中途断线也不丢），写不完读者说「继续」。
+            // USER_RAG 落地：客户端在本机按本问挑出的几条历史对话记忆（跨场的长期记性）。
+            // 和 LONGASK 同一条纪律——**挂在当轮 user 消息上，不进 system**：
+            // ①system 是可被基底前缀缓存的固定段，每轮换内容会把缓存打散；②这几条是"这一问才相关"的，不该长驻。
+            // 明确告诉它这是摘要不是原文，免得它照着复述、或假装记得摘要里没写的事。
+            const umem = b.guide ? String(b.umem || "").slice(0, UMEM_MAX) : "";
+            const UMEM = umem ? ("\n\n【我的长期记忆 · 来自我与你此前几场对话的摘要（存在我本机，不是本场原文）】\n" + umem + "\n（以上只作背景：相关就用，不相关就当没看见；不要复述它，也不要假装记得这里面没写的事。）") : "";
             const askLen = b.guide ? wdsAskLen(q) : 0;
             const LONGASK = askLen ? ("\n\n【本轮特别指令 · 覆盖上面《怎么答》第 5 条】我这一问明确要一篇约 " + askLen + " 字的长篇。这一轮不受「一次两三段以内」的约束：直接连续写下去，写到约 " + askLen + " 字；不要先写提纲、不要说「我将／好的」、不要问我要不要继续；别在心里反复打草稿，边想边落笔——写出来的部分都会留住，万一没写完我会说「继续」，你接着往下写就行。") : "";
             const tokWant = askLen ? Math.min(32000, Math.max(WDS_TOK_SAFE, Math.round(askLen * 1.8))) : WDS_TOK_SAFE;
             // 历史预算随正文/站内资料篇幅收缩：合计钳在 ~12万字符内，防超长文+百轮对话挤爆基底上下文
             // 陪读：正文+历史 ~12万字符收缩；与WDS对话（guide）：全面记忆——大预算+单条1.2万，正常百轮尽量不裁；
             //   但基底输入窗口是硬物理上限，深聊会溢出——故预算做成可收缩，溢出时（见 _runAnswer 的 CONTEXT_OVERFLOW 分支）逐级缩小重试。
-            let histBudget = b.guide ? Math.max(60000, WDS_GUIDE_HIST_BUDGET - docText.length - siteCtx.length) : Math.min(WDS_HIST_BUDGET, Math.max(20000, 120000 - docText.length - siteCtx.length));
+            let histBudget = b.guide ? Math.max(60000, WDS_GUIDE_HIST_BUDGET - docText.length - siteCtx.length - UMEM.length) : Math.min(WDS_HIST_BUDGET, Math.max(20000, 120000 - docText.length - siteCtx.length));
             // messages 做成可按当前 histBudget 重建（system + 提交文章两轮 固定，历史与本轮问题随预算变）
             const _buildMessages = () => {
               const mm = [{ role: "system", content: sys }];
@@ -2857,7 +2920,7 @@ export default {
                 mm.push({ role: "assistant", content: "《" + (docTitle || "未命名") + "》全文我已通读完毕（" + docText.length + " 字符）。接下来你每问一句，我都扣着这篇文章本身答——引它的原话、拆它的显露与差异序列、指出它的创新与缝隙。你问吧。" });
               }
               mm.push(...packReadHistory(history, histBudget, b.guide ? 12000 : 0));
-              mm.push({ role: "user", content: (focus ? ("我正读到这一句：「" + focus + "」\n\n我的问题：" + q) : q) + LONGASK });
+              mm.push({ role: "user", content: (focus ? ("我正读到这一句：「" + focus + "」\n\n我的问题：" + q) : q) + UMEM + LONGASK });
               return mm;
             };
             let messages = _buildMessages();

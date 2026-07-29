@@ -15,7 +15,9 @@
   "use strict";
   if (window.WDSStore) return;
 
-  var DB_NAME = "wds-store", DB_VER = 1, ST = "convos";
+  // DB_VER 2（2026-07-29）：新增「用户RAG」两个仓——MEMO 存每场对话的摘要条目，KV 存用户画像与开关。
+  // 升级只新建缺的仓，convos 里已有的对话原样保留（onupgradeneeded 不动既有数据）。
+  var DB_NAME = "wds-store", DB_VER = 2, ST = "convos", MEMO = "memos", KV = "kv";
   var MAX_SESSIONS = 60;          // 每个智能体保留的会话上限，超出淘汰最旧
   var SAVE_DEBOUNCE = 400;
 
@@ -33,6 +35,11 @@
           os.createIndex("agent_updated", ["agent", "updatedAt"]);
           os.createIndex("agent_scope_updated", ["agent", "scope", "updatedAt"]);
         }
+        if (!d.objectStoreNames.contains(MEMO)) {
+          var om = d.createObjectStore(MEMO, { keyPath: "id" });   // id = 被摘要的那场对话的 id
+          om.createIndex("agent_updated", ["agent", "updatedAt"]);
+        }
+        if (!d.objectStoreNames.contains(KV)) d.createObjectStore(KV, { keyPath: "k" });
       };
       rq.onsuccess = function () { res(rq.result); };
       rq.onerror = function () { rej(rq.error || new Error("idb open failed")); };
@@ -41,10 +48,11 @@
     return dbP;
   }
 
-  function tx(mode, fn) {
+  function tx(mode, fn) { return txs(ST, mode, fn); }
+  function txs(store, mode, fn) {
     return db().then(function (d) {
       return new Promise(function (res, rej) {
-        var t = d.transaction(ST, mode), os = t.objectStore(ST), out;
+        var t = d.transaction(store, mode), os = t.objectStore(store), out;
         try { out = fn(os); } catch (e) { return rej(e); }
         t.oncomplete = function () { res(out && out.__v !== undefined ? out.__v : out); };
         t.onerror = function () { rej(t.error); };
@@ -88,7 +96,12 @@
     });
   }
   function get(id) { return tx("readonly", function (os) { return req(os.get(id)); }); }
-  function remove(id) { return tx("readwrite", function (os) { os.delete(id); }); }
+  // 人工删除一场：连它在用户RAG里的那条记忆一并删掉（读者说"删了"就该是删干净）。
+  // 与之相对，trim() 的自动淘汰**不动记忆**——原文超过 60 场被挤掉，摘要仍留着，这正是长期记忆的意义。
+  function remove(id) {
+    return tx("readwrite", function (os) { os.delete(id); })
+      .then(function () { return memoDel(id).catch(function () {}); });
+  }
 
   // 列出某智能体（可选限定 scope）的会话，新→旧
   function list(agent, scope) {
@@ -114,6 +127,10 @@
     return list(agent, scope).then(function (metas) {
       return tx("readwrite", function (os) {
         metas.forEach(function (m) { os.delete(m.id); });
+      }).then(function () {
+        // 全量清空（不限 scope）＝连用户RAG一起清；限定 scope 时只删那几条对应的记忆
+        if (scope === undefined || scope === null) return memoClear(agent).catch(function () {});
+        return Promise.all(metas.map(function (m) { return memoDel(m.id).catch(function () {}); }));
       });
     });
   }
@@ -125,6 +142,37 @@
       return tx("readwrite", function (os) { dead.forEach(function (m) { os.delete(m.id); }); });
     }).catch(function () {});
   }
+
+  /* ---------- 用户RAG：每场对话一条摘要（memos） + 画像与开关（kv） ----------
+   * 摘要由智能体侧调 /api/wds/memo 生成后写进来；这里只负责存取，不碰网络。
+   * fp = 源对话的指纹（轮数:更新时间）——指纹变了就说明那场又聊过，该条摘要作废待重做。
+   */
+  function memoFp(meta) { return String((meta && meta.n) || 0) + ":" + String((meta && meta.updatedAt) || 0); }
+  function memoPut(rec) {
+    if (!rec || !rec.id) return Promise.resolve(null);
+    rec.madeAt = rec.madeAt || Date.now();
+    return txs(MEMO, "readwrite", function (os) { os.put(rec); }).then(function () { return rec; });
+  }
+  function memoGet(id) { return txs(MEMO, "readonly", function (os) { return req(os.get(id)); }); }
+  function memoDel(id) { return txs(MEMO, "readwrite", function (os) { os.delete(id); }); }
+  function memoList(agent) {
+    return txs(MEMO, "readonly", function (os) {
+      var idx = os.index("agent_updated");
+      var box = { __v: [] };
+      idx.openCursor(IDBKeyRange.bound([agent, 0], [agent, Infinity]), "prev").onsuccess = function (e) {
+        var c = e.target.result; if (!c) return;
+        box.__v.push(c.value); c.continue();
+      };
+      return box;
+    });
+  }
+  function memoClear(agent) {
+    return memoList(agent).then(function (rs) {
+      return txs(MEMO, "readwrite", function (os) { rs.forEach(function (r) { os.delete(r.id); }); });
+    });
+  }
+  function kvGet(k) { return txs(KV, "readonly", function (os) { return req(os.get(k)); }).then(function (r) { return r ? r.v : null; }); }
+  function kvSet(k, v) { return txs(KV, "readwrite", function (os) { os.put({ k: k, v: v }); }); }
 
   /* ---------- 会话句柄 ---------- */
 
@@ -354,7 +402,16 @@
     exportOne: exportOne,
     exportAll: exportAll,
     asText: asText,
-    stamp: stamp
+    stamp: stamp,
+    // 用户RAG
+    memoFp: memoFp,
+    memoPut: memoPut,
+    memoGet: memoGet,
+    memoDel: memoDel,
+    memoList: memoList,
+    memoClear: memoClear,
+    kvGet: kvGet,
+    kvSet: kvSet
   };
 
   // 探测可用性：IndexedDB 打不开（隐私模式/被禁用）就整体降级为不存
