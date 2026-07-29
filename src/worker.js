@@ -3709,7 +3709,12 @@ export default {
       }
       try {
         const key = _key;
-        const obj = await env.PDFS.get(key, { range: request.headers, onlyIf: request.headers });
+        // ⚠️ range 只在**真有 Range 头**时才传：实测发现无条件传 request.headers 时，
+        // 即便读者没要分段，R2 也会把 obj.range 填成"整份"(offset 0/length=size)，
+        // 于是普通下载被我回成 206 + content-range 0-N/N。字节是对的，但两个后果：
+        // ①下载器/PDF.js 面对"非分段请求却收到 206"行为不可预期；
+        // ②**Cache API 不接受 206**，cache.put 静默失败——那层边缘缓存等于没做，每次都回桶。
+        const obj = await env.PDFS.get(key, { range: _hasRange ? request.headers : undefined, onlyIf: request.headers });
         if (obj) {
           const h = new Headers();
           obj.writeHttpMetadata(h);
@@ -3719,7 +3724,7 @@ export default {
           h.set("cache-control", "public, max-age=31536000, immutable");
           h.set("x-served-from", "r2");
           if (!("body" in obj)) return new Response(null, { status: 304, headers: h });   // onlyIf 不满足＝没变，回 304
-          if (obj.range && obj.range.offset !== undefined) {
+          if (_hasRange && obj.range && obj.range.offset !== undefined) {
             const st = obj.range.offset, ln = obj.range.length === undefined ? (obj.size - st) : obj.range.length;
             h.set("content-range", "bytes " + st + "-" + (st + ln - 1) + "/" + obj.size);
             h.set("content-length", String(ln));

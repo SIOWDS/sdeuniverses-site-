@@ -19,7 +19,9 @@ console.log("\n[一] 供给：R2 优先、落空回落、URL 不变");
   ok(seg.length > 500, "R2_PDF 供给段在（" + seg.length + " 字符）");
   ok(/env\.PDFS && \/\^\\\/students\\\/\[\^\?\]\+\\\.pdf\$\/i\.test\(url\.pathname\)/.test(seg), "只拦 /students/**.pdf，且桶没绑定时整段等于不存在");
   ok(/request\.method === "GET" \|\| request\.method === "HEAD"/.test(seg), "只接管 GET/HEAD（其它方法不碰）");
-  ok(/range: request\.headers, onlyIf: request\.headers/.test(seg), "Range 与 If-None-Match 交给 R2 自己解析（PDF.js 分块取的命根子）");
+  ok(/range: _hasRange \? request\.headers : undefined, onlyIf: request\.headers/.test(seg),
+     "**只在真有 Range 头时才向 R2 要分段**——否则 R2 会把 obj.range 填成整份，普通下载被回成 206，且 206 存不进 Cache API（那层缓存就白做了）");
+  ok(/if \(_hasRange && obj\.range && obj\.range\.offset !== undefined\)/.test(seg), "回 206 也要以'读者确实要了分段'为前提");
   ok(/accept-ranges/.test(seg) && /status: 206/.test(seg) && /content-range/.test(seg), "命中分块时回 206 + content-range + accept-ranges");
   ok(/if \(!\("body" in obj\)\) return new Response\(null, \{ status: 304/.test(seg), "onlyIf 不满足回 304，不重复传");
   ok(/catch \(e\) \{ \/\* R2 出任何岔子/.test(seg), "R2 抛异常时不抛给读者，落回仓库");
