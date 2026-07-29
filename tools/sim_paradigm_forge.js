@@ -387,21 +387,24 @@ function setStudent(c, slug) {
     const selB = f(/【A（已定，随机抽出）】/);
     ok('A 随机抽定、带候选号进调令', selB && /【A（已定，随机抽出）】\n[LPW]\d/.test(selB.user));
     ok('候选清单用 gid 打头（L#）', selB && /L1　留白/.test(selB.user) && /L6　同意/.test(selB.user));
-    ok('对立按发生学判、不按字面判', selB && /按发生学判，不按字面判/.test(selB.user));
-    ok('发生学五条写全', selB && /目标同、路径互斥/.test(selB.user) && /归因相反/.test(selB.user) &&
-      /正是另一篇的病因/.test(selB.user) && /中心位对调/.test(selB.user) && /结局判反/.test(selB.user));
-    ok('点名两种假对立', selB && /字面相反而其实不相干/.test(selB.user));
-    ok('先往外跨：领域优先，同主题也可但落到发生学', selB && /首选\*\*领域不同/.test(selB.user) && /同一个主题也可以/.test(selB.user));
+    ok('对立必须是不同角度/模态的斜对立', selB && /不同角度／不同模态/.test(selB.user) && /斜着的对立/.test(selB.user));
+    ok('明令禁同一角度正面顶', selB && /同一个角度、同一根轴/.test(selB.user) && /碰不出新东西/.test(selB.user));
+    ok('给出一句话测试（判谁对能化解就扔）', selB && /判谁对/.test(selB.user));
+    ok('斜对立四条硬形态写全', selB && /必须守住的条件.*病根|病根/.test(selB.user) && /中心位对调/.test(selB.user) &&
+      /互相取消/.test(selB.user) && /结构性成因.*时序性成因/.test(selB.user));
+    ok('点名两种假对立（含同角度正面顶）', selB && /同一角度正面对顶/.test(selB.user) && /字面相反其实各说各的/.test(selB.user));
+    ok('先往外跨：跨角度比跨领域更要紧', selB && /跨角度比跨领域更要紧/.test(selB.user));
     ok('B 用机读候选号', selB && /B：L7/.test(selB.user));
     const selC = f(/你的任务：从下面清单里挑出/);
     ok('找 C 明写"让 A 和 B 同时不成立"', selC && /它要让 A 和 B 同时不成立/.test(selC.user));
     ok('找 C 允许诚实说没有', selC && /C：无/.test(selC.user));
     const pv = f(/你是对子验收员/);
     ok('对子验收独立一趟、只验不提名', pv && /只验/.test(pv.system) && /不许提名/.test(pv.system));
-    ok('对子验收按发生学五条打分', pv && /按发生学判/.test(pv.user));
+    ok('对子验收把同角度正面顶压到 ≤4', pv && /同一个角度、同一根轴/.test(pv.user) && /烈度 ≤4/.test(pv.user));
+    ok('对子验收给斜对立高分', pv && /斜对立/.test(pv.user));
     ok('对子验收：门类不同不扣分', pv && /门类不同不扣分/.test(pv.user));
     const ver = f(/你是验收员/);
-    ok('三方验收也按发生学判', ver && /按发生学判/.test(ver.user));
+    ok('三方验收也压同角度正面顶、抬斜对立', ver && /同一个角度、同一根轴/.test(ver.user) && /斜对立/.test(ver.user));
     const gate = f(/请先做体检/);
     ok('体检写死三道闸', gate && /闸一/.test(gate.user) && /闸二/.test(gate.user) && /闸三/.test(gate.user));
     ok('体检把已发清单垫进去（避重）', gate && /已发清单/.test(gate.user));
@@ -1126,17 +1129,18 @@ function setStudent(c, slug) {
     ok('第二层照样定标', /定标/.test(c.$('stat-select').textContent), c.$('stat-select').textContent);
   });
 
-  await step('二十三之十、对立按发生学判：五条判据 + 假对立', async () => {
+  await step('二十三之十、对立必须是不同角度的斜对立：判据 + 禁同角度正面顶', async () => {
     const c = await boot();
     await runPipeline(c, 45000);
     const nom = c.calls.find(x => /【A（已定，随机抽出）】/.test(x.user));
-    ok('提名调令把对立定义在发生学上', nom && /按发生学判，不按字面判/.test(nom.user));
-    ok('给出发生学五条', nom && /目标同、路径互斥/.test(nom.user) && /归因相反/.test(nom.user) &&
-      /正是另一篇的病因/.test(nom.user) && /中心位对调/.test(nom.user) && /结局判反/.test(nom.user));
-    ok('点名两种假对立', nom && /字面相反而其实不相干/.test(nom.user));
+    ok('提名调令把对立定义成斜对立', nom && /不同角度／不同模态/.test(nom.user) && /斜着的对立/.test(nom.user));
+    ok('铁律禁同一角度正面顶', nom && /同一个角度、同一根轴/.test(nom.user) && /碰不出新东西/.test(nom.user));
+    ok('给出斜对立四条硬形态', nom && /病根/.test(nom.user) && /中心位对调/.test(nom.user) &&
+      /互相取消/.test(nom.user) && /结构性成因.*时序性成因/.test(nom.user));
+    ok('点名两种假对立（含同角度正面顶）', nom && /同一角度正面对顶/.test(nom.user) && /字面相反其实各说各的/.test(nom.user));
     ok('要求从两篇各摘一句原话', nom && /各摘一句原话/.test(nom.user));
     const pv = c.calls.find(x => /你是对子验收员/.test(x.user));
-    ok('对子验收按同一把尺（发生学五条，任一种 ≥6）', pv && /按发生学判/.test(pv.user));
+    ok('对子验收把同角度正面顶压到 ≤4、给斜对立高分', pv && /同一个角度、同一根轴/.test(pv.user) && /斜对立/.test(pv.user));
     ok('对子验收：门类不同不扣分', pv && /门类不同不扣分/.test(pv.user));
   });
 
