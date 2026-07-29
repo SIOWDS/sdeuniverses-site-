@@ -96,7 +96,8 @@ function defaultAnswer(userMsg) {
   if (/合成一份 ≤3000 字的作业底盘/.test(userMsg)) return '一、本体论要害……二、方法论工序……三、碰撞心法转写……四、十条铁律……' + '铁律一条。'.repeat(80);
   if (/【A（已定，随机抽出）】/.test(userMsg)) return pickB(firstFreeB(userMsg));
   if (/你的任务：从下面清单里挑出/.test(userMsg)) return pickC(firstFreeC(userMsg));
-  if (/从你自己的知识库里举一个真实存在的/.test(userMsg)) return kbAnswer();
+  if (/它要与 A \*\*正面对立\*\*/.test(userMsg)) return kbBAnswer();   // 找 B 的知识库
+  if (/从你自己的知识库里举一个真实存在的/.test(userMsg)) return kbAnswer();  // 找 C 的知识库
   if (/由你自己造一个。这是最后手段/.test(userMsg)) return forgedAnswer();
   if (/你是对子验收员/.test(userMsg)) return pairOK(8);
   if (/你是验收员/.test(userMsg))
@@ -156,6 +157,12 @@ function kbAnswer() {
     '支撑观点甲：结果层。　支撑观点乙：路径层。　支撑观点丙：条件层。',
     '与A的冲突：一句　｜　与B的冲突：一句',
     '转述：' + '真实论点的转述若干。'.repeat(60)].join('\n');
+}
+function kbBAnswer() {
+  return ['出处：某学者《对立之书》1988',
+    'B 的主题观点：撤手恰恰是灾，不是德。',
+    'A×B 为什么不能同时成立：同一个动作被判了相反的结局。',
+    '转述：' + '真实对立论点的转述若干。'.repeat(50)].join('\n');
 }
 function forgedAnswer() {
   return ['标题：他们争的那样东西不在那儿',
@@ -696,23 +703,27 @@ function setStudent(c, slug) {
     })());
   });
 
-  await step('十七之三、对子顶不上就换一篇 A 重来（阶梯第一段）', async () => {
-    let nb = 0, pv = 0;
+  await step('十七之三、对子不够硬：A 不换，把 B 的范围逐级往外扩', async () => {
+    let pv = 0;
     const c = await boot({ answer: u => {
-      if (/【A（已定，随机抽出）】/.test(u)) { nb++; return pickB(firstFreeB(u)); }
-      if (/你是对子验收员/.test(u)) { pv++; return pv === 1 ? pairBad(4) : pairOK(8); }
+      if (/【A（已定，随机抽出）】/.test(u)) return pickB(firstFreeB(u));
+      if (/你是对子验收员/.test(u)) { pv++; return pv < 3 ? pairBad(4) : pairOK(8); }   // 前两层弱，第三层过
       return defaultAnswer(u);
     } });
     const done = await runPipeline(c, 30000);
-    ok('第一对被判 4/10 后换了一篇 A 重找 B', nb === 2, '实际找了 ' + nb + ' 次 B');
-    ok('每一对都验了一次', pv === 2, '实际 ' + pv + ' 次');
-    ok('对子立住之后才去找第三篇', c.calls.filter(x => /你的任务：从下面清单里挑出/.test(x.user)).length >= 1);
-    ok('最终定标', /定标 · 烈度 8\/10/.test(c.$('stat-select').textContent), c.$('stat-select').textContent);
-    const nom2 = c.calls.filter(x => /【A（已定，随机抽出）】/.test(x.user))[1];
-    ok('换 A 那一轮带上了"已经试过"清单', nom2 && /已经试过、被判不合格的/.test(nom2.user));
-    ok('把上一轮的判词原样交回去', nom2 && /只是侧重不同/.test(nom2.user));
-    ok('明令别只换一个就交差', nom2 && /别只换一个就交差/.test(nom2.user));
-    ok('搜寻过程逐轮记在页面上', (c.$('out-select').parentNode.querySelector('.sel-log').textContent.match(/第 \d 轮/g) || []).length >= 2);
+    ok('对子弱时 A 没有被换掉（usedA 只推进一次 → 只随机一篇 A）',
+      c.calls.filter(x => /【A（已定，随机抽出）】/.test(x.user)).length === 3, '找了 ' + c.calls.filter(x => /【A（已定，随机抽出）】/.test(x.user)).length + ' 次 B');
+    ok('三次找 B 用的是同一个 A', (function () {
+      const aset = new Set(c.calls.filter(x => /【A（已定，随机抽出）】/.test(x.user))
+        .map(x => (/【A（已定，随机抽出）】\n([LPW]\d+)/.exec(x.user) || [])[1]));
+      return aset.size === 1;
+    })(), '不同 A 数');
+    const log = c.$('out-select').parentNode.querySelector('.sel-log').textContent;
+    ok('日志写明"太弱，往外扩一层"', /太弱，往外扩一层/.test(log), log.slice(0, 200));
+    ok('第二次找 B 的调令带"往外扩了一层"提示', c.calls.filter(x=>/【A（已定，随机抽出）】/.test(x.user)).slice(1).some(x=>/往外扩了一层/.test(x.user)));
+    ok('每一层都验了对子', pv === 3, '实际 ' + pv + ' 次');
+    ok('第三层立住后去找第三篇', c.calls.some(x => /你的任务：从下面清单里挑出/.test(x.user)));
+    ok('最终定标', /定标/.test(c.$('stat-select').textContent), c.$('stat-select').textContent);
     ok('跑到底', done, c.$('stat-review').textContent);
   });
 
@@ -733,20 +744,21 @@ function setStudent(c, slug) {
     ok('最终定标', /定标/.test(c.$('stat-select').textContent), c.$('stat-select').textContent);
   });
 
-  await step('十七之五、一对都没立住：取最凶的对子，第三方逐级退到知识库→自造', async () => {
+  await step('十七之五、B 三层文章都太弱 → 退到基底库找一个真实的对立 B', async () => {
     const c = await boot({ answer: u => {
-      if (/你是对子验收员/.test(u)) return pairBad(4);
+      if (/【A（已定，随机抽出）】/.test(u)) return pickB(firstFreeB(u));
+      if (/它要与 A \*\*正面对立\*\*/.test(u)) return kbBAnswer();
+      if (/你是对子验收员/.test(u)) return /真实对立论点/.test(u) ? pairOK(8) : pairBad(4);  // 库里的 B 判 8，站内 B 判 4
       return defaultAnswer(u);
     } });
-    c.$('maxRounds').value = '3';
     const done = await runPipeline(c, 45000);
-    const nb = c.calls.filter(x => /【A（已定，随机抽出）】/.test(x.user)).length;
-    ok('换了几篇 A 都没立住，但不会无界地试', nb >= 3 && nb <= 12, '实际找了 ' + nb + ' 次 B');
-    // 一对真对子都没过，站内 C 也无从谈起 → 应走到"知识库找第三方"，再不行自造
-    ok('走到知识库找第三方那一步', c.calls.some(x => /从你自己的知识库里举一个真实存在的/.test(x.user)));
-    ok('第三个源标成"知识库"或"自造"', /知识库|自造/.test(c.$('srcState').textContent), c.$('srcState').textContent);
-    ok('红字如实说来源不全是站内文章', /不全是站内文章|不是站内文章/.test(c.$('errBox').textContent), c.$('errBox').textContent);
-    ok('不阻断，照样跑完给你看', done, c.$('stat-review').textContent);
+    const nA = new Set(c.calls.filter(x => /【A（已定，随机抽出）】/.test(x.user))
+      .map(x => (/【A（已定，随机抽出）】\n([LPW]\d+)/.exec(x.user) || [])[1])).size;
+    ok('站内三层的 B 都太弱后，走到基底库找 B', c.calls.some(x => /它要与 A \*\*正面对立\*\*/.test(x.user)));
+    ok('库里的 B 立住了对子、往下跑（没一直换 A）',
+      /定标/.test(c.$('stat-select').textContent) || /知识库|自造/.test(c.$('srcState').textContent), c.$('stat-select').textContent);
+    ok('B 来自库时日志有交代', /库/.test(c.$('out-select').parentNode.querySelector('.sel-log').textContent));
+    ok('跑到底', done, c.$('stat-review').textContent);
   });
 
   await step('十七之五之二、站内三层都没有第三方 → 先知识库；库里也举不出 → 才自造', async () => {
@@ -799,12 +811,17 @@ function setStudent(c, slug) {
     ok('换完跑到底', done, c.$('stat-review').textContent);
   });
 
-  await step('十七之八、基底始终给不出编号时说人话', async () => {
-    const c = await boot({ answer: u => /【A（已定，随机抽出）】/.test(u) ? '我觉得这几篇都不错，可惜没写编号。' : defaultAnswer(u) });
+  await step('十七之八、连基底库都配不出对立面时，如实收手', async () => {
+    // 找 B 的三层与知识库全给废话 → 每个 A 四层皆败 → 换 A → 最终如实收手
+    const c = await boot({ answer: u => {
+      if (/【A（已定，随机抽出）】/.test(u)) return '我觉得这几篇都不错，可惜没写编号。';
+      if (/它要与 A \*\*正面对立\*\*/.test(u)) return '出处：无';
+      return defaultAnswer(u);
+    } });
     c.$('maxRounds').value = '3';
     c.$('apiKey').value = 'sk-fake'; c.click('#goBtn');
-    await waitFor(() => c.$('errBox').style.display === 'block', 15000);
-    ok('提示重跑本格或改手挑', /勾上「我自己挑三篇」/.test(c.$('errBox').textContent), c.$('errBox').textContent);
+    await waitFor(() => c.$('errBox').style.display === 'block', 25000);
+    ok('如实收手、指路手挑或换学员', /勾上「我自己挑三篇」|换一位学员/.test(c.$('errBox').textContent), c.$('errBox').textContent);
     ok('没有硬撑着往下跑', c.$('stat-gate').textContent === '待命');
   });
 
@@ -1088,20 +1105,20 @@ function setStudent(c, slug) {
     ok('只点标题也能靠反查救回来', /定标/.test(b.$('stat-select').textContent), b.$('stat-select').textContent);
     ok('反查到的正是那一篇', /同意/.test(b.$('srcState').textContent), b.$('srcState').textContent);
 
-    // ③ 真的什么都没给：换一篇 A 重来，回灌的话说人话
+    // ③ 第一层读不出 B：往外扩一层（A 不换），下一层能挑就照样立住
     let nb = 0;
     const c = await boot({ answer: u => {
       if (/【A（已定，随机抽出）】/.test(u)) { nb++; return nb === 1
-        ? '这几篇都不错，我说不好挑哪一篇。'.repeat(4) : defaultAnswer(u); }
+        ? '这几篇都不错，我说不好挑哪一篇。'.repeat(4) : pickB(firstFreeB(u)); }
       return defaultAnswer(u);
     } });
     await runPipeline(c, 45000);
     const log = c.$('out-select').parentNode.querySelector('.sel-log').textContent;
-    ok('这一轮作废并换一篇 A 重来', /没找出 B/.test(log), log.slice(0, 160));
-    const nom2 = c.calls.filter(x => /【A（已定，随机抽出）】/.test(x.user))[1];
-    ok('回灌的话说人话', nom2 && /没找出对立的 B/.test(nom2.user) && !/#0/.test(nom2.user));
-    ok('机读格式写在调令里', nom2 && /B：L7/.test(nom2.user));
-    ok('第二轮照样定标', /定标/.test(c.$('stat-select').textContent), c.$('stat-select').textContent);
+    ok('第一层没读出 B 时往外扩一层（不换 A）', /没读出 B 编号，往外扩一层/.test(log), log.slice(0, 200));
+    ok('第二层用的还是同一个 A', new Set(c.calls.filter(x => /【A（已定，随机抽出）】/.test(x.user))
+      .map(x => (/【A（已定，随机抽出）】\n([LPW]\d+)/.exec(x.user) || [])[1])).size === 1, '不同 A 数');
+    ok('机读格式写在调令里', c.calls.some(x => /【A（已定，随机抽出）】/.test(x.user) && /B：L7/.test(x.user)));
+    ok('第二层照样定标', /定标/.test(c.$('stat-select').textContent), c.$('stat-select').textContent);
   });
 
   await step('二十三之十、对立按发生学判：五条判据 + 假对立', async () => {

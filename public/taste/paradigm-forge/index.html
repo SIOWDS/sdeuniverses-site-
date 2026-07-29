@@ -169,7 +169,7 @@ select.model-select{max-width:340px}
     <div id="mA" class="srcbox">
       <label class="lbl">学员</label>
       <select id="stuSel"></select>
-      <div class="small" style="margin:8px 0" id="autoNote">随机抽定一篇 A → 找与 A 对立的 B（本人栏找不到就扩到其他学员、再到全站长文）→ 再找<b>同时顶住 A 和 B</b> 的 C（同样逐级放宽）。三层都没有，才由知识库举一个真实第三方，<b>再没有才自造</b>——自造是最后手段。</div>
+      <div class="small" style="margin:8px 0" id="autoNote">随机抽定一篇 A（固定不换）→ 找与 A 对立的 B：<b>对立度不够就逐级放宽范围</b>——本人栏 → 其他学员 → 全站长文 → 基底知识库。立住对子后，再找<b>同时顶住 A 和 B</b> 的 C（同样逐级放宽，最后才知识库、再自造）。</div>
       <div class="small" style="margin:6px 0;color:var(--muted)">内化那一格走<b>快速档</b>（压缩活，快而稳）；碰撞与成文全程<b>满功率</b>。</div>
       <div class="row" style="margin:6px 0">
         <label class="small" style="display:flex;gap:6px;align-items:center">最多试
@@ -1127,12 +1127,13 @@ function sdeOppositeBlock(){
   ].join('\n');
 }
 
-async function loadTrio(gids){
-  if(!gids || gids.length!==3) throw new Error('没凑齐三个源——重跑本格，或勾上「我自己挑三篇」。');
+async function loadTrio(descs){
+  if(!descs || descs.length!==3) throw new Error('没凑齐三个源——重跑本格，或勾上「我自己挑三篇」。');
   const out=[];
-  for(const g of gids) out.push(await srcOfGid(g));
-  if(new Set(out.map(x=>x.url)).size!==3) throw new Error('三个源里有重复。');
-  ST.sources=out; ST.seed=gids;
+  for(const d of descs) out.push(isGid(d) ? await srcOfGid(d) : d);   // gid 取正文；源对象直接用
+  const keys=out.map(x=>x.url||x.title);
+  if(new Set(keys).size!==3) throw new Error('三个源里有重复。');
+  ST.sources=out; ST.seed=descs.map(d=>isGid(d)?d:'(源)');
   ST.spineRows=[]; ST.conflict='';
   $('srcState').textContent='种子：'+out.map(s=>s.title.slice(0,12)).join(' × ');
   renderTrio();
@@ -1170,7 +1171,7 @@ function promptFor(id){
   }
 
   if(id==='verifyPair'){
-    const pr=(ST.__pending2||[]).map(g=>poolByGid(g)||{});
+    const pr=(ST.__pending2||[]).map(asSrc);
     return [
       '你是对子验收员，不是提名者。下面两篇被提名做碰撞底座，你只做一件事：判它们到底顶不顶得上。',
       '',
@@ -1194,7 +1195,7 @@ function promptFor(id){
   }
 
   if(id==='pickC'){
-    const P=ST.pair||{}, A=poolByGid(P.aGid)||{}, B=poolByGid(P.bGid)||{}, pool=ST.__pool||[];
+    const P=ST.pair||{}, A=poolByGid(P.aGid)||{}, B=asSrc(P.bGid), pool=ST.__pool||[];
     return [
       '【已经立住的对子——不许更换】',
       'A '+(A.gid||'')+'　'+(A.title||'?')+(A.author?('　/'+A.author):'')+'　主题观点：'+(P.ta||'（见摘要）'),
@@ -1223,7 +1224,7 @@ function promptFor(id){
   }
 
   if(id==='pickCKB'){
-    const P=ST.pair||{}, A=poolByGid(P.aGid)||{}, B=poolByGid(P.bGid)||{};
+    const P=ST.pair||{}, A=poolByGid(P.aGid)||{}, B=asSrc(P.bGid);
     return [
       '【已经立住的对子——不许更换】',
       'A　'+(A.title||'?')+'　主题观点：'+(P.ta||''),
@@ -1250,7 +1251,7 @@ function promptFor(id){
   }
 
   if(id==='makeC'){
-    const P=ST.pair||{}, A=poolByGid(P.aGid)||{}, B=poolByGid(P.bGid)||{};
+    const P=ST.pair||{}, A=poolByGid(P.aGid)||{}, B=asSrc(P.bGid);
     return [
       '站内没有、你的知识库里也举不出可靠的真第三方。**到这一步，才由你自己造一个。这是最后手段。**',
       '',
@@ -1275,7 +1276,7 @@ function promptFor(id){
   }
 
   if(id==='verify'){
-    const d3=(ST.__pending||[]).map(x=> x.gid?x:(poolByGid(x)||{title:x&&x.title,summary:x&&x.summary,author:x&&x.author}));
+    const d3=(ST.__pending||[]).map(asSrc);
     return [
       '你是验收员，不是提名者。下面三篇被提名做碰撞种子，你只做一件事：判它们到底打不打架。',
       '',
@@ -1737,47 +1738,49 @@ async function doSelect(){
   for(let r=ST.tried.length; r<limit; r++){
     if(ST.abort) throw new Error('已停下');
 
-    /* ① 没有对子 → 随机定 A，逐级找与它对立的 B */
+    /* ① 没有对子 → 随机定一篇 A（固定），逐级放宽范围找与它对立的 B。
+       关键：对子**不够硬**（<6）也往外扩，不重新换 A；本人栏→他人→全站→基底库四层都配不到，才换 A。 */
     if(!ST.pair){
-      let aGid,bGid,swapped=false;
-      if(ST.__swap){ aGid=ST.__swap[0]; bGid=ST.__swap[1]; ST.__swap=null; swapped=true; ST.aGid=aGid; }
-      else {
-        aGid=randSelfGid(ST.usedA);
-        if(!aGid){ selLog('这位学员的篇目已经全部当过 A 了。'); break; }
-        ST.usedA.push(aGid); ST.aGid=aGid;
-        // B 逐级放宽：0 本人栏 → 1 +他人 → 2 +全站
-        bGid=null;
-        for(let rung=0; rung<=2 && !bGid; rung++){
-          ST.__rung=rung;
-          ST.__pool=poolAt(rung).filter(x=>x.gid!==aGid);
+      // 回退换来的对子（A×上一个C候选）：直接验，不走 B 阶梯
+      if(ST.__swap){
+        const aGid=ST.__swap[0], bDesc=ST.__swap[1]; ST.__swap=null; ST.aGid=aGid;
+        const pr=await tryPair(aGid, bDesc, r, transcript, true);
+        if(pr){ ST.pair=pr; cFail=0; lastC=''; }
+        continue;
+      }
+      const aGid=randSelfGid(ST.usedA);
+      if(!aGid){ selLog('这位学员的篇目已经全部当过 A 了。'); break; }
+      ST.usedA.push(aGid); ST.aGid=aGid;
+      const triedB=[]; let locked=null;
+      // 阶梯：0本人栏 1其他学员 2全站长文 3基底库
+      for(let rung=0; rung<=3 && !locked && !ST.abort; rung++){
+        ST.__rung=rung;
+        if(rung<=2){
+          ST.__pool=poolAt(rung).filter(x=>x.gid!==aGid && triedB.indexOf(x.gid)<0);
+          if(!ST.__pool.length){ continue; }
           setStat('select','<span class="spinner"></span> 第 '+(r+1)+' 轮 · A '+aGid+' → 在'+RUNG_CN[rung]+'找对立的 B','run');
           const nb=await askStream(sdeSystem(), promptFor('pickB'), p.out, p.stat, p.meta, 2600, '第'+(r+1)+'轮找B·'+RUNG_CN[rung]);
-          bGid=parseGid(nb.text||'', 'B', ST.__pool, [aGid]);
-          if(bGid==='') { if(rung<2) selLog('第 '+(r+1)+' 轮：'+RUNG_CN[rung]+'里没有能顶 A 的，往外扩一层。'); bGid=null; continue; }
-          if(bGid===null){ break; } // 读不出编号：这一轮作废
-        }
-        if(!bGid){
-          ST.tried.push({ gids:[aGid], score:0, why:'A '+aGid+' 三层都没找出对立的 B（或没给可读编号）' });
-          selLog('第 '+(r+1)+' 轮：A '+aGid+' —— 没找出 B，换一篇 A 重来。');
-          continue;
+          const bGid=parseGid(nb.text||'', 'B', ST.__pool, [aGid].concat(triedB));
+          if(bGid===''){ if(rung<3) selLog('第 '+(r+1)+' 轮：'+RUNG_CN[rung]+'里没有能顶 A 的，往外扩一层。'); continue; }
+          if(bGid===null){ if(rung<3) selLog('第 '+(r+1)+' 轮：'+RUNG_CN[rung]+'这一层没读出 B 编号，往外扩一层。'); continue; }
+          const pr=await tryPair(aGid, bGid, r, transcript, false);
+          if(pr){ locked=pr; break; }
+          triedB.push(bGid);
+          if(rung<3) selLog('第 '+(r+1)+' 轮：这一层的 B 太弱，往外扩一层找更对立的。');
+        } else {
+          // 第四层：基底库举一个真实的对立 B
+          const kbB=await findBInKB(aGid);
+          if(!kbB){ break; }
+          const pr=await tryPair(aGid, kbB, r, transcript, false);
+          if(pr){ locked=pr; break; }
         }
       }
-      ST.__pending2=[aGid,bGid];
-      setStat('select','<span class="spinner"></span> 第 '+(r+1)+' 轮 · 验对子 '+aGid+'×'+bGid,'run');
-      const vb=await askStream('你是对子验收员，只验两篇顶不顶得上，不许提名。宁可判低。', promptFor('verifyPair'),
-        p.out, p.stat, p.meta, 900, '第'+(r+1)+'轮验对子');
-      const v2=parseVerdict(vb.text||'');
-      const sc2=(v2.score==null?0:v2.score);
-      const ta=/主题A[：:]\s*([^｜\n|]+)/.exec(vb.text||''), tb=/主题B[：:]\s*([^｜\n|]+)/.exec(vb.text||'');
-      const bx=poolByGid(bGid)||{};
-      transcript.push('第 '+(r+1)+' 轮 对子 '+aGid+'×'+bGid+'　烈度 '+sc2+'/10　'+v2.why);
-      selLog('第 '+(r+1)+' 轮：'+(swapped?'回退换对子 ':'')+aGid+'×'+bGid+'（'+(SCOPE_CN[bx.scope]||'')+'）　对子烈度 <b>'+sc2+'/10</b>　'+escTxt(v2.why));
-      const pr={ aGid:aGid, bGid:bGid, why:v2.why, ta:(ta?ta[1].trim():''), tb:(tb?tb[1].trim():''), sc:sc2 };
-      if(!ST.bestPair || sc2>ST.bestPair.sc) ST.bestPair=pr;
-      ST.tried.push({ gids:[aGid,bGid], score:sc2, why:'对子 '+sc2+'/10：'+v2.why });
-      if(sc2<6) continue;
-      ST.pair=pr; cFail=0; lastC='';
-      selLog('<span style="color:var(--ok)">✓ 对子立住（'+sc2+'/10），接下来找同时顶住这两篇的第三篇。</span>');
+      if(!locked){
+        selLog('第 '+(r+1)+' 轮：A '+aGid+' 四层（本人栏／其他学员／全站／知识库）都配不到够硬的对立面，换一篇 A。');
+        continue;
+      }
+      ST.pair=locked; cFail=0; lastC='';
+      selLog('<span style="color:var(--ok)">✓ 对子立住（'+locked.sc+'/10，B 来自'+(SCOPE_CN[asSrc(locked.bGid).scope]||'')+'），接下来找同时顶住这两篇的第三篇。</span>');
       continue;
     }
 
@@ -1786,23 +1789,25 @@ async function doSelect(){
     for(let rung=0; rung<=2 && !cGid; rung++){
       ST.__crung=rung;
       ST.__pool=poolAt(rung).filter(x=>x.gid!==ST.pair.aGid && x.gid!==ST.pair.bGid && ST.badC.indexOf(x.gid)<0);
-      setStat('select','<span class="spinner"></span> 第 '+(r+1)+' 轮 · 在'+RUNG_CN[rung]+'找同时顶住 '+ST.pair.aGid+'×'+ST.pair.bGid+' 的 C','run');
+      const bTagC=isGid(ST.pair.bGid)?ST.pair.bGid:'（'+(SCOPE_CN[asSrc(ST.pair.bGid).scope]||'库')+'）';
+      setStat('select','<span class="spinner"></span> 第 '+(r+1)+' 轮 · 在'+RUNG_CN[rung]+'找同时顶住 '+ST.pair.aGid+'×'+bTagC+' 的 C','run');
       const nc=await askStream(sdeSystem(), promptFor('pickC'), p.out, p.stat, p.meta, 2600, '第'+(r+1)+'轮找C·'+RUNG_CN[rung]);
-      cGid=parseGid(nc.text||'', 'C', ST.__pool, [ST.pair.aGid, ST.pair.bGid].concat(ST.badC));
+      cGid=parseGid(nc.text||'', 'C', ST.__pool, [ST.pair.aGid].concat(isGid(ST.pair.bGid)?[ST.pair.bGid]:[]).concat(ST.badC));
       if(cGid===''){ if(rung<2) selLog('第 '+(r+1)+' 轮：'+RUNG_CN[rung]+'里没有能同时顶两篇的 C，往外扩一层。'); cGid=null; continue; }
       if(cGid===null) break;
     }
 
     if(cGid){
-      const trio=[ST.pair.aGid, ST.pair.bGid, cGid]; lastC=cGid;
+      const trio=[ST.pair.aGid, ST.pair.bGid, cGid]; lastC=cGid;   // bGid 可能是源对象
       ST.__pending=trio;
       const cx=poolByGid(cGid)||{};
-      setStat('select','<span class="spinner"></span> 第 '+(r+1)+' 轮 · 三方验收 '+trio.join(' '),'run');
+      const trioTag=trio.map(d=>isGid(d)?d:'（'+(SCOPE_CN[asSrc(d).scope]||'库')+'）').join(' ');
+      setStat('select','<span class="spinner"></span> 第 '+(r+1)+' 轮 · 三方验收 '+trioTag,'run');
       const ver=await askStream('你是碰撞种子的验收员，只验不提名。宁可判低，不许放互补的组合过去。', promptFor('verify'),
         p.out, p.stat, p.meta, 1200, '第'+(r+1)+'轮验收');
       const v=parseVerdict(ver.text||'');
       const sc=(v.score==null?0:v.score)-(v.same==='高'?2:0);
-      transcript.push('第 '+(r+1)+' 轮 '+trio.join(' ')+'　烈度 '+(v.score==null?'?':v.score)+'/10　同源度 '+(v.same||'?')+'　'+v.why);
+      transcript.push('第 '+(r+1)+' 轮 '+trioTag+'　烈度 '+(v.score==null?'?':v.score)+'/10　同源度 '+(v.same||'?')+'　'+v.why);
       selLog('第 '+(r+1)+' 轮：+C '+cGid+'（'+(SCOPE_CN[cx.scope]||'')+'）　三方烈度 <b>'+(v.score==null?'?':v.score)+'/10</b>　同源度 '+(v.same||'?')+'　'+escTxt(v.why));
       if(!ST.best || sc>ST.best.sc) ST.best={ gids:trio, sc:sc, v:v };
       ST.tried.push({ gids:trio, score:(v.score==null?0:v.score), why:v.why });
@@ -1819,7 +1824,7 @@ async function doSelect(){
 
     /* ③ 三层文章都没有 C → 先知识库、再自造（都不占学员篇目） */
     cFail++;
-    ST.tried.push({ gids:[ST.pair.aGid, ST.pair.bGid], score:0, why:'站内三层都找不出第三方（第 '+cFail+' 次）' });
+    ST.tried.push({ gids:[ST.pair.aGid, isGid(ST.pair.bGid)?ST.pair.bGid:'(库)'], score:0, why:'站内三层都找不出第三方（第 '+cFail+' 次）' });
     selLog('第 '+(r+1)+' 轮：本人栏／其他学员／全站都没有能同时顶两篇的 C。');
     const kb=await findCInKB(transcript);
     if(kb) return kb;
@@ -1868,8 +1873,9 @@ async function forgeC(transcript){
 
 /* 把知识库/自造的第三方装成第三个源，跑通下游 */
 async function installForged(transcript, title, txt, kind){
-  const out=[ await srcOfGid(ST.pair.aGid), await srcOfGid(ST.pair.bGid), { title:title, url:'', author:'', scope:kind, text:txt } ];
-  ST.sources=out; ST.seed=[ST.pair.aGid, ST.pair.bGid, '(造)'];
+  const bSrc = isGid(ST.pair.bGid) ? await srcOfGid(ST.pair.bGid) : asSrc(ST.pair.bGid);
+  const out=[ await srcOfGid(ST.pair.aGid), bSrc, { title:title, url:'', author:'', scope:kind, text:txt } ];
+  ST.sources=out; ST.seed=[ST.pair.aGid, (isGid(ST.pair.bGid)?ST.pair.bGid:'(源)'), '(造)'];
   ST.forged=kind; ST.spineRows=[]; ST.conflict=''; ST.seedScore=6;
   ST.out.select=(transcript||[]).join('\n')+'\n第三方'+(kind==='kb'?'取自大模型知识库':'由基底自造')+'：'+title;
   $('srcState').textContent='种子：'+out.map(s=>s.title.slice(0,12)).join(' × ');
@@ -1883,6 +1889,61 @@ async function installForged(transcript, title, txt, kind){
   return ST.out.select;
 }
 
+/* descriptor 解析：B/C 可能是真文章的 gid（字符串），也可能是知识库/自造的源对象 */
+function asSrc(d){ return (d && typeof d==='object') ? d : (poolByGid(d)||{}); }
+function isGid(d){ return typeof d==='string'; }
+/* 让基底从知识库举一个真实存在、与 A 对立的 B（A 四层文章都配不到够硬的对立面时）。
+   成了返回一个源对象（含 summary/text），否则 null。 */
+async function findBInKB(aGid){
+  const p=panels.select, A=poolByGid(aGid)||{};
+  const cp=[
+    '这位学员本人栏、其他学员、全站长文都翻遍了，没有一篇能和下面这篇 A 形成够硬的对立。',
+    '现在**从你自己的知识库里举一个真实存在的**——某位学者的理论、某项研究、某个已发表的论点，它要与 A **正面对立**（A 成立它就不成立）。',
+    '',
+    'A　'+(A.title||'?')+(A.author?('　/'+A.author):'')+'\n　　'+String(A.summary||'').slice(0,220),
+    '',
+    sdeOppositeBlock(),
+    '',
+    '硬要求：',
+    '· 必须**真实存在、可查证**：给得出提出者与出处（作者 · 篇名或书名 · 年份）；记不准就换一个，**绝不允许编造文献**；',
+    '· 它要与 A 正面对立，不是给 A 作背景补充；',
+    '· 用**你自己的话**转述，超过二十字的原话一律不要。',
+    '举不出可靠的真东西，就只写一行「出处：无」。',
+    '',
+    '【输出格式，逐项写全】',
+    '出处：作者《篇名或书名》年份',
+    'B 的主题观点：一句 ≤40 字的判断句',
+    'A×B 为什么不能同时成立：一句',
+    '转述：400–700 字，把它的论证说到能被反驳的程度。'
+  ].join('\n');
+  setStat('select','<span class="spinner"></span> 站内配不到对立面 · 从知识库里找一个真实的 B','run');
+  const m=await askStream(sdeSystem(), cp, p.out, p.stat, p.meta, 2000, '知识库找B');
+  const txt=m.text||'';
+  if(/出处[：:]\s*无/.test(txt) || txt.replace(/\s/g,'').length<180){ selLog('知识库里也举不出能顶 A 的真实论点。'); return null; }
+  const src=/出处[：:]\s*([^\n]+)/.exec(txt), th=/B\s*的主题观点[：:]\s*([^\n]+)/.exec(txt);
+  return { gid:null, scope:'kb', url:'', author:'',
+    title:'（知识库）'+((src?src[1]:'').replace(/[《》]/g,'').trim().slice(0,26) || '与 A 正面对立的一个已有论点'),
+    summary:(th?th[1].trim():'').slice(0,120) || txt.replace(/\s+/g,' ').slice(0,120),
+    tb:(th?th[1].trim():''), text:txt };
+}
+/* 验一对 A×B（B 是 gid 或知识库源对象）。够硬（≥6）返回 pair 对象，否则记 bestPair/tried 并返回 null */
+async function tryPair(aGid, bDesc, r, transcript, swapped){
+  const p=panels.select, bx=asSrc(bDesc);
+  ST.__pending2=[aGid, bDesc];
+  const bTag=isGid(bDesc)?bDesc:'（'+(SCOPE_CN[bx.scope]||'库')+'）'+(bx.title||'').slice(0,10);
+  setStat('select','<span class="spinner"></span> 第 '+(r+1)+' 轮 · 验对子 '+aGid+'×'+bTag,'run');
+  const vb=await askStream('你是对子验收员，只验两篇顶不顶得上，不许提名。宁可判低。', promptFor('verifyPair'),
+    p.out, p.stat, p.meta, 900, '第'+(r+1)+'轮验对子');
+  const v2=parseVerdict(vb.text||'');
+  const sc2=(v2.score==null?0:v2.score);
+  const ta=/主题A[：:]\s*([^｜\n|]+)/.exec(vb.text||''), tb=/主题B[：:]\s*([^｜\n|]+)/.exec(vb.text||'');
+  transcript.push('第 '+(r+1)+' 轮 对子 '+aGid+'×'+bTag+'　烈度 '+sc2+'/10　'+v2.why);
+  selLog('第 '+(r+1)+' 轮：'+(swapped?'回退换对子 ':'')+aGid+'×'+bTag+'（B 来自'+(SCOPE_CN[bx.scope]||'')+'）　对子烈度 <b>'+sc2+'/10</b>　'+escTxt(v2.why));
+  const pr={ aGid:aGid, bGid:bDesc, why:v2.why, ta:(ta?ta[1].trim():''), tb:(tb?tb[1].trim():(bx.tb||'')), sc:sc2 };
+  if(!ST.bestPair || sc2>ST.bestPair.sc) ST.bestPair=pr;
+  ST.tried.push({ gids:[aGid, isGid(bDesc)?bDesc:'(库)'], score:sc2, why:'对子 '+sc2+'/10：'+v2.why });
+  return sc2>=6 ? pr : null;
+}
 function selHint(s){ selLog('<span style="color:var(--warn)">'+s+'</span>'); }
 
 async function doWrite(){
@@ -2246,7 +2307,7 @@ $('dlEngine').addEventListener('click', ()=>{
 });
 
 /* ===================== 起 ===================== */
-const BUILD_TAG = '20260729-1539·v1';
+const BUILD_TAG = '20260729-1616·v1';
 (function(){ const el=$('buildTag'); if(el) el.textContent='构建 '+BUILD_TAG; })();
 loadData();
 </script>
