@@ -22,21 +22,16 @@
 name: search-index
 
 on:
-  # 【2026-07-29 二改】索引改上 R2 之后，"每次 push 重建"当初被砍掉的那个理由
-  #   （每次重建都往 git 里写 218MB 速朽副本）已经不存在，故恢复 push 触发。
-  #   新文章 push 完几分钟就进站内搜索，不必再等到凌晨。
-  push:
-    branches: [main]
-    paths-ignore:
-      # 这三类改动不影响索引内容，跑一次是白烧 1590 次 R2 写操作。
-      # roster.json 尤其要排除：roster.yml 每次 push 都会重建它并回推一个 commit，
-      # 那个 commit 又是一次 push —— 不排除就等于每次推送触发两遍。
-      - 'public/students/roster.json'
-      - 'public/search/**'
-      - '.github/**'
+  # 【2026-07-29 二改·又改回】曾短暂恢复过 push 触发（迁 R2 之后，"每次重建都往 git
+  #   写 218MB 速朽副本"这个当初砍它的理由已不存在）。但账算下来不划算：文档编号是
+  #   url_list 排序后 enumerate 出来的，插一篇新文章会把其后所有编号整体后移，于是
+  #   几乎每个分片内容都真的变了，增量同步省不下来 —— 每跑一趟就是约 1590 次 R2 写。
+  #   按每天 55-83 次重建算，月 Class A 操作从约 5 万涨到 300-380 万，越过 100 万免费额
+  #   度后每月十来美元。**用户 2026-07-29 决定维持每日一次。**
+  #   若将来仓库瘦身完、或索引改成能增量更新，可再议；那时记得同时加回 paths-ignore
+  #   （roster.json 必排除：roster.yml 每次 push 都回推一个 commit，那本身又是一次
+  #   push，不排除等于每次推送触发两遍）。
   schedule:
-    # 保留每天一次做兜底：push 触发有 paths-ignore 和并发取消，
-    # 万一某次内容变更被漏掉或被后来的 push 挤掉，凌晨这一趟会补上。
     - cron: '0 18 * * *'
   workflow_dispatch:                 # 想立刻跑：Actions 页面 → search-index → Run workflow
 
@@ -128,8 +123,8 @@ jobs:
           echo "线上那份已更新"
 
           # 快照每天只留一份：键名按日期，同一天跑第二次也只是把同一批键覆盖一遍，
-          # 留不下新东西，却要再烧 1590 次写操作。所以 push 触发的那些跑不留快照，
-          # 只有定时和手动跑才留。
+          # 留不下新东西，却要再烧 1590 次写操作。下面这个 push 判断是留给未来的护栏——
+          # 现在没有 push 触发，它不会命中；哪天真加回 push 了，不至于连快照也翻倍。
           # 不加 --delete，也不覆盖别的日期；保留期交给桶上的 Object Lifecycle Rule
           # （search-snap/ 前缀 30 天过期）。这是 git 缺的那个能力：能忘。
           if [ "${GITHUB_EVENT_NAME}" = "push" ]; then
