@@ -32,7 +32,8 @@ PAPERS = [{
              "而是对同一场个体化生成行使的三种权能——命名、判错、计算。"
              "三大对立由此成为一条个体化律的三个侧面，三门学科各自最硬的难题"
              "——数学的贝纳塞拉夫非唯一性、符号学的解释项难题、逻辑多元论的坍缩问题——被统一为同一处症结的三种发作，"
-             "由此打开一门此前不存在的交叉学科：**个体化生成论**。"),
+             "由此打开一门此前不存在的交叉学科：**个体化生成论**。"
+             "本文并在数学侧作一次形式坐实：把单价基础的「同构即同一」从个体化律里作为**定理导出**、而非作为公理假设。"),
     "clash": ("三家在「基本单元的同一性从何而来」这同一问题上给出互斥答案："
               "生物符号学说同一性/意义是真实的、有根的（根在活的解释关系里）；"
               "逻辑多元论与反例外论说没有唯一、先验、普遍的有效性判准（多元、可修、或无）；"
@@ -131,7 +132,7 @@ def build_page(p, body, toc, pages):
     t = re.sub(r'<h1 class="art-title">.*?</h1>', f'<h1 class="art-title">{p["title"]}</h1>', t, flags=re.S)
     t = re.sub(r'<p class="art-sub">.*?</p>', f'<p class="art-sub">{p["sub"]}</p>', t, flags=re.S)
     t = re.sub(r'<div class="art-meta">.*?</div>',
-               f'<div class="art-meta">王德生 ＋ Claude · 约 1.6 万字 · {pages} 页 · '
+               f'<div class="art-meta">王德生 ＋ Claude · 约 1.8 万字 · {pages} 页 · '
                f'三种阅读方式 · 发表于{PUBDATE}</div>', t, flags=re.S)
     t = re.sub(r'<div class="deck">.*?</div>', f'<div class="deck">{strongify(p["deck"])}</div>', t, flags=re.S)
     links = "".join(f'<a href="#{i}">{html.escape(x)}</a>' for i, x in toc)
