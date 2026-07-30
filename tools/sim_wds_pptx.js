@@ -315,6 +315,23 @@ console.log("── 四 · 两端接线");
   ok(/deckReady \|\| deckOf\(text\)/.test(wm), "点按钮时优先用预取好的那份");
 }
 
+console.log("── 四点二 · 首次真跑抓到的：多条成对页要走对照卡");
+{
+  const t = (title, bs) => X.pickLayout({ title: title, bullets: bs, notes: "", kind: "content" }, 4, 9);
+  // 读者真跑那份的第 4 页：5 条全是 `A ｜ B`、标题写着「旧思维与新思维对比」，
+  // 却因为旧判据 n<=3 落回普通要点页，竖线原样印在卡片里。
+  ok(t("旧思维与新思维对比", ["旧思维 ｜ 新思维", "急于给结论 ｜ 先追问过程", "罗列碎片 ｜ 追踪关系", "结构当事实 ｜ 结构是结果", "永远正确 ｜ 可被反驳"]) === "compare",
+     "五条成对＋标题带对比 → 左右对照（原来落回要点页）");
+  ok(t("两条路", ["旧 ｜ 新", "急于结论 ｜ 追问过程", "碎片 ｜ 关系"]) === "compare",
+     "标题没有对比二字，但首条是表头 → 也走对照（表头比标题词更硬）");
+  ok(/function headerish\(/.test(MOD) && /a\.length <= 8 && c\.length > 0 && c\.length <= 8/.test(MOD), "表头判据＝两侧都短");
+  // 顺序：表头判据必须排在步骤/时间线之后，否则 `五月 ｜ 上线` 会被当成表头
+  ok(t("三个月的阶段", ["五月 ｜ 上线", "六月 ｜ 试跑", "七月 ｜ 十二步"]) === "timeline", "时间线不被表头判据抢走");
+  ok(t("怎么做的流程", ["检索 ｜ 取段", "碰撞 ｜ 出典范", "划界 ｜ 当闸门"]) === "steps", "步骤条不被抢走");
+  ok(t("关键训练数字", ["3 ｜ 每天追问的旧判断", "3 ｜ 记录跳完才反应的事", "1 ｜ 差点跳但停住的事"]) === "kpi", "大数字页不被抢走");
+  ok(MOD.indexOf('headerish(bs[0])') > MOD.indexOf('return "timeline"'), "表头判据在代码里就排在时间线之后（顺序即判据）");
+}
+
 console.log("── 四点五 · 空产出不许闷着（2026-07-30 实测撞上）");
 {
   const DIST = wk.slice(wk.indexOf('url.pathname === "/api/wds/distill"'), wk.indexOf('url.pathname === "/api/chat/clear"'));

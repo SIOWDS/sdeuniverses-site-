@@ -470,6 +470,13 @@
 
   /* 自动选版式：只看这一页内容的**形状**，不看它写了什么。
      显式 `layout: kpi` 永远优先——机器猜错时人要能一句话改掉。 */
+  // 「旧思维 ｜ 新思维」这种两侧都短的成对行＝对照表的表头。认出它比认标题词可靠得多。
+  function headerish(b) {
+    var p = String(b || "").split(/[|｜]/);
+    if (p.length < 2) return false;
+    var a = p[0].trim(), c = p.slice(1).join("|").trim();
+    return a.length > 0 && a.length <= 8 && c.length > 0 && c.length <= 8;
+  }
   function pickLayout(s, idx, total) {
     if (s.layout && LAYOUTS[s.layout]) return s.layout;
     if (s.kind === "cover") return s.subtitle ? "cover" : "coverCenter";
@@ -486,9 +493,12 @@
     if (nums >= 2 && n <= 3) return "kpi";
     if (nums === 1 && n === 1) return "kpiBig";
     if (n === 4 && pairs === 4 && /辨别|矩阵|四格|2×2|2x2/.test(s.title || "")) return "matrix";
-    if (pairs >= 2 && n <= 3 && /对比|vs|与|之别|差别/i.test(s.title || "")) return "compare";
+    if (pairs >= 2 && pairs >= n - 1 && n <= 7 && /对比|vs|之别|差别|两种|新旧|前后/i.test(s.title || "")) return "compare";
     if (pairs >= 3 && /步骤|流程|做法|怎么做/.test(s.title || "")) return "steps";
     if (pairs >= 3 && /时间|阶段|演进|历程|路线/.test(s.title || "")) return "timeline";
+    // 首条两侧都短＝对照表的表头，这是最硬的信号；但必须排在"步骤/时间线"之后——
+    // `五月 ｜ 上线` 两侧也都短，先判就会把时间线抢走（2026-07-30 护栏当场抓到）。
+    if (pairs >= 3 && pairs === n && n <= 7 && headerish(bs[0])) return "compare";
     if (n === 1 && String(bs[0]).length >= 14) return "lead";
     if (n >= 6) return "bulletsTwo";
     // 一份稿子里普通要点页最多，全用同一种摆法就是"十页长一个样"。
