@@ -80,6 +80,17 @@ function isAdminName(name) {
   const extra = String((IM_ENV && IM_ENV.IM_ADMINS) || "").split(",");
   return [].concat(IM_ADMINS_BUILTIN, extra).some((x) => x && imNorm(x) === n);
 }
+// 站点管理口令是否已设定。没设定时 checkpass 恒为 false，得给出能看懂的话，
+// 而不是让管理员对着"管理密码不正确"反复试。
+async function adminPassExists() {
+  try {
+    if (!IM_ENV || !IM_ENV.CONFIG_VAULT) return false;
+    const cv = IM_ENV.CONFIG_VAULT.get(IM_ENV.CONFIG_VAULT.idFromName("global"));
+    const r = await cv.fetch(new Request("https://do/", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ op: "status" }) }));
+    const j = await r.json().catch(() => ({}));
+    return !!(j && j.hasAdmin);
+  } catch (e) { return false; }
+}
 async function adminPassOk(pass) {
   try {
     if (!IM_ENV || !IM_ENV.CONFIG_VAULT || !pass) return false;
@@ -4747,6 +4758,7 @@ export default {
       // ===== 全权管理：名字在管理员名单 且 管理口令正确，两条都过才放行 =====
       if (op === "admin") {
         if (!isAdminName(who.name)) return Response.json({ ok: false, msg: "你没有管理权限。" }, { status: 403 });
+        if (!(await adminPassExists())) return Response.json({ ok: false, msg: "本站还没有设定过管理密码。请先在文章讨论区的管理入口设定一次，之后这里就能用同一个密码。" }, { status: 403 });
         if (!(await adminPassOk(b.pass))) return Response.json({ ok: false, msg: "管理密码不正确。" }, { status: 403 });
         const a = String(b.a || "");
         if (a === "auth") return Response.json({ ok: true, me });
