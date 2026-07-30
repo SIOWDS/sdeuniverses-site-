@@ -3949,7 +3949,7 @@ export default {
       if (request.method === "OPTIONS") return new Response(null, { headers: _cors() });
       if (request.method !== "POST") return new Response("Method Not Allowed", { status: 405 });
       let b = {}; try { b = await request.json(); } catch (e) {}
-      const kind = ({ report: 1, essay: 1, outline: 1 })[b.kind] ? b.kind : "report";
+      const kind = ({ report: 1, essay: 1, outline: 1, deck: 1 })[b.kind] ? b.kind : "report";
       const turns = Array.isArray(b.history) ? b.history : [];   // 整场收下，长短由 readConvoText 处理
       const dlang = b.lang === "en" ? "en" : "zh";
       if (!turns.length) return _sseResp([{ t: "error", v: "这场还没有可成文的内容。" }]);
@@ -3986,6 +3986,21 @@ export default {
           + "④ 全程不出现「读者问」「我回答」「这场对话」之类痕迹，也不出现学派术语堆砌——普通人要能读懂。\n"
           + "⑤ 结尾留一个开口，不自我封顶。\n"
           + "用 Markdown，标题用 # 和 ##。约三千字。" },
+        deck: { name: "对外 PPT", tok: 9000, spec:
+          "把这场对话做成一套【对外汇报用的幻灯片稿】——听众没参与过这场谈话，只有十几分钟，要在这十几分钟里被说服。\n"
+          + "【格式硬约束（页面要照它切页并生成真 .pptx，错一点就切不开，务必逐条照办）】\n"
+          + "· 第一块是封面：第一行 `# 主标题`（不超过 22 字，是判断不是话题），第二行 `## 一句话主张`。\n"
+          + "· 此后每一页之间用单独一行 `---` 分隔。\n"
+          + "· 每页第一行 `## 页标题`（不超过 16 字）。\n"
+          + "· 页内要点用 `- ` 开头，每页 3–5 条，**每条不超过 24 字且必须是判断句**（「X 不是 Y，而是 Z」这类），不许是名词短语。\n"
+          + "· 每页最后一行 `> ` 开头写讲稿：站上会怎么讲这一页，2–3 句，含一个不能省的例子或数字。\n"
+          + "· 想要一张过渡页时：只写 `## 一、章节名`、不写要点、不写讲稿。\n"
+          + "【内容要求】\n"
+          + "① 全套 8–14 页（含封面），页数按内容定，别凑。\n"
+          + "② 第二页必须是「问题是什么」，最后一页必须是「下一步做什么」，中间按论证顺序排，不按对话顺序排。\n"
+          + "③ 至少有一页给出可被反驳的判据或数字；有不利证据也要写进去，不许只报喜。\n"
+          + "④ 不出现「读者问」「本次对话」之类痕迹，也别堆学派术语——听众是外人。\n"
+          + "⑤ 只输出这套稿子本身，前后不要任何说明。" },
         outline: { name: "写作提纲", tok: 6000, spec:
           "把这场对话变成一份【可以直接照着写的提纲】。结构：\n"
           + "① 母题：一句反直觉的判断，全篇的脊梁。\n"

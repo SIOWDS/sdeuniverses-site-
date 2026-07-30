@@ -297,8 +297,8 @@ ROUTE["/api/wds/chat"] = [
   layer.querySelector(".wdsm-distbtn").click();
   const menu = document.body.querySelector(".wdsm-menu");
   ok(!!menu, "成文菜单弹出");
-  // 菜单在「选择保存目录」加入后是六项：报告/成文/提纲 ＋ 导出 ＋ 选目录 ＋ 成文记录
-  ok(menu.children.length === 6, "菜单六项（报告/成文/提纲/导出/选目录/成文记录），实得 " + menu.children.length);
+  // 2026-07-30 加了第四档「对外 PPT」→ 七项：报告/成文/提纲/PPT ＋ 导出 ＋ 选目录 ＋ 成文记录
+  ok(menu.children.length === 7, "菜单七项（报告/成文/提纲/对外PPT/导出/选目录/成文记录），实得 " + menu.children.length);
   menu.children[0].click();
   await new Promise((r) => setTimeout(r, 220));
   const dist = document.body.querySelector(".wdsm-dist");
@@ -312,7 +312,7 @@ ROUTE["/api/wds/chat"] = [
   DOWNLOADS = [];
   layer.querySelector(".wdsm-distbtn").click();
   const menu2 = document.body.querySelector(".wdsm-menu");
-  menu2.children[3].click();
+  menu2.children[4].click();          // 四档之后才是「导出本场」，索引随之后移
   ok(DOWNLOADS.length === 1 && DOWNLOADS[0].includes("与 WDS 的对话"), "导出了 Markdown 文件");
 
   console.log("⑪ 追问建议与朗读");

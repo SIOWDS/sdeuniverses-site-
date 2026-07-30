@@ -373,6 +373,10 @@
       aMd: "⧉ 原文", aEditIn: "✎ 编辑", edSave: "保存并重答", edCancel: "取消",
     aCont: "↳ 继续", contQ: "接着上面继续写下去，别重复已经写过的部分。",
     lkOpen: "打开站内这篇（新标签页）",
+    kDeck: "对外 PPT", kDeckS: "做成一套汇报幻灯片，可直接下载 .pptx",
+    dPptx: "⤓ 存为 .pptx", dPptxWait: "正在生成 .pptx…", dPptxNo: "这份稿子切不出幻灯片（需要 ## 页标题与 - 要点）",
+    dPptxOk: "已生成 幻灯片 ",
+    deckFoot: "SDE Universes · sdeuniverses.com",
     bMem: "⌾ 记忆", memTitle: "全局记忆 · 我的历史对话",
     memHd: "本机共 <b>{n}</b> 场对话（含其它 WDS 智能体），已炼出 <b>{m}</b> 条记忆，待更新 <b>{p}</b> 场",
     memGo: "开始更新", memProf: "重炼画像", memExp: "导出记忆", memClr: "清空记忆",
@@ -490,6 +494,10 @@
       aMd: "⧉ Source", aEditIn: "✎ Edit", edSave: "Save & regenerate", edCancel: "Cancel",
     aCont: "↳ Continue", contQ: "Continue from where you stopped; don't repeat what you already wrote.",
     lkOpen: "Open this article on the site (new tab)",
+    kDeck: "Slide deck", kDeckS: "Turn this chat into a deck — download as .pptx",
+    dPptx: "⤓ Save as .pptx", dPptxWait: "Building .pptx…", dPptxNo: "This draft has no slides to cut (needs ## titles and - bullets)",
+    dPptxOk: "Deck ready · slides ",
+    deckFoot: "SDE Universes · sdeuniverses.com",
     bMem: "⌾ Memory", memTitle: "Global memory · your past chats",
     memHd: "<b>{n}</b> chats on this device (all WDS agents), <b>{m}</b> distilled, <b>{p}</b> pending",
     memGo: "Update now", memProf: "Rebuild profile", memExp: "Export", memClr: "Clear",
@@ -936,6 +944,14 @@
     if (!wdsKeyGet()) say(t("memNoKey"));
     MEM.refresh(paint);
     return m;
+  }
+  // 二进制存盘：与 saveToDir 同一条链（WDSSaveDir.save 本就接受 Blob），只是不做文本包装
+  function saveBlobToDir(name, blob, say) {
+    var api = dirApi();
+    if (!api) { download(name, blob); if (say) say(t("dDirNoApi")); return; }
+    api.save(name, blob, { noOverwrite: true }).then(function (r) {
+      if (say) say(r && r.where === "dir" ? (t("dDirSaved") + (r.dir || "") + " / " + r.name) : "");
+    }).catch(function () { download(name, blob); if (say) say(t("dDirFail")); });
   }
   function atBottom() { return bodyEl.scrollHeight - bodyEl.scrollTop - bodyEl.clientHeight < 90; }
   function scrollBottom(smooth) {
@@ -1389,6 +1405,29 @@
     }).catch(function () {});
   }
 
+  /* ════════ 对外 PPT：把成文产出的幻灯片稿做成真 .pptx ════════
+     生成器是全站共享模块 /assets/wds-pptx.js（零依赖、store-zip、**全同步**）。
+     全同步是刻意的：`showSaveFilePicker` 要求生成必须发生在用户点击那一下之内，
+     中间一 await 手势就过期——sde-docsave 那条线上栽过，这里不再栽。
+     所以模块在成文面板一打开就先拉进来，点按钮时它必须已经在内存里。 */
+  function pptxBoot(then) {
+    if (window.WDSPptx) { if (then) then(true); return; }
+    if (!document.head || !document.head.appendChild) { if (then) then(false); return; }
+    var sc = document.createElement("script");
+    sc.src = "/assets/wds-pptx.js"; sc.async = true;
+    sc.onload = function () { if (then) then(!!window.WDSPptx); };
+    sc.onerror = function () { if (then) then(false); };
+    document.head.appendChild(sc);
+  }
+  function deckOf(text) {
+    if (!window.WDSPptx) return null;
+    var d = window.WDSPptx.parse(text);
+    if (!d || !d.slides.length) return null;
+    d.footer = t("deckFoot") + " · " + new Date().toISOString().slice(0, 10);
+    d.kicker = "SDE UNIVERSES";
+    return d;
+  }
+
   function renderSources(cell, srcs, kind) {
     if (!srcs || !srcs.length) return null;
     var box = el("div", "wdsm-src" + (kind === "web" ? " wdsm-web" : ""));
@@ -1572,7 +1611,9 @@
   }
 
   function download(name, text) {
-    var b = new Blob([text], { type: "text/markdown;charset=utf-8" });
+    // text 可能已经是 Blob（.pptx 这类二进制走同一条路）——原样用，别再包成 text/markdown
+    var b = (text && typeof text === "object" && typeof text.size === "number")
+      ? text : new Blob([text], { type: "text/markdown;charset=utf-8" });
     var a = document.createElement("a"); a.href = URL.createObjectURL(b); a.download = name;
     document.body.appendChild(a); a.click();
     setTimeout(function () { URL.revokeObjectURL(a.href); if (a.parentNode) a.parentNode.removeChild(a); }, 800);
@@ -1993,9 +2034,9 @@
   inEl.addEventListener("keydown", function (e) { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); if (!streaming) send(); } });
 
   /* ── 成文：把整场对话锻成 报告 / 文章 / 提纲，或直接导出 ── */
-  function kindT(k) { return t(({ report: "kReport", essay: "kEssay", outline: "kOutline" })[k]); }
-  function kindS(k) { return t(({ report: "kReportS", essay: "kEssayS", outline: "kOutlineS" })[k]); }
-  var KIND_KEYS = ["report", "essay", "outline"];
+  function kindT(k) { return t(({ report: "kReport", essay: "kEssay", outline: "kOutline", deck: "kDeck" })[k]); }
+  function kindS(k) { return t(({ report: "kReportS", essay: "kEssayS", outline: "kOutlineS", deck: "kDeckS" })[k]); }
+  var KIND_KEYS = ["report", "essay", "outline", "deck"];
   layer.querySelector(".wdsm-distbtn").onclick = function (ev) {
     var old = document.querySelector(".wdsm-menu");
     if (old) { old.parentNode.removeChild(old); return; }
@@ -2114,6 +2155,22 @@
       dWd = setTimeout(function () { dTimedOut = true; try { if (dr) dr.cancel(); } catch (e) {} }, 45000);
     }
     var svBtn = wrap.querySelector(".dsv"), cpBtn = wrap.querySelector(".dcp"), dlBtn = wrap.querySelector(".ddl"), dirBtn = wrap.querySelector(".ddir");
+    var pxBtn = null;
+    if (kind === "deck") {
+      pptxBoot(function () {});                       // 先拉模块，别等点击那一刻才去加载
+      pxBtn = el("button", "wdsm-tbtn dpx", t("dPptx"));
+      dlBtn.parentNode.insertBefore(pxBtn, dlBtn);
+      pxBtn.onclick = function () {
+        if (!text) return;
+        if (!window.WDSPptx) { stat.textContent = t("dPptxWait"); pptxBoot(function (ok) { if (ok) pxBtn.onclick(); }); return; }
+        var d = deckOf(text);
+        if (!d) { stat.textContent = t("dPptxNo"); return; }
+        var blob = window.WDSPptx.blob(d);            // 同步造好字节，再去要目录/下载（手势还新鲜）
+        var nm = "WDS-" + safeName(d.title || kindT(kind)) + "-" + stampName() + ".pptx";
+        stat.textContent = t("dPptxOk") + (d.slides.length + 1);
+        saveBlobToDir(nm, blob, function (msg) { if (msg) stat.textContent = msg; });
+      };
+    }
     svBtn.textContent = t("dSave"); cpBtn.textContent = t("dCopy"); dlBtn.textContent = t("dDl");
     dirBtn.textContent = t("dDir");
     dirBtn.title = dirName() ? (t("dDirSaved") + dirName()) : t("dDirNone");
