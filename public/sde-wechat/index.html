@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>SDE 微信 · 群聊与私聊 | SDE Universes</title>
+<meta name="description" content="SDE 微信：站内的纯文字聊天系统——群聊、一对一私聊、通讯录、建群、群公告、@提及、引用回复、未读提醒。Google 账号登录即用，无需安装。">
+<meta name="robots" content="noindex">
+<style>
+:root{
+  --bg:#F7F3E9;--surface:#F1EBDC;--card:#FBF8F0;--card2:#F4EEDF;
+  --border:#D8CBAA;--border2:#E4DAC2;
+  --text:#2A2318;--text2:#6B6050;--muted:#9A8F7A;
+  --gold:#8A6817;--gold2:#A8842B;
+  --disc:#3B4E9C;--disc2:#5162B4;--disc-soft:rgba(59,78,156,0.08);
+  --grp:#2E7D64;--red:#C0603F;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{font-family:'Noto Serif SC',Georgia,'Songti SC',serif;background:var(--surface);color:var(--text);line-height:1.75;-webkit-tap-highlight-color:transparent}
+a{color:var(--disc)}
+#app{max-width:520px;margin:0 auto;height:100dvh;display:flex;flex-direction:column;background:var(--bg);box-shadow:0 0 24px rgba(0,0,0,0.07)}
+.top{flex:none;display:flex;align-items:center;gap:8px;padding:0.7rem 0.9rem;background:var(--card2);border-bottom:1px solid var(--border2);min-height:52px}
+.top .back{font-size:1.3rem;color:var(--disc);cursor:pointer;line-height:1;padding:0 4px;user-select:none;flex:none}
+.top .ttlwrap{flex:1;min-width:0;cursor:default}
+.top .ttl{font-weight:800;font-size:1.02rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.top .sub{font-size:0.7rem;color:var(--text2);display:flex;align-items:center;gap:5px}
+.dot{width:7px;height:7px;border-radius:50%;background:#B9AE93;flex:none}
+.dot.on{background:#2FA36B}.dot.off{background:var(--red)}
+.top .act{font-size:0.74rem;color:var(--text2);text-decoration:none;flex:none;border:1px solid var(--border);border-radius:14px;padding:2px 10px;cursor:pointer;background:transparent;font-family:inherit}
+.body{flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden}
+.view{display:none;flex:1;min-height:0;flex-direction:column}
+.view.on{display:flex}
+.scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.row{display:flex;align-items:center;gap:12px;padding:0.8rem 1rem;background:var(--card);border-bottom:1px solid var(--border2);cursor:pointer}
+.row:active{background:var(--card2)}
+.av{flex:none;width:42px;height:42px;border-radius:8px;background:var(--disc);color:#F5F2E8;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1.02rem;position:relative}
+.av.g{background:var(--grp);border-radius:11px}
+.av.me{background:var(--gold)}
+.badge{position:absolute;top:-5px;right:-5px;min-width:18px;height:18px;border-radius:9px;background:var(--red);color:#fff;font-size:0.68rem;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0 5px;font-family:system-ui,sans-serif}
+.rmain{flex:1;min-width:0}
+.rname{font-weight:700;font-size:0.97rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rlast{font-size:0.79rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
+.rlast .at{color:var(--red);font-weight:700}
+.rtime{flex:none;font-size:0.7rem;color:var(--muted);align-self:flex-start;padding-top:3px}
+.chip{display:inline-block;font-size:0.65rem;color:var(--disc);background:var(--disc-soft);border:1px solid var(--disc);border-radius:20px;padding:0 7px;margin-left:6px;vertical-align:1px;font-family:system-ui,sans-serif;font-weight:400}
+.chip.g{color:var(--grp);border-color:var(--grp);background:rgba(46,125,100,0.08)}
+.hint{padding:1.6rem 1.4rem;color:var(--text2);font-size:0.89rem;text-align:center;line-height:1.9}
+.hint b{color:var(--text)}
+.sec{padding:0.5rem 1rem;font-size:0.7rem;letter-spacing:0.18em;color:var(--muted);background:var(--surface);text-transform:uppercase;display:flex;justify-content:space-between;align-items:center}
+.sec button{font:inherit;font-size:0.72rem;letter-spacing:0.04em;color:var(--grp);background:transparent;border:1px solid var(--grp);border-radius:14px;padding:1px 11px;cursor:pointer}
+.search{padding:0.55rem 1rem;background:var(--card2);border-bottom:1px solid var(--border2)}
+.search input{width:100%;font:inherit;font-size:0.9rem;padding:0.42rem 0.7rem;border:1px solid var(--border);border-radius:8px;background:#fff;color:var(--text);outline:none}
+.search input:focus{border-color:var(--disc)}
+.msgs{flex:1;overflow-y:auto;padding:0.9rem;display:flex;flex-direction:column;gap:0.55rem;background:var(--bg)}
+.notice{flex:none;background:#FBF6E9;border-bottom:1px solid var(--gold);padding:0.5rem 1rem;font-size:0.8rem;color:var(--text2);display:none;line-height:1.65}
+.notice.on{display:block}
+.notice b{color:var(--gold2)}
+.msg{display:flex;flex-direction:column;max-width:82%;align-self:flex-start}
+.msg.mine{align-self:flex-end;align-items:flex-end}
+.msg .who{font-size:0.7rem;color:var(--muted);margin:0 5px 3px}
+.msg .bub{background:var(--card);border:1px solid var(--border2);border-radius:12px;padding:0.48rem 0.75rem;font-size:0.95rem;line-height:1.65;white-space:pre-wrap;word-break:break-word;color:var(--text)}
+.msg.mine .bub{background:var(--disc);border-color:var(--disc);color:#F5F2E8}
+.msg .bub .q{display:block;font-size:0.78rem;line-height:1.5;color:var(--text2);border-left:3px solid var(--border);padding:2px 0 2px 7px;margin-bottom:5px;white-space:pre-wrap;word-break:break-word}
+.msg.mine .bub .q{color:#E6E1D2;border-left-color:rgba(255,255,255,0.55)}
+.msg .tm{font-size:0.66rem;color:var(--muted);margin:2px 6px 0}
+.msg .tm a{color:inherit;opacity:0.75;text-decoration:underline;cursor:pointer;margin-left:6px}
+.msg.bot .bub{background:#FBF6E9;border-color:var(--gold);color:var(--text)}
+.msg.bot .who{color:var(--gold2);font-weight:700}
+.bub.recalled{background:transparent;border:1px dashed var(--border);color:var(--muted);font-style:italic}
+.msg.mine .bub.recalled{background:transparent;color:var(--muted)}
+.typing{align-self:flex-start;font-size:0.8rem;color:var(--muted);font-style:italic;padding:2px 8px}
+.newpill{position:absolute;left:50%;transform:translateX(-50%);bottom:78px;background:var(--disc);color:#F5F2E8;font-size:0.76rem;padding:5px 15px;border-radius:20px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.18);display:none;z-index:3}
+.foot{flex:none;border-top:1px solid var(--border2);padding:0.55rem 0.7rem;background:var(--card2)}
+.replybar{display:none;align-items:flex-start;gap:8px;background:var(--card);border:1px solid var(--border2);border-left:3px solid var(--disc);border-radius:7px;padding:5px 8px;margin-bottom:7px;font-size:0.78rem;color:var(--text2);line-height:1.5}
+.replybar.on{display:flex}
+.replybar .rtxt{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.replybar .x{cursor:pointer;font-size:0.95rem;color:var(--muted);flex:none}
+.panel{display:none;flex-wrap:wrap;gap:2px;max-height:126px;overflow-y:auto;background:var(--card);border:1px solid var(--border2);border-radius:8px;padding:6px;margin-bottom:7px}
+.panel.on{display:flex}
+.panel span{font-size:1.25rem;cursor:pointer;padding:3px 5px;border-radius:6px;line-height:1}
+.panel.at{flex-direction:column;flex-wrap:nowrap;gap:0}
+.panel.at span{font-size:0.9rem;padding:6px 8px;border-radius:6px;font-family:inherit}
+.panel.at span:hover{background:var(--card2)}
+.inbar{display:flex;gap:6px;align-items:flex-end}
+.inbar textarea{flex:1;font:inherit;font-size:0.95rem;color:var(--text);background:#fff;border:1px solid var(--border);border-radius:8px;padding:0.48rem 0.7rem;resize:none;height:40px;max-height:110px;line-height:1.5;outline:none}
+.inbar textarea:focus{border-color:var(--disc)}
+.ib{font-size:1rem;background:transparent;border:1px solid var(--border);border-radius:8px;height:40px;width:38px;flex:none;cursor:pointer;padding:0;line-height:1;font-family:inherit}
+.ib.w{background:#FBF6E9;border-color:var(--gold)}
+.ib.at{color:var(--grp);border-color:var(--grp);font-weight:700}
+.send{font:inherit;font-size:0.88rem;font-weight:700;padding:0 1rem;height:40px;border-radius:8px;border:1px solid var(--disc);background:var(--disc);color:#F5F2E8;cursor:pointer;flex:none}
+.send:disabled{opacity:0.5}
+.note{font-size:0.73rem;color:var(--muted);min-height:1em;margin-top:4px}
+.tabs{flex:none;display:flex;border-top:1px solid var(--border2);background:var(--card2);padding-bottom:env(safe-area-inset-bottom)}
+.tab{flex:1;text-align:center;padding:0.45rem 0 0.5rem;font-size:0.68rem;color:var(--text2);cursor:pointer;position:relative;letter-spacing:0.05em}
+.tab i{display:block;font-size:1.2rem;font-style:normal;line-height:1.3}
+.tab.on{color:var(--disc);font-weight:700}
+.tab .tb{position:absolute;top:2px;left:50%;margin-left:4px;min-width:17px;height:17px;border-radius:9px;background:var(--red);color:#fff;font-size:0.66rem;display:none;align-items:center;justify-content:center;padding:0 4px;font-family:system-ui,sans-serif;font-weight:700}
+.tab .tb.on{display:flex}
+#gate{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem;padding:2rem 1.5rem;text-align:center}
+#gate h2{font-size:1.35rem;font-weight:800}
+#gate p{font-size:0.9rem;color:var(--text2);max-width:340px}
+.form{padding:1.1rem 1rem}
+.form label{display:block;font-size:0.78rem;color:var(--text2);margin:0 0 5px 2px;letter-spacing:0.06em}
+.form input[type=text],.form textarea{width:100%;font:inherit;font-size:0.95rem;padding:0.5rem 0.7rem;border:1px solid var(--border);border-radius:8px;background:#fff;color:var(--text);outline:none;margin-bottom:0.9rem}
+.form textarea{resize:vertical;min-height:74px;line-height:1.7}
+.form input:focus,.form textarea:focus{border-color:var(--disc)}
+.pick{max-height:38vh;overflow-y:auto;border:1px solid var(--border2);border-radius:8px;background:var(--card);margin-bottom:0.9rem}
+.pick .p{display:flex;align-items:center;gap:10px;padding:0.5rem 0.7rem;border-bottom:1px solid var(--border2);cursor:pointer;font-size:0.92rem}
+.pick .p:last-child{border-bottom:none}
+.pick .p .bx{width:18px;height:18px;border:1px solid var(--border);border-radius:4px;flex:none;display:flex;align-items:center;justify-content:center;font-size:0.8rem;color:#fff;background:#fff}
+.pick .p.on .bx{background:var(--grp);border-color:var(--grp)}
+.btn{font:inherit;font-size:0.92rem;font-weight:700;padding:0.55rem 1.4rem;border-radius:8px;border:1px solid var(--disc);background:var(--disc);color:#F5F2E8;cursor:pointer}
+.btn.gh{background:transparent;color:var(--disc)}
+.btn.dg{border-color:var(--red);color:var(--red);background:transparent}
+.btn:disabled{opacity:0.5}
+.formmsg{font-size:0.8rem;color:var(--red);min-height:1em;margin-top:8px}
+.me-card{padding:1.3rem 1.1rem}
+.me-card .nm{font-size:1.15rem;font-weight:800}
+.me-card .uid{font-size:0.72rem;color:var(--muted);font-family:ui-monospace,monospace;margin-top:2px}
+.me-item{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:0.75rem 0.9rem;background:var(--card);border:1px solid var(--border2);border-radius:9px;margin-bottom:0.55rem;font-size:0.87rem}
+.me-item button{font:inherit;font-size:0.77rem;padding:0.28rem 0.85rem;border-radius:15px;border:1px solid var(--disc);background:transparent;color:var(--disc);cursor:pointer}
+.me-item a{text-decoration:none}
+.gmeta{padding:1rem;background:var(--card2);border-bottom:1px solid var(--border2)}
+.gmeta .gn{font-size:1.1rem;font-weight:800}
+.gmeta .gc{font-size:0.78rem;color:var(--muted);margin-top:2px}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <div class="top">
+    <span class="back" id="t-back" style="display:none">‹</span>
+    <div class="ttlwrap" id="t-ttlwrap">
+      <div class="ttl" id="t-ttl">SDE 微信</div>
+      <div class="sub" id="t-sub"><span class="dot" id="t-dot"></span><span id="t-stat"></span></div>
+    </div>
+    <button class="act" id="t-act" type="button" style="display:none">群资料</button>
+    <a class="act" id="t-plaza" href="/sde-talk/">广场</a>
+  </div>
+
+  <div class="body">
+
+    <div class="view on" id="v-gate">
+      <div id="gate">
+        <h2>SDE 微信</h2>
+        <p>站内的纯文字聊天系统：群聊、一对一私聊、通讯录、建群、群公告、@提及、引用回复、未读提醒。用 Google 账号登录即用，无需安装。</p>
+        <div id="gsi"></div>
+        <p style="font-size:0.78rem;color:var(--muted)">群与私聊都只有成员看得见——外人打不开。</p>
+      </div>
+    </div>
+
+    <div class="view" id="v-chats">
+      <div class="scroll" id="chat-list"><div class="hint">正在加载…</div></div>
+    </div>
+
+    <div class="view" id="v-book">
+      <div class="search"><input id="q" placeholder="搜群名或人名…" autocomplete="off"></div>
+      <div class="scroll" id="book-list"><div class="hint">正在加载…</div></div>
+    </div>
+
+    <div class="view" id="v-talk" style="position:relative">
+      <div class="notice" id="g-notice"></div>
+      <div class="msgs" id="msgs"></div>
+      <div class="newpill" id="newpill">有新消息 ↓</div>
+      <div class="foot">
+        <div class="replybar" id="replybar"><span class="rtxt" id="reply-txt"></span><span class="x" id="reply-x">✕</span></div>
+        <div class="panel" id="epanel"></div>
+        <div class="panel at" id="atpanel"></div>
+        <div class="inbar">
+          <button class="ib" id="b-emoji" type="button" title="表情">😊</button>
+          <button class="ib at" id="b-at" type="button" title="@ 群成员" style="display:none">@</button>
+          <button class="ib w" id="b-wds" type="button" title="问 WDS 智能体">🤖</button>
+          <textarea id="text" maxlength="500" placeholder="说点什么…（Enter 发送）"></textarea>
+          <button class="send" id="b-send">发送</button>
+        </div>
+        <div class="note" id="note"></div>
+      </div>
+    </div>
+
+    <div class="view" id="v-gnew">
+      <div class="scroll">
+        <div class="form">
+          <label>群名称</label>
+          <input type="text" id="gn-name" maxlength="30" placeholder="例如：SDE 学员 · 改姓训练">
+          <label>拉谁进群（可多选，之后还能加）</label>
+          <div class="pick" id="gn-pick"></div>
+          <button class="btn" id="gn-ok">建群</button>
+          <button class="btn gh" id="gn-cancel">取消</button>
+          <div class="formmsg" id="gn-msg"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="view" id="v-ginfo">
+      <div class="scroll">
+        <div class="gmeta">
+          <div class="gn" id="gi-name">—</div>
+          <div class="gc" id="gi-count"></div>
+        </div>
+        <div class="form">
+          <label>群公告<span id="gi-owner-hint" style="color:var(--muted)"></span></label>
+          <textarea id="gi-notice" maxlength="300" placeholder="（还没有群公告）"></textarea>
+          <button class="btn" id="gi-save" style="display:none">保存公告</button>
+          <div class="formmsg" id="gi-msg"></div>
+        </div>
+        <div class="sec">群成员<button id="gi-add">＋ 拉人</button></div>
+        <div id="gi-members"></div>
+        <div class="pick" id="gi-pick" style="display:none;margin:0.9rem 1rem"></div>
+        <div style="padding:0 1rem 1rem;display:none" id="gi-addwrap">
+          <button class="btn" id="gi-addok">确认拉入</button>
+          <button class="btn gh" id="gi-addcancel">取消</button>
+        </div>
+        <div class="form"><button class="btn dg" id="gi-leave">退出这个群</button></div>
+      </div>
+    </div>
+
+    <div class="view" id="v-me">
+      <div class="scroll">
+        <div class="me-card">
+          <div class="nm" id="me-nm">—</div>
+          <div class="uid" id="me-uid"></div>
+          <div style="margin-top:1.1rem">
+            <div class="me-item"><span>新消息桌面提醒</span><button id="b-notify">开启</button></div>
+            <div class="me-item"><span>SDE 讨论（公开广场）</span><a href="/sde-talk/"><button>进入</button></a></div>
+            <div class="me-item"><span>SDE 会议室</span><a href="/meeting/"><button>进入</button></a></div>
+            <div class="me-item"><span>退出登录</span><button id="b-out">退出</button></div>
+          </div>
+          <p style="font-size:0.79rem;color:var(--muted);margin-top:1rem;line-height:1.95">
+            这是<b>纯文字</b>系统：只发文字与表情，不发图片、语音、文件。<br>
+            通讯录里是所有在本站登录过的人——学员一登录就出现，可直接私聊或拉进群。<br>
+            群里 <b>@某人</b> 会给他一个红标；<b>@所有人</b> 全员提醒。<br>
+            任何会话里都能 <b>@WDS</b> 提问，答案只落在这个会话里。<br>
+            消息 2 分钟内可撤回；长按不用，点消息下方的「回复」即可引用。
+          </p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="tabs" id="tabs" style="display:none">
+    <div class="tab on" data-go="chats"><i>💬</i>聊天<span class="tb" id="tb-unread"></span></div>
+    <div class="tab" data-go="book"><i>👥</i>通讯录</div>
+    <div class="tab" data-go="me"><i>👤</i>我</div>
+  </div>
+
+</div>
+
+<script>
+(function(){
+"use strict";
+function el(id){return document.getElementById(id)}
+var GCID="985037699618-de3smmqf2rer0pfhf4mrtrj3rgahgu5u.apps.googleusercontent.com";
+var TITLE="SDE 微信 · 群聊与私聊 | SDE Universes";
+var CRED="",ME=null,contacts=[],groups=[],chats=[],roster={},unread=0;
+var cur=null,ws=null,connected=false,tries=0,usePoll=false,pollT=null,lastId=0,seen={},nodes={},pendingNew=0,inboxT=null,notifyOn=false;
+var replyTo=null,gMembers=[],gOwner=false,pickSel={};
+
+/* ── 小工具 ── */
+function note(s){el("note").textContent=s||""}
+function pad(x){return(x<10?"0":"")+x}
+function fmtT(ts){var d=new Date(ts),n=new Date();
+  if(d.toDateString()===n.toDateString())return pad(d.getHours())+":"+pad(d.getMinutes());
+  var y=new Date(n.getTime()-86400000);
+  if(d.toDateString()===y.toDateString())return "昨天 "+pad(d.getHours())+":"+pad(d.getMinutes());
+  return (d.getMonth()+1)+"/"+d.getDate();}
+function initial(nm){nm=String(nm||"?").trim();return nm?nm.slice(0,1):"?"}
+function api(op,extra){
+  var body={credential:CRED,op:op};
+  if(extra)for(var k in extra)body[k]=extra[k];
+  return fetch("/api/im",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(body)})
+    .then(function(r){return r.json().then(function(d){return{s:r.status,d:d}})});
+}
+function setStat(state){var d=el("t-dot"),s=el("t-stat");
+  if(!cur){d.className="dot";s.textContent="";return;}
+  d.className="dot"+(state==="online"?" on":state==="offline"?" off":"");
+  s.textContent=state==="online"?(cur.kind==="g"?(cur.count?cur.count+" 人":"群聊"):"在线"):state==="offline"?"重连中…":"连接中…";}
+
+/* ── 视图 ── */
+function show(v){
+  ["gate","chats","book","talk","gnew","ginfo","me"].forEach(function(x){el("v-"+x).classList.toggle("on",x===v)});
+  el("tabs").style.display=(v==="gate")?"none":"flex";
+  el("t-back").style.display=(v==="talk"||v==="gnew"||v==="ginfo")?"block":"none";
+  el("t-sub").style.display=(v==="talk")?"flex":"none";
+  el("t-act").style.display=(v==="talk"&&cur&&cur.kind==="g")?"block":"none";
+  el("t-plaza").style.display=(v==="chats"||v==="book"||v==="me")?"block":"none";
+  if(v==="gnew")el("t-ttl").textContent="建群";
+  else if(v==="ginfo")el("t-ttl").textContent="群资料";
+  else if(v!=="talk")el("t-ttl").textContent="SDE 微信";
+  Array.prototype.forEach.call(document.querySelectorAll(".tab"),function(t){t.classList.toggle("on",v===t.getAttribute("data-go"))});
+}
+Array.prototype.forEach.call(document.querySelectorAll(".tab"),function(t){
+  t.onclick=function(){var g=t.getAttribute("data-go");closeTalk();show(g);if(g==="chats")loadInbox();if(g==="book")loadBook();};
+});
+el("t-back").onclick=function(){
+  if(el("v-ginfo").classList.contains("on")&&cur){show("talk");return;}
+  closeTalk();show("chats");loadInbox();
+};
+
+/* ── 登录 ── */
+try{var stg=JSON.parse(sessionStorage.getItem("sde_gauth")||"null");if(stg&&stg.exp>Date.now())CRED=stg.cred;}catch(e){}
+window.__sdeWxCb=function(resp){
+  try{CRED=resp.credential;
+    var p=JSON.parse(atob(resp.credential.split(".")[1].replace(/-/g,"+").replace(/_/g,"/")));
+    var nm=(p.name||(p.email||"").split("@")[0]||"").slice(0,20);
+    try{sessionStorage.setItem("sde_gauth",JSON.stringify({cred:CRED,name:nm,exp:Date.now()+50*60*1000}));}catch(e){}
+    afterLogin();
+  }catch(e){el("gsi").textContent="登录信息解析失败，请重试。";}
+};
+function bootGsi(){
+  if(!(window.google&&google.accounts&&google.accounts.id)){el("gsi").textContent="Google 登录组件加载失败，请检查网络后刷新。";return;}
+  google.accounts.id.initialize({client_id:GCID,callback:window.__sdeWxCb,auto_select:true});
+  google.accounts.id.renderButton(el("gsi"),{theme:"outline",size:"large",text:"signin_with",shape:"pill"});
+}
+function logout(){CRED="";ME=null;try{sessionStorage.removeItem("sde_gauth")}catch(e){}closeTalk();show("gate");}
+el("b-out").onclick=logout;
+function afterLogin(){
+  api("contacts").then(function(x){
+    if(x.s===401||!x.d||!x.d.ok){logout();return;}
+    ME=x.d.me;contacts=x.d.contacts||[];
+    el("me-nm").textContent=ME.name;el("me-uid").textContent="ID "+ME.uid;
+    show("chats");loadInbox();loadGroups();
+    if(inboxT)clearInterval(inboxT);
+    inboxT=setInterval(function(){loadInbox(true)},15000);
+  }).catch(function(){el("gsi").textContent="网络异常，请稍后重试。"});
+}
+
+/* ── 聊天列表 ── */
+function setUnread(n){
+  unread=n||0;var b=el("tb-unread");
+  b.textContent=unread>99?"99+":String(unread);
+  b.classList.toggle("on",unread>0);
+  document.title=(unread>0?"("+unread+") ":"")+TITLE;
+}
+function loadInbox(quiet){
+  if(!CRED)return Promise.resolve();
+  return api("inbox").then(function(x){
+    if(!x.d||!x.d.ok)return;
+    var before={};chats.forEach(function(c){before[c.key]=c.unread||0});
+    chats=x.d.chats||[];setUnread(x.d.unread||0);
+    if(!cur)renderChats();
+    if(quiet&&notifyOn)chats.forEach(function(c){
+      if((c.unread||0)>(before[c.key]||0)&&(!cur||cur.key!==c.key)){
+        try{new Notification((c.kind==="g"?"群 ":"")+c.name,{body:c.last||"",tag:"sde-wx-"+c.key});}catch(e){}
+      }
+    });
+  }).catch(function(){});
+}
+function renderChats(){
+  var L=el("chat-list");L.textContent="";
+  if(!chats.length){
+    var h=document.createElement("div");h.className="hint";
+    h.innerHTML="还没有会话。<br>去 <b>通讯录</b> 找人私聊，或建一个群。";
+    L.appendChild(h);return;
+  }
+  chats.forEach(function(c){
+    var last=c.last||"";
+    L.appendChild(rowFor({name:c.name,kind:c.kind,last:last,at:c.at,ts:c.lastTs,unread:c.unread,count:c.count,
+      onclick:function(){c.kind==="g"?openGroup(c.gid,c.name):openDm(c.peer,c.name)}}));
+  });
+}
+function rowFor(o){
+  var r=document.createElement("div");r.className="row";r.onclick=o.onclick;
+  var a=document.createElement("div");a.className="av"+(o.kind==="g"?" g":"");a.textContent=o.kind==="g"?"群":initial(o.name);
+  if(o.unread>0){var b=document.createElement("span");b.className="badge";b.textContent=o.unread>99?"99+":String(o.unread);a.appendChild(b);}
+  var m=document.createElement("div");m.className="rmain";
+  var n=document.createElement("div");n.className="rname";n.textContent=o.name;
+  if(o.kind==="g"&&o.count){var cg=document.createElement("span");cg.className="chip g";cg.textContent=o.count+" 人";n.appendChild(cg);}
+  if(o.kind!=="g"&&roster[o.name]){var cs=document.createElement("span");cs.className="chip";cs.textContent="学员";n.appendChild(cs);}
+  m.appendChild(n);
+  if(o.last||o.at){
+    var l=document.createElement("div");l.className="rlast";
+    if(o.at){var s=document.createElement("span");s.className="at";s.textContent="[有人@你] ";l.appendChild(s);}
+    l.appendChild(document.createTextNode(o.last||""));m.appendChild(l);
+  }
+  r.appendChild(a);r.appendChild(m);
+  if(o.ts){var t=document.createElement("div");t.className="rtime";t.textContent=fmtT(o.ts);r.appendChild(t);}
+  return r;
+}
+
+/* ── 通讯录（我的群 + 人） ── */
+function loadBook(){
+  if(!CRED)return;
+  api("contacts").then(function(x){if(x.d&&x.d.ok){contacts=x.d.contacts||[];renderBook();}}).catch(function(){});
+  loadGroups();
+}
+function loadGroups(){
+  if(!CRED)return Promise.resolve();
+  return api("groups").then(function(x){if(x.d&&x.d.ok){groups=x.d.groups||[];renderBook();}}).catch(function(){});
+}
+function renderBook(){
+  var L=el("book-list"),q=(el("q").value||"").trim().toLowerCase();
+  L.textContent="";
+  var gs=groups.filter(function(g){return !q||String(g.name||"").toLowerCase().indexOf(q)>=0});
+  var ps=contacts.filter(function(c){return !q||String(c.name||"").toLowerCase().indexOf(q)>=0});
+  var s1=document.createElement("div");s1.className="sec";
+  s1.appendChild(document.createTextNode("我的群 · "+gs.length));
+  var nb=document.createElement("button");nb.id="gn-open";nb.textContent="＋ 建群";nb.onclick=openGnew;s1.appendChild(nb);
+  L.appendChild(s1);
+  if(!gs.length){var h0=document.createElement("div");h0.className="hint";h0.style.padding="1rem";h0.textContent=q?"没有匹配的群。":"还没有群——点右上「＋ 建群」。";L.appendChild(h0);}
+  gs.forEach(function(g){L.appendChild(rowFor({name:g.name,kind:"g",count:g.count,onclick:function(){openGroup(g.gid,g.name)}}))});
+  var s2=document.createElement("div");s2.className="sec";s2.appendChild(document.createTextNode("登录过本站的人 · "+ps.length));L.appendChild(s2);
+  if(!ps.length){var h=document.createElement("div");h.className="hint";h.style.padding="1rem";h.innerHTML=q?"没有匹配的名字。":"学员在本站用 Google 登录一次，就会出现在这里。";L.appendChild(h);}
+  ps.forEach(function(c){L.appendChild(rowFor({name:c.name,last:"最近活跃 "+fmtT(c.ts),onclick:function(){openDm(c.uid,c.name)}}))});
+}
+el("q").addEventListener("input",renderBook);
+
+/* ── 建群 ── */
+function openGnew(){
+  pickSel={};el("gn-name").value="";el("gn-msg").textContent="";
+  var P=el("gn-pick");P.textContent="";
+  if(!contacts.length){var h=document.createElement("div");h.className="hint";h.style.padding="1rem";h.textContent="通讯录里还没有别人——可以先建群，之后再拉人。";P.appendChild(h);}
+  contacts.forEach(function(c){P.appendChild(pickRow(c.uid,c.name))});
+  show("gnew");
+}
+function pickRow(uid,name){
+  var d=document.createElement("div");d.className="p";
+  var b=document.createElement("span");b.className="bx";b.textContent="✓";
+  var s=document.createElement("span");s.textContent=name;
+  d.appendChild(b);d.appendChild(s);
+  d.onclick=function(){if(pickSel[uid]){delete pickSel[uid];d.classList.remove("on");}else{pickSel[uid]=1;d.classList.add("on");}};
+  return d;
+}
+el("gn-cancel").onclick=function(){show("book")};
+el("gn-ok").onclick=function(){
+  var nm=el("gn-name").value.trim();
+  if(!nm){el("gn-msg").textContent="先给群起个名字。";return;}
+  var mem=Object.keys(pickSel);
+  el("gn-ok").disabled=true;el("gn-msg").textContent="";
+  api("gcreate",{name:nm,members:mem}).then(function(x){
+    el("gn-ok").disabled=false;
+    if(!x.d||!x.d.ok){el("gn-msg").textContent=(x.d&&x.d.msg)||"建群失败。";return;}
+    loadGroups();loadInbox();openGroup(x.d.gid,nm);
+  }).catch(function(){el("gn-ok").disabled=false;el("gn-msg").textContent="网络异常。"});
+};
+
+/* ── 打开会话 ── */
+function closeTalk(){
+  if(ws){try{ws.onclose=null;ws.close()}catch(e){}ws=null}
+  if(pollT){clearInterval(pollT);pollT=null}
+  connected=false;usePoll=false;tries=0;cur=null;lastId=0;seen={};nodes={};pendingNew=0;
+  replyTo=null;gMembers=[];gOwner=false;
+  el("msgs").textContent="";el("newpill").style.display="none";note("");
+  el("replybar").classList.remove("on");el("g-notice").classList.remove("on");
+  el("atpanel").classList.remove("on");el("epanel").classList.remove("on");
+  el("b-at").style.display="none";setStat("");
+}
+function openDm(peer,name){open_({kind:"dm",key:peer,peer:peer,name:name},{peer:peer})}
+function openGroup(gid,name){open_({kind:"g",key:"g"+gid,gid:gid,name:name},{gid:gid})}
+function open_(c,arg){
+  closeTalk();cur=c;
+  el("t-ttl").textContent=c.name;
+  show("talk");setStat("connecting");
+  el("b-at").style.display=(c.kind==="g")?"block":"none";
+  api("open",arg).then(function(x){
+    if(!x.d||!x.d.ok||!x.d.room){note((x.d&&x.d.msg)||"打不开这个会话。");return;}
+    cur.room=x.d.room;
+    if(c.kind==="g"){cur.count=x.d.count||0;gOwner=!!x.d.owner;setNotice(x.d.notice);setStat("connecting");}
+    connect();
+    api("read",{peer:c.key}).then(function(){loadInbox()});
+  }).catch(function(){note("网络异常。")});
+}
+function setNotice(s){
+  var n=el("g-notice");n.textContent="";
+  if(!s){n.classList.remove("on");return;}
+  var b=document.createElement("b");b.textContent="群公告　";
+  n.appendChild(b);n.appendChild(document.createTextNode(s));n.classList.add("on");
+}
+el("t-ttlwrap").onclick=function(){if(cur&&cur.kind==="g"&&el("v-talk").classList.contains("on"))openGinfo()};
+el("t-act").onclick=function(){if(cur&&cur.kind==="g")openGinfo()};
+
+/* ── 群资料 ── */
+function openGinfo(){
+  if(!cur||cur.kind!=="g")return;
+  el("gi-msg").textContent="";el("gi-pick").style.display="none";el("gi-addwrap").style.display="none";
+  api("ginfo",{gid:cur.gid}).then(function(x){
+    if(!x.d||!x.d.ok){el("gi-msg").textContent=(x.d&&x.d.msg)||"读不到群资料。";show("ginfo");return;}
+    var g=x.d.group;gMembers=x.d.members||[];gOwner=(g.owner===ME.uid);
+    cur.count=gMembers.length;
+    el("gi-name").textContent=g.name;
+    el("gi-count").textContent=gMembers.length+" 位成员"+(gOwner?"　·　你是群主":"");
+    el("gi-notice").value=g.notice||"";
+    el("gi-notice").readOnly=!gOwner;
+    el("gi-save").style.display=gOwner?"inline-block":"none";
+    el("gi-owner-hint").textContent=gOwner?"（你可以改）":"（只有群主能改）";
+    el("gi-add").style.display="inline-block";
+    var M=el("gi-members");M.textContent="";
+    gMembers.forEach(function(m){
+      var r=document.createElement("div");r.className="row";r.style.cursor="default";
+      var a=document.createElement("div");a.className="av"+(m.uid===ME.uid?" me":"");a.textContent=initial(m.name);
+      var mm=document.createElement("div");mm.className="rmain";
+      var n=document.createElement("div");n.className="rname";n.textContent=m.name;
+      if(m.owner){var c=document.createElement("span");c.className="chip g";c.textContent="群主";n.appendChild(c);}
+      if(m.uid===ME.uid){var c2=document.createElement("span");c2.className="chip";c2.textContent="我";n.appendChild(c2);}
+      mm.appendChild(n);r.appendChild(a);r.appendChild(mm);
+      if(gOwner&&m.uid!==ME.uid){
+        var kb=document.createElement("button");kb.className="act";kb.textContent="移出";
+        kb.onclick=function(ev){ev.stopPropagation();
+          if(!confirm("把「"+m.name+"」移出本群？"))return;
+          api("gkick",{gid:cur.gid,target:m.uid}).then(function(y){
+            if(y.d&&y.d.ok)openGinfo();else el("gi-msg").textContent=(y.d&&y.d.msg)||"移出失败。";
+          });};
+        r.appendChild(kb);
+      }else if(m.uid!==ME.uid){
+        var db=document.createElement("button");db.className="act";db.textContent="私聊";
+        db.onclick=function(ev){ev.stopPropagation();openDm(m.uid,m.name)};
+        r.appendChild(db);
+      }
+      M.appendChild(r);
+    });
+    show("ginfo");
+  }).catch(function(){el("gi-msg").textContent="网络异常。";show("ginfo")});
+}
+el("gi-save").onclick=function(){
+  el("gi-save").disabled=true;
+  api("gnotice",{gid:cur.gid,notice:el("gi-notice").value}).then(function(x){
+    el("gi-save").disabled=false;
+    if(x.d&&x.d.ok){el("gi-msg").style.color="var(--grp)";el("gi-msg").textContent="公告已更新。";setNotice(el("gi-notice").value.trim());}
+    else{el("gi-msg").style.color="var(--red)";el("gi-msg").textContent=(x.d&&x.d.msg)||"保存失败。";}
+  }).catch(function(){el("gi-save").disabled=false;el("gi-msg").textContent="网络异常。"});
+};
+el("gi-add").onclick=function(){
+  pickSel={};var P=el("gi-pick");P.textContent="";
+  var inG={};gMembers.forEach(function(m){inG[m.uid]=1});
+  var cand=contacts.filter(function(c){return !inG[c.uid]});
+  if(!cand.length){var h=document.createElement("div");h.className="hint";h.style.padding="0.9rem";h.textContent="通讯录里的人都已经在群里了。";P.appendChild(h);}
+  cand.forEach(function(c){P.appendChild(pickRow(c.uid,c.name))});
+  P.style.display="block";el("gi-addwrap").style.display="block";
+};
+el("gi-addcancel").onclick=function(){el("gi-pick").style.display="none";el("gi-addwrap").style.display="none"};
+el("gi-addok").onclick=function(){
+  var add=Object.keys(pickSel);
+  if(!add.length){el("gi-msg").textContent="先选人。";return;}
+  el("gi-addok").disabled=true;
+  api("gadd",{gid:cur.gid,add:add}).then(function(x){
+    el("gi-addok").disabled=false;
+    if(x.d&&x.d.ok){openGinfo();loadGroups();}else{el("gi-msg").style.color="var(--red)";el("gi-msg").textContent=(x.d&&x.d.msg)||"拉人失败。";}
+  }).catch(function(){el("gi-addok").disabled=false;el("gi-msg").textContent="网络异常。"});
+};
+el("gi-leave").onclick=function(){
+  if(!confirm("退出「"+cur.name+"」？退出后就看不到群里的消息了。"))return;
+  api("gleave",{gid:cur.gid}).then(function(){closeTalk();loadGroups();loadInbox();show("chats")});
+};
+
+/* ── 连接 ── */
+function wsSend(o){try{ws.send(JSON.stringify(o))}catch(e){}}
+function connect(){
+  if(!cur||!cur.room||usePoll)return;
+  var url=(location.protocol==="https:"?"wss://":"ws://")+location.host+"/api/chat?room="+encodeURIComponent(cur.room);
+  try{ws=new WebSocket(url);}catch(e){reconnect();return;}
+  ws.onopen=function(){connected=true;tries=0;setStat("online");wsSend({t:"auth",cred:CRED});};
+  ws.onmessage=function(ev){
+    var d;try{d=JSON.parse(ev.data)}catch(e){return}
+    if(d.t==="needauth"){wsSend({t:"auth",cred:CRED});}
+    else if(d.t==="meta"){if(cur){cur.name=d.name||cur.name;cur.count=d.count||cur.count;gOwner=!!d.owner;el("t-ttl").textContent=cur.name;setNotice(d.notice);setStat("online");}}
+    else if(d.t==="history"){(d.items||[]).forEach(addMsg);toBottom();}
+    else if(d.t==="msg"){addMsg(d);if(cur)api("read",{peer:cur.key});}
+    else if(d.t==="authed"){note("");}
+    else if(d.t==="recall"){onRecall(d.id)}
+    else if(d.t==="typing"){showTyping()}
+    else if(d.t==="err"){
+      if(d.m==="no-access"){note("你不在这个会话里。");}
+      else if(d.m==="login"){note("登录已过期，请重新登录。");logout();}
+      else note(d.m||"发送失败。");
+    }
+  };
+  ws.onclose=function(){connected=false;if(usePoll||!cur)return;setStat("offline");reconnect();};
+  ws.onerror=function(){try{ws.close()}catch(e){}};
+}
+function reconnect(){tries++;if(tries>=5){startPoll();return;}setTimeout(function(){if(cur)connect()},Math.min(1000*tries,5000));}
+function startPoll(){
+  if(usePoll||!cur)return;usePoll=true;setStat("online");el("t-stat").textContent="已连接（兼容模式）";
+  function tick(){
+    if(!cur)return;
+    fetch("/api/chat?room="+encodeURIComponent(cur.room),{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({credential:CRED,op:"poll",since:lastId})})
+    .then(function(r){return r.json()}).then(function(d){
+      if(!d)return;
+      if(d.items)d.items.forEach(addMsg);
+      if(d.recalls)d.recalls.forEach(onRecall);
+    }).catch(function(){});
+  }
+  tick();pollT=setInterval(tick,3000);
+}
+
+/* ── 消息 ── */
+function nearBottom(){var s=el("msgs");return s.scrollHeight-s.scrollTop-s.clientHeight<60}
+function toBottom(){var s=el("msgs");s.scrollTop=s.scrollHeight;pendingNew=0;el("newpill").style.display="none";}
+el("newpill").onclick=toBottom;
+el("msgs").addEventListener("scroll",function(){if(nearBottom()){pendingNew=0;el("newpill").style.display="none";}});
+function renderRecalled(b){b.textContent="[消息已撤回]";b.className="bub recalled";}
+function addMsg(m){
+  if(m.id&&seen[m.id])return; if(m.id){seen[m.id]=1;if(m.id>lastId)lastId=m.id;}
+  var mine=!!(ME&&m.name===ME.name),bot=(m.bot||m.name==="WDS智能体");
+  if(bot)hideTyping();
+  var wasNear=nearBottom();
+  var w=document.createElement("div");w.className="msg"+(bot?" bot":(mine?" mine":""));
+  var who=document.createElement("div");who.className="who";who.textContent=(bot?"🤖 ":"")+m.name;
+  var b=document.createElement("div");b.className="bub";
+  var tm=document.createElement("div");tm.className="tm";tm.textContent=fmtT(m.ts);
+  w.appendChild(who);w.appendChild(b);w.appendChild(tm);
+  if(m.recalled){renderRecalled(b);}
+  else{
+    if(m.re){var q=document.createElement("span");q.className="q";q.textContent=m.re.name+"："+m.re.text;b.appendChild(q);}
+    var body=m.img?"[图片]":String(m.text||"");
+    b.appendChild(document.createTextNode(body));
+    var rp=document.createElement("a");rp.textContent="回复";
+    rp.onclick=function(){setReply(m.id,m.name,body)};
+    tm.appendChild(rp);
+    if(mine&&!bot){
+      var age=Date.now()-m.ts;
+      if(age<120000){
+        var rc=document.createElement("a");rc.textContent="撤回";
+        rc.onclick=function(){doRecall(m.id)};
+        tm.appendChild(rc);
+        setTimeout(function(){if(rc.parentNode)rc.parentNode.removeChild(rc)},120000-age);
+      }
+    }
+  }
+  if(m.id)nodes[m.id]=b;
+  el("msgs").appendChild(w);
+  if(wasNear||mine)toBottom();
+  else{pendingNew++;var p=el("newpill");p.textContent="有 "+pendingNew+" 条新消息 ↓";p.style.display="block";}
+}
+function onRecall(id){var b=nodes[id];if(b&&!/recalled/.test(b.className))renderRecalled(b);}
+function doRecall(id){
+  if(usePoll){
+    fetch("/api/chat?room="+encodeURIComponent(cur.room),{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({credential:CRED,op:"recall",id:id})})
+    .then(function(r){return r.json()}).then(function(d){if(!d||!d.ok)note((d&&d.msg)||"撤回失败。")}).catch(function(){note("网络异常。")});
+  }else{
+    if(!(ws&&connected)){note("正在重连，请稍候…");return;}
+    wsSend({t:"recall",id:id});
+  }
+}
+function setReply(id,name,text){
+  replyTo={id:id,name:name,text:String(text||"").slice(0,60)};
+  el("reply-txt").textContent="回复 "+name+"："+replyTo.text;
+  el("replybar").classList.add("on");el("text").focus();
+}
+el("reply-x").onclick=function(){replyTo=null;el("replybar").classList.remove("on")};
+function doSend(){
+  var t=el("text").value.trim();
+  if(t.length<1||!cur||!cur.room)return;
+  var re=replyTo?replyTo.id:undefined;
+  if(usePoll){
+    el("b-send").disabled=true;
+    fetch("/api/chat?room="+encodeURIComponent(cur.room),{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({credential:CRED,text:t,re:re})})
+    .then(function(r){return r.json().then(function(d){return{s:r.status,d:d}})}).then(function(x){
+      el("b-send").disabled=false;
+      if(x.d&&x.d.ok){clearInput();}
+      else if(x.s===401){note("登录已过期，请重新登录。");logout();}
+      else note((x.d&&x.d.msg)||"发送失败。");
+    }).catch(function(){el("b-send").disabled=false;note("网络异常。")});
+  }else{
+    if(!(ws&&connected)){note("正在重连，请稍候…");return;}
+    wsSend({t:"msg",text:t,re:re});clearInput();
+  }
+}
+function clearInput(){el("text").value="";note("");el("text").style.height="40px";replyTo=null;el("replybar").classList.remove("on");}
+el("b-send").onclick=doSend;
+el("text").addEventListener("keydown",function(e){if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();doSend();}});
+el("text").addEventListener("input",function(){this.style.height="40px";this.style.height=Math.min(this.scrollHeight,110)+"px";});
+el("b-wds").onclick=function(){var t=el("text");if(!/^@\s*wds/i.test(t.value))t.value="@WDS "+t.value;t.focus();};
+function insert(s){var t=el("text"),a=t.selectionStart||0,b=t.selectionEnd||0,v=t.value;
+  t.value=v.slice(0,a)+s+v.slice(b);t.selectionStart=t.selectionEnd=a+s.length;t.focus();}
+
+/* 表情（表情是文字，故保留） */
+(function(){
+  var EMOJI="😀 😃 😄 😁 😆 😊 🙂 😉 😍 🥰 😘 😜 🤪 🤔 🤨 😐 😴 😷 😎 🥳 🤗 🙄 😮 😲 😳 😭 😢 😱 😡 🥲 👍 👎 👏 🙏 💪 🤝 👌 ✌️ 🙌 🎉 🔥 💯 ❤️ 💔 ⭐ ✅ ❌ 🌹 ☕ 🍵 🎂 👀".split(" ");
+  var panel=el("epanel"),btn=el("b-emoji");
+  EMOJI.forEach(function(e){var s=document.createElement("span");s.textContent=e;s.onclick=function(){insert(e)};panel.appendChild(s)});
+  btn.onclick=function(ev){ev.stopPropagation();el("atpanel").classList.remove("on");panel.classList.toggle("on")};
+  document.addEventListener("click",function(ev){if(panel.classList.contains("on")&&ev.target!==btn&&!panel.contains(ev.target))panel.classList.remove("on")});
+})();
+
+/* @提及：列出群成员 */
+el("b-at").onclick=function(ev){
+  ev.stopPropagation();
+  var P=el("atpanel");el("epanel").classList.remove("on");
+  if(P.classList.contains("on")){P.classList.remove("on");return;}
+  P.textContent="";
+  var all=document.createElement("span");all.textContent="@所有人";all.onclick=function(){insert("@所有人 ");P.classList.remove("on")};
+  P.appendChild(all);
+  function add(list){list.forEach(function(m){
+    if(ME&&m.uid===ME.uid)return;
+    var s=document.createElement("span");s.textContent="@"+m.name;
+    s.onclick=function(){insert("@"+m.name+" ");P.classList.remove("on")};
+    P.appendChild(s);
+  })}
+  if(gMembers.length){add(gMembers);P.classList.add("on");}
+  else api("ginfo",{gid:cur.gid}).then(function(x){
+    if(x.d&&x.d.ok){gMembers=x.d.members||[];add(gMembers);}
+    P.classList.add("on");
+  }).catch(function(){P.classList.add("on")});
+};
+document.addEventListener("click",function(ev){var P=el("atpanel");if(P.classList.contains("on")&&ev.target!==el("b-at")&&!P.contains(ev.target))P.classList.remove("on")});
+
+/* WDS 思考中 */
+var typingEl=null;
+function showTyping(){if(!typingEl){typingEl=document.createElement("div");typingEl.className="typing";typingEl.textContent="🤖 WDS智能体 正在思考…";}var n=nearBottom();el("msgs").appendChild(typingEl);if(n)toBottom();}
+function hideTyping(){if(typingEl&&typingEl.parentNode)typingEl.parentNode.removeChild(typingEl);}
+
+/* 桌面提醒 */
+el("b-notify").onclick=function(){
+  var b=el("b-notify");
+  if(!("Notification" in window)){b.textContent="不支持";return;}
+  Notification.requestPermission().then(function(p){notifyOn=(p==="granted");b.textContent=notifyOn?"已开启":"被拒绝";});
+};
+if("Notification" in window&&Notification.permission==="granted"){notifyOn=true;el("b-notify").textContent="已开启";}
+
+/* 学员名录：给通讯录打「学员」标 */
+fetch("/students/roster.json").then(function(r){return r.json()}).then(function(d){
+  (d&&d.students||[]).forEach(function(s){if(s&&s.name)roster[s.name]=s.slug});
+  if(ME){renderBook();if(!cur)renderChats();}
+}).catch(function(){});
+
+/* 起 */
+(function(){var s=document.createElement("script");s.src="https://accounts.google.com/gsi/client";s.async=true;s.defer=true;
+ s.onload=bootGsi;s.onerror=function(){el("gsi").textContent="无法连接 Google 登录服务。"};document.head.appendChild(s);})();
+if(CRED)afterLogin();
+window.__sdeWx={api:api,openDm:openDm,openGroup:openGroup,openGnew:openGnew,openGinfo:openGinfo,addMsg:addMsg,
+  loadInbox:loadInbox,loadBook:loadBook,renderBook:renderBook,setReply:setReply,
+  state:function(){return{ME:ME,contacts:contacts,groups:groups,chats:chats,cur:cur,unread:unread,usePoll:usePoll,replyTo:replyTo,gMembers:gMembers,gOwner:gOwner}},
+  _afterLogin:afterLogin,_setCred:function(c){CRED=c},_show:show};
+})();
+</script>
+</body>
+</html>

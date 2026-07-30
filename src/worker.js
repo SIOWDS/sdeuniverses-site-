@@ -42,6 +42,12 @@ function dmParties(room) {
   return m ? [m[1], m[2]] : null;
 }
 function dmPeer(parties, uid) { return parties[0] === uid ? parties[1] : parties[0]; }
+// 群房间＝g/<gid>（gid 12 位十六进制随机）。和私聊一样：不是成员就进不去。
+function gidOk(gid) { return /^[0-9a-f]{12}$/.test(String(gid || "")); }
+function gRoomGid(room) { const m = /^g\/([0-9a-f]{12})$/.exec(String(room || "").toLowerCase()); return m ? m[1] : ""; }
+function newGid() { return [...crypto.getRandomValues(new Uint8Array(6))].map((x) => x.toString(16).padStart(2, "0")).join(""); }
+// 会话键：私聊＝对方 uid（12位十六进制）；群＝"g"+gid（13 位、以 g 开头）——两者不会撞。
+function convKeyG(gid) { return "g" + gid; }
 export class VisitCounter {
   constructor(ctx, env) {
     this.ctx = ctx;
@@ -292,11 +298,13 @@ export class CommentBox {
     if (request.headers.get("Upgrade") === "websocket") {
       const pair = new WebSocketPair();
       const client = pair[0], server = pair[1];
-      const _dm = dmParties(_u.searchParams.get("room") || "");
+      const _room = _u.searchParams.get("room") || "";
+      const _dm = dmParties(_room), _gid = gRoomGid(_room);
       this.ctx.acceptWebSocket(server);
-      if (_dm) {
-        // 私聊不给围观：连上什么都不发，等 {t:"auth"} 验明身份且确属这两人之一，才放历史。
-        server.serializeAttachment({ dm: _dm });
+      if (_dm || _gid) {
+        // 私聊与群都不给围观：连上什么都不发，等 {t:"auth"} 验明身份（私聊＝这两人之一，
+        // 群＝确在成员名单里），才放历史。
+        server.serializeAttachment(_dm ? { dm: _dm } : { g: _gid });
         try { server.send(JSON.stringify({ t: "needauth" })); } catch (e) {}
         return new Response(null, { status: 101, webSocket: client });
       }
@@ -359,13 +367,21 @@ export class CommentBox {
       }
       if (op === "inbox") {
         if (!ok12(uid)) return Response.json({ ok: false });
-        const m = await this.ctx.storage.list({ prefix: "ib:" + uid + ":", limit: 200 });
+        const m = await this.ctx.storage.list({ prefix: "ib:" + uid + ":", limit: 300 });
         const out = []; let unread = 0;
         for (const v of m.values()) {
-          if (!v || !v.peer) continue;
+          if (!v) continue;
+          if (v.kind === "g") { // 群会话
+            const g = await this.ctx.storage.get("g:" + v.gid);
+            if (!g || (g.members || []).indexOf(uid) < 0) continue; // 已退群/被移出：不再列
+            unread += v.unread || 0;
+            out.push({ kind: "g", key: convKeyG(v.gid), gid: v.gid, name: g.name, count: (g.members || []).length, last: v.last || "", lastTs: v.lastTs || 0, unread: v.unread || 0, at: v.at ? 1 : 0 });
+            continue;
+          }
+          if (!v.peer) continue;
           const u = (await this.ctx.storage.get("u:" + v.peer)) || {};
           unread += v.unread || 0;
-          out.push({ peer: v.peer, name: u.name || "（未署名）", last: v.last || "", lastTs: v.lastTs || 0, unread: v.unread || 0 });
+          out.push({ kind: "dm", key: v.peer, peer: v.peer, name: u.name || "（未署名）", last: v.last || "", lastTs: v.lastTs || 0, unread: v.unread || 0 });
         }
         out.sort((x, y) => (y.lastTs || 0) - (x.lastTs || 0));
         return Response.json({ ok: true, chats: out, unread });
@@ -373,7 +389,125 @@ export class CommentBox {
       if (op === "read") {
         const k = "ib:" + uid + ":" + String(b.peer || "");
         const cur = await this.ctx.storage.get(k);
-        if (cur) { cur.unread = 0; await this.ctx.storage.put(k, cur); }
+        if (cur) { cur.unread = 0; cur.at = 0; await this.ctx.storage.put(k, cur); }
+        return Response.json({ ok: true });
+      }
+      // ——— 群 ———
+      if (op === "gcreate") {
+        if (!ok12(uid)) return Response.json({ ok: false });
+        const nm = String(b.name || "").replace(/[\u0000-\u001f]/g, "").trim().slice(0, 30);
+        if (!nm) return Response.json({ ok: false, msg: "群名不能为空。" });
+        let mem = Array.isArray(b.members) ? b.members.filter(ok12) : [];
+        mem = [uid].concat(mem.filter((x) => x !== uid));
+        mem = mem.filter((x, i) => mem.indexOf(x) === i).slice(0, 200);
+        const gid = String(b.gid || "");
+        if (!gidOk(gid)) return Response.json({ ok: false });
+        const me = (await this.ctx.storage.get("u:" + uid)) || {};
+        const g = { gid, name: nm, owner: uid, members: mem, notice: "", ts: now };
+        await this.ctx.storage.put("g:" + gid, g);
+        for (const m of mem) {
+          await this.ctx.storage.put("gm:" + m + ":" + gid, 1);
+          await this.ctx.storage.put("ib:" + m + ":" + convKeyG(gid), { kind: "g", gid, last: (me.name || "有人") + " 建了这个群", lastTs: now, unread: m === uid ? 0 : 1 });
+        }
+        return Response.json({ ok: true, gid, group: g });
+      }
+      if (op === "groups") {
+        if (!ok12(uid)) return Response.json({ ok: false });
+        const idx = await this.ctx.storage.list({ prefix: "gm:" + uid + ":", limit: 300 });
+        const out = [];
+        for (const k of idx.keys()) {
+          const gid = k.slice(("gm:" + uid + ":").length);
+          const g = await this.ctx.storage.get("g:" + gid);
+          if (g && (g.members || []).indexOf(uid) >= 0) out.push({ gid: g.gid, name: g.name, count: (g.members || []).length, owner: g.owner, ts: g.ts || 0 });
+        }
+        out.sort((x, y) => (y.ts || 0) - (x.ts || 0));
+        return Response.json({ ok: true, groups: out });
+      }
+      if (op === "ismember") {
+        const g = await this.ctx.storage.get("g:" + String(b.gid || ""));
+        if (!g) return Response.json({ ok: true, member: false });
+        const isM = (g.members || []).indexOf(uid) >= 0;
+        return Response.json({ ok: true, member: isM, name: g.name, notice: g.notice || "", count: (g.members || []).length, owner: g.owner });
+      }
+      if (op === "ginfo") {
+        const g = await this.ctx.storage.get("g:" + String(b.gid || ""));
+        if (!g) return Response.json({ ok: false, msg: "群不存在。" });
+        if ((g.members || []).indexOf(uid) < 0) return Response.json({ ok: false, msg: "你不在这个群里。", code: 403 });
+        const mem = [];
+        for (const m of g.members || []) { const u = (await this.ctx.storage.get("u:" + m)) || {}; mem.push({ uid: m, name: u.name || "（未署名）", owner: m === g.owner }); }
+        return Response.json({ ok: true, group: { gid: g.gid, name: g.name, notice: g.notice || "", owner: g.owner, ts: g.ts || 0 }, members: mem });
+      }
+      if (op === "gadd") { // 群成员都可以拉人（与微信一致）
+        const gid = String(b.gid || "");
+        const g = await this.ctx.storage.get("g:" + gid);
+        if (!g) return Response.json({ ok: false, msg: "群不存在。" });
+        if ((g.members || []).indexOf(uid) < 0) return Response.json({ ok: false, msg: "你不在这个群里。", code: 403 });
+        const add = (Array.isArray(b.add) ? b.add : []).filter(ok12).filter((x) => g.members.indexOf(x) < 0);
+        if (!add.length) return Response.json({ ok: true, added: 0, group: g });
+        if (g.members.length + add.length > 200) return Response.json({ ok: false, msg: "一个群最多 200 人。" });
+        const me = (await this.ctx.storage.get("u:" + uid)) || {};
+        g.members = g.members.concat(add);
+        await this.ctx.storage.put("g:" + gid, g);
+        for (const m of add) {
+          await this.ctx.storage.put("gm:" + m + ":" + gid, 1);
+          await this.ctx.storage.put("ib:" + m + ":" + convKeyG(gid), { kind: "g", gid, last: (me.name || "有人") + " 把你拉进了群", lastTs: now, unread: 1 });
+        }
+        return Response.json({ ok: true, added: add.length, group: g });
+      }
+      if (op === "gkick") { // 只有群主能移出成员
+        const gid = String(b.gid || ""), tgt = String(b.target || "");
+        const g = await this.ctx.storage.get("g:" + gid);
+        if (!g) return Response.json({ ok: false, msg: "群不存在。" });
+        if (g.owner !== uid) return Response.json({ ok: false, msg: "只有群主能移出成员。", code: 403 });
+        if (tgt === uid) return Response.json({ ok: false, msg: "群主不能移出自己，请用退群/解散。" });
+        g.members = (g.members || []).filter((x) => x !== tgt);
+        await this.ctx.storage.put("g:" + gid, g);
+        await this.ctx.storage.delete("gm:" + tgt + ":" + gid);
+        await this.ctx.storage.delete("ib:" + tgt + ":" + convKeyG(gid));
+        return Response.json({ ok: true, group: g });
+      }
+      if (op === "gleave") {
+        const gid = String(b.gid || "");
+        const g = await this.ctx.storage.get("g:" + gid);
+        if (!g) return Response.json({ ok: true });
+        g.members = (g.members || []).filter((x) => x !== uid);
+        await this.ctx.storage.delete("gm:" + uid + ":" + gid);
+        await this.ctx.storage.delete("ib:" + uid + ":" + convKeyG(gid));
+        if (!g.members.length) { await this.ctx.storage.delete("g:" + gid); return Response.json({ ok: true, dissolved: true }); }
+        if (g.owner === uid) g.owner = g.members[0]; // 群主走了，群交给最早的成员
+        await this.ctx.storage.put("g:" + gid, g);
+        return Response.json({ ok: true });
+      }
+      if (op === "gnotice") { // 群公告：只有群主能改
+        const gid = String(b.gid || "");
+        const g = await this.ctx.storage.get("g:" + gid);
+        if (!g) return Response.json({ ok: false, msg: "群不存在。" });
+        if (g.owner !== uid) return Response.json({ ok: false, msg: "只有群主能改群公告。", code: 403 });
+        g.notice = String(b.notice || "").replace(/[\u0000-\u0009\u000b-\u001f]/g, "").trim().slice(0, 300);
+        if (b.name) g.name = String(b.name).replace(/[\u0000-\u001f]/g, "").trim().slice(0, 30) || g.name;
+        await this.ctx.storage.put("g:" + gid, g);
+        return Response.json({ ok: true, group: g });
+      }
+      if (op === "gbump") { // 群里有新消息：除发言人外，每位成员未读 +1；被 @ 到的另打标
+        const gid = String(b.gid || ""), from = String(b.from || "");
+        const g = await this.ctx.storage.get("g:" + gid);
+        if (!g || !ok12(from)) return Response.json({ ok: false });
+        const text = String(b.text || "").slice(0, 60), ts = Number(b.ts) || now;
+        const src = String(b.atsrc || "");
+        const atAll = /@(所有人|全体成员|all)/i.test(src);
+        if (b.fromName) { const p = (await this.ctx.storage.get("u:" + from)) || {}; await this.ctx.storage.put("u:" + from, { uid: from, name: String(b.fromName).slice(0, 20), ts, first: p.first || ts }); }
+        for (const m of g.members || []) {
+          const k = "ib:" + m + ":" + convKeyG(gid);
+          const cur = (await this.ctx.storage.get(k)) || { kind: "g", gid, unread: 0 };
+          cur.kind = "g"; cur.gid = gid; cur.last = (b.fromName ? b.fromName + "：" : "") + text; cur.lastTs = ts;
+          if (m === from) { cur.unread = 0; cur.at = 0; }
+          else {
+            cur.unread = (cur.unread || 0) + 1;
+            const u = (await this.ctx.storage.get("u:" + m)) || {};
+            if (atAll || (u.name && src.indexOf("@" + u.name) >= 0)) cur.at = 1;
+          }
+          await this.ctx.storage.put(k, cur);
+        }
         return Response.json({ ok: true });
       }
       if (op === "bump") { // 私聊房间有新消息时回调：两边各记一笔，收信方未读 +1
@@ -412,9 +546,9 @@ export class CommentBox {
     }
     // ===== 实时群聊：HTTP 历史拉取 / 轮询兜底 / POST 发言 =====
     if (_u.pathname === "/api/chat") {
-      const _dmc = dmParties(_u.searchParams.get("room") || "");
-      // 私聊不给匿名围观：历史只能登录后用 POST op:"poll" 取（兜底模式），或走 WebSocket 认证后取。
-      if (_dmc && request.method === "GET") return Response.json({ ok: false, msg: "私聊需要登录后从会话里进入。" }, { status: 403 });
+      const _dmc = dmParties(_u.searchParams.get("room") || ""), _gidc = gRoomGid(_u.searchParams.get("room") || "");
+      // 私聊与群都不给匿名围观：历史只能登录后用 POST op:"poll" 取（兜底模式），或走 WebSocket 认证后取。
+      if ((_dmc || _gidc) && request.method === "GET") return Response.json({ ok: false, msg: "这个会话需要登录后从聊天列表进入。" }, { status: 403 });
       if (request.method === "GET") {
         const since = parseInt(_u.searchParams.get("since") || "0", 10) || 0;
         const st = await this.chatRead();
@@ -426,13 +560,17 @@ export class CommentBox {
         const who = await verifyGoogleCredential(body.credential);
         if (!who) return Response.json({ ok: false, msg: "请先用 Google 账号登录后再发言。" }, { status: 401 });
         if (_dmc && (!who.uid || _dmc.indexOf(who.uid) < 0)) return Response.json({ ok: false, msg: "你不在这个私聊里。" }, { status: 403 });
-        if (_dmc && body.op === "poll") { // 私聊的轮询兜底：验明身份才给历史
+        if (_gidc) { // 群：必须在成员名单里
+          const gi = await this._gCheck(_gidc, who.uid);
+          if (!gi.member) return Response.json({ ok: false, msg: "你不在这个群里。" }, { status: 403 });
+        }
+        if ((_dmc || _gidc) && body.op === "poll") { // 私聊/群的轮询兜底：验明身份才给历史
           const since = parseInt(body.since || "0", 10) || 0;
           const st = await this.chatRead();
           return Response.json({ ok: true, items: st.log.filter((m) => m.id > since), recalls: st.log.filter((m) => m.recalled).map((m) => m.id), last: st.seq, online: this.ctx.getWebSockets().length }, { headers: { "cache-control": "no-store" } });
         }
         if (body.op === "recall") { const rr = await this.chatRecall(who.name, body.id); return Response.json(rr.ok ? { ok: true } : { ok: false, msg: rr.msg }, { status: rr.ok ? 200 : 400 }); }
-        const r = await this.chatAdd(who.name, body.text, _dmc ? { parties: _dmc, uid: who.uid } : null);
+        const r = await this.chatAdd(who.name, body.text, _dmc ? { parties: _dmc, uid: who.uid } : (_gidc ? { gid: _gidc, uid: who.uid } : null), body.re);
         return Response.json(r.ok ? { ok: true } : { ok: false, msg: r.msg }, { status: r.ok ? 200 : (r.code || 400) });
       }
       return new Response("method", { status: 405 });
@@ -533,7 +671,7 @@ export class CommentBox {
     const seq = (await this.ctx.storage.get("cseq")) || 0;
     return { log, seq };
   }
-  async chatAdd(name, rawText, im) {
+  async chatAdd(name, rawText, im, reId) {
     const clean = (s, n) => String(s || "").replace(/[\u0000-\u0009\u000b-\u001f]/g, "").trim().slice(0, n);
     name = clean(name, 20);
     const text = clean(rawText, 500);
@@ -546,14 +684,21 @@ export class CommentBox {
     if (hits.length && now - hits[hits.length - 1] < 600) return { ok: false, msg: "发得太快了，缓一下。", code: 429 };
     if (hits.length >= 400) return { ok: false, msg: "今天发得够多啦，明天继续。", code: 429 };
     let { log, seq } = await this.chatRead();
+    // 引用回复：把被引的那条压成一小块存进新消息（引原文一份，之后原文撤回也不影响这块）
+    let re = null;
+    if (reId) {
+      const src = log.find((x) => x.id === parseInt(reId, 10));
+      if (src && !src.recalled) re = { id: src.id, name: src.name, text: String(src.text || (src.img ? "[图片]" : "")).slice(0, 60) };
+    }
     seq += 1;
     const msg = { id: seq, name, text, ts: now };
+    if (re) msg.re = re;
     log.push(msg);
     if (log.length > 300) log = log.slice(-300);
     await this.ctx.storage.put("clog", log);
     await this.ctx.storage.put("cseq", seq);
     await this.ctx.storage.put(key, [...hits, now]);
-    this.broadcast({ t: "msg", id: msg.id, name: msg.name, text: msg.text, ts: msg.ts });
+    this.broadcast({ t: "msg", id: msg.id, name: msg.name, text: msg.text, ts: msg.ts, re: re || undefined });
     if (im) this._imBump(im, name, text);
     const _wq = wdsQuestion(text);
     if (_wq) { try { this.ctx.waitUntil(this.answerWDS(_wq).catch(() => {})); } catch (e) { this.answerWDS(_wq).catch(() => {}); } }
@@ -712,12 +857,24 @@ export class CommentBox {
     if (!reply) reply = "（我这会儿没接上，稍后再 @我一次试试。）";
     await this.chatAddBot(reply, tier);
   }
-  // 把一条私聊消息记进双方的会话列表（收信方未读 +1）——目录实例是 im-dir-global。
+  // 把一条消息记进相关各方的会话列表（收信方未读 +1；群里被 @ 的另打标）——目录实例是 im-dir-global。
+  _dir() { return this.env.COMMENTS.get(this.env.COMMENTS.idFromName("im-dir-global")); }
+  async _dirCall(payload) {
+    const r = await this._dir().fetch(new Request("https://do/_dir", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(payload) }));
+    return await r.json().catch(() => ({ ok: false }));
+  }
+  // 群成员校验（每条连接认证时问一次目录）
+  async _gCheck(gid, uid) {
+    try { const d = await this._dirCall({ op: "ismember", uid: uid, gid: gid }); return { member: !!(d && d.member), name: (d && d.name) || "", notice: (d && d.notice) || "", count: (d && d.count) || 0, owner: (d && d.owner) || "" }; }
+    catch (e) { return { member: false }; }
+  }
   _imBump(im, name, text) {
     const run = async () => {
       try {
-        const dir = this.env.COMMENTS.get(this.env.COMMENTS.idFromName("im-dir-global"));
-        await dir.fetch(new Request("https://do/_dir", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ op: "bump", from: im.uid, fromName: name, to: dmPeer(im.parties, im.uid), text: String(text || "").slice(0, 60), ts: Date.now() }) }));
+        const payload = im.gid
+          ? { op: "gbump", gid: im.gid, from: im.uid, fromName: name, text: String(text || "").slice(0, 60), atsrc: String(text || "").slice(0, 200), ts: Date.now() }
+          : { op: "bump", from: im.uid, fromName: name, to: dmPeer(im.parties, im.uid), text: String(text || "").slice(0, 60), ts: Date.now() };
+        await this._dirCall(payload);
       } catch (e) {}
     };
     try { this.ctx.waitUntil(run()); } catch (e) { run().catch(() => {}); }
@@ -727,7 +884,7 @@ export class CommentBox {
     for (const ws of this.ctx.getWebSockets()) {
       try {
         const att = ws.deserializeAttachment() || {};
-        if (att.dm && !att.uid) continue; // 私聊房间里尚未通过身份校验的连接：一律不发
+        if ((att.dm || att.g) && !att.uid) continue; // 私聊/群房间里尚未通过身份校验的连接：一律不发
         ws.send(s);
       } catch (e) {}
     }
@@ -751,20 +908,34 @@ export class CommentBox {
         try { ws.send(JSON.stringify({ t: "history", items: st.log.slice(-120), online: this.ctx.getWebSockets().length })); } catch (e) {}
         return;
       }
+      if (att0.g) { // 群：必须在成员名单里，验过才给历史与群公告
+        const gi = await this._gCheck(att0.g, who.uid);
+        if (!gi.member) {
+          try { ws.send(JSON.stringify({ t: "err", m: "no-access" })); } catch (e) {}
+          try { ws.close(1008, "forbidden"); } catch (e) {}
+          return;
+        }
+        ws.serializeAttachment({ g: att0.g, name: who.name, uid: who.uid });
+        const st = await this.chatRead();
+        try { ws.send(JSON.stringify({ t: "authed", name: who.name })); } catch (e) {}
+        try { ws.send(JSON.stringify({ t: "meta", name: gi.name, notice: gi.notice, count: gi.count, owner: gi.owner === who.uid })); } catch (e) {}
+        try { ws.send(JSON.stringify({ t: "history", items: st.log.slice(-120), online: this.ctx.getWebSockets().length })); } catch (e) {}
+        return;
+      }
       ws.serializeAttachment({ name: who.name });
       try { ws.send(JSON.stringify({ t: "authed", name: who.name })); } catch (e) {}
       return;
     }
     if (d.t === "msg") {
       const att = ws.deserializeAttachment() || {};
-      if (!att.name || (att.dm && !att.uid)) { try { ws.send(JSON.stringify({ t: "err", m: "login" })); } catch (e) {} return; }
-      const r = await this.chatAdd(att.name, d.text, att.dm ? { parties: att.dm, uid: att.uid } : null);
+      if (!att.name || ((att.dm || att.g) && !att.uid)) { try { ws.send(JSON.stringify({ t: "err", m: "login" })); } catch (e) {} return; }
+      const r = await this.chatAdd(att.name, d.text, att.dm ? { parties: att.dm, uid: att.uid } : (att.g ? { gid: att.g, uid: att.uid } : null), d.re);
       if (!r.ok) { try { ws.send(JSON.stringify({ t: "err", m: r.msg || "发送失败" })); } catch (e) {} }
       return;
     }
     if (d.t === "recall") {
       const att = ws.deserializeAttachment() || {};
-      if (!att.name || (att.dm && !att.uid)) { try { ws.send(JSON.stringify({ t: "err", m: "login" })); } catch (e) {} return; }
+      if (!att.name || ((att.dm || att.g) && !att.uid)) { try { ws.send(JSON.stringify({ t: "err", m: "login" })); } catch (e) {} return; }
       const r = await this.chatRecall(att.name, d.id);
       if (!r.ok) { try { ws.send(JSON.stringify({ t: "err", m: r.msg || "撤回失败" })); } catch (e) {} }
       return;
@@ -3768,6 +3939,10 @@ export default {
       const r = await env.COMMENTS.get(env.COMMENTS.idFromName("chat:" + room)).fetch(new Request("https://do/_clear", { method: "POST" }));
       return Response.json(await r.json(), { headers: { "access-control-allow-origin": "*" } });
     }
+    // 私聊页已升级为「SDE 微信」整套系统，换到 /sde-wechat/；老链接不作废，301 过去。
+    if (url.pathname === "/sde-talk/im" || url.pathname === "/sde-talk/im/") {
+      return new Response(null, { status: 301, headers: { location: "/sde-wechat/", "cache-control": "no-store" } });
+    }
     // /api/im：微信式私聊的目录服务——通讯录、会话列表、未读清零、打开某人的私聊房间。
     // 一律要 Google 登录：先验凭证换出 uid（Google sub 的哈希），再转给 im-dir-global 目录实例。
     // 私聊内容本身不经这里，走 /api/chat?room=dm/<a>-<b>（房间号由双方各自算出，服务端校验成员）。
@@ -3795,10 +3970,28 @@ export default {
       }
       if (op === "read") { await call({ op: "read", uid: who.uid, peer: String(b.peer || "") }); return Response.json({ ok: true }); }
       if (op === "open") {
+        if (b.gid) { // 打开群
+          const gid = String(b.gid);
+          if (!gidOk(gid)) return Response.json({ ok: false, msg: "群号不对。" }, { status: 400 });
+          const g = await call({ op: "ismember", uid: who.uid, gid });
+          if (!g || !g.member) return Response.json({ ok: false, msg: "你不在这个群里。" }, { status: 403 });
+          await call({ op: "hello", uid: who.uid, name: who.name });
+          return Response.json({ ok: true, kind: "g", room: "g/" + gid, name: g.name, notice: g.notice || "", count: g.count || 0, owner: g.owner === who.uid, me });
+        }
         const room = dmRoomFor(who.uid, String(b.peer || ""));
         if (!room) return Response.json({ ok: false, msg: "找不到这个人。" }, { status: 400 });
         await call({ op: "hello", uid: who.uid, name: who.name });
-        return Response.json({ ok: true, room, me });
+        return Response.json({ ok: true, kind: "dm", room, me });
+      }
+      if (op === "groups") { const d = await call({ op: "groups", uid: who.uid }); return Response.json({ ok: true, me, groups: (d && d.groups) || [] }, { headers: { "cache-control": "no-store" } }); }
+      if (op === "gcreate") {
+        await call({ op: "hello", uid: who.uid, name: who.name });
+        const d = await call({ op: "gcreate", uid: who.uid, name: b.name, members: b.members, gid: newGid() });
+        return Response.json(d && d.ok ? { ok: true, gid: d.gid, room: "g/" + d.gid } : { ok: false, msg: (d && d.msg) || "建群失败。" }, { status: d && d.ok ? 200 : 400 });
+      }
+      if (op === "ginfo" || op === "gadd" || op === "gkick" || op === "gleave" || op === "gnotice") {
+        const d = await call(Object.assign({ uid: who.uid }, b, { op, credential: undefined }));
+        return Response.json(d || { ok: false }, { status: (d && d.ok) ? 200 : ((d && d.code) || 400) });
       }
       return Response.json({ ok: false, msg: "unknown op" }, { status: 400 });
     }
@@ -3807,9 +4000,9 @@ export default {
       if (!/^[a-z0-9-]+(\/[a-z0-9-]+)*$/.test(room) || room.length > 120) {
         return new Response(JSON.stringify({ ok: false, msg: "bad room" }), { status: 400, headers: { "content-type": "application/json" } });
       }
-      // 私聊房间：匿名 GET 一律拒（群聊照旧可围观）；图片 GET 由房间内的令牌把关。
-      if (url.pathname === "/api/chat" && request.method === "GET" && request.headers.get("Upgrade") !== "websocket" && dmParties(room)) {
-        return Response.json({ ok: false, msg: "私聊需要登录后从会话里进入。" }, { status: 403 });
+      // 私聊与自建群房间：匿名 GET 一律拒（公开广场 sde-plaza / discussions/hall 照旧可围观）。
+      if (url.pathname === "/api/chat" && request.method === "GET" && request.headers.get("Upgrade") !== "websocket" && (dmParties(room) || gRoomGid(room))) {
+        return Response.json({ ok: false, msg: "这个会话需要登录后从聊天列表进入。" }, { status: 403 });
       }
       return env.COMMENTS.get(env.COMMENTS.idFromName("chat:" + room)).fetch(request);
     }
