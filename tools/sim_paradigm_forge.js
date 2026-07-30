@@ -146,6 +146,8 @@ function webPickAnswer(o) {
     '对立点：三家把病根安在三个不同的层上，互相取消对方的前提。'].join('\n\n');
 }
 function defaultAnswer(userMsg) {
+  if (/第一步：由你自己定一个议题/.test(userMsg))
+    return '议题：一件事被记录下来之后还是不是原来那件事';
   if (/把它拆成\*\*三个检索词\*\*/.test(userMsg))
     return '1｜认知心理学｜认知负荷 理论 争论\n2｜制度经济学｜度量 制度 批评\n3｜现象学｜前反思 身体 理论';
   if (/请从里面挑出\*\*三家现行理论\*\*/.test(userMsg)) return webPickAnswer();
@@ -589,42 +591,56 @@ function setStudent(c, slug) {
     ok('第二遍确实重新挑了一次', cA.calls.some(x => /【A（已定，随机抽出）】/.test(x.user)));
   });
 
-  await step('十、模式 B（三人各一篇）', async () => {
+  await step('十、模式 B（三人各一篇 · 全由基底挑）', async () => {
     const c = await boot();
     c.click('.mode[data-mode="B"]'); await sleep(60);
-    ok('三行作者×篇目都填上了', [0,1,2].every(i => c.$('bStu' + i).options.length === 3 && c.$('bArt' + i).options.length > 0));
-    ok('默认就是三位不同作者', new Set([0,1,2].map(i => c.$('bStu' + i).value)).size === 3,
-      [0,1,2].map(i => c.$('bStu' + i).value).join(','));
-    c.$('bStu0').value = 'gao-peng'; c.$('bStu0').dispatchEvent(new c.win.Event('change', { bubbles: true }));
-    await sleep(40);
-    ok('换作者后篇目跟着换', Array.from(c.$('bArt0').options).some(o => /禁令的肉身/.test(o.textContent)));
-    // 此刻第一、二行都是高鹏且都选了第一篇——先验"撞源必被拦"，再换回去跑正题
-    c.$('apiKey').value = 'sk-fake'; c.click('#goBtn');
-    await waitFor(() => c.$('errBox').style.display === 'block', 4000);
-    ok('两行选到同一篇时被拦下', /不能重复/.test(c.$('errBox').textContent), c.$('errBox').textContent);
-    c.$('bStu0').value = 'zhang-qiong'; c.$('bStu0').dispatchEvent(new c.win.Event('change', { bubbles: true }));
-    await sleep(40);
+    ok('手选下拉已经不存在了', !c.$('bStu0') && !c.$('bArt0'));
+    ok('面板交代了由基底挑', /全由基底挑/.test(c.$('mB').textContent));
+    ok('面板写明三位不同作者这条硬约束', /三位不同作者/.test(c.$('mB').textContent));
+    ok('状态条报的是自动选源', /由基底/.test(c.$('srcState').textContent), c.$('srcState').textContent);
     const done = await runPipeline(c);
     ok('B 模式跑得完', done, c.$('stat-review').textContent);
-    ok('调令里带上了三位作者名', c.calls.some(x => /张琼/.test(x.user) && /高鹏/.test(x.user) && /胡敏/.test(x.user)));
+    ok('走的是自动选篇（调令里有随机抽定的 A）', c.calls.some(x => /【A（已定，随机抽出）】/.test(x.user)));
+    const selLogEl = c.doc.querySelector('.sel-log');
+    ok('日志里报了随机定的第一人', !!selLogEl && /随机定第一人/.test(selLogEl.textContent));
+    ok('调令交代了同作者已被剔掉', c.calls.some(x => /同作者/.test(x.user)));
+    ok('三个源确实来自三位不同作者',
+      new Set(c.win.__forge.ST.sources.map(s => s.author || '')).size === 3,
+      c.win.__forge.ST.sources.map(s => s.author).join(','));
     ok('零抛错', c.errors.length === 0, c.errors.slice(0, 2).join(' ｜ '));
   });
 
-  await step('十一、模式 C（站上三长文 + 关键词筛）', async () => {
+  await step('十一、模式 C（站上三长文 · 全由基底挑）', async () => {
     const c = await boot();
     c.click('.mode[data-mode="C"]'); await sleep(60);
-    ok('三个下拉都有候选', [0,1,2].every(i => c.$('cSel' + i).options.length > 0));
-    const q = c.$('cQ0'); q.value = '睡眠'; q.dispatchEvent(new c.win.Event('input', { bubbles: true }));
-    await sleep(40);
-    const opts = Array.from(c.$('cSel0').options).map(o => o.textContent);
-    ok('关键词把候选筛窄且全命中', opts.length > 0 && opts.every(t => /睡眠/.test(t)), '共 ' + opts.length);
-    q.value = ''; q.dispatchEvent(new c.win.Event('input', { bubbles: true })); await sleep(40);
-    ok('清掉关键词候选回满', c.$('cSel0').options.length > opts.length);
-    c.$('cSel0').selectedIndex = 0; c.$('cSel1').selectedIndex = 1; c.$('cSel2').selectedIndex = 2;
+    ok('手选下拉与关键词框都不存在了', !c.$('cSel0') && !c.$('cQ0'));
+    ok('面板交代了由基底挑', /全由基底挑/.test(c.$('mC').textContent));
+    ok('面板写明语汇重叠这条硬约束', /语汇高度重合/.test(c.$('mC').textContent));
+    ok('状态条报的是自动选源', /由基底/.test(c.$('srcState').textContent), c.$('srcState').textContent);
     const done = await runPipeline(c);
     ok('C 模式跑得完', done, c.$('stat-review').textContent);
+    ok('种子取自站上长文（W 号）', c.calls.some(x => /【A（已定，随机抽出）】\s*\n?\s*W\d+/.test(x.user)),
+      (c.win.__forge.ST.seed || []).join(','));
     ok('三个源的链接进了调令', c.calls.some(x => /\/column\/fake-/.test(x.user)));
     ok('零抛错', c.errors.length === 0, c.errors.slice(0, 2).join(' ｜ '));
+  });
+
+  await step('十一之二、语汇族这道闸真的会剔候选（纯函数直测）', async () => {
+    const c = await boot();
+    const W = c.win.__forge;
+    ok('探针挂上了', !!W);
+    ok('阈值就是站内实测定的 0.06', W.VOCAB_SIM_MAX === 0.06, String(W.VOCAB_SIM_MAX));
+    const a = { title: '留白与撤手的限度', summary: '撤手是德' };
+    const twin = { title: '留白与撤手的限度（续）', summary: '撤手是德' };
+    const far = { title: '密码学中的零知识证明', summary: '不泄露即可验证' };
+    ok('near-duplicate 的重叠率过阈值', W.jaccard(W.vocabSig(a), W.vocabSig(twin)) >= 0.06);
+    ok('不相干篇目的重叠率在阈值下', W.jaccard(W.vocabSig(a), W.vocabSig(far)) < 0.06);
+    W.ST.mode = 'C';
+    const kept = W.distinctFilter([twin, far].concat(
+      Array.from({ length: 10 }, (_, i) => ({ title: '毫不相干之' + i, summary: '另说一事' + i }))), [a]);
+    ok('孪生篇被剔出清单', !kept.some(x => /续/.test(x.title)));
+    ok('不相干的留下了', kept.some(x => /零知识/.test(x.title)));
+    ok('池子没被掏空', kept.length >= 8, String(kept.length));
   });
 
   await step('十二、模式 F（自由投喂）', async () => {
@@ -1500,6 +1516,24 @@ function setStudent(c, slug) {
     ok('三家已就位', /三家已就位/.test(c.$('srcState').textContent), c.$('srcState').textContent);
     ok('红字提醒站外来源要自己核对链接', /点开每个链接核对/.test(c.$('errBox').textContent), c.$('errBox').textContent);
     ok('横幅标出站外来源', /联网找/.test(c.$('doneBanner').textContent), c.$('doneBanner').textContent);
+  });
+
+  await step('二十七之一之二、模式 D 议题留空：基底自己定，且强制避开撞过的地', async () => {
+    const c = await boot();
+    c.click('.mode[data-mode="D"]');
+    c.$('dTopic').value = '';
+    c.$('dTopic').dispatchEvent(new c.win.Event('input', { bubbles: true }));
+    ok('留空也算源已备齐（不再拦路）', /由基底自己定|基底/.test(c.$('srcState').textContent), c.$('srcState').textContent);
+    const done = await runPipeline(c, 35000);
+    ok('跑到底', done, c.$('stat-review').textContent);
+    const tp = c.calls.filter(x => /第一步：由你自己定一个议题/.test(x.user)).pop();
+    ok('先打了一趟"自己定议题"', !!tp);
+    ok('定议题时带上了撞过的清单', tp && /已经撞过的（别再选同一块地）/.test(tp.user));
+    ok('要求议题能被不同学科打架', tp && /互相打架/.test(tp.user));
+    ok('定出来的议题回填进了输入框', /记录下来/.test(c.$('dTopic').value), c.$('dTopic').value);
+    const q = c.calls.filter(x => /把它拆成\*\*三个检索词\*\*/.test(x.user)).pop();
+    ok('拆检索词用的是基底自定的那个议题', q && /记录下来/.test(q.user));
+    ok('零抛错', c.errors.length === 0, c.errors.slice(0, 2).join(' ｜ '));
   });
 
   await step('二十七之二、模式 D 自动切到论文体，且成品照论文骨架写', async () => {
