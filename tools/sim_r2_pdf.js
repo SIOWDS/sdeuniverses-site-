@@ -69,6 +69,11 @@ console.log("\n[二之二] 直写：不经过仓库就把字节放进桶（自�
   ok(!/env\.ASSETS\.fetch/.test(seg),
      "**整段不碰 ASSETS** —— 这正是它与 r2-migrate 的分别：不要求文件先进 git");
   ok(/_b64ToBytes\(String\(f\.b64 \|\| ""\)\)/.test(seg), "收 base64 字节");
+  // 栽过一次：_b64ToBytes 本来就返回 ArrayBuffer，补了 .buffer 就恒为 undefined，
+  // 一切输入都被报成"字节数不对：0"。源码检视抓不到，是线上黑盒抓到的——所以在这里钉死。
+  ok(/return arr\.buffer;/.test(W.slice(W.indexOf("function _b64ToBytes"), W.indexOf("function _b64ToBytes") + 400)),
+     "前提：_b64ToBytes 返回的就是 ArrayBuffer");
+  ok(!/_b64ToBytes\([^)]*\)\.buffer/.test(seg), "**不许再给它补 .buffer**（补了恒 undefined，一切输入都报字节数 0）");
   ok(/base64 解不开/.test(seg), "base64 坏了如实报，不当成空文件写进去");
   ok(/\^students\\\/\[A-Za-z0-9\._\\-\\\/\]\+\\\.pdf\$/i.test(seg) && /IDX_KEYS\.test\(p\)/.test(seg),
      "白名单与 r2-migrate 逐字同款：只许 students/**.pdf 与索引键");

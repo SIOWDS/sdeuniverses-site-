@@ -4619,7 +4619,10 @@ export default {
         try {
           if (!b.force) { const hd = await env.PDFS.head(p); if (hd) { out.push({ p: p, ok: true, skip: 1, size: hd.size }); continue; } }
           let buf;
-          try { buf = _b64ToBytes(String(f.b64 || "")).buffer; }
+          // _b64ToBytes 本来就返回 ArrayBuffer（见其定义末行的注释），**别再补 .buffer**——
+          // 补了就恒为 undefined，然后一律报成"字节数不对：0"。源码检视式的 sim 抓不到这个，
+          // 是线上黑盒（真 PDF 只有 9 字节却报 0）才露出来的。
+          try { buf = _b64ToBytes(String(f.b64 || "")); }
           catch (e) { out.push({ p: p, ok: false, msg: "base64 解不开" }); continue; }
           // 与 r2-migrate 同一道门槛：索引分片小到几百字节，不能按 PDF 的 1000 一刀切。
           const _min = _isIdx ? 2 : 1000;
