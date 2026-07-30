@@ -4176,7 +4176,7 @@ export default {
           + "④ 全程不出现「读者问」「我回答」「这场对话」之类痕迹，也不出现学派术语堆砌——普通人要能读懂。\n"
           + "⑤ 结尾留一个开口，不自我封顶。\n"
           + "用 Markdown，标题用 # 和 ##。约三千字。" },
-        deck: { name: "对外 PPT", tok: 9000, spec:
+        deck: { name: "对外 PPT", tok: 16000, spec:
           "把这场对话做成一套【对外汇报用的幻灯片稿】——听众没参与过这场谈话，只有十几分钟，要在这十几分钟里被说服。\n"
           + "【格式硬约束（页面要照它切页并生成真 .pptx，错一点就切不开，务必逐条照办）】\n"
           + "· 第一块是封面：第一行 `# 主标题`（不超过 22 字，是判断不是话题），第二行 `## 一句话主张`。\n"
@@ -4243,12 +4243,17 @@ export default {
             // 成文是全链路里最费脑的一步（满功率＋几千字输出），此前是唯一一条没戴时钟的 WDS 路由：
             // 平台掐断是静默的，不设时限就只能看到一个永远转着的光标。
             const clk = wdsClock(DISTILL_FIRST_MS, DISTILL_TOTAL_MS);
+            // 抽成变量：下面"空产出降档重试"那一遍要复用同一份，绝不能两遍喂的不是同一件事
+            const messages = [
+              { role: "system", content: sys },
+              { role: "user", content: "以下是这场对话的全文：\n\n" + convo + "\n———\n现在开始产出「" + SPEC.name + "」。" },
+            ];
             let upstream;
             try {
               upstream = await fetch(VC.url, {
                 method: "POST",
                 headers: { "content-type": "application/json", authorization: "Bearer " + KEY },
-                body: JSON.stringify(wdsTopBody(VC, { model: VC.model, stream: true, max_tokens: SPEC.tok, messages: [{ role: "system", content: sys }, { role: "user", content: "以下是这场对话的全文：\n\n" + convo + "\n———\n现在开始产出「" + SPEC.name + "」。" }] })),
+                body: JSON.stringify(wdsTopBody(VC, { model: VC.model, stream: true, max_tokens: SPEC.tok, messages })),
                 signal: clk.signal,
               });
             } catch (e) {
@@ -4290,6 +4295,45 @@ export default {
               else controller.enqueue(_sseBytes({ t: "error", v: why + "（可再试一次）" }));
             }
             clk.stop();
+            // ── 空产出兜底：满功率档会把 max_tokens 花在思考上，正文一个字都没出来。
+            //    原来只回一句"没有产出内容"，读者不知道发生了什么、我方也查不出。
+            //    现在：说清怎么空的，并**自动降档重试一次**（关掉思考、预算减半），只重试一次。
+            if (!wrote) {
+              controller.enqueue(_sseBytes({ t: "note", v: "第一遍把 " + SPEC.tok + " 的预算全用在思考上了（思考 " + _st.think + " 字、正文 0 字），正在关掉思考重来一次…" }));
+              _st.stage = SPEC.name + "·重试";
+              const clk2 = wdsClock(DISTILL_FIRST_MS, DISTILL_TOTAL_MS);
+              try {
+                const up2 = await fetch(VC.url, {
+                  method: "POST",
+                  headers: { "content-type": "application/json", authorization: "Bearer " + KEY },
+                  // 刻意不走 wdsTopBody：这一遍就是要**没有思考**，把预算全留给正文
+                  body: JSON.stringify({ model: VC.model, stream: true, max_tokens: Math.round(SPEC.tok / 2), messages }),
+                  signal: clk2.signal,
+                });
+                const rd2 = up2.body.getReader();
+                let bf2 = "";
+                while (true) {
+                  const r2 = await rd2.read();
+                  if (r2.done) break;
+                  bf2 += dec.decode(r2.value, { stream: true });
+                  let ix;
+                  while ((ix = bf2.indexOf("\n")) >= 0) {
+                    const ln = bf2.slice(0, ix).trim(); bf2 = bf2.slice(ix + 1);
+                    if (ln.slice(0, 5) !== "data:") continue;
+                    const pl = ln.slice(5).trim();
+                    if (pl === "[DONE]") break;
+                    try {
+                      const d2 = (JSON.parse(pl).choices || [{}])[0].delta || {};
+                      if (d2.content) { clk2.firstFrame(); _st.out += d2.content.length; wrote += d2.content.length; controller.enqueue(_sseBytes({ t: "token", v: d2.content })); }
+                    } catch (e2) {}
+                  }
+                }
+              } catch (e2) {
+                controller.enqueue(_sseBytes({ t: "note", v: "关掉思考重来这一遍也没成：" + ((e2 && e2.message) || "未知原因") + "。换标准档或稍后再试。" }));
+              }
+              clk2.stop();
+              if (!wrote) controller.enqueue(_sseBytes({ t: "note", v: "两遍都没写出正文。多半是这一场对话太长、把输入窗吃满了——试试新开一场再成文，或换一家基底。" }));
+            }
           } catch (e) {
             controller.enqueue(_sseBytes({ t: "error", v: "成文出错：" + (e && e.message) + "（可再试一次）" }));
           }

@@ -315,6 +315,18 @@ console.log("── 四 · 两端接线");
   ok(/deckReady \|\| deckOf\(text\)/.test(wm), "点按钮时优先用预取好的那份");
 }
 
+console.log("── 四点五 · 空产出不许闷着（2026-07-30 实测撞上）");
+{
+  const DIST = wk.slice(wk.indexOf('url.pathname === "/api/wds/distill"'), wk.indexOf('url.pathname === "/api/chat/clear"'));
+  ok(/deck: \{ name: "对外 PPT", tok: 16000/.test(wk), "PPT 档预算提到 16000（排 8–14 页的规划量比写一篇文章大，满功率档思考还吃同一份预算）");
+  ok(/const messages = \[/.test(DIST), "messages 抽成变量——两遍必须喂同一件事");
+  ok(/if \(!wrote\) \{[\s\S]{0,400}全用在思考上了/.test(DIST), "空产出时说清怎么空的（思考几字、正文 0 字）");
+  ok(/关掉思考重来一次/.test(DIST) && /max_tokens: Math\.round\(SPEC\.tok \/ 2\)/.test(DIST), "自动降档重试一次：关思考、预算减半");
+  ok(/刻意不走 wdsTopBody/.test(DIST), "重试那一遍不套满功率（否则又把预算烧在思考上）");
+  ok(/两遍都没写出正文/.test(DIST), "两遍都空也要给下一步，不许闷着");
+  ok(/dEmptyHint/.test(wm) && /if \(!text\) dNote\(t\("dEmptyHint"\), 1\)/.test(wm), "客户端空产出也挂一条说明");
+}
+
 console.log("── 五 · 20 套模板：每套一份写作 Skill（骨架＋纪律＋视觉方案）");
 {
   const ids = ["brief","research","teach","review","proposal","onepage","pitch","product","train","health",

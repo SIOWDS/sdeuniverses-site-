@@ -385,6 +385,7 @@
     kDeck: "对外 PPT", kDeckS: "做成一套汇报幻灯片，可直接下载 .pptx",
     dPptx: "⤓ 存为 .pptx", dPptxWait: "正在生成 .pptx…", dPptxNo: "这份稿子切不出幻灯片（需要 ## 页标题与 - 要点）",
     dPptxOk: "已生成 幻灯片 ",
+    dEmptyHint: "两种可能：这一场太长把输入窗吃满了，或基底把预算全用在思考上。换标准档、或新开一场再成文。",
     deckFoot: "SDE Universes · sdeuniverses.com",
     bMem: "⌾ 记忆", memTitle: "全局记忆 · 我的历史对话",
     memHd: "本机共 <b>{n}</b> 场对话（含其它 WDS 智能体），已炼出 <b>{m}</b> 条记忆，待更新 <b>{p}</b> 场",
@@ -515,6 +516,7 @@
     kDeck: "Slide deck", kDeckS: "Turn this chat into a deck — download as .pptx",
     dPptx: "⤓ Save as .pptx", dPptxWait: "Building .pptx…", dPptxNo: "This draft has no slides to cut (needs ## titles and - bullets)",
     dPptxOk: "Deck ready · slides ",
+    dEmptyHint: "Either this chat is too long for the input window, or the model spent its budget on thinking. Try the standard tier, or a fresh chat.",
     deckFoot: "SDE Universes · sdeuniverses.com",
     bMem: "⌾ Memory", memTitle: "Global memory · your past chats",
     memHd: "<b>{n}</b> chats on this device (all WDS agents), <b>{m}</b> distilled, <b>{p}</b> pending",
@@ -2363,6 +2365,7 @@
       if (stBtn && stBtn.parentNode) stBtn.parentNode.removeChild(stBtn);   // 写完了就没有可停的了
       if (dStopped && text) dNote(t("stopped"));
       out.innerHTML = text ? mdRender(text) : esc(t("dEmpty"));
+      if (!text) dNote(t("dEmptyHint"), 1);          // 空产出必须给个下一步，不能只说"没有内容"
       if (text) autoLink(out, text);            // 成文里提到的站内篇目同样挂链接
       if (text && kind === "deck") deckPrep(text, function () {});   // 稿子写完就把配图取回来
       stat.textContent = text ? (t("dDone") + text.length) : t("dFail");
