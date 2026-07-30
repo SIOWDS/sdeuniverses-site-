@@ -559,6 +559,9 @@
     /* ── 侧栏 ── */
     ".wdsm-side{flex:none;width:262px;background:var(--wside);border-right:1px solid var(--wline);display:flex;flex-direction:column;transition:width .18s ease}" +
     ".wdsm-layer.fold .wdsm-side{width:0;overflow:hidden;border-right:none}" +
+    /* 收回之后必须还能回来：« 长在侧栏里，侧栏一收它跟着没；
+       所以折叠态把顶栏的 ☰ 放出来当唯一的回程票。宽屏原本 display:none。 */
+    ".wdsm-layer.fold .wdsm-burger{display:block}" +
     ".wdsm-sbrand{flex:none;display:flex;align-items:center;gap:8px;padding:14px 12px 10px 16px}" +
     ".wdsm-sbrand a{font:700 12.5px/1 inherit;letter-spacing:1.2px;color:var(--wgold);text-decoration:none;white-space:nowrap}" +
     ".wdsm-fold{margin-left:auto;background:none;border:none;color:var(--wdim);font-size:15px;cursor:pointer;padding:4px 6px;border-radius:6px;line-height:1}" +
@@ -2789,7 +2792,12 @@
   var foldBtn = layer.querySelector(".wdsm-fold");
   if (foldBtn) foldBtn.onclick = foldToggle;
   var burger = layer.querySelector(".wdsm-burger");
-  if (burger) burger.onclick = function () { drawer(!layer.classList.contains("draw")); };
+  if (burger) burger.onclick = function () {
+    // 宽屏折叠态：☰ 是把侧栏收回来的那个键（drawer 的 .draw 规则只在 ≤900px 生效，
+    // 宽屏上点它等于什么都没发生 —— 那正是读者「点了缩回就再也回不来」的成因）。
+    if (!narrow() && layer.classList.contains("fold")) { foldSet(false); return; }
+    drawer(!layer.classList.contains("draw"));
+  };
 
   /* 侧栏底部三个入口 */
   layer.querySelectorAll(".wdsm-sb").forEach(function (b) {

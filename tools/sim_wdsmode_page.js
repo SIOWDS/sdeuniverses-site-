@@ -141,6 +141,13 @@ T('返回浏览=history.back', e3.navigated==='BACK');
   T("拿不到模块时退回普通下载，读者不空手", dec.includes('if (!A || !A.supported()) { say(t("dDirNoApi")); download(name, text); return; }'));
   T("导出本场对话也走同一个目录", dec.includes("function exportSession") && dec.includes('saveToDir("WDS-" + safeName(t("convoTitle"))'));
   T("菜单动作有浮动提示条（菜单里没有状态栏可写）", dec.includes("wdsm-toast") && dec.includes("function toast(msg)"));
+  // ── 侧栏「收回」必须有回程票（2026-07-30 线上读者反馈：点了 « 就再也回不来）──
+  // « 长在 .wdsm-side 内部，而 .fold 把侧栏压成 width:0;overflow:hidden，按钮跟着一起消失；
+  // 顶栏的 ☰ 原本只在 ≤900px 显示，宽屏上等于没有出口，且 fold 态写进 localStorage 会跨刷新留存。
+  T("折叠时顶栏 ☰ 会露出来当出口", dec.includes(".wdsm-layer.fold .wdsm-burger{display:block}"));
+  T("宽屏折叠态点 ☰ 是展开侧栏，不是去切窄屏抽屉", dec.includes('if (!narrow() && layer.classList.contains("fold")) { foldSet(false); return; }'));
+  T("折叠仍然会被记住（不是靠不记状态绕过去的）", dec.includes("localStorage.setItem(LS_FOLD"));
+  T("收起按钮确实在侧栏内部，所以出口不能只有它", dec.includes("wdsm-sbrand") && dec.includes("wdsm-fold"));
   T("中英两套文案都齐（dDir/dDirPick/dDirNoApi/dDirDenied）", ["dDir:", "dDirPick:", "dDirNoApi:", "dDirDenied:", "dDirSaved:"].every(function (k) { return (dec.split(k).length - 1) >= 2; }));
 }
 
