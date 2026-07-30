@@ -182,7 +182,9 @@ const WS = (() => {
 console.log("── 十一 · 成文（distill）：整场可见 + 时钟 + 断流保稿");
 {
   ok(!/b\.history\.slice\(-40\)/.test(DIST), "不再只吃最近 40 条");
-  ok(/readConvoText\(turns, DISTILL_CONVO_MAX\)/.test(DIST), "改用 readConvoText（保头 35%＋保尾＋明标省略），不再自写一套截断");
+  // 上限已改成按输出预算动态算（让 Max 真有地方可用），但仍是 readConvoText 那一套裁法
+  ok(/readConvoText\(turns, convoMax\)/.test(DIST) && /convoMax = Math\.max\(20000/.test(DIST),
+     "仍用 readConvoText（保头 35%＋保尾＋明标省略），且上限随输出预算动态算");
   ok(/DISTILL_CONVO_MAX = 100000/.test(wk), "成文能看的对话原文提到 10 万字符（原 4 万且从中间断掉）");
   ok(/const clk = wdsClock\(DISTILL_FIRST_MS, DISTILL_TOTAL_MS\)/.test(DIST), "成文戴上时钟（此前是唯一没戴的 WDS 路由）");
   ok(/wdsFetchMax\(VC, KEY, messages, true, SPEC\.tok, clk\.signal\)/.test(DIST) && /clk\.firstFrame\(\)/.test(DIST) && /clk\.stop\(\)/.test(DIST),
@@ -231,7 +233,8 @@ console.log("── 十四 · 客户端：成文说明与稿互不覆盖、看�
   ok(!/前端拼会被 q 的 800 字钳位吃掉）。 \*\//.test(wm), "那条 800 字的过期注释已改准");
   ok(/WDS_CHAT_Q_MAX=20000/.test(wm), "注释里写的是现行上限");
   // 版本戳只能往前：断言认"今天的、比 e 更新的"，别把具体字母写死（今天已经 d→e→f 三次）
-  ok(/wds-mode\.js\?v=2026073[0-9]([f-z])/.test(shell), "版本戳再 bump（本轮又动了 wds-mode.js）");
+  // 已跨到 0731，判据放宽成"今年七月底之后的任一戳"，别再钉死日期与字母
+  ok(/wds-mode\.js\?v=20260[78]\d\d[a-z]/.test(shell), "版本戳再 bump（本轮又动了 wds-mode.js）");
 }
 
 console.log("── 十四点五 · 追问建议改成六路径引导");

@@ -2364,10 +2364,13 @@
     var text = "", dr = null, lastP = 0, dnote = null, dWd = null, dTimedOut = false;
     /* 说明行挂在正文之外：出错或断流时不再把已写出的稿抹掉，稿也不再把说明抹掉
        （原来两者写在同一个容器里，谁后到谁赢，两样都可能丢）。 */
+    // **追加**不是覆盖：一次成文可能有好几条说明（截断告知／空产出诊断／断流保稿），
+    // 早先写成覆盖，结果服务端那条最要紧的诊断被客户端的兜底提示盖掉，读者只看到"两种可能…"。
     function dNote(msg, bad) {
       if (!dnote) { dnote = el("div"); cbox.appendChild(dnote); }
-      dnote.textContent = String(msg || "");
-      dnote.style.cssText = "font-size:12.5px;line-height:1.6;margin:10px 0 0;color:" + (bad ? "#E8A8A0" : "#8B7B5E");
+      var line = el("div", null, String(msg || ""));
+      line.style.cssText = "font-size:12.5px;line-height:1.6;margin:10px 0 0;color:" + (bad ? "#E8A8A0" : "#8B7B5E");
+      dnote.appendChild(line);
     }
     // 看门狗：成文这条流原来客户端一个超时都没有，服务端也没戴时钟（今天补上了）——
     // 两头都不设时限时，流被无声掐断就只剩一个永远转着的光标。

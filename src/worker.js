@@ -4280,7 +4280,6 @@ export default {
       // 把对话码成给基底看的材料。只带文本、不带任何身份信息。
       // 用 readConvoText（与《问对WDS》同一套）：超长时保开头 35% + 保结尾 + 中间明标省略多少字，
       // 而不是原来的"只带最近 40 条、拼到 4 万字符就 break"——那样成文只看得见尾巴，且省略不说一声。
-      const convo = readConvoText(turns, DISTILL_CONVO_MAX);
       const SPEC = {
         report: { name: "对话报告", tok: 24000, spec:
           "把这场对话整理成一份【对话报告】。结构：\n"
@@ -4357,6 +4356,13 @@ export default {
           + "④ 全篇最脆的一环在哪，怎么补。\n"
           + "用 Markdown。只给提纲，不要写正文。" },
       }[kind];
+      // 【入参预算】给输出留够位置：上下文窗要同时装下 system＋对话原文＋输出。
+      // 口径：总窗按 12 万字符算，先扣掉这一档的输出预算，再留 1.2 万给 system，剩下的才是对话能占的。
+      // 下限 2 万——再少就等于没看这场对话；上限仍是 DISTILL_CONVO_MAX。
+      const convoMax = Math.max(20000, Math.min(DISTILL_CONVO_MAX, 120000 - SPEC.tok - 12000));
+      const convoFull = readConvoText(turns, 10000000);          // 先看看这一场到底多长
+      const convo = convoFull.length > convoMax ? readConvoText(turns, convoMax) : convoFull;
+      const convoCut = convoFull.length - convo.length;
 
       const stream = new ReadableStream({
         async start(controller) {
@@ -4364,6 +4370,8 @@ export default {
           const fin = () => { if (_hb) clearInterval(_hb); try { controller.enqueue(_ENC.encode("data: [DONE]\n\n")); controller.close(); } catch (e) {} };
           const _st = { t0: Date.now(), think: 0, out: 0, stage: "准备" };
           _hb = wdsBeat(controller, _st);
+          if (convoCut > 0) controller.enqueue(_sseBytes({ t: "note", v: "这一场很长（" + convoFull.length + " 字）：为了给" + SPEC.name
+            + "留出满额的写作预算，只带了 " + convo.length + " 字进去（保开头与结尾，中间已明标省略）。" }));
           try {
             let reflect = ""; try { reflect = await ensureReflect(env, url, rvendor, VC, KEY); } catch (e) {}
             _st.stage = SPEC.name;
@@ -4433,7 +4441,7 @@ export default {
             //    原来只回一句"没有产出内容"，读者不知道发生了什么、我方也查不出。
             //    现在：说清怎么空的，并**自动降档重试一次**（关掉思考、预算减半），只重试一次。
             if (!wrote) {
-              controller.enqueue(_sseBytes({ t: "note", v: "第一遍顶配预算 " + SPEC.tok + " 全用在思考上了（思考 " + _st.think + " 字、正文 0 字），正在关掉思考重来一次…" }));
+              controller.enqueue(_sseBytes({ t: "note", v: "第一遍没写出正文：预算 " + SPEC.tok + "、思考 " + _st.think + " 字、正文 0 字；入参 system " + sys.length + " 字 ＋ 对话 " + convo.length + " 字。正在关掉思考重来一次…" }));
               _st.stage = SPEC.name + "·重试";
               const clk2 = wdsClock(DISTILL_FIRST_MS, DISTILL_TOTAL_MS);
               try {

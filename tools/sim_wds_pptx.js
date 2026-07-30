@@ -460,6 +460,25 @@ console.log("── 四点〇五 · 美的九宫格 ＋ 迭代循环装配");
   ok(/这是第二轮：上一稿已按「美的九宫格」验过/.test(wk) && /别推倒重来/.test(wk), "第二轮只照单修，不推倒重来");
 }
 
+console.log("── 四点四 · 让 Max 真有地方可用（第二次空产出抓到的）");
+{
+  const DIST = wk.slice(wk.indexOf('url.pathname === "/api/wds/distill"'), wk.indexOf('url.pathname === "/api/chat/clear"'));
+  ok(/const convoMax = Math\.max\(20000, Math\.min\(DISTILL_CONVO_MAX, 120000 - SPEC\.tok - 12000\)\)/.test(DIST),
+     "对话原文的上限按输出预算算——输出占 6.4 万，输入就必须让位");
+  ok(/const convoFull = readConvoText\(turns, 10000000\)/.test(DIST), "先量这一场到底多长，再决定裁不裁");
+  ok(/convoCut > 0/.test(DIST) && /只带了 " \+ convo\.length/.test(DIST), "真裁了就告诉读者这份稿子是照着多少字写的");
+  ok(/入参 system " \+ sys\.length/.test(DIST) && /对话 " \+ convo\.length/.test(DIST),
+     "空产出的诊断把入参也报出来（预算/思考/正文/system/对话，五个数一次给全）");
+  // 预算算术：四档都要留得下输出
+  const calc = (tok) => Math.max(20000, Math.min(100000, 120000 - tok - 12000));
+  ok(calc(64000) === 44000, "PPT 档：输出 64000 → 对话最多 44000 字");
+  ok(calc(16000) === 92000, "提纲档：输出小 → 对话可以带得多");
+  ok(calc(200000) === 20000, "极端情况下也有下限，不会算成负数");
+  // 客户端：多条说明必须都看得见
+  ok(/dnote\.appendChild\(line\)/.test(wm), "dNote 改成追加——覆盖会把服务端那条诊断盖掉（这次就是这么丢的）");
+  ok(!/dnote\.textContent = String\(msg/.test(wm), "旧的覆盖写法已去掉");
+}
+
 console.log("── 四点二 · 首次真跑抓到的：多条成对页要走对照卡");
 {
   const t = (title, bs) => X.pickLayout({ title: title, bullets: bs, notes: "", kind: "content" }, 4, 9);
@@ -505,7 +524,7 @@ console.log("── 四点五 · 空产出不许闷着（2026-07-30 实测撞上
   ok(/if \(a >= 16000\) return \[a, Math\.min\(32000, a\), Math\.min\(16000, a\)\]/.test(wk), "长文档档有自己的降档阶梯（不再退到 6000 那种答话口径）");
   ok(/report: \{ name: "对话报告", tok: 24000/.test(wk) && /essay: \{ name: "提炼成文", tok: 32000/.test(wk) && /outline: \{ name: "写作提纲", tok: 16000/.test(wk), "报告/成文/提纲三档也一并提到长文档区间");
   ok(/const messages = \[/.test(DIST), "messages 抽成变量——两遍必须喂同一件事");
-  ok(/if \(!wrote\) \{[\s\S]{0,400}全用在思考上了/.test(DIST), "空产出时说清怎么空的（思考几字、正文 0 字）");
+  ok(/if \(!wrote\) \{[\s\S]{0,400}第一遍没写出正文/.test(DIST), "空产出时说清怎么空的（预算/思考/正文/入参五个数）");
   ok(/关掉思考重来一次/.test(DIST) && /max_tokens: Math\.min\(32000, Math\.round\(SPEC\.tok \/ 2\)\)/.test(DIST), "自动降档重试一次：关思考、预算减半且钳在 32000");
   ok(/刻意不走 wdsTopBody/.test(DIST), "重试那一遍不套满功率（否则又把预算烧在思考上）");
   ok(/两遍都没写出正文/.test(DIST), "两遍都空也要给下一步，不许闷着");
