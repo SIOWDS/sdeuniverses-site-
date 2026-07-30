@@ -144,8 +144,17 @@ a{color:var(--disc)}
     <div class="view on" id="v-gate">
       <div id="gate">
         <h2>SDE 微信</h2>
-        <p>站内的纯文字聊天系统：群聊、一对一私聊、通讯录、建群、群公告、@提及、引用回复、未读提醒。用 Google 账号登录即用，无需安装。</p>
+        <p>站内的纯文字聊天系统：群聊、一对一私聊、通讯录、建群、群公告、@提及、引用回复、未读提醒。用 Google 账号登录即用；打不开 Google 的可用站内口令进入，无需安装。</p>
         <div id="gsi"></div>
+        <div id="pwbox" style="margin-top:14px;padding-top:14px;border-top:1px solid var(--line,#e5e5e5)">
+          <p style="font-size:0.8rem;color:var(--muted);margin:0 0 8px">打不开 Google 登录的，用站内口令进入：</p>
+          <input id="pw-name" maxlength="20" placeholder="你的名字（群里显示这个）" autocomplete="off"
+                 style="width:100%;box-sizing:border-box;padding:9px 11px;margin-bottom:7px;border:1px solid var(--line,#ddd);border-radius:8px;font-size:0.95rem">
+          <input id="pw-code" type="password" maxlength="60" placeholder="口令" autocomplete="off"
+                 style="width:100%;box-sizing:border-box;padding:9px 11px;margin-bottom:7px;border:1px solid var(--line,#ddd);border-radius:8px;font-size:0.95rem">
+          <button id="pw-go" class="btn" style="width:100%">进入</button>
+          <div id="pw-msg" style="font-size:0.8rem;color:#b3261e;margin-top:7px;min-height:1em"></div>
+        </div>
         <p style="font-size:0.78rem;color:var(--muted)">群与私聊都只有成员看得见——外人打不开。</p>
       </div>
     </div>
@@ -313,8 +322,25 @@ function bootGsi(){
   google.accounts.id.initialize({client_id:GCID,callback:window.__sdeWxCb,auto_select:true});
   google.accounts.id.renderButton(el("gsi"),{theme:"outline",size:"large",text:"signin_with",shape:"pill"});
 }
+function pwLogin(){
+  var nm=(el("pw-name").value||"").trim().slice(0,20), pw=(el("pw-code").value||"");
+  var m=el("pw-msg");
+  if(!nm){m.textContent="先起个名字。";return;}
+  if(!pw){m.textContent="请输入口令。";return;}
+  m.style.color="var(--muted)";m.textContent="正在进入…";
+  var c="sdepw1:"+pw+":"+nm;
+  var prev=CRED; CRED=c;
+  api("contacts").then(function(x){
+    if(x.s===401||!x.d||!x.d.ok){CRED=prev;m.style.color="#b3261e";m.textContent="口令不对，或名字不可用。";return;}
+    try{sessionStorage.setItem("sde_gauth",JSON.stringify({cred:c,name:nm,exp:Date.now()+12*60*60*1000}));}catch(e){}
+    el("pw-code").value="";m.textContent="";afterLogin();
+  }).catch(function(){CRED=prev;m.style.color="#b3261e";m.textContent="网络异常，请重试。";});
+}
 function logout(){CRED="";ME=null;try{sessionStorage.removeItem("sde_gauth")}catch(e){}closeTalk();show("gate");}
 el("b-out").onclick=logout;
+el("pw-go").onclick=pwLogin;
+el("pw-code").addEventListener("keydown",function(e){if(e.key==="Enter")pwLogin();});
+el("pw-name").addEventListener("keydown",function(e){if(e.key==="Enter")el("pw-code").focus();});
 function afterLogin(){
   api("contacts").then(function(x){
     if(x.s===401||!x.d||!x.d.ok){logout();return;}
