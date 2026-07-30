@@ -1,0 +1,53 @@
+<!DOCTYPE html><html lang="zh"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>结构生物学与蛋白折叠 · 新思想前沿 | SDE Universes</title>
+<meta name="description" content="这十年结构生物学的思想转向：从逐个实验测定到 AlphaFold 从序列学出结构、AlphaFold3 生成式全原子建模与蛋白设计，2024 诺贝尔化学奖。">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Noto+Serif+SC:wght@300;400;500;600&display=swap">
+<style>
+:root{--bg:#F5EFE0;--card:#FAF6EC;--gold:#8A6817;--gold2:#A88233;--text:#2A2315;--text2:#6B5D47;--muted:#98886C;--border:rgba(138,104,23,0.22)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'Noto Serif SC',Georgia,serif;line-height:1.9;-webkit-font-smoothing:antialiased}
+.top{max-width:760px;margin:0 auto;padding:1.4rem 1.5rem 0;font-size:.86rem}
+.top a{color:var(--gold);text-decoration:none;font-weight:600}.top a:hover{text-decoration:underline}
+.top .sep{color:var(--muted);margin:0 .5rem}
+main{max-width:760px;margin:0 auto;padding:1.5rem 1.5rem 4rem}
+.kicker{font-size:.82rem;letter-spacing:.18em;color:var(--gold2);font-weight:600;margin-bottom:.9rem}
+h1{font-size:2rem;line-height:1.3;font-weight:700;margin-bottom:.7rem;letter-spacing:.01em}
+.meta{font-size:.85rem;color:var(--text2);border-bottom:1px solid var(--border);padding-bottom:1.1rem;margin-bottom:1.6rem}
+.lede{font-size:1.12rem;color:var(--text);font-weight:500;margin-bottom:1.5rem}
+h2{font-size:1.18rem;font-weight:600;color:var(--gold);margin:1.9rem 0 .6rem}
+p{margin:0 0 1.1rem;text-align:justify}
+.end{margin-top:2rem;padding-top:1.2rem;border-top:1px solid var(--border);font-size:.86rem;color:var(--muted)}
+.end b{color:var(--text2)}
+</style></head><body>
+<div class="top"><a href="/">SDE Universes</a><span class="sep">·</span><a href="/frontier/">新思想前沿</a><span class="sep">›</span><span style="color:var(--text2)">生命科学</span></div>
+<main>
+<div class="kicker">新思想前沿 · 生命科学</div>
+<h1>结构生物学与蛋白折叠</h1>
+<div class="meta">近十年最新思想摘要 · 约 1800 字 · 王德生 亲撰 · 2026 年 7 月</div>
+<p class="lede">这十年结构生物学最大的新思想，是把一个困了半个世纪的难题——给定氨基酸序列、预测蛋白质会折叠成什么三维形状——从一个靠实验一个个测的苦活，变成一个由数据学出来、可预测、且可反向设计的映射。2024 年诺贝尔化学奖为这次转向盖了章。</p>
+<h2>一、折叠问题：半个世纪的大挑战</h2>
+<p>蛋白质的功能由它的三维结构决定，而结构又由一维的氨基酸序列决定——这是安芬森半个世纪前立下的原则。可是从序列反推结构，在计算上是天文级的难题：列文塔尔早就指出，一条链可能的折叠构象多到穷举需要超过宇宙年龄，蛋白却能在毫秒内折好。</p>
+<p>几十年里，人们只能靠 X 射线晶体学、核磁共振、以及近十年分辨率革命后的冷冻电镜，一个一个地把结构测出来，慢而且贵。于是已知序列的数量以指数速度甩开已知结构；衡量预测水平的 CASP 双年赛，几十年里进展缓慢，一度让人怀疑这个问题是否可解。</p>
+<h2>二、AlphaFold2：近实验精度的一跃</h2>
+<p>转折发生在 2020 年的 CASP14：DeepMind 的 AlphaFold2 把预测精度推到接近实验水平，主链误差约一埃（原子尺度），全局评分中位数越过 90 分，等于宣告单链蛋白的折叠问题被实质解决。</p>
+<p>它的关键不在于套用某条物理定律，而是用一套注意力架构（Evoformer 与结构模块），把同源序列的多序列比对里蕴含的进化共变信息，与残基两两之间的几何关系耦合起来、端到端地学习——让数据里隐含的物理自己浮现。Meta 随后用纯语言模型的 ESMFold 给出另一条更快的路，印证了这一范式的普遍性。</p>
+<h2>三、把结构变成免费的公共基础设施</h2>
+<p>紧接着，AlphaFold 蛋白结构数据库（AFDB）一次性放出两亿多个蛋白的预测结构，几乎覆盖了已知蛋白的全域，并与 UniProt 等资源交叉引用、嵌进生物学家日常使用的数据流。</p>
+<p>结构由此从一种要专门去测的稀缺资源，变成像序列一样随手可查的公共知识。对整个生物学的日常研究——功能注释、酶机制、抗药性、进化分析——这种可及性的改变，比任何一次夺冠都更深远。</p>
+<h2>四、从预测到设计：被 AI 加速的另一半</h2>
+<p>诺奖的另一半给了戴维·贝克的计算蛋白设计。这一支不是预测天然蛋白，而是反过来——从想要的功能出发，设计自然界并不存在的新蛋白。</p>
+<p>近几年，Baker 团队把生成式方法（如基于扩散的 RFdiffusion）引入设计，能按需造出结合特定靶点的全新结合蛋白、酶与疫苗骨架，成功率大幅提升。读结构与写结构，从此是同一件事的两面：既能问一条序列会折成什么，也能问想要某个形状该用什么序列。</p>
+<h2>五、AlphaFold3：从单链到一团原子</h2>
+<p>2024 年 5 月的 AlphaFold3 换了引擎：改用扩散模型，把蛋白、DNA、RNA、小分子配体、离子统统当作一团不同类型的原子来生成，因而能预测蛋白与药物、蛋白与核酸的复合体——直接对准了药物发现，并与 Isomorphic Labs 一起走向制药。</p>
+<p>有意思的是，据参与最初 AlphaFold 的研究者评价，AF3 在纯粹的蛋白折叠上相比 AF2 提升有限，真正的跃迁在于用一套统一的生成式框架处理任意生物分子的相互作用——它把结构预测和分子设计接进了同一个思路里。</p>
+<h2>六、诺奖及其含义</h2>
+<p>2024 年诺贝尔化学奖授予哈萨比斯、江珀（AlphaFold）与贝克（蛋白设计）。这是由人工智能驱动的科学突破第一次拿到诺奖，标志计算生物学进入一个新纪元，也回答了一个被称作生物化学几十年大挑战的问题——在氨基酸序列与三维结构、进而与功能之间，双向的桥第一次被搭起来。</p>
+<h2>七、边界与争议</h2>
+<p>须如实划界：AlphaFold 擅长给出静态的、单一的结构，对蛋白的构象动态与多态、内在无序蛋白、点突变的功能效应、以及缺乏同源序列的孤儿蛋白，仍力有不逮；它给的是一张最可能的快照，不是一部电影。</p>
+<p>AF3 一度收紧开放——代码限非商用、训练权重需学术申请，引发开放科学之争；而且预测不等于理解，模型给出的坐标仍需实验验证。它交出的是一张几近完整的底图，不是终点。</p>
+<h2>八、一句话</h2>
+<p>蛋白结构从逐个实验测量的稀缺品，变成从序列学出来、既可预测也可反向设计的公共知识；生物学第一次拥有了几乎全部蛋白的三维底图。</p>
+<div class="end"><b>新思想前沿</b> 是一个持续撰写的专栏：近十年，各主要领域最新思想的摘要，每领域约 2000 字，共 100 个学科面板，由王德生亲撰、逐月填充。 · <a href="/frontier/" style="color:var(--gold);text-decoration:none">← 回到 100 学科面板</a></div>
+</main></body></html>

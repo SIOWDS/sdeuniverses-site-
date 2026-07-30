@@ -1,0 +1,50 @@
+<!DOCTYPE html><html lang="zh"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>量子信息与量子计算 · 新思想前沿 | SDE Universes</title>
+<meta name="description" content="这十年量子计算的思想转向：从追求量子优越性，到 2024 年 Google Willow 首次实验跨过纠错阈值——错误随规模下降，通往容错量子计算；及后量子密码。">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Noto+Serif+SC:wght@300;400;500;600&display=swap">
+<style>
+:root{--bg:#F5EFE0;--card:#FAF6EC;--gold:#8A6817;--gold2:#A88233;--text:#2A2315;--text2:#6B5D47;--muted:#98886C;--border:rgba(138,104,23,0.22)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'Noto Serif SC',Georgia,serif;line-height:1.9;-webkit-font-smoothing:antialiased}
+.top{max-width:760px;margin:0 auto;padding:1.4rem 1.5rem 0;font-size:.86rem}
+.top a{color:var(--gold);text-decoration:none;font-weight:600}.top a:hover{text-decoration:underline}
+.top .sep{color:var(--muted);margin:0 .5rem}
+main{max-width:760px;margin:0 auto;padding:1.5rem 1.5rem 4rem}
+.kicker{font-size:.82rem;letter-spacing:.18em;color:var(--gold2);font-weight:600;margin-bottom:.9rem}
+h1{font-size:2rem;line-height:1.3;font-weight:700;margin-bottom:.7rem;letter-spacing:.01em}
+.meta{font-size:.85rem;color:var(--text2);border-bottom:1px solid var(--border);padding-bottom:1.1rem;margin-bottom:1.6rem}
+.lede{font-size:1.12rem;color:var(--text);font-weight:500;margin-bottom:1.5rem}
+h2{font-size:1.18rem;font-weight:600;color:var(--gold);margin:1.9rem 0 .6rem}
+p{margin:0 0 1.1rem;text-align:justify}
+.end{margin-top:2rem;padding-top:1.2rem;border-top:1px solid var(--border);font-size:.86rem;color:var(--muted)}
+.end b{color:var(--text2)}
+</style></head><body>
+<div class="top"><a href="/">SDE Universes</a><span class="sep">·</span><a href="/frontier/">新思想前沿</a><span class="sep">›</span><span style="color:var(--text2)">物理学</span></div>
+<main>
+<div class="kicker">新思想前沿 · 物理学</div>
+<h1>量子信息与量子计算</h1>
+<div class="meta">近十年最新思想摘要 · 约 1700 字 · 王德生 亲撰 · 2026 年 7 月</div>
+<p class="lede">这十年量子计算最重要的思想转向，不是造出更多量子比特，而是跨过一道二十多年前只在纸面上证明的门槛：让错误随着规模增大而下降，而不是上升。2024 年底，这道纠错阈值第一次被实验跨过——通往容错量子计算机的路，从理论变成了工程。</p>
+<h2>一、承诺与诅咒：量子比特的脆弱</h2>
+<p>量子计算的威力来自叠加与纠缠：肖尔算法能对大数分解给出指数级加速（直接威胁现行密码），格罗弗搜索给出平方级加速，量子模拟则可能算清经典计算机算不动的分子与材料。</p>
+<p>但量子态极其脆弱，稍受环境扰动就退相干、出错。过去二十年，领域停在含噪中等规模（NISQ）阶段——能做几十上百个比特的演示，但错误随比特和门操作增多而累积，跑不了有深度的长算法。这是量子计算的承诺，也是它的诅咒。</p>
+<h2>二、2019 的量子优越性及其争议</h2>
+<p>2019 年，谷歌的 Sycamore 在随机线路采样这一刻意挑选、便于展示量子优势的任务上，几分钟做完据称经典超算要上万年的计算，首次宣称量子优越性。</p>
+<p>但那是一个没有实用价值的基准，而且经典算法与超算随后不断反扑、把差距一再拉回。它证明的是原理上量子确实能做经典难做的事，却不是一台有用的机器——真正的门槛不在这里。</p>
+<h2>三、纠错阈值：纸上二十年的定理</h2>
+<p>早在 1990 年代，人们就证明了量子纠错的思路：把许多脆弱的物理比特按纠错码编织成一个受保护的逻辑比特，只要单个物理比特的错误率低于某个临界阈值，逻辑错误率就会随编码规模指数下降。这就是容错量子计算的理论地基。</p>
+<p>可问题是，此后二十多年，谁也没能在真机上做到低于阈值——现实里往往是：你多加进来的比特带来的新错误，比纠错省下的还多，于是越做越糟。理论上的那条向下的曲线，迟迟没在实验里出现。</p>
+<h2>四、Willow：阈值第一次被跨过</h2>
+<p>2024 年 12 月，谷歌的 Willow 芯片（约 105 个超导比特）首次实验演示了低于阈值：当表面码的距离从 3 增到 5 再到 7（即用越来越多物理比特护住一个逻辑比特），逻辑错误率每加大一档就约减半（抑制因子约 2.14），并首次超过盈亏平衡——受保护的逻辑比特寿命，超过了芯片上最好的那个裸物理比特。</p>
+<p>它还实现了必须实时跟上芯片纠错节拍的解码器（延迟约几十微秒）。附带的随机线路采样跑分（五分钟对经典机的天文年）只是花絮；真正的里程碑，是那条越大越准、方向朝下的错误曲线——它把容错从纸上定理变成了工程事实。</p>
+<h2>五、群雄与多条技术路线</h2>
+<p>超导路线（谷歌 Willow、IBM 的路线图）之外，还有离子阱（保真度高、已演示多个逻辑比特的运算）、可用光镊阵列灵活重构的中性原子、可室温运行的光子、以及用连续变量编码的玻色子比特等多条路线在竞速；DeepMind 甚至用神经网络来当纠错解码器。多方竞争把整条技术栈一起往前推。</p>
+<p>但须清醒：跨过阈值不等于已有可用的机器。要跑肖尔算法破解真正的密码，估计需要上百万个物理比特协同纠错，距离今天仍隔着数量级的硬仗。</p>
+<h2>六、另一面：后量子密码</h2>
+<p>因为肖尔算法一旦跑在足够大的容错机上，就能击破现行的公钥密码体系，防御侧不得不同步展开：2024 年，美国 NIST 正式发布首批后量子密码标准，全球开始在先存后解（今天截获、将来解密）的威胁下迁移到抗量子的算法。这是量子威胁倒逼出的、此刻就在进行的现实工程。</p>
+<h2>七、一句话</h2>
+<p>量子计算的新思想，是把证明能算得比经典快的执念，换成证明错误能随规模下降；跨过纠错阈值之后，问题从量子有没有优越性，变成什么时候造出第一台真正有用的容错机。</p>
+<div class="end"><b>新思想前沿</b> 是一个持续撰写的专栏：近十年，各主要领域最新思想的摘要，每领域约 2000 字，共 100 个学科面板，由王德生亲撰、逐月填充。 · <a href="/frontier/" style="color:var(--gold);text-decoration:none">← 回到 100 学科面板</a></div>
+</main></body></html>
