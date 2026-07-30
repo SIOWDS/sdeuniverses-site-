@@ -131,5 +131,51 @@ console.log("\n[五] 二次提智：命名之后再查一次（这一步是整�
   ok(/新命名「/.test(g2), "状态栏说清是哪个命名、还差几篇没交代");
 }
 
+console.log("\n[六] 跨学科闸（当天全部扣分的大头：对手几乎全在本领域内部）");
+{
+  const ga = H.indexOf("function nbrCrossOK(text){"), gb = H.indexOf("\nfunction nbrSectionOK", ga);
+  const ta = H.indexOf("function nbrDiscTags(seg){"), tb = H.indexOf("\n}", ta) + 2;
+  const hintLine = H.slice(H.indexOf("const DISC_HINTS ="), H.indexOf("\n// nbrDiscTags"));
+  const box = (function(){ const m={exports:{}};
+    new Function("module", hintLine + "\n" + H.slice(ta,tb) + "\n" + H.slice(ga,gb) + "\nmodule.exports={nbrDiscTags,nbrCrossOK};")(m);
+    return m.exports; })();
+  const { nbrDiscTags, nbrCrossOK } = box;
+
+  const S = (own, tags) => "五、近邻检测\n本文所属学科：" + own + "\n"
+    + tags.map((t,i)=>"其"+(i+1)+"，（Foo, 19"+(70+i)+"，《书》）（学科："+t+"）……若观察到 X 则本文错。").join("\n");
+
+  ok(nbrCrossOK(S("社会学", ["社会学","社会学","社会学"])) === false,
+     "三个标注全是本文学科 → 不通过（这正是要抓的那种：只在自家门内找对手）");
+  ok(nbrCrossOK(S("社会学", ["社会学","社会心理学","组织行为学"])) === true, "标注里有多个不同学科 → 通过");
+  ok(nbrCrossOK(S("法学", ["教育心理学","教育心理学","教育心理学"])) === true,
+     "三个同一学科、但与本文学科不同 → 也算跨出去了");
+  ok(nbrCrossOK("一、引论\n二、机制") === null, "没有近邻一节 → null（交给另一道闸管，不在这里重复报错）");
+  ok(nbrCrossOK("五、近邻检测\n与福柯不同……与布迪厄不同……与拉图尔不同……") === null,
+     "缺标注又一个学科名都没提到 → null 放行，宁可漏查不可乱判");
+  ok(nbrCrossOK("五、近邻检测\n心理学上的自我知觉……社会学的越轨正常化……") === true,
+     "缺标注但提到两个不同学科名 → 兜底推断通过");
+  ok(nbrCrossOK("") === null && typeof nbrCrossOK(null) !== "undefined", "空输入不抛错");
+
+  const d = nbrDiscTags(S("社会学", ["社会学","心理学"]));
+  ok(d.own === "社会学" && d.tags.length === 2, "标注解析：本文学科与各条学科都取到");
+  ok(nbrDiscTags("（学科: 组织行为学 ）").tags[0] === "组织行为学", "半角括号、半角冒号、多余空格都能吃下");
+
+  const specs = ["const PAPER_SPEC_1W = `", "const PAPER_SPEC = `", "const UPLIFT_SPEC = `"];
+  for (const k of specs) {
+    const s2 = H.slice(H.indexOf(k), H.indexOf(k) + 12000);
+    ok(/NBR_DISC_MARK/.test(s2), k.replace(/const | = `/g,"") + "：带 NBR_DISC_MARK（要求可解析的学科标注）");
+    ok(/本文所属学科/.test(s2) && /（学科：/.test(s2), k.replace(/const | = `/g,"") + "：给了固定格式，闸门才有确定判据");
+  }
+  const g3 = H.slice(H.indexOf("// 第三关（跨学科）"), H.indexOf("const fixSink"));
+  // 断言必须钉在 _needFix 那一行上：_cross === false 也出现在状态栏的三元里，
+  // 只查"整段有没有这串字"的话，把它从 _needFix 里删掉照样能通过——那就是一条假断言。
+  const needFixLine = (H.match(/const _needFix = [^;]*;/) || [""])[0];
+  ok(/_cross === false/.test(needFixLine), "第三关真的接进了 _needFix 那一行（而不是只出现在状态栏里）");
+  ok(/看不出学科时返回 null，一律放行/.test(g3), "注释写明 null 放行的取舍");
+  ok(/全在同一学科内/.test(g3), "状态栏告诉用户是哪一关没过");
+  const fx2 = H.slice(H.indexOf("function NBR_FIX_INPUT"), H.indexOf("async function runOnePaper"));
+  ok(/crossFailed/.test(fx2) && /换成真正来自别的学科的对手/.test(fx2), "补节指令在这一关失败时明确要求换一个跨学科对手");
+}
+
 console.log("\n结果：PASS " + P + " · FAIL " + F);
 process.exit(F ? 1 : 0);

@@ -1176,6 +1176,13 @@ const PAPER_SPEC = `
 · 三、这三个近邻里，**至少一个必须来自问题所在领域之外的学科**。原因很实在：
   同一个机制常常在别的学科里已经被人用别的名字研究了几十年，而领域内的对手往往离得更远。
   只在本领域内找对手，是这类论文最常见也最致命的漏洞。
+  【格式硬要求 · NBR_DISC_MARK】这一节开头先写一行「本文所属学科：XXX」；
+  随后每个库外近邻的出处后面，紧跟一个学科标注，格式就是「（学科：XXX）」——
+  例如"（Bem, 1972，《自我知觉理论》）（学科：社会心理学）"。学科名写通行的学科名
+  （社会学／心理学／人类学／经济学／管理学／法学／哲学／历史学／教育学／生理学／临床医学／
+  组织行为学／科学社会学／语言学／政治学／计算机科学……），不要写成研究主题。
+  这个标注不是排版要求，是给你自己的一道自查：三个标注若全和「本文所属学科」相同，
+  说明你只在自家门内找了对手，请把其中至少一个换成真正跨学科的近邻。
 
 近邻找不到不是本事，是没找够——最像的那几个一定存在。若通篇找不出任何近邻，说明你的命名太模糊，
 先把它收紧到能被对手瞄准的程度。
@@ -1365,6 +1372,13 @@ const PAPER_SPEC_1W = `
 · 三、这三个近邻里，**至少一个必须来自问题所在领域之外的学科**。原因很实在：
   同一个机制常常在别的学科里已经被人用别的名字研究了几十年，而领域内的对手往往离得更远。
   只在本领域内找对手，是这类论文最常见也最致命的漏洞。
+  【格式硬要求 · NBR_DISC_MARK】这一节开头先写一行「本文所属学科：XXX」；
+  随后每个库外近邻的出处后面，紧跟一个学科标注，格式就是「（学科：XXX）」——
+  例如"（Bem, 1972，《自我知觉理论》）（学科：社会心理学）"。学科名写通行的学科名
+  （社会学／心理学／人类学／经济学／管理学／法学／哲学／历史学／教育学／生理学／临床医学／
+  组织行为学／科学社会学／语言学／政治学／计算机科学……），不要写成研究主题。
+  这个标注不是排版要求，是给你自己的一道自查：三个标注若全和「本文所属学科」相同，
+  说明你只在自家门内找了对手，请把其中至少一个换成真正跨学科的近邻。
 
 近邻找不到不是本事，是没找够——最像的那几个一定存在。若通篇找不出任何近邻，说明你的命名太模糊，
 先把它收紧到能被对手瞄准的程度。
@@ -1437,6 +1451,8 @@ const UPLIFT_SPEC = `
 
 · 三、这三个里至少一个来自问题所在领域**之外**的学科。同一个机制常常在别的学科里已被人用别的名字研究了几十年，
   而领域内的对手往往离得更远——只在本领域找对手，是这类论文最常见也最致命的漏洞。
+  【格式硬要求 · NBR_DISC_MARK】本节开头写一行「本文所属学科：XXX」，每个库外近邻的出处后紧跟「（学科：XXX）」。
+  三个标注若全与「本文所属学科」相同，说明你只在自家门内找了对手，至少换一个真正跨学科的近邻进来。
 
 注意：提智把思想做深，但不许把这一节做掉。整篇重写时，这一节要跟着新命名重写，不是把初稿那一节照搬过来。
 `;
@@ -2535,6 +2551,43 @@ function keyForVendor(sel, explicitKey){
 //   只在\"明显没写\"时才触发补写，避免把已经写好的论文反复加尾巴。
 //   ① 得有那一节（标题里带\"近邻\"）；② 该节里至少点到 3 个可指认的对手
 //   （以\"作者+年份\"或\"《作品》\"或\"某某的某概念\"计）；③ 得出现判决性对照预测的字样。
+// ===== 跨学科闸 =====
+// DISC_HINTS：标注缺失时的兜底推断表。故意只放**学科名**，不放研究主题词——
+//   推断错一个学科，闸门就会冤枉一篇好论文，代价比漏查大。
+const DISC_HINTS = ['社会学','心理学','社会心理学','认知心理学','发展心理学','人类学','民族学','经济学','行为经济学',
+  '管理学','组织行为学','法学','法理学','哲学','伦理学','现象学','政治学','历史学','思想史','教育学','语言学',
+  '传播学','新闻学','生理学','病理学','临床医学','流行病学','公共卫生','神经科学','生物学','生态学','营养学',
+  '计算机科学','人工智能','统计学','数学','物理学','工程学','人因工程','科学社会学','知识社会学','宗教学','文学','美学','军事学'];
+// nbrDiscTags：解析该节里的「本文所属学科：X」与各条「（学科：X）」。
+function nbrDiscTags(seg){
+  const s = String(seg||'');
+  const own = (s.match(/本文所属学科\s*[：:]\s*([^\s，。；、（）()\n]{2,12})/) || [])[1] || '';
+  const tags = (s.match(/[（(]\s*学科\s*[：:]\s*([^）)]{2,16})[）)]/g) || [])
+    .map(x => (x.match(/学科\s*[：:]\s*([^）)]{2,16})/) || [])[1] || '')
+    .map(x => x.trim()).filter(Boolean);
+  return { own: own.trim(), tags: tags };
+}
+// nbrCrossOK：三个近邻是不是全挤在同一学科里。
+//   返回 true=通过、false=没通过、null=看不出（缺标注又推断不出）——null 一律放行。
+function nbrCrossOK(text){
+  const t = String(text||'');
+  const m = t.match(/(近邻检测|最近邻[^\n]{0,12}(切割|检测|对质)|近邻切割)[\s\S]{0,6000}/);
+  if(!m) return null;                       // 连那一节都没有，交给 nbrSectionOK 去管
+  const seg = m[0];
+  const d = nbrDiscTags(seg);
+  if(d.tags.length >= 2){
+    const uniq = d.tags.filter((v,i)=>d.tags.indexOf(v)===i);
+    if(uniq.length >= 2) return true;                       // 标注里就有两个以上不同学科
+    if(d.own && uniq[0] && uniq[0] !== d.own) return true;   // 只有一个学科，但与本文学科不同
+    return false;                                           // 三个标注同一个学科 → 只在门内找
+  }
+  // 兜底：没标注，看该节提到几个不同的学科名
+  const found = DISC_HINTS.filter(x => seg.indexOf(x) >= 0);
+  const uniq2 = found.filter((v,i)=>found.indexOf(v)===i);
+  if(uniq2.length >= 2) return true;
+  if(uniq2.length === 0) return null;       // 一个学科名都没提到 → 看不出，不冤枉
+  return d.own ? (uniq2[0] !== d.own ? true : false) : null;
+}
 function nbrSectionOK(text){
   const t = String(text||'');
   const m = t.match(/(近邻检测|最近邻[^\n]{0,12}(切割|检测|对质)|近邻切割)[\s\S]{0,6000}/);
@@ -2577,14 +2630,16 @@ async function nbrPostNameGap(paperText){
   }
   return { name:name, block:blk, missed:missed };
 }
-function NBR_FIX_INPUT(paperText, writeInput, extraBlock){
+function NBR_FIX_INPUT(paperText, writeInput, extraBlock, crossFailed){
   return '你刚写完下面这篇论文，但其中的【近邻检测】一节缺失或不合格。\n'
     + '现在只补写这一节，不要重写论文、不要复述已有内容、不要写任何交代过程的话。\n\n'
     + '这一节必须做到：\n'
     + '· 站内近邻（若下方输入里给了清单）逐条交代：它说到哪一步、你的分离线在哪；划不出就写明重复。\n'
     + '· 库外近邻至少三个，每个给全四件：出处（作者+年份+作品，真实可查，记不准年份就不写年份）／\n'
     + '  它已经说到哪一步／分离线（可操作的判别）／一个判决性对照预测（若观察到 X 则本文错、该近邻足够；若 Y 则本文成立）。\n'
-    + '· 这三个里至少一个来自问题所在领域**之外**的学科。\n\n'
+    + '· 这三个里至少一个来自问题所在领域**之外**的学科。\n'
+    + '· 本节开头写一行「本文所属学科：XXX」，每个库外近邻的出处后紧跟「（学科：XXX）」。\n\n'
+    + (crossFailed ? '【本次特别注意】上一稿的三个近邻全落在同一个学科里——这正是这类论文最常见的漏洞。\n请把其中至少一个换成真正来自别的学科的对手：同一个机制常常在别的学科里已被人用别的名字研究了几十年。\n\n' : '')
     + '直接以一个小节标题开始输出（例如"近邻检测：为什么这个命名不能被现成概念替换"），一千五百字以内。\n\n'
     + (extraBlock ? ('──── 按本文这个新命名重新查到的站内近邻（这几篇正文里没有提到，必须逐条交代）────\n' + extraBlock + '\n\n') : '')
     + '──── 这篇论文的写作输入（含站内近邻清单，若有）────\n' + String(writeInput||'').slice(0,4000)
@@ -2630,15 +2685,18 @@ async function runOnePaper(cfg){
     // 把"稿里根本没提到"的那几篇挑出来。为空则这一关自动通过。
     let _pn = { name:'', block:'', missed:[] };
     try{ _pn = await nbrPostNameGap(paperText); }catch(_){}
-    const _needFix = paperText && (!nbrSectionOK(paperText) || _pn.missed.length > 0);
+    // 第三关（跨学科）：三个近邻全挤在同一学科里 → 不过。看不出学科时返回 null，一律放行。
+    const _cross = nbrCrossOK(paperText);
+    const _needFix = paperText && (!nbrSectionOK(paperText) || _pn.missed.length > 0 || _cross === false);
     if(_needFix){
       setStat(_pn.missed.length ? ('⚖ 新命名「'+_pn.name+'」还有 '+_pn.missed.length+' 篇站内近邻未交代，正在补写…')
-                                : '⚖ 近邻检测未达标，正在补写这一节…');
+              : (_cross === false ? '⚖ 三个近邻全在同一学科内，正在换一个跨学科的对手补写…'
+                                  : '⚖ 近邻检测未达标，正在补写这一节…'));
       const fixSink = document.createElement('div');
       // system 用本阶段自己的规范（cfg.draftPrompt）：提智阶段若拿第一批的规范去补，
       // 补出来的那一节口径与全篇不一致。
       const fixed = await streamChat(cfg.writeKey, cfg.writeSel, (cfg.draftPrompt || paper1wPrompt()),
-        NBR_FIX_INPUT(paperText, cfg.writeInput, (_pn.missed.length ? _pn.block : '')), fixSink, dummy, dummy, 4000);
+        NBR_FIX_INPUT(paperText, cfg.writeInput, (_pn.missed.length ? _pn.block : ''), _cross === false), fixSink, dummy, dummy, 4000);
       const add = (fixed && fixed.text || '').trim();
       if(add && /近邻/.test(add)) paperText = paperText.replace(/\s*$/, '') + '\n\n' + add + '\n';
     }
