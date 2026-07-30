@@ -31,6 +31,40 @@ async function imUid(sub) {
 }
 // 私聊房间号＝dm/<小的uid>-<大的uid>：一对人永远得同一个房间，双方各自算出的完全相同，
 // 无需在服务端另存"会话表"。房间名仍落在 /api/chat 的 room 正则（小写字母数字与连字符）内。
+// ── 口令登录通道（「SDE 微信」专用，Google 之外的第二条门）────────────
+// 大陆学员打不开 Google 登录，故为 IM/聊天另开一条共享口令通道。
+// 口令真值放 Cloudflare 环境变量 IM_PW（Workers → Settings → Variables → Encrypt）。
+// 本仓库是公开仓，源码里只留一个 SHA-256 回退值；一旦设了 IM_PW，回退即整条失效。
+let IM_PW_ENV = "";                 // 每次请求由入口与 DO 构造器写入
+const IM_PW_FALLBACK = "e7f0aafaf35f0764a826b05770742240163e74adbae5e5988f44628711dd50b3";
+async function sha256hex(s) {
+  const b = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(String(s)));
+  return [...new Uint8Array(b)].map((x) => x.toString(16).padStart(2, "0")).join("");
+}
+// 凭证形如 sdepw1:<口令>:<昵称>。昵称在最后，可含冒号。
+// 校验通过后按昵称派生恒定 uid ⇒ 同一昵称每次登录都是通讯录里的同一个人。
+async function verifyPasscode(cred) {
+  if (typeof cred !== "string" || cred.slice(0, 7) !== "sdepw1:" || cred.length > 300) return null;
+  const rest = cred.slice(7);
+  const i = rest.indexOf(":");
+  if (i < 1) return null;
+  const pw = rest.slice(0, i);
+  const name = rest.slice(i + 1).trim().replace(/[\u0000-\u001f]/g, "").slice(0, 20);
+  if (!name) return null;
+  let ok = false;
+  try {
+    if (IM_PW_ENV) ok = (pw === IM_PW_ENV);
+    else ok = ((await sha256hex(pw)) === IM_PW_FALLBACK);
+  } catch (e) { return null; }
+  if (!ok) return null;
+  const uid = await imUid("pw:" + name.toLowerCase());
+  return uid ? { name, uid, pw: true } : null;
+}
+// 聊天面（/api/im、/api/chat、WS、WDS 上传）认这两条门中的任意一条。
+// 注意：/api/comments（文章讨论区）不走这里，仍然只认 Google。
+async function verifyIdent(cred) {
+  return (await verifyPasscode(cred)) || (await verifyGoogleCredential(cred));
+}
 function dmRoomFor(a, b) {
   a = String(a || ""); b = String(b || "");
   if (!/^[0-9a-f]{12}$/.test(a) || !/^[0-9a-f]{12}$/.test(b) || a === b) return "";
@@ -312,7 +346,7 @@ function wdsMode(q) {
   return "clean";
 }
 export class CommentBox {
-  constructor(ctx, env) { this.ctx = ctx; this.env = env; }
+  constructor(ctx, env) { this.ctx = ctx; this.env = env; if (env && env.IM_PW) IM_PW_ENV = String(env.IM_PW); }
   async fetch(request) {
     const _u = new URL(request.url);
     // ===== 实时群聊：WebSocket 升级（观看无需登录，发言需 Google 登录）=====
@@ -351,7 +385,7 @@ export class CommentBox {
       if (request.method === "POST") {
         const body = await request.json().catch(() => null);
         if (!body || !body.data) return Response.json({ ok: false, msg: "请求格式不对。" }, { status: 400 });
-        const who = await verifyGoogleCredential(body.credential);
+        const who = await verifyIdent(body.credential);
         if (!who) return Response.json({ ok: false, msg: "请先用 Google 账号登录后再发图片。" }, { status: 401 });
         const _dmi = dmParties(_u.searchParams.get("room") || "");
         if (_dmi && (!who.uid || _dmi.indexOf(who.uid) < 0)) return Response.json({ ok: false, msg: "你不在这个私聊里。" }, { status: 403 });
@@ -578,7 +612,7 @@ export class CommentBox {
       if (request.method === "POST") {
         const body = await request.json().catch(() => null);
         if (!body) return Response.json({ ok: false, msg: "请求格式不对。" }, { status: 400 });
-        const who = await verifyGoogleCredential(body.credential);
+        const who = await verifyIdent(body.credential);
         if (!who) return Response.json({ ok: false, msg: "请先用 Google 账号登录后再发言。" }, { status: 401 });
         if (_dmc && (!who.uid || _dmc.indexOf(who.uid) < 0)) return Response.json({ ok: false, msg: "你不在这个私聊里。" }, { status: 403 });
         if (_gidc) { // 群：必须在成员名单里
@@ -915,7 +949,7 @@ export class CommentBox {
     let d; try { d = JSON.parse(message); } catch (e) { return; }
     if (d.t === "auth") {
       const att0 = ws.deserializeAttachment() || {};
-      const who = await verifyGoogleCredential(d.cred);
+      const who = await verifyIdent(d.cred);
       if (!who) { try { ws.send(JSON.stringify({ t: "err", m: "login" })); } catch (e) {} return; }
       if (att0.dm) { // 私聊：必须是这两位之一，验过才给历史；不是就直接关掉
         if (!who.uid || att0.dm.indexOf(who.uid) < 0) {
@@ -3051,6 +3085,7 @@ async function askCore(request, env, url, body, SINK) {
 
 export default {
   async fetch(request, env, ctx) {
+    if (env && env.IM_PW) IM_PW_ENV = String(env.IM_PW);
     const url = new URL(request.url);
     // /fresh：永不缓存的首页镜像，用于验证最新版本
     if (url.pathname === "/fresh") {
@@ -3089,7 +3124,7 @@ export default {
     // /api/chat：实时群聊。WebSocket 升级=实时收发；GET=历史/轮询兜底；POST=轮询兜底发言。转发到 COMMENTS 的 chat:<room> 实例。
     if (url.pathname === "/api/wds/analyze" && request.method === "POST") {
       const b = await request.json().catch(() => ({}));
-      const who = await verifyGoogleCredential(b.credential);
+      const who = await verifyIdent(b.credential);
       if (!who) return Response.json({ ok: false, msg: "请先用 Google 账号登录再上传文档。" }, { status: 401 });
       const room = (b.room || "").toLowerCase();
       if (!/^[a-z0-9-]+(\/[a-z0-9-]+)*$/.test(room)) return Response.json({ ok: false, msg: "bad room" }, { status: 400 });
@@ -3110,7 +3145,7 @@ export default {
     }
     if (url.pathname === "/api/wds/paper" && request.method === "POST") {
       const b = await request.json().catch(() => ({}));
-      const who = await verifyGoogleCredential(b.credential);
+      const who = await verifyIdent(b.credential);
       if (!who) return Response.json({ ok: false, msg: "请先用 Google 账号登录再提炼论文。" }, { status: 401 });
       const room = (b.room || "").toLowerCase();
       if (!/^[a-z0-9-]+(\/[a-z0-9-]+)*$/.test(room)) return Response.json({ ok: false, msg: "bad room" }, { status: 400 });
@@ -4530,7 +4565,7 @@ export default {
     if (url.pathname === "/api/im" && request.method === "POST") {
       const b = await request.json().catch(() => null);
       if (!b) return Response.json({ ok: false, msg: "请求格式不对。" }, { status: 400 });
-      const who = await verifyGoogleCredential(b.credential);
+      const who = await verifyIdent(b.credential);
       if (!who || !who.uid) return Response.json({ ok: false, msg: "请先用 Google 账号登录。" }, { status: 401 });
       const dir = env.COMMENTS.get(env.COMMENTS.idFromName("im-dir-global"));
       const call = async (payload) => {
