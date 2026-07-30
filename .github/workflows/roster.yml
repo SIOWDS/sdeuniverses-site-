@@ -1,4 +1,12 @@
-# 学员发表数与排名 · 自动重建
+# 学员发表数与排名 + 站内近邻索引 · 自动重建
+#
+# 2026-07-29 起这个工作流产出两份派生数据，都是"随发文即时作废"的小文件：
+#   public/students/roster.json   126KB  发表数与活跃分
+#   public/kb/neighbors.json      约 800KB  站内近邻索引（标题+副标题+关键词+那一刀）
+# 后者供 /api/kb/neighbors 用。它必须跟着发文走：新篇没进索引，下一次近邻检索就
+# 查不到它，两个智能体会在毫不知情的情况下把同一个概念第二次发明——这种失败是静默的，
+# 没有任何人会收到报错，所以宁可每次发文都重建一遍。
+# 之所以不另开一个工作流：两个 bot 同时往 main 提交会互相撞，而这里已经有 rebase 重试。
 #
 # 2026-07-29 从 search-index.yml 拆出来。原先两件事挂在同一个工作流上：
 # 重建索引（218MB 生成物）与重建排名（126KB）。索引每次重排都往 git 历史里
@@ -17,7 +25,13 @@ on:
     paths:
       - 'public/students/**'
       - '!public/students/roster.json'   # 本工作流自己的产物，排除以免自我触发
+      - 'public/column/**'               # 近邻索引覆盖全站篇目，不止学员专栏
+      - 'public/paradigm/**'
+      - 'public/confluence/**'
+      - 'public/books/**'
+      - '!public/kb/neighbors.json'      # 同上，排除自我触发
       - 'tools/build_roster.py'
+      - 'tools/build_neighbors.py'
   workflow_dispatch:
 
 concurrency:
@@ -41,19 +55,24 @@ jobs:
       - name: 重建学员发表数与排名数据
         run: python3 tools/build_roster.py
 
+      - name: 重建站内近邻索引
+        run: python3 tools/build_neighbors.py
+
       - name: 有变化就提交回 main
         run: |
-          if git diff --quiet -- public/students/roster.json; then
-            echo "排名已和内容一致，无需提交"
+          if git diff --quiet -- public/students/roster.json public/kb/neighbors.json; then
+            echo "两份派生数据都已和内容一致，无需提交"
             exit 0
           fi
           git config user.name "sde-index-bot"
           git config user.email "wangdesheng1234567@gmail.com"
-          git add public/students/roster.json
-          git commit -m "Rebuild student rankings for ${GITHUB_SHA::7}
+          git add public/students/roster.json public/kb/neighbors.json
+          git commit -m "Rebuild rankings and the site neighbour index for ${GITHUB_SHA::7}
 
-          Publication counts and activity scores are derived from what is on disk,
-          so they go stale the instant an article lands. 126KB, rebuilt on every push."
+          Both are derived from what is on disk and go stale the instant an article
+          lands. The neighbour index is what /api/kb/neighbors serves: if a new paper
+          is missing from it, the next nearest-neighbour check cannot see it, and a
+          concept gets invented a second time with nobody being told."
           # main 可能已前进（并发 push），冲突就 rebase 重试
           for i in 1 2 3; do
             git push && exit 0

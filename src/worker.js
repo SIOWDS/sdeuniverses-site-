@@ -936,6 +936,103 @@ async function loadPyramid(env, url) {
   } catch (e) {}
   return PYR;
 }
+// ===== NEIGHBORS：站内近邻清单 =====
+// 目的与 retrieveKB 不同：不为"多知道一点"，而为**逼出交代**——
+// 新判断必须说清它与站上已有篇目的分离线，否则概念会在同一个专栏里重复发明。
+// 材料取 /students/publications.json：每条 item 的 summary 是发表时逐篇写的一句话判断。
+let PUBS = { at: 0, items: null };
+// 首选 /kb/neighbors.json（生成物：标题+副标题+关键词+那一刀 四类文本都在里面）。
+// 为什么必须要副标题与关键词：自造概念名（自噬性稳态、拮抗负荷、品核）在很多篇里
+// 不在标题里，只在副标题或关键词里；只匹配标题会漏掉最该被召回的那一篇，
+// 而漏召回在这个端点上是**静默失败**——产出照走，只是概念被第二次发明。
+// 生成物缺失时退回 publications.json（少了副标题与关键词，召回变差但端点仍可用）。
+async function loadPubs(env, url) {
+  const now = Date.now();
+  if (PUBS.at && now - PUBS.at < CORPUS_TTL && PUBS.items) return PUBS.items;
+  let out = [];
+  try {
+    const r = await env.ASSETS.fetch(new Request(new URL("/kb/neighbors.json", url)));
+    if (r.ok) {
+      const j = await r.json();
+      for (const it of (j.items || [])) {
+        if (!it || !it.u || !it.t) continue;
+        out.push({ t: String(it.t), sub: String(it.sub || ""), kw: String(it.kw || ""), u: String(it.u), kind: String(it.kind || ""), line: String(it.line || ""), au: String(it.au || ""), auSlug: String(it.auSlug || "") });
+      }
+    }
+  } catch (e) {}
+  if (!out.length) {
+    try {
+      const r = await env.ASSETS.fetch(new Request(new URL("/students/publications.json", url)));
+      if (r.ok) {
+        const j = await r.json();
+        for (const st of (j.students || [])) for (const it of (st.items || [])) {
+          if (!it || !it.url || !it.title) continue;
+          out.push({ t: String(it.title), sub: "", kw: "", u: String(it.url), kind: String(it.kind || ""), line: String(it.summary || ""), au: String(st.name || ""), auSlug: String(st.slug || "") });
+        }
+      }
+    } catch (e) {}
+  }
+  PUBS = { at: now, items: out };
+  return out;
+}
+// nbTerms/nbRank 是纯函数：与 pyramidDrill 同一套中文二元切分，便于离线测试。
+function nbTerms(q) {
+  const raw = String(q || "").toLowerCase();
+  const terms = [];
+  for (const w of (raw.match(/[a-z]{3,}/g) || [])) terms.push(w);
+  for (const run of (raw.match(/[\u4e00-\u9fff]{2,}/g) || [])) { for (let i = 0; i + 2 <= run.length; i++) terms.push(run.slice(i, i + 2)); }
+  const uniq = [];
+  const seen = Object.create(null);
+  for (const t of terms) if (!seen[t]) { seen[t] = 1; uniq.push(t); }
+  return uniq;
+}
+// 标题权重最高（概念名通常落在标题里），一句话判断次之，栏目名只作微弱加成。
+// own=作者自己的篇目：**不排除、只标注**——自我重复正是最常见也最难自查的一种重合。
+function nbRank(items, q, k, opts) {
+  opts = opts || {};
+  const terms = nbTerms(q);
+  if (!terms.length) return [];
+  const au = String(opts.author || "").trim();
+  const out = [];
+  for (const it of (items || [])) {
+    const T = String(it.t || "").toLowerCase(), S2 = String(it.sub || "").toLowerCase(),
+          KW = String(it.kw || "").toLowerCase(), L = String(it.line || "").toLowerCase(),
+          K = String(it.kind || "").toLowerCase();
+    let sc = 0, cov = 0;
+    // 关键词与副标题给到接近标题的权重：自造概念名常常只出现在这两处。
+    for (const t of terms) {
+      let hit = 0;
+      if (T.indexOf(t) >= 0) { sc += 3; hit = 1; }
+      if (KW.indexOf(t) >= 0) { sc += 2; hit = 1; }
+      if (S2.indexOf(t) >= 0) { sc += 2; hit = 1; }
+      if (L.indexOf(t) >= 0) { sc += 1; hit = 1; }
+      if (K.indexOf(t) >= 0) { sc += 1; hit = 1; }
+      cov += hit;
+    }
+    // 覆盖度加权：命中「问题里几个不同的词」比「同一个词在多处重复出现」更能说明是同一个概念。
+    // 没有这一项，标题里含「自噬性适应」的那篇会压过关键词里写着「自噬性稳态」的那篇——
+    // 而后者才是真正要被交代分离线的那一篇。
+    sc += 3 * cov;
+    if (sc <= 0) continue;
+    const own = !!au && (it.auSlug === au || it.au === au);
+    out.push({ t: it.t, u: it.u, kind: it.kind, line: it.line, au: it.au, own: own, score: sc + (own ? 2 : 0) });
+  }
+  out.sort((a, b) => b.score - a.score || String(a.u).localeCompare(String(b.u)));
+  return out.slice(0, Math.max(1, k || 8));
+}
+// 渲染成可直接注入的一块。注意这里只交付**材料与交代义务**，不替调用方规定文风：
+// 各智能体的提问自己决定近邻节写成什么样，这一块只负责"名单在此，逐条处理"。
+function nbBlock(list) {
+  if (!list || !list.length) return "";
+  const lines = list.map((x, i) => (i + 1) + "、《" + x.t + "》（" + x.u + "）"
+    + (x.au ? "｜作者 " + x.au : "") + (x.own ? "｜**本人已发**" : "")
+    + (x.line ? "\n　　该篇的判断：" + x.line : ""));
+  return "【站内近邻（sdeuniverses.com 已发表的相关篇目）——这一节是硬要求：\n"
+    + "对下列每一篇，必须说清它已经说到哪一步，以及你这一次的判断与它的分离线在哪；\n"
+    + "凡划不出分离线的，直接说明本次判断与该篇重复，不要另起新名。标注「本人已发」的尤其要查，\n"
+    + "同一个作者在同一个栏目里重复发明概念，是最不容易被自己发现的一种重合。】\n"
+    + lines.join("\n") + "\n";
+}
 // 三层下钻：给一段问题，从长期原则里挑最相关的几条 → 顺 mids 进中期条目 → 顺 docs 落到文章。
 // 纯文本词重合打分（长期/中期都是相对固定的小结构，几十条，扫一遍很轻）。返回 {principles, mids, docs}。
 // 三层语义下钻：词匹配只负责【进入语义图的入口】，之后沿【离线编纂好的语义连接】走——
@@ -3495,6 +3592,43 @@ export default {
         return Response.json({ ok: true, count: list.length, principles: list }, { headers: _cors() });
       } catch (e) {
         return Response.json({ ok: false, principles: [] }, { headers: _cors() });
+      }
+    }
+    if (url.pathname === "/api/kb/neighbors") {
+      // 站内近邻清单：给任意智能体一张"必须逐条交代分离线"的名单。无需 Key，只读静态资产。
+      // 两路材料：publications.json（学员专栏，自带一句话判断）+ 分层检索（每日必读/学科通融/专著等
+      // 不在 publications 里的栏目，用命中片段首句当那一行）。按 url 去重后合并排序。
+      if (request.method === "OPTIONS") return new Response(null, { headers: _cors() });
+      if (request.method !== "POST") return new Response("Method Not Allowed", { status: 405 });
+      let b = {}; try { b = await request.json(); } catch (e) {}
+      const q = String(b.q || "").trim().slice(0, 2000);
+      if (q.length < 1) return Response.json({ neighbors: [], block: "", n: 0 }, { headers: _cors() });
+      const k = Math.max(1, Math.min(20, parseInt(b.k, 10) || 8));
+      const author = String(b.author || "").slice(0, 40);
+      const wantSite = b.site !== false;   // 是否并入非学员栏目（默认并入）
+      try {
+        const pubs = await loadPubs(env, url);
+        let list = nbRank(pubs, q, k + 6, { author: author });
+        const seen = Object.create(null);
+        for (const x of list) seen[x.u] = 1;
+        if (wantSite) {
+          // 只多取一小把，够补上 publications 覆盖不到的栏目即可，不为它加检索预算。
+          try {
+            const lr = await lightRetrieve(env, url, q, [], 8, 900, { pick: 8 });
+            for (const ck of (lr.hits || [])) {
+              const d = lr.corpus.docs[ck.d];
+              if (!d || !d.u || seen[d.u]) continue;
+              if (/^\/students\//.test(d.u)) continue;   // 学员篇目已由 publications 一路覆盖且带判断句
+              seen[d.u] = 1;
+              const first = String(ck.t || "").replace(/\s+/g, " ").trim().slice(0, 120);
+              list.push({ t: d.t, u: d.u, kind: "", line: first, au: "", own: false, score: 1 });
+            }
+          } catch (e) {}
+        }
+        list = list.sort((a, c) => c.score - a.score).slice(0, k);
+        return Response.json({ neighbors: list, block: nbBlock(list), n: list.length, terms: nbTerms(q).length }, { headers: _cors() });
+      } catch (e) {
+        return Response.json({ neighbors: [], block: "", n: 0, error: String(e && e.message) }, { headers: _cors() });
       }
     }
     if (url.pathname === "/api/kb/retrieve") {
