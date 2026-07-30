@@ -380,12 +380,7 @@
     pathTip: "SDE 六路径：三条延伸各从一个不同的维度起手（它是什么／它怎么走的／它站在什么上面）",
     tplPick: "做成哪一种？", tplNote: "选定后，基底会按这一种的页面骨架来写——不只是换配色",
     tplAuto: "自动｜由内容自己定", tplAutoS: "不指定骨架，按这场谈的内容判断该有哪几页",
-    tplBrief: "工作汇报", tplBriefS: "结论先行 · 关键数字 · 风险 · 下一步（9–12 页）",
-    tplTeach: "教学讲义", tplTeachS: "一个概念 · 常见误解 · 步骤 · 自测（10–14 页）",
-    tplPitch: "路演提案", tplPitchS: "痛点 · 洞见 · 方案 · 凭什么是我们（9–12 页）",
-    tplResearch: "研究汇报", tplResearchS: "问题 · 方法 · 发现 · 最近邻 · 证伪条件（10–14 页）",
-    tplReview: "复盘总结", tplReviewS: "目标 · 实际 · 时间线 · 归因 · 改动清单（9–12 页）",
-    tplTalk: "观点演讲", tplTalkS: "一句主张 · 三页证据 · 引文 · 反对意见（8–11 页）",
+    tierS: "简单 · 白底一色，投影仪最保险", tierM: "中等 · 染色底＋淡底纹", tierR: "复杂 · 深色/渐变＋图案，字大话少",
     stopGen: "停止生成", stopHint: "Esc", stopped: "已停下——上面写出来的部分留着了",
     kDeck: "对外 PPT", kDeckS: "做成一套汇报幻灯片，可直接下载 .pptx",
     dPptx: "⤓ 存为 .pptx", dPptxWait: "正在生成 .pptx…", dPptxNo: "这份稿子切不出幻灯片（需要 ## 页标题与 - 要点）",
@@ -515,12 +510,7 @@
     pathTip: "SDE's six paths: each suggestion starts from a different dimension (what it is / how it moves / what it stands on)",
     tplPick: "Which kind of deck?", tplNote: "The model writes to the chosen skeleton — this is more than a colour scheme",
     tplAuto: "Auto · let the content decide", tplAutoS: "No fixed skeleton; pages are chosen from what was discussed",
-    tplBrief: "Status briefing", tplBriefS: "Conclusion first · key numbers · risks · next steps (9–12)",
-    tplTeach: "Teaching deck", tplTeachS: "One concept · misconceptions · steps · self-check (10–14)",
-    tplPitch: "Pitch", tplPitchS: "Pain · insight · plan · why us (9–12)",
-    tplResearch: "Research talk", tplResearchS: "Question · method · findings · nearest work · falsifiers (10–14)",
-    tplReview: "Retrospective", tplReviewS: "Goals · actuals · timeline · causes · changes (9–12)",
-    tplTalk: "Opinion talk", tplTalkS: "One claim · three proofs · quote · objections (8–11)",
+    tierS: "Simple · white ground, one accent", tierM: "Mid · tinted ground with a light texture", tierR: "Rich · dark or gradient with a pattern",
     stopGen: "Stop generating", stopHint: "Esc", stopped: "Stopped — what's above is kept",
     kDeck: "Slide deck", kDeckS: "Turn this chat into a deck — download as .pptx",
     dPptx: "⤓ Save as .pptx", dPptxWait: "Building .pptx…", dPptxNo: "This draft has no slides to cut (needs ## titles and - bullets)",
@@ -611,6 +601,7 @@
     ".wdsm-tplb{max-width:520px;width:100%;background:var(--wpanel);border:1px solid var(--wline2);border-radius:16px;padding:20px 22px;max-height:84vh;overflow:auto}" +
     ".wdsm-tplb h4{margin:0 0 4px;font-size:16px;color:var(--wtx2)}" +
     ".wdsm-tplnote{font-size:12px;color:var(--wdim2);line-height:1.6;margin:0 0 14px}" +
+    ".wdsm-tplgrp{font-size:11px;color:var(--wdim2);letter-spacing:1px;margin:14px 0 7px;padding-left:2px}" +
     ".wdsm-tplitem{display:block;width:100%;text-align:left;background:var(--wfill);border:1px solid var(--wline);border-radius:11px;padding:11px 14px;margin-bottom:8px;cursor:pointer}" +
     ".wdsm-tplitem:hover{border-color:var(--wgold)}" +
     ".wdsm-tplitem b{display:block;font-size:14px;color:var(--wtx2);font-weight:600;margin-bottom:3px}" +
@@ -912,10 +903,15 @@
     var box = el("div", "wdsm-tplb");
     box.appendChild(el("h4", null, t("tplPick")));
     box.appendChild(el("div", "wdsm-tplnote", t("tplNote")));
+    var lastTier = null;
     DECK_TPLS.forEach(function (x) {
+      if (x.tier && x.tier !== lastTier) {                 // 按复杂度分三组，别让 20 条平铺成一堵墙
+        lastTier = x.tier;
+        box.appendChild(el("div", "wdsm-tplgrp", t("tier" + ({ "简单": "S", "中等": "M", "复杂": "R" })[x.tier])));
+      }
       var b = el("button", "wdsm-tplitem");
-      b.appendChild(el("b", null, t(x.key)));
-      b.appendChild(el("span", null, t(x.key + "S")));
+      b.appendChild(el("b", null, x.id ? x.n : t("tplAuto")));
+      b.appendChild(el("span", null, x.id ? x.s : t("tplAutoS")));
       b.onclick = function () {
         if (m.parentNode) m.parentNode.removeChild(m);
         distill("deck", null, null, x.id);
@@ -1050,13 +1046,27 @@
   /* PPT 模板：一套模板＝页面骨架＋写作纪律＋视觉主题。骨架与纪律在服务端（基底照它写），
      主题在这边（渲染时用）。**两边的 id 必须一一对应**，改一边就要改另一边。 */
   var DECK_TPLS = [
-    { id: "", key: "tplAuto", theme: "" },
-    { id: "brief", key: "tplBrief", theme: "slate" },
-    { id: "teach", key: "tplTeach", theme: "forest" },
-    { id: "pitch", key: "tplPitch", theme: "clay" },
-    { id: "research", key: "tplResearch", theme: "ink" },
-    { id: "review", key: "tplReview", theme: "plum" },
-    { id: "talk", key: "tplTalk", theme: "night" },
+    { id: "", n: "", theme: "", tier: "", s: "" },      // 自动：文案走 tplAuto/tplAutoS
+    { id: "brief", n: "工作汇报", theme: "slate", tier: "简单", s: "结论先行 · 关键数字 · 风险 · 下一步（9–12 页）" },
+    { id: "research", n: "研究汇报", theme: "ink", tier: "简单", s: "问题 · 方法 · 发现 · 最近邻 · 证伪条件（10–14 页）" },
+    { id: "teach", n: "教学讲义", theme: "forest", tier: "简单", s: "一个概念 · 常见误解 · 步骤 · 自测（10–14 页）" },
+    { id: "review", n: "复盘总结", theme: "plum", tier: "简单", s: "目标 · 实际 · 时间线 · 归因 · 改动清单（9–12 页）" },
+    { id: "proposal", n: "方案建议", theme: "sea", tier: "简单", s: "三个方案 · 各自代价 · 建议哪个（9–12 页）" },
+    { id: "onepage", n: "一页纸摘要", theme: "clay", tier: "简单", s: "结论 · 三个数 · 一张图，最多 7 页" },
+    { id: "pitch", n: "路演提案", theme: "sand", tier: "中等", s: "痛点 · 洞见 · 方案 · 凭什么是我们（9–12 页）" },
+    { id: "product", n: "产品发布", theme: "mist", tier: "中等", s: "以前 · 变化 · 三个能力 · 还不能做什么（10–13 页）" },
+    { id: "train", n: "培训课件", theme: "moss", tier: "中等", s: "练什么 · 标准流程 · 现场练习 · 自查清单（12–14 页）" },
+    { id: "health", n: "健康科普", theme: "celadon", tier: "中等", s: "结论 · 误解 · 何时就医 · 边界（9–12 页）" },
+    { id: "edu", n: "家校沟通", theme: "blush", tier: "中等", s: "看到什么 · 两种理解 · 家里能做什么（9–12 页）" },
+    { id: "data", n: "数据解读", theme: "steel", tier: "中等", s: "三张图 · 关键数字 · 这些数不能说明什么（10–13 页）" },
+    { id: "cases", n: "案例分析", theme: "amber", tier: "中等", s: "时间线 · 关键节点 · 两种解释 · 可迁移性（10–13 页）" },
+    { id: "talk", n: "观点演讲", theme: "midnight", tier: "复杂", s: "一句主张 · 三页证据 · 引文 · 反对意见（8–11 页）" },
+    { id: "keynote", n: "主题演讲", theme: "royal", tier: "复杂", s: "大场合 · 每页最多三条 · 字大话少（10–13 页）" },
+    { id: "vision", n: "战略愿景", theme: "indigo", tier: "复杂", s: "愿景 · 时间线 · 风险 · 三步走（10–13 页）" },
+    { id: "brandstory", n: "品牌故事", theme: "wine", tier: "复杂", s: "起点 · 转折 · 引文 · 我们不做什么（9–12 页）" },
+    { id: "award", n: "成果汇报", theme: "jade", tier: "复杂", s: "创新点 · 同类对照 · 可复制性 · 局限（10–13 页）" },
+    { id: "launch", n: "发布会", theme: "sunset", tier: "复杂", s: "一件事 · 三个亮点 · 何时可用（9–12 页）" },
+    { id: "story", n: "叙事汇报", theme: "carbon", tier: "复杂", s: "一条线 · 最难的一关 · 学到什么（10–13 页）" },
   ];
   function tplTheme(id) {
     for (var i = 0; i < DECK_TPLS.length; i++) if (DECK_TPLS[i].id === id) return DECK_TPLS[i].theme;
@@ -1546,7 +1556,7 @@
     if (window.WDSPptx) { if (then) then(true); return; }
     if (!document.head || !document.head.appendChild) { if (then) then(false); return; }
     var sc = document.createElement("script");
-    sc.src = "/assets/wds-pptx.js?v=4"; sc.async = true;   // 模块也要能刷新：改它就 bump 这个号
+    sc.src = "/assets/wds-pptx.js?v=5"; sc.async = true;   // 模块也要能刷新：改它就 bump 这个号
     sc.onload = function () { if (then) then(!!window.WDSPptx); };
     sc.onerror = function () { if (then) then(false); };
     document.head.appendChild(sc);

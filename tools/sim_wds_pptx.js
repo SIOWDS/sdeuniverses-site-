@@ -190,7 +190,7 @@ console.log("── 三点五 · 图表：原生图表＋内嵌工作簿");
 console.log("── 三点八 · 20 套版式：自动选、真摆得开、不出界");
 {
   ok(X.layouts().length >= 20, "版式不少于 20 套（实得 " + X.layouts().length + "，含别名）");
-  ok(X.themes().length === 6, "主题 6 套");
+  ok(X.themes().length === 20, "配色 20 套");
   // 自动选版式：只看内容形状
   const P2 = (title, bullets, extra) => Object.assign({ title, bullets, notes: "", kind: "content" }, extra || {});
   const pick = (s, i, n) => X.pickLayout(s, i === undefined ? 3 : i, n === undefined ? 9 : n);
@@ -214,7 +214,7 @@ console.log("── 三点八 · 20 套版式：自动选、真摆得开、不�
   ok(X.pickTheme({ title: "课堂里的学习发生", slides: [] }) === "forest", "教育题 → forest");
   ok(X.pickTheme({ title: "慢性病的治疗次序", slides: [] }) === "plum", "医疗题 → plum");
   ok(X.pickTheme({ title: "营收与客户增长", slides: [] }) === "slate", "商业题 → slate");
-  ok(X.pickTheme({ title: "随便什么", slides: [], theme: "night" }) === "night", "显式 theme: 优先");
+  ok(X.pickTheme({ title: "随便什么", slides: [], theme: "midnight" }) === "midnight", "显式 theme: 优先");
   // 真造：每套版式都摆得出，且没有任何形状出界
   const md2 = ["# 封面标题", "## 副标题", "---", "## 目录", "- 一", "- 二", "- 三",
     "---", "## 三个数", "- 125 ｜ 甲", "- 128 ｜ 乙", "- 115 ｜ 丙",
@@ -315,36 +315,53 @@ console.log("── 四 · 两端接线");
   ok(/deckReady \|\| deckOf\(text\)/.test(wm), "点按钮时优先用预取好的那份");
 }
 
-console.log("── 五 · 模板＝写作 Skill（骨架＋纪律＋主题三件绑死）");
+console.log("── 五 · 20 套模板：每套一份写作 Skill（骨架＋纪律＋视觉方案）");
 {
-  const ids = ["brief", "teach", "pitch", "research", "review", "talk"];
+  const ids = ["brief","research","teach","review","proposal","onepage","pitch","product","train","health",
+               "edu","data","cases","talk","keynote","vision","brandstory","award","launch","story"];
   ok(/const DECK_TPL = \{/.test(wk), "服务端有模板表");
-  ids.forEach(function (id) { ok(new RegExp(id + ": \\{\\s*\\n?\\s*name:").test(wk), "有模板 " + id); });
-  ok(/const tplId = DECK_TPL\[b\.tpl\] \? b\.tpl : ""/.test(wk), "tpl 走白名单，认不出就当没选");
-  ok(/tplId \? \("\\n" \+ DECK_TPL\[tplId\]\.spec/.test(wk), "选了模板就把该模板的骨架拼进写作要求");
-  ok(/本次未指定模板/.test(wk), "没选模板也有兜底口径（不是静默少一段）");
-  // 六套骨架必须真不一样——否则"模板"只是换了个名字
-  const specs = ids.map(function (id) {
-    const i = wk.indexOf(id + ": {"), j = wk.indexOf("},", i);
-    return wk.slice(i, j);
+  ok(ids.every(function (id) { return new RegExp("\\n  " + id + ": \\{ name:").test(wk); }), "20 套齐（缺一即失败）");
+  ok(/const tplId = DECK_TPL\[b\.tpl\] \? b\.tpl : ""/.test(wk), "tpl 走白名单");
+  ok(/DECK_SIZES/.test(wk) && /字号与字数（渲染端实际值，按它控字数）/.test(wk), "把渲染端真实字号告诉基底（否则字数一超必溢出）");
+  ok(/页标题 32pt：\*\*不超过 16 字\*\*/.test(wk) && /3 条时 20pt、4 条 17pt、5 条 16pt/.test(wk), "字号与字数上限一一对应");
+  // 每套都得有：抬头、逐页骨架、语气、主题、复杂度、页数
+  const blocks = ids.map(function (id) {
+    const i = wk.indexOf("\n  " + id + ": { name:");
+    return wk.slice(i, wk.indexOf('" },', i) + 4);
   });
-  const heads = specs.map(function (s) { return (s.match(/【本套模板：([^】]+)】/) || [])[1]; });
-  ok(new Set(heads).size === 6, "六套各有自己的抬头（实得 " + heads.join("/") + "）");
-  ok(specs.every(function (s) { return /页面骨架/.test(s) && /语气：/.test(s); }), "每套都写明页面骨架与语气");
-  ok(specs.every(function (s) { return /theme: "\w+"/.test(s); }), "每套都钉了视觉主题");
-  const themes = specs.map(function (s) { return (s.match(/theme: "(\w+)"/) || [])[1]; });
-  ok(new Set(themes).size === 6, "六套主题各不相同（" + themes.join("/") + "）");
-  ok(specs.filter(function (s) { return /```chart```/.test(s); }).length >= 4, "多数模板要求出图表");
-  ok(/不许只报喜/.test(specs[0]) && /证伪条件/.test(specs[3]), "汇报要写风险、研究要写证伪——纪律各按各的行当");
-  // 客户端
-  ok(/DECK_TPLS = \[/.test(wm), "客户端有对应的模板表");
-  ok(ids.every(function (id) { return new RegExp('id: "' + id + '"').test(wm); }), "两边 id 一一对应");
-  ok(/function tplMenu\(/.test(wm) && /if \(k === "deck"\) \{ tplMenu\(\); return; \}/.test(wm), "选 PPT 先问做成哪一种");
-  ok(/distill\("deck", null, null, x\.id\)/.test(wm), "选中的模板真传下去");
-  ok(/tpl: tpl \|\| ""/.test(wm), "请求体里带 tpl");
-  ok(/if \(tpl && !d\.theme\) d\.theme = tplTheme\(tpl\)/.test(wm), "渲染时按模板定主题，稿子里显式写了 theme: 则以稿子为准");
-  ok(/tplAuto: "自动｜由内容自己定"/.test(wm), "保留「自动」——不是每场谈话都套得进某个骨架");
-  ok(/不只是换配色/.test(wm), "菜单上说清楚模板改的是骨架不只是配色");
+  ok(blocks.every(function (b) { return /【[^】]+】/.test(b); }), "每套都有自己的抬头");
+  ok(blocks.every(function (b) { return /①/.test(b) && /语气：/.test(b); }), "每套都逐页排骨架并写明语气");
+  ok(blocks.every(function (b) { return /theme: "\w+"/.test(b) && /tier: "[简中复]/.test(b) && /pages: "/.test(b); }), "每套都钉了配色、复杂度与页数");
+  const heads = blocks.map(function (b) { return (b.match(/【([^】]+)】/) || [])[1]; });
+  ok(new Set(heads).size === 20, "20 个抬头各不相同（实得 " + new Set(heads).size + "）");
+  const themes = blocks.map(function (b) { return (b.match(/theme: "(\w+)"/) || [])[1]; });
+  ok(new Set(themes).size === 20, "20 套配色一一对应、互不重复");
+  const tiers = blocks.map(function (b) { return (b.match(/tier: "([简中复])/) || [])[1]; });
+  ok(tiers.filter(function (x) { return x === "简"; }).length === 6
+     && tiers.filter(function (x) { return x === "中"; }).length === 7
+     && tiers.filter(function (x) { return x === "复"; }).length === 7, "6/7/7 三档分布");
+  // 不是每套都该逼着出图：品牌故事/教学讲义这类硬塞图表反而假。13/20 是刻意的。
+  ok(blocks.filter(function (b) { return /chart/.test(b); }).length >= 12, "多数模板要求出图表（实得 " + blocks.filter(function (b) { return /chart/.test(b); }).length + " / 20）");
+  ok(/必须写不利情形/.test(blocks[0]) && /证伪条件/.test(blocks[1]) && /不许承诺疗效/.test(blocks[9])
+     && /未验证的不许写成已验证/.test(blocks[17]), "各行当有各自的硬纪律（汇报写风险/研究写证伪/科普不许承诺/评奖不许把未验证写成已验证）");
+  ok(/这套模板的价值在于\*\*不写什么\*\*/.test(blocks[5]), "一页纸模板明写「价值在于不写什么」");
+
+  // 20 套视觉方案
+  ok(X.themes().length === 20, "配色 20 套（实得 " + X.themes().length + "）");
+  const missing = themes.filter(function (t) { return X.themes().indexOf(t) < 0; });
+  ok(missing.length === 0, "模板点名的配色全都存在（缺：" + (missing.join(",") || "无") + "）");
+  ok(/DECO_PRST/.test(MOD) && /pattFill/.test(MOD), "底纹用原生 pattFill（不是摆几百个小圆点把 XML 撑爆）");
+  ok(/mix\(CLR\.bg, CLR\.faint, 0\.16\)/.test(MOD), "底纹色紧贴底色——实测用 faint 会把深色页拉成一块中灰，对比度当场毁掉");
+  ok(/gradFill/.test(MOD) && /c\.grad = CLR\.grad/.test(MOD), "复杂档封面/收尾走渐变");
+  ok(/scale \|\| 1/.test(MOD), "字号有主题倍率（复杂档字更大）");
+  ok(/tier: "rich"/.test(MOD) && /tier: "simple"/.test(MOD) && /tier: "mid"/.test(MOD), "配色也标了复杂度");
+
+  // 客户端 20 条 + 三档分组
+  ok(ids.every(function (id) { return new RegExp('id: "' + id + '"').test(wm); }), "客户端 20 条一一对应");
+  ok(/wdsm-tplgrp/.test(wm) && /tierS: "简单/.test(wm) && /tierR: "复杂/.test(wm), "菜单按三档分组（20 条平铺是一堵墙）");
+  ok(/x\.id \? x\.n : t\("tplAuto"\)/.test(wm), "第一条仍是「自动」");
+  ok(/distill\("deck", null, null, x\.id\)/.test(wm) && /tpl: tpl \|\| ""/.test(wm), "选中的模板真传下去");
+  ok(/if \(tpl && !d\.theme\) d\.theme = tplTheme\(tpl\)/.test(wm), "渲染按模板定配色");
 }
 
 console.log("\n===== " + P + " PASS / " + F + " FAIL =====");

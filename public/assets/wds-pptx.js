@@ -83,18 +83,70 @@
 
   // 16:9 宽屏：13.333in × 7.5in
   var W = 12192000, H = 6858000, MX = 838200;              // 左右留白 0.92in（>0.5in 下限）
-  /* ═══════════ 主题（6 套）═══════════
-     不是"换个色"这么简单——每套定好正文/次要/淡出/强调/卡片底五种角色，
-     所有版式只认角色不认具体色值，所以换主题不会有哪一处漏改。 */
+  /* ═══════════ 20 套视觉方案 ═══════════
+     一套方案 ＝ 配色 ＋ 底纹 ＋ 字号档，分三个复杂度：
+       简单（白底/浅底，一个强调色，无底纹）——正式、耐看、投影仪最保险
+       中等（染色底 ＋ 淡底纹 ＋ 卡片）——有颜色但不喧宾夺主
+       复杂（深底/渐变 ＋ 图案）——发布会、演讲、对外形象
+     字段：bg 底色｜tx 正文｜dim 次要｜faint 极淡｜ac 强调｜ac2 次强调｜card 卡片底｜line 分隔
+           deep 整幅深色页底｜onDeep 深色页上的字｜tint 更浅一层
+           deco 底纹（none/dots/grid/diag/rings/wave）｜grad 渐变（有则封面/过渡用渐变）
+           scale 字号倍率（复杂档字更大更少字）｜tier 复杂度 */
   var THEMES = {
-    ink:    { bg: "FFFFFF", tx: "16181D", dim: "5C6270", faint: "9AA0AC", ac: "8A6A2F", ac2: "4A6572", card: "F6F4EF", line: "E4E0D8", deep: "2A2118", onDeep: "F6F1E7", tint: "FBF9F5" },
-    slate:  { bg: "FFFFFF", tx: "141A20", dim: "51606D", faint: "93A0AB", ac: "2F5D7C", ac2: "7A8B99", card: "F1F5F8", line: "DDE5EA", deep: "17323F", onDeep: "EAF2F6", tint: "F8FBFC" },
-    forest: { bg: "FFFFFF", tx: "16201A", dim: "4F6154", faint: "94A398", ac: "3F6B4A", ac2: "7A8B6F", card: "F0F5F1", line: "DCE6DE", deep: "1D3327", onDeep: "ECF3EE", tint: "F8FBF9" },
-    clay:   { bg: "FFFFFF", tx: "201814", dim: "6B5A50", faint: "A89A90", ac: "9A5B3F", ac2: "8A7A6A", card: "F8F2ED", line: "E8DED6", deep: "3A2419", onDeep: "F7EFE8", tint: "FCF8F5" },
-    plum:   { bg: "FFFFFF", tx: "1C161F", dim: "5F5266", faint: "9C93A3", ac: "6B4A6B", ac2: "8A7A93", card: "F5F1F6", line: "E5DCE7", deep: "2E1F31", onDeep: "F4EDF5", tint: "FBF8FC" },
-    night:  { bg: "15171C", tx: "F2F0EA", dim: "B8BCC4", faint: "6E7480", ac: "C9A227", ac2: "7FA0B5", card: "1E2128", line: "2A2E36", deep: "0E1013", onDeep: "F2F0EA", tint: "1A1D23" },
+    /* ── 简单档 6 套 ── */
+    ink:    { tier: "simple", bg: "FFFFFF", tx: "16181D", dim: "5C6270", faint: "9AA0AC", ac: "8A6A2F", ac2: "4A6572", card: "F6F4EF", line: "E4E0D8", deep: "2A2118", onDeep: "F6F1E7", tint: "FBF9F5", deco: "none" },
+    slate:  { tier: "simple", bg: "FFFFFF", tx: "141A20", dim: "51606D", faint: "93A0AB", ac: "2F5D7C", ac2: "7A8B99", card: "F1F5F8", line: "DDE5EA", deep: "17323F", onDeep: "EAF2F6", tint: "F8FBFC", deco: "none" },
+    forest: { tier: "simple", bg: "FFFFFF", tx: "16201A", dim: "4F6154", faint: "94A398", ac: "3F6B4A", ac2: "7A8B6F", card: "F0F5F1", line: "DCE6DE", deep: "1D3327", onDeep: "ECF3EE", tint: "F8FBF9", deco: "none" },
+    clay:   { tier: "simple", bg: "FFFFFF", tx: "201814", dim: "6B5A50", faint: "A89A90", ac: "9A5B3F", ac2: "8A7A6A", card: "F8F2ED", line: "E8DED6", deep: "3A2419", onDeep: "F7EFE8", tint: "FCF8F5", deco: "none" },
+    plum:   { tier: "simple", bg: "FFFFFF", tx: "1C161F", dim: "5F5266", faint: "9C93A3", ac: "6B4A6B", ac2: "8A7A93", card: "F5F1F6", line: "E5DCE7", deep: "2E1F31", onDeep: "F4EDF5", tint: "FBF8FC", deco: "none" },
+    sea:    { tier: "simple", bg: "FFFFFF", tx: "0F1E22", dim: "466066", faint: "8FA5A9", ac: "1F6B73", ac2: "6E9298", card: "EEF5F5", line: "D8E6E6", deep: "10353A", onDeep: "E8F4F4", tint: "F7FBFB", deco: "none" },
+    /* ── 中等档 7 套：底色染上一层，加淡底纹 ── */
+    sand:   { tier: "mid", bg: "FBF7EF", tx: "1F1B14", dim: "6A6153", faint: "AFA694", ac: "9C7A2E", ac2: "6E7A5A", card: "F4EDDF", line: "E6DCC8", deep: "3A2F1B", onDeep: "FAF5E9", tint: "FDFBF6", deco: "dots" },
+    mist:   { tier: "mid", bg: "F4F7FA", tx: "121A22", dim: "4E5D6B", faint: "94A3B2", ac: "3B6E9C", ac2: "7C93A8", card: "E9EFF6", line: "D6E1EC", deep: "16303F", onDeep: "EDF4FA", tint: "FAFCFE", deco: "grid" },
+    moss:   { tier: "mid", bg: "F3F7F1", tx: "16201A", dim: "4E6152", faint: "97A897", ac: "4B7A46", ac2: "7D9470", card: "E7F0E5", line: "D5E4D3", deep: "1E3521", onDeep: "EFF6ED", tint: "F9FCF8", deco: "diag" },
+    blush:  { tier: "mid", bg: "FCF4F3", tx: "231619", dim: "6E555A", faint: "B29A9E", ac: "A24E56", ac2: "8C7076", card: "F7E8E7", line: "EDD8D7", deep: "3D2024", onDeep: "FBEFEE", tint: "FEF9F8", deco: "dots" },
+    steel:  { tier: "mid", bg: "F5F6F7", tx: "16191C", dim: "555C63", faint: "9AA2A9", ac: "44606E", ac2: "7E8A93", card: "EAEDF0", line: "DBE0E4", deep: "202730", onDeep: "F0F3F5", tint: "FAFBFC", deco: "diag" },
+    amber:  { tier: "mid", bg: "FDF6EC", tx: "241B10", dim: "6F5F49", faint: "B3A48C", ac: "B07515", ac2: "8A7350", card: "F8ECD9", line: "EEDCC0", deep: "3E2C10", onDeep: "FBF2E4", tint: "FEFAF4", deco: "rings" },
+    celadon:{ tier: "mid", bg: "F1F7F6", tx: "10201E", dim: "466360", faint: "8FA8A5", ac: "2C7A72", ac2: "6E9691", card: "E4F0EE", line: "D2E4E1", deep: "12403A", onDeep: "EAF6F4", tint: "F8FCFB", deco: "wave" },
+    /* ── 复杂档 7 套：深底或渐变 ＋ 图案，字更大更少 ── */
+    midnight:{ tier: "rich", bg: "121826", tx: "EDF1F8", dim: "A6B0C4", faint: "5E6A80", ac: "6FA8FF", ac2: "8E9BB5", card: "1B2334", line: "28324A", deep: "0B111C", onDeep: "EDF1F8", tint: "161E2E", deco: "dots", grad: ["16203A", "0C111C"], scale: 1.05 },
+    carbon: { tier: "rich", bg: "17181A", tx: "F0EFEC", dim: "A8A6A1", faint: "5F5E5B", ac: "D8A657", ac2: "8E8B84", card: "202224", line: "2E3033", deep: "0F1011", onDeep: "F0EFEC", tint: "1C1D20", deco: "grid", grad: ["232528", "121314"], scale: 1.05 },
+    wine:   { tier: "rich", bg: "24141A", tx: "F6ECEE", dim: "C0A3AB", faint: "6E5259", ac: "D98C7A", ac2: "9E7C84", card: "301C24", line: "3E262F", deep: "180C11", onDeep: "F6ECEE", tint: "2A1820", deco: "rings", grad: ["311922", "180C11"], scale: 1.05 },
+    indigo: { tier: "rich", bg: "161A33", tx: "EBEDF8", dim: "A6ABCB", faint: "5C6288", ac: "8C9BFF", ac2: "8A90B4", card: "1F2440", line: "2C3255", deep: "0D1022", onDeep: "EBEDF8", tint: "1A1F3A", deco: "diag", grad: ["1E244A", "0E1124"], scale: 1.05 },
+    jade:   { tier: "rich", bg: "0F241E", tx: "E9F4F0", dim: "9DBBB2", faint: "51706A", ac: "5FC1A0", ac2: "84A79C", card: "16302A", line: "204039", deep: "081812", onDeep: "E9F4F0", tint: "132A24", deco: "rings", grad: ["133029", "081812"], scale: 1.05 },
+    royal:  { tier: "rich", bg: "141B3D", tx: "ECEEFA", dim: "A5ADD3", faint: "5A628E", ac: "F0C46A", ac2: "8A93C0", card: "1D2550", line: "2A3468", deep: "0B0F26", onDeep: "ECEEFA", tint: "18204A", deco: "grid", grad: ["1E2A63", "0C1029"], scale: 1.05 },
+    sunset: { tier: "rich", bg: "2A1620", tx: "FBEDE6", dim: "D0A99B", faint: "7A5A53", ac: "F2A365", ac2: "B08376", card: "381D28", line: "492633", deep: "1B0D14", onDeep: "FBEDE6", tint: "31192360", deco: "wave", grad: ["4A2233", "1E0F16"], scale: 1.05 },
   };
-  var CLR = THEMES.ink;                     // 当前主题；build() 开头按 deck 定
+  var CLR = THEMES.ink;
+
+  /* 底纹：native DrawingML 的 pattFill —— 一个矩形＋预置图案，几十字节，
+     比自己摆几百个小圆点省得多，也不会把 XML 撑爆。只铺在内容页，且颜色压到极淡：
+     底纹的作用是让白页不空，不是让人看见底纹。 */
+  var DECO_PRST = { dots: "pct5", grid: "lgGrid", diag: "ltUpDiag", rings: "pct10", wave: "ltHorz" };
+  // 底纹颜色必须**紧贴底色**：实测 royal 用 faint 当图案色时，整页平均色被拉成一块中灰蓝，
+  // 深色方案的对比度当场毁掉。改成"从底色往 faint 挪 16%"——密不密都无所谓，页面仍是底色。
+  function mix(a, b, t) {
+    function p(x, i) { return parseInt(String(x).slice(i, i + 2), 16); }
+    var r = Math.round(p(a, 0) + (p(b, 0) - p(a, 0)) * t);
+    var g = Math.round(p(a, 2) + (p(b, 2) - p(a, 2)) * t);
+    var c = Math.round(p(a, 4) + (p(b, 4) - p(a, 4)) * t);
+    function hx(n) { return ("0" + Math.max(0, Math.min(255, n)).toString(16)).slice(-2).toUpperCase(); }
+    return hx(r) + hx(g) + hx(c);
+  }
+  function decoRect(id, prst, fg, bg) {
+    return '<p:sp><p:nvSpPr><p:cNvPr id="' + id + '" name="deco"/><p:cNvSpPr/><p:nvPr/></p:nvSpPr>'
+      + '<p:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="' + W + '" cy="' + H + '"/></a:xfrm>'
+      + '<a:prstGeom prst="rect"><a:avLst/></a:prstGeom>'
+      + '<a:pattFill prst="' + prst + '"><a:fgClr><a:srgbClr val="' + fg + '"/></a:fgClr>'
+      + '<a:bgClr><a:srgbClr val="' + bg + '"/></a:bgClr></a:pattFill><a:ln><a:noFill/></a:ln></p:spPr>'
+      + '<p:txBody><a:bodyPr/><a:lstStyle/><a:p><a:endParaRPr lang="zh-CN"/></a:p></p:txBody></p:sp>';
+  }
+  function decoOf(c) {
+    var prst = DECO_PRST[CLR.deco || "none"];
+    if (!prst) return "";
+    return decoRect(c.id++, prst, mix(CLR.bg, CLR.faint, 0.16), CLR.bg);
+  }
+
   // 主题自动选：按内容里的行当词猜，猜不出用 ink。显式 `theme: night` 优先。
   function pickTheme(deck) {
     var name = String((deck && deck.theme) || "").toLowerCase();
@@ -166,7 +218,8 @@
       + (o.line ? '<a:lnSpc><a:spcPct val="' + o.line + '"/></a:lnSpc>' : "")
       + (o.bullet ? '<a:buClr><a:srgbClr val="' + CLR.ac + '"/></a:buClr><a:buFont typeface="Arial"/><a:buChar char="\u2022"/>' : '<a:buNone/>')
       + '</a:pPr>';
-    var rPr = '<a:rPr lang="zh-CN" altLang="en-US" sz="' + (o.sz || 1800) + '"'
+    var sz = Math.round((o.sz || 1800) * (CLR.scale || 1) / 100) * 100;   // 复杂档整体放大一档
+    var rPr = '<a:rPr lang="zh-CN" altLang="en-US" sz="' + sz + '"'
       + (o.b ? ' b="1"' : "") + (o.i ? ' i="1"' : "") + ' dirty="0">'
       + '<a:solidFill><a:srgbClr val="' + (o.color || CLR.tx) + '"/></a:solidFill>'
       + '<a:latin typeface="+mn-lt"/><a:ea typeface="+mn-ea"/></a:rPr>';
@@ -202,7 +255,7 @@
 
   var LAYOUTS = {
     cover: function (s, c) {
-      c.bg = CLR.deep;                                  // 整幅深色，白底内容页之前先给一记重音
+      c.bg = CLR.deep; c.grad = CLR.grad;               // 整幅深色（有渐变方案就走渐变），先给一记重音
       var o = dot(c.id++, MX, 1500000, 200000, CLR.ac);
       if (c.kicker) o += tbox(c.id++, "kicker", MX + 340000, 1520000, W - MX * 2, 400000, para(c.kicker, { sz: 1300, color: CLR.ac, b: true }));
       o += tbox(c.id++, "title", MX, 2130000, W - MX * 2 - 600000, 2100000, para(s.title, { sz: 4000, b: true, color: CLR.onDeep, line: 115000 }));
@@ -399,7 +452,7 @@
         + pageNo(c.id++, c.idx, c.total);
     },
     closing: function (s, c) {
-      c.bg = CLR.deep;                                  // 与封面呼应，收在同一个色上
+      c.bg = CLR.deep; c.grad = CLR.grad;               // 与封面呼应，收在同一个色上
       var o = tbox(c.id++, "t", MX, 1500000, W - MX * 2, 1200000, para(s.title, { sz: 3600, b: true, color: CLR.onDeep })), i;
       for (i = 0; i < Math.min(4, s.bullets.length); i++) {
         var y = 3000000 + i * 720000;
@@ -448,15 +501,26 @@
     var c = { id: 2, idx: idx, total: total, footer: footer, kicker: kicker };
     var name = pickLayout(s, idx, total);
     var shapes = (LAYOUTS[name] || LAYOUTS.bullets)(s, c);
-    return wrapSlide(shapes, name, c.bg);
+    // 底纹画在最前面＝叠在最底层；整幅彩页（封面/过渡/收尾）不铺，它本身就是一片色
+    if (!c.bg) shapes = decoOf(c) + shapes;
+    return wrapSlide(shapes, name, c.bg, c.grad);
   }
 
   function pad(n) { return n < 10 ? "0" + n : String(n); }
   function hasChart(s) { return !!(s && s.chart && s.chart.series && s.chart.series.length && (s.chart.categories || []).length); }
   function hasImage(s) { return !!(s && s.image && s.image.bytes && s.image.bytes.length && s.image.ext); }
-  function wrapSlide(shapes, layoutName, bg) {
+  function wrapSlide(shapes, layoutName, bg, grad) {
+    var bgxml = "";
+    if (grad && grad.length === 2) {
+      bgxml = '<p:bg><p:bgPr><a:gradFill rotWithShape="1"><a:gsLst>'
+        + '<a:gs pos="0"><a:srgbClr val="' + grad[0] + '"/></a:gs>'
+        + '<a:gs pos="100000"><a:srgbClr val="' + grad[1] + '"/></a:gs>'
+        + '</a:gsLst><a:lin ang="5400000" scaled="0"/></a:gradFill><a:effectLst/></p:bgPr></p:bg>';
+    } else if (bg) {
+      bgxml = '<p:bg><p:bgPr><a:solidFill><a:srgbClr val="' + bg + '"/></a:solidFill><a:effectLst/></p:bgPr></p:bg>';
+    }
     return XD + '<p:sld ' + A + ' ' + P + ' ' + R + '><!-- layout: ' + esc(layoutName || "bullets") + ' --><p:cSld>'
-      + (bg ? '<p:bg><p:bgPr><a:solidFill><a:srgbClr val="' + bg + '"/></a:solidFill><a:effectLst/></p:bgPr></p:bg>' : "")
+      + bgxml
       + '<p:spTree>'
       + '<p:nvGrpSpPr><p:cNvPr id="1" name=""/><p:cNvGrpSpPr/><p:nvPr/></p:nvGrpSpPr>'
       + '<p:grpSpPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="0" cy="0"/><a:chOff x="0" y="0"/><a:chExt cx="0" cy="0"/></a:xfrm></p:grpSpPr>'
