@@ -29,29 +29,28 @@ PAPERS = [{
              "且互相排斥的三个判断，其实是同一个问题的三个侧面：一个基本单元——符号、有效推理、数——凭什么是它自己？"
              "同一性既非内在实体、亦非纯差异结构、更非无，而是**一束关系经差异呈现、被指称接住的生成事件**；"
              "三门不是三个争地基的领域，而是对同一场个体化行使的命名、判错、计算三种权能；三门老大难被诊断为同一症结的三种发作，"
-             "打开一门**形式个体化论**。本文给出三门各自层级不同的形式坐实（数学侧一条定理、逻辑侧一条判准构造、符号侧一条论证），"
-             "并证明一条**命名不变性定理**——可被命名的单元必为自同构群的不动点、其数不超过不动点数；"
-             "而反向一般不成立（自同构不变不蕴含可描述，如实数域自同构平凡而 π 不可一阶定义），这恰表明**命名不能被化约为计算**。"
-             "**本稿据两轮外部审稿两度修订**：纠正早先关于排中律的技术误断（结构化基础中经典排中不可导出、但可作非构造公理相容外加，可导出性≠相容性）、"
-             "补语境封闭条款、并把早先偏隐喻的「守恒」收窄为以自同构不变性为内核的个体化权衡原则。"),
+             "打开一门**形式个体化论**。本文如实标明三门坐实的层级不同：数学侧一条**结构身份原则**（为单价基础的「同构即同一」提供本体论动机）、"
+             "逻辑侧一条**本地判准**（并给出四类逻辑的结构性语义方向）、符号侧一条**概念论证**；全文无争议的**定理**只有一条——"
+             "**命名不变性定理**：可被无参数一阶语言命名的单元必为自同构群的不动点（Def⊆Fix），故其数不超过不动点数；"
+             "反向一般不成立（自同构不变不蕴含可描述，实数域自同构平凡而 π 不可一阶定义），这恰给出**命名不能被化约为计算**这一局部非还原支点。"
+             "**本稿经三轮外部审稿逐轮修订**：纠正排中律技术误断（可导出性≠相容性）、补语境封闭、把命名定理收窄为单向正确、"
+             "并把早先偏隐喻的「守恒」降格为启发式动机、承重原则改以自同构不变性为内核。"),
     "clash": ("三家在「基本单元的同一性从何而来」这同一问题上给出互斥答案："
-              "生物符号学说同一性/意义是真实的、有根的（根在活的解释关系里）；"
-              "逻辑多元论与反例外论说没有唯一、先验、普遍的有效性判准；"
-              "单价基础说同一性纯是结构关系、无内在实体（同构即同一）。"
-              "三者在本文所揭示的统一问题下处于尖锐张力，难以同时为真。"),
+              "生物符号学说同一性/意义是真实的、有根的；逻辑多元论与反例外论说没有唯一、先验、普遍的有效性判准；"
+              "单价基础说同一性纯是结构关系、无内在实体（同构即同一）。三者在本文所揭示的统一问题下处于尖锐张力，难以同时为真。"),
     "sources": [
         ("符号学 · 生物符号学",
          "Theses on Biosemiotics: Prolegomena to a Theoretical Biology (Kull, Deacon, Emmeche, Hoffmeyer, Stjernfelt, 2009)",
          "https://doi.org/10.1007/s12304-009-9050-8",
-         "符号过程是真实的自然事实，凡有生命进行解释处即有意义；借皮尔斯三元符号观强调解释项是不可还原的真实环节、不必预设外部解释者——意义有根，不可还原为纯差异结构。"),
+         "符号过程是真实的自然事实，凡有生命进行解释处即有意义；解释项是不可还原的真实环节、不必预设外部解释者——意义有根，不可还原为纯差异结构。"),
         ("逻辑学 · 逻辑多元论与反例外论",
-         "Logical Pluralism (Stanford Encyclopedia of Philosophy); Beall & Restall, Logical Pluralism (OUP 2006); Hjortland, Anti-Exceptionalism about Logic (Phil. Studies 2017)",
+         "Logical Pluralism (SEP); Beall & Restall, Logical Pluralism (OUP 2006); Hjortland, Anti-Exceptionalism about Logic (Phil. Studies 2017)",
          "https://plato.stanford.edu/entries/logical-pluralism/",
-         "对逻辑一元论的挑战：多元论主张不止一种正确后承关系，反例外论主张逻辑无先验例外地位、方法论上与经验科学连续、可修正——没有唯一先验普遍的有效性判准。"),
+         "对逻辑一元论的挑战：多元论主张不止一种正确后承关系，反例外论主张逻辑无先验例外地位、可修正——没有唯一先验普遍的有效性判准。"),
         ("数学 · 单价基础 / 同伦类型论",
-         "Homotopy Type Theory: Univalent Foundations of Mathematics (The Univalent Foundations Program, 2013, §3.2–3.4); Kapulkin & Lumsdaine (simplicial model); Awodey",
+         "Homotopy Type Theory (Univalent Foundations Program, 2013); Kapulkin & Lumsdaine, 单纯集模型中的排中律 (arXiv:2006.13694); Awodey",
          "https://homotopytypetheory.org/book/",
-         "单价公理推出「同构即同一」。朴素排中与单价不相容（原书 §3 排中律讨论），但命题层排中与单价相容（Kapulkin & Lumsdaine 单纯集模型）——故结构化基础中经典排中不可导出、可非构造外加，是本文纠正后跨门结论的对账靶。"),
+         "单价公理推出「同构即同一」。朴素排中与单价不相容，但命题层排中与单价相容（Kapulkin & Lumsdaine 证于单纯集模型）——故结构化基础中经典排中不可导出、可非构造外加，是本文跨门结论的对账靶。"),
     ],
 }]
 
@@ -132,7 +131,7 @@ def build_page(p, body, toc, pages):
     t = re.sub(r'<h1 class="art-title">.*?</h1>', f'<h1 class="art-title">{p["title"]}</h1>', t, flags=re.S)
     t = re.sub(r'<p class="art-sub">.*?</p>', f'<p class="art-sub">{p["sub"]}</p>', t, flags=re.S)
     t = re.sub(r'<div class="art-meta">.*?</div>',
-               f'<div class="art-meta">王德生 ＋ Claude · 约 3.6 万字 · {pages} 页 · '
+               f'<div class="art-meta">王德生 ＋ Claude · 约 3.5 万字 · {pages} 页 · '
                f'三种阅读方式 · 发表于{PUBDATE}</div>', t, flags=re.S)
     t = re.sub(r'<div class="deck">.*?</div>', f'<div class="deck">{strongify(p["deck"])}</div>', t, flags=re.S)
     links = "".join(f'<a href="#{i}">{html.escape(x)}</a>' for i, x in toc)
