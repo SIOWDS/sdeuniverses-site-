@@ -318,10 +318,13 @@ console.log("── 四 · 两端接线");
 console.log("── 四点五 · 空产出不许闷着（2026-07-30 实测撞上）");
 {
   const DIST = wk.slice(wk.indexOf('url.pathname === "/api/wds/distill"'), wk.indexOf('url.pathname === "/api/chat/clear"'));
-  ok(/deck: \{ name: "对外 PPT", tok: 16000/.test(wk), "PPT 档预算提到 16000（排 8–14 页的规划量比写一篇文章大，满功率档思考还吃同一份预算）");
+  ok(/deck: \{ name: "对外 PPT", tok: WDS_TOK_MAX/.test(wk), "PPT 档直接给顶配 WDS_TOK_MAX（DeepSeek 吃得下，别因为别家吃不下就一起压低）");
+  ok(/upstream = await wdsFetchMax\(VC, KEY, messages, true, SPEC\.tok, clk\.signal\)/.test(DIST), "成文走 wdsFetchMax：顶配起步，撞 400 自动降档");
+  ok(/if \(a >= 16000\) return \[a, Math\.min\(32000, a\), Math\.min\(16000, a\)\]/.test(wk), "长文档档有自己的降档阶梯（不再退到 6000 那种答话口径）");
+  ok(/report: \{ name: "对话报告", tok: 24000/.test(wk) && /essay: \{ name: "提炼成文", tok: 32000/.test(wk) && /outline: \{ name: "写作提纲", tok: 16000/.test(wk), "报告/成文/提纲三档也一并提到长文档区间");
   ok(/const messages = \[/.test(DIST), "messages 抽成变量——两遍必须喂同一件事");
   ok(/if \(!wrote\) \{[\s\S]{0,400}全用在思考上了/.test(DIST), "空产出时说清怎么空的（思考几字、正文 0 字）");
-  ok(/关掉思考重来一次/.test(DIST) && /max_tokens: Math\.round\(SPEC\.tok \/ 2\)/.test(DIST), "自动降档重试一次：关思考、预算减半");
+  ok(/关掉思考重来一次/.test(DIST) && /max_tokens: Math\.min\(32000, Math\.round\(SPEC\.tok \/ 2\)\)/.test(DIST), "自动降档重试一次：关思考、预算减半且钳在 32000");
   ok(/刻意不走 wdsTopBody/.test(DIST), "重试那一遍不套满功率（否则又把预算烧在思考上）");
   ok(/两遍都没写出正文/.test(DIST), "两遍都空也要给下一步，不许闷着");
   ok(/dEmptyHint/.test(wm) && /if \(!text\) dNote\(t\("dEmptyHint"\), 1\)/.test(wm), "客户端空产出也挂一条说明");

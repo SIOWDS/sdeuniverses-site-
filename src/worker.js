@@ -130,8 +130,14 @@ const WDS_TOK_SAFE = 8000, WDS_TOK_RETRY = 4000;
 // 且**只有它**能例外：判据是"输出本身就该有几千字"，不是"我希望它想得久一点"。
 const WDS_TOK_REFLECT = 32000, WDS_TOK_REFLECT_RETRY = 16000;
 function wdsLadder(VC, want) {
-  // 满功率档：有界起步，再降两档（降的是"想多久"，不是"能写多长"）
-  if (VC && VC.top) { const a = want || WDS_TOK_SAFE; return [a, Math.min(6000, a), Math.min(WDS_TOK_RETRY, a)]; }
+  if (VC && VC.top) {
+    const a = want || WDS_TOK_SAFE;
+    // 长文档档（成文/PPT/心得这类"输出本身就该有几千字"的）：给顶配，降档也降得体面。
+    // 与下面那条的分界是**产出该多长**，不是"我希望它想得久一点"——满功率的思考与正文吃同一份
+    // max_tokens，8000 的老口径下 PPT 会把预算全烧在思考上、正文一个字都不出（2026-07-30 实测撞上）。
+    if (a >= 16000) return [a, Math.min(32000, a), Math.min(16000, a)];
+    return [a, Math.min(6000, a), Math.min(WDS_TOK_RETRY, a)];
+  }
   return WDS_TOK_LADDER;
 }
 async function wdsFetchMax(VC, KEY, messages, stream, want, signal) {
@@ -4160,7 +4166,7 @@ export default {
       // 而不是原来的"只带最近 40 条、拼到 4 万字符就 break"——那样成文只看得见尾巴，且省略不说一声。
       const convo = readConvoText(turns, DISTILL_CONVO_MAX);
       const SPEC = {
-        report: { name: "对话报告", tok: 9000, spec:
+        report: { name: "对话报告", tok: 24000, spec:
           "把这场对话整理成一份【对话报告】。结构：\n"
           + "① 一句话结论——这场谈话最承重的那个判断是什么（不是话题是什么，是判断是什么）。\n"
           + "② 谈了哪几件事——分点列出，每点一句话说清读者问的是什么、答的核心是什么。\n"
@@ -4168,7 +4174,7 @@ export default {
           + "④ 还没解决的——哪些问题只碰了一下、哪些答案是脆的、哪一步最容易被反驳。\n"
           + "⑤ 下一步可做的——三到五条具体的、能动手的建议（读哪篇、往哪个方向追、可以写什么）。\n"
           + "用 Markdown，标题用 ##。忠于对话内容，不添加对话里没有的结论。" },
-        essay: { name: "提炼成文", tok: 14000, spec:
+        essay: { name: "提炼成文", tok: 32000, spec:
           "把这场对话【提炼成一篇独立成立的文章】——不是对话记录的整理，是一篇读者从没看过这场对话也能读懂、也能被说服的文章。要求：\n"
           + "① 拟一个真标题（不是「关于XX的讨论」这种）。\n"
           + "② 开篇第一句就是最承重的那个判断，反直觉、可被反驳。\n"
@@ -4176,7 +4182,7 @@ export default {
           + "④ 全程不出现「读者问」「我回答」「这场对话」之类痕迹，也不出现学派术语堆砌——普通人要能读懂。\n"
           + "⑤ 结尾留一个开口，不自我封顶。\n"
           + "用 Markdown，标题用 # 和 ##。约三千字。" },
-        deck: { name: "对外 PPT", tok: 16000, spec:
+        deck: { name: "对外 PPT", tok: WDS_TOK_MAX, spec:
           "把这场对话做成一套【对外汇报用的幻灯片稿】——听众没参与过这场谈话，只有十几分钟，要在这十几分钟里被说服。\n"
           + "【格式硬约束（页面要照它切页并生成真 .pptx，错一点就切不开，务必逐条照办）】\n"
           + "· 第一块是封面：第一行 `# 主标题`（不超过 22 字，是判断不是话题），第二行 `## 一句话主张`。\n"
@@ -4216,7 +4222,7 @@ export default {
           + (tplId ? ("\n" + DECK_TPL[tplId].spec
               + "\n（页数：" + DECK_TPL[tplId].pages + "。骨架里写「只写一条要点」的页，就真的只写一条——它会被放大成整页的一句话。）")
             : "\n（本次未指定模板：按内容自己判断该有哪几页，仍须满足上面第④条的多样性要求。）") },
-        outline: { name: "写作提纲", tok: 6000, spec:
+        outline: { name: "写作提纲", tok: 16000, spec:
           "把这场对话变成一份【可以直接照着写的提纲】。结构：\n"
           + "① 母题：一句反直觉的判断，全篇的脊梁。\n"
           + "② 为什么这条母题立得住：三条支撑理由。\n"
@@ -4250,12 +4256,9 @@ export default {
             ];
             let upstream;
             try {
-              upstream = await fetch(VC.url, {
-                method: "POST",
-                headers: { "content-type": "application/json", authorization: "Bearer " + KEY },
-                body: JSON.stringify(wdsTopBody(VC, { model: VC.model, stream: true, max_tokens: SPEC.tok, messages })),
-                signal: clk.signal,
-              });
+              // 走 wdsFetchMax：顶配起步（SPEC.tok），若某家型号嫌大回 400 就自动降档重发，
+              // 不必替五家基底各猜一个上限——DeepSeek 能吃下的，别因为别家吃不下就一起压低。
+              upstream = await wdsFetchMax(VC, KEY, messages, true, SPEC.tok, clk.signal);
             } catch (e) {
               clk.stop();
               controller.enqueue(_sseBytes({ t: "error", v: (clk.cut ? clk.why("成文") : ("接不上基底：" + (e && e.message))) + "（可再试一次）" }));
@@ -4299,7 +4302,7 @@ export default {
             //    原来只回一句"没有产出内容"，读者不知道发生了什么、我方也查不出。
             //    现在：说清怎么空的，并**自动降档重试一次**（关掉思考、预算减半），只重试一次。
             if (!wrote) {
-              controller.enqueue(_sseBytes({ t: "note", v: "第一遍把 " + SPEC.tok + " 的预算全用在思考上了（思考 " + _st.think + " 字、正文 0 字），正在关掉思考重来一次…" }));
+              controller.enqueue(_sseBytes({ t: "note", v: "第一遍顶配预算 " + SPEC.tok + " 全用在思考上了（思考 " + _st.think + " 字、正文 0 字），正在关掉思考重来一次…" }));
               _st.stage = SPEC.name + "·重试";
               const clk2 = wdsClock(DISTILL_FIRST_MS, DISTILL_TOTAL_MS);
               try {
@@ -4307,7 +4310,7 @@ export default {
                   method: "POST",
                   headers: { "content-type": "application/json", authorization: "Bearer " + KEY },
                   // 刻意不走 wdsTopBody：这一遍就是要**没有思考**，把预算全留给正文
-                  body: JSON.stringify({ model: VC.model, stream: true, max_tokens: Math.round(SPEC.tok / 2), messages }),
+                  body: JSON.stringify({ model: VC.model, stream: true, max_tokens: Math.min(32000, Math.round(SPEC.tok / 2)), messages }),
                   signal: clk2.signal,
                 });
                 const rd2 = up2.body.getReader();
