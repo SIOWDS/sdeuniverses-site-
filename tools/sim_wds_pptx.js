@@ -516,11 +516,36 @@ console.log("── 四点三 · 第二份真跑抓到的：标题被写成了�
   ok(/三个数字必须互不相同/.test(wk), "大数字页禁止三张卡同一个数（实测栽过）");
 }
 
+console.log("── 四点四五 · 第三次空产出：输出预算按入参实际大小算 ＋ 诊断当正文吐出");
+{
+  const DIST = wk.slice(wk.indexOf('url.pathname === "/api/wds/distill"'), wk.indexOf('url.pathname === "/api/chat/clear"'));
+  ok(/const inChars = sys\.length \+ convo\.length/.test(DIST), "先量入参实际有多大");
+  ok(/const tokWant = Math\.max\(6000, Math\.min\(SPEC\.tok, Math\.round\(115000 - inChars \* 1\.05\)\)\)/.test(DIST),
+     "输出预算＝本档上限与「窗里还剩多少」取小——写死 64000 而入参又有五六万，等于向上游要一个它给不出的数");
+  ok(/wdsFetchMax\(VC, KEY, messages, true, tokWant, clk\.signal, true\)/.test(DIST), "用的是算出来的预算，且要上游回报用量");
+  const f = (s, c, spec) => Math.max(6000, Math.min(spec, Math.round(115000 - (s + c) * 1.05)));
+  ok(f(10000, 20000, 64000) === 64000, "入参小 → 顶配照给");
+  ok(f(10000, 44000, 64000) < 64000 && f(10000, 44000, 64000) > 50000, "入参五万多 → 自动让出一部分（实得 " + f(10000, 44000, 64000) + "）");
+  ok(f(10000, 100000, 64000) === 6000, "入参极端时也有下限，不会算成负数");
+  // usage 与 finish_reason：空产出时唯一能说清真相的证据
+  ok(/withUsage/.test(wk) && /body\.stream_options = \{ include_usage: true \}/.test(wk), "wdsFetchMax 可选开启上游用量回报");
+  ok(/只在调用方明确要时才加/.test(wk), "默认不开——有的家不认这个字段，加了反而 400");
+  ok(/if \(j\.usage\) usage = j\.usage/.test(DIST) && /finish_reason\) finish =/.test(DIST), "读循环收下用量与收束理由");
+  ok(/上游自报：入 /.test(DIST) && /上游给的收束理由：/.test(DIST), "诊断里带上上游自己报的数");
+  ok(/j\.choices && j\.choices\[0\] && j\.choices\[0\]\.delta/.test(DIST), "choices 可能是空数组（usage 那一帧），必须先判再取");
+  // 诊断当正文吐出：note 在旧版页面会被覆盖，正文不会
+  ok(/controller\.enqueue\(_sseBytes\(\{ t: "token", v: diag \}\)\)/.test(DIST), "第一遍的诊断同时当正文吐出（旧版页面也看得见）");
+  ok(/t: "token", v: diag2/.test(DIST), "两遍都空的最终诊断同样当正文吐出");
+  ok(/最可能是这一场太长把上下文窗吃满了/.test(DIST), "最终诊断给出可执行的下一步");
+}
+
 console.log("── 四点五 · 空产出不许闷着（2026-07-30 实测撞上）");
 {
   const DIST = wk.slice(wk.indexOf('url.pathname === "/api/wds/distill"'), wk.indexOf('url.pathname === "/api/chat/clear"'));
   ok(/deck: \{ name: "对外 PPT", tok: WDS_TOK_MAX/.test(wk), "PPT 档直接给顶配 WDS_TOK_MAX（DeepSeek 吃得下，别因为别家吃不下就一起压低）");
-  ok(/upstream = await wdsFetchMax\(VC, KEY, messages, true, SPEC\.tok, clk\.signal\)/.test(DIST), "成文走 wdsFetchMax：顶配起步，撞 400 自动降档");
+  // 预算已改成按入参动态算（tokWant），仍是顶配起步＋撞 400 自动降档
+  ok(/upstream = await wdsFetchMax\(VC, KEY, messages, true, tokWant, clk\.signal, true\)/.test(DIST),
+     "成文走 wdsFetchMax：按入参算出的预算起步，撞 400 自动降档");
   ok(/if \(a >= 16000\) return \[a, Math\.min\(32000, a\), Math\.min\(16000, a\)\]/.test(wk), "长文档档有自己的降档阶梯（不再退到 6000 那种答话口径）");
   ok(/report: \{ name: "对话报告", tok: 24000/.test(wk) && /essay: \{ name: "提炼成文", tok: 32000/.test(wk) && /outline: \{ name: "写作提纲", tok: 16000/.test(wk), "报告/成文/提纲三档也一并提到长文档区间");
   ok(/const messages = \[/.test(DIST), "messages 抽成变量——两遍必须喂同一件事");

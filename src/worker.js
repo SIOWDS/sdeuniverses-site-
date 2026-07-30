@@ -140,14 +140,18 @@ function wdsLadder(VC, want) {
   }
   return WDS_TOK_LADDER;
 }
-async function wdsFetchMax(VC, KEY, messages, stream, want, signal) {
+async function wdsFetchMax(VC, KEY, messages, stream, want, signal, withUsage) {
   const ladder = wdsLadder(VC, want);
   let resp = null;
   for (let i = 0; i < ladder.length; i++) {
+    const body = { model: VC.model, stream: !!stream, max_tokens: ladder[i], messages };
+    // 让上游随流回报用量：空产出时这是唯一能说清"到底喂进去多少、吐出来多少"的证据。
+    // 只在调用方明确要时才加——有的家不认这个字段，加了反而 400。
+    if (stream && withUsage) body.stream_options = { include_usage: true };
     resp = await fetch(VC.url, {
       method: "POST",
       headers: { "content-type": "application/json", authorization: "Bearer " + KEY },
-      body: JSON.stringify(wdsTopBody(VC, { model: VC.model, stream: !!stream, max_tokens: ladder[i], messages })),
+      body: JSON.stringify(wdsTopBody(VC, body)),
       signal: signal || undefined,   // 上层给的时钟护栏：上游卡死时由它掐断，别把整个请求拖到平台上限被无声杀掉
     });
     if (resp.ok || resp.status !== 400 || i === ladder.length - 1) return resp;
@@ -4383,6 +4387,11 @@ export default {
               + (dlang === "en" ? "\n\n【LANGUAGE】Write the whole piece in English — natural English prose, not translated Chinese. Keep SDE terms as Show / Difference / Entanglement." : "");
             // 成文是全链路里最费脑的一步（满功率＋几千字输出），此前是唯一一条没戴时钟的 WDS 路由：
             // 平台掐断是静默的，不设时限就只能看到一个永远转着的光标。
+            // 【输出预算按入参实际大小算】上下文窗是共用的：system＋对话已经吃掉多少，
+            // 输出就只能要剩下的那部分。写死 64000 而入参又有五六万时，等于向上游要一个它给不出的数——
+            // 上游既不报错也不写正文，读者只看到"没有产出内容"（2026-07-30 连撞三次）。
+            const inChars = sys.length + convo.length;
+            const tokWant = Math.max(6000, Math.min(SPEC.tok, Math.round(115000 - inChars * 1.05)));
             const clk = wdsClock(DISTILL_FIRST_MS, DISTILL_TOTAL_MS);
             // 抽成变量：下面"空产出降档重试"那一遍要复用同一份，绝不能两遍喂的不是同一件事
             const messages = [
@@ -4397,7 +4406,7 @@ export default {
             try {
               // 走 wdsFetchMax：顶配起步（SPEC.tok），若某家型号嫌大回 400 就自动降档重发，
               // 不必替五家基底各猜一个上限——DeepSeek 能吃下的，别因为别家吃不下就一起压低。
-              upstream = await wdsFetchMax(VC, KEY, messages, true, SPEC.tok, clk.signal);
+              upstream = await wdsFetchMax(VC, KEY, messages, true, tokWant, clk.signal, true);
             } catch (e) {
               clk.stop();
               controller.enqueue(_sseBytes({ t: "error", v: (clk.cut ? clk.why("成文") : ("接不上基底：" + (e && e.message))) + "（可再试一次）" }));
@@ -4410,7 +4419,7 @@ export default {
             }
             const reader = upstream.body.getReader();
             const dec = new TextDecoder();
-            let buf = "", wrote = 0;
+            let buf = "", wrote = 0, finish = "", usage = null;
             try {
             while (true) {
               const { done: rdone, value } = await reader.read();
@@ -4425,6 +4434,8 @@ export default {
                 if (p === "[DONE]") continue;
                 let j; try { j = JSON.parse(p); } catch (e) { continue; }
                 if (j.error) { controller.enqueue(_sseBytes({ t: "error", v: j.error.message || "基底流内错误" })); continue; }
+                if (j.usage) usage = j.usage;                                   // 上游自报用量（include_usage）
+                if (j.choices && j.choices[0] && j.choices[0].finish_reason) finish = j.choices[0].finish_reason;
                 const d = (j.choices && j.choices[0] && j.choices[0].delta) || {};
                 if (d.reasoning_content) { clk.firstFrame(); _st.think += d.reasoning_content.length; controller.enqueue(_sseBytes({ t: "think", v: d.reasoning_content })); }
                 if (d.content) { clk.firstFrame(); _st.out += d.content.length; wrote += d.content.length; controller.enqueue(_sseBytes({ t: "token", v: d.content })); }
@@ -4441,7 +4452,15 @@ export default {
             //    原来只回一句"没有产出内容"，读者不知道发生了什么、我方也查不出。
             //    现在：说清怎么空的，并**自动降档重试一次**（关掉思考、预算减半），只重试一次。
             if (!wrote) {
-              controller.enqueue(_sseBytes({ t: "note", v: "第一遍没写出正文：预算 " + SPEC.tok + "、思考 " + _st.think + " 字、正文 0 字；入参 system " + sys.length + " 字 ＋ 对话 " + convo.length + " 字。正在关掉思考重来一次…" }));
+              const uinfo = usage ? ("；上游自报：入 " + (usage.prompt_tokens || "?") + " tok、出 "
+                + (usage.completion_tokens || "?") + " tok" + (usage.completion_tokens_details && usage.completion_tokens_details.reasoning_tokens
+                  ? ("（其中思考 " + usage.completion_tokens_details.reasoning_tokens + "）") : "")) : "";
+              const diag = "（第一遍没写出正文：要了 " + tokWant + " 的输出预算〔本档上限 " + SPEC.tok + "〕，"
+                + "思考 " + _st.think + " 字、正文 0 字；入参 system " + sys.length + " 字 ＋ 对话 " + convo.length + " 字"
+                + (finish ? ("；上游给的收束理由：" + finish) : "") + uinfo + "。正在关掉思考重来一次…）\n\n";
+              // 诊断既发 note、也**当正文吐出去**——note 在旧版页面里会被后一条覆盖，正文不会丢。
+              controller.enqueue(_sseBytes({ t: "note", v: diag }));
+              controller.enqueue(_sseBytes({ t: "token", v: diag }));
               _st.stage = SPEC.name + "·重试";
               const clk2 = wdsClock(DISTILL_FIRST_MS, DISTILL_TOTAL_MS);
               try {
@@ -4474,7 +4493,13 @@ export default {
                 controller.enqueue(_sseBytes({ t: "note", v: "关掉思考重来这一遍也没成：" + ((e2 && e2.message) || "未知原因") + "。换标准档或稍后再试。" }));
               }
               clk2.stop();
-              if (!wrote) controller.enqueue(_sseBytes({ t: "note", v: "两遍都没写出正文。多半是这一场对话太长、把输入窗吃满了——试试新开一场再成文，或换一家基底。" }));
+              if (!wrote) {
+                const diag2 = "（两遍都没写出正文。入参 " + inChars + " 字、要过 " + tokWant + " 与 "
+                  + Math.min(32000, Math.round(SPEC.tok / 2)) + " 两档预算都没出正文。"
+                  + "最可能是这一场太长把上下文窗吃满了：新开一场再成文，或把顶部模式从「深度思考」切到「标准」。）";
+                controller.enqueue(_sseBytes({ t: "note", v: diag2 }));
+                controller.enqueue(_sseBytes({ t: "token", v: diag2 }));
+              }
             }
           } catch (e) {
             controller.enqueue(_sseBytes({ t: "error", v: "成文出错：" + (e && e.message) + "（可再试一次）" }));

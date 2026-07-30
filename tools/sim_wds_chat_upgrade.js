@@ -187,11 +187,12 @@ console.log("── 十一 · 成文（distill）：整场可见 + 时钟 + 断�
      "仍用 readConvoText（保头 35%＋保尾＋明标省略），且上限随输出预算动态算");
   ok(/DISTILL_CONVO_MAX = 100000/.test(wk), "成文能看的对话原文提到 10 万字符（原 4 万且从中间断掉）");
   ok(/const clk = wdsClock\(DISTILL_FIRST_MS, DISTILL_TOTAL_MS\)/.test(DIST), "成文戴上时钟（此前是唯一没戴的 WDS 路由）");
-  ok(/wdsFetchMax\(VC, KEY, messages, true, SPEC\.tok, clk\.signal\)/.test(DIST) && /clk\.firstFrame\(\)/.test(DIST) && /clk\.stop\(\)/.test(DIST),
+  ok(/wdsFetchMax\(VC, KEY, messages, true, tokWant, clk\.signal, true\)/.test(DIST) && /clk\.firstFrame\(\)/.test(DIST) && /clk\.stop\(\)/.test(DIST),
      "signal 经 wdsFetchMax 透传、首帧撤护栏、收尾撤钟");
   ok(/if \(wrote\)[\s\S]{0,120}t: "note"/.test(DIST), "断流时已写出的稿保留并发 note");
   ok(/_st\.stage = SPEC\.name/.test(DIST), "心跳带上「在写哪一件」");
-  ok(/name: "提炼成文", tok: 32000/.test(DIST), "要三千字就别只给 6000 预算——现在四档一律走长文档区间（同「8000 token 装不下 8000 汉字」一族）");
+  ok(/name: "提炼成文", tok: 32000/.test(DIST), "要三千字就别只给 6000 预算——四档一律走长文档区间");
+  ok(/const tokWant = Math\.max\(6000/.test(DIST), "但真正下单的是按入参算出来的 tokWant（窗是共用的）");
   // readConvoText 真跑：超限时保头保尾且明标省略
   const rct = grab(wk, "readConvoText", ["WDS_MAX_TURNS"])(100);
   const turns = Array.from({ length: 30 }, (_, i) => ({ role: i % 2 ? "wds" : "reader", text: "第" + i + "段" + "字".repeat(400) }));
