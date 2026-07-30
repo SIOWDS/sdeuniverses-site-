@@ -6,6 +6,7 @@
 "use strict";
 const fs = require("fs");
 let FAILS = 0, PASS = 0;
+function curToolShown(btn, name) { return String(btn.textContent || "").includes(name); }
 function ok(c, m) { if (c) { PASS++; console.log("  PASS " + m); } else { FAILS++; console.log("  FAIL " + m); } }
 
 /* ---------- 极简 DOM ---------- */
@@ -621,6 +622,65 @@ ROUTE["/api/wds/chat"] = [
   ok(!!layer.querySelector(".wdsm-drop"), "拖文件进来出现落区提示");
   layer.dispatch("dragleave", {});
   ok(!layer.querySelector(".wdsm-drop"), "拖离即撤掉提示");
+
+  /* ══════════════ ㉓ SDE 九道工序（问WDS 独有）══════════════ */
+  console.log("㉓ SDE 工序：菜单 / 挂载 / 斜杠命令 / 近邻名单卡");
+  const tlBtn = layer.querySelector(".wdsm-toolbtn");
+  ok(!!tlBtn, "模式条上有「⊞ SDE 工序」按钮");
+  ok(layer.querySelectorAll(".wdsm-mode").filter((b) => b.getAttribute("data-k")).length === 3,
+     "工序按钮借 .wdsm-mode 样式但没有 data-k，不参与三档互斥（三档仍是 3 个）");
+  tlBtn.click();
+  const tlm = document.body.querySelector(".wdsm-menu");
+  ok(!!tlm && tlm.querySelectorAll("button").length === 10, "工序菜单九道＋「不用工序」共十项，实得 " + (tlm ? tlm.querySelectorAll("button").length : 0));
+  ["创新智商评分", "三视角误差互消", "母题打造", "近邻检测", "改姓", "缝隙扫描", "三篇碰撞", "27 宫格定位", "九宫格取三格"]
+    .forEach((n) => ok(tlm.querySelectorAll("button").some((b) => b.textContent.includes(n)), "菜单里有「" + n + "」"));
+  tlm.querySelectorAll("button").find((b) => b.textContent.includes("近邻检测")).click();
+  ok(curToolShown(tlBtn, "近邻检测") && tlBtn.classList.contains("on"), "选中的工序在按钮上看得见并高亮，实得 " + tlBtn.textContent);
+  ok(!("sde_wds_tool" in store), "工序刻意不写 localStorage（会实质改变产出形态，不该在看不见的地方跨会话生效）");
+
+  layer.querySelector(".wdsm-newbtn").click();
+  ROUTE["/api/wds/chat"] = [
+    { t: "nbr", v: [{ t: "自噬性稳态", u: "/students/zhang-qiong/x/", au: "张琼", own: true }, { t: "复现土", u: "/students/hu-min/y/", au: "胡敏", own: false }] },
+    { t: "token", v: "近邻检测：\n\n本文所属学科：教育学" },
+  ];
+  inEl.value = "这个概念和站里已有的重不重";
+  sendEl.click();
+  await new Promise((r) => setTimeout(r, 140));
+  ok(LAST_PAYLOAD.tool === "nbr", "payload 带 tool=nbr，实得 " + LAST_PAYLOAD.tool);
+  const nbT = layer.querySelector(".wdsm-msgs").lastChild;
+  const nbBox = nbT.querySelector(".wdsm-nbr");
+  ok(!!nbBox && nbBox.querySelectorAll("a").length === 2, "近邻名单卡渲染出两条，实得 " + (nbBox ? nbBox.querySelectorAll("a").length : 0));
+  ok(nbBox.textContent.includes("本人已发"), "本人已发的那一篇被标出来（自我重复最难自查）");
+
+  layer.querySelector(".wdsm-newbtn").click();
+  ROUTE["/api/wds/chat"] = [{ t: "nbrfail", v: "empty" }, { t: "token", v: "只凭记忆答。" }];
+  inEl.value = "再查一次";
+  sendEl.click();
+  await new Promise((r) => setTimeout(r, 140));
+  const failCard = layer.querySelector(".wdsm-msgs").lastChild.querySelector(".wdsm-nbr");
+  ok(!!failCard && !!failCard.querySelector(".nf"), "名单取不到时如实说一句，而不是静默把没做的检测当做过了");
+
+  console.log("㉔ 斜杠命令");
+  layer.querySelector(".wdsm-newbtn").click();
+  ROUTE["/api/wds/chat"] = [{ t: "token", v: "评分结果。" }];
+  inEl.value = "/评分 这一段值多少分";
+  sendEl.click();
+  await new Promise((r) => setTimeout(r, 140));
+  ok(LAST_PAYLOAD.tool === "iq", "/评分 挂上创新智商工序，实得 " + LAST_PAYLOAD.tool);
+  ok(LAST_PAYLOAD.q === "这一段值多少分", "命令本身从提问里摘掉了，实得 " + LAST_PAYLOAD.q);
+  layer.querySelector(".wdsm-newbtn").click();
+  inEl.value = "/母题";
+  sendEl.click();
+  await new Promise((r) => setTimeout(r, 60));
+  ok(tlBtn.textContent.includes("母题"), "只敲 /母题 不带问题：挂上工序、等下一句，不空发");
+  layer.querySelector(".wdsm-newbtn").click();
+  inEl.value = "/zzz 一个带斜杠的问题";
+  sendEl.click();
+  await new Promise((r) => setTimeout(r, 140));
+  ok(LAST_PAYLOAD.q === "/zzz 一个带斜杠的问题", "认不出的斜杠原样送出（读者可能本来就要问带斜杠的东西），实得 " + LAST_PAYLOAD.q);
+  tlBtn.click();
+  document.body.querySelector(".wdsm-menu").querySelectorAll("button").find((b) => b.textContent.includes("不用工序")).click();
+  ok(!tlBtn.classList.contains("on") && LAST_PAYLOAD.tool !== undefined, "可以摘掉工序回到普通对话");
 
   console.log("\n===== " + PASS + " PASS / " + FAILS + " FAIL =====");
   process.exit(FAILS ? 1 : 0);

@@ -98,7 +98,12 @@ console.log("\n[四] 端点契约（对着源码里那段路由查）");
   ok(/q\.length < 1/.test(seg), "空问题直接短路，不去动静态资产");
   ok(/catch \(e\)/.test(seg) && /neighbors: \[\], block: ""/.test(seg), "失败回空清单而不是 500——近邻拿不到时产出照走，不许因此崩掉");
   ok(/parseInt\(b\.k, 10\)/.test(seg) && /Math\.min\(20/.test(seg), "k 有上限，防止被要一张几百条的名单");
-  ok(/\/\^\\\/students\\\/\//.test(seg) || /students/.test(seg), "分层检索那一路排除 /students/，避免与 publications 一路重复计一篇两次");
+  // 取名单的逻辑已抽进共用 nbrFor()（端点与「近邻工序」共用一份），故断言钉到那个函数上，
+  // 并额外要求端点确实是委托给它——不然两边会各留一份、静默地漂。
+  const nf = W.slice(W.indexOf("async function nbrFor("), W.indexOf("function nbBlock("));
+  ok(/\/\^\\\/students\\\/\//.test(nf), "共用 nbrFor 里，分层检索那一路排除 /students/，避免与 publications 一路重复计一篇两次");
+  ok(/nbRank\(pubs/.test(nf) && /lightRetrieve/.test(nf) && /sort\(/.test(nf), "共用 nbrFor 两路材料齐全并排序取前 k");
+  ok(/await nbrFor\(/.test(seg), "端点委托给共用 nbrFor（召回口径只有一份）");
   ok(/CORPUS_TTL/.test(W.slice(W.indexOf("async function loadPubs"), W.indexOf("function nbTerms"))), "publications 走模块级缓存（401KB，不该每次问都重取）");
 }
 
