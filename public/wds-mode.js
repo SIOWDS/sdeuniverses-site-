@@ -18,6 +18,7 @@
 
   var API = "/api/wds/chat";
   var API_DISTILL = "/api/wds/distill";
+  var API_LINK = "/api/wds/link";        // 篇名→站内网址（只读索引，不烧 Key）
   var LS = "sdeuniverses_wds_mode";
   var LS_MODE = "sde_wds_thinkmode";      // "std" | "deep"
   var LS_WEB = "sde_wds_web";             // "1" | "0"
@@ -371,6 +372,7 @@
       brPrev: "上一版", brNext: "下一版", brOf: " / ",
       aMd: "⧉ 原文", aEditIn: "✎ 编辑", edSave: "保存并重答", edCancel: "取消",
     aCont: "↳ 继续", contQ: "接着上面继续写下去，别重复已经写过的部分。",
+    lkOpen: "打开站内这篇（新标签页）",
     bMem: "⌾ 记忆", memTitle: "全局记忆 · 我的历史对话",
     memHd: "本机共 <b>{n}</b> 场对话（含其它 WDS 智能体），已炼出 <b>{m}</b> 条记忆，待更新 <b>{p}</b> 场",
     memGo: "开始更新", memProf: "重炼画像", memExp: "导出记忆", memClr: "清空记忆",
@@ -487,6 +489,7 @@
       brPrev: "Previous version", brNext: "Next version", brOf: " / ",
       aMd: "⧉ Source", aEditIn: "✎ Edit", edSave: "Save & regenerate", edCancel: "Cancel",
     aCont: "↳ Continue", contQ: "Continue from where you stopped; don't repeat what you already wrote.",
+    lkOpen: "Open this article on the site (new tab)",
     bMem: "⌾ Memory", memTitle: "Global memory · your past chats",
     memHd: "<b>{n}</b> chats on this device (all WDS agents), <b>{m}</b> distilled, <b>{p}</b> pending",
     memGo: "Update now", memProf: "Rebuild profile", memExp: "Export", memClr: "Clear",
@@ -690,6 +693,8 @@
     ".wdsm-dist-t{font:700 15px/1 inherit;color:var(--wtx2);flex:none}" +
     ".wdsm-dist-c{flex:1;overflow-y:auto;padding:20px 22px}" +
     /* 快捷键帮助 / 拖拽遮罩 */
+    ".wdsm-lk{color:var(--wgold2);text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1px;text-decoration-color:rgba(190,160,90,.5)}" +
+    ".wdsm-lk:hover{text-decoration-color:var(--wgold)}" +
     ".wdsm-membtn{position:relative}" +
     ".wdsm-mbadge{position:absolute;top:-5px;right:-5px;min-width:15px;height:15px;line-height:15px;border-radius:9px;background:var(--wgold);color:#1a1508;font-size:10px;font-style:normal;text-align:center;padding:0 3px}" +
     ".wdsm-memb{max-width:560px;width:100%;background:var(--wpanel);border:1px solid var(--wline2);border-radius:16px;padding:20px 22px;max-height:82vh;overflow:auto}" +
@@ -1303,6 +1308,87 @@
 
   // 来源列表不在流里当场画，而是等正文写完再由 flushSrcs 调过来（读者先看到回答）；
   // 默认收成一行，点开才展开，不抢正文的版面。
+  /* ════════ 站内篇目自动挂链接 ════════
+     病根（2026-07-30 实测）：读者要"三篇文章的链接"，它答"站内文章没有链接，你去搜索框敲标题"——
+     纯属幻觉，因为送进它上下文的段落头只有【来源：篇名】、从来没有网址。
+     修法两条腿：① worker 把网址随篇名一起给它、并要求写成 Markdown 链接；
+     ② 这里兜底——答案里凡出现《篇名》而我们知道它的网址，就地把它变成可点的链接。
+     兜底这条不依赖模型是否听话，所以是主力。 */
+  var LINKMAP = {};                                  // 规范化篇名 → 站内网址（本页缓存，跨轮复用）
+  var LINKMISS = {};                                 // 问过后端仍查不到的，别反复问
+  function lkNorm(s) {
+    return String(s || "").toLowerCase().replace(/\s+/g, "")
+      .replace(/[《》〈〉「」『』\u201c\u201d\u2018\u2019"'`·・｜|,，。.、:：;；!！?？()（）\[\]【】—–-]/g, "");
+  }
+  function lkPut(list) {
+    (list || []).forEach(function (d) {
+      if (!d || !d.u || !d.t) return;
+      var head = String(d.t).split(" · ")[0];        // 站内标题多是「篇名 · 作者 · SDE Universes」
+      if (lkNorm(head)) LINKMAP[lkNorm(head)] = d.u;
+      if (lkNorm(d.t)) LINKMAP[lkNorm(d.t)] = d.u;
+    });
+  }
+  // 在已渲染的 DOM 里就地替换；跳过 a/code/pre，免得把已有链接或代码改坏
+  function lkScan(root) {
+    if (!root || !document.createTreeWalker) return 0;
+    var walk = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null), nodes = [], n, hit = 0;
+    while ((n = walk.nextNode())) {
+      if (!n.nodeValue || n.nodeValue.indexOf("《") < 0) continue;
+      var p = n.parentNode, skip = false;
+      while (p && p !== root) {
+        var tg = (p.tagName || "").toLowerCase();
+        if (tg === "a" || tg === "code" || tg === "pre") { skip = true; break; }
+        p = p.parentNode;
+      }
+      if (!skip) nodes.push(n);
+    }
+    nodes.forEach(function (node) {
+      var s = node.nodeValue, re = /《([^》\n]{2,60})》/g, m, last = 0, frag = null;
+      while ((m = re.exec(s))) {
+        var u = LINKMAP[lkNorm(m[1])];
+        if (!u) continue;
+        frag = frag || document.createDocumentFragment();
+        if (m.index > last) frag.appendChild(document.createTextNode(s.slice(last, m.index)));
+        var a = document.createElement("a");
+        a.href = u; a.target = "_blank"; a.rel = "noopener";
+        a.className = "wdsm-lk"; a.title = t("lkOpen"); a.textContent = m[0];
+        frag.appendChild(a); last = m.index + m[0].length; hit++;
+      }
+      if (frag) {
+        if (last < s.length) frag.appendChild(document.createTextNode(s.slice(last)));
+        node.parentNode.replaceChild(frag, node);
+      }
+    });
+    return hit;
+  }
+  // 先用已知的挂一遍；答案里还有不认识的篇名，就问一次后端，回来再挂一遍
+  function autoLink(root, text) {
+    if (!root) return;
+    lkScan(root);
+    var want = [], seen = {};
+    String(text || "").replace(/《([^》\n]{2,60})》/g, function (whole, inner) {
+      var k = lkNorm(inner);
+      if (k && !LINKMAP[k] && !LINKMISS[k] && !seen[k]) { seen[k] = 1; want.push(inner); }
+      return whole;
+    });
+    if (!want.length) return;
+    fetch(API_LINK, {
+      method: "POST", headers: { "content-type": "application/json" },
+      body: JSON.stringify({ titles: want.slice(0, 12) }),
+    }).then(function (r) { return r.json(); }).then(function (j) {
+      want.forEach(function (x) { LINKMISS[lkNorm(x)] = 1; });     // 先全记为查不到
+      if (j && j.hits && j.hits.length) {
+        j.hits.forEach(function (x) {
+          if (!x || !x.u) return;
+          delete LINKMISS[lkNorm(x.q)];
+          LINKMAP[lkNorm(x.q)] = x.u;                              // 按读者写的那个名字也记一条
+          lkPut([{ u: x.u, t: x.t }]);
+        });
+        lkScan(root);
+      }
+    }).catch(function () {});
+  }
+
   function renderSources(cell, srcs, kind) {
     if (!srcs || !srcs.length) return null;
     var box = el("div", "wdsm-src" + (kind === "web" ? " wdsm-web" : ""));
@@ -1389,6 +1475,7 @@
   }
   function mountActs(cell, text) {
     if (cell.wait && cell.wait.parentNode) { cell.wait.parentNode.removeChild(cell.wait); cell.wait = null; }
+    autoLink(cell.a, text);                     // 答案里的站内篇目就地变成可点链接
     if (cell.acts && cell.acts.parentNode) cell.acts.parentNode.removeChild(cell.acts);
     var row = el("div", "wdsm-acts");
     var cp = el("button", "wdsm-act", t("aCopy"));
@@ -1866,7 +1953,7 @@
               if (p === "[DONE]") return finish();
               var j; try { j = JSON.parse(p); } catch (e) { continue; }
               if (j.t === "quota") { if (j.v && typeof j.v.left === "number") { dayLeft = j.v.left; updTurns(); } }
-              else if (j.t === "sources") { if (!srcDone) { srcDone = true; pendSite = j.v; } }
+              else if (j.t === "sources") { if (!srcDone) { srcDone = true; pendSite = j.v; lkPut(j.v); } }
               else if (j.t === "web") { pendWeb = j.v; }
               else if (j.t === "webfail") {
                 var why = j.v === "need_search_key" ? t("webNeedKey") : (j.v === "bad_search_key" ? t("webBadKey") : t("webNone"));
@@ -2040,6 +2127,7 @@
     function done() {
       clearTimeout(dWd);
       out.innerHTML = text ? mdRender(text) : esc(t("dEmpty"));
+      if (text) autoLink(out, text);            // 成文里提到的站内篇目同样挂链接
       stat.textContent = text ? (t("dDone") + text.length) : t("dFail");
       if (dTimedOut) dNote(t("dCut"), 1);
     }

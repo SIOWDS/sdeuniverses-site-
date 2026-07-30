@@ -1910,6 +1910,7 @@ const DISTILL_FIRST_MS = 90000, DISTILL_TOTAL_MS = 300000;   // 成文的两级�
 const DISTILL_CONVO_MAX = 100000;            // 成文能看多长的对话原文（原来 4 万且从中间断掉）
 const WDS_ASR_PER_MIN = 6, WDS_ASR_PER_DAY = 120;            // 语音转写：会回落站方 Key，必须限流
 const WDS_WS_PER_MIN = 10, WDS_WS_PER_DAY = 200;             // 联网搜索：同理
+const WDS_LINK_PER_MIN = 40, WDS_LINK_PER_DAY = 1200;        // 篇名→网址：只读索引不烧 Key，放宽但仍设桶
 const WDS_PER_DAY = 300, WDS_PER_MIN = 20;   // 自带 Key＝用户自付，日上限放到限流器硬顶；分钟档防脚本滥用
 // 配额桶分家：各 BYOK 入口互不吃额度（用户自带 Key、自付费用，限流只为防滥用）。
 // 桶名 byok:<入口>:k<keyhash> —— chat=全站问答 / read=陪读 / dlg=与WDS对话 / ask=搜索问答。
@@ -2174,6 +2175,8 @@ function WDS_CHAT_SYS(reflect, SDEM, siteCtx, webCtx, deep, docCtx, about, lang,
     + "\n\n【怎么答】"
     + "\n1. 像王德生本人：直接、犀利、追问本质、善用比喻、一句顶十句；给洞见，不做资料复述员。"
     + "\n2. 手上有《站内资料》时优先据它作答，可核验的书名/引文/数据/篇名以它为准；引用某篇观点时标（来源：篇名）；资料里没有的别编造。"
+    + "\n2b. **提到站内任何一篇文章，就把它写成可点的链接**：`[《篇名》](网址)`。网址只从《可点开的站内篇目》里照抄，一个字都不许自己拼；"
+    + "清单里没有的篇目，只写篇名、不编网址（页面会自己去查，查到会替你挂上）。**站内每篇文章都有网址——绝不许说\"站里的文章没有链接\"或让读者自己去搜索框敲标题。**"
     + "\n3. 站内资料不足、或读者只是想聊 SDE，就凭你的内核底盘直接展开——SDE 是一套能剖开任何问题的本体论，放手用它，别拘泥站里有没有现成文章。"
     + "\n4. 术语当场用最短的话讲清（显露/差异序列/特征纠缠/介生态/成熟态等），别掉书袋、别堆术语、别摆空模板。"
     + "\n5. 说人话，短——两三段以内，别写论文。不确定就说不确定；绝不寒暄或\"好的/我将\"之类元话，直接从核心那句说起；结尾可留一个把读者往下一步推的反问或一句荐读。"
@@ -3687,13 +3690,21 @@ export default {
                 const d = corpus.docs[ck.d];
                 if (!d) continue;
                 if (!seen[d.u]) { seen[d.u] = 1; sources.push({ u: d.u, t: d.t }); }
-                chunkText += "【来源：" + d.t + "】\n" + ck.t + "\n\n";
+                // 网址必须跟着篇名一起进上下文：它看不见网址，就会当站里没有链接
+                // （2026-07-30 实测：读者要链接，它答"站内文章没有链接"——纯属没见过网址的幻觉）
+                chunkText += "【来源：" + d.t + "｜" + new URL(d.u, url).toString() + "】\n" + ck.t + "\n\n";
                 if (chunkText.length > chunkCap) break;
               }
               ctxText = kbBlock + (kbBlock && chunkText ? "\n【补充 · 站内原文片段】\n" : "") + chunkText;
             } catch (e) {}
             sources = sources.slice(0, deep ? 10 : 6);
             if (sources.length) controller.enqueue(_sseBytes({ t: "sources", v: sources })); // 出处先发前端
+            // 可点清单：把这一轮所有能引的篇目与真网址列成一份，附在站内资料末尾。
+            // 只列这一份、且要求它只准照抄——凭印象拼站内网址必然拼错（篇名≠路径）。
+            if (sources.length) {
+              ctxText += "\n\n【可点开的站内篇目 · 提到哪一篇就把它写成链接（网址只准从这里照抄，不许自己拼）】\n"
+                + sources.map((s) => "- 《" + String(s.t || "").split(" · ")[0] + "》 " + new URL(s.u, url).toString()).join("\n") + "\n";
+            }
             // —— 联网搜索（可选）：搜到就把站外资料块并进 system，并把来源卡发给前端 ——
             let webCtx = "";
             if (wantWeb) {
@@ -3877,12 +3888,50 @@ export default {
       } finally { clearTimeout(timer); }
     }
 
+    // LINK_LOOKUP — /api/wds/link：把「篇名」解析成站内网址。不调基底、不烧任何 Key，只读索引。
+    // 用途：答案里出现《某篇》而这一轮的检索结果里没有它时，页面拿这个把链接补上。
+    if (url.pathname === "/api/wds/link" && request.method === "POST") {
+      let b = {}; try { b = await request.json(); } catch (e) {}
+      const titles = (Array.isArray(b.titles) ? b.titles : []).slice(0, 12)
+        .map((x) => String(x || "").trim().slice(0, 120)).filter(Boolean);
+      if (!titles.length) return Response.json({ ok: true, hits: [] }, { headers: _cors() });
+      const _lip = request.headers.get("cf-connecting-ip") || "unknown";
+      try {
+        const lim = env.ASK_LIMITER.get(env.ASK_LIMITER.idFromName(wdsBucket("link", _lip, "")));
+        const lr0 = await (await lim.fetch(new Request("https://limiter.internal/?w=" + WDS_LINK_PER_MIN + "&d=" + WDS_LINK_PER_DAY))).json();
+        if (!lr0.ok) return Response.json({ ok: false, reason: "rate", hits: [] }, { headers: _cors() });
+      } catch (e) {}
+      // 归一化：去掉书名号/空格/标点与「 · SDE Universes」「 · 作者名」这类站点后缀，
+      // 否则「《S就是"被看到"这件事本身》」永远配不上索引里的「S就是"被看到"这件事本身 · SDE Universes」。
+      const nrm = (s) => String(s || "").toLowerCase()
+        .replace(/\s+/g, "").replace(/[《》〈〉「」『』\u201c\u201d\u2018\u2019"'`·・｜|,，。.、:：;；!！?？()（）\[\]【】—–\-]/g, "");
+      const head = (s) => nrm(String(s || "").split(" · ")[0]);
+      const hits = [];
+      try {
+        const lr = await lightRetrieve(env, url, titles.join(" "), [], 24, 300, { pick: 24 });
+        const docs = (lr.corpus && lr.corpus.docs) || [];
+        for (const t of titles) {
+          const nt = nrm(t);
+          if (nt.length < 2) continue;
+          let best = null;
+          for (const d of docs) {
+            if (!d || !d.t || !d.u) continue;
+            const hd = head(d.t), nd = nrm(d.t);
+            if (hd === nt || nd === nt) { best = d; break; }                 // 先要精确
+            if (!best && nt.length >= 6 && (hd.indexOf(nt) === 0 || nt.indexOf(hd) === 0)) best = d;   // 再退让到前缀
+          }
+          if (best) hits.push({ q: t, t: best.t, u: best.u });
+        }
+      } catch (e) {}
+      return Response.json({ ok: true, hits }, { headers: _cors() });
+    }
     // /api/wds/websearch：独立的联网搜索端点（供各智能体复用；不调基底，只返回搜索结果）
     if (url.pathname === "/api/wds/websearch") {
       if (request.method === "OPTIONS") return new Response(null, { headers: _cors() });
       if (request.method !== "POST") return new Response("Method Not Allowed", { status: 405 });
       let b = {}; try { b = await request.json(); } catch (e) {}
       // 无 Key 时 webSearch 会回落站方智谱 Key：不限流就是把站方额度当公共搜索接口送出去。
+      // （下面 /api/wds/link 见本文件另一处：它不烧任何 Key，只读索引）
       const _wip = request.headers.get("cf-connecting-ip") || "unknown";
       try {
         const lim = env.ASK_LIMITER.get(env.ASK_LIMITER.idFromName(wdsBucket("ws", _wip, String(b.skey || b.key || ""))));

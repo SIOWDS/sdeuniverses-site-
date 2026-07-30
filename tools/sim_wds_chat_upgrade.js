@@ -266,6 +266,35 @@ console.log("── 十五 · 全局记忆（用户RAG）接到 问WDS");
   ok(long.length <= M.IN + 40 && /中间省略 \d+ 字符/.test(long), "喂给摘要的原文超长时取头尾并明标省略");
 }
 
+console.log("── 十六 · 站内篇目自动挂链接");
+{
+  const LINK = (() => { const a = wk.indexOf('url.pathname === "/api/wds/link"'); return wk.slice(a, a + 3000); })();
+  // 病根：送进上下文的段落头只有篇名没有网址 → 它当站里没有链接（读者实测撞上）
+  ok(/【来源：" \+ d\.t \+ "｜" \+ new URL\(d\.u, url\)/.test(CHAT), "站内段落头带上真网址（原来只有篇名）");
+  ok(/可点开的站内篇目/.test(CHAT), "每轮附一份可点清单（篇名＋真网址）");
+  ok(/网址只准从这里照抄，不许自己拼/.test(CHAT), "清单明写只准照抄——凭印象拼站内路径必然拼错");
+  ok(/绝不许说\\"站里的文章没有链接\\"/.test(wk) || /站里的文章没有链接/.test(wk), "作答纪律直接堵掉那句幻觉");
+  ok(/\[《篇名》\]\(网址\)/.test(wk), "要求写成 Markdown 链接");
+  ok(/url\.pathname === "\/api\/wds\/link"/.test(wk), "新端点 /api/wds/link 在位");
+  ok(/wdsBucket\("link"/.test(LINK) && /WDS_LINK_PER_MIN/.test(wk), "篇名解析端点也有限流桶（不烧 Key 但会读索引）");
+  ok(/hits\.push\(\{ q: t, t: best\.t, u: best\.u \}\)/.test(LINK), "回传读者写的名字、索引里的真标题与网址三样");
+  ok(/hd === nt \|\| nd === nt/.test(LINK), "先要精确匹配");
+  ok(/nt\.length >= 6/.test(LINK), "再退让到前缀，且短名不许模糊匹配（免得张冠李戴）");
+  // 客户端兜底
+  ok(/function lkScan\(/.test(wm) && /function autoLink\(/.test(wm), "页面有兜底：模型没写链接也照样挂上");
+  ok(/tg === "a" \|\| tg === "code" \|\| tg === "pre"/.test(wm), "跳过 a/code/pre，不改坏已有链接与代码");
+  ok(/lkPut\(j\.v\)/.test(wm), "收到出处就把篇名→网址喂进表（本轮不必再问后端）");
+  ok(/autoLink\(cell\.a, text\)/.test(wm) && /autoLink\(out, text\)/.test(wm), "答案与成文都挂");
+  ok(/LINKMISS/.test(wm), "查不到的记下来，别反复问后端");
+  ok(/\.wdsm-lk\{color:var\(--wgold2\)/.test(wm), "链接有可见样式（不能挂了看不出来）");
+  // 行为实测：规范化能把《S就是"被看到"这件事本身》配上索引里的长标题
+  const lkNorm = new Function("return " + wm.slice(wm.indexOf("function lkNorm("), wm.indexOf("function lkPut(")))();
+  const long = "S就是「被看到」这件事本身 · 王德生 · SDE Universes";
+  ok(lkNorm("S就是\u201c被看到\u201d这件事本身") === lkNorm(long.split(" · ")[0]), "书名号/引号/空格差异不影响匹配");
+  ok(lkNorm("《D从来不是变化》") === lkNorm("D从来不是变化"), "带不带书名号都归一到同一个键");
+  ok(lkNorm("") === "", "空串不炸");
+}
+
 (async () => {
   const cut = await global.__clockCheck;
   ok(cut === "首帧", "首帧超时的 cut 标记是「首帧」（诊断行据此说人话）");
