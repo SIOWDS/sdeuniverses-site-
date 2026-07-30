@@ -531,13 +531,29 @@ console.log("── 四点三 · 第二份真跑抓到的：标题被写成了�
   ok(/三个数字必须互不相同/.test(wk), "大数字页禁止三张卡同一个数（实测栽过）");
 }
 
+console.log("── 四点四八 · 第四次空产出：长输入不走满功率 ＋ 报错走双通道");
+{
+  const DIST = wk.slice(wk.indexOf('url.pathname === "/api/wds/distill"'), wk.indexOf('url.pathname === "/api/chat/clear"'));
+  ok(/const heavyIn = inChars > 30000/.test(DIST), "入参超过三万字就算「重」");
+  ok(/const VCuse = \(heavyIn && VC\.top\) \? \{ url: VC\.url, model: VC\.model, name: VC\.name \} : VC/.test(DIST),
+     "重输入时摘掉 top（满功率）——思考与正文吃同一份预算，长输入下思考会把额度吃光");
+  ok(/wdsFetchMax\(VCuse, /.test(DIST), "真的用摘过的那份档位去取流");
+  ok(/已自动关掉「满功率思考」/.test(DIST), "摘了要告诉读者，别让人以为偷偷降级");
+  ok(/不是降级，是把预算让给正文/.test(DIST), "注释写清这不是降级");
+  // 报错双通道：读者页面可能是旧版，note/error 会被覆盖，token 不会
+  const both = (DIST.match(/t: "token", v: "（" \+ emsg/g) || []).length;
+  ok(both >= 3, "三处报错出口都同时当正文吐出（实得 " + both + " 处）");
+  ok(/报错不能被界面吞掉/.test(DIST), "注释写明为什么要发两遍");
+  ok(/const emsg = \(upstream\.status === 401/.test(DIST), "HTTP 错误也走同一套双通道");
+}
+
 console.log("── 四点四五 · 第三次空产出：输出预算按入参实际大小算 ＋ 诊断当正文吐出");
 {
   const DIST = wk.slice(wk.indexOf('url.pathname === "/api/wds/distill"'), wk.indexOf('url.pathname === "/api/chat/clear"'));
   ok(/const inChars = sys\.length \+ convo\.length/.test(DIST), "先量入参实际有多大");
   ok(/const tokWant = Math\.max\(6000, Math\.min\(SPEC\.tok, Math\.round\(115000 - inChars \* 1\.05\)\)\)/.test(DIST),
      "输出预算＝本档上限与「窗里还剩多少」取小——写死 64000 而入参又有五六万，等于向上游要一个它给不出的数");
-  ok(/wdsFetchMax\(VC, KEY, messages, true, tokWant, clk\.signal, true\)/.test(DIST), "用的是算出来的预算，且要上游回报用量");
+  ok(/wdsFetchMax\(VCuse, KEY, messages, true, tokWant, clk\.signal, true\)/.test(DIST), "用的是算出来的预算与摘过的档位，且要上游回报用量");
   const f = (s, c, spec) => Math.max(6000, Math.min(spec, Math.round(115000 - (s + c) * 1.05)));
   ok(f(10000, 20000, 64000) === 64000, "入参小 → 顶配照给");
   ok(f(10000, 44000, 64000) < 64000 && f(10000, 44000, 64000) > 50000, "入参五万多 → 自动让出一部分（实得 " + f(10000, 44000, 64000) + "）");
@@ -559,7 +575,7 @@ console.log("── 四点五 · 空产出不许闷着（2026-07-30 实测撞上
   const DIST = wk.slice(wk.indexOf('url.pathname === "/api/wds/distill"'), wk.indexOf('url.pathname === "/api/chat/clear"'));
   ok(/deck: \{ name: "对外 PPT", tok: WDS_TOK_MAX/.test(wk), "PPT 档直接给顶配 WDS_TOK_MAX（DeepSeek 吃得下，别因为别家吃不下就一起压低）");
   // 预算已改成按入参动态算（tokWant），仍是顶配起步＋撞 400 自动降档
-  ok(/upstream = await wdsFetchMax\(VC, KEY, messages, true, tokWant, clk\.signal, true\)/.test(DIST),
+  ok(/upstream = await wdsFetchMax\(VCuse, KEY, messages, true, tokWant, clk\.signal, true\)/.test(DIST),
      "成文走 wdsFetchMax：按入参算出的预算起步，撞 400 自动降档");
   ok(/if \(a >= 16000\) return \[a, Math\.min\(32000, a\), Math\.min\(16000, a\)\]/.test(wk), "长文档档有自己的降档阶梯（不再退到 6000 那种答话口径）");
   ok(/report: \{ name: "对话报告", tok: 24000/.test(wk) && /essay: \{ name: "提炼成文", tok: 32000/.test(wk) && /outline: \{ name: "写作提纲", tok: 16000/.test(wk), "报告/成文/提纲三档也一并提到长文档区间");

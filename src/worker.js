@@ -4426,6 +4426,13 @@ export default {
             // 输出就只能要剩下的那部分。写死 64000 而入参又有五六万时，等于向上游要一个它给不出的数——
             // 上游既不报错也不写正文，读者只看到"没有产出内容"（2026-07-30 连撞三次）。
             const inChars = sys.length + convo.length;
+            // 【长输入不走满功率】满功率的思考与正文吃同一份 max_tokens：入参已经三四万字时，
+            // 它会把预算全花在思考上，正文一个字都不出（2026-07-30 连撞四次，共同项都是"深度档＋很长的一场"）。
+            // 超过阈值就摘掉 top —— 不是降级，是把预算让给正文。摘不摘都告诉读者。
+            const heavyIn = inChars > 30000;
+            const VCuse = (heavyIn && VC.top) ? { url: VC.url, model: VC.model, name: VC.name } : VC;
+            if (heavyIn && VC.top) controller.enqueue(_sseBytes({ t: "note", v: "这一场的入参有 " + inChars
+              + " 字：已自动关掉「满功率思考」，把整份预算让给正文——否则思考会把额度吃光、正文一个字都写不出来。" }));
             const tokWant = Math.max(6000, Math.min(SPEC.tok, Math.round(115000 - inChars * 1.05)));
             const clk = wdsClock(DISTILL_FIRST_MS, DISTILL_TOTAL_MS);
             // 抽成变量：下面"空产出降档重试"那一遍要复用同一份，绝不能两遍喂的不是同一件事
@@ -4441,16 +4448,23 @@ export default {
             try {
               // 走 wdsFetchMax：顶配起步（SPEC.tok），若某家型号嫌大回 400 就自动降档重发，
               // 不必替五家基底各猜一个上限——DeepSeek 能吃下的，别因为别家吃不下就一起压低。
-              upstream = await wdsFetchMax(VC, KEY, messages, true, tokWant, clk.signal, true);
+              upstream = await wdsFetchMax(VCuse, KEY, messages, true, tokWant, clk.signal, true);
             } catch (e) {
               clk.stop();
-              controller.enqueue(_sseBytes({ t: "error", v: (clk.cut ? clk.why("成文") : ("接不上基底：" + (e && e.message))) + "（可再试一次）" }));
+              const emsg = (clk.cut ? clk.why("成文") : ("接不上基底：" + (e && e.message))) + "（可再试一次）";
+              controller.enqueue(_sseBytes({ t: "error", v: emsg }));
+              controller.enqueue(_sseBytes({ t: "token", v: "（" + emsg + "）" }));
               return fin();
             }
             if (!upstream.ok) {
               const errtxt = (await upstream.text()).slice(0, 300);
-              if (upstream.status === 401 || upstream.status === 402 || upstream.status === 429) { controller.enqueue(_sseBytes({ t: "error", v: "你的 Key 用不了（" + upstream.status + "）：额度不足或填错了。", code: "bad_key" })); return fin(); }
-              controller.enqueue(_sseBytes({ t: "error", v: "基底返回错误 " + upstream.status + "：" + errtxt })); return fin();
+              // 同一句话发两遍：error 给新版界面，token 给旧版界面——**报错不能被界面吞掉**。
+              const emsg = (upstream.status === 401 || upstream.status === 402 || upstream.status === 429)
+                ? ("你的 Key 用不了（" + upstream.status + "）：额度不足或填错了。")
+                : ("基底返回错误 " + upstream.status + "：" + errtxt);
+              controller.enqueue(_sseBytes({ t: "error", v: emsg, code: (upstream.status === 401 || upstream.status === 402 || upstream.status === 429) ? "bad_key" : "" }));
+              controller.enqueue(_sseBytes({ t: "token", v: "（" + emsg + "）" }));
+              return fin();
             }
             const reader = upstream.body.getReader();
             const dec = new TextDecoder();
@@ -4537,7 +4551,9 @@ export default {
               }
             }
           } catch (e) {
-            controller.enqueue(_sseBytes({ t: "error", v: "成文出错：" + (e && e.message) + "（可再试一次）" }));
+            const emsg = "成文出错：" + (e && e.message) + "（可再试一次）";
+            controller.enqueue(_sseBytes({ t: "error", v: emsg }));
+            controller.enqueue(_sseBytes({ t: "token", v: "（" + emsg + "）" }));
           }
           fin();
         },

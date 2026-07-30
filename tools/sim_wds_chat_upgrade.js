@@ -187,7 +187,7 @@ console.log("── 十一 · 成文（distill）：整场可见 + 时钟 + 断�
      "仍用 readConvoText（保头 35%＋保尾＋明标省略），且上限随输出预算动态算");
   ok(/DISTILL_CONVO_MAX = 100000/.test(wk), "成文能看的对话原文提到 10 万字符（原 4 万且从中间断掉）");
   ok(/const clk = wdsClock\(DISTILL_FIRST_MS, DISTILL_TOTAL_MS\)/.test(DIST), "成文戴上时钟（此前是唯一没戴的 WDS 路由）");
-  ok(/wdsFetchMax\(VC, KEY, messages, true, tokWant, clk\.signal, true\)/.test(DIST) && /clk\.firstFrame\(\)/.test(DIST) && /clk\.stop\(\)/.test(DIST),
+  ok(/wdsFetchMax\(VCuse, KEY, messages, true, tokWant, clk\.signal, true\)/.test(DIST) && /clk\.firstFrame\(\)/.test(DIST) && /clk\.stop\(\)/.test(DIST),
      "signal 经 wdsFetchMax 透传、首帧撤护栏、收尾撤钟");
   ok(/if \(wrote\)[\s\S]{0,120}t: "note"/.test(DIST), "断流时已写出的稿保留并发 note");
   ok(/_st\.stage = SPEC\.name/.test(DIST), "心跳带上「在写哪一件」");
