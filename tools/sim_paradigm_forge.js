@@ -26,6 +26,11 @@ const { JSDOM, VirtualConsole } = jsdom;
 const HTML_PATH = process.env.FORGE_HTML ||
   path.join(__dirname, '..', 'public', 'taste', 'paradigm-forge', 'index.html');
 const HTML = fs.readFileSync(HTML_PATH, 'utf8');
+/* 页面靠两个共用模块干近邻的活，而 jsdom 不加载外链脚本 —— 这里注入**真源码**。
+ * 不写替身：判据一被复制两份就会漂，而那种漂是静默的（一边改了阈值另一边不知道）。 */
+const ASSETS = path.join(__dirname, '..', 'public', 'taste', 'assets');
+const RAG_JS = fs.readFileSync(path.join(ASSETS, 'sde-rag.js'), 'utf8');
+const NBR_JS = fs.readFileSync(path.join(ASSETS, 'sde-nbr-gate.js'), 'utf8');
 
 let pass = 0, fail = 0;
 const fails = [];
@@ -91,7 +96,59 @@ function spineAnswer(conflictLine) {
     '冲突 2×3：两条处方相反。',
     '主题冲突：' + (conflictLine || '三对全冲突')].join('\n\n');
 }
+/* 端点真产物的形状（worker.js 的 nbBlock）：抬头 + 编号 + 《标题》（链接）｜作者 ｜本人已发 + 那一行判断。
+   带一篇「自噬性稳态」那样的近名篇目，好让第三关（成文改了名）有东西可抓。 */
+function NBR_BLOCK(q) {
+  const near = /拮抗负荷|新命名/.test(q) ? '拮抗负荷的临界' : '自噬性稳态';
+  return '【站内近邻（sdeuniverses.com 已发表的相关篇目）——这一节是硬要求：\n'
+    + '对下列每一篇，必须说清它已经说到哪一步，以及你这一次的判断与它的分离线在哪；\n'
+    + '凡划不出分离线的，直接说明本次判断与该篇重复，不要另起新名。】\n'
+    + '1、《' + near + '》（/students/zhang-qiong/x/）｜作者 张琼｜**本人已发**\n'
+    + '　　该篇的判断：系统靠自己吃掉自己维持稳定。\n'
+    + '2、《改不动的机器》（/students/zhang-qiong/y/）\n'
+    + '　　该篇的判断：越是修得动的地方越先被修死。\n';
+}
+/* 一份形状齐全、两关都过的划界产物：抬头 + 学科 + 三处点名 + 学科标注 + 判决性预测 */
+function demarcOK() {
+  return '近邻检测\n本文所属学科：社会学\n'
+    + '一、可取用困难（Bjork 1994）（学科：认知心理学）｜它说到哪一步：难一点记得牢。｜分离线：本文讲的是那道难度被谁读出来。｜判决性对照预测：若把难度撤掉而效果不变，则本文错。\n'
+    + '二、《规训与惩罚》（学科：哲学）｜它说到哪一步：可见性生产服从。｜分离线：本文讲的是不可见者被判为不存在。｜判决性对照预测：若不可测项照样进入分配，则本文错。\n'
+    + '三、古德哈特定律（Goodhart 1975）（学科：经济学）｜它说到哪一步：度量一旦成目标就变坏。｜分离线：病灶在固定这个动作本身。｜判决性对照预测：若换更好的度量能恢复流失的能力，则本文错。\n'
+    + '四、《自噬性稳态》（学科：社会学）｜它说到哪一步：系统吃自己维稳。｜分离线：本文的是外化-固定，不是自我消耗。\n'
+    + '五、《改不动的机器》（学科：社会学）｜它说到哪一步：修得动的先被修死。｜分离线：本文给的是成因不是现象。\n'
+    + '最近的邻居是古德哈特定律，但它不能吸收本判断：它管的是度量的品质，本文管的是固定这个动作。';
+}
+/* 缺判决性预测、且六条全在同一学科 —— 两关都该拦下 */
+function demarcBad() {
+  return '近邻检测\n本文所属学科：社会学\n'
+    + '一、《自噬性稳态》（学科：社会学）｜侧重不同。\n'
+    + '二、《改不动的机器》（学科：社会学）｜侧重不同。\n'
+    + '三、某个说法（学科：社会学）｜侧重不同。';
+}
+/* 假的检索结果：形状照 worker.js 的 webSearch 出参 {t,u,s,m,d} */
+function WEB_ITEMS(q) {
+  return [0, 1, 2, 3].map(i => ({
+    t: '关于「' + q.slice(0, 8) + '」的理论 ' + (i + 1), u: 'https://example.org/paper-' + i,
+    s: '这一家主张若干。'.repeat(12), m: '期刊 ' + i, d: '2025-0' + (i + 1) + '-01'
+  }));
+}
+/* 三个成形的源（模式 D 的第二趟产物）。noLink 用来验"拿不到链接时不替它编" */
+function webPickAnswer(o) {
+  o = o || {};
+  const one = (n, disc) => ['===源' + n,
+    '标题：' + disc + '的那一家理论',
+    '学科：' + disc,
+    '出处：某人 2025 · 《某篇》',
+    '链接：' + (o.noLink ? '（检索结果里没有）' : 'https://example.org/paper-' + n),
+    '论点：这一家认为那件事的病根在' + disc + '这一层。',
+    '正文：' + '论证若干句。'.repeat(40)].join('\n');
+  return [one(1, '认知心理学'), one(2, '制度经济学'), one(3, '现象学'), '===',
+    '对立点：三家把病根安在三个不同的层上，互相取消对方的前提。'].join('\n\n');
+}
 function defaultAnswer(userMsg) {
+  if (/把它拆成\*\*三个检索词\*\*/.test(userMsg))
+    return '1｜认知心理学｜认知负荷 理论 争论\n2｜制度经济学｜度量 制度 批评\n3｜现象学｜前反思 身体 理论';
+  if (/请从里面挑出\*\*三家现行理论\*\*/.test(userMsg)) return webPickAnswer();
   if (/这是 SDE 内功的第/.test(userMsg)) return '这一段的承重判断若干。' + '要点。'.repeat(20);
   if (/合成一份 ≤3000 字的作业底盘/.test(userMsg)) return '一、本体论要害……二、方法论工序……三、碰撞心法转写……四、十条铁律……' + '铁律一条。'.repeat(80);
   if (/【A（已定，随机抽出）】/.test(userMsg)) return pickB(firstFreeB(userMsg));
@@ -106,6 +163,8 @@ function defaultAnswer(userMsg) {
   if (/列一份文章目录/.test(userMsg))
     return Array.from({ length: 16 }, (_, i) => '第' + (i + 1) + '章、章名' + (i + 1) + ' —— 落一件事').join('\n');
   if (/照下面的目录，把整篇文章/.test(userMsg)) return '正文若干句，够长，末尾有句号。'.repeat(700);
+  if (/请把它与既有说法逐一划清界线/.test(userMsg)) return demarcOK();
+  if (/请执行涌现/.test(userMsg)) return '涌现物：命名为「外化固定症」。' + '一句判断撑住它。'.repeat(20);
   if (/你是评审/.test(userMsg)) return '总分：152\n五维：S=150 D=151 E=152 I=153 F=150\n判级：典范级\n最该补的一刀：' + '再往下切一层。'.repeat(6);
   if (/请先做体检/.test(userMsg)) return gateOK();
   return '产物：一段假的工序输出。'.repeat(6);
@@ -218,6 +277,19 @@ async function boot(opts) {
       if (url.indexOf('sde-collide-heart.txt') >= 0) return T('二阶碰撞心法：先找矛盾再找高分。'.repeat(80));
       if (url.indexOf('sde-innovation-iq.txt') >= 0) return T('创新智商评分标尺：五维 S/D/E/I/F。'.repeat(80));
       if (url.indexOf('/api/kb/retrieve') >= 0) return opts.kbFail ? BAD(500) : J({ block: '【站内材料】假的检索块' });
+      if (url.indexOf('/api/wds/websearch') >= 0) {
+        const q = (JSON.parse(init.body || '{}').q) || '';
+        ctx.webQ = (ctx.webQ || []); ctx.webQ.push(q);
+        if (opts.webNoKey) return J({ ok: false, reason: 'need_search_key', items: [] });
+        if (opts.webThin) return J({ ok: true, reason: '', items: [] });
+        return J({ ok: true, reason: '', items: WEB_ITEMS(q) });
+      }
+      if (url.indexOf('/api/kb/neighbors') >= 0) {
+        if (opts.nbrFail) return BAD(500);
+        const q = (JSON.parse(init.body || '{}').q) || '';
+        ctx.nbrQ = (ctx.nbrQ || []); ctx.nbrQ.push(q);
+        return J({ n: 2, block: NBR_BLOCK(q) });
+      }
       if (url.indexOf('chat/completions') >= 0 || url.indexOf('/api/llm-proxy') >= 0) {
         const body = JSON.parse(init.body);
         const msgs = body.messages || [];
@@ -248,6 +320,8 @@ async function boot(opts) {
     virtualConsole: vc, pretendToBeVisual: true,
     beforeParse(win) {
       win.fetch = makeFetch();
+      // 两个共用模块要在页面脚本之前就位（页面第一次用到它们是在近邻划界那一格）
+      try { win.eval(RAG_JS); win.eval(NBR_JS); } catch (e) { ctx.errors.push('共用模块注入失败: ' + e.message); }
       win.TextDecoder = TextDecoder; win.TextEncoder = TextEncoder;
       win.AbortController = AbortController;
       win.Element.prototype.scrollIntoView = function () {};
@@ -292,6 +366,13 @@ async function runPipeline(c, timeout) {
 }
 /* 自动模式：什么都不用选，学员下拉默认第一位即可 */
 function pickModeA(c) { return 3; }
+/* 模式 D：点 D 卡片、填议题 */
+function pickModeD(c) {
+  c.click('.mode[data-mode="D"]');
+  c.$('dTopic').value = '一个东西被度量之后会怎样';
+  c.$('dTopic').dispatchEvent(new c.win.Event('input', { bubbles: true }));
+  return 3;
+}
 /* 手挑模式：勾上"我自己挑三篇"，再勾前三篇 */
 function pickModeAManual(c) {
   const chk = c.$('manualChk');
@@ -317,7 +398,9 @@ function setStudent(c, slug) {
       .every((id, i) => c1.doc.querySelectorAll('.stage')[i].id === 'stage-' + id));
     ok('八家基底都在选择器里', ['ds:pro','glm:pro','kimi:pro','qwen:pro','minimax:pro','gpt:pro','claude:pro','gemini:pro']
       .every(v => !!c1.doc.querySelector('option[value="' + v + '"]')));
-    ok('四种选源模式都在', c1.doc.querySelectorAll('.mode').length === 4);
+    ok('五种选源模式都在（A/B/C/D/F）', c1.doc.querySelectorAll('.mode').length === 5);
+    ok('模式 D 在（站外三领域·自动检索）', !!c1.doc.querySelector('.mode[data-mode="D"]'));
+    ok('成品体例两选一', c1.doc.querySelectorAll('#genreSel option').length === 2);
     ok('选源目录已载入（学员三位）', c1.$('stuSel').options.length === 3, '实际 ' + c1.$('stuSel').options.length);
     ok('模式 A 默认交给基底挑（手挑列表收起）', c1.doc.getElementById('stuManual').classList.contains('hidden'));
     ok('状态条说清了由基底从几篇里挑', /由基底从「张琼」的 6 篇里挑/.test(c1.$('srcState').textContent), c1.$('srcState').textContent);
@@ -437,9 +520,10 @@ function setStudent(c, slug) {
     ok('涌现含自反与反噬预言', em && /自反/.test(em.user) && /反噬预言/.test(em.user));
     ok('涌现要证伪条件与写死日期的赌注', em && /证伪条件/.test(em.user) && /赌注/.test(em.user));
     ok('涌现明令不自评', em && /你不给自己打分/.test(em.user));
-    const de = f(/划清界线/);
-    ok('划界要 6–10 个近邻并落到可分辨判据', de && /6–10 个/.test(de.user) && /判据差在哪/.test(de.user));
-    ok('划界把站内检索块垫了进去', de && /站内可参照的近邻材料/.test(de.user));
+    const de = f(/请把它与既有说法逐一划清界线/);
+    ok('划界要 6–10 个近邻、点名 ≥3、落到可分辨判据',
+      de && /6–10 个/.test(de.user) && /至少 3 个必须点到名/.test(de.user) && /可分辨的差别/.test(de.user));
+    ok('划界把站内语料垫了进去（背景）', de && /站内可参照的语料/.test(de.user));
     const wr = f(/照下面的目录，把整篇文章/);
     ok('成文 system 管住学派术语（非哲学禁令 或 哲学放行都算）',
       wr && (/不得出现任何学派术语/.test(wr.system) || /这是\*\*哲学文章\*\*/.test(wr.system)));
@@ -1246,6 +1330,264 @@ function setStudent(c, slug) {
     ok('痕迹闸能抓工序词', c.win.traceHits('这三篇文章碰撞后，本文综合出五重检验。').length >= 3,
       JSON.stringify(c.win.traceHits('这三篇文章碰撞后，本文综合出五重检验。')));
     ok('正常论证不误伤', c.win.traceHits('账本记不下的那样东西，与古德哈特定律不是一回事。').length === 0);
+  });
+
+  /* ============ 二十六、近邻三关 ============
+     为什么单开一节：这一页的近邻工序与金点子/中华智问共用同一份判据模块，
+     而它多一条自己的规矩——闸门查的是【划界格的产物】而不是成品（成品要零工序痕迹，
+     往正文里塞一节叫「近邻检测」的东西恰好是被封禁的那种痕迹）。这一节就是守这条分工的。 */
+
+  await step('二十六、近邻名单：走专用端点、多种子、名单前置于语料', async () => {
+    const c = await boot();
+    pickModeA(c);
+    const done = await runPipeline(c, 30000);
+    ok('跑到底', done, c.$('stat-review').textContent);
+    const de = c.calls.filter(x => /请把它与既有说法逐一划清界线/.test(x.user)).pop();
+    ok('划界调令拿到的是名单（不只是语料）', de && /站内近邻（sdeuniverses\.com 已发表的相关篇目）/.test(de.user));
+    ok('名单前置在语料之前（放后面会被语料埋掉）',
+      de && de.user.indexOf('站内近邻（sdeuniverses') < de.user.indexOf('站内可参照的语料'));
+    ok('打的是专用端点 /api/kb/neighbors', (c.nbrQ || []).length >= 1, JSON.stringify(c.nbrQ));
+    ok('多种子：判断与命名各查一个角度', (c.nbrQ || []).length >= 2, JSON.stringify(c.nbrQ));
+    ok('命名单独当过种子（概念名常只在副标题/关键词里，用话题查召回不到）',
+      (c.nbrQ || []).some(q => /外化固定症/.test(q)), JSON.stringify(c.nbrQ));
+    ok('名单里「本人已发」的标注带进去了', de && /本人已发/.test(de.user));
+  });
+
+  await step('二十六之二、划界调令要可解析的形状（想让什么被检查，先让它有个形状）', async () => {
+    const c = await boot();
+    pickModeA(c);
+    await runPipeline(c, 30000);
+    const de = c.calls.filter(x => /请把它与既有说法逐一划清界线/.test(x.user)).pop();
+    ok('第一行钉「近邻检测」', de && /第一行必须是：近邻检测/.test(de.user));
+    ok('第二行钉「本文所属学科」', de && /第二行必须是：本文所属学科/.test(de.user));
+    ok('每条要「（学科：XXX）」标注', de && /（学科：XXX）/.test(de.user));
+    ok('至少 3 个点到名（作者年份 或《作品》）', de && /至少 3 个必须点到名/.test(de.user));
+    ok('至少一个来自本文学科之外', de && /至少一个必须来自本文学科之外/.test(de.user));
+    ok('每条要判决性对照预测', de && /判决性对照预测/.test(de.user) && /若……则本文错/.test(de.user));
+    ok('明说这是引擎室中间产物、成品会改写成散文', de && /引擎室的中间产物/.test(de.user) && /改写成散文/.test(de.user));
+  });
+
+  await step('二十六之三、两关就地过：达标时状态条如实报', async () => {
+    const c = await boot();
+    pickModeA(c);
+    await runPipeline(c, 30000);
+    ok('划界格标为达标', /划界达标/.test(c.$('stat-demarc').textContent), c.$('stat-demarc').textContent);
+    ok('交付横幅报了过闸', /近邻划界已过闸/.test(c.$('doneBanner').textContent), c.$('doneBanner').textContent);
+  });
+
+  await step('二十六之四、关一/关三不过：默认停下让用户决定，不自动重跑，也不阻断交付', async () => {
+    const c = await boot({ answer: u => /划清界线/.test(u) ? demarcBad() : defaultAnswer(u) });
+    pickModeA(c);
+    const done = await runPipeline(c, 30000);
+    const demarcCalls = c.calls.filter(x => /请把它与既有说法逐一划清界线/.test(x.user)).length;
+    ok('划界只跑了一趟（默认不自动重跑）', demarcCalls === 1, '跑了 ' + demarcCalls + ' 趟');
+    ok('状态条标出没过闸', /⚠/.test(c.$('stat-demarc').textContent), c.$('stat-demarc').textContent);
+    ok('红字点名是哪一关没过', /判决性对照预测|同一学科/.test(c.$('errBox').textContent), c.$('errBox').textContent);
+    ok('红字给出三条口子（重跑/编辑/照走）', /重跑本格/.test(c.$('errBox').textContent) && /由你决定/.test(c.$('errBox').textContent));
+    ok('照样跑到底、照样交付', done, c.$('stat-review').textContent);
+    ok('交付横幅把没过闸也报出来', /近邻划界：/.test(c.$('doneBanner').textContent), c.$('doneBanner').textContent);
+  });
+
+  await step('二十六之五、勾了自动重跑：不过闸就重跑那一格（只重跑一次）', async () => {
+    const c = await boot({ answer: u => /划清界线/.test(u) ? demarcBad() : defaultAnswer(u) });
+    c.$('autoRedoChk').checked = true;
+    pickModeA(c);
+    const done = await runPipeline(c, 40000);
+    const demarcCalls = c.calls.filter(x => /请把它与既有说法逐一划清界线/.test(x.user)).length;
+    ok('划界重跑了一趟', demarcCalls === 2, '跑了 ' + demarcCalls + ' 趟');
+    ok('不会无限重跑', demarcCalls <= 2, '跑了 ' + demarcCalls + ' 趟');
+    ok('照样跑到底', done, c.$('stat-review').textContent);
+  });
+
+  await step('二十六之六、名单取不到：如实说一句、照样跑到底（不静默当做做过了）', async () => {
+    const c = await boot({ nbrFail: true });
+    pickModeA(c);
+    const done = await runPipeline(c, 30000);
+    ok('横幅如实说名单没取到', /近邻名单未取到|没上桌/.test(c.$('doneBanner').textContent), c.$('doneBanner').textContent);
+    ok('照样跑到底（名单缺失不该让整格失败）', done, c.$('stat-review').textContent);
+    const de = c.calls.filter(x => /请把它与既有说法逐一划清界线/.test(x.user)).pop();
+    ok('划界照做（调令仍在）', de && /划清界线/.test(de.user));
+  });
+
+  await step('二十六之七、关二：成品改了名就重查，点名未交代的篇目', async () => {
+    // 划界那一格照「外化固定症」查过；成品里却管它叫「拮抗负荷症」——等于没查
+    const c = await boot({
+      answer: u => {
+        if (/划清界线/.test(u)) return demarcOK();
+        if (/照下面的目录，把整篇文章/.test(u))
+          return '本文将这一现象命名为「拮抗负荷症」。' + '正文若干句，够长，末尾有句号。'.repeat(700);
+        return defaultAnswer(u);
+      }
+    });
+    pickModeA(c);
+    const done = await runPipeline(c, 30000);
+    ok('抓住了改名', /拮抗负荷症/.test(c.$('errBox').textContent), c.$('errBox').textContent);
+    ok('拿新名字重查过一遍', (c.nbrQ || []).some(q => /拮抗负荷症/.test(q)), JSON.stringify(c.nbrQ));
+    ok('点名了未交代的站内篇目', /《/.test(c.$('errBox').textContent), c.$('errBox').textContent);
+    ok('横幅也记一笔', /篇近邻未交代/.test(c.$('doneBanner').textContent), c.$('doneBanner').textContent);
+    ok('默认不自动重写（是否重跑由用户定）',
+      c.calls.filter(x => /照下面的目录，把整篇文章/.test(x.user)).length === 1);
+    ok('照样交付', done, c.$('stat-review').textContent);
+  });
+
+  await step('二十六之八、关二自动档：带着那些篇目重写一遍，且当散文写、不许另起一节', async () => {
+    const c = await boot({
+      answer: u => {
+        if (/划清界线/.test(u)) return demarcOK();
+        if (/照下面的目录，把整篇文章/.test(u))
+          return '本文将这一现象命名为「拮抗负荷症」。' + '正文若干句，够长，末尾有句号。'.repeat(700);
+        return defaultAnswer(u);
+      }
+    });
+    c.$('autoRedoChk').checked = true;
+    pickModeA(c);
+    await runPipeline(c, 45000);
+    const wr = c.calls.filter(x => /照下面的目录，把整篇文章/.test(x.user));
+    ok('成文重写了一趟', wr.length === 2, '跑了 ' + wr.length + ' 趟');
+    ok('重写调令点名了那些篇目', wr.length > 1 && /《/.test(wr[1].user));
+    ok('明令当散文写、不许另起一节（成品要零工序痕迹）',
+      wr.length > 1 && /当散文写/.test(wr[1].user) && /不许另起一节/.test(wr[1].user));
+  });
+
+  await step('二十六之九、评审拿到名单去核对（它有 I 封顶 130 那条铁律）', async () => {
+    const c = await boot();
+    pickModeA(c);
+    await runPipeline(c, 30000);
+    const rv = c.calls.filter(x => /你是评审/.test(x.user)).pop();
+    ok('评审调令附了名单', rv && /站内近邻（sdeuniverses/.test(rv.user));
+    ok('名单里没被交代的要扣分', rv && /名单里没被交代的篇目每一篇再减 2/.test(rv.user));
+  });
+
+  await step('二十六之十、共用模块本身跑一遍判据，且页面确实优先走它', async () => {
+    const c = await boot();
+    const G = c.win.SDENbr;
+    ok('共用模块已加载（页面不另存一份判据）', !!G && typeof G.sectionOK === 'function');
+    if (G) {
+      ok('关一：形状齐全的划界产物过', G.sectionOK(demarcOK()) === true);
+      ok('关一：缺判决性预测的不过', G.sectionOK(demarcBad()) === false);
+      ok('关三：全挤在同一学科 → false', G.crossOK(demarcBad()) === false);
+      ok('关三：跨了学科 → true', G.crossOK(demarcOK()) === true);
+      ok('关三：看不出 → null（放行，冤枉好文章的代价更大）', G.crossOK('一段没有学科标注的普通文字。') === null);
+      ok('抽命名认得出「命名为「X」」', G.coinedName('本文将这一现象命名为「外化固定症」。') === '外化固定症');
+    }
+    // 钉在承重那一行：闸门必须是问模块要的判定，不是页面自己算的
+    ok('页面的闸门钉在 window.SDENbr 上', /const G = window\.SDENbr;/.test(HTML));
+    ok('模块没加载就整关跳过（不是当成没过）', /if\(G\)\{[\s\S]{0,400}sectionOK/.test(HTML));
+    ok('第三关抽的是成品里的名字', /G\.coinedName\(ST\.article\)/.test(HTML));
+  });
+
+  /* ============ 二十七、模式 D（站外三领域·联网检索）与成品体例 ============
+     这一路的要害不是"能不能搜到"，而是**搜不到时会不会假装搜过**。
+     所以四条失败路径（没检索 Key／搜得太少／基底给不出成形的源／链接没拿到）
+     都要如实说出来并指路 F 模式，一条都不许静默降级。 */
+
+  await step('二十七、模式 D：拆检索词 → 三轮检索 → 挑三家斜对立的', async () => {
+    const c = await boot();
+    pickModeD(c);
+    const done = await runPipeline(c, 35000);
+    ok('跑到底', done, c.$('stat-review').textContent);
+    const q = c.calls.filter(x => /把它拆成\*\*三个检索词\*\*/.test(x.user)).pop();
+    ok('先拆检索词', !!q);
+    ok('要求落在三个不同学科上', q && /三个不同的学科/.test(q.user));
+    ok('检索词限长（超长召回反而差）', q && /≤ 12 个字/.test(q.user));
+    ok('拆词也带斜对立的判据', q && /斜/.test(q.user));
+    ok('三轮检索都打了 /api/wds/websearch', (c.webQ || []).length === 3, JSON.stringify(c.webQ));
+    const pk = c.calls.filter(x => /请从里面挑出\*\*三家现行理论\*\*/.test(x.user)).pop();
+    ok('把检索结果交给基底去挑', pk && /\[W1-1\]/.test(pk.user));
+    ok('挑三家时也给斜对立的判据', pk && /斜着的对立|斜对立|斜着/.test(pk.user));
+    ok('一个字都不许编（作者/年份/链接只许照抄）', pk && /一个字都不许编/.test(pk.user));
+    ok('宁可少挑一家也不许造假出处', pk && /不许造一个像真的出处/.test(pk.user));
+    ok('三家已就位', /三家已就位/.test(c.$('srcState').textContent), c.$('srcState').textContent);
+    ok('红字提醒站外来源要自己核对链接', /点开每个链接核对/.test(c.$('errBox').textContent), c.$('errBox').textContent);
+    ok('横幅标出站外来源', /联网找/.test(c.$('doneBanner').textContent), c.$('doneBanner').textContent);
+  });
+
+  await step('二十七之二、模式 D 自动切到论文体，且成品照论文骨架写', async () => {
+    const c = await boot();
+    pickModeD(c);
+    ok('选了 D 就默认论文体', c.$('genreSel').value === 'paper', c.$('genreSel').value);
+    ok('提示说清论文体要给链接', /三家出处必须给可点开核对的链接/.test(c.$('genreNote').textContent));
+    await runPipeline(c, 35000);
+    const ol = c.calls.filter(x => /列一份学术论文的节次目录/.test(x.user)).pop();
+    ok('目录换成论文骨架', ol && /文献综述/.test(ol.user) && /参考文献/.test(ol.user));
+    ok('论文体也禁"研究方法"这类节次（工序不进成品）', ol && /不许出现.*研究方法/.test(ol.user));
+    const wr = c.calls.filter(x => /照下面的目录，把整篇文章/.test(x.user)).pop();
+    ok('成文 system 是论文体', wr && /跨学科的学术创新论文/.test(wr.system));
+    ok('论文体正面写三家（文献综述不是车间痕迹）', wr && /三家理论要正面写出来/.test(wr.system));
+    ok('论文体照样禁工艺词', wr && /不许出现碰撞、对撞/.test(wr.system));
+    ok('论文体照样禁学派专名', wr && /不许出现学派专名/.test(wr.system));
+    ok('把三家出处交给写手了', wr && /三家的出处/.test(wr.user));
+    ok('链接只许照抄不许编', wr && /链接只许照抄、不许编/.test(wr.user));
+  });
+
+  await step('二十七之三、散文体是站内碰撞的默认，改过之后不被模式覆盖', async () => {
+    const c = await boot();
+    ok('模式 A 默认散文体', c.$('genreSel').value === 'essay', c.$('genreSel').value);
+    // 用户手动改成论文体后，再切模式不许把他的选择改回去
+    c.$('genreSel').value = 'paper';
+    c.$('genreSel').dispatchEvent(new c.win.Event('change', { bubbles: true }));
+    c.click('.mode[data-mode="C"]');
+    ok('用户改过之后以用户为准', c.$('genreSel').value === 'paper', c.$('genreSel').value);
+    c.click('.mode[data-mode="A"]');
+    ok('切回站内模式也不擅自改回', c.$('genreSel').value === 'paper', c.$('genreSel').value);
+  });
+
+  await step('二十七之四、去痕迹词表分层：论文体放行"三家"，工艺词恒查', async () => {
+    const c = await boot();
+    const t = '本文综合三家理论，这三篇文章的矛盾轴由碰撞撞出。';
+    c.$('genreSel').value = 'essay';
+    const has = (arr, w) => arr.some(x => String(x).indexOf(w) === 0);   // hitList 出的是「词×次数」
+    const e = c.win.traceHits(t);
+    ok('散文体：三篇来源/本文综合都算痕迹', has(e, '本文综合') && has(e, '这三篇'), JSON.stringify(e));
+    c.$('genreSel').value = 'paper';
+    const p = c.win.traceHits(t);
+    ok('论文体：放行"本文综合""这三篇"', !has(p, '本文综合') && !has(p, '这三篇'), JSON.stringify(p));
+    ok('论文体：碰撞/矛盾轴/撞出仍恒查',
+      has(p, '碰撞') && has(p, '矛盾轴') && has(p, '撞出'), JSON.stringify(p));
+    ok('论文体：干净的学术文本零命中', c.win.traceHits('本文提出一条判据，并给出可证伪条件。').length === 0);
+  });
+
+  await step('二十七之五、没有检索 Key：如实说，指路 F 模式，不假装搜过', async () => {
+    const c = await boot({ webNoKey: true });
+    pickModeD(c);
+    c.$('apiKey').value = 'sk-fake';
+    c.click('#goBtn');
+    await waitFor(() => /用不了|检索/.test(c.$('errBox').textContent), 20000);
+    ok('如实报出用不了', /联网检索这一路暂时用不了/.test(c.$('errBox').textContent), c.$('errBox').textContent);
+    ok('指路 F 模式', /F 模式/.test(c.$('errBox').textContent));
+    ok('没有把三家凑出来（选源状态条不许说已就位）',
+      !/三家已就位/.test(c.$('srcState').textContent), c.$('srcState').textContent);
+    ok('也没往下走到抽脊', c.calls.filter(x => /一个主题观点/.test(x.user)).length === 0);
+  });
+
+  await step('二十七之六、搜得太少 / 基底给不出成形的源：都如实停下', async () => {
+    const c1b = await boot({ webThin: true });
+    pickModeD(c1b);
+    c1b.$('apiKey').value = 'sk-fake';
+    c1b.click('#goBtn');
+    await waitFor(() => /撑不起|只搜到/.test(c1b.$('errBox').textContent), 20000);
+    ok('搜得太少就说撑不起三个源', /撑不起三个源/.test(c1b.$('errBox').textContent), c1b.$('errBox').textContent);
+
+    const c2 = await boot({
+      answer: u => /请从里面挑出\*\*三家现行理论\*\*/.test(u) ? '===源1\n标题：只挑到一家\n===' : defaultAnswer(u)
+    });
+    pickModeD(c2);
+    c2.$('apiKey').value = 'sk-fake';
+    c2.click('#goBtn');
+    await waitFor(() => /成形的源/.test(c2.$('errBox').textContent), 20000);
+    ok('只读出一个源就停下并指路', /只从基底那里读出 1 个成形的源/.test(c2.$('errBox').textContent), c2.$('errBox').textContent);
+  });
+
+  await step('二十七之七、拿不到链接时不替它编一个', async () => {
+    const c = await boot({
+      answer: u => /请从里面挑出\*\*三家现行理论\*\*/.test(u) ? webPickAnswer({ noLink: true }) : defaultAnswer(u)
+    });
+    pickModeD(c);
+    await runPipeline(c, 35000);
+    ok('红字点出有几家没拿到链接', /没拿到可点开的链接/.test(c.$('errBox').textContent), c.$('errBox').textContent);
+    const wr = c.calls.filter(x => /照下面的目录，把整篇文章/.test(x.user)).pop();
+    ok('出处清单如实写"无链接，须自行补"', wr && /无链接，须自行补/.test(wr.user));
+    ok('没有凭空造出一个 http 链接', wr && !/https?:\/\/(?!sdeuniverses)/.test((wr.user.match(/【三家的出处[\s\S]{0,600}/) || [''])[0]));
   });
 
   await step('二十五、全程零运行时错误', async () => {

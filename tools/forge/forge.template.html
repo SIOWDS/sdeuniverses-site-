@@ -130,7 +130,8 @@ select.model-select{max-width:340px}
       <div class="mode on" data-mode="A"><b>A · 一人三篇</b><span>只选一位学员——<b>哪三篇由基底挑</b>，它要挑互相打架的，不是挑最好的</span></div>
       <div class="mode" data-mode="B"><b>B · 三人各一篇</b><span>三位学员、三个领域（已发篇目里最出成绩的一类）</span></div>
       <div class="mode" data-mode="C"><b>C · 站上三长文</b><span>三个学科的站上长文</span></div>
-      <div class="mode" data-mode="F"><b>F · 自由投喂</b><span>你自己粘三篇进来（站外理论也走这里）</span></div>
+      <div class="mode" data-mode="D"><b>D · 站外三领域</b><span>给一个议题——<b>三个领域的对立理论由基底联网去找</b>（撞站外理论，成品走学科通融）</span></div>
+      <div class="mode" data-mode="F"><b>F · 自由投喂</b><span>你自己粘三篇进来（手上已有站外理论时用这个，材料比检索到的厚）</span></div>
     </div>
 
     <div id="mA" class="srcbox">
@@ -162,6 +163,17 @@ select.model-select{max-width:340px}
     <div id="mB" class="srcbox hidden"></div>
     <div id="mC" class="srcbox hidden"></div>
 
+    <div id="mD" class="srcbox hidden">
+      <label class="lbl">议题（一句话，越具体越好）</label>
+      <input type="text" id="dTopic" placeholder="例：一个东西被度量之后会怎样／人能不能靠听别人说来获得道德知识">
+      <div class="small" style="margin-top:8px">基底先把这个议题拆成三个**不同领域**的检索词，各搜一轮，再从搜到的东西里挑三家<b>斜着对立</b>的理论。</div>
+      <label class="small" style="display:flex;gap:6px;align-items:center;margin:10px 0">
+        <input type="checkbox" id="dSiteKey" style="width:auto" checked> 用本站的检索通道（不勾则用你自己的智谱 Key 检索——填在下面）
+      </label>
+      <input type="password" id="dSkey" placeholder="智谱 API Key（仅用于联网检索，只存在你自己的浏览器里）" style="display:none">
+      <div class="small" style="margin-top:8px;color:var(--muted)">⚠ 这一路的源在站外：材料只有摘要级，抽脊会比站内薄；发表前<b>务必自己点开每个链接核对</b>。手上已有全文就改用 F 模式。</div>
+    </div>
+
     <div id="mF" class="srcbox hidden">
       <div class="small" style="margin-bottom:8px">三个源各粘一段：第一行当标题，其余当正文（每篇建议 2000 字以上；站外理论可粘论文摘要＋核心论证）。</div>
       <textarea id="f1" rows="5" placeholder="第一个源：标题&#10;正文……"></textarea>
@@ -169,6 +181,17 @@ select.model-select{max-width:340px}
       <textarea id="f2" rows="5" placeholder="第二个源：标题&#10;正文……"></textarea>
       <div style="height:8px"></div>
       <textarea id="f3" rows="5" placeholder="第三个源：标题&#10;正文……"></textarea>
+    </div>
+
+    <div class="row" style="margin-top:14px;align-items:center">
+      <div style="min-width:280px">
+        <label class="lbl">成品体例</label>
+        <select id="genreSel">
+          <option value="essay">每日必读体 · 散文（普通人读得懂，不列来源）</option>
+          <option value="paper">学科通融体 · 学术论文（摘要·关键词·编号章节·文献综述·参考文献）</option>
+        </select>
+      </div>
+      <span class="small" id="genreNote" style="flex:1;min-width:240px;color:var(--muted)"></span>
     </div>
 
     <div class="row" style="margin-top:14px">
@@ -227,6 +250,9 @@ select.model-select{max-width:340px}
 
 <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js"></script>
 <script src="/assets/wds-savedir.js"></script>
+<!-- 站内近邻：端点客户端 + 三关判据。判据只有一份来源，复制两份必漂，而那种漂是静默的 -->
+<script src="/taste/assets/sde-rag.js?v=4"></script>
+<script src="/taste/assets/sde-nbr-gate.js?v=1"></script>
 <script>
 /* ===================== 多厂商基底引擎（与金点子发生器同源，由 tools/build_forge_page.py 注入） ===================== */
 /*@VENDORS@*/
@@ -272,6 +298,64 @@ async function kbCtx(q){
     const j = await r.json();
     return (j && j.block) ? j.block : '';
   }catch(e){ return ''; }
+}
+
+/* 站内近邻名单 —— 与 kbCtx 的分工是硬的：
+     retrieve 交付「可垫进调令的语料块」，拿不到只是答得浅；
+     neighbors 交付「必须逐条交代分离线的名单」，拿不到就会把同一个概念第二次发明。
+   所以两样都取、**并存不替换**，且名单**前置**在语料之前——放在后面会被语料埋掉。 */
+const NBR_CHECK_MARK = '近邻检测';        // 让判据认得出这一节（sde-nbr-gate.js 的 sectionOK 按它找）
+const NBR_DISC_MARK  = '本文所属学科';    // 学科标注的锚：想让什么被检查，先让它有个可解析的形状
+async function nbrOne(q, k){
+  try{
+    if(window.SDERag && window.SDERag.neighbors) return (await window.SDERag.neighbors(q, {k:k||8})) || '';
+    const r = await fetch('/api/kb/neighbors', { method:'POST', headers:{'content-type':'application/json'},
+      body: JSON.stringify({ q:String(q||'').slice(0,2000), k:k||8 }) });
+    if(!r.ok) return '';
+    const j = await r.json();
+    return (j && j.block) ? j.block : '';
+  }catch(e){ return ''; }
+}
+/* 多种子：一个种子只查一个角度。撞车最常发生在**最终那个命名**上——
+   概念名往往不在标题里、只在副标题或关键词里，用「话题」去查根本召回不到。
+   所以命名必须单独当一个种子查一遍。失败即空串，安全退回（名单缺失不该让整格失败）。 */
+async function nbrList(seeds, k){
+  const qs = [];
+  (seeds||[]).forEach(s=>{
+    const t = String(s||'').replace(/\s+/g,' ').trim();
+    if(t.length > 3 && qs.indexOf(t) < 0) qs.push(t.slice(0,600));
+  });
+  if(!qs.length) return '';
+  let blocks = [];
+  try{ blocks = await Promise.all(qs.slice(0,4).map(q=>nbrOne(q, k))); }catch(e){ return ''; }
+  const seen = {}, head = [], rows = [];
+  blocks.filter(Boolean).join('\n').split('\n').forEach(ln=>{
+    const t = ln.replace(/\s+$/,'');
+    if(!t.trim()) return;
+    const body = t.replace(/^\s*\d+、/, '').trim();          // 各块各自从 1 起编号，去掉再统一重编
+    const key = body.replace(/\s+/g,'').slice(0,40);
+    if(!key || seen[key]) return;
+    seen[key] = 1;
+    if(/^【|^对下列每一篇|^凡划不出|^同一个作者/.test(body)) head.push(t);
+    else rows.push(body);
+  });
+  if(!rows.length) return '';
+  const out = [];
+  let n = 0;
+  rows.forEach(r=>{ if(/^　　/.test(r) || /^该篇的判断/.test(r)) out.push('　　'+r.replace(/^　*/,'')); else out.push((++n)+'、'+r); });
+  return head.join('\n') + '\n' + out.slice(0, 90).join('\n');
+}
+/* 抽出这一次的命名：涌现格要求「命名涌现物：≤20字，结构性命名」，成品里也会用它。
+   共用模块的 coinedName 认五种措辞；它抽不出时退回涌现格产物里的「命名：X」一行。 */
+function forgeCoined(){
+  const em = ST.out.emerge || '';
+  if(window.SDENbr && window.SDENbr.coinedName){
+    const n = window.SDENbr.coinedName(em);
+    if(n) return n;
+  }
+  const m = em.match(/命名[：:]\s*[「“"《【]?([^」”"》】，。；\n]{2,20})/)
+        || em.match(/[「“"《【]([^」”"》】]{2,20})[」”"》】]\s*[（(]?(?:性|症|悖论|陷阱|耦合)/);
+  return m ? m[1].trim() : '';
 }
 
 /* ===================== 流式调用（与金点子发生器同源） ===================== */
@@ -333,6 +417,19 @@ function hitList(words, text){
   return out;
 }
 // 是不是哲学文章？① 用户勾了"哲学文章"开关；② 三个源门类里哲学类占多数
+/* 成品体例：essay＝每日必读体（散文、不列来源）｜paper＝学科通融体（学术论文、出处全给）。
+   模式变了给一个默认值，但用户改过之后就以用户为准——他比程序知道这一篇要发哪儿。 */
+function genre(){ const s=$('genreSel'); return (s && s.value==='paper') ? 'paper' : 'essay'; }
+function isPaper(){ return genre()==='paper'; }
+function syncGenre(){
+  const s=$('genreSel'); if(!s) return;
+  const outside = (ST.mode==='D' || ST.mode==='F');
+  if(!s.dataset.touched) s.value = outside ? 'paper' : 'essay';
+  $('genreNote').innerHTML = isPaper()
+    ? '论文体：摘要·关键词·编号章节·文献综述·理论框架·结论·参考文献；<b>三家出处必须给可点开核对的链接</b>。撞站外理论走这一体例。'
+    : '散文体：不列来源、不用学术引注、长句 ≤90 字，普通人读得懂。撞站内篇目走这一体例。';
+}
+
 function isPhilPiece(){
   if($('philChk') && $('philChk').checked) return true;
   const srcs = ST.sources||[];
@@ -342,7 +439,14 @@ function isPhilPiece(){
   return n >= Math.ceil(srcs.length/2);   // 过半是哲学源 → 当哲学文章
 }
 // 痕迹＝硬痕迹恒查；哲学词仅在"非哲学文章"时查
-function traceHits(text){ return hitList(TRACE, text); }
+/* 论文体里放行的那几个 —— 「三家」「文献综述」在学术论文里是正经动作
+   （已发的之八、之九都有「三家为何各自到不了」这一节），不是车间痕迹。
+   碰撞/对撞/撞出/矛盾轴/五重检验/三视角/近邻划界/本文的方法 仍然恒查。 */
+const TRACE_PAPER_OK = ['三个源','三篇来源','三篇文章','本文综合','这三篇'];
+function traceHits(text){
+  const words = isPaper() ? TRACE.filter(w=>TRACE_PAPER_OK.indexOf(w)<0) : TRACE;
+  return hitList(words, text);
+}
 function termHits(text){
   const phil = isPhilPiece();
   const words = phil ? TERMS_HARD : TERMS_HARD.concat(TERMS_PHIL);
@@ -370,7 +474,8 @@ const STAGES = [
 const ST = { mode:'A', sources:[], out:{}, outline:'', article:'', score:null, running:false, abort:false,
              manual:false, tried:[], seed:null, seedScore:0, outer:0, best:null, xinde:'',
              redoFrom:null, rounds:0, termRetry:0, termFix:null, notes:[],
-             spineRows:[], conflict:'' };
+             spineRows:[], conflict:'', truncated:false,
+             coined:'', finalName:'', nbrWhy:'', nbrMissed:null, nameFix:null, nbrRetry:0, nbrRetry2:0 };
 
 /* ===================== 面板 ===================== */
 const panels = {};
@@ -454,7 +559,8 @@ function optionsFor(items, val, txt){
   return items.map(x=>'<option value="'+val(x)+'">'+txt(x).replace(/</g,'&lt;')+'</option>').join('');
 }
 function renderMode(){
-  ['A','B','C','F'].forEach(m=> $('m'+m).classList.toggle('hidden', m!==ST.mode));
+  ['A','B','C','D','F'].forEach(m=> $('m'+m).classList.toggle('hidden', m!==ST.mode));
+  syncGenre();
   if(ST.mode==='A' && STUDENTS.length){
     const sel = $('stuSel');
     if(!sel.options.length){
@@ -541,6 +647,11 @@ function updateSrcState(){
   if(ST.mode==='A') n = stuPicked.length;
   else if(ST.mode==='B') n = [0,1,2].filter(i=>$('bArt'+i) && $('bArt'+i).value).length;
   else if(ST.mode==='C') n = [0,1,2].filter(i=>$('cSel'+i) && $('cSel'+i).value).length;
+  else if(ST.mode==='D'){
+    const t=($('dTopic').value||'').trim();
+    $('srcState').textContent = t ? '三家理论由基底联网去找（议题：'+t.slice(0,18)+'）' : '先给一个议题';
+    return t.length>=4 ? 3 : 0;
+  }
   else n = [1,2,3].filter(i=>($('f'+i).value||'').trim().length>200).length;
   $('srcState').textContent = '已选 '+n+' / 3 个源';
   return n;
@@ -557,6 +668,22 @@ $('modes').addEventListener('click', e=>{
   $('modes').querySelectorAll('.mode').forEach(x=>x.classList.toggle('on', x===m));
   renderMode();
 });
+$('genreSel').addEventListener('change', e=>{ e.target.dataset.touched='1'; syncGenre(); });
+$('dSiteKey').addEventListener('change', e=>{
+  $('dSkey').style.display = e.target.checked ? 'none' : '';
+});
+
+/* 论文体要用的出处清单。绝不替基底补链接：手上没有就写"（无链接，须自行补）"，
+   宁可让它写"尚不能确定"，也不能给它一个看起来像真的假出处。 */
+function srcCite(){
+  return ST.sources.map((s,i)=>{
+    const bits = [];
+    if(s.author) bits.push(s.author);
+    if(s.kind) bits.push(s.kind);
+    return '['+(i+1)+'] 《'+s.title+'》'+(bits.length?('（'+bits.join('·')+'）'):'')
+         + '　' + (s.url ? s.url : '（无链接，须自行补）');
+  }).join('\n');
+}
 
 /* 站内正文抓取：同源 fetch → 去掉脚本/导航/尾栏 → 纯文本 */
 async function pullText(url){
@@ -588,6 +715,8 @@ async function collectSources(){
       if(!url) throw new Error('模式 B 的第 '+(i+1)+' 个源还没选。');
       out.push({ title, url, author, text: await pullText(url) });
     }
+  } else if(ST.mode==='D'){
+    return [];                                    // 三家由「选篇」那一格联网去找
   } else if(ST.mode==='C'){
     for(const i of [0,1,2]){
       const url = $('cSel'+i).value;
@@ -1022,21 +1151,34 @@ function promptFor(id){
 
   if(id==='demarc') return [
     '下面是撞出来的判断。请把它与既有说法逐一划清界线——这一步决定它是不是换皮。',
-    '要求：选 6–10 个最容易被读者混为一谈的既有概念（学界成名概念优先，也可包括本站已发的近邻篇目），逐一写：',
-    '  · 那个概念讲的是什么（一句话，公允）',
-    '  · 本判断讲的是什么',
-    '  · 判据差在哪（必须落到一个可分辨的差别上，不许停在"侧重不同"）',
-    '并在最后指出：其中哪一个是最近的邻居、为什么本判断仍不可被它吸收。',
+    '**这一格是引擎室的中间产物，不是成品**，所以要写成可被逐条核对的形状；成品那一步会把它改写成散文。',
+    '',
+    '输出的第一行必须是：'+NBR_CHECK_MARK,
+    '第二行必须是：'+NBR_DISC_MARK+'：XXX（一个学科名，如社会学／法学／认知心理学）',
+    '',
+    '然后选 6–10 个最容易被读者混为一谈的既有概念，逐一写。**其中至少 3 个必须点到名**——',
+    '点名的形状是「（作者 年份）」或《作品》，一个该领域的人一听就知道指什么才算点到；',
+    '**至少一个必须来自本文学科之外**（否则这条判断只是本行当内部的一次整理）。每条写四件：',
+    '  · 出处：概念名（作者 年份）或《作品》，紧跟一个「（学科：XXX）」标注',
+    '  · 它说到哪一步（一句话，公允；不许写成稻草人）',
+    '  · 本判断说的是什么，分离线落在哪（必须是一个**可分辨的差别**，不许停在"侧重不同""更强调"）',
+    '  · 判决性对照预测：一句「若……则本文错」——一个两者会给出相反答案的具体情形',
+    '',
+    '站内近邻名单是**硬要求**：名单里的每一篇都要在上面出现一次，或明说它与本判断重复；',
+    '标注「本人已发」的尤其要查——同一个作者重复发明概念，是最不容易被自己发现的一种重合。',
+    '最后指出：哪一个是最近的邻居、为什么本判断仍不可被它吸收。',
     '',
     '【本判断】', O.emerge || '',
-    '', (window.__KB ? ('【站内可参照的近邻材料】\n'+window.__KB) : '')
+    ST.coined ? ('【这一次的命名（分离线要针对它，不是针对话题）】'+ST.coined) : '',
+    '', (window.__NBR ? window.__NBR : ''),
+    '', (window.__KB ? ('【站内可参照的语料（背景，不是待交代的名单）】\n'+window.__KB) : '')
   ].join('\n');
 
   if(id==='review') return [
     '你是评审，不是作者。对下面这篇文章按 SDE 创新智商五维打分（每维 0–170，给总分）：',
     'S 结构显露 ｜ D 路径组织 ｜ E 纠缠厚度 ｜ I 不可还原度 ｜ F 可证伪度。',
     '反膨胀铁律（硬约束，必须执行）：',
-    '  · 没有与既有概念逐一划界的，I 封顶 130；',
+    '  · 没有与既有概念逐一划界的，I 封顶 130；下面附了站内近邻名单，名单里没被交代的篇目每一篇再减 2；',
     '  · 没有可证伪条件的，F 封顶 130；',
     '  · 跨学科兑现少于五个的，E 封顶 132；',
     '  · 正文出现学派术语（如"显露""特征纠缠""发生学"等）的，总分直接减 8。',
@@ -1047,6 +1189,7 @@ function promptFor(id){
     '若总分 < 150：必须点名回炉到哪一道工序（体检／抽脊／混沌碰撞／扩候选／候选互撞／自组织／涌现／近邻划界／成文），并给一句具体动作。',
     '再给三条"最该补的一刀"。',
     '',
+    (window.__NBR ? (window.__NBR + '\n') : ''),
     '【待评文章】',
     (ST.article || '').slice(0, 24000)
   ].join('\n');
@@ -1057,6 +1200,7 @@ function promptFor(id){
 /* 成文用的系统提示：改姓，SDE 只作隐性引擎 */
 function writerSystem(){
   const phil = isPhilPiece();
+  if(isPaper()) return paperWriterSystem(phil);
   return [
     '你在为一个面向普通读者的专栏写文章。',
     sdeSystem(),
@@ -1074,6 +1218,29 @@ function writerSystem(){
     '③ 论点要硬，语气要平——不喊口号、不用排比煽情、不写"我们必须"；',
     '④ 每一章都要有具体的场景或例子，不许整章都是抽象论断；',
     '⑤ 不许出现"综上所述""总而言之"这类过渡废话。'
+  ].join('\n');
+}
+
+/* 论文体（学科通融）的系统提示。与散文体的差别不只是文风：
+   那一栏的规矩是**三家出处全部给出可直接点开核对的原始链接**——撞的是别人的理论，
+   把出处交清楚是最低限度的规矩。所以这里不但不禁"三家"，还要求把它们各自说到哪一步
+   写成正式的文献综述。仍然禁的是学派专名与工序痕迹（碰撞/矛盾轴/五重检验…）。 */
+function paperWriterSystem(phil){
+  return [
+    '你在写一篇跨学科的学术创新论文，投给一个只发原创理论的栏目。',
+    sdeSystem(),
+    '',
+    '【本次输出的硬规矩，违反即作废重写】',
+    (phil
+      ? '① 本体论、发生学、涌现、显露、纠缠这类概念是正经学术词汇，可以正常使用；但**不许出现学派专名**——SDE、差异序列、特征纠缠、三大方程、六路径、介生态、去母体化、改姓、龙爪手、金点子、德麦、意义三律；'
+      : '① 不许出现学派专名，也不要通篇套用某一家的术语体系：SDE、显露、差异序列、特征纠缠、三大方程、六路径、介生态、显影、回写、底盘 一律不用——要用这门学科自己的话把事情说清；'),
+    '①之二 **不许留下这篇文章是怎么做出来的痕迹**：不许出现碰撞、对撞、撞出、矛盾轴、候选、二阶涌现、三视角、五重检验、近邻划界这类工艺词。',
+    '　　但**三家理论要正面写出来**——那是文献综述该做的事，不是车间痕迹：各家说到哪一步、彼此在哪一点上不能同时为真，都要交代清楚。',
+    '② 体例是标准的学术创新论文，按这个顺序：摘 要 · 关键词 · 一、导论 · 二、文献综述（2.1／2.2／2.3 各一家）· 三、冲突定位 · 四、理论框架（命名与定义）· 五、逐领域兑现 · 六、判据与可证伪条件 · 七、三家各自为何到不了这一条 · 八、推论与适用边界 · 结论 · 注释 · 参考文献。',
+    '③ **三家的出处必须可核对**：正文首次提到时给出作者与年份，参考文献里给出完整条目**并附原始链接**。链接只许用材料里出现过的，一个字都不许编。',
+    '④ 宁可少写一句，也不许编造文献、数据、页码。材料里没有的，就说"据本文所据材料尚不能确定"。',
+    '⑤ 论点要硬，语气要平；术语第一次出现就给定义；不用排比煽情、不写"我们必须"、不写"综上所述"。',
+    '⑥ 结论里必须有适用边界（这条判断在哪种情形下不适用），以及一条写死日期的可证伪赌注。'
   ].join('\n');
 }
 
@@ -1193,12 +1360,21 @@ async function runStage(i){
   const s = STAGES[i];
   if(s.id==='warmup') return await doWarmup();
   if(s.id==='select'){
+    if(ST.mode==='D') return await doSelectWeb();
     if(ST.mode!=='A' || ST.manual){ setStat('select', '跳过（源已指定）'); ST.out.select=''; return ''; }
     return await doSelect();
   }
   if(s.id==='write') return await doWrite();
   if(s.id==='demarc'){
-    try{ window.__KB = await kbCtx(((ST.out.emerge||'').slice(0,600))); }catch(e){ window.__KB=''; }
+    // 名单与语料两样都取：名单是待交代的清单（缺了会静默地把概念第二次发明），语料只是背景。
+    ST.coined = forgeCoined();
+    const seeds = [ (ST.out.emerge||'').slice(0,600), ST.coined,
+                    (ST.spineRows||[]).map(r=>r.theme||'').join(' ').slice(0,300) ];
+    try{
+      const [nb, kb] = await Promise.all([ nbrList(seeds, 8), kbCtx(((ST.out.emerge||'').slice(0,600))) ]);
+      window.__NBR = nb || ''; window.__KB = kb || '';
+    }catch(e){ window.__NBR=''; window.__KB=''; }
+    if(!window.__NBR) note('站内近邻名单这次取不到（端点或索引不可用）——划界照做，但"最近的那个对手"没上桌，发表前请自己核一遍。');
   }
   const sys = (s.id==='review') ? reviewSystem() : sdeSystem();
   const txt = await callStage(s.id, promptFor(s.id), s.tok, sys);
@@ -1221,6 +1397,31 @@ async function runStage(i){
         return txt;
       }
       showErr('三条主题观点没能两两冲突：'+ST.conflict+'。碰撞照跑，但底盘不硬——换一位学员或改手挑会更实在。');
+    }
+  }
+  if(s.id==='demarc'){
+    // 两关就地查（第三关"最终命名有没有被查过"要等成品出来才知道，放在成文之后）：
+    //   关一 有没有真做检测（点名≥3 + 判决性预测）· 关三 三个近邻是不是全挤在同一学科。
+    // 判据只有一份来源：共用模块 sde-nbr-gate.js。模块没加载成功就整关跳过——
+    // 闸门冤枉一篇好文章的代价，比放过一篇没跨域的更大。
+    const G = window.SDENbr;
+    if(G){
+      const okSec = G.sectionOK(txt);
+      const cross = G.crossOK(txt);          // true / false / null（看不出→放行）
+      const why = !okSec ? '没点够名或缺判决性对照预测' : (cross === false ? '六到十个近邻全挤在同一学科内' : '');
+      ST.nbrWhy = why;
+      setStat('demarc', (why ? '⚠ ' : '✓ ') + (why || '划界达标 · 已点名并给出判决性预测'), 'done');
+      if(why){
+        note('近邻划界没过闸：'+why+'。');
+        if($('autoRedoChk') && $('autoRedoChk').checked && ST.nbrRetry < 1){
+          ST.nbrRetry++;
+          showErr('近邻划界没过闸（'+why+'）——正在重跑这一格。');
+          ST.redoFrom = STAGES.findIndex(x=>x.id==='demarc');
+        } else {
+          showErr('近邻划界没过闸：'+why+'。划界是评审 I 维的硬门槛（不划界 I 封顶 130）——'
+                + '要重做就点这一格的「重跑本格」，或用「编辑产物」自己补上，或就这样往下走——由你决定。');
+        }
+      }
     }
   }
   if(s.id==='gate'){
@@ -1336,6 +1537,130 @@ async function doWarmup(){
   try{ localStorage.setItem(sig, ST.xinde); }catch(_){ }
   setStat('warmup', '✓ 读完 '+chunks.length+' 段内功 · 心得 '+ST.xinde.replace(/\s/g,'').length+' 字', 'done');
   return ST.xinde;
+}
+
+/* ============ 模式 D：站外三领域，联网检索 ============
+   两趟基底 + 三趟检索：拆检索词 → 各搜一轮 → 从搜到的东西里挑三家斜对立的理论并写成三个源。
+   检索走 /api/wds/websearch（智谱 search_std）。它的口径：skey 传了就用用户自己的，
+   没传就用站点管理端的 Key；两个都没有时返回 need_search_key —— 那时**如实说，指路 F 模式**，
+   不假装搜过。 */
+async function webSearch(q, skey){
+  try{
+    const r = await fetch('/api/wds/websearch', { method:'POST', headers:{'content-type':'application/json'},
+      body: JSON.stringify({ q:String(q||'').slice(0,70), skey:skey||'', n:8 }) });
+    if(!r.ok) return { ok:false, reason:'http_'+r.status, items:[] };
+    return await r.json();
+  }catch(e){ return { ok:false, reason:'net', items:[] }; }
+}
+function webBlockOf(tag, items){
+  let s = '', n = 0;
+  (items||[]).forEach(it=>{
+    if(s.length > 4200) return;
+    s += '['+tag+(++n)+'] '+(it.t||'') + (it.d?('（'+it.d+'）'):'') + (it.m?(' · '+it.m):'') + '\n'
+       + (it.s||'') + '\n' + (it.u||'') + '\n\n';
+  });
+  return s;
+}
+async function doSelectWeb(){
+  const id='select', p=panels[id];
+  openStage(id);
+  const topic = ($('dTopic').value||'').trim();
+  if(topic.length < 4) throw new Error('模式 D 要先给一个议题（至少四个字）。');
+  const skey = $('dSiteKey').checked ? '' : ($('dSkey').value||'').trim();
+
+  // 一、拆成三个不同领域的检索词
+  setStat(id, '<span class="spinner"></span> 拆检索词', 'run');
+  const qp = [
+    '议题：'+topic,
+    '',
+    '把它拆成**三个检索词**，交给搜索引擎去找三家**不同学科**的现行理论。要求：',
+    '· 三个词必须落在三个不同的学科/领域上（例如认知心理学 × 制度经济学 × 现象学），不许是同一领域的三种问法；',
+    '· 每个词要能搜到**有名有姓的理论或有争论的文献**，不是科普介绍——加上学科名、理论名、"理论""争论""critique"这类词；',
+    '· 每个词 ≤ 12 个字（搜索引擎超长了召回反而差）。',
+    '',
+    sdeOppositeBlock(),
+    '',
+    '输出正好三行，每行形如：',
+    '1｜学科名｜检索词',
+    '2｜学科名｜检索词',
+    '3｜学科名｜检索词',
+    '不要写别的。'
+  ].join('\n');
+  const qr = await askFast(sdeSystem(), qp, p.out, p.stat, p.meta, 1200, '拆检索词');
+  const rows = (qr.text||'').split('\n').map(x=>x.trim())
+    .map(x=>x.match(/^[1-3]\s*[｜|]\s*([^｜|]{2,16})\s*[｜|]\s*(.+)$/))
+    .filter(Boolean).map(m=>({ disc:m[1].trim(), q:m[2].trim().replace(/[。，、]$/,'') }));
+  if(rows.length < 3) throw new Error('没能从基底那里读出三个检索词（它给的是：'+(qr.text||'').slice(0,80)+'）。重跑本格，或改用 F 模式自己粘三篇。');
+
+  // 二、各搜一轮
+  setStat(id, '<span class="spinner"></span> 联网检索三个领域', 'run');
+  selLog('检索词：' + rows.map(r=>r.disc+'「'+r.q+'」').join('　'));
+  const res = await Promise.all(rows.slice(0,3).map(r=>webSearch(r.q, skey)));
+  const bad = res.find(x=>!x || !x.ok);
+  if(bad && /need_search_key|bad_search_key/.test(bad.reason||'')){
+    throw new Error('联网检索这一路暂时用不了（'+bad.reason+'）：本站的检索通道没配好、或你填的智谱 Key 不能用。'
+                  + '把「用本站的检索通道」的勾去掉、填一把可用的智谱 Key，或改用 F 模式自己粘三篇站外理论。');
+  }
+  const hit = res.reduce((n,x)=>n+((x&&x.items)?x.items.length:0), 0);
+  if(hit < 3) throw new Error('三轮检索一共只搜到 '+hit+' 条，撑不起三个源。换个更具体的议题重跑本格，或改用 F 模式。');
+  const blocks = res.map((x,i)=>'【'+rows[i].disc+'｜检索词：'+rows[i].q+'】\n'+webBlockOf('W'+(i+1)+'-', (x&&x.items)||[])).join('\n');
+  selLog('搜到 '+hit+' 条，交给基底挑三家。');
+
+  // 三、挑三家斜对立的，写成三个源
+  setStat(id, '<span class="spinner"></span> 从检索结果里挑三家斜对立的理论', 'run');
+  const pp = [
+    '下面是三轮联网检索的结果。请从里面挑出**三家现行理论**，让它们两两斜着对立。',
+    '',
+    sdeOppositeBlock(),
+    '',
+    '**铁律：一个字都不许编。** 作者、年份、书名/篇名、结论、链接，只许用检索结果里真出现过的；',
+    '拿不准的就不要写进去。宁可只挑到两家、明说第三家没搜到，也不许造一个像真的出处。',
+    '',
+    '每一家写成一个源，形状必须照这个来（三段，段间空一行）：',
+    '===源N',
+    '标题：这一家的理论名（≤30字）',
+    '学科：一个学科名',
+    '出处：作者 年份 · 篇名或书名',
+    '链接：检索结果里那条的网址（照抄，不许改）',
+    '论点：这一家在本议题上的核心主张，一句话（≤60字），要是个能被反驳的判断',
+    '正文：把这一家的论证展开 600–900 字——它凭什么这么说、它的关键条件是什么、它最强的证据是什么、它在哪儿最脆。',
+    '　　　只许用检索材料里有的东西，加上这门学科的公共常识；不许添具体数据与页码。',
+    '===',
+    '',
+    '最后另起一行写：对立点：一句话说清这三家为什么不能同时为真（≤80字）。',
+    '',
+    blocks
+  ].join('\n');
+  const pr = await askStream(sdeSystem(), pp, p.out, p.stat, p.meta, TOK_HARD, '挑三家');
+  const txt = pr.text||'';
+
+  const got = [];
+  txt.split(/^===\s*源\s*[0-9一二三]/m).slice(1).forEach(seg=>{
+    const g = k=>{ const m = seg.match(new RegExp('^\\s*'+k+'[：:]\\s*(.+)$','m')); return m ? m[1].trim() : ''; };
+    const body = (seg.match(/^\s*正文[：:]\s*([\s\S]*?)(?:\n\s*===|$)/m)||[])[1] || '';
+    const title = g('标题');
+    if(!title) return;
+    // 基底常在拿不到链接时填一句「（检索结果里没有）」——那不是链接。只认 http(s)，
+    // 其余一律当没有：一个看起来像出处的假出处，比明说"无链接"坏得多。
+    const raw = g('链接');
+    const url = /^https?:\/\//.test(raw) ? raw : '';
+    got.push({ title: title.slice(0,60), url: url, author: g('出处'), kind: g('学科'),
+               text: ('【'+g('学科')+'｜'+g('出处')+'】\n' + g('论点') + '\n' + body).slice(0, MAX_SRC),
+               outside: true });
+  });
+  if(got.length < 3) throw new Error('只从基底那里读出 '+got.length+' 个成形的源（要三个）。重跑本格，或改用 F 模式自己粘三篇。');
+  ST.sources = got.slice(0,3);
+  const noLink = ST.sources.filter(s=>!/^https?:\/\//.test(s.url||''));
+  $('srcState').textContent = '三家已就位：' + ST.sources.map(s=>s.title.slice(0,12)).join(' × ');
+  selLog('<b>三家：</b>' + ST.sources.map(s=>(s.kind?('['+s.kind+']'):'')+s.title).join('　×　'));
+  note('模式 D：三家理论来自站外检索，发表走「学科通融」（论文体、出处须逐条核对）。');
+  showErr('三家理论是联网搜来的：' + (noLink.length
+      ? ('其中 '+noLink.length+' 家没拿到可点开的链接——')
+      : '') + '发表前请自己点开每个链接核对一遍。这一路的材料只有摘要级，抽脊会比站内薄；'
+      + '手上已有全文就改用 F 模式。成品体例已切到「学科通融体」。');
+  setStat(id, '✓ 三家已就位（站外）', 'done');
+  ST.out.select = txt;
+  return txt;
 }
 
 async function doSelect(){
@@ -1493,6 +1818,7 @@ async function installForged(transcript, title, txt, kind){
 /* descriptor 解析：B/C 可能是真文章的 gid（字符串），也可能是知识库/自造的源对象 */
 function asSrc(d){ return (d && typeof d==='object') ? d : (poolByGid(d)||{}); }
 function isGid(d){ return typeof d==='string'; }
+try{ syncGenre(); }catch(_){ }
 /* 让基底从知识库举一个真实存在、与 A 对立的 B（A 四层文章都配不到够硬的对立面时）。
    成了返回一个源对象（含 summary/text），否则 null。 */
 async function findBInKB(aGid){
@@ -1554,23 +1880,42 @@ async function doWrite(){
   const key = needKey(); if(!key) throw new Error('缺 Key');
   const fix = ST.termFix;
   ST.termFix = null;
+  const nf = ST.nameFix;
+  ST.nameFix = null;
   const head = [
+    nf ? ('【上一稿把这件事命名为「'+nf.name+'」，而站内这些篇目讲的是很近的东西、正文里一句没提：'
+        + nf.missed.map(t=>'《'+t+'》').join('、')
+        + '。这一稿要在行文里把与它们的分界交代清楚——**当散文写**，不许另起一节、不许标"近邻""划界"这类节名，就写成"这与某某说的不是一回事，因为……"。】') : '',
     fix ? ('【上一稿的问题：正文里留了这些不该有的东西——'+fix.join('、')+'。这一稿一个都不许出现：学派术语换成大白话，做法的痕迹整句删掉或改写成就事论事的说法，别把句子改软。】') : '',
     '【要写的那条判断】', ST.out.emerge||'',
     '', '【与既有说法的分界（写成"这与某某说的不是一回事"，不要写成方法论）】', (ST.out.demarc||'').slice(0,6000),
-    '', '【可用的素材：底下这些判断可以用，但**不许在正文里交代它们的出处**，也不许说它们来自几篇文章】',
+    isPaper()
+      ? '\n【三家的出处（文献综述与参考文献要用它，链接只许照抄、不许编）】\n' + srcCite()
+      : '',
+    '', (isPaper()
+      ? '【可用的素材：底下这些判断可以用；出处按上面那份清单如实标注】'
+      : '【可用的素材：底下这些判断可以用，但**不许在正文里交代它们的出处**，也不许说它们来自几篇文章】'),
     (ST.out.spine||'').slice(0,4000)
   ].join('\n');
 
   // 一、目录
-  const outlineP = [
+  const outlineP = (isPaper() ? [
+    '按下面的材料，列一份学术论文的节次目录，形如「二、文献综述 —— 这一节要落哪一件事（≤20字）」。',
+    '照这个骨架来（可细分到 2.1／2.2／2.3，共 14–20 个条目）：',
+    '摘 要 · 关键词 · 一、导论（三个不该同时为真的命题）· 二、文献综述（每家一节）· 三、冲突定位 ·',
+    '四、理论框架（命名并定义这条判断）· 五、逐领域兑现 · 六、判据与可证伪条件 ·',
+    '七、三家各自为何到不了这一条 · 八、推论与适用边界 · 结论 · 注释 · 参考文献。',
+    '**不许出现"研究方法""如何得出本文判断"这类节次**——工序不进成品；文献综述是正经章节，照写。',
+    '只输出目录，不写正文。',
+    '', head
+  ] : [
     '按下面的材料，列一份文章目录：15–22 章，每章一行，形如「一、章名 —— 这一章要落哪一件事（≤20字）」。',
     '结构要求：前两章把现象摆出来（用具体场景，不许先给结论）；中段给机制与判据；',
     '必须各留一章给：与最近的既有说法划清界线／不适用的边界／证伪条件／自反（本文自己是不是它所描述的东西的标本）。',
     '**不许出现"三篇来源""方法说明""研究方法""如何得出本文判断"这类章目**——成品里不留做法的痕迹。',
     '末章给一条写死日期的赌注。只输出目录，不写正文。',
     '', head
-  ].join('\n');
+  ]).join('\n');
   const o = await askStream(writerSystem(), outlineP, p.out, p.stat, p.meta, 3000, '列目录');
   ST.outline = o.text||'';
   const chapters = ST.outline.split('\n').map(x=>x.trim()).filter(x=>/^[一二三四五六七八九十]+[、.]/.test(x) || /^\d+[、.]/.test(x));
@@ -1581,7 +1926,9 @@ async function doWrite(){
   setStat(id, '<span class="spinner"></span> 按目录一趟写完整篇（约两万字）', 'run');
   const cp = [
     '照下面的目录，把整篇文章**一次写完**，从第一章到最后一章，一气呵成。',
-    '· 每章 1000–1400 字，全篇约两万字；直接写正文，章名可作小标题，不要复述目录、不要写"接下来""下一章"。',
+    isPaper()
+      ? '· 每节 1000–1500 字，全篇约两万字；开头是「摘 要」与「关键词」，结尾有完整的参考文献（含可点开的原始链接）。'
+      : '· 每章 1000–1400 字，全篇约两万字；直接写正文，章名可作小标题，不要复述目录、不要写"接下来""下一章"。',
     '· 中途不要停下来征求意见、不要写"（未完待续）"，直接把最后一章也写完。',
     '', '【全文目录（照这个顺序写，写全，别跳章）】', ST.outline,
     '', head
@@ -1621,8 +1968,46 @@ async function doWrite(){
       showErr('正文里留了痕迹：'+hits.join('、')+'。要重写就点这一格的「重跑本格」（会把这些词带进去点名删掉），或用「编辑产物」手改，或就用这版直接交付——由你决定。');
     }
   }
+  await nbrPostName();
   $('deliver').style.display='';
   return ST.article;
+}
+
+/* 第三关：查的是不是最后真用上的那个名字。
+   这一关是为「成文时改了名」造的——划界那一格照 A 名查得再干净，成品里叫了 B 名，
+   等于没查。抽不出名字就放行（宁可漏查，不可乱查）。
+   注意这里**不往正文里加节**：成品要零工序痕迹，分界只能以散文形态混在行文里，
+   所以补法是带着点名重跑成文，而不是往尾巴上贴一节。 */
+async function nbrPostName(){
+  const G = window.SDENbr;
+  if(!G || !ST.article) return;
+  let name = '';
+  try{ name = G.coinedName(ST.article) || ''; }catch(e){ return; }
+  if(!name) return;
+  ST.finalName = name;
+  const checked = String(ST.coined||'');
+  if(checked && (name.indexOf(checked) >= 0 || checked.indexOf(name) >= 0)) return;   // 与查过的是同一个名字
+  let blk = '';
+  try{ blk = await nbrList([name], 6); }catch(e){ return; }
+  if(!blk) return;
+  const titles = (blk.match(/《([^》]{2,60})》/g) || []).map(s=>s.slice(1,-1));
+  const missed = titles.filter(t=>{
+    const head = t.replace(/[：:—\-·].*$/,'').slice(0,10);
+    return head && ST.article.indexOf(head) < 0;
+  });
+  if(!missed.length) return;
+  ST.nbrMissed = missed;
+  note('成品里的命名「'+name+'」与划界那一格查的不是同一个（查的是「'+(checked||'（未抽出）')+'）」，重查后还有 '+missed.length+' 篇站内近邻没被交代。');
+  if($('autoRedoChk') && $('autoRedoChk').checked && ST.nbrRetry2 < 1){
+    ST.nbrRetry2++;
+    ST.nameFix = { name:name, missed:missed.slice(0,6) };
+    showErr('成品的命名「'+name+'」还有 '+missed.length+' 篇站内近邻没交代——正在带着这些篇目重写一遍。');
+    ST.redoFrom = STAGES.findIndex(s=>s.id==='write');
+    return;
+  }
+  showErr('成品里管这件事叫「'+name+'」，而划界那一格查的是另一个名字。拿这个名字重查，站内还有这些篇目没被交代：'
+        + missed.slice(0,6).map(t=>'《'+t+'》').join('、')
+        + '。同名或近名重复发明是最难自查的一种撞车——要带着它们重写就点成文格的「重跑本格」，或自己核一遍。');
 }
 
 function renderScore(){
@@ -1673,8 +2058,12 @@ async function deliver(){
     '成品 '+words+' 字',
     ST.score==null ? '评审未读到分数' : ('创新智商 '+ST.score+(ST.score>=150?'（过线）':'（未过线，已回炉 '+ST.rounds+' 轮）')),
     hits.length ? ('⚠ 术语残留：'+hits.join('、')) : '术语零残留',
-    ST.mode==='A' && !ST.manual ? ('三个种子由基底找（试了 '+ST.tried.length+' 组，定标烈度 '+ST.seedScore+'/10）') : '三篇由你指定',
-    ST.conflict ? ('主题冲突：'+ST.conflict) : ''
+    isPaper() ? '体例：学科通融体（论文）' : '体例：每日必读体（散文）',
+    ST.mode==='D' ? '三家由基底联网找（站外，链接须自行核对）'
+      : (ST.mode==='A' && !ST.manual ? ('三个种子由基底找（试了 '+ST.tried.length+' 组，定标烈度 '+ST.seedScore+'/10）') : '三篇由你指定'),
+    ST.conflict ? ('主题冲突：'+ST.conflict) : '',
+    ST.nbrWhy ? ('⚠ 近邻划界：'+ST.nbrWhy) : (window.__NBR ? '近邻划界已过闸' : '近邻名单未取到'),
+    (ST.nbrMissed && ST.nbrMissed.length) ? ('⚠ 命名「'+(ST.finalName||'')+'」还有 '+ST.nbrMissed.length+' 篇近邻未交代') : ''
   ].filter(Boolean);
   $('doneBanner').innerHTML = '✓ 跑完了。' + bits.join('　·　') +
     (ST.notes.length ? ('<br><span style="color:var(--muted)">中途自动修了：'+ST.notes.join('　')+'</span>') : '');
@@ -1710,7 +2099,9 @@ $('resetBtn').addEventListener('click', ()=>{
   ST.out = {}; ST.article=''; ST.outline=''; ST.score=null; ST.sources=[];
   ST.tried=[]; ST.seed=null; ST.seedScore=0; ST.outer=0; ST.best=null; ST.pair=null; ST.bestPair=null; ST.usedA=[]; ST.badC=[]; ST.__swap=null; ST.forged=false;   // 心得不清：它按内功+基底缓存，重跑不必重内化
   ST.redoFrom=null; ST.rounds=0; ST.termRetry=0; ST.termFix=null; ST.notes=[];
-  ST.spineRows=[]; ST.conflict='';
+  ST.spineRows=[]; ST.conflict=''; ST.truncated=false;
+  ST.coined=''; ST.finalName=''; ST.nbrWhy=''; ST.nbrMissed=null; ST.nameFix=null; ST.nbrRetry=0; ST.nbrRetry2=0;
+  window.__NBR=''; window.__KB='';
   $('trioCard').classList.add('hidden'); $('trioBox').innerHTML=''; $('trioConflict').innerHTML='';
   $('runbar').classList.add('hidden'); $('doneBanner').innerHTML='';
   STAGES.forEach(s=>{

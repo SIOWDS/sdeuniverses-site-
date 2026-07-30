@@ -1,12 +1,18 @@
 # 学员发表数与排名 + 站内近邻索引 · 自动重建
 #
 # 2026-07-29 起这个工作流产出两份派生数据，都是"随发文即时作废"的小文件：
-#   public/students/roster.json   126KB  发表数与活跃分
-#   public/kb/neighbors.json      约 800KB  站内近邻索引（标题+副标题+关键词+那一刀）
-# 后者供 /api/kb/neighbors 用。它必须跟着发文走：新篇没进索引，下一次近邻检索就
+#   public/students/roster.json              126KB  发表数与活跃分
+#   public/kb/neighbors.json                 约 800KB  站内近邻索引（标题+副标题+关键词+那一刀）
+#   public/taste/paradigm-forge/catalog.json 约 125KB  碰撞机的站内选源目录
+# 第二份供 /api/kb/neighbors 用。它必须跟着发文走：新篇没进索引，下一次近邻检索就
 # 查不到它，两个智能体会在毫不知情的情况下把同一个概念第二次发明——这种失败是静默的，
 # 没有任何人会收到报错，所以宁可每次发文都重建一遍。
-# 之所以不另开一个工作流：两个 bot 同时往 main 提交会互相撞，而这里已经有 rebase 重试。
+# 第三份是「SDE 碰撞出典范」选源用的目录（模式 C 从它挑站上长文）。它同样必须跟着发文走，
+# 而且理由更尖锐一点：碰撞机自己产出的每日必读/学科通融篇目，如果不进这份目录，
+# 它下一次挑源时就看不见自己上一次撞过什么——等于亲手打开了重复碰撞的口子。
+# 2026-07-30 挂上来之前它停在 07-29 的 341 篇，一天就已经缺了 9 篇。
+#
+# 之所以不另开工作流：几个 bot 同时往 main 提交会互相撞，而这里已经有 rebase 重试。
 #
 # 2026-07-29 从 search-index.yml 拆出来。原先两件事挂在同一个工作流上：
 # 重建索引（218MB 生成物）与重建排名（126KB）。索引每次重排都往 git 历史里
@@ -29,9 +35,14 @@ on:
       - 'public/paradigm/**'
       - 'public/confluence/**'
       - 'public/books/**'
+      - 'public/creation/**'             # 以下三栏只有碰撞机目录要扫
+      - 'public/art/**'
+      - 'public/fiction/**'
       - '!public/kb/neighbors.json'      # 同上，排除自我触发
+      - '!public/taste/paradigm-forge/catalog.json'
       - 'tools/build_roster.py'
       - 'tools/build_neighbors.py'
+      - 'tools/build_forge_catalog.py'
   workflow_dispatch:
 
 concurrency:
@@ -58,21 +69,27 @@ jobs:
       - name: 重建站内近邻索引
         run: python3 tools/build_neighbors.py
 
+      - name: 重建碰撞机的站内选源目录
+        run: python3 tools/build_forge_catalog.py
+
       - name: 有变化就提交回 main
         run: |
-          if git diff --quiet -- public/students/roster.json public/kb/neighbors.json; then
-            echo "两份派生数据都已和内容一致，无需提交"
+          FILES="public/students/roster.json public/kb/neighbors.json public/taste/paradigm-forge/catalog.json"
+          if git diff --quiet -- $FILES; then
+            echo "三份派生数据都已和内容一致，无需提交"
             exit 0
           fi
           git config user.name "sde-index-bot"
           git config user.email "wangdesheng1234567@gmail.com"
-          git add public/students/roster.json public/kb/neighbors.json
-          git commit -m "Rebuild rankings and the site neighbour index for ${GITHUB_SHA::7}
+          git add $FILES
+          git commit -m "Rebuild rankings, the neighbour index and the forge catalogue for ${GITHUB_SHA::7}
 
-          Both are derived from what is on disk and go stale the instant an article
+          All three are derived from what is on disk and go stale the instant an article
           lands. The neighbour index is what /api/kb/neighbors serves: if a new paper
           is missing from it, the next nearest-neighbour check cannot see it, and a
-          concept gets invented a second time with nobody being told."
+          concept gets invented a second time with nobody being told. The forge
+          catalogue is worse still when stale: the collider cannot see the pieces it
+          published itself, so nothing stops it colliding the same sources twice."
           # main 可能已前进（并发 push），冲突就 rebase 重试
           for i in 1 2 3; do
             git push && exit 0
