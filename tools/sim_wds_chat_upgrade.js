@@ -74,7 +74,7 @@ console.log("── 三 · 长篇请求：按字数给预算 + 当轮覆盖简�
   ok(/tokWant = askLen[\s\S]{0,160}Math\.min\(32000/.test(CHAT), "长篇按 askLen 给预算（上限 3.2 万）");
   ok(/max_tokens: tokWant/.test(CHAT), "预算真的用上了（原来是硬编码 2600/4000/6000）");
   ok(/解除《怎么答》第 5 条/.test(CHAT), "当轮挂覆盖指令解除「两三段以内」");
-  ok(/content: q \+ \(askLen/.test(CHAT), "覆盖指令挂在当轮 user 消息、不进 system（保前缀缓存）");
+  ok(/content: q \+ UMEM \+ \(askLen/.test(CHAT), "覆盖指令与记忆都挂在当轮 user 消息、不进 system（保前缀缓存）");
   const askLen = grab(wk, "wdsAskLen")();
   const tok = (q) => { const a = askLen(q); return a ? Math.min(32000, Math.max(6000, Math.round(a * 1.8))) : 2600; };
   ok(tok("先写 8000 字") >= 14000, "要 8000 字 → 预算上万（这正是 15:12 那次翻车的病根）");
@@ -229,7 +229,41 @@ console.log("── 十四 · 客户端：成文说明与稿互不覆盖、看�
   ok(/sbCap/.test(wm) && /length >= 50/.test(wm), "侧栏快到 60 场上限时先打招呼");
   ok(!/前端拼会被 q 的 800 字钳位吃掉）。 \*\//.test(wm), "那条 800 字的过期注释已改准");
   ok(/WDS_CHAT_Q_MAX=20000/.test(wm), "注释里写的是现行上限");
-  ok(/wds-mode\.js\?v=20260730e/.test(shell), "版本戳再 bump（本轮又动了 wds-mode.js）");
+  // 版本戳只能往前：断言认"今天的、比 e 更新的"，别把具体字母写死（今天已经 d→e→f 三次）
+  ok(/wds-mode\.js\?v=2026073[0-9]([f-z])/.test(shell), "版本戳再 bump（本轮又动了 wds-mode.js）");
+}
+
+console.log("── 十五 · 全局记忆（用户RAG）接到 问WDS");
+{
+  const MOD = fs.readFileSync(ROOT + "/public/assets/wds-memo.js", "utf8");
+  const STORE = fs.readFileSync(ROOT + "/public/assets/wds-store.js", "utf8");
+  ok(/window\.WDSMemo/.test(MOD), "引擎是共享模块（问WDS 与 和WDS对话 同用一份，不写第二套）");
+  ok(/sc\.src = "\/assets\/wds-memo\.js"/.test(wm), "问WDS 加载共享模块");
+  ok(/agent: "wds-chat", agents: "all"/.test(wm), "记忆池跨所有智能体（「记住所有的历史对话」是字面意思）");
+  ok(/umem: memRecall\(q\)/.test(wm), "每问都带上按这一问召回的记忆");
+  ok(/function memPanel\(/.test(wm) && /memGo|memProf|memClr/.test(wm), "有面板：更新/重炼画像/逐条删除/导出/清空");
+  ok(/wdsm-mbadge/.test(wm) && /function memBadge\(/.test(wm), "顶栏按钮带「待更新几场」角标");
+  ok(/memoListAll: memoListAll,/.test(STORE) && /listAll: listAll,/.test(STORE), "store 补了跨智能体列表且原有导出一个没动");
+  // 服务端：收下、有上限、不进 system、从历史预算里扣
+  ok(/const umem = String\(b\.umem \|\| ""\)\.slice\(0, UMEM_MAX\)/.test(CHAT), "chat 收 umem 并钳在 UMEM_MAX");
+  ok(/UMEM_MAX = 6000/.test(wk), "上限 6000 字符（与客户端 CAP 同一个数）");
+  ok(/WDS_CHAT_HIST_BUDGET - sys\.length - UMEM\.length/.test(CHAT), "历史预算把记忆占用扣掉了——记性不能把现场挤出去");
+  const sysLine = CHAT.slice(CHAT.indexOf("const sys = WDS_CHAT_SYS("), CHAT.indexOf("const sys = WDS_CHAT_SYS(") + 200);
+  ok(!/umem|UMEM/.test(sysLine), "不进 system（system 是可缓存的固定前缀，每轮换内容会把缓存打散）");
+  ok(/不要复述它，也不要假装记得这里面没写的事/.test(CHAT), "提示语讲明这是摘要不是原文");
+  // 纯函数行为实测（模块本体）
+  const win = {};
+  new Function("window", "localStorage", "document", "fetch", MOD)(win, { getItem: () => null, setItem() {} }, {}, () => Promise.resolve({ json: () => Promise.resolve({}) }));
+  const M = win.WDSMemo;
+  const recs = [
+    { id: "a", title: "创新智商怎么打分", gist: "五维评分与两条硬阈值", keys: ["创新智商"], points: "S/D/E/I/F", updatedAt: 2 },
+    { id: "b", title: "今天天气", gist: "闲聊", keys: ["天气"], points: "没谈出什么", updatedAt: 1 },
+  ];
+  const hit = M.pick("创新智商这套五维靠谱吗", recs, 3, "");
+  ok(hit.length === 1 && hit[0].id === "a", "按这一问挑出相关的那条，不相关的被阈值挡住");
+  ok(M.pick("创新智商五维", recs, 3, "a").length === 0, "排除当前这一场（原文已逐字在场，再塞摘要是浪费）");
+  const long = M.convoText({ turns: [{ role: "reader", text: "问".repeat(30000) }] });
+  ok(long.length <= M.IN + 40 && /中间省略 \d+ 字符/.test(long), "喂给摘要的原文超长时取头尾并明标省略");
 }
 
 (async () => {

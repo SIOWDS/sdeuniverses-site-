@@ -271,122 +271,53 @@
   //  ② **手动更新，不偷跑**——每条摘要都要花你自己 Key 的一次调用，什么时候更新由你按按钮决定。
   //  ③ 检索在本机做（纯字符串打分，不联网、不发第二次调用），只把挑中的那几条送出去。
   var MEMO_API = "/api/wds/memo";
-  var MEMO_IN = 24000;      // 单场喂给摘要的字符上限（与服务端 MEMO_IN_MAX 对齐；超长取头尾、中间明标省略）
-  var UMEM_CAP = 6000;      // 每答垫进去的记忆总量上限（与服务端 UMEM_MAX 对齐）
+  // 引擎已抽成全站共享模块 /assets/wds-memo.js（window.WDSMemo）——下面这些只是薄委托，
+  // 面板与角标代码一个字没改。抽的原因：问WDS（/taste/wds-chat/）也要全局记忆，
+  // 同一套检索/摘要/画像逻辑绝不写第二份（2026-07-28 存盘那次的撞车教训）。
   var UM = { memos: [], metas: [], profile: "", pkeys: [], ready: false, running: false, stop: false };
-
-  function umOn() { return localStorage.getItem("sde_wds_umem_on") !== "0"; }
-  function umTopK() { var k = parseInt(localStorage.getItem("sde_wds_umem_k"), 10); return (k >= 1 && k <= 6) ? k : 3; }
-  function umFp(m) { return String(m.n || 0) + ":" + String(m.updatedAt || 0); }
-  // 待更新 = 够长(至少一问一答)、且还没有摘要或摘要对应的是旧版本的那些场
-  function umPending() {
-    var have = {}; UM.memos.forEach(function (r) { have[r.id] = r; });
-    return UM.metas.filter(function (m) {
-      if ((m.n || 0) < 2) return false;
-      var r = have[m.id];
-      return !r || r.fp !== umFp(m);
+  var MEMO_ENGINE = null;
+  function umEngine() {
+    if (MEMO_ENGINE || !window.WDSMemo || !stApi) return MEMO_ENGINE;
+    MEMO_ENGINE = window.WDSMemo.create({
+      store: stApi, agent: "wds-dialogue", profileKey: "profile:wds-dialogue",
+      currentId: function () { return stSess ? stSess.id() : ""; },
     });
+    UM = MEMO_ENGINE.state;                 // 面板读的就是这份 state，换成引擎的同一个对象
+    return MEMO_ENGINE;
   }
+  function umBoot(then) {
+    if (window.WDSMemo) { umEngine(); if (then) then(); return; }
+    if (!document.head || !document.head.appendChild) { if (then) then(); return; }   // 没法加载就静默降级，绝不抛
+    var sc = document.createElement("script");
+    sc.src = "/assets/wds-memo.js"; sc.async = true;
+    sc.onload = function () { umEngine(); if (then) then(); };
+    sc.onerror = function () { if (then) then(); };
+    document.head.appendChild(sc);
+  }
+  function umOn() { var e = umEngine(); return e ? e.on() : (localStorage.getItem("sde_wds_umem_on") !== "0"); }
+  function umTopK() { var e = umEngine(); return e ? e.topK() : 3; }
+  function umFp(m) { return window.WDSMemo ? window.WDSMemo.fp(m) : (String(m.n || 0) + ":" + String(m.updatedAt || 0)); }
+  function umPending() { var e = umEngine(); return e ? e.pending() : []; }
   function umBadge() {
     var b = $("#mbadge"); if (!b) return;
     var n = UM.ready ? umPending().length : 0;
     if (n > 0) { b.textContent = String(n); b.hidden = false; } else { b.hidden = true; }
   }
   function umLoad(then) {
-    if (!stApi) { if (then) then(); return; }
-    Promise.all([stApi.memoList("wds-dialogue"), stApi.list("wds-dialogue"), stApi.kvGet("profile:wds-dialogue")])
-      .then(function (r) {
-        UM.memos = r[0] || []; UM.metas = r[1] || [];
-        var p = r[2] || null;
-        UM.profile = (p && p.text) || ""; UM.pkeys = (p && p.keys) || [];
-        UM.ready = true; umBadge();
-        if (then) then();
-      })
-      .catch(function () { UM.ready = true; if (then) then(); });
-  }
-
-  /* —— 本机检索：中文按二元组打分，关键词命中另加权。纯函数，便于模拟脚本直接验行为。—— */
-  function umNorm(s) { return String(s || "").toLowerCase().replace(/[\s\u3000-\u303f\uff00-\uff0f\uff1a-\uff20！-～,.;:!?()\[\]"'`~\-—…·]/g, ""); }
-  function umGrams(s) {
-    var t = umNorm(s), g = {}, i;
-    for (i = 0; i + 2 <= t.length; i++) g[t.slice(i, i + 2)] = 1;
-    return g;
-  }
-  function umScore(q, rec) {
-    var qg = umGrams(q), keys = Object.keys(qg);
-    if (!keys.length) return 0;
-    var body = umNorm((rec.title || "") + (rec.gist || "") + (rec.points || "") + (rec.stance || "") + (rec.keys || []).join(""));
-    var hit = 0, i;
-    for (i = 0; i < keys.length; i++) if (body.indexOf(keys[i]) >= 0) hit++;
-    var s = hit / keys.length;
-    var qn = umNorm(q), bonus = 0;
-    (rec.keys || []).forEach(function (k) { var kk = umNorm(k); if (kk.length >= 2 && qn.indexOf(kk) >= 0) bonus += 0.35; });
-    return s + Math.min(1, bonus);
-  }
-  // 挑出最相关的几条。**排除当前这一场**——它的原文已经逐字在上下文里，再塞一遍摘要只是浪费预算。
-  function umPick(q, list, k, excludeId) {
-    var scored = (list || [])
-      .filter(function (r) { return r && r.id !== excludeId && (r.gist || r.points); })
-      .map(function (r) { return { r: r, s: umScore(q, r) }; })
-      .filter(function (x) { return x.s > 0.08; });
-    scored.sort(function (a, b) { return b.s - a.s || (b.r.updatedAt || 0) - (a.r.updatedAt || 0); });
-    return scored.slice(0, k || 3).map(function (x) { return x.r; });
-  }
-  // 组装垫进当轮提问的那段文本；硬截在 UMEM_CAP，宁可少给也不许挤掉本场对话
-  function umRecall(q) {
-    if (!umOn() || !UM.ready) return "";
-    var out = [];
-    if (UM.profile) out.push("· 关于我（从我历次对话里提炼）：" + UM.profile.slice(0, 600));
-    var picked = umPick(q, UM.memos, umTopK(), stSess ? stSess.id() : "");
-    picked.forEach(function (r, i) {
-      var when = stApi ? stApi.stamp(r.updatedAt || r.madeAt || Date.now()) : "";
-      out.push("· 第 " + (i + 1) + " 条《" + (r.title || "未命名对话") + "》（" + when + "）：" + (r.gist || "") + (r.points ? ("\n  要点：" + r.points) : ""));
-    });
-    if (!out.length) return "";
-    var s = out.join("\n");
-    return s.length > UMEM_CAP ? s.slice(0, UMEM_CAP) + "…（余下略）" : s;
-  }
-
-  /* —— 更新：逐场调 /api/wds/memo。顺序做、可中断、已做过的跳过；一场失败只丢那一场。—— */
-  function umConvoText(rec) {
-    var body = (rec.turns || []).map(function (t) {
-      return (t.role === "reader" ? "【我】\n" : "【WDS】\n") + (t.text || "");
-    }).join("\n\n");
-    if (body.length <= MEMO_IN) return body;
-    var head = Math.round(MEMO_IN * 0.6), tail = MEMO_IN - head;
-    return body.slice(0, head) + "\n\n……（中间省略 " + (body.length - MEMO_IN) + " 字符）……\n\n" + body.slice(body.length - tail);
-  }
-  function umOne(meta, kv) {
-    return stApi.get(meta.id).then(function (rec) {
-      if (!rec) return { ok: false, msg: "这一场已经不在本机了" };
-      return fetch(MEMO_API, {
-        method: "POST", headers: { "content-type": "application/json" },
-        body: JSON.stringify({ mode: "one", key: kv.key, vendor: kv.vendor, title: rec.title || "", text: umConvoText(rec) })
-      }).then(function (r) { return r.json(); }).then(function (j) {
-        if (!j || !j.ok) return { ok: false, msg: (j && j.msg) || "没提炼出来", code: j && j.code };
-        return stApi.memoPut({
-          id: meta.id, agent: "wds-dialogue", title: rec.title || "", updatedAt: meta.updatedAt, n: meta.n,
-          fp: umFp(meta), gist: j.gist || "", keys: j.keys || [], points: j.points || "", stance: j.stance || ""
-        }).then(function () { return { ok: true }; });
-      }).catch(function (e) { return { ok: false, msg: (e && e.message) || "网络没接上" }; });
+    umBoot(function () {
+      var e = umEngine();
+      if (!e) { UM.ready = true; umBadge(); if (then) then(); return; }
+      e.refresh(function () { UM = e.state; umBadge(); if (then) then(); });
     });
   }
-  function umRefreshProfile(kv, say) {
-    var feed = UM.memos.slice(0, 60).map(function (r) {
-      return "《" + (r.title || "未命名") + "》：" + (r.gist || "") + (r.keys && r.keys.length ? ("｜关键词：" + r.keys.join("、")) : "") + (r.stance ? ("｜我的立场：" + r.stance) : "");
-    }).join("\n");
-    if (!feed.trim()) { say("还没有可提炼画像的记忆条目。"); return Promise.resolve(); }
-    say("正在提炼你的画像…");
-    return fetch(MEMO_API, {
-      method: "POST", headers: { "content-type": "application/json" },
-      body: JSON.stringify({ mode: "profile", key: kv.key, vendor: kv.vendor, text: feed.slice(0, MEMO_IN) })
-    }).then(function (r) { return r.json(); }).then(function (j) {
-      if (!j || !j.ok || !j.profile) { say("画像这次没提炼成（" + ((j && j.msg) || "空结果") + "），可以再点一次。"); return; }
-      UM.profile = j.profile; UM.pkeys = j.keys || [];
-      return stApi.kvSet("profile:wds-dialogue", { text: j.profile, keys: j.keys || [], at: Date.now() })
-        .then(function () { say("画像已更新。"); });
-    }).catch(function (e) { say("画像更新出错：" + ((e && e.message) || "")); });
-  }
+  function umNorm(s) { return window.WDSMemo ? window.WDSMemo.norm(s) : String(s || ""); }
+  function umGrams(s) { return window.WDSMemo ? window.WDSMemo.grams(s) : {}; }
+  function umScore(q, rec) { return window.WDSMemo ? window.WDSMemo.score(q, rec) : 0; }
+  function umPick(q, list, k, excludeId) { return window.WDSMemo ? window.WDSMemo.pick(q, list, k, excludeId) : []; }
+  function umRecall(q) { var e = umEngine(); return e ? e.recall(q) : ""; }
+  function umConvoText(rec) { return window.WDSMemo ? window.WDSMemo.convoText(rec) : ""; }
+  function umOne(meta, kv) { var e = umEngine(); return e ? e.one(meta, kv) : Promise.resolve({ ok: false, msg: "记忆引擎没加载上" }); }
+  function umRefreshProfile(kv, say) { var e = umEngine(); return e ? e.profileRefresh(kv, say) : Promise.resolve(); }
 
   function umPanel() {
     if (!stApi) return;

@@ -6,6 +6,9 @@
  * v4（全面对标提升）：整场记忆全量上送（原来只带最近 4 轮）· 长问不再静默截断 · 「继续」接着写 ·
  *   「复制」出纯文本 /「原文」出 Markdown（原来两个按钮同一个动作）· 嵌套列表/多行引用/有序列表续号 ·
  *   等待期显示"跑了几秒·在哪一段" · 图标钮补 aria 名字。
+ * v5：全局记忆（用户RAG）——把谈完的每一场炼成一条摘要存本机，每问一句按这一问挑几条垫进当轮提问，
+ *   跨场也有记性。引擎是全站共享模块 /assets/wds-memo.js（与 /taste/wds-dialogue/ 同一份实现），
+ *   本文件只管入口按钮与面板。**跨智能体**：记忆池取全部 agent 的历史，不只本页。
  * Markdown 实际支持：标题 粗斜体 删除线 行内码 围栏代码块(高亮+复制) 有序/无序/嵌套列表 任务清单
  *   表格 引用 分隔线 链接 KaTeX 公式。改这里时顺手改这行，别让接手的人照过期注释判断能力。 */
 (function () {
@@ -368,6 +371,16 @@
       brPrev: "上一版", brNext: "下一版", brOf: " / ",
       aMd: "⧉ 原文", aEditIn: "✎ 编辑", edSave: "保存并重答", edCancel: "取消",
     aCont: "↳ 继续", contQ: "接着上面继续写下去，别重复已经写过的部分。",
+    bMem: "⌾ 记忆", memTitle: "全局记忆 · 我的历史对话",
+    memHd: "本机共 <b>{n}</b> 场对话（含其它 WDS 智能体），已炼出 <b>{m}</b> 条记忆，待更新 <b>{p}</b> 场",
+    memGo: "开始更新", memProf: "重炼画像", memExp: "导出记忆", memClr: "清空记忆",
+    memSwOn: "答题时启用我的记忆", memK1: "每答垫入", memK2: "条",
+    memNone: "还没有记忆条目——聊过几场之后点「开始更新」，它才记得住你。",
+    memNoKey: "更新记忆也用你自己的 Key（右上 ⚙ 设置）。",
+    memProfH: "我的画像",
+    memDelAsk: "删掉这一条记忆？（原对话不受影响）",
+    memClrAsk: "清空全部记忆条目与画像？（对话原文不受影响）",
+    memNote: "摘要与画像只存在你这台设备的浏览器里，不上传本站、不同步。更新时对话原文随你自己的 Key 发往你选的基底（与平常问答同一条路），本站不经手。删除某一场对话时它的记忆一并删除；被自动淘汰的旧对话（超 60 场）只丢原文、记忆仍留着。",
     arIn: "输入你的问题", arSend: "发送", arStop: "停止生成", arToBot: "回到最新", arMenu: "对话列表", arMsgs: "对话内容",
       cbCopy: "复制", cbCopied: "已复制", dropHint: "松手即作为附件加入本场（图片只读得出其中的文字，走本机 OCR）",
       pasteAdd: "已把粘贴的文件加为附件",
@@ -474,6 +487,16 @@
       brPrev: "Previous version", brNext: "Next version", brOf: " / ",
       aMd: "⧉ Source", aEditIn: "✎ Edit", edSave: "Save & regenerate", edCancel: "Cancel",
     aCont: "↳ Continue", contQ: "Continue from where you stopped; don't repeat what you already wrote.",
+    bMem: "⌾ Memory", memTitle: "Global memory · your past chats",
+    memHd: "<b>{n}</b> chats on this device (all WDS agents), <b>{m}</b> distilled, <b>{p}</b> pending",
+    memGo: "Update now", memProf: "Rebuild profile", memExp: "Export", memClr: "Clear",
+    memSwOn: "Use my memory when answering", memK1: "Inject", memK2: "per answer",
+    memNone: "No memory yet — chat a few times, then hit Update so it can remember you.",
+    memNoKey: "Updating memory also runs on your own Key (⚙ top right).",
+    memProfH: "Your profile",
+    memDelAsk: "Delete this memory entry? (the chat itself is untouched)",
+    memClrAsk: "Clear all memory entries and the profile? (transcripts are untouched)",
+    memNote: "Summaries and the profile live only in this browser — never uploaded, never synced. Updating sends the transcript to your chosen model with your own Key (same path as a normal answer); this site never touches it.",
     arIn: "Type your question", arSend: "Send", arStop: "Stop generating", arToBot: "Jump to latest", arMenu: "Chat list", arMsgs: "Conversation",
       cbCopy: "Copy", cbCopied: "Copied", dropHint: "Drop to attach to this chat (images: text only, local OCR)",
       pasteAdd: "Pasted file attached",
@@ -667,6 +690,22 @@
     ".wdsm-dist-t{font:700 15px/1 inherit;color:var(--wtx2);flex:none}" +
     ".wdsm-dist-c{flex:1;overflow-y:auto;padding:20px 22px}" +
     /* 快捷键帮助 / 拖拽遮罩 */
+    ".wdsm-membtn{position:relative}" +
+    ".wdsm-mbadge{position:absolute;top:-5px;right:-5px;min-width:15px;height:15px;line-height:15px;border-radius:9px;background:var(--wgold);color:#1a1508;font-size:10px;font-style:normal;text-align:center;padding:0 3px}" +
+    ".wdsm-memb{max-width:560px;width:100%;background:var(--wpanel);border:1px solid var(--wline2);border-radius:16px;padding:20px 22px;max-height:82vh;overflow:auto}" +
+    ".wdsm-memb h4{margin:0 0 6px;font-size:16px;color:var(--wtx2)}" +
+    ".wdsm-memhd{font-size:12.5px;color:var(--wdim);margin:0 0 12px;line-height:1.7}" +
+    ".wdsm-memhd b{color:var(--wgold2)}" +
+    ".wdsm-memrow{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px}" +
+    ".wdsm-memrow .st{font-size:12px;color:var(--wdim2);flex:1;min-width:120px}" +
+    ".wdsm-memp{font-size:13px;color:var(--wtx);line-height:1.75;background:var(--wfill);border:1px solid var(--wline);border-radius:10px;padding:10px 12px;margin-bottom:12px;white-space:pre-wrap}" +
+    ".wdsm-meml{border-top:1px solid var(--wline)}" +
+    ".wdsm-memi{display:flex;gap:8px;align-items:flex-start;padding:8px 0;border-bottom:1px solid var(--wline);font-size:12.5px;color:var(--wdim)}" +
+    ".wdsm-memi b{color:var(--wtx);font-weight:600;font-size:13px;display:block;margin-bottom:2px}" +
+    ".wdsm-memi button{flex:none;background:none;border:none;color:var(--wdim2);cursor:pointer;font-size:14px}" +
+    ".wdsm-memi button:hover{color:#E8A8A0}" +
+    ".wdsm-memsw{display:flex;gap:14px;align-items:center;flex-wrap:wrap;font-size:12.5px;color:var(--wdim);padding:12px 0 0}" +
+    ".wdsm-memnote{font-size:11.5px;color:var(--wdim2);line-height:1.7;margin-top:10px}" +
     ".wdsm-help{position:fixed;inset:0;z-index:100004;background:var(--wmask);display:flex;align-items:center;justify-content:center;padding:20px}" +
     ".wdsm-help-b{max-width:420px;width:100%;background:var(--wpanel);border:1px solid var(--wline2);border-radius:16px;padding:22px 24px}" +
     ".wdsm-help-b h4{margin:0 0 14px;font-size:16px;color:var(--wtx2)}" +
@@ -713,6 +752,7 @@
         "<button class='wdsm-tbtn wdsm-langbtn' title='中文 / English'>EN</button>" +
         "<button class='wdsm-tbtn wdsm-distbtn'></button>" +
         "<button class='wdsm-tbtn wdsm-histbtn' style='display:none'></button>" +
+        "<button class='wdsm-tbtn wdsm-membtn'><span class='mb'></span><i class='wdsm-mbadge' style='display:none'></i></button>" +
         "<button class='wdsm-tbtn wdsm-keybtn'></button><button class='wdsm-newbtn'></button>" +
       "</div>" +
       "<div class='wdsm-body empty'>" +
@@ -781,6 +821,117 @@
     if (dropped) out.unshift({ role: "reader", text: "（本场更早的 " + dropped + " 条发言因长度省略，这是同一场对话。）" });
     return out;
   }
+  /* ════════════════ 全局记忆（用户RAG）════════════════
+     引擎只有一份：/assets/wds-memo.js（与 /taste/wds-dialogue/ 共用）。这里只管接线与面板。
+     跨智能体：agents:"all" —— 记忆池取本机所有 WDS 对话（问WDS ＋ 和WDS对话 ＋ 陪读），
+     所以"记住并搜索所有的历史对话"是字面意思，不限本页。 */
+  var MEM = null;
+  function memBoot() {
+    if (MEM || !stApi) return;
+    function go() {
+      if (!window.WDSMemo || !stApi) return;
+      MEM = window.WDSMemo.create({
+        store: stApi, agent: "wds-chat", agents: "all", profileKey: "profile:global",
+        currentId: function () { return stSess ? stSess.id() : ""; },
+      });
+      MEM.refresh(function () { memBadge(); });
+    }
+    if (window.WDSMemo) { go(); return; }
+    if (!document.head || !document.head.appendChild) return;   // 桩环境/异常页面：静默降级，绝不抛
+    var sc = document.createElement("script");
+    sc.src = "/assets/wds-memo.js"; sc.async = true;
+    sc.onload = go; sc.onerror = function () {};
+    document.head.appendChild(sc);
+  }
+  function memBadge() {
+    var b = layer.querySelector(".wdsm-mbadge");
+    if (!b) return;
+    var n = (MEM && MEM.state.ready) ? MEM.pending().length : 0;
+    if (n > 0) { b.textContent = String(n); b.style.display = ""; } else { b.style.display = "none"; }
+  }
+  function memRecall(q) { try { return MEM ? MEM.recall(q) : ""; } catch (e) { return ""; } }
+
+  function memPanel() {
+    var m = el("div", "wdsm-help");                 // 复用遮罩层样式
+    var box = el("div", "wdsm-memb");
+    box.appendChild(el("h4", null, t("memTitle")));
+    var hd = el("div", "wdsm-memhd"); box.appendChild(hd);
+    var row = el("div", "wdsm-memrow");
+    var goB = el("button", "wdsm-act", t("memGo")), prB = el("button", "wdsm-act", t("memProf"));
+    var exB = el("button", "wdsm-act", t("memExp")), clB = el("button", "wdsm-act", t("memClr"));
+    var st = el("span", "st", "");
+    row.appendChild(goB); row.appendChild(prB); row.appendChild(exB); row.appendChild(clB); row.appendChild(st);
+    box.appendChild(row);
+    var prof = el("div", "wdsm-memp"); box.appendChild(prof);
+    var list = el("div", "wdsm-meml"); box.appendChild(list);
+    var sw = el("div", "wdsm-memsw");
+    var cb = document.createElement("input"); cb.type = "checkbox";
+    var lb = el("label"); lb.appendChild(cb); lb.appendChild(document.createTextNode(" " + t("memSwOn")));
+    var kSel = document.createElement("select");
+    [1, 2, 3, 4, 5].forEach(function (k) { var op = document.createElement("option"); op.value = String(k); op.textContent = String(k); kSel.appendChild(op); });
+    var lk = el("label"); lk.appendChild(document.createTextNode(t("memK1") + " ")); lk.appendChild(kSel); lk.appendChild(document.createTextNode(" " + t("memK2")));
+    sw.appendChild(lb); sw.appendChild(lk); box.appendChild(sw);
+    box.appendChild(el("div", "wdsm-memnote", t("memNote")));
+    m.appendChild(box);
+    m.onclick = function (ev) { if (!ev || ev.target === m) { if (MEM) MEM.stop(); if (m.parentNode) m.parentNode.removeChild(m); } };
+    document.body.appendChild(m);
+    function say(x) { st.textContent = x || ""; }
+    if (!MEM) { say(t("memNone")); return m; }
+    cb.checked = MEM.on();
+    cb.onchange = function () { MEM.setOn(cb.checked); };
+    kSel.value = String(MEM.topK());
+    kSel.onchange = function () { MEM.setTopK(kSel.value); };
+
+    function paint() {
+      var S = MEM.state;
+      hd.innerHTML = t("memHd").replace("{n}", String(S.metas.length)).replace("{m}", String(S.memos.length)).replace("{p}", String(MEM.pending().length));
+      prof.style.display = S.profile ? "" : "none";
+      prof.textContent = S.profile ? (t("memProfH") + "：" + S.profile) : "";
+      list.innerHTML = "";
+      if (!S.memos.length) { list.appendChild(el("div", "wdsm-memnote", t("memNone"))); }
+      S.memos.forEach(function (r) {
+        var it = el("div", "wdsm-memi");
+        var txt = el("div"); txt.style.flex = "1";
+        txt.appendChild(el("b", null, r.title || t("sbUntitled")));
+        txt.appendChild(document.createTextNode((stApi ? stApi.stamp(r.updatedAt || r.madeAt || Date.now()) + " · " : "") + (r.gist || "")));
+        it.appendChild(txt);
+        var x = el("button", null, "×"); x.title = t("sbDel");
+        x.onclick = function () {
+          if (window.confirm && !window.confirm(t("memDelAsk"))) return;
+          stApi.memoDel(r.id).then(function () { MEM.refresh(function () { paint(); memBadge(); }); }).catch(function () {});
+        };
+        it.appendChild(x);
+        list.appendChild(it);
+      });
+      memBadge();
+    }
+    goB.onclick = function () {
+      var kv = wdsKeyGet();
+      if (!kv) { say(t("memNoKey")); wdsKeyPanel(function () {}); return; }
+      if (MEM.state.running) { MEM.stop(); return; }
+      MEM.runAll(kv, { say: say, tick: paint });
+    };
+    prB.onclick = function () {
+      var kv = wdsKeyGet();
+      if (!kv) { say(t("memNoKey")); wdsKeyPanel(function () {}); return; }
+      MEM.profileRefresh(kv, say).then(paint);
+    };
+    exB.onclick = function () {
+      download("WDS-memory-" + stampName() + ".json",
+        JSON.stringify({ site: "sdeuniverses.com", kind: "wds-global-memory", at: new Date().toISOString(), profile: MEM.state.profile, memos: MEM.state.memos }, null, 2));
+    };
+    clB.onclick = function () {
+      if (window.confirm && !window.confirm(t("memClrAsk"))) return;
+      var ids = MEM.state.memos.map(function (r) { return r.id; });
+      var p = ids.reduce(function (acc, id) { return acc.then(function () { return stApi.memoDel(id); }); }, Promise.resolve());
+      p.then(function () { return stApi.kvSet("profile:global", null); })
+       .then(function () { MEM.refresh(function () { MEM.state.profile = ""; paint(); say(""); }); })
+       .catch(function () { say("清空没成功。"); });
+    };
+    if (!wdsKeyGet()) say(t("memNoKey"));
+    MEM.refresh(paint);
+    return m;
+  }
   function atBottom() { return bodyEl.scrollHeight - bodyEl.scrollTop - bodyEl.clientHeight < 90; }
   function scrollBottom(smooth) {
     try { bodyEl.scrollTo({ top: bodyEl.scrollHeight, behavior: smooth ? "smooth" : "auto" }); }
@@ -799,6 +950,7 @@
     q(".wdsm-distbtn").textContent = t("bDistill");
     q(".wdsm-histbtn").textContent = t("bHist");
     q(".wdsm-keybtn").textContent = t("bSet");
+    try { q(".wdsm-membtn .mb").textContent = t("bMem"); } catch (e) {}   // 按钮里还有个角标 <i>，不能整体 textContent
     q(".wdsm-newbtn").textContent = t("bNew");
     q(".wdsm-langbtn").textContent = LANG === "zh" ? "EN" : "中";
     var g = function (sel) { return q(sel) || {}; };   // 防空取：桩环境里某些节点不存在，别为文案崩掉整页
@@ -987,7 +1139,7 @@
     stBooting = true;
     function go() {
       if (!window.WDSStore) { stApi = false; return; }
-      window.WDSStore.load(function (a) { stApi = a || false; if (stApi) { stMakeSession(); stShowBtn(); sbRender(); } });
+      window.WDSStore.load(function (a) { stApi = a || false; if (stApi) { stMakeSession(); stShowBtn(); sbRender(); memBoot(); } });
     }
     if (window.WDSStore) { go(); return; }
     var sc = document.createElement("script");
@@ -995,7 +1147,10 @@
     sc.onload = go; sc.onerror = function () { stApi = false; };
     document.head.appendChild(sc);
   }
-  function stSave(h) { if (stSess && h && h.length) { stSess.save(h); sbSoon(); } }
+  function stSave(h) {
+    if (stSess && h && h.length) { stSess.save(h); sbSoon(); }
+    if (MEM && MEM.state.ready) setTimeout(function () { MEM.refresh(memBadge); }, 900);   // 本场变长了＝多一场待更新
+  }
   // 落盘是防抖 400ms 的，侧栏比它再晚一点刷，才看得到新起的标题
   var sbTimer = null;
   function sbSoon() { clearTimeout(sbTimer); sbTimer = setTimeout(sbRender, 700); }
@@ -1025,6 +1180,7 @@
     tb.onclick = function () { if (tb.dataset.m === "normal") close(); };
   });
   layer.querySelector(".wdsm-keybtn").onclick = function () { wdsKeyPanel(function () {}); };
+  layer.querySelector(".wdsm-membtn").onclick = function () { memBoot(); memPanel(); };
   layer.querySelector(".wdsm-langbtn").onclick = function () {
     LANG = LANG === "zh" ? "en" : "zh";
     try { localStorage.setItem(LS_LANG, LANG); } catch (e) {}
@@ -1641,7 +1797,7 @@
     history.push({ role: "reader", text: q }); updTurns(); stSave(history);
     streaming = true; stoppedByUser = false;
     sendEl.textContent = "■"; sendEl.classList.add("stop"); sendEl.title = "停止生成"; sendEl.setAttribute("aria-label", t("arStop"));
-    var payload = { q: q, history: histPack(), key: kv.key, vendor: kv.vendor, model: kv.model || "", mode: thinkMode, web: webOn ? 1 : 0, skey: wdsSearchKey(), about: aboutPlus(), lang: LANG, tool: curTool };
+    var payload = { q: q, history: histPack(), umem: memRecall(q), key: kv.key, vendor: kv.vendor, model: kv.model || "", mode: thinkMode, web: webOn ? 1 : 0, skey: wdsSearchKey(), about: aboutPlus(), lang: LANG, tool: curTool };
     var packed = docsForQuery(q);
     if (packed) {
       payload.docs = packed;                        // 附件常驻本场：每轮都带，长文按这一问现取段

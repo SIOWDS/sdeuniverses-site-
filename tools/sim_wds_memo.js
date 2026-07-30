@@ -15,6 +15,9 @@ const ROOT = __dirname + "/..";
 const W = fs.readFileSync(ROOT + "/src/worker.js", "utf8");
 const S = fs.readFileSync(ROOT + "/public/assets/wds-store.js", "utf8");
 const PAGE = fs.readFileSync(ROOT + "/public/taste/wds-dialogue/index.html", "utf8");
+const CHAT = fs.readFileSync(ROOT + "/public/wds-mode.js", "utf8");
+const MOD = fs.readFileSync(ROOT + "/public/assets/wds-memo.js", "utf8");   // 引擎只有这一份实现
+const STORE = fs.readFileSync(ROOT + "/public/assets/wds-store.js", "utf8");
 let P = 0, F = 0;
 const ok = (c, m) => { c ? (P++, console.log("  PASS " + m)) : (F++, console.log("  FAIL " + m)); };
 const num = (re, src) => Number((( src || W).match(re) || [])[1]);
@@ -91,16 +94,19 @@ console.log("\n[三] 垫进去的记忆：有上限、挂当轮、扣预算");
 /* ── ④ 本机检索：行为实测 ── */
 console.log("\n[四] 检索在本机做：打分、阈值、排除本场、topK、截断");
 {
-  const a = PAGE.indexOf("  function umOn()"), z = PAGE.indexOf("  /* —— 更新：逐场调");
-  ok(a > 0 && z > a, "从页面里取到检索这一段源码");
-  const seg = PAGE.slice(a, z);
+  // 引擎已抽成共享模块 /assets/wds-memo.js —— 这里跑**模块本体**（页面只是薄委托，见 [五]）
+  ok(/window\.WDSMemo = \{/.test(MOD) && /create: create/.test(MOD), "共享模块导出 WDSMemo.create 与纯函数");
   const mk = (sw, k, prof, sessId) => {
-    const LS = { getItem: (x) => (x === "sde_wds_umem_on" ? (sw ? "1" : "0") : x === "sde_wds_umem_k" ? String(k) : null), setItem() {} };
-    const UM = { memos: [], metas: [], profile: prof || "", pkeys: [], ready: true, running: false, stop: false };
-    const stApi = { stamp: () => "今天 10:00" };
-    const stSess = { id: () => sessId || "" };
-    const box = new Function("localStorage", "UM", "stApi", "stSess", "UMEM_CAP",
-      seg + "\nreturn { umOn, umTopK, umNorm, umGrams, umScore, umPick, umRecall, umFp, umPending };")(LS, UM, stApi, stSess, 6000);
+    const LS = { _d: {}, getItem(x) { return x === "sde_wds_umem_on" ? (sw ? "1" : "0") : x === "sde_wds_umem_k" ? String(k) : (this._d[x] || null); }, setItem(x, v) { this._d[x] = v; } };
+    const win = {};
+    new Function("window", "localStorage", "document", "fetch", MOD)(win, LS, { }, () => Promise.resolve({ json: () => Promise.resolve({}) }));
+    const store = { stamp: () => "今天 10:00" };
+    const eng = win.WDSMemo.create({ store: store, agent: "wds-dialogue", currentId: () => sessId || "" });
+    const UM = eng.state; UM.ready = true; UM.profile = prof || "";
+    // 老断言用的是 um* 名字，这里做一层名字映射，断言正文一个字不动
+    const box = { umOn: eng.on, umTopK: eng.topK, umNorm: win.WDSMemo.norm, umGrams: win.WDSMemo.grams,
+                  umScore: win.WDSMemo.score, umPick: win.WDSMemo.pick, umRecall: eng.recall,
+                  umFp: win.WDSMemo.fp, umPending: eng.pending };
     return { box, UM };
   };
   const R = [
@@ -155,19 +161,58 @@ console.log("\n[四] 检索在本机做：打分、阈值、排除本场、topK�
 /* ── ⑤ 两端对齐与接线 ── */
 console.log("\n[五] 两端对齐与接线");
 {
-  const cIn = num(/var MEMO_IN = (\d+)/, PAGE), sIn = num(/const MEMO_IN_MAX = (\d+)/);
+  const cIn = num(/var MEMO_IN = (\d+)/, MOD), sIn = num(/const MEMO_IN_MAX = (\d+)/);
   ok(cIn === sIn, "客户端截断口径 " + cIn + " 与服务端上限 " + sIn + " 对齐（客户端不许比服务端还宽，否则白发一趟被截）");
-  const cCap = num(/var UMEM_CAP = (\d+)/, PAGE), sCap = num(/const UMEM_MAX = (\d+)/);
+  const cCap = num(/var UMEM_CAP = (\d+)/, MOD), sCap = num(/const UMEM_MAX = (\d+)/);
   ok(cCap === sCap, "注入上限两端对齐（" + cCap + "）");
   ok(/id="bmem"[^>]*hidden/.test(PAGE), "按钮默认隐藏——本机存不了记录时（隐私模式）不该出现一个点了没反应的按钮");
   ok(/stMakeSession\(\); stShowBtn\(\); umShowBtn\(\);/.test(PAGE), "存储就绪后才亮出「记忆更新」按钮");
   ok(/umem: umRecall\(q\)/.test(PAGE), "答题请求确实带上了本机挑出的记忆");
-  ok(/mode: "one"/.test(PAGE) && /mode: "profile"/.test(PAGE), "客户端两种更新都接了：逐场摘要 + 重炼画像");
+  ok(/mode: "one"/.test(MOD) && /mode: "profile"/.test(MOD), "两种更新都在共享模块里：逐场摘要 + 重炼画像");
+  ok(/umRefreshProfile\(kv, say\)/.test(PAGE) && /profileRefresh\(kv, say\)/.test(PAGE), "对话页的画像更新委托给模块");
   ok(/r\.code === "rate" \|\| r\.code === "bad_key"/.test(PAGE), "撞上限流、或 Key 用不了时**停下并说明**，不拿同一把坏 Key 连撞几十场");
   ok(/UM\.stop/.test(PAGE) && /剩下的下次接着做/.test(PAGE), "批量更新可中断，且已做好的不丢、下次接着做");
   ok(/摘要与画像只存在你这台设备的浏览器里/.test(PAGE), "面板里把'存在哪、发给谁'讲清楚了");
   ok(/记忆更新/.test(PAGE) && /⌾ 记忆更新/.test(PAGE), "顶栏按钮文案在");
 }
 
-console.log("\n===== " + P + " PASS / " + F + " FAIL =====");
-process.exit(F ? 1 : 0);
+/* ── ⑥ 只有一份实现：两个页面都委托给共享模块（2026-07-30 抽模块时立的） ── */
+console.log("\n[六] 引擎只有一份：两个调用方都委托出去，谁也没有第二套");
+{
+  ok(!/function umScore\(q, rec\) \{\n    var qg/.test(PAGE), "对话页不再自带打分实现");
+  ok(/window\.WDSMemo\.score\(q, rec\)/.test(PAGE) && /window\.WDSMemo\.pick\(/.test(PAGE), "对话页的 umScore/umPick 是薄委托");
+  ok(/sc\.src = "\/assets\/wds-memo\.js"/.test(PAGE), "对话页加载共享模块");
+  ok(/WDSMemo\.create\(\{/.test(PAGE) && /agent: "wds-dialogue"/.test(PAGE), "对话页按自己的 agent 建实例");
+  ok(/sc\.src = "\/assets\/wds-memo\.js"/.test(CHAT), "问WDS 也加载同一个模块（不是抄一份）");
+  ok(/agent: "wds-chat", agents: "all"/.test(CHAT), "问WDS 的记忆池是**跨智能体**的（真·全局记忆）");
+  ok(/profileKey: "profile:global"/.test(CHAT), "问WDS 用全局画像键");
+  ok(/umem: memRecall\(q\)/.test(CHAT), "问WDS 每问都带上按这一问召回的记忆");
+  ok(/function memListAll|memoListAll/.test(STORE) && /listAll: listAll/.test(STORE), "store 补了跨智能体的两个列表（纯新增，旧调用方零影响）");
+  ok(/memoList: memoList,/.test(STORE), "memoList 原样保留");
+  // 行为实测：跨智能体的池子确实两家都取
+  const win = {}; const calls = [];
+  new Function("window", "localStorage", "document", "fetch", MOD)(win, { getItem: () => null, setItem() {} }, {}, () => Promise.resolve({ json: () => Promise.resolve({}) }));
+  const store = {
+    stamp: () => "今天", memoList: (a) => { calls.push("memoList:" + a); return Promise.resolve([{ id: "d1", agent: "wds-dialogue", gist: "甲", updatedAt: 1 }]); },
+    memoListAll: () => { calls.push("memoListAll"); return Promise.resolve([{ id: "d1", agent: "wds-dialogue", gist: "甲", updatedAt: 1 }, { id: "c1", agent: "wds-chat", gist: "乙", updatedAt: 2 }]); },
+    list: (a) => { calls.push("list:" + a); return Promise.resolve([]); },
+    listAll: () => { calls.push("listAll"); return Promise.resolve([{ id: "d1", n: 4, updatedAt: 1 }, { id: "c1", n: 4, updatedAt: 2 }]); },
+    kvGet: () => Promise.resolve(null),
+  };
+  const g = win.WDSMemo.create({ store: store, agent: "wds-chat", agents: "all", currentId: () => "" });
+  const one = win.WDSMemo.create({ store: store, agent: "wds-dialogue", currentId: () => "" });
+  return_check: {
+    g.refresh(function () {
+      ok(calls.indexOf("memoListAll") >= 0 && calls.indexOf("listAll") >= 0, "agents:'all' → 取全部智能体的记忆与会话");
+      ok(g.state.memos.length === 2, "两个智能体的记忆合成一个池子（实得 " + g.state.memos.length + " 条）");
+      one.refresh(function () {
+        ok(calls.indexOf("memoList:wds-dialogue") >= 0, "不传 agents 时仍只取本智能体（对话页行为一字未变）");
+        ok(one.state.memos.length === 1, "单智能体池子还是 1 条");
+        console.log("\n===== " + P + " PASS / " + F + " FAIL =====");
+        process.exit(F ? 1 : 0);
+      });
+    });
+  }
+}
+
+

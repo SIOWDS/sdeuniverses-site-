@@ -15,25 +15,32 @@ console.log("[静态核对]");
 ok("页面不引用任何浮层（wds-read.js / wds-mode.js / WDS_READ 配置）",
   !PAGE.includes("wds-read.js") && !PAGE.includes("wds-mode.js") && !PAGE.includes("WDS_READ"));
 ok("worker guide 分支在位（带全站RAG siteCtx + 读者文章）", W.includes("b.guide ? WDS_DIALOGUE_SYS(reflect, SDEM, siteCtx, docTitle, docText)"));
-ok("guide 全站检索加强档在位（K=36+接续+3万上限+来源回传）",
-  W.includes("retrieve(corpus, q, 36, expTerms)") && W.includes("siteCtx.length > (docText ? 12000 : 30000)") && W.includes('{ t: "sources", v: siteSrcs }'));
-ok("万字论文分部亦带站内资料（GD 检索 K=12 / 8000 上限）",
-  W.includes("retrieve(corpus, pq, 12, [])") && W.includes("partCtx.length > 8000"));
+// 检索架构已换成 RAG_SUBREQUEST（装语料是 CPU 大户，和写作挤在同一个请求里会被平台掐死），
+// 所以判据从"就地 retrieve(K=36)"改为"走 /api/wds/rag 子请求 + 来源回传"。
+ok("guide 全站检索走 rag 子请求且来源回传前端",
+  W.includes('new URL("/api/wds/rag", url)') && W.includes('{ t: "sources", v: siteSrcs }'));
+ok("万字论文分部亦带站内资料（同样走子请求，注入到分部提示里）",
+  W.includes("let partCtx = \"\";") && W.includes("【站内资料·全站检索到的相关段落"));
+// WDS_TOP_MODEL 后来加了 kimi/qwen/minimax 三家，整体字面比对必然失败——只钉这两家的型号
 ok("最强档模型钉在 v4-pro / glm-5",
-  W.includes('const WDS_TOP_MODEL = { deepseek: "deepseek-v4-pro", zhipu: "glm-5" }'));
+  /WDS_TOP_MODEL = \{[^}]*deepseek: "deepseek-v4-pro"[^}]*zhipu: "glm-5"/.test(W));
 ok("思考模式满功率（thinking enabled + reasoning_effort max + 去 temperature）",
   W.includes('body.thinking = { type: "enabled" }') && W.includes('body.reasoning_effort = "max"') && W.includes("delete body.temperature"));
 ok("三条对话链路都走最强档（开工/对话guide/成文guide）",
   W.includes("const VC = wdsTopVC(vd);") && W.includes('const VC = b.guide ? wdsTopVC(vd) : { url: WDS_VENDORS[vd].url')
   && (W.split("b.guide ? wdsTopVC(vd)").length - 1) === 2);
-ok("陪读不被波及（非 guide 仍走 WDS_VENDORS 默认档）", W.includes("wdsTopBody(VC, { model: VC.model, stream: true, max_tokens: b.guide ? 8000 : 2200"));
+// 预算口径已由"guide 8000 / 陪读 2200"改成按"这一步该产出多长"分档（十五修），故只验档位分流仍在
+ok("陪读不被波及（非 guide 不走顶配档）",
+  W.includes('const VC = b.guide ? wdsTopVC(vd) : { url: WDS_VENDORS[vd].url'));
 ok("worker paperN 3-6 在位", W.includes("Math.max(3, Math.min(6, parseInt(b.paperN, 10) || 3))") && W.includes("j.parts.slice(0, PN)"));
 ok("worker 开工路由 dialogue-reflect 在位", W.includes('url.pathname === "/api/wds/dialogue-reflect"') && W.includes("DIALOGUE_REFLECT_PROMPT"));
 ok("read/read-paper 优先吃本场心得 b.reflect", W.split("slice(0, 14000)").length >= 3);   // 站内另有智能体也用 14000，故用 >=
 ok("方法论指引起手三选一", W.includes("起手按问题种类三选一"));
-ok("全面记忆预算在位（guide 30万+单条1.2万+长问4000+成文10万）",
-  W.includes("WDS_GUIDE_HIST_BUDGET = 300000") && /b\.guide \? Math\.max\(60000, WDS_GUIDE_HIST_BUDGET - docText\.length - siteCtx\.length\)/.test(W)
-  && W.includes("histBudget, b.guide ? 12000 : 0") && W.includes("b.guide ? 4000 : 500") && W.includes("b.guide ? 300000 : 24000"));
+// 预算被两次下调过（699efdd6：30万必撞输入窗→12万；成文 30万→14万），且现在还要给全局记忆 UMEM 让位
+ok("全面记忆预算在位（guide 12万－正文－站内－记忆，单条1.2万，长问4000，成文14万）",
+  W.includes("WDS_GUIDE_HIST_BUDGET = 120000")
+  && /b\.guide \? Math\.max\(60000, WDS_GUIDE_HIST_BUDGET - docText\.length - siteCtx\.length - UMEM\.length\)/.test(W)
+  && W.includes("histBudget, b.guide ? 12000 : 0") && W.includes("b.guide ? 4000 : 500") && W.includes("b.guide ? 140000 : 24000"));
 // 功能级：抽出 packReadHistory 实测——guide 预算下 100 轮×2400 字符全量不裁、单条 1.2 万不截
 (function () {
   const m = W.match(/function packReadHistory[\s\S]*?\n}\n/);
@@ -148,7 +155,18 @@ global.fetch = function (url, opt) {
 
 // 取内联脚本并执行
 const js = PAGE.match(/<script>\n([\s\S]*)\n<\/script>/)[1];
+// 桩补最小可用 head：页面在脚本开头就往 head 注 /assets/wds-savedir.js 与 /assets/wds-memo.js，
+// 没有 head 就在第 19 行当场抛 —— 这个护栏自 2026-07-28（存盘模块抽出那笔）起一直是崩着的。
+if (!document.head) document.head = { appendChild(c) { if (c && c.onerror) setTimeout(() => c.onerror(), 0); return c; } };
 eval(js);
+
+// —— 全局记忆：引擎抽成共享模块后，页面应当只剩薄委托（2026-07-30）——
+ok("页面不再自带记忆引擎，改为委托 /assets/wds-memo.js",
+  PAGE.includes('sc.src = "/assets/wds-memo.js"') && PAGE.includes("WDSMemo.create({") && !/function umScore\(q, rec\) \{\s*\n\s*var qg/.test(PAGE));
+ok("委托后 um* 这些名字仍在（面板与角标代码一个字没改）",
+  ["umOn", "umTopK", "umFp", "umPending", "umBadge", "umLoad", "umRecall", "umOne", "umRefreshProfile", "umPanel", "umShowBtn"].every((n) => PAGE.includes("function " + n + "(")));
+ok("模块加载失败时静默降级、绝不抛（桩里就是这条路）", PAGE.includes("if (!document.head || !document.head.appendChild)"));
+ok("答题请求仍带 umem", /umem: umRecall\(q\)/.test(PAGE));
 
 // —— 输入文章（07-20）——
 ok("worker: WDS_DIALOGUE_SYS 收文章两参", W.includes("function WDS_DIALOGUE_SYS(reflect, SDEM, siteCtx, artTitle, artText)"));

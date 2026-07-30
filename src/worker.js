@@ -3600,6 +3600,11 @@ export default {
       // 长度不在这里砍——交给下面 packReadHistory 按 system 实际体量裁，且超预算才裁、裁了明标省略。
       const history = Array.isArray(b.history) ? b.history : [];
       const askLen = wdsAskLen(q);                       // 读者点名要几千字：预算/口径/时限三件一起变
+      // USER_RAG（全局记忆）：客户端在本机按这一问挑出的几条历史对话摘要＋画像。
+      // 与 LONGASK 同一条纪律——挂在当轮 user 消息上、**不进 system**：
+      // ①system 是可被基底前缀缓存的固定段，每轮换内容会把缓存打散；②这几条只对这一问相关，不该长驻。
+      // 明确告诉它这是摘要不是原文，免得它照着复述、或假装记得摘要里没写的事。
+      const umem = String(b.umem || "").slice(0, UMEM_MAX);
       const userKey = String(b.key || "").trim();
       if (userKey.length < 8) return _sseResp([{ t: "error", v: "WDS 助手用你自己的 API Key 运行（在设置里填入，只存在你的浏览器本地，与本站无关）。", code: "need_key" }]);
       const vd = wdsVendorOf(b.vendor);
@@ -3712,7 +3717,9 @@ export default {
             const messages = [{ role: "system", content: sys }];
             // 历史预算随 system 实际体量收缩：站内资料/附件/心得都在 system 里，
             // 一起顶上去会撞输入窗（400 context too long）。超预算才从最旧处裁，并明标省略。
-            const histBudget = Math.max(WDS_CHAT_HIST_MIN, WDS_CHAT_HIST_BUDGET - sys.length);
+            const UMEM = umem ? ("\n\n【我的长期记忆 · 来自我与你此前几场对话的摘要（存在我本机，不是本场原文）】\n" + umem
+              + "\n（以上只作背景：相关就用，不相关就当没看见；不要复述它，也不要假装记得这里面没写的事。）") : "";
+            const histBudget = Math.max(WDS_CHAT_HIST_MIN, WDS_CHAT_HIST_BUDGET - sys.length - UMEM.length);
             const packed = packReadHistory(history, histBudget, WDS_CHAT_PERMSG,
               (n) => "（本场更早的 " + n + " 条发言因长度省略；这是同一场持续对话，请接着往下谈。）");
             for (const m of packed) messages.push(m);
@@ -3720,7 +3727,7 @@ export default {
             // 固定前缀要留给厂商的前缀缓存，且长 system 末尾是低注意力位。
             messages.push({
               role: "user",
-              content: q + (askLen
+              content: q + UMEM + (askLen
                 ? ("\n\n（本轮特别要求：读者要的是长篇，约 " + askLen + " 字。解除《怎么答》第 5 条的\"两三段以内\"，按这个长度写足；"
                    + "别在心里反复打草稿，边想边落笔——写不完读者会点「继续」。）")
                 : ""),

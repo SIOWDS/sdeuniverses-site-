@@ -166,6 +166,28 @@
       return box;
     });
   }
+  // 全局记忆（跨智能体）用：不分 agent 取全部。按 updatedAt 倒序，与 memoList/list 的次序口径一致。
+  function memoListAll() {
+    return txs(MEMO, "readonly", function (os) {
+      var box = { __v: [] };
+      os.openCursor().onsuccess = function (e) { var c = e.target.result; if (!c) return; box.__v.push(c.value); c.continue(); };
+      return box;
+    }).then(function (rs) { return (rs || []).sort(function (a, b) { return (b.updatedAt || 0) - (a.updatedAt || 0); }); });
+  }
+  function listAll() {
+    return tx("readonly", function (os) {
+      var box = { __v: [] };
+      os.openCursor().onsuccess = function (e) {
+        var c = e.target.result; if (!c) return;
+        var r = c.value;
+        box.__v.push({ id: r.id, agent: r.agent, title: r.title, updatedAt: r.updatedAt, n: (r.turns || []).length,
+                       scope: r.scope, scopeLabel: r.scopeLabel || "" });
+        c.continue();
+      };
+      return box;
+    }).then(function (rs) { return (rs || []).sort(function (a, b) { return (b.updatedAt || 0) - (a.updatedAt || 0); }); });
+  }
+
   function memoClear(agent) {
     return memoList(agent).then(function (rs) {
       return txs(MEMO, "readwrite", function (os) { rs.forEach(function (r) { os.delete(r.id); }); });
@@ -409,6 +431,8 @@
     memoGet: memoGet,
     memoDel: memoDel,
     memoList: memoList,
+    memoListAll: memoListAll,
+    listAll: listAll,
     memoClear: memoClear,
     kvGet: kvGet,
     kvSet: kvSet
