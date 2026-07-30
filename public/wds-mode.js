@@ -327,6 +327,9 @@
       micSwitch: "浏览器自带的听写在你这边连不上，已改用本机转写（免费、离线）。",
       micFail: "语音没成：",
       attFull: "全文常驻本场", attIdx: "按问题取段", attSegs: " 段", attStay: "附件会跟着这一场对话，直到你去掉它或开新对话",
+    attGone: "附件只在本页有效，刷新会丢（对话文字会自动续上）",
+    sbCap: "本机只保留最近 60 场，更旧的会自动淘汰——想长期留着就用 ⤓ 导出",
+    dCut: "成文这一步断了（上面已写出的部分仍可复制/导出）",
       micLocal: "本机转写（免费）", micDl: "首次要下载模型 ",
       micLocalAsk: "本机转写完全免费、不用任何 Key，音频也不出这台机器。代价是首次要下载约 80 MB 的模型（之后浏览器会记住，不再重下），没有独立显卡的机器转一句话可能要等十几秒。现在下吗？",
       micLocalWait: "本机识别中…（第一次慢些）", micLocalNo: "本机转写在这台设备上跑不起来",
@@ -430,6 +433,9 @@
       micSwitch: "The browser's own dictation can't reach its service from here, so on-device transcription is used instead (free, offline).",
       micFail: "Voice input failed: ",
       attFull: "kept in full for this chat", attIdx: "excerpted per question", attSegs: " segments", attStay: "Attachments stay with this conversation until you remove them or start a new one",
+    attGone: "Attachments live on this page only — a refresh drops them (the transcript comes back)",
+    sbCap: "Only the latest 60 chats are kept locally; older ones are dropped — export (⤓) to keep them",
+    dCut: "This write-up was cut off (what's above can still be copied or exported)",
       micLocal: "On-device (free)", micDl: "Downloading the model ",
       micLocalAsk: "On-device transcription is free, needs no key, and the audio never leaves this machine. The cost is a one-time download of about 80 MB (the browser keeps it afterwards), and on a machine without a discrete GPU a sentence may take ten-odd seconds. Download it now?",
       micLocalWait: "Transcribing on this device… (the first run is slower)", micLocalNo: "On-device transcription can't run on this device",
@@ -879,7 +885,7 @@
     attsEl.innerHTML = "";
     if (!atts.length) { attsEl.style.display = "none"; return; }
     attsEl.style.display = "";
-    attsEl.title = t("attStay");
+    attsEl.title = t("attStay") + " · " + t("attGone");
     atts.forEach(function (d, i) {
       var chip = el("div", "wdsm-att");
       chip.appendChild(el("b", null, d.name));
@@ -890,6 +896,9 @@
       chip.appendChild(x);
       attsEl.appendChild(chip);
     });
+    var gone = el("div", null, t("attGone"));       // 静默丢附件是最坏的贴心：说在明处
+    gone.style.cssText = "color:#6b7684;font-size:11.5px;margin:4px 2px 0;flex-basis:100%";
+    attsEl.appendChild(gone);
   }
   function attStatus(msg, bad) {
     attsEl.style.display = "";
@@ -1846,7 +1855,21 @@
       + "<div class='wdsm-dist-c'><div class='wdsm-a'></div></div></div>";
     document.body.appendChild(wrap);
     var out = wrap.querySelector(".wdsm-a"), stat = wrap.querySelector(".dst");
-    var text = "", dr = null, lastP = 0;
+    var cbox = wrap.querySelector(".wdsm-dist-c");
+    var text = "", dr = null, lastP = 0, dnote = null, dWd = null, dTimedOut = false;
+    /* 说明行挂在正文之外：出错或断流时不再把已写出的稿抹掉，稿也不再把说明抹掉
+       （原来两者写在同一个容器里，谁后到谁赢，两样都可能丢）。 */
+    function dNote(msg, bad) {
+      if (!dnote) { dnote = el("div"); cbox.appendChild(dnote); }
+      dnote.textContent = String(msg || "");
+      dnote.style.cssText = "font-size:12.5px;line-height:1.6;margin:10px 0 0;color:" + (bad ? "#E8A8A0" : "#8B7B5E");
+    }
+    // 看门狗：成文这条流原来客户端一个超时都没有，服务端也没戴时钟（今天补上了）——
+    // 两头都不设时限时，流被无声掐断就只剩一个永远转着的光标。
+    function dBump() {
+      clearTimeout(dWd);
+      dWd = setTimeout(function () { dTimedOut = true; try { if (dr) dr.cancel(); } catch (e) {} }, 45000);
+    }
     var svBtn = wrap.querySelector(".dsv"), cpBtn = wrap.querySelector(".dcp"), dlBtn = wrap.querySelector(".ddl"), dirBtn = wrap.querySelector(".ddir");
     svBtn.textContent = t("dSave"); cpBtn.textContent = t("dCopy"); dlBtn.textContent = t("dDl");
     dirBtn.textContent = t("dDir");
@@ -1858,7 +1881,12 @@
         dirBtn.title = dirName() ? (t("dDirSaved") + dirName()) : t("dDirNone");
       });
     };
-    function done() { out.innerHTML = text ? mdRender(text) : esc(t("dEmpty")); stat.textContent = text ? (t("dDone") + text.length) : t("dFail"); }
+    function done() {
+      clearTimeout(dWd);
+      out.innerHTML = text ? mdRender(text) : esc(t("dEmpty"));
+      stat.textContent = text ? (t("dDone") + text.length) : t("dFail");
+      if (dTimedOut) dNote(t("dCut"), 1);
+    }
     wrap.querySelector(".dx").onclick = function () { try { if (dr) dr.cancel(); } catch (e) {} wrap.parentNode.removeChild(wrap); };
     cpBtn.onclick = function () { copyText(text); cpBtn.textContent = t("aCopied"); setTimeout(function () { cpBtn.textContent = t("dCopy"); }, 1400); };
     dlBtn.onclick = function () { download("WDS-" + kind + "-" + new Date().toISOString().slice(0, 10) + ".md", text); };
@@ -1868,6 +1896,7 @@
     };
     if (existing) { text = existing; done(); return; }
     out.innerHTML = "<span class='cur'>▊</span>";
+    dBump();
 
     fetch(API_DISTILL, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ kind: kind, history: history, key: kv.key, vendor: kv.vendor, model: kv.model || "", lang: LANG }) })
       .then(function (resp) {
@@ -1877,6 +1906,7 @@
         function pump() {
           return reader.read().then(function (r) {
             if (r.done) { done(); return; }
+            dBump();
             buf += dec.decode(r.value, { stream: true });
             var idx;
             while ((idx = buf.indexOf("\n")) >= 0) {
@@ -1886,21 +1916,29 @@
               if (p === "[DONE]") { done(); return; }
               var j; try { j = JSON.parse(p); } catch (e) { continue; }
               if (j.t === "token") { text += j.v; if (Date.now() - lastP > 130) { lastP = Date.now(); out.innerHTML = mdRender(text) + "<span class='cur'>▊</span>"; } }
-              else if (j.t === "beat") { if (!text && j.v) stat.textContent = t("thinking") + " " + (j.v.sec || 0) + "s · " + (j.v.think || 0); }
-              else if (j.t === "error") { out.className = "wdsm-a plain wdsm-err"; out.textContent = j.v; stat.textContent = t("dFail"); if (j.code === "need_key" || j.code === "bad_key") setTimeout(function () { wdsKeyPanel(function () {}); }, 400); }
+              else if (j.t === "beat") { if (!text && j.v) stat.textContent = t("thinking") + " " + (j.v.sec || 0) + "s · " + (j.v.think || 0) + (j.v.stage ? " · " + j.v.stage : ""); }
+              else if (j.t === "note") { dNote(j.v); }
+              else if (j.t === "error") { dNote(j.v, 1); stat.textContent = t("dFail"); if (j.code === "need_key" || j.code === "bad_key") setTimeout(function () { wdsKeyPanel(function () {}); }, 400); }
             }
             return pump();
           });
         }
         return pump();
       })
-      .catch(function (e) { out.className = "wdsm-a plain wdsm-err"; out.textContent = t("errNoOut") + (e && e.message) + ")"; stat.textContent = t("dFail"); });
+      .catch(function (e) {
+        clearTimeout(dWd);
+        if (text) { out.innerHTML = mdRender(text); dNote(dTimedOut ? t("dCut") : (t("errNoOut") + (e && e.message) + ")"), 1); }
+        else { out.className = "wdsm-a plain wdsm-err"; out.textContent = t("errNoOut") + (e && e.message) + ")"; }
+        stat.textContent = t("dFail");
+      });
   }
 
   /* ════════════════ SDE 工序（问WDS 独有的九道）════════════════
      一道工序＝这一轮必须交付哪几件东西。选中后一直挂着（按钮上看得见），
      不写进 localStorage——工序会实质改变产出形态，不该在读者看不见的地方跨会话生效。
-     斜杠命令与菜单是同一套 key，前端只负责传 key，工序文本一律在后端（前端拼会被 q 的 800 字钳位吃掉）。 */
+     斜杠命令与菜单是同一套 key，前端只负责传 key，工序文本一律在后端
+     （历史原因：q 曾被硬切 800 字，前端拼会被吃掉；现在上限是 WDS_CHAT_Q_MAX=20000，但工序文本仍留在后端——
+       它是产品口径的一部分，不该让读者的提问额度替它买单）。 */
   var TOOLS = [
     { k: "iq", n: "tlIq", s: "tlIqS", cmd: ["评分", "iq", "打分"] },
     { k: "three", n: "tlThree", s: "tlThreeS", cmd: ["三视角", "three", "互消"] },
@@ -2176,6 +2214,11 @@
         };
         sbListEl.appendChild(it);
       });
+      if ((metas || []).length >= 50) {           // 快到 wds-store 的 60 场上限了，先打招呼
+        var cap = el("div", "wdsm-snone", t("sbCap"));
+        cap.style.cssText = "font-size:11.5px;line-height:1.6;opacity:.75";
+        sbListEl.appendChild(cap);
+      }
     }).catch(function () {});
   }
   if (sbSchEl) sbSchEl.addEventListener("input", function () { sbKw = String(sbSchEl.value || "").trim(); sbRender(); });

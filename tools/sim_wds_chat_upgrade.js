@@ -149,7 +149,7 @@ console.log("── 七/八/九 · 等待期可见、aria、注释与版本戳")
   ok(/arStop/.test(wm) && /sendEl\.setAttribute\("aria-label", t\("arStop"\)\)/.test(wm), "发送钮变停止钮时名字跟着变");
   ok(/全站问答 v4/.test(wm), "文件头版本随能力一起走");
   ok(/表格 引用 分隔线 链接 KaTeX 公式/.test(wm), "文件头如实列出实际支持的 Markdown（过期注释已改）");
-  ok(/wds-mode\.js\?v=20260730d/.test(shell), "壳页版本戳已 bump（动 wds-mode.js 必 bump）");
+  ok(/wds-mode\.js\?v=2026073[0-9][a-z]/.test(shell), "壳页版本戳已 bump（动 wds-mode.js 必 bump）");
 }
 
 console.log("── 十 · 没有回归：陪读与「和WDS对话」的口径一个字没动");
@@ -162,6 +162,74 @@ console.log("── 十 · 没有回归：陪读与「和WDS对话」的口径�
   const four = pack(big, 60000, 3000, (n) => "（本场更早的 " + n + " 条…）");
   ok(/本场更早的 \d+ 条…/.test(four[0].content), "四参调用用调用方给的措辞");
   ok(pack(big.slice(0, 2), 60000, 3000).length === 2, "预算之内不裁（旧契约仍成立）");
+}
+
+/* ══════ 第二批（2026-07-30 下午）：成文 / 追问 / 语音 / 联网 / 提示 ══════ */
+const DIST = (() => {
+  const a = wk.indexOf('url.pathname === "/api/wds/distill"');
+  const b = wk.indexOf('url.pathname === "/api/chat/clear"', a);
+  return wk.slice(a, b > 0 ? b : a + 12000);
+})();
+const ASR = (() => {
+  const a = wk.indexOf('url.pathname === "/api/wds/asr"');
+  return wk.slice(a, wk.indexOf('url.pathname === "/api/wds/ping"', a));
+})();
+const WS = (() => {
+  const a = wk.indexOf('url.pathname === "/api/wds/websearch"');
+  return wk.slice(a, wk.indexOf('url.pathname === "/api/wds/distill"', a));
+})();
+
+console.log("── 十一 · 成文（distill）：整场可见 + 时钟 + 断流保稿");
+{
+  ok(!/b\.history\.slice\(-40\)/.test(DIST), "不再只吃最近 40 条");
+  ok(/readConvoText\(turns, DISTILL_CONVO_MAX\)/.test(DIST), "改用 readConvoText（保头 35%＋保尾＋明标省略），不再自写一套截断");
+  ok(/DISTILL_CONVO_MAX = 100000/.test(wk), "成文能看的对话原文提到 10 万字符（原 4 万且从中间断掉）");
+  ok(/const clk = wdsClock\(DISTILL_FIRST_MS, DISTILL_TOTAL_MS\)/.test(DIST), "成文戴上时钟（此前是唯一没戴的 WDS 路由）");
+  ok(/signal: clk\.signal/.test(DIST) && /clk\.firstFrame\(\)/.test(DIST) && /clk\.stop\(\)/.test(DIST), "signal 透传、首帧撤护栏、收尾撤钟");
+  ok(/if \(wrote\)[\s\S]{0,120}t: "note"/.test(DIST), "断流时已写出的稿保留并发 note");
+  ok(/_st\.stage = SPEC\.name/.test(DIST), "心跳带上「在写哪一件」");
+  ok(/name: "提炼成文", tok: 14000/.test(DIST), "要三千字就别只给 6000 预算（同「8000 token 装不下 8000 汉字」一族）");
+  // readConvoText 真跑：超限时保头保尾且明标省略
+  const rct = grab(wk, "readConvoText", ["WDS_MAX_TURNS"])(100);
+  const turns = Array.from({ length: 30 }, (_, i) => ({ role: i % 2 ? "wds" : "reader", text: "第" + i + "段" + "字".repeat(400) }));
+  const short = rct(turns.slice(0, 2), 100000);
+  ok(/第0段/.test(short) && /第1段/.test(short), "预算之内原文照带");
+  const long = rct(turns, 4000);
+  ok(/第0段/.test(long), "超限也保住开头（原来只留尾部）");
+  ok(/第29段/.test(long), "结尾也在");
+  ok(/中间已省略 \d+ 字/.test(long), "省略了要明标省略多少字");
+}
+
+console.log("── 十二 · 追问建议不许拖住已答完的一轮");
+{
+  ok(/WDS_FOLLOW_MS = 12000/.test(wk), "追问建议有短截止常量");
+  ok(/"\\n\\n三行：", 200, WDS_FOLLOW_MS\)/.test(wk), "followUps 真把短截止传进 llmText（原来吃缺省 55 秒）");
+}
+
+console.log("── 十三 · 会烧站方 Key 的两个端点都上了限流");
+{
+  ok(/wdsBucket\("asr"/.test(ASR) && /WDS_ASR_PER_MIN/.test(ASR), "语音转写有限流桶");
+  ok(/code: "rate"/.test(ASR), "撞限流时说人话，不是静默失败");
+  ok(/wdsBucket\("ws"/.test(WS) && /WDS_WS_PER_MIN/.test(WS), "联网搜索有限流桶（原来无 Key 也能当免费搜索 API 打）");
+  ok(/WDS_ASR_PER_DAY = 120/.test(wk) && /WDS_WS_PER_DAY = 200/.test(wk), "两个日额度写成常量");
+  const bucket = grab(wk, "wdsBucket", ["_lhash"])(
+    (s, seed) => { let x = seed >>> 0; for (let i = 0; i < s.length; i++) { x ^= s.charCodeAt(i); x = Math.imul(x, 16777619) >>> 0; } return x.toString(16).padStart(8, "0"); }
+  );
+  ok(bucket("asr", "1.2.3.4", "") === "byok:asr:1.2.3.4", "没带 Key 时按 IP 计（这正是烧站方额度的那种请求）");
+  ok(bucket("ws", "1.2.3.4", "sk-abcdefgh") === bucket("ws", "9.9.9.9", "sk-abcdefgh"), "带了 Key 就按 Key 计，不受共用出口 IP 牵连");
+}
+
+console.log("── 十四 · 客户端：成文说明与稿互不覆盖、看门狗、两处提示、注释");
+{
+  ok(/function dNote\(/.test(wm), "成文有独立的说明行（不再往正文上盖）");
+  ok(/else if \(j\.t === "error"\) \{ dNote\(j\.v, 1\)/.test(wm), "出错走说明行，已写出的稿不被抹掉");
+  ok(/if \(text\) \{ out\.innerHTML = mdRender\(text\); dNote\(/.test(wm), "网络异常时也先把稿渲染回来再说明原因");
+  ok(/function dBump\(/.test(wm) && /dTimedOut = true/.test(wm), "成文有 45 秒看门狗（原来客户端一个超时都没有）");
+  ok(/attGone/.test(wm) && /flex-basis:100%/.test(wm), "附件区明说刷新会丢");
+  ok(/sbCap/.test(wm) && /length >= 50/.test(wm), "侧栏快到 60 场上限时先打招呼");
+  ok(!/前端拼会被 q 的 800 字钳位吃掉）。 \*\//.test(wm), "那条 800 字的过期注释已改准");
+  ok(/WDS_CHAT_Q_MAX=20000/.test(wm), "注释里写的是现行上限");
+  ok(/wds-mode\.js\?v=20260730e/.test(shell), "版本戳再 bump（本轮又动了 wds-mode.js）");
 }
 
 (async () => {

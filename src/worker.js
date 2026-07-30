@@ -1905,6 +1905,11 @@ function looseJSON(s) {
 
 // ===== 陪读额度与全程记忆 =====
 // 解禁后：每台机器每天最多 100 次对话（原 60），每分钟 12 次（原 8）。两个 BYOK 入口共用同一配额桶。
+const WDS_FOLLOW_MS = 12000;                 // 追问建议的短截止（配菜不许拖住正菜，见 followUps）
+const DISTILL_FIRST_MS = 90000, DISTILL_TOTAL_MS = 300000;   // 成文的两级时钟
+const DISTILL_CONVO_MAX = 100000;            // 成文能看多长的对话原文（原来 4 万且从中间断掉）
+const WDS_ASR_PER_MIN = 6, WDS_ASR_PER_DAY = 120;            // 语音转写：会回落站方 Key，必须限流
+const WDS_WS_PER_MIN = 10, WDS_WS_PER_DAY = 200;             // 联网搜索：同理
 const WDS_PER_DAY = 300, WDS_PER_MIN = 20;   // 自带 Key＝用户自付，日上限放到限流器硬顶；分钟档防脚本滥用
 // 配额桶分家：各 BYOK 入口互不吃额度（用户自带 Key、自付费用，限流只为防滥用）。
 // 桶名 byok:<入口>:k<keyhash> —— chat=全站问答 / read=陪读 / dlg=与WDS对话 / ask=搜索问答。
@@ -2016,7 +2021,9 @@ const FOLLOW_SYS = "你是对话的旁观者。看完一问一答，写出读者
 async function followUps(VC, KEY, q, ans, lang) {
   try {
     const sys = FOLLOW_SYS + (lang === "en" ? "\n⑥ Write the three questions in English." : "");
-    const out = await llmText(VC, KEY, sys, "读者问：" + String(q).slice(0, 400) + "\n\nWDS 答：" + String(ans).slice(0, 2500) + "\n\n三行：", 200);
+    // 短截止（WDS_FOLLOW_MS）：这一步跑在正文写完之后、同一个请求里，客户端要等 [DONE] 才收尾并挂出操作行。
+    // 吃缺省 55 秒＝正文早写完了，读者却按不到 复制/继续/重答。它是配菜：晚了就不上，不许拖住正菜。
+    const out = await llmText(VC, KEY, sys, "读者问：" + String(q).slice(0, 400) + "\n\nWDS 答：" + String(ans).slice(0, 2500) + "\n\n三行：", 200, WDS_FOLLOW_MS);
     if (!out) return [];
     return out.split(/\n+/).map((s) => s.replace(/^[\s\d.、)\-*·]+/, "").trim())
       .filter((s) => s.length >= 4 && s.length <= 40).slice(0, 3);
@@ -3794,6 +3801,13 @@ export default {
       let key = String(b.key || "").trim();
       if (key.length < 8) key = await _adminGlmKey(env);
       if (key.length < 8) return Response.json({ ok: false, code: "need_key" }, { headers: _cors() });
+      // 限流：没自带 Key 时这里烧的是站方额度，且单次可传 12MB 音频——此前一个桶都没有。
+      const _aip = request.headers.get("cf-connecting-ip") || "unknown";
+      try {
+        const lim = env.ASK_LIMITER.get(env.ASK_LIMITER.idFromName(wdsBucket("asr", _aip, String(b.key || ""))));
+        const lr = await (await lim.fetch(new Request("https://limiter.internal/?w=" + WDS_ASR_PER_MIN + "&d=" + WDS_ASR_PER_DAY))).json();
+        if (!lr.ok) return Response.json({ ok: false, code: "rate", msg: lr.reason === "day" ? "今天的语音转写次数用完了。" : "说得太快啦，过十几秒再来。" }, { headers: _cors() });
+      } catch (e) {}
       const b64 = String(b.audio || "");
       if (b64.length < 100) return Response.json({ ok: false, code: "no_audio" }, { headers: _cors() });
       if (b64.length > 12000000) return Response.json({ ok: false, code: "too_big" }, { headers: _cors() });
@@ -3861,6 +3875,13 @@ export default {
       if (request.method === "OPTIONS") return new Response(null, { headers: _cors() });
       if (request.method !== "POST") return new Response("Method Not Allowed", { status: 405 });
       let b = {}; try { b = await request.json(); } catch (e) {}
+      // 无 Key 时 webSearch 会回落站方智谱 Key：不限流就是把站方额度当公共搜索接口送出去。
+      const _wip = request.headers.get("cf-connecting-ip") || "unknown";
+      try {
+        const lim = env.ASK_LIMITER.get(env.ASK_LIMITER.idFromName(wdsBucket("ws", _wip, String(b.skey || b.key || ""))));
+        const lr = await (await lim.fetch(new Request("https://limiter.internal/?w=" + WDS_WS_PER_MIN + "&d=" + WDS_WS_PER_DAY))).json();
+        if (!lr.ok) return Response.json({ ok: false, reason: "rate", items: [] }, { headers: _cors() });
+      } catch (e) {}
       const r = await webSearch(env, String(b.q || ""), String(b.skey || b.key || ""), b.n);
       return Response.json(r, { headers: _cors() });
     }
@@ -3872,7 +3893,7 @@ export default {
       if (request.method !== "POST") return new Response("Method Not Allowed", { status: 405 });
       let b = {}; try { b = await request.json(); } catch (e) {}
       const kind = ({ report: 1, essay: 1, outline: 1 })[b.kind] ? b.kind : "report";
-      const turns = Array.isArray(b.history) ? b.history.slice(-40) : [];
+      const turns = Array.isArray(b.history) ? b.history : [];   // 整场收下，长短由 readConvoText 处理
       const dlang = b.lang === "en" ? "en" : "zh";
       if (!turns.length) return _sseResp([{ t: "error", v: "这场还没有可成文的内容。" }]);
       const userKey = String(b.key || "").trim();
@@ -3888,15 +3909,11 @@ export default {
       } catch (e) {}
 
       // 把对话码成给基底看的材料。只带文本、不带任何身份信息。
-      let convo = "";
-      for (const m of turns) {
-        const who = (m && m.role === "wds") ? "WDS" : "读者";
-        const t = String((m && m.text) || "").slice(0, 4000);
-        if (t) convo += "【" + who + "】" + t + "\n\n";
-        if (convo.length > 40000) break;
-      }
+      // 用 readConvoText（与《问对WDS》同一套）：超长时保开头 35% + 保结尾 + 中间明标省略多少字，
+      // 而不是原来的"只带最近 40 条、拼到 4 万字符就 break"——那样成文只看得见尾巴，且省略不说一声。
+      const convo = readConvoText(turns, DISTILL_CONVO_MAX);
       const SPEC = {
-        report: { name: "对话报告", tok: 5000, spec:
+        report: { name: "对话报告", tok: 9000, spec:
           "把这场对话整理成一份【对话报告】。结构：\n"
           + "① 一句话结论——这场谈话最承重的那个判断是什么（不是话题是什么，是判断是什么）。\n"
           + "② 谈了哪几件事——分点列出，每点一句话说清读者问的是什么、答的核心是什么。\n"
@@ -3904,7 +3921,7 @@ export default {
           + "④ 还没解决的——哪些问题只碰了一下、哪些答案是脆的、哪一步最容易被反驳。\n"
           + "⑤ 下一步可做的——三到五条具体的、能动手的建议（读哪篇、往哪个方向追、可以写什么）。\n"
           + "用 Markdown，标题用 ##。忠于对话内容，不添加对话里没有的结论。" },
-        essay: { name: "提炼成文", tok: 6000, spec:
+        essay: { name: "提炼成文", tok: 14000, spec:
           "把这场对话【提炼成一篇独立成立的文章】——不是对话记录的整理，是一篇读者从没看过这场对话也能读懂、也能被说服的文章。要求：\n"
           + "① 拟一个真标题（不是「关于XX的讨论」这种）。\n"
           + "② 开篇第一句就是最承重的那个判断，反直觉、可被反驳。\n"
@@ -3912,7 +3929,7 @@ export default {
           + "④ 全程不出现「读者问」「我回答」「这场对话」之类痕迹，也不出现学派术语堆砌——普通人要能读懂。\n"
           + "⑤ 结尾留一个开口，不自我封顶。\n"
           + "用 Markdown，标题用 # 和 ##。约三千字。" },
-        outline: { name: "写作提纲", tok: 3600, spec:
+        outline: { name: "写作提纲", tok: 6000, spec:
           "把这场对话变成一份【可以直接照着写的提纲】。结构：\n"
           + "① 母题：一句反直觉的判断，全篇的脊梁。\n"
           + "② 为什么这条母题立得住：三条支撑理由。\n"
@@ -3925,24 +3942,33 @@ export default {
         async start(controller) {
           let _hb = null;
           const fin = () => { if (_hb) clearInterval(_hb); try { controller.enqueue(_ENC.encode("data: [DONE]\n\n")); controller.close(); } catch (e) {} };
-          const _st = { t0: Date.now(), think: 0, out: 0 };
+          const _st = { t0: Date.now(), think: 0, out: 0, stage: "准备" };
           _hb = wdsBeat(controller, _st);
           try {
             let reflect = ""; try { reflect = await ensureReflect(env, url, rvendor, VC, KEY); } catch (e) {}
+            _st.stage = SPEC.name;
             const sys = "你是 WDS，王德生的 AI 分身、SDE 本体论的老师。现在要把一场你与读者的谈话，锻成一件能留下来的东西。"
               + "\n\nSDE 骨架：显露 S / 差异序列 D / 特征纠缠 E；三大方程 S=F(D,E)·D=G(S,E)·E=H(S,D)；六路径；意义三律；发生学——追问事物为何如此发生，而非如何被发现。"
               + (reflect ? ("\n\n【SDE 内化心得·思考底盘（别复述、别提\"心得/内功\"）】\n" + reflect) : "")
               + "\n\n【本次任务】\n" + SPEC.spec
               + "\n\n【硬规矩】直接从正文开始，不要开场白、不要\"好的/以下是\"。判断要锋利、可被反驳，不要正确的废话。"
               + (dlang === "en" ? "\n\n【LANGUAGE】Write the whole piece in English — natural English prose, not translated Chinese. Keep SDE terms as Show / Difference / Entanglement." : "");
+            // 成文是全链路里最费脑的一步（满功率＋几千字输出），此前是唯一一条没戴时钟的 WDS 路由：
+            // 平台掐断是静默的，不设时限就只能看到一个永远转着的光标。
+            const clk = wdsClock(DISTILL_FIRST_MS, DISTILL_TOTAL_MS);
             let upstream;
             try {
               upstream = await fetch(VC.url, {
                 method: "POST",
                 headers: { "content-type": "application/json", authorization: "Bearer " + KEY },
                 body: JSON.stringify(wdsTopBody(VC, { model: VC.model, stream: true, max_tokens: SPEC.tok, messages: [{ role: "system", content: sys }, { role: "user", content: "以下是这场对话的全文：\n\n" + convo + "\n———\n现在开始产出「" + SPEC.name + "」。" }] })),
+                signal: clk.signal,
               });
-            } catch (e) { controller.enqueue(_sseBytes({ t: "error", v: "接不上基底：" + (e && e.message) })); return fin(); }
+            } catch (e) {
+              clk.stop();
+              controller.enqueue(_sseBytes({ t: "error", v: (clk.cut ? clk.why("成文") : ("接不上基底：" + (e && e.message))) + "（可再试一次）" }));
+              return fin();
+            }
             if (!upstream.ok) {
               const errtxt = (await upstream.text()).slice(0, 300);
               if (upstream.status === 401 || upstream.status === 402 || upstream.status === 429) { controller.enqueue(_sseBytes({ t: "error", v: "你的 Key 用不了（" + upstream.status + "）：额度不足或填错了。", code: "bad_key" })); return fin(); }
@@ -3950,7 +3976,8 @@ export default {
             }
             const reader = upstream.body.getReader();
             const dec = new TextDecoder();
-            let buf = "";
+            let buf = "", wrote = 0;
+            try {
             while (true) {
               const { done: rdone, value } = await reader.read();
               if (rdone) break;
@@ -3965,10 +3992,17 @@ export default {
                 let j; try { j = JSON.parse(p); } catch (e) { continue; }
                 if (j.error) { controller.enqueue(_sseBytes({ t: "error", v: j.error.message || "基底流内错误" })); continue; }
                 const d = (j.choices && j.choices[0] && j.choices[0].delta) || {};
-                if (d.reasoning_content) { _st.think += d.reasoning_content.length; controller.enqueue(_sseBytes({ t: "think", v: d.reasoning_content })); }
-                if (d.content) { _st.out += d.content.length; controller.enqueue(_sseBytes({ t: "token", v: d.content })); }
+                if (d.reasoning_content) { clk.firstFrame(); _st.think += d.reasoning_content.length; controller.enqueue(_sseBytes({ t: "think", v: d.reasoning_content })); }
+                if (d.content) { clk.firstFrame(); _st.out += d.content.length; wrote += d.content.length; controller.enqueue(_sseBytes({ t: "token", v: d.content })); }
               }
             }
+            } catch (e) {
+              // 中途断线：已经写出来的稿一个字都不丢（客户端把 note 挂在稿子下面，不覆盖正文）
+              const why = clk.cut ? clk.why("成文") : ("流中断：" + (e && e.message));
+              if (wrote) controller.enqueue(_sseBytes({ t: "note", v: why + "——上面已写出的部分保留着，可以复制/导出，或再试一次。" }));
+              else controller.enqueue(_sseBytes({ t: "error", v: why + "（可再试一次）" }));
+            }
+            clk.stop();
           } catch (e) {
             controller.enqueue(_sseBytes({ t: "error", v: "成文出错：" + (e && e.message) + "（可再试一次）" }));
           }
