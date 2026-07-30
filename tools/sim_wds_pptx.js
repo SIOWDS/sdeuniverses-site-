@@ -332,6 +332,26 @@ console.log("── 四点二 · 首次真跑抓到的：多条成对页要走�
   ok(MOD.indexOf('headerish(bs[0])') > MOD.indexOf('return "timeline"'), "表头判据在代码里就排在时间线之后（顺序即判据）");
 }
 
+console.log("── 四点三 · 第二份真跑抓到的：标题被写成了表头");
+{
+  const t = (title, bs) => X.pickLayout({ title: title, bullets: bs, notes: "", kind: "content" }, 4, 9);
+  const pageA = { title: "多数人以为 ｜ 实际上", bullets: ["问题有固定本质 ｜ 问题是过程积累的结果", "聪明由基因决定 ｜ 聪明是在特定路径里长出的", "学不会是因为难 ｜ 学不会是因为旧程序太滑"], notes: "", kind: "content" };
+  ok(X.pickLayout(pageA, 3, 9) === "compare", "标题成对＋正文成对 → 对照页（原来落回要点页、竖线原样印出来）");
+  ok(t("100 ｜ 别扭追问的必经次数", ["100 ｜ 头一百次很别扭", "100 ｜ 间隔会悄悄缩短", "100 ｜ 直到成为第一反应"]) === "kpi", "标题带竖线但正文是数字对 → 仍走大数字页，不被对照页抢走");
+  // 真造：标题当表头时不再画页标题，卡片上提
+  const z6 = unzip(Buffer.from(X.build({ title: "封面", subtitle: "副", slides: [pageA] })));
+  const s2 = z6["ppt/slides/slide2.xml"].toString("utf8");
+  ok(/多数人以为/.test(s2) && /实际上/.test(s2), "表头两侧分别进了左右栏");
+  ok(!/<a:t xml:space="preserve">多数人以为 ｜ 实际上<\/a:t>/.test(s2), "带竖线的整行不再作为页标题印出来");
+  ok(/roundRect/.test(s2), "两栏卡片在");
+  const offs = [...s2.matchAll(/<a:off x="(\d+)" y="(\d+)"\/><a:ext cx="(\d+)" cy="(\d+)"\/>/g)];
+  ok(offs.every((m) => +m[2] + +m[4] <= 6858000 + 1), "卡片上提后仍不出界");
+  // 提示端治本
+  ok(/标题里绝不许出现竖线/.test(wk), "提示明令标题不许带竖线");
+  ok(/表头是\*\*第一条要点\*\*，不是标题/.test(wk), "并说清表头该写在哪");
+  ok(/三个数字必须互不相同/.test(wk), "大数字页禁止三张卡同一个数（实测栽过）");
+}
+
 console.log("── 四点五 · 空产出不许闷着（2026-07-30 实测撞上）");
 {
   const DIST = wk.slice(wk.indexOf('url.pathname === "/api/wds/distill"'), wk.indexOf('url.pathname === "/api/chat/clear"'));

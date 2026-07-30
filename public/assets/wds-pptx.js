@@ -367,15 +367,21 @@
         + pageNo(c.id++, c.idx, c.total);
     },
     compare: function (s, c) {
-      var gap = 500000, cw = (W - MX * 2 - gap) / 2, o = titleOf(s, c.id++), i;
+      var gap = 500000, cw = (W - MX * 2 - gap) / 2, i;
       var L = [], Rr = [];
+      // 标题本身是成对行（模型把表头写进了标题）：用它当两栏表头，页标题就不画了——
+      // 两个栏头已经把话说清楚，再顶一行带竖线的标题反而是噪音。
+      var titlePair = /[|｜]/.test(s.title || "");
+      var o = titlePair ? "" : titleOf(s, c.id++);
+      if (titlePair) { var tp = splitPair(s.title); L.push(tp.a); Rr.push(tp.b); }
       for (i = 0; i < s.bullets.length; i++) { var p = splitPair(s.bullets[i]); L.push(p.a); Rr.push(p.b); }
+      var topY = titlePair ? 1200000 : BODY_Y;              // 没有页标题就把卡片往上提，别在顶上空一大块
       [[MX, L, CLR.ac], [MX + cw + gap, Rr, CLR.ac2]].forEach(function (col) {
-        o += card(c.id++, col[0], BODY_Y, cw, 3600000);
-        o += tbox(c.id++, "h", col[0] + 320000, BODY_Y + 300000, cw - 640000, 600000, para(col[1][0] || "", { sz: 2000, b: true, color: col[2] }));
+        o += card(c.id++, col[0], topY, cw, titlePair ? 4300000 : 3600000);
+        o += tbox(c.id++, "h", col[0] + 320000, topY + 300000, cw - 640000, 600000, para(col[1][0] || "", { sz: 2000, b: true, color: col[2] }));
         var body = "";
         for (var j = 1; j < col[1].length; j++) body += para(col[1][j], { sz: 1600, bullet: true, indent: true, spcBef: j > 1 ? 800 : 0 });
-        if (body) o += tbox(c.id++, "b", col[0] + 320000, BODY_Y + 1050000, cw - 640000, 2400000, body);
+        if (body) o += tbox(c.id++, "b", col[0] + 320000, topY + 1050000, cw - 640000, titlePair ? 3100000 : 2400000, body);
       });
       return o + pageNo(c.id++, c.idx, c.total);
     },
@@ -499,6 +505,9 @@
     // 首条两侧都短＝对照表的表头，这是最硬的信号；但必须排在"步骤/时间线"之后——
     // `五月 ｜ 上线` 两侧也都短，先判就会把时间线抢走（2026-07-30 护栏当场抓到）。
     if (pairs >= 3 && pairs === n && n <= 7 && headerish(bs[0])) return "compare";
+    // 实测第二份真跑：模型把表头写进了 `## 标题`（标题就是 `多数人以为 ｜ 实际上`），
+    // 正文全是成对行却落回要点页、竖线原样印出来。标题成对＋正文成对＝对照页，按这个救。
+    if (/[|｜]/.test(s.title || "") && pairs >= 2 && pairs === n && n <= 7) return "compare";
     if (n === 1 && String(bs[0]).length >= 14) return "lead";
     if (n >= 6) return "bulletsTwo";
     // 一份稿子里普通要点页最多，全用同一种摆法就是"十页长一个样"。
