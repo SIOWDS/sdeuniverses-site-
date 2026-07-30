@@ -1414,7 +1414,7 @@
     if (window.WDSPptx) { if (then) then(true); return; }
     if (!document.head || !document.head.appendChild) { if (then) then(false); return; }
     var sc = document.createElement("script");
-    sc.src = "/assets/wds-pptx.js?v=2"; sc.async = true;   // 模块也要能刷新：改它就 bump 这个号
+    sc.src = "/assets/wds-pptx.js?v=3"; sc.async = true;   // 模块也要能刷新：改它就 bump 这个号
     sc.onload = function () { if (then) then(!!window.WDSPptx); };
     sc.onerror = function () { if (then) then(false); };
     document.head.appendChild(sc);
@@ -1426,6 +1426,19 @@
     d.footer = t("deckFoot") + " · " + new Date().toISOString().slice(0, 10);
     d.kicker = "SDE UNIVERSES";
     return d;
+  }
+  /* 配图要在**点击之前**取回来：build() 必须全同步（保住用户手势），
+     所以稿子一写完就预取，点按钮时字节已经在内存里。取不到就退回文字版式，不拦路。 */
+  var deckReady = null;
+  function deckPrep(text, then) {
+    deckReady = null;
+    pptxBoot(function (ok) {
+      if (!ok) { if (then) then(null); return; }
+      var d = deckOf(text);
+      if (!d) { if (then) then(null); return; }
+      window.WDSPptx.preload(d).then(function () { deckReady = d; if (then) then(d); })
+        .catch(function () { deckReady = d; if (then) then(d); });
+    });
   }
 
   function renderSources(cell, srcs, kind) {
@@ -2163,7 +2176,7 @@
       pxBtn.onclick = function () {
         if (!text) return;
         if (!window.WDSPptx) { stat.textContent = t("dPptxWait"); pptxBoot(function (ok) { if (ok) pxBtn.onclick(); }); return; }
-        var d = deckOf(text);
+        var d = deckReady || deckOf(text);        // 预取过就用预取的那份（带配图）
         if (!d) { stat.textContent = t("dPptxNo"); return; }
         var blob = window.WDSPptx.blob(d);            // 同步造好字节，再去要目录/下载（手势还新鲜）
         var nm = "WDS-" + safeName(d.title || kindT(kind)) + "-" + stampName() + ".pptx";
@@ -2185,6 +2198,7 @@
       clearTimeout(dWd);
       out.innerHTML = text ? mdRender(text) : esc(t("dEmpty"));
       if (text) autoLink(out, text);            // 成文里提到的站内篇目同样挂链接
+      if (text && kind === "deck") deckPrep(text, function () {});   // 稿子写完就把配图取回来
       stat.textContent = text ? (t("dDone") + text.length) : t("dFail");
       if (dTimedOut) dNote(t("dCut"), 1);
     }

@@ -180,6 +180,103 @@ console.log("── 三点五 · 图表：原生图表＋内嵌工作簿");
   ok(/<c:legend>/.test(z2["ppt/charts/chart3.xml"].toString("utf8")), "饼图一定给图例（不然认不出哪块是哪块）");
 }
 
+console.log("── 三点八 · 20 套版式：自动选、真摆得开、不出界");
+{
+  ok(X.layouts().length >= 20, "版式不少于 20 套（实得 " + X.layouts().length + "，含别名）");
+  ok(X.themes().length === 6, "主题 6 套");
+  // 自动选版式：只看内容形状
+  const P2 = (title, bullets, extra) => Object.assign({ title, bullets, notes: "", kind: "content" }, extra || {});
+  const pick = (s, i, n) => X.pickLayout(s, i === undefined ? 3 : i, n === undefined ? 9 : n);
+  ok(pick(P2("三个关键数字", ["125 ｜ 首跑", "128 ｜ 引擎室", "115 ｜ I 维"])) === "kpi", "数字+竖线 → 大数字卡片");
+  ok(pick(P2("唯一的数", ["115 ｜ 两次都卡在这里"])) === "kpiBig", "只有一个数 → 巨大数字页");
+  ok(pick(P2("裸答与提智的对比", ["裸模型 ｜ 提智后", "不知道站里写过什么 ｜ 带出处"])) === "compare", "成对内容+对比标题 → 左右对照");
+  ok(pick(P2("四格辨别", ["a ｜ 1", "b ｜ 2", "c ｜ 3", "d ｜ 4"])) === "matrix", "四条成对+辨别标题 → 2×2");
+  ok(pick(P2("三个阶段", ["五月 ｜ 上线", "六月 ｜ 试跑", "七月 ｜ 十二步"])) === "timeline", "阶段标题 → 时间线");
+  ok(pick(P2("怎么做的流程", ["检索 ｜ 取段", "碰撞 ｜ 出典范", "划界 ｜ 当闸门"])) === "steps", "流程标题 → 步骤条");
+  ok(pick(P2("他这样说", ["「差异不能自己站住。」", "王德生"])) === "quote", "引号开头 → 引文页");
+  ok(pick(P2("目录", ["一", "二", "三", "四"])) === "agenda", "目录 → 编号两栏");
+  ok(pick(P2("下一步做什么", ["a", "b"]), 9, 9) === "closing", "末页且标题是下一步 → 行动清单");
+  ok(pick(P2("一、证据与边界", [])) === "section", "无要点 → 过渡页");
+  ok(pick(P2("一句话说清", ["提智改变的不是它想得多快，而是它据以想的东西"])) === "lead", "单条长句 → 一句话页");
+  ok(pick(P2("七条", ["a","b","c","d","e","f","g"])) === "bulletsTwo", "六条以上 → 两栏");
+  ok(pick(P2("普通页", ["a","b","c"])) === "bullets", "其余走标准要点页");
+  ok(pick(P2("随便", ["a"], { layout: "matrix" })) === "matrix", "显式 layout: 永远优先（机器猜错时人能一句话改掉）");
+  ok(pick(P2("图页", ["a","b"], { chart: { series: [1], categories: [1] } })) === "chartRight", "有图有要点 → 左文右图");
+  ok(pick(P2("整幅图", [], { chart: { series: [1], categories: [1] } })) === "chartFull", "有图无要点 → 整幅");
+  // 主题自动选
+  ok(X.pickTheme({ title: "课堂里的学习发生", slides: [] }) === "forest", "教育题 → forest");
+  ok(X.pickTheme({ title: "慢性病的治疗次序", slides: [] }) === "plum", "医疗题 → plum");
+  ok(X.pickTheme({ title: "营收与客户增长", slides: [] }) === "slate", "商业题 → slate");
+  ok(X.pickTheme({ title: "随便什么", slides: [], theme: "night" }) === "night", "显式 theme: 优先");
+  // 真造：每套版式都摆得出，且没有任何形状出界
+  const md2 = ["# 封面标题", "## 副标题", "---", "## 目录", "- 一", "- 二", "- 三",
+    "---", "## 三个数", "- 125 ｜ 甲", "- 128 ｜ 乙", "- 115 ｜ 丙",
+    "---", "## 对比说明", "- 左 ｜ 右", "- a ｜ b",
+    "---", "## 四格辨别", "- a ｜ 1", "- b ｜ 2", "- c ｜ 3", "- d ｜ 4",
+    "---", "## 三个阶段", "- 五月 ｜ 甲", "- 六月 ｜ 乙", "- 七月 ｜ 丙",
+    "---", "## 怎么做的流程", "- 一 ｜ 甲", "- 二 ｜ 乙", "- 三 ｜ 丙",
+    "---", "## 他这样说", "- 「一句原话。」", "- 某人",
+    "---", "## 一、过渡", "---", "## 下一步做什么", "- 甲", "- 乙"].join("\n");
+  const d2 = X.parse(md2);
+  const z3 = unzip(Buffer.from(X.build(d2)));
+  const used = [];
+  for (let i = 1; i <= 10; i++) {
+    const f = z3["ppt/slides/slide" + i + ".xml"];
+    if (!f) continue;
+    const m = f.toString("utf8").match(/<!-- layout: ([a-zA-Z]+) -->/);
+    if (m) used.push(m[1]);
+  }
+  ok(new Set(used).size >= 8, "一份稿子里真用出 " + new Set(used).size + " 种不同版式（不是每页都一个样）");
+  // 出界检查：任何形状的 off+ext 都不许超出画布（整幅图/遮罩例外，它们本就铺满）
+  let over = [];
+  Object.keys(z3).filter((n) => /^ppt\/slides\/slide\d+\.xml$/.test(n)).forEach((n) => {
+    const xml = z3[n].toString("utf8");
+    const re = /<a:off x="(-?\d+)" y="(-?\d+)"\/><a:ext cx="(\d+)" cy="(\d+)"\/>/g;
+    let m;
+    while ((m = re.exec(xml))) {
+      const x = +m[1], y = +m[2], cx = +m[3], cy = +m[4];
+      if (x < 0 || y < 0 || x + cx > 12192000 + 1 || y + cy > 6858000 + 1) over.push(n + " " + [x, y, cx, cy].join(","));
+    }
+  });
+  ok(over.length === 0, "没有任何形状出界（实得 " + over.length + " 处越界）" + (over[0] ? " 例：" + over[0] : ""));
+  ok(/roundRect/.test(z3["ppt/slides/slide3.xml"].toString("utf8")), "大数字页真画了卡片底（不是光秃秃的字）");
+  ok(!/prstGeom prst="line"/.test(z3["ppt/slides/slide2.xml"].toString("utf8")), "目录页没有装饰性横线（标题下画线是 AI 幻灯片的标志性廉价感）");
+}
+
+console.log("── 三点九 · 配图");
+{
+  // 造一张 2×2 的真 PNG（自己写 IHDR/IDAT/IEND，用 store 级 zlib 块）
+  const zlibp = require("zlib");
+  function crcBuf(b) { let c = ~0; for (const x of b) { c ^= x; for (let k = 0; k < 8; k++) c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1); } return (~c) >>> 0; }
+  function chunk(type, data) {
+    const len = Buffer.alloc(4); len.writeUInt32BE(data.length);
+    const td = Buffer.concat([Buffer.from(type, "ascii"), data]);
+    const crc = Buffer.alloc(4); crc.writeUInt32BE(crcBuf(td));
+    return Buffer.concat([len, td, crc]);
+  }
+  const ihdr = Buffer.alloc(13); ihdr.writeUInt32BE(4, 0); ihdr.writeUInt32BE(3, 4); ihdr[8] = 8; ihdr[9] = 2;
+  const raw = Buffer.concat([Buffer.alloc(1), Buffer.alloc(12, 200), Buffer.alloc(1), Buffer.alloc(12, 120), Buffer.alloc(1), Buffer.alloc(12, 60)]);
+  const png = Buffer.concat([Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]), chunk("IHDR", ihdr), chunk("IDAT", zlibp.deflateSync(raw)), chunk("IEND", Buffer.alloc(0))]);
+  const d3 = X.parse("# 封面\n## 副\n---\n## 有配图的一页\n- 一条\n- 两条\n- 三条\nimage: /assets/x.png\n");
+  ok(!!d3.slides[0].image && d3.slides[0].image.url === "/assets/x.png", "image: 那一行被解析成配图（字节等 preload 去取）");
+  d3.slides[0].image.bytes = new Uint8Array(png); d3.slides[0].image.ext = "png";
+  d3.slides[0].image.nat = { w: 4, h: 3 };
+  ok(X.pickLayout(d3.slides[0], 1, 2) === "imageRight", "有图有要点 → 左文右图");
+  const z4 = unzip(Buffer.from(X.build(d3)));
+  ok(!!z4["ppt/media/image2.png"], "图片作为 media 部件打进包里");
+  ok(/Extension="png"/.test(z4["[Content_Types].xml"].toString("utf8")), "png 扩展名有 Default 声明");
+  ok(/relationships\/image/.test(z4["ppt/slides/_rels/slide2.xml.rels"].toString("utf8")), "幻灯片关系里有 image");
+  const s2x = z4["ppt/slides/slide2.xml"].toString("utf8");
+  ok(/<p:pic>/.test(s2x) && /r:embed="rId8"/.test(s2x), "幻灯片里真有一张图");
+  ok(/srcRect/.test(s2x), "按比例裁切而不是拉伸变形（4:3 的图放进竖长格子里）");
+  // 没取到字节时必须优雅退回
+  const d4 = X.parse("# 封面\n## 副\n---\n## 配图取不到\n- 一条\nimage: https://别的站/x.png\n");
+  d4.slides[0].image = { url: "x" };            // 只有 url、没有 bytes ＝ preload 失败的样子
+  ok(X.pickLayout(d4.slides[0], 1, 2) === "bullets", "配图没取到就退回文字版式，不是空白页");
+  const z5 = unzip(Buffer.from(X.build(d4)));
+  ok(!Object.keys(z5).some((n) => /media/.test(n)), "也不会打进一个空的 media 部件");
+}
+
 console.log("── 四 · 两端接线");
 {
   ok(/deck: \{ name: "对外 PPT"/.test(wk), "worker 有第四档");
@@ -197,6 +294,11 @@ console.log("── 四 · 两端接线");
   ok(/有数字就上图表/.test(wk), "提示教会了图表围栏");
   ok(/绝不许为了好看编一组数/.test(wk), "明令不许编数——编出来的图比没有图坏得多");
   ok(/一页最多一个图表；categories 最多 6 个/.test(wk), "图表有上限（版面与可读性）");
+  ok(/版式是自动挑的（20 套）/.test(wk), "提示教会了「写对形状比写 layout 更可靠」");
+  ok(/layout: kpi/.test(wk) && /theme: slate/.test(wk), "也留了显式指定的出口");
+  ok(/不许自己编一个路径/.test(wk), "配图路径同样不许编（与站内篇名同一条纪律）");
+  ok(/function deckPrep\(/.test(wm) && /WDSPptx\.preload\(d\)/.test(wm), "客户端在成文写完就预取配图（点击那一刻必须已在内存）");
+  ok(/deckReady \|\| deckOf\(text\)/.test(wm), "点按钮时优先用预取好的那份");
 }
 
 console.log("\n===== " + P + " PASS / " + F + " FAIL =====");

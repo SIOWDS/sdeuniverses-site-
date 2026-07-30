@@ -83,78 +83,329 @@
 
   // 16:9 宽屏：13.333in × 7.5in
   var W = 12192000, H = 6858000, MX = 838200;              // 左右留白 0.92in（>0.5in 下限）
-  var CLR = { tx: "16181D", dim: "5C6270", faint: "9AA0AC", gold: "8A6A2F", bg: "FFFFFF" };
+  /* ═══════════ 主题（6 套）═══════════
+     不是"换个色"这么简单——每套定好正文/次要/淡出/强调/卡片底五种角色，
+     所有版式只认角色不认具体色值，所以换主题不会有哪一处漏改。 */
+  var THEMES = {
+    ink:    { bg: "FFFFFF", tx: "16181D", dim: "5C6270", faint: "9AA0AC", ac: "8A6A2F", ac2: "4A6572", card: "F6F4EF", line: "E4E0D8" },
+    slate:  { bg: "FFFFFF", tx: "141A20", dim: "51606D", faint: "93A0AB", ac: "2F5D7C", ac2: "7A8B99", card: "F1F5F8", line: "DDE5EA" },
+    forest: { bg: "FFFFFF", tx: "16201A", dim: "4F6154", faint: "94A398", ac: "3F6B4A", ac2: "7A8B6F", card: "F0F5F1", line: "DCE6DE" },
+    clay:   { bg: "FFFFFF", tx: "201814", dim: "6B5A50", faint: "A89A90", ac: "9A5B3F", ac2: "8A7A6A", card: "F8F2ED", line: "E8DED6" },
+    plum:   { bg: "FFFFFF", tx: "1C161F", dim: "5F5266", faint: "9C93A3", ac: "6B4A6B", ac2: "8A7A93", card: "F5F1F6", line: "E5DCE7" },
+    night:  { bg: "15171C", tx: "F2F0EA", dim: "B8BCC4", faint: "6E7480", ac: "C9A227", ac2: "7FA0B5", card: "1E2128", line: "2A2E36" },
+  };
+  var CLR = THEMES.ink;                     // 当前主题；build() 开头按 deck 定
+  // 主题自动选：按内容里的行当词猜，猜不出用 ink。显式 `theme: night` 优先。
+  function pickTheme(deck) {
+    var name = String((deck && deck.theme) || "").toLowerCase();
+    if (THEMES[name]) return name;
+    var t = ((deck && deck.title) || "") + ((deck && deck.subtitle) || "");
+    (deck && deck.slides || []).forEach(function (s) { t += (s.title || "") + (s.bullets || []).join(""); });
+    if (/教育|教学|学习|课堂|学生|教师/.test(t)) return "forest";
+    if (/医|健康|疾病|治疗|临床|患者|养生/.test(t)) return "plum";
+    if (/商业|市场|营收|客户|增长|company|业务|销售|成本/.test(t)) return "slate";
+    if (/哲学|文明|文化|人文|伦理|历史|艺术/.test(t)) return "clay";
+    return "ink";
+  }
 
+  /* ═══════════ 画图元 ═══════════ */
   function tbox(id, name, x, y, cx, cy, paras, extra) {
+    extra = extra || {};
     return '<p:sp><p:nvSpPr><p:cNvPr id="' + id + '" name="' + esc(name) + '"/><p:cNvSpPr txBox="1"/><p:nvPr/></p:nvSpPr>'
-      + '<p:spPr><a:xfrm><a:off x="' + x + '" y="' + y + '"/><a:ext cx="' + cx + '" cy="' + cy + '"/></a:xfrm>'
+      + '<p:spPr><a:xfrm><a:off x="' + Math.round(x) + '" y="' + Math.round(y) + '"/><a:ext cx="' + Math.round(cx) + '" cy="' + Math.round(cy) + '"/></a:xfrm>'
       + '<a:prstGeom prst="rect"><a:avLst/></a:prstGeom><a:noFill/></p:spPr>'
-      + '<p:txBody><a:bodyPr wrap="square" lIns="0" tIns="0" rIns="0" bIns="0" anchor="' + ((extra && extra.anchor) || "t") + '"><a:normAutofit/></a:bodyPr>'
+      + '<p:txBody><a:bodyPr wrap="square" lIns="0" tIns="0" rIns="0" bIns="0" anchor="' + (extra.anchor || "t") + '"><a:normAutofit/></a:bodyPr>'
       + '<a:lstStyle/>' + paras + '</p:txBody></p:sp>';
+  }
+  // 卡片：淡底圆角块。**不画描边、不画侧边色条**——那是 AI 幻灯片的标志性廉价感。
+  function card(id, x, y, cx, cy, fill, rad) {
+    return '<p:sp><p:nvSpPr><p:cNvPr id="' + id + '" name="card"/><p:cNvSpPr/><p:nvPr/></p:nvSpPr>'
+      + '<p:spPr><a:xfrm><a:off x="' + Math.round(x) + '" y="' + Math.round(y) + '"/><a:ext cx="' + Math.round(cx) + '" cy="' + Math.round(cy) + '"/></a:xfrm>'
+      + '<a:prstGeom prst="roundRect"><a:avLst><a:gd name="adj" fmla="val ' + (rad === undefined ? 6000 : rad) + '"/></a:avLst></a:prstGeom>'
+      + '<a:solidFill><a:srgbClr val="' + (fill || CLR.card) + '"/></a:solidFill><a:ln><a:noFill/></a:ln></p:spPr>'
+      + '<p:txBody><a:bodyPr/><a:lstStyle/><a:p><a:endParaRPr lang="zh-CN"/></a:p></p:txBody></p:sp>';
+  }
+  function dot(id, x, y, d, fill) {
+    return '<p:sp><p:nvSpPr><p:cNvPr id="' + id + '" name="dot"/><p:cNvSpPr/><p:nvPr/></p:nvSpPr>'
+      + '<p:spPr><a:xfrm><a:off x="' + Math.round(x) + '" y="' + Math.round(y) + '"/><a:ext cx="' + Math.round(d) + '" cy="' + Math.round(d) + '"/></a:xfrm>'
+      + '<a:prstGeom prst="ellipse"><a:avLst/></a:prstGeom>'
+      + '<a:solidFill><a:srgbClr val="' + (fill || CLR.ac) + '"/></a:solidFill><a:ln><a:noFill/></a:ln></p:spPr>'
+      + '<p:txBody><a:bodyPr/><a:lstStyle/><a:p><a:endParaRPr lang="zh-CN"/></a:p></p:txBody></p:sp>';
+  }
+  function hline(id, x, y, cx, w, clr) {
+    return '<p:cxnSp><p:nvCxnSpPr><p:cNvPr id="' + id + '" name="line"/><p:cNvCxnSpPr/><p:nvPr/></p:nvCxnSpPr>'
+      + '<p:spPr><a:xfrm><a:off x="' + Math.round(x) + '" y="' + Math.round(y) + '"/><a:ext cx="' + Math.round(cx) + '" cy="0"/></a:xfrm>'
+      + '<a:prstGeom prst="line"><a:avLst/></a:prstGeom>'
+      + '<a:ln w="' + (w || 12700) + '"><a:solidFill><a:srgbClr val="' + (clr || CLR.line) + '"/></a:solidFill></a:ln></p:spPr></p:cxnSp>';
+  }
+  // 图片：按"填满不变形"裁（srcRect 裁掉多出来的那一边），拿不到原始尺寸就退回拉伸
+  function pic(id, rid, x, y, cx, cy, natural) {
+    var crop = '<a:stretch><a:fillRect/></a:stretch>';
+    if (natural && natural.w && natural.h) {
+      var want = cx / cy, have = natural.w / natural.h, c;
+      if (have > want) { c = Math.round((1 - want / have) / 2 * 100000); crop = '<a:srcRect l="' + c + '" r="' + c + '"/><a:stretch><a:fillRect/></a:stretch>'; }
+      else if (have < want) { c = Math.round((1 - have / want) / 2 * 100000); crop = '<a:srcRect t="' + c + '" b="' + c + '"/><a:stretch><a:fillRect/></a:stretch>'; }
+    }
+    return '<p:pic><p:nvPicPr><p:cNvPr id="' + id + '" name="pic"/><p:cNvPicPr><a:picLocks noChangeAspect="1"/></p:cNvPicPr><p:nvPr/></p:nvPicPr>'
+      + '<p:blipFill><a:blip ' + R + ' r:embed="' + rid + '"/>' + crop + '</p:blipFill>'
+      + '<p:spPr><a:xfrm><a:off x="' + Math.round(x) + '" y="' + Math.round(y) + '"/><a:ext cx="' + Math.round(cx) + '" cy="' + Math.round(cy) + '"/></a:xfrm>'
+      + '<a:prstGeom prst="rect"><a:avLst/></a:prstGeom></p:spPr></p:pic>';
+  }
+  function scrim(id, x, y, cx, cy, clr, alpha) {
+    return '<p:sp><p:nvSpPr><p:cNvPr id="' + id + '" name="scrim"/><p:cNvSpPr/><p:nvPr/></p:nvSpPr>'
+      + '<p:spPr><a:xfrm><a:off x="' + Math.round(x) + '" y="' + Math.round(y) + '"/><a:ext cx="' + Math.round(cx) + '" cy="' + Math.round(cy) + '"/></a:xfrm>'
+      + '<a:prstGeom prst="rect"><a:avLst/></a:prstGeom>'
+      + '<a:solidFill><a:srgbClr val="' + (clr || "000000") + '"><a:alpha val="' + (alpha || 45000) + '"/></a:srgbClr></a:solidFill>'
+      + '<a:ln><a:noFill/></a:ln></p:spPr><p:txBody><a:bodyPr/><a:lstStyle/><a:p><a:endParaRPr lang="zh-CN"/></a:p></p:txBody></p:sp>';
   }
   function para(text, o) {
     o = o || {};
     var pPr = '<a:pPr' + (o.algn ? ' algn="' + o.algn + '"' : "")
       + (o.indent ? ' marL="342900" indent="-342900"' : ' marL="0" indent="0"') + '>'
       + (o.spcBef ? '<a:spcBef><a:spcPts val="' + o.spcBef + '"/></a:spcBef>' : "")
-      + (o.bullet ? '<a:buClr><a:srgbClr val="' + CLR.gold + '"/></a:buClr><a:buFont typeface="Arial"/><a:buChar char="\u2022"/>'
-                  : '<a:buNone/>')
+      + (o.line ? '<a:lnSpc><a:spcPct val="' + o.line + '"/></a:lnSpc>' : "")
+      + (o.bullet ? '<a:buClr><a:srgbClr val="' + CLR.ac + '"/></a:buClr><a:buFont typeface="Arial"/><a:buChar char="\u2022"/>' : '<a:buNone/>')
       + '</a:pPr>';
     var rPr = '<a:rPr lang="zh-CN" altLang="en-US" sz="' + (o.sz || 1800) + '"'
-      + (o.b ? ' b="1"' : "") + ' dirty="0"><a:solidFill><a:srgbClr val="' + (o.color || CLR.tx) + '"/></a:solidFill>'
+      + (o.b ? ' b="1"' : "") + (o.i ? ' i="1"' : "") + ' dirty="0">'
+      + '<a:solidFill><a:srgbClr val="' + (o.color || CLR.tx) + '"/></a:solidFill>'
       + '<a:latin typeface="+mn-lt"/><a:ea typeface="+mn-ea"/></a:rPr>';
     return '<a:p>' + pPr + '<a:r>' + rPr + '<a:t xml:space="preserve">' + esc(text) + '</a:t></a:r></a:p>';
   }
 
-  function slideXml(s, idx, total, footer) {
-    var shapes = "", id = 2;
-    if (s.kind === "cover") {
-      shapes += tbox(id++, "kicker", MX, 1600200, W - MX * 2, 400000,
-        para(s.kicker || "", { sz: 1400, color: CLR.gold, b: true }));
-      shapes += tbox(id++, "title", MX, 2130000, W - MX * 2, 1900000,
-        para(s.title, { sz: 4000, b: true }));
-      if (s.subtitle) shapes += tbox(id++, "subtitle", MX, 4130000, W - MX * 2, 1100000,
-        para(s.subtitle, { sz: 2000, color: CLR.dim }));
-      if (footer) shapes += tbox(id++, "footer", MX, 5900000, W - MX * 2, 400000,
-        para(footer, { sz: 1100, color: CLR.faint }));
-      return wrapSlide(shapes);
-    }
-    if (s.kind === "section") {
-      shapes += tbox(id++, "sectionNo", MX, 2600000, W - MX * 2, 400000,
-        para(pad(idx), { sz: 1400, color: CLR.gold, b: true }));
-      shapes += tbox(id++, "sectionTitle", MX, 3080000, W - MX * 2, 1500000,
-        para(s.title, { sz: 3200, b: true }));
-      return wrapSlide(shapes);
-    }
-    shapes += tbox(id++, "title", MX, 620000, W - MX * 2, 1000000, para(s.title, { sz: 3200, b: true }));
-    var hasChart = !!(s.chart && s.chart.series && s.chart.series.length);
-    var bodyW = hasChart && s.bullets.length ? Math.round((W - MX * 2) * 0.42) : (W - MX * 2);
-    var body = "";
-    for (var i = 0; i < s.bullets.length; i++) {
-      body += para(s.bullets[i], { sz: hasChart ? 1600 : bulletSize(s.bullets), bullet: true, indent: true, spcBef: i ? 900 : 0 });
-    }
-    if (body) shapes += tbox(id++, "body", MX, 1900000, bodyW, 4000000, body);
-    if (hasChart) {
-      // 有要点＝左文右图（图占 52%）；没要点＝整幅铺开。留 0.35in 的沟，别让文字贴着图。
-      var cx = s.bullets.length ? Math.round((W - MX * 2) * 0.52) : (W - MX * 2);
-      var cxx = s.bullets.length ? (W - MX - cx) : MX;
-      shapes += frame(id++, "rId9", cxx, 1780000, cx, 4100000);
-    }
-    shapes += tbox(id++, "pageNo", W - MX - 900000, 6150000, 900000, 300000,
-      para(pad(idx) + " / " + pad(total), { sz: 1000, color: CLR.faint, algn: "r" }));
-    return wrapSlide(shapes);
+  /* ═══════════ 20 套版式 ═══════════
+     每套是一个函数：拿到这一页的内容，摆出这一页的几何。
+     判据（下面 pickLayout）只看内容的形状，不看它写了什么——
+     所以"自动选版式"是可复现的，同样一页永远得到同一套版式。 */
+  var TITLE_Y = 620000, TITLE_H = 1000000, BODY_Y = 1900000;
+  function titleOf(s, id, sz) { return tbox(id, "title", MX, TITLE_Y, W - MX * 2, TITLE_H, para(s.title, { sz: sz || 3200, b: true })); }
+  function pageNo(id, idx, total) {
+    return tbox(id, "pageNo", W - MX - 900000, 6150000, 900000, 300000, para(pad(idx) + " / " + pad(total), { sz: 1000, color: CLR.faint, algn: "r" }));
   }
-  function bulletSize(bs) {                      // 要点多/长就自动降一档，宁可小一点也不许溢出版心
+  function bulletBody(bs, x, y, cx, cy, sz) {
+    var body = "", i;
+    for (i = 0; i < bs.length; i++) body += para(bs[i], { sz: sz || bulletSize(bs), bullet: true, indent: true, spcBef: i ? 900 : 0, line: 105000 });
+    return body ? tbox(900 + Math.round(x / 1000), "body", x, y, cx, cy, body) : "";
+  }
+  function bulletSize(bs) {
     var n = bs.length, longest = 0, i;
     for (i = 0; i < bs.length; i++) longest = Math.max(longest, String(bs[i]).length);
     if (n >= 6 || longest > 46) return 1600;
     if (n >= 5 || longest > 32) return 1800;
     return 2000;
   }
+  // 「28 ｜ 说明」这种一分为二的写法，多处版式共用
+  function splitPair(s) {
+    var m = String(s || "").split(/[|｜]/);
+    return { a: (m[0] || "").trim(), b: (m.slice(1).join("|") || "").trim() };
+  }
+
+  var LAYOUTS = {
+    cover: function (s, c) {
+      var o = "";
+      if (c.kicker) o += tbox(c.id++, "kicker", MX, 1600200, W - MX * 2, 400000, para(c.kicker, { sz: 1400, color: CLR.ac, b: true }));
+      o += tbox(c.id++, "title", MX, 2130000, W - MX * 2, 1900000, para(s.title, { sz: 4000, b: true, line: 115000 }));
+      if (s.subtitle) o += tbox(c.id++, "sub", MX, 4130000, W - MX * 2, 1100000, para(s.subtitle, { sz: 2000, color: CLR.dim }));
+      if (c.footer) o += tbox(c.id++, "footer", MX, 5900000, W - MX * 2, 400000, para(c.footer, { sz: 1100, color: CLR.faint }));
+      return o;
+    },
+    coverCenter: function (s, c) {
+      var o = tbox(c.id++, "title", MX, 2400000, W - MX * 2, 2000000, para(s.title, { sz: 4400, b: true, algn: "ctr", line: 115000 }));
+      if (c.footer) o += tbox(c.id++, "footer", MX, 5900000, W - MX * 2, 400000, para(c.footer, { sz: 1100, color: CLR.faint, algn: "ctr" }));
+      return o;
+    },
+    section: function (s, c) {
+      return tbox(c.id++, "no", MX, 2600000, W - MX * 2, 400000, para(pad(c.idx), { sz: 1400, color: CLR.ac, b: true }))
+        + tbox(c.id++, "t", MX, 3080000, W - MX * 2, 1500000, para(s.title, { sz: 3600, b: true }));
+    },
+    agenda: function (s, c) {
+      var o = titleOf(s, c.id++), i, half = Math.ceil(s.bullets.length / 2);
+      for (i = 0; i < s.bullets.length; i++) {
+        var col = i < half ? 0 : 1, row = i < half ? i : i - half;
+        var x = MX + col * ((W - MX * 2) / 2), y = BODY_Y + row * 780000;
+        o += tbox(c.id++, "n", x, y, 700000, 500000, para(pad(i + 1), { sz: 1800, b: true, color: CLR.ac }));
+        o += tbox(c.id++, "t", x + 640000, y + 20000, (W - MX * 2) / 2 - 900000, 600000, para(s.bullets[i], { sz: 1800 }));
+      }
+      return o + pageNo(c.id++, c.idx, c.total);
+    },
+    bullets: function (s, c) {
+      return titleOf(s, c.id++) + bulletBody(s.bullets, MX, BODY_Y, W - MX * 2, 4000000) + pageNo(c.id++, c.idx, c.total);
+    },
+    bulletsTwo: function (s, c) {
+      var half = Math.ceil(s.bullets.length / 2), gap = 500000, cw = (W - MX * 2 - gap) / 2;
+      return titleOf(s, c.id++)
+        + bulletBody(s.bullets.slice(0, half), MX, BODY_Y, cw, 4000000, 1600)
+        + bulletBody(s.bullets.slice(half), MX + cw + gap, BODY_Y, cw, 4000000, 1600)
+        + pageNo(c.id++, c.idx, c.total);
+    },
+    lead: function (s, c) {
+      return titleOf(s, c.id++, 2400)
+        + tbox(c.id++, "lead", MX, 2400000, W - MX * 2, 2400000, para(s.bullets[0] || "", { sz: 3200, b: true, line: 120000 }))
+        + pageNo(c.id++, c.idx, c.total);
+    },
+    quote: function (s, c) {
+      var q = s.bullets[0] || s.title;
+      return tbox(c.id++, "mark", MX, 1500000, 1200000, 1200000, para("\u201C", { sz: 8000, color: CLR.ac }))
+        + tbox(c.id++, "q", MX, 2500000, W - MX * 2 - 900000, 2400000, para(q, { sz: 2800, i: true, line: 125000 }))
+        + (s.bullets[1] ? tbox(c.id++, "by", MX, 5100000, W - MX * 2, 500000, para("— " + s.bullets[1], { sz: 1500, color: CLR.dim })) : "")
+        + pageNo(c.id++, c.idx, c.total);
+    },
+    kpi: function (s, c) {
+      var n = Math.min(3, s.bullets.length), gap = 400000, cw = (W - MX * 2 - gap * (n - 1)) / n, i, o = titleOf(s, c.id++);
+      for (i = 0; i < n; i++) {
+        var p = splitPair(s.bullets[i]), x = MX + i * (cw + gap);
+        o += card(c.id++, x, BODY_Y, cw, 2600000);
+        o += tbox(c.id++, "num", x + 300000, BODY_Y + 500000, cw - 600000, 1100000, para(p.a, { sz: 4000, b: true, color: CLR.ac }));
+        o += tbox(c.id++, "lab", x + 300000, BODY_Y + 1700000, cw - 600000, 700000, para(p.b, { sz: 1500, color: CLR.dim }));
+      }
+      return o + pageNo(c.id++, c.idx, c.total);
+    },
+    kpiBig: function (s, c) {
+      var p = splitPair(s.bullets[0] || "");
+      return titleOf(s, c.id++)
+        + tbox(c.id++, "num", MX, 2200000, W - MX * 2, 2000000, para(p.a, { sz: 8000, b: true, color: CLR.ac }))
+        + tbox(c.id++, "lab", MX, 4400000, W - MX * 2, 900000, para(p.b, { sz: 2000, color: CLR.dim }))
+        + pageNo(c.id++, c.idx, c.total);
+    },
+    compare: function (s, c) {
+      var gap = 500000, cw = (W - MX * 2 - gap) / 2, o = titleOf(s, c.id++), i;
+      var L = [], Rr = [];
+      for (i = 0; i < s.bullets.length; i++) { var p = splitPair(s.bullets[i]); L.push(p.a); Rr.push(p.b); }
+      [[MX, L, CLR.ac], [MX + cw + gap, Rr, CLR.ac2]].forEach(function (col) {
+        o += card(c.id++, col[0], BODY_Y, cw, 3600000);
+        o += tbox(c.id++, "h", col[0] + 320000, BODY_Y + 300000, cw - 640000, 600000, para(col[1][0] || "", { sz: 2000, b: true, color: col[2] }));
+        var body = "";
+        for (var j = 1; j < col[1].length; j++) body += para(col[1][j], { sz: 1600, bullet: true, indent: true, spcBef: j > 1 ? 800 : 0 });
+        if (body) o += tbox(c.id++, "b", col[0] + 320000, BODY_Y + 1050000, cw - 640000, 2400000, body);
+      });
+      return o + pageNo(c.id++, c.idx, c.total);
+    },
+    matrix: function (s, c) {
+      var gap = 300000, cw = (W - MX * 2 - gap) / 2, ch = 1700000, o = titleOf(s, c.id++), i;
+      for (i = 0; i < 4; i++) {
+        var x = MX + (i % 2) * (cw + gap), y = BODY_Y + Math.floor(i / 2) * (ch + gap);
+        var p = splitPair(s.bullets[i] || "");
+        o += card(c.id++, x, y, cw, ch);
+        o += tbox(c.id++, "h", x + 280000, y + 240000, cw - 560000, 500000, para(p.a, { sz: 1700, b: true, color: CLR.ac }));
+        o += tbox(c.id++, "d", x + 280000, y + 800000, cw - 560000, 800000, para(p.b, { sz: 1400, color: CLR.dim }));
+      }
+      return o + pageNo(c.id++, c.idx, c.total);
+    },
+    timeline: function (s, c) {
+      var n = Math.min(5, s.bullets.length), o = titleOf(s, c.id++), i;
+      var y = 3300000, x0 = MX + 200000, span = (W - MX * 2 - 400000) / Math.max(1, n - 1);
+      o += hline(c.id++, x0, y, (n - 1) * span, 19050, CLR.line);
+      for (i = 0; i < n; i++) {
+        var p = splitPair(s.bullets[i]), cx = x0 + i * span;
+        // 首尾两个节点的标签会伸出画布，夹回来（越界的元素在 PowerPoint 里是"看不见但确实存在"，最难查）
+        var lx = Math.max(MX / 2, Math.min(cx - span / 2, W - MX / 2 - span));
+        o += dot(c.id++, cx - 90000, y - 90000, 180000, CLR.ac);
+        o += tbox(c.id++, "k", lx, y - 900000, span, 600000, para(p.a, { sz: 1700, b: true, algn: "ctr" }));
+        o += tbox(c.id++, "v", lx, y + 250000, span, 900000, para(p.b, { sz: 1400, color: CLR.dim, algn: "ctr" }));
+      }
+      return o + pageNo(c.id++, c.idx, c.total);
+    },
+    steps: function (s, c) {
+      var n = Math.min(4, s.bullets.length), gap = 360000, cw = (W - MX * 2 - gap * (n - 1)) / n, o = titleOf(s, c.id++), i;
+      for (i = 0; i < n; i++) {
+        var p = splitPair(s.bullets[i]), x = MX + i * (cw + gap);
+        o += dot(c.id++, x, BODY_Y, 560000, CLR.ac);
+        o += tbox(c.id++, "n", x, BODY_Y + 110000, 560000, 400000, para(String(i + 1), { sz: 1600, b: true, color: CLR.bg, algn: "ctr" }));
+        o += tbox(c.id++, "h", x, BODY_Y + 760000, cw, 600000, para(p.a, { sz: 1800, b: true }));
+        o += tbox(c.id++, "d", x, BODY_Y + 1400000, cw, 1600000, para(p.b, { sz: 1400, color: CLR.dim, line: 110000 }));
+      }
+      return o + pageNo(c.id++, c.idx, c.total);
+    },
+    chartRight: function (s, c) {
+      var cw = Math.round((W - MX * 2) * 0.52);
+      return titleOf(s, c.id++)
+        + bulletBody(s.bullets, MX, BODY_Y, Math.round((W - MX * 2) * 0.42), 4000000, 1600)
+        + frame(c.id++, "rId9", W - MX - cw, 1780000, cw, 4100000)
+        + pageNo(c.id++, c.idx, c.total);
+    },
+    chartFull: function (s, c) {
+      return titleOf(s, c.id++) + frame(c.id++, "rId9", MX, 1780000, W - MX * 2, 4100000) + pageNo(c.id++, c.idx, c.total);
+    },
+    chartLead: function (s, c) {
+      return titleOf(s, c.id++)
+        + frame(c.id++, "rId9", MX, 1700000, W - MX * 2, 3100000)
+        + card(c.id++, MX, 5000000, W - MX * 2, 900000)
+        + tbox(c.id++, "take", MX + 320000, 5230000, W - MX * 2 - 640000, 500000, para(s.bullets[0] || "", { sz: 1700, b: true, color: CLR.ac }))
+        + pageNo(c.id++, c.idx, c.total);
+    },
+    imageRight: function (s, c) {
+      var iw = Math.round((W - MX * 2) * 0.48);
+      return titleOf(s, c.id++)
+        + bulletBody(s.bullets, MX, BODY_Y, Math.round((W - MX * 2) * 0.46), 3800000, 1700)
+        + pic(c.id++, "rId8", W - MX - iw, 1780000, iw, 4100000, s.image && s.image.nat)
+        + pageNo(c.id++, c.idx, c.total);
+    },
+    imageFull: function (s, c) {
+      return pic(c.id++, "rId8", 0, 0, W, H, s.image && s.image.nat)
+        + scrim(c.id++, 0, 0, W, H, "000000", 42000)
+        + tbox(c.id++, "t", MX, 2600000, W - MX * 2, 1800000, para(s.title, { sz: 3600, b: true, color: "FFFFFF", line: 115000 }))
+        + (s.bullets[0] ? tbox(c.id++, "s", MX, 4400000, W - MX * 2, 800000, para(s.bullets[0], { sz: 1800, color: "F0EEE9" })) : "");
+    },
+    imageTop: function (s, c) {
+      return pic(c.id++, "rId8", 0, 0, W, 3400000, s.image && s.image.nat)
+        + titleOf({ title: s.title }, c.id++, 2800)
+        + bulletBody(s.bullets, MX, 4700000, W - MX * 2, 1600000, 1600)
+        + pageNo(c.id++, c.idx, c.total);
+    },
+    closing: function (s, c) {
+      var o = tbox(c.id++, "t", MX, 1500000, W - MX * 2, 1200000, para(s.title, { sz: 3600, b: true })), i;
+      for (i = 0; i < Math.min(4, s.bullets.length); i++) {
+        var y = 3000000 + i * 700000;
+        o += dot(c.id++, MX, y + 120000, 160000, CLR.ac);
+        o += tbox(c.id++, "l", MX + 400000, y, W - MX * 2 - 400000, 600000, para(s.bullets[i], { sz: 1900 }));
+      }
+      if (c.footer) o += tbox(c.id++, "f", MX, 6000000, W - MX * 2, 400000, para(c.footer, { sz: 1100, color: CLR.faint }));
+      return o;
+    },
+  };
+  // 别名，方便提示词里直呼
+  LAYOUTS.title = LAYOUTS.cover; LAYOUTS.divider = LAYOUTS.section; LAYOUTS.list = LAYOUTS.bullets;
+  LAYOUTS.twoCol = LAYOUTS.bulletsTwo; LAYOUTS.big = LAYOUTS.kpiBig; LAYOUTS.grid = LAYOUTS.matrix;
+  LAYOUTS.end = LAYOUTS.closing;
+
+  /* 自动选版式：只看这一页内容的**形状**，不看它写了什么。
+     显式 `layout: kpi` 永远优先——机器猜错时人要能一句话改掉。 */
+  function pickLayout(s, idx, total) {
+    if (s.layout && LAYOUTS[s.layout]) return s.layout;
+    if (s.kind === "cover") return s.subtitle ? "cover" : "coverCenter";
+    var bs = s.bullets || [], n = bs.length;
+    var pairs = bs.filter(function (b) { return /[|｜]/.test(b); }).length;
+    var nums = bs.filter(function (b) { return /^\s*[\d.,%+\-]{1,8}\s*[|｜]/.test(b) || /^\s*[\d.,]+\s*(%|万|亿|倍|分|人|天|年|月|次)/.test(b); }).length;
+    if (s.image && s.image.bytes && s.image.bytes.length) return n === 0 ? "imageFull" : (n <= 2 ? "imageTop" : "imageRight");
+    if (s.chart) return n === 0 ? "chartFull" : (n === 1 ? "chartLead" : "chartRight");
+    if (n === 0) return "section";
+    if (/^[一二三四五六七八九十]+[、.]|^第[一二三四五六七八九十]+[章部分]/.test(s.title || "") && n <= 1) return "section";
+    if (/^[“"「『]/.test(bs[0] || "") || /引用|原话/.test(s.title || "")) return "quote";
+    if (idx === total && /下一步|结论|行动|计划|接下来|收束/.test(s.title || "")) return "closing";
+    if (/目录|议程|全场|路线/.test(s.title || "") && n >= 3) return "agenda";
+    if (nums >= 2 && n <= 3) return "kpi";
+    if (nums === 1 && n === 1) return "kpiBig";
+    if (n === 4 && pairs === 4 && /辨别|矩阵|四格|2×2|2x2/.test(s.title || "")) return "matrix";
+    if (pairs >= 2 && n <= 3 && /对比|vs|与|之别|差别/i.test(s.title || "")) return "compare";
+    if (pairs >= 3 && /步骤|流程|做法|怎么做/.test(s.title || "")) return "steps";
+    if (pairs >= 3 && /时间|阶段|演进|历程|路线/.test(s.title || "")) return "timeline";
+    if (n === 1 && String(bs[0]).length >= 14) return "lead";
+    if (n >= 6) return "bulletsTwo";
+    return "bullets";
+  }
+
+  function slideXml(s, idx, total, footer, kicker) {
+    var c = { id: 2, idx: idx, total: total, footer: footer, kicker: kicker };
+    var name = pickLayout(s, idx, total);
+    var shapes = (LAYOUTS[name] || LAYOUTS.bullets)(s, c);
+    return wrapSlide(shapes, name);
+  }
+
   function pad(n) { return n < 10 ? "0" + n : String(n); }
   function hasChart(s) { return !!(s && s.chart && s.chart.series && s.chart.series.length && (s.chart.categories || []).length); }
-  function wrapSlide(shapes) {
-    return XD + '<p:sld ' + A + ' ' + P + ' ' + R + '><p:cSld><p:spTree>'
+  function hasImage(s) { return !!(s && s.image && s.image.bytes && s.image.bytes.length && s.image.ext); }
+  function wrapSlide(shapes, layoutName) {
+    return XD + '<p:sld ' + A + ' ' + P + ' ' + R + '><!-- layout: ' + esc(layoutName || "bullets") + ' --><p:cSld><p:spTree>'
       + '<p:nvGrpSpPr><p:cNvPr id="1" name=""/><p:cNvGrpSpPr/><p:nvPr/></p:nvGrpSpPr>'
       + '<p:grpSpPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="0" cy="0"/><a:chOff x="0" y="0"/><a:chExt cx="0" cy="0"/></a:xfrm></p:grpSpPr>'
       + shapes + '</p:spTree></p:cSld><p:clrMapOvr><a:masterClrMapping/></p:clrMapOvr></p:sld>';
@@ -309,7 +560,7 @@
       + '<a:clrScheme name="WDS"><a:dk1><a:sysClr val="windowText" lastClr="000000"/></a:dk1>'
       + '<a:lt1><a:sysClr val="window" lastClr="FFFFFF"/></a:lt1>'
       + '<a:dk2><a:srgbClr val="' + CLR.tx + '"/></a:dk2><a:lt2><a:srgbClr val="F4F1EA"/></a:lt2>'
-      + '<a:accent1><a:srgbClr val="' + CLR.gold + '"/></a:accent1><a:accent2><a:srgbClr val="4A6572"/></a:accent2>'
+      + '<a:accent1><a:srgbClr val="' + CLR.ac + '"/></a:accent1><a:accent2><a:srgbClr val="' + CLR.ac2 + '"/></a:accent2>'
       + '<a:accent3><a:srgbClr val="7A6A55"/></a:accent3><a:accent4><a:srgbClr val="8C6D3F"/></a:accent4>'
       + '<a:accent5><a:srgbClr val="5C6270"/></a:accent5><a:accent6><a:srgbClr val="9AA0AC"/></a:accent6>'
       + '<a:hlink><a:srgbClr val="8A6A2F"/></a:hlink><a:folHlink><a:srgbClr val="7A6A55"/></a:folHlink></a:clrScheme>'
@@ -355,11 +606,13 @@
   function build(deck, opts) {
     opts = opts || {};
     deck = deck || {};
+    CLR = THEMES[pickTheme(deck)] || THEMES.ink;      // 主题在这里定一次，之后所有版式只认角色
     var slides = (deck.slides || []).slice(0, 60);
     var footer = deck.footer || opts.footer || "";
     var all = [{ kind: "cover", title: deck.title || "未命名", subtitle: deck.subtitle || "", kicker: deck.kicker || "" }].concat(slides);
     var files = [], i;
 
+    var needExt = {};                                  // 用到了哪些图片扩展名，就声明哪些（漏声明＝文件损坏）
     var ctypes = XD + '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">'
       + '<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>'
       + '<Default Extension="xml" ContentType="application/xml"/>'
@@ -376,7 +629,11 @@
       ctypes += '<Override PartName="/ppt/slides/slide' + (i + 1) + '.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.slide+xml"/>';
       if (all[i].notes) ctypes += '<Override PartName="/ppt/notesSlides/notesSlide' + (i + 1) + '.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.notesSlide+xml"/>';
       if (hasChart(all[i])) ctypes += '<Override PartName="/ppt/charts/chart' + (i + 1) + '.xml" ContentType="application/vnd.openxmlformats-officedocument.drawingml.chart+xml"/>';
+      if (hasImage(all[i])) needExt[all[i].image.ext] = 1;
     }
+    Object.keys(needExt).forEach(function (x) {
+      ctypes += '<Default Extension="' + x + '" ContentType="image/' + (x === "jpg" ? "jpeg" : x) + '"/>';
+    });
     files.push({ name: "[Content_Types].xml", data: enc(ctypes + "</Types>") });
 
     files.push({ name: "_rels/.rels", data: enc(XD + '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
@@ -426,7 +683,7 @@
 
     for (i = 0; i < all.length; i++) {
       var s = all[i];
-      files.push({ name: "ppt/slides/slide" + (i + 1) + ".xml", data: enc(slideXml(s, i, all.length - 1, footer)) });
+      files.push({ name: "ppt/slides/slide" + (i + 1) + ".xml", data: enc(slideXml(s, i, all.length - 1, footer, deck.kicker || "")) });
       var rels = XD + '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
         + '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slideLayout" Target="../slideLayouts/slideLayout1.xml"/>';
       if (s.notes) {
@@ -435,6 +692,10 @@
         files.push({ name: "ppt/notesSlides/_rels/notesSlide" + (i + 1) + ".xml.rels", data: enc(XD + '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
           + '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/notesMaster" Target="../notesMasters/notesMaster1.xml"/>'
           + '<Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slide" Target="../slides/slide' + (i + 1) + '.xml"/></Relationships>') });
+      }
+      if (hasImage(s)) {
+        rels += '<Relationship Id="rId8" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="../media/image' + (i + 1) + '.' + s.image.ext + '"/>';
+        files.push({ name: "ppt/media/image" + (i + 1) + "." + s.image.ext, data: s.image.bytes });
       }
       if (hasChart(s)) {
         rels += '<Relationship Id="rId9" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/chart" Target="../charts/chart' + (i + 1) + '.xml"/>';
@@ -463,9 +724,9 @@
       cur.title = (cur.title || "").trim();
       cur.notes = (cur.notes || "").trim();
       cur.bullets = cur.bullets.filter(function (x) { return x; });
-      if (cur.title || cur.bullets.length || cur.chart) {
-        // 有图表就一定是内容页（哪怕一条要点都没有——整幅图那种）
-        cur.kind = (cur.bullets.length || cur.chart) ? "content" : "section";
+      if (cur.title || cur.bullets.length || cur.chart || cur.image) {
+        // 有图表/配图就一定是内容页（哪怕一条要点都没有——整幅那种）
+        cur.kind = (cur.bullets.length || cur.chart || cur.image) ? "content" : "section";
         deck.slides.push(cur);
       }
       cur = null;
@@ -486,6 +747,17 @@
       if ((m = L.match(/^\s*##\s+(.*)$/))) {
         if (!deck.slides.length && !cur && !deck.subtitle) { deck.subtitle = m[1].trim(); continue; }
         push(); cur = { title: m[1].trim(), bullets: [], notes: "" }; continue;
+      }
+      if ((m = L.match(/^\s*(?:layout|版式)\s*[:：]\s*(.+)$/i))) {
+        if (!cur) cur = { title: "", bullets: [], notes: "" };
+        cur.layout = m[1].trim().replace(/\s+/g, "");
+        continue;
+      }
+      if ((m = L.match(/^\s*(?:theme|主题)\s*[:：]\s*(.+)$/i))) { deck.theme = m[1].trim().toLowerCase(); continue; }
+      if ((m = L.match(/^\s*(?:image|img|配图)\s*[:：]\s*(\S+)\s*$/i))) {
+        if (!cur) cur = { title: "", bullets: [], notes: "" };
+        cur.image = { url: m[1].trim() };          // 字节要等 preload() 去取，build 必须保持同步
+        continue;
       }
       if ((m = L.match(/^\s*(?:[-*+]|\d+[.)])\s+(.*)$/))) {
         if (!cur) cur = { title: "", bullets: [], notes: "" };
@@ -551,9 +823,55 @@
       .replace(/\[([^\]]+)\]\([^)]*\)/g, "$1").trim();
   }
 
+  /* 配图预取：**必须在点击之前做完**。build() 全同步是为了保住用户手势，
+     所以取字节这件事只能提前——成文写完就 preload()，点按钮时字节已在内存。
+     只取同源（本站）图片：跨域会被 CORS 挡住，而"图没取到"绝不能让整份 PPT 生不出来——
+     取不到就把 image 去掉，那一页自动退回文字版式。 */
+  function imgSize(u8, ext) {
+    try {
+      if (ext === "png" && u8.length > 24) {
+        var dv = new DataView(u8.buffer, u8.byteOffset, u8.byteLength);
+        return { w: dv.getUint32(16), h: dv.getUint32(20) };
+      }
+      if (ext === "jpg" || ext === "jpeg") {
+        var i = 2;
+        while (i < u8.length - 9) {
+          if (u8[i] !== 0xFF) { i++; continue; }
+          var mk = u8[i + 1], len = (u8[i + 2] << 8) | u8[i + 3];
+          if (mk >= 0xC0 && mk <= 0xCF && mk !== 0xC4 && mk !== 0xC8 && mk !== 0xCC) {
+            return { h: (u8[i + 5] << 8) | u8[i + 6], w: (u8[i + 7] << 8) | u8[i + 8] };
+          }
+          i += 2 + len;
+        }
+      }
+    } catch (e) {}
+    return null;
+  }
+  function preload(deck) {
+    var jobs = ((deck && deck.slides) || []).filter(function (s) { return s.image && s.image.url && !s.image.bytes; });
+    if (!jobs.length) return Promise.resolve(deck);
+    return Promise.all(jobs.map(function (s) {
+      var u = String(s.image.url);
+      if (!/^\//.test(u) && !new RegExp("^" + (location.origin || "").replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).test(u)) { delete s.image; return Promise.resolve(); }
+      return fetch(u).then(function (r) { return r.ok ? r.arrayBuffer() : null; }).then(function (ab) {
+        if (!ab || ab.byteLength < 200) { delete s.image; return; }
+        var ext = (u.split("?")[0].split(".").pop() || "").toLowerCase();
+        if (ext === "jpeg") ext = "jpg";
+        if (["png", "jpg", "gif", "webp"].indexOf(ext) < 0) { delete s.image; return; }
+        var u8 = new Uint8Array(ab);
+        s.image.bytes = u8; s.image.ext = ext; s.image.nat = imgSize(u8, ext);
+      }).catch(function () { delete s.image; });
+    })).then(function () { return deck; });
+  }
+
   window.WDSPptx = {
     build: build,
     parse: parse,
+    preload: preload,
+    layouts: function () { return Object.keys(LAYOUTS); },
+    themes: function () { return Object.keys(THEMES); },
+    pickLayout: pickLayout,
+    pickTheme: pickTheme,
     blob: function (deck, opts) {
       return new Blob([build(deck, opts)], { type: "application/vnd.openxmlformats-officedocument.presentationml.presentation" });
     },
