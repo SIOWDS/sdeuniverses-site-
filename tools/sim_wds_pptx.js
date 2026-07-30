@@ -345,7 +345,8 @@ console.log("── 四点〇 · 装配三原则：统一 · 多样 · 和谐（
   for (let i = 0; i < 8; i++) many.slides.push({ title: "第" + i + "页", bullets: ["甲", "乙", "丙"], notes: "", kind: "content" });
   ok(X.audit(many).diversity.length > 0, "八页全是要点页 → 多样性违规");
   // 提示端
-  ok(/装配三原则：美＝统一·多样·和谐/.test(wk), "三原则也写进了给基底的写作纪律");
+  // 三原则那段已被九宫格整段替代（三格是九格的头三格），判据随之上移到 DECK_BEAUTY9
+  ok(/美的九宫格：整份稿子按这九格自我要求/.test(wk), "三原则已升级成九宫格写进给基底的写作纪律");
   ok(/相邻两页不许写成同一个形状/.test(wk) && /宁可少一条，不许挤/.test(wk), "多样与和谐都落成可执行的一句话");
 }
 
@@ -379,6 +380,44 @@ console.log("── 三点九五 · PPT 文本打造 Skill：逐页产出 ＋ �
   ok(!/想象力四条/.test(mkSpec("essay", "", 64000).spec), "没有污染「提炼成文」那一档");
   ok(deckSpec.length > 3500 && deckSpec.length < 6000, "deck 规格总长可控（实得 " + deckSpec.length + " 字）");
   ok(deckSpec.indexOf("字号与字数") < deckSpec.indexOf("文本打造"), "先给字数上限、再给怎么写（顺序即教学次序）");
+}
+
+console.log("── 三点九八 · 九宫格写进基底的写作 Skill（不只在渲染端）");
+{
+  ok(/const DECK_BEAUTY9 = /.test(wk), "九宫格写成给基底的常量（渲染端那份 audit9 是同一套的机器版）");
+  ["统一","多样","和谐","完全","活力","纯一","爱","自由","平安"].forEach(function (z) {
+    ok(new RegExp("\\*\\*" + z + "\\*\\*：").test(wk), "写作口径里有「" + z + "」这一格");
+  });
+  ok(/构成之美——怎么摆/.test(wk) && /品格之美——这一份是哪一种/.test(wk) && /感受之美——听众看着如何/.test(wk), "三层各有抬头");
+  ok(/渲染端只能验"摆得对不对"，写得美不美只有写的人能负责/.test(wk), "注释写明为什么必须同时进提示");
+  // 20 套各钉两格，且与客户端 TPL_ACCENT 一一对应（跨运行时的同步，最容易改一边忘一边）
+  const ids = Object.keys(X.TPL_ACCENT);
+  const zh2id = { "统一": "unity", "多样": "diversity", "和谐": "harmony", "完全": "complete", "活力": "vital",
+                  "纯一": "single", "爱": "love", "自由": "freedom", "平安": "peace" };
+  let mismatch = [];
+  ids.forEach(function (id) {
+    const m = wk.match(new RegExp("\\n  " + id + ": \\{[^\\n]*accent: \\[\"([^\"]+)\", \"([^\"]+)\"\\]"));
+    if (!m) { mismatch.push(id + ":服务端没钉"); return; }
+    const pair = [zh2id[m[1]], zh2id[m[2]]];
+    if (JSON.stringify(pair) !== JSON.stringify(X.TPL_ACCENT[id])) mismatch.push(id + ":" + pair + "≠" + X.TPL_ACCENT[id]);
+  });
+  ok(mismatch.length === 0, "20 套的侧重两格两端完全一致（不一致的：" + (mismatch.join("；") || "无") + "）");
+  ok((wk.match(/accent: \[/g) || []).length === 20, "20 套都钉了侧重格");
+  // 拼接实测
+  const sizes = wk.slice(wk.indexOf("const DECK_SIZES"), wk.indexOf("// ── DECK_CRAFT"));
+  const craft = wk.slice(wk.indexOf("const DECK_CRAFT"), wk.indexOf("// ── DECK_BEAUTY9"));
+  const nine = wk.slice(wk.indexOf("const DECK_BEAUTY9"), wk.indexOf("// ── DECK_TPL"));
+  const tplsrc = wk.slice(wk.indexOf("const DECK_TPL = {"), wk.indexOf("const DISTILL_FIRST_MS"));
+  const s0 = wk.indexOf("const SPEC = {"), e0 = wk.indexOf("}[kind];", s0) + 8;
+  const mk = new Function("kind", "tplId", "WDS_TOK_MAX", sizes + craft + nine + tplsrc + wk.slice(s0, e0) + "\nreturn SPEC;");
+  const spTalk = mk("deck", "talk", 64000).spec, spHealth = mk("deck", "health", 64000).spec;
+  ok(/尤其看重九宫格里的两格：「活力」与「自由」/.test(spTalk), "观点演讲点名「活力＋自由」");
+  ok(/尤其看重九宫格里的两格：「纯一」与「平安」/.test(spHealth), "健康科普点名「纯一＋平安」");
+  ok(/这两格打分是加倍的，其余七格达标也救不回来/.test(spTalk), "说清侧重格是加倍权重");
+  ok(/自检九问/.test(spTalk) && /有没有连着三页写成同一个形状/.test(spTalk) && /有没有哪句话是在吓唬人/.test(spTalk),
+     "交稿前的自检从三问扩成九问，一格一问");
+  ok(!/美的九宫格/.test(mk("essay", "", 64000).spec), "仍未污染「提炼成文」那一档");
+  ok(spTalk.length < 6000, "deck 规格总长仍可控（实得 " + spTalk.length + " 字）");
 }
 
 console.log("── 四点〇五 · 美的九宫格 ＋ 迭代循环装配");
