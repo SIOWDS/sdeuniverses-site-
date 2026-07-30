@@ -96,7 +96,14 @@ function unzip(b) {
   ok(pres.indexOf("notesMasterIdLst") < pres.indexOf("sldIdLst"), "notesMasterIdLst 在 sldIdLst 之前（规范次序）");
   const s2 = z["ppt/slides/slide2.xml"].toString("utf8");
   ok(/问题是什么/.test(s2) && /裸模型不知道站里写过什么/.test(s2), "第 2 张有标题与要点");
-  ok(/buChar char="\u2022"/.test(s2), "项目符号用 buChar，不是正文里打一个 • （会出双重符号）");
+  // 要点页现在是编号卡片（不带圆点），但用到圆点的版式（图表页/对比页/图片页）必须走 buChar
+  const anyBu = Object.keys(z).filter((n) => /^ppt\/slides\/slide\d+\.xml$/.test(n))
+    .map((n) => z[n].toString("utf8")).join("");
+  // 这份样例全是图表页（chartLead/chartFull），不带圆点；专门造一页 chartRight 来验
+  const zBu = unzip(Buffer.from(X.build(X.parse(
+    "# a\n## b\n---\n## 左文右图\n- 一条\n- 两条\n```chart\ncategories: 甲, 乙\nseries: s | 1, 2\n```"))));
+  ok(/buChar char="\u2022"/.test(zBu["ppt/slides/slide2.xml"].toString("utf8")), "用到圆点的版式走 buChar 声明");
+  ok(!/<a:t[^>]*>[^<]*\u2022/.test(anyBu), "正文里没有手打的 •（手打会与声明的符号叠成双重圆点）");
   ok(/01 \/ 03/.test(s2), "页码是 当前/总数");
   const n2 = z["ppt/notesSlides/notesSlide2.xml"].toString("utf8");
   ok(/开场三十秒/.test(n2), "讲稿进的是 notesSlide，不是幻灯片上的文本框");
@@ -297,6 +304,13 @@ console.log("── 四 · 两端接线");
   ok(/版式是自动挑的（20 套）/.test(wk), "提示教会了「写对形状比写 layout 更可靠」");
   ok(/layout: kpi/.test(wk) && /theme: slate/.test(wk), "也留了显式指定的出口");
   ok(/不许自己编一个路径/.test(wk), "配图路径同样不许编（与站内篇名同一条纪律）");
+  ok(/别做成十页一个样/.test(wk), "提示明令全套至少 3 页不是普通要点页");
+  ok(/必须至少有一页图表或大数字页/.test(wk), "对话里有数字就必须出图（否则等于没把硬东西挑出来）");
+  const wm0 = MOD;
+  ok(/bulletsLead/.test(wm0), "要点页有两种摆法可交替");
+  ok(/idx % 2 === 0/.test(wm0), "按页码奇偶交替（可复现，不是随机）");
+  ok(/c\.bg = CLR\.deep/.test(wm0) && /c\.bg = CLR\.ac/.test(wm0), "封面/过渡/收尾整幅上色（白底内容页夹在中间才不寡淡）");
+  ok(/deep: "1D3327"/.test(wm0) && /onDeep:/.test(wm0) && /tint:/.test(wm0), "每套主题都配了整幅底色与其上的字色");
   ok(/function deckPrep\(/.test(wm) && /WDSPptx\.preload\(d\)/.test(wm), "客户端在成文写完就预取配图（点击那一刻必须已在内存）");
   ok(/deckReady \|\| deckOf\(text\)/.test(wm), "点按钮时优先用预取好的那份");
 }

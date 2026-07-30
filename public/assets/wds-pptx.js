@@ -87,12 +87,12 @@
      不是"换个色"这么简单——每套定好正文/次要/淡出/强调/卡片底五种角色，
      所有版式只认角色不认具体色值，所以换主题不会有哪一处漏改。 */
   var THEMES = {
-    ink:    { bg: "FFFFFF", tx: "16181D", dim: "5C6270", faint: "9AA0AC", ac: "8A6A2F", ac2: "4A6572", card: "F6F4EF", line: "E4E0D8" },
-    slate:  { bg: "FFFFFF", tx: "141A20", dim: "51606D", faint: "93A0AB", ac: "2F5D7C", ac2: "7A8B99", card: "F1F5F8", line: "DDE5EA" },
-    forest: { bg: "FFFFFF", tx: "16201A", dim: "4F6154", faint: "94A398", ac: "3F6B4A", ac2: "7A8B6F", card: "F0F5F1", line: "DCE6DE" },
-    clay:   { bg: "FFFFFF", tx: "201814", dim: "6B5A50", faint: "A89A90", ac: "9A5B3F", ac2: "8A7A6A", card: "F8F2ED", line: "E8DED6" },
-    plum:   { bg: "FFFFFF", tx: "1C161F", dim: "5F5266", faint: "9C93A3", ac: "6B4A6B", ac2: "8A7A93", card: "F5F1F6", line: "E5DCE7" },
-    night:  { bg: "15171C", tx: "F2F0EA", dim: "B8BCC4", faint: "6E7480", ac: "C9A227", ac2: "7FA0B5", card: "1E2128", line: "2A2E36" },
+    ink:    { bg: "FFFFFF", tx: "16181D", dim: "5C6270", faint: "9AA0AC", ac: "8A6A2F", ac2: "4A6572", card: "F6F4EF", line: "E4E0D8", deep: "2A2118", onDeep: "F6F1E7", tint: "FBF9F5" },
+    slate:  { bg: "FFFFFF", tx: "141A20", dim: "51606D", faint: "93A0AB", ac: "2F5D7C", ac2: "7A8B99", card: "F1F5F8", line: "DDE5EA", deep: "17323F", onDeep: "EAF2F6", tint: "F8FBFC" },
+    forest: { bg: "FFFFFF", tx: "16201A", dim: "4F6154", faint: "94A398", ac: "3F6B4A", ac2: "7A8B6F", card: "F0F5F1", line: "DCE6DE", deep: "1D3327", onDeep: "ECF3EE", tint: "F8FBF9" },
+    clay:   { bg: "FFFFFF", tx: "201814", dim: "6B5A50", faint: "A89A90", ac: "9A5B3F", ac2: "8A7A6A", card: "F8F2ED", line: "E8DED6", deep: "3A2419", onDeep: "F7EFE8", tint: "FCF8F5" },
+    plum:   { bg: "FFFFFF", tx: "1C161F", dim: "5F5266", faint: "9C93A3", ac: "6B4A6B", ac2: "8A7A93", card: "F5F1F6", line: "E5DCE7", deep: "2E1F31", onDeep: "F4EDF5", tint: "FBF8FC" },
+    night:  { bg: "15171C", tx: "F2F0EA", dim: "B8BCC4", faint: "6E7480", ac: "C9A227", ac2: "7FA0B5", card: "1E2128", line: "2A2E36", deep: "0E1013", onDeep: "F2F0EA", tint: "1A1D23" },
   };
   var CLR = THEMES.ink;                     // 当前主题；build() 开头按 deck 定
   // 主题自动选：按内容里的行当词猜，猜不出用 ink。显式 `theme: night` 优先。
@@ -202,21 +202,24 @@
 
   var LAYOUTS = {
     cover: function (s, c) {
-      var o = "";
-      if (c.kicker) o += tbox(c.id++, "kicker", MX, 1600200, W - MX * 2, 400000, para(c.kicker, { sz: 1400, color: CLR.ac, b: true }));
-      o += tbox(c.id++, "title", MX, 2130000, W - MX * 2, 1900000, para(s.title, { sz: 4000, b: true, line: 115000 }));
-      if (s.subtitle) o += tbox(c.id++, "sub", MX, 4130000, W - MX * 2, 1100000, para(s.subtitle, { sz: 2000, color: CLR.dim }));
-      if (c.footer) o += tbox(c.id++, "footer", MX, 5900000, W - MX * 2, 400000, para(c.footer, { sz: 1100, color: CLR.faint }));
+      c.bg = CLR.deep;                                  // 整幅深色，白底内容页之前先给一记重音
+      var o = dot(c.id++, MX, 1500000, 200000, CLR.ac);
+      if (c.kicker) o += tbox(c.id++, "kicker", MX + 340000, 1520000, W - MX * 2, 400000, para(c.kicker, { sz: 1300, color: CLR.ac, b: true }));
+      o += tbox(c.id++, "title", MX, 2130000, W - MX * 2 - 600000, 2100000, para(s.title, { sz: 4000, b: true, color: CLR.onDeep, line: 115000 }));
+      if (s.subtitle) o += tbox(c.id++, "sub", MX, 4330000, W - MX * 2 - 900000, 1100000, para(s.subtitle, { sz: 1900, color: CLR.ac2 }));
+      if (c.footer) o += tbox(c.id++, "footer", MX, 5900000, W - MX * 2, 400000, para(c.footer, { sz: 1100, color: CLR.ac2 }));
       return o;
     },
     coverCenter: function (s, c) {
-      var o = tbox(c.id++, "title", MX, 2400000, W - MX * 2, 2000000, para(s.title, { sz: 4400, b: true, algn: "ctr", line: 115000 }));
-      if (c.footer) o += tbox(c.id++, "footer", MX, 5900000, W - MX * 2, 400000, para(c.footer, { sz: 1100, color: CLR.faint, algn: "ctr" }));
+      c.bg = CLR.deep;
+      var o = tbox(c.id++, "title", MX, 2400000, W - MX * 2, 2000000, para(s.title, { sz: 4400, b: true, color: CLR.onDeep, algn: "ctr", line: 115000 }));
+      if (c.footer) o += tbox(c.id++, "footer", MX, 5900000, W - MX * 2, 400000, para(c.footer, { sz: 1100, color: CLR.ac2, algn: "ctr" }));
       return o;
     },
     section: function (s, c) {
-      return tbox(c.id++, "no", MX, 2600000, W - MX * 2, 400000, para(pad(c.idx), { sz: 1400, color: CLR.ac, b: true }))
-        + tbox(c.id++, "t", MX, 3080000, W - MX * 2, 1500000, para(s.title, { sz: 3600, b: true }));
+      c.bg = CLR.ac;                                    // 过渡页整幅上强调色：翻到这里就知道"换段了"
+      return tbox(c.id++, "no", MX, 2560000, W - MX * 2, 400000, para(pad(c.idx), { sz: 1500, color: CLR.onDeep, b: true }))
+        + tbox(c.id++, "t", MX, 3080000, W - MX * 2, 1600000, para(s.title, { sz: 3600, b: true, color: CLR.onDeep }));
     },
     agenda: function (s, c) {
       var o = titleOf(s, c.id++), i, half = Math.ceil(s.bullets.length / 2);
@@ -228,19 +231,62 @@
       }
       return o + pageNo(c.id++, c.idx, c.total);
     },
+    // 最常用的一页：整份里九成是它，所以它必须自己就好看。
+    // ≤4 条 → 每条一张淡色卡＋强调色序号；≥5 条 → 编号列（卡片会挤）。
     bullets: function (s, c) {
-      return titleOf(s, c.id++) + bulletBody(s.bullets, MX, BODY_Y, W - MX * 2, 4000000) + pageNo(c.id++, c.idx, c.total);
+      var bs = s.bullets, n = bs.length, o = titleOf(s, c.id++), i;
+      if (n <= 5) {
+        var gap = n >= 5 ? 170000 : 220000, ch = Math.min(900000, (4050000 - gap * (n - 1)) / Math.max(1, n));
+        for (i = 0; i < n; i++) {
+          var y = BODY_Y + i * (ch + gap);
+          o += card(c.id++, MX, y, W - MX * 2, ch, CLR.card);
+          o += tbox(c.id++, "n", MX + 300000, y + (ch - 420000) / 2, 560000, 460000, para(pad(i + 1), { sz: 1700, b: true, color: CLR.ac }));
+          o += tbox(c.id++, "t", MX + 940000, y + (ch - 480000) / 2, W - MX * 2 - 1240000, 520000,
+            para(bs[i], { sz: n <= 3 ? 1900 : (n === 4 ? 1700 : 1600), line: 105000 }), { anchor: "ctr" });
+        }
+      } else {
+        for (i = 0; i < n; i++) {
+          var yy = BODY_Y + i * 640000;
+          o += tbox(c.id++, "n", MX, yy, 560000, 480000, para(pad(i + 1), { sz: 1500, b: true, color: CLR.ac }));
+          o += tbox(c.id++, "t", MX + 640000, yy, W - MX * 2 - 640000, 560000, para(bs[i], { sz: 1600, line: 105000 }));
+        }
+      }
+      return o + pageNo(c.id++, c.idx, c.total);
     },
     bulletsTwo: function (s, c) {
-      var half = Math.ceil(s.bullets.length / 2), gap = 500000, cw = (W - MX * 2 - gap) / 2;
-      return titleOf(s, c.id++)
-        + bulletBody(s.bullets.slice(0, half), MX, BODY_Y, cw, 4000000, 1600)
-        + bulletBody(s.bullets.slice(half), MX + cw + gap, BODY_Y, cw, 4000000, 1600)
-        + pageNo(c.id++, c.idx, c.total);
+      var bs = s.bullets, half = Math.ceil(bs.length / 2), gap = 400000, cw = (W - MX * 2 - gap) / 2;
+      var o = titleOf(s, c.id++), i;
+      for (i = 0; i < bs.length; i++) {
+        var col = i < half ? 0 : 1, row = i < half ? i : i - half;
+        var x = MX + col * (cw + gap), y = BODY_Y + row * 760000;
+        o += card(c.id++, x, y - 60000, cw, 680000, CLR.card);
+        o += tbox(c.id++, "n", x + 240000, y + 100000, 420000, 400000, para(pad(i + 1), { sz: 1400, b: true, color: CLR.ac }));
+        o += tbox(c.id++, "t", x + 700000, y + 60000, cw - 940000, 560000, para(bs[i], { sz: 1500, line: 105000 }), { anchor: "ctr" });
+      }
+      return o + pageNo(c.id++, c.idx, c.total);
+    },
+    // 与 bullets 交替出现：同样一堆要点，换一种摆法，整份就不再是一个模子
+    bulletsLead: function (s, c) {
+      var bs = s.bullets, o = titleOf(s, c.id++), i;
+      o += card(c.id++, MX, BODY_Y, W - MX * 2, 1150000, CLR.card);
+      o += tbox(c.id++, "lead", MX + 420000, BODY_Y + 250000, W - MX * 2 - 840000, 700000,
+        para(bs[0] || "", { sz: 2100, b: true, color: CLR.ac, line: 105000 }), { anchor: "ctr" });
+      var rest = bs.slice(1), n = rest.length;
+      if (n) {
+        var cols = n >= 3 ? 3 : n, gap = 300000, cw = (W - MX * 2 - gap * (cols - 1)) / cols;
+        for (i = 0; i < n; i++) {
+          var col = i % cols, row = Math.floor(i / cols);
+          var x = MX + col * (cw + gap), y = BODY_Y + 1400000 + row * 1250000;
+          o += tbox(c.id++, "n", x, y, 500000, 400000, para(pad(i + 2), { sz: 1400, b: true, color: CLR.ac2 }));
+          o += tbox(c.id++, "t", x, y + 460000, cw, 900000, para(rest[i], { sz: 1500, line: 108000 }));
+        }
+      }
+      return o + pageNo(c.id++, c.idx, c.total);
     },
     lead: function (s, c) {
       return titleOf(s, c.id++, 2400)
-        + tbox(c.id++, "lead", MX, 2400000, W - MX * 2, 2400000, para(s.bullets[0] || "", { sz: 3200, b: true, line: 120000 }))
+        + card(c.id++, MX, 2200000, W - MX * 2, 2600000, CLR.card)
+        + tbox(c.id++, "lead", MX + 500000, 2600000, W - MX * 2 - 1000000, 1900000, para(s.bullets[0] || "", { sz: 3000, b: true, line: 120000 }))
         + pageNo(c.id++, c.idx, c.total);
     },
     quote: function (s, c) {
@@ -353,13 +399,14 @@
         + pageNo(c.id++, c.idx, c.total);
     },
     closing: function (s, c) {
-      var o = tbox(c.id++, "t", MX, 1500000, W - MX * 2, 1200000, para(s.title, { sz: 3600, b: true })), i;
+      c.bg = CLR.deep;                                  // 与封面呼应，收在同一个色上
+      var o = tbox(c.id++, "t", MX, 1500000, W - MX * 2, 1200000, para(s.title, { sz: 3600, b: true, color: CLR.onDeep })), i;
       for (i = 0; i < Math.min(4, s.bullets.length); i++) {
-        var y = 3000000 + i * 700000;
-        o += dot(c.id++, MX, y + 120000, 160000, CLR.ac);
-        o += tbox(c.id++, "l", MX + 400000, y, W - MX * 2 - 400000, 600000, para(s.bullets[i], { sz: 1900 }));
+        var y = 3000000 + i * 720000;
+        o += dot(c.id++, MX, y + 150000, 170000, CLR.ac);
+        o += tbox(c.id++, "l", MX + 420000, y, W - MX * 2 - 420000, 620000, para(s.bullets[i], { sz: 1900, color: CLR.onDeep }));
       }
-      if (c.footer) o += tbox(c.id++, "f", MX, 6000000, W - MX * 2, 400000, para(c.footer, { sz: 1100, color: CLR.faint }));
+      if (c.footer) o += tbox(c.id++, "f", MX, 6000000, W - MX * 2, 400000, para(c.footer, { sz: 1100, color: CLR.ac2 }));
       return o;
     },
   };
@@ -391,6 +438,9 @@
     if (pairs >= 3 && /时间|阶段|演进|历程|路线/.test(s.title || "")) return "timeline";
     if (n === 1 && String(bs[0]).length >= 14) return "lead";
     if (n >= 6) return "bulletsTwo";
+    // 一份稿子里普通要点页最多，全用同一种摆法就是"十页长一个样"。
+    // 按页码奇偶交替（不是随机——同一页永远得到同一种，改一次稿子不会整份大变样）。
+    if (n >= 3 && idx % 2 === 0) return "bulletsLead";
     return "bullets";
   }
 
@@ -398,14 +448,16 @@
     var c = { id: 2, idx: idx, total: total, footer: footer, kicker: kicker };
     var name = pickLayout(s, idx, total);
     var shapes = (LAYOUTS[name] || LAYOUTS.bullets)(s, c);
-    return wrapSlide(shapes, name);
+    return wrapSlide(shapes, name, c.bg);
   }
 
   function pad(n) { return n < 10 ? "0" + n : String(n); }
   function hasChart(s) { return !!(s && s.chart && s.chart.series && s.chart.series.length && (s.chart.categories || []).length); }
   function hasImage(s) { return !!(s && s.image && s.image.bytes && s.image.bytes.length && s.image.ext); }
-  function wrapSlide(shapes, layoutName) {
-    return XD + '<p:sld ' + A + ' ' + P + ' ' + R + '><!-- layout: ' + esc(layoutName || "bullets") + ' --><p:cSld><p:spTree>'
+  function wrapSlide(shapes, layoutName, bg) {
+    return XD + '<p:sld ' + A + ' ' + P + ' ' + R + '><!-- layout: ' + esc(layoutName || "bullets") + ' --><p:cSld>'
+      + (bg ? '<p:bg><p:bgPr><a:solidFill><a:srgbClr val="' + bg + '"/></a:solidFill><a:effectLst/></p:bgPr></p:bg>' : "")
+      + '<p:spTree>'
       + '<p:nvGrpSpPr><p:cNvPr id="1" name=""/><p:cNvGrpSpPr/><p:nvPr/></p:nvGrpSpPr>'
       + '<p:grpSpPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="0" cy="0"/><a:chOff x="0" y="0"/><a:chExt cx="0" cy="0"/></a:xfrm></p:grpSpPr>'
       + shapes + '</p:spTree></p:cSld><p:clrMapOvr><a:masterClrMapping/></p:clrMapOvr></p:sld>';
