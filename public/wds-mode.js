@@ -1576,7 +1576,7 @@
      实现不在这里：全站共用 /assets/wds-savedir.js（window.WDSSaveDir），金点子发生器等
      也用同一份。这里只做三件事：尽早把它拉进来（目录句柄要在点击那一刻已在内存里，
      否则 requestPermission 拿不到用户手势）、把结果译成本页文案、没有它就退回普通下载。 ── */
-  var SAVEDIR_SRC = "/assets/wds-savedir.js?v=20260728a";
+  var SAVEDIR_SRC = "/assets/wds-savedir.js?v=20260730a";
   function dirApi() { return window.WDSSaveDir || null; }
   function dirSupported() { var A = dirApi(); return !!(A && A.supported()); }
   function dirName() { var A = dirApi(); return A ? A.name() : ""; }

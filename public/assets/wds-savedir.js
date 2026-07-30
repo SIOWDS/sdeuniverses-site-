@@ -12,6 +12,9 @@
  *   WDSSaveDir.ensure()            // 在 click 里尽早调；没选过就弹选择器，选过就复用（必要时请求续权）
  *   await WDSSaveDir.save(name, blob)   // 有目录写目录，没有就下载；返回 {where:'dir'|'download', name, dir}
  *   WDSSaveDir.supported() / .name() / .forget() / .onChange(fn)
+ *
+ * save() 回退成下载时，返回值里可能带 reason:"perm" —— 意思是"文件夹还在，只是这一刻没授权"。
+ * 界面要据此说实话，并提示用户再点一次（那一次点击就是新的手势，ensure() 能续上权限）。
  */
 (function () {
   "use strict";
@@ -86,9 +89,17 @@
     if (!supported()) return Promise.resolve(null);
     return load().then(function () {
       if (handle && !opts.repick) {
-        return perm(handle, true).then(function (s) {
+        // silent 模式（save() 内部走的就是它）**只查不请求**。
+        // requestPermission 必须在用户手势内，而 save 是在打包完之后才被调到的——
+        // 一篇上万字的 Word 打包要好几秒，那时手势早已过期，Chrome 不弹框、直接回 'prompt'。
+        // 旧代码把这种 'prompt' 当成"用户撤销了授权"，于是 handle=null + idbDel()：
+        // **用户选好的文件夹会在一次下载之后凭空消失**，"存储位置"变回默认下载目录，
+        // 看起来就像"存储按钮点不动了"。这是本模块最贵的一个 bug，别改回去。
+        return perm(handle, !opts.silent).then(function (s) {
           if (s === "granted") return handle;
-          handle = null; idbDel(); fire();     // 用户撤销了授权，当没选过处理
+          // **只有明确 denied 才忘掉**。'prompt' 只说明这一刻没授权（手势过期，或还没问过），
+          // 目录必须留着——下一次在用户手势里的 ensure() 才有得续权。
+          if (s === "denied") { handle = null; idbDel(); fire(); }
           return opts.silent ? null : pick(opts);
         });
       }
@@ -126,14 +137,19 @@
   // 写文件。有目录就写目录，没有（或不支持、或用户取消、或写失败）一律回退成普通下载——绝不因为存不进目录就丢了产出。
   function save(fname, blob, opts) {
     var o = opts || {};
-    return ensure(Object.assign({ silent: true }, o)).then(function (h) {
-      if (!h) return download(fname, blob);
+    return load().then(function () {
+      var hadHandle = !!handle;
+      return ensure(Object.assign({ silent: true }, o)).then(function (h) {
+      // 选过文件夹、却没写进去 ＝ 这一刻没授权（多半是打包耗时超过了手势有效期）。
+      // 必须把原因带出去让界面说实话，否则用户会以为文件已经进了文件夹。
+      if (!h) { var r = download(fname, blob); if (hadHandle && handle) r.reason = "perm"; return r; }
       return (o.noOverwrite ? freeName(h, fname) : Promise.resolve(fname)).then(function (nm) {
         return h.getFileHandle(nm, { create: true })
           .then(function (fh) { return fh.createWritable(); })
           .then(function (w) { return w.write(blob).then(function () { return w.close(); }); })
           .then(function () { return { where: "dir", name: nm, dir: name() }; })
           .catch(function () { return download(fname, blob); });
+      });
       });
     });
   }

@@ -129,7 +129,7 @@ footer{border-top:1px solid var(--border);text-align:center;padding:30px 20px 44
 .privacy-note b{color:var(--gold)}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js"></script>
-<script src="/assets/wds-savedir.js"></script>
+<script src="/assets/wds-savedir.js?v=20260730a"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script src="/taste/assets/sde-rag.js?v=4"></script>
@@ -2982,7 +2982,17 @@ function sdPaint(){
 function sdSaved(r){
   const note = document.getElementById('saveDirNote');
   if(!note) return;
-  note.textContent = r.where === 'dir' ? ('已写入「' + r.dir + '」：' + r.name) : ('已下载到默认下载目录：' + r.name);
+  if(r.where === 'dir'){ note.textContent = '已写入「' + r.dir + '」：' + r.name; return; }
+  // reason==='perm' ＝ 文件夹还在，只是这一刻没授权（多半是打包耗时超过了手势有效期）。
+  // 不能只说"已下载"就完事——用户会以为文件进了文件夹，回头在那儿找不到。
+  if(r.reason === 'perm'){
+    note.textContent = '⚠ 这一份没能写进「' + (window.WDSSaveDir ? window.WDSSaveDir.name() : '你选的文件夹')
+      + '」，已改为下载到默认下载目录：' + r.name
+      + '。原因是浏览器的授权在打包过程中过期了（它要求授权必须紧跟你的点击）。'
+      + '文件夹没丢——点一下「更换文件夹」重新授权，或直接再点一次下载即可。';
+    return;
+  }
+  note.textContent = '已下载到默认下载目录：' + r.name;
 }
 (function(){
   const pick = document.getElementById('saveDirPick');
@@ -3993,8 +4003,13 @@ if(emergeDlBtn){
       ...toParas(em)
     ];
     const doc = new Document({sections:[{children:kids}]});
+    // 与 dlPapers 同款预热：**趁用户手势还没过期，先把目录与权限要到手**。
+    // 打包是异步的，等它完了再让 save() 去续权，浏览器已经不认这个手势了。
+    const _dirP = (window.WDSSaveDir && window.WDSSaveDir.supported())
+      ? window.WDSSaveDir.ensure({ id:'sde-idea-papers' }).catch(()=>null)
+      : Promise.resolve(null);
     Packer.toBlob(doc).then(blob=>{
-      if(window.WDSSaveDir){ window.WDSSaveDir.save('二阶涌现_新典范.docx', blob).then(sdSaved); return; }
+      if(window.WDSSaveDir){ _dirP.then(()=> window.WDSSaveDir.save('二阶涌现_新典范.docx', blob)).then(sdSaved); return; }
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url; a.download = '二阶涌现_新典范.docx'; a.click();

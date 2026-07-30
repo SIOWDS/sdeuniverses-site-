@@ -122,7 +122,12 @@ const wait = (ms) => new Promise((r) => setTimeout(r, ms || 30));
     ok(i > 0 && seg.indexOf("saveWordDocx(") > 0, id + " 走统一的 saveWordDocx");
   });
   ok(/WDSSaveDir[\s\S]{0,200}ensure\(\{ id:'sde-idea-papers' \}\)/.test(html), "saveWordDocx 里先要目录再打包（手势没过期时）");
-  ok(html.indexOf('<script src="/assets/wds-savedir.js"></script>') > 0, "页面引入了存储模块");
+  // 断言写死过整个 script 标签，2026-07-30 给模块加 ?v= 缓存版本号时被它绊了一下。
+  // 真正该钉的是两件事：引了这个模块，**而且带版本号**——不带的话改了模块，
+  // 缓存里的老客户端还是拿旧版（这个模块刚出过一次"文件夹被悄悄删掉"的 bug）。
+  var m = /<script src="\/assets\/wds-savedir\.js(\?v=[^"]+)?"><\/script>/.exec(html);
+  ok(!!m, "页面引入了存储模块");
+  ok(!!(m && m[1]), "而且带 ?v= 缓存版本号（改了模块必须 bump，否则老客户端拿旧版）", m ? "无版本号" : "");
   ok(html.indexOf('id="saveDirPick"') > 0 && html.indexOf('id="saveDirClear"') > 0, "页面上有选择/清除文件夹的按钮");
   ok((html.match(/WDSSaveDir \? await window\.WDSSaveDir\.ensure/g) || []).length === 2, "两条自动流水线也复用同一个目录，不让用户选两次");
 
