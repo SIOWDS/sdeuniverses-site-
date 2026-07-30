@@ -144,18 +144,18 @@ a{color:var(--disc)}
     <div class="view on" id="v-gate">
       <div id="gate">
         <h2>SDE 微信</h2>
-        <p>站内的纯文字聊天系统：群聊、一对一私聊、通讯录、建群、群公告、@提及、引用回复、未读提醒。用站内口令进入即可，无需安装、无需翻墙。口令向学员发放；名字须与学员名录一致。</p>
+        <p>站内的纯文字聊天系统：群聊、一对一私聊、通讯录、建群、群公告、@提及、引用回复、未读提醒。输入名字和进入密码即可，无需安装、无需翻墙。密码向学员发放；名字须与学员名录一致。</p>
         <div id="gsi" style="display:none"></div>
         <div id="pwbox" style="margin-top:14px">
-          <p style="font-size:0.8rem;color:var(--muted);margin:0 0 8px">用站内口令进入：</p>
-          <input id="pw-name" maxlength="20" list="pw-roster" placeholder="你的名字（学员名录里的名字）" autocomplete="off"
+          <p style="font-size:0.8rem;color:var(--muted);margin:0 0 8px">输入名字和进入密码：</p>
+          <input id="pw-name" maxlength="20" list="pw-roster" placeholder="输入名字" autocomplete="off"
                  style="width:100%;box-sizing:border-box;padding:9px 11px;margin-bottom:7px;border:1px solid var(--line,#ddd);border-radius:8px;font-size:0.95rem">
-          <input id="pw-code" type="password" maxlength="60" placeholder="口令" autocomplete="off"
+          <input id="pw-code" type="password" maxlength="60" placeholder="进入密码" autocomplete="off"
                  style="width:100%;box-sizing:border-box;padding:9px 11px;margin-bottom:7px;border:1px solid var(--line,#ddd);border-radius:8px;font-size:0.95rem">
           <button id="pw-go" class="btn" style="width:100%">进入</button>
           <datalist id="pw-roster"></datalist>
           <div id="pw-msg" style="font-size:0.8rem;color:#b3261e;margin-top:7px;min-height:1em"></div>
-          <p style="font-size:0.76rem;color:var(--muted);margin:8px 0 0">名字要和你在站上发表用的名字一致，点一下输入框可以从名录里选。</p>
+          <p style="font-size:0.76rem;color:var(--muted);margin:8px 0 0">名字要和你在站上发表用的名字一致（点一下输入框可以从名录里选）；进入密码向学员发放。</p>
         </div>
         <p style="font-size:0.78rem;color:var(--muted)">群与私聊都只有成员看得见——外人打不开。</p>
       </div>
@@ -328,12 +328,12 @@ function pwLogin(){
   var nm=(el("pw-name").value||"").trim().slice(0,20), pw=(el("pw-code").value||"");
   var m=el("pw-msg");
   if(!nm){m.textContent="先起个名字。";return;}
-  if(!pw){m.textContent="请输入口令。";return;}
+  if(!pw){m.textContent="请输入密码。";return;}
   m.style.color="var(--muted)";m.textContent="正在进入…";
   var c="sdepw1:"+pw+":"+nm;
   var prev=CRED; CRED=c;
   api("contacts").then(function(x){
-    if(x.s===401||!x.d||!x.d.ok){CRED=prev;m.style.color="#b3261e";m.textContent=(x.d&&x.d.msg)||"进不去，请检查名字和口令。";return;}
+    if(x.s===401||!x.d||!x.d.ok){CRED=prev;m.style.color="#b3261e";m.textContent=(x.d&&x.d.msg)||"进不去，请检查名字和密码。";return;}
     try{sessionStorage.setItem("sde_gauth",JSON.stringify({cred:c,name:nm,exp:Date.now()+12*60*60*1000}));}catch(e){}
     el("pw-code").value="";m.textContent="";afterLogin();
   }).catch(function(){CRED=prev;m.style.color="#b3261e";m.textContent="网络异常，请重试。";});
