@@ -1573,7 +1573,7 @@
   /* 期望的渲染器版本。**读者的标签页可能开了一整天**——旧模块留在内存里，
      改了半天的渲染一点都用不上（2026-07-30 实测：读者拿到的产物是三版之前渲染的）。
      所以这里不只按 URL 版本号取，还要**核对模块自报的 VERSION**，对不上就带随机串强制重取。 */
-  var PPTX_WANT = 9;
+  var PPTX_WANT = 10;
   function pptxBoot(then, forced) {
     if (window.WDSPptx && window.WDSPptx.VERSION >= PPTX_WANT) { if (then) then(true); return; }
     if (window.WDSPptx && !forced) {                       // 内存里是旧的：丢掉重取一次

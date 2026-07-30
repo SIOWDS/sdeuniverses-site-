@@ -18,7 +18,7 @@
   // 版本号：改了渲染就把它 +1，并同步 wds-mode.js 里的 PPTX_WANT。
   // 作用有二：①页面发现版本对不上会强制重取（读者的标签页可能开了一整天）；
   // ②这个号会写进 .pptx 的属性里——**拿到一份产物就能立刻知道它出自哪一版渲染器**。
-  var VERSION = 9;
+  var VERSION = 10;
   if (window.WDSPptx && window.WDSPptx.VERSION >= VERSION) return;
 
   /* ─────────── zip（store，无压缩） ─────────── */
@@ -588,7 +588,9 @@
       var q = s.bullets[0] || s.title;
       return tbox(c.id++, "mark", MX, 1500000, 1200000, 1200000, para("\u201C", { sz: 8000, color: CLR.ac }))
         + tbox(c.id++, "q", MX, 2500000, W - MX * 2 - 900000, 2400000, para(q, { sz: 2800, i: true, line: 125000 }))
-        + (s.bullets[1] ? tbox(c.id++, "by", MX, 5100000, W - MX * 2, 500000, para("— " + s.bullets[1], { sz: 1500, color: CLR.dim })) : "")
+        + (s.bullets[1] ? tbox(c.id++, "by", MX, 5100000, W - MX * 2, 500000,
+            // 模型常自己带破折号（——王德生），前缀就成了「— ——王德生」。先剥掉它自带的再补。
+            para("— " + String(s.bullets[1]).replace(/^[\s—–\-－]+/, ""), { sz: 1500, color: CLR.dim })) : "")
         + pageNo(c.id++, c.idx, c.total);
     },
     kpi: function (s, c) {
@@ -736,7 +738,7 @@
     if (n === 0) return "section";
     if (/^[一二三四五六七八九十]+[、.]|^第[一二三四五六七八九十]+[章部分]/.test(s.title || "") && n <= 1) return "section";
     if (/^[“"「『]/.test(bs[0] || "") || /引用|原话/.test(s.title || "")) return "quote";
-    if (idx === total && /下一步|结论|行动|计划|接下来|收束/.test(s.title || "")) return "closing";
+    if (idx === total && /下一步|结论|行动|计划|接下来|收束|练习|开始|从明天|从今天|行动清单/.test(s.title || "")) return "closing";
     if (/目录|议程|全场|路线/.test(s.title || "") && n >= 3) return "agenda";
     if (nums >= 2 && n <= 3) return "kpi";
     if (nums === 1 && n === 1) return "kpiBig";
@@ -751,6 +753,9 @@
     // 正文全是成对行却落回要点页、竖线原样印出来。标题成对＋正文成对＝对照页，按这个救。
     if (/[|｜]/.test(s.title || "") && pairs >= 2 && pairs === n && n <= 7) return "compare";
     if (n === 1 && String(bs[0]).length >= 14) return "lead";
+    // 末页兜底：最后一页、二到四条、又不是引文/图表/配图 → 收尾版式。
+    // **必须排在所有形状判据之后**——否则会把最后一页的对照卡/2×2/大数字全抢走（护栏当场抓到）。
+    if (idx === total && n >= 2 && n <= 4 && !s.chart && !(s.image && s.image.bytes)) return "closing";
     if (n >= 6) return "bulletsTwo";
     // 一份稿子里普通要点页最多，全用同一种摆法就是"十页长一个样"。
     // 按页码奇偶交替（不是随机——同一页永远得到同一种，改一次稿子不会整份大变样）。
