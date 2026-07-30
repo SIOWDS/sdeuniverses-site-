@@ -126,12 +126,20 @@
         para(s.title, { sz: 3200, b: true }));
       return wrapSlide(shapes);
     }
-    shapes += tbox(id++, "title", MX, 620000, W - MX * 2, 1000000, para(s.title, { sz: 2800, b: true }));
+    shapes += tbox(id++, "title", MX, 620000, W - MX * 2, 1000000, para(s.title, { sz: 3200, b: true }));
+    var hasChart = !!(s.chart && s.chart.series && s.chart.series.length);
+    var bodyW = hasChart && s.bullets.length ? Math.round((W - MX * 2) * 0.42) : (W - MX * 2);
     var body = "";
     for (var i = 0; i < s.bullets.length; i++) {
-      body += para(s.bullets[i], { sz: bulletSize(s.bullets), bullet: true, indent: true, spcBef: i ? 900 : 0 });
+      body += para(s.bullets[i], { sz: hasChart ? 1600 : bulletSize(s.bullets), bullet: true, indent: true, spcBef: i ? 900 : 0 });
     }
-    if (body) shapes += tbox(id++, "body", MX, 1900000, W - MX * 2, 4200000, body);
+    if (body) shapes += tbox(id++, "body", MX, 1900000, bodyW, 4000000, body);
+    if (hasChart) {
+      // 有要点＝左文右图（图占 52%）；没要点＝整幅铺开。留 0.35in 的沟，别让文字贴着图。
+      var cx = s.bullets.length ? Math.round((W - MX * 2) * 0.52) : (W - MX * 2);
+      var cxx = s.bullets.length ? (W - MX - cx) : MX;
+      shapes += frame(id++, "rId9", cxx, 1780000, cx, 4100000);
+    }
     shapes += tbox(id++, "pageNo", W - MX - 900000, 6150000, 900000, 300000,
       para(pad(idx) + " / " + pad(total), { sz: 1000, color: CLR.faint, algn: "r" }));
     return wrapSlide(shapes);
@@ -144,6 +152,7 @@
     return 2000;
   }
   function pad(n) { return n < 10 ? "0" + n : String(n); }
+  function hasChart(s) { return !!(s && s.chart && s.chart.series && s.chart.series.length && (s.chart.categories || []).length); }
   function wrapSlide(shapes) {
     return XD + '<p:sld ' + A + ' ' + P + ' ' + R + '><p:cSld><p:spTree>'
       + '<p:nvGrpSpPr><p:cNvPr id="1" name=""/><p:cNvGrpSpPr/><p:nvPr/></p:nvGrpSpPr>'
@@ -158,6 +167,132 @@
       + '<p:nvPr><p:ph type="body" idx="1"/></p:nvPr></p:nvSpPr><p:spPr/>'
       + '<p:txBody><a:bodyPr/><a:lstStyle/>' + para(text, { sz: 1200 }) + '</p:txBody></p:sp>'
       + '</p:spTree></p:cSld><p:clrMapOvr><a:masterClrMapping/></p:clrMapOvr></p:notes>';
+  }
+
+  /* ═══════ 原生图表（不是图片）═══════
+     一张 PowerPoint 原生图表＝三样东西：ppt/charts/chartN.xml（图表本体）、
+     ppt/embeddings/dataN.xlsx（它的数据源，缺了「编辑数据」就打不开）、
+     以及幻灯片里的一个 <p:graphicFrame> 指过去。三样少一样，PowerPoint 就判文件有问题。
+     只做柱/线/饼三种——它们覆盖汇报里九成的图，且都不需要额外的坐标轴花样。 */
+  var CHART_CLR = ["8A6A2F", "4A6572", "7A6A55", "9AA0AC", "B08A3E", "5C6270"];
+  function chartXml(ch, id) {
+    var cats = ch.categories || [], sers = ch.series || [], type = ch.type || "bar";
+    function strCache(arr, f) {
+      var s = '<c:strRef><c:f>' + f + '</c:f><c:strCache><c:ptCount val="' + arr.length + '"/>';
+      for (var i = 0; i < arr.length; i++) s += '<c:pt idx="' + i + '"><c:v>' + esc(arr[i]) + '</c:v></c:pt>';
+      return s + '</c:strCache></c:strRef>';
+    }
+    function numCache(arr, f) {
+      var s = '<c:numRef><c:f>' + f + '</c:f><c:numCache><c:formatCode>General</c:formatCode><c:ptCount val="' + arr.length + '"/>';
+      for (var i = 0; i < arr.length; i++) s += '<c:pt idx="' + i + '"><c:v>' + (isFinite(arr[i]) ? arr[i] : 0) + '</c:v></c:pt>';
+      return s + '</c:numCache></c:numRef>';
+    }
+    function col(i) { return CHART_CLR[i % CHART_CLR.length]; }
+    function txPr(sz) {
+      return '<c:txPr><a:bodyPr/><a:lstStyle/><a:p><a:pPr><a:defRPr sz="' + (sz || 1100) + '">'
+        + '<a:solidFill><a:srgbClr val="' + CLR.dim + '"/></a:solidFill></a:defRPr></a:pPr><a:endParaRPr lang="zh-CN"/></a:p></c:txPr>';
+    }
+    var cl = "A", body = "", i, j;
+    var sersXml = "";
+    for (i = 0; i < sers.length; i++) {
+      var sname = sers[i].name || ("系列" + (i + 1));
+      var colLetter = String.fromCharCode(66 + i);            // B、C、D…
+      var fill = (type === "pie")
+        ? ""                                                   // 饼图靠 dPt 分色，见下
+        : '<c:spPr><a:solidFill><a:srgbClr val="' + col(i) + '"/></a:solidFill><a:ln><a:noFill/></a:ln></c:spPr>';
+      var dpts = "";
+      if (type === "pie") {
+        for (j = 0; j < cats.length; j++) {
+          dpts += '<c:dPt><c:idx val="' + j + '"/><c:bubble3D val="0"/>'
+            + '<c:spPr><a:solidFill><a:srgbClr val="' + col(j) + '"/></a:solidFill><a:ln w="12700"><a:solidFill><a:srgbClr val="FFFFFF"/></a:solidFill></a:ln></c:spPr></c:dPt>';
+        }
+      }
+      var marker = (type === "line") ? '<c:marker><c:symbol val="circle"/><c:size val="6"/><c:spPr><a:solidFill><a:srgbClr val="' + col(i) + '"/></a:solidFill></c:spPr></c:marker>' : "";
+      var lnSp = (type === "line") ? '<c:spPr><a:ln w="28575" cap="rnd"><a:solidFill><a:srgbClr val="' + col(i) + '"/></a:solidFill><a:round/></a:ln><a:effectLst/></c:spPr>' : fill;
+      sersXml += '<c:ser><c:idx val="' + i + '"/><c:order val="' + i + '"/>'
+        + '<c:tx>' + strCache([sname], "Sheet1!$" + colLetter + "$1") + '</c:tx>'
+        + lnSp + dpts + marker
+        + '<c:dLbls><c:spPr><a:noFill/><a:ln><a:noFill/></a:ln></c:spPr>' + txPr(1000)
+        + '<c:dLblPos val="' + (type === "bar" ? "outEnd" : (type === "pie" ? "bestFit" : "t")) + '"/>'
+        + '<c:showLegendKey val="0"/><c:showVal val="1"/><c:showCatName val="0"/><c:showSerName val="0"/><c:showPercent val="0"/><c:showBubbleSize val="0"/></c:dLbls>'
+        + '<c:cat>' + strCache(cats, "Sheet1!$A$2:$A$" + (cats.length + 1)) + '</c:cat>'
+        + '<c:val>' + numCache(sers[i].values || [], "Sheet1!$" + colLetter + "$2:$" + colLetter + "$" + (cats.length + 1)) + '</c:val>'
+        + (type === "line" ? '<c:smooth val="0"/>' : "")
+        + '</c:ser>';
+    }
+    var axIdC = 111111111, axIdV = 222222222;
+    if (type === "pie") {
+      body = '<c:pieChart><c:varyColors val="1"/>' + sersXml + '<c:firstSliceAng val="0"/></c:pieChart>';
+    } else if (type === "line") {
+      body = '<c:lineChart><c:grouping val="standard"/><c:varyColors val="0"/>' + sersXml
+        + '<c:marker val="1"/><c:axId val="' + axIdC + '"/><c:axId val="' + axIdV + '"/></c:lineChart>';
+    } else {
+      body = '<c:barChart><c:barDir val="col"/><c:grouping val="clustered"/><c:varyColors val="0"/>' + sersXml
+        + '<c:gapWidth val="70"/><c:overlap val="-10"/><c:axId val="' + axIdC + '"/><c:axId val="' + axIdV + '"/></c:barChart>';
+    }
+    var axes = "";
+    if (type !== "pie") {
+      axes = '<c:catAx><c:axId val="' + axIdC + '"/><c:scaling><c:orientation val="minMax"/></c:scaling><c:delete val="0"/><c:axPos val="b"/>'
+        + '<c:spPr><a:ln w="9525"><a:solidFill><a:srgbClr val="D8D4CC"/></a:solidFill></a:ln></c:spPr>' + txPr()
+        + '<c:crossAx val="' + axIdV + '"/><c:crosses val="autoZero"/><c:auto val="1"/><c:lblAlgn val="ctr"/><c:lblOffset val="100"/><c:noMultiLvlLbl val="0"/></c:catAx>'
+        + '<c:valAx><c:axId val="' + axIdV + '"/><c:scaling><c:orientation val="minMax"/></c:scaling><c:delete val="0"/><c:axPos val="l"/>'
+        + '<c:majorGridlines><c:spPr><a:ln w="9525"><a:solidFill><a:srgbClr val="EDEAE3"/></a:solidFill></a:ln></c:spPr></c:majorGridlines>'
+        + '<c:numFmt formatCode="General" sourceLinked="1"/><c:majorTickMark val="none"/><c:minorTickMark val="none"/><c:tickLblPos val="nextTo"/>'
+        + '<c:spPr><a:ln><a:noFill/></a:ln></c:spPr>' + txPr()
+        + '<c:crossAx val="' + axIdC + '"/><c:crosses val="autoZero"/><c:crossBetween val="between"/></c:valAx>';
+    }
+    var title = ch.title
+      ? '<c:title><c:tx><c:rich><a:bodyPr/><a:lstStyle/><a:p><a:pPr><a:defRPr sz="1200" b="1"><a:solidFill><a:srgbClr val="' + CLR.tx + '"/></a:solidFill></a:defRPr></a:pPr>'
+        + '<a:r><a:rPr lang="zh-CN" sz="1200" b="1"/><a:t>' + esc(ch.title) + '</a:t></a:r></a:p></c:rich></c:tx><c:overlay val="0"/></c:title><c:autoTitleDeleted val="0"/>'
+      : '<c:autoTitleDeleted val="1"/>';
+    var legend = (sers.length > 1 || type === "pie")
+      ? '<c:legend><c:legendPos val="b"/><c:overlay val="0"/>' + txPr() + '</c:legend>' : "";
+    return XD + '<c:chartSpace xmlns:c="http://schemas.openxmlformats.org/drawingml/2006/chart" ' + A + ' ' + R + '>'
+      + '<c:date1904 val="0"/><c:lang val="zh-CN"/><c:roundedCorners val="0"/>'
+      + '<c:chart>' + title + '<c:plotArea><c:layout/>' + body + axes
+      + '<c:spPr><a:noFill/><a:ln><a:noFill/></a:ln></c:spPr></c:plotArea>' + legend
+      + '<c:plotVisOnly val="1"/><c:dispBlanksAs val="gap"/></c:chart>'
+      + '<c:spPr><a:noFill/><a:ln><a:noFill/></a:ln></c:spPr>'
+      + '<c:externalData r:id="rId1"><c:autoUpdate val="0"/></c:externalData></c:chartSpace>';
+  }
+  // 内嵌工作簿：一个最小 xlsx（自己也是 zip——正好复用上面的 zipStore）
+  function chartXlsx(ch) {
+    var cats = ch.categories || [], sers = ch.series || [], i, j;
+    var rows = '<row r="1"><c r="A1" t="inlineStr"><is><t></t></is></c>';
+    for (i = 0; i < sers.length; i++) {
+      rows += '<c r="' + String.fromCharCode(66 + i) + '1" t="inlineStr"><is><t>' + esc(sers[i].name || ("系列" + (i + 1))) + '</t></is></c>';
+    }
+    rows += '</row>';
+    for (j = 0; j < cats.length; j++) {
+      rows += '<row r="' + (j + 2) + '"><c r="A' + (j + 2) + '" t="inlineStr"><is><t>' + esc(cats[j]) + '</t></is></c>';
+      for (i = 0; i < sers.length; i++) {
+        var v = (sers[i].values || [])[j];
+        rows += '<c r="' + String.fromCharCode(66 + i) + (j + 2) + '"><v>' + (isFinite(v) ? v : 0) + '</v></c>';
+      }
+      rows += '</row>';
+    }
+    var SS = 'xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"';
+    return zipStore([
+      { name: "[Content_Types].xml", data: enc(XD + '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">'
+        + '<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>'
+        + '<Default Extension="xml" ContentType="application/xml"/>'
+        + '<Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>'
+        + '<Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/></Types>') },
+      { name: "_rels/.rels", data: enc(XD + '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
+        + '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>') },
+      { name: "xl/workbook.xml", data: enc(XD + '<workbook ' + SS + ' ' + R + '><sheets><sheet name="Sheet1" sheetId="1" r:id="rId1"/></sheets></workbook>') },
+      { name: "xl/_rels/workbook.xml.rels", data: enc(XD + '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
+        + '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/></Relationships>') },
+      { name: "xl/worksheets/sheet1.xml", data: enc(XD + '<worksheet ' + SS + '><sheetData>' + rows + '</sheetData></worksheet>') },
+    ]);
+  }
+  function frame(id, rid, x, y, cx, cy) {
+    return '<p:graphicFrame><p:nvGraphicFramePr><p:cNvPr id="' + id + '" name="Chart ' + id + '"/>'
+      + '<p:cNvGraphicFramePr/><p:nvPr/></p:nvGraphicFramePr>'
+      + '<p:xfrm><a:off x="' + x + '" y="' + y + '"/><a:ext cx="' + cx + '" cy="' + cy + '"/></p:xfrm>'
+      + '<a:graphic><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/chart">'
+      + '<c:chart xmlns:c="http://schemas.openxmlformats.org/drawingml/2006/chart" ' + R + ' r:id="' + rid + '"/>'
+      + '</a:graphicData></a:graphic></p:graphicFrame>';
   }
 
   function theme(nm) {
@@ -228,6 +363,7 @@
     var ctypes = XD + '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">'
       + '<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>'
       + '<Default Extension="xml" ContentType="application/xml"/>'
+      + '<Default Extension="xlsx" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"/>'
       + '<Override PartName="/ppt/presentation.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.presentation.main+xml"/>'
       + '<Override PartName="/ppt/slideMasters/slideMaster1.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.slideMaster+xml"/>'
       + '<Override PartName="/ppt/slideLayouts/slideLayout1.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.slideLayout+xml"/>'
@@ -239,6 +375,7 @@
     for (i = 0; i < all.length; i++) {
       ctypes += '<Override PartName="/ppt/slides/slide' + (i + 1) + '.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.slide+xml"/>';
       if (all[i].notes) ctypes += '<Override PartName="/ppt/notesSlides/notesSlide' + (i + 1) + '.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.notesSlide+xml"/>';
+      if (hasChart(all[i])) ctypes += '<Override PartName="/ppt/charts/chart' + (i + 1) + '.xml" ContentType="application/vnd.openxmlformats-officedocument.drawingml.chart+xml"/>';
     }
     files.push({ name: "[Content_Types].xml", data: enc(ctypes + "</Types>") });
 
@@ -299,6 +436,13 @@
           + '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/notesMaster" Target="../notesMasters/notesMaster1.xml"/>'
           + '<Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slide" Target="../slides/slide' + (i + 1) + '.xml"/></Relationships>') });
       }
+      if (hasChart(s)) {
+        rels += '<Relationship Id="rId9" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/chart" Target="../charts/chart' + (i + 1) + '.xml"/>';
+        files.push({ name: "ppt/charts/chart" + (i + 1) + ".xml", data: enc(chartXml(s.chart, i + 1)) });
+        files.push({ name: "ppt/charts/_rels/chart" + (i + 1) + ".xml.rels", data: enc(XD + '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
+          + '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/package" Target="../embeddings/data' + (i + 1) + '.xlsx"/></Relationships>') });
+        files.push({ name: "ppt/embeddings/data" + (i + 1) + ".xlsx", data: chartXlsx(s.chart) });
+      }
       rels += '</Relationships>';
       files.push({ name: "ppt/slides/_rels/slide" + (i + 1) + ".xml.rels", data: enc(rels) });
     }
@@ -319,14 +463,24 @@
       cur.title = (cur.title || "").trim();
       cur.notes = (cur.notes || "").trim();
       cur.bullets = cur.bullets.filter(function (x) { return x; });
-      if (cur.title || cur.bullets.length) {
-        cur.kind = cur.bullets.length ? "content" : "section";
+      if (cur.title || cur.bullets.length || cur.chart) {
+        // 有图表就一定是内容页（哪怕一条要点都没有——整幅图那种）
+        cur.kind = (cur.bullets.length || cur.chart) ? "content" : "section";
         deck.slides.push(cur);
       }
       cur = null;
     }
     for (i = 0; i < lines.length; i++) {
       var L = lines[i], m;
+      // ```chart 围栏：整块收走再交给 chartOf()。必须先于分隔线判断——围栏里也可能出现 ---
+      if (/^\s*```\s*chart\s*$/i.test(L)) {
+        var buf = [];
+        for (i++; i < lines.length && !/^\s*```\s*$/.test(lines[i]); i++) buf.push(lines[i]);
+        if (!cur) cur = { title: "", bullets: [], notes: "" };
+        var ch = chartOf(buf);
+        if (ch) cur.chart = ch;
+        continue;
+      }
       if (/^\s*(-{3,}|\*{3,}|_{3,})\s*$/.test(L)) { push(); cur = { title: "", bullets: [], notes: "" }; continue; }
       if ((m = L.match(/^\s*#\s+(.*)$/))) { if (!deck.title) { deck.title = m[1].trim(); } else { push(); cur = { title: m[1].trim(), bullets: [], notes: "" }; } continue; }
       if ((m = L.match(/^\s*##\s+(.*)$/))) {
@@ -350,6 +504,47 @@
     }
     push();
     return deck;
+  }
+  /* 图表块的写法（服务端提示里写死同一套）：
+       type: bar | line | pie
+       title: 图题
+       categories: 甲, 乙, 丙
+       series: 系列名 | 1, 2, 3
+     解析要宽容：中英文冒号/逗号都认；数字带 % 或「万」照样取得出数；
+     但**绝不猜**——分类数与数值数对不上就按分类数截齐/补零，宁可少画也不编数。 */
+  function chartOf(lines) {
+    var ch = { type: "bar", title: "", categories: [], series: [] }, i;
+    function cut(s) { return String(s).split(/[:：]/).slice(1).join(":").trim(); }
+    function items(s) { return String(s).split(/[,，、]/).map(function (x) { return x.trim(); }).filter(function (x) { return x !== ""; }); }
+    function num(s) {
+      var t = String(s).replace(/[^\d.\-eE+]/g, "");
+      var v = parseFloat(t);
+      return isFinite(v) ? v : 0;
+    }
+    for (i = 0; i < lines.length; i++) {
+      var L = String(lines[i] || "").trim();
+      if (!L) continue;
+      if (/^type\s*[:：]/i.test(L)) {
+        var tp = cut(L).toLowerCase();
+        ch.type = /pie|饼/.test(tp) ? "pie" : (/line|折线|线/.test(tp) ? "line" : "bar");
+      } else if (/^(title|图题|标题)\s*[:：]/i.test(L)) ch.title = cut(L);
+      else if (/^(categories|cats|分类|横轴)\s*[:：]/i.test(L)) ch.categories = items(cut(L)).slice(0, 12);
+      else if (/^(series|系列|数据)\s*[:：]/i.test(L)) {
+        var rest = cut(L), parts = rest.split(/[|｜]/);
+        var nm = parts.length > 1 ? parts[0].trim() : "";
+        var vals = items(parts.length > 1 ? parts.slice(1).join("|") : rest).map(num);
+        ch.series.push({ name: nm, values: vals });
+      }
+    }
+    if (!ch.categories.length || !ch.series.length) return null;
+    for (i = 0; i < ch.series.length; i++) {
+      var v = ch.series[i].values.slice(0, ch.categories.length);
+      while (v.length < ch.categories.length) v.push(0);
+      ch.series[i].values = v;
+      if (!ch.series[i].name) ch.series[i].name = ch.title || "数值";
+    }
+    if (ch.type === "pie") ch.series = ch.series.slice(0, 1);   // 饼图只有一个系列有意义
+    return ch;
   }
   function clean(s) {
     return String(s || "").replace(/\*\*([^*]+)\*\*/g, "$1").replace(/`([^`]+)`/g, "$1")

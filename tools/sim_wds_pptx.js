@@ -125,6 +125,61 @@ console.log("── 三 · 畸形输入不许炸");
   });
 }
 
+console.log("── 三点五 · 图表：原生图表＋内嵌工作簿");
+{
+  const CH = [
+    "# 封面", "## 副标题", "---",
+    "## 比大小", "- 一条要点",
+    "```chart", "type: bar", "title: 两次真跑", "categories: S, D, E, I, F",
+    "series: 操作自盲 | 133, 129, 121, 115, 128", "series: 引擎室 | 130,148,125,115,115", "```",
+    "> 讲稿：两根柱子在 I 上一样矮。", "---",
+    "## 看构成",
+    "```chart", "type: 饼", "标题: 扣分构成", "分类: 甲、乙、丙", "系列: 扣分 | 16、9、7", "```", "---",
+    "## 看趋势",
+    "```chart", "type: line", "categories: 五月, 六月", "series: 走势 | 118%, 124%", "```",
+  ].join("\n");
+  const d = X.parse(CH);
+  ok(d.slides.length === 3, "三张图表页都切出来了（实得 " + d.slides.length + "）");
+  ok(d.slides[0].chart.type === "bar" && d.slides[0].chart.series.length === 2, "柱状图两个系列");
+  ok(d.slides[0].chart.series[1].values.length === 5, "第二个系列不带空格也解析得出（实得 " + d.slides[0].chart.series[1].values.length + " 个值）");
+  ok(d.slides[1].chart.type === "pie" && d.slides[1].chart.series.length === 1, "中文 type/标题/分类/系列 与顿号都认；饼图只留一个系列");
+  ok(d.slides[1].chart.categories.length === 3, "顿号分隔的分类切得开");
+  ok(d.slides[2].chart.series[0].values[0] === 118, "数值带 % 也取得出数");
+  ok(d.slides[1].kind === "content", "只有图没有要点的页也是内容页，不会被当成过渡页");
+  ok(d.slides[0].bullets.length === 1 && /开场|一条要点/.test(d.slides[0].bullets[0]), "图表块不会把要点吃掉");
+  ok(/两根柱子/.test(d.slides[0].notes), "图表块之后的讲稿仍收得到");
+  // 数值个数与分类对不上时：截齐/补零，绝不编数
+  const mis = X.parse("# a\n---\n## x\n```chart\ncategories: 甲, 乙, 丙\nseries: s | 1, 2, 3, 4, 5\n```");
+  ok(mis.slides[0].chart.series[0].values.length === 3, "数值多了就截到分类数");
+  const short = X.parse("# a\n---\n## x\n```chart\ncategories: 甲, 乙, 丙\nseries: s | 1\n```");
+  ok(short.slides[0].chart.series[0].values.join(",") === "1,0,0", "数值少了补 0，不猜");
+  const noCat = X.parse("# a\n---\n## x\n```chart\ntype: bar\nseries: s | 1,2\n```");
+  ok(!noCat.slides[0].chart, "没有分类就不出图（宁可不画也不编）");
+
+  const b2 = Buffer.from(X.build(d));
+  const z2 = unzip(b2);
+  ok(!!z2["ppt/charts/chart2.xml"] && !!z2["ppt/charts/chart3.xml"] && !!z2["ppt/charts/chart4.xml"], "三张图表各有自己的 chart 部件");
+  ok(!!z2["ppt/embeddings/data2.xlsx"], "带内嵌工作簿——没有它 PowerPoint 的「编辑数据」打不开");
+  const inner = unzip(z2["ppt/embeddings/data2.xlsx"]);
+  ok(!!inner["xl/worksheets/sheet1.xml"], "内嵌工作簿本身也是个完整 xlsx（zip 套 zip）");
+  ok(/<v>133<\/v>/.test(inner["xl/worksheets/sheet1.xml"].toString("utf8")), "工作簿里是真数据，不是占位");
+  const ct2 = z2["[Content_Types].xml"].toString("utf8");
+  ok(/drawingml\.chart\+xml/.test(ct2) && (ct2.match(/drawingml\.chart\+xml/g) || []).length === 3, "每张图表都在 Content_Types 里登记");
+  ok(/Extension="xlsx"/.test(ct2), "xlsx 扩展名有 Default 声明（漏了 PowerPoint 直接判损坏）");
+  const s2 = z2["ppt/slides/slide2.xml"].toString("utf8");
+  ok(/graphicFrame/.test(s2) && /r:id="rId9"/.test(s2), "幻灯片里有 graphicFrame 指向图表");
+  ok(/Type="[^"]*relationships\/chart"/.test(z2["ppt/slides/_rels/slide2.xml.rels"].toString("utf8")), "关系类型是 chart");
+  const c2 = z2["ppt/charts/chart2.xml"].toString("utf8");
+  ok(/<c:barChart>/.test(c2) && /<c:barDir val="col"\/>/.test(c2), "柱状图是 barChart/col");
+  ok(/<c:externalData r:id="rId1"\/?>/.test(c2) || /<c:externalData r:id="rId1">/.test(c2), "图表指回内嵌工作簿");
+  ok(/<c:pieChart>/.test(z2["ppt/charts/chart3.xml"].toString("utf8")), "饼图是 pieChart");
+  ok(/<c:lineChart>/.test(z2["ppt/charts/chart4.xml"].toString("utf8")), "折线是 lineChart");
+  ok(/<c:dLbls>/.test(c2) && /showVal val="1"/.test(c2), "数值标签默认打开（不然读者要眯着眼估）");
+  ok(/<c:legend>/.test(c2), "两个以上系列才给图例");
+  ok(!/<c:legend>/.test(z2["ppt/charts/chart4.xml"].toString("utf8")), "单系列折线不放图例（一条线还配图例是噪音）");
+  ok(/<c:legend>/.test(z2["ppt/charts/chart3.xml"].toString("utf8")), "饼图一定给图例（不然认不出哪块是哪块）");
+}
+
 console.log("── 四 · 两端接线");
 {
   ok(/deck: \{ name: "对外 PPT"/.test(wk), "worker 有第四档");
@@ -134,11 +189,14 @@ console.log("── 四 · 两端接线");
   ok(/8–14 页/.test(wk), "页数有上下限");
   ok(/不许只报喜/.test(wk), "要求写进不利证据");
   ok(/KIND_KEYS = \["report", "essay", "outline", "deck"\]/.test(wm), "客户端菜单加了第四档");
-  ok(/function pptxBoot\(/.test(wm) && /assets\/wds-pptx\.js/.test(wm), "客户端懒加载共享模块");
+  ok(/function pptxBoot\(/.test(wm) && /assets\/wds-pptx\.js\?v=/.test(wm), "客户端懒加载共享模块，且模块带版本号（改了能刷到）");
   ok(/pptxBoot\(function \(\) \{\}\);/.test(wm), "成文面板一开就先拉模块（点击那一刻必须已在内存）");
   ok(/window\.WDSPptx\.blob\(d\)/.test(wm) && /saveBlobToDir\(nm, blob/.test(wm), "同步造字节后再存盘（不让用户手势过期）");
   ok(/typeof text\.size === "number"/.test(wm), "download 认得 Blob，不把二进制包成 text/markdown");
   ok(/dPptxNo/.test(wm), "切不出页时说人话，不给一个空文件");
+  ok(/有数字就上图表/.test(wk), "提示教会了图表围栏");
+  ok(/绝不许为了好看编一组数/.test(wk), "明令不许编数——编出来的图比没有图坏得多");
+  ok(/一页最多一个图表；categories 最多 6 个/.test(wk), "图表有上限（版面与可读性）");
 }
 
 console.log("\n===== " + P + " PASS / " + F + " FAIL =====");

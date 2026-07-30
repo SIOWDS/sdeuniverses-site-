@@ -3995,6 +3995,11 @@ export default {
           + "· 页内要点用 `- ` 开头，每页 3–5 条，**每条不超过 24 字且必须是判断句**（「X 不是 Y，而是 Z」这类），不许是名词短语。\n"
           + "· 每页最后一行 `> ` 开头写讲稿：站上会怎么讲这一页，2–3 句，含一个不能省的例子或数字。\n"
           + "· 想要一张过渡页时：只写 `## 一、章节名`、不写要点、不写讲稿。\n"
+          + "· **有数字就上图表**（会生成 PowerPoint 原生图表，可编辑数据，不是图片）。在那一页的要点之后插一个围栏块：\n"
+          + "  ```chart\n  type: bar\n  title: 图题\n  categories: 甲, 乙, 丙\n  series: 系列名 | 12, 34, 56\n  ```\n"
+          + "  type 三选一：bar 柱状（比大小）／line 折线（看趋势）／pie 饼（看构成，只放一个 series）。多系列就写多行 series，各行数值个数必须与 categories 一样多。\n"
+          + "  **数字只准来自这场对话里真出现过的**——没有真数字就不要画图，绝不许为了好看编一组数（编出来的图比没有图坏得多）。\n"
+          + "  一页最多一个图表；categories 最多 6 个；有图表的那页要点压到 2–3 条（版面要留给图）。\n"
           + "【内容要求】\n"
           + "① 全套 8–14 页（含封面），页数按内容定，别凑。\n"
           + "② 第二页必须是「问题是什么」，最后一页必须是「下一步做什么」，中间按论证顺序排，不按对话顺序排。\n"
@@ -4583,49 +4588,6 @@ export default {
           // 索引里有小到几百字节的分片（如 shard-plagiarism），门槛不能按 PDF 的 1000 字节一刀切。
           const _min = _isIdx ? 2 : 1000;
           if (!buf || buf.byteLength < _min) { out.push({ p: p, ok: false, msg: "取回的字节数不对：" + (buf ? buf.byteLength : 0) }); continue; }
-          await env.PDFS.put(p, buf, _isIdx
-            ? { httpMetadata: { contentType: "application/json; charset=utf-8", cacheControl: "no-cache" } }
-            : { httpMetadata: { contentType: "application/pdf", cacheControl: "public, max-age=31536000, immutable" } });
-          const hd2 = await env.PDFS.head(p);
-          out.push({ p: p, ok: !!hd2 && hd2.size === buf.byteLength, size: buf.byteLength, r2: hd2 ? hd2.size : 0 });
-        } catch (e) { out.push({ p: p, ok: false, msg: (e && e.message) || "put 失败" }); }
-      }
-      return J({ ok: true, done: out });
-    }
-    // R2_PUT：**直接把字节写进 R2**，不经过仓库。
-    // 为什么要有它：r2-migrate 是"从 ASSETS 搬到桶里"，也就是文件必须**先进 git 才能进 R2**——
-    // 对自动存档来说方向是反的（要两次提交，中间还得在 git 里留一份，仓库照旧长胖）。
-    // 危险在于它不会报错：取文件是"先查 R2、落空回落 ASSETS"，所以新 PDF 提交进 git 照样能显示，
-    // 仓库悄悄重新长胖，等哪天有人按"PDF 都在 R2 了"去清 git，新发的那批当场 404。
-    // 能力刻意收窄到与 r2-migrate 同一个白名单（口令是前端级的，泄露了也必须无害）。
-    if (url.pathname === "/api/admin/r2-put" && request.method === "POST") {
-      let b = {}; try { b = await request.json(); } catch (e) {}
-      const J = (o, st) => Response.json(o, { status: st || 200, headers: _cors() });
-      if (String(b.pass || "") !== "SDE2013") return J({ ok: false, msg: "口令不对。" }, 401);
-      if (!env.PDFS) return J({ ok: false, msg: "还没绑定 R2 桶（wrangler.jsonc 里的 PDFS）。" }, 400);
-      // 单个也走 files 数组，调用方不必分辨两种形状。
-      const files = (Array.isArray(b.files) ? b.files : (b.path ? [{ path: b.path, b64: b.b64 }] : [])).slice(0, 10);
-      const out = [];
-      for (const f0 of files) {
-        const f = f0 || {};
-        const p = String(f.path || "");
-        const _isIdx = IDX_KEYS.test(p);
-        if ((!/^students\/[A-Za-z0-9._\-\/]+\.pdf$/i.test(p) && !_isIdx) || p.indexOf("..") >= 0) { out.push({ p: p, ok: false, msg: "路径不在允许范围" }); continue; }
-        try {
-          if (!b.force) { const hd = await env.PDFS.head(p); if (hd) { out.push({ p: p, ok: true, skip: 1, size: hd.size }); continue; } }
-          let buf;
-          try { buf = _b64ToBytes(String(f.b64 || "")).buffer; }
-          catch (e) { out.push({ p: p, ok: false, msg: "base64 解不开" }); continue; }
-          // 与 r2-migrate 同一道门槛：索引分片小到几百字节，不能按 PDF 的 1000 一刀切。
-          const _min = _isIdx ? 2 : 1000;
-          if (!buf || buf.byteLength < _min) { out.push({ p: p, ok: false, msg: "字节数不对：" + (buf ? buf.byteLength : 0) }); continue; }
-          // 真是 PDF 才让进：白名单只管路径长相，管不住内容；写错内容比写错路径更难发现。
-          if (!_isIdx) {
-            const head4 = new Uint8Array(buf.slice(0, 4));
-            if (!(head4[0] === 0x25 && head4[1] === 0x50 && head4[2] === 0x44 && head4[3] === 0x46)) {
-              out.push({ p: p, ok: false, msg: "不是 PDF（开头不是 %PDF）" }); continue;
-            }
-          }
           await env.PDFS.put(p, buf, _isIdx
             ? { httpMetadata: { contentType: "application/json; charset=utf-8", cacheControl: "no-cache" } }
             : { httpMetadata: { contentType: "application/pdf", cacheControl: "public, max-age=31536000, immutable" } });
