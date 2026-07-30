@@ -315,5 +315,37 @@ console.log("── 四 · 两端接线");
   ok(/deckReady \|\| deckOf\(text\)/.test(wm), "点按钮时优先用预取好的那份");
 }
 
+console.log("── 五 · 模板＝写作 Skill（骨架＋纪律＋主题三件绑死）");
+{
+  const ids = ["brief", "teach", "pitch", "research", "review", "talk"];
+  ok(/const DECK_TPL = \{/.test(wk), "服务端有模板表");
+  ids.forEach(function (id) { ok(new RegExp(id + ": \\{\\s*\\n?\\s*name:").test(wk), "有模板 " + id); });
+  ok(/const tplId = DECK_TPL\[b\.tpl\] \? b\.tpl : ""/.test(wk), "tpl 走白名单，认不出就当没选");
+  ok(/tplId \? \("\\n" \+ DECK_TPL\[tplId\]\.spec/.test(wk), "选了模板就把该模板的骨架拼进写作要求");
+  ok(/本次未指定模板/.test(wk), "没选模板也有兜底口径（不是静默少一段）");
+  // 六套骨架必须真不一样——否则"模板"只是换了个名字
+  const specs = ids.map(function (id) {
+    const i = wk.indexOf(id + ": {"), j = wk.indexOf("},", i);
+    return wk.slice(i, j);
+  });
+  const heads = specs.map(function (s) { return (s.match(/【本套模板：([^】]+)】/) || [])[1]; });
+  ok(new Set(heads).size === 6, "六套各有自己的抬头（实得 " + heads.join("/") + "）");
+  ok(specs.every(function (s) { return /页面骨架/.test(s) && /语气：/.test(s); }), "每套都写明页面骨架与语气");
+  ok(specs.every(function (s) { return /theme: "\w+"/.test(s); }), "每套都钉了视觉主题");
+  const themes = specs.map(function (s) { return (s.match(/theme: "(\w+)"/) || [])[1]; });
+  ok(new Set(themes).size === 6, "六套主题各不相同（" + themes.join("/") + "）");
+  ok(specs.filter(function (s) { return /```chart```/.test(s); }).length >= 4, "多数模板要求出图表");
+  ok(/不许只报喜/.test(specs[0]) && /证伪条件/.test(specs[3]), "汇报要写风险、研究要写证伪——纪律各按各的行当");
+  // 客户端
+  ok(/DECK_TPLS = \[/.test(wm), "客户端有对应的模板表");
+  ok(ids.every(function (id) { return new RegExp('id: "' + id + '"').test(wm); }), "两边 id 一一对应");
+  ok(/function tplMenu\(/.test(wm) && /if \(k === "deck"\) \{ tplMenu\(\); return; \}/.test(wm), "选 PPT 先问做成哪一种");
+  ok(/distill\("deck", null, null, x\.id\)/.test(wm), "选中的模板真传下去");
+  ok(/tpl: tpl \|\| ""/.test(wm), "请求体里带 tpl");
+  ok(/if \(tpl && !d\.theme\) d\.theme = tplTheme\(tpl\)/.test(wm), "渲染时按模板定主题，稿子里显式写了 theme: 则以稿子为准");
+  ok(/tplAuto: "自动｜由内容自己定"/.test(wm), "保留「自动」——不是每场谈话都套得进某个骨架");
+  ok(/不只是换配色/.test(wm), "菜单上说清楚模板改的是骨架不只是配色");
+}
+
 console.log("\n===== " + P + " PASS / " + F + " FAIL =====");
 process.exit(F ? 1 : 0);

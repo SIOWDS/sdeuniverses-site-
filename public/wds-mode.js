@@ -377,6 +377,14 @@
     tipDeck: "✦ 这场可以一键做成 PPT",
     tipX: "不再提示",
     needTalkDeck: "先聊两句——PPT 是从这一场对话锻出来的，空着做不出。",
+    tplPick: "做成哪一种？", tplNote: "选定后，基底会按这一种的页面骨架来写——不只是换配色",
+    tplAuto: "自动｜由内容自己定", tplAutoS: "不指定骨架，按这场谈的内容判断该有哪几页",
+    tplBrief: "工作汇报", tplBriefS: "结论先行 · 关键数字 · 风险 · 下一步（9–12 页）",
+    tplTeach: "教学讲义", tplTeachS: "一个概念 · 常见误解 · 步骤 · 自测（10–14 页）",
+    tplPitch: "路演提案", tplPitchS: "痛点 · 洞见 · 方案 · 凭什么是我们（9–12 页）",
+    tplResearch: "研究汇报", tplResearchS: "问题 · 方法 · 发现 · 最近邻 · 证伪条件（10–14 页）",
+    tplReview: "复盘总结", tplReviewS: "目标 · 实际 · 时间线 · 归因 · 改动清单（9–12 页）",
+    tplTalk: "观点演讲", tplTalkS: "一句主张 · 三页证据 · 引文 · 反对意见（8–11 页）",
     stopGen: "停止生成", stopHint: "Esc", stopped: "已停下——上面写出来的部分留着了",
     kDeck: "对外 PPT", kDeckS: "做成一套汇报幻灯片，可直接下载 .pptx",
     dPptx: "⤓ 存为 .pptx", dPptxWait: "正在生成 .pptx…", dPptxNo: "这份稿子切不出幻灯片（需要 ## 页标题与 - 要点）",
@@ -503,6 +511,14 @@
     tipDeck: "✦ Turn this chat into a deck",
     tipX: "Don't show again",
     needTalkDeck: "Talk a little first — the deck is forged from this conversation.",
+    tplPick: "Which kind of deck?", tplNote: "The model writes to the chosen skeleton — this is more than a colour scheme",
+    tplAuto: "Auto · let the content decide", tplAutoS: "No fixed skeleton; pages are chosen from what was discussed",
+    tplBrief: "Status briefing", tplBriefS: "Conclusion first · key numbers · risks · next steps (9–12)",
+    tplTeach: "Teaching deck", tplTeachS: "One concept · misconceptions · steps · self-check (10–14)",
+    tplPitch: "Pitch", tplPitchS: "Pain · insight · plan · why us (9–12)",
+    tplResearch: "Research talk", tplResearchS: "Question · method · findings · nearest work · falsifiers (10–14)",
+    tplReview: "Retrospective", tplReviewS: "Goals · actuals · timeline · causes · changes (9–12)",
+    tplTalk: "Opinion talk", tplTalkS: "One claim · three proofs · quote · objections (8–11)",
     stopGen: "Stop generating", stopHint: "Esc", stopped: "Stopped — what's above is kept",
     kDeck: "Slide deck", kDeckS: "Turn this chat into a deck — download as .pptx",
     dPptx: "⤓ Save as .pptx", dPptxWait: "Building .pptx…", dPptxNo: "This draft has no slides to cut (needs ## titles and - bullets)",
@@ -589,6 +605,13 @@
     ".wdsm-egs{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:22px}" +
     ".wdsm-eg{background:var(--wfill);border:1px solid var(--wline);color:var(--wtx);border-radius:12px;padding:10px 14px;font-size:13.5px;cursor:pointer;text-align:left;transition:border-color .15s}" +
     ".wdsm-eg:hover{border-color:var(--wline2)}" +
+    ".wdsm-tplb{max-width:520px;width:100%;background:var(--wpanel);border:1px solid var(--wline2);border-radius:16px;padding:20px 22px;max-height:84vh;overflow:auto}" +
+    ".wdsm-tplb h4{margin:0 0 4px;font-size:16px;color:var(--wtx2)}" +
+    ".wdsm-tplnote{font-size:12px;color:var(--wdim2);line-height:1.6;margin:0 0 14px}" +
+    ".wdsm-tplitem{display:block;width:100%;text-align:left;background:var(--wfill);border:1px solid var(--wline);border-radius:11px;padding:11px 14px;margin-bottom:8px;cursor:pointer}" +
+    ".wdsm-tplitem:hover{border-color:var(--wgold)}" +
+    ".wdsm-tplitem b{display:block;font-size:14px;color:var(--wtx2);font-weight:600;margin-bottom:3px}" +
+    ".wdsm-tplitem span{display:block;font-size:11.5px;color:var(--wdim);line-height:1.55}" +
     ".wdsm-new{font-style:normal;font-size:9.5px;font-weight:700;letter-spacing:.5px;color:#1a1508;background:var(--wgold);border-radius:4px;padding:2px 5px;margin-left:7px;vertical-align:2px}" +
     ".wdsm-hero-after{margin-top:26px;font-size:12.5px;line-height:1.7;color:var(--wdim2)}" +
     ".wdsm-tipdeck{position:absolute;top:-46px;left:50%;transform:translateX(-50%);display:none;align-items:center;gap:10px;height:34px;padding:0 8px 0 15px;border-radius:18px;border:1px solid var(--wgold);background:var(--wbg2);color:var(--wgold2);font:12.5px/1 inherit;cursor:pointer;z-index:5;box-shadow:0 4px 14px var(--wsh)}" +
@@ -879,6 +902,28 @@
     sc.onload = go; sc.onerror = function () {};
     document.head.appendChild(sc);
   }
+  /* 模板二级菜单：选哪一种，就等于给基底装哪一份写作 Skill。
+     「自动」保留——不是每场谈话都套得进某个骨架，硬套比不套坏。 */
+  function tplMenu() {
+    var m = el("div", "wdsm-help");
+    var box = el("div", "wdsm-tplb");
+    box.appendChild(el("h4", null, t("tplPick")));
+    box.appendChild(el("div", "wdsm-tplnote", t("tplNote")));
+    DECK_TPLS.forEach(function (x) {
+      var b = el("button", "wdsm-tplitem");
+      b.appendChild(el("b", null, t(x.key)));
+      b.appendChild(el("span", null, t(x.key + "S")));
+      b.onclick = function () {
+        if (m.parentNode) m.parentNode.removeChild(m);
+        distill("deck", null, null, x.id);
+      };
+      box.appendChild(b);
+    });
+    m.appendChild(box);
+    m.onclick = function (ev) { if (!ev || ev.target === m) { if (m.parentNode) m.parentNode.removeChild(m); } };
+    document.body.appendChild(m);
+    return m;
+  }
   function memBadge() {
     var b = layer.querySelector(".wdsm-mbadge");
     if (!b) return;
@@ -999,6 +1044,21 @@
   /* 可见性：功能在、但读者找不到，等于没有（PPT 与停止键连着栽了两次）。
      三条出口：①顶栏按钮自己写着「成文 · PPT」②空白页写明聊完能做什么
      ③第一次答完在输入框上方冒一次提示——**只冒一次、可永久关掉**，不做成常驻噪音。 */
+  /* PPT 模板：一套模板＝页面骨架＋写作纪律＋视觉主题。骨架与纪律在服务端（基底照它写），
+     主题在这边（渲染时用）。**两边的 id 必须一一对应**，改一边就要改另一边。 */
+  var DECK_TPLS = [
+    { id: "", key: "tplAuto", theme: "" },
+    { id: "brief", key: "tplBrief", theme: "slate" },
+    { id: "teach", key: "tplTeach", theme: "forest" },
+    { id: "pitch", key: "tplPitch", theme: "clay" },
+    { id: "research", key: "tplResearch", theme: "ink" },
+    { id: "review", key: "tplReview", theme: "plum" },
+    { id: "talk", key: "tplTalk", theme: "night" },
+  ];
+  function tplTheme(id) {
+    for (var i = 0; i < DECK_TPLS.length; i++) if (DECK_TPLS[i].id === id) return DECK_TPLS[i].theme;
+    return "";
+  }
   var TIP_KEY = "sde_wds_tipdeck_off";
   function tipDeckShow() {
     var b = layer.querySelector(".wdsm-tipdeck");
@@ -2133,7 +2193,11 @@
       b.appendChild(document.createTextNode(kindT(k)));
       if (k === "deck") { var nb = el("i", "wdsm-new", "NEW"); b.appendChild(nb); }
       b.appendChild(el("span", "sub", kindS(k)));
-      b.onclick = function () { if (menu.parentNode) menu.parentNode.removeChild(menu); distill(k); };
+      b.onclick = function () {
+        if (menu.parentNode) menu.parentNode.removeChild(menu);
+        if (k === "deck") { tplMenu(); return; }        // PPT 先问做成哪一种
+        distill(k);
+      };
       menu.appendChild(b);
     });
     var dl = el("button");
@@ -2215,7 +2279,7 @@
   }
 
   // 成文面板。第三个参数给「成文记录」复用：直接把存下的正文摊开，不再调基底。
-  function distill(kind, existing, title) {
+  function distill(kind, existing, title, tpl) {
     var kv = existing ? {} : wdsKeyGet();
     if (!existing && !kv) { wdsKeyPanel(function () { distill(kind); }); return; }
     var wrap = el("div", "wdsm-dist");
@@ -2257,6 +2321,7 @@
         if (!window.WDSPptx) { stat.textContent = t("dPptxWait"); pptxBoot(function (ok) { if (ok) pxBtn.onclick(); }); return; }
         var d = deckReady || deckOf(text);        // 预取过就用预取的那份（带配图）
         if (!d) { stat.textContent = t("dPptxNo"); return; }
+        if (tpl && !d.theme) d.theme = tplTheme(tpl);      // 模板定的主题（稿子里写了 theme: 则以稿子为准）
         var blob = window.WDSPptx.blob(d);            // 同步造好字节，再去要目录/下载（手势还新鲜）
         var nm = "WDS-" + safeName(d.title || kindT(kind)) + "-" + stampName() + ".pptx";
         stat.textContent = t("dPptxOk") + (d.slides.length + 1);
@@ -2294,7 +2359,7 @@
     out.innerHTML = "<span class='cur'>▊</span>";
     dBump();
 
-    fetch(API_DISTILL, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ kind: kind, history: history, key: kv.key, vendor: kv.vendor, model: kv.model || "", lang: LANG }) })
+    fetch(API_DISTILL, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ kind: kind, history: history, key: kv.key, vendor: kv.vendor, model: kv.model || "", lang: LANG, tpl: tpl || "" }) })
       .then(function (resp) {
         if (!resp.ok || !resp.body) throw new Error("HTTP " + resp.status);
         var reader = resp.body.getReader(); dr = reader;
