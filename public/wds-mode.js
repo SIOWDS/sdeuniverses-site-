@@ -274,7 +274,7 @@
   var TXT = {
     zh: {
       tabNormal: "常规", tabBack: "\u2190 返回浏览", tabWds: "\u2726 问WDS",
-      bDistill: "\u270e 成文", bHist: "\u21ba 历史", bSet: "\u2699 设置", bNew: "\uff0b 新对话",
+      bDistill: "\u270e 成文 · PPT", bHist: "\u21ba 历史", bSet: "\u2699 设置", bNew: "\uff0b 新对话",
       heroSub: "王德生的 AI 分身 · SDE 本体论老师<br>检索全站文章与专著，也能直接和你对谈 SDE",
       egs: ["SDE 说的“显露”和“结构”有什么不同？", "用 SDE 怎么看慢性病的发生？", "什么是特征纠缠？举个例子", "帮我找几篇入门 SDE 的文章"],
       mAtt: "\ud83d\udcce 附件", mStd: "\u26a1 标准", mDeep: "\u25c8 深度思考", mWeb: "\ud83c\udf10 联网",
@@ -373,6 +373,10 @@
       aMd: "⧉ 原文", aEditIn: "✎ 编辑", edSave: "保存并重答", edCancel: "取消",
     aCont: "↳ 继续", contQ: "接着上面继续写下去，别重复已经写过的部分。",
     lkOpen: "打开站内这篇（新标签页）",
+    heroAfter: "聊完之后，顶栏 ✎ 可以把这一场做成报告 / 文章 / 提纲，或一套带图表的对外 PPT",
+    tipDeck: "✦ 这场可以一键做成 PPT",
+    tipX: "不再提示",
+    needTalkDeck: "先聊两句——PPT 是从这一场对话锻出来的，空着做不出。",
     stopGen: "停止生成", stopHint: "Esc", stopped: "已停下——上面写出来的部分留着了",
     kDeck: "对外 PPT", kDeckS: "做成一套汇报幻灯片，可直接下载 .pptx",
     dPptx: "⤓ 存为 .pptx", dPptxWait: "正在生成 .pptx…", dPptxNo: "这份稿子切不出幻灯片（需要 ## 页标题与 - 要点）",
@@ -394,7 +398,7 @@
     },
     en: {
       tabNormal: "Browse", tabBack: "\u2190 Back to site", tabWds: "\u2726 WDS",
-      bDistill: "\u270e Write up", bHist: "\u21ba History", bSet: "\u2699 Settings", bNew: "\uff0b New chat",
+      bDistill: "\u270e Write up · Deck", bHist: "\u21ba History", bSet: "\u2699 Settings", bNew: "\uff0b New chat",
       heroSub: "Wang Desheng's AI counterpart · a teacher of the SDE ontology<br>It searches the whole site, and it will also just think with you",
       egs: ["What separates Show from structure in SDE?", "How would SDE read the onset of a chronic disease?", "What is entanglement of features? Give an example.", "Point me at a few pieces to start with"],
       mAtt: "\ud83d\udcce Attach", mStd: "\u26a1 Standard", mDeep: "\u25c8 Deep", mWeb: "\ud83c\udf10 Web",
@@ -495,6 +499,10 @@
       aMd: "⧉ Source", aEditIn: "✎ Edit", edSave: "Save & regenerate", edCancel: "Cancel",
     aCont: "↳ Continue", contQ: "Continue from where you stopped; don't repeat what you already wrote.",
     lkOpen: "Open this article on the site (new tab)",
+    heroAfter: "Once you've talked, ✎ in the top bar turns this chat into a report, an article, an outline, or a slide deck with charts",
+    tipDeck: "✦ Turn this chat into a deck",
+    tipX: "Don't show again",
+    needTalkDeck: "Talk a little first — the deck is forged from this conversation.",
     stopGen: "Stop generating", stopHint: "Esc", stopped: "Stopped — what's above is kept",
     kDeck: "Slide deck", kDeckS: "Turn this chat into a deck — download as .pptx",
     dPptx: "⤓ Save as .pptx", dPptxWait: "Building .pptx…", dPptxNo: "This draft has no slides to cut (needs ## titles and - bullets)",
@@ -581,6 +589,12 @@
     ".wdsm-egs{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:22px}" +
     ".wdsm-eg{background:var(--wfill);border:1px solid var(--wline);color:var(--wtx);border-radius:12px;padding:10px 14px;font-size:13.5px;cursor:pointer;text-align:left;transition:border-color .15s}" +
     ".wdsm-eg:hover{border-color:var(--wline2)}" +
+    ".wdsm-new{font-style:normal;font-size:9.5px;font-weight:700;letter-spacing:.5px;color:#1a1508;background:var(--wgold);border-radius:4px;padding:2px 5px;margin-left:7px;vertical-align:2px}" +
+    ".wdsm-hero-after{margin-top:26px;font-size:12.5px;line-height:1.7;color:var(--wdim2)}" +
+    ".wdsm-tipdeck{position:absolute;top:-46px;left:50%;transform:translateX(-50%);display:none;align-items:center;gap:10px;height:34px;padding:0 8px 0 15px;border-radius:18px;border:1px solid var(--wgold);background:var(--wbg2);color:var(--wgold2);font:12.5px/1 inherit;cursor:pointer;z-index:5;box-shadow:0 4px 14px var(--wsh)}" +
+    ".wdsm-tipdeck.on{display:inline-flex}" +
+    ".wdsm-tipdeck b{font-weight:600}" +
+    ".wdsm-tipdeck em{font-style:normal;color:var(--wdim2);border-left:1px solid var(--wline);padding-left:9px;font-size:11.5px}" +
     ".wdsm-msgs{max-width:768px;width:100%;margin:0 auto;padding:34px 24px 56px}" +
     ".wdsm-turn{margin-bottom:46px;animation:wdsmFade .3s ease both}" +
     ".wdsm-q{text-align:right;margin-bottom:22px}" +
@@ -779,10 +793,12 @@
           "<h1 class='wdsm-h1'>问 <span class='dot'>WDS</span></h1>" +
           "<div class='wdsm-sub'></div>" +
           "<div class='wdsm-egs'></div>" +
+          "<div class='wdsm-hero-after'></div>" +
         "</div>" +
         "<div class='wdsm-msgs' style='display:none'></div>" +
       "</div>" +
       "<div class='wdsm-inbar'>" +
+        "<button class='wdsm-tipdeck'><b></b><em></em></button>" +
         "<button class='wdsm-stopbar'><span>\u25a0</span><b class='lb'></b><i></i></button>" +
         "<button class='wdsm-tobot' style='display:none'>\u2193</button>" +
         "<div class='wdsm-modes'>" +
@@ -980,6 +996,25 @@
       var tb = layer.querySelector(".wdsm-tobot"); if (tb) tb.style.display = "none";   // 同一位置，别叠在一起
     } else b.classList.remove("on");
   }
+  /* 可见性：功能在、但读者找不到，等于没有（PPT 与停止键连着栽了两次）。
+     三条出口：①顶栏按钮自己写着「成文 · PPT」②空白页写明聊完能做什么
+     ③第一次答完在输入框上方冒一次提示——**只冒一次、可永久关掉**，不做成常驻噪音。 */
+  var TIP_KEY = "sde_wds_tipdeck_off";
+  function tipDeckShow() {
+    var b = layer.querySelector(".wdsm-tipdeck");
+    if (!b || streaming) return;
+    try { if (localStorage.getItem(TIP_KEY) === "1") return; } catch (e) {}
+    if (history.length < 2) return;                       // 至少一问一答，空着做不出 PPT
+    var lb = b.querySelector && b.querySelector("b"), xb = b.querySelector && b.querySelector("em");
+    if (lb) lb.textContent = t("tipDeck"); else b.textContent = t("tipDeck");
+    if (xb) xb.textContent = "\u00d7 " + t("tipX");
+    b.classList.add("on");
+  }
+  function tipDeckHide(forever) {
+    var b = layer.querySelector(".wdsm-tipdeck");
+    if (b) b.classList.remove("on");
+    if (forever) { try { localStorage.setItem(TIP_KEY, "1"); } catch (e) {} }
+  }
   function atBottom() { return bodyEl.scrollHeight - bodyEl.scrollTop - bodyEl.clientHeight < 90; }
   function scrollBottom(smooth) {
     try { bodyEl.scrollTo({ top: bodyEl.scrollHeight, behavior: smooth ? "smooth" : "auto" }); }
@@ -998,6 +1033,7 @@
     q(".wdsm-distbtn").textContent = t("bDistill");
     q(".wdsm-histbtn").textContent = t("bHist");
     q(".wdsm-keybtn").textContent = t("bSet");
+    try { q(".wdsm-hero-after").textContent = t("heroAfter"); } catch (e) {}
     try { q(".wdsm-membtn .mb").textContent = t("bMem"); } catch (e) {}   // 按钮里还有个角标 <i>，不能整体 textContent
     q(".wdsm-newbtn").textContent = t("bNew");
     q(".wdsm-langbtn").textContent = LANG === "zh" ? "EN" : "中";
@@ -1230,6 +1266,11 @@
   layer.querySelector(".wdsm-keybtn").onclick = function () { wdsKeyPanel(function () {}); };
   layer.querySelector(".wdsm-membtn").onclick = function () { memBoot(); memPanel(); };
   layer.querySelector(".wdsm-stopbar").onclick = function () { stopGen(); };
+  layer.querySelector(".wdsm-tipdeck").onclick = function (ev) {
+    var onX = ev && ev.target && ev.target.tagName && ev.target.tagName.toLowerCase() === "em";
+    tipDeckHide(true);                                    // 点哪儿都不再提示——提示的使命是被用一次
+    if (!onX) distill("deck");
+  };
   layer.querySelector(".wdsm-langbtn").onclick = function () {
     LANG = LANG === "zh" ? "en" : "zh";
     try { localStorage.setItem(LS_LANG, LANG); } catch (e) {}
@@ -1966,7 +2007,7 @@
     history.push({ role: "reader", text: q }); updTurns(); stSave(history);
     streaming = true; stoppedByUser = false;
     sendEl.textContent = "■"; sendEl.classList.add("stop"); sendEl.title = t("stopGen"); sendEl.setAttribute("aria-label", t("arStop"));
-    stopBarShow(true);
+    stopBarShow(true); tipDeckHide(false);
     var payload = { q: q, history: histPack(), umem: memRecall(q), key: kv.key, vendor: kv.vendor, model: kv.model || "", mode: thinkMode, web: webOn ? 1 : 0, skey: wdsSearchKey(), about: aboutPlus(), lang: LANG, tool: curTool };
     var packed = docsForQuery(q);
     if (packed) {
@@ -1997,6 +2038,7 @@
       sendEl.textContent = "↑"; sendEl.classList.remove("stop"); sendEl.title = ""; sendEl.setAttribute("aria-label", t("arSend"));
       stopBarShow(false);
       if (stoppedByUser && answer) noteLine(cell, t("stopped"));
+      if (answer) setTimeout(tipDeckShow, 600);           // 答完才提示，别在半路上打断阅读
       if (cell.thinkL && thinkTxt) cell.thinkL.textContent = t("thought") + thinkTxt.length + t("chars");
       flushSrcs();                                        // 出错/中途停下时也把收着的来源补上
       updTurns();
@@ -2084,11 +2126,12 @@
   layer.querySelector(".wdsm-distbtn").onclick = function (ev) {
     var old = document.querySelector(".wdsm-menu");
     if (old) { old.parentNode.removeChild(old); return; }
-    if (!history.length) { alert(t("needTalk")); return; }
+    if (!history.length) { alert(t("needTalkDeck")); return; }
     var menu = el("div", "wdsm-menu");
     KIND_KEYS.forEach(function (k) {
       var b = el("button");
       b.appendChild(document.createTextNode(kindT(k)));
+      if (k === "deck") { var nb = el("i", "wdsm-new", "NEW"); b.appendChild(nb); }
       b.appendChild(el("span", "sub", kindS(k)));
       b.onclick = function () { if (menu.parentNode) menu.parentNode.removeChild(menu); distill(k); };
       menu.appendChild(b);

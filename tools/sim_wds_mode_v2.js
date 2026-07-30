@@ -311,6 +311,23 @@ ROUTE["/api/wds/chat"] = [
   T("样式用真实存在的 CSS 变量", !/--wfaint/.test(wm));
 }
 
+console.log("⑦.8 对外 PPT 的可见性（找不到＝没有）");
+{
+  const wm = require("fs").readFileSync("/home/claude/site/public/wds-mode.js", "utf8");
+  const T = (name, cond) => ok(cond, name);
+  T("顶栏按钮自己写着里面有 PPT", /bDistill: "\\u270e 成文 · PPT"/.test(wm) && /Write up · Deck/.test(wm));
+  T("空白页写明聊完能做什么", /wdsm-hero-after/.test(wm) && /heroAfter: "聊完之后/.test(wm));
+  T("空白页那行真被贴上去（不是只定义了文案）", /q\("\.wdsm-hero-after"\)\.textContent = t\("heroAfter"\)/.test(wm));
+  T("菜单里 PPT 带 NEW 标", /k === "deck"[\s\S]{0,60}wdsm-new/.test(wm));
+  T("答完会冒一次提示条", /wdsm-tipdeck/.test(wm) && /setTimeout\(tipDeckShow, 600\)/.test(wm));
+  T("提示只在有问有答之后才冒（空着做不出 PPT）", /history\.length < 2\) return/.test(wm));
+  T("提示可永久关掉，且点哪儿都不再提示", /localStorage\.setItem\(TIP_KEY, "1"\)/.test(wm) && /tipDeckHide\(true\);\s*\/\/ 点哪儿都不再提示/.test(wm));
+  T("点提示正文就直接开 PPT", /if \(!onX\) distill\("deck"\)/.test(wm));
+  T("开始下一轮先把提示收起，不与停止条抢位置", /stopBarShow\(true\); tipDeckHide\(false\)/.test(wm));
+  T("流式途中不冒提示（别打断阅读）", /if \(!b \|\| streaming\) return/.test(wm));
+  T("空对话点成文时说人话，不是通用提示", /needTalkDeck: "先聊两句/.test(wm) && /alert\(t\("needTalkDeck"\)\)/.test(wm));
+}
+
 console.log("⑧ 成文（distill）");
   ROUTE["/api/wds/distill"] = [{ t: "beat", v: { sec: 2, think: 9 } }, { t: "token", v: "# 报告标题\n\n结论：一句话。" }];
   layer.querySelector(".wdsm-distbtn").click();
