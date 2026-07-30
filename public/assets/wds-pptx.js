@@ -230,7 +230,85 @@
      每套是一个函数：拿到这一页的内容，摆出这一页的几何。
      判据（下面 pickLayout）只看内容的形状，不看它写了什么——
      所以"自动选版式"是可复现的，同样一页永远得到同一套版式。 */
-  var TITLE_Y = 620000, TITLE_H = 1000000, BODY_Y = 1900000;
+  /* ═══════════ 装配三原则：统一 · 多样 · 和谐 ═══════════
+     美不是"挑个好看的颜色"，是三件可被机械检查的事。写在这里，并由 audit() 逐页验：
+
+     【统一】全套只有一套语法。同一角色的东西永远在同一位置、同一字号、同一颜色角色：
+       页标题永远在 TITLE_Y、正文永远从 BODY_Y 起、左右永远留 MX、字号只准取 SCALE 里那几档、
+       颜色只准用角色名（tx/dim/ac/card…）不许现场调色。**读者翻十页，看到的是同一个人做的。**
+
+     【多样】相邻页不许长一个样。同一版式**连着出现不超过 2 页**；一份稿子至少用出 4 种版式；
+       墨量要有起伏（整幅彩页与留白页交替），否则十页平铺就是催眠。
+
+     【和谐】比例与对比落在可容忍区间。正文对底色的对比度 ≥ 4.5:1（WCAG AA）、
+       次要文字 ≥ 3:1；每页墨量落在 6%–55% 之间（太空＝没做完，太满＝挤）；
+       所有纵向间距都是 RHYTHM 的整数倍，横向分栏只用 42/52 与 50/50 两种比例。 */
+  var GRID = {
+    W: 12192000, H: 6858000, MX: 838200,          // 画布与左右留白
+    TITLE_Y: 620000, TITLE_H: 1000000,            // 页标题的锚点（每一页都从这里起）
+    BODY_Y: 1900000, BODY_H: 4000000,             // 正文区
+    RHYTHM: 20000,                                // 纵向节奏单位：所有间距都是它的整数倍
+    SPLIT: [0.42, 0.52],                          // 左右分栏只用这一组（文 42% / 图 52%，留 6% 沟）
+    FOOT_Y: 6150000,
+  };
+  var SCALE = { xl: 8000, cover: 4000, big: 3600, h1: 3200, h2: 2800, lead: 3000, quote: 2800,
+                kpi: 4000, card: 2000, body: 1800, small: 1600, tiny: 1500, foot: 1100, micro: 1000 };
+
+  // WCAG 相对亮度与对比度——「和谐」里唯一不能靠感觉的一项
+  function _lin(c) { c /= 255; return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4); }
+  function lumOf(hex) {
+    var r = parseInt(String(hex).slice(0, 2), 16), g = parseInt(String(hex).slice(2, 4), 16), b = parseInt(String(hex).slice(4, 6), 16);
+    return 0.2126 * _lin(r) + 0.7152 * _lin(g) + 0.0722 * _lin(b);
+  }
+  function contrast(a, b) {
+    var l1 = lumOf(a), l2 = lumOf(b);
+    return (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05);
+  }
+
+  /* 多样闸门：同一版式连着三页就把中间那页换成同族的另一种摆法。
+     **确定性**：只看序列本身，不掷骰子——同一份稿子永远得到同一个结果。 */
+  var SIBLING = { bullets: "bulletsLead", bulletsLead: "bullets", bulletsTwo: "bullets",
+                  chartRight: "chartLead", chartLead: "chartRight", kpi: "kpiBig", kpiBig: "kpi" };
+  function diversify(names) {
+    for (var i = 2; i < names.length; i++) {
+      if (names[i] === names[i - 1] && names[i - 1] === names[i - 2]) {
+        var sib = SIBLING[names[i - 1]];
+        if (sib) names[i - 1] = sib;                // 换中间那页，首尾不动（改动最小）
+      }
+    }
+    return names;
+  }
+
+  /* audit()：把三原则跑成一份可读的违规清单。build() 不用它，sim 与排障用它。 */
+  function audit(deck) {
+    var out = { unity: [], diversity: [], harmony: [] };
+    var th = THEMES[pickTheme(deck)] || THEMES.ink;
+    // 和谐：对比度
+    var c1 = contrast(th.tx, th.bg), c2 = contrast(th.dim, th.bg), c3 = contrast(th.onDeep, th.deep);
+    if (c1 < 4.5) out.harmony.push("正文对底色对比度只有 " + c1.toFixed(2) + "（要 ≥4.5）");
+    if (c2 < 3) out.harmony.push("次要文字对比度只有 " + c2.toFixed(2) + "（要 ≥3）");
+    if (c3 < 4.5) out.harmony.push("深色页文字对比度只有 " + c3.toFixed(2) + "（要 ≥4.5）");
+    // 统一 + 多样：走一遍版式序列
+    var slides = (deck.slides || []);
+    var names = slides.map(function (s, i) { return pickLayout(s, i + 1, slides.length); });
+    names = diversify(names);
+    var run = 1;
+    for (var i = 1; i < names.length; i++) {
+      if (names[i] === names[i - 1]) { run++; if (run > 2) out.diversity.push("第 " + (i + 1) + " 页起同一版式连着 " + run + " 页"); }
+      else run = 1;
+    }
+    if (slides.length >= 6 && new Set(names).size < 4) out.diversity.push("整份只用了 " + new Set(names).size + " 种版式（≥6 页时至少 4 种）");
+    // 统一：字数越界＝那一页会被迫缩字号，破坏"同一字号"这条
+    slides.forEach(function (s, i) {
+      if ((s.title || "").length > 16) out.unity.push("第 " + (i + 2) + " 页标题 " + s.title.length + " 字（上限 16，超了会被迫缩字号）");
+      (s.bullets || []).forEach(function (b) {
+        if (String(b).length > 24) out.unity.push("第 " + (i + 2) + " 页有一条要点 " + String(b).length + " 字（上限 24）");
+      });
+    });
+    return out;
+  }
+
+  var TITLE_Y = GRID.TITLE_Y, TITLE_H = GRID.TITLE_H, BODY_Y = GRID.BODY_Y;   // 旧名保留，值统一由 GRID 出
   function titleOf(s, id, sz) { return tbox(id, "title", MX, TITLE_Y, W - MX * 2, TITLE_H, para(s.title, { sz: sz || 3200, b: true })); }
   function pageNo(id, idx, total) {
     return tbox(id, "pageNo", W - MX - 900000, 6150000, 900000, 300000, para(pad(idx) + " / " + pad(total), { sz: 1000, color: CLR.faint, algn: "r" }));
@@ -516,9 +594,9 @@
     return "bullets";
   }
 
-  function slideXml(s, idx, total, footer, kicker) {
+  function slideXml(s, idx, total, footer, kicker, forced) {
     var c = { id: 2, idx: idx, total: total, footer: footer, kicker: kicker };
-    var name = pickLayout(s, idx, total);
+    var name = forced || pickLayout(s, idx, total);
     var shapes = (LAYOUTS[name] || LAYOUTS.bullets)(s, c);
     // 底纹画在最前面＝叠在最底层；整幅彩页（封面/过渡/收尾）不铺，它本身就是一片色
     if (!c.bg) shapes = decoOf(c) + shapes;
@@ -745,6 +823,10 @@
     var slides = (deck.slides || []).slice(0, 60);
     var footer = deck.footer || opts.footer || "";
     var all = [{ kind: "cover", title: deck.title || "未命名", subtitle: deck.subtitle || "", kicker: deck.kicker || "" }].concat(slides);
+    // 【多样】整份的版式序列先定下来，再过一遍闸门：同一版式连着三页就换掉中间那页。
+    // 必须在这里做——逐页各判各的，就永远看不见"连着三页"这件事。
+    var plan = all.map(function (s, i) { return pickLayout(s, i, all.length - 1); });
+    plan = diversify(plan);
     var files = [], i;
 
     var needExt = {};                                  // 用到了哪些图片扩展名，就声明哪些（漏声明＝文件损坏）
@@ -818,7 +900,7 @@
 
     for (i = 0; i < all.length; i++) {
       var s = all[i];
-      files.push({ name: "ppt/slides/slide" + (i + 1) + ".xml", data: enc(slideXml(s, i, all.length - 1, footer, deck.kicker || "")) });
+      files.push({ name: "ppt/slides/slide" + (i + 1) + ".xml", data: enc(slideXml(s, i, all.length - 1, footer, deck.kicker || "", plan[i])) });
       var rels = XD + '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
         + '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slideLayout" Target="../slideLayouts/slideLayout1.xml"/>';
       if (s.notes) {
@@ -1004,6 +1086,7 @@
     parse: parse,
     preload: preload,
     layouts: function () { return Object.keys(LAYOUTS); },
+    audit: audit, contrast: contrast, diversify: diversify, GRID: GRID, SCALE: SCALE,
     themes: function () { return Object.keys(THEMES); },
     pickLayout: pickLayout,
     pickTheme: pickTheme,

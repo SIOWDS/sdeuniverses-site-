@@ -315,6 +315,39 @@ console.log("── 四 · 两端接线");
   ok(/deckReady \|\| deckOf\(text\)/.test(wm), "点按钮时优先用预取好的那份");
 }
 
+console.log("── 四点〇 · 装配三原则：统一 · 多样 · 和谐（可机械检查）");
+{
+  ok(/var GRID = \{/.test(MOD) && /var SCALE = \{/.test(MOD), "网格与字号档写成一处常量（统一的物质基础）");
+  ok(/TITLE_Y = GRID\.TITLE_Y/.test(MOD), "旧的散落常量已并到 GRID，不再各写各的");
+  ok(/function contrast\(/.test(MOD) && /0\.03928/.test(MOD), "对比度按 WCAG 相对亮度算，不是拍脑袋");
+  // 和谐：20 套配色逐个验，一套不合格就算失败
+  const bad = X.themes().filter(function (t) { return X.audit({ title: "x", slides: [], theme: t }).harmony.length; });
+  ok(bad.length === 0, "20 套配色的正文/次要/深色页对比度全部达标（不达标的：" + (bad.join(",") || "无") + "）");
+  ok(X.contrast("000000", "FFFFFF") > 20 && X.contrast("777777", "808080") < 1.3, "对比度函数本身可信（黑白极大、相近极小）");
+  // 多样：闸门是确定性的
+  ok(JSON.stringify(X.diversify(["bullets", "bullets", "bullets", "bullets", "kpi"]))
+     === JSON.stringify(["bullets", "bulletsLead", "bullets", "bullets", "kpi"]), "连着三页同形就换掉中间那页");
+  ok(JSON.stringify(X.diversify(["a", "b", "a", "b"])) === JSON.stringify(["a", "b", "a", "b"]), "本来就交替的不动");
+  const seq = ["bullets", "bullets", "bullets", "bullets", "bullets", "bullets"];
+  const d1 = X.diversify(seq.slice()), d2 = X.diversify(seq.slice());
+  ok(JSON.stringify(d1) === JSON.stringify(d2), "闸门是确定性的（同一序列永远同一结果，不掷骰子）");
+  ok(d1.filter(function (x) { return x === "bullets"; }).length < 6, "六页全同形会被打散（实得 " + d1.join(",") + "）");
+  ok(/plan = diversify\(plan\)/.test(MOD) && /pickLayout\(s, i, all\.length - 1\)/.test(MOD),
+     "闸门接在 build 里、按整份序列跑——逐页各判各的就永远看不见「连着三页」");
+  // 统一：audit 能抓出超字数
+  const a2 = X.audit({ title: "t", slides: [{ title: "这个标题写得实在是太长了超过十六个字了吧", bullets: ["短"], notes: "", kind: "content" }] });
+  ok(a2.unity.length === 1 && /标题/.test(a2.unity[0]), "标题超字数被 audit 抓出（超了会被迫缩字号，破坏统一）");
+  const a3 = X.audit({ title: "t", slides: [{ title: "短", bullets: ["这一条要点写得非常非常长，长到远远超过了二十四个字的上限了"], notes: "", kind: "content" }] });
+  ok(a3.unity.length === 1 && /要点/.test(a3.unity[0]), "要点超字数也被抓出");
+  // 多样：整份用得太少也算违规
+  const many = { title: "t", slides: [] };
+  for (let i = 0; i < 8; i++) many.slides.push({ title: "第" + i + "页", bullets: ["甲", "乙", "丙"], notes: "", kind: "content" });
+  ok(X.audit(many).diversity.length > 0, "八页全是要点页 → 多样性违规");
+  // 提示端
+  ok(/装配三原则：美＝统一·多样·和谐/.test(wk), "三原则也写进了给基底的写作纪律");
+  ok(/相邻两页不许写成同一个形状/.test(wk) && /宁可少一条，不许挤/.test(wk), "多样与和谐都落成可执行的一句话");
+}
+
 console.log("── 四点二 · 首次真跑抓到的：多条成对页要走对照卡");
 {
   const t = (title, bs) => X.pickLayout({ title: title, bullets: bs, notes: "", kind: "content" }, 4, 9);

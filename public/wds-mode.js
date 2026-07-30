@@ -1558,7 +1558,7 @@
     if (window.WDSPptx) { if (then) then(true); return; }
     if (!document.head || !document.head.appendChild) { if (then) then(false); return; }
     var sc = document.createElement("script");
-    sc.src = "/assets/wds-pptx.js?v=7"; sc.async = true;   // 模块也要能刷新：改它就 bump 这个号
+    sc.src = "/assets/wds-pptx.js?v=8"; sc.async = true;   // 模块也要能刷新：改它就 bump 这个号
     sc.onload = function () { if (then) then(!!window.WDSPptx); };
     sc.onerror = function () { if (then) then(false); };
     document.head.appendChild(sc);
