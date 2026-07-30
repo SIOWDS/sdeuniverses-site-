@@ -1,8 +1,13 @@
-/* 问WDS —— 全站问答 v3（对标 Claude 的对话外壳）。独立界面在 /taste/wds-chat/（页内置 window.WDSM_PAGE=1 后引入本脚本）。
+/* 问WDS —— 全站问答 v4（对标 Claude 的对话外壳）。独立界面在 /taste/wds-chat/（页内置 window.WDSM_PAGE=1 后引入本脚本）。
  * 其余页面引入本脚本只注入入口（导航「✦ 问WDS」或右下「✦ 问全站」按钮），点击跳转独立页。
  * 后端 /api/wds/chat：全站检索 + SDE 内核 + 王德生人格 + 多轮 + 出处；mode=deep 走满血深度档；web=1 联网。
  *      /api/wds/distill：把整场对话锻成 报告 / 成文 / 提纲。
- * v2 新增：Markdown 渲染 · 思考过程可展开 · 三档模式条 · 停止/重答/改问 · 站外来源 · 成文与导出。 */
+ * v2 新增：Markdown 渲染 · 思考过程可展开 · 三档模式条 · 停止/重答/改问 · 站外来源 · 成文与导出。
+ * v4（全面对标提升）：整场记忆全量上送（原来只带最近 4 轮）· 长问不再静默截断 · 「继续」接着写 ·
+ *   「复制」出纯文本 /「原文」出 Markdown（原来两个按钮同一个动作）· 嵌套列表/多行引用/有序列表续号 ·
+ *   等待期显示"跑了几秒·在哪一段" · 图标钮补 aria 名字。
+ * Markdown 实际支持：标题 粗斜体 删除线 行内码 围栏代码块(高亮+复制) 有序/无序/嵌套列表 任务清单
+ *   表格 引用 分隔线 链接 KaTeX 公式。改这里时顺手改这行，别让接手的人照过期注释判断能力。 */
 (function () {
   "use strict";
   if (window.__wdsModeMounted) return;
@@ -75,6 +80,26 @@
     MATH.push({ s: src, b: !!blk });
     return "\u0000M" + (MATH.length - 1) + "\u0000";
   }
+  /* 「复制」要的是能直接贴进邮件/文档的纯文本，「原文」要的是原始 Markdown。
+     两个按钮以前调的是同一个函数、同一个字符串——等于其中一个是白按的。 */
+  function plainOf(md) {
+    return String(md || "")
+      .replace(/```[A-Za-z0-9+#._-]*\n?([\s\S]*?)```/g, "$1")
+      .replace(/`([^`\n]+)`/g, "$1")
+      .replace(/^\s{0,3}#{1,6}\s+/gm, "")
+      .replace(/\*\*\*([^*]+)\*\*\*/g, "$1").replace(/\*\*([^*]+)\*\*/g, "$1")
+      .replace(/(^|[^*])\*([^*\n]+)\*/g, "$1$2").replace(/~~([^~]+)~~/g, "$1")
+      .replace(/!\[([^\]]*)\]\([^)]*\)/g, "$1")
+      .replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, "$1（$2）")
+      .replace(/^\s{0,3}&gt;\s?/gm, "").replace(/^\s{0,3}>\s?/gm, "")
+      .replace(/^\s{0,3}(?:---+|\*\*\*+|___+)\s*$/gm, "")
+      .replace(/\n{3,}/g, "\n\n").trim();
+  }
+  // 末尾没有收尾标点＝多半是被预算或时钟掐在半句上，这时才给「继续」，免得平白多一个按钮
+  function looksCut(x) {
+    var s = String(x || "").trim();
+    return !!s && !/[。！？…”」』】》.!?:：;；)\]]$/.test(s.slice(-1));
+  }
   function mdRender(src) {
     MATH = [];
     var raw = String(src || "");
@@ -97,13 +122,22 @@
                return pre + texStub(c, 0);
              });
     var s2 = esc(raw);
-    var lines = s2.split("\n"), out = [], listType = null, listCls = "", para = [];
+    var lines = s2.split("\n"), out = [], para = [];
     function flushPara() { if (para.length) { out.push("<p>" + para.join("<br>") + "</p>"); para = []; } }
-    function flushList() { if (listType) { out.push("</" + listType + ">"); listType = null; listCls = ""; } }
-    function openList(tag, cls) {
-      if (listType === tag && listCls === cls) return;
-      flushList(); listType = tag; listCls = cls;
-      out.push("<" + tag + (cls ? " class='" + cls + "'" : "") + ">");
+    /* 列表用一个缩进栈，而不是一个"当前列表"变量——否则子项会被压平成同级（模型爱写两级清单）。
+       缩进按每 2 个空格算一层（Tab 折成 4 空格）。 */
+    var lstack = [];
+    function indOf(sp) { return Math.floor(String(sp || "").replace(/\t/g, "    ").length / 2); }
+    function flushList() { while (lstack.length) out.push("</" + lstack.pop().tag + ">"); }
+    function openList(tag, cls, ind, start) {
+      ind = ind || 0;
+      while (lstack.length && lstack[lstack.length - 1].ind > ind) out.push("</" + lstack.pop().tag + ">");
+      var top = lstack[lstack.length - 1];
+      if (top && top.ind === ind && (top.tag !== tag || top.cls !== cls)) { out.push("</" + lstack.pop().tag + ">"); top = lstack[lstack.length - 1]; }
+      if (top && top.ind === ind) return;                       // 同级同类：接着用
+      out.push("<" + tag + (cls ? " class='" + cls + "'" : "")
+        + (tag === "ol" && start > 1 ? " start='" + start + "'" : "") + ">");   // 有序列表从它自己的号码起，别每段重数 1
+      lstack.push({ tag: tag, cls: cls, ind: ind });
     }
     function inline(x) {
       return x
@@ -153,14 +187,20 @@
         var lv = m[1].length;
         out.push("<h" + lv + ">" + inline(m[2]) + "</h" + lv + ">"); continue;
       }
-      if ((m = L.match(/^\s*[-*+]\s+\[([ xX])\]\s+(.*)$/))) {   // 任务清单
-        flushPara(); openList("ul", "tl");
-        out.push("<li><span class='tb" + (m[1] === " " ? "" : " on") + "'></span>" + inline(m[2]) + "</li>"); continue;
+      if ((m = L.match(/^(\s*)[-*+]\s+\[([ xX])\]\s+(.*)$/))) {   // 任务清单
+        flushPara(); openList("ul", "tl", indOf(m[1]));
+        out.push("<li><span class='tb" + (m[2] === " " ? "" : " on") + "'></span>" + inline(m[3]) + "</li>"); continue;
       }
-      if ((m = L.match(/^\s*[-*+]\s+(.*)$/))) { flushPara(); openList("ul", ""); out.push("<li>" + inline(m[1]) + "</li>"); continue; }
-      if ((m = L.match(/^\s*\d+[.)]\s+(.*)$/))) { flushPara(); openList("ol", ""); out.push("<li>" + inline(m[1]) + "</li>"); continue; }
+      if ((m = L.match(/^(\s*)[-*+]\s+(.*)$/))) { flushPara(); openList("ul", "", indOf(m[1])); out.push("<li>" + inline(m[2]) + "</li>"); continue; }
+      if ((m = L.match(/^(\s*)(\d+)[.)]\s+(.*)$/))) { flushPara(); openList("ol", "", indOf(m[1]), parseInt(m[2], 10)); out.push("<li>" + inline(m[3]) + "</li>"); continue; }
       // 注意：这里的正文已被 esc() 整体转义过，Markdown 的 "&gt;" 此刻长这样，不能写成 ">"
-      if ((m = L.match(/^\s*&gt;\s?(.*)$/))) { flushPara(); flushList(); out.push("<blockquote>" + inline(m[1]) + "</blockquote>"); continue; }
+      // 连续的引用行合成一块（原来一行一个 blockquote，多行引用会叠成一串豆腐块）
+      if ((m = L.match(/^\s*&gt;\s?(.*)$/))) {
+        flushPara(); flushList();
+        var qls = [inline(m[1])];
+        while (i + 1 < lines.length && /^\s*&gt;\s?/.test(lines[i + 1])) { i++; qls.push(inline(lines[i].replace(/^\s*&gt;\s?/, ""))); }
+        out.push("<blockquote>" + qls.join("<br>") + "</blockquote>"); continue;
+      }
       para.push(inline(L));
     }
     flushPara(); flushList();
@@ -324,7 +364,9 @@
       hpStop: "停止生成 / 关面板", hpEdit: "编辑上一问（输入框为空时）", hpHelp: "本帮助", hpFold: "开合侧栏",
       brPrev: "上一版", brNext: "下一版", brOf: " / ",
       aMd: "⧉ 原文", aEditIn: "✎ 编辑", edSave: "保存并重答", edCancel: "取消",
-      cbCopy: "复制", cbCopied: "已复制", dropHint: "松手即作为附件加入本场",
+    aCont: "↳ 继续", contQ: "接着上面继续写下去，别重复已经写过的部分。",
+    arIn: "输入你的问题", arSend: "发送", arStop: "停止生成", arToBot: "回到最新", arMenu: "对话列表", arMsgs: "对话内容",
+      cbCopy: "复制", cbCopied: "已复制", dropHint: "松手即作为附件加入本场（图片只读得出其中的文字，走本机 OCR）",
       pasteAdd: "已把粘贴的文件加为附件",
     },
     en: {
@@ -425,7 +467,9 @@
       hpStop: "Stop / close panel", hpEdit: "Edit last question (empty input)", hpHelp: "This help", hpFold: "Toggle sidebar",
       brPrev: "Previous version", brNext: "Next version", brOf: " / ",
       aMd: "⧉ Source", aEditIn: "✎ Edit", edSave: "Save & regenerate", edCancel: "Cancel",
-      cbCopy: "Copy", cbCopied: "Copied", dropHint: "Drop to attach to this chat",
+    aCont: "↳ Continue", contQ: "Continue from where you stopped; don't repeat what you already wrote.",
+    arIn: "Type your question", arSend: "Send", arStop: "Stop generating", arToBot: "Jump to latest", arMenu: "Chat list", arMsgs: "Conversation",
+      cbCopy: "Copy", cbCopied: "Copied", dropHint: "Drop to attach to this chat (images: text only, local OCR)",
       pasteAdd: "Pasted file attached",
     },
   };
@@ -697,9 +741,40 @@
   var inEl = layer.querySelector(".wdsm-in");
   var sendEl = layer.querySelector(".wdsm-send");
 
+  /* 无障碍：↑ ⏹ ↓ ☰ 这些图标钮在读屏软件里原来只念得出符号。文案随语言切换时一并更新（见 applyLang）。 */
+  function ariaSet() {
+    try {
+      inEl.setAttribute("aria-label", t("arIn"));
+      sendEl.setAttribute("aria-label", streaming ? t("arStop") : t("arSend"));
+      msgsEl.setAttribute("role", "log");
+      msgsEl.setAttribute("aria-live", "polite");
+      msgsEl.setAttribute("aria-label", t("arMsgs"));
+      var tb = layer.querySelector(".wdsm-tobot"); if (tb) tb.setAttribute("aria-label", t("arToBot"));
+      var bg = layer.querySelector(".wdsm-burger"); if (bg) bg.setAttribute("aria-label", t("arMenu"));
+      var sch = layer.querySelector(".wdsm-sch"); if (sch) sch.setAttribute("aria-label", t("hpSearch"));
+    } catch (e) {}
+  }
+  ariaSet();
+
   // —— 跟随滚动（学 Claude / GPT）：只有读者本来就贴在底部时才自动跟，
   // 一旦手动往上翻就松手（不再把人拽回去），改用右下的「回到最新」回去。
   var toBotEl = layer.querySelector(".wdsm-tobot"), stick = true;
+  /* 整场都带上（服务端再按 system 体量裁一次）。这里只做两件事：单条钳位、总量预算；
+     超预算才从最旧处丢，且丢了要留一句说明——静默丢历史＝它忽然忘了前面谈过什么。
+     口径与 worker 的 WDS_CHAT_PERMSG / WDS_CHAT_HIST_BUDGET 对齐。 */
+  var HIST_PERMSG = 12000, HIST_BUDGET = 120000;
+  function histPack() {
+    var out = [], total = 0, i;
+    for (i = 0; i < history.length; i++) {
+      var txt = String(history[i].text || "").slice(0, HIST_PERMSG);
+      if (txt) out.push({ role: history[i].role, text: txt });
+    }
+    for (i = 0; i < out.length; i++) total += out[i].text.length;
+    var dropped = 0;
+    while (total > HIST_BUDGET && out.length > 2) { total -= out[0].text.length; out.shift(); dropped++; }
+    if (dropped) out.unshift({ role: "reader", text: "（本场更早的 " + dropped + " 条发言因长度省略，这是同一场对话。）" });
+    return out;
+  }
   function atBottom() { return bodyEl.scrollHeight - bodyEl.scrollTop - bodyEl.clientHeight < 90; }
   function scrollBottom(smooth) {
     try { bodyEl.scrollTo({ top: bodyEl.scrollHeight, behavior: smooth ? "smooth" : "auto" }); }
@@ -711,6 +786,7 @@
   var tipEl = layer.querySelector(".wdsm-mode-tip");
   // 语言只重刷"外壳"（按钮/提示/示例）；已经生成的回答保持它当时的语言——重译旧答既不诚实也没必要。
   function applyLang() {
+    ariaSet();                                  // 文案随语言走，切换后要重贴一遍
     var q = function (sel) { return layer.querySelector(sel); };
     q(".wdsm-tab[data-m='normal']").textContent = PAGE ? t("tabBack") : t("tabNormal");
     q(".wdsm-tab[data-m='wds']").textContent = t("tabWds");
@@ -1131,11 +1207,27 @@
   }
 
   // —— 每答下方的操作行：复制 / 重答 / 改问 ——
+  /* 等待行：没有思考流可看时也要让人看见"它在动、在哪一段"（不然就是对着一个死掉的转圈）。
+     正文一开始写就撤掉。 */
+  function waitLine(cell, txt) {
+    if (!cell.wait) {
+      cell.wait = el("div", null, "");
+      cell.wait.style.cssText = "color:#6b7684;font-size:12.5px;margin:0 0 10px";
+      cell.turn.insertBefore(cell.wait, cell.a);
+    }
+    cell.wait.textContent = txt;
+  }
+  function noteLine(cell, txt) {
+    var n = el("div", null, String(txt || ""));
+    n.style.cssText = "color:#8B7B5E;font-size:12.5px;line-height:1.6;margin:8px 0 0";
+    cell.turn.appendChild(n);
+  }
   function mountActs(cell, text) {
+    if (cell.wait && cell.wait.parentNode) { cell.wait.parentNode.removeChild(cell.wait); cell.wait = null; }
     if (cell.acts && cell.acts.parentNode) cell.acts.parentNode.removeChild(cell.acts);
     var row = el("div", "wdsm-acts");
     var cp = el("button", "wdsm-act", t("aCopy"));
-    cp.onclick = function () { copyText(text); cp.textContent = t("aCopied"); setTimeout(function () { cp.textContent = t("aCopy"); }, 1400); };
+    cp.onclick = function () { copyText(plainOf(text)); cp.textContent = t("aCopied"); setTimeout(function () { cp.textContent = t("aCopy"); }, 1400); };
     var rg = el("button", "wdsm-act", t("aRegen"));
     rg.onclick = function () { regen(cell); };
     var ed = el("button", "wdsm-act", t("aEdit"));
@@ -1144,7 +1236,13 @@
     sp.onclick = function () { speak(text, sp); };
     var md = el("button", "wdsm-act", t("aMd"));
     md.onclick = function () { copyText(text); md.textContent = t("aCopied"); setTimeout(function () { md.textContent = t("aMd"); }, 1400); };
-    row.appendChild(cp); row.appendChild(md); row.appendChild(sp); row.appendChild(rg); row.appendChild(ed);
+    row.appendChild(cp); row.appendChild(md); row.appendChild(sp);
+    if (looksCut(text)) {                                  // 被掐在半句上时才出现
+      var ct = el("button", "wdsm-act", t("aCont"));
+      ct.onclick = function () { if (streaming) return; inEl.value = t("contQ"); send(); };
+      row.appendChild(ct);
+    }
+    row.appendChild(rg); row.appendChild(ed);
     cell.turn.appendChild(row); cell.acts = row;
     bindCode(cell); typeset(cell.a);      // 代码块复制（事件委托）与公式排版都等正文定稿再做
     cell.verIdx = null; mountQBar(cell);  // 有了新一版，问题条上才画出 ‹1/2›
@@ -1533,8 +1631,8 @@
     cell.a.innerHTML = "<span class='cur'>▊</span>";
     history.push({ role: "reader", text: q }); updTurns(); stSave(history);
     streaming = true; stoppedByUser = false;
-    sendEl.textContent = "■"; sendEl.classList.add("stop"); sendEl.title = "停止生成";
-    var payload = { q: q, history: history.slice(-4), key: kv.key, vendor: kv.vendor, model: kv.model || "", mode: thinkMode, web: webOn ? 1 : 0, skey: wdsSearchKey(), about: aboutPlus(), lang: LANG, tool: curTool };
+    sendEl.textContent = "■"; sendEl.classList.add("stop"); sendEl.title = "停止生成"; sendEl.setAttribute("aria-label", t("arStop"));
+    var payload = { q: q, history: histPack(), key: kv.key, vendor: kv.vendor, model: kv.model || "", mode: thinkMode, web: webOn ? 1 : 0, skey: wdsSearchKey(), about: aboutPlus(), lang: LANG, tool: curTool };
     var packed = docsForQuery(q);
     if (packed) {
       payload.docs = packed;                        // 附件常驻本场：每轮都带，长文按这一问现取段
@@ -1561,7 +1659,7 @@
     }
     function endUI() {
       streaming = false; curReader = null;
-      sendEl.textContent = "↑"; sendEl.classList.remove("stop"); sendEl.title = "";
+      sendEl.textContent = "↑"; sendEl.classList.remove("stop"); sendEl.title = ""; sendEl.setAttribute("aria-label", t("arSend"));
       if (cell.thinkL && thinkTxt) cell.thinkL.textContent = t("thought") + thinkTxt.length + t("chars");
       flushSrcs();                                        // 出错/中途停下时也把收着的来源补上
       updTurns();
@@ -1612,7 +1710,12 @@
                 cell.turn.insertBefore(w, cell.a);
               }
               else if (j.t === "think") { thinkTxt += j.v; thinkBox(cell); cell.thinkC.textContent = thinkTxt; if (!answer) cell.thinkL.textContent = t("thinking") + " " + thinkTxt.length; }
-              else if (j.t === "beat") { if (!answer && cell.think && j.v) cell.thinkL.textContent = t("thinking") + " " + (j.v.sec || 0) + "s · " + (j.v.think || 0); }
+              else if (j.t === "beat") {
+                var bv = j.v || {};
+                if (!answer && cell.think) cell.thinkL.textContent = t("thinking") + " " + (bv.sec || 0) + "s · " + (bv.think || 0) + (bv.stage ? " · " + bv.stage : "");
+                else if (!answer) waitLine(cell, t("thinking") + " " + (bv.sec || 0) + "s" + (bv.stage ? " · " + bv.stage : ""));
+              }
+              else if (j.t === "note") { noteLine(cell, j.v); }
               else if (j.t === "nbr") { renderNbr(cell, j.v || []); }
               else if (j.t === "nbrfail") { nbrFailNote(cell); }
               else if (j.t === "follow") { renderFollows(cell, j.v); }

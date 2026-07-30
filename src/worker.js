@@ -220,6 +220,17 @@ function wdsAskLen(q) {
   if (!want && /(详细展开|详尽|长文|写长一点|完整地写|全文写|扩写|通篇改写)/.test(s)) want = 3000;
   return want >= 1200 ? Math.min(want, 20000) : 0;   // 1200 字以下按常规问答走；单次上限 2 万字，再长该走「继续」或成文流程
 }
+
+// ── 全站问答（问WDS）的分档口径。沿用十二～十五修那条通则：
+//    "这一步该产出多长"决定它的预算、口径与时限——一刀切的全局常量必然在某一步上错。
+//    所以提问上限、历史预算、单条上限、两级时钟分开定，别再共用一个数。
+const WDS_CHAT_Q_MAX = 20000;          // 提问上限（原 800：粘长文的读者后半段被静默吃掉）
+const WDS_CHAT_HIST_BUDGET = 120000;   // 整场历史预算（字符），实际按 system 体量再收缩
+const WDS_CHAT_HIST_MIN = 20000;       // 收缩下限：system 再大也要留出这么多历史
+const WDS_CHAT_PERMSG = 12000;         // 单条上限（原 1500：长答一律只剩开头）
+const CHAT_FIRST_MS = 90000;           // 首帧护栏，收到第一帧即撤（正常长思考不误杀）
+const CHAT_TOTAL_MS = 240000;
+const CHAT_TOTAL_LONG_MS = 420000;     // 读者点名要长篇时给更长的总时长
 function wdsVendorOf(v) { return WDS_VMAP[String(v || "").toLowerCase()] || "zhipu"; }
 function wdsShort(vd) { return WDS_VSHORT[vd] || "glm"; }
 // 读者自填的型号覆盖默认值。只放行像模型名的字符串，别让它变成往上游注入别的东西的口子。
@@ -1922,7 +1933,7 @@ const WDS_MAX_TURNS = 100;          // 最多记 100 轮
 const WDS_HIST_BUDGET = 60000;      // 送进基底的历史字数预算（约 4 万 token，超出从最旧处裁）
 const WDS_GUIDE_HIST_BUDGET = 120000; // 与WDS对话（高级会话）：尽量全量记忆——每答携带尽可能多的对话原文；约 8 万 token，留出 system+心得+站内资料的余量，仍溢出时由 CONTEXT_OVERFLOW 逐级砍半（原 30 万字符≈20万token 超过多数基底输入窗，深聊必 400）
 // 把整场对话打包成 messages：默认全带上；仅当超预算时从最旧处裁，并留一条说明保住连贯性。
-function packReadHistory(history, budget, perMsg) {
+function packReadHistory(history, budget, perMsg, note) {
   const arr = (Array.isArray(history) ? history : []).slice(-WDS_MAX_TURNS * 2);
   const msgs = [];
   for (const m of arr) {
@@ -1935,7 +1946,7 @@ function packReadHistory(history, budget, perMsg) {
   let dropped = 0;
   const HB = budget || WDS_HIST_BUDGET;
   while (total > HB && msgs.length > 2) { total -= msgs[0].content.length; msgs.shift(); dropped++; }
-  if (dropped) msgs.unshift({ role: "user", content: "（本场陪读更早的 " + dropped + " 条发言因长度省略；这是同一场持续讨论，请接着往下谈。）" });
+  if (dropped) msgs.unshift({ role: "user", content: note ? note(dropped) : ("（本场陪读更早的 " + dropped + " 条发言因长度省略；这是同一场持续讨论，请接着往下谈。）") });
   return msgs;
 }
 // 把整场对话转成纯文本，供总结与成文使用。
@@ -3574,9 +3585,14 @@ export default {
       if (request.method === "OPTIONS") return new Response(null, { headers: _cors() });
       if (request.method !== "POST") return new Response("Method Not Allowed", { status: 405 });
       let b = {}; try { b = await request.json(); } catch (e) {}
-      const q = String(b.q || "").trim().slice(0, 800);
+      const qRaw = String(b.q || "").trim();
+      const q = qRaw.slice(0, WDS_CHAT_Q_MAX);
+      const qCut = qRaw.length - q.length;               // 真被截了多少：如实告知，不再静默丢后半段
       if (q.length < 1) return _sseResp([{ t: "error", v: "问点什么吧。" }]);
-      const history = Array.isArray(b.history) ? b.history.slice(-4) : [];
+      // 整场历史全量收下（原来只带最近 4 轮：第五轮起它就真的忘了开头）。
+      // 长度不在这里砍——交给下面 packReadHistory 按 system 实际体量裁，且超预算才裁、裁了明标省略。
+      const history = Array.isArray(b.history) ? b.history : [];
+      const askLen = wdsAskLen(q);                       // 读者点名要几千字：预算/口径/时限三件一起变
       const userKey = String(b.key || "").trim();
       if (userKey.length < 8) return _sseResp([{ t: "error", v: "WDS 助手用你自己的 API Key 运行（在设置里填入，只存在你的浏览器本地，与本站无关）。", code: "need_key" }]);
       const vd = wdsVendorOf(b.vendor);
@@ -3637,8 +3653,11 @@ export default {
             // 全站检索：先调用结构化知识(九库邻域子图,密/准/省token),再以相似句片段补充
             let ctxText = "", sources = [];
             const seen = {};
+            if (qCut > 0) controller.enqueue(_sseBytes({ t: "note", v: "你这一问超过 " + WDS_CHAT_Q_MAX + " 字，只带上了前 " + WDS_CHAT_Q_MAX + " 字（后面 " + qCut + " 字没进去）。这么长的材料建议用「＋」当附件传，别塞进提问框。" }));
             try {
+              _st.stage = "扩展检索词";
               const expTerms = await sdeExpandQuery(VC, KEY, q);
+              _st.stage = "站内检索";
               const wide = deep || tool === "collide";   // 碰撞要在更宽的面上挑，才可能凑出互相矛盾的三篇
               const _lrC = await lightRetrieve(env, url, q, expTerms, wide ? 30 : 20, 1600, { pick: wide ? 28 : 18 });
               const corpus = _lrC.corpus;
@@ -3684,16 +3703,38 @@ export default {
             const SDEM = "\n\nSDE 骨架：显露 S / 差异序列 D / 特征纠缠 E；三大方程 S=F(D,E)·D=G(S,E)·E=H(S,D)；六路径；意义三律（特征·自由·幸福）；发生学——追问事物为何如此发生，而非如何被发现。";
             const sys = WDS_CHAT_SYS(reflect, SDEM, (nbrCtx ? nbrCtx + "\n" : "") + ctxText, webCtx, deep, docCtx, about, lang, docNote, tool);
             const messages = [{ role: "system", content: sys }];
-            for (const m of history) {
-              const role = (m && m.role === "wds") ? "assistant" : "user";
-              const content = String((m && m.text) || "").slice(0, 1500);
-              if (content) messages.push({ role, content });
-            }
-            messages.push({ role: "user", content: q });
+            // 历史预算随 system 实际体量收缩：站内资料/附件/心得都在 system 里，
+            // 一起顶上去会撞输入窗（400 context too long）。超预算才从最旧处裁，并明标省略。
+            const histBudget = Math.max(WDS_CHAT_HIST_MIN, WDS_CHAT_HIST_BUDGET - sys.length);
+            const packed = packReadHistory(history, histBudget, WDS_CHAT_PERMSG,
+              (n) => "（本场更早的 " + n + " 条发言因长度省略；这是同一场持续对话，请接着往下谈。）");
+            for (const m of packed) messages.push(m);
+            // 长篇请求：覆盖指令挂在**这一轮的 user 消息**上，不写进 system——
+            // 固定前缀要留给厂商的前缀缓存，且长 system 末尾是低注意力位。
+            messages.push({
+              role: "user",
+              content: q + (askLen
+                ? ("\n\n（本轮特别要求：读者要的是长篇，约 " + askLen + " 字。解除《怎么答》第 5 条的\"两三段以内\"，按这个长度写足；"
+                   + "别在心里反复打草稿，边想边落笔——写不完读者会点「继续」。）")
+                : ""),
+            });
+            // 时钟（十二～十五修的通则）：凡"出流之后 await 上游"的调用一律戴 wdsClock。
+            // 不戴的代价已经付过四次：平台无声掐断时既无 error 也无正文，读者只看到"什么都没有"。
+            // 这里心跳撑着连接，反而让客户端的无字节看门狗永远喂饱——所以时钟只能由我方来掐。
+            const tokWant = askLen
+              ? Math.min(32000, Math.max(6000, Math.round(askLen * 1.8)))   // 中文近似 1 字 1 token，留一点余量
+              : (deep ? 6000 : (tool ? 4000 : 2600));
+            const clk = wdsClock(CHAT_FIRST_MS, askLen ? CHAT_TOTAL_LONG_MS : CHAT_TOTAL_MS);
+            _st.pre = Math.round((Date.now() - _st.t0) / 1000);
+            _st.stage = "基底作答";
             let upstream;
             try {
-              upstream = await fetch(VC.url, { method: "POST", headers: { "content-type": "application/json", authorization: "Bearer " + KEY }, body: JSON.stringify(wdsTopBody(VC, { model: VC.model, stream: true, max_tokens: deep ? 6000 : (tool ? 4000 : 2600), messages })) });
-            } catch (e) { controller.enqueue(_sseBytes({ t: "error", v: "接不上基底：" + (e && e.message) })); return fin(); }
+              upstream = await fetch(VC.url, { method: "POST", headers: { "content-type": "application/json", authorization: "Bearer " + KEY }, body: JSON.stringify(wdsTopBody(VC, { model: VC.model, stream: true, max_tokens: tokWant, messages })), signal: clk.signal });
+            } catch (e) {
+              clk.stop();
+              controller.enqueue(_sseBytes({ t: "error", v: (clk.cut ? clk.why("基底") : ("接不上基底：" + (e && e.message))) + "（可再问一次）" }));
+              return fin();
+            }
             if (!upstream.ok) {
               const errtxt = (await upstream.text()).slice(0, 300);
               if (upstream.status === 401 || upstream.status === 402 || upstream.status === 429) { controller.enqueue(_sseBytes({ t: "error", v: "你的 Key 用不了（" + upstream.status + "）：额度不足或填错了。去设置里检查或换一个。", code: "bad_key" })); return fin(); }
@@ -3702,6 +3743,7 @@ export default {
             const reader = upstream.body.getReader();
             const dec = new TextDecoder();
             let buf = "", outText = "";
+            try {
             while (true) {
               const { done: rdone, value } = await reader.read();
               if (rdone) break;
@@ -3716,10 +3758,17 @@ export default {
                 let j; try { j = JSON.parse(p); } catch (e) { continue; }
                 if (j.error) { controller.enqueue(_sseBytes({ t: "error", v: j.error.message || "基底流内错误" })); continue; }
                 const d = (j.choices && j.choices[0] && j.choices[0].delta) || {};
-                if (d.reasoning_content) { if (_st) _st.think += d.reasoning_content.length; controller.enqueue(_sseBytes({ t: "think", v: d.reasoning_content })); }
-                if (d.content) { if (_st) _st.out += d.content.length; outText += d.content; controller.enqueue(_sseBytes({ t: "token", v: d.content })); }
+                if (d.reasoning_content) { clk.firstFrame(); if (_st) _st.think += d.reasoning_content.length; controller.enqueue(_sseBytes({ t: "think", v: d.reasoning_content })); }
+                if (d.content) { clk.firstFrame(); if (_st) _st.out += d.content.length; outText += d.content; controller.enqueue(_sseBytes({ t: "token", v: d.content })); }
               }
             }
+            } catch (e) {
+              // 中途断线（含被自己的时钟掐断）：已经写出来的一个字都不丢，只补一句说得出原因的说明。
+              const why = clk.cut ? clk.why("作答") : ("流中断：" + (e && e.message));
+              if (outText) controller.enqueue(_sseBytes({ t: "note", v: why + "——上面已写出的部分保留着，说一句「继续」就接着写。" }));
+              else controller.enqueue(_sseBytes({ t: "error", v: why + "（可再问一次；深度档慢，可先用标准档）" }));
+            }
+            clk.stop();
             // 追问建议：正文已经吐完（读者已在读了），再花一次便宜档补三个「接着可以问什么」。
             // 走 WDS_VENDORS 的快档而非满血档——这一步要快，慢了读者早就自己打字了；失败一律吞掉。
             if (outText.length > 150) {
