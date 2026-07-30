@@ -98,5 +98,38 @@ console.log("\n[四] 闸的失败安全 + 端点切换");
   ok(RAG.indexOf("nbr2|") > 0, "缓存键换代，避免读到旧格式的缓存");
 }
 
+console.log("\n[五] 二次提智：命名之后再查一次（这一步是整条线上唯一会造新词的地方）");
+{
+  const up = H.slice(H.indexOf("const UPLIFT_SPEC = `"), H.indexOf("function upliftPrompt()"));
+  ok(/NBR_CHECK_MARK/.test(up), "UPLIFT_SPEC 也有近邻检测节（提智整篇重写、且会剥掉学术规范，不明写就会被删掉）");
+  ok(/跟着新命名重写/.test(up), "明写这一节要跟着新命名重写，不许照搬初稿那一节");
+  ok(/领域.{0,6}之外.{0,3}的学科/.test(up) && /判决性对照预测/.test(up), "提智稿同样要求跨学科近邻与判决性预测");
+
+  const run = H.slice(H.indexOf("const _upq0="), H.indexOf("const results = await Promise.allSettled(defs"));
+  ok(/_upNbrs/.test(run) && /Promise\.all\(defs\.map/.test(run), "提智的近邻名单逐篇取（四篇提智的是四个不同命名）");
+  ok(/d\.src&&d\.src\.text|d\.src && d\.src\.text/.test(run), "种子是那篇待提升论文自己的正文，不是共用的原初问题");
+  ok(/SDERag\.ctx\(_upq0\)/.test(run), "全站语料块照旧注入（语料让它知道更多，名单才逼它交代）——两者并存，不是替换");
+
+  /* 抽命名 */
+  const ca = H.indexOf("function coinedName(text){"), cb = H.indexOf("\n}", ca) + 2;
+  const coinedName = (function(){ const m={exports:{}}; new Function("module", H.slice(ca,cb)+"\nmodule.exports=coinedName;")(m); return m.exports; })();
+  ok(coinedName("……本文将其命名为“拮抗负荷”，指的是……") === "拮抗负荷", "抽得出「命名为“X”」");
+  ok(coinedName("我们把这一机制称之为「反向雕刻」。") === "反向雕刻", "抽得出「把这一机制称之为「X」」（措辞很杂，不能只认一种）");
+  ok(coinedName("将其称为“默会承担”，是因为……") === "默会承担", "抽得出「将其称为“X”」");
+  ok(coinedName("本文提出“品核”这一概念") === "品核", "抽得出「提出“X”」");
+  ok(coinedName("这是一篇没有新命名的综述。") === "", "抽不出就返回空串——宁可漏查，不可乱查");
+  ok(coinedName("") === "", "空文不抛错");
+
+  const gp = H.slice(H.indexOf("async function nbrPostNameGap"), H.indexOf("function NBR_FIX_INPUT"));
+  ok(/window\.SDERag/.test(gp) && /return \{ name:'', block:'', missed:\[\] \}/.test(gp), "SDERag 不在或抽不出命名时，这一关自动通过而不是报错");
+  ok(/catch\(_\)/.test(gp), "查询失败不影响出稿");
+  ok(/paperText\.indexOf\(head\) < 0/.test(gp), "判据是「这篇的标题在稿里根本没被提到」——只挑真漏的，不挑措辞");
+
+  const g2 = H.slice(H.indexOf("// ── 近邻闸 ──"), H.indexOf("// 2. ") > 0 ? H.indexOf("// 2. ") : H.indexOf("// ── 近邻闸 ──") + 4000);
+  ok(/_pn\.missed\.length > 0/.test(g2), "两关任一不过就补写：没做检测，或检测的不是现在这个名字");
+  ok(/cfg\.draftPrompt \|\| paper1wPrompt\(\)/.test(g2), "补写用本阶段自己的规范（提智别拿第一批的规范去补）");
+  ok(/新命名「/.test(g2), "状态栏说清是哪个命名、还差几篇没交代");
+}
+
 console.log("\n结果：PASS " + P + " · FAIL " + F);
 process.exit(F ? 1 : 0);

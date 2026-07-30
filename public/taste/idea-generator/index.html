@@ -1423,6 +1423,22 @@ const UPLIFT_SPEC = `
 · 结尾用一句朴素自然的话给出新判断的证伪条件。
 
 现在，请对下面这篇论文执行上述发生引擎工序，输出被提升后的、以一个不可还原的新命名为核心的完整论文。
+▍近邻检测（NBR_CHECK_MARK · 提智稿的硬要求，缺此节即为不合格）
+这一步你会造出一个新词——而撞车只可能撞在新词上。所以命名之后，必须有一节专门检测这个**新命名**：
+
+· 一、新命名先过站内。输入里若给了【站内近邻】清单，逐条交代：那一篇说到哪一步，你的新命名与它的分离线在哪。
+  凡划不出分离线的，直接写明重复，并撤回这个命名、往矛盾更深处再结算一层——不要保留一个同义的新词。
+  标注「本人已发」的那几篇尤其要查：同一个人把同一个概念发明两次，是最不容易被自己发现的一种重合。
+
+· 二、库外近邻至少三个，每个给全四件：出处（作者、年份、作品，真实可查；记不准年份就不写年份，但不能编）／
+  它已经说到哪一步（如实概述，不设稻草人）／分离线（写成可操作的判别）／
+  一个判决性对照预测（"若观察到 X，则本文错、该近邻足够；若 Y，则本文成立"）。
+  第四件是重心：没有对照预测的分离线，等于没有分离线。
+
+· 三、这三个里至少一个来自问题所在领域**之外**的学科。同一个机制常常在别的学科里已被人用别的名字研究了几十年，
+  而领域内的对手往往离得更远——只在本领域找对手，是这类论文最常见也最致命的漏洞。
+
+注意：提智把思想做深，但不许把这一节做掉。整篇重写时，这一节要跟着新命名重写，不是把初稿那一节照搬过来。
 `;
 function upliftPrompt(){ return SDE_BASE + UPLIFT_SPEC; }
 
@@ -2530,7 +2546,38 @@ function nbrSectionOK(text){
               || /对照预测|判决性/.test(seg);
   return named >= 3 && hasPred;
 }
-function NBR_FIX_INPUT(paperText, writeInput){
+// coinedName：从稿子里抽出那个新造的命名。抽不出就返回空串——
+//   抽不出不等于没命名，所以复查这一关只在抽得出时才做（宁可漏查，不可乱查）。
+function coinedName(text){
+  const t = String(text||'').slice(0, 20000);
+  const pats = [
+    /(?:本文|我)(?:将(?:其|这|之)?|把(?:它|这|其)?[^。\n]{0,12})?命名为[「“"《【]?([^」”"》】，。；\n]{2,14})/,
+    /命名为[「“"《【]?([^」”"》】，。；\n]{2,14})/,
+    /(?:本文|我)(?:提出|称(?:之为)?)[「“"《【]([^」”"》】]{2,14})/,
+    /(?:把|将)(?:这一|这种|该|其)?[^。\n]{0,12}称(?:之)?为[「“"《【]?([^」”"》】，。；\n]{2,14})/,
+    /(?:本文|我们|我)(?:据此|因此)?(?:提出|引入)[「“"《【]([^」”"》】]{2,14})/
+  ];
+  for(const p of pats){ const m = t.match(p); if(m && m[1]) return m[1].trim(); }
+  return '';
+}
+// nbrPostNameGap：拿新命名再查一次站内近邻，返回"稿里根本没提到"的那几篇。
+//   前一道闸查的是"有没有做检测"，这一道查的是"检测的是不是现在这个名字"——
+//   提智会把名字换掉，先前那次检测随之作废。
+async function nbrPostNameGap(paperText){
+  const name = coinedName(paperText);
+  if(!name || !window.SDERag) return { name:'', block:'', missed:[] };
+  let blk = '';
+  try{ blk = await window.SDERag.neighbors(name, { k:6 }); }catch(_){ return { name:name, block:'', missed:[] }; }
+  if(!blk) return { name:name, block:'', missed:[] };
+  const titles = (blk.match(/《([^》]{2,60})》/g)||[]).map(s=>s.slice(1,-1));
+  const missed = [];
+  for(const t of titles){
+    const head = t.replace(/[：:—\-·].*$/,'').slice(0,10);
+    if(head && paperText.indexOf(head) < 0) missed.push(t);
+  }
+  return { name:name, block:blk, missed:missed };
+}
+function NBR_FIX_INPUT(paperText, writeInput, extraBlock){
   return '你刚写完下面这篇论文，但其中的【近邻检测】一节缺失或不合格。\n'
     + '现在只补写这一节，不要重写论文、不要复述已有内容、不要写任何交代过程的话。\n\n'
     + '这一节必须做到：\n'
@@ -2539,6 +2586,7 @@ function NBR_FIX_INPUT(paperText, writeInput){
     + '  它已经说到哪一步／分离线（可操作的判别）／一个判决性对照预测（若观察到 X 则本文错、该近邻足够；若 Y 则本文成立）。\n'
     + '· 这三个里至少一个来自问题所在领域**之外**的学科。\n\n'
     + '直接以一个小节标题开始输出（例如"近邻检测：为什么这个命名不能被现成概念替换"），一千五百字以内。\n\n'
+    + (extraBlock ? ('──── 按本文这个新命名重新查到的站内近邻（这几篇正文里没有提到，必须逐条交代）────\n' + extraBlock + '\n\n') : '')
     + '──── 这篇论文的写作输入（含站内近邻清单，若有）────\n' + String(writeInput||'').slice(0,4000)
     + '\n\n──── 已写成的论文正文 ────\n' + String(paperText||'').slice(0,12000);
 }
@@ -2578,11 +2626,19 @@ async function runOnePaper(cfg){
   // 缺了就**只补写这一节**再拼回去——不整篇重写：满功率配大任务会跑过平台时长上限、
   // 落得"只有思考、正文 0 字"（站上踩过两次）。补写是小任务、预算有界，安全。
   try{
-    if(paperText && !nbrSectionOK(paperText)){
-      setStat('⚖ 近邻检测未达标，正在补写这一节…');
+    // 第二关（命名后复查）：拿稿子里那个新命名再查一次站内近邻，
+    // 把"稿里根本没提到"的那几篇挑出来。为空则这一关自动通过。
+    let _pn = { name:'', block:'', missed:[] };
+    try{ _pn = await nbrPostNameGap(paperText); }catch(_){}
+    const _needFix = paperText && (!nbrSectionOK(paperText) || _pn.missed.length > 0);
+    if(_needFix){
+      setStat(_pn.missed.length ? ('⚖ 新命名「'+_pn.name+'」还有 '+_pn.missed.length+' 篇站内近邻未交代，正在补写…')
+                                : '⚖ 近邻检测未达标，正在补写这一节…');
       const fixSink = document.createElement('div');
-      const fixed = await streamChat(cfg.writeKey, cfg.writeSel, paper1wPrompt(),
-        NBR_FIX_INPUT(paperText, cfg.writeInput), fixSink, dummy, dummy, 4000);
+      // system 用本阶段自己的规范（cfg.draftPrompt）：提智阶段若拿第一批的规范去补，
+      // 补出来的那一节口径与全篇不一致。
+      const fixed = await streamChat(cfg.writeKey, cfg.writeSel, (cfg.draftPrompt || paper1wPrompt()),
+        NBR_FIX_INPUT(paperText, cfg.writeInput, (_pn.missed.length ? _pn.block : '')), fixSink, dummy, dummy, 4000);
       const add = (fixed && fixed.text || '').trim();
       if(add && /近邻/.test(add)) paperText = paperText.replace(/\s*$/, '') + '\n\n' + add + '\n';
     }
@@ -3051,14 +3107,24 @@ if(upliftBtn){
       return { bodyEl: wrap.querySelector('.upCellBody'), statusEl: wrap.querySelector('.upCellStatus'), title:newTitle };
     });
 
-    // 二次提智是"够不够创新/要不要撞已有命名"的判定站 → 强注入全站上下文
-    let _upCtx=''; { const _upq=(window._lastResult && window._lastResult.question)||''; if(window.SDERag && _upq){ try{ _upCtx = await window.SDERag.ctx(_upq); }catch(_){} } }
+    // 二次提智是"够不够创新/要不要撞已有命名"的判定站 → 全站语料上下文照旧注入，
+    // 但"要不要撞已有命名"这件事靠的不是语料块，而是一张要逐条交代的近邻名单：
+    // 语料块让基底知道得更多，名单才逼它说清分离线。且名单必须**逐篇**取——
+    // 四篇提智的是四个不同的命名，共用一份按原初问题取的清单等于没查。
+    const _upq0=(window._lastResult && window._lastResult.question)||'';
+    const _upAu=(window._lastResult && window._lastResult.author)||'';
+    let _upCtx=''; if(window.SDERag && _upq0){ try{ _upCtx = await window.SDERag.ctx(_upq0); }catch(_){} }
+    const _upNbrs = await Promise.all(defs.map(async (d)=>{
+      if(!window.SDERag) return '';
+      try{ return await window.SDERag.neighbors((_upq0+' '+String((d.src&&d.src.text)||'').slice(0,600)).trim(), { k:8, author:_upAu }); }
+      catch(_){ return ''; }
+    }));
     // 并发：每篇复用 runOnePaper —— 初稿用发生引擎(upliftPrompt)，然后同样走双审+改稿
     const results = await Promise.allSettled(defs.map((d,i)=>runOnePaper({
       title: cells[i].title,
       draftPrompt: upliftPromptR(ureflection),   // ★ 带《从发现到发生》心得 + 发生引擎冲150
       reflection: ureflection,                    // 审稿人也带心得，用发生学标准把关
-      writeInput: buildUpliftInput(d.src.text, _upCtx),  // 输入 = 第一批那篇全文 + 全站上下文
+      writeInput: buildUpliftInput(d.src.text, ((_upNbrs[i]||'') + (_upNbrs[i]&&_upCtx?'\n\n':'') + (_upCtx||''))),  // 输入 = 第一批那篇全文 + 本篇的站内近邻名单 + 全站上下文
       bodyEl: cells[i].bodyEl,
       statusEl: cells[i].statusEl,
       writeSel, writeKey,
