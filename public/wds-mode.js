@@ -1570,11 +1570,20 @@
      全同步是刻意的：`showSaveFilePicker` 要求生成必须发生在用户点击那一下之内，
      中间一 await 手势就过期——sde-docsave 那条线上栽过，这里不再栽。
      所以模块在成文面板一打开就先拉进来，点按钮时它必须已经在内存里。 */
-  function pptxBoot(then) {
-    if (window.WDSPptx) { if (then) then(true); return; }
+  /* 期望的渲染器版本。**读者的标签页可能开了一整天**——旧模块留在内存里，
+     改了半天的渲染一点都用不上（2026-07-30 实测：读者拿到的产物是三版之前渲染的）。
+     所以这里不只按 URL 版本号取，还要**核对模块自报的 VERSION**，对不上就带随机串强制重取。 */
+  var PPTX_WANT = 9;
+  function pptxBoot(then, forced) {
+    if (window.WDSPptx && window.WDSPptx.VERSION >= PPTX_WANT) { if (then) then(true); return; }
+    if (window.WDSPptx && !forced) {                       // 内存里是旧的：丢掉重取一次
+      try { delete window.WDSPptx; } catch (e) { window.WDSPptx = null; }
+      return pptxBoot(then, true);
+    }
     if (!document.head || !document.head.appendChild) { if (then) then(false); return; }
     var sc = document.createElement("script");
-    sc.src = "/assets/wds-pptx.js?v=9"; sc.async = true;   // 模块也要能刷新：改它就 bump 这个号
+    sc.src = "/assets/wds-pptx.js?v=" + PPTX_WANT + (forced ? ("&r=" + Date.now()) : "");
+    sc.async = true;
     sc.onload = function () { if (then) then(!!window.WDSPptx); };
     sc.onerror = function () { if (then) then(false); };
     document.head.appendChild(sc);
@@ -2400,7 +2409,7 @@
         if (tpl && !d.theme) d.theme = tplTheme(tpl);      // 模板定的主题（稿子里写了 theme: 则以稿子为准）
         var blob = window.WDSPptx.blob(d);            // 同步造好字节，再去要目录/下载（手势还新鲜）
         var nm = "WDS-" + safeName(d.title || kindT(kind)) + "-" + stampName() + ".pptx";
-        stat.textContent = t("dPptxOk") + (d.slides.length + 1);
+        stat.textContent = t("dPptxOk") + (d.slides.length + 1) + " · 渲染器 v" + (window.WDSPptx.VERSION || "?");
         saveBlobToDir(nm, blob, function (msg) { if (msg) stat.textContent = msg; });
       };
     }

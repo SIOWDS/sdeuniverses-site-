@@ -15,7 +15,11 @@
  */
 (function () {
   "use strict";
-  if (window.WDSPptx) return;
+  // 版本号：改了渲染就把它 +1，并同步 wds-mode.js 里的 PPTX_WANT。
+  // 作用有二：①页面发现版本对不上会强制重取（读者的标签页可能开了一整天）；
+  // ②这个号会写进 .pptx 的属性里——**拿到一份产物就能立刻知道它出自哪一版渲染器**。
+  var VERSION = 9;
+  if (window.WDSPptx && window.WDSPptx.VERSION >= VERSION) return;
 
   /* ─────────── zip（store，无压缩） ─────────── */
   var CRCT = (function () {
@@ -1029,7 +1033,7 @@
       + '<dcterms:created xsi:type="dcterms:W3CDTF">' + now + '</dcterms:created>'
       + '<dcterms:modified xsi:type="dcterms:W3CDTF">' + now + '</dcterms:modified></cp:coreProperties>') });
     files.push({ name: "docProps/app.xml", data: enc(XD + '<Properties xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties" xmlns:vt="http://schemas.openxmlformats.org/officeDocument/2006/docPropsVTypes">'
-      + '<Application>WDS</Application><Slides>' + all.length + '</Slides></Properties>') });
+      + '<Application>WDS deck v' + VERSION + '</Application><Slides>' + all.length + '</Slides></Properties>') });
 
     var pres = XD + '<p:presentation ' + A + ' ' + P + ' ' + R + ' saveSubsetFonts="1">'
       + '<p:sldMasterIdLst><p:sldMasterId id="2147483648" r:id="rId1"/></p:sldMasterIdLst>'
@@ -1245,6 +1249,7 @@
   }
 
   window.WDSPptx = {
+    VERSION: VERSION,
     build: build,
     parse: parse,
     preload: preload,

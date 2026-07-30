@@ -350,6 +350,21 @@ console.log("── 四点〇 · 装配三原则：统一 · 多样 · 和谐（
   ok(/相邻两页不许写成同一个形状/.test(wk) && /宁可少一条，不许挤/.test(wk), "多样与和谐都落成可执行的一句话");
 }
 
+console.log("── 三点九 · 渲染器版本号：拿到一份产物就知道它出自哪一版");
+{
+  ok(/var VERSION = \d+;/.test(MOD) && typeof X.VERSION === "number", "模块自报版本号");
+  ok(/window\.WDSPptx && window\.WDSPptx\.VERSION >= VERSION\) return/.test(MOD), "已加载的若不比自己新才让位（旧的不能顶掉新的）");
+  ok(/<Application>WDS deck v' \+ VERSION/.test(MOD), "版本写进 .pptx 属性——**拿到产物就能立刻判定渲染器版本**");
+  ok(/var PPTX_WANT = \d+;/.test(wm), "页面声明它期望的版本");
+  ok(new RegExp("PPTX_WANT = " + X.VERSION + ";").test(wm), "两端版本号一致（实为 v" + X.VERSION + "）");
+  ok(/window\.WDSPptx\.VERSION >= PPTX_WANT/.test(wm), "页面核对模块自报版本，不只看 URL 上的号");
+  ok(/delete window\.WDSPptx/.test(wm) && /"&r=" \+ Date\.now\(\)/.test(wm), "内存里是旧模块就丢掉、带随机串强制重取");
+  ok(/渲染器 v" \+ \(window\.WDSPptx\.VERSION/.test(wm), "存盘时把版本显示给读者");
+  // 真造一份，属性里必须带版本
+  const zv = unzip(Buffer.from(X.build(X.parse("# a\n## b\n---\n## c\n- d\n"))));
+  ok(/WDS deck v\d+/.test(zv["docProps/app.xml"].toString("utf8")), "产物属性里确实带着版本号");
+}
+
 console.log("── 三点九五 · PPT 文本打造 Skill：逐页产出 ＋ 想象力 ＋ 编造边界");
 {
   ok(/const DECK_CRAFT = /.test(wk), "文本打造写成独立常量（与管字数的 DECK_SIZES 分工：一个管能放多少，一个管怎么写）");
