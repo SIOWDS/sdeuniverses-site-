@@ -77,6 +77,7 @@ table.iq th{color:var(--gold2);font-weight:700}
 footer{border-top:1px solid rgba(255,255,255,0.08);margin-top:44px;padding:22px 0 34px;text-align:center;color:var(--sub);font-size:12.5px}
 </style>
 <script src="/taste/assets/sde-rag.js?v=4"></script>
+<script src="/taste/assets/sde-nbr-gate.js?v=1"></script>
 </head>
 <body>
 
@@ -2428,6 +2429,35 @@ function compositeOf(parsed, evs){
   if(!vals.length) return 138;
   return Math.round(vals.reduce((x,y)=>x+y,0)/vals.length);
 }
+// 近邻闸（三关）：判据来自共用模块 window.SDENbr（唯一来源）。
+//   不过就**只补写那一节**再拼回原文尾部——不整篇重写：满功率配大任务会跑过平台时长上限、
+//   落得"只有思考、正文 0 字"。模块没加载成功时整关跳过（宁可不查，不可误伤出稿）。
+async function nbrGateFix(text, sys, question, nbrBlock, stEl){
+  try{
+    if(!text || !window.SDENbr) return text;
+    const v = await window.SDENbr.verdict(text);
+    if(!v.need) return text;
+    if(stEl) stEl.innerHTML = '<span class="spinner"></span> ⚖ ' + v.why + '，正在补写近邻检测一节…';
+    const fixUsr = '你刚写完下面这篇论文，但其中的【近邻检测】一节缺失或不合格（'+v.why+'）。\n'
+      + '现在只补写这一节，不要重写论文、不要复述已有内容、不要写任何交代过程的话。\n\n'
+      + '这一节必须做到：\n'
+      + '· 站内近邻（下方清单，若有）逐条交代：它说到哪一步、你的分离线在哪；划不出就写明重复。\n'
+      + '· 库外近邻至少三个，每个给全四件：出处（作者+年份+作品，真实可查，记不准年份就不写年份）／\n'
+      + '  它已经说到哪一步／分离线（可操作的判别）／一个判决性对照预测。\n'
+      + '· 这三个里至少一个来自本议题所在领域之外的学科。\n'
+      + '· 本节开头写一行「本文所属学科：XXX」，每个库外近邻的出处后紧跟「（学科：XXX）」。\n\n'
+      + (v.cross === false ? '【本次特别注意】上一稿的三个近邻全落在同一个学科里，请把其中至少一个换成真正来自别的学科的对手。\n\n' : '')
+      + (v.block ? ('──── 按本文这个新命名重新查到的站内近邻（正文里没有提到，必须逐条交代）────\n' + v.block + '\n\n') : '')
+      + (nbrBlock ? ('──── 站内近邻清单 ────\n' + nbrBlock + '\n\n') : '')
+      + '直接以一个小节标题开始输出（例如"近邻检测：为什么这个命名不能被现成概念替换"），一千五百字以内。\n\n'
+      + '──── 议题 ────\n' + String(question||'') + '\n\n──── 已写成的论文正文 ────\n' + String(text).slice(0,16000);
+    const sink = document.createElement('div');
+    const r = await streamChat(RUN.key, RUN.sel, sys, fixUsr, sink, { textContent:'' }, { textContent:'' }, null, 4000);
+    const add = (r && r.text || '').trim();
+    if(add && /近邻/.test(add)) return String(text).replace(/\s*$/, '') + '\n\n' + add + '\n';
+  }catch(_){ /* 补不上就照原样：近邻检测是加固，不该成为整篇失败的理由 */ }
+  return text;
+}
 function paperSystem(agentOrNull, xinde){
   const skill = SDE_BASE;   // 与桌面版一致:写论文阶段用完整内功(路径工作已在六轮完成,论文只需保份量)
   let sys = '你即将接收两份本体论先验,然后基于 6 轮 SDE 提智的产出,撰写一篇 2 万字的学术论文。\n\n'
@@ -2435,7 +2465,17 @@ function paperSystem(agentOrNull, xinde){
     + skill
     + '\n\n═══════════════════════ 第二部分:学术论文写作 Skill(用于工程化论文) ═══════════════════════\n\n'
     + PAPER_SKILL
-    + '\n\n═══════════════════════ 任务说明 ═══════════════════════\n\n'
+    + '\n\n═══════════════════════ 任务说明 ═══════════════════════\n\n'    + '\n\n【近邻检测 · NBR_CHECK_MARK（硬要求，缺此节即为不合格）】\n'
+    + '文献综述之后、结论之前，必须有一节专门检测本文那个核心命名——证明它不能被现成概念无损替换：\n'
+    + '· 一、材料里若给了【站内近邻】清单（sdeuniverses.com 已发表的相关篇目），逐条交代：那一篇说到哪一步、\n'
+    + '  本文的判断与它的分离线在哪。划不出分离线的，直接写明重复并撤回命名，往矛盾更深处再结算一层，不要另起同义词。\n'
+    + '  标注「本人已发」的尤其要查：同一个人把同一个概念发明两次，是最不容易被自己发现的一种重合。\n'
+    + '· 二、库外近邻至少三个，每个给全四件：出处（作者、年份、作品，真实可查；记不准年份就不写年份，但不能编）／\n'
+    + '  它已经说到哪一步（如实概述，不设稻草人）／分离线（写成可操作的判别）／一个判决性对照预测\n'
+    + '  （"若观察到 X，则本文错、该近邻足够；若 Y，则本文成立"）。第四件是重心：没有对照预测的分离线等于没有分离线。\n'
+    + '· 三、这三个里至少一个来自本议题所在领域**之外**的学科。同一个机制常常在别的学科里已被人用别的名字研究了几十年。\n'
+    + '  【格式硬要求 · NBR_DISC_MARK】本节开头写一行「本文所属学科：XXX」，每个库外近邻的出处后紧跟「（学科：XXX）」。\n'
+    + '  三个标注若全与「本文所属学科」相同，说明只在自家门内找了对手，至少换一个真正跨学科的近邻进来。\n'
     + '你的任务是:\n'
     + '1. 内化以上两份先验\n'
     + '2. 基于用户提供的 6 轮 SDE 提智产出(最后一轮回答 + 全部摘要),\n'
@@ -2450,9 +2490,12 @@ function paperSystem(agentOrNull, xinde){
   sys = withXinde(sys, xinde, '这篇论文带着这个已内化的认知去写。');
   return sys;
 }
-function paperMaterials(question, summaries, finalAnswer){
-  const parts = ['# 原始议题\n\n' + question + '\n\n',
-    '# 6 轮 SDE 提智的判断脉络(从 R1 到 R N 的摘要)\n\n'];
+function paperMaterials(question, summaries, finalAnswer, nbrBlock){
+  const parts = [];
+  // 站内近邻名单前置：它不是语料，是一张要逐条交代的名单。放最前面，避免被两万字材料埋掉。
+  if(nbrBlock) parts.push(nbrBlock + '\n\n');
+  parts.push('# 原始议题\n\n' + question + '\n\n',
+    '# 6 轮 SDE 提智的判断脉络(从 R1 到 R N 的摘要)\n\n');
   summaries.forEach((s,i)=>{ parts.push('## R'+(i+1)+' 摘要\n\n'+s+'\n\n'); });
   parts.push('# 最后一轮(R'+summaries.length+')的完整回答 ── 这是论文的核心素材\n\n'+(finalAnswer||'')+'\n\n');
   parts.push('# 现在请撰写论文\n\n'
@@ -2809,6 +2852,15 @@ async function runLane(agent, manualMode){
     setChip(L, rnd, 'on');
     L.st.innerHTML='<span class="spinner"></span> 第'+rnd+'/'+maxR+'轮 · '+(ROUND_LABEL[rnd]||'螺旋深化');
     const sys = roundSystem(agent, rnd===1, RUN.xinde['DS-'+agent]||'');
+    // 每轮按**当轮主题**重取站内底盘：六轮螺旋每轮都在换焦点，
+    // 拿第一轮的底盘用到第六轮等于后五轮没查。种子 = 原初问题 + 上一轮摘要。
+    if(rnd > 1 && window.SDERag){
+      try{
+        const _seed = (RUN.question + ' ' + String((history[history.length-1]||{}).summary || (history[history.length-1]||{}).answer || '').slice(0,400)).trim();
+        const _c = await window.SDERag.ctx(_seed);
+        if(_c) RUN.kbCtx = _c;          // 取不到就沿用上一份，不把已有底盘清空
+      }catch(_){}
+    }
     const usr = rnd===1 ? ((RUN.kbCtx ? RUN.kbCtx + '\n【问题】\n' : '') + RUN.question) : buildRoundUserMsg(RUN.question, history, pendingFb);
     const sub = mkSub(L.body, '第'+rnd+'轮 · '+(ROUND_LABEL[rnd]||'螺旋深化'));
     let res;
@@ -2858,8 +2910,13 @@ async function runLane(agent, manualMode){
   const finalRound = history[history.length-1];
   let ptext = '';
   try{
+    // 成文前取一次站内近邻：种子 = 原初问题 + 末轮判断（论文的核心命名就长在末轮里）
+    let _nb = '';
+    if(window.SDERag){
+      try{ _nb = await window.SDERag.neighbors((RUN.question + ' ' + String(finalRound.answer||finalRound.summary||'').slice(0,600)).trim(), { k:8 }); }catch(_){}
+    }
     const pr = await streamChat(RUN.key, RUN.sel, paperSystem(agent, RUN.xinde['DS-'+agent]||''),
-      paperMaterials(RUN.question, history.map(h=>h.summary||''), finalRound.answer||finalRound.summary||''),
+      paperMaterials(RUN.question, history.map(h=>h.summary||''), finalRound.answer||finalRound.summary||'', _nb),
       pb.body, pb.st, pb.meta, pb.el, PAPER_TOKENS);
     ptext = (pr && pr.text || '').trim();
   }catch(e){ pb.st.textContent='✗ 论文生成失败:'+String(e&&e.message||e).slice(0,80); }
@@ -2867,6 +2924,7 @@ async function runLane(agent, manualMode){
     ptext = (finalRound.answer || finalRound.summary || '').trim();
     pb.st.textContent = (pb.st.textContent||'') + ' · 已用末轮收口全文兜底';
   }
+  ptext = await nbrGateFix(ptext, paperSystem(agent, RUN.xinde['DS-'+agent]||''), RUN.question, _nb, pb.st);
   ptext = dejargonOutput(ptext);
   finalizePaper(agent, ptext);
   setChip(L, maxR+1, 'done');
@@ -2968,6 +3026,9 @@ async function runCollision(){
   if(RUN_STOPPED) throw new Error('已手动停止');
   const pb = RUN.papers['典范'];
   pb.open(); pb.st.innerHTML='<span class="spinner"></span> 把典范写成第四篇论文(约 2 万字)';
+  // 典范这一篇的命名就在第③步里，拿它去取站内近邻
+  let _nb4 = '';
+  if(window.SDERag){ try{ _nb4 = await window.SDERag.neighbors((q + ' ' + String(step3||'').slice(0,600)).trim(), { k:8 }); }catch(_){} }
   let ptext='';
   try{
     const pr = await streamChat(RUN.key, RUN.sel, paperSystem(null, RUN.xinde['碰撞']||''),
@@ -2978,11 +3039,12 @@ async function runCollision(){
           .concat(bs ? ['第⑥步·盲区涌现(5 个最近邻各自结构性看不见什么 / 它们共同站着的那块地 / 本文把它当作产物而非给定 ── '
             + '**这一段决定本文的不可还原性:文献综述的"研究缺口"一节必须写成"既有各路径共同把 X 当作给定,因此都看不见 Y",'
             + '而不是"还有三个方面没人研究";理论框架必须把那个"被当作给定的东西"当作待解释的产物来处理**):\n'+bs] : []),
-        step3),
+        step3, _nb4),
       pb.body, pb.st, pb.meta, pb.el, PAPER_TOKENS);
     ptext=(pr && pr.text || '').trim();
   }catch(e){ pb.st.textContent='✗ 第四篇生成失败:'+String(e&&e.message||e).slice(0,80); }
   if(!ptext){ ptext = step3; pb.st.textContent=(pb.st.textContent||'')+' · 已用第③步典范全文兜底'; }
+  ptext = await nbrGateFix(ptext, paperSystem(null, RUN.xinde['碰撞']||''), q, _nb4, pb.st);
   ptext = dejargonOutput(ptext);
   finalizePaper('典范', ptext);
 }

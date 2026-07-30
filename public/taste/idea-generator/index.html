@@ -133,6 +133,7 @@ footer{border-top:1px solid var(--border);text-align:center;padding:30px 20px 44
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script src="/taste/assets/sde-rag.js?v=4"></script>
+<script src="/taste/assets/sde-nbr-gate.js?v=1"></script>
 </head>
 <body>
 
@@ -2570,6 +2571,8 @@ function nbrDiscTags(seg){
 // nbrCrossOK：三个近邻是不是全挤在同一学科里。
 //   返回 true=通过、false=没通过、null=看不出（缺标注又推断不出）——null 一律放行。
 function nbrCrossOK(text){
+  // 判据的唯一来源是共用模块；本地实现只在模块没加载成功时兜底（避免两页各存一份后漂移）。
+  if(window.SDENbr && window.SDENbr.crossOK) return window.SDENbr.crossOK(text);
   const t = String(text||'');
   const m = t.match(/(近邻检测|最近邻[^\n]{0,12}(切割|检测|对质)|近邻切割)[\s\S]{0,6000}/);
   if(!m) return null;                       // 连那一节都没有，交给 nbrSectionOK 去管
@@ -2589,6 +2592,8 @@ function nbrCrossOK(text){
   return d.own ? (uniq2[0] !== d.own ? true : false) : null;
 }
 function nbrSectionOK(text){
+  // 判据的唯一来源是共用模块；本地实现只在模块没加载成功时兜底（避免两页各存一份后漂移）。
+  if(window.SDENbr && window.SDENbr.sectionOK) return window.SDENbr.sectionOK(text);
   const t = String(text||'');
   const m = t.match(/(近邻检测|最近邻[^\n]{0,12}(切割|检测|对质)|近邻切割)[\s\S]{0,6000}/);
   if(!m) return false;
@@ -2602,6 +2607,8 @@ function nbrSectionOK(text){
 // coinedName：从稿子里抽出那个新造的命名。抽不出就返回空串——
 //   抽不出不等于没命名，所以复查这一关只在抽得出时才做（宁可漏查，不可乱查）。
 function coinedName(text){
+  // 判据的唯一来源是共用模块；本地实现只在模块没加载成功时兜底（避免两页各存一份后漂移）。
+  if(window.SDENbr && window.SDENbr.coinedName) return window.SDENbr.coinedName(text);
   const t = String(text||'').slice(0, 20000);
   const pats = [
     /(?:本文|我)(?:将(?:其|这|之)?|把(?:它|这|其)?[^。\n]{0,12})?命名为[「“"《【]?([^」”"》】，。；\n]{2,14})/,

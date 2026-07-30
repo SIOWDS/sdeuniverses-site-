@@ -20,7 +20,7 @@ const a = H.indexOf("function nbrSectionOK(text){");
 const b = H.indexOf("\n}", a) + 2;
 const nbrSectionOK = (function () {
   const m = { exports: {} };
-  new Function("module", H.slice(a, b) + "\nmodule.exports=nbrSectionOK;")(m);
+  new Function("module", "window", H.slice(a, b) + "\nmodule.exports=nbrSectionOK;")(m, {});
   return m.exports;
 })();
 
@@ -112,7 +112,7 @@ console.log("\n[五] 二次提智：命名之后再查一次（这一步是整�
 
   /* 抽命名 */
   const ca = H.indexOf("function coinedName(text){"), cb = H.indexOf("\n}", ca) + 2;
-  const coinedName = (function(){ const m={exports:{}}; new Function("module", H.slice(ca,cb)+"\nmodule.exports=coinedName;")(m); return m.exports; })();
+  const coinedName = (function(){ const m={exports:{}}; new Function("module","window", H.slice(ca,cb)+"\nmodule.exports=coinedName;")(m,{}); return m.exports; })();
   ok(coinedName("……本文将其命名为“拮抗负荷”，指的是……") === "拮抗负荷", "抽得出「命名为“X”」");
   ok(coinedName("我们把这一机制称之为「反向雕刻」。") === "反向雕刻", "抽得出「把这一机制称之为「X」」（措辞很杂，不能只认一种）");
   ok(coinedName("将其称为“默会承担”，是因为……") === "默会承担", "抽得出「将其称为“X”」");
@@ -137,7 +137,7 @@ console.log("\n[六] 跨学科闸（当天全部扣分的大头：对手几乎�
   const ta = H.indexOf("function nbrDiscTags(seg){"), tb = H.indexOf("\n}", ta) + 2;
   const hintLine = H.slice(H.indexOf("const DISC_HINTS ="), H.indexOf("\n// nbrDiscTags"));
   const box = (function(){ const m={exports:{}};
-    new Function("module", hintLine + "\n" + H.slice(ta,tb) + "\n" + H.slice(ga,gb) + "\nmodule.exports={nbrDiscTags,nbrCrossOK};")(m);
+    new Function("module","window", hintLine + "\n" + H.slice(ta,tb) + "\n" + H.slice(ga,gb) + "\nmodule.exports={nbrDiscTags,nbrCrossOK};")(m,{});
     return m.exports; })();
   const { nbrDiscTags, nbrCrossOK } = box;
 
