@@ -93,7 +93,11 @@ const document = {
   querySelector: (s) => head.querySelector(s) || body.querySelector(s),
   querySelectorAll: (s) => body.querySelectorAll(s),
   documentElement: new Node("html"),
-  addEventListener() {}, removeEventListener() {}, execCommand() { return true; },
+  _dl: {},
+  addEventListener(t, f) { (this._dl[t] = this._dl[t] || []).push(f); },
+  removeEventListener(t, f) { if (this._dl[t]) this._dl[t] = this._dl[t].filter((x) => x !== f); },
+  dispatch(t, ev) { (this._dl[t] || []).slice().forEach((f) => f(ev || {})); },
+  execCommand() { return true; },
 };
 const store = {};
 const localStorage = { getItem: (k) => (k in store ? store[k] : null), setItem: (k, v) => { store[k] = String(v); }, removeItem: (k) => { delete store[k]; } };
@@ -117,8 +121,12 @@ const fetchMock = (url, opt) => {
 let DOWNLOADS = [];
 const window = {
   __wdsModeMounted: false, WDSM_PAGE: 1, history: { length: 2, back() {} },
-  location: { href: "/taste/wds-chat/", pathname: "/taste/wds-chat/" }, innerWidth: 1200,
+  location: { href: "/taste/wds-chat/", pathname: "/taste/wds-chat/" }, innerWidth: 1200, innerHeight: 800,
+  matchMedia: () => ({ matches: false }),
+  prompt: (msg, def) => (PROMPT_NEXT === undefined ? def : PROMPT_NEXT),
+  confirm: () => CONFIRM_NEXT,
 };
+let PROMPT_NEXT = undefined, CONFIRM_NEXT = true;
 global.window = window; global.document = document; global.localStorage = localStorage;
 global.fetch = fetchMock;
 const navMock = { clipboard: { writeText() {} } };
@@ -248,7 +256,7 @@ ROUTE["/api/wds/chat"] = [
   const turn = msgs.children[0];
   const ans = turn.querySelector(".wdsm-a");
   const html = ans.innerHTML;
-  ok(html.includes("<h3>") || html.includes("<h4>"), "Markdown 标题被渲染");
+  ok(/<h[1-6]>/.test(html), "Markdown 标题被渲染（v3 起 # / ## 渲染为真 h1 / h2）");
   ok(html.includes("<strong>显露</strong>"), "粗体被渲染");
   ok(html.includes("<em>被看见</em>"), "斜体被渲染");
   ok(html.includes("<ul>") && html.includes("<li>"), "无序列表被渲染");
@@ -295,7 +303,7 @@ ROUTE["/api/wds/chat"] = [
   const dist = document.body.querySelector(".wdsm-dist");
   ok(!!dist, "成文面板出现");
   ok(LAST_PAYLOAD.kind === "report" && Array.isArray(LAST_PAYLOAD.history), "distill payload 正确");
-  ok(dist.querySelector(".wdsm-a").innerHTML.includes("<h3>"), "成文内容按 Markdown 渲染");
+  ok(/<h[1-6]>/.test(dist.querySelector(".wdsm-a").innerHTML), "成文内容按 Markdown 渲染");
   dist.querySelector(".dx").click();
   ok(!document.body.querySelector(".wdsm-dist"), "成文面板可关闭");
 
@@ -485,6 +493,134 @@ ROUTE["/api/wds/chat"] = [
   console.log("⑭ 新对话复位");
   layer.querySelector(".wdsm-newbtn").click();
   ok(layer.querySelector(".wdsm-msgs").children.length === 0, "新对话已清空");
+
+  /* ══════════════ ⑮ 问WDS v3：Claude 式外壳 ══════════════ */
+  console.log("⑮ v3 侧栏 / 折叠 / 抽屉");
+  const side = layer.querySelector(".wdsm-side");
+  ok(!!side, "左侧会话侧栏已挂载");
+  ok(!!layer.querySelector(".wdsm-nc") && !!layer.querySelector(".wdsm-sch") && !!layer.querySelector(".wdsm-list"),
+     "侧栏三件：新对话按钮 / 搜索框 / 会话列表");
+  ok(layer.querySelectorAll(".wdsm-sb").length === 3, "侧栏底部三个入口（外观/风格/快捷键），实得 " + layer.querySelectorAll(".wdsm-sb").length);
+  ok(layer.querySelector(".wdsm-tab[data-m='wds']").textContent.includes("问WDS"), "已更名为「问WDS」");
+  const foldBtn = layer.querySelector(".wdsm-fold");
+  foldBtn.click();
+  ok(layer.classList.contains("fold") && store["sde_wds_fold"] === "1", "点收起 → 侧栏折叠且记住");
+  foldBtn.click();
+  ok(!layer.classList.contains("fold") && store["sde_wds_fold"] === "0", "再点展开");
+  layer.querySelector(".wdsm-burger").click();
+  ok(layer.classList.contains("draw"), "窄屏汉堡键把侧栏当抽屉推出");
+  layer.querySelector(".wdsm-scrim").click();
+  ok(!layer.classList.contains("draw"), "点遮罩收回抽屉");
+
+  console.log("⑯ v3 外观三档主题");
+  layer.querySelector(".wdsm-sb[data-a='theme']").click();
+  let vTm = document.body.querySelector(".wdsm-menu");
+  ok(!!vTm && vTm.querySelectorAll("button").length === 3, "外观菜单三档（深/浅/跟随系统）");
+  vTm.querySelectorAll("button").find((b) => b.textContent.includes("浅色")).click();
+  ok(store["sde_wds_theme"] === "light" && document.documentElement.classList.contains("wdsm-lt"),
+     "选浅色 → :root 上 wdsm-lt 生效并记住（内联样式的设置面板也跟着换肤）");
+  layer.querySelector(".wdsm-sb[data-a='theme']").click();
+  document.body.querySelector(".wdsm-menu").querySelectorAll("button").find((b) => b.textContent.includes("深色")).click();
+  ok(!document.documentElement.classList.contains("wdsm-lt"), "切回深色");
+
+  console.log("⑰ v3 顶栏模型选择器");
+  const mp = layer.querySelector(".wdsm-mp");
+  ok(!!mp && mp.textContent.includes("智谱"), "模型选择器回显当前基底，实得 " + mp.textContent);
+  mp.click();
+  const vMm = document.body.querySelector(".wdsm-menu");
+  ok(!!vMm, "模型菜单弹出");
+  ok(vMm.querySelectorAll("button").filter((b) => /DeepSeek|智谱|Kimi|千问|MiniMax/.test(b.textContent)).length === 5,
+     "菜单里五家基底俱在");
+  vMm.querySelectorAll("button").find((b) => b.textContent.trim().endsWith("深度")).click();
+  ok(store["sde_wds_thinkmode"] === "deep" && mp.textContent.includes("深度"), "在顶栏就地切到深度档并回显");
+  mp.click();
+  document.body.querySelector(".wdsm-menu").querySelectorAll("button").find((b) => b.textContent.trim().endsWith("标准")).click();
+  ok(store["sde_wds_thinkmode"] === "std", "切回标准档");
+
+  console.log("⑱ v3 写作风格随问题上行");
+  layer.querySelector(".wdsm-sb[data-a='style']").click();
+  const vSm = document.body.querySelector(".wdsm-menu");
+  ok(!!vSm && vSm.querySelectorAll("button").length === 6, "风格菜单六档，实得 " + (vSm ? vSm.querySelectorAll("button").length : 0));
+  vSm.querySelectorAll("button").find((b) => b.textContent.includes("更狠")).click();
+  ok(store["sde_wds_style"] === "sharp", "选中的风格已存本地");
+  layer.querySelector(".wdsm-newbtn").click();
+  ROUTE["/api/wds/chat"] = [{ t: "token", v: "一句判断。" }];
+  inEl.value = "风格测试";
+  sendEl.click();
+  await new Promise((r) => setTimeout(r, 120));
+  ok(/【口吻】/.test(LAST_PAYLOAD.about || ""), "风格作为【口吻】段随 about 上行");
+  store["sde_wds_about"] = "我是中学老师";
+  inEl.value = "再问一句";
+  sendEl.click();
+  await new Promise((r) => setTimeout(r, 120));
+  ok((LAST_PAYLOAD.about || "").indexOf("我是中学老师") === 0 && /【口吻】/.test(LAST_PAYLOAD.about),
+     "自定义指令在前、风格在后，两段并存不互相顶掉");
+  store["sde_wds_style"] = "default";
+  delete store["sde_wds_about"];
+
+  console.log("⑲ v3 快捷键与帮助");
+  layer.querySelector(".wdsm-sb[data-a='help']").click();
+  const vHp = document.body.querySelector(".wdsm-help");
+  ok(!!vHp && vHp.querySelectorAll(".wdsm-help-r").length === 8, "快捷键面板八条，实得 " + (vHp ? vHp.querySelectorAll(".wdsm-help-r").length : 0));
+  document.dispatch("keydown", { key: "Escape" });
+  ok(!document.body.querySelector(".wdsm-help"), "Esc 关掉面板");
+  document.dispatch("keydown", { ctrlKey: true, key: "b", preventDefault() {} });
+  ok(layer.classList.contains("fold"), "Ctrl+B 开合侧栏");
+  document.dispatch("keydown", { ctrlKey: true, key: "b", preventDefault() {} });
+  document.dispatch("keydown", { ctrlKey: true, key: "/", preventDefault() {} });
+  ok(!!document.body.querySelector(".wdsm-help"), "Ctrl+/ 调出快捷键面板");
+  document.dispatch("keydown", { key: "Escape" });
+  inEl.value = "";
+  document.dispatch("keydown", { key: "ArrowUp", target: inEl, preventDefault() {} });
+  ok(inEl.value === "再问一句", "输入框空着按 ↑ 把上一问调回来，实得 " + inEl.value);
+  inEl.value = "";
+
+  console.log("⑳ v3 Markdown 升级：表格 / 任务清单 / 删除线 / 代码块 / 公式");
+  layer.querySelector(".wdsm-newbtn").click();
+  ROUTE["/api/wds/chat"] = [{ t: "token", v: "# 大标题\n\n| 维 | 说明 |\n|---|:--:|\n| S | 显露 |\n| D | 差异 |\n\n- [x] 做完的\n- [ ] 没做的\n\n~~划掉~~ 与公式 $E=mc^2$ 与\n\n$$S=F(D,E)$$\n\n```js\nconst a = 1; // 注释\n```\n" }];
+  inEl.value = "渲染测试";
+  sendEl.click();
+  await new Promise((r) => setTimeout(r, 140));
+  const vT2 = layer.querySelector(".wdsm-msgs").lastChild;
+  const vH2 = vT2.querySelector(".wdsm-a").innerHTML;
+  ok(vH2.includes("<h1>"), "# 渲染为 h1");
+  ok(vH2.includes("<table>") && vH2.includes("<th") && vH2.includes("text-align:center"), "表格渲染且认对齐标记");
+  ok(vH2.includes("ul class='tl'") && vH2.includes("tb on") && vH2.includes("class='tb'"), "任务清单渲染出勾选/未勾选两种");
+  ok(vH2.includes("<del>"), "删除线渲染");
+  ok(vH2.includes("wdsm-cb") && vH2.includes("JavaScript") && vH2.includes("cbc"), "代码块带语言标签与复制键");
+  ok(vH2.includes("tk-k") && vH2.includes("tk-c"), "代码块做了轻量高亮（关键字/注释）");
+  ok((vH2.match(/wdsm-tex/g) || []).length === 2, "行内 $…$ 与块级 $$…$$ 各出一个公式位，实得 " + (vH2.match(/wdsm-tex/g) || []).length);
+  ok(vH2.includes("blk"), "块级公式标了 blk（KaTeX 装不上时原样显示 $$…$$，不假装渲染过）");
+  const srcNoCmt = fs.readFileSync("public/wds-mode.js", "utf8").split("\n").map((L) => L.replace(/^\s*\/\/.*$/, "")).join("\n");
+  ok(!/\(\?<[=!]/.test(srcNoCmt), "代码里没有 lookbehind 正则（老 Safari 解析 (?<! 当场语法错、整脚本一起死）");
+
+  console.log("㉑ v3 就地编辑与分支版本 ‹1/2›");
+  const vQb = vT2.querySelector(".wdsm-qb");
+  ok(!!vQb, "问题下方有编辑键");
+  vQb.click();
+  const edBox = vT2.querySelector(".wdsm-edit");
+  ok(!!edBox, "点编辑 → 就地长出 textarea");
+  const eta = edBox.querySelector("textarea");
+  ok(eta.value === "渲染测试", "原问题已回填");
+  eta.value = "改过的问题";
+  ROUTE["/api/wds/chat"] = [{ t: "token", v: "第二版回答。" }];
+  edBox.querySelector(".pri").click();
+  await new Promise((r) => setTimeout(r, 140));
+  const vT3 = layer.querySelector(".wdsm-msgs").lastChild;
+  ok(vT3.querySelector(".wdsm-q").textContent.includes("改过的问题"), "以新问重跑了这一轮");
+  const brs = vT3.querySelector(".wdsm-brs");
+  ok(!!brs && brs.textContent.replace(/\s/g, "").includes("2/2"), "分支条显示 2/2，实得 " + (brs ? brs.textContent : "无"));
+  brs.querySelectorAll("button")[0].click();
+  ok(vT3.querySelector(".wdsm-q").textContent.includes("渲染测试"), "点 ‹ 翻回第一版的问题");
+  ok(vT3.querySelector(".wdsm-a").innerHTML.includes("<table>"), "答案也一起翻回旧版（问与答成对切换）");
+  vT3.querySelector(".wdsm-brs").querySelectorAll("button")[1].click();
+  ok(vT3.querySelector(".wdsm-a").innerHTML.includes("第二版回答"), "点 › 回到最新那一版");
+
+  console.log("㉒ v3 拖拽提示");
+  layer.dispatch("dragover", { preventDefault() {} });
+  ok(!!layer.querySelector(".wdsm-drop"), "拖文件进来出现落区提示");
+  layer.dispatch("dragleave", {});
+  ok(!layer.querySelector(".wdsm-drop"), "拖离即撤掉提示");
 
   console.log("\n===== " + PASS + " PASS / " + FAILS + " FAIL =====");
   process.exit(FAILS ? 1 : 0);
