@@ -51,20 +51,39 @@
 
   // 轻注入：把全站上下文压成一份"已有最近邻"清单——只保留来源标题 + 结构判断行，
   // 去掉大段原文片段，给"别撞已有命名/补真实引注"的站用，省 token。
-  async function neighbors(q) {
-    var k = _ckey(q, 'nbr', 16, 4000);
+  // neighbors(q, opts)：站内近邻清单。走专用端点 /api/kb/neighbors——
+  //   它给的是【标题 + 链接 + 那篇自己的一句话判断 + 是否本人已发】，并已同题去重。
+  //   这三样缺一样，基底就没法真的划分离线：只有标题时它只能猜那篇讲什么。
+  //   opts.author 传学员 slug/姓名 → 自己已发的篇目会被标注（不排除：自我重复最难自查）。
+  //   端点不可用或无命中时，退回旧的 retrieve 筛行法，保证老行为不丢。
+  async function neighbors(q, opts) {
+    opts = opts || {};
+    var k = _ckey(q, 'nbr2|' + (opts.author || '') + '|' + (opts.k || 8), 16, 4000);
     if (k in _cache) return _cache[k];
+    try {
+      var r = await fetch('/api/kb/neighbors', {
+        method: 'POST', headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ q: String(q || '').slice(0, 2000), k: opts.k || 8, author: opts.author || '' })
+      });
+      if (r.ok) {
+        var j = await r.json();
+        if (j && j.block) return (_cache[k] = j.block);
+      }
+    } catch (e) {}
+    return (_cache[k] = await _neighborsLegacy(q));
+  }
+  // 旧实现（兜底）：从 retrieve 的块里筛九库结构行 + 标题清单。
+  async function _neighborsLegacy(q) {
     var r = await _fetch(q, 16, 4000);
     var block = r.block || '';
     var srcs = r.srcs || [];
-    if (!block && !srcs.length) return (_cache[k] = '');
-    // 只取"结构判断"部分（▶/· 开头的九库行）+ 来源清单，丢弃【全站原文片段】大段正文。
+    if (!block && !srcs.length) return '';
     var lines = block.split('\n');
     var kept = [];
     for (var i = 0; i < lines.length; i++) {
       var ln = lines[i];
-      if (/^【全站原文片段】/.test(ln)) break;      // 到原文片段就停
-      if (/^[▶·]/.test(ln)) kept.push(ln);          // 只留九库结构行
+      if (/^【全站原文片段】/.test(ln)) break;
+      if (/^[▶·]/.test(ln)) kept.push(ln);
     }
     var srcList = srcs.slice(0, 10).map(function (s) { return '· ' + (s.t || ''); }).join('\n');
     var out = '';
@@ -73,7 +92,7 @@
         + (kept.length ? kept.join('\n') + '\n' : '')
         + (srcList ? '\n【已有相关文章】\n' + srcList : '');
     }
-    return (_cache[k] = out);
+    return out;
   }
 
   // 便捷包装：把上下文拼到一段用户文本前（有则前置，无则原样返回）。

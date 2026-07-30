@@ -1157,6 +1157,28 @@ const PAPER_SPEC = `
 · 读完让同行有"这个概念抓住了一个我们一直感到却说不清的东西，而且论证得住"的信服感。
 
 现在，请把这个新典范，写成这样一篇两万字的正式学术论文。\n\n▍参考文献铁律（REF_DISCIPLINE_MARK · 最高优先，压倒一切格式要求）\n· 这篇论文里出现的任何一条参考文献、任何一处具体引证，都必须是真实存在、可被查证的。做不到查证，就不要写。\n· 你只能引用你确有把握真实存在的文献——真实作者名下、广为人知、你有高置信度确信其真实存在的著作或论文。凡是你拿不准是否真实、或需要靠猜测拼凑出处的，一律不写。\n· 绝对禁止编造：不得虚构论文/著作的标题、作者、期刊名、出版社、年份、卷期、页码、DOI、链接。不得把真实作者安到一个并不存在的标题上，也不得把一个真实标题的年份/期刊/页码随手填一个。这类编造是本任务最严重的错误，一旦出现，整篇论文即为不合格。\n· 宁缺毋滥：如果就某个论点你没有可靠的真实文献可引，就不要列参考文献，改用'有一种影响深远的看法认为……''某种功能主义传统倾向于……'这类不依赖具体出处的方式，或点出真实思想家其广为人知的核心立场而不给虚构出处。一篇参考文献很短、甚至不设独立参考文献列表的诚实论文，远好过一篇挂满编造引证的论文。\n· 如果确实要列参考文献，只列你高置信度确信真实存在的那几条；对每一条，你都要在心里能回答'这本书/这篇文章真的存在吗'——答不上来就删掉。\n· 一句话：真实 > 完整。查不到就不写，永远不要为了让论文'看起来学术'而编造任何一条文献。
+▍近邻检测（NBR_CHECK_MARK · 硬要求，缺此节即为不合格）
+在正文的理论建构立起来之后、结论之前，必须有一节专门做近邻检测。这一节不是文献综述，是一次自证：
+证明你这个命名不能被现成的东西无损替换掉。写法有三条硬规矩：
+
+· 一、站内近邻逐条交代。输入里若给了【站内近邻】清单，对其中每一篇都要处理：说清它已经说到哪一步，
+  以及你这一次的判断与它的分离线在哪。凡划不出分离线的，直接写明"本文与该篇重复"，撤回你的命名、
+  往矛盾更深处再结算一层——不要另起一个同义的新词。标注「本人已发」的那几篇尤其要查：
+  同一个作者在同一个领域里把一个概念发明两次，是最不容易被自己发现的一种重合。
+
+· 二、库外近邻至少三个，每个都要给全四件东西：
+  （1）出处——作者、年份、作品名，必须是真实存在可查证的；想不起确切年份就不要写年份，但不能编。
+  （2）它已经说到哪一步——用一两句话如实概述那个概念的主张，不要贬低成稻草人。
+  （3）分离线——你的判断切开了它装不下的什么。要写成可操作的判别，不要只说"不同"。
+  （4）一个判决性对照预测——"若观察到 X，则本文错、该近邻足够；若观察到 Y，则本文成立"。
+      这一条是整节的重心：没有对照预测的分离线，等于没有分离线。
+
+· 三、这三个近邻里，**至少一个必须来自问题所在领域之外的学科**。原因很实在：
+  同一个机制常常在别的学科里已经被人用别的名字研究了几十年，而领域内的对手往往离得更远。
+  只在本领域内找对手，是这类论文最常见也最致命的漏洞。
+
+近邻找不到不是本事，是没找够——最像的那几个一定存在。若通篇找不出任何近邻，说明你的命名太模糊，
+先把它收紧到能被对手瞄准的程度。
 `;
 // 论文用系统提示 = SDE 内功底盘 + 学术论文写作规格
 function paperPrompt(){ return SDE_BASE + PAPER_SPEC; }
@@ -1324,6 +1346,28 @@ const PAPER_SPEC_1W = `
 · 你不是在向某人提交一份待批改的作业，你就是这篇论文的作者，正在完成一篇会被同行阅读与引用的正式论文。以作者的口吻和姿态，把它一气呵成地写完。
 
 现在，请把给你的这个核心判断，写成这样一篇约一万字的正式学术论文——一篇完整的成品，从标题到最后一句论证一气呵成，不含任何交稿说明或元对话。
+▍近邻检测（NBR_CHECK_MARK · 硬要求，缺此节即为不合格）
+在正文的理论建构立起来之后、结论之前，必须有一节专门做近邻检测。这一节不是文献综述，是一次自证：
+证明你这个命名不能被现成的东西无损替换掉。写法有三条硬规矩：
+
+· 一、站内近邻逐条交代。输入里若给了【站内近邻】清单，对其中每一篇都要处理：说清它已经说到哪一步，
+  以及你这一次的判断与它的分离线在哪。凡划不出分离线的，直接写明"本文与该篇重复"，撤回你的命名、
+  往矛盾更深处再结算一层——不要另起一个同义的新词。标注「本人已发」的那几篇尤其要查：
+  同一个作者在同一个领域里把一个概念发明两次，是最不容易被自己发现的一种重合。
+
+· 二、库外近邻至少三个，每个都要给全四件东西：
+  （1）出处——作者、年份、作品名，必须是真实存在可查证的；想不起确切年份就不要写年份，但不能编。
+  （2）它已经说到哪一步——用一两句话如实概述那个概念的主张，不要贬低成稻草人。
+  （3）分离线——你的判断切开了它装不下的什么。要写成可操作的判别，不要只说"不同"。
+  （4）一个判决性对照预测——"若观察到 X，则本文错、该近邻足够；若观察到 Y，则本文成立"。
+      这一条是整节的重心：没有对照预测的分离线，等于没有分离线。
+
+· 三、这三个近邻里，**至少一个必须来自问题所在领域之外的学科**。原因很实在：
+  同一个机制常常在别的学科里已经被人用别的名字研究了几十年，而领域内的对手往往离得更远。
+  只在本领域内找对手，是这类论文最常见也最致命的漏洞。
+
+近邻找不到不是本事，是没找够——最像的那几个一定存在。若通篇找不出任何近邻，说明你的命名太模糊，
+先把它收紧到能被对手瞄准的程度。
 `;
 function paper1wPrompt(){ return SDE_BASE + PAPER_SPEC_1W; }
 
@@ -2471,6 +2515,33 @@ function keyForVendor(sel, explicitKey){
 
 // 生成一篇论文的完整流程：写初稿 → A审 → B审 → 主笔据两意见改一次
 // paperCfg: { title, writeInput, bodyEl, statusEl, writeSel, writeKey, revA, revAKey, revB, revBKey }
+// nbrSectionOK：初稿里那节近邻检测算不算写到位。判据故意保守——
+//   只在\"明显没写\"时才触发补写，避免把已经写好的论文反复加尾巴。
+//   ① 得有那一节（标题里带\"近邻\"）；② 该节里至少点到 3 个可指认的对手
+//   （以\"作者+年份\"或\"《作品》\"或\"某某的某概念\"计）；③ 得出现判决性对照预测的字样。
+function nbrSectionOK(text){
+  const t = String(text||'');
+  const m = t.match(/(近邻检测|最近邻[^\n]{0,12}(切割|检测|对质)|近邻切割)[\s\S]{0,6000}/);
+  if(!m) return false;
+  const seg = m[0];
+  const named = (seg.match(/[（(]\s*[^）)]{0,30}(1[6-9]|20)\d{2}[^）)]{0,12}[）)]/g)||[]).length
+              + (seg.match(/《[^》]{2,40}》/g)||[]).length;
+  const hasPred = /(若|如果)[^\n]{0,80}(则本文|本文即错|本文错|本文不成立|说明本文)/.test(seg)
+              || /对照预测|判决性/.test(seg);
+  return named >= 3 && hasPred;
+}
+function NBR_FIX_INPUT(paperText, writeInput){
+  return '你刚写完下面这篇论文，但其中的【近邻检测】一节缺失或不合格。\n'
+    + '现在只补写这一节，不要重写论文、不要复述已有内容、不要写任何交代过程的话。\n\n'
+    + '这一节必须做到：\n'
+    + '· 站内近邻（若下方输入里给了清单）逐条交代：它说到哪一步、你的分离线在哪；划不出就写明重复。\n'
+    + '· 库外近邻至少三个，每个给全四件：出处（作者+年份+作品，真实可查，记不准年份就不写年份）／\n'
+    + '  它已经说到哪一步／分离线（可操作的判别）／一个判决性对照预测（若观察到 X 则本文错、该近邻足够；若 Y 则本文成立）。\n'
+    + '· 这三个里至少一个来自问题所在领域**之外**的学科。\n\n'
+    + '直接以一个小节标题开始输出（例如"近邻检测：为什么这个命名不能被现成概念替换"），一千五百字以内。\n\n'
+    + '──── 这篇论文的写作输入（含站内近邻清单，若有）────\n' + String(writeInput||'').slice(0,4000)
+    + '\n\n──── 已写成的论文正文 ────\n' + String(paperText||'').slice(0,12000);
+}
 async function runOnePaper(cfg){
   const dummy = { textContent:'', innerHTML:'' };
   const setStat = (t)=>{ if(cfg.statusEl) cfg.statusEl.textContent = t; };
@@ -2502,6 +2573,20 @@ async function runOnePaper(cfg){
   }catch(e){ stopTicker(); setStat('✗ 生成失败：'+e.message); if(cfg.bodyEl) cfg.bodyEl.innerHTML='<span class="placeholder" style="color:#E8897B">✗ 这篇生成失败：'+esc4(e.message)+'（多为 API Key 无此基底权限、余额不足或被限流；可刷新重试或换基底/换快速档）</span>'; throw e; }
   stopTicker();
   let paperText = draft.text || '';
+  // ── 近邻闸 ──
+  // 全天审稿的账：扣分几乎从不在论证质量，全在"最近的那个对手没上桌"。所以这一节不能靠提醒，要检测。
+  // 缺了就**只补写这一节**再拼回去——不整篇重写：满功率配大任务会跑过平台时长上限、
+  // 落得"只有思考、正文 0 字"（站上踩过两次）。补写是小任务、预算有界，安全。
+  try{
+    if(paperText && !nbrSectionOK(paperText)){
+      setStat('⚖ 近邻检测未达标，正在补写这一节…');
+      const fixSink = document.createElement('div');
+      const fixed = await streamChat(cfg.writeKey, cfg.writeSel, paper1wPrompt(),
+        NBR_FIX_INPUT(paperText, cfg.writeInput), fixSink, dummy, dummy, 4000);
+      const add = (fixed && fixed.text || '').trim();
+      if(add && /近邻/.test(add)) paperText = paperText.replace(/\s*$/, '') + '\n\n' + add + '\n';
+    }
+  }catch(_){ /* 补不上就照原样往下走：近邻检测是加固，不该成为整篇失败的理由 */ }
   if(!paperText){ setStat('✗ 未产出内容'); if(cfg.bodyEl) cfg.bodyEl.innerHTML='<span class="placeholder" style="color:#E8897B">✗ 未产出内容（基底返回了空结果，通常是该档位/基底暂时不可用或被限流；请刷新重试，或换一个写作基底、换快速档）</span>'; throw new Error('初稿为空'); }
   if(cfg.bodyEl) cfg.bodyEl.innerHTML = renderPaperText(paperText);   // 初稿完成，一次性显示
 
@@ -2620,13 +2705,22 @@ if(fourStartBtn){
       $('reflStatus').textContent = '（跳过）';
     }
 
-    // 四篇的写作输入（轻注入：带一份站内已有最近邻清单，避免撞已发命名/便于补真实引注）
-    let _fpNbr=''; if(window.SDERag){ try{ _fpNbr = await window.SDERag.neighbors(r.question||''); }catch(_){} }
+    // 四篇的近邻清单**逐篇取**。原先四篇共用一份、按"原初问题"取——那是话题的近邻，
+    // 不是这篇论文里那个命名的近邻。要检测的是命名会不会撞车，所以每篇拿自己的核心判断去问。
+    const _nbrFor = async (seed)=>{
+      if(!window.SDERag) return '';
+      try{ return await window.SDERag.neighbors(((r.question||'')+' '+String(seed||'').slice(0,400)).trim(), { k:8, author:(r.author||'') }); }
+      catch(_){ return ''; }
+    };
+    const [_nb0,_nb1,_nb2,_nb3] = await Promise.all([
+      _nbrFor(r.rows[0] && r.rows[0].sde), _nbrFor(r.rows[1] && r.rows[1].sde),
+      _nbrFor(r.rows[2] && r.rows[2].sde), _nbrFor(em)
+    ]);
     const paperDefs = [
-      { title:'论文① · 金点子①（'+(r.rows[0].view||'视角一')+'）', input: buildSingleIdeaInput(r.rows, 0, r.question, _fpNbr) },
-      { title:'论文② · 金点子②（'+(r.rows[1].view||'视角二')+'）', input: buildSingleIdeaInput(r.rows, 1, r.question, _fpNbr) },
-      { title:'论文③ · 金点子③（'+(r.rows[2].view||'视角三')+'）', input: buildSingleIdeaInput(r.rows, 2, r.question, _fpNbr) },
-      { title:'论文④ · 新典范（三金点子涌现）', input: buildParadigmInput1w(r.rows, r.question, em, _fpNbr) },
+      { title:'论文① · 金点子①（'+(r.rows[0].view||'视角一')+'）', input: buildSingleIdeaInput(r.rows, 0, r.question, _nb0) },
+      { title:'论文② · 金点子②（'+(r.rows[1].view||'视角二')+'）', input: buildSingleIdeaInput(r.rows, 1, r.question, _nb1) },
+      { title:'论文③ · 金点子③（'+(r.rows[2].view||'视角三')+'）', input: buildSingleIdeaInput(r.rows, 2, r.question, _nb2) },
+      { title:'论文④ · 新典范（三金点子涌现）', input: buildParadigmInput1w(r.rows, r.question, em, _nb3) },
     ];
 
     // 建四个结果块（追加在心得块之后，不清空）
