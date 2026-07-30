@@ -1,0 +1,59 @@
+<!DOCTYPE html><html lang="zh"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>基础模型与大语言模型 · 新思想前沿 | SDE Universes</title>
+<meta name="description" content="近十年人工智能最重要的新思想：智能被重述为可缩放的压缩加可展开的推理。变压器、缩放定律、RLHF、扩散模型，到 2024–2025 的推理模型与测试时算力。约 2000 字。">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Noto+Serif+SC:wght@300;400;500;600&display=swap">
+<style>
+:root{--bg:#F5EFE0;--card:#FAF6EC;--gold:#8A6817;--gold2:#A88233;--text:#2A2315;--text2:#6B5D47;--muted:#98886C;--border:rgba(138,104,23,0.22)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'Noto Serif SC',Georgia,serif;line-height:1.9;-webkit-font-smoothing:antialiased}
+.top{max-width:760px;margin:0 auto;padding:1.4rem 1.5rem 0;font-size:.86rem}
+.top a{color:var(--gold);text-decoration:none;font-weight:600}.top a:hover{text-decoration:underline}
+.top .sep{color:var(--muted);margin:0 .5rem}
+main{max-width:760px;margin:0 auto;padding:1.5rem 1.5rem 4rem}
+.kicker{font-size:.82rem;letter-spacing:.18em;color:var(--gold2);font-weight:600;text-transform:none;margin-bottom:.9rem}
+h1{font-size:2rem;line-height:1.3;font-weight:700;margin-bottom:.7rem;letter-spacing:.01em}
+.meta{font-size:.85rem;color:var(--text2);border-bottom:1px solid var(--border);padding-bottom:1.1rem;margin-bottom:1.6rem}
+.lede{font-size:1.12rem;color:var(--text);font-weight:500;margin-bottom:1.5rem}
+h2{font-size:1.18rem;font-weight:600;color:var(--gold);margin:1.9rem 0 .6rem}
+p{margin:0 0 1.1rem;text-align:justify}
+.end{margin-top:2rem;padding-top:1.2rem;border-top:1px solid var(--border);font-size:.86rem;color:var(--muted)}
+.end b{color:var(--text2)}
+</style></head><body>
+<div class="top"><a href="/">SDE Universes</a><span class="sep">·</span><a href="/frontier/">新思想前沿</a><span class="sep">›</span><span style="color:var(--text2)">计算与人工智能</span></div>
+<main>
+<div class="kicker">新思想前沿 · 计算与人工智能</div>
+<h1>基础模型与大语言模型</h1>
+<div class="meta">近十年最新思想摘要 · 约 2000 字 · 王德生 亲撰 · 2026 年 7 月</div>
+
+<p class="lede">要为过去十年的人工智能挑一个最重要的新思想，它不是某个具体算法，而是一次范式的重写：智能被重新理解为——在海量数据上把规律压缩进一个巨大的可微函数里，再在需要时把算力展开成推理。围绕这一句话，十年间接连长出六七个彼此咬合的观念，今天合称「基础模型」（foundation model）范式。</p>
+
+<h2>一、变压器：并行训练解开规模的枷锁</h2>
+<p>起点是 2017 年的变压器（Transformer）。它用「自注意力」取代了循环与卷积：序列里每个位置都能一步看到其余全部位置，训练因此可以彻底并行。这个看似只是工程性的改动，解开了规模的枷锁——此后一切「更大更强」的模型，底座都是它。</p>
+
+<h2>二、预训练、涌现与「基础模型」</h2>
+<p>第二步是「预训练＋适配」。2018 年后，BERT、GPT 证明：先在无标注的海量文本上做一件看似很蠢的事——预测下一个词——模型就能自己长出语法、常识乃至推理的雏形。2020 年的 GPT-3 把它推到临界点：不改一个参数，只在提示里给几个例子，模型就能做没见过的新任务（上下文学习），某些能力在规模跨过阈值后以「涌现」的方式出现。2021 年，学界给这类「一次预训练、可适配千种下游任务」的底座起名基础模型，宣告 AI 从「为每个任务各训一个模型」转向「训一个底座、再裁剪」。</p>
+
+<h2>三、缩放定律：把进步变成可预测的工程</h2>
+<p>第三步把这件事变成可预测的工程。2020 年的缩放定律发现：模型的损失随参数量、数据量与训练算力按幂律平滑下降，且能从小规模外推到大规模。2022 年的 Chinchilla 修正了配方——参数和数据要按比例同增，而非一味堆参数。「缩放有效」从此成为整个行业的信条，也成了融资叙事。</p>
+
+<h2>四、对齐与 RLHF：从「会说话」到「听话有用」</h2>
+<p>第四步跨过「会续写」与「听话有用」之间的鸿沟。2022 年的 InstructGPT 与随后的 ChatGPT 用「基于人类反馈的强化学习」（RLHF），把一个只会预测下一个词的语言模型，驯成一个会遵循指令、会拒绝有害请求的助手。对齐（alignment）由此从哲学思辨变成一条可操作的后训练管线——这也是 ChatGPT 引爆大众的直接原因。</p>
+
+<h2>五、生成模型与多模态</h2>
+<p>与此并行的是生成模型的跃迁：扩散模型（2020–2022）以「从纯噪声里一步步去噪」的思路，把图像、音频、视频生成推到以假乱真；基础模型也从纯文本走向多模态，把文字、图像、声音统一进同一个表示空间。</p>
+
+<h2>六、转折：推理模型与测试时算力（最新）</h2>
+<p>真正的最新转折发生在 2024–2025 年。此前十年，前沿几乎等于「训练时堆算力」；而 o 系列、DeepSeek-R1、Gemini 2.5、Claude 4 证明了另一条轴——测试时算力（test-time compute）：让模型在回答前「想得更久」，生成很长的思维链、边推理边自我纠错。配套的训练法是「可验证奖励的强化学习」（RLVR）：对有标准答案的数学、代码题，让模型自己摸索解法、只按对错给奖励。效果惊人——一个小模型被允许多想十秒，能胜过一个大它十几倍却秒答的模型。「缩放」的含义因此被改写：从「把模型练多大」，变为「让模型在推理时想多久」。</p>
+
+<h2>七、争论与转向：从发现期到工业期</h2>
+<p>这带来一场仍在进行的争论。一派认为训练侧的缩放正撞上「数据墙」、收益递减；另一派把希望移到推理侧。更冷静的观察是：整个领域正从「发现期」转入「工业期」——人们问的不再是「缩放能不能继续降低损失」，而是「哪一种缩放能换来可靠、可盈利的真实任务完成率」。测试时推理甚至外溢到别的学科：已有蛋白质设计团队报告，给生成模型更多推理算力，产出分子的质量也随之提升，俨然是「生物学里的测试时缩放定律」。</p>
+
+<h2>八、悬而未决：黑箱、对齐与「理解」</h2>
+<p>范式内部仍有大问题悬而未决：机制可解释性想打开这只黑箱、弄清参数里究竟编码了什么；对齐与安全要确保越来越强的系统仍然可控；幻觉与可靠性、以及把模型接成能自主行动的「智能体」之后的失控风险，都还没有稳妥答案。更深的一问是哲学的：这些系统究竟「理解」了什么，还是只是把人类语料压缩到极致的统计装置？</p>
+
+<p>若把十年浓缩成一句：人工智能的新思想，是把「智能」重述为可缩放的压缩，加可展开的推理。而此刻的前沿，正把重心从「把模型练得更大」，移向「让模型学会更久地想」。</p>
+
+<div class="end"><b>新思想前沿</b> 是一个持续撰写的专栏：近十年，各主要领域最新思想的摘要，每领域约 2000 字，共 100 个学科面板，由王德生亲撰、逐月填充。 · <a href="/frontier/" style="color:var(--gold);text-decoration:none">← 回到 100 学科面板</a></div>
+</main></body></html>
