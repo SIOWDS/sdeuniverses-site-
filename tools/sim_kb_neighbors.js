@@ -102,5 +102,21 @@ console.log("\n[四] 端点契约（对着源码里那段路由查）");
   ok(/CORPUS_TTL/.test(W.slice(W.indexOf("async function loadPubs"), W.indexOf("function nbTerms"))), "publications 走模块级缓存（401KB，不该每次问都重取）");
 }
 
+console.log("\n[五] 合作论文同题去重 + 行长截断（线上实测暴露出来的两处）");
+{
+  const CO = [
+    { t: "自噬性委任：爱情发生学中的自我保全递归化研究", sub: "", kw: "自噬性委任", u: "/students/zhang-qiong/paper-p24-d01-a03/", kind: "", line: "x".repeat(300), au: "张琼", auSlug: "zhang-qiong" },
+    { t: "自噬性委任：爱情发生学中的自我保全递归化研究", sub: "", kw: "自噬性委任", u: "/students/liu-yanyan/paper-p24-d01-a03/", kind: "", line: "x".repeat(300), au: "刘言言", auSlug: "liu-yanyan" },
+    { t: "拮抗负荷", sub: "", kw: "自噬性委任", u: "/students/hu-min/antagonistic-load/", kind: "", line: "短", au: "胡敏", auSlug: "hu-min" },
+  ];
+  const r = nbRank(CO, "自噬性委任", 8, { author: "liu-yanyan" });
+  ok(r.length === 2, "同一篇合作论文只占一个位置（站上十几篇合作论文同时收在两人名下）");
+  ok(/张琼/.test(r[0].au) && /刘言言/.test(r[0].au), "两位作者被并列写出，而不是丢掉一个");
+  ok(r[0].own === true, "任一路是本人已发，合并后仍保留该标注");
+  const blk = nbBlock(r);
+  ok(/……/.test(blk), "过长的那一行被截断并加省略号");
+  ok(blk.indexOf("x".repeat(200)) < 0, "300 字的判断句没有整段进块（名单是待交代的清单，不是语料）");
+}
+
 console.log("\n结果：PASS " + P + " · FAIL " + F);
 process.exit(F ? 1 : 0);

@@ -1018,15 +1018,28 @@ function nbRank(items, q, k, opts) {
     out.push({ t: it.t, u: it.u, kind: it.kind, line: it.line, au: it.au, own: own, score: sc + (own ? 2 : 0) });
   }
   out.sort((a, b) => b.score - a.score || String(a.u).localeCompare(String(b.u)));
-  return out.slice(0, Math.max(1, k || 8));
+  // 同题去重：站上有十几篇合作论文同时收在两位作者名下（同一 slug、两个 url），
+  // 不去重会让一篇合作论文占掉名单里两个位置，把真正不同的近邻挤出去。
+  // 合并时把两位作者并列写出，并且只要有一路是本人已发就保留该标注。
+  const byT = Object.create(null), dedup = [];
+  for (const x of out) {
+    const key = String(x.t || "").replace(/[\s：:—\-·「」《》、，。]/g, "");
+    const prev = byT[key];
+    if (prev) { if (x.au && prev.au.indexOf(x.au) < 0) prev.au += "、" + x.au; if (x.own) prev.own = true; continue; }
+    byT[key] = x; dedup.push(x);
+  }
+  return dedup.slice(0, Math.max(1, k || 8));
 }
 // 渲染成可直接注入的一块。注意这里只交付**材料与交代义务**，不替调用方规定文风：
 // 各智能体的提问自己决定近邻节写成什么样，这一块只负责"名单在此，逐条处理"。
 function nbBlock(list) {
   if (!list || !list.length) return "";
+  // 那一行截到 140 字：名单是要被逐条处理的，不是拿来读的；行太长会把提问的预算吃掉，
+  // 也会让基底把它当成语料去消化，而不是当成一张待交代的清单。
+  const cut = (t) => { t = String(t || "").replace(/\s+/g, " ").trim(); return t.length > 140 ? t.slice(0, 140) + "……" : t; };
   const lines = list.map((x, i) => (i + 1) + "、《" + x.t + "》（" + x.u + "）"
     + (x.au ? "｜作者 " + x.au : "") + (x.own ? "｜**本人已发**" : "")
-    + (x.line ? "\n　　该篇的判断：" + x.line : ""));
+    + (x.line ? "\n　　该篇的判断：" + cut(x.line) : ""));
   return "【站内近邻（sdeuniverses.com 已发表的相关篇目）——这一节是硬要求：\n"
     + "对下列每一篇，必须说清它已经说到哪一步，以及你这一次的判断与它的分离线在哪；\n"
     + "凡划不出分离线的，直接说明本次判断与该篇重复，不要另起新名。标注「本人已发」的尤其要查，\n"
