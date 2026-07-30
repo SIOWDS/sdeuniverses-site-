@@ -3,7 +3,9 @@
    ① 供给走 R2 优先、落空静默回落 ASSETS —— 迁移做到一半时两边并存，任何一篇都不会 404；
    ② URL 一个字不改 —— 因为页面与 read.html 都是按**相对文件名**引 PDF，改链要动一千多个页面；
    ③ 必须支持 Range —— PDF.js 对大文件分块取，不给 206 就读不出；
-   ④ 搬运口子的能力必须收窄到无害（口令是前端级的）：源与目标都钉死在 students/**.pdf。
+   ④ 搬运口子的能力必须收窄到无害（口令是前端级的）：源与目标都钉死在 students/**.pdf；
+   ⑤ 直写口子（r2-put）不碰 ASSETS —— 自动存档必须能一步进桶，否则文件得先进 git 才能进 R2，
+     而"先查 R2、落空回落 ASSETS"会让这种回归**不报错地**发生：页面照显示，仓库照长胖。
    全部对着 worker.js 真源码，行为部分用桩实测。 */
 "use strict";
 const fs = require("fs");
@@ -49,9 +51,35 @@ console.log("\n[二] 搬运：在边缘自己搬，能力收窄到无害");
      "路径白名单钉死在 students/**.pdf 且挡掉 ..（口令是前端级的，能力必须小到即便泄露也无害）");
   ok(/String\(b\.pass \|\| ""\) !== "SDE2013"/.test(seg), "带口令门");
   ok(/if \(!b\.force\) \{ const hd = await env\.PDFS\.head\(p\); if \(hd\) \{[^}]*skip: 1/.test(seg), "已经在桶里的默认跳过——可以反复跑，断了接着来");
-  ok(/buf\.byteLength < 1000/.test(seg), "取回的字节数不对就不写进桶（防把半截/错误页当 PDF 存进去）");
+  // 门槛后来改成随类型走（索引分片小到几百字节，不能按 PDF 的 1000 一刀切）——
+  // 这条断言一度还停在旧的字面 1000 上，红了很久没人管。
+  ok(/const _min = _isIdx \? 2 : 1000/.test(seg) && /buf\.byteLength < _min/.test(seg),
+     "取回的字节数不对就不写进桶（防把半截/错误页当 PDF 存进去），门槛随类型走");
   ok(/const hd2 = await env\.PDFS\.head\(p\);[\s\S]*hd2\.size === buf\.byteLength/.test(seg), "写完立刻回头核一次大小，对不上就报 ok:false");
   ok(/\.slice\(0, 25\)/.test(seg), "一次最多 25 个，不把单个请求撑爆");
+}
+
+console.log("\n[二之二] 直写：不经过仓库就把字节放进桶（自动存档要的那条路）");
+{
+  const seg = W.slice(W.indexOf("// R2_PUT"), W.indexOf("// R2_CHECK"));
+  ok(seg.length > 500, "R2_PUT 段在（" + seg.length + " 字符）");
+  ok(/url\.pathname === "\/api\/admin\/r2-put" && request\.method === "POST"/.test(seg), "端点是 POST /api/admin/r2-put");
+  ok(/String\(b\.pass \|\| ""\) !== "SDE2013"/.test(seg), "同样带口令门");
+  ok(/if \(!env\.PDFS\)/.test(seg), "桶没绑定时明说，而不是静默成功");
+  ok(!/env\.ASSETS\.fetch/.test(seg),
+     "**整段不碰 ASSETS** —— 这正是它与 r2-migrate 的分别：不要求文件先进 git");
+  ok(/_b64ToBytes\(String\(f\.b64 \|\| ""\)\)/.test(seg), "收 base64 字节");
+  ok(/base64 解不开/.test(seg), "base64 坏了如实报，不当成空文件写进去");
+  ok(/\^students\\\/\[A-Za-z0-9\._\\-\\\/\]\+\\\.pdf\$/i.test(seg) && /IDX_KEYS\.test\(p\)/.test(seg),
+     "白名单与 r2-migrate 逐字同款：只许 students/**.pdf 与索引键");
+  ok(/p\.indexOf\("\.\."\) >= 0/.test(seg), "挡穿越路径");
+  ok(/head4\[0\] === 0x25 && head4\[1\] === 0x50 && head4\[2\] === 0x44 && head4\[3\] === 0x46/.test(seg),
+     "**内容也要验**：白名单只管路径长相，写错内容比写错路径更难发现——非 %PDF 开头一律挡回");
+  ok(/const _min = _isIdx \? 2 : 1000/.test(seg), "空文件门槛与 r2-migrate 同一道（索引分片小，不能一刀切）");
+  ok(/const hd2 = await env\.PDFS\.head\(p\);[\s\S]*hd2\.size === buf\.byteLength/.test(seg), "写完立刻回头核一次大小");
+  ok(/if \(!b\.force\) \{ const hd = await env\.PDFS\.head\(p\); if \(hd\) \{[\s\S]*?skip: 1/.test(seg), "已经在桶里的默认跳过，可反复跑");
+  ok(/\.slice\(0, 10\)/.test(seg), "一次最多 10 个（单个也走 files 数组，调用方不必分辨两种形状）");
+  ok(/contentType: "application\/pdf"/.test(seg) && /immutable/.test(seg), "PDF 带正确 content-type 与长缓存");
 }
 
 console.log("\n[三] 核对：删仓库文件之前的那道闸");
