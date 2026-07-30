@@ -1,4 +1,4 @@
-/* WDS PDF 取文垫片 —— 让 WDS 助手能读到 PDF.js 阅读器"当前这一页"的文字。
+/* WDS PDF 取文垫片 —— 让 问WDS 能读到 PDF.js 阅读器"当前这一页"的文字。
  * 旧版阅读器只把 PDF 画在 canvas 上，没有可选文本层，助手拿不到正文。
  * 本垫片按页取 textContent，写进 window.__wdsPdfText，供 wds-read.js 的 docTextFn 使用。
  * 用法（在阅读页里，放在 wds-read.js 之前）：
