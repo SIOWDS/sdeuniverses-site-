@@ -292,7 +292,26 @@ ROUTE["/api/wds/chat"] = [
   await new Promise((r) => setTimeout(r, 200));
   ok(!sendEl.classList.contains("stop"), "停止后发送键复位");
 
-  console.log("⑧ 成文（distill）");
+  console.log("⑦.5 停止键（三个入口一条路）");
+{
+  const wm = require("fs").readFileSync("/home/claude/site/public/wds-mode.js", "utf8");
+  const T = (name, cond) => ok(cond, name);
+  T("有一个独立的停止条（不只是发送钮变成方块）", /wdsm-stopbar/.test(wm));
+  T("停止条上写着字，不是一个光秃秃的图标", /stopGen: "停止生成"/.test(wm) && /lb\.textContent = t\("stopGen"\)/.test(wm));
+  T("装饰元素缺失也不打断流（贴文案全程 null 安全）", /if \(lb\) lb\.textContent[\s\S]{0,80}else b\.textContent/.test(wm));
+  T("停止条标出快捷键 Esc", /stopHint: "Esc"/.test(wm));
+  T("三个入口（发送钮/停止条/Esc）都走同一个 stopGen()", (wm.match(/stopGen\(\)/g) || []).length >= 3);
+  T("stopGen 一定置 stoppedByUser（否则「停下」会被当成「出错」）", /function stopGen\(\)[\s\S]{0,160}stoppedByUser = true/.test(wm));
+  T("开始流式就显示、收尾就隐藏", /stopBarShow\(true\)/.test(wm) && /stopBarShow\(false\)/.test(wm));
+  T("与「回到最新」同一位置时不叠在一起", /wdsm-tobot"\);\s*if \(tb\) tb\.style\.display = "none"/.test(wm));
+  T("停下之后说一句「已停下，写出来的留着了」", /stopped: "已停下/.test(wm) && /stoppedByUser && answer\) noteLine/.test(wm));
+  T("成文那条流也有停止键（原来只有关闭）", /wdsm-tbtn dstop/.test(wm) && /dStopped = true/.test(wm));
+  T("成文停下同样保住已写的稿", /dStopped && text\) dNote\(t\("stopped"\)\)/.test(wm));
+  T("写完就把停止键撤掉", /stBtn\.parentNode\.removeChild\(stBtn\)/.test(wm));
+  T("样式用真实存在的 CSS 变量", !/--wfaint/.test(wm));
+}
+
+console.log("⑧ 成文（distill）");
   ROUTE["/api/wds/distill"] = [{ t: "beat", v: { sec: 2, think: 9 } }, { t: "token", v: "# 报告标题\n\n结论：一句话。" }];
   layer.querySelector(".wdsm-distbtn").click();
   const menu = document.body.querySelector(".wdsm-menu");

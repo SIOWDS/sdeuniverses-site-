@@ -373,6 +373,7 @@
       aMd: "⧉ 原文", aEditIn: "✎ 编辑", edSave: "保存并重答", edCancel: "取消",
     aCont: "↳ 继续", contQ: "接着上面继续写下去，别重复已经写过的部分。",
     lkOpen: "打开站内这篇（新标签页）",
+    stopGen: "停止生成", stopHint: "Esc", stopped: "已停下——上面写出来的部分留着了",
     kDeck: "对外 PPT", kDeckS: "做成一套汇报幻灯片，可直接下载 .pptx",
     dPptx: "⤓ 存为 .pptx", dPptxWait: "正在生成 .pptx…", dPptxNo: "这份稿子切不出幻灯片（需要 ## 页标题与 - 要点）",
     dPptxOk: "已生成 幻灯片 ",
@@ -494,6 +495,7 @@
       aMd: "⧉ Source", aEditIn: "✎ Edit", edSave: "Save & regenerate", edCancel: "Cancel",
     aCont: "↳ Continue", contQ: "Continue from where you stopped; don't repeat what you already wrote.",
     lkOpen: "Open this article on the site (new tab)",
+    stopGen: "Stop generating", stopHint: "Esc", stopped: "Stopped — what's above is kept",
     kDeck: "Slide deck", kDeckS: "Turn this chat into a deck — download as .pptx",
     dPptx: "⤓ Save as .pptx", dPptxWait: "Building .pptx…", dPptxNo: "This draft has no slides to cut (needs ## titles and - bullets)",
     dPptxOk: "Deck ready · slides ",
@@ -659,6 +661,10 @@
     ".wdsm-nbr a b{font-weight:700;color:var(--wgold2);font-size:11px;margin-left:6px}" +
     ".wdsm-nbr .nf{color:#E8A8A0;font-size:12.5px;line-height:1.6}" +
     ".wdsm-inbar{flex:none;position:relative;border-top:1px solid var(--wline2);padding:12px 20px 14px;background:var(--wbg)}" +
+    ".wdsm-stopbar{position:absolute;top:-46px;left:50%;transform:translateX(-50%);display:none;align-items:center;gap:7px;height:34px;padding:0 15px;border-radius:18px;border:1px solid var(--wline2);background:var(--wbg2);color:var(--wtx2);font:13px/1 inherit;cursor:pointer;z-index:7;box-shadow:0 4px 14px var(--wsh)}" +
+    ".wdsm-stopbar:hover{border-color:var(--wgold);color:var(--wgold2)}" +
+    ".wdsm-stopbar.on{display:inline-flex}" +
+    ".wdsm-stopbar i{font-style:normal;font-size:11px;color:var(--wdim2);border:1px solid var(--wline);border-radius:4px;padding:2px 5px}" +
     ".wdsm-tobot{position:absolute;top:-46px;left:50%;transform:translateX(-50%);width:34px;height:34px;border-radius:50%;border:1px solid var(--wline2);background:var(--wbg2);color:var(--wgold);font-size:15px;line-height:1;cursor:pointer;z-index:6;box-shadow:0 4px 14px var(--wsh)}" +
     ".wdsm-tobot:hover{border-color:var(--wgold)}" +
     ".wdsm-modes{max-width:760px;margin:0 auto 9px;display:flex;gap:7px;align-items:center;flex-wrap:wrap}" +
@@ -777,6 +783,7 @@
         "<div class='wdsm-msgs' style='display:none'></div>" +
       "</div>" +
       "<div class='wdsm-inbar'>" +
+        "<button class='wdsm-stopbar'><span>\u25a0</span><b class='lb'></b><i></i></button>" +
         "<button class='wdsm-tobot' style='display:none'>\u2193</button>" +
         "<div class='wdsm-modes'>" +
           "<button class='wdsm-mode wdsm-attbtn'></button>" +
@@ -952,6 +959,26 @@
     api.save(name, blob, { noOverwrite: true }).then(function (r) {
       if (say) say(r && r.where === "dir" ? (t("dDirSaved") + (r.dir || "") + " / " + r.name) : "");
     }).catch(function () { download(name, blob); if (say) say(t("dDirFail")); });
+  }
+  /* 停下这件事只能有一条路：发送钮变成的 ■、输入框上方那条「停止生成」、Esc——
+     三个入口都调它。分三份实现迟早有一份忘了置 stoppedByUser，那时"停下"会被当成"出错"。 */
+  function stopGen() {
+    if (!streaming) return false;
+    stoppedByUser = true;
+    try { if (curReader) curReader.cancel(); } catch (e) {}
+    return true;
+  }
+  function stopBarShow(on) {
+    var b = layer.querySelector(".wdsm-stopbar");
+    if (!b) return;
+    if (on) {
+      // 一个装饰元素找不到，绝不能把整条流打断——贴文案全程 null 安全
+      var lb = b.querySelector && b.querySelector(".lb"), kb = b.querySelector && b.querySelector("i");
+      if (lb) lb.textContent = t("stopGen"); else b.textContent = "\u25a0 " + t("stopGen");
+      if (kb) kb.textContent = t("stopHint");
+      b.classList.add("on");
+      var tb = layer.querySelector(".wdsm-tobot"); if (tb) tb.style.display = "none";   // 同一位置，别叠在一起
+    } else b.classList.remove("on");
   }
   function atBottom() { return bodyEl.scrollHeight - bodyEl.scrollTop - bodyEl.clientHeight < 90; }
   function scrollBottom(smooth) {
@@ -1202,6 +1229,7 @@
   });
   layer.querySelector(".wdsm-keybtn").onclick = function () { wdsKeyPanel(function () {}); };
   layer.querySelector(".wdsm-membtn").onclick = function () { memBoot(); memPanel(); };
+  layer.querySelector(".wdsm-stopbar").onclick = function () { stopGen(); };
   layer.querySelector(".wdsm-langbtn").onclick = function () {
     LANG = LANG === "zh" ? "en" : "zh";
     try { localStorage.setItem(LS_LANG, LANG); } catch (e) {}
@@ -1937,7 +1965,8 @@
     cell.a.innerHTML = "<span class='cur'>▊</span>";
     history.push({ role: "reader", text: q }); updTurns(); stSave(history);
     streaming = true; stoppedByUser = false;
-    sendEl.textContent = "■"; sendEl.classList.add("stop"); sendEl.title = "停止生成"; sendEl.setAttribute("aria-label", t("arStop"));
+    sendEl.textContent = "■"; sendEl.classList.add("stop"); sendEl.title = t("stopGen"); sendEl.setAttribute("aria-label", t("arStop"));
+    stopBarShow(true);
     var payload = { q: q, history: histPack(), umem: memRecall(q), key: kv.key, vendor: kv.vendor, model: kv.model || "", mode: thinkMode, web: webOn ? 1 : 0, skey: wdsSearchKey(), about: aboutPlus(), lang: LANG, tool: curTool };
     var packed = docsForQuery(q);
     if (packed) {
@@ -1966,6 +1995,8 @@
     function endUI() {
       streaming = false; curReader = null;
       sendEl.textContent = "↑"; sendEl.classList.remove("stop"); sendEl.title = ""; sendEl.setAttribute("aria-label", t("arSend"));
+      stopBarShow(false);
+      if (stoppedByUser && answer) noteLine(cell, t("stopped"));
       if (cell.thinkL && thinkTxt) cell.thinkL.textContent = t("thought") + thinkTxt.length + t("chars");
       flushSrcs();                                        // 出错/中途停下时也把收着的来源补上
       updTurns();
@@ -2041,7 +2072,7 @@
       });
   }
   sendEl.onclick = function () {
-    if (streaming) { stoppedByUser = true; try { if (curReader) curReader.cancel(); } catch (e) {} return; }
+    if (stopGen()) return;
     send();
   };
   inEl.addEventListener("keydown", function (e) { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); if (!streaming) send(); } });
@@ -2168,6 +2199,11 @@
       dWd = setTimeout(function () { dTimedOut = true; try { if (dr) dr.cancel(); } catch (e) {} }, 45000);
     }
     var svBtn = wrap.querySelector(".dsv"), cpBtn = wrap.querySelector(".dcp"), dlBtn = wrap.querySelector(".ddl"), dirBtn = wrap.querySelector(".ddir");
+    var dStopped = false;
+    // 成文原来只有 ✕（关掉整个面板）。停下与关掉是两件事：停下要把已经写出来的那一半留在眼前。
+    var stBtn = el("button", "wdsm-tbtn dstop", "\u25a0 " + t("stopGen"));
+    svBtn.parentNode.insertBefore(stBtn, svBtn);
+    stBtn.onclick = function () { dStopped = true; try { if (dr) dr.cancel(); } catch (e) {} };
     var pxBtn = null;
     if (kind === "deck") {
       pptxBoot(function () {});                       // 先拉模块，别等点击那一刻才去加载
@@ -2196,6 +2232,8 @@
     };
     function done() {
       clearTimeout(dWd);
+      if (stBtn && stBtn.parentNode) stBtn.parentNode.removeChild(stBtn);   // 写完了就没有可停的了
+      if (dStopped && text) dNote(t("stopped"));
       out.innerHTML = text ? mdRender(text) : esc(t("dEmpty"));
       if (text) autoLink(out, text);            // 成文里提到的站内篇目同样挂链接
       if (text && kind === "deck") deckPrep(text, function () {});   // 稿子写完就把配图取回来
@@ -2614,7 +2652,7 @@
     if (!e) return;
     var mod = e.metaKey || e.ctrlKey, k = String(e.key || "");
     if (k === "Escape") {
-      if (streaming) { stoppedByUser = true; try { if (curReader) curReader.cancel(); } catch (e2) {} return; }
+      if (stopGen()) return;
       var pn = document.querySelector(".wdsm-help") || document.querySelector(".wdsm-dist") || document.querySelector(".wdsm-menu");
       if (pn && pn.parentNode) pn.parentNode.removeChild(pn);
       return;
