@@ -180,6 +180,12 @@ select.model-select{max-width:340px}
       <label class="small" style="display:flex;gap:6px;align-items:center;margin:8px 0">
         <input type="checkbox" id="manualChk" style="width:auto"> 我自己挑三篇（不用基底选）
       </label>
+      <label class="small" style="display:flex;gap:6px;align-items:center;margin:8px 0">
+        <input type="checkbox" id="philChk" style="width:auto"> 这是哲学文章（放行本体论、涌现、发生学这类词——只在成品里保留学派专名与工序痕迹的封禁）
+      </label>
+      <label class="small" style="display:flex;gap:6px;align-items:center;margin:8px 0">
+        <input type="checkbox" id="autoRedoChk" style="width:auto"> 发现问题就自动重跑（默认关：留了痕迹或不到 150 分时，停下来让你决定要不要重写/回炉）
+      </label>
       <div id="stuManual" class="hidden">
         <div class="small" style="margin:8px 0">勾三篇（勾第四篇会把最早的一篇顶掉）</div>
         <div id="stuList" style="max-height:260px;overflow:auto;border:1px solid var(--border);border-radius:8px;padding:8px"></div>
@@ -743,19 +749,33 @@ function reviewSystem(){
 
 /* ===================== 术语零容忍（对读者的成品） ===================== */
 /* 成品里不许留"这篇文章是怎么做出来的"的痕迹——工艺词一律不进正文 */
-const TRACE = ['碰撞','对撞','撞出','涌现','暗流','矛盾轴','候选判断','二阶','三个源','三篇来源','三篇文章',
+// 硬痕迹：暴露"碰撞机工序"的词，任何文章都不该出现（哲学文章也拦）
+const TRACE = ['碰撞','对撞','撞出','矛盾轴','候选判断','二阶','三个源','三篇来源','三篇文章',
                '本文综合','这三篇','五重检验','三视角','近邻划界','本文的方法','本文所用的方法','本文采用的方法'];
-function traceHits(text){
+// 学派专名：永远是 SDE 招牌，哪怕哲学文章也拦
+const TERMS_HARD = ['SDE','差异序列','特征纠缠','三大方程','六路径','九步法','介生态','四结局诊断','去母体化','改姓','龙爪手','金点子','德麦','意义三律'];
+// 哲学词：在哲学文章里是正经词汇（放行），只在非哲学文章里当作 SDE 术语泄漏来拦
+const TERMS_PHIL = ['显露','显露态','本体论','发生学','显影','回写','底盘','纠缠维度','涌现','暗流'];
+function hitList(words, text){
   const s = text || '', out = [];
-  TRACE.forEach(w=>{ const n = s.split(w).length - 1; if(n>0) out.push(w+'×'+n); });
+  words.forEach(w=>{ const n = s.split(w).length - 1; if(n>0) out.push(w+'×'+n); });
   return out;
 }
-const TERMS = ['SDE','显露','显露态','差异序列','特征纠缠','本体论','发生学','三大方程','六路径','九步法','介生态','显影','回写','底盘','纠缠维度','意义三律','四结局诊断','去母体化','改姓','龙爪手','金点子','德麦'];
+// 是不是哲学文章？① 用户勾了"哲学文章"开关；② 三个源门类里哲学类占多数
+function isPhilPiece(){
+  if($('philChk') && $('philChk').checked) return true;
+  const srcs = ST.sources||[];
+  if(!srcs.length) return false;
+  const re = /哲学|存在论|本体论|认识论|形而上|现象学|伦理学|美学|思辨|哲思/;
+  const n = srcs.filter(s => re.test(String(s.kind||'')+String(s.title||''))).length;
+  return n >= Math.ceil(srcs.length/2);   // 过半是哲学源 → 当哲学文章
+}
+// 痕迹＝硬痕迹恒查；哲学词仅在"非哲学文章"时查
+function traceHits(text){ return hitList(TRACE, text); }
 function termHits(text){
-  const t = text || '';
-  const hits = [];
-  TERMS.forEach(w=>{ const n = t.split(w).length - 1; if(n>0) hits.push(w+'×'+n); });
-  return hits;
+  const phil = isPhilPiece();
+  const words = phil ? TERMS_HARD : TERMS_HARD.concat(TERMS_PHIL);
+  return hitList(words, text);
 }
 
 /* ===================== 工序表 ===================== */
@@ -1100,7 +1120,7 @@ function randSelfGid(usedGids){
 async function srcOfGid(gid){
   const x=poolByGid(gid);
   if(!x) throw new Error('候选号超出范围（'+gid+'）');
-  return {title:x.title,url:x.url,author:x.author,scope:x.scope,text:await pullText(x.url)};
+  return {title:x.title,url:x.url,author:x.author,scope:x.scope,kind:x.kind||'',text:await pullText(x.url)};
 }
 function selLog(html){
   const p=panels.select; if(!p) return;
@@ -1465,14 +1485,17 @@ function promptFor(id){
 
 /* 成文用的系统提示：改姓，SDE 只作隐性引擎 */
 function writerSystem(){
+  const phil = isPhilPiece();
   return [
     '你在为一个面向普通读者的专栏写文章。',
     sdeSystem(),
     '',
     '【本次输出的硬规矩，违反即作废重写】',
-    '① 正文不得出现任何学派术语：不许出现 SDE、显露、差异序列、特征纠缠、本体论、发生学、三大方程、六路径、介生态、显影、回写、底盘 等词；',
+    (phil
+      ? '① 这是一篇**哲学文章**：本体论、发生学、涌现、显露、纠缠、回写这类概念是正经词汇，**可以正常使用**，不必回避。但仍不许出现学派专名——SDE、差异序列、特征纠缠、三大方程、六路径、介生态、去母体化、改姓、龙爪手、金点子、德麦、意义三律；'
+      : '① 正文不得出现任何学派术语：不许出现 SDE、显露、差异序列、特征纠缠、本体论、发生学、三大方程、六路径、介生态、显影、回写、底盘、涌现 等词；'),
     '①之二 **成品里不许留下这篇文章是怎么做出来的痕迹**：不许提三篇来源、不许说"本文综合了三种观点""通过对比三个领域""这三篇文章"；',
-    '　　也不许出现碰撞、对撞、撞出、涌现、暗流、矛盾轴、候选、二阶、三视角、五重检验、近邻划界这类工艺词。',
+    '　　也不许出现碰撞、对撞、撞出、矛盾轴、候选、二阶、三视角、五重检验、近邻划界这类工艺词。',
     '　　判断要像它本来就长在这门学科里一样自己站住：论点自持、证据自足、来路不必交代。读者只该看见结论与论证，看不见车间。',
     '　　与既有说法划清界线的那一章照写，但要写成"这与某某说的不是一回事"，不是"本文与近邻的划界"。',
     '　　自反那一章照写，但写的是这条判断对本文自己适不适用，不是这套方法对自己适不适用。',
@@ -1651,12 +1674,20 @@ async function runStage(i){
     const m = txt.match(/总分[：:]\s*(\d{2,3})/);
     ST.score = m ? parseInt(m[1],10) : null;
     renderScore();
-    if(ST.score !== null && ST.score < 150 && ST.rounds < 2){
-      ST.rounds++;
+    if(ST.score !== null && ST.score < 150){
+      const autoRedo = $('autoRedoChk') && $('autoRedoChk').checked;
       const back = backStageFrom(txt);
-      note('第 '+ST.rounds+' 轮回炉：'+ST.score+' 分，从「'+STAGES[back].n+'」重跑。');
-      showErr('创新智商 '+ST.score+'，不到 150——自动回炉：从「'+STAGES[back].n+'」重跑（第 '+ST.rounds+'/2 轮）。');
-      ST.redoFrom = back;
+      if(autoRedo && ST.rounds < 2){
+        ST.rounds++;
+        note('第 '+ST.rounds+' 轮回炉：'+ST.score+' 分，从「'+STAGES[back].n+'」重跑。');
+        showErr('创新智商 '+ST.score+'，不到 150——自动回炉：从「'+STAGES[back].n+'」重跑（第 '+ST.rounds+'/2 轮）。');
+        ST.redoFrom = back;
+      } else if(!autoRedo){
+        // 默认：不自动回炉，停下来让用户决定
+        showErr('创新智商 '+ST.score+'，不到 150。评审建议从「'+STAGES[back].n+'」回炉——要回炉就到那一格点「重跑本格」、再点「从这里继续往下」；也可以就用这版交付。由你决定。');
+      } else {
+        showErr('创新智商 '+ST.score+'，回炉两轮仍不到 150。要么手动从某一格重跑，要么就用这版——由你决定。');
+      }
     }
   }
   return txt;
@@ -2003,14 +2034,21 @@ async function doWrite(){
     ? ('· ⚠ '+(terms.length?('术语残留 '+terms.join('、')):'')+(terms.length&&traces.length?' ｜ ':'')+(traces.length?('工艺痕迹 '+traces.join('、')):''))
     : '· 术语零残留 · 无工艺痕迹'), 'done');
   if(hits.length){
-    if(ST.termRetry < 1){
+    const autoRedo = $('autoRedoChk') && $('autoRedoChk').checked;
+    if(autoRedo && ST.termRetry < 1){
       ST.termRetry++; ST.termFix = hits;
       note('正文里留了'+(terms.length?'学派术语':'')+(terms.length&&traces.length?'与':'')+(traces.length?'做法的痕迹':'')+'（'+hits.join('、')+'），自动重写一遍。');
       showErr('正文里留了痕迹：'+hits.join('、')+'——正在自动重写一遍。');
       ST.redoFrom = STAGES.findIndex(s=>s.id==='write');
       return ST.article;
     }
-    showErr('重写一遍之后仍有残留：'+hits.join('、')+'。用「编辑产物」手工改掉——这一条是上站硬门槛。');
+    // 默认：不自动重写，停下来让用户决定
+    if(autoRedo){
+      showErr('重写一遍之后仍有残留：'+hits.join('、')+'。用「编辑产物」手工改掉——这一条是上站硬门槛。');
+    } else {
+      ST.termFix = hits;   // 存起来，用户点「重跑本格」重写时带进调令点名
+      showErr('正文里留了痕迹：'+hits.join('、')+'。要重写就点这一格的「重跑本格」（会把这些词带进去点名删掉），或用「编辑产物」手改，或就用这版直接交付——由你决定。');
+    }
   }
   $('deliver').style.display='';
   return ST.article;
@@ -2307,7 +2345,7 @@ $('dlEngine').addEventListener('click', ()=>{
 });
 
 /* ===================== 起 ===================== */
-const BUILD_TAG = '20260729-2303·v1';
+const BUILD_TAG = '20260730-0052·v1';
 (function(){ const el=$('buildTag'); if(el) el.textContent='构建 '+BUILD_TAG; })();
 loadData();
 </script>

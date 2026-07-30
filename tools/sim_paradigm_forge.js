@@ -441,7 +441,9 @@ function setStudent(c, slug) {
     ok('划界要 6–10 个近邻并落到可分辨判据', de && /6–10 个/.test(de.user) && /判据差在哪/.test(de.user));
     ok('划界把站内检索块垫了进去', de && /站内可参照的近邻材料/.test(de.user));
     const wr = f(/照下面的目录，把整篇文章/);
-    ok('成文 system 写死术语零容忍', wr && /不得出现任何学派术语/.test(wr.system));
+    ok('成文 system 管住学派术语（非哲学禁令 或 哲学放行都算）',
+      wr && (/不得出现任何学派术语/.test(wr.system) || /这是\*\*哲学文章\*\*/.test(wr.system)));
+    ok('学派专名任何时候都禁', wr && /SDE、差异序列|SDE、显露/.test(wr.system));
     ok('成文 system 要求长句 ≤90 字', wr && /长句不超过 90 字/.test(wr.system));
     ok('成文调令要求直接写正文、不复述目录', wr && /不要复述目录/.test(wr.user));
     ok('成文调令带上目录、要求写全别跳章', wr && /照这个顺序写，写全，别跳章/.test(wr.user));
@@ -604,7 +606,7 @@ function setStudent(c, slug) {
     ok('不阻断，照样跑完', done, c.$('stat-review').textContent);
   });
 
-  await step('十六、成文带术语：自动改姓重写一次', async () => {
+  await step('十六、成文带术语＋勾了自动重跑：改姓重写一次', async () => {
     let round = 0;
     const c = await boot({ answer: u => {
       if (/照下面的目录，把整篇文章/.test(u)) {
@@ -615,6 +617,7 @@ function setStudent(c, slug) {
       if (/列一份文章目录/.test(u)) { round++; }
       return defaultAnswer(u);
     } });
+    c.$('autoRedoChk').checked = true;   // 勾上：发现问题自动重跑
     const done = await runPipeline(c, 30000);
     ok('跑得完', done, c.$('stat-review').textContent);
     ok('成文重写了一遍（目录出了两次）', round === 2, '实际 ' + round + ' 次');
@@ -623,9 +626,24 @@ function setStudent(c, slug) {
     ok('横幅记下了自动修的这一笔', /自动重写/.test(c.$('doneBanner').textContent), c.$('doneBanner').textContent);
   });
 
-  await step('十六之二、改写一遍仍带术语就不再空转', async () => {
+  await step('十六之〇、默认（没勾自动重跑）：带术语时停下来交给用户，不自动重写', async () => {
+    let round = 0;
+    const c = await boot({ answer: u => {
+      if (/列一份文章目录/.test(u)) { round++; }
+      if (/照下面的目录，把整篇文章/.test(u)) return '这一段讲显露与特征纠缠，还引了发生学，末尾有句号。'.repeat(200);
+      return defaultAnswer(u);
+    } });
+    const done = await runPipeline(c, 30000);   // 不勾开关
+    ok('成文只跑了一趟、没自动重写', round === 1, '目录出了 ' + round + ' 次');
+    ok('如实报术语残留', /术语残留/.test(c.$('stat-write').textContent), c.$('stat-write').textContent);
+    ok('提示由用户决定（重跑本格／编辑产物／直接交付）', /由你决定/.test(c.$('errBox').textContent), c.$('errBox').textContent);
+    ok('照样交付这版（不阻断）', done && c.$('deliver').style.display !== 'none');
+  });
+
+  await step('十六之二、勾了自动重跑、改写一遍仍带术语就不再空转', async () => {
     const c = await boot({ answer: u => /照下面的目录，把整篇文章/.test(u)
       ? '这一段讲显露与特征纠缠，还引了发生学，末尾有句号。'.repeat(200) : defaultAnswer(u) });
+    c.$('autoRedoChk').checked = true;
     const done = await runPipeline(c, 30000);
     ok('跑得完（不静默失败）', done);
     ok('只重写一次就收手', (c.calls.filter(x => /列一份文章目录/.test(x.user)) || []).length === 2);
@@ -633,7 +651,7 @@ function setStudent(c, slug) {
     ok('横幅把术语残留亮出来', /术语残留/.test(c.$('doneBanner').textContent));
   });
 
-  await step('十七、评审不到 150：自动回炉，第二轮过线', async () => {
+  await step('十七、评审不到 150＋勾了自动重跑：回炉，第二轮过线', async () => {
     let rv = 0;
     const c = await boot({ answer: u => {
       if (/你是评审/.test(u)) {
@@ -644,6 +662,7 @@ function setStudent(c, slug) {
       }
       return defaultAnswer(u);
     } });
+    c.$('autoRedoChk').checked = true;
     const done = await runPipeline(c, 40000);
     ok('评审跑了两轮', rv === 2, '实际 ' + rv + ' 轮');
     ok('回炉回到了评审点名的那一格（近邻划界）',
@@ -655,12 +674,25 @@ function setStudent(c, slug) {
     ok('跑完了', done);
   });
 
-  await step('十七之一、评审两轮都不过线就收手（不无限回炉）', async () => {
+  await step('十七之〇、默认（没勾自动重跑）：不到 150 停下来，交给用户决定回炉', async () => {
+    let rv = 0;
+    const c = await boot({ answer: u => {
+      if (/你是评审/.test(u)) { rv++; return '总分：138\n五维：S=140 D=139 E=132 I=130 F=130\n判级：偏低\n若总分<150：回炉到「近邻划界」。'; }
+      return defaultAnswer(u);
+    } });
+    const done = await runPipeline(c, 40000);   // 不勾开关
+    ok('评审只跑了一次、没自动回炉', rv === 1, '评审 ' + rv + ' 次');
+    ok('提示回哪一格＋由用户决定', /回炉/.test(c.$('errBox').textContent) && /由你决定/.test(c.$('errBox').textContent), c.$('errBox').textContent);
+    ok('照样交付这版（不阻断）', done && c.$('deliver').style.display !== 'none');
+  });
+
+  await step('十七之一、勾了自动重跑、评审两轮都不过线就收手（不无限回炉）', async () => {
     let rv = 0;
     const c = await boot({ answer: u => {
       if (/你是评审/.test(u)) { rv++; return '总分：138\n五维：S=140 D=139 E=132 I=130 F=130\n判级：偏低\n回炉：涌现'; }
       return defaultAnswer(u);
     } });
+    c.$('autoRedoChk').checked = true;
     await runPipeline(c, 45000);
     ok('最多回炉两轮（评审三次）', rv === 3, '实际评审 ' + rv + ' 次');
     ok('回炉去的是评审点名的涌现格',
@@ -1046,7 +1078,7 @@ function setStudent(c, slug) {
     await runPipeline(c, 40000);
     const wr = c.calls.find(x => /照下面的目录，把整篇文章/.test(x.user));
     ok('成文 system 明令不留做法痕迹', wr && /不许留下这篇文章是怎么做出来的痕迹/.test(wr.system));
-    ok('点名禁掉工艺词', wr && /碰撞、对撞、撞出、涌现、暗流/.test(wr.system));
+    ok('点名禁掉工艺词', wr && /碰撞、对撞、撞出、矛盾轴/.test(wr.system));
     ok('要求判断像本来就长在这门学科里', wr && /来路不必交代/.test(wr.system));
     ok('划界那章要写成"这与某某说的不是一回事"', wr && /不是一回事/.test(wr.system));
     ok('给写手的素材不带出处', wr && /不许在正文里交代它们的出处/.test(wr.user) && !/https?:\/\//.test(wr.user.split('【可用的素材')[1] || ''));
@@ -1055,18 +1087,35 @@ function setStudent(c, slug) {
     ok('干净成品报"无工艺痕迹"', /无工艺痕迹/.test(c.$('stat-write').textContent), c.$('stat-write').textContent);
   });
 
-  await step('二十三之六、正文带了工艺词就自动重写一遍', async () => {
+  await step('二十三之六、勾了自动重跑、正文带工艺词就自动重写一遍', async () => {
     let wrote = 0;
     const c = await boot({ answer: u => {
       if (/照下面的目录，把整篇文章/.test(u)) { wrote++;
-        return wrote === 1 ? ('这一段说明三篇文章碰撞之后涌现出的暗流，末尾有句号。'.repeat(200)) : ('干净的正文，末尾有句号。'.repeat(300)); }
+        return wrote === 1 ? ('这一段说明三篇文章碰撞之后本文综合出的矛盾轴，末尾有句号。'.repeat(200)) : ('干净的正文，末尾有句号。'.repeat(300)); }
       return defaultAnswer(u);
     } });
+    c.$('autoRedoChk').checked = true;
     const done = await runPipeline(c, 50000);
     ok('工艺痕迹被逮住', /工艺痕迹/.test(c.$('stat-write').textContent) || /无工艺痕迹/.test(c.$('stat-write').textContent));
     ok('自动重写了一遍（成文跑了两趟）', wrote === 2, '共写了 ' + wrote + ' 趟');
     ok('重写的调令里点名了痕迹词', c.calls.some(x => /照下面的目录，把整篇文章/.test(x.user) && /做法的痕迹整句删掉/.test(x.user)));
     ok('重写后干净了', /无工艺痕迹/.test(c.$('stat-write').textContent), c.$('stat-write').textContent);
+    ok('跑到底', done, c.$('stat-review').textContent);
+  });
+
+  await step('二十三之六之二、哲学文章：本体论/涌现/发生学放行，不触发重写', async () => {
+    let wrote = 0;
+    const c = await boot({ answer: u => {
+      if (/照下面的目录，把整篇文章/.test(u)) { wrote++;
+        // 满是哲学词、但没有工序痕迹，末尾有句号
+        return '这一章谈本体论如何在发生学意义上涌现，末尾有句号。'.repeat(300); }
+      return defaultAnswer(u);
+    } });
+    c.$('philChk').checked = true;   // 声明哲学文章
+    const done = await runPipeline(c, 45000);
+    ok('哲学词没被当术语残留', /术语零残留/.test(c.$('stat-write').textContent), c.$('stat-write').textContent);
+    ok('没有触发改姓重写（成文只跑一趟）', wrote === 1, '成文跑了 ' + wrote + ' 趟');
+    ok('成文调令按哲学文章放行（不禁本体论）', c.calls.some(x => /照下面的目录，把整篇文章/.test(x.user) && /这是\*\*哲学文章\*\*|正经词汇/.test(x.system)));
     ok('跑到底', done, c.$('stat-review').textContent);
   });
 
@@ -1179,13 +1228,23 @@ function setStudent(c, slug) {
     ok('照样跑到底', done, c.$('stat-review').textContent);
   });
 
-  await step('二十四、术语闸本身', async () => {
+  await step('二十四、术语闸本身（分层：硬专名恒查／哲学词看是不是哲学文章）', async () => {
     const c = await boot();
-    ok('能抓出多词', c.win.termHits('这里有显露、特征纠缠和发生学。').length >= 3);
+    // 非哲学文章：哲学词也算术语泄漏（默认未跑选篇，ST.sources 空 → 非哲学）
+    c.$('philChk').checked = false;
+    ok('非哲学文章：本体论/发生学/涌现都算术语', c.win.termHits('这里有本体论、发生学和涌现。').length >= 3,
+      JSON.stringify(c.win.termHits('这里有本体论、发生学和涌现。')));
+    ok('学派专名任何时候都算', c.win.termHits('这套 SDE 与差异序列。').length >= 2);
     ok('干净文本零命中', c.win.termHits('账本记不下的那样东西。').length === 0);
-    ok('计数写在结果里', /×2/.test(c.win.termHits('发生学与发生学').join(',')));
-    ok('痕迹闸能抓工艺词', c.win.traceHits('这三篇文章碰撞后涌现出暗流。').length >= 3,
-      JSON.stringify(c.win.traceHits('这三篇文章碰撞后涌现出暗流。')));
+    // 哲学文章：本体论/涌现/发生学放行，但学派专名仍拦
+    c.$('philChk').checked = true;
+    ok('哲学文章：本体论/发生学/涌现放行', c.win.termHits('这里有本体论、发生学和涌现。').length === 0,
+      JSON.stringify(c.win.termHits('这里有本体论、发生学和涌现。')));
+    ok('哲学文章里学派专名照样拦', c.win.termHits('这套 SDE 与差异序列。').length >= 2);
+    c.$('philChk').checked = false;
+    // 痕迹闸（工序词）：与哲学与否无关，恒查
+    ok('痕迹闸能抓工序词', c.win.traceHits('这三篇文章碰撞后，本文综合出五重检验。').length >= 3,
+      JSON.stringify(c.win.traceHits('这三篇文章碰撞后，本文综合出五重检验。')));
     ok('正常论证不误伤', c.win.traceHits('账本记不下的那样东西，与古德哈特定律不是一回事。').length === 0);
   });
 
