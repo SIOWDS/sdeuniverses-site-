@@ -71,6 +71,43 @@ async function sha256hex(s) {
 }
 // 凭证形如 sdepw1:<口令>:<昵称>。昵称在最后，可含冒号。
 // 校验通过后按昵称派生恒定 uid ⇒ 同一昵称每次登录都是通讯录里的同一个人。
+// ── 全权管理（2026-07-30 用户裁定）──────────────────────────────
+// 管理员 = 名字在管理员名单 且 手里有站点管理口令（复用 ConfigVault 的 checkpass，
+// 不另造一个秘密）。名单内置王德生，另可用环境变量 IM_ADMINS（逗号分隔）追加。
+const IM_ADMINS_BUILTIN = ["王德生", "Desheng Wang", "wang-desheng"];
+function isAdminName(name) {
+  const n = imNorm(name);
+  const extra = String((IM_ENV && IM_ENV.IM_ADMINS) || "").split(",");
+  return [].concat(IM_ADMINS_BUILTIN, extra).some((x) => x && imNorm(x) === n);
+}
+async function adminPassOk(pass) {
+  try {
+    if (!IM_ENV || !IM_ENV.CONFIG_VAULT || !pass) return false;
+    const cv = IM_ENV.CONFIG_VAULT.get(IM_ENV.CONFIG_VAULT.idFromName("global"));
+    const r = await cv.fetch(new Request("https://do/", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ op: "checkpass", pass: String(pass) }) }));
+    const j = await r.json().catch(() => ({}));
+    return !!(j && j.ok);
+  } catch (e) { return false; }
+}
+// 封禁名单：被管理员移除并封禁的人，拿对密码也进不来。60 秒缓存。
+let BANS = null, BANS_AT = 0;
+function imDir() { return IM_ENV.COMMENTS.get(IM_ENV.COMMENTS.idFromName("im-dir-global")); }
+async function dirCall(payload) {
+  const r = await imDir().fetch(new Request("https://do/_dir", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(payload) }));
+  return await r.json().catch(() => ({ ok: false }));
+}
+async function bansCached() {
+  const now = Date.now();
+  if (BANS && now - BANS_AT < 60000) return BANS;
+  try {
+    if (!IM_ENV || !IM_ENV.COMMENTS) return BANS || new Set();
+    const d = await dirCall({ op: "abans" });
+    BANS = new Set(((d && d.bans) || []).map((x) => imNorm(x.name || x)));
+    BANS_AT = now;
+  } catch (e) {}
+  return BANS || new Set();
+}
+
 async function verifyPasscode(cred) {
   if (typeof cred !== "string" || cred.slice(0, 7) !== "sdepw1:" || cred.length > 300) return null;
   const rest = cred.slice(7);
@@ -93,6 +130,8 @@ async function verifyPasscode(cred) {
     if (!hit) return { bad: "name" };
     disp = hit;
   }
+  const bans = await bansCached();
+  if (bans.has(imNorm(disp))) return { bad: "ban" };
   const uid = await imUid("pw:" + imNorm(disp));
   return uid ? { name: disp, uid, pw: true } : null;
 }
@@ -450,6 +489,80 @@ export class CommentBox {
         const prev = (await this.ctx.storage.get("u:" + uid)) || {};
         await this.ctx.storage.put("u:" + uid, { uid, name: String(b.name || prev.name || "").slice(0, 20), ts: now, first: prev.first || now });
         return Response.json({ ok: true });
+      }
+      // ===== 全权管理（路由层已验过管理员身份＋管理口令才会转发到这里）=====
+      if (op === "alist") {
+        const m = await this.ctx.storage.list({ prefix: "u:", limit: 1000 });
+        const out = [];
+        for (const v of m.values()) if (v && v.uid) out.push({ uid: v.uid, name: v.name || "", ts: v.ts || 0 });
+        out.sort((x, y) => (y.ts || 0) - (x.ts || 0));
+        return Response.json({ ok: true, users: out });
+      }
+      if (op === "agroups") {
+        const m = await this.ctx.storage.list({ prefix: "g:", limit: 1000 });
+        const out = [];
+        for (const v of m.values()) if (v && v.gid) out.push({ gid: v.gid, name: v.name || "", count: (v.members || []).length, owner: v.owner || "", ts: v.ts || 0 });
+        out.sort((x, y) => (y.ts || 0) - (x.ts || 0));
+        return Response.json({ ok: true, groups: out });
+      }
+      if (op === "arm") { // 彻底移除一个人：通讯录条目、群籍、会话，全清
+        const t = String(b.target || "");
+        if (!ok12(t)) return Response.json({ ok: false, msg: "uid 不对。" });
+        const u = (await this.ctx.storage.get("u:" + t)) || {};
+        let ng = 0;
+        const gi = await this.ctx.storage.list({ prefix: "gm:" + t + ":", limit: 500 });
+        for (const k of gi.keys()) {
+          const gid = k.slice(("gm:" + t + ":").length);
+          const g = await this.ctx.storage.get("g:" + gid);
+          if (g) {
+            g.members = (g.members || []).filter((x) => x !== t);
+            if (g.owner === t) g.owner = g.members[0] || "";
+            await this.ctx.storage.put("g:" + gid, g);
+            ng++;
+          }
+          await this.ctx.storage.delete(k);
+        }
+        const ib = await this.ctx.storage.list({ prefix: "ib:" + t + ":", limit: 500 });
+        for (const k of ib.keys()) await this.ctx.storage.delete(k);
+        const all = await this.ctx.storage.list({ prefix: "ib:", limit: 2000 });
+        for (const k of all.keys()) if (k.endsWith(":" + t)) await this.ctx.storage.delete(k);
+        await this.ctx.storage.delete("u:" + t);
+        return Response.json({ ok: true, name: u.name || "", groups: ng });
+      }
+      if (op === "aban" || op === "aunban") {
+        const nm = String(b.name || "").trim().slice(0, 40);
+        if (!nm) return Response.json({ ok: false, msg: "名字不能为空。" });
+        const key = "ban:" + nm.replace(/\s+/g, " ").toLowerCase();
+        if (op === "aban") await this.ctx.storage.put(key, { name: nm, ts: now });
+        else await this.ctx.storage.delete(key);
+        return Response.json({ ok: true });
+      }
+      if (op === "abans") {
+        const m = await this.ctx.storage.list({ prefix: "ban:", limit: 500 });
+        const out = []; for (const v of m.values()) if (v && v.name) out.push({ name: v.name, ts: v.ts || 0 });
+        return Response.json({ ok: true, bans: out });
+      }
+      if (op === "agdel") {
+        const gid = String(b.gid || "");
+        const g = await this.ctx.storage.get("g:" + gid);
+        if (!g) return Response.json({ ok: false, msg: "群不存在。" });
+        for (const m of g.members || []) {
+          await this.ctx.storage.delete("gm:" + m + ":" + gid);
+          await this.ctx.storage.delete("ib:" + m + ":" + convKeyG(gid));
+        }
+        await this.ctx.storage.delete("g:" + gid);
+        return Response.json({ ok: true, name: g.name || "" });
+      }
+      if (op === "agkick") {
+        const gid = String(b.gid || ""), t = String(b.target || "");
+        const g = await this.ctx.storage.get("g:" + gid);
+        if (!g) return Response.json({ ok: false, msg: "群不存在。" });
+        g.members = (g.members || []).filter((x) => x !== t);
+        if (g.owner === t) g.owner = g.members[0] || "";
+        await this.ctx.storage.put("g:" + gid, g);
+        await this.ctx.storage.delete("gm:" + t + ":" + gid);
+        await this.ctx.storage.delete("ib:" + t + ":" + convKeyG(gid));
+        return Response.json({ ok: true, count: g.members.length });
       }
       if (op === "contacts") {
         const m = await this.ctx.storage.list({ prefix: "u:", limit: 600 });
@@ -4622,6 +4735,7 @@ export default {
       const who = await verifyIdent(b.credential);
       const probe = await verifyPasscode(b.credential);
       if (probe && probe.bad === "name") return Response.json({ ok: false, msg: "这个名字不在学员名录里。请用你在站上发表用的名字。" }, { status: 401 });
+      if (probe && probe.bad === "ban") return Response.json({ ok: false, msg: "这个名字已被管理员停用。" }, { status: 403 });
       if (!who || !who.uid) return Response.json({ ok: false, msg: "密码不对，请向管理员确认。" }, { status: 401 });
       const dir = env.COMMENTS.get(env.COMMENTS.idFromName("im-dir-global"));
       const call = async (payload) => {
@@ -4630,6 +4744,30 @@ export default {
       };
       const me = { uid: who.uid, name: who.name };
       const op = String(b.op || "");
+      // ===== 全权管理：名字在管理员名单 且 管理口令正确，两条都过才放行 =====
+      if (op === "admin") {
+        if (!isAdminName(who.name)) return Response.json({ ok: false, msg: "你没有管理权限。" }, { status: 403 });
+        if (!(await adminPassOk(b.pass))) return Response.json({ ok: false, msg: "管理密码不正确。" }, { status: 403 });
+        const a = String(b.a || "");
+        if (a === "auth") return Response.json({ ok: true, me });
+        if (a === "users") return Response.json(await call({ op: "alist" }), { headers: { "cache-control": "no-store" } });
+        if (a === "groups") return Response.json(await call({ op: "agroups" }), { headers: { "cache-control": "no-store" } });
+        if (a === "bans") return Response.json(await call({ op: "abans" }), { headers: { "cache-control": "no-store" } });
+        if (a === "rm") {
+          if (String(b.target) === who.uid) return Response.json({ ok: false, msg: "不能移除你自己。" }, { status: 400 });
+          const d = await call({ op: "arm", target: String(b.target || "") });
+          if (d && d.ok && b.ban && d.name) { await call({ op: "aban", name: d.name }); BANS = null; }
+          return Response.json(d);
+        }
+        if (a === "ban" || a === "unban") {
+          const d = await call({ op: a === "ban" ? "aban" : "aunban", name: String(b.name || "") });
+          BANS = null;                       // 立刻生效，不等 60 秒缓存过期
+          return Response.json(d);
+        }
+        if (a === "gdel") return Response.json(await call({ op: "agdel", gid: String(b.gid || "") }));
+        if (a === "gkick") return Response.json(await call({ op: "agkick", gid: String(b.gid || ""), target: String(b.target || "") }));
+        return Response.json({ ok: false, msg: "未知的管理动作。" }, { status: 400 });
+      }
       if (op === "hello") { await call({ op: "hello", uid: who.uid, name: who.name }); return Response.json({ ok: true, me }); }
       if (op === "contacts") {
         await call({ op: "hello", uid: who.uid, name: who.name });
