@@ -386,6 +386,8 @@
     dPptx: "⤓ 存为 .pptx", dPptxWait: "正在生成 .pptx…", dPptxNo: "这份稿子切不出幻灯片（需要 ## 页标题与 - 要点）",
     dPptxOk: "已生成 幻灯片 ",
     dEmptyHint: "两种可能：这一场太长把输入窗吃满了，或基底把预算全用在思考上。换标准档、或新开一场再成文。",
+    b9Score: "美的九宫格 ", b9Polish: "↻ 按九宫格再打磨一轮", b9Good: "九宫格已达标",
+    b9Tip: "统一·多样·和谐（怎么摆）｜完全·活力·纯一（是哪一种）｜爱·自由·平安（看着如何）",
     deckFoot: "SDE Universes · sdeuniverses.com",
     bMem: "⌾ 记忆", memTitle: "全局记忆 · 我的历史对话",
     memHd: "本机共 <b>{n}</b> 场对话（含其它 WDS 智能体），已炼出 <b>{m}</b> 条记忆，待更新 <b>{p}</b> 场",
@@ -517,6 +519,8 @@
     dPptx: "⤓ Save as .pptx", dPptxWait: "Building .pptx…", dPptxNo: "This draft has no slides to cut (needs ## titles and - bullets)",
     dPptxOk: "Deck ready · slides ",
     dEmptyHint: "Either this chat is too long for the input window, or the model spent its budget on thinking. Try the standard tier, or a fresh chat.",
+    b9Score: "Beauty grid ", b9Polish: "↻ Polish once more against the grid", b9Good: "The grid is satisfied",
+    b9Tip: "Unity·Diversity·Harmony (how it sits) | Completeness·Vitality·Singleness (which kind) | Love·Freedom·Peace (how it feels)",
     deckFoot: "SDE Universes · sdeuniverses.com",
     bMem: "⌾ Memory", memTitle: "Global memory · your past chats",
     memHd: "<b>{n}</b> chats on this device (all WDS agents), <b>{m}</b> distilled, <b>{p}</b> pending",
@@ -603,6 +607,15 @@
     ".wdsm-tplb{max-width:520px;width:100%;background:var(--wpanel);border:1px solid var(--wline2);border-radius:16px;padding:20px 22px;max-height:84vh;overflow:auto}" +
     ".wdsm-tplb h4{margin:0 0 4px;font-size:16px;color:var(--wtx2)}" +
     ".wdsm-tplnote{font-size:12px;color:var(--wdim2);line-height:1.6;margin:0 0 14px}" +
+    ".wdsm-b9{margin-top:14px;padding-top:12px;border-top:1px solid var(--wline)}" +
+    ".wdsm-b9h{font-size:13px;color:var(--wtx2);margin-bottom:8px}" +
+    ".wdsm-b9h b{color:var(--wgold2)}" +
+    ".wdsm-b9g{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:9px}" +
+    ".wdsm-b9c{font-style:normal;font-size:11.5px;padding:3px 8px;border-radius:6px;border:1px solid var(--wline);color:var(--wdim)}" +
+    ".wdsm-b9c.ok{border-color:rgba(120,160,110,.5)}" +
+    ".wdsm-b9c.mid{border-color:rgba(190,160,90,.6);color:var(--wgold2)}" +
+    ".wdsm-b9c.bad{border-color:rgba(200,120,110,.6);color:#C88A82}" +
+    ".wdsm-b9r{font-size:12px;color:var(--wdim);line-height:1.7;margin-bottom:10px}" +
     ".wdsm-tplgrp{font-size:11px;color:var(--wdim2);letter-spacing:1px;margin:14px 0 7px;padding-left:2px}" +
     ".wdsm-tplitem{display:block;width:100%;text-align:left;background:var(--wfill);border:1px solid var(--wline);border-radius:11px;padding:11px 14px;margin-bottom:8px;cursor:pointer}" +
     ".wdsm-tplitem:hover{border-color:var(--wgold)}" +
@@ -1558,11 +1571,46 @@
     if (window.WDSPptx) { if (then) then(true); return; }
     if (!document.head || !document.head.appendChild) { if (then) then(false); return; }
     var sc = document.createElement("script");
-    sc.src = "/assets/wds-pptx.js?v=8"; sc.async = true;   // 模块也要能刷新：改它就 bump 这个号
+    sc.src = "/assets/wds-pptx.js?v=9"; sc.async = true;   // 模块也要能刷新：改它就 bump 这个号
     sc.onload = function () { if (then) then(!!window.WDSPptx); };
     sc.onerror = function () { if (then) then(false); };
     document.head.appendChild(sc);
   }
+  /* 迭代循环的**外环**：稿子写完按美的九宫格打分，不达标就给一个「再打磨一轮」——
+     点了会把上一稿与逐条不合格项一起送回基底重写。内环（只调摆法）在生成器里跑，
+     外环必须由基底来：摆法救不了"缺一页边界"。 */
+  var b9Last = null;
+  function b9Show(text) {
+    if (!window.WDSPptx || !window.WDSPptx.audit9) return;
+    var wrap = document.querySelector(".wdsm-dist-c");
+    if (!wrap) return;
+    var d = deckReady || deckOf(text);
+    if (!d) return;
+    d.tpl = b9Last && b9Last.tpl ? b9Last.tpl : d.tpl;
+    var a = window.WDSPptx.assemble(d, 4);
+    b9Last = { text: text, report: a.report, total: a.total, tpl: d.tpl };
+    var box = el("div", "wdsm-b9");
+    var head = el("div", "wdsm-b9h");
+    head.appendChild(el("b", null, t("b9Score") + a.total + " / 100"));
+    head.title = t("b9Tip");
+    box.appendChild(head);
+    var g = el("div", "wdsm-b9g");
+    window.WDSPptx.BEAUTY9.forEach(function (c) {
+      var s = (a.cells[c.id] || {}).score;
+      var cell = el("i", "wdsm-b9c" + (s >= 85 ? " ok" : (s >= 65 ? " mid" : " bad")), c.zh + " " + s);
+      cell.title = c.tier + "：" + c.says + ((a.cells[c.id] || {}).why || []).map(function (w) { return "\n· " + w; }).join("");
+      g.appendChild(cell);
+    });
+    box.appendChild(g);
+    if (a.report.length) {
+      box.appendChild(el("div", "wdsm-b9r", a.report.join("　·　")));
+      var b = el("button", "wdsm-tbtn", t("b9Polish"));
+      b.onclick = function () { b.disabled = true; distill("deck", null, null, b9Last.tpl, { fix: a.report.join("\n"), prev: text }); };
+      box.appendChild(b);
+    } else box.appendChild(el("div", "wdsm-b9r", t("b9Good")));
+    wrap.appendChild(box);
+  }
+
   function deckOf(text) {
     if (!window.WDSPptx) return null;
     var d = window.WDSPptx.parse(text);
@@ -2301,7 +2349,7 @@
   }
 
   // 成文面板。第三个参数给「成文记录」复用：直接把存下的正文摊开，不再调基底。
-  function distill(kind, existing, title, tpl) {
+  function distill(kind, existing, title, tpl, again) {
     var kv = existing ? {} : wdsKeyGet();
     if (!existing && !kv) { wdsKeyPanel(function () { distill(kind); }); return; }
     var wrap = el("div", "wdsm-dist");
@@ -2367,7 +2415,7 @@
       out.innerHTML = text ? mdRender(text) : esc(t("dEmpty"));
       if (!text) dNote(t("dEmptyHint"), 1);          // 空产出必须给个下一步，不能只说"没有内容"
       if (text) autoLink(out, text);            // 成文里提到的站内篇目同样挂链接
-      if (text && kind === "deck") deckPrep(text, function () {});   // 稿子写完就把配图取回来
+      if (text && kind === "deck") deckPrep(text, function () { b9Show(text); });   // 取配图，顺便按九宫格验一遍
       stat.textContent = text ? (t("dDone") + text.length) : t("dFail");
       if (dTimedOut) dNote(t("dCut"), 1);
     }
@@ -2382,7 +2430,8 @@
     out.innerHTML = "<span class='cur'>▊</span>";
     dBump();
 
-    fetch(API_DISTILL, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ kind: kind, history: history, key: kv.key, vendor: kv.vendor, model: kv.model || "", lang: LANG, tpl: tpl || "" }) })
+    fetch(API_DISTILL, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ kind: kind, history: history, key: kv.key, vendor: kv.vendor, model: kv.model || "", lang: LANG, tpl: tpl || "",
+        fix: (again && again.fix) || "", prev: (again && again.prev) || "" }) })
       .then(function (resp) {
         if (!resp.ok || !resp.body) throw new Error("HTTP " + resp.status);
         var reader = resp.body.getReader(); dr = reader;

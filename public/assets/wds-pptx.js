@@ -308,6 +308,166 @@
     return out;
   }
 
+  /* ═══════════════ 美的九宫格 ═══════════════
+     三层各三格，合起来是一份可打分的验收单。渲染端能管的就自动管，管不了的如实报回去让基底重写。
+
+       ┌ 构成之美（怎么摆）  统一 · 多样 · 和谐
+       ├ 品格之美（是哪一种）完全 · 活力 · 纯一   ← 不同种类的 PPT 侧重不同格
+       └ 感受之美（看着如何）爱 · 自由 · 平安
+
+     每一格都要落到五处载体上：图 / 色彩 / 字体 / 渲染 / 整体架构。
+     打分口径一律 0–100；`assemble()` 是**迭代循环**：摆一版 → 按九宫格打分 → 只改摆法再打一版，
+     直到分不再涨或到轮次上限。**注意它只调"摆法"，绝不替读者编内容**——
+     内容层的缺口（比如缺一页边界、缺一张图）如实写进 report，交回给基底重写那一轮去补。 */
+  var BEAUTY9 = [
+    { id: "unity",    zh: "统一", tier: "构成", says: "一套网格一套字号一套角色色；同一角色永远同位置" },
+    { id: "diversity",zh: "多样", tier: "构成", says: "相邻页不同形；整份至少四种版式；墨量有起伏" },
+    { id: "harmony",  zh: "和谐", tier: "构成", says: "对比度达标；每页墨量 6–55%；间距守同一节奏" },
+    { id: "complete", zh: "完全", tier: "品格", says: "该有的环节齐：主张·证据·边界·下一步；每页有讲稿" },
+    { id: "vital",    zh: "活力", tier: "品格", says: "有动势：数字/图表/对照/大字页占四成以上" },
+    { id: "single",   zh: "纯一", tier: "品格", says: "一页只讲一件事；不混形状；全篇只有一个主张" },
+    { id: "love",     zh: "爱",   tier: "感受", says: "为听众着想：讲稿齐、有例子、边界诚实、不堆术语" },
+    { id: "freedom",  zh: "自由", tier: "感受", says: "留白与呼吸：不塞满、有过渡页、每页条数克制" },
+    { id: "peace",    zh: "平安", tier: "感受", says: "不刺眼不喧哗：色不过三、字号不跳、无装饰噪音" },
+  ];
+
+  // 每种模板侧重哪一格（品格三选一 ＋ 感受三选一）。侧重的格权重加倍。
+  var TPL_ACCENT = {
+    brief: ["complete", "peace"], research: ["complete", "peace"], teach: ["complete", "love"],
+    review: ["complete", "peace"], proposal: ["complete", "freedom"], onepage: ["single", "peace"],
+    pitch: ["vital", "freedom"], product: ["vital", "love"], train: ["complete", "love"],
+    health: ["single", "peace"], edu: ["single", "love"], data: ["complete", "peace"],
+    cases: ["complete", "freedom"], talk: ["vital", "freedom"], keynote: ["vital", "freedom"],
+    vision: ["vital", "freedom"], brandstory: ["single", "love"], award: ["complete", "peace"],
+    launch: ["vital", "freedom"], story: ["single", "love"],
+  };
+
+  var STRONG = { kpi: 1, kpiBig: 1, compare: 1, matrix: 1, timeline: 1, steps: 1, quote: 1, lead: 1,
+                 chartRight: 1, chartFull: 1, chartLead: 1, section: 1, imageFull: 1, imageRight: 1, imageTop: 1 };
+
+  /* 九宫格打分。plan 是版式序列（含封面）。返回 {cells:{id:{score,why[]}}, total, report[]} */
+  function audit9(deck, plan) {
+    var th = THEMES[pickTheme(deck)] || THEMES.ink;
+    var slides = deck.slides || [];
+    plan = plan || diversify(slides.map(function (s, i) { return pickLayout(s, i + 1, slides.length); }));
+    var body = plan.slice(plan.length - slides.length);        // 去掉封面那一格
+    var cells = {}, i;
+    function put(id, score, why) { cells[id] = { score: Math.max(0, Math.min(100, Math.round(score))), why: why || [] }; }
+
+    /* ── 构成 ── */
+    var uw = [];
+    slides.forEach(function (s, k) {
+      if ((s.title || "").length > 16) uw.push("第" + (k + 2) + "页标题" + s.title.length + "字（上限16）");
+      (s.bullets || []).forEach(function (b) { if (String(b).length > 24) uw.push("第" + (k + 2) + "页有条要点" + String(b).length + "字（上限24）"); });
+    });
+    put("unity", 100 - uw.length * 12, uw);
+
+    var dw = [], run = 1, maxRun = 1;
+    for (i = 1; i < body.length; i++) { if (body[i] === body[i - 1]) { run++; maxRun = Math.max(maxRun, run); } else run = 1; }
+    var kinds = {}; body.forEach(function (x) { kinds[x] = 1; });
+    var nKinds = Object.keys(kinds).length;
+    if (maxRun > 2) dw.push("有" + maxRun + "页连着同一种版式");
+    if (slides.length >= 6 && nKinds < 4) dw.push("整份只用了" + nKinds + "种版式");
+    put("diversity", 100 - (maxRun > 2 ? (maxRun - 2) * 20 : 0) - (slides.length >= 6 ? Math.max(0, 4 - nKinds) * 15 : 0), dw);
+
+    var hw = [];
+    var c1 = contrast(th.tx, th.bg), c2 = contrast(th.dim, th.bg);
+    if (c1 < 4.5) hw.push("正文对比度" + c1.toFixed(1));
+    if (c2 < 3) hw.push("次要文字对比度" + c2.toFixed(1));
+    slides.forEach(function (s, k) {
+      var ink = (s.bullets || []).join("").length + (s.title || "").length;
+      if (ink > 190) hw.push("第" + (k + 2) + "页字太满（" + ink + "字）");
+    });
+    put("harmony", 100 - hw.length * 14, hw);
+
+    /* ── 品格 ── */
+    var cw = [];
+    var txtAll = slides.map(function (s) { return (s.title || "") + (s.bullets || []).join(""); }).join("");
+    var hasLead = body.indexOf("lead") >= 0 || body.indexOf("kpiBig") >= 0;
+    var hasEvidence = body.some(function (x) { return /chart|kpi/.test(x); }) || /\d/.test(txtAll);
+    var hasEdge = /失效|不成立|局限|风险|边界|不能|不许|反例|证伪|是错的|错了|失败|不适用|例外|代价/.test(txtAll);
+    var hasNext = body[body.length - 1] === "closing" || /下一步|接下来|行动/.test(slides.length ? (slides[slides.length - 1].title || "") : "");
+    var noNotes = slides.filter(function (s) { return !(s.notes || "").trim(); }).length;
+    if (!hasLead) cw.push("没有一页把主张单独立出来");
+    if (!hasEvidence) cw.push("没有可核验的数字或图表");
+    if (!hasEdge) cw.push("没有写边界/失效条件");
+    if (!hasNext) cw.push("末页不是「下一步」");
+    if (noNotes) cw.push(noNotes + "页没有讲稿");
+    put("complete", 100 - cw.length * 18, cw);
+
+    var vw = [], strong = body.filter(function (x) { return STRONG[x]; }).length;
+    var ratio = body.length ? strong / body.length : 0;
+    if (ratio < 0.4) vw.push("有动势的页只占" + Math.round(ratio * 100) + "%（要四成以上）");
+    put("vital", Math.min(100, ratio * 200), vw);
+
+    var sw = [];
+    slides.forEach(function (s, k) {
+      var n = (s.bullets || []).length;
+      if (n > 5) sw.push("第" + (k + 2) + "页" + n + "条（一页只讲一件事）");
+      if (s.chart && n > 3) sw.push("第" + (k + 2) + "页又是图又是多条要点");
+      if (/[，,、].*[，,、]/.test(s.title || "")) sw.push("第" + (k + 2) + "页标题里塞了三段话");
+    });
+    put("single", 100 - sw.length * 15, sw);
+
+    /* ── 感受 ── */
+    var lw = [];
+    if (noNotes) lw.push(noNotes + "页没有讲稿（听众拿不到你的话）");
+    if (!hasEdge) lw.push("没有诚实交代边界");
+    if (!/例|比如|举个|案例/.test(txtAll)) lw.push("全篇没有一个例子");
+    put("love", 100 - lw.length * 20, lw);
+
+    var fw = [], avg = slides.length ? slides.reduce(function (a, s) { return a + (s.bullets || []).length; }, 0) / slides.length : 0;
+    if (avg > 4.2) fw.push("平均每页" + avg.toFixed(1) + "条（挤）");
+    if (slides.length >= 8 && body.indexOf("section") < 0) fw.push("八页以上却没有一页过渡（读者没处喘气）");
+    put("freedom", 100 - fw.length * 22, fw);
+
+    var pw = [];
+    if (c1 > 19) pw.push("纯黑配纯白，投影上刺眼");
+    var jump = slides.some(function (s) { return (s.bullets || []).length === 1 && String((s.bullets || [])[0] || "").length > 34; });
+    if (jump) pw.push("一句话页那句太长（会被迫缩到很小）");
+    put("peace", 100 - pw.length * 25, pw);
+
+    // 该模板侧重的两格权重加倍
+    var acc = TPL_ACCENT[deck.tpl] || [];
+    var tot = 0, wsum = 0;
+    BEAUTY9.forEach(function (c) {
+      var w = acc.indexOf(c.id) >= 0 ? 2 : 1;
+      tot += (cells[c.id] ? cells[c.id].score : 100) * w; wsum += w;
+    });
+    var report = [];
+    BEAUTY9.forEach(function (c) {
+      var x = cells[c.id];
+      if (x && x.why.length) report.push(c.zh + "（" + c.tier + "）：" + x.why.join("；"));
+    });
+    return { cells: cells, total: Math.round(tot / wsum), report: report, plan: plan };
+  }
+
+  /* 装配＝迭代循环。每轮只动"摆法"，打分不再涨就停。
+     绝不替读者编内容——内容层的缺口留在 report 里，交给基底重写那一轮。 */
+  function assemble(deck, rounds) {
+    var slides = deck.slides || [];
+    var plan = slides.map(function (s, i) { return pickLayout(s, i + 1, slides.length); });
+    var best = null, R = rounds || 4;
+    for (var r = 0; r < R; r++) {
+      var cand = diversify(plan.slice());
+      // 活力不足时：把"单条长句"的页提成一句话页、把纯数字页提成大数字页（都只是换摆法）
+      if (audit9(deck, ["cover"].concat(cand)).cells.vital.score < 80) {
+        for (var i = 0; i < cand.length; i++) {
+          var s = slides[i];
+          if (!s) continue;
+          if (cand[i] === "bullets" && (s.bullets || []).length === 1 && String(s.bullets[0]).length >= 12) cand[i] = "lead";
+          else if (cand[i] === "bullets" && (s.bullets || []).length === 1) cand[i] = "kpiBig";
+        }
+        cand = diversify(cand);
+      }
+      var sc = audit9(deck, ["cover"].concat(cand));
+      if (!best || sc.total > best.total) { best = sc; best.plan = ["cover"].concat(cand); plan = cand; }
+      else break;                                   // 不再涨就停：迭代要能停，否则就是死循环
+      best.rounds = r + 1;
+    }
+    return best || audit9(deck, null);
+  }
+
   var TITLE_Y = GRID.TITLE_Y, TITLE_H = GRID.TITLE_H, BODY_Y = GRID.BODY_Y;   // 旧名保留，值统一由 GRID 出
   function titleOf(s, id, sz) { return tbox(id, "title", MX, TITLE_Y, W - MX * 2, TITLE_H, para(s.title, { sz: sz || 3200, b: true })); }
   function pageNo(id, idx, total) {
@@ -825,8 +985,11 @@
     var all = [{ kind: "cover", title: deck.title || "未命名", subtitle: deck.subtitle || "", kicker: deck.kicker || "" }].concat(slides);
     // 【多样】整份的版式序列先定下来，再过一遍闸门：同一版式连着三页就换掉中间那页。
     // 必须在这里做——逐页各判各的，就永远看不见"连着三页"这件事。
-    var plan = all.map(function (s, i) { return pickLayout(s, i, all.length - 1); });
-    plan = diversify(plan);
+    // 【装配＝迭代循环】摆一版 → 按美的九宫格打分 → 只改摆法再摆一版，分不再涨就停。
+    var asm = assemble(deck, 4);
+    var plan = asm.plan && asm.plan.length === all.length ? asm.plan
+      : diversify(all.map(function (s, i) { return pickLayout(s, i, all.length - 1); }));
+    deck._score = asm.total; deck._report = asm.report;      // 客户端拿去显示，也可回喂给基底重写
     var files = [], i;
 
     var needExt = {};                                  // 用到了哪些图片扩展名，就声明哪些（漏声明＝文件损坏）
@@ -1086,7 +1249,8 @@
     parse: parse,
     preload: preload,
     layouts: function () { return Object.keys(LAYOUTS); },
-    audit: audit, contrast: contrast, diversify: diversify, GRID: GRID, SCALE: SCALE,
+    audit: audit, audit9: audit9, assemble: assemble, BEAUTY9: BEAUTY9, TPL_ACCENT: TPL_ACCENT,
+    contrast: contrast, diversify: diversify, GRID: GRID, SCALE: SCALE,
     themes: function () { return Object.keys(THEMES); },
     pickLayout: pickLayout,
     pickTheme: pickTheme,

@@ -4146,6 +4146,10 @@ export default {
       // 模板：不只是配色，它决定「这一场该有哪几页、每页该写成什么形状」——
       // 也就是给基底装哪一份「PPT 写作 Skill」。auto ＝ 由内容自己选。
       const tplId = DECK_TPL[b.tpl] ? b.tpl : "";
+      // 迭代循环的**外环**：客户端把上一稿与九宫格审计一起送回来，这一轮只做"照单修"。
+      // 内环（只调摆法）在浏览器里跑；外环（改内容）必须由基底来——摆法救不了"缺一页边界"。
+      const fixNote = String(b.fix || "").slice(0, 3000);
+      const prevDraft = String(b.prev || "").slice(0, 20000);
       const turns = Array.isArray(b.history) ? b.history : [];   // 整场收下，长短由 readConvoText 处理
       const dlang = b.lang === "en" ? "en" : "zh";
       if (!turns.length) return _sseResp([{ t: "error", v: "这场还没有可成文的内容。" }]);
@@ -4261,7 +4265,11 @@ export default {
             // 抽成变量：下面"空产出降档重试"那一遍要复用同一份，绝不能两遍喂的不是同一件事
             const messages = [
               { role: "system", content: sys },
-              { role: "user", content: "以下是这场对话的全文：\n\n" + convo + "\n———\n现在开始产出「" + SPEC.name + "」。" },
+              { role: "user", content: "以下是这场对话的全文：\n\n" + convo + "\n———\n现在开始产出「" + SPEC.name + "」。"
+                + (fixNote ? ("\n\n【这是第二轮：上一稿已按「美的九宫格」验过，下面是**逐条不合格项**】\n" + fixNote
+                    + "\n\n【怎么修】只针对上面这些条目改，**别推倒重来**——没被点名的页原样保留（可以微调措辞）。"
+                    + "缺页就补页、条数超了就删到限内、缺讲稿就补讲稿、缺边界页就真加一页写清什么情况下这套判断失效。"
+                    + "改完仍按同一套格式输出整份稿子。\n\n【上一稿全文】\n" + prevDraft) : "") },
             ];
             let upstream;
             try {

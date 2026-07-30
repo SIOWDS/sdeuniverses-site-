@@ -332,8 +332,9 @@ console.log("── 四点〇 · 装配三原则：统一 · 多样 · 和谐（
   const d1 = X.diversify(seq.slice()), d2 = X.diversify(seq.slice());
   ok(JSON.stringify(d1) === JSON.stringify(d2), "闸门是确定性的（同一序列永远同一结果，不掷骰子）");
   ok(d1.filter(function (x) { return x === "bullets"; }).length < 6, "六页全同形会被打散（实得 " + d1.join(",") + "）");
-  ok(/plan = diversify\(plan\)/.test(MOD) && /pickLayout\(s, i, all\.length - 1\)/.test(MOD),
-     "闸门接在 build 里、按整份序列跑——逐页各判各的就永远看不见「连着三页」");
+  // 闸门现在包在 assemble() 的迭代循环里（每轮都 diversify 一次），判据随之改成"build 用的是迭代结果"
+  ok(/var asm = assemble\(deck, 4\)/.test(MOD) && /cand = diversify\(plan\.slice\(\)\)/.test(MOD),
+     "闸门在 assemble 的每一轮里跑，build 用的是迭代后的摆法——逐页各判各的就永远看不见「连着三页」");
   // 统一：audit 能抓出超字数
   const a2 = X.audit({ title: "t", slides: [{ title: "这个标题写得实在是太长了超过十六个字了吧", bullets: ["短"], notes: "", kind: "content" }] });
   ok(a2.unity.length === 1 && /标题/.test(a2.unity[0]), "标题超字数被 audit 抓出（超了会被迫缩字号，破坏统一）");
@@ -346,6 +347,46 @@ console.log("── 四点〇 · 装配三原则：统一 · 多样 · 和谐（
   // 提示端
   ok(/装配三原则：美＝统一·多样·和谐/.test(wk), "三原则也写进了给基底的写作纪律");
   ok(/相邻两页不许写成同一个形状/.test(wk) && /宁可少一条，不许挤/.test(wk), "多样与和谐都落成可执行的一句话");
+}
+
+console.log("── 四点〇五 · 美的九宫格 ＋ 迭代循环装配");
+{
+  ok(/var BEAUTY9 = \[/.test(MOD), "九宫格写成表");
+  const zh = ["统一","多样","和谐","完全","活力","纯一","爱","自由","平安"];
+  ok(zh.every(function (z) { return new RegExp('zh: "' + z + '"').test(MOD); }), "九格齐（构成/品格/感受各三）");
+  ok(X.BEAUTY9.length === 9 && new Set(X.BEAUTY9.map(function (c) { return c.tier; })).size === 3, "分三层，每层三格");
+  ok(X.BEAUTY9.every(function (c) { return c.says && c.says.length > 8; }), "每一格都写明它检查什么（不是只有名字）");
+  ok(/TPL_ACCENT/.test(MOD) && Object.keys(X.TPL_ACCENT).length === 20, "20 套模板各自侧重哪两格（不同种类应用不同的美）");
+  ok(Object.keys(X.TPL_ACCENT).every(function (k) { return X.TPL_ACCENT[k].length === 2; }), "各侧重一个品格＋一个感受");
+  // 打分行为
+  const mk = (n, opts) => { const d = { title: "t", subtitle: "s", slides: [] , tpl: (opts||{}).tpl};
+    for (let i = 0; i < n; i++) d.slides.push({ title: "第" + i + "页", bullets: ["甲","乙","丙"], notes: (opts||{}).notes === false ? "" : "讲稿", kind: "content" });
+    return d; };
+  const flat = X.audit9(mk(8));
+  ok(flat.total < 85, "八页全是要点页、无数字无边界 → 总分被压下来（实得 " + flat.total + "）");
+  ok(flat.cells.vital.score < 60, "活力这一格最先掉");
+  ok(flat.report.length > 0, "给得出逐条不合格项（这份要回喂给基底重写）");
+  const noNotes = X.audit9(mk(6, { notes: false }));
+  ok(noNotes.cells.love.score < 100 && /讲稿/.test(noNotes.cells.love.why.join("")), "没讲稿会扣「爱」——听众拿不到你的话");
+  ok(/是错的|失败|不适用/.test(MOD), "边界判据认得「什么情况证明我这个方法是错的」这种写法（真数据抓出来的漏判）");
+  // 迭代循环
+  const a1 = X.assemble(mk(9), 4);
+  ok(a1 && typeof a1.total === "number" && Array.isArray(a1.plan), "assemble 返回分数与最终摆法");
+  ok(a1.plan.length === 10, "摆法含封面，与页数对齐");
+  const b1 = X.assemble(mk(9), 4), b2 = X.assemble(mk(9), 4);
+  ok(b1.total === b2.total && JSON.stringify(b1.plan) === JSON.stringify(b2.plan), "迭代是确定性的：同一份稿子两次跑结果一致");
+  ok(/分不再涨就停/.test(MOD) || /不再涨就停/.test(MOD), "循环有停止条件（写在注释里，也写在代码里）");
+  ok(/绝不替读者编内容/.test(MOD), "内环只调摆法，绝不编内容——缺一页边界要留给基底补");
+  ok(/deck\._score = asm\.total/.test(MOD), "build 用的就是迭代后的摆法，并把分数带出来");
+  // 侧重格权重加倍
+  const s1 = X.audit9(mk(8, { tpl: "talk" })), s2 = X.audit9(mk(8, { tpl: "brief" }));
+  ok(s1.total !== s2.total, "同一份稿子在不同模板下得分不同（侧重的格权重加倍）");
+  // 外环：客户端与服务端
+  ok(/function b9Show\(/.test(wm) && /WDSPptx\.assemble/.test(wm), "客户端稿子写完就按九宫格验一遍");
+  ok(/b9Polish/.test(wm) && /distill\("deck", null, null, b9Last\.tpl, \{ fix:/.test(wm), "不达标给「再打磨一轮」，点了把逐条不合格项回喂");
+  ok(/fix: \(again && again\.fix\)/.test(wm) && /prev: \(again && again\.prev\)/.test(wm), "请求体带上一稿与审计单");
+  ok(/const fixNote = String\(b\.fix/.test(wk) && /const prevDraft = String\(b\.prev/.test(wk), "服务端收下审计单与上一稿");
+  ok(/这是第二轮：上一稿已按「美的九宫格」验过/.test(wk) && /别推倒重来/.test(wk), "第二轮只照单修，不推倒重来");
 }
 
 console.log("── 四点二 · 首次真跑抓到的：多条成对页要走对照卡");
