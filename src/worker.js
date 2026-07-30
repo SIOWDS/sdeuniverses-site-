@@ -36,6 +36,34 @@ async function imUid(sub) {
 // 口令真值放 Cloudflare 环境变量 IM_PW（Workers → Settings → Variables → Encrypt）。
 // 本仓库是公开仓，源码里只留一个 SHA-256 回退值；一旦设了 IM_PW，回退即整条失效。
 let IM_PW_ENV = "";                 // 每次请求由入口与 DO 构造器写入
+let IM_ENV = null;                  // 同上：留着读 ASSETS（学员名录）
+// ── 名字必须是学员名录里的名字（2026-07-30 用户裁定）──────────────
+// 名录＝ /students/roster.json 的 students[].name；同时接受 slug，
+// 但落地一律换成名录里的规范名 ⇒ 一个人只会有一个身份。
+// 名录之外还要进的人（如王德生）走环境变量 IM_NAMES（逗号分隔）。
+const IM_NAMES_BUILTIN = ["王德生", "Desheng Wang", "wang-desheng"];
+let ROSTER = null, ROSTER_AT = 0;
+function imNorm(x) { return String(x || "").trim().replace(/\s+/g, " ").toLowerCase(); }
+async function rosterMap() {
+  const now = Date.now();
+  if (ROSTER && now - ROSTER_AT < 300000) return ROSTER;   // 5 分钟缓存
+  try {
+    if (!IM_ENV || !IM_ENV.ASSETS) return ROSTER;
+    const r = await IM_ENV.ASSETS.fetch(new Request("https://sdeuniverses.com/students/roster.json"));
+    if (!r.ok) return ROSTER;
+    const j = await r.json();
+    const m = new Map();
+    for (const st of (j && j.students) || []) {
+      if (!st || !st.name) continue;
+      m.set(imNorm(st.name), String(st.name));
+      if (st.slug) m.set(imNorm(st.slug), String(st.name));
+    }
+    const extra = [].concat(IM_NAMES_BUILTIN, String((IM_ENV && IM_ENV.IM_NAMES) || "").split(",").filter(Boolean));
+    for (const n of extra) { const t = String(n).trim(); if (t) m.set(imNorm(t), t); }
+    if (m.size) { ROSTER = m; ROSTER_AT = now; }
+  } catch (e) {}
+  return ROSTER;
+}
 const IM_PW_FALLBACK = "e7f0aafaf35f0764a826b05770742240163e74adbae5e5988f44628711dd50b3";
 async function sha256hex(s) {
   const b = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(String(s)));
@@ -57,13 +85,23 @@ async function verifyPasscode(cred) {
     else ok = ((await sha256hex(pw)) === IM_PW_FALLBACK);
   } catch (e) { return null; }
   if (!ok) return null;
-  const uid = await imUid("pw:" + name.toLowerCase());
-  return uid ? { name, uid, pw: true } : null;
+  // 名字必须在学员名录里。名录一次都没取到过时放行（宁可少拦，不把全体锁在门外）。
+  const rm = await rosterMap();
+  let disp = name;
+  if (rm) {
+    const hit = rm.get(imNorm(name));
+    if (!hit) return { bad: "name" };
+    disp = hit;
+  }
+  const uid = await imUid("pw:" + imNorm(disp));
+  return uid ? { name: disp, uid, pw: true } : null;
 }
 // 聊天面（/api/im、/api/chat、WS、WDS 上传）认这两条门中的任意一条。
 // 注意：/api/comments（文章讨论区）不走这里，仍然只认 Google。
 async function verifyIdent(cred) {
-  return (await verifyPasscode(cred)) || (await verifyGoogleCredential(cred));
+  const p = await verifyPasscode(cred);
+  if (p && p.bad) return null;                  // 口令对但名字不在名录 → 不放行
+  return p || (await verifyGoogleCredential(cred));
 }
 function dmRoomFor(a, b) {
   a = String(a || ""); b = String(b || "");
@@ -346,7 +384,7 @@ function wdsMode(q) {
   return "clean";
 }
 export class CommentBox {
-  constructor(ctx, env) { this.ctx = ctx; this.env = env; if (env && env.IM_PW) IM_PW_ENV = String(env.IM_PW); }
+  constructor(ctx, env) { this.ctx = ctx; this.env = env; if (env) { IM_ENV = env; if (env.IM_PW) IM_PW_ENV = String(env.IM_PW); } }
   async fetch(request) {
     const _u = new URL(request.url);
     // ===== 实时群聊：WebSocket 升级（观看无需登录，发言需 Google 登录）=====
@@ -3085,7 +3123,7 @@ async function askCore(request, env, url, body, SINK) {
 
 export default {
   async fetch(request, env, ctx) {
-    if (env && env.IM_PW) IM_PW_ENV = String(env.IM_PW);
+    if (env) { IM_ENV = env; if (env.IM_PW) IM_PW_ENV = String(env.IM_PW); }
     const url = new URL(request.url);
     // /fresh：永不缓存的首页镜像，用于验证最新版本
     if (url.pathname === "/fresh") {
@@ -4582,7 +4620,9 @@ export default {
       const b = await request.json().catch(() => null);
       if (!b) return Response.json({ ok: false, msg: "请求格式不对。" }, { status: 400 });
       const who = await verifyIdent(b.credential);
-      if (!who || !who.uid) return Response.json({ ok: false, msg: "请先登录：用 Google 账号，或在「SDE 微信」用站内口令。" }, { status: 401 });
+      const probe = await verifyPasscode(b.credential);
+      if (probe && probe.bad === "name") return Response.json({ ok: false, msg: "这个名字不在学员名录里。请用你在站上发表用的名字。" }, { status: 401 });
+      if (!who || !who.uid) return Response.json({ ok: false, msg: "口令不对，请向管理员确认。" }, { status: 401 });
       const dir = env.COMMENTS.get(env.COMMENTS.idFromName("im-dir-global"));
       const call = async (payload) => {
         const r = await dir.fetch(new Request("https://do/_dir", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(payload) }));
