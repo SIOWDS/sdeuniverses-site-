@@ -203,6 +203,19 @@ a{color:var(--disc)}
       <div class="scroll" id="fw-list"><div class="hint">正在加载…</div></div>
     </div>
 
+    <div class="view" id="v-admin">
+      <div class="scroll" id="ad-body">
+        <div id="ad-gate" style="padding:18px">
+          <p style="font-size:0.86rem;color:var(--muted);margin:0 0 10px">全权管理需要<b>管理密码</b>（与站点管理口令相同）。</p>
+          <input id="ad-pw" type="password" maxlength="80" placeholder="管理密码" autocomplete="off"
+                 style="width:100%;box-sizing:border-box;padding:9px 11px;margin-bottom:8px;border:1px solid var(--line,#ddd);border-radius:8px">
+          <button id="ad-go" class="btn" style="width:100%">解锁</button>
+          <div id="ad-msg" style="font-size:0.8rem;color:#b3261e;margin-top:8px;min-height:1em"></div>
+        </div>
+        <div id="ad-panel" style="display:none"></div>
+      </div>
+    </div>
+
     <div class="view" id="v-gnew">
       <div class="scroll">
         <div class="form">
@@ -249,6 +262,7 @@ a{color:var(--disc)}
             <div class="me-item"><span>新消息桌面提醒</span><button id="b-notify">开启</button></div>
             <div class="me-item"><span>SDE 讨论（公开广场）</span><a href="/sde-talk/"><button>进入</button></a></div>
             <div class="me-item"><span>SDE 会议室</span><a href="/meeting/"><button>进入</button></a></div>
+            <div class="me-item"><span>全权管理</span><button id="b-admin">进入</button></div>
             <div class="me-item"><span>退出登录</span><button id="b-out">退出</button></div>
           </div>
           <p style="font-size:0.79rem;color:var(--muted);margin-top:1rem;line-height:1.95">
@@ -304,22 +318,113 @@ function setStat(state){var d=el("t-dot"),s=el("t-stat");
 
 /* ── 视图 ── */
 function show(v){
-  ["gate","chats","book","talk","gnew","ginfo","me","fwd"].forEach(function(x){el("v-"+x).classList.toggle("on",x===v)});
+  ["gate","chats","book","talk","gnew","ginfo","me","fwd","admin"].forEach(function(x){el("v-"+x).classList.toggle("on",x===v)});
   el("tabs").style.display=(v==="gate")?"none":"flex";
-  el("t-back").style.display=(v==="talk"||v==="gnew"||v==="ginfo"||v==="fwd")?"block":"none";
+  el("t-back").style.display=(v==="talk"||v==="gnew"||v==="ginfo"||v==="fwd"||v==="admin")?"block":"none";
   el("t-sub").style.display=(v==="talk")?"flex":"none";
   el("t-act").style.display=(v==="talk"&&cur&&cur.kind==="g")?"block":"none";
   el("t-plaza").style.display=(v==="chats"||v==="book"||v==="me")?"block":"none";
   if(v==="gnew")el("t-ttl").textContent="建群";
   else if(v==="ginfo")el("t-ttl").textContent="群资料";
   else if(v==="fwd")el("t-ttl").textContent="转发给…";
+  else if(v==="admin")el("t-ttl").textContent="全权管理";
   else if(v!=="talk")el("t-ttl").textContent="SDE 微信";
   Array.prototype.forEach.call(document.querySelectorAll(".tab"),function(t){t.classList.toggle("on",v===t.getAttribute("data-go"))});
 }
 Array.prototype.forEach.call(document.querySelectorAll(".tab"),function(t){
   t.onclick=function(){var g=t.getAttribute("data-go");closeTalk();show(g);if(g==="chats")loadInbox();if(g==="book")loadBook();};
 });
+/* ── 全权管理 ── */
+var ADPW="";
+try{ADPW=sessionStorage.getItem("sde_wx_adpw")||"";}catch(e){}
+function adCall(act,extra){
+  var body={credential:CRED,op:"admin",a:act,pass:ADPW};
+  if(extra)for(var k in extra)body[k]=extra[k];
+  return fetch("/api/im",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(body)})
+    .then(function(r){return r.json().then(function(d){return{s:r.status,d:d}})});
+}
+function esc(x){return String(x==null?"":x).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function adUnlock(){
+  var pw=el("ad-pw").value||"",m=el("ad-msg");
+  if(!pw){m.textContent="请输入管理密码。";return;}
+  ADPW=pw;m.style.color="var(--muted)";m.textContent="正在核对…";
+  adCall("auth").then(function(x){
+    if(!x.d||!x.d.ok){ADPW="";m.style.color="#b3261e";m.textContent=(x.d&&x.d.msg)||"解锁失败。";return;}
+    try{sessionStorage.setItem("sde_wx_adpw",ADPW);}catch(e){}
+    el("ad-pw").value="";m.textContent="";el("ad-gate").style.display="none";
+    el("ad-panel").style.display="";adLoad();
+  }).catch(function(){m.style.color="#b3261e";m.textContent="网络异常。"});
+}
+function adLoad(){
+  var box=el("ad-panel");box.innerHTML='<div class="hint">正在加载…</div>';
+  Promise.all([adCall("users"),adCall("groups"),adCall("bans")]).then(function(r){
+    var us=(r[0].d&&r[0].d.users)||[],gs=(r[1].d&&r[1].d.groups)||[],bs=(r[2].d&&r[2].d.bans)||[];
+    var h='<div style="padding:14px 16px">';
+    h+='<h3 style="margin:0 0 6px;font-size:0.95rem">全部用户（'+us.length+'）</h3>';
+    h+='<p style="font-size:0.76rem;color:var(--muted);margin:0 0 10px">移除＝从通讯录、所有群、所有会话里彻底清掉。勾上「同时停用」他就再也登不进来。</p>';
+    us.forEach(function(u){
+      h+='<div class="me-item"><span>'+esc(u.name||"（未署名）")+' <span style="color:var(--muted);font-size:0.74rem">'+esc(u.uid)+'</span></span>'+
+         '<span><label style="font-size:0.74rem;color:var(--muted);margin-right:8px"><input type="checkbox" class="ad-ban" data-u="'+esc(u.uid)+'"> 同时停用</label>'+
+         '<button class="ad-rm" data-u="'+esc(u.uid)+'" data-n="'+esc(u.name||"")+'">移除</button></span></div>';
+    });
+    h+='<h3 style="margin:20px 0 6px;font-size:0.95rem">全部群（'+gs.length+'）</h3>';
+    if(!gs.length)h+='<p style="font-size:0.8rem;color:var(--muted)">还没有群。</p>';
+    gs.forEach(function(g){
+      h+='<div class="me-item"><span>'+esc(g.name||"（无名群）")+' <span style="color:var(--muted);font-size:0.74rem">'+g.count+' 人</span></span>'+
+         '<button class="ad-gdel" data-g="'+esc(g.gid)+'" data-n="'+esc(g.name||"")+'">解散</button></div>';
+    });
+    h+='<h3 style="margin:20px 0 6px;font-size:0.95rem">已停用的名字（'+bs.length+'）</h3>';
+    if(!bs.length)h+='<p style="font-size:0.8rem;color:var(--muted)">没有被停用的名字。</p>';
+    bs.forEach(function(x){
+      h+='<div class="me-item"><span>'+esc(x.name)+'</span><button class="ad-unban" data-n="'+esc(x.name)+'">恢复</button></div>';
+    });
+    h+='<div id="ad-note" style="font-size:0.8rem;color:var(--muted);margin-top:14px;min-height:1em"></div></div>';
+    box.innerHTML=h;adBind();
+  }).catch(function(){box.innerHTML='<div class="hint">加载失败，请重试。</div>'});
+}
+function adNote(t,bad){var n=el("ad-note");if(n){n.style.color=bad?"#b3261e":"var(--muted)";n.textContent=t;}}
+function adBind(){
+  Array.prototype.forEach.call(document.querySelectorAll(".ad-rm"),function(btn){
+    btn.onclick=function(){
+      var u=btn.getAttribute("data-u"),n=btn.getAttribute("data-n")||u;
+      var cb=document.querySelector('.ad-ban[data-u="'+u+'"]'),ban=cb&&cb.checked;
+      if(!confirm("确定移除「"+n+"」？"+(ban?"并停用这个名字（他将无法再登录）。":"")))return;
+      adNote("处理中…");adCall("rm",{target:u,ban:ban?1:0}).then(function(x){
+        if(!x.d||!x.d.ok){adNote((x.d&&x.d.msg)||"移除失败。",true);return;}
+        adNote("已移除「"+n+"」"+(x.d.groups?("，退出 "+x.d.groups+" 个群"):"")+(ban?"，并已停用":"")+"。");adLoad();
+      }).catch(function(){adNote("网络异常。",true)});
+    };
+  });
+  Array.prototype.forEach.call(document.querySelectorAll(".ad-gdel"),function(btn){
+    btn.onclick=function(){
+      var g=btn.getAttribute("data-g"),n=btn.getAttribute("data-n")||g;
+      if(!confirm("确定解散群「"+n+"」？群里所有人都会失去这个会话。"))return;
+      adNote("处理中…");adCall("gdel",{gid:g}).then(function(x){
+        if(!x.d||!x.d.ok){adNote((x.d&&x.d.msg)||"解散失败。",true);return;}
+        adNote("已解散「"+n+"」。");adLoad();
+      }).catch(function(){adNote("网络异常。",true)});
+    };
+  });
+  Array.prototype.forEach.call(document.querySelectorAll(".ad-unban"),function(btn){
+    btn.onclick=function(){
+      var n=btn.getAttribute("data-n");
+      adNote("处理中…");adCall("unban",{name:n}).then(function(x){
+        if(!x.d||!x.d.ok){adNote((x.d&&x.d.msg)||"恢复失败。",true);return;}
+        adNote("已恢复「"+n+"」，他可以再登录了。");adLoad();
+      }).catch(function(){adNote("网络异常。",true)});
+    };
+  });
+}
+el("b-admin").onclick=function(){
+  show("admin");
+  if(ADPW){el("ad-gate").style.display="none";el("ad-panel").style.display="";adLoad();}
+  else{el("ad-gate").style.display="";el("ad-panel").style.display="none";}
+};
+el("ad-go").onclick=adUnlock;
+el("ad-pw").addEventListener("keydown",function(e){if(e.key==="Enter")adUnlock();});
+
 el("t-back").onclick=function(){
+  if(el("v-admin").classList.contains("on")){show("me");return;}
   if(el("v-fwd").classList.contains("on")){show(cur?"talk":"chats");return;}
   if(el("v-ginfo").classList.contains("on")&&cur){show("talk");return;}
   closeTalk();show("chats");loadInbox();
@@ -354,7 +459,7 @@ function pwLogin(){
     el("pw-code").value="";m.textContent="";afterLogin();
   }).catch(function(){CRED=prev;m.style.color="#b3261e";m.textContent="网络异常，请重试。";});
 }
-function logout(){CRED="";ME=null;try{sessionStorage.removeItem("sde_gauth")}catch(e){}closeTalk();show("gate");}
+function logout(){CRED="";ME=null;ADPW="";try{sessionStorage.removeItem("sde_wx_adpw")}catch(e){}try{sessionStorage.removeItem("sde_gauth")}catch(e){}closeTalk();show("gate");}
 el("b-out").onclick=logout;
 el("pw-go").onclick=pwLogin;
 var rosterLoaded=false;
