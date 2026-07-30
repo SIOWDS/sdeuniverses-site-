@@ -1553,8 +1553,11 @@ function setStudent(c, slug) {
     c.$('apiKey').value = 'sk-fake';
     c.click('#goBtn');
     await waitFor(() => /用不了|检索/.test(c.$('errBox').textContent), 20000);
-    ok('如实报出用不了', /联网检索这一路暂时用不了/.test(c.$('errBox').textContent), c.$('errBox').textContent);
+    ok('如实报出不通', /联网检索这一路现在不通/.test(c.$('errBox').textContent), c.$('errBox').textContent);
+    ok('说清是本站通道没配 Key', /本站的检索通道还没配智谱 Key/.test(c.$('errBox').textContent));
     ok('指路 F 模式', /F 模式/.test(c.$('errBox').textContent));
+    ok('把死路铺成活路：自动切到自备 Key', c.$('dSiteKey').checked === false);
+    ok('自备 Key 那一格已露出来', c.$('dSkey').style.display !== 'none', c.$('dSkey').style.display);
     ok('没有把三家凑出来（选源状态条不许说已就位）',
       !/三家已就位/.test(c.$('srcState').textContent), c.$('srcState').textContent);
     ok('也没往下走到抽脊', c.calls.filter(x => /一个主题观点/.test(x.user)).length === 0);

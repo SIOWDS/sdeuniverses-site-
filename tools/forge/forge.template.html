@@ -170,6 +170,7 @@ select.model-select{max-width:340px}
       <label class="small" style="display:flex;gap:6px;align-items:center;margin:10px 0">
         <input type="checkbox" id="dSiteKey" style="width:auto" checked> 用本站的检索通道（不勾则用你自己的智谱 Key 检索——填在下面）
       </label>
+      <div class="small" style="margin:-4px 0 8px;color:var(--muted)">本站通道要管理端配过智谱 Key 才通；不通时下面这一格会自动露出来，填一把自己的智谱 Key 即可。</div>
       <input type="password" id="dSkey" placeholder="智谱 API Key（仅用于联网检索，只存在你自己的浏览器里）" style="display:none">
       <div class="small" style="margin-top:8px;color:var(--muted)">⚠ 这一路的源在站外：材料只有摘要级，抽脊会比站内薄；发表前<b>务必自己点开每个链接核对</b>。手上已有全文就改用 F 模式。</div>
     </div>
@@ -1598,8 +1599,17 @@ async function doSelectWeb(){
   const res = await Promise.all(rows.slice(0,3).map(r=>webSearch(r.q, skey)));
   const bad = res.find(x=>!x || !x.ok);
   if(bad && /need_search_key|bad_search_key/.test(bad.reason||'')){
-    throw new Error('联网检索这一路暂时用不了（'+bad.reason+'）：本站的检索通道没配好、或你填的智谱 Key 不能用。'
-                  + '把「用本站的检索通道」的勾去掉、填一把可用的智谱 Key，或改用 F 模式自己粘三篇站外理论。');
+    // 死路要当场变成一步能走通的路：替用户切到「用自己的 Key」并把输入框露出来，
+    // 而不是只丢一句报错让他自己去猜该点哪儿。
+    if($('dSiteKey').checked){
+      $('dSiteKey').checked = false;
+      $('dSkey').style.display = '';
+      try{ $('dSkey').focus(); }catch(_){ }
+    }
+    throw new Error('联网检索这一路现在不通（'+bad.reason+'）：'
+      + (bad.reason==='need_search_key' ? '本站的检索通道还没配智谱 Key。' : '你填的那把智谱 Key 不能用（或没开联网搜索权限）。')
+      + '已经替你切到「用自己的智谱 Key」——填进上面那一格再点一次「重跑本格」即可；'
+      + '手上有现成的站外理论，改用 F 模式会更实在（材料比检索到的厚）。');
   }
   const hit = res.reduce((n,x)=>n+((x&&x.items)?x.items.length:0), 0);
   if(hit < 3) throw new Error('三轮检索一共只搜到 '+hit+' 条，撑不起三个源。换个更具体的议题重跑本格，或改用 F 模式。');
