@@ -534,8 +534,12 @@ ok("worker：三层按需下钻（L0 版块 → L1 篇 → L2 段），每层各
   W.includes("TIERED_SCAN") && W.includes("/search/sections.json") && /"\/search\/kw\/" \+ se \+ "\.json"/.test(W) && /\/search\/doc\/" \+ c\.i \+ "\.json/.test(W) && /o\.budget \|\| 3000000/.test(W) && /o\.pick \|\| 16/.test(W));
 ok("worker：三层都能动态扩展（选不出版块→退回；候选太少→加拉版块；材料够了→停止下钻）",
   /return ragScanShards\(env, url, man, coords/.test(W) && /docScore\.size < Math\.max\(6, PICK_DOCS \/ 2\)/.test(W) && /i % 8 === 0 && got >= WANT \* 3/.test(W));
-ok("worker：小层文件带缓存与 30 秒复验，段层从不缓存",
-  /let TIER = \{ at: 0, l0: null, l1: \{\} \}/.test(W) && /now - TIER\.at > CORPUS_TTL/.test(W) && !/TIER\.l2/.test(W));
+// 2026-07-30：manifest(263KB) 与 sde-coords(86KB) 也并进了这份小层缓存（此前每次调用都重拉重解，
+// 出流前的 CPU 就是这么堆上平台上限的）；过期判定收拢到 tierFresh() 一处，四份同生同死。段层照旧不缓存。
+ok("worker：小层文件带缓存与 30 秒复验（含 manifest 与 coords），段层从不缓存",
+  /let TIER = \{ at: 0, l0: null, l1: \{\}, man: null, coords: undefined \}/.test(W)
+  && /function tierFresh\(\)/.test(W) && /now - TIER\.at > CORPUS_TTL/.test(W)
+  && /TIER\.man = j;/.test(W) && /TIER\.coords !== undefined/.test(W) && !/TIER\.l2/.test(W));
 ok("worker：全站再无整份装载语料（loadCorpus 已无人调用，五个入口全走轻量检索）",
   !/await loadCorpus\(/.test(W) && (W.match(/lightRetrieve\(/g) || []).length >= 6 && !/retrieve\(corpus, q,/.test(W.replace("function retrieve(corpus, q, k, expTerms)", "")));
 ok("worker：分层索引缺失时退回逐片扫描（限时限片，不开天窗）",

@@ -636,7 +636,7 @@ function resetThread(){
   document.getElementById('briefBox').textContent='';
   document.getElementById('briefStat').textContent='';
   /* 涌现现场也要一起清：牌堆不清，新题目的第一次碰撞会抽到上一题剩下的那三种撞法 */
-  briefKind='distill'; paradigms=[]; emergeUsed=[];
+  briefKind='distill'; paradigms=[]; emergeUsed=[]; emergeFails=[];
   document.getElementById('emergeWrap').classList.remove('show');
   document.getElementById('emergeActs').classList.remove('show');
   document.getElementById('emergeBox').innerHTML='';
@@ -795,7 +795,7 @@ function doDistill(){
     stat.textContent='✓ 论文入口资料已就绪（'+brief.length+' 字，出自 '+turns.length+' 轮问对）· 现在点「成文一篇」，论文将以它为起点逐条兑现。';
   }).catch(function(e){
     box.className='ans';
-    stat.textContent='✗ 提炼失败：'+(e.message||String(e));
+    stat.textContent='✗ 提炼失败：'+errText(e);
   }).finally(function(){
     distilling=false; btn.disabled=false;
   });
@@ -1261,7 +1261,7 @@ var EMERGE_WAYS=[
   [1,'两两对撞'],[2,'三方共撞·取共同分离点'],[3,'一个当待撞物·两个当敌意最近邻'],
   [4,'换承重层级'],[5,'换母学科'],[6,'反向撞·先立否定式']
 ];
-var emerging=false, emergeUsed=[], paradigms=[];
+var emerging=false, emergeUsed=[], paradigms=[], emergeFails=[];
 /* 入口资料有两种来源、栏目结构不同（提炼档九栏／涌现档十栏），成文时要按来源发指令 */
 var briefKind='distill';
 function wayName(n){ for(var i=0;i<EMERGE_WAYS.length;i++) if(EMERGE_WAYS[i][0]===n) return EMERGE_WAYS[i][1]; return '第'+n+'式'; }
@@ -1276,6 +1276,15 @@ function pickWays(n){
 }
 function viewsText(){
   return turns.map(function(t,i){ return '〔第'+(i+1)+'轮〕问：'+t.q+'\n'+t.a; }).join('\n\n').slice(0,20000);
+}
+/* 出错原因要能读，才谈得上让人决定重试。平台把调用按资源上限掐掉时返回的是 Cloudflare
+   自己的 HTML 错误页，整页塞进 message 里，读者只看见一串标签——那不叫报错，那叫失踪。 */
+function errText(e){
+  var m=String((e&&e.message)||e||'');
+  if(/^HTTP 503/.test(m)) return '服务端 503（平台资源上限——通常是同一分钟里连打太多次重活）。等十几秒再点一次即可。';
+  if(/^HTTP 5\d\d/.test(m)) return '服务端 '+m.slice(5,8)+'，请稍后重试。';
+  if(/^HTTP 4\d\d/.test(m)) return '请求被拒（'+m.slice(5,8)+'）：'+m.slice(9).replace(/<[^>]*>/g,' ').replace(/\s+/g,' ').slice(0,120);
+  return m.replace(/<[^>]*>/g,' ').replace(/\s+/g,' ').slice(0,180);
 }
 /* 一台通用的 SSE 收集器：碰撞、盲评、综合提炼三环共用，不再各写一份 pump */
 function sseCollect(payload, onStat){
@@ -1298,6 +1307,9 @@ function sseCollect(payload, onStat){
             var j; try{ j=JSON.parse(pl); }catch(e){ continue; }
             if(j.t==='token'){ acc+=j.v; if(onStat) onStat(acc.length,false); }
             else if(j.t==='think'){ if(onStat) onStat(acc.length,true); }
+            /* 服务端「先出流再干活」之后，检索/装内功那十几秒里会先发 status——接住它，
+               否则读者盯着一条不动的状态行，以为死了。 */
+            else if(j.t==='status'){ if(onStat) onStat(acc.length,false,j.v); }
             else if(j.t==='error'){ rej(new Error(j.v||'基底返回错误')); return; }
           }
           pump();
@@ -1312,6 +1324,12 @@ function paradigmName(t){
 }
 function renderParadigms(sel){
   var o='';
+  /* 失败也是现场的一部分：哪一路死了、死于什么，必须留在页面上——
+     否则三路里死两路，读者只看见"少了两张卡"，以为本来就该是一张。 */
+  if(emergeFails.length){
+    o+='<div style="border:1px solid #C08A5E;border-radius:11px;padding:10px 13px;margin-bottom:10px;background:var(--card);font-size:0.78rem;color:var(--text2);line-height:1.7">'
+      +'<b style="color:#A85B2B">本次有 '+emergeFails.length+' 处未跑通</b><br>'+emergeFails.map(esc).join('<br>')+'</div>';
+  }
   paradigms.forEach(function(p,ix){
     var win=(sel===ix);
     o+='<div style="border:1px solid '+(win?'#B5860F':'var(--border)')+';border-radius:11px;padding:13px 15px;margin-bottom:10px;background:var(--card)'+(win?';box-shadow:0 2px 12px rgba(138,104,23,0.18)':'')+'">'
@@ -1322,6 +1340,7 @@ function renderParadigms(sel){
       +'</div>'
       +(p.dims?'<div style="font-size:0.74rem;color:var(--muted);margin-top:3px">S'+p.dims.S+' D'+p.dims.D+' E'+p.dims.E+' I'+p.dims.I+' F'+p.dims.F+'　·　'+esc(iqLevel(p.total))+'</div>':'')
       +(p.verdict?'<div style="font-size:0.77rem;color:var(--text2);line-height:1.65;margin-top:6px">'+esc(String(p.verdict).slice(0,240))+'</div>':'')
+      +(p.err?'<div style="font-size:0.75rem;color:#A85B2B;margin-top:6px">创新检查未完成：'+esc(p.err)+'（本卡按 0 分参与择优）</div>':'')
       +'<div style="font-size:0.76rem;color:var(--text2);line-height:1.75;margin-top:7px;max-height:'+(win?'none':'7.5em')+';overflow:hidden;white-space:pre-wrap">'+esc(p.text.slice(0,win?4000:420))+'</div>'
       +'</div>';
   });
@@ -1335,6 +1354,7 @@ function doEmerge(again){
   var uk=(keyMode==='own')?document.getElementById('userKey').value.trim():'';
   if(keyMode==='own' && !uk){ document.getElementById('userKey').focus(); flashAsk('请先填入你的 API Key，或切回「系统」。'); return Promise.resolve(); }
   emerging=true;
+  emergeFails=[];
   var btn=document.getElementById('btnEmerge'); btn.disabled=true;
   document.getElementById('emergeWrap').classList.add('show');
   document.getElementById('emergeActs').classList.remove('show');
@@ -1351,12 +1371,19 @@ function doEmerge(again){
   ways.forEach(function(w,ix){
     chain=chain.then(function(){
       stat.textContent='🌀 第 '+(ix+1)+'/3 路碰撞中（'+wayName(w)+'）…每一路都装内功＋心得＋方法论，约 40–80 秒';
-      return sseCollect({mode:'collide',q:oq,origin:oq,views:vt,way:w},function(n,think){
-        stat.textContent=(think?'🧠 ':'🌀 ')+'第 '+(ix+1)+'/3 路碰撞（'+wayName(w)+'）'+(think?'·深度思考中':'·已产出 '+n+' 字')+'…';
+      return sseCollect({mode:'collide',q:oq,origin:oq,views:vt,way:w},function(n,think,msg){
+        stat.textContent=(think?'🧠 ':'🌀 ')+'第 '+(ix+1)+'/3 路碰撞（'+wayName(w)+'）'
+          +(msg?'·'+msg:(think?'·深度思考中':'·已产出 '+n+' 字'))+'…';
       }).then(function(t){
         t=String(t||'').trim();
         if(t.length>200){ paradigms.push({way:w,text:t}); renderParadigms(-1); }
-      },function(){ /* 单路失败不拖垮另外两路 */ });
+        else { emergeFails.push('第 '+(ix+1)+' 路（'+wayName(w)+'）产出过短（'+t.length+' 字），已弃'); renderParadigms(-1); }
+      },function(err){
+        /* 单路失败不拖垮另外两路——但也不再吞掉。吞掉的后果是屏幕上只剩一个 ✗，
+           而那个 ✗ 出自最后一环，读者以为是提炼坏了，其实前面已经死了两路。 */
+        emergeFails.push('第 '+(ix+1)+' 路（'+wayName(w)+'）失败：'+errText(err));
+        renderParadigms(-1);
+      });
     });
   });
   return chain.then(function(){
@@ -1366,16 +1393,16 @@ function doEmerge(again){
     paradigms.forEach(function(p,ix){
       c2=c2.then(function(){
         stat.textContent='🎯 创新检查 '+(ix+1)+'/'+paradigms.length+'（独立盲评，评分者不装内功）…';
-        return sseCollect({mode:'iq',q:oq,text:p.text},function(n){
-          stat.textContent='🎯 创新检查 '+(ix+1)+'/'+paradigms.length+'…（'+n+' 字）';
+        return sseCollect({mode:'iq',q:oq,text:p.text},function(n,think,msg){
+          stat.textContent='🎯 创新检查 '+(ix+1)+'/'+paradigms.length+(msg?'…'+msg:'…（'+n+' 字）');
         }).then(function(raw){
           try{
             var j=parseIqJson(raw);
             var d={S:iqNum(j.S&&j.S.score),D:iqNum(j.D&&j.D.score),E:iqNum(j.E&&j.E.score),I:iqNum(j.I&&j.I.score),F:iqNum(j.F&&j.F.score)};
             p.dims=d; p.total=pyRound(iqComposite(d)); p.verdict=j.verdict||''; p.card=j;
-          }catch(e){ p.total=0; }
+          }catch(e){ p.total=0; p.err='评分卡解析失败（基底没按 JSON 交卷）'; }
           renderParadigms(-1);
-        },function(){ p.total=0; });
+        },function(err){ p.total=0; p.err=errText(err); renderParadigms(-1); });
       });
     });
     return c2;
@@ -1403,8 +1430,18 @@ function doEmerge(again){
     var bstat=document.getElementById('briefStat'), box=document.getElementById('briefBox');
     box.textContent=''; box.className='ans blink';
     bstat.textContent='🧬 最终综合提炼中（整条产线最要紧的一步：收拢胜出典范、回收落选零件、把评分卡短板转成论文作业）…';
-    return sseCollect({mode:'synth',q:oq,origin:oq,hist:buildHist(true),winner:paradigms[best].text,others:others,cards:cards},
-      function(n,think){ if(!think) bstat.textContent='🧬 最终综合提炼中…（'+n+' 字）'; })
+    /* 综合提炼是整条链上最后、最贵的一环，此前也是唯一没有重试的一环：它一挂，
+       前面十几次调用（十轮问对＋三路碰撞＋三次盲评）就全白跑。给它一次自动重试。 */
+    var synthOnce=function(attempt){
+      return sseCollect({mode:'synth',q:oq,origin:oq,hist:buildHist(true),winner:paradigms[best].text,others:others,cards:cards},
+        function(n,think,msg){ if(!think) bstat.textContent='🧬 最终综合提炼中'+(attempt>1?'（第 '+attempt+' 次尝试）':'')+(msg?'·'+msg:'…（'+n+' 字）'); })
+        .catch(function(err){
+          if(attempt>=2) throw err;
+          bstat.textContent='… 综合提炼出错（'+errText(err)+'）正在重试…';
+          return new Promise(function(r){ setTimeout(r,4000); }).then(function(){ return synthOnce(attempt+1); });
+        });
+    };
+    return synthOnce(1)
       .then(function(t){
         box.className='ans'; box.textContent=String(t||'').trim();
         brief=String(t||'').trim(); briefKind='synth';
@@ -1412,7 +1449,8 @@ function doEmerge(again){
         bstat.textContent='✓ 综合提炼完成（'+brief.length+' 字）· 出自 '+turns.length+' 轮问对 → '+paradigms.length+' 个候选典范 → 择优 → 提炼。现在点「成文一篇」，论文将以它为起点逐条兑现。';
       });
   }).catch(function(e){
-    stat.textContent='✗ '+(e.message||String(e));
+    stat.textContent='✗ '+errText(e);
+    renderParadigms(paradigms.length?0:-1);
   }).finally(function(){ emerging=false; btn.disabled=false; });
 }
 function renderSources(list){

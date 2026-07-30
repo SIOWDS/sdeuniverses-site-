@@ -1,0 +1,239 @@
+/* sim_ask_stream_first —— /api/ask 「先出流再干活」与 TIER 缓存的端到端干跑。
+   不是源码检视：真 import src/worker.js，给它一副打桩的 env 与 globalThis.fetch，
+   真跑 worker.fetch()，看它到底什么时候把 Response 交出来、流里按什么次序吐了什么。
+
+   为什么必须真跑：这次修的东西正是「源码看着都对、线上却被平台掐掉」那一类——
+   出流早晚是时序问题，grep 抓不到；只有让检索故意慢三秒、再看 Response 是不是几十毫秒就回来，
+   才算证明。（.buffer 那个坑就是源码检视放过、线上黑盒才抓到的，见 Skill 七之二。）
+
+   十组断言：
+   ① 出流不等重活：检索慢 3 秒，Response 仍必须立刻返回，且是 200 + event-stream
+   ② 事件次序：先 status(检索中) → sources → token，末尾恰好一个 [DONE]
+   ③ 深度档（collide）会先报「装载内功与心得」，且提示词骨架没被改坏
+   ④ 检索整段炸掉 → 流内 error，HTTP 仍 200（不再把异常甩给平台变 5xx）
+   ⑤ 限流命中 → 流内 error，不是干巴巴的非流式响应
+   ⑥ recommend 仍走非流式 JSON（前端是 resp.json() 接的，包进 SSE 就读不出来）
+   ⑦ 四步法写进同一条流：四段 status 齐全，[DONE] 仍只有一个（没有嵌套流/重复收尾）
+   ⑧ TIER 缓存：连打两次，manifest 与 sde-coords 各只取一次
+   ⑨ 上游 402（系统 Key 没额度）→ 流内 error 带 code=use_own_key
+   ⑩ 上游连不上 → 流内 error，流照样干净收尾
+*/
+"use strict";
+let P = 0, F = 0;
+const ok = (c, m) => { c ? (P++, console.log("  PASS " + m)) : (F++, console.log("  FAIL " + m)); };
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+/* ── 打桩的索引与内功 ── */
+const MAN = {
+  built: "2026-07-30T00:00:00Z",
+  sections: [{ key: "col", label: "长文专栏" }],
+  docs: [{ i: 0, s: "col", t: "意义的磨损", u: "/column/a/" }, { i: 1, s: "col", t: "耐候性", u: "/column/b/" }],
+};
+const SECTIONS = { sections: [{ s: "col", k: ["意义", "磨损", "耐候"] }] };
+const KW = { rows: [{ i: 0, k: ["意义", "磨损"] }, { i: 1, k: ["耐候"] }] };
+const DOC = { c: ["意义会磨损，是因为它靠反复被兑现来维持。".repeat(20)] };
+const COORDS = { 0: ["意义"], 1: ["耐候"] };
+const NEIGONG = "内功正文。".repeat(2000); // > 5000 字，过 loadNeigong 的长度校验
+
+function makeEnv(opt) {
+  opt = opt || {};
+  const hits = { manifest: 0, coords: 0, sections: 0, kw: 0, doc: 0, neigong: 0 };
+  const json = (o) => new Response(JSON.stringify(o), { headers: { "content-type": "application/json" } });
+  const ASSETS = {
+    fetch: async (req) => {
+      const p = new URL(req.url).pathname;
+      if (p === "/search/manifest.json") { hits.manifest++; if (opt.idxThrow) return new Response("boom", { status: 500 }); return json(MAN); }
+      if (p === "/search/sde-coords.json") { hits.coords++; return json(COORDS); }
+      if (p === "/search/sections.json") { hits.sections++; return json(SECTIONS); }
+      if (p.startsWith("/search/kw/")) { hits.kw++; return json(KW); }
+      if (p.startsWith("/search/doc/")) {
+        hits.doc++;
+        if (opt.slowMs) await sleep(opt.slowMs);   // 故意把最重的一层拖慢
+        return json(DOC);
+      }
+      if (p === "/taste/assets/sde-neigong.txt") { hits.neigong++; return new Response(NEIGONG); }
+      return new Response("not found", { status: 404 });
+    },
+  };
+  const doStub = (handler) => ({ idFromName: () => "id", get: () => ({ fetch: handler }) });
+  const env = {
+    ASSETS,
+    ASK_LIMITER: doStub(async () => json({ ok: opt.limited ? false : true, reason: "rate" })),
+    CONFIG_VAULT: doStub(async (req) => {
+      const b = await req.json();
+      if (b.op === "getVendor") return json({});                       // 没设活跃基底 → 回退系统 Key
+      if (b.op === "getReflect") return json({ reflect: "心得正文。".repeat(200) });
+      if (b.op === "get") return json({ key: "sk-sim" });
+      return json({});
+    }),
+    SDE_SEARCH_KEY: "sk-sim",
+  };
+  return { env, hits };
+}
+
+/* ── 打桩的基底：SSE 流式回两个 token；非流式回一段文字 ── */
+function installFetch(opt) {
+  opt = opt || {};
+  const seen = [];
+  globalThis.fetch = async (input, init) => {
+    const u = String((input && input.url) || input);
+    const body = init && init.body ? JSON.parse(init.body) : {};
+    seen.push({ u, body });
+    if (opt.netThrow) throw new Error("connect ECONNREFUSED");
+    if (opt.upstreamStatus && opt.upstreamStatus !== 200) {
+      return new Response("quota exhausted", { status: opt.upstreamStatus });
+    }
+    if (body.stream) {
+      const lines =
+        'data: {"choices":[{"delta":{"content":"甲"}}]}\n\n' +
+        'data: {"choices":[{"delta":{"content":"乙"}}]}\n\n' +
+        "data: [DONE]\n\n";
+      return new Response(new Blob([lines]).stream(), { status: 200 });
+    }
+    return new Response(JSON.stringify({ choices: [{ message: { content: "词一、词二" } }] }), { status: 200 });
+  };
+  return seen;
+}
+
+const askReq = (payload) =>
+  new Request("https://sdeuniverses.com/api/ask", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+
+async function drain(resp) {
+  const txt = await resp.text();
+  const evs = [];
+  for (const ln of txt.split("\n")) {
+    const s = ln.trim();
+    if (!s.startsWith("data:")) continue;
+    const p = s.slice(5).trim();
+    if (p === "[DONE]") { evs.push({ t: "__done__" }); continue; }
+    try { evs.push(JSON.parse(p)); } catch (e) {}
+  }
+  return evs;
+}
+
+/* TIER/NEIGONG 这些是模块级缓存（线上一个 isolate 内共用，本来就该跨请求活着）。
+   干跑里若整场共用一份模块，第二组的打桩就永远不会被问到——第一组已经把缓存填满了。
+   所以每一组都拿一份全新的模块实例（import 带唯一 query），只有第[六]组故意共用，
+   它测的正是「同一个实例里第二次不再重拉」。 */
+let _mn = 0;
+const freshWorker = async () => (await import("../src/worker.js?sim=" + (++_mn))).default;
+
+(async () => {
+  let worker = await freshWorker();
+
+  /* ①②③ 出流不等重活 + 事件次序 + 深度档提示 */
+  console.log("\n[一] 出流护栏：检索故意慢 3 秒，Response 必须立刻回来");
+  {
+    const { env } = makeEnv({ slowMs: 3000 });
+    const seen = installFetch();
+    const t0 = Date.now();
+    const resp = await worker.fetch(askReq({ q: "意义为什么会磨损", mode: "collide", way: 5, views: "观点一…", vendor: "ds" }), env, {});
+    const ttfb = Date.now() - t0;
+    ok(ttfb < 800, "Response 在 " + ttfb + "ms 就交出来了（重活还在后头跑，旧版这里必须等满 3 秒以上）");
+    ok(resp.status === 200, "HTTP 200");
+    ok((resp.headers.get("content-type") || "").indexOf("text/event-stream") >= 0, "content-type 是 event-stream");
+
+    const evs = await drain(resp);
+    const kinds = evs.map((e) => e.t);
+    ok(kinds.indexOf("status") >= 0 && kinds.indexOf("status") < kinds.indexOf("sources"), "先报进度 status，再给 sources");
+    ok(/检索/.test((evs.find((e) => e.t === "status") || {}).v || ""), "第一条进度说的是「正在检索站内语料」");
+    ok(evs.some((e) => e.t === "status" && /内功/.test(e.v || "")), "深度档另报了一条「正在装载内功与心得」");
+    ok(kinds.indexOf("sources") < kinds.indexOf("token"), "sources 在正文之前");
+    ok(evs.filter((e) => e.t === "__done__").length === 1, "[DONE] 恰好一个");
+    ok(evs.filter((e) => e.t === "token").map((e) => e.v).join("") === "甲乙", "正文两个 token 都转发到了");
+
+    const sys = String((seen.find((s) => s.body && s.body.stream && (s.body.messages || []).length) || { body: { messages: [{ content: "" }] } }).body.messages[0].content);
+    ok(sys.indexOf("换母学科") >= 0, "collide 第五式（换母学科）确实进了系统提示——碰撞方式表没被改坏");
+    ok(sys.indexOf("【承重命题】") >= 0 && sys.indexOf("【它最容易在哪里被推翻】") >= 0, "典范八节骨架首尾都在");
+  }
+
+  /* ④ 检索炸掉 → 流内 error，不是平台 5xx */
+  console.log("\n[二] 重活炸掉也只退化成流内错误");
+  worker = await freshWorker();
+  {
+    const { env } = makeEnv({ idxThrow: true });
+    installFetch();
+    const resp = await worker.fetch(askReq({ q: "意义为什么会磨损", mode: "collide", way: 1 }), env, {});
+    ok(resp.status === 200, "HTTP 仍是 200（异常没有甩给平台）");
+    const evs = await drain(resp);
+    ok(evs.some((e) => e.t === "error"), "流里给出了 error 事件：" + JSON.stringify((evs.find((e) => e.t === "error") || {}).v || "").slice(0, 60));
+    ok(evs.filter((e) => e.t === "__done__").length === 1, "照样干净收尾，[DONE] 一个");
+  }
+
+  /* ⑤ 限流 */
+  console.log("\n[三] 限流命中");
+  worker = await freshWorker();
+  {
+    const { env } = makeEnv({ limited: true });
+    installFetch();
+    const resp = await worker.fetch(askReq({ q: "意义为什么会磨损" }), env, {});
+    const evs = await drain(resp);
+    ok(resp.status === 200 && evs.some((e) => e.t === "error" && /频繁/.test(e.v || "")), "限流也走流内 error");
+  }
+
+  /* ⑥ recommend 仍是 JSON */
+  console.log("\n[四] recommend 不许被包进 SSE");
+  worker = await freshWorker();
+  {
+    const { env } = makeEnv({});
+    installFetch();
+    const resp = await worker.fetch(askReq({ q: "意义为什么会磨损", mode: "recommend", ans: "略" }), env, {});
+    ok((resp.headers.get("content-type") || "").indexOf("application/json") >= 0, "content-type 还是 application/json");
+    const j = await resp.json();
+    ok(Array.isArray(j.items), "前端 resp.json() 拿得到 items 数组");
+  }
+
+  /* ⑦ 四步法写进同一条流 */
+  console.log("\n[五] 四步法与主流共用一条流");
+  worker = await freshWorker();
+  {
+    const { env } = makeEnv({});
+    installFetch();
+    const resp = await worker.fetch(askReq({ q: "意义为什么会磨损", deep: true, four: true }), env, {});
+    ok(resp.status === 200, "HTTP 200");
+    const evs = await drain(resp);
+    const st = evs.filter((e) => e.t === "status").map((e) => e.v).join(" | ");
+    ok(/① S 维度/.test(st) && /④ 三视角/.test(st), "四步的四段进度都在同一条流里：" + st.slice(0, 40) + "…");
+    ok(evs.filter((e) => e.t === "__done__").length === 1, "[DONE] 仍只有一个（没有内外层各收一次尾）");
+  }
+
+  /* ⑧ TIER 缓存 */
+  console.log("\n[六] manifest 与 sde-coords 只取一次");
+  worker = await freshWorker();
+  {
+    const { env, hits } = makeEnv({});
+    installFetch();
+    await drain(await worker.fetch(askReq({ q: "意义为什么会磨损" }), env, {}));
+    ok(hits.manifest === 1 && hits.coords === 1, "第一次问：manifest 与 sde-coords 各取一次（缓存不是把它整个跳过了）");
+    await drain(await worker.fetch(askReq({ q: "耐候性从哪里来" }), env, {}));
+    ok(hits.manifest === 1, "第二次问不再重拉 manifest（累计 " + hits.manifest + " 次，旧版是 2 次 × 263KB）");
+    ok(hits.coords === 1, "第二次问不再重拉 sde-coords（累计 " + hits.coords + " 次，旧版是 2 次 × 86KB）");
+    ok(hits.doc >= 2, "但真正要用的段层照旧逐次下钻（doc 取了 " + hits.doc + " 次），缓存没有把检索本身冻住");
+  }
+
+  /* ⑨⑩ 上游异常 */
+  console.log("\n[七] 上游异常的两条路");
+  worker = await freshWorker();
+  {
+    const { env } = makeEnv({});
+    installFetch({ upstreamStatus: 402 });
+    const evs = await drain(await worker.fetch(askReq({ q: "意义为什么会磨损" }), env, {}));
+    const er = evs.find((e) => e.t === "error") || {};
+    ok(er.code === "use_own_key", "系统 Key 402 → 流内 error 带 code=use_own_key（引导改用自带 Key）");
+  }
+  {
+    const { env } = makeEnv({});
+    installFetch({ netThrow: true });
+    const resp = await worker.fetch(askReq({ q: "意义为什么会磨损" }), env, {});
+    const evs = await drain(resp);
+    ok(resp.status === 200 && evs.some((e) => e.t === "error"), "上游连不上 → 流内 error，HTTP 仍 200");
+    ok(evs.filter((e) => e.t === "__done__").length === 1, "流干净收尾");
+  }
+
+  console.log("\n———— sim_ask_stream_first: " + P + " passed, " + F + " failed ————");
+  process.exit(F ? 1 : 0);
+})();

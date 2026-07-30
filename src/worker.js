@@ -1485,12 +1485,15 @@ async function loadCorpus(env, url) {
 }
 // SDE 坐标（索引侧打标产物；未打标则为 null，检索自动退回纯词义扩展）
 async function loadCoords(env, url) {
+  tierFresh();
+  if (TIER.coords !== undefined) return TIER.coords;   // 取回过就复用（null 也算取回过，别每次重试）
   try {
     const cj = await (await idxFetch(env, url, "/search/sde-coords.json")).json();
     const m = {};
     for (const k in cj) m[k] = new Set((cj[k] || []).map((t) => String(t).toLowerCase()));
-    return Object.keys(m).length ? m : null;
-  } catch (e) { return null; }
+    TIER.coords = Object.keys(m).length ? m : null;
+  } catch (e) { TIER.coords = null; }
+  return TIER.coords;
 }
 // RAG_STREAMED_SCAN：与WDS对话专用的检索。
 // 全站索引现在是 60MB／20 个分片（单片最大 6MB）；旧做法 loadCorpus 把 20 片一次性装进内存再打分，
@@ -1526,7 +1529,21 @@ async function lightRetrieve(env, url, q, expTerms, k, cut, opts) {
 //   L2 段层  doc/<i>.json → 一轮 8 篇地取，够用就停，不够再取下一轮。
 // 每层都能"动态扩展"：选不出版块就放宽到全站篇层；候选篇太少就多拉两个版块；
 // 资料不够长就再下钻一轮。目标是每次问答只读几百 KB，而不是把 60MB 全搬进来。
-let TIER = { at: 0, l0: null, l1: {} };   // 小文件缓存（合计几百 KB，安全）；30 秒复验一次
+let TIER = { at: 0, l0: null, l1: {}, man: null, coords: undefined };   // 小文件缓存（合计几百 KB，安全）；30 秒复验一次
+// TIER 的过期判定只在这一处做，manifest/coords/l0/l1 同生同死——半新半旧的索引对不上号，
+// 篇号错一位，取回来的就是另一篇文章。manifest(263KB) 与 sde-coords(86KB) 此前每次调用都
+// 重拉重解，反倒是更小的 sections/kw 有缓存；出流前的 CPU 就是这么一点点堆上平台上限的。
+function tierFresh() {
+  const now = Date.now();
+  if (now - TIER.at > CORPUS_TTL) TIER = { at: now, l0: null, l1: {}, man: null, coords: undefined };
+}
+async function idxManifest(env, url) {
+  tierFresh();
+  if (TIER.man) return TIER.man;
+  const j = await (await idxFetch(env, url, "/search/manifest.json")).json();
+  TIER.man = j;
+  return j;
+}
 // IDX_KEYS：允许从 R2 供给的索引数据文件。**只认生成物**——
 // /search/index.html 是搜索页本身，永远留在仓库里，不在此列。
 const IDX_KEYS = /^search\/(?:manifest|sections|keywords|sde-coords)\.json$|^search\/shard-[A-Za-z0-9_.-]+\.json$|^search\/(?:doc|kw)\/[A-Za-z0-9_.-]+\.json$/;
@@ -1544,8 +1561,7 @@ async function idxFetch(env, url, path) {
   return env.ASSETS.fetch(new Request(new URL(path, url)));
 }
 async function tierGet(env, url, path, key) {
-  const now = Date.now();
-  if (now - TIER.at > CORPUS_TTL) { TIER = { at: now, l0: null, l1: {} }; }
+  tierFresh();
   if (key === "l0" && TIER.l0) return TIER.l0;
   if (key !== "l0" && TIER.l1[key]) return TIER.l1[key];
   const r = await idxFetch(env, url, path);
@@ -1563,7 +1579,7 @@ function _scoreKeys(list, baseKeys, exp, prev) {
   return sc;
 }
 async function ragScan(env, url, q, expTerms, prevQ, k, chunkLimit, opts) {
-  const man = await (await idxFetch(env, url, "/search/manifest.json")).json();
+  const man = await idxManifest(env, url);
   const coords = await loadCoords(env, url);
   const { baseKeys, exp } = ragKeys(q, expTerms);
   const prev = prevQ && prevQ !== q ? ragKeys(prevQ, []).baseKeys : [];
@@ -2461,14 +2477,56 @@ async function sdeExpandQuery(VC, KEY, q, ms) {
   return out.replace(/\n/g, "、").split(/[、,，;；\s]+/).map((s) => s.trim()).filter((s) => s.length >= 2 && s.length <= 12).slice(0, 24);
 }
 
+// STREAM_FIRST（2026-07-30）：/api/ask 的出流护栏。
+// 病史：整条重活——SDE 词表扩展、三层全站检索、心得、内功、拼提示、await 上游——原本全在
+// 「返回 Response 之前」跑完（线上实测出流前就占掉 9–15 秒）。一旦贴上平台的资源/时间上限，
+// 这次调用会被 Cloudflare 直接掐断并回它自己的 503 HTML 错误页，前端拿到的就是那句
+// 「HTTP 503 <!DOCTYPE html> <!--[if lt IE 7]>…」——既不是基底返回的，也不是本 worker 返回的。
+// 涌现档一次连打 7 次 /api/ask（三路碰撞＋三次盲评＋一次综合提炼），把这个概率乘了七。
+// 同仓 /api/wds/read 的三处早就改成「先出流再干活」（见 3450/3618/3854 的注释），这里补最后一条产线。
+// 做法：先把 200 与 event-stream 头交出去，再在流内跑 askCore——出流之后再慢，也只退化成流内
+// 可读的错误与进度提示，不再是一堵读不懂的 503 墙。
+// 例外：recommend 是非流式 JSON（前端 resp.json()），包进 SSE 流会当场读不出来，照旧走老路。
 async function handleAsk(request, env, url) {
   if (request.method === "OPTIONS") return new Response(null, { headers: _cors() });
   if (request.method !== "POST") return new Response("Method Not Allowed", { status: 405 });
-
   let body = {};
   try { body = await request.json(); } catch (e) {}
+  body = body || {};
+  if (body.mode === "recommend") return askCore(request, env, url, body, null);
+  const st = { closed: false };
+  const stream = new ReadableStream({
+    async start(controller) {
+      // 交给 askCore 的假控制器：enqueue 照转，close 只记一笔——真正的收尾统一在这里做，
+      // 免得内层已经 close 过、外层再 close 一次直接抛错。
+      const ctl = {
+        enqueue: (b) => { try { controller.enqueue(b); } catch (e) {} },
+        close: () => { st.closed = true; },
+      };
+      try {
+        await askCore(request, env, url, body, { ctl: ctl, st: st });
+      } catch (e) {
+        ctl.enqueue(_sseBytes({ t: "error", v: "服务端异常：" + ((e && e.message) || String(e)) }));
+      }
+      if (!st.closed) { try { controller.enqueue(_ENC.encode("data: [DONE]\n\n")); } catch (e) {} }
+      try { controller.close(); } catch (e) {}
+    },
+  });
+  return new Response(stream, { headers: { ..._cors(), "content-type": "text/event-stream; charset=utf-8", "cache-control": "no-store" } });
+}
+
+async function askCore(request, env, url, body, SINK) {
+  // SINK=null → 老行为：自己造 Response（只剩非流式的 recommend 走这条）。
+  // SINK={ctl,st} → 流内模式：所有出口改成往外层控制器里写，返回值一律 null。
+  const _out = (objs) => {
+    if (!SINK) return _sseResp(objs);
+    for (const o of objs) SINK.ctl.enqueue(_sseBytes(o));
+    return null;
+  };
+  // 进度提示：出流之后这些重活要跑十几秒，读者总得看见页面还活着。
+  const _stat = (v) => { if (SINK) SINK.ctl.enqueue(_sseBytes({ t: "status", v: v })); };
   const q = String(body.q || "").trim().slice(0, 300); // 输入硬钳位
-  if (q.length < 2) return _sseResp([{ t: "error", v: "请输入一个问题（至少 2 个字）。" }]);
+  if (q.length < 2) return _out([{ t: "error", v: "请输入一个问题（至少 2 个字）。" }]);
 
   // 模式：answer（默认问答）/ recommend（答后点击①·推荐阅读）/ paper（答后点击②·成文一篇，两段续写）
   // 模式：answer / recommend（推荐阅读）/ paper（成文一篇）/ iq（创新智商盲评）/ polish（打磨修改）
@@ -2510,7 +2568,7 @@ async function handleAsk(request, env, url) {
       if (!KEY) KEY = env.SDE_SEARCH_KEY || "";
     }
   }
-  if (!KEY) return _sseResp([{ t: "error", v: "智能问答尚未启用：管理员尚未配置系统密钥。你也可以在下方填入自己的 API Key 直接使用。", code: "use_own_key" }]);
+  if (!KEY) return _out([{ t: "error", v: "智能问答尚未启用：管理员尚未配置系统密钥。你也可以在下方填入自己的 API Key 直接使用。", code: "use_own_key" }]);
 
   // 限流：系统 Key 与自带 Key 各用独立配额桶（自带 Key 用户自付，不与系统额度互挤）
   const ip = request.headers.get("cf-connecting-ip") || "unknown";
@@ -2521,7 +2579,7 @@ async function handleAsk(request, env, url) {
       const msg = lr.reason === "day"
         ? "今日提问次数已达上限，请明天再来，或改用「🔍 关键词检索」。"
         : "提问太频繁了，请过十几秒再试。";
-      return _sseResp([{ t: "error", v: msg }]);
+      return _out([{ t: "error", v: msg }]);
     }
   } catch (e) {}
 
@@ -2539,6 +2597,7 @@ async function handleAsk(request, env, url) {
   const rq = _lightDeep
     ? (hist.map((t) => t.q).join(" ").slice(0, 300) || q)
     : (hist.length ? (q + " " + originQ.slice(0, 40)) : q);
+  _stat("🔎 正在检索站内语料…");
   const expTerms = await sdeExpandQuery(VC, KEY, rq); // SDE 词义扩展：问题→SDE 术语，再拿去召回
   const expStr = expTerms.join(" · ");
   const _lrA = await lightRetrieve(env, url, rq, expTerms, K, 1600, { pick: deep ? 48 : 20, perDoc: deep ? 3 : 2, budget: deep ? 6000000 : 3000000 });
@@ -2598,6 +2657,7 @@ async function handleAsk(request, env, url) {
   let MAXTOK = 4000;
   // ===== 深度档 =====
   if (deep) {
+    _stat("📚 正在装载内功与心得…");
     const reflect = await ensureReflect(env, url, vendor, VC, KEY);
     const neigong = await loadNeigong(env, url);
     // 四步法（S→D→E→整合，四次独立调用；贵 4 倍，仅在「四步法」开关打开时启用）
@@ -2610,8 +2670,7 @@ async function handleAsk(request, env, url) {
       const Q1 = "请【只从 S 维度·显露/结构】展开这个问题，先完全不碰过程与环境：它显露出哪些可辨认的结构、稳定核心、可识别的单位？与正常态或其他情况有何结构性差异？反复观察中什么保持一致？分点写透，约 600–900 字。";
       const Q2 = "请【只从 D 维度·差异/过程】展开这个问题，先完全不碰结构与环境：它在哪些差异张力里演化？经历哪些阶段转换、有什么周期节奏？被什么推动、朝什么方向减阻前进？分点写透，约 600–900 字。";
       const Q3 = "请【只从 E 维度·纠缠/环境】展开这个问题，先完全不碰结构与过程：它在三界（现实界/理念界/自我界）各是什么？在什么符号、逻辑、信息与什么能量条件下才得以发生？被什么环境纠缠、约束？分点写透，约 600–900 字。";
-      const stream = new ReadableStream({
-        async start(controller) {
+      const run4 = async (controller) => {
           let _st = null;   // 这条流不带心跳，但下面共用的转发行会读 _st——严格模式下未声明即抛错
           const st = (v) => controller.enqueue(_sseBytes({ t: "status", v }));
           controller.enqueue(_sseBytes({ t: "sources", v: sources }));
@@ -2672,8 +2731,9 @@ async function handleAsk(request, env, url) {
           }
           controller.enqueue(_ENC.encode("data: [DONE]\n\n"));
           controller.close();
-        },
-      });
+      };
+      if (SINK) { await run4(SINK.ctl); return null; }
+      const stream = new ReadableStream({ start: run4 });
       return new Response(stream, { headers: { ..._cors(), "content-type": "text/event-stream; charset=utf-8", "cache-control": "no-store" } });
     }
     // ===== 模式：成文一篇（答后点击②）——两段续写 · 最高提智（完整内功 + 心得 + 方法论后台运行，前台学术语言） =====
@@ -2937,21 +2997,20 @@ async function handleAsk(request, env, url) {
       }),
     });
   } catch (e) {
-    return _sseResp([{ t: "sources", v: sources }, { t: "error", v: VC.name + " 连接失败：" + (e && e.message) }]);
+    return _out([{ t: "sources", v: sources }, { t: "error", v: VC.name + " 连接失败：" + (e && e.message) }]);
   }
   if (!upstream.ok) {
     const errtxt = (await upstream.text()).slice(0, 300);
     // 系统 Key 遇额度/鉴权问题(401/402/429) → 引导改用自带 Key
     if (!byok && (upstream.status === 401 || upstream.status === 402 || upstream.status === 429)) {
-      return _sseResp([{ t: "error", v: "系统额度暂时不可用（" + VC.name + " " + upstream.status + "）。你可以在下方填入自己的 API Key 继续使用。", code: "use_own_key" }]);
+      return _out([{ t: "error", v: "系统额度暂时不可用（" + VC.name + " " + upstream.status + "）。你可以在下方填入自己的 API Key 继续使用。", code: "use_own_key" }]);
     }
-    return _sseResp([{ t: "sources", v: sources }, { t: "error", v: VC.name + " 返回错误 " + upstream.status + "：" + errtxt }]);
+    return _out([{ t: "sources", v: sources }, { t: "error", v: VC.name + " 返回错误 " + upstream.status + "：" + errtxt }]);
   }
 
   const reader = upstream.body.getReader();
   const dec = new TextDecoder();
-  const stream = new ReadableStream({
-    async start(controller) {
+  const runMain = async (controller) => {
       let _st = null;   // 这条流不带心跳，但下面共用的转发行会读 _st——严格模式下未声明即抛错
       controller.enqueue(_sseBytes({ t: "sources", v: sources })); // 先给出处，再流答案
       if (expStr) controller.enqueue(_sseBytes({ t: "expand", v: expStr }));
@@ -2980,8 +3039,9 @@ async function handleAsk(request, env, url) {
       }
       controller.enqueue(_ENC.encode("data: [DONE]\n\n"));
       controller.close();
-    },
-  });
+  };
+  if (SINK) { await runMain(SINK.ctl); return null; }
+  const stream = new ReadableStream({ start: runMain });
   return new Response(stream, { headers: { ..._cors(), "content-type": "text/event-stream; charset=utf-8", "cache-control": "no-store" } });
 }
 
