@@ -377,6 +377,7 @@
     tipDeck: "✦ 这场可以一键做成 PPT",
     tipX: "不再提示",
     needTalkDeck: "先聊两句——PPT 是从这一场对话锻出来的，空着做不出。",
+    pathTip: "SDE 六路径：三条延伸各从一个不同的维度起手（它是什么／它怎么走的／它站在什么上面）",
     tplPick: "做成哪一种？", tplNote: "选定后，基底会按这一种的页面骨架来写——不只是换配色",
     tplAuto: "自动｜由内容自己定", tplAutoS: "不指定骨架，按这场谈的内容判断该有哪几页",
     tplBrief: "工作汇报", tplBriefS: "结论先行 · 关键数字 · 风险 · 下一步（9–12 页）",
@@ -511,6 +512,7 @@
     tipDeck: "✦ Turn this chat into a deck",
     tipX: "Don't show again",
     needTalkDeck: "Talk a little first — the deck is forged from this conversation.",
+    pathTip: "SDE's six paths: each suggestion starts from a different dimension (what it is / how it moves / what it stands on)",
     tplPick: "Which kind of deck?", tplNote: "The model writes to the chosen skeleton — this is more than a colour scheme",
     tplAuto: "Auto · let the content decide", tplAutoS: "No fixed skeleton; pages are chosen from what was discussed",
     tplBrief: "Status briefing", tplBriefS: "Conclusion first · key numbers · risks · next steps (9–12)",
@@ -605,6 +607,7 @@
     ".wdsm-egs{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:22px}" +
     ".wdsm-eg{background:var(--wfill);border:1px solid var(--wline);color:var(--wtx);border-radius:12px;padding:10px 14px;font-size:13.5px;cursor:pointer;text-align:left;transition:border-color .15s}" +
     ".wdsm-eg:hover{border-color:var(--wline2)}" +
+    ".wdsm-follow .pt{font-style:normal;font-size:10.5px;color:var(--wgold2);background:var(--wfill2);border:1px solid var(--wline);border-radius:5px;padding:2px 6px;margin-right:8px;white-space:nowrap;vertical-align:1px}" +
     ".wdsm-tplb{max-width:520px;width:100%;background:var(--wpanel);border:1px solid var(--wline2);border-radius:16px;padding:20px 22px;max-height:84vh;overflow:auto}" +
     ".wdsm-tplb h4{margin:0 0 4px;font-size:16px;color:var(--wtx2)}" +
     ".wdsm-tplnote{font-size:12px;color:var(--wdim2);line-height:1.6;margin:0 0 14px}" +
@@ -1597,13 +1600,20 @@
   }
 
   // —— 追问建议：由后端在正文写完后补一次便宜档产出，点一下就直接问出去 ——
+  /* 追问建议 = 六路径引导：三条各走一条不同的发生路径，读者每点一次就换一次起手维度。
+     兼容两种形状：老的纯字符串、新的 {p:路径名, q:问句}——升级期两边都可能回。 */
   function renderFollows(cell, qs) {
     if (!qs || !qs.length || cell.follows) return;
     var box = el("div", "wdsm-follows");
     box.appendChild(el("div", "wdsm-follows-h", t("followsH")));
-    qs.slice(0, 3).forEach(function (t) {
-      var b = el("button", "wdsm-follow", t);
-      b.onclick = function () { if (!streaming) send(t); };
+    qs.slice(0, 3).forEach(function (item) {
+      var q = (item && typeof item === "object") ? String(item.q || "") : String(item || "");
+      var p = (item && typeof item === "object") ? String(item.p || "") : "";
+      if (!q) return;
+      var b = el("button", "wdsm-follow");
+      if (p) { var tag = el("i", "pt", p); tag.title = t("pathTip"); b.appendChild(tag); }
+      b.appendChild(document.createTextNode(q));
+      b.onclick = function () { if (!streaming) send(q); };   // 只发问句，路径名是给人看的
       box.appendChild(b);
     });
     cell.turn.appendChild(box); cell.follows = box;

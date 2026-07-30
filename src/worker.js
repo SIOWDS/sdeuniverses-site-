@@ -2107,19 +2107,44 @@ function WDS_DIALOGUE_SYS(reflect, SDEM, siteCtx, artTitle, artText) {
 // ===== 追问建议 =====
 // 正文写完后再花一次便宜档（不开思考、不进检索）问一句"接着该问什么"。
 // 硬要求：必须是【读者会想问的下一句】，不是【WDS 想讲的下一段】——后者是自说自话，前者才是把人往前推。
-const FOLLOW_SYS = "你是对话的旁观者。看完一问一答，写出读者最可能接着问的三个问题。"
-  + "\n规矩：① 每个问题一行，不编号、不加符号、不解释；② 每个 8–22 字，是一句真正的问句；"
-  + "③ 三个要指向不同方向（一个往深里挖、一个往旁边挪、一个往落地上落），不要三个同义；"
-  + "④ 只写读者会问的，不要写成 WDS 的讲课提纲；⑤ 只输出三行，别的什么都不要。";
+// 六路径引导（2026-07-30）：三条延伸不再是"往深/往旁/往落地"这种通用方向，
+// 而是**各走一条不同的发生路径**——S/D/E 的排列恰好六条，起手必居其一。
+// 这样读者每点一次，就等于被带着换一次起手维度：一直问"它是什么"的人会被推去问"它怎么走的"。
+// 判据用学派自己的话：卡住的是「它是什么」(S 起手)、「它怎么走的」(D 起手)、还是「它站在什么上面」(E 起手)。
+const SDE_PATHS = "S→D→E 学科本体论分析（它到底是什么，经什么差异、在什么土壤里长成）｜"
+  + "S→E→D 配置与决策（认了这个定性之后，该怎么配资源、怎么选）｜"
+  + "D→S→E 咨询与干预（照现在这条路走下去会怎样，改哪一步）｜"
+  + "D→E→S 求助与困境（我卡住了，卡在什么土壤上）｜"
+  + "E→S→D 社会分析（是什么样的环境让它成了现在这样）｜"
+  + "E→D→S 综述与建制（这一片已经有谁在做、怎么把它立成制度）";
+const FOLLOW_SYS = "你是对话的旁观者，也是 SDE 的引路人。看完一问一答，给读者三条自然的下一问。"
+  + "\n\n【六路径】S/D/E 的排列恰好六条，任何提问的起手都落在其中一条：\n" + SDE_PATHS
+  + "\n\n规矩：\n① **三条各走一条不同的路径**，且尽量避开这一答已经走完的那条——读者一直问『它是什么』时，要把他推去问『它怎么走的』『它站在什么上面』。"
+  + "\n② 每行写成 `路径中文名｜问句`（竖线分隔，路径名照抄上面六个中文名之一，别自造）。"
+  + "\n③ 问句 8–22 字，是读者真会问的一句话，**不是 WDS 想讲的下一段**；要接着这一答的具体内容问，不许是「能再详细讲讲吗」这种万能句。"
+  + "\n④ 只输出三行，别的什么都不要，不编号、不解释。";
 async function followUps(VC, KEY, q, ans, lang) {
   try {
     const sys = FOLLOW_SYS + (lang === "en" ? "\n⑥ Write the three questions in English." : "");
     // 短截止（WDS_FOLLOW_MS）：这一步跑在正文写完之后、同一个请求里，客户端要等 [DONE] 才收尾并挂出操作行。
     // 吃缺省 55 秒＝正文早写完了，读者却按不到 复制/继续/重答。它是配菜：晚了就不上，不许拖住正菜。
-    const out = await llmText(VC, KEY, sys, "读者问：" + String(q).slice(0, 400) + "\n\nWDS 答：" + String(ans).slice(0, 2500) + "\n\n三行：", 200, WDS_FOLLOW_MS);
+    const out = await llmText(VC, KEY, sys, "读者问：" + String(q).slice(0, 400) + "\n\nWDS 答：" + String(ans).slice(0, 2500) + "\n\n三行：", 260, WDS_FOLLOW_MS);
     if (!out) return [];
-    return out.split(/\n+/).map((s) => s.replace(/^[\s\d.、)\-*·]+/, "").trim())
-      .filter((s) => s.length >= 4 && s.length <= 40).slice(0, 3);
+    // 回给前端的是 {p 路径名, q 问句}。**解析必须宽容**：模型偶尔会漏竖线或多写编号，
+    // 漏了就当没有路径名照样出问句——引导是增益，不能因为格式没对上就一条都不给。
+    const PATHNAMES = ["学科本体论分析", "配置与决策", "咨询与干预", "求助与困境", "社会分析", "综述与建制"];
+    return out.split(/\n+/).map((line) => {
+      const s = String(line).replace(/^[\s\d.、)\-*·]+/, "").trim();
+      if (!s) return null;
+      const parts = s.split(/[|｜]/);
+      if (parts.length >= 2) {
+        const p = parts[0].trim().replace(/^[SDE→\s]+/, "").trim();
+        const qq = parts.slice(1).join("|").trim();
+        if (qq.length >= 4 && qq.length <= 40) return { p: PATHNAMES.indexOf(p) >= 0 ? p : "", q: qq };
+        return null;
+      }
+      return (s.length >= 4 && s.length <= 40) ? { p: "", q: s } : null;
+    }).filter(Boolean).slice(0, 3);
   } catch (e) { return []; }
 }
 

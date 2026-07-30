@@ -203,7 +203,7 @@ console.log("── 十一 · 成文（distill）：整场可见 + 时钟 + 断�
 console.log("── 十二 · 追问建议不许拖住已答完的一轮");
 {
   ok(/WDS_FOLLOW_MS = 12000/.test(wk), "追问建议有短截止常量");
-  ok(/"\\n\\n三行：", 200, WDS_FOLLOW_MS\)/.test(wk), "followUps 真把短截止传进 llmText（原来吃缺省 55 秒）");
+  ok(/"\\n\\n三行：", \d+, WDS_FOLLOW_MS\)/.test(wk), "followUps 真把短截止传进 llmText（原来吃缺省 55 秒）");
 }
 
 console.log("── 十三 · 会烧站方 Key 的两个端点都上了限流");
@@ -231,6 +231,38 @@ console.log("── 十四 · 客户端：成文说明与稿互不覆盖、看�
   ok(/WDS_CHAT_Q_MAX=20000/.test(wm), "注释里写的是现行上限");
   // 版本戳只能往前：断言认"今天的、比 e 更新的"，别把具体字母写死（今天已经 d→e→f 三次）
   ok(/wds-mode\.js\?v=2026073[0-9]([f-z])/.test(shell), "版本戳再 bump（本轮又动了 wds-mode.js）");
+}
+
+console.log("── 十四点五 · 追问建议改成六路径引导");
+{
+  ok(/const SDE_PATHS = /.test(wk), "六条路径写成常量（不是散在提示里）");
+  ["学科本体论分析", "配置与决策", "咨询与干预", "求助与困境", "社会分析", "综述与建制"].forEach(function (n) {
+    ok(new RegExp(n).test(wk), "六路径含「" + n + "」");
+  });
+  ok(/S→D→E/.test(wk) && /E→D→S/.test(wk), "路径用 S/D/E 的排列写明，六条齐");
+  ok(/三条各走一条不同的路径/.test(wk), "要求三条各走一条不同的路径");
+  ok(/尽量避开这一答已经走完的那条/.test(wk), "避开这一答已经走过的那条（否则等于原地打转）");
+  ok(/路径中文名｜问句/.test(wk), "回传格式是 路径名｜问句");
+  ok(/不许是「能再详细讲讲吗」这种万能句/.test(wk), "明令不许万能句");
+  // 解析行为实测：抽出 followUps 的解析段
+  const src = wk.slice(wk.indexOf("async function followUps"), wk.indexOf("// ===== 联网搜索"));
+  const parse = new Function("out", src.slice(src.indexOf("const PATHNAMES"), src.lastIndexOf("}).filter(Boolean).slice(0, 3);") + 31)
+    .replace("return out.split", "return String(out).split"));
+  const r1 = parse("咨询与干预｜照这条路走下去会怎样？\n社会分析｜是什么环境让它成了这样？\n求助与困境｜我卡在哪一层土壤上？");
+  ok(r1.length === 3 && r1[0].p === "咨询与干预" && /照这条路/.test(r1[0].q), "正常三行解析出路径名与问句");
+  const r2 = parse("1. 咨询与干预｜改哪一步最省力？\n- 社会分析｜谁在维持这个结构？");
+  ok(r2.length === 2 && r2[0].p === "咨询与干预", "带编号/符号也剥得掉");
+  const r3 = parse("这套判断在什么情况下会失效？\n换个学科看会怎样？");
+  ok(r3.length === 2 && r3[0].p === "" && /什么情况下/.test(r3[0].q), "模型漏了竖线也照样出问句（引导是增益，不能因格式没对上就一条不给）");
+  const r4 = parse("自造路径名｜这句还算不算数？");
+  ok(r4.length === 1 && r4[0].p === "", "自造的路径名不认，但问句留着");
+  ok(parse("").length === 0 && parse("短").length === 0, "空的/太短的丢掉");
+  // 客户端
+  ok(/typeof item === "object"\) \? String\(item\.q/.test(wm), "客户端认 {p,q} 新形状");
+  ok(/String\(item \|\| ""\)/.test(wm), "也兼容老的纯字符串（升级期两边都可能回）");
+  ok(/b\.onclick = function \(\) \{ if \(!streaming\) send\(q\); \}/.test(wm), "点了只发问句，路径名不进提问");
+  ok(/wdsm-follow \.pt\{/.test(wm), "路径名有独立样式（小标签，不抢问句注意力）");
+  ok(/pathTip: "SDE 六路径/.test(wm), "标签有解释（读者不必先懂六路径才敢点）");
 }
 
 console.log("── 十五 · 全局记忆（用户RAG）接到 问WDS");
