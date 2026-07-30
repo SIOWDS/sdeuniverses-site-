@@ -4597,6 +4597,49 @@ export default {
       }
       return J({ ok: true, done: out });
     }
+    // R2_PUT：**直接把字节写进 R2**，不经过仓库。
+    // 为什么要有它：r2-migrate 是"从 ASSETS 搬到桶里"，也就是文件必须**先进 git 才能进 R2**——
+    // 对自动存档来说方向是反的（要两次提交，中间还得在 git 里留一份，仓库照旧长胖）。
+    // 危险在于它不会报错：取文件是"先查 R2、落空回落 ASSETS"，所以新 PDF 提交进 git 照样能显示，
+    // 仓库悄悄重新长胖，等哪天有人按"PDF 都在 R2 了"去清 git，新发的那批当场 404。
+    // 能力刻意收窄到与 r2-migrate 同一个白名单（口令是前端级的，泄露了也必须无害）。
+    if (url.pathname === "/api/admin/r2-put" && request.method === "POST") {
+      let b = {}; try { b = await request.json(); } catch (e) {}
+      const J = (o, st) => Response.json(o, { status: st || 200, headers: _cors() });
+      if (String(b.pass || "") !== "SDE2013") return J({ ok: false, msg: "口令不对。" }, 401);
+      if (!env.PDFS) return J({ ok: false, msg: "还没绑定 R2 桶（wrangler.jsonc 里的 PDFS）。" }, 400);
+      // 单个也走 files 数组，调用方不必分辨两种形状。
+      const files = (Array.isArray(b.files) ? b.files : (b.path ? [{ path: b.path, b64: b.b64 }] : [])).slice(0, 10);
+      const out = [];
+      for (const f0 of files) {
+        const f = f0 || {};
+        const p = String(f.path || "");
+        const _isIdx = IDX_KEYS.test(p);
+        if ((!/^students\/[A-Za-z0-9._\-\/]+\.pdf$/i.test(p) && !_isIdx) || p.indexOf("..") >= 0) { out.push({ p: p, ok: false, msg: "路径不在允许范围" }); continue; }
+        try {
+          if (!b.force) { const hd = await env.PDFS.head(p); if (hd) { out.push({ p: p, ok: true, skip: 1, size: hd.size }); continue; } }
+          let buf;
+          try { buf = _b64ToBytes(String(f.b64 || "")).buffer; }
+          catch (e) { out.push({ p: p, ok: false, msg: "base64 解不开" }); continue; }
+          // 与 r2-migrate 同一道门槛：索引分片小到几百字节，不能按 PDF 的 1000 一刀切。
+          const _min = _isIdx ? 2 : 1000;
+          if (!buf || buf.byteLength < _min) { out.push({ p: p, ok: false, msg: "字节数不对：" + (buf ? buf.byteLength : 0) }); continue; }
+          // 真是 PDF 才让进：白名单只管路径长相，管不住内容；写错内容比写错路径更难发现。
+          if (!_isIdx) {
+            const head4 = new Uint8Array(buf.slice(0, 4));
+            if (!(head4[0] === 0x25 && head4[1] === 0x50 && head4[2] === 0x44 && head4[3] === 0x46)) {
+              out.push({ p: p, ok: false, msg: "不是 PDF（开头不是 %PDF）" }); continue;
+            }
+          }
+          await env.PDFS.put(p, buf, _isIdx
+            ? { httpMetadata: { contentType: "application/json; charset=utf-8", cacheControl: "no-cache" } }
+            : { httpMetadata: { contentType: "application/pdf", cacheControl: "public, max-age=31536000, immutable" } });
+          const hd2 = await env.PDFS.head(p);
+          out.push({ p: p, ok: !!hd2 && hd2.size === buf.byteLength, size: buf.byteLength, r2: hd2 ? hd2.size : 0 });
+        } catch (e) { out.push({ p: p, ok: false, msg: (e && e.message) || "put 失败" }); }
+      }
+      return J({ ok: true, done: out });
+    }
     // R2_CHECK：核对某几个 key 在不在桶里、大小对不对（删仓库文件之前必须逐个过这一关）。
     if (url.pathname === "/api/admin/r2-check" && request.method === "POST") {
       let b = {}; try { b = await request.json(); } catch (e) {}
