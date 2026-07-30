@@ -275,6 +275,7 @@ console.log("── 十六 · 站内篇目自动挂链接");
   ok(/网址只准从这里照抄，不许自己拼/.test(CHAT), "清单明写只准照抄——凭印象拼站内路径必然拼错");
   ok(/绝不许说\\"站里的文章没有链接\\"/.test(wk) || /站里的文章没有链接/.test(wk), "作答纪律直接堵掉那句幻觉");
   ok(/\[《篇名》\]\(网址\)/.test(wk), "要求写成 Markdown 链接");
+  ok(/不许自己造一个像模像样的站内篇名/.test(wk), "连篇名也只准用检索里真出现过的（截图那三个篇名站内根本不存在）");
   ok(/url\.pathname === "\/api\/wds\/link"/.test(wk), "新端点 /api/wds/link 在位");
   ok(/wdsBucket\("link"/.test(LINK) && /WDS_LINK_PER_MIN/.test(wk), "篇名解析端点也有限流桶（不烧 Key 但会读索引）");
   ok(/hits\.push\(\{ q: t, t: best\.t, u: best\.u \}\)/.test(LINK), "回传读者写的名字、索引里的真标题与网址三样");
