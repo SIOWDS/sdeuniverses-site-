@@ -93,6 +93,11 @@ select.cfg-in{appearance:auto;-webkit-appearance:menulist;cursor:pointer}
 .cfg-save:disabled{opacity:0.5}
 .cfg-msg{font-size:12.5px;margin-top:10px;min-height:16px;line-height:1.6}
 .cfg-note{font-size:11.5px;color:var(--muted);line-height:1.7;margin-top:12px;padding-top:10px;border-top:1px solid var(--line)}
+.imbtn{position:relative;display:inline-flex;align-items:center;gap:4px;font-size:12.5px;text-decoration:none;color:#F5F2E8;background:rgba(255,255,255,0.16);border:1px solid rgba(255,255,255,0.35);border-radius:16px;padding:3px 11px;white-space:nowrap;margin-right:8px}
+.imbtn:hover{background:rgba(255,255,255,0.26)}
+.imdot{display:none;min-width:16px;height:16px;border-radius:8px;background:#C0603F;color:#fff;font-size:10.5px;font-weight:700;align-items:center;justify-content:center;padding:0 4px;font-family:system-ui,sans-serif}
+.imdot.on{display:inline-flex}
+@media(max-width:520px){.imbtn{padding:3px 8px;font-size:12px}.imbtn .imlbl{display:none}}
 </style>
 </head>
 <body>
@@ -100,7 +105,7 @@ select.cfg-in{appearance:auto;-webkit-appearance:menulist;cursor:pointer}
 <div class="top">
   <a class="back" href="/">← 首页</a>
   <div class="tt">SDE 讨论<span class="sub"><span class="dot off" id="tk-dot"></span><span id="tk-status">连接中…</span></span></div>
-  <div class="who-wrap"><span class="who" id="tk-who"></span><button class="gear" id="cfg-open" type="button" title="管理员配置 API">⚙</button></div>
+  <div class="who-wrap"><a class="imbtn" id="im-entry" href="/sde-talk/im/" title="私聊 · 通讯录 · 一对一">💬<span class="imlbl">私聊</span><span class="imdot" id="im-dot"></span></a><span class="who" id="tk-who"></span><button class="gear" id="cfg-open" type="button" title="管理员配置 API">⚙</button></div>
 </div>
 
 <div class="wds-bar">
@@ -466,5 +471,25 @@ if(el("cfg-save"))el("cfg-save").onclick=function(){
 <script src="/taste/wds-companion/wds-read.js?v=20260730c" defer></script>
 
 <script src="/wds-mode.js?v=20260730c" defer></script>
+<script>
+/* 顶栏「私聊」未读红点：读同一份 sde_gauth 登录态，轮询 /api/im 的未读总数。
+   未登录、或接口不通时静默——绝不影响群聊本身。 */
+(function(){
+  var dot=document.getElementById("im-dot"),ent=document.getElementById("im-entry");
+  if(!dot||!ent)return;
+  function cred(){try{var s=JSON.parse(sessionStorage.getItem("sde_gauth")||"null");return(s&&s.exp>Date.now())?s.cred:"";}catch(e){return"";}}
+  function tick(){
+    var c=cred();if(!c){dot.classList.remove("on");return;}
+    fetch("/api/im",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({credential:c,op:"inbox"})})
+    .then(function(r){return r.json()}).then(function(d){
+      var n=(d&&d.ok&&d.unread)||0;
+      dot.textContent=n>99?"99+":String(n);
+      dot.classList.toggle("on",n>0);
+      ent.title=n>0?("私聊 · "+n+" 条未读"):"私聊 · 通讯录 · 一对一";
+    }).catch(function(){});
+  }
+  setTimeout(tick,1500);setInterval(tick,20000);
+})();
+</script>
 </body>
 </html>
