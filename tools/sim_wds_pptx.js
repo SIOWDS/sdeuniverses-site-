@@ -349,6 +349,38 @@ console.log("── 四点〇 · 装配三原则：统一 · 多样 · 和谐（
   ok(/相邻两页不许写成同一个形状/.test(wk) && /宁可少一条，不许挤/.test(wk), "多样与和谐都落成可执行的一句话");
 }
 
+console.log("── 三点九五 · PPT 文本打造 Skill：逐页产出 ＋ 想象力 ＋ 编造边界");
+{
+  ok(/const DECK_CRAFT = /.test(wk), "文本打造写成独立常量（与管字数的 DECK_SIZES 分工：一个管能放多少，一个管怎么写）");
+  ok(/按骨架逐页写，不许合并、不许跳号/.test(wk), "逐页产出：骨架说第几页写什么就写什么");
+  ok(/写不出来不是删掉那一页，而是回到对话里找/.test(wk), "写不出来的处置写明了（不许用空话糊过去）");
+  ok(/这一页要让听众记住哪一句/.test(wk), "下笔前先定一句");
+  ok(/想象力四条/.test(wk), "想象力条款在");
+  ok(/标题要有画面或张力/.test(wk) && /不写「问题分析」/.test(wk), "①标题要有画面，不要功能标签（给了正反例）");
+  ok(/要点要落到具体物/.test(wk) && /「提升元认知水平」不是/.test(wk), "②要点落到具体物（给了反例）");
+  ok(/全套用一个贯穿的意象\*\*，且只用一个/.test(wk) && /换喻比无喻更乱/.test(wk), "③一个意象贯穿到底");
+  ok(/讲稿里要有一个现场动作/.test(wk), "④讲稿要有现场动作，不是把幻灯片再念一遍");
+  // 边界——这条最要紧：今天已因编造栽过两次（编站内篇名、三张卡全是 100）
+  ok(/越界就是编造，比平淡坏得多/.test(wk), "想象力有明确边界");
+  ok(/想象力只作用于措辞与结构，不作用于事实/.test(wk), "**事实不许想象**——这条是整段的承重墙");
+  ok(/一律只能来自这场对话/.test(wk), "事实/数字/人名/篇名/引文只准来自对话");
+  ok(/没有真数字就别硬凑数字页/.test(wk), "没数字就别凑数字页（对应真跑里三张卡全是 100 那次）");
+  ok(/比喻要标明是比喻，不要写成机制/.test(wk), "比喻不许写成机制");
+  ok(/禁用清单/.test(wk) && /赋能、闭环、生态/.test(wk) && /功能性标题/.test(wk), "禁用清单：空词与功能性标题");
+  ok(/写完自检三问/.test(wk) && /哪一页删掉，整份不受影响/.test(wk), "交稿前有自检三问");
+  // 拼接：只进 deck 档，不许污染报告/成文/提纲
+  const sizes = wk.slice(wk.indexOf("const DECK_SIZES"), wk.indexOf("// ── DECK_CRAFT"));
+  const craft = wk.slice(wk.indexOf("const DECK_CRAFT"), wk.indexOf("// ── DECK_TPL"));
+  const tplsrc = wk.slice(wk.indexOf("const DECK_TPL = {"), wk.indexOf("const DISTILL_FIRST_MS"));
+  const s0 = wk.indexOf("const SPEC = {"), e0 = wk.indexOf("}[kind];", s0) + 8;
+  const mkSpec = new Function("kind", "tplId", "WDS_TOK_MAX", sizes + craft + tplsrc + wk.slice(s0, e0) + "\nreturn SPEC;");
+  const deckSpec = mkSpec("deck", "teach", 64000).spec;
+  ok(/想象力四条/.test(deckSpec) && /按骨架逐页写/.test(deckSpec), "文本打造真的拼进了 deck 规格");
+  ok(!/想象力四条/.test(mkSpec("essay", "", 64000).spec), "没有污染「提炼成文」那一档");
+  ok(deckSpec.length > 3500 && deckSpec.length < 6000, "deck 规格总长可控（实得 " + deckSpec.length + " 字）");
+  ok(deckSpec.indexOf("字号与字数") < deckSpec.indexOf("文本打造"), "先给字数上限、再给怎么写（顺序即教学次序）");
+}
+
 console.log("── 四点〇五 · 美的九宫格 ＋ 迭代循环装配");
 {
   ok(/var BEAUTY9 = \[/.test(MOD), "九宫格写成表");
