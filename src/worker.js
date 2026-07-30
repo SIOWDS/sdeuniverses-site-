@@ -424,7 +424,7 @@ export class CommentBox {
         const body = await request.json().catch(() => null);
         if (!body || !body.data) return Response.json({ ok: false, msg: "请求格式不对。" }, { status: 400 });
         const who = await verifyIdent(body.credential);
-        if (!who) return Response.json({ ok: false, msg: "请先登录：用 Google 账号，或在「SDE 微信」用站内口令后再发图片。" }, { status: 401 });
+        if (!who) return Response.json({ ok: false, msg: "请先在「SDE 微信」用名字和密码登录，再发图片。" }, { status: 401 });
         const _dmi = dmParties(_u.searchParams.get("room") || "");
         if (_dmi && (!who.uid || _dmi.indexOf(who.uid) < 0)) return Response.json({ ok: false, msg: "你不在这个私聊里。" }, { status: 403 });
         let bytes;
@@ -651,7 +651,7 @@ export class CommentBox {
         const body = await request.json().catch(() => null);
         if (!body) return Response.json({ ok: false, msg: "请求格式不对。" }, { status: 400 });
         const who = await verifyIdent(body.credential);
-        if (!who) return Response.json({ ok: false, msg: "请先登录：用 Google 账号，或在「SDE 微信」用站内口令后再发言。" }, { status: 401 });
+        if (!who) return Response.json({ ok: false, msg: "请先在「SDE 微信」用名字和密码登录，再发言。" }, { status: 401 });
         if (_dmc && (!who.uid || _dmc.indexOf(who.uid) < 0)) return Response.json({ ok: false, msg: "你不在这个私聊里。" }, { status: 403 });
         if (_gidc) { // 群：必须在成员名单里
           const gi = await this._gCheck(_gidc, who.uid);
@@ -3163,7 +3163,7 @@ export default {
     if (url.pathname === "/api/wds/analyze" && request.method === "POST") {
       const b = await request.json().catch(() => ({}));
       const who = await verifyIdent(b.credential);
-      if (!who) return Response.json({ ok: false, msg: "请先登录：用 Google 账号，或在「SDE 微信」用站内口令再上传文档。" }, { status: 401 });
+      if (!who) return Response.json({ ok: false, msg: "请先在「SDE 微信」用名字和密码登录，再上传文档。" }, { status: 401 });
       const room = (b.room || "").toLowerCase();
       if (!/^[a-z0-9-]+(\/[a-z0-9-]+)*$/.test(room)) return Response.json({ ok: false, msg: "bad room" }, { status: 400 });
       const text = String(b.text || "").slice(0, 16000);
@@ -3184,7 +3184,7 @@ export default {
     if (url.pathname === "/api/wds/paper" && request.method === "POST") {
       const b = await request.json().catch(() => ({}));
       const who = await verifyIdent(b.credential);
-      if (!who) return Response.json({ ok: false, msg: "请先登录：用 Google 账号，或在「SDE 微信」用站内口令再提炼论文。" }, { status: 401 });
+      if (!who) return Response.json({ ok: false, msg: "请先在「SDE 微信」用名字和密码登录，再提炼论文。" }, { status: 401 });
       const room = (b.room || "").toLowerCase();
       if (!/^[a-z0-9-]+(\/[a-z0-9-]+)*$/.test(room)) return Response.json({ ok: false, msg: "bad room" }, { status: 400 });
       const vc = await wdsPaperVC(env);
@@ -4622,7 +4622,7 @@ export default {
       const who = await verifyIdent(b.credential);
       const probe = await verifyPasscode(b.credential);
       if (probe && probe.bad === "name") return Response.json({ ok: false, msg: "这个名字不在学员名录里。请用你在站上发表用的名字。" }, { status: 401 });
-      if (!who || !who.uid) return Response.json({ ok: false, msg: "口令不对，请向管理员确认。" }, { status: 401 });
+      if (!who || !who.uid) return Response.json({ ok: false, msg: "密码不对，请向管理员确认。" }, { status: 401 });
       const dir = env.COMMENTS.get(env.COMMENTS.idFromName("im-dir-global"));
       const call = async (payload) => {
         const r = await dir.fetch(new Request("https://do/_dir", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(payload) }));
