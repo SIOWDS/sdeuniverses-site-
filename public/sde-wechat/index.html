@@ -144,10 +144,10 @@ a{color:var(--disc)}
     <div class="view on" id="v-gate">
       <div id="gate">
         <h2>SDE 微信</h2>
-        <p>站内的纯文字聊天系统：群聊、一对一私聊、通讯录、建群、群公告、@提及、引用回复、未读提醒。用 Google 账号登录即用；打不开 Google 的可用站内口令进入，无需安装。</p>
-        <div id="gsi"></div>
-        <div id="pwbox" style="margin-top:14px;padding-top:14px;border-top:1px solid var(--line,#e5e5e5)">
-          <p style="font-size:0.8rem;color:var(--muted);margin:0 0 8px">打不开 Google 登录的，用站内口令进入：</p>
+        <p>站内的纯文字聊天系统：群聊、一对一私聊、通讯录、建群、群公告、@提及、引用回复、未读提醒。用站内口令进入即可，无需安装、无需翻墙。口令向学员发放。</p>
+        <div id="gsi" style="display:none"></div>
+        <div id="pwbox" style="margin-top:14px">
+          <p style="font-size:0.8rem;color:var(--muted);margin:0 0 8px">用站内口令进入：</p>
           <input id="pw-name" maxlength="20" placeholder="你的名字（群里显示这个）" autocomplete="off"
                  style="width:100%;box-sizing:border-box;padding:9px 11px;margin-bottom:7px;border:1px solid var(--line,#ddd);border-radius:8px;font-size:0.95rem">
           <input id="pw-code" type="password" maxlength="60" placeholder="口令" autocomplete="off"
@@ -741,8 +741,13 @@ fetch("/students/roster.json").then(function(r){return r.json()}).then(function(
 }).catch(function(){});
 
 /* 起 */
-(function(){var s=document.createElement("script");s.src="https://accounts.google.com/gsi/client";s.async=true;s.defer=true;
+/* Google 登录暂停使用（2026-07-30 用户裁定）：不再加载 accounts.google.com，
+   避免大陆访问卡在这条外链上。后端 verifyIdent 仍然接受 Google 凭证，
+   要恢复只需把下面这行的 0 改回 1。 */
+var USE_GOOGLE=0;
+if(USE_GOOGLE){(function(){var s=document.createElement("script");s.src="https://accounts.google.com/gsi/client";s.async=true;s.defer=true;
  s.onload=bootGsi;s.onerror=function(){el("gsi").textContent="无法连接 Google 登录服务。"};document.head.appendChild(s);})();
+ el("gsi").style.display="";}
 if(CRED)afterLogin();
 window.__sdeWx={api:api,openDm:openDm,openGroup:openGroup,openGnew:openGnew,openGinfo:openGinfo,addMsg:addMsg,
   loadInbox:loadInbox,loadBook:loadBook,renderBook:renderBook,setReply:setReply,
