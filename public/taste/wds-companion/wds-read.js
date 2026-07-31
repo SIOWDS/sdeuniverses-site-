@@ -7,6 +7,15 @@
  * 聊完可一键「总结这场对话」，或提炼成约 5000 字论文并导出 PDF（走 /api/wds/read-paper）。 */
 (function () {
   "use strict";
+
+  /* 思想库存入库模块（全站共用一份）。陪读被 800 多个页面引入，
+     不能要求每页各记一遍依赖，所以由它自己拉进来——照 wds-mode.js 的同款做法。 */
+  (function () {
+    if (window.SDEVault) return;
+    var sc = document.createElement("script");
+    sc.src = "/taste/assets/sde-vault.js?v=1"; sc.defer = true;
+    document.head.appendChild(sc);
+  })();
   if (window.__wdsReadMounted) return;
   window.__wdsReadMounted = true;
 
@@ -306,6 +315,7 @@
       + "<div class='wdsr-docbody'></div>"
       + "<div class='wdsr-docfoot'><span class='wdsr-prog'></span>"
       + "<button class='wdsr-db copy'>\u590d\u5236\u5168\u6587</button>"
+      + "<button class='wdsr-db vault'>\u{1F4A1} \u5b58\u8fdb\u5e93\u5b58</button>"
       + "<button class='wdsr-db pri pdf'>\u5bfc\u51fa PDF</button></div></div>";
     document.body.appendChild(m);
     var tEl = q1(".wdsr-doct", m), bEl = q1(".wdsr-docbody", m), pEl = q1(".wdsr-prog", m);
@@ -319,6 +329,33 @@
       try { navigator.clipboard.writeText(full); b.textContent = "\u5df2\u590d\u5236"; setTimeout(function () { b.textContent = "\u590d\u5236\u5168\u6587"; }, 1600); } catch (e) {}
     };
     q1(".pdf", m).onclick = function () { exportPDF(tEl.textContent, bEl.textContent, kind); };
+    /* 💡 存进库存 —— **手动，不自动**。
+       别处（金点子/中华智问/经典解构/问WDS/和WDS对话/大比拼/搜索页提炼）都是自动入库，
+       因为那些是**提炼件**：三段硬门、栏目化、经过评审。而陪读浮层的产出是**随手问答**——
+       自动入库会把库存冲稀，「随便翻翻」翻出一堆平庸句子，反而毁掉库存的用处。
+       ⇒ 这里由读者自己决定：读到一句真觉得好的，按一下。
+       选中了文字就存选中的那一段，没选中就存整段的第一句点题。 */
+    q1(".vault", m).onclick = function () {
+      var b = q1(".vault", m);
+      var sel = "";
+      try { sel = String(window.getSelection ? window.getSelection().toString() : "").trim(); } catch (e) {}
+      var body = bEl.textContent || "";
+      var one = sel && sel.length >= 3 && body.indexOf(sel) >= 0
+        ? sel.replace(/\s+/g, " ").slice(0, 200)
+        : (window.SDEVault ? window.SDEVault.lead(body, 200) : "");
+      if (!one) { pEl.textContent = "\u9009\u4e00\u53e5\u518d\u5b58\uff0c\u6216\u7b49\u5b83\u5199\u5b8c\u3002"; return; }
+      if (!window.SDEVault) { pEl.textContent = "\u5165\u5e93\u6a21\u5757\u8fd8\u6ca1\u52a0\u8f7d\u5b8c\uff0c\u7a0d\u7b49\u518d\u70b9\u3002"; return; }
+      b.disabled = true;
+      var vb = q1(".wdsr-vaultnote", m);
+      if (!vb) {
+        vb = el("div", "wdsr-vaultnote");
+        vb.style.cssText = "font-size:12.5px;line-height:1.7;margin:6px 0 0;opacity:.82;flex-basis:100%";
+        pEl.parentNode.appendChild(vb);
+      }
+      window.SDEVault.auto([{ kind: "line", text: one }],
+        "\u966a\u8bfb \u00b7 " + (tEl.textContent || "").slice(0, 24), vb)
+        .then(function () { b.disabled = false; });
+    };
     return {
       setText: function (t) { bEl.textContent = t; },
       setTitle: function (t) { tEl.textContent = t; },

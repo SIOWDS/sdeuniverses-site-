@@ -14,6 +14,7 @@ const CD = R("public/taste/classics-deconstructor/index.html");
 const WM = R("public/wds-mode.js");
 const WD = R("public/taste/wds-dialogue/index.html");
 const UP = R("public/taste/uplift-compare/index.html");
+const RD = R("public/taste/wds-companion/wds-read.js");
 
 let pass = 0, fail = 0;
 function ok(n, c, e) { if (c) { pass++; console.log("  ✓ " + n); } else { fail++; console.log("  ✗ " + n + (e !== undefined ? "  ← " + JSON.stringify(e) : "")); } }
@@ -140,16 +141,36 @@ function rest() {
   ok("接在成文落定处", /\$\('paperBody'\)\.textContent = paper;[\s\S]{0,900}SDEVault\.auto\(/.test(UP)
     && /'对话智商大比拼 · WDS 栏成文'/.test(UP));
 
-  group("七、六台都没把纪律抄一遍（纪律只在模块里）");
-  [["金点子", IG], ["中华智问", ZW], ["经典解构器", CD], ["问WDS", WM], ["和WDS对话", WD], ["对话智商大比拼", UP]]
+  group("六之二、陪读浮层：唯一手动的一处");
+  ok("陪读自己把模块拉进来（它被 800 多页引入，不能每页各记依赖）",
+    /sc\.src = "\/taste\/assets\/sde-vault\.js/.test(RD));
+  ok("★ 它是**手动**的：底栏多一枚按钮，而不是在渲染完成处自动入库",
+    /class='wdsr-db vault'/.test(RD) && /q1\("\.vault", m\)\.onclick/.test(RD));
+  ok("★ 注释写清为什么这一处不自动（随手问答会把库存冲稀）",
+    /手动，不自动/.test(RD) && /把库存冲稀/.test(RD));
+  ok("选中了文字就存选中那段，没选中才取点题句",
+    /window\.getSelection/.test(RD) && /SDEVault\.lead\(body, 200\)/.test(RD));
+  ok("选中的必须真在正文里（防把页面别处选中的字存进来）", /body\.indexOf\(sel\) >= 0/.test(RD));
+  ok("取不到就提示重选，不硬存", /选一句再存|\\u9009\\u4e00\\u53e5\\u518d\\u5b58/.test(RD));
+  ok("模块还没加载完时说人话、不静默", /\\u5165\\u5e93\\u6a21\\u5757\\u8fd8\\u6ca1\\u52a0\\u8f7d\\u5b8c|入库模块还没加载完/.test(RD));
+  ok("按钮防重复点（存的时候禁用，回来再放开）",
+    /b\.disabled = true;/.test(RD) && /b\.disabled = false;/.test(RD)
+    && RD.indexOf('b.disabled = true;') < RD.indexOf('b.disabled = false;'));
+  ok("出处带上这篇的标题（日后能追是读哪一篇时存的）", /tEl\.textContent \|\| ""\)\.slice\(0, 24\)/.test(RD));
+
+  group("七、七处都没把纪律抄一遍（纪律只在模块里）");
+  [["金点子", IG], ["中华智问", ZW], ["经典解构器", CD], ["问WDS", WM], ["和WDS对话", WD], ["对话智商大比拼", UP], ["陪读浮层", RD]]
     .forEach(function (pair) {
       ok(pair[0] + " 没有重复的入库话术（纪律只写在模块里）", pair[1].indexOf("已自动存进思想库存") < 0);
     });
-  ok("六台都只调 SDEVault.auto，没人自己拼 /api/im 的入库请求",
-    [IG, ZW, CD, WM, WD, UP].every(function (s) {
+  ok("七处都只调 SDEVault.auto，没人自己拼 /api/im 的入库请求",
+    [IG, ZW, CD, WM, WD, UP, RD].every(function (s) {
       return s.indexOf('a: "add"') < 0 && s.indexOf('a:"add"') < 0;
     }));
-  ok("六台都真的调到了 auto()", [IG, ZW, CD, WM, WD, UP].every(function (s) { return /SDEVault\.auto\(/.test(s); }));
+  ok("七处都真的调到了 auto()", [IG, ZW, CD, WM, WD, UP, RD].every(function (s) { return /SDEVault\.auto\(/.test(s); }));
+  ok("★ 只有陪读是手动的，其余六处都在收口处自动",
+    /q1\("\.vault", m\)\.onclick/.test(RD)
+    && [IG, ZW, CD, WM, WD, UP].every(function (s) { return !/onclick[^;]{0,40}SDEVault\.auto/.test(s); }));
 
   console.log("\n" + "═".repeat(52));
   console.log("  通过 " + pass + " / " + (pass + fail) + (fail ? "   ✗ 失败 " + fail : "   全绿"));
