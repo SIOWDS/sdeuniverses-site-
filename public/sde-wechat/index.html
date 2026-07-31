@@ -301,6 +301,9 @@ a{color:var(--disc)}
       </div>
     </div>
 
+    <div class="view" id="v-vault">
+      <div class="scroll" id="vt-body"></div>
+    </div>
     <div class="view" id="v-cand">
       <div class="scroll" id="cd-list"></div>
     </div>
@@ -385,6 +388,7 @@ a{color:var(--disc)}
           <textarea id="mp-text" maxlength="1000" placeholder="这一刻的想法…（最多 1000 字）"></textarea>
           <div class="mu-bar">
             <button class="btn mu" id="mu-go" type="button">✨ SDE金句生产机</button>
+            <button class="btn mu" id="mu-vault" type="button">💡 从库存里挑</button>
             <select id="mu-kind">
               <option value="auto">自动（看图·接你写的）</option>
               <option value="maxim">格言体</option>
@@ -423,6 +427,7 @@ a{color:var(--disc)}
             <div class="me-item"><span>新消息桌面提醒</span><button id="b-notify">开启</button></div>
             <div class="me-item"><span>SDE 讨论（公开广场）</span><a href="/sde-talk/"><button>进入</button></a></div>
             <div class="me-item"><span>SDE 会议室</span><a href="/meeting/"><button>进入</button></a></div>
+            <div class="me-item"><span>💡 思想库存<br><span style="font-size:0.74rem;color:var(--muted)">对话里撞出来的东西存在这儿，发朋友圈、立候选卡都从这儿取</span></span><button id="b-vault">进入</button></div>
             <div class="me-item"><span>全权管理</span><button id="b-admin">进入</button></div>
             <div class="me-item"><span>退出登录</span><button id="b-out">退出</button></div>
           </div>
@@ -483,9 +488,9 @@ function setStat(state){var d=el("t-dot"),s=el("t-stat");
 
 /* ── 视图 ── */
 function show(v){
-  ["gate","chats","book","talk","gnew","ginfo","me","fwd","admin","moments","mopost","monews","dtalk","cand","cdnew","cdone","cdnews"].forEach(function(x){el("v-"+x).classList.toggle("on",x===v)});
+  ["gate","chats","book","talk","gnew","ginfo","me","fwd","admin","moments","mopost","monews","dtalk","cand","cdnew","cdone","cdnews","vault"].forEach(function(x){el("v-"+x).classList.toggle("on",x===v)});
   el("tabs").style.display=(v==="gate")?"none":"flex";
-  el("t-back").style.display=(v==="talk"||v==="gnew"||v==="ginfo"||v==="fwd"||v==="admin"||v==="mopost"||v==="monews"||v==="dtalk"||v==="cdnew"||v==="cdone"||v==="cdnews"||(v==="moments"&&moWho)||(v==="cand"&&cdWho))?"block":"none";
+  el("t-back").style.display=(v==="talk"||v==="gnew"||v==="ginfo"||v==="fwd"||v==="admin"||v==="mopost"||v==="monews"||v==="dtalk"||v==="cdnew"||v==="cdone"||v==="cdnews"||v==="vault"||(v==="moments"&&moWho)||(v==="cand"&&cdWho))?"block":"none";
   el("t-sub").style.display=(v==="talk")?"flex":"none";
   el("t-act").style.display=(v==="talk"&&cur&&cur.kind==="g")?"block":"none";
   el("t-plaza").style.display=(v==="chats"||v==="book"||v==="me")?"block":"none";
@@ -501,6 +506,7 @@ function show(v){
   else if(v==="cdnew")el("t-ttl").textContent="立一张候选卡";
   else if(v==="cdone")el("t-ttl").textContent="候选卡";
   else if(v==="cdnews")el("t-ttl").textContent="顶回提醒";
+  else if(v==="vault")el("t-ttl").textContent="💡 思想库存";
   else if(v==="cand")el("t-ttl").textContent=cdWho?(cdWhoName+"的候选"):"候选";
   else if(v==="moments")el("t-ttl").textContent=moWho?(moWhoName+"的朋友圈"):"朋友圈";
   else if(v!=="talk")el("t-ttl").textContent="SDE 微信";
@@ -663,6 +669,7 @@ el("t-back").onclick=function(){
   if(el("v-moments").classList.contains("on")&&moWho){moGo("","");return;}
   if(el("v-admin").classList.contains("on")){show("me");return;}
   if(el("v-cdnew").classList.contains("on")||el("v-cdone").classList.contains("on")||el("v-cdnews").classList.contains("on")){show("cand");return;}
+  if(el("v-vault").classList.contains("on")){show(vtFrom||"me");return;}
   if(el("v-cand").classList.contains("on")&&cdWho){cdGo("","");return;}
   if(el("v-fwd").classList.contains("on")){show(cur?"talk":"chats");return;}
   if(el("v-ginfo").classList.contains("on")&&cur){show("talk");return;}
@@ -717,7 +724,7 @@ function afterLogin(){
     if(x.s===401||!x.d||!x.d.ok){logout();return;}
     ME=x.d.me;contacts=x.d.contacts||[];
     el("me-nm").textContent=ME.name;el("me-uid").textContent="ID "+ME.uid;
-    show("chats");loadInbox();loadGroups();moBadge();cdWire();cdBadge();dtBadge();
+    show("chats");loadInbox();loadGroups();moBadge();cdWire();cdBadge();vtWire();dtBadge();
     if(inboxT)clearInterval(inboxT);
     inboxT=setInterval(function(){loadInbox(true);moBadge();dtBadge();},15000);
   }).catch(function(){el("gsi").textContent="网络异常，请稍后重试。"});
@@ -1371,6 +1378,114 @@ function cdBadge(){
     var t=el("tb-cd");if(!t)return;
     var n=(d&&d.n)||0;t.textContent=n?String(n):"";t.style.display=n?"inline-block":"none";
   }).catch(function(){});
+}
+/* ═══ 思想库存 ═══
+   用户定的：「对话产生的很多新思想，要能自动进入微信的某个库存……可以自动点击那个库存去发现。
+   这样对话产生的新思想和朋友圈可以共用，或者微信整个共用。」
+   **两个门槛，一条通路**：库存低门槛（一句话就存）先接住对话里冒出来的东西，
+   够硬的再一键升格成候选卡（三段硬门）。库存是全站共用的一池——
+   对话侧存进来、朋友圈「说点什么」从里面取、候选卡从里面升格。 */
+var vtFrom="", vtMode="new", vtPick=null;
+var VT_KIND={line:"金句",name:"命名",claim:"命题",note:"观察"};
+function vtApi(a,extra){return api("vt",Object.assign({a:a},extra||{}));}
+function vtWire(){
+  var b=el("b-vault");
+  if(b)b.onclick=function(){vtMode="new";vtGo("me",null);};
+  var mv=el("mu-vault");
+  // 朋友圈这一条正是用户点名的场景：「有的时候，加入了图片，不知道今天想说什么」
+  // ——金句生产机是现造，库存是**已经攒下的**，两条路并排放。
+  if(mv)mv.onclick=function(){
+    vtMode="new";
+    vtGo("mopost",function(it){
+      show("mopost");
+      var ta=el("mp-text");
+      if(ta){ta.value=(ta.value?(ta.value+"\n"):"")+it.text;ta.focus();}
+    });
+  };
+}
+/* from＝从哪进来的（决定返回键回哪）；onPick＝点一条要干什么（朋友圈是填进正文） */
+function vtGo(from,onPick){vtFrom=from||"me";vtPick=onPick||null;show("vault");vtLoad();}
+function vtLoad(){
+  var box=el("vt-body");box.innerHTML='<div class="hint">正在加载…</div>';
+  var q={limit:40};
+  if(vtMode==="pick")q.pick=1;
+  if(vtMode==="fresh")q.fresh=1;
+  if(vtMode==="mine")q.who=(ME&&ME.uid)||"";
+  vtApi("feed",q).then(function(d){
+    if(!d||!d.ok){box.innerHTML='<div class="hint">加载失败，请重试。</div>';return;}
+    var items=d.items||[];
+    var h='<div style="padding:12px 14px 0">'
+      +'<p style="font-size:0.8rem;color:var(--muted);line-height:1.8;margin:0 0 10px">'
+      +'库存是<b>全站共用的一池</b>：对话里撞出来的东西存进这里，'
+      +'发朋友圈时可以从这里挑一句，够硬的还能一键升格成候选卡去被人顶回。<br>'
+      +'<b>门槛故意放低</b>——一句能站住的话就值得存下来，别让它刷新即失。</p>'
+      +'<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">'
+      +['new:最新','pick:🎲 随便翻翻','fresh:还没被用过','mine:我存的'].map(function(x){
+          var k=x.split(":")[0],t=x.split(":")[1];
+          return '<button class="vt-tab'+(vtMode===k?" on":"")+'" data-m="'+k+'" style="font-size:0.76rem;padding:4px 10px;border-radius:14px;border:1px solid '+(vtMode===k?"var(--brand,#1a7f5a)":"var(--line,#ddd)")+';background:'+(vtMode===k?"rgba(26,127,90,.08)":"transparent")+'">'+t+'</button>';
+        }).join("")
+      +'</div></div>';
+    if(!items.length){
+      h+='<div style="padding:4px 16px 22px;font-size:0.86rem;color:var(--muted);line-height:1.9">'
+        +(vtMode==="mine"?'<b>你还没往库存里存过东西。</b><br><br>':'<b>库存还是空的。</b><br><br>')
+        +'去<a href="/search/">搜索页的涌现档</a>撞一轮，三观点和典范上都有「💡 存进库存」；'
+        +'或者<a href="/taste/wds-chat/">和 WDS 对话</a>问出一句好话，回来手动存。</div>';
+    }else{
+      items.forEach(function(it){
+        h+='<div class="me-item" style="display:block;padding:12px 16px;border-bottom:1px solid var(--line,#eee)">'
+          +'<div style="font-size:0.72rem;color:var(--muted);margin-bottom:4px">'
+          +esc(VT_KIND[it.kind]||"观察")+'　·　'+esc(it.name||"")
+          +(it.src?('　·　'+esc(it.src)):'')
+          +(it.used?('　·　已被用过 '+it.used+' 次'):'')+'</div>'
+          +'<div style="font-size:0.95rem;line-height:1.7">'+esc(it.text)+'</div>'
+          +'<div style="margin-top:7px;font-size:0.78rem">'
+          +(vtPick?'<a href="#" class="vt-use" data-id="'+esc(it.id)+'">用这一句 →</a>　':'')
+          +'<a href="#" class="vt-up" data-id="'+esc(it.id)+'">升格成候选卡 →</a>'
+          +(it.uid===((ME&&ME.uid)||"")?'　<a href="#" class="vt-del" data-id="'+esc(it.id)+'" style="color:#b3261e">删</a>':'')
+          +'</div></div>';
+      });
+    }
+    box.innerHTML=h;vtBind();
+  }).catch(function(){box.innerHTML='<div class="hint">加载失败，请重试。</div>'});
+}
+function vtBind(){
+  Array.prototype.forEach.call(document.querySelectorAll(".vt-tab"),function(b){
+    b.onclick=function(){vtMode=b.getAttribute("data-m");vtLoad();};
+  });
+  Array.prototype.forEach.call(document.querySelectorAll(".vt-use"),function(a){
+    a.onclick=function(e){e.preventDefault();
+      var id=a.getAttribute("data-id");
+      var it=null;
+      Array.prototype.forEach.call(document.querySelectorAll(".vt-use"),function(){});
+      vtApi("feed",{limit:60}).then(function(d){
+        ((d&&d.items)||[]).forEach(function(x){if(x.id===id)it=x;});
+        if(!it)return;
+        vtApi("use",{id:id});                 // 记一次取用（不等它回，用户不该为统计等）
+        if(vtPick)vtPick(it);
+      });
+    };
+  });
+  Array.prototype.forEach.call(document.querySelectorAll(".vt-up"),function(a){
+    a.onclick=function(e){e.preventDefault();
+      var id=a.getAttribute("data-id");
+      vtApi("feed",{limit:60}).then(function(d){
+        var it=null;((d&&d.items)||[]).forEach(function(x){if(x.id===id)it=x;});
+        if(!it)return;
+        // 升格＝把这句话填进候选卡的承重命题，另外两段仍要作者自己补——**不替他编**
+        show("cdnew");
+        el("cd-prop").value=it.text;el("cd-face").value="";el("cd-crit").value="";
+        el("cd-nbr").textContent="";el("cd-nbr").removeAttribute("data-nbr");
+        el("cd-msg").textContent="已从库存取来承重命题。另两段要你自己补——说不出切了哪一刀、给不出判据，它就还不是一张能被顶回的卡。";
+        try{cdNbrCheck();cdPickWho();}catch(e2){}
+      });
+    };
+  });
+  Array.prototype.forEach.call(document.querySelectorAll(".vt-del"),function(a){
+    a.onclick=function(e){e.preventDefault();
+      if(!confirm("从库存里删掉这一条？"))return;
+      vtApi("del",{id:a.getAttribute("data-id")}).then(function(){vtLoad();});
+    };
+  });
 }
 function cdApi(a,extra){return api("cd",Object.assign({a:a},extra||{}));}
 function cdGo(who,name){cdWho=who||"";cdWhoName=name||"";show("cand");cdLoad();}

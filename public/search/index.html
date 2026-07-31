@@ -1347,6 +1347,36 @@ function cdSection(txt,names){
   }
   return "";
 }
+/* 存进库存：**低门槛的那条路**。
+   候选卡要三段硬门，而典范名／承重命题这类东西哪怕只有一句也值得留下来——
+   否则它只活在这一次会话的内存里，刷新即失。存进去之后，
+   朋友圈「说点什么」能从里面挑，够硬的还能在微信里一键升格成候选卡。 */
+function toVault(ix){
+  var p=paradigms[ix]; if(!p)return;
+  var msg=document.getElementById("cdmsg"+ix);
+  var cred=cdCred();
+  if(!cred){ msg.innerHTML='要先在 <a href="/sde-wechat/" target="_blank">SDE 微信</a> 登录一次（全站通用）。'; return; }
+  /* 存两条：典范名（命名）与承重命题（命题）。取不到就少存一条，绝不编造。 */
+  var name=paradigmName(p.text);
+  var prop=cdSection(p.text,["二、承重命题","承重命题"]);
+  var jobs=[];
+  if(name&&name.length>3)jobs.push({kind:"name",text:name.slice(0,200)});
+  if(prop&&prop.length>3)jobs.push({kind:"claim",text:prop.slice(0,200)});
+  if(!jobs.length){ msg.textContent="这张典范里没解析出可存的东西。"; return; }
+  msg.textContent="正在存进库存…";
+  var src="涌现档 · "+wayName(p.way);
+  Promise.all(jobs.map(function(j){
+    return fetch("/api/im",{method:"POST",headers:{"content-type":"application/json"},
+      body:JSON.stringify({credential:cred,op:"vt",a:"add",text:j.text,kind:j.kind,src:src})})
+      .then(function(r){return r.json()}).catch(function(){return {ok:false}});
+  })).then(function(rs){
+    var okn=rs.filter(function(x){return x&&x.ok}).length;
+    var dup=rs.filter(function(x){return x&&x.dup}).length;
+    if(!okn){msg.textContent="没存进去，请重试。";return;}
+    msg.innerHTML='已存 '+okn+' 条'+(dup?('（其中 '+dup+' 条早就存过）'):'')
+      +' → <a href="/sde-wechat/" target="_blank">去「💡 思想库存」看</a>';
+  });
+}
 function toCandidate(ix){
   var p=paradigms[ix]; if(!p)return;
   var msg=document.getElementById("cdmsg"+ix);
@@ -1403,6 +1433,7 @@ function renderParadigms(sel){
       /* 对话 → 微信 这条接缝：典范骨架的第二、三、五节，正好就是候选卡的三段。
          不接的话，撞出来的东西只活在这一次会话的内存里，刷新即失。 */
       +'<div style="margin-top:9px"><button class="actbtn" style="font-size:0.76rem;padding:5px 11px" onclick="toCandidate('+ix+')">📤 立成候选卡（交给不共享语汇的人顶回）</button>'
+      +' <button class="actbtn" style="font-size:0.76rem;padding:5px 11px" onclick="toVault('+ix+')">💡 存进库存</button>'
       +'<span id="cdmsg'+ix+'" style="font-size:0.74rem;color:var(--muted);margin-left:8px"></span></div>'
       +'</div>';
   });

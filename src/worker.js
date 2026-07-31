@@ -904,6 +904,71 @@ export class CommentBox {
         c.settled = tnow;
         return true;
       };
+      /* ═══ 思想库存（vault）═══
+         用户的话：「对话产生的很多新思想，要能自动进入微信的某个库存……
+         可以自动点击那个库存去发现。这样对话产生的新思想和朋友圈可以共用，或者微信整个共用。」
+         **为什么它必须与候选卡分开、而不是并进去**：
+           候选卡是**高门槛**（承重命题＋辨别面＋可裁决判据三段硬门，72 小时结算）；
+           而对话里冒出来的多数东西还没成型——一个命名、一句金句、一条观察。
+           它们不该被硬门挡在门外白白丢掉（现在的下场是刷新即失），也不该冒充候选卡。
+         ⇒ **两个门槛，一条通路**：库存低门槛先接住，够硬的再一键升格成候选卡。
+         库存是**全站共用的一池**：对话侧存进来，朋友圈「说点什么」从里面取，候选卡从里面升格。
+         键：vt:<inv>:<rnd> ＝一条；vu:<uid>:… ＝个人索引。inv 口径同朋友圈（升序即倒序）。 */
+      const vtKinds = { line: "金句", name: "命名", claim: "命题", note: "观察" };
+      if (op === "vtadd") {
+        if (!ok12(uid)) return Response.json({ ok: false });
+        const text = moClean(b.text, 200);
+        if (text.length < 4) return Response.json({ ok: false, msg: "太短了——存一句能站住的话。" });
+        const kind = vtKinds[String(b.kind || "")] ? String(b.kind) : "note";
+        const src = moClean(b.src, 80);
+        // 同一个人存重复的一句就不再多存一条（库存要能被翻，不能被刷屏）
+        const mine = await this.ctx.storage.list({ prefix: "vu:" + uid + ":", limit: 200 });
+        for (const k of mine.keys()) {
+          const it = await this.ctx.storage.get("vt:" + k.slice(("vu:" + uid + ":").length));
+          if (it && it.text === text) return Response.json({ ok: true, dup: 1, item: it });
+        }
+        const u0 = (await this.ctx.storage.get("u:" + uid)) || {};
+        const id = moInv(now) + ":" + moRnd();
+        const item = { id, uid, name: moClean(b.name || u0.name, 20), text, kind, src, ts: now, used: 0 };
+        await this.ctx.storage.put("vt:" + id, item);
+        await this.ctx.storage.put("vu:" + uid + ":" + id, 1);
+        return Response.json({ ok: true, item });
+      }
+      if (op === "vtfeed") {
+        const lim = Math.min(60, Math.max(1, parseInt(b.limit || 30, 10)));
+        const only = String(b.who || "");
+        const pre = only ? ("vu:" + only + ":") : "vt:";
+        // 取比要的多一些，好在服务端做「随机发现」与「只看没用过的」两种取法
+        const m = await this.ctx.storage.list({ prefix: pre, limit: only ? lim : 300 });
+        let out = [];
+        for (const k of m.keys()) {
+          const id = only ? k.slice(pre.length) : k.slice(3);
+          const it = only ? await this.ctx.storage.get("vt:" + id) : await this.ctx.storage.get(k);
+          if (it) out.push(it);
+        }
+        if (b.fresh) out = out.filter((x) => !(x.used > 0));   // 只看还没被用过的
+        if (b.pick) {                                          // 随机发现：洗一把再截
+          for (let i = out.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); const t = out[i]; out[i] = out[j]; out[j] = t; }
+        }
+        return Response.json({ ok: true, items: out.slice(0, lim), total: out.length });
+      }
+      if (op === "vtuse") {
+        const id = String(b.id || "");
+        const it = await this.ctx.storage.get("vt:" + id);
+        if (!it) return Response.json({ ok: false, msg: "这条已经不在了。" });
+        it.used = (it.used || 0) + 1; it.lastUse = now;
+        await this.ctx.storage.put("vt:" + id, it);
+        return Response.json({ ok: true, used: it.used });
+      }
+      if (op === "vtdel") {
+        const id = String(b.id || "");
+        const it = await this.ctx.storage.get("vt:" + id);
+        if (!it) return Response.json({ ok: false, msg: "已经不在了。" });
+        if (it.uid !== uid) return Response.json({ ok: false, msg: "只能删自己存的。" });
+        await this.ctx.storage.delete("vt:" + id);
+        await this.ctx.storage.delete("vu:" + it.uid + ":" + id);
+        return Response.json({ ok: true });
+      }
       if (op === "cdpost") {
         if (!ok12(uid)) return Response.json({ ok: false });
         const prop = cdClean(b.prop, 120);            // 50 字级承重命题（留冗余，不硬切）
@@ -5897,6 +5962,18 @@ export default {
       }
 
       // ===== 朋友圈：文字进 DO，图片进 R2（moments/<key>.jpg），一个字节都不进 git =====
+      if (op === "vt") {   // 思想库存（全站共用一池）
+        const a = String(b.a || "");
+        const pass = ["add", "feed", "use", "del"];
+        if (pass.indexOf(a) < 0) return Response.json({ ok: false, msg: "未知的库存动作。" }, { status: 400 });
+        await call({ op: "hello", uid: who.uid, name: who.name });
+        const d = await call({
+          op: "vt" + a, uid: who.uid, name: who.name,
+          who: String(b.who || ""), limit: b.limit, fresh: b.fresh ? 1 : 0, pick: b.pick ? 1 : 0,
+          id: String(b.id || ""), text: b.text, kind: b.kind, src: b.src,
+        });
+        return Response.json(Object.assign({ me }, d || { ok: false }), { headers: { "cache-control": "no-store" } });
+      }
       if (op === "cd") {   // 候选卡与顶回
         const a = String(b.a || "");
         const pass = ["feed", "post", "back", "sep", "del", "news", "badge"];
