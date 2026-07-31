@@ -7,10 +7,11 @@
  *   · 首页地址不动 —— 全站几千处 href="/"、站内索引、外部链接、SEO 落地页全都不用迁；
  *   · 选「浏览」是当场揭开下面那一页，不用再加载一次首页（一次点击换一次白屏是很亏的）；
  *   · 首页正文仍在 DOM 里，抓取与无脚本环境照常可读。
- * 什么时候见到它（见 shouldOpen）：**从站外进来或刷新根地址，每次都见**——
- * 用户定的是“输入 sdeuniverses.com 打开就是入口”，那就每次进门都得看见门。
- * 只有**站内**点回首页（同源 referrer / 前进后退）且这一会话已经进过门才放行，
- * 否则每点一次“首页”都被拦一道，门就成了路障。想随时回看：/?portal=1 。
+ * 什么时候见到它（见 shouldOpen）：**入口 ⇔ sdeuniverses.com，一一对应**——
+ * 域名根地址每一次打开都是入口（直接输地址、书签、外链、刷新、前进后退、站内点“首页”，
+ * 一视同仁，不记“这一会话进过门没有”）；除了根地址，别的地址一概不是入口。
+ * 旧的第二门牌 /?portal=1 已作废：多一个地址就不叫唯一对应了，它现在等同于根地址，
+ * 且开门时地址栏会被归一成 “/”。
  *
  * ── 画面（多样 · 统一 · 和谐）──
  * 多样：三个入口各有各的色相与各自的图案母题——
@@ -32,43 +33,28 @@
   if (window.__sdePortalMounted) return;
   window.__sdePortalMounted = true;
 
-  var KEY = "sde_portal_seen";
   var P = String(location.pathname || "/");
-  var FORCE = /[?&]portal=1/.test(String(location.search || ""));
 
-  /* 拉开这一层的规矩（抽成纯函数，模拟脚本才能逐种情形复核）：
-       ① ?portal=1 —— 永远拉（专供回看）
-       ② 只在站点根（/ 或 /index.html）拉，别的页一律放行
-       ③ 刷新根地址 —— 等于重新进门，拉
-       ④ 前进后退回到首页 —— 算站内走动，进过门就不再拦
-       ⑤ referrer 是本站（站内点“首页”）—— 同上
-       ⑥ 其余（直接输地址、书签、搜索结果、新标签页、外链）—— **每次都拉** */
+  /* 门规（2026-07-31 用户裁定：**这个入口严格对应 sdeuniverses.com，而且是唯一对应**）：
+       ① 域名根地址（/ 或 /index.html）—— **每次都拉**。不看 referrer、不看刷新还是前进后退、
+          也不再记“这一会话进过门没有”：输一次域名就是进一次门，站内点“首页”回来同样是进门。
+       ② 除此之外的任何地址，一概不是入口（内页本来也不引这个脚本）。
+       ③ 第二门牌 /?portal=1 作废——一个入口只能有一个地址，多一个就不叫唯一对应。
+          站内那颗回入口的 △ 已改指 "/"（assets/sde-modes.js 与 wds-mode.js）。
+     抽成纯函数，模拟脚本才能逐种情形复核。 */
   function shouldOpen(env) {
-    if (env.force) return true;
-    if (env.path !== "/" && env.path !== "/index.html") return false;
-    if (env.navType === "reload") return true;
-    if (env.navType === "back_forward") return !env.seen;
-    if (env.internal) return !env.seen;
-    return true;
+    return env.path === "/" || env.path === "/index.html";
   }
-  function sameOrigin(ref, origin) {
-    if (!ref || !origin || ref.slice(0, origin.length) !== origin) return false;
-    var c = ref.charAt(origin.length);
-    return c === "" || c === "/" || c === "?" || c === "#";
-  }
-  function readEnv() {
-    var ref = "", seen = false, nav = "";
-    try { ref = String(document.referrer || ""); } catch (e) {}
-    try { seen = !!sessionStorage.getItem(KEY); } catch (e) {}
-    try {
-      var es = performance.getEntriesByType && performance.getEntriesByType("navigation");
-      if (es && es[0] && es[0].type) nav = String(es[0].type);
-      else if (performance.navigation) nav = performance.navigation.type === 1 ? "reload" : "navigate";
-    } catch (e) {}
-    return { force: FORCE, path: P, seen: seen, navType: nav,
-             internal: sameOrigin(ref, String(location.origin || "")) };
-  }
+  function readEnv() { return { path: P }; }
   if (!shouldOpen(readEnv())) return;
+
+  /* 地址栏一并归一：入口露面时，地址必须正好是 https://sdeuniverses.com/ 。
+     /index.html、旧的 ?portal=1、任何残留的 query 或 #hash 都在这里抹平。
+     用 replaceState 而不是跳转：不多发一次请求，也不在后退历史里多留一格。 */
+  try {
+    if ((location.pathname !== "/" || location.search || location.hash) &&
+        window.history && history.replaceState) history.replaceState(null, "", "/");
+  } catch (e) {}
 
   /* 输完域名回车，第一眼就该是入口，而不是“先闪一下浏览页再盖上门”。
      脚本已改成同步执行（index.html 里去掉了 defer），所以这一句跑在 <body> 落地**之前**：
@@ -686,7 +672,7 @@
       var sub = document.createElement("span");
       sub.className = "sdep-sub"; sub.textContent = T(n.zhS, n.enS);
       a.appendChild(wrap); a.appendChild(nm); a.appendChild(sub);
-      a.onclick = function () { seen(); if (!href) close(); };   // 浏览＝就地揭开，不跳转
+      a.onclick = function () { if (!href) close(); };          // 浏览＝就地揭开，不跳转
       stage.appendChild(a);
     });
     box.appendChild(stage);
@@ -701,7 +687,7 @@
     skip.className = "sdep-skip";
     skip.type = "button";
     skip.textContent = T("\u76f4\u63a5\u6d4f\u89c8 \u203a", "Just browse \u203a");
-    skip.onclick = function () { seen(); close(); };
+    skip.onclick = function () { close(); };
     foot.appendChild(skip);
     box.appendChild(foot);
 
@@ -721,7 +707,7 @@
 
     function onKey(e) {
       if (!e) return;
-      if (e.key === "Escape") { seen(); close(); }
+      if (e.key === "Escape") { close(); }
     }
     function close() {
       document.removeEventListener("keydown", onKey);
@@ -733,8 +719,6 @@
     }
     window.SDEPortal = { close: close, nodes: NODES };
   }
-  function seen() { try { sessionStorage.setItem(KEY, "1"); } catch (e) {} }
-
   /* 尽早上屏：首页 HTML 有四十多万字符，等 DOMContentLoaded 会先黑屏白等一段。
      <body> 一出现就挂——入口自带样式，不依赖页面的 CSS 加载完。 */
   (function whenBody() {

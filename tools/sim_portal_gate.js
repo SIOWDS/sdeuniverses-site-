@@ -1,17 +1,18 @@
 /* sim_portal_gate.js —— 入口层「什么时候该出现」的验收
  *
- * 用户定的（2026-07-31）：**输入 sdeuniverses.com 打开，见到的应该是入口**；
- * 从入口再点进浏览、微信、对话这三大功能体系。
- *
- * 所以规矩是：从站外进来或刷新根地址，每次都拦；只有站内点回首页、且这一会话
- * 已经进过门，才放行——否则每点一次"首页"都被拦一道，门就成了路障。
+ * 用户定的（2026-07-31）：**这个入口严格对应 sdeuniverses.com，而且是唯一对应。**
+ * 于是门规只剩一条：域名根地址每一次打开都是入口；除了根地址，别的地址一概不是入口。
+ * 从前那些分叉（?portal=1 第二门牌、referrer 判站内、navigation type、
+ * sessionStorage 记「这一会话进过门没有」）全部作废——一个入口只能有一个地址，
+ * 一个地址也只能对着一件事。
  *
  * 跑法：node tools/sim_portal_gate.js
  */
 "use strict";
 var fs = require("fs");
 var path = require("path");
-var SRC = path.join(__dirname, "..", "public", "assets", "sde-portal.js");
+var ROOT = path.join(__dirname, "..");
+var SRC = path.join(ROOT, "public", "assets", "sde-portal.js");
 var src = fs.readFileSync(SRC, "utf8");
 
 var pass = 0, fail = 0;
@@ -25,52 +26,65 @@ function grab(re, what) {
   return m;
 }
 var shouldOpen = eval("(" + grab(/function shouldOpen\(env\) \{[\s\S]*?\n  \}\n/, "shouldOpen")[0] + ")");
-var sameOrigin = eval("(" + grab(/function sameOrigin\(ref, origin\) \{[\s\S]*?\n  \}\n/, "sameOrigin")[0] + ")");
 var NODES = eval("(" + grab(/var NODES = (\[[\s\S]*?\n  \]);/, "NODES")[1] + ")");
 var GO = eval("(" + grab(/var GO = (\{[^}]*\});/, "GO")[1] + ")");
 
+/* 门规现在只看一样东西：路径。所以 env 里多塞什么都不该改变结论——
+   下面几组刻意把从前起作用的四个变量都塞进来，验它们确实**不再**起作用。 */
 function E(o) {
-  return { force: !!o.force, path: o.path || "/", seen: !!o.seen,
+  o = o || {};
+  return { path: o.path || "/", force: !!o.force, seen: !!o.seen,
            navType: o.navType || "navigate", internal: !!o.internal };
 }
 
-console.log("[进门：输入域名就该见到入口]");
-ok("直接输地址（无 referrer）→ 拦", shouldOpen(E({})) === true);
-ok("直接输地址、这一会话已进过门 → 还是拦（每次进门都见门）",
-   shouldOpen(E({ seen: true })) === true);
-ok("从搜索结果/外链进来 → 拦", shouldOpen(E({ internal: false, seen: true })) === true);
-ok("新标签页打开根地址 → 拦", shouldOpen(E({ navType: "navigate" })) === true);
-ok("刷新根地址 → 拦（刷新＝重新进门）", shouldOpen(E({ navType: "reload", seen: true })) === true);
-ok("/index.html 与 / 一视同仁", shouldOpen(E({ path: "/index.html" })) === true);
+console.log("[域名根地址 —— 每一次都是入口]");
+ok("直接输 sdeuniverses.com（无 referrer）→ 拦", shouldOpen(E({})) === true);
+ok("这一会话已经进过门 → 还是拦（不再记 seen）", shouldOpen(E({ seen: true })) === true);
+ok("刷新根地址 → 拦", shouldOpen(E({ navType: "reload", seen: true })) === true);
+ok("后退回到根地址 → 拦", shouldOpen(E({ navType: "back_forward", seen: true })) === true);
+ok("⚠ 站内点“首页”回来 → 一样拦（严格对应：这个地址就是入口）",
+   shouldOpen(E({ internal: true, seen: true })) === true);
+ok("从搜索结果/外链/书签进来 → 拦", shouldOpen(E({ internal: false, seen: true })) === true);
+ok("/index.html 与 / 一视同仁（边缘已 307 到 /，这里是双保险）",
+   shouldOpen(E({ path: "/index.html", seen: true })) === true);
 
-console.log("[站内走动：门不能变成路障]");
-ok("站内点回首页、已进过门 → 放行", shouldOpen(E({ internal: true, seen: true })) === false);
-ok("站内点到首页、但这一会话还没进过门 → 仍要拦",
-   shouldOpen(E({ internal: true, seen: false })) === true);
-ok("后退回首页、已进过门 → 放行",
-   shouldOpen(E({ navType: "back_forward", internal: true, seen: true })) === false);
-ok("后退回首页、还没进过门 → 拦",
-   shouldOpen(E({ navType: "back_forward", seen: false })) === true);
+console.log("[除了根地址，别的地址一概不是入口]");
+["/students/", "/column/x/", "/sde-wechat/", "/taste/chatsde/", "/books/m/48/", "/index.htm", "//"]
+  .forEach(function (p) { ok(p + " 不是入口", shouldOpen(E({ path: p })) === false); });
+ok("⚠ 内页带 ?portal=1 也不是入口（第二门牌已作废）",
+   shouldOpen(E({ path: "/students/", force: true })) === false);
+ok("内页不受 seen / navType 影响",
+   shouldOpen(E({ path: "/health/", seen: false, navType: "reload" })) === false);
 
-console.log("[别的页面一律放行]");
-["/students/", "/column/x/", "/sde-wechat/", "/taste/chatsde/", "/books/m/48/"].forEach(function (p) {
-  ok(p + " 不拦", shouldOpen(E({ path: p })) === false);
+console.log("[唯一对应：从前那些分叉必须真的从源码里消失]");
+/* 这条断言只挑“调用形态”，不挑关键词：源码的注释里还留着 /?portal=1 的来龙去脉，
+   而地址栏归一那段又要正当地读一次 location.search——按关键词断言必假失败。 */
+ok("⚠ 没有 ?portal=1 这个第二门牌了（不再按 search 判门）",
+   !/var FORCE/.test(src) && !/env\.force/.test(src) && !/portal=1\/\.test/.test(src));
+ok("location.search 只剩地址栏归一那一处用途",
+   (src.match(/location\.search/g) || []).length === 1);
+ok("⚠ 不再记「这一会话进过门没有」", !/sessionStorage/.test(src) && !/sde_portal_seen/.test(src));
+ok("⚠ 不再看 referrer 判站内", !/document\.referrer/.test(src) && !/sameOrigin\(/.test(src));
+ok("⚠ 不再看 navigation type（刷新/前进后退不再分家）",
+   !/getEntriesByType\(/.test(src) && !/performance\.navigation/.test(src));
+ok("shouldOpen 只吃 path 一个字段", /function shouldOpen\(env\) \{\s*return env\.path === "\/" \|\| env\.path === "\/index\.html";\s*\}/.test(src));
+
+console.log("[地址栏也归一：入口露面时地址正好是 sdeuniverses.com/]");
+ok("有 replaceState 归一这一段", /history\.replaceState\(null, "", "\/"\)/.test(src));
+ok("三种不干净的地址都覆盖到（路径不是 / · 带 query · 带 #hash）",
+   /location\.pathname !== "\/" \|\| location\.search \|\| location\.hash/.test(src));
+ok("⚠ 用 replaceState 而不是跳转（不多发一次请求、不在后退历史里多留一格）",
+   !/location\.replace\(/.test(src) && !/location\.href = "\/"/.test(src));
+ok("归一发生在开门判定之后（不开门的页面地址不许动）",
+   src.indexOf('history.replaceState') > src.indexOf("if (!shouldOpen(readEnv())) return;"));
+
+console.log("[站内那颗回入口的 △ 也指同一个地址]");
+[["public/assets/sde-modes.js", /var PORTAL = "\/";/],
+ ["public/wds-mode.js", /var PORTAL_URL = "\/";/]].forEach(function (t) {
+  var s = fs.readFileSync(path.join(ROOT, t[0]), "utf8");
+  ok(t[0] + " 指向域名根", t[1].test(s));
+  ok(t[0] + " 里没有 /?portal=1 残留", s.indexOf("/?portal=1") < 0);
 });
-ok("内页也不受 seen 影响", shouldOpen(E({ path: "/health/", seen: false })) === false);
-
-console.log("[?portal=1 永远能回看]");
-ok("根地址带 ?portal=1 → 拦", shouldOpen(E({ force: true, seen: true, internal: true })) === true);
-ok("内页带 ?portal=1 也拦（专供回看）",
-   shouldOpen(E({ force: true, path: "/students/" })) === true);
-
-console.log("[referrer 判本站：不许被仿冒域名骗过去]");
-var O = "https://sdeuniverses.com";
-ok("本站页面算站内", sameOrigin(O + "/column/x/", O) === true);
-ok("本站根算站内", sameOrigin(O + "/", O) === true);
-ok("空 referrer 不算站内", sameOrigin("", O) === false);
-ok("外站不算站内", sameOrigin("https://www.google.com/", O) === false);
-ok("⚠ 前缀相同的仿冒域名不算站内", sameOrigin("https://sdeuniverses.com.evil.example/", O) === false);
-ok("末尾无斜杠也认", sameOrigin(O, O) === true);
 
 console.log("[三大功能体系的去处]");
 ok("三个入口，一个不多一个不少", NODES.length === 3, NODES.map(function (n) { return n.k; }).join("/"));
@@ -84,18 +98,16 @@ console.log("[接线]");
 ok("真的用 shouldOpen(readEnv()) 把关", /if \(!shouldOpen\(readEnv\(\)\)\) return;/.test(src));
 ok("⚠ 不再是「一会话只拦一次」那句老判断",
    !/if \(!FORCE && sessionStorage\.getItem\(KEY\)\) return;/.test(src));
-ok("readEnv 读的是 referrer / sessionStorage / navigation 三样",
-   /document\.referrer/.test(src) && /sessionStorage\.getItem\(KEY\)/.test(src) &&
-   /getEntriesByType\("navigation"\)/.test(src));
-ok("老浏览器有 performance.navigation 兜底", /performance\.navigation\.type === 1 \? "reload"/.test(src));
-ok("点进任一入口都记一笔「进过门」", /a\.onclick = function \(\) \{ seen\(\);/.test(src));
-ok("「直接浏览 ›」与 Esc 也记", /skip\.onclick = function \(\) \{ seen\(\); close\(\); \}/.test(src) &&
-   /e\.key === "Escape"\) \{ seen\(\); close\(\); \}/.test(src));
+ok("三个出口（点入口 · 直接浏览 · Esc）都不再记账、也没留下空调用",
+   /a\.onclick = function \(\) \{ if \(!href\) close\(\); \}/.test(src) &&
+   /skip\.onclick = function \(\) \{ close\(\); \}/.test(src) &&
+   /e\.key === "Escape"\) \{ close\(\); \}/.test(src) &&
+   !/ seen\(\);/.test(src));
 
 console.log("[不允许先闪一下浏览页]");
 /* 输完域名回车，第一眼就该是入口。defer 是“整页解析完才执行”，
    浏览器会先把浏览页画出来再盖上门——这正是用户看见的那一闪。 */
-var IDX = fs.readFileSync(path.join(__dirname, "..", "public", "index.html"), "utf8");
+var IDX = fs.readFileSync(path.join(ROOT, "public", "index.html"), "utf8");
 var tag = (IDX.match(/<script[^>]*sde-portal\.js[^>]*>/) || [""])[0];
 ok("首页确实引了入口脚本", !!tag, tag);
 ok("⚠ 引入时**不得**带 defer（defer = 先渲染整页再执行 = 必闪）", !/\bdefer\b/.test(tag), tag);

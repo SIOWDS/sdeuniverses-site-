@@ -85,7 +85,9 @@ console.log("① 浏览态：顶栏紧跟「问WDS」插一颗「SDE 微信」")
   ok(!nav.querySelector(".sdemx"), "浏览态不画三段条——人就在浏览态，顶栏要的是通往另外两态的门");
   ok(!!env.head.querySelector("style"), "样式自带，不依赖页面");
   const home = nav.querySelector(".sdemx-home");
-  ok(!!home && home.href === "/?portal=1", "顶栏有一颗回入口页的 △，实得 " + (home && home.href));
+  // 2026-07-31 改口径：入口严格且唯一地对应域名根地址，第二门牌 /?portal=1 作废，
+  // 这颗 △ 因此改指 "/"（根地址每次打开都是入口，见 tools/sim_portal_gate.js）。
+  ok(!!home && home.href === "/", "顶栏有一颗回入口页的 △，指的是域名根，实得 " + (home && home.href));
   ok(!!home && nav.children.indexOf(home) === nav.children.indexOf(pills[1]) + 1, "△ 排在两颗药丸之后");
   // 2026-07-31 改口径：这颗 △ 上面要写「系统入口」。原来的断言是 textContent === "△"
   // （固化"图形按钮不带字"），已随口径作废。保住的是原意里仍成立的那半句——**一颗即可**：
