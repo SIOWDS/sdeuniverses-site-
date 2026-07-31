@@ -25,9 +25,10 @@ function extract(re, label) {
 }
 const src = [
   extract(/function cdSection\(txt,names\)\{[\s\S]*?\n}/, "cdSection"),
+  extract(/var VAULT_PICKS = \[[\s\S]*?\n\];/, "VAULT_PICKS"),
 ].join("\n");
 const box = {};
-new Function("box", src + "\nbox.cdSection=cdSection;")(box);
+new Function("box", src + "\nbox.cdSection=cdSection;box.VAULT_PICKS=VAULT_PICKS;")(box);
 
 /* 一份像样的典范骨架（照 worker 里 collide 的八节要求） */
 const PARA = `一、典范名：划界者的拇指不在指纹里
@@ -91,6 +92,46 @@ ok("每张卡有自己的消息位，不会互相覆盖",
   js.indexOf("cdmsg'+ix+'") >= 0 && js.indexOf('getElementById("cdmsg"+ix)') >= 0);
 ok("页面引了近邻库模块", /assets\/sde-nbr\.js/.test(html));
 ok("注释写明这条缝此前是断的、为什么要接", /只活在一次会话的内存里/.test(js));
+
+group("八、精华要点自动进库存");
+{
+  // 用户：「SDE对话里面产生出来的『精华要点』需要**自动**进入『库存』」
+  const SYNTH = `一、最终承重命题：任何划界者都无法在自己划出的界内安置自己的划界动作
+二、它是怎么涌现出来的：换母学科，从法学换到控制论
+三、落选典范的可回收零件：……
+四、辨别面与二维辨别格：把「规则适用于对象」与「规则适用于自身」分开
+五、可裁决判据与可观测代理：找到一条能规定自身适用条件的规则，本判断即失效
+六、敌意最近邻：卢曼、冯·福斯特
+七、两条独立证伪条件：……
+八、经验材料：……
+九、评分卡开出的作业：……
+十、明确不写什么：……`;
+  ok("挑单里覆盖了两套栏目名（提炼档九栏／涌现档十栏）",
+    box.VAULT_PICKS.length >= 4 && box.VAULT_PICKS.some((x) => x[1].indexOf("最终承重命题") >= 0)
+    && box.VAULT_PICKS.some((x) => x[1].indexOf("候选承重命题") >= 0));
+  const got = box.VAULT_PICKS.map((x) => box.cdSection(SYNTH, x[1])).filter((t) => t && t.length >= 6);
+  ok("从十栏里真抽得出要点", got.length >= 3, got.length);
+  ok("抽的是承重命题那一句", /任何划界者都无法/.test(got[0]), got[0]);
+  ok("★ 抽出来的不带下一栏的内容", !/它是怎么涌现/.test(got[0]));
+  ok("辨别面与判据也抽得到",
+    got.some((t) => /规则适用于对象/.test(t)) && got.some((t) => /能规定自身适用条件/.test(t)));
+
+  ok("两个完成点都挂了（提炼档与涌现档）",
+    js.indexOf("autoVault(brief, '提炼精华')") >= 0 && js.indexOf("autoVault(brief, '综合提炼')") >= 0);
+  ok("★ 自动不等于静默：存了几条、去哪看都写出来",
+    /已自动存进思想库存 " \+ okn \+ " 条/.test(js) && /去「💡 思想库存」看/.test(js));
+  ok("并告诉读者存错了能删（自动写入必须可撤）", /存错了可以在那里删/.test(js));
+  // 只在 autoVault 这一段里查——整页别处另有功能用「请登录」字样，全局查会假失败
+  const AV = (js.match(/function autoVault\(text, kindLabel\)\{[\s\S]*?\n\}/) || [""])[0];
+  ok("★ 未登录不偷偷存，且给的是可点的去处不是「请登录」",
+    /这份精华要点还没进库存/.test(AV) && /<a href="\/sde-wechat\/"/.test(AV) && AV.indexOf("请登录") < 0);
+  ok("取不到要点时如实说本次没存，不假装存了",
+    /没解析出可入库的要点/.test(js) && /本次没往库存里存/.test(js));
+  ok("同一份里两栏抄到同一句只存一条", /if\(seen\[t\]\) continue;/.test(js));
+  ok("每条按库存上限先裁到 200 字", /t = t\.slice\(0, 200\);/.test(js));
+  ok("出处带上来源与轮数（日后能追是哪一场问对）", /kindLabel \+ " · " \+ turns\.length \+ " 轮问对"/.test(js));
+  ok("重复存过的条数单独报（服务端按人去重）", /其中 " \+ dup \+ " 条早就存过/.test(js));
+}
 
 console.log("\n" + "═".repeat(52));
 console.log("  通过 " + pass + " / " + (pass + fail) + (fail ? "   ✗ 失败 " + fail : "   全绿"));

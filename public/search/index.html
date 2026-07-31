@@ -796,6 +796,7 @@ function doDistill(){
     stat.textContent='✓ 论文入口资料已就绪（'+brief.length+' 字，出自 '+turns.length+' 轮问对）· 现在点「成文一篇」，论文将以它为起点逐条兑现。';
   }).catch(function(e){
     box.className='ans';
+    autoVault(brief, '提炼精华');
     stat.textContent='✗ 提炼失败：'+errText(e);
   }).finally(function(){
     distilling=false; btn.disabled=false;
@@ -1351,6 +1352,62 @@ function cdSection(txt,names){
    候选卡要三段硬门，而典范名／承重命题这类东西哪怕只有一句也值得留下来——
    否则它只活在这一次会话的内存里，刷新即失。存进去之后，
    朋友圈「说点什么」能从里面挑，够硬的还能在微信里一键升格成候选卡。 */
+/* ═══ 精华要点 → 自动进库存 ═══
+   用户定的：「SDE对话里面产生出来的『精华要点』需要**自动**进入『库存』」。
+   「精华要点」＝这条产线的枢纽产物《论文入口资料》——两个来源、两套栏目：
+     提炼档（doDistill，九栏）与涌现档（综合提炼，十栏）。两处完成点都挂。
+   三条纪律：
+   ① **自动不等于静默**——存了几条、去哪看，必须当场说出来；库存里随时能删。
+   ② **未登录不偷偷存**（库存要有作者）；退化成一句带去处的提示，不是一句"请登录"。
+   ③ **取不到就不存，绝不编造**；同一份提炼重跑，服务端按人去重，不会灌成一堆。 */
+var VAULT_PICKS = [
+  ["claim", ["一、最终承重命题", "最终承重命题", "承重命题", "候选承重命题"]],
+  ["claim", ["四、辨别面与二维辨别格", "辨别面与二维辨别格", "它切开的辨别面", "辨别面"]],
+  ["note",  ["五、可裁决判据与可观测代理", "五、可裁决判据", "可裁决判据"]],
+  ["note",  ["分离点", "可裁决的分离线", "分离线"]],
+  ["name",  ["一、典范名", "典范名"]]
+];
+function autoVault(text, kindLabel){
+  var stat = document.getElementById("briefStat");
+  var tip = document.getElementById("briefVault");
+  if(!tip){
+    tip = document.createElement("div");
+    tip.id = "briefVault";
+    tip.style.cssText = "font-size:0.78rem;color:var(--muted);margin-top:6px;line-height:1.7";
+    if(stat && stat.parentNode) stat.parentNode.insertBefore(tip, stat.nextSibling);
+  }
+  var cred = cdCred();
+  if(!cred){
+    tip.innerHTML = '这份精华要点还没进库存——先在 <a href="/sde-wechat/" target="_blank">SDE 微信</a> 登录一次（全站通用），'
+      + '以后每次提炼都会自动存进「💡 思想库存」，发朋友圈和立候选卡都能从那里取。';
+    return;
+  }
+  var jobs = [], seen = {};
+  for(var i=0;i<VAULT_PICKS.length;i++){
+    var t = cdSection(text, VAULT_PICKS[i][1]);
+    if(!t || t.length < 6) continue;              // 取不到就不存
+    t = t.slice(0, 200);
+    if(seen[t]) continue;                          // 同一份里两栏抄到同一句，只存一条
+    seen[t] = 1;
+    jobs.push({ kind: VAULT_PICKS[i][0], text: t });
+  }
+  if(!jobs.length){ tip.textContent = "这份提炼里没解析出可入库的要点（栏目名可能变了），本次没往库存里存。"; return; }
+  tip.textContent = "正在把精华要点存进库存…";
+  var src = kindLabel + " · " + turns.length + " 轮问对";
+  Promise.all(jobs.map(function(j){
+    return fetch("/api/im", { method:"POST", headers:{"content-type":"application/json"},
+      body: JSON.stringify({ credential: cred, op:"vt", a:"add", text:j.text, kind:j.kind, src:src }) })
+      .then(function(r){ return r.json(); }).catch(function(){ return { ok:false }; });
+  })).then(function(rs){
+    var okn = rs.filter(function(x){ return x && x.ok; }).length;
+    var dup = rs.filter(function(x){ return x && x.dup; }).length;
+    if(!okn){ tip.textContent = "要点没存进库存（可能是登录过期），可稍后在微信里手动补。"; return; }
+    tip.innerHTML = "已自动存进思想库存 " + okn + " 条"
+      + (dup ? ("（其中 " + dup + " 条早就存过）") : "")
+      + ' → <a href="/sde-wechat/" target="_blank">去「💡 思想库存」看</a>'
+      + '　<span style="color:var(--muted)">存错了可以在那里删。</span>';
+  });
+}
 function toVault(ix){
   var p=paradigms[ix]; if(!p)return;
   var msg=document.getElementById("cdmsg"+ix);
@@ -1541,6 +1598,7 @@ function doEmerge(again){
         if(brief.length<300){ bstat.textContent='⚠ 综合提炼产出过短（'+brief.length+' 字），本次不作为论文入口，请重试。'; brief=''; return; }
         bstat.textContent='✓ 综合提炼完成（'+brief.length+' 字）· 出自 '+turns.length+' 轮问对 → '+paradigms.length+' 个候选典范 → 择优 → 提炼。现在点「成文一篇」，论文将以它为起点逐条兑现。';
       });
+        autoVault(brief, '综合提炼');
   }).catch(function(e){
     stat.textContent='✗ '+errText(e);
     renderParadigms(paradigms.length?0:-1);
