@@ -259,6 +259,11 @@ def paper_iq(idx):
     m = re.search(r'创新智商标注[\s\S]{0,600}?综合分为\s*(\d{3})', t)
     if m:
         return int(m.group(1)), 'blind'
+    # 「SDE 创新智商 138　全文盲评 · 待独立复核」/「…结构化盲评…」
+    # 分数后面紧跟口径标签的写法：标了盲评就是盲评，不能落进 legacy 兜底。
+    m = re.search(r'创新智商[：:\s\u3000]*(\d{3})[\s\u3000]*(?:全文盲评|结构化盲评|盲评)', t)
+    if m:
+        return int(m.group(1)), 'blind'
     m = re.search(r'创新智商[：:\s]*(\d{3})', t)
     if m:
         return int(m.group(1)), 'legacy'
