@@ -92,5 +92,39 @@ ok("点进任一入口都记一笔「进过门」", /a\.onclick = function \(\) 
 ok("「直接浏览 ›」与 Esc 也记", /skip\.onclick = function \(\) \{ seen\(\); close\(\); \}/.test(src) &&
    /e\.key === "Escape"\) \{ seen\(\); close\(\); \}/.test(src));
 
+console.log("[不允许先闪一下浏览页]");
+/* 输完域名回车，第一眼就该是入口。defer 是“整页解析完才执行”，
+   浏览器会先把浏览页画出来再盖上门——这正是用户看见的那一闪。 */
+var IDX = fs.readFileSync(path.join(__dirname, "..", "public", "index.html"), "utf8");
+var tag = (IDX.match(/<script[^>]*sde-portal\.js[^>]*>/) || [""])[0];
+ok("首页确实引了入口脚本", !!tag, tag);
+ok("⚠ 引入时**不得**带 defer（defer = 先渲染整页再执行 = 必闪）", !/\bdefer\b/.test(tag), tag);
+ok("⚠ 也不得带 async（同样不保证在 <body> 之前跑）", !/\basync\b/.test(tag), tag);
+ok("脚本写在 </head> 之前（正文一行都没开始渲染）",
+   IDX.indexOf(tag) < IDX.indexOf("</head>"));
+
+ok("有 lockPage / unlockPage 一对", /function lockPage\(\)/.test(src) && /function unlockPage\(\)/.test(src));
+ok("⚡ 判定要开门之后立刻按住（lockPage 在 mount 之前就调）",
+   src.indexOf("\n  lockPage();") > src.indexOf("if (!shouldOpen(readEnv())) return;") &&
+   src.indexOf("\n  lockPage();") < src.indexOf("function mount()"));
+ok("不开门就不按（return 在 lockPage 之前）",
+   src.indexOf("if (!shouldOpen(readEnv())) return;") < src.indexOf("\n  lockPage();"));
+ok("按住的是页面本体、放行的是入口那一层",
+   /html\.sdep-hold body\{visibility:hidden\}/.test(src) &&
+   /html\.sdep-hold body \.sdep\{visibility:visible\}/.test(src));
+ok("按住期间背景就是入口的暗底（不会先白一下）",
+   /html\.sdep-hold\{background:#0C0906;overflow:hidden\}/.test(src));
+ok("用 visibility 而不是 display（揭开时不用重排）",
+   !/html\.sdep-hold body\{display:none/.test(src));
+ok("入口一上屏就松手", /document\.body\.appendChild\(box\);\s*\n\s*unlockPage\(\);/.test(src));
+ok("按住着进场时不做整层淡入（否则那半秒会把下面透出来）",
+   /box\.className = HOLD \? "sdep nofade" : "sdep";/.test(src) && /\.sdep\.nofade\{animation:none\}/.test(src));
+ok("⚡ 有看门狗兜底（mount 没跑成也不会一直黑着）", /setTimeout\(unlockPage, \d+\);/.test(src));
+ok("⚡ <body> 一出现就挂，不等 DOMContentLoaded（首页 HTML 四十多万字符）",
+   /function whenBody\(\)[\s\S]{0,140}document\.body\) \{ mount\(\); return; \}/.test(src) &&
+   !/addEventListener\("DOMContentLoaded", mount\)/.test(src));
+ok("语言判定推迟到用的时候（现在脚本跑在 <body> 之前，模块层问 body 会问到空）",
+   /var L = null;/.test(src) && /if \(L === null\) L = lang\(\);/.test(src));
+
 console.log("\n" + pass + " PASS / " + fail + " FAIL");
 process.exit(fail ? 1 : 0);

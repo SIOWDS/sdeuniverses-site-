@@ -70,6 +70,36 @@
   }
   if (!shouldOpen(readEnv())) return;
 
+  /* 输完域名回车，第一眼就该是入口，而不是“先闪一下浏览页再盖上门”。
+     脚本已改成同步执行（index.html 里去掉了 defer），所以这一句跑在 <body> 落地**之前**：
+     先把页面本体按住（visibility:hidden）、只放 .sdep 这一层出来，等入口上屏再松手。
+     用 visibility 而不是 display：布局照算、图片照加载，揭开时不用重排。 */
+  var HOLD = false;
+  function lockPage() {
+    try {
+      var st = document.createElement("style");
+      st.id = "sdep-lock";
+      st.textContent =
+        "html.sdep-hold{background:#0C0906;overflow:hidden}" +
+        "html.sdep-hold body{visibility:hidden}" +
+        "html.sdep-hold body .sdep{visibility:visible}";
+      (document.head || document.documentElement).appendChild(st);
+      document.documentElement.className += " sdep-hold";
+      HOLD = true;
+    } catch (e) {}
+  }
+  function unlockPage() {
+    if (!HOLD) return;
+    HOLD = false;
+    try {
+      var el = document.documentElement;
+      el.className = el.className.replace(/\s*\bsdep-hold\b/g, "");
+    } catch (e) {}
+  }
+  lockPage();
+  // 看门狗：万一 mount 没跑成（脚本报错、DOMContentLoaded 没来），页面不能就这么一直黑着
+  setTimeout(unlockPage, 5000);
+
   function lang() {
     try {
       var v = localStorage.getItem("sde_wds_lang");
@@ -81,8 +111,12 @@
     } catch (e) {}
     return "zh";
   }
-  var L = lang();
-  function T(zh, en) { return L === "en" ? en : zh; }
+  // 推迟到真要用的时候再问：脚本现在同步跑在 <body> 之前，模块层就问会问到空
+  var L = null;
+  function T(zh, en) {
+    if (L === null) L = lang();
+    return L === "en" ? en : zh;
+  }
 
   // 顺时针：上 → 右下 → 左下，正好是 1·2·3。c=这一态的色相。
   var NODES = [
@@ -173,6 +207,9 @@
     "background:#0C0906;color:#E8E4DA;overflow:hidden;" +
     "font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;animation:sdepIn .5s ease both}" +
     "@keyframes sdepIn{from{opacity:0}to{opacity:1}}" +
+    /* 被 lockPage 按住着进场时不做整层淡入：背景本来就已经是黑的，
+       再淡一次反而会在那半秒里把下面的页面透出来。内部各元素自己的入场动画照旧。 */
+    ".sdep.nofade{animation:none}" +
     ".sdep.out{animation:sdepOut .3s ease both}" +
     "@keyframes sdepOut{from{opacity:1}to{opacity:0;visibility:hidden}}" +
     /* 三团角落微光 ＋ 中心暗晕：画面四周有色，中心始终读得出字 */
@@ -411,7 +448,7 @@
     document.head.appendChild(st);
 
     var box = document.createElement("div");
-    box.className = "sdep";
+    box.className = HOLD ? "sdep nofade" : "sdep";
     box.setAttribute("role", "dialog");
     box.setAttribute("aria-label", T("\u5165\u53e3\uff1a\u4e09\u4e2a\u677f\u5757", "Entry: three sections"));
 
@@ -669,6 +706,7 @@
     box.appendChild(foot);
 
     document.body.appendChild(box);
+    unlockPage();          // 入口已经盖在最上面且不透明，可以把页面本体放回来了
     drawRing();
     startFire();                                   // 上屏即按实测尺寸重画（同步，赶在描线动画开始之前）
     window.addEventListener("resize", drawRing);
@@ -697,6 +735,10 @@
   }
   function seen() { try { sessionStorage.setItem(KEY, "1"); } catch (e) {} }
 
-  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", mount);
-  else mount();
+  /* 尽早上屏：首页 HTML 有四十多万字符，等 DOMContentLoaded 会先黑屏白等一段。
+     <body> 一出现就挂——入口自带样式，不依赖页面的 CSS 加载完。 */
+  (function whenBody() {
+    if (document.body) { mount(); return; }
+    setTimeout(whenBody, 4);
+  })();
 })();

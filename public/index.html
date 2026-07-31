@@ -394,8 +394,11 @@ body.zh .en-only{display:none}
 </style>
 <link rel="stylesheet" href="/wds-glow.css">
 <!-- 入口页：打开网站先见到的那一层（三角形 · 三个入口）。做成首页上的一层，
-     首页地址与正文都不动；选「SDE 浏览」是就地揭开下面这一页，不再加载一次。 -->
-<script src="/assets/sde-portal.js" defer></script>
+     首页地址与正文都不动；选「SDE 浏览」是就地揭开下面这一页，不再加载一次。
+     ⚠ **不允许加 defer/async**：defer 是“整页解析完才执行”，浏览器会先把浏览页
+     画出来、再盖上入口，输完域名回车就会看见闪一下。同步执行，它才能在 <body>
+     落地之前先把页面按住（见 sde-portal.js 里的 lockPage）。 -->
+<script src="/assets/sde-portal.js"></script>
 </head>
 <body class="zh">
 

@@ -177,7 +177,8 @@ ok("CSS 有 .sdep-tri.done{stroke-dasharray:none", /\.sdep-tri\.done\{stroke-das
 ok("animationend 绑了 doneDraw", /ring\.addEventListener\("animationend", doneDraw\)/.test(src));
 ok("有定时器兜底（animationend 没触发也不会断着）", /setTimeout\(doneDraw, \d+\)/.test(src));
 ok("reduced-motion 下也不留虚线", /prefers-reduced-motion:reduce\)\{\.sdep-tri\{animation:none;stroke-dasharray:none/.test(src));
-ok("上屏后立即按实测尺寸重画", /document\.body\.appendChild\(box\);\s*\n\s*drawRing\(\);/.test(src));
+ok("上屏后立即按实测尺寸重画（中间只允许插一两句）",
+   /document\.body\.appendChild\(box\);[\s\S]{0,140}?drawRing\(\);/.test(src));
 ok("resize 重画", /addEventListener\("resize", drawRing\)/.test(src));
 ok("关闭时撤掉 resize 监听（不漏）", /removeEventListener\("resize", drawRing\)/.test(src));
 ok("⚠ 不许再用 getTotalLength 当 dasharray（viewBox 单位，会断）", !/ring\.getTotalLength\(\)/.test(src));
