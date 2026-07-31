@@ -7,8 +7,22 @@
  *   · 首页地址不动 —— 全站几千处 href="/"、站内索引、外部链接、SEO 落地页全都不用迁；
  *   · 选「浏览」是当场揭开下面那一页，不用再加载一次首页（一次点击换一次白屏是很亏的）；
  *   · 首页正文仍在 DOM 里，抓取与无脚本环境照常可读。
- * 一次会话只拦一次（sessionStorage）：入口页的用处是"进门时分个道"，
- * 不是每次回首页都拦一道。想再看：/?portal=1 。
+ * 一次会话只拦一次（sessionStorage）；想再看：/?portal=1 。
+ *
+ * ── 画面（多样 · 统一 · 和谐）──
+ * 多样：三个入口各有各的色相与各自的图案母题——
+ *       浏览＝青（互联网的连接：节点与连线的网）
+ *       对话＝金（大模型的活力：脉冲弧、星芒、声波）
+ *       微信＝紫（社群的信望爱：三环相扣、心、向上的弧）
+ * 统一：三色只出自同一条暖黑底上的同一套明度；三角形那一条边用一支渐变从青经金到紫
+ *       走完全程——一条线，三种颜色，连续不断。
+ * 和谐：图案一律压在极低不透明度、只在四周，中心留给字；三处角落各一团同色微光把
+ *       画面兜圆，中心再压一层暗晕保证字始终读得出。
+ *
+ * 两个坐标系分开，别混：
+ *   · 三角形与三个入口共用一组百分比坐标 NODES（svg 用 preserveAspectRatio="none" 拉满，
+ *     所以顶点与 HTML 节点严丝合缝）；
+ *   · 四周的图案在另一张 svg 上，用 "xMidYMid slice"——圆必须是圆的，不能跟着拉扁。
  */
 (function () {
   "use strict";
@@ -35,48 +49,138 @@
   var L = lang();
   function T(zh, en) { return L === "en" ? en : zh; }
 
-  // 顺时针：上 → 右下 → 左下，正好是 1·2·3
+  // 顺时针：上 → 右下 → 左下，正好是 1·2·3。c=这一态的色相。
   var NODES = [
-    { k: "browse", x: 50, y: 9, icon: "\u25a4", zh: "SDE \u6d4f\u89c8", en: "SDE Browse",
+    { k: "browse", x: 50, y: 15, c: "#4FB6B2", icon: "\u25a4", zh: "SDE \u6d4f\u89c8", en: "SDE Browse",
       zhS: "\u4e13\u680f \u00b7 \u4e13\u8457 \u00b7 \u5b66\u5458 \u00b7 \u5168\u7ad9\u68c0\u7d22", enS: "Columns \u00b7 Books \u00b7 Students \u00b7 Search" },
-    { k: "wds", x: 91, y: 84, icon: "\u2726", zh: "SDE \u5bf9\u8bdd", en: "SDE Dialogue",
+    { k: "wds", x: 88, y: 82, c: "#E0B65C", icon: "\u2726", zh: "SDE \u5bf9\u8bdd", en: "SDE Dialogue",
       zhS: "\u95ee WDS\uff1a\u5168\u7ad9\u95ee\u7b54\u4e0e SDE \u5bf9\u8c08", enS: "Ask WDS about anything here" },
-    { k: "im", x: 9, y: 84, icon: "\ud83d\udcac", zh: "SDE \u5fae\u4fe1", en: "SDE Messenger",
+    { k: "im", x: 12, y: 82, c: "#A981C4", icon: "\ud83d\udcac", zh: "SDE \u5fae\u4fe1", en: "SDE Messenger",
       zhS: "\u7fa4\u804a \u00b7 \u79c1\u804a \u00b7 \u4f1a\u8bae \u00b7 \u5e7f\u573a", enS: "Groups \u00b7 DMs \u00b7 Meetings \u00b7 Plaza" },
   ];
   var GO = { browse: "", im: "/sde-wechat/", wds: "/taste/wds-chat/" };   // browse 留空＝就地揭开
 
   var CSS =
     ".sdep{position:fixed;inset:0;z-index:99995;display:flex;flex-direction:column;align-items:center;justify-content:center;" +
-    "background:radial-gradient(120% 90% at 50% 0%,#1a150f 0%,#0F0B07 62%);color:#E8E4DA;" +
-    "font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;animation:sdepIn .45s ease both}" +
+    "background:#0C0906;color:#E8E4DA;overflow:hidden;" +
+    "font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;animation:sdepIn .5s ease both}" +
     "@keyframes sdepIn{from{opacity:0}to{opacity:1}}" +
     ".sdep.out{animation:sdepOut .3s ease both}" +
     "@keyframes sdepOut{from{opacity:1}to{opacity:0;visibility:hidden}}" +
-    ".sdep-hd{text-align:center;margin-bottom:6px}" +
-    ".sdep-hd b{display:block;font:700 15px/1 inherit;letter-spacing:3px;color:#D4B25E}" +
-    ".sdep-hd i{display:block;font-style:normal;font-size:12.5px;color:#8B98A5;margin-top:9px;letter-spacing:.5px}" +
-    ".sdep-stage{position:relative;width:min(78vw,560px);height:min(66vh,460px);margin:8px 0 4px}" +
-    ".sdep-stage svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}" +
-    ".sdep-tri{fill:none;stroke:rgba(212,178,94,.42);stroke-width:1.2;stroke-dasharray:1000;" +
-    "animation:sdepDraw 1.5s ease .15s both}" +
+    /* 三团角落微光 ＋ 中心暗晕：画面四周有色，中心始终读得出字 */
+    ".sdep-glow{position:absolute;inset:0;pointer-events:none;" +
+    "background:radial-gradient(46% 40% at 50% 6%,rgba(79,182,178,.20),transparent 70%)," +
+    "radial-gradient(46% 42% at 94% 92%,rgba(224,182,92,.20),transparent 70%)," +
+    "radial-gradient(46% 42% at 6% 92%,rgba(169,129,196,.20),transparent 70%)," +
+    "radial-gradient(58% 46% at 50% 56%,rgba(10,8,5,.86),transparent 72%)}" +
+    ".sdep-deco{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;opacity:.9}" +
+    ".sdep-stage{position:relative;width:min(84vw,720px);height:min(62vh,440px);margin:0 0 18px}" +
+    ".sdep-tri-svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}" +
+    ".sdep-tri{fill:none;stroke:url(#sdepEdge);stroke-width:1.3;stroke-linejoin:round;stroke-dasharray:1000;" +
+    "animation:sdepDraw 1.6s ease .15s both}" +
     "@keyframes sdepDraw{from{stroke-dashoffset:1000}to{stroke-dashoffset:0}}" +
-    ".sdep-node{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:8px;" +
-    "text-decoration:none;color:#E8E4DA;cursor:pointer;background:none;border:none;padding:0;font:inherit;" +
-    "animation:sdepPop .5s ease both}" +
+    ".sdep-node{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:9px;" +
+    "text-decoration:none;color:#E8E4DA;cursor:pointer;background:none;border:none;padding:0;font:inherit;outline:none;" +
+    "animation:sdepPop .55s ease both}" +
     "@keyframes sdepPop{from{opacity:0;transform:translate(-50%,-50%) scale(.86)}to{opacity:1;transform:translate(-50%,-50%) scale(1)}}" +
-    ".sdep-dot{width:70px;height:70px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:26px;" +
-    "border:1px solid rgba(212,178,94,.5);background:rgba(212,178,94,.09);transition:all .18s}" +
-    ".sdep-node:hover .sdep-dot,.sdep-node:focus-visible .sdep-dot{background:#D4B25E;color:#0F0B07;transform:scale(1.07);" +
-    "box-shadow:0 0 0 8px rgba(212,178,94,.12)}" +
-    /* 三角形正中的字号：letter-spacing 会在最后一个字后面也加一份，右边看着就偏了，所以补一个等量的负边距把它抵掉 */
-    ".sdep-mid{position:absolute;transform:translate(-50%,-50%);pointer-events:none;font:700 clamp(20px,3.8vw,38px)/1 inherit;letter-spacing:.34em;margin-right:-.34em;color:#D4B25E;text-shadow:0 0 26px rgba(212,178,94,.28);white-space:nowrap;animation:sdepPop .6s ease 1s both}" +
-    ".sdep-nm{font:700 14.5px/1 inherit;letter-spacing:.5px;white-space:nowrap}" +
+    ".sdep-dot{width:74px;height:74px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:27px;" +
+    "border:1px solid var(--c);color:var(--c);background:rgba(255,255,255,.03);transition:all .2s;" +
+    "box-shadow:0 0 0 0 rgba(255,255,255,0),inset 0 0 26px -14px var(--c)}" +
+    ".sdep-node:hover .sdep-dot,.sdep-node:focus-visible .sdep-dot{background:var(--c);color:#0C0906;transform:scale(1.08);" +
+    "box-shadow:0 0 34px -6px var(--c)}" +
+    ".sdep-node:focus-visible .sdep-nm{text-decoration:underline}" +
+    ".sdep-nm{font:700 15px/1 inherit;letter-spacing:1px;white-space:nowrap;color:var(--c)}" +
     ".sdep-sub{font-size:11.5px;color:#8B98A5;white-space:nowrap}" +
-    ".sdep-skip{margin-top:14px;background:none;border:none;color:#8B98A5;font:12.5px/1 inherit;cursor:pointer;padding:8px 12px}" +
-    ".sdep-skip:hover{color:#D4B25E}" +
-    "@media(max-width:620px){.sdep-stage{width:88vw;height:58vh}.sdep-dot{width:56px;height:56px;font-size:21px}" +
+    /* 正中：letter-spacing 会在末字后面也加一份，右边看着就偏了，补一个等量负边距抵掉 */
+    ".sdep-mid{position:absolute;transform:translate(-50%,-50%);pointer-events:none;" +
+    "font:700 clamp(21px,3.9vw,40px)/1 inherit;letter-spacing:.34em;margin-right:-.34em;" +
+    "color:#F0DCA6;text-shadow:0 0 30px rgba(224,182,92,.35);white-space:nowrap;" +
+    "animation:sdepPop .6s ease 1s both}" +
+    ".sdep-mid2{position:absolute;transform:translate(-50%,-50%);pointer-events:none;white-space:nowrap;" +
+    "font:600 10.5px/1 inherit;letter-spacing:.42em;margin-right:-.42em;color:#8B7B5E;" +
+    "animation:sdepPop .6s ease 1.2s both}" +
+    ".sdep-foot{position:relative;text-align:center;animation:sdepPop .6s ease 1.35s both}" +
+    ".sdep-foot i{display:block;font-style:normal;font-size:12px;color:#7C8894;letter-spacing:.5px;margin-bottom:10px}" +
+    ".sdep-skip{background:none;border:1px solid rgba(255,255,255,.14);border-radius:999px;color:#9AA6B2;" +
+    "font:12.5px/1 inherit;cursor:pointer;padding:9px 18px;transition:all .18s}" +
+    ".sdep-skip:hover{color:#F0DCA6;border-color:rgba(240,220,166,.5)}" +
+    "@media(max-width:620px){.sdep-stage{width:92vw;height:56vh}.sdep-dot{width:58px;height:58px;font-size:22px}" +
     ".sdep-nm{font-size:13px}.sdep-sub{display:none}}";
+
+  var NS = "http://www.w3.org/2000/svg";
+  function S(tag, attrs) {
+    var e = document.createElementNS(NS, tag);
+    for (var k in attrs) e.setAttribute(k, attrs[k]);
+    return e;
+  }
+  /* 四周的图案：三个母题各占一角，全部压在低不透明度上。
+     这张 svg 用 slice，圆才是圆的——三角形那张是 none（要跟着拉满），两者不能共用。 */
+  function deco() {
+    var svg = S("svg", { class: "sdep-deco", viewBox: "0 0 100 100", preserveAspectRatio: "xMidYMid slice" });
+    svg.setAttribute("aria-hidden", "true");
+
+    // ① 互联网的连接（青）：一张会呼吸的节点网，铺在上方两侧
+    var net = S("g", { stroke: "#4FB6B2", fill: "#4FB6B2", "stroke-width": ".18", opacity: ".34" });
+    var pts = [[6, 10], [15, 5], [23, 14], [12, 20], [30, 7], [34, 18], [78, 8], [87, 4], [93, 13], [82, 18], [70, 14], [95, 22]];
+    var links = [[0, 1], [1, 2], [2, 3], [0, 3], [1, 4], [4, 5], [2, 5], [6, 7], [7, 8], [8, 9], [6, 9], [6, 10], [8, 11], [9, 11]];
+    links.forEach(function (l) {
+      net.appendChild(S("line", { x1: pts[l[0]][0], y1: pts[l[0]][1], x2: pts[l[1]][0], y2: pts[l[1]][1] }));
+    });
+    pts.forEach(function (p, i) {
+      var c = S("circle", { cx: p[0], cy: p[1], r: (i % 3 === 0 ? 1.05 : .62) });
+      if (i % 4 === 0) {
+        var an = S("animate", { attributeName: "opacity", values: "1;.28;1", dur: (3.6 + i * .4) + "s", repeatCount: "indefinite" });
+        c.appendChild(an);
+      }
+      net.appendChild(c);
+    });
+    svg.appendChild(net);
+
+    // ② 大模型对话的活力（金）：脉冲弧 ＋ 星芒 ＋ 声波，落在右下
+    var spark = S("g", { opacity: ".36" });
+    [7, 11, 15.5].forEach(function (r, i) {
+      var a = S("circle", { cx: 92, cy: 74, r: r, fill: "none", stroke: "#E0B65C", "stroke-width": ".2", "stroke-dasharray": "2.2 3.4" });
+      a.appendChild(S("animate", { attributeName: "opacity", values: ".2;.75;.2", dur: (4 + i) + "s", begin: (i * .8) + "s", repeatCount: "indefinite" }));
+      spark.appendChild(a);
+    });
+    spark.appendChild(S("path", {
+      d: "M92 66.4 L93.2 72.6 L99.4 73.8 L93.2 75 L92 81.2 L90.8 75 L84.6 73.8 L90.8 72.6 Z",
+      fill: "#E0B65C", opacity: ".8",
+    }));
+    for (var i = 0; i < 7; i++) {                                  // 声波：一排高低不等的短竖线
+      var h = 1.6 + (i % 3) * 1.5 + (i === 3 ? 2.2 : 0);
+      var bar = S("rect", { x: 70 + i * 2.2, y: 92 - h, width: ".72", height: h, rx: ".36", fill: "#E0B65C" });
+      bar.appendChild(S("animate", { attributeName: "height", values: h + ";" + (h * 2.1) + ";" + h, dur: (1.5 + i * .18) + "s", repeatCount: "indefinite" }));
+      bar.appendChild(S("animate", { attributeName: "y", values: (92 - h) + ";" + (92 - h * 2.1) + ";" + (92 - h), dur: (1.5 + i * .18) + "s", repeatCount: "indefinite" }));
+      spark.appendChild(bar);
+    }
+    svg.appendChild(spark);
+
+    // ③ 社群的信望爱（紫）：三环相扣（信·望·爱） ＋ 一颗心 ＋ 向上的弧，落在左下
+    var comm = S("g", { stroke: "#A981C4", fill: "none", "stroke-width": ".22", opacity: ".38" });
+    [[8, 84], [14.6, 84], [11.3, 89.2]].forEach(function (p) {
+      comm.appendChild(S("circle", { cx: p[0], cy: p[1], r: 4.1 }));
+    });
+    comm.appendChild(S("path", { d: "M4 74 C4 71.6 7.4 71.6 7.4 74 C7.4 76.4 4 78.4 4 78.4 C4 78.4 .6 76.4 .6 74 C.6 71.6 4 71.6 4 74 Z", fill: "#A981C4", stroke: "none", opacity: ".8" }));
+    comm.appendChild(S("path", { d: "M2 66 Q10 57 20 63", "stroke-dasharray": "1.8 2.4" }));
+    var pulse = S("circle", { cx: 11.3, cy: 86.4, r: 1.1, fill: "#A981C4", stroke: "none" });
+    pulse.appendChild(S("animate", { attributeName: "r", values: "1.1;2.1;1.1", dur: "3.4s", repeatCount: "indefinite" }));
+    comm.appendChild(pulse);
+    svg.appendChild(comm);
+
+    // 四周的浮尘：三色各撒几粒，把空处兜住（很淡，只在边上）
+    var dust = S("g", { opacity: ".5" });
+    var seeds = [[3, 38, "#4FB6B2"], [97, 42, "#E0B65C"], [5, 58, "#A981C4"], [95, 60, "#4FB6B2"],
+                 [24, 96, "#A981C4"], [46, 3, "#4FB6B2"], [62, 97, "#E0B65C"], [98, 8, "#4FB6B2"],
+                 [2, 92, "#A981C4"], [55, 94, "#E0B65C"], [40, 97, "#A981C4"], [88, 34, "#E0B65C"]];
+    seeds.forEach(function (s, i) {
+      var d = S("circle", { cx: s[0], cy: s[1], r: .45, fill: s[2] });
+      d.appendChild(S("animate", { attributeName: "opacity", values: ".25;.9;.25", dur: (5 + (i % 5)) + "s", repeatCount: "indefinite" }));
+      dust.appendChild(d);
+    });
+    svg.appendChild(dust);
+    return svg;
+  }
 
   function mount() {
     var st = document.createElement("style");
@@ -88,39 +192,46 @@
     box.setAttribute("role", "dialog");
     box.setAttribute("aria-label", T("\u5165\u53e3\uff1a\u4e09\u4e2a\u677f\u5757", "Entry: three sections"));
 
-    var hd = document.createElement("div");
-    hd.className = "sdep-hd";
-    var b = document.createElement("b"); b.textContent = "SDE UNIVERSES";
-    var i = document.createElement("i");
-    i.textContent = T("\u4e09\u4e2a\u677f\u5757 \u00b7 \u5e76\u5217\u800c\u7acb \u00b7 \u968f\u65f6\u4e92\u5207",
-                      "Three sections \u00b7 equal footing \u00b7 switch anytime");
-    hd.appendChild(b); hd.appendChild(i);
-    box.appendChild(hd);
+    var glow = document.createElement("div"); glow.className = "sdep-glow";
+    box.appendChild(glow);
+    box.appendChild(deco());
 
     var stage = document.createElement("div");
     stage.className = "sdep-stage";
-    // 三角形本体：用 SVG 画线，顶点坐标与下面三个入口用的是同一组数
-    var ns = "http://www.w3.org/2000/svg";
-    var svg = document.createElementNS(ns, "svg");
-    svg.setAttribute("viewBox", "0 0 100 100");
-    svg.setAttribute("preserveAspectRatio", "none");
+
+    // 三角形：与三个入口共用同一组坐标；一支渐变从青经金到紫走完全程（多样，却是一条线）
+    var svg = S("svg", { class: "sdep-tri-svg", viewBox: "0 0 100 100", preserveAspectRatio: "none" });
     svg.setAttribute("aria-hidden", "true");
-    var poly = document.createElementNS(ns, "polygon");
-    poly.setAttribute("class", "sdep-tri");
-    poly.setAttribute("points", NODES.map(function (n) { return n.x + "," + n.y; }).join(" "));
-    poly.setAttribute("vector-effect", "non-scaling-stroke");
+    var defs = S("defs", {});
+    var grad = S("linearGradient", { id: "sdepEdge", x1: "0", y1: "1", x2: "1", y2: "0" });
+    [NODES[2].c, NODES[0].c, NODES[1].c].forEach(function (c, i) {
+      grad.appendChild(S("stop", { offset: (i * 50) + "%", "stop-color": c, "stop-opacity": ".72" }));
+    });
+    defs.appendChild(grad);
+    svg.appendChild(defs);
+    var poly = S("polygon", {
+      class: "sdep-tri",
+      points: NODES.map(function (n) { return n.x + "," + n.y; }).join(" "),
+      "vector-effect": "non-scaling-stroke",
+    });
     svg.appendChild(poly);
     stage.appendChild(svg);
+
     // 正中「爱思乐园」：位置由三个顶点现算重心，改顶点它自己跟着走，不写死
+    var cx = 0, cy = 0;
+    NODES.forEach(function (n) { cx += n.x; cy += n.y; });
+    cx /= NODES.length; cy /= NODES.length;
     var mid = document.createElement("div");
     mid.className = "sdep-mid";
     mid.textContent = "\u7231\u601d\u4e50\u56ed";
     mid.setAttribute("aria-hidden", "true");
-    var cx = 0, cy = 0;
-    NODES.forEach(function (n) { cx += n.x; cy += n.y; });
-    mid.style.left = (cx / NODES.length) + "%";
-    mid.style.top = (cy / NODES.length) + "%";
+    mid.style.left = cx + "%"; mid.style.top = cy + "%";
     stage.appendChild(mid);
+    var mid2 = document.createElement("div");
+    mid2.className = "sdep-mid2";
+    mid2.textContent = "SDE UNIVERSES";
+    mid2.style.left = cx + "%"; mid2.style.top = (cy + 8) + "%";
+    stage.appendChild(mid2);
 
     NODES.forEach(function (n, idx) {
       var href = GO[n.k];
@@ -129,7 +240,8 @@
       if (href) a.href = href; else a.type = "button";
       a.style.left = n.x + "%";
       a.style.top = n.y + "%";
-      a.style.animationDelay = (0.5 + idx * 0.12) + "s";
+      a.style.setProperty("--c", n.c);
+      a.style.animationDelay = (0.45 + idx * 0.13) + "s";
       var dot = document.createElement("span");
       dot.className = "sdep-dot"; dot.textContent = n.icon;
       var nm = document.createElement("span");
@@ -142,16 +254,24 @@
     });
     box.appendChild(stage);
 
+    var foot = document.createElement("div");
+    foot.className = "sdep-foot";
+    var tip = document.createElement("i");
+    tip.textContent = T("\u4e09\u4e2a\u677f\u5757 \u00b7 \u5e76\u5217\u800c\u7acb \u00b7 \u968f\u65f6\u4e92\u5207",
+                        "Three sections \u00b7 equal footing \u00b7 switch anytime");
+    foot.appendChild(tip);
     var skip = document.createElement("button");
     skip.className = "sdep-skip";
     skip.type = "button";
     skip.textContent = T("\u76f4\u63a5\u6d4f\u89c8 \u203a", "Just browse \u203a");
     skip.onclick = function () { seen(); close(); };
-    box.appendChild(skip);
+    foot.appendChild(skip);
+    box.appendChild(foot);
 
     document.body.appendChild(box);
     try { document.documentElement.style.overflow = "hidden"; } catch (e) {}
-    setTimeout(function () { try { stage.querySelector(".sdep-node").focus(); } catch (e) {} }, 60);
+    // 刻意**不**自动聚焦：鼠标进来的人会平白看到一圈方形焦点环（第一版就是这样，很难看）。
+    // 键盘的人按 Tab 就到第一个入口，无障碍不受损。
     document.addEventListener("keydown", onKey);
 
     function onKey(e) {

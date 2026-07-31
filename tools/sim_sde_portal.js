@@ -16,6 +16,7 @@ class N {
     this.tagName = String(t || "div").toUpperCase(); this.ns = ns || "";
     this.children = []; this.className = ""; this.attrs = {}; this.style = {};
     this._text = ""; this.parentNode = null; this.type = "";
+    this.style.setProperty = (k, v) => { this.style[k] = v; };   // 桩补：模块用它设 --c 色相变量
   }
   set textContent(v) { this._text = String(v); this.children.length = 0; }
   get textContent() { return this._text || this.children.map((c) => c.textContent).join(""); }
@@ -100,6 +101,23 @@ ok(!!mid && mid.textContent === "爱思乐园", "三角形正中是「爱思乐�
 }
 ok(/pointer-events:none/.test(SRC), "正中那四个字不挡点击（它是字，不是按钮）");
 ok(/margin-right:-\.34em/.test(SRC), "字间距在末字后面多出的那一份被抵掉了（否则四个字看着偏左）");
+
+console.log("②b 多样 · 统一 · 和谐");
+{
+  const cols = nodes.map((n) => n.style["--c"]);
+  ok(new Set(cols).size === 3, "三个入口三种色相（多样），实得 " + cols.join(" "));
+  ok(/linearGradient/.test(SRC) && /sdepEdge/.test(SRC), "三角形那条边用一支渐变把三色走完全程（统一：一条线，三种颜色）");
+  const deco = box.querySelector(".sdep-deco");
+  ok(!!deco, "四周有图案层");
+  ok(deco.attrs.preserveAspectRatio === "xMidYMid slice",
+    "图案层用 slice —— 圆必须是圆的；三角形那张是 none（要跟着拉满），两张不能共用");
+  ok(deco.querySelectorAll("line").length >= 10, "互联网的连接：一张节点网，实得连线 " + deco.querySelectorAll("line").length + " 条");
+  ok(deco.querySelectorAll("rect").length >= 5, "大模型的活力：声波柱，实得 " + deco.querySelectorAll("rect").length + " 根");
+  ok(deco.querySelectorAll("circle").length >= 20, "社群的三环与浮尘，实得圆 " + deco.querySelectorAll("circle").length + " 个");
+  ok(deco.querySelectorAll("animate").length >= 8, "图案是活的（有动画），实得 " + deco.querySelectorAll("animate").length + " 条");
+  ok(!/\.focus\(\)/.test(SRC), "不自动聚焦——鼠标进来的人会平白看到一圈方形焦点环（第一版就是这样）");
+  ok(!!box.querySelector(".sdep-glow"), "三团角落微光把画面兜圆");
+}
 
 console.log("③ 浏览＝就地揭开，另两个＝真链接");
 {
