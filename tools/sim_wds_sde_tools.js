@@ -14,19 +14,20 @@ function ok(c, m) { if (c) { PASS++; console.log("  PASS " + m); } else { FAILS+
 const W = fs.readFileSync("src/worker.js", "utf8");
 const F = fs.readFileSync("public/wds-mode.js", "utf8");
 
-console.log("① 九道工序齐全且各有实体");
-const KEYS = ["iq", "three", "motif", "nbr", "rename", "gap", "collide", "grid", "nine"];
+console.log("① 每道工序齐全且各有实体");
+// 别写死数量：加一道工序就要改三处数字，这种断言迟早被人图省事删掉。跟着白名单走。
+const KEYS = ["iq", "three", "motif", "nbr", "rename", "gap", "collide", "grid", "nine", "map"];
 const mKeys = W.match(/const WDS_TOOL_KEYS = \[([^\]]+)\]/);
 ok(!!mKeys, "WDS_TOOL_KEYS 存在");
 KEYS.forEach((k) => ok(mKeys && mKeys[1].includes('"' + k + '"'), "白名单里有 " + k));
 const seg = W.slice(W.indexOf("const WDS_TOOLS = {"), W.indexOf("function wdsToolSys("));
 KEYS.forEach((k) => ok(new RegExp("\\n  " + k + ":").test(seg), k + " 有工序正文"));
-ok(/本轮工序/.test(seg) && (seg.match(/本轮工序/g) || []).length === 9, "九道都以「本轮工序」开头，实得 " + (seg.match(/本轮工序/g) || []).length);
+ok(/本轮工序/.test(seg) && (seg.match(/本轮工序/g) || []).length === KEYS.length, "每道都以「本轮工序」开头，应 " + KEYS.length + " 道，实得 " + (seg.match(/本轮工序/g) || []).length);
 // 每道都要有「做不到就直说」的出口——工序最怕的不是做不到，是假装做到了
 const bodies = seg.split(/\n  (?=[a-z]+:)/).slice(1);
-ok(bodies.length === 9, "切出九段工序正文，实得 " + bodies.length);
+ok(bodies.length === KEYS.length, "切出 " + KEYS.length + " 段工序正文，实得 " + bodies.length);
 const OUT = /直说|不要编|别硬凑|说不足以|不许说|凑不满|凑不出|撑不起|就说用不上|会的话指出/;
-bodies.forEach((b, i) => ok(OUT.test(b), KEYS[i] + " 留了「做不到就直说」的出口"));
+bodies.forEach((b) => ok(OUT.test(b), (b.match(/^([a-z]+):/) || [0, "?"])[1] + " 留了「做不到就直说」的出口"));
 
 console.log("② tool 走白名单");
 ok(/WDS_TOOL_KEYS\.indexOf\(String\(b\.tool \|\| ""\)\) >= 0 \? String\(b\.tool\) : ""/.test(W),
