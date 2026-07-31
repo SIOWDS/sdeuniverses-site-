@@ -40,6 +40,14 @@ button:hover{opacity:.88}
 #verdict{margin:20px 0 0;padding:14px 16px;background:var(--card);border-left:2px solid var(--ac2);
  font-size:14.5px;color:var(--dim);display:none}
 #verdict.miss{border-left-color:#B4543C}
+#gate{margin:16px 0 0;display:none}
+#gate .g{padding:14px 16px;background:var(--card);border-left:2px solid var(--ac);font-size:14.5px}
+#gate .g.no{border-left-color:#B4543C}
+#gate .g b{color:var(--pa)}
+#gate .rel{margin:12px 0 0;padding-left:14px;border-left:1px solid var(--line);font-size:13.5px;color:var(--dim)}
+#gate .rel .t{color:var(--ac2)}
+#gate .rel .t.own{color:#D08A72}
+#gate .miss{margin:12px 0 0;font-size:13.5px;color:var(--dim)}
 .card{border-top:1px solid var(--line);padding:22px 0}
 .card .top{display:flex;gap:12px;align-items:baseline;flex-wrap:wrap}
 .cid{font-size:11px;color:var(--faint);letter-spacing:.1em}
@@ -87,13 +95,23 @@ footer{border-top:1px solid var(--line);margin-top:52px;padding:26px 0 46px;font
       而它的承重命题（「任何划界者都无法在自己划出的界内安置自己的划界动作」）检得出。</div>
     <textarea id="q" placeholder="例：成功结算这个动作本身消耗掉下一次判断所需的认知偿付力……"></textarea>
     <div class="row">
-      <button id="go">查这块地被谁占着</button>
+      <button id="go">① 粗筛：查这块地被谁占着</button>
+      <button class="ghost" id="fine" disabled>② 细判：判它是不是换词重述</button>
       <button class="ghost" id="clr">看全部卡片</button>
-      <span class="hint">零调用 · 不烧任何 Key</span>
+      <span class="hint">粗筛零调用不烧 Key；细判用你自己的 Key</span>
     </div>
   </div>
 
+  <div class="row" id="keyrow" style="display:none">
+    <input id="k" type="password" placeholder="你的 API Key（只存在这台浏览器里）"
+      style="flex:1;min-width:240px;background:var(--card);color:var(--pa);border:1px solid var(--line);border-radius:3px;padding:8px 12px;font:inherit;font-size:14px">
+    <select id="vd" style="background:var(--card);color:var(--pa);border:1px solid var(--line);border-radius:3px;padding:8px 10px;font:inherit;font-size:14px">
+      <option value="ds">DeepSeek</option><option value="glm">智谱 GLM</option>
+    </select>
+  </div>
+
   <div id="verdict"></div>
+  <div id="gate"></div>
   <div id="list"></div>
 </div>
 
@@ -153,12 +171,60 @@ footer{border-top:1px solid var(--line);margin-top:52px;padding:26px 0 46px;font
       VD.className = res.status==="miss" ? "miss" : "";
       VD.innerHTML = "<b>"+esc(res.status==="miss"?"〔库未命中〕":"命中 "+res.hits.length+" 张")
                    + "</b>　" + esc(res.verdict);
+      LASTQ=q; LASTIDS=res.hits.map(function(c){return c.id}); LASTCARDS=res.hits;
+      $("fine").disabled = res.hits.length===0;
+      $("gate").style.display="none"; $("gate").innerHTML="";
       LIST.innerHTML = res.hits.map(function(c){return card(c,true)}).join("")
         || '<div class="card">词面上没有可比的卡。这不构成放行——见上面第 ① 条。</div>';
       window.scrollTo({top:VD.offsetTop-80,behavior:"smooth"});
     });
   };
-  $("clr").onclick=function(){ $("q").value=""; showAll(); window.scrollTo({top:0,behavior:"smooth"}) };
+  // ── 二级细判 ─────────────────────────────────────────
+  // Key 沿全站 BYOK 规范键：任一智能体填过一次，这里自动借到。
+  var KEYS=["sde_ds_key","sde_glm_key"], VMAP={sde_ds_key:"ds",sde_glm_key:"glm"};
+  function keyGet(){
+    var v=$("k").value.trim(); if(v) return {k:v,vd:$("vd").value};
+    for(var i=0;i<KEYS.length;i++){ var x=localStorage.getItem(KEYS[i]); if(x&&x.length>=8) return {k:x,vd:VMAP[KEYS[i]]}; }
+    return null;
+  }
+  function keySave(k,vd){ try{ localStorage.setItem(vd==="glm"?"sde_glm_key":"sde_ds_key",k); }catch(e){} }
+  var LASTQ="", LASTIDS=[], LASTCARDS=[];
+  function relName(r){ return {own:"占死",near:"近邻·带分离线活着",far:"无关",unjudged:"基底漏判"}[r]||r; }
+  $("fine").onclick=function(){
+    var kv=keyGet();
+    if(!kv){ $("keyrow").style.display="flex"; $("k").focus();
+      $("gate").style.display="block";
+      $("gate").innerHTML='<div class="g no">细判要用你自己的 Key（粗筛不用）。填在上面那一行，只存在这台浏览器里。</div>';
+      return; }
+    if($("k").value.trim()) keySave(kv.k,kv.vd);
+    var btn=this; btn.disabled=true; var old=btn.textContent; btn.textContent="判定中…";
+    $("gate").style.display="block";
+    $("gate").innerHTML='<div class="g">正在把这 '+LASTIDS.length+' 张交给基底判——它要回答的是「新命题能不能被这一张 1:1 替换」。</div>';
+    SDENbr.judge(LASTQ, LASTIDS, kv.k, kv.vd).then(function(r){
+      btn.disabled=false; btn.textContent=old;
+      if(!r.ok){ $("gate").innerHTML='<div class="g no">'+esc(r.msg||"细判没成")+'</div>'; return; }
+      var html='<div class="g'+(r.pass?"":" no")+'"><b>'+esc(r.verdict)+'</b>'
+        +(r.line?'<div style="margin-top:8px;color:var(--dim)">'+esc(r.line)+'</div>':'')+'</div>';
+      (r.v||[]).forEach(function(x){
+        var c=(LASTCARDS||[]).filter(function(c){return c.id===x.id})[0]||{};
+        html+='<div class="rel"><span class="t'+(x.rel==="own"?" own":"")+'">【'+esc(relName(x.rel))+'】</span> '
+          +esc(x.id)+'　'+esc((c.src&&c.src.author)||"")+'　'+esc(x.why||"")
+          +(x.sep?'<div style="margin-top:4px;color:var(--faint)">分离线：'+esc(x.sep)+'</div>':'')+'</div>';
+      });
+      if((r.miss||[]).length){
+        html+='<div class="miss"><b>库外还应请进来的占位者</b>（基底点的，尚未入库——按纪律③应当场写卡）：';
+        r.miss.forEach(function(m){ html+='<div class="rel">'+esc(m.who)+'《'+esc(m.title)+'》　'+esc(m.why)+'</div>'; });
+        html+='</div>';
+      }
+      $("gate").innerHTML=html;
+    }).catch(function(e){
+      btn.disabled=false; btn.textContent=old;
+      $("gate").innerHTML='<div class="g no">细判出错：'+esc(e.message)+'</div>';
+    });
+  };
+
+  $("clr").onclick=function(){ $("q").value=""; $("fine").disabled=true;
+    $("gate").style.display="none"; showAll(); window.scrollTo({top:0,behavior:"smooth"}) };
   $("q").addEventListener("keydown",function(e){
     if((e.metaKey||e.ctrlKey)&&e.key==="Enter") $("go").click();
   });

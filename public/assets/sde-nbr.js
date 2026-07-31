@@ -109,6 +109,30 @@
          + (top.src.year ? " " + top.src.year : "") + "　等 " + res.hits.length + " 家";
   }
 
+  /* 二级细判：把粗筛的 top-N 交基底判「是不是 1:1 可替换」。
+     这一步**要 Key**（粗筛不要）。为什么必须有它：拿当天 35 条真候选实测，
+     有 3 条与它的正主一个词都不共享，词面永远够不着。
+     返回 {ok,pass,owned,near,v:[{id,rel,why,sep}],miss:[…],line,verdict}
+     rel ∈ own(占死) / near(近邻·带分离线活着) / far(无关) / unjudged(基底漏判)。
+     ⚠ pass 由服务端按规则算：占死一张即不过；near 给不出分离线的会被降为 own。 */
+  function judge(q, ids, key, vendor) {
+    return fetch("/api/nbr/judge", {
+      method: "POST", headers: { "content-type": "application/json" },
+      body: JSON.stringify({ q: q, ids: ids || [], key: key || "", vendor: vendor || "" })
+    }).then(function (r) { return r.json(); });
+  }
+
+  /* 把一次粗筛 + 一次细判合成候选卡上那一行结论。
+     ⚠ 粗筛 miss 时**不许**说"没被占"——只说库未命中、不得据以放行。 */
+  function gateLine(coarse, fine) {
+    if (coarse && coarse.status === "miss" && !fine)
+      return "闸门：〔库未命中〕· 不得据以放行 · 待二级细判或人工指名";
+    if (!fine || !fine.ok) return "闸门：粗筛命中 " + ((coarse && coarse.hits.length) || 0) + " 张 · 未细判";
+    return (fine.pass ? "闸门：过 · " : "闸门：不过 · ")
+         + "占死 " + fine.owned + " · 近邻 " + fine.near
+         + (fine.miss && fine.miss.length ? " · 另有 " + fine.miss.length + " 位库外占位者待请进" : "");
+  }
+
   /* 纪律③ 的口子：新占位者回写。落库在服务端，这里只做形状校验，
      免得日后有人拿一张缺分离线的卡直接入库。*/
   function shape(card) {
@@ -119,6 +143,7 @@
     return { ok: miss.length === 0, miss: miss };
   }
 
-  w.SDENbr = { load: load, ask: ask, verdictLine: verdictLine, shape: shape,
+  w.SDENbr = { load: load, ask: ask, judge: judge, verdictLine: verdictLine,
+               gateLine: gateLine, shape: shape,
                _grams: grams, _score: score, _norm: norm, SRC: SRC };
 })(window);
