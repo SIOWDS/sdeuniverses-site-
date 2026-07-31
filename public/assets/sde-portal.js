@@ -109,10 +109,53 @@
   }
   /* 一粒火星的去向：均匀铺满一圈，再加一点**确定性**抖动（不用随机数，模拟脚本才能逐粒复核）。
      SPARK_R0 = 起飞半径（贴着圆边，圆半径 37）；R = 落点半径，就是“四射”能射多远。 */
-  var SPARK_N = 16, SPARK_R0 = 41;
-  var SPARK_F = [0.58, 0.74, 0.88, 1];      // 四档远近：四分之一直达屏幕边界
-  function sparkAngle(s) {
-    return (s * 360 / SPARK_N + (s % 3) * 7) * Math.PI / 180;
+  // 起飞半径（圆半径 37，刚出圆边）；每团火备多少粒备用——
+  // 40 是跑出来的：再少就会在大阵时抽干池子（池=28 时丢掉 4.6% 的粒），
+  // 而“大阵发不出来”正好把用户要的那个落差磨平了。
+  var SPARK_R0 = 41, SPARK_POOL = 40;
+  /* 自带种子的随机数（mulberry32）。画面上是真随机，模拟脚本里又能逐次复演——
+     用 Math.random 就两头落空：既没法回放现场，也无法对“有多有少”这件事立断言。 */
+  function rng(seed) {
+    var a = seed >>> 0;
+    return function () {
+      a = (a + 0x6D2B79F5) >>> 0;
+      var t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+  /* 一阵火的规格。大多数时候零零星星几粒，偶尔轰一大阵；
+     **大阵之后必跟一段长静默**——“突然很多、突然很少”的落差就是这么来的，
+     若只是每阵随机几粒，平均下来反而是一片均匀的沙沙声。 */
+  var PUFF = {
+    small: [1, 3], big: [9, 15], bigP: 0.17,
+    gapS: [130, 820], gapB: [1100, 2800],   // 毫秒：平常两阵之间 / 大阵之后
+  };
+  function puffPlan(rnd) {
+    var big = rnd() < PUFF.bigP;
+    var rg = big ? PUFF.big : PUFF.small, gp = big ? PUFF.gapB : PUFF.gapS;
+    return {
+      big: big,
+      n: Math.floor(rg[0] + rnd() * (rg[1] - rg[0] + 1)),
+      gap: gp[0] + rnd() * (gp[1] - gp[0]),
+    };
+  }
+  /* 一粒火星：方向、远近、大小、快慢全随机。
+     reach = 这个方向上到屏幕边界还有多远；f 可以超过 1，那几粒就真飞出屏幕（被裁掉）。
+     大阵里的粒子略大略快，才像“轰”的一下。 */
+  function sparkPlan(rnd, reachAt, big) {
+    var a = rnd() * Math.PI * 2, ca = Math.cos(a), sa = Math.sin(a);
+    // 先抽方向，再拿**这个**方向去问边界有多远——两次分开算会对不上号
+    var reach = reachAt ? reachAt(a) : 0;
+    var f = 0.30 + rnd() * 0.85;
+    var R = Math.max(SPARK_R0 + 60, (reach || 0) * f);
+    var r0 = SPARK_R0 + rnd() * 8;
+    return {
+      a: a, f: f, R: R,
+      sx: ca * r0, sy: sa * r0, tx: ca * R, ty: sa * R,
+      d: (big ? 12 : 9) + rnd() * 8,                        // 直径 9–17px（大阵 12–20px）
+      dur: Math.min(7.5, (1.9 + R / 235) * (big ? 0.82 : 1) * (0.85 + rnd() * 0.45)),
+    };
   }
   /* 从 (cx,cy) 沿角度 a 走，到视口四边还有多远。四块边界取最近的那一块。 */
   function edgeReach(cx, cy, vw, vh, a) {
@@ -123,19 +166,7 @@
     else if (sa < -1e-6) t = Math.min(t, -cy / sa);
     return (isFinite(t) && t > 0) ? t : 0;
   }
-  /* 一粒火星：**方向**由 s 定死（不用随机数，模拟才能逐粒复核），**飞多远**由 reach 定——
-     reach 就是这个方向上到屏幕边界的距离。于是三团火会一直射到四周边界，
-     并在半路上彼此相遇（红的、绿的、蓝的 TOKEN 混在一块）。
-     飞得远的就飞得久一点（dur 跟着 R 走），否则远处那几粒会快得像子弹。 */
-  function sparkVec(s, reach) {
-    var a = sparkAngle(s), ca = Math.cos(a), sa = Math.sin(a);
-    var R = Math.max(SPARK_R0 + 60, (reach || 0) * SPARK_F[s % SPARK_F.length]);
-    return {
-      sx: ca * SPARK_R0, sy: sa * SPARK_R0,
-      tx: ca * R, ty: sa * R,
-      dur: Math.min(7.5, 2.2 + R / 230), delay: s * 0.23,
-    };
-  }
+
 
   var CSS =
     ".sdep{position:fixed;inset:0;z-index:99995;display:flex;flex-direction:column;align-items:center;justify-content:center;" +
@@ -169,9 +200,11 @@
     ".sdep-fire{position:absolute;left:50%;top:50%;width:150px;height:150px;transform:translate(-50%,-50%);pointer-events:none;z-index:0}" +
 ".sdep-fire b{position:absolute;left:50%;top:50%;width:106px;height:106px;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(circle,var(--f1) 0,transparent 62%),radial-gradient(circle at 32% 68%,var(--f2) 0,transparent 56%),radial-gradient(circle at 70% 34%,var(--f3) 0,transparent 56%);filter:blur(9px);animation:sdepFlick 1.9s ease-in-out infinite}" +
     "@keyframes sdepFlick{0%,100%{opacity:.72;transform:translate(-50%,-50%) scale(1)}50%{opacity:1;transform:translate(-50%,-50%) scale(1.12)}}" +
-    /* 火星：从圆边起飞，往四面八方飞出去。去向由 --sx/--sy → --tx/--ty 给（见 sparkVec），
+    /* 火星：从圆边起飞，往四面八方飞出去。去向由 --sx/--sy → --tx/--ty 给（见 sparkPlan），
        位置用 margin 拿掉自身一半，位移就全是纯像素值，插值不会出鬼。 */
-".sdep-sp{position:absolute;left:50%;top:50%;margin:-8px 0 0 -8px;width:16px;height:16px;border-radius:50%;opacity:0;box-shadow:0 0 22px currentColor;animation-name:sdepBurst;animation-timing-function:ease-out;animation-iteration-count:infinite}" +
+/* 尺寸每粒不同（--d）；默认**不放动画**，由 JS 一阵一阵地点名发射，
+   放完一次就回池里待命——这样才能时多时少、徽然轰一大阵。 */
+".sdep-sp{position:absolute;left:50%;top:50%;width:var(--d,16px);height:var(--d,16px);margin:calc(var(--d,16px) / -2) 0 0 calc(var(--d,16px) / -2);border-radius:50%;opacity:0;box-shadow:0 0 22px currentColor;animation-name:none;animation-timing-function:ease-out;animation-iteration-count:1}" +
     "@keyframes sdepBurst{0%{opacity:0;transform:translate(var(--sx,0),var(--sy,0)) scale(.5)}" +
     "12%{opacity:.95}64%{opacity:.5}100%{opacity:0;transform:translate(var(--tx,0),var(--ty,0)) scale(.3)}}" +
     "@media(prefers-reduced-motion:reduce){.sdep-sp,.sdep-fire b{animation:none}}" +
@@ -477,6 +510,53 @@
       }
       return { C: C, rad: rad };
     }
+    /* 烧 TOKEN 的节奏：不是匀速的，是一阵一阵的。
+       每个入口一个自己的种子（三团火不会齐步）；每阵抽一次“几粒、隔多久”，
+       大阵之后自带一段长静默 —— 看上去就是时多时少、徽然轰一下。
+       池子抽干了就少发几粒，不排队也不新建元素。 */
+    var fireTimers = [];
+    function launch(sp, pl, color) {
+      sp.__busy = true;
+      sp.style.animationName = "none";
+      void sp.offsetWidth;          // 强制回流：不读这一下，同一帧里“清掉再设上”浏览器不算重启
+      sp.style.color = color;       // box-shadow 用 currentColor 发光
+      sp.style.background = color;
+      sp.style.setProperty("--d", pl.d.toFixed(1) + "px");
+      sp.style.setProperty("--sx", pl.sx.toFixed(1) + "px");
+      sp.style.setProperty("--sy", pl.sy.toFixed(1) + "px");
+      sp.style.setProperty("--tx", pl.tx.toFixed(1) + "px");
+      sp.style.setProperty("--ty", pl.ty.toFixed(1) + "px");
+      sp.style.animationDuration = pl.dur.toFixed(2) + "s";
+      sp.style.animationName = "sdepBurst";
+    }
+    function startFire() {
+      try {
+        if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+      } catch (e) {}
+      NODES.forEach(function (n, i) {
+        var rnd = rng(0x5DE0 + i * 7717), F = FIRE[n.k] || FIRE.wds;
+        (function tick() {
+          var g = GEOM[i];
+          if (g) {
+            var puff = puffPlan(rnd), sent = 0;
+            var reachAt = function (a) { return edgeReach(g.cx, g.cy, g.vw, g.vh, a); };
+            for (var k = 0; k < g.pool.length && sent < puff.n; k++) {
+              var sp = g.pool[k];
+              if (sp.__busy) continue;
+              launch(sp, sparkPlan(rnd, reachAt, puff.big), F[Math.floor(rnd() * 3)]);
+              sent++;
+            }
+            fireTimers[i] = setTimeout(tick, puff.gap);
+          } else {
+            fireTimers[i] = setTimeout(tick, 300);          // 还没量到几何，稍后再来
+          }
+        })();
+      });
+    }
+    function stopFire() {
+      for (var i = 0; i < fireTimers.length; i++) clearTimeout(fireTimers[i]);
+      fireTimers = [];
+    }
     function drawRing() {
       var W = stage.clientWidth || 720, H = stage.clientHeight || 440;
       var m = circleCenters(W, H);
@@ -484,28 +564,29 @@
       var g = waveEdges(C, W, H, rad);
       ring.setAttribute("d", g.d);
       ring.style.setProperty("--L", Math.ceil(g.len));
-      aimSparks();
+      refreshGeom();
     }
     /* 火星能飞多远，只有上了屏才知道：要先知道圆心在**视口**里的位置。
        .sdep 是 fixed inset:0，所以 offset 链的原点就是视口左上角；
-       一律用 offset*（布局值），不用 rect——节点入场时正在跑 scale(.86)。 */
-    function aimSparks() {
+       一律用 offset*（布局值），不用 rect——节点入场时正在跑 scale(.86)。
+       量一次存起来，发射时直接查；窗口一变（drawRing）就重量。 */
+    var GEOM = [];
+    function refreshGeom() {
       var vw = window.innerWidth || 1280, vh = window.innerHeight || 720;
       var els = stage.querySelectorAll(".sdep-node");
+      GEOM = [];
       for (var i = 0; i < els.length; i++) {
         var nd = els[i], dot = nd.querySelector(".sdep-dot"), wrap = dot && dot.parentNode;
-        if (!dot || !wrap || !nd.offsetWidth) continue;
-        var cx = stage.offsetLeft + nd.offsetLeft - nd.offsetWidth / 2 + wrap.offsetLeft + dot.offsetLeft + dot.offsetWidth / 2;
-        var cy = stage.offsetTop + nd.offsetTop - nd.offsetHeight / 2 + wrap.offsetTop + dot.offsetTop + dot.offsetHeight / 2;
-        var sps = nd.querySelectorAll(".sdep-sp");
-        for (var s = 0; s < sps.length; s++) {
-          var v = sparkVec(s, edgeReach(cx, cy, vw, vh, sparkAngle(s)));
-          sps[s].style.setProperty("--tx", v.tx.toFixed(1) + "px");
-          sps[s].style.setProperty("--ty", v.ty.toFixed(1) + "px");
-          sps[s].style.animationDuration = v.dur.toFixed(2) + "s";
-        }
+        if (!dot || !wrap || !nd.offsetWidth) { GEOM.push(null); continue; }
+        GEOM.push({
+          cx: stage.offsetLeft + nd.offsetLeft - nd.offsetWidth / 2 + wrap.offsetLeft + dot.offsetLeft + dot.offsetWidth / 2,
+          cy: stage.offsetTop + nd.offsetTop - nd.offsetHeight / 2 + wrap.offsetTop + dot.offsetTop + dot.offsetHeight / 2,
+          vw: vw, vh: vh,
+          pool: nd.querySelectorAll(".sdep-sp"),
+        });
       }
     }
+
     svg.appendChild(ring);
     stage.appendChild(svg);
 
@@ -546,20 +627,19 @@
       fire.className = "sdep-fire";
       fire.setAttribute("aria-hidden", "true");
       fire.appendChild(document.createElement("b"));
-      for (var s = 0; s < SPARK_N; s++) {
-        var v = sparkVec(s, 300);                         // 占位；上屏后 aimSparks() 按真实几何重设
+      for (var s = 0; s < SPARK_POOL; s++) {
         var sp = document.createElement("i");
         sp.className = "sdep-sp";
-        sp.style.color = F[s % 3];                        // box-shadow 用 currentColor 发光
-        sp.style.background = F[s % 3];
-        sp.style.setProperty("--sx", v.sx.toFixed(1) + "px");
-        sp.style.setProperty("--sy", v.sy.toFixed(1) + "px");
-        sp.style.setProperty("--tx", v.tx.toFixed(1) + "px");
-        sp.style.setProperty("--ty", v.ty.toFixed(1) + "px");
-        sp.style.animationDuration = v.dur.toFixed(2) + "s";
-        sp.style.animationDelay = v.delay.toFixed(2) + "s";
+        // 放完一次就抬手回池（清掉 animation-name，下次才能重新触发）
+        (function (el) {
+          el.addEventListener("animationend", function () {
+            el.__busy = false;
+            el.style.animationName = "none";
+          });
+        })(sp);
         fire.appendChild(sp);
       }
+
       var dot = document.createElement("span");
       dot.className = "sdep-dot";
       if (ART[n.k]) dot.appendChild(ART[n.k]()); else dot.textContent = n.icon;
@@ -589,7 +669,8 @@
     box.appendChild(foot);
 
     document.body.appendChild(box);
-    drawRing();                                   // 上屏即按实测尺寸重画（同步，赶在描线动画开始之前）
+    drawRing();
+    startFire();                                   // 上屏即按实测尺寸重画（同步，赶在描线动画开始之前）
     window.addEventListener("resize", drawRing);
     // 描线一完就永久关掉虚线；定时器是兵不厉（animationend 没触发也不能让曲线断着）
     function doneDraw() { try { ring.setAttribute("class", "sdep-tri done"); } catch (e) {} }
@@ -607,6 +688,7 @@
     function close() {
       document.removeEventListener("keydown", onKey);
       window.removeEventListener("resize", drawRing);
+      stopFire();                                   // 定时器不收，关掉了还在后台一阵一阵地烧
       box.className = "sdep out";
       try { document.documentElement.style.overflow = ""; } catch (e) {}
       setTimeout(function () { if (box.parentNode) box.parentNode.removeChild(box); }, 320);
