@@ -314,6 +314,10 @@
       kEssay: "提炼成文", kEssayS: "锻成一篇独立成立的文章，约三千字",
       kOutline: "写作提纲", kOutlineS: "母题 + 章节骨架，照着就能写",
       mExport: "\u2913 导出本场对话", mExportS: "Markdown 文件，存到本机",
+      mPdf: "\u2913 导出为 PDF", mPdfS: "排成印刷稿，在打印框里选「另存为 PDF」",
+      pdfWait: "正在排版…", pdfTip: "打印框里把「目标」选成「另存为 PDF」即可存成文件。",
+      pdfMe: "我", pdfFoot: "导出自 ChatSDE · sdeuniverses.com　|　回答由大模型生成，引用前请自行核实。",
+      pdfNo: "这个浏览器拦住了打印窗口——请允许弹出窗口后再试，或先用 ⤓ 导出 Markdown。",
       mDhist: "\u21ba 成文记录", mDhistS: "取回以前存下的报告与文章",
       needTalk: "先聊几句，再来成文。",
       dWorking: "正在锻…", dDone: "完成 · ", dFail: "失败", dEmpty: "（没有产出内容，可再试一次）",
@@ -448,6 +452,10 @@
       kEssay: "Forge into an essay", kEssayS: "A piece that stands on its own, about 3,000 words",
       kOutline: "Writing outline", kOutlineS: "A motif plus a chapter skeleton you can write from",
       mExport: "\u2913 Export this chat", mExportS: "A Markdown file, saved to your machine",
+      mPdf: "\u2913 Export as PDF", mPdfS: "Typeset for print — pick \u201cSave as PDF\u201d in the print dialog",
+      pdfWait: "Typesetting\u2026", pdfTip: "In the print dialog, set Destination to \u201cSave as PDF\u201d.",
+      pdfMe: "Me", pdfFoot: "Exported from ChatSDE \u00b7 sdeuniverses.com  |  Answers are model-generated \u2014 verify before citing.",
+      pdfNo: "The browser blocked the print window — allow pop-ups and retry, or export Markdown with \u2913.",
       mDhist: "\u21ba Saved write-ups", mDhistS: "Pull back reports and essays you kept",
       needTalk: "Talk a while first, then write it up.",
       dWorking: "Forging…", dDone: "Done · ", dFail: "Failed", dEmpty: "(nothing came out — try again)",
@@ -3481,6 +3489,11 @@
     dl.appendChild(el("span", "sub", t("mExportS")));
     dl.onclick = function () { if (menu.parentNode) menu.parentNode.removeChild(menu); exportSession(); };
     menu.appendChild(dl);
+    var pf = el("button", "wdsm-pdfbtn-installed");
+    pf.appendChild(document.createTextNode(t("mPdf")));
+    pf.appendChild(el("span", "sub", t("mPdfS")));
+    pf.onclick = function () { if (menu.parentNode) menu.parentNode.removeChild(menu); exportPdf(); };
+    menu.appendChild(pf);
     var pd = el("button");
     pd.appendChild(document.createTextNode(t("dDirPick")));
     pd.appendChild(el("span", "sub", dirName() ? (t("dDirSaved") + dirName()) : (dirSupported() ? t("dDirPickS") : t("dDirNoApi"))));
@@ -3513,6 +3526,69 @@
   // 导出本场对话：和成文共用同一个目录——选过目录就写进去，没选过就当场问一次，都不行才普通下载。
   function exportSession() {
     saveToDir("WDS-" + safeName(t("convoTitle")) + "-" + stampName() + ".md", sessionMd(), toast);
+  }
+
+  /* ════════ 导出为 PDF ════════
+     排版与出稿在全站共用模块 /assets/wds-pdf.js（零依赖、纯函数生成 html）。
+     **为什么不自己吐 PDF 字节**：PDF 里的汉字要么落在内嵌字体里、要么是个空格，
+     而仓库里没有中日韩字体、也不该有（十几 MB 一份，正是当年把仓库撑到 4.37GB 的那类）。
+     浏览器自己的打印管线带着系统中文字体，出来的是真矢量、可选可搜——所以这里只负责
+     把对话排成一份干净的印刷稿，最后一步交给「另存为 PDF」。
+     ⚠️ 稿子取的是**已经渲染好的 DOM**（.wdsm-a），不是 mdRender(history)：公式已被
+     typeset 过、站内篇目已被 autoLink 挂上，重渲一遍这两样都会掉。取不到 DOM 才回退。 */
+  var PDF_WANT = 1;
+  function pdfBoot(then, forced) {
+    if (window.WDSPdf && window.WDSPdf.VERSION >= PDF_WANT) { then(true); return; }
+    if (window.WDSPdf && !forced) { delete window.WDSPdf; return pdfBoot(then, true); }
+    var sc = document.createElement("script");
+    sc.src = "/assets/wds-pdf.js?v=" + PDF_WANT + (forced ? ("&r=" + Date.now()) : "");
+    sc.async = true;
+    sc.onload = function () { then(!!(window.WDSPdf && window.WDSPdf.VERSION >= PDF_WANT)); };
+    sc.onerror = function () { then(false); };
+    document.head.appendChild(sc);
+  }
+  // 从稿子里铲掉的：动作条、提问悬浮条、思考过程（界面里本来就是收起的）、光标、候选卡面板。
+  var PDF_DROP = ".wdsm-acts,.wdsm-qbar,.wdsm-think,.wdsm-tipdeck,.cur,button,.wdsm-candbox,.wdsm-menu";
+  function pdfBlocks() {
+    var out = [];
+    var turns = msgsEl ? msgsEl.querySelectorAll(".wdsm-turn") : [];
+    for (var i = 0; i < turns.length; i++) {
+      var qs = turns[i].querySelector(".wdsm-q span");
+      var ae = turns[i].querySelector(".wdsm-a");
+      var html = "";
+      if (ae) {
+        var c = ae.cloneNode(true);
+        var junk = c.querySelectorAll(PDF_DROP);
+        for (var j = 0; j < junk.length; j++) if (junk[j].parentNode) junk[j].parentNode.removeChild(junk[j]);
+        html = c.innerHTML;
+      }
+      if ((qs && qs.textContent) || html) out.push({ q: qs ? qs.textContent : "", html: html });
+    }
+    if (out.length) return out;
+    // 回退：DOM 取不到（历史刚恢复、或结构变了）就按 history 重渲一遍，宁可少几个公式也要出稿。
+    var cur = null;
+    history.forEach(function (m) {
+      if (m.role === "reader") { cur = { q: m.text, html: "" }; out.push(cur); }
+      else if (cur && !cur.html) cur.html = mdRender(m.text);
+      else out.push({ q: "", html: mdRender(m.text) });
+    });
+    return out;
+  }
+  function exportPdf() {
+    if (!history.length) { alert(t("needTalk")); return; }
+    toast(t("pdfWait"));
+    pdfBoot(function (ok) {
+      if (!ok) { alert(t("pdfNo")); return; }
+      var blocks = pdfBlocks();
+      window.WDSPdf.print({
+        title: t("convoTitle"),
+        lang: LANG === "en" ? "en" : "zh",
+        katex: "/assets/katex/katex.min.css",
+        meta: [new Date().toLocaleString(), blocks.length + t("sbTurnsN"), "ChatSDE · sdeuniverses.com"],
+        blocks: blocks.map(function (b) { return { q: b.q, html: b.html, qLabel: t("pdfMe"), aLabel: "WDS" }; }),
+        foot: t("pdfFoot"),
+      }, function (done) { if (!done) alert(t("pdfNo")); else toast(t("pdfTip")); });
+    });
   }
 
   /* ── 成文落本机：和对话记录共用 IndexedDB，但另立一个 agent，两个历史面板互不混。 ── */

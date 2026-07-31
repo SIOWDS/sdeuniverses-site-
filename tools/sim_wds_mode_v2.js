@@ -372,8 +372,11 @@ console.log("⑧ 成文（distill）");
   layer.querySelector(".wdsm-distbtn").click();
   const menu = document.body.querySelector(".wdsm-menu");
   ok(!!menu, "成文菜单弹出");
-  // 2026-07-30 加了第四档「对外 PPT」→ 七项：报告/成文/提纲/PPT ＋ 导出 ＋ 选目录 ＋ 成文记录
-  ok(menu.children.length === 7, "菜单七项（报告/成文/提纲/对外PPT/导出/选目录/成文记录），实得 " + menu.children.length);
+  // 2026-07-30 加了第四档「对外 PPT」；2026-08-01 导出这一族多了「导出为 PDF」
+  //  → 八项：报告/成文/提纲/PPT ＋ 导出 Markdown ＋ 导出 PDF ＋ 选目录 ＋ 成文记录
+  ok(menu.children.length === 8, "菜单八项（报告/成文/提纲/对外PPT/导出MD/导出PDF/选目录/成文记录），实得 " + menu.children.length);
+  ok(/导出为 PDF/.test(menu.textContent), "「导出为 PDF」这一项真的在菜单里（出口在，读者才找得到）");
+  ok(menu.children[5].className.indexOf("wdsm-pdfbtn-installed") >= 0, "PDF 出口紧挨着「导出本场对话」（第 6 项）");
   menu.children[0].click();
   await new Promise((r) => setTimeout(r, 220));
   const dist = document.body.querySelector(".wdsm-dist");
