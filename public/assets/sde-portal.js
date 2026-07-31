@@ -238,14 +238,15 @@
     var WAVE_N = 20;       // 每条边几个整周期
     // 波幅要跟着周期数走：20 个周期时波长只有边长的 1/20，还用大波幅就成了一排尖齿。
     var WAVE_A = 2.2;      // 波幅（viewBox 纵向单位）
+    // C = 三个**圆心**的 viewBox 坐标（注意：不是 NODES！见 drawRing 里的解释）；
     // W、H = 舞台的实测像素尺寸；gap = 两头各缩进多少像素（≈圆半径，刚好搭在圆边上）。
-    function waveEdges(W, H, gap) {
+    function waveEdges(C, W, H, gap) {
       // 采样密度必须跟着周期数走：每个周期至少十几个点，否则正弦会被采成锯齿
       var d = "", SEG = WAVE_N * 18, len = 0;
       var r = function (v) { return Math.round(v * 100) / 100; };
       var AR = (W && H) ? (W / H) : (720 / 440);
-      NODES.forEach(function (a, i) {
-        var b = NODES[(i + 1) % NODES.length];
+      C.forEach(function (a, i) {
+        var b = C[(i + 1) % C.length];
         var dx = b.x - a.x, dy = b.y - a.y;
         // 舞台空间里的垂线方向，再换算回 viewBox 单位
         var k = Math.sqrt(dy * dy + dx * dx * AR * AR) || 1;
@@ -269,16 +270,38 @@
     }
     var ring = S("path", {
       class: "sdep-tri",
-      d: waveEdges(720, 440, 37).d,     // 先按设计尺寸画一版，上屏后 drawRing() 立即按实测重画
+      d: waveEdges(NODES, 720, 440, 37).d,   // 先粗画一版，上屏后 drawRing() 立即按实测圆心重画
       fill: "none",
       "vector-effect": "non-scaling-stroke",
     });
-    // 上屏后按真实尺寸重画：舌台多宽多高、圆多大，都得等 layout 才知道
+    // 上屏后按真实尺寸重画：舞台多宽多高、圆多大、圆心在哪，都得等 layout 才知道。
+    //
+    // ⚠ **NODES 的坐标不是圆心**。入口节点是一个竖向 flex 块（圆 + 名字 + 副标题），
+    //   用 translate(-50%,-50%) 定位，所以落在 NODES 上的是**整块的中心**，
+    //   而圆在块的最上面 —— 圆心比锤点高出大半个标题区（实测 ≈ 22px）。
+    //   第一版就是直接拿 NODES 当接点，于是波线停在标题上、距圆边还差一截，
+    //   看上去既接不上圆又压着字。下面把这段偏移量从 DOM 量出来补回去。
+    //   量的是 offsetLeft/Top/Width/Height（**布局值，不受 transform 影响**）——
+    //   节点入场时正在跑 scale(.86) 的 pop 动画，用 getBoundingClientRect 会量到缩小的那一瞬。
+    function circleCenters(W, H) {
+      var els = stage.querySelectorAll(".sdep-node"), C = [], rad = 0;
+      if (els.length !== NODES.length) return null;
+      for (var i = 0; i < els.length; i++) {
+        var nd = els[i], dot = nd.querySelector(".sdep-dot");
+        var wrap = dot && dot.parentNode;
+        if (!dot || !wrap || !nd.offsetWidth || !dot.offsetWidth) return null;
+        rad = dot.offsetWidth / 2;
+        var ox = wrap.offsetLeft + dot.offsetLeft + dot.offsetWidth / 2 - nd.offsetWidth / 2;
+        var oy = wrap.offsetTop + dot.offsetTop + dot.offsetHeight / 2 - nd.offsetHeight / 2;
+        C.push({ x: NODES[i].x + ox * 100 / W, y: NODES[i].y + oy * 100 / H });
+      }
+      return { C: C, rad: rad };
+    }
     function drawRing() {
       var W = stage.clientWidth || 720, H = stage.clientHeight || 440;
-      var dotEl = stage.querySelector(".sdep-dot");
-      var rad = (dotEl && dotEl.offsetWidth ? dotEl.offsetWidth / 2 : 37) - 1;   // 减 1 像素：压在圆框下面，不留发丝缝
-      var g = waveEdges(W, H, rad);
+      var m = circleCenters(W, H);
+      var C = m ? m.C : NODES, rad = (m ? m.rad : 37) - 1;   // 减 1 像素：压在圆框下面，不留发丝缝
+      var g = waveEdges(C, W, H, rad);
       ring.setAttribute("d", g.d);
       ring.style.setProperty("--L", Math.ceil(g.len));
     }
