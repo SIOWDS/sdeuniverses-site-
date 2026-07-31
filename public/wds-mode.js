@@ -25,6 +25,14 @@
     document.head.appendChild(sc);
   })();
 
+  /* 候选卡出口 ＋ 近邻一级闸门（同样全站共用一份：涌现档与这里是同两条纪律）。 */
+  (function () {
+    if (window.SDECand) return;
+    var sc = document.createElement("script");
+    sc.src = "/taste/assets/sde-cand.js?v=1"; sc.defer = true;
+    document.head.appendChild(sc);
+  })();
+
   var API = "/api/wds/chat";
   var API_DISTILL = "/api/wds/distill";
   var API_LINK = "/api/wds/link";        // 篇名→站内网址（只读索引，不烧 Key）
@@ -585,6 +593,15 @@
       pjAll: "全部对话", pjTitle: "项目", pjNew: "＋ 新建项目", pjAsk: "项目叫什么？",
       pjAbout: "✎ 这个项目的常驻说明", pjAboutAsk: "这个项目里，每一问都要 WDS 知道的背景与要求（会随每问带上）",
       pjDel: "删掉这个项目？（里面的对话不会删，只是回到「全部」）", pjNone: "还没有项目。项目＝一组对话＋一段常驻说明，适合一本书、一门课、一个长活。",
+      cdBtn: "🎯 立成候选卡", cdH: "把这一句压成候选卡，交给不共享语汇的人顶回",
+      cdTip: "候选卡不是发帖：一句能被反对的承重命题 ＋ 它切开的那一刀 ＋ 一条可裁决的判据。落卡后是 72 小时顶回期，三个出口——没人顶回〔未交手〕／被占位者击中而说不出分离线〔死格〕／带着分离线活下来〔已交手〕。",
+      cdProp: "承重命题（50 字级，一句能被反对的话）：", cdFace: "它切开的辨别面（这一刀把哪两样分开了）：",
+      cdCrit: "可裁决判据（凭什么能判它错）：",
+      cdPropPh: "X 不是 Y₁ 也不是 Y₂，而是 Z", cdFacePh: "把「……」与「……」分开", cdCritPh: "若出现……，本命题即失效",
+      cdGateWait: "正在查占位库（零调用、不烧 Key）…", gateH: "近邻一级闸门",
+      cdGo: "落卡 · 开始 72 小时顶回期", cdGoing: "正在落卡…", cdSee: "去「🎯 候选」看",
+      cdNoMod: "sde-cand.js 没装载上，刷新一次再试。", cdSrcAns: "ChatSDE · 这一答", cdSrcDist: "ChatSDE · ",
+      cdSelTip: "选中回答里的一句再点这里，就用那一句当承重命题；没选中就先替你填了开头那一句——它多半还得再压一压。",
     },
     en: {
       cvTitle: "Canvas", cvOpen: "⧉ Canvas", cvClose: "Hide canvas",       cvEmpty: "The canvas is empty. What lands here automatically: structure maps (/map), deep-research reports, and any diagram, page, table or long draft that comes back as a block.\n\nTo put something here by hand: hit “⧉ To canvas” under any answer.\n\nOnce here you can switch versions, preview, download, save locally, or select a passage and have SDE revise it in place.",
@@ -620,6 +637,15 @@
       pjAll: "All chats", pjTitle: "Projects", pjNew: "＋ New project", pjAsk: "Project name?",
       pjAbout: "✎ Standing instructions for this project", pjAboutAsk: "Background and requirements SDE should know for every question in this project",
       pjDel: "Delete this project? (its chats stay, they just move back to All)", pjNone: "No projects yet. A project = a group of chats + standing instructions — good for a book, a course, a long job.",
+      cdBtn: "🎯 Candidate card", cdH: "Compress this into a candidate card, for people who don't share your vocabulary to push back on",
+      cdTip: "A candidate card is not a post: one load-bearing claim that can be opposed + the distinction it cuts + one decidable criterion. Then a 72-hour window with three exits — untested / dead square / survived with a separating line.",
+      cdProp: "Load-bearing claim (about 50 characters, opposable):", cdFace: "The distinction it cuts (which two things does it separate?):",
+      cdCrit: "Decidable criterion (what would show it wrong?):",
+      cdPropPh: "X is neither Y₁ nor Y₂, but Z", cdFacePh: "separates “…” from “…”", cdCritPh: "if … shows up, this claim fails",
+      cdGateWait: "Checking the occupancy library (no model call, no key)…", gateH: "Neighbour gate (level 1)",
+      cdGo: "Post it · start the 72-hour window", cdGoing: "Posting…", cdSee: "Open “Candidates”",
+      cdNoMod: "sde-cand.js did not load; refresh and try again.", cdSrcAns: "ChatSDE · this answer", cdSrcDist: "ChatSDE · ",
+      cdSelTip: "Select a sentence in the answer first and it becomes the claim; otherwise the opening line is pre-filled — it probably still needs compressing.",
     },
   };
   function tx(k, map) {
@@ -876,6 +902,11 @@
     ".wdsm-pass .lb{display:block;font-size:11px;color:var(--wdim2);margin-bottom:4px}" +
     ".wdsm-agents{margin-top:10px;display:flex;flex-direction:column;gap:7px}" +
     ".wdsm-agent{display:block;width:100%;text-align:left;background:var(--wbg);border:1px solid var(--wline);border-radius:9px;padding:9px 11px;cursor:pointer;color:var(--wtx);font:inherit}" +
+    ".wdsm-cand .lb{margin-top:9px}" +
+    ".wdsm-cand .gate{margin-top:9px;font-size:11.5px;line-height:1.7;color:var(--wdim2);border-left:2px solid var(--wline2);padding-left:9px}" +
+    ".wdsm-cand .go{margin-top:11px;display:flex;align-items:center;gap:9px;flex-wrap:wrap}" +
+    ".wdsm-cand .msg{font-size:11.5px;line-height:1.6;color:var(--wdim2)}" +
+    ".wdsm-cand .msg a{color:var(--wgold)}" +
     ".wdsm-agent:hover{border-color:var(--wgold);}" +
     ".wdsm-agent b{display:block;font-size:13px;font-weight:600;margin-bottom:2px}" +
     ".wdsm-agent i{display:block;font-style:normal;font-size:11.5px;line-height:1.55;color:var(--wdim2)}" +
@@ -2027,6 +2058,78 @@
     cell.turn.appendChild(box); cell.pass = box;
   }
 
+  /* 读者选中的那一段（必须真在这条回答里）。选中即当承重命题——比替他猜一句强。
+     ⚠️ 必须在 mousedown 那一刻取：点按钮这一下在多数浏览器里会把选区清掉。 */
+  function selInside(node) {
+    try {
+      var s = window.getSelection();
+      if (!s || s.isCollapsed || !s.rangeCount) return "";
+      var r = s.getRangeAt(0);
+      if (!node || !node.contains || !node.contains(r.commonAncestorContainer)) return "";
+      return String(s.toString() || "").replace(/\s+/g, " ").trim();
+    } catch (e) { return ""; }
+  }
+
+  /* —— 候选卡出口（对话 → 微信）＋ 近邻一级闸门 ——
+     三大体系是一次「发生」的三个相位：浏览＝遭遇 → 对话＝逼问（产出候选）→ 微信＝对撞
+     （交给不共享语汇族的他者顶回）→ 回到浏览沉淀。这一头此前是断的：ChatSDE 里撞出来的
+     判断只活在这一场的内存里，刷新即失，没有任何路径把它送到一个人面前。
+     四条纪律（三段硬门／库未命中不得据以放行／查库失败不拦路／未登录给去处）
+     全写在共用模块 /taste/assets/sde-cand.js 里，这里一句话术都不重抄。 */
+  function candBox(host, pre, srcLabel) {
+    var C = window.SDECand;
+    var box = el("div", "wdsm-pass wdsm-cand");
+    box.appendChild(el("h4", "", t("cdH")));
+    box.appendChild(el("p", "", t("cdTip")));
+    if (!C) { box.appendChild(el("p", "", t("cdNoMod"))); host.appendChild(box); return box; }
+    var d = pre || {};
+    function field(labKey, phKey, val, minH) {
+      box.appendChild(el("span", "lb", t(labKey)));
+      var ta = document.createElement("textarea");
+      ta.value = String(val || ""); ta.placeholder = t(phKey);
+      if (minH) ta.style.minHeight = minH;
+      box.appendChild(ta);
+      return ta;
+    }
+    var pEl = field("cdProp", "cdPropPh", d.prop, "44px");
+    var gEl = el("div", "gate", t("cdGateWait"));
+    box.appendChild(gEl);
+    var fEl = field("cdFace", "cdFacePh", d.face);
+    var cEl = field("cdCrit", "cdCritPh", d.crit);
+    var row = el("div", "go");
+    var go = el("button", "wdsm-act", t("cdGo"));
+    var msg = el("span", "msg");
+    row.appendChild(go); row.appendChild(msg);
+    box.appendChild(row);
+    // 闸门随命题改动重查：零调用、不烧 Key，所以敢边打字边查（600ms 防抖）。
+    var tm = null;
+    function runGate() {
+      gEl.textContent = t("cdGateWait");
+      C.gate(pEl.value).then(function (g) {
+        gEl.innerHTML = "";
+        gEl.appendChild(el("div", null, g.line));
+        var bs = C.brief(g, 3);
+        if (bs.length) {
+          var ul = el("div"); ul.style.cssText = "margin-top:5px;opacity:.85";
+          bs.forEach(function (s) { ul.appendChild(el("div", null, "\u00b7 " + s)); });
+          gEl.appendChild(ul);
+        }
+      });
+    }
+    pEl.oninput = function () { clearTimeout(tm); tm = setTimeout(runGate, 600); };
+    runGate();
+    go.onclick = function () {
+      go.disabled = true; msg.textContent = t("cdGoing");
+      C.post({ prop: pEl.value, face: fEl.value, crit: cEl.value, src: srcLabel || t("cdSrcAns") })
+        .then(function (r) {
+          if (!r.ok) { go.disabled = false; msg.innerHTML = r.msg || "落卡失败。"; return; }
+          msg.innerHTML = esc(r.msg || "") + ' <a href="/sde-wechat/" target="_blank">' + esc(t("cdSee")) + "</a>";
+        });
+    };
+    host.appendChild(box);
+    return box;
+  }
+
   function mountActs(cell, text) {
     if (cell.wait && cell.wait.parentNode) { cell.wait.parentNode.removeChild(cell.wait); cell.wait = null; }
     autoLink(cell.a, text);                     // 答案里的站内篇目就地变成可点链接
@@ -2058,6 +2161,19 @@
     var ps = el("button", "wdsm-act", t("aPass"));
     ps.onclick = function () { passPanel(cell, ps); };
     row.appendChild(ps);
+    // 候选卡：把这一答里的一句压成 50 字级承重命题，查一遍占位库，再交给微信顶回。
+    var cdb = el("button", "wdsm-act", t("cdBtn"));
+    cdb.title = t("cdSelTip");
+    var cdSel = "";
+    cdb.onmousedown = function () { cdSel = selInside(cell.a); };   // 点下去那一刻取选区，晚一步就没了
+    cdb.onclick = function () {
+      if (cell.cand && cell.cand.parentNode) { cell.cand.parentNode.removeChild(cell.cand); cell.cand = null; return; }
+      var C = window.SDECand;
+      var d = C ? C.draft(text) : { prop: "", face: "", crit: "" };
+      if (cdSel) d.prop = cdSel.slice(0, (C && C.LIM.prop) || 120);
+      cell.cand = candBox(cell.turn, d, t("cdSrcAns"));
+    };
+    row.appendChild(cdb);
     row.appendChild(rg); row.appendChild(ed);
     cell.turn.appendChild(row); cell.acts = row;
     bindCode(cell); typeset(cell.a);      // 代码块复制（事件委托）与公式排版都等正文定稿再做
@@ -3527,6 +3643,33 @@
               if (stat && stat.parentNode) stat.parentNode.appendChild(_vb);
             }
             window.SDEVault.auto([{ kind: "claim", text: _vt }], "ChatSDE · " + kindT(kind), _vb);
+          }
+        }
+      } catch (e) {}
+      /* 近邻一级闸门（零调用、不烧 Key）＋ 候选卡出口。
+         成文是这一场里最像"候选"的产物，却从来没被查过一次占位库——两次真跑的 I=115
+         都出在这里（《操作自盲》的正主卢曼从头到尾没被检索过）。闸门放在成文**落地的那一刻**，
+         而不是评分时才补：那时命题已经定死，近邻只能给它背书，淘汰不掉任何东西。 */
+      try {
+        if (window.SDECand && text && text.length > 80) {
+          var _cd = window.SDECand.draft(text);
+          if (_cd.prop && _cd.prop.length >= 8) {
+            var _gb = el("div", "wdsm-gatenote");
+            _gb.style.cssText = "font-size:12.5px;line-height:1.7;margin:8px 0 0;color:#8B7B5E";
+            _gb.textContent = t("cdGateWait");
+            if (stat && stat.parentNode) stat.parentNode.appendChild(_gb);
+            window.SDECand.gate(_cd.prop).then(function (g) {
+              _gb.textContent = "";
+              _gb.appendChild(el("div", null, t("gateH") + "：" + g.line));
+              window.SDECand.brief(g, 3).forEach(function (s) { _gb.appendChild(el("div", null, "\u00b7 " + s)); });
+              var _b = el("button", "wdsm-act", t("cdBtn"));
+              _b.style.marginTop = "7px";
+              _b.onclick = function () {
+                if (_b._box && _b._box.parentNode) { _b._box.parentNode.removeChild(_b._box); _b._box = null; return; }
+                _b._box = candBox(cbox, _cd, t("cdSrcDist") + kindT(kind));
+              };
+              _gb.appendChild(_b);
+            });
           }
         }
       } catch (e) {}

@@ -120,6 +120,7 @@ a.reco .rw{font-size:0.8rem;color:var(--muted,#8a8a8a);margin-top:3px;line-heigh
 .pdf-acts.show{display:flex}
 </style>
   <script src="/assets/sde-nbr.js"></script>
+  <script src="/taste/assets/sde-cand.js?v=1"></script>
 </head>
 <body>
 <nav>
@@ -1330,24 +1331,12 @@ function paradigmName(t){
    只活在一次会话的内存里，刷新即失，没有任何路径把候选送到一个人面前。
    身份复用全站单点登录（sessionStorage["sde_gauth"] ／ localStorage["sde_talk_id"]），
    与「SDE 微信」是同一个键——在微信登录过一次，这里就能直接落卡。 */
-function cdCred(){
-  try{
-    var c=sessionStorage.getItem("sde_gauth");
-    if(c)return c;
-    var raw=localStorage.getItem("sde_talk_id");
-    if(raw){var o=JSON.parse(raw); if(o&&o.cred&&(!o.exp||o.exp>Date.now()))return o.cred;}
-  }catch(e){}
-  return "";
-}
-/* 典范骨架八节 → 候选卡三段。取不到就退回整段文本的前若干字，**绝不编造**。 */
-function cdSection(txt,names){
-  for(var i=0;i<names.length;i++){
-    var re=new RegExp(names[i]+"[：:]?\\s*([\\s\\S]*?)(?=\\n\\s*[一二三四五六七八九十]{1,3}[、．.]|$)");
-    var m=String(txt||"").match(re);
-    if(m&&m[1]&&m[1].trim().length>3)return m[1].trim().replace(/\s+/g," ");
-  }
-  return "";
-}
+/* 身份取用与「典范骨架八节 → 候选卡三段」的切节都搬进了全站共用模块
+   /taste/assets/sde-cand.js——这条缝现在有第二个出口（ChatSDE 的每一答与成文），
+   同一套纪律抄两遍必漂，而这类漂移是静默的：卡照样落，只是某一关不再把关。
+   这里只留薄壳，**读者看到的话术与行为一字未改**。 */
+function cdCred(){ return (window.SDECand && window.SDECand.cred()) || ""; }
+function cdSection(txt,names){ return (window.SDECand && window.SDECand.section(txt,names)) || ""; }
 /* 存进库存：**低门槛的那条路**。
    候选卡要三段硬门，而典范名／承重命题这类东西哪怕只有一句也值得留下来——
    否则它只活在这一次会话的内存里，刷新即失。存进去之后，
@@ -1437,35 +1426,20 @@ function toVault(ix){
 function toCandidate(ix){
   var p=paradigms[ix]; if(!p)return;
   var msg=document.getElementById("cdmsg"+ix);
-  var cred=cdCred();
-  if(!cred){
-    msg.innerHTML='要先在 <a href="/sde-wechat/" target="_blank">SDE 微信</a> 用名字和密码登录一次（全站通用，登好回来再点）。';
-    return;
-  }
+  if(!window.SDECand){ msg.textContent="sde-cand.js 没装载上，刷新一次再试。"; return; }
+  /* 解析归页面（骨架节名是这一页的事），落卡与闸门归模块。
+     三段缺任一段都拒绝落卡，并**各给各的理由**——取不到就说取不到，绝不编造。 */
   var prop=cdSection(p.text,["二、承重命题","承重命题"]);
   var face=cdSection(p.text,["三、它切开的辨别面","它切开的辨别面","辨别面"]);
   var crit=cdSection(p.text,["五、可裁决判据","可裁决判据","六、可裁决判据"]);
   if(!prop){ msg.textContent="这张典范里没解析出「承重命题」，先手动去微信立卡。"; return; }
   if(!face){ msg.textContent="没解析出「它切开的辨别面」——候选卡缺这一段就没法被顶回，先手动立卡。"; return; }
   if(!crit){ msg.textContent="没解析出「可裁决判据」——没有判据别人只能表态，先手动立卡。"; return; }
-  prop=prop.slice(0,120); face=face.slice(0,200); crit=crit.slice(0,300);
-  msg.textContent="正在查占位库…";
-  var go=function(nbr){
-    msg.textContent="正在落卡…";
-    fetch("/api/im",{method:"POST",headers:{"content-type":"application/json"},
-      body:JSON.stringify({credential:cred,op:"cd",a:"post",prop:prop,face:face,crit:crit,nbr:nbr})})
-      .then(function(r){return r.json()})
-      .then(function(d){
-        if(!d||!d.ok){msg.textContent=(d&&d.msg)||"落卡失败。";return;}
-        msg.innerHTML='已立卡 · 72 小时顶回期开始 → <a href="/sde-wechat/" target="_blank">去「🎯 候选」看</a>';
-      }).catch(function(){msg.textContent="落卡失败，请重试。";});
-  };
-  if(window.SDENbr){
-    window.SDENbr.ask(prop,5).then(function(res){
-      go({status:res.status,verdict:res.verdict,
-          hits:(res.hits||[]).slice(0,5).map(function(x){return {prop:x.prop,who:(x.src&&x.src.author)||""};})});
-    }).catch(function(){go(null);});
-  } else go(null);
+  msg.textContent="正在查占位库、落卡…";
+  window.SDECand.post({prop:prop,face:face,crit:crit,src:"涌现档 · "+wayName(p.way)}).then(function(r){
+    if(!r||!r.ok){ msg.innerHTML=(r&&r.msg)||"落卡失败。"; return; }
+    msg.innerHTML='已立卡 · 72 小时顶回期开始 → <a href="/sde-wechat/" target="_blank">去「🎯 候选」看</a>';
+  });
 }
 function renderParadigms(sel){
   var o='';
@@ -1669,7 +1643,7 @@ function saveKey(){
 <script>window.WDS_READ={selector:".wrap"};</script>
 <script src="/taste/wds-companion/wds-read.js?v=20260731g" defer></script>
 
-<script src="/wds-mode.js?v=20260731h" defer></script>
+<script src="/wds-mode.js?v=20260731i" defer></script>
 <script src="/taste/assets/sde-handoff.js?v=1"></script>
 <script>
 /* 接住从 SDE 对话交过来的那一问：只填框、不开跑（纪律见 sde-handoff.js）。 */

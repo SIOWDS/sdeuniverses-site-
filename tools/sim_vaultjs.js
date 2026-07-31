@@ -12,7 +12,7 @@ const IG = R("public/taste/idea-generator/index.html");
 const ZW = R("public/taste/zhiwen/index.html");
 const CD = R("public/taste/classics-deconstructor/index.html");
 const WM = R("public/wds-mode.js");
-const WD = R("public/taste/wds-dialogue/index.html");
+const WD = R("public/taste/sde-dialogue/index.html");   // ⚠️ 改名后新门牌；旧址 /taste/wds-dialogue/ 只剩跳转壳，读它等于读空文件
 const UP = R("public/taste/uplift-compare/index.html");
 const RD = R("public/taste/wds-companion/wds-read.js");
 
@@ -125,7 +125,7 @@ function rest() {
     /sc\.src = "\/taste\/assets\/sde-vault\.js/.test(WM) && /if \(window\.SDEVault\) return;/.test(WM));
   ok("★ 挂在 distill 的 done()——报告／成文／提纲三种锻造产物的唯一收口",
     /if \(dTimedOut\) dNote\(t\("dCut"\), 1\);[\s\S]{0,1600}SDEVault\.auto\(\[\{ kind: "claim"/.test(WM)
-    && /"问WDS · " \+ kindT\(kind\)/.test(WM));
+    && /"ChatSDE · " \+ kindT\(kind\)/.test(WM));   // 改名后出处写 ChatSDE
   ok("成文类取 lead、报告提纲取 head", /kind === "paper" \|\| kind === "essay"[\s\S]{0,120}lead\(text, 200\)/.test(WM));
   ok("太短的不入库（多半是还没写完）", /text\.length > 80/.test(WM));
 
@@ -134,7 +134,7 @@ function rest() {
     /流停即入库/.test(WD) && /2500\)/.test(WD) && /vDone = true/.test(WD));
   ok("只入一次，不在流中途反复入库", /if \(vDone\) return;/.test(WD));
   ok("太短不入库（多半没写完或失败）", /body\.length < 200/.test(WD));
-  ok("三种产物各带各的出处", /《问对WDS》/.test(WD) && /本场心得/.test(WD) && /全场总结/.test(WD));
+  ok("三种产物各带各的出处", /《问对SDE》/.test(WD) && /本场心得/.test(WD) && /全场总结/.test(WD));   // 改名：《问对WDS》→《问对SDE》
 
   ok("对话智商大比拼引了模块", /taste\/assets\/sde-vault\.js/.test(UP));
   ok("★ 只存提智那一栏，左栏裸答不入库", /col === 'wds'/.test(UP) && /左栏是裸答对照组/.test(UP));
