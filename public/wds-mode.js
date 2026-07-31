@@ -1282,8 +1282,9 @@
     q(".wdsm-note").textContent = t("note");
     q(".wdsm-mic").title = t("micIdle");
     if (!inEl.disabled) inEl.placeholder = t("ph");
+    // 首屏不再铺示例问题（2026-07-31 用户指定去掉）。词条 egs 与容器 .wdsm-egs 都留着，
+    // 将来想换个形式再用不必从头写；这里只是不再往里塞东西。
     egsEl.innerHTML = "";
-    t("egs").forEach(function (x) { var b = el("button", "wdsm-eg", x); b.onclick = function () { inEl.value = x; send(); }; egsEl.appendChild(b); });
     paintModes(); updTurns();
     try { document.documentElement.lang = LANG; } catch (e) {}
   }

@@ -430,7 +430,7 @@ console.log("⑧ 成文（distill）");
   ok(langBtn.textContent === "中", "切到英文后按钮显示 中");
   ok(layer.querySelector(".wdsm-mode[data-k='deep']").textContent === "\u25c8 Deep", "档位按钮已英化");
   ok(inEl.placeholder.indexOf("Ask WDS") === 0, "输入框占位已英化");
-  ok(layer.querySelectorAll(".wdsm-eg").length === 4, "英文示例问题已重铺");
+  ok(layer.querySelectorAll(".wdsm-eg").length === 0, "首屏不铺示例问题（切语言也不会把它们铺回来），实得 " + layer.querySelectorAll(".wdsm-eg").length);
   ROUTE["/api/wds/chat"] = [{ t: "token", v: "In English." }];
   inEl.value = "hello";
   await new Promise((res) => { sendEl.click(); setTimeout(res, 200); });
