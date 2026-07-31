@@ -26,11 +26,19 @@
 
   // 回到入口页。地址只在这里定义一次，wds-mode.js 用的是同一串。
   var PORTAL = "/?portal=1";
+  // 只有浏览首页那颗烧——烧一处才是记号，处处都烧就成了噪音
+  function isHome() {
+    var p = String(location.pathname || "/");
+    return p === "/" || p === "/index.html";
+  }
   function homeBtn() {
     var a = document.createElement("a");
     a.className = "sdemx-home";
     a.href = PORTAL;
-    // 三角＝入口页那张图，认得出；四周烧着，与它指向的那张图同一种火
+    var gl0 = document.createElement("i");
+    gl0.textContent = "\u25b3";
+    if (!isHome()) { a.appendChild(gl0); return a; }          // 内页：一颗安静的 △
+    // 首页：三角＝入口页那张图，认得出；火裹着它，与它指向的那张图同一种火
     var fire = document.createElement("span");
     fire.className = "sdemx-fire";
     fire.setAttribute("aria-hidden", "true");
@@ -47,9 +55,7 @@
       sp.style.animationDelay = (i2 * 0.27) + "s";
       fire.appendChild(sp);
     }
-    var gl = document.createElement("i");
-    gl.textContent = "\u25b3";
-    a.appendChild(fire); a.appendChild(gl);
+    a.appendChild(gl0); a.appendChild(fire);                  // 字在前、火在后加入＝火盖在字上
     a.title = lang() === "en" ? "Back to the entry page" : "\u56de\u5230\u5165\u53e3\u9875";
     a.setAttribute("aria-label", a.title);
     return a;
@@ -93,14 +99,14 @@
     /* 烧 TOKEN（与首页智能体条、入口页三图标同一套火）。isolation 必须有：
        不给按钮做一个层叠上下文，火层那个 z-index:-1 会掉到页面背景后面、整团看不见。 */
     ".sdemx-home{position:relative;isolation:isolate}" +
-    ".sdemx-home i{font-style:normal;position:relative;z-index:1}" +
-    ".sdemx-fire{position:absolute;left:50%;top:54%;width:92px;height:92px;transform:translate(-50%,-50%);pointer-events:none;z-index:-1}" +
+    ".sdemx-home i{font-style:normal;position:relative;z-index:1;color:#FFE9C2;text-shadow:0 0 8px rgba(255,140,20,.95),0 0 18px rgba(255,90,0,.6)}" +
+    ".sdemx-fire{position:absolute;left:50%;bottom:-7px;width:66px;height:60px;transform:translateX(-50%);pointer-events:none;z-index:2}" +
 ".sdemx-fire b{position:absolute;left:50%;bottom:0;transform-origin:50% 100%;border-radius:50% 50% 46% 46% / 68% 68% 32% 32%;animation-name:sdemxBurn;animation-timing-function:ease-in-out;animation-iteration-count:infinite}" +
-    ".sdemx-fire .f1{width:96%;height:88%;filter:blur(9px);opacity:.55;background:radial-gradient(50% 62% at 50% 100%,#FF3D00 0%,rgba(255,61,0,.5) 46%,transparent 74%);animation-duration:1.35s}" +
-    ".sdemx-fire .f2{width:66%;height:70%;filter:blur(5px);opacity:.8;background:radial-gradient(52% 64% at 50% 100%,#FF9A1F 0%,rgba(255,140,20,.6) 48%,transparent 76%);animation-duration:1.02s;animation-delay:-.4s}" +
-    ".sdemx-fire .f3{width:38%;height:48%;filter:blur(2.6px);opacity:.92;background:radial-gradient(54% 66% at 50% 100%,#FFF3C4 0%,#FFC93C 44%,transparent 78%);animation-duration:.78s;animation-delay:-.7s}" +
+    ".sdemx-fire .f1{width:98%;height:96%;filter:blur(9px);opacity:.5;background:radial-gradient(50% 62% at 50% 100%,#FF3D00 0%,rgba(255,61,0,.5) 46%,transparent 74%);animation-duration:1.35s}" +
+    ".sdemx-fire .f2{width:70%;height:80%;filter:blur(5px);opacity:.62;background:radial-gradient(52% 64% at 50% 100%,#FF9A1F 0%,rgba(255,140,20,.6) 48%,transparent 76%);animation-duration:1.02s;animation-delay:-.4s}" +
+    ".sdemx-fire .f3{width:42%;height:58%;filter:blur(2.6px);opacity:.6;background:radial-gradient(54% 66% at 50% 100%,#FFF3C4 0%,#FFC93C 44%,transparent 78%);animation-duration:.78s;animation-delay:-.7s}" +
     "@keyframes sdemxBurn{0%{transform:translateX(-50%) scale(1,1) skewX(0deg)}22%{transform:translateX(-50%) scale(1.07,1.2) skewX(-4deg)}46%{transform:translateX(-50%) scale(.93,1.34) skewX(3deg)}68%{transform:translateX(-50%) scale(1.09,1.14) skewX(-2deg)}100%{transform:translateX(-50%) scale(1,1.04) skewX(1deg)}}" +
-    ".sdemx-sp{position:absolute;bottom:16%;width:2px;height:2px;border-radius:50%;opacity:0;animation-name:sdemxRise;animation-timing-function:linear;animation-iteration-count:infinite}" +
+    ".sdemx-sp{position:absolute;bottom:6%;width:2px;height:2px;border-radius:50%;opacity:0;animation-name:sdemxRise;animation-timing-function:linear;animation-iteration-count:infinite}" +
     "@keyframes sdemxRise{0%{opacity:0;transform:translateY(0) scale(.5)}18%{opacity:1}100%{opacity:0;transform:translateY(-54px) scale(.12)}}" +
     ".sdemx .sdemx-home{margin-left:3px;border-left:1px solid rgba(212,178,94,.28);border-radius:0 999px 999px 0}" +
     /* 兜底浮动：只有页面里找不到任何合适落点时才用。

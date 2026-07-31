@@ -581,10 +581,8 @@ console.log("⑧ 成文（distill）");
 {
   const pb = layer.querySelector(".wdsm-portal");
   ok(!!pb, "侧栏有回入口页的 △");
-  ok(!!pb.querySelector(".wdsm-pfire"), "△ 四周也烧着");
-  ok(pb.querySelectorAll(".wdsm-psp").length === 12, "火星十二粒，实得 " + pb.querySelectorAll(".wdsm-psp").length);
-  ok(pb.querySelectorAll("b").length === 3, "三层火舌，实得 " + pb.querySelectorAll("b").length);
-  ok(/isolation:isolate/.test(src), "按钮做了层叠上下文——不然火层的 z-index:-1 会掉到背景后面");
+  ok(!pb.querySelector(".wdsm-pfire") && !/wdsmBurn/.test(src),
+    "侧栏这颗 △ 刻意不烧——火只留浏览首页那一处");
 }
   ok(layer.querySelector(".wdsm-tab[data-m='wds']").textContent.includes("问WDS"), "已更名为「问WDS」");
   const foldBtn = layer.querySelector(".wdsm-fold");

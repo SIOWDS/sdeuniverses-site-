@@ -84,12 +84,28 @@ console.log("① 浏览态：顶栏紧跟「问WDS」插一颗「SDE 微信」")
   ok(!!home && home.href === "/?portal=1", "顶栏有一颗回入口页的 △，实得 " + (home && home.href));
   ok(!!home && nav.children.indexOf(home) === nav.children.indexOf(pills[1]) + 1, "△ 排在两颗药丸之后");
   ok(home.textContent === "△", "△ 是图形按钮，不分中英，一颗即可");
+  ok(!home.querySelector(".sdemx-fire"), "内页那颗 △ 是安静的（烧一处才是记号，处处都烧就成了噪音）");
+}
+
+console.log("①b 只有浏览首页那颗 △ 在烧，且火盖住三角形");
+{
+  const env = freshDoc("/");
+  const nav = new N("div"); nav.className = "nav-links";
+  const wds = new N("a"); wds.className = "zh-only wdsm-navbtn"; wds.href = "/taste/wds-chat/";
+  nav.appendChild(wds); env.body.appendChild(nav);
+  run(env);
+  const home = nav.querySelector(".sdemx-home");
   const hf = home.querySelector(".sdemx-fire");
-  ok(!!hf && !!hf.querySelector("b"), "△ 四周也烧着（它指的就是那张烧着的入口图）");
+  ok(!!hf && hf.querySelectorAll("b").length === 3, "首页那颗在烧，三层火舌");
   ok(hf.querySelectorAll(".sdemx-sp").length === 12, "火星十二粒，实得 " + hf.querySelectorAll(".sdemx-sp").length);
-  ok(hf.querySelectorAll("b").length === 3, "三层火舌，实得 " + hf.querySelectorAll("b").length);
-  ok(new Set(hf.querySelectorAll(".sdemx-sp").map((x) => x.style.animationDelay)).size > 1, "火星错开起飞");
-  ok(/isolation:isolate/.test(SRC), "按钮做了层叠上下文——不然火层那个 z-index:-1 会掉到页面背景后面去");
+  const kids = home.children.map((c) => c.className || c.tagName);
+  ok(kids.indexOf("sdemx-fire") === kids.length - 1,
+    "火最后加入＝盖在三角形上面，不是垫在它背后，实得顺序 " + kids.join(" > "));
+  ok(/\.sdemx-fire\{[^"]*z-index:2/.test(SRC), "火层 z-index 在字之上");
+  ok(/\.sdemx-fire \.f3\{[^"]*opacity:\.6/.test(SRC), "内焰压到半透明——不然三角形会被糊没");
+  ok(!/mix-blend-mode:\s*screen/.test(SRC),
+    "不用 screen 混合：顶栏是米色浅底，screen 会把橙色直接洗成白，火就没了");
+  ok(/text-shadow:0 0 8px rgba\(255,140,20/.test(SRC), "三角形本身调成受热的颜色，不然在火里会变成一个黑洞");
 }
 
 console.log("② 当前态按路径判定");
