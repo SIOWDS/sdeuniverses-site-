@@ -314,7 +314,7 @@
       kEssay: "提炼成文", kEssayS: "锻成一篇独立成立的文章，约三千字",
       kOutline: "写作提纲", kOutlineS: "母题 + 章节骨架，照着就能写",
       mExport: "\u2913 导出本场对话", mExportS: "Markdown 文件，存到本机",
-      mPdf: "\u2913 导出为 PDF", mPdfS: "排成印刷稿，在打印框里选「另存为 PDF」",
+      bPdf: "\u2913 PDF", bPdfT: "把整场对话排成印刷稿并打印——在打印框里把「目标」选成「另存为 PDF」，即可存成文件",
       pdfWait: "正在排版…", pdfTip: "打印框里把「目标」选成「另存为 PDF」即可存成文件。",
       pdfMe: "我", pdfFoot: "导出自 ChatSDE · sdeuniverses.com　|　回答由大模型生成，引用前请自行核实。",
       pdfNo: "这个浏览器拦住了打印窗口——请允许弹出窗口后再试，或先用 ⤓ 导出 Markdown。",
@@ -452,7 +452,7 @@
       kEssay: "Forge into an essay", kEssayS: "A piece that stands on its own, about 3,000 words",
       kOutline: "Writing outline", kOutlineS: "A motif plus a chapter skeleton you can write from",
       mExport: "\u2913 Export this chat", mExportS: "A Markdown file, saved to your machine",
-      mPdf: "\u2913 Export as PDF", mPdfS: "Typeset for print — pick \u201cSave as PDF\u201d in the print dialog",
+      bPdf: "\u2913 PDF", bPdfT: "Typeset this whole chat for print \u2014 set Destination to \u201cSave as PDF\u201d in the dialog to keep the file",
       pdfWait: "Typesetting\u2026", pdfTip: "In the print dialog, set Destination to \u201cSave as PDF\u201d.",
       pdfMe: "Me", pdfFoot: "Exported from ChatSDE \u00b7 sdeuniverses.com  |  Answers are model-generated \u2014 verify before citing.",
       pdfNo: "The browser blocked the print window — allow pop-ups and retry, or export Markdown with \u2913.",
@@ -1026,6 +1026,7 @@
         "<button class='wdsm-tbtn wdsm-langbtn' title='中文 / English'>EN</button>" +
         "<button class='wdsm-tbtn wdsm-cvbtn'></button>" +
         "<button class='wdsm-tbtn wdsm-distbtn'></button>" +
+        "<button class='wdsm-tbtn wdsm-pdfbtn'></button>" +
         "<button class='wdsm-tbtn wdsm-histbtn' style='display:none'></button>" +
         "<button class='wdsm-tbtn wdsm-membtn'><span class='mb'></span><i class='wdsm-mbadge' style='display:none'></i></button>" +
         "<button class='wdsm-tbtn wdsm-keybtn'></button><button class='wdsm-newbtn'></button>" +
@@ -1347,6 +1348,7 @@
     q(".wdsm-tab[data-m='im']").textContent = t("tabIm");
     q(".wdsm-tab[data-m='portal']").textContent = t("tabPortal");
     q(".wdsm-distbtn").textContent = t("bDistill");
+    try { var pb = q(".wdsm-pdfbtn"); pb.textContent = t("bPdf"); pb.title = t("bPdfT"); } catch (e) {}
     q(".wdsm-histbtn").textContent = t("bHist");
     q(".wdsm-keybtn").textContent = t("bSet");
     try { q(".wdsm-membtn .mb").textContent = t("bMem"); } catch (e) {}   // 按钮里还有个角标 <i>，不能整体 textContent
@@ -3467,6 +3469,7 @@
   function kindT(k) { return t(({ report: "kReport", essay: "kEssay", outline: "kOutline", deck: "kDeck" })[k]); }
   function kindS(k) { return t(({ report: "kReportS", essay: "kEssayS", outline: "kOutlineS", deck: "kDeckS" })[k]); }
   var KIND_KEYS = ["report", "essay", "outline", "deck"];
+  try { layer.querySelector(".wdsm-pdfbtn").onclick = function () { exportPdf(); }; } catch (e) {}
   layer.querySelector(".wdsm-distbtn").onclick = function (ev) {
     var old = document.querySelector(".wdsm-menu");
     if (old) { old.parentNode.removeChild(old); return; }
@@ -3489,11 +3492,6 @@
     dl.appendChild(el("span", "sub", t("mExportS")));
     dl.onclick = function () { if (menu.parentNode) menu.parentNode.removeChild(menu); exportSession(); };
     menu.appendChild(dl);
-    var pf = el("button", "wdsm-pdfbtn-installed");
-    pf.appendChild(document.createTextNode(t("mPdf")));
-    pf.appendChild(el("span", "sub", t("mPdfS")));
-    pf.onclick = function () { if (menu.parentNode) menu.parentNode.removeChild(menu); exportPdf(); };
-    menu.appendChild(pf);
     var pd = el("button");
     pd.appendChild(document.createTextNode(t("dDirPick")));
     pd.appendChild(el("span", "sub", dirName() ? (t("dDirSaved") + dirName()) : (dirSupported() ? t("dDirPickS") : t("dDirNoApi"))));

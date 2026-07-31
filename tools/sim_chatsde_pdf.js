@@ -136,14 +136,18 @@ ok("DOM 取不到时按 history 回退出稿", back.length === 1 && back[0].q ==
 
 /* ═══ 三、源码级 ═══ */
 console.log("── 接线 ──");
-ok("菜单里挂了一处出口（且只有一处）", (SRC.match(/wdsm-pdfbtn-installed/g) || []).length === 1);
-ok("出口紧挨着「导出本场对话」", /exportSession\(\); \};\n    menu\.appendChild\(dl\);\n    var pf = el\("button"/.test(SRC));
-ok("点了走 exportPdf", /pf\.onclick[^\n]*exportPdf\(\)/.test(SRC));
+// 出口在顶栏，不在「成文 · PPT」下拉里——PDF 是零调用的原样打印，跟"调基底重新锻一篇"
+// 不是一回事，埋进成文菜单既难找、也把它说成了成文的子功能。（用户 2026-08-01 令）
+ok("顶栏有一颗独立 PDF 按钮", (SRC.match(/wdsm-tbtn wdsm-pdfbtn/g) || []).length === 1);
+ok("按钮紧挨着「成文 · PPT」", /wdsm-distbtn'><\/button>" \+\n\s*"<button class='wdsm-tbtn wdsm-pdfbtn/.test(SRC));
+ok("点了走 exportPdf", /\.wdsm-pdfbtn"\)\.onclick = function \(\) \{ exportPdf\(\); \}/.test(SRC));
+ok("**没有**再挂在成文下拉里", SRC.indexOf("wdsm-pdfbtn-installed") < 0 && SRC.indexOf("mPdfS") < 0);
+ok("按钮文字与 title 随语言刷新", /wdsm-pdfbtn"\); pb\.textContent = t\("bPdf"\); pb\.title = t\("bPdfT"\)/.test(SRC));
 ok("模块按版本串引（改了模块不 bump ⇒ 缓存里还是老的）", /wds-pdf\.js\?v=" \+ PDF_WANT/.test(SRC));
 ok("装不上模块时说人话而不是静默", /if \(!ok\) \{ alert\(t\("pdfNo"\)\); return; \}/.test(SRC));
 ok("出稿后把「目标选另存为 PDF」讲给用户", /toast\(t\("pdfTip"\)\)/.test(SRC));
 ok("空对话不让导（needTalk）", /function exportPdf\(\) \{\s*\n\s*if \(!history\.length\) \{ alert\(t\("needTalk"\)\)/.test(SRC));
-["mPdf", "mPdfS", "pdfWait", "pdfTip", "pdfNo", "pdfMe", "pdfFoot"].forEach((k) => {
+["bPdf", "bPdfT", "pdfWait", "pdfTip", "pdfNo", "pdfMe", "pdfFoot"].forEach((k) => {
   ok("中英两套文案都有 " + k, (SRC.match(new RegExp("\\b" + k + ":", "g")) || []).length === 2);
 });
 ok("公式走自托管 katex（打印时 CDN 未必在）", SRC.indexOf('katex: "/assets/katex/katex.min.css"') > 0);

@@ -367,16 +367,21 @@ console.log("⑦.8 对外 PPT 的可见性（找不到＝没有）");
   T("空对话点成文时说人话，不是通用提示", /needTalkDeck: "先聊两句/.test(wm) && /alert\(t\("needTalkDeck"\)\)/.test(wm));
 }
 
+// 顶栏那颗独立 PDF 按钮（2026-08-01 用户令：放在成文外面）
+  ok(!!layer.querySelector(".wdsm-pdfbtn"), "顶栏有独立的 PDF 按钮");
+  ok(/PDF/.test(layer.querySelector(".wdsm-pdfbtn").textContent), "按钮上写着 PDF（读者一眼能找到）");
+  ok(/另存为 PDF|Save as PDF/.test(layer.querySelector(".wdsm-pdfbtn").title || ""), "title 讲清楚了要在打印框里选「另存为 PDF」");
+  ok(typeof layer.querySelector(".wdsm-pdfbtn").onclick === "function", "PDF 按钮绑上了事件");
 console.log("⑧ 成文（distill）");
   ROUTE["/api/wds/distill"] = [{ t: "beat", v: { sec: 2, think: 9 } }, { t: "token", v: "# 报告标题\n\n结论：一句话。" }];
   layer.querySelector(".wdsm-distbtn").click();
   const menu = document.body.querySelector(".wdsm-menu");
   ok(!!menu, "成文菜单弹出");
-  // 2026-07-30 加了第四档「对外 PPT」；2026-08-01 导出这一族多了「导出为 PDF」
-  //  → 八项：报告/成文/提纲/PPT ＋ 导出 Markdown ＋ 导出 PDF ＋ 选目录 ＋ 成文记录
-  ok(menu.children.length === 8, "菜单八项（报告/成文/提纲/对外PPT/导出MD/导出PDF/选目录/成文记录），实得 " + menu.children.length);
-  ok(/导出为 PDF/.test(menu.textContent), "「导出为 PDF」这一项真的在菜单里（出口在，读者才找得到）");
-  ok(menu.children[5].className.indexOf("wdsm-pdfbtn-installed") >= 0, "PDF 出口紧挨着「导出本场对话」（第 6 项）");
+  // 2026-07-30 加了第四档「对外 PPT」→ 七项：报告/成文/提纲/PPT ＋ 导出 ＋ 选目录 ＋ 成文记录
+  // 2026-08-01：PDF 一度加在这里，随即按用户令搬到顶栏——这里必须**退回七项**，
+  // 否则等于把"零调用的原样打印"又说成成文的一个子功能。
+  ok(menu.children.length === 7, "菜单七项（报告/成文/提纲/对外PPT/导出/选目录/成文记录），实得 " + menu.children.length);
+  ok(menu.textContent.indexOf("PDF") < 0, "PDF 不在成文菜单里（它在顶栏）");
   menu.children[0].click();
   await new Promise((r) => setTimeout(r, 220));
   const dist = document.body.querySelector(".wdsm-dist");
