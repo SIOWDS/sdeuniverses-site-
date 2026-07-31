@@ -265,8 +265,8 @@ function buildSplitPayload(sel,systemPrompt,userMsg){
 /* ═══ SDE 内功 ═══ */
 let SDE_BASE=`你是一位思想极其深刻、善于穿透常识的跨学科洞察者。核心心法：不问"这个东西是什么"，而问"它在什么条件下、经什么路径、成为现在的样子"。世界不是被发现的，而是被发生出来的。`;
 let SDE_BASE_LOADED=false;
-let neigongPromise=(async function(){ try{ const r=await fetch('/taste/assets/sde-neigong.txt?v=3.3',{cache:'force-cache'}); if(r.ok){ const f=await r.text(); if(f&&f.length>5000){ SDE_BASE=f; SDE_BASE_LOADED=true; const el=document.getElementById('neigongStatus'); if(el){ el.textContent='✓ SDE 内功已加载（'+f.length+' 字 · 提智就绪）'; el.style.color='#5FBF7F'; } return true; } } return false; }catch(e){ return false; } })();
-async function ensureNeigong(){ let ok=await neigongPromise; if(!ok||!SDE_BASE_LOADED){ neigongPromise=(async()=>{ try{ const r=await fetch('/taste/assets/sde-neigong.txt?v=3.3',{cache:'no-store'}); if(r.ok){ const f=await r.text(); if(f&&f.length>5000){ SDE_BASE=f; SDE_BASE_LOADED=true; return true; } } }catch(e){} return false; })(); ok=await neigongPromise; } if(!ok||!SDE_BASE_LOADED) throw new Error('SDE 内功尚未加载成功，无法提智评分。请刷新页面后重试。'); return true; }
+let neigongPromise=(async function(){ try{ const r=await fetch('/taste/assets/sde-neigong.txt?v=3.4',{cache:'force-cache'}); if(r.ok){ const f=await r.text(); if(f&&f.length>5000){ SDE_BASE=f; SDE_BASE_LOADED=true; const el=document.getElementById('neigongStatus'); if(el){ el.textContent='✓ SDE 内功已加载（'+f.length+' 字 · 提智就绪）'; el.style.color='#5FBF7F'; } return true; } } return false; }catch(e){ return false; } })();
+async function ensureNeigong(){ let ok=await neigongPromise; if(!ok||!SDE_BASE_LOADED){ neigongPromise=(async()=>{ try{ const r=await fetch('/taste/assets/sde-neigong.txt?v=3.4',{cache:'no-store'}); if(r.ok){ const f=await r.text(); if(f&&f.length>5000){ SDE_BASE=f; SDE_BASE_LOADED=true; return true; } } }catch(e){} return false; })(); ok=await neigongPromise; } if(!ok||!SDE_BASE_LOADED) throw new Error('SDE 内功尚未加载成功，无法提智评分。请刷新页面后重试。'); return true; }
 
 /* ═══ 第一次提智：写《从发现到发生》心得（同规范·同缓存键） ═══ */
 const REFLECT_SPEC=`

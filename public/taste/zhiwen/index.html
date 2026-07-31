@@ -277,7 +277,7 @@ function loadAsset(url, minLen, onOk){
     if(resp.ok){ const t = await resp.text(); if(t && t.length>minLen){ onOk(t); return true; } }
   }catch(e){} return false; })();
 }
-let neigongPromise = loadAsset('/taste/assets/sde-neigong.txt?v=3.3', 5000, t=>{
+let neigongPromise = loadAsset('/taste/assets/sde-neigong.txt?v=3.4', 5000, t=>{
   SDE_BASE=t; SDE_BASE_LOADED=true;
   const el=document.getElementById('neigongStatus'); if(el){ el.textContent='✓ SDE 内功已加载('+t.length+' 字)'; el.style.color='#5FBF7F'; }
 });
@@ -288,7 +288,7 @@ let pskillPromise = loadAsset('/taste/zhiwen/assets/paper-skill.txt', 2000, t=>{
 async function ensurePriors(){
   await neigongPromise; await pskillPromise;
   if(!SDE_BASE_LOADED){
-    neigongPromise = loadAsset('/taste/assets/sde-neigong.txt?v=3.3', 5000, t=>{SDE_BASE=t;SDE_BASE_LOADED=true;});
+    neigongPromise = loadAsset('/taste/assets/sde-neigong.txt?v=3.4', 5000, t=>{SDE_BASE=t;SDE_BASE_LOADED=true;});
     await neigongPromise;
   }
   if(!PAPER_SKILL_LOADED){
