@@ -76,7 +76,7 @@ console.log("\n=== 1. \u65e0\u56fe\u65e0\u8349\u7a3f\uff1a\u4ece\u7ad9\u5185\u7b
 REPLY = "```json\n" + J5 + "\n```";
 let x = await muse({});
 ok("200 \u4e14 ok", x.s === 200 && x.d.ok, x);
-ok("\u56de\u4e94\u6761", x.d.lines.length === 5, x.d.lines);
+ok("\u56de\u4e09\u6761", x.d.lines.length === 3, x.d.lines);
 ok("\u5e26\u7ad9\u5185\u51fa\u5904", (x.d.srcs || []).length >= 1, x.d.srcs);
 ok("\u63d0\u793a\u91cc\u771f\u653e\u4e86\u7bc7\u76ee\u53e5", /\u7ad9\u5185\u7bc7\u76ee/.test(UP.messages[1].content), UP.messages[1].content.slice(0, 120));
 ok("\u6ca1\u56fe\u65f6 user \u662f\u7eaf\u6587\u672c", typeof UP.messages[1].content === "string");
@@ -114,13 +114,15 @@ ok("\u62ff\u5230\u4e09\u53e5\u4ee5\u4e0a", x.d.ok && x.d.lines.length >= 3, x.d.
 ok("\u5e8f\u53f7\u88ab\u5265\u5e72\u51c0", x.d.lines.every((s) => !/^[\d\-\u2022]/.test(s)), x.d.lines);
 ok("\u5f15\u53f7\u88ab\u5265\u5e72\u51c0", x.d.lines.every((s) => !/^["\u201c\u300c]/.test(s)), x.d.lines);
 
-console.log("\n=== 7. \u53bb\u91cd\u3001\u8fc7\u77ed\u8fc7\u957f\u4e00\u5f8b\u4e22\u3001\u5c01\u9876\u4e94\u6761 ===");
+console.log("\n=== 7. \u53bb\u91cd\u3001\u8fc7\u77ed\u8fc7\u957f\u4e00\u5f8b\u4e22\u3001\u5c01\u9876\u4e09\u6761 ===");
 REPLY = JSON.stringify({ lines: ["\u597d", "\u91cd\u590d\u7684\u4e00\u53e5\u8bdd\u5199\u5f97\u5177\u4f53", "\u91cd\u590d\u7684\u4e00\u53e5\u8bdd\u5199\u5f97\u5177\u4f53", "\u5341".repeat(70), "\u7b2c\u4e8c\u53e5\u5199\u5f97\u5177\u4f53\u4e00\u70b9", "\u7b2c\u4e09\u53e5\u5199\u5f97\u5177\u4f53\u4e00\u70b9", "\u7b2c\u56db\u53e5\u5199\u5f97\u5177\u4f53\u4e00\u70b9", "\u7b2c\u4e94\u53e5\u5199\u5f97\u5177\u4f53\u4e00\u70b9", "\u7b2c\u516d\u53e5\u5199\u5f97\u5177\u4f53\u4e00\u70b9"] });
 x = await muse({});
-ok("\u6700\u591a\u4e94\u6761", x.d.lines.length === 5, x.d.lines);
+ok("\u6700\u591a\u4e09\u6761", x.d.lines.length === 3, x.d.lines);
 ok("\u8fc7\u77ed\u7684\u201c\u597d\u201d\u88ab\u4e22", !x.d.lines.includes("\u597d"));
 ok("\u8fc7\u957f\u7684\u88ab\u4e22", x.d.lines.every((s) => s.length <= 60));
 ok("\u91cd\u590d\u7684\u53ea\u7559\u4e00\u6761", x.d.lines.filter((s) => s === "\u91cd\u590d\u7684\u4e00\u53e5\u8bdd\u5199\u5f97\u5177\u4f53").length === 1, x.d.lines);
+
+ok("\u8981\u6c42\u57fa\u5e95\u53ea\u51fa\u4e09\u6761", /\u51fa\u4e09\u6761/.test(UP.messages[1].content));
 
 console.log("\n=== 8. \u4e00\u6761\u90fd\u6ca1\u751f\u51fa\u6765 \u2192 502 \u4e14\u8bdd\u8bf4\u4eba\u8bdd ===");
 REPLY = "{}";
@@ -153,7 +155,7 @@ console.log("\n=== 13. \u53e3\u5473\u771f\u7684\u8fdb\u4e86\u63d0\u793a\uff0c\u6
 x = await muse({ kind: "flip" });
 ok("\u53cd\u7740\u8bf4", /\u53cd\u7740\u8bf4/.test(UP.messages[1].content));
 x = await muse({ kind: "\u6ce8\u5165\u70b9\u4ec0\u4e48" });
-ok("\u672a\u77e5\u53e3\u5473\u843d auto", /\u968f\u4f60\u5224\u65ad\u8fd9\u4e00\u523b/.test(UP.messages[1].content));
+ok("\u672a\u77e5\u53e3\u5473\u843d auto", /\u4e09\u6761\u5404\u53f8\u5176\u804c/.test(UP.messages[1].content));
 
 console.log("\n=== 14. \u8d85\u957f\u8349\u7a3f\u88ab\u94b3\u5230 400 \u5b57 ===");
 x = await muse({ seed: "\u5361".repeat(900) });

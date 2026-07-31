@@ -441,7 +441,7 @@ async function wdsPaperVC(env) {
 //         ③站内篇目（走 neighbors/publications，CI 每次重建）——所以它**随论文长**：
 //           今天发的文，今天就能从它里长出一句话来。
 const MUSE_KINDS = {
-  auto: "随你判断这一刻最该说哪一句。",
+  auto: "三条各司其职：第一条贴着眼前的具体（看见的、手上正在做的那件事）；第二条划一条分界（X 不是 Y，是 Z）；第三条问一句别人没想到要问的。",
   maxim: "写成格言体：一句断言，主语明确，不留退路。",
   flip: "反着说：把大家默认成立的那句话翻过来，但要翻得站得住。",
   ask: "写成一个问句：问出别人没想到要问的那一处。",
@@ -460,9 +460,9 @@ const MUSE_SYS = "你是「SDE金句生产机」，为 SDE 学员在朋友圈的
   + "3. 禁鸡汤（愿你…／生活总会…／慢慢来），禁空词（赋能、闭环、格局、认知升级、深度融合），禁排比煊情，禁感叹号。\n"
   + "4. 可以锋利（“X 不是 Y，是 Z”），但不许教育别人、不许居高临下。\n"
   + "5. 事实、人名、篇名、数字**只能来自给你的材料**，一个都不许现编；没材料就写眼前的事，不写像真的假事。\n"
-  + "6. 五条要是五个不同角度，不是同一句话的五种说法。\n"
+  + "6. **只出三条**，三条要是三个不同角度，不是同一句话的三种说法；宁可三条都短，不要凑数。\n"
   + "7. 术语最多出现一处，且必须是这句话本身非它不可。\n"
-  + "\n【输出】只输出 JSON，不要任何别的字：{\"lines\":[\"第一句\",\"第二句\",\"第三句\",\"第四句\",\"第五句\"]}";
+  + "\n【输出】只输出 JSON，不要任何别的字：{\"lines\":[\"第一句\",\"第二句\",\"第三句\"]}";
 const WDS_SYS = `你是"WDS智能体"，王德生（Desheng）先生的 AI 分身，SDE 本体论的老师，正在 SDE 学员的讨论群里当场回答学生的提问。
 
 【思想内核·SDE 本体论】
@@ -5947,7 +5947,7 @@ export default {
             + (canSee ? "【他刚放了 " + imgs.length + " 张图】先看图：图里有什么、在做什么、什么时候什么地方。看不清就别猜，改从别处下手。\n\n" : "")
             + (imgs.length && !canSee ? "【他放了图，但当前基底看不了图】别装作看过，就着别的料写。\n\n" : "")
             + (mat ? mat + "\n\n" : "")
-            + "【口味】" + MUSE_KINDS[kindK] + "\n\n出五条。只输出那段 JSON。";
+            + "【口味】" + MUSE_KINDS[kindK] + "\n\n出三条。只输出那段 JSON。";
           const uContent = canSee
             ? [{ type: "text", text: uTxt }].concat(imgs.map((im) => ({ type: "image_url", image_url: { url: im.d } })))
             : uTxt;
@@ -5963,7 +5963,7 @@ export default {
             if (/^[\[\]{}]/.test(s) || s.indexOf("lines") >= 0) continue;
             if (had2[s]) continue;
             had2[s] = 1; out.push(s);
-            if (out.length >= 5) break;
+            if (out.length >= 3) break;   // 三条：多了就不是选，是再读一遍
           }
           if (!out.length) return Response.json({ ok: false, msg: "这次没生出来，换个口味或者过一会儿再点。" }, { status: 502 });
           return Response.json({ ok: true, lines: out, saw: canSee ? imgs.length : 0, blind: (imgs.length && !canSee) ? 1 : 0, srcs: srcs.slice(0, 3) }, { headers: { "cache-control": "no-store" } });
