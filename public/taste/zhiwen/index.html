@@ -3445,5 +3445,12 @@ window.__zwRun = run; window.__zwStop = stopRun; window.__zwState = ()=>RUN; win
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', go); else go();
 })();
 </script>
+<script src="/taste/assets/sde-handoff.js?v=1"></script>
+<script>
+/* 接住从 SDE 对话交过来的那一问：只填框、不开跑（纪律见 sde-handoff.js）。 */
+window.addEventListener("load", function () {
+  try { if (window.SDEHandoff) SDEHandoff.receive("zhiwen"); } catch (e) {}
+});
+</script>
 </body>
 </html>

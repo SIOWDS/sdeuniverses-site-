@@ -4577,5 +4577,12 @@ questionEl.addEventListener('keydown', e=>{ if((e.ctrlKey||e.metaKey)&&e.key==='
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', go); else go();
 })();
 </script>
+<script src="/taste/assets/sde-handoff.js?v=1"></script>
+<script>
+/* 接住从 SDE 对话交过来的那一问：只填框、不开跑（纪律见 sde-handoff.js）。 */
+window.addEventListener("load", function () {
+  try { if (window.SDEHandoff) SDEHandoff.receive("idea"); } catch (e) {}
+});
+</script>
 </body>
 </html>

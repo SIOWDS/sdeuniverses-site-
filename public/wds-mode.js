@@ -382,7 +382,10 @@
       aMd: "⧉ 原文", aEditIn: "✎ 编辑", edSave: "保存并重答", edCancel: "取消",
     aCont: "↳ 继续", contQ: "接着上面继续写下去，别重复已经写过的部分。",
     lkOpen: "打开站内这篇（新标签页）",
-    heroAfter: "聊完之后，顶栏 ✎ 可以把这一场做成报告 / 文章 / 提纲，或一套带图表的对外 PPT",
+    heroAfter: "聊完之后，顶栏 ✎ 可以把这一场做成报告 / 文章 / 提纲，或一套带图表的对外 PPT；每个回答下方的「🤝 交给智能体」还能把这一问原样交给金点子、中华智问这些更重的产线接着做",
+    aPass: "\ud83e\udd1d 交给智能体", passH: "把这一问交给别的智能体接着做",
+    passTip: "它们各自都能干很重的活（几十路调用、一两个小时），但入口都是一个空框——这里直接把你刚才这一问原样递过去，在新标签打开，**只填不跑**，开始与否你自己按。",
+    passGo: "交过去 →", passEdit: "要交出去的那一句（可以改）：", passNone: "先问一句，才有东西可交。",
     tipDeck: "✦ 这场可以一键做成 PPT",
     tipX: "不再提示",
     needTalkDeck: "先聊两句——PPT 是从这一场对话锻出来的，空着做不出。",
@@ -515,7 +518,10 @@
       aMd: "⧉ Source", aEditIn: "✎ Edit", edSave: "Save & regenerate", edCancel: "Cancel",
     aCont: "↳ Continue", contQ: "Continue from where you stopped; don't repeat what you already wrote.",
     lkOpen: "Open this article on the site (new tab)",
-    heroAfter: "Once you've talked, ✎ in the top bar turns this chat into a report, an article, an outline, or a slide deck with charts",
+    heroAfter: "Once you've talked, ✎ in the top bar turns this chat into a report, an article, an outline, or a slide deck with charts; \u201cHand off\u201d under each answer passes the same question to the heavier agents",
+    aPass: "\ud83e\udd1d Hand off", passH: "Pass this question to another agent",
+    passTip: "Each of them runs a long pipeline. Your question is handed over as-is, in a new tab. It fills the box; it never presses start.",
+    passGo: "Hand over \u2192", passEdit: "The line being handed over (editable):", passNone: "Ask something first.",
     tipDeck: "✦ Turn this chat into a deck",
     tipX: "Don't show again",
     needTalkDeck: "Talk a little first — the deck is forged from this conversation.",
@@ -867,6 +873,17 @@
     ".wdsm-att i{font-style:normal;color:var(--wdim);font-size:11.5px}" +
     ".wdsm-att button{background:none;border:none;color:var(--wteal);cursor:pointer;font-size:14px;line-height:1;padding:0 2px}" +
     ".wdsm-att button:hover{color:#E88}" +
+    ".wdsm-pass{margin-top:12px;border:1px solid var(--wline);border-radius:10px;background:var(--wfill);padding:12px 13px}" +
+    ".wdsm-pass h4{margin:0 0 6px;font-size:12.5px;color:var(--wgold);font-weight:600}" +
+    ".wdsm-pass p{margin:0 0 9px;font-size:11.5px;line-height:1.65;color:var(--wdim2)}" +
+    ".wdsm-pass textarea{width:100%;box-sizing:border-box;background:var(--wbg);color:var(--wtx);border:1px solid var(--wline);border-radius:8px;padding:8px 10px;font:12.5px/1.6 inherit;resize:vertical;min-height:52px}" +
+    ".wdsm-pass .lb{display:block;font-size:11px;color:var(--wdim2);margin-bottom:4px}" +
+    ".wdsm-agents{margin-top:10px;display:flex;flex-direction:column;gap:7px}" +
+    ".wdsm-agent{display:block;width:100%;text-align:left;background:var(--wbg);border:1px solid var(--wline);border-radius:9px;padding:9px 11px;cursor:pointer;color:var(--wtx);font:inherit}" +
+    ".wdsm-agent:hover{border-color:var(--wgold);}" +
+    ".wdsm-agent b{display:block;font-size:13px;font-weight:600;margin-bottom:2px}" +
+    ".wdsm-agent i{display:block;font-style:normal;font-size:11.5px;line-height:1.55;color:var(--wdim2)}" +
+    ".wdsm-agent u{display:block;text-decoration:none;font-size:11px;color:var(--wgold2);margin-top:3px}" +
     ".wdsm-follows{margin-top:14px;display:flex;flex-wrap:wrap;gap:8px}" +
     ".wdsm-follow{background:var(--wfill);border:1px solid var(--wline);color:var(--wtx);border-radius:999px;padding:7px 13px;font:13px/1 inherit;cursor:pointer;text-align:left}" +
     ".wdsm-follow:hover{border-color:var(--wline2);color:var(--wgold)}" +
@@ -1987,6 +2004,41 @@
     n.style.cssText = "color:#8B7B5E;font-size:12.5px;line-height:1.6;margin:8px 0 0";
     cell.turn.appendChild(n);
   }
+  /* —— 交给别的智能体接着做 ——
+     用户定的：「SDE对话承接着大模型AI的智慧功能，所以里面应该连接着几个通用的智能体，比如金点子，中华智问……」
+     这里只做一件事：把**这一问**原样递过去并在新标签打开。三条纪律与共用模块 sde-handoff.js 一致：
+     只填不跑（那边一按就是几十分钟、烧读者自己的 Key）／新标签（不丢这一场对话）／递的是可改的一句。 */
+  function passPanel(cell, btn) {
+    if (cell.pass && cell.pass.parentNode) { cell.pass.parentNode.removeChild(cell.pass); cell.pass = null; return; }
+    var H = window.SDEHandoff;
+    var box = el("div", "wdsm-pass");
+    box.appendChild(el("h4", "", t("passH")));
+    box.appendChild(el("p", "", t("passTip")));
+    var lb = el("span", "lb", t("passEdit"));
+    box.appendChild(lb);
+    var ta = document.createElement("textarea");
+    ta.value = String(cell.q || "").trim();
+    box.appendChild(ta);
+    var list = el("div", "wdsm-agents");
+    var agents = (H && H.AGENTS) || [];
+    if (!agents.length) { list.appendChild(el("p", "", "sde-handoff.js 没装载上，刷新一次再试。")); }
+    agents.forEach(function (a) {
+      var b = el("button", "wdsm-agent");
+      b.appendChild(el("b", "", a.icon + " " + a.name));
+      b.appendChild(el("i", "", a.what));
+      b.appendChild(el("u", "", a.cost + "  \u00b7  " + t("passGo")));
+      b.onclick = function () {
+        var q = String(ta.value || "").trim();
+        if (!q) { ta.focus(); return; }
+        H.send(a.id, q, "SDE 对话");
+        b.querySelector("u").textContent = "已在新标签打开，去那边按开始";
+      };
+      list.appendChild(b);
+    });
+    box.appendChild(list);
+    cell.turn.appendChild(box); cell.pass = box;
+  }
+
   function mountActs(cell, text) {
     if (cell.wait && cell.wait.parentNode) { cell.wait.parentNode.removeChild(cell.wait); cell.wait = null; }
     autoLink(cell.a, text);                     // 答案里的站内篇目就地变成可点链接
@@ -2015,6 +2067,9 @@
       cvb.textContent = tx("cvDropped"); setTimeout(function () { cvb.textContent = tx("cvDrop"); }, 1400);
     };
     row.appendChild(cvb);
+    var ps = el("button", "wdsm-act", t("aPass"));
+    ps.onclick = function () { passPanel(cell, ps); };
+    row.appendChild(ps);
     row.appendChild(rg); row.appendChild(ed);
     cell.turn.appendChild(row); cell.acts = row;
     bindCode(cell); typeset(cell.a);      // 代码块复制（事件委托）与公式排版都等正文定稿再做
