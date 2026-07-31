@@ -441,7 +441,7 @@ async function wdsPaperVC(env) {
 //         ③站内篇目（走 neighbors/publications，CI 每次重建）——所以它**随论文长**：
 //           今天发的文，今天就能从它里长出一句话来。
 const MUSE_KINDS = {
-  auto: "三条各司其职：第一条贴着眼前的具体（看见的、手上正在做的那件事）；第二条划一条分界（X 不是 Y，是 Z）；第三条问一句别人没想到要问的。",
+  auto: "五条各司其职，别撑成同一副面孔：有的贴着眼前的具体，有的划一条分界（X 不是 Y，是 Z），有的问一句别人没想到要问的。",
   maxim: "写成格言体：一句断言，主语明确，不留退路。",
   flip: "反着说：把大家默认成立的那句话翻过来，但要翻得站得住。",
   ask: "写成一个问句：问出别人没想到要问的那一处。",
@@ -460,9 +460,14 @@ const MUSE_SYS = "你是「SDE金句生产机」，为 SDE 学员在朋友圈的
   + "3. 禁鸡汤（愿你…／生活总会…／慢慢来），禁空词（赋能、闭环、格局、认知升级、深度融合），禁排比煊情，禁感叹号。\n"
   + "4. 可以锋利（“X 不是 Y，是 Z”），但不许教育别人、不许居高临下。\n"
   + "5. 事实、人名、篇名、数字**只能来自给你的材料**，一个都不许现编；没材料就写眼前的事，不写像真的假事。\n"
-  + "6. **只出三条**，三条要是三个不同角度，不是同一句话的三种说法；宁可三条都短，不要凑数。\n"
-  + "7. 术语最多出现一处，且必须是这句话本身非它不可。\n"
-  + "\n【输出】只输出 JSON，不要任何别的字：{\"lines\":[\"第一句\",\"第二句\",\"第三句\"]}";
+  + "6. **一篇长一条，五篇出五条**：第 i 条必须是从编号 i 的那篇里长出来的，不许两条抽同一篇。\n"
+  + "   长出来≠摘要：把那篇的判断搬到**读者今天过的日子里**，能被发在朋友圈而不像在发论文。\n"
+  + "   你拿到的只是题目与一句判断，**别假装读过全文**，不许编文中细节、不许把篇名写进句子里。\n"
+  + "7. 五条要是五个不同角度，不是同一句话的五种说法；宁可都短，不要凑字。\n"
+  + "8. 术语最多出现一处，且必须是这句话本身非它不可。\n"
+  + "\n【输出】只输出 JSON，不要任何别的字：\n"
+  + "{\"lines\":[{\"i\":1,\"t\":\"由第1篇长出的那句\"},{\"i\":2,\"t\":\"由第2篇长出的那句\"}]}\n"
+  + "i 是篇目编号，t 是那句话本身（句子里不要带篇名、不要带引号）。";
 const WDS_SYS = `你是"WDS智能体"，王德生（Desheng）先生的 AI 分身，SDE 本体论的老师，正在 SDE 学员的讨论群里当场回答学生的提问。
 
 【思想内核·SDE 本体论】
@@ -5963,9 +5968,28 @@ export default {
           const ladder = imgs.length ? wdsVisionLadder(vd, "") : [];
           const canSee = imgs.length > 0 && ladder.length > 0;
           if (canSee) VC = { url: VC.url, model: ladder[0], name: VC.name };
-          // 站内料：有草稿就按草稿检索；什么都没有就从站内篇目里拈几篇——这一路让它随论文长。
-          let mat = "";
+          // 站内料：**每次都随机拈五篇站内文章**（一篇长一条）——这就是这台机器的发动机：
+          //   篇目表走 loadPubs（neighbors/publications，CI 每次重建）⇒ **站上多一篇，它多一份料**。
+          //   有草稿时额外再取三段相关原文（只作贴题用，不取代随机那五篇）。
+          const PICKN = 5;
           const srcs = [];
+          let matArts = "", matRel = "";
+          try {
+            const pubs = await loadPubs(env, url);
+            if (pubs && pubs.length) {
+              const had = Object.create(null), parts = [];
+              for (let i = 0; i < 60 && srcs.length < PICKN; i++) {
+                const pp = pubs[Math.floor(Math.random() * pubs.length)];
+                if (!pp || !pp.t || had[pp.t]) continue;
+                had[pp.t] = 1;
+                srcs.push({ t: pp.t, u: pp.u || "" });
+                parts.push(srcs.length + ". \u300a" + pp.t + "\u300b" + (pp.au ? "\uff08" + pp.au + "\uff09" : "")
+                  + (pp.kw ? "\uff5c\u5173\u952e\u8bcd\uff1a" + String(pp.kw).replace(/\s+/g, " ").trim().slice(0, 60) : "")
+                  + "\n   \u5b83\u7684\u4e00\u53e5\u5224\u65ad\uff1a" + String(pp.line || "\uff08\u672a\u7ed9\uff09").replace(/\s+/g, " ").trim().slice(0, 160));
+              }
+              if (parts.length) matArts = "\u3010\u4eca\u5929\u968f\u673a\u7ffb\u5230\u7684\u7ad9\u5185\u6587\u7ae0\uff08\u4e00\u7bc7\u957f\u4e00\u6761\uff0c\u6309\u7f16\u53f7\u5bf9\u5e94\uff09\u3011\n" + parts.join("\n");
+            }
+          } catch (e) {}
           try {
             if (seed.length >= 4) {
               const lr = await lightRetrieve(env, url, seed, [], 6, 360, { pick: 6 });
@@ -5974,50 +5998,42 @@ export default {
                 const dd = lr.corpus.docs[ck.d];
                 if (!dd || !dd.t || had[dd.t]) continue;
                 had[dd.t] = 1;
-                parts.push("《" + dd.t + "》：" + String(ck.t || "").replace(/\s+/g, " ").trim().slice(0, 160));
-                srcs.push({ t: dd.t, u: dd.u || "" });
+                parts.push("\u300a" + dd.t + "\u300b\uff1a" + String(ck.t || "").replace(/\s+/g, " ").trim().slice(0, 160));
                 if (parts.length >= 3) break;
               }
-              if (parts.length) mat = "【站内相关（可用可不用，用了就别说错）】\n" + parts.join("\n");
-            } else if (!canSee) {
-              const pubs = await loadPubs(env, url);
-              if (pubs && pubs.length) {
-                const had = Object.create(null), parts = [];
-                for (let i = 0; i < 30 && parts.length < 3; i++) {
-                  const pp = pubs[Math.floor(Math.random() * pubs.length)];
-                  if (!pp || !pp.t || had[pp.t]) continue;
-                  had[pp.t] = 1;
-                  parts.push("《" + pp.t + "》" + (pp.au ? "（" + pp.au + "）" : "") + "：" + String(pp.line || "").replace(/\s+/g, " ").trim().slice(0, 140));
-                  srcs.push({ t: pp.t, u: pp.u || "" });
-                }
-                if (parts.length) mat = "【站内篇目（今天没什么想说时，从这里长一句出来；可用可不用）】\n" + parts.join("\n");
-              }
+              if (parts.length) matRel = "\u3010\u8ddf\u4ed6\u8fd9\u534a\u53e5\u6709\u5173\u7684\u7ad9\u5185\u6bb5\u843d\uff08\u53ea\u4f5c\u53c2\u8003\uff0c\u4e0d\u4ee3\u66ff\u4e0a\u9762\u90a3\u4e94\u7bc7\uff09\u3011\n" + parts.join("\n");
             }
           } catch (e) {}
-          const uTxt = (seed ? "【他已经写了半句】" + seed + "\n（顺着这半句往下，或把它改得更利落；不许换题。）\n\n" : "")
-            + (canSee ? "【他刚放了 " + imgs.length + " 张图】先看图：图里有什么、在做什么、什么时候什么地方。看不清就别猜，改从别处下手。\n\n" : "")
-            + (imgs.length && !canSee ? "【他放了图，但当前基底看不了图】别装作看过，就着别的料写。\n\n" : "")
-            + (mat ? mat + "\n\n" : "")
-            + "【口味】" + MUSE_KINDS[kindK] + "\n\n出三条。只输出那段 JSON。";
+          const uTxt = (matArts ? matArts + "\n\n" : "")
+            + (matRel ? matRel + "\n\n" : "")
+            + (seed ? "\u3010\u4ed6\u5df2\u7ecf\u5199\u4e86\u534a\u53e5\u3011" + seed + "\n\uff08\u4e94\u6761\u91cc\u81f3\u5c11\u6709\u4e24\u6761\u63a5\u5f97\u4e0a\u8fd9\u534a\u53e5\uff1b\u4ecd\u7136\u4e00\u7bc7\u957f\u4e00\u6761\u3002\uff09\n\n" : "")
+            + (canSee ? "\u3010\u4ed6\u521a\u653e\u4e86 " + imgs.length + " \u5f20\u56fe\u3011\u5148\u770b\u56fe\uff1a\u56fe\u91cc\u6709\u4ec0\u4e48\u3001\u5728\u505a\u4ec0\u4e48\u3002\u4e94\u6761\u91cc\u5c3d\u91cf\u6709\u51e0\u6761\u80fd\u76f4\u63a5\u914d\u8fd9\u5f20\u56fe\uff0c\u4f46**\u6bcf\u4e00\u6761\u4ecd\u7136\u5f97\u4ece\u5b83\u90a3\u7bc7\u91cc\u957f\u51fa\u6765**\uff0c\u4e0d\u662f\u770b\u56fe\u8bf4\u8bdd\u3002\u770b\u4e0d\u6e05\u5c31\u522b\u731c\u3002\n\n" : "")
+            + (imgs.length && !canSee ? "\u3010\u4ed6\u653e\u4e86\u56fe\uff0c\u4f46\u5f53\u524d\u57fa\u5e95\u770b\u4e0d\u4e86\u56fe\u3011\u522b\u88c5\u4f5c\u770b\u8fc7\u3002\u4e94\u6761\u5c3d\u91cf\u5206\u5f00\u62c9\uff0c\u8ba9\u4ed6\u81ea\u5df1\u6311\u4e00\u6761\u914d\u5f97\u4e0a\u56fe\u7684\u3002\n\n" : "")
+            + "\u3010\u53e3\u5473\u3011" + MUSE_KINDS[kindK] + "\n\n\u51fa\u4e94\u6761\uff08\u7bc7\u76ee\u4e0d\u8db3\u4e94\u7bc7\u65f6\uff0c\u6709\u51e0\u7bc7\u51fa\u51e0\u6761\uff09\u3002\u53ea\u8f93\u51fa\u90a3\u6bb5 JSON\u3002";
           const uContent = canSee
             ? [{ type: "text", text: uTxt }].concat(imgs.map((im) => ({ type: "image_url", image_url: { url: im.d } })))
             : uTxt;
-          const raw = await llmText(VC, KEY, MUSE_SYS, uContent, 900, 30000);
+          const raw = await llmText(VC, KEY, MUSE_SYS, uContent, 1100, 30000);
           const jj = looseJSON(raw);
           const cand = (jj && Array.isArray(jj.lines)) ? jj.lines : String(raw || "").split("\n");
+          // 每条带着它的出处回去（i 是篇目编号）；基底不给 i 就只给句子，不瞎猜一个出处挂上去。
           const out = [], had2 = Object.create(null);
           for (const one of cand) {
-            let s = String(one == null ? "" : one).replace(/\s+/g, " ").trim()
+            const isObj = one && typeof one === "object";
+            let s = String((isObj ? one.t : one) == null ? "" : (isObj ? one.t : one)).replace(/\s+/g, " ").trim()
               .replace(/^[-\u2013\u2014*\u00b7\u2022\d]+[.\u3001)\uff09\s]*/, "")
               .replace(/^["\u201c\u300c\u300e]/, "").replace(/["\u201d\u300d\u300f]$/, "").trim();
             if (s.length < 4 || s.length > 60) continue;
             if (/^[\[\]{}]/.test(s) || s.indexOf("lines") >= 0) continue;
             if (had2[s]) continue;
-            had2[s] = 1; out.push(s);
-            if (out.length >= 3) break;   // 三条：多了就不是选，是再读一遍
+            had2[s] = 1;
+            const k = isObj ? (parseInt(one.i, 10) - 1) : -1;
+            const src = (k >= 0 && srcs[k]) ? srcs[k] : null;
+            out.push({ t: s, s: src ? src.t : "", u: src ? src.u : "" });
+            if (out.length >= 5) break;   // 五条：一篇一条
           }
           if (!out.length) return Response.json({ ok: false, msg: "这次没生出来，换个口味或者过一会儿再点。" }, { status: 502 });
-          return Response.json({ ok: true, lines: out, saw: canSee ? imgs.length : 0, blind: (imgs.length && !canSee) ? 1 : 0, srcs: srcs.slice(0, 3) }, { headers: { "cache-control": "no-store" } });
+          return Response.json({ ok: true, lines: out, saw: canSee ? imgs.length : 0, blind: (imgs.length && !canSee) ? 1 : 0, read: srcs.length }, { headers: { "cache-control": "no-store" } });
         }
         const MOMAP = { like: "molike", cmt: "mocmt", cdel: "mocdel", del: "model", news: "monews", badge: "mobadge" };
         if (MOMAP[a]) {

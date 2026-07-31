@@ -181,6 +181,9 @@ a{color:var(--disc)}
 .mu-out{margin:0 0 0.9rem}
 .mu-out .mu-note{font-size:0.76rem;color:var(--muted);line-height:1.6;margin-bottom:7px}
 .mu-out .mu-item{border:1px solid var(--border);background:var(--card);border-radius:9px;padding:0.5rem 0.7rem;margin-bottom:7px;font-size:0.95rem;line-height:1.65;cursor:pointer}
+.mu-out .mu-txt{font-size:0.95rem;line-height:1.65}
+.mu-out .mu-src{font-size:0.72rem;color:var(--muted);margin-top:3px}
+.mu-out .mu-src a{color:var(--disc);text-decoration:none}
 .mu-out .mu-item:active{background:var(--card2)}
 .mu-out .mu-again{display:inline-block;font-size:0.82rem;color:var(--disc);cursor:pointer;padding:2px 0}
 .nw{padding:0.75rem 1rem;background:var(--card);border-bottom:1px solid var(--border2);font-size:0.87rem;line-height:1.75;cursor:pointer}
@@ -1852,20 +1855,33 @@ function muShrink(b64,cb){
 function muPaint(d){
   var O=el("mu-out");O.textContent="";
   var tip="";
-  if(d.saw)tip="看了你的 "+d.saw+" 张图。";
-  else if(d.blind)tip="当前基底看不了图，这批是就着字写的。";
-  if(d.srcs&&d.srcs.length)tip+=(tip?" ":"")+"取材站内："+d.srcs.map(function(s){return "《"+s.t+"》"}).join("");
-  tip+=(tip?" ":"")+"点一条就填进上面，填完还能改。";
+  if(d.read)tip="\u4eca\u5929\u968f\u673a\u7ffb\u4e86\u7ad9\u5185 "+d.read+" \u7bc7\u6587\u7ae0\uff0c\u4e00\u7bc7\u957f\u4e00\u53e5\u3002";
+  if(d.saw)tip+=(tip?" ":"")+"\u4e5f\u770b\u4e86\u4f60\u7684 "+d.saw+" \u5f20\u56fe\u3002";
+  else if(d.blind)tip+=(tip?" ":"")+"\u5f53\u524d\u57fa\u5e95\u770b\u4e0d\u4e86\u56fe\uff0c\u4f60\u81ea\u5df1\u6311\u4e00\u6761\u914d\u5f97\u4e0a\u56fe\u7684\u3002";
+  tip+=(tip?" ":"")+"\u70b9\u4e00\u6761\u5c31\u586b\u8fdb\u4e0a\u9762\uff0c\u586b\u5b8c\u8fd8\u80fd\u6539\u3002";
   O.appendChild(mkEl("div","mu-note",tip));
-  (d.lines||[]).forEach(function(s){
-    var r=mkEl("div","mu-item",s);
+  (d.lines||[]).forEach(function(x){
+    var s=(x&&typeof x==="object")?String(x.t||""):String(x||"");
+    if(!s)return;
+    var r=mkEl("div","mu-item");
+    r.appendChild(mkEl("div","mu-txt",s));
+    if(x&&x.s){
+      var f=mkEl("div","mu-src","\u957f\u81ea\u300a"+x.s+"\u300b");
+      if(x.u){
+        var link=document.createElement("a");
+        link.href=x.u;link.target="_blank";link.rel="noopener";link.textContent="\u53bb\u8bfb";
+        link.onclick=function(e){e.stopPropagation()};
+        f.appendChild(document.createTextNode(" "));f.appendChild(link);
+      }
+      r.appendChild(f);
+    }
     r.onclick=function(){
       el("mp-text").value=s;el("mp-text").focus();
-      el("mp-msg").style.color="var(--muted)";el("mp-msg").textContent="已填入，可以直接改。";
+      el("mp-msg").style.color="var(--muted)";el("mp-msg").textContent="\u5df2\u586b\u5165\uff0c\u53ef\u4ee5\u76f4\u63a5\u6539\u3002";
     };
     O.appendChild(r);
   });
-  var ag=mkEl("div","mu-again","↻ 换一批");
+  var ag=mkEl("div","mu-again","\u21bb \u6362\u4e00\u6279\uff08\u518d\u7ffb\u4e94\u7bc7\uff09");
   ag.onclick=function(){el("mu-go").click()};
   O.appendChild(ag);
 }

@@ -43,7 +43,7 @@ Object.defineProperty(global, "moPick", { get: () => moPick });
 
 let CALLS = [], NEXT = null;
 global.api = (op, extra) => { CALLS.push({ op, extra }); return NEXT(); };
-global.document = { createElement: (t) => (t === "canvas" ? { width: 0, height: 0, getContext: () => ({ fillRect() {}, drawImage() {} }), toDataURL: () => "data:image/jpeg;base64,SHRUNK" } : mkNode(t)) };
+global.document = { createTextNode: (s) => ({ tag: "#text", textContent: s, children: [] }), createElement: (t) => (t === "canvas" ? { width: 0, height: 0, getContext: () => ({ fillRect() {}, drawImage() {} }), toDataURL: () => "data:image/jpeg;base64,SHRUNK" } : mkNode(t)) };
 global.Image = class { set src(v) { this.width = 1600; this.height = 900; setTimeout(() => this.onload && this.onload(), 0); } };
 
 /* ── 2. 装载真代码 ── */
@@ -70,22 +70,24 @@ muGo.click();
 ok("\u6b63\u5728\u60f3\u7684\u65f6\u5019\u518d\u70b9\u4e0d\u4f1a\u91cd\u53d1", CALLS.length === 1, CALLS.length);
 
 console.log("\n=== 2. \u56de\u6765\u4e86\uff1a\u5019\u9009\u53ef\u70b9\uff0c\u70b9\u4e00\u6761\u5c31\u586b\u8fdb\u8f93\u5165\u6846 ===");
-resolve1({ s: 200, d: { ok: true, lines: ["\u7b2c\u4e00\u53e5", "\u7b2c\u4e8c\u53e5"], saw: 0, blind: 0, srcs: [{ t: "\u56de\u5199\u7f3a\u5931", u: "/x/" }] } });
+resolve1({ s: 200, d: { ok: true, lines: [{ t: "\u7b2c\u4e00\u53e5", s: "\u56de\u5199\u7f3a\u5931", u: "/x/" }, { t: "\u7b2c\u4e8c\u53e5", s: "\u9759\u4e3a", u: "" }], saw: 0, blind: 0, read: 5 } });
 await sleep(5);
 ok("\u6309\u94ae\u6062\u590d", !muGo.disabled && /\u91d1\u53e5\u751f\u4ea7\u673a/.test(muGo.textContent), muGo.textContent);
 const out = NODES["mu-out"];
 const items = out.children.filter((c) => c.className === "mu-item");
 ok("\u4e24\u6761\u5019\u9009\u90fd\u6e32\u4e0a\u4e86", items.length === 2, out.children.map((c) => c.className));
-ok("\u7b2c\u4e00\u884c\u662f\u8bf4\u660e", out.children[0].className === "mu-note" && /\u53d6\u6750\u7ad9\u5185.*\u56de\u5199\u7f3a\u5931/.test(out.children[0].textContent), out.children[0].textContent);
+ok("\u7b2c\u4e00\u884c\u62a5\u4e86\u7ffb\u4e86\u51e0\u7bc7", out.children[0].className === "mu-note" && /\u7ffb\u4e86\u7ad9\u5185 5 \u7bc7/.test(out.children[0].textContent), out.children[0].textContent);
+ok("\u6bcf\u6761\u4e0b\u9762\u6302\u51fa\u5904", items[0].children.some((c) => c.className === "mu-src" && /\u56de\u5199\u7f3a\u5931/.test(c.textContent)), items[0].children.map((c) => c.className + ":" + c.textContent));
+ok("\u6ca1\u94fe\u63a5\u5c31\u4e0d\u51fa\u201c\u53bb\u8bfb\u201d", !items[1].children.filter((c) => c.className === "mu-src")[0].children.length, "ok");
 ok("\u672b\u5c3e\u6709\u6362\u4e00\u6279", out.children[out.children.length - 1].className === "mu-again");
 items[1].click();
-ok("\u70b9\u4e00\u6761\u5c31\u586b\u8fdb\u53bb", NODES["mp-text"].value === "\u7b2c\u4e8c\u53e5", NODES["mp-text"].value);
+ok("\u70b9\u4e00\u6761\u53ea\u586b\u53e5\u5b50\u3001\u4e0d\u5e26\u51fa\u5904", NODES["mp-text"].value === "\u7b2c\u4e8c\u53e5", NODES["mp-text"].value);
 ok("\u5149\u6807\u56de\u5230\u8f93\u5165\u6846", NODES["mp-text"].focused === true);
 ok("\u4e0b\u65b9\u63d0\u793a\u544a\u8bc9\u4ed6\u53ef\u4ee5\u6539", /\u53ef\u4ee5\u76f4\u63a5\u6539/.test(NODES["mp-msg"].textContent));
 
 console.log("\n=== 3. \u6709\u56fe\uff1a\u5148\u53e6\u7f29\u4e00\u9053\u3001\u6700\u591a\u4e24\u5f20 ===");
 CALLS = [];
-NEXT = () => Promise.resolve({ s: 200, d: { ok: true, lines: ["\u4e00\u53e5"], saw: 2, blind: 0, srcs: [] } });
+NEXT = () => Promise.resolve({ s: 200, d: { ok: true, lines: [{ t: "\u4e00\u53e5\u8bdd", s: "", u: "" }], saw: 2, blind: 0, read: 5 } });
 global.__setPick(["AAA", "BBB", "CCC", "DDD"]);
 muGo.click();
 await sleep(20);
@@ -94,7 +96,7 @@ ok("\u9001\u7684\u662f\u53e6\u7f29\u8fc7\u7684 dataURL", CALLS[0].extra.imgs.eve
 ok("\u770b\u4e86\u56fe\u7684\u63d0\u793a\u5728", /\u770b\u4e86\u4f60\u7684 2 \u5f20\u56fe/.test(NODES["mu-out"].children[0].textContent), NODES["mu-out"].children[0].textContent);
 
 console.log("\n=== 4. \u57fa\u5e95\u770b\u4e0d\u4e86\u56fe\uff1a\u5982\u5b9e\u544a\u8bc9\u7528\u6237 ===");
-NEXT = () => Promise.resolve({ s: 200, d: { ok: true, lines: ["\u4e00\u53e5"], saw: 0, blind: 1, srcs: [] } });
+NEXT = () => Promise.resolve({ s: 200, d: { ok: true, lines: [{ t: "\u4e00\u53e5\u8bdd", s: "", u: "" }], saw: 0, blind: 1, read: 5 } });
 muGo.click();
 await sleep(20);
 ok("\u8bf4\u4e86\u770b\u4e0d\u4e86\u56fe", /\u770b\u4e0d\u4e86\u56fe/.test(NODES["mu-out"].children[0].textContent), NODES["mu-out"].children[0].textContent);
@@ -113,7 +115,7 @@ ok("\u7f51\u7edc\u5f02\u5e38\u4e5f\u89e3\u9501", !muGo.disabled && /\u7f51\u7edc
 
 console.log("\n=== 6. \u6362\u4e00\u6279\uff1a\u518d\u8dd1\u4e00\u6b21 ===");
 CALLS = [];
-NEXT = () => Promise.resolve({ s: 200, d: { ok: true, lines: ["\u4e00", "\u4e8c"], saw: 0, blind: 0, srcs: [] } });
+NEXT = () => Promise.resolve({ s: 200, d: { ok: true, lines: [{ t: "\u4e00\u53e5\u8bdd" }, { t: "\u4e8c\u53e5\u8bdd" }], saw: 0, blind: 0, read: 5 } });
 muGo.click();
 await sleep(20);
 const again = NODES["mu-out"].children[NODES["mu-out"].children.length - 1];
