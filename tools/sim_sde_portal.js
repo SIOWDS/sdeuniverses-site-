@@ -119,6 +119,22 @@ console.log("②b 多样 · 统一 · 和谐");
   ok(!!box.querySelector(".sdep-glow"), "三团角落微光把画面兜圆");
 }
 
+console.log("②c 三个图标四周烧 TOKEN");
+{
+  const fires = box.querySelectorAll(".sdep-fire");
+  ok(fires.length === 3, "三个图标各烧一团，实得 " + fires.length);
+  ok(fires.every((f) => f.querySelector("b")), "每团都有火焰底光");
+  const sp = fires[0].querySelectorAll(".sdep-sp");
+  ok(sp.length === 9, "火星九粒，实得 " + sp.length);
+  ok(new Set(sp.map((x) => x.style.animationDelay)).size > 1, "火星错开起飞（同时起飞就成了一排跳动的点，不像火）");
+  const cols = new Set(sp.map((x) => x.style.background));
+  ok(cols.has(NODEC(nodes[0])), "火星里掺了本入口自己的色（同为一种火，各带各的色）");
+  ok(cols.size >= 3, "其余是首页那套火色（橙/琥珀/橘），实得 " + cols.size + " 种");
+  ok(/z-index:1/.test(SRC) && /sdep-dotwrap/.test(SRC), "火在下、图标在上（分层，别让火盖住图标）");
+  ok(/@keyframes sdepFlick/.test(SRC), "火在明灭，不是一张静止的橙色贴纸");
+}
+function NODEC(n) { return n.style["--c"]; }
+
 console.log("③ 浏览＝就地揭开，另两个＝真链接");
 {
   const browse = nodes[0], wds = nodes[1], im = nodes[2];

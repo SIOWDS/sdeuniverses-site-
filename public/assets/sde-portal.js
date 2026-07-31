@@ -83,7 +83,14 @@
     "text-decoration:none;color:#E8E4DA;cursor:pointer;background:none;border:none;padding:0;font:inherit;outline:none;" +
     "animation:sdepPop .55s ease both}" +
     "@keyframes sdepPop{from{opacity:0;transform:translate(-50%,-50%) scale(.86)}to{opacity:1;transform:translate(-50%,-50%) scale(1)}}" +
-    ".sdep-dot{width:74px;height:74px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:27px;" +
+    /* 烧 TOKEN：与首页智能体条同一套火（火焰底光 ＋ 上升火星），图标压在火上面 */
+    ".sdep-dotwrap{position:relative;display:flex;align-items:center;justify-content:center;width:74px;height:74px}" +
+    ".sdep-fire{position:absolute;left:50%;top:50%;width:132px;height:132px;transform:translate(-50%,-50%);pointer-events:none;z-index:0}" +
+    ".sdep-fire b{position:absolute;left:50%;bottom:8%;width:78%;height:62%;transform:translateX(-50%);border-radius:50%;background:radial-gradient(60% 80% at 30% 100%,rgba(255,110,0,.50),transparent 62%),radial-gradient(55% 80% at 62% 100%,rgba(255,190,60,.45),transparent 62%),radial-gradient(55% 80% at 86% 100%,rgba(255,70,0,.45),transparent 60%);filter:blur(7px);animation:sdepFlick 1.8s ease-in-out infinite}" +
+    "@keyframes sdepFlick{0%,100%{opacity:.7;transform:translateX(-50%) scaleY(1)}50%{opacity:1;transform:translateX(-50%) scaleY(1.14)}}" +
+    ".sdep-sp{position:absolute;bottom:16%;width:3px;height:3px;border-radius:50%;opacity:0;animation-name:sdepRise;animation-timing-function:linear;animation-iteration-count:infinite}" +
+    "@keyframes sdepRise{0%{opacity:0;transform:translateY(0) scale(.5)}14%{opacity:1}70%{opacity:.7}100%{opacity:0;transform:translateY(-64px) scale(.15)}}" +
+    ".sdep-dot{position:relative;z-index:1;width:74px;height:74px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:27px;" +
     "border:1px solid var(--c);color:var(--c);background:rgba(255,255,255,.03);transition:all .2s;" +
     "box-shadow:0 0 0 0 rgba(255,255,255,0),inset 0 0 26px -14px var(--c)}" +
     ".sdep-node:hover .sdep-dot,.sdep-node:focus-visible .sdep-dot{background:var(--c);color:#0C0906;transform:scale(1.08);" +
@@ -104,7 +111,7 @@
     ".sdep-skip{background:none;border:1px solid rgba(255,255,255,.14);border-radius:999px;color:#9AA6B2;" +
     "font:12.5px/1 inherit;cursor:pointer;padding:9px 18px;transition:all .18s}" +
     ".sdep-skip:hover{color:#F0DCA6;border-color:rgba(240,220,166,.5)}" +
-    "@media(max-width:620px){.sdep-stage{width:92vw;height:56vh}.sdep-dot{width:58px;height:58px;font-size:22px}" +
+    "@media(max-width:620px){.sdep-stage{width:92vw;height:56vh}.sdep-dot{width:58px;height:58px;font-size:22px}.sdep-dotwrap{width:58px;height:58px}.sdep-fire{width:104px;height:104px}" +
     ".sdep-nm{font-size:13px}.sdep-sub{display:none}}";
 
   var NS = "http://www.w3.org/2000/svg";
@@ -242,13 +249,31 @@
       a.style.top = n.y + "%";
       a.style.setProperty("--c", n.c);
       a.style.animationDelay = (0.45 + idx * 0.13) + "s";
+      // 烧 TOKEN：火在下、图标在上。火星里掺三粒本入口的色——同为一种火，各带各的色。
+      var wrap = document.createElement("span");
+      wrap.className = "sdep-dotwrap";
+      var fire = document.createElement("span");
+      fire.className = "sdep-fire";
+      fire.setAttribute("aria-hidden", "true");
+      fire.appendChild(document.createElement("b"));
+      var HOT = ["#FF6E00", "#FFBE3C", "#FF8A3C"];
+      for (var s = 0; s < 9; s++) {
+        var sp = document.createElement("i");
+        sp.className = "sdep-sp";
+        sp.style.left = (16 + s * 8.4) + "%";
+        sp.style.background = (s % 3 === 0) ? n.c : HOT[s % 3];
+        sp.style.animationDuration = (2.2 + (s % 5) * 0.42) + "s";
+        sp.style.animationDelay = (s * 0.31) + "s";
+        fire.appendChild(sp);
+      }
       var dot = document.createElement("span");
       dot.className = "sdep-dot"; dot.textContent = n.icon;
+      wrap.appendChild(fire); wrap.appendChild(dot);
       var nm = document.createElement("span");
       nm.className = "sdep-nm"; nm.textContent = T(n.zh, n.en);
       var sub = document.createElement("span");
       sub.className = "sdep-sub"; sub.textContent = T(n.zhS, n.enS);
-      a.appendChild(dot); a.appendChild(nm); a.appendChild(sub);
+      a.appendChild(wrap); a.appendChild(nm); a.appendChild(sub);
       a.onclick = function () { seen(); if (!href) close(); };   // 浏览＝就地揭开，不跳转
       stage.appendChild(a);
     });
