@@ -165,6 +165,14 @@ a{color:var(--disc)}
 .mp-thumbs .t img{width:100%;height:100%;object-fit:cover;display:block}
 .mp-thumbs .t .x{position:absolute;top:1px;right:1px;background:rgba(0,0,0,0.6);color:#fff;width:19px;height:19px;border-radius:50%;font-size:0.75rem;line-height:19px;text-align:center;cursor:pointer}
 .mp-add{width:74px;height:74px;border:1px dashed var(--border);border-radius:7px;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:1.5rem;cursor:pointer;background:var(--card)}
+.mu-bar{display:flex;gap:8px;align-items:center;margin:0 0 0.8rem}
+.mu-bar .btn.mu{flex:none;border-color:var(--gold);background:var(--gold);padding:0.5rem 0.9rem;font-size:0.86rem}
+.mu-bar select{flex:1;min-width:0;font:inherit;font-size:0.82rem;color:var(--text2);padding:0.45rem 0.4rem;border:1px solid var(--border);border-radius:8px;background:var(--card)}
+.mu-out{margin:0 0 0.9rem}
+.mu-out .mu-note{font-size:0.76rem;color:var(--muted);line-height:1.6;margin-bottom:7px}
+.mu-out .mu-item{border:1px solid var(--border);background:var(--card);border-radius:9px;padding:0.5rem 0.7rem;margin-bottom:7px;font-size:0.95rem;line-height:1.65;cursor:pointer}
+.mu-out .mu-item:active{background:var(--card2)}
+.mu-out .mu-again{display:inline-block;font-size:0.82rem;color:var(--disc);cursor:pointer;padding:2px 0}
 .nw{padding:0.75rem 1rem;background:var(--card);border-bottom:1px solid var(--border2);font-size:0.87rem;line-height:1.75;cursor:pointer}
 .nw b{color:var(--disc)}
 .nw .t{font-size:0.72rem;color:var(--muted)}
@@ -325,6 +333,18 @@ a{color:var(--disc)}
         <div class="form">
           <label>说点什么</label>
           <textarea id="mp-text" maxlength="1000" placeholder="这一刻的想法…（最多 1000 字）"></textarea>
+          <div class="mu-bar">
+            <button class="btn mu" id="mu-go" type="button">✨ SDE金句生产机</button>
+            <select id="mu-kind">
+              <option value="auto">自动（看图·接你写的）</option>
+              <option value="maxim">格言体</option>
+              <option value="flip">反着说</option>
+              <option value="ask">问一句</option>
+              <option value="fun">幽默一点</option>
+              <option value="now">就写这一刻</option>
+            </select>
+          </div>
+          <div class="mu-out" id="mu-out"></div>
           <label>图片（最多 9 张，自动压缩）</label>
           <div class="mp-thumbs" id="mp-thumbs"></div>
           <input type="file" id="mp-file" accept="image/*" multiple style="display:none">
@@ -1336,7 +1356,7 @@ el("mo-box").onclick=function(e){
 
 /* 发表 */
 function moOpenPost(){
-  moPick=[];el("mp-text").value="";el("mp-msg").textContent="";
+  moPick=[];el("mp-text").value="";el("mp-msg").textContent="";el("mu-out").textContent="";
   moPaintThumbs();show("mopost");
 }
 el("t-mopen").onclick=moOpenPost;
@@ -1436,6 +1456,77 @@ el("mp-ok").onclick=function(){
     moPick=[];moDoc=null;moPaintDoc();el("mp-text").value="";m.textContent="";
     moGo("","");
   }).catch(function(){el("mp-ok").disabled=false;m.style.color="var(--red)";m.textContent="网络异常，请重试。"});
+};
+
+/* SDE金句生产机：看图·接草稿·从站内篇目里长一句 */
+var muBusy=false;
+/* 这里的图另缩一道：发帖那份是 1280 长边·每张可到 520KB，
+   直接拿去让基底看图会把请求体撞爆。看图只需要“看清是什么”，640 就够。*/
+function muShrink(b64,cb){
+  try{
+    var im=new Image();
+    im.onload=function(){
+      var w=im.width,h2=im.height,M=640;
+      if(w>M||h2>M){var s=M/Math.max(w,h2);w=Math.round(w*s);h2=Math.round(h2*s);}
+      var c=document.createElement("canvas");c.width=w;c.height=h2;
+      var g=c.getContext("2d");g.fillStyle="#fff";g.fillRect(0,0,w,h2);g.drawImage(im,0,0,w,h2);
+      cb(c.toDataURL("image/jpeg",0.6));
+    };
+    im.onerror=function(){cb(null)};
+    im.src="data:image/jpeg;base64,"+b64;
+  }catch(e){cb(null)}
+}
+function muPaint(d){
+  var O=el("mu-out");O.textContent="";
+  var tip="";
+  if(d.saw)tip="看了你的 "+d.saw+" 张图。";
+  else if(d.blind)tip="当前基底看不了图，这批是就着字写的。";
+  if(d.srcs&&d.srcs.length)tip+=(tip?" ":"")+"取材站内："+d.srcs.map(function(s){return "《"+s.t+"》"}).join("");
+  tip+=(tip?" ":"")+"点一条就填进上面，填完还能改。";
+  O.appendChild(mkEl("div","mu-note",tip));
+  (d.lines||[]).forEach(function(s){
+    var r=mkEl("div","mu-item",s);
+    r.onclick=function(){
+      el("mp-text").value=s;el("mp-text").focus();
+      el("mp-msg").style.color="var(--muted)";el("mp-msg").textContent="已填入，可以直接改。";
+    };
+    O.appendChild(r);
+  });
+  var ag=mkEl("div","mu-again","↻ 换一批");
+  ag.onclick=function(){el("mu-go").click()};
+  O.appendChild(ag);
+}
+el("mu-go").onclick=function(){
+  if(muBusy)return;
+  muBusy=true;
+  var btn=el("mu-go"),old=btn.textContent;
+  btn.disabled=true;btn.textContent="正在想…";
+  el("mu-out").textContent="";
+  el("mu-out").appendChild(mkEl("div","mu-note","正在想（十几秒）…"));
+  var seed=(el("mp-text").value||"").trim(),kind=el("mu-kind").value;
+  var picks=moPick.slice(0,2),imgs=[],done=0;
+  function fire(){
+    api("mo",{a:"muse",seed:seed,kind:kind,imgs:imgs}).then(function(x){
+      muBusy=false;btn.disabled=false;btn.textContent=old;
+      if(!x.d||!x.d.ok){
+        el("mu-out").textContent="";
+        el("mu-out").appendChild(mkEl("div","mu-note",(x.d&&x.d.msg)||"没生出来，过会儿再试。"));
+        return;
+      }
+      muPaint(x.d);
+    }).catch(function(){
+      muBusy=false;btn.disabled=false;btn.textContent=old;
+      el("mu-out").textContent="";
+      el("mu-out").appendChild(mkEl("div","mu-note","网络异常，请重试。"));
+    });
+  }
+  if(!picks.length){fire();return;}
+  picks.forEach(function(b64){
+    muShrink(b64,function(d){
+      if(d)imgs.push(d);
+      if(++done===picks.length)fire();
+    });
+  });
 };
 
 /* 新消息（谁赞了我、谁评了我） */

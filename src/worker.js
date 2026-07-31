@@ -434,6 +434,35 @@ async function wdsPaperVC(env) {
   } catch (e) {}
   return null;
 }
+// ===== SDE金句生产机（朋友圈「说点什么」的当场供词）=====
+// 定位：不是替人说话，是把人卡住的那一下推开——给几句能直接说出口的话，选完还得自己改。
+// 三种料：①刚传的图（只有视觉档能看图的那几家才真看，看不了就如实说，绝不假装看过）
+//         ②已经写了半句的草稿（沿着它往下，不换题）
+//         ③站内篇目（走 neighbors/publications，CI 每次重建）——所以它**随论文长**：
+//           今天发的文，今天就能从它里长出一句话来。
+const MUSE_KINDS = {
+  auto: "随你判断这一刻最该说哪一句。",
+  maxim: "写成格言体：一句断言，主语明确，不留退路。",
+  flip: "反着说：把大家默认成立的那句话翻过来，但要翻得站得住。",
+  ask: "写成一个问句：问出别人没想到要问的那一处。",
+  fun: "带点自嘲或幽默，可以轻，但不许油。",
+  now: "只写这一刻的具体：此时此地看见的、手上正在做的那件事。",
+};
+const MUSE_SYS = "你是「SDE金句生产机」，为 SDE 学员在朋友圈的「说点什么」处现几句备选。\n"
+  + "\n【用什么眼睛看】\n"
+  + "· 看发生：这件事是怎么发生出来的，不是它“是什么”。\n"
+  + "· 看差异：哪一条分界线在这里被划了出来，划在哪两样东西之间。\n"
+  + "· 看纠缠：谁和谁互相成为了对方的条件。\n"
+  + "这三样是你的眼睛，不是你的词。**成品里不许讲课、不许解释这套眼睛。**\n"
+  + "\n【硬规矩】\n"
+  + "1. 每条 12–34 字，一整句，能被人原样说出口。\n"
+  + "2. 落到具体物：一个动作、一个场景、一个数、一个能被指认的东西。抽象名词堆起来的那种句子直接作废。\n"
+  + "3. 禁鸡汤（愿你…／生活总会…／慢慢来），禁空词（赋能、闭环、格局、认知升级、深度融合），禁排比煊情，禁感叹号。\n"
+  + "4. 可以锋利（“X 不是 Y，是 Z”），但不许教育别人、不许居高临下。\n"
+  + "5. 事实、人名、篇名、数字**只能来自给你的材料**，一个都不许现编；没材料就写眼前的事，不写像真的假事。\n"
+  + "6. 五条要是五个不同角度，不是同一句话的五种说法。\n"
+  + "7. 术语最多出现一处，且必须是这句话本身非它不可。\n"
+  + "\n【输出】只输出 JSON，不要任何别的字：{\"lines\":[\"第一句\",\"第二句\",\"第三句\",\"第四句\",\"第五句\"]}";
 const WDS_SYS = `你是"WDS智能体"，王德生（Desheng）先生的 AI 分身，SDE 本体论的老师，正在 SDE 学员的讨论群里当场回答学生的提问。
 
 【思想内核·SDE 本体论】
@@ -5482,6 +5511,84 @@ export default {
           }
           const d = await call({ op: "mopost", uid: who.uid, name: who.name, text: b.text, imgs: keys, doc });
           return Response.json(d || { ok: false }, { status: (d && d.ok) ? 200 : 400 });
+        }
+        // ── SDE金句生产机：给「说点什么」当场生一批候选（耗的是站点系统 Key，所以按 uid 单独限流）──
+        if (a === "muse") {
+          const seed = String(b.seed || "").trim().slice(0, 400);
+          const kindK = MUSE_KINDS[String(b.kind || "")] ? String(b.kind) : "auto";
+          const imgs = wdsPickImgs((Array.isArray(b.imgs) ? b.imgs : []).slice(0, 2).map((d) => ({ n: "朋友圈配图", d: String(d || "") })));
+          try {
+            const lim = env.ASK_LIMITER.get(env.ASK_LIMITER.idFromName("muse:" + who.uid));
+            const lr = await (await lim.fetch(new Request("https://limiter.internal/?w=6&d=60"))).json();
+            if (!lr.ok) return Response.json({ ok: false, msg: lr.reason === "day" ? "今天的金句额度用完了（每天 60 次），明天再来。" : "生得太快了，过十几秒再点。" }, { status: 429 });
+          } catch (e) {}
+          let vd = "", VC = null, KEY = "";
+          const av = await getActiveVendor(env);
+          if (av) { vd = av.vendor; VC = { url: WDS_VENDORS[vd].url, model: av.model || WDS_VENDORS[vd].model, name: WDS_VENDORS[vd].name }; KEY = av.key; }
+          else {
+            const pv = await wdsPaperVC(env);
+            if (pv) { vd = "zhipu"; VC = { url: pv.VC.url, model: pv.VC.model, name: "GLM" }; KEY = pv.KEY; }
+          }
+          if (!KEY || !VC) return Response.json({ ok: false, msg: "金句生产机还没通电：管理员还没配置系统基底密钥。" }, { status: 503 });
+          // 看图：只有 zhipu/qwen/kimi 在本站口径下能真吃图；其余家如实告诉前端（blind），不拿幻想冒充“它看过了”。
+          const ladder = imgs.length ? wdsVisionLadder(vd, "") : [];
+          const canSee = imgs.length > 0 && ladder.length > 0;
+          if (canSee) VC = { url: VC.url, model: ladder[0], name: VC.name };
+          // 站内料：有草稿就按草稿检索；什么都没有就从站内篇目里拈几篇——这一路让它随论文长。
+          let mat = "";
+          const srcs = [];
+          try {
+            if (seed.length >= 4) {
+              const lr = await lightRetrieve(env, url, seed, [], 6, 360, { pick: 6 });
+              const had = Object.create(null), parts = [];
+              for (const ck of (lr.hits || [])) {
+                const dd = lr.corpus.docs[ck.d];
+                if (!dd || !dd.t || had[dd.t]) continue;
+                had[dd.t] = 1;
+                parts.push("《" + dd.t + "》：" + String(ck.t || "").replace(/\s+/g, " ").trim().slice(0, 160));
+                srcs.push({ t: dd.t, u: dd.u || "" });
+                if (parts.length >= 3) break;
+              }
+              if (parts.length) mat = "【站内相关（可用可不用，用了就别说错）】\n" + parts.join("\n");
+            } else if (!canSee) {
+              const pubs = await loadPubs(env, url);
+              if (pubs && pubs.length) {
+                const had = Object.create(null), parts = [];
+                for (let i = 0; i < 30 && parts.length < 3; i++) {
+                  const pp = pubs[Math.floor(Math.random() * pubs.length)];
+                  if (!pp || !pp.t || had[pp.t]) continue;
+                  had[pp.t] = 1;
+                  parts.push("《" + pp.t + "》" + (pp.au ? "（" + pp.au + "）" : "") + "：" + String(pp.line || "").replace(/\s+/g, " ").trim().slice(0, 140));
+                  srcs.push({ t: pp.t, u: pp.u || "" });
+                }
+                if (parts.length) mat = "【站内篇目（今天没什么想说时，从这里长一句出来；可用可不用）】\n" + parts.join("\n");
+              }
+            }
+          } catch (e) {}
+          const uTxt = (seed ? "【他已经写了半句】" + seed + "\n（顺着这半句往下，或把它改得更利落；不许换题。）\n\n" : "")
+            + (canSee ? "【他刚放了 " + imgs.length + " 张图】先看图：图里有什么、在做什么、什么时候什么地方。看不清就别猜，改从别处下手。\n\n" : "")
+            + (imgs.length && !canSee ? "【他放了图，但当前基底看不了图】别装作看过，就着别的料写。\n\n" : "")
+            + (mat ? mat + "\n\n" : "")
+            + "【口味】" + MUSE_KINDS[kindK] + "\n\n出五条。只输出那段 JSON。";
+          const uContent = canSee
+            ? [{ type: "text", text: uTxt }].concat(imgs.map((im) => ({ type: "image_url", image_url: { url: im.d } })))
+            : uTxt;
+          const raw = await llmText(VC, KEY, MUSE_SYS, uContent, 900, 30000);
+          const jj = looseJSON(raw);
+          const cand = (jj && Array.isArray(jj.lines)) ? jj.lines : String(raw || "").split("\n");
+          const out = [], had2 = Object.create(null);
+          for (const one of cand) {
+            let s = String(one == null ? "" : one).replace(/\s+/g, " ").trim()
+              .replace(/^[-\u2013\u2014*\u00b7\u2022\d]+[.\u3001)\uff09\s]*/, "")
+              .replace(/^["\u201c\u300c\u300e]/, "").replace(/["\u201d\u300d\u300f]$/, "").trim();
+            if (s.length < 4 || s.length > 60) continue;
+            if (/^[\[\]{}]/.test(s) || s.indexOf("lines") >= 0) continue;
+            if (had2[s]) continue;
+            had2[s] = 1; out.push(s);
+            if (out.length >= 5) break;
+          }
+          if (!out.length) return Response.json({ ok: false, msg: "这次没生出来，换个口味或者过一会儿再点。" }, { status: 502 });
+          return Response.json({ ok: true, lines: out, saw: canSee ? imgs.length : 0, blind: (imgs.length && !canSee) ? 1 : 0, srcs: srcs.slice(0, 3) }, { headers: { "cache-control": "no-store" } });
         }
         const MOMAP = { like: "molike", cmt: "mocmt", cdel: "mocdel", del: "model", news: "monews", badge: "mobadge" };
         if (MOMAP[a]) {
