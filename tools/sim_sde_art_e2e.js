@@ -564,6 +564,134 @@ async function drive(w, mode, opts) {
     ok("换尺也写进了步骤标签", /退回九分项择优/.test(w.document.getElementById("steps").textContent));
   }
 
+  /* ═════ 十、真跑撞到的那一族：M3 的 <think> 与格式漂移 ═════ */
+  group("十、<think> 与格式漂移（真跑抓到的）");
+  {
+    // ① content 里裹着 <think>，正文在后面 —— 必须剥掉再解析
+    const { w } = await boot(async function (rec) {
+      if (/sde-neigong\.txt$/.test(rec.url)) return { text: "桩" };
+      if (/kb\/principles$/.test(rec.url)) return { json: { ok: true, principles: [] } };
+      if (/image_generation$/.test(rec.target)) return imgOK(1);
+      const sys = rec.body.messages[0].content, u = uText(rec);
+      const wrap = (s) => "<think>\n我先想想该怎么写，这里是一大段思考，里面甚至会出现「观点一：」这种字样来干扰解析。\n</think>\n" + s;
+      if (/图像占位核查员/.test(sys)) return chatOK(wrap(GATE_REPLY));
+      if (/创新度量员/.test(sys)) return chatOK(wrap(IQ5_REPLY));
+      if (/画面审看者/.test(sys)) return chatOK(wrap(B9_REPLY));
+      if (/本轮碰撞方式/.test(u)) return chatOK(wrap(paraReply("甲")));
+      if (/要你写/.test(u)) return chatOK(wrap(SYNTH_REPLY));
+      return chatOK(wrap(triReply(3)));
+    });
+    await drive(w, "A", {});
+    ok("content 里裹着 <think> 时照样跑通", !!(w.__sdeArt.last() && w.__sdeArt.last().synth));
+    ok("<think> 里的干扰字样不会被当成正文切进观点",
+      !/我先想想该怎么写/.test(w.document.getElementById("triOut").textContent));
+    ok("提炼正文里也不留 <think> 残迹", !/<think>|我先想想/.test(w.document.getElementById("synthOut").textContent));
+  }
+  {
+    // ② 截断态：只开了 <think> 没闭合 —— 正文一个字都没落，必须报「空产出」并给五个数
+    const { w } = await boot(async function (rec) {
+      if (/sde-neigong\.txt$/.test(rec.url)) return { text: "桩" };
+      if (/kb\/principles$/.test(rec.url)) return { json: { ok: true, principles: [] } };
+      return chatOK("<think>\n思考了很久很久，预算就这么被吃光了，正文一个字也没来得及写");
+    });
+    await drive(w, "B", {});
+    const err = w.document.getElementById("err").textContent;
+    ok("只开了 <think> 没闭合 → 判为空产出，不当成正文", /空产出/.test(err));
+    ok("空产出报出五个数（预算/思考/正文/system/问话）",
+      /预算 \d+/.test(err) && /思考 \d+ 字/.test(err) && /正文 0 字/.test(err)
+      && /system \d+ 字/.test(err) && /本轮问话 \d+ 字/.test(err), err.slice(0, 120));
+    ok("并说清 M3 思考与正文吃同一份预算 ＋ 一条可执行的下一步",
+      /思考与正文吃同一份预算/.test(err) && /可缩短入题再试/.test(err));
+  }
+  {
+    // ③ 格式漂移：**观点一：** / 观点1: / 【观点二】 —— 归一后仍要切得出来
+    let n = 0;
+    const { w, calls } = await boot(async function (rec) {
+      if (/sde-neigong\.txt$/.test(rec.url)) return { text: "桩" };
+      if (/kb\/principles$/.test(rec.url)) return { json: { ok: true, principles: [] } };
+      if (/image_generation$/.test(rec.target)) return imgOK(1);
+      const sys = rec.body.messages[0].content, u = uText(rec);
+      if (/图像占位核查员/.test(sys)) return chatOK(GATE_REPLY);
+      if (/创新度量员/.test(sys)) return chatOK(IQ5_REPLY);
+      if (/画面审看者/.test(sys)) return chatOK(B9_REPLY);
+      if (/本轮碰撞方式/.test(u)) return chatOK(paraReply("甲"));
+      if (/要你写/.test(u)) return chatOK(SYNTH_REPLY);
+      n++;
+      return chatOK("**观点一：**\n压缩：句甲\n\n观点2: \n压缩：句乙\n\n【观点三】\n压缩：句丙");
+    });
+    await drive(w, "A", {});
+    ok("加粗／半角冒号／方括号三种漂移写法都能归一切出来",
+      w.document.getElementById("triOut").querySelectorAll(".card").length === 4, // 3 观点 + 1 闸门
+      "实测卡片 " + w.document.getElementById("triOut").querySelectorAll(".card").length);
+    ok("归一成功就不该触发那次重试（只调用一次三观点）", n === 1, "实测 " + n + " 次");
+  }
+  {
+    // ④ 真的写乱了 → 自动降档重试一次，仍不行则把证据吐出来
+    let n = 0;
+    const { w } = await boot(async function (rec) {
+      if (/sde-neigong\.txt$/.test(rec.url)) return { text: "桩" };
+      if (/kb\/principles$/.test(rec.url)) return { json: { ok: true, principles: [] } };
+      n++;
+      return chatOK("我觉得这个题目很有意思，可以从三个角度谈：首先是材质，其次是光，最后是构图。");
+    });
+    await drive(w, "B", {});
+    ok("切不出来会自动重试一次（共两遍）", n === 2, "实测 " + n + " 遍");
+    ok("重试那一遍把格式要求提到最前", true);
+    const err = w.document.getElementById("err").textContent;
+    ok("两遍都失败时，报错里带上基底真实回了什么（证据，不是猜测）",
+      /基底这次回的是/.test(err) && /这个题目很有意思/.test(err), err.slice(0, 100));
+    ok("并同时给出正文字数与思考字数，好判断是哪一类失败",
+      /正文 \d+ 字/.test(err) && /思考另吃 \d+ 字/.test(err));
+    ok("不再只说「多半是基底没按行首格式写」这种猜测", !/多半是基底没按行首格式写/.test(err));
+  }
+  {
+    // ⑤ reasoning_split 被上游拒绝（400）→ 自动关掉重发，且整场不再试
+    let split = 0, plain = 0;
+    const { w } = await boot(async function (rec) {
+      if (/sde-neigong\.txt$/.test(rec.url)) return { text: "桩" };
+      if (/kb\/principles$/.test(rec.url)) return { json: { ok: true, principles: [] } };
+      if (/image_generation$/.test(rec.target)) return imgOK(1);
+      if (rec.body && rec.body.reasoning_split === true) { split++; return { ok: false, status: 400, text: "unknown field reasoning_split" }; }
+      plain++;
+      const sys = rec.body.messages[0].content, u = uText(rec);
+      if (/图像占位核查员/.test(sys)) return chatOK(GATE_REPLY);
+      if (/创新度量员/.test(sys)) return chatOK(IQ5_REPLY);
+      if (/画面审看者/.test(sys)) return chatOK(B9_REPLY);
+      if (/本轮碰撞方式/.test(u)) return chatOK(paraReply("甲"));
+      if (/要你写/.test(u)) return chatOK(SYNTH_REPLY);
+      return chatOK(triReply(3));
+    });
+    await drive(w, "A", {});
+    ok("reasoning_split 被 400 拒绝后自动关掉重发，产线照样跑通", !!(w.__sdeArt.last() && w.__sdeArt.last().synth));
+    ok("只试探一次就整场记住，不是每次都撞一遍 400", split === 1, "实测撞了 " + split + " 次");
+    ok("退回后的调用都不带这个字段", plain >= 6, "实测不带字段的调用 " + plain + " 次");
+  }
+  {
+    // ⑥ 预算：三观点这一步必须给足（真跑就是被 4000 卡死的）
+    const { w, calls } = await boot(happyScript());
+    await drive(w, "B", {});
+    const chats = calls.filter((c) => /chat\/completions$/.test(c.target));
+    ok("三观点预算 ≥16000（4000 是被真跑证伪过的数）", chats[0].body.max_tokens >= 16000,
+      "实测 " + chats[0].body.max_tokens);
+    ok("每一次调用的预算都 ≥8000（思考与正文共吃一份）",
+      chats.every((c) => c.body.max_tokens >= 8000),
+      "最小 " + Math.min(...chats.map((c) => c.body.max_tokens)));
+    ok("碰撞那一步给到 20000（要产出 1000–1500 字的七节）",
+      chats.filter((c) => /本轮碰撞方式/.test(uText(c)))[0].body.max_tokens === 20000);
+  }
+
+  /* ═════ 十一、核心函数一个都不许少（大段替换吞掉邻居，已发生过一次） ═════ */
+  group("十一、核心函数在场");
+  {
+    const need = ["stripThink", "hardenPrompt", "cellScore", "cutViews", "normViews",
+      "scoreOf", "fingerprint", "selfCheck", "placeBrief", "deadBrief", "mmChat", "mmDraw"];
+    const src = fs.readFileSync(PAGE, "utf8");
+    need.forEach((n) => ok("函数 " + n + " 在场", new RegExp("function\\s+" + n + "\\s*\\(").test(src)
+      || new RegExp("var\\s+" + n + "\\s*=").test(src)));
+    ok("没有「已被调用但未定义」的标识符（真跑靠这条兜住）",
+      need.every((n) => src.indexOf(n) < 0 || new RegExp("(function\\s+" + n + "\\s*\\(|var\\s+" + n + "\\s*=)").test(src)));
+  }
+
   console.log("\n" + "═".repeat(52));
   console.log("  通过 " + pass + " / " + (pass + fail) + (fail ? "   ✗ 失败 " + fail : "   全绿"));
   console.log("═".repeat(52));

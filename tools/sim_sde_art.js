@@ -229,7 +229,18 @@ ok("重开能恢复草稿", /sde_art_draft/.test(js) && /恢复它/.test(js));
 ok("单张下载（全浏览器可用的 a[download]）", /download="sde-art-/.test(js));
 ok("打包下载全部图", /btnDlAll/.test(js));
 ok("失败必须显式报错，无静默 catch 吞掉主流程", /function fail\(msg\)/.test(js) && /\$\("err"\)\.innerHTML/.test(js));
-ok("空产出给出可执行的下一步而不是只说「没有内容」", /空产出[\s\S]{0,120}可缩短入题再试/.test(js));
+// 真跑撞过这一族：M3 的思考与正文吃同一份 max_tokens，思考吃光就只剩 <think>
+ok("空产出报出五个数（预算/思考/正文/system/问话）",
+  /空产出：预算 "\+\(maxTok\|\|4000\)\+"，思考 "\+thinkLen\+" 字，正文 0 字/.test(js)
+  && /system "\+sys\.length\+" 字/.test(js) && /本轮问话 "\+String\(user\)\.length\+" 字/.test(js));
+ok("空产出说清根因并给可执行的下一步", /思考与正文吃同一份预算/.test(js) && /可缩短入题再试/.test(js));
+ok("content 里的 <think> 一律剥掉（M3 硬特性，官方文档写明）",
+  /function stripThink/.test(js) && /<think>\[\\s\\S\]\*\?<\\\/think>/.test(js));
+ok("截断态（只开头没闭合）也当思考处理，不当正文", /只开了头没闭合/.test(js));
+ok("reasoning_split 试探一次，被 400 拒就整场关掉", /MM_SPLIT = false/.test(js) && /整场记住|整场关掉/.test(js));
+ok("三观点切不出来会自动重试一次，且报错带上基底真回了什么",
+  /更硬的格式要求重跑一次/.test(js) && /基底这次回的是/.test(js));
+ok("三观点预算 16000（4000 已被真跑证伪）", /mmChat\(triSys, triUser, 16000\)/.test(js));
 
 /* ═════ 十、Key 与零责任架构 ═════ */
 group("十、Key 与零责任架构");

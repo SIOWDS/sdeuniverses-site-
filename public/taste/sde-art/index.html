@@ -67,7 +67,7 @@ footer{border-top:1px solid var(--line);color:var(--dim);font-size:13px;padding:
   <a href="/" class="home" style="color:var(--gold)">SDE Universes</a>
   <a href="/#taste" style="font-size:13.5px">← 免费品尝</a>
   <span style="flex:1"></span>
-  <span style="font-size:12.5px;color:var(--dim)">基底：MiniMax（M3 思考与看图 · image-01 出图）</span>
+  <span style="font-size:12.5px;color:var(--dim)">基底：MiniMax（M3 思考与看图 · image-01 出图） · <span id="verTag">产线 v—</span></span>
 </div></header>
 
 <div class="wrap">
@@ -183,7 +183,7 @@ footer{border-top:1px solid var(--line);color:var(--dim);font-size:13px;padding:
 var PROXY = "/api/llm-proxy";
 var MODEL = "MiniMax-M3";           // 思考与看图（M2.x 看不了图，必须 M3）
 var IMGMODEL = "image-01";
-var VERSION = 2;
+var VERSION = 3;   // 页面头部会印出来：截图里一眼能看出读者跑的是哪一版
 
 function $(id){ return document.getElementById(id); }
 function esc(s){ return String(s==null?"":s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];}); }
@@ -424,6 +424,25 @@ function sysBase(core, withCore){
 
 /* ── MiniMax 调用（全部经 /api/llm-proxy 转发） ─────────────── */
 var ABORT = null;
+/* ⚠️ M3 的硬特性（官方文档写明）：**原生 OpenAI 接口下，content 字段里会包含 <think> 标签内容**——
+   思考与正文塞在同一个字段、吃同一份 max_tokens。第一次真跑就栽在这上面：
+   三观点那一步只给 4000，system 里压着 49k 字内功，思考把预算吃光，content 里全是 <think>，
+   一条「观点一：」都没有 → 切到 0 条。这是「空产出」的同族，只是它吐了字，吐的全是思考。
+   三道防线，缺一不可：
+   ① reasoning_split：让思考走 reasoning_details 字段（官方开关）。有的路由不认这个字段会 400，
+      认了就干净，不认就自动退回不带它重发——**绝不替上游猜，试一次就知道**。
+   ② 无论开关成没成，都把 content 里的 <think>…</think> 剥掉（含"只开了头没闭合"的截断态）。
+   ③ 预算按"正文该多长"给，且必须给思考留出余量。 */
+function stripThink(s){
+  var t = String(s||"");
+  var thought = "";
+  t = t.replace(/<think>[\s\S]*?<\/think>/gi, function(m){ thought += m; return ""; });
+  // 截断态：只开了头没闭合 —— 后面全是思考，正文一个字都没落
+  var open = t.search(/<think>/i);
+  if(open >= 0){ thought += t.slice(open); t = t.slice(0, open); }
+  return { text: t.trim(), think: thought };
+}
+var MM_SPLIT = true;   // reasoning_split 是否可用；一旦被上游拒绝就整场关掉，不再重试
 async function mmChat(sys, user, maxTok, imgs){
   var content = user;
   if(imgs && imgs.length){
@@ -431,24 +450,42 @@ async function mmChat(sys, user, maxTok, imgs){
       return { type:"image_url", image_url:{ url:d } };
     }));
   }
-  var body = {
-    model: MODEL, stream: false, max_tokens: maxTok||4000,
-    messages: [{ role:"system", content:sys }, { role:"user", content:content }]
-  };
-  var r = await fetch(PROXY, {
-    method:"POST", signal: ABORT ? ABORT.signal : undefined,
-    headers:{ "content-type":"application/json", "authorization":"Bearer "+key(),
-              "x-target-url": host()+"/v1/chat/completions" },
-    body: JSON.stringify(body)
-  });
-  var t = await r.text();
-  if(!r.ok) throw new Error("基底 HTTP "+r.status+"："+t.slice(0,220));
-  var j; try{ j = JSON.parse(t); }catch(e){ throw new Error("基底返回不是 JSON："+t.slice(0,220)); }
-  var c = j && j.choices && j.choices[0] && j.choices[0].message;
-  var out = c ? (c.content||"") : "";
-  if(!out) throw new Error("空产出：基底把预算全用在思考上了，或上下文顶穿。可缩短入题再试。");
-  return out;
+  async function once(useSplit){
+    var body = {
+      model: MODEL, stream: false, max_tokens: maxTok||4000,
+      messages: [{ role:"system", content:sys }, { role:"user", content:content }]
+    };
+    if(useSplit) body.reasoning_split = true;
+    var r = await fetch(PROXY, {
+      method:"POST", signal: ABORT ? ABORT.signal : undefined,
+      headers:{ "content-type":"application/json", "authorization":"Bearer "+key(),
+                "x-target-url": host()+"/v1/chat/completions" },
+      body: JSON.stringify(body)
+    });
+    return { r: r, t: await r.text() };
+  }
+  var res = await once(MM_SPLIT);
+  // 400 且开着 split → 多半是这个字段不被认。关掉重发一次，并整场记住。
+  if(!res.r.ok && res.r.status === 400 && MM_SPLIT){
+    MM_SPLIT = false;
+    res = await once(false);
+  }
+  if(!res.r.ok) throw new Error("基底 HTTP "+res.r.status+"："+res.t.slice(0,220));
+  var j; try{ j = JSON.parse(res.t); }catch(e){ throw new Error("基底返回不是 JSON："+res.t.slice(0,220)); }
+  var msg = j && j.choices && j.choices[0] && j.choices[0].message;
+  var raw = msg ? (msg.content||"") : "";
+  var sp = stripThink(raw);
+  var thinkLen = sp.think.length + String((msg && msg.reasoning_content) || "").length;
+  if(!sp.text){
+    // 「没有产出内容」是最坏的报错——必须当场说出五个数与一条可执行的下一步
+    throw new Error("空产出：预算 "+(maxTok||4000)+"，思考 "+thinkLen+" 字，正文 0 字，"
+      + "system "+sys.length+" 字，本轮问话 "+String(user).length+" 字。"
+      + "M3 的思考与正文吃同一份预算——多半是思考把它吃光了。可缩短入题再试。");
+  }
+  LAST_THINK = thinkLen;   // 供排障用：上一次调用里思考吃掉了多少字
+  return sp.text;
 }
+var LAST_THINK = 0;
 /* 渲染端回收路径：不指望基底听话。
    PPT 那条线的教训——「凡是靠形状驱动的设计，都要在渲染端为『形状写错位置』留一条
    回收路径，光靠提示禁止不够」。这里管两件事：
@@ -520,12 +557,35 @@ $("perWay").onchange = calcCost;
 calcCost();
 
 /* ── 解析工具：绝不猜，宽容但不补 ───────────────────────────── */
+/* 切块器：宽容但仍不猜。
+   第一次真跑切到 0 条，事后看基底的写法五花八门——**观点一：** / 观点一: / 观点一、/
+   【观点一】/ ## 观点一 / 观点1：都可能。形状驱动的解析必须在渲染端留回收路径，
+   光在提示里写「行首固定写观点一：」不够（这是 PPT 线那条教训的第三次应验）。 */
 function cutBlocks(txt, re){
   var out = [], m, idx = [];
   var r = new RegExp(re, "g");
   while((m = r.exec(txt)) !== null) idx.push(m.index);
   for(var i=0;i<idx.length;i++) out.push(txt.slice(idx[i], i+1<idx.length ? idx[i+1] : txt.length).trim());
   return out;
+}
+/* 三观点专用：把各种写法归一成「观点一：」再切 */
+var CN_NUM = ["一","二","三"];
+function normViews(txt){
+  var t = String(txt||"");
+  t = t.replace(/\*\*/g, "").replace(/^#{1,6}\s*/gm, "");          // 去粗体与 markdown 标题号
+  t = t.replace(/[【\[（(]\s*观点\s*([一二三123])\s*[】\]）)]/g, "观点$1：");
+  t = t.replace(/观点\s*([123])/g, function(_,d){ return "观点" + CN_NUM[+d-1]; });
+  t = t.replace(/(观点[一二三])\s*[：:、.．·\-—]?\s*/g, "$1：");
+  return t;
+}
+function cutViews(txt){
+  var v = cutBlocks(normViews(txt), "观点[一二三]：");
+  // 归一后仍切不出来，退一步按「压缩：」这条必填行数块——它是闸门要用的那一句
+  if(v.length < 2){
+    var alt = cutBlocks(normViews(txt), "压缩[：:]");
+    if(alt.length >= 2) return alt;
+  }
+  return v;
 }
 function grab(txt, label){
   var re = new RegExp(label + "[：:]\\s*([\\s\\S]*?)(?=\\n[A-Z一二三四五六七八九十]{1,4}[、：:）\\)]|\\n【|$)");
@@ -549,7 +609,7 @@ async function run(again){
   ways.forEach(function(w){ names.push("二阶碰撞 "+w.n+"：" + w.t); });
   ways.forEach(function(w){ names.push("五维刻度 "+w.n+"（S/D/E/I/F · 典范这一本账）"); });
   ways.forEach(function(w){ names.push("出图 "+w.n+"（image-01 × "+per+"）"); });
-  ways.forEach(function(w){ names.push("M3 看图 · 九宫格评分 "+w.n); });
+  ways.forEach(function(w){ names.push("M3 看图 · 九分项评分 "+w.n); });
   names.push("近邻闸门·出（看着图查，不是看 prompt 查）");
   names.push("择优与综合提炼");
   initSteps(names);
@@ -576,9 +636,25 @@ async function run(again){
       + "  压缩：把这条压成 50 字以内的一句视觉命题（这句要拿去查占位库）\n"
       + "  最易被推翻处：一句\n"
       + "每条 220–340 字。写完就停——不要综合、不下结论、不调和。调和等于把涌现的原料先烧掉。";
-    var triTxt = await mmChat(triSys, triUser, 4000);
-    var views = cutBlocks(triTxt, "观点[一二三]：");
-    if(views.length < 2) throw new Error("三观点没切出来（只切到 "+views.length+" 条）。多半是基底没按行首格式写，可重试一次。");
+    // 预算按「正文该多长」给，并给思考留余量：三条各 220–340 字≈1000 字正文，M3 的思考通常还要吃掉几倍。
+    var triTxt = await mmChat(triSys, triUser, 16000);
+    var views = cutViews(triTxt);
+    if(views.length < 2){
+      // 自动降档重试一次：把格式要求提到最前、砍掉一切修饰，并明说上一遍错在哪
+      say("三观点没切出来，正在用更硬的格式要求重跑一次…");
+      var retryUser = "【只输出三段，别的一个字都不要。每段第一行必须原样是「观点一：」「观点二：」「观点三：」，"
+        + "不要加粗、不要编号、不要前言、不要结语、不要总结。】\n\n" + triUser;
+      triTxt = await mmChat(triSys, retryUser, 16000);
+      views = cutViews(triTxt);
+    }
+    if(views.length < 2){
+      var head = String(triTxt).replace(/\s+/g," ").slice(0,240);
+      throw new Error("三观点没切出来（只切到 "+views.length+" 条），两遍都没成。"
+        + "基底这次回的是（前 240 字）：「" + head + "」；正文 " + String(triTxt).length
+        + " 字，思考另吃 " + LAST_THINK + " 字。"
+        + "若正文很短而思考很长，说明 M3 把预算花在思考上了——缩短入题再试；"
+        + "若正文很长却没有「观点一：」，那是它没按格式写，直接重试通常就好。");
+    }
     mark(si,"done", views.length+" 条"); si++;
 
     /* ③近邻闸门·进（不装内功——照 mode=iq 防通胀纪律） */
@@ -594,7 +670,7 @@ async function run(again){
       + "条N｜分离线：占位图式在【某可见特征】上是 A，本条是非 A，读法是……（判定为通过时必须写满这一行）\n"
       + "条N｜死格风险：中了哪一条病征就写出病名与理由；一条都不中写「无」\n\n"
       + views.map(function(v,i){ return "【条"+(i+1)+"】" + v; }).join("\n\n");
-    var gateTxt = await mmChat(gateSys, gateUser, 2200);
+    var gateTxt = await mmChat(gateSys, gateUser, 8000);
     mark(si,"done"); si++;
     renderTri(views, gateTxt);
 
@@ -624,7 +700,7 @@ async function run(again){
           + "   （e）结尾原样接上这一串：no text, no letters, no numbers, no watermark, no recognizable real person, no logo, no brand, not in the style of any named artist\n"
           + "   （f）**不许出现任何艺术家人名或画派名**。\n"
           + "全文 1000–1500 字。";
-        var colTxt = await mmChat(colSys, colUser, 4200);
+        var colTxt = await mmChat(colSys, colUser, 20000);
         var prompt = grab(colTxt, "七、绘图指令") || grab(colTxt, "绘图指令");
         prompt = prompt.replace(/^[（(].*?[）)]\s*/,"").trim();
         if(!prompt || prompt.length < 60) throw new Error("第七节绘图指令没解析出来");
@@ -660,7 +736,7 @@ async function run(again){
         var iqUser = "【要评的典范】\n" + pq.txt.slice(0, 3000)
           + "\n\n【它撞出来的方式】" + pq.way.t
           + "\n\n请按五维读数。注意：你评的是这个**典范**（一个视觉命题），不是评一张具体的画。";
-        var iqTxt = await mmChat(iqSys, iqUser, 1600);
+        var iqTxt = await mmChat(iqSys, iqUser, 8000);
         pq.iqReport = iqTxt;
         pq.iq = {};
         IQ5.forEach(function(d){ pq.iq[d[1]] = cellScore(iqTxt, d[0], 200); });
@@ -712,7 +788,7 @@ async function run(again){
           + "② 如果这张图只是让人「认出」了什么、识别一完成观看就结束，那它停在一号位的物：连接与活力两格必须低分。\n"
           + "另：画面被塞满、没有可走的空处，「共存」与「连接」两项必须扣。\n"
           + "如果这张图中了「打卡化」或「十五秒消费」，「活力」（再点燃之力）必须给低分——一眼看完的东西没有第二次发生。";
-        var b9Txt = await mmChat(b9Sys, b9User, 1800, p3.imgs.slice(0,3));
+        var b9Txt = await mmChat(b9Sys, b9User, 8000, p3.imgs.slice(0,3));
         p3.report = b9Txt;
         p3.score = scoreOf(b9Txt, M.accent);
         mark(si,"done", p3.score!=null ? (p3.score+" 分") : "已评");
@@ -737,7 +813,7 @@ async function run(again){
       var goUser = "逐张核查。每张按四行：\n图N｜判定：〔占位失败〕／〔通过〕／〔库未命中·不放行〕\n图N｜撞上：具体图式名或艺术家名，没有写「无」\n图N｜分离线：（判通过时必须写满）\n"
         + "图N｜死格：中了哪条病征（打卡化／十五秒消费／防弹玻璃式／语法失传），一条都不中写「无」——**这是绘画的当代第一死因，比撞图式更该说**\n"
         + "最后一行写：最干净的是第几张。";
-      var goTxt = await mmChat(goSys, goUser, 1600, allImgs.slice(0,4));
+      var goTxt = await mmChat(goSys, goUser, 8000, allImgs.slice(0,4));
       $("drawOut").insertAdjacentHTML("beforeend",
         '<div class="card" style="margin-top:16px"><h2>近邻闸门 · 出（看着图查）</h2><div class="out">'+esc(goTxt)+'</div></div>');
       mark(si,"done");
@@ -771,7 +847,7 @@ async function run(again){
       + "五、两张卡开出的作业（九分项与五维各自最弱的那一项，逐条转写成下一版的具体动作，禁「加强构图」「加强创新」这类空话；**两本账分开写，不许合并成一个总评**）\n"
       + "六、明确不画什么\n"
       + (MODE==="C" ? "全文控制在 300–500 字。" : (MODE==="A" ? "全文 600–900 字，并在最后附一行 alt 文本（一句，供无障碍阅读用）。" : "全文 1200–1800 字。"));
-    var syTxt = await mmChat(sysBase(core,true), syUser, MODE==="C"?1600:4000);
+    var syTxt = await mmChat(sysBase(core,true), syUser, MODE==="C"?8000:20000);
     $("synthOut").textContent = fallbackNote + syTxt;
     mark(si,"done", (byIQ ? ("胜出 五维 "+(winner.iqTotal!=null?winner.iqTotal:"—")+" 分")
                           : ("五维全缺·退回九分项择优，胜出 "+(winner.score!=null?winner.score:"—")+" 分")));
@@ -883,6 +959,7 @@ function saveDraft(){
   }catch(e){}
 })();
 
+try{ $("verTag").textContent = "产线 v" + VERSION; }catch(e){}
 $("btnRun").onclick = function(){ run(false); };
 $("btnAgain").onclick = function(){ run(true); };
 $("btnStop").onclick = function(){ if(ABORT) ABORT.abort(); };
