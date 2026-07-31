@@ -147,7 +147,7 @@ async function verifyPasscode(cred) {
   return uid ? { name: disp, uid, pw: true } : null;
 }
 // 聊天面（/api/im、/api/chat、WS、WDS 上传）认这两条门中的任意一条。
-// 注意：/api/comments（文章讨论区）不走这里，仍然只认 Google。
+// /api/comments（文章讨论区）2026-07-31 起也走这里——大陆学员用名字+密码即可发言。
 async function verifyIdent(cred) {
   const p = await verifyPasscode(cred);
   if (p && p.bad) return null;                  // 口令对但名字不在名录 → 不放行
@@ -5394,10 +5394,17 @@ export default {
         const clean = (s, n) => String(s || "").replace(/[\u0000-\u0009\u000b-\u001f]/g, "").trim().slice(0, n);
         let name;
         const googleOn = GOOGLE_CLIENT_ID.length > 0;
-        if (googleOn) { // 方案B：只认 Google 登录，发言人 = Google 账号名字
-          const who = await verifyGoogleCredential(body.credential);
-          if (!who) return Response.json({ ok: false, msg: "请先用 Google 账号登录后再发言。" }, { status: 401 });
-          name = clean(who.name, 20);
+        // 2026-07-31 解禁：发言身份 = 站内名字+密码 ∪ Google（与「SDE 微信」同一套身份）。
+        // 大陆学员打不开 Google，此前 845 篇文章底下的讨论区对他们等于不存在。
+        const whoIdent = await verifyIdent(body.credential);
+        if (whoIdent && whoIdent.uid) {
+          name = clean(whoIdent.name, 20);
+        } else if (googleOn) {
+          // 把「密码不对」「名字不在名录」「已被停用」分开报，否则学员只会看到一句没用的话
+          const probe = await verifyPasscode(body.credential);
+          if (probe && probe.bad === "name") return Response.json({ ok: false, msg: "这个名字不在学员名录里。请用你在站上发表用的名字。" }, { status: 401 });
+          if (probe && probe.bad === "ban") return Response.json({ ok: false, msg: "这个名字已被管理员停用。" }, { status: 403 });
+          return Response.json({ ok: false, msg: "请先在下方用名字和密码登录后再发言。" }, { status: 401 });
         } else {
           name = clean(body.name, 20);
           if (!name) return Response.json({ ok: false, msg: "请先起一个名字。" });
@@ -5411,7 +5418,7 @@ export default {
         const nb = await crypto.subtle.digest("SHA-256", new TextEncoder().encode("sde-nm-v1:" + ip));
         const nh = [...new Uint8Array(nb)].map((b) => b.toString(16).padStart(2, "0")).join("");
         const names = env.COMMENTS.get(env.COMMENTS.idFromName("names-global"));
-        if (!googleOn) { // 旧通道才做 IP-名字绑定；Google 实名无需绑定
+        if (!googleOn && !whoIdent) { // 只有未验明身份的旧通道才做 IP-名字绑定
           const claim = await (await names.fetch(new Request("https://do/", { method: "POST", body: JSON.stringify({ op: "claim", h: nh, name }) }))).json();
           if (!claim.ok) return Response.json({ ok: false, msg: claim.msg || "名字与你的网络不匹配。" }, { status: 409 });
         }
