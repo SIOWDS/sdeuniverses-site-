@@ -53,6 +53,10 @@
     ".sdemx a:hover{background:rgba(212,178,94,.18)}" +
     ".sdemx a.on{background:var(--gold,#D4B25E);color:#0F0B07}" +
     ".sdemx a i{font-style:normal;font-size:12px}" +
+    /* 浏览态顶栏那一颗：与站点自带的「问WDS」成对，描边而不是填色——两颗都填色会互相喊 */
+    ".sdemx-pill{border:1px solid var(--gold,#D4B25E);border-radius:16px;padding:3px 13px;" +
+    "color:var(--gold,#8C6A3A);font-weight:700;text-decoration:none;white-space:nowrap}" +
+    ".sdemx-pill:hover{background:var(--gold,#D4B25E);color:#0F0B07}" +
     /* 兜底浮动：只有页面里找不到任何合适落点时才用 */
     ".sdemx-float{position:fixed;right:16px;bottom:16px;z-index:99990;box-shadow:0 6px 20px rgba(0,0,0,.28);background:var(--wbg2,#12100C)}" +
     "@media(max-width:560px){.sdemx a span{display:none}.sdemx a{padding:6px 9px}.sdemx a i{font-size:14px}}";
@@ -89,21 +93,40 @@
       || null;
   }
 
+  // 浏览态的顶栏：紧跟「✦ 问WDS」插一颗「💬 SDE 微信」。
+  // 为什么不是三段条：人在浏览态时，"浏览"就是他所在的地方——顶栏需要的是通往另外两态的门，
+  // 不是一个把自己也画进去的三段条。会议与讨论都并进了微信这一格，所以顶栏这两颗就够了。
+  // 站点的中英是靠 body 上的 class 切 .zh-only/.en-only，所以要成对插。
+  function pills(nav) {
+    var im = SDE_MODES[1];
+    function mk(cls, label) {
+      var a = document.createElement("a");
+      a.className = "sdemx-pill " + cls;
+      a.href = im.href;
+      a.textContent = label;
+      a.title = lang() === "en" ? im.enT : im.zhT;
+      return a;
+    }
+    var zh = mk("zh-only", "\ud83d\udcac SDE \u5fae\u4fe1");
+    var en = mk("en-only", "\ud83d\udcac Messenger");
+    var all = nav.querySelectorAll(".wdsm-navbtn");
+    var anchor = all.length ? all[all.length - 1] : null;    // 紧跟问WDS；它不在就落到末尾
+    if (anchor && anchor.nextSibling) { nav.insertBefore(zh, anchor.nextSibling); nav.insertBefore(en, zh.nextSibling); }
+    else if (anchor) { nav.appendChild(zh); nav.appendChild(en); }
+    else { nav.appendChild(zh); nav.appendChild(en); }
+  }
   function mount() {
-    if (document.querySelector(".sdemx")) return;            // 已经有一个就不再挂第二个
+    if (document.querySelector(".sdemx") || document.querySelector(".sdemx-pill")) return;
     var st = document.createElement("style");
     st.textContent = CSS;
     document.head.appendChild(st);
-    var h = host();
+    var slot = document.querySelector("[data-sde-modes]");
+    var h = slot || host();
+    // 浏览态 ＋ 站点顶栏：只加那一颗药丸（三段条留给应用态、显式落点与无顶栏页面）。
+    // 显式落点是页面明说"切换器放这儿"，那就给完整三段条，不替它做主。
+    if (!slot && h && curKey() === "browse" && h.className.indexOf("nav-links") >= 0) { pills(h); return; }
     var box = build({ cls: h ? "" : "sdemx-float" });
-    if (h) {
-      // 顶栏里那颗旧的「✦ 问WDS」按钮由三态条取代，避免同一件事有两个入口
-      var old = h.querySelector(".wdsm-navbtn");
-      while (old) { old.parentNode.removeChild(old); old = h.querySelector(".wdsm-navbtn"); }
-      h.appendChild(box);
-    } else {
-      document.body.appendChild(box);
-    }
+    if (h) h.appendChild(box); else document.body.appendChild(box);
   }
 
   window.SDEModes = { list: SDE_MODES, current: curKey, build: build, mount: mount };

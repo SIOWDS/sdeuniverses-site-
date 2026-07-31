@@ -22,6 +22,8 @@ class N {
   set textContent(v) { this._text = String(v); this.children.length = 0; }
   get textContent() { return this._text || this.children.map((c) => c.textContent).join(""); }
   appendChild(c) { c.parentNode = this; this.children.push(c); return c; }
+  insertBefore(c, ref) { const i = this.children.indexOf(ref); c.parentNode = this; if (i < 0) this.children.push(c); else this.children.splice(i, 0, c); return c; }
+  get nextSibling() { if (!this.parentNode) return null; const i = this.parentNode.children.indexOf(this); return this.parentNode.children[i + 1] || null; }
   removeChild(c) { const i = this.children.indexOf(c); if (i >= 0) this.children.splice(i, 1); c.parentNode = null; return c; }
   setAttribute(k, v) { this.attrs[k] = String(v); if (k === "class") this.className = String(v); }
   getAttribute(k) { return k === "class" ? this.className : (this.attrs[k] ?? null); }
@@ -58,23 +60,25 @@ function run(env) {
   return env.win.SDEModes;
 }
 
-console.log("① 挂进顶栏 .nav-links");
+console.log("① 浏览态：顶栏紧跟「问WDS」插一颗「SDE 微信」");
 {
   const env = freshDoc("/column/some-piece/");
   const nav = new N("div"); nav.className = "nav-links";
-  const old = new N("a"); old.className = "zh-only wdsm-navbtn"; old.textContent = "✦ 问WDS";
-  nav.appendChild(old);
+  const search = new N("a"); search.className = "primary"; search.href = "/search/";
+  const wds = new N("a"); wds.className = "zh-only wdsm-navbtn"; wds.href = "/taste/wds-chat/"; wds.textContent = "✦ 问WDS";
+  const wdsEn = new N("a"); wdsEn.className = "en-only wdsm-navbtn"; wdsEn.href = "/taste/wds-chat/"; wdsEn.textContent = "✦ Ask WDS";
+  const later = new N("a"); later.className = "zh-only"; later.textContent = "每日必读";
+  [search, wds, wdsEn, later].forEach((n) => nav.appendChild(n));
   env.body.appendChild(nav);
   run(env);
-  const box = env.body.querySelector(".sdemx");
-  ok(!!box, "三态条挂上了");
-  ok(box && box.parentNode === nav, "挂在 .nav-links 里（看起来像页面自带的，而不是浮在角上）");
-  const as = box.querySelectorAll("a");
-  ok(as.length === 3, "正好三档，实得 " + as.length);
-  // 模块用的是 a.href = "…"（浏览器里就是标准写法），桩里它落在 JS 属性上而不是 attrs
-  ok(as.map((a) => a.href).join(" ") === "/ /sde-wechat/ /taste/wds-chat/", "三个目的地，实得 " + as.map((a) => a.href).join(" "));
-  ok(as[0].className === "on", "在专栏页时高亮「浏览」");
-  ok(!nav.querySelector(".wdsm-navbtn"), "顶栏原来那颗单独的「✦ 问WDS」被取代（同一件事不留两个入口）");
+  const pills = nav.querySelectorAll(".sdemx-pill");
+  ok(pills.length === 2, "插了中英两颗（站点靠 body class 切 .zh-only/.en-only），实得 " + pills.length);
+  ok(pills.every((p) => p.href === "/sde-wechat/"), "都指向 SDE 微信");
+  ok(nav.children.indexOf(pills[0]) === nav.children.indexOf(wdsEn) + 1,
+    "紧跟在「问WDS」后面，实得位置 " + nav.children.indexOf(pills[0]) + "（问WDS 在 " + nav.children.indexOf(wdsEn) + "）");
+  ok(nav.children.indexOf(pills[1]) < nav.children.indexOf(later), "排在后面那些栏目链接之前");
+  ok(!!nav.querySelector(".wdsm-navbtn"), "「问WDS」原样留着（不是被取代，是并排）");
+  ok(!nav.querySelector(".sdemx"), "浏览态不画三段条——人就在浏览态，顶栏要的是通往另外两态的门");
   ok(!!env.head.querySelector("style"), "样式自带，不依赖页面");
 }
 
