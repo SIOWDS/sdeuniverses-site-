@@ -574,6 +574,98 @@ export class CommentBox {
         await this.ctx.storage.delete("u:" + t);
         return Response.json({ ok: true, name: u.name || "", groups: ng });
       }
+      if (op === "amerge") { // 身份归一：把旧 uid 名下的一切改挂到新 uid
+        // 为什么需要它：国内走口令、海外走 Google，是两拨真实的人，两个入口都得留；
+        // 但 uid 一个从名字派生（imUid("pw:"+规范名））、一个从 Google sub 派生，
+        // ⇒ 同一个人换通道进来就是通讯录里的另一个人，群、私聊、朋友圈全跟着旧 uid 走。
+        // 聊天里这只是不便；对「候选卡记作者、记回写档案」来说是承重问题，所以必须能改绑。
+        const from = String(b.from || ""), to = String(b.to || "");
+        if (!ok12(from) || !ok12(to)) return Response.json({ ok: false, msg: "uid 不对。" });
+        if (from === to) return Response.json({ ok: false, msg: "两个是同一个 uid，不用合并。" });
+        const uFrom = await this.ctx.storage.get("u:" + from);
+        if (!uFrom) return Response.json({ ok: false, msg: "要合并的旧身份不在通讯录里。" });
+        const uTo = (await this.ctx.storage.get("u:" + to)) || { name: String(b.toName || ""), ts: now };
+        if (String(b.toName || "")) uTo.name = String(b.toName);
+        const rep = { groups: 0, convs: 0, dmLost: 0, posts: 0, likes: 0, cmts: 0, news: 0 };
+
+        // ① 群籍：gm 索引改挂，群成员数组与群主一并替换（去重，防止他本来两个身份都在同一个群）
+        const gi = await this.ctx.storage.list({ prefix: "gm:" + from + ":", limit: 500 });
+        for (const k of gi.keys()) {
+          const gid = k.slice(("gm:" + from + ":").length);
+          const g = await this.ctx.storage.get("g:" + gid);
+          if (g) {
+            const ms = (g.members || []).map((x) => (x === from ? to : x));
+            g.members = ms.filter((x, i) => ms.indexOf(x) === i);
+            if (g.owner === from) g.owner = to;
+            await this.ctx.storage.put("g:" + gid, g);
+            rep.groups++;
+          }
+          await this.ctx.storage.put("gm:" + to + ":" + gid, 1);
+          await this.ctx.storage.delete(k);
+        }
+
+        // ② 会话索引（两向）。⚠️ 私聊房号是 dm/<小uid>-<大uid>，消息本体在另一个 DO 里，
+        //    换了 uid 就换了房号——**历史搬不过来**。不假装搬走，改写 last 如实说明，并计数上报。
+        //    群聊不受影响：群房号是 g/<gid>，与 uid 无关（群是大头，这是好消息）。
+        const ib = await this.ctx.storage.list({ prefix: "ib:" + from + ":", limit: 500 });
+        for (const k of ib.keys()) {
+          const tail = k.slice(("ib:" + from + ":").length);
+          const v = (await this.ctx.storage.get(k)) || {};
+          if (v && v.kind !== "g") { v.last = "（合并前的私聊记录不在此处）"; v.unread = 0; rep.dmLost++; }
+          if (!(await this.ctx.storage.get("ib:" + to + ":" + tail))) await this.ctx.storage.put("ib:" + to + ":" + tail, v);
+          await this.ctx.storage.delete(k);
+          rep.convs++;
+        }
+        const allIb = await this.ctx.storage.list({ prefix: "ib:", limit: 2000 });
+        for (const k of allIb.keys()) {
+          if (!k.endsWith(":" + from)) continue;
+          const head = k.slice(0, k.length - from.length);
+          const v = await this.ctx.storage.get(k);
+          if (!(await this.ctx.storage.get(head + to))) await this.ctx.storage.put(head + to, v);
+          await this.ctx.storage.delete(k);
+        }
+
+        // ③ 朋友圈：个人索引、作者、点赞、评论里的 uid 一起换
+        const mu = await this.ctx.storage.list({ prefix: "mu:" + from + ":", limit: 1000 });
+        for (const k of mu.keys()) {
+          await this.ctx.storage.put("mu:" + to + ":" + k.slice(("mu:" + from + ":").length), 1);
+          await this.ctx.storage.delete(k);
+        }
+        const mos = await this.ctx.storage.list({ prefix: "mo:", limit: 2000 });
+        for (const [k, pst] of mos) {
+          if (!pst || typeof pst !== "object") continue;
+          let dirty = false;
+          if (pst.uid === from) { pst.uid = to; if (uTo.name) pst.name = uTo.name; dirty = true; rep.posts++; }
+          for (const l of (pst.likes || [])) if (l && l.uid === from) { l.uid = to; if (uTo.name) l.name = uTo.name; dirty = true; rep.likes++; }
+          for (const c of (pst.cmts || [])) if (c && c.uid === from) { c.uid = to; if (uTo.name) c.name = uTo.name; dirty = true; rep.cmts++; }
+          if (dirty) await this.ctx.storage.put(k, pst);
+        }
+
+        // ④ 提醒队列并进新身份（保留上限 60，与 moNotify 同口径）
+        const nFrom = (await this.ctx.storage.get("mn:" + from)) || null;
+        if (nFrom && Array.isArray(nFrom.q) && nFrom.q.length) {
+          const nTo = (await this.ctx.storage.get("mn:" + to)) || { q: [], seen: 0 };
+          nTo.q = nFrom.q.concat(nTo.q || []).slice(0, 60);
+          nTo.seen = Math.max(nTo.seen || 0, nFrom.seen || 0);
+          await this.ctx.storage.put("mn:" + to, nTo);
+          rep.news = nFrom.q.length;
+        }
+        await this.ctx.storage.delete("mn:" + from);
+        await this.ctx.storage.delete("morl:" + from);   // 发帖限流是临时量，不搬
+
+        // ⑤ 收尾：旧条目删掉，新身份确保在通讯录里，并留一条别名以便日后追查
+        await this.ctx.storage.delete("u:" + from);
+        uTo.ts = Math.max(uTo.ts || 0, uFrom.ts || 0, now);
+        await this.ctx.storage.put("u:" + to, uTo);
+        await this.ctx.storage.put("alias:" + from, { to, fromName: uFrom.name || "", toName: uTo.name || "", ts: now });
+        return Response.json({ ok: true, fromName: uFrom.name || "", toName: uTo.name || "", ...rep });
+      }
+      if (op === "aaliases") {
+        const m = await this.ctx.storage.list({ prefix: "alias:", limit: 300 });
+        const out = [];
+        for (const [k, v] of m) out.push({ from: k.slice(6), to: (v && v.to) || "", fromName: (v && v.fromName) || "", toName: (v && v.toName) || "", ts: (v && v.ts) || 0 });
+        return Response.json({ ok: true, aliases: out });
+      }
       if (op === "aban" || op === "aunban") {
         const nm = String(b.name || "").trim().slice(0, 40);
         if (!nm) return Response.json({ ok: false, msg: "名字不能为空。" });
@@ -5266,6 +5358,29 @@ export default {
           const d = await call({ op: "model", uid: who.uid, id: String(b.id || ""), force: 1 });
           if (d && d.ok && env.PDFS) { for (const k of (d.imgs || [])) { try { await env.PDFS.delete("moments/" + k + ".jpg"); } catch (e) {} } }
           return Response.json(d || { ok: false });
+        }
+        if (a === "merge") {
+          // 管理员只给「旧 uid ＋ 目标名录名」；目标 uid 由服务端按口令通道的派生式算，
+          // 保证归一之后**身份锚在名录上，与进站通道无关**——国内外两个入口，一个人。
+          const from = String(b.from || "");
+          const nmIn = String(b.toName || "").trim();
+          if (!nmIn) return Response.json({ ok: false, msg: "要合并到哪个名字？" }, { status: 400 });
+          const rm = await rosterMap();
+          const disp = rm ? rm.get(imNorm(nmIn)) : nmIn;
+          if (!disp) return Response.json({ ok: false, msg: "「" + nmIn + "」不在学员名录里。" }, { status: 400 });
+          const to = await imUid("pw:" + imNorm(disp));
+          if (!to) return Response.json({ ok: false, msg: "算不出目标 uid。" }, { status: 500 });
+          if (from === who.uid) return Response.json({ ok: false, msg: "不能把你当前登录的这个身份当作旧身份合并掉。" }, { status: 400 });
+          const d = await call({ op: "amerge", from, to, toName: disp });
+          return Response.json(d);
+        }
+        if (a === "aliases") return Response.json(await call({ op: "aaliases" }), { headers: { "cache-control": "no-store" } });
+        if (a === "whois") {   // 给管理员算一下：某个名录名对应的 uid 是多少
+          const rm = await rosterMap();
+          const nm = String(b.name || "").trim();
+          const disp = rm ? rm.get(imNorm(nm)) : nm;
+          if (!disp) return Response.json({ ok: false, msg: "「" + nm + "」不在学员名录里。" }, { status: 400 });
+          return Response.json({ ok: true, name: disp, uid: await imUid("pw:" + imNorm(disp)) });
         }
         if (a === "gdel") return Response.json(await call({ op: "agdel", gid: String(b.gid || "") }));
         if (a === "gkick") return Response.json(await call({ op: "agkick", gid: String(b.gid || ""), target: String(b.target || "") }));

@@ -439,10 +439,27 @@ function adUnlock(){
 }
 function adLoad(){
   var box=el("ad-panel");box.innerHTML='<div class="hint">正在加载…</div>';
-  Promise.all([adCall("users"),adCall("groups"),adCall("bans")]).then(function(r){
+  Promise.all([adCall("users"),adCall("groups"),adCall("bans"),adCall("aliases")]).then(function(r){
     var us=(r[0].d&&r[0].d.users)||[],gs=(r[1].d&&r[1].d.groups)||[],bs=(r[2].d&&r[2].d.bans)||[];
     var h='<div style="padding:14px 16px">';
-    h+='<h3 style="margin:0 0 6px;font-size:0.95rem">全部用户（'+us.length+'）</h3>';
+    // 合并身份排在最前——国内走口令、海外走 Google，两个入口该留，但一个人只该有一个身份。
+    h+='<h3 style="margin:0 0 6px;font-size:0.95rem">合并身份（国内／海外同一个人）</h3>';
+    h+='<p style="font-size:0.76rem;color:var(--muted);margin:0 0 8px;line-height:1.7">'
+      +'大陆用名字＋密码进，海外用 Google 进——<b>是两拨真实的人，两个入口都保留</b>；'
+      +'但同一个人换通道进来会变成通讯录里的另一个人，群、朋友圈都跟着旧身份走。'
+      +'在下面选中那个旧身份，填他在<b>学员名录里的名字</b>，就把一切改挂过去。<br>'
+      +'⚠️ <b>群聊与朋友圈都能完整搬走；私聊的历史消息搬不走</b>'
+      +'（私聊房号由两个 uid 算出来，换了 uid 就是另一个房间）——会话还在，里面会写明。</p>';
+    h+='<div class="me-item" style="display:block;padding:10px 0">'
+      +'<select id="ad-mg-from" style="width:100%;box-sizing:border-box;padding:8px;margin-bottom:6px;border:1px solid var(--line,#ddd);border-radius:8px">'
+      +'<option value="">选一个要并掉的旧身份…</option>';
+    us.forEach(function(u){ h+='<option value="'+esc(u.uid)+'">'+esc(u.name||"（未署名）")+'　'+esc(u.uid)+'</option>'; });
+    h+='</select>'
+      +'<input id="ad-mg-to" list="ad-roster" maxlength="40" placeholder="合并到名录里的哪个名字（可填本名或 slug）" '
+      +'style="width:100%;box-sizing:border-box;padding:8px;margin-bottom:6px;border:1px solid var(--line,#ddd);border-radius:8px">'
+      +'<datalist id="ad-roster"></datalist>'
+      +'<button id="ad-mg-go" class="btn" style="width:100%">合并</button></div>';
+    h+='<h3 style="margin:20px 0 6px;font-size:0.95rem">全部用户（'+us.length+'）</h3>';
     h+='<p style="font-size:0.76rem;color:var(--muted);margin:0 0 10px">移除＝从通讯录、所有群、所有会话里彻底清掉。勾上「同时停用」他就再也登不进来。</p>';
     us.forEach(function(u){
       h+='<div class="me-item"><span>'+esc(u.name||"（未署名）")+' <span style="color:var(--muted);font-size:0.74rem">'+esc(u.uid)+'</span></span>'+
@@ -460,12 +477,51 @@ function adLoad(){
     bs.forEach(function(x){
       h+='<div class="me-item"><span>'+esc(x.name)+'</span><button class="ad-unban" data-n="'+esc(x.name)+'">恢复</button></div>';
     });
+    var als=(r[3]&&r[3].d&&r[3].d.aliases)||[];
+    if(als.length){
+      h+='<h3 style="margin:20px 0 6px;font-size:0.95rem">已合并过的身份（'+als.length+'）</h3>';
+      h+='<p style="font-size:0.76rem;color:var(--muted);margin:0 0 8px">留痕只为日后追查，不影响使用。</p>';
+      als.forEach(function(a){
+        h+='<div class="me-item"><span>'+esc(a.fromName||"（未署名）")+' <span style="color:var(--muted);font-size:0.74rem">'+esc(a.from)+'</span>'
+          +' → '+esc(a.toName||"")+' <span style="color:var(--muted);font-size:0.74rem">'+esc(a.to)+'</span></span></div>';
+      });
+    }
     h+='<div id="ad-note" style="font-size:0.8rem;color:var(--muted);margin-top:14px;min-height:1em"></div></div>';
     box.innerHTML=h;adBind();
   }).catch(function(){box.innerHTML='<div class="hint">加载失败，请重试。</div>'});
 }
 function adNote(t,bad){var n=el("ad-note");if(n){n.style.color=bad?"#b3261e":"var(--muted)";n.textContent=t;}}
 function adBind(){
+  // 名录联想：第一次点输入框才拉 roster.json（140KB，不进首屏）——与门禁那处同一惯例
+  var mgTo=el("ad-mg-to");
+  if(mgTo){
+    mgTo.addEventListener("focus",function once(){
+      mgTo.removeEventListener("focus",once);
+      fetch("/students/roster.json").then(function(r){return r.json()}).then(function(j){
+        var dl=el("ad-roster");if(!dl)return;
+        ((j&&j.students)||[]).forEach(function(s){
+          if(!s||!s.name)return;
+          var o=document.createElement("option");o.value=s.name;dl.appendChild(o);
+        });
+      }).catch(function(){});
+    });
+  }
+  var mgGo=el("ad-mg-go");
+  if(mgGo)mgGo.onclick=function(){
+    var from=(el("ad-mg-from")||{}).value||"",to=((el("ad-mg-to")||{}).value||"").trim();
+    if(!from){adNote("先选一个要并掉的旧身份。",1);return;}
+    if(!to){adNote("填上要合并到的名录名字。",1);return;}
+    if(!confirm("把 "+from+" 名下的群籍、会话、朋友圈全部改挂到「"+to+"」？\n私聊的历史消息搬不走（会话仍在）。此操作不可撤销。"))return;
+    adNote("正在合并…");
+    adCall("merge",{from:from,toName:to}).then(function(x){
+      var d=x.d||{};
+      if(!d.ok){adNote(d.msg||"合并失败。",1);return;}
+      adNote("已把「"+(d.fromName||from)+"」并进「"+(d.toName||to)+"」："
+        +"群 "+(d.groups||0)+"，会话 "+(d.convs||0)+"（其中 "+(d.dmLost||0)+" 个私聊的历史留在原处），"
+        +"动态 "+(d.posts||0)+"，赞 "+(d.likes||0)+"，评论 "+(d.cmts||0)+"，提醒 "+(d.news||0)+"。");
+      setTimeout(adLoad,900);
+    }).catch(function(){adNote("合并失败，请重试。",1)});
+  };
   Array.prototype.forEach.call(document.querySelectorAll(".ad-rm"),function(btn){
     btn.onclick=function(){
       var u=btn.getAttribute("data-u"),n=btn.getAttribute("data-n")||u;
