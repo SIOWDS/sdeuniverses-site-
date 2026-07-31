@@ -250,6 +250,15 @@ def paper_iq(idx):
     m = re.search(r'创新智商[：:\s]*(\d{3})\s*[（(]\s*原稿盲评', t)
     if m:
         return int(m.group(1)), 'blind'
+    # 「SDE 创新智商　盲评 134 → 修改设计目标 136」/「盲评 137 → 加固后 138」
+    # 箭头左边是原稿盲评，右边是编辑增补后的修改设计目标（不计分）
+    m = re.search(r'创新智商[：:\s\u3000]*盲评\s*(\d{3})', t)
+    if m:
+        return int(m.group(1)), 'blind'
+    # 「关于本文的创新智商标注　本文在未经任何编辑改动的原稿状态下接受过一次盲评…按固定权重计算的综合分为 130」
+    m = re.search(r'创新智商标注[\s\S]{0,600}?综合分为\s*(\d{3})', t)
+    if m:
+        return int(m.group(1)), 'blind'
     m = re.search(r'创新智商[：:\s]*(\d{3})', t)
     if m:
         return int(m.group(1)), 'legacy'
