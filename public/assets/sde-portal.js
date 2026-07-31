@@ -129,6 +129,18 @@
     ".sdep-node:hover .sdep-dot,.sdep-node:focus-visible .sdep-dot{background:var(--c);color:#0C0906;transform:scale(1.08);" +
     "box-shadow:0 0 34px -6px var(--c)}" +
     ".sdep-node:focus-visible .sdep-nm{text-decoration:underline}" +
+    /* 圆里的图标：字形画不出“两个人撞在一起”这件事，改用 SVG 现画，
+       尺寸跟着 font-size 走（em），窄屏字号一小它自己就跟着小。 */
+    ".sdep-icon{width:1.55em;height:1.1em;display:block;overflow:visible;fill:none;stroke:currentColor;" +
+    "stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}" +
+    /* 两个小人迎面走近、撞上、回弹；三支动画同一个周期，火花才会正好落在相撞那一瞬 */
+    ".sdep-icon .figL{animation:sdepBumpL 1.9s ease-in-out infinite}" +
+    ".sdep-icon .figR{animation:sdepBumpR 1.9s ease-in-out infinite}" +
+    "@keyframes sdepBumpL{0%,12%{transform:translateX(-2.4px)}40%,50%{transform:translateX(2.2px)}78%,100%{transform:translateX(-2.4px)}}" +
+    "@keyframes sdepBumpR{0%,12%{transform:translateX(2.4px)}40%,50%{transform:translateX(-2.2px)}78%,100%{transform:translateX(2.4px)}}" +
+    ".sdep-icon .clash{opacity:0;transform-box:fill-box;transform-origin:center;animation:sdepClash 1.9s ease-out infinite}" +
+    "@keyframes sdepClash{0%,34%{opacity:0;transform:scale(.25)}44%{opacity:1;transform:scale(1)}64%{opacity:0;transform:scale(1.55)}100%{opacity:0;transform:scale(.25)}}" +
+    "@media(prefers-reduced-motion:reduce){.sdep-icon .figL,.sdep-icon .figR,.sdep-icon .clash{animation:none}.sdep-icon .clash{opacity:.85}}" +
     ".sdep-nm{font:700 15px/1 inherit;letter-spacing:1px;white-space:nowrap;color:var(--c)}" +
     ".sdep-sub{font-size:11.5px;color:#8B98A5;white-space:nowrap}" +
     /* 正中：letter-spacing 会在末字后面也加一份，右边看着就偏了，补一个等量负边距抵掉 */
@@ -160,6 +172,40 @@
     for (var k in attrs) e.setAttribute(k, attrs[k]);
     return e;
   }
+  /* 「SDE 对话」圆里的图标：**两个小人迎面相撞**。
+     为什么不用字形：对话不是轮流发言，是两边撞出一个开场时谁也没有的东西——
+     “撞”这件事得真动起来才看得出来，静止的星形说不了。
+     坐标系 40×28：左人在 11.5、右人在 28.5，相撞点在正中 (20,14)。 */
+  function collideIcon() {
+    var svg = S("svg", { "class": "sdep-icon", viewBox: "0 0 40 28" });
+    svg.setAttribute("aria-hidden", "true");
+    // dir = 朝向对面的方向（1 向右、-1 向左）；伸向对面的那只手比另一只长
+    function fig(cls, x, dir) {
+      var g = S("g", { "class": "fig " + cls });
+      g.appendChild(S("circle", { cx: x, cy: 7.6, r: 3 }));                                  // 头
+      g.appendChild(S("path", { d: "M" + x + " 10.9 V17.6" }));                              // 身子
+      g.appendChild(S("path", { d: "M" + x + " 13.2 L" + (x + dir * 4.6) + " 14.9" }));      // 前手（伸向对面）
+      g.appendChild(S("path", { d: "M" + x + " 13.2 L" + (x - dir * 3.4) + " 15.6" }));      // 后手
+      g.appendChild(S("path", { d: "M" + x + " 17.6 L" + (x + dir * 3.4) + " 23.4" }));      // 前腿
+      g.appendChild(S("path", { d: "M" + x + " 17.6 L" + (x - dir * 3.2) + " 23.4" }));      // 后腿
+      return g;
+    }
+    svg.appendChild(fig("figL", 11.5, 1));
+    svg.appendChild(fig("figR", 28.5, -1));
+    // 撞出来的那下：从相撞点向六个方向射出去的短线
+    var clash = S("g", { "class": "clash" });
+    [[0, -1], [0.87, -0.5], [0.87, 0.5], [0, 1], [-0.87, 0.5], [-0.87, -0.5]].forEach(function (v) {
+      clash.appendChild(S("path", {
+        d: "M" + (20 + v[0] * 2.4).toFixed(2) + " " + (14 + v[1] * 2.4).toFixed(2) +
+           " L" + (20 + v[0] * 5.4).toFixed(2) + " " + (14 + v[1] * 5.4).toFixed(2),
+      }));
+    });
+    svg.appendChild(clash);
+    return svg;
+  }
+  // 哪个入口用现画的图标（没列在这里的就用 NODES[].icon 那个字形）
+  var ART = { wds: collideIcon };
+
   /* 四周的图案：三个母题各占一角，全部压在低不透明度上。
      这张 svg 用 slice，圆才是圆的——三角形那张是 none（要跟着拉满），两者不能共用。 */
   function deco() {
@@ -397,7 +443,8 @@
         fire.appendChild(sp);
       }
       var dot = document.createElement("span");
-      dot.className = "sdep-dot"; dot.textContent = n.icon;
+      dot.className = "sdep-dot";
+      if (ART[n.k]) dot.appendChild(ART[n.k]()); else dot.textContent = n.icon;
       wrap.appendChild(fire); wrap.appendChild(dot);
       var nm = document.createElement("span");
       nm.className = "sdep-nm"; nm.textContent = T(n.zh, n.en);
