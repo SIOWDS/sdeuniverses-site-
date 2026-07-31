@@ -218,41 +218,53 @@
     });
     defs.appendChild(grad);
     svg.appendChild(defs);
-    // 三条边各画一条 S 型曲线：三次贝塞尔，两个控制点沿垂线朝相反两侧偏出去，
-    // 于是前半段鼓向一边、后半段鼓向另一边，中点仍精确落在两顶点连线的中点上。
-    // 幅度按各自边长取，三条边看起来才是同一种弯法（等长偏移会让短边显得更弯）。
-    function sPath(a, b, k) {
-      var dx = b.x - a.x, dy = b.y - a.y;
-      var L = Math.sqrt(dx * dx + dy * dy) || 1;
-      var nx = -dy / L, ny = dx / L;                     // 垂线单位向量
-      var amp = k * L;
+    // 三条边连成一条不断的正弦曲线：绕三角形走一圈，在顶点处收敛为零、平滑接上下一条边。
+    //
+    // 波形 f(t) = A · sin(πt) · sin(2πn·t)：
+    //   · sin(2πn·t) 是正弦本体，n 取整数保证两端都恰好归零 —— 曲线精确穿过每个顶点；
+    //   · sin(πt) 是包络，让波在边的中段鼓起、到顶点自然收平。没有它，顶点处会留下折角。
+    var WAVE_N = 2;        // 每条边几个整周期
+    var WAVE_A = 5.5;      // 波幅（viewBox 纵向单位）
+    // viewBox 是 100×100，但 preserveAspectRatio="none" 把它拉成了舞台的 720×440，
+    // 横竖缩放比不同。若直接按 viewBox 里的垂线偏移，斜边的波会比底边明显胖一圈。
+    // 下面按舞台的设计宽高比把横向分量折算回去，三条边的波幅在眼睛里才是一样的。
+    var AR = 720 / 440;
+    function waveRing(nodes) {
+      var d = "", SEG = 96;
       var r = function (v) { return Math.round(v * 100) / 100; };
-      return "M" + r(a.x) + "," + r(a.y) +
-             " C" + r(a.x + dx / 3 + nx * amp) + "," + r(a.y + dy / 3 + ny * amp) +
-             " " + r(a.x + dx * 2 / 3 - nx * amp) + "," + r(a.y + dy * 2 / 3 - ny * amp) +
-             " " + r(b.x) + "," + r(b.y);
-    }
-    // 顶点仍旧只有 NODES 一处；这里只是把"依次连回起点"写出来
-    NODES.forEach(function (a, i) {
-      var b = NODES[(i + 1) % NODES.length];
-      var pa = S("path", {
-        class: "sdep-tri",
-        d: sPath(a, b, 0.13),
-        fill: "none",
-        "vector-effect": "non-scaling-stroke",
-        "data-edge": a.k + "-" + b.k,
+      nodes.forEach(function (a, i) {
+        var b = nodes[(i + 1) % nodes.length];
+        var dx = b.x - a.x, dy = b.y - a.y;
+        // 舞台空间里的垂线方向，再换算回 viewBox 单位
+        var k = Math.sqrt(dy * dy + dx * dx * AR * AR) || 1;
+        var ux = (-dy / AR) / k, uy = (dx * AR) / k;
+        for (var s = (i === 0 ? 0 : 1); s <= SEG; s++) {
+          var t = s / SEG;
+          var off = WAVE_A * Math.sin(Math.PI * t) * Math.sin(2 * Math.PI * WAVE_N * t);
+          var x = a.x + dx * t + ux * off, y = a.y + dy * t + uy * off;
+          d += (d ? " L" : "M") + r(x) + "," + r(y);
+        }
       });
-      // 描线长度按这条曲线自己算——写死一个数，长短边就会一快一慢
-      var len = 0;
-      try { len = pa.getTotalLength(); } catch (e) {}
-      if (!len || !isFinite(len)) {
-        var dx2 = b.x - a.x, dy2 = b.y - a.y;
-        len = Math.sqrt(dx2 * dx2 + dy2 * dy2) * 1.15;   // S 形比直线长，取个够用的估值
-      }
-      pa.style.setProperty("--L", Math.ceil(len));
-      pa.style.animationDelay = (0.15 + i * 0.22) + "s";
-      svg.appendChild(pa);
+      return d + " Z";
+    }
+    // 顶点仍旧只有 NODES 一处；这里只是让波绕着它们走一圈
+    var ring = S("path", {
+      class: "sdep-tri",
+      d: waveRing(NODES),
+      fill: "none",
+      "vector-effect": "non-scaling-stroke",
     });
+    // 一笔画完：整圈是一条路径，描线长度也按整圈算
+    var len = 0;
+    try { len = ring.getTotalLength(); } catch (e) {}
+    if (!len || !isFinite(len)) {
+      NODES.forEach(function (a, i) {
+        var b = NODES[(i + 1) % NODES.length];
+        len += Math.sqrt(Math.pow(b.x - a.x, 2) + Math.pow(b.y - a.y, 2)) * 1.6;   // 波比直线长
+      });
+    }
+    ring.style.setProperty("--L", Math.ceil(len));
+    svg.appendChild(ring);
     stage.appendChild(svg);
 
     // 正中「爱思乐园」：位置由三个顶点现算重心，改顶点它自己跟着走，不写死

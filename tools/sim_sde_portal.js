@@ -98,43 +98,41 @@ ok(nodes.map((n) => n.querySelector(".sdep-nm").textContent).join(" / ").indexOf
 const edges = box.querySelectorAll("path").filter(function (e) {
   return String(e.className || "").indexOf("sdep-tri") >= 0;
 });
-ok(edges.length === 3, "三条边各是一条独立曲线，实得 " + edges.length);
-const nodePos = nodes.map((n) => parseFloat(n.style.left) + "," + parseFloat(n.style.top));
+ok(edges.length === 1, "三条边连成一条不断的路径，实得 " + edges.length + " 条");
+const nodePos = nodes.map((n) => [parseFloat(n.style.left), parseFloat(n.style.top)]);
 {
-  // 每条边：必须是三次贝塞尔（S 型的载体），且首尾正好落在相邻两个入口上
-  let allCubic = true, allJoin = true, detail = [];
-  edges.forEach((e, i) => {
-    const d = String(e.attrs.d || "");
-    if (d.indexOf("C") < 0) allCubic = false;
-    const m = d.match(/^M\s*([-\d.]+),([-\d.]+)\s*C[^]*\s([-\d.]+),([-\d.]+)$/);
-    if (!m) { allJoin = false; detail.push("第" + (i + 1) + "条读不出首尾"); return; }
-    const from = parseFloat(m[1]) + "," + parseFloat(m[2]);
-    const to = parseFloat(m[3]) + "," + parseFloat(m[4]);
-    if (from !== nodePos[i] || to !== nodePos[(i + 1) % 3]) {
-      allJoin = false; detail.push("第" + (i + 1) + "条 " + from + "→" + to);
-    }
+  const d = String(edges[0] ? edges[0].attrs.d || "" : "");
+  ok(/Z\s*$/.test(d), "整圈闭合（收尾回到起点，不是三段拼起来的）");
+  const pts = (d.match(/[-\d.]+,[-\d.]+/g) || []).map((s) => s.split(",").map(Number));
+  ok(pts.length > 200, "是密采样的曲线而不是三条直边，实得 " + pts.length + " 个点");
+  // 顶点必须被精确穿过——正弦在整周期的两端归零，才接得上下一条边
+  let worst = 0;
+  nodePos.forEach(([x, y]) => {
+    let best = Infinity;
+    pts.forEach(([px, py]) => { const dd = Math.hypot(px - x, py - y); if (dd < best) best = dd; });
+    if (best > worst) worst = best;
   });
-  ok(allCubic, "三条边都是三次贝塞尔曲线（不是直线）");
-  ok(allJoin, "每条曲线首尾正落在相邻两个入口上（同一组坐标，不是各写一份）" + (detail.length ? "：" + detail.join(" ｜ ") : ""));
-}
-{
-  // S 型的判据：两个控制点必须落在弦的两侧（同侧就是弓形，不是 S）
-  let allS = true, sd = [];
-  edges.forEach((e, i) => {
-    const n = String(e.attrs.d || "").match(/[-\d.]+/g).map(Number);
-    if (n.length < 8) { allS = false; return; }
-    const [ax, ay, c1x, c1y, c2x, c2y, bx, by] = n;
+  ok(worst < 0.01, "曲线精确穿过三个入口（同一组坐标，不是各写一份），最大偏差 " + worst.toFixed(4));
+  // 正弦的判据：每条边上，偏离弦的方向要反复换边；只鼓一次那是弓形，不是正弦
+  let allWave = true, det = [];
+  nodePos.forEach(([ax, ay], i) => {
+    const [bx, by] = nodePos[(i + 1) % 3];
     const dx = bx - ax, dy = by - ay;
-    const s1 = dx * (c1y - ay) - dy * (c1x - ax);      // 叉积定侧
-    const s2 = dx * (c2y - ay) - dy * (c2x - ax);
-    if (!(s1 * s2 < 0)) { allS = false; sd.push("第" + (i + 1) + "条 " + s1.toFixed(1) + "/" + s2.toFixed(1)); }
+    const seg = pts.filter(([px, py]) => {
+      const t = ((px - ax) * dx + (py - ay) * dy) / (dx * dx + dy * dy);
+      return t > 0.02 && t < 0.98;
+    });
+    let flips = 0, prev = 0;
+    seg.forEach(([px, py]) => {
+      const cr = dx * (py - ay) - dy * (px - ax);
+      if (prev && cr * prev < 0) flips++;
+      if (Math.abs(cr) > 1e-6) prev = cr;
+    });
+    if (flips < 2) { allWave = false; det.push("第" + (i + 1) + "条只换边 " + flips + " 次"); }
   });
-  ok(allS, "两个控制点分居弦的两侧 —— 是 S 型而不是弓形" + (sd.length ? "：" + sd.join(" ｜ ") : ""));
-}
-{
-  // 描线长度得各算各的，写死一个数长短边就一快一慢
-  const lens = edges.map((e) => String(e.style && e.style.getPropertyValue ? e.style.getPropertyValue("--L") : (e.style["--L"] || "")));
-  ok(lens.every((v) => v && parseFloat(v) > 0), "每条边的描线长度是按自己算出来的：" + lens.join(" / "));
+  ok(allWave, "每条边上都在来回摆动 —— 是正弦而不是单鼓一次的弓形" + (det.length ? "：" + det.join(" ｜ ") : ""));
+  const L = edges[0].style.getPropertyValue("--L");
+  ok(L && parseFloat(L) > 0, "整圈的描线长度是算出来的（一笔画完）：" + L);
 }
 ok(parseFloat(nodes[0].style.top) < parseFloat(nodes[1].style.top), "第一个在顶端");
 const mid = box.querySelector(".sdep-mid");
