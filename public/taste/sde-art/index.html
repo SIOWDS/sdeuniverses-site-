@@ -356,6 +356,28 @@ async function mmChat(sys, user, maxTok, imgs){
   if(!out) throw new Error("空产出：基底把预算全用在思考上了，或上下文顶穿。可缩短入题再试。");
   return out;
 }
+/* 渲染端回收路径：不指望基底听话。
+   PPT 那条线的教训——「凡是靠形状驱动的设计，都要在渲染端为『形状写错位置』留一条
+   回收路径，光靠提示禁止不够」。这里管两件事：
+   ① 艺术家／画派指名一律摘掉（禁令①既是版权自保，也是 I 维自保）；
+   ② 英文禁令串缺了就补上。两件都要留痕告诉读者，绝不静默改写。 */
+var ARTIST_RE = new RegExp(
+  "(in the (manner|style) of\\s+[^,.;]{1,40})|(\\b(van\\s*gogh|escher|mondrian|dali|salvador\\s+dali|magritte|rothko|kandinsky|picasso|monet|klimt|hokusai|vermeer|caravaggio|pollock|matisse|munch|turner|basquiat|warhol|miyazaki|moebius|giger)\\b[a-z-]*)",
+  "gi");
+var BAN_TAIL = "no text, no letters, no numbers, no watermark, no recognizable real person, no logo, no brand, not in the style of any named artist";
+function hardenPrompt(p){
+  var s = String(p||""), hits = [];
+  // ⚠️ 先把已有的禁令串摘出去再净化：禁令串自身含 "not in the style of any named artist"，
+  //    不先摘走，ARTIST_RE 会把自家尾巴一起吃掉，然后又补一条——addedTail 会撒谎、尾巴还可能重复。
+  var had = s.indexOf(BAN_TAIL) >= 0;
+  if(had) s = s.split(BAN_TAIL).join(" ");
+  s = s.replace(ARTIST_RE, function(m){ hits.push(m.trim()); return ""; });
+  s = s.replace(/\s*,\s*,/g, ",").replace(/\s{2,}/g, " ").replace(/^[\s,]+/, "").replace(/[,\s]+$/,"").trim();
+  if(s.length > 1500 - BAN_TAIL.length - 2) s = s.slice(0, 1500 - BAN_TAIL.length - 2).replace(/[,\s]+$/,"");
+  s = s + ", " + BAN_TAIL;
+  return { p: s, stripped: hits, addedTail: !had };
+}
+
 async function mmDraw(prompt, ratio, n){
   var body = { model: IMGMODEL, prompt: String(prompt).slice(0,1500), aspect_ratio: ratio,
                n: n, response_format: "base64", prompt_optimizer: false };
@@ -508,7 +530,9 @@ async function run(again){
         var prompt = grab(colTxt, "七、绘图指令") || grab(colTxt, "绘图指令");
         prompt = prompt.replace(/^[（(].*?[）)]\s*/,"").trim();
         if(!prompt || prompt.length < 60) throw new Error("第七节绘图指令没解析出来");
-        paras.push({ way:w, txt:colTxt, prompt:prompt, imgs:[], score:null, report:"" });
+        var hd = hardenPrompt(prompt);
+        paras.push({ way:w, txt:colTxt, prompt:hd.p, imgs:[], score:null, report:"",
+                     stripped:hd.stripped, addedTail:hd.addedTail });
         mark(si,"done", w.t);
       }catch(e){
         mark(si,"fail", (e&&e.message||"失败").slice(0,60));
@@ -606,15 +630,26 @@ async function run(again){
   }
 }
 
+/* 取某一格的分。
+   ⚠️ 这里踩过一个隐蔽的坑：格名里有单字的（「爱」），而它极容易出现在**别的格**的
+   理由文字里（「三张一个样，很不可爱也不自由」）。早先的写法是「哪一行含这个格名就算哪一行」，
+   于是「爱」和「自由」双双被「多样」那一行的 10 分抢走，C 档还把「爱」加倍——
+   一份八格 90 分的卡被算成 61。**必须锚定行首并要求紧跟分隔符**，只认 `格名｜分数｜理由` 这个形状。 */
+function cellScore(txt, name){
+  var lines = String(txt).split(/\n/);
+  // 前缀允许 · - * 数字 . 、 ） ) 与空格任意混排——真产出常写成「1. 统一｜80｜…」或「· 3. 活力｜77｜…」
+  var re = new RegExp("^[\\s·\\-*\\d.、）)]*" + name + "\\s*[｜|/:：,，]\\s*(\\d{1,3})");
+  for(var i=0;i<lines.length;i++){
+    var m = lines[i].match(re);
+    if(m) return Math.min(100, parseInt(m[1],10));
+  }
+  return null;
+}
 function scoreOf(txt, accent){
-  var lines = String(txt).split(/\n/), sum = 0, wsum = 0;
+  var sum = 0, wsum = 0;
   B9.forEach(function(g){
-    var hit = null;
-    lines.forEach(function(L){ if(L.indexOf(g[0])>=0 && /\d/.test(L) && hit===null) hit = L; });
-    if(hit===null) return;
-    var m = hit.match(/(\d{1,3})/);
-    if(!m) return;
-    var v = Math.min(100, parseInt(m[1],10));
+    var v = cellScore(txt, g[0]);
+    if(v === null) return;
     var w = (accent.indexOf(g[0])>=0) ? 2 : 1;
     sum += v*w; wsum += w;
   });
@@ -636,6 +671,8 @@ function renderDraw(paras){
     h += '<div class="card" style="background:#0C1015;margin:14px 0">';
     h += '<b style="color:var(--gold)">第 '+(i+1)+' 路 · 碰撞方式 '+p.way.n+'：'+esc(p.way.t)+'</b>';
     if(p.score!=null) h += ' <span class="tag pass">九宫格 '+p.score+'</span>';
+    if(p.stripped && p.stripped.length) h += ' <span class="tag hit">渲染端摘掉了 '+p.stripped.length+' 处艺术家指名：'+esc(p.stripped.join("、"))+'</span>';
+    if(p.addedTail) h += ' <span class="tag hit">禁令串是渲染端补的（基底没写）</span>';
     h += '<div class="out" style="margin-top:8px;max-height:300px">'+esc(p.txt)+'</div>';
     if(p.imgs.length){
       h += '<div class="gal">' + p.imgs.map(function(d,k){
@@ -644,10 +681,7 @@ function renderDraw(paras){
     }
     if(p.report){
       h += '<div class="b9">' + B9.map(function(g){
-        var line = null;
-        p.report.split(/\n/).forEach(function(L){ if(L.indexOf(g[0])>=0 && /\d/.test(L) && line===null) line = L; });
-        var m = line && line.match(/(\d{1,3})/);
-        var v = m ? Math.min(100,parseInt(m[1],10)) : null;
+        var v = cellScore(p.report, g[0]);   // 与 scoreOf 共用一把尺，格子与总分不会各说各话
         return '<div class="g'+(v!=null && v<60 ? ' low':'')+'" title="'+esc(g[2])+'"><b>'+g[0]+'</b><u>'+(v==null?"—":v)+'</u></div>';
       }).join("") + '</div>';
       h += '<div class="out" style="margin-top:10px;max-height:220px">'+esc(p.report)+'</div>';
@@ -691,8 +725,12 @@ $("btnDlAll").onclick = function(){
     });
   });
 };
+/* 只读探针：供 tools/sim_sde_art*.js 抠内部状态做干跑。页面自身不读它。
+   露出 run 是为了让 e2e 能 await 整条产线——onclick 不返回 promise，不露就只能轮询。 */
 window.__sdeArt = { WAYS:WAYS, B9:B9, MODES:MODES, pickWays:pickWays, scoreOf:scoreOf,
-                    placeBrief:placeBrief, PLACE_SDE:PLACE_SDE, VERSION:VERSION };
+                    placeBrief:placeBrief, PLACE_SDE:PLACE_SDE, VERSION:VERSION,
+                    run:run, setMode:function(m){ MODE=m; }, last:function(){ return LAST; },
+                    resetWays:function(){ usedWays=[]; } };
 </script>
 </body>
 </html>

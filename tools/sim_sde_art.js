@@ -32,14 +32,18 @@ const src = [
   extract(/function placeBrief\(\)\{[\s\S]*?\n}/, "placeBrief"),
   extract(/var B9 = \[[\s\S]*?\n\];/, "B9"),
   extract(/var MODES = \{[\s\S]*?\n\};/, "MODES"),
+  extract(/function cellScore\(txt, name\)\{[\s\S]*?\n}/, "cellScore"),
   extract(/function scoreOf\(txt, accent\)\{[\s\S]*?\n}/, "scoreOf"),
+  extract(/var ARTIST_RE = new RegExp\([\s\S]*?\);/, "ARTIST_RE"),
+  extract(/var BAN_TAIL = "[^"]*";/, "BAN_TAIL"),
+  extract(/function hardenPrompt\(p\)\{[\s\S]*?\n}/, "hardenPrompt"),
   extract(/function cutBlocks\(txt, re\)\{[\s\S]*?\n}/, "cutBlocks"),
   extract(/function grab\(txt, label\)\{[\s\S]*?\n}/, "grab"),
 ].join("\n");
 const box = {};
 new Function("box", src + "\nbox.WAYS=WAYS;box.pickWays=pickWays;box.PLACE_SDE=PLACE_SDE;box.PLACE_CLICHE=PLACE_CLICHE;"
   + "box.PLACE_STYLE=PLACE_STYLE;box.placeBrief=placeBrief;box.B9=B9;box.MODES=MODES;"
-  + "box.scoreOf=scoreOf;box.cutBlocks=cutBlocks;box.grab=grab;")(box);
+  + "box.scoreOf=scoreOf;box.cutBlocks=cutBlocks;box.grab=grab;box.cellScore=cellScore;box.hardenPrompt=hardenPrompt;box.BAN_TAIL=BAN_TAIL;")(box);
 
 /* ═════ 一、六种碰撞方式与抽签器（真跑） ═════ */
 group("一、六方式与抽签器");
@@ -194,6 +198,45 @@ const para = "一、典范名：甲\n二、承重命题：不是A也不是B而�
 ok("grab 取得到承重命题", /不是A也不是B而是C/.test(box.grab(para, "二、承重命题")));
 ok("grab 取得到绘图指令", /a wide field/.test(box.grab(para, "七、绘图指令")));
 ok("grab 取不到时返回空串而非 undefined", box.grab(para, "九、不存在的节") === "");
+
+/* ═════ 十一之二、渲染端回收路径（基底不听话时） ═════ */
+group("十一之二、渲染端回收路径");
+{
+  const r1 = box.hardenPrompt("a seam across the frame in the style of Van Gogh, thick impasto");
+  const body1 = r1.p.split(box.BAN_TAIL)[0];   // 尾巴自己含 "not in the style of"，只查正文那一段
+  ok("摘掉 in the style of + 艺术家名", !/van gogh/i.test(body1) && !/in the style of/i.test(body1), body1);
+  ok("摘掉的东西如实记下来（不静默改写）", r1.stripped.length >= 1, JSON.stringify(r1.stripped));
+  const r2 = box.hardenPrompt("an Escher-like impossible stair beside a Mondrian grid");
+  ok("裸名也摘（Escher / Mondrian）", !/escher|mondrian/i.test(r2.p), r2.p);
+  const r3 = box.hardenPrompt("a bare seam, side light");
+  ok("基底漏写禁令串时补上", r3.p.indexOf(box.BAN_TAIL) >= 0 && r3.addedTail === true);
+  const r4 = box.hardenPrompt("a bare seam, " + box.BAN_TAIL);
+  ok("已有禁令串就不重复补", r4.addedTail === false
+    && r4.p.split(box.BAN_TAIL).length - 1 === 1);
+  const r5 = box.hardenPrompt("x".repeat(2000));
+  ok("超长时裁到 1500 以内且禁令串仍在尾部",
+    r5.p.length <= 1500 && r5.p.indexOf(box.BAN_TAIL) >= 0, "len=" + r5.p.length);
+}
+
+/* ═════ 十一之三、单字格名不串行（真跑过的坑） ═════ */
+group("十一之三、cellScore 锚定行首");
+{
+  const card = ["统一｜90｜稳", "多样｜10｜三张一个样，很不可爱也不自由", "和谐｜90｜稳",
+    "完全｜90｜稳", "活力｜90｜稳", "纯一｜90｜稳",
+    "爱｜88｜有具体物", "自由｜86｜留白足", "平安｜90｜安定"].join("\n");
+  ok("「爱」取到自己那一行的 88，不被「多样」行的 10 抢走", box.cellScore(card, "爱") === 88, box.cellScore(card, "爱"));
+  ok("「自由」取到 86", box.cellScore(card, "自由") === 86, box.cellScore(card, "自由"));
+  ok("「多样」取到 10", box.cellScore(card, "多样") === 10);
+  ok("带项目符号的行也认（· 1. 、）", box.cellScore("· 3. 活力｜77｜有动势", "活力") === 77);
+  ok("竖线换成冒号也认", box.cellScore("平安：81：安定", "平安") === 81);
+  ok("整行没这一格就返回 null（不猜）", box.cellScore(card, "不存在的格") === null);
+  // 只准有一处取分逻辑：定义 1 处 ＋ 调用 2 处（scoreOf 与 renderDraw）。
+  // 旧的「哪一行含格名就算哪一行」写法必须绝迹（accent.indexOf 是权重查表，不算取分）。
+  ok("格子渲染与总分共用同一把尺（源码里只有一处取分逻辑）",
+    (js.match(/cellScore\(/g) || []).length === 3
+    && !/forEach\(function\(L\)\{ if\(L\.indexOf\(g\[0\]\)/.test(js)
+    && !/p\.report\.split\(\/\\n\/\)\.forEach/.test(js));
+}
 
 /* ═════ 十二、成本算术 ═════ */
 group("十二、成本算术");
