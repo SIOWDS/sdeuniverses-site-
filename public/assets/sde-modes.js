@@ -30,7 +30,24 @@
     var a = document.createElement("a");
     a.className = "sdemx-home";
     a.href = PORTAL;
-    a.textContent = "\u25b3";                                   // 三角＝入口页那张图，认得出
+    // 三角＝入口页那张图，认得出；四周烧着，与它指向的那张图同一种火
+    var fire = document.createElement("span");
+    fire.className = "sdemx-fire";
+    fire.setAttribute("aria-hidden", "true");
+    fire.appendChild(document.createElement("b"));
+    var HOT = ["#FF6E00", "#FFBE3C", "#FF8A3C", "#E0B65C"];
+    for (var i2 = 0; i2 < 6; i2++) {
+      var sp = document.createElement("s");
+      sp.className = "sdemx-sp";
+      sp.style.left = (18 + i2 * 12) + "%";
+      sp.style.background = HOT[i2 % HOT.length];
+      sp.style.animationDuration = (1.6 + (i2 % 4) * 0.34) + "s";
+      sp.style.animationDelay = (i2 * 0.27) + "s";
+      fire.appendChild(sp);
+    }
+    var gl = document.createElement("i");
+    gl.textContent = "\u25b3";
+    a.appendChild(fire); a.appendChild(gl);
     a.title = lang() === "en" ? "Back to the entry page" : "\u56de\u5230\u5165\u53e3\u9875";
     a.setAttribute("aria-label", a.title);
     return a;
@@ -71,6 +88,15 @@
     /* △ 不是第四态，是回门口：比三档小半号，条内用一道细线隔开 */
     ".sdemx-home{display:inline-flex;align-items:center;justify-content:center;min-width:26px;padding:4px 7px;border-radius:999px;text-decoration:none;color:var(--gold,#8C6A3A);font:600 12px/1 inherit;opacity:.75}" +
     ".sdemx-home:hover{opacity:1;background:rgba(212,178,94,.18)}" +
+    /* 烧 TOKEN（与首页智能体条、入口页三图标同一套火）。isolation 必须有：
+       不给按钮做一个层叠上下文，火层那个 z-index:-1 会掉到页面背景后面、整团看不见。 */
+    ".sdemx-home{position:relative;isolation:isolate}" +
+    ".sdemx-home i{font-style:normal;position:relative;z-index:1}" +
+    ".sdemx-fire{position:absolute;left:50%;top:50%;width:46px;height:46px;transform:translate(-50%,-50%);pointer-events:none;z-index:-1}" +
+    ".sdemx-fire b{position:absolute;left:50%;bottom:4%;width:76%;height:68%;transform:translateX(-50%);border-radius:50%;background:radial-gradient(60% 80% at 32% 100%,rgba(255,110,0,.55),transparent 64%),radial-gradient(55% 80% at 66% 100%,rgba(255,190,60,.5),transparent 64%);filter:blur(4px);animation:sdemxFlick 1.7s ease-in-out infinite}" +
+    "@keyframes sdemxFlick{0%,100%{opacity:.6;transform:translateX(-50%) scaleY(1)}50%{opacity:1;transform:translateX(-50%) scaleY(1.18)}}" +
+    ".sdemx-sp{position:absolute;bottom:16%;width:2px;height:2px;border-radius:50%;opacity:0;animation-name:sdemxRise;animation-timing-function:linear;animation-iteration-count:infinite}" +
+    "@keyframes sdemxRise{0%{opacity:0;transform:translateY(0) scale(.5)}18%{opacity:1}100%{opacity:0;transform:translateY(-24px) scale(.15)}}" +
     ".sdemx .sdemx-home{margin-left:3px;border-left:1px solid rgba(212,178,94,.28);border-radius:0 999px 999px 0}" +
     /* 兜底浮动：只有页面里找不到任何合适落点时才用。
      * 这一条落在两千多个来路不明的页面上，宿主的 CSS 什么都可能写，所以尺寸必须自己钉死：

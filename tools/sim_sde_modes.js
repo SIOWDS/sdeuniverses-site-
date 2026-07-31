@@ -84,6 +84,11 @@ console.log("① 浏览态：顶栏紧跟「问WDS」插一颗「SDE 微信」")
   ok(!!home && home.href === "/?portal=1", "顶栏有一颗回入口页的 △，实得 " + (home && home.href));
   ok(!!home && nav.children.indexOf(home) === nav.children.indexOf(pills[1]) + 1, "△ 排在两颗药丸之后");
   ok(home.textContent === "△", "△ 是图形按钮，不分中英，一颗即可");
+  const hf = home.querySelector(".sdemx-fire");
+  ok(!!hf && !!hf.querySelector("b"), "△ 四周也烧着（它指的就是那张烧着的入口图）");
+  ok(hf.querySelectorAll(".sdemx-sp").length === 6, "火星六粒，实得 " + hf.querySelectorAll(".sdemx-sp").length);
+  ok(new Set(hf.querySelectorAll(".sdemx-sp").map((x) => x.style.animationDelay)).size > 1, "火星错开起飞");
+  ok(/isolation:isolate/.test(SRC), "按钮做了层叠上下文——不然火层那个 z-index:-1 会掉到页面背景后面去");
 }
 
 console.log("② 当前态按路径判定");

@@ -717,6 +717,14 @@
     ".wdsm-tabs{display:flex;gap:4px;background:var(--wfill);border-radius:999px;padding:3px}" +
     ".wdsm-tab{border:none;background:none;color:var(--wdim);font:600 12px/1 inherit;padding:6px 9px;border-radius:999px;cursor:pointer;white-space:nowrap;flex:none}" +
     ".wdsm-tab.sel{background:var(--wgold);color:var(--wbg)}" +
+    /* 回入口的 △ 也烧着（暗底口径）。isolation 见 sde-modes.js 同处注释。 */
+    ".wdsm-portal{position:relative;isolation:isolate;color:var(--wgold);opacity:.85}" +
+    ".wdsm-portal:hover{opacity:1}" +
+    ".wdsm-pfire{position:absolute;left:50%;top:50%;width:40px;height:40px;transform:translate(-50%,-50%);pointer-events:none;z-index:-1}" +
+    ".wdsm-pfire b{position:absolute;left:50%;bottom:6%;width:76%;height:66%;transform:translateX(-50%);border-radius:50%;background:radial-gradient(60% 80% at 32% 100%,rgba(255,110,0,.5),transparent 64%),radial-gradient(55% 80% at 66% 100%,rgba(255,190,60,.45),transparent 64%);filter:blur(4px);animation:wdsmFlick 1.7s ease-in-out infinite}" +
+    "@keyframes wdsmFlick{0%,100%{opacity:.55;transform:translateX(-50%) scaleY(1)}50%{opacity:1;transform:translateX(-50%) scaleY(1.18)}}" +
+    ".wdsm-psp{position:absolute;bottom:16%;width:2px;height:2px;border-radius:50%;opacity:0;animation-name:wdsmRise;animation-timing-function:linear;animation-iteration-count:infinite}" +
+    "@keyframes wdsmRise{0%{opacity:0;transform:translateY(0) scale(.5)}18%{opacity:1}100%{opacity:0;transform:translateY(-22px) scale(.15)}}" +
     ".wdsm-mp{background:var(--wfill);border:1px solid var(--wline);color:var(--wtx);font:600 13px/1 inherit;padding:8px 12px;border-radius:10px;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:7px}" +
     ".wdsm-mp:hover{border-color:var(--wline2);color:var(--wgold)}" +
     ".wdsm-mp .mpk{font-weight:400;color:var(--wdim);font-size:12px}" +
@@ -1571,7 +1579,22 @@
   var PORTAL_URL = "/?portal=1";                              // 与 sde-modes.js 的 PORTAL 同一串
   (function () {
     var pb = layer.querySelector(".wdsm-portal");
-    if (pb) pb.onclick = function () { window.location.href = PORTAL_URL; };
+    if (!pb) return;
+    pb.onclick = function () { window.location.href = PORTAL_URL; };
+    // 四周烧着——它指的就是那张烧着的入口图
+    var pf = el("span", "wdsm-pfire");
+    pf.setAttribute("aria-hidden", "true");
+    pf.appendChild(el("b"));
+    var HOT = ["#FF6E00", "#FFBE3C", "#FF8A3C", "#D4B25E"];
+    for (var i = 0; i < 6; i++) {
+      var sp = el("s", "wdsm-psp");
+      sp.style.left = (18 + i * 12) + "%";
+      sp.style.background = HOT[i % HOT.length];
+      sp.style.animationDuration = (1.6 + (i % 4) * 0.34) + "s";
+      sp.style.animationDelay = (i * 0.27) + "s";
+      pf.appendChild(sp);
+    }
+    pb.insertBefore(pf, pb.firstChild);
   })();
   layer.querySelectorAll(".wdsm-tab").forEach(function (tb) {
     tb.onclick = function () {
