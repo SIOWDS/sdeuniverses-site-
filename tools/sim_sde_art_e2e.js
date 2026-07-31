@@ -696,15 +696,26 @@ async function drive(w, mode, opts) {
     const { w, calls } = await boot(happyScript());
     await drive(w, "B", {});
     const chats = calls.filter((c) => /chat\/completions$/.test(c.target));
-    ok("三观点预算 ≥48000（4000 与 16000 都被真跑证伪过）", chats[0].body.max_tokens >= 48000,
-      "实测 " + chats[0].body.max_tokens);
-    ok("每一次调用的预算都 ≥32000（思考与正文共吃一份，M3 思考动辄三万字）",
-      chats.every((c) => c.body.max_tokens >= 32000),
-      "最小 " + Math.min(...chats.map((c) => c.body.max_tokens)));
-    ok("碰撞那一步给到 64000（预算是天花板不是花费，给低了必然截断）",
-      chats.filter((c) => /本轮碰撞方式/.test(uText(c)))[0].body.max_tokens === 64000);
-    ok("每一次都同时发 max_tokens 与 max_completion_tokens（M3 官方示例用后者）",
-      chats.every((c) => c.body.max_tokens === c.body.max_completion_tokens && c.body.max_completion_tokens > 0));
+    ok("三观点预算＝官方推荐值 131072", chats[0].body.max_completion_tokens === 131072,
+      "实测 " + chats[0].body.max_completion_tokens);
+    ok("每一次调用的预算都 ≥131072（M3 思考动辄三万字，上限是天花板不是花费）",
+      chats.every((c) => c.body.max_completion_tokens >= 131072),
+      "最小 " + Math.min(...chats.map((c) => c.body.max_completion_tokens)));
+    ok("每一步都给到官方推荐值 131072（4000/16000/48000/64000 全被真跑证伪过）",
+      chats.every((c) => c.body.max_completion_tokens === 131072),
+      "实测 " + [...new Set(chats.map((c) => c.body.max_completion_tokens))].join(","));
+    ok("max_completion_tokens 与已弃用的 max_tokens 同发同值（兼容中间层）",
+      chats.every((c) => c.body.max_tokens === c.body.max_completion_tokens));
+    ok("机械四步关掉思考（进闸/五维/看图/出闸），生成三步不关",
+      chats.filter((c) => c.body.thinking && c.body.thinking.type === "disabled").length === 8
+      && chats.filter((c) => !c.body.thinking).length === 5,
+      "关思考 " + chats.filter((c) => c.body.thinking).length + " 次");
+    ok("thinking 只发官方允许的 disabled",
+      chats.every((c) => !c.body.thinking || c.body.thinking.type === "disabled"));
+    ok("看图一律带 detail:high",
+      chats.filter((c) => Array.isArray(c.body.messages[1].content))
+        .every((c) => c.body.messages[1].content.filter((b) => b.type === "image_url")
+          .every((b) => b.image_url.detail === "high")));
   }
 
   {
@@ -716,10 +727,10 @@ async function drive(w, mode, opts) {
     if (/sde-neigong\.txt$/.test(rec.url)) return { text: "桩" };
       if (/kb\/principles$/.test(rec.url)) return { json: { ok: true, principles: [] } };
       if (/image_generation$/.test(rec.target)) return imgOK(1);
-      caps.push(rec.body.max_tokens);
+      caps.push(rec.body.max_completion_tokens);
       n++;
       // 第一遍一律空产出（思考吃光），第二遍（加码后）才正常回
-      const big = rec.body.max_tokens >= 96000;
+      const big = rec.body.max_completion_tokens > 131072;   // 只有加过码的那一遍才放行
       const sys = rec.body.messages[0].content, u = uText(rec);
       if (!big) return { json: { choices: [{ finish_reason: "length", message: { content: "", reasoning_content: "思".repeat(30000) } }] } };
       if (/图像占位核查员/.test(sys)) return chatOK(GATE_REPLY);
@@ -732,7 +743,7 @@ async function drive(w, mode, opts) {
     await drive(w, "A", {});
     ok("空产出会自动把上限抬高重跑一次（不是直接失败）", caps.some((c, i) => i > 0 && c > caps[i - 1]),
       "上限序列 " + caps.slice(0, 4).join(","));
-    ok("加码是三倍且钳在 120000 以内", caps.every((c) => c <= 120000));
+    ok("加码钳在官方硬上限 524288 以内", caps.every((c) => c <= 524288));
     ok("加码后整条产线跑通", !!(w.__sdeArt.last() && w.__sdeArt.last().synth));
   }
 

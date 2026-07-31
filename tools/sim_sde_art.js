@@ -99,7 +99,7 @@ ok("闸门不装内功（防评分通胀，与 mode=iq 同纪律）",
 ok("看图评分者同样不装内功", /b9Sys\s*=\s*"你是画面审看者/.test(js) && !/b9Sys\s*=\s*sysBase/.test(js));
 ok("闸门查两次：进（查压缩句）与出（看着图查）",
   /近邻闸门·进|近邻闸门 · 进/.test(js) && /近邻闸门·出|近邻闸门 · 出/.test(js));
-ok("出闸门是把图传给基底看，不是看 prompt", /goTxt = await mmChat\(goSys, goUser, \d+, allImgs/.test(js));
+ok("出闸门是把图传给基底看，不是看 prompt", /goTxt = await mmChat\(goSys, goUser, TOK_REC, allImgs/.test(js));
 
 /* ═════ 四、三号位九分项坐标仪（《SDE艺术论》第五章第四节交付的正典仪器） ═════ */
 group("四、三号位九分项坐标仪");
@@ -236,12 +236,28 @@ ok("空产出把两条思考通道分开报（<think> 标签内 vs 旁路 reason
 ok("空产出带 finish_reason（判断是否被上限截断的关键证据）", /finish_reason="\+fin/.test(js));
 ok("空产出仍报出预算/正文/system/问话四个数", /空产出：预算 "\+maxTok/.test(js)
   && /正文 0 字，system "\+sys\.length/.test(js) && /本轮问话 "/.test(js));
-ok("两个上限字段同发（M3 官方示例用 max_completion_tokens）",
-  /max_tokens: tok, max_completion_tokens: tok/.test(js));
-ok("空产出会自动加码重试一次，且钳在 120000", /Math\.min\(120000, want \* 3\)/.test(js));
+// 官方 spec：max_tokens 已弃用，max_completion_tokens 才是现行字段；两个同发只为兼容中间层
+ok("两个上限字段同发，且 max_completion_tokens 在前",
+  /max_completion_tokens: tok, max_tokens: tok/.test(js));
+ok("官方常量写死在一处并附出处", /var TOK_REC = 131072/.test(js) && /var TOK_MAX = 524288/.test(js)
+  && /text-chat-openai/.test(js));
+ok("注释写明 max_tokens 已被官方弃用", /max_tokens \*\*已弃用\*\*/.test(js));
+ok("七步的上限都给到官方推荐值 TOK_REC",
+  (js.match(/mmChat\([a-zA-Z0-9]+, [a-zA-Z0-9]+, TOK_REC/g) || []).length === 7,
+  String((js.match(/mmChat\([a-zA-Z0-9]+, [a-zA-Z0-9]+, TOK_REC/g) || []).length));
+// 正则里 [^)]* 遇到 slice(0,3) 里的右括号就断了——数带 noThink 的调用要允许括号
+ok("机械四步关掉思考（进闸/五维/看图/出闸），生成三步不关",
+  (js.match(/TOK_REC[^;]*?, true\)/g) || []).length === 4,
+  String((js.match(/TOK_REC[^;]*?, true\)/g) || []).length));
+ok("thinking 只用官方允许的 disabled", /body\.thinking = \{ type: "disabled" \}/.test(js) && !/type: "enabled"/.test(js));
+ok("看图一律 detail:high（看不清等于白看）", /detail:"high"/.test(js));
+
+ok("空产出加码钳在官方硬上限 TOK_MAX", /Math\.min\(TOK_MAX, Math\.max\(want \* 2, TOK_REC\)\)/.test(js));
+ok("两条退路按病因分：关了思考还空→打开思考重来；开着思考空→抬上限重来",
+  /if\(noThink\)\{/.test(js) && /打开思考重跑一次/.test(js) && /抬到 "\+bigger/.test(js));
 ok("加码时告诉读者（不许悄悄重跑）", /把上限从 "\+want\+" 抬到 "\+bigger/.test(js));
 ok("注释里写死「预算是天花板不是花费」这条判据", /预算是天花板不是花费/.test(js));
-ok("三观点预算 48000（4000 与 16000 都被真跑证伪过）", /mmChat\(triSys, triUser, 48000\)/.test(js));
+ok("三观点预算＝官方推荐值（4000/16000/48000 都被真跑证伪过）", /mmChat\(triSys, triUser, TOK_REC\)/.test(js));
 ok("机械核对类的步骤明说别长篇推演", /这一步是机械核对，不是论述/.test(js) && /这一步是读数，不是论述/.test(js));
 
 /* ═════ 十、Key 与零责任架构 ═════ */
