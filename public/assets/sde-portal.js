@@ -79,7 +79,9 @@
     ".sdep-tri{fill:none;stroke:url(#sdepEdge);stroke-width:1.3;stroke-linecap:round;" +
     "stroke-dasharray:var(--L,240);stroke-dashoffset:var(--L,240);animation:sdepDraw 1.35s ease both}" +
     "@keyframes sdepDraw{to{stroke-dashoffset:0}}" +
-    "@media(prefers-reduced-motion:reduce){.sdep-tri{animation:none;stroke-dashoffset:0}}" +
+    /* 描线一完就把虚线彻底关掉：此后 dasharray 不再参与渲染，曲线不可能再断 */
+    ".sdep-tri.done{stroke-dasharray:none;stroke-dashoffset:0}" +
+    "@media(prefers-reduced-motion:reduce){.sdep-tri{animation:none;stroke-dasharray:none;stroke-dashoffset:0}}" +
     ".sdep-node{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:9px;" +
     "text-decoration:none;color:#E8E4DA;cursor:pointer;background:none;border:none;padding:0;font:inherit;outline:none;" +
     "animation:sdepPop .55s ease both}" +
@@ -218,54 +220,68 @@
     });
     defs.appendChild(grad);
     svg.appendChild(defs);
-    // 三条边连成一条不断的正弦曲线：绕三角形走一圈，在顶点处收敛为零、平滑接上下一条边。
+    // 三条边各是一条不断的正弦曲线：从一个圆的边上出发、到下一个圆的边上为止，
+    // 中间一笔不断。两头正好搭在圆上，三个入口才真是被一根波绳串起来的。
     //
-    // 波形 f(t) = A · sin(πt) · sin(2πn·t)：
-    //   · sin(2πn·t) 是正弦本体，n 取整数保证两端都恰好归零 —— 曲线精确穿过每个顶点；
-    //   · sin(πt) 是包络，让波在边的中段鼓起、到顶点自然收平。没有它，顶点处会留下折角。
+    // 波形 f(u) = A · sin(πu) · sin(2πn·u)：
+    //   · sin(2πn·u) 是正弦本体，n 取整数保证两端恰好归零 —— 曲线精确落在两个接点上；
+    //   · sin(πu) 是包络，让波在中段鼓起、到两端自然收平。没它，接圆处会留下折角。
+    //
+    // ⚠ 两个坑都出在 preserveAspectRatio="none" 把 100×100 拉成了舞台的 W×H：
+    //   ① 横竖缩放比不同，若直接按 viewBox 里的垂线偏移，斜边的波会比底边胖一圈
+    //      —— 下面按**实测**的舞台宽高比把横向分量折算回去；
+    //   ② 描线动画的 stroke-dasharray 在 non-scaling-stroke 下是按**屏幕像素**算的，
+    //      而 getTotalLength() 给的是 viewBox 单位（这里差了四五倍）。拿后者当虚线长度，
+    //      就成了「实 L、虚 L、实 L…」——曲线中间断成几截，正是要修的毛病。
+    //      所以长度就地按屏幕像素累加（宁可偏大：偏大只是描线晚一拍，偏小就是断），
+    //      且描完立即把 dasharray 清成 none（见下方 doneDraw）——此后怎么改窗口都不可能再断。
     var WAVE_N = 20;       // 每条边几个整周期
     // 波幅要跟着周期数走：20 个周期时波长只有边长的 1/20，还用大波幅就成了一排尖齿。
-    // 取波长的三成左右，密而不刺，两端的圆才像被一条紧密的波绳串着。
     var WAVE_A = 2.2;      // 波幅（viewBox 纵向单位）
-    // viewBox 是 100×100，但 preserveAspectRatio="none" 把它拉成了舞台的 720×440，
-    // 横竖缩放比不同。若直接按 viewBox 里的垂线偏移，斜边的波会比底边明显胖一圈。
-    // 下面按舞台的设计宽高比把横向分量折算回去，三条边的波幅在眼睛里才是一样的。
-    var AR = 720 / 440;
-    function waveRing(nodes) {
+    // W、H = 舞台的实测像素尺寸；gap = 两头各缩进多少像素（≈圆半径，刚好搭在圆边上）。
+    function waveEdges(W, H, gap) {
       // 采样密度必须跟着周期数走：每个周期至少十几个点，否则正弦会被采成锯齿
-      var d = "", SEG = WAVE_N * 18, len = 0, px = 0, py = 0;
+      var d = "", SEG = WAVE_N * 18, len = 0;
       var r = function (v) { return Math.round(v * 100) / 100; };
-      nodes.forEach(function (a, i) {
-        var b = nodes[(i + 1) % nodes.length];
+      var AR = (W && H) ? (W / H) : (720 / 440);
+      NODES.forEach(function (a, i) {
+        var b = NODES[(i + 1) % NODES.length];
         var dx = b.x - a.x, dy = b.y - a.y;
         // 舞台空间里的垂线方向，再换算回 viewBox 单位
         var k = Math.sqrt(dy * dy + dx * dx * AR * AR) || 1;
         var ux = (-dy / AR) / k, uy = (dx * AR) / k;
-        for (var s = (i === 0 ? 0 : 1); s <= SEG; s++) {
-          var t = s / SEG;
-          var off = WAVE_A * Math.sin(Math.PI * t) * Math.sin(2 * Math.PI * WAVE_N * t);
+        // 这条边在屏幕上有多长 → 把“缩进 gap 像素”换算成 t 的比例
+        var pxLen = Math.sqrt(Math.pow(dx * W / 100, 2) + Math.pow(dy * H / 100, 2)) || 1;
+        var t0 = Math.min(0.42, Math.max(0, gap) / pxLen), t1 = 1 - t0;
+        var px = 0, py = 0;
+        for (var s = 0; s <= SEG; s++) {
+          var u = s / SEG, t = t0 + (t1 - t0) * u;
+          // 包络与正弦都走局部参数 u：缩进之后两端依旧恰好归零，接圆处不留折角
+          var off = WAVE_A * Math.sin(Math.PI * u) * Math.sin(2 * Math.PI * WAVE_N * u);
           var x = a.x + dx * t + ux * off, y = a.y + dy * t + uy * off;
-          if (d) len += Math.sqrt((x - px) * (x - px) + (y - py) * (y - py));
+          if (s) len += Math.sqrt(Math.pow((x - px) * W / 100, 2) + Math.pow((y - py) * H / 100, 2));
           px = x; py = y;
-          d += (d ? " L" : "M") + r(x) + "," + r(y);
+          d += (s ? " L" : " M") + r(x) + "," + r(y);
         }
       });
-      // 长度就地由折线累加得出——点是自己采的，没必要再回头猜一个倍数
-      return { d: d + " Z", len: len };
+      // 长度就地由折线累加得出（屏幕像素）——点是自己采的，没必要再回头猜一个倍数
+      return { d: d.slice(1), len: len };
     }
-    // 顶点仍旧只有 NODES 一处；这里只是让波绕着它们走一圈
-    var ring0 = waveRing(NODES);
     var ring = S("path", {
       class: "sdep-tri",
-      d: ring0.d,
+      d: waveEdges(720, 440, 37).d,     // 先按设计尺寸画一版，上屏后 drawRing() 立即按实测重画
       fill: "none",
       "vector-effect": "non-scaling-stroke",
     });
-    // 一笔画完：整圈是一条路径，描线长度也按整圈算
-    var len = 0;
-    try { len = ring.getTotalLength(); } catch (e) {}
-    if (!len || !isFinite(len)) len = ring0.len;      // 取不到就用采样时累加的那个数，同样是实测
-    ring.style.setProperty("--L", Math.ceil(len));
+    // 上屏后按真实尺寸重画：舌台多宽多高、圆多大，都得等 layout 才知道
+    function drawRing() {
+      var W = stage.clientWidth || 720, H = stage.clientHeight || 440;
+      var dotEl = stage.querySelector(".sdep-dot");
+      var rad = (dotEl && dotEl.offsetWidth ? dotEl.offsetWidth / 2 : 37) - 1;   // 减 1 像素：压在圆框下面，不留发丝缝
+      var g = waveEdges(W, H, rad);
+      ring.setAttribute("d", g.d);
+      ring.style.setProperty("--L", Math.ceil(g.len));
+    }
     svg.appendChild(ring);
     stage.appendChild(svg);
 
@@ -339,6 +355,12 @@
     box.appendChild(foot);
 
     document.body.appendChild(box);
+    drawRing();                                   // 上屏即按实测尺寸重画（同步，赶在描线动画开始之前）
+    window.addEventListener("resize", drawRing);
+    // 描线一完就永久关掉虚线；定时器是兵不厉（animationend 没触发也不能让曲线断着）
+    function doneDraw() { try { ring.setAttribute("class", "sdep-tri done"); } catch (e) {} }
+    ring.addEventListener("animationend", doneDraw);
+    setTimeout(doneDraw, 1800);
     try { document.documentElement.style.overflow = "hidden"; } catch (e) {}
     // 刻意**不**自动聚焦：鼠标进来的人会平白看到一圈方形焦点环（第一版就是这样，很难看）。
     // 键盘的人按 Tab 就到第一个入口，无障碍不受损。
@@ -350,6 +372,7 @@
     }
     function close() {
       document.removeEventListener("keydown", onKey);
+      window.removeEventListener("resize", drawRing);
       box.className = "sdep out";
       try { document.documentElement.style.overflow = ""; } catch (e) {}
       setTimeout(function () { if (box.parentNode) box.parentNode.removeChild(box); }, 320);
