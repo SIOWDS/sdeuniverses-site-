@@ -6795,6 +6795,16 @@ export default {
       r.headers.set("x-served-at", new Date().toISOString());
       return r;
     }
+    // 图片/字体/媒体：内容几乎不变，给 30 天缓存，省掉每次访问的 304 协商往返。
+    // 故意不用 immutable、不用一年——同名替换（换封面、改配图）时最多 30 天见新版；
+    // 要立刻生效就换文件名或给 URL 加 ?v=。
+    // .js / .css 故意不在此列：它们是站点逻辑，必须保持 no-cache 走 ETag 协商，
+    // 推上去用户下一次访问即得新版（这正是上面 HTML 禁缓存要守的同一条纪律）。
+    if (/\.(png|jpe?g|webp|gif|svg|ico|avif|woff2?|ttf|otf|mp3|mp4)$/i.test(url.pathname)) {
+      const r2 = new Response(resp.body, resp);
+      r2.headers.set("cache-control", "public, max-age=2592000");
+      return r2;
+    }
     return resp;
   },
 };
