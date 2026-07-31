@@ -161,7 +161,7 @@ async function drive(w, mode, opts) {
   {
     const { w, calls } = await boot(happyScript());
     await drive(w, "B", {});
-    const api = calls.filter((c) => /minimaxi?\.(com|io)/.test(c.target));
+    const api = calls.filter((c) => /minimaxi?\.(com|io)/.test(c.target) && /\/api\/llm-proxy$/.test(c.url));
     const chats = api.filter((c) => /chat\/completions$/.test(c.target));
     const draws = api.filter((c) => /image_generation$/.test(c.target));
 
@@ -294,10 +294,12 @@ async function drive(w, mode, opts) {
     w.document.getElementById("mmKey").value = "";
     w.document.getElementById("topic").value = "画个画";
     await w.__sdeArt.run(false);
-    ok("没填 Key 直接挡回，零调用", calls.length === 0 && /API Key/.test(w.document.getElementById("err").textContent));
+    // 版本自查是开机就跑的，不算基底调用 —— 只数 llm-proxy
+    const llmN = () => calls.filter((c) => /\/api\/llm-proxy$/.test(c.url)).length;
+    ok("没填 Key 直接挡回，零基底调用", llmN() === 0 && /API Key/.test(w.document.getElementById("err").textContent));
     w.document.getElementById("mmKey").value = "sk-stub";
     await w.__sdeArt.run(false);
-    ok("入题太短挡回，仍零调用", calls.length === 0 && /太短/.test(w.document.getElementById("err").textContent));
+    ok("入题太短挡回，仍零基底调用", llmN() === 0 && /太短/.test(w.document.getElementById("err").textContent));
   }
 
   /* ═════ 四、闸门的话真的送到了 ═════ */
@@ -346,7 +348,9 @@ async function drive(w, mode, opts) {
   {
     // ① 基底漏掉了英文禁令串
     const { w, calls } = await boot(async function (rec) {
-      if (/sde-neigong\.txt$/.test(rec.url)) return { text: "桩" };
+      if (/sde-art\/\?_v=/.test(rec.url)) return { text: "var VERSION = 5;" };   // 版本自查
+      if (/sde-art\/\?_v=/.test(rec.url)) return { text: "var VERSION = 5;" };   // 版本自查
+    if (/sde-neigong\.txt$/.test(rec.url)) return { text: "桩" };
       if (/kb\/principles$/.test(rec.url)) return { json: { ok: true, principles: [] } };
       if (/image_generation$/.test(rec.target)) return imgOK(1);
       const sys = rec.body.messages[0].content, u = String(rec.body.messages[1].content);
@@ -367,7 +371,9 @@ async function drive(w, mode, opts) {
   {
     // ② 基底把艺术家人名写进了 prompt（禁令①被违反）
     const { w, calls } = await boot(async function (rec) {
-      if (/sde-neigong\.txt$/.test(rec.url)) return { text: "桩" };
+      if (/sde-art\/\?_v=/.test(rec.url)) return { text: "var VERSION = 5;" };   // 版本自查
+      if (/sde-art\/\?_v=/.test(rec.url)) return { text: "var VERSION = 5;" };   // 版本自查
+    if (/sde-neigong\.txt$/.test(rec.url)) return { text: "桩" };
       if (/kb\/principles$/.test(rec.url)) return { json: { ok: true, principles: [] } };
       if (/image_generation$/.test(rec.target)) return imgOK(1);
       const sys = rec.body.messages[0].content, u = String(rec.body.messages[1].content);
@@ -391,7 +397,6 @@ async function drive(w, mode, opts) {
   {
     const { w, calls } = await boot(happyScript());
     await drive(w, "B", {});
-    const n1 = calls.length;
     const firstWays = calls.filter((c) => /本轮碰撞方式/.test(String(c.body && c.body.messages && c.body.messages[1] && c.body.messages[1].content)))
       .map((c) => String(c.body.messages[1].content).match(/本轮碰撞方式 (\d)/)[1]);
     await w.__sdeArt.run(true);   // 「🎲 换碰撞方式重来一次」
@@ -407,8 +412,9 @@ async function drive(w, mode, opts) {
     ok("重来一次不会把上一轮的观点卡留下",
       w.document.getElementById("triOut").querySelectorAll(".card").length === 4,
       "实测 " + w.document.getElementById("triOut").querySelectorAll(".card").length);
-    ok("重来一次的调用数与第一轮相同（没有多烧也没有少跑）", calls.length - n1 === n1 - 2,
-      "第一轮 " + (n1 - 2) + "(不含内功/原则) 第二轮 " + (calls.length - n1));
+    const llmOnly = calls.filter((c) => /\/api\/llm-proxy$/.test(c.url)).length;
+    ok("重来一次的调用数与第一轮相同（没有多烧也没有少跑）", llmOnly === 2 * 16,
+      "两轮 llm-proxy 合计 " + llmOnly + "（每轮应为 13 聊天 ＋ 3 出图）");
   }
 
   /* ═════ 八、再往刁钻处挖 ═════ */
@@ -416,7 +422,9 @@ async function drive(w, mode, opts) {
   {
     // ① 单字格名「爱」出现在别的格的理由里 —— 会不会串行取错分？
     const { w } = await boot(async function (rec) {
-      if (/sde-neigong\.txt$/.test(rec.url)) return { text: "桩" };
+      if (/sde-art\/\?_v=/.test(rec.url)) return { text: "var VERSION = 5;" };   // 版本自查
+      if (/sde-art\/\?_v=/.test(rec.url)) return { text: "var VERSION = 5;" };   // 版本自查
+    if (/sde-neigong\.txt$/.test(rec.url)) return { text: "桩" };
       if (/kb\/principles$/.test(rec.url)) return { json: { ok: true, principles: [] } };
       if (/image_generation$/.test(rec.target)) return imgOK(1);
       const sys = rec.body.messages[0].content, u = String(rec.body.messages[1].content);
@@ -441,7 +449,9 @@ async function drive(w, mode, opts) {
   {
     // ② 基底把第七节写在中间，后面还有第八节
     const { w, calls } = await boot(async function (rec) {
-      if (/sde-neigong\.txt$/.test(rec.url)) return { text: "桩" };
+      if (/sde-art\/\?_v=/.test(rec.url)) return { text: "var VERSION = 5;" };   // 版本自查
+      if (/sde-art\/\?_v=/.test(rec.url)) return { text: "var VERSION = 5;" };   // 版本自查
+    if (/sde-neigong\.txt$/.test(rec.url)) return { text: "桩" };
       if (/kb\/principles$/.test(rec.url)) return { json: { ok: true, principles: [] } };
       if (/image_generation$/.test(rec.target)) return imgOK(1);
       const sys = rec.body.messages[0].content, u = String(rec.body.messages[1].content);
@@ -462,7 +472,9 @@ async function drive(w, mode, opts) {
   {
     // ③ 上游 200 但 content 为空（四次空产出的同族）
     const { w } = await boot(async function (rec) {
-      if (/sde-neigong\.txt$/.test(rec.url)) return { text: "桩" };
+      if (/sde-art\/\?_v=/.test(rec.url)) return { text: "var VERSION = 5;" };   // 版本自查
+      if (/sde-art\/\?_v=/.test(rec.url)) return { text: "var VERSION = 5;" };   // 版本自查
+    if (/sde-neigong\.txt$/.test(rec.url)) return { text: "桩" };
       if (/kb\/principles$/.test(rec.url)) return { json: { ok: true, principles: [] } };
       return { json: { choices: [{ message: { content: "" } }] } };
     });
@@ -476,7 +488,9 @@ async function drive(w, mode, opts) {
   {
     // ④ 上游返回的不是 JSON（Cloudflare 错误页那一类）
     const { w } = await boot(async function (rec) {
-      if (/sde-neigong\.txt$/.test(rec.url)) return { text: "桩" };
+      if (/sde-art\/\?_v=/.test(rec.url)) return { text: "var VERSION = 5;" };   // 版本自查
+      if (/sde-art\/\?_v=/.test(rec.url)) return { text: "var VERSION = 5;" };   // 版本自查
+    if (/sde-neigong\.txt$/.test(rec.url)) return { text: "桩" };
       if (/kb\/principles$/.test(rec.url)) return { json: { ok: true, principles: [] } };
       return { ok: false, status: 503, text: "<!DOCTYPE html><html>Cloudflare</html>" };
     });
@@ -571,7 +585,9 @@ async function drive(w, mode, opts) {
   {
     // ① content 里裹着 <think>，正文在后面 —— 必须剥掉再解析
     const { w } = await boot(async function (rec) {
-      if (/sde-neigong\.txt$/.test(rec.url)) return { text: "桩" };
+      if (/sde-art\/\?_v=/.test(rec.url)) return { text: "var VERSION = 5;" };   // 版本自查
+      if (/sde-art\/\?_v=/.test(rec.url)) return { text: "var VERSION = 5;" };   // 版本自查
+    if (/sde-neigong\.txt$/.test(rec.url)) return { text: "桩" };
       if (/kb\/principles$/.test(rec.url)) return { json: { ok: true, principles: [] } };
       if (/image_generation$/.test(rec.target)) return imgOK(1);
       const sys = rec.body.messages[0].content, u = uText(rec);
@@ -592,7 +608,9 @@ async function drive(w, mode, opts) {
   {
     // ② 截断态：只开了 <think> 没闭合 —— 正文一个字都没落，必须报「空产出」并给五个数
     const { w } = await boot(async function (rec) {
-      if (/sde-neigong\.txt$/.test(rec.url)) return { text: "桩" };
+      if (/sde-art\/\?_v=/.test(rec.url)) return { text: "var VERSION = 5;" };   // 版本自查
+      if (/sde-art\/\?_v=/.test(rec.url)) return { text: "var VERSION = 5;" };   // 版本自查
+    if (/sde-neigong\.txt$/.test(rec.url)) return { text: "桩" };
       if (/kb\/principles$/.test(rec.url)) return { json: { ok: true, principles: [] } };
       return chatOK("<think>\n思考了很久很久，预算就这么被吃光了，正文一个字也没来得及写");
     });
@@ -608,7 +626,9 @@ async function drive(w, mode, opts) {
     // ③ 格式漂移：**观点一：** / 观点1: / 【观点二】 —— 归一后仍要切得出来
     let n = 0;
     const { w, calls } = await boot(async function (rec) {
-      if (/sde-neigong\.txt$/.test(rec.url)) return { text: "桩" };
+      if (/sde-art\/\?_v=/.test(rec.url)) return { text: "var VERSION = 5;" };   // 版本自查
+      if (/sde-art\/\?_v=/.test(rec.url)) return { text: "var VERSION = 5;" };   // 版本自查
+    if (/sde-neigong\.txt$/.test(rec.url)) return { text: "桩" };
       if (/kb\/principles$/.test(rec.url)) return { json: { ok: true, principles: [] } };
       if (/image_generation$/.test(rec.target)) return imgOK(1);
       const sys = rec.body.messages[0].content, u = uText(rec);
@@ -630,7 +650,9 @@ async function drive(w, mode, opts) {
     // ④ 真的写乱了 → 自动降档重试一次，仍不行则把证据吐出来
     let n = 0;
     const { w } = await boot(async function (rec) {
-      if (/sde-neigong\.txt$/.test(rec.url)) return { text: "桩" };
+      if (/sde-art\/\?_v=/.test(rec.url)) return { text: "var VERSION = 5;" };   // 版本自查
+      if (/sde-art\/\?_v=/.test(rec.url)) return { text: "var VERSION = 5;" };   // 版本自查
+    if (/sde-neigong\.txt$/.test(rec.url)) return { text: "桩" };
       if (/kb\/principles$/.test(rec.url)) return { json: { ok: true, principles: [] } };
       n++;
       return chatOK("我觉得这个题目很有意思，可以从三个角度谈：首先是材质，其次是光，最后是构图。");
@@ -649,7 +671,9 @@ async function drive(w, mode, opts) {
     // ⑤ reasoning_split 被上游拒绝（400）→ 自动关掉重发，且整场不再试
     let split = 0, plain = 0;
     const { w } = await boot(async function (rec) {
-      if (/sde-neigong\.txt$/.test(rec.url)) return { text: "桩" };
+      if (/sde-art\/\?_v=/.test(rec.url)) return { text: "var VERSION = 5;" };   // 版本自查
+      if (/sde-art\/\?_v=/.test(rec.url)) return { text: "var VERSION = 5;" };   // 版本自查
+    if (/sde-neigong\.txt$/.test(rec.url)) return { text: "桩" };
       if (/kb\/principles$/.test(rec.url)) return { json: { ok: true, principles: [] } };
       if (/image_generation$/.test(rec.target)) return imgOK(1);
       if (rec.body && rec.body.reasoning_split === true) { split++; return { ok: false, status: 400, text: "unknown field reasoning_split" }; }
@@ -687,7 +711,9 @@ async function drive(w, mode, opts) {
     // 空产出 → 自动加码重试一次（第二次真跑的直接对策）
     let n = 0, caps = [];
     const { w } = await boot(async function (rec) {
-      if (/sde-neigong\.txt$/.test(rec.url)) return { text: "桩" };
+      if (/sde-art\/\?_v=/.test(rec.url)) return { text: "var VERSION = 5;" };   // 版本自查
+      if (/sde-art\/\?_v=/.test(rec.url)) return { text: "var VERSION = 5;" };   // 版本自查
+    if (/sde-neigong\.txt$/.test(rec.url)) return { text: "桩" };
       if (/kb\/principles$/.test(rec.url)) return { json: { ok: true, principles: [] } };
       if (/image_generation$/.test(rec.target)) return imgOK(1);
       caps.push(rec.body.max_tokens);
@@ -720,6 +746,46 @@ async function drive(w, mode, opts) {
       || new RegExp("var\\s+" + n + "\\s*=").test(src)));
     ok("没有「已被调用但未定义」的标识符（真跑靠这条兜住）",
       need.every((n) => src.indexOf(n) < 0 || new RegExp("(function\\s+" + n + "\\s*\\(|var\\s+" + n + "\\s*=)").test(src)));
+  }
+
+  /* ═════ 十二、版本自愈（真跑连撞两次旧版之后加的） ═════ */
+  group("十二、版本自愈");
+  {
+    // 线上比本地新 → 开工前必须挡住，且一次基底都不许调
+    let llm = 0;
+    const { w, calls } = await boot(async function (rec) {
+      if (/sde-art\/\?_v=/.test(rec.url)) return { text: "var VERSION = 99;" };
+      if (/\/api\/llm-proxy$/.test(rec.url)) llm++;
+      if (/sde-neigong\.txt$/.test(rec.url)) return { text: "桩" };
+      if (/kb\/principles$/.test(rec.url)) return { json: { ok: true, principles: [] } };
+      return chatOK("不该被调到");
+    });
+    await drive(w, "A", {});
+    ok("线上有更新版时，开工被挡住，一次基底都没调（不白烧 Key）", llm === 0, "实测调了 " + llm + " 次");
+    ok("挡住时明说这个标签页是旧版、线上是第几版",
+      /这个标签页是旧版/.test(w.document.getElementById("err").textContent)
+      && /线上已经是 v99/.test(w.document.getElementById("err").textContent));
+    ok("给出刷新按钮，而不是自动刷新（读者的入题可能刚敲完）",
+      !!w.document.getElementById("btnReload"));
+    ok("版本自查带 cache-buster 且 no-store（否则查到的还是缓存里那份）",
+      calls.some((c) => /\?_v=\d+/.test(c.url)));
+  }
+  {
+    // 版本一致 → 照常跑，不打扰
+    const { w, calls } = await boot(happyScript());
+    await drive(w, "B", {});
+    ok("版本一致时不打扰，产线照常跑通", !!(w.__sdeArt.last() && w.__sdeArt.last().synth));
+    ok("版本自查不计入基底调用的统计",
+      calls.filter((c) => /\/api\/llm-proxy$/.test(c.url) && /chat\/completions$/.test(c.target)).length === 13);
+  }
+  {
+    // 版本自查本身挂了（离线/404）→ 不许因此拦住读者
+    const { w } = await boot(async function (rec) {
+      if (/sde-art\/\?_v=/.test(rec.url)) return { ok: false, status: 404, text: "nope" };
+      return happyScript()(rec, 0);
+    });
+    await drive(w, "A", {});
+    ok("版本自查失败时不拦路（自查是保险，不是门禁）", !!(w.__sdeArt.last() && w.__sdeArt.last().synth));
   }
 
   console.log("\n" + "═".repeat(52));

@@ -183,7 +183,7 @@ footer{border-top:1px solid var(--line);color:var(--dim);font-size:13px;padding:
 var PROXY = "/api/llm-proxy";
 var MODEL = "MiniMax-M3";           // 思考与看图（M2.x 看不了图，必须 M3）
 var IMGMODEL = "image-01";
-var VERSION = 4;   // 页面头部会印出来：截图里一眼能看出读者跑的是哪一版
+var VERSION = 5;   // 页面头部会印出来：截图里一眼能看出读者跑的是哪一版
 
 function $(id){ return document.getElementById(id); }
 function esc(s){ return String(s==null?"":s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];}); }
@@ -632,6 +632,9 @@ var LAST = null;
 async function run(again){
   var topic = ($("topic").value||"").trim();
   if(!key()){ fail("先填 MiniMax API Key。"); return; }
+  // 开工前先问一次线上版本：拿旧产线跑，烧的是真钱，得到的却是早已修掉的老毛病。
+  var newest = await checkVersion();
+  if(newest && newest > VERSION){ staleBanner(newest); return; }
   if(topic.length < 8){ fail("入题太短——至少写一句能被反对的话。"); return; }
 
   ABORT = new AbortController();
@@ -996,6 +999,34 @@ function saveDraft(){
 })();
 
 try{ $("verTag").textContent = "产线 v" + VERSION; }catch(e){}
+
+/* ── 版本自愈：服务端缓存头是对的（no-store），但**已经打开的标签页**里跑的仍是当初载入的那份 JS。
+     PPT 那条线栽过一次：「标签页开了一整天，改了半天的渲染一点都用不上」。
+     所以每次开工前先问一次线上是第几版；比自己新就挡住，不让读者拿旧产线白烧钱。
+     不自动刷新——读者的入题可能是刚敲进去的长文；先落草稿，再由他自己点。 ── */
+var NEWEST = null;
+async function checkVersion(){
+  try{
+    var r = await fetch(location.pathname + "?_v=" + Date.now(), { cache:"no-store" });
+    if(!r.ok) return null;
+    var t = await r.text();
+    var m = t.match(/var VERSION = (\d+)/);
+    NEWEST = m ? parseInt(m[1],10) : null;
+    return NEWEST;
+  }catch(e){ return null; }
+}
+function staleBanner(n){
+  var box = $("err");
+  box.innerHTML = '<div class="warn"><b>这个标签页是旧版（产线 v'+VERSION+'），线上已经是 v'+n+'。</b><br>'
+    + '旧版跑出来的问题多半早就修好了，接着跑只是白烧 Key。你的入题已经存进本机草稿，刷新不会丢。<br>'
+    + '<button class="ghost" id="btnReload" style="margin-top:10px">立即刷新到 v'+n+'</button></div>';
+  $("btnReload").onclick = function(){
+    try{ localStorage.setItem("sde_art_draft", JSON.stringify({ t:Date.now(), topic:$("topic").value, mode:MODE, synth:"（刷新前的入题已保住）", n:0 })); }catch(e){}
+    location.reload(true);
+  };
+}
+checkVersion().then(function(n){ if(n && n > VERSION) staleBanner(n); });
+
 $("btnRun").onclick = function(){ run(false); };
 $("btnAgain").onclick = function(){ run(true); };
 $("btnStop").onclick = function(){ if(ABORT) ABORT.abort(); };

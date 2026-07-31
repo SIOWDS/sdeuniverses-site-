@@ -370,6 +370,22 @@ group("十一之六、两本账");
   ok("过 150 的才标本体论级", /p\.iqTotal>=150\?' · 本体论级'/.test(js));
 }
 
+/* ═════ 十一之七、版本自愈（真跑连撞两次旧标签页之后加的） ═════ */
+group("十一之七、版本自愈");
+{
+  ok("页面自报版本号", /var VERSION = \d+;/.test(js));
+  ok("版本号印在页头（截图里一眼可辨）", /verTag/.test(html) && /产线 v" \+ VERSION/.test(js));
+  ok("开机查一次线上版本", /checkVersion\(\)\.then/.test(js));
+  ok("每次开工前再查一次（页面可能开了很久）", /var newest = await checkVersion\(\)/.test(js));
+  ok("自查带 cache-buster 与 no-store（否则查到的还是缓存那份）",
+    /\?_v=" \+ Date\.now\(\)/.test(js) && /cache:"no-store"/.test(js));
+  ok("比线上旧就挡住，且不调基底", /if\(newest && newest > VERSION\)\{ staleBanner\(newest\); return; \}/.test(js));
+  ok("不自动刷新，给按钮（读者的入题可能刚敲完）", /btnReload/.test(js) && !/setTimeout\([^)]*location\.reload/.test(js));
+  ok("刷新前先把入题落进草稿", /btnReload"\)\.onclick[\s\S]{0,220}sde_art_draft/.test(js));
+  ok("自查失败返回 null，不拦路（保险不是门禁）", /catch\(e\)\{ return null; \}/.test(js));
+  ok("注释写明服务端缓存头没问题、旧版粘在已打开的标签页里", /已经打开的标签页/.test(js));
+}
+
 /* ═════ 十二、成本算术 ═════ */
 group("十二、成本算术");
 function costOf(ways, per) {
