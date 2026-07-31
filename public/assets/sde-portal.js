@@ -60,6 +60,31 @@
   ];
   var GO = { browse: "", im: "/sde-wechat/", wds: "/taste/wds-chat/" };   // browse 留空＝就地揭开
 
+  /* 烧 TOKEN 的火色（用户定）：浏览烧绿 · 对话烧红 · 微信烧蓝。
+     注意它与节点自身的色相（NODES[].c 青/金/紫）是两回事：色相标身份，火色标烧的是哪一种 TOKEN。
+     每组三色：[亮芯, 主体, 过渡]。 */
+  var FIRE = {
+    browse: ["#8CFFC0", "#2FE07A", "#0FBF63"],
+    wds:    ["#FF9A6B", "#FF3B2F", "#E01F1F"],
+    im:     ["#9CD6FF", "#2E7BFF", "#1A54E0"],
+  };
+  function rgba(hex, a) {
+    var n = parseInt(hex.slice(1), 16);
+    return "rgba(" + ((n >> 16) & 255) + "," + ((n >> 8) & 255) + "," + (n & 255) + "," + a + ")";
+  }
+  /* 一粒火星的去向：均匀铺满一圈，再加一点**确定性**抖动（不用随机数，模拟脚本才能逐粒复核）。
+     SPARK_R0 = 起飞半径（贴着圆边，圆半径 37）；R = 落点半径，就是“四射”能射多远。 */
+  var SPARK_N = 12, SPARK_R0 = 41;
+  function sparkVec(s) {
+    var ang = (s * 360 / SPARK_N + (s % 3) * 9) * Math.PI / 180;
+    var R = 82 + (s % 4) * 11;                      // 82–115px（旧版只往上飘 64px）
+    return {
+      sx: Math.cos(ang) * SPARK_R0, sy: Math.sin(ang) * SPARK_R0,
+      tx: Math.cos(ang) * R, ty: Math.sin(ang) * R,
+      dur: 2.4 + (s % 5) * 0.36, delay: s * 0.27,
+    };
+  }
+
   var CSS =
     ".sdep{position:fixed;inset:0;z-index:99995;display:flex;flex-direction:column;align-items:center;justify-content:center;" +
     "background:#0C0906;color:#E8E4DA;overflow:hidden;" +
@@ -86,13 +111,18 @@
     "text-decoration:none;color:#E8E4DA;cursor:pointer;background:none;border:none;padding:0;font:inherit;outline:none;" +
     "animation:sdepPop .55s ease both}" +
     "@keyframes sdepPop{from{opacity:0;transform:translate(-50%,-50%) scale(.86)}to{opacity:1;transform:translate(-50%,-50%) scale(1)}}" +
-    /* 烧 TOKEN：与首页智能体条同一套火（火焰底光 ＋ 上升火星），图标压在火上面 */
+    /* 烧 TOKEN：一个燃烧的核（圆背后的晕）＋ 四射的火星，图标压在火上面。
+       颜色不写死在这里——三个入口各烧各的（绿/红/蓝），逐节点用 --f1/--f2/--f3 注入。 */
     ".sdep-dotwrap{position:relative;display:flex;align-items:center;justify-content:center;width:74px;height:74px}" +
-    ".sdep-fire{position:absolute;left:50%;top:50%;width:132px;height:132px;transform:translate(-50%,-50%);pointer-events:none;z-index:0}" +
-".sdep-fire b{position:absolute;left:50%;bottom:8%;width:78%;height:62%;transform:translateX(-50%);border-radius:50%;background:radial-gradient(60% 80% at 30% 100%,rgba(255,110,0,.50),transparent 62%),radial-gradient(55% 80% at 62% 100%,rgba(255,190,60,.45),transparent 62%),radial-gradient(55% 80% at 86% 100%,rgba(255,70,0,.45),transparent 60%);filter:blur(7px);animation:sdepFlick 1.8s ease-in-out infinite}" +
-    "@keyframes sdepFlick{0%,100%{opacity:.7;transform:translateX(-50%) scaleY(1)}50%{opacity:1;transform:translateX(-50%) scaleY(1.14)}}" +
-".sdep-sp{position:absolute;bottom:16%;width:3px;height:3px;border-radius:50%;opacity:0;animation-name:sdepRise;animation-timing-function:linear;animation-iteration-count:infinite}" +
-    "@keyframes sdepRise{0%{opacity:0;transform:translateY(0) scale(.5)}14%{opacity:1}70%{opacity:.7}100%{opacity:0;transform:translateY(-64px) scale(.15)}}" +
+    ".sdep-fire{position:absolute;left:50%;top:50%;width:150px;height:150px;transform:translate(-50%,-50%);pointer-events:none;z-index:0}" +
+".sdep-fire b{position:absolute;left:50%;top:50%;width:106px;height:106px;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(circle,var(--f1) 0,transparent 62%),radial-gradient(circle at 32% 68%,var(--f2) 0,transparent 56%),radial-gradient(circle at 70% 34%,var(--f3) 0,transparent 56%);filter:blur(9px);animation:sdepFlick 1.9s ease-in-out infinite}" +
+    "@keyframes sdepFlick{0%,100%{opacity:.72;transform:translate(-50%,-50%) scale(1)}50%{opacity:1;transform:translate(-50%,-50%) scale(1.12)}}" +
+    /* 火星：从圆边起飞，往四面八方飞出去。去向由 --sx/--sy → --tx/--ty 给（见 sparkVec），
+       位置用 margin 拿掉自身一半，位移就全是纯像素值，插值不会出鬼。 */
+".sdep-sp{position:absolute;left:50%;top:50%;margin:-4px 0 0 -4px;width:8px;height:8px;border-radius:50%;opacity:0;box-shadow:0 0 12px currentColor;animation-name:sdepBurst;animation-timing-function:ease-out;animation-iteration-count:infinite}" +
+    "@keyframes sdepBurst{0%{opacity:0;transform:translate(var(--sx,0),var(--sy,0)) scale(.5)}" +
+    "14%{opacity:1}70%{opacity:.72}100%{opacity:0;transform:translate(var(--tx,0),var(--ty,0)) scale(.22)}}" +
+    "@media(prefers-reduced-motion:reduce){.sdep-sp,.sdep-fire b{animation:none}}" +
     ".sdep-dot{position:relative;z-index:1;width:74px;height:74px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:27px;" +
     "border:1px solid var(--c);color:var(--c);background:rgba(255,255,255,.03);transition:all .2s;" +
     "box-shadow:0 0 0 0 rgba(255,255,255,0),inset 0 0 26px -14px var(--c)}" +
@@ -114,7 +144,9 @@
     ".sdep-skip{background:none;border:1px solid rgba(255,255,255,.14);border-radius:999px;color:#9AA6B2;" +
     "font:12.5px/1 inherit;cursor:pointer;padding:9px 18px;transition:all .18s}" +
     ".sdep-skip:hover{color:#F0DCA6;border-color:rgba(240,220,166,.5)}" +
-    "@media(max-width:620px){.sdep-stage{width:92vw;height:56vh}.sdep-dot{width:58px;height:58px;font-size:22px}.sdep-dotwrap{width:58px;height:58px}.sdep-fire{width:104px;height:104px}" +
+    "@media(max-width:620px){.sdep-stage{width:92vw;height:56vh}.sdep-dot{width:58px;height:58px;font-size:22px}.sdep-dotwrap{width:58px;height:58px}" +
+    /* 火星的位移是像素值，窄屏只能连同整团火一起 scale 缩（改 width 没用） */
+    ".sdep-fire{width:118px;height:118px;transform:translate(-50%,-50%) scale(.78)}" +
     ".sdep-nm{font-size:13px}.sdep-sub{display:none}}";
 
   var NS = "http://www.w3.org/2000/svg";
@@ -333,21 +365,30 @@
       a.style.top = n.y + "%";
       a.style.setProperty("--c", n.c);
       a.style.animationDelay = (0.45 + idx * 0.13) + "s";
-      // 烧 TOKEN：火在下、图标在上。火星里掺三粒本入口的色——同为一种火，各带各的色。
+      // 烧 TOKEN：火在圆背后、图标在圆上。三个入口各烧各的颜色（见 FIRE），
+      // 火星从圆边起飞、往四面八方射出去。
+      var F = FIRE[n.k] || FIRE.wds;
+      a.style.setProperty("--f1", rgba(F[1], .52));      // 主体
+      a.style.setProperty("--f2", rgba(F[0], .44));      // 亮芯
+      a.style.setProperty("--f3", rgba(F[2], .46));      // 过渡
       var wrap = document.createElement("span");
       wrap.className = "sdep-dotwrap";
       var fire = document.createElement("span");
       fire.className = "sdep-fire";
       fire.setAttribute("aria-hidden", "true");
       fire.appendChild(document.createElement("b"));
-      var HOT = ["#FF6E00", "#FFBE3C", "#FF8A3C"];
-      for (var s = 0; s < 9; s++) {
+      for (var s = 0; s < SPARK_N; s++) {
+        var v = sparkVec(s);
         var sp = document.createElement("i");
         sp.className = "sdep-sp";
-        sp.style.left = (16 + s * 8.4) + "%";
-        sp.style.background = (s % 3 === 0) ? n.c : HOT[s % 3];
-        sp.style.animationDuration = (2.2 + (s % 5) * 0.42) + "s";
-        sp.style.animationDelay = (s * 0.31) + "s";
+        sp.style.color = F[s % 3];                        // box-shadow 用 currentColor 发光
+        sp.style.background = F[s % 3];
+        sp.style.setProperty("--sx", v.sx.toFixed(1) + "px");
+        sp.style.setProperty("--sy", v.sy.toFixed(1) + "px");
+        sp.style.setProperty("--tx", v.tx.toFixed(1) + "px");
+        sp.style.setProperty("--ty", v.ty.toFixed(1) + "px");
+        sp.style.animationDuration = v.dur.toFixed(2) + "s";
+        sp.style.animationDelay = v.delay.toFixed(2) + "s";
         fire.appendChild(sp);
       }
       var dot = document.createElement("span");
