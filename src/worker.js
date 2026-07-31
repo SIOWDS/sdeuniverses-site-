@@ -2714,9 +2714,12 @@ async function llmText(VC, KEY, sys, usr, maxTok, msTimeout, stat) {
   const ctrl = new AbortController();
   const timer = setTimeout(() => { try { ctrl.abort(); } catch (e) {} }, msTimeout || 55000);
   try {
+    // 只有**短额度**的配菜调用才强行关思考：那种额度一旦被 reasoning 吃掉就一个字都写不出来。
+    // 长文调用（4000+）留着它想——那是它写得好的原因，且额度足够想完再写。
+    const _plain = !(VC && VC.top) && (maxTok || 0) <= 2000;
     const _mk = (tok) => {
       const base = { model: VC.model, stream: false, max_tokens: tok, messages: [{ role: "system", content: sys }, { role: "user", content: usr }] };
-      return JSON.stringify(VC && VC.top ? wdsTopBody(VC, base) : wdsPlainBody(VC, base));
+      return JSON.stringify(VC && VC.top ? wdsTopBody(VC, base) : (_plain ? wdsPlainBody(VC, base) : base));
     };
     let resp = await fetch(VC.url, {
       method: "POST",

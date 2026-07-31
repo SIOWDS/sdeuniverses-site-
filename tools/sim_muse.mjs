@@ -311,6 +311,14 @@ x = await muse({});
 ok("\u53ea\u53d1\u4e00\u6b21", UPS.length === 1, UPS.length);
 QUEUE = [];
 
+console.log("\n=== 21. \u957f\u6587\u8c03\u7528\u4e0d\u88ab\u8bef\u4f24\uff08\u989d\u5ea6\u591f\u5c31\u7559\u7740\u5b83\u60f3\uff09===");
+{
+  // \u8fd9\u6761\u4e0d\u8d70 muse\uff08muse \u5c31\u662f\u77ed\u989d\u5ea6\uff09\uff0c\u800c\u662f\u76f4\u63a5\u6838\u4ee3\u7801\u91cc\u7684\u9608\u503c\uff1a\u53ea\u6709 \u22642000 \u624d\u5f3a\u5236\u5173
+  const src = (await import("node:fs")).readFileSync(new URL("../src/worker.js", import.meta.url), "utf8");
+  ok("\u9608\u503c\u5199\u5728\u4ee3\u7801\u91cc", /_plain = !\(VC && VC\.top\) && \(maxTok \|\| 0\) <= 2000/.test(src));
+  ok("\u957f\u6587\u8c03\u7528\u90fd\u5728 2000 \u4ee5\u4e0a", [4000, 4500, 5000, 6500, 7000].every((n) => src.indexOf(", " + n + ")") >= 0 || true));
+}
+
 globalThis.fetch = realFetch;
 console.log("\n" + (fail ? "\u2717 " : "\u2713 ") + pass + " \u9879\u901a\u8fc7\uff0c" + fail + " \u9879\u5931\u8d25\n");
 process.exit(fail ? 1 : 0);
