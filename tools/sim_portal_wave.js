@@ -151,6 +151,27 @@ ok("圆大于边时缩进被夹住（仍出三条、坐标有限）",
 var g4 = waveEdges(NODES, W, H, RAD);
 ok("量不到 DOM 时退回 NODES 也能出图", g4.d.indexOf("M") === 0 && g4.len > 0);
 
+console.log("[版式：sdepPop 只能给绝对定位的元素用]");
+/* CSS 在源码里是一堆字符串拼出来的，直接对源码正则会被引号截断
+   （第一版就这么写的，结果 popUsers 是空集、断言白白通过）——先 eval 成真 CSS 再查。 */
+var CSS = eval(grab(/var CSS =\n?([\s\S]*?);\n\n  var NS/, "CSS")[1]);
+var rules = {};
+CSS.replace(/(\.[a-zA-Z0-9_.-]+)\{([^{}]*)\}/g, function (all, sel, body) { rules[sel] = (rules[sel] || "") + body; return all; });
+ok("CSS 真的 eval 出来了（不是空串）", CSS.length > 2000 && Object.keys(rules).length > 10,
+   CSS.length + " 字符 / " + Object.keys(rules).length + " 条规则");
+ok("sdepPop 本体带 translate(-50%,-50%)",
+   /@keyframes sdepPop\{from\{opacity:0;transform:translate\(-50%,-50%\)/.test(CSS));
+var popUsers = Object.keys(rules).filter(function (sel) { return /animation:sdepPop/.test(rules[sel]); });
+ok("确实抄到了 sdepPop 的使用者（不是空集假通过）", popUsers.length >= 3, popUsers.join(" "));
+ok("用 sdepPop 的都是绝对定位的（自带 translate(-50%,-50%)）",
+   popUsers.every(function (sel) { return /transform:translate\(-50%,-50%\)/.test(rules[sel]); }), popUsers.join(" "));
+ok("⬇ 底部块不再用 sdepPop（它是 flex 流内元素，一用就往左拉半个身位）",
+   popUsers.indexOf(".sdep-foot") === -1 && /animation:sdepFootIn/.test(rules[".sdep-foot"] || ""));
+ok("底部自己的入场动画里没有位移百分比",
+   /@keyframes sdepFootIn\{from\{opacity:0;transform:translateY\(8px\)\}to\{opacity:1;transform:none\}\}/.test(CSS));
+ok("底部块本身居中靠 text-align:center 与父层 align-items:center",
+   /text-align:center/.test(rules[".sdep-foot"] || "") && /align-items:center/.test(rules[".sdep"] || ""));
+
 console.log("[源码守卫]");
 ok("CSS 有 .sdep-tri.done{stroke-dasharray:none", /\.sdep-tri\.done\{stroke-dasharray:none/.test(src));
 ok("animationend 绑了 doneDraw", /ring\.addEventListener\("animationend", doneDraw\)/.test(src));

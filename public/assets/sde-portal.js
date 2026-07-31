@@ -139,7 +139,12 @@
     ".sdep-mid2{position:absolute;transform:translate(-50%,-50%);pointer-events:none;white-space:nowrap;" +
     "font:600 10.5px/1 inherit;letter-spacing:.42em;margin-right:-.42em;color:#8B7B5E;" +
     "animation:sdepPop .6s ease 1.2s both}" +
-    ".sdep-foot{position:relative;text-align:center;animation:sdepPop .6s ease 1.35s both}" +
+    /* ⚠ 底部这块是**普通流内元素**（.sdep 是 flex 列、align-items:center），
+       不能跟着用 sdepPop——那支动画自带 translate(-50%,-50%)，是给拿 left/top 百分比
+       绝对定位的节点与中间标题用的。套在这块上，它会被整个往左拉半个身位、
+       往上拉半个身高（实测偏左 ≈ 87px）——就是“直接浏览”那排不居中的原因。 */
+    ".sdep-foot{position:relative;text-align:center;animation:sdepFootIn .6s ease 1.35s both}" +
+    "@keyframes sdepFootIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}" +
     ".sdep-foot i{display:block;font-style:normal;font-size:12px;color:#7C8894;letter-spacing:.5px;margin-bottom:10px}" +
     ".sdep-skip{background:none;border:1px solid rgba(255,255,255,.14);border-radius:999px;color:#9AA6B2;" +
     "font:12.5px/1 inherit;cursor:pointer;padding:9px 18px;transition:all .18s}" +
