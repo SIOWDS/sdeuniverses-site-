@@ -57,8 +57,19 @@
     ".sdemx-pill{border:1px solid var(--gold,#D4B25E);border-radius:16px;padding:3px 13px;" +
     "color:var(--gold,#8C6A3A);font-weight:700;text-decoration:none;white-space:nowrap}" +
     ".sdemx-pill:hover{background:var(--gold,#D4B25E);color:#0F0B07}" +
-    /* 兜底浮动：只有页面里找不到任何合适落点时才用 */
-    ".sdemx-float{position:fixed;right:16px;bottom:16px;z-index:99990;box-shadow:0 6px 20px rgba(0,0,0,.28);background:var(--wbg2,#12100C)}" +
+    /* 兜底浮动：只有页面里找不到任何合适落点时才用。
+     * 这一条落在两千多个来路不明的页面上，宿主的 CSS 什么都可能写，所以尺寸必须自己钉死：
+     * 金点子发生器上它曾被撑成 391×860，border-radius:999px 于是画出一颗贯穿整屏的胶囊。
+     * 下面的 !important 不是偷懒——正是为这种"宿主未知"的场合准备的。
+     * bottom 让到 130px，是给页面本来就有的两颗浮标（陪读 22px、问全站 76px）腾位，免得叠在一起。 */
+    ".sdemx-float{position:fixed!important;right:16px!important;bottom:130px!important;left:auto!important;top:auto!important;z-index:99990;" +
+    "display:inline-flex!important;flex-direction:row!important;flex-wrap:nowrap!important;align-items:center!important;" +
+    "width:auto!important;height:auto!important;max-width:calc(100vw - 32px);max-height:40px;" +
+    "padding:3px!important;margin:0!important;line-height:1!important;box-sizing:border-box;" +
+    "box-shadow:0 6px 20px rgba(0,0,0,.28);background:var(--wbg2,#12100C)}" +
+    ".sdemx-float a{flex:0 0 auto!important;height:26px!important;min-height:0!important;max-height:26px!important;" +
+    "padding:0 10px!important;margin:0!important;line-height:26px!important;font-size:12.5px!important;box-sizing:border-box}" +
+    ".sdemx-float a i,.sdemx-float a span{line-height:1!important;height:auto!important;margin:0!important;padding:0!important}" +
     "@media(max-width:560px){.sdemx a span{display:none}.sdemx a{padding:6px 9px}.sdemx a i{font-size:14px}}";
 
   function build(opts) {
