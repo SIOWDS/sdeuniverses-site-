@@ -74,14 +74,31 @@
   }
   /* 一粒火星的去向：均匀铺满一圈，再加一点**确定性**抖动（不用随机数，模拟脚本才能逐粒复核）。
      SPARK_R0 = 起飞半径（贴着圆边，圆半径 37）；R = 落点半径，就是“四射”能射多远。 */
-  var SPARK_N = 12, SPARK_R0 = 41;
-  function sparkVec(s) {
-    var ang = (s * 360 / SPARK_N + (s % 3) * 9) * Math.PI / 180;
-    var R = 82 + (s % 4) * 11;                      // 82–115px（旧版只往上飘 64px）
+  var SPARK_N = 16, SPARK_R0 = 41;
+  var SPARK_F = [0.58, 0.74, 0.88, 1];      // 四档远近：四分之一直达屏幕边界
+  function sparkAngle(s) {
+    return (s * 360 / SPARK_N + (s % 3) * 7) * Math.PI / 180;
+  }
+  /* 从 (cx,cy) 沿角度 a 走，到视口四边还有多远。四块边界取最近的那一块。 */
+  function edgeReach(cx, cy, vw, vh, a) {
+    var ca = Math.cos(a), sa = Math.sin(a), t = Infinity;
+    if (ca > 1e-6) t = Math.min(t, (vw - cx) / ca);
+    else if (ca < -1e-6) t = Math.min(t, -cx / ca);
+    if (sa > 1e-6) t = Math.min(t, (vh - cy) / sa);
+    else if (sa < -1e-6) t = Math.min(t, -cy / sa);
+    return (isFinite(t) && t > 0) ? t : 0;
+  }
+  /* 一粒火星：**方向**由 s 定死（不用随机数，模拟才能逐粒复核），**飞多远**由 reach 定——
+     reach 就是这个方向上到屏幕边界的距离。于是三团火会一直射到四周边界，
+     并在半路上彼此相遇（红的、绿的、蓝的 TOKEN 混在一块）。
+     飞得远的就飞得久一点（dur 跟着 R 走），否则远处那几粒会快得像子弹。 */
+  function sparkVec(s, reach) {
+    var a = sparkAngle(s), ca = Math.cos(a), sa = Math.sin(a);
+    var R = Math.max(SPARK_R0 + 60, (reach || 0) * SPARK_F[s % SPARK_F.length]);
     return {
-      sx: Math.cos(ang) * SPARK_R0, sy: Math.sin(ang) * SPARK_R0,
-      tx: Math.cos(ang) * R, ty: Math.sin(ang) * R,
-      dur: 2.4 + (s % 5) * 0.36, delay: s * 0.27,
+      sx: ca * SPARK_R0, sy: sa * SPARK_R0,
+      tx: ca * R, ty: sa * R,
+      dur: Math.min(7.5, 2.2 + R / 230), delay: s * 0.23,
     };
   }
 
@@ -119,9 +136,9 @@
     "@keyframes sdepFlick{0%,100%{opacity:.72;transform:translate(-50%,-50%) scale(1)}50%{opacity:1;transform:translate(-50%,-50%) scale(1.12)}}" +
     /* 火星：从圆边起飞，往四面八方飞出去。去向由 --sx/--sy → --tx/--ty 给（见 sparkVec），
        位置用 margin 拿掉自身一半，位移就全是纯像素值，插值不会出鬼。 */
-".sdep-sp{position:absolute;left:50%;top:50%;margin:-6px 0 0 -6px;width:12px;height:12px;border-radius:50%;opacity:0;box-shadow:0 0 18px currentColor;animation-name:sdepBurst;animation-timing-function:ease-out;animation-iteration-count:infinite}" +
+".sdep-sp{position:absolute;left:50%;top:50%;margin:-8px 0 0 -8px;width:16px;height:16px;border-radius:50%;opacity:0;box-shadow:0 0 22px currentColor;animation-name:sdepBurst;animation-timing-function:ease-out;animation-iteration-count:infinite}" +
     "@keyframes sdepBurst{0%{opacity:0;transform:translate(var(--sx,0),var(--sy,0)) scale(.5)}" +
-    "14%{opacity:1}70%{opacity:.72}100%{opacity:0;transform:translate(var(--tx,0),var(--ty,0)) scale(.22)}}" +
+    "12%{opacity:.95}64%{opacity:.5}100%{opacity:0;transform:translate(var(--tx,0),var(--ty,0)) scale(.3)}}" +
     "@media(prefers-reduced-motion:reduce){.sdep-sp,.sdep-fire b{animation:none}}" +
     ".sdep-dot{position:relative;z-index:1;width:74px;height:74px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:27px;" +
     "border:1px solid var(--c);color:var(--c);background:rgba(255,255,255,.03);transition:all .2s;" +
@@ -172,8 +189,9 @@
     "font:12.5px/1 inherit;cursor:pointer;padding:9px 18px;transition:all .18s}" +
     ".sdep-skip:hover{color:#F0DCA6;border-color:rgba(240,220,166,.5)}" +
     "@media(max-width:620px){.sdep-stage{width:92vw;height:56vh}.sdep-dot{width:58px;height:58px;font-size:22px}.sdep-dotwrap{width:58px;height:58px}" +
-    /* 火星的位移是像素值，窄屏只能连同整团火一起 scale 缩（改 width 没用） */
-    ".sdep-fire{width:118px;height:118px;transform:translate(-50%,-50%) scale(.78)}" +
+    /* 窄屏只缩“燃烧核”：火星的射程现在是按视口现算的，
+       再给整团火上 scale 会把射程一起缩掉，就到不了边界了。 */
+    ".sdep-fire{width:118px;height:118px}.sdep-fire b{width:84px;height:84px}" +
     ".sdep-nm{font-size:13px}.sdep-sub{display:none}}";
 
   var NS = "http://www.w3.org/2000/svg";
@@ -431,6 +449,27 @@
       var g = waveEdges(C, W, H, rad);
       ring.setAttribute("d", g.d);
       ring.style.setProperty("--L", Math.ceil(g.len));
+      aimSparks();
+    }
+    /* 火星能飞多远，只有上了屏才知道：要先知道圆心在**视口**里的位置。
+       .sdep 是 fixed inset:0，所以 offset 链的原点就是视口左上角；
+       一律用 offset*（布局值），不用 rect——节点入场时正在跑 scale(.86)。 */
+    function aimSparks() {
+      var vw = window.innerWidth || 1280, vh = window.innerHeight || 720;
+      var els = stage.querySelectorAll(".sdep-node");
+      for (var i = 0; i < els.length; i++) {
+        var nd = els[i], dot = nd.querySelector(".sdep-dot"), wrap = dot && dot.parentNode;
+        if (!dot || !wrap || !nd.offsetWidth) continue;
+        var cx = stage.offsetLeft + nd.offsetLeft - nd.offsetWidth / 2 + wrap.offsetLeft + dot.offsetLeft + dot.offsetWidth / 2;
+        var cy = stage.offsetTop + nd.offsetTop - nd.offsetHeight / 2 + wrap.offsetTop + dot.offsetTop + dot.offsetHeight / 2;
+        var sps = nd.querySelectorAll(".sdep-sp");
+        for (var s = 0; s < sps.length; s++) {
+          var v = sparkVec(s, edgeReach(cx, cy, vw, vh, sparkAngle(s)));
+          sps[s].style.setProperty("--tx", v.tx.toFixed(1) + "px");
+          sps[s].style.setProperty("--ty", v.ty.toFixed(1) + "px");
+          sps[s].style.animationDuration = v.dur.toFixed(2) + "s";
+        }
+      }
     }
     svg.appendChild(ring);
     stage.appendChild(svg);
@@ -473,7 +512,7 @@
       fire.setAttribute("aria-hidden", "true");
       fire.appendChild(document.createElement("b"));
       for (var s = 0; s < SPARK_N; s++) {
-        var v = sparkVec(s);
+        var v = sparkVec(s, 300);                         // 占位；上屏后 aimSparks() 按真实几何重设
         var sp = document.createElement("i");
         sp.className = "sdep-sp";
         sp.style.color = F[s % 3];                        // box-shadow 用 currentColor 发光
