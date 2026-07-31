@@ -1590,13 +1590,13 @@
 
 
   function open() { stBoot(); layer.classList.add("on"); document.documentElement.classList.add("wdsm-open"); setTimeout(function () { inEl.focus(); }, 80); }
-  function leave() { if (window.history.length > 1) { window.history.back(); } else { window.location.href = "/"; } }
+  function leave() { if (window.history.length > 1) { window.history.back(); } else { window.location.href = "/browse/"; } }
   function close() { if (PAGE) { leave(); return; } layer.classList.remove("on"); document.documentElement.classList.remove("wdsm-open"); }
   window.wdsMode = function (on) { on === false ? close() : (PAGE ? open() : (window.location.href = PAGE_URL)); };
   try { localStorage.removeItem(LS); } catch (e) {}  // 清掉旧的"自动弹出"记忆
 
   // 三态互切：目的地与 /assets/sde-modes.js 的 SDE_MODES 是同一套（模拟有跨文件断言钉住）
-  var TAB_GO = { normal: "/", im: "/sde-wechat/", wds: "/taste/chatsde/" };
+  var TAB_GO = { normal: "/browse/", im: "/sde-wechat/", wds: "/taste/chatsde/" };
   var PORTAL_URL = "/home/";                                  // 与 sde-modes.js 的 PORTAL 同一串（入口页的门牌）
   (function () {
     var pb = layer.querySelector(".wdsm-portal");
@@ -1609,7 +1609,7 @@
       var m = tb.dataset.m;
       if (m === "wds") return;                                  // 已经在这儿了
       if (m === "normal") { close(); return; }                  // close() 会走 leave()：有来路就回来路，没有才回首页
-      window.location.href = TAB_GO[m] || "/";
+      window.location.href = TAB_GO[m] || "/browse/";
     };
   });
   layer.querySelector(".wdsm-keybtn").onclick = function () { wdsKeyPanel(function () {}); };

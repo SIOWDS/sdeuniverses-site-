@@ -83,6 +83,33 @@ ok("三个出口共用同一个 close（入口卡「SDE 浏览」/ 底部「直�
   ok("改写后的请求确实喂给了 ASSETS", /env\.ASSETS\.fetch\(assetReq\)/.test(W));
 }
 
+/* ── 全站扫描：回「浏览」的一律指 /browse/，只有回「系统入口」才进 /home/ ──────
+ * 用户 2026-07-31 定的分工。裸 href="/" 现在是个 bug：站标、页脚站名、板块锚点
+ * 点下去会落到裸域名 → 当场触发开门，人明明只是想回浏览页。
+ * 尤其是 /#taste 这类锚点：在 /browse/ 页上点它会整页跳走再被弹一次门。 */
+{
+  var walk = function (dir, out) {
+    fs.readdirSync(dir, { withFileTypes: true }).forEach(function (e) {
+      var full = path.join(dir, e.name);
+      if (e.isDirectory()) walk(full, out);
+      else if (e.name.endsWith(".html")) out.push(full);
+    });
+    return out;
+  };
+  var pages = walk(path.join(ROOT, "public"), []);
+  var bare = 0, anchor = 0, browse = 0;
+  pages.forEach(function (f) {
+    var t = fs.readFileSync(f, "utf8");
+    bare += (t.match(/href="\/"/g) || []).length;
+    anchor += (t.match(/href="\/#/g) || []).length;
+    browse += (t.match(/href="\/browse\//g) || []).length;
+  });
+  ok("扫到的页面数够多（防止空集假通过），实得 " + pages.length, pages.length > 2000);
+  ok("全站没有裸 href=\"/\"（回浏览要指 /browse/），实得 " + bare, bare === 0);
+  ok("全站没有 href=\"/#锚点\"（同上，且它会把人弹出 /browse/），实得 " + anchor, anchor === 0);
+  ok("确实换成了 /browse/，实得 " + browse + " 处", browse > 2000);
+}
+
 console.log("[唯一对应：从前那些分叉必须真的从源码里消失]");
 /* 这条断言只挑“调用形态”，不挑关键词：源码的注释里还留着 /?portal=1 的来龙去脉，
    而地址栏归一那段又要正当地读一次 location.search——按关键词断言必假失败。 */
