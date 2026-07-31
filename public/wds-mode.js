@@ -248,8 +248,14 @@
              .replace(/\\\(([\s\S]+?)\\\)/g, function (m, c) { return texStub(c, 0); })
              // 行内 $...$：绝不用 lookbehind（老 Safari 解析 (?<!) 当场语法错、整个脚本一起死），
              // 首尾空白改在回调里手判。
-             .replace(/(^|[\s(（])\$([^\s$][^$\n]*?)\$/g, function (m, pre, c) {
+             // ⚠️ 左边界曾写成 [\s(（]（只认空白和左括号）——**中文里公式几乎总是紧贴着标点**：
+             //   「试试，$c$ 不再是」「兜底：$e^{i3\theta}$」全都不匹配，于是整段只有前面带空格的
+             //   那几条排成了公式，其余原样露着 $…$。改成"只挡字母数字和转义符"，别的一律放行。
+             .replace(/(^|[^A-Za-z0-9$\\])\$([^\s$][^$\n]*?)\$/g, function (m, pre, c) {
                if (/\s$/.test(c)) return m;
+               // 式子里出现汉字或全角标点 ⇒ 这两个 $ 多半分属两处（「他花了 $5 买咖啡；变量 A$B」），
+               // 不是一条公式。左边界放宽之后这道闸是必须的，否则会把半句话排成数学。
+               if (/[\u3000-\u303F\u4E00-\u9FFF\uFF00-\uFFEF]/.test(c)) return m;
                return pre + texStub(c, 0);
              });
     var s2 = esc(raw);
@@ -348,6 +354,7 @@
   /* ── 公式排版：KaTeX 懒加载（jsdelivr，失败退 unpkg）。装不上就保持原样显示 $...$，
      不假装渲染过。只在正文写完后跑一次——流式中每帧重排会闪。 ── */
   var KTX = { on: 0, load: 0 };
+  var TEXC = {};   // 公式源码 → 已排好的 HTML。流式每帧都重贴 innerHTML，不记忆化会把同一条式子排上百遍
   // 自托管排第一：/assets/katex 就在本站（20 个 woff2 齐）。CDN 只当备胎——
   // 挂着 CDN 等于把"界面上有没有公式"押在第三方可达性上，导出的 PDF 跟着一起赌。
   var KTX_HOSTS = ["/assets/katex", "https://cdn.jsdelivr.net/npm/katex@0.16.9/dist", "https://unpkg.com/katex@0.16.9/dist"];
@@ -368,21 +375,32 @@
     }
     tryHost();
   }
+  /* 同步排版：KaTeX 已在内存里才做事，做不了就原样留着（不假装渲染过）。
+     返回还剩多少条没排——调用方据此决定要不要再等一轮。 */
+  function typesetSync(node) {
+    if (!node || !node.querySelectorAll) return 0;
+    var els = node.querySelectorAll(".wdsm-tex.raw");
+    if (!els || !els.length) return 0;
+    if (!window.katex) return els.length;
+    for (var i = 0; i < els.length; i++) {
+      var e = els[i], k = e.getAttribute("data-m"), it = MATH[+k];
+      // MATH 是上一次 mdRender 留下的全局数组，异步回调里它可能已被下一次渲染重置
+      // ⇒ 一律以 DOM 里的 $…$ 原文兜底，绝不拿下标去猜别的式子
+      var src = it ? it.s : String(e.textContent || "").replace(/^\$\$?|\$\$?$/g, "");
+      var blk = e.className.indexOf("blk") >= 0;
+      var ck = (blk ? "B" : "I") + src;
+      try {
+        if (!TEXC[ck]) TEXC[ck] = window.katex.renderToString(src, { displayMode: blk, throwOnError: false });
+        e.innerHTML = TEXC[ck];
+        e.classList.remove("raw");
+      } catch (e2) {}
+    }
+    return 0;
+  }
   function typeset(node) {
     if (!node || !node.querySelectorAll) return;
-    var els = node.querySelectorAll(".wdsm-tex.raw");
-    if (!els || !els.length) return;
-    katexBoot(function () {
-      if (!window.katex) return;                      // 装不上就让它保持 $...$ 原样
-      for (var i = 0; i < els.length; i++) {
-        var e = els[i], k = e.getAttribute("data-m"), it = MATH[+k];
-        var src = it ? it.s : String(e.textContent || "").replace(/^\$\$?|\$\$?$/g, "");
-        try {
-          e.innerHTML = window.katex.renderToString(src, { displayMode: e.className.indexOf("blk") >= 0, throwOnError: false });
-          e.classList.remove("raw");
-        } catch (e2) {}
-      }
-    });
+    if (!typesetSync(node)) return;                 // 已经排完（或本来就没公式）
+    katexBoot(function () { typesetSync(node); });  // 装不上就让它保持 $...$ 原样
   }
   // 代码块「复制」：事件委托挂在整轮上——正文流式重绘会换掉 innerHTML，逐个绑会一直丢
   function bindCode(cell) {
@@ -2299,6 +2317,8 @@
     row.appendChild(rg); row.appendChild(ed);
     cell.turn.appendChild(row); cell.acts = row;
     bindCode(cell); typeset(cell.a);      // 代码块复制（事件委托）与公式排版都等正文定稿再做
+    if (cell.mathRetry) clearTimeout(cell.mathRetry);
+    cell.mathRetry = setTimeout(function () { typeset(cell.a); }, 1200);   // KaTeX 刚好还没到位 / MATH 被下一次渲染重置：补一刀
     cell.verIdx = null; mountQBar(cell);  // 有了新一版，问题条上才画出 ‹1/2›
   }
   // 回滚：把这一轮及其之后的 DOM 与 history 一起去掉（重答/改问共用）
@@ -2677,6 +2697,8 @@
   function send(forceQ) {
     var q = String(forceQ != null ? forceQ : inEl.value).trim();
     if (!q) return;
+    // 预热：275KB 的 KaTeX 等答案写完再去拉，读者就要多盯着 $…$ 看好几百毫秒
+    try { katexBoot(function () {}); } catch (e) {}
     // 正在答：这一句排队，答完自动接着问（输入框照旧清空，手感与真发出去一致）
     if (streaming) {
       if (qPush(q) && forceQ == null) { inEl.value = ""; inEl.style.height = "auto"; }
@@ -2734,6 +2756,7 @@
       if (now - lastPaint < 110) return;
       lastPaint = now;
       cell.a.innerHTML = mdRender(answer) + "<span class='cur'>▊</span>";
+      typesetSync(cell.a);            // 与贴 innerHTML 同一个任务里排完，浏览器只画最终形态 ⇒ 不闪
       if (stick) scrollBottom();
     }
     function endUI() {
