@@ -108,7 +108,7 @@ article p{margin:0 0 16px}
 <p>工业时代——特别是泰勒制与福特制大规模推行的时期——生产组织的一个核心特征是：将复杂的工作流程拆解为一系列可被标准化操作的单元，然后为每个单元匹配合格的执行者。在这种体制下，“合格”的标准是清晰、稳定、可被提前测量的：你会不会操作这台机器？你能不能在一小时内完成规定数量的装配动作？你是否掌握了某项可被书面考核的专业知识？这些问题的答案，在一个人进入工厂或办公室之前，就可以通过考试、证书、文凭来预先判定。被度量的那些技能——程式化操作、标准知识记忆、基本逻辑推理——在度量之后的漫长时间里基本保持不变。</p>
 <p>正是在这种历史条件下，“外部度量”才得以伪装成价值的透明翻译器——不是因为它真的测全了一个人的全部价值，而是因为它恰好测到了那个时代的生产组织最需要的那一部分，而且那部分的保质期足够长。旧合约的“有效”依赖于一个粗暴的操作：把一个人的全部认知品质、创造潜力、判断力和成长可能性，压缩在单一的标准化尺度上，然后宣称这个尺度的大小代表了他的未来价值。只要被压进去的那些东西在压进去之后的十年、二十年里大致保持稳定，这个压平看起来就是成功的。</p>
 <p>这不是度量工具的本体论能力。这是特定技能形态与特定度量工具之间的历史性巧合。旧合约从来不是一台精密运转的机器——它是一个始终在进行着粗暴简化的构造物，只不过在历史上，这个构造物恰好与它所处的环境形成了一段足够长的稳定共生期。</p>
-<p>2.3 一个必须被压住的发问：度量的目光为什么只看得到那些东西？</p>
+<h3>2.3 一个必须被压住的发问：度量的目光为什么只看得到那些东西？</h3>
 <p>但这里有一个更深的问题：为什么标准化考试在历史上被锻造为只能看见某些能力、而对另一些能力始终是盲的？这个“盲”不是偶然的，而是度量这个动作本身的构成性特征。</p>
 <p>度量永远需要把一个对象从它的时间流中摘出来、冻住、翻译成一个静态的数字。那些可以被摘出来、冻住而不变质的能力——计算速度、公式记忆、程式化解题——天然地适合被度量。而那些只能在流动中才存在的能力——在两组矛盾中做取舍的判断力、对未成形机会的嗅觉、在不确定情境中做决定的分寸感——在本体论上就无法被这种动作捕获。不是度量工具不够精密，而是度量这个动作的语法本身，就无法处理那些一旦被摘出时间流就会消失的东西。</p>
 <p>这一笔之所以重要，是因为它解释了旧合约失效的根因不只是一项外部条件的变化（“技术变快了”）。旧合约的底层语法——通过“摘出—冻住—翻译”来认证价值——本身就内含了一个盲区。在工业时代，这个盲区不致命，因为社会最需要的那部分能力恰好不在盲区里。但在技术加速时代，当社会最需要的那部分能力恰好落入了这个盲区的中心，这个语法的极限就不再可以被忽视。</p>
@@ -171,7 +171,7 @@ article p{margin:0 0 16px}
 <p>他在这两周内提交了四十多个commit，其中近半数在提交后三天内又被他自己revert或大幅重构。看这段时期的commit diff，一个清晰的模式浮现出来：早期修改往往是“在报告所指的位置打补丁”——一个参数越界就加边界检查，一个空指针异常就加空值判断。但补丁打上去几天后，他才发现那个局部修改在另一个模块里引发了更隐蔽的相关问题。于是他撤回补丁，重新读代码。这一次他的修改位置不再是报告所指的那个局部点，而是更深一层的接口设计——他把整个模块的抽象边界重新画了一遍。</p>
 <p>这个过程不是既有的“架构直觉”被激活——而是架构直觉在每一轮“打补丁→发现问题→撤回→重新理解→改写接口”的循环中，被一步步地逼出来。2020年12月他写下的那轮大规模重构，commit信息里有一句话：“之前一直觉得这个模块的设计很奇怪，但说不上来哪里不对。这次终于看清楚了。”这个“终于看清楚了”不是突然的顿悟——它是过去十周里在四十多个commit、二十多次回退、十几次与用户的反复讨论中，一点一点从身体里被制造出来的。在2020年3月那个第一次拼写修正的时刻，他对这个模块的“架构直觉”根本不存在。不是隐默地存在。是没有。</p>
 <p>到2023年，陈远已成为那个工具库的核心维护者，拥有提交决策权和发布权。一个外部观察者如果只看他2020年3月的commit和2023年6月的commit，会觉得这简直是两个人写的。但如果你顺着这中间的commit序列一条一条读过去——四次大规模重构、数十次回退、上百条issue讨论——你会看到那个能力不是某一天从天而降的，它是在每一次必须亲自面对一个此前从未见过的问题、并且没有别人可以代替他做判断的时刻，从那一笔一笔的commit里被硬逼出来的。</p>
-<p>5.2 这一切为什么必须在公开中发生？</p>
+<h3>5.2 这一切为什么必须在公开中发生？</h3>
 <p>本节回答全文最关键的因果主张：为什么公开的铭写对于这一能力生成过程是构成性的，而非仅仅是辅助性的？ 陈远如果同样刻苦地私下写代码——不开源、不发布、不回应任何真实用户的问题——他是否能长出同样的架构直觉？</p>
 <p>本文的论证是：不能。因为在私下的练习中，他不会被拖进那个“无法回避反馈”的处境。</p>
 <p>公开性的构成性作用体现在三个层面。第一，公开痕迹创造了不可回避的外部反馈回路。当陈远的代码被五十倍的用户量实际使用时，他遭遇的边界bug不是他自己选择的练习题——那是真实的使用者在真实的使用情境中从代码里压出来的裂缝。他不能像做课后习题那样，说“这道题太难，我换一道做”。那些bug必须被修，因为有人在依赖他的代码。正是这种“被真实需求架住”的处境，逼他做出了那些私下练习永远不会逼他做的架构性重构。第二，公开痕迹创造了可被独立核查的责任密度。每一次commit不仅是一行代码的修改，它是被公开钉在时间线上、可以被任何人（包括未来的自己）回来看的一条记录。当陈远知道他在2020年10月做出的每一次判断都可能被未来的维护者（甚至未来的自己）重新审阅时，他被迫在每一次commit之前更深入地理解自己到底在做什么——这不是道德自觉，而是公开痕迹所施加的认知压力。第三，公开痕迹创造了历史性深度。当三年后的陈远回看自己在2020年12月写下的那轮重构时，他看到的不是一张静态的成绩单，而是一条他自己的判断力如何从补丁式的表层修补逐渐下沉到接口抽象层的完整轨迹。这个轨迹本身，成为他后续能力进一步生成的土壤——他可以从自己的旧代码中读出自己当时没意识到的盲区，然后在这基础上长出新的判断力。私下练习无法提供这种可以被重新阅读、重新解释、重新从中学习的自反性深度。</p>
@@ -250,19 +250,19 @@ article p{margin:0 0 16px}
 <li>若痕迹型识别机制在痕迹自然度低的职业中同样快速扩散并有效，则本文的适用范围限定应被修正。</li>
 </ol>
 <h2>注释</h2>
-<p>[1] 张陆为基于多个真实毕业生经历合成的理想型，用于揭示结构性机制。文中陈远为化名，所涉GitHub公开记录均指向可被独立核查的公开数字痕迹类型；已获本人许可使用化名及对其commit历史的分析。</p>
-<p>[2] 此处采纳劳动力市场信号发送理论的一般逻辑——文凭的有效性取决于不同能力者获取文凭的成本差异——而不涉及其均衡分析技术细节。经典文献见Spence (1973)。</p>
-<p>[3] 拉图尔关于inscription的核心讨论，见Latour, B. (1987). Science in Action. Cambridge, MA: Harvard University Press; 以及Latour, B., &amp; Woolgar, S. (1986). Laboratory Life. Princeton, NJ: Princeton University Press.</p>
-<p>[4] 巴特勒表演性理论的核心论述，见Butler, J. (1990). Gender Trouble. New York: Routledge; Butler, J. (1993). Bodies That Matter. New York: Routledge.</p>
-<p>[5] Lave, J., &amp; Wenger, E. (1991). Situated Learning: Legitimate Peripheral Participation. Cambridge: Cambridge University Press.</p>
-<p>[6] Sennett, R. (2008). The Craftsman. New Haven: Yale University Press.</p>
-<p>[7] Polanyi, M. (1958). Personal Knowledge: Towards a Post-Critical Philosophy. London: Routledge.</p>
-<p>[8] Collins, R. (1979). The Credential Society: An Historical Sociology of Education and Stratification. New York: Academic Press.</p>
-<p>[9] Foucault, M. (1983). L’écriture de soi. Corps écrit, 5, 3–23.</p>
-<p>[10] 本文所引陈远案例的GitHub commit记录、issue讨论均为真实可查的公开数据。为保护当事人隐私，以下对其commit历史的具体描述在不改变结构性特征的前提下做了轻度抽象化处理。</p>
-<p>[11] Bourdieu, P. (1979). La Distinction: Critique sociale du jugement. Paris: Les Éditions de Minuit.</p>
-<p>[12] 量化自我研究的相关文献，见Lupton, D. (2016). The Quantified Self. Cambridge: Polity; 以及Nafus, D. (Ed.) (2016). Quantified: Biosensing Technologies in Everyday Life. Cambridge, MA: MIT Press.</p>
-<p>[13] 本节所设三种证伪条件，系用于标识本文核心判断经验边界的分析性设想，而非对未来的精确预测。其能否成立，需由后续经验研究而非本文的论证来裁决。</p>
+<p class="ref">[1] 张陆为基于多个真实毕业生经历合成的理想型，用于揭示结构性机制。文中陈远为化名，所涉GitHub公开记录均指向可被独立核查的公开数字痕迹类型；已获本人许可使用化名及对其commit历史的分析。</p>
+<p class="ref">[2] 此处采纳劳动力市场信号发送理论的一般逻辑——文凭的有效性取决于不同能力者获取文凭的成本差异——而不涉及其均衡分析技术细节。经典文献见Spence (1973)。</p>
+<p class="ref">[3] 拉图尔关于inscription的核心讨论，见Latour, B. (1987). Science in Action. Cambridge, MA: Harvard University Press; 以及Latour, B., &amp; Woolgar, S. (1986). Laboratory Life. Princeton, NJ: Princeton University Press.</p>
+<p class="ref">[4] 巴特勒表演性理论的核心论述，见Butler, J. (1990). Gender Trouble. New York: Routledge; Butler, J. (1993). Bodies That Matter. New York: Routledge.</p>
+<p class="ref">[5] Lave, J., &amp; Wenger, E. (1991). Situated Learning: Legitimate Peripheral Participation. Cambridge: Cambridge University Press.</p>
+<p class="ref">[6] Sennett, R. (2008). The Craftsman. New Haven: Yale University Press.</p>
+<p class="ref">[7] Polanyi, M. (1958). Personal Knowledge: Towards a Post-Critical Philosophy. London: Routledge.</p>
+<p class="ref">[8] Collins, R. (1979). The Credential Society: An Historical Sociology of Education and Stratification. New York: Academic Press.</p>
+<p class="ref">[9] Foucault, M. (1983). L’écriture de soi. Corps écrit, 5, 3–23.</p>
+<p class="ref">[10] 本文所引陈远案例的GitHub commit记录、issue讨论均为真实可查的公开数据。为保护当事人隐私，以下对其commit历史的具体描述在不改变结构性特征的前提下做了轻度抽象化处理。</p>
+<p class="ref">[11] Bourdieu, P. (1979). La Distinction: Critique sociale du jugement. Paris: Les Éditions de Minuit.</p>
+<p class="ref">[12] 量化自我研究的相关文献，见Lupton, D. (2016). The Quantified Self. Cambridge: Polity; 以及Nafus, D. (Ed.) (2016). Quantified: Biosensing Technologies in Everyday Life. Cambridge, MA: MIT Press.</p>
+<p class="ref">[13] 本节所设三种证伪条件，系用于标识本文核心判断经验边界的分析性设想，而非对未来的精确预测。其能否成立，需由后续经验研究而非本文的论证来裁决。</p>
 <h2>参考文献</h2>
 <p class="ref">Bourdieu, P. (1979). La Distinction: Critique sociale du jugement. Paris: Les Éditions de Minuit.</p>
 <p class="ref">Butler, J. (1990). Gender Trouble. New York: Routledge.</p>
