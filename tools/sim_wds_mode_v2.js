@@ -766,6 +766,16 @@ console.log("⑧ 成文（distill）");
   dropBtn.click();
   ok(layer.querySelectorAll(".wdsm-cvtab").length === before + 1, "手动落画布多出一件成品");
   ok(!!layer.querySelector(".wdsm-cvbtn"), "顶栏有画布开关（关掉之后还回得来）");
+  // 这条是补的：曾把"空画布时藏起按钮"当体贴，结果读者打开页面根本找不到这个功能
+  layer.querySelector(".wdsm-newbtn").click();          // 换一场＝画布清空
+  const cvb0 = layer.querySelector(".wdsm-cvbtn");
+  ok(cvb0 && cvb0.style.display !== "none", "画布为空时按钮**仍然看得见**（入口不该由有没有内容来决定）");
+  ok(String(cvb0.textContent).length > 1, "空画布时按钮上也有字，实得 " + JSON.stringify(cvb0.textContent));
+  cvb0.click();
+  ok(layer.classList.contains("cvon"), "空画布也点得开");
+  ok(String(layer.querySelector(".wdsm-cvwrap").textContent).includes("落到画布"),
+    "空态里写明了怎么手动放一件进来（读者是在「点开了却什么都没有」的处境里读它）");
+  cvb0.click();
   // 换一场：成品跟着走
   layer.querySelector(".wdsm-newbtn").click();
   ok(layer.querySelectorAll(".wdsm-cvtab").length === 0 && !layer.classList.contains("cvon"),

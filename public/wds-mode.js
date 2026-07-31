@@ -541,7 +541,8 @@
      t() 先查 TXT 再查这里。 */
   var TX2 = {
     zh: {
-      cvTitle: "画布", cvOpen: "⧉ 画布", cvClose: "收起画布", cvEmpty: "还没有东西落到画布。长产出（报告、图、网页、评分卡）会自动落这儿，也可以在任一条回答下点「⧉ 落到画布」。",
+      cvTitle: "画布", cvOpen: "⧉ 画布", cvClose: "收起画布",       cvEmpty: "画布还是空的。会自动落到这儿的是：结构图（/结构图）、深度研究的报告、以及回答里成块的图/网页/表格/长文稿。\n\n想手动放一件进来：在任意一条回答下面点「⧉ 落到画布」。\n\n落进来之后可以切版本、预览、下载、存到本机，也可以选中其中一段让 WDS 就地改。",
+      cvTip: "画布：放长产出与图，可切版本、就地改",
       cvPrev: "预览", cvSrc: "源码", cvCopy: "复制", cvDl: "下载", cvSave: "存到本机", cvSaved: "已存",
       cvAsk: "让 WDS 改这一段", cvAskAll: "让 WDS 改这一版", cvVer: "版本", cvDrop: "⧉ 落到画布", cvDropped: "已落到画布",
       cvPick: "选中画布里的一段，再点这里", cvNoPrev: "这一类只能看源码",
@@ -571,7 +572,8 @@
       pjDel: "删掉这个项目？（里面的对话不会删，只是回到「全部」）", pjNone: "还没有项目。项目＝一组对话＋一段常驻说明，适合一本书、一门课、一个长活。",
     },
     en: {
-      cvTitle: "Canvas", cvOpen: "⧉ Canvas", cvClose: "Hide canvas", cvEmpty: "Nothing on the canvas yet. Long outputs (reports, diagrams, pages, score cards) land here automatically — or hit ⧉ under any answer.",
+      cvTitle: "Canvas", cvOpen: "⧉ Canvas", cvClose: "Hide canvas",       cvEmpty: "The canvas is empty. What lands here automatically: structure maps (/map), deep-research reports, and any diagram, page, table or long draft that comes back as a block.\n\nTo put something here by hand: hit “⧉ To canvas” under any answer.\n\nOnce here you can switch versions, preview, download, save locally, or select a passage and have WDS revise it in place.",
+      cvTip: "Canvas: long outputs and diagrams — versions, in-place revision",
       cvPrev: "Preview", cvSrc: "Source", cvCopy: "Copy", cvDl: "Download", cvSave: "Save locally", cvSaved: "Saved",
       cvAsk: "Ask WDS to revise this", cvAskAll: "Ask WDS to revise this version", cvVer: "Version", cvDrop: "⧉ To canvas", cvDropped: "On the canvas",
       cvPick: "Select something on the canvas first", cvNoPrev: "Source only for this kind",
@@ -2882,8 +2884,11 @@
   }
   function cvPaint() {
     if (cvBtn) {
+      // 常驻。**不要**在画布为空时把它藏起来——那等于把功能藏成不存在，
+      // 读者永远等不到"它自己冒出来"的那一刻，只会以为没有这个东西。
       cvBtn.textContent = tx("cvOpen") + (CV.items.length ? " " + CV.items.length : "");
-      cvBtn.style.display = CV.items.length ? "" : "none";   // 没东西时不占地方
+      cvBtn.title = tx("cvTip");
+      if (layer.classList.contains("cvon")) cvBtn.classList.add("on"); else cvBtn.classList.remove("on");
     }
     if (!cvEl) return;
     var hd = cvEl.querySelector(".wdsm-cvtop b"); if (hd) hd.textContent = tx("cvTitle");
@@ -2895,7 +2900,12 @@
     });
     cvBarEl.innerHTML = ""; cvWrapEl.innerHTML = "";
     var it = cvCur();
-    if (!it) { cvWrapEl.appendChild(el("div", "wdsm-cvempty", tx("cvEmpty"))); return; }
+    if (!it) {
+      var em = el("div", "wdsm-cvempty");
+      tx("cvEmpty").split("\n\n").forEach(function (p) { em.appendChild(el("p", null, p)); });
+      cvWrapEl.appendChild(em);
+      return;
+    }
     var canPrev = (it.kind === "svg" || it.kind === "html" || it.kind === "mermaid" || it.kind === "md" || it.kind === "csv");
     function mk(label, fn, on) { var b = el("button", "wdsm-cvb" + (on ? " on" : ""), label); b.onclick = fn; cvBarEl.appendChild(b); return b; }
     if (canPrev) {
@@ -2944,6 +2954,7 @@
     var x = cvEl && cvEl.querySelector(".wdsm-cvx");
     if (x) { x.title = tx("cvClose"); x.onclick = function () { cvShow(false); }; }
     if (cvBtn) cvBtn.onclick = function () { cvShow(!layer.classList.contains("cvon")); cvPaint(); };
+    cvPaint();
   })();
 
   /* ══════════════════ 本场账本（上下文压缩）══════════════════
