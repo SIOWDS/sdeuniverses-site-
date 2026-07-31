@@ -32,6 +32,13 @@ header{border-bottom:1px solid var(--line);background:linear-gradient(180deg,#0E
 .ptitle{font-size:14px;font-weight:700;color:var(--gold2);margin:0 0 12px;letter-spacing:0.04em}
 label.f{display:block;font-size:12.5px;color:var(--sub);margin:12px 0 5px}
 label.f .req{color:var(--bad)}
+    button.kbtn{background:rgba(212,178,94,0.12);border:1px solid var(--line);color:var(--gold2);border-radius:8px;padding:6px 13px;font-size:12.5px;cursor:pointer;margin-top:7px}
+    button.kbtn:hover:not(:disabled){border-color:var(--gold);color:var(--gold)}
+    button.kbtn:disabled{opacity:0.45;cursor:not-allowed}
+    .kmsg{display:block;font-size:12px;color:var(--sub);margin-top:5px;line-height:1.55}
+    .kmsg.ok{color:var(--ok)}
+    .kmsg.warn{color:var(--warn)}
+    .kmsg.bad{color:var(--bad)}
 input[type=password],input[type=text],textarea,select{width:100%;background:#0C1015;border:1px solid rgba(255,255,255,0.14);border-radius:9px;color:var(--ink);padding:10px 12px;font-size:14px;font-family:inherit;outline:none}
 input:focus,textarea:focus,select:focus{border-color:var(--gold)}
 textarea{min-height:86px;resize:vertical;line-height:1.7}
@@ -148,6 +155,7 @@ footer{border-top:1px solid rgba(255,255,255,0.08);margin-top:44px;padding:22px 
         </select>
         <label class="f" id="keyLabel">你的 DeepSeek API Key <span class="req">*</span></label>
         <input type="password" id="apiKey" placeholder="sk-..." autocomplete="off">
+        <button type="button" class="kbtn" id="keyTest">🔎 检测这个 Key 是否有效</button><span class="kmsg" id="keyTestMsg"></span>
         <div id="overseasNote" style="display:none;font-size:12px;color:var(--warn);margin-top:6px">境外基底经本站 /api/llm-proxy 中转转发(只转发,不留存)。</div>
       </div>
       <div>
@@ -167,6 +175,7 @@ footer{border-top:1px solid rgba(255,255,255,0.08);margin-top:44px;padding:22px 
         <div id="evalKeyRow" style="display:none">
           <label class="f" id="evalKeyLabel">评审基底 API Key <span class="req">*</span></label>
           <input type="password" id="evalKey" placeholder="sk-..." autocomplete="off">
+          <button type="button" class="kbtn" id="evalKeyTest">🔎 检测这个 Key 是否有效</button><span class="kmsg" id="evalKeyTestMsg"></span>
         </div>
         <label class="f">评审基底二(可选第二席 · 与自评合成三方取均)</label>
         <select id="evalSel2">
@@ -184,6 +193,7 @@ footer{border-top:1px solid rgba(255,255,255,0.08);margin-top:44px;padding:22px 
         <div id="evalKeyRow2" style="display:none">
           <label class="f" id="evalKeyLabel2">评审基底二 API Key <span class="req">*</span></label>
           <input type="password" id="evalKey2" placeholder="sk-..." autocomplete="off">
+          <button type="button" class="kbtn" id="evalKeyTest2">🔎 检测这个 Key 是否有效</button><span class="kmsg" id="evalKeyTestMsg2"></span>
         </div>
         <label class="f">档位</label>
         <div class="modeRow">
@@ -1475,6 +1485,89 @@ async function sdeKbContext(q){
     return (j && j.block) ? j.block : '';
   }catch(e){ return ''; }
 }
+// ============ 请求头构造（真跑与 Key 检测共用同一条路，改一处两处都变）============
+function chatHeaders(model, apiKey){
+  const { vendor, tier } = parseModel(model);
+  const headers = { 'Content-Type':'application/json' };
+  if(isOverseas(model)){
+    if(vendor === 'gpt'){ headers['Authorization'] = 'Bearer ' + apiKey; headers['x-target-url'] = 'https://api.openai.com/v1/chat/completions'; }
+    else if(vendor === 'minimax'){ headers['Authorization'] = 'Bearer ' + apiKey; headers['x-target-url'] = 'https://api.minimaxi.com/v1/chat/completions'; }
+    else if(vendor === 'claude'){ headers['x-api-key'] = apiKey; headers['anthropic-version'] = '2023-06-01'; headers['anthropic-dangerous-direct-browser-access'] = 'true'; headers['x-target-url'] = 'https://api.anthropic.com/v1/messages'; }
+    else if(vendor === 'gemini'){ const gm = (tier === 'pro') ? 'gemini-3.1-pro-preview' : 'gemini-2.5-flash'; headers['x-target-url'] = 'https://generativelanguage.googleapis.com/v1beta/models/' + gm + ':generateContent?key=' + encodeURIComponent(apiKey); }
+  } else {
+    headers['Authorization'] = 'Bearer ' + apiKey;
+  }
+  return headers;
+}
+
+// ============ Key 有效性检测：最小一次真实调用 ============
+// 为什么要真打一次而不是查格式：Key 长得对不代表能用——常见故障是余额不足、未实名、
+// 该型号没在账户里开通、境外中转不通。这四种在开跑两小时之后才暴露，代价太大。
+// 探测请求刻意做到最小：关掉深度思考、预算压到 32 token，一次约合几厘钱。
+const PROBE_TOKENS = 32;
+function buildProbePayload(sel){
+  const { vendor } = parseModel(sel);
+  const p = buildPayload(sel, '回答一个字。', '嗨', PROBE_TOKENS);
+  if(vendor === 'gemini'){ p.generationConfig = { maxOutputTokens: PROBE_TOKENS, temperature: 0 }; return p; }
+  if(vendor === 'claude'){ p.max_tokens = PROBE_TOKENS; return p; }
+  if(p.thinking) p.thinking = { type:'disabled' };
+  if('reasoning_effort' in p) delete p.reasoning_effort;
+  if('enable_thinking' in p) p.enable_thinking = false;
+  if('reasoning_split' in p) delete p.reasoning_split;
+  if('max_completion_tokens' in p) p.max_completion_tokens = PROBE_TOKENS; else p.max_tokens = PROBE_TOKENS;
+  return p;
+}
+// 纯函数：把一次探测的 HTTP 状态与响应体判成三档结论。单独抽出来是为了能被模拟脚本逐条验。
+// 分档纪律：只有"这个 Key 本身不能用"才算 bad；余额不足、限流、型号没开通都是 warn——
+// Key 是好的，问题在账户或选型，报成"无效"会让用户白白换 Key。
+function probeVerdict(status, raw){
+  const t = String(raw == null ? '' : raw);
+  const low = t.toLowerCase();
+  let j = null; try{ j = JSON.parse(t); }catch(_){}
+  if(status === 200 && j){
+    const br = j.base_resp;   // MiniMax 把错误裹在 200 里
+    if(br && br.status_code){
+      if(br.status_code === 1004) return { level:'bad',  msg:'✗ 鉴权失败（MiniMax 1004）——Key 不对或尚未生效' };
+      if(br.status_code === 1008) return { level:'warn', msg:'⚠ Key 有效，但账户余额不足（MiniMax 1008）——充值后即可跑' };
+      if(br.status_code !== 0)    return { level:'warn', msg:'⚠ 接口返回错误码 ' + br.status_code + '：' + (br.status_msg || '') };
+    }
+    if(j.error){ const m = (j.error.message || j.error.type || j.error.code || ''); return { level:'warn', msg:'⚠ 接口在 200 里报了错：' + String(m).slice(0,160) }; }
+  }
+  if(status === 200) return { level:'ok', msg:'✓ Key 有效，所选基底可以调用（已真发一次最小请求验过）' };
+  if(status === 401) return { level:'bad', msg:'✗ Key 无效或未授权（401）——请核对有没有复制全、是不是拿错了厂商的 Key' };
+  if(status === 403) return { level:'bad', msg:'✗ 被拒绝（403）——Key 可能未实名、未开通该服务，或所在地区受限' };
+  if(status === 402 || /insufficient[ _-]?balance|余额不足|欠费|arrears/.test(low)) return { level:'warn', msg:'⚠ Key 本身有效，但账户余额不足（402）——充值后即可跑' };
+  if(status === 429) return { level:'warn', msg:'⚠ Key 有效，但被限流或额度已用尽（429）——稍后再试' };
+  if(status === 404 || /model.{0,4}not.{0,4}found|does not exist|无此模型|model_not_found/.test(low)) return { level:'warn', msg:'⚠ Key 可能有效，但这个基底型号在你的账户下不可用（404）——换一档或去厂商后台开通' };
+  if(status === 400 && /(api[_ -]?key|apikey|invalid.{0,16}key|token)/.test(low)) return { level:'bad', msg:'✗ Key 格式或内容不对（400）：' + t.slice(0,140) };
+  if(status >= 500) return { level:'warn', msg:'⚠ 厂商或本站中转暂时故障（' + status + '）——不是你的 Key 的问题，稍后再试' };
+  return { level:'warn', msg:'⚠ 未能判定（' + status + '）：' + t.slice(0,160) };
+}
+const PROBE_MS = 30000;
+async function runKeyProbe(sel, key, btn, msgEl){
+  if(!sel || sel === 'off' || sel === 'follow'){ msgEl.className = 'kmsg warn'; msgEl.textContent = '这一席跟随写作基底，用的是上面那个 Key，检测上面那个即可。'; return; }
+  if(!key){ msgEl.className = 'kmsg bad'; msgEl.textContent = '请先把 Key 填进上面的框。'; return; }
+  const old = btn.textContent;
+  btn.disabled = true; btn.textContent = '检测中…';
+  msgEl.className = 'kmsg'; msgEl.textContent = '正在向 ' + vendorName(sel) + ' 发一次最小请求（' + (isOverseas(sel) ? '经本站中转' : '浏览器直连') + '，约几秒，几乎不计费）……';
+  const ac = new AbortController();
+  const killer = setTimeout(()=>{ try{ ac.abort(); }catch(_){} }, PROBE_MS);
+  let v;
+  try{
+    const url = isOverseas(sel) ? PROXY_URL : apiUrl(sel);
+    const r = await fetch(url, { method:'POST', headers: chatHeaders(sel, key), body: JSON.stringify(buildProbePayload(sel)), signal: ac.signal });
+    let raw = ''; try{ raw = await r.text(); }catch(_){}
+    v = probeVerdict(r.status, raw);
+  }catch(e){
+    v = { level:'warn', msg: (e && e.name === 'AbortError')
+      ? '⚠ ' + Math.round(PROBE_MS/1000) + ' 秒内没有响应——网络或中转不通，这一次没能判定 Key'
+      : '⚠ 请求发不出去：' + (e && e.message ? e.message : e) + (isOverseas(sel) ? '（境外基底走本站中转，可能是中转不通）' : '（国内直连，可能是网络或浏览器插件拦截）') };
+  }
+  clearTimeout(killer);
+  btn.disabled = false; btn.textContent = old;
+  msgEl.className = 'kmsg ' + v.level; msgEl.textContent = v.msg;
+}
+
 async function streamChat(apiKey, model, systemPrompt, userQ, bodyEl, statusEl, metaEl, colEl, maxTokens){
   colEl.classList.add('generating');
   const { vendor, tier } = parseModel(model);
@@ -1489,15 +1582,7 @@ async function streamChat(apiKey, model, systemPrompt, userQ, bodyEl, statusEl, 
 
   const overseas = isOverseas(model);
   const url = overseas ? PROXY_URL : apiUrl(model);
-  const headers = { 'Content-Type':'application/json' };
-  if(overseas){
-    if(vendor === 'gpt'){ headers['Authorization'] = 'Bearer ' + apiKey; headers['x-target-url'] = 'https://api.openai.com/v1/chat/completions'; }
-    else if(vendor === 'minimax'){ headers['Authorization'] = 'Bearer ' + apiKey; headers['x-target-url'] = 'https://api.minimaxi.com/v1/chat/completions'; }
-    else if(vendor === 'claude'){ headers['x-api-key'] = apiKey; headers['anthropic-version'] = '2023-06-01'; headers['anthropic-dangerous-direct-browser-access'] = 'true'; headers['x-target-url'] = 'https://api.anthropic.com/v1/messages'; }
-    else if(vendor === 'gemini'){ const gm = (tier === 'pro') ? 'gemini-3.1-pro-preview' : 'gemini-2.5-flash'; headers['x-target-url'] = 'https://generativelanguage.googleapis.com/v1beta/models/' + gm + ':generateContent?key=' + encodeURIComponent(apiKey); }
-  } else {
-    headers['Authorization'] = 'Bearer ' + apiKey;
-  }
+  const headers = chatHeaders(model, apiKey);
 
   let resp;
   try{
@@ -2211,6 +2296,18 @@ evalSel2.addEventListener('change', refreshEvalKeyUI);
 apiKeyEl.addEventListener('input', ()=>{ try{ localStorage.setItem(keyStoreName(), apiKeyEl.value.trim()); }catch(_){} });
 evalKeyEl.addEventListener('input', ()=>{ try{ localStorage.setItem(keyStoreName(evalSel.value), evalKeyEl.value.trim()); }catch(_){} });
 evalKeyEl2.addEventListener('input', ()=>{ try{ localStorage.setItem(keyStoreName(evalSel2.value), evalKeyEl2.value.trim()); }catch(_){} });
+
+// 三个 Key 各配一个「检测有效性」钮（换基底/换席位即清掉上一次的结论，免得旧结论贴在新基底上）
+keyTest.addEventListener('click', ()=> runKeyProbe(modelSel.value, apiKeyEl.value.trim(), keyTest, keyTestMsg));
+evalKeyTest.addEventListener('click', ()=> runKeyProbe(evalSel.value, evalKeyEl.value.trim(), evalKeyTest, evalKeyTestMsg));
+evalKeyTest2.addEventListener('click', ()=> runKeyProbe(evalSel2.value, evalKeyEl2.value.trim(), evalKeyTest2, evalKeyTestMsg2));
+function clearProbeMsg(el){ el.className='kmsg'; el.textContent=''; }
+modelSel.addEventListener('change', ()=>{ clearProbeMsg(keyTestMsg); clearProbeMsg(evalKeyTestMsg); clearProbeMsg(evalKeyTestMsg2); });
+evalSel.addEventListener('change', ()=> clearProbeMsg(evalKeyTestMsg));
+evalSel2.addEventListener('change', ()=> clearProbeMsg(evalKeyTestMsg2));
+apiKeyEl.addEventListener('input', ()=> clearProbeMsg(keyTestMsg));
+evalKeyEl.addEventListener('input', ()=> clearProbeMsg(evalKeyTestMsg));
+evalKeyEl2.addEventListener('input', ()=> clearProbeMsg(evalKeyTestMsg2));
 
 // 档位切换
 function getMode(){ return modeManual.classList.contains('sel') ? 'manual' : (modeFull.classList.contains('sel') ? 'full' : 'fast'); }
