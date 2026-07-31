@@ -5404,6 +5404,10 @@ export default {
           const probe = await verifyPasscode(body.credential);
           if (probe && probe.bad === "name") return Response.json({ ok: false, msg: "这个名字不在学员名录里。请用你在站上发表用的名字。" }, { status: 401 });
           if (probe && probe.bad === "ban") return Response.json({ ok: false, msg: "这个名字已被管理员停用。" }, { status: 403 });
+          // 递了密码但没过 ≠ 压根没登录。混成一句话，学员会以为自己没登录，反复登录反复失败。
+          if (typeof body.credential === "string" && body.credential.slice(0, 7) === "sdepw1:") {
+            return Response.json({ ok: false, msg: "密码不对，请向管理员确认。" }, { status: 401 });
+          }
           return Response.json({ ok: false, msg: "请先在下方用名字和密码登录后再发言。" }, { status: 401 });
         } else {
           name = clean(body.name, 20);
