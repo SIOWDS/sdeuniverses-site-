@@ -168,6 +168,18 @@ a{color:var(--disc)}
 .nw{padding:0.75rem 1rem;background:var(--card);border-bottom:1px solid var(--border2);font-size:0.87rem;line-height:1.75;cursor:pointer}
 .nw b{color:var(--disc)}
 .nw .t{font-size:0.72rem;color:var(--muted)}
+
+/* 朋友圈里的文章条 */
+.mo-doc{display:flex;align-items:center;gap:10px;margin:8px 0 2px;padding:10px 12px;border:1px solid rgba(201,168,76,.34);
+  border-radius:8px;background:rgba(201,168,76,.06);cursor:pointer}
+.mo-doc:hover{background:rgba(201,168,76,.12)}
+.mo-doc-ic{flex:0 0 40px;height:46px;border-radius:5px;display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:800;letter-spacing:.06em;color:#1a1410}
+.mo-doc-ic.pdf{background:#C9584C}.mo-doc-ic.doc{background:#4C7EC9}
+.mo-doc-tx{flex:1 1 auto;min-width:0}
+.mo-doc-n{font-size:14px;line-height:1.45;color:#E7DFC8;word-break:break-all}
+.mo-doc-s{font-size:12px;color:#9A906F;margin-top:3px}
+.mo-doc .dg{flex:0 0 auto;font-size:12px}
 </style>
 <!-- 全站三态：浏览 / SDE 微信 / SDE 对话。模块自己会挂到 .top 顶栏上 -->
 <script src="/assets/sde-modes.js" defer></script>
@@ -316,6 +328,10 @@ a{color:var(--disc)}
           <label>图片（最多 9 张，自动压缩）</label>
           <div class="mp-thumbs" id="mp-thumbs"></div>
           <input type="file" id="mp-file" accept="image/*" multiple style="display:none">
+          <label>文章（PDF 或 Word，可选，单篇不超过 20MB）</label>
+          <div id="mp-docbox"></div>
+          <button class="btn gh" id="mp-docpick" type="button">＋ 附一篇文章</button>
+          <input type="file" id="mp-doc" accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" style="display:none">
           <button class="btn" id="mp-ok">发表</button>
           <button class="btn gh" id="mp-cancel">取消</button>
           <div class="formmsg" id="mp-msg"></div>
@@ -1165,6 +1181,24 @@ function moRender(){
     L.appendChild(mkEl("div","mo-more","—— 到底了 ——")).style.color="var(--muted)";
   }
 }
+/* 朋友圈里的一篇文章：PDF 点开就在浏览器里翻，Word 浏览器读不了、只能下载。
+   两者都走 /api/im/doc?k= —— 与图片同一道门（键不可枚举）。 */
+function moSize(n){n=Number(n)||0;return n<1024?n+" B":n<1048576?(n/1024).toFixed(0)+" KB":(n/1048576).toFixed(1)+" MB";}
+function moDocCard(d){
+  var isPdf=d.t==="pdf";
+  var box=mkEl("div","mo-doc");
+  var ic=mkEl("div","mo-doc-ic",isPdf?"PDF":"DOC");
+  ic.className="mo-doc-ic "+(isPdf?"pdf":"doc");
+  var tx=mkEl("div","mo-doc-tx");
+  tx.appendChild(mkEl("div","mo-doc-n",d.n||("文章."+d.t)));
+  tx.appendChild(mkEl("div","mo-doc-s",(isPdf?"PDF 文章 · ":"Word 文章 · ")+moSize(d.s)+(isPdf?" · 点击阅读":" · 点击下载")));
+  box.appendChild(ic);box.appendChild(tx);
+  box.onclick=function(ev){
+    ev.stopPropagation();
+    window.open("/api/im/doc?k="+encodeURIComponent(d.k),"_blank","noopener");
+  };
+  return box;
+}
 function moCard(p){
   var box=mkEl("div","mo");box.setAttribute("data-id",p.id);
   var av=mkEl("div","av",initial(p.name));
@@ -1186,6 +1220,7 @@ function moCard(p){
     });
     mm.appendChild(g);
   }
+  if(p.doc&&p.doc.k){mm.appendChild(moDocCard(p.doc));}
   var bar=mkEl("div","bar");
   bar.appendChild(mkEl("span",null,moFmt(p.ts)));
   bar.appendChild(mkEl("span","sp"));
@@ -1354,14 +1389,51 @@ el("mp-file").addEventListener("change",function(){
     });
   });
 });
+/* 文章上传：走裸二进制 /api/im/up，不走 base64——一份 8MB 的 PDF 转 base64 要 10.7MB。
+   凭证不能放 body（body 就是文件），走 x-sde-cred 头。 */
+var moDoc=null;
+function moPaintDoc(){
+  var box=el("mp-docbox");box.innerHTML="";
+  if(!moDoc){return;}
+  var row=mkEl("div","mo-doc");
+  row.appendChild(mkEl("div","mo-doc-ic "+(moDoc.t==="pdf"?"pdf":"doc"),moDoc.t==="pdf"?"PDF":"DOC"));
+  var tx=mkEl("div","mo-doc-tx");
+  tx.appendChild(mkEl("div","mo-doc-n",moDoc.n));
+  tx.appendChild(mkEl("div","mo-doc-s",moSize(moDoc.s)+" · 已上传"));
+  row.appendChild(tx);
+  var x=mkEl("a","dg","移除");
+  x.onclick=function(ev){ev.stopPropagation();moDoc=null;moPaintDoc();};
+  row.appendChild(x);
+  box.appendChild(row);
+}
+el("mp-docpick").onclick=function(){el("mp-doc").click()};
+el("mp-doc").addEventListener("change",function(){
+  var f=this.files&&this.files[0],m=el("mp-msg"),self=this;
+  if(!f)return;
+  var nm=f.name||"", low=nm.toLowerCase(), t="";
+  if(low.slice(-4)===".pdf")t="pdf"; else if(low.slice(-5)===".docx")t="docx";
+  if(!t){m.style.color="var(--red)";m.textContent=low.slice(-4)===".doc"?"旧的 .doc 请先在 Word 里另存为 .docx。":"只支持 PDF 和 Word（.docx）。";self.value="";return;}
+  if(f.size>20*1024*1024){m.style.color="var(--red)";m.textContent="文件太大了（上限 20MB）。";self.value="";return;}
+  m.style.color="var(--muted)";m.textContent="正在上传《"+nm+"》…";
+  el("mp-docpick").disabled=true;el("mp-ok").disabled=true;
+  fetch("/api/im/up?t="+t+"&n="+encodeURIComponent(nm),{method:"POST",headers:{"x-sde-cred":CRED},body:f})
+    .then(function(r){return r.json()})
+    .then(function(x){
+      el("mp-docpick").disabled=false;el("mp-ok").disabled=false;self.value="";
+      if(!x||!x.ok){m.style.color="var(--red)";m.textContent=(x&&x.msg)||"上传失败，请重试。";return;}
+      moDoc={k:x.k,n:x.n,t:x.t,s:x.s};m.textContent="";moPaintDoc();
+    })
+    .catch(function(){el("mp-docpick").disabled=false;el("mp-ok").disabled=false;self.value="";
+      m.style.color="var(--red)";m.textContent="上传时网络异常，请重试。";});
+});
 el("mp-ok").onclick=function(){
   var t=(el("mp-text").value||"").trim(),m=el("mp-msg");
-  if(!t&&!moPick.length){m.style.color="var(--red)";m.textContent="写点什么，或者放张图。";return;}
+  if(!t&&!moPick.length&&!moDoc){m.style.color="var(--red)";m.textContent="写点什么，或者放张图、附一篇文章。";return;}
   el("mp-ok").disabled=true;m.style.color="var(--muted)";m.textContent="正在发表…";
-  api("mo",{a:"post",text:t,imgs:moPick}).then(function(x){
+  api("mo",{a:"post",text:t,imgs:moPick,doc:moDoc}).then(function(x){
     el("mp-ok").disabled=false;
     if(!x.d||!x.d.ok){m.style.color="var(--red)";m.textContent=(x.d&&x.d.msg)||"发表失败。";return;}
-    moPick=[];el("mp-text").value="";m.textContent="";
+    moPick=[];moDoc=null;moPaintDoc();el("mp-text").value="";m.textContent="";
     moGo("","");
   }).catch(function(){el("mp-ok").disabled=false;m.style.color="var(--red)";m.textContent="网络异常，请重试。"});
 };

@@ -789,7 +789,10 @@ export class CommentBox {
         if (!ok12(uid)) return Response.json({ ok: false });
         const txt = moClean(b.text, 1000);
         const imgs = (Array.isArray(b.imgs) ? b.imgs : []).filter((x) => /^[0-9a-f]{16}$/.test(String(x))).slice(0, 9);
-        if (!txt && !imgs.length) return Response.json({ ok: false, msg: "写点什么，或者放张图。" });
+        const doc = (b.doc && /^[0-9a-f]{16}$/.test(String(b.doc.k || "")) && (b.doc.t === "pdf" || b.doc.t === "docx"))
+          ? { k: String(b.doc.k), t: String(b.doc.t), n: moClean(b.doc.n, 80) || ("文章." + b.doc.t), s: Number(b.doc.s) || 0 }
+          : null;
+        if (!txt && !imgs.length && !doc) return Response.json({ ok: false, msg: "写点什么，或者放张图、附一篇文章。" });
         const rk = "morl:" + uid;
         let hits = (await this.ctx.storage.get(rk)) || [];
         hits = hits.filter((t) => now - t < 86400000);
@@ -799,7 +802,7 @@ export class CommentBox {
         await this.ctx.storage.put(rk, hits);
         const u0 = (await this.ctx.storage.get("u:" + uid)) || {};
         const id = moInv(now) + ":" + moRnd();
-        const post = { id, uid, name: moClean(b.name || u0.name, 20), text: txt, imgs, ts: now, likes: [], cmts: [] };
+        const post = { id, uid, name: moClean(b.name || u0.name, 20), text: txt, imgs, doc, ts: now, likes: [], cmts: [] };
         await this.ctx.storage.put("mo:" + id, post);
         await this.ctx.storage.put("mu:" + uid + ":" + id, 1);
         post.mine = 1; post.liked = 0;
@@ -859,7 +862,7 @@ export class CommentBox {
         if (p.uid !== uid && !b.force) return Response.json({ ok: false, msg: "只能删自己的动态。", code: 403 });
         await this.ctx.storage.delete("mo:" + id);
         await this.ctx.storage.delete("mu:" + p.uid + ":" + id);
-        return Response.json({ ok: true, imgs: p.imgs || [] });
+        return Response.json({ ok: true, imgs: p.imgs || [], doc: p.doc || null });
       }
       if (op === "monews") {
         if (!ok12(uid)) return Response.json({ ok: false });
@@ -5317,6 +5320,63 @@ export default {
         headers: { "content-type": "image/jpeg", "cache-control": "public, max-age=31536000, immutable" },
       });
     }
+    // 朋友圈文章附件：PDF / Word。与图片同一道门——键是 16 位随机十六进制、不可枚举，
+    // 文件存 R2 的 moments/doc/ 下，一个字节都不进 git（仓库已 4.37GB，铁律）。
+    // 读：PDF 用 inline 让浏览器直接翻；Word 浏览器读不了，只能 attachment 下载。
+    if (url.pathname === "/api/im/doc" && (request.method === "GET" || request.method === "HEAD")) {
+      const k = String(url.searchParams.get("k") || "");
+      if (!/^[0-9a-f]{16}$/.test(k)) return new Response("bad key", { status: 400 });
+      if (!env.PDFS) return new Response("not found", { status: 404 });
+      let obj = await env.PDFS.get("moments/doc/" + k + ".pdf");
+      let kind = "pdf";
+      if (!obj) { obj = await env.PDFS.get("moments/doc/" + k + ".docx"); kind = "docx"; }
+      if (!obj) return new Response("not found", { status: 404 });
+      const nm = (obj.customMetadata && obj.customMetadata.n) || ("article." + kind);
+      // 文件名里的非 ASCII 只能走 filename*（RFC 5987），否则中文名会在部分浏览器上乱码或截断
+      const dispo = (kind === "pdf" ? "inline" : "attachment") +
+        "; filename=\"" + nm.replace(/[^\x20-\x7e]/g, "_").replace(/"/g, "") + "\"" +
+        "; filename*=UTF-8''" + encodeURIComponent(nm);
+      return new Response(request.method === "HEAD" ? null : obj.body, {
+        headers: {
+          "content-type": kind === "pdf" ? "application/pdf"
+            : "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+          "content-disposition": dispo,
+          "cache-control": "public, max-age=31536000, immutable",
+        },
+      });
+    }
+    // 上传走裸二进制，不走 base64 的 JSON —— 一份 8MB 的 PDF 转 base64 要 10.7MB，
+    // 还得整个读进 worker 内存再解一遍；这里直接把 request.body 流给 R2。
+    // 凭证不能放 body（body 是文件本身），改走 x-sde-cred 头。
+    if (url.pathname === "/api/im/up" && request.method === "POST") {
+      const cred = request.headers.get("x-sde-cred") || "";
+      const who = await verifyIdent(cred);
+      if (!who || !who.uid) return Response.json({ ok: false, msg: "请先登录再上传。" }, { status: 401 });
+      if (!env.PDFS) return Response.json({ ok: false, msg: "文件存储暂时不可用。" }, { status: 400 });
+      const t = String(url.searchParams.get("t") || "").toLowerCase();
+      if (t !== "pdf" && t !== "docx") return Response.json({ ok: false, msg: "只支持 PDF 和 Word（.docx）。" }, { status: 400 });
+      let nm = "";
+      try { nm = decodeURIComponent(String(url.searchParams.get("n") || "")).slice(0, 80); } catch (e) { nm = ""; }
+      nm = nm.replace(/[\r\n\t]/g, " ").trim() || ("文章." + t);
+      const MAX = 20 * 1024 * 1024;
+      const declared = Number(request.headers.get("content-length") || 0);
+      if (declared > MAX) return Response.json({ ok: false, msg: "文件太大了（上限 20MB）。" }, { status: 400 });
+      const buf = await request.arrayBuffer();
+      const bytes = new Uint8Array(buf);
+      if (!bytes.byteLength) return Response.json({ ok: false, msg: "文件是空的。" }, { status: 400 });
+      if (bytes.byteLength > MAX) return Response.json({ ok: false, msg: "文件太大了（上限 20MB）。" }, { status: 400 });
+      // 看真身，不信扩展名：PDF 以 %PDF- 开头；docx 是 zip，以 PK\x03\x04 开头
+      const isPdf = bytes[0] === 0x25 && bytes[1] === 0x50 && bytes[2] === 0x44 && bytes[3] === 0x46;
+      const isZip = bytes[0] === 0x50 && bytes[1] === 0x4b && bytes[2] === 0x03 && bytes[3] === 0x04;
+      if (t === "pdf" && !isPdf) return Response.json({ ok: false, msg: "这不像一个 PDF 文件。" }, { status: 400 });
+      if (t === "docx" && !isZip) return Response.json({ ok: false, msg: "这不像一个 .docx 文件（旧的 .doc 请先另存为 .docx）。" }, { status: 400 });
+      const k = [...crypto.getRandomValues(new Uint8Array(8))].map((x) => x.toString(16).padStart(2, "0")).join("");
+      await env.PDFS.put("moments/doc/" + k + "." + t, bytes, {
+        httpMetadata: { contentType: t === "pdf" ? "application/pdf" : "application/vnd.openxmlformats-officedocument.wordprocessingml.document" },
+        customMetadata: { n: nm, by: who.uid },
+      });
+      return Response.json({ ok: true, k, n: nm, t, s: bytes.byteLength });
+    }
     if (url.pathname === "/api/im" && request.method === "POST") {
       const b = await request.json().catch(() => null);
       if (!b) return Response.json({ ok: false, msg: "请求格式不对。" }, { status: 400 });
@@ -5412,14 +5472,23 @@ export default {
             await env.PDFS.put("moments/" + k + ".jpg", bytes, { httpMetadata: { contentType: "image/jpeg", cacheControl: "public, max-age=31536000, immutable" } });
             keys.push(k);
           }
-          const d = await call({ op: "mopost", uid: who.uid, name: who.name, text: b.text, imgs: keys });
+          // 文章附件：前端已经把文件传到 R2 拿到了 k，这里只核一次「桶里真有这个东西」，
+          // 免得有人手捏一个 k 发出来、卡片点开是 404。
+          let doc = null;
+          if (b.doc && /^[0-9a-f]{16}$/.test(String(b.doc.k || "")) && (b.doc.t === "pdf" || b.doc.t === "docx")) {
+            const hd = env.PDFS ? await env.PDFS.head("moments/doc/" + b.doc.k + "." + b.doc.t) : null;
+            if (!hd) return Response.json({ ok: false, msg: "这篇文章没上传成功，请重新选一次。" }, { status: 400 });
+            doc = { k: String(b.doc.k), t: b.doc.t, n: String(b.doc.n || "").slice(0, 80), s: hd.size };
+          }
+          const d = await call({ op: "mopost", uid: who.uid, name: who.name, text: b.text, imgs: keys, doc });
           return Response.json(d || { ok: false }, { status: (d && d.ok) ? 200 : 400 });
         }
         const MOMAP = { like: "molike", cmt: "mocmt", cdel: "mocdel", del: "model", news: "monews", badge: "mobadge" };
         if (MOMAP[a]) {
           const d = await call({ op: MOMAP[a], uid: who.uid, name: who.name, id: String(b.id || ""), cid: String(b.cid || ""), rid: String(b.rid || ""), text: b.text });
-          if (a === "del" && d && d.ok && env.PDFS) {   // 动态没了，图片也别留在桶里
+          if (a === "del" && d && d.ok && env.PDFS) {   // 动态没了，图片和附件也别留在桶里
             for (const k of (d.imgs || [])) { try { await env.PDFS.delete("moments/" + k + ".jpg"); } catch (e) {} }
+            if (d.doc && d.doc.k) { try { await env.PDFS.delete("moments/doc/" + d.doc.k + "." + d.doc.t); } catch (e) {} }
           }
           return Response.json(d || { ok: false }, { status: (d && d.ok) ? 200 : ((d && d.code) || 400) });
         }
