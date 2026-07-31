@@ -584,7 +584,12 @@ console.log("⑧ 成文（distill）");
   ok(!pb.querySelector(".wdsm-pfire") && !/wdsmBurn/.test(src),
     "侧栏这颗 △ 刻意不烧——火只留浏览首页那一处");
 }
-  ok(layer.querySelector(".wdsm-tab[data-m='wds']").textContent.includes("ChatSDE"), "已正式更名为「ChatSDE」");
+  // 抬头写"你在哪儿"，底下三颗写"能去哪儿"——所以底下不再有一颗写着 ChatSDE 的死按钮
+  ok(/<a href='\/taste\/chatsde\/'>ChatSDE<\/a>/.test(src), "侧栏抬头就是产品名 ChatSDE");
+  ok(!layer.querySelector(".wdsm-tab[data-m='wds']"), "底下那颗点了没反应的 ChatSDE 已经撤掉");
+  const _pt = layer.querySelector(".wdsm-tab[data-m='portal']");
+  ok(_pt && _pt.textContent.includes("系统入口"), "第三颗改成「系统入口」，实得 " + (_pt ? _pt.textContent : "(没有)"));
+  ok(layer.querySelectorAll(".wdsm-tab").length === 3, "三颗就是三颗（孤零零的 △ 已并进来），实得 " + layer.querySelectorAll(".wdsm-tab").length);
   const foldBtn = layer.querySelector(".wdsm-fold");
   foldBtn.click();
   ok(layer.classList.contains("fold") && store["sde_wds_fold"] === "1", "点收起 → 侧栏折叠且记住");

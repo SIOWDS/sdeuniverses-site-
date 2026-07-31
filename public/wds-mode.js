@@ -282,7 +282,7 @@
 
   var TXT = {
     zh: {
-      tabNormal: "常规", tabBack: "\u2190 返回浏览", tabWds: "\u2726 ChatSDE",
+      tabNormal: "常规", tabBack: "\u2190 返回浏览", tabPortal: "\u2726 \u7cfb\u7edf\u5165\u53e3",
       bDistill: "\u270e 成文 · PPT", bHist: "\u21ba 历史", bSet: "\u2699 设置", bNew: "\uff0b 新对话",
       heroSub: "王德生的 AI 分身 · SDE 本体论老师<br>检索全站文章与专著，也能直接和你对谈 SDE",
       egs: ["SDE 说的“显露”和“结构”有什么不同？", "用 SDE 怎么看慢性病的发生？", "什么是特征纠缠？举个例子", "帮我找几篇入门 SDE 的文章"],
@@ -416,7 +416,7 @@
       pasteAdd: "已把粘贴的文件加为附件",
     },
     en: {
-      tabNormal: "Browse", tabBack: "\u2190 Back to site", tabWds: "\u2726 WDS",
+      tabNormal: "Browse", tabBack: "\u2190 Back to site", tabPortal: "\u2726 Entry",
       bDistill: "\u270e Write up · Deck", bHist: "\u21ba History", bSet: "\u2699 Settings", bNew: "\uff0b New chat",
       heroSub: "Wang Desheng's AI counterpart · a teacher of the SDE ontology<br>It searches the whole site, and it will also just think with you",
       egs: ["What separates Show from structure in SDE?", "How would SDE read the onset of a chronic disease?", "What is entanglement of features? Give an example.", "Point me at a few pieces to start with"],
@@ -733,7 +733,7 @@
     ".wdsm-tab{border:none;background:none;color:var(--wdim);font:600 12px/1 inherit;padding:6px 9px;border-radius:999px;cursor:pointer;white-space:nowrap;flex:none}" +
     ".wdsm-tab.sel{background:var(--wgold);color:var(--wbg)}" +
     /* 回入口的 △ 也烧着（暗底口径）。isolation 见 sde-modes.js 同处注释。 */
-    ".wdsm-portal{color:var(--wgold);opacity:.85}" +
+    ".wdsm-portal{color:var(--wgold);opacity:.9;box-shadow:inset 0 0 0 1px var(--wgold)}" +
     ".wdsm-portal:hover{opacity:1}" +
     ".wdsm-mp{background:var(--wfill);border:1px solid var(--wline);color:var(--wtx);font:600 13px/1 inherit;padding:8px 12px;border-radius:10px;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:7px}" +
     ".wdsm-mp:hover{border-color:var(--wline2);color:var(--wgold)}" +
@@ -971,13 +971,13 @@
   var layer = el("div", "wdsm-layer");
   layer.innerHTML =
     "<div class='wdsm-side'>" +
-      "<div class='wdsm-sbrand'><a href='/'>SDE UNIVERSES</a><button class='wdsm-fold'>\u00ab</button></div>" +
+      "<div class='wdsm-sbrand'><a href='/taste/chatsde/'>ChatSDE</a><button class='wdsm-fold'>\u00ab</button></div>" +
       "<button class='wdsm-nc'></button>" +
       "<div class='wdsm-pjwrap'><button class='wdsm-pj'></button></div>" +
       "<div class='wdsm-schwrap'><input class='wdsm-sch' type='text'></div>" +
       "<div class='wdsm-list'></div>" +
       "<div class='wdsm-sbot'>" +
-        "<div class='wdsm-tabs'><button class='wdsm-tab' data-m='normal'></button><button class='wdsm-tab' data-m='im'></button><button class='wdsm-tab sel' data-m='wds'></button><button class='wdsm-tab wdsm-portal' title='\u56de\u5230\u5165\u53e3\u9875'>\u25b3</button></div>" +
+        "<div class='wdsm-tabs'><button class='wdsm-tab' data-m='normal'></button><button class='wdsm-tab' data-m='im'></button><button class='wdsm-tab wdsm-portal' data-m='portal' title='\u56de\u5230\u5165\u53e3\u9875'></button></div>" +
         "<button class='wdsm-sb' data-a='theme'></button>" +
         "<button class='wdsm-sb' data-a='style'></button>" +
         "<button class='wdsm-sb' data-a='preset'></button>" +
@@ -1313,7 +1313,7 @@
     var q = function (sel) { return layer.querySelector(sel); };
     q(".wdsm-tab[data-m='normal']").textContent = t("tabBrowse");
     q(".wdsm-tab[data-m='im']").textContent = t("tabIm");
-    q(".wdsm-tab[data-m='wds']").textContent = t("tabWds");
+    q(".wdsm-tab[data-m='portal']").textContent = t("tabPortal");
     q(".wdsm-distbtn").textContent = t("bDistill");
     q(".wdsm-histbtn").textContent = t("bHist");
     q(".wdsm-keybtn").textContent = t("bSet");
@@ -1598,16 +1598,13 @@
   // 三态互切：目的地与 /assets/sde-modes.js 的 SDE_MODES 是同一套（模拟有跨文件断言钉住）
   var TAB_GO = { normal: "/browse/", im: "/sde-wechat/", wds: "/taste/chatsde/" };
   var PORTAL_URL = "/home/";                                  // 与 sde-modes.js 的 PORTAL 同一串（入口页的门牌）
-  (function () {
-    var pb = layer.querySelector(".wdsm-portal");
-    if (!pb) return;
-    pb.onclick = function () { window.location.href = PORTAL_URL; };
-    // 这颗刻意不烧：火只留浏览首页那一处（烧一处是记号，处处烧是噪音）
-  })();
+  // 入口那颗现在就是三颗里的一颗（data-m='portal'），接线在下面那个循环里一处完成——
+  // 同一个按钮不该有两处 onclick，后写的会静默盖掉先写的。
+  // 它刻意不烧火：火只留浏览首页那一处（烧一处是记号，处处烧是噪音）。
   layer.querySelectorAll(".wdsm-tab").forEach(function (tb) {
     tb.onclick = function () {
       var m = tb.dataset.m;
-      if (m === "wds") return;                                  // 已经在这儿了
+      if (m === "portal") { window.location.href = PORTAL_URL; return; }
       if (m === "normal") { close(); return; }                  // close() 会走 leave()：有来路就回来路，没有才回首页
       window.location.href = TAB_GO[m] || "/browse/";
     };
