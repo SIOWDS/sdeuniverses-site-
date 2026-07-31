@@ -1700,13 +1700,15 @@ function moDocCard(d){
   var tx=mkEl("div","mo-doc-tx");
   tx.appendChild(mkEl("div","mo-doc-n",d.n||("文章."+d.t)));
   var life=moDocLife(d.ts);
-  tx.appendChild(mkEl("div","mo-doc-s",(isPdf?"PDF 文章 · ":"Word 文章 · ")+moSize(d.s)+(isPdf?" · 点击阅读":" · 点击下载")));
+  tx.appendChild(mkEl("div","mo-doc-s",(isPdf?"PDF 文章 · ":"Word 文章 · ")+moSize(d.s)+(isPdf?" · 点击阅读":" · 点击在线阅读")));
   var lf=mkEl("div","mo-doc-s"+(life.dead?" dead":""),life.txt);
   tx.appendChild(lf);
   box.appendChild(ic);box.appendChild(tx);
   box.onclick=function(ev){
     ev.stopPropagation();
-    window.open("/api/im/doc?k="+encodeURIComponent(d.k),"_blank","noopener");
+    /* 进站内阅读器：PDF 翻页＋缩放、Word 用 mammoth 在线转成网页；
+       两个库都自托管在 /assets/lib/，不走 cdnjs 外链。 */
+    window.open("/sde-wechat/doc.html?k="+encodeURIComponent(d.k)+"&t="+encodeURIComponent(d.t)+"&n="+encodeURIComponent(d.n||""),"_blank","noopener");
   };
   return box;
 }
