@@ -199,7 +199,7 @@ footer{border-top:1px solid var(--line);color:var(--dim);font-size:13px;padding:
 var PROXY = "/api/llm-proxy";
 var MODEL = "MiniMax-M3";           // 思考与看图（M2.x 看不了图，必须 M3）
 var IMGMODEL = "image-01";
-var VERSION = 12;
+var VERSION = 13;
 /* ── MiniMax-M3 官方 spec（platform.minimaxi.com/docs/api-reference/text-chat-openai，2026-07-31 核对）──
    · max_tokens **已弃用**，官方明令改用 max_completion_tokens。我先前一直在给一个弃用字段设上限，
      等于没设——第二次真跑「预算 8000／思考 33630 字」就是这么打穿的。
@@ -715,6 +715,14 @@ var ARTIST_RE = new RegExp(
   "(in the (manner|style) of\\s+[^,.;]{1,40})|(\\b(van\\s*gogh|escher|mondrian|dali|salvador\\s+dali|magritte|rothko|kandinsky|picasso|monet|klimt|hokusai|vermeer|caravaggio|pollock|matisse|munch|turner|basquiat|warhol|miyazaki|moebius|giger)\\b[a-z-]*)",
   "gi");
 var BAN_TAIL = "no text, no letters, no numbers, no watermark, no recognizable real person, no logo, no brand, not in the style of any named artist";
+/* 「一个场，不是拼贴」——**渲染端强制注入**，不再指望基底听话。
+   v10 就把这条写进了绘图指令的要求里，而真跑连续两张画都还是拼贴：
+   第一张是硬竖缝（连接 52），第二张被评为「更近拼贴而非深度的并存」（关系 0、连接 15）。
+   **写在要求里 ≠ 落在 prompt 里**——这是「渲染端回收路径」那条通则的第四次应验。
+   同时按住第二个连续复发的病：退化成极简静物（一块布、一根条纹，看着像作品其实空）。 */
+var FIELD_TAIL = "one continuous pictorial field, not a collage: the areas must interlock and modify each other where they meet, "
+  + "not sit side by side as flat bands; give the eye one clear place to stand inside the picture; "
+  + "avoid reducing the whole to a single minimal object on an empty ground";
 function hardenPrompt(p){
   var s = String(p||""), hits = [];
   // ⚠️ 先把已有的禁令串摘出去再净化：禁令串自身含 "not in the style of any named artist"，
@@ -723,9 +731,12 @@ function hardenPrompt(p){
   if(had) s = s.split(BAN_TAIL).join(" ");
   s = s.replace(ARTIST_RE, function(m){ hits.push(m.trim()); return ""; });
   s = s.replace(/\s*,\s*,/g, ",").replace(/\s{2,}/g, " ").replace(/^[\s,]+/, "").replace(/[,\s]+$/,"").trim();
-  if(s.length > 1500 - BAN_TAIL.length - 2) s = s.slice(0, 1500 - BAN_TAIL.length - 2).replace(/[,\s]+$/,"");
-  s = s + ", " + BAN_TAIL;
-  return { p: s, stripped: hits, addedTail: !had };
+  // 场的纪律与禁令串一样，一律由渲染端补齐；基底自己写了就不重复。
+  var hadField = s.indexOf("one continuous pictorial field") >= 0;
+  var tail = (hadField ? "" : FIELD_TAIL + ", ") + BAN_TAIL;
+  if(s.length > 1500 - tail.length - 2) s = s.slice(0, 1500 - tail.length - 2).replace(/[,\s]+$/,"");
+  s = s + ", " + tail;
+  return { p: s, stripped: hits, addedTail: !had, addedField: !hadField };
 }
 
 async function mmDraw(prompt, ratio, n){
@@ -993,7 +1004,13 @@ async function run(again){
           + "**纠缠维骗不到分**：无根的新奇（为怪而怪）在此维必须现形。\n\n"
           + "**这一步是读数，不是论述**：直接给分，别在心里反复推演。\n"
           + "严格按每行一维输出，共五行，不要别的：\n维名｜分数｜一句为什么\n"
-          + "然后另起一行写「弱在」：指出最弱的一维，并给一条可动手的坐标（不许写「加强创新」这类空话）。";
+          + "然后另起一行写「弱在」：指出最弱的一维，并给一条可动手的坐标（不许写「加强创新」这类空话）。\n"
+          + "\n最后再写两行——**这两行不是评分，是出图前的最后一道闸**：\n"
+          + "可画性｜高／中／低｜这个典范交给一台**通用文生图基底**，它最可能画成什么样？\n"
+          + "  实测栽过两次的退化方向：①退化成**极简静物**（一块布、一根条纹、一个几何图形，看着像作品其实空）；\n"
+          + "  ②退化成**拼贴**（画面被切成互不相干的几块，观者进不去）。判低就直说低。\n"
+          + "补救句｜若可画性不是「高」，写出一句必须补进英文 prompt 的话（要具体到可见特征：\n"
+          + "  比如「让两种材质在同一处真正咬合而不是并排」「留一个可以站进去的近景」），不许写空话。";
         var iqUser = "【要评的典范】\n" + pq.txt.slice(0, 3000)
           + "\n\n【它撞出来的方式】" + pq.way.t
           + "\n\n请按五维读数。注意：你评的是这个**典范**（一个视觉命题），不是评一张具体的画。";
@@ -1006,6 +1023,11 @@ async function run(again){
         pq.iqTotal = wsum ? Math.round(sum/wsum) : null;
         pq.fp = fingerprint(pq.iq);
         pq.sc = selfCheck(pq.iq);
+        // 可画性：五维那一步顺带问出来的最后一道闸（零额外调用）
+        var mDraw = iqTxt.match(/可画性[｜|：:]\s*([高中低])/);
+        pq.paint = mDraw ? mDraw[1] : "";
+        var mFix = iqTxt.match(/补救句[｜|：:]\s*([^\n]+)/);
+        pq.paintFix = mFix ? mFix[1].trim() : "";
         mark(si,"done", (pq.iqTotal!=null? pq.iqTotal+" 分" : "已评") + (pq.fp? " · "+pq.fp.n : ""));
       }catch(e){
         mark(si,"fail",(e&&e.message||"失败").slice(0,60));
@@ -1021,7 +1043,13 @@ async function run(again){
       if(!p){ mark(si,"fail","上一步没出典范"); si++; continue; }
       mark(si,"run"); say("第 "+(wi2+1)+" 路出图中（image-01 × "+per+"）…");
       try{
-        p.imgs = await mmDraw(p.prompt, $("ratio").value, per);
+        var usePrompt = p.prompt;
+        if(p.paint && p.paint !== "高" && p.paintFix){
+          // 可画性判了中/低 → 把补救句接进 prompt，并留痕告诉读者动过手
+          usePrompt = hardenPrompt(p.prompt.split(BAN_TAIL)[0] + ", " + p.paintFix).p;
+          p.promptFixed = true;
+        }
+        p.imgs = await mmDraw(usePrompt, $("ratio").value, per);
         mark(si,"done", p.imgs.length+" 张");
       }catch(e){ mark(si,"fail",(e&&e.message||"失败").slice(0,60)); p.imgs = []; }
       si++;
@@ -1175,6 +1203,8 @@ function renderDraw(paras){
     if(p.score!=null) h += ' <span class="tag pass">九分项 '+p.score+'</span>';
     if(p.iqTotal!=null) h += ' <span class="tag '+(p.iqTotal>=150?'pass':'')+'">五维 '+p.iqTotal+(p.iqTotal>=150?' · 本体论级':'')+'</span>';
     if(p.fp) h += ' <span class="tag">'+esc(p.fp.n)+'</span>';
+    if(p.paint) h += ' <span class="tag'+(p.paint==="高"?" pass":" hit")+'">可画性 '+esc(p.paint)+'</span>';
+    if(p.promptFixed) h += ' <span class="tag hit">已按可画性补救句改过 prompt</span>';
     if(p.stripped && p.stripped.length) h += ' <span class="tag hit">渲染端摘掉了 '+p.stripped.length+' 处艺术家指名：'+esc(p.stripped.join("、"))+'</span>';
     if(p.addedTail) h += ' <span class="tag hit">禁令串是渲染端补的（基底没写）</span>';
     h += '<div class="out" style="margin-top:8px;max-height:300px">'+esc(p.txt)+'</div>';

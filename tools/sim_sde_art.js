@@ -42,6 +42,7 @@ const src = [
   extract(/function scoreOf\(txt, accent\)\{[\s\S]*?\n}/, "scoreOf"),
   extract(/var ARTIST_RE = new RegExp\([\s\S]*?\);/, "ARTIST_RE"),
   extract(/var BAN_TAIL = "[^"]*";/, "BAN_TAIL"),
+  extract(/var FIELD_TAIL = "[\s\S]*?";/, "FIELD_TAIL"),
   extract(/function hardenPrompt\(p\)\{[\s\S]*?\n}/, "hardenPrompt"),
   extract(/function cutBlocks\(txt, re\)\{[\s\S]*?\n}/, "cutBlocks"),
   extract(/function grab\(txt, label\)\{[\s\S]*?\n}/, "grab"),
@@ -49,7 +50,7 @@ const src = [
 const box = {};
 new Function("box", src + "\nbox.WAYS=WAYS;box.pickWays=pickWays;box.PLACE_SDE=PLACE_SDE;box.PLACE_CLICHE=PLACE_CLICHE;"
   + "box.PLACE_STYLE=PLACE_STYLE;box.placeBrief=placeBrief;box.B9=B9;box.MODES=MODES;"
-  + "box.scoreOf=scoreOf;box.cutBlocks=cutBlocks;box.grab=grab;box.cellScore=cellScore;box.hardenPrompt=hardenPrompt;box.BAN_TAIL=BAN_TAIL;box.IQ5=IQ5;box.IQ5_GATE=IQ5_GATE;box.fingerprint=fingerprint;box.selfCheck=selfCheck;box.DEAD_FORMS=DEAD_FORMS;box.deadBrief=deadBrief;")(box);
+  + "box.scoreOf=scoreOf;box.cutBlocks=cutBlocks;box.grab=grab;box.cellScore=cellScore;box.hardenPrompt=hardenPrompt;box.BAN_TAIL=BAN_TAIL;box.FIELD_TAIL=FIELD_TAIL;box.IQ5=IQ5;box.IQ5_GATE=IQ5_GATE;box.fingerprint=fingerprint;box.selfCheck=selfCheck;box.DEAD_FORMS=DEAD_FORMS;box.deadBrief=deadBrief;")(box);
 
 /* ═════ 一、六种碰撞方式与抽签器（真跑） ═════ */
 group("一、六方式与抽签器");
@@ -483,6 +484,34 @@ group("十一之十、流式");
     /async function readErr/.test(js) && /1039\|token/.test(js) && /护栏当场抓到/.test(js));
   ok("524/522/504 都进了错误码表", /524/.test(js) && /522/.test(js) && /504/.test(js));
   ok("出图仍是非流式（一次性拿 base64）", /model: IMGMODEL/.test(js) && !/IMGMODEL[^;]*stream: true/.test(js));
+}
+
+/* ═════ 十一之十一、可画性闸与场的强制注入（第二份真跑 20 分之后加的） ═════ */
+group("十一之十一、可画性与场");
+{
+  ok("五维那一步顺带问可画性（零额外调用）", /可画性｜高／中／低/.test(js));
+  ok("点名两个实测栽过的退化方向", /极简静物/.test(js) && /退化成\*\*拼贴\*\*/.test(js));
+  ok("补救句要具体到可见特征、不许空话", /不许写空话/.test(js));
+  ok("可画性与补救句都被解析", /pq\.paint = /.test(js) && /pq\.paintFix = /.test(js));
+  ok("非「高」时把补救句接进 prompt 并留痕", /p\.promptFixed = true/.test(js) && /已按可画性补救句改过 prompt/.test(js));
+
+  // 场：渲染端强制注入，不再指望基底听话
+  ok("FIELD_TAIL 存在且写明 not a collage", /var FIELD_TAIL = /.test(js) && /not a collage/.test(js));
+  ok("并按住极简静物", /avoid reducing the whole to a single minimal object/.test(js));
+  ok("注释写明这是第四次应验「写在要求里 ≠ 落在 prompt 里」", /写在要求里 ≠ 落在 prompt 里/.test(js));
+  ok("注释记下两次真跑的读数（硬竖缝 52／拼贴 关系0 连接15）",
+    /连接 52/.test(js) && /关系 0、连接 15/.test(js));
+
+  const r1 = box.hardenPrompt("a taut seam across the frame, side light");
+  ok("场纪律被自动补上", r1.p.indexOf("one continuous pictorial field") >= 0 && r1.addedField === true);
+  ok("场纪律排在禁令串之前", r1.p.indexOf("one continuous pictorial field") < r1.p.indexOf(box.BAN_TAIL));
+  const r2 = box.hardenPrompt("x, " + box.FIELD_TAIL + ", " + box.BAN_TAIL);
+  ok("基底自己写了就不重复补", r2.addedField === false
+    && r2.p.split("one continuous pictorial field").length - 1 === 1);
+  const r3 = box.hardenPrompt("y".repeat(2000));
+  ok("多了一段场纪律之后仍不超 1500", r3.p.length <= 1500, String(r3.p.length));
+  ok("超长裁切后场纪律与禁令串都还在",
+    r3.p.indexOf("one continuous pictorial field") >= 0 && r3.p.indexOf(box.BAN_TAIL) >= 0);
 }
 
 /* ═════ 十二、成本算术 ═════ */

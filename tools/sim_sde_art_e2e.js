@@ -69,7 +69,9 @@ const IQ5_REPLY = [
   "纠缠维｜128｜土壤扎在观看惯例这一层，不算薄",
   "整合维｜130｜拿掉留白整体就塌，是器官不是拼盘",
   "穿透维｜120｜回写有限，尚不足以重置棋盘"
-].join("\n") + "\n弱在：穿透维——把这条路径写成可被别人接着走的做法，而不是一次性的效果。";
+].join("\n") + "\n弱在：穿透维——把这条路径写成可被别人接着走的做法，而不是一次性的效果。"
+  + "\n可画性｜低｜通用文生图多半会把它退化成一块布上的一道条纹，看着像作品其实空。"
+  + "\n补救句｜让两种材质在同一处真正咬合而不是并排，并留一个可以站进去的近景。";
 const GATEOUT_REPLY =
   "图1｜判定：〔通过〕\n图1｜撞上：无\n图1｜分离线：与地层剖面在层界走向上分开。\n" +
   "图2｜判定：〔占位失败〕\n图2｜撞上：蒙德里安红黄蓝方格\n图2｜分离线：—\n最干净的是第 1 张。";
@@ -1033,6 +1035,41 @@ async function drive(w, mode, opts) {
     ok("看门狗阈值 90 秒，且注释写明「平台掐断会变成 524，那时什么都问不出来」",
       /IDLE_MS = 90000/.test(fs.readFileSync(PAGE, "utf8"))
       && /平台掐断会变成 524/.test(fs.readFileSync(PAGE, "utf8")));
+  }
+
+  /* ═════ 十五、可画性闸与场的强制注入（第二份真跑画作 20 分之后加的） ═════ */
+  group("十五、可画性闸与场");
+  {
+    const { w, calls } = await boot(happyScript());
+    await drive(w, "A", {});
+    const chats = calls.filter((c) => /chat\/completions$/.test(c.target));
+    const iq = chats.filter((c) => /创新度量员/.test(c.body.messages[0].content))[0];
+    ok("五维那一步顺带问可画性（零额外调用）", /可画性/.test(iq.body.messages[0].content));
+    ok("点名两个实测栽过的退化方向：极简静物／拼贴",
+      /极简静物/.test(iq.body.messages[0].content) && /拼贴/.test(iq.body.messages[0].content));
+    ok("要求给出具体到可见特征的补救句，不许空话",
+      /补救句/.test(iq.body.messages[0].content) && /不许写空话/.test(iq.body.messages[0].content));
+
+    const p0 = w.__sdeArt.last().paras.filter(Boolean)[0];
+    ok("可画性读数被解析出来", p0.paint === "低", "实测 " + p0.paint);
+    ok("补救句被解析出来", /真正咬合/.test(p0.paintFix || ""), p0.paintFix);
+    ok("可画性不是「高」时，补救句真的接进了送出去的 prompt", p0.promptFixed === true);
+    const draw = calls.filter((c) => /image_generation$/.test(c.target))[0];
+    ok("送出去的 prompt 里确实带上了补救句", /真正咬合/.test(draw.body.prompt), draw.body.prompt.slice(-160));
+    ok("卡片上把可画性与「已改过 prompt」都留痕",
+      /可画性 低/.test(w.document.getElementById("drawOut").innerHTML)
+      && /已按可画性补救句改过 prompt/.test(w.document.getElementById("drawOut").innerHTML));
+
+    ok("每一条送出去的 prompt 都被强制注入「一个场，不是拼贴」",
+      calls.filter((c) => /image_generation$/.test(c.target))
+        .every((c) => /one continuous pictorial field, not a collage/.test(c.body.prompt)));
+    ok("并按住「退化成极简静物」这个第二个复发病",
+      draw.body.prompt.indexOf("avoid reducing the whole to a single minimal object") >= 0);
+    ok("场的纪律排在禁令串之前，禁令串仍在最尾",
+      draw.body.prompt.indexOf("one continuous pictorial field") < draw.body.prompt.indexOf("no text, no letters"));
+    ok("prompt 仍不超 1500 字符（多了一段场纪律之后也不许超）",
+      calls.filter((c) => /image_generation$/.test(c.target)).every((c) => c.body.prompt.length <= 1500),
+      "最长 " + Math.max(...calls.filter((c) => /image_generation$/.test(c.target)).map((c) => c.body.prompt.length)));
   }
 
   /* ═════ 十一、核心函数一个都不许少（大段替换吞掉邻居，已发生过一次） ═════ */
