@@ -125,13 +125,18 @@ console.log("②c 三个图标四周烧 TOKEN");
   ok(fires.length === 3, "三个图标各烧一团，实得 " + fires.length);
   ok(fires.every((f) => f.querySelector("b")), "每团都有火焰底光");
   const sp = fires[0].querySelectorAll(".sdep-sp");
-  ok(sp.length === 9, "火星九粒，实得 " + sp.length);
+  ok(sp.length === 18, "火星十八粒，实得 " + sp.length);
   ok(new Set(sp.map((x) => x.style.animationDelay)).size > 1, "火星错开起飞（同时起飞就成了一排跳动的点，不像火）");
   const cols = new Set(sp.map((x) => x.style.background));
   ok(cols.has(NODEC(nodes[0])), "火星里掺了本入口自己的色（同为一种火，各带各的色）");
   ok(cols.size >= 3, "其余是首页那套火色（橙/琥珀/橘），实得 " + cols.size + " 种");
   ok(/z-index:1/.test(SRC) && /sdep-dotwrap/.test(SRC), "火在下、图标在上（分层，别让火盖住图标）");
-  ok(/@keyframes sdepFlick/.test(SRC), "火在明灭，不是一张静止的橙色贴纸");
+  ok(/@keyframes sdepBurn/.test(SRC), "火在形变，不是只改透明度（只改透明度做不出火）");
+  const tg = fires[0].querySelectorAll("b");
+  ok(tg.length === 3, "三层火舌（外焰暗红/中焰橙/内焰黄白），实得 " + tg.length);
+  const durs = (SRC.match(/animation-duration:[.\d]+s/g) || []);
+  ok(new Set(durs).size >= 3, "三层各用不同时长与相位，永远不同步——火之所以像火，全在于它从不重复自己");
+  ok(/transform-origin:50% 100%/.test(SRC), "火苗底部定住、只有上部乱窜");
 }
 function NODEC(n) { return n.style["--c"]; }
 

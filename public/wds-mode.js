@@ -720,11 +720,14 @@
     /* 回入口的 △ 也烧着（暗底口径）。isolation 见 sde-modes.js 同处注释。 */
     ".wdsm-portal{position:relative;isolation:isolate;color:var(--wgold);opacity:.85}" +
     ".wdsm-portal:hover{opacity:1}" +
-    ".wdsm-pfire{position:absolute;left:50%;top:50%;width:40px;height:40px;transform:translate(-50%,-50%);pointer-events:none;z-index:-1}" +
-    ".wdsm-pfire b{position:absolute;left:50%;bottom:6%;width:76%;height:66%;transform:translateX(-50%);border-radius:50%;background:radial-gradient(60% 80% at 32% 100%,rgba(255,110,0,.5),transparent 64%),radial-gradient(55% 80% at 66% 100%,rgba(255,190,60,.45),transparent 64%);filter:blur(4px);animation:wdsmFlick 1.7s ease-in-out infinite}" +
-    "@keyframes wdsmFlick{0%,100%{opacity:.55;transform:translateX(-50%) scaleY(1)}50%{opacity:1;transform:translateX(-50%) scaleY(1.18)}}" +
+    ".wdsm-pfire{position:absolute;left:50%;top:54%;width:84px;height:84px;transform:translate(-50%,-50%);pointer-events:none;z-index:-1}" +
+".wdsm-p-fire b{position:absolute;left:50%;bottom:0;transform-origin:50% 100%;border-radius:50% 50% 46% 46% / 68% 68% 32% 32%;animation-name:wdsmBurn;animation-timing-function:ease-in-out;animation-iteration-count:infinite}" +
+    ".wdsm-p-fire .f1{width:96%;height:88%;filter:blur(9px);opacity:.55;background:radial-gradient(50% 62% at 50% 100%,#FF3D00 0%,rgba(255,61,0,.5) 46%,transparent 74%);animation-duration:1.35s}" +
+    ".wdsm-p-fire .f2{width:66%;height:70%;filter:blur(5px);opacity:.8;background:radial-gradient(52% 64% at 50% 100%,#FF9A1F 0%,rgba(255,140,20,.6) 48%,transparent 76%);animation-duration:1.02s;animation-delay:-.4s}" +
+    ".wdsm-p-fire .f3{width:38%;height:48%;filter:blur(2.6px);opacity:.92;background:radial-gradient(54% 66% at 50% 100%,#FFF3C4 0%,#FFC93C 44%,transparent 78%);animation-duration:.78s;animation-delay:-.7s}" +
+    "@keyframes wdsmBurn{0%{transform:translateX(-50%) scale(1,1) skewX(0deg)}22%{transform:translateX(-50%) scale(1.07,1.2) skewX(-4deg)}46%{transform:translateX(-50%) scale(.93,1.34) skewX(3deg)}68%{transform:translateX(-50%) scale(1.09,1.14) skewX(-2deg)}100%{transform:translateX(-50%) scale(1,1.04) skewX(1deg)}}" +
     ".wdsm-psp{position:absolute;bottom:16%;width:2px;height:2px;border-radius:50%;opacity:0;animation-name:wdsmRise;animation-timing-function:linear;animation-iteration-count:infinite}" +
-    "@keyframes wdsmRise{0%{opacity:0;transform:translateY(0) scale(.5)}18%{opacity:1}100%{opacity:0;transform:translateY(-22px) scale(.15)}}" +
+    "@keyframes wdsmRise{0%{opacity:0;transform:translateY(0) scale(.5)}18%{opacity:1}100%{opacity:0;transform:translateY(-50px) scale(.12)}}" +
     ".wdsm-mp{background:var(--wfill);border:1px solid var(--wline);color:var(--wtx);font:600 13px/1 inherit;padding:8px 12px;border-radius:10px;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:7px}" +
     ".wdsm-mp:hover{border-color:var(--wline2);color:var(--wgold)}" +
     ".wdsm-mp .mpk{font-weight:400;color:var(--wdim);font-size:12px}" +
@@ -1584,11 +1587,11 @@
     // 四周烧着——它指的就是那张烧着的入口图
     var pf = el("span", "wdsm-pfire");
     pf.setAttribute("aria-hidden", "true");
-    pf.appendChild(el("b"));
+    ["f1", "f2", "f3"].forEach(function (fc) { pf.appendChild(el("b", fc)); });
     var HOT = ["#FF6E00", "#FFBE3C", "#FF8A3C", "#D4B25E"];
-    for (var i = 0; i < 6; i++) {
+    for (var i = 0; i < 12; i++) {
       var sp = el("s", "wdsm-psp");
-      sp.style.left = (18 + i * 12) + "%";
+      sp.style.left = (12 + (i * 6.6) % 76) + "%";
       sp.style.background = HOT[i % HOT.length];
       sp.style.animationDuration = (1.6 + (i % 4) * 0.34) + "s";
       sp.style.animationDelay = (i * 0.27) + "s";

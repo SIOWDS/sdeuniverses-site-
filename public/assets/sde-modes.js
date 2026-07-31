@@ -34,12 +34,14 @@
     var fire = document.createElement("span");
     fire.className = "sdemx-fire";
     fire.setAttribute("aria-hidden", "true");
-    fire.appendChild(document.createElement("b"));
+    ["f1", "f2", "f3"].forEach(function (fc) {
+      var t = document.createElement("b"); t.className = fc; fire.appendChild(t);
+    });
     var HOT = ["#FF6E00", "#FFBE3C", "#FF8A3C", "#E0B65C"];
-    for (var i2 = 0; i2 < 6; i2++) {
+    for (var i2 = 0; i2 < 12; i2++) {
       var sp = document.createElement("s");
       sp.className = "sdemx-sp";
-      sp.style.left = (18 + i2 * 12) + "%";
+      sp.style.left = (12 + (i2 * 6.6) % 76) + "%";
       sp.style.background = HOT[i2 % HOT.length];
       sp.style.animationDuration = (1.6 + (i2 % 4) * 0.34) + "s";
       sp.style.animationDelay = (i2 * 0.27) + "s";
@@ -92,11 +94,14 @@
        不给按钮做一个层叠上下文，火层那个 z-index:-1 会掉到页面背景后面、整团看不见。 */
     ".sdemx-home{position:relative;isolation:isolate}" +
     ".sdemx-home i{font-style:normal;position:relative;z-index:1}" +
-    ".sdemx-fire{position:absolute;left:50%;top:50%;width:46px;height:46px;transform:translate(-50%,-50%);pointer-events:none;z-index:-1}" +
-    ".sdemx-fire b{position:absolute;left:50%;bottom:4%;width:76%;height:68%;transform:translateX(-50%);border-radius:50%;background:radial-gradient(60% 80% at 32% 100%,rgba(255,110,0,.55),transparent 64%),radial-gradient(55% 80% at 66% 100%,rgba(255,190,60,.5),transparent 64%);filter:blur(4px);animation:sdemxFlick 1.7s ease-in-out infinite}" +
-    "@keyframes sdemxFlick{0%,100%{opacity:.6;transform:translateX(-50%) scaleY(1)}50%{opacity:1;transform:translateX(-50%) scaleY(1.18)}}" +
+    ".sdemx-fire{position:absolute;left:50%;top:54%;width:92px;height:92px;transform:translate(-50%,-50%);pointer-events:none;z-index:-1}" +
+".sdemx-fire b{position:absolute;left:50%;bottom:0;transform-origin:50% 100%;border-radius:50% 50% 46% 46% / 68% 68% 32% 32%;animation-name:sdemxBurn;animation-timing-function:ease-in-out;animation-iteration-count:infinite}" +
+    ".sdemx-fire .f1{width:96%;height:88%;filter:blur(9px);opacity:.55;background:radial-gradient(50% 62% at 50% 100%,#FF3D00 0%,rgba(255,61,0,.5) 46%,transparent 74%);animation-duration:1.35s}" +
+    ".sdemx-fire .f2{width:66%;height:70%;filter:blur(5px);opacity:.8;background:radial-gradient(52% 64% at 50% 100%,#FF9A1F 0%,rgba(255,140,20,.6) 48%,transparent 76%);animation-duration:1.02s;animation-delay:-.4s}" +
+    ".sdemx-fire .f3{width:38%;height:48%;filter:blur(2.6px);opacity:.92;background:radial-gradient(54% 66% at 50% 100%,#FFF3C4 0%,#FFC93C 44%,transparent 78%);animation-duration:.78s;animation-delay:-.7s}" +
+    "@keyframes sdemxBurn{0%{transform:translateX(-50%) scale(1,1) skewX(0deg)}22%{transform:translateX(-50%) scale(1.07,1.2) skewX(-4deg)}46%{transform:translateX(-50%) scale(.93,1.34) skewX(3deg)}68%{transform:translateX(-50%) scale(1.09,1.14) skewX(-2deg)}100%{transform:translateX(-50%) scale(1,1.04) skewX(1deg)}}" +
     ".sdemx-sp{position:absolute;bottom:16%;width:2px;height:2px;border-radius:50%;opacity:0;animation-name:sdemxRise;animation-timing-function:linear;animation-iteration-count:infinite}" +
-    "@keyframes sdemxRise{0%{opacity:0;transform:translateY(0) scale(.5)}18%{opacity:1}100%{opacity:0;transform:translateY(-24px) scale(.15)}}" +
+    "@keyframes sdemxRise{0%{opacity:0;transform:translateY(0) scale(.5)}18%{opacity:1}100%{opacity:0;transform:translateY(-54px) scale(.12)}}" +
     ".sdemx .sdemx-home{margin-left:3px;border-left:1px solid rgba(212,178,94,.28);border-radius:0 999px 999px 0}" +
     /* 兜底浮动：只有页面里找不到任何合适落点时才用。
      * 这一条落在两千多个来路不明的页面上，宿主的 CSS 什么都可能写，所以尺寸必须自己钉死：
