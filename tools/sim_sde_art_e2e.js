@@ -794,6 +794,45 @@ async function drive(w, mode, opts) {
       chats.every((c) => c.body.max_completion_tokens === 524288));
   }
 
+  /* ═════ 十二之三、错误码翻译（第四次真跑撞 402 之后加的） ═════ */
+  group("十二之三、错误码翻译");
+  const errCase = async (status, body, want, notWant) => {
+    const { w } = await boot(async function (rec) {
+      if (/sde-art\/\?_v=/.test(rec.url)) return { text: "var VERSION = 8;" };
+      if (/sde-neigong\.txt$/.test(rec.url)) return { text: "桩" };
+      if (/kb\/principles$/.test(rec.url)) return { json: { ok: true, principles: [] } };
+      return { ok: false, status, text: body };
+    });
+    await drive(w, "A", {});
+    return w.document.getElementById("err").textContent;
+  };
+  {
+    const e = await errCase(402, '{"type":"error","error":{"type":"insufficient_balance_error","message":"insufficient balance (1008)","http_code":"402"}}');
+    ok("402/1008 判成余额不足，并明说不是 Key 的问题", /余额不足/.test(e) && /不是 Key 的问题/.test(e), e.slice(0, 80));
+    ok("给出充值去处", /platform\.minimaxi\.com/.test(e));
+    ok("并给一条省钱的下一步（关顶配可省 1.5 倍）", /1\.5 倍/.test(e));
+    ok("原始返回仍附在后面（排障要用，但不再是第一眼看到的东西）",
+      /原始返回：HTTP 402/.test(e) && e.indexOf("余额不足") < e.indexOf("原始返回"));
+  }
+  {
+    const e = await errCase(401, '{"base_resp":{"status_code":1004,"status_msg":"invalid api key"}}');
+    ok("401/1004 才判成鉴权失败", /鉴权失败/.test(e), e.slice(0, 60));
+    ok("并提示国内站与海外站的 Key 不通用", /不通用/.test(e));
+    ok("鉴权失败不会被误判成余额问题", !/余额不足/.test(e));
+  }
+  {
+    const e = await errCase(429, '{"base_resp":{"status_code":1002,"status_msg":"rate limit"}}');
+    ok("1002 判成触发限流并给等待建议", /触发限流/.test(e) && /等一分钟/.test(e));
+  }
+  {
+    const e = await errCase(500, '{"base_resp":{"status_code":1013,"status_msg":"internal"}}');
+    ok("1013 判成上游内部错误，明说不是读者这边的问题", /不是你这边/.test(e));
+  }
+  {
+    const e = await errCase(400, '{"error":"something we have never seen"}');
+    ok("认不出的错误码原样保留，不硬套一个解释", /基底 HTTP 400/.test(e) && !/余额不足|鉴权失败/.test(e));
+  }
+
   /* ═════ 十一、核心函数一个都不许少（大段替换吞掉邻居，已发生过一次） ═════ */
   group("十一、核心函数在场");
   {

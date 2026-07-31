@@ -189,7 +189,7 @@ footer{border-top:1px solid var(--line);color:var(--dim);font-size:13px;padding:
 var PROXY = "/api/llm-proxy";
 var MODEL = "MiniMax-M3";           // 思考与看图（M2.x 看不了图，必须 M3）
 var IMGMODEL = "image-01";
-var VERSION = 7;
+var VERSION = 8;
 /* ── MiniMax-M3 官方 spec（platform.minimaxi.com/docs/api-reference/text-chat-openai，2026-07-31 核对）──
    · max_tokens **已弃用**，官方明令改用 max_completion_tokens。我先前一直在给一个弃用字段设上限，
      等于没设——第二次真跑「预算 8000／思考 33630 字」就是这么打穿的。
@@ -473,6 +473,28 @@ function stripThink(s){
   if(open >= 0){ thought += t.slice(open); t = t.slice(0, open); }
   return { text: t.trim(), think: thought };
 }
+/* MiniMax 官方错误码 → 人话 ＋ 可执行的下一步。
+   （错误码表见 platform.minimaxi.com 的「错误码查询列表」，2026-07-31 核对）
+   为什么要做这张表：真跑第四次撞上的是 HTTP 402 / insufficient_balance_error / 1008，
+   页面把整串 JSON 原样甩出来，读者第一反应是「Key 不对？」——**其实 Key 是通的，是余额没了**。
+   报错不解释，读者就只能猜；猜错了就去改根本没坏的那一样东西。 */
+var MM_ERRS = [
+  [/1008|insufficient_balance/i, 402, "账户余额不足（错误码 1008）——**不是 Key 的问题，Key 是通的**。到 platform.minimaxi.com 账户中心充值即可。若想省着用：把「顶配」开关关掉可省下优先准入的 1.5 倍，出图本身很便宜（0.025 元/张），钱主要花在文本上。"],
+  [/1004|invalid_api_key|unauthorized/i, 401, "鉴权失败（错误码 1004）——这才是 Key 的问题：检查有没有多余空格、是不是复制全了、以及国内站与海外站选错（api.minimaxi.com ↔ api.minimax.io 的 Key 不通用）。"],
+  [/1002|rate.?limit/i, 429, "触发限流（错误码 1002）——请求太密。等一分钟再跑；或打开「顶配」走优先准入，官方口径是能减少这类失败。"],
+  [/1039/i, 0, "Token 超出限制（错误码 1039）——上限或输入太大。产线会自动降档重试；若反复出现，把入题截短一些。"],
+  [/1013|internal/i, 0, "服务内部错误（错误码 1013）——上游的问题，不是你这边。稍等重试即可。"],
+  [/1027/i, 0, "输出内容错误（错误码 1027）——上游判定产出不合规。换个说法重跑，或改一下入题里的措辞。"],
+  [/2013|invalid.?param/i, 0, "参数错误（错误码 2013）——请求体有字段不被接受。这是本页的问题，请把这条报错发给维护者。"],
+  [/1001|timeout/i, 0, "请求超时（错误码 1001）——上游没在时限内回话。重试一次通常就好。"]
+];
+function mmExplain(status, text){
+  for(var i=0;i<MM_ERRS.length;i++){
+    var e = MM_ERRS[i];
+    if(e[0].test(text) || (e[1] && e[1] === status)) return e[2];
+  }
+  return "";
+}
 var MM_SPLIT = true;   // reasoning_split 是否可用；一旦被上游拒绝就整场关掉，不再重试
 /* 对外的 mmChat：空产出且看得出是被上限截断时，**自动加码重试一次**。
    预算是天花板不是花费——上限给高了不多花一分钱（按实际用量计费），给低了却必然截断。
@@ -546,7 +568,11 @@ async function mmChatOnce(sys, user, maxTok, imgs, noThink){
     say("上限 "+TOK_LADDER[TOK_LEVEL-1]+" 被这条路由挡回，降到 "+tokNow()+" 重发…");
     res = await once(MM_SPLIT);
   }
-  if(!res.r.ok) throw new Error("基底 HTTP "+res.r.status+"："+res.t.slice(0,220));
+  if(!res.r.ok){
+    var why = mmExplain(res.r.status, res.t);
+    throw new Error(why ? (why + "\n\n（原始返回：HTTP "+res.r.status+" "+res.t.slice(0,180)+"）")
+                        : ("基底 HTTP "+res.r.status+"："+res.t.slice(0,220)));
+  }
   var j; try{ j = JSON.parse(res.t); }catch(e){ throw new Error("基底返回不是 JSON："+res.t.slice(0,220)); }
   var ch = j && j.choices && j.choices[0];
   var msg = ch && ch.message;
@@ -603,7 +629,11 @@ async function mmDraw(prompt, ratio, n){
     body: JSON.stringify(body)
   });
   var t = await r.text();
-  if(!r.ok) throw new Error("出图 HTTP "+r.status+"："+t.slice(0,220));
+  if(!r.ok){
+    var whyImg = mmExplain(r.status, t);
+    throw new Error(whyImg ? (whyImg + "\n\n（原始返回：HTTP "+r.status+" "+t.slice(0,180)+"）")
+                           : ("出图 HTTP "+r.status+"："+t.slice(0,220)));
+  }
   var j; try{ j = JSON.parse(t); }catch(e){ throw new Error("出图返回不是 JSON："+t.slice(0,220)); }
   var arr = (j && j.data && j.data.image_base64) || [];
   if(!arr.length) throw new Error("出图没有返回图片："+t.slice(0,220));
