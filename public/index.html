@@ -36,10 +36,10 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;flex-direction:
 .nav-bar-sub{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:0.55rem 1.5rem;width:100%;margin-top:0.6rem;padding-top:0.7rem;border-top:1px solid var(--border2)}
 .nav-bar-sub a{color:var(--text2);text-decoration:none;font-size:0.9rem;font-weight:600;letter-spacing:0.14em;transition:color 0.2s}
 .nav-bar-sub a:hover{text-decoration:underline;text-underline-offset:4px;opacity:0.78}
-.nav-logo{display:inline-flex;flex-direction:column;justify-content:center;line-height:1.1;color:var(--gold);text-decoration:none;white-space:nowrap}
+.nav-logo{display:inline-flex;flex-direction:column;align-items:stretch;justify-content:center;line-height:1.12;color:var(--gold);text-decoration:none}
 .nav-logo .nl-en{font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:700;letter-spacing:0.05em}
-.nav-logo .nl-cn{font-family:"Noto Serif SC",Georgia,serif;font-size:0.8rem;font-weight:700;letter-spacing:0.32em;text-indent:0.32em;opacity:.93}
-@media(max-width:520px){.nav-logo .nl-en{font-size:1rem}.nav-logo .nl-cn{font-size:0.72rem;letter-spacing:0.24em;text-indent:0.24em}}
+.nav-logo .nl-cn{font-family:"Noto Serif SC",Georgia,serif;font-size:0.84rem;font-weight:700;opacity:.95;text-align:justify;text-align-last:justify;-moz-text-align-last:justify;letter-spacing:0;text-indent:0}
+@media(max-width:520px){.nav-logo .nl-en{font-size:1rem}.nav-logo .nl-cn{font-size:0.75rem}}
 .nav-links{display:flex;align-items:center;gap:1.5rem}
 .nav-links a{color:var(--text2);text-decoration:none;font-size:0.85rem;letter-spacing:0.08em;transition:color 0.2s}
 .nav-links a:hover{color:var(--gold)}
@@ -112,7 +112,9 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;flex-direction:
 .hero-eyebrow{font-size:0.72rem;letter-spacing:0.3em;color:var(--gold);text-transform:uppercase;margin-bottom:1.5rem;font-weight:600;z-index:1;position:relative}
 .hero-title{font-family:'Playfair Display',serif;font-size:clamp(3rem,8vw,7rem);font-weight:700;line-height:1.05;color:var(--text);margin-bottom:0.5rem;z-index:1;position:relative}
 .hero-title span{color:var(--gold)}
-.hero-cn{font-family:"Noto Serif SC",Georgia,serif;font-size:clamp(1.35rem,3.4vw,2.35rem);font-weight:700;letter-spacing:0.44em;text-indent:0.44em;color:var(--gold);margin:-0.15rem 0 0.9rem;z-index:1;position:relative;opacity:.95;white-space:nowrap}
+.hero-word{display:flex;flex-direction:column;align-items:stretch;z-index:1;position:relative}
+.hero-word .hero-title{margin-bottom:0.1rem}
+.hero-cn{font-family:"Noto Serif SC",Georgia,serif;font-size:clamp(1.6rem,4.1vw,3rem);font-weight:700;color:var(--gold);margin:0 0 0.9rem;opacity:.95;text-align:justify;text-align-last:justify;-moz-text-align-last:justify;letter-spacing:0;text-indent:0}
 .hero-subtitle{font-size:clamp(1.15rem,2.4vw,1.7rem);color:var(--text);margin:1.5rem 0 2.5rem;font-weight:400;z-index:1;position:relative;max-width:680px}
 .hero-subtitle em{color:var(--gold);font-style:normal;font-weight:600}
 .hero-ctas{display:flex;gap:1rem;flex-wrap:wrap;justify-content:center;margin-bottom:3rem;z-index:1;position:relative}
@@ -250,7 +252,10 @@ section.panel{padding:5rem 2rem}
 /* ── FOOTER ── */
 footer{background:var(--bg);border-top:1px solid var(--border2);padding:3rem 2rem}
 .footer-inner{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:3rem}
-.footer-brand h4{font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--gold);font-weight:700;letter-spacing:0.05em}
+.footer-brand h4{color:var(--gold);font-weight:700}
+.fb-word{display:inline-flex;flex-direction:column;align-items:stretch;line-height:1.2}
+.fb-en{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;letter-spacing:0.05em}
+.fb-cn{font-family:"Noto Serif SC",Georgia,serif;font-size:0.84rem;font-weight:700;margin-top:3px;opacity:.95;text-align:justify;text-align-last:justify;-moz-text-align-last:justify;letter-spacing:0;text-indent:0}
 .footer-brand p{font-size:0.82rem;color:var(--text2);margin-top:0.8rem;line-height:1.7;max-width:280px}
 .footer-col h4{font-size:0.7rem;letter-spacing:0.2em;color:var(--gold);text-transform:uppercase;margin-bottom:1rem;font-weight:600}
 .footer-col ul{list-style:none}
@@ -525,8 +530,10 @@ body.zh .en-only{display:none}
   <div class="hero-grid"></div>
   <div class="hero-eyebrow zh-only">SDE 智能体集群 · 10 大行业 · 1 个母体引擎</div>
   <div class="hero-eyebrow en-only">SDE AGENT CLUSTER · 10 INDUSTRIES · 1 META-ENGINE</div>
-  <h1 class="hero-title">SDE <span>Universes</span></h1>
-  <div class="hero-cn">爱思乐园</div>
+  <div class="hero-word">
+    <h1 class="hero-title">SDE <span>Universes</span></h1>
+    <div class="hero-cn">爱思乐园</div>
+  </div>
   <p class="hero-subtitle zh-only">选择你的行业，进入你的 <em>SDE 智能体</em><br>每一个都由 <em>SDE 发生学</em> 锻造，由 55+ 部专著背书</p>
   <p class="hero-subtitle en-only">Choose your industry, meet your <em>SDE agent</em><br>All forged by <em>SDE Generativics</em>, backed by 55+ monographs</p>
   <div class="hero-ctas">
@@ -3052,7 +3059,7 @@ body.zh .en-only{display:none}
 <footer>
 <div class="footer-inner">
   <div class="footer-brand">
-    <h4>SDE Universes<span style="display:block;font-family:'Noto Serif SC',Georgia,serif;font-size:0.86rem;letter-spacing:0.3em;text-indent:0.3em;margin-top:3px;white-space:nowrap">爱思乐园</span></h4>
+    <h4><span class="fb-word"><span class="fb-en">SDE Universes</span><span class="fb-cn">爱思乐园</span></span></h4>
     <p class="zh-only">SDE 智能体集群。SDE 发生学锻造引擎驱动，理论背书，由王德生创立，Demai International 运营，新加坡为基地，面向全球。</p>
     <p class="en-only">The SDE agent cluster, powered by the SDE Generativics forging engine, theory-backed. Founded by Wang Desheng, operated by Demai International, based in Singapore.</p>
   </div>
