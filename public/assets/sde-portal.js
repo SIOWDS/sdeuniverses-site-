@@ -223,14 +223,17 @@
     // 波形 f(t) = A · sin(πt) · sin(2πn·t)：
     //   · sin(2πn·t) 是正弦本体，n 取整数保证两端都恰好归零 —— 曲线精确穿过每个顶点；
     //   · sin(πt) 是包络，让波在边的中段鼓起、到顶点自然收平。没有它，顶点处会留下折角。
-    var WAVE_N = 2;        // 每条边几个整周期
-    var WAVE_A = 5.5;      // 波幅（viewBox 纵向单位）
+    var WAVE_N = 20;       // 每条边几个整周期
+    // 波幅要跟着周期数走：20 个周期时波长只有边长的 1/20，还用大波幅就成了一排尖齿。
+    // 取波长的三成左右，密而不刺，两端的圆才像被一条紧密的波绳串着。
+    var WAVE_A = 2.2;      // 波幅（viewBox 纵向单位）
     // viewBox 是 100×100，但 preserveAspectRatio="none" 把它拉成了舞台的 720×440，
     // 横竖缩放比不同。若直接按 viewBox 里的垂线偏移，斜边的波会比底边明显胖一圈。
     // 下面按舞台的设计宽高比把横向分量折算回去，三条边的波幅在眼睛里才是一样的。
     var AR = 720 / 440;
     function waveRing(nodes) {
-      var d = "", SEG = 96;
+      // 采样密度必须跟着周期数走：每个周期至少十几个点，否则正弦会被采成锯齿
+      var d = "", SEG = WAVE_N * 18, len = 0, px = 0, py = 0;
       var r = function (v) { return Math.round(v * 100) / 100; };
       nodes.forEach(function (a, i) {
         var b = nodes[(i + 1) % nodes.length];
@@ -242,27 +245,26 @@
           var t = s / SEG;
           var off = WAVE_A * Math.sin(Math.PI * t) * Math.sin(2 * Math.PI * WAVE_N * t);
           var x = a.x + dx * t + ux * off, y = a.y + dy * t + uy * off;
+          if (d) len += Math.sqrt((x - px) * (x - px) + (y - py) * (y - py));
+          px = x; py = y;
           d += (d ? " L" : "M") + r(x) + "," + r(y);
         }
       });
-      return d + " Z";
+      // 长度就地由折线累加得出——点是自己采的，没必要再回头猜一个倍数
+      return { d: d + " Z", len: len };
     }
     // 顶点仍旧只有 NODES 一处；这里只是让波绕着它们走一圈
+    var ring0 = waveRing(NODES);
     var ring = S("path", {
       class: "sdep-tri",
-      d: waveRing(NODES),
+      d: ring0.d,
       fill: "none",
       "vector-effect": "non-scaling-stroke",
     });
     // 一笔画完：整圈是一条路径，描线长度也按整圈算
     var len = 0;
     try { len = ring.getTotalLength(); } catch (e) {}
-    if (!len || !isFinite(len)) {
-      NODES.forEach(function (a, i) {
-        var b = NODES[(i + 1) % NODES.length];
-        len += Math.sqrt(Math.pow(b.x - a.x, 2) + Math.pow(b.y - a.y, 2)) * 1.6;   // 波比直线长
-      });
-    }
+    if (!len || !isFinite(len)) len = ring0.len;      // 取不到就用采样时累加的那个数，同样是实测
     ring.style.setProperty("--L", Math.ceil(len));
     svg.appendChild(ring);
     stage.appendChild(svg);
