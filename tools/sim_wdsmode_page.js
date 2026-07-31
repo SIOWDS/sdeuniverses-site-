@@ -104,7 +104,11 @@ const tabs3 = layer3.children.filter(c=>(c.className||'').includes('wdsm-tab')&&
 const normal3 = tabs3.find(t=>t.dataset.m==='normal');
 // 桩里没有站点语言标记，t() 会落到英文档——断言按两种语言都认（设计后来加了中英双语）
 T('第一档是「浏览」（三态：浏览 / SDE 微信 / SDE 对话）', normal3 && /浏览|Browse/.test(normal3.textContent));
-T('独立页侧栏有三档，实得 '+tabs3.length, tabs3.length===3);
+// 按 data-m 数，别按 .wdsm-tab 数：回入口的 △ 借了同一套样式但不是一态，
+// 数总数的断言在加一颗按钮时必然误报（这次就误报了）
+const modes3 = tabs3.filter(t=>t.dataset && t.dataset.m);
+T('独立页侧栏三态齐（浏览/微信/对话），实得 '+modes3.length, modes3.length===3);
+T('侧栏还有一颗回入口页的 △（它不带 data-m，所以不算一态）', tabs3.some(t=>(t.className||'').includes('wdsm-portal')));
 T('中间那档是 SDE 微信', tabs3.some(t=>t.dataset.m==='im'));
 normal3.onclick && normal3.onclick();
 T('返回浏览=history.back', e3.navigated==='BACK');

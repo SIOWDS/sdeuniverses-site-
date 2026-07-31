@@ -24,6 +24,17 @@
     { k: "wds", href: "/taste/wds-chat/", icon: "\u2726", zh: "SDE \u5bf9\u8bdd", en: "Dialogue", zhT: "\u95ee WDS\uff1a\u5168\u7ad9\u95ee\u7b54\u4e0e SDE \u5bf9\u8c08", enT: "Ask WDS about anything on the site" },
   ];
 
+  // 回到入口页。地址只在这里定义一次，wds-mode.js 用的是同一串。
+  var PORTAL = "/?portal=1";
+  function homeBtn() {
+    var a = document.createElement("a");
+    a.className = "sdemx-home";
+    a.href = PORTAL;
+    a.textContent = "\u25b3";                                   // 三角＝入口页那张图，认得出
+    a.title = lang() === "en" ? "Back to the entry page" : "\u56de\u5230\u5165\u53e3\u9875";
+    a.setAttribute("aria-label", a.title);
+    return a;
+  }
   function curKey() {
     var p = String(location.pathname || "/");
     for (var i = 0; i < SDE_MODES.length; i++) {
@@ -57,6 +68,10 @@
     ".sdemx-pill{border:1px solid var(--gold,#D4B25E);border-radius:16px;padding:3px 13px;" +
     "color:var(--gold,#8C6A3A);font-weight:700;text-decoration:none;white-space:nowrap}" +
     ".sdemx-pill:hover{background:var(--gold,#D4B25E);color:#0F0B07}" +
+    /* △ 不是第四态，是回门口：比三档小半号，条内用一道细线隔开 */
+    ".sdemx-home{display:inline-flex;align-items:center;justify-content:center;min-width:26px;padding:4px 7px;border-radius:999px;text-decoration:none;color:var(--gold,#8C6A3A);font:600 12px/1 inherit;opacity:.75}" +
+    ".sdemx-home:hover{opacity:1;background:rgba(212,178,94,.18)}" +
+    ".sdemx .sdemx-home{margin-left:3px;border-left:1px solid rgba(212,178,94,.28);border-radius:0 999px 999px 0}" +
     /* 兜底浮动：只有页面里找不到任何合适落点时才用。
      * 这一条落在两千多个来路不明的页面上，宿主的 CSS 什么都可能写，所以尺寸必须自己钉死：
      * 金点子发生器上它曾被撑成 391×860，border-radius:999px 于是画出一颗贯穿整屏的胶囊。
@@ -92,6 +107,7 @@
       a.appendChild(s);
       box.appendChild(a);
     });
+    box.appendChild(homeBtn());
     return box;
   }
 
@@ -122,9 +138,10 @@
     var en = mk("en-only", "\ud83d\udcac Messenger");
     var all = nav.querySelectorAll(".wdsm-navbtn");
     var anchor = all.length ? all[all.length - 1] : null;    // 紧跟问WDS；它不在就落到末尾
-    if (anchor && anchor.nextSibling) { nav.insertBefore(zh, anchor.nextSibling); nav.insertBefore(en, zh.nextSibling); }
-    else if (anchor) { nav.appendChild(zh); nav.appendChild(en); }
-    else { nav.appendChild(zh); nav.appendChild(en); }
+    var hm = homeBtn();
+    if (anchor && anchor.nextSibling) {
+      nav.insertBefore(zh, anchor.nextSibling); nav.insertBefore(en, zh.nextSibling); nav.insertBefore(hm, en.nextSibling);
+    } else { nav.appendChild(zh); nav.appendChild(en); nav.appendChild(hm); }
   }
   function mount() {
     if (document.querySelector(".sdemx") || document.querySelector(".sdemx-pill")) return;
@@ -140,7 +157,7 @@
     if (h) h.appendChild(box); else document.body.appendChild(box);
   }
 
-  window.SDEModes = { list: SDE_MODES, current: curKey, build: build, mount: mount };
+  window.SDEModes = { list: SDE_MODES, portal: PORTAL, current: curKey, build: build, mount: mount };
 
   // 问WDS 是全屏层，切换器画在它自己的侧栏里（同一张表），这里不重复挂
   if (window.WDSM_PAGE) return;

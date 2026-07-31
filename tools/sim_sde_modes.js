@@ -80,6 +80,10 @@ console.log("① 浏览态：顶栏紧跟「问WDS」插一颗「SDE 微信」")
   ok(!!nav.querySelector(".wdsm-navbtn"), "「问WDS」原样留着（不是被取代，是并排）");
   ok(!nav.querySelector(".sdemx"), "浏览态不画三段条——人就在浏览态，顶栏要的是通往另外两态的门");
   ok(!!env.head.querySelector("style"), "样式自带，不依赖页面");
+  const home = nav.querySelector(".sdemx-home");
+  ok(!!home && home.href === "/?portal=1", "顶栏有一颗回入口页的 △，实得 " + (home && home.href));
+  ok(!!home && nav.children.indexOf(home) === nav.children.indexOf(pills[1]) + 1, "△ 排在两颗药丸之后");
+  ok(home.textContent === "△", "△ 是图形按钮，不分中英，一颗即可");
 }
 
 console.log("② 当前态按路径判定");
@@ -89,6 +93,8 @@ console.log("② 当前态按路径判定");
   ok(M1.current() === "im", "在 /sde-wechat/ 判为 SDE 微信，实得 " + M1.current());
   const box = e1.body.querySelector(".sdemx");
   ok(box.querySelectorAll("a")[1].className === "on", "高亮的是第二档");
+  ok(box.querySelectorAll("a").length === 4 && box.querySelector(".sdemx-home"),
+    "三段条尾也有回入口的 △（三态＋一个回门口，不是四态），实得 " + box.querySelectorAll("a").length + " 个");
   ok(box.parentNode.className === "top", "微信页没有 .nav-links，就近挂到 .top 顶栏");
 }
 {
@@ -131,6 +137,10 @@ console.log("④ 跨文件一致：问WDS 侧栏三档 vs 本模块 SDE_MODES");
   ok(/data-m='im'/.test(WM), "侧栏有 SDE 微信那一档");
   ok(/tabBrowse:/.test(WM) && /tabIm:/.test(WM), "三档都有文案（不许再出现没名字的按钮）");
   ok(/sc\.onerror = injectNav/.test(WM), "三态模块拉不到时退回老的单按钮注入（宁可少一个入口，不能一个都没有）");
+  const pm = (SRC.match(/var PORTAL = "([^"]+)"/) || [])[1];
+  const pw = (WM.match(/var PORTAL_URL = "([^"]+)"/) || [])[1];
+  ok(pm && pm === pw, "回入口页的地址两处同一串（模块 " + pm + " ｜ 问WDS " + pw + "）");
+  ok(/wdsm-portal/.test(WM), "问WDS 侧栏也有回入口的 △");
 }
 
 console.log("⑤ 微信页确实引了模块");

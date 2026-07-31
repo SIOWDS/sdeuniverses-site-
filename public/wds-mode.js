@@ -948,7 +948,7 @@
       "<div class='wdsm-schwrap'><input class='wdsm-sch' type='text'></div>" +
       "<div class='wdsm-list'></div>" +
       "<div class='wdsm-sbot'>" +
-        "<div class='wdsm-tabs'><button class='wdsm-tab' data-m='normal'></button><button class='wdsm-tab' data-m='im'></button><button class='wdsm-tab sel' data-m='wds'></button></div>" +
+        "<div class='wdsm-tabs'><button class='wdsm-tab' data-m='normal'></button><button class='wdsm-tab' data-m='im'></button><button class='wdsm-tab sel' data-m='wds'></button><button class='wdsm-tab wdsm-portal' title='\u56de\u5230\u5165\u53e3\u9875'>\u25b3</button></div>" +
         "<button class='wdsm-sb' data-a='theme'></button>" +
         "<button class='wdsm-sb' data-a='style'></button>" +
         "<button class='wdsm-sb' data-a='preset'></button>" +
@@ -1568,6 +1568,11 @@
 
   // 三态互切：目的地与 /assets/sde-modes.js 的 SDE_MODES 是同一套（模拟有跨文件断言钉住）
   var TAB_GO = { normal: "/", im: "/sde-wechat/", wds: "/taste/wds-chat/" };
+  var PORTAL_URL = "/?portal=1";                              // 与 sde-modes.js 的 PORTAL 同一串
+  (function () {
+    var pb = layer.querySelector(".wdsm-portal");
+    if (pb) pb.onclick = function () { window.location.href = PORTAL_URL; };
+  })();
   layer.querySelectorAll(".wdsm-tab").forEach(function (tb) {
     tb.onclick = function () {
       var m = tb.dataset.m;
