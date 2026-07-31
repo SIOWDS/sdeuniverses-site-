@@ -6130,7 +6130,14 @@ export default {
             out.push({ t: s, s: src ? src.t : "", u: src ? src.u : "", v: (src && src.vt) ? 1 : 0 });
             if (out.length >= 5) break;   // 五条：一篇一条
           }
-          if (!out.length) return Response.json({ ok: false, msg: "这次没生出来，换个口味或者过一会儿再点。" }, { status: 502 });
+          if (!out.length) {
+            // 一条都没洗出来时，**管理员**能看见基底到底回了什么（型号不存在、额度尽、格式不对……），
+            // 否则只能对着一句"没生出来"盲猜；学员仍只看到人话。
+            const dbg = isAdminName(who.name)
+              ? "（" + VC.model + "）" + String(raw || "（空回应）").replace(/\s+/g, " ").slice(0, 220)
+              : "";
+            return Response.json({ ok: false, msg: "这次没生出来，换个口味或者过一会儿再点。" + dbg }, { status: 502 });
+          }
           return Response.json({ ok: true, lines: out, saw: canSee ? imgs.length : 0, blind: (imgs.length && !canSee) ? 1 : 0, read: srcs.filter((x) => !x.vt).length, vault: srcs.filter((x) => x.vt).length }, { headers: { "cache-control": "no-store" } });
         }
         const MOMAP = { like: "molike", cmt: "mocmt", cdel: "mocdel", del: "model", news: "monews", badge: "mobadge" };
