@@ -85,6 +85,7 @@ footer{border-top:1px solid rgba(255,255,255,0.08);margin-top:44px;padding:22px 
 </style>
 <script src="/taste/assets/sde-rag.js?v=4"></script>
 <script src="/taste/assets/sde-nbr-gate.js?v=1"></script>
+  <script src="/taste/assets/sde-vault.js?v=1"></script>
 </head>
 <body>
 
@@ -2435,6 +2436,25 @@ function finalizePaper(key, text){
   blk.dlDocx.disabled=false; blk.dlMd.disabled=false;
   blk.dlDocx.onclick = ()=>{ saveDocx(fname+'.docx', firstLine(text)||fname, text, docMeta()).catch(e=>showErr('导出失败:'+e.message)); };
   blk.dlMd.onclick = ()=>{ saveText(fname+'.md', text); };
+  /* 四篇的核心观点自动进思想库存。这里是四篇**唯一的收口**（A/B/C 三台各一篇＋碰撞典范一篇），
+     所以挂一处就覆盖四篇；装配出来的「研论」是把前四篇装配成书，不是新观点，**不入库**。
+     碰撞典范取「一句话点题」（lead），三台论文取标题行（head）——两种产出的开头形态不同。 */
+  try{
+    if(window.SDEVault && key!=='研论'){
+      const _t = (key==='典范') ? window.SDEVault.lead(text,200) : window.SDEVault.head(text,200);
+      if(_t){
+        let _vb = document.getElementById('vaultNote_'+key);
+        if(!_vb){
+          _vb = document.createElement('div');
+          _vb.id = 'vaultNote_'+key;
+          _vb.style.cssText = 'font-size:0.8rem;line-height:1.7;margin:8px 0 0;opacity:.85';
+          if(blk.meta && blk.meta.parentNode) blk.meta.parentNode.appendChild(_vb);
+        }
+        window.SDEVault.auto([{ kind: (key==='典范'?'claim':'name'), text:_t }],
+          '中华智问 · ' + fname, _vb);
+      }
+    }
+  }catch(e){}
 }
 function firstLine(t){ const m=(t||'').split('\n').map(s=>s.trim()).filter(Boolean); return m.length? m[0].replace(/^#+\s*/,'').slice(0,60):''; }
 function docMeta(){ return 'sdeuniverses.com · '+new Date().toLocaleString('zh-CN'); }

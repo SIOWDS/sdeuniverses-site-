@@ -135,6 +135,7 @@ footer{border-top:1px solid var(--border);text-align:center;padding:30px 20px 44
 <script src="/taste/assets/sde-rag.js?v=4"></script>
 <script src="/taste/assets/sde-nbr-gate.js?v=1"></script>
 <script src="/taste/assets/sde-scope-gate.js?v=1"></script>
+  <script src="/taste/assets/sde-vault.js?v=1"></script>
 </head>
 <body>
 
@@ -2531,6 +2532,23 @@ async function run(){
   };
   if(window._lastResult.rows.length){
     $('downloadRow').style.display='block';
+    /* 三个金点子自动进库存。产出规格里写死了「开头用一个凝练的标题（一行，点出你的核心洞察）」，
+       所以每篇 SDE 侧的第一行标题就是那个金点子本身。左栏裸答不存——那是对照组，不是产出。 */
+    try{
+      if(window.SDEVault){
+        var _gp = window._lastResult.rows.map(function(r,i){
+          return { kind:"name", text: window.SDEVault.head(r.sde, 200) };
+        }).filter(function(x){ return x.text; });
+        var _gbox = $('vaultNoteGold');
+        if(!_gbox){
+          _gbox = document.createElement('div');
+          _gbox.id = 'vaultNoteGold';
+          _gbox.style.cssText = 'font-size:0.8rem;line-height:1.7;margin:8px 0 0;opacity:.85';
+          var _dr = $('downloadRow'); if(_dr && _dr.parentNode) _dr.parentNode.insertBefore(_gbox, _dr.nextSibling);
+        }
+        window.SDEVault.auto(_gp, "金点子 · 三视角对决", _gbox);
+      }
+    }catch(e){}
   }
   // 思考效率对比卡片
   renderEfficiency(plainStats, sdeStats);
@@ -4042,6 +4060,21 @@ if(emergeBtn){
         // 流式结束后，用轻排版重渲染
         bodyEl.innerHTML = renderEmergeText(res.text);
         window._lastEmerge = res.text;
+        /* 典范点子自动进库存。涌现产出的开头是「一句话点题：这次三个金点子最终撞出了什么」，
+           所以取的是点题那一句（lead），不是标题（head）。 */
+        try{
+          if(window.SDEVault){
+            var _ep = [{ kind:"claim", text: window.SDEVault.lead(res.text, 200) }].filter(function(x){ return x.text; });
+            var _ebox = $('vaultNoteEmerge');
+            if(!_ebox){
+              _ebox = document.createElement('div');
+              _ebox.id = 'vaultNoteEmerge';
+              _ebox.style.cssText = 'font-size:0.8rem;line-height:1.7;margin:8px 0 0;opacity:.85';
+              var _er = $('emergeDlRow'); if(_er && _er.parentNode) _er.parentNode.insertBefore(_ebox, _er.nextSibling);
+            }
+            window.SDEVault.auto(_ep, "金点子 · 二阶涌现典范", _ebox);
+          }
+        }catch(e){}
         $('emergeDlRow').style.display='block';
         statusEl.textContent = '✓ 涌现完成';
       }
