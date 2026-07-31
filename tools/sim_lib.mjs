@@ -130,5 +130,24 @@ ok(!/请登录/.test(vault.replace(/\/\*[\s\S]*?\*\//g, "")), "话术不是一�
 ok(read.includes("wdsr-fav") && /SDEVault\.fav/.test(read), "陪读浮层按钮已接 fav");
 ok(!/fetch\("\/api\/im"/.test(read.slice(read.indexOf("wdsr-fav"))), "浮层不自拼 /api/im，纪律只在模块里");
 
+
+console.log("── 9. E 维度：S 的两个库进聊天现场，且 @WDS 看得见");
+const wsrc = src;
+ok(/_wdsLibContext/.test(wsrc), "后端有 _wdsLibContext");
+const lc = wsrc.slice(wsrc.indexOf("async _wdsLibContext"), wsrc.indexOf("async answerWDS"));
+ok(/op: "lbpub"/.test(lc) && /op: "vtfeed"/.test(lc), "两个库都取（文章推荐位＋思想库存）");
+ok(/_dirCall/.test(lc), "走目录 DO（库不在聊天室这个 DO 里）");
+ok(/catch \(e\) \{ return ""; \}/.test(lc), "取不到静默返空——上下文是加分项不是门禁");
+ok(/x\.sep/.test(lc), "推荐位带上推荐人写的分离线（那才是有信息的部分）");
+ok(/libCtx/.test(wsrc) && /\+ \(libCtx \|\| ""\)/.test(wsrc), "已注入 @WDS 的 user 消息");
+ok(page.includes('id="b-ins"'), "聊天输入区有 📎");
+ok(page.includes('id="inspanel"'), "用的是自建面板");
+const insSeg = page.slice(page.indexOf("function insWire"), page.indexOf("function lbWire"));
+ok(!/el\("epanel"\)\.innerHTML/.test(insSeg), "★ 不覆盖表情面板的内容（曾写错，会永久毁掉表情格子）");
+ok(/classList\.toggle\("on"\)/.test(insSeg), "按既有机制用 .on 类开关，不是 style.display");
+ok(/lbGo\("talk"/.test(insSeg) && /vtGo\("talk"/.test(insSeg), "两个库都接进聊天，且 from=talk 好让返回键回会话");
+ok(/it&&it\.text/.test(insSeg) || /it\.text/.test(insSeg), "★ vtPick 回调收到的是整条记录，取 it.text（不是字符串）");
+ok(/replace\(\/\\s\+\$\/,""\)/.test(insSeg), "插入是追加不是覆盖");
+
 console.log(`\n${P} PASS / ${F} FAIL`);
 process.exit(F ? 1 : 0);

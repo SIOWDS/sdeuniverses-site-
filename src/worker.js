@@ -1685,6 +1685,34 @@ export class CommentBox {
       return s;
     } catch (e) { return ""; }
   }
+  /* 让 @WDS 看得见「S 维度」带进微信的两样东西：文章精选库与思想库存。
+     **这不是给它加语料**——全站 840 篇它本来就能 RAG 检索到；
+     这是给它**上下文**：这个共同体此刻正盯着哪几篇、手上攒着哪几句还没成型的话。
+     差别很实在：前者是「它能查资料」，后者是「它知道我们在谈什么」，后者才让追问接得上。
+     两个库都在目录 DO 里（本 DO 是聊天室），故走 _dirCall；**失败一律静默**——
+     上下文是加分项不是门禁，取不到照样答。 */
+  async _wdsLibContext() {
+    try {
+      const [lb, vt] = await Promise.all([
+        this._dirCall({ op: "lbpub", uid: "", limit: 6 }).catch(() => null),
+        this._dirCall({ op: "vtfeed", uid: "", limit: 6, pick: 1 }).catch(() => null),
+      ]);
+      let s = "";
+      const arts = (lb && lb.items) || [];
+      if (arts.length) {
+        s += "【共同体最近推荐的站内文章·每条都附了推荐人写的「它切开了什么」】\n"
+          + arts.map((x) => "《" + String(x.title || "").slice(0, 60) + "》"
+              + (x.sep ? ("　——" + String(x.sep).slice(0, 120)) : "")
+              + (x.name ? ("（" + String(x.name).slice(0, 12) + " 推荐）") : "")).join("\n") + "\n\n";
+      }
+      const vs = (vt && vt.items) || [];
+      if (vs.length) {
+        s += "【思想库存里最近的几条·这些是人自己撞出来的，还没成文】\n"
+          + vs.map((x) => "· " + String(x.text || "").slice(0, 120)).join("\n") + "\n\n";
+      }
+      return s.length > 2200 ? s.slice(0, 2200) : s;
+    } catch (e) { return ""; }
+  }
   async answerWDS(question) {
     const now = Date.now();
     const last = (await this.ctx.storage.get("wdslast")) || 0;
@@ -1721,6 +1749,8 @@ export class CommentBox {
     try { reflect = await ensureReflect(this.env, base, rvendor, VC, key); } catch (e) {}
     // 群聊 RAG：把最近的群讨论作上下文
     const ctx = await this._wdsChatContext();
+    // S 维度带进来的两个库（见 _wdsLibContext 的注释）
+    const libCtx = await this._wdsLibContext();
     // 全站 RAG：不仅群内，从站内索引检索全站相关段落（可引用具体篇目）
     let siteCtx = "";
     try {
@@ -1749,7 +1779,7 @@ export class CommentBox {
     const _modeInstr = _mode === "sde"
       ? "\n\n════ 本次输出模式 = 纯正 SDE 语言 ════\n放开使用 SDE 本体论的完整术语：显露 S / 差异序列 D / 特征纠缠 E、三大方程 S=F(D,E)·D=G(S,E)·E=H(S,D)、六路径、意义三律、发生学、显影、中心位轮转 等，把术语讲透、用得精准，像给 SDE 学员上专业课；该用术语就用术语，不必回避。"
       : "\n\n════ 本次输出模式 = 去痕迹 ════\n用日常或该问题所属领域的母语回答，把道理讲透；输出里绝不出现『显露 / 差异 / 纠缠 / SDE / 发生学 / 三大方程 / 六路径 / 意义三律 / 中心位 / 显影』等任何 SDE 术语标签——这套框架只在你脑子里当隐性引擎，前台说人话。";
-    const usr = (siteCtx ? ("《站内资料》（从全站检索到的相关段落——可核验的书名/引文/数据/篇名以此为准；引用时标（来源：篇名）；资料里没有的别编）\n" + siteCtx + "\n") : "") + (ctx ? ("【群里最近的讨论·供你了解上下文】\n" + ctx + "\n\n") : "") + "【提问者的问题】\n" + String(q).slice(0, 1000);
+    const usr = (siteCtx ? ("《站内资料》（从全站检索到的相关段落——可核验的书名/引文/数据/篇名以此为准；引用时标（来源：篇名）；资料里没有的别编）\n" + siteCtx + "\n") : "") + (ctx ? ("【群里最近的讨论·供你了解上下文】\n" + ctx + "\n\n") : "") + (libCtx || "") + "【提问者的问题】\n" + String(q).slice(0, 1000);
     let reply = "";
     try {
       const ctrl = new AbortController();

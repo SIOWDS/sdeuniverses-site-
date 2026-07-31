@@ -281,10 +281,12 @@ a{color:var(--disc)}
         <div class="replybar" id="replybar"><span class="rtxt" id="reply-txt"></span><span class="x" id="reply-x">✕</span></div>
         <div class="panel" id="epanel"></div>
         <div class="panel at" id="atpanel"></div>
+        <div class="panel" id="inspanel"></div>
         <div class="inbar">
           <button class="ib" id="b-emoji" type="button" title="表情">😊</button>
           <button class="ib at" id="b-at" type="button" title="@ 群成员" style="display:none">@</button>
           <button class="ib w" id="b-wds" type="button" title="问 WDS 智能体">🤖</button>
+        <button class="ib" id="b-ins" type="button" title="插一篇文章 / 插一句库存">📎</button>
           <button class="ib" id="b-find" type="button" title="搜本会话">🔍</button>
           <textarea id="text" maxlength="500" placeholder="说点什么…（Enter 发送）"></textarea>
           <button class="send" id="b-send">发送</button>
@@ -764,7 +766,7 @@ function afterLogin(){
     if(x.s===401||!x.d||!x.d.ok){logout();return;}
     ME=x.d.me;contacts=x.d.contacts||[];
     el("me-nm").textContent=ME.name;el("me-uid").textContent="ID "+ME.uid;
-    show("chats");loadInbox();loadGroups();moBadge();cdWire();cdBadge();vtWire();lbWire();dtBadge();
+    show("chats");loadInbox();loadGroups();moBadge();cdWire();cdBadge();vtWire();lbWire();insWire();dtBadge();
     if(inboxT)clearInterval(inboxT);
     inboxT=setInterval(function(){loadInbox(true);moBadge();dtBadge();},15000);
   }).catch(function(){el("gsi").textContent="网络异常，请稍后重试。"});
@@ -1538,6 +1540,36 @@ function lbBind(){
     lbApi("push",{slug:it.slug,title:it.title,sub:it.sub,field:it.field,sep:sep}).then(function(d){
       if(d&&d.ok){lbMode="pub";lbLoad();}else alert((d&&d.msg)||"没推成。");});});
 }
+
+/* 📎 聊天现场插一篇／插一句 ——「S 维度」在群聊与私聊里的在场。
+   两个库此前只在「我」页与朋友圈发表页够得着，聊天里完全够不着；
+   而聊天恰恰是纠缠真正发生的地方（E 的现场）。
+   插入一律**追加**、不覆盖已经写了的字；插完回到会话。 */
+function insWire(){
+  var b=el("b-ins");if(!b)return;
+  var p=el("inspanel");
+  p.innerHTML='<div style="padding:10px 12px;font-size:0.86rem;line-height:2">'
+    +'<div style="color:var(--muted);font-size:0.76rem;margin-bottom:6px">从「浏览」那一维带进来的两个库</div>'
+    +'<a href="#" id="ins-art" style="display:block">📚 插一篇文章（站内链接）</a>'
+    +'<a href="#" id="ins-vt" style="display:block">💡 插一句思想库存</a></div>';
+  b.onclick=function(ev){ev.stopPropagation();
+    el("epanel").classList.remove("on");el("atpanel").classList.remove("on");
+    p.classList.toggle("on");};
+  document.addEventListener("click",function(ev){
+    if(p.classList.contains("on")&&ev.target!==b&&!p.contains(ev.target))p.classList.remove("on");});
+  el("ins-art").onclick=function(e){e.preventDefault();p.classList.remove("on");
+    lbGo("talk",function(it){insAppend("《"+it.title+"》 "+location.origin+lbUrl(it.slug));});};
+  /* ⚠️ vtPick 收到的是**整条记录**不是字符串（vtBind 里 vtPick(it)），取 it.text */
+  el("ins-vt").onclick=function(e){e.preventDefault();p.classList.remove("on");
+    vtGo("talk",function(it){insAppend((it&&it.text)||"");});};
+}
+function insAppend(add){
+  var t=el("text");
+  if(t){t.value=(t.value?(t.value.replace(/\s+$/,"")+"\n"):"")+add;}
+  show("talk");
+  if(t)t.focus();
+}
+
 function lbWire(){
   var b=el("b-lib");if(b)b.onclick=function(){lbMode="pub";lbGo("me",null);};
   var ma=el("mu-article");
