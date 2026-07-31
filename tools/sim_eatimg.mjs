@@ -191,5 +191,31 @@ ok("\u91cd\u590d\u7684\u53ea\u7559\u4e00\u6761", it2.filter((c) => /\u91cd\u590d
 ok("\u8fc7\u957f\u7684\u4e22\u4e86", !it2.some((c) => c.deep.length > 70));
 ok("\u6ca1\u7ed9\u89e3\u6784\u65f6\u53ea\u6e32\u770b\u89c1\u4e00\u884c", NODES["ic-out"].children[0].children.length === 1);
 
+console.log("\n=== 9. \u5403\u56fe\u7aef\u4e5f\u5f97\u5173\u601d\u8003\uff08\u5426\u5219\u6b63\u6587\u56de\u7a7a\uff09===");
+global.__unlock(); go.disabled = false;
+RESP = { status: 200, body: env1(GOOD) };
+NODES["ic-vd"].value = "glm"; NODES["ic-vd"].onchange();
+NODES["ic-key"].value = "sk-glm-1234567890"; NODES["ic-key"].emit("input");
+go.click(); await sleep(20);
+let bd = JSON.parse(REQ.init.body);
+ok("\u667a\u8c31\uff1athinking disabled", bd.thinking && bd.thinking.type === "disabled", bd.thinking);
+ok("\u9884\u7b97\u7ed9\u8db3", bd.max_tokens >= 3000, bd.max_tokens);
+NODES["ic-vd"].value = "qwen"; NODES["ic-vd"].onchange();
+NODES["ic-key"].value = "sk-qwen-abcdefgh"; NODES["ic-key"].emit("input");
+go.click(); await sleep(20);
+bd = JSON.parse(REQ.init.body);
+ok("\u5343\u95ee\uff1aenable_thinking=false", bd.enable_thinking === false, bd.enable_thinking);
+NODES["ic-vd"].value = "kimi"; NODES["ic-vd"].onchange();
+NODES["ic-key"].value = "sk-kimi-abcdefgh"; NODES["ic-key"].emit("input");
+go.click(); await sleep(20);
+bd = JSON.parse(REQ.init.body);
+ok("Kimi \u4e0d\u585e\u5f00\u5173\uff08\u5b83\u6ca1\u6709\uff09", !("thinking" in bd) && !("enable_thinking" in bd), Object.keys(bd));
+
+console.log("\n=== 10. \u53ea\u60f3\u4e0d\u5199\u65f6\uff0c\u8bdd\u8981\u8bf4\u5230\u70b9\u4e0a ===");
+RESP = { status: 200, body: JSON.stringify({ choices: [{ message: { content: "", reasoning_content: "\u6211\u5148\u60f3\u60f3\u2026" } }] }) };
+go.click(); await sleep(20);
+ok("\u76f4\u8bf4\u989d\u5ea6\u82b1\u5728\u60f3\u4e0a\u4e86", /\u989d\u5ea6\u5168\u82b1\u5728/.test(NODES["ic-out"].children[0].textContent), NODES["ic-out"].children[0].textContent);
+NODES["ic-vd"].value = "glm"; NODES["ic-vd"].onchange();
+
 console.log("\n" + (fail ? "\u2717 " : "\u2713 ") + pass + " \u9879\u901a\u8fc7\uff0c" + fail + " \u9879\u5931\u8d25\n");
 process.exit(fail ? 1 : 0);

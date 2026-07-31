@@ -22,11 +22,15 @@ const PUBS = {
 let UP = null;            // 最近一次基底请求体
 let REPLY = "";           // 基底该回什么
 let UPSTATUS = 200;
+let QUEUE = [];           // 按次回放的上游响应（空则退回 REPLY）
+let UPS = [];             // 每次上游请求体的留档
 const realFetch = globalThis.fetch;
 globalThis.fetch = async (req, init) => {
   const u = typeof req === "string" ? req : req.url;
   if (/chat\/completions/.test(u)) {
     UP = JSON.parse(typeof req === "string" ? init.body : await req.text());
+    UPS.push(UP);                                   // 逐次留档：重试类断言要看第二发
+    if (QUEUE.length) { const q = QUEUE.shift(); return q.status && q.status !== 200 ? new Response(q.body || "boom", { status: q.status }) : Response.json(q.json); }
     if (UPSTATUS !== 200) return new Response("boom", { status: UPSTATUS });
     return Response.json({ choices: [{ message: { content: REPLY } }] });
   }
@@ -75,11 +79,11 @@ function mkEnv(o = {}) {
   };
 }
 
-async function muse(body, envOpts) {
+async function muse(body, envOpts, who) {
   UP = null;
   const req = new Request("https://sdeuniverses.com/api/im", {
     method: "POST", headers: { "content-type": "application/json" },
-    body: JSON.stringify(Object.assign({ credential: "sdepw1:TESTPW:\u5f20\u743c", op: "mo", a: "muse" }, body)),
+    body: JSON.stringify(Object.assign({ credential: "sdepw1:TESTPW:" + (who || "\u5f20\u743c"), op: "mo", a: "muse" }, body)),
   });
   const r = await worker.fetch(req, mkEnv(envOpts || {}), { waitUntil() {}, passThroughOnException() {} });
   return { s: r.status, d: await r.json().catch(() => null) };
@@ -187,7 +191,7 @@ const sys = UP.messages[0].content;
 ok("\u7981\u9e21\u6c64", /\u7981\u9e21\u6c64/.test(sys));
 ok("\u4e0d\u8bb8\u73b0\u7f16\u4e8b\u5b9e", /\u4e0d\u8bb8\u73b0\u7f16/.test(sys));
 ok("\u4e0d\u8bb8\u8bb2\u8bfe", /\u4e0d\u8bb8\u8bb2\u8bfe/.test(sys));
-ok("\u6ca1\u5f00\u601d\u8003\u6ee1\u529f\u7387\uff08\u914d\u83dc\u8c03\u7528\uff09", !("thinking" in UP) && !("enable_thinking" in UP), Object.keys(UP));
+ok("\u6ca1\u5f00\u601d\u8003\u6ee1\u529f\u7387\uff0c\u800c\u4e14\u628a\u601d\u8003\u5173\u6b7b\u4e86", UP.thinking && UP.thinking.type === "disabled" && !("reasoning_effort" in UP), UP.thinking);
 
 console.log("\n=== 15b. \u7bc7\u76ee\u7f16\u53f7\u8d8a\u754c\uff1a\u5b81\u53ef\u4e0d\u7ed9\u51fa\u5904\uff0c\u4e5f\u4e0d\u6302\u9519 ===");
 REPLY = JSON.stringify({ lines: [{ i: 99, t: "\u7f16\u53f7\u8d8a\u754c\u7684\u90a3\u4e00\u53e5\u8bdd" }, { i: 2, t: "\u7f16\u53f7\u6b63\u5e38\u7684\u90a3\u4e00\u53e5\u8bdd" }] });
@@ -258,6 +262,54 @@ console.log("\n=== 17. 库存也是料（用户：对话产生的新思想和朋
   const x = await muse({}, { vaultThrow: 1 });
   ok("\u2605 \u5e93\u5b58\u53d6\u4e0d\u5230\u65f6\u7167\u6837\u51fa\u53e5\uff08\u52a0\u6599\u662f\u52a0\u5206\u9879\uff0c\u4e0d\u662f\u95e8\u7981\uff09", x.d.ok === true, x.d.msg);
 }
+
+console.log("\n=== 17. \u914d\u83dc\u8c03\u7528\u5fc5\u987b**\u663e\u5f0f\u5173\u6389\u601d\u8003**\uff08\u5426\u5219 max_tokens \u88ab reasoning \u5403\u5149\uff09===");
+QUEUE = []; UPS = []; REPLY = J5;
+x = await muse({});
+ok("\u667a\u8c31\uff1athinking disabled", UPS[UPS.length - 1].thinking && UPS[UPS.length - 1].thinking.type === "disabled", UPS[UPS.length - 1].thinking);
+UPS = [];
+x = await muse({}, { vendor: { vendor: "deepseek", key: "sk-test-key-123456" } });
+ok("DeepSeek\uff1athinking disabled", UPS[UPS.length - 1].thinking && UPS[UPS.length - 1].thinking.type === "disabled", UPS[UPS.length - 1].thinking);
+ok("\u4e0d\u518d\u642d reasoning_effort", !("reasoning_effort" in UPS[UPS.length - 1]), Object.keys(UPS[UPS.length - 1]));
+UPS = [];
+x = await muse({}, { vendor: { vendor: "qwen", key: "sk-test-key-123456" } });
+ok("\u5343\u95ee\uff1aenable_thinking=false", UPS[UPS.length - 1].enable_thinking === false, UPS[UPS.length - 1].enable_thinking);
+
+console.log("\n=== 18. \u53ea\u60f3\u4e0d\u5199\uff08\u6b63\u6587\u7a7a + reasoning_content\uff09\u2192 \u52a0\u5927\u9884\u7b97\u91cd\u8bd5\u4e00\u6b21 ===");
+UPS = [];
+QUEUE = [
+  { json: { choices: [{ index: 0, finish_reason: "length", message: { role: "assistant", content: "", reasoning_content: "\u6211\u5148\u60f3\u60f3\u2026" } }] } },
+  { json: { choices: [{ message: { content: J5 } }] } },
+];
+x = await muse({});
+ok("\u7b2c\u4e8c\u53d1\u6551\u56de\u6765\u4e86", x.s === 200 && x.d.ok && x.d.lines.length === 5, x.d && x.d.msg);
+ok("\u786e\u5b9e\u53d1\u4e86\u4e24\u6b21", UPS.length === 2, UPS.length);
+ok("\u7b2c\u4e8c\u6b21\u9884\u7b97\u53d8\u5927", UPS[1].max_tokens === UPS[0].max_tokens * 3, [UPS[0].max_tokens, UPS[1].max_tokens]);
+ok("\u4e24\u53d1\u8bf4\u7684\u662f\u540c\u4e00\u4ef6\u4e8b", JSON.stringify(UPS[0].messages) === JSON.stringify(UPS[1].messages));
+
+console.log("\n=== 19. \u4e24\u53d1\u90fd\u53ea\u60f3\u4e0d\u5199 \u2192 502\uff0c\u4e14\u7ba1\u7406\u5458\u80fd\u770b\u89c1\u539f\u56e0 ===");
+UPS = [];
+const onlyThink = { json: { choices: [{ finish_reason: "length", message: { content: "", reasoning_content: "\u53c8\u60f3\u4e86\u4e00\u904d" } }] } };
+QUEUE = [onlyThink, onlyThink];
+x = await muse({}, {}, "\u738b\u5fb7\u751f");   // \u7ba1\u7406\u5458\u624d\u770b\u5f97\u5230\u8bca\u65ad
+ok("502", x.s === 502, x.s);
+ok("\u7ba1\u7406\u5458\u770b\u5230\u201c\u4e24\u6b21\u90fd\u53ea\u60f3\u4e0d\u5199\u201d", /\u4e24\u6b21\u90fd\u53ea\u60f3\u4e0d\u5199/.test(x.d.msg), x.d.msg);
+ok("\u5b66\u5458\u53ea\u770b\u5230\u4eba\u8bdd", await (async () => {
+  UPS = []; QUEUE = [onlyThink, onlyThink];
+  const req = new Request("https://sdeuniverses.com/api/im", {
+    method: "POST", headers: { "content-type": "application/json" },
+    body: JSON.stringify({ credential: "sdepw1:TESTPW:\u5f20\u743c", op: "mo", a: "muse" }),
+  });
+  const r = await worker.fetch(req, mkEnv(), { waitUntil() {} });
+  const d = await r.json();
+  return !/HTTP|reasoning|\u53ea\u60f3\u4e0d\u5199/.test(d.msg || "");
+})());
+
+console.log("\n=== 20. \u5e72\u51c0\u7684\u7a7a\uff08\u6ca1\u60f3\u4e5f\u6ca1\u5199\uff09\u4e0d\u91cd\u8bd5 ===");
+UPS = []; QUEUE = [{ json: { choices: [{ finish_reason: "stop", message: { content: "" } }] } }];
+x = await muse({});
+ok("\u53ea\u53d1\u4e00\u6b21", UPS.length === 1, UPS.length);
+QUEUE = [];
 
 globalThis.fetch = realFetch;
 console.log("\n" + (fail ? "\u2717 " : "\u2713 ") + pass + " \u9879\u901a\u8fc7\uff0c" + fail + " \u9879\u5931\u8d25\n");

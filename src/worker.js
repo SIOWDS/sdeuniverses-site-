@@ -311,6 +311,18 @@ async function wdsRag(env, url, body) {
   if (env.SELF && env.SELF.fetch) return env.SELF.fetch(req);
   return fetch(req);   // 没配自绑定时的退路（本地/预览环境）
 }
+// 配菜调用（要 JSON、要短、要快）**必须显式关掉思考**。
+// 血的教训：DeepSeek V4 与 GLM-5 这类模型**默认就在思考**，wdsTopBody 只管"加大功率"，不管"关"。
+// 于是 max_tokens 被 reasoning_content 吃光，choices[0].message.content 回来是**空字符串**，
+// 上层看到的是"没生出来"，看不出是被思考吃掉了额度——朋友圈金句机就是这么哑了一整天。
+// 关不掉的家（Kimi/MiniMax 思考常开、无开关）由 llmText 的"空正文重试"兜底。
+function wdsPlainBody(VC, body) {
+  const u = String((VC && VC.url) || "");
+  if (u.indexOf("api.deepseek.com") >= 0) body.thinking = { type: "disabled" };
+  else if (u.indexOf("open.bigmodel.cn") >= 0) body.thinking = { type: "disabled" };
+  else if (u.indexOf("dashscope.aliyuncs.com") >= 0) body.enable_thinking = false;
+  return body;
+}
 function wdsTopBody(VC, body) {
   if (!VC || !VC.top) return body;
   const u = String(VC.url);
@@ -2702,10 +2714,14 @@ async function llmText(VC, KEY, sys, usr, maxTok, msTimeout, stat) {
   const ctrl = new AbortController();
   const timer = setTimeout(() => { try { ctrl.abort(); } catch (e) {} }, msTimeout || 55000);
   try {
-    const resp = await fetch(VC.url, {
+    const _mk = (tok) => {
+      const base = { model: VC.model, stream: false, max_tokens: tok, messages: [{ role: "system", content: sys }, { role: "user", content: usr }] };
+      return JSON.stringify(VC && VC.top ? wdsTopBody(VC, base) : wdsPlainBody(VC, base));
+    };
+    let resp = await fetch(VC.url, {
       method: "POST",
       headers: { "content-type": "application/json", authorization: "Bearer " + KEY },
-      body: JSON.stringify(wdsTopBody(VC, { model: VC.model, stream: false, max_tokens: maxTok, messages: [{ role: "system", content: sys }, { role: "user", content: usr }] })),
+      body: _mk(maxTok),
       signal: ctrl.signal,
     });
     if (stat) stat.status = resp.status;   // 可选回执：让调用方分得清"Key 不能用"与"基底没写出来"（不传就与从前完全一样）
@@ -2716,8 +2732,24 @@ async function llmText(VC, KEY, sys, usr, maxTok, msTimeout, stat) {
       return "";
     }
     const j = await resp.json();
-    const txt = (j.choices && j.choices[0] && j.choices[0].message && j.choices[0].message.content) || "";
-    if (stat && !txt) { try { stat.err = "200 但没正文：" + JSON.stringify(j).slice(0, 300); } catch (e) {} }
+    let txt = (j.choices && j.choices[0] && j.choices[0].message && j.choices[0].message.content) || "";
+    // 关不掉思考的家（Kimi/MiniMax）：额度全被 reasoning 吃掉时正文为空。加大预算重试一次，
+    // 而不是把一句"没生出来"丢给用户。只重试一次，且只在确实"想了但没写"时。
+    const m0 = (j.choices && j.choices[0]) || {};
+    if (!txt && ((m0.message && m0.message.reasoning_content) || m0.finish_reason === "length")) {
+      if (stat) stat.retried = 1;
+      const resp2 = await fetch(VC.url, {
+        method: "POST",
+        headers: { "content-type": "application/json", authorization: "Bearer " + KEY },
+        body: _mk(Math.min((maxTok || 1000) * 3, 6000)),
+        signal: ctrl.signal,
+      });
+      if (resp2.ok) {
+        const j2 = await resp2.json();
+        txt = (j2.choices && j2.choices[0] && j2.choices[0].message && j2.choices[0].message.content) || "";
+        if (stat && !txt) { try { stat.err = "两次都只想不写：" + JSON.stringify(j2).slice(0, 260); } catch (e) {} }
+      } else if (stat) { try { stat.err = "重试 HTTP " + resp2.status + "：" + (await resp2.text()).slice(0, 260); } catch (e) {} }
+    } else if (stat && !txt) { try { stat.err = "200 但没正文：" + JSON.stringify(j).slice(0, 300); } catch (e) {} }
     return txt;
   } catch (e) { if (stat) stat.err = "连接异常：" + ((e && e.name) || "") + " " + ((e && e.message) || ""); return ""; }
   finally { clearTimeout(timer); }

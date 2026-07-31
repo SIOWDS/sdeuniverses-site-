@@ -2217,12 +2217,16 @@ el("ic-go").onclick=function(){
   function fire(){
     if(!imgs.length){fin();icNote("图没处理成功，换一张试试。");return;}
     var model=(el("ic-model").value||"").trim()||c.m;
-    var body={model:model,max_tokens:1400,messages:[
+    /* 与后端同一条纪律：**默认在思考的模型会把 max_tokens 全花在 reasoning 上**，
+       正文回来是空的。能关的家一律关掉，Kimi 关不掉就给足预算。 */
+    var body={model:model,max_tokens:3000,messages:[
       {role:"system",content:IC_SYS},
       {role:"user",content:[{type:"text",text:"【口味】"+(IC_KIND[el("ic-kind").value]||IC_KIND.asis)
         +"\n\n这是读者要发朋友圈的 "+imgs.length+" 张图。按三步来，只输出那段 JSON。"}]
         .concat(imgs.map(function(d){return {type:"image_url",image_url:{url:d}}}))}
     ]};
+    if(c.k==="sde_glm_key")body.thinking={type:"disabled"};
+    else if(c.k==="sde_qwen_key")body.enable_thinking=false;
     var url=c.proxy?"/api/llm-proxy":c.url;
     var hd={"content-type":"application/json",authorization:"Bearer "+key};
     if(c.proxy)hd["x-target-url"]=c.url;
@@ -2241,7 +2245,13 @@ el("ic-go").onclick=function(){
       var txt=(j&&j.choices&&j.choices[0]&&j.choices[0].message&&j.choices[0].message.content)||"";
       if(typeof txt!=="string"&&txt&&txt.length)txt=txt.map(function(p){return (p&&p.text)||""}).join("");
       var d=icParse(txt);
-      if(!d||!d.lines.length){icNote("它没按格式回。再点一次，或换个型号试试。");return;}
+      if(!d||!d.lines.length){
+        var think=(j&&j.choices&&j.choices[0]&&j.choices[0].message&&j.choices[0].message.reasoning_content)||"";
+        icNote(think&&!txt
+          ?"它把额度全花在“想”上了，正文没写出来。换一个不默认思考的型号再试。"
+          :"它没按格式回。再点一次，或换个型号试试。");
+        return;
+      }
       icPaint(d);
     }).catch(function(e){
       clearTimeout(to);fin();
