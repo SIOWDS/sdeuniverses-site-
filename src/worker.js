@@ -6778,7 +6778,15 @@ export default {
       return J({ ok: true, n: out.length, hit: out.filter((x) => x.in).length, done: out });
     }
     // Everything else: serve static assets (with configured html/404 handling)
-    const resp = await env.ASSETS.fetch(request);
+    // 浏览页的门牌 /browse/ 服务的就是根那份首页 HTML——根地址严格且唯一地留给入口页，
+    // 所以浏览页得有自己的网址（否则收藏、分享、刷新拿到的都是"入口"，人却明明在浏览页）。
+    // **原地取内容，不发 30x 跳转**：内容是同一份，跳转只会多一次往返、并在后退历史里多一格。
+    // 入口脚本按 pathname 判断开门（只认 "/" 与 "/index.html"），所以 /browse/ 天然不开门。
+    let assetReq = request;
+    if (url.pathname === "/browse" || url.pathname === "/browse/") {
+      assetReq = new Request(new URL("/", url), request);
+    }
+    const resp = await env.ASSETS.fetch(assetReq);
     const ct = resp.headers.get("content-type") || "";
     if (ct.includes("text/html")) {
       const r = new Response(resp.body, resp);

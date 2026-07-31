@@ -56,6 +56,33 @@ ok("⚠ 内页带 ?portal=1 也不是入口（第二门牌已作废）",
 ok("内页不受 seen / navType 影响",
    shouldOpen(E({ path: "/health/", seen: false, navType: "reload" })) === false);
 
+/* ── 浏览页有自己的门牌 /browse/（2026-07-31）────────────────────────────
+ * 根地址严格且唯一地属于入口页，那浏览页就不能也叫根地址——否则收藏、分享、
+ * 刷新拿到的都是"入口"，而人明明在浏览页。揭开门之后地址换成 /browse/，
+ * worker 让这个地址返回同一份首页 HTML，所以不必真跳转。            */
+ok("/browse/ 不是入口，不开门", shouldOpen(E({ path: "/browse/" })) === false);
+ok("/browse 不带尾斜杠也不开门", shouldOpen(E({ path: "/browse" })) === false);
+ok("在 /browse/ 刷新照样不开门（这正是它有自己网址的意义）",
+   shouldOpen(E({ path: "/browse/", navType: "reload" })) === false);
+var BROWSE = (src.match(/var BROWSE = "([^"]+)"/) || [, ""])[1];
+ok("BROWSE 门牌是 /browse/，实得 " + BROWSE, BROWSE === "/browse/");
+var closeBody = (src.match(/function close\(\) \{[\s\S]*?\n    \}/) || [, ""])[0];
+ok("close() 里把地址换成 BROWSE", /history\.replaceState\(null, "", BROWSE\)/.test(closeBody));
+ok("换地址用 replaceState 而不是跳转（内容已在本页，跳转是白发一次请求）",
+   !/location\.href\s*=/.test(closeBody) && !/location\.assign/.test(closeBody) && !/location\.replace/.test(closeBody));
+ok("三个出口共用同一个 close（入口卡「SDE 浏览」/ 底部「直接浏览 ›」/ Esc）",
+   /if \(!href\) close\(\);/.test(src) && /skip\.onclick = function \(\) \{ close\(\); \};/.test(src) &&
+   /e\.key === "Escape"[\s\S]{0,40}close\(\)/.test(src));
+{
+  var W = fs.readFileSync(path.join(ROOT, "src", "worker.js"), "utf8");
+  ok("worker 认 /browse/ 与 /browse 两种写法",
+     /url\.pathname === "\/browse" \|\| url\.pathname === "\/browse\/"/.test(W));
+  ok("worker 是原地取根那份内容，不是 30x 跳转",
+     /assetReq = new Request\(new URL\("\/", url\), request\)/.test(W) &&
+     !/browse[\s\S]{0,200}status:\s*30\d/.test(W));
+  ok("改写后的请求确实喂给了 ASSETS", /env\.ASSETS\.fetch\(assetReq\)/.test(W));
+}
+
 console.log("[唯一对应：从前那些分叉必须真的从源码里消失]");
 /* 这条断言只挑“调用形态”，不挑关键词：源码的注释里还留着 /?portal=1 的来龙去脉，
    而地址栏归一那段又要正当地读一次 location.search——按关键词断言必假失败。 */

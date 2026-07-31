@@ -114,6 +114,9 @@
       zhS: "\u7fa4\u804a \u00b7 \u79c1\u804a \u00b7 \u4f1a\u8bae \u00b7 \u5e7f\u573a", enS: "Groups \u00b7 DMs \u00b7 Meetings \u00b7 Plaza" },
   ];
   var GO = { browse: "", im: "/sde-wechat/", wds: "/taste/chatsde/" };   // browse 留空＝就地揭开
+  // 浏览页的门牌。根地址 "/" 严格且唯一地属于入口页（第十二刀），所以揭开门之后
+  // 地址要换成这一个。worker 让 /browse/ 返回同一份首页 HTML，因此不必真的跳转。
+  var BROWSE = "/browse/";
 
   /* 烧 TOKEN 的火色（用户定）：浏览烧绿 · 对话烧红 · 微信烧蓝。
      注意它与节点自身的色相（NODES[].c 青/金/紫）是两回事：色相标身份，火色标烧的是哪一种 TOKEN。
@@ -713,6 +716,14 @@
       document.removeEventListener("keydown", onKey);
       window.removeEventListener("resize", drawRing);
       stopFire();                                   // 定时器不收，关掉了还在后台一阵一阵地烧
+      /* 揭开门＝进了浏览页，地址栏就该是浏览页自己的门牌。根地址是入口页的，
+         两者不能共用一个网址——否则收藏、分享、刷新拿到的都是"入口"，而人明明在浏览页。
+         走 replaceState 不跳转：内容本来就已经在这一页上，再发一次请求纯属浪费，
+         后退历史也不该多出一格（按后退该回到进站之前，不是回到门口）。
+         三个出口都经过这里：入口卡「SDE 浏览」、底部「直接浏览 ›」、Esc。 */
+      try {
+        if (window.history && history.replaceState) history.replaceState(null, "", BROWSE);
+      } catch (e) {}
       box.className = "sdep out";
       try { document.documentElement.style.overflow = ""; } catch (e) {}
       setTimeout(function () { if (box.parentNode) box.parentNode.removeChild(box); }, 320);
