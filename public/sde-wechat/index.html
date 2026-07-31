@@ -1708,7 +1708,7 @@ function moDocCard(d){
     ev.stopPropagation();
     /* 进站内阅读器：PDF 翻页＋缩放、Word 用 mammoth 在线转成网页；
        两个库都自托管在 /assets/lib/，不走 cdnjs 外链。 */
-    window.open("/sde-wechat/doc.html?k="+encodeURIComponent(d.k)+"&t="+encodeURIComponent(d.t)+"&n="+encodeURIComponent(d.n||""),"_blank","noopener");
+    window.open("/sde-wechat/doc?k="+encodeURIComponent(d.k)+"&t="+encodeURIComponent(d.t)+"&n="+encodeURIComponent(d.n||""),"_blank","noopener");
   };
   return box;
 }
