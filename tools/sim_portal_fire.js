@@ -49,6 +49,17 @@ ok("三个入口各有一组火色", !!(FIRE.browse && FIRE.wds && FIRE.im));
   });
   ok(key + " 三色都是" + zh + "（该通道最大）", allDominant, arr.join(" "));
 });
+/* 不只“该通道最大”，还得是正色（用户第二次裁定：纯红/血红、草料树叶的绿、蓝天的蓝） */
+ok("wds 是血红不是橙火（绿≈蓝且远小于红）",
+   FIRE.wds.every(function (hex) {
+     var c = rgb(hex);
+     return Math.abs(c.g - c.b) <= 6 && c.g < c.r * 0.35;
+   }), FIRE.wds.join(" "));
+ok("browse 是草叶绿不是薄荷/青（绿 > 蓝×1.5）",
+   FIRE.browse.every(function (hex) { var c = rgb(hex); return c.g > c.b * 1.5; }), FIRE.browse.join(" "));
+ok("im 是天蓝不是紫（蓝 > 绿 > 红）",
+   FIRE.im.every(function (hex) { var c = rgb(hex); return c.b > c.g && c.g > c.r; }), FIRE.im.join(" "));
+
 /* 三组之间不许撞车 */
 var flat = [].concat(FIRE.browse, FIRE.wds, FIRE.im);
 ok("九个火色互不重复", new Set(flat).size === flat.length);
@@ -102,8 +113,9 @@ ok("延迟从 0 起、覆盖一个周期以上",
    Math.max.apply(null, V.map(function (v) { return v.delay; })) > 2);
 
 console.log("[源码守卫]");
-ok("粒子直径 8px（旧版 3px）", /\.sdep-sp\{[^}]*width:8px;height:8px/.test(src));
-ok("粒子带自发光 box-shadow:0 0 12px currentColor", /box-shadow:0 0 12px currentColor/.test(src));
+ok("粒子直径 12px（一路从 3 → 8 → 12）", /\.sdep-sp\{[^}]*width:12px;height:12px/.test(src));
+ok("位移前先用 margin 拿掉自身一半（随尺寸同步改）", /\.sdep-sp\{[^}]*margin:-6px 0 0 -6px/.test(src));
+ok("粒子带自发光 box-shadow:0 0 18px currentColor", /box-shadow:0 0 18px currentColor/.test(src));
 ok("位移走 --tx/--ty（不是写死的 translateY）",
    /@keyframes sdepBurst\{[^]*?var\(--tx,0\),var\(--ty,0\)/.test(src));
 ok("起飞点走 --sx/--sy", /var\(--sx,0\),var\(--sy,0\)/.test(src));

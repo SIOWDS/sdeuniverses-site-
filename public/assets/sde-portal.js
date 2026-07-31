@@ -64,9 +64,9 @@
      注意它与节点自身的色相（NODES[].c 青/金/紫）是两回事：色相标身份，火色标烧的是哪一种 TOKEN。
      每组三色：[亮芯, 主体, 过渡]。 */
   var FIRE = {
-    browse: ["#8CFFC0", "#2FE07A", "#0FBF63"],
-    wds:    ["#FF9A6B", "#FF3B2F", "#E01F1F"],
-    im:     ["#9CD6FF", "#2E7BFF", "#1A54E0"],
+    browse: ["#7CE06A", "#34A832", "#1C7A1C"],   // 草料与树叶的绿：绿远大于蓝，不往薄荷/青上跑
+    wds:    ["#FF3B3B", "#D40000", "#8B0000"],   // 血红：绿与蓝实质为零且相等，不往橙上偏
+    im:     ["#A6DAFF", "#3FA0F0", "#1F6FD0"],   // 蓝天的蓝：蓝>绿>红，偏青不偏紫
   };
   function rgba(hex, a) {
     var n = parseInt(hex.slice(1), 16);
@@ -119,7 +119,7 @@
     "@keyframes sdepFlick{0%,100%{opacity:.72;transform:translate(-50%,-50%) scale(1)}50%{opacity:1;transform:translate(-50%,-50%) scale(1.12)}}" +
     /* 火星：从圆边起飞，往四面八方飞出去。去向由 --sx/--sy → --tx/--ty 给（见 sparkVec），
        位置用 margin 拿掉自身一半，位移就全是纯像素值，插值不会出鬼。 */
-".sdep-sp{position:absolute;left:50%;top:50%;margin:-4px 0 0 -4px;width:8px;height:8px;border-radius:50%;opacity:0;box-shadow:0 0 12px currentColor;animation-name:sdepBurst;animation-timing-function:ease-out;animation-iteration-count:infinite}" +
+".sdep-sp{position:absolute;left:50%;top:50%;margin:-6px 0 0 -6px;width:12px;height:12px;border-radius:50%;opacity:0;box-shadow:0 0 18px currentColor;animation-name:sdepBurst;animation-timing-function:ease-out;animation-iteration-count:infinite}" +
     "@keyframes sdepBurst{0%{opacity:0;transform:translate(var(--sx,0),var(--sy,0)) scale(.5)}" +
     "14%{opacity:1}70%{opacity:.72}100%{opacity:0;transform:translate(var(--tx,0),var(--ty,0)) scale(.22)}}" +
     "@media(prefers-reduced-motion:reduce){.sdep-sp,.sdep-fire b{animation:none}}" +
