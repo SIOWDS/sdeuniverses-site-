@@ -284,7 +284,6 @@
     zh: {
       tabNormal: "常规", tabBack: "\u2190 返回浏览", tabPortal: "\u2726 \u7cfb\u7edf\u5165\u53e3",
       bDistill: "\u270e 成文 · PPT", bHist: "\u21ba 历史", bSet: "\u2699 设置", bNew: "\uff0b 新对话",
-      heroSub: "王德生的 AI 分身 · SDE 本体论老师<br>检索全站文章与专著，也能直接和你对谈 SDE",
       egs: ["SDE 说的“显露”和“结构”有什么不同？", "用 SDE 怎么看慢性病的发生？", "什么是特征纠缠？举个例子", "帮我找几篇入门 SDE 的文章"],
       mAtt: "\ud83d\udcce 附件", mStd: "\u26a1 标准", mDeep: "\u25c8 深度思考", mWeb: "\ud83c\udf10 联网",
       tipStd: "快答档，够用且省", tipDeep: "满血基底＋满功率思考＋SDE 全内功与方法论工序，慢但深", tipWeb: " · 已开联网（需智谱 Key）",
@@ -382,7 +381,6 @@
       aMd: "⧉ 原文", aEditIn: "✎ 编辑", edSave: "保存并重答", edCancel: "取消",
     aCont: "↳ 继续", contQ: "接着上面继续写下去，别重复已经写过的部分。",
     lkOpen: "打开站内这篇（新标签页）",
-    heroAfter: "聊完之后，顶栏 ✎ 可以把这一场做成报告 / 文章 / 提纲，或一套带图表的对外 PPT；每个回答下方的「🤝 交给智能体」还能把这一问原样交给金点子、中华智问这些更重的产线接着做",
     aPass: "\ud83e\udd1d 交给智能体", passH: "把这一问交给别的智能体接着做",
     passTip: "它们各自都能干很重的活（几十路调用、一两个小时），但入口都是一个空框——这里直接把你刚才这一问原样递过去，在新标签打开，**只填不跑**，开始与否你自己按。",
     passGo: "交过去 →", passEdit: "要交出去的那一句（可以改）：", passNone: "先问一句，才有东西可交。",
@@ -418,7 +416,6 @@
     en: {
       tabNormal: "Browse", tabBack: "\u2190 Back to site", tabPortal: "\u2726 Entry",
       bDistill: "\u270e Write up · Deck", bHist: "\u21ba History", bSet: "\u2699 Settings", bNew: "\uff0b New chat",
-      heroSub: "Wang Desheng's AI counterpart · a teacher of the SDE ontology<br>It searches the whole site, and it will also just think with you",
       egs: ["What separates Show from structure in SDE?", "How would SDE read the onset of a chronic disease?", "What is entanglement of features? Give an example.", "Point me at a few pieces to start with"],
       mAtt: "\ud83d\udcce Attach", mStd: "\u26a1 Standard", mDeep: "\u25c8 Deep", mWeb: "\ud83c\udf10 Web",
       tipStd: "Fast tier — enough for most questions, and cheap",
@@ -518,7 +515,6 @@
       aMd: "⧉ Source", aEditIn: "✎ Edit", edSave: "Save & regenerate", edCancel: "Cancel",
     aCont: "↳ Continue", contQ: "Continue from where you stopped; don't repeat what you already wrote.",
     lkOpen: "Open this article on the site (new tab)",
-    heroAfter: "Once you've talked, ✎ in the top bar turns this chat into a report, an article, an outline, or a slide deck with charts; \u201cHand off\u201d under each answer passes the same question to the heavier agents",
     aPass: "\ud83e\udd1d Hand off", passH: "Pass this question to another agent",
     passTip: "Each of them runs a long pipeline. Your question is handed over as-is, in a new tab. It fills the box; it never presses start.",
     passGo: "Hand over \u2192", passEdit: "The line being handed over (editable):", passNone: "Ask something first.",
@@ -997,10 +993,7 @@
       "</div>" +
       "<div class='wdsm-body empty'>" +
         "<div class='wdsm-hero'>" +
-          "<h1 class='wdsm-h1'>问 <span class='dot'>WDS</span></h1>" +
-          "<div class='wdsm-sub'></div>" +
           "<div class='wdsm-egs'></div>" +
-          "<div class='wdsm-hero-after'></div>" +
         "</div>" +
         "<div class='wdsm-msgs' style='display:none'></div>" +
       "</div>" +
@@ -1317,7 +1310,6 @@
     q(".wdsm-distbtn").textContent = t("bDistill");
     q(".wdsm-histbtn").textContent = t("bHist");
     q(".wdsm-keybtn").textContent = t("bSet");
-    try { q(".wdsm-hero-after").textContent = t("heroAfter"); } catch (e) {}
     try { q(".wdsm-membtn .mb").textContent = t("bMem"); } catch (e) {}   // 按钮里还有个角标 <i>，不能整体 textContent
     q(".wdsm-newbtn").textContent = t("bNew");
     try { rsPaint(); lnkPaint(); cvPaint(); compPaint(); duPaint(); pjPaint(); } catch (e) {}
@@ -1332,7 +1324,6 @@
     g(".wdsm-sb[data-a='help']").textContent = t("sbHelp");
     paintTool();
     paintMp(); sbRender();
-    q(".wdsm-sub").innerHTML = t("heroSub");
     // 收进输入框之后它只写一个 ＋（Claude 那种），原来的文案挪去当悬停提示
     var _att = q(".wdsm-attbtn");
     _att.textContent = "\uff0b"; _att.title = t("mAtt");
