@@ -38,7 +38,12 @@ ROSTER = os.path.join(STUDENTS, 'roster.json')
 # 索引页约定名：这些目录是"目录页"，不是作品本身
 INDEX_NAMES = {'works', 'submit', 'starter-template',
                # 学员级频道的容器页（卡片目录，不是作品本身）
-               'tcm-philosophy', 'cinema-literature'}
+               'tcm-philosophy', 'cinema-literature', 'precision-medicine'}
+
+# 频道容器页的机器可读标记。新建学员级频道时在 hub 页 <head> 里放一行
+#     <meta name="sde-page-kind" content="channel">
+# 即可被本脚本自动排除，不必再往上面那张名单里手工加名字。
+CHANNEL_MARK = 'name="sde-page-kind" content="channel"'
 
 # 页面骨架：这些标签/类下的文字不算正文字数
 SKIP_TAGS = {'script', 'style', 'nav', 'footer', 'head'}
@@ -122,7 +127,9 @@ def find_items(slug_dir):
         ]
 
         if os.path.exists(idx):
-            if not indexed_children:
+            if CHANNEL_MARK in open(idx, encoding='utf-8').read():
+                pass  # 频道容器页：是卡片目录，不是作品
+            elif not indexed_children:
                 out.append(d)
             else:
                 # A published paper may also contain application sub-papers.
