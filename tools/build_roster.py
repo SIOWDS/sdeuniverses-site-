@@ -38,7 +38,8 @@ ROSTER = os.path.join(STUDENTS, 'roster.json')
 # 索引页约定名：这些目录是"目录页"，不是作品本身
 INDEX_NAMES = {'works', 'submit', 'starter-template',
                # 学员级频道的容器页（卡片目录，不是作品本身）
-               'tcm-philosophy', 'cinema-literature', 'precision-medicine'}
+               'tcm-philosophy', 'cinema-literature', 'precision-medicine',
+               'risk-and-care'}
 
 # 频道容器页的机器可读标记。新建学员级频道时在 hub 页 <head> 里放一行
 #     <meta name="sde-page-kind" content="channel">
