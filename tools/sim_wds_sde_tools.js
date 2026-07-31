@@ -33,7 +33,7 @@ ok(/WDS_TOOL_KEYS\.indexOf\(String\(b\.tool \|\| ""\)\) >= 0 \? String\(b\.tool\
    "认不出的 tool 一律当没选（不把读者传来的字符串拼进 system）");
 
 console.log("③ 工序块拼进 system；近邻名单前置");
-ok(/function WDS_CHAT_SYS\(reflect, SDEM, siteCtx, webCtx, deep, docCtx, about, lang, docNote, tool\)/.test(W),
+ok(/function WDS_CHAT_SYS\(reflect, SDEM, siteCtx, webCtx, deep, docCtx, about, lang, docNote, tool(?:, rs)?\)/.test(W),
    "WDS_CHAT_SYS 收 tool");
 ok(/\+ wdsToolSys\(tool\)/.test(W), "system 里拼了 wdsToolSys(tool)");
 ok(/WDS_CHAT_SYS\(reflect, SDEM, \(nbrCtx \? nbrCtx \+ "\\n" : ""\) \+ ctxText/.test(W),
@@ -43,10 +43,18 @@ ok(/t: "nbrfail"/.test(W) && /nbrfail/.test(F), "取不到名单时发 nbrfail�
 ok(/wide = deep \|\| tool === "collide"/.test(W), "碰撞工序加宽站内检索（否则挑不出互相矛盾的三篇）");
 
 console.log("④ 满功率预算没被工序顶破");
-const mt = W.match(/max_tokens: deep \? (\d+) : \(tool \? (\d+) : (\d+)\)/);
-ok(!!mt, "chat 的 max_tokens 三分支存在");
+// 这条守的是全站最贵的那个教训：满功率档的 max_tokens 一旦调大，思考就跑过平台时长上限、
+// 被杀在思考阶段——流干净结束、正文 0 字、不报任何错。正则写死了行文形状，早先加 askLen 长文档时
+// 就已经匹配不上、空转至今；改成先揪出 tokWant 那一整段表达式，再从里面挑数字。
+// 必须先切到 chat 段内：/api/wds/read 里也有一份同名的 tokWant，直接 indexOf 会跨过几千行检索代码
+const CHATSEG = W.slice(W.indexOf('url.pathname === "/api/wds/chat"'), W.indexOf('url.pathname === "/api/wds/research"'));
+const twSeg = CHATSEG.slice(CHATSEG.indexOf("const tokWant = askLen"), CHATSEG.indexOf("const clk = wdsClock"));
+const mt = twSeg.match(/deep \? (\d+) : \(tool \? (\d+) : (\d+)\)/);
+ok(!!mt, "chat 的 max_tokens 三分支存在（深度/工序/闲聊）");
 ok(mt && +mt[1] <= 8000, "满功率档 ≤ 8000（这是硬约束不是可调参数），实得 " + (mt ? mt[1] : "?"));
 ok(mt && +mt[2] > +mt[3] && +mt[2] <= 12000, "工序档比闲聊宽但仍有界，实得 " + (mt ? mt[2] + " vs " + mt[3] : "?"));
+const bigs = (twSeg.match(/\b(\d{4,6})\b/g) || []).map(Number).filter((n) => n > 8000 && n !== 32000);
+ok(bigs.length === 0, "tokWant 段里没有 8000 以上的裸预算（32000 是长文档档的天花板，另有出处），实得 " + bigs.join("/"));
 
 console.log("⑤ 前端只传 key，不自己拼工序文本");
 ok(/tool: curTool/.test(F), "payload 带 tool");

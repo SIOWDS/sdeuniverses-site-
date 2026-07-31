@@ -125,6 +125,21 @@
       return step();
     });
   }
+  // 图片读成 data URL：这串会原样发给视觉档（本站不留存、也不经过本站）
+  function readDataURL(file) {
+    return new Promise(function (res, rej) {
+      var r = new FileReader();
+      r.onload = function () { res(String(r.result || "")); };
+      r.onerror = function () { rej(new Error("图片读不出来")); };
+      r.readAsDataURL(file);
+    });
+  }
+  // 按需 OCR：传 data URL 即可（tesseract 认这个），用在"这家基底看不了图"的退路上
+  function ocrDataUrl(d) {
+    return needTess().then(function (T) {
+      return T.recognize(d, "chi_sim+eng").then(function (r) { return ((r && r.data && r.data.text) || "").trim(); });
+    });
+  }
   function ocrImage(file, prog) {
     return needTess().then(function (T) {
       if (prog) prog("OCR", 1, 1);
@@ -144,12 +159,14 @@
         });
       });
     } else if (/\.pdf$/.test(low)) P = readBuf(file).then(function (ab) { return pdfText(ab, prog); });
-    else if (/\.(png|jpe?g|webp|bmp|gif)$/.test(low)) P = ocrImage(file, prog).then(function (t) { return { text: t, note: "图片 · 本机 OCR" }; });
+    else if (/\.(png|jpe?g|webp|bmp|gif)$/.test(low)) P = readDataURL(file).then(function (d) { return { text: "", note: "图片", img: d }; });
     else if (/\.doc$/.test(low)) P = Promise.reject(new Error("旧版 .doc 读不了，请在 Word 里另存为 .docx 再上传"));
     else P = readText(file).then(function (t) { return { text: t, note: "按纯文本读" }; });
 
     return P.then(function (r) {
       var t = clean(r.text);
+      // 图片没有文字是正常的（它本来就不是拿来读字的），不能按"读不出文字"退回
+      if (r.img) return { name: name, text: t, note: r.note || "图片", img: r.img };
       if (!t) throw new Error("这个文件里没读出文字");
       var cut = t.length > MAX_CHARS;
       return { name: name, text: cut ? t.slice(0, MAX_CHARS) : t, note: (r.note || "") + (cut ? " · 太长，只取了前 " + MAX_CHARS + " 字" : "") };
@@ -162,7 +179,7 @@
     return new Promise(function (res) {
       var inp = document.createElement("input");
       inp.type = "file";
-      inp.accept = ".txt,.md,.markdown,.csv,.json,.log,.docx,.pdf,.png,.jpg,.jpeg,.webp,.bmp";
+      inp.accept = ".txt,.md,.markdown,.csv,.json,.log,.docx,.pdf,.png,.jpg,.jpeg,.webp,.bmp,.gif";
       if (opts.multiple !== false) inp.multiple = true;
       inp.style.cssText = "position:fixed;left:-9999px;top:0";
       document.body.appendChild(inp);
@@ -234,7 +251,7 @@
     return { text: text, take: idxs.length, total: chunks.length };
   }
 
-  var API = { pick: pick, parseFile: parseFile, MAX_CHARS: MAX_CHARS, chunk: chunk, selectChunks: selectChunks };
+  var API = { pick: pick, parseFile: parseFile, MAX_CHARS: MAX_CHARS, chunk: chunk, selectChunks: selectChunks, ocrDataUrl: ocrDataUrl };
   window.WDSAttach = {
     load: function (cb) {
       var okEnv = !!(window.FileReader && window.Promise);

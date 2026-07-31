@@ -42,7 +42,7 @@ function grab(src, name, args) {
 console.log("── 一 · 整场记忆（客户端 histPack ＋ 服务端全量收下）");
 {
   ok(!/history\.slice\(-4\)/.test(wm), "客户端不再只送最近 4 轮");
-  ok(/history: histPack\(\)/.test(wm), "payload 走 histPack()");
+  ok(/history: histPack\([a-zA-Z()]*\)/.test(wm), "payload 走 histPack()（现在带一个起点参数：已压进账本的那几轮不重复上送）");
   ok(!/b\.history\.slice\(-4\)/.test(CHAT), "服务端不再截最近 4 轮");
   ok(/const history = Array\.isArray\(b\.history\) \? b\.history : \[\]/.test(CHAT), "服务端整场收下，长度交给 packReadHistory");
 
@@ -74,7 +74,9 @@ console.log("── 三 · 长篇请求：按字数给预算 + 当轮覆盖简�
   ok(/tokWant = askLen[\s\S]{0,160}Math\.min\(32000/.test(CHAT), "长篇按 askLen 给预算（上限 3.2 万）");
   ok(/max_tokens: tokWant/.test(CHAT), "预算真的用上了（原来是硬编码 2600/4000/6000）");
   ok(/解除《怎么答》第 5 条/.test(CHAT), "当轮挂覆盖指令解除「两三段以内」");
-  ok(/content: q \+ UMEM \+ \(askLen/.test(CHAT), "覆盖指令与记忆都挂在当轮 user 消息、不进 system（保前缀缓存）");
+  // 形状变了（要支持看图，当轮 content 可能是数组），纪律没变：覆盖指令与记忆一律挂当轮、不进 system
+  ok(/const uText = q \+ UMEM \+ \(askLen/.test(CHAT), "覆盖指令与记忆都挂在当轮 user 消息、不进 system（保前缀缓存）");
+  ok(!/WDS_CHAT_SYS\([^)]*UMEM/.test(CHAT), "UMEM 没有被塞进 system（塞进去就把厂商的前缀缓存打散了）");
   const askLen = grab(wk, "wdsAskLen")();
   const tok = (q) => { const a = askLen(q); return a ? Math.min(32000, Math.max(6000, Math.round(a * 1.8))) : 2600; };
   ok(tok("先写 8000 字") >= 14000, "要 8000 字 → 预算上万（这正是 15:12 那次翻车的病根）");

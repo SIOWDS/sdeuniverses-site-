@@ -217,7 +217,10 @@ export class VisitCounter {
 // DeepSeek V4：deepseek-v4-pro（1.6T/49B激活，1M 上下文）＞ flash；thinking:enabled + reasoning_effort:"max" 为最高推理投入档
 // 注意：思考模式下 temperature/top_p/penalty 全部无效，必须不传
 // 深度档型号（满血）。Kimi K3 与 MiniMax M2.x 的思考是常开的，没有单独的开关参数。
-const WDS_TOP_MODEL = { deepseek: "deepseek-v4-pro", zhipu: "glm-5", kimi: "kimi-k3", qwen: "qwen3.7-max", minimax: "MiniMax-M3" };
+// ⚠️ kimi 深度档一度写成 kimi-k3 —— Kimi 平台的模型表里**没有**这个名字（2026-07-31 实查：
+//    现存 kimi-k2.7-code / kimi-k2.7-code-highspeed / kimi-k2.6 / kimi-k2.5；下线的是 kimi-k2-*-preview 那一批）。
+//    发一个不存在的型号＝这家深度档一直在 400。改回 k2.6（Kimi 自己标的"迄今最智能"）。
+const WDS_TOP_MODEL = { deepseek: "deepseek-v4-pro", zhipu: "glm-5", kimi: "kimi-k2.6", qwen: "qwen3.7-max", minimax: "MiniMax-M3" };
 function wdsTopVC(vd) {
   const base = WDS_VENDORS[vd];
   return { url: base.url, model: WDS_TOP_MODEL[vd] || base.model, name: base.name, top: 1 };
@@ -333,6 +336,37 @@ const WDS_VENDORS = {
   qwen: { url: "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions", model: "qwen-plus", name: "\u5343\u95ee Qwen", apply: "bailian.console.aliyun.com" },
   minimax: { url: "https://api.minimax.io/v1/chat/completions", model: "MiniMax-M2.7", name: "MiniMax", apply: "platform.minimax.io" },
 };
+// ── 看图（视觉档）。**只有这三家**在本站的转发口径下能直接吃图；DeepSeek / MiniMax 走不了，
+//    读者选了它们又传图，我们如实说一句「这家看不了图」，绝不拿 OCR 出来的字冒充"它看过了"。
+//    每家给一个备用名：型号改名/下线时沿着阶梯自动退一格，而不是整条看图功能一起哑掉。
+//    默认核对于 2026-07-31。读者仍可在设置里覆盖（payload.vmodel）。
+const WDS_VISION = {
+  zhipu: ["glm-5v", "glm-4.6v"],
+  qwen: ["qwen-vl-max", "qwen3-vl-plus"],
+  kimi: ["kimi-k2.6", "moonshot-v1-32k-vision-preview"],
+};
+function wdsVisionLadder(vd, want) {
+  const base = WDS_VISION[vd] || [];
+  const w = String(want || "").trim();
+  if (w && w.length <= 60 && /^[A-Za-z0-9._:\/-]+$/.test(w)) return [w].concat(base);
+  return base.slice();
+}
+// 图片钳位：4 张、总计 6MB base64。**必须校验 data URL 的形状**——这串是要原样转给上游的，
+// 不校验就等于把读者传来的任意字符串塞进上游请求体。
+const WDS_IMG_MAX = 4, WDS_IMG_BYTES = 6 * 1024 * 1024;
+function wdsPickImgs(list) {
+  const out = [];
+  if (!Array.isArray(list)) return out;
+  let tot = 0;
+  for (const im of list.slice(0, WDS_IMG_MAX)) {
+    const d = String((im && im.d) || "");
+    if (!/^data:image\/(png|jpeg|jpg|webp|gif|bmp);base64,[A-Za-z0-9+/=\s]+$/.test(d)) continue;
+    if (tot + d.length > WDS_IMG_BYTES) break;
+    tot += d.length;
+    out.push({ n: String((im && im.n) || "图片").slice(0, 80), d: d.replace(/\s+/g, "") });
+  }
+  return out;
+}
 // 前端短码 ↔ 基底键。未知一律落 zhipu（老前端只发 ds/其它两种值，这样不会断）。
 const WDS_VMAP = { ds: "deepseek", glm: "zhipu", kimi: "kimi", qwen: "qwen", mm: "minimax" };
 const WDS_VSHORT = { deepseek: "ds", zhipu: "glm", kimi: "kimi", qwen: "qwen", minimax: "mm" };
@@ -2631,7 +2665,21 @@ function wdsToolSys(tool) {
   return "\n\n" + b + "\n（工序只管这一轮要交付什么，不改你的口吻：仍然直接、犀利、说人话，不要复述工序名、不要把小标题写成「工序①」。）";
 }
 
-function WDS_CHAT_SYS(reflect, SDEM, siteCtx, webCtx, deep, docCtx, about, lang, docNote, tool) {
+// RESEARCH_STEP：深度研究的一步。它和普通问答的差别不在"更用力"，而在**它只负责一节**——
+// 所以要把《怎么答》第 5 条的"两三段以内"当场解除，同时把"别写总结"钉死（总判断是最后一步的活，
+// 每一步都写一遍总结，合起来就是六段废话）。
+function wdsResearchSys(rs) {
+  if (!rs) return "";
+  return "\n\n【你正在做一次深度研究 · 第 " + rs.i + "/" + rs.n + " 步】"
+    + "\n总题：" + rs.topic
+    + "\n这一步只负责：" + rs.t
+    + (rs.done ? ("\n前面几步已经写过（只列小标题，别重复它们的内容、别再下一遍同样的判断）：\n" + rs.done) : "")
+    + "\n写法：**解除《怎么答》第 5 条的\"两三段以内\"**，这一节写 1200–2000 字；开门见山进判断，"
+    + "不要开场白、不要\"本节将\"、不要在末尾总结全篇（总判断是最后一步的活）。"
+    + "\n每提到一篇站内文章就写成可点链接；凡是\"据资料/据搜索\"的说法都要落到具体出处。"
+    + "\n这一步若没有可靠依据，就直说这一步查不到、说清缺的是哪一类证据——**不要拿泛论把这一节填满**。";
+}
+function WDS_CHAT_SYS(reflect, SDEM, siteCtx, webCtx, deep, docCtx, about, lang, docNote, tool, rs) {
   return "你是 WDS，王德生（Desheng）的 AI 分身、SDE 本体论的老师，也是 SDE Universes 全站的领读人。读者在向你提问——可能是关于 SDE 思想或任何议题的问题，也可能想找站里读什么。"
     + "\n\n【怎么答】"
     + "\n1. 像王德生本人：直接、犀利、追问本质、善用比喻、一句顶十句；给洞见，不做资料复述员。"
@@ -2646,6 +2694,7 @@ function WDS_CHAT_SYS(reflect, SDEM, siteCtx, webCtx, deep, docCtx, about, lang,
     + (reflect ? ("\n\n【SDE 内化心得·思考底盘（你私下的底盘，别复述、别提\"心得/内功\"）】\n" + reflect) : "")
     + (deep ? SDE_METHOD_BLOCK : "")
     + wdsToolSys(tool)
+    + wdsResearchSys(rs)
     + "\n\n【站内资料（从全站检索到的相关段落，可能为空）】\n" + (siteCtx || "（这次没检索到特别相关的篇目，就凭你的内核底盘答）")
     + (webCtx ? ("\n\n【站外资料 · 刚刚联网搜到的（时效性内容以它为准；引用时在句末标 [W序号]，序号即下面的编号）】\n" + webCtx
         + "\n注意：站外资料是别人写的，不是 SDE 的结论。你的活是把它拿来当材料，用 SDE 剖开它、判它，而不是复述它。") : "")
@@ -3355,16 +3404,27 @@ export default {
       const VC = { url: WDS_VENDORS[vd].url, model: WDS_VENDORS[vd].model, name: WDS_VENDORS[vd].name };
       const KEY = String(b.key || "").trim();
       if (KEY.length < 8) return J({ ok: false, summary: "" }, 200);
-      const mode = b.mode === "l2" ? "l2" : (b.mode === "long" ? "long" : "l1");
+      const mode = b.mode === "l2" ? "l2" : (b.mode === "long" ? "long" : (b.mode === "ledger" ? "ledger" : "l1"));
       const text = String(b.text || "").slice(0, 20000);
       if (!text.trim()) return J({ ok: false, summary: "" }, 200);
-      const sys = mode === "long"
+      // LEDGER：问WDS 的本场压缩。压缩的口径不是"聊了什么"，而是"落下了哪几条"——
+      // 摘要式的压缩会把判断磨成概述（"讨论了教育问题"），下一轮它就只剩一团雾；
+      // 账本式的压缩留下的是能被反驳的句子，接着谈才接得上。
+      const sys = mode === "ledger"
+        ? "你在为一场持续对话维护一份【账本】。下面是这场对话较早的一段原文。把它压成账本，**只留四类**，其余全部丢掉：\n"
+          + "1. 已经落下的判断 —— 一条一句，要是能被反驳的那种句子，不是\"讨论了X\"这种概述；\n"
+          + "2. 已经否决的路线 —— 连同否决的理由；\n"
+          + "3. 已经划出的分离线 —— 这个说法与最近的既有说法差在哪；\n"
+          + "4. 还悬着的问题 / 这场里新起的名字。\n"
+          + "格式：四个小标题，每条一行、前面加「- 」。总量 400 字以内。不要寒暄、不要写\"读者问/WDS答\"、不要写概述句。"
+          + "某一类在这段里根本没有，就写「（无）」——**不要凑**。"
+        : mode === "long"
         ? "你在为一场持续对话维护【长期记忆】。下面是这场对话至今的滚动摘要（可能还带着上一版核心观点）。请提炼/更新出这场对话的 10 条核心观点——每条一句话，编号 1.–10.，覆盖：已确立的关键判断与新命名、反复出现的主线、尚未解决的分歧。若已有旧版核心观点，就在其基础上稳健更新（改动最小、只并入新沉淀的东西），不要每次推倒重写。总量约 500 字。只输出这 10 条本身，不要前言、不要提\"核心观点/摘要\"字样以外的话。"
         : (mode === "l2"
           ? "你在为一场持续对话维护滚动记忆。下面是几段更早的对话小结。把它们合并压缩成一段约 500 字的连续记忆，保留：谈过的核心问题、已达成的关键判断与命名、还悬着的分歧或待续线索；丢掉寒暄与重复。只输出这段合并摘要本身，用连贯中文，不要分点、不要前言、不要提\"摘要\"二字。"
           : "你在为一场持续对话维护滚动记忆。下面是较早的一轮问答。把它压成约 200 字的要点小结，保留：读者问的核心、WDS 给出的关键判断与新命名、以及留下的追问或悬念；丢掉客套与铺陈。只输出这段小结本身，用连贯中文，不要分点、不要前言、不要提\"摘要\"二字。");
       try {
-        const out = await llmText(VC, KEY, sys, text, mode === "l1" ? 500 : 900);
+        const out = await llmText(VC, KEY, sys, text, mode === "l1" ? 500 : 900);   // ledger 走 900：四类小标题装得下，且远在"结构化短输出必须有界"那条线内
         return J({ ok: !!out, summary: String(out || "").trim() });
       } catch (e) {
         return J({ ok: false, summary: "" }, 200);
@@ -4152,7 +4212,28 @@ export default {
       const lang = b.lang === "en" ? "en" : "zh";                 // 界面语言：决定用哪种语言作答
       // SDE 工序：白名单校验，认不出的一律当没选（绝不把读者传来的字符串拼进 system）
       const tool = WDS_TOOL_KEYS.indexOf(String(b.tool || "")) >= 0 ? String(b.tool) : "";
-      const VC = { url: WDS_VENDORS[vd].url, model: wdsPickModel(vd, umodel, deep), name: WDS_VENDORS[vd].name, top: deep ? 1 : 0 };
+      // COMPACTION：本场更早的对话已在读者本机压成一份「账本」（只留判断/否决/分离线/悬案）。
+      // 它替代的是被裁掉的原文，所以位置在历史之前、且必须**标明它是账本不是原文**——
+      // 否则它会照着账本复述，把压缩过的结论当成自己刚说过的话。
+      const comp = String(b.comp || "").slice(0, 8000);
+      // RESEARCH：深度研究的一步。走同一条产线（检索/联网/流式/时钟全都现成），只换口径与预算。
+      const rsRaw = (b.rs && typeof b.rs === "object") ? b.rs : null;
+      const rs = rsRaw ? {
+        i: Math.max(1, Math.min(12, parseInt(rsRaw.i, 10) || 1)),
+        n: Math.max(1, Math.min(12, parseInt(rsRaw.n, 10) || 1)),
+        t: String(rsRaw.t || "").slice(0, 200),
+        topic: String(rsRaw.topic || "").slice(0, 300),
+        done: String(rsRaw.done || "").slice(0, 3000),
+      } : null;
+      // VISION：读者带来的图。**图不进附件那条文字线**——附件线走的是 OCR 出来的字，
+      // 那是"读它印了什么"，不是"看它长什么样"（图表的形状、版式、手写、白板上的箭头，OCR 一个都给不出）。
+      const imgs = wdsPickImgs(b.imgs);
+      const visLadder = imgs.length ? wdsVisionLadder(vd, String(b.vmodel || "")) : [];
+      const canSee = imgs.length > 0 && visLadder.length > 0;
+      // 看图时一律卸掉满功率档：视觉档型号多半没有思考开关，且这一步的活是"看清"不是"想久"。
+      const VC = canSee
+        ? { url: WDS_VENDORS[vd].url, model: visLadder[0], name: WDS_VENDORS[vd].name, top: 0 }
+        : { url: WDS_VENDORS[vd].url, model: wdsPickModel(vd, umodel, deep), name: WDS_VENDORS[vd].name, top: deep ? 1 : 0 };
       const KEY = userKey, rvendor = wdsShort(vd);
       const ip = request.headers.get("cf-connecting-ip") || "unknown";
       let dayLeft = null;
@@ -4175,6 +4256,8 @@ export default {
             // 全站检索：先调用结构化知识(九库邻域子图,密/准/省token),再以相似句片段补充
             let ctxText = "", sources = [];
             const seen = {};
+            if (imgs.length && !canSee) controller.enqueue(_sseBytes({ t: "note", v: "你传了 " + imgs.length + " 张图，但你现在选的这家基底在本站的接口下看不了图（能看图的是 智谱 GLM / 千问 Qwen / Kimi）。这一轮它**没有看到图**，只能就你的文字作答——要它真看图，去顶栏换一家。" }));
+            else if (canSee) controller.enqueue(_sseBytes({ t: "note", v: "已把 " + imgs.length + " 张图直接交给 " + VC.name + " 的视觉档（" + VC.model + "）看——不是文字识别。" }));
             if (qCut > 0) controller.enqueue(_sseBytes({ t: "note", v: "你这一问超过 " + WDS_CHAT_Q_MAX + " 字，只带上了前 " + WDS_CHAT_Q_MAX + " 字（后面 " + qCut + " 字没进去）。这么长的材料建议用「＋」当附件传，别塞进提问框。" }));
             try {
               _st.stage = "扩展检索词";
@@ -4231,37 +4314,59 @@ export default {
             }
             let reflect = ""; try { reflect = await ensureReflect(env, url, rvendor, VC, KEY); } catch (e) {}
             const SDEM = "\n\nSDE 骨架：显露 S / 差异序列 D / 特征纠缠 E；三大方程 S=F(D,E)·D=G(S,E)·E=H(S,D)；六路径；意义三律（特征·自由·幸福）；发生学——追问事物为何如此发生，而非如何被发现。";
-            const sys = WDS_CHAT_SYS(reflect, SDEM, (nbrCtx ? nbrCtx + "\n" : "") + ctxText, webCtx, deep, docCtx, about, lang, docNote, tool);
+            const sys = WDS_CHAT_SYS(reflect, SDEM, (nbrCtx ? nbrCtx + "\n" : "") + ctxText, webCtx, deep, docCtx, about, lang, docNote, tool, rs);
             const messages = [{ role: "system", content: sys }];
             // 历史预算随 system 实际体量收缩：站内资料/附件/心得都在 system 里，
             // 一起顶上去会撞输入窗（400 context too long）。超预算才从最旧处裁，并明标省略。
             const UMEM = umem ? ("\n\n【我的长期记忆 · 来自我与你此前几场对话的摘要（存在我本机，不是本场原文）】\n" + umem
               + "\n（以上只作背景：相关就用，不相关就当没看见；不要复述它，也不要假装记得这里面没写的事。）") : "";
             const histBudget = Math.max(WDS_CHAT_HIST_MIN, WDS_CHAT_HIST_BUDGET - sys.length - UMEM.length);
+            if (comp) messages.push({
+              role: "user",
+              content: "【本场前情账本】以下不是原文，是这场对话更早那些轮次压出来的账本（只留下：已落下的判断、已否决的路线、已划的分离线、还悬着的问题）。"
+                + "把它当成已经发生过的事实接着往下谈；**不要复述它**，也不要假装记得账本里没写的细节。\n" + comp,
+            });
             const packed = packReadHistory(history, histBudget, WDS_CHAT_PERMSG,
               (n) => "（本场更早的 " + n + " 条发言因长度省略；这是同一场持续对话，请接着往下谈。）");
             for (const m of packed) messages.push(m);
             // 长篇请求：覆盖指令挂在**这一轮的 user 消息**上，不写进 system——
             // 固定前缀要留给厂商的前缀缓存，且长 system 末尾是低注意力位。
+            const uText = q + UMEM + (askLen
+              ? ("\n\n（本轮特别要求：读者要的是长篇，约 " + askLen + " 字。解除《怎么答》第 5 条的\"两三段以内\"，按这个长度写足；"
+                 + "别在心里反复打草稿，边想边落笔——写不完读者会点「继续」。）")
+              : "");
+            // 看图时当轮 user 是 content 数组（各家都吃 OpenAI 那套 image_url/data URL）。
+            // 图放在文字**之后**：先让它知道要看什么，再给它看。
             messages.push({
               role: "user",
-              content: q + UMEM + (askLen
-                ? ("\n\n（本轮特别要求：读者要的是长篇，约 " + askLen + " 字。解除《怎么答》第 5 条的\"两三段以内\"，按这个长度写足；"
-                   + "别在心里反复打草稿，边想边落笔——写不完读者会点「继续」。）")
-                : ""),
+              content: canSee
+                ? [{ type: "text", text: uText + "\n\n（上面这 " + imgs.length + " 张图是读者刚传的：" + imgs.map((im) => im.n).join("、")
+                    + "。请直接看图作答；图里看不清的地方就说看不清，不要猜。）" }]
+                    .concat(imgs.map((im) => ({ type: "image_url", image_url: { url: im.d } })))
+                : uText,
             });
             // 时钟（十二～十五修的通则）：凡"出流之后 await 上游"的调用一律戴 wdsClock。
             // 不戴的代价已经付过四次：平台无声掐断时既无 error 也无正文，读者只看到"什么都没有"。
             // 这里心跳撑着连接，反而让客户端的无字节看门狗永远喂饱——所以时钟只能由我方来掐。
+            // 预算按"这一步该产出多长"给（老通则）：研究的一节 1200–2000 字 → 4000；满功率档仍死守 6000（≤8000 是硬约束）。
             const tokWant = askLen
               ? Math.min(32000, Math.max(6000, Math.round(askLen * 1.8)))   // 中文近似 1 字 1 token，留一点余量
-              : (deep ? 6000 : (tool ? 4000 : 2600));
+              : (rs ? (deep ? 6000 : 4000) : (deep ? 6000 : (tool ? 4000 : 2600)));
             const clk = wdsClock(CHAT_FIRST_MS, askLen ? CHAT_TOTAL_LONG_MS : CHAT_TOTAL_MS);
             _st.pre = Math.round((Date.now() - _st.t0) / 1000);
             _st.stage = "基底作答";
             let upstream;
             try {
-              upstream = await fetch(VC.url, { method: "POST", headers: { "content-type": "application/json", authorization: "Bearer " + KEY }, body: JSON.stringify(wdsTopBody(VC, { model: VC.model, stream: true, max_tokens: tokWant, messages })), signal: clk.signal });
+              // 视觉档型号会改名/下线：认不出就沿备用名退一格重发一次（只在看图这条路上，且只退到列表用完）。
+              for (let vi = 0; ; vi++) {
+                upstream = await fetch(VC.url, { method: "POST", headers: { "content-type": "application/json", authorization: "Bearer " + KEY }, body: JSON.stringify(wdsTopBody(VC, { model: VC.model, stream: true, max_tokens: tokWant, messages })), signal: clk.signal });
+                if (upstream.ok || !canSee || vi + 1 >= visLadder.length) break;
+                if (upstream.status !== 400 && upstream.status !== 404) break;
+                let et = ""; try { et = (await upstream.clone().text()).slice(0, 300); } catch (e2) {}
+                if (!/model|not\s*found|不存在|无效|invalid/i.test(et)) break;
+                VC.model = visLadder[vi + 1];
+                controller.enqueue(_sseBytes({ t: "note", v: "视觉档型号换成了 " + VC.model + "（上一个这家已经不认了）。" }));
+              }
             } catch (e) {
               clk.stop();
               controller.enqueue(_sseBytes({ t: "error", v: (clk.cut ? clk.why("基底") : ("接不上基底：" + (e && e.message))) + "（可再问一次）" }));
@@ -4303,13 +4408,140 @@ export default {
             clk.stop();
             // 追问建议：正文已经吐完（读者已在读了），再花一次便宜档补三个「接着可以问什么」。
             // 走 WDS_VENDORS 的快档而非满血档——这一步要快，慢了读者早就自己打字了；失败一律吞掉。
-            if (outText.length > 150) {
+            if (outText.length > 150 && !rs) {
               const fVC = { url: WDS_VENDORS[vd].url, model: WDS_VENDORS[vd].model };
               const fs = await followUps(fVC, KEY, q, outText, lang);
               if (fs.length) controller.enqueue(_sseBytes({ t: "follow", v: fs }));
             }
           } catch (e) {
             controller.enqueue(_sseBytes({ t: "error", v: "生成出错：" + (e && e.message) + "（可再问一次）" }));
+          }
+          fin();
+        },
+      });
+      return new Response(stream, { headers: { ..._cors(), "content-type": "text/event-stream; charset=utf-8", "cache-control": "no-store" } });
+    }
+    // ── 深度研究 /api/wds/research ─────────────────────────────────────────
+    // 分两个 mode，**中间那几步不在这里**：每一步都走 /api/wds/chat（带 rs 字段），
+    // 因为检索/联网/流式/心跳/时钟/限流那一整套已经在那条产线上跑熟了，重写一份只会多一份 bug。
+    //   mode=plan  —— 拆题。结构化 JSON，**必须非满功率＋有界预算**（老教训：满功率写 JSON 必崩）。非流式。
+    //   mode=final —— 总判断。流式（先出流后干活＋心跳＋时钟），只吃各步正文，不再检索。
+    if (url.pathname === "/api/wds/research") {
+      if (request.method === "OPTIONS") return new Response(null, { headers: _cors() });
+      if (request.method !== "POST") return new Response("Method Not Allowed", { status: 405 });
+      let b = {}; try { b = await request.json(); } catch (e) {}
+      const vd = wdsVendorOf(b.vendor);
+      const KEY = String(b.key || "").trim();
+      const lang = b.lang === "en" ? "en" : "zh";
+      const q = String(b.q || "").trim().slice(0, 4000);
+      const mode = b.mode === "final" ? "final" : "plan";
+      if (KEY.length < 8) {
+        if (mode === "plan") return Response.json({ ok: false, code: "need_key", msg: "深度研究用你自己的 API Key 运行（在设置里填入，只存在你的浏览器本地）。" }, { status: 200, headers: _cors() });
+        return _sseResp([{ t: "error", v: "深度研究用你自己的 API Key 运行。", code: "need_key" }]);
+      }
+      const LANG = lang === "en" ? "\n\nWrite in English." : "";
+      if (mode === "plan") {
+        if (!q) return Response.json({ ok: false, msg: "先给一个要研究的题目。" }, { status: 200, headers: _cors() });
+        const want = Math.max(3, Math.min(6, parseInt(b.n, 10) || 4));
+        // 非满功率（结构化输出的铁律）＋ 有界预算 ＋ 短时限：拆题是配菜，卡住就该空手回来。
+        const VC = { url: WDS_VENDORS[vd].url, model: wdsPickModel(vd, String(b.model || ""), 0), name: WDS_VENDORS[vd].name };
+        const sys = "你在替 WDS（王德生的 AI 分身、SDE 本体论老师）为一次深度研究拆题。"
+          + "读者给一个题目，你把它拆成 " + want + " 个**依次推进**的取证步骤——不是把题目换几种说法，而是每一步都去查一类不同的东西、"
+          + "且后一步要能站在前一步的结论上。最后一步之后会另有一次总判断，所以**不要留一步叫\"总结\"**。"
+          + "每一步要能被单独拿去做一次全站检索＋联网检索，所以写成一个具体的问句，别写成名词短语。"
+          + "\n只输出 JSON，形如："
+          + "{\"title\":\"这次研究的标题（一句，不超过 24 字）\",\"steps\":[{\"t\":\"第一步要查清的具体问句\",\"why\":\"为什么这一步必须在前面（一句）\"}]}"
+          + "\n不要 Markdown 代码围栏，不要任何解释文字。" + LANG;
+        try {
+          const out = await llmText(VC, KEY, sys, "题目：" + q, 3000, 60000);
+          const j = looseJSON(out || "");
+          const steps = (j && Array.isArray(j.steps) ? j.steps : [])
+            .map((s) => ({ t: String((s && s.t) || "").trim().slice(0, 200), why: String((s && s.why) || "").trim().slice(0, 200) }))
+            .filter((s) => s.t).slice(0, 6);
+          if (!steps.length) return Response.json({ ok: false, msg: "拆题没成——再点一次，或把题目说得更具体些。" }, { status: 200, headers: _cors() });
+          return Response.json({ ok: true, title: String((j && j.title) || q).slice(0, 80), steps }, { status: 200, headers: _cors() });
+        } catch (e) {
+          return Response.json({ ok: false, msg: "拆题出错：" + (e && e.message) }, { status: 200, headers: _cors() });
+        }
+      }
+      // ── mode=final：总判断 ──
+      const secs = (Array.isArray(b.secs) ? b.secs : []).slice(0, 8).map((s) => ({
+        t: String((s && s.t) || "").slice(0, 200),
+        body: String((s && s.body) || "").slice(0, 4000),   // 只吃各步的前 4000 字：总判断要的是它们的落点，不是全文重读
+      })).filter((s) => s.body);
+      if (!secs.length) return _sseResp([{ t: "error", v: "没有可用的分步正文，写不了总判断。" }]);
+      const deep = b.mode2 === "deep" || !!b.deep;
+      const VC = deep ? wdsTopVC(vd) : { url: WDS_VENDORS[vd].url, model: wdsPickModel(vd, String(b.model || ""), 0), name: WDS_VENDORS[vd].name };
+      const ip = request.headers.get("cf-connecting-ip") || "unknown";
+      try {
+        const lim = env.ASK_LIMITER.get(env.ASK_LIMITER.idFromName(wdsBucket("chat", ip, KEY)));
+        const lr = await (await lim.fetch(new Request("https://limiter.internal/?w=" + WDS_PER_MIN + "&d=" + WDS_PER_DAY))).json();
+        if (!lr.ok) return _sseResp([{ t: "error", v: lr.reason === "day" ? "这把 Key 今天的额度用完了，明天再来。" : "太快啦，过十几秒再来。" }]);
+      } catch (e) {}
+      const stream = new ReadableStream({
+        async start(controller) {
+          let _hb = null;
+          const fin = () => { if (_hb) clearInterval(_hb); try { controller.enqueue(_ENC.encode("data: [DONE]\n\n")); controller.close(); } catch (e) {} };
+          const _st = { t0: Date.now(), think: 0, out: 0, stage: "写总判断" };
+          _hb = wdsBeat(controller, _st);
+          try {
+            let reflect = ""; try { reflect = await ensureReflect(env, url, wdsShort(vd), VC, KEY); } catch (e) {}
+            const sys = "你是 WDS，王德生的 AI 分身、SDE 本体论老师。一次深度研究的各分步已经写完，现在只剩最后一件活：**下总判断**。"
+              + (reflect ? ("\n\n【SDE 内化心得·思考底盘（别复述、别提\"心得\"二字）】\n" + reflect) : "")
+              + "\n\n【总判断怎么写】"
+              + "\n1. 开头一句就是结论——这次研究把什么问题从哪儿挪到了哪儿。不许有\"本文/本次研究将\"这类开场。"
+              + "\n2. 然后写三件事，各一段："
+              + "\n   · **撞出来的那一条**：把各步单独看不出、合起来才成立的那个判断说出来。这是这份报告存在的理由；写不出来就老实说各步之间没撞出新东西。"
+              + "\n   · **各步之间打架的地方**：哪两步的结论互相矛盾、矛盾在哪一层。不要和稀泥。"
+              + "\n   · **这次没查到的**：缺的是哪一类证据、要往哪儿再查一步。"
+              + "\n3. 最后给一条可被反驳的判断，并写明它的证伪条件（什么情况出现就说明它错了）。"
+              + "\n4. 全程说人话，不堆术语；1000 字上下；不要重复各步已经写过的细节。" + LANG;
+            const usr = "研究题目：" + q + "\n\n【各分步的正文（节选）】\n"
+              + secs.map((s, i) => "── 第 " + (i + 1) + " 步 · " + s.t + " ──\n" + s.body).join("\n\n");
+            const clk = wdsClock(CHAT_FIRST_MS, CHAT_TOTAL_MS);
+            let upstream;
+            try {
+              upstream = await wdsFetchMax(VC, KEY, [{ role: "system", content: sys }, { role: "user", content: usr }], true, deep ? 6000 : 4000, clk.signal);
+            } catch (e) {
+              clk.stop();
+              controller.enqueue(_sseBytes({ t: "error", v: (clk.cut ? clk.why("基底") : ("接不上基底：" + (e && e.message))) }));
+              return fin();
+            }
+            if (!upstream.ok) {
+              const errtxt = (await upstream.text()).slice(0, 300);
+              if (upstream.status === 401 || upstream.status === 402 || upstream.status === 429) { controller.enqueue(_sseBytes({ t: "error", v: "你的 Key 用不了（" + upstream.status + "）。", code: "bad_key" })); return fin(); }
+              controller.enqueue(_sseBytes({ t: "error", v: "基底返回错误 " + upstream.status + "：" + errtxt })); return fin();
+            }
+            const reader = upstream.body.getReader();
+            const dec = new TextDecoder();
+            let buf = "", outText = "";
+            try {
+              while (true) {
+                const { done: rdone, value } = await reader.read();
+                if (rdone) break;
+                buf += dec.decode(value, { stream: true });
+                let idx;
+                while ((idx = buf.indexOf("\n")) >= 0) {
+                  const line = buf.slice(0, idx).trim();
+                  buf = buf.slice(idx + 1);
+                  if (!line.startsWith("data:")) continue;
+                  const p = line.slice(5).trim();
+                  if (p === "[DONE]") continue;
+                  let j; try { j = JSON.parse(p); } catch (e) { continue; }
+                  if (j.error) { controller.enqueue(_sseBytes({ t: "error", v: j.error.message || "基底流内错误" })); continue; }
+                  const d = (j.choices && j.choices[0] && j.choices[0].delta) || {};
+                  if (d.reasoning_content) { clk.firstFrame(); _st.think += d.reasoning_content.length; controller.enqueue(_sseBytes({ t: "think", v: d.reasoning_content })); }
+                  if (d.content) { clk.firstFrame(); _st.out += d.content.length; outText += d.content; controller.enqueue(_sseBytes({ t: "token", v: d.content })); }
+                }
+              }
+            } catch (e) {
+              const why = clk.cut ? clk.why("总判断") : ("流中断：" + (e && e.message));
+              if (outText) controller.enqueue(_sseBytes({ t: "note", v: why + "——已写出的部分保留着。" }));
+              else controller.enqueue(_sseBytes({ t: "error", v: why }));
+            }
+            clk.stop();
+          } catch (e) {
+            controller.enqueue(_sseBytes({ t: "error", v: "总判断出错：" + (e && e.message) }));
           }
           fin();
         },
