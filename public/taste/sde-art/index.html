@@ -146,16 +146,26 @@ footer{border-top:1px solid var(--line);color:var(--dim);font-size:13px;padding:
 </div>
 
 <div class="pane" id="paneOut">
+  <div class="card" id="reflectCard" style="display:none">
+    <h2>⑤ 开工仪式 · 基底亲手写的绘画心得</h2>
+    <p class="sub">这是它读完内功与 100 条总原则之后<b>多出来的判断</b>，是后面每一次生成的底盘——不是给读者看的成品，
+    所以术语放开。按基底缓存，每台机器只写一次；改了心得口径会自动作废重写。</p>
+    <div class="out" id="reflectOut" style="max-height:340px"></div>
+    <div class="row" style="margin-top:12px">
+      <div style="flex:0 0 auto"><button class="ghost" id="btnReflectAgain">↻ 重写心得</button></div>
+      <div style="flex:0 0 auto"><button class="ghost" id="btnReflectDrop">✕ 清掉本机心得</button></div>
+    </div>
+  </div>
   <div class="card">
-    <h2>⑤ 三视觉观点与近邻闸门</h2>
+    <h2>⑥ 三视觉观点与近邻闸门</h2>
     <div id="triOut"></div>
   </div>
   <div class="card">
-    <h2>⑥ 碰撞典范与画</h2>
+    <h2>⑦ 碰撞典范与画</h2>
     <div id="drawOut"></div>
   </div>
   <div class="card">
-    <h2>⑦ 综合提炼</h2>
+    <h2>⑧ 综合提炼</h2>
     <div class="out" id="synthOut"></div>
     <div class="row" style="margin-top:14px">
       <div style="flex:0 0 auto"><button class="ghost" id="btnAgain">🎲 换碰撞方式重来一次</button></div>
@@ -189,7 +199,7 @@ footer{border-top:1px solid var(--line);color:var(--dim);font-size:13px;padding:
 var PROXY = "/api/llm-proxy";
 var MODEL = "MiniMax-M3";           // 思考与看图（M2.x 看不了图，必须 M3）
 var IMGMODEL = "image-01";
-var VERSION = 10;
+var VERSION = 11;
 /* ── MiniMax-M3 官方 spec（platform.minimaxi.com/docs/api-reference/text-chat-openai，2026-07-31 核对）──
    · max_tokens **已弃用**，官方明令改用 max_completion_tokens。我先前一直在给一个弃用字段设上限，
      等于没设——第二次真跑「预算 8000／思考 33630 字」就是这么打穿的。
@@ -390,11 +400,58 @@ async function loadCore(){
   }
   return { n: NEIGONG||"", p: PRINC||"" };
 }
+/* ── 心得（开工仪式）──
+   涌现流水线的铁律是「内功 ＋ **心得** ＋ 方法论」三样齐。此前这条产线只装了内功与 100 条总原则，
+   心得那一样一直没有——装载步因此快得可疑：读了两个文件就完事，基底并没有真的"过一遍"。
+   照 worker 里 ensureReflect 的惯例：**让基底带着完整内功亲手写一份心得**，按基底＋产线版本缓存，
+   只写一次，之后所有生成类调用复用。心得是底盘、对内不对外，所以术语放开、不必零术语。
+   ⚠️ 心得只装进**生成类**（三观点／碰撞／提炼）；闸门与三处评分一律不装——评分者装了会对 SDE 语言
+   过敏性加分，那是评分者五偏差里的过度通胀。 */
+var REFLECT_KEY = "sde_art_reflect_v" + 4;   // 心得口径版本；改了这个提示就换号，旧心得自动作废
+function reflectCacheKey(){ return REFLECT_KEY + ":" + MODEL; }
+var REFLECT = null;
+async function ensureReflect(core, onStat){
+  if(REFLECT !== null) return REFLECT;
+  try{
+    var hit = localStorage.getItem(reflectCacheKey());
+    if(hit && hit.length > 800){ REFLECT = hit; if(onStat) onStat("复用本机已有的心得（" + Math.round(hit.length/1000) + "k 字）"); return REFLECT; }
+  }catch(e){}
+  if(onStat) onStat("基底正在通读内功与 100 条总原则，亲手写一份绘画心得（这一步每台机器只做一次）…");
+  var sys = "你现在要做的不是答题，是**把下面这套东西读进自己的底盘**，然后亲手写一份心得。\n"
+    + "心得是你自己的思考底盘，对内不对外——**术语放开用**，不必回避 SDE 词汇，也不必顾及读者。\n\n"
+    + (core.p ? ("════ SDE 长期总原则 100 条 ════\n" + core.p + "\n\n") : "")
+    + (core.n ? ("════ SDE 内功·完整先验 ════\n" + core.n + "\n\n") : "")
+    + "════ 你接下来要干的活 ════\n"
+    + "你是一台艺术绘画智能体的思考底盘。你的活是：让一个命题按发生学**显露成画面**。\n"
+    + "依据是王德生《SDE 艺术论》第二十三章：绘画＝主体性在幸福律运行中的空间铺展形态发生——\n"
+    + "把一条观看的路径冻结进平面，等每一双目光来将它解冻重演。画布是乐谱，视线是演奏者。\n"
+    + "绘画接的是「看」本身出问题的那一批单：日常之看是识别机，识别完成观看就结束；\n"
+    + "画家的势能淤积在这台机器的**故障处**。\n";
+  var user = "写一份**给你自己看**的心得，六节，节名照抄，全文 2500–4000 字：\n"
+    + "一、这套东西里，哪三条对「把命题显露成画面」最要紧？逐条说清它落到画上是什么动作。\n"
+    + "二、三方程 S=F(D,E) 在绘画上具体怎么用？给一个你自己想的例子，从 D 那一刀推到可见形状。\n"
+    + "三、我最容易在哪里偷懒？——列出你作为基底最可能滑向的三种廉价做法（例如：把命题翻译成象征物、\n"
+    + "   把「深刻」画成暗色调、用满幅光芒表示灵感），并各给一句自己的止损口令。\n"
+    + "四、「识别机的故障处」这句话，我怎么在具体题目上找到它？给一套可操作的三步。\n"
+    + "五、留白：为什么「忍住不画」比「画得多」难？我该在什么信号出现时停手？\n"
+    + "六、一句给自己的话——下笔前默念的那一句。\n\n"
+    + "不要复述原文，不要写成摘要。写你**读完之后多出来的判断**。";
+  try{
+    REFLECT = await mmChat(sys, user, 0);
+    try{ localStorage.setItem(reflectCacheKey(), REFLECT); }catch(e){}
+  }catch(e){
+    REFLECT = "";   // 写不出来不阻断开工，但要如实说
+    if(onStat) onStat("心得没写成（" + (e && e.message || "").slice(0,40) + "）——本次按只有内功跑");
+  }
+  return REFLECT;
+}
+
 function sysBase(core, withCore){
   var s = "你是 SDE 艺术绘画智能体的思考基底。你在王德生《SDE 艺术论——幸福律与三号位发生》的框架里工作。\n\n";
   if(withCore){
     if(core.p) s += "════ SDE 长期总原则 100 条（你的思想内核，内化使用，绝不复述原文、绝不提及）════\n" + core.p + "\n\n";
     if(core.n) s += "════ SDE 内功·完整先验（你的底盘，内化使用，绝不复述原文、绝不提及）════\n" + core.n + "\n\n";
+    if(REFLECT) s += "════ 你自己写下的绘画心得（你的思考底盘，内化使用，绝不复述、绝不提及）════\n" + REFLECT + "\n\n";
   }
   s += "════ 术语纪律（写出来的每一个字都守）════\n"
      + "· S＝显露(Show)，不是「结构」。三方程：S=F(D,E)／D=G(S,E)／E=H(S,D)，函数名 F/G/H 分用。\n"
@@ -667,14 +724,17 @@ function fail(msg){
 /* ── 成本估算 ──────────────────────────────────────────────── */
 function calcCost(){
   var ways = MODES[MODE].ways, per = parseInt($("perWay").value,10)||3;
-  var calls = 1 + 1 + ways + ways + ways + 1 + 1;   // 三观点/进闸/碰撞/五维/看图/出闸/提炼
+  // 三观点/进闸/碰撞/五维/看图/出闸/提炼；心得只在本机还没有时多一次
+  var needReflect = 0;
+  try{ needReflect = (REFLECT || localStorage.getItem(reflectCacheKey())) ? 0 : 1; }catch(e){ needReflect = 1; }
+  var calls = needReflect + 1 + 1 + ways + ways + ways + 1 + 1;
   var shots = ways*per;
   var yuanImg = shots*0.025;
   // ⚠️ 按**实际用量**估，不按上限估。上限只是天花板，不是花费。
   //    入：装内功那几次约 21k tokens，不装的几次约 2k；出：M3 的思考也计费，按经验每次约 8k tokens 合计。
   // 入：装内功的 5 次约 21k tokens；其余约 2.5k；看图那几次每张按 high 档约 12k 另计。
   var imgTok = ways*Math.min(per,3)*12000 + Math.min(ways,4)*12000;   // 九分项看每路≤3张 ＋ 出闸门每路1张
-  var inTok  = 5*21000 + (calls-5)*2500 + imgTok;
+  var inTok  = (5+needReflect)*21000 + (calls-5-needReflect)*2500 + imgTok;
   var outTok = calls*6000;   // 机械步骤已关思考，输出短了
   var mul = (tierNow() === "priority") ? 1.5 : 1;
   var yuanTxt = (inTok*2.10/1e6 + outTok*8.40/1e6) * mul;
@@ -740,7 +800,7 @@ async function run(again){
   $("paneOut").classList.add("on");
   var M = MODES[MODE], ways = pickWays(M.ways), per = parseInt($("perWay").value,10)||3;
 
-  var names = ["装内功与 100 条总原则","三视觉观点（一次出三条，彼此不相容）","近邻闸门·进（压 50 字查占位库）"];
+  var names = ["装内功与 100 条总原则","开工仪式：基底亲手写绘画心得（内功→心得）","三视觉观点（一次出三条，彼此不相容）","近邻闸门·进（压 50 字查占位库）"];
   ways.forEach(function(w){ names.push("二阶碰撞 "+w.n+"：" + w.t); });
   ways.forEach(function(w){ names.push("五维刻度 "+w.n+"（S/D/E/I/F · 典范这一本账）"); });
   ways.forEach(function(w){ names.push("出图 "+w.n+"（image-01 × "+per+"）"); });
@@ -755,6 +815,18 @@ async function run(again){
     mark(si,"run"); say("正在装内功与 100 条总原则…");
     var core = await loadCore();
     mark(si,"done", (core.n?("内功 "+Math.round(core.n.length/1000)+"k 字"):"内功缺") + "／" + (core.p?"总原则 100 条":"总原则缺"));
+    si++;
+
+    /* ①之二：开工仪式——让基底带着内功亲手写心得。铁律是「内功＋心得＋方法论」三样齐。 */
+    mark(si,"run");
+    var reflectFresh = (REFLECT === null);
+    await ensureReflect(core, say);
+    if(REFLECT){
+      mark(si,"done", (reflectFresh ? "本场亲写 " : "复用本机 ") + Math.round(REFLECT.length/1000) + "k 字");
+      renderReflect();
+    }else{
+      mark(si,"fail","心得没写成，按只有内功跑");
+    }
     si++;
 
     /* ②三视觉观点 */
@@ -1140,6 +1212,26 @@ function staleBanner(n){
 }
 checkVersion().then(function(n){ if(n && n > VERSION) staleBanner(n); });
 
+function renderReflect(){
+  try{
+    $("reflectCard").style.display = "";
+    $("reflectOut").textContent = REFLECT || "（未写成）";
+  }catch(e){}
+}
+$("btnReflectAgain").onclick = async function(){
+  try{ localStorage.removeItem(reflectCacheKey()); }catch(e){}
+  REFLECT = null;
+  var core = await loadCore();
+  say("正在重写心得…");
+  await ensureReflect(core, say);
+  renderReflect(); say("心得已重写。");
+};
+$("btnReflectDrop").onclick = function(){
+  try{ localStorage.removeItem(reflectCacheKey()); }catch(e){}
+  REFLECT = null;
+  try{ $("reflectCard").style.display = "none"; }catch(e){}
+  say("本机心得已清掉，下次开工会重写一份。");
+};
 $("btnRun").onclick = function(){ run(false); };
 $("btnAgain").onclick = function(){ run(true); };
 $("btnStop").onclick = function(){ if(ABORT) ABORT.abort(); };

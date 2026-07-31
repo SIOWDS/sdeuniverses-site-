@@ -40,6 +40,8 @@ function triReply(n) {
     "最易被推翻处：如果两侧密度差看不出来，这一刀就没落下。";
   return [1, 2, 3].slice(0, n).map((i) => one(i, ["沉降", "上浮", "悬停"][i - 1])).join("\n\n");
 }
+const REFLECT_REPLY = "一、最要紧的三条\n……\n二、三方程在绘画上怎么用\n……\n三、我最容易在哪里偷懒\n……\n"
+  + "四、怎么找识别机的故障处\n……\n五、留白：为什么忍住不画更难\n……\n六、下笔前默念的那一句\n把标签摘掉，再看一眼。";
 const GATE_REPLY =
   "条1｜判定：〔通过〕\n条1｜撞上：无\n条1｜分离线：地层剖面在【层界是水平堆叠】上是 A，本条是非 A（缝是竖的且两侧同质），读法是看缝的走向。\n" +
   "条2｜判定：〔占位失败〕\n条2｜撞上：群鸟成形\n条2｜分离线：—\n" +
@@ -126,8 +128,10 @@ function happyScript(opts) {
     const sys = (rec.body.messages[0] && rec.body.messages[0].content) || "";
     if (/彼此不相容\*{0,2}的视觉进路|三条\*{0,2}彼此不相容/.test(uText) || /观点一：/.test(uText) === false && /要你做的/.test(uText))
       return chatOK(triReply(opts.triCount == null ? 3 : opts.triCount));
+    if (/把下面这套东西读进自己的底盘/.test(sys)) return chatOK(REFLECT_REPLY);
     if (/图像占位核查员/.test(sys) && !/看着\*{0,2}成品图/.test(sys)) return chatOK(GATE_REPLY);
-    if (/图像占位核查员/.test(sys)) return chatOK(GATEOUT_REPLY);
+    if (/把下面这套东西读进自己的底盘/.test(sys)) return chatOK(REFLECT_REPLY);
+      if (/图像占位核查员/.test(sys)) return chatOK(GATEOUT_REPLY);
     if (/创新度量员/.test(sys)) return chatOK(opts.iqGarbage ? "乱写，没有任何维名与分数" : IQ5_REPLY);
     if (/画面审看者/.test(sys)) {
       auditSeen++;
@@ -167,7 +171,8 @@ async function drive(w, mode, opts) {
 
     ok("内功与 100 条总原则各取一次", calls.filter((c) => /sde-neigong/.test(c.url)).length === 1
       && calls.filter((c) => /kb\/principles/.test(c.url)).length === 1);
-    ok("基底调用 13 次（三观点1＋进闸1＋碰撞3＋五维3＋看图3＋出闸1＋提炼1）", chats.length === 13, "实测 " + chats.length);
+    ok("基底调用 14 次（心得1＋三观点1＋进闸1＋碰撞3＋五维3＋看图3＋出闸1＋提炼1）",
+      chats.length === 14, "实测 " + chats.length);
     ok("出图 3 次（每路一次）", draws.length === 3, "实测 " + draws.length);
     ok("全部走 /api/llm-proxy，无浏览器直连", api.every((c) => /\/api\/llm-proxy$/.test(c.url)));
     ok("每一次都带 Bearer，且 Key 不出现在 body 里",
@@ -194,12 +199,15 @@ async function drive(w, mode, opts) {
     // 装内功 / 不装内功的分工
     const withCore = chats.filter((c) => /SDE 内功·完整先验/.test(c.body.messages[0].content));
     const noCore = chats.filter((c) => !/SDE 内功·完整先验/.test(c.body.messages[0].content));
-    ok("装内功的是：三观点＋三路碰撞＋综合提炼＝5 次", withCore.length === 5, "实测 " + withCore.length);
+    ok("装内功的是：心得＋三观点＋三路碰撞＋综合提炼＝6 次", withCore.length === 6, "实测 " + withCore.length);
     ok("不装内功的是：进闸门1＋五维3＋看图3＋出闸门1＝8 次（三处评分者一律不装，防通胀）",
       noCore.length === 8, "实测 " + noCore.length);
     ok("装内功的每一次也都装了 100 条总原则", withCore.every((c) => /长期总原则 100 条/.test(c.body.messages[0].content)));
-    ok("装内功的每一次都带术语纪律", withCore.every((c) => /S＝显露\(Show\)/.test(c.body.messages[0].content)));
-    ok("三观点提示里明令写完就停、不许调和", /写完就停/.test(chats[0].body.messages[1].content));
+    // 心得那一次的 system 是开工仪式专用的（术语放开），不走 sysBase，所以不查它的术语纪律
+    ok("除心得外，装内功的每一次都带术语纪律",
+      withCore.filter((c) => !/把下面这套东西读进自己的底盘/.test(c.body.messages[0].content))
+        .every((c) => /S＝显露\(Show\)/.test(c.body.messages[0].content)));
+    ok("三观点提示里明令写完就停、不许调和", /写完就停/.test(chats[1].body.messages[1].content));
 
     // 碰撞方式无放回
     const wayNos = chats.filter((c) => /本轮碰撞方式/.test(String(c.body.messages[1].content)))
@@ -219,7 +227,7 @@ async function drive(w, mode, opts) {
 
   /* ═════ 二、三档差异真生效 ═════ */
   group("二、三档差异");
-  for (const [m, wantChats, wantDraws] of [["A", 7, 1], ["C", 7, 1], ["B", 13, 3]]) {
+  for (const [m, wantChats, wantDraws] of [["A", 8, 1], ["C", 8, 1], ["B", 14, 3]]) {
     const { w, calls } = await boot(happyScript());
     await drive(w, m, {});
     const chats = calls.filter((c) => /chat\/completions$/.test(c.target));
@@ -354,6 +362,7 @@ async function drive(w, mode, opts) {
       if (/kb\/principles$/.test(rec.url)) return { json: { ok: true, principles: [] } };
       if (/image_generation$/.test(rec.target)) return imgOK(1);
       const sys = rec.body.messages[0].content, u = String(rec.body.messages[1].content);
+      if (/把下面这套东西读进自己的底盘/.test(sys)) return chatOK(REFLECT_REPLY);
       if (/图像占位核查员/.test(sys)) return chatOK(GATE_REPLY);
       if (/创新度量员/.test(sys)) return chatOK(IQ5_REPLY);
       if (/画面审看者/.test(sys)) return chatOK(B9_REPLY);
@@ -377,6 +386,7 @@ async function drive(w, mode, opts) {
       if (/kb\/principles$/.test(rec.url)) return { json: { ok: true, principles: [] } };
       if (/image_generation$/.test(rec.target)) return imgOK(1);
       const sys = rec.body.messages[0].content, u = String(rec.body.messages[1].content);
+      if (/把下面这套东西读进自己的底盘/.test(sys)) return chatOK(REFLECT_REPLY);
       if (/图像占位核查员/.test(sys)) return chatOK(GATE_REPLY);
       if (/创新度量员/.test(sys)) return chatOK(IQ5_REPLY);
       if (/画面审看者/.test(sys)) return chatOK(B9_REPLY);
@@ -413,8 +423,9 @@ async function drive(w, mode, opts) {
       w.document.getElementById("triOut").querySelectorAll(".card").length === 4,
       "实测 " + w.document.getElementById("triOut").querySelectorAll(".card").length);
     const llmOnly = calls.filter((c) => /\/api\/llm-proxy$/.test(c.url)).length;
-    ok("重来一次的调用数与第一轮相同（没有多烧也没有少跑）", llmOnly === 2 * 16,
-      "两轮 llm-proxy 合计 " + llmOnly + "（每轮应为 13 聊天 ＋ 3 出图）");
+    // 第二轮复用本机心得，少一次调用 —— 这正是缓存该起的作用
+    ok("重来一次复用心得，比第一轮正好少一次调用", llmOnly === 17 + 16,
+      "两轮 llm-proxy 合计 " + llmOnly + "（首轮 14 聊天＋3 出图，次轮 13＋3）");
   }
 
   /* ═════ 八、再往刁钻处挖 ═════ */
@@ -428,6 +439,7 @@ async function drive(w, mode, opts) {
       if (/kb\/principles$/.test(rec.url)) return { json: { ok: true, principles: [] } };
       if (/image_generation$/.test(rec.target)) return imgOK(1);
       const sys = rec.body.messages[0].content, u = String(rec.body.messages[1].content);
+      if (/把下面这套东西读进自己的底盘/.test(sys)) return chatOK(REFLECT_REPLY);
       if (/图像占位核查员/.test(sys)) return chatOK(GATE_REPLY);
       if (/创新度量员/.test(sys)) return chatOK(IQ5_REPLY);
       if (/画面审看者/.test(sys))
@@ -455,6 +467,7 @@ async function drive(w, mode, opts) {
       if (/kb\/principles$/.test(rec.url)) return { json: { ok: true, principles: [] } };
       if (/image_generation$/.test(rec.target)) return imgOK(1);
       const sys = rec.body.messages[0].content, u = String(rec.body.messages[1].content);
+      if (/把下面这套东西读进自己的底盘/.test(sys)) return chatOK(REFLECT_REPLY);
       if (/图像占位核查员/.test(sys)) return chatOK(GATE_REPLY);
       if (/创新度量员/.test(sys)) return chatOK(IQ5_REPLY);
       if (/画面审看者/.test(sys)) return chatOK(B9_REPLY);
@@ -503,6 +516,7 @@ async function drive(w, mode, opts) {
       if (/sde-neigong\.txt$/.test(rec.url) || /kb\/principles$/.test(rec.url)) return { ok: false, status: 404, text: "nope" };
       if (/image_generation$/.test(rec.target)) return imgOK(1);
       const sys = rec.body.messages[0].content, u = String(rec.body.messages[1].content);
+      if (/把下面这套东西读进自己的底盘/.test(sys)) return chatOK(REFLECT_REPLY);
       if (/图像占位核查员/.test(sys)) return chatOK(GATE_REPLY);
       if (/创新度量员/.test(sys)) return chatOK(IQ5_REPLY);
       if (/画面审看者/.test(sys)) return chatOK(B9_REPLY);
@@ -592,6 +606,7 @@ async function drive(w, mode, opts) {
       if (/image_generation$/.test(rec.target)) return imgOK(1);
       const sys = rec.body.messages[0].content, u = uText(rec);
       const wrap = (s) => "<think>\n我先想想该怎么写，这里是一大段思考，里面甚至会出现「观点一：」这种字样来干扰解析。\n</think>\n" + s;
+      if (/把下面这套东西读进自己的底盘/.test(sys)) return chatOK(REFLECT_REPLY);
       if (/图像占位核查员/.test(sys)) return chatOK(wrap(GATE_REPLY));
       if (/创新度量员/.test(sys)) return chatOK(wrap(IQ5_REPLY));
       if (/画面审看者/.test(sys)) return chatOK(wrap(B9_REPLY));
@@ -632,6 +647,7 @@ async function drive(w, mode, opts) {
       if (/kb\/principles$/.test(rec.url)) return { json: { ok: true, principles: [] } };
       if (/image_generation$/.test(rec.target)) return imgOK(1);
       const sys = rec.body.messages[0].content, u = uText(rec);
+      if (/把下面这套东西读进自己的底盘/.test(sys)) return chatOK(REFLECT_REPLY);
       if (/图像占位核查员/.test(sys)) return chatOK(GATE_REPLY);
       if (/创新度量员/.test(sys)) return chatOK(IQ5_REPLY);
       if (/画面审看者/.test(sys)) return chatOK(B9_REPLY);
@@ -658,7 +674,8 @@ async function drive(w, mode, opts) {
       return chatOK("我觉得这个题目很有意思，可以从三个角度谈：首先是材质，其次是光，最后是构图。");
     });
     await drive(w, "B", {});
-    ok("切不出来会自动重试一次（共两遍）", n === 2, "实测 " + n + " 遍");
+    // 这个桩对所有调用都回同一段乱写，心得那一次也算进 n —— 故为 1(心得) + 2(三观点两遍)
+    ok("切不出来会自动重试一次（三观点两遍，另加心得那一次）", n === 3, "实测 " + n + " 遍");
     ok("重试那一遍把格式要求提到最前", true);
     const err = w.document.getElementById("err").textContent;
     ok("两遍都失败时，报错里带上基底真实回了什么（证据，不是猜测）",
@@ -679,6 +696,7 @@ async function drive(w, mode, opts) {
       if (rec.body && rec.body.reasoning_split === true) { split++; return { ok: false, status: 400, text: "unknown field reasoning_split" }; }
       plain++;
       const sys = rec.body.messages[0].content, u = uText(rec);
+      if (/把下面这套东西读进自己的底盘/.test(sys)) return chatOK(REFLECT_REPLY);
       if (/图像占位核查员/.test(sys)) return chatOK(GATE_REPLY);
       if (/创新度量员/.test(sys)) return chatOK(IQ5_REPLY);
       if (/画面审看者/.test(sys)) return chatOK(B9_REPLY);
@@ -701,16 +719,16 @@ async function drive(w, mode, opts) {
     ok("每一次调用的预算都 ＝官方硬上限 524288", 
       chats.every((c) => c.body.max_completion_tokens === 524288),
       "最小 " + Math.min(...chats.map((c) => c.body.max_completion_tokens)));
-    ok("八步一律顶配起步，没有哪一步自带一个更小的上限（阶梯只降不升，写死就等于压死）",
+    ok("九步一律顶配起步，没有哪一步自带一个更小的上限（阶梯只降不升，写死就等于压死）",
       chats.every((c) => c.body.max_completion_tokens === 524288),
       "实测 " + [...new Set(chats.map((c) => c.body.max_completion_tokens))].join(","));
     ok("每一次都带 service_tier（顶配走优先准入）",
       chats.every((c) => c.body.service_tier === "priority"), chats[0].body.service_tier);
     ok("max_completion_tokens 与已弃用的 max_tokens 同发同值（兼容中间层）",
       chats.every((c) => c.body.max_tokens === c.body.max_completion_tokens));
-    ok("机械四步关掉思考（进闸/五维/看图/出闸），生成三步不关",
+    ok("机械四步关掉思考（进闸/五维/看图/出闸），生成六次不关（心得＋三观点＋三碰撞＋提炼）",
       chats.filter((c) => c.body.thinking && c.body.thinking.type === "disabled").length === 8
-      && chats.filter((c) => !c.body.thinking).length === 5,
+      && chats.filter((c) => !c.body.thinking).length === 6,
       "关思考 " + chats.filter((c) => c.body.thinking).length + " 次");
     ok("thinking 只发官方允许的 disabled",
       chats.every((c) => !c.body.thinking || c.body.thinking.type === "disabled"));
@@ -735,6 +753,7 @@ async function drive(w, mode, opts) {
       const big = rec.body.thinking === undefined;   // 只有「打开思考」那一遍才放行
       const sys = rec.body.messages[0].content, u = uText(rec);
       if (!big) return { json: { choices: [{ finish_reason: "length", message: { content: "", reasoning_content: "思".repeat(30000) } }] } };
+      if (/把下面这套东西读进自己的底盘/.test(sys)) return chatOK(REFLECT_REPLY);
       if (/图像占位核查员/.test(sys)) return chatOK(GATE_REPLY);
       if (/创新度量员/.test(sys)) return chatOK(IQ5_REPLY);
       if (/画面审看者/.test(sys)) return chatOK(B9_REPLY);
@@ -763,6 +782,7 @@ async function drive(w, mode, opts) {
       if (rec.body.max_completion_tokens > 262144)
         return { ok: false, status: 400, text: '{"base_resp":{"status_code":1039,"status_msg":"Token 超出限制"}}' };
       const sys = rec.body.messages[0].content, u = uText(rec);
+      if (/把下面这套东西读进自己的底盘/.test(sys)) return chatOK(REFLECT_REPLY);
       if (/图像占位核查员/.test(sys)) return chatOK(GATE_REPLY);
       if (/创新度量员/.test(sys)) return chatOK(IQ5_REPLY);
       if (/画面审看者/.test(sys)) return chatOK(B9_REPLY);
@@ -859,6 +879,66 @@ async function drive(w, mode, opts) {
     ok("并写出线上是第几版", /线上 v999/.test(tag.textContent));
   }
 
+  /* ═════ 十三、开工仪式·心得（用户指出「装内功太快，应该有心得体会产生」之后加的） ═════ */
+  group("十三、开工仪式·心得");
+  {
+    const { w, calls } = await boot(happyScript());
+    await drive(w, "B", {});
+    const chats = calls.filter((c) => /chat\/completions$/.test(c.target));
+    const ref = chats.filter((c) => /把下面这套东西读进自己的底盘/.test(c.body.messages[0].content));
+    ok("开工仪式真的跑了一次", ref.length === 1, "实测 " + ref.length + " 次");
+    ok("心得那一次带着完整内功与 100 条总原则",
+      /SDE 内功·完整先验/.test(ref[0].body.messages[0].content)
+      && /长期总原则 100 条/.test(ref[0].body.messages[0].content));
+    ok("心得的活写明是「让命题显露成画面」，不是泛泛读书",
+      /显露成画面/.test(ref[0].body.messages[0].content));
+    ok("心得明说术语放开、对内不对外（它是底盘不是成品）",
+      /术语放开/.test(ref[0].body.messages[0].content) && /对内不对外/.test(ref[0].body.messages[0].content));
+    ok("心得要它写「读完之后多出来的判断」，不许复述原文",
+      /多出来的判断/.test(ref[0].body.messages[1].content) && /不要复述原文/.test(ref[0].body.messages[1].content));
+    ok("心得六节里有「我最容易在哪里偷懒」这一节（防廉价做法）",
+      /最容易在哪里偷懒/.test(ref[0].body.messages[1].content));
+    ok("心得排在三观点之前（先有底盘再动手）",
+      chats.indexOf(ref[0]) === 0);
+
+    // 心得只装进生成类，不装进评分类
+    const withRef = chats.filter((c) => /你自己写下的绘画心得/.test(c.body.messages[0].content));
+    ok("心得装进生成类＝三观点＋三路碰撞＋提炼＝5 次", withRef.length === 5, "实测 " + withRef.length);
+    ok("闸门与三处评分一律不装心得（防评分通胀，与不装内功同一条纪律）",
+      chats.filter((c) => /图像占位核查员|创新度量员|画面审看者/.test(c.body.messages[0].content))
+        .every((c) => !/你自己写下的绘画心得/.test(c.body.messages[0].content)));
+
+    ok("心得落进 localStorage，按基底＋口径版本作键",
+      !!w.localStorage.getItem("sde_art_reflect_v4:MiniMax-M3"));
+    ok("心得亮在页面上（读者说「太快」，就是因为看不见东西发生）",
+      w.document.getElementById("reflectCard").style.display !== "none"
+      && w.document.getElementById("reflectOut").textContent.length > 10);
+    ok("给了重写与清掉两个按钮",
+      !!w.document.getElementById("btnReflectAgain") && !!w.document.getElementById("btnReflectDrop"));
+  }
+  {
+    // 心得写不出来 → 不阻断开工，但要如实说
+    const { w } = await boot(async function (rec) {
+      if (/sde-art\/\?_v=/.test(rec.url)) return { text: "var VERSION = 11;" };
+      if (/sde-neigong\.txt$/.test(rec.url)) return { text: "桩" };
+      if (/kb\/principles$/.test(rec.url)) return { json: { ok: true, principles: [] } };
+      if (/image_generation$/.test(rec.target)) return imgOK(1);
+      const sys = rec.body.messages[0].content, u = uText(rec);
+      if (/把下面这套东西读进自己的底盘/.test(sys)) return { ok: false, status: 500, text: "boom" };
+      if (/把下面这套东西读进自己的底盘/.test(sys)) return chatOK(REFLECT_REPLY);
+      if (/图像占位核查员/.test(sys)) return chatOK(GATE_REPLY);
+      if (/创新度量员/.test(sys)) return chatOK(IQ5_REPLY);
+      if (/画面审看者/.test(sys)) return chatOK(B9_REPLY);
+      if (/本轮碰撞方式/.test(u)) return chatOK(paraReply("甲"));
+      if (/要你写/.test(u)) return chatOK(SYNTH_REPLY);
+      return chatOK(triReply(3));
+    });
+    await drive(w, "A", {});
+    ok("心得写不出来不阻断开工（退化为只有内功）", !!(w.__sdeArt.last() && w.__sdeArt.last().synth));
+    ok("并在步骤上如实标失败，不假装写成了",
+      /心得没写成/.test(w.document.getElementById("steps").textContent));
+  }
+
   /* ═════ 十一、核心函数一个都不许少（大段替换吞掉邻居，已发生过一次） ═════ */
   group("十一、核心函数在场");
   {
@@ -899,7 +979,7 @@ async function drive(w, mode, opts) {
     await drive(w, "B", {});
     ok("版本一致时不打扰，产线照常跑通", !!(w.__sdeArt.last() && w.__sdeArt.last().synth));
     ok("版本自查不计入基底调用的统计",
-      calls.filter((c) => /\/api\/llm-proxy$/.test(c.url) && /chat\/completions$/.test(c.target)).length === 13);
+      calls.filter((c) => /\/api\/llm-proxy$/.test(c.url) && /chat\/completions$/.test(c.target)).length === 14);
   }
   {
     // 版本自查本身挂了（离线/404）→ 不许因此拦住读者
