@@ -186,6 +186,16 @@ a{color:var(--disc)}
 .mu-out .mu-src a{color:var(--disc);text-decoration:none}
 .mu-out .mu-item:active{background:var(--card2)}
 .mu-out .mu-again{display:inline-block;font-size:0.82rem;color:var(--disc);cursor:pointer;padding:2px 0}
+.ag-hd{font-size:0.74rem;color:var(--text2);letter-spacing:0.04em;margin:0 0 6px 2px}
+.ag-hd b{color:var(--gold);font-weight:700}
+.ag-sub{font-size:0.72rem;color:var(--muted);margin:0 0 8px 2px;line-height:1.55}
+.ag-sep{height:1px;background:var(--border2);margin:0.2rem 0 0.9rem}
+.mu-bar .btn.ic{border-color:var(--grp);background:var(--grp)}
+.ic-key{width:100%;font:inherit;font-size:0.84rem;padding:0.45rem 0.6rem;border:1px solid var(--border);border-radius:8px;background:#fff;color:var(--text);outline:none;margin-bottom:7px}
+.ic-key:focus{border-color:var(--grp)}
+.ic-see{border:1px dashed var(--border);border-radius:9px;padding:0.5rem 0.7rem;margin-bottom:8px;font-size:0.8rem;color:var(--text2);line-height:1.7}
+.ic-see .k{color:var(--muted);margin-right:4px}
+.mu-out .mu-tag{display:inline-block;font-size:0.68rem;color:#F5F2E8;background:var(--grp);border-radius:4px;padding:0 5px;margin-right:6px;vertical-align:0.08em}
 .nw{padding:0.75rem 1rem;background:var(--card);border-bottom:1px solid var(--border2);font-size:0.87rem;line-height:1.75;cursor:pointer}
 .nw b{color:var(--disc)}
 .nw .t{font-size:0.72rem;color:var(--muted)}
@@ -386,6 +396,7 @@ a{color:var(--disc)}
         <div class="form">
           <label>说点什么</label>
           <textarea id="mp-text" maxlength="1000" placeholder="这一刻的想法…（最多 1000 字）"></textarea>
+          <div class="ag-hd">① <b>SDE金句生产机</b> · 随机翻五篇站内文章，一篇长一句</div>
           <div class="mu-bar">
             <button class="btn mu" id="mu-go" type="button">✨ SDE金句生产机</button>
             <button class="btn mu" id="mu-vault" type="button">💡 从库存里挑</button>
@@ -399,6 +410,28 @@ a{color:var(--disc)}
             </select>
           </div>
           <div class="mu-out" id="mu-out"></div>
+          <div class="ag-sep"></div>
+          <div class="ag-hd">② <b>吃图出金句</b> · 用 SDE 解构你这张图，再出五句</div>
+          <div class="ag-sub">先在下面放图，再点它。用的是<b>你自己的看图基底</b>：Key 只存在你本机、直连厂商，本站服务器不经手。</div>
+          <div class="mu-bar">
+            <select id="ic-vd">
+              <option value="glm">智谱 GLM（大陆直连）</option>
+              <option value="qwen">千问 Qwen（大陆直连）</option>
+              <option value="kimi">Kimi（大陆直连）</option>
+              <option value="gpt">GPT（经本站中转）</option>
+            </select>
+            <select id="ic-kind">
+              <option value="asis">就图说图</option>
+              <option value="borrow">借图说事</option>
+              <option value="maxim">格言体</option>
+              <option value="flip">反着说</option>
+              <option value="fun">幽默一点</option>
+            </select>
+          </div>
+          <input type="text" id="ic-key" class="ic-key" placeholder="填你自己的 API Key（只存本机，填一次就行）">
+          <input type="text" id="ic-model" class="ic-key" placeholder="型号（可留空，默认 glm-5v）">
+          <div class="mu-bar"><button class="btn ic" id="ic-go" type="button">🖼 吃图出金句</button></div>
+          <div class="mu-out" id="ic-out"></div>
           <label>图片（最多 9 张，自动压缩）</label>
           <div class="mp-thumbs" id="mp-thumbs"></div>
           <input type="file" id="mp-file" accept="image/*" multiple style="display:none">
@@ -1849,7 +1882,7 @@ el("mo-box").onclick=function(e){
 
 /* 发表 */
 function moOpenPost(){
-  moPick=[];el("mp-text").value="";el("mp-msg").textContent="";el("mu-out").textContent="";
+  moPick=[];el("mp-text").value="";el("mp-msg").textContent="";el("mu-out").textContent="";el("ic-out").textContent="";
   moPaintThumbs();show("mopost");
 }
 el("t-mopen").onclick=moOpenPost;
@@ -2029,6 +2062,195 @@ el("mu-go").onclick=function(){
   if(!picks.length){fire();return;}
   picks.forEach(function(b64){
     muShrink(b64,function(d){
+      if(d)imgs.push(d);
+      if(++done===picks.length)fire();
+    });
+  });
+};
+
+/* 吃图出金句：用读者自己的看图基底，先用 SDE 解构这张图，再从解构里长五句。
+   两条纪律：① Key 只存本机、浏览器直连厂商，**本站服务器不经手**（国产三家）；
+   GPT 没有 CORS，只能走本站 /api/llm-proxy 纯转发（只转不存）。
+   ② 它看不清就该说看不清，不允许拿想象填图里没有的东西。*/
+var IC_VD={
+  glm:{n:"智谱 GLM",url:"https://open.bigmodel.cn/api/paas/v4/chat/completions",m:"glm-5v",k:"sde_glm_key",apply:"open.bigmodel.cn"},
+  qwen:{n:"千问 Qwen",url:"https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions",m:"qwen-vl-max",k:"sde_qwen_key",apply:"bailian.console.aliyun.com"},
+  kimi:{n:"Kimi",url:"https://api.moonshot.cn/v1/chat/completions",m:"kimi-k2.6",k:"sde_kimi_key",apply:"platform.moonshot.cn"},
+  gpt:{n:"GPT",url:"https://api.openai.com/v1/chat/completions",m:"gpt-5.5",k:"sde_gpt_key",apply:"platform.openai.com",proxy:1}
+};
+var IC_KIND={
+  asis:"就图说图：句句不离这张图里看得见的东西。",
+  borrow:"借图说事：从图里那件具体的东西起手，落到一件人人都碰到过的事上。",
+  maxim:"格言体：一句断言，主语明确，不留退路。",
+  flip:"反着说：把看图的人默认会说的那句话翻过来，但要翻得站得住。",
+  fun:"带点自嘲或幽默，可以轻，但不许油。"
+};
+var IC_SYS="你是「吃图出金句」：先用 SDE 解构一张图，再从解构里长出五句能发朋友圈的话。\n"
++"\n【第一步·看见什么】先只列图里**真看得见**的东西：物件、动作、地方、光线、时间。"
++"看不清就写看不清。**不许写图里没有的东西**，不许猜人名地名品牌与心情。\n"
++"\n【第二步·三格解构】只靠上一步列出的东西做：\n"
++"· 显露（S）：这张图把什么**显了出来**？同时它又**遮住**了什么（画框之外、快门之前后）？\n"
++"· 差异（D）：图里那条分界线划在哪两样东西之间？（上下、内外、新旧、人与物、动与停…）\n"
++"· 纠缠（E）：图里谁和谁**互为条件**？拿掉其中一样，另一样就不成立的，是哪两样？\n"
++"这三格是**你自己看的工具**，不要在金句里讲这套词。\n"
++"\n【第三步·出五句】**五句各占一个机位，不许两句同位**：\n"
++"1（S显）这张图显出来的那件事；2（S遮）它同时遮住的那件事；"
++"3（D）那条分界线；4（D反）把默认读法翻过来；5（E）谁和谁互为条件。\n"
++"\n【硬规矩】\n"
++"1. 每句 12–34 字，一整句，能被人原样说出口。\n"
++"2. 句里必须有图里的**具体物**，不许整句都是抽象名词。\n"
++"3. 禁鸡汤（愿你…／生活总会…），禁空词（赋能、闭环、格局、认知升级），禁排比煊情，禁感叹号。\n"
++"4. 不许描述性地复述图（“一张安静的下午…”）；金句不是图说。\n"
++"5. 不许教育别人、不许居高临下；不许出现人名、品牌、地名，除非图里白纸黑字写着。\n"
++"6. 宁可句子短，不要凑字；实在看不清图，就在 see 里写明，lines 宁可少几句。\n"
++"\n【输出】只输出 JSON，不要任何别的字：\n"
++'{"see":["看得见的东西","…"],"s":"显露与遮蔽","d":"那条分界线","e":"谁与谁互为条件",'
++'"lines":[{"g":"S显","t":"…"},{"g":"S遮","t":"…"},{"g":"D","t":"…"},{"g":"D反","t":"…"},{"g":"E","t":"…"}]}';
+var icBusy=false;
+function icCfg(){return IC_VD[el("ic-vd").value]||IC_VD.glm}
+function icLoadKey(){
+  var c=icCfg(),k="";
+  try{k=localStorage.getItem(c.k)||""}catch(e){}
+  el("ic-key").value=k;
+  el("ic-key").placeholder="填你在 "+c.apply+" 申的 Key（只存本机）";
+  el("ic-model").placeholder="型号（可留空，默认 "+c.m+"）";
+}
+el("ic-vd").onchange=function(){
+  try{localStorage.setItem("sde_ic_vd",el("ic-vd").value)}catch(e){}
+  icLoadKey();
+};
+el("ic-key").addEventListener("input",function(){
+  var v=(this.value||"").trim();
+  if(!v)return;                                  /* 空值不写，避免清空误删存档 */
+  try{localStorage.setItem(icCfg().k,v)}catch(e){}
+});
+(function(){
+  try{
+    var v=localStorage.getItem("sde_ic_vd");
+    if(v&&IC_VD[v])el("ic-vd").value=v;
+  }catch(e){}
+  icLoadKey();
+})();
+function icShrink(b64,cb){
+  try{
+    var im=new Image();
+    im.onload=function(){
+      var w=im.width,h2=im.height,M=768;
+      if(w>M||h2>M){var s=M/Math.max(w,h2);w=Math.round(w*s);h2=Math.round(h2*s);}
+      var c=document.createElement("canvas");c.width=w;c.height=h2;
+      var g=c.getContext("2d");g.fillStyle="#fff";g.fillRect(0,0,w,h2);g.drawImage(im,0,0,w,h2);
+      cb(c.toDataURL("image/jpeg",0.68));
+    };
+    im.onerror=function(){cb(null)};
+    im.src="data:image/jpeg;base64,"+b64;
+  }catch(e){cb(null)}
+}
+function icNote(s){var O=el("ic-out");O.textContent="";O.appendChild(mkEl("div","mu-note",s));}
+function icPaint(d){
+  var O=el("ic-out");O.textContent="";
+  var see=mkEl("div","ic-see");
+  var l1=mkEl("div");l1.appendChild(mkEl("span","k","看见："));
+  l1.appendChild(document.createTextNode((d.see||[]).join("、")||"（没列）"));
+  see.appendChild(l1);
+  [["显露：",d.s],["差异：",d.d],["纠缠：",d.e]].forEach(function(pr){
+    if(!pr[1])return;
+    var ln=mkEl("div");ln.appendChild(mkEl("span","k",pr[0]));
+    ln.appendChild(document.createTextNode(pr[1]));
+    see.appendChild(ln);
+  });
+  O.appendChild(see);
+  (d.lines||[]).forEach(function(x){
+    var s=(x&&typeof x==="object")?String(x.t||""):String(x||"");
+    if(!s)return;
+    var r=mkEl("div","mu-item"),t=mkEl("div","mu-txt");
+    if(x&&x.g)t.appendChild(mkEl("span","mu-tag",String(x.g).slice(0,3)));
+    t.appendChild(document.createTextNode(s));
+    r.appendChild(t);
+    r.onclick=function(){
+      el("mp-text").value=s;el("mp-text").focus();
+      el("mp-msg").style.color="var(--muted)";el("mp-msg").textContent="已填入，可以直接改。";
+    };
+    O.appendChild(r);
+  });
+  var ag=mkEl("div","mu-again","↻ 再吃一遍");
+  ag.onclick=function(){el("ic-go").click()};
+  O.appendChild(ag);
+}
+function icParse(txt){
+  var s=String(txt||"").replace(/```json|```/g,"").trim();
+  var j=null;
+  try{j=JSON.parse(s)}catch(e){}
+  if(!j){
+    var a=s.indexOf("{"),z=s.lastIndexOf("}");
+    if(a>=0&&z>a){try{j=JSON.parse(s.slice(a,z+1))}catch(e){}}
+  }
+  if(!j)return null;
+  var out={see:[],s:"",d:"",e:"",lines:[]},had={};
+  if(Array.isArray(j.see))out.see=j.see.map(function(v){return String(v||"").trim().slice(0,40)}).filter(Boolean).slice(0,8);
+  out.s=String(j.s||"").trim().slice(0,120);
+  out.d=String(j.d||"").trim().slice(0,120);
+  out.e=String(j.e||"").trim().slice(0,120);
+  (Array.isArray(j.lines)?j.lines:[]).forEach(function(one){
+    var isO=one&&typeof one==="object";
+    var t=String((isO?one.t:one)||"").replace(/\s+/g," ").trim()
+      .replace(/^[-\u2013\u2014*\u00b7\u2022\d]+[.\u3001)\uff09\s]*/,"")
+      .replace(/^["\u201c\u300c\u300e]/,"").replace(/["\u201d\u300d\u300f]$/,"");
+    if(t.length<4||t.length>60)return;
+    if(had[t])return;had[t]=1;
+    out.lines.push({t:t,g:isO?String(one.g||"").trim().slice(0,3):""});
+  });
+  out.lines=out.lines.slice(0,5);
+  return out;
+}
+el("ic-go").onclick=function(){
+  if(icBusy)return;
+  var btn=el("ic-go"),old=btn.textContent,c=icCfg();
+  var key=(el("ic-key").value||"").trim();
+  if(!moPick.length){icNote("先在下面放一张图，它才有得吃。");return;}
+  if(key.length<8){icNote("先填你自己的 "+c.n+" API Key（在 "+c.apply+" 申）。它只存在你本机。");return;}
+  icBusy=true;btn.disabled=true;btn.textContent="正在看图…";
+  icNote("正在看图、解构、出句（半分钟左右）…");
+  var picks=moPick.slice(0,2),imgs=[],done=0;
+  function fin(){icBusy=false;btn.disabled=false;btn.textContent=old;}
+  function fire(){
+    if(!imgs.length){fin();icNote("图没处理成功，换一张试试。");return;}
+    var model=(el("ic-model").value||"").trim()||c.m;
+    var body={model:model,max_tokens:1400,messages:[
+      {role:"system",content:IC_SYS},
+      {role:"user",content:[{type:"text",text:"【口味】"+(IC_KIND[el("ic-kind").value]||IC_KIND.asis)
+        +"\n\n这是读者要发朋友圈的 "+imgs.length+" 张图。按三步来，只输出那段 JSON。"}]
+        .concat(imgs.map(function(d){return {type:"image_url",image_url:{url:d}}}))}
+    ]};
+    var url=c.proxy?"/api/llm-proxy":c.url;
+    var hd={"content-type":"application/json",authorization:"Bearer "+key};
+    if(c.proxy)hd["x-target-url"]=c.url;
+    var ctl=new AbortController(),to=setTimeout(function(){try{ctl.abort()}catch(e){}},90000);
+    fetch(url,{method:"POST",headers:hd,body:JSON.stringify(body),signal:ctl.signal}).then(function(r){
+      return r.text().then(function(t){return{s:r.status,t:t}});
+    }).then(function(z){
+      clearTimeout(to);fin();
+      if(z.s===401||z.s===403){icNote("Key 用不了（"+z.s+"）：填错了或没开这个型号的权限。");return;}
+      if(z.s===402||z.s===429){icNote("这把 Key 此刻用不了（"+z.s+"）：余额不足或调得太快。");return;}
+      var j=null;try{j=JSON.parse(z.t)}catch(e){}
+      if(z.s!==200){
+        var m=(j&&j.error&&(j.error.message||j.error.type))||String(z.t||"").slice(0,140);
+        icNote(c.n+" 返回错误 "+z.s+"："+m);return;
+      }
+      var txt=(j&&j.choices&&j.choices[0]&&j.choices[0].message&&j.choices[0].message.content)||"";
+      if(typeof txt!=="string"&&txt&&txt.length)txt=txt.map(function(p){return (p&&p.text)||""}).join("");
+      var d=icParse(txt);
+      if(!d||!d.lines.length){icNote("它没按格式回。再点一次，或换个型号试试。");return;}
+      icPaint(d);
+    }).catch(function(e){
+      clearTimeout(to);fin();
+      var msg=(e&&e.name==="AbortError")
+        ?"超时了（超过 90 秒）。图小一点或换个型号再试。"
+        :"连不上 "+c.n+"："+((e&&e.message)||"网络异常")+"。如果是浏览器拦了跨域（CORS），换一家试试。";
+      icNote(msg);
+    });
+  }
+  picks.forEach(function(b64){
+    icShrink(b64,function(d){
       if(d)imgs.push(d);
       if(++done===picks.length)fire();
     });
