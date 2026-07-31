@@ -39,6 +39,8 @@ const src = [
   extract(/function selfCheck\(m\)\{[\s\S]*?\n}/, "selfCheck"),
   extract(/var DEAD_FORMS = \[[\s\S]*?\n\];/, "DEAD_FORMS"),
   extract(/function deadBrief\(\)\{[\s\S]*?\n}/, "deadBrief"),
+  extract(/var PLACE_COMP = \[[\s\S]*?\n\];/, "PLACE_COMP"),
+  extract(/function compBrief\(\)\{[\s\S]*?\n}/, "compBrief"),
   extract(/function scoreOf\(txt, accent\)\{[\s\S]*?\n}/, "scoreOf"),
   extract(/var ARTIST_RE = new RegExp\([\s\S]*?\);/, "ARTIST_RE"),
   extract(/var BAN_TAIL = "[^"]*";/, "BAN_TAIL"),
@@ -50,7 +52,7 @@ const src = [
 const box = {};
 new Function("box", src + "\nbox.WAYS=WAYS;box.pickWays=pickWays;box.PLACE_SDE=PLACE_SDE;box.PLACE_CLICHE=PLACE_CLICHE;"
   + "box.PLACE_STYLE=PLACE_STYLE;box.placeBrief=placeBrief;box.B9=B9;box.MODES=MODES;"
-  + "box.scoreOf=scoreOf;box.cutBlocks=cutBlocks;box.grab=grab;box.cellScore=cellScore;box.hardenPrompt=hardenPrompt;box.BAN_TAIL=BAN_TAIL;box.FIELD_TAIL=FIELD_TAIL;box.IQ5=IQ5;box.IQ5_GATE=IQ5_GATE;box.fingerprint=fingerprint;box.selfCheck=selfCheck;box.DEAD_FORMS=DEAD_FORMS;box.deadBrief=deadBrief;")(box);
+  + "box.scoreOf=scoreOf;box.cutBlocks=cutBlocks;box.grab=grab;box.cellScore=cellScore;box.hardenPrompt=hardenPrompt;box.BAN_TAIL=BAN_TAIL;box.FIELD_TAIL=FIELD_TAIL;box.IQ5=IQ5;box.IQ5_GATE=IQ5_GATE;box.fingerprint=fingerprint;box.selfCheck=selfCheck;box.DEAD_FORMS=DEAD_FORMS;box.deadBrief=deadBrief;box.PLACE_COMP=PLACE_COMP;box.compBrief=compBrief;")(box);
 
 /* ═════ 一、六种碰撞方式与抽签器（真跑） ═════ */
 group("一、六方式与抽签器");
@@ -497,7 +499,13 @@ group("十一之十一、可画性与场");
 
   // 场：渲染端强制注入，不再指望基底听话
   ok("FIELD_TAIL 存在且写明 not a collage", /var FIELD_TAIL = /.test(js) && /not a collage/.test(js));
-  ok("并按住极简静物", /avoid reducing the whole to a single minimal object/.test(js));
+  ok("并按住极简静物与「空掉一半＋直线」两种退化",
+    /avoid reducing the whole to a single object on an empty ground/.test(js)
+    && /avoid a minimal horizon split with one blank half/.test(js));
+  ok("边界不许是直尺（真留白由笔迹/渗染/物形走出来）",
+    /never a ruler-straight edge across the frame/.test(js));
+  ok("大片空白必须被其余部分读到（拿掉它，其余读法就变）",
+    /removing it would change how the rest is seen/.test(js));
   ok("注释写明这是第四次应验「写在要求里 ≠ 落在 prompt 里」", /写在要求里 ≠ 落在 prompt 里/.test(js));
   ok("注释记下两次真跑的读数（硬竖缝 52／拼贴 关系0 连接15）",
     /连接 52/.test(js) && /关系 0、连接 15/.test(js));
@@ -512,6 +520,34 @@ group("十一之十一、可画性与场");
   ok("多了一段场纪律之后仍不超 1500", r3.p.length <= 1500, String(r3.p.length));
   ok("超长裁切后场纪律与禁令串都还在",
     r3.p.indexOf("one continuous pictorial field") >= 0 && r3.p.indexOf(box.BAN_TAIL) >= 0);
+}
+
+/* ═════ 十一之十二、构图骨架占位（第三批真跑两张栽在骨架上之后加的） ═════ */
+group("十一之十二、构图骨架占位");
+{
+  const names = box.PLACE_COMP.map(c => c[0]);
+  ok("骨架占位表 ≥7 条", box.PLACE_COMP.length >= 7);
+  ok("「水平二分·极简地平线」在场（第三批栽的正是它）",
+    names.some(n => /水平二分|极简地平线/.test(n)));
+  ok("居中对称／对角线／三分法／网格／单一物件居中 都在",
+    ["居中对称","对角线","三分法","网格","单一物件居中"].every(k => names.some(n => n.indexOf(k) >= 0)));
+  ok("每条都给出可执行判据", box.PLACE_COMP.every(c => c[1] && c[1].length > 15));
+  ok("「水平二分」的判据是可操作的替换测试",
+    /把空的那一侧换成任何别的颜色/.test(box.PLACE_COMP.find(c => /水平二分/.test(c[0]))[1]));
+
+  const cb = box.compBrief();
+  ok("骨架表点明「占位也藏在骨架里」", /也藏在骨架里/.test(cb));
+  ok("并写死留白的真判据三层（互相定义／入场处／忍住不画）",
+    /有与无同场互相定义/.test(cb) && /白处即观者的入场处/.test(cb) && /忍住不画/.test(cb));
+  ok("明写「空掉一半 ＋ 一条直尺般的边界」不是留白，是没画",
+    /不是留白，是没画/.test(cb));
+  ok("给出留白的可裁决测试：拿掉空的那一半，实的那一半会不会失去意思",
+    /拿掉空的那一半/.test(cb));
+  ok("三处（进闸门／出闸门／看图评分）都吃骨架表",
+    (js.match(/compBrief\(\)/g) || []).length >= 4);   // 定义 1 ＋ 调用 3
+  ok("九分项加了反向硬判据：空白不与实处互相定义则共存≤30、连接≤25",
+    /「共存」不得高于 30/.test(js) && /「连接」不得高于 25/.test(js));
+  ok("sysBase 的留白节也写死了这条反向失败", /那不是留白，是没画/.test(js) && /刚栽过两张/.test(js));
 }
 
 /* ═════ 十二、成本算术 ═════ */

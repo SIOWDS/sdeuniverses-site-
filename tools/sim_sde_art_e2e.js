@@ -1063,8 +1063,12 @@ async function drive(w, mode, opts) {
     ok("每一条送出去的 prompt 都被强制注入「一个场，不是拼贴」",
       calls.filter((c) => /image_generation$/.test(c.target))
         .every((c) => /one continuous pictorial field, not a collage/.test(c.body.prompt)));
-    ok("并按住「退化成极简静物」这个第二个复发病",
-      draw.body.prompt.indexOf("avoid reducing the whole to a single minimal object") >= 0);
+    ok("并按住两种退化：极简静物、以及「空掉一半＋直线」",
+      draw.body.prompt.indexOf("avoid reducing the whole to a single object on an empty ground") >= 0
+      && draw.body.prompt.indexOf("avoid a minimal horizon split with one blank half") >= 0);
+    ok("边界不许是直尺，大片空白必须被其余部分读到",
+      /never a ruler-straight edge across the frame/.test(draw.body.prompt)
+      && /removing it would change how the rest is seen/.test(draw.body.prompt));
     ok("场的纪律排在禁令串之前，禁令串仍在最尾",
       draw.body.prompt.indexOf("one continuous pictorial field") < draw.body.prompt.indexOf("no text, no letters"));
     ok("prompt 仍不超 1500 字符（多了一段场纪律之后也不许超）",

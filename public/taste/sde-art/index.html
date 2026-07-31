@@ -199,7 +199,7 @@ footer{border-top:1px solid var(--line);color:var(--dim);font-size:13px;padding:
 var PROXY = "/api/llm-proxy";
 var MODEL = "MiniMax-M3";           // 思考与看图（M2.x 看不了图，必须 M3）
 var IMGMODEL = "image-01";
-var VERSION = 13;
+var VERSION = 14;
 /* ── MiniMax-M3 官方 spec（platform.minimaxi.com/docs/api-reference/text-chat-openai，2026-07-31 核对）──
    · max_tokens **已弃用**，官方明令改用 max_completion_tokens。我先前一直在给一个弃用字段设上限，
      等于没设——第二次真跑「预算 8000／思考 33630 字」就是这么打穿的。
@@ -367,6 +367,28 @@ var DEAD_FORMS = [
   ["防弹玻璃式","有名作的气派而无入场的通道：观者只能站在它对面确认它在，进不去。判据＝画里有没有一处是留给观者进来的。"],
   ["语法失传",  "只有掌握某套已失传的观看语法才进得去——通道断则场难开。判据＝一个没有受过训练的人能不能自己走进去。"]
 ];
+/* 构图骨架的占位（2026-07-31 第三批真跑补入）。
+   前两层查的是**题材**（喷发→放射光芒）与**动作**（v10 补），而第三批三张画里有两张栽在
+   **骨架**上：上半幅全空、下半幅一条实处、中间一条直尺水平线——极简地平线是被占得最满的
+   构图之一。**骨架本身就是陈词，必须单独查一层。** */
+var PLACE_COMP = [
+  ["水平二分·极简地平线", "上下两块，一条水平线切开，一侧近乎空白。判据＝把空的那一侧换成任何别的颜色，实的那一侧读法变不变；不变就是没画，不是留白。"],
+  ["居中对称", "主体正中、左右镜像。稳，但也最没有话说——对称本身不构成一刀。"],
+  ["对角线切分", "一道对角把画面分成两个三角。上一批真跑栽过一次。"],
+  ["三分法／黄金分割", "构图课的默认答案。用它不算错，但它不能是这幅画唯一的主张。"],
+  ["中心放射／万道光芒", "见通用陈词「放射光芒=灵感迸发」。"],
+  ["网格／方格分区", "把画面切成规整方块，各格互不相干＝拼贴的另一种长相。"],
+  ["单一物件居中于空底", "一块布、一根条纹、一个几何体摆在空背景上——看着像作品，其实是极简静物的退化。上一批真跑栽过。"]
+];
+function compBrief(){
+  return "【构图骨架占位表】占位不只藏在题材与动作里，**也藏在骨架里**。以下骨架本身已被占满，\n"
+    + "用它就必须说清「凭哪个可见特征与它分开」，说不清即判占位失败：\n"
+    + PLACE_COMP.map(function(c){ return "· " + c[0] + "：" + c[1]; }).join("\n") + "\n"
+    + "⚠️**留白的真判据**（书里第二十三章）：留白是①共存的极限形态——**有与无同场互相定义**；\n"
+    + "②连接的邀请函——**白处即观者的入场处**；③忍住不画。\n"
+    + "**「空掉一半 ＋ 一条直尺般的边界」不是留白，是没画。**真留白的边界由笔迹、渗染、\n"
+    + "物形自然走出来，且空处与实处互相改写读法——拿掉空的那一半，实的那一半就失去意思。\n";
+}
 function deadBrief(){
   return "【死格化病征表】绘画的当代第一死因不是画得差，是死格——图像已经通货膨胀，而绘画的现职是**减速装置**：\n"
     + "在十五秒的世界里做一座公然的减速带。以下四种病征，中一条就要在读数里说出来：\n"
@@ -490,6 +512,9 @@ function sysBase(core, withCore){
      + "   ②连接的邀请函（白处即观者的入场处，观者不是看客，是这个场的合建者）；\n"
      + "   ③对作者最险的纪律——**留白不是没画，是忍住不画**，每一处白都是一次抢答冲动的成功克制。\n"
      + "   ⚠️这一条对你尤其要紧：出图基底的默认病就是把画面塞满。**画面的功率，一半在于画了什么，一半在于为目光留出了多少可走的路。**\n"
+     + "   ⚠️⚠️但**反向的失败同样致命，而且刚栽过两张**：把画面空掉一半、中间拉一条直尺般的水平线——\n"
+     + "   **那不是留白，是没画。**判据只有一条：**拿掉空的那一半，实的那一半会不会失去意思？**\n"
+     + "   不会，就说明那片空白什么活都没干。真留白的边界由笔迹、渗染、物形自己走出来，绝不是一条直线。\n"
      + "工艺甲·色彩关系作业：颜色不是被涂上去的，是**在关系中被点燃的**。一块灰置于蓝中发暖、置于橙旁转冷（同一管颜料，两种存在）。\n"
      + "   不要写「某物是某颜色」，要写「什么颜色挨着什么颜色，被推到什么状态」。\n"
      + "工艺乙·构图的连接工程：给目光修路。《最后的晚餐》把全部透视线汇于基督头部——画上没有一支箭头，\n"
@@ -721,8 +746,11 @@ var BAN_TAIL = "no text, no letters, no numbers, no watermark, no recognizable r
    **写在要求里 ≠ 落在 prompt 里**——这是「渲染端回收路径」那条通则的第四次应验。
    同时按住第二个连续复发的病：退化成极简静物（一块布、一根条纹，看着像作品其实空）。 */
 var FIELD_TAIL = "one continuous pictorial field, not a collage: the areas must interlock and modify each other where they meet, "
-  + "not sit side by side as flat bands; give the eye one clear place to stand inside the picture; "
-  + "avoid reducing the whole to a single minimal object on an empty ground";
+  + "not sit side by side as flat bands; the boundary between them must be made by brush, bleed or the form itself, "
+  + "never a ruler-straight edge across the frame; if a large area is left empty it must still be read by the rest of the picture "
+  + "so that removing it would change how the rest is seen; give the eye one clear place to stand inside the picture; "
+  + "avoid a minimal horizon split with one blank half, and avoid reducing the whole to a single object on an empty ground";
+
 function hardenPrompt(p){
   var s = String(p||""), hits = [];
   // ⚠️ 先把已有的禁令串摘出去再净化：禁令串自身含 "not in the style of any named artist"，
@@ -924,7 +952,7 @@ async function run(again){
     /* ③近邻闸门·进（不装内功——照 mode=iq 防通胀纪律） */
     mark(si,"run"); say("近邻闸门：拿压缩句去查图像占位库…");
     var gateSys = "你是图像占位核查员。你**不带任何学派立场**，做两件事：①判断一句视觉命题是否已经被现成图式占住；②判断它会不会一出生就死格。\n"
-      + placeBrief() + "\n" + deadBrief()
+      + placeBrief() + "\n" + compBrief() + "\n" + deadBrief()
       + "\n**这一步是机械核对，不是论述**：直接按格式给读数，别在心里反复推演——想得越久，落笔的预算越少。\n"
       + "\n⚠️**动词也要查**：占位不只藏在名词里，更常藏在动作里——「喷发／迸发／涌出／绽放／流淌／升起」这类词，"
       + "各自都有一张烂熟的默认图（喷发→满幅放射光芒，绽放→花朵盛开，流淌→丝带状光带）。"
@@ -1067,7 +1095,7 @@ async function run(again){
           + "本档尤其看重「" + M.accent[0] + "」与「" + M.accent[1] + "」——**这两格打分是加倍的，其余七格达标也救不回来**。\n"
           + "九格与各自的判据：\n"
           + B9.map(function(g){ return "· " + g[0] + "（" + g[1] + "）：" + g[2]; }).join("\n")
-          + "\n\n" + deadBrief()
+          + "\n\n" + compBrief() + "\n" + deadBrief()
           + "\n严格按每行一项输出，共九行，不要别的：\n项名｜分数(0-100)｜一句为什么\n"
           + "看不清就说看不清，不要猜。";
         var b9User = "【这组图想要显露的那一刀】" + (grab(p3.txt,"三、它切开的辨别面") || "见画面")
@@ -1075,7 +1103,10 @@ async function run(again){
           + "\n\n请看下面 " + p3.imgs.length + " 张图并逐格打分。两条必须照做：\n"
           + "① 「关系」这一格量的是元素之间——如果每个元素单独看也一样，关系为零；\n"
           + "② 如果这张图只是让人「认出」了什么、识别一完成观看就结束，那它停在一号位的物：连接与活力两格必须低分。\n"
-          + "另：画面被塞满、没有可走的空处，「共存」与「连接」两项必须扣。\n"
+          + "另两条硬判据（都是真跑栽出来的）：\n"
+          + "· 画面被塞满、没有可走的空处 → 「共存」与「连接」两项必须扣。\n"
+          + "· **反过来也一样**：大片空白若**不与实处互相定义**（把空的那一侧换个颜色，实的那一侧读法不变），\n"
+          + "  那不是留白是没画——「共存」不得高于 30，「连接」不得高于 25。\n"
           + "如果这张图中了「打卡化」或「十五秒消费」，「活力」（再点燃之力）必须给低分——一眼看完的东西没有第二次发生。";
         var b9Txt = await mmChat(b9Sys, b9User, 0, p3.imgs.slice(0,3), true);
         p3.report = b9Txt;
@@ -1096,7 +1127,7 @@ async function run(again){
       var allImgs = [];
       paras.forEach(function(p){ if(p && p.imgs.length) allImgs.push(p.imgs[0]); });
       if(!allImgs.length) throw new Error("没有图可查");
-      var goSys = "你是图像占位核查员，现在**看着成品图**核查，不看文字描述。\n" + placeBrief() + "\n" + deadBrief()
+      var goSys = "你是图像占位核查员，现在**看着成品图**核查，不看文字描述。\n" + placeBrief() + "\n" + compBrief() + "\n" + deadBrief()
         + "\n三条纪律同前：库未命中不得据以放行；通过须带一条可裁决的分离线；说不出分离线即判占位失败。\n"
         + "另外单独核一件事：这张图像不像任何一位可辨识艺术家的手笔？像就直接判占位失败并点名。";
       var goUser = "逐张核查。每张按四行：\n图N｜判定：〔占位失败〕／〔通过〕／〔库未命中·不放行〕\n图N｜撞上：具体图式名或艺术家名，没有写「无」\n图N｜分离线：（判通过时必须写满）\n"
