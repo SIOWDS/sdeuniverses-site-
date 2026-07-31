@@ -87,7 +87,7 @@ function tail() {
   /* ── ⑤ 心跳与客户端把阶段显示出来（下次报障一眼可判） ── */
   console.log("\n[五] 阶段随心跳回传，读者截图即证据");
   ok(/stage: state\.stage \|\| ""/.test(src), "心跳事件带上了当前阶段");
-  const page = fs.readFileSync("/home/claude/site/public/taste/wds-dialogue/index.html", "utf8");
+  const page = fs.readFileSync("/home/claude/site/public/taste/sde-dialogue/index.html", "utf8");
   ok(/j\.v\.stage\) diag\.stage = j\.v\.stage/.test(page), "客户端记住最后一个阶段");
   ok(/已 " \+ \(j\.v\.sec \|\| 0\) \+ " 秒 · "/.test(page), "等待时显示的是「已 N 秒 · 某阶段」");
   ok(/流式收到 " \+ diag\.bytes \+ " 字节/.test(page), "诊断行如实报收到多少字节（不再一律写「流式 0 字节」）");
@@ -115,7 +115,7 @@ function tail() {
   ok(/wdsFetchMax\(VC, KEY, \[[^\]]*\], true, undefined, clk\.signal\)/.test(partSeg), "分部把时钟交给了发车口");
   ok(/写到一半断了/.test(partSeg), "分部中途断线时已写好的不丢");
 
-  const page2 = fs.readFileSync("/home/claude/site/public/taste/wds-dialogue/index.html", "utf8");
+  const page2 = fs.readFileSync("/home/claude/site/public/taste/sde-dialogue/index.html", "utf8");
   ok(/PLAN_DIAG/.test(page2) && /拟题这一步的连接被中途切断/.test(page2), "客户端：拟题空手而归时说得出收到了什么");
   ok(!/msg: errMsg \|\| "提纲生成失败，请重试。"/.test(page2), "不再一律回一句没有信息量的「提纲生成失败」");
   ok(/v\.stage \? \(v\.stage \+ " · "\) : ""/.test(page2), "论文进度条也显示当前在哪一步");
@@ -139,7 +139,7 @@ function tail() {
     ok(/_runReflect\(WDS_TOK_REFLECT\)/.test(refSeg) && /_runReflect\(WDS_TOK_REFLECT_RETRY\)/.test(refSeg), "写不够就降一档再写一次");
     ok(/rf\.code === "bad_key"/.test(refSeg), "Key 不能用属硬错，不做无谓重试");
     ok(/ok\(a\)|signal: _ac\.signal/.test(src) && /clearTimeout\(_to\)/.test(src), "ensureReflect 的裸 fetch 也有了超时（它会在答题流里被调用）");
-    const page3 = fs.readFileSync("/home/claude/site/public/taste/wds-dialogue/index.html", "utf8");
+    const page3 = fs.readFileSync("/home/claude/site/public/taste/sde-dialogue/index.html", "utf8");
     ok(/XINDE_RETRY/.test(page3) && /点这一行可以重来一次开工/.test(page3), "客户端：开工失败可一键重试，不必刷新整页");
     ok(!/刷新页面可重试开工仪式/.test(page3), "旧的「刷新页面」指引已去掉——刷新会丢掉整场对话");
 
@@ -160,7 +160,7 @@ function tail() {
     ok(/LONGASK\) \}\);/.test(src) || /\+ LONGASK/.test(src), "覆盖指令挂在每轮 user 消息上（不污染可缓存的固定前缀）");
     ok(/ANS_TOTAL_MS = askLen \? 300000 : 180000/.test(src), "写长篇时总时长护栏跟着放宽");
     ok(/const _retryTok = askLen \? tokWant : WDS_TOK_RETRY;/.test(src) && /_runAnswer\(_retryTok, !!askLen\)/.test(src), "长篇重答不砍长度、改卸满功率；常规问答仍是降预算");
-    const page4 = fs.readFileSync("/home/claude/site/public/taste/wds-dialogue/index.html", "utf8");
+    const page4 = fs.readFileSync("/home/claude/site/public/taste/sde-dialogue/index.html", "utf8");
     ok(/跑了 " \+ Math\.round\(\(Date\.now\(\) - diag\.t0\) \/ 1000\)/.test(page4), "被切断的诊断行现在说得出跑了几秒（用来量平台到底在第几秒掐）");
 
     console.log("\n===== " + P + " PASS / " + F + " FAIL =====");

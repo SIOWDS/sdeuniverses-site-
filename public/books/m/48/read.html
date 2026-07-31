@@ -159,15 +159,15 @@ document.addEventListener('keydown',function(e){
 });
 window.addEventListener('resize',function(){clearTimeout(window._rz);window._rz=setTimeout(function(){queue(pageNum);},220);});
 
-// —— 接入 WDS 陪读：把「当前页文本 + 页码」喂给助手，文字层让读者能选中某句作焦点 ——
+// —— 接入 SDE 陪读：把「当前页文本 + 页码」喂给助手，文字层让读者能选中某句作焦点 ——
 window.WDS_READ = {
   title: BOOK_TITLE,
   bodyEl: function(){ return document.getElementById('page-wrap'); },
   docTextFn: function(){ return currentPageText ? ('【第 '+pageNum+' 页 / 共 '+(pdfDoc?pdfDoc.numPages:'?')+' 页】\n'+currentPageText) : ''; }
 };
 </script>
-<script src="/taste/wds-companion/wds-read.js?v=20260731f" defer></script>
+<script src="/taste/wds-companion/wds-read.js?v=20260731g" defer></script>
 
-<script src="/wds-mode.js?v=20260731f" defer></script>
+<script src="/wds-mode.js?v=20260731g" defer></script>
 </body>
 </html>

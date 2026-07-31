@@ -44,7 +44,7 @@
     } catch (e) { loading = false; }
   }
 
-  /* 整本抽取：后台逐页取文写进 window.__wdsPdfFull，供 WDS 陪读把整篇喂给基底。
+  /* 整本抽取：后台逐页取文写进 window.__wdsPdfFull，供 SDE 陪读把整篇喂给基底。
    * 10 万字符封顶（覆盖站内全部文章级 PDF；专著级取前若干章并标注截断）；单页失败下轮 interval 重试。 */
   var fullDone = false, fullBusy = false;
   function pullFull(d) {

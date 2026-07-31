@@ -1,4 +1,4 @@
-/* WDS 陪读浮层 —— 读者阅读论文/专著时，就当前正文与选中的那一句，与 WDS 一对一对话。
+/* SDE 陪读浮层 —— 读者阅读论文/专著时，就当前正文与选中的那一句，与 WDS 一对一对话。
  * 用法：在阅读页里加入（title/selector/room 皆可选）：
  *   <script>window.WDS_READ = { title:'文章标题', selector:'article', room:'sde-plaza' };</script>
  *   <script src="/taste/wds-companion/wds-read.js" defer></script>
@@ -110,7 +110,7 @@
 
   var panel = el("div", "wdsr-panel");
   panel.innerHTML =
-    "<div class='wdsr-head'><div class='wdsr-title'><span class='wdsr-dot'></span>" + (CFG.panelTitle || "ChatSDE · 陪读") + "</div>" +
+    "<div class='wdsr-head'><div class='wdsr-title'><span class='wdsr-dot'></span>" + (CFG.panelTitle || "SDE 陪读") + "</div>" +
     "<div class='wdsr-sub'>" + (CFG.subLabel || "陪你读，不替你读") + "</div>" + "<button class='wdsr-histbtn' title='本机对话记录' style='display:none;position:absolute;right:72px;top:15px;background:none;border:none;color:#7C8798;font-size:15px;cursor:pointer;padding:0'>↺</button><button class='wdsr-keybtn' title='设置 API Key' style='position:absolute;right:44px;top:15px;background:none;border:none;color:#7C8798;font-size:15px;cursor:pointer;padding:0'>⚙</button><button class='wdsr-close' aria-label='关闭'>\u00d7</button></div>" +
     "<div class='wdsr-tools'><button class='wdsr-tool wdsr-sum' disabled>\u603b\u7ed3\u8fd9\u573a\u5bf9\u8bdd</button><button class='wdsr-tool wdsr-pap' disabled>" + (CFG.paperLabel || "\u751f\u6210 5000 \u5b57\u8bba\u6587") + "</button></div>" +
     "<div class='wdsr-msgs'></div>" +

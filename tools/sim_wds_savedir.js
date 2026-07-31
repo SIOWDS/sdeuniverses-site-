@@ -130,7 +130,7 @@ const wait = (ms) => new Promise((r) => setTimeout(r, ms || 25));
   console.log("\n[五] 两个调用方都用这一份，没有第二套实现");
   {
     const wm = fs.readFileSync("/home/claude/site/public/wds-mode.js", "utf8");
-    const dlg = fs.readFileSync("/home/claude/site/public/taste/wds-dialogue/index.html", "utf8");
+    const dlg = fs.readFileSync("/home/claude/site/public/taste/sde-dialogue/index.html", "utf8");
     ok(wm.includes("/assets/wds-savedir.js") && dlg.includes("/assets/wds-savedir.js"), "两处都引用共享模块");
     ok(!/indexedDB\.open\(\s*DIRDB/.test(wm) && !wm.includes('DIRDB = "wds-fs"'), "wds-mode.js 里那套重复实现已删干净");
     ok(!/showDirectoryPicker\s*\(/.test(dlg), "对话页没有再自写一个目录选择器");

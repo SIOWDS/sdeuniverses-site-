@@ -14,7 +14,7 @@ function note(name, extra) { warn++; warns.push(name + (extra ? "（" + extra + 
 function head(t) { console.log("\n" + t); }
 
 const ROOT = __dirname + "/..";
-const PAGE = fs.readFileSync(ROOT + "/public/taste/wds-dialogue/index.html", "utf8");
+const PAGE = fs.readFileSync(ROOT + "/public/taste/sde-dialogue/index.html", "utf8");
 const W = fs.readFileSync(ROOT + "/src/worker.js", "utf8");
 const HOME = fs.readFileSync(ROOT + "/public/index.html", "utf8");
 const PAGE_D = PAGE.replace(/\\u([0-9a-fA-F]{4})/g, (m, c) => String.fromCharCode(parseInt(c, 16)));
@@ -142,7 +142,7 @@ ok("创新智商正文在站上且口径完整", (function () {
 ok("页面零浮层引用（独立界面）", !PAGE.includes("wds-read.js") && !PAGE.includes("wds-mode.js") && !PAGE.includes("WDS_READ"));
 ok("页面渲染全走 textContent（防 XSS 注入）", !/bubble\.innerHTML|\.innerHTML\s*=\s*(answer|r\.text|j\.v)/.test(PAGE));
 ok("首页三处挂载仍在（卡片 / 中部大栏 / 子导航）",
-  HOME.includes('href="/taste/wds-dialogue/"') && HOME.includes('id="wds-dialogue"') && HOME.includes("与WDS对话"));
+  HOME.includes('href="/taste/sde-dialogue/"') && HOME.includes('id="wds-dialogue"') && HOME.includes("SDE 对谈"));
 ok("首页与页面文案口径一致（全面记忆 / 满血 / 5000字心得）",
   HOME.includes("全面记忆") && PAGE.includes("全面记忆") && PAGE.includes("满血") && PAGE.includes("5000"));
 

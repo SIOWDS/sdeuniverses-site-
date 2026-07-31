@@ -1,0 +1,1221 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SDE 对谈 · 问对SDE | SDE Universes</title>
+<meta name="description" content="SDE 对谈：学习 SDE 思想体系与智慧应用的高级会话智能体，跑在 DeepSeek-V4-Pro 思考模式最高档。每场开工先通读满血 SDE 内功（本体论先验＋创新智商评估两部分）、亲写约5500字心得，再按问题种类从三大方程、六路径或123原理任一起手作答；最多一百轮、全面记忆（每答携带全部对话原文），聊到最后一键凝成约一万字论文《问对SDE》。">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mammoth@1.6.0/mammoth.browser.min.js"></script>
+<style>
+  :root{--bg:#0C1F22;--pane:#0F272B;--ink:#E8F0EE;--dim:#8FA8A4;--line:rgba(127,212,200,.14);--qing:#3DA5A5;--qing2:#7FD4C8;--gold:#C9A227;--paper:#FBFAF7}
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{margin:0;background:radial-gradient(ellipse at 50% 0%,#123332 0%,#0C1F22 48%,#081114 100%);color:var(--ink);font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;-webkit-font-smoothing:antialiased}
+  .app{display:flex;flex-direction:column;height:100vh}
+  /* 顶栏 */
+  .bar{flex:none;display:flex;align-items:center;gap:12px;padding:12px 18px;border-bottom:1px solid var(--line);background:rgba(8,17,20,.6);backdrop-filter:blur(6px)}
+  .brand{display:flex;align-items:baseline;gap:10px;text-decoration:none}
+  .brand b{font-family:'Songti SC','Noto Serif SC',serif;font-size:20px;color:var(--ink);letter-spacing:.06em}
+  .brand b i{font-style:normal;color:var(--qing2)}
+  .brand span{font-size:11.5px;color:var(--gold);letter-spacing:.12em}
+  .turns{margin-left:auto;font-size:12.5px;color:var(--dim);white-space:nowrap}
+  .tbtn{background:none;border:1px solid var(--line);color:var(--qing2);border-radius:18px;padding:7px 14px;font:600 12.5px/1 inherit;cursor:pointer;white-space:nowrap}
+  .tbtn:hover{border-color:var(--qing)}
+  .tbtn:disabled{opacity:.38;cursor:default}
+  .tbtn.gold{color:var(--gold);border-color:rgba(201,162,39,.4)}
+  .kbtn{background:none;border:none;color:var(--dim);font-size:17px;cursor:pointer;padding:2px 4px}
+  .home{color:var(--dim);text-decoration:none;font-size:12.5px;white-space:nowrap}
+  .home:hover{color:var(--qing2)}
+  /* 主体：左方法论 右对话 */
+  .main{flex:1;display:flex;min-height:0}
+  .guide{flex:none;width:400px;max-width:38vw;overflow-y:auto;padding:26px 26px 60px;border-right:1px solid var(--line);background:rgba(8,17,20,.35)}
+  .guide h2{font-family:'Songti SC','Noto Serif SC',serif;font-size:17px;font-weight:600;color:var(--qing2);margin:26px 0 10px;padding-left:9px;border-left:3px solid var(--qing)}
+  .guide h2:first-child{margin-top:0}
+  .guide p{font-family:'Songti SC','Noto Serif SC',serif;font-size:14.5px;line-height:1.9;color:#C4D6D2;margin:0 0 14px}
+  .guide table{width:100%;border-collapse:collapse;font-size:12px;line-height:1.6;margin:0 0 14px;color:#C4D6D2}
+  .guide th,.guide td{border:1px solid var(--line);padding:5px 7px;text-align:left;vertical-align:top}
+  .guide th{color:var(--qing2);font-weight:600;white-space:nowrap;background:rgba(61,165,165,.08)}
+  .guide code{font-family:'SF Mono',Menlo,monospace;font-size:12.5px;background:rgba(61,165,165,.12);border-radius:4px;padding:1px 5px;color:var(--qing2)}
+  .guide .gm{font-size:11.5px;color:var(--dim);letter-spacing:.28em;margin-bottom:14px}
+  /* 对话区 */
+  .chat{flex:1;display:flex;flex-direction:column;min-width:0}
+  .msgs{flex:1;overflow-y:auto;padding:26px 8%}
+  .m{margin-bottom:20px;animation:fade .3s ease both}
+  .m .who{font-size:11px;letter-spacing:.2em;color:var(--dim);margin-bottom:5px}
+  .m.wds .who{color:var(--qing)}
+  .m .t{font-size:15.5px;line-height:1.85;white-space:pre-wrap;word-break:break-word}
+  .m.me{display:flex;flex-direction:column;align-items:flex-end}
+  .m.me .t{background:rgba(255,255,255,.06);border:1px solid var(--line);border-radius:12px;padding:10px 14px;max-width:86%;color:#CFDDDA}
+  .m.wds .t{color:var(--ink);max-width:92%}
+  .m .t.err{color:#E89A8E}
+  .m .t.stream::after{content:'▪';color:var(--qing);margin-left:2px;animation:blink 1s step-end infinite}
+  .srcs{margin-top:8px;font-size:12px;line-height:1.9;color:var(--dim)}
+  .srcs a{display:inline-block;margin:2px 6px 2px 0;padding:2px 9px;border:1px solid var(--line);border-radius:12px;color:var(--qing2);text-decoration:none}
+  .srcs a:hover{border-color:var(--qing)}
+  .hello{color:var(--dim);font-size:14px;line-height:1.9;border:1px dashed var(--line);border-radius:12px;padding:16px 18px;max-width:640px;margin:0 auto 8px}
+  .hello b{color:var(--qing2)}
+  /* 输入栏 */
+  .inbar{flex:none;display:flex;gap:10px;align-items:flex-end;padding:14px 8% 20px;border-top:1px solid var(--line);background:rgba(8,17,20,.45)}
+  .in{flex:1;resize:none;background:rgba(255,255,255,.05);color:var(--ink);border:1px solid rgba(127,212,200,.22);border-radius:11px;padding:11px 13px;font-size:15px;font-family:inherit;outline:none;line-height:1.55;max-height:180px}
+  .in::placeholder{color:#5c716e}
+  .in:focus{border-color:var(--qing)}
+  .go{background:linear-gradient(120deg,#3DA5A5,#2E8686);color:#07171A;border:none;border-radius:11px;padding:12px 22px;font:800 15px/1 inherit;cursor:pointer;white-space:nowrap}
+  .go:disabled{opacity:.4;cursor:default}
+  /* 弹窗（Key / 成文） */
+  .veil{position:fixed;inset:0;background:rgba(4,10,12,.72);z-index:60;display:flex;align-items:center;justify-content:center;padding:20px}
+  .box{background:#0F272B;border:1px solid var(--line);border-radius:16px;width:min(560px,94vw);max-height:88vh;display:flex;flex-direction:column;box-shadow:0 20px 70px rgba(0,0,0,.5)}
+  .boxh{flex:none;display:flex;align-items:center;gap:10px;padding:16px 18px;border-bottom:1px solid var(--line)}
+  .boxh b{font-family:'Songti SC','Noto Serif SC',serif;font-size:16.5px;color:var(--ink);flex:1;line-height:1.5}
+  .boxx{background:none;border:none;color:var(--dim);font-size:21px;cursor:pointer;padding:0 2px}
+  .boxb{overflow-y:auto;padding:18px}
+  .boxf{flex:none;display:flex;gap:10px;align-items:center;padding:12px 18px;border-top:1px solid var(--line)}
+  .prog{flex:1;font-size:12.5px;color:var(--dim)}
+  .doct{font-family:'Songti SC','Noto Serif SC',serif;font-size:15px;line-height:2;white-space:pre-wrap;color:#DDE9E6}
+  .doc .box{width:min(760px,96vw)}
+  .kv{display:flex;gap:8px;margin:0 0 12px}
+  .kv button{flex:1;background:none;border:1px solid rgba(212,178,94,.4);color:#E6EDF3;border-radius:9px;padding:9px 0;font:600 13.5px/1 inherit;cursor:pointer}
+  .kin{width:100%;background:rgba(255,255,255,.05);color:var(--ink);border:1px solid rgba(127,212,200,.22);border-radius:9px;padding:10px 12px;font-size:14px;font-family:inherit;outline:none}
+  .kn{font-size:12px;color:var(--dim);line-height:1.7;margin-top:10px}
+  .kn a{color:var(--gold)}
+  /* 输入文章 */
+  .artchip{display:inline-flex;align-items:center;gap:7px;max-width:280px;font-size:12px;color:var(--gold);border:1px solid rgba(201,162,39,.4);border-radius:14px;padding:4px 10px}
+  /* 用户RAG（记忆更新）面板 */
+  .mbadge{font-style:normal;display:inline-block;margin-left:6px;min-width:16px;padding:1px 5px;border-radius:9px;background:var(--gold);color:#0B1F23;font-size:10.5px;font-weight:700;line-height:1.4}
+  .mem .box{width:min(680px,96vw)}
+  .memhd{font-size:12.5px;color:var(--dim);line-height:1.75;margin-bottom:12px}
+  .memhd b{color:var(--qing2)}
+  .memrow{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
+  .memprog{font-size:12px;color:var(--dim);flex:1;min-width:140px}
+  .memprof{border:1px solid var(--line);border-radius:10px;padding:11px 13px;margin-bottom:12px;font-size:13px;line-height:1.85;color:var(--ink);white-space:pre-wrap}
+  .memprof .pl{display:block;font-size:11.5px;color:var(--gold);letter-spacing:.5px;margin-bottom:5px}
+  .memit{border-top:1px solid var(--line);padding:11px 2px}
+  .memit .mt{display:flex;gap:8px;align-items:flex-start}
+  .memit .mn{flex:1;min-width:0;font-size:13.5px;color:var(--ink);line-height:1.6}
+  .memit .mm{font-size:11.5px;color:var(--dim);margin-top:3px}
+  .memit .mg{font-size:12.5px;color:var(--qing2);margin-top:5px;line-height:1.7}
+  .memit .mp{font-size:12.5px;color:var(--dim);margin-top:6px;line-height:1.8;white-space:pre-wrap;display:none}
+  .memit.on .mp{display:block}
+  .memit .mx{background:none;border:none;color:var(--dim);cursor:pointer;font-size:14px;line-height:1;padding:2px 4px;flex:none}
+  .memit .mx:hover{color:var(--gold)}
+  .memstale{color:var(--gold);font-size:11px;border:1px solid rgba(201,162,39,.4);border-radius:8px;padding:1px 6px;margin-left:6px}
+  .memsw{display:flex;gap:14px;align-items:center;flex-wrap:wrap;font-size:12.5px;color:var(--dim);border-top:1px solid var(--line);padding-top:11px;margin-top:4px}
+  .memsw label{display:inline-flex;gap:6px;align-items:center;cursor:pointer}
+  .memsw select{background:#0B1F23;color:var(--ink);border:1px solid var(--line);border-radius:7px;padding:3px 6px;font:inherit;font-size:12px}
+  .memnote{font-size:11.5px;color:var(--dim);line-height:1.75;margin-top:10px;opacity:.85}
+  .artchip i{font-style:normal;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .artchip button{background:none;border:none;color:var(--dim);font-size:15px;line-height:1;cursor:pointer;padding:0}
+  .arow{display:flex;gap:8px;align-items:center;margin:0 0 10px;flex-wrap:wrap}
+  .arow .tbtn{flex:none}
+  .atitle{width:100%;background:rgba(255,255,255,.05);color:var(--ink);border:1px solid rgba(127,212,200,.22);border-radius:9px;padding:9px 11px;font-size:14px;font-family:inherit;outline:none;margin:0 0 10px}
+  .apaste{width:100%;height:200px;resize:vertical;background:rgba(255,255,255,.05);color:var(--ink);border:1px solid rgba(127,212,200,.22);border-radius:9px;padding:10px 12px;font-size:13.5px;line-height:1.7;font-family:inherit;outline:none}
+  .ahint{font-size:12px;color:var(--dim);line-height:1.8;margin-top:10px}
+  .astat{font-size:12.5px;color:var(--qing2);min-height:18px;margin-top:8px}
+  .astat.err{color:#E89A8E}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  @keyframes blink{50%{opacity:0}}
+  /* 窄屏：方法论收起为抽屉 */
+  .gtog{display:none}
+  @media(max-width:920px){
+    .guide{position:fixed;left:0;top:0;height:100%;width:min(86vw,400px);max-width:none;z-index:50;transform:translateX(-105%);transition:transform .25s;background:#0B2024;box-shadow:8px 0 40px rgba(0,0,0,.5)}
+    .guide.on{transform:none}
+    .gtog{display:inline-block}
+    .msgs,.inbar{padding-left:16px;padding-right:16px}
+    .brand span{display:none}
+  }
+</style>
+  <script src="/taste/assets/sde-vault.js?v=1"></script>
+</head>
+<body>
+<div class="app">
+  <div class="bar">
+    <a class="brand" href="/taste/sde-dialogue/"><b>与<i>WDS</i>对话</b><span>问对SDE · 智能体免费区</span></a>
+    <button class="tbtn gtog" id="gtog">方法论</button>
+    <button class="tbtn" id="bart">＋ 输入文章</button>
+    <button class="tbtn" id="bclr" title="清空对话栏（本场心得与已载入的文章保留）">清空对话</button>
+    <button class="tbtn" id="bhist" title="本机对话记录" hidden>↺ 历史</button>
+    <button class="tbtn" id="bmem" title="用户RAG系统更新：把本机全部历史对话摘要成可检索的长期记忆" hidden>⌾ 记忆更新<i class="mbadge" id="mbadge" hidden></i></button>
+    <span class="artchip" id="artchip" hidden></span>
+    <span class="turns" id="turns">剩余 100 次</span>
+    <button class="tbtn" id="bsum" disabled>总结这场对话</button>
+    <button class="tbtn gold" id="bpap" disabled>凝成一万字论文《问对SDE》</button>
+    <button class="kbtn" id="bkey" title="设置 API Key">⚙</button>
+    <a class="home" href="/#wds-dialogue">← 首页</a>
+  </div>
+  <div class="main">
+    <aside class="guide" id="guide">
+      <div class="gm">基底：DeepSeek-V4-Pro · 思考模式满功率（reasoning_effort = max）</div>
+      <div class="gm">WDS 回答你时遵循的方法论 · 先读一遍，问题更锋利</div>
+      <h2>它靠什么答题：三层分工</h2>
+      <p>基底跑在 <b>DeepSeek 最强档</b>（V4-Pro，1.6T 参数／百万上下文，思考模式开到 max——先在内部推演一遍再落笔，因此答得慢但答得实）。底盘四样，样样满血：<b>全站检索</b>——答每一问前先从 sdeuniverses.com 全站语料捞出相关文章段落垫进上下文（强化召回＋多轮接续），可核验的书名、引文、篇名以站内资料为准，出处随答案列出；<b>内功</b>——两部分：第一部分是完整 SDE 本体论先验，它看问题的那双眼；第二部分是<b>创新智商评估</b>（五维 S/D/E/I/F、加权公式、150 本体论级与 160 典范级两条硬阈值），它称量一段思想的那把尺；<b>心得</b>——<b>每场对话开工时</b>，它把满血内功真读一遍、当场亲手写下约 5000 字学习笔记（首条消息发出后自动进行，约一两分钟，本场只做一次，写成后可点开查看）——它站在自己刚蒸馏出的认知上答题，不是站在别人代写的确认上；<b>方法论</b>——三大方程、六路径、123原理。分工严格：三大方程管三元<b>是什么关系</b>（静态结构），123原理管这关系<b>如何自我推进</b>（动态引擎），六路径管判断<b>从哪一维起手</b>（操作入口）。</p>
+      <h2>三大方程</h2>
+      <p><code>S=F(D,E)</code> <code>D=G(S,E)</code> <code>E=H(S,D)</code>。F/G/H 是占位符，不是待解的函数——写成方程只为钉死：每一维都由另外两维共同决定，没有任何一维是独立自变量。这是同时互生，不是循环定义；完整三元是成熟态不是原初态。判断动作：看到任何一维，立刻追问另外两维；凡"归根到底由 X 决定"的单向叙事一律警觉——那是该被撬开的地基。</p>
+      <h2>123原理</h2>
+      <p>① D 与 E 相互矛盾 → ② 矛盾推动 S 改变（S 是矛盾的结算点，不是起点）→ ③ S 的改变回写 D 与 E → 新一轮。矛盾是引擎不是故障：见到张力别抹平，顺着它挖；最易漏的是③回写——不交代新显露态如何改写了路径与土壤，就只用了半个 123。它不是正反合（合题不改写土壤，回写恰恰改写土壤）；见三不套：无张力、无结算、无回写者，一律不是 123。</p>
+      <h2>六路径</h2>
+      <table>
+        <tr><th>路径</th><th>适用</th><th>翻车方式</th></tr>
+        <tr><td>S→D→E</td><td>学科本体论分析</td><td>变下定义比赛</td></tr>
+        <tr><td>S→E→D</td><td>配置 / 决策</td><td>变可行性报告</td></tr>
+        <tr><td>D→S→E</td><td>咨询 / 干预</td><td>刚进过程就贴标签</td></tr>
+        <tr><td>D→E→S</td><td>求助 / 困境</td><td>陪走一场没锚出结构</td></tr>
+        <tr><td>E→S→D</td><td>社会分析</td><td>背景铺大半篇</td></tr>
+        <tr><td>E→D→S</td><td>综述 / 建制</td><td>排完别人的话就完</td></tr>
+      </table>
+      <p>三维排列恰好六条，没有第七条。起点错了，后面再深也是浪费——先问：这个议题卡在"它是什么"（S 起）、"它怎么走的"（D 起）、还是"它站在什么上面"（E 起）？并对两条惯性设防：总先下定义、总先铺背景。路径管思考的进入次序，不管行文结构。</p>
+      <h2>从一百轮到《问对SDE》</h2>
+      <p>WDS 答你每一问的工序，<b>起手按问题种类三选一</b>：问"它是什么／什么关系"→ 从<b>三大方程</b>开局互问三维；问"怎么分析／从哪下手／给建议"→ 先认任务 DNA、从<b>六路径</b>开局；问"为什么会这样／怎么演变／为什么卡住"→ 从<b>123原理</b>开局（矛盾→结算→必追回写）。开局只定入口，不封另两件工具，且每一答说得出起手根据。聊到有东西了，点顶栏金色按钮：拟题与提纲之后六个部分逐段写成，约一万字，金点子取自这场对话里真正反直觉、可被检验的新判断。问对了，才算问过。</p>    </aside>
+    <div class="chat">
+      <div class="msgs" id="msgs">
+        <div class="hello"><b>SDE 对谈 的用途，是带你学习 SDE 思想体系、并把它用成能上手的智慧应用</b>——不是闲聊，而是带着你自己的真问题，在一问一答里把这套本体论学通、用活。<br>这里是<b>SDE 对谈</b>的高级会话界面。你发出第一问后，WDS 会先做<b>开工仪式</b>：通读满血 SDE 内功（本体论先验 ＋ 创新智商评估两部分）、亲手写下约 5500 字心得（约一两分钟，本场只做一次，写成后可点开查看），然后带着这份刚蒸馏出的认知回答你。答每一问前，它还会<b>检索 sdeuniverses.com 全站</b>（一千五百多万字语料），把相关文章段落连同出处垫进上下文——答完在气泡下方列出本答引用的站内篇目。起手按你问题的种类，从<b>三大方程</b>、<b>六路径</b>或<b>123原理</b>任一开局，并点明起手根据。一场最多 <b>100 轮</b>、<b>全面记忆</b>——每一答都携带此前<b>全部对话原文</b>（不裁剪、不摘要，问与答逐字带上）；聊够两轮后，顶栏可<b>总结</b>或<b>凝成一万字论文《问对SDE》</b>（可导出 PDF）。本智能体跑在 <b>DeepSeek-V4-Pro 思考模式（max 档）</b>——每一答都先内部推演再落笔，比普通问答慢一些，深度换速度。想让 WDS 读<b>你自己的文章</b>：点顶栏<b>「＋ 输入文章」</b>——上传 .docx/.pdf/.txt/.md、贴一条站内文章链接、或直接把正文粘进去（上限约 5 万汉字，文件只在你本机解析、不上传本站）；载入后它<b>每一答都带着这篇全文</b>，总结与万字论文也会带上它。<br>首次使用请点右上 ⚙ 填入你自己的大模型 Key（只存你的浏览器本地，本站不经手）。想让它<b>记得你以往几场谈过什么</b>：点顶栏<b>「⌾ 记忆更新」</b>——它会把你本机每一场历史对话各写成一条摘要、再提炼出一份你的画像，此后每问一句都会按这一问从中挑出最相关的几条垫进上下文（摘要与画像同样只存你本机）。</div>
+      </div>
+      <div class="inbar">
+        <textarea class="in" id="q" rows="2" placeholder="向 WDS 发问……（Enter 发送，Shift+Enter 换行）"></textarea>
+        <button class="go" id="go">问</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+(function () {
+  "use strict";
+  var API = "/api/wds/read", PAPER = "/api/wds/read-paper", MAX = 100, PN = 6;
+  var TITLE = "问对SDE";
+  function $(s, r) { return (r || document).querySelector(s); }
+  function el(t, c, x) { var e = document.createElement(t); if (c) e.className = c; if (x != null) e.textContent = x; return e; }
+  var msgs = $("#msgs"), qEl = $("#q"), goEl = $("#go"), turnsEl = $("#turns"), sumB = $("#bsum"), papB = $("#bpap");
+  var helloEl = $(".hello", msgs);   // 开场白：清空对话栏后原样放回
+  var history = [], streaming = false, busy = false;
+
+  /* —— 存到用户自选目录 ——
+     实现在全站共用的 /assets/wds-savedir.js（window.WDSSaveDir），成文页与金点子发生器同用一份。
+     必须**尽早**加载：目录句柄要在点击那一刻已经在内存里，否则 requestPermission 拿不到用户手势、
+     浏览器会拒掉授权弹窗。这里只做加载与文案，不再自己写一套。 */
+  (function () {
+    if (window.WDSSaveDir) return;
+    var sc = document.createElement("script");
+    sc.src = "/assets/wds-savedir.js?v=20260730a"; sc.async = true;
+    document.head.appendChild(sc);
+  })();
+  function sdApi() { return window.WDSSaveDir || null; }
+  function sdName() { var A = sdApi(); return A ? A.name() : ""; }
+  // 把一份文稿写进目录；没选过就当场问一次，不支持或写不进去一律回退成普通下载——不让人空手。
+  function saveDoc(fname, text, say) {
+    var A = sdApi();
+    if (!A || !A.supported()) {
+      say("这个浏览器不支持选目录（Chrome / Edge 支持），已改为普通下载。");
+      var b = new Blob([text], { type: "text/markdown;charset=utf-8" });
+      var a = document.createElement("a"); a.href = URL.createObjectURL(b); a.download = fname;
+      document.body.appendChild(a); a.click();
+      setTimeout(function () { try { URL.revokeObjectURL(a.href); a.remove(); } catch (e) {} }, 3000);
+      return;
+    }
+    say("正在写入…");
+    A.save(fname, new Blob([text], { type: "text/markdown;charset=utf-8" }), { silent: false, noOverwrite: true, id: "wds-dialogue" })
+      .then(function (r) { say(r && r.where === "dir" ? ("已存到 " + r.dir + "/" + r.name) : "已下载 " + ((r && r.name) || fname)); })
+      .catch(function (e) { say("写不进去（" + ((e && e.message) || "write failed") + "）"); });
+  }
+
+  // —— 本机对话记录（IndexedDB，见 /assets/wds-store.js）——
+  var stApi = null, stSess = null, stBooting = false;
+  function stMakeSession() {
+    if (!stApi) return;
+    stSess = stApi.session({ agent: "wds-dialogue", scope: "", scopeLabel: "" });
+  }
+  function stBoot() {
+    if (stApi !== null || stBooting) return;
+    stBooting = true;
+    function go() {
+      if (!window.WDSStore) { stApi = false; return; }
+      window.WDSStore.load(function (a) { stApi = a || false; if (stApi) { stMakeSession(); stShowBtn(); umShowBtn(); } });
+    }
+    if (window.WDSStore) { go(); return; }
+    var sc = document.createElement("script");
+    sc.src = "/assets/wds-store.js"; sc.async = true;
+    sc.onload = go; sc.onerror = function () { stApi = false; };
+    document.head.appendChild(sc);
+  }
+  // 每轮落盘后顺手刷一下"待更新"角标：这一场又长了，记忆就该提醒你更新
+  function stSave(h) {
+    if (stSess && h && h.length) stSess.save(h);
+    if (stApi && UM.ready) setTimeout(function () { umLoad(function () {}); }, 900);
+  }
+  function stShowBtn() {
+    var b = $("#bhist"); if (!b) return;
+    b.hidden = false;
+    b.onclick = function () {
+      if (!stApi) return;
+      stApi.openPanel({ agent: "wds-dialogue", theme: "light", onRestore: stRestore });
+    };
+  }
+  function stRestore(rec) {
+    history = []; msgs.innerHTML = "";
+    (rec.turns || []).forEach(function (t) {
+      if (!t || !t.text) return;
+      addMsg(t.role === "reader" ? "reader" : "wds", t.text);
+      history.push({ role: t.role, text: t.text });
+    });
+    if (stSess) stSess.adopt(rec);
+    paint();
+    msgs.scrollTop = msgs.scrollHeight;
+  }
+
+  // ═══ 用户RAG系统（全局记忆）══════════════════════════════════════════
+  //  「历史」存的是每一场的**原文**，只有你点开才看得到；这里做的是另一件事：
+  //  把本机每一场历史对话各压成一条摘要（主旨/关键词/要点/你的立场），再从全部摘要提炼一份「你的画像」，
+  //  合起来就是一个**属于你自己的 RAG**。此后每问一句，页面在本机按这一问挑出最相关的几条，
+  //  连同画像垫进当轮提问——于是跨场对话之间它有了记性，而不只是一场之内的百轮记忆。
+  //
+  //  三条不能破的规矩：
+  //  ① 摘要与画像**只存在你这台机器的 IndexedDB 里**，与对话原文同一个仓、同样不上传本站；
+  //     生成摘要时对话原文随你自己的 Key 发往你选的基底（与平常问答同一条路），本站不经手、不落盘。
+  //  ② **手动更新，不偷跑**——每条摘要都要花你自己 Key 的一次调用，什么时候更新由你按按钮决定。
+  //  ③ 检索在本机做（纯字符串打分，不联网、不发第二次调用），只把挑中的那几条送出去。
+  var MEMO_API = "/api/wds/memo";
+  // 引擎已抽成全站共享模块 /assets/wds-memo.js（window.WDSMemo）——下面这些只是薄委托，
+  // 面板与角标代码一个字没改。抽的原因：ChatSDE（/taste/chatsde/）也要全局记忆，
+  // 同一套检索/摘要/画像逻辑绝不写第二份（2026-07-28 存盘那次的撞车教训）。
+  var UM = { memos: [], metas: [], profile: "", pkeys: [], ready: false, running: false, stop: false };
+  var MEMO_ENGINE = null;
+  function umEngine() {
+    if (MEMO_ENGINE || !window.WDSMemo || !stApi) return MEMO_ENGINE;
+    MEMO_ENGINE = window.WDSMemo.create({
+      store: stApi, agent: "wds-dialogue", profileKey: "profile:wds-dialogue",
+      currentId: function () { return stSess ? stSess.id() : ""; },
+    });
+    UM = MEMO_ENGINE.state;                 // 面板读的就是这份 state，换成引擎的同一个对象
+    return MEMO_ENGINE;
+  }
+  function umBoot(then) {
+    if (window.WDSMemo) { umEngine(); if (then) then(); return; }
+    if (!document.head || !document.head.appendChild) { if (then) then(); return; }   // 没法加载就静默降级，绝不抛
+    var sc = document.createElement("script");
+    sc.src = "/assets/wds-memo.js"; sc.async = true;
+    sc.onload = function () { umEngine(); if (then) then(); };
+    sc.onerror = function () { if (then) then(); };
+    document.head.appendChild(sc);
+  }
+  function umOn() { var e = umEngine(); return e ? e.on() : (localStorage.getItem("sde_wds_umem_on") !== "0"); }
+  function umTopK() { var e = umEngine(); return e ? e.topK() : 3; }
+  function umFp(m) { return window.WDSMemo ? window.WDSMemo.fp(m) : (String(m.n || 0) + ":" + String(m.updatedAt || 0)); }
+  function umPending() { var e = umEngine(); return e ? e.pending() : []; }
+  function umBadge() {
+    var b = $("#mbadge"); if (!b) return;
+    var n = UM.ready ? umPending().length : 0;
+    if (n > 0) { b.textContent = String(n); b.hidden = false; } else { b.hidden = true; }
+  }
+  function umLoad(then) {
+    umBoot(function () {
+      var e = umEngine();
+      if (!e) { UM.ready = true; umBadge(); if (then) then(); return; }
+      e.refresh(function () { UM = e.state; umBadge(); if (then) then(); });
+    });
+  }
+  function umNorm(s) { return window.WDSMemo ? window.WDSMemo.norm(s) : String(s || ""); }
+  function umGrams(s) { return window.WDSMemo ? window.WDSMemo.grams(s) : {}; }
+  function umScore(q, rec) { return window.WDSMemo ? window.WDSMemo.score(q, rec) : 0; }
+  function umPick(q, list, k, excludeId) { return window.WDSMemo ? window.WDSMemo.pick(q, list, k, excludeId) : []; }
+  function umRecall(q) { var e = umEngine(); return e ? e.recall(q) : ""; }
+  function umConvoText(rec) { return window.WDSMemo ? window.WDSMemo.convoText(rec) : ""; }
+  function umOne(meta, kv) { var e = umEngine(); return e ? e.one(meta, kv) : Promise.resolve({ ok: false, msg: "记忆引擎没加载上" }); }
+  function umRefreshProfile(kv, say) { var e = umEngine(); return e ? e.profileRefresh(kv, say) : Promise.resolve(); }
+
+  function umPanel() {
+    if (!stApi) return;
+    var kv0 = keyGet();
+    var m = el("div", "veil mem");
+    m.innerHTML = "<div class='box'><div class='boxh'><b class='dt'>用户RAG系统 · 全局记忆</b><button class='boxx'>\u00d7</button></div>"
+      + "<div class='boxb'><div class='memhd'></div>"
+      + "<div class='memrow'><button class='tbtn gold mgo'>开始更新</button><button class='tbtn mprof'>重新提炼画像</button>"
+      + "<button class='tbtn mexp'>导出记忆</button><span class='memprog'></span></div>"
+      + "<div class='mprofbox'></div><div class='mlist'></div>"
+      + "<div class='memsw'><label><input type='checkbox' class='msw'> 答题时启用我的记忆</label>"
+      + "<label>每答垫入 <select class='mk'><option value='1'>1</option><option value='2'>2</option><option value='3'>3</option><option value='4'>4</option><option value='5'>5</option></select> 条</label>"
+      + "<span class='memsp' style='flex:1'></span><button class='tbtn mclr'>清空记忆</button></div>"
+      + "<div class='memnote'>摘要与画像只存在你这台设备的浏览器里，不上传本站、不同步。更新时对话原文随你自己的 Key 发往你选的基底（与平常问答同一条路），本站不经手。删除某一场对话时，它对应的那条记忆会一并删除；被系统自动淘汰的旧对话（超过 60 场）则只丢原文、记忆仍留着。</div>"
+      + "</div></div>";
+    document.body.appendChild(m);
+    var hdE = $(".memhd", m), pgE = $(".memprog", m), lsE = $(".mlist", m), pfE = $(".mprofbox", m);
+    var goB = $(".mgo", m), prB = $(".mprof", m);
+    function close() { UM.stop = true; m.remove(); }
+    $(".boxx", m).onclick = close;
+    m.addEventListener("click", function (e) { if (e.target === m) close(); });
+    function say(t) { pgE.textContent = t || ""; }
+
+    var swE = $(".msw", m); swE.checked = umOn();
+    swE.onchange = function () { localStorage.setItem("sde_wds_umem_on", swE.checked ? "1" : "0"); };
+    var kE = $(".mk", m); kE.value = String(umTopK());
+    kE.onchange = function () { localStorage.setItem("sde_wds_umem_k", kE.value); };
+
+    function paintHead() {
+      var pend = umPending().length;
+      hdE.innerHTML = "本机共 <b>" + UM.metas.length + "</b> 场对话，其中 <b>" + UM.memos.length + "</b> 场已入记忆"
+        + (pend ? ("，<b>" + pend + "</b> 场待更新（新对话，或聊过之后又长了）") : "，全部是最新的")
+        + "。每更新一条＝花你自己 Key 的一次调用。";
+      goB.textContent = pend ? ("开始更新（" + pend + " 场）") : "全部已是最新";
+      goB.disabled = !pend || UM.running;
+    }
+    function paintProfile() {
+      pfE.innerHTML = "";
+      if (!UM.profile) return;
+      var d = el("div", "memprof");
+      d.appendChild(el("span", "pl", "你的画像"));
+      d.appendChild(document.createTextNode(UM.profile));
+      pfE.appendChild(d);
+    }
+    function paintList() {
+      lsE.innerHTML = "";
+      if (!UM.memos.length) { lsE.appendChild(el("div", "memhd", "还没有记忆条目。点「开始更新」，它会把你本机的历史对话逐场读一遍、各写一条摘要。")); return; }
+      var have = {}; UM.metas.forEach(function (x) { have[x.id] = x; });
+      UM.memos.forEach(function (r) {
+        var it = el("div", "memit");
+        var top = el("div", "mt");
+        var mn = el("div", "mn");
+        mn.appendChild(document.createTextNode(r.title || "未命名对话"));
+        var cur = have[r.id];
+        if (cur && r.fp !== umFp(cur)) mn.appendChild(el("span", "memstale", "待更新"));
+        if (!cur) mn.appendChild(el("span", "memstale", "原文已淘汰"));
+        var mm = el("div", "mm", (stApi.stamp(r.updatedAt || r.madeAt) || "") + " · " + Math.ceil((r.n || 0) / 2) + " 轮"
+          + (r.keys && r.keys.length ? (" · " + r.keys.slice(0, 6).join("、")) : ""));
+        mn.appendChild(mm);
+        top.appendChild(mn);
+        var x = el("button", "mx", "\uD83D\uDDD1");
+        x.title = "删除这一条记忆";
+        x.onclick = function (e) {
+          e.stopPropagation();
+          if (!window.confirm("删掉这一条记忆？（原对话不受影响）")) return;
+          stApi.memoDel(r.id).then(function () { umLoad(function () { paintHead(); paintList(); }); }).catch(function () {});
+        };
+        top.appendChild(x);
+        it.appendChild(top);
+        if (r.gist) it.appendChild(el("div", "mg", r.gist));
+        if (r.points) it.appendChild(el("div", "mp", r.points + (r.stance ? ("\n我的立场：" + r.stance) : "")));
+        it.onclick = function () { it.classList.toggle("on"); };
+        lsE.appendChild(it);
+      });
+    }
+
+    goB.onclick = function () {
+      if (UM.running) { UM.stop = true; say("正在停…"); return; }
+      var kv = keyGet();
+      if (!kv) { say("先点右上 ⚙ 填入你自己的大模型 Key——更新记忆也用你的 Key 运行。"); return; }
+      var todo = umPending();
+      if (!todo.length) return;
+      UM.running = true; UM.stop = false; goB.textContent = "停止"; goB.disabled = false;
+      var i = 0, done = 0, fail = 0;
+      (function step() {
+        if (UM.stop || i >= todo.length) {
+          UM.running = false;
+          umLoad(function () { paintHead(); paintList(); });
+          say("本次更新：成功 " + done + " 条" + (fail ? ("，失败 " + fail + " 条") : "") + (UM.stop ? "（已停止，剩下的下次接着做）" : "") + "。"
+            + (done && !UM.profile ? " 建议再点一次「重新提炼画像」。" : ""));
+          return;
+        }
+        var meta = todo[i++];
+        say("第 " + i + "/" + todo.length + " 场：《" + (meta.title || "未命名") + "》…");
+        umOne(meta, kv).then(function (r) {
+          // 限流与 Key 用不了都是**硬错**：立刻停下并说明，不拿同一把坏 Key 连撞几十场
+          if (r.ok) done++; else { fail++; if (r.code === "rate" || r.code === "bad_key") { UM.stop = true; say(r.msg || "更新中断了。"); } }
+          setTimeout(step, 120);   // 稍微错开，别把限流器打满
+        });
+      })();
+    };
+    prB.onclick = function () {
+      var kv = keyGet();
+      if (!kv) { say("先点右上 ⚙ 填入你自己的大模型 Key。"); return; }
+      umRefreshProfile(kv, say).then(function () { paintProfile(); umBadge(); });
+    };
+    $(".mexp", m).onclick = function () {
+      var blob = { site: "sdeuniverses.com", agent: "wds-dialogue", exportedAt: new Date().toISOString(), profile: UM.profile, memos: UM.memos };
+      try {
+        var b = new Blob([JSON.stringify(blob, null, 2)], { type: "application/json;charset=utf-8" });
+        var a = document.createElement("a"); a.href = URL.createObjectURL(b);
+        a.download = "WDS用户记忆-" + new Date().toISOString().slice(0, 10) + ".json";
+        document.body.appendChild(a); a.click();
+        setTimeout(function () { try { URL.revokeObjectURL(a.href); a.remove(); } catch (e) {} }, 3000);
+        say("已导出。");
+      } catch (e) { say("导出失败。"); }
+    };
+    $(".mclr", m).onclick = function () {
+      if (!window.confirm("清空本机的全部记忆条目与画像？（历史对话原文不受影响，可以重新更新）")) return;
+      stApi.memoClear("wds-dialogue")
+        .then(function () { return stApi.kvSet("profile:wds-dialogue", null); })
+        .then(function () { umLoad(function () { UM.profile = ""; paintHead(); paintProfile(); paintList(); say("已清空。"); }); })
+        .catch(function () { say("清空没成功。"); });
+    };
+
+    if (!kv0) say("还没填 Key——更新记忆也用你自己的 Key 运行（右上 ⚙）。");
+    umLoad(function () { paintHead(); paintProfile(); paintList(); });
+  }
+  function umShowBtn() {
+    var b = $("#bmem"); if (!b) return;
+    b.hidden = false;
+    b.onclick = umPanel;
+    umLoad(function () {});
+  }
+
+  // ─── 三层记忆（短期原文 · 中期滚动摘要 · 长期核心观点）─────────────────
+
+  //  像人的记忆：合计 ~1万字以内就全用原文（第一次就是原文，不压缩）；超了才开始压。
+  //   · 短期：尽量多的最近原文，逐字，永远在最前——只受 1 万字上限约束，不是固定 3 轮。
+  //   · 中期：滚动摘要——超阈值时把"滑出短期的最早那轮"压成约 200 字，滚进中期；仍超就继续往前压。
+  //   · 长期：约 500 字的「10 条核心观点」，从全场沉淀，首次跨阈值时生成，之后每再滚 LONG_EVERY(=5) 轮才刷一次（缓慢更新、相对不动）。
+  //  发送次序：长期核心观点 → 中期滚动摘要 → 短期原文 → 本轮问题。
+  //  成文/《问对SDE》仍走 full history（另一个 fetch），写论文要细节。
+  var SUM_SUMM = "/api/wds/summarize";
+  var MEM_BUDGET = 10000;   // 三层合计的软上限（字符）；未超不压缩，短期尽量多留原文
+  var SHORT_MIN = 2;        // 短期原文的安全下限——正常由 1 万字上限决定留多少轮，这里只保证极端情况下(单轮极长)至少留最近这么多轮逐字
+  var LONG_EVERY = 5;       // 长期核心观点每再滚这么多轮刷一次
+  // MEM.mid：中期摘要段数组；MEM.long：长期核心观点(字符串)；MEM.folded：已压进中期的"轮"数；MEM.longAt：上次刷长期时的 folded 值
+  var MEM = { mid: [], long: "", folded: 0, longAt: 0 };
+  function memKey() { return "sde_wds_dlg_mem"; }
+  function memLoad() { try { var s = JSON.parse(localStorage.getItem(memKey()) || "null"); if (s && s.mid) MEM = { mid: s.mid || [], long: s.long || "", folded: s.folded || 0, longAt: s.longAt || 0 }; } catch (e) {} }
+  function memSave() { try { localStorage.setItem(memKey(), JSON.stringify(MEM)); } catch (e) {} }
+  function sumReset() { MEM = { mid: [], long: "", folded: 0, longAt: 0 }; memSave(); }
+  // 把 history 切成"轮"：每轮 = {q, a}（reader 后跟 wds）
+  function asRounds() {
+    var rounds = [];
+    for (var i = 0; i < history.length; i++) {
+      if (history[i].role === "reader") {
+        var a = (history[i + 1] && history[i + 1].role === "wds") ? history[i + 1].text : "";
+        rounds.push({ q: history[i].text, a: a });
+      }
+    }
+    return rounds;
+  }
+  // 记忆文本：长期 + 中期，拼成一段"此前记忆"。短期原文另走 history 尾部。
+  function memText() {
+    var parts = [];
+    if (MEM.long) parts.push("【长期记忆 · 本场核心观点】\n" + MEM.long);
+    if (MEM.mid.length) parts.push("【中期记忆 · 较早对话的滚动摘要】\n" + MEM.mid.join("\n"));
+    return parts.join("\n\n").trim();
+  }
+  // 估算合计字符：长期 + 中期 + 短期(未被压缩的原文轮)
+  function memTotalChars(rounds) {
+    var n = 0; n += MEM.long.length;
+    for (var i = 0; i < MEM.mid.length; i++) n += MEM.mid[i].length;
+    for (var j = MEM.folded; j < rounds.length; j++) n += (rounds[j].q || "").length + (rounds[j].a || "").length;
+    return n;
+  }
+  // 压缩历史：发给答题端点的 history。未超阈值→尽量全原文；超了→长期+中期(合成一条) + 尽量多的最近原文(受1万字上限)。
+  function compactHistory() {
+    var rounds = asRounds();
+    var mem = memText();
+    var out = [];
+    if (mem) out.push({ role: "wds", text: mem });
+    // 短期原文：从"已压进中期之后"开始的所有轮。folded=0(未超阈值)→全原文；超阈值折叠后 folded 前移→只剩尾部原文（短期尽量多留，只在超阈值时才往前压，且至少留 SHORT_MIN 轮）
+    var startRaw = Math.min(MEM.folded, rounds.length);
+    var raw = rounds.slice(startRaw);
+    for (var i = 0; i < raw.length; i++) {
+      if (raw[i].q) out.push({ role: "reader", text: raw[i].q });
+      if (raw[i].a) out.push({ role: "wds", text: raw[i].a });
+    }
+    return out;
+  }
+  // 后台维护：答完一轮后调。只有合计超 MEM_BUDGET 时才把最早的未压轮滚进中期；够长则刷新长期核心观点。不阻塞 UI、失败静默。
+  function summarizeExchange() {
+    var kv = keyGet(); if (!kv) return;
+    var rounds = asRounds();
+    // 只要合计仍超阈值、且还有"短期之外的轮"可压，就把最早那轮压进中期（一次压一轮，逐步逼近阈值内）
+    function maybeFold() {
+      var rs = asRounds();
+      var canFold = (rs.length - MEM.folded) > SHORT_MIN;   // 安全下限：至少给短期留 SHORT_MIN 轮原文；正常是"压到合计≤1万就停"，能留多少留多少
+      if (memTotalChars(rs) <= MEM_BUDGET || !canFold) { maybeRefreshLong(rs); return; }
+      var r = rs[MEM.folded];
+      var body = { mode: "l1", vendor: kv.vendor, key: kv.key, text: "读者问：" + (r.q || "") + "\n\nWDS 答：" + (r.a || "") };
+      fetch(SUM_SUMM, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) })
+        .then(function (x) { return x.json(); })
+        .then(function (j) {
+          if (!j || !j.summary) { maybeRefreshLong(asRounds()); return; }   // 压缩失败：该轮暂不折，仍在原文里兜底
+          MEM.mid.push(j.summary); MEM.folded++; memSave();
+          maybeFold();   // 可能仍超阈值，继续压下一轮
+        })
+        .catch(function () {});
+    }
+    // 长期核心观点：首次达到"够长"(folded>=LONG_EVERY 或中期已有量)时生成；之后每再滚 LONG_EVERY 轮刷一次
+    function maybeRefreshLong(rs) {
+      var due = (!MEM.long && MEM.folded >= LONG_EVERY) || (MEM.long && (MEM.folded - MEM.longAt) >= LONG_EVERY);
+      if (!due) return;
+      // 长期从全场沉淀：喂中期摘要 + 长期旧观点，让它提炼/更新 10 条核心观点
+      var feed = (MEM.long ? ("已有核心观点：\n" + MEM.long + "\n\n") : "") + "对话滚动摘要：\n" + MEM.mid.join("\n");
+      var body = { mode: "long", vendor: kv.vendor, key: kv.key, text: feed };
+      fetch(SUM_SUMM, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) })
+        .then(function (x) { return x.json(); })
+        .then(function (j) { if (j && j.summary) { MEM.long = j.summary; MEM.longAt = MEM.folded; memSave(); } })
+        .catch(function () {});
+    }
+    maybeFold();
+  }
+  memLoad();
+
+  // —— Key：本智能体自己的界面与存取；键名沿用全站 BYOK 规范（sde_wds_key/vendor），空则借 sde_ds_key / sde_glm_key ——
+  function keyGet() {
+    var k = localStorage.getItem("sde_wds_key") || "", v = localStorage.getItem("sde_wds_vendor") || "ds";
+    if (!k) {
+      if (localStorage.getItem("sde_ds_key")) { k = localStorage.getItem("sde_ds_key"); v = "ds"; }
+      else if (localStorage.getItem("sde_glm_key")) { k = localStorage.getItem("sde_glm_key"); v = "glm"; }
+    }
+    return k && k.length >= 8 ? { key: k, vendor: v } : null;
+  }
+  function keySave(k, v) {
+    localStorage.setItem("sde_wds_key", k); localStorage.setItem("sde_wds_vendor", v);
+    localStorage.setItem(v === "ds" ? "sde_ds_key" : "sde_glm_key", k);
+  }
+  function keyPanel(done) {
+    var vend = localStorage.getItem("sde_wds_vendor") || "ds";
+    var m = el("div", "veil");
+    m.innerHTML = "<div class='box'><div class='boxh'><b>用你自己的 API Key 运行</b><button class='boxx'>\u00d7</button></div>"
+      + "<div class='boxb'><div class='kv'><button data-v='ds'>DeepSeek</button><button data-v='glm'>\u667a\u8c31 GLM</button></div>"
+      + "<input class='kin' type='password' placeholder='\u7c98\u8d34 API Key\uff0c\u53ea\u5b58\u4f60\u7684\u6d4f\u89c8\u5668\u672c\u5730'>"
+      + "<div class='kn' id='klink'></div></div>"
+      + "<div class='boxf'><span class='prog'>\u672c\u7ad9\u4e0d\u7ecf\u624b\u3001\u4e0d\u4e0a\u4f20\u4f60\u7684 Key</span><button class='tbtn' id='ksave'>\u4fdd\u5b58</button></div></div>";
+    document.body.appendChild(m);
+    var kin = $(".kin", m), klink = $("#klink", m);
+    kin.value = localStorage.getItem("sde_wds_key") || "";
+    function paint() {
+      m.querySelectorAll(".kv button").forEach(function (b) {
+        var on = b.dataset.v === vend;
+        b.style.background = on ? "rgba(212,178,94,.2)" : "none";
+        b.style.borderColor = on ? "#D4B25E" : "rgba(212,178,94,.4)";
+      });
+      klink.innerHTML = vend === "ds"
+        ? "\u8fd8\u6ca1\u6709 Key\uff1f\u53bb <a href='https://platform.deepseek.com' target='_blank'>platform.deepseek.com</a> \u7533\u8bf7"
+        : "\u8fd8\u6ca1\u6709 Key\uff1f\u53bb <a href='https://open.bigmodel.cn' target='_blank'>open.bigmodel.cn</a> \u7533\u8bf7";
+    }
+    m.querySelectorAll(".kv button").forEach(function (b) { b.onclick = function () { vend = b.dataset.v; paint(); }; });
+    paint();
+    function close() { m.remove(); }
+    $(".boxx", m).onclick = close;
+    m.addEventListener("click", function (e) { if (e.target === m) close(); });
+    $("#ksave", m).onclick = function () {
+      var k = kin.value.trim();
+      if (k.length < 8) { kin.style.borderColor = "#E89A8E"; return; }
+      keySave(k, vend); close(); if (done) done(true);
+    };
+  }
+  $("#bkey").onclick = function () { keyPanel(null); };
+  function needKey(retry) { var kv = keyGet(); if (kv) return kv; keyPanel(retry); return null; }
+
+
+  // —— 输入文章：上传 .docx/.pdf/.txt/.md、贴站内链接自动取文、或直接粘正文。全部在本机解析，正文只随你的 Key 发往你选的基底 ——
+  var ART_MAX = 100000;
+  var article = { title: "", text: "" };
+  try { if (window.pdfjsLib) pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js"; } catch (_) {}
+  function readBuf(f) { return new Promise(function (res, rej) { var r = new FileReader(); r.onload = function () { res(r.result); }; r.onerror = function () { rej(new Error("\u6587\u4ef6\u8bfb\u53d6\u5931\u8d25")); }; r.readAsArrayBuffer(f); }); }
+  function bufText(ab) { try { return new TextDecoder("utf-8").decode(new Uint8Array(ab)); } catch (e) { return ""; } }
+  function extractDocx(ab) {
+    if (!window.mammoth) throw new Error("docx \u89e3\u6790\u5e93\u6ca1\u52a0\u8f7d\u4e0a\uff0c\u5237\u65b0\u9875\u9762\u518d\u8bd5");
+    return window.mammoth.extractRawText({ arrayBuffer: ab }).then(function (r) { return ((r && r.value) || "").trim(); });
+  }
+  function extractPdf(ab, onPage) {
+    if (!window.pdfjsLib) return Promise.reject(new Error("PDF \u89e3\u6790\u5e93\u6ca1\u52a0\u8f7d\u4e0a\uff0c\u5237\u65b0\u9875\u9762\u518d\u8bd5"));
+    return pdfjsLib.getDocument({ data: ab }).promise.then(function (pdf) {
+      var out = [], i = 0;
+      function next() {
+        if (i >= pdf.numPages) return out.join("\n\n");
+        i++; if (onPage) onPage(i, pdf.numPages);
+        return pdf.getPage(i).then(function (pg) { return pg.getTextContent(); }).then(function (tc) {
+          out.push(tc.items.map(function (it) { return it.str; }).join(" ").replace(/\s+/g, " ").trim());
+          return out.join("").length > ART_MAX * 1.5 ? out.join("\n\n") : next();
+        });
+      }
+      return next();
+    });
+  }
+  function htmlToText(html) {
+    var d = new DOMParser().parseFromString(html, "text/html");
+    Array.prototype.forEach.call(d.querySelectorAll("script,style,nav,header,footer,noscript,aside"), function (n) { n.remove(); });
+    var main = d.querySelector("article") || d.querySelector(".wrap") || d.querySelector("main") || d.body;
+    var ttl = (d.querySelector("h1") && d.querySelector("h1").textContent.trim()) || (d.title || "").split("|")[0].trim();
+    var t = ((main ? main.textContent : "") || "").replace(/[ \t]+/g, " ").replace(/\n{3,}/g, "\n\n").trim();
+    return { title: ttl, text: t };
+  }
+  function paintArt() {
+    var chip = $("#artchip");
+    if (article.text) {
+      chip.hidden = false; chip.innerHTML = "";
+      chip.appendChild(el("i", "", "\u6587\u7ae0\u300a" + article.title + "\u300b" + article.text.length + "\u5b57"));
+      var x = el("button", "", "\u00d7"); x.title = "\u79fb\u9664\u8fd9\u7bc7\u6587\u7ae0";
+      x.onclick = function () { article.title = ""; article.text = ""; paintArt(); };
+      chip.appendChild(x);
+    } else chip.hidden = true;
+  }
+  function setArticle(title, text, st) {
+    text = String(text || "").replace(/\r/g, "").trim();
+    if (text.length < 30) { if (st) st("\u6ca1\u8bfb\u51fa\u6b63\u6587\uff08\u4e0d\u8db3 30 \u5b57\uff09\u2014\u2014\u626b\u63cf\u7248 PDF \u65e0\u6587\u5b57\u5c42\uff0c\u6362\u6210\u76f4\u63a5\u7c98\u8d34\u6b63\u6587\u6700\u7a33\u3002", 1); return false; }
+    var cut = text.length > ART_MAX; if (cut) text = text.slice(0, ART_MAX);
+    article.title = String(title || "\u672a\u547d\u540d\u6587\u7ae0").replace(/\s+/g, " ").trim().slice(0, 120);
+    article.text = text; paintArt();
+    if (st) st("\u5df2\u8f7d\u5165\u300a" + article.title + "\u300b" + text.length + " \u5b57\u7b26" + (cut ? "\uff08\u8d85 10 \u4e07\u5df2\u622a\u65ad\uff09" : "") + "\u2014\u2014\u4ece\u4e0b\u4e00\u95ee\u8d77\uff0cWDS \u6bcf\u4e00\u7b54\u90fd\u5e26\u7740\u8fd9\u7bc7\u5168\u6587\u3002", 0);
+    return true;
+  }
+  function artPanel() {
+    var m = el("div", "veil");
+    m.innerHTML = "<div class='box'><div class='boxh'><b>\u7ed9 WDS \u4e00\u7bc7\u6587\u7ae0</b><button class='boxx'>\u00d7</button></div>"
+      + "<div class='boxb'>"
+      + "<div class='arow'><button class='tbtn' id='afile'>\u4e0a\u4f20\u6587\u4ef6 .docx / .pdf / .txt / .md</button>"
+      + "<button class='tbtn' id='aurl'>\u8d34\u94fe\u63a5\u53d6\u7ad9\u5185\u6587\u7ae0</button></div>"
+      + "<input class='atitle' id='atit' placeholder='\u6587\u7ae0\u6807\u9898\uff08\u53ef\u7559\u7a7a\uff0c\u81ea\u52a8\u53d6\u6587\u4ef6\u540d\u6216\u7f51\u9875\u6807\u9898\uff09'>"
+      + "<textarea class='apaste' id='apas' placeholder='\u2026\u2026\u6216\u8005\u628a\u6b63\u6587\u76f4\u63a5\u7c98\u5230\u8fd9\u91cc\uff08\u6700\u7a33\u7684\u4e00\u79cd\uff09'></textarea>"
+      + "<div class='astat' id='asta'></div>"
+      + "<div class='ahint'>\u6587\u4ef6\u5728\u4f60\u672c\u673a\u6d4f\u89c8\u5668\u91cc\u89e3\u6790\uff0c\u4e0d\u4e0a\u4f20\u672c\u7ad9\uff1b\u6b63\u6587\u968f\u4f60\u81ea\u5df1\u7684 Key \u53d1\u5f80\u4f60\u9009\u7684\u57fa\u5e95\u3002\u4e0a\u9650 10 \u4e07\u5b57\u7b26\uff08\u7ea6 5 \u4e07\u6c49\u5b57\uff09\uff0c\u8d85\u51fa\u81ea\u52a8\u622a\u65ad\u3002\u8f7d\u5165\u540e\u6bcf\u4e00\u7b54\u90fd\u643a\u5e26\u5168\u6587\uff0c\u603b\u7ed3\u4e0e\u4e07\u5b57\u8bba\u6587\u4e5f\u4f1a\u5e26\u4e0a\u5b83\uff0ctoken \u6d88\u8017\u4f1a\u660e\u663e\u4e0a\u5347\u3002</div>"
+      + "</div><div class='boxf'><span class='prog'>\u8f7d\u5165\u540e\u53ef\u70b9\u9876\u680f\u6807\u8bb0\u4e0a\u7684 \u00d7 \u968f\u65f6\u79fb\u9664</span>"
+      + "<button class='tbtn' id='aclr'>\u6e05\u9664</button><button class='tbtn gold' id='aok'>\u8f7d\u5165</button></div></div>"
+      + "<input type='file' id='afin' accept='.docx,.pdf,.txt,.md,.markdown,.htm,.html' style='display:none'>";
+    document.body.appendChild(m);
+    var tit = $("#atit", m), pas = $("#apas", m), sta = $("#asta", m), fin = $("#afin", m);
+    if (article.text) { tit.value = article.title; pas.value = article.text; }
+    function st(msg, bad) { sta.textContent = msg; sta.className = "astat" + (bad ? " err" : ""); }
+    function close() { m.remove(); }
+    $(".boxx", m).onclick = close;
+    m.addEventListener("click", function (e) { if (e.target === m) close(); });
+    $("#afile", m).onclick = function () { fin.click(); };
+    fin.onchange = function () {
+      var f = fin.files && fin.files[0]; if (!f) return;
+      var nm = f.name.replace(/\.[^.]+$/, ""), lo = f.name.toLowerCase();
+      st("\u6b63\u5728\u89e3\u6790\u300a" + nm + "\u300b\u2026", 0);
+      readBuf(f).then(function (ab) {
+        if (/\.docx$/.test(lo)) return extractDocx(ab);
+        if (/\.pdf$/.test(lo)) return extractPdf(ab, function (i, t) { st("\u6b63\u5728\u62bd\u53d6\u7b2c " + i + "/" + t + " \u9875\u2026", 0); });
+        if (/\.html?$/.test(lo)) return htmlToText(bufText(ab)).text;
+        return bufText(ab);
+      }).then(function (t) {
+        pas.value = t || ""; if (!tit.value.trim()) tit.value = nm;
+        if (t && t.trim().length >= 30) st("\u89e3\u6790\u51fa " + t.length + " \u5b57\u7b26\uff0c\u786e\u8ba4\u65e0\u8bef\u540e\u70b9\u300c\u8f7d\u5165\u300d\u3002", 0);
+        else st("\u6ca1\u62bd\u51fa\u6587\u5b57\uff08\u53ef\u80fd\u662f\u626b\u63cf\u7248 PDF \u6216\u65e7\u7248 .doc\uff09\u2014\u2014\u8bf7\u628a\u6b63\u6587\u7c98\u5230\u4e0b\u9762\u3002", 1);
+      }).catch(function (e) { st("\u89e3\u6790\u5931\u8d25\uff1a" + (e && e.message || e), 1); });
+      fin.value = "";
+    };
+    $("#aurl", m).onclick = function () {
+      var u = window.prompt("\u7c98\u5165\u6587\u7ae0\u94fe\u63a5\uff08\u672c\u7ad9 sdeuniverses.com \u7684\u9875\u9762\uff0c\u5982 /column/xxx/ \u6216\u5b8c\u6574\u7f51\u5740\uff09\uff1a", "");
+      if (!u) return; u = u.trim();
+      var path = u;
+      try { if (/^https?:\/\//i.test(u)) { var U = new URL(u); if (U.hostname && U.hostname.indexOf("sdeuniverses.com") < 0) { st("\u53ea\u80fd\u53d6\u672c\u7ad9\uff08sdeuniverses.com\uff09\u7684\u9875\u9762\uff1b\u5916\u7ad9\u8bf7\u590d\u5236\u6b63\u6587\u7c98\u8d34\u3002", 1); return; } path = U.pathname + U.search; } } catch (e) { }
+      if (path.charAt(0) !== "/") path = "/" + path;
+      st("\u6b63\u5728\u53d6\u6587\u2026", 0);
+      fetch(path, { credentials: "omit" }).then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.text(); })
+        .then(function (html) {
+          var o = htmlToText(html);
+          pas.value = o.text; if (!tit.value.trim()) tit.value = o.title || path;
+          st(o.text.length >= 30 ? ("\u53d6\u5230 " + o.text.length + " \u5b57\u7b26\uff0c\u70b9\u300c\u8f7d\u5165\u300d\u3002") : "\u8fd9\u4e2a\u9875\u9762\u6ca1\u53d6\u5230\u6b63\u6587\uff0c\u6539\u7528\u7c98\u8d34\u3002", o.text.length >= 30 ? 0 : 1);
+        }).catch(function (e) { st("\u53d6\u6587\u5931\u8d25\uff1a" + (e && e.message || e) + "\uff08PDF \u9605\u8bfb\u9875\u8bf7\u6539\u7528\u4e0a\u4f20\uff09", 1); });
+    };
+    $("#aclr", m).onclick = function () { article.title = ""; article.text = ""; paintArt(); pas.value = ""; tit.value = ""; st("\u5df2\u6e05\u9664\uff0c\u672c\u573a\u4e0d\u518d\u643a\u5e26\u6587\u7ae0\u3002", 0); };
+    $("#aok", m).onclick = function () { if (setArticle(tit.value, pas.value, st)) setTimeout(close, 700); };
+  }
+  if ($("#bart")) $("#bart").onclick = artPanel;
+
+  // —— 清空对话栏：只清聊天记录与轮次，本场心得（开工仪式的成果）与已载入的文章都保留，不必重跑开工 ——
+  function clearChat() {
+    if (streaming || busy) return;
+    if (!window.confirm("\u6e05\u7a7a\u5bf9\u8bdd\u680f\uff1f\u5df2\u8c08\u7684 " + turns() + " \u8f6e\u95ee\u7b54\u5c06\u88ab\u6e05\u6389\u4e14\u4e0d\u53ef\u6062\u590d\uff0c\u8f6e\u6b21\u91cd\u65b0\u8ba1\u3002\n\n\u672c\u573a\u5fc3\u5f97\u4e0e\u5df2\u8f7d\u5165\u7684\u6587\u7ae0\u4f1a\u4fdd\u7559\uff0c\u4e0d\u7528\u91cd\u8dd1\u5f00\u5de5\u4eea\u5f0f\u3002")) return;
+    history = [];
+    sumReset();
+    msgs.innerHTML = "";
+    if (helloEl) msgs.appendChild(helloEl);
+    qEl.disabled = false; goEl.disabled = false;
+    qEl.placeholder = "\u5411 WDS \u53d1\u95ee\u2026\u2026\uff08Enter \u53d1\u9001\uff0cShift+Enter \u6362\u884c\uff09";
+    paint();
+    qEl.focus();
+  }
+  if ($("#bclr")) $("#bclr").onclick = function () { if (stSess) stSess.reset(); clearChat(); };
+
+  // —— 状态 ——
+  function turns() { var n = 0; for (var i = 0; i < history.length; i++) if (history[i].role === "reader") n++; return n; }
+  function paint() {
+    var n = turns();
+    turnsEl.textContent = "剩余 " + (MAX - n) + " 次";
+    var ready = n >= 2 && !busy && !streaming;
+    sumB.disabled = !ready; papB.disabled = !ready;
+    if (n >= MAX) { qEl.disabled = true; goEl.disabled = true; qEl.placeholder = "\u8fd9\u573a\u5df2\u8c08\u6ee1 100 \u8f6e\u2014\u2014\u603b\u7ed3\u6216\u51dd\u6210\u300a\u95ee\u5bf9WDS\u300b\u5427\u3002"; }
+  }
+  function addMsg(role, text) {
+    var w = el("div", "m " + (role === "wds" ? "wds" : "me"));
+    w.appendChild(el("div", "who", role === "wds" ? "WDS" : "\u4f60"));
+    var t = el("div", "t", text); w.appendChild(t);
+    msgs.appendChild(w); msgs.scrollTop = msgs.scrollHeight;
+    return t;
+  }
+
+  // —— 高级会话：开工仪式（满血内功 → 本场亲写约5000字心得）+ 对话（流式 SSE；独立界面，不复用任何浮层） ——
+  var XREF = "/api/wds/dialogue-reflect";
+  var xinde = "", xindeTried = false;
+  function showXinde() {
+    if (!xinde) return;
+    var dm = docModal("\u4e0e WDS \u5bf9\u8bdd \u00b7 \u672c\u573a\u5185\u529f\u5fc3\u5f97", "xinde");
+    dm.setText(xinde);
+    dm.setProg("\u672c\u5fc3\u5f97\u7531 WDS \u672c\u573a\u5f00\u5de5\u65f6\u901a\u8bfb\u6ee1\u8840\u5185\u529f\u540e\u4eb2\u624b\u5199\u6210\uff0c\u57ab\u5165\u5176\u540e\u6bcf\u4e00\u7b54");
+  }
+  function learnFirst(done) {
+    var kv = keyGet(); if (!kv) { xindeTried = true; return done(); }
+    streaming = true; goEl.disabled = true; paint();
+    var st = addMsg("wds", "\u5f00\u5de5\u4eea\u5f0f\uff1a\u6b63\u5728\u901a\u8bfb\u6ee1\u8840 SDE \u5185\u529f\u3001\u4eb2\u624b\u64b0\u5199\u7ea6 5000 \u5b57\u5fc3\u5f97\uff08\u7ea6\u9700\u4e00\u4e24\u5206\u949f\uff0c\u53ea\u5728\u672c\u573a\u5f00\u5de5\u65f6\u505a\u4e00\u6b21\uff09\u2026");
+    st.classList.add("stream");
+    // FAKE_STREAM_UI：开工仪式改收 SSE——思考期间服务端每 5 秒发一个 beat（秒数/推演字数），
+    // 既喂活连接，也让状态条一直在动；末尾一个 xinde 事件带回全文。
+    var xt0 = Date.now();
+    fetch(XREF, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ key: kv.key, vendor: kv.vendor }) })
+      .then(function (r) {
+        if (!r.ok || !r.body) return { ok: false, msg: "HTTP " + r.status };
+        var reader = r.body.getReader(), dec = new TextDecoder(), buf = "", got = null, em = "", ec = "", think = 0;
+        function pump() {
+          return reader.read().then(function (res) {
+            if (res.done) return got ? { ok: true, text: got.text, chars: got.chars } : { ok: false, msg: em || "开工学习没出稿", code: ec };
+            buf += dec.decode(res.value, { stream: true });
+            var ix;
+            while ((ix = buf.indexOf("\n")) >= 0) {
+              var line = buf.slice(0, ix).trim(); buf = buf.slice(ix + 1);
+              if (line.indexOf("data:") !== 0) continue;
+              var pp = line.slice(5).trim(); if (pp === "[DONE]") continue;
+              try {
+                var j = JSON.parse(pp);
+                if (j.t === "xinde" && j.v) got = j.v;
+                else if (j.t === "think") { think += (j.v || "").length; }
+                else if (j.t === "error") { em = j.v; ec = j.code || ""; }
+                if (j.t === "beat" || j.t === "think" || j.t === "token") {
+                  var sec = j.t === "beat" && j.v ? j.v.sec : Math.round((Date.now() - xt0) / 1000);
+                  var tk = j.t === "beat" && j.v && j.v.think ? j.v.think : think;
+                  st.textContent = "\u5f00\u5de5\u4eea\u5f0f\uff1a\u6b63\u5728\u901a\u8bfb\u6ee1\u8840 SDE \u5185\u529f\u3001\u4eb2\u624b\u5199\u5fc3\u5f97\u2026\uff08\u5df2 " + sec + " \u79d2\uff0c\u5df2\u63a8\u6f14 " + tk + " \u5b57\uff09";
+                }
+              } catch (e) {}
+            }
+            return pump();
+          });
+        }
+        return pump();
+      }, function (e) { return { ok: false, msg: (e && e.message) || "接不上" }; })
+      .then(function (r) {
+        xindeTried = true; streaming = false; goEl.disabled = false;
+        st.classList.remove("stream");
+        if (r.ok && r.text) {
+          xinde = r.text;
+          st.textContent = "\u2713 \u5185\u529f\u5df2\u5185\u5316 \u00b7 \u672c\u573a\u5fc3\u5f97 " + (r.chars || r.text.length) + " \u5b57\uff08\u70b9\u6b64\u67e5\u770b\uff09";
+          st.style.cursor = "pointer"; st.style.color = "#7FD4C8";
+          st.onclick = showXinde;
+        } else {
+          st.classList.add("err");
+          st.textContent = "开工学习没完成（" + (r.msg || "未知原因") + "）——本场先用既有内化底盘作答。点这一行可以重来一次开工，不必刷新页面（刷新会丢掉这场对话）。";
+          st.style.cursor = "pointer";
+          st.onclick = function () {   // XINDE_RETRY：重试开工，不必刷新整页
+            if (streaming) return;
+            st.onclick = null; st.style.cursor = "";
+            var w = st.parentNode;   // addMsg 返回的是气泡里的文本节点，整条消息是它的父节点
+            if (w && w.parentNode) w.parentNode.removeChild(w);
+            xinde = ""; xindeTried = false;
+            learnFirst(function () { paint(); });
+          };
+          if (r.code === "need_key" || r.code === "bad_key") keyPanel(null);
+        }
+        paint(); done();
+      })
+      .catch(function (e) {
+        xindeTried = true; streaming = false; goEl.disabled = false;
+        st.classList.remove("stream"); st.classList.add("err");
+        st.textContent = "\u5f00\u5de5\u5b66\u4e60\u6ca1\u5b8c\u6210\uff08" + (e && e.message) + "\uff09\u2014\u2014\u672c\u573a\u5148\u7528\u65e2\u6709\u5185\u5316\u5e95\u76d8\u4f5c\u7b54\u3002";
+        paint(); done();
+      });
+  }
+  function send() {
+    var q = qEl.value.trim(); if (!q || streaming) return;
+    var kv = needKey(function (ok) { if (ok) send(); }); if (!kv) return;
+    if (turns() >= MAX) { paint(); return; }
+    qEl.value = "";
+    addMsg("reader", q);
+    history.push({ role: "reader", text: q });
+    stSave(history);
+    paint();
+    if (!xinde && !xindeTried) { learnFirst(function () { dispatch(q); }); return; }
+    dispatch(q);
+  }
+  function dispatch(q) {
+    var kv = keyGet(); if (!kv) { paint(); return; }
+    var bubble = addMsg("wds", ""); bubble.classList.add("stream");
+    streaming = true; goEl.disabled = true; paint();
+    var wd = null, timedOut = false;   // 存活看门狗:靠心跳字节喂,45s 无任何字节(含 : ping)判定连接已死
+    // USER_RAG：在本机按这一问挑出最相关的几条历史对话记忆（跨场记性）。挑选与打分全在浏览器里做，
+    // 不发第二次调用；关掉开关、或还没更新过记忆时它就是空串，与从前完全一样。
+    var payload = { q: q, docTitle: article.text ? article.title : TITLE, docText: article.text || "", focus: "", history: compactHistory(), key: kv.key, vendor: kv.vendor, guide: 1, reflect: xinde, umem: umRecall(q) };
+
+    fetch(API, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(payload) })
+      .then(function (resp) {
+        if (!resp.ok || !resp.body) throw new Error("HTTP " + resp.status);
+        var reader = resp.body.getReader(), dec = new TextDecoder(), buf = "", answer = "", srcs = [], think = "";
+        var diag = { beats: 0, sawEnd: null, notes: 0, t0: Date.now(), status: resp.status, bytes: 0, head: "", lastNote: "", stage: "" };   // ANSWER_DIAG_UI：空答时得说得出"到底收到了什么"
+        function bumpWd() { clearTimeout(wd); wd = setTimeout(function () { timedOut = true; try { reader.cancel(); } catch (e) {} }, 45000); }
+        bumpWd();
+        function pump() {
+          return reader.read().then(function (r) {
+            if (r.done) {
+              clearTimeout(wd);
+              bubble.classList.remove("stream");
+              if (timedOut && !answer) { bubble.classList.add("err"); bubble.textContent = "连接像是断了（也许想太久被中间层切了）。你刚才那句我记着——再点一下发送，或把问题问得更聚焦些。"; history.pop(); streaming = false; goEl.disabled = false; paint(); return; }
+              if (answer && srcs.length) {
+                var sb = el("div", "srcs");
+                sb.appendChild(el("span", "", "\u672c\u7b54\u68c0\u7d22\u5230\u7684\u7ad9\u5185\u7bc7\u76ee\uff1a"));
+                for (var si = 0; si < srcs.length && si < 8; si++) {
+                  var a = document.createElement("a"); a.href = srcs[si].u; a.target = "_blank"; a.textContent = srcs[si].t; sb.appendChild(a);
+                }
+                bubble.parentNode.appendChild(sb); msgs.scrollTop = msgs.scrollHeight;
+              }
+              if (answer) { history.push({ role: "wds", text: answer }); stSave(history); summarizeExchange(); }
+              else if (!diag.bytes || !diag.sawEnd) {   // CUT_FALLBACK：0 字节、或流被中途切断（没收到结束标记）——都改用不流式再取一次
+                // NOSTREAM_FALLBACK：一个字节都没收到＝流被中间层/浏览器吃掉了，不是没生成。
+                // 改用不流式的取法（整份读回来再按同一套 SSE 文本解析），拿得到就照常显示。
+                bubble.classList.remove("err");
+                bubble.textContent = "\uff08\u6d41\u88ab\u5207\u65ad\uff0c\u6539\u7528\u4e0d\u6d41\u5f0f\u91cd\u53d6\u4e00\u6b21\uff08\u6162\uff0c\u8bf7\u7b49\uff09\u2026\uff09";
+                fetch(API, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(payload) })
+                  .then(function (r2) { return r2.text().then(function (t2) { return { st: r2.status, t: t2 }; }); })
+                  .then(function (o) {
+                    var ans = "", err = "", ln = String(o.t || "").split("\n");
+                    for (var k = 0; k < ln.length; k++) {
+                      var s2 = ln[k].trim(); if (s2.indexOf("data:") !== 0) continue;
+                      var q2 = s2.slice(5).trim(); if (q2 === "[DONE]") continue;
+                      try { var jj = JSON.parse(q2); if (jj.t === "token") ans += jj.v || ""; else if (jj.t === "error") err = jj.v || ""; } catch (e) {}
+                    }
+                    bubble.classList.remove("stream");
+                    if (ans) { bubble.textContent = ans; history.push({ role: "wds", text: ans }); stSave(history); summarizeExchange(); }
+                    else {
+                      bubble.classList.add("err");
+                      bubble.textContent = "没收到回答。【诊断】流式收到 " + diag.bytes + " 字节 · 跑了 " + Math.round((Date.now() - diag.t0) / 1000) + " 秒 · 思考 " + think.replace(/\s/g, "").length + " 字（HTTP " + diag.status + "，" + (diag.sawEnd ? "有结束标记" : "被中途切断") + "，停在「" + (diag.stage || "未知") + "」）；不流式重取 HTTP " + o.st + "、收到 " + String(o.t || "").length + " 字节" + (err ? ("；基底说：" + err) : "") + (diag.lastNote ? ("；提示：" + diag.lastNote) : "") + "。把这行截图给我。";
+                      history.pop();
+                    }
+                    streaming = false; goEl.disabled = false; paint();
+                  })
+                  .catch(function (e2) {
+                    bubble.classList.remove("stream"); bubble.classList.add("err");
+                    bubble.textContent = "\u6ca1\u6536\u5230\u56de\u7b54\u3002\u3010\u8bca\u65ad\u3011\u6d41\u5f0f 0 \u5b57\u8282\uff08HTTP " + diag.status + "\uff09\uff1b\u4e0d\u6d41\u5f0f\u91cd\u53d6\u4e5f\u5931\u8d25\uff1a" + (e2 && e2.message) + "\u3002\u628a\u8fd9\u884c\u622a\u56fe\u7ed9\u6211\u3002";
+                    history.pop(); streaming = false; goEl.disabled = false; paint();
+                  });
+                return;
+              }
+              else {
+                bubble.classList.add("err");
+                var sec = diag.sawEnd && diag.sawEnd.sec ? diag.sawEnd.sec : Math.round((Date.now() - diag.t0) / 1000);
+                var why = diag.sawEnd ? (diag.sawEnd.think ? "\u57fa\u5e95\u53ea\u60f3\u4e86\u6ca1\u5199" : "\u57fa\u5e95\u4ec0\u4e48\u90fd\u6ca1\u56de") : "\u8fde\u63a5\u88ab\u4e2d\u9014\u5207\u65ad\uff08\u6ca1\u6536\u5230\u7ed3\u675f\u6807\u8bb0\uff09";
+                bubble.textContent = (bubble.textContent && bubble.textContent.indexOf("\uff08") !== 0 ? bubble.textContent + "\n" : "")
+                  + "\u6ca1\u6536\u5230\u56de\u7b54\u3002\u3010\u8bca\u65ad\u3011" + why + " \u00b7 \u5df2\u8dd1 " + sec + " \u79d2 \u00b7 \u5fc3\u8df3 " + diag.beats + " \u6b21 \u00b7 \u601d\u8003 " + think.replace(/\s/g, "").length + " \u5b57 \u00b7 \u68c0\u7d22 " + srcs.length + " \u7bc7 \u00b7 \u91cd\u7b54 " + diag.notes + " \u6b21 \u00b7 HTTP " + diag.status + " \u00b7 \u6536\u5230 " + diag.bytes + " 字节 · 停在「" + (diag.stage || "未知") + "」" + (diag.sawEnd && diag.sawEnd.pre ? ("（其中准备阶段 " + diag.sawEnd.pre + " 秒）") : "") + (diag.lastNote ? ("\uff1b\u63d0\u793a\uff1a" + diag.lastNote) : "") + "\u3002\u628a\u8fd9\u884c\u622a\u56fe\u7ed9\u6211\u5c31\u80fd\u5b9a\u4f4d\u3002";
+                history.pop();
+              }
+              streaming = false; goEl.disabled = false; paint();
+              return;
+            }
+            bumpWd();
+            diag.bytes += (r.value && r.value.length) || 0;
+            var _chunk = dec.decode(r.value, { stream: true });
+            if (!diag.head) diag.head = _chunk.slice(0, 100);
+            buf += _chunk;
+            var i;
+            while ((i = buf.indexOf("\n")) >= 0) {
+              var line = buf.slice(0, i).trim(); buf = buf.slice(i + 1);
+              if (!line.startsWith("data:")) continue;
+              var p = line.slice(5).trim();
+              if (p === "[DONE]") continue;
+              var j; try { j = JSON.parse(p); } catch (e) { continue; }
+              if (j.t === "token" && j.v) { answer += j.v; bubble.textContent = answer; msgs.scrollTop = msgs.scrollHeight; }
+              else if (j.t === "sources") { srcs = Array.isArray(j.v) ? j.v : []; }
+              else if (j.t === "think") { think += (j.v || ""); if (!answer) bubble.textContent = "\uff08\u6df1\u601d\u4e2d\u2026\u5df2\u63a8\u6f14 " + think.replace(/\s/g, "").length + " \u5b57\uff09"; }
+              else if (j.t === "beat") { diag.beats++; if (j.v && j.v.stage) diag.stage = j.v.stage; if (!answer && !think && j.v) bubble.textContent = "（已 " + (j.v.sec || 0) + " 秒 · " + (j.v.stage || "基底还在想") + "…）"; }
+              else if (j.t === "note") { diag.notes++; diag.lastNote = j.v || ""; if (!answer) bubble.textContent = "\uff08" + (j.v || "") + "\uff09"; }
+              else if (j.t === "end") { diag.sawEnd = j.v || {}; }
+              else if (j.t === "error") {
+                bubble.classList.remove("stream"); bubble.classList.add("err");
+                bubble.textContent = j.v || "\u51fa\u9519\u4e86";
+                if (j.code === "need_key" || j.code === "bad_key") keyPanel(null);
+                history.pop(); streaming = false; goEl.disabled = false; paint();
+              }
+            }
+            return pump();
+          });
+        }
+        return pump();
+      })
+      .catch(function (e) {
+        clearTimeout(wd); bubble.classList.remove("stream"); bubble.classList.add("err");
+        bubble.textContent = "\u63a5\u4e0d\u4e0a WDS\uff08" + (e && e.message) + "\uff09\u3002\u68c0\u67e5\u7f51\u7edc\u540e\u91cd\u8bd5\u2014\u2014\u4f60\u521a\u624d\u90a3\u53e5\u6211\u8bb0\u7740\u3002";
+        streaming = false; goEl.disabled = false; paint();
+      });
+  }
+
+  // —— 总结 / 凝成万字论文（独立弹窗 + 印刷 PDF） ——
+  function post(body) {
+    body.guide = 1; body.paperN = PN; body.docTitle = article.text ? article.title : TITLE; body.docText = article.text || ""; body.history = history; body.reflect = xinde;
+    return fetch(PAPER, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) })
+      .then(function (r) { return r.json().catch(function () { return { ok: false, msg: "HTTP " + r.status }; }); });
+  }
+  // 偶发的平台 503 / 上游超时（→502 请重试）/ 限流自动退避重试，避免整篇成文被一次抖动打断（need_key 等硬错不重试）
+  function postR(body) {
+    var delays = [1500, 4000], max = delays.length + 1;
+    function attempt(n) {
+      return post(body).then(function (r) {
+        var m = String((r && r.msg) || "");
+        var transient = r && r.ok === false && !r.code && (/HTTP\s*(5\d\d|429)/.test(m) || /请重试/.test(m) || /太快/.test(m));
+        if (transient && n < max - 1) return new Promise(function (res) { setTimeout(res, delays[n]); }).then(function () { return attempt(n + 1); });
+        return r;
+      }, function (e) {
+        if (n < max - 1) return new Promise(function (res) { setTimeout(res, delays[n]); }).then(function () { return attempt(n + 1); });
+        throw e;
+      });
+    }
+    return attempt(0);
+  }
+  // 分部写作走流式（SSE）：先建立连接再逐字收——避免“出流前”被平台上限杀掉而 503；出流前的偶发 5xx 仍退避重试。
+  // 心跳→人话：思考期间没有正文，就把"已跑几秒、推演了多少字"显示出来，让人看得见它在动
+  function beatTip(v) {
+    if (!v) return "\u2026";
+    var s = "（" + (v.stage ? (v.stage + " · ") : "") + "已 " + (v.sec || 0) + " 秒";
+    if (v.out) s += "，已写 " + v.out + " 字";
+    else if (v.think) s += "\uff0c\u6df1\u601d\u63a8\u6f14 " + v.think + " \u5b57";
+    return s + "\uff09\u2026";
+  }
+  function postStream(body, onToken, needText, onBeat) {
+    body.guide = 1; body.paperN = PN; body.docTitle = article.text ? article.title : TITLE; body.docText = article.text || ""; body.history = history; body.reflect = xinde;
+    // 退避加长（平台 503 常连着来，1.5s/4s 太短，三次全撞在同一阵抖动里）；needText=1 时“0 字”也算失败
+    var delays = [2000, 6000, 15000];
+    function attempt(n) {
+      return fetch(PAPER, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) }).then(function (r) {
+        if (!r.ok || !r.body) {
+          if (n < delays.length) return new Promise(function (res) { setTimeout(res, delays[n]); }).then(function () { return attempt(n + 1); });
+          throw new Error("HTTP " + r.status);
+        }
+        var reader = r.body.getReader(), dec = new TextDecoder(), buf = "", text = "", errMsg = "", errCode = "";
+        function pump() {
+          return reader.read().then(function (res) {
+            if (res.done) {
+              if (errMsg && !text) { var er = new Error(errMsg); er.code = errCode; throw er; }
+              if (needText && !text.replace(/\s/g, "")) { var e0 = new Error("\u6b63\u6587 0 \u5b57"); e0.retryable = 1; throw e0; }
+              return text;
+            }
+            buf += dec.decode(res.value, { stream: true });
+            var idx2;
+            while ((idx2 = buf.indexOf("\n")) >= 0) {
+              var line = buf.slice(0, idx2).trim(); buf = buf.slice(idx2 + 1);
+              if (line.indexOf("data:") !== 0) continue;
+              var pp = line.slice(5).trim();
+              if (pp === "[DONE]") continue;
+              try { var j = JSON.parse(pp); if (j.t === "token") { text += j.v; if (onToken) onToken(text); } else if (j.t === "beat") { if (onBeat) onBeat(j.v); } else if (j.t === "error") { errMsg = j.v; errCode = j.code || ""; } } catch (e) {}
+            }
+            return pump();
+          });
+        }
+        return pump().catch(function (e) {
+          var soft = e && (e.retryable || e.code === "empty");
+          if (soft && n < delays.length) return new Promise(function (res) { setTimeout(res, delays[n]); }).then(function () { return attempt(n + 1); });
+          throw e;
+        });
+      }, function (e) {
+        if (n < delays.length) return new Promise(function (res) { setTimeout(res, delays[n]); }).then(function () { return attempt(n + 1); });
+        throw e;
+      });
+    }
+    return attempt(0);
+  }
+  // 拟题也走流式（SSE）：先建立连接，思考在流内进行，末尾一个 {t:"plan"} 事件带回结构化提纲——避免出流前 503。
+  function postPlanStream(body, onNote, onBeat) {
+    body.guide = 1; body.paperN = PN; body.docTitle = article.text ? article.title : TITLE; body.docText = article.text || ""; body.history = history; body.reflect = xinde;
+    var delays = [2000, 6000, 15000];
+    function attempt(n) {
+      return fetch(PAPER, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) }).then(function (r) {
+        if (!r.ok || !r.body) {
+          if (n < delays.length) return new Promise(function (res) { setTimeout(res, delays[n]); }).then(function () { return attempt(n + 1); });
+          throw new Error("HTTP " + r.status);
+        }
+        var reader = r.body.getReader(), dec = new TextDecoder(), buf = "", plan = null, errMsg = "", errCode = "";
+        var pdiag = { bytes: 0, beats: 0, think: 0, t0: Date.now() };   // PLAN_DIAG：空手而归时得说得出到底收到了什么
+        function pump() {
+          return reader.read().then(function (res) {
+            if (res.done) {
+              if (plan) return plan;
+              if (errMsg) return { ok: false, msg: errMsg, code: errCode };
+              // 既没有提纲也没有一句错误说明＝流被中途掐断（服务端每条失败分支都会发 error）
+              return { ok: false, code: errCode, msg: "拟题这一步的连接被中途切断（收到 " + pdiag.bytes + " 字节 · 心跳 " + pdiag.beats + " 次 · 思考 " + pdiag.think + " 字 · 已跑 " + Math.round((Date.now() - pdiag.t0) / 1000) + " 秒），没收到结束标记。可以点下面的按钮再试一次" };
+            }
+            pdiag.bytes += (res.value && res.value.length) || 0;
+            buf += dec.decode(res.value, { stream: true });
+            var idx2;
+            while ((idx2 = buf.indexOf("\n")) >= 0) {
+              var line = buf.slice(0, idx2).trim(); buf = buf.slice(idx2 + 1);
+              if (line.indexOf("data:") !== 0) continue;
+              var pp = line.slice(5).trim();
+              if (pp === "[DONE]") continue;
+              try { var j = JSON.parse(pp); if (j.t === "plan" && j.v) { plan = { ok: true, title: j.v.title, points: j.v.points || [], parts: j.v.parts || [], convo: j.v.convo || "" }; } else if (j.t === "note") { if (onNote) onNote(j.v); } else if (j.t === "beat") { pdiag.beats++; if (j.v && j.v.think) pdiag.think = j.v.think; if (onBeat) onBeat(j.v); } else if (j.t === "error") { errMsg = j.v; errCode = j.code || ""; } } catch (e) {}
+            }
+            return pump();
+          });
+        }
+        return pump();
+      }, function (e) {
+        if (n < delays.length) return new Promise(function (res) { setTimeout(res, delays[n]); }).then(function () { return attempt(n + 1); });
+        throw e;
+      });
+    }
+    return attempt(0);
+  }
+  function docModal(title, kind) {
+    var m = el("div", "veil doc");
+    m.innerHTML = "<div class='box'><div class='boxh'><b class='dt'></b><button class='boxx'>\u00d7</button></div>"
+      + "<div class='boxb'><div class='doct'></div></div>"
+      + "<div class='boxf'><span class='prog'></span><button class='tbtn resume' style='display:none'></button><button class='tbtn savedir'>\u{1F4C1} \u5b58\u5230\u76ee\u5f55</button><button class='tbtn copy'>\u590d\u5236\u5168\u6587</button><button class='tbtn gold pdf'>\u5bfc\u51fa PDF</button></div></div>";
+    document.body.appendChild(m);
+    var tE = $(".dt", m), bE = $(".doct", m), pE = $(".prog", m);
+    tE.textContent = title;
+    function close() { m.remove(); }
+    $(".boxx", m).onclick = close;
+    m.addEventListener("click", function (e) { if (e.target === m) close(); });
+    $(".copy", m).onclick = function () {
+      try { navigator.clipboard.writeText(tE.textContent + "\n\n" + bE.textContent); pE.textContent = "\u5df2\u590d\u5236"; } catch (e) {}
+    };
+    $(".pdf", m).onclick = function () { exportPDF(tE.textContent, bE.textContent, kind); };
+    var sdB = $(".savedir", m);
+    sdB.title = sdName() ? ("现在存到：" + sdName()) : "还没选目录，点一下会让你选";
+    sdB.onclick = function () {
+      var body = bE.textContent;
+      if (!body) { pE.textContent = "还没有内容可存"; return; }
+      var nm = (sdApi() ? sdApi().safeName(tE.textContent) : "WDS") || "WDS";
+      var st = sdApi() ? sdApi().stamp() : String(Date.now());
+      saveDoc("WDS-" + nm + "-" + st + ".md", "# " + tE.textContent + "\n\n" + body, function (msg) {
+        pE.textContent = msg;
+        sdB.title = sdName() ? ("现在存到：" + sdName()) : "还没选目录，点一下会让你选";
+      });
+    };
+    var rE = $(".resume", m);
+    /* 精华自动进思想库存。
+       ⚠️ docModal 只暴露 setText/setProg，**没有显式的完成回调**（成文是流式一段段 pump 进来的）。
+       所以用「**流停即入库**」：文本 2.5 秒不再增长就算写完，那时才取一句入库。
+       这样不必去猜每个调用者的完成路径，也不会在流中途反复入库。 */
+    var vTimer = null, vDone = false;
+    function vaultLater() {
+      if (vDone) return;
+      clearTimeout(vTimer);
+      vTimer = setTimeout(function () {
+        var body = bE.textContent || "";
+        if (body.length < 200) return;                 // 太短多半是还没写完或失败了
+        vDone = true;
+        try {
+          if (!window.SDEVault) return;
+          var one = window.SDEVault.lead(body, 200);   // 《问对SDE》与总结都是叙述体，取点题句
+          if (!one) return;
+          var vb = m.querySelector(".vaultnote");
+          if (!vb) {
+            vb = document.createElement("div");
+            vb.className = "vaultnote";
+            vb.style.cssText = "font-size:12.5px;line-height:1.7;margin:8px 0 0;opacity:.8";
+            pE.parentNode.insertBefore(vb, pE.nextSibling);
+          }
+          window.SDEVault.auto([{ kind: "claim", text: one }],
+            "和WDS对话 · " + (kind === "paper" ? "《问对SDE》" : (kind === "xinde" ? "本场心得" : "全场总结")), vb);
+        } catch (e) {}
+      }, 2500);
+    }
+    return {
+      setText: function (t) { bE.textContent = t; vaultLater(); }, setTitle: function (t) { tE.textContent = t; }, setProg: function (t) { pE.textContent = t || ""; }, close: close,
+      // PAPER_RESUME：中断后不必从头重来——留一个“从第 N 部分继续”的按钮，已写好的部分与提纲都在
+      setResume: function (label, fn) {
+        if (!fn) { rE.style.display = "none"; rE.onclick = null; return; }
+        rE.textContent = label; rE.style.display = "";
+        rE.onclick = function () { rE.style.display = "none"; rE.onclick = null; fn(); };
+      },
+    };
+  }
+  function exportPDF(title, body, kind) {
+    var w = window.open("", "_blank");
+    if (!w) { alert("\u6d4f\u89c8\u5668\u62e6\u4e86\u65b0\u7a97\u53e3\uff0c\u5141\u8bb8\u5f39\u7a97\u540e\u91cd\u8bd5"); return; }
+    var meta = kind === "paper" ? "\u300a\u95ee\u5bf9WDS\u300b\u00b7 \u672c\u6587\u7531\u4e00\u573a\u4e0e WDS \u7684\u5bf9\u8bdd\u51dd\u6210 \u00b7 SDE Universes" : (kind === "xinde" ? "\u4e0e WDS \u5bf9\u8bdd \u00b7 \u672c\u573a\u5185\u529f\u5fc3\u5f97\uff08\u5f00\u5de5\u4eea\u5f0f\u4ea7\u51fa\uff09 \u00b7 SDE Universes" : "\u4e0e WDS \u5bf9\u8bdd \u00b7 \u5168\u573a\u603b\u7ed3 \u00b7 SDE Universes");
+    var paras = body.split(/\n+/).map(function (s) {
+      s = s.trim(); if (!s) return "";
+      var esc = s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      if (s.length <= 24 && !/[\u3002\uff1f\uff01.?!]$/.test(s)) return "<h2>" + esc + "</h2>";
+      return "<p>" + esc + "</p>";
+    }).join("");
+    w.document.write("<!DOCTYPE html><html><head><meta charset='utf-8'><title>" + title.replace(/</g, "&lt;") + "</title><style>"
+      + "@page{size:A4;margin:22mm}"
+      + "body{font-family:'Songti SC','Noto Serif CJK SC','SimSun',serif;color:#111;line-height:2;font-size:12.5pt}"
+      + "h1{font-size:19pt;line-height:1.5;margin:0 0 6pt}"
+      + ".meta{font-size:9.5pt;color:#666;margin:0 0 22pt;padding-bottom:10pt;border-bottom:.6pt solid #999}"
+      + "h2{font-size:13.5pt;margin:18pt 0 6pt}"
+      + "p{margin:0 0 0;text-indent:2em}"
+      + ".foot{margin-top:26pt;padding-top:8pt;border-top:.6pt solid #999;font-size:8.5pt;color:#777}"
+      + "@media print{.noprint{display:none}}"
+      + ".noprint{position:fixed;top:12px;right:12px;background:#141A24;color:#fff;border:none;border-radius:8px;padding:10px 18px;font:600 14px -apple-system,'PingFang SC',sans-serif;cursor:pointer}"
+      + "</style></head><body>"
+      + "<button class='noprint' onclick='window.print()'>\u6253\u5370 / \u5b58\u4e3a PDF</button>"
+      + "<h1>" + title.replace(/</g, "&lt;") + "</h1><div class='meta'>" + meta + "</div>"
+      + paras
+      + "<div class='foot'>\u7531\u5927\u6a21\u578b\u751f\u6210\uff0c\u89c2\u70b9\u4f9b\u601d\u8003\u53c2\u8003\uff1b\u53ef\u6838\u9a8c\u4e8b\u5b9e\u8bf7\u4ee5\u539f\u59cb\u6587\u732e\u4e3a\u51c6\u3002sdeuniverses.com</div>"
+      + "</body></html>");
+    w.document.close();
+    setTimeout(function () { try { w.print(); } catch (e) {} }, 700);
+  }
+  sumB.onclick = function () {
+    var kv = needKey(function (ok) { if (ok) sumB.onclick(); }); if (!kv) return;
+    busy = true; paint();
+    var dm = docModal("\u6b63\u5728\u603b\u7ed3\u8fd9\u573a\u5bf9\u8bdd\u2026", "summary");
+    dm.setProg("\u8c03\u7528\u4f60\u81ea\u5df1\u7684\u57fa\u5e95\u4e2d\u2026");
+    postStream({ mode: "summary", key: kv.key, vendor: kv.vendor }, function (partial) { dm.setText(partial); }, 1, function (bv) { dm.setProg("\u6b63\u5728\u603b\u7ed3" + beatTip(bv)); })
+      .then(function (text) {
+        busy = false; paint(); dm.setProg("");
+        dm.setTitle("\u4e0e WDS \u5bf9\u8bdd \u00b7 \u5168\u573a\u603b\u7ed3"); dm.setText(text);
+      })
+      .catch(function (e) { busy = false; paint(); dm.setProg(""); dm.setTitle("\u6ca1\u80fd\u751f\u6210"); dm.setText("\u751f\u6210\u51fa\u9519\uff1a" + (e && e.message)); if (e && e.code === "need_key") keyPanel(null); });
+  };
+  papB.onclick = function () {
+    var KV = needKey(function (ok) { if (ok) papB.onclick(); }); if (!KV) return;
+    busy = true; paint();
+    var dm = docModal("\u6b63\u5728\u51dd\u6210\u300a\u95ee\u5bf9WDS\u300b\u2026", "paper");
+    dm.setProg("\u7b2c 1 \u6b65\uff1a\u62df\u9898\u4e0e\u63d0\u7eb2\u2026");
+    var out = "", prev = "", i = 0, PLAN = null;
+    function step() {
+      var pl = PLAN;
+      if (i >= pl.parts.length) {
+        busy = false; paint(); dm.setResume(null, null);
+        dm.setProg("\u5171 " + out.replace(/\s/g, "").length + " \u5b57 \u00b7 \u53ef\u590d\u5236\u6216\u5bfc\u51fa PDF");
+        return;
+      }
+      dm.setProg("\u7b2c " + (i + 2) + " \u6b65 / \u5171 " + (pl.parts.length + 1) + " \u6b65\uff1a\u6b63\u5728\u5199\u3010" + pl.parts[i].h + "\u3011\u2026");
+      var base = out ? (out + "\n\n") : "", head = pl.parts[i].h + "\n";
+      var pTip = "\u7b2c " + (i + 2) + " \u6b65 / \u5171 " + (pl.parts.length + 1) + " \u6b65\uff1a\u6b63\u5728\u5199\u3010" + pl.parts[i].h + "\u3011";
+      return postStream({ mode: "part", idx: i, title: pl.title, points: pl.points, parts: pl.parts, convo: pl.convo, prevBrief: prev.slice(-1400), key: KV.key, vendor: KV.vendor }, function (partial) { dm.setText(base + head + partial); }, 1, function (bv) { dm.setProg(pTip + beatTip(bv)); })
+        .then(function (text) {
+          out = base + head + text;
+          prev = text; i++;
+          dm.setText(out);
+          return step();
+        });
+    }
+    function fail(e) {
+      busy = false; paint(); dm.setProg("");
+      dm.setText(out + (out ? "\n\n" : "") + "\u3010\u751f\u6210\u4e2d\u65ad\uff1a" + (e && e.message) + "\u3002\u5df2\u5199\u597d\u7684\u90e8\u5206\u4ecd\u53ef\u590d\u5236\u6216\u5bfc\u51fa\u3002\u3011");
+      if (PLAN && i < PLAN.parts.length) {
+        dm.setResume("\u4ece\u7b2c " + (i + 1) + " \u90e8\u5206\u7ee7\u7eed", function () {
+          busy = true; paint(); dm.setText(out);
+          try { step().catch(fail); } catch (e2) { fail(e2); }
+        });
+      } else if (!PLAN && !(e && e.code === "need_key")) {
+        dm.setResume("\u91cd\u65b0\u62df\u9898\u518d\u8bd5\u4e00\u6b21", function () {
+          busy = true; paint(); dm.setText("");
+          try { plan().catch(fail); } catch (e2) { fail(e2); }
+        });
+      }
+      if (e && e.code === "need_key") keyPanel(null);
+    }
+    // PLAN_RETRY：拟题这一步本身也会倒（满功率思考吃光预算 → 提纲解析失败），倒了同样给一键重试，不必关掉重开
+    function plan() {
+      dm.setProg("\u7b2c 1 \u6b65\uff1a\u62df\u9898\u4e0e\u63d0\u7eb2\u2026");
+      return postPlanStream({ mode: "plan", key: KV.key, vendor: KV.vendor }, function (n) { dm.setProg(n); }, function (bv) { dm.setProg("\u7b2c 1 \u6b65\uff1a\u62df\u9898\u4e0e\u63d0\u7eb2" + beatTip(bv)); }).then(function (pl) {
+        if (!pl.ok) { var er = new Error(pl.msg || "\u63d0\u7eb2\u5931\u8d25"); er.code = pl.code; throw er; }
+        PLAN = pl; dm.setTitle(pl.title);
+        return step();
+      });
+    }
+    plan().catch(fail);
+  };
+
+  // —— 输入与抽屉 ——
+  goEl.onclick = send;
+  qEl.addEventListener("keydown", function (e) { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } });
+  $("#gtog").onclick = function () { $("#guide").classList.toggle("on"); };
+  stBoot();
+  paint();
+})();
+</script>
+</body>
+</html>

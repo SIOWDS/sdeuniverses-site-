@@ -7,7 +7,7 @@
  *   「复制」出纯文本 /「原文」出 Markdown（原来两个按钮同一个动作）· 嵌套列表/多行引用/有序列表续号 ·
  *   等待期显示"跑了几秒·在哪一段" · 图标钮补 aria 名字。
  * v5：全局记忆（用户RAG）——把谈完的每一场炼成一条摘要存本机，每问一句按这一问挑几条垫进当轮提问，
- *   跨场也有记性。引擎是全站共享模块 /assets/wds-memo.js（与 /taste/wds-dialogue/ 同一份实现），
+ *   跨场也有记性。引擎是全站共享模块 /assets/wds-memo.js（与 /taste/sde-dialogue/ 同一份实现），
  *   本文件只管入口按钮与面板。**跨智能体**：记忆池取全部 agent 的历史，不只本页。
  * Markdown 实际支持：标题 粗斜体 删除线 行内码 围栏代码块(高亮+复制) 有序/无序/嵌套列表 任务清单
  *   表格 引用 分隔线 链接 KaTeX 公式。改这里时顺手改这行，别让接手的人照过期注释判断能力。 */
@@ -290,8 +290,8 @@
       tipStd: "快答档，够用且省", tipDeep: "满血基底＋满功率思考＋SDE 全内功与方法论工序，慢但深", tipWeb: " · 已开联网（需智谱 Key）",
       ph: "问 WDS 任何 SDE 问题，或让它帮你找站里读什么…",
       note: "ChatSDE 会尽力扣着全站内容作答，可核验的书名/引文请以原文为准。用你自己的大模型 Key 运行，只存在浏览器本地。",
-      left: "本场剩余 ", times: " 次", today: " 次 · 今日 ", turnsTitle: "本场＝这一次对话最多 100 轮（点＋新对话可重开）；今日＝本机每天在「全站问答」入口的额度，陪读与「与WDS对话」各有独立额度。",
-      dayOut: "今日本机额度已用完，明天再来（陪读与「与WDS对话」不受影响）。",
+      left: "本场剩余 ", times: " 次", today: " 次 · 今日 ", turnsTitle: "本场＝这一次对话最多 100 轮（点＋新对话可重开）；今日＝本机每天在「全站问答」入口的额度，陪读与「SDE 对谈」各有独立额度。",
+      dayOut: "今日本机额度已用完，明天再来（陪读与「SDE 对谈」不受影响）。",
       sessFull: "这场已谈满 100 次，点＋新对话重开。",
       srcSite: "站内文献", srcWeb: "站外来源 · 联网搜索", followsH: "接着可以问",
       srcN: " 篇", toBot: "回到最新",
@@ -435,7 +435,7 @@
       thinking: "Thinking…", thought: "Thought for ", chars: " chars (open)", expand: "open", collapse: "close",
       stopped: "(you stopped it)", stoppedOnly: "(stopped)",
       errDead: "The connection dropped — it may have thought too long and been cut. Try again in a moment; your question is still here.",
-      errNet: "Couldn't reach WDS (", errNetEnd: "). Try again shortly.",
+      errNet: "Couldn't reach SDE (", errNetEnd: "). Try again shortly.",
       webNeedKey: "Web search didn't run: it needs a Zhipu key (put one in ⚙ Settings — the same key works for both).",
       webBadKey: "Web search didn't run: that Zhipu key won't work (quota or permissions).",
       webNone: "Web search found nothing this time; answering from the site instead.",
@@ -453,11 +453,11 @@
       dDirNoApi: "This browser can't pick folders (Chrome / Edge can) — falling back to a normal download.",
       dDirDenied: "No write permission for that folder — please choose it again.",
       dDirFail: "Couldn't write it (",
-      convoTitle: "A conversation with WDS", errNoOut: "The write-up didn't connect (",
+      convoTitle: "A conversation with SDE", errNoOut: "The write-up didn't connect (",
       setTitle: "Settings", setKeyH: "Use your own API key",
       setKeyP: "WDS runs on your own model key. <b style=\"color:#C9A227\">The key stays in this browser and is never sent to this site</b>; clear it whenever you like. Web search goes through Zhipu, so one Zhipu key covers both chat and search.",
       setAboutH: "Custom instructions (optional)",
-      setAboutP: "A line about who you are, what you're working on, and how you want WDS to answer. It rides along with every question from then on. Also kept only on this device.",
+      setAboutP: "A line about who you are, what you're working on, and how you want SDE to answer. It rides along with every question from then on. Also kept only on this device.",
       setAboutPh: "e.g. I teach secondary-school biology and I'm bringing SDE into my lesson planning. Give me examples I can use in class; one pass on the terminology is enough.",
       setKeyPh: "Paste your API key", setSave: "Save and start", setCancel: "Cancel",
       linkDs: "No key yet? Get one at <a href='https://platform.deepseek.com' target='_blank' style='color:#C9A227'>platform.deepseek.com</a>",
@@ -538,7 +538,7 @@
     b9Tip: "Unity·Diversity·Harmony (how it sits) | Completeness·Vitality·Singleness (which kind) | Love·Freedom·Peace (how it feels)",
     deckFoot: "SDE Universes · sdeuniverses.com",
     bMem: "⌾ Memory", memTitle: "Global memory · your past chats",
-    memHd: "<b>{n}</b> chats on this device (all WDS agents), <b>{m}</b> distilled, <b>{p}</b> pending",
+    memHd: "<b>{n}</b> chats on this device (all SDE agents), <b>{m}</b> distilled, <b>{p}</b> pending",
     memGo: "Update now", memProf: "Rebuild profile", memExp: "Export", memClr: "Clear",
     memSwOn: "Use my memory when answering", memK1: "Inject", memK2: "per answer",
     memNone: "No memory yet — chat a few times, then hit Update so it can remember you.",
@@ -591,7 +591,7 @@
       pjDel: "删掉这个项目？（里面的对话不会删，只是回到「全部」）", pjNone: "还没有项目。项目＝一组对话＋一段常驻说明，适合一本书、一门课、一个长活。",
     },
     en: {
-      cvTitle: "Canvas", cvOpen: "⧉ Canvas", cvClose: "Hide canvas",       cvEmpty: "The canvas is empty. What lands here automatically: structure maps (/map), deep-research reports, and any diagram, page, table or long draft that comes back as a block.\n\nTo put something here by hand: hit “⧉ To canvas” under any answer.\n\nOnce here you can switch versions, preview, download, save locally, or select a passage and have WDS revise it in place.",
+      cvTitle: "Canvas", cvOpen: "⧉ Canvas", cvClose: "Hide canvas",       cvEmpty: "The canvas is empty. What lands here automatically: structure maps (/map), deep-research reports, and any diagram, page, table or long draft that comes back as a block.\n\nTo put something here by hand: hit “⧉ To canvas” under any answer.\n\nOnce here you can switch versions, preview, download, save locally, or select a passage and have SDE revise it in place.",
       cvTip: "Canvas: long outputs and diagrams — versions, in-place revision",
       cvPrev: "Preview", cvSrc: "Source", cvCopy: "Copy", cvDl: "Download", cvSave: "Save locally", cvSaved: "Saved",
       cvAsk: "ChatSDE to revise this", cvAskAll: "ChatSDE to revise this version", cvVer: "Version", cvDrop: "⧉ To canvas", cvDropped: "On the canvas",
@@ -617,12 +617,12 @@
       qPausedT: "⏸ Paused · {n} waiting", qResume: "Resume", qClear: "Clear queue",
       qFull: "10 queued messages max", qNext: "Next: ",
       tabBrowse: "▤ Browse", tabIm: "💬 Messenger",
-      duBtn: "⇉ Two models", duTip: "Ask both at once, side by side; then have WDS compare them",
+      duBtn: "⇉ Two models", duTip: "Ask both at once, side by side; then have SDE compare them",
       duPick: "Which second model?", duNoKey: "(no key yet)", duOff: "Single model",
-      duCmp: "⇄ Have WDS compare these", duCmpQ: "Below are two answers to the same question from two different models. Compare them and say only four things: (1) what each saw that the other missed; (2) where they flatly contradict each other (point to the sentences); (3) which holds up better under attack, and why; (4) what both missed. Do not restate their content.",
+      duCmp: "⇄ Have SDE compare these", duCmpQ: "Below are two answers to the same question from two different models. Compare them and say only four things: (1) what each saw that the other missed; (2) where they flatly contradict each other (point to the sentences); (3) which holds up better under attack, and why; (4) what both missed. Do not restate their content.",
       duNeed: "Side-by-side needs a key for both models (add them in settings).",
       pjAll: "All chats", pjTitle: "Projects", pjNew: "＋ New project", pjAsk: "Project name?",
-      pjAbout: "✎ Standing instructions for this project", pjAboutAsk: "Background and requirements WDS should know for every question in this project",
+      pjAbout: "✎ Standing instructions for this project", pjAboutAsk: "Background and requirements SDE should know for every question in this project",
       pjDel: "Delete this project? (its chats stay, they just move back to All)", pjNone: "No projects yet. A project = a group of chats + standing instructions — good for a book, a course, a long job.",
     },
   };
@@ -1084,7 +1084,7 @@
     return out;
   }
   /* ════════════════ 全局记忆（用户RAG）════════════════
-     引擎只有一份：/assets/wds-memo.js（与 /taste/wds-dialogue/ 共用）。这里只管接线与面板。
+     引擎只有一份：/assets/wds-memo.js（与 /taste/sde-dialogue/ 共用）。这里只管接线与面板。
      跨智能体：agents:"all" —— 记忆池取本机所有 WDS 对话（ChatSDE ＋ 和WDS对话 ＋ 陪读），
      所以"记住并搜索所有的历史对话"是字面意思，不限本页。 */
   var MEM = null;
