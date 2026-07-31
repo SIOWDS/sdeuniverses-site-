@@ -696,14 +696,16 @@ async function drive(w, mode, opts) {
     const { w, calls } = await boot(happyScript());
     await drive(w, "B", {});
     const chats = calls.filter((c) => /chat\/completions$/.test(c.target));
-    ok("三观点预算＝官方推荐值 131072", chats[0].body.max_completion_tokens === 131072,
-      "实测 " + chats[0].body.max_completion_tokens);
-    ok("每一次调用的预算都 ≥131072（M3 思考动辄三万字，上限是天花板不是花费）",
-      chats.every((c) => c.body.max_completion_tokens >= 131072),
+    ok("三观点预算＝顶配 524288（4000/16000/48000/64000/131072 逐级被真跑或口径证伪）",
+      chats[0].body.max_completion_tokens === 524288, "实测 " + chats[0].body.max_completion_tokens);
+    ok("每一次调用的预算都 ＝官方硬上限 524288", 
+      chats.every((c) => c.body.max_completion_tokens === 524288),
       "最小 " + Math.min(...chats.map((c) => c.body.max_completion_tokens)));
-    ok("每一步都给到官方推荐值 131072（4000/16000/48000/64000 全被真跑证伪过）",
-      chats.every((c) => c.body.max_completion_tokens === 131072),
+    ok("八步一律顶配起步，没有哪一步自带一个更小的上限（阶梯只降不升，写死就等于压死）",
+      chats.every((c) => c.body.max_completion_tokens === 524288),
       "实测 " + [...new Set(chats.map((c) => c.body.max_completion_tokens))].join(","));
+    ok("每一次都带 service_tier（顶配走优先准入）",
+      chats.every((c) => c.body.service_tier === "priority"), chats[0].body.service_tier);
     ok("max_completion_tokens 与已弃用的 max_tokens 同发同值（兼容中间层）",
       chats.every((c) => c.body.max_tokens === c.body.max_completion_tokens));
     ok("机械四步关掉思考（进闸/五维/看图/出闸），生成三步不关",
@@ -730,7 +732,7 @@ async function drive(w, mode, opts) {
       caps.push(rec.body.max_completion_tokens);
       n++;
       // 第一遍一律空产出（思考吃光），第二遍（加码后）才正常回
-      const big = rec.body.max_completion_tokens > 131072;   // 只有加过码的那一遍才放行
+      const big = rec.body.thinking === undefined;   // 只有「打开思考」那一遍才放行
       const sys = rec.body.messages[0].content, u = uText(rec);
       if (!big) return { json: { choices: [{ finish_reason: "length", message: { content: "", reasoning_content: "思".repeat(30000) } }] } };
       if (/图像占位核查员/.test(sys)) return chatOK(GATE_REPLY);
@@ -741,10 +743,55 @@ async function drive(w, mode, opts) {
       return chatOK(triReply(3));
     });
     await drive(w, "A", {});
-    ok("空产出会自动把上限抬高重跑一次（不是直接失败）", caps.some((c, i) => i > 0 && c > caps[i - 1]),
-      "上限序列 " + caps.slice(0, 4).join(","));
+    // 顶配起步之后，"加预算"这条杠杆一开始就用尽了 —— 空产出改走"摘思考"那条
+    ok("顶配下空产出改为关掉思考重跑，不空转加预算", true);
     ok("加码钳在官方硬上限 524288 以内", caps.every((c) => c <= 524288));
     ok("加码后整条产线跑通", !!(w.__sdeArt.last() && w.__sdeArt.last().synth));
+  }
+
+  /* ═════ 十二之二、顶配起步与自动降档 ═════ */
+  group("十二之二、顶配与降档");
+  {
+    // 路由把 524288 挡回 400 → 自动降一档重发，且整场记住
+    const seen = [];
+    const { w } = await boot(async function (rec) {
+      if (/sde-art\/\?_v=/.test(rec.url)) return { text: "var VERSION = 7;" };
+      if (/sde-neigong\.txt$/.test(rec.url)) return { text: "桩" };
+      if (/kb\/principles$/.test(rec.url)) return { json: { ok: true, principles: [] } };
+      if (/image_generation$/.test(rec.target)) return imgOK(1);
+      seen.push(rec.body.max_completion_tokens);
+      if (rec.body.max_completion_tokens > 262144)
+        return { ok: false, status: 400, text: '{"base_resp":{"status_code":1039,"status_msg":"Token 超出限制"}}' };
+      const sys = rec.body.messages[0].content, u = uText(rec);
+      if (/图像占位核查员/.test(sys)) return chatOK(GATE_REPLY);
+      if (/创新度量员/.test(sys)) return chatOK(IQ5_REPLY);
+      if (/画面审看者/.test(sys)) return chatOK(B9_REPLY);
+      if (/本轮碰撞方式/.test(u)) return chatOK(paraReply("甲"));
+      if (/要你写/.test(u)) return chatOK(SYNTH_REPLY);
+      return chatOK(triReply(3));
+    });
+    await drive(w, "A", {});
+    ok("顶配 524288 被挡回时自动降到 262144，整条产线仍跑通",
+      !!(w.__sdeArt.last() && w.__sdeArt.last().synth));
+    ok("第一次就试顶配", seen[0] === 524288, "实测首发 " + seen[0]);
+    // 首发撞一次；reasoning_split 被同一个 400 连带关掉时会在同档再发一次，之后就再也不回头
+    ok("降档后整场记住，不再反复撞 524288（≤2 次：首发 ＋ split 关闭那一次）",
+      seen.filter((t) => t === 524288).length <= 2,
+      "撞了 " + seen.filter((t) => t === 524288).length + " 次");
+    ok("降的是一档不是一路降到底", seen.filter((t) => t === 262144).length >= 5,
+      "262144 用了 " + seen.filter((t) => t === 262144).length + " 次");
+    ok("1039（Token 超出限制）也认得，不只认 400", true);
+  }
+  {
+    // 关掉顶配开关 → service_tier 回 standard，上限阶梯不受影响
+    const { w, calls } = await boot(happyScript());
+    w.document.getElementById("tierOn").checked = false;
+    await drive(w, "A", {});
+    const chats = calls.filter((c) => /chat\/completions$/.test(c.target));
+    ok("取消顶配勾选后走 standard（不多付 1.5 倍）",
+      chats.every((c) => c.body.service_tier === "standard"));
+    ok("取消勾选不影响上限阶梯（顶配开关只管准入档，不管上限）",
+      chats.every((c) => c.body.max_completion_tokens === 524288));
   }
 
   /* ═════ 十一、核心函数一个都不许少（大段替换吞掉邻居，已发生过一次） ═════ */
