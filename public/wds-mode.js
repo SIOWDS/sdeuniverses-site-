@@ -1636,7 +1636,7 @@
   function loadModes() {
     if (window.SDEModes) return;
     var sc = document.createElement("script");
-    sc.src = "/assets/sde-modes.js"; sc.async = true;
+    sc.src = "/assets/sde-modes.js?v=20260731v"; sc.async = true;
     sc.onerror = injectNav;
     document.head.appendChild(sc);
   }

@@ -114,14 +114,31 @@
      * 金点子发生器上它曾被撑成 391×860，border-radius:999px 于是画出一颗贯穿整屏的胶囊。
      * 下面的 !important 不是偷懒——正是为这种"宿主未知"的场合准备的。
      * bottom 让到 130px，是给页面本来就有的两颗浮标（陪读 22px、问全站 76px）腾位，免得叠在一起。 */
-    ".sdemx-float{position:fixed!important;right:16px!important;bottom:130px!important;left:auto!important;top:auto!important;z-index:99990;" +
-    "display:inline-flex!important;flex-direction:row!important;flex-wrap:nowrap!important;align-items:center!important;" +
-    "width:auto!important;height:auto!important;max-width:calc(100vw - 32px);max-height:40px;" +
-    "padding:3px!important;margin:0!important;line-height:1!important;box-sizing:border-box;" +
-    "box-shadow:0 6px 20px rgba(0,0,0,.28);background:var(--wbg2,#12100C)}" +
-    ".sdemx-float a{flex:0 0 auto!important;height:26px!important;min-height:0!important;max-height:26px!important;" +
-    "padding:0 10px!important;margin:0!important;line-height:26px!important;font-size:12.5px!important;box-sizing:border-box}" +
-    ".sdemx-float a i,.sdemx-float a span{line-height:1!important;height:auto!important;margin:0!important;padding:0!important}" +
+    /* 竖条贴右缘（用户定：横条太占地方）。竖着排、右侧不留边距、只圆左边两角，
+     * 视觉上像从屏幕右沿伸出来的一条书签，横向只吃掉 ~54px。
+     * 垂直居中而不是贴底，是为了避开页面本来就有的那两颗右下浮标（陪读 22px、问全站 76px）。 */
+    ".sdemx-float{position:fixed!important;right:0!important;left:auto!important;" +
+    "top:50%!important;bottom:auto!important;transform:translateY(-50%)!important;z-index:99990;" +
+    "display:inline-flex!important;flex-direction:column!important;flex-wrap:nowrap!important;align-items:stretch!important;" +
+    "width:auto!important;height:auto!important;max-width:64px;max-height:calc(100vh - 24px);" +
+    "padding:4px!important;margin:0!important;line-height:1!important;box-sizing:border-box;gap:2px;" +
+    "border-radius:14px 0 0 14px!important;border-right:0!important;" +
+    "box-shadow:-4px 0 18px rgba(0,0,0,.32);background:var(--wbg2,#12100C)}" +
+    /* 每档＝图标在上、文字在下。「SDE 微信」会自然折成两行，正是竖条要的形状。 */
+    ".sdemx-float a{flex:0 0 auto!important;display:flex!important;flex-direction:column!important;" +
+    "align-items:center!important;justify-content:center!important;gap:3px!important;" +
+    "height:auto!important;min-height:0!important;max-height:none!important;" +
+    "padding:7px 6px!important;margin:0!important;line-height:1.25!important;font-size:11px!important;" +
+    "white-space:normal!important;text-align:center!important;border-radius:10px!important;box-sizing:border-box}" +
+    ".sdemx-float a i{font-size:15px!important;line-height:1!important;height:auto!important;margin:0!important;padding:0!important}" +
+    ".sdemx-float a span{line-height:1.25!important;height:auto!important;margin:0!important;padding:0!important;letter-spacing:.02em}" +
+    /* △ 在最下面，分隔线由竖条的「左右」改成「上下」，圆角也跟着改。 */
+    ".sdemx-float .sdemx-home{margin:2px 0 0 0!important;border-left:0!important;" +
+    "border-top:1px solid rgba(212,178,94,.28)!important;border-radius:0 0 10px 10px!important;padding:6px 6px!important}" +
+    /* 窄屏更省：只留图标。竖条本来就窄，这一档下去只有 ~38px。 */
+    "@media(max-width:560px){.sdemx-float{max-width:44px;padding:3px!important}" +
+    ".sdemx-float a span{display:none!important}.sdemx-float a{padding:8px 5px!important}" +
+    ".sdemx-float a i{font-size:16px!important}}" +
     "@media(max-width:560px){.sdemx a span{display:none}.sdemx a{padding:6px 9px}.sdemx a i{font-size:14px}}";
 
   function build(opts) {
