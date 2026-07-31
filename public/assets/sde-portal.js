@@ -76,9 +76,10 @@
     ".sdep-deco{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;opacity:.9}" +
     ".sdep-stage{position:relative;width:min(84vw,720px);height:min(62vh,440px);margin:0 0 18px}" +
     ".sdep-tri-svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}" +
-    ".sdep-tri{fill:none;stroke:url(#sdepEdge);stroke-width:1.3;stroke-linejoin:round;stroke-dasharray:1000;" +
-    "animation:sdepDraw 1.6s ease .15s both}" +
-    "@keyframes sdepDraw{from{stroke-dashoffset:1000}to{stroke-dashoffset:0}}" +
+    ".sdep-tri{fill:none;stroke:url(#sdepEdge);stroke-width:1.3;stroke-linecap:round;" +
+    "stroke-dasharray:var(--L,240);stroke-dashoffset:var(--L,240);animation:sdepDraw 1.35s ease both}" +
+    "@keyframes sdepDraw{to{stroke-dashoffset:0}}" +
+    "@media(prefers-reduced-motion:reduce){.sdep-tri{animation:none;stroke-dashoffset:0}}" +
     ".sdep-node{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:9px;" +
     "text-decoration:none;color:#E8E4DA;cursor:pointer;background:none;border:none;padding:0;font:inherit;outline:none;" +
     "animation:sdepPop .55s ease both}" +
@@ -213,18 +214,48 @@
     var svg = S("svg", { class: "sdep-tri-svg", viewBox: "0 0 100 100", preserveAspectRatio: "none" });
     svg.setAttribute("aria-hidden", "true");
     var defs = S("defs", {});
-    var grad = S("linearGradient", { id: "sdepEdge", x1: "0", y1: "1", x2: "1", y2: "0" });
+    var grad = S("linearGradient", { id: "sdepEdge", gradientUnits: "userSpaceOnUse",
+      x1: "0", y1: "100", x2: "100", y2: "0" });
     [NODES[2].c, NODES[0].c, NODES[1].c].forEach(function (c, i) {
       grad.appendChild(S("stop", { offset: (i * 50) + "%", "stop-color": c, "stop-opacity": ".72" }));
     });
     defs.appendChild(grad);
     svg.appendChild(defs);
-    var poly = S("polygon", {
-      class: "sdep-tri",
-      points: NODES.map(function (n) { return n.x + "," + n.y; }).join(" "),
-      "vector-effect": "non-scaling-stroke",
+    // 三条边各画一条 S 型曲线：三次贝塞尔，两个控制点沿垂线朝相反两侧偏出去，
+    // 于是前半段鼓向一边、后半段鼓向另一边，中点仍精确落在两顶点连线的中点上。
+    // 幅度按各自边长取，三条边看起来才是同一种弯法（等长偏移会让短边显得更弯）。
+    function sPath(a, b, k) {
+      var dx = b.x - a.x, dy = b.y - a.y;
+      var L = Math.sqrt(dx * dx + dy * dy) || 1;
+      var nx = -dy / L, ny = dx / L;                     // 垂线单位向量
+      var amp = k * L;
+      var r = function (v) { return Math.round(v * 100) / 100; };
+      return "M" + r(a.x) + "," + r(a.y) +
+             " C" + r(a.x + dx / 3 + nx * amp) + "," + r(a.y + dy / 3 + ny * amp) +
+             " " + r(a.x + dx * 2 / 3 - nx * amp) + "," + r(a.y + dy * 2 / 3 - ny * amp) +
+             " " + r(b.x) + "," + r(b.y);
+    }
+    // 顶点仍旧只有 NODES 一处；这里只是把"依次连回起点"写出来
+    NODES.forEach(function (a, i) {
+      var b = NODES[(i + 1) % NODES.length];
+      var pa = S("path", {
+        class: "sdep-tri",
+        d: sPath(a, b, 0.13),
+        fill: "none",
+        "vector-effect": "non-scaling-stroke",
+        "data-edge": a.k + "-" + b.k,
+      });
+      // 描线长度按这条曲线自己算——写死一个数，长短边就会一快一慢
+      var len = 0;
+      try { len = pa.getTotalLength(); } catch (e) {}
+      if (!len || !isFinite(len)) {
+        var dx2 = b.x - a.x, dy2 = b.y - a.y;
+        len = Math.sqrt(dx2 * dx2 + dy2 * dy2) * 1.15;   // S 形比直线长，取个够用的估值
+      }
+      pa.style.setProperty("--L", Math.ceil(len));
+      pa.style.animationDelay = (0.15 + i * 0.22) + "s";
+      svg.appendChild(pa);
     });
-    svg.appendChild(poly);
     stage.appendChild(svg);
 
     // 正中「爱思乐园」：位置由三个顶点现算重心，改顶点它自己跟着走，不写死

@@ -14,9 +14,20 @@ const MODES = fs.readFileSync("/home/claude/site/public/assets/sde-modes.js", "u
 class N {
   constructor(t, ns) {
     this.tagName = String(t || "div").toUpperCase(); this.ns = ns || "";
-    this.children = []; this.className = ""; this.attrs = {}; this.style = {};
+    this.children = []; this.className = ""; this.attrs = {};
+    // 桩的 style 得带上 setProperty / getPropertyValue —— 真浏览器里有，桩里没有的话
+    // 脚本一用 CSS 变量就当场抛错，而这种错在页面上只表现为"三角形没画出来"，很难查。
+    // 两处都要：模块用 setProperty 设 --c 色相与 --L 描线长度，断言用 getPropertyValue 读回来。
+    this.style = {};
+    Object.defineProperty(this.style, "setProperty", {
+      enumerable: false, writable: true, configurable: true,
+      value: function (k, v) { this[k] = String(v); },
+    });
+    Object.defineProperty(this.style, "getPropertyValue", {
+      enumerable: false, writable: true, configurable: true,
+      value: function (k) { return this[k] == null ? "" : String(this[k]); },
+    });
     this._text = ""; this.parentNode = null; this.type = "";
-    this.style.setProperty = (k, v) => { this.style[k] = v; };   // 桩补：模块用它设 --c 色相变量
   }
   set textContent(v) { this._text = String(v); this.children.length = 0; }
   get textContent() { return this._text || this.children.map((c) => c.textContent).join(""); }
@@ -83,12 +94,48 @@ const nodes = box.querySelectorAll(".sdep-node");
 ok(nodes.length === 3, "三个入口，实得 " + nodes.length);
 ok(nodes.map((n) => n.querySelector(".sdep-nm").textContent).join(" / ").indexOf("SDE") === 0,
   "三个名字，实得 " + nodes.map((n) => n.querySelector(".sdep-nm").textContent).join(" / "));
-const poly = box.querySelector("polygon");
-ok(!!poly, "三角形是真画出来的（polygon）");
-const pts = String(poly.attrs.points || "").split(" ");
+// 只认三角形的边：图标四周的火焰也是 path，一起数进来就永远对不上
+const edges = box.querySelectorAll("path").filter(function (e) {
+  return String(e.className || "").indexOf("sdep-tri") >= 0;
+});
+ok(edges.length === 3, "三条边各是一条独立曲线，实得 " + edges.length);
 const nodePos = nodes.map((n) => parseFloat(n.style.left) + "," + parseFloat(n.style.top));
-ok(pts.length === 3 && pts.join(" ") === nodePos.join(" "),
-  "三个入口正落在三角形的三个顶端（同一组坐标，不是各写一份）：" + pts.join(" ") + " ｜ " + nodePos.join(" "));
+{
+  // 每条边：必须是三次贝塞尔（S 型的载体），且首尾正好落在相邻两个入口上
+  let allCubic = true, allJoin = true, detail = [];
+  edges.forEach((e, i) => {
+    const d = String(e.attrs.d || "");
+    if (d.indexOf("C") < 0) allCubic = false;
+    const m = d.match(/^M\s*([-\d.]+),([-\d.]+)\s*C[^]*\s([-\d.]+),([-\d.]+)$/);
+    if (!m) { allJoin = false; detail.push("第" + (i + 1) + "条读不出首尾"); return; }
+    const from = parseFloat(m[1]) + "," + parseFloat(m[2]);
+    const to = parseFloat(m[3]) + "," + parseFloat(m[4]);
+    if (from !== nodePos[i] || to !== nodePos[(i + 1) % 3]) {
+      allJoin = false; detail.push("第" + (i + 1) + "条 " + from + "→" + to);
+    }
+  });
+  ok(allCubic, "三条边都是三次贝塞尔曲线（不是直线）");
+  ok(allJoin, "每条曲线首尾正落在相邻两个入口上（同一组坐标，不是各写一份）" + (detail.length ? "：" + detail.join(" ｜ ") : ""));
+}
+{
+  // S 型的判据：两个控制点必须落在弦的两侧（同侧就是弓形，不是 S）
+  let allS = true, sd = [];
+  edges.forEach((e, i) => {
+    const n = String(e.attrs.d || "").match(/[-\d.]+/g).map(Number);
+    if (n.length < 8) { allS = false; return; }
+    const [ax, ay, c1x, c1y, c2x, c2y, bx, by] = n;
+    const dx = bx - ax, dy = by - ay;
+    const s1 = dx * (c1y - ay) - dy * (c1x - ax);      // 叉积定侧
+    const s2 = dx * (c2y - ay) - dy * (c2x - ax);
+    if (!(s1 * s2 < 0)) { allS = false; sd.push("第" + (i + 1) + "条 " + s1.toFixed(1) + "/" + s2.toFixed(1)); }
+  });
+  ok(allS, "两个控制点分居弦的两侧 —— 是 S 型而不是弓形" + (sd.length ? "：" + sd.join(" ｜ ") : ""));
+}
+{
+  // 描线长度得各算各的，写死一个数长短边就一快一慢
+  const lens = edges.map((e) => String(e.style && e.style.getPropertyValue ? e.style.getPropertyValue("--L") : (e.style["--L"] || "")));
+  ok(lens.every((v) => v && parseFloat(v) > 0), "每条边的描线长度是按自己算出来的：" + lens.join(" / "));
+}
 ok(parseFloat(nodes[0].style.top) < parseFloat(nodes[1].style.top), "第一个在顶端");
 const mid = box.querySelector(".sdep-mid");
 ok(!!mid && mid.textContent === "爱思乐园", "三角形正中是「爱思乐园」四个字，实得 " + (mid ? mid.textContent : "无"));
