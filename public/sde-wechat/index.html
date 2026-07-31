@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>SDE 微信 · 群聊与私聊 | SDE Universes</title>
-<meta name="description" content="SDE 微信：站内的纯文字聊天系统——群聊、一对一私聊、通讯录、建群、群公告、@提及、引用回复、未读提醒。Google 账号登录即用，无需安装。">
+<meta name="description" content="SDE 微信：站内聊天系统——群聊、一对一私聊、朋友圈（发文字与图片、点赞、评论）、通讯录、建群、群公告、@提及、引用回复、未读提醒。输入名字和密码即用，无需安装。">
 <meta name="robots" content="noindex">
 <style>
 :root{
@@ -124,12 +124,58 @@ a{color:var(--disc)}
 .gmeta{padding:1rem;background:var(--card2);border-bottom:1px solid var(--border2)}
 .gmeta .gn{font-size:1.1rem;font-weight:800}
 .gmeta .gc{font-size:0.78rem;color:var(--muted);margin-top:2px}
+/* ── 朋友圈 ── */
+.mo{display:flex;gap:11px;padding:0.95rem 1rem;background:var(--card);border-bottom:1px solid var(--border2)}
+.mo .av{cursor:pointer}
+.mo .mm{flex:1;min-width:0}
+.mo .mn{font-weight:700;font-size:0.94rem;color:var(--disc);cursor:pointer}
+.mo .mt{font-size:0.95rem;line-height:1.8;white-space:pre-wrap;word-break:break-word;margin-top:2px}
+.mo .imgs{display:grid;gap:4px;margin-top:8px;grid-template-columns:repeat(3,1fr)}
+.mo .imgs.n1{grid-template-columns:minmax(0,72%)}
+.mo .imgs.n2,.mo .imgs.n4{grid-template-columns:repeat(2,1fr)}
+.mo .imgs img{width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:7px;background:var(--card2);cursor:zoom-in;display:block;border:1px solid var(--border2)}
+.mo .imgs.n1 img{aspect-ratio:4/3;object-fit:cover}
+.mo .bar{display:flex;align-items:center;gap:15px;margin-top:8px;font-size:0.76rem;color:var(--muted)}
+.mo .bar a{color:var(--disc);text-decoration:none;cursor:pointer}
+.mo .bar a.dg{color:var(--red)}
+.mo .bar .sp{flex:1}
+.mo .likes{margin-top:8px;background:var(--card2);border:1px solid var(--border2);border-radius:8px;padding:6px 10px;font-size:0.81rem;line-height:1.75;color:var(--text2)}
+.mo .likes b{color:var(--disc);font-weight:700}
+.mo .cs{margin-top:6px;background:var(--card2);border:1px solid var(--border2);border-radius:8px;padding:2px 10px}
+.mo .likes+.cs{margin-top:-1px;border-top-left-radius:0;border-top-right-radius:0}
+.mo .c{font-size:0.84rem;line-height:1.8;padding:4px 0;border-bottom:1px solid var(--border2);word-break:break-word}
+.mo .c:last-child{border-bottom:none}
+.mo .c b{color:var(--disc);font-weight:700;cursor:pointer}
+.mo .c i{font-style:normal;color:var(--muted)}
+.mo .c .x{float:right;color:var(--muted);cursor:pointer;font-size:0.76rem;margin-left:8px}
+.mo .cin{display:none;gap:6px;margin-top:7px}
+.mo .cin.on{display:flex}
+.mo .cin input{flex:1;min-width:0;font:inherit;font-size:0.88rem;padding:0.36rem 0.6rem;border:1px solid var(--border);border-radius:7px;background:#fff;color:var(--text);outline:none}
+.mo .cin input:focus{border-color:var(--disc)}
+.mo .cin button{font:inherit;font-size:0.8rem;padding:0 0.85rem;border-radius:7px;border:1px solid var(--disc);background:var(--disc);color:#F5F2E8;cursor:pointer;flex:none}
+.mo-news{padding:0.6rem 1rem;background:#FBF6E9;border-bottom:1px solid var(--gold);font-size:0.83rem;color:var(--gold2);cursor:pointer;display:none;font-weight:700}
+.mo-news.on{display:block}
+.mo-more{padding:0.9rem;text-align:center;font-size:0.83rem;color:var(--disc);cursor:pointer}
+.mo-box{position:fixed;inset:0;background:rgba(20,17,10,0.93);display:none;align-items:center;justify-content:center;z-index:50;cursor:zoom-out;padding:14px}
+.mo-box.on{display:flex}
+.mo-box img{max-width:100%;max-height:100%;object-fit:contain;border-radius:4px}
+.mo-box .cnt{position:absolute;top:14px;left:0;right:0;text-align:center;color:#EDE6D4;font-size:0.8rem}
+.mp-thumbs{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:0.9rem}
+.mp-thumbs .t{position:relative;width:74px;height:74px;border-radius:7px;overflow:hidden;border:1px solid var(--border)}
+.mp-thumbs .t img{width:100%;height:100%;object-fit:cover;display:block}
+.mp-thumbs .t .x{position:absolute;top:1px;right:1px;background:rgba(0,0,0,0.6);color:#fff;width:19px;height:19px;border-radius:50%;font-size:0.75rem;line-height:19px;text-align:center;cursor:pointer}
+.mp-add{width:74px;height:74px;border:1px dashed var(--border);border-radius:7px;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:1.5rem;cursor:pointer;background:var(--card)}
+.nw{padding:0.75rem 1rem;background:var(--card);border-bottom:1px solid var(--border2);font-size:0.87rem;line-height:1.75;cursor:pointer}
+.nw b{color:var(--disc)}
+.nw .t{font-size:0.72rem;color:var(--muted)}
 </style>
 <!-- 全站三态：浏览 / SDE 微信 / SDE 对话。模块自己会挂到 .top 顶栏上 -->
 <script src="/assets/sde-modes.js" defer></script>
 </head>
 <body>
 <div id="app">
+
+  <div class="mo-box" id="mo-box"><div class="cnt" id="mo-cnt"></div><img id="mo-big" alt=""></div>
 
   <div class="top">
     <span class="back" id="t-back" style="display:none">‹</span>
@@ -138,6 +184,7 @@ a{color:var(--disc)}
       <div class="sub" id="t-sub"><span class="dot" id="t-dot"></span><span id="t-stat"></span></div>
     </div>
     <button class="act" id="t-act" type="button" style="display:none">群资料</button>
+    <button class="act" id="t-mopen" type="button" style="display:none">发表</button>
     <a class="act" id="t-mtg" href="/meeting/">会议</a>
     <a class="act" id="t-plaza" href="/sde-talk/">广场</a>
   </div>
@@ -147,7 +194,7 @@ a{color:var(--disc)}
     <div class="view on" id="v-gate">
       <div id="gate">
         <h2>SDE 微信</h2>
-        <p>站内的纯文字聊天系统：群聊、一对一私聊、通讯录、建群、群公告、@提及、引用回复、未读提醒。输入名字和进入密码即可，无需安装、无需翻墙。密码向学员发放；名字须与学员名录一致。</p>
+        <p>站内的聊天系统：群聊、一对一私聊、<b>朋友圈</b>、通讯录、建群、群公告、@提及、引用回复、未读提醒。输入名字和进入密码即可，无需安装、无需翻墙。密码向学员发放；名字须与学员名录一致。</p>
         <div id="gsi" style="display:none"></div>
         <div id="pwbox" style="margin-top:14px">
           <p style="font-size:0.8rem;color:var(--muted);margin:0 0 8px">输入名字和进入密码：</p>
@@ -256,6 +303,30 @@ a{color:var(--disc)}
       </div>
     </div>
 
+    <div class="view" id="v-moments">
+      <div class="mo-news" id="mo-newsbar"></div>
+      <div class="scroll" id="mo-list"><div class="hint">正在加载…</div></div>
+    </div>
+
+    <div class="view" id="v-mopost">
+      <div class="scroll">
+        <div class="form">
+          <label>说点什么</label>
+          <textarea id="mp-text" maxlength="1000" placeholder="这一刻的想法…（最多 1000 字）"></textarea>
+          <label>图片（最多 9 张，自动压缩）</label>
+          <div class="mp-thumbs" id="mp-thumbs"></div>
+          <input type="file" id="mp-file" accept="image/*" multiple style="display:none">
+          <button class="btn" id="mp-ok">发表</button>
+          <button class="btn gh" id="mp-cancel">取消</button>
+          <div class="formmsg" id="mp-msg"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="view" id="v-monews">
+      <div class="scroll" id="nw-list"><div class="hint">正在加载…</div></div>
+    </div>
+
     <div class="view" id="v-me">
       <div class="scroll">
         <div class="me-card">
@@ -269,7 +340,8 @@ a{color:var(--disc)}
             <div class="me-item"><span>退出登录</span><button id="b-out">退出</button></div>
           </div>
           <p style="font-size:0.79rem;color:var(--muted);margin-top:1rem;line-height:1.95">
-            这是<b>纯文字</b>系统：只发文字与表情，不发图片、语音、文件。<br>
+            聊天是<b>纯文字</b>的：只发文字与表情，不发语音、文件；<b>图片请发在朋友圈</b>。<br>
+            <b>朋友圈</b>＝站内所有登录过的人共见的一条时间线：发文字与图片、点赞、评论、回复；点名字看某人的全部。<br>
             通讯录里是所有在本站登录过的人——学员一登录就出现，可直接私聊或拉进群。<br>
             群里 <b>@某人</b> 会给他一个红标；<b>@所有人</b> 全员提醒。<br>
             任何会话里都能 <b>@WDS</b> 提问，答案只落在这个会话里。<br>
@@ -284,6 +356,7 @@ a{color:var(--disc)}
   <div class="tabs" id="tabs" style="display:none">
     <div class="tab on" data-go="chats"><i>💬</i>聊天<span class="tb" id="tb-unread"></span></div>
     <div class="tab" data-go="book"><i>👥</i>通讯录</div>
+    <div class="tab" data-go="moments"><i>🌿</i>朋友圈<span class="tb" id="tb-mo"></span></div>
     <div class="tab" data-go="me"><i>👤</i>我</div>
   </div>
 
@@ -321,21 +394,27 @@ function setStat(state){var d=el("t-dot"),s=el("t-stat");
 
 /* ── 视图 ── */
 function show(v){
-  ["gate","chats","book","talk","gnew","ginfo","me","fwd","admin"].forEach(function(x){el("v-"+x).classList.toggle("on",x===v)});
+  ["gate","chats","book","talk","gnew","ginfo","me","fwd","admin","moments","mopost","monews"].forEach(function(x){el("v-"+x).classList.toggle("on",x===v)});
   el("tabs").style.display=(v==="gate")?"none":"flex";
-  el("t-back").style.display=(v==="talk"||v==="gnew"||v==="ginfo"||v==="fwd"||v==="admin")?"block":"none";
+  el("t-back").style.display=(v==="talk"||v==="gnew"||v==="ginfo"||v==="fwd"||v==="admin"||v==="mopost"||v==="monews"||(v==="moments"&&moWho))?"block":"none";
   el("t-sub").style.display=(v==="talk")?"flex":"none";
   el("t-act").style.display=(v==="talk"&&cur&&cur.kind==="g")?"block":"none";
   el("t-plaza").style.display=(v==="chats"||v==="book"||v==="me")?"block":"none";
+  el("t-mopen").style.display=(v==="moments")?"block":"none";
   if(v==="gnew")el("t-ttl").textContent="建群";
   else if(v==="ginfo")el("t-ttl").textContent="群资料";
   else if(v==="fwd")el("t-ttl").textContent="转发给…";
   else if(v==="admin")el("t-ttl").textContent="全权管理";
+  else if(v==="mopost")el("t-ttl").textContent="发表";
+  else if(v==="monews")el("t-ttl").textContent="新消息";
+  else if(v==="moments")el("t-ttl").textContent=moWho?(moWhoName+"的朋友圈"):"朋友圈";
   else if(v!=="talk")el("t-ttl").textContent="SDE 微信";
   Array.prototype.forEach.call(document.querySelectorAll(".tab"),function(t){t.classList.toggle("on",v===t.getAttribute("data-go"))});
 }
 Array.prototype.forEach.call(document.querySelectorAll(".tab"),function(t){
-  t.onclick=function(){var g=t.getAttribute("data-go");closeTalk();show(g);if(g==="chats")loadInbox();if(g==="book")loadBook();};
+  t.onclick=function(){var g=t.getAttribute("data-go");closeTalk();
+    if(g==="moments"){moGo("","");return;}
+    show(g);if(g==="chats")loadInbox();if(g==="book")loadBook();};
 });
 /* ── 全权管理 ── */
 var ADPW="";
@@ -427,6 +506,8 @@ el("ad-go").onclick=adUnlock;
 el("ad-pw").addEventListener("keydown",function(e){if(e.key==="Enter")adUnlock();});
 
 el("t-back").onclick=function(){
+  if(el("v-mopost").classList.contains("on")||el("v-monews").classList.contains("on")){show("moments");return;}
+  if(el("v-moments").classList.contains("on")&&moWho){moGo("","");return;}
   if(el("v-admin").classList.contains("on")){show("me");return;}
   if(el("v-fwd").classList.contains("on")){show(cur?"talk":"chats");return;}
   if(el("v-ginfo").classList.contains("on")&&cur){show("talk");return;}
@@ -481,9 +562,9 @@ function afterLogin(){
     if(x.s===401||!x.d||!x.d.ok){logout();return;}
     ME=x.d.me;contacts=x.d.contacts||[];
     el("me-nm").textContent=ME.name;el("me-uid").textContent="ID "+ME.uid;
-    show("chats");loadInbox();loadGroups();
+    show("chats");loadInbox();loadGroups();moBadge();
     if(inboxT)clearInterval(inboxT);
-    inboxT=setInterval(function(){loadInbox(true)},15000);
+    inboxT=setInterval(function(){loadInbox(true);moBadge();},15000);
   }).catch(function(){el("gsi").textContent="网络异常，请稍后重试。"});
 }
 
@@ -982,6 +1063,291 @@ function doFwd(t){
 }
 el("fw-q").addEventListener("input",renderFwd);
 
+/* ── 朋友圈 ── */
+var moPosts=[],moNext="",moMore=false,moWho="",moWhoName="",moLoading=false,moPick=[],moBadgeN=0,moFresh=0;
+
+function mkEl(tag,cls,txt){var d=document.createElement(tag);if(cls)d.className=cls;if(txt!=null)d.textContent=txt;return d}
+function moFmt(ts){var d=new Date(ts),n=Date.now()-ts;
+  if(n<60000)return "刚刚";
+  if(n<3600000)return Math.floor(n/60000)+" 分钟前";
+  if(n<86400000)return Math.floor(n/3600000)+" 小时前";
+  if(n<2592000000)return Math.floor(n/86400000)+" 天前";
+  return (d.getMonth()+1)+"月"+d.getDate()+"日";}
+
+function moGo(who,name){
+  moWho=who||"";moWhoName=name||"";
+  moPosts=[];moNext="";moMore=false;
+  show("moments");moLoad(false);
+}
+function moLoad(more){
+  if(moLoading||!CRED)return;
+  moLoading=true;
+  var L=el("mo-list");
+  if(!more)L.innerHTML='<div class="hint">正在加载…</div>';
+  api("mo",{a:"feed",who:moWho,after:more?moNext:"",limit:20}).then(function(x){
+    moLoading=false;
+    if(!x.d||!x.d.ok){if(!more)L.innerHTML='<div class="hint">加载失败，稍后重试。</div>';return;}
+    moPosts=more?moPosts.concat(x.d.posts||[]):(x.d.posts||[]);
+    moNext=x.d.next||"";moMore=!!x.d.more;
+    if(!more){moFresh=0;moPaintBadge();}
+    moRender();
+  }).catch(function(){moLoading=false;if(!more)L.innerHTML='<div class="hint">网络异常，稍后重试。</div>'});
+}
+function moRender(){
+  var L=el("mo-list");L.textContent="";
+  if(!moPosts.length){
+    var h=mkEl("div","hint");
+    h.innerHTML=moWho?"他还没有发过朋友圈。":"朋友圈还空着。<br>点右上角 <b>发表</b>，说点什么。";
+    L.appendChild(h);return;
+  }
+  moPosts.forEach(function(p){L.appendChild(moCard(p))});
+  if(moMore){
+    var m=mkEl("div","mo-more","加载更多 ↓");
+    m.onclick=function(){m.textContent="正在加载…";moLoad(true)};
+    L.appendChild(m);
+  }else{
+    L.appendChild(mkEl("div","mo-more","—— 到底了 ——")).style.color="var(--muted)";
+  }
+}
+function moCard(p){
+  var box=mkEl("div","mo");box.setAttribute("data-id",p.id);
+  var av=mkEl("div","av",initial(p.name));
+  if(ME&&p.uid===ME.uid)av.className="av me";
+  av.onclick=function(){moGo(p.uid,p.name)};
+  var mm=mkEl("div","mm");
+  var nm=mkEl("div","mn",p.name||"（未署名）");
+  nm.onclick=function(){moGo(p.uid,p.name)};
+  mm.appendChild(nm);
+  if(p.text)mm.appendChild(mkEl("div","mt",p.text));
+  var imgs=p.imgs||[];
+  if(imgs.length){
+    var g=mkEl("div","imgs n"+Math.min(imgs.length,9));
+    imgs.forEach(function(k,i){
+      var im=document.createElement("img");
+      im.loading="lazy";im.src="/api/im/img?k="+encodeURIComponent(k);im.alt="";
+      im.onclick=function(){moBig(imgs,i)};
+      g.appendChild(im);
+    });
+    mm.appendChild(g);
+  }
+  var bar=mkEl("div","bar");
+  bar.appendChild(mkEl("span",null,moFmt(p.ts)));
+  bar.appendChild(mkEl("span","sp"));
+  var lk=mkEl("a",null,p.liked?"取消赞":"赞");
+  lk.onclick=function(){moLike(p,lk)};
+  bar.appendChild(lk);
+  var cm=mkEl("a",null,"评论");
+  bar.appendChild(cm);
+  if(p.mine){
+    var dl=mkEl("a","dg","删除");
+    dl.onclick=function(){moDel(p)};
+    bar.appendChild(dl);
+  }
+  mm.appendChild(bar);
+  var lw=mkEl("div","likes");lw.style.display=(p.likes&&p.likes.length)?"":"none";
+  mm.appendChild(lw);
+  var cs=mkEl("div","cs");
+  mm.appendChild(cs);
+  var cin=mkEl("div","cin");
+  var inp=document.createElement("input");inp.maxLength=300;inp.placeholder="评论…";
+  var snd=mkEl("button",null,"发送");
+  var rid="",rname="";
+  cin.appendChild(inp);cin.appendChild(snd);
+  mm.appendChild(cin);
+  function doSend(){
+    var t=(inp.value||"").trim();
+    if(!t)return;
+    snd.disabled=true;
+    api("mo",{a:"cmt",id:p.id,text:t,rid:rid}).then(function(x){
+      snd.disabled=false;
+      if(!x.d||!x.d.ok){inp.placeholder=(x.d&&x.d.msg)||"发送失败";return;}
+      p.cmts=x.d.cmts||[];inp.value="";rid="";rname="";inp.placeholder="评论…";
+      paintC();
+    }).catch(function(){snd.disabled=false;inp.placeholder="网络异常"});
+  }
+  snd.onclick=doSend;
+  inp.addEventListener("keydown",function(e){if(e.key==="Enter")doSend()});
+  cm.onclick=function(){cin.classList.toggle("on");if(cin.classList.contains("on"))inp.focus()};
+  function paintL(){
+    var ls=p.likes||[];
+    lw.style.display=ls.length?"":"none";
+    lw.textContent="";
+    if(!ls.length)return;
+    lw.appendChild(document.createTextNode("♡ "));
+    ls.forEach(function(u,i){
+      if(i)lw.appendChild(document.createTextNode("，"));
+      lw.appendChild(mkEl("b",null,u.name||"（未署名）"));
+    });
+  }
+  function paintC(){
+    var cl=p.cmts||[];
+    cs.style.display=cl.length?"":"none";
+    cs.textContent="";
+    cl.forEach(function(c){
+      var d=mkEl("div","c");
+      var who=mkEl("b",null,c.name||"（未署名）");
+      who.onclick=function(){rid=c.cid;rname=c.name;inp.placeholder="回复 "+c.name+"…";cin.classList.add("on");inp.focus()};
+      d.appendChild(who);
+      if(c.rname){d.appendChild(mkEl("i",null," 回复 "));d.appendChild(mkEl("b",null,c.rname));}
+      d.appendChild(document.createTextNode("："+(c.text||"")));
+      if(ME&&(c.uid===ME.uid||p.uid===ME.uid)){
+        var x=mkEl("span","x","删");
+        x.onclick=function(){
+          if(!confirm("删掉这条评论？"))return;
+          api("mo",{a:"cdel",id:p.id,cid:c.cid}).then(function(y){
+            if(y.d&&y.d.ok){p.cmts=y.d.cmts||[];paintC();}
+          }).catch(function(){});
+        };
+        d.appendChild(x);
+      }
+      cs.appendChild(d);
+    });
+  }
+  paintL();paintC();
+  box._paintL=paintL;
+  box.appendChild(av);box.appendChild(mm);
+  return box;
+}
+function moLike(p,lk){
+  lk.style.opacity="0.5";
+  api("mo",{a:"like",id:p.id}).then(function(x){
+    lk.style.opacity="";
+    if(!x.d||!x.d.ok)return;
+    p.likes=x.d.likes||[];p.liked=x.d.on?1:0;
+    lk.textContent=p.liked?"取消赞":"赞";
+    var card=el("mo-list").querySelector('.mo[data-id="'+p.id+'"]');
+    if(card&&card._paintL)card._paintL();
+  }).catch(function(){lk.style.opacity=""});
+}
+function moDel(p){
+  if(!confirm("删掉这条动态？点赞和评论会一起消失。"))return;
+  api("mo",{a:"del",id:p.id}).then(function(x){
+    if(!x.d||!x.d.ok){alert((x.d&&x.d.msg)||"删除失败。");return;}
+    moPosts=moPosts.filter(function(q){return q.id!==p.id});
+    moRender();
+  }).catch(function(){alert("网络异常。")});
+}
+
+/* 大图 */
+var moBigList=[],moBigI=0;
+function moBig(list,i){
+  moBigList=list;moBigI=i;
+  el("mo-big").src="/api/im/img?k="+encodeURIComponent(list[i]);
+  el("mo-cnt").textContent=list.length>1?((i+1)+" / "+list.length):"";
+  el("mo-box").classList.add("on");
+}
+el("mo-box").onclick=function(e){
+  if(moBigList.length>1&&e.target&&e.target.id==="mo-big"){
+    moBigI=(moBigI+1)%moBigList.length;moBig(moBigList,moBigI);return;
+  }
+  el("mo-box").classList.remove("on");el("mo-big").src="";
+};
+
+/* 发表 */
+function moOpenPost(){
+  moPick=[];el("mp-text").value="";el("mp-msg").textContent="";
+  moPaintThumbs();show("mopost");
+}
+el("t-mopen").onclick=moOpenPost;
+el("mp-cancel").onclick=function(){show("moments")};
+function moPaintThumbs(){
+  var T=el("mp-thumbs");T.textContent="";
+  moPick.forEach(function(b64,i){
+    var t=mkEl("div","t");
+    var im=document.createElement("img");im.src="data:image/jpeg;base64,"+b64;
+    var x=mkEl("span","x","✕");
+    x.onclick=function(){moPick.splice(i,1);moPaintThumbs()};
+    t.appendChild(im);t.appendChild(x);T.appendChild(t);
+  });
+  if(moPick.length<9){
+    var a=mkEl("div","mp-add","＋");
+    a.onclick=function(){el("mp-file").click()};
+    T.appendChild(a);
+  }
+}
+function moShrink(file,cb){
+  var fr=new FileReader();
+  fr.onload=function(){
+    var im=new Image();
+    im.onload=function(){
+      var w=im.width,h2=im.height,M=1280;
+      if(w>M||h2>M){var s=M/Math.max(w,h2);w=Math.round(w*s);h2=Math.round(h2*s);}
+      var c=document.createElement("canvas");c.width=w;c.height=h2;
+      var g=c.getContext("2d");g.fillStyle="#fff";g.fillRect(0,0,w,h2);g.drawImage(im,0,0,w,h2);
+      var q=0.78,out=c.toDataURL("image/jpeg",q);
+      while(out.length>520000&&q>0.35){q-=0.12;out=c.toDataURL("image/jpeg",q);}
+      cb(out.split(",")[1]||null);
+    };
+    im.onerror=function(){cb(null)};
+    im.src=fr.result;
+  };
+  fr.onerror=function(){cb(null)};
+  fr.readAsDataURL(file);
+}
+el("mp-file").addEventListener("change",function(){
+  var fs=Array.prototype.slice.call(this.files||[]),self=this;
+  if(!fs.length)return;
+  el("mp-msg").style.color="var(--muted)";el("mp-msg").textContent="正在压缩图片…";
+  var left=Math.min(fs.length,9-moPick.length);
+  if(left<=0){el("mp-msg").textContent="最多 9 张。";self.value="";return;}
+  var done=0;
+  fs.slice(0,left).forEach(function(f){
+    moShrink(f,function(b64){
+      if(b64&&moPick.length<9)moPick.push(b64);
+      if(++done===left){el("mp-msg").textContent="";moPaintThumbs();self.value="";}
+    });
+  });
+});
+el("mp-ok").onclick=function(){
+  var t=(el("mp-text").value||"").trim(),m=el("mp-msg");
+  if(!t&&!moPick.length){m.style.color="var(--red)";m.textContent="写点什么，或者放张图。";return;}
+  el("mp-ok").disabled=true;m.style.color="var(--muted)";m.textContent="正在发表…";
+  api("mo",{a:"post",text:t,imgs:moPick}).then(function(x){
+    el("mp-ok").disabled=false;
+    if(!x.d||!x.d.ok){m.style.color="var(--red)";m.textContent=(x.d&&x.d.msg)||"发表失败。";return;}
+    moPick=[];el("mp-text").value="";m.textContent="";
+    moGo("","");
+  }).catch(function(){el("mp-ok").disabled=false;m.style.color="var(--red)";m.textContent="网络异常，请重试。"});
+};
+
+/* 新消息（谁赞了我、谁评了我） */
+function moPaintBadge(){
+  var b=el("tb-mo");
+  b.textContent=moBadgeN>99?"99+":String(moBadgeN||"");
+  b.classList.toggle("on",moBadgeN>0||!!moFresh);
+  if(moBadgeN<=0&&moFresh)b.textContent="";
+  var nb=el("mo-newsbar");
+  nb.classList.toggle("on",moBadgeN>0);
+  nb.textContent=moBadgeN>0?("有 "+moBadgeN+" 条新消息 ›"):"";
+}
+el("mo-newsbar").onclick=function(){
+  el("nw-list").innerHTML='<div class="hint">正在加载…</div>';
+  show("monews");
+  api("mo",{a:"news"}).then(function(x){
+    var L=el("nw-list");L.textContent="";
+    var ns=(x.d&&x.d.news)||[];
+    moBadgeN=0;moPaintBadge();
+    if(!ns.length){L.innerHTML='<div class="hint">没有新消息。</div>';return;}
+    ns.forEach(function(n){
+      var d=mkEl("div","nw");
+      d.appendChild(mkEl("b",null,n.name||"有人"));
+      d.appendChild(document.createTextNode(n.k==="like"?" 赞了你的动态":(n.k==="reply"?" 回复了你：":" 评论了你：")));
+      if(n.k!=="like")d.appendChild(document.createTextNode(n.text||""));
+      d.appendChild(mkEl("div","t",moFmt(n.ts)));
+      d.onclick=function(){moGo("","")};
+      L.appendChild(d);
+    });
+  }).catch(function(){el("nw-list").innerHTML='<div class="hint">加载失败。</div>'});
+};
+function moBadge(){
+  if(!CRED)return;
+  api("mo",{a:"badge"}).then(function(x){
+    if(!x.d||!x.d.ok)return;
+    moBadgeN=x.d.n||0;moFresh=x.d.fresh||0;
+    moPaintBadge();
+  }).catch(function(){});
+}
+
 /* 起 */
 /* Google 登录暂停使用（2026-07-30 用户裁定）：不再加载 accounts.google.com，
    避免大陆访问卡在这条外链上。后端 verifyIdent 仍然接受 Google 凭证，
@@ -994,7 +1360,10 @@ if(CRED)afterLogin();
 window.__sdeWx={api:api,openDm:openDm,openGroup:openGroup,openGnew:openGnew,openGinfo:openGinfo,addMsg:addMsg,
   loadInbox:loadInbox,loadBook:loadBook,renderBook:renderBook,setReply:setReply,
   state:function(){return{ME:ME,contacts:contacts,groups:groups,chats:chats,cur:cur,unread:unread,usePoll:usePoll,replyTo:replyTo,gMembers:gMembers,gOwner:gOwner}},
-  _afterLogin:afterLogin,_setCred:function(c){CRED=c},_show:show};
+  _afterLogin:afterLogin,_setCred:function(c){CRED=c},_show:show,
+  moGo:moGo,moLoad:moLoad,moRender:moRender,moBadge:moBadge,moOpenPost:moOpenPost,moShrink:moShrink,
+  moState:function(){return{moWho:moWho,moWhoName:moWhoName,moPosts:moPosts,moPick:moPick,moBadgeN:moBadgeN,moFresh:moFresh,moMore:moMore,moNext:moNext}},
+  _moSet:function(o){if(o.posts)moPosts=o.posts;if(o.pick)moPick=o.pick;if("badgeN" in o)moBadgeN=o.badgeN;if("fresh" in o)moFresh=o.fresh;if("who" in o){moWho=o.who;moWhoName=o.whoName||"";}}};
 })();
 </script>
 </body>

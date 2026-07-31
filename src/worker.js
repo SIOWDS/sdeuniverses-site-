@@ -643,6 +643,154 @@ export class CommentBox {
         if (cur) { cur.unread = 0; cur.at = 0; await this.ctx.storage.put(k, cur); }
         return Response.json({ ok: true });
       }
+      // ——— 朋友圈（moments）———
+      // 键：mo:<inv>:<rnd> ＝一条动态（点赞与评论都存在这条里面）；
+      //     mu:<uid>:<inv>:<rnd> ＝这个人的索引（「只看他的」用）；
+      //     mn:<uid> ＝他的朋友圈提醒（谁赞了我、谁评了我）与最后看到的时间。
+      // inv＝1e15 减去时间戳后补零，所以 list 的升序天然就是时间倒序，翻页只要 startAfter。
+      // 图片不在这里——图片走 R2（moments/<key>.jpg），这里只存键名。
+      const moInv = (t) => String(1e15 - t).padStart(16, "0");
+      const moIdOk = (x) => /^[0-9]{16}:[0-9a-f]{8}$/.test(String(x || ""));
+      const moClean = (s, n) => String(s || "").replace(/[\u0000-\u0009\u000b-\u001f]/g, "").trim().slice(0, n);
+      const moRnd = () => [...crypto.getRandomValues(new Uint8Array(4))].map((x) => x.toString(16).padStart(2, "0")).join("");
+      const moNotify = async (target, item) => {
+        if (!ok12(target) || target === uid) return;   // 自己赞自己、自己评自己，不提醒
+        const k = "mn:" + target;
+        const cur = (await this.ctx.storage.get(k)) || { n: [] };
+        cur.n = [item].concat(cur.n || []).slice(0, 60);
+        await this.ctx.storage.put(k, cur);
+      };
+      if (op === "mofeed") {
+        const lim = Math.min(30, Math.max(1, parseInt(b.limit || 20, 10)));
+        const only = String(b.who || "");
+        let keys = [];
+        if (only) {
+          const pre = "mu:" + only + ":";
+          const o = { prefix: pre, limit: lim + 1 };
+          if (b.after) o.startAfter = pre + String(b.after);
+          const m = await this.ctx.storage.list(o);
+          for (const k of m.keys()) keys.push("mo:" + k.slice(pre.length));
+        } else {
+          const o = { prefix: "mo:", limit: lim + 1 };
+          if (b.after) o.startAfter = "mo:" + String(b.after);
+          const m = await this.ctx.storage.list(o);
+          for (const k of m.keys()) keys.push(k);
+        }
+        const more = keys.length > lim;
+        keys = keys.slice(0, lim);
+        const posts = [];
+        for (const k of keys) {
+          const p = await this.ctx.storage.get(k);
+          if (!p || !p.id) continue;
+          p.liked = (p.likes || []).some((x) => x.uid === uid) ? 1 : 0;
+          p.mine = p.uid === uid ? 1 : 0;
+          posts.push(p);
+        }
+        if (!b.after && ok12(uid)) {   // 看了第一页＝这一刻之前的都算看过了
+          const k = "mn:" + uid;
+          const cur = (await this.ctx.storage.get(k)) || { n: [] };
+          if (posts.length && (posts[0].ts || 0) > (cur.seen || 0)) { cur.seen = posts[0].ts; await this.ctx.storage.put(k, cur); }
+        }
+        return Response.json({ ok: true, posts, more, next: posts.length ? posts[posts.length - 1].id : "" });
+      }
+      if (op === "mopost") {
+        if (!ok12(uid)) return Response.json({ ok: false });
+        const txt = moClean(b.text, 1000);
+        const imgs = (Array.isArray(b.imgs) ? b.imgs : []).filter((x) => /^[0-9a-f]{16}$/.test(String(x))).slice(0, 9);
+        if (!txt && !imgs.length) return Response.json({ ok: false, msg: "写点什么，或者放张图。" });
+        const rk = "morl:" + uid;
+        let hits = (await this.ctx.storage.get(rk)) || [];
+        hits = hits.filter((t) => now - t < 86400000);
+        if (hits.length && now - hits[hits.length - 1] < 5000) return Response.json({ ok: false, msg: "发得太快了，缓一下。" });
+        if (hits.length >= 50) return Response.json({ ok: false, msg: "今天发得够多啦，明天再来。" });
+        hits.push(now);
+        await this.ctx.storage.put(rk, hits);
+        const u0 = (await this.ctx.storage.get("u:" + uid)) || {};
+        const id = moInv(now) + ":" + moRnd();
+        const post = { id, uid, name: moClean(b.name || u0.name, 20), text: txt, imgs, ts: now, likes: [], cmts: [] };
+        await this.ctx.storage.put("mo:" + id, post);
+        await this.ctx.storage.put("mu:" + uid + ":" + id, 1);
+        post.mine = 1; post.liked = 0;
+        return Response.json({ ok: true, post });
+      }
+      if (op === "molike") {
+        const id = String(b.id || "");
+        if (!moIdOk(id) || !ok12(uid)) return Response.json({ ok: false, msg: "参数不对。" });
+        const p = await this.ctx.storage.get("mo:" + id);
+        if (!p) return Response.json({ ok: false, msg: "这条动态已经不在了。" });
+        p.likes = p.likes || [];
+        const i = p.likes.findIndex((x) => x.uid === uid);
+        let on = 0;
+        if (i >= 0) p.likes.splice(i, 1);
+        else { p.likes.push({ uid, name: moClean(b.name, 20), ts: now }); on = 1; }
+        await this.ctx.storage.put("mo:" + id, p);
+        if (on) await moNotify(p.uid, { k: "like", id, name: moClean(b.name, 20), text: moClean(p.text, 30), ts: now });
+        return Response.json({ ok: true, on, likes: p.likes });
+      }
+      if (op === "mocmt") {
+        const id = String(b.id || "");
+        if (!moIdOk(id) || !ok12(uid)) return Response.json({ ok: false, msg: "参数不对。" });
+        const txt = moClean(b.text, 300);
+        if (!txt) return Response.json({ ok: false, msg: "说点什么吧。" });
+        const p = await this.ctx.storage.get("mo:" + id);
+        if (!p) return Response.json({ ok: false, msg: "这条动态已经不在了。" });
+        p.cmts = p.cmts || [];
+        if (p.cmts.length >= 200) return Response.json({ ok: false, msg: "这条动态的评论满了。" });
+        const rid = String(b.rid || "");
+        const r = rid ? p.cmts.find((x) => x.cid === rid) : null;
+        const c = { cid: moRnd(), uid, name: moClean(b.name, 20), text: txt, ts: now };
+        if (r) { c.rid = r.cid; c.rname = r.name; }
+        p.cmts.push(c);
+        await this.ctx.storage.put("mo:" + id, p);
+        await moNotify(p.uid, { k: "cmt", id, name: c.name, text: moClean(txt, 40), ts: now });
+        if (r && r.uid !== p.uid) await moNotify(r.uid, { k: "reply", id, name: c.name, text: moClean(txt, 40), ts: now });
+        return Response.json({ ok: true, cmts: p.cmts });
+      }
+      if (op === "mocdel") {
+        const id = String(b.id || "");
+        if (!moIdOk(id)) return Response.json({ ok: false, msg: "参数不对。" });
+        const p = await this.ctx.storage.get("mo:" + id);
+        if (!p) return Response.json({ ok: false, msg: "这条动态已经不在了。" });
+        const c = (p.cmts || []).find((x) => x.cid === String(b.cid || ""));
+        if (!c) return Response.json({ ok: true, cmts: p.cmts || [] });
+        // 自己的评论可以删；动态的主人也可以删自己楼里的评论；管理员 force
+        if (c.uid !== uid && p.uid !== uid && !b.force) return Response.json({ ok: false, msg: "只能删自己的评论。", code: 403 });
+        p.cmts = (p.cmts || []).filter((x) => x.cid !== c.cid);
+        await this.ctx.storage.put("mo:" + id, p);
+        return Response.json({ ok: true, cmts: p.cmts });
+      }
+      if (op === "model") {
+        const id = String(b.id || "");
+        if (!moIdOk(id)) return Response.json({ ok: false, msg: "参数不对。" });
+        const p = await this.ctx.storage.get("mo:" + id);
+        if (!p) return Response.json({ ok: true, gone: 1, imgs: [] });
+        if (p.uid !== uid && !b.force) return Response.json({ ok: false, msg: "只能删自己的动态。", code: 403 });
+        await this.ctx.storage.delete("mo:" + id);
+        await this.ctx.storage.delete("mu:" + p.uid + ":" + id);
+        return Response.json({ ok: true, imgs: p.imgs || [] });
+      }
+      if (op === "monews") {
+        if (!ok12(uid)) return Response.json({ ok: false });
+        const k = "mn:" + uid;
+        const cur = (await this.ctx.storage.get(k)) || { n: [] };
+        const list = cur.n || [];
+        if (list.length) { cur.n = []; await this.ctx.storage.put(k, cur); }
+        return Response.json({ ok: true, news: list });
+      }
+      if (op === "mobadge") {
+        if (!ok12(uid)) return Response.json({ ok: false });
+        const cur = (await this.ctx.storage.get("mn:" + uid)) || { n: [] };
+        const m = await this.ctx.storage.list({ prefix: "mo:", limit: 1 });
+        let top = 0;
+        for (const v of m.values()) if (v && v.ts) top = v.ts;
+        return Response.json({ ok: true, n: (cur.n || []).length, fresh: top > (cur.seen || 0) ? 1 : 0 });
+      }
+      if (op === "moall") {   // 管理面板用：列全部动态（不含图片字节）
+        const m = await this.ctx.storage.list({ prefix: "mo:", limit: 500 });
+        const out = [];
+        for (const v of m.values()) if (v && v.id) out.push({ id: v.id, uid: v.uid, name: v.name || "", text: moClean(v.text, 60), imgs: (v.imgs || []).length, ts: v.ts || 0, likes: (v.likes || []).length, cmts: (v.cmts || []).length });
+        return Response.json({ ok: true, posts: out });
+      }
       // ——— 群 ———
       if (op === "gcreate") {
         if (!ok12(uid)) return Response.json({ ok: false });
@@ -5065,6 +5213,18 @@ export default {
     // /api/im：微信式私聊的目录服务——通讯录、会话列表、未读清零、打开某人的私聊房间。
     // 一律要 Google 登录：先验凭证换出 uid（Google sub 的哈希），再转给 im-dir-global 目录实例。
     // 私聊内容本身不经这里，走 /api/chat?room=dm/<a>-<b>（房间号由双方各自算出，服务端校验成员）。
+    // 朋友圈图片：键是 16 位随机十六进制，存在 R2 的 moments/ 下（不进 git，不占 DO）。
+    // <img> 带不了请求头，所以门就是「键不可枚举」——与私聊图片的一次性令牌同一个思路。
+    if (url.pathname === "/api/im/img" && (request.method === "GET" || request.method === "HEAD")) {
+      const k = String(url.searchParams.get("k") || "");
+      if (!/^[0-9a-f]{16}$/.test(k)) return new Response("bad key", { status: 400 });
+      if (!env.PDFS) return new Response("not found", { status: 404 });
+      const obj = await env.PDFS.get("moments/" + k + ".jpg");
+      if (!obj) return new Response("not found", { status: 404 });
+      return new Response(request.method === "HEAD" ? null : obj.body, {
+        headers: { "content-type": "image/jpeg", "cache-control": "public, max-age=31536000, immutable" },
+      });
+    }
     if (url.pathname === "/api/im" && request.method === "POST") {
       const b = await request.json().catch(() => null);
       if (!b) return Response.json({ ok: false, msg: "请求格式不对。" }, { status: 400 });
@@ -5101,9 +5261,54 @@ export default {
           BANS = null;                       // 立刻生效，不等 60 秒缓存过期
           return Response.json(d);
         }
+        if (a === "moall") return Response.json(await call({ op: "moall" }), { headers: { "cache-control": "no-store" } });
+        if (a === "model") {
+          const d = await call({ op: "model", uid: who.uid, id: String(b.id || ""), force: 1 });
+          if (d && d.ok && env.PDFS) { for (const k of (d.imgs || [])) { try { await env.PDFS.delete("moments/" + k + ".jpg"); } catch (e) {} } }
+          return Response.json(d || { ok: false });
+        }
         if (a === "gdel") return Response.json(await call({ op: "agdel", gid: String(b.gid || "") }));
         if (a === "gkick") return Response.json(await call({ op: "agkick", gid: String(b.gid || ""), target: String(b.target || "") }));
         return Response.json({ ok: false, msg: "未知的管理动作。" }, { status: 400 });
+      }
+      // ===== 朋友圈：文字进 DO，图片进 R2（moments/<key>.jpg），一个字节都不进 git =====
+      if (op === "mo") {
+        const a = String(b.a || "");
+        if (a === "feed") {
+          await call({ op: "hello", uid: who.uid, name: who.name });
+          const d = await call({ op: "mofeed", uid: who.uid, who: String(b.who || ""), after: String(b.after || ""), limit: b.limit });
+          return Response.json(Object.assign({ me }, d || { ok: false }), { headers: { "cache-control": "no-store" } });
+        }
+        if (a === "post") {
+          const raw = Array.isArray(b.imgs) ? b.imgs.slice(0, 9) : [];
+          const keys = [];
+          for (const one of raw) {
+            let bytes;
+            try {
+              const b64 = String(one).replace(/^data:[^,]*,/, "");
+              const bin = atob(b64);
+              bytes = new Uint8Array(bin.length);
+              for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+            } catch (e) { return Response.json({ ok: false, msg: "有一张图片没读懂，换一张试试。" }, { status: 400 }); }
+            if (!bytes.byteLength) continue;
+            if (bytes.byteLength > 400 * 1024) return Response.json({ ok: false, msg: "有图片太大了（压缩后需小于 400KB）。" }, { status: 400 });
+            if (!env.PDFS) return Response.json({ ok: false, msg: "图片存储暂时不可用，先只发文字吧。" }, { status: 400 });
+            const k = [...crypto.getRandomValues(new Uint8Array(8))].map((x) => x.toString(16).padStart(2, "0")).join("");
+            await env.PDFS.put("moments/" + k + ".jpg", bytes, { httpMetadata: { contentType: "image/jpeg", cacheControl: "public, max-age=31536000, immutable" } });
+            keys.push(k);
+          }
+          const d = await call({ op: "mopost", uid: who.uid, name: who.name, text: b.text, imgs: keys });
+          return Response.json(d || { ok: false }, { status: (d && d.ok) ? 200 : 400 });
+        }
+        const MOMAP = { like: "molike", cmt: "mocmt", cdel: "mocdel", del: "model", news: "monews", badge: "mobadge" };
+        if (MOMAP[a]) {
+          const d = await call({ op: MOMAP[a], uid: who.uid, name: who.name, id: String(b.id || ""), cid: String(b.cid || ""), rid: String(b.rid || ""), text: b.text });
+          if (a === "del" && d && d.ok && env.PDFS) {   // 动态没了，图片也别留在桶里
+            for (const k of (d.imgs || [])) { try { await env.PDFS.delete("moments/" + k + ".jpg"); } catch (e) {} }
+          }
+          return Response.json(d || { ok: false }, { status: (d && d.ok) ? 200 : ((d && d.code) || 400) });
+        }
+        return Response.json({ ok: false, msg: "未知的朋友圈动作。" }, { status: 400 });
       }
       if (op === "hello") { await call({ op: "hello", uid: who.uid, name: who.name }); return Response.json({ ok: true, me }); }
       if (op === "contacts") {
