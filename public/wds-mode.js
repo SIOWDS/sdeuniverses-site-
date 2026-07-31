@@ -1288,7 +1288,7 @@
     try { q(".wdsm-hero-after").textContent = t("heroAfter"); } catch (e) {}
     try { q(".wdsm-membtn .mb").textContent = t("bMem"); } catch (e) {}   // 按钮里还有个角标 <i>，不能整体 textContent
     q(".wdsm-newbtn").textContent = t("bNew");
-    try { rsPaint(); cvPaint(); compPaint(); duPaint(); pjPaint(); } catch (e) {}
+    try { rsPaint(); lnkPaint(); cvPaint(); compPaint(); duPaint(); pjPaint(); } catch (e) {}
     q(".wdsm-langbtn").textContent = LANG === "zh" ? "EN" : "中";
     var g = function (sel) { return q(sel) || {}; };   // 防空取：桩环境里某些节点不存在，别为文案崩掉整页
     g(".wdsm-nc").textContent = t("sbNew");
@@ -2764,8 +2764,13 @@
       })
       .catch(function (e) { attStatus(t("lnkBad") + ((e && e.message) || "?"), 1); });
   }
-  if (lnkBtn) {
+  function lnkPaint() {
+    if (!lnkBtn) return;
+    lnkBtn.textContent = t("lnkBtn");     // 漏了这一行，它就是一颗没名字的空框
     lnkBtn.title = t("lnkTip");
+  }
+  lnkPaint();
+  if (lnkBtn) {
     lnkBtn.onclick = function () {
       if (streaming) return;
       // 输入框里已经贴了网址就直接用它，并把它从提问里摘掉（读者的意思是"读这个"，不是"问这一串字符"）

@@ -211,6 +211,14 @@ const inEl = layer.querySelector(".wdsm-in"), sendEl = layer.querySelector(".wds
 const modes = layer.querySelectorAll(".wdsm-mode").filter((b) => b.getAttribute("data-k"));
 ok(modes.length === 3, "模式条三个档位按钮（标准/深度/联网），实得 " + modes.length);
 ok(!!layer.querySelector(".wdsm-attbtn"), "附件按钮存在（借 .wdsm-mode 样式但无 data-k，不参与档位互斥）");
+// 通用守门：模式条上**每一颗按钮都必须有字**。
+// 逐颗写断言是补不完的——链接键当初就是这么漏成一颗空框的（文案定义了，没人写进 DOM）。
+// 只在模式条上扫：这几颗都是 JS 直接写 textContent 的，桩上取得准；顶栏「记忆」的字在子 span 里、
+// 画布的 × 是标签间文本，桩的扁平解析两样都取不到，扫过去全是假阳性。
+{
+  const blank = layer.querySelectorAll(".wdsm-mode").filter((b) => !String(b.textContent || "").trim());
+  ok(blank.length === 0, "模式条上没有没名字的按钮，实得空按钮 " + blank.length + " 颗（className：" + blank.map((b) => b.className).join(" / ") + "）");
+}
 // 版式对齐 Claude：＋附件 · 模型选择器 · 语音 三样都收进输入框。
 // **必须在源码上验，不能在桩上验** —— 桩的 innerHTML 是扁平解析，所有节点都成了兄弟，
 // 于是 inwrap.querySelector(...) 一律为空、layer.querySelector(".wdsm-top") 里也一律没东西：
