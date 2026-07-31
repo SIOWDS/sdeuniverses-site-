@@ -222,7 +222,16 @@ ok("空对话不让导（needTalk）", /function exportPdf\(\) \{\s*\n\s*if \(!h
 });
 ok("公式走自托管 katex（打印时 CDN 未必在）", SRC.indexOf('katex: "/assets/katex/katex.min.css"') > 0);
 ok("出稿带 base", /base: \(location && location\.origin/.test(SRC));
-ok("模块要到 v3（版心宽按 @page 折算）", /var PDF_WANT = 3;/.test(SRC));
+ok("模块要到 v4（建议文件名带时间戳）", /var PDF_WANT = 4;/.test(SRC));
+/* 打印框的建议文件名 = 印刷稿的 <title>。它必须与封面大标题分家，否则每导一次都撞同名，
+   读者每次都被逼进"是否替换"那一步——而替换成不成功不归网页管（文件被阅读器占着就写不进去）。 */
+{
+  const d = PDF.doc({ title: "与 WDS 的对话", file: "ChatSDE-与 WDS 的对话-20260801-0713", blocks: [] });
+  ok("<title> 用的是 file（＝建议文件名）", /<title>ChatSDE-与 WDS 的对话-20260801-0713<\/title>/.test(d));
+  ok("封面大标题仍是 title，不带时间戳", /<div class=cover><h1>与 WDS 的对话<\/h1>/.test(d));
+}
+ok("不传 file 时退回 title（老调用方行为不变）", /<title>只有标题<\/title>/.test(PDF.doc({ title: "只有标题", blocks: [] })));
+ok("导出时真的传了带时间戳的 file", /file: "ChatSDE-" \+ safeName\(t\("convoTitle"\)\) \+ "-" \+ stampName\(\),/.test(SRC));
 // KaTeX 挂在 CDN 上，等于把"界面上有没有公式"押在第三方可达性上，PDF 跟着一起赌
 ok("KaTeX 自托管排第一顺位", /var KTX_HOSTS = \["\/assets\/katex",/.test(SRC));
 ok("导出前先把没排的公式排完（pdfMath 在取稿之前）",

@@ -18,7 +18,8 @@
  */
 (function (w) {
   "use strict";
-  var VERSION = 3;   // v3：版心宽按 @page 的 178mm 折算，不再问 1px 的 iframe 要
+  var VERSION = 4;   // v4：文件名与封面标题分家（o.file 进 <title> ＝ 打印框的建议文件名）
+  // v3：版心宽按 @page 的 178mm 折算，不再问 1px 的 iframe 要
   var PAGE_W_MM = 178;   // A4 210mm − @page 左右各 16mm。改 @page 的 margin 必须同步改这里
   // v2：公式（KaTeX）当一等公民——字体等齐再打印、超宽公式自动缩到版心
 
@@ -104,13 +105,17 @@
   function doc(o) {
     o = o || {};
     var title = String(o.title || "对话记录");
+    // ⚠️ `<title>` 就是打印框「另存为 PDF」的**建议文件名**，而封面上那行大标题是给人看的。
+    //    两者共用一个字符串，等于每次导出都建议同一个名字 → 每次都撞名 → 每次都要人去点"替换"，
+    //    而替换成不成功不归网页管。所以文件名单独一路，调用方可传时间戳。
+    var file = String(o.file || title);
     var blocks = Array.isArray(o.blocks) ? o.blocks : [];
     var meta = (Array.isArray(o.meta) ? o.meta : []).filter(Boolean);
     var lang = o.lang === "en" ? "en" : "zh-CN";
     var katex = o.katex ? '<link rel="stylesheet" href="' + esc(o.katex) + '">' : "";
     var h = "";
     h += '<!DOCTYPE html><html lang="' + lang + '"><head><meta charset="utf-8">';
-    h += "<title>" + esc(title) + "</title>";
+    h += "<title>" + esc(file) + "</title>";
     h += '<meta name="viewport" content="width=device-width,initial-scale=1">';
     // srcdoc 文档的相对地址在几家浏览器里解析口径不一致（about:srcdoc vs 父页 base），
     // 而答案里可能带站内图片、KaTeX 的字体又是 CSS 里的相对路径——显式钉一个 base 最稳。
