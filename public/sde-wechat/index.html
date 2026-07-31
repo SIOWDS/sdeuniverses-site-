@@ -522,6 +522,10 @@ function api(op,extra){
   return fetch("/api/im",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(body)})
     .then(function(r){return r.json().then(function(d){return{s:r.status,d:d}})});
 }
+/* api() 回的是 {s:HTTP状态, d:载荷}——老调用点按 x.d.ok 读，不能改它的形状。
+   候选/库存/文章库三家的调用点都按「载荷」在读，所以在各自的 wrapper 里拆一次包。
+   ⚠️ 这条曾让三个 tab 全部常亮「加载失败，请重试。」，而后端一直是 200 ok。 */
+function unwrap(x){return (x&&x.d)?x.d:{ok:false};}
 function setStat(state){var d=el("t-dot"),s=el("t-stat");
   if(!cur){d.className="dot";s.textContent="";return;}
   d.className="dot"+(state==="online"?" on":state==="offline"?" off":"");
@@ -1429,7 +1433,7 @@ function cdBadge(){
    对话侧存进来、朋友圈「说点什么」从里面取、候选卡从里面升格。 */
 var vtFrom="", vtMode="new", vtPick=null;
 var VT_KIND={line:"金句",name:"命名",claim:"命题",note:"观察"};
-function vtApi(a,extra){return api("vt",Object.assign({a:a},extra||{}));}
+function vtApi(a,extra){return api("vt",Object.assign({a:a},extra||{})).then(unwrap);}
 
 /* ===== 文章库 =====
    存的是**指针不是副本**：站上 840 篇已有规范索引，这里只记 slug/title。
@@ -1441,7 +1445,7 @@ function vtApi(a,extra){return api("vt",Object.assign({a:a},extra||{}));}
      · 发现    —— 不由人放，由前端从 publications.json 现算「离你最远」：
                   优先给你**没收过的领域**。零后端零调用，永远有货且永远是陌生的。 */
 var lbFrom="me", lbMode="pub", lbPick=null, lbPubs=null, lbMineCache=[];
-function lbApi(a,extra){return api("lb",Object.assign({a:a},extra||{}));}
+function lbApi(a,extra){return api("lb",Object.assign({a:a},extra||{})).then(unwrap);}
 function lbGo(from,onPick){lbFrom=from||"me";lbPick=onPick||null;show("lib");lbLoad();}
 function lbUrl(slug){return "/students/"+String(slug||"").replace(/^\/+|\/+$/g,"")+"/";}
 /* 站上的规范索引，取一次缓存住；失败不拦路（发现这一路没了，另两路照用） */
@@ -1682,7 +1686,7 @@ function vtBind(){
     };
   });
 }
-function cdApi(a,extra){return api("cd",Object.assign({a:a},extra||{}));}
+function cdApi(a,extra){return api("cd",Object.assign({a:a},extra||{})).then(unwrap);}
 function cdGo(who,name){cdWho=who||"";cdWhoName=name||"";show("cand");cdLoad();}
 function cdLeft(c){
   if(c.state!=="open")return "";
