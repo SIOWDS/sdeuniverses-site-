@@ -23,6 +23,9 @@
  * ④ **未登录不偷偷落卡**——给的是可点的去处，不是一句「请登录」。
  * ⑤ **取不到就说取不到，绝不编造**——section() 抠不出返回空串，draft() 宁可留空让人自己写。
  *
+ * 落卡会带上账本字段（sys 来处维度／kin 血缘），服务端据此生成 pid 与文法指纹 g——
+ * 三个子系统日后指着同一条命题说话，靠的就是这个 pid（见 src/worker.js 的 ppUp 段）。
+ *
  * 身份复用全站单点登录：sessionStorage["sde_gauth"] → localStorage["sde_talk_id"]（看 exp），
  * 与 SDEVault 同一把钥匙；有 SDEVault 时直接问它，免得两处各存一份口径。
  *
@@ -184,7 +187,10 @@
         body: JSON.stringify({
           credential: cr, op: "cd", a: "post",
           prop: v.card.prop, face: v.card.face, crit: v.card.crit,
-          nbr: pack, src: String((c && c.src) || "").slice(0, 80)
+          nbr: pack, src: String((c && c.src) || "").slice(0, 80),
+          // 账本两件：sys＝它在哪个维度上冒出来（S 浏览／D 对话／E 微信，默认 D）；
+          // kin＝血缘，它从哪几条命题分叉出来。**共同创造用分叉不用共编**，见 worker 里 ppUp 那段口径。
+          sys: String((c && c.sys) || "D"), kin: (c && c.kin) || []
         })
       }).then(function (r) { return r.json(); })
         .then(function (d) {

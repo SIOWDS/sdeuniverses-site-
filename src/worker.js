@@ -916,6 +916,69 @@ export class CommentBox {
         c.settled = tnow;
         return true;
       };
+
+      /* ═══ 命题账本（ledger）═══
+         用户定的口径：三个子系统＝S/D/E 三个维度（浏览＝显露／ChatSDE＝发生／微信＝纠缠），
+         而**纠缠的最小充分条件是三处操作同一个对象**。那个对象只能是承重命题——
+         50 字级、可被反对的一句：它本来就是 I 维那把刀、近邻库的查询键、候选卡的第一段。
+
+         **不造第五套键空间。** 站上已有四套互不认识的东西（库存 vt: ／候选卡 cd: ／
+         近邻库 cards.json ／站内文章 slug），账本不是第五套，是把它们认成同一个对象的
+         四个年龄段。候选卡本来就几乎是账本了（prop/face/crit/backs/seps/state/due 全有），
+         这里只补四件：
+           pid  跨三系统的稳定标识。cd:<inv>:<rnd> 是**存储键**不是标识——换存储、搬家、
+                导出再导入，它就没了；而三个系统要指着同一条命题说话。
+           kin  血缘：它从哪几条命题分叉/撞出来。**共同创造用分叉，不用共编**——
+                一条命题只有一个作者，既免掉自由群体里最伤感情的所有权争议，
+                又让"这个想法是怎么来的"自动长成一条可回溯的链。
+           g    文法指纹（汉字二元组＋拉丁整词）：距离引擎与零调用粗筛的燃料。
+           src  来处 {sys:"S|D|E", at:一句话}——账本要答得出"它是在哪个维度上冒出来的"。
+
+         ⚠️ g 必须与 public/assets/sde-nbr.js 的 grams() **逐字同义**：一端算出的指纹另一端
+            要能直接比。近邻库那条线已经栽过一次（Python 报告与 JS 运行时给出两个召回数字，
+            根因是两端口径差了三处），所以 tools/sim_ledger.mjs 有一条断言拿同一批输入
+            比两端产出的文法集合，改任一端不同步就当场红。
+
+         **不存分数。** 没有赞、没有粉丝数、没有排名字段——自由群体里任何可排序成等级的
+            数字都会让所有人朝分高的那个人的语汇靠拢，而语汇距离正是这套系统唯一的稀缺品。
+            schema 里不给它位置，比事后约定"我们不做排行榜"可靠得多。 */
+      const PP_PUNCT = /[\s，。、；：？！…—－·「」『』《》〈〉""''"'（）()\[\]【】,.;:?!/\\|+*=~`#$%^&_-]+/g;
+      const ppGrams = (s) => {
+        const low = String(s || "").toLowerCase();
+        const out = Object.create(null);
+        // 拉丁词必须在「标点换空格」之后、「压掉空白」之前抽：先压空白会把 ego depletion
+        // 粘成 egodepletion，外文原题再也整词命中不了（近邻库那条线的护栏当场抓到过）。
+        const lat = low.replace(PP_PUNCT, " ").match(/[a-z0-9]{3,}/g) || [];
+        for (const w of lat) out[w] = 1;
+        const t = low.replace(PP_PUNCT, "");
+        const cjk = [];
+        for (let i = 0; i < t.length; i++) {
+          const c = t.charCodeAt(i);
+          if (c >= 0x4e00 && c <= 0x9fff) cjk.push(t.charAt(i));
+        }
+        for (let i = 0; i < cjk.length - 1; i++) out[cjk[i] + cjk[i + 1]] = 1;
+        return Object.keys(out);
+      };
+      const PP_ID_RE = /^p_[0-9a-z]{6,14}_[0-9a-f]{4}$/;
+      // 时间前缀补齐到 8 位再拼：不补位就只是"大多数时候能排序"——36 进制串长短不一时
+      // 字典序会骗人（1000 → "rs" 排在 2000 → "1jk" 后面）。8 位够用到 2059 年。
+      const ppId = (t) => "p_" + Number(t || Date.now()).toString(36).padStart(8, "0").slice(-8) + "_" + Math.random().toString(16).slice(2, 6);
+      const ppSys = (x) => (["S", "D", "E"].indexOf(String(x || "").toUpperCase()) >= 0 ? String(x).toUpperCase() : "D");
+      const ppKin = (x) => (Array.isArray(x) ? x : []).map((v) => String(v || "")).filter((v) => PP_ID_RE.test(v)).slice(0, 8);
+      /* 惰性升格：老卡被读到时才补齐，改过才写回——与 cdSettle 同一路数。
+         **不做批量迁移**：批量要对 DO 全表扫描、要挑一个没人在写的时刻，
+         而惰性升格零风险、自然收敛，且天然幂等。 */
+      const ppUp = (c) => {
+        if (!c) return false;
+        let dirty = false;
+        if (!PP_ID_RE.test(String(c.pid || ""))) { c.pid = ppId(c.ts); dirty = true; }
+        if (!Array.isArray(c.g) || !c.g.length) { c.g = ppGrams([c.prop, c.face].join(" ")); dirty = true; }
+        if (!Array.isArray(c.kin)) { c.kin = []; dirty = true; }
+        if (!c.src || typeof c.src !== "object") { c.src = { sys: "E", at: "" }; dirty = true; }
+        return dirty;
+      };
+      /* pid → 存储键 的指针。写指针是幂等的，重复写一次比漏写一次便宜太多。 */
+      const ppLink = async (st, c) => { if (c && c.pid && c.id) await st.put("pp:" + c.pid, c.id); };
       /* ═══ 思想库存（vault）═══
          用户的话：「对话产生的很多新思想，要能自动进入微信的某个库存……
          可以自动点击那个库存去发现。这样对话产生的新思想和朋友圈可以共用，或者微信整个共用。」
@@ -1079,6 +1142,11 @@ export class CommentBox {
         const id = cdInv(now) + ":" + cdRnd();
         const card = {
           id, uid, name: cdClean(b.name || u0.name, 20), ts: now,
+          // ── 账本四件（见上面 ppUp 那段的口径）──
+          pid: ppId(now),
+          src: { sys: ppSys(b.sys), at: cdClean(b.src, 80) },
+          kin: ppKin(b.kin),
+          g: ppGrams(cdClean(b.prop, 120) + " " + cdClean(b.face, 200)),
           prop, face, crit,
           nbr: (b.nbr && typeof b.nbr === "object") ? { status: String(b.nbr.status || ""), verdict: cdClean(b.nbr.verdict, 300), hits: (Array.isArray(b.nbr.hits) ? b.nbr.hits : []).slice(0, 5).map((x) => ({ prop: cdClean(x.prop, 120), who: cdClean(x.who, 60) })) } : null,
           picks: (Array.isArray(b.picks) ? b.picks : []).slice(0, 8).map((x) => cdClean(x, 20)),
@@ -1086,6 +1154,7 @@ export class CommentBox {
         };
         await this.ctx.storage.put("cd:" + id, card);
         await this.ctx.storage.put("cu:" + uid + ":" + id, 1);
+        await ppLink(this.ctx.storage, card);
         return Response.json({ ok: true, card });
       }
       if (op === "cdfeed") {
@@ -1098,7 +1167,10 @@ export class CommentBox {
           const id = only ? k.slice(pre.length) : k.slice(3);
           const c = only ? await this.ctx.storage.get("cd:" + id) : await this.ctx.storage.get(k);
           if (!c) continue;
-          if (cdSettle(c, now)) await this.ctx.storage.put("cd:" + c.id, c);   // 惰性结算
+          // 惰性结算 ＋ 惰性升格：两件事各自判，别用短路写在一行（|| 会吃掉第二件）
+          let dirty = cdSettle(c, now);
+          if (ppUp(c)) { dirty = true; await ppLink(this.ctx.storage, c); }
+          if (dirty) await this.ctx.storage.put("cd:" + c.id, c);
           out.push(c);
         }
         const more = out.length > lim;
@@ -1122,6 +1194,7 @@ export class CommentBox {
         if (c.backs.length >= 30) return Response.json({ ok: false, msg: "这张卡的顶回够多了。" });
         const bid = cdRnd();
         c.backs.push({ bid, uid, name: cdClean(b.name, 20), kind, text: txt, ts: now });
+        if (ppUp(c)) await ppLink(this.ctx.storage, c);
         await this.ctx.storage.put("cd:" + id, c);
         await cdNotify(c.uid, { k: "back", id, bid, kind, name: cdClean(b.name, 20), text: cdClean(txt, 40), prop: cdClean(c.prop, 30), ts: now });
         return Response.json({ ok: true, card: c });
@@ -1141,9 +1214,24 @@ export class CommentBox {
         if (!(c.backs || []).some((x) => x.bid === to)) return Response.json({ ok: false, msg: "找不到这条顶回。" });
         c.seps = (c.seps || []).filter((s) => s.to !== to);
         c.seps.push({ to, text: txt, ts: now });
+        if (ppUp(c)) await ppLink(this.ctx.storage, c);
         await this.ctx.storage.put("cd:" + id, c);
         const bk = (c.backs || []).find((x) => x.bid === to);
         if (bk) await cdNotify(bk.uid, { k: "sep", id, name: c.name, text: cdClean(txt, 40), prop: cdClean(c.prop, 30), ts: now });
+        return Response.json({ ok: true, card: c });
+      }
+      if (op === "ppget") {
+        /* 三个维度指着同一条命题说话的唯一入口。老卡没被读到过就还没有 pid——
+           这时如实说"不在账本里"，不假装它不存在。 */
+        const pid = String(b.pid || "");
+        if (!PP_ID_RE.test(pid)) return Response.json({ ok: false, msg: "认不出这个命题号。" });
+        const key = await this.ctx.storage.get("pp:" + pid);
+        if (!key) return Response.json({ ok: false, msg: "这条命题还不在账本里（老卡要被读到一次才会补上命题号）。" });
+        const c = await this.ctx.storage.get("cd:" + key);
+        if (!c) return Response.json({ ok: false, msg: "这条命题已经不在了。" });
+        let dirty = cdSettle(c, now);
+        if (ppUp(c)) { dirty = true; await ppLink(this.ctx.storage, c); }
+        if (dirty) await this.ctx.storage.put("cd:" + key, c);
         return Response.json({ ok: true, card: c });
       }
       if (op === "cddel") {
@@ -6148,7 +6236,15 @@ export default {
           who: String(b.who || ""), after: String(b.after || ""), limit: b.limit,
           id: String(b.id || ""), to: String(b.to || ""), kind: String(b.kind || ""),
           text: b.text, prop: b.prop, face: b.face, crit: b.crit, nbr: b.nbr, picks: b.picks,
+          sys: b.sys, src: b.src, kin: b.kin,          // 账本：来处与血缘
         });
+        return Response.json(Object.assign({ me }, d || { ok: false }), { headers: { "cache-control": "no-store" } });
+      }
+      if (op === "pp") {   // 命题账本：三个维度指着同一条命题说话
+        const a = String(b.a || "");
+        const pass = ["get"];
+        if (pass.indexOf(a) < 0) return Response.json({ ok: false, msg: "未知的账本动作。" }, { status: 400 });
+        const d = await call({ op: "pp" + a, uid: who.uid, name: who.name, pid: String(b.pid || "") });
         return Response.json(Object.assign({ me }, d || { ok: false }), { headers: { "cache-control": "no-store" } });
       }
       if (op === "mo") {
