@@ -851,8 +851,14 @@
     ".wdsm-follow{background:var(--wfill);border:1px solid var(--wline);color:var(--wtx);border-radius:999px;padding:7px 13px;font:13px/1 inherit;cursor:pointer;text-align:left}" +
     ".wdsm-follow:hover{border-color:var(--wline2);color:var(--wgold)}" +
     ".wdsm-follows-h{width:100%;font-size:11px;letter-spacing:1px;color:var(--wdim2);margin-bottom:2px}" +
-    ".wdsm-inwrap{max-width:760px;margin:0 auto;display:flex;gap:10px;align-items:flex-end;background:var(--wfill);border:1px solid var(--wline2);border-radius:16px;padding:8px 8px 8px 16px}" +
-    ".wdsm-in{flex:1;resize:none;background:none;border:none;outline:none;color:var(--wtx2);font:15px/1.6 inherit;max-height:160px;padding:6px 0}" +
+    ".wdsm-inwrap{max-width:760px;margin:0 auto;background:var(--wfill);border:1px solid var(--wline2);border-radius:16px;padding:10px 10px 8px 14px}" +
+    ".wdsm-inrow{display:flex;gap:8px;align-items:center;margin-top:4px}" +
+    ".wdsm-insp{flex:1}" +
+    /* 收进框里的三样：＋ 做成圆钮，模型选择器与两颗图标钮一起缩一号，免得把框撑高 */
+    ".wdsm-inrow .wdsm-attbtn{width:34px;height:34px;padding:0;border-radius:999px;font-size:20px;line-height:1;display:flex;align-items:center;justify-content:center}" +
+    ".wdsm-inrow .wdsm-mp{padding:7px 10px;font-size:12.5px;border-radius:9px}" +
+    ".wdsm-inrow .wdsm-mic,.wdsm-inrow .wdsm-send{width:36px;height:36px;border-radius:10px;font-size:16px}" +
+    ".wdsm-in{width:100%;display:block;resize:none;background:none;border:none;outline:none;color:var(--wtx2);font:15px/1.6 inherit;max-height:160px;padding:6px 0}" +
     ".wdsm-in::placeholder{color:var(--wdim2)}" +
     ".wdsm-mic{flex:none;background:none;border:1px solid var(--wline2);color:var(--wgold2);border-radius:11px;width:40px;height:40px;font-size:17px;cursor:pointer;line-height:1}" +
     ".wdsm-mic:hover{background:var(--wfill2)}" +
@@ -938,7 +944,6 @@
     "<div class='wdsm-main'>" +
       "<div class='wdsm-top'>" +
         "<button class='wdsm-burger'>\u2630</button>" +
-        "<button class='wdsm-mp'></button>" +
         "<div class='wdsm-top-sp'></div><span class='wdsm-turns' id='wdsmTurns'>本场剩余 100 次</span>" +
         "<button class='wdsm-tbtn wdsm-langbtn' title='中文 / English'>EN</button>" +
         "<button class='wdsm-tbtn wdsm-cvbtn'></button>" +
@@ -961,7 +966,6 @@
         "<button class='wdsm-stopbar'><span>\u25a0</span><b class='lb'></b><i></i></button>" +
         "<button class='wdsm-tobot' style='display:none'>\u2193</button>" +
         "<div class='wdsm-modes'>" +
-          "<button class='wdsm-mode wdsm-attbtn'></button>" +
           "<button class='wdsm-mode wdsm-toolbtn'></button>" +
           "<button class='wdsm-mode' data-k='std'></button>" +
           "<button class='wdsm-mode' data-k='deep'></button>" +
@@ -972,7 +976,16 @@
           "<span class='wdsm-mode-tip'></span>" +
         "</div>" +
         "<div class='wdsm-atts' style='display:none'></div>" +
-        "<div class='wdsm-inwrap'><textarea class='wdsm-in' rows='1'></textarea><button class='wdsm-mic'>\ud83c\udf99</button><button class='wdsm-send'>\u2191</button></div>" +
+        "<div class='wdsm-inwrap'>" +
+          "<textarea class='wdsm-in' rows='1'></textarea>" +
+          "<div class='wdsm-inrow'>" +
+            "<button class='wdsm-mode wdsm-attbtn'></button>" +
+            "<span class='wdsm-insp'></span>" +
+            "<button class='wdsm-mp'></button>" +
+            "<button class='wdsm-mic'>\ud83c\udf99</button>" +
+            "<button class='wdsm-send'>\u2191</button>" +
+          "</div>" +
+        "</div>" +
         "<div class='wdsm-micbar'></div>" +
         "<div class='wdsm-note'></div>" +
       "</div>" +
@@ -1275,7 +1288,9 @@
     paintTool();
     paintMp(); sbRender();
     q(".wdsm-sub").innerHTML = t("heroSub");
-    q(".wdsm-attbtn").textContent = t("mAtt");
+    // 收进输入框之后它只写一个 ＋（Claude 那种），原来的文案挪去当悬停提示
+    var _att = q(".wdsm-attbtn");
+    _att.textContent = "\uff0b"; _att.title = t("mAtt");
     q(".wdsm-mode[data-k='std']").textContent = t("mStd");
     q(".wdsm-mode[data-k='deep']").textContent = t("mDeep");
     q(".wdsm-mode[data-k='web']").textContent = t("mWeb");

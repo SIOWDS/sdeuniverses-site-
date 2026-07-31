@@ -211,6 +211,24 @@ const inEl = layer.querySelector(".wdsm-in"), sendEl = layer.querySelector(".wds
 const modes = layer.querySelectorAll(".wdsm-mode").filter((b) => b.getAttribute("data-k"));
 ok(modes.length === 3, "模式条三个档位按钮（标准/深度/联网），实得 " + modes.length);
 ok(!!layer.querySelector(".wdsm-attbtn"), "附件按钮存在（借 .wdsm-mode 样式但无 data-k，不参与档位互斥）");
+// 版式对齐 Claude：＋附件 · 模型选择器 · 语音 三样都收进输入框。
+// **必须在源码上验，不能在桩上验** —— 桩的 innerHTML 是扁平解析，所有节点都成了兄弟，
+// 于是 inwrap.querySelector(...) 一律为空、layer.querySelector(".wdsm-top") 里也一律没东西：
+// 两个方向的断言都会“通过”，测了个寂寞。
+{
+  const cut = (a, b) => { const i = src.indexOf(a), j = src.indexOf(b, i); return i >= 0 && j > i ? src.slice(i, j) : ""; };
+  const box = cut("<div class='wdsm-inwrap'>", "<div class='wdsm-micbar'>");
+  const top = cut("<div class='wdsm-top'>", "<div class='wdsm-body");
+  const mds = cut("<div class='wdsm-modes'>", "<div class='wdsm-atts'");
+  ok(box.includes("wdsm-attbtn"), "＋附件在输入框里");
+  ok(box.includes("wdsm-mp"), "模型选择器在输入框里");
+  ok(box.includes("wdsm-mic") && box.includes("wdsm-send"), "语音与发送在输入框里");
+  ok(!top.includes("wdsm-mp"), "顶栏已不再放模型选择器");
+  ok(!mds.includes("wdsm-attbtn"), "模式条已不再放附件按钮");
+}
+ok(layer.querySelector(".wdsm-attbtn").textContent === "\uff0b", "框里那颗只写一个 ＋，实得 " + JSON.stringify(layer.querySelector(".wdsm-attbtn").textContent));
+// 桩里 el.title = "x" 只落在 JS 属性上、进不了 attrs，所以读 .title 而不是 getAttribute
+ok(String(layer.querySelector(".wdsm-attbtn").title || "").length > 1, "＋ 的原文案挪去当悬停提示，没有丢，实得 " + JSON.stringify(layer.querySelector(".wdsm-attbtn").title));
 ok(!!layer.querySelector(".wdsm-distbtn"), "成文按钮存在");
 
 console.log("② 模式切换");
