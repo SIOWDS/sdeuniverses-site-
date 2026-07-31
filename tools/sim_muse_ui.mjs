@@ -11,7 +11,9 @@ function ok(name, cond, extra) {
 
 /* ── 0. 静态校验：新代码里 el("x") 引到的 id，HTML 里必须真有 ── */
 const a = HTML.indexOf("/* SDE\u91d1\u53e5\u751f\u4ea7\u673a\uff1a");
-const z = HTML.indexOf("/* \u65b0\u6d88\u606f\uff08\u8c01\u8d5e\u4e86\u6211", a);
+// \u7ec8\u70b9\u53d6\u201c\u4e0b\u4e00\u5757\u201d\uff1a\u4e24\u5757\u4e4b\u95f4\u540e\u6765\u63d2\u4e86\u300c\u5403\u56fe\u51fa\u91d1\u53e5\u300d\uff0c\u56fa\u5b9a\u7ec8\u70b9\u4f1a\u628a\u5b83\u4e00\u5e76\u541e\u8fdb\u6765
+const zCand = ["/* \u5403\u56fe\u51fa\u91d1\u53e5\uff1a", "/* \u65b0\u6d88\u606f\uff08\u8c01\u8d5e\u4e86\u6211"].map((s) => HTML.indexOf(s, a)).filter((i) => i > a);
+const z = Math.min.apply(null, zCand);
 ok("\u80fd\u5728\u9875\u9762\u91cc\u627e\u5230\u91d1\u53e5\u5757", a > 0 && z > a, { a, z });
 const BLOCK = HTML.slice(a, z);
 const ids = [...new Set([...BLOCK.matchAll(/el\("([^"]+)"\)/g)].map((m) => m[1]))];
