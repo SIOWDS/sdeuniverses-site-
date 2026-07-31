@@ -2709,10 +2709,17 @@ async function llmText(VC, KEY, sys, usr, maxTok, msTimeout, stat) {
       signal: ctrl.signal,
     });
     if (stat) stat.status = resp.status;   // 可选回执：让调用方分得清"Key 不能用"与"基底没写出来"（不传就与从前完全一样）
-    if (!resp.ok) return "";
+    if (!resp.ok) {
+      // 传了 stat 的调用方还想知道**厂商到底说了什么**（型号不存在／余额／参数不合法都在这句里）。
+      // 不传 stat 的老调用方行为完全不变。
+      if (stat) { try { stat.err = (await resp.text()).slice(0, 300); } catch (e) {} }
+      return "";
+    }
     const j = await resp.json();
-    return (j.choices && j.choices[0] && j.choices[0].message && j.choices[0].message.content) || "";
-  } catch (e) { return ""; }
+    const txt = (j.choices && j.choices[0] && j.choices[0].message && j.choices[0].message.content) || "";
+    if (stat && !txt) { try { stat.err = "200 但没正文：" + JSON.stringify(j).slice(0, 300); } catch (e) {} }
+    return txt;
+  } catch (e) { if (stat) stat.err = "连接异常：" + ((e && e.name) || "") + " " + ((e && e.message) || ""); return ""; }
   finally { clearTimeout(timer); }
 }
 
@@ -6111,7 +6118,8 @@ export default {
           const uContent = canSee
             ? [{ type: "text", text: uTxt }].concat(imgs.map((im) => ({ type: "image_url", image_url: { url: im.d } })))
             : uTxt;
-          const raw = await llmText(VC, KEY, MUSE_SYS, uContent, 1100, 30000);
+          const mstat = {};
+          const raw = await llmText(VC, KEY, MUSE_SYS, uContent, 1100, 30000, mstat);
           const jj = looseJSON(raw);
           const cand = (jj && Array.isArray(jj.lines)) ? jj.lines : String(raw || "").split("\n");
           // 每条带着它的出处回去（i 是篇目编号）；基底不给 i 就只给句子，不瞎猜一个出处挂上去。
@@ -6134,7 +6142,7 @@ export default {
             // 一条都没洗出来时，**管理员**能看见基底到底回了什么（型号不存在、额度尽、格式不对……），
             // 否则只能对着一句"没生出来"盲猜；学员仍只看到人话。
             const dbg = isAdminName(who.name)
-              ? "（" + VC.model + "）" + String(raw || "（空回应）").replace(/\s+/g, " ").slice(0, 220)
+              ? "（" + VC.model + " · HTTP " + (mstat.status || "-") + "）" + (mstat.err || String(raw || "（空回应）").replace(/\s+/g, " ").slice(0, 220))
               : "";
             return Response.json({ ok: false, msg: "这次没生出来，换个口味或者过一会儿再点。" + dbg }, { status: 502 });
           }
