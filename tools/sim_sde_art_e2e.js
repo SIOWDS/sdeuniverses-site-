@@ -61,6 +61,13 @@ const B9_REPLY = [
   "完全｜66｜那一刀读得出但不够狠", "活力｜58｜偏静", "纯一｜85｜只讲一件事",
   "爱｜74｜有可辨认的具体物", "自由｜80｜上方留白足", "平安｜88｜不推搡"
 ].join("\n");
+const IQ5_REPLY = [
+  "结构维｜132｜场立得住，但可拆为两种已有做法的加权",
+  "差异维｜141｜离既有轨道有一段，属轨道的延伸偏新",
+  "纠缠维｜128｜土壤扎在观看惯例这一层，不算薄",
+  "整合维｜130｜拿掉留白整体就塌，是器官不是拼盘",
+  "穿透维｜120｜回写有限，尚不足以重置棋盘"
+].join("\n") + "\n弱在：穿透维——把这条路径写成可被别人接着走的做法，而不是一次性的效果。";
 const GATEOUT_REPLY =
   "图1｜判定：〔通过〕\n图1｜撞上：无\n图1｜分离线：与地层剖面在层界走向上分开。\n" +
   "图2｜判定：〔占位失败〕\n图2｜撞上：蒙德里安红黄蓝方格\n图2｜分离线：—\n最干净的是第 1 张。";
@@ -97,6 +104,9 @@ async function boot(script) {
   return { w, calls, dom };
 }
 function chatOK(text) { return { json: { choices: [{ message: { content: text } }] } }; }
+function uText(c){ const u=c.body.messages[1].content;
+  return typeof u === "string" ? u : (u.find(b=>b.type==="text")||{}).text || ""; }
+
 function imgOK(n) { return { json: { data: { image_base64: Array(n).fill(TINY_JPG_B64) } } }; }
 
 /* 一份「一切正常」的剧本 */
@@ -118,6 +128,7 @@ function happyScript(opts) {
       return chatOK(triReply(opts.triCount == null ? 3 : opts.triCount));
     if (/图像占位核查员/.test(sys) && !/看着\*{0,2}成品图/.test(sys)) return chatOK(GATE_REPLY);
     if (/图像占位核查员/.test(sys)) return chatOK(GATEOUT_REPLY);
+    if (/创新度量员/.test(sys)) return chatOK(opts.iqGarbage ? "乱写，没有任何维名与分数" : IQ5_REPLY);
     if (/画面审看者/.test(sys)) {
       auditSeen++;
       if (opts.auditGarbageAt === auditSeen) return chatOK("完全乱写，没有任何格名与分数");
@@ -156,7 +167,7 @@ async function drive(w, mode, opts) {
 
     ok("内功与 100 条总原则各取一次", calls.filter((c) => /sde-neigong/.test(c.url)).length === 1
       && calls.filter((c) => /kb\/principles/.test(c.url)).length === 1);
-    ok("基底调用 10 次（三观点1＋进闸1＋碰撞3＋看图3＋出闸1＋提炼1）", chats.length === 10, "实测 " + chats.length);
+    ok("基底调用 13 次（三观点1＋进闸1＋碰撞3＋五维3＋看图3＋出闸1＋提炼1）", chats.length === 13, "实测 " + chats.length);
     ok("出图 3 次（每路一次）", draws.length === 3, "实测 " + draws.length);
     ok("全部走 /api/llm-proxy，无浏览器直连", api.every((c) => /\/api\/llm-proxy$/.test(c.url)));
     ok("每一次都带 Bearer，且 Key 不出现在 body 里",
@@ -184,7 +195,8 @@ async function drive(w, mode, opts) {
     const withCore = chats.filter((c) => /SDE 内功·完整先验/.test(c.body.messages[0].content));
     const noCore = chats.filter((c) => !/SDE 内功·完整先验/.test(c.body.messages[0].content));
     ok("装内功的是：三观点＋三路碰撞＋综合提炼＝5 次", withCore.length === 5, "实测 " + withCore.length);
-    ok("不装内功的是：进闸门＋三次看图＋出闸门＝5 次（防评分通胀）", noCore.length === 5, "实测 " + noCore.length);
+    ok("不装内功的是：进闸门1＋五维3＋看图3＋出闸门1＝8 次（三处评分者一律不装，防通胀）",
+      noCore.length === 8, "实测 " + noCore.length);
     ok("装内功的每一次也都装了 100 条总原则", withCore.every((c) => /长期总原则 100 条/.test(c.body.messages[0].content)));
     ok("装内功的每一次都带术语纪律", withCore.every((c) => /S＝显露\(Show\)/.test(c.body.messages[0].content)));
     ok("三观点提示里明令写完就停、不许调和", /写完就停/.test(chats[0].body.messages[1].content));
@@ -198,7 +210,8 @@ async function drive(w, mode, opts) {
     ok("胜出者带着分数", w.__sdeArt.last().winner.score != null);
     ok("综合提炼落到页面上", /评分卡开出的作业/.test(w.document.getElementById("synthOut").textContent));
     ok("草稿已落 localStorage（第 0 层保底）", !!w.localStorage.getItem("sde_art_draft"));
-    ok("九个格子都渲染出来了", w.document.querySelectorAll("#drawOut .b9 .g").length === 27, // 3 路 × 9 格
+    ok("两本账的格子都渲染出来（3 路 ×（九分项 9 ＋ 五维 5）＝42）",
+      w.document.querySelectorAll("#drawOut .b9 .g").length === 42,
       "实测 " + w.document.querySelectorAll("#drawOut .b9 .g").length);
     ok("三路共 9 张图渲染出来", w.document.querySelectorAll("#drawOut .shot img").length === 9,
       "实测 " + w.document.querySelectorAll("#drawOut .shot img").length);
@@ -206,7 +219,7 @@ async function drive(w, mode, opts) {
 
   /* ═════ 二、三档差异真生效 ═════ */
   group("二、三档差异");
-  for (const [m, wantChats, wantDraws] of [["A", 6, 1], ["C", 6, 1], ["B", 10, 3]]) {
+  for (const [m, wantChats, wantDraws] of [["A", 7, 1], ["C", 7, 1], ["B", 13, 3]]) {
     const { w, calls } = await boot(happyScript());
     await drive(w, m, {});
     const chats = calls.filter((c) => /chat\/completions$/.test(c.target));
@@ -265,8 +278,8 @@ async function drive(w, mode, opts) {
     await drive(w, "B", {});
     const ps = w.__sdeArt.last().paras.filter(Boolean);
     ok("评分卡解析失败记 null，不打崩流程", ps.some((p) => p.score === null) && ps.some((p) => p.score != null));
-    ok("胜出的是真评上分的那个，不是记 null 的",
-      w.__sdeArt.last().winner.score != null);
+    ok("九分项评分卡解析失败时，胜出仍由五维定（两本账互不拖累）",
+      w.__sdeArt.last().winner.iqTotal != null);
   }
   {
     // ⑥ 基底只给两条观点
@@ -306,9 +319,11 @@ async function drive(w, mode, opts) {
       collide.body.messages[1].content.indexOf("近邻闸门的核查结论") >= 0
       && collide.body.messages[1].content.indexOf("占位失败") >= 0);
     const synth = chats[chats.length - 1];
-    ok("综合提炼吃到了胜出典范＋评分卡＋落选典范三样",
-      /胜出典范/.test(synth.body.messages[1].content) && /九宫格评分卡/.test(synth.body.messages[1].content)
-      && /落选典范/.test(synth.body.messages[1].content));
+    ok("综合提炼吃到四样：胜出典范＋九分项读数＋五维读数＋落选典范",
+      /胜出典范/.test(synth.body.messages[1].content) && /九分项读数/.test(synth.body.messages[1].content)
+      && /五维刻度/.test(synth.body.messages[1].content) && /落选典范/.test(synth.body.messages[1].content));
+    ok("综合提炼里两本账分开写、不许合并成一个总评",
+      /两本账分开写[，,]?\s*不许合并成一个总评/.test(synth.body.messages[1].content));
   }
 
   /* ═════ 五、确定性 ═════ */
@@ -336,6 +351,7 @@ async function drive(w, mode, opts) {
       if (/image_generation$/.test(rec.target)) return imgOK(1);
       const sys = rec.body.messages[0].content, u = String(rec.body.messages[1].content);
       if (/图像占位核查员/.test(sys)) return chatOK(GATE_REPLY);
+      if (/创新度量员/.test(sys)) return chatOK(IQ5_REPLY);
       if (/画面审看者/.test(sys)) return chatOK(B9_REPLY);
       if (/本轮碰撞方式/.test(u))
         return chatOK("一、典范名：甲\n二、承重命题：不是A也不是B而是C\n七、绘图指令：a taut horizontal seam across the whole frame, loose fibre meeting dense stone, low raking side light, matte surface, weight gathered low");
@@ -356,6 +372,7 @@ async function drive(w, mode, opts) {
       if (/image_generation$/.test(rec.target)) return imgOK(1);
       const sys = rec.body.messages[0].content, u = String(rec.body.messages[1].content);
       if (/图像占位核查员/.test(sys)) return chatOK(GATE_REPLY);
+      if (/创新度量员/.test(sys)) return chatOK(IQ5_REPLY);
       if (/画面审看者/.test(sys)) return chatOK(B9_REPLY);
       if (/本轮碰撞方式/.test(u))
         return chatOK("一、典范名：甲\n二、承重命题：不是A也不是B而是C\n七、绘图指令：a swirling night field in the manner of Van Gogh, Escher-like impossible stair, thick impasto, no text");
@@ -404,6 +421,7 @@ async function drive(w, mode, opts) {
       if (/image_generation$/.test(rec.target)) return imgOK(1);
       const sys = rec.body.messages[0].content, u = String(rec.body.messages[1].content);
       if (/图像占位核查员/.test(sys)) return chatOK(GATE_REPLY);
+      if (/创新度量员/.test(sys)) return chatOK(IQ5_REPLY);
       if (/画面审看者/.test(sys))
         return chatOK([
           "关系｜90｜稳", "影响｜10｜后段没有回写前段，结构与连接都被拖累，活力也差", "共存｜90｜稳",
@@ -428,6 +446,7 @@ async function drive(w, mode, opts) {
       if (/image_generation$/.test(rec.target)) return imgOK(1);
       const sys = rec.body.messages[0].content, u = String(rec.body.messages[1].content);
       if (/图像占位核查员/.test(sys)) return chatOK(GATE_REPLY);
+      if (/创新度量员/.test(sys)) return chatOK(IQ5_REPLY);
       if (/画面审看者/.test(sys)) return chatOK(B9_REPLY);
       if (/本轮碰撞方式/.test(u))
         return chatOK("一、典范名：甲\n七、绘图指令：a taut horizontal seam across the whole frame, loose fibre meeting dense stone, low raking side light, matte\n八、附注：本条为自选补充，不属于绘图指令\n九、备注：随手写的");
@@ -469,6 +488,7 @@ async function drive(w, mode, opts) {
       if (/image_generation$/.test(rec.target)) return imgOK(1);
       const sys = rec.body.messages[0].content, u = String(rec.body.messages[1].content);
       if (/图像占位核查员/.test(sys)) return chatOK(GATE_REPLY);
+      if (/创新度量员/.test(sys)) return chatOK(IQ5_REPLY);
       if (/画面审看者/.test(sys)) return chatOK(B9_REPLY);
       if (/本轮碰撞方式/.test(u)) return chatOK(paraReply("甲"));
       if (/要你写/.test(u)) return chatOK(SYNTH_REPLY);
@@ -483,6 +503,65 @@ async function drive(w, mode, opts) {
     ok("内功缺了，术语纪律与承重纪律仍然在场（那是写死的不是取来的）",
       chats.every((c) => !/本轮碰撞方式/.test(String(c.body.messages[1].content))
         || /S＝显露\(Show\)/.test(c.body.messages[0].content)));
+  }
+
+  /* ═════ 九、两本账与死格化（本轮新增） ═════ */
+  group("九、两本账与死格化");
+  {
+    const { w, calls } = await boot(happyScript());
+    await drive(w, "B", {});
+    const chats = calls.filter((c) => /chat\/completions$/.test(c.target));
+    const iq = chats.filter((c) => /创新度量员/.test(c.body.messages[0].content));
+    ok("五维评分环真的跑了三次（每路一次）", iq.length === 3, "实测 " + iq.length);
+    ok("五维评的是典范文本，不带图（省钱且对得上对象）",
+      iq.every((c) => typeof c.body.messages[1].content === "string"));
+    ok("五维提示写死权重 .25 在差异维（五维中最高）", /差异维（D，权重 0.25）/.test(iq[0].body.messages[0].content));
+    ok("五维提示写死 150 为本体论级门槛", /一百五十分为本体论级门槛/.test(iq[0].body.messages[0].content));
+    ok("五维提示写死「不裁决私人发生·两本账永远分开记」",
+      /不裁决任何一次私人发生/.test(iq[0].body.messages[0].content)
+      && /两本账[，,]?\s*永远分开记/.test(iq[0].body.messages[0].content));
+    ok("五维提示写死「纠缠维骗不到分」", /纠缠维骗不到分/.test(iq[0].body.messages[0].content));
+    ok("五维提示要求校准年代棋盘", /校准年代棋盘/.test(iq[0].body.messages[0].content));
+
+    const last = w.__sdeArt.last();
+    const p0 = last.paras.filter(Boolean)[0];
+    // 桩卡：S132 D141 E128 I130 F120 → .2*132+.25*141+.2*128+.2*130+.15*120 = 26.4+35.25+25.6+26+18 = 131.25 → 131
+    ok("五维加权总分按书里的权重算（桩卡应得 131）", p0.iqTotal === 131, "实测 " + p0.iqTotal);
+    ok("三种指纹判出来了", !!(p0.fp && p0.fp.n));
+    ok("九分项与五维两个读数并存、没有合并成一个总分",
+      p0.score != null && p0.iqTotal != null && p0.score !== p0.iqTotal);
+    ok("择优用的是五维（典范这一本账）", last.winner.iqTotal != null);
+    ok("页面上两本账分开印（九分项与五维各一枚标签）",
+      /九分项 \d+/.test(w.document.getElementById("drawOut").innerHTML)
+      && /五维 \d+/.test(w.document.getElementById("drawOut").innerHTML));
+
+    // 死格化
+    const gateIn = chats.filter((c) => /图像占位核查员/.test(c.body.messages[0].content))[0];
+    ok("进闸门带上了死格化病征表", /死格化病征表/.test(gateIn.body.messages[0].content));
+    ok("四种病征齐（打卡化／十五秒消费／防弹玻璃式／语法失传）",
+      ["打卡化", "十五秒消费", "防弹玻璃式", "语法失传"].every((n) => gateIn.body.messages[0].content.indexOf(n) >= 0));
+    ok("打卡化的判据写成可执行的一问（最合理的用途是不是当背景板）",
+      /最合理的用途是不是当背景板/.test(gateIn.body.messages[0].content));
+    ok("进闸门要求逐条回答死格风险", /死格风险/.test(gateIn.body.messages[1].content));
+    const goOut = chats.filter((c) => /看着\*{0,2}成品图\*{0,2}/.test(c.body.messages[0].content))[0];
+    ok("出闸门（看着图）也带死格化病征表", goOut && /死格化病征表/.test(goOut.body.messages[0].content));
+    ok("出闸门明写死格比撞图式更该说", goOut && /当代第一死因[，,]?\s*比撞图式更该说/.test(uText(goOut)));
+    const b9 = chats.filter((c) => /画面审看者/.test(c.body.messages[0].content))[0];
+    ok("看图评分的 system 里带死格化病征表", /死格化病征表/.test(b9.body.messages[0].content));
+    ok("看图评分的当轮问话里写明：中了打卡化或十五秒消费就压「活力」",
+      /中了「打卡化」或「十五秒消费」/.test(uText(b9)) && /必须给低分/.test(uText(b9)),
+      uText(b9).slice(-90));
+  }
+  {
+    // 五维评不出来 → 不打崩，且择优退回九分项并说出来
+    const { w } = await boot(happyScript({ iqGarbage: true }));
+    await drive(w, "B", {});
+    ok("五维全评不出来时照样出图、照样提炼", !!(w.__sdeArt.last() && w.__sdeArt.last().synth));
+    // 换尺告知必须走必达通道：状态行会被后一条 say 盖掉，所以查步骤标签与提炼正文
+    ok("五维评不出来时择优退回九分项，且换尺这件事写进了提炼正文（必达通道）",
+      /退回九分项/.test(w.document.getElementById("synthOut").textContent),
+      w.document.getElementById("synthOut").textContent.slice(0, 40));
+    ok("换尺也写进了步骤标签", /退回九分项择优/.test(w.document.getElementById("steps").textContent));
   }
 
   console.log("\n" + "═".repeat(52));

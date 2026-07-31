@@ -32,7 +32,13 @@ const src = [
   extract(/function placeBrief\(\)\{[\s\S]*?\n}/, "placeBrief"),
   extract(/var B9 = \[[\s\S]*?\n\];/, "B9"),
   extract(/var MODES = \{[\s\S]*?\n\};/, "MODES"),
-  extract(/function cellScore\(txt, name\)\{[\s\S]*?\n}/, "cellScore"),
+  extract(/function cellScore\(txt, name, hi\)\{[\s\S]*?\n}/, "cellScore"),
+  extract(/var IQ5 = \[[\s\S]*?\n\];/, "IQ5"),
+  extract(/var IQ5_GATE = \d+;/, "IQ5_GATE"),
+  extract(/function fingerprint\(m\)\{[\s\S]*?\n}/, "fingerprint"),
+  extract(/function selfCheck\(m\)\{[\s\S]*?\n}/, "selfCheck"),
+  extract(/var DEAD_FORMS = \[[\s\S]*?\n\];/, "DEAD_FORMS"),
+  extract(/function deadBrief\(\)\{[\s\S]*?\n}/, "deadBrief"),
   extract(/function scoreOf\(txt, accent\)\{[\s\S]*?\n}/, "scoreOf"),
   extract(/var ARTIST_RE = new RegExp\([\s\S]*?\);/, "ARTIST_RE"),
   extract(/var BAN_TAIL = "[^"]*";/, "BAN_TAIL"),
@@ -43,7 +49,7 @@ const src = [
 const box = {};
 new Function("box", src + "\nbox.WAYS=WAYS;box.pickWays=pickWays;box.PLACE_SDE=PLACE_SDE;box.PLACE_CLICHE=PLACE_CLICHE;"
   + "box.PLACE_STYLE=PLACE_STYLE;box.placeBrief=placeBrief;box.B9=B9;box.MODES=MODES;"
-  + "box.scoreOf=scoreOf;box.cutBlocks=cutBlocks;box.grab=grab;box.cellScore=cellScore;box.hardenPrompt=hardenPrompt;box.BAN_TAIL=BAN_TAIL;")(box);
+  + "box.scoreOf=scoreOf;box.cutBlocks=cutBlocks;box.grab=grab;box.cellScore=cellScore;box.hardenPrompt=hardenPrompt;box.BAN_TAIL=BAN_TAIL;box.IQ5=IQ5;box.IQ5_GATE=IQ5_GATE;box.fingerprint=fingerprint;box.selfCheck=selfCheck;box.DEAD_FORMS=DEAD_FORMS;box.deadBrief=deadBrief;")(box);
 
 /* ═════ 一、六种碰撞方式与抽签器（真跑） ═════ */
 group("一、六方式与抽签器");
@@ -209,7 +215,9 @@ ok("碰撞三条禁令在场（不许挑一个当结论/不许调和/不许编�
 ok("想象力只作用于形式与结构，不作用于事实", /只作用于形式与结构[，,]?\s*不作用于事实/.test(js));
 ok("典范骨架七节固定（供背靠背评分）", /一、典范名[\s\S]{0,900}七、绘图指令/.test(js));
 ok("综合提炼六节含「落选典范的可回收零件」", /三、落选典范的可回收零件/.test(js));
-ok("综合提炼含「评分卡开出的作业」且禁空话", /五、评分卡开出的作业[\s\S]{0,120}禁「加强构图」这类空话/.test(js));
+ok("综合提炼含「两张卡开出的作业」，且两本账分开写、禁空话",
+  /五、两张卡开出的作业[\s\S]{0,220}禁「加强构图」「加强创新」这类空话/.test(js)
+  && /两本账分开写/.test(js));
 ok("单路失败不拖垮另外两路", /单路失败不拖垮另外两路/.test(js) && /paras\.push\(null\)/.test(js));
 ok("三路全挂则报错收场、不进出图不污染交付", /三路碰撞全挂了[\s\S]{0,40}不污染交付/.test(js));
 ok("评分失败记 null 不打崩流程", /评分失败记 0 不打崩流程/.test(js));
@@ -273,27 +281,97 @@ group("十一之三、cellScore 锚定行首");
   ok("整行没这一格就返回 null（不猜）", box.cellScore(card, "不存在的格") === null);
   // 只准有一处取分逻辑：定义 1 处 ＋ 调用 2 处（scoreOf 与 renderDraw）。
   // 旧的「哪一行含格名就算哪一行」写法必须绝迹（accent.indexOf 是权重查表，不算取分）。
-  ok("格子渲染与总分共用同一把尺（源码里只有一处取分逻辑）",
-    (js.match(/cellScore\(/g) || []).length === 3
+  // 定义 1 处 ＋ 调用 4 处（九分项 scoreOf 与卡片渲染、五维评分环与卡片渲染）
+  ok("取分只有一处逻辑，四处调用共用它",
+    (js.match(/cellScore\(/g) || []).length === 5
     && !/forEach\(function\(L\)\{ if\(L\.indexOf\(g\[0\]\)/.test(js)
     && !/p\.report\.split\(\/\\n\/\)\.forEach/.test(js));
+}
+
+/* ═════ 十一之四、五维刻度（第十七章）＝典范那一本账 ═════ */
+group("十一之四、五维刻度");
+{
+  ok("五维齐 S/D/E/I/F", box.IQ5.length === 5
+    && JSON.stringify(box.IQ5.map(d => d[1])) === JSON.stringify(["S", "D", "E", "I", "F"]));
+  ok("权重照书：.20/.25/.20/.20/.15",
+    JSON.stringify(box.IQ5.map(d => d[2])) === JSON.stringify([0.20, 0.25, 0.20, 0.20, 0.15]));
+  ok("权重之和为 1", Math.abs(box.IQ5.reduce((a, d) => a + d[2], 0) - 1) < 1e-9);
+  ok("差异维权重最高（书里明写五维中权重最高的一维）",
+    box.IQ5.find(d => d[1] === "D")[2] === Math.max(...box.IQ5.map(d => d[2])));
+  ok("本体论级门槛＝150", box.IQ5_GATE === 150);
+  ok("纠缠维判据写死「差异维可以骗到分，纠缠维骗不到」",
+    /差异维可以骗到分[，,]?\s*纠缠维骗不到/.test(box.IQ5.find(d => d[1] === "E")[3]));
+  ok("穿透维判据写死它是滞后指标故权重最轻", /滞后指标/.test(box.IQ5.find(d => d[1] === "F")[3]));
+
+  // 量程：五维是 100–170 向上开放的尺，九分项是 0–100 的尺 —— 同一函数两把尺，量程必须由调用方交代
+  const card5 = "结构维｜132｜x\n差异维｜141｜x\n纠缠维｜128｜x\n整合维｜130｜x\n穿透维｜120｜x";
+  ok("五维取分不被 100 钳死（传 hi=200）", box.cellScore(card5, "差异维", 200) === 141,
+    String(box.cellScore(card5, "差异维", 200)));
+  ok("不传 hi 时仍按九分项的 0–100 钳（默认不变）", box.cellScore(card5, "差异维") === 100);
+  const tot = box.IQ5.reduce((a, d) => a + box.cellScore(card5, d[0], 200) * d[2], 0);
+  ok("加权总分照书算＝131", Math.round(tot) === 131, String(Math.round(tot)));
+
+  // 三种指纹
+  ok("杰作指纹＝差异与穿透双高", box.fingerprint({ S: 120, D: 150, E: 130, I: 130, F: 145 }).n === "杰作指纹");
+  ok("行活指纹＝结构虚高·差异趴地·纠缠近零",
+    box.fingerprint({ S: 130, D: 110, E: 105, I: 120, F: 100 }).n === "行活指纹");
+  ok("佳作指纹＝各维均衡良好但未重置棋盘",
+    box.fingerprint({ S: 130, D: 128, E: 130, I: 130, F: 120 }).n === "佳作指纹");
+  ok("杰作指纹要提醒「完全未必圆润」", /完全/.test(box.fingerprint({ S: 120, D: 150, E: 130, I: 130, F: 145 }).d));
+  ok("没有读数时返回 null（不猜指纹）", box.fingerprint(null) === null);
+
+  // 自检表：把那声模糊的「不对劲」翻译成可动手的坐标
+  ok("新而空 → 指向纠缠维", /查纠缠维/.test(box.selfCheck({ S: 120, D: 145, E: 115, I: 120, F: 120 })));
+  ok("厚而旧 → 指向差异维", /查差异维/.test(box.selfCheck({ S: 120, D: 110, E: 140, I: 120, F: 120 })));
+  ok("处处精彩整体散 → 指向整合维", /查整合维/.test(box.selfCheck({ S: 145, D: 125, E: 125, I: 120, F: 120 })));
+  ok("均衡时不乱开药方", box.selfCheck({ S: 130, D: 130, E: 130, I: 130, F: 130 }) === "");
+}
+
+/* ═════ 十一之五、死格化病征（绘画的当代第一死因） ═════ */
+group("十一之五、死格化病征");
+{
+  const names = box.DEAD_FORMS.map(d => d[0]);
+  ok("四种病征齐", box.DEAD_FORMS.length === 4);
+  ok("打卡化在场（举手机＝把三号位入场券换成一号位到场证明）", names.includes("打卡化"));
+  ok("十五秒消费在场", names.includes("十五秒消费"));
+  ok("防弹玻璃式在场", names.includes("防弹玻璃式"));
+  ok("语法失传在场", names.includes("语法失传"));
+  ok("每条都给出可执行的判据（含「判据＝」）", box.DEAD_FORMS.every(d => /判据＝/.test(d[1])));
+  const db = box.deadBrief();
+  ok("病征表点明绘画的现职是减速装置", /减速装置/.test(db));
+  ok("病征表写明「中一条就要在读数里说出来」", /中一条就要在读数里说出来/.test(db));
+  ok("三处评分都吃到死格判据（进闸门/出闸门/看图）",
+    (js.match(/deadBrief\(\)/g) || []).length >= 4);   // 定义 1 ＋ 调用 3
+}
+
+/* ═════ 十一之六、两本账不许合并 ═════ */
+group("十一之六、两本账");
+{
+  ok("择优用五维（择的是典范）", /if\(byIQ\)\{ if\(!winner \|\| \(p\.iqTotal\|\|0\) > \(winner\.iqTotal\|\|0\)\)/.test(js));
+  ok("五维全缺才退回九分项，且必须说出来", /退回九分项择优/.test(js) && /不许悄悄换尺/.test(js));
+  ok("换尺告知走必达通道（不只靠会被盖掉的状态行）",
+    /fallbackNote/.test(js) && /\$\("synthOut"\)\.textContent = fallbackNote/.test(js));
+  ok("提炼提示明令两本账分开写、不许合并成一个总评", /两本账分开写[，,]?\s*不许合并成一个总评/.test(js));
+  ok("五维提示写死「不裁决私人发生」", /不裁决任何一次私人发生/.test(js));
+  ok("页面上两本账各印一枚标签", /九分项 '\+p\.score/.test(js) && /五维 '\+p\.iqTotal/.test(js));
+  ok("过 150 的才标本体论级", /p\.iqTotal>=150\?' · 本体论级'/.test(js));
 }
 
 /* ═════ 十二、成本算术 ═════ */
 group("十二、成本算术");
 function costOf(ways, per) {
-  const calls = 1 + 1 + ways + ways + 1 + 1;
+  const calls = 1 + 1 + ways + ways + ways + 1 + 1;   // 三观点/进闸/碰撞/五维/看图/出闸/提炼
   const shots = ways * per;
   return { calls, shots, yuan: shots * 0.025 + calls * (21000 * 2.10 / 1e6 + 2000 * 8.40 / 1e6) };
 }
 const cB = costOf(3, 3);
 // 10 次＝三观点1＋进闸门1＋碰撞3＋看图评分3＋出闸门1＋综合提炼1。设计书初稿写的「约12次」是估的，以本式为准。
-ok("B 档全套＝10 次调用 ＋ 9 张图", cB.calls === 10 && cB.shots === 9, "calls=" + cB.calls + " shots=" + cB.shots);
-ok("B 档全套约 1 元（0.8–1.2）", cB.yuan > 0.8 && cB.yuan < 1.2, cB.yuan.toFixed(3));
+ok("B 档全套＝13 次调用 ＋ 9 张图", cB.calls === 13 && cB.shots === 9, "calls=" + cB.calls + " shots=" + cB.shots);
+ok("B 档全套约 1.2 元（1.0–1.4）", cB.yuan > 1.0 && cB.yuan < 1.4, cB.yuan.toFixed(3));
 const cA = costOf(1, 3);
-ok("A 档＝6 次调用 ＋ 3 张图", cA.calls === 6 && cA.shots === 3);
+ok("A 档＝7 次调用 ＋ 3 张图", cA.calls === 7 && cA.shots === 3);
 // A 档省的是碰撞与看图各两路，但内功装载是每次调用都付，所以省不到一半——写实数，别写好听的。
-ok("A 档约为 B 档的一半略多（0.45–0.60）", cA.yuan / cB.yuan > 0.45 && cA.yuan / cB.yuan < 0.60,
+ok("A 档约为 B 档的一半略多（0.45–0.62）", cA.yuan / cB.yuan > 0.45 && cA.yuan / cB.yuan < 0.62,
   cA.yuan.toFixed(3) + " / " + cB.yuan.toFixed(3) + " = " + (cA.yuan / cB.yuan).toFixed(3));
 ok("页面里的成本算式与本表同源（同为 0.025/张、2.10 与 8.40 元每百万）",
   /0\.025/.test(js) && /2\.10/.test(js) && /8\.40/.test(js));

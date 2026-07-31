@@ -79,7 +79,8 @@ footer{border-top:1px solid var(--line);color:var(--dim);font-size:13px;padding:
   <p style="color:#C9A34E"><b>画布是乐谱，视线是演奏者，构图是记在空间里的时间指令。</b></p>
   <p>所以下笔前先答三问：这幅画要让<b>识别机在哪一处故障</b>？势能是「看」的<b>认知反叛</b>还是「看」的<b>存在密写</b>？那次故障显露成什么可见形状？</p>
   <p style="color:#C9A34E"><b>作废判据：</b>如果这张画只是让人「认出」了什么、识别一完成观看就结束——它停在一号位的物，作废重来。</p>
-  <p style="color:#8B98A5;font-size:13.5px">评分用书里第五章交付的正典仪器「三号位九分项坐标仪」：分布之三（关系·影响·共存）· 场之三（连接·次序·结构）· 美之三（完全·纯一·活力）。</p>
+  <p style="color:#8B98A5;font-size:13.5px"><b>两本账，分开记。</b>画面这一本用第五章交付的「三号位九分项坐标仪」：分布之三（关系·影响·共存）· 场之三（连接·次序·结构）· 美之三（完全·纯一·活力）；典范这一本用第十七章的<b>五维刻度</b>（S 结构 .20／D 差异 .25／E 纠缠 .20／I 整合 .20／F 穿透 .15，<b>150 为本体论级门槛</b>）。择优看五维——择的是典范；九分项是画面兑现度的独立读数，<b>两者绝不合并成一个总分</b>。</p>
+  <p style="color:#8B98A5;font-size:13.5px">出图前后各查一次占位，并同时查<b>死格化</b>四病征（打卡化／十五秒消费／防弹玻璃式／语法失传）——图像已经通货膨胀，绘画的现职是<b>减速装置</b>，一眼看完的东西没有第二次发生。</p>
 </section>
 
 <div class="card">
@@ -182,7 +183,7 @@ footer{border-top:1px solid var(--line);color:var(--dim);font-size:13px;padding:
 var PROXY = "/api/llm-proxy";
 var MODEL = "MiniMax-M3";           // 思考与看图（M2.x 看不了图，必须 M3）
 var IMGMODEL = "image-01";
-var VERSION = 1;
+var VERSION = 2;
 
 function $(id){ return document.getElementById(id); }
 function esc(s){ return String(s==null?"":s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];}); }
@@ -282,6 +283,49 @@ function placeBrief(){
 }
 
 /* ── 美的九宫格（图像版判据）。不加第十格，只在原九格里挂图像判据 ── */
+/* ── 五维刻度（第十七章）。与九分项**分属两本账**：
+     九分项量这一张画的场，五维量这个典范对领域棋盘的回写。绝不合并成一个总分。
+     权重取自书：S .20 / D .25 / E .20 / I .20 / F .15；一百五十分为本体论级门槛。 ── */
+var IQ5 = [
+  ["结构维","S",0.20,"新显露的稳定性与不可还原度。这个场是否真的立住了（三柱：完全·纯一·活力），以及能否被拆解为已有形式的加权组合？可还原者得低分——再精致也是重组。"],
+  ["差异维","D",0.25,"路径的原创深度，五维中权重最高。这条路离既有轨道多远：轨道内的精致化、轨道的延伸、还是新轨道的开辟？衡量时必须校准年代棋盘。"],
+  ["纠缠维","E",0.20,"接入土壤的厚度：它接通的现实界经验、理念界传统、自我界势能厚不厚。**差异维可以骗到分，纠缠维骗不到**——薄土之上立不起厚场；为怪而怪在此维现形。"],
+  ["整合维","I",0.20,"整体的咬合度：新元素与全体的相互需要程度。拿掉任何一部分，整体是否塌？各部分是拼盘还是器官？炫技之作多在此维失血。"],
+  ["穿透维","F",0.15,"回写的力度：这件作品完成后，领域的棋盘被重置了多少？它之后，同行还能不能装作它不存在。滞后指标，故权重最轻，却是区分「当年惊艳」与「改写历史」的最后一刀。"]
+];
+var IQ5_GATE = 150;   // 本体论级门槛：过线的作品不只是优秀，它重置了棋盘
+/* 三种分数结构指纹（第十七章第三节）——比总分有用得多 */
+function fingerprint(m){
+  if(!m) return null;
+  var S=m.S, D=m.D, E=m.E, I=m.I, F=m.F;
+  if(D!=null && F!=null && D>=140 && F>=135) return {n:"杰作指纹", d:"差异维与穿透维双高——新轨道加上不可逆的回写。注意：这一类的「完全」未必圆润，掀桌子的作品初看常是破的，它的完全性在深层咬合处。"};
+  if(E!=null && D!=null && S!=null && S>=125 && D<=115 && E<=110) return {n:"行活指纹", d:"结构维虚高（形态完整）、差异维趴地（全程秩序态）、纠缠维近零（无势能注入）——一具保存完好的空壳。总分或许及格，指纹一目了然。"};
+  return {n:"佳作指纹", d:"各维均衡地良好：真实的路径推进、扎实的土壤、立得住的场，但差异维停在轨道延伸段，穿透维有限——它丰富了棋盘，没有重置棋盘。健康的生态里佳作是大多数，且理应是大多数。"};
+}
+/* 反向使用即自检表（第十七章第四节）：把那声模糊的「不对劲」翻译成可动手的坐标 */
+function selfCheck(m){
+  if(!m) return "";
+  var out=[];
+  if(m.D!=null && m.E!=null && m.D-m.E>=20) out.push("新而空——差异跑在了土壤前面，查纠缠维");
+  if(m.E!=null && m.D!=null && m.E-m.D>=20) out.push("厚而旧——势能在旧模具里浇铸，查差异维");
+  if(m.I!=null && m.S!=null && m.S-m.I>=20) out.push("处处精彩整体散——查整合维");
+  return out.join("；");
+}
+
+/* ── 死格化病征表（第二章的防弹玻璃与十五秒、第二十三章第五节的打卡化）。
+     这不是「撞上了谁」，是「这张画会不会一出生就死格」——死格化是绘画的当代第一死因。 ── */
+var DEAD_FORMS = [
+  ["打卡化",   "一眼可拍、拍完即走：举起手机的那个动作，把三号位的入场券换成了一号位的到场证明。判据＝这张图最合理的用途是不是当背景板。"],
+  ["十五秒消费","信息一次给完，没有第二眼可看：识别完成即观看结束。判据＝再看一分钟，还有没有新东西长出来。"],
+  ["防弹玻璃式","有名作的气派而无入场的通道：观者只能站在它对面确认它在，进不去。判据＝画里有没有一处是留给观者进来的。"],
+  ["语法失传",  "只有掌握某套已失传的观看语法才进得去——通道断则场难开。判据＝一个没有受过训练的人能不能自己走进去。"]
+];
+function deadBrief(){
+  return "【死格化病征表】绘画的当代第一死因不是画得差，是死格——图像已经通货膨胀，而绘画的现职是**减速装置**：\n"
+    + "在十五秒的世界里做一座公然的减速带。以下四种病征，中一条就要在读数里说出来：\n"
+    + DEAD_FORMS.map(function(d){ return "· " + d[0] + "：" + d[1]; }).join("\n") + "\n";
+}
+
 var B9 = [
   ["关系","分布·规范轴", "元素不由自身定义，而由它与场中其他元素的相互位置定义。一块灰色置于冷蓝中发暖、移到橙红旁转沉静——颜料成分没变，变的是关系。画面里若每个元素单独看也一样，关系分项为零"],
   ["影响","分布·规范轴", "新入场的元素回写全部旧元素的意义。看到画面某一处之后，先看过的部分是否被整个重新照亮？三号位的场中没有任何已发生的部分是封存的"],
@@ -465,7 +509,7 @@ function fail(msg){
 /* ── 成本估算 ──────────────────────────────────────────────── */
 function calcCost(){
   var ways = MODES[MODE].ways, per = parseInt($("perWay").value,10)||3;
-  var calls = 1 /*tri*/ + 1 /*gateIn*/ + ways /*collide*/ + ways /*audit*/ + 1 /*gateOut*/ + 1 /*synth*/;
+  var calls = 1 /*tri*/ + 1 /*gateIn*/ + ways /*collide*/ + ways /*五维*/ + ways /*audit*/ + 1 /*gateOut*/ + 1 /*synth*/;
   var shots = ways*per;
   var yuanImg = shots*0.025;
   var yuanTxt = calls*(21000*2.10/1e6 + 2000*8.40/1e6);
@@ -503,6 +547,7 @@ async function run(again){
 
   var names = ["装内功与 100 条总原则","三视觉观点（一次出三条，彼此不相容）","近邻闸门·进（压 50 字查占位库）"];
   ways.forEach(function(w){ names.push("二阶碰撞 "+w.n+"：" + w.t); });
+  ways.forEach(function(w){ names.push("五维刻度 "+w.n+"（S/D/E/I/F · 典范这一本账）"); });
   ways.forEach(function(w){ names.push("出图 "+w.n+"（image-01 × "+per+"）"); });
   ways.forEach(function(w){ names.push("M3 看图 · 九宫格评分 "+w.n); });
   names.push("近邻闸门·出（看着图查，不是看 prompt 查）");
@@ -538,15 +583,16 @@ async function run(again){
 
     /* ③近邻闸门·进（不装内功——照 mode=iq 防通胀纪律） */
     mark(si,"run"); say("近邻闸门：拿压缩句去查图像占位库…");
-    var gateSys = "你是图像占位核查员。你**不带任何学派立场**，只做一件事：判断一句视觉命题是否已经被现成图式占住。\n"
-      + placeBrief()
+    var gateSys = "你是图像占位核查员。你**不带任何学派立场**，做两件事：①判断一句视觉命题是否已经被现成图式占住；②判断它会不会一出生就死格。\n"
+      + placeBrief() + "\n" + deadBrief()
       + "\n【三条纪律】\n① 库里没有 ≠ 没被占位。库里没有就写〔库未命中〕，**不得据此判定通过**。\n"
       + "② 通过的条件不是「找不到近邻」，而是「带着一条**可裁决的分离线**活下来」——你要能说出：占位图式在哪个具体可见特征上是 A，而这一条是非 A，这个差别怎么用眼睛读出来。\n"
       + "③ 说不出分离线，就判占位失败。\n";
     var gateUser = "逐条核查下面三条视觉命题。每条按这个格式回答，不要别的：\n"
       + "条N｜判定：〔占位失败〕或〔通过〕或〔库未命中·不放行〕\n"
       + "条N｜撞上：写出撞上的具体图式名；没撞上写「无」\n"
-      + "条N｜分离线：占位图式在【某可见特征】上是 A，本条是非 A，读法是……（判定为通过时必须写满这一行）\n\n"
+      + "条N｜分离线：占位图式在【某可见特征】上是 A，本条是非 A，读法是……（判定为通过时必须写满这一行）\n"
+      + "条N｜死格风险：中了哪一条病征就写出病名与理由；一条都不中写「无」\n\n"
       + views.map(function(v,i){ return "【条"+(i+1)+"】" + v; }).join("\n\n");
     var gateTxt = await mmChat(gateSys, gateUser, 2200);
     mark(si,"done"); si++;
@@ -595,6 +641,43 @@ async function run(again){
     var live = paras.filter(function(p){ return p; });
     if(!live.length) throw new Error("三路碰撞全挂了，不进出图、不污染交付。");
 
+    /* ④之二：五维刻度（不装内功——评分者装了会对 SDE 语言过敏性加分） */
+    for(var wq=0; wq<ways.length; wq++){
+      var pq = paras[wq];
+      if(!pq){ mark(si,"fail","上一步没出典范"); si++; continue; }
+      mark(si,"run"); say("第 "+(wq+1)+" 路：五维刻度评这个典范对棋盘的回写…");
+      try{
+        var iqSys = "你是创新度量员。你**不带学派立场**，只按下面这把尺读数。\n"
+          + "这把尺量的是**这个典范对领域棋盘的回写力度**，**不裁决任何一次私人发生的真伪**——两本账，永远分开记。\n"
+          + "评分是刻画不是在场：它服务于比较与教学，永远替代不了进场本身。\n\n"
+          + "五个维度与权重：\n"
+          + IQ5.map(function(d){ return "· " + d[0] + "（" + d[1] + "，权重 " + d[2] + "）：" + d[3]; }).join("\n")
+          + "\n\n刻度说明：每维给一个 100–170 的整数，向上开放；一百五十分为本体论级门槛——过线的不只是优秀，它重置了棋盘。\n"
+          + "**衡量差异维时必须校准年代棋盘**：在别人做过之后再做一次，与第一次做出来，路径深度天差地别。\n"
+          + "**纠缠维骗不到分**：无根的新奇（为怪而怪）在此维必须现形。\n\n"
+          + "严格按每行一维输出，共五行，不要别的：\n维名｜分数｜一句为什么\n"
+          + "然后另起一行写「弱在」：指出最弱的一维，并给一条可动手的坐标（不许写「加强创新」这类空话）。";
+        var iqUser = "【要评的典范】\n" + pq.txt.slice(0, 3000)
+          + "\n\n【它撞出来的方式】" + pq.way.t
+          + "\n\n请按五维读数。注意：你评的是这个**典范**（一个视觉命题），不是评一张具体的画。";
+        var iqTxt = await mmChat(iqSys, iqUser, 1600);
+        pq.iqReport = iqTxt;
+        pq.iq = {};
+        IQ5.forEach(function(d){ pq.iq[d[1]] = cellScore(iqTxt, d[0], 200); });
+        var sum=0, wsum=0;
+        IQ5.forEach(function(d){ var v=pq.iq[d[1]]; if(v!=null){ sum+=v*d[2]; wsum+=d[2]; } });
+        pq.iqTotal = wsum ? Math.round(sum/wsum) : null;
+        pq.fp = fingerprint(pq.iq);
+        pq.sc = selfCheck(pq.iq);
+        mark(si,"done", (pq.iqTotal!=null? pq.iqTotal+" 分" : "已评") + (pq.fp? " · "+pq.fp.n : ""));
+      }catch(e){
+        mark(si,"fail",(e&&e.message||"失败").slice(0,60));
+        pq.iqTotal = null;   // 评不出不打崩流程，照样出图
+      }
+      si++;
+      renderDraw(paras);
+    }
+
     /* ⑤出图 */
     for(var wi2=0; wi2<ways.length; wi2++){
       var p = paras[wi2];
@@ -619,14 +702,16 @@ async function run(again){
           + "本档尤其看重「" + M.accent[0] + "」与「" + M.accent[1] + "」——**这两格打分是加倍的，其余七格达标也救不回来**。\n"
           + "九格与各自的判据：\n"
           + B9.map(function(g){ return "· " + g[0] + "（" + g[1] + "）：" + g[2]; }).join("\n")
-          + "\n\n严格按每行一格输出，共九行，不要别的：\n格名｜分数(0-100)｜一句为什么\n"
+          + "\n\n" + deadBrief()
+          + "\n严格按每行一项输出，共九行，不要别的：\n项名｜分数(0-100)｜一句为什么\n"
           + "看不清就说看不清，不要猜。";
         var b9User = "【这组图想要显露的那一刀】" + (grab(p3.txt,"三、它切开的辨别面") || "见画面")
           + "\n【承重命题】" + (grab(p3.txt,"二、承重命题") || "")
           + "\n\n请看下面 " + p3.imgs.length + " 张图并逐格打分。两条必须照做：\n"
           + "① 「关系」这一格量的是元素之间——如果每个元素单独看也一样，关系为零；\n"
           + "② 如果这张图只是让人「认出」了什么、识别一完成观看就结束，那它停在一号位的物：连接与活力两格必须低分。\n"
-          + "另：画面被塞满、没有可走的空处，「共存」与「连接」两格必须扣。";
+          + "另：画面被塞满、没有可走的空处，「共存」与「连接」两项必须扣。\n"
+          + "如果这张图中了「打卡化」或「十五秒消费」，「活力」（再点燃之力）必须给低分——一眼看完的东西没有第二次发生。";
         var b9Txt = await mmChat(b9Sys, b9User, 1800, p3.imgs.slice(0,3));
         p3.report = b9Txt;
         p3.score = scoreOf(b9Txt, M.accent);
@@ -646,10 +731,12 @@ async function run(again){
       var allImgs = [];
       paras.forEach(function(p){ if(p && p.imgs.length) allImgs.push(p.imgs[0]); });
       if(!allImgs.length) throw new Error("没有图可查");
-      var goSys = "你是图像占位核查员，现在**看着成品图**核查，不看文字描述。\n" + placeBrief()
+      var goSys = "你是图像占位核查员，现在**看着成品图**核查，不看文字描述。\n" + placeBrief() + "\n" + deadBrief()
         + "\n三条纪律同前：库未命中不得据以放行；通过须带一条可裁决的分离线；说不出分离线即判占位失败。\n"
         + "另外单独核一件事：这张图像不像任何一位可辨识艺术家的手笔？像就直接判占位失败并点名。";
-      var goUser = "逐张核查。每张按三行：\n图N｜判定：〔占位失败〕／〔通过〕／〔库未命中·不放行〕\n图N｜撞上：具体图式名或艺术家名，没有写「无」\n图N｜分离线：（判通过时必须写满）\n最后一行写：最干净的是第几张。";
+      var goUser = "逐张核查。每张按四行：\n图N｜判定：〔占位失败〕／〔通过〕／〔库未命中·不放行〕\n图N｜撞上：具体图式名或艺术家名，没有写「无」\n图N｜分离线：（判通过时必须写满）\n"
+        + "图N｜死格：中了哪条病征（打卡化／十五秒消费／防弹玻璃式／语法失传），一条都不中写「无」——**这是绘画的当代第一死因，比撞图式更该说**\n"
+        + "最后一行写：最干净的是第几张。";
       var goTxt = await mmChat(goSys, goUser, 1600, allImgs.slice(0,4));
       $("drawOut").insertAdjacentHTML("beforeend",
         '<div class="card" style="margin-top:16px"><h2>近邻闸门 · 出（看着图查）</h2><div class="out">'+esc(goTxt)+'</div></div>');
@@ -659,21 +746,35 @@ async function run(again){
 
     /* ⑧择优 + 综合提炼 */
     mark(si,"run"); say("择优与综合提炼…");
-    live.forEach(function(p){ if(!winner || (p.score||0) > (winner.score||0)) winner = p; });
+    // 择优用**五维**：择的是典范（观念层对棋盘的回写）。九分项是画面兑现度的独立读数，两本账不合并。
+    // 五维全评不出来时才退回九分项择优——退回要说出来，不许悄悄换尺。
+    var byIQ = live.some(function(p){ return p.iqTotal != null; });
+    live.forEach(function(p){
+      if(byIQ){ if(!winner || (p.iqTotal||0) > (winner.iqTotal||0)) winner = p; }
+      else    { if(!winner || (p.score||0)   > (winner.score||0))   winner = p; }
+    });
+    // ⚠️ 这句不能只走 say()——后面还有一条 say("完成…") 会把它盖掉（与 dNote 覆盖同族的坑）。
+    //    换尺这件事必须走必达通道：进度条标签 ＋ 提炼正文开头，两处都留。
+    var fallbackNote = byIQ ? "" : "〔本次五维一路都没评出来，择优已退回九分项——换过尺，特此说明。〕\n\n";
     var syUser = "【入题】" + topic
       + "\n\n【胜出典范·" + winner.way.t + "】\n" + winner.txt
-      + "\n\n【九宫格评分卡】\n" + (winner.report||"（未评上分）")
+      + "\n\n【九分项读数·画面这一本账】\n" + (winner.report||"（未评上分）")
+      + "\n\n【五维刻度·典范这一本账】\n" + (winner.iqReport||"（未评上分）")
+      + (winner.iqTotal!=null ? ("\n加权总分 " + winner.iqTotal + "（一百五十为本体论级门槛）"
+          + (winner.fp ? "；分数结构＝" + winner.fp.n + "：" + winner.fp.d : "")
+          + (winner.sc ? "；自检表读出：" + winner.sc : "")) : "")
       + (live.length>1 ? ("\n\n【落选典范】\n" + live.filter(function(p){return p!==winner;}).map(function(p){ return "〔"+p.way.t+"〕" + p.txt.slice(0,700); }).join("\n\n")) : "")
       + "\n\n【要你写】一篇〈这幅画是怎么发生的〉，按六节，节名照抄：\n"
       + "一、这幅画要让识别机在哪里故障（并写明势能是认知反叛还是存在密写）\n二、它是怎么撞出来的（写清用的是哪种碰撞方式，以及它撞掉了什么）\n"
       + "三、落选典范的可回收零件（每个落选的：淘汰理由＋还剩哪件能用、装到哪一节）\n"
       + "四、分离线（它跟哪几个已有图式分开、凭哪个可见特征、怎么用眼睛读出来）\n"
-      + "五、评分卡开出的作业（每条扣分逐条转写成下一版的具体动作，禁「加强构图」这类空话）\n"
+      + "五、两张卡开出的作业（九分项与五维各自最弱的那一项，逐条转写成下一版的具体动作，禁「加强构图」「加强创新」这类空话；**两本账分开写，不许合并成一个总评**）\n"
       + "六、明确不画什么\n"
       + (MODE==="C" ? "全文控制在 300–500 字。" : (MODE==="A" ? "全文 600–900 字，并在最后附一行 alt 文本（一句，供无障碍阅读用）。" : "全文 1200–1800 字。"));
     var syTxt = await mmChat(sysBase(core,true), syUser, MODE==="C"?1600:4000);
-    $("synthOut").textContent = syTxt;
-    mark(si,"done", winner.score!=null ? ("胜出 "+winner.score+" 分") : "已提炼");
+    $("synthOut").textContent = fallbackNote + syTxt;
+    mark(si,"done", (byIQ ? ("胜出 五维 "+(winner.iqTotal!=null?winner.iqTotal:"—")+" 分")
+                          : ("五维全缺·退回九分项择优，胜出 "+(winner.score!=null?winner.score:"—")+" 分")));
     say("完成。胜出的是〔" + winner.way.t + "〕。");
     LAST = { paras:paras, winner:winner, synth:syTxt };
     saveDraft();
@@ -691,13 +792,17 @@ async function run(again){
    理由文字里（「三张一个样，很不可爱也不自由」）。早先的写法是「哪一行含这个格名就算哪一行」，
    于是「爱」和「自由」双双被「多样」那一行的 10 分抢走，C 档还把「爱」加倍——
    一份八格 90 分的卡被算成 61。**必须锚定行首并要求紧跟分隔符**，只认 `格名｜分数｜理由` 这个形状。 */
-function cellScore(txt, name){
+function cellScore(txt, name, hi){
+  // ⚠️ hi 是上钳，**必须按尺给**：九分项是 0–100 的尺，五维刻度是 100–170、向上开放的尺。
+  //    早先写死 Math.min(100,…)，于是五维每一维都被钳成 100，一百五十的门槛永远够不着——
+  //    同一个取分函数服务两把不同量程的尺时，量程必须由调用方交代，不能藏在函数里。
+  hi = hi || 100;
   var lines = String(txt).split(/\n/);
   // 前缀允许 · - * 数字 . 、 ） ) 与空格任意混排——真产出常写成「1. 统一｜80｜…」或「· 3. 活力｜77｜…」
   var re = new RegExp("^[\\s·\\-*\\d.、）)]*" + name + "\\s*[｜|/:：,，]\\s*(\\d{1,3})");
   for(var i=0;i<lines.length;i++){
     var m = lines[i].match(re);
-    if(m) return Math.min(100, parseInt(m[1],10));
+    if(m) return Math.min(hi, parseInt(m[1],10));
   }
   return null;
 }
@@ -726,7 +831,9 @@ function renderDraw(paras){
     if(!p){ h += '<div class="warn">第 '+(i+1)+' 路：碰撞失败，本路作废（另外几路照跑）。</div>'; return; }
     h += '<div class="card" style="background:#0C1015;margin:14px 0">';
     h += '<b style="color:var(--gold)">第 '+(i+1)+' 路 · 碰撞方式 '+p.way.n+'：'+esc(p.way.t)+'</b>';
-    if(p.score!=null) h += ' <span class="tag pass">九宫格 '+p.score+'</span>';
+    if(p.score!=null) h += ' <span class="tag pass">九分项 '+p.score+'</span>';
+    if(p.iqTotal!=null) h += ' <span class="tag '+(p.iqTotal>=150?'pass':'')+'">五维 '+p.iqTotal+(p.iqTotal>=150?' · 本体论级':'')+'</span>';
+    if(p.fp) h += ' <span class="tag">'+esc(p.fp.n)+'</span>';
     if(p.stripped && p.stripped.length) h += ' <span class="tag hit">渲染端摘掉了 '+p.stripped.length+' 处艺术家指名：'+esc(p.stripped.join("、"))+'</span>';
     if(p.addedTail) h += ' <span class="tag hit">禁令串是渲染端补的（基底没写）</span>';
     h += '<div class="out" style="margin-top:8px;max-height:300px">'+esc(p.txt)+'</div>';
@@ -734,6 +841,15 @@ function renderDraw(paras){
       h += '<div class="gal">' + p.imgs.map(function(d,k){
         return '<div class="shot"><img src="'+d+'" alt="第'+(i+1)+'路第'+(k+1)+'张"><div class="cap">第 '+(k+1)+' 张 · <a href="'+d+'" download="sde-art-'+(i+1)+'-'+(k+1)+'.jpg">下载</a></div></div>';
       }).join("") + '</div>';
+    }
+    if(p.iqReport){
+      h += '<div class="b9" style="grid-template-columns:repeat(5,1fr)">' + IQ5.map(function(d){
+        var v = cellScore(p.iqReport, d[0], 200);
+        return '<div class="g'+(v!=null && v<127 ? ' low':'')+'" title="'+esc(d[3])+'"><b>'+d[1]+'·'+d[0].replace("维","")+'</b><u>'+(v==null?"—":v)+'</u></div>';
+      }).join("") + '</div>';
+      if(p.sc) h += '<div class="warn" style="margin-top:8px">自检表读出：'+esc(p.sc)+'</div>';
+      if(p.fp) h += '<div class="note" style="margin-top:8px"><b>'+esc(p.fp.n)+'</b>——'+esc(p.fp.d)+'</div>';
+      h += '<div class="out" style="margin-top:10px;max-height:200px">'+esc(p.iqReport)+'</div>';
     }
     if(p.report){
       h += '<div class="b9">' + B9.map(function(g){
@@ -785,6 +901,8 @@ $("btnDlAll").onclick = function(){
    露出 run 是为了让 e2e 能 await 整条产线——onclick 不返回 promise，不露就只能轮询。 */
 window.__sdeArt = { WAYS:WAYS, B9:B9, MODES:MODES, pickWays:pickWays, scoreOf:scoreOf,
                     placeBrief:placeBrief, PLACE_SDE:PLACE_SDE, VERSION:VERSION,
+                    IQ5:IQ5, IQ5_GATE:IQ5_GATE, fingerprint:fingerprint, selfCheck:selfCheck,
+                    DEAD_FORMS:DEAD_FORMS, deadBrief:deadBrief, cellScore:cellScore,
                     run:run, setMode:function(m){ MODE=m; }, last:function(){ return LAST; },
                     resetWays:function(){ usedWays=[]; } };
 </script>
