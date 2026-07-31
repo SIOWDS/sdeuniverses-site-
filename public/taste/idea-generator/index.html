@@ -134,6 +134,7 @@ footer{border-top:1px solid var(--border);text-align:center;padding:30px 20px 44
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script src="/taste/assets/sde-rag.js?v=4"></script>
 <script src="/taste/assets/sde-nbr-gate.js?v=1"></script>
+<script src="/taste/assets/sde-scope-gate.js?v=1"></script>
 </head>
 <body>
 
@@ -1293,6 +1294,22 @@ function sdeScopeBlock(){
          '看句子还成立吗；不成立即为越界。凡有收窄，正文必须写成条件式命题，且标题/摘要/结论三处口径一致，' +
          '并指出两类阴性案例该在哪里找。另查一次：论文是否只在自变量拉满的那批对象里取证（在自变量上选样）。\n\n';
 }
+// 生产关口的守界令：每一站都要拿到原初问题、并在产出末尾交一行回执。
+// 只有审稿站把关是不够的——漂移发生在写作那一刻，等审稿才发现已经晚了一整轮。
+function sdeScopeOrder(stageName, noteText){
+  var q = sdeOrigQuestion();
+  if(!q) return '';
+  return '\n\n【守界关口 · ' + (stageName||'本站') + '（宪法条 · 内功第八部分）】\n' +
+    '原初问题：' + q + '\n' +
+    (noteText ? noteText + '\n' : '') +
+    '动手前核一次，写完再核一次：①把你结论句的主语原样换成上面这个原初问题的主语，句子还成立吗？不成立就是**越界**——收窄不禁止，偷换禁止。' +
+    '②若你实际只处理了原初问题所指对象里的一小类，必须在正文写成**条件式命题**（"在 C₁、C₂ 条件下…"），并让标题、摘要、结论三处口径一致；' +
+    '只在局限性一节补一句、摘要仍写全称判断的，等于把越界写进脚注，不算守界。' +
+    '③不得**在自变量上选样**：命题若是"因为 X 所以 Y"，就不能只在 X 拉满的那批对象里取证——那样唯一能证伪它的样本恰好被你排除了。' +
+    '④凡收窄，必须指出两类阴性案例该去哪里找：机制该出现却没出现的、不该出现却出现的。\n' +
+    '**产出末尾必须另起一行写：【守界回执】覆盖对象＝…；与原初问题的关系＝同一／收窄（条件：…）；阴性案例位置＝…** ' +
+    '这一行是本关口的交付物之一，不得省略。\n';
+}
 function buildReviewInput(paperText){
   return sdeScopeBlock() + '【待审稿的论文全文】\n\n' + (paperText||'').trim() + '\n\n请以顶刊审稿人身份，写一份严苛而具体的审稿意见。';
 }
@@ -1311,6 +1328,7 @@ function buildPaperInput(rows, question, emergeText){
   });
   s += '\n请把上述新典范扩写成一篇约两万字的正式学术论文。';
   return s;
+  s += sdeScopeOrder('论文写作');
 }
 
 // ========== 四篇1万字论文（三金点子各一篇 + 新典范一篇）==========
@@ -1505,7 +1523,7 @@ const NORMALIZE_SPEC = `
 `;
 function normalizePrompt(){ return NORMALIZE_SPEC; }
 function buildNormalizeInput(paperText){
-  return '【待补规范的论文全文（思想、论证与案例均已定稿，不得改动）】\n\n' + (paperText||'').trim() + '\n\n请对上面这篇论文执行"补规范"工序：只加文内引注、作者脚注、参考文献与材料说明，不改动其思想、论证与案例，严格遵守"绝不编造"铁律。直接输出补规范后的完整论文全文。';
+  return '【待补规范的论文全文（思想、论证与案例均已定稿，不得改动）】\n\n' + (paperText||'').trim() + '\n\n请对上面这篇论文执行"补规范"工序：只加文内引注、作者脚注、参考文献与材料说明，不改动其思想、论证与案例，严格遵守"绝不编造"铁律。直接输出补规范后的完整论文全文。' + sdeScopeOrder('补规范·只核不改', '本站不改思想与论证：只核对象是否仍与原初问题一致。若发现越界，照原样保留正文，把问题如实写进守界回执，交给下一站的审稿人处理——不得在本站悄悄改口径。');
 }
 
 // ========== 两次内功提智：第一次让基底写《从发现到发生》心得，把发生学内化成自己的东西 ==========
@@ -1806,7 +1824,7 @@ async function getSharedReflection(writeSel, writeKey, onProgress){
 }
 // 二次提智的输入 = 第一批那篇论文全文
 function buildUpliftInput(paperText, ragCtx){
-  const s = '【待提升的论文全文（第一批·资深学者水平）】\\n\\n' + (paperText||'').trim() + '\\n\\n请对这篇论文执行"发生引擎"二次提升工序，输出以一个从矛盾里结算出来的、不可还原的新命名为核心的完整论文。';
+  const s = sdeScopeOrder('二次提智').replace(/^\n\n/,'') + '\n【待提升的论文全文（第一批·资深学者水平）】\\n\\n' + (paperText||'').trim() + '\\n\\n请对这篇论文执行"发生引擎"二次提升工序，输出以一个从矛盾里结算出来的、不可还原的新命名为核心的完整论文。';
   return (window.SDERag ? window.SDERag.prepend(ragCtx, s) : s);
 }
 
@@ -1822,6 +1840,7 @@ function buildSingleIdeaInput(rows, idx, question, ragCtx){
     others.forEach(x=>{ s += '\n──── 金点子' + marks[x.i] + '（' + (x.r.view||('视角'+(x.i+1))) + '）────\n' + (x.r.sde||'').trim() + '\n'; });
   }
   s += '\n请把上面标为"核心论点"的那一个金点子，扩写成一篇约一万字的正式学术论文。';
+  s += sdeScopeOrder('四篇论文·单金点子');
   return (window.SDERag ? window.SDERag.prepend(ragCtx, s) : s);
 }
 
@@ -1832,6 +1851,7 @@ function buildParadigmInput1w(rows, question, emergeText, ragCtx){
   s += '【三个金点子原文，供你在论文中调用其中的洞察与论证素材】\n';
   (rows||[]).forEach((r,i)=>{ s += '\n──── 金点子' + ['①','②','③'][i] + '（' + (r.view||('视角'+(i+1))) + '）────\n' + (r.sde||'').trim() + '\n'; });
   s += '\n请把上述新典范扩写成一篇约一万字的正式学术论文。';
+  s += sdeScopeOrder('四篇论文·新典范');
   return (window.SDERag ? window.SDERag.prepend(ragCtx, s) : s);
 }
 // 把三篇 SDE 金点子拼成涌现的输入
@@ -1840,6 +1860,7 @@ function buildEmergeInput(rows, question, ragCtx){
   rows.forEach((r,i)=>{
     s += '\n════ 金点子' + ['①','②','③'][i] + '（' + (r.view||('视角'+(i+1))) + '）════\n' + (r.sde||'').trim() + '\n';
   });
+  s += sdeScopeOrder('二阶涌现');
   return (window.SDERag ? window.SDERag.prepend(ragCtx, s) : s);
 }
 
@@ -4080,7 +4101,25 @@ function renderPaperText(text){
     }
     html += '<p style="margin:0 0 12px;text-align:justify;text-indent:2em">'+line+'</p>';
   }
-  return html;
+  return sdeScopeBanner(text) + html;
+}
+// 守界闸的可见告警条：机械跑一遍，只提示不阻断（看不出就放行）。
+// 挂在 renderPaperText 上是因为它是四篇/二次提智/补规范/打磨四站显示论文的**唯一出口**——
+// 一处接线，四个关口全覆盖。
+function sdeScopeBanner(text){
+  try{
+    if(!window.SDEScope || !window.SDEScope.check) return '';
+    var r = window.SDEScope.check(sdeOrigQuestion(), text||'');
+    if(!r || r.level!=='warn' || !r.msgs.length) return '';
+    var items = r.msgs.map(function(m){
+      return '<div style="margin:4px 0 0;padding-left:14px;text-indent:-14px">· '+
+             String(m).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')+'</div>';
+    }).join('');
+    return '<div style="border:1px solid #C9A227;background:rgba(201,162,39,0.10);border-radius:8px;'+
+           'padding:11px 13px;margin:0 0 16px;font-size:12.5px;line-height:1.75;color:#E8C878">'+
+           '<b style="color:#F0D48A">⚖ 守界闸 · 可能越界（宪法条 · 内功第八部分）</b>'+items+
+           '<div style="margin-top:6px;color:#B9A46A">这是机械检查，只提示不阻断；确认无误可忽略。</div></div>';
+  }catch(e){ return ''; }
 }
 
 const paperBtn = $('paperBtn');
@@ -4278,6 +4317,7 @@ function buildReviseInputDual(paperText, revA, revB){
   s += '════ 审稿人 A 的意见 ════\n' + (revA||'').trim() + '\n\n';
   if(revB && revB.trim()){ s += '════ 审稿人 B 的意见 ════\n' + revB.trim() + '\n\n'; }
   s += '请据此直接输出改好后的完整论文全文。';
+  paperText = sdeScopeBlock() + paperText;
   return s;
 }
 
