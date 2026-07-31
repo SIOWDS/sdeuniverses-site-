@@ -2194,7 +2194,7 @@ async function streamChat(apiKey, model, systemPrompt, userQ, bodyEl, statusEl, 
   try{
     resp = await fetch(apiUrl(model), {
       method:'POST',
-      headers:{ 'Content-Type':'application/json', 'Authorization':'Bearer '+apiKey },
+      headers: chatHeaders(model, apiKey),
       body: JSON.stringify(buildPayload(model, systemPrompt, userQ, maxTokens)),
       signal: ac.signal
     });
@@ -2297,6 +2297,21 @@ async function streamChat(apiKey, model, systemPrompt, userQ, bodyEl, statusEl, 
   return { text:acc, chars, thinkChars, finish:fin, secs:parseFloat(secs) };
 }
 
+// ============ 请求头构造（真跑与 Key 检测共用同一条路，改一处两处都变）============
+function chatHeaders(model, apiKey){
+  const { vendor, tier } = parseModel(model);
+  const headers = { 'Content-Type':'application/json' };
+  if(typeof isOverseas === 'function' && isOverseas(model)){
+    if(vendor === 'gpt'){ headers['Authorization'] = 'Bearer ' + apiKey; headers['x-target-url'] = 'https://api.openai.com/v1/chat/completions'; }
+    else if(vendor === 'minimax'){ headers['Authorization'] = 'Bearer ' + apiKey; headers['x-target-url'] = 'https://api.minimaxi.com/v1/chat/completions'; }
+    else if(vendor === 'claude'){ headers['x-api-key'] = apiKey; headers['anthropic-version'] = '2023-06-01'; headers['anthropic-dangerous-direct-browser-access'] = 'true'; headers['x-target-url'] = 'https://api.anthropic.com/v1/messages'; }
+    else if(vendor === 'gemini'){ const gm = (tier === 'pro') ? 'gemini-3.1-pro-preview' : 'gemini-2.5-flash'; headers['x-target-url'] = 'https://generativelanguage.googleapis.com/v1beta/models/' + gm + ':streamGenerateContent?alt=sse&key=' + encodeURIComponent(apiKey); }
+  } else {
+    headers['Authorization'] = 'Bearer ' + apiKey;
+  }
+  return headers;
+}
+
 // 境外基底（GPT/Claude/Gemini）：经 /api/llm-proxy 中转、【流式】逐块返回，按各家 SSE 格式解析。
 // 流式的意义：首字节几秒到达、代理逐块透传（src/worker.js 直接透传 upstream.body），
 // 服务端不必等全部生成完，永不撞 Cloudflare ~100s 网关超时——这才让长文（论文 max_tokens 32000）在境外基底上跑得通。
@@ -2304,24 +2319,8 @@ async function callOverseas(apiKey, model, systemPrompt, userQ, bodyEl, statusEl
   const { vendor, tier } = parseModel(model);
   const payload = buildPayload(model, systemPrompt, userQ, maxTokens);
 
-  // 组装代理请求头：不同厂商鉴权方式不同
-  const headers = { 'Content-Type':'application/json' };
-  if(vendor === 'gpt'){
-    headers['Authorization'] = 'Bearer ' + apiKey;
-    headers['x-target-url'] = 'https://api.openai.com/v1/chat/completions';
-  } else if(vendor === 'minimax'){
-    headers['Authorization'] = 'Bearer ' + apiKey;
-    headers['x-target-url'] = 'https://api.minimaxi.com/v1/chat/completions';
-  } else if(vendor === 'claude'){
-    headers['x-api-key'] = apiKey;
-    headers['anthropic-version'] = '2023-06-01';
-    headers['anthropic-dangerous-direct-browser-access'] = 'true';
-    headers['x-target-url'] = 'https://api.anthropic.com/v1/messages';
-  } else if(vendor === 'gemini'){
-    const gm = (tier === 'pro') ? 'gemini-3.1-pro-preview' : 'gemini-2.5-flash';
-    // 流式端点：streamGenerateContent + alt=sse，返回 SSE 而非一次性 JSON
-    headers['x-target-url'] = 'https://generativelanguage.googleapis.com/v1beta/models/' + gm + ':streamGenerateContent?alt=sse&key=' + encodeURIComponent(apiKey);
-  }
+  // 组装代理请求头（与 Key 检测共用同一个 chatHeaders）
+  const headers = chatHeaders(model, apiKey);
 
   bodyEl.innerHTML='<span class="placeholder">✓ 已连接，'+vendorName()+' 正在启动'+(tier==='pro'?'（较强模型首次响应可能需 1-2 分钟）':'')+'……<br><span style="font-size:12px;opacity:.7">境外基底经中转、流式逐字返回，请稍候</span></span>';
   statusEl.innerHTML='<span class="spinner"></span> 等待响应';
@@ -4545,5 +4544,38 @@ questionEl.addEventListener('keydown', e=>{ if((e.ctrlKey||e.metaKey)&&e.key==='
 <script src="/taste/wds-companion/wds-read.js?v=20260730c" defer></script>
 
 <script src="/wds-mode.js?v=20260730c" defer></script>
+<script src="/taste/assets/sde-keyprobe.js?v=1"></script>
+<script>
+/* Key 有效性检测：按钮由 SDEKeyProbe 注入到每个 Key 输入框之后（本页 HTML 一行未改）。
+   真跑与检测共用同一套 chatHeaders / apiUrl / buildPayload —— 否则会出现"检测通过、真跑失败"。 */
+(function(){
+  function go(){
+    if(!window.SDEKeyProbe) return;
+    try{
+      SDEKeyProbe.attach([
+        { key:'apiKey',          sel:'modelSel' },
+        { key:'osKey',           sel:'osModel' },
+        { key:'osRevAKey',       sel:'osRevA' },
+        { key:'osRevBKey',       sel:'osRevB' },
+        { key:'osbKey',          sel:'osbModel' },
+        { key:'osbRevAKey',      sel:'osbRevA' },
+        { key:'osbRevBKey',      sel:'osbRevB' },
+        { key:'fourRevAKey',     sel:'fourRevA' },
+        { key:'fourRevBKey',     sel:'fourRevB' },
+        { key:'reviewKeyInputA', sel:'reviewModelSelA' },
+        { key:'reviewKeyInputB', sel:'reviewModelSelB' },
+        { key:'writerKeyInput',  sel:'writerModelSel' }
+      ], {
+        buildPayload: buildPayload,
+        chatHeaders: chatHeaders,
+        apiUrl: apiUrl,
+        isOverseas: (typeof isOverseas === 'function') ? isOverseas : function(){ return false; },
+        proxyUrl: (typeof PROXY_URL !== 'undefined') ? PROXY_URL : '/api/llm-proxy'
+      });
+    }catch(e){ /* 检测是附加件，装不上也绝不能影响正常跑批 */ }
+  }
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', go); else go();
+})();
+</script>
 </body>
 </html>

@@ -246,6 +246,8 @@ const SEL_NAME={ 'ds:pro':'DeepSeek-V4-Pro','glm:pro':'GLM-5' };
 const SEL_COLOR={ 'ds:pro':'#4C8BF5','glm:pro':'#3FB6A8' };
 function parseModel(sel){ const [vendor,tier]=sel.split(':'); return {vendor,tier}; }
 function apiUrl(sel){ return API_URLS[parseModel(sel).vendor]; }
+// 请求头构造（真跑与 Key 检测共用同一条路）。本页只有 ds/glm 两家，全部浏览器直连、无中转。
+function chatHeaders(sel, apiKey){ return { 'Content-Type':'application/json', 'Authorization':'Bearer '+apiKey }; }
 function buildPayload(sel,systemPrompt,userMsg,maxTokens){
   const {vendor}=parseModel(sel); const cap=(typeof maxTokens==='number'&&maxTokens>0)?maxTokens:12000;
   const base={ stream:true, messages:[{role:'system',content:systemPrompt},{role:'user',content:userMsg}], max_tokens:cap };
@@ -737,7 +739,7 @@ async function streamChat(apiKey,sel,systemPrompt,userMsg,maxTokens,statusEl2,st
   setS('连接中…');
   const payload=(opts&&opts.split)?buildSplitPayload(sel,systemPrompt,userMsg):buildPayload(sel,systemPrompt,userMsg,maxTokens);
   let resp;
-  try{ resp=await fetch(apiUrl(sel),{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+apiKey},body:JSON.stringify(payload),signal:ac.signal}); }
+  try{ resp=await fetch(apiUrl(sel),{method:'POST',headers:chatHeaders(sel,apiKey),body:JSON.stringify(payload),signal:ac.signal}); }
   catch(e){ clearTimeout(killer); throw new Error(e.name==='AbortError'?'超时中止':'网络请求失败：'+e.message); }
   if(!resp.ok){ let d=''; try{const j=await resp.json(); d=j.error?.message||JSON.stringify(j);}catch(_){d=resp.statusText;} clearTimeout(killer); throw new Error('接口 '+resp.status+'：'+d); }
   const reader=resp.body.getReader(),decoder=new TextDecoder();
@@ -1001,5 +1003,28 @@ goBtn.addEventListener('click',run);
 <script src="/taste/wds-companion/wds-read.js?v=20260730c" defer></script>
 
 <script src="/wds-mode.js?v=20260730c" defer></script>
+<script src="/taste/assets/sde-keyprobe.js?v=1"></script>
+<script>
+/* Key 有效性检测：按钮由 SDEKeyProbe 注入到每个 Key 输入框之后（本页 HTML 一行未改）。
+   真跑与检测共用同一套 chatHeaders / apiUrl / buildPayload —— 否则会出现"检测通过、真跑失败"。 */
+(function(){
+  function go(){
+    if(!window.SDEKeyProbe) return;
+    try{
+      SDEKeyProbe.attach([
+        { key:'dsKey',  model:'ds:pro',  at:'.key-card' },
+        { key:'glmKey', model:'glm:pro', at:'.key-card' }
+      ], {
+        buildPayload: buildPayload,
+        chatHeaders: chatHeaders,
+        apiUrl: apiUrl,
+        isOverseas: (typeof isOverseas === 'function') ? isOverseas : function(){ return false; },
+        proxyUrl: (typeof PROXY_URL !== 'undefined') ? PROXY_URL : '/api/llm-proxy'
+      });
+    }catch(e){ /* 检测是附加件，装不上也绝不能影响正常跑批 */ }
+  }
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', go); else go();
+})();
+</script>
 </body>
 </html>
