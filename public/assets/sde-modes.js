@@ -35,6 +35,16 @@
     var a = document.createElement("a");
     a.className = "sdemx-home";
     a.href = PORTAL;
+    // 标签写在三角上方。没有字的时候，这颗 △ 只对已经知道它是什么的人才是入口；
+    // 站点的中英靠 body 上的 class 切，所以成对插、由 CSS 隐掉另一个——
+    // 不能像 title 那样用 lang() 定死，否则点「中/EN」切换时这四个字不会跟着变。
+    var lz = document.createElement("span");
+    lz.className = "sdemx-hlab zh-only";
+    lz.textContent = "\u7cfb\u7edf\u5165\u53e3";
+    var le = document.createElement("span");
+    le.className = "sdemx-hlab en-only";
+    le.textContent = "System Entry";
+    a.appendChild(lz); a.appendChild(le);
     var gl0 = document.createElement("i");
     gl0.textContent = "\u25b3";
     if (!isHome()) { a.appendChild(gl0); return a; }          // 内页：一颗安静的 △
@@ -98,7 +108,11 @@
     ".sdemx-home:hover{opacity:1;background:rgba(212,178,94,.18)}" +
     /* 烧 TOKEN（与首页智能体条、入口页三图标同一套火）。isolation 必须有：
        不给按钮做一个层叠上下文，火层那个 z-index:-1 会掉到页面背景后面、整团看不见。 */
-    ".sdemx-home{position:relative;isolation:isolate}" +
+    ".sdemx-home{position:relative;isolation:isolate;display:inline-flex;flex-direction:column;" +
+    "align-items:center;justify-content:center;gap:1px;line-height:1.1}" +
+    /* 字必须比火层（z-index:2）更高，否则火苗窜上来会把这四个字糊掉。 */
+    ".sdemx-hlab{position:relative;z-index:3;font-size:10.5px;letter-spacing:.06em;" +
+    "color:var(--gold,#D4B25E);white-space:nowrap;text-shadow:0 1px 3px rgba(0,0,0,.55)}" +
     ".sdemx-home i{font-style:normal;position:relative;z-index:1;color:#FFE9C2;text-shadow:0 0 8px rgba(255,140,20,.95),0 0 18px rgba(255,90,0,.6)}" +
     ".sdemx-fire{position:absolute;left:50%;bottom:-7px;width:66px;height:60px;transform:translateX(-50%);pointer-events:none;z-index:2}" +
 ".sdemx-fire b{position:absolute;left:50%;bottom:0;transform-origin:50% 100%;border-radius:50% 50% 46% 46% / 68% 68% 32% 32%;animation-name:sdemxBurn;animation-timing-function:ease-in-out;animation-iteration-count:infinite}" +

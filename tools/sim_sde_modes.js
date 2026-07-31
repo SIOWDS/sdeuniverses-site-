@@ -9,7 +9,11 @@ const fs = require("fs");
 let PASS = 0, FAILS = 0;
 function ok(c, m) { if (c) { PASS++; console.log("  PASS " + m); } else { FAILS++; console.log("  FAIL " + m); } }
 
-const SRC = fs.readFileSync("/home/claude/site/public/assets/sde-modes.js", "utf8");
+const SRC = fs.readFileSync(require("path").join(__dirname, "../public/assets/sde-modes.js"), "utf8");
+// 模块里的 CSS 是一长串 "…" + "…" 拼出来的，所以对源码直接跑 /\.sel\{[^"]*prop/ 这种正则
+// 会在第一个引号处截断——属性只要恰好落在下一段就永远匹配不到，断言假失败（这坑踩过不止一次）。
+// 先把拼接缝合掉再验。
+const CSSFLAT = SRC.replace(/"\s*\+\s*"/g, "");
 const WM = fs.readFileSync("/home/claude/site/public/wds-mode.js", "utf8");
 
 /* ---------- 极简 DOM（节点用 createElement 建，所以嵌套是真的） ---------- */
@@ -83,7 +87,19 @@ console.log("① 浏览态：顶栏紧跟「问WDS」插一颗「SDE 微信」")
   const home = nav.querySelector(".sdemx-home");
   ok(!!home && home.href === "/?portal=1", "顶栏有一颗回入口页的 △，实得 " + (home && home.href));
   ok(!!home && nav.children.indexOf(home) === nav.children.indexOf(pills[1]) + 1, "△ 排在两颗药丸之后");
-  ok(home.textContent === "△", "△ 是图形按钮，不分中英，一颗即可");
+  // 2026-07-31 改口径：这颗 △ 上面要写「系统入口」。原来的断言是 textContent === "△"
+  // （固化"图形按钮不带字"），已随口径作废。保住的是原意里仍成立的那半句——**一颗即可**：
+  // 标签成对是靠 zh-only/en-only 由 CSS 隐掉一个，不是像药丸那样插两颗 <a>。
+  const hlabs = home.querySelectorAll(".sdemx-hlab");
+  ok(hlabs.length === 2, "△ 带一对中英标签，实得 " + hlabs.length + " 个");
+  ok(hlabs[0].className.indexOf("zh-only") >= 0 && hlabs[0].textContent === "系统入口",
+    "中文标签是「系统入口」，实得「" + (hlabs[0] && hlabs[0].textContent) + "」");
+  ok(hlabs[1].className.indexOf("en-only") >= 0 && hlabs[1].textContent === "System Entry",
+    "英文标签是「System Entry」，实得「" + (hlabs[1] && hlabs[1].textContent) + "」");
+  ok(nav.querySelectorAll(".sdemx-home").length === 1, "△ 仍然只有一颗（标签靠 CSS 隐显，不是插两颗按钮）");
+  ok(home.textContent.indexOf("△") >= 0, "△ 字形还在");
+  const kids = Array.prototype.slice.call(home.children);
+  ok(kids.indexOf(hlabs[0]) < kids.findIndex((c) => c.tagName === "I"), "标签排在 △ 之前（字在上、三角在下）");
   ok(!home.querySelector(".sdemx-fire"), "内页那颗 △ 是安静的（烧一处才是记号，处处都烧就成了噪音）");
 }
 
@@ -106,6 +122,12 @@ console.log("①b 只有浏览首页那颗 △ 在烧，且火盖住三角形");
   ok(!/mix-blend-mode:\s*screen/.test(SRC),
     "不用 screen 混合：顶栏是米色浅底，screen 会把橙色直接洗成白，火就没了");
   ok(/text-shadow:0 0 8px rgba\(255,140,20/.test(SRC), "三角形本身调成受热的颜色，不然在火里会变成一个黑洞");
+  // 「系统入口」四个字在烧着的这一颗上也得有，而且必须压在火之上：
+  // 火层是 z-index:2、△ 是 1（有意让火裹住三角），标签若不抬到 3，火苗窜上来就把字糊掉了。
+  ok(home.querySelectorAll(".sdemx-hlab").length === 2, "烧着的这颗也带中英标签");
+  ok(/\.sdemx-hlab\{[^}]*z-index:3/.test(CSSFLAT), "标签 z-index:3，压在火层（2）之上");
+  ok(/\.sdemx-home\{[^}]*flex-direction:column/.test(CSSFLAT), "按钮竖排：字在上、三角在下");
+  ok(/\.sdemx-hlab\{[^}]*white-space:nowrap/.test(CSSFLAT), "四个字不许折行");
 }
 
 console.log("② 当前态按路径判定");
