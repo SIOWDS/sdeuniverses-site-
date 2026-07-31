@@ -6,7 +6,7 @@
  * 谁在引：
  *   · 全站浏览页 —— 由 /wds-mode.js 自动加载（那份脚本本来就在两千多个页面上）
  *   · /sde-wechat/ —— 页面自己一行 <script>
- *   · /taste/wds-chat/ —— **不**由本文件挂载（window.WDSM_PAGE 时自动跳过）：
+ *   · /taste/chatsde/ —— **不**由本文件挂载（window.WDSM_PAGE 时自动跳过）：
  *     那个界面是全屏层，切换器画在它自己的侧栏里，用的是同一张 SDE_MODES 表。
  *
  * 落点顺序：[data-sde-modes] → .nav-links → .top → 右下浮动。
@@ -21,7 +21,7 @@
   var SDE_MODES = [
     { k: "browse", href: "/", icon: "\u25a4", zh: "\u6d4f\u89c8", en: "Browse", zhT: "\u56de\u5230\u7f51\u7ad9\uff1a\u4e13\u680f\u00b7\u4e13\u8457\u00b7\u5b66\u5458", enT: "The site: columns, books, students" },
     { k: "im", href: "/sde-wechat/", icon: "\ud83d\udcac", zh: "SDE \u5fae\u4fe1", en: "Messenger", zhT: "\u7fa4\u804a\u4e0e\u79c1\u804a", enT: "Groups and direct messages" },
-    { k: "wds", href: "/taste/wds-chat/", icon: "\u2726", zh: "SDE \u5bf9\u8bdd", en: "Dialogue", zhT: "\u95ee WDS\uff1a\u5168\u7ad9\u95ee\u7b54\u4e0e SDE \u5bf9\u8c08", enT: "Ask WDS about anything on the site" },
+    { k: "wds", href: "/taste/chatsde/", icon: "\u2726", zh: "SDE \u5bf9\u8bdd", en: "Dialogue", zhT: "ChatSDE\uff1a\u5168\u7ad9\u95ee\u7b54\u4e0e SDE \u5bf9\u8c08", enT: "ChatSDE about anything on the site" },
   ];
 
   // 回到入口页。地址只在这里定义一次，wds-mode.js 用的是同一串。
@@ -75,6 +75,9 @@
     for (var i = 0; i < SDE_MODES.length; i++) {
       var m = SDE_MODES[i];
       if (m.k !== "browse" && p.indexOf(m.href) === 0) return m.k;
+      // 更名遗留：/taste/wds-chat/ 是 ChatSDE 的旧门牌（现为跳转页）。旧址还在流通，
+      // 认它一手，免得切换器把它错标成"浏览"。
+      if (m.k === "wds" && p.indexOf("/taste/wds-chat/") === 0) return m.k;
     }
     return "browse";
   }
@@ -99,7 +102,7 @@
     ".sdemx a:hover{background:rgba(212,178,94,.18)}" +
     ".sdemx a.on{background:var(--gold,#D4B25E);color:#0F0B07}" +
     ".sdemx a i{font-style:normal;font-size:12px}" +
-    /* 浏览态顶栏那一颗：与站点自带的「问WDS」成对，描边而不是填色——两颗都填色会互相喊 */
+    /* 浏览态顶栏那一颗：与站点自带的「ChatSDE」成对，描边而不是填色——两颗都填色会互相喊 */
     ".sdemx-pill{border:1px solid var(--gold,#D4B25E);border-radius:16px;padding:3px 13px;" +
     "color:var(--gold,#8C6A3A);font-weight:700;text-decoration:none;white-space:nowrap}" +
     ".sdemx-pill:hover{background:var(--gold,#D4B25E);color:#0F0B07}" +
@@ -188,7 +191,7 @@
       || null;
   }
 
-  // 浏览态的顶栏：紧跟「✦ 问WDS」插一颗「💬 SDE 微信」。
+  // 浏览态的顶栏：紧跟「✦ ChatSDE」插一颗「💬 SDE 微信」。
   // 为什么不是三段条：人在浏览态时，"浏览"就是他所在的地方——顶栏需要的是通往另外两态的门，
   // 不是一个把自己也画进去的三段条。会议与讨论都并进了微信这一格，所以顶栏这两颗就够了。
   // 站点的中英是靠 body 上的 class 切 .zh-only/.en-only，所以要成对插。
@@ -205,7 +208,7 @@
     var zh = mk("zh-only", "\ud83d\udcac SDE \u5fae\u4fe1");
     var en = mk("en-only", "\ud83d\udcac Messenger");
     var all = nav.querySelectorAll(".wdsm-navbtn");
-    var anchor = all.length ? all[all.length - 1] : null;    // 紧跟问WDS；它不在就落到末尾
+    var anchor = all.length ? all[all.length - 1] : null;    // 紧跟ChatSDE；它不在就落到末尾
     var hm = homeBtn();
     if (anchor && anchor.nextSibling) {
       nav.insertBefore(zh, anchor.nextSibling); nav.insertBefore(en, zh.nextSibling); nav.insertBefore(hm, en.nextSibling);
@@ -227,7 +230,7 @@
 
   window.SDEModes = { list: SDE_MODES, portal: PORTAL, current: curKey, build: build, mount: mount };
 
-  // 问WDS 是全屏层，切换器画在它自己的侧栏里（同一张表），这里不重复挂
+  // ChatSDE 是全屏层，切换器画在它自己的侧栏里（同一张表），这里不重复挂
   if (window.WDSM_PAGE) return;
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", mount);
   else mount();

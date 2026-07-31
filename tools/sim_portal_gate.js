@@ -53,7 +53,7 @@ ok("后退回首页、还没进过门 → 拦",
    shouldOpen(E({ navType: "back_forward", seen: false })) === true);
 
 console.log("[别的页面一律放行]");
-["/students/", "/column/x/", "/sde-wechat/", "/taste/wds-chat/", "/books/m/48/"].forEach(function (p) {
+["/students/", "/column/x/", "/sde-wechat/", "/taste/chatsde/", "/books/m/48/"].forEach(function (p) {
   ok(p + " 不拦", shouldOpen(E({ path: p })) === false);
 });
 ok("内页也不受 seen 影响", shouldOpen(E({ path: "/health/", seen: false })) === false);
@@ -76,7 +76,7 @@ console.log("[三大功能体系的去处]");
 ok("三个入口，一个不多一个不少", NODES.length === 3, NODES.map(function (n) { return n.k; }).join("/"));
 ok("浏览＝就地揭开首页（不跳转，不再加载一次首页）", GO.browse === "");
 ok("微信 → /sde-wechat/", GO.im === "/sde-wechat/");
-ok("对话 → /taste/wds-chat/", GO.wds === "/taste/wds-chat/");
+ok("对话 → /taste/chatsde/（更名后的正式门牌）", GO.wds === "/taste/chatsde/");
 ok("每个入口都有去处（GO 的键与 NODES 对得上）",
    NODES.every(function (n) { return Object.prototype.hasOwnProperty.call(GO, n.k); }));
 

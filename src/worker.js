@@ -399,7 +399,7 @@ function wdsAskLen(q) {
   return want >= 1200 ? Math.min(want, 20000) : 0;   // 1200 字以下按常规问答走；单次上限 2 万字，再长该走「继续」或成文流程
 }
 
-// ── 全站问答（问WDS）的分档口径。沿用十二～十五修那条通则：
+// ── 全站问答（ChatSDE）的分档口径。沿用十二～十五修那条通则：
 //    "这一步该产出多长"决定它的预算、口径与时限——一刀切的全局常量必然在某一步上错。
 //    所以提问上限、历史预算、单条上限、两级时钟分开定，别再共用一个数。
 const WDS_CHAT_Q_MAX = 20000;          // 提问上限（原 800：粘长文的读者后半段被静默吃掉）
@@ -3228,7 +3228,7 @@ const SDE_METHOD_BLOCK = "\n\n【深度档 · 必须真走的工序（不要复�
   + "\n输出要求：先给一句最承重的判断（反直觉、可被反驳），再展开三到五段把它撑住，最后留一个把读者推向下一步的问题。全程说人话，不堆术语、不摆模板。";
 
 
-/* ═══════════ SDE 工序（问WDS 独有；Claude/GPT 那边没有对应物）═══════════
+/* ═══════════ SDE 工序（ChatSDE 独有；Claude/GPT 那边没有对应物）═══════════
    每道工序是一段**硬要求**，不是提示口吻：它规定这一轮必须交付哪几件东西、
    哪一件交不出就要明说交不出。刻意都带一条"做不到就直说"的出口——
    工序最怕的不是做不到，是假装做到了（那会静默地把一次没做的检测记成做过）。 */
@@ -4097,7 +4097,7 @@ export default {
       const mode = b.mode === "l2" ? "l2" : (b.mode === "long" ? "long" : (b.mode === "ledger" ? "ledger" : "l1"));
       const text = String(b.text || "").slice(0, 20000);
       if (!text.trim()) return J({ ok: false, summary: "" }, 200);
-      // LEDGER：问WDS 的本场压缩。压缩的口径不是"聊了什么"，而是"落下了哪几条"——
+      // LEDGER：ChatSDE 的本场压缩。压缩的口径不是"聊了什么"，而是"落下了哪几条"——
       // 摘要式的压缩会把判断磨成概述（"讨论了教育问题"），下一轮它就只剩一团雾；
       // 账本式的压缩留下的是能被反驳的句子，接着谈才接得上。
       const sys = mode === "ledger"
@@ -5052,7 +5052,7 @@ export default {
       try {
         const lim = env.ASK_LIMITER.get(env.ASK_LIMITER.idFromName(wdsBucket("chat", ip, userKey)));
         const lr = await (await lim.fetch(new Request("https://limiter.internal/?w=" + WDS_PER_MIN + "&d=" + WDS_PER_DAY))).json();
-        if (!lr.ok) return _sseResp([{ t: "error", v: lr.reason === "day" ? ("这把 Key 今天在「全站问答」入口已用 " + (lr.inDay || 0) + "/" + WDS_PER_DAY + " 次，明天再来（额度按你的 Key 计，陪读与「与WDS对话」各有独立额度）。") : "聊得太快啦，过十几秒再问。" }]);
+        if (!lr.ok) return _sseResp([{ t: "error", v: lr.reason === "day" ? ("这把 Key 今天在「ChatSDE」入口已用 " + (lr.inDay || 0) + "/" + WDS_PER_DAY + " 次，明天再来（额度按你的 Key 计，陪读与「与WDS对话」各有独立额度）。") : "聊得太快啦，过十几秒再问。" }]);
         dayLeft = Math.max(0, WDS_PER_DAY - (lr.inDay || 0));   // 回传真实日剩余，供前端显示
       } catch (e) {}
       // ── 先出流后干活:先把 200 SSE 流交出去,重活(全站RAG + 内化心得 + await 上游首字节)移入

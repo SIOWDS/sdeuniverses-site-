@@ -562,7 +562,7 @@ function flashAsk(msg){
   var ansEl=document.getElementById('ans'); ansEl.className='ans'; ansEl.innerHTML='<div class="err">'+esc(msg)+'</div>';
   document.getElementById('sources').innerHTML=''; document.getElementById('thinkBar').textContent='';
 }
-/* 与品尝系列/问WDS 共用同一套本地键名：在任何一个智能体填过 Key，其余入口自动获得 */
+/* 与品尝系列/ChatSDE 共用同一套本地键名：在任何一个智能体填过 Key，其余入口自动获得 */
 function askKeyName(v){ return v==='ds' ? 'sde_ds_key' : 'sde_glm_key'; }
 document.getElementById('userKey').addEventListener('input', function(){ try{ var k=this.value.trim(); localStorage.setItem('sde_user_key', k); localStorage.setItem(askKeyName(vendor), k); }catch(e){} });
 (function restoreAsk(){
@@ -1667,9 +1667,9 @@ function saveKey(){
 </script>
 
 <script>window.WDS_READ={selector:".wrap"};</script>
-<script src="/taste/wds-companion/wds-read.js?v=20260730c" defer></script>
+<script src="/taste/wds-companion/wds-read.js?v=20260731f" defer></script>
 
-<script src="/wds-mode.js?v=20260730c" defer></script>
+<script src="/wds-mode.js?v=20260731f" defer></script>
 <script src="/taste/assets/sde-handoff.js?v=1"></script>
 <script>
 /* 接住从 SDE 对话交过来的那一问：只填框、不开跑（纪律见 sde-handoff.js）。 */

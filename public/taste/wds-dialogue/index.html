@@ -273,7 +273,7 @@
   //  ③ 检索在本机做（纯字符串打分，不联网、不发第二次调用），只把挑中的那几条送出去。
   var MEMO_API = "/api/wds/memo";
   // 引擎已抽成全站共享模块 /assets/wds-memo.js（window.WDSMemo）——下面这些只是薄委托，
-  // 面板与角标代码一个字没改。抽的原因：问WDS（/taste/wds-chat/）也要全局记忆，
+  // 面板与角标代码一个字没改。抽的原因：ChatSDE（/taste/chatsde/）也要全局记忆，
   // 同一套检索/摘要/画像逻辑绝不写第二份（2026-07-28 存盘那次的撞车教训）。
   var UM = { memos: [], metas: [], profile: "", pkeys: [], ready: false, running: false, stop: false };
   var MEMO_ENGINE = null;

@@ -15,7 +15,9 @@ const fs = require("fs");
 const ROOT = "/home/claude/site";
 const wm = fs.readFileSync(ROOT + "/public/wds-mode.js", "utf8");
 const wk = fs.readFileSync(ROOT + "/src/worker.js", "utf8");
-const shell = fs.readFileSync(ROOT + "/public/taste/wds-chat/index.html", "utf8");
+// 更名后正式门牌是 /taste/chatsde/；旧址成了跳转页，两份都要验
+const shell = fs.readFileSync(ROOT + "/public/taste/chatsde/index.html", "utf8");
+const shellOld = fs.readFileSync(ROOT + "/public/taste/wds-chat/index.html", "utf8");
 let P = 0, F = 0;
 const ok = (c, m) => { c ? (P++, console.log("  PASS " + m)) : (F++, console.log("  FAIL " + m)); };
 

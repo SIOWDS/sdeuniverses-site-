@@ -1,5 +1,5 @@
-/* 问WDS —— 全站问答 v4（对标 Claude 的对话外壳）。独立界面在 /taste/wds-chat/（页内置 window.WDSM_PAGE=1 后引入本脚本）。
- * 其余页面引入本脚本只注入入口（导航「✦ 问WDS」或右下「✦ 问全站」按钮），点击跳转独立页。
+/* ChatSDE —— 全站问答 v4（对标 Claude 的对话外壳）。独立界面在 /taste/chatsde/（页内置 window.WDSM_PAGE=1 后引入本脚本）。
+ * 其余页面引入本脚本只注入入口（导航「✦ ChatSDE」或右下「✦ 问全站」按钮），点击跳转独立页。
  * 后端 /api/wds/chat：全站检索 + SDE 内核 + 王德生人格 + 多轮 + 出处；mode=deep 走满血深度档；web=1 联网。
  *      /api/wds/distill：把整场对话锻成 报告 / 成文 / 提纲。
  * v2 新增：Markdown 渲染 · 思考过程可展开 · 三档模式条 · 停止/重答/改问 · 站外来源 · 成文与导出。
@@ -33,7 +33,7 @@
   var LS_WEB = "sde_wds_web";             // "1" | "0"
   var LS_LANG = "sde_wds_lang";           // "zh" | "en"
   var PAGE = !!window.WDSM_PAGE;
-  var PAGE_URL = "/taste/wds-chat/";
+  var PAGE_URL = "/taste/chatsde/";
   function el(t, c, x) { var e = document.createElement(t); if (c) e.className = c; if (x != null) e.textContent = x; return e; }
   function esc(s) { return String(s).replace(/[&<>]/g, function (m) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;" }[m]; }); }
 
@@ -282,14 +282,14 @@
 
   var TXT = {
     zh: {
-      tabNormal: "常规", tabBack: "\u2190 返回浏览", tabWds: "\u2726 问WDS",
+      tabNormal: "常规", tabBack: "\u2190 返回浏览", tabWds: "\u2726 ChatSDE",
       bDistill: "\u270e 成文 · PPT", bHist: "\u21ba 历史", bSet: "\u2699 设置", bNew: "\uff0b 新对话",
       heroSub: "王德生的 AI 分身 · SDE 本体论老师<br>检索全站文章与专著，也能直接和你对谈 SDE",
       egs: ["SDE 说的“显露”和“结构”有什么不同？", "用 SDE 怎么看慢性病的发生？", "什么是特征纠缠？举个例子", "帮我找几篇入门 SDE 的文章"],
       mAtt: "\ud83d\udcce 附件", mStd: "\u26a1 标准", mDeep: "\u25c8 深度思考", mWeb: "\ud83c\udf10 联网",
       tipStd: "快答档，够用且省", tipDeep: "满血基底＋满功率思考＋SDE 全内功与方法论工序，慢但深", tipWeb: " · 已开联网（需智谱 Key）",
       ph: "问 WDS 任何 SDE 问题，或让它帮你找站里读什么…",
-      note: "问WDS 会尽力扣着全站内容作答，可核验的书名/引文请以原文为准。用你自己的大模型 Key 运行，只存在浏览器本地。",
+      note: "ChatSDE 会尽力扣着全站内容作答，可核验的书名/引文请以原文为准。用你自己的大模型 Key 运行，只存在浏览器本地。",
       left: "本场剩余 ", times: " 次", today: " 次 · 今日 ", turnsTitle: "本场＝这一次对话最多 100 轮（点＋新对话可重开）；今日＝本机每天在「全站问答」入口的额度，陪读与「与WDS对话」各有独立额度。",
       dayOut: "今日本机额度已用完，明天再来（陪读与「与WDS对话」不受影响）。",
       sessFull: "这场已谈满 100 次，点＋新对话重开。",
@@ -319,7 +319,7 @@
       dDirFail: "写不进去（",
       convoTitle: "与 WDS 的对话", errNoOut: "成文没接上（",
       setTitle: "设置", setKeyH: "用你自己的 API Key",
-      setKeyP: "问WDS 用你自己的大模型 Key 运行。<b style=\"color:#C9A227\">Key 只存在你的浏览器本地，不会上传本站</b>，随时可清除。联网搜索走智谱通道，填一把智谱 Key 即可同时用于对话与联网。",
+      setKeyP: "ChatSDE 用你自己的大模型 Key 运行。<b style=\"color:#C9A227\">Key 只存在你的浏览器本地，不会上传本站</b>，随时可清除。联网搜索走智谱通道，填一把智谱 Key 即可同时用于对话与联网。",
       setAboutH: "自定义指令（可空）",
       setAboutP: "写一句你是谁、在做什么、想让 WDS 怎么答你。以后每次提问都会带上，不必再重复交代。也只存在你本机。",
       setAboutPh: "例：我是中学生物老师，正在把 SDE 用到备课上。答我时多举课堂能直接用的例子，术语讲一遍就够。",
@@ -424,7 +424,7 @@
       tipStd: "Fast tier — enough for most questions, and cheap",
       tipDeep: "Top model at full reasoning power, the whole SDE groundwork and its method stages. Slow, but it digs.",
       tipWeb: " · Web search on (needs a Zhipu key)",
-      ph: "Ask WDS anything about SDE, or ask it what to read here…",
+      ph: "ChatSDE anything about SDE, or ask it what to read here…",
       note: "WDS answers from what is actually on this site. Check titles and quotations against the originals. It runs on your own model key, kept only in this browser.",
       left: "", times: " left this session", today: " left this session · ", turnsTitle: "Session = up to 100 turns in this chat (start a new one to reset). Today = this key's daily allowance on the site-wide entrance; the reading companion has its own.",
       dayOut: "Today's allowance for this key is used up. Come back tomorrow.",
@@ -594,7 +594,7 @@
       cvTitle: "Canvas", cvOpen: "⧉ Canvas", cvClose: "Hide canvas",       cvEmpty: "The canvas is empty. What lands here automatically: structure maps (/map), deep-research reports, and any diagram, page, table or long draft that comes back as a block.\n\nTo put something here by hand: hit “⧉ To canvas” under any answer.\n\nOnce here you can switch versions, preview, download, save locally, or select a passage and have WDS revise it in place.",
       cvTip: "Canvas: long outputs and diagrams — versions, in-place revision",
       cvPrev: "Preview", cvSrc: "Source", cvCopy: "Copy", cvDl: "Download", cvSave: "Save locally", cvSaved: "Saved",
-      cvAsk: "Ask WDS to revise this", cvAskAll: "Ask WDS to revise this version", cvVer: "Version", cvDrop: "⧉ To canvas", cvDropped: "On the canvas",
+      cvAsk: "ChatSDE to revise this", cvAskAll: "ChatSDE to revise this version", cvVer: "Version", cvDrop: "⧉ To canvas", cvDropped: "On the canvas",
       cvPick: "Select something on the canvas first", cvNoPrev: "Source only for this kind",
       cvAskPre: "The passage below comes from the canvas \u201c{t}\u201d. Rewrite it as I ask; output the revised passage only, no commentary:",
       rsBtn: "🔬 Deep research", rsOn: "Deep research: on", rsTip: "Break it down → gather evidence step by step → one verdict, with sources (uses several turns)",
@@ -1085,7 +1085,7 @@
   }
   /* ════════════════ 全局记忆（用户RAG）════════════════
      引擎只有一份：/assets/wds-memo.js（与 /taste/wds-dialogue/ 共用）。这里只管接线与面板。
-     跨智能体：agents:"all" —— 记忆池取本机所有 WDS 对话（问WDS ＋ 和WDS对话 ＋ 陪读），
+     跨智能体：agents:"all" —— 记忆池取本机所有 WDS 对话（ChatSDE ＋ 和WDS对话 ＋ 陪读），
      所以"记住并搜索所有的历史对话"是字面意思，不限本页。 */
   var MEM = null;
   function memBoot() {
@@ -1596,7 +1596,7 @@
   try { localStorage.removeItem(LS); } catch (e) {}  // 清掉旧的"自动弹出"记忆
 
   // 三态互切：目的地与 /assets/sde-modes.js 的 SDE_MODES 是同一套（模拟有跨文件断言钉住）
-  var TAB_GO = { normal: "/", im: "/sde-wechat/", wds: "/taste/wds-chat/" };
+  var TAB_GO = { normal: "/", im: "/sde-wechat/", wds: "/taste/chatsde/" };
   var PORTAL_URL = "/?portal=1";                              // 与 sde-modes.js 的 PORTAL 同一串
   (function () {
     var pb = layer.querySelector(".wdsm-portal");
@@ -1644,7 +1644,7 @@
       return a;
     }
     var search = nav.querySelector("a[href='/search/']");
-    var zh = mk("zh-only", "✦ 问WDS"), en = mk("en-only", "✦ Ask WDS");
+    var zh = mk("zh-only", "✦ ChatSDE"), en = mk("en-only", "✦ ChatSDE");
     if (search && search.nextSibling) { nav.insertBefore(zh, search.nextSibling); nav.insertBefore(en, zh.nextSibling); }
     else { nav.appendChild(zh); nav.appendChild(en); }
   }
@@ -1658,7 +1658,7 @@
   }
   // 全站三态（浏览 / SDE 微信 / SDE 对话）：本脚本已在两千多个页面上，
   // 让它去把三态条请来，于是所有页面自动长出切换器，一个页面都不用改。
-  // 模块拉不到时退回老的单按钮注入——宁可只有问WDS入口，也不能一个入口都没有。
+  // 模块拉不到时退回老的单按钮注入——宁可只有ChatSDE入口，也不能一个入口都没有。
   function loadModes() {
     if (window.SDEModes) return;
     var sc = document.createElement("script");
@@ -3538,7 +3538,7 @@
               _vb.style.cssText = "font-size:12.5px;line-height:1.7;margin:8px 0 0;opacity:.8";
               if (stat && stat.parentNode) stat.parentNode.appendChild(_vb);
             }
-            window.SDEVault.auto([{ kind: "claim", text: _vt }], "问WDS · " + kindT(kind), _vb);
+            window.SDEVault.auto([{ kind: "claim", text: _vt }], "ChatSDE · " + kindT(kind), _vb);
           }
         }
       } catch (e) {}
@@ -3590,7 +3590,7 @@
       });
   }
 
-  /* ════════════════ SDE 工序（问WDS 独有的九道）════════════════
+  /* ════════════════ SDE 工序（ChatSDE 独有的九道）════════════════
      一道工序＝这一轮必须交付哪几件东西。选中后一直挂着（按钮上看得见），
      不写进 localStorage——工序会实质改变产出形态，不该在读者看不见的地方跨会话生效。
      斜杠命令与菜单是同一套 key，前端只负责传 key，工序文本一律在后端

@@ -142,9 +142,13 @@ console.log("② 当前态按路径判定");
   ok(box.parentNode.className === "top", "微信页没有 .nav-links，就近挂到 .top 顶栏");
 }
 {
-  const e2 = freshDoc("/taste/wds-chat/");
+  const e2 = freshDoc("/taste/chatsde/");
   const M2 = run(e2);
-  ok(M2.current() === "wds", "在 /taste/wds-chat/ 判为 SDE 对话，实得 " + M2.current());
+  ok(M2.current() === "wds", "在 /taste/chatsde/ 判为 SDE 对话，实得 " + M2.current());
+  // 旧门牌仍在流通（跳转页），切换器不能把它错标成"浏览"
+  const e2b = freshDoc("/taste/wds-chat/");
+  const M2b = run(e2b);
+  ok(M2b.current() === "wds", "旧址 /taste/wds-chat/ 也仍判为 SDE 对话，实得 " + M2b.current());
 }
 
 console.log("③ 兜底浮动 / 指定落点 / 问WDS 页不挂");
@@ -163,7 +167,7 @@ console.log("③ 兜底浮动 / 指定落点 / 问WDS 页不挂");
   ok(e.body.querySelector(".sdemx").parentNode === slot, "页面指定了落点就用它（[data-sde-modes] 优先级最高）");
 }
 {
-  const e = freshDoc("/taste/wds-chat/", { wdsPage: true });
+  const e = freshDoc("/taste/chatsde/", { wdsPage: true });
   const M = run(e);
   ok(!e.body.querySelector(".sdemx"), "问WDS 是全屏层，模块不重复挂（它自己侧栏里画）");
   ok(typeof M.build === "function", "但仍然把 build/list 暴露出来，谁要谁自己画");

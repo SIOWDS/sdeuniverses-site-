@@ -123,11 +123,11 @@
     { k: "browse", x: 50, y: 15, c: "#4FB6B2", icon: "\u25a4", zh: "SDE \u6d4f\u89c8", en: "SDE Browse",
       zhS: "\u4e13\u680f \u00b7 \u4e13\u8457 \u00b7 \u5b66\u5458 \u00b7 \u5168\u7ad9\u68c0\u7d22", enS: "Columns \u00b7 Books \u00b7 Students \u00b7 Search" },
     { k: "wds", x: 88, y: 82, c: "#E0B65C", icon: "\u2726", zh: "SDE \u5bf9\u8bdd", en: "SDE Dialogue",
-      zhS: "\u95ee WDS\uff1a\u5168\u7ad9\u95ee\u7b54\u4e0e SDE \u5bf9\u8c08", enS: "Ask WDS about anything here" },
+      zhS: "\u95ee WDS\uff1a\u5168\u7ad9\u95ee\u7b54\u4e0e SDE \u5bf9\u8c08", enS: "ChatSDE about anything here" },
     { k: "im", x: 12, y: 82, c: "#A981C4", icon: "\ud83d\udcac", zh: "SDE \u5fae\u4fe1", en: "SDE Messenger",
       zhS: "\u7fa4\u804a \u00b7 \u79c1\u804a \u00b7 \u4f1a\u8bae \u00b7 \u5e7f\u573a", enS: "Groups \u00b7 DMs \u00b7 Meetings \u00b7 Plaza" },
   ];
-  var GO = { browse: "", im: "/sde-wechat/", wds: "/taste/wds-chat/" };   // browse 留空＝就地揭开
+  var GO = { browse: "", im: "/sde-wechat/", wds: "/taste/chatsde/" };   // browse 留空＝就地揭开
 
   /* 烧 TOKEN 的火色（用户定）：浏览烧绿 · 对话烧红 · 微信烧蓝。
      注意它与节点自身的色相（NODES[].c 青/金/紫）是两回事：色相标身份，火色标烧的是哪一种 TOKEN。

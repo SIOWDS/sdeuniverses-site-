@@ -110,7 +110,7 @@
 
   var panel = el("div", "wdsr-panel");
   panel.innerHTML =
-    "<div class='wdsr-head'><div class='wdsr-title'><span class='wdsr-dot'></span>" + (CFG.panelTitle || "问WDS · 陪读") + "</div>" +
+    "<div class='wdsr-head'><div class='wdsr-title'><span class='wdsr-dot'></span>" + (CFG.panelTitle || "ChatSDE · 陪读") + "</div>" +
     "<div class='wdsr-sub'>" + (CFG.subLabel || "陪你读，不替你读") + "</div>" + "<button class='wdsr-histbtn' title='本机对话记录' style='display:none;position:absolute;right:72px;top:15px;background:none;border:none;color:#7C8798;font-size:15px;cursor:pointer;padding:0'>↺</button><button class='wdsr-keybtn' title='设置 API Key' style='position:absolute;right:44px;top:15px;background:none;border:none;color:#7C8798;font-size:15px;cursor:pointer;padding:0'>⚙</button><button class='wdsr-close' aria-label='关闭'>\u00d7</button></div>" +
     "<div class='wdsr-tools'><button class='wdsr-tool wdsr-sum' disabled>\u603b\u7ed3\u8fd9\u573a\u5bf9\u8bdd</button><button class='wdsr-tool wdsr-pap' disabled>" + (CFG.paperLabel || "\u751f\u6210 5000 \u5b57\u8bba\u6587") + "</button></div>" +
     "<div class='wdsr-msgs'></div>" +
@@ -229,7 +229,7 @@
     m.style.cssText = "position:fixed;inset:0;z-index:100001;background:rgba(10,8,5,.72);display:flex;align-items:center;justify-content:center;padding:20px;font-family:-apple-system,'PingFang SC',sans-serif";
     m.innerHTML = "<div style='max-width:400px;width:100%;background:#161B22;border:1px solid rgba(212,178,94,.3);border-radius:16px;padding:26px'>"
       + "<div style='font-size:17px;font-weight:700;color:#F5EFE0;margin-bottom:8px'>用你自己的 API Key</div>"
-      + "<div style='font-size:13px;color:#8B98A5;line-height:1.7;margin-bottom:18px'>问WDS 用你自己的大模型 Key 运行。<b style=\"color:#C9A227\">Key 只存在你的浏览器本地，不会上传本站</b>，随时可清除。</div>"
+      + "<div style='font-size:13px;color:#8B98A5;line-height:1.7;margin-bottom:18px'>ChatSDE 用你自己的大模型 Key 运行。<b style=\"color:#C9A227\">Key 只存在你的浏览器本地，不会上传本站</b>，随时可清除。</div>"
       + "<div style='display:flex;gap:8px;margin-bottom:14px'><button class='kv' data-v='ds' style='flex:1;padding:9px;border-radius:9px;border:1px solid rgba(212,178,94,.4);background:none;color:#E8E4DA;cursor:pointer;font:13px inherit'>DeepSeek</button><button class='kv' data-v='glm' style='flex:1;padding:9px;border-radius:9px;border:1px solid rgba(212,178,94,.4);background:none;color:#E8E4DA;cursor:pointer;font:13px inherit'>智谱 GLM</button></div>"
       + "<input class='kin' type='password' placeholder='粘贴你的 API Key' style='width:100%;box-sizing:border-box;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);border-radius:9px;padding:11px;color:#F5EFE0;font:14px inherit;outline:none;margin-bottom:10px'>"
       + "<div class='klink' style='font-size:12px;color:#6b7684;line-height:1.6;margin-bottom:18px'></div>"
@@ -330,7 +330,7 @@
     };
     q1(".pdf", m).onclick = function () { exportPDF(tEl.textContent, bEl.textContent, kind); };
     /* 💡 存进库存 —— **手动，不自动**。
-       别处（金点子/中华智问/经典解构/问WDS/和WDS对话/大比拼/搜索页提炼）都是自动入库，
+       别处（金点子/中华智问/经典解构/ChatSDE/和WDS对话/大比拼/搜索页提炼）都是自动入库，
        因为那些是**提炼件**：三段硬门、栏目化、经过评审。而陪读浮层的产出是**随手问答**——
        自动入库会把库存冲稀，「随便翻翻」翻出一堆平庸句子，反而毁掉库存的用处。
        ⇒ 这里由读者自己决定：读到一句真觉得好的，按一下。

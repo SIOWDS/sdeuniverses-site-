@@ -127,9 +127,12 @@ ok("\u6a21\u5757\u6ca1\u88c5\u8f7d\u65f6\u8bf4\u4eba\u8bdd\u800c\u4e0d\u662f\u62
 ok("\u7a7a\u6001\u4e5f\u6307\u4e86\u8def\uff08hero \u91cc\u63d0\u4e86\u4ea4\u7ed9\u667a\u80fd\u4f53\uff09", /heroAfter:[^\n]*\u4ea4\u7ed9\u667a\u80fd\u4f53/.test(WDS));
 ok("\u4e2d\u82f1\u6587\u6848\u90fd\u914d\u9f50\uff08passH/passTip/passGo\uff09",
   (WDS.match(/passH:/g) || []).length === 2 && (WDS.match(/passTip:/g) || []).length === 2 && (WDS.match(/passGo:/g) || []).length === 2);
-const shell = R("public/taste/wds-chat/index.html");
+const shell = R("public/taste/chatsde/index.html");
 ok("\u58f3\u9875\u5f15\u4e86\u6a21\u5757", /sde-handoff\.js\?v=/.test(shell));
-ok("\u58f3\u9875\u7248\u672c\u6233\u5f80\u524d\u8d70\u4e86", /wds-mode\.js\?v=20260731e/.test(shell));
+// 别把版本戳钉成魔法数字——它每动一次 wds-mode.js 就要往前走一格。
+// 只验"格式对且不早于上一次已知值"（这套戳是 YYYYMMDD+字母，按字典序比就是按时间比）。
+const _st = (shell.match(/wds-mode\.js\?v=(20\d{6}[a-z]+)/) || [])[1] || "";
+ok("\u58f3\u9875\u7248\u672c\u6233\u5f80\u524d\u8d70\u4e86\uff08\u5b9e\u5f97 " + _st + "\uff09", _st >= "20260731e");
 
 console.log("\n=== 7. \u4e94\u6761\u7eaa\u5f8b\u5199\u5728\u6a21\u5757\u91cc\uff08\u5404\u9875\u4e0d\u8bb8\u5404\u5199\u4e00\u5957\uff09 ===");
 ["\u4e00\u6b21\u6027", "\u8bfb\u8005\u7684\u4e1c\u897f\u4f18\u5148", "\u53ea\u586b\u4e0d\u8dd1", "\u5931\u8d25\u4e0d\u62e6\u8def", "\u8bf4\u6e05\u6765\u5904"].forEach((k) =>

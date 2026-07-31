@@ -461,7 +461,7 @@ console.log("⑧ 成文（distill）");
   ok(store["sde_wds_lang"] === "en", "语言已存本地");
   ok(langBtn.textContent === "中", "切到英文后按钮显示 中");
   ok(layer.querySelector(".wdsm-mode[data-k='deep']").textContent === "\u25c8 Deep", "档位按钮已英化");
-  ok(inEl.placeholder.indexOf("Ask WDS") === 0, "输入框占位已英化");
+  ok(inEl.placeholder.indexOf("ChatSDE") === 0, "输入框占位已英化（ChatSDE）");
   ok(layer.querySelectorAll(".wdsm-eg").length === 0, "首屏不铺示例问题（切语言也不会把它们铺回来），实得 " + layer.querySelectorAll(".wdsm-eg").length);
   ROUTE["/api/wds/chat"] = [{ t: "token", v: "In English." }];
   inEl.value = "hello";
@@ -584,7 +584,7 @@ console.log("⑧ 成文（distill）");
   ok(!pb.querySelector(".wdsm-pfire") && !/wdsmBurn/.test(src),
     "侧栏这颗 △ 刻意不烧——火只留浏览首页那一处");
 }
-  ok(layer.querySelector(".wdsm-tab[data-m='wds']").textContent.includes("问WDS"), "已更名为「问WDS」");
+  ok(layer.querySelector(".wdsm-tab[data-m='wds']").textContent.includes("ChatSDE"), "已正式更名为「ChatSDE」");
   const foldBtn = layer.querySelector(".wdsm-fold");
   foldBtn.click();
   ok(layer.classList.contains("fold") && store["sde_wds_fold"] === "1", "点收起 → 侧栏折叠且记住");
