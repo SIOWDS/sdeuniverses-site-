@@ -1,6 +1,8 @@
 /* sim_portal_icon.js —— 「SDE 对话」圆里那个图标的验收
  *
- * 用户定的（2026-07-31）：圆里不能是一个静止的图，要是**两个小人的碰撞**——对话碰撞的符号。
+ * 用户定的（2026-07-31）：
+ *   · SDE 对话的圆里不能是一个静止的图，要是**两个小人的碰撞**——对话碰撞的符号；
+ *   · SDE 微信的圆里要是**很多小人在牽手、拉成一个结构**。
  * 所以这里要钉的不只是"画了两个人"，而是"这两个人确实在朝对方走、并且火花正落在相撞那一瞬"。
  *
  * 跑法：node tools/sim_portal_icon.js
@@ -28,6 +30,7 @@ function S(tag, attrs) {
   for (var k in attrs) e.attrs[k] = attrs[k];
   e.appendChild = function (c) { e.kids.push(c); return c; };
   e.setAttribute = function (k, v) { e.attrs[k] = v; };
+  e.style = {};
   return e;
 }
 var collideIcon = eval("(" + grab(/function collideIcon\(\) \{[\s\S]*?\n  \}\n/, "collideIcon")[0] + ")");
@@ -138,8 +141,74 @@ var durs = (CSS.match(/animation:sdep(BumpL|BumpR|Clash) ([\d.]+)s/g) || [])
 ok("三支动画同一个周期（否则火花会飘到没人的时候）",
    durs.length === 3 && new Set(durs).size === 1, durs.join("/"));
 
+console.log("[一圈手拉手（SDE 微信）]");
+var handsIcon = eval("(" + grab(/function handsIcon\(\) \{[\s\S]*?\n  \}\n/, "handsIcon")[0] + ")");
+var HANDS_N = parseInt(grab(/var HANDS_N = (\d+), HANDS_CYCLE = ([\d.]+);/, "HANDS_N")[1], 10);
+var HANDS_CYCLE = parseFloat(grab(/var HANDS_N = \d+, HANDS_CYCLE = ([\d.]+);/, "HANDS_CYCLE")[1]);
+var ring = handsIcon();
+ok("是方的（viewBox 40×40，带 sq 变体）",
+   ring.attrs.viewBox === "0 0 40 40" && /\bsq\b/.test(ring.attrs["class"]));
+ok("sq 变体在 CSS 里真是正方形", /\.sdep-icon\.sq\{width:1\.5em;height:1\.5em/.test(src));
+ok("对装饰层隐身", ring.attrs["aria-hidden"] === "true");
+var heads = byClass(ring, "hd"), armsG = byClass(ring, "arms");
+ok("“很多”小人（≥ 6 个）", HANDS_N >= 6 && heads.length === HANDS_N, String(heads.length));
+ok("手臂是一条闭合的环（带 Z）", armsG.length === 1 && /Z$/.test(armsG[0].attrs.d.trim()));
+
+var RC = { x: 20, y: 20 };
+function pol(p) {
+  return { r: Math.hypot(p.x - RC.x, p.y - RC.y),
+           a: (Math.atan2(p.y - RC.y, p.x - RC.x) * 180 / Math.PI + 360) % 360 };
+}
+var hp = heads.map(function (c) { return pol({ x: +c.attrs.cx, y: +c.attrs.cy }); });
+ok("头都在同一个圈上（半径 13，±0.05）",
+   hp.every(function (q) { return Math.abs(q.r - 13) < 0.05; }));
+var ha = hp.map(function (q) { return q.a; }).sort(function (a, b) { return a - b; });
+var even = ha.every(function (v, i) {
+  var g = (i === ha.length - 1) ? (ha[0] + 360 - v) : (ha[i + 1] - v);
+  return Math.abs(g - 360 / HANDS_N) < 0.05;
+});
+ok("围成一圈且间隔均匀（每人 " + (360 / HANDS_N).toFixed(0) + "°）", even, ha.map(function (v) { return v.toFixed(0); }).join(","));
+
+/* 手臂环：肩（大半径）与握手处（小半径）交替，握手处恰好在两人正中 */
+var verts = armsG[0].attrs.d.replace(/[MZ]/g, " ").trim().split(/\s*L\s*|\s+/).filter(Boolean)
+  .map(function (t) { var q = t.split(","); return pol({ x: +q[0], y: +q[1] }); });
+ok("环上顶点 = 人数×2（一肩一手）", verts.length === HANDS_N * 2, String(verts.length));
+var sh = verts.filter(function (_, i) { return i % 2 === 0; }), hn = verts.filter(function (_, i) { return i % 2 === 1; });
+ok("肩在头与手之间的半径上（9.8）", sh.every(function (q) { return Math.abs(q.r - 9.8) < 0.05; }));
+ok("握在一起的手往里塌（7.4 < 9.8，手臂才看得出是拉着的）",
+   hn.every(function (q) { return Math.abs(q.r - 7.4) < 0.05; }));
+ok("每只手都恰在相邻两人正中（±0.05°）",
+   hn.every(function (q, i) {
+     var a0 = sh[i].a, a1 = sh[(i + 1) % sh.length].a;
+     var mid = (a0 + (((a1 - a0) % 360 + 360) % 360) / 2) % 360;
+     return Math.abs(((q.a - mid) % 360 + 360) % 360) < 0.05 || Math.abs(((q.a - mid) % 360 + 360) % 360 - 360) < 0.05;
+   }));
+ok("肩与头同一个方向（脖子是径向的）",
+   sh.every(function (q) { return ha.some(function (a) { return Math.abs(a - q.a) < 0.05; }); }));
+var necks = ring.kids[0].kids.filter(function (k) { return k.tag === "path" && !/arms/.test(k.attrs["class"] || ""); });
+ok("每人一段脖子", necks.length === HANDS_N, String(necks.length));
+
+/* 亮光沿圈传递：延时逐个错开、刚好铺满一个周期 */
+var delays = heads.map(function (c) { return parseFloat(c.style.animationDelay); });
+ok("每个头都有自己的延时", delays.every(function (v) { return !isNaN(v); }));
+ok("延时互不相同（不会齐步闪）", new Set(delays).size === HANDS_N, delays.join("/"));
+ok("延时均匀铺满一个周期（0→" + HANDS_CYCLE + "s）",
+   Math.min.apply(null, delays) === 0 &&
+   Math.max.apply(null, delays) < HANDS_CYCLE &&
+   delays.slice().sort(function (a, b) { return a - b; }).every(function (v, i) {
+     return Math.abs(v - i * HANDS_CYCLE / HANDS_N) < 0.01;
+   }), delays.join("/"));
+var ringDurs = (CSS.match(/animation:sdep(Hold|Clasp) ([\d.]+)s/g) || []).map(function (t) { return t.match(/([\d.]+)s/)[1]; });
+ok("头与手臂同一个周期，且等于延时排的那个周期",
+   ringDurs.length === 2 && new Set(ringDurs).size === 1 && parseFloat(ringDurs[0]) === HANDS_CYCLE,
+   ringDurs.join("/") + " vs " + HANDS_CYCLE);
+ok("头是实心的（这个尺寸下描边会糊）",
+   /\.sdep-icon \.hd\{fill:currentColor;stroke:none/.test(src));
+ok("reduced-motion 下两支都停",
+   /prefers-reduced-motion:reduce\)\{\.sdep-icon \.hd,\.sdep-icon \.arms\{animation:none\}/.test(src));
+
 console.log("[挂载与守卫]");
-ok("wds 走现画图标（ART 映射）", /var ART = \{ wds: collideIcon \}/.test(src));
+ok("两个入口都走现画图标（ART 映射）", /var ART = \{ wds: collideIcon, im: handsIcon \}/.test(src));
 ok("没列进 ART 的仍用字形兜底", /if \(ART\[n\.k\]\) dot\.appendChild\(ART\[n\.k\]\(\)\); else dot\.textContent = n\.icon;/.test(src));
 ok("图标尺寸跟着字号走（em，不写死 px）", /\.sdep-icon\{width:1\.55em;height:1\.1em/.test(src));
 ok("描边用 currentColor（hover 反白时跟着变）", /\.sdep-icon\{[^"]*stroke:currentColor/.test(src));

@@ -133,6 +133,16 @@
        尺寸跟着 font-size 走（em），窄屏字号一小它自己就跟着小。 */
     ".sdep-icon{width:1.55em;height:1.1em;display:block;overflow:visible;fill:none;stroke:currentColor;" +
     "stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}" +
+    /* 围成一圈的那个是方的（viewBox 40×40），不能跟着扭成 40×28 */
+    ".sdep-icon.sq{width:1.5em;height:1.5em;stroke-width:1.45}" +
+    /* 一圈小人手拉手：手臂那圈轻轻呼吸，亮光沿着圈子一个传一个——
+       这坐结构是活的，不是一张静图。头的延时在建图时逐个排开。 */
+    /* 头用实心：这么小的圆若只描边，中间那点空会糊成一团 */
+    ".sdep-icon .hd{fill:currentColor;stroke:none;transform-box:fill-box;transform-origin:center;animation:sdepHold 2.4s ease-in-out infinite}" +
+    "@keyframes sdepHold{0%,60%,100%{transform:scale(1);opacity:.82}16%{transform:scale(1.24);opacity:1}}" +
+    ".sdep-icon .arms{transform-box:fill-box;transform-origin:center;animation:sdepClasp 2.4s ease-in-out infinite}" +
+    "@keyframes sdepClasp{0%,100%{transform:scale(1);opacity:.8}50%{transform:scale(1.05);opacity:1}}" +
+    "@media(prefers-reduced-motion:reduce){.sdep-icon .hd,.sdep-icon .arms{animation:none}}" +
     /* 两个小人迎面走近、撞上、回弹；三支动画同一个周期，火花才会正好落在相撞那一瞬 */
     ".sdep-icon .figL{animation:sdepBumpL 1.9s ease-in-out infinite}" +
     ".sdep-icon .figR{animation:sdepBumpR 1.9s ease-in-out infinite}" +
@@ -204,7 +214,41 @@
     return svg;
   }
   // 哪个入口用现画的图标（没列在这里的就用 NODES[].icon 那个字形）
-  var ART = { wds: collideIcon };
+  /* 「SDE 微信」圆里的图标：**一大圈小人手拉手，拉成一个结构**。
+     不是一个对话气泡（那只说了“有人在说话”），而是人与人搭起来的那个形——
+     群聊·私聊·会议·广场，说到底是一圈人手拉着手才立得住。
+     40×40，圆心 (20,20)：N 个头在半径 13 的圈上，脖子往里接到肩（半径 9.8），
+     再由一条**闭合的锯齿环**把肩与肩串起来：两人之间往里塔到半径 7.4，那一点就是握在一起的手。 */
+  var HANDS_N = 8, HANDS_CYCLE = 2.4;
+  function handsIcon() {
+    var svg = S("svg", { "class": "sdep-icon sq", viewBox: "0 0 40 40" });
+    svg.setAttribute("aria-hidden", "true");
+    var CX = 20, CY = 20, RH = 13, RN = 10.9, RS = 9.8, RA = 7.4;
+    function P(r, deg) {
+      var a = deg * Math.PI / 180;
+      return { x: +(CX + r * Math.cos(a)).toFixed(2), y: +(CY + r * Math.sin(a)).toFixed(2) };
+    }
+    var g = S("g", {});
+    // 先画手臂那一圈（压在头下面）
+    var d = "";
+    for (var i = 0; i < HANDS_N; i++) {
+      var sh = P(RS, -90 + i * 360 / HANDS_N);
+      var hd = P(RA, -90 + (i + 0.5) * 360 / HANDS_N);     // 两人中间：握手处
+      d += (i ? " L" : "M") + sh.x + "," + sh.y + " L" + hd.x + "," + hd.y;
+    }
+    g.appendChild(S("path", { "class": "arms", d: d + " Z" }));
+    for (var j = 0; j < HANDS_N; j++) {
+      var deg = -90 + j * 360 / HANDS_N;
+      var n1 = P(RN, deg), n2 = P(RS, deg), hh = P(RH, deg);
+      g.appendChild(S("path", { d: "M" + n1.x + "," + n1.y + " L" + n2.x + "," + n2.y }));   // 脖子
+      var c = S("circle", { "class": "hd", cx: hh.x, cy: hh.y, r: 2.15 });
+      c.style.animationDelay = (j * HANDS_CYCLE / HANDS_N).toFixed(2) + "s";                 // 亮光逐个传过去
+      g.appendChild(c);
+    }
+    svg.appendChild(g);
+    return svg;
+  }
+  var ART = { wds: collideIcon, im: handsIcon };
 
   /* 四周的图案：三个母题各占一角，全部压在低不透明度上。
      这张 svg 用 slice，圆才是圆的——三角形那张是 none（要跟着拉满），两者不能共用。 */
