@@ -16,6 +16,9 @@
   // 不再和答题挤在同一个请求里把流掐死。用 fetch(自己的公网地址) 会 522（自请求回环超时）。
   // R2_PDF：学员 PDF 存这里。桶是私有的（Public Access = Disabled），不对外直连，
   // 全部经 Worker 出去——所以不需要自定义域名，URL 与从前一模一样。
+  // 定时清 SDE 微信库：朋友圈附件只留 7 天（见 worker.js 的 wxSweep）。
+  // 每天 04:17 UTC 跑一次；错开整点，免得和别人的 cron 挤在同一分钟。
+  "triggers": { "crons": ["17 4 * * *"] },
   "r2_buckets": [
     { "binding": "PDFS", "bucket_name": "sdeuniverses-pdf" }
   ],

@@ -3834,7 +3834,45 @@ async function askCore(request, env, url, body, SINK) {
   return new Response(stream, { headers: { ..._cors(), "content-type": "text/event-stream; charset=utf-8", "cache-control": "no-store" } });
 }
 
+// ===== SDE 微信库：朋友圈附件只在 R2 里存 7 天 =====
+// 为什么要有这个：朋友圈的文章是「推荐给朋友读一读」，不是站内出版物——站内出版物走
+// /students/ 那条线、永久保存。这些附件单份可到 20MB，不设期限迟早把桶撑爆
+// （站点仓已经因为二进制失控到 4.37GB，同一个教训不想再来一次）。
+// 做法是定时扫，不是靠 R2 的 lifecycle 规则——lifecycle 只能在控制台点，
+// 写在代码里的东西才跟着仓库走、才能被复核。
+const WX_LIB = "sde-wechat/lib/";        // SDE 微信库（新件都进这里）
+const WX_LIB_OLD = "moments/doc/";       // 首版的落点，一并扫，扫完自然清空
+const WX_TTL_MS = 7 * 24 * 3600 * 1000;
+
+async function wxSweep(env, now) {
+  if (!env || !env.PDFS) return { ok: false, msg: "没有绑定 R2 桶。" };
+  const cutoff = (now || Date.now()) - WX_TTL_MS;
+  let scanned = 0, removed = 0, kept = 0;
+  const gone = [];
+  for (const prefix of [WX_LIB, WX_LIB_OLD]) {
+    let cursor = undefined;
+    for (let round = 0; round < 50; round++) {   // 上限 5 万件，防扫穿
+      const page = await env.PDFS.list({ prefix, limit: 1000, cursor });
+      for (const o of (page.objects || [])) {
+        scanned++;
+        const t = o.uploaded ? new Date(o.uploaded).getTime() : 0;
+        if (t && t > cutoff) { kept++; continue; }
+        try { await env.PDFS.delete(o.key); removed++; gone.push(o.key); } catch (e) {}
+      }
+      if (!page.truncated) break;
+      cursor = page.cursor;
+    }
+  }
+  return { ok: true, scanned, removed, kept, ttlDays: 7, gone: gone.slice(0, 20) };
+}
+
 export default {
+  // 定时清库：每天 04:17 UTC 跑一次（cron 写在 wrangler.jsonc 的 triggers.crons）
+  async scheduled(event, env, ctx) {
+    if (env) { IM_ENV = env; if (env.IM_PW) IM_PW_ENV = String(env.IM_PW); }
+    const r = await wxSweep(env, Date.now());
+    console.log("[wx-lib-sweep]", JSON.stringify(r));
+  },
   async fetch(request, env, ctx) {
     if (env) { IM_ENV = env; if (env.IM_PW) IM_PW_ENV = String(env.IM_PW); }
     const url = new URL(request.url);
@@ -5712,10 +5750,16 @@ export default {
       const k = String(url.searchParams.get("k") || "");
       if (!/^[0-9a-f]{16}$/.test(k)) return new Response("bad key", { status: 400 });
       if (!env.PDFS) return new Response("not found", { status: 404 });
-      let obj = await env.PDFS.get("moments/doc/" + k + ".pdf");
-      let kind = "pdf";
-      if (!obj) { obj = await env.PDFS.get("moments/doc/" + k + ".docx"); kind = "docx"; }
-      if (!obj) return new Response("not found", { status: 404 });
+      let obj = null, kind = "pdf";
+      for (const pre of [WX_LIB, WX_LIB_OLD]) {            // 新库优先，首版落点回落
+        obj = await env.PDFS.get(pre + k + ".pdf");
+        if (obj) { kind = "pdf"; break; }
+        obj = await env.PDFS.get(pre + k + ".docx");
+        if (obj) { kind = "docx"; break; }
+      }
+      // 过期被清掉的和从来没有过的，对读者是同一件事：告诉他这篇已经不在了。
+      if (!obj) return new Response("这篇文章已超过 7 天保留期，已从 SDE 微信库清除。请让作者重新发一次。", {
+        status: 404, headers: { "content-type": "text/plain; charset=utf-8" } });
       const nm = (obj.customMetadata && obj.customMetadata.n) || ("article." + kind);
       // 文件名里的非 ASCII 只能走 filename*（RFC 5987），否则中文名会在部分浏览器上乱码或截断
       const dispo = (kind === "pdf" ? "inline" : "attachment") +
@@ -5756,7 +5800,7 @@ export default {
       if (t === "pdf" && !isPdf) return Response.json({ ok: false, msg: "这不像一个 PDF 文件。" }, { status: 400 });
       if (t === "docx" && !isZip) return Response.json({ ok: false, msg: "这不像一个 .docx 文件（旧的 .doc 请先另存为 .docx）。" }, { status: 400 });
       const k = [...crypto.getRandomValues(new Uint8Array(8))].map((x) => x.toString(16).padStart(2, "0")).join("");
-      await env.PDFS.put("moments/doc/" + k + "." + t, bytes, {
+      await env.PDFS.put(WX_LIB + k + "." + t, bytes, {
         httpMetadata: { contentType: t === "pdf" ? "application/pdf" : "application/vnd.openxmlformats-officedocument.wordprocessingml.document" },
         customMetadata: { n: nm, by: who.uid },
       });
@@ -5883,7 +5927,7 @@ export default {
           // 免得有人手捏一个 k 发出来、卡片点开是 404。
           let doc = null;
           if (b.doc && /^[0-9a-f]{16}$/.test(String(b.doc.k || "")) && (b.doc.t === "pdf" || b.doc.t === "docx")) {
-            const hd = env.PDFS ? await env.PDFS.head("moments/doc/" + b.doc.k + "." + b.doc.t) : null;
+            const hd = env.PDFS ? (await env.PDFS.head(WX_LIB + b.doc.k + "." + b.doc.t) || await env.PDFS.head(WX_LIB_OLD + b.doc.k + "." + b.doc.t)) : null;
             if (!hd) return Response.json({ ok: false, msg: "这篇文章没上传成功，请重新选一次。" }, { status: 400 });
             doc = { k: String(b.doc.k), t: b.doc.t, n: String(b.doc.n || "").slice(0, 80), s: hd.size };
           }
@@ -5968,12 +6012,16 @@ export default {
           if (!out.length) return Response.json({ ok: false, msg: "这次没生出来，换个口味或者过一会儿再点。" }, { status: 502 });
           return Response.json({ ok: true, lines: out, saw: canSee ? imgs.length : 0, blind: (imgs.length && !canSee) ? 1 : 0, srcs: srcs.slice(0, 3) }, { headers: { "cache-control": "no-store" } });
         }
+        if (a === "gc") {   // 手动清一次库；cron 每天自己跑，这个是给人按的
+          const r = await wxSweep(env, Date.now());
+          return Response.json(r, { status: r.ok ? 200 : 400 });
+        }
         const MOMAP = { like: "molike", cmt: "mocmt", cdel: "mocdel", del: "model", news: "monews", badge: "mobadge" };
         if (MOMAP[a]) {
           const d = await call({ op: MOMAP[a], uid: who.uid, name: who.name, id: String(b.id || ""), cid: String(b.cid || ""), rid: String(b.rid || ""), text: b.text });
           if (a === "del" && d && d.ok && env.PDFS) {   // 动态没了，图片和附件也别留在桶里
             for (const k of (d.imgs || [])) { try { await env.PDFS.delete("moments/" + k + ".jpg"); } catch (e) {} }
-            if (d.doc && d.doc.k) { try { await env.PDFS.delete("moments/doc/" + d.doc.k + "." + d.doc.t); } catch (e) {} }
+            if (d.doc && d.doc.k) { for (const pre of [WX_LIB, WX_LIB_OLD]) { try { await env.PDFS.delete(pre + d.doc.k + "." + d.doc.t); } catch (e) {} } }
           }
           return Response.json(d || { ok: false }, { status: (d && d.ok) ? 200 : ((d && d.code) || 400) });
         }
