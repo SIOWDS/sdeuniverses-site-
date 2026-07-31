@@ -312,10 +312,14 @@ ROUTE["/api/wds/chat"] = [
   ROUTE["/api/wds/chat"] = [{ t: "token", v: "刚开个头" }, { t: "token", v: "……" }];
   inEl.value = "再问一句";
   sendEl.click();
-  ok(sendEl.classList.contains("stop"), "生成中发送键变停止键");
-  sendEl.click();  // 停止
+  // 发送键不再兼职停止：生成中它仍是 ↑（按它＝排队），可停的是另立的那颗 ■
+  const stopK = layer.querySelector(".wdsm-stopk");
+  ok(!!stopK, "输入框里有独立的停止键（右侧凑够四颗：模型选择器·语音·停止·发送）");
+  ok(!sendEl.classList.contains("stop") && sendEl.textContent === "\u2191", "生成中发送键仍是 ↑，实得 " + sendEl.textContent);
+  ok(stopK.disabled === false, "生成中停止键可用");
+  stopK.click();  // 停止
   await new Promise((r) => setTimeout(r, 200));
-  ok(!sendEl.classList.contains("stop"), "停止后发送键复位");
+  ok(stopK.disabled === true, "停下之后停止键置灰（没东西可停就别装作可点）");
 
   console.log("⑦.5 停止键（三个入口一条路）");
 {
@@ -325,7 +329,9 @@ ROUTE["/api/wds/chat"] = [
   T("停止条上写着字，不是一个光秃秃的图标", /stopGen: "停止生成"/.test(wm) && /lb\.textContent = t\("stopGen"\)/.test(wm));
   T("装饰元素缺失也不打断流（贴文案全程 null 安全）", /if \(lb\) lb\.textContent[\s\S]{0,80}else b\.textContent/.test(wm));
   T("停止条标出快捷键 Esc", /stopHint: "Esc"/.test(wm));
-  T("三个入口（发送钮/停止条/Esc）都走同一个 stopGen()", (wm.match(/stopGen\(\)/g) || []).length >= 3);
+  T("三个停止入口（■ 键 / 浮动条 / Esc）走同一个 doStop()", (wm.match(/doStop\(\)/g) || []).length >= 4);
+  T("doStop 只停当前这一条，队列改成暂停而不是丢掉（读者写下的字不该因为按了停止就没了）",
+    /function doStop\(\)[\s\S]{0,220}QUEUE\.length[\s\S]{0,60}qPaused = true/.test(wm));
   T("stopGen 一定置 stoppedByUser（否则「停下」会被当成「出错」）", /function stopGen\(\)[\s\S]{0,160}stoppedByUser = true/.test(wm));
   T("开始流式就显示、收尾就隐藏", /stopBarShow\(true\)/.test(wm) && /stopBarShow\(false\)/.test(wm));
   T("与「回到最新」同一位置时不叠在一起", /wdsm-tobot"\);\s*if \(tb\) tb\.style\.display = "none"/.test(wm));
@@ -1043,6 +1049,45 @@ console.log("⑧ 成文（distill）");
   await new Promise((r) => setTimeout(r, 140));
   ok(!String(CALLS.filter((c) => c.url === "/api/wds/chat").pop().p.about).includes("【当前项目】"),
     "切回全部后不再带项目说明（说明只属于那个项目）");
+
+
+  /* ═════════ ㉜ 连续输入排队 ═════════ */
+  console.log("㉜ 排队");
+  layer.querySelector(".wdsm-newbtn").click();
+  ROUTE["/api/wds/chat"] = [{ t: "token", v: "第一问的回答。" }];
+  CALLS = [];
+  inEl.value = "第一问";
+  sendEl.click();
+  // 还在流里就接着敲第二、第三句
+  inEl.value = "第二问";
+  sendEl.click();
+  ok(CALLS.filter((c) => c.url === "/api/wds/chat").length === 1, "生成中再按发送不会立刻发请求，实得 " + CALLS.filter((c) => c.url === "/api/wds/chat").length);
+  ok(inEl.value === "", "排进队列后输入框照旧清空（手感与真发出去一致）");
+  const qbar = layer.querySelector(".wdsm-que");
+  ok(!!qbar && String(qbar.textContent).includes("已排队"), "输入区上方有队列条，实得 " + (qbar ? qbar.textContent.slice(0, 24) : "无"));
+  ok(String(qbar.textContent).includes("第二问"), "队列条上写着下一句是什么（排了什么进去要看得见）");
+  // 轮询驱动：上一条答完就自动把队首发出去
+  await new Promise((r) => setTimeout(r, 900));
+  const sent = CALLS.filter((c) => c.url === "/api/wds/chat").map((c) => c.p.q);
+  ok(sent.length === 2 && sent[1] === "第二问", "上一条答完自动接着问队首，实得 " + JSON.stringify(sent));
+  ok(!layer.querySelector(".wdsm-que"), "队列空了就把队列条收掉");
+  // 停止：停当前这一条，队列暂停而不是丢掉
+  ROUTE["/api/wds/chat"] = [{ t: "token", v: "慢慢答……" }];
+  CALLS = [];
+  inEl.value = "甲"; sendEl.click();
+  inEl.value = "乙"; sendEl.click();
+  inEl.value = "丙"; sendEl.click();
+  layer.querySelector(".wdsm-stopk").click();
+  await new Promise((r) => setTimeout(r, 900));
+  ok(CALLS.filter((c) => c.url === "/api/wds/chat").length === 1, "按了停止，队列不自动接着跑（「停止」就该是停止），实得 " + CALLS.filter((c) => c.url === "/api/wds/chat").length);
+  const qb2 = layer.querySelector(".wdsm-que");
+  ok(!!qb2 && String(qb2.textContent).includes("已暂停"), "队列条改成「已暂停 · N 条待发」");
+  ok(qb2.querySelectorAll("button").length === 2, "暂停时给两条出路：继续发 / 清空队列，实得 " + qb2.querySelectorAll("button").length);
+  qb2.querySelectorAll("button").find((b) => String(b.textContent).includes("继续")).click();
+  await new Promise((r) => setTimeout(r, 900));
+  ok(CALLS.filter((c) => c.url === "/api/wds/chat").length >= 2, "点「继续发」才接着跑");
+  layer.querySelectorAll(".wdsm-que").forEach(function (b) { if (b.parentNode) b.parentNode.removeChild(b); });
+  QUEUE_CLEANUP: ;
 
   console.log("\n===== " + PASS + " PASS / " + FAILS + " FAIL =====");
   process.exit(FAILS ? 1 : 0);

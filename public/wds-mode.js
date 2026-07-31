@@ -563,6 +563,9 @@
       psSave: "＋ 把现在这套存为预设", psAsk: "给这套预设起个名字", psDel: "删掉这个预设？",
       psExp: "⤓ 导出全部", psImp: "⤒ 导入", psImpAsk: "把导出的预设 JSON 贴在这里", psImpBad: "这段不是预设文件",
       psOn: "已切到预设：", psFull: "预设最多 12 套，先删一个再存。",
+      qTip: "它正在答——现在发出的会排队，答完自动接着问", qBar: "⏳ 已排队 {n} 条",
+      qPausedT: "⏸ 已暂停 · {n} 条待发", qResume: "继续发", qClear: "清空队列",
+      qFull: "队列最多 10 条", qNext: "下一句：",
       duBtn: "⇉ 双基底", duTip: "同一问同时问两家，左右并排；答完可再让 WDS 做一次对照",
       duPick: "第二家用谁？", duNoKey: "（还没填 Key）", duOff: "不并排",
       duCmp: "⇄ 让 WDS 对照这两份", duCmpQ: "下面是同一个问题交给两家基底得到的两份回答。请对照它们，只说四件事：①两边各自看见了对方没看见的什么；②它们在哪一点上正面矛盾（指到具体句子）；③哪一份更经得起反驳、为什么；④两份都漏掉的是什么。不要复述它们的内容。",
@@ -594,6 +597,9 @@
       psSave: "＋ Save current setup", psAsk: "Name this preset", psDel: "Delete this preset?",
       psExp: "⤓ Export all", psImp: "⤒ Import", psImpAsk: "Paste the exported preset JSON here", psImpBad: "That is not a preset file",
       psOn: "Switched to preset: ", psFull: "12 presets max — delete one first.",
+      qTip: "It is still answering — what you send now is queued and asked next", qBar: "⏳ {n} queued",
+      qPausedT: "⏸ Paused · {n} waiting", qResume: "Resume", qClear: "Clear queue",
+      qFull: "10 queued messages max", qNext: "Next: ",
       duBtn: "⇉ Two models", duTip: "Ask both at once, side by side; then have WDS compare them",
       duPick: "Which second model?", duNoKey: "(no key yet)", duOff: "Single model",
       duCmp: "⇄ Have WDS compare these", duCmpQ: "Below are two answers to the same question from two different models. Compare them and say only four things: (1) what each saw that the other missed; (2) where they flatly contradict each other (point to the sentences); (3) which holds up better under attack, and why; (4) what both missed. Do not restate their content.",
@@ -857,7 +863,13 @@
     /* 收进框里的三样：＋ 做成圆钮，模型选择器与两颗图标钮一起缩一号，免得把框撑高 */
     ".wdsm-inrow .wdsm-attbtn{width:34px;height:34px;padding:0;border-radius:999px;font-size:20px;line-height:1;display:flex;align-items:center;justify-content:center}" +
     ".wdsm-inrow .wdsm-mp{padding:7px 10px;font-size:12.5px;border-radius:9px}" +
-    ".wdsm-inrow .wdsm-mic,.wdsm-inrow .wdsm-send{width:36px;height:36px;border-radius:10px;font-size:16px}" +
+    ".wdsm-inrow .wdsm-mic,.wdsm-inrow .wdsm-send,.wdsm-inrow .wdsm-stopk{width:36px;height:36px;border-radius:10px;font-size:16px}" +
+    ".wdsm-stopk{flex:none;background:none;border:1px solid var(--wline2);color:var(--wtx);cursor:pointer;line-height:1}" +
+    ".wdsm-stopk:hover:not(:disabled){background:#B4453E;border-color:#B4453E;color:#F5EFE0}" +
+    ".wdsm-stopk:disabled{opacity:.32;cursor:default}" +
+    ".wdsm-que{max-width:760px;margin:0 auto 8px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:12px;color:var(--wgold2)}" +
+    ".wdsm-que button{background:none;border:1px solid var(--wline);color:var(--wdim);font:11.5px/1 inherit;padding:4px 8px;border-radius:7px;cursor:pointer}" +
+    ".wdsm-que em{font-style:normal;color:var(--wdim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:320px}" +
     ".wdsm-in{width:100%;display:block;resize:none;background:none;border:none;outline:none;color:var(--wtx2);font:15px/1.6 inherit;max-height:160px;padding:6px 0}" +
     ".wdsm-in::placeholder{color:var(--wdim2)}" +
     ".wdsm-mic{flex:none;background:none;border:1px solid var(--wline2);color:var(--wgold2);border-radius:11px;width:40px;height:40px;font-size:17px;cursor:pointer;line-height:1}" +
@@ -983,6 +995,7 @@
             "<span class='wdsm-insp'></span>" +
             "<button class='wdsm-mp'></button>" +
             "<button class='wdsm-mic'>\ud83c\udf99</button>" +
+            "<button class='wdsm-stopk'>\u25a0</button>" +
             "<button class='wdsm-send'>\u2191</button>" +
           "</div>" +
         "</div>" +
@@ -1555,7 +1568,7 @@
   });
   layer.querySelector(".wdsm-keybtn").onclick = function () { wdsKeyPanel(function () {}); };
   layer.querySelector(".wdsm-membtn").onclick = function () { memBoot(); memPanel(); };
-  layer.querySelector(".wdsm-stopbar").onclick = function () { stopGen(); };
+  layer.querySelector(".wdsm-stopbar").onclick = function () { doStop(); };
   layer.querySelector(".wdsm-tipdeck").onclick = function (ev) {
     var onX = ev && ev.target && ev.target.tagName && ev.target.tagName.toLowerCase() === "em";
     tipDeckHide(true);                                    // 点哪儿都不再提示——提示的使命是被用一次
@@ -2343,7 +2356,12 @@
   var _keepVers = false;                 // 由 regen/editInline 置起：这一次 send 是「同一轮的另一版」
   function send(forceQ) {
     var q = String(forceQ != null ? forceQ : inEl.value).trim();
-    if (!q || streaming) return;
+    if (!q) return;
+    // 正在答：这一句排队，答完自动接着问（输入框照旧清空，手感与真发出去一致）
+    if (streaming) {
+      if (qPush(q) && forceQ == null) { inEl.value = ""; inEl.style.height = "auto"; }
+      return;
+    }
     // 并排挂着时：一问同时交给两家
     if (duV && !streaming) {
       var kvd = wdsKeyGet(); if (!kvd) { wdsKeyPanel(function () { send(q); }); return; }
@@ -2368,7 +2386,7 @@
     cell.a.innerHTML = "<span class='cur'>▊</span>";
     history.push({ role: "reader", text: q }); updTurns(); stSave(history);
     streaming = true; stoppedByUser = false;
-    sendEl.textContent = "■"; sendEl.classList.add("stop"); sendEl.title = t("stopGen"); sendEl.setAttribute("aria-label", t("arStop"));
+    busyUI(true);
     stopBarShow(true); tipDeckHide(false);
     var payload = { q: q, history: histPack(compFrom()), umem: memRecall(q), key: kv.key, vendor: kv.vendor, model: kv.model || "", mode: thinkMode, web: webOn ? 1 : 0, skey: wdsSearchKey(), about: aboutPlus(), lang: LANG, tool: curTool };
     if (COMP.text) payload.comp = COMP.text;              // 前情账本：替代被裁掉的原文
@@ -2400,7 +2418,7 @@
     }
     function endUI() {
       streaming = false; curReader = null;
-      sendEl.textContent = "↑"; sendEl.classList.remove("stop"); sendEl.title = ""; sendEl.setAttribute("aria-label", t("arSend"));
+      busyUI(false);
       stopBarShow(false);
       if (stoppedByUser && answer) noteLine(cell, t("stopped"));
       if (answer) setTimeout(tipDeckShow, 600);           // 答完才提示，别在半路上打断阅读
@@ -2480,14 +2498,70 @@
         endUI();
       });
   }
-  sendEl.onclick = function () {
-    if (stopGen()) return;
-    send();
-  };
-  inEl.addEventListener("keydown", function (e) { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); if (!streaming) send(); } });
+  sendEl.onclick = function () { send(); };       // 它不再兼职停止：忙的时候按它＝排队
+  inEl.addEventListener("keydown", function (e) { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } });
 
 
 
+
+
+  /* ══════════════ 连续输入排队 ＋ 独立停止键 ══════════════
+     以前发送键在答题时会变成 ■，于是"停止"和"发送"共用一颗——想趁它写的时候
+     先把下一句敲下来，做不到。现在 ↑ 永远是 ↑（忙时按它＝排队），■ 另立一颗。
+     驱动用轻量轮询而不是给三条产线（普通/研究/并排）各挂收尾钩子：
+     挂三处早晚漏一处，漏了的表现是"排的队再也不发了"，很难被发现。 */
+  var QUEUE = [], qPaused = false, Q_MAX = 10;
+  var stopKey = layer.querySelector(".wdsm-stopk");
+  // 类名是 wdsm-que 不是 wdsm-q —— .wdsm-q 早就被提问气泡占着，
+  // 撞了不只是选择器取错元素，连样式都会糊到每一条提问上（模拟当场抓到）
+  function qPaint() {
+    var bar = layer.querySelector(".wdsm-que");
+    if (!QUEUE.length) { if (bar && bar.parentNode) bar.parentNode.removeChild(bar); return; }
+    if (!bar) {
+      bar = el("div", "wdsm-que");
+      var host = layer.querySelector(".wdsm-atts");
+      if (host && host.parentNode) host.parentNode.insertBefore(bar, host);
+    }
+    bar.innerHTML = "";
+    bar.appendChild(el("span", null, qPaused ? tx("qPausedT", { n: QUEUE.length }) : tx("qBar", { n: QUEUE.length })));
+    bar.appendChild(el("em", null, tx("qNext") + String(QUEUE[0] || "").slice(0, 40)));
+    if (qPaused) {
+      var go = el("button", null, tx("qResume"));
+      go.onclick = function () { qPaused = false; qPaint(); qTick(); };
+      bar.appendChild(go);
+    }
+    var cl = el("button", null, tx("qClear"));
+    cl.onclick = function () { QUEUE = []; qPaused = false; qPaint(); };
+    bar.appendChild(cl);
+  }
+  function qPush(q) {
+    if (QUEUE.length >= Q_MAX) { toast(tx("qFull")); return false; }
+    QUEUE.push(q); qPaint(); return true;
+  }
+  function qTick() {
+    if (streaming || qPaused || !QUEUE.length) return;
+    var q = QUEUE.shift();
+    qPaint();
+    send(q);
+  }
+  setInterval(qTick, 400);
+  // 忙/闲两态：发送键不再变形（它永远是发送），改由停止键的可用状态表达"有没有东西可停"
+  function busyUI(on) {
+    if (stopKey) { stopKey.disabled = !on; stopKey.title = t("stopGen"); stopKey.setAttribute("aria-label", t("arStop")); }
+    sendEl.textContent = "\u2191";
+    sendEl.classList.remove("stop");
+    sendEl.title = on ? tx("qTip") : "";
+    sendEl.setAttribute("aria-label", t("arSend"));
+  }
+  // 停止＝停当前这一条。队列里还有的不自动接着跑（"停止"就该是停止），
+  // 但也不扔掉读者已经写下的字——改成暂停，条上给「继续发」与「清空队列」。
+  function doStop() {
+    if (!stopGen()) return false;
+    if (QUEUE.length) { qPaused = true; qPaint(); }
+    return true;
+  }
+  if (stopKey) stopKey.onclick = function () { doStop(); };
+  busyUI(false);
 
   /* ══════════════ 双基底并排 ══════════════
      别家都没有这个。而本站从头就是靠"同一问喂多家、看谁看见了什么"做提智实证的——
@@ -2530,7 +2604,7 @@
     if (!mine || !other.key) { toast(t("duNeed")); return false; }
     history.push({ role: "reader", text: q }); updTurns(); 
     streaming = true; stoppedByUser = false; RS.stop = false;
-    sendEl.textContent = "\u25a0"; sendEl.classList.add("stop"); stopBarShow(true);
+    busyUI(true); stopBarShow(true);
     var wrap = el("div", "wdsm-du");
     var cols = [mine, other].map(function (who) {
       var c = el("div", "wdsm-duc");
@@ -2558,7 +2632,7 @@
           done++;
           if (done < 2) return;
           streaming = false; curReader = null;
-          sendEl.textContent = "\u2191"; sendEl.classList.remove("stop"); stopBarShow(false);
+          busyUI(false); stopBarShow(false);
           var both = cols.map(function (c) { return "【" + vinfo(c.who.vendor).name + "】\n" + c.text; }).join("\n\n");
           history.push({ role: "wds", text: both }); stSave(history); updTurns(); compTick();
           var row = el("div", "wdsm-acts");
@@ -3077,7 +3151,7 @@
   function rsRun(topic) {
     var kv = wdsKeyGet(); if (!kv) { wdsKeyPanel(function () { rsRun(topic); }); return; }
     RS.running = true; RS.stop = false; streaming = true;
-    sendEl.textContent = "\u25a0"; sendEl.classList.add("stop"); stopBarShow(true);
+    busyUI(true); stopBarShow(true);
     var cell = addTurn(topic);
     history.push({ role: "reader", text: topic }); updTurns();
     var card = el("div", "wdsm-rs");
@@ -3093,7 +3167,7 @@
     }
     function endRs(report) {
       RS.running = false; streaming = false; curReader = null;
-      sendEl.textContent = "\u2191"; sendEl.classList.remove("stop"); stopBarShow(false);
+      busyUI(false); stopBarShow(false);
       if (report) { history.push({ role: "wds", text: report }); stSave(history); compTick(); }
       updTurns();
     }
@@ -3772,7 +3846,7 @@
     if (!e) return;
     var mod = e.metaKey || e.ctrlKey, k = String(e.key || "");
     if (k === "Escape") {
-      if (stopGen()) return;
+      if (doStop()) return;
       var pn = document.querySelector(".wdsm-help") || document.querySelector(".wdsm-dist") || document.querySelector(".wdsm-menu");
       if (pn && pn.parentNode) pn.parentNode.removeChild(pn);
       return;

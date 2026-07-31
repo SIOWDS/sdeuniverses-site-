@@ -148,7 +148,10 @@ console.log("── 七/八/九 · 等待期可见、aria、注释与版本戳")
   ok(/function noteLine\(/.test(wm), "note 有落点，不至于静默丢弃");
   ok(/function ariaSet\(/.test(wm) && /ariaSet\(\);/.test(wm), "aria 名字有装上（不是只定义不调用）");
   ok(/aria-label/.test(wm) && /"aria-live", "polite"/.test(wm), "输入框/发送钮有名字，消息区是 live region");
-  ok(/arStop/.test(wm) && /sendEl\.setAttribute\("aria-label", t\("arStop"\)\)/.test(wm), "发送钮变停止钮时名字跟着变");
+  // 发送钮不再兼职停止，所以它的名字永远是"发送"；"停止"这个名字归那颗独立的停止键
+  ok(/stopKey\.setAttribute\("aria-label", t\("arStop"\)\)/.test(wm), "独立停止键有自己的 aria 名字");
+  ok(/sendEl\.setAttribute\("aria-label", t\("arSend"\)\)/.test(wm) && !/sendEl\.setAttribute\("aria-label", t\("arStop"\)\)/.test(wm),
+     "发送钮的 aria 名字始终是「发送」（它不再变成停止钮）");
   ok(/全站问答 v4/.test(wm), "文件头版本随能力一起走");
   ok(/表格 引用 分隔线 链接 KaTeX 公式/.test(wm), "文件头如实列出实际支持的 Markdown（过期注释已改）");
   ok(/wds-mode\.js\?v=2026073[0-9][a-z]/.test(shell), "壳页版本戳已 bump（动 wds-mode.js 必 bump）");
