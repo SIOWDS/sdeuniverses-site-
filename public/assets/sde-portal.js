@@ -7,7 +7,10 @@
  *   · 首页地址不动 —— 全站几千处 href="/"、站内索引、外部链接、SEO 落地页全都不用迁；
  *   · 选「浏览」是当场揭开下面那一页，不用再加载一次首页（一次点击换一次白屏是很亏的）；
  *   · 首页正文仍在 DOM 里，抓取与无脚本环境照常可读。
- * 一次会话只拦一次（sessionStorage）；想再看：/?portal=1 。
+ * 什么时候见到它（见 shouldOpen）：**从站外进来或刷新根地址，每次都见**——
+ * 用户定的是“输入 sdeuniverses.com 打开就是入口”，那就每次进门都得看见门。
+ * 只有**站内**点回首页（同源 referrer / 前进后退）且这一会话已经进过门才放行，
+ * 否则每点一次“首页”都被拦一道，门就成了路障。想随时回看：/?portal=1 。
  *
  * ── 画面（多样 · 统一 · 和谐）──
  * 多样：三个入口各有各的色相与各自的图案母题——
@@ -32,8 +35,40 @@
   var KEY = "sde_portal_seen";
   var P = String(location.pathname || "/");
   var FORCE = /[?&]portal=1/.test(String(location.search || ""));
-  if (!FORCE && P !== "/" && P !== "/index.html") return;      // 只在首页拦
-  try { if (!FORCE && sessionStorage.getItem(KEY)) return; } catch (e) {}
+
+  /* 拉开这一层的规矩（抽成纯函数，模拟脚本才能逐种情形复核）：
+       ① ?portal=1 —— 永远拉（专供回看）
+       ② 只在站点根（/ 或 /index.html）拉，别的页一律放行
+       ③ 刷新根地址 —— 等于重新进门，拉
+       ④ 前进后退回到首页 —— 算站内走动，进过门就不再拦
+       ⑤ referrer 是本站（站内点“首页”）—— 同上
+       ⑥ 其余（直接输地址、书签、搜索结果、新标签页、外链）—— **每次都拉** */
+  function shouldOpen(env) {
+    if (env.force) return true;
+    if (env.path !== "/" && env.path !== "/index.html") return false;
+    if (env.navType === "reload") return true;
+    if (env.navType === "back_forward") return !env.seen;
+    if (env.internal) return !env.seen;
+    return true;
+  }
+  function sameOrigin(ref, origin) {
+    if (!ref || !origin || ref.slice(0, origin.length) !== origin) return false;
+    var c = ref.charAt(origin.length);
+    return c === "" || c === "/" || c === "?" || c === "#";
+  }
+  function readEnv() {
+    var ref = "", seen = false, nav = "";
+    try { ref = String(document.referrer || ""); } catch (e) {}
+    try { seen = !!sessionStorage.getItem(KEY); } catch (e) {}
+    try {
+      var es = performance.getEntriesByType && performance.getEntriesByType("navigation");
+      if (es && es[0] && es[0].type) nav = String(es[0].type);
+      else if (performance.navigation) nav = performance.navigation.type === 1 ? "reload" : "navigate";
+    } catch (e) {}
+    return { force: FORCE, path: P, seen: seen, navType: nav,
+             internal: sameOrigin(ref, String(location.origin || "")) };
+  }
+  if (!shouldOpen(readEnv())) return;
 
   function lang() {
     try {
