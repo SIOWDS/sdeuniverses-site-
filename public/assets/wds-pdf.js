@@ -18,7 +18,9 @@
  */
 (function (w) {
   "use strict";
-  var VERSION = 2;   // v2：公式（KaTeX）当一等公民——字体等齐再打印、超宽公式自动缩到版心
+  var VERSION = 3;   // v3：版心宽按 @page 的 178mm 折算，不再问 1px 的 iframe 要
+  var PAGE_W_MM = 178;   // A4 210mm − @page 左右各 16mm。改 @page 的 margin 必须同步改这里
+  // v2：公式（KaTeX）当一等公民——字体等齐再打印、超宽公式自动缩到版心
 
   function esc(s) {
     return String(s == null ? "" : s).replace(/[&<>"]/g, function (m) {
@@ -193,8 +195,18 @@
      缩的是内层 .katex，外层留着占位；transform 不改变布局高度，所以外层要显式收一下高。 */
   function fitWide(d) {
     try {
-      var host = d.querySelector(".wrap");
-      var W = host ? host.clientWidth : 0;
+      // ⚠️ 版心宽**不能**问屏幕要：printFrame 的 iframe 是 1px×1px，量 .wrap 得到 0，
+      //    fitWide 会当场退出，超宽公式一条都缩不了、打印时被裁掉右边一截。
+      //    宽度由 @page 定死（A4 210mm − 左右 16mm = 178mm），用探针让浏览器自己换算。
+      var W = 0;
+      try {
+        var probe = d.createElement("div");
+        probe.style.cssText = "position:absolute;left:-9999px;top:0;width:" + PAGE_W_MM + "mm;height:1px";
+        (d.body || d.documentElement).appendChild(probe);
+        W = probe.getBoundingClientRect ? probe.getBoundingClientRect().width : probe.offsetWidth;
+        if (probe.parentNode) probe.parentNode.removeChild(probe);
+      } catch (e) {}
+      if (!W) W = PAGE_W_MM / 25.4 * 96;          // 换算不出来：按 96dpi 折
       if (!W) return;
       var list = d.querySelectorAll(".katex-display,.wdsm-tex.blk");
       for (var i = 0; i < list.length; i++) {

@@ -14,7 +14,8 @@ const ok = (n, c) => { if (c) { pass++; console.log("  ✓ " + n); } else { fail
 /* ═══ 一、模块本身 ═══ */
 console.log("── /assets/wds-pdf.js ──");
 const PDF = require(path.join(ROOT, "public/assets/wds-pdf.js"));
-ok("导出 VERSION/doc/scrub/print/fitWide", PDF.VERSION >= 2 && typeof PDF.doc === "function" && typeof PDF.scrub === "function" && typeof PDF.print === "function" && typeof PDF.fitWide === "function");
+const PDFSRC = fs.readFileSync(path.join(ROOT, "public/assets/wds-pdf.js"), "utf8");
+ok("导出 VERSION/doc/scrub/print/fitWide", PDF.VERSION >= 3 && typeof PDF.doc === "function" && typeof PDF.scrub === "function" && typeof PDF.print === "function" && typeof PDF.fitWide === "function");
 
 const H = PDF.doc({
   title: "与 WDS 的对话",
@@ -89,9 +90,21 @@ function fakeBox(w) {
                 setAttribute: (k, v) => { box.attrs[k] = v; }, _inner: inner };
   return box;
 }
-function runFit(hostW, boxes) {
-  PDF.fitWide({ querySelector: (s) => (s === ".wrap" ? { clientWidth: hostW } : null), querySelectorAll: () => boxes });
+/* 版心宽现在由 178mm 的探针量（v3）——**不能**再喂 .wrap 的 clientWidth：
+   真产品路径里 printFrame 的 iframe 是 1px×1px，.wrap 量出来是 0，
+   老写法当场 return、超宽公式一条都不缩，打印时右边被裁掉一截（2026-08-01 实测坐实）。 */
+function fakeDoc(probeW, boxes) {
+  const probe = { style: {}, parentNode: null, offsetWidth: probeW, getBoundingClientRect: () => ({ width: probeW }) };
+  const doc = {
+    _probe: probe, _wrapAsked: 0,
+    createElement: () => probe,
+    body: { appendChild: (n) => { n.parentNode = { removeChild: () => {} }; } },
+    querySelector: (s) => { if (s === ".wrap") doc._wrapAsked++; return null; },
+    querySelectorAll: () => boxes,
+  };
+  return doc;
 }
+function runFit(hostW, boxes) { PDF.fitWide(fakeDoc(hostW, boxes)); }
 const narrow = fakeBox(400), wide = fakeBox(1200), huge = fakeBox(9000);
 runFit(600, [narrow, wide, huge]);
 ok("没超宽的公式一个字节都不动", !narrow._inner.style.transform && !narrow.attrs["data-fit"]);
@@ -99,7 +112,23 @@ ok("没超宽的公式一个字节都不动", !narrow._inner.style.transform && 
 ok("超宽的被等比缩到版心（缩的是内层）", /^scale\(0\.49/.test(wide._inner.style.transform || "") && wide.attrs["data-fit"] === "0.498" && !wide.style.transform);
 ok("缩放有下限 0.45（再小就不是给人读的了）", huge.attrs["data-fit"] === "0.450");
 ok("缩过的外层收了高、切了溢出（transform 不改布局高度）", wide.style.overflow === "hidden" && /px$/.test(wide.style.height || ""));
-ok("版心量不到就整段跳过，不乱缩", (() => { const b = fakeBox(9000); PDF.fitWide({ querySelector: () => null, querySelectorAll: () => [b] }); return !b._inner.style.transform; })());
+// 探针量不出来（老浏览器/怪环境）不是"跳过"，而是按 96dpi 折算 178mm≈672.8px 继续缩——
+// 跳过等于放任裁切，比按标称宽缩坏得多
+ok("探针量不到就按 96dpi 折算版心，不放任裁切", (() => {
+  const b = fakeBox(1000);
+  PDF.fitWide(fakeDoc(0, [b]));
+  const s = parseFloat(b.attrs["data-fit"] || "0");
+  return s > 0.66 && s < 0.68;                     // (672.8-2)/1000 ≈ 0.671，且没落到 0.45 的下限上
+})());
+ok("fitWide 不再问 .wrap 要版心宽（1px iframe 里它是 0）", (() => {
+  const d = fakeDoc(660, [fakeBox(1200)]); PDF.fitWide(d); return d._wrapAsked === 0;
+})());
+ok("源码里已无 .wrap 的 clientWidth 量法", !/querySelector\(["'`]\.wrap["'`]\)[\s\S]{0,60}clientWidth/.test(PDFSRC));
+ok("PAGE_W_MM 与 @page 的 margin 对得上（210 − 16×2 = 178）", (() => {
+  const mm = /var PAGE_W_MM = (\d+);/.exec(PDFSRC);
+  const pg = /@page\{size:A4;margin:\d+mm (\d+)mm/.exec(PDFSRC);
+  return mm && pg && Number(mm[1]) === 210 - Number(pg[1]) * 2;
+})());
 ok("传进来的不是 document 也不炸", (() => { try { PDF.fitWide(null); PDF.fitWide({}); return true; } catch (e) { return false; } })());
 
 /* ═══ 二、抠出 pdfBlocks 配假 DOM 真跑 ═══ */
@@ -193,7 +222,7 @@ ok("空对话不让导（needTalk）", /function exportPdf\(\) \{\s*\n\s*if \(!h
 });
 ok("公式走自托管 katex（打印时 CDN 未必在）", SRC.indexOf('katex: "/assets/katex/katex.min.css"') > 0);
 ok("出稿带 base", /base: \(location && location\.origin/.test(SRC));
-ok("模块要到 v2（等字体、缩超宽公式）", /var PDF_WANT = 2;/.test(SRC));
+ok("模块要到 v3（版心宽按 @page 折算）", /var PDF_WANT = 3;/.test(SRC));
 // KaTeX 挂在 CDN 上，等于把"界面上有没有公式"押在第三方可达性上，PDF 跟着一起赌
 ok("KaTeX 自托管排第一顺位", /var KTX_HOSTS = \["\/assets\/katex",/.test(SRC));
 ok("导出前先把没排的公式排完（pdfMath 在取稿之前）",

@@ -3669,7 +3669,7 @@
      把对话排成一份干净的印刷稿，最后一步交给「另存为 PDF」。
      ⚠️ 稿子取的是**已经渲染好的 DOM**（.wdsm-a），不是 mdRender(history)：公式已被
      typeset 过、站内篇目已被 autoLink 挂上，重渲一遍这两样都会掉。取不到 DOM 才回退。 */
-  var PDF_WANT = 2;                 // v2 起：等字体、缩超宽公式（见 /assets/wds-pdf.js）
+  var PDF_WANT = 3;                 // v3 起：版心宽按 @page 折算（v2：等字体、缩超宽公式）见 /assets/wds-pdf.js
   function pdfBoot(then, forced) {
     if (window.WDSPdf && window.WDSPdf.VERSION >= PDF_WANT) { then(true); return; }
     if (window.WDSPdf && !forced) { delete window.WDSPdf; return pdfBoot(then, true); }
