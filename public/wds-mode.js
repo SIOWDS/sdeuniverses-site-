@@ -566,6 +566,7 @@
       qTip: "它正在答——现在发出的会排队，答完自动接着问", qBar: "⏳ 已排队 {n} 条",
       qPausedT: "⏸ 已暂停 · {n} 条待发", qResume: "继续发", qClear: "清空队列",
       qFull: "队列最多 10 条", qNext: "下一句：",
+      tabBrowse: "▤ 浏览", tabIm: "💬 SDE 微信",
       duBtn: "⇉ 双基底", duTip: "同一问同时问两家，左右并排；答完可再让 WDS 做一次对照",
       duPick: "第二家用谁？", duNoKey: "（还没填 Key）", duOff: "不并排",
       duCmp: "⇄ 让 WDS 对照这两份", duCmpQ: "下面是同一个问题交给两家基底得到的两份回答。请对照它们，只说四件事：①两边各自看见了对方没看见的什么；②它们在哪一点上正面矛盾（指到具体句子）；③哪一份更经得起反驳、为什么；④两份都漏掉的是什么。不要复述它们的内容。",
@@ -600,6 +601,7 @@
       qTip: "It is still answering — what you send now is queued and asked next", qBar: "⏳ {n} queued",
       qPausedT: "⏸ Paused · {n} waiting", qResume: "Resume", qClear: "Clear queue",
       qFull: "10 queued messages max", qNext: "Next: ",
+      tabBrowse: "▤ Browse", tabIm: "💬 Messenger",
       duBtn: "⇉ Two models", duTip: "Ask both at once, side by side; then have WDS compare them",
       duPick: "Which second model?", duNoKey: "(no key yet)", duOff: "Single model",
       duCmp: "⇄ Have WDS compare these", duCmpQ: "Below are two answers to the same question from two different models. Compare them and say only four things: (1) what each saw that the other missed; (2) where they flatly contradict each other (point to the sentences); (3) which holds up better under attack, and why; (4) what both missed. Do not restate their content.",
@@ -713,7 +715,7 @@
     ".wdsm-top{flex:none;display:flex;align-items:center;gap:8px;padding:12px 18px;border-bottom:1px solid var(--wline2)}" +
     ".wdsm-burger{display:none;background:none;border:1px solid var(--wline);color:var(--wtx);font-size:15px;border-radius:8px;padding:6px 10px;cursor:pointer;line-height:1}" +
     ".wdsm-tabs{display:flex;gap:4px;background:var(--wfill);border-radius:999px;padding:3px}" +
-    ".wdsm-tab{border:none;background:none;color:var(--wdim);font:600 12.5px/1 inherit;padding:6px 13px;border-radius:999px;cursor:pointer;white-space:nowrap}" +
+    ".wdsm-tab{border:none;background:none;color:var(--wdim);font:600 12px/1 inherit;padding:6px 9px;border-radius:999px;cursor:pointer;white-space:nowrap;flex:none}" +
     ".wdsm-tab.sel{background:var(--wgold);color:var(--wbg)}" +
     ".wdsm-mp{background:var(--wfill);border:1px solid var(--wline);color:var(--wtx);font:600 13px/1 inherit;padding:8px 12px;border-radius:10px;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:7px}" +
     ".wdsm-mp:hover{border-color:var(--wline2);color:var(--wgold)}" +
@@ -946,7 +948,7 @@
       "<div class='wdsm-schwrap'><input class='wdsm-sch' type='text'></div>" +
       "<div class='wdsm-list'></div>" +
       "<div class='wdsm-sbot'>" +
-        "<div class='wdsm-tabs'><button class='wdsm-tab' data-m='normal'></button><button class='wdsm-tab sel' data-m='wds'></button></div>" +
+        "<div class='wdsm-tabs'><button class='wdsm-tab' data-m='normal'></button><button class='wdsm-tab' data-m='im'></button><button class='wdsm-tab sel' data-m='wds'></button></div>" +
         "<button class='wdsm-sb' data-a='theme'></button>" +
         "<button class='wdsm-sb' data-a='style'></button>" +
         "<button class='wdsm-sb' data-a='preset'></button>" +
@@ -1280,7 +1282,8 @@
   function applyLang() {
     ariaSet();                                  // 文案随语言走，切换后要重贴一遍
     var q = function (sel) { return layer.querySelector(sel); };
-    q(".wdsm-tab[data-m='normal']").textContent = PAGE ? t("tabBack") : t("tabNormal");
+    q(".wdsm-tab[data-m='normal']").textContent = t("tabBrowse");
+    q(".wdsm-tab[data-m='im']").textContent = t("tabIm");
     q(".wdsm-tab[data-m='wds']").textContent = t("tabWds");
     q(".wdsm-distbtn").textContent = t("bDistill");
     q(".wdsm-histbtn").textContent = t("bHist");
@@ -1563,8 +1566,15 @@
   window.wdsMode = function (on) { on === false ? close() : (PAGE ? open() : (window.location.href = PAGE_URL)); };
   try { localStorage.removeItem(LS); } catch (e) {}  // 清掉旧的"自动弹出"记忆
 
+  // 三态互切：目的地与 /assets/sde-modes.js 的 SDE_MODES 是同一套（模拟有跨文件断言钉住）
+  var TAB_GO = { normal: "/", im: "/sde-wechat/", wds: "/taste/wds-chat/" };
   layer.querySelectorAll(".wdsm-tab").forEach(function (tb) {
-    tb.onclick = function () { if (tb.dataset.m === "normal") close(); };
+    tb.onclick = function () {
+      var m = tb.dataset.m;
+      if (m === "wds") return;                                  // 已经在这儿了
+      if (m === "normal") { close(); return; }                  // close() 会走 leave()：有来路就回来路，没有才回首页
+      window.location.href = TAB_GO[m] || "/";
+    };
   });
   layer.querySelector(".wdsm-keybtn").onclick = function () { wdsKeyPanel(function () {}); };
   layer.querySelector(".wdsm-membtn").onclick = function () { memBoot(); memPanel(); };
@@ -1610,7 +1620,17 @@
     b.onclick = function () { window.location.href = PAGE_URL; };
     document.body.appendChild(b);
   }
-  if (!PAGE) injectNav();
+  // 全站三态（浏览 / SDE 微信 / SDE 对话）：本脚本已在两千多个页面上，
+  // 让它去把三态条请来，于是所有页面自动长出切换器，一个页面都不用改。
+  // 模块拉不到时退回老的单按钮注入——宁可只有问WDS入口，也不能一个入口都没有。
+  function loadModes() {
+    if (window.SDEModes) return;
+    var sc = document.createElement("script");
+    sc.src = "/assets/sde-modes.js"; sc.async = true;
+    sc.onerror = injectNav;
+    document.head.appendChild(sc);
+  }
+  if (!PAGE) loadModes();
 
   inEl.addEventListener("input", function () { inEl.style.height = "auto"; inEl.style.height = Math.min(inEl.scrollHeight, 160) + "px"; });
 

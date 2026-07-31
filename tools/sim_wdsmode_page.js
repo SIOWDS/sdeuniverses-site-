@@ -74,20 +74,25 @@ let pass=0, fail=0; const T=(name,c)=>{ if(c){pass++;console.log('PASS',name)}el
 // 场景1：普通页有导航 + 旧 LS=1（历史上会自动弹出）
 let e1=makeEnv(true,false,{sdeuniverses_wds_mode:'1'});
 run(e1);
-const pill = e1.nav.children.find(c=>(c.className||'').includes('wdsm-navbtn'));
-T('导航药丸=真实链接指向独立页', pill && pill.attrs.href==='/taste/wds-chat/');
-T('药丸无 preventDefault 开浮层的 onclick', !pill._onclick);
+// 全站入口改成三态条（浏览/SDE微信/SDE对话）：wds-mode.js 不再自己注入那颗单独的药丸，
+// 而是把 /assets/sde-modes.js 请来，由它挂三态条。这里验"请了"，三态条本身由 sim_sde_modes.js 验。
+const req = (e1.doc.head.children||[]).find(c=>c.tag==='script' && String(c.attrs.src||c.src||'').includes('sde-modes.js'));
+T('普通页会把三态模块请来（它负责挂 浏览/SDE微信/SDE对话 三档）', !!req);
+T('模块拉不到时退回老的单按钮注入，不至于一个入口都没有', /sc\.onerror = injectNav/.test(src));
+// 入口必须是真链接（不是在本页开浮层）——三态条那三档是 <a href>，由 sim_sde_modes.js 验；
+// 这里守的是退路 injectNav 也仍然是真链接。
+T('退路入口仍是真链接指向独立页', /a\.href = PAGE_URL/.test(src));
 const layer1 = e1.body.children.find(c=>c.className==='wdsm-layer');
 T('旧 LS=1 也不再自动弹出浮层', layer1 && !layer1.classList.contains('on'));
 T('旧 LS 记忆已清除', !('sdeuniverses_wds_mode' in e1.store));
 
-// 场景2：普通页无导航 → 浮钮=跳转
+// 场景2：普通页无导航 —— 三态模块自己会在找不到落点时挂兜底浮动条（见 sim_sde_modes.js），
+// 所以这里只验 wds-mode.js 照样把模块请来，且退路 mountFab 仍在（模块拉不到时才用得上）
 let e2=makeEnv(false,false,{});
 run(e2);
-const fab = e2.body.children.find(c=>c.className==='wdsm-fab');
-T('无导航页挂浮钮', !!fab);
-fab._onclick && fab._onclick();
-T('浮钮点击=跳转独立页而非开浮层', e2.navigated==='/taste/wds-chat/');
+const req2 = (e2.doc.head.children||[]).find(c=>c.tag==='script' && String(c.attrs.src||c.src||'').includes('sde-modes.js'));
+T('无导航页也把三态模块请来', !!req2);
+T('退路浮钮仍在（模块拉不到时才用得上）', /function mountFab\(/.test(src) && /window\.location\.href = PAGE_URL/.test(src));
 
 // 场景3：独立页模式
 let e3=makeEnv(false,true,{});
@@ -98,7 +103,9 @@ T('独立页不再挂浮钮', !e3.body.children.find(c=>c.className==='wdsm-fab'
 const tabs3 = layer3.children.filter(c=>(c.className||'').includes('wdsm-tab')&&!(c.className||'').includes('wdsm-tabs'));
 const normal3 = tabs3.find(t=>t.dataset.m==='normal');
 // 桩里没有站点语言标记，t() 会落到英文档——断言按两种语言都认（设计后来加了中英双语）
-T('常规页签改名为返回浏览', normal3 && /返回|Back/.test(normal3.textContent));
+T('第一档是「浏览」（三态：浏览 / SDE 微信 / SDE 对话）', normal3 && /浏览|Browse/.test(normal3.textContent));
+T('独立页侧栏有三档，实得 '+tabs3.length, tabs3.length===3);
+T('中间那档是 SDE 微信', tabs3.some(t=>t.dataset.m==='im'));
 normal3.onclick && normal3.onclick();
 T('返回浏览=history.back', e3.navigated==='BACK');
 
