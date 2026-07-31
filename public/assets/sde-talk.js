@@ -270,7 +270,8 @@
       note("发送中…");
       fetch(API, {
         method: "POST", headers: { "content-type": "application/json" },
-        body: JSON.stringify({ credential: cred, text: text, parent: parent }),
+        // 带上标题：讨论回流到「SDE 微信」时要显示「谁在哪篇文章下说了什么」
+        body: JSON.stringify({ credential: cred, text: text, parent: parent, title: (document.title || "").split(" | ")[0].split(" · ")[0].slice(0, 90) }),
       }).then(function (r) { return r.json().then(function (d) { return { s: r.status, d: d }; }); })
         .then(function (x) {
           el("tk-send").disabled = false;

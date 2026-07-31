@@ -769,6 +769,83 @@ export class CommentBox {
         if (cur) { cur.unread = 0; cur.at = 0; await this.ctx.storage.put(k, cur); }
         return Response.json({ ok: true });
       }
+      // ——— 文章讨论的回流（discussion）———
+      // 键：dc:<inv>:<rnd> ＝全站「最新讨论」一条（只留最近 400 条，够翻几页就行）；
+      //     dn:<uid> ＝这个人的讨论提醒（谁回了我、谁在我的文章下发言）。
+      // 为什么放在目录 DO 而不是各篇的留言 DO：留言按 slug 分片，没有全局视图；
+      // 而「回路」要的恰恰是跨篇的汇流与找人。
+      const dcInv = (t) => String(1e15 - t).padStart(16, "0");
+      const dcClean = (s, n) => String(s || "").replace(/[\u0000-\u0009\u000b-\u001f]/g, "").trim().slice(0, n);
+      if (op === "dcpost") {
+        const slug = String(b.slug || "");
+        if (!/^[a-z0-9-]+(\/[a-z0-9-]+)*$/.test(slug)) return Response.json({ ok: false });
+        const rnd = [...crypto.getRandomValues(new Uint8Array(4))].map((x) => x.toString(16).padStart(2, "0")).join("");
+        const rec = {
+          id: dcInv(now) + ":" + rnd,
+          slug, title: dcClean(b.title, 90), name: dcClean(b.name, 20), uid: String(b.uid || ""),
+          text: dcClean(b.text, 160), reply: b.reply ? 1 : 0, ts: now,
+        };
+        await this.ctx.storage.put("dc:" + rec.id, rec);
+        // 只留最近 400 条：list 升序＝时间倒序，第 400 条之后的都可以走
+        const all = await this.ctx.storage.list({ prefix: "dc:", limit: 600 });
+        const keys = [...all.keys()];
+        if (keys.length > 400) {
+          const doomed = keys.slice(400);
+          for (let i = 0; i < doomed.length; i += 128) await this.ctx.storage.delete(doomed.slice(i, i + 128));
+        }
+        // 定向提醒：作者、被回复的人、同帖先发过言的人；自己不提醒自己，同一人只提醒一次
+        const seen = new Set([rec.uid]);
+        let sent = 0;
+        for (const t of (Array.isArray(b.targets) ? b.targets : [])) {
+          const u = String(t && t.uid || "");
+          if (!/^[0-9a-f]{12}$/.test(u) || seen.has(u)) continue;
+          seen.add(u);
+          const k = "dn:" + u;
+          const cur = (await this.ctx.storage.get(k)) || { n: [] };
+          cur.n = [{
+            k: String(t.k || "join"), slug, title: rec.title,
+            name: rec.name, text: rec.text, ts: now,
+          }].concat(cur.n || []).slice(0, 60);
+          await this.ctx.storage.put(k, cur);
+          sent++;
+        }
+        return Response.json({ ok: true, id: rec.id, notified: sent });
+      }
+      if (op === "dcfeed") {
+        const lim = Math.min(40, Math.max(1, parseInt(b.limit || 20, 10)));
+        const o = { prefix: "dc:", limit: lim + 1 };
+        if (b.after) o.startAfter = "dc:" + String(b.after);
+        const m = await this.ctx.storage.list(o);
+        const rows = [...m.values()].filter((x) => x && x.id);
+        const more = rows.length > lim;
+        const posts = rows.slice(0, lim);
+        if (!b.after && ok12(uid)) {   // 看了第一页＝这一刻之前的都算看过
+          const k = "dn:" + uid;
+          const cur = (await this.ctx.storage.get(k)) || { n: [] };
+          if (posts.length && (posts[0].ts || 0) > (cur.seen || 0)) { cur.seen = posts[0].ts; await this.ctx.storage.put(k, cur); }
+        }
+        return Response.json({ ok: true, posts, more, next: posts.length ? posts[posts.length - 1].id : "" });
+      }
+      if (op === "dcnews") {
+        if (!ok12(uid)) return Response.json({ ok: false });
+        const k = "dn:" + uid;
+        const cur = (await this.ctx.storage.get(k)) || { n: [] };
+        const list = cur.n || [];
+        if (list.length) { cur.n = []; await this.ctx.storage.put(k, cur); }
+        return Response.json({ ok: true, news: list });
+      }
+      if (op === "dcbadge") {
+        if (!ok12(uid)) return Response.json({ ok: false });
+        const cur = (await this.ctx.storage.get("dn:" + uid)) || { n: [] };
+        const m = await this.ctx.storage.list({ prefix: "dc:", limit: 1 });
+        let top = null;
+        for (const v of m.values()) if (v && v.ts) top = v;
+        return Response.json({
+          ok: true, n: (cur.n || []).length,
+          fresh: (top && top.ts > (cur.seen || 0)) ? 1 : 0,
+          last: top ? { name: top.name, title: top.title, text: top.text, slug: top.slug, ts: top.ts } : null,
+        });
+      }
       // ——— 朋友圈（moments）———
       // 键：mo:<inv>:<rnd> ＝一条动态（点赞与评论都存在这条里面）；
       //     mu:<uid>:<inv>:<rnd> ＝这个人的索引（「只看他的」用）；
@@ -5623,6 +5700,15 @@ export default {
         if (a === "gkick") return Response.json(await call({ op: "agkick", gid: String(b.gid || ""), target: String(b.target || "") }));
         return Response.json({ ok: false, msg: "未知的管理动作。" }, { status: 400 });
       }
+      // ===== 文章讨论的回流：全站最新讨论 + 谁回了我 =====
+      if (op === "dt") {
+        const a = String(b.a || "");
+        const MAP = { feed: "dcfeed", news: "dcnews", badge: "dcbadge" };
+        if (!MAP[a]) return Response.json({ ok: false, msg: "未知的讨论动作。" }, { status: 400 });
+        const d = await call({ op: MAP[a], uid: who.uid, after: String(b.after || ""), limit: b.limit });
+        return Response.json(Object.assign({ me }, d || { ok: false }), { headers: { "cache-control": "no-store" } });
+      }
+
       // ===== 朋友圈：文字进 DO，图片进 R2（moments/<key>.jpg），一个字节都不进 git =====
       if (op === "cd") {   // 候选卡与顶回
         const a = String(b.a || "");
@@ -5888,6 +5974,38 @@ export default {
         const data = await resp.json().catch(() => null);
         if (data && data.ok) { // 发言成功 → 在全局登记该文章（供管理页发现）
           await names.fetch(new Request("https://do/", { method: "POST", body: JSON.stringify({ op: "reg", slug }) }));
+          // ——— 把这条发言接回「SDE 微信」：进全站讨论流，并提醒该提醒的人 ———
+          // 不接这一步，1407 个讨论区就是只写的：没人会为了看有没有回复而重开一篇文章。
+          try {
+            const rm = await rosterMap();
+            const uidOf = async (nm) => {
+              if (!rm) return "";
+              const hit = rm.get(imNorm(nm));
+              return hit ? await imUid("pw:" + imNorm(hit)) : "";
+            };
+            const targets = [];
+            const push = (u, k) => { if (u && u !== (whoIdent && whoIdent.uid)) targets.push({ uid: u, k }); };
+            // ① 文章作者：/students/<作者slug>/<篇> —— 名录里 slug 也能查到人
+            const seg = slug.split("/");
+            if (seg[0] === "students" && seg[1]) push(await uidOf(seg[1]), "mine");
+            // ② 被回复的人 ③ 这一帖里先发过言的人
+            const prior = await (await box.fetch(new Request(url.toString(), { method: "GET" }))).json().catch(() => null);
+            const list = (prior && prior.items) || [];
+            if (body.parent) {
+              const p = list.find((x) => x && x.id === body.parent);
+              if (p && p.name) push(await uidOf(p.name), "reply");
+            }
+            const others = [...new Set(list.map((x) => x && x.name).filter(Boolean))].slice(0, 30);
+            for (const nm of others) push(await uidOf(nm), "join");
+            const dir2 = env.COMMENTS.get(env.COMMENTS.idFromName("im-dir-global"));
+            await dir2.fetch(new Request("https://do/_dir", {
+              method: "POST", headers: { "content-type": "application/json" },
+              body: JSON.stringify({
+                op: "dcpost", slug, title: body.title, name,
+                uid: (whoIdent && whoIdent.uid) || "", text, reply: body.parent ? 1 : 0, targets,
+              }),
+            }));
+          } catch (e) { /* 回流失败不该让发言失败 */ }
         }
         return new Response(JSON.stringify(data || { ok: false, msg: "服务异常，请稍后再试。" }), {
           status: data ? resp.status : 500,

@@ -124,6 +124,16 @@ a{color:var(--disc)}
 .gmeta{padding:1rem;background:var(--card2);border-bottom:1px solid var(--border2)}
 .gmeta .gn{font-size:1.1rem;font-weight:800}
 .gmeta .gc{font-size:0.78rem;color:var(--muted);margin-top:2px}
+/* ── 文章讨论 ── */
+.dt-row .av{background:var(--gold);color:#fff}
+.dt{padding:0.85rem 1rem;background:var(--card);border-bottom:1px solid var(--border2);cursor:pointer}
+.dt:hover{background:var(--card2)}
+.dt .h{font-size:0.88rem;line-height:1.6}
+.dt .h b{color:var(--disc);font-weight:700}
+.dt .t{font-size:0.9rem;line-height:1.7;margin-top:3px;word-break:break-word}
+.dt .w{font-size:0.75rem;color:var(--muted);margin-top:4px}
+.dt .w em{font-style:normal;color:var(--gold2)}
+.dt.new{background:#FBF6E9}
 /* ── 朋友圈 ── */
 .mo{display:flex;gap:11px;padding:0.95rem 1rem;background:var(--card);border-bottom:1px solid var(--border2)}
 .mo .av{cursor:pointer}
@@ -355,6 +365,10 @@ a{color:var(--disc)}
       </div>
     </div>
 
+    <div class="view" id="v-dtalk">
+      <div class="scroll" id="dt-list"><div class="hint">正在加载…</div></div>
+    </div>
+
     <div class="view" id="v-moments">
       <div class="mo-news" id="mo-newsbar"></div>
       <div class="scroll" id="mo-list"><div class="hint">正在加载…</div></div>
@@ -409,6 +423,7 @@ a{color:var(--disc)}
           </div>
           <p style="font-size:0.79rem;color:var(--muted);margin-top:1rem;line-height:1.95">
             聊天是<b>纯文字</b>的：只发文字与表情，不发语音、文件；<b>图片请发在朋友圈</b>。<br>
+            <b>文章讨论</b>＝全站 1400 多篇文章底下的讨论都汇到消息列表最上面那条，谁回了你会有提醒。<br>
             <b>朋友圈</b>＝站内所有登录过的人共见的一条时间线：发文字与图片、点赞、评论、回复；点名字看某人的全部。<br>
             通讯录里是所有在本站登录过的人——学员一登录就出现，可直接私聊或拉进群。<br>
             群里 <b>@某人</b> 会给他一个红标；<b>@所有人</b> 全员提醒。<br>
@@ -463,9 +478,9 @@ function setStat(state){var d=el("t-dot"),s=el("t-stat");
 
 /* ── 视图 ── */
 function show(v){
-  ["gate","chats","book","talk","gnew","ginfo","me","fwd","admin","moments","mopost","monews","cand","cdnew","cdone","cdnews"].forEach(function(x){el("v-"+x).classList.toggle("on",x===v)});
+  ["gate","chats","book","talk","gnew","ginfo","me","fwd","admin","moments","mopost","monews","dtalk","cand","cdnew","cdone","cdnews"].forEach(function(x){el("v-"+x).classList.toggle("on",x===v)});
   el("tabs").style.display=(v==="gate")?"none":"flex";
-  el("t-back").style.display=(v==="talk"||v==="gnew"||v==="ginfo"||v==="fwd"||v==="admin"||v==="mopost"||v==="monews"||v==="cdnew"||v==="cdone"||v==="cdnews"||(v==="moments"&&moWho)||(v==="cand"&&cdWho))?"block":"none";
+  el("t-back").style.display=(v==="talk"||v==="gnew"||v==="ginfo"||v==="fwd"||v==="admin"||v==="mopost"||v==="monews"||v==="dtalk"||v==="cdnew"||v==="cdone"||v==="cdnews"||(v==="moments"&&moWho)||(v==="cand"&&cdWho))?"block":"none";
   el("t-sub").style.display=(v==="talk")?"flex":"none";
   el("t-act").style.display=(v==="talk"&&cur&&cur.kind==="g")?"block":"none";
   el("t-plaza").style.display=(v==="chats"||v==="book"||v==="me")?"block":"none";
@@ -475,6 +490,7 @@ function show(v){
   else if(v==="ginfo")el("t-ttl").textContent="群资料";
   else if(v==="fwd")el("t-ttl").textContent="转发给…";
   else if(v==="admin")el("t-ttl").textContent="全权管理";
+  else if(v==="dtalk")el("t-ttl").textContent="文章讨论";
   else if(v==="mopost")el("t-ttl").textContent="发表";
   else if(v==="monews")el("t-ttl").textContent="新消息";
   else if(v==="cdnew")el("t-ttl").textContent="立一张候选卡";
@@ -637,6 +653,7 @@ el("ad-go").onclick=adUnlock;
 el("ad-pw").addEventListener("keydown",function(e){if(e.key==="Enter")adUnlock();});
 
 el("t-back").onclick=function(){
+  if(el("v-dtalk").classList.contains("on")){show("chats");loadInbox();return;}
   if(el("v-mopost").classList.contains("on")||el("v-monews").classList.contains("on")){show("moments");return;}
   if(el("v-moments").classList.contains("on")&&moWho){moGo("","");return;}
   if(el("v-admin").classList.contains("on")){show("me");return;}
@@ -695,9 +712,9 @@ function afterLogin(){
     if(x.s===401||!x.d||!x.d.ok){logout();return;}
     ME=x.d.me;contacts=x.d.contacts||[];
     el("me-nm").textContent=ME.name;el("me-uid").textContent="ID "+ME.uid;
-    show("chats");loadInbox();loadGroups();moBadge();cdWire();cdBadge();
+    show("chats");loadInbox();loadGroups();moBadge();cdWire();cdBadge();dtBadge();
     if(inboxT)clearInterval(inboxT);
-    inboxT=setInterval(function(){loadInbox(true);moBadge();},15000);
+    inboxT=setInterval(function(){loadInbox(true);moBadge();dtBadge();},15000);
   }).catch(function(){el("gsi").textContent="网络异常，请稍后重试。"});
 }
 
@@ -724,10 +741,11 @@ function loadInbox(quiet){
 }
 function renderChats(){
   var L=el("chat-list");L.textContent="";
+  L.appendChild(dtRow());          // 「文章讨论」永远排在最上面
   if(!chats.length){
     var h=document.createElement("div");h.className="hint";
     h.innerHTML="还没有会话。<br>去 <b>通讯录</b> 找人私聊，或建一个群。";
-    L.appendChild(h);return;
+    h.style.paddingTop="1.2rem";L.appendChild(h);return;
   }
   chats.slice().sort(function(a,b){return (isPin(b.key)?1:0)-(isPin(a.key)?1:0)}).forEach(function(c){
     var last=c.last||"";
@@ -1195,6 +1213,102 @@ function doFwd(t){
   }).catch(function(){h.textContent="网络异常，请重试。"});
 }
 el("fw-q").addEventListener("input",renderFwd);
+
+/* ── 文章讨论：把 1407 个讨论区汇到一处 ── */
+var dtN=0,dtFresh=0,dtLast=null,dtPosts=[],dtNext="",dtMore=false,dtLoading=false;
+
+function dtRow(){
+  var r=document.createElement("div");r.className="row dt-row";
+  r.onclick=dtOpen;
+  var a=document.createElement("div");a.className="av";a.textContent="📄";
+  if(dtN>0){var b=document.createElement("span");b.className="badge";b.textContent=dtN>99?"99+":String(dtN);a.appendChild(b);}
+  var m=document.createElement("div");m.className="rmain";
+  var n=document.createElement("div");n.className="rname";n.textContent="文章讨论";
+  if(dtFresh&&!dtN){var c=document.createElement("span");c.className="chip";c.textContent="有新";n.appendChild(c);}
+  m.appendChild(n);
+  var l=document.createElement("div");l.className="rlast";
+  l.textContent=dtLast?((dtLast.name||"有人")+"：" + (dtLast.text||"")):"全站文章底下的讨论都汇到这里";
+  m.appendChild(l);
+  r.appendChild(a);r.appendChild(m);
+  if(dtLast&&dtLast.ts){var t=document.createElement("div");t.className="rtime";t.textContent=fmtT(dtLast.ts);r.appendChild(t);}
+  return r;
+}
+function dtOpen(){
+  dtPosts=[];dtNext="";dtMore=false;
+  show("dtalk");
+  el("dt-list").innerHTML='<div class="hint">正在加载…</div>';
+  // 先把「谁回了我」取走（取一次即清零），再拉全站最新讨论
+  api("dt",{a:"news"}).then(function(x){
+    var news=(x.d&&x.d.news)||[];
+    dtN=0;
+    return api("dt",{a:"feed",limit:25}).then(function(y){
+      if(y.d&&y.d.ok){dtPosts=y.d.posts||[];dtNext=y.d.next||"";dtMore=!!y.d.more;dtFresh=0;}
+      dtRender(news);
+      renderChats();
+    });
+  }).catch(function(){el("dt-list").innerHTML='<div class="hint">加载失败，稍后重试。</div>'});
+}
+function dtWhy(k){
+  if(k==="mine")return "在你的文章下";
+  if(k==="reply")return "回复了你";
+  return "也在这一帖里";
+}
+function dtCard(p,why){
+  var d=document.createElement("div");d.className="dt"+(why?" new":"");
+  var hh=document.createElement("div");hh.className="h";
+  var b=document.createElement("b");b.textContent=p.name||"有人";
+  hh.appendChild(b);
+  hh.appendChild(document.createTextNode(why?("　"+dtWhy(why)):(p.reply?"　回复了一条":"　发言")));
+  d.appendChild(hh);
+  var t=document.createElement("div");t.className="t";t.textContent=p.text||"";d.appendChild(t);
+  var w=document.createElement("div");w.className="w";
+  var em=document.createElement("em");em.textContent=p.title||p.slug;
+  w.appendChild(document.createTextNode("《"));w.appendChild(em);
+  w.appendChild(document.createTextNode("》 · "+fmtT(p.ts)+" · 点开去看 →"));
+  d.appendChild(w);
+  d.onclick=function(){window.open("/"+p.slug+"/#sde-talk","_blank","noopener")};
+  return d;
+}
+function dtRender(news){
+  var L=el("dt-list");L.textContent="";
+  if(news&&news.length){
+    var s=document.createElement("div");s.className="sec";
+    s.appendChild(document.createTextNode("与你有关 · "+news.length));
+    L.appendChild(s);
+    news.forEach(function(n){L.appendChild(dtCard(n,n.k||"join"))});
+  }
+  var s2=document.createElement("div");s2.className="sec";
+  s2.appendChild(document.createTextNode("全站最新讨论"));
+  L.appendChild(s2);
+  if(!dtPosts.length){
+    var e=document.createElement("div");e.className="hint";
+    e.innerHTML="还没有人在文章底下说话。<br>随便打开一篇文章，滚到底，就能发言。";
+    L.appendChild(e);return;
+  }
+  dtPosts.forEach(function(p){L.appendChild(dtCard(p,""))});
+  if(dtMore){
+    var m=document.createElement("div");m.className="mo-more";m.textContent="加载更多 ↓";
+    m.onclick=function(){
+      if(dtLoading)return;dtLoading=true;m.textContent="正在加载…";
+      api("dt",{a:"feed",after:dtNext,limit:25}).then(function(y){
+        dtLoading=false;
+        if(!y.d||!y.d.ok){m.textContent="加载失败";return;}
+        dtPosts=dtPosts.concat(y.d.posts||[]);dtNext=y.d.next||"";dtMore=!!y.d.more;
+        dtRender(null);
+      }).catch(function(){dtLoading=false;m.textContent="网络异常"});
+    };
+    L.appendChild(m);
+  }
+}
+function dtBadge(){
+  if(!CRED)return;
+  api("dt",{a:"badge"}).then(function(x){
+    if(!x.d||!x.d.ok)return;
+    var was=dtN+"|"+dtFresh+"|"+((dtLast&&dtLast.ts)||0);
+    dtN=x.d.n||0;dtFresh=x.d.fresh||0;dtLast=x.d.last||null;
+    if(was!==dtN+"|"+dtFresh+"|"+((dtLast&&dtLast.ts)||0)&&el("v-chats").classList.contains("on")&&!cur)renderChats();
+  }).catch(function(){});
+}
 
 /* ── 朋友圈 ── */
 var moPosts=[],moNext="",moMore=false,moWho="",moWhoName="",moLoading=false,moPick=[],moBadgeN=0,moFresh=0;
@@ -1825,6 +1939,9 @@ window.__sdeWx={api:api,openDm:openDm,openGroup:openGroup,openGnew:openGnew,open
   state:function(){return{ME:ME,contacts:contacts,groups:groups,chats:chats,cur:cur,unread:unread,usePoll:usePoll,replyTo:replyTo,gMembers:gMembers,gOwner:gOwner}},
   _afterLogin:afterLogin,_setCred:function(c){CRED=c},_show:show,
   moGo:moGo,moLoad:moLoad,moRender:moRender,moBadge:moBadge,moOpenPost:moOpenPost,moShrink:moShrink,
+  dtOpen:dtOpen,dtBadge:dtBadge,dtRender:dtRender,dtRow:dtRow,
+  dtState:function(){return{dtN:dtN,dtFresh:dtFresh,dtLast:dtLast,dtPosts:dtPosts,dtMore:dtMore}},
+  _dtSet:function(o){if("n" in o)dtN=o.n;if("fresh" in o)dtFresh=o.fresh;if("last" in o)dtLast=o.last;if(o.posts)dtPosts=o.posts;},
   moState:function(){return{moWho:moWho,moWhoName:moWhoName,moPosts:moPosts,moPick:moPick,moBadgeN:moBadgeN,moFresh:moFresh,moMore:moMore,moNext:moNext}},
   _moSet:function(o){if(o.posts)moPosts=o.posts;if(o.pick)moPick=o.pick;if("badgeN" in o)moBadgeN=o.badgeN;if("fresh" in o)moFresh=o.fresh;if("who" in o){moWho=o.who;moWhoName=o.whoName||"";}}};
 })();
