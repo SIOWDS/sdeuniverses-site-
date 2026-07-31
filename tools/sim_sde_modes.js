@@ -114,16 +114,44 @@ console.log("①b 只有浏览首页那颗 △ 在烧，且火盖住三角形");
   run(env);
   const home = nav.querySelector(".sdemx-home");
   const hf = home.querySelector(".sdemx-fire");
-  ok(!!hf && hf.querySelectorAll("b").length === 3, "首页那颗在烧，三层火舌");
+  ok(!!hf && hf.querySelectorAll("b").length === 3, "首页那颗在烧，三股火");
+  // 2026-07-31 改口径：原来是同一种橙的三层火舌（f1/f2/f3 大中小套着烧）。
+  // 现在是**红绿蓝三股**——绿/红/蓝各一股、位置错开、加色混合，重叠带相加成白亮的芯。
+  // 三色与入口页 sde-portal.js 的 FIRE 表同源：浏览烧草叶绿、对话烧血红、微信烧蓝天蓝。
+  const stems = ["fg", "fr", "fb"].map((c) => hf.querySelector("." + c));
+  ok(stems.every(Boolean), "三股各就各位（fg 绿 / fr 红 / fb 蓝）");
+  const cssOf = (c) => (CSSFLAT.match(new RegExp("\\.sdemx-fire \\." + c + "\\{([^}]*)\\}")) || [, ""])[1];
+  const [cg, cr, cb] = ["fg", "fr", "fb"].map(cssOf);
+  ok(/#7CE06A/.test(cg) && /52,168,50/.test(cg), "绿股用草叶绿（与入口页同一组）");
+  ok(/#FF3B3B/.test(cr) && /212,0,0/.test(cr), "红股用血红（不许偏橙）");
+  ok(/#A6DAFF/.test(cb) && /63,160,240/.test(cb), "蓝股用蓝天蓝（偏青不偏紫）");
+  const lefts = [cg, cr, cb].map((c) => parseFloat((c.match(/left:([\d.]+)%/) || [, "0"])[1]));
+  ok(lefts[0] < lefts[1] && lefts[1] < lefts[2], "三股左中右错开，实得 " + lefts.join(" / "));
+  ok(lefts[2] - lefts[0] > 30, "错开够远，三股才分得出来，实得跨度 " + (lefts[2] - lefts[0]));
+  const wid = parseFloat((CSSFLAT.match(/\.sdemx-fire b\{[^}]*width:([\d.]+)%/) || [, "0"])[1]);
+  ok(wid > (lefts[1] - lefts[0]), "每股比相邻间距宽＝必然重叠，这条重叠带就是「交融」，实得宽 " + wid + "% vs 间距 " + (lefts[1] - lefts[0]) + "%");
+  const durs = [cg, cr, cb].map((c) => parseFloat((c.match(/animation-duration:([\d.]+)s/) || [, "0"])[1]));
+  ok(new Set(durs).size === 3, "三股周期互不相同，不会齐步摇，实得 " + durs.join(" / "));
+  // 加色是"交融"的物理前提：CSS 默认的覆盖式合成只会让后画的盖住先画的，叠出一片灰。
+  ok(/\.sdemx-fire b\{[^}]*mix-blend-mode:plus-lighter/.test(CSSFLAT), "股与股之间用加色混合");
+  ok(/\.sdemx-fire\{[^}]*isolation:isolate/.test(CSSFLAT), "火层自成混合上下文（否则加色会一路加到页面浅底上）");
+  const rgbOf = (t) => { const h = t.replace("#", ""); return [0, 2, 4].map((i) => parseInt(h.slice(i, i + 2), 16)); };
+  const pick = (css) => (css.match(/#[0-9A-Fa-f]{6}/g) || []).map(rgbOf);
+  ok(pick(cr).every(([r, g, b]) => Math.abs(g - b) <= 6 && g < r * 0.35), "红股守血红判据（不许偏橙）");
+  ok(pick(cg).every(([r, g, b]) => g > b * 1.5), "绿股守草叶绿判据（不许偏薄荷）");
+  ok(pick(cb).every(([r, g, b]) => b > g && g > r), "蓝股守蓝天蓝判据（偏青不偏紫）");
+  const ops = [cg, cr, cb].map((c) => parseFloat((c.match(/opacity:([\d.]+)/) || [, "1"])[1]));
+  ok(ops.every((o) => o > 0.3 && o <= 0.72), "三股都压到半透明——三角不被糊没、重叠处又能叠出亮芯，实得 " + ops.join(" / "));
   ok(hf.querySelectorAll(".sdemx-sp").length === 12, "火星十二粒，实得 " + hf.querySelectorAll(".sdemx-sp").length);
   const kids = home.children.map((c) => c.className || c.tagName);
   ok(kids.indexOf("sdemx-fire") === kids.length - 1,
     "火最后加入＝盖在三角形上面，不是垫在它背后，实得顺序 " + kids.join(" > "));
   ok(/\.sdemx-fire\{[^"]*z-index:2/.test(SRC), "火层 z-index 在字之上");
-  ok(/\.sdemx-fire \.f3\{[^"]*opacity:\.6/.test(SRC), "内焰压到半透明——不然三角形会被糊没");
   ok(!/mix-blend-mode:\s*screen/.test(SRC),
     "不用 screen 混合：顶栏是米色浅底，screen 会把橙色直接洗成白，火就没了");
-  ok(/text-shadow:0 0 8px rgba\(255,140,20/.test(SRC), "三角形本身调成受热的颜色，不然在火里会变成一个黑洞");
+  const iCss = (CSSFLAT.match(/\.sdemx-home i\{([^}]*)\}/) || [, ""])[1];
+  ok(/text-shadow:0 0 8px/.test(iCss), "三角形本身仍调成受热的颜色，不然在火里会变成一个黑洞");
+  ok(!/rgba\(255,\s*(140|90),/.test(iCss), "三角的光不再是橙的（不与三色火抢第四色）");
   // 「系统入口」四个字在烧着的这一颗上也得有，而且必须压在火之上：
   // 火层是 z-index:2、△ 是 1（有意让火裹住三角），标签若不抬到 3，火苗窜上来就把字糊掉了。
   ok(home.querySelectorAll(".sdemx-hlab").length === 2, "烧着的这颗也带中英标签");

@@ -48,14 +48,17 @@
     var gl0 = document.createElement("i");
     gl0.textContent = "\u25b3";
     if (!isHome()) { a.appendChild(gl0); return a; }          // 内页：一颗安静的 △
-    // 首页：三角＝入口页那张图，认得出；火裹着它，与它指向的那张图同一种火
+    // 首页：三角＝入口页那张图，认得出；火裹着它，与它指向的那张图同一种火。
+    // 三股火＝入口页三团 TOKEN 火的收束：SDE 浏览烧草叶绿、SDE 对话烧血红、SDE 微信烧蓝天蓝。
+    // 正色口径与 sde-portal.js 的 FIRE 表一致（血红不许偏橙、绿不许偏薄荷、蓝偏青不偏紫）。
     var fire = document.createElement("span");
     fire.className = "sdemx-fire";
     fire.setAttribute("aria-hidden", "true");
-    ["f1", "f2", "f3"].forEach(function (fc) {
+    ["fg", "fr", "fb"].forEach(function (fc) {
       var t = document.createElement("b"); t.className = fc; fire.appendChild(t);
     });
-    var HOT = ["#FF6E00", "#FFBE3C", "#FF8A3C", "#E0B65C"];
+    // 火星也三色轮着来，一粒一色——三股火在上面交融，飘出来的火星就该是三色混着走。
+    var HOT = ["#7CE06A", "#FF3B3B", "#A6DAFF", "#34A832", "#D40000", "#3FA0F0"];
     for (var i2 = 0; i2 < 12; i2++) {
       var sp = document.createElement("s");
       sp.className = "sdemx-sp";
@@ -116,12 +119,26 @@
     /* 字必须比火层（z-index:2）更高，否则火苗窜上来会把这四个字糊掉。 */
     ".sdemx-hlab{position:relative;z-index:3;font-size:10.5px;letter-spacing:.06em;" +
     "color:var(--gold,#D4B25E);white-space:nowrap;text-shadow:0 1px 3px rgba(0,0,0,.55)}" +
-    ".sdemx-home i{font-style:normal;position:relative;z-index:1;color:#FFE9C2;text-shadow:0 0 8px rgba(255,140,20,.95),0 0 18px rgba(255,90,0,.6)}" +
-    ".sdemx-fire{position:absolute;left:50%;bottom:-7px;width:66px;height:60px;transform:translateX(-50%);pointer-events:none;z-index:2}" +
-".sdemx-fire b{position:absolute;left:50%;bottom:0;transform-origin:50% 100%;border-radius:50% 50% 46% 46% / 68% 68% 32% 32%;animation-name:sdemxBurn;animation-timing-function:ease-in-out;animation-iteration-count:infinite}" +
-    ".sdemx-fire .f1{width:98%;height:96%;filter:blur(9px);opacity:.5;background:radial-gradient(50% 62% at 50% 100%,#FF3D00 0%,rgba(255,61,0,.5) 46%,transparent 74%);animation-duration:1.35s}" +
-    ".sdemx-fire .f2{width:70%;height:80%;filter:blur(5px);opacity:.62;background:radial-gradient(52% 64% at 50% 100%,#FF9A1F 0%,rgba(255,140,20,.6) 48%,transparent 76%);animation-duration:1.02s;animation-delay:-.4s}" +
-    ".sdemx-fire .f3{width:42%;height:58%;filter:blur(2.6px);opacity:.6;background:radial-gradient(54% 66% at 50% 100%,#FFF3C4 0%,#FFC93C 44%,transparent 78%);animation-duration:.78s;animation-delay:-.7s}" +
+    /* 三角本身仍要"受热"，否则在火里就是一个黑洞；但光色改中性暖白——
+     * 火已经是红绿蓝三股，再让三角发橙光，那道橙会成为画面里唯一游离的第四色。 */
+    ".sdemx-home i{font-style:normal;position:relative;z-index:1;color:#FFF6DC;text-shadow:0 0 8px rgba(255,246,220,.95),0 0 18px rgba(255,255,255,.55)}" +
+    /* isolation:isolate ＝ 火层自成一个混合上下文。三股之间用 plus-lighter（加色，光该有的算法：
+     绿+红+蓝 在重叠处相加成白，那条白芯正是"交融"本身）；而火层整体仍以正常方式合成到
+     页面上，所以不会把顶栏那片米色浅底洗掉。
+     ——底下那条"不用 screen 混合"的禁令说的是**火层与页面底**之间，不是股与股之间；
+     没有这个隔离层，加色算法会一路加到页面背景上，火就真的没了。 */
+    ".sdemx-fire{position:absolute;left:50%;bottom:-7px;width:66px;height:60px;transform:translateX(-50%);pointer-events:none;z-index:2;isolation:isolate}" +
+/* 三股火：绿在左、红居中、蓝在右，各自摇曳，中间那条重叠带靠加色混合混出白亮的芯。
+     * **交融不能靠 screen 那种混合模式**（顶栏是米色浅底，它会把颜色直接洗成白，火就没了；
+     * 这里连字面都不写全，因为 sim 有一条"源码里不许出现它"的断言，注释也会被逮到）。
+     * 三股周期互质（1.38/1.02/0.81s）才不会齐步摇。
+     * 每股都用入口页那一组的三段色（亮芯／主体／过渡），**自己不带白芯**——
+     * 白是三股叠在一起才该出现的东西。哪一股自带白，交融就成了假的：
+     * 看上去每股都亮，中间反而分不出那条真正混色的带。 */
+    ".sdemx-fire b{position:absolute;bottom:0;width:54%;height:88%;mix-blend-mode:plus-lighter;transform-origin:50% 100%;border-radius:50% 50% 46% 46% / 68% 68% 32% 32%;animation-name:sdemxBurn;animation-timing-function:ease-in-out;animation-iteration-count:infinite}" +
+    ".sdemx-fire .fg{left:26%;filter:blur(5.5px);opacity:.66;background:radial-gradient(52% 64% at 50% 100%,#7CE06A 0%,rgba(52,168,50,.62) 42%,rgba(28,122,28,.28) 66%,transparent 82%);animation-duration:1.38s}" +
+    ".sdemx-fire .fr{left:50%;filter:blur(5px);opacity:.7;background:radial-gradient(52% 66% at 50% 100%,#FF3B3B 0%,rgba(212,0,0,.62) 42%,rgba(139,0,0,.28) 66%,transparent 82%);animation-duration:1.02s;animation-delay:-.34s}" +
+    ".sdemx-fire .fb{left:74%;filter:blur(5.5px);opacity:.66;background:radial-gradient(52% 64% at 50% 100%,#A6DAFF 0%,rgba(63,160,240,.62) 42%,rgba(31,111,208,.28) 66%,transparent 82%);animation-duration:.81s;animation-delay:-.62s}" +
     "@keyframes sdemxBurn{0%{transform:translateX(-50%) scale(1,1) skewX(0deg)}22%{transform:translateX(-50%) scale(1.07,1.2) skewX(-4deg)}46%{transform:translateX(-50%) scale(.93,1.34) skewX(3deg)}68%{transform:translateX(-50%) scale(1.09,1.14) skewX(-2deg)}100%{transform:translateX(-50%) scale(1,1.04) skewX(1deg)}}" +
     ".sdemx-sp{position:absolute;bottom:6%;width:2px;height:2px;border-radius:50%;opacity:0;animation-name:sdemxRise;animation-timing-function:linear;animation-iteration-count:infinite}" +
     "@keyframes sdemxRise{0%{opacity:0;transform:translateY(0) scale(.5)}18%{opacity:1}100%{opacity:0;transform:translateY(-54px) scale(.12)}}" +
