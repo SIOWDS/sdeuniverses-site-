@@ -74,5 +74,33 @@ ok(/const WDS_TOK_SAFE = 8000, WDS_TOK_RETRY = 4000/.test(S), "满功率首发/�
 ok(/request\.method === "OPTIONS"/.test(RES), "research 有 CORS 预检分支");
 ok(/env\.ASK_LIMITER/.test(RES), "research 也走限流（否则一趟研究能绕开日额度）");
 
+console.log("⑥ 贴链接读全文 /api/wds/readurl");
+const RU = seg('url.pathname === "/api/wds/readurl"', "// /api/wds/asr");
+ok(!!RU, "端点存在");
+ok(/\^https\?:\\\/\\\//.test(RU), "只认 http/https");
+ok(/host === "localhost"/.test(RU) && /\^127\\\./.test(RU) && /\^192\\\.168\\\./.test(RU) && /\^172\\\.\(1\[6-9\]/.test(RU),
+  "内网/环回地址全部拒掉（这是把 Worker 变成取物工具，不拦就是开放代理）");
+ok(/host === url\.hostname\.toLowerCase\(\)/.test(RU), "拒绝取本站自己（自请求回环实测直接 522）");
+ok(/ASK_LIMITER/.test(RU), "走限流（它不烧读者的 Key，所以更要防被当免费代理刷）");
+ok(/setTimeout\(\(\) => \{ try \{ ac\.abort/.test(RU) && /15000/.test(RU), "15 秒超时掐断");
+ok(/text\/html/.test(RU) && /indexOf\("text\/plain"\) < 0/.test(RU), "只收 HTML/纯文本，别的类型如实回绝");
+ok(/3 \* 1024 \* 1024/.test(RU), "原始体积封顶 3MB");
+ok(/user-agent/.test(RU) && !/authorization|cookie/i.test(RU), "不带任何凭证、不透传读者的请求头");
+ok(/wdsHtmlText/.test(RU) && /function wdsHtmlText/.test(S), "有独立的正文抽取器");
+ok(/out\.text\.length < 60/.test(RU), "抽不出正文时如实说抽不出，不拿导航栏和页脚冒充正文");
+const HT = seg("function wdsHtmlText", "function webBlock");
+ok(/script\|style\|noscript\|svg\|canvas\|iframe\|template\|form\|select\|button/.test(HT), "先整块剔掉非正文标签");
+ok(/nav\|header\|footer\|aside/.test(HT), "导航/页眉/页脚/边栏一并剔掉");
+ok(/slice\(0, 120000\)/.test(HT), "抽出的正文封顶 12 万字");
+
+console.log("⑦ 结构图工序 map");
+ok(/WDS_TOOL_KEYS = \[[^\]]*"map"\]/.test(S), "map 在工序白名单里");
+const MP = seg("  map: ", "  iq: ");
+ok(/mermaid/.test(MP), "产出 mermaid 块（画布直接渲染）");
+ok(/不许出现圆括号、引号、分号、冒号/.test(MP), "钉死节点文字里的禁用符号（带了图当场渲染不出来）");
+ok(/无名箭头等于没画/.test(MP), "每条边要写关系动词");
+ok(/最多 18 个节点/.test(MP), "节点数封顶（画不下＝没抓住主干）");
+ok(/不要硬凑一张好看的图/.test(MP), "没有结构可画就直说——凑出来的结构图比没有更误导人");
+
 console.log("\n===== " + PASS + " PASS / " + FAILS + " FAIL =====");
 process.exit(FAILS ? 1 : 0);

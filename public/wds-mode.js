@@ -555,6 +555,13 @@
       cpNote: "更早的对话已经压成下面这份账本随每一问带上（原文不再上送）。压缩用的是你自己的 Key。",
       imgSee: "直接看图", imgNo: "当前基底看不了图", imgOcr: "改用本机 OCR 转文字", imgOcrGo: "正在识别…",
       imgHint: "能看图的是 智谱 GLM / 千问 Qwen / Kimi；DeepSeek 与 MiniMax 在本站的接口下只能读文字。",
+      tlMap: "结构图", tlMapS: "把这一问里的结构画成图（落在右侧画布里），并说清哪条边最承重",
+      lnkBtn: "🔗 链接", lnkTip: "贴一个网址，把那一篇读进来当附件（本站只抓正文，不带你的任何凭证）",
+      lnkAsk: "把哪个网址读进来？", lnkGo: "正在读这一页…", lnkBad: "读不了：",
+      psBtn: "◧ 预设", psTitle: "预设", psNone: "还没有预设。把现在这一套（基底·档位·联网·工序·口吻·自定义指令）存下来，下次一键切回。",
+      psSave: "＋ 把现在这套存为预设", psAsk: "给这套预设起个名字", psDel: "删掉这个预设？",
+      psExp: "⤓ 导出全部", psImp: "⤒ 导入", psImpAsk: "把导出的预设 JSON 贴在这里", psImpBad: "这段不是预设文件",
+      psOn: "已切到预设：", psFull: "预设最多 12 套，先删一个再存。",
     },
     en: {
       cvTitle: "Canvas", cvOpen: "⧉ Canvas", cvClose: "Hide canvas", cvEmpty: "Nothing on the canvas yet. Long outputs (reports, diagrams, pages, score cards) land here automatically — or hit ⧉ under any answer.",
@@ -571,6 +578,13 @@
       cpNote: "Earlier turns are now carried as this ledger instead of raw text. Compaction runs on your own Key.",
       imgSee: "seen directly", imgNo: "this model can't see images", imgOcr: "run local OCR instead", imgOcrGo: "reading\u2026",
       imgHint: "Vision works with Zhipu GLM / Qwen / Kimi; DeepSeek and MiniMax are text-only on this site.",
+      tlMap: "Structure map", tlMapS: "Draw the structure behind this question (renders on the canvas) and say which edge carries the weight",
+      lnkBtn: "🔗 Link", lnkTip: "Paste a URL and this page is pulled in as an attachment (text only, no credentials sent)",
+      lnkAsk: "Which URL should I read?", lnkGo: "Reading that page\u2026", lnkBad: "Could not read it: ",
+      psBtn: "◧ Presets", psTitle: "Presets", psNone: "No presets yet. Save the current setup (model, tier, web, procedure, voice, instructions) and switch back in one click.",
+      psSave: "＋ Save current setup", psAsk: "Name this preset", psDel: "Delete this preset?",
+      psExp: "⤓ Export all", psImp: "⤒ Import", psImpAsk: "Paste the exported preset JSON here", psImpBad: "That is not a preset file",
+      psOn: "Switched to preset: ", psFull: "12 presets max — delete one first.",
     },
   };
   function tx(k, map) {
@@ -585,7 +599,13 @@
     return "zh";
   }
   var LANG = langInit();
-  function t(k) { var d = TXT[LANG] || TXT.zh; return (k in d) ? d[k] : TXT.zh[k]; }
+  // 先查主字典，再查 TX2（新功能的文案都写在 TX2 里，不去动那两坨大字典）
+  function t(k) {
+    var d = TXT[LANG] || TXT.zh;
+    if (k in d) return d[k];
+    if (k in TXT.zh) return TXT.zh[k];
+    return tx(k);
+  }
 
   /* ── 主题走 CSS 变量并挂在 :root 上（而非 .wdsm-layer）——设置/成文那几个面板是内联样式，
      只有变量在 :root 才够得着；换肤时它们跟着变，不必再复制一份浅色面板。 ── */
@@ -885,6 +905,7 @@
         "<div class='wdsm-tabs'><button class='wdsm-tab' data-m='normal'></button><button class='wdsm-tab sel' data-m='wds'></button></div>" +
         "<button class='wdsm-sb' data-a='theme'></button>" +
         "<button class='wdsm-sb' data-a='style'></button>" +
+        "<button class='wdsm-sb' data-a='preset'></button>" +
         "<button class='wdsm-sb' data-a='help'></button>" +
       "</div>" +
     "</div>" +
@@ -920,6 +941,7 @@
           "<button class='wdsm-mode' data-k='deep'></button>" +
           "<button class='wdsm-mode' data-k='web'></button>" +
           "<button class='wdsm-mode wdsm-rsbtn'></button>" +
+          "<button class='wdsm-mode wdsm-lnkbtn'></button>" +
           "<span class='wdsm-mode-tip'></span>" +
         "</div>" +
         "<div class='wdsm-atts' style='display:none'></div>" +
@@ -1221,6 +1243,7 @@
     g(".wdsm-fold").title = layer.classList.contains("fold") ? t("sbUnfold") : t("sbFold");
     g(".wdsm-sb[data-a='theme']").textContent = t("sbTheme");
     g(".wdsm-sb[data-a='style']").textContent = t("sbStyle");
+    g(".wdsm-sb[data-a='preset']").textContent = t("psBtn");
     g(".wdsm-sb[data-a='help']").textContent = t("sbHelp");
     paintTool();
     paintMp(); sbRender();
@@ -2411,6 +2434,142 @@
   inEl.addEventListener("keydown", function (e) { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); if (!streaming) send(); } });
 
 
+
+  /* ══════════════ 贴链接读全文 ══════════════
+     联网搜索解决的是"去找几条"，这个解决的是"就读这一篇"。抓回来的正文当一份附件常驻本场，
+     于是它和上传的文件走同一条线（超长自动切块、按问题取段），不必另造一套。 */
+  var lnkBtn = layer.querySelector(".wdsm-lnkbtn");
+  function urlIn(s) {
+    var m = String(s || "").match(/https?:\/\/[^\s<>"'）)】]+/);
+    return m ? m[0] : "";
+  }
+  function lnkGrab(u) {
+    attStatus(t("lnkGo"));
+    fetch("/api/wds/readurl", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ u: u }) })
+      .then(function (r) { return r.json(); })
+      .then(function (j) {
+        if (!j || !j.ok) { attStatus(t("lnkBad") + ((j && j.msg) || "?"), 1); return; }
+        attLoad(function (A) {
+          var d = { name: j.title || j.url, text: j.text, note: j.note || "网页", src: j.url };
+          if (A && A.chunk && d.text.length > FULL_MAX) d.chunks = A.chunk(d.text);
+          if (atts.length >= 5) atts.shift();
+          atts.push(d); paintAtts();
+        });
+      })
+      .catch(function (e) { attStatus(t("lnkBad") + ((e && e.message) || "?"), 1); });
+  }
+  if (lnkBtn) {
+    lnkBtn.title = t("lnkTip");
+    lnkBtn.onclick = function () {
+      if (streaming) return;
+      // 输入框里已经贴了网址就直接用它，并把它从提问里摘掉（读者的意思是"读这个"，不是"问这一串字符"）
+      var inU = urlIn(inEl.value);
+      var u = inU || (window.prompt ? window.prompt(t("lnkAsk"), "https://") : "");
+      if (!u) return;
+      u = urlIn(u) || u;
+      if (inU) { inEl.value = inEl.value.split(inU).join("").trim(); inEl.style.height = "auto"; }
+      lnkGrab(u);
+    };
+  }
+
+  /* ══════════════ 预设智能体 ══════════════
+     一套预设＝基底＋档位＋联网＋工序＋口吻＋自定义指令。为什么值得有：
+     同一个人一天里要当好几种角色（审稿人／改姓教练／母题师／随便聊聊），
+     每次手动调六个开关，实际结果是根本不调，一直用同一套设置干所有活。
+     只存设置，不存 Key（Key 另有各自的槽位，导出的预设文件里不该带它）。 */
+  var LS_PRESETS = "sde_wds_presets";
+  function psAll() {
+    try { var a = JSON.parse(localStorage.getItem(LS_PRESETS) || "[]"); return Array.isArray(a) ? a : []; }
+    catch (e) { return []; }
+  }
+  function psPut(a) { try { localStorage.setItem(LS_PRESETS, JSON.stringify(a.slice(0, 12))); } catch (e) {} }
+  function psSnap(name) {
+    var kv = null; try { kv = wdsKeyGet(); } catch (e) {}
+    return {
+      n: String(name || "").slice(0, 40),
+      v: kv ? kv.vendor : "", m: kv ? (kv.model || "") : "",
+      md: thinkMode, web: webOn ? 1 : 0, tool: curTool,
+      st: styleGet(), stc: styleCustom(), ab: aboutGet(),
+    };
+  }
+  function psApply(p) {
+    try {
+      if (p.v) localStorage.setItem("sde_wds_vendor", p.v);
+      if (p.m) localStorage.setItem("sde_wds_model_" + p.v, p.m);
+      thinkMode = (p.md === "deep") ? "deep" : "std"; localStorage.setItem(LS_MODE, thinkMode);
+      webOn = !!p.web; localStorage.setItem(LS_WEB, webOn ? "1" : "0");
+      localStorage.setItem(LS_STYLE, p.st || "default");
+      if (p.stc) localStorage.setItem(LS_STYLE_C, p.stc);
+      localStorage.setItem(LS_ABOUT, p.ab || "");
+    } catch (e) {}
+    toolSet(p.tool || "");
+    paintModes(); paintMp();
+    toast(t("psOn") + p.n);
+  }
+  function psPanel(anchor) {
+    menuAt(anchor, function (menu) {
+      menu.appendChild(el("div", "mh", t("psTitle")));
+      var list = psAll();
+      if (!list.length) {
+        var none = el("div", "mh", t("psNone"));
+        none.style.cssText = "font-weight:400;line-height:1.6;white-space:normal;max-width:260px";
+        menu.appendChild(none);
+      }
+      list.forEach(function (p, i) {
+        var b = el("button");
+        b.appendChild(document.createTextNode(p.n));
+        var sub = (p.v || "?") + " · " + (p.md === "deep" ? t("mDeep") : t("mStd"))
+          + (p.web ? " · " + t("mWeb") : "")
+          + (p.tool && toolInfo(p.tool) ? " · " + t(toolInfo(p.tool).n) : "");
+        b.appendChild(el("span", "sub", sub));
+        b.onclick = function () { closeMenu(); psApply(p); };
+        var x = el("button", "psx", "\u00d7"); x.title = t("psDel");
+        x.style.cssText = "position:absolute;right:6px;top:6px;padding:2px 6px;border:none;background:none;color:var(--wdim)";
+        x.onclick = function (ev) {
+          if (ev && ev.stopPropagation) ev.stopPropagation();
+          if (window.confirm && !window.confirm(t("psDel"))) return;
+          var a = psAll(); a.splice(i, 1); psPut(a); closeMenu(); psPanel(anchor);
+        };
+        b.style.position = "relative";
+        b.appendChild(x);
+        menu.appendChild(b);
+      });
+      var sv = el("button", null, t("psSave"));
+      sv.onclick = function () {
+        closeMenu();
+        var a = psAll();
+        if (a.length >= 12) { toast(t("psFull")); return; }
+        var nm = window.prompt ? window.prompt(t("psAsk"), "") : "";
+        if (!nm || !String(nm).trim()) return;
+        a.unshift(psSnap(String(nm).trim())); psPut(a);
+        toast(t("psTitle") + "：" + String(nm).trim());
+      };
+      menu.appendChild(sv);
+      var ex = el("button", null, t("psExp"));
+      ex.onclick = function () { closeMenu(); download("wds-presets.json", JSON.stringify(psAll(), null, 2)); };
+      menu.appendChild(ex);
+      var im = el("button", null, t("psImp"));
+      im.onclick = function () {
+        closeMenu();
+        var raw = window.prompt ? window.prompt(t("psImpAsk"), "") : "";
+        if (!raw) return;
+        try {
+          var a = JSON.parse(raw);
+          if (!Array.isArray(a) || !a.length || !a[0] || typeof a[0].n !== "string") { toast(t("psImpBad")); return; }
+          // 只收认得的字段：导入的是别人给的文件，不许它往 localStorage 里塞任意东西
+          var clean = a.slice(0, 12).map(function (p) {
+            return { n: String(p.n || "").slice(0, 40), v: String(p.v || ""), m: String(p.m || ""),
+                     md: p.md === "deep" ? "deep" : "std", web: p.web ? 1 : 0, tool: String(p.tool || ""),
+                     st: String(p.st || "default"), stc: String(p.stc || "").slice(0, 2000), ab: String(p.ab || "").slice(0, 1200) };
+          });
+          psPut(clean.concat(psAll()).slice(0, 12));
+          toast(t("psTitle") + " +" + clean.length);
+        } catch (e) { toast(t("psImpBad")); }
+      };
+      menu.appendChild(im);
+    });
+  }
+
   /* ══════════════════ 画布（Artifacts）══════════════════
      为什么要有它：SDE 工序的产出（评分卡、母题定稿、近邻分离线表、研究报告、一张图、一页网页）
      本质是**成品**，不是聊天流里的一段话。留在流里就只能一直往回翻，改一版又多一段。
@@ -3013,7 +3172,8 @@
     { k: "gap", n: "tlGap", s: "tlGapS", cmd: ["缝隙", "gap"] },
     { k: "collide", n: "tlCollide", s: "tlCollideS", cmd: ["碰撞", "collide"] },
     { k: "grid", n: "tlGrid", s: "tlGridS", cmd: ["坐标", "grid", "宫格"] },
-    { k: "nine", n: "tlNine", s: "tlNineS", cmd: ["九宫", "nine"] }
+    { k: "nine", n: "tlNine", s: "tlNineS", cmd: ["九宫", "nine"] },
+    { k: "map", n: "tlMap", s: "tlMapS", cmd: ["结构图", "map", "导图"] }
   ];
   var curTool = "";
   function toolInfo(k) { for (var i = 0; i < TOOLS.length; i++) if (TOOLS[i].k === k) return TOOLS[i]; return null; }
@@ -3342,6 +3502,7 @@
           });
         });
       } else if (a === "style") styleMenu(b);
+      else if (a === "preset") psPanel(b);
       else if (a === "help") helpPanel();
     };
   });
