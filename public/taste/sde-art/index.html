@@ -183,7 +183,7 @@ footer{border-top:1px solid var(--line);color:var(--dim);font-size:13px;padding:
 var PROXY = "/api/llm-proxy";
 var MODEL = "MiniMax-M3";           // 思考与看图（M2.x 看不了图，必须 M3）
 var IMGMODEL = "image-01";
-var VERSION = 3;   // 页面头部会印出来：截图里一眼能看出读者跑的是哪一版
+var VERSION = 4;   // 页面头部会印出来：截图里一眼能看出读者跑的是哪一版
 
 function $(id){ return document.getElementById(id); }
 function esc(s){ return String(s==null?"":s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];}); }
@@ -443,7 +443,23 @@ function stripThink(s){
   return { text: t.trim(), think: thought };
 }
 var MM_SPLIT = true;   // reasoning_split 是否可用；一旦被上游拒绝就整场关掉，不再重试
+/* 对外的 mmChat：空产出且看得出是被上限截断时，**自动加码重试一次**。
+   预算是天花板不是花费——上限给高了不多花一分钱（按实际用量计费），给低了却必然截断。
+   第二次真跑就是这么死的：给了 8000，思考跑了 33630 字，正文一个字没落。 */
 async function mmChat(sys, user, maxTok, imgs){
+  var want = maxTok || 32000;
+  try{
+    return await mmChatOnce(sys, user, want, imgs);
+  }catch(e){
+    var m = String(e && e.message || "");
+    if(m.indexOf("空产出") < 0) throw e;
+    var bigger = Math.min(120000, want * 3);
+    if(bigger <= want) throw e;
+    say("上一遍思考把预算吃光了（正文 0 字），正在把上限从 "+want+" 抬到 "+bigger+" 重跑一次…");
+    return await mmChatOnce(sys, user, bigger, imgs);
+  }
+}
+async function mmChatOnce(sys, user, maxTok, imgs){
   var content = user;
   if(imgs && imgs.length){
     content = [{ type:"text", text:user }].concat(imgs.map(function(d){
@@ -451,8 +467,12 @@ async function mmChat(sys, user, maxTok, imgs){
     }));
   }
   async function once(useSplit){
+    var tok = maxTok || 32000;
     var body = {
-      model: MODEL, stream: false, max_tokens: maxTok||4000,
+      model: MODEL, stream: false,
+      // ⚠️ 两个都发：M3 的官方示例用的是 max_completion_tokens，而多数 OpenAI 兼容客户端发 max_tokens。
+      //    发漏了那一个，上限就形同虚设——第二次真跑就是这么被打穿的（预算 8000，思考却跑了 33630 字）。
+      max_tokens: tok, max_completion_tokens: tok,
       messages: [{ role:"system", content:sys }, { role:"user", content:content }]
     };
     if(useSplit) body.reasoning_split = true;
@@ -472,20 +492,29 @@ async function mmChat(sys, user, maxTok, imgs){
   }
   if(!res.r.ok) throw new Error("基底 HTTP "+res.r.status+"："+res.t.slice(0,220));
   var j; try{ j = JSON.parse(res.t); }catch(e){ throw new Error("基底返回不是 JSON："+res.t.slice(0,220)); }
-  var msg = j && j.choices && j.choices[0] && j.choices[0].message;
+  var ch = j && j.choices && j.choices[0];
+  var msg = ch && ch.message;
   var raw = msg ? (msg.content||"") : "";
   var sp = stripThink(raw);
-  var thinkLen = sp.think.length + String((msg && msg.reasoning_content) || "").length;
+  // 两条思考通道分开数：<think> 标签在正文里（reasoning_split 没生效），reasoning_content 在旁路（生效了）。
+  // 分不清这两者，就分不清「该关思考」还是「该加预算」。
+  var tagLen = sp.think.length;
+  var sideLen = String((msg && (msg.reasoning_content || msg.reasoning_details)) || "").length;
+  var thinkLen = tagLen + sideLen;
+  var fin = (ch && ch.finish_reason) || "?";
+  LAST_DIAG = { tok: maxTok, tag: tagLen, side: sideLen, think: thinkLen,
+                body: sp.text.length, sys: sys.length, user: String(user).length, fin: fin };
   if(!sp.text){
-    // 「没有产出内容」是最坏的报错——必须当场说出五个数与一条可执行的下一步
-    throw new Error("空产出：预算 "+(maxTok||4000)+"，思考 "+thinkLen+" 字，正文 0 字，"
-      + "system "+sys.length+" 字，本轮问话 "+String(user).length+" 字。"
-      + "M3 的思考与正文吃同一份预算——多半是思考把它吃光了。可缩短入题再试。");
+    // 「没有产出内容」是最坏的报错——必须当场说出全部证据与一条可执行的下一步
+    throw new Error("空产出：预算 "+maxTok+"，思考 "+thinkLen+" 字（其中 <think> 标签内 "+tagLen
+      + " 字、旁路 reasoning 字段 "+sideLen+" 字），正文 0 字，system "+sys.length+" 字，本轮问话 "
+      + String(user).length+" 字，finish_reason="+fin+"。"
+      + (fin === "length" ? "被上限截断了——已在自动加码重试。" : "思考与正文吃同一份预算。"));
   }
   LAST_THINK = thinkLen;   // 供排障用：上一次调用里思考吃掉了多少字
   return sp.text;
 }
-var LAST_THINK = 0;
+var LAST_THINK = 0, LAST_DIAG = null;
 /* 渲染端回收路径：不指望基底听话。
    PPT 那条线的教训——「凡是靠形状驱动的设计，都要在渲染端为『形状写错位置』留一条
    回收路径，光靠提示禁止不够」。这里管两件事：
@@ -546,12 +575,17 @@ function fail(msg){
 /* ── 成本估算 ──────────────────────────────────────────────── */
 function calcCost(){
   var ways = MODES[MODE].ways, per = parseInt($("perWay").value,10)||3;
-  var calls = 1 /*tri*/ + 1 /*gateIn*/ + ways /*collide*/ + ways /*五维*/ + ways /*audit*/ + 1 /*gateOut*/ + 1 /*synth*/;
+  var calls = 1 + 1 + ways + ways + ways + 1 + 1;   // 三观点/进闸/碰撞/五维/看图/出闸/提炼
   var shots = ways*per;
   var yuanImg = shots*0.025;
-  var yuanTxt = calls*(21000*2.10/1e6 + 2000*8.40/1e6);
+  // ⚠️ 按**实际用量**估，不按上限估。上限只是天花板，不是花费。
+  //    入：装内功那几次约 21k tokens，不装的几次约 2k；出：M3 的思考也计费，按经验每次约 8k tokens 合计。
+  var inTok  = 5*21000 + (calls-5)*2500;
+  var outTok = calls*8000;
+  var yuanTxt = inTok*2.10/1e6 + outTok*8.40/1e6;
   $("cost").textContent = "本次预计：基底调用 "+calls+" 次 · 出图 "+shots+" 张 · 约 "
-    + (yuanImg+yuanTxt).toFixed(2) + " 元（图 "+yuanImg.toFixed(2)+" ＋ 文 "+yuanTxt.toFixed(2)+"，含内功装载）";
+    + (yuanImg+yuanTxt).toFixed(2) + " 元（图 "+yuanImg.toFixed(2)+" ＋ 文 "+yuanTxt.toFixed(2)
+    + "，含内功装载与 M3 的思考用量；实际按用量计费，思考短则更便宜）";
 }
 $("perWay").onchange = calcCost;
 calcCost();
@@ -637,14 +671,14 @@ async function run(again){
       + "  最易被推翻处：一句\n"
       + "每条 220–340 字。写完就停——不要综合、不下结论、不调和。调和等于把涌现的原料先烧掉。";
     // 预算按「正文该多长」给，并给思考留余量：三条各 220–340 字≈1000 字正文，M3 的思考通常还要吃掉几倍。
-    var triTxt = await mmChat(triSys, triUser, 16000);
+    var triTxt = await mmChat(triSys, triUser, 48000);
     var views = cutViews(triTxt);
     if(views.length < 2){
       // 自动降档重试一次：把格式要求提到最前、砍掉一切修饰，并明说上一遍错在哪
       say("三观点没切出来，正在用更硬的格式要求重跑一次…");
       var retryUser = "【只输出三段，别的一个字都不要。每段第一行必须原样是「观点一：」「观点二：」「观点三：」，"
         + "不要加粗、不要编号、不要前言、不要结语、不要总结。】\n\n" + triUser;
-      triTxt = await mmChat(triSys, retryUser, 16000);
+      triTxt = await mmChat(triSys, retryUser, 48000);
       views = cutViews(triTxt);
     }
     if(views.length < 2){
@@ -661,6 +695,7 @@ async function run(again){
     mark(si,"run"); say("近邻闸门：拿压缩句去查图像占位库…");
     var gateSys = "你是图像占位核查员。你**不带任何学派立场**，做两件事：①判断一句视觉命题是否已经被现成图式占住；②判断它会不会一出生就死格。\n"
       + placeBrief() + "\n" + deadBrief()
+      + "\n**这一步是机械核对，不是论述**：直接按格式给读数，别在心里反复推演——想得越久，落笔的预算越少。\n"
       + "\n【三条纪律】\n① 库里没有 ≠ 没被占位。库里没有就写〔库未命中〕，**不得据此判定通过**。\n"
       + "② 通过的条件不是「找不到近邻」，而是「带着一条**可裁决的分离线**活下来」——你要能说出：占位图式在哪个具体可见特征上是 A，而这一条是非 A，这个差别怎么用眼睛读出来。\n"
       + "③ 说不出分离线，就判占位失败。\n";
@@ -670,7 +705,7 @@ async function run(again){
       + "条N｜分离线：占位图式在【某可见特征】上是 A，本条是非 A，读法是……（判定为通过时必须写满这一行）\n"
       + "条N｜死格风险：中了哪一条病征就写出病名与理由；一条都不中写「无」\n\n"
       + views.map(function(v,i){ return "【条"+(i+1)+"】" + v; }).join("\n\n");
-    var gateTxt = await mmChat(gateSys, gateUser, 8000);
+    var gateTxt = await mmChat(gateSys, gateUser, 32000);
     mark(si,"done"); si++;
     renderTri(views, gateTxt);
 
@@ -700,7 +735,7 @@ async function run(again){
           + "   （e）结尾原样接上这一串：no text, no letters, no numbers, no watermark, no recognizable real person, no logo, no brand, not in the style of any named artist\n"
           + "   （f）**不许出现任何艺术家人名或画派名**。\n"
           + "全文 1000–1500 字。";
-        var colTxt = await mmChat(colSys, colUser, 20000);
+        var colTxt = await mmChat(colSys, colUser, 64000);
         var prompt = grab(colTxt, "七、绘图指令") || grab(colTxt, "绘图指令");
         prompt = prompt.replace(/^[（(].*?[）)]\s*/,"").trim();
         if(!prompt || prompt.length < 60) throw new Error("第七节绘图指令没解析出来");
@@ -731,12 +766,13 @@ async function run(again){
           + "\n\n刻度说明：每维给一个 100–170 的整数，向上开放；一百五十分为本体论级门槛——过线的不只是优秀，它重置了棋盘。\n"
           + "**衡量差异维时必须校准年代棋盘**：在别人做过之后再做一次，与第一次做出来，路径深度天差地别。\n"
           + "**纠缠维骗不到分**：无根的新奇（为怪而怪）在此维必须现形。\n\n"
+          + "**这一步是读数，不是论述**：直接给分，别在心里反复推演。\n"
           + "严格按每行一维输出，共五行，不要别的：\n维名｜分数｜一句为什么\n"
           + "然后另起一行写「弱在」：指出最弱的一维，并给一条可动手的坐标（不许写「加强创新」这类空话）。";
         var iqUser = "【要评的典范】\n" + pq.txt.slice(0, 3000)
           + "\n\n【它撞出来的方式】" + pq.way.t
           + "\n\n请按五维读数。注意：你评的是这个**典范**（一个视觉命题），不是评一张具体的画。";
-        var iqTxt = await mmChat(iqSys, iqUser, 8000);
+        var iqTxt = await mmChat(iqSys, iqUser, 32000);
         pq.iqReport = iqTxt;
         pq.iq = {};
         IQ5.forEach(function(d){ pq.iq[d[1]] = cellScore(iqTxt, d[0], 200); });
@@ -788,7 +824,7 @@ async function run(again){
           + "② 如果这张图只是让人「认出」了什么、识别一完成观看就结束，那它停在一号位的物：连接与活力两格必须低分。\n"
           + "另：画面被塞满、没有可走的空处，「共存」与「连接」两项必须扣。\n"
           + "如果这张图中了「打卡化」或「十五秒消费」，「活力」（再点燃之力）必须给低分——一眼看完的东西没有第二次发生。";
-        var b9Txt = await mmChat(b9Sys, b9User, 8000, p3.imgs.slice(0,3));
+        var b9Txt = await mmChat(b9Sys, b9User, 32000, p3.imgs.slice(0,3));
         p3.report = b9Txt;
         p3.score = scoreOf(b9Txt, M.accent);
         mark(si,"done", p3.score!=null ? (p3.score+" 分") : "已评");
@@ -813,7 +849,7 @@ async function run(again){
       var goUser = "逐张核查。每张按四行：\n图N｜判定：〔占位失败〕／〔通过〕／〔库未命中·不放行〕\n图N｜撞上：具体图式名或艺术家名，没有写「无」\n图N｜分离线：（判通过时必须写满）\n"
         + "图N｜死格：中了哪条病征（打卡化／十五秒消费／防弹玻璃式／语法失传），一条都不中写「无」——**这是绘画的当代第一死因，比撞图式更该说**\n"
         + "最后一行写：最干净的是第几张。";
-      var goTxt = await mmChat(goSys, goUser, 8000, allImgs.slice(0,4));
+      var goTxt = await mmChat(goSys, goUser, 32000, allImgs.slice(0,4));
       $("drawOut").insertAdjacentHTML("beforeend",
         '<div class="card" style="margin-top:16px"><h2>近邻闸门 · 出（看着图查）</h2><div class="out">'+esc(goTxt)+'</div></div>');
       mark(si,"done");
@@ -847,7 +883,7 @@ async function run(again){
       + "五、两张卡开出的作业（九分项与五维各自最弱的那一项，逐条转写成下一版的具体动作，禁「加强构图」「加强创新」这类空话；**两本账分开写，不许合并成一个总评**）\n"
       + "六、明确不画什么\n"
       + (MODE==="C" ? "全文控制在 300–500 字。" : (MODE==="A" ? "全文 600–900 字，并在最后附一行 alt 文本（一句，供无障碍阅读用）。" : "全文 1200–1800 字。"));
-    var syTxt = await mmChat(sysBase(core,true), syUser, MODE==="C"?8000:20000);
+    var syTxt = await mmChat(sysBase(core,true), syUser, MODE==="C"?32000:64000);
     $("synthOut").textContent = fallbackNote + syTxt;
     mark(si,"done", (byIQ ? ("胜出 五维 "+(winner.iqTotal!=null?winner.iqTotal:"—")+" 分")
                           : ("五维全缺·退回九分项择优，胜出 "+(winner.score!=null?winner.score:"—")+" 分")));

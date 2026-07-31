@@ -469,7 +469,9 @@ async function drive(w, mode, opts) {
     await drive(w, "B", {});
     const err = w.document.getElementById("err").textContent;
     ok("上游 200 但正文为空 → 显式报「空产出」，不是「什么也没发生」", /空产出/.test(err), err.slice(0, 80));
-    ok("空产出时给出可执行的下一步", /可缩短入题再试/.test(err));
+    ok("空产出报出 finish_reason（判断是不是被上限截断的关键证据）", /finish_reason=/.test(err), err.slice(-60));
+    ok("空产出把两条思考通道分开报（<think> 标签内 vs 旁路 reasoning 字段）",
+      /<think> 标签内 \d+ 字/.test(err) && /旁路 reasoning 字段 \d+ 字/.test(err));
   }
   {
     // ④ 上游返回的不是 JSON（Cloudflare 错误页那一类）
@@ -600,8 +602,7 @@ async function drive(w, mode, opts) {
     ok("空产出报出五个数（预算/思考/正文/system/问话）",
       /预算 \d+/.test(err) && /思考 \d+ 字/.test(err) && /正文 0 字/.test(err)
       && /system \d+ 字/.test(err) && /本轮问话 \d+ 字/.test(err), err.slice(0, 120));
-    ok("并说清 M3 思考与正文吃同一份预算 ＋ 一条可执行的下一步",
-      /思考与正文吃同一份预算/.test(err) && /可缩短入题再试/.test(err));
+    ok("并说清思考与正文吃同一份预算", /思考与正文吃同一份预算|被上限截断/.test(err));
   }
   {
     // ③ 格式漂移：**观点一：** / 观点1: / 【观点二】 —— 归一后仍要切得出来
@@ -671,13 +672,42 @@ async function drive(w, mode, opts) {
     const { w, calls } = await boot(happyScript());
     await drive(w, "B", {});
     const chats = calls.filter((c) => /chat\/completions$/.test(c.target));
-    ok("三观点预算 ≥16000（4000 是被真跑证伪过的数）", chats[0].body.max_tokens >= 16000,
+    ok("三观点预算 ≥48000（4000 与 16000 都被真跑证伪过）", chats[0].body.max_tokens >= 48000,
       "实测 " + chats[0].body.max_tokens);
-    ok("每一次调用的预算都 ≥8000（思考与正文共吃一份）",
-      chats.every((c) => c.body.max_tokens >= 8000),
+    ok("每一次调用的预算都 ≥32000（思考与正文共吃一份，M3 思考动辄三万字）",
+      chats.every((c) => c.body.max_tokens >= 32000),
       "最小 " + Math.min(...chats.map((c) => c.body.max_tokens)));
-    ok("碰撞那一步给到 20000（要产出 1000–1500 字的七节）",
-      chats.filter((c) => /本轮碰撞方式/.test(uText(c)))[0].body.max_tokens === 20000);
+    ok("碰撞那一步给到 64000（预算是天花板不是花费，给低了必然截断）",
+      chats.filter((c) => /本轮碰撞方式/.test(uText(c)))[0].body.max_tokens === 64000);
+    ok("每一次都同时发 max_tokens 与 max_completion_tokens（M3 官方示例用后者）",
+      chats.every((c) => c.body.max_tokens === c.body.max_completion_tokens && c.body.max_completion_tokens > 0));
+  }
+
+  {
+    // 空产出 → 自动加码重试一次（第二次真跑的直接对策）
+    let n = 0, caps = [];
+    const { w } = await boot(async function (rec) {
+      if (/sde-neigong\.txt$/.test(rec.url)) return { text: "桩" };
+      if (/kb\/principles$/.test(rec.url)) return { json: { ok: true, principles: [] } };
+      if (/image_generation$/.test(rec.target)) return imgOK(1);
+      caps.push(rec.body.max_tokens);
+      n++;
+      // 第一遍一律空产出（思考吃光），第二遍（加码后）才正常回
+      const big = rec.body.max_tokens >= 96000;
+      const sys = rec.body.messages[0].content, u = uText(rec);
+      if (!big) return { json: { choices: [{ finish_reason: "length", message: { content: "", reasoning_content: "思".repeat(30000) } }] } };
+      if (/图像占位核查员/.test(sys)) return chatOK(GATE_REPLY);
+      if (/创新度量员/.test(sys)) return chatOK(IQ5_REPLY);
+      if (/画面审看者/.test(sys)) return chatOK(B9_REPLY);
+      if (/本轮碰撞方式/.test(u)) return chatOK(paraReply("甲"));
+      if (/要你写/.test(u)) return chatOK(SYNTH_REPLY);
+      return chatOK(triReply(3));
+    });
+    await drive(w, "A", {});
+    ok("空产出会自动把上限抬高重跑一次（不是直接失败）", caps.some((c, i) => i > 0 && c > caps[i - 1]),
+      "上限序列 " + caps.slice(0, 4).join(","));
+    ok("加码是三倍且钳在 120000 以内", caps.every((c) => c <= 120000));
+    ok("加码后整条产线跑通", !!(w.__sdeArt.last() && w.__sdeArt.last().synth));
   }
 
   /* ═════ 十一、核心函数一个都不许少（大段替换吞掉邻居，已发生过一次） ═════ */

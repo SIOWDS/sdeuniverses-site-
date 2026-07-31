@@ -230,17 +230,19 @@ ok("单张下载（全浏览器可用的 a[download]）", /download="sde-art-/.t
 ok("打包下载全部图", /btnDlAll/.test(js));
 ok("失败必须显式报错，无静默 catch 吞掉主流程", /function fail\(msg\)/.test(js) && /\$\("err"\)\.innerHTML/.test(js));
 // 真跑撞过这一族：M3 的思考与正文吃同一份 max_tokens，思考吃光就只剩 <think>
-ok("空产出报出五个数（预算/思考/正文/system/问话）",
-  /空产出：预算 "\+\(maxTok\|\|4000\)\+"，思考 "\+thinkLen\+" 字，正文 0 字/.test(js)
-  && /system "\+sys\.length\+" 字/.test(js) && /本轮问话 "\+String\(user\)\.length\+" 字/.test(js));
-ok("空产出说清根因并给可执行的下一步", /思考与正文吃同一份预算/.test(js) && /可缩短入题再试/.test(js));
-ok("content 里的 <think> 一律剥掉（M3 硬特性，官方文档写明）",
-  /function stripThink/.test(js) && /<think>\[\\s\\S\]\*\?<\\\/think>/.test(js));
-ok("截断态（只开头没闭合）也当思考处理，不当正文", /只开了头没闭合/.test(js));
-ok("reasoning_split 试探一次，被 400 拒就整场关掉", /MM_SPLIT = false/.test(js) && /整场记住|整场关掉/.test(js));
-ok("三观点切不出来会自动重试一次，且报错带上基底真回了什么",
-  /更硬的格式要求重跑一次/.test(js) && /基底这次回的是/.test(js));
-ok("三观点预算 16000（4000 已被真跑证伪）", /mmChat\(triSys, triUser, 16000\)/.test(js));
+// 第二次真跑（预算 8000／思考 33630 字／正文 0 字）之后的口径
+ok("空产出把两条思考通道分开报（<think> 标签内 vs 旁路 reasoning 字段）",
+  /<think> 标签内 "/.test(js) && /旁路 reasoning 字段 "/.test(js));
+ok("空产出带 finish_reason（判断是否被上限截断的关键证据）", /finish_reason="\+fin/.test(js));
+ok("空产出仍报出预算/正文/system/问话四个数", /空产出：预算 "\+maxTok/.test(js)
+  && /正文 0 字，system "\+sys\.length/.test(js) && /本轮问话 "/.test(js));
+ok("两个上限字段同发（M3 官方示例用 max_completion_tokens）",
+  /max_tokens: tok, max_completion_tokens: tok/.test(js));
+ok("空产出会自动加码重试一次，且钳在 120000", /Math\.min\(120000, want \* 3\)/.test(js));
+ok("加码时告诉读者（不许悄悄重跑）", /把上限从 "\+want\+" 抬到 "\+bigger/.test(js));
+ok("注释里写死「预算是天花板不是花费」这条判据", /预算是天花板不是花费/.test(js));
+ok("三观点预算 48000（4000 与 16000 都被真跑证伪过）", /mmChat\(triSys, triUser, 48000\)/.test(js));
+ok("机械核对类的步骤明说别长篇推演", /这一步是机械核对，不是论述/.test(js) && /这一步是读数，不是论述/.test(js));
 
 /* ═════ 十、Key 与零责任架构 ═════ */
 group("十、Key 与零责任架构");
