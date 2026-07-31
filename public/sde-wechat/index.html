@@ -191,6 +191,7 @@ a{color:var(--disc)}
 </style>
 <!-- 全站三态：浏览 / SDE 微信 / SDE 对话。模块自己会挂到 .top 顶栏上 -->
 <script src="/assets/sde-modes.js" defer></script>
+  <script src="/assets/sde-nbr.js"></script>
 </head>
 <body>
 <div id="app">
@@ -204,7 +205,7 @@ a{color:var(--disc)}
       <div class="sub" id="t-sub"><span class="dot" id="t-dot"></span><span id="t-stat"></span></div>
     </div>
     <button class="act" id="t-act" type="button" style="display:none">群资料</button>
-    <button class="act" id="t-mopen" type="button" style="display:none">发表</button>
+    <button class="act" id="t-mopen" type="button" style="display:none">发表</button><div id="t-cdnew" class="tbtn" style="display:none">＋立卡</div>
     <a class="act" id="t-mtg" href="/meeting/">会议</a>
     <a class="act" id="t-plaza" href="/sde-talk/">广场</a>
   </div>
@@ -284,6 +285,37 @@ a{color:var(--disc)}
         </div>
         <div id="ad-panel" style="display:none"></div>
       </div>
+    </div>
+
+    <div class="view" id="v-cand">
+      <div class="scroll" id="cd-list"></div>
+    </div>
+    <div class="view" id="v-cdnew">
+      <div class="scroll"><div class="form">
+        <p style="font-size:0.82rem;color:var(--muted);line-height:1.75;margin:0 0 12px">
+          候选卡不是发帖。它是一句<b>能被反对的判断</b>，交给和你不共享语汇的人来顶。<br>
+          三段都要填满——<b>说不出切了哪一刀、给不出可裁决的判据，别人只能表态，不能顶回。</b><br>
+          落卡后有 <b>72 小时</b>顶回期，到点自动结算：没人顶＝未交手；被占位者击中而你说不出分离线＝死格；
+          带着分离线活下来＝已交手。
+        </p>
+        <label>承重命题（压成 50 字上下的一句话）</label>
+        <textarea id="cd-prop" maxlength="120" rows="2" placeholder="例：任何划界者都无法在自己划出的界内安置自己的划界动作"></textarea>
+        <div id="cd-nbr" style="font-size:0.8rem;color:var(--muted);margin:-4px 0 10px;line-height:1.7"></div>
+        <label>它切开的辨别面（把什么和什么分开）</label>
+        <textarea id="cd-face" maxlength="200" rows="2" placeholder="例：把「规则适用于对象」与「规则适用于自身」分开"></textarea>
+        <label>一条可裁决判据（怎样才算它错了）</label>
+        <textarea id="cd-crit" maxlength="300" rows="2" placeholder="例：找到一条能规定自身适用条件的规则，本判断即失效"></textarea>
+        <div id="cd-picks" style="font-size:0.8rem;color:var(--muted);margin:0 0 10px;line-height:1.8"></div>
+        <button class="btn" id="cd-ok">落卡（开始 72 小时顶回期）</button>
+        <button class="btn gh" id="cd-cancel">取消</button>
+        <div class="formmsg" id="cd-msg"></div>
+      </div></div>
+    </div>
+    <div class="view" id="v-cdone">
+      <div class="scroll" id="cd-one"></div>
+    </div>
+    <div class="view" id="v-cdnews">
+      <div class="scroll" id="cd-newsbox"></div>
     </div>
 
     <div class="view" id="v-gnew">
@@ -392,7 +424,8 @@ a{color:var(--disc)}
   <div class="tabs" id="tabs" style="display:none">
     <div class="tab on" data-go="chats"><i>💬</i>聊天<span class="tb" id="tb-unread"></span></div>
     <div class="tab" data-go="book"><i>👥</i>通讯录</div>
-    <div class="tab" data-go="moments"><i>🌿</i>朋友圈<span class="tb" id="tb-mo"></span></div>
+    <div class="tab" data-go="cand"><i>🎯</i>候选<span class="tb" id="tb-cd"></span></div>
+  <div class="tab" data-go="moments"><i>🌿</i>朋友圈<span class="tb" id="tb-mo"></span></div>
     <div class="tab" data-go="me"><i>👤</i>我</div>
   </div>
 
@@ -430,19 +463,24 @@ function setStat(state){var d=el("t-dot"),s=el("t-stat");
 
 /* ── 视图 ── */
 function show(v){
-  ["gate","chats","book","talk","gnew","ginfo","me","fwd","admin","moments","mopost","monews"].forEach(function(x){el("v-"+x).classList.toggle("on",x===v)});
+  ["gate","chats","book","talk","gnew","ginfo","me","fwd","admin","moments","mopost","monews","cand","cdnew","cdone","cdnews"].forEach(function(x){el("v-"+x).classList.toggle("on",x===v)});
   el("tabs").style.display=(v==="gate")?"none":"flex";
-  el("t-back").style.display=(v==="talk"||v==="gnew"||v==="ginfo"||v==="fwd"||v==="admin"||v==="mopost"||v==="monews"||(v==="moments"&&moWho))?"block":"none";
+  el("t-back").style.display=(v==="talk"||v==="gnew"||v==="ginfo"||v==="fwd"||v==="admin"||v==="mopost"||v==="monews"||v==="cdnew"||v==="cdone"||v==="cdnews"||(v==="moments"&&moWho)||(v==="cand"&&cdWho))?"block":"none";
   el("t-sub").style.display=(v==="talk")?"flex":"none";
   el("t-act").style.display=(v==="talk"&&cur&&cur.kind==="g")?"block":"none";
   el("t-plaza").style.display=(v==="chats"||v==="book"||v==="me")?"block":"none";
   el("t-mopen").style.display=(v==="moments")?"block":"none";
+  el("t-cdnew").style.display=(v==="cand")?"block":"none";
   if(v==="gnew")el("t-ttl").textContent="建群";
   else if(v==="ginfo")el("t-ttl").textContent="群资料";
   else if(v==="fwd")el("t-ttl").textContent="转发给…";
   else if(v==="admin")el("t-ttl").textContent="全权管理";
   else if(v==="mopost")el("t-ttl").textContent="发表";
   else if(v==="monews")el("t-ttl").textContent="新消息";
+  else if(v==="cdnew")el("t-ttl").textContent="立一张候选卡";
+  else if(v==="cdone")el("t-ttl").textContent="候选卡";
+  else if(v==="cdnews")el("t-ttl").textContent="顶回提醒";
+  else if(v==="cand")el("t-ttl").textContent=cdWho?(cdWhoName+"的候选"):"候选";
   else if(v==="moments")el("t-ttl").textContent=moWho?(moWhoName+"的朋友圈"):"朋友圈";
   else if(v!=="talk")el("t-ttl").textContent="SDE 微信";
   Array.prototype.forEach.call(document.querySelectorAll(".tab"),function(t){t.classList.toggle("on",v===t.getAttribute("data-go"))});
@@ -450,6 +488,7 @@ function show(v){
 Array.prototype.forEach.call(document.querySelectorAll(".tab"),function(t){
   t.onclick=function(){var g=t.getAttribute("data-go");closeTalk();
     if(g==="moments"){moGo("","");return;}
+    if(g==="cand"){cdGo("","");return;}
     show(g);if(g==="chats")loadInbox();if(g==="book")loadBook();};
 });
 /* ── 全权管理 ── */
@@ -601,6 +640,8 @@ el("t-back").onclick=function(){
   if(el("v-mopost").classList.contains("on")||el("v-monews").classList.contains("on")){show("moments");return;}
   if(el("v-moments").classList.contains("on")&&moWho){moGo("","");return;}
   if(el("v-admin").classList.contains("on")){show("me");return;}
+  if(el("v-cdnew").classList.contains("on")||el("v-cdone").classList.contains("on")||el("v-cdnews").classList.contains("on")){show("cand");return;}
+  if(el("v-cand").classList.contains("on")&&cdWho){cdGo("","");return;}
   if(el("v-fwd").classList.contains("on")){show(cur?"talk":"chats");return;}
   if(el("v-ginfo").classList.contains("on")&&cur){show("talk");return;}
   closeTalk();show("chats");loadInbox();
@@ -654,7 +695,7 @@ function afterLogin(){
     if(x.s===401||!x.d||!x.d.ok){logout();return;}
     ME=x.d.me;contacts=x.d.contacts||[];
     el("me-nm").textContent=ME.name;el("me-uid").textContent="ID "+ME.uid;
-    show("chats");loadInbox();loadGroups();moBadge();
+    show("chats");loadInbox();loadGroups();moBadge();cdWire();cdBadge();
     if(inboxT)clearInterval(inboxT);
     inboxT=setInterval(function(){loadInbox(true);moBadge();},15000);
   }).catch(function(){el("gsi").textContent="网络异常，请稍后重试。"});
@@ -1165,6 +1206,209 @@ function moFmt(ts){var d=new Date(ts),n=Date.now()-ts;
   if(n<86400000)return Math.floor(n/3600000)+" 小时前";
   if(n<2592000000)return Math.floor(n/86400000)+" 天前";
   return (d.getMonth()+1)+"月"+d.getDate()+"日";}
+
+/* ═══ 候选卡与顶回 ═══
+   设计判据（改之前先读）：
+   ① Feed 没有终点，所以只能靠不断刺激维持；发生是有终点的——一张卡出生→被顶回→或死或活→结算。
+      所以这里是**一条有终点的链**，不是流。
+   ② **顶回不是点赞**，只有三种：占位者／反向预测／换承重层级。顶回记录就是分离线的原料。
+   ③ 落卡前先查近邻库（/assets/sde-nbr.js，零调用不烧 Key）。**库未命中 ≠ 未被占位**——
+      这句不是谨慎，是实测：评测集 35 条真候选里有 4 条与正主一个词都不共享。
+   ④ 共享密码 ⇒ 作者不可验证，所以这里**没有声望分、没有排行榜**；「活下来」只是一个状态。 */
+var cdWho="",cdWhoName="",cdCards=[],cdRoster=null;
+var CD_STATE={open:["顶回期",""],untouched:["未交手","#8a8a8a"],dead:["死格","#b3261e"],alive:["已交手","#1a7f5a"]};
+var CD_KIND={occ:"占位者",rev:"反向预测",lvl:"换承重层级"};
+
+function cdWire(){
+  var b=el("t-cdnew");
+  if(b)b.onclick=function(){
+    el("cd-prop").value="";el("cd-face").value="";el("cd-crit").value="";
+    el("cd-nbr").textContent="";el("cd-nbr").removeAttribute("data-nbr");
+    el("cd-msg").textContent="";show("cdnew");cdPickWho();
+  };
+  var pr=el("cd-prop");
+  if(pr)pr.oninput=function(){clearTimeout(cdNbrTimer);cdNbrTimer=setTimeout(cdNbrCheck,700);};
+  var ca=el("cd-cancel");if(ca)ca.onclick=function(){show("cand");};
+  var okb=el("cd-ok");
+  if(okb)okb.onclick=function(){
+    var prop=(el("cd-prop").value||"").trim(),face=(el("cd-face").value||"").trim(),crit=(el("cd-crit").value||"").trim();
+    var msg=el("cd-msg");
+    if(prop.length<8){msg.textContent="承重命题太短——先把它压成一句能被反对的话。";return;}
+    if(!face){msg.textContent="「它切开的辨别面」不能空：说不出切了哪一刀，这张卡没法被顶回。";return;}
+    if(!crit){msg.textContent="「可裁决判据」不能空：没有判据，别人只能表态，不能顶回。";return;}
+    var nbrRaw=el("cd-nbr").getAttribute("data-nbr"),nbr=null;
+    try{nbr=nbrRaw?JSON.parse(nbrRaw):null;}catch(e){}
+    var pk=(el("cd-picks").getAttribute("data-picks")||"").split(",").filter(Boolean);
+    okb.disabled=true;msg.textContent="正在落卡…";
+    cdApi("post",{prop:prop,face:face,crit:crit,nbr:nbr,picks:pk}).then(function(d){
+      okb.disabled=false;
+      if(!d||!d.ok){msg.textContent=(d&&d.msg)||"落卡失败。";return;}
+      cdGo("","");
+    }).catch(function(){okb.disabled=false;msg.textContent="落卡失败，请重试。";});
+  };
+}
+function cdBadge(){
+  cdApi("badge",{}).then(function(d){
+    var t=el("tb-cd");if(!t)return;
+    var n=(d&&d.n)||0;t.textContent=n?String(n):"";t.style.display=n?"inline-block":"none";
+  }).catch(function(){});
+}
+function cdApi(a,extra){return api("cd",Object.assign({a:a},extra||{}));}
+function cdGo(who,name){cdWho=who||"";cdWhoName=name||"";show("cand");cdLoad();}
+function cdLeft(c){
+  if(c.state!=="open")return "";
+  var ms=c.due-Date.now();if(ms<=0)return "正在结算…";
+  var hh=Math.floor(ms/3600000);
+  return hh>=1?("还剩 "+hh+" 小时"):("还剩 "+Math.max(1,Math.floor(ms/60000))+" 分钟");
+}
+function cdLoad(){
+  var box=el("cd-list");box.innerHTML='<div class="hint">正在加载…</div>';
+  cdApi("feed",{who:cdWho}).then(function(d){
+    if(!d||!d.ok){box.innerHTML='<div class="hint">加载失败，请重试。</div>';return;}
+    cdCards=d.cards||[];
+    if(!cdCards.length){
+      // 可见性铁律③：空态必须写明出路，不能只说"还没有"
+      box.innerHTML='<div style="padding:22px 18px;font-size:0.86rem;color:var(--muted);line-height:1.9">'
+        +'<b style="color:var(--fg,#222)">这里还没有候选。</b><br><br>'
+        +'候选卡是一句<b>能被反对的判断</b>——不是感想，不是提问。<br>'
+        +'你把它立在这里，系统会挑几位<b>和你不共享语汇的人</b>来顶它；'
+        +'72 小时后自动结算：没人顶＝未交手，被占位者击中而你说不出分离线＝死格，'
+        +'带着分离线活下来＝已交手。<br><br>'
+        +'点右上角<b>「＋立卡」</b>开始。想不出来的话，'
+        +'去<a href="/taste/wds-chat/">和 WDS 对话</a>撞一个出来，再把它压成一句话搬过来。</div>';
+      return;
+    }
+    var h="";
+    cdCards.forEach(function(c){h+=cdCardHtml(c,0);});
+    box.innerHTML=h;cdBind();
+  }).catch(function(){box.innerHTML='<div class="hint">加载失败，请重试。</div>'});
+}
+function cdCardHtml(c,full){
+  var s=CD_STATE[c.state]||CD_STATE.open;
+  var h='<div class="mo-item" data-id="'+esc(c.id)+'" style="padding:14px 16px;border-bottom:1px solid var(--line,#eee)">';
+  h+='<div style="display:flex;align-items:baseline;gap:8px;margin-bottom:6px">'
+    +'<b class="cd-who" data-u="'+esc(c.uid)+'" data-n="'+esc(c.name)+'" style="cursor:pointer">'+esc(c.name||"（未署名）")+'</b>'
+    +'<span style="font-size:0.72rem;padding:1px 7px;border-radius:10px;border:1px solid '+(s[1]||"var(--line,#ddd)")+';color:'+(s[1]||"var(--muted)")+'">'+s[0]+'</span>'
+    +'<span style="font-size:0.72rem;color:var(--muted)">'+esc(cdLeft(c))+'</span></div>';
+  h+='<div style="font-size:0.98rem;font-weight:600;line-height:1.6;margin-bottom:6px">'+esc(c.prop)+'</div>';
+  h+='<div style="font-size:0.82rem;color:var(--muted);line-height:1.7">切开：'+esc(c.face)+'</div>';
+  h+='<div style="font-size:0.82rem;color:var(--muted);line-height:1.7;margin-bottom:6px">判据：'+esc(c.crit)+'</div>';
+  if(c.nbr&&c.nbr.verdict)h+='<div style="font-size:0.78rem;color:var(--muted);background:rgba(0,0,0,.04);border-radius:8px;padding:7px 9px;margin-bottom:6px">'+esc(c.nbr.verdict)+'</div>';
+  var nb=(c.backs||[]).length,ns=(c.seps||[]).length;
+  h+='<div style="font-size:0.78rem;color:var(--muted)">顶回 '+nb+' 条'+(ns?('　分离线 '+ns+' 条'):'')+'　<a href="#" class="cd-open" data-id="'+esc(c.id)+'">展开 →</a></div>';
+  if(full){
+    (c.backs||[]).forEach(function(b){
+      var mine=(c.seps||[]).filter(function(s2){return s2.to===b.bid;})[0];
+      h+='<div style="margin-top:10px;padding:9px 11px;background:rgba(0,0,0,.03);border-radius:9px">'
+        +'<div style="font-size:0.78rem;color:var(--muted);margin-bottom:3px">'+esc(b.name||"")+'　·　<b>'+esc(CD_KIND[b.kind]||b.kind)+'</b></div>'
+        +'<div style="font-size:0.86rem;line-height:1.7">'+esc(b.text)+'</div>';
+      if(mine)h+='<div style="margin-top:7px;padding-left:9px;border-left:2px solid var(--brand,#1a7f5a);font-size:0.84rem;line-height:1.7"><span style="color:var(--muted);font-size:0.76rem">分离线：</span>'+esc(mine.text)+'</div>';
+      else if(c.uid===ME.uid&&c.state==="open"&&b.kind==="occ")
+        h+='<div style="margin-top:7px"><a href="#" class="cd-sep" data-id="'+esc(c.id)+'" data-b="'+esc(b.bid)+'">给一条分离线 →</a>'
+          +'<span style="font-size:0.76rem;color:#b3261e;margin-left:8px">不给就会判死格</span></div>';
+      h+='</div>';
+    });
+    if(c.state==="open"&&c.uid!==ME.uid){
+      h+='<div style="margin-top:12px"><div style="font-size:0.8rem;color:var(--muted);margin-bottom:6px">顶回它（只有这三种，没有点赞）：</div>'
+        +'<textarea class="cd-btext" data-id="'+esc(c.id)+'" rows="2" maxlength="600" placeholder="写清楚一点——顶回要能被作者回应" style="width:100%;box-sizing:border-box;padding:8px;border:1px solid var(--line,#ddd);border-radius:8px;margin-bottom:6px"></textarea>'
+        +'<button class="cd-back" data-id="'+esc(c.id)+'" data-k="occ">我这儿有一个占位者</button> '
+        +'<button class="cd-back" data-id="'+esc(c.id)+'" data-k="rev">我给一条方向相反的预测</button> '
+        +'<button class="cd-back" data-id="'+esc(c.id)+'" data-k="lvl">我换一个承重层级重述</button></div>';
+    }
+    if(c.uid===ME.uid)h+='<div style="margin-top:10px"><a href="#" class="cd-del" data-id="'+esc(c.id)+'" style="color:#b3261e">删掉这张卡</a></div>';
+  }
+  h+='</div>';return h;
+}
+function cdBind(){
+  Array.prototype.forEach.call(document.querySelectorAll(".cd-open"),function(a){
+    a.onclick=function(e){e.preventDefault();cdOne(a.getAttribute("data-id"));};
+  });
+  Array.prototype.forEach.call(document.querySelectorAll(".cd-who"),function(a){
+    a.onclick=function(){cdGo(a.getAttribute("data-u"),a.getAttribute("data-n"));};
+  });
+  Array.prototype.forEach.call(document.querySelectorAll(".cd-back"),function(btn){
+    btn.onclick=function(){
+      var id=btn.getAttribute("data-id"),k=btn.getAttribute("data-k");
+      var ta=document.querySelector('.cd-btext[data-id="'+id+'"]');
+      var t=(ta&&ta.value||"").trim();
+      if(t.length<4){alert("写清楚一点——顶回要能被作者回应。");return;}
+      btn.disabled=true;
+      cdApi("back",{id:id,kind:k,text:t}).then(function(d){
+        btn.disabled=false;
+        if(!d||!d.ok){alert((d&&d.msg)||"顶回失败。");return;}
+        cdOne(id);
+      }).catch(function(){btn.disabled=false;alert("顶回失败。")});
+    };
+  });
+  Array.prototype.forEach.call(document.querySelectorAll(".cd-sep"),function(a){
+    a.onclick=function(e){e.preventDefault();
+      var t=prompt("分离线要写满：占位者在【某个可见特征】上是 A，本条是非 A，怎么读出来。");
+      if(!t||t.trim().length<4)return;
+      cdApi("sep",{id:a.getAttribute("data-id"),to:a.getAttribute("data-b"),text:t.trim()}).then(function(d){
+        if(!d||!d.ok){alert((d&&d.msg)||"没写成。");return;}
+        cdOne(a.getAttribute("data-id"));
+      });
+    };
+  });
+  Array.prototype.forEach.call(document.querySelectorAll(".cd-del"),function(a){
+    a.onclick=function(e){e.preventDefault();
+      if(!confirm("删掉这张卡？顶回记录会一起没了。"))return;
+      cdApi("del",{id:a.getAttribute("data-id")}).then(function(){cdGo(cdWho,cdWhoName);});
+    };
+  });
+}
+function cdOne(id){
+  show("cdone");
+  var box=el("cd-one");box.innerHTML='<div class="hint">正在加载…</div>';
+  cdApi("feed",{}).then(function(d){
+    var c=((d&&d.cards)||[]).filter(function(x){return x.id===id;})[0];
+    if(!c){box.innerHTML='<div class="hint">这张卡已经不在了。</div>';return;}
+    box.innerHTML=cdCardHtml(c,1);cdBind();
+  });
+}
+/* 立卡：一边写一边查近邻库；点将按「作品领域与你不重叠」挑 */
+function cdRosterLoad(){
+  if(cdRoster)return Promise.resolve(cdRoster);
+  return fetch("/students/roster.json").then(function(r){return r.json()}).then(function(j){
+    cdRoster=((j&&j.students)||[]).map(function(s){
+      var f={};((s.papers)||[]).forEach(function(p){if(p&&p.field)f[p.field]=1;});
+      return {name:s.name,n:((s.papers)||[]).length,fields:f};
+    }).filter(function(x){return x.n>0;});
+    return cdRoster;
+  }).catch(function(){cdRoster=[];return cdRoster;});
+}
+function cdPickWho(){
+  // 点将 v1：按**作品领域完全不重叠**挑，作品多的优先（活跃）。
+  // 这是领域级，不是语汇族级——语汇族要每人的全文，日后再上，现在先能用。
+  var box=el("cd-picks");if(!box)return;
+  cdRosterLoad().then(function(rs){
+    var me=null;rs.forEach(function(x){if(x.name===ME.name)me=x;});
+    var mine=me?me.fields:{};
+    var far=rs.filter(function(x){
+      if(x.name===ME.name)return false;
+      var k;for(k in x.fields)if(mine[k])return false;   // 有一个领域重叠就不算"最远"
+      return true;
+    }).sort(function(a,b){return b.n-a.n;}).slice(0,5);
+    if(!far.length){box.textContent="";return;}
+    box.innerHTML='点将（按<b>作品领域与你不重叠</b>挑，落卡后他们会看到）：'
+      +far.map(function(x){return esc(x.name);}).join("、")
+      +'<br><span style="font-size:0.74rem">现在是领域级的粗算，不是语汇族级——挑得出人就够用，日后再精。</span>';
+    box.setAttribute("data-picks",far.map(function(x){return x.name;}).join(","));
+  });
+}
+var cdNbrTimer=null;
+function cdNbrCheck(){
+  var q=(el("cd-prop").value||"").trim(),box=el("cd-nbr");
+  if(q.length<8){box.textContent="";box.removeAttribute("data-nbr");return;}
+  box.textContent="正在查占位库…";
+  if(!window.SDENbr){box.textContent="";return;}
+  window.SDENbr.ask(q,5).then(function(res){
+    box.textContent=window.SDENbr.verdictLine(res)
+      +(res.status==="miss"?"　（查不到不等于没被占，不得据以放行）":"");
+    box.setAttribute("data-nbr",JSON.stringify({status:res.status,verdict:res.verdict,
+      hits:(res.hits||[]).slice(0,5).map(function(x){return {prop:x.prop,who:(x.src&&x.src.author)||""};})}));
+  }).catch(function(){box.textContent="占位库没查成（不影响落卡）。";});
+}
 
 function moGo(who,name){
   moWho=who||"";moWhoName=name||"";

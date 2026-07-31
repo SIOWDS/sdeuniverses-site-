@@ -671,13 +671,18 @@ export class CommentBox {
         }
 
         // ④ 提醒队列并进新身份（保留上限 60，与 moNotify 同口径）
+        // ⚠️ 提醒队列的字段名是 `n` 不是 `q`（见 moNotify：cur.n = [item].concat(cur.n)）。
+        //    我第一版按 `q` 写，模拟还全绿——因为模拟的种子是我按自己的假设造的，
+        //    **它测的是我的假设，不是真代码**。读 moNotify 原文才抓出来。
         const nFrom = (await this.ctx.storage.get("mn:" + from)) || null;
-        if (nFrom && Array.isArray(nFrom.q) && nFrom.q.length) {
-          const nTo = (await this.ctx.storage.get("mn:" + to)) || { q: [], seen: 0 };
-          nTo.q = nFrom.q.concat(nTo.q || []).slice(0, 60);
-          nTo.seen = Math.max(nTo.seen || 0, nFrom.seen || 0);
+        const qFrom = (nFrom && (nFrom.n || nFrom.q)) || [];
+        if (Array.isArray(qFrom) && qFrom.length) {
+          const nTo = (await this.ctx.storage.get("mn:" + to)) || { n: [], seen: 0 };
+          nTo.n = qFrom.concat(nTo.n || nTo.q || []).slice(0, 60);
+          if (nTo.q) delete nTo.q;
+          nTo.seen = Math.max(nTo.seen || 0, (nFrom && nFrom.seen) || 0);
           await this.ctx.storage.put("mn:" + to, nTo);
-          rep.news = nFrom.q.length;
+          rep.news = qFrom.length;
         }
         await this.ctx.storage.delete("mn:" + from);
         await this.ctx.storage.delete("morl:" + from);   // 发帖限流是临时量，不搬
@@ -781,6 +786,149 @@ export class CommentBox {
         cur.n = [item].concat(cur.n || []).slice(0, 60);
         await this.ctx.storage.put(k, cur);
       };
+      /* ═══ 候选卡与顶回 ═══
+         这一档不是社交件，是「新思想发生」的载体。三条设计判据写在这里，改之前先读：
+         ① Feed 的根本问题是**它没有终点**，所以只能靠不断刺激维持。发生是有终点的：
+            一张卡出生 → 被顶回 → 或死或活 → 结算 → 沉淀。所以候选是**一条有终点的链**，不是流。
+         ② **顶回不是点赞**。只有三种动作：给一个占位者／给一条方向相反的预测／换一个承重层级重述。
+            这三样对应六种碰撞方式里最可操作的几条；顶回记录就是分离线的原料，而分离线正是 I 分的来源。
+         ③ **共享密码 ⇒ 作者不可验证**，所以这里不做声望分、不做排行榜；
+            「活下来」只是一个状态，进不进站由王德生人工点头（本档不自动进站）。
+         键：cd:<inv>:<rnd> ＝一张卡（顶回与分离线都存这条里）；cu:<uid>:… ＝个人索引；
+             cn:<uid> ＝候选提醒（与朋友圈 mn: 分开，两条流互不打扰）。
+         结算是**惰性**的：读 feed 时到点即算，不需要定时任务。 */
+      const cdInv = moInv, cdRnd = moRnd, cdClean = moClean;
+      const cdIdOk = (x) => /^[0-9]{16}:[0-9a-f]{8}$/.test(String(x || ""));
+      const CD_WIN = 72 * 3600 * 1000;                  // 顶回期 72 小时
+      const CD_KINDS = { occ: "占位者", rev: "反向预测", lvl: "换承重层级" };
+      const cdNotify = async (target, item) => {
+        if (!ok12(target) || target === uid) return;
+        const k = "cn:" + target;
+        const cur = (await this.ctx.storage.get(k)) || { n: [] };
+        cur.n = [item].concat(cur.n || []).slice(0, 60);
+        await this.ctx.storage.put(k, cur);
+      };
+      /* 结算：到点自动分三路。写回只在状态真的变了的时候发生。 */
+      const cdSettle = (c, tnow) => {
+        if (!c || c.state !== "open") return false;
+        if (tnow < (c.due || 0)) return false;
+        const backs = c.backs || [], seps = c.seps || [];
+        if (!backs.length) { c.state = "untouched"; }
+        else {
+          // 被占位者击中、而作者没有对那一条给出分离线 ⇒ 死格
+          const occNoSep = backs.some((b2) => b2.kind === "occ" && !seps.some((s) => s.to === b2.bid));
+          c.state = occNoSep ? "dead" : "alive";
+        }
+        c.settled = tnow;
+        return true;
+      };
+      if (op === "cdpost") {
+        if (!ok12(uid)) return Response.json({ ok: false });
+        const prop = cdClean(b.prop, 120);            // 50 字级承重命题（留冗余，不硬切）
+        const face = cdClean(b.face, 200);            // 它切开的辨别面
+        const crit = cdClean(b.crit, 300);            // 一条可裁决判据
+        if (prop.length < 8) return Response.json({ ok: false, msg: "承重命题太短——先把它压成一句能被反对的话。" });
+        if (!face) return Response.json({ ok: false, msg: "「它切开的辨别面」不能空：说不出切了哪一刀，这张卡没法被顶回。" });
+        if (!crit) return Response.json({ ok: false, msg: "「可裁决判据」不能空：没有判据，别人只能表态，不能顶回。" });
+        const rk = "cdrl:" + uid;
+        let hits = (await this.ctx.storage.get(rk)) || [];
+        hits = hits.filter((t) => now - t < 86400000);
+        if (hits.length && now - hits[hits.length - 1] < 20000) return Response.json({ ok: false, msg: "刚发过一张，缓一下——候选卡不是发帖。" });
+        if (hits.length >= 10) return Response.json({ ok: false, msg: "今天十张够多了。候选贵在少而硬。" });
+        hits.push(now); await this.ctx.storage.put(rk, hits);
+        const u0 = (await this.ctx.storage.get("u:" + uid)) || {};
+        const id = cdInv(now) + ":" + cdRnd();
+        const card = {
+          id, uid, name: cdClean(b.name || u0.name, 20), ts: now,
+          prop, face, crit,
+          nbr: (b.nbr && typeof b.nbr === "object") ? { status: String(b.nbr.status || ""), verdict: cdClean(b.nbr.verdict, 300), hits: (Array.isArray(b.nbr.hits) ? b.nbr.hits : []).slice(0, 5).map((x) => ({ prop: cdClean(x.prop, 120), who: cdClean(x.who, 60) })) } : null,
+          picks: (Array.isArray(b.picks) ? b.picks : []).slice(0, 8).map((x) => cdClean(x, 20)),
+          due: now + CD_WIN, state: "open", backs: [], seps: [], settled: 0,
+        };
+        await this.ctx.storage.put("cd:" + id, card);
+        await this.ctx.storage.put("cu:" + uid + ":" + id, 1);
+        return Response.json({ ok: true, card });
+      }
+      if (op === "cdfeed") {
+        const lim = Math.min(30, Math.max(1, parseInt(b.limit || 20, 10)));
+        const only = String(b.who || "");
+        const pre = only ? ("cu:" + only + ":") : "cd:";
+        const m = await this.ctx.storage.list({ prefix: pre, limit: lim + 1, startAfter: b.after ? (pre + String(b.after)) : undefined });
+        const out = [];
+        for (const k of m.keys()) {
+          const id = only ? k.slice(pre.length) : k.slice(3);
+          const c = only ? await this.ctx.storage.get("cd:" + id) : await this.ctx.storage.get(k);
+          if (!c) continue;
+          if (cdSettle(c, now)) await this.ctx.storage.put("cd:" + c.id, c);   // 惰性结算
+          out.push(c);
+        }
+        const more = out.length > lim;
+        return Response.json({ ok: true, cards: out.slice(0, lim), more, next: out.length ? out[Math.min(lim, out.length) - 1].id : "" });
+      }
+      if (op === "cdback") {
+        const id = String(b.id || ""); const kind = String(b.kind || "");
+        if (!cdIdOk(id) || !ok12(uid)) return Response.json({ ok: false, msg: "参数不对。" });
+        if (!CD_KINDS[kind]) return Response.json({ ok: false, msg: "顶回只有三种：占位者／反向预测／换承重层级。" });
+        const txt = cdClean(b.text, 600);
+        if (txt.length < 4) return Response.json({ ok: false, msg: "写清楚一点——顶回要能被作者回应。" });
+        const c = await this.ctx.storage.get("cd:" + id);
+        if (!c) return Response.json({ ok: false, msg: "这张卡已经不在了。" });
+        // ⚠️ 门要看**状态**，不是看这一次有没有发生状态转移。
+        //    早先写成 if (cdSettle(...))，只挡得住"恰好在这一次触发结算"的那一次；
+        //    卡已经结算之后 cdSettle 返回 false，于是**已死格的卡还能被继续顶回**。护栏当场抓到。
+        if (cdSettle(c, now)) await this.ctx.storage.put("cd:" + id, c);
+        if (c.state !== "open") return Response.json({ ok: false, msg: "顶回期已过，这张卡已经结算。" });
+        if (c.uid === uid) return Response.json({ ok: false, msg: "自己顶自己不算交手。" });
+        c.backs = c.backs || [];
+        if (c.backs.length >= 30) return Response.json({ ok: false, msg: "这张卡的顶回够多了。" });
+        const bid = cdRnd();
+        c.backs.push({ bid, uid, name: cdClean(b.name, 20), kind, text: txt, ts: now });
+        await this.ctx.storage.put("cd:" + id, c);
+        await cdNotify(c.uid, { k: "back", id, bid, kind, name: cdClean(b.name, 20), text: cdClean(txt, 40), prop: cdClean(c.prop, 30), ts: now });
+        return Response.json({ ok: true, card: c });
+      }
+      if (op === "cdsep") {   // 作者对某一条顶回给出分离线——这是把「死格」救回「活下来」的唯一动作
+        const id = String(b.id || ""), to = String(b.to || "");
+        if (!cdIdOk(id) || !ok12(uid)) return Response.json({ ok: false, msg: "参数不对。" });
+        const txt = cdClean(b.text, 600);
+        if (txt.length < 4) return Response.json({ ok: false, msg: "分离线要写满：占位者在【某处】是 A，本条是非 A，怎么读出来。" });
+        const c = await this.ctx.storage.get("cd:" + id);
+        if (!c) return Response.json({ ok: false, msg: "这张卡已经不在了。" });
+        // ⚠️ 过期检查必须排在参数检查之前：时限对双方一样硬，不该被"找不到这条顶回"抢先报出去。
+        //    顺序即判据——这条在别处（PPT 线的版式判定链）已经栽过三次。
+        if (cdSettle(c, now)) await this.ctx.storage.put("cd:" + id, c);
+        if (c.state !== "open") return Response.json({ ok: false, msg: "顶回期已过，这张卡已经结算。" });
+        if (c.uid !== uid) return Response.json({ ok: false, msg: "只有作者能给分离线。" });
+        if (!(c.backs || []).some((x) => x.bid === to)) return Response.json({ ok: false, msg: "找不到这条顶回。" });
+        c.seps = (c.seps || []).filter((s) => s.to !== to);
+        c.seps.push({ to, text: txt, ts: now });
+        await this.ctx.storage.put("cd:" + id, c);
+        const bk = (c.backs || []).find((x) => x.bid === to);
+        if (bk) await cdNotify(bk.uid, { k: "sep", id, name: c.name, text: cdClean(txt, 40), prop: cdClean(c.prop, 30), ts: now });
+        return Response.json({ ok: true, card: c });
+      }
+      if (op === "cddel") {
+        const id = String(b.id || "");
+        if (!cdIdOk(id)) return Response.json({ ok: false });
+        const c = await this.ctx.storage.get("cd:" + id);
+        if (!c) return Response.json({ ok: false, msg: "已经不在了。" });
+        if (c.uid !== uid && !b.force) return Response.json({ ok: false, msg: "只能删自己的卡。" });
+        await this.ctx.storage.delete("cd:" + id);
+        await this.ctx.storage.delete("cu:" + c.uid + ":" + id);
+        return Response.json({ ok: true });
+      }
+      if (op === "cdnews") {
+        const k = "cn:" + uid;
+        const cur = (await this.ctx.storage.get(k)) || { n: [], seen: 0 };
+        const items = (cur.n || []).slice(0, 40);
+        cur.seen = now; await this.ctx.storage.put(k, cur);
+        return Response.json({ ok: true, items });
+      }
+      if (op === "cdbadge") {
+        const cur = (await this.ctx.storage.get("cn:" + uid)) || { n: [], seen: 0 };
+        const n = (cur.n || []).filter((x) => (x.ts || 0) > (cur.seen || 0)).length;
+        return Response.json({ ok: true, n });
+      }
       if (op === "mofeed") {
         const lim = Math.min(30, Math.max(1, parseInt(b.limit || 20, 10)));
         const only = String(b.who || "");
@@ -5476,6 +5624,19 @@ export default {
         return Response.json({ ok: false, msg: "未知的管理动作。" }, { status: 400 });
       }
       // ===== 朋友圈：文字进 DO，图片进 R2（moments/<key>.jpg），一个字节都不进 git =====
+      if (op === "cd") {   // 候选卡与顶回
+        const a = String(b.a || "");
+        const pass = ["feed", "post", "back", "sep", "del", "news", "badge"];
+        if (pass.indexOf(a) < 0) return Response.json({ ok: false, msg: "未知的候选动作。" }, { status: 400 });
+        await call({ op: "hello", uid: who.uid, name: who.name });
+        const d = await call({
+          op: "cd" + a, uid: who.uid, name: who.name,
+          who: String(b.who || ""), after: String(b.after || ""), limit: b.limit,
+          id: String(b.id || ""), to: String(b.to || ""), kind: String(b.kind || ""),
+          text: b.text, prop: b.prop, face: b.face, crit: b.crit, nbr: b.nbr, picks: b.picks,
+        });
+        return Response.json(Object.assign({ me }, d || { ok: false }), { headers: { "cache-control": "no-store" } });
+      }
       if (op === "mo") {
         const a = String(b.a || "");
         if (a === "feed") {

@@ -82,8 +82,9 @@ async function seed() {
   await s.put("mu:" + P1 + ":inv2:bbb", 1);
 
   // 提醒与限流
-  await s.put("mn:" + OLD, { q: [{ k: "like", ts: 640 }, { k: "cmt", ts: 650 }], seen: 100 });
-  await s.put("mn:" + NEW, { q: [{ k: "like", ts: 660 }], seen: 200 });
+  // ⚠️ 字段名必须与 moNotify 的真实写法一致（cur.n），不能按自己的假设造
+  await s.put("mn:" + OLD, { n: [{ k: "like", ts: 640 }, { k: "cmt", ts: 650 }], seen: 100 });
+  await s.put("mn:" + NEW, { n: [{ k: "like", ts: 660 }], seen: 200 });
   await s.put("morl:" + OLD, [500, 600]);
 }
 
@@ -138,7 +139,8 @@ async function seed() {
 
   group("五、提醒与收尾");
   const mn = await st.get("mn:" + NEW);
-  ok("提醒队列并进新身份，两边都在", mn.q.length === 3, mn.q.length);
+  ok("提醒队列并进新身份，两边都在", (mn.n || []).length === 3, mn);
+  ok("★ 用的是真实字段名 n（第一版按 q 写，模拟因种子同错而全绿）", Array.isArray(mn.n) && !mn.q, mn);
   ok("seen 取两者较大（不把已看过的又标成未读）", mn.seen === 200, mn.seen);
   ok("旧提醒队列已删", (await st.get("mn:" + OLD)) === undefined);
   ok("发帖限流是临时量，不搬且清掉", (await st.get("morl:" + OLD)) === undefined);
