@@ -69,6 +69,8 @@
     "border:1px solid rgba(212,178,94,.5);background:rgba(212,178,94,.09);transition:all .18s}" +
     ".sdep-node:hover .sdep-dot,.sdep-node:focus-visible .sdep-dot{background:#D4B25E;color:#0F0B07;transform:scale(1.07);" +
     "box-shadow:0 0 0 8px rgba(212,178,94,.12)}" +
+    /* 三角形正中的字号：letter-spacing 会在最后一个字后面也加一份，右边看着就偏了，所以补一个等量的负边距把它抵掉 */
+    ".sdep-mid{position:absolute;transform:translate(-50%,-50%);pointer-events:none;font:700 clamp(20px,3.8vw,38px)/1 inherit;letter-spacing:.34em;margin-right:-.34em;color:#D4B25E;text-shadow:0 0 26px rgba(212,178,94,.28);white-space:nowrap;animation:sdepPop .6s ease 1s both}" +
     ".sdep-nm{font:700 14.5px/1 inherit;letter-spacing:.5px;white-space:nowrap}" +
     ".sdep-sub{font-size:11.5px;color:#8B98A5;white-space:nowrap}" +
     ".sdep-skip{margin-top:14px;background:none;border:none;color:#8B98A5;font:12.5px/1 inherit;cursor:pointer;padding:8px 12px}" +
@@ -109,6 +111,16 @@
     poly.setAttribute("vector-effect", "non-scaling-stroke");
     svg.appendChild(poly);
     stage.appendChild(svg);
+    // 正中「爱思乐园」：位置由三个顶点现算重心，改顶点它自己跟着走，不写死
+    var mid = document.createElement("div");
+    mid.className = "sdep-mid";
+    mid.textContent = "\u7231\u601d\u4e50\u56ed";
+    mid.setAttribute("aria-hidden", "true");
+    var cx = 0, cy = 0;
+    NODES.forEach(function (n) { cx += n.x; cy += n.y; });
+    mid.style.left = (cx / NODES.length) + "%";
+    mid.style.top = (cy / NODES.length) + "%";
+    stage.appendChild(mid);
 
     NODES.forEach(function (n, idx) {
       var href = GO[n.k];

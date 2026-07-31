@@ -89,6 +89,17 @@ const nodePos = nodes.map((n) => parseFloat(n.style.left) + "," + parseFloat(n.s
 ok(pts.length === 3 && pts.join(" ") === nodePos.join(" "),
   "三个入口正落在三角形的三个顶端（同一组坐标，不是各写一份）：" + pts.join(" ") + " ｜ " + nodePos.join(" "));
 ok(parseFloat(nodes[0].style.top) < parseFloat(nodes[1].style.top), "第一个在顶端");
+const mid = box.querySelector(".sdep-mid");
+ok(!!mid && mid.textContent === "爱思乐园", "三角形正中是「爱思乐园」四个字，实得 " + (mid ? mid.textContent : "无"));
+{
+  // 重心必须由三个顶点现算——写死了就会在改顶点时飘到三角形外面去
+  let cx = 0, cy = 0;
+  nodes.forEach((n) => { cx += parseFloat(n.style.left); cy += parseFloat(n.style.top); });
+  ok(Math.abs(parseFloat(mid.style.left) - cx / 3) < 0.01 && Math.abs(parseFloat(mid.style.top) - cy / 3) < 0.01,
+    "落在三个顶点的重心上（跟着顶点走，不是写死的百分比）：" + mid.style.left + "/" + mid.style.top);
+}
+ok(/pointer-events:none/.test(SRC), "正中那四个字不挡点击（它是字，不是按钮）");
+ok(/margin-right:-\.34em/.test(SRC), "字间距在末字后面多出的那一份被抵掉了（否则四个字看着偏左）");
 
 console.log("③ 浏览＝就地揭开，另两个＝真链接");
 {
