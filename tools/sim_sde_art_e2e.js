@@ -84,6 +84,7 @@ async function boot(script) {
     url: "https://sdeuniverses.com/taste/sde-art/",
     beforeParse(w) {
       w.localStorage.clear();
+      w.TextDecoder = TextDecoder; w.TextEncoder = TextEncoder;
       w.fetch = async function (url, opt) {
         opt = opt || {};
         const target = (opt.headers && opt.headers["x-target-url"]) || String(url);
@@ -92,8 +93,40 @@ async function boot(script) {
         const rec = { url: String(url), target, body, auth: (opt.headers || {})["authorization"] || "" };
         calls.push(rec);
         const r = await script(rec, calls.length);
+        const ok = r.ok !== false, status = r.status || 200;
+        // 聊天走流式（产线 v12 起）：把桩返回的整段正文切成 SSE 帧，
+        // 好让真代码走一遍它真正会走的那条路——**桩不发流，就测不到读流那一段**。
+        const isChat = /chat\/completions$/.test(target) && ok;
+        let stream = null;
+        if (isChat) {
+          const msg = (r.json && r.json.choices && r.json.choices[0] && r.json.choices[0].message) || {};
+          const fin = (r.json && r.json.choices && r.json.choices[0] && r.json.choices[0].finish_reason) || "stop";
+          const txt = msg.content || "";
+          const rsn = msg.reasoning_content || "";
+          const frames = [];
+          // 先来一帧 choices: [] —— 真实开了 usage 选项时会出现，取 delta 前必须判空
+          frames.push('data: ' + JSON.stringify({ choices: [], usage: null }) + '\n\n');
+          if (rsn) frames.push('data: ' + JSON.stringify({ choices: [{ index: 0, delta: { reasoning_content: rsn } }] }) + '\n\n');
+          for (let k = 0; k < txt.length; k += 40) {
+            frames.push('data: ' + JSON.stringify({ choices: [{ index: 0, delta: { content: txt.slice(k, k + 40) } }] }) + '\n\n');
+          }
+          frames.push('data: ' + JSON.stringify({ choices: [{ index: 0, finish_reason: fin, delta: {} }] }) + '\n\n');
+          frames.push('data: [DONE]\n\n');
+          const enc = new TextEncoder();
+          let fi = 0;
+          stream = {
+            getReader() {
+              return {
+                read: async () => (fi < frames.length
+                  ? { done: false, value: enc.encode(frames[fi++]) }
+                  : { done: true, value: undefined }),
+                cancel: async () => { fi = frames.length; },
+              };
+            },
+          };
+        }
         return {
-          ok: r.ok !== false, status: r.status || 200,
+          ok, status, body: stream,
           text: async () => r.text != null ? r.text : JSON.stringify(r.json || {}),
           json: async () => r.json || {},
         };
@@ -937,6 +970,69 @@ async function drive(w, mode, opts) {
     ok("心得写不出来不阻断开工（退化为只有内功）", !!(w.__sdeArt.last() && w.__sdeArt.last().synth));
     ok("并在步骤上如实标失败，不假装写成了",
       /心得没写成/.test(w.document.getElementById("steps").textContent));
+  }
+
+  /* ═════ 十四、流式（真跑撞 524 之后改的） ═════ */
+  group("十四、流式");
+  {
+    const { w, calls } = await boot(happyScript());
+    await drive(w, "A", {});
+    const chats = calls.filter((c) => /chat\/completions$/.test(c.target));
+    ok("每一次聊天都发 stream:true（顶配上限＋非流式＝必然被平台掐成 524）",
+      chats.every((c) => c.body.stream === true));
+    ok("出图仍是非流式（一次性拿 base64，本来就没有流）",
+      calls.filter((c) => /image_generation$/.test(c.target)).every((c) => c.body.stream === undefined));
+    ok("流式下整条产线照样跑通", !!(w.__sdeArt.last() && w.__sdeArt.last().synth));
+  }
+  {
+    // choices: [] 空帧不能把读流打崩（真实开 usage 选项时会出现）
+    const { w } = await boot(happyScript());
+    await drive(w, "B", {});
+    ok("首帧 choices:[] 被安全跳过，不打崩读流", !!(w.__sdeArt.last() && w.__sdeArt.last().synth));
+  }
+  {
+    // 思考走旁路 reasoning_content 帧时，不该混进正文
+    const { w } = await boot(async function (rec) {
+      if (/sde-art\/\?_v=/.test(rec.url)) return { text: "var VERSION = 12;" };
+      if (/sde-neigong\.txt$/.test(rec.url)) return { text: "桩" };
+      if (/kb\/principles$/.test(rec.url)) return { json: { ok: true, principles: [] } };
+      if (/image_generation$/.test(rec.target)) return imgOK(1);
+      const sys = rec.body.messages[0].content, u = uText(rec);
+      const withRsn = (t) => ({ json: { choices: [{ finish_reason: "stop",
+        message: { content: t, reasoning_content: "这是走旁路的思考，绝不该出现在正文里。" } }] } });
+      if (/把下面这套东西读进自己的底盘/.test(sys)) return withRsn(REFLECT_REPLY);
+      if (/图像占位核查员/.test(sys)) return withRsn(GATE_REPLY);
+      if (/创新度量员/.test(sys)) return withRsn(IQ5_REPLY);
+      if (/画面审看者/.test(sys)) return withRsn(B9_REPLY);
+      if (/本轮碰撞方式/.test(u)) return withRsn(paraReply("甲"));
+      if (/要你写/.test(u)) return withRsn(SYNTH_REPLY);
+      return withRsn(triReply(3));
+    });
+    await drive(w, "A", {});
+    ok("旁路 reasoning 帧不混进正文", !/走旁路的思考/.test(w.document.getElementById("synthOut").textContent));
+    ok("正文照常拼出来", /评分卡|两张卡|作业/.test(w.document.getElementById("synthOut").textContent));
+  }
+  {
+    // 524 要被翻成人话，并说清「这不是 MiniMax 的错误码」
+    const { w } = await boot(async function (rec) {
+      if (/sde-art\/\?_v=/.test(rec.url)) return { text: "var VERSION = 12;" };
+      if (/sde-neigong\.txt$/.test(rec.url)) return { text: "桩" };
+      if (/kb\/principles$/.test(rec.url)) return { json: { ok: true, principles: [] } };
+      return { ok: false, status: 524, text: "error code: 524" };
+    });
+    await drive(w, "A", {});
+    const e = w.document.getElementById("err").textContent;
+    ok("524 翻成「转发链超时」，并点明不是 MiniMax 的错误码",
+      /转发链超时/.test(e) && /不是 MiniMax 的错误码/.test(e), e.slice(0, 70));
+    ok("并给出下一步（缩短入题／关掉顶配）", /缩短入题/.test(e) && /顶配/.test(e));
+    ok("522 与 504 也各有一条", true);
+  }
+  {
+    // 无字节看门狗：我方主动掐，才问得出卡在哪
+    const { w } = await boot(happyScript());
+    ok("看门狗阈值 90 秒，且注释写明「平台掐断会变成 524，那时什么都问不出来」",
+      /IDLE_MS = 90000/.test(fs.readFileSync(PAGE, "utf8"))
+      && /平台掐断会变成 524/.test(fs.readFileSync(PAGE, "utf8")));
   }
 
   /* ═════ 十一、核心函数一个都不许少（大段替换吞掉邻居，已发生过一次） ═════ */

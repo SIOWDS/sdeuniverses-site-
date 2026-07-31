@@ -199,7 +199,7 @@ footer{border-top:1px solid var(--line);color:var(--dim);font-size:13px;padding:
 var PROXY = "/api/llm-proxy";
 var MODEL = "MiniMax-M3";           // 思考与看图（M2.x 看不了图，必须 M3）
 var IMGMODEL = "image-01";
-var VERSION = 11;
+var VERSION = 12;
 /* ── MiniMax-M3 官方 spec（platform.minimaxi.com/docs/api-reference/text-chat-openai，2026-07-31 核对）──
    · max_tokens **已弃用**，官方明令改用 max_completion_tokens。我先前一直在给一个弃用字段设上限，
      等于没设——第二次真跑「预算 8000／思考 33630 字」就是这么打穿的。
@@ -549,7 +549,12 @@ var MM_ERRS = [
   [/1013|internal/i, 0, "服务内部错误（错误码 1013）——上游的问题，不是你这边。稍等重试即可。"],
   [/1027/i, 0, "输出内容错误（错误码 1027）——上游判定产出不合规。换个说法重跑，或改一下入题里的措辞。"],
   [/2013|invalid.?param/i, 0, "参数错误（错误码 2013）——请求体有字段不被接受。这是本页的问题，请把这条报错发给维护者。"],
-  [/1001|timeout/i, 0, "请求超时（错误码 1001）——上游没在时限内回话。重试一次通常就好。"]
+  [/1001/i, 0, "请求超时（错误码 1001）——上游没在时限内回话。重试一次通常就好。"],
+  [/^$/, 524, "**转发链超时（HTTP 524）**——这不是 MiniMax 的错误码，是 Cloudflare 的「源站在时限内没回话」。"
+    + "本页已改为流式请求，字节会一直流着，正常不该再出现 524；若仍出现，多半是这一场入题太长、"
+    + "基底连第一个字节都要想很久。缩短入题，或把「顶配」关掉走标准档。"],
+  [/^$/, 522, "**连接超时（HTTP 522）**——转发链没能连上上游。稍等重试；持续出现请检查网络或换国内／海外站。"],
+  [/^$/, 504, "**网关超时（HTTP 504）**——中间层等不及了。同 524：缩短入题或关掉顶配再试。"]
 ];
 function mmExplain(status, text){
   for(var i=0;i<MM_ERRS.length;i++){
@@ -558,37 +563,20 @@ function mmExplain(status, text){
   }
   return "";
 }
-var MM_SPLIT = true;   // reasoning_split 是否可用；一旦被上游拒绝就整场关掉，不再重试
-/* 对外的 mmChat：空产出且看得出是被上限截断时，**自动加码重试一次**。
-   预算是天花板不是花费——上限给高了不多花一分钱（按实际用量计费），给低了却必然截断。
-   第二次真跑就是这么死的：给了 8000，思考跑了 33630 字，正文一个字没落。 */
-async function mmChat(sys, user, maxTok, imgs, noThink){
-  var want = Math.min(tokNow(), maxTok || tokNow());
-  try{
-    return await mmChatOnce(sys, user, want, imgs, noThink);
-  }catch(e){
-    var m = String(e && e.message || "");
-    if(m.indexOf("空产出") < 0) throw e;
-    // 两条退路，按病因分：
-    // · 关了思考还空产出 → 不是预算问题，是它真没话说：把思考打开重来（doc 说 disabled 是「跳过思考直接回答」，
-    //   但真遇到空手，让它想一想反而有产出）。
-    // · 开着思考空产出 → 是被上限截断：抬到官方硬上限重来。
-    if(noThink){
-      say("关掉思考那一遍没有产出，正在打开思考重跑一次…");
-      return await mmChatOnce(sys, user, tokNow(), imgs, false);
-    }
-    var bigger = tokNow();
-    if(bigger > want){
-      say("上一遍思考把预算吃光了（正文 0 字），正在把上限从 "+want+" 抬到 "+bigger+" 重跑一次…");
-      return await mmChatOnce(sys, user, bigger, imgs, false);
-    }
-    // 已经在顶配了，加预算这条杠杆用尽——**该摘的是思考，不是调数字**（PPT 线那条教训）。
-    // 关掉思考重来一遍：整份预算全给正文。
-    say("已在顶配上限（"+want+"）仍无正文，改为关掉思考重跑一次——把整份预算让给正文…");
-    return await mmChatOnce(sys, user, want, imgs, true);
-  }
-}
-async function mmChatOnce(sys, user, maxTok, imgs, noThink){
+var MM_SPLIT = true;
+var LAST_THINK = 0, LAST_DIAG = null;
+
+/* ⚠️⚠️ 为什么必须走流式（v12 起）
+   真跑第五次撞上 **HTTP 524**——那不是 MiniMax 的错误码，是 **Cloudflare 的「源站超时」**。
+   根子是我自己的结构性错误：把上限抬到顶配 524288，却还在用**非流式**请求。
+   非流式＝必须等它把话说完才回第一个字节；而 M3 在顶配下带着思考可以跑好几分钟，
+   平台一百秒就掐断。**这是 /api/ask 那条线「先出流再干活」教训的镜像：
+   凡是长活，必须让字节先流起来，否则平台会赶在你之前掐断。**
+   流式还顺带给了两样以前没有的东西：①看得见它在写（读者不再面对一个静止的转圈）
+   ②**无字节看门狗**——真卡住时是我方主动掐，能说清卡在哪一步、已经收了多少字。 */
+var IDLE_MS = 90000;   // 连续这么久一个字节都没有，判定为卡死，由我方掐断（平台掐断会变成 524，什么都问不出来）
+
+async function mmChatOnce(sys, user, maxTok, imgs, noThink, onDelta){
   var content = user;
   if(imgs && imgs.length){
     // detail:"high" —— 官方口径：low≈最高600 token／default≈1k–3k／high≈数千至15k+。
@@ -600,7 +588,7 @@ async function mmChatOnce(sys, user, maxTok, imgs, noThink){
   async function once(useSplit){
     var tok = Math.min(tokNow(), maxTok || tokNow());
     var body = {
-      model: MODEL, stream: false, service_tier: tierNow(),
+      model: MODEL, stream: true, service_tier: tierNow(),
       // max_completion_tokens 是官方现行字段；max_tokens 已弃用，仍同发一份只为兼容中间层。
       max_completion_tokens: tok, max_tokens: tok,
       messages: [{ role:"system", content:sys }, { role:"user", content:content }]
@@ -615,51 +603,109 @@ async function mmChatOnce(sys, user, maxTok, imgs, noThink){
                 "x-target-url": host()+"/v1/chat/completions" },
       body: JSON.stringify(body)
     });
-    return { r: r, t: await r.text() };
+    return r;
   }
-  var res = await once(MM_SPLIT);
-  // 400 且开着 split → 多半是这个字段不被认。关掉重发一次，并整场记住。
-  if(!res.r.ok && res.r.status === 400 && MM_SPLIT){
-    MM_SPLIT = false;
-    res = await once(false);
+  // 失败响应没有流可留，先把 body 读出来——降档要靠它才认得出 1039（Token 超出限制）。
+  // 流式改造时这里一度只看 HTTP 400，1039 就漏了；护栏当场抓到。
+  var r = await once(MM_SPLIT), errText = "";
+  async function readErr(resp){ try{ return (await resp.text()) || ""; }catch(e){ return ""; } }
+  if(!r.ok) errText = await readErr(r);
+  if(!r.ok && r.status === 400 && MM_SPLIT){
+    MM_SPLIT = false; r = await once(false);
+    errText = r.ok ? "" : await readErr(r);
   }
-  // 上限太大被入口挡掉（400 或 base_resp 1039＝Token 超出限制）→ 沿阶梯降一档重发，整场记住。
   var guard = 0;
-  while(!res.r.ok && guard++ < TOK_LADDER.length
-        && (res.r.status === 400 || /1039|token/i.test(res.t))
+  while(!r.ok && guard++ < TOK_LADDER.length
+        && (r.status === 400 || /1039|token/i.test(errText))
         && tokDown()){
     say("上限 "+TOK_LADDER[TOK_LEVEL-1]+" 被这条路由挡回，降到 "+tokNow()+" 重发…");
-    res = await once(MM_SPLIT);
+    r = await once(MM_SPLIT);
+    errText = r.ok ? "" : await readErr(r);
   }
-  if(!res.r.ok){
-    var why = mmExplain(res.r.status, res.t);
-    throw new Error(why ? (why + "\n\n（原始返回：HTTP "+res.r.status+" "+res.t.slice(0,180)+"）")
-                        : ("基底 HTTP "+res.r.status+"："+res.t.slice(0,220)));
+  if(!r.ok){
+    var head = errText.slice(0,220);
+    var why = mmExplain(r.status, head);
+    throw new Error(why ? (why + "\n\n（原始返回：HTTP "+r.status+" "+head+"）")
+                        : ("基底 HTTP "+r.status+"："+head));
   }
-  var j; try{ j = JSON.parse(res.t); }catch(e){ throw new Error("基底返回不是 JSON："+res.t.slice(0,220)); }
-  var ch = j && j.choices && j.choices[0];
-  var msg = ch && ch.message;
-  var raw = msg ? (msg.content||"") : "";
-  var sp = stripThink(raw);
-  // 两条思考通道分开数：<think> 标签在正文里（reasoning_split 没生效），reasoning_content 在旁路（生效了）。
-  // 分不清这两者，就分不清「该关思考」还是「该加预算」。
-  var tagLen = sp.think.length;
-  var sideLen = String((msg && (msg.reasoning_content || msg.reasoning_details)) || "").length;
+
+  /* ── 读流。三件事同时做：拼正文、拼思考、喂看门狗。 ── */
+  var reader = r.body.getReader(), dec = new TextDecoder(), buf = "";
+  var out = "", think = "", fin = "?", lastByte = Date.now(), stopped = false;
+  var wd = setInterval(function(){
+    if(Date.now() - lastByte > IDLE_MS){
+      stopped = true;
+      try{ reader.cancel(); }catch(e){}
+    }
+  }, 3000);
+  try{
+    while(true){
+      var st = await reader.read();
+      if(st.done) break;
+      lastByte = Date.now();
+      buf += dec.decode(st.value, { stream:true });
+      var lines = buf.split("\n");
+      buf = lines.pop();
+      for(var li=0; li<lines.length; li++){
+        var ln = lines[li].trim();
+        if(!ln || ln.indexOf("data:") !== 0) continue;
+        var payload = ln.slice(5).trim();
+        if(payload === "[DONE]") continue;
+        var jj; try{ jj = JSON.parse(payload); }catch(e){ continue; }
+        // ⚠️ 开了 include_usage 之类的选项后会多一帧 choices: []，取 delta 前必须判空
+        var ch0 = jj.choices && jj.choices[0];
+        if(!ch0) continue;
+        if(ch0.finish_reason) fin = ch0.finish_reason;
+        var d = ch0.delta || {};
+        if(d.reasoning_content) think += d.reasoning_content;
+        if(d.content){ out += d.content; if(onDelta) onDelta(out); }
+      }
+    }
+  } finally { clearInterval(wd); }
+
+  var sp = stripThink(out);
+  var tagLen = sp.think.length, sideLen = think.length;
   var thinkLen = tagLen + sideLen;
-  var fin = (ch && ch.finish_reason) || "?";
+  LAST_THINK = thinkLen;
   LAST_DIAG = { tok: maxTok, tag: tagLen, side: sideLen, think: thinkLen,
                 body: sp.text.length, sys: sys.length, user: String(user).length, fin: fin };
+  if(stopped && !sp.text){
+    throw new Error("卡住了：连续 "+Math.round(IDLE_MS/1000)+" 秒没有收到任何字节，已由本页主动掐断"
+      + "（不掐断的话平台会在一百秒时返 524，那时什么都问不出来）。"
+      + "已收到思考 "+thinkLen+" 字、正文 0 字。缩短入题、或把「顶配」关掉走标准档再试。");
+  }
   if(!sp.text){
-    // 「没有产出内容」是最坏的报错——必须当场说出全部证据与一条可执行的下一步
     throw new Error("空产出：预算 "+maxTok+"，思考 "+thinkLen+" 字（其中 <think> 标签内 "+tagLen
       + " 字、旁路 reasoning 字段 "+sideLen+" 字），正文 0 字，system "+sys.length+" 字，本轮问话 "
       + String(user).length+" 字，finish_reason="+fin+"。"
       + (fin === "length" ? "被上限截断了——已在自动加码重试。" : "思考与正文吃同一份预算。"));
   }
-  LAST_THINK = thinkLen;   // 供排障用：上一次调用里思考吃掉了多少字
   return sp.text;
 }
-var LAST_THINK = 0, LAST_DIAG = null;
+
+/* 对外的 mmChat：空产出时按病因分岔重试。
+   预算是天花板不是花费——上限给高了不多花一分钱（按实际用量计费），给低了却必然截断。 */
+async function mmChat(sys, user, maxTok, imgs, noThink, onDelta){
+  var want = Math.min(tokNow(), maxTok || tokNow());
+  try{
+    return await mmChatOnce(sys, user, want, imgs, noThink, onDelta);
+  }catch(e){
+    var m = String(e && e.message || "");
+    if(m.indexOf("空产出") < 0) throw e;
+    if(noThink){
+      say("关掉思考那一遍没有产出，正在打开思考重跑一次…");
+      return await mmChatOnce(sys, user, tokNow(), imgs, false, onDelta);
+    }
+    var bigger = tokNow();
+    if(bigger > want){
+      say("上一遍思考把预算吃光了（正文 0 字），正在把上限从 "+want+" 抬到 "+bigger+" 重跑一次…");
+      return await mmChatOnce(sys, user, bigger, imgs, false, onDelta);
+    }
+    // 已经在顶配了，加预算这条杠杆用尽——**该摘的是思考，不是调数字**（PPT 线那条教训）。
+    say("已在顶配上限（"+want+"）仍无正文，改为关掉思考重跑一次——把整份预算让给正文…");
+    return await mmChatOnce(sys, user, want, imgs, true, onDelta);
+  }
+}
 /* 渲染端回收路径：不指望基底听话。
    PPT 那条线的教训——「凡是靠形状驱动的设计，都要在渲染端为『形状写错位置』留一条
    回收路径，光靠提示禁止不够」。这里管两件事：

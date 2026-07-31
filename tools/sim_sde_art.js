@@ -464,6 +464,27 @@ group("十一之九、心得");
     /needReflect/.test(js) && /localStorage\.getItem\(reflectCacheKey\(\)\)\) \? 0 : 1/.test(js));
 }
 
+/* ═════ 十一之十、流式（真跑撞 HTTP 524 之后改的） ═════ */
+group("十一之十、流式");
+{
+  ok("聊天一律 stream:true", /model: MODEL, stream: true/.test(js));
+  ok("注释写清 524 是 Cloudflare 的源站超时、不是 MiniMax 的错误码",
+    /不是 MiniMax 的错误码/.test(js) && /Cloudflare/.test(js));
+  ok("并写清根因：顶配上限 ＋ 非流式 ＝ 必然被平台掐断", /凡是长活，必须让字节先流起来/.test(js));
+  ok("SSE 读帧：认 data: 前缀与 \\[DONE\\]", /indexOf\("data:"\)/.test(js) && /\[DONE\]/.test(js));
+  ok("取 delta 前判空 choices（开 usage 选项会多一帧 choices: \\[\\]）",
+    /var ch0 = jj\.choices && jj\.choices\[0\];/.test(js) && /if\(!ch0\) continue;/.test(js));
+  ok("旁路 reasoning_content 单独累计，不混进正文",
+    /if\(d\.reasoning_content\) think \+= d\.reasoning_content;/.test(js));
+  ok("无字节看门狗 90 秒，由我方主动掐断", /IDLE_MS = 90000/.test(js) && /由本页主动掐断/.test(js));
+  ok("并写明为什么要自己掐：平台掐断会变成 524，那时什么都问不出来",
+    /平台掐断会变成 524/.test(js));
+  ok("失败响应先读 body，1039 才认得出来（流式改造时一度漏掉）",
+    /async function readErr/.test(js) && /1039\|token/.test(js) && /护栏当场抓到/.test(js));
+  ok("524/522/504 都进了错误码表", /524/.test(js) && /522/.test(js) && /504/.test(js));
+  ok("出图仍是非流式（一次性拿 base64）", /model: IMGMODEL/.test(js) && !/IMGMODEL[^;]*stream: true/.test(js));
+}
+
 /* ═════ 十二、成本算术 ═════ */
 group("十二、成本算术");
 function costOf(ways, per) {
