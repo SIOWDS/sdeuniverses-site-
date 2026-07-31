@@ -833,6 +833,32 @@ async function drive(w, mode, opts) {
     ok("认不出的错误码原样保留，不硬套一个解释", /基底 HTTP 400/.test(e) && !/余额不足|鉴权失败/.test(e));
   }
 
+  /* ═════ 十二之四、产物自证版本（读者连撞四次旧标签页之后加的） ═════ */
+  group("十二之四、产物自证版本");
+  {
+    const { w } = await boot(happyScript());
+    await drive(w, "B", {});
+    const out = w.document.getElementById("synthOut").textContent;
+    ok("提炼正文开头盖版本印记", /〔SDE 艺术绘画 · 产线 v\d+/.test(out), out.slice(0, 60));
+    ok("印记里带上限与档位（拿到产物就知道跑的是什么口径）",
+      /上限 \d+/.test(out) && /(文章配图|独立画作|开放作画)/.test(out));
+    ok("下载的图片文件名带版本号",
+      /download="sde-art-v\d+-/.test(w.document.getElementById("drawOut").innerHTML));
+  }
+  {
+    // 旧版时页头也一起变红（横幅可能在折叠区外，页头永远在）
+    const { w } = await boot(async function (rec) {
+      if (/sde-art\/\?_v=/.test(rec.url)) return { text: "var VERSION = 999;" };
+      if (/sde-neigong\.txt$/.test(rec.url)) return { text: "桩" };
+      if (/kb\/principles$/.test(rec.url)) return { json: { ok: true, principles: [] } };
+      return chatOK("不该被调到");
+    });
+    await drive(w, "A", {});
+    const tag = w.document.getElementById("verTag");
+    ok("旧版时页头版本戳变成告警", /⚠ 旧版/.test(tag.textContent), tag.textContent);
+    ok("并写出线上是第几版", /线上 v999/.test(tag.textContent));
+  }
+
   /* ═════ 十一、核心函数一个都不许少（大段替换吞掉邻居，已发生过一次） ═════ */
   group("十一、核心函数在场");
   {

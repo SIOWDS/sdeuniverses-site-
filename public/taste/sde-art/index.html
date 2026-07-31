@@ -189,7 +189,7 @@ footer{border-top:1px solid var(--line);color:var(--dim);font-size:13px;padding:
 var PROXY = "/api/llm-proxy";
 var MODEL = "MiniMax-M3";           // 思考与看图（M2.x 看不了图，必须 M3）
 var IMGMODEL = "image-01";
-var VERSION = 8;
+var VERSION = 9;
 /* ── MiniMax-M3 官方 spec（platform.minimaxi.com/docs/api-reference/text-chat-openai，2026-07-31 核对）──
    · max_tokens **已弃用**，官方明令改用 max_completion_tokens。我先前一直在给一个弃用字段设上限，
      等于没设——第二次真跑「预算 8000／思考 33630 字」就是这么打穿的。
@@ -979,7 +979,11 @@ async function run(again){
       + "六、明确不画什么\n"
       + (MODE==="C" ? "全文控制在 300–500 字。" : (MODE==="A" ? "全文 600–900 字，并在最后附一行 alt 文本（一句，供无障碍阅读用）。" : "全文 1200–1800 字。"));
     var syTxt = await mmChat(sysBase(core,true), syUser, 0);
-    $("synthOut").textContent = fallbackNote + syTxt;
+    // 产物自证版本（PPT 线那条教训）：以后拿到任何一份产出，一眼就知道它出自哪一版产线，
+    // 不必再花一轮确认读者手上跑的是不是改好的那版。
+    var stamp = "〔SDE 艺术绘画 · 产线 v" + VERSION + " · 上限 " + tokNow()
+      + " · " + MODES[MODE].name + " · " + new Date().toLocaleString("zh-CN") + "〕\n\n";
+    $("synthOut").textContent = stamp + fallbackNote + syTxt;
     mark(si,"done", (byIQ ? ("胜出 五维 "+(winner.iqTotal!=null?winner.iqTotal:"—")+" 分")
                           : ("五维全缺·退回九分项择优，胜出 "+(winner.score!=null?winner.score:"—")+" 分")));
     say("完成。胜出的是〔" + winner.way.t + "〕。");
@@ -1046,7 +1050,7 @@ function renderDraw(paras){
     h += '<div class="out" style="margin-top:8px;max-height:300px">'+esc(p.txt)+'</div>';
     if(p.imgs.length){
       h += '<div class="gal">' + p.imgs.map(function(d,k){
-        return '<div class="shot"><img src="'+d+'" alt="第'+(i+1)+'路第'+(k+1)+'张"><div class="cap">第 '+(k+1)+' 张 · <a href="'+d+'" download="sde-art-'+(i+1)+'-'+(k+1)+'.jpg">下载</a></div></div>';
+        return '<div class="shot"><img src="'+d+'" alt="第'+(i+1)+'路第'+(k+1)+'张"><div class="cap">第 '+(k+1)+' 张 · <a href="'+d+'" download="sde-art-v'+VERSION+'-'+(i+1)+'-'+(k+1)+'.jpg">下载</a></div></div>';
       }).join("") + '</div>';
     }
     if(p.iqReport){
@@ -1108,6 +1112,11 @@ async function checkVersion(){
   }catch(e){ return null; }
 }
 function staleBanner(n){
+  try{  // 页头也一起变红——横幅可能在折叠区外，页头永远在
+    var t = $("verTag");
+    t.textContent = "⚠ 旧版 v" + VERSION + "（线上 v" + n + "）";
+    t.style.color = "#C4643E"; t.style.fontWeight = "800";
+  }catch(e){}
   var box = $("err");
   box.innerHTML = '<div class="warn"><b>这个标签页是旧版（产线 v'+VERSION+'），线上已经是 v'+n+'。</b><br>'
     + '旧版跑出来的问题多半早就修好了，接着跑只是白烧 Key。你的入题已经存进本机草稿，刷新不会丢。<br>'
@@ -1128,7 +1137,7 @@ $("btnDlAll").onclick = function(){
     if(!p) return;
     p.imgs.forEach(function(d,k){
       var a = document.createElement("a");
-      a.href = d; a.download = "sde-art-"+(i+1)+"-"+(k+1)+".jpg";
+      a.href = d; a.download = "sde-art-v"+VERSION+"-"+(i+1)+"-"+(k+1)+".jpg";
       document.body.appendChild(a); a.click(); a.remove();
     });
   });

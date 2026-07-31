@@ -389,7 +389,7 @@ group("十一之六、两本账");
   ok("择优用五维（择的是典范）", /if\(byIQ\)\{ if\(!winner \|\| \(p\.iqTotal\|\|0\) > \(winner\.iqTotal\|\|0\)\)/.test(js));
   ok("五维全缺才退回九分项，且必须说出来", /退回九分项择优/.test(js) && /不许悄悄换尺/.test(js));
   ok("换尺告知走必达通道（不只靠会被盖掉的状态行）",
-    /fallbackNote/.test(js) && /\$\("synthOut"\)\.textContent = fallbackNote/.test(js));
+    /fallbackNote/.test(js) && /\$\("synthOut"\)\.textContent = stamp \+ fallbackNote/.test(js));
   ok("提炼提示明令两本账分开写、不许合并成一个总评", /两本账分开写[，,]?\s*不许合并成一个总评/.test(js));
   ok("五维提示写死「不裁决私人发生」", /不裁决任何一次私人发生/.test(js));
   ok("页面上两本账各印一枚标签", /九分项 '\+p\.score/.test(js) && /五维 '\+p\.iqTotal/.test(js));
