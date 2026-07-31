@@ -6067,6 +6067,26 @@ export default {
               if (parts.length) matArts = "\u3010\u4eca\u5929\u968f\u673a\u7ffb\u5230\u7684\u7ad9\u5185\u6587\u7ae0\uff08\u4e00\u7bc7\u957f\u4e00\u6761\uff0c\u6309\u7f16\u53f7\u5bf9\u5e94\uff09\u3011\n" + parts.join("\n");
             }
           } catch (e) {}
+          // 库存也是料。用户的话：「对话产生的新思想和朋友圈可以共用」——
+          //   站上的**存量文章**与学员刚存进来的**新念头**混着翻，才叫共用。
+          //   编号接着上面排（srcs 是同一个数组），所以「i → 出处」那套机制一行都不用改。
+          let matVault = "";
+          try {
+            const vf = await call({ op: "vtfeed", uid: who.uid, pick: 1, limit: 3 });
+            const vits = (vf && vf.items) || [];
+            const parts = [];
+            for (const it of vits) {
+              if (!it || !it.text) continue;
+              srcs.push({ t: "\u5e93\u5b58 \u00b7 " + (it.name || "\u6709\u4eba") + "\u5b58\u7684", u: "", vt: 1 });
+              parts.push(srcs.length + ". \u300c" + String(it.text).replace(/\s+/g, " ").trim().slice(0, 200) + "\u300d"
+                + "\uff08" + (it.name || "\u6709\u4eba") + " \u5b58\u7684"
+                + (it.src ? "\uff0c\u6765\u81ea" + String(it.src).slice(0, 40) : "") + "\uff09");
+            }
+            if (parts.length) matVault = "\u3010\u5b66\u5458\u5b58\u8fdb\u601d\u60f3\u5e93\u5b58\u7684\u65b0\u5ff5\u5934\uff08\u7f16\u53f7\u63a5\u7740\u4e0a\u9762\uff09\u3011\n"
+              + parts.join("\n")
+              + "\n\uff08\u8fd9\u51e0\u6761\u662f\u4eba\u81ea\u5df1\u649e\u51fa\u6765\u7684\uff0c\u4e0d\u662f\u6587\u7ae0\uff1a"
+              + "\u628a\u5b83\u5f80\u524d\u63a8\u4e00\u6b65\u3001\u6216\u6362\u4e2a\u8bf4\u6cd5\u8ba9\u5b83\u7ad9\u4f4f\uff0c\u522b\u53ea\u662f\u628a\u5b83\u62c4\u4e00\u904d\u3002\uff09";
+          } catch (e) {}
           try {
             if (seed.length >= 4) {
               const lr = await lightRetrieve(env, url, seed, [], 6, 360, { pick: 6 });
@@ -6082,11 +6102,12 @@ export default {
             }
           } catch (e) {}
           const uTxt = (matArts ? matArts + "\n\n" : "")
+            + (matVault ? matVault + "\n\n" : "")
             + (matRel ? matRel + "\n\n" : "")
             + (seed ? "\u3010\u4ed6\u5df2\u7ecf\u5199\u4e86\u534a\u53e5\u3011" + seed + "\n\uff08\u4e94\u6761\u91cc\u81f3\u5c11\u6709\u4e24\u6761\u63a5\u5f97\u4e0a\u8fd9\u534a\u53e5\uff1b\u4ecd\u7136\u4e00\u7bc7\u957f\u4e00\u6761\u3002\uff09\n\n" : "")
             + (canSee ? "\u3010\u4ed6\u521a\u653e\u4e86 " + imgs.length + " \u5f20\u56fe\u3011\u5148\u770b\u56fe\uff1a\u56fe\u91cc\u6709\u4ec0\u4e48\u3001\u5728\u505a\u4ec0\u4e48\u3002\u4e94\u6761\u91cc\u5c3d\u91cf\u6709\u51e0\u6761\u80fd\u76f4\u63a5\u914d\u8fd9\u5f20\u56fe\uff0c\u4f46**\u6bcf\u4e00\u6761\u4ecd\u7136\u5f97\u4ece\u5b83\u90a3\u7bc7\u91cc\u957f\u51fa\u6765**\uff0c\u4e0d\u662f\u770b\u56fe\u8bf4\u8bdd\u3002\u770b\u4e0d\u6e05\u5c31\u522b\u731c\u3002\n\n" : "")
             + (imgs.length && !canSee ? "\u3010\u4ed6\u653e\u4e86\u56fe\uff0c\u4f46\u5f53\u524d\u57fa\u5e95\u770b\u4e0d\u4e86\u56fe\u3011\u522b\u88c5\u4f5c\u770b\u8fc7\u3002\u4e94\u6761\u5c3d\u91cf\u5206\u5f00\u62c9\uff0c\u8ba9\u4ed6\u81ea\u5df1\u6311\u4e00\u6761\u914d\u5f97\u4e0a\u56fe\u7684\u3002\n\n" : "")
-            + "\u3010\u53e3\u5473\u3011" + MUSE_KINDS[kindK] + "\n\n\u51fa\u4e94\u6761\uff08\u7bc7\u76ee\u4e0d\u8db3\u4e94\u7bc7\u65f6\uff0c\u6709\u51e0\u7bc7\u51fa\u51e0\u6761\uff09\u3002\u53ea\u8f93\u51fa\u90a3\u6bb5 JSON\u3002";
+            + "\u3010\u53e3\u5473\u3011" + MUSE_KINDS[kindK] + "\n\n\u51fa\u4e94\u6761\uff1a**\u4e00\u4efd\u6599\u957f\u4e00\u6761**\uff0c\u6599\u4e0d\u8db3\u4e94\u4efd\u65f6\u6709\u51e0\u4efd\u51fa\u51e0\u6761\uff1b\u5e93\u5b58\u90a3\u51e0\u6761\u4e0e\u6587\u7ae0\u540c\u7b49\u5f85\u9047\uff0c\u522b\u628a\u5b83\u4eec\u6392\u5728\u540e\u9762\u5f53\u642d\u5934\u3002\u53ea\u8f93\u51fa\u90a3\u6bb5 JSON\u3002";
           const uContent = canSee
             ? [{ type: "text", text: uTxt }].concat(imgs.map((im) => ({ type: "image_url", image_url: { url: im.d } })))
             : uTxt;
@@ -6106,11 +6127,11 @@ export default {
             had2[s] = 1;
             const k = isObj ? (parseInt(one.i, 10) - 1) : -1;
             const src = (k >= 0 && srcs[k]) ? srcs[k] : null;
-            out.push({ t: s, s: src ? src.t : "", u: src ? src.u : "" });
+            out.push({ t: s, s: src ? src.t : "", u: src ? src.u : "", v: (src && src.vt) ? 1 : 0 });
             if (out.length >= 5) break;   // 五条：一篇一条
           }
           if (!out.length) return Response.json({ ok: false, msg: "这次没生出来，换个口味或者过一会儿再点。" }, { status: 502 });
-          return Response.json({ ok: true, lines: out, saw: canSee ? imgs.length : 0, blind: (imgs.length && !canSee) ? 1 : 0, read: srcs.length }, { headers: { "cache-control": "no-store" } });
+          return Response.json({ ok: true, lines: out, saw: canSee ? imgs.length : 0, blind: (imgs.length && !canSee) ? 1 : 0, read: srcs.filter((x) => !x.vt).length, vault: srcs.filter((x) => x.vt).length }, { headers: { "cache-control": "no-store" } });
         }
         const MOMAP = { like: "molike", cmt: "mocmt", cdel: "mocdel", del: "model", news: "monews", badge: "mobadge" };
         if (MOMAP[a]) {

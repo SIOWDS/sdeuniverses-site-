@@ -2016,7 +2016,9 @@ function muPaint(d){
     var r=mkEl("div","mu-item");
     r.appendChild(mkEl("div","mu-txt",s));
     if(x&&x.s){
-      var f=mkEl("div","mu-src","\u957f\u81ea\u300a"+x.s+"\u300b");
+      /* 出处两种：文章要书名号＋「去读」外链；库存条目没有篇也没有链接，直接写「长自 库存 · 谁存的」。
+         不加书名号是**判据不是审美**——库存里的句子不是一篇文章，套上书名号会让读者以为站上有这么一篇。 */
+      var f=mkEl("div","mu-src",x.v?("\u957f\u81ea "+x.s):("\u957f\u81ea\u300a"+x.s+"\u300b"));
       if(x.u){
         var link=document.createElement("a");
         link.href=x.u;link.target="_blank";link.rel="noopener";link.textContent="\u53bb\u8bfb";

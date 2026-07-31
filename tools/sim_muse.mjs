@@ -44,7 +44,22 @@ function mkEnv(o = {}) {
         return new Response("", { status: 404 });        // roster / 索引一律缺席（走各自的兜底）
       },
     },
-    COMMENTS: { idFromName: (n) => n, get: () => ({ fetch: async () => Response.json({ ok: true, bans: [] }) }) },
+    /* ⚠️ 目录 DO 的桩必须**按 op 分派**：早先它对任何 op 都回同一个 {ok:true,bans:[]}，
+       于是 muse 里新加的 vtfeed（库存取料）静默拿到空，护栏还是全绿——**假绿**。
+       这与 sim_merge 那次「种子按自己的假设造」是同一类错：桩糊弄了，测的就不是真代码。 */
+    COMMENTS: {
+      idFromName: (n) => n,
+      get: () => ({
+        fetch: async (req) => {
+          let b = {}; try { b = await req.json(); } catch (e) {}
+          if (b.op === "vtfeed") {
+            if (o.vaultThrow) throw new Error("vault down");
+            return Response.json({ ok: true, items: o.vault || [] });
+          }
+          return Response.json({ ok: true, bans: [] });
+        },
+      }),
+    },
     ASK_LIMITER: { idFromName: (n) => n, get: () => ({ fetch: async () => Response.json(o.limit || { ok: true, inDay: 1 }) }) },
     CONFIG_VAULT: {
       idFromName: (n) => n,
@@ -189,6 +204,59 @@ console.log("\n=== 16. \u672a\u767b\u5f55\u8fdb\u4e0d\u4e86 ===");
   });
   const r = await worker.fetch(req, mkEnv(), { waitUntil() {} });
   ok("401", r.status === 401, r.status);
+}
+
+
+/* 取出最近一次基底请求里的「本轮问话」（可能是字符串，也可能是带图的数组） */
+function upUser() {
+  const c = UP && UP.messages && UP.messages[1] && UP.messages[1].content;
+  if (typeof c === "string") return c;
+  if (Array.isArray(c)) { const t = c.find((x) => x && x.type === "text"); return (t && t.text) || ""; }
+  return "";
+}
+
+console.log("\n=== 17. 库存也是料（用户：对话产生的新思想和朋友圈可以共用）===");
+{
+  const VAULT = [
+    { id: "v1", text: "\u5185\u9a71\u529b\u4e0d\u662f\u88ab\u6253\u6389\u7684\uff0c\u662f\u5728\u4e00\u6b21\u6b21\u300c\u4e0d\u5212\u7b97\u300d\u91cc\u81ea\u5df1\u9000\u56de\u53bb\u7684", name: "\u5f20\u743c", kind: "claim", src: "\u6d8c\u73b0\u6863 \u00b7 \u6362\u6bcd\u5b66\u79d1" },
+    { id: "v2", text: "\u7559\u767d\u4e0d\u662f\u6ca1\u753b\uff0c\u662f\u5fcd\u4f4f\u4e0d\u753b", name: "\u80e1\u654f", kind: "line", src: "" },
+  ];
+  REPLY = "```json\n" + J5 + "\n```";
+  const x = await muse({}, { vault: VAULT });
+  const u = upUser();
+  ok("\u5e93\u5b58\u90a3\u4e00\u5757\u771f\u7684\u8fdb\u4e86\u63d0\u793a", u.indexOf("\u5b66\u5458\u5b58\u8fdb\u601d\u60f3\u5e93\u5b58\u7684\u65b0\u5ff5\u5934") >= 0, u.slice(0, 100));
+  ok("\u2605 \u7f16\u53f7\u63a5\u7740\u6587\u7ae0\u5f80\u4e0b\u6392\uff0c\u4e0d\u53e6\u8d77\u4e00\u5957",
+    /\n6\. \u300c\u5185\u9a71\u529b\u4e0d\u662f\u88ab\u6253\u6389\u7684/.test(u), (u.match(/\n6\. [^\n]{0,30}/) || [])[0]);
+  ok("\u5b58\u7684\u4eba\u4e0e\u6765\u8def\u90fd\u5e26\u8fdb\u53bb\u4e86",
+    u.indexOf("\u5f20\u743c \u5b58\u7684") >= 0 && u.indexOf("\u6765\u81ea\u6d8c\u73b0\u6863") >= 0);
+  ok("\u2605 \u660e\u4ee4\u522b\u53ea\u628a\u5b83\u62c4\u4e00\u904d\uff08\u5b83\u662f\u4eba\u649e\u51fa\u6765\u7684\uff0c\u4e0d\u662f\u6587\u7ae0\uff09",
+    u.indexOf("\u522b\u53ea\u662f\u628a\u5b83\u62c4\u4e00\u904d") >= 0);
+  ok("\u6536\u5c3e\u6539\u6210\u300c\u4e00\u4efd\u6599\u957f\u4e00\u6761\u300d", u.indexOf("\u4e00\u4efd\u6599\u957f\u4e00\u6761") >= 0);
+  ok("\u5e76\u660e\u4ee4\u5e93\u5b58\u4e0e\u6587\u7ae0\u540c\u7b49\u5f85\u9047\u3001\u4e0d\u5f53\u642d\u5934", u.indexOf("\u540c\u7b49\u5f85\u9047") >= 0);
+  ok("\u8fd4\u56de\u91cc\u628a\u6587\u7ae0\u6570\u4e0e\u5e93\u5b58\u6570\u5206\u5f00\u62a5", x.d.read === 5 && x.d.vault === 2, { read: x.d.read, vault: x.d.vault });
+}
+{
+  const VAULT = [{ id: "v1", text: "\u4e00\u53e5\u5b58\u5728\u5e93\u5b58\u91cc\u7684\u8bdd", name: "\u9ad8\u9e4f", kind: "line", src: "" }];
+  REPLY = JSON.stringify({ lines: [{ i: 6, t: "\u4ece\u5e93\u5b58\u90a3\u4e00\u6761\u957f\u51fa\u6765\u7684\u91d1\u53e5" }, { i: 1, t: "\u4ece\u6587\u7ae0\u90a3\u4e00\u7bc7\u957f\u51fa\u6765\u7684\u91d1\u53e5" }] });
+  const x = await muse({}, { vault: VAULT });
+  const L = x.d.lines || [];
+  ok("\u5e93\u5b58\u90a3\u6761\u7684\u51fa\u5904\u5199\u6210\u300c\u5e93\u5b58 \u00b7 \u8c01\u5b58\u7684\u300d", /\u5e93\u5b58 \u00b7 \u9ad8\u9e4f\u5b58\u7684/.test(L[0].s || ""), L[0]);
+  ok("\u2605 \u5e93\u5b58\u6761\u76ee\u4e0d\u6302\u94fe\u63a5\uff08\u7ad9\u4e0a\u5e76\u6ca1\u6709\u8fd9\u4e48\u4e00\u7bc7\uff09", !L[0].u);
+  ok("\u5e76\u6253\u4e0a v \u6807\u8bb0\u4f9b\u524d\u7aef\u5206\u5f00\u6e32\u67d3", L[0].v === 1);
+  ok("\u6587\u7ae0\u90a3\u6761\u4ecd\u662f\u7bc7\u540d\uff0b\u94fe\u63a5\u4e14\u65e0 v", L[1].s && L[1].u && !L[1].v, L[1]);
+}
+{
+  REPLY = "```json\n" + J5 + "\n```";
+  const x = await muse({}, { vault: [] });
+  const u = upUser();
+  ok("\u5e93\u5b58\u7a7a\u65f6\u4e0d\u51fa\u73b0\u90a3\u4e00\u5757", u.indexOf("\u5b66\u5458\u5b58\u8fdb\u601d\u60f3\u5e93\u5b58") < 0);
+  ok("\u6587\u7ae0\u90a3\u4e94\u7bc7\u7167\u5e38\u5728", u.indexOf("\u968f\u673a\u7ffb\u5230\u7684\u7ad9\u5185\u6587\u7ae0") >= 0);
+  ok("\u8fd4\u56de\u91cc vault \u8ba1 0", x.d.vault === 0, x.d.vault);
+}
+{
+  REPLY = "```json\n" + J5 + "\n```";
+  const x = await muse({}, { vaultThrow: 1 });
+  ok("\u2605 \u5e93\u5b58\u53d6\u4e0d\u5230\u65f6\u7167\u6837\u51fa\u53e5\uff08\u52a0\u6599\u662f\u52a0\u5206\u9879\uff0c\u4e0d\u662f\u95e8\u7981\uff09", x.d.ok === true, x.d.msg);
 }
 
 globalThis.fetch = realFetch;
