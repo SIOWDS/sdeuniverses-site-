@@ -216,7 +216,7 @@
     return section;
   }
 
-    fetch("/students/publications.json?v=20260731-gp4")
+    fetch("/students/publications.json?v=20260731-chenpm")
     .then(function (response) {
       if (!response.ok) throw new Error("Publication data unavailable");
       return response.json();
