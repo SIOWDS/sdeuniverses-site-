@@ -25,7 +25,7 @@
   ];
 
   // 回到入口页。地址只在这里定义一次，wds-mode.js 用的是同一串。
-  var PORTAL = "/";                                          // 入口＝域名根地址，唯一对应
+  var PORTAL = "/home/";                                     // 入口页的门牌（裸域名会落到这里）
   // 只有浏览首页那颗烧——烧一处才是记号，处处都烧就成了噪音
   function isHome() {
     var p = String(location.pathname || "/");

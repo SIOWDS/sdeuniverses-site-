@@ -75,8 +75,8 @@ ok("三个出口共用同一个 close（入口卡「SDE 浏览」/ 底部「直�
    /e\.key === "Escape"[\s\S]{0,40}close\(\)/.test(src));
 {
   var W = fs.readFileSync(path.join(ROOT, "src", "worker.js"), "utf8");
-  ok("worker 认 /browse/ 与 /browse 两种写法",
-     /url\.pathname === "\/browse" \|\| url\.pathname === "\/browse\/"/.test(W));
+  ok("worker 认 /home/ 与 /browse/（带不带尾斜杠都认）",
+     /\/\^\\\/\(browse\|home\)\\\/\?\$\//.test(W));
   ok("worker 是原地取根那份内容，不是 30x 跳转",
      /assetReq = new Request\(new URL\("\/", url\), request\)/.test(W) &&
      !/browse[\s\S]{0,200}status:\s*30\d/.test(W));
@@ -94,22 +94,35 @@ ok("⚠ 不再记「这一会话进过门没有」", !/sessionStorage/.test(src)
 ok("⚠ 不再看 referrer 判站内", !/document\.referrer/.test(src) && !/sameOrigin\(/.test(src));
 ok("⚠ 不再看 navigation type（刷新/前进后退不再分家）",
    !/getEntriesByType\(/.test(src) && !/performance\.navigation/.test(src));
-ok("shouldOpen 只吃 path 一个字段", /function shouldOpen\(env\) \{\s*return env\.path === "\/" \|\| env\.path === "\/index\.html";\s*\}/.test(src));
+// 2026-07-31 用户改口径：「入口页用 home，输入 sdeuniverses.com 就自动进入 home 页」。
+// 于是入口认四种写法（裸域名／index.html／/home／/home/），落地后地址栏改写成 /home/。
+ok("shouldOpen 只吃 path 一个字段（不看 referrer / navType / seen）",
+   /function shouldOpen\(env\) \{[\s\S]{0,220}?\}/.test(src) &&
+   !/env\.(force|seen|navType|ref)/.test((src.match(/function shouldOpen\(env\) \{[\s\S]*?\n  \}/) || [""])[0]));
+ok("裸域名开门", shouldOpen(E({ path: "/" })) === true);
+ok("/home/ 开门", shouldOpen(E({ path: "/home/" })) === true);
+ok("/home 不带尾斜杠也开门", shouldOpen(E({ path: "/home" })) === true);
+ok("/index.html 仍兜底开门", shouldOpen(E({ path: "/index.html" })) === true);
+ok("⚠ /browse/ 依旧不开门（它是浏览页，不是入口）", shouldOpen(E({ path: "/browse/" })) === false);
 
-console.log("[地址栏也归一：入口露面时地址正好是 sdeuniverses.com/]");
-ok("有 replaceState 归一这一段", /history\.replaceState\(null, "", "\/"\)/.test(src));
-ok("三种不干净的地址都覆盖到（路径不是 / · 带 query · 带 #hash）",
-   /location\.pathname !== "\/" \|\| location\.search \|\| location\.hash/.test(src));
+console.log("[地址栏也归一：入口露面时地址正好是 sdeuniverses.com/home/]");
+var HOME = (src.match(/var HOME = "([^"]+)"/) || [, ""])[1];
+ok("HOME 门牌是 /home/，实得 " + HOME, HOME === "/home/");
+ok("有 replaceState 归一这一段，且归到 HOME", /history\.replaceState\(null, "", HOME\)/.test(src));
+ok("三种不干净的地址都覆盖到（路径不是 /home/ · 带 query · 带 #hash）",
+   /location\.pathname !== HOME \|\| location\.search \|\| location\.hash/.test(src));
+ok("⚠ 归一目标不再是裸域名（否则输了域名地址栏还是光秃秃的）",
+   !/history\.replaceState\(null, "", "\/"\)/.test(src));
 ok("⚠ 用 replaceState 而不是跳转（不多发一次请求、不在后退历史里多留一格）",
    !/location\.replace\(/.test(src) && !/location\.href = "\/"/.test(src));
 ok("归一发生在开门判定之后（不开门的页面地址不许动）",
    src.indexOf('history.replaceState') > src.indexOf("if (!shouldOpen(readEnv())) return;"));
 
 console.log("[站内那颗回入口的 △ 也指同一个地址]");
-[["public/assets/sde-modes.js", /var PORTAL = "\/";/],
- ["public/wds-mode.js", /var PORTAL_URL = "\/";/]].forEach(function (t) {
+[["public/assets/sde-modes.js", /var PORTAL = "\/home\/";/],
+ ["public/wds-mode.js", /var PORTAL_URL = "\/home\/";/]].forEach(function (t) {
   var s = fs.readFileSync(path.join(ROOT, t[0]), "utf8");
-  ok(t[0] + " 指向域名根", t[1].test(s));
+  ok(t[0] + " 的回入口按钮指向 /home/", t[1].test(s));
   ok(t[0] + " 里没有 /?portal=1 残留", s.indexOf("/?portal=1") < 0);
 });
 

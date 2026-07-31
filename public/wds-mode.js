@@ -1597,7 +1597,7 @@
 
   // 三态互切：目的地与 /assets/sde-modes.js 的 SDE_MODES 是同一套（模拟有跨文件断言钉住）
   var TAB_GO = { normal: "/", im: "/sde-wechat/", wds: "/taste/chatsde/" };
-  var PORTAL_URL = "/";                                       // 与 sde-modes.js 的 PORTAL 同一串（入口＝域名根）
+  var PORTAL_URL = "/home/";                                  // 与 sde-modes.js 的 PORTAL 同一串（入口页的门牌）
   (function () {
     var pb = layer.querySelector(".wdsm-portal");
     if (!pb) return;

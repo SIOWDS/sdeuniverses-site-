@@ -42,18 +42,26 @@
        ③ 第二门牌 /?portal=1 作废——一个入口只能有一个地址，多一个就不叫唯一对应。
           站内那颗回入口的 △ 已改指 "/"（assets/sde-modes.js 与 wds-mode.js）。
      抽成纯函数，模拟脚本才能逐种情形复核。 */
+  /* 入口页的正式门牌是 /home/（用户 2026-07-31 定：「输入 sdeuniverses.com 就自动进入 home 页」）。
+     根地址仍然是入口——它是进站的默认落点，只是落地后地址栏改写成 /home/，
+     所以这里认四种写法：裸域名、/index.html（边缘会 307 到 /，兜底留着）、/home、/home/。
+     浏览页是 /browse/，不在此列 —— 它天然不开门，那正是它有自己网址的意义。 */
   function shouldOpen(env) {
-    return env.path === "/" || env.path === "/index.html";
+    return env.path === "/" || env.path === "/index.html" ||
+           env.path === "/home" || env.path === "/home/";
   }
   function readEnv() { return { path: P }; }
   if (!shouldOpen(readEnv())) return;
 
-  /* 地址栏一并归一：入口露面时，地址必须正好是 https://sdeuniverses.com/ 。
-     /index.html、旧的 ?portal=1、任何残留的 query 或 #hash 都在这里抹平。
-     用 replaceState 而不是跳转：不多发一次请求，也不在后退历史里多留一格。 */
+  /* 地址栏一并归一：入口露面时，地址必须正好是 https://sdeuniverses.com/home/ 。
+     裸域名、/index.html、旧的 ?portal=1、任何残留的 query 或 #hash 都在这里抹平——
+     **输入 sdeuniverses.com 就落到 home 页**，这是用户定的口径。
+     用 replaceState 而不是 30x 跳转：内容已经在这一页上，跳转白发一次请求、
+     后退历史还多一格（按后退该回进站之前，不是回裸域名再被弹一次）。 */
   try {
-    if ((location.pathname !== "/" || location.search || location.hash) &&
-        window.history && history.replaceState) history.replaceState(null, "", "/");
+    if (location.pathname !== HOME || location.search || location.hash) {
+      if (window.history && history.replaceState) history.replaceState(null, "", HOME);
+    }
   } catch (e) {}
 
   /* 输完域名回车，第一眼就该是入口，而不是“先闪一下浏览页再盖上门”。
@@ -117,6 +125,9 @@
   // 浏览页的门牌。根地址 "/" 严格且唯一地属于入口页（第十二刀），所以揭开门之后
   // 地址要换成这一个。worker 让 /browse/ 返回同一份首页 HTML，因此不必真的跳转。
   var BROWSE = "/browse/";
+  // 入口页的门牌。进站落在裸域名上时，地址栏改写成这一个——地址与页面一一对应，
+  // 收藏 /home/ 拿到入口、收藏 /browse/ 拿到浏览页，各是各的。
+  var HOME = "/home/";
 
   /* 烧 TOKEN 的火色（用户定）：浏览烧绿 · 对话烧红 · 微信烧蓝。
      注意它与节点自身的色相（NODES[].c 青/金/紫）是两回事：色相标身份，火色标烧的是哪一种 TOKEN。

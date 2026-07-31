@@ -6778,12 +6778,15 @@ export default {
       return J({ ok: true, n: out.length, hit: out.filter((x) => x.in).length, done: out });
     }
     // Everything else: serve static assets (with configured html/404 handling)
-    // 浏览页的门牌 /browse/ 服务的就是根那份首页 HTML——根地址严格且唯一地留给入口页，
-    // 所以浏览页得有自己的网址（否则收藏、分享、刷新拿到的都是"入口"，人却明明在浏览页）。
-    // **原地取内容，不发 30x 跳转**：内容是同一份，跳转只会多一次往返、并在后退历史里多一格。
-    // 入口脚本按 pathname 判断开门（只认 "/" 与 "/index.html"），所以 /browse/ 天然不开门。
+    // 三个地址、一份 HTML：
+    //   /         裸域名，进站的默认落点（入口脚本会把地址栏改写成 /home/）
+    //   /home/    入口页的门牌
+    //   /browse/  浏览页的门牌
+    // 地址各归各的，内容却是同一份——入口只是这一页上的一层（sde-portal.js 注入），
+    // 开不开门由脚本按 pathname 判定，服务端不必也不该分叉。
+    // **原地取内容，不发 30x 跳转**：跳转多一次往返，后退历史还多一格。
     let assetReq = request;
-    if (url.pathname === "/browse" || url.pathname === "/browse/") {
+    if (/^\/(browse|home)\/?$/.test(url.pathname)) {
       assetReq = new Request(new URL("/", url), request);
     }
     const resp = await env.ASSETS.fetch(assetReq);
