@@ -95,26 +95,39 @@ ok("闸门查两次：进（查压缩句）与出（看着图查）",
   /近邻闸门·进|近邻闸门 · 进/.test(js) && /近邻闸门·出|近邻闸门 · 出/.test(js));
 ok("出闸门是把图传给基底看，不是看 prompt", /goTxt = await mmChat\(goSys, goUser, \d+, allImgs/.test(js));
 
-/* ═════ 四、美的九宫格（图像版） ═════ */
-group("四、美的九宫格");
+/* ═════ 四、三号位九分项坐标仪（《SDE艺术论》第五章第四节交付的正典仪器） ═════ */
+group("四、三号位九分项坐标仪");
 const names = box.B9.map(g => g[0]);
-ok("九格齐", box.B9.length === 9);
-ok("三层各三格", ["统一", "多样", "和谐"].every(n => names.includes(n))
-  && ["完全", "活力", "纯一"].every(n => names.includes(n))
-  && ["爱", "自由", "平安"].every(n => names.includes(n)));
-ok("不加第十格", box.B9.length === 9 && new Set(names).size === 9);
-ok("每格都挂了图像判据", box.B9.every(g => g[2] && (g[2].match(/[\u4e00-\u9fa5]/g) || []).length >= 10));
-ok("「完全」判据＝画面里能读出 D", /读出\s*D/.test(box.B9.find(g => g[0] === "完全")[2]));
-ok("「多样」判据＝同组图不许同形", /同形/.test(box.B9.find(g => g[0] === "多样")[2]));
+ok("九项齐", box.B9.length === 9);
+ok("分布之三·规范轴＝关系·影响·共存", ["关系", "影响", "共存"].every(n => names.includes(n)), names.join(","));
+ok("场之三·模态轴＝连接·次序·结构", ["连接", "次序", "结构"].every(n => names.includes(n)));
+ok("美之三·价值轴＝完全·纯一·活力", ["完全", "纯一", "活力"].every(n => names.includes(n)));
+ok("三轴各三项，次序不乱（分布→场→美）",
+  box.B9.slice(0, 3).every(g => /分布/.test(g[1])) && box.B9.slice(3, 6).every(g => /场/.test(g[1]))
+  && box.B9.slice(6, 9).every(g => /美/.test(g[1])));
+ok("不加第十项（这是书交付的仪器，不许自己添格）", box.B9.length === 9 && new Set(names).size === 9);
+ok("每项都挂了可看图判读的判据", box.B9.every(g => g[2] && (g[2].match(/[\u4e00-\u9fa5]/g) || []).length >= 20));
+ok("「关系」判据＝元素不由自身定义而由相互位置定义",
+  /相互位置/.test(box.B9.find(g => g[0] === "关系")[2]));
+ok("「影响」判据＝新元素回写全部旧元素的意义",
+  /回写/.test(box.B9.find(g => g[0] === "影响")[2]));
+ok("「共存」判据＝异质元素同场并立而互不消解",
+  /互不消解|不消解/.test(box.B9.find(g => g[0] === "共存")[2]));
+ok("「完全」判据＝不可增删、对抗碎片化",
+  /不可增删/.test(box.B9.find(g => g[0] === "完全")[2]) && /碎片化/.test(box.B9.find(g => g[0] === "完全")[2]));
+ok("「纯一」判据写明不是单调（单调是贫乏，纯一是杂多的统摄）",
+  /单调是贫乏/.test(box.B9.find(g => g[0] === "纯一")[2]));
+ok("「活力」判据＝再点燃之力、对抗僵死化",
+  /再点燃/.test(box.B9.find(g => g[0] === "活力")[2]) && /僵死化/.test(box.B9.find(g => g[0] === "活力")[2]));
 
 /* 侧重加倍：真跑 scoreOf */
 const card = box.B9.map(g => g[0] + "｜" + (g[0] === "活力" ? 40 : 80) + "｜理由").join("\n");
-const sA = box.scoreOf(card, ["纯一", "和谐"]);   // 活力不加倍
-const sB = box.scoreOf(card, ["活力", "自由"]);   // 活力加倍
-ok("侧重格打分加倍（活力低时 B 档必须更低）", sB < sA, "A档=" + sA + " B档=" + sB);
-ok("九格全 80 时得 80", box.scoreOf(box.B9.map(g => g[0] + "｜80｜x").join("\n"), ["爱", "平安"]) === 80);
-ok("评分卡解析不出来返回 null（记 0 不打崩流程）", box.scoreOf("完全乱写没有格名", ["爱", "平安"]) === null);
-ok("分数钳在 100 以内", box.scoreOf(box.B9.map(g => g[0] + "｜999｜x").join("\n"), ["爱", "平安"]) === 100);
+const sA = box.scoreOf(card, ["连接", "完全"]);   // A 档：活力不加倍
+const sB = box.scoreOf(card, ["影响", "活力"]);   // B 档：活力加倍
+ok("侧重项打分加倍（活力低时 B 档必须更低）", sB < sA, "A档=" + sA + " B档=" + sB);
+ok("九格全 80 时得 80", box.scoreOf(box.B9.map(g => g[0] + "｜80｜x").join("\n"), ["连接", "共存"]) === 80);
+ok("评分卡解析不出来返回 null（记 0 不打崩流程）", box.scoreOf("完全乱写没有项名", ["连接", "共存"]) === null);
+ok("分数钳在 100 以内", box.scoreOf(box.B9.map(g => g[0] + "｜999｜x").join("\n"), ["连接", "共存"]) === 100);
 
 /* ═════ 五、三档 ═════ */
 group("五、三档");
@@ -123,22 +136,50 @@ ok("A 档 1 路、B 档 3 路择优、C 档 1 路",
   box.MODES.A.ways === 1 && box.MODES.B.ways === 3 && box.MODES.C.ways === 1);
 ok("每档各钉两个侧重格，且都是九格里的名字",
   ["A", "B", "C"].every(k => box.MODES[k].accent.length === 2 && box.MODES[k].accent.every(n => names.includes(n))));
-ok("A 档侧重纯一与和谐（不许喧宾夺主）",
-  box.MODES.A.accent.includes("纯一") && box.MODES.A.accent.includes("和谐"));
-ok("B 档侧重活力与自由", box.MODES.B.accent.includes("活力") && box.MODES.B.accent.includes("自由"));
-ok("C 档侧重爱与平安", box.MODES.C.accent.includes("爱") && box.MODES.C.accent.includes("平安"));
+// 绘画门类的配权指纹本就是「连接与完全双高配」（第二十三章身份证），A 档照它钉
+ok("A 档侧重连接与完全（＝绘画门类的配权指纹）",
+  box.MODES.A.accent.includes("连接") && box.MODES.A.accent.includes("完全"));
+ok("B 档侧重影响与活力（独立作品看回写与再点燃）",
+  box.MODES.B.accent.includes("影响") && box.MODES.B.accent.includes("活力"));
+ok("C 档侧重连接与共存（进得去、容得下张力）",
+  box.MODES.C.accent.includes("连接") && box.MODES.C.accent.includes("共存"));
 ok("三档各有自己的交付口径", ["A", "B", "C"].every(k => box.MODES[k].deliver && box.MODES[k].deliver.length > 12));
 
-/* ═════ 六、承重纪律与三条禁令 ═════ */
+/* ═════ 六、承重纪律与三条禁令（依《SDE艺术论》第二十三章） ═════ */
 group("六、承重纪律与禁令");
-ok("三问 D→E→S 顺序写死在 system", /D — 这幅画要把什么和什么分开[\s\S]{0,400}E — 它落在哪一层沉淀[\s\S]{0,400}S — 那一刀显露成什么/.test(js));
-ok("作废判据在场（删掉 D 画面不变＝装饰）", /把 D 那一问删掉[\s\S]{0,60}作废/.test(js));
+ok("绘画的正典定位写进 system（空间铺展形态发生）", /空间铺展形态发生/.test(js));
+ok("「画布是乐谱，视线是演奏者」在场", /画布是乐谱[，,]?\s*视线是演奏者/.test(js));
+ok("起点写明是表象性显露，不是建筑的结构性显露", /表象性显露/.test(js) && /不是建筑的结构性显露/.test(js));
+ok("配权指纹＝连接与完全双高配", /连接与完全\*{0,2}双高配/.test(js));
+ok("独有属性＝全场同时给出但不等于全场同时被接收", /全场同时给出[，,]?\s*但?不等于全场同时被接收/.test(js));
+ok("审美微时序三站（一号位见一幅画→二号位被牵着走→三号位整场撑开）",
+  /一号位[\s\S]{0,120}二号位[\s\S]{0,120}整场撑开/.test(js));
+ok("张力形态＝「看」出问题的那一批（识别机故障处）", /识别机/.test(js) && /故障处/.test(js));
+ok("两份档案都在（塞尚＝认知反叛／八大＝存在密写）",
+  /塞尚/.test(js) && /八大山人/.test(js) && /认知反叛/.test(js) && /存在密写/.test(js));
+ok("三问按书改：故障点→势能二择一→可见形状",
+  /识别机在\*{0,2}哪一处\*{0,2}故障[\s\S]{0,300}认知反叛[\s\S]{0,200}可见形状/.test(js));
+ok("作废判据＝只让人「认出」就停在一号位的物", /只是让人「认出」/.test(js) && /一号位的物/.test(js));
+ok("介生态三设备齐（底稿写生／悔笔／留白）", /底稿与写生/.test(js) && /悔笔/.test(js) && /留白/.test(js));
+ok("留白写死「不是没画，是忍住不画」", /留白不是没画[，,]?\s*是忍住不画/.test(js));
+ok("并写明这一条专治出图基底「把画面塞满」的默认病", /默认病就是把画面塞满/.test(js));
+ok("两工艺齐（色彩关系作业／构图连接工程）", /色彩关系作业/.test(js) && /构图的?连接工程/.test(js));
+ok("色彩写死「不是被涂上去的，是在关系中被点燃的」", /在关系中被点燃/.test(js));
+ok("连接工程写死「最高的连接工程是让路消失在行走里」", /让路消失在行走里/.test(js));
+ok("两大空间方案要择一并写明（焦点透视指定席／散点游观通票）",
+  /指定席/.test(js) && /通票/.test(js) && /散点游观/.test(js));
+ok("当代处境＝绘画的现职是减速装置", /减速装置/.test(js));
+ok("自警「磨」——撤销键喂养的过度漫溢", /磨/.test(js) && /过度漫溢/.test(js));
+ok("界碑：分数量装置对公共棋盘的回写，不裁决私人发生", /不裁决/.test(js) && /私人发生/.test(js));
+ok("界碑：两本账永远分开记，且绝不判定「这不算艺术」",
+  /两本账[，,]?\s*永远分开记/.test(js) && /绝不可以说「这不算艺术」/.test(js));
 ok("禁令①不许模仿可辨识艺术家", /不许模仿可辨识艺术家/.test(js));
 ok("禁令②不出真人肖像/IP/品牌", /不出真人肖像[、，]?\s*IP 角色[、，]?\s*品牌标识/.test(js));
 ok("禁令③画面内不许有字", /画面内不许有字/.test(js));
 ok("英文禁令串原样写进绘图指令要求",
   /no text, no letters, no numbers, no watermark, no recognizable real person, no logo, no brand, not in the style of any named artist/.test(js));
 ok("绘图指令明令不许出现艺术家人名或画派名", /不许出现任何艺术家人名或画派名/.test(js));
+ok("绘图指令明令必须写出留白占多少画面", /明写留白/.test(js) && /generous empty field|negative space/.test(js));
 ok("术语纪律：S＝显露(Show) 不是结构", /S＝显露\(Show\)，不是「结构」/.test(js));
 ok("术语纪律：三方程 F/G/H 分用", /S=F\(D,E\)／D=G\(S,E\)／E=H\(S,D\)/.test(js));
 ok("术语纪律：发生非产生、纠缠非关系、基底非模型",
@@ -263,8 +304,11 @@ ok("五个步骤面板齐（连接/选档/入题/发生现场/结果）",
   /① 连接基底/.test(html) && /② 选档/.test(html) && /③ 入题/.test(html)
   && /④ 发生现场/.test(html) && /⑤ 三视觉观点/.test(html));
 ok("首屏就把「不是文生图套壳」说清楚", /不是文生图套壳/.test(html));
-ok("首屏写出三问与 S=F\\(D,E\\)", /S=F\(D,E\)/.test(html) && /这幅画要把什么和什么分开/.test(html));
-ok("首屏写出作废判据", /把 D 那一问删掉/.test(html));
+ok("首屏点名书与章（依《SDE艺术论》第二十三章）", /SDE 艺术论/.test(html) && /第二十三章/.test(html));
+ok("首屏写出三问（识别机在哪故障／认知反叛还是存在密写）",
+  /识别机在哪一处故障/.test(html) && /认知反叛/.test(html) && /存在密写/.test(html));
+ok("首屏写出作废判据", /只是让人「认出」/.test(html) && /一号位的物/.test(html));
+ok("首屏点名评分用的是正典九分项坐标仪", /三号位九分项坐标仪/.test(html));
 ok("三条禁令印在页面上（不只在提示里）", /三条写死的禁令/.test(html));
 ok("版本号写进页面供排障", /var VERSION = \d+/.test(js));
 ok("露出只读探针 window.__sdeArt 供 sim 抠", /window\.__sdeArt/.test(js));

@@ -215,7 +215,7 @@ async function drive(w, mode, opts) {
       chats.length === wantChats && draws.length === wantDraws,
       "实测 " + chats.length + "/" + draws.length);
     const b9sys = chats.filter((c) => /画面审看者/.test(c.body.messages[0].content))[0];
-    const acc = { A: ["纯一", "和谐"], B: ["活力", "自由"], C: ["爱", "平安"] }[m];
+    const acc = { A: ["连接", "完全"], B: ["影响", "活力"], C: ["连接", "共存"] }[m];
     ok(m + " 档把侧重格「" + acc.join("／") + "」点名写进看图提示",
       b9sys && acc.every((n) => b9sys.body.messages[0].content.indexOf("「" + n + "」") >= 0));
     ok(m + " 档明写侧重格打分加倍、其余七格救不回来",
@@ -406,18 +406,18 @@ async function drive(w, mode, opts) {
       if (/图像占位核查员/.test(sys)) return chatOK(GATE_REPLY);
       if (/画面审看者/.test(sys))
         return chatOK([
-          "统一｜90｜稳", "多样｜10｜三张一个样，很不可爱也不自由", "和谐｜90｜稳",
-          "完全｜90｜稳", "活力｜90｜稳", "纯一｜90｜稳",
-          "爱｜90｜有具体物", "自由｜90｜留白足", "平安｜90｜安定"
+          "关系｜90｜稳", "影响｜10｜后段没有回写前段，结构与连接都被拖累，活力也差", "共存｜90｜稳",
+          "连接｜90｜稳", "次序｜90｜稳", "结构｜90｜稳",
+          "完全｜90｜稳", "纯一｜90｜稳", "活力｜90｜稳"
         ].join("\n"));
       if (/本轮碰撞方式/.test(u)) return chatOK(paraReply("甲"));
       if (/要你写/.test(u)) return chatOK(SYNTH_REPLY);
       return chatOK(triReply(3));
     });
-    await drive(w, "C", {});   // C 档侧重「爱」「平安」
+    await drive(w, "C", {});   // C 档侧重「连接」「共存」
     const p = w.__sdeArt.last().paras.filter(Boolean)[0];
     // 正确答案：八格 90、多样 10，C 档「爱／平安」加倍 → (90*7 + 10 + 90*2)/11 ≈ 84
-    ok("单字格名「爱」不会被别格理由里的「爱」抢走分数", p.score >= 80,
+    ok("项名出现在别项的理由文字里，不会抢走分数（结构/连接/活力都被「影响」那行提到）", p.score >= 80,
       "实测 " + p.score + "（若取错会明显偏低）");
   }
   {
