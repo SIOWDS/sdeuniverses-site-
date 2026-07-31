@@ -126,6 +126,7 @@ textarea{resize:vertical;min-height:120px;line-height:1.75}
 footer{border-top:1px solid var(--border);margin-top:60px;padding:30px 20px;text-align:center;color:var(--muted);font-size:13px}
 footer a{color:var(--gold)}
 </style>
+  <script src="/taste/assets/sde-vault.js?v=1"></script>
 </head>
 <body>
 
@@ -1679,6 +1680,28 @@ async function run(){
   // SDE 创新智商评估：终稿定稿后独立送评一次，用评估基底（默认跟随写作基底，也可单独指定）。
   // 用自己的 try/catch 包起来——评估失败不能反过来把已经写好的论文标记成"生成中断"，两件事互不牵连。
   async function runIqAssess(iqKey, finalText, label){
+    /* 五篇的核心观点自动进思想库存。这里是**唯一收口**——四篇（传统经学＋SDE1/2/3）与
+       碰撞篇定稿后都从这儿送评，挂一处覆盖五篇。
+       ⚠️ 传统经学是**对照组**（不注入内功也不注入心得），与金点子左栏裸答同理：**不入库**。
+       碰撞篇取「一句话点题」（lead），三条 SDE 链取标题行（head）——两种产出的开头形态不同。 */
+    try{
+      if(window.SDEVault && iqKey !== 'plain'){
+        const _t = (iqKey === 'collision') ? window.SDEVault.lead(finalText, 200)
+                                           : window.SDEVault.head(finalText, 200);
+        if(_t){
+          let _vb = document.getElementById('vaultNoteCd_' + iqKey);
+          if(!_vb){
+            _vb = document.createElement('div');
+            _vb.id = 'vaultNoteCd_' + iqKey;
+            _vb.style.cssText = 'font-size:0.8rem;line-height:1.7;margin:8px 0 0;opacity:.85';
+            const _host = (iqCells[iqKey] && iqCells[iqKey].body) || null;
+            if(_host && _host.parentNode) _host.parentNode.appendChild(_vb);
+          }
+          window.SDEVault.auto([{ kind: (iqKey === 'collision' ? 'claim' : 'name'), text: _t }],
+            '经典解构 · ' + (label || iqKey), _vb);
+        }
+      }
+    }catch(e){}
     const iqCell = iqCells[iqKey];
     if(!finalText){ iqCell.status.textContent='无终稿·未送评'; return; }
     iqCell.status.innerHTML = '<span class="spinner"></span> 送评中';

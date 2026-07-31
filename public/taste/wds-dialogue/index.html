@@ -124,6 +124,7 @@
     .brand span{display:none}
   }
 </style>
+  <script src="/taste/assets/sde-vault.js?v=1"></script>
 </head>
 <body>
 <div class="app">
@@ -1077,8 +1078,36 @@
       });
     };
     var rE = $(".resume", m);
+    /* 精华自动进思想库存。
+       ⚠️ docModal 只暴露 setText/setProg，**没有显式的完成回调**（成文是流式一段段 pump 进来的）。
+       所以用「**流停即入库**」：文本 2.5 秒不再增长就算写完，那时才取一句入库。
+       这样不必去猜每个调用者的完成路径，也不会在流中途反复入库。 */
+    var vTimer = null, vDone = false;
+    function vaultLater() {
+      if (vDone) return;
+      clearTimeout(vTimer);
+      vTimer = setTimeout(function () {
+        var body = bE.textContent || "";
+        if (body.length < 200) return;                 // 太短多半是还没写完或失败了
+        vDone = true;
+        try {
+          if (!window.SDEVault) return;
+          var one = window.SDEVault.lead(body, 200);   // 《问对WDS》与总结都是叙述体，取点题句
+          if (!one) return;
+          var vb = m.querySelector(".vaultnote");
+          if (!vb) {
+            vb = document.createElement("div");
+            vb.className = "vaultnote";
+            vb.style.cssText = "font-size:12.5px;line-height:1.7;margin:8px 0 0;opacity:.8";
+            pE.parentNode.insertBefore(vb, pE.nextSibling);
+          }
+          window.SDEVault.auto([{ kind: "claim", text: one }],
+            "和WDS对话 · " + (kind === "paper" ? "《问对WDS》" : (kind === "xinde" ? "本场心得" : "全场总结")), vb);
+        } catch (e) {}
+      }, 2500);
+    }
     return {
-      setText: function (t) { bE.textContent = t; }, setTitle: function (t) { tE.textContent = t; }, setProg: function (t) { pE.textContent = t || ""; }, close: close,
+      setText: function (t) { bE.textContent = t; vaultLater(); }, setTitle: function (t) { tE.textContent = t; }, setProg: function (t) { pE.textContent = t || ""; }, close: close,
       // PAPER_RESUME：中断后不必从头重来——留一个“从第 N 部分继续”的按钮，已写好的部分与提纲都在
       setResume: function (label, fn) {
         if (!fn) { rE.style.display = "none"; rE.onclick = null; return; }

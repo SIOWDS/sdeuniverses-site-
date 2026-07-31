@@ -108,6 +108,7 @@ button.ghost:hover{color:var(--ink);border-color:var(--gold)}
 .modalBody{padding:16px 18px;overflow:auto;white-space:pre-wrap;font-size:13.5px;color:#CBD5DE;line-height:1.9}
 footer{border-top:1px solid rgba(255,255,255,0.08);margin-top:40px;padding:22px 0 40px;text-align:center;color:var(--sub);font-size:12.5px}
 </style>
+  <script src="/taste/assets/sde-vault.js?v=1"></script>
 </head>
 <body>
 <header>
@@ -707,6 +708,23 @@ async function writePaper(col, words){
     lastPaper = { title: colName+'·'+words+'字论文', text: paper };
     $('paperTitle').textContent = colName+'栏 · 约'+words+'字论文';
     $('paperBody').textContent = paper;
+    /* 成文的核心观点自动进思想库存。
+       ⚠️ **只存 WDS（提智）那一栏**——左栏是裸答对照组，与金点子左栏同理，存了就污染库存。 */
+    try{
+      if(window.SDEVault && col === 'wds'){
+        const _t = window.SDEVault.head(paper, 200);
+        if(_t){
+          let _vb = document.getElementById('vaultNoteUp');
+          if(!_vb){
+            _vb = document.createElement('div');
+            _vb.id = 'vaultNoteUp';
+            _vb.style.cssText = 'font-size:0.8rem;line-height:1.7;margin:10px 0 0;opacity:.85';
+            $('paperBody').parentNode.appendChild(_vb);
+          }
+          window.SDEVault.auto([{ kind:'name', text:_t }], '对话智商大比拼 · WDS 栏成文', _vb);
+        }
+      }
+    }catch(e){}
   }catch(e){
     $('paperBody').innerHTML = '<span style="color:#E06C60">✗ 成文失败：'+esc(e.message)+'</span>';
     showErr(e.message);

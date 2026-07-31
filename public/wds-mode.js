@@ -16,6 +16,15 @@
   if (window.__wdsModeMounted) return;
   window.__wdsModeMounted = true;
 
+  /* 思想库存入库模块（全站共用一份，照 WDSSaveDir 的惯例自己拉进来——
+     壳页只引 wds-mode.js，不该让每个壳页各记一遍依赖）。 */
+  (function () {
+    if (window.SDEVault) return;
+    var sc = document.createElement("script");
+    sc.src = "/taste/assets/sde-vault.js?v=1"; sc.defer = true;
+    document.head.appendChild(sc);
+  })();
+
   var API = "/api/wds/chat";
   var API_DISTILL = "/api/wds/distill";
   var API_LINK = "/api/wds/link";        // 篇名→站内网址（只读索引，不烧 Key）
@@ -3459,6 +3468,25 @@
       if (text && kind === "deck") deckPrep(text, function () { b9Show(text); });   // 取配图，顺便按九宫格验一遍
       stat.textContent = text ? (t("dDone") + text.length) : t("dFail");
       if (dTimedOut) dNote(t("dCut"), 1);
+      /* 精华自动进思想库存。这里是「报告／成文／提纲」三种锻造产物的唯一收口。
+         报告与提纲是结构化的，取标题行；成文类取「一句话点题」。
+         模块自己管未登录、去重、失败不拦路，这里只负责给它对的那一句。 */
+      try {
+        if (window.SDEVault && text && text.length > 80) {
+          var _vt = (kind === "paper" || kind === "essay")
+            ? window.SDEVault.lead(text, 200) : window.SDEVault.head(text, 200);
+          if (_vt) {
+            var _vb = wrap.querySelector(".wdsm-vaultnote");
+            if (!_vb) {
+              _vb = document.createElement("div");
+              _vb.className = "wdsm-vaultnote";
+              _vb.style.cssText = "font-size:12.5px;line-height:1.7;margin:8px 0 0;opacity:.8";
+              if (stat && stat.parentNode) stat.parentNode.appendChild(_vb);
+            }
+            window.SDEVault.auto([{ kind: "claim", text: _vt }], "问WDS · " + kindT(kind), _vb);
+          }
+        }
+      } catch (e) {}
     }
     wrap.querySelector(".dx").onclick = function () { try { if (dr) dr.cancel(); } catch (e) {} wrap.parentNode.removeChild(wrap); };
     cpBtn.onclick = function () { copyText(text); cpBtn.textContent = t("aCopied"); setTimeout(function () { cpBtn.textContent = t("dCopy"); }, 1400); };

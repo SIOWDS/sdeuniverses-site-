@@ -10,6 +10,10 @@ const R = (p) => fs.readFileSync(path.join(__dirname, "..", p), "utf8");
 const MOD = R("public/taste/assets/sde-vault.js");
 const IG = R("public/taste/idea-generator/index.html");
 const ZW = R("public/taste/zhiwen/index.html");
+const CD = R("public/taste/classics-deconstructor/index.html");
+const WM = R("public/wds-mode.js");
+const WD = R("public/taste/wds-dialogue/index.html");
+const UP = R("public/taste/uplift-compare/index.html");
 
 let pass = 0, fail = 0;
 function ok(n, c, e) { if (c) { pass++; console.log("  ✓ " + n); } else { fail++; console.log("  ✗ " + n + (e !== undefined ? "  ← " + JSON.stringify(e) : "")); } }
@@ -107,12 +111,45 @@ function rest() {
   ok("每篇各有自己的消息位", /'vaultNote_'\+key/.test(ZW));
   ok("接线包在 try/catch 里", /try\{\s*if\(window\.SDEVault && key!=='研论'\)\{[\s\S]{0,800}\}catch\(e\)\{\}/.test(ZW));
 
-  group("七、两台都没把纪律抄一遍（纪律只在模块里）");
-  ok("金点子页里没有重复的入库话术", IG.indexOf("已自动存进思想库存") < 0);
-  ok("中华智问页里也没有", ZW.indexOf("已自动存进思想库存") < 0);
-  ok("两台都只调 SDEVault.auto，不自己拼 /api/im 的入库请求",
-    IG.indexOf('a: "add"') < 0 && ZW.indexOf('a: "add"') < 0
-    && IG.indexOf("a:\"add\"") < 0 && ZW.indexOf("a:\"add\"") < 0);
+  group("七之前、其余四台接线");
+  ok("经典解构器引了模块", /taste\/assets\/sde-vault\.js/.test(CD));
+  ok("★ 挂在 runIqAssess——四篇＋碰撞篇定稿后的唯一收口，一处覆盖五篇",
+    /async function runIqAssess\(iqKey, finalText, label\)\{[\s\S]{0,900}SDEVault\.auto\(/.test(CD));
+  ok("★ 传统经学是对照组，不入库（同金点子左栏裸答）",
+    /iqKey !== 'plain'/.test(CD) && /对照组/.test(CD));
+  ok("碰撞篇用 lead、三条 SDE 链用 head",
+    /iqKey === 'collision'\) \? window\.SDEVault\.lead/.test(CD) && /window\.SDEVault\.head\(finalText, 200\)/.test(CD));
+
+  ok("问WDS（wds-mode.js）自己把模块拉进来（壳页只引它一个）",
+    /sc\.src = "\/taste\/assets\/sde-vault\.js/.test(WM) && /if \(window\.SDEVault\) return;/.test(WM));
+  ok("★ 挂在 distill 的 done()——报告／成文／提纲三种锻造产物的唯一收口",
+    /if \(dTimedOut\) dNote\(t\("dCut"\), 1\);[\s\S]{0,1600}SDEVault\.auto\(\[\{ kind: "claim"/.test(WM)
+    && /"问WDS · " \+ kindT\(kind\)/.test(WM));
+  ok("成文类取 lead、报告提纲取 head", /kind === "paper" \|\| kind === "essay"[\s\S]{0,120}lead\(text, 200\)/.test(WM));
+  ok("太短的不入库（多半是还没写完）", /text\.length > 80/.test(WM));
+
+  ok("和WDS对话引了模块", /taste\/assets\/sde-vault\.js/.test(WD));
+  ok("★ docModal 没有完成回调 ⇒ 用「流停即入库」，2.5 秒不再增长才算写完",
+    /流停即入库/.test(WD) && /2500\)/.test(WD) && /vDone = true/.test(WD));
+  ok("只入一次，不在流中途反复入库", /if \(vDone\) return;/.test(WD));
+  ok("太短不入库（多半没写完或失败）", /body\.length < 200/.test(WD));
+  ok("三种产物各带各的出处", /《问对WDS》/.test(WD) && /本场心得/.test(WD) && /全场总结/.test(WD));
+
+  ok("对话智商大比拼引了模块", /taste\/assets\/sde-vault\.js/.test(UP));
+  ok("★ 只存提智那一栏，左栏裸答不入库", /col === 'wds'/.test(UP) && /左栏是裸答对照组/.test(UP));
+  ok("接在成文落定处", /\$\('paperBody'\)\.textContent = paper;[\s\S]{0,900}SDEVault\.auto\(/.test(UP)
+    && /'对话智商大比拼 · WDS 栏成文'/.test(UP));
+
+  group("七、六台都没把纪律抄一遍（纪律只在模块里）");
+  [["金点子", IG], ["中华智问", ZW], ["经典解构器", CD], ["问WDS", WM], ["和WDS对话", WD], ["对话智商大比拼", UP]]
+    .forEach(function (pair) {
+      ok(pair[0] + " 没有重复的入库话术（纪律只写在模块里）", pair[1].indexOf("已自动存进思想库存") < 0);
+    });
+  ok("六台都只调 SDEVault.auto，没人自己拼 /api/im 的入库请求",
+    [IG, ZW, CD, WM, WD, UP].every(function (s) {
+      return s.indexOf('a: "add"') < 0 && s.indexOf('a:"add"') < 0;
+    }));
+  ok("六台都真的调到了 auto()", [IG, ZW, CD, WM, WD, UP].every(function (s) { return /SDEVault\.auto\(/.test(s); }));
 
   console.log("\n" + "═".repeat(52));
   console.log("  通过 " + pass + " / " + (pass + fail) + (fail ? "   ✗ 失败 " + fail : "   全绿"));
