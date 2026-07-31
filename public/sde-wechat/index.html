@@ -311,6 +311,10 @@ a{color:var(--disc)}
       </div>
     </div>
 
+    <div class="view" id="v-lib">
+      <div class="scroll" id="lb-body"></div>
+    </div>
+
     <div class="view" id="v-vault">
       <div class="scroll" id="vt-body"></div>
     </div>
@@ -400,6 +404,7 @@ a{color:var(--disc)}
           <div class="mu-bar">
             <button class="btn mu" id="mu-go" type="button">✨ SDE金句生产机</button>
             <button class="btn mu" id="mu-vault" type="button">💡 从库存里挑</button>
+            <button class="btn mu" id="mu-article" type="button">📎 插一篇文章</button>
             <select id="mu-kind">
               <option value="auto">自动（看图·接你写的）</option>
               <option value="maxim">格言体</option>
@@ -461,6 +466,7 @@ a{color:var(--disc)}
             <div class="me-item"><span>SDE 讨论（公开广场）</span><a href="/sde-talk/"><button>进入</button></a></div>
             <div class="me-item"><span>SDE 会议室</span><a href="/meeting/"><button>进入</button></a></div>
             <div class="me-item"><span>💡 思想库存<br><span style="font-size:0.74rem;color:var(--muted)">对话里撞出来的东西存在这儿，发朋友圈、立候选卡都从这儿取</span></span><button id="b-vault">进入</button></div>
+            <div class="me-item"><span>📚 文章库<br><span style="font-size:0.74rem;color:var(--muted)">站上的文章收在这儿；发帖发朋友圈时可以随时插一篇进去</span></span><button id="b-lib">进入</button></div>
             <div class="me-item"><span>全权管理</span><button id="b-admin">进入</button></div>
             <div class="me-item"><span>退出登录</span><button id="b-out">退出</button></div>
           </div>
@@ -521,9 +527,9 @@ function setStat(state){var d=el("t-dot"),s=el("t-stat");
 
 /* ── 视图 ── */
 function show(v){
-  ["gate","chats","book","talk","gnew","ginfo","me","fwd","admin","moments","mopost","monews","dtalk","cand","cdnew","cdone","cdnews","vault"].forEach(function(x){el("v-"+x).classList.toggle("on",x===v)});
+  ["gate","chats","book","talk","gnew","ginfo","me","fwd","admin","moments","mopost","monews","dtalk","cand","cdnew","cdone","cdnews","vault","lib"].forEach(function(x){el("v-"+x).classList.toggle("on",x===v)});
   el("tabs").style.display=(v==="gate")?"none":"flex";
-  el("t-back").style.display=(v==="talk"||v==="gnew"||v==="ginfo"||v==="fwd"||v==="admin"||v==="mopost"||v==="monews"||v==="dtalk"||v==="cdnew"||v==="cdone"||v==="cdnews"||v==="vault"||(v==="moments"&&moWho)||(v==="cand"&&cdWho))?"block":"none";
+  el("t-back").style.display=(v==="talk"||v==="gnew"||v==="ginfo"||v==="fwd"||v==="admin"||v==="mopost"||v==="monews"||v==="dtalk"||v==="cdnew"||v==="cdone"||v==="cdnews"||v==="vault"||v==="lib"||(v==="moments"&&moWho)||(v==="cand"&&cdWho))?"block":"none";
   el("t-sub").style.display=(v==="talk")?"flex":"none";
   el("t-act").style.display=(v==="talk"&&cur&&cur.kind==="g")?"block":"none";
   el("t-plaza").style.display=(v==="chats"||v==="book"||v==="me")?"block":"none";
@@ -539,7 +545,7 @@ function show(v){
   else if(v==="cdnew")el("t-ttl").textContent="立一张候选卡";
   else if(v==="cdone")el("t-ttl").textContent="候选卡";
   else if(v==="cdnews")el("t-ttl").textContent="顶回提醒";
-  else if(v==="vault")el("t-ttl").textContent="💡 思想库存";
+  else if(v==="vault")el("t-ttl").textContent="💡 思想库存";   else if(v==="lib")el("t-ttl").textContent="📚 文章库";
   else if(v==="cand")el("t-ttl").textContent=cdWho?(cdWhoName+"的候选"):"候选";
   else if(v==="moments")el("t-ttl").textContent=moWho?(moWhoName+"的朋友圈"):"朋友圈";
   else if(v!=="talk")el("t-ttl").textContent="SDE 微信";
@@ -702,6 +708,7 @@ el("t-back").onclick=function(){
   if(el("v-moments").classList.contains("on")&&moWho){moGo("","");return;}
   if(el("v-admin").classList.contains("on")){show("me");return;}
   if(el("v-cdnew").classList.contains("on")||el("v-cdone").classList.contains("on")||el("v-cdnews").classList.contains("on")){show("cand");return;}
+  if(el("v-lib").classList.contains("on")){show(lbFrom||"me");return;}
   if(el("v-vault").classList.contains("on")){show(vtFrom||"me");return;}
   if(el("v-cand").classList.contains("on")&&cdWho){cdGo("","");return;}
   if(el("v-fwd").classList.contains("on")){show(cur?"talk":"chats");return;}
@@ -757,7 +764,7 @@ function afterLogin(){
     if(x.s===401||!x.d||!x.d.ok){logout();return;}
     ME=x.d.me;contacts=x.d.contacts||[];
     el("me-nm").textContent=ME.name;el("me-uid").textContent="ID "+ME.uid;
-    show("chats");loadInbox();loadGroups();moBadge();cdWire();cdBadge();vtWire();dtBadge();
+    show("chats");loadInbox();loadGroups();moBadge();cdWire();cdBadge();vtWire();lbWire();dtBadge();
     if(inboxT)clearInterval(inboxT);
     inboxT=setInterval(function(){loadInbox(true);moBadge();dtBadge();},15000);
   }).catch(function(){el("gsi").textContent="网络异常，请稍后重试。"});
@@ -1421,6 +1428,129 @@ function cdBadge(){
 var vtFrom="", vtMode="new", vtPick=null;
 var VT_KIND={line:"金句",name:"命名",claim:"命题",note:"观察"};
 function vtApi(a,extra){return api("vt",Object.assign({a:a},extra||{}));}
+
+/* ===== 文章库 =====
+   存的是**指针不是副本**：站上 840 篇已有规范索引，这里只记 slug/title。
+   三路来源，奖励方向是分开的：
+     · 我收的  —— 私人书签，只按时间排，不计数、不公开、不做热度。
+                  热度榜是回声室，与「新思想发生」这条最高判据相反（同点赞被删掉的理由）。
+     · 推荐位  —— 要进公共库得另按一次「推给大家」，且必须附一句它切开了什么。
+                  同「转发必须附一条自己的分离线」：门槛高，但每一条都带信息。
+     · 发现    —— 不由人放，由前端从 publications.json 现算「离你最远」：
+                  优先给你**没收过的领域**。零后端零调用，永远有货且永远是陌生的。 */
+var lbFrom="me", lbMode="pub", lbPick=null, lbPubs=null, lbMineCache=[];
+function lbApi(a,extra){return api("lb",Object.assign({a:a},extra||{}));}
+function lbGo(from,onPick){lbFrom=from||"me";lbPick=onPick||null;show("lib");lbLoad();}
+function lbUrl(slug){return "/students/"+String(slug||"").replace(/^\/+|\/+$/g,"")+"/";}
+/* 站上的规范索引，取一次缓存住；失败不拦路（发现这一路没了，另两路照用） */
+function lbLoadPubs(){
+  if(lbPubs)return Promise.resolve(lbPubs);
+  return fetch("/students/publications.json",{cache:"force-cache"}).then(function(r){return r.json();}).then(function(d){
+    var out=[];(d.students||[]).forEach(function(s){(s.items||[]).forEach(function(it){
+      out.push({slug:String(it.url||"").replace(/^\/students\/|\/$/g,""),title:it.title||"",sub:it.summary||"",field:it.kind||"",who:s.name||""});
+    });});
+    lbPubs=out;return out;
+  }).catch(function(){lbPubs=[];return [];});
+}
+/* 「离你最远」：把我收过的领域记下来，优先给没收过的那些领域的篇目 */
+function lbFar(all,mine,n){
+  var seen={};mine.forEach(function(x){if(x.field)seen[x.field]=1;});
+  var far=all.filter(function(x){return x.field&&!seen[x.field];});
+  var pool=far.length>=n?far:all.slice();
+  for(var i=pool.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=pool[i];pool[i]=pool[j];pool[j]=t;}
+  return {items:pool.slice(0,n),far:far.length};
+}
+function lbCard(it,acts){
+  return '<div class="me-item" style="display:block;padding:12px 16px;border-bottom:1px solid var(--line,#eee)">'
+    +(it.name||it.who?('<div style="font-size:0.72rem;color:var(--muted);margin-bottom:4px">'+esc(it.name||it.who)+(it.field?('　·　'+esc(it.field)):'')+'</div>'):'')
+    +'<div style="font-size:0.95rem;line-height:1.65;font-weight:600">'+esc(it.title)+'</div>'
+    +(it.sep?('<div style="margin-top:5px;font-size:0.84rem;line-height:1.7;color:var(--brand,#1a7f5a)">它切开的：'+esc(it.sep)+'</div>'):'')
+    +(it.sub?('<div style="margin-top:4px;font-size:0.8rem;line-height:1.7;color:var(--muted)">'+esc(it.sub).slice(0,120)+'</div>'):'')
+    +'<div style="margin-top:7px;font-size:0.78rem">'+acts+'</div></div>';
+}
+function lbLoad(){
+  var box=el("lb-body");box.innerHTML='<div class="hint">正在加载…</div>';
+  var head='<div style="padding:12px 14px 0">'
+    +'<p style="font-size:0.8rem;color:var(--muted);line-height:1.8;margin:0 0 10px">'
+    +'这里存的是<b>站上文章的链接</b>，不是副本。<b>「我收的」是私人书签</b>——只按时间排，'
+    +'不计数、不公开、不排热度；要让别人看见，得另按一次「推给大家」<b>并写一句它切开了什么</b>。<br>'
+    +'<b>「发现」不由人放</b>，是从全站现算的<b>离你最远</b>：优先给你还没收过的领域。</p>'
+    +'<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">'
+    +['pub:📌 推荐位','far:🧭 发现','mine:⭐ 我收的'].map(function(x){
+        var k=x.split(":")[0],t=x.split(":")[1];
+        return '<button class="lb-tab'+(lbMode===k?" on":"")+'" data-m="'+k+'" style="font-size:0.76rem;padding:4px 10px;border-radius:14px;border:1px solid '+(lbMode===k?"var(--brand,#1a7f5a)":"var(--line,#ddd)")+';background:'+(lbMode===k?"rgba(26,127,90,.08)":"transparent")+'">'+t+'</button>';
+      }).join("")
+    +'</div></div>';
+  function render(items,tip){
+    var s=head+(tip||"");
+    if(!items.length){
+      s+='<div style="padding:4px 16px 22px;font-size:0.86rem;color:var(--muted);line-height:1.9">'
+        +(lbMode==="mine"?'<b>你还没收过文章。</b><br><br>在站上读到值得记住的一篇，浮层底栏点「⭐ 收进文章库」就进来了。'
+         :lbMode==="pub"?'<b>推荐位还是空的。</b><br><br>去「⭐ 我收的」里挑一篇，写一句它切开了什么，推给大家。'
+         :'<b>暂时取不到全站目录。</b><br><br>另外两栏照常可用。')+'</div>';
+    }else{
+      items.forEach(function(it){
+        var acts="";
+        if(lbPick)acts+='<a href="#" class="lb-use" data-slug="'+esc(it.slug)+'" data-title="'+esc(it.title)+'">插入这一篇 →</a>　';
+        acts+='<a href="'+lbUrl(it.slug)+'" target="_blank" rel="noopener">去读 ↗</a>';
+        if(lbMode==="mine")acts+='　<a href="#" class="lb-push" data-id="'+esc(it.id)+'">推给大家</a>　<a href="#" class="lb-del" data-id="'+esc(it.id)+'" style="color:var(--muted)">删除</a>';
+        if(lbMode==="far")acts+='　<a href="#" class="lb-add" data-slug="'+esc(it.slug)+'" data-title="'+esc(it.title)+'" data-sub="'+esc(it.sub||"")+'" data-field="'+esc(it.field||"")+'">⭐ 收藏</a>';
+        if(lbMode==="pub"&&ME&&it.uid===ME.uid)acts+='　<a href="#" class="lb-unpush" data-id="'+esc(it.id)+'" style="color:var(--muted)">撤回</a>';
+        s+=lbCard(it,acts);
+      });
+    }
+    box.innerHTML=s;lbBind();
+  }
+  if(lbMode==="far"){
+    Promise.all([lbLoadPubs(),lbApi("mine",{limit:200})]).then(function(r){
+      var all=r[0]||[],mine=(r[1]&&r[1].items)||[];lbMineCache=mine;
+      var g=lbFar(all,mine,24);
+      render(g.items,'<div style="padding:0 16px 8px;font-size:0.76rem;color:var(--muted)">全站 '+all.length+' 篇，其中 '+g.far+' 篇落在你还没收过的领域。每次进来重洗一遍。</div>');
+    });
+    return;
+  }
+  lbApi(lbMode==="mine"?"mine":"pub",{limit:60}).then(function(d){
+    if(!d||!d.ok){box.innerHTML='<div class="hint">加载失败，请重试。</div>';return;}
+    if(lbMode==="mine")lbMineCache=d.items||[];
+    render(d.items||[]);
+  });
+}
+function lbBind(){
+  Array.prototype.forEach.call(el("lb-body").querySelectorAll(".lb-tab"),function(b){
+    b.onclick=function(){lbMode=b.getAttribute("data-m");lbLoad();};});
+  function on(cls,fn){Array.prototype.forEach.call(el("lb-body").querySelectorAll(cls),function(a){
+    a.onclick=function(e){e.preventDefault();fn(a);};});}
+  on(".lb-use",function(a){if(lbPick)lbPick({slug:a.getAttribute("data-slug"),title:a.getAttribute("data-title")});});
+  on(".lb-add",function(a){
+    lbApi("add",{slug:a.getAttribute("data-slug"),title:a.getAttribute("data-title"),sub:a.getAttribute("data-sub"),field:a.getAttribute("data-field")})
+      .then(function(d){a.textContent=(d&&d.ok)?(d.dup?"已在库里":"已收藏"):((d&&d.msg)||"没收成");a.style.color="var(--muted)";});});
+  on(".lb-del",function(a){
+    if(!confirm("从「我收的」里删掉这一篇？"))return;
+    lbApi("del",{id:a.getAttribute("data-id")}).then(function(){lbLoad();});});
+  on(".lb-unpush",function(a){
+    if(!confirm("从推荐位撤回？"))return;
+    lbApi("unpush",{id:a.getAttribute("data-id")}).then(function(){lbLoad();});});
+  on(".lb-push",function(a){
+    var it=null;lbMineCache.forEach(function(x){if(x.id===a.getAttribute("data-id"))it=x;});
+    if(!it)return;
+    var sep=prompt("推给大家之前，写一句它切开了什么——\n（只写「好文推荐」的话，别人无从判断要不要点开；至少 12 字）","");
+    if(sep===null)return;
+    lbApi("push",{slug:it.slug,title:it.title,sub:it.sub,field:it.field,sep:sep}).then(function(d){
+      if(d&&d.ok){lbMode="pub";lbLoad();}else alert((d&&d.msg)||"没推成。");});});
+}
+function lbWire(){
+  var b=el("b-lib");if(b)b.onclick=function(){lbMode="pub";lbGo("me",null);};
+  var ma=el("mu-article");
+  if(ma)ma.onclick=function(){
+    lbGo("mopost",function(it){
+      var t=el("mp-text");
+      if(t){var add="《"+it.title+"》 "+location.origin+lbUrl(it.slug);
+        t.value=(t.value?(t.value.replace(/\s+$/,"")+"\n"):"")+add;}
+      show("mopost");
+    });
+  };
+}
+
 function vtWire(){
   var b=el("b-vault");
   if(b)b.onclick=function(){vtMode="new";vtGo("me",null);};

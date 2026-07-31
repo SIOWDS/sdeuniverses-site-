@@ -981,6 +981,86 @@ export class CommentBox {
         await this.ctx.storage.delete("vu:" + it.uid + ":" + id);
         return Response.json({ ok: true });
       }
+      /* ===== 文章库：私人收藏 lb: ＋ 公共推荐位 lp: =====
+         用户的话：「SDE微信里面可以做一个 微信公共文章链接库 和 我喜欢的文章……
+         目的是丰富微信互动的时候，可以在微信群里，或者广场里面，随时点击和选择里面的文章。」
+         **存指针不存副本**：站上 840 篇已有规范索引，这里只记 slug/title。
+         **收藏不计数、不公开、不排热度**——热度榜是回声室，与「新思想发生」相反
+         （同点赞被删掉、Feed 改按「离你最远」排的那条理由）。
+         **要进公共库得另按一次「推给大家」并附一句分离线**，同「转发必须附分离线」。
+         键：lb:<uid>:<inv>:<rnd> ＝我收的；lp:<inv>:<rnd> ＝公共推荐位。 */
+      if (op === "lbadd") {
+        if (!ok12(uid)) return Response.json({ ok: false });
+        const slug = moClean(b.slug, 160).replace(/[^A-Za-z0-9\/\-_]/g, "");
+        const title = moClean(b.title, 120);
+        if (!slug || slug.indexOf("/") < 0) return Response.json({ ok: false, msg: "这条链接认不出是站上的哪一篇。" });
+        if (!title) return Response.json({ ok: false, msg: "取不到篇名——先在文章页上收藏。" });
+        const pre = "lb:" + uid + ":";
+        const mine = await this.ctx.storage.list({ prefix: pre, limit: 400 });
+        for (const k of mine.keys()) {
+          const it = await this.ctx.storage.get(k);
+          if (it && it.slug === slug) return Response.json({ ok: true, dup: 1, item: it });
+        }
+        const id = moInv(now) + ":" + moRnd();
+        const item = { id, uid, slug, title, sub: moClean(b.sub, 200), field: moClean(b.field, 40), ts: now };
+        await this.ctx.storage.put(pre + id, item);
+        return Response.json({ ok: true, item });
+      }
+      if (op === "lbmine") {
+        const lim = Math.min(200, Math.max(1, parseInt(b.limit || 60, 10)));
+        const m = await this.ctx.storage.list({ prefix: "lb:" + uid + ":", limit: lim });
+        const out = [];
+        for (const k of m.keys()) { const it = await this.ctx.storage.get(k); if (it) out.push(it); }
+        return Response.json({ ok: true, items: out, total: out.length });
+      }
+      if (op === "lbdel") {
+        const id = String(b.id || "");
+        const k = "lb:" + uid + ":" + id;
+        const it = await this.ctx.storage.get(k);
+        if (!it) return Response.json({ ok: false, msg: "已经不在了。" });
+        await this.ctx.storage.delete(k);
+        return Response.json({ ok: true });
+      }
+      if (op === "lbpush") {
+        // 推给大家：门槛在这一句分离线上。说不出它切开了什么，就只是转发。
+        if (!ok12(uid)) return Response.json({ ok: false });
+        const slug = moClean(b.slug, 160).replace(/[^A-Za-z0-9\/\-_]/g, "");
+        const title = moClean(b.title, 120);
+        const sep = moClean(b.sep, 300);
+        if (!slug || !title) return Response.json({ ok: false, msg: "这条链接认不出是站上的哪一篇。" });
+        if (sep.length < 12) return Response.json({ ok: false, msg: "得写一句它切开了什么——只说「好文推荐」的话，别人无从判断要不要点开。" });
+        const rk = "lprl:" + uid;
+        let hits = (await this.ctx.storage.get(rk)) || [];
+        hits = hits.filter((t) => now - t < 86400000);
+        if (hits.length && now - hits[hits.length - 1] < 20000) return Response.json({ ok: false, msg: "刚推过一篇，缓一下。" });
+        if (hits.length >= 10) return Response.json({ ok: false, msg: "今天推满 10 篇了——推荐位贵在少而准。" });
+        const dupm = await this.ctx.storage.list({ prefix: "lp:", limit: 300 });
+        for (const k of dupm.keys()) {
+          const it = await this.ctx.storage.get(k);
+          if (it && it.slug === slug && it.uid === uid) return Response.json({ ok: false, msg: "你已经推过这一篇了。" });
+        }
+        const u0 = (await this.ctx.storage.get("u:" + uid)) || {};
+        const id = moInv(now) + ":" + moRnd();
+        const item = { id, uid, name: moClean(b.name || u0.name, 20), slug, title, sub: moClean(b.sub, 200), field: moClean(b.field, 40), sep, ts: now };
+        await this.ctx.storage.put("lp:" + id, item);
+        hits.push(now); await this.ctx.storage.put(rk, hits);
+        return Response.json({ ok: true, item });
+      }
+      if (op === "lbpub") {
+        const lim = Math.min(80, Math.max(1, parseInt(b.limit || 30, 10)));
+        const m = await this.ctx.storage.list({ prefix: "lp:", limit: 300 });
+        let out = [];
+        for (const k of m.keys()) { const it = await this.ctx.storage.get(k); if (it) out.push(it); }
+        return Response.json({ ok: true, items: out.slice(0, lim), total: out.length });
+      }
+      if (op === "lbunpush") {
+        const id = String(b.id || "");
+        const it = await this.ctx.storage.get("lp:" + id);
+        if (!it) return Response.json({ ok: false, msg: "已经不在了。" });
+        if (it.uid !== uid) return Response.json({ ok: false, msg: "只能撤回自己推的。" });
+        await this.ctx.storage.delete("lp:" + id);
+        return Response.json({ ok: true });
+      }
       if (op === "cdpost") {
         if (!ok12(uid)) return Response.json({ ok: false });
         const prop = cdClean(b.prop, 120);            // 50 字级承重命题（留冗余，不硬切）
@@ -6013,6 +6093,18 @@ export default {
           op: "vt" + a, uid: who.uid, name: who.name,
           who: String(b.who || ""), limit: b.limit, fresh: b.fresh ? 1 : 0, pick: b.pick ? 1 : 0,
           id: String(b.id || ""), text: b.text, kind: b.kind, src: b.src,
+        });
+        return Response.json(Object.assign({ me }, d || { ok: false }), { headers: { "cache-control": "no-store" } });
+      }
+      if (op === "lb") {   // 文章库：收藏（私人）与推荐位（公共，必附分离线）
+        const a = String(b.a || "");
+        const pass = ["add", "mine", "del", "push", "pub", "unpush"];
+        if (pass.indexOf(a) < 0) return Response.json({ ok: false, msg: "未知的文章库动作。" }, { status: 400 });
+        await call({ op: "hello", uid: who.uid, name: who.name });
+        const d = await call({
+          op: "lb" + a, uid: who.uid, name: who.name,
+          limit: b.limit, id: String(b.id || ""),
+          slug: b.slug, title: b.title, sub: b.sub, field: b.field, sep: b.sep,
         });
         return Response.json(Object.assign({ me }, d || { ok: false }), { headers: { "cache-control": "no-store" } });
       }

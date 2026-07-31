@@ -112,7 +112,7 @@
   panel.innerHTML =
     "<div class='wdsr-head'><div class='wdsr-title'><span class='wdsr-dot'></span>" + (CFG.panelTitle || "SDE 陪读") + "</div>" +
     "<div class='wdsr-sub'>" + (CFG.subLabel || "陪你读，不替你读") + "</div>" + "<button class='wdsr-histbtn' title='本机对话记录' style='display:none;position:absolute;right:72px;top:15px;background:none;border:none;color:#7C8798;font-size:15px;cursor:pointer;padding:0'>↺</button><button class='wdsr-keybtn' title='设置 API Key' style='position:absolute;right:44px;top:15px;background:none;border:none;color:#7C8798;font-size:15px;cursor:pointer;padding:0'>⚙</button><button class='wdsr-close' aria-label='关闭'>\u00d7</button></div>" +
-    "<div class='wdsr-tools'><button class='wdsr-tool wdsr-sum' disabled>\u603b\u7ed3\u8fd9\u573a\u5bf9\u8bdd</button><button class='wdsr-tool wdsr-pap' disabled>" + (CFG.paperLabel || "\u751f\u6210 5000 \u5b57\u8bba\u6587") + "</button></div>" +
+    "<div class='wdsr-tools'><button class='wdsr-tool wdsr-fav'>\u2b50 \u6536\u8fdb\u6587\u7ae0\u5e93</button><button class='wdsr-tool wdsr-sum' disabled>\u603b\u7ed3\u8fd9\u573a\u5bf9\u8bdd</button><button class='wdsr-tool wdsr-pap' disabled>" + (CFG.paperLabel || "\u751f\u6210 5000 \u5b57\u8bba\u6587") + "</button></div>" +
     "<div class='wdsr-msgs'></div>" +
     "<div class='wdsr-focuswrap'></div>" +
     "<div class='wdsr-inputbar'><textarea class='wdsr-input' rows='2' placeholder='问 WDS，或在正文里选一句\u2026'></textarea><button class='wdsr-send'>问</button></div>";
@@ -180,6 +180,31 @@
   function closePanel() { panel.classList.remove("wdsr-open"); fab.style.display = ""; }
   fab.onclick = function () { stBoot(); openPanel(); }; q1(".wdsr-close", panel).onclick = closePanel;
   if (CFG.auto) { setTimeout(openPanel, 250); }
+  /* ⭐ 收进文章库 —— 收的是**当前这一页**，不是对话产出。
+     浮层已注入 845 篇文章页，这里是读者遇到一篇好文时唯一顺手的位置。
+     指针不存副本：slug 取自路径，题名与副题取自页面自己的 h1/.art-subtitle。
+     纪律与话术全在 SDEVault.fav 里，本文件一句都不重抄。 */
+  q1(".wdsr-fav", panel).onclick = function () {
+    var b = q1(".wdsr-fav", panel);
+    var slug = String(location.pathname || "").replace(/^\/students\//, "").replace(/^\/+|\/+$/g, "");
+    var h1 = document.querySelector("h1.art-title") || document.querySelector("h1");
+    var sub = document.querySelector(".art-subtitle") || document.querySelector(".hook");
+    var ser = document.querySelector(".art-series");
+    var box = q1(".wdsr-favnote", panel);
+    if (!box) {
+      box = el("div", "wdsr-favnote");
+      box.style.cssText = "font-size:12px;line-height:1.7;padding:0 14px 8px;opacity:.85";
+      q1(".wdsr-tools", panel).parentNode.insertBefore(box, q1(".wdsr-tools", panel).nextSibling);
+    }
+    if (!window.SDEVault) { box.textContent = "\u6a21\u5757\u8fd8\u6ca1\u52a0\u8f7d\u5b8c\uff0c\u7a0d\u7b49\u518d\u70b9\u3002"; return; }
+    b.disabled = true;
+    window.SDEVault.fav({
+      slug: slug,
+      title: (h1 && h1.textContent || document.title || "").split(" · ")[0].trim(),
+      sub: (sub && sub.textContent || "").trim(),
+      field: (ser && ser.textContent || "").split("·").pop().trim(),
+    }, box).then(function () { b.disabled = false; });
+  };
   q1(".wdsr-keybtn", panel).onclick = function () { wdsKeyPanel(function () {}); };
 
   function addMsg(role, text, focus) {

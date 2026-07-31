@@ -126,5 +126,41 @@
     });
   }
 
-  w.SDEVault = { auto: auto, head: head, lead: lead, cred: cred, KINDS: KINDS };
+
+  /* ===== 收进「📚 文章库」 =====
+     与 auto() 同住一个模块，是因为它们共用同一套东西：身份、四条纪律、话术。
+     各页各写一遍 = 改一处漏四处，那正是这个模块存在的理由。
+     **它存的是指针不是副本**：站上文章已有规范索引，这里只递 slug/title。
+     **收藏是私人书签**——不计数、不公开、不排热度；要让别人看见，
+     得在微信里另按一次「推给大家」并写一句它切开了什么。 */
+  function fav(a, box) {
+    var slug = String((a && a.slug) || "").replace(/^\/+|\/+$/g, "");
+    var title = String((a && a.title) || "").trim().slice(0, 120);
+    if (!slug || slug.indexOf("/") < 0 || !title) {
+      note(box, "这一页认不出是站上的哪一篇，没收进文章库。");
+      return Promise.resolve({ ok: false });
+    }
+    var c = cred();
+    if (!c) {
+      note(box, '还没收进文章库——先在 <a href="/sde-wechat/" target="_blank">SDE 微信</a> 登录一次（全站通用），'
+        + '以后读到好文章按一下就收进「📚 文章库」，发帖发朋友圈时能随时插一篇。');
+      return Promise.resolve({ ok: false, noAuth: 1 });
+    }
+    note(box, "正在收进文章库…");
+    return fetch("/api/im", {
+      method: "POST", headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        credential: c, op: "lb", a: "add", slug: slug, title: title,
+        sub: String((a && a.sub) || "").slice(0, 200), field: String((a && a.field) || "").slice(0, 40),
+      }),
+    }).then(function (r) { return r.json(); }).then(function (d) {
+      if (!d || !d.ok) { note(box, (d && d.msg) || "没收成（可能是登录过期）。"); return { ok: false }; }
+      note(box, (d.dup ? "这一篇早就在文章库里了" : "已收进文章库")
+        + ' → <a href="/sde-wechat/" target="_blank">去「📚 文章库」看</a>'
+        + '　<span style="opacity:.75">收藏是私人的；要推给大家得另写一句它切开了什么。</span>');
+      return { ok: true, dup: !!d.dup };
+    }).catch(function () { note(box, "没收成（网络出错）。"); return { ok: false }; });
+  }
+
+  w.SDEVault = { auto: auto, fav: fav, head: head, lead: lead, cred: cred, KINDS: KINDS };
 })(window);
