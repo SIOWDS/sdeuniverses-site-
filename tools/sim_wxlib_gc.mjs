@@ -13,7 +13,7 @@ t("删帖时两个前缀都删", /for \(const pre of \[WX_LIB, WX_LIB_OLD\]\) \{
 t("过期 404 有中文说明而不是裸 not found", /已超过 7 天保留期/.test(src));
 t("scheduled 入口存在", /async scheduled\(event, env, ctx\)/.test(src));
 t("cron 写进了 wrangler", /"crons":\s*\[\s*"17 4 \* \* \*"\s*\]/.test(readFileSync("wrangler.jsonc","utf8")));
-t("管理面留了手动清库", /a === "gc"/.test(src));
+t("手动清库挂在管理员门里", /if \(op === "admin"\)[\s\S]*?a === "gc"/.test(src));
 
 // 把 wxSweep 抠出来单独跑（同一份源码，不是另写一份）
 const body=src.slice(src.indexOf("async function wxSweep"), src.indexOf("export default {"));

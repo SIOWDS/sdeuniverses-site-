@@ -5827,6 +5827,13 @@ export default {
         if (!(await adminPassExists())) return Response.json({ ok: false, msg: "本站还没有设定过管理密码。请先在文章讨论区的管理入口设定一次，之后这里就能用同一个密码。" }, { status: 403 });
         if (!(await adminPassOk(b.pass))) return Response.json({ ok: false, msg: "管理密码不正确。" }, { status: 403 });
         const a = String(b.a || "");
+        // 手动清一次 SDE 微信库（cron 每天自己跑，这个是给人按的）。
+        // 放在管理员双因子门里：它只删已过期的、不会误删，但每调用一次就要把整个前缀列一遍，
+        // 开给所有学员等于白送一个算力放大器。
+        if (a === "gc") {
+          const r = await wxSweep(env, Date.now());
+          return Response.json(r, { status: r.ok ? 200 : 400 });
+        }
         if (a === "auth") return Response.json({ ok: true, me });
         if (a === "users") return Response.json(await call({ op: "alist" }), { headers: { "cache-control": "no-store" } });
         if (a === "groups") return Response.json(await call({ op: "agroups" }), { headers: { "cache-control": "no-store" } });
@@ -6011,10 +6018,6 @@ export default {
           }
           if (!out.length) return Response.json({ ok: false, msg: "这次没生出来，换个口味或者过一会儿再点。" }, { status: 502 });
           return Response.json({ ok: true, lines: out, saw: canSee ? imgs.length : 0, blind: (imgs.length && !canSee) ? 1 : 0, srcs: srcs.slice(0, 3) }, { headers: { "cache-control": "no-store" } });
-        }
-        if (a === "gc") {   // 手动清一次库；cron 每天自己跑，这个是给人按的
-          const r = await wxSweep(env, Date.now());
-          return Response.json(r, { status: r.ok ? 200 : 400 });
         }
         const MOMAP = { like: "molike", cmt: "mocmt", cdel: "mocdel", del: "model", news: "monews", badge: "mobadge" };
         if (MOMAP[a]) {
