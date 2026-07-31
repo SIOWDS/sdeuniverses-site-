@@ -1189,7 +1189,7 @@ const PAPER_SPEC = `
 
 近邻找不到不是本事，是没找够——最像的那几个一定存在。若通篇找不出任何近邻，说明你的命名太模糊，
 先把它收紧到能被对手瞄准的程度。
-`;
+\n\n▍交付纪律（三条，机械可查——写坏了下游会当场退回）\n· **第一行必须是论文标题本身**，不是「以下是修改后的完整论文」、不是「好的，我将…」、不是「摘要」也不是「一、引言」。**任何开场白、说明、致谢都不要写**——直接从标题开始。\n· **不要写任何形式的评审史**：不写「承蒙审稿人」「作者感谢匿名审稿人」「根据审稿意见本版已…」「以回应审稿人对…的关切」。**这篇论文并未经过同行评议，写了就是伪造。**（把某位审稿人可能提的质疑当作论证对手来正面回应是可以的，那是修辞；声称本文真的被评审过、并据此说明改了什么，不可以。）\n· **全文用简体中文**，不要出现繁体字。`;
 // 论文用系统提示 = SDE 内功底盘 + 学术论文写作规格
 function paperPrompt(){ return SDE_BASE + PAPER_SPEC; }
 
@@ -1264,7 +1264,7 @@ const REVISE_SPEC = `
 · 目标：让这一版拿回到那位审稿人面前时，他会承认"作者认真对待了意见，文章确实上了一个台阶"。
 
 现在，请输出改好后的完整论文。\n\n▍参考文献铁律（REF_DISCIPLINE_MARK · 最高优先，压倒一切格式要求）\n· 这篇论文里出现的任何一条参考文献、任何一处具体引证，都必须是真实存在、可被查证的。做不到查证，就不要写。\n· 你只能引用你确有把握真实存在的文献——真实作者名下、广为人知、你有高置信度确信其真实存在的著作或论文。凡是你拿不准是否真实、或需要靠猜测拼凑出处的，一律不写。\n· 绝对禁止编造：不得虚构论文/著作的标题、作者、期刊名、出版社、年份、卷期、页码、DOI、链接。不得把真实作者安到一个并不存在的标题上，也不得把一个真实标题的年份/期刊/页码随手填一个。这类编造是本任务最严重的错误，一旦出现，整篇论文即为不合格。\n· 宁缺毋滥：如果就某个论点你没有可靠的真实文献可引，就不要列参考文献，改用'有一种影响深远的看法认为……''某种功能主义传统倾向于……'这类不依赖具体出处的方式，或点出真实思想家其广为人知的核心立场而不给虚构出处。一篇参考文献很短、甚至不设独立参考文献列表的诚实论文，远好过一篇挂满编造引证的论文。\n· 如果确实要列参考文献，只列你高置信度确信真实存在的那几条；对每一条，你都要在心里能回答'这本书/这篇文章真的存在吗'——答不上来就删掉。\n· 一句话：真实 > 完整。查不到就不写，永远不要为了让论文'看起来学术'而编造任何一条文献。
-`;
+\n\n▍交付纪律（三条，机械可查——写坏了下游会当场退回）\n· **第一行必须是论文标题本身**，不是「以下是修改后的完整论文」、不是「好的，我将…」、不是「摘要」也不是「一、引言」。**任何开场白、说明、致谢都不要写**——直接从标题开始。\n· **不要写任何形式的评审史**：不写「承蒙审稿人」「作者感谢匿名审稿人」「根据审稿意见本版已…」「以回应审稿人对…的关切」。**这篇论文并未经过同行评议，写了就是伪造。**（把某位审稿人可能提的质疑当作论证对手来正面回应是可以的，那是修辞；声称本文真的被评审过、并据此说明改了什么，不可以。）\n· **全文用简体中文**，不要出现繁体字。`;
 function reviewPrompt(reflectionText){
   const base = reflectionText
     ? SDE_BASE + '\n\n---\n【这是你本轮开始时亲手写下的《从发现到发生》心得与自我检视——你已诚实检视过发现学与发生学的分野。审稿时请用发生学的眼光把关：不要因为一篇论文"诊断得精确、结构工整、旁征博引"就给高分（那恰恰可能是发现学的顶配伪装成深刻）。要专门揪出它是否滑回了发现学——是否在给对象下定义/贴诊断标签（XX症/XX陷阱/XX悖论）、是否套用现成框架充深刻、是否滑向"回归某个永恒本质"、它的核心命名能否被某个已有概念1:1替换。真正的好论文，是让新结构从矛盾里发生出来、命名不可还原的那种；请据此严苛把关。】\n\n' + reflectionText.trim() + '\n\n---\n'
@@ -1435,7 +1435,7 @@ const PAPER_SPEC_1W = `
 
 近邻找不到不是本事，是没找够——最像的那几个一定存在。若通篇找不出任何近邻，说明你的命名太模糊，
 先把它收紧到能被对手瞄准的程度。
-`;
+\n\n▍交付纪律（三条，机械可查——写坏了下游会当场退回）\n· **第一行必须是论文标题本身**，不是「以下是修改后的完整论文」、不是「好的，我将…」、不是「摘要」也不是「一、引言」。**任何开场白、说明、致谢都不要写**——直接从标题开始。\n· **不要写任何形式的评审史**：不写「承蒙审稿人」「作者感谢匿名审稿人」「根据审稿意见本版已…」「以回应审稿人对…的关切」。**这篇论文并未经过同行评议，写了就是伪造。**（把某位审稿人可能提的质疑当作论证对手来正面回应是可以的，那是修辞；声称本文真的被评审过、并据此说明改了什么，不可以。）\n· **全文用简体中文**，不要出现繁体字。`;
 function paper1wPrompt(){ return SDE_BASE + PAPER_SPEC_1W; }
 
 // ========== 二次 SDE 提智：发生引擎（三方程·123原理·六路径·Δ→S→E·五连问）冲150 ==========
@@ -1508,7 +1508,7 @@ const UPLIFT_SPEC = `
   三个标注若全与「本文所属学科」相同，说明你只在自家门内找了对手，至少换一个真正跨学科的近邻进来。
 
 注意：提智把思想做深，但不许把这一节做掉。整篇重写时，这一节要跟着新命名重写，不是把初稿那一节照搬过来。
-`;
+\n\n▍交付纪律（三条，机械可查——写坏了下游会当场退回）\n· **第一行必须是论文标题本身**，不是「以下是修改后的完整论文」、不是「好的，我将…」、不是「摘要」也不是「一、引言」。**任何开场白、说明、致谢都不要写**——直接从标题开始。\n· **不要写任何形式的评审史**：不写「承蒙审稿人」「作者感谢匿名审稿人」「根据审稿意见本版已…」「以回应审稿人对…的关切」。**这篇论文并未经过同行评议，写了就是伪造。**（把某位审稿人可能提的质疑当作论证对手来正面回应是可以的，那是修辞；声称本文真的被评审过、并据此说明改了什么，不可以。）\n· **全文用简体中文**，不要出现繁体字。`;
 function upliftPrompt(){ return SDE_BASE + UPLIFT_SPEC; }
 
 // ========== 补规范：学术装置增补（接在二次提智之后，只加规范不改思想） ==========
@@ -2954,7 +2954,7 @@ if(fourStartBtn){
     // 收集成功的
     window._fourPapers = results.map((res,i)=>({
       title: paperDefs[i].title,
-      text: res.status==='fulfilled' ? (res.value.text||'') : '',
+      text: res.status==='fulfilled' ? sanitizeAndLog(res.value.text||'', paperDefs[i].title) : '',
       revA: res.status==='fulfilled' ? (res.value.revA||'') : '',
       revB: res.status==='fulfilled' ? (res.value.revB||'') : '',
       revLabelA: res.status==='fulfilled' ? (res.value.revLabelA||'') : '',
@@ -3293,7 +3293,7 @@ if(upliftBtn){
 
     window._upliftPapers = results.map((res,i)=>({
       title: cells[i].title,
-      text: res.status==='fulfilled' ? (res.value.text||'') : ''
+      text: res.status==='fulfilled' ? sanitizeAndLog(res.value.text||'', cells[i].title) : ''
     }));
     const okCount = window._upliftPapers.filter(p=>p.text).length;
 
@@ -3372,7 +3372,7 @@ if(normalizeBtn){
       }));
       window._normalizedPapers = results.map((res,i)=>({
         title: cells[i].title,
-        text: res.status==='fulfilled' ? (res.value||'') : ''
+        text: res.status==='fulfilled' ? sanitizeAndLog(res.value||'', cells[i].title) : ''
       }));
       const okCount = window._normalizedPapers.filter(p=>p.text).length;
       if(st) st.textContent='完成：'+okCount+'/'+defs.length+' 篇已补规范（真实引注·脚注·参考文献）';
@@ -3485,7 +3485,7 @@ if(polishBtn){
       })));
       window._polishedPapers = results.map((res,i)=>({
         title: cells[i].title,
-        text: res.status==='fulfilled' ? (res.value.text||'') : ''
+        text: res.status==='fulfilled' ? sanitizeAndLog(res.value.text||'', cells[i].title) : ''
       }));
       const okCount = window._polishedPapers.filter(p=>p.text).length;
       if(st) st.textContent='完成：'+okCount+'/'+defs.length+' 篇已二次审稿 + 打磨';
@@ -3532,6 +3532,113 @@ function waitStage(varName, triggerBtnId, timeoutMs){
   });
 }
 // 生成 docx Blob（复用 saveWordDocx 的文档构建，但不下载、返回 Blob）
+
+/* ===== 产线三修 · 机械净化（零调用） =====
+   三类脏东西是从真实投稿里倒推出来的，每一类都曾让人工在建页时逐篇清理：
+   ① 繁体漂移（「製止」应为「制止」）
+   ② 基底独白与**虚构的评审史**——「好的，我将综合审稿人A和审稿人B的意见…」
+      「承蒙两位匿名审稿人的尖锐批评」。这批稿从未经过任何同行评议，
+      这类句子是产线残留，不是作者写的。
+      ⚠️ 必须放过**修辞式假想审稿人**（「一个审稿人会问…」「任何审稿人都有理由问」），
+      那是论证手法，删了会伤到正文。
+   ③ 标题槽位失败——首行不是标题而是独白/节标题/产线标记。
+   任何一步都不静默：净化了什么写进 window.__sanitizeLog，界面上给提示。 */
+var T2S = {'製':'制','後':'后','衝':'冲','發':'发','現':'现','來':'来','對':'对','實':'实',
+  '學':'学','經':'经','點':'点','當':'当','機':'机','總':'总','認':'认','關':'关','開':'开',
+  '會':'会','個':'个','為':'为','與':'与','這':'这','種':'种','時':'时','進':'进','間':'间',
+  '產':'产','應':'应','麼':'么','樣':'样','無':'无','業':'业','數':'数','態':'态','體':'体',
+  '傳':'传','導':'导','處':'处','將':'将','見':'见','題':'题','類':'类','結':'结','構':'构',
+  '義':'义','觀':'观','論':'论','說':'说','語':'语','讓':'让','過':'过','還':'还','邊':'边',
+  '變':'变','條':'条','設':'设','識':'识','歷':'历','驗':'验','資':'资','轉':'转','術':'术'};
+function _t2s(s){
+  var out = '', hit = 0;
+  for(var i=0;i<s.length;i++){ var c=s[i]; if(T2S[c]){ out+=T2S[c]; hit++; } else out+=c; }
+  return { text: out, hit: hit };
+}
+/* 整行即基底独白 —— 只在**正文最前面的连续几行**里删，
+   正文中间出现「以下是…」多半是作者自己的行文，不碰。 */
+var MONO_LINE = /^(好的[，。,.]?.{0,60}|以下是(修改|改好|重写|完整)[^\n]{0,40}|让我(先|来)[^\n]{0,40}|现在开始(写|改)[^\n]{0,30}|(改稿|修改)策略如下[：:]?|^\d+\.\s*(问题裁定明示|结构优化)（回应[AB]\d+[^\n]{0,30}）)$/;
+/* 虚构的评审史：句中出现且指向"本文真的被评审过" */
+var FAKE_REVIEW = [
+  [/承蒙(两位|各位|匿名)?审稿人[^。；\n]{0,60}[。；]?/g, ''],
+  [/作者感谢(两位|各位)?匿名审稿人[^。\n]{0,80}。/g, ''],
+  [/[，,]?\s*以回应审稿人对[^。\n]{0,40}的关切/g, ''],
+  [/根据审稿意见[，,]?/g, ''],
+  [/(是)?在审稿意见(的)?推动下(增补|补充|加入)的[，,]?/g, ''],
+  [/审稿人(所)?指出的?(那处|一处|的)/g, '一处'],
+  [/如审稿人所指出的[：:]?/g, ''],
+  [/综合审稿人[AB]和审稿人[AB]的意见[，,]?/g, '']
+];
+/* 修辞式假想审稿人：放过。判据＝出现在虚拟/条件语气里 */
+var RHETORICAL = /(一位|一个|任何|严苛的|挑剔的)?审稿人(可能|会|都有理由|将)/;
+
+function sanitizePaper(text, tag){
+  var log = { t2s:0, mono:0, review:0, title:'ok', tag: tag||'' };
+  // 空文本＝这一篇没写出来，同样要报出来，不能算 ok
+  if(!text){ log.title = 'bad:（空文本）'; return { text:'', log:log }; }
+  var r = _t2s(text); text = r.text; log.t2s = r.hit;
+
+  var lines = text.split('\n');
+  /* ② 掐头：只扫开头 8 行，遇到第一行像标题的就停 */
+  var cut = 0;
+  for(var i=0;i<lines.length && i<8;i++){
+    var t = lines[i].trim();
+    if(!t){ cut = i+1; continue; }
+    if(MONO_LINE.test(t)){ cut = i+1; log.mono++; continue; }
+    break;
+  }
+  if(cut) lines = lines.slice(cut);
+  text = lines.join('\n');
+
+  /* ② 虚构评审史：逐条替换，但整句含修辞式假想审稿人的跳过 */
+  FAKE_REVIEW.forEach(function(pair){
+    text = text.replace(pair[0], function(m){
+      // ⚠️ 这些正则带捕获组，replace 回调的参数是 (match, p1…pn, offset, string)——
+      // 不能写死 (m, off, whole)，否则 off/whole 会错位。一律从 arguments 尾部取。
+      var whole = arguments[arguments.length-1], off = arguments[arguments.length-2];
+      if(typeof whole !== 'string' || typeof off !== 'number') return pair[1];
+      var s = Math.max(0, off-40), e = Math.min(whole.length, off+m.length+40);
+      if(RHETORICAL.test(whole.slice(s,e))) return m;   // 修辞用法，放过
+      log.review++; return pair[1];
+    });
+  });
+  text = text.replace(/[ \t]+\n/g,'\n').replace(/\n{4,}/g,'\n\n\n');
+
+  /* ③ 标题槽位校验：首个非空行必须像标题 */
+  var first = '';
+  var arr = text.split('\n');
+  for(var j=0;j<arr.length;j++){ if(arr[j].trim()){ first = arr[j].trim(); break; } }
+  var bad = (!first)
+    || first.length > 80
+    || /^(摘\s*要|关键词|ABSTRACT|一、|1[\.．]|引言|导论|点题)/.test(first)
+    || /^(提升·)?论文\s*[①②③④⑤⑥⑦⑧⑨⑩]/.test(first)
+    || /金点子\s*[①②③④⑤⑥⑦⑧⑨⑩]/.test(first)
+    || /[。！？]$/.test(first);
+  log.title = bad ? ('bad:'+first.slice(0,30)) : 'ok';
+  return { text: text, log: log };
+}
+window.__sanitizeLog = [];
+function sanitizeAndLog(text, tag){
+  var r = sanitizePaper(text, tag);
+  if(r.log.t2s || r.log.mono || r.log.review || r.log.title!=='ok') window.__sanitizeLog.push(r.log);
+  return r.text;
+}
+/* 把净化结果说给人听——不静默 */
+function sanitizeNotice(){
+  var L = window.__sanitizeLog || [];
+  if(!L.length) return '';
+  var t2s=0, mono=0, rev=0, bad=[];
+  L.forEach(function(x){ t2s+=x.t2s; mono+=x.mono; rev+=x.review;
+    if(x.title!=='ok') bad.push((x.tag||'?')+'：'+x.title.replace(/^bad:/,'')); });
+  var parts=[];
+  if(t2s) parts.push('繁体字已归一 '+t2s+' 处');
+  if(mono) parts.push('掐掉基底独白 '+mono+' 行');
+  if(rev) parts.push('清除虚构评审史 '+rev+' 处');
+  var s = parts.length ? ('　🧹 '+parts.join('；')) : '';
+  if(bad.length) s += '　⚠️ 首行不像标题，请人工确认：'+bad.join('｜');
+  return s;
+}
+
 function buildPapersDocxBlob(title, subtitle, papers){
   const { Document, Packer, Paragraph, TextRun, AlignmentType } = docx;
   const children = [ new Paragraph({ children:[new TextRun({ text:title, bold:true, size:36, color:'1a1205' })], spacing:{ after:140 }, alignment:AlignmentType.CENTER }) ];
@@ -3539,8 +3646,10 @@ function buildPapersDocxBlob(title, subtitle, papers){
   try{ children.push(thoughtDeclPara()); }catch(_){}
   (papers||[]).forEach((pp)=>{
     if(!pp || !pp.text) return;
+    // 产线三修的最后一道：进投稿箱的文本一定是净化过的
+    var _clean = sanitizeAndLog(pp.text, pp.title||'');
     children.push(new Paragraph({ children:[new TextRun({ text:pp.title||'（未命名）', bold:true, size:30, color:'1a1205' })], spacing:{ before:260, after:160 }, pageBreakBefore:true }));
-    children.push(...mdParas(pp.text, { size:24, color:'222222', titleFirst:true, titleSize:32, autoHeading:true, justify:false }));
+    children.push(...mdParas(_clean, { size:24, color:'222222', titleFirst:true, titleSize:32, autoHeading:true, justify:false }));
   });
   const doc = new Document({ sections:[{ properties:{}, children }] });
   return Packer.toBlob(doc);
@@ -3563,7 +3672,7 @@ async function submitPolishedToInbox(pass, student, setStatus){
   fd.append('student', student||'');
   fd.append('note', '【金点子发生器·一键投稿】'+(student?('作者：'+student+'　·　'):'')+'原初问题：'+q.slice(0,280));
   fd.append('file', blob, fname);
-  setStatus && setStatus('正在上传到收件箱…');
+  setStatus && setStatus('正在上传到收件箱…'+sanitizeNotice());
   const resp = await fetch('/api/submit', { method:'POST', body:fd });
   let r={}; try{ r = await resp.json(); }catch(_){}
   if(resp.status===200 && r.ok){ return true; }
