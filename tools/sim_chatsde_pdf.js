@@ -14,7 +14,7 @@ const ok = (n, c) => { if (c) { pass++; console.log("  ✓ " + n); } else { fail
 /* ═══ 一、模块本身 ═══ */
 console.log("── /assets/wds-pdf.js ──");
 const PDF = require(path.join(ROOT, "public/assets/wds-pdf.js"));
-ok("导出 VERSION/doc/scrub/print", PDF.VERSION >= 1 && typeof PDF.doc === "function" && typeof PDF.scrub === "function" && typeof PDF.print === "function");
+ok("导出 VERSION/doc/scrub/print/fitWide", PDF.VERSION >= 2 && typeof PDF.doc === "function" && typeof PDF.scrub === "function" && typeof PDF.print === "function" && typeof PDF.fitWide === "function");
 
 const H = PDF.doc({
   title: "与 WDS 的对话",
@@ -60,6 +60,47 @@ const X = PDF.doc({ title: '<img src=x onerror="hack()">', meta: ['"><script>h()
 ok("标题里的尖括号被转义（当文本贴，不当 html）", X.indexOf("&lt;img") > 0 && X.indexOf("<img") < 0);
 ok("meta 里的注入被转义", X.indexOf("hack()") < 0 && X.indexOf("h()") < 0 || X.indexOf("&lt;script&gt;") > 0);
 ok("空对话也出得了一份合法稿子", /<\/html>$/.test(PDF.doc({}).trim()));
+
+/* ═══ 一之二、公式（2026-08-01「升级为最高配置」）═══ */
+console.log("── 公式 ──");
+const KTX = '<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML">' +
+  '<semantics><mrow><mi>S</mi></mrow><annotation encoding="application/x-tex">S=F(D,E)</annotation></semantics>' +
+  '</math></span><span class="katex-html" aria-hidden="true"><span class="base">S</span></span></span>';
+const KC = PDF.scrub(KTX);
+ok("KaTeX 的可视 HTML 原样留着", KC.indexOf("katex-html") > 0 && KC.indexOf('<span class="katex">') === 0);
+// 一条公式 KaTeX 出两份：MathML（含 TeX 原文）＋ 可视 HTML。屏幕上前者靠 clip 藏起来，
+// 印进 PDF 之后照样躺在文字层里——选中/搜索会把同一条式子取出三遍。
+ok("重复的 MathML 连同 TeX 原文一并摘掉", KC.indexOf("katex-mathml") < 0 && KC.indexOf("annotation") < 0);
+ok("摘 MathML 不会误伤正文", PDF.scrub("<p>a</p>" + KTX + "<p>b</p>").indexOf("<p>b</p>") > 0);
+
+const M = PDF.doc({ blocks: [{ html: KTX }], katex: "/assets/katex/katex.min.css", base: "https://sdeuniverses.com/" });
+ok("<base> 钉住了（srcdoc 的相对地址各家解析不一）", M.indexOf('<base href="https://sdeuniverses.com/">') > 0);
+ok("引的是站内自托管 katex 样式", M.indexOf('href="/assets/katex/katex.min.css"') > 0);
+// katex.min.css 自带 .katex-display{overflow-x:auto}——屏幕上是滚动条，纸上就是被裁掉一截
+ok("块级公式改回 overflow visible（否则印出来缺一截）", /\.katex-display\{[^}]*overflow-x:visible/.test(M));
+ok("块级公式不许被切页", /\.katex-display\{[^}]*break-inside:avoid/.test(M));
+ok("**没有**给 .katex 设 max-width（一设就永远量不出超宽）", !/\.katex-display>\.katex\{[^}]*max-width/.test(M));
+ok("KaTeX 装不上时的 $…$ 兜底也有样式", /\.wdsm-tex\.raw\{/.test(M) && /\.wdsm-tex\.blk\{/.test(M));
+
+/* fitWide：配一副只回答"多宽"的假 document 直测缩放判据 */
+function fakeBox(w) {
+  const inner = { style: {}, offsetHeight: 40, offsetWidth: w, scrollWidth: w, getBoundingClientRect: () => ({ width: w }) };
+  const box = { style: {}, attrs: {}, querySelector: () => inner, firstElementChild: inner,
+                setAttribute: (k, v) => { box.attrs[k] = v; }, _inner: inner };
+  return box;
+}
+function runFit(hostW, boxes) {
+  PDF.fitWide({ querySelector: (s) => (s === ".wrap" ? { clientWidth: hostW } : null), querySelectorAll: () => boxes });
+}
+const narrow = fakeBox(400), wide = fakeBox(1200), huge = fakeBox(9000);
+runFit(600, [narrow, wide, huge]);
+ok("没超宽的公式一个字节都不动", !narrow._inner.style.transform && !narrow.attrs["data-fit"]);
+// 缩的是内层 .katex，外层留着占位——缩外层会把上下留白一起压扁
+ok("超宽的被等比缩到版心（缩的是内层）", /^scale\(0\.49/.test(wide._inner.style.transform || "") && wide.attrs["data-fit"] === "0.498" && !wide.style.transform);
+ok("缩放有下限 0.45（再小就不是给人读的了）", huge.attrs["data-fit"] === "0.450");
+ok("缩过的外层收了高、切了溢出（transform 不改布局高度）", wide.style.overflow === "hidden" && /px$/.test(wide.style.height || ""));
+ok("版心量不到就整段跳过，不乱缩", (() => { const b = fakeBox(9000); PDF.fitWide({ querySelector: () => null, querySelectorAll: () => [b] }); return !b._inner.style.transform; })());
+ok("传进来的不是 document 也不炸", (() => { try { PDF.fitWide(null); PDF.fitWide({}); return true; } catch (e) { return false; } })());
 
 /* ═══ 二、抠出 pdfBlocks 配假 DOM 真跑 ═══ */
 console.log("── pdfBlocks（真代码 + 假 DOM）──");
@@ -151,6 +192,17 @@ ok("空对话不让导（needTalk）", /function exportPdf\(\) \{\s*\n\s*if \(!h
   ok("中英两套文案都有 " + k, (SRC.match(new RegExp("\\b" + k + ":", "g")) || []).length === 2);
 });
 ok("公式走自托管 katex（打印时 CDN 未必在）", SRC.indexOf('katex: "/assets/katex/katex.min.css"') > 0);
+ok("出稿带 base", /base: \(location && location\.origin/.test(SRC));
+ok("模块要到 v2（等字体、缩超宽公式）", /var PDF_WANT = 2;/.test(SRC));
+// KaTeX 挂在 CDN 上，等于把"界面上有没有公式"押在第三方可达性上，PDF 跟着一起赌
+ok("KaTeX 自托管排第一顺位", /var KTX_HOSTS = \["\/assets\/katex",/.test(SRC));
+ok("导出前先把没排的公式排完（pdfMath 在取稿之前）",
+   /pdfMath\(function \(\) \{\n\s*var blocks = pdfBlocks\(\);/.test(SRC));
+// typeset() 按 MATH[data-m] 取源码，而 MATH 是上一次 mdRender 的全局数组——
+// 导出这一刻下标撞上就会渲染出另一条式子。错得像对的，比空着更坏。
+ok("pdfMath 不碰全局 MATH（一律以 DOM 里的 $…$ 原文为准）",
+   (() => { const m = /function pdfMath\(then\) \{[\s\S]*?\n  \}/.exec(SRC); return m && m[0].indexOf("MATH[") < 0 && m[0].indexOf("textContent") > 0; })());
+ok("KaTeX 拉不动也要出稿（有超时兜底）", /setTimeout\(go, 6000\)/.test(SRC));
 // 上游（用户令）刻意删掉的空态提示，不许借这次改动加回来
 ok("没有把空态 hero 提示加回来", SRC.indexOf("heroAfter") < 0
   && !/class=.?.?wdsm-hero-after/.test(SRC)

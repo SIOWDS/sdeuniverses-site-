@@ -238,7 +238,9 @@
   /* ── 公式排版：KaTeX 懒加载（jsdelivr，失败退 unpkg）。装不上就保持原样显示 $...$，
      不假装渲染过。只在正文写完后跑一次——流式中每帧重排会闪。 ── */
   var KTX = { on: 0, load: 0 };
-  var KTX_HOSTS = ["https://cdn.jsdelivr.net/npm/katex@0.16.9/dist", "https://unpkg.com/katex@0.16.9/dist"];
+  // 自托管排第一：/assets/katex 就在本站（20 个 woff2 齐）。CDN 只当备胎——
+  // 挂着 CDN 等于把"界面上有没有公式"押在第三方可达性上，导出的 PDF 跟着一起赌。
+  var KTX_HOSTS = ["/assets/katex", "https://cdn.jsdelivr.net/npm/katex@0.16.9/dist", "https://unpkg.com/katex@0.16.9/dist"];
   function katexBoot(cb) {
     if (window.katex) { KTX.on = 1; cb(); return; }
     if (KTX.load) { setTimeout(function () { cb(); }, 600); return; }
@@ -3534,7 +3536,7 @@
      把对话排成一份干净的印刷稿，最后一步交给「另存为 PDF」。
      ⚠️ 稿子取的是**已经渲染好的 DOM**（.wdsm-a），不是 mdRender(history)：公式已被
      typeset 过、站内篇目已被 autoLink 挂上，重渲一遍这两样都会掉。取不到 DOM 才回退。 */
-  var PDF_WANT = 1;
+  var PDF_WANT = 2;                 // v2 起：等字体、缩超宽公式（见 /assets/wds-pdf.js）
   function pdfBoot(then, forced) {
     if (window.WDSPdf && window.WDSPdf.VERSION >= PDF_WANT) { then(true); return; }
     if (window.WDSPdf && !forced) { delete window.WDSPdf; return pdfBoot(then, true); }
@@ -3572,20 +3574,48 @@
     });
     return out;
   }
+  /* 导出前把还没排的公式就地排完。
+     ⚠️ **不复用 typeset()**：它按 MATH[data-m] 取源码，而 MATH 是上一次 mdRender 留下的
+        全局数组——导出这一刻它装的是别的回答的公式，下标撞上就会渲染出**另一条式子**
+        （比空着更坏：错得像对的）。这里一律以 DOM 里的 $…$ 原文为准。 */
+  function pdfMath(then) {
+    var raws = msgsEl ? msgsEl.querySelectorAll(".wdsm-tex.raw") : [];
+    if (!raws || !raws.length) { then(); return; }
+    var done = false, go = function () { if (done) return; done = true; then(); };
+    setTimeout(go, 6000);                       // KaTeX 拉不动也要出稿，只是公式保持 $…$ 原样
+    katexBoot(function () {
+      if (window.katex) {
+        for (var i = 0; i < raws.length; i++) {
+          var e = raws[i], s = String(e.textContent || "").trim();
+          var blk = String(e.className).indexOf("blk") >= 0 || /^\$\$/.test(s);
+          var src = s.replace(/^\$\$([\s\S]*)\$\$$/, "$1").replace(/^\$([\s\S]*)\$$/, "$1");
+          if (!src) continue;
+          try {
+            e.innerHTML = window.katex.renderToString(src, { displayMode: blk, throwOnError: false });
+            e.classList.remove("raw");
+          } catch (e2) {}
+        }
+      }
+      go();
+    });
+  }
   function exportPdf() {
     if (!history.length) { alert(t("needTalk")); return; }
     toast(t("pdfWait"));
     pdfBoot(function (ok) {
       if (!ok) { alert(t("pdfNo")); return; }
+      pdfMath(function () {
       var blocks = pdfBlocks();
       window.WDSPdf.print({
         title: t("convoTitle"),
         lang: LANG === "en" ? "en" : "zh",
         katex: "/assets/katex/katex.min.css",
+        base: (location && location.origin ? location.origin + "/" : ""),
         meta: [new Date().toLocaleString(), blocks.length + t("sbTurnsN"), "ChatSDE · sdeuniverses.com"],
         blocks: blocks.map(function (b) { return { q: b.q, html: b.html, qLabel: t("pdfMe"), aLabel: "WDS" }; }),
         foot: t("pdfFoot"),
       }, function (done) { if (!done) alert(t("pdfNo")); else toast(t("pdfTip")); });
+      });
     });
   }
 

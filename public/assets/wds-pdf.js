@@ -18,7 +18,7 @@
  */
 (function (w) {
   "use strict";
-  var VERSION = 1;
+  var VERSION = 2;   // v2：公式（KaTeX）当一等公民——字体等齐再打印、超宽公式自动缩到版心
 
   function esc(s) {
     return String(s == null ? "" : s).replace(/[&<>"]/g, function (m) {
@@ -30,6 +30,11 @@
      而且不需要先造一棵可能带副作用的树。 */
   function scrub(html) {
     var s = String(html || "");
+    /* KaTeX 每条公式都出两份：一份 MathML（含 <annotation> 里的 TeX 原文），一份可视 HTML。
+       屏幕上前者靠 clip 隐藏，**但那是"看不见"不是"不存在"**——印进 PDF 之后它照样躺在
+       文字层里，选中/复制/搜索会把同一条公式取出三遍（MathML ＋ TeX 源码 ＋ 正文）。
+       印刷稿不需要 MathML，直接摘掉：省字节，也让 PDF 里选出来的东西就是看见的东西。 */
+    s = s.replace(/<span class="katex-mathml">[\s\S]*?<\/math><\/span>/gi, "");
     s = s.replace(/<script[\s\S]*?<\/script>/gi, "");
     s = s.replace(/<style[\s\S]*?<\/style>/gi, "");
     s = s.replace(/<(button|input|select|textarea|iframe|object|embed|form)[\s\S]*?<\/\1>/gi, "");
@@ -76,6 +81,19 @@
     '.a img{max-width:100%;height:auto}' +
     '.a a{color:#8a6d1f;text-decoration:none}' +
     '.a hr{border:0;border-top:1px solid #e6e1d3;margin:1em 0}' +
+    /* ── 公式：KaTeX 的行内/块级两路，外加"装不上 KaTeX"时的原样 $…$ 兜底 ──
+       ⚠️ katex.min.css 里的 .katex-display 带 overflow-x:auto——屏幕上是滚动条，
+          印到纸上就是**直接被裁掉一截**。这里必须显式改回 visible。 */
+    '.katex{font-size:1.06em;line-height:1.35}' +
+    '.katex-display{margin:.85em 0;overflow-x:visible;overflow-y:visible;break-inside:avoid;text-align:center}' +
+    // ⚠️ 这里**不能**给 .katex 设 max-width:100%——一设，超宽公式的盒子就被夹到版心宽，
+    //    量出来永远"没超"，fitWide 一条都不会缩，纸上照样冲出去。让它自然撑开再去量。
+    '.katex-display>.katex{display:inline-block;white-space:nowrap}' +
+    '.wdsm-tex{font-family:"Latin Modern Math","Times New Roman",serif}' +
+    '.wdsm-tex.blk{display:block;margin:.85em 0;text-align:center;break-inside:avoid;overflow:visible}' +
+    '.wdsm-tex.raw{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.92em;color:#6b5b2f;' +
+      'background:#f7f5ef;border:1px dashed #ddd6c4;border-radius:3px;padding:.05em .3em}' +
+    '.katex .katex-mathml{position:absolute;clip:rect(1px,1px,1px,1px);width:1px;height:1px;overflow:hidden}' +
     '.rule{border:0;border-top:1px solid #ece7db;margin:0 0 22px}' +
     '.foot{margin-top:30px;padding-top:10px;border-top:1px solid #ece7db;font-size:8.5pt;color:#8b8271;line-height:1.7}' +
     '@media screen{body{padding:28px 22px;max-width:820px;margin:0 auto}}';
@@ -92,6 +110,9 @@
     h += '<!DOCTYPE html><html lang="' + lang + '"><head><meta charset="utf-8">';
     h += "<title>" + esc(title) + "</title>";
     h += '<meta name="viewport" content="width=device-width,initial-scale=1">';
+    // srcdoc 文档的相对地址在几家浏览器里解析口径不一致（about:srcdoc vs 父页 base），
+    // 而答案里可能带站内图片、KaTeX 的字体又是 CSS 里的相对路径——显式钉一个 base 最稳。
+    if (o.base) h += '<base href="' + esc(o.base) + '">';
     h += katex;
     h += "<style>" + CSS + "</style></head><body><div class=wrap>";
     h += '<div class=cover><h1>' + esc(title) + "</h1><div class=meta>";
@@ -125,6 +146,11 @@
     ifr.onload = function () {
       var win = ifr.contentWindow;
       if (!win) { kill(); cb(false); return; }
+      /* 顺序是判据：**字体没到位就量不准**（KaTeX 的每一个符号宽度都来自它自己的字体，
+         回退字体下量出来的宽度是错的，缩放系数跟着错），所以必须
+         等字体 → 量宽并缩 → 等图 → 打印。这四步换个次序，公式要么被裁、要么缩过头。 */
+      waitFonts(win.document, function () {
+      fitWide(win.document);
       // 图片没解码完就打印，那几张图在 PDF 里会是空的——等一等，但不无限等。
       waitImgs(win.document, function () {
         try {
@@ -139,11 +165,56 @@
         } catch (e) { kill(); cb(false); return; }
         setTimeout(kill, 120000);   // 兜底：afterprint 在几家浏览器里不一定来
       });
+      });
     };
     try {
       if ("srcdoc" in ifr) ifr.srcdoc = html;
       else { var d = ifr.contentWindow.document; d.open(); d.write(html); d.close(); }
     } catch (e) { kill(); cb(false); }
+  }
+
+  /* 等 webfont：KaTeX 的字形全在它自己的字体里，字体没落地就打印，
+     出来的公式要么是方框、要么是回退字体拼出来的歪东西。document.fonts 没有就直接过。 */
+  function waitFonts(d, then) {
+    var fired = false;
+    var go = function () { if (fired) return; fired = true; then(); };
+    try {
+      if (d.fonts && d.fonts.ready && typeof d.fonts.ready.then === "function") {
+        d.fonts.ready.then(function () { setTimeout(go, 60); }, go);
+        setTimeout(go, 4000);          // 字体拉不动也得出稿
+        return;
+      }
+    } catch (e) {}
+    setTimeout(go, 260);               // 没有 FontFaceSet 的老浏览器：给样式一点时间
+  }
+
+  /* 超宽的块级公式（长推导、大矩阵）在纸上会横着冲出版心，而 KaTeX 的 HTML 不会自动折行。
+     ⇒ 量一次，超了就等比缩到版心宽度（下限 0.45，再小就不是给人读的了）。
+     缩的是内层 .katex，外层留着占位；transform 不改变布局高度，所以外层要显式收一下高。 */
+  function fitWide(d) {
+    try {
+      var host = d.querySelector(".wrap");
+      var W = host ? host.clientWidth : 0;
+      if (!W) return;
+      var list = d.querySelectorAll(".katex-display,.wdsm-tex.blk");
+      for (var i = 0; i < list.length; i++) {
+        var box = list[i];
+        var inner = box.querySelector(".katex") || box.firstElementChild || box;
+        // 量 getBoundingClientRect：inline-block 溢出时 scrollWidth 只报可视宽，会漏判
+        var r = inner.getBoundingClientRect ? inner.getBoundingClientRect() : null;
+        var w = Math.max((r && r.width) || 0, inner.scrollWidth || 0, inner.offsetWidth || 0);
+        if (!w || w <= W) continue;
+        var sc = Math.max(0.45, (W - 2) / w);
+        var h0 = inner.offsetHeight || 0;
+        inner.style.display = "inline-block";
+        inner.style.transformOrigin = "left top";
+        inner.style.transform = "scale(" + sc.toFixed(3) + ")";
+        box.style.textAlign = "left";
+        box.style.overflow = "hidden";
+        if (h0) box.style.height = Math.ceil(h0 * sc) + "px";
+        box.setAttribute("data-fit", sc.toFixed(3));
+      }
+    } catch (e) {}
   }
 
   function waitImgs(d, then) {
@@ -190,6 +261,6 @@
     else printFrame(html, second);
   }
 
-  w.WDSPdf = { VERSION: VERSION, doc: doc, scrub: scrub, print: print, esc: esc };
+  w.WDSPdf = { VERSION: VERSION, doc: doc, scrub: scrub, print: print, esc: esc, fitWide: fitWide };
   if (typeof module !== "undefined" && module.exports) module.exports = w.WDSPdf;
 })(typeof window !== "undefined" ? window : this);
