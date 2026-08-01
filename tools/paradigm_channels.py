@@ -132,9 +132,46 @@ def build_pages(db, h):
     return n
 
 
+STAMP_BEG = "<!-- ch-stamp -->"
+
+
+def stamp_articles(db):
+    """在每篇文章页的眉题下加一行「频道 · X」，链到该频道页。
+
+    ⚠️ 位置是有讲究的：**必须另起一个兄弟 div，不能塞进 art-series/hero-eyebrow 里面**。
+    `paradigm_renumber.py` 用 `((?:art-series|hero-eyebrow)">)[^<]*(</div>)` 重写那一行的
+    纯文本，里面塞任何标签都会被它整段抹掉（而且它 assert 只匹配一次，塞坏了会直接报错）。
+    本函数幂等：先摘掉旧的一行，再插新的。
+    """
+    n = 0
+    cn = {c["id"]: c["cn"] for c in db["channels"]}
+    for u, cid in sorted(db["map"].items()):
+        f = ROOT / "public" / u.strip("/") / "index.html"
+        if not f.exists():
+            print("  ✗ 页面不存在：%s" % u); continue
+        h = f.read_text(encoding="utf-8")
+        # 连同前面的空白一起摘掉，否则每跑一次就多缩进一行（内容幂等而字节不幂等）
+        h = re.sub(r"\s*" + re.escape(STAMP_BEG) + r'<div class="art-channel".*?</div>', "", h, flags=re.S)
+        line = ('%s<div class="art-channel" style="margin:6px 0 2px;font-size:12.5px;'
+                'letter-spacing:.14em;color:#B5714A;opacity:.92">频道 · '
+                '<a href="/paradigm/%s/" style="color:#B5714A;text-decoration:none;'
+                'border-bottom:1px solid rgba(181,113,74,.45)">%s</a></div>'
+                % (STAMP_BEG, cid, html.escape(cn[cid])))
+        m = re.search(r'<div class="(?:art-series|hero-eyebrow)">[^<]*</div>', h)
+        assert m, "%s：找不到眉题行" % u
+        h = h[:m.end()] + "\n  " + line + h[m.end():]
+        assert h.count("<div") == h.count("</div>"), "%s：div 不配平" % u
+        assert len(re.findall(r'class="(?:art-series|hero-eyebrow)"', h)) == 1, "%s：眉题行不唯一" % u
+        f.write_text(h, encoding="utf-8")
+        n += 1
+    print("  已标注 %d 篇" % n)
+    return n
+
+
 def main():
     ap = argparse.ArgumentParser(); ap.add_argument("--audit", action="store_true")
     ap.add_argument("--pages", action="store_true", help="同时重建六个频道子页")
+    ap.add_argument("--stamp", action="store_true", help="在每篇文章页眉题下标注所属频道（幂等）")
     a = ap.parse_args()
     db = json.loads(DB.read_text(encoding="utf-8"))
     h = PAGE.read_text(encoding="utf-8")
@@ -168,6 +205,9 @@ def main():
     if a.pages:
         print("频道子页：")
         build_pages(db, h)
+    if a.stamp:
+        print("文章页频道标注：")
+        stamp_articles(db)
 
 
 if __name__ == "__main__":
