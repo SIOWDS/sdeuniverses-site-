@@ -216,6 +216,7 @@ a{color:var(--disc)}
 <!-- 全站三态：浏览 / SDE 微信 / SDE 对话。模块自己会挂到 .top 顶栏上 -->
 <script src="/assets/sde-modes.js?v=20260731v" defer></script>
   <script src="/assets/sde-nbr.js"></script>
+  <script src="/assets/sde-dist.js?v=1"></script>
 </head>
 <body>
 <div id="app">
@@ -1387,7 +1388,7 @@ function moFmt(ts){var d=new Date(ts),n=Date.now()-ts;
    ③ 落卡前先查近邻库（/assets/sde-nbr.js，零调用不烧 Key）。**库未命中 ≠ 未被占位**——
       这句不是谨慎，是实测：评测集 35 条真候选里有 4 条与正主一个词都不共享。
    ④ 共享密码 ⇒ 作者不可验证，所以这里**没有声望分、没有排行榜**；「活下来」只是一个状态。 */
-var cdWho="",cdWhoName="",cdCards=[],cdRoster=null;
+var cdWho="",cdWhoName="",cdCards=[],cdRoster=null,cdRosterRaw=null;
 var CD_STATE={open:["顶回期",""],untouched:["未交手","#8a8a8a"],dead:["死格","#b3261e"],alive:["已交手","#1a7f5a"]};
 var CD_KIND={occ:"占位者",rev:"反向预测",lvl:"换承重层级"};
 
@@ -1803,6 +1804,7 @@ function cdOne(id){
 function cdRosterLoad(){
   if(cdRoster)return Promise.resolve(cdRoster);
   return fetch("/students/roster.json").then(function(r){return r.json()}).then(function(j){
+    cdRosterRaw=((j&&j.students)||[]);      // v2 点将要 slug，下面那张表只留了 name
     cdRoster=((j&&j.students)||[]).map(function(s){
       var f={};((s.papers)||[]).forEach(function(p){if(p&&p.field)f[p.field]=1;});
       return {name:s.name,n:((s.papers)||[]).length,fields:f};
@@ -1810,9 +1812,10 @@ function cdRosterLoad(){
     return cdRoster;
   }).catch(function(){cdRoster=[];return cdRoster;});
 }
-function cdPickWho(){
-  // 点将 v1：按**作品领域完全不重叠**挑，作品多的优先（活跃）。
-  // 这是领域级，不是语汇族级——语汇族要每人的全文，日后再上，现在先能用。
+function cdPickWhoV1(){
+  // 回退档：按**作品领域完全不重叠**挑。留着是因为 v2 有三种取不到的情形
+  // （模块没加载／库里还没有我／命题还没写够字数），那时总得有人可点。
+  // 它的毛病是几乎挑不动：20 人 190 对里领域完全不重叠的只有 7 对。
   var box=el("cd-picks");if(!box)return;
   cdRosterLoad().then(function(rs){
     var me=null;rs.forEach(function(x){if(x.name===ME.name)me=x;});
@@ -1825,9 +1828,34 @@ function cdPickWho(){
     if(!far.length){box.textContent="";return;}
     box.innerHTML='点将（按<b>作品领域与你不重叠</b>挑，落卡后他们会看到）：'
       +far.map(function(x){return esc(x.name);}).join("、")
-      +'<br><span style="font-size:0.74rem">现在是领域级的粗算，不是语汇族级——挑得出人就够用，日后再精。</span>';
+      +'<br><span style="font-size:0.74rem">这是领域级的粗算——语汇族库这次没取到，先用它顶上。</span>';
     box.setAttribute("data-picks",far.map(function(x){return x.name;}).join(","));
   });
+}
+/* 点将 v2 · 语汇族级（/assets/sde-dist.js，零调用不烧 Key）
+   问的是「谁离**这条命题**最远」，不是「谁离**这个人**最远」——
+   一个人整体离你很远，却可能恰好在这条命题上跟你撞在一起，那就不该点他。
+   推的是池不是人：距离决定谁进池，轮转决定这次叫谁。直接取最远那一个，
+   实测会让同一个人被推给几乎所有人（最集中的一位吃到 16 次），
+   顶回请求全压给他，他第二天就不来了。 */
+function cdPickWho(){
+  var box=el("cd-picks");if(!box)return;
+  var prop=((el("cd-prop")&&el("cd-prop").value)||"").trim();
+  if(!window.SDEDist||prop.length<8){cdPickWhoV1();return;}
+  var mySlug="";
+  cdRosterLoad().then(function(){
+    try{
+      var rs=(cdRosterRaw||[]);
+      for(var i=0;i<rs.length;i++)if(rs[i].name===ME.name){mySlug=rs[i].slug||"";break;}
+    }catch(e){}
+    return window.SDEDist.forText(prop,3,mySlug);
+  }).then(function(far){
+    if(!far||!far.length){cdPickWhoV1();return;}
+    box.innerHTML='点将（按<b>语汇族距离</b>挑：谁离这条命题最远，落卡后他们会看到）：'
+      +far.map(function(x){return esc(x.name)+'<span style="opacity:.6">（'+(x.fields||[]).slice(0,1).join("")+'）</span>';}).join("、")
+      +'<br><span style="font-size:0.74rem">从最远的一批里轮着点，不是每次都叫同一个人。距离是词面粗算，不代表他一定看得懂这条——他看不懂也是一种读数。</span>';
+    box.setAttribute("data-picks",far.map(function(x){return x.name;}).join(","));
+  }).catch(function(){cdPickWhoV1();});
 }
 var cdNbrTimer=null;
 function cdNbrCheck(){
@@ -1841,6 +1869,8 @@ function cdNbrCheck(){
     box.setAttribute("data-nbr",JSON.stringify({status:res.status,verdict:res.verdict,
       hits:(res.hits||[]).slice(0,5).map(function(x){return {prop:x.prop,who:(x.src&&x.src.author)||""};})}));
   }).catch(function(){box.textContent="占位库没查成（不影响落卡）。";});
+  // 命题变了，该点的人也就变了——v2 问的是「谁离这条命题最远」，不重算就还是上一条的答案
+  try{cdPickWho();}catch(e){}
 }
 
 function moGo(who,name){
