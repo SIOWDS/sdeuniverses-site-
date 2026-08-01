@@ -76,6 +76,25 @@
     ".wdsr-streaming::after{content:'\\25AA';color:#3DA5A5;margin-left:1px;animation:wdsrBlink 1s step-end infinite}" +
     ".wdsr-focuswrap:empty{display:none}" +
     ".wdsr-chip{margin:0 14px 8px;background:rgba(61,165,165,.09);border:1px solid rgba(61,165,165,.3);border-radius:8px;padding:8px 10px;display:flex;gap:8px;align-items:flex-start;animation:wdsrFade .25s ease both}" +
+    ".wdsr-acts{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 2px}" +
+    ".wdsr-act{background:transparent;border:1px solid rgba(255,255,255,.18);color:#AEB9C6;border-radius:14px;padding:3px 10px;font:inherit;font-size:11.5px;cursor:pointer;line-height:1.6}" +
+    ".wdsr-act:hover{border-color:#5FA8D3;color:#8FC4E8}" +
+    ".wdsr-pan{flex:1 1 100%;margin:6px 0 2px;padding:10px 11px;border:1px solid rgba(255,255,255,.14);border-radius:6px;background:rgba(255,255,255,.03)}" +
+    ".wdsr-pt{font-size:12.5px;color:#E6EDF3;font-weight:600;margin-bottom:4px}" +
+    ".wdsr-ph{font-size:11.5px;color:#7E8B99;line-height:1.75;margin-bottom:7px}" +
+    ".wdsr-pan label{display:block;font-size:11px;color:#8FA0B2;margin:6px 0 3px}" +
+    ".wdsr-pan textarea{width:100%;box-sizing:border-box;background:rgba(0,0,0,.28);color:#E6EDF3;border:1px solid rgba(255,255,255,.14);border-radius:4px;padding:6px 8px;font:inherit;font-size:12px;line-height:1.7;resize:vertical}" +
+    ".wdsr-gate{font-size:11px;color:#9DB6D4;line-height:1.7;margin:7px 0 0;padding:6px 8px;background:rgba(95,168,211,.08);border-radius:4px}" +
+    ".wdsr-prow{display:flex;gap:6px;margin-top:8px}" +
+    ".wdsr-actnote{font-size:11px;color:#8FA0B2;margin-top:6px;line-height:1.7}" +
+    ".wdsr-actnote.wdsr-bad{color:#E8897B}" +
+    ".wdsr-list{margin-top:6px;display:flex;flex-direction:column;gap:5px}" +
+    ".wdsr-agent{text-align:left;background:transparent;border:1px solid rgba(255,255,255,.13);border-radius:5px;padding:7px 9px;cursor:pointer;font:inherit;color:#AEB9C6}" +
+    ".wdsr-agent:hover{border-color:#5FA8D3}" +
+    ".wdsr-agent b{display:block;font-size:12px;color:#E6EDF3;font-weight:600;margin-bottom:2px}" +
+    ".wdsr-agent span{display:block;font-size:11px;color:#7E8B99;line-height:1.65}" +
+    ".wdsr-agent i{display:block;font-size:10.5px;color:#5F7183;font-style:normal;margin-top:2px}" +
+    ".wdsr-pan a{color:#5FA8D3}"
     ".wdsr-chiptag{color:#3DA5A5;font-size:10px;letter-spacing:1px;margin-top:2px;white-space:nowrap}" +
     ".wdsr-chiptext{flex:1;color:#E8E4DA;font-size:12.5px;font-family:'Songti SC',serif;line-height:1.5}" +
     ".wdsr-chipx{background:none;border:none;color:#7C8798;cursor:pointer;font-size:15px;line-height:1;padding:0}" +
@@ -123,6 +142,7 @@
 
   var msgsEl = q1(".wdsr-msgs", panel), inputEl = q1(".wdsr-input", panel), sendEl = q1(".wdsr-send", panel), focusWrap = q1(".wdsr-focuswrap", panel);
   var history = [], focusSeg = "", streaming = false, busy = false;
+  var lastAsk = "";   // 这一轮读者问的那句；交接面板拿它做预填（选中段优先，没选中就用它）
 
   // —— 本机对话记录（IndexedDB，见 /assets/wds-store.js）——
   var stApi = null, stSess = null, stBooting = false;
@@ -212,8 +232,150 @@
     if (role === "reader" && focus) { var fq = el("div", "wdsr-mfocus"); fq.textContent = focus.length > 70 ? focus.slice(0, 70) + "\u2026" : focus; wrap.appendChild(fq); }
     var body = el("div", "wdsr-bubble"); body.textContent = text; wrap.appendChild(body);
     msgsEl.appendChild(wrap); msgsEl.scrollTop = msgsEl.scrollHeight;
+    // 动作条不在这里造。**用时才造**（见 wdsrActs）——开场白、报错这类消息永远用不上，
+    // 每条都挂一个空壳只是往 DOM 里堆死元素。这里只把外壳记在 body 上，供 wdsrActs 挂载。
+    if (role === "wds") body._wrap = wrap;
     return body;
   }
+
+  /* ───────── 浏览 → 微信 / 浏览 → 产线：这一层此前完全没有 ─────────
+   * 陪读浮层铺在两千多个正文页上，是全站最宽的入口，而它此前是条死胡同：
+   * 读者在文章页问出一个好问题，既落不成候选卡（送不到微信去被顶回），
+   * 也转不去任何一台产线。两个模块（sde-cand / sde-handoff）站内早就有，这里只是把线接上。
+   * ⚠ 两个模块一律**懒加载**：这份脚本在 2000+ 页上跑，不能为一个多数人不点的按钮
+   *   给每一页都加两个请求。第一次点才拉，拉不到就如实说，不拦路。 */
+  var LAZY = {};
+  function lazyJs(src) {
+    if (LAZY[src]) return LAZY[src];
+    LAZY[src] = new Promise(function (res, rej) {
+      var t = document.createElement("script");
+      t.src = src; t.async = true;
+      t.onload = function () { res(true); };
+      t.onerror = function () { rej(new Error("load_fail")); };
+      document.head.appendChild(t);
+    });
+    return LAZY[src];
+  }
+  function actBtn(label, title) {
+    var b = el("button", "wdsr-act"); b.type = "button"; b.textContent = label;
+    if (title) b.title = title;
+    return b;
+  }
+  function actNote(box, txt, kind) {
+    var n = q1(".wdsr-actnote", box) || el("div", "wdsr-actnote");
+    n.className = "wdsr-actnote" + (kind ? " wdsr-" + kind : "");
+    n.textContent = txt; if (!n.parentNode) box.appendChild(n);
+    return n;
+  }
+  function wdsrActs(bubble, answer) {
+    // 太短的答案没什么可立卡的；没有外壳（不是通过 addMsg 造的）也不硬挂
+    if (!bubble || !bubble._wrap || !answer || answer.length < 40) return;
+    var box = bubble._acts;
+    if (!box) { box = el("div", "wdsr-acts"); bubble._wrap.appendChild(box); bubble._acts = box; }
+    box.innerHTML = ""; box.style.display = "";
+    var bCard = actBtn("\u27e1 \u7acb\u6210\u5019\u9009\u5361", "把这一段压成一条承重命题，送去 SDE 微信让别人顶回");
+    var bPass = actBtn("\uD83E\uDD1D \u4ea4\u7ed9\u667a\u80fd\u4f53", "把这一问原样递给一台完整产线（只填不跑，用你自己的 Key）");
+    box.appendChild(bCard); box.appendChild(bPass);
+    bCard.onclick = function () { candPanel(box, answer); };
+    bPass.onclick = function () { passPanel(box); };
+  }
+
+
+  /* ── 候选卡面板（浏览 → 微信）──
+   * 三段硬门与占位闸门全部交给 SDECand，这里一行都不重写——
+   * 抄第二遍必漂，而这类漂移是静默的：卡照样落、闸照样显示一行字，只是某一关已经不在把关了。 */
+  function candPanel(box, answer) {
+    var old = q1(".wdsr-pan", box); if (old) { old.parentNode.removeChild(old); return; }
+    var pan = el("div", "wdsr-pan");
+    pan.innerHTML =
+      "<div class='wdsr-pt'>\u7acb\u6210\u5019\u9009\u5361 \u00b7 \u9001\u53bb\u88ab\u9876\u56de</div>"
+      + "<div class='wdsr-ph'>\u4e09\u6bb5\u90fd\u8981\u586b\u3002\u8bf4\u4e0d\u51fa\u5207\u4e86\u54ea\u4e00\u5200\uff0c\u522b\u4eba\u5c31\u6ca1\u6cd5\u9876\u56de\uff1b\u6ca1\u6709\u5224\u636e\uff0c\u522b\u4eba\u53ea\u80fd\u8868\u6001\u3002</div>"
+      + "<label>\u627f\u91cd\u547d\u9898</label><textarea class='wdsr-f1' rows='2'></textarea>"
+      + "<label>\u5b83\u5207\u5f00\u7684\u8fa8\u522b\u9762</label><textarea class='wdsr-f2' rows='2'></textarea>"
+      + "<label>\u53ef\u88c1\u51b3\u5224\u636e</label><textarea class='wdsr-f3' rows='2'></textarea>"
+      + "<div class='wdsr-gate'>\u5360\u4f4d\u7c97\u7b5b\uff1a\u5148\u586b\u627f\u91cd\u547d\u9898\u3002</div>"
+      + "<div class='wdsr-prow'><button class='wdsr-act wdsr-go'>\u843d\u5361</button>"
+      + "<button class='wdsr-act wdsr-cx'>\u53d6\u6d88</button></div>";
+    box.appendChild(pan);
+    var f1 = q1(".wdsr-f1", pan), f2 = q1(".wdsr-f2", pan), f3 = q1(".wdsr-f3", pan), gt = q1(".wdsr-gate", pan);
+    q1(".wdsr-cx", pan).onclick = function () { pan.parentNode.removeChild(pan); };
+
+    lazyJs("/taste/assets/sde-cand.js?v=1").then(function () {
+      var C = window.SDECand; if (!C) throw new Error("no_mod");
+      // 预填：取不到就留空让人自己写，绝不编造（模块纪律⑤）
+      var d = {}; try { d = C.draft(answer) || {}; } catch (e) {}
+      if (d.prop) f1.value = d.prop; if (d.face) f2.value = d.face; if (d.crit) f3.value = d.crit;
+      var t = null;
+      f1.oninput = function () {
+        clearTimeout(t);
+        t = setTimeout(function () {
+          var v = f1.value.trim();
+          if (v.length < 8) { gt.textContent = "\u5360\u4f4d\u7c97\u7b5b\uff1a\u5148\u586b\u627f\u91cd\u547d\u9898\u3002"; return; }
+          gt.textContent = "\u5360\u4f4d\u7c97\u7b5b\uff1a\u67e5\u8be2\u4e2d\u2026";
+          C.gate(v).then(function (g) { gt.textContent = g.line; })
+                   .catch(function () { gt.textContent = C.NA_LINE; });
+        }, 500);
+      };
+      q1(".wdsr-go", pan).onclick = function () {
+        var c = {
+          prop: f1.value.trim(), face: f2.value.trim(), crit: f3.value.trim(),
+          // ⚠ sys 必须是 "S"：这张卡是在**浏览**这一维上冒出来的。
+          //   模块默认 "D"（对话），照抄默认会让账本把浏览产的卡记成对话产的。
+          sys: "S",
+          src: "SDE \u966a\u8bfb \u00b7 " + (docTitle() || document.title || "").slice(0, 40)
+        };
+        var bad = C.check(c);
+        if (bad && bad.length) { actNote(pan, bad[0], "bad"); return; }
+        actNote(pan, "\u843d\u5361\u4e2d\u2026");
+        C.post(c).then(function (r) {
+          if (!r || !r.ok) { actNote(pan, (r && r.msg) || "\u843d\u5361\u5931\u8d25\u3002", "bad"); return; }
+          pan.innerHTML = "<div class='wdsr-pt'>\u2713 " + esc(r.msg || "\u5df2\u7acb\u5361")
+            + "</div><div class='wdsr-ph'>\u53bb <a href='" + C.WX
+            + "' target='_blank' rel='noopener'>SDE \u5fae\u4fe1</a> \u770b\u8c01\u9876\u4f60\u3002</div>";
+        }).catch(function () { actNote(pan, "\u843d\u5361\u5931\u8d25\uff08\u7f51\u7edc\u51fa\u9519\uff09\u3002", "bad"); });
+      };
+    }).catch(function () {
+      pan.innerHTML = "<div class='wdsr-ph'>\u5019\u9009\u5361\u6a21\u5757\u6ca1\u52a0\u8f7d\u4e0a\u3002\u4f60\u4ecd\u53ef\u4ee5\u76f4\u63a5\u53bb "
+        + "<a href='/sde-wechat/' target='_blank' rel='noopener'>SDE \u5fae\u4fe1</a> \u624b\u52a8\u7acb\u4e00\u5f20\u5361\u3002</div>";
+    });
+  }
+
+  /* ── 交接面板（浏览 → 产线）── 只填不跑：那边一按就是几十分钟、烧的是读者自己的 Key。 */
+  function passPanel(box) {
+    var old = q1(".wdsr-pan", box); if (old) { old.parentNode.removeChild(old); return; }
+    var pan = el("div", "wdsr-pan");
+    pan.innerHTML = "<div class='wdsr-pt'>\u4ea4\u7ed9\u54ea\u4e00\u53f0</div>"
+      + "<div class='wdsr-ph'>\u628a\u4e0b\u9762\u8fd9\u53e5\u9012\u8fc7\u53bb\uff0c\u65b0\u6807\u7b7e\u6253\u5f00\u3002"
+      + "<b>\u53ea\u5e2e\u4f60\u586b\u8fdb\u53bb\uff0c\u4e0d\u66ff\u4f60\u6309\u5f00\u59cb\u3002</b></div>"
+      + "<textarea class='wdsr-fq' rows='2'></textarea><div class='wdsr-list'></div>"
+      + "<div class='wdsr-prow'><button class='wdsr-act wdsr-cx'>\u53d6\u6d88</button></div>";
+    box.appendChild(pan);
+    var fq = q1(".wdsr-fq", pan);
+    fq.value = (focusSeg || lastAsk || "").slice(0, 500);
+    q1(".wdsr-cx", pan).onclick = function () { pan.parentNode.removeChild(pan); };
+    lazyJs("/taste/assets/sde-handoff.js?v=2").then(function () {
+      var H = window.SDEHandoff; if (!H || !H.AGENTS) throw new Error("no_mod");
+      var list = q1(".wdsr-list", pan);
+      H.AGENTS.forEach(function (a) {
+        var r = el("button", "wdsr-agent"); r.type = "button";
+        r.innerHTML = "<b>" + esc(a.icon + " " + a.name) + "</b><span>" + esc(a.what) + "</span><i>" + esc(a.cost) + "</i>";
+        r.onclick = function () {
+          var q = fq.value.trim();
+          if (!q) { actNote(pan, "\u5148\u5199\u4e00\u53e5\u8981\u9012\u8fc7\u53bb\u7684\u8bdd\u3002", "bad"); return; }
+          try { H.send(a.id, q, "SDE \u966a\u8bfb \u00b7 " + (docTitle() || "").slice(0, 30)); }
+          catch (e) { actNote(pan, "\u6253\u4e0d\u5f00\u90a3\u4e00\u9875\uff0c\u8bf7\u76f4\u63a5\u8bbf\u95ee " + a.url, "bad"); return; }
+          actNote(pan, "\u5df2\u9012\u8fc7\u53bb\u00b7\u5728\u65b0\u6807\u7b7e\u91cc\u786e\u8ba4\u540e\u81ea\u5df1\u6309\u5f00\u59cb");
+        };
+        list.appendChild(r);
+      });
+    }).catch(function () {
+      q1(".wdsr-list", pan).innerHTML = "<div class='wdsr-ph'>\u4ea4\u63a5\u6a21\u5757\u6ca1\u52a0\u8f7d\u4e0a\u3002"
+        + "\u4f60\u53ef\u4ee5\u76f4\u63a5\u6253\u5f00 <a href='/taste/idea-generator/' target='_blank' rel='noopener'>\u91d1\u70b9\u5b50</a>\u3001"
+        + "<a href='/taste/zhiwen/' target='_blank' rel='noopener'>\u4e2d\u534e\u667a\u95ee</a> \u6216 "
+        + "<a href='/taste/sde-dynamics/' target='_blank' rel='noopener'>\u52a8\u529b\u667a\u80fd\u4f53</a>\uff0c\u81ea\u5df1\u628a\u8fd9\u53e5\u8d34\u8fdb\u53bb\u3002</div>";
+    });
+  }
+
   function setFocus(t) {
     focusSeg = t || "";
     focusWrap.innerHTML = "";
@@ -278,6 +440,7 @@
     var seg = focusSeg;
     if (turns() >= MAX_TURNS) { paintState(); return; }
     addMsg("reader", q, seg || null);
+    lastAsk = String(q || "");
     history.push({ role: "reader", text: q });
     stSave(history);
     paintState();
@@ -295,6 +458,8 @@
         function finish() {
           bubble.classList.remove("wdsr-streaming");
           if (answer) { history.push({ role: "wds", text: answer }); stSave(history); }
+          // 答完才摆动作条——流式期间摆出来，等于请读者对半截话下判断
+          try { wdsrActs(bubble, answer); } catch (e) {}
           streaming = false; sendEl.disabled = false; paintState();
         }
         function pump() {
