@@ -65,6 +65,9 @@ def load():
 def fix_article_pages(led, disp):
     for p, v in led.items():
         page = PUB / v / "index.html"
+        if not page.exists():
+            print(f"   · 跳过 {v}：已领号 #{p}，页面尚未建立")
+            continue
         h = page.read_text(encoding="utf-8")
         new = "每 日 必 读 · 典 范 文 · " + spaced(to_cn(disp[p]))
         h2, n = re.subn(r'((?:art-series|hero-eyebrow)">)[^<]*(</div>)',
