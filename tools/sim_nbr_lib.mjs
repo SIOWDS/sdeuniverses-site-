@@ -69,8 +69,14 @@ const vague = db.cards.filter((c) => c.sep.some((s) => /^侧重|^更强调|^角�
 ok(vague.length === 0, "没有「侧重不同」这类不算划界的分离线");
 // ⚠ 卡号不连续（库里原本就有 0073 以上的号），不能用 id >= 判本批——按确切号认。
 const BATCH2 = Array.from({ length: 27 }, (_, i) => "nbr-" + String(301 + i).padStart(4, "0"));
+// ⚠ C 批有两张（Espeland《排名与反应性》、Festinger《认知失调论》）与占位者库重复，
+// 并库时被合并掉了——**这是正确行为，不是丢卡**：重复会把召回劈成两半。
+// 所以这里断言的是「作品在库里」，不是「这个卡号在库里」。
 const newCards = db.cards.filter((c) => BATCH2.includes(c.id));
-ok(newCards.length === 27, `C 批 27 张（实测 ${newCards.length}）`);
+ok(newCards.length >= 25, `C 批存活 ${newCards.length} 张（另有与占位者库重复者被合并）`);
+for (const t of ["Rankings and Reactivity", "A Theory of Cognitive Dissonance"]) {
+  ok(R("public/nbr/cards.json").includes(t), `★ 被合并的那张的作品仍在库里：${t}`);
+}
 ok(newCards.every((c) => c.sep.some((s) => /可实测|判决性对照|预测/.test(s))),
    "★ C 批**每一张**都带可裁决的对照预测（侧重不同不算划界，这是硬规矩）");
 
@@ -81,6 +87,25 @@ ok(bn.includes("CARDS_A + CARDS_B + CARDS_C"), "三批都进 CARDS");
 const cc = R("tools/nbr/cards_c.py");
 ok(/frm=/.test(cc), "每张卡记着从哪一篇回写来的");
 ok(db.cards.every((c) => (c.g || []).length > 3), "★ 全部卡都有预算词元 g（缺了就永远召不回来）");
+
+console.log("── 6. 并库：一份源，两个投影");
+const ph = JSON.parse(R("public/kb/placeholders.json"));
+ok(db.n === ph.n, `★ 两个投影条数一致（${db.n} vs ${ph.n}）——分家就会漂，而且漂起来是静默的`);
+ok(ph.source && /投影生成/.test(ph.source), "placeholders 里写明它是投影、勿手改");
+const bnx = R("tools/build_nbr.py");
+ok(bnx.includes("placeholders.json"), "★ 两个 json 由同一个构建器写出");
+ok(bnx.includes("from cards_d import CARDS_D") && bnx.includes("from cards_e import CARDS_E"), "D/E 批都在源里");
+ok(bnx.includes("def _dedupe"), "★ 有去重合并（同作品的卡把召回劈成两半，是缺陷不是冗余）");
+ok(bnx.includes("keep[\"alias\"]"), "去重时别名取并集（丢一条就少一个钩子）");
+const phIds = ph.items.map((x) => x.id);
+ok(new Set(phIds).size === phIds.length, "投影里 id 唯一");
+ok(!phIds.some((i) => /^nbr-\d+$/.test(i)), "★ 投影的主键是命题空间不是编号（那边护栏的硬要求）");
+ok(phIds.includes("control-variance-pathology"), "★ 原有语义 slug 保住了（否则碰撞机那边的引用全断）");
+const allTxt = R("public/nbr/cards.json");
+for (const who of ["Woods", "Luhmann", "Lorde", "Marcuse", "Yankelovich", "Harrison", "Bainbridge", "Kocherlakota"]) {
+  ok(allTxt.includes(who), `${who} 在库里`);
+}
+ok(R("tools/nbr/cards_e.py").includes("Woods"), "★ Woods 是当天写完文章就回写的（写它时库里没有他）");
 
 console.log(`\n${P} PASS / ${F} FAIL`);
 process.exit(F ? 1 : 0);

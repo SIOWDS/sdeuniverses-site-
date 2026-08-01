@@ -20,8 +20,45 @@ sys.path.insert(0, os.path.join(HERE, 'nbr'))
 from cards_a import CARDS_A          # noqa: E402
 from cards_b import CARDS_B          # noqa: E402
 from cards_c import CARDS_C          # noqa: E402
+from cards_d import CARDS_D          # noqa: E402
+from cards_e import CARDS_E          # noqa: E402
 
-CARDS = CARDS_A + CARDS_B + CARDS_C
+_RAW = CARDS_A + CARDS_B + CARDS_C + CARDS_D + CARDS_E
+
+
+def _tkey(c):
+    """按作品名归一。同一部作品在两个库里各有一张卡这件事真的发生了
+    （Espeland & Sauder 的《排名与反应性》就是一例），而**重复本身是缺陷**：
+    它把召回劈成两半——查询命中哪一张全看词面的偶然，而两张卡的分离线可能不一样。"""
+    t = str((c.get("src") or {}).get("title") or "").lower()
+    return re.sub(r"[^a-z0-9\u4e00-\u9fff]+", "", t)[:40]
+
+
+def _dedupe(rows):
+    """合并同作品的卡：**别名取并集**（别名表是召回的成败关键，丢一条就少一个钩子），
+    分离线取并集（两张卡各自切出的分离线都留着），pid 优先保留（碰撞机那边按 pid 引用）。
+    保留先出现者的其余字段——A/B/C 是手写的，比自动并入的 D 更可靠。"""
+    seen, out = {}, []
+    for c in rows:
+        k = _tkey(c)
+        if not k:
+            out.append(c); continue
+        if k in seen:
+            keep = seen[k]
+            keep["alias"] = list(dict.fromkeys(list(keep["alias"]) + list(c.get("alias") or [])))
+            keep["sep"] = list(dict.fromkeys(list(keep["sep"]) + list(c.get("sep") or [])))
+            if c.get("pid") and not keep.get("pid"):
+                keep["pid"] = c["pid"]
+            continue
+        c = dict(c)
+        seen[k] = c
+        out.append(c)
+    return out
+
+
+CARDS = _dedupe(_RAW)
+if len(CARDS) != len(_RAW):
+    print(f"去重：{len(_RAW)} → {len(CARDS)} 张（合并了 {len(_RAW) - len(CARDS)} 组同作品卡，别名与分离线取并集）")
 VERIFY_OK = {"verified", "cited-in-context", "unverified"}
 
 # ── 归一化与文法（与 sde-nbr.js 必须逐字同义） ──────────────────
@@ -193,6 +230,57 @@ def main():
     with open(p, "w", encoding="utf-8") as f:
         json.dump(out, f, ensure_ascii=False, separators=(",", ":"))
     print(f"写出 {p}  {os.path.getsize(p) // 1024} KB")
+
+    # ── 第二个投影：/kb/placeholders.json ──────────────────────────────
+    # 站上曾有两个近邻库，schema 不同、消费者不同（金点子/中华智问读 /nbr/，
+    # 碰撞机的候选闸读 /kb/）。**两份判据分家一定会漂，而且漂起来是静默的**：
+    # 一边补了卡另一边不知道，闸门照样显示"已过闸"，只是它查的那半个库里没有那个人。
+    # 所以并成一份源、两个投影——两边的消费者一行都不用改，判据只有一处。
+    #
+    # ⚠ pid 是这张卡在占位者库里的原 id（语义 slug）。有 pid 的用 pid，
+    #   没有的（本来就出自 /nbr/ 的卡）用一个从命题里派生的稳定 slug——
+    #   **绝不能用 nbr-XXXX 当 id**，那边的护栏明写"主键是命题空间不是人名/编号"。
+    def _ph_id(c):
+        if c.get("pid"):
+            return c["pid"]
+        raw = (c["src"].get("title") or "").strip() or c["prop"]
+        base = re.sub(r"[^a-z0-9]+", "-", raw[:48].lower()).strip("-")
+        if base:
+            return base
+        # 作品名是纯中文（或为空）时，用命题的前若干汉字做主键——
+        # **不能回退到 nbr-XXXX**：那边的护栏明写「主键是命题空间，不是学科或人名或编号」。
+        zh = re.sub(r"[^\u4e00-\u9fff]+", "", c["prop"])[:14]
+        return zh or c["id"]
+
+    ph = dict(
+        generated=__import__("datetime").datetime.utcnow().strftime("%Y-%m-%d"),
+        schema="命题空间为主键·别名表用于50字压缩召回",
+        source="由 tools/nbr/cards_*.py 投影生成，勿手改——手改会被下一次 build_nbr.py 抹掉",
+        n=len(CARDS),
+        items=[dict(
+            id=_ph_id(c),
+            p=c["prop"],
+            a=c["alias"],
+            o=c["src"].get("title") or "",
+            au=c["src"].get("author") or "",
+            y=c["src"].get("year") or 0,
+            d=c["ring"],
+            h=c["holds"],
+            s="；".join(c["sep"]),
+            v="核验" if c.get("verify") == "verified" else "待核",
+        ) for c in CARDS])
+    d2 = os.path.join(ROOT, "public", "kb")
+    os.makedirs(d2, exist_ok=True)
+    p2 = os.path.join(d2, "placeholders.json")
+    with open(p2, "w", encoding="utf-8") as f:
+        json.dump(ph, f, ensure_ascii=False, separators=(",", ":"))
+    print(f"写出 {p2}  {os.path.getsize(p2) // 1024} KB  （同一份源的第二个投影）")
+
+    # 两个投影必须同源：条数一致，且 id 不重复
+    assert ph["n"] == out["n"], "两个投影条数对不上"
+    ids = [x["id"] for x in ph["items"]]
+    dup = [i for i in set(ids) if ids.count(i) > 1]
+    assert not dup, f"placeholders 投影里 id 重复：{dup[:5]}"
 
 
 if __name__ == "__main__":
