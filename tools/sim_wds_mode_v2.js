@@ -377,10 +377,10 @@ console.log("⑧ 成文（distill）");
   layer.querySelector(".wdsm-distbtn").click();
   const menu = document.body.querySelector(".wdsm-menu");
   ok(!!menu, "成文菜单弹出");
-  // 2026-07-30 加了第四档「对外 PPT」→ 七项：报告/成文/提纲/PPT ＋ 导出 ＋ 选目录 ＋ 成文记录
-  // 2026-08-01：PDF 一度加在这里，随即按用户令搬到顶栏——这里必须**退回七项**，
-  // 否则等于把"零调用的原样打印"又说成成文的一个子功能。
-  ok(menu.children.length === 7, "菜单七项（报告/成文/提纲/对外PPT/导出/选目录/成文记录），实得 " + menu.children.length);
+  // 2026-07-30 加第四档「对外 PPT」；2026-08-01 PDF 一度加在这里随即按用户令搬到顶栏（**不许退回**）；
+  // 2026-08-01 再加第五档「凝成一万字论文」→ 八项：报告/成文/一万字/提纲/PPT ＋ 导出 ＋ 选目录 ＋ 成文记录。
+  ok(menu.children.length === 8, "菜单八项（报告/成文/一万字/提纲/对外PPT/导出/选目录/成文记录），实得 " + menu.children.length);
+  ok(menu.textContent.indexOf("一万字") >= 0, "一万字论文那一档在菜单里");
   ok(menu.textContent.indexOf("PDF") < 0, "PDF 不在成文菜单里（它在顶栏）");
   menu.children[0].click();
   await new Promise((r) => setTimeout(r, 220));
@@ -395,7 +395,11 @@ console.log("⑧ 成文（distill）");
   DOWNLOADS = [];
   layer.querySelector(".wdsm-distbtn").click();
   const menu2 = document.body.querySelector(".wdsm-menu");
-  menu2.children[4].click();          // 四档之后才是「导出本场」，索引随之后移
+  // ⚠ 不许再按序号点。此前写的是 children[4]，加一档「一万字论文」就把「导出本场」推到了 5，
+  //   于是这一条连同后面两条一起假红——而它们看起来像是别的功能坏了。**按文案找，插档不影响。**
+  const mExportBtn = [].slice.call(menu2.children).filter((b) => /导出本场|Export this chat/.test(b.textContent))[0];
+  ok(!!mExportBtn, "菜单里找得到「导出本场对话」（按文案找，不按序号）");
+  mExportBtn.click();
   ok(DOWNLOADS.length === 1 && DOWNLOADS[0].includes("与 WDS 的对话"), "导出了 Markdown 文件");
 
   console.log("⑪ 追问建议与朗读");

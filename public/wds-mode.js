@@ -33,6 +33,15 @@
     document.head.appendChild(sc);
   })();
 
+  /* 造 .docx（全站共用一份）。两处要用它：成文存 Word、以及投稿——
+     学员投稿口 /api/submit 只收真 ZIP，而 docx 本身就是 zip，所以这两件其实是同一件。 */
+  (function () {
+    if (window.SDEDocx) return;
+    var sc = document.createElement("script");
+    sc.src = "/assets/sde-docx.js?v=1"; sc.defer = true;
+    document.head.appendChild(sc);
+  })();
+
   var API = "/api/wds/chat";
   var API_DISTILL = "/api/wds/distill";
   var API_LINK = "/api/wds/link";        // 篇名→站内网址（只读索引，不烧 Key）
@@ -443,6 +452,14 @@
       kReport: "对话报告", kReportS: "结论 · 谈了什么 · 立住的判断 · 未解决 · 下一步",
       kEssay: "提炼成文", kEssayS: "锻成一篇独立成立的文章，约三千字",
       kOutline: "写作提纲", kOutlineS: "母题 + 章节骨架，照着就能写",
+      kPaper: "凝成一万字论文", kPaperS: "承重命题 + 不含情态词的判据 + 逐条划界 + 证伪条件，约一万字",
+      mDocx: "\u2913 Word (.docx)", mDocxS: "把这一篇存成 Word 文档",
+      mSub: "\u2709 \u6295\u7a3f\u5230\u6536\u4ef6\u7bb1", mSubS: "把这一篇投给编辑部（需要投稿密码）",
+      subT: "\u6295\u7a3f\u5230\u6536\u4ef6\u7bb1", subName: "\u4f5c\u8005\u540d", subPass: "\u6295\u7a3f\u5bc6\u7801",
+      subGo: "\u6295\u7a3f", subCancel: "\u53d6\u6d88",
+      subP: "\u6295\u51fa\u53bb\u7684\u662f\u4e0a\u9762\u8fd9\u4e00\u7bc7\uff08\u5b58\u6210 Word \u540e\u4e0a\u4f20\uff09\u3002\u7f16\u8f91\u90e8\u4f1a\u5148\u8bc4\u518d\u51b3\u5b9a\u53d1\u4e0d\u53d1\uff0c\u4e0d\u662f\u6295\u4e86\u5c31\u4e0a\u3002",
+      subOk: "\u2713 \u5df2\u9001\u8fdb\u6536\u4ef6\u7bb1", subBad: "\u6295\u7a3f\u5931\u8d25\uff1a", subNeed: "\u5148\u586b\u6295\u7a3f\u5bc6\u7801\u3002",
+      subWait: "\u6b63\u5728\u4e0a\u4f20\u2026",
       mExport: "\u2913 导出本场对话", mExportS: "Markdown 文件，存到本机",
       bPdf: "\u2913 PDF", bPdfT: "把整场对话排成印刷稿并打印——在打印框里把「目标」选成「另存为 PDF」，即可存成文件",
       pdfWait: "正在排版…", pdfTip: "打印框里把「目标」选成「另存为 PDF」即可存成文件。",
@@ -588,6 +605,14 @@
       kReport: "Conversation report", kReportS: "Verdict · what was covered · what held · what didn't · next",
       kEssay: "Forge into an essay", kEssayS: "A piece that stands on its own, about 3,000 words",
       kOutline: "Writing outline", kOutlineS: "A motif plus a chapter skeleton you can write from",
+      kPaper: "Forge a 10,000-word paper", kPaperS: "Load-bearing claim + a modal-free test + demarcations + falsifiers",
+      mDocx: "\u2913 Word (.docx)", mDocxS: "Save this piece as a Word document",
+      mSub: "\u2709 Submit to the inbox", mSubS: "Send this piece to the editors (needs the submission password)",
+      subT: "Submit to the inbox", subName: "Author", subPass: "Submission password",
+      subGo: "Submit", subCancel: "Cancel",
+      subP: "What gets sent is the piece above (saved as Word). The editors read it first \u2014 submitting is not publishing.",
+      subOk: "\u2713 Sent to the inbox", subBad: "Submission failed: ", subNeed: "Enter the submission password first.",
+      subWait: "Uploading\u2026",
       mExport: "\u2913 Export this chat", mExportS: "A Markdown file, saved to your machine",
       bPdf: "\u2913 PDF", bPdfT: "Typeset this whole chat for print \u2014 set Destination to \u201cSave as PDF\u201d in the dialog to keep the file",
       pdfWait: "Typesetting\u2026", pdfTip: "In the print dialog, set Destination to \u201cSave as PDF\u201d.",
@@ -3869,10 +3894,73 @@
       .catch(function (e) { fail(tx("rsPlanFail") + ((e && e.message) || "?")); });
   }
 
+  /* ── 投稿到收件箱（ChatSDE → 学员投稿箱 → 评分 → 建页）──
+     这是「对话」这一维通向「浏览」的唯一一条实路：此前 ChatSDE 只能指路挂链接，
+     产出不了任何能进站的东西。走的是站内既有的 /api/submit（与金点子的一键投稿同一个口）。
+     三条纪律：
+     ① **投稿密码只留在这一次提交里**，不写 localStorage——它不是"我的 Key"，是编辑部的门禁；
+     ② 文件必须是**真 docx**（服务端逐字节查 PK），所以经 SDEDocx 造，不拿 .md 冒充；
+     ③ **说清楚投了不等于发了**——编辑部先评再决定，不许让人以为按一下就上站。 */
+  function firstTitleOf(md) {
+    var m = /^\s*#\s+(.+)$/m.exec(String(md || ""));
+    return m ? m[1].trim().slice(0, 60) : "";
+  }
+  function submitPanel(box, text, kind, stat) {
+    var old = box.querySelector(".wdsm-subpan");
+    if (old) { old.parentNode.removeChild(old); return; }
+    var pan = el("div", "wdsm-subpan");
+    pan.style.cssText = "margin:10px 0 0;padding:11px 12px;border:1px solid rgba(255,255,255,.14);border-radius:6px;background:rgba(255,255,255,.03)";
+    pan.innerHTML =
+      "<div style='font-size:13px;font-weight:600;color:#E6EDF3;margin-bottom:4px'></div>"
+      + "<div class='sp' style='font-size:11.5px;color:#8B7B5E;line-height:1.75;margin-bottom:8px'></div>"
+      + "<input class='sn' type='text' style='width:100%;box-sizing:border-box;margin-bottom:6px'>"
+      + "<input class='sk' type='password' autocomplete='off' style='width:100%;box-sizing:border-box'>"
+      + "<div style='display:flex;gap:6px;margin-top:9px'>"
+      + "<button class='wdsm-tbtn sgo'></button><button class='wdsm-tbtn scx'></button></div>"
+      + "<div class='sm' style='font-size:11.5px;line-height:1.7;margin-top:7px;color:#8B7B5E'></div>";
+    box.appendChild(pan);
+    pan.firstChild.textContent = t("subT");
+    pan.querySelector(".sp").textContent = t("subP");
+    var nIn = pan.querySelector(".sn"), kIn = pan.querySelector(".sk"), msg = pan.querySelector(".sm");
+    nIn.placeholder = t("subName"); kIn.placeholder = t("subPass");
+    pan.querySelector(".sgo").textContent = t("subGo");
+    pan.querySelector(".scx").textContent = t("subCancel");
+    pan.querySelector(".scx").onclick = function () { pan.parentNode.removeChild(pan); };
+    // 作者名可以记住（那是读者自己的名字）；**密码不记**——见纪律①
+    try { var v = localStorage.getItem("sde_sub_author"); if (v) nIn.value = v; } catch (e) {}
+    pan.querySelector(".sgo").onclick = function () {
+      var pass = kIn.value.trim();
+      if (!pass) { msg.textContent = t("subNeed"); return; }
+      if (!window.SDEDocx) { msg.textContent = t("dPptxWait"); return; }
+      var who = nIn.value.trim();
+      try { if (who) localStorage.setItem("sde_sub_author", who); } catch (e) {}
+      var title = firstTitleOf(text) || kindT(kind);
+      msg.textContent = t("subWait");
+      var blob = window.SDEDocx.build({ title: title, author: who || "ChatSDE", md: text });
+      // 命名成 .zip 以过服务端的 ZIP 校验（docx 首字节本就是 PK，改名不改内容）
+      var fname = safeName((who || "ChatSDE") + "_" + title).slice(0, 48) + "_" + stampName() + ".zip";
+      var fd = new FormData();
+      fd.append("pass", pass);
+      fd.append("student", who);
+      fd.append("note", "【ChatSDE 成文·" + kindT(kind) + "】" + title);
+      fd.append("file", blob, fname);
+      fetch("/api/submit", { method: "POST", body: fd })
+        .then(function (r) { return r.json().catch(function () { return {}; }); })
+        .then(function (d) {
+          if (d && d.ok) { msg.textContent = t("subOk"); kIn.value = ""; return; }
+          msg.textContent = t("subBad") + ((d && d.msg) || "?");
+        })
+        .catch(function (e) { msg.textContent = t("subBad") + ((e && e.message) || "?"); });
+    };
+    setTimeout(function () { (nIn.value ? kIn : nIn).focus(); }, 60);
+  }
+
   /* ── 成文：把整场对话锻成 报告 / 文章 / 提纲，或直接导出 ── */
-  function kindT(k) { return t(({ report: "kReport", essay: "kEssay", outline: "kOutline", deck: "kDeck" })[k]); }
-  function kindS(k) { return t(({ report: "kReportS", essay: "kEssayS", outline: "kOutlineS", deck: "kDeckS" })[k]); }
-  var KIND_KEYS = ["report", "essay", "outline", "deck"];
+  function kindT(k) { return t(({ report: "kReport", essay: "kEssay", outline: "kOutline", paper: "kPaper", deck: "kDeck" })[k]); }
+  function kindS(k) { return t(({ report: "kReportS", essay: "kEssayS", outline: "kOutlineS", paper: "kPaperS", deck: "kDeckS" })[k]); }
+  // paper 排在 essay 之后：它是 essay 的重档（三千字 → 一万字），
+  // 而 deck 是另一种东西（给听众的），不该夹在两者中间。
+  var KIND_KEYS = ["report", "essay", "paper", "outline", "deck"];
   try { layer.querySelector(".wdsm-pdfbtn").onclick = function () { exportPdf(); }; } catch (e) {}
   layer.querySelector(".wdsm-distbtn").onclick = function (ev) {
     var old = document.querySelector(".wdsm-menu");
@@ -4114,6 +4202,25 @@
         stat.textContent = t("dPptxOk") + (d.slides.length + 1) + " · 渲染器 v" + (window.WDSPptx.VERSION || "?");
         saveBlobToDir(nm, blob, function (msg) { if (msg) stat.textContent = msg; });
       };
+    }
+    /* ── Word 与投稿：成文此前只能出 Markdown 与「打印成 PDF」，拿不出一份能直接投出去的稿子。
+       两颗都只在**文章类**档位上摆（deck 是 PPT，报告/提纲不是投稿物）。 */
+    var dxBtn = null, subBtn = null;
+    if (kind === "essay" || kind === "paper") {
+      dxBtn = el("button", "wdsm-tbtn ddocx", t("mDocx"));
+      dxBtn.title = t("mDocxS");
+      dlBtn.parentNode.insertBefore(dxBtn, dlBtn);
+      dxBtn.onclick = function () {
+        if (!text) return;
+        if (!window.SDEDocx) { stat.textContent = t("dPptxWait"); return; }
+        var blob = window.SDEDocx.build({ title: firstTitleOf(text) || kindT(kind), author: "ChatSDE", md: text });
+        var nm = "WDS-" + safeName(firstTitleOf(text) || kind) + "-" + stampName() + ".docx";
+        saveBlobToDir(nm, blob, function (msg) { if (msg) stat.textContent = msg; });
+      };
+      subBtn = el("button", "wdsm-tbtn dsub", t("mSub"));
+      subBtn.title = t("mSubS");
+      dlBtn.parentNode.insertBefore(subBtn, dlBtn);
+      subBtn.onclick = function () { submitPanel(cbox, text, kind, stat); };
     }
     svBtn.textContent = t("dSave"); cpBtn.textContent = t("dCopy"); dlBtn.textContent = t("dDl");
     dirBtn.textContent = t("dDir");
