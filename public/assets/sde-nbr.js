@@ -143,7 +143,33 @@
     return { ok: miss.length === 0, miss: miss };
   }
 
-  w.SDENbr = { load: load, ask: ask, judge: judge, verdictLine: verdictLine,
-               gateLine: gateLine, shape: shape,
+  /* 三级：联网找**库外**的占位者。
+     为什么必须有这一级：前两级的覆盖面就是库的覆盖面，而两次真跑失手的三位
+     （卢曼、Lorde、马尔库塞）一张卡都没有——不在库里，前两级在原理上找不到。
+     查询词由服务端拼死（强制含同向式问法），客户端只递承重命题。 */
+  function web(q, key) {
+    return fetch("/api/nbr/web", {
+      method: "POST", headers: { "content-type": "application/json" },
+      body: JSON.stringify({ q: q, key: key || "" })
+    }).then(function (r) { return r.json(); })
+      .catch(function () { return { ok: false, n: 0, hits: [], verdict: "未核验·联网这一关没跑通——不得据以放行" }; });
+  }
+
+  /* 三级合一的结论行。⚠ 三个 miss 叠在一起仍然只能说「未命中」，
+     不许说「未被占位」——这是这道闸唯一不能让步的地方。 */
+  function gateLine3(coarse, fine, wr) {
+    var base = gateLine(coarse, fine);
+    if (!wr) return base + " · 站外未查";
+    if (wr.code === "need_search_key") return base + " · 站外〔未核验：无检索 Key〕不得据以放行";
+    if (!wr.n) return base + " · 站外未命中〔不得据以放行〕";
+    return base + " · 站外另召回 " + wr.n + " 条待判";
+  }
+
+  w.SDENbr = { load: load, ask: ask, judge: judge, web: web, verdictLine: verdictLine,
+               gateLine: gateLine, gateLine3: gateLine3, shape: shape,
                _grams: grams, _score: score, _norm: norm, SRC: SRC };
+  /* ⚠ 独立命名：/taste/assets/sde-nbr-gate.js 也叫 SDENbr（那是三关判据，这是库查询）。
+     两者同页加载时后装的会把前一个整个盖掉，而这种失败是静默的——闸门照常显示"已过闸"，
+     只是判的根本不是那件事。凡同页要用两者，一律用 SDENbrLib / SDENbrGate 这两个名字。 */
+  w.SDENbrLib = w.SDENbr;
 })(window);

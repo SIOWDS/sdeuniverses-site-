@@ -19,8 +19,9 @@ sys.path.insert(0, os.path.join(HERE, 'nbr'))
 
 from cards_a import CARDS_A          # noqa: E402
 from cards_b import CARDS_B          # noqa: E402
+from cards_c import CARDS_C          # noqa: E402
 
-CARDS = CARDS_A + CARDS_B
+CARDS = CARDS_A + CARDS_B + CARDS_C
 VERIFY_OK = {"verified", "cited-in-context", "unverified"}
 
 # ── 归一化与文法（与 sde-nbr.js 必须逐字同义） ──────────────────

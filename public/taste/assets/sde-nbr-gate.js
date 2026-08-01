@@ -107,4 +107,7 @@
 
   w.SDENbr = { sectionOK: sectionOK, coinedName: coinedName, postNameGap: postNameGap,
                discTags: discTags, crossOK: crossOK, verdict: verdict, DISC_HINTS: DISC_HINTS };
+  /* ⚠ 与 /assets/sde-nbr.js（近邻库查询）撞名。两者同页加载时后装的会静默盖掉前一个，
+     而闸门照样显示"已过闸"——只是判的不是那件事了。同页要用两者，用 SDENbrGate / SDENbrLib。 */
+  w.SDENbrGate = w.SDENbr;
 })(window);
