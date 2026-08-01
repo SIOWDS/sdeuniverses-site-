@@ -16,7 +16,7 @@ const F = fs.readFileSync("public/wds-mode.js", "utf8");
 
 console.log("① 每道工序齐全且各有实体");
 // 别写死数量：加一道工序就要改三处数字，这种断言迟早被人图省事删掉。跟着白名单走。
-const KEYS = ["iq", "three", "motif", "nbr", "rename", "gap", "collide", "grid", "nine", "map"];
+const KEYS = ["iq", "three", "motif", "nbr", "rename", "gap", "collide", "forge", "grid", "nine", "map"];
 const mKeys = W.match(/const WDS_TOOL_KEYS = \[([^\]]+)\]/);
 ok(!!mKeys, "WDS_TOOL_KEYS 存在");
 KEYS.forEach((k) => ok(mKeys && mKeys[1].includes('"' + k + '"'), "白名单里有 " + k));

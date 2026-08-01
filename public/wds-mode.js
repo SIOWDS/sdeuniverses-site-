@@ -504,6 +504,9 @@
       tlRename: "改姓", tlRenameS: "改写成目标学科母语，零 SDE 术语",
       tlGap: "缝隙扫描", tlGapS: "读出结构缝隙，发明一个新概念去填",
       tlCollide: "三篇碰撞", tlCollideS: "站内三篇互相矛盾的文章撞出一句新判断",
+      tlForge: "学科通融", tlForgeS: "三家撞出一条新判断的简版（整趟产线用 /通融）",
+      fgTitle: "学科通融 · 二阶碰撞", fgPlan: "十四道工序，顺序不可换", fgSteps: "这一趟 {n} 道工序",
+      fgJudge: "只到判断，不成文",
       tlGrid: "27 宫格定位", tlGridS: "C⊗M⊗V 与一二三号位，中心位轮到谁",
       tlNine: "九宫格取三格", tlNineS: "抽三个视角各问各答，再撞成一条",
       nbrH: "站内近邻 · 待交代分离线", nbrFail: "这次没取到站内近邻名单——下面的近邻检测只凭它自己的记忆，请当心。",
@@ -642,6 +645,9 @@
       tlRename: "Rename into a discipline", tlRenameS: "Rewrite in the target field's native voice, zero SDE terms",
       tlGap: "Gap scan", tlGapS: "Find the structural gap, coin a concept to fill it",
       tlCollide: "Collide three pieces", tlCollideS: "Three contradicting site pieces struck into one new claim",
+      tlForge: "Cross-discipline forge", tlForgeS: "Second-order collision, short form (full run: /forge)",
+      fgTitle: "Cross-discipline forge", fgPlan: "Fourteen stages, order fixed", fgSteps: "{n} stages",
+      fgJudge: "stop at the claim, no full draft",
       tlGrid: "27-cell placement", tlGridS: "C⊗M⊗V and positions one/two/three; whose turn at centre",
       tlNine: "Nine-cell, draw three", tlNineS: "Three viewpoints, each asked and answered, then struck together",
       nbrH: "Site neighbours · dividing lines owed", nbrFail: "No site neighbour list came back this time — the check below runs on memory alone, so treat it with care.",
@@ -2716,6 +2722,14 @@
       if (forceQ == null) { inEl.value = ""; inEl.style.height = "auto"; }
       RS.on = false; rsPaint(); rsRun(q); return;
     }
+    // 学科通融：这一问不是一次问答，是一整趟十四道工序的产线
+    var fgq = forgePick(q);
+    if (fgq && !streaming && !RS.running) {
+      if (turns() >= MAX) { updTurns(); return; }
+      if (forceQ == null) { inEl.value = ""; inEl.style.height = "auto"; }
+      rsRun(fgq.topic, { judge: fgq.judge });
+      return;
+    }
     // 开头的 /评分 之类：认出来就挂上那道工序，并把命令本身从提问里摘掉
     var sl = slashPick(q);
     if (sl) { toolSet(sl.k); q = String(sl.rest || "").trim(); if (!q) { inEl.value = ""; inEl.style.height = "auto"; return; } }
@@ -3496,15 +3510,15 @@
         return pump();
       });
   }
-  function rsRun(topic) {
-    var kv = wdsKeyGet(); if (!kv) { wdsKeyPanel(function () { rsRun(topic); }); return; }
+  function rsRun(topic, fg) {
+    var kv = wdsKeyGet(); if (!kv) { wdsKeyPanel(function () { rsRun(topic, fg); }); return; }
     RS.running = true; RS.stop = false; streaming = true;
     busyUI(true); stopBarShow(true);
     var cell = addTurn(topic);
     history.push({ role: "reader", text: topic }); updTurns();
     var card = el("div", "wdsm-rs");
-    var head = el("div", "rsh"); head.appendChild(el("b", null, tx("rsBtn")));
-    var note = el("span", "rsn", tx("rsPlan")); head.appendChild(note);
+    var head = el("div", "rsh"); head.appendChild(el("b", null, fg ? tx("fgTitle") : tx("rsBtn")));
+    var note = el("span", "rsn", fg ? tx("fgPlan") : tx("rsPlan")); head.appendChild(note);
     card.appendChild(head);
     cell.a.innerHTML = ""; cell.a.appendChild(card);
     var base = { key: kv.key, vendor: kv.vendor, model: kv.model || "", lang: LANG };
@@ -3519,7 +3533,9 @@
       if (report) { history.push({ role: "wds", text: report }); stSave(history); compTick(); }
       updTurns();
     }
-    rsPost({ mode: "plan", q: topic, n: 4, key: base.key, vendor: base.vendor, model: base.model, lang: LANG })
+    var _planBody = { mode: "plan", q: topic, n: 4, key: base.key, vendor: base.vendor, model: base.model, lang: LANG };
+    if (fg) { _planBody.plan = "forge"; if (fg.judge) _planBody.judge = 1; }
+    rsPost(_planBody)
       .then(function (r) { return r.json(); })
       .then(function (j) {
         if (!j || !j.ok) {
@@ -3528,7 +3544,9 @@
         }
         title = j.title || topic;
         steps = j.steps;
-        note.textContent = tx("rsSteps", { n: steps.length }) + " \u00b7 " + tx("rsCost", { n: steps.length + 1 });
+        note.textContent = (fg ? tx("fgSteps", { n: steps.length }) : tx("rsSteps", { n: steps.length }))
+          + " \u00b7 " + tx("rsCost", { n: steps.length + 1 })
+          + (fg && fg.judge ? (" \u00b7 " + tx("fgJudge")) : "");
         var rows = steps.map(function (s, i) {
           var box = el("div", "wdsm-rstep");
           var sh = el("div", "sh");
@@ -3550,7 +3568,7 @@
           var pl = {
             q: s.t, history: [], key: base.key, vendor: base.vendor, model: base.model,
             mode: thinkMode, web: webOn ? 1 : 0, skey: wdsSearchKey(), about: aboutPlus(), lang: LANG,
-            rs: { i: i + 1, n: steps.length, t: s.t, topic: topic, done: done },
+            rs: { i: i + 1, n: steps.length, t: s.t, topic: topic, done: done, forge: fg ? 1 : 0 },
           };
           return rsStream(API, pl, function (txt) { r.sb.innerHTML = mdRender(txt); if (stick) scrollBottom(); })
             .then(function (txt) {
@@ -3566,6 +3584,9 @@
         }
         function finalStep() {
           if (!secs.length) return fail(tx("rsStop"));
+          // 学科通融不跑「总判断」那一步：最后一道工序就是交付自查，再加一段总结
+          // 只会把结论摆到论证前面（本产线明令禁止的写法），还白烧一次额度。
+          if (fg) return done("");
           note.textContent = tx("rsFinal");
           var vb = el("div", "wdsm-rstep open");
           var vh = el("div", "sh"); vh.appendChild(el("b", null, "\u25c6 " + tx("rsFinal")));
@@ -3974,6 +3995,7 @@
     { k: "rename", n: "tlRename", s: "tlRenameS", cmd: ["改姓", "rename"] },
     { k: "gap", n: "tlGap", s: "tlGapS", cmd: ["缝隙", "gap"] },
     { k: "collide", n: "tlCollide", s: "tlCollideS", cmd: ["碰撞", "collide"] },
+    { k: "forge", n: "tlForge", s: "tlForgeS", cmd: ["通融", "forge", "学科通融"] },
     { k: "grid", n: "tlGrid", s: "tlGridS", cmd: ["坐标", "grid", "宫格"] },
     { k: "nine", n: "tlNine", s: "tlNineS", cmd: ["九宫", "nine"] },
     { k: "map", n: "tlMap", s: "tlMapS", cmd: ["结构图", "map", "导图"] }
@@ -4006,6 +4028,26 @@
       menu.appendChild(no);
     });
   };
+  /* 学科通融 · 二阶碰撞：一整趟产线的入口。
+     两种叫法都认：斜杠 /通融、/forge、/学科通融；以及直接用话吩咐
+     （「做一次学科通融碰撞：体育×舞蹈×心理学」「二阶碰撞 三个领域…」）。
+     题里带「只到判断」「不成文」「不写全文」时只跑前十三道工序，不进成文那三步。
+     工序表在服务端，前端只负责把 plan:"forge" 递过去——顺序不可换这件事不该由前端说了算。 */
+  function forgePick(q) {
+    var t0 = String(q || "").trim();
+    var m = t0.match(/^\/(通融|forge|学科通融)[\s\u3000:：,，、]*([\s\S]*)$/i);
+    var rest = null;
+    if (m) rest = m[2];
+    else {
+      var m2 = t0.match(/^(?:请|帮我|来|做|跑|开)?\s*(?:一次|一趟|一条)?\s*(?:学科通融(?:碰撞)?|二阶碰撞|碰撞出典范)[\s\u3000:：,，、]*([\s\S]*)$/);
+      if (m2) rest = m2[1];
+    }
+    if (rest == null) return null;
+    rest = String(rest).trim();
+    if (!rest) return null;                       // 只打了命令没给题：当普通提问处理，别空跑
+    var judge = /只到判断|不成文|不写全文|不要全文/.test(rest);
+    return { topic: rest, judge: judge };
+  }
   // 斜杠命令：只认**开头**的 /xxx，认出来就把它从提问里摘掉（别让命令本身混进语义）。
   // 认不出的 /xxx 原样留着——读者可能本来就想问一个带斜杠的东西。
   function slashPick(q) {

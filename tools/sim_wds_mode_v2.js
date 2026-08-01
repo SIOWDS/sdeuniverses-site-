@@ -726,7 +726,7 @@ console.log("⑧ 成文（distill）");
      "工序按钮借 .wdsm-mode 样式但没有 data-k，不参与三档互斥（三档仍是 3 个）");
   tlBtn.click();
   const tlm = document.body.querySelector(".wdsm-menu");
-  ok(!!tlm && tlm.querySelectorAll("button").length === 11, "工序菜单十道＋「不用工序」共十一项，实得 " + (tlm ? tlm.querySelectorAll("button").length : 0));
+  ok(!!tlm && tlm.querySelectorAll("button").length === 12, "工序菜单十一道＋「不用工序」共十二项，实得 " + (tlm ? tlm.querySelectorAll("button").length : 0));
   ["创新智商评分", "三视角误差互消", "母题打造", "近邻检测", "改姓", "缝隙扫描", "三篇碰撞", "27 宫格定位", "九宫格取三格"]
     .forEach((n) => ok(tlm.querySelectorAll("button").some((b) => b.textContent.includes(n)), "菜单里有「" + n + "」"));
   tlm.querySelectorAll("button").find((b) => b.textContent.includes("近邻检测")).click();

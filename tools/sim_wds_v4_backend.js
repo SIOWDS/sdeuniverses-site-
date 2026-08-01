@@ -51,7 +51,8 @@ ok(/不要凑/.test(SUM), "某一类没有就写「（无）」，不许凑—�
 
 console.log("④ 深度研究");
 ok(/const rs = rsRaw \? \{/.test(CHAT), "chat 收 rs（研究步走同一条熟产线：检索/联网/心跳/时钟全现成）");
-ok(/Math\.max\(1, Math\.min\(12, parseInt\(rsRaw\.i, 10\)/.test(CHAT), "rs 的步号有上下界钳位（读者传来的东西一律不信）");
+ok(/Math\.max\(1, Math\.min\(20, parseInt\(rsRaw\.i, 10\)/.test(CHAT), "rs 的步号有上下界钳位（读者传来的东西一律不信）；上限 20＝学科通融十八道工序放得下");
+ok(/forge: rsRaw\.forge \? 1 : 0/.test(CHAT), "rs 收 forge 位，且只当布尔用（不把读者传来的字符串拼进 system）");
 ok(/rs \? \(deep \? 6000 : 4000\)/.test(CHAT), "研究步预算 4000／满功率仍 6000");
 ok(!/rs \? [\s\S]{0,40}(?:1[0-9]{4}|[89][0-9]{3})/.test(CHAT), "研究步没有把满功率预算顶到 8000 以上（硬约束，不是可调参数）");
 ok(/outText\.length > 150 && !rs/.test(CHAT), "研究步不出追问建议（那是给读者接着聊用的，研究流程里是噪音）");
