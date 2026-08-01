@@ -16,7 +16,7 @@ import argparse, json, re, sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-DB = ROOT / "public" / "kb" / "foreign-neighbors.json"
+DB = ROOT / "public" / "kb" / "placeholders.json"   # 唯一来源；foreign-neighbors.json 已并入此处
 STOP = set("的了是不在和与对把被就都也很一个这那如果因为所以但是而且不是就是可以能够我们他们它们本文一种一条一个人什么怎么为什么".split()) | set("的了是不在和与对")
 
 
@@ -38,10 +38,10 @@ def rank(q, items, top=8):
     scored = []
     for c in items:
         # eats 权重最高：闸门问的是"它会不会吞掉这条"，不是"它跟这条像不像"
-        s = (3.0 * len(qt & toks(c.get("eats", "")))
-             + 1.5 * len(qt & toks(c.get("says", "")))
-             + 2.0 * len(qt & toks(" ".join(c.get("aliases", []))))
-             + 1.0 * len(qt & toks(c.get("name", "") + " " + c.get("field", ""))))
+        s = (3.0 * len(qt & toks(c.get("h", "")))
+             + 1.5 * len(qt & toks(c.get("p", "")))
+             + 2.0 * len(qt & toks(" ".join(c.get("a", []))))
+             + 1.0 * len(qt & toks(" ".join(c.get("a",[])[:1]) + " " + c.get("d",""))))
         if s > 0:
             scored.append((s, c))
     scored.sort(key=lambda x: -x[0])
@@ -57,10 +57,10 @@ def main():
     items = d["items"]
 
     if a.audit:
-        bad = [c["id"] for c in items if not c.get("eats")]
+        bad = [c["id"] for c in items if not c.get("h")]
         dup = len(items) - len({c["id"] for c in items})
         print(f"{len(items)} 张卡 · 无 eats {len(bad)} · 重复 id {dup} · 批次 "
-              f"{sorted({c.get('batch','') for c in items})}")
+              f"{sorted({c.get('d','') for c in items})}")
         if bad:
             print("  ✗ 缺 eats：", bad)
         sys.exit(1 if (bad or dup) else 0)
@@ -73,13 +73,13 @@ def main():
         sys.exit(2)
     print(f"命中 {len(hits)} 位（按「它会不会吞掉这条」排序）：\n")
     for s, c in hits:
-        print(f"[{s:5.1f}] {c['name']}　{c['who']} {c['year']}　（{c['field']}）")
-        print(f"        它说到哪一步：{c['says']}")
-        print(f"        它会吞掉：{c['eats']}")
-        if c.get("split"):
-            print(f"        已知分离线：{c['split']}")
-        if c.get("url"):
-            print(f"        出处：{c['url']}")
+        print(f"[{s:5.1f}] {c['a'][0]}　{c['au']} {c['y']}　（{c['d']}）")
+        print(f"        它说到哪一步：{c['p']}")
+        print(f"        它会吞掉：{c['h']}")
+        if c.get("s"):
+            print(f"        已知分离线：{c['s']}")
+        if c.get("v"):
+            print(f"        核验：{c['v']}")
         print()
     print("提醒：命中不等于淘汰。通过条件是「带着一条可裁决分离线活下来」；"
           "而未命中只说明本批种子没覆盖，仍须跑 web 检索。")
