@@ -393,10 +393,10 @@ function setStudent(c, slug) {
 
   const c1 = await boot();
   await step('一、页面起得来（静态结构）', async () => {
-    ok('十二道工序面板都在', c1.doc.querySelectorAll('.stage').length === 12, '实际 ' + c1.doc.querySelectorAll('.stage').length);
+    ok('十三道工序面板都在', c1.doc.querySelectorAll('.stage').length === 13, '实际 ' + c1.doc.querySelectorAll('.stage').length);
     ok('第一格是内化、第二格是选篇', c1.doc.querySelectorAll('.stage')[0].id === 'stage-warmup' &&
       c1.doc.querySelectorAll('.stage')[1].id === 'stage-select');
-    ok('工序顺序正确', ['warmup','select','gate','spine','collide','expand','collide2','selforg','emerge','demarc','write','review']
+    ok('工序顺序正确（候选闸在扩候选与候选互撞之间）', ['warmup','select','gate','spine','collide','expand','nbrgate','collide2','selforg','emerge','demarc','write','review']
       .every((id, i) => c1.doc.querySelectorAll('.stage')[i].id === 'stage-' + id));
     ok('八家基底都在选择器里', ['ds:pro','glm:pro','kimi:pro','qwen:pro','minimax:pro','gpt:pro','claude:pro','gemini:pro']
       .every(v => !!c1.doc.querySelector('option[value="' + v + '"]')));
@@ -445,7 +445,7 @@ function setStudent(c, slug) {
       cA.calls.some(x => /你是对子验收员/.test(x.user)) &&
       cA.calls.some(x => /你的任务：从下面清单里挑出/.test(x.user)) &&
       cA.calls.some(x => /你是验收员/.test(x.user)));
-    ['gate','spine','collide','expand','collide2','selforg','emerge','demarc'].forEach(id =>
+    ['gate','spine','collide','expand','nbrgate','collide2','selforg','emerge','demarc'].forEach(id =>
       ok('  ' + id + ' 出了结果', /✓/.test(cA.$('stat-' + id).textContent), cA.$('stat-' + id).textContent));
     ok('成文格给出了字数', /字/.test(cA.$('stat-write').textContent), cA.$('stat-write').textContent);
     ok('成文格报告术语零残留', /术语零残留/.test(cA.$('stat-write').textContent));
@@ -515,7 +515,7 @@ function setStudent(c, slug) {
     const exp = f(/五个候选判断/);
     ok('扩候选要求候选间不同脊、不凑数', exp && /不许同脊/.test(exp.user) && /不要凑数/.test(exp.user));
     const c2 = f(/第二阶对撞/);
-    ok('候选互撞是 C(5,2)=10 对', c2 && /10 对/.test(c2.user));
+    ok('候选互撞只吃过闸幸存的候选', c2 && /C\(n,2\)/.test(c2.user) && /已被淘汰的候选不许再进来/.test(c2.user));
     const so = f(/自组织聚类/);
     ok('暗流要 ≥2 个涌现物支撑、不许硬凑', so && /≥2 个涌现物/.test(so.user) && /不许硬凑/.test(so.user));
     const em = f(/五重检验/);
@@ -1108,7 +1108,7 @@ function setStudent(c, slug) {
       pack && pack.text ? pack.text.slice(0, 60).replace(/\n/g, '⏎') : '(没取到内容)');
     ok('发布包附了三篇来源与划界', pack && pack.text && /## 三篇来源/.test(pack.text) && /与既有说法的划界/.test(pack.text));
     const eng = c.saved.find(x => /引擎室_/.test(x.name));
-    ok('引擎室 md 十二格俱全', eng && eng.text && (eng.text.match(/\n## \d+\./g) || []).length === 12,
+    ok('引擎室 md 十三格俱全', eng && eng.text && (eng.text.match(/\n## \d+\./g) || []).length === 13,
       eng && eng.text ? ((eng.text.match(/\n## \d+\./g) || []).length + ' 格') : '(没取到内容)');
     c.click('#dlDocx'); await sleep(400);
     ok('Word 也写进了目录', c.saved.some(x => /\.docx$/.test(x.name)));

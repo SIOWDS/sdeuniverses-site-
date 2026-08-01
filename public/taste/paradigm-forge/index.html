@@ -287,6 +287,7 @@ select.model-select{max-width:340px}
 <!-- 站内近邻：端点客户端 + 三关判据。判据只有一份来源，复制两份必漂，而那种漂是静默的 -->
 <script src="/taste/assets/sde-rag.js?v=4"></script>
 <script src="/taste/assets/sde-nbr-gate.js?v=1"></script>
+<script src="/taste/assets/sde-placeholder-lib.js?v=1"></script>
 <script>
 /* ===================== 多厂商基底引擎（与金点子发生器同源，由 tools/build_forge_page.py 注入） ===================== */
 // 多厂商 API 地址
@@ -541,7 +542,7 @@ async function streamChat(apiKey, model, systemPrompt, userQ, bodyEl, statusEl, 
   try{
     resp = await fetch(apiUrl(model), {
       method:'POST',
-      headers:{ 'Content-Type':'application/json', 'Authorization':'Bearer '+apiKey },
+      headers: chatHeaders(model, apiKey),
       body: JSON.stringify(buildPayload(model, systemPrompt, userQ, maxTokens)),
       signal: ac.signal
     });
@@ -644,6 +645,21 @@ async function streamChat(apiKey, model, systemPrompt, userQ, bodyEl, statusEl, 
   return { text:acc, chars, thinkChars, finish:fin, secs:parseFloat(secs) };
 }
 
+// ============ 请求头构造（真跑与 Key 检测共用同一条路，改一处两处都变）============
+function chatHeaders(model, apiKey){
+  const { vendor, tier } = parseModel(model);
+  const headers = { 'Content-Type':'application/json' };
+  if(typeof isOverseas === 'function' && isOverseas(model)){
+    if(vendor === 'gpt'){ headers['Authorization'] = 'Bearer ' + apiKey; headers['x-target-url'] = 'https://api.openai.com/v1/chat/completions'; }
+    else if(vendor === 'minimax'){ headers['Authorization'] = 'Bearer ' + apiKey; headers['x-target-url'] = 'https://api.minimaxi.com/v1/chat/completions'; }
+    else if(vendor === 'claude'){ headers['x-api-key'] = apiKey; headers['anthropic-version'] = '2023-06-01'; headers['anthropic-dangerous-direct-browser-access'] = 'true'; headers['x-target-url'] = 'https://api.anthropic.com/v1/messages'; }
+    else if(vendor === 'gemini'){ const gm = (tier === 'pro') ? 'gemini-3.1-pro-preview' : 'gemini-2.5-flash'; headers['x-target-url'] = 'https://generativelanguage.googleapis.com/v1beta/models/' + gm + ':streamGenerateContent?alt=sse&key=' + encodeURIComponent(apiKey); }
+  } else {
+    headers['Authorization'] = 'Bearer ' + apiKey;
+  }
+  return headers;
+}
+
 // 境外基底（GPT/Claude/Gemini）：经 /api/llm-proxy 中转、【流式】逐块返回，按各家 SSE 格式解析。
 // 流式的意义：首字节几秒到达、代理逐块透传（src/worker.js 直接透传 upstream.body），
 // 服务端不必等全部生成完，永不撞 Cloudflare ~100s 网关超时——这才让长文（论文 max_tokens 32000）在境外基底上跑得通。
@@ -651,24 +667,8 @@ async function callOverseas(apiKey, model, systemPrompt, userQ, bodyEl, statusEl
   const { vendor, tier } = parseModel(model);
   const payload = buildPayload(model, systemPrompt, userQ, maxTokens);
 
-  // 组装代理请求头：不同厂商鉴权方式不同
-  const headers = { 'Content-Type':'application/json' };
-  if(vendor === 'gpt'){
-    headers['Authorization'] = 'Bearer ' + apiKey;
-    headers['x-target-url'] = 'https://api.openai.com/v1/chat/completions';
-  } else if(vendor === 'minimax'){
-    headers['Authorization'] = 'Bearer ' + apiKey;
-    headers['x-target-url'] = 'https://api.minimaxi.com/v1/chat/completions';
-  } else if(vendor === 'claude'){
-    headers['x-api-key'] = apiKey;
-    headers['anthropic-version'] = '2023-06-01';
-    headers['anthropic-dangerous-direct-browser-access'] = 'true';
-    headers['x-target-url'] = 'https://api.anthropic.com/v1/messages';
-  } else if(vendor === 'gemini'){
-    const gm = (tier === 'pro') ? 'gemini-3.1-pro-preview' : 'gemini-2.5-flash';
-    // 流式端点：streamGenerateContent + alt=sse，返回 SSE 而非一次性 JSON
-    headers['x-target-url'] = 'https://generativelanguage.googleapis.com/v1beta/models/' + gm + ':streamGenerateContent?alt=sse&key=' + encodeURIComponent(apiKey);
-  }
+  // 组装代理请求头（与 Key 检测共用同一个 chatHeaders）
+  const headers = chatHeaders(model, apiKey);
 
   bodyEl.innerHTML='<span class="placeholder">✓ 已连接，'+vendorName()+' 正在启动'+(tier==='pro'?'（较强模型首次响应可能需 1-2 分钟）':'')+'……<br><span style="font-size:12px;opacity:.7">境外基底经中转、流式逐字返回，请稍候</span></span>';
   statusEl.innerHTML='<span class="spinner"></span> 等待响应';
@@ -894,7 +894,8 @@ const STAGES = [
   {id:'spine',   n:'抽脊',     hint:'每篇抽三条最硬的话，共九条',        tok:TOK_HARD},
   {id:'collide', n:'混沌碰撞', hint:'跨篇两两对撞，二十七对',            tok:TOK_HARD},
   {id:'expand',  n:'扩候选',   hint:'先铺开成五个候选判断，不急着收',    tok:TOK_HARD},
-  {id:'collide2',n:'候选互撞', hint:'五个候选再互撞，十对',              tok:TOK_HARD},
+  {id:'nbrgate', n:'候选闸',   hint:'每个候选压到50字，查占位者：站内＋占位者库＋联网', tok:TOK_HARD},
+  {id:'collide2',n:'候选互撞', hint:'幸存候选再互撞',                    tok:TOK_HARD},
   {id:'selforg', n:'自组织',   hint:'撞出来的东西自己抱团，成暗流',      tok:6000},
   {id:'emerge',  n:'涌现',     hint:'收敛成一句谁单看都说不出的话',      tok:TOK_HARD},
   {id:'demarc',  n:'近邻划界', hint:'与既有说法逐一划清界线',            tok:TOK_HARD},
@@ -1600,13 +1601,49 @@ function promptFor(id){
     O.collide || ''
   ].join('\n');
 
+  if(id==='nbrgate') return [
+    '下面是几个候选判断。**逐个过闸**，不是逐个夸奖。这一格的产出决定后面十道工序撞的是不是一块已经被占满的地。',
+    '',
+    '对每一个候选，按顺序做四件事：',
+    '一、**压成 50 字**：把它压成一句最紧的承重命题。压不出来的，说明它还没成形，直接判「未成形·淘汰」。',
+    '二、**先找同向占位者**：先找 ≥3 位说过**类似意思**的既有作者（不是先找对立派——对立派是你能推开的那些，同向的才是推不开的），',
+    '　　其中至少一位来自本候选所属学科之外，至少一位给出外文原题。下面附了两份材料，但**不得只靠它们**：',
+    '　　材料里没有的，你要自己从已有知识里点名，并在后面标〔未核验〕。',
+    '三、**1:1 替换测试**：把候选的名字换成最像的那个占位者的概念名，整段论证是否照样成立？照样成立＝被占位。',
+    '四、**判决**：被占位者当场淘汰；除非能补上一条**可裁决分离线**——同一个具体案例，按占位者判是 A、按本候选判是非 A，且说清 A 怎么读数。',
+    '',
+    '三条纪律（违反其一，这道闸就变成橡皮图章，比没有更坏）：',
+    '· **未命中不等于未被占位。** 两份材料都没命中时，只能标〔库未命中〕，不得据以放行。',
+    '· **通过条件不是「无近邻」，是「带着一条可裁决分离线活下来」。** 否则谁也过不了，闸门永不返回健康。',
+    '· **只引自己人＝仍停在一阶。** 若你点出来的占位者全在同一个语料圈或同一个作者群里，视同未检索，判该候选「未检索·淘汰」。',
+    '',
+    '【输出格式，程序要读，别改字段名】',
+    '候选X · 50字：……',
+    '候选X · 同向占位者：1）概念名（作者 年份·学科）〔核验/未核验〕 2）… 3）…',
+    '候选X · 替换测试：换成〔哪一个〕之后，论证 照样成立／不成立（一句话说明）',
+    '候选X · 分离线：同一案例〔……〕，按〔占位者〕判是 A，按本候选判是非 A，A 的读数是〔……〕　／　给不出',
+    '候选X · 判决：存活／淘汰（一句话理由）',
+    '（每个候选一块，格式相同）',
+    '',
+    '最后一行必须是：幸存候选：甲、丙……（写候选的编号或名字，全被淘汰就写「全部淘汰」）',
+    '',
+    '【候选】', O.expand || '',
+    '', (window.__PH ? window.__PH : ''),
+    '', (window.__NBRC ? window.__NBRC : ''),
+    '', (window.__WEB ? window.__WEB : '')
+  ].join('\n');
+
   if(id==='collide2') return [
-    '下面是五个候选判断。请执行第二阶对撞：C(5,2)=10 对。',
+    '下面是**过了候选闸、活下来的**那些候选判断。请执行第二阶对撞：两两相撞，C(n,2) 对。',
     '优先对撞轴：结局对立（两个候选对同一件事给了相反的处方）／主因互斥（两个候选把同一结果归给互不相容的原因）。无焦点即作废。',
     '每对给出：焦点一句话 ＋ 撞出的二阶涌现物（结构性命名 ≤20字）＋ 它为什么单看任一候选都到不了。',
     '',
-    '【五候选】',
-    O.expand || ''
+    '**已被淘汰的候选不许再进来**——它们是被占位者占满的地，撞它们等于替别人的旧命题做工。',
+    '若只剩一个候选，如实说「材料只撑得起一个」，不要为了凑对子把淘汰的拉回来。',
+    '',
+    '【幸存候选（判决见每块末行）】',
+    O.nbrgate || '',
+    '', '【候选原文（备查）】', (O.expand||'').slice(0, 3000)
   ].join('\n');
 
   if(id==='selforg') return [
@@ -1837,7 +1874,7 @@ async function callStage(id, prompt, tok, system){
 
 /* 从评审文字里读出该回哪一格；读不出就回「近邻划界」——历次经验里这一格最常是短板 */
 const BACK_MAP = [['体检','gate'],['抽脊','spine'],['混沌碰撞','collide'],['碰撞','collide'],
-  ['扩候选','expand'],['候选互撞','collide2'],['自组织','selforg'],['涌现','emerge'],
+  ['扩候选','expand'],['候选闸','nbrgate'],['占位','nbrgate'],['候选互撞','collide2'],['自组织','selforg'],['涌现','emerge'],
   ['近邻划界','demarc'],['划界','demarc'],['成文','write']];
 function backStageFrom(txt){
   const seg = (txt||'').split(/回炉|回到/).slice(1).join(' ');
@@ -1857,6 +1894,43 @@ async function runStage(i){
     return await doSelect();
   }
   if(s.id==='write') return await doWrite();
+  if(s.id==='nbrgate'){
+    // 三路取料：站内近邻（本站有没有人说过）／占位者库（世界上有没有人说过）／联网（库里没有的那一层）。
+    // 三路互不替代——这正是两次真跑失手的地方：站内库够不着 Holling & Meffe、Bainbridge 这一层。
+    const seed = (ST.out.expand||'').slice(0, 1200);
+    setStat('nbrgate', '<span class="spinner"></span> 取料：站内近邻 · 占位者库 · 联网', 'run');
+    // 占位者库（纯前端、无 Key、失败即空）
+    try{
+      const G = window.SDEPlaceholder;
+      const hits = G ? await G.match(seed, 6) : [];
+      window.__PH = G ? G.block(hits) : '';
+      if(G && !hits.length) note('占位者库这次没命中——按纪律，未命中不等于未被占位，闸门照跑但不得据此放行。');
+    }catch(e){ window.__PH = ''; }
+    // 站内近邻
+    try{ window.__NBRC = await nbrList([seed.slice(0,600)], 6) || ''; }catch(e){ window.__NBRC=''; }
+    // 联网：先让基底把候选转成英文检索词，再各搜一轮。搜不动就如实标明，不假装搜过。
+    window.__WEB = '';
+    try{
+      const qp = [
+        '把下面这些候选判断转成 2 条**英文**学术检索词，用来查「国际上有没有人已经说过同类的话」。',
+        '每行一条，形如：Q1: keyword keyword keyword（4–8 个词，用领域通行说法，不要直译中文）。',
+        '只输出两行，别的都不要。', '', seed.slice(0,900)
+      ].join('\n');
+      const box = document.createElement('div'); box.className='out'; box.style.marginTop='8px';
+      panels.nbrgate.out.parentNode.insertBefore(box, panels.nbrgate.out.nextSibling);
+      const qr = await askFast(sdeSystem(), qp, box, panels.nbrgate.stat, panels.nbrgate.meta, 400, '转检索词');
+      const qs = (qr.text||'').split('\n').map(x=>{ const m=/Q\d\s*[:：]\s*(.+)/.exec(x.trim()); return m?m[1].trim():''; }).filter(Boolean).slice(0,2);
+      if(qs.length){
+        const res = await Promise.all(qs.map(q=>webSearch(q, '')));
+        const bad = res.find(x=>!x || !x.ok);
+        if(bad){ window.__WEB = '【联网检索：本次不可用（'+((bad&&bad.error)||'未知')+'）——按纪律标〔未联网〕，不得据以放行】'; }
+        else {
+          window.__WEB = '【联网检索到的国际近邻（用于 1:1 替换测试；条目只是线索，引用前须核原文）】\n'
+            + res.map((x,i)=>'〔检索词：'+qs[i]+'〕\n'+webBlockOf('N'+(i+1)+'-', (x&&x.items)||[])).join('\n');
+        }
+      }
+    }catch(e){ window.__WEB = '【联网检索：本次不可用——按纪律标〔未联网〕，不得据以放行】'; }
+  }
   if(s.id==='demarc'){
     // 名单与语料两样都取：名单是待交代的清单（缺了会静默地把概念第二次发明），语料只是背景。
     ST.coined = forgeCoined();
@@ -1914,6 +1988,27 @@ async function runStage(i){
                 + '要重做就点这一格的「重跑本格」，或用「编辑产物」自己补上，或就这样往下走——由你决定。');
         }
       }
+    }
+  }
+  if(s.id==='nbrgate'){
+    const line = (txt.match(/幸存候选[：:]\s*([^\n]*)/) || [])[1] || '';
+    const dead = (txt.match(/判决[：:]\s*淘汰/g) || []).length;
+    const live = (txt.match(/判决[：:]\s*存活/g) || []).length;
+    const sepN = (txt.match(/分离线[：:]/g) || []).length;
+    ST.gateLive = live;
+    const allDead = /全部淘汰/.test(line) || (live === 0 && dead > 0);
+    setStat('nbrgate', (allDead?'⚠ ':'✓ ') + '存活 '+live+' · 淘汰 '+dead + (line?(' · '+line.slice(0,40)):''), 'done');
+    if(allDead){
+      note('候选全部被占位淘汰——这不是失败，是这道闸在干活。回「扩候选」用剩下的产物另铺一批。');
+      showErr('所有候选都被既有说法占满了。要么回「扩候选」另铺一批（推荐），要么回「混沌碰撞」换撞法——'
+            + '硬往下走只会撞出一块别人已经占满的地。');
+      if($('autoRedoChk') && $('autoRedoChk').checked && ST.gateRetry < 1){
+        ST.gateRetry = (ST.gateRetry||0) + 1;
+        ST.redoFrom = STAGES.findIndex(x=>x.id==='expand');
+      }
+    } else if(live > 0 && sepN === 0){
+      showErr('有候选判了存活，却一条分离线都没给——按纪律，通过条件是「带着一条可裁决分离线活下来」，'
+            + '不是「没查到近邻」。建议点「重跑本格」。');
     }
   }
   if(s.id==='gate'){
@@ -2843,7 +2938,7 @@ $('dlEngine').addEventListener('click', ()=>{
 });
 
 /* ===================== 起 ===================== */
-const BUILD_TAG = '20260730-0758·v1';
+const BUILD_TAG = '20260801-0111·v1';
 (function(){ const el=$('buildTag'); if(el) el.textContent='构建 '+BUILD_TAG; })();
 loadData();
 </script>
