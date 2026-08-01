@@ -22,8 +22,9 @@ from cards_b import CARDS_B          # noqa: E402
 from cards_c import CARDS_C          # noqa: E402
 from cards_d import CARDS_D          # noqa: E402
 from cards_e import CARDS_E          # noqa: E402
+from cards_f import CARDS_F          # noqa: E402
 
-_RAW = CARDS_A + CARDS_B + CARDS_C + CARDS_D + CARDS_E
+_RAW = CARDS_A + CARDS_B + CARDS_C + CARDS_D + CARDS_E + CARDS_F
 
 
 def _tkey(c):
