@@ -1,0 +1,128 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>运转与停止 · 每日必读 · 典范文 · 多学科碰撞 | SDE Universes</title>
+<meta name="description" content="每日必读 · 运转与停止 频道：一套东西怎么继续跑，以及它什么时候非得先停下来。这一族关心边界、悬置、维护与终止——尤其是那些不出事故、因而从不被记录的失效。 每日必读：每篇典范文都由 Claude 在王德生博士指导下，把站内三篇分属不同学科、且彼此打架的文章做二阶碰撞写成。不带任何学派术语，普通人一路读得下来。作者 王德生 ＋ Claude。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&display=swap">
+<style>
+:root{--ink:#1E2A3A;--ink2:#4E5A68;--paper:#F4F1E8;--card:#FBF9F2;--indigo:#243447;
+--clay:#B5714A;--clay2:#C98A63;--line:rgba(30,42,58,.16)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:"Noto Serif SC","Songti SC",serif;line-height:1.95}
+a{color:inherit}
+nav{position:sticky;top:0;z-index:10;background:rgba(244,241,232,.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+.navin{max-width:1080px;margin:auto;padding:13px 24px;display:flex;justify-content:space-between;font-size:14px}
+.navin a{text-decoration:none;color:var(--clay)}
+.hero{position:relative;overflow:hidden;color:#EDE7DA;padding:86px 22px 78px;text-align:center;
+background:radial-gradient(circle at 30% 28%,rgba(60,86,112,.5),transparent 42%),
+radial-gradient(circle at 72% 66%,rgba(181,113,74,.34),transparent 40%),
+linear-gradient(148deg,#161F2B,#243447 58%,#1E2A3A)}
+.hero:before{content:"";position:absolute;inset:8% 7%;border:1px solid rgba(201,138,99,.24)}
+.heroin{position:relative;z-index:1;max-width:860px;margin:auto}
+.eyebrow{font-size:12px;letter-spacing:.46em;color:#C99C7A}
+.hero h1{font-size:clamp(42px,7vw,76px);margin:20px 0 16px;line-height:1.14;text-shadow:0 6px 30px #0C1219}
+.hero p{font-size:clamp(16px,2vw,20px);color:#D8D0C0;line-height:2;margin:0 auto;max-width:700px}
+.how{display:flex;justify-content:center;gap:14px;margin-top:30px;flex-wrap:wrap}
+.how span{border:1px solid rgba(201,138,99,.5);border-radius:22px;padding:7px 17px;font-size:13px;color:#E0D6C4}
+.wrap{max-width:1080px;margin:auto;padding:64px 24px 40px}
+.lead{max-width:820px;margin:0 auto 20px;font-size:17.5px;line-height:2.08;text-align:justify}
+.lead:first-letter{float:left;font-size:52px;line-height:.86;color:var(--clay);padding:9px 10px 0 0}
+.rule{max-width:820px;margin:0 auto 50px;font-size:14.5px;color:var(--ink2);line-height:1.95;
+border-left:3px solid var(--clay);padding:4px 0 4px 16px}
+.item{display:block;background:var(--card);border:1px solid var(--line);
+border-top:4px solid var(--indigo);border-radius:11px;padding:30px 32px;margin-bottom:20px;transition:.2s}
+.item:hover{transform:translateY(-4px);box-shadow:0 15px 36px rgba(30,42,58,.12)}
+.item .n{font-size:12px;letter-spacing:.2em;color:var(--clay)}
+.item h2{font-size:27px;margin:9px 0 8px;color:var(--indigo);line-height:1.4}
+.item .sub{font-size:15.5px;color:var(--ink2);font-style:italic;margin:0 0 12px;line-height:1.8}
+.item .hk{font-size:15px;color:var(--ink2);margin:0 0 16px}
+.trio{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:16px 0 14px}
+.trio div{border:1px dashed rgba(30,42,58,.22);border-radius:8px;padding:11px 13px;font-size:13px;line-height:1.72;color:var(--ink2)}
+.trio div b{display:block;color:var(--clay);font-size:11.5px;letter-spacing:.1em;margin-bottom:4px}
+.meta{font-size:12.5px;color:var(--ink2);border-top:1px dashed var(--line);padding-top:11px}
+.item h2 a{text-decoration:none;color:inherit}
+.item h2 a:hover{color:var(--clay)}
+.trio div a{color:var(--indigo);text-decoration:none;border-bottom:1px solid rgba(30,42,58,.3)}
+.trio div a:hover{color:var(--clay);border-bottom-color:var(--clay)}
+.rdmore{display:inline-block;margin:2px 0 12px;font-size:14px;color:var(--clay);text-decoration:none;letter-spacing:.05em}
+.rdmore:hover{text-decoration:underline;text-underline-offset:4px}
+footer{text-align:center;border-top:1px solid var(--line);padding:34px;color:var(--ink2);font-size:12.5px}
+@media(max-width:760px){.trio{grid-template-columns:1fr}.wrap{padding:44px 18px 30px}}
+
+.byline{margin-top:24px;font-size:13px;letter-spacing:.28em;color:#C99C7A}
+.spec{max-width:820px;margin:0 auto 46px;background:var(--card);border:1px solid var(--line);
+border-left:4px solid var(--clay);border-radius:11px;padding:26px 30px}
+.spec .lb{display:block;color:var(--clay);letter-spacing:.28em;font-size:12.5px;margin-bottom:14px}
+.spec ol{margin:0;padding-left:1.3em}
+.spec li{font-size:15px;line-height:1.95;margin-bottom:12px;text-align:justify}
+.spec li b{color:var(--indigo)}
+.how-made{margin:16px 0 0;padding-top:14px;border-top:1px dashed var(--line);
+font-size:14px;color:var(--ink2);line-height:1.95;text-align:justify}
+.how-made b{color:var(--clay);letter-spacing:.06em;margin-right:6px}
+@media(max-width:720px){.spec{padding:20px 18px}.trio{grid-template-columns:1fr}}
+
+.chnav{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 22px}
+.chnav a{text-decoration:none;font-size:13px;letter-spacing:.06em;padding:7px 14px;border:1px solid var(--clay);border-radius:20px;color:var(--clay);background:transparent;transition:all .18s}
+.chnav a:hover{background:var(--clay);color:#fff}
+.chbox{border:1px solid rgba(181,113,74,.28);border-radius:6px;padding:20px 22px;margin:0 0 14px;background:rgba(181,113,74,.045)}
+.chbox h3{margin:0 0 6px;font-size:17px;letter-spacing:.04em;color:var(--clay)}
+.chbox .cn-lead{margin:0 0 12px;font-size:14px;line-height:1.95;color:var(--ink2);text-align:justify}
+.chbox ul{margin:0;padding-left:20px}
+.chbox li{font-size:14.5px;line-height:1.95;margin:0 0 4px}
+.chbox li a{color:var(--ink);text-decoration:none;border-bottom:1px solid rgba(181,113,74,.35)}
+.chbox li a:hover{color:var(--clay)}
+.chbox .cn-n{float:right;font-size:12.5px;color:var(--clay);opacity:.8;letter-spacing:.08em}
+</style></head><body>
+<nav><div class="navin"><a href="/browse/">SDE Universes</a><a href="/paradigm/">← 返回每日必读</a><a href="/confluence/" title="站外碰撞">学科通融 · 站外碰撞 →</a></div></nav>
+<header class="hero"><div class="heroin">
+<div class="eyebrow">每 日 必 读 · 频 道</div>
+<h1>运转与停止</h1>
+<p>一套东西怎么继续跑，以及它什么时候非得先停下来。这一族关心边界、悬置、维护与终止——尤其是那些不出事故、因而从不被记录的失效。</p>
+<div class="how"><span>共 6 篇</span><span>按撞出来的判断管什么分</span><span>不按被撞三篇的学科分</span></div>
+<div class="byline">作者 · 王德生 ＋ Claude</div>
+</div></header>
+<main class="wrap">
+<p class="lead">这一族的几篇问的是同一件事的不同侧面，连起来读比单看一篇更有用。每篇的原文、编号与来源三篇都与<a href="/paradigm/">栏目主页</a>上的完全一致——这里只是换了一种进来的方式。</p>
+<div class="chnav" style="margin-bottom:26px"><a href="/paradigm/ledger/">计量与结算</a><a href="/paradigm/teach/">教与学</a><a href="/paradigm/recognize/">承认与关系</a><a href="/paradigm/channel/">通道与形式</a><a href="/paradigm/pass/">传递与替代</a></div>
+<div class="item"><div class="n">之一 · 三学科交叉：系统神经科学 × 计算机系统 × 会计与内控（本篇撞的是站外三家传统）</div><h2><a href="/paradigm/why-it-has-to-stop/">为什么非得停下来</a></h2><p class="sub">盘点要关门，修路要封路，清理内存要卡一下，而人每天要交出七八个小时。最顺口的解释是「维护和干活抢同一副硬件」——可如果只是资源问题，加倍投入就该解决它。本文认为三家成熟传统都漏了同一件事：停机不是为了腾出资源，是为了冻结判断的前提。</p><p class="hk">清点一百件货，力气可以忽略不计——可只要收发不停，你就永远得不到一份对的数。而冲刷一条管道里的沉积极耗资源，却可以一边用一边冲。这两个例子放在一起，「停机是为了腾出资源」这个解释就塌了。 三家成熟传统在这件事上立场互相取消：睡眠研究说那段离线不可取消；并发内存回收三十年的纲领就是消灭停顿，把必须暂停的窗口从几秒压到亚毫秒；会计取消了停业盘点，却坚决保留截止日，而它自己给的两个理由互相推不出。本文提出的判断是：一项维护之所以必须停机，是因为它所依据的那个判断会被在线活动推翻——停机是为了冻结判断的前提；由此得到一条可判定的判据：看那个判据是不是单调的（一旦成立就不会被逆转）。这条判据不是思辨，工程界已经算了三十年，只是把它写成了自己的局部事实。文末给十处跨领域读数、两处反过来迫使它让步的地方、六条能推翻它的条件（最便宜的一条只需翻一份公开的功能演进史，另一条只需一间仓库和一天），以及一条写死到 2032 年的赌注。</p><div class="trio"><div><b>系统神经科学 · 睡眠功能之争</b><a href="https://pubmed.ncbi.nlm.nih.gov/24411729/">整晚在做什么：普遍下调、选择性重演，还是代谢废物的冲刷</a></div><div><b>计算机系统 · 并发内存回收</b><a href="https://dl.acm.org/doi/10.1145/359642.359655">把必须暂停的窗口从几秒压到亚毫秒：快照式标记、写屏障、疏散与安全点</a></div><div><b>会计与内控 · 盘点与截止</b><a href="https://www.iaasb.org/publications/international-standard-auditing-501-audit-evidence-specific-considerations-selected-items">关门盘点被循环盘点与持续审计取代，而截止日不可取消</a></div></div><a class="rdmore" href="/paradigm/why-it-has-to-stop/">读全文 →</a><div class="meta">约 1.6 万字 · 17 页 · 三种读法 · 作者 王德生 ＋ Claude · 发表于2026年8月1日 · 本篇撞的是<b>站外</b>三家理论，三条来源均给出可直接点开核对的原始出处</div></div>
+<div class="item"><div class="n">之六 · 三学科交叉：家庭伦理学 × 艺术存在论 × 科学思想史（三篇源由程序随机抽出）</div><h2><a href="/paradigm/nobody-refused-you/">没有人拒绝过你</a></h2><p class="sub">一个动作从一个社会里消失，通常被归给两件事：它被禁止了，或者它被抽走了资源。本文论证还有第三种，而且更深——它的必要性被更便宜地满足了。这一种关闭不经过拒绝，因此既不留下可上诉的裁定，也不在别处留下任何指纹。</p><p class="hk">三个场景：一个儿子知道那笔家庭旧账是怎么被做成还不掉的，他能把每一步拆给你听，然后他照旧还不掉；一位清代学者把几年光阴投在一个冷僻字的古音上，投入的量远超他那个行当自身要求的必要量；一个人打开写作软件，还没想好第一句，屏幕上已经排好了六个开头，其中两个比他昨天想到的更顺。三处都出现了同一个读数——某样东西没有发生——而现有的词（压抑、剥夺、异化、退化、失传）不区分它们。本文把「关闭」拆成三层：拿走回报、拿走执行条件、拿走必要性。前两层都经过一次拒绝，因而在邻近领域留下超出该领域自身逻辑的过量投入；第三层不拒绝任何人，所以什么也不留。由此得到一条判断：拒绝是指纹的唯一来源——凡是以「去找被压抑的痕迹」为方法的研究传统，在第三层里必然空手而归，并且必然把空手而归读成「这里没问题」。文末给一张四格分辨表与四步查法、九处跨领域读数、一处反过来迫使它让步的地方（来自渔业生态学）、六条能推翻它的条件（第一条只要一支笔和一台打印机），以及一条写死到 2032 年的赌注。</p><div class="trio"><div><b>家庭伦理学 · 《义务的债务化与痛苦的避税》</b><a href="/family-ethics/non-clearing-debt/">功能被外部服务接走之后，家庭不但没散，反而被一笔拒绝任何偿还手段的道德旧账锁得更紧</a></div><div><b>艺术存在论 · 《守卫的漂移》</b><a href="/students/qin-li/guarding-drift/">不可代偿、不可撤回、亲自承担后果的那种慢判决，与可外包的快决策之间有一道边界，它正在被抹平</a></div><div><b>科学思想史 · 《并非缺失，而是生成》</b><a href="/culture-tech/needham/structural-redirection/">被制度拒绝供养的求真冲动不会消失，它被推进有名分的知识躯壳里，在那里留下过量的严谨</a></div></div><a class="rdmore" href="/paradigm/nobody-refused-you/">读全文 →</a><div class="meta">约 1.8 万字 · 17 页 · 三种读法 · 作者 王德生 ＋ Claude · 发表于2026年8月1日 · 本篇三篇源由<b>程序随机抽取</b>，三条来源均可直接点开核对</div></div>
+<div class="item"><div class="n">之十三 · 三学科交叉：学术范式 × 临床心理 × AI教育（本篇是群内碰撞：三位不同学员）</div><h2><a href="/paradigm/closed-door-leaks/">门关着，后果照样溜得出去</a></h2><p class="sub">边界该守还是该敞，是个假问题——真正决定出不出事的，是过界时「谁说了算」和「谁担后果」这两样，有没有捆在一起过去。让决定权过了界、把责任留在门内（或反过来），才是所有边界事故的共同形状。</p><p class="hk">关于边界，长年有两拨人在吵：一拨说要守，越界即入侵；一拨说要通，闭界会自毁。他们吵不出结果，因为都站在同一个错问题上——门该开还是该关。本文顺着第三种声音往下走，得到一个分法：一道边界危不危险，跟它开还是关关系不大；决定安危的是另一样——有东西越过它时，**「谁说了算」和「谁担后果」这两样，是捆在一起过去的，还是被拆开、只过去一样**。关死的门照样漏后果，敞开的门也能让责任堂堂正正跟进来；所有边界事故的形状只有一个：**决定权和责任分了家，一个过了界，另一个留在原地**。</p><div class="trio"><div><b>学术范式 · 胡志英</b><a href="/students/hu-zhiying/boundary-contraction/">边界收缩即边疆永失：学术范式免疫性-脆弱性悖论的一个通用机制</a></div><div><b>临床心理 · 孔凡鹤</b><a href="/students/kong-fanhe/adjudicative-withholding/">理解的不逾：论治疗性理解的生成条件、入侵性与伦理边界</a></div><div><b>AI教育 · 陈晓艳</b><a href="/students/chen-xiaoyan/dissolving-boundary/">溶解性边界：真正的风险不是人机边界流动，而是责任与控制脱钩</a></div></div><a class="rdmore" href="/paradigm/closed-door-leaks/">读全文 →</a><div class="meta">约 1.2 万字 · 7 页 · 三种读法 · 作者 王德生 ＋ Claude · 发表于2026年7月29日 · 三篇来源分属<a href="/students/hu-zhiying/" style="color:var(--clay)">胡志英</a>、<a href="/students/kong-fanhe/" style="color:var(--clay)">孔凡鹤</a>、<a href="/students/chen-xiaoyan/" style="color:var(--clay)">陈晓艳</a>三位学员</div></div>
+<div class="item"><div class="n">之十七 · 三家在世经济学体系交叉：制度 × 分配动力学 × 观念与修辞</div>
+<h2><a href="/paradigm/catch-up-lag/">改一样，另外两样多久跟上</a></h2>
+<p class="sub">三位在世经济学家为「富裕从哪来」吵了三十年，各有硬证据；他们争的那个「因」，其实是同一台机器上的三个轮子</p>
+<p class="hk"><b>阿西莫格鲁</b>说是规矩——谁能进场、权力怎么分；<b>皮凯蒂</b>说是积累本身的动力学——只要资本回报长期高过增长，存量就自动压过流量，这条路不需要任何人下决心；<b>麦克洛斯基</b>说前两个都不对，是<b>说法变了</b>——产权制度自古到处都有、资本从来也不缺，变的是一七〇〇年前后北欧开始把做买卖和搞发明当成体面事。三人指名道姓打过笔战（前两位在《经济展望杂志》同一期上互驳，第三位的书名副标题同时点名另外两位）。文章先指出这场争论的结构：<b>允许「再加一步」三家都不可推翻，不许加一步三家都已被驳倒</b>——这样的问法出不来答案。于是把问题从「谁是因」换成<b>「先动之后，另外两个多久跟上」</b>：三个轮子（规矩／钱往哪流／话怎么说）互相咬合，而互相带动不等于同时。由此得四种可辨认的结局，以及一条最实用的判断：<b>绝大多数「改了却没用」不是改错了方向，是只改了一个轮子</b>——而这个诊断的下一步与「方向错了」完全相反。附六条通道的宽窄（最宽是钱→话，最窄是话→钱；故最短有效路径通常是「规矩→钱→话」，而人们最爱试的宣传与呼吁恰是最窄的两条）、第三个轮子为何没有开关、十一个现场、十二领域、四类边界与六条纪律。</p>
+<div class="trio">
+<div><b>达龙·阿西莫格鲁（1967— ，2024 诺奖）· 是规矩</b><a href="https://www.aeaweb.org/articles?id=10.1257%2Fjep.29.1.3">The Rise and Decline of General Laws of Capitalism（他与罗宾逊驳皮凯蒂的那篇）</a></div>
+<div><b>托马·皮凯蒂（1971— ）· 是积累的动力学</b><a href="https://www.aeaweb.org/articles?id=10.1257%2Fjep.29.1.67">Putting Distribution Back at the Center of Economics（同一期上他的回应）</a></div>
+<div><b>迪尔德丽·麦克洛斯基（1942— ）· 是说法变了</b><a href="https://press.uchicago.edu/ucp/books/book/chicago/B/bo18546614.html">Bourgeois Equality: How Ideas, Not Capital or Institutions, Enriched the World</a></div>
+</div>
+<a class="rdmore" href="/paradigm/catch-up-lag/">读全文 →</a>
+<div class="meta">约 1.4 万字 · 13 页 · 三种读法 · 作者 王德生 ＋ Claude · 发表于2026年7月28日 · 本栏第三次撞站外理论，三家均为在世学者且有公开笔战</div></div>
+<div class="item"><div class="n">之三十六 · 三学科交叉：课程理论 × 认知科学 × 高等教育社会学</div>
+<h2><a href="/paradigm/suspended-time/">挂着：为什么最耗人的不是走投无路，而是永远还能再等一次</a></h2>
+<p class="sub">一段没有答案的时间是养料还是消耗，不看它多长、不看你多难受，只看它有没有一个非到不可的头</p>
+<p class="hk">一位博士生被宽限了八个月，什么也没想出来；一个高中生在档案被锁死的那个下午，想通了一件改变她此后姿态的事；一个考研第三年的人焦虑最深、产出最少。三段时间的命运，既不由长短决定，也不由痛苦决定。文章命名<b>挂起</b>——判决权被交给一个永不到场的"以后"、没有不能再推的到期日、而希望被持续续发的那种时间——并给出任何人都能自己核查的三问：<b>谁在判、什么时候必须判完、判完之后谁承担</b>。由此推出一个反直觉的判断：最耗人的不是绝境，而是中间那一格；而现代制度最稳定的产能，正是由两组各自做对了事的好人，一组缓冲掉绝境、一组推掉到期日，合力把所有人挤进那一格。附三种变体、四类反例边界与五条对抗纪律。</p>
+<div class="trio">
+<div><b>课程理论 · 空白要被刻意守住</b><a href="/students/yang-yong/cognitive-fasting/">认知的禁食：AI 时代课程功能的重释</a></div>
+<div><b>认知科学 · 被恩许的空白什么也不长</b><a href="/students/hu-zhiying/forced-causation/">受迫生成：在被剥夺了等待权的世界里，因果何以被逼出</a></div>
+<div><b>高等教育社会学 · 空白正被批量生产</b><a href="/students/putao/deferred-credentialing/">悬置的闸口：中国高等教育扩张中的延迟认证与多系统借时</a></div>
+</div>
+<a class="rdmore" href="/paradigm/suspended-time/">读全文 →</a>
+<div class="meta">约 2.4 万字 · 20 页 · 三种读法 · 作者 王德生 ＋ Claude · 发表于2026年7月28日 · 三篇来源分属<a href="/students/yang-yong/" style="color:var(--clay)">阳涌</a>、<a href="/students/hu-zhiying/" style="color:var(--clay)">胡志英</a>、<a href="/students/putao/" style="color:var(--clay)">葡萄</a>三位作者</div></div>
+<div class="item"><div class="n">之三十九 · 三学科交叉：临床医学 × 教育 × 组织理论</div>
+<h2><a href="/column/power-to-stop/">能停下来，是因为不必交代</a></h2>
+<p class="sub">终止能力，就是不被显现地存在的能力</p>
+<p class="hk">一块两年不消的疤，一个砍不掉的项目，一片长得过于整齐的森林——我们默认「结束」是自然发生的：柴烧完了，火就灭了。这个想象是错的。结束是一套单独的本事，可以在开始的那一套完好无损的情况下独自坏掉。文章由此推出一个更宽的判断：<b>一件事能自己停下来，条件是停下来那一刻它不欠任何人一个交代</b>；当它必须持续证明自己值得继续，它就再也没有办法结束，只能跑到某样东西耗尽为止。附四条不适用的边界与一节可操作的做法。</p>
+<div class="trio">
+<div><b>临床医学 · 终止是独立程序</b><a href="/health/medicine/termination-failure/">关不掉的病：终止失败作为一个病族</a></div>
+<div><b>教育 · 裁决层给不出终止指令</b><a href="/education/ai-era/self-execution/">自律杀死自己：最痛苦的悖论</a></div>
+<div><b>组织理论 · 保护即照亮，照亮即切割</b><a href="/students/hu-zhiying/audit-excision/">审计性剥离：创新识别如何从价值发生的完整体中切走骨</a></div>
+</div>
+<a class="rdmore" href="/column/power-to-stop/">读全文 →</a>
+<div class="meta">约 1.2 万字 · 14 页 · 三种读法 · 作者 王德生 ＋ Claude · 发表于2026年7月27日 · 正文页在 <a href="/column/power-to-stop/" style="color:var(--clay)">今日长文</a> 目录下</div></div>
+<div class="spec" style="background:transparent;border-style:dashed;margin-top:26px"><span class="lb">别 的 频 道</span><div class="chnav"><a href="/paradigm/ledger/">计量与结算</a><a href="/paradigm/teach/">教与学</a><a href="/paradigm/recognize/">承认与关系</a><a href="/paradigm/channel/">通道与形式</a><a href="/paradigm/pass/">传递与替代</a></div></div>
+</main>
+<footer>每日必读 · 运转与停止 · 作者 王德生 ＋ Claude · © 德麦国际 Demai International</footer>
+<script src="/assets/sde-talk.js?v=20260731b" defer></script>
+<script src="/wds-mode.js?v=20260731i" defer></script>
+</body></html>
