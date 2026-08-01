@@ -136,6 +136,7 @@ footer{border-top:1px solid var(--border);text-align:center;padding:30px 20px 44
 <script src="/taste/assets/sde-nbr-gate.js?v=1"></script>
 <script src="/taste/assets/sde-scope-gate.js?v=1"></script>
   <script src="/taste/assets/sde-vault.js?v=1"></script>
+  <script src="/taste/assets/sde-papers-archive.js?v=1"></script>
 </head>
 <body>
 
@@ -696,6 +697,22 @@ footer{border-top:1px solid var(--border);text-align:center;padding:30px 20px 44
       <button id="polishInboxBtn" style="background:linear-gradient(135deg,#B0842E,#D4A845);color:#fff;font-weight:700;font-size:14px;border:none;border-radius:8px;padding:11px 26px;cursor:pointer;margin-left:10px;box-shadow:0 4px 16px rgba(176,132,46,0.35)">📥 把这最后四篇存入 Inbox</button>
       <div id="polishInboxStatus" style="font-size:12.5px;color:#9AA5B0;margin-top:10px;min-height:16px;line-height:1.6"></div>
     </div>
+  </div>
+</div>
+
+<!-- 本机档案 · 跑过的四篇存在你自己的浏览器里 -->
+<!-- 为什么要有它：一次生成要跑 40-90 分钟，跑完自动投进收件箱；可产出只活在那一个页面的内存里，
+     刷新一下、手滑关掉就全没了，投稿人连自己投了什么都看不到。收件箱是私有仓、作者本人打不开，
+     所以"我投了什么"这件事只能由本机这份档案来回答。 -->
+<div id="archiveWrap" style="max-width:1000px;margin:26px auto 0;display:none">
+  <div style="background:linear-gradient(135deg,rgba(46,110,158,0.10),rgba(8,16,26,0.5));border:1px solid rgba(63,143,196,0.42);border-radius:14px;padding:26px 30px">
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:6px">
+      <div style="font-size:19px;font-weight:700;color:#3F8FC4;letter-spacing:0.04em">📚 本机档案 · 跑过的四篇</div>
+      <div id="archiveStatus" style="font-size:13px;color:#8B98A5"></div>
+      <button id="archiveClearBtn" style="margin-left:auto;background:transparent;color:#8B98A5;font-size:12.5px;border:1px solid rgba(255,255,255,0.18);border-radius:7px;padding:6px 14px;cursor:pointer">🗑 清空全部</button>
+    </div>
+    <div style="font-size:12.5px;color:#9AA5B0;line-height:1.75;margin-bottom:16px">每跑完一次「二次审稿 + 打磨」，四篇全文自动在这里存一份——<b style="color:#8FC4E8">刷新、关页、明天再打开都还在</b>。只留最近 <b style="color:#8FC4E8">30</b> 次，更旧的自动淘汰。<b style="color:#E8A33D">只存在你自己这台机器的浏览器里，一个字节都不上传</b>；换台电脑或清了浏览器数据就没了，要长期保存请用下面的下载。</div>
+    <div id="archiveList"></div>
   </div>
 </div>
 
@@ -3002,7 +3019,7 @@ function thoughtDeclPara(){
 }
 (function(){ const el=document.getElementById('thoughtDeclBar'); if(el) el.textContent='📖 '+THOUGHT_DECL; })();
 // 构建版本徽章：每次部署改这个 tag——用户一眼能看出浏览器跑的是不是最新代码（根治"改了但没刷到"的排障黑洞）
-const BUILD_TAG = '20260801·投稿后可在线阅读四篇+下载给回执';
+const BUILD_TAG = '20260801b·四篇存本机档案(刷新也在)+在线阅读';
 (function(){ const el=document.getElementById('buildTag'); if(el) el.textContent=BUILD_TAG; })();
 
 // 四篇下载为一个Word
@@ -3525,6 +3542,8 @@ if(polishBtn){
       const okCount = window._polishedPapers.filter(p=>p.text).length;
       if(st) st.textContent='完成：'+okCount+'/'+defs.length+' 篇已二次审稿 + 打磨';
       if(okCount>0 && dlRow) dlRow.style.display='block';
+      // 立刻在本机存一份：从这一刻起，刷新或关页都不再等于全丢
+      if(okCount>0) archivePolished('打磨完成');
     }catch(err){
       showErr('二次审稿+打磨出错：'+(err&&err.message?err.message:err)+'（按钮已复位，可重试；反复失败请按 F12 看 Console）');
       const s2=$('polishStatus'); if(s2) s2.textContent='出错，已停止';
@@ -3614,6 +3633,102 @@ function papersToMd(papers, q){
   return out;
 }
 
+/* ===== 本机档案 ===== */
+function _archNote(t){ const el=$('archiveStatus'); if(el) el.textContent = t||''; }
+function archivePolished(why, extra){
+  try{
+    if(!window.SDEPapers || !SDEPapers.supported() || !_papersReady(window._polishedPapers)) return Promise.resolve(null);
+    extra = extra || {};
+    const rec = {
+      question: (window._lastResult && window._lastResult.question) || '',
+      student: extra.student || (($('autoSubStudent')&&$('autoSubStudent').value.trim())||''),
+      dest: extra.dest || '',
+      label: why || '',
+      papers: window._polishedPapers
+    };
+    return SDEPapers.save(rec).then(function(m){
+      // 自动不等于静默：存没存上、存了几篇，当场说出来
+      if(m){ _archNote('刚存入本机档案：'+m.n+' 篇 · 约 '+(m.chars||0).toLocaleString()+' 字'); }
+      return renderArchive().then(function(){ return m; });
+    });
+  }catch(_){ return Promise.resolve(null); }
+}
+function _archTime(ts){
+  try{ const d=new Date(ts); const p=n=>('0'+n).slice(-2);
+    return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate())+' '+p(d.getHours())+':'+p(d.getMinutes()); }
+  catch(_){ return ''; }
+}
+function renderArchive(){
+  const wrap=$('archiveWrap'), box=$('archiveList');
+  if(!wrap || !box || !window.SDEPapers || !SDEPapers.supported()) return Promise.resolve(0);
+  return SDEPapers.list().then(function(rows){
+    if(!rows.length){ wrap.style.display='none'; return 0; }
+    wrap.style.display='block';
+    box.innerHTML='';
+    rows.forEach(function(r){
+      const row=document.createElement('div');
+      row.style.cssText='border:1px solid rgba(63,143,196,0.28);border-radius:10px;padding:14px 16px;margin-bottom:10px;background:rgba(10,18,28,0.55)';
+      const head=document.createElement('div');
+      head.style.cssText='font-size:14px;color:#D4DCE4;font-weight:600;line-height:1.6;margin-bottom:4px';
+      head.textContent = r.question || '（未记下原初问题）';        // textContent：问题里带尖括号也不串版
+      const meta=document.createElement('div');
+      meta.style.cssText='font-size:12px;color:#8B98A5;line-height:1.6;margin-bottom:10px';
+      meta.textContent = _archTime(r.ts) + ' · ' + r.n + ' 篇 · 约 ' + (r.chars||0).toLocaleString() + ' 字'
+        + (r.student ? (' · 作者：'+r.student) : '')
+        + (r.dest==='submit' ? ' · 已投收件箱' : (r.dest==='local' ? ' · 已存本地文件夹' : ''));
+      const bar=document.createElement('div');
+      bar.style.cssText='display:flex;gap:8px;flex-wrap:wrap';
+      const mk=(txt,style,fn)=>{ const b=document.createElement('button'); b.textContent=txt; b.style.cssText=style; b.addEventListener('click',fn); bar.appendChild(b); return b; };
+      const S1='background:linear-gradient(135deg,#2E6E9E,#3F8FC4);color:#fff;font-weight:700;font-size:12.5px;border:none;border-radius:7px;padding:7px 14px;cursor:pointer';
+      const S2='background:transparent;color:#9AA5B0;font-size:12.5px;border:1px solid rgba(255,255,255,0.18);border-radius:7px;padding:7px 14px;cursor:pointer';
+      mk('📖 阅读', S1, function(){
+        SDEPapers.get(r.id).then(function(rec){
+          if(!rec){ _archNote('这一条读不出来了（可能已被清掉）'); renderArchive(); return; }
+          openPapersReader(rec.papers, '本机档案 · '+_archTime(rec.ts), rec.question);
+        });
+      });
+      mk('📄 Word', S2, function(){
+        SDEPapers.get(r.id).then(function(rec){
+          if(!rec) return;
+          const blocks=[];
+          rec.papers.forEach(function(pp){ if(!pp.text) return; blocks.push({heading:pp.title,pageBreak:true}); blocks.push({md:pp.text,titleFirst:true}); });
+          saveWordDocx('最后四篇 · 二次审稿打磨版 · 学术论文', '原初问题：'+(rec.question||''), blocks, '最后四篇_'+_archTime(rec.ts).replace(/[^0-9]/g,'')+'.docx', $('archiveStatus'));
+        });
+      });
+      mk('📝 .md', S2, function(){
+        SDEPapers.get(r.id).then(function(rec){
+          if(!rec) return;
+          try{
+            const blob=new Blob([papersToMd(rec.papers, rec.question)], {type:'text/markdown;charset=utf-8'});
+            const url=URL.createObjectURL(blob);
+            const a=document.createElement('a'); a.href=url; a.download='最后四篇_'+_archTime(rec.ts).replace(/[^0-9]/g,'')+'.md';
+            document.body.appendChild(a); a.click(); a.remove();
+            setTimeout(function(){ try{ URL.revokeObjectURL(url); }catch(_){} },4000);
+            _archNote('✓ 已下载纯文本');
+          }catch(e){ _archNote('✗ 存纯文本失败：'+((e&&e.message)||e)); }
+        });
+      });
+      mk('🗑 删除', S2, function(){
+        if(!confirm('删掉这一条档案？全文一并删除，且无法撤销。')) return;
+        SDEPapers.remove(r.id).then(function(){ _archNote('已删除一条'); renderArchive(); });
+      });
+      row.appendChild(head); row.appendChild(meta); row.appendChild(bar);
+      box.appendChild(row);
+    });
+    return rows.length;
+  });
+}
+(function(){
+  const cb=$('archiveClearBtn');
+  if(cb) cb.addEventListener('click', function(){
+    if(!window.SDEPapers) return;
+    if(!confirm('清空本机档案里的全部记录？全文一并删除，且无法撤销。')) return;
+    SDEPapers.clear().then(function(){ _archNote('已清空'); renderArchive(); });
+  });
+  // 开页就把上次跑的东西摆出来——用户回到这一页的第一件事往往就是找它
+  try{ renderArchive(); }catch(_){}
+})();
+
 // 最后四篇（打磨版）下载
 const polishDlBtn = $('polishDlBtn');
 if(polishDlBtn){
@@ -3622,7 +3737,7 @@ if(polishDlBtn){
     const papers = window._polishedPapers;
     // 原来这里是 `if(!papers) return;` —— 什么都不说地退出，正是"点了没反应"的来源之一
     if(!_papersReady(papers)){
-      if(note) note.textContent = '✗ 还没有可下载的四篇：请先跑完「二次审稿 + 打磨」。（若刚跑完却仍是这句，说明本页被刷新过——文本只在本页内存里，刷新即失。）';
+      if(note) note.textContent = '✗ 还没有可下载的四篇：请先跑完「二次审稿 + 打磨」。（若刚跑完却仍是这句，说明本页被刷新过——到下方「📚 本机档案」里取那一次的四篇。）';
       return;
     }
     const q = (window._lastResult && window._lastResult.question) || '';
@@ -4048,7 +4163,9 @@ if(autoRunBtn){
         }
         osStage(8, osDest==='local'
           ? ('✓ 全部完成！最后四篇已作为一个 .docx '+(dirHandle?'存入你选的文件夹':'下载到默认下载目录')+'。可关闭此窗口，结果也在下方页面里。')
-          : ('✓ 全部完成！最后四篇已以「'+student+'」的名字存入收件箱。可关闭此窗口，结果也在下方页面里。'));
+          : ('✓ 全部完成！最后四篇已以「'+student+'」的名字存入收件箱。四篇全文也已存进本页下方的「📚 本机档案」，刷新或关页都还在。'));
+        // 去向落定后再记一次：档案行上直接写着"已投收件箱"，日后一眼认得出哪一次是投出去的
+        try{ await archivePolished(osDest==='local'?'一次生成·存本地':'一次生成·已投稿', {student:student, dest:osDest}); }catch(_){}
         // 投完之后最该有的一个动作：立刻看看自己投出去的是什么。
         try{
           var _rb = document.createElement('button');
