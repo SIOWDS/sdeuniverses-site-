@@ -36,6 +36,14 @@
       cost: "\u8981\u4f60\u81ea\u5df1\u7684 Key \u00b7 1\u20132.5 \u5c0f\u65f6"
     },
     {
+      /* 三原理型（动力）：与金点子（三维度＝是什么）、中华智问（六路径＝怎么办）
+         构成题型三分——这一台只接「为什么」，产物是一份动力证伪报告，不是答案。 */
+      id: "dynamics", name: "SDE \u52a8\u529b\u667a\u80fd\u4f53", icon: "\u27f3",
+      url: "/taste/sde-dynamics/", sel: ["question"],
+      what: "\u4e09\u6761\u52a8\u529b\u5404\u81ea\u4e3b\u5f20\u81ea\u5df1\u662f\u9a71\u52a8 \u2192 \u649e\u51fa\u4e00\u7ec4\u4f1a\u8ba9\u539f\u4e3b\u5f20\u7ffb\u8f66\u7684\u89c2\u6d4b",
+      cost: "\u8981\u4f60\u81ea\u5df1\u7684 Key \u00b7 10\u201325 \u5206\u949f"
+    },
+    {
       id: "uplift", name: "\u5bf9\u8bdd\u667a\u5546\u5927\u6bd4\u62fc", icon: "\u2694\uFE0F",
       url: "/taste/uplift-compare/", sel: ["qbox"],
       what: "\u540c\u4e00\u53e5\u540c\u65f6\u95ee\u88f8\u57fa\u5e95\u4e0e\u63d0\u667a\u57fa\u5e95\uff0c\u5f53\u573a\u770b\u5dee\u522b",

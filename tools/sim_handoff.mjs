@@ -49,10 +49,18 @@ eval(MOD);
 const H = global.window.SDEHandoff;
 ok("\u6a21\u5757\u88c5\u8f7d\u5e76\u6302\u4e0a window", !!H && typeof H.send === "function");
 
-console.log("\n=== 1. \u6ce8\u518c\u8868\uff1a\u4e94\u53f0\u901a\u7528\u667a\u80fd\u4f53\u90fd\u5728\uff0c\u4e14\u6bcf\u53f0\u90fd\u8bf4\u6e05\u4e86\u4ee3\u4ef7 ===");
+console.log("\n=== 1. 注册表：六台通用智能体都在，且每台都说清了代价 ===");
 const ids = H.AGENTS.map((a) => a.id);
-ok("\u4e94\u53f0", H.AGENTS.length === 5, ids);
-["idea", "zhiwen", "uplift", "forge", "search"].forEach((i) => ok("\u5728\u8868\u91cc\uff1a" + i, ids.indexOf(i) >= 0));
+ok("六台", H.AGENTS.length === 6, ids);
+["idea", "zhiwen", "dynamics", "uplift", "forge", "search"].forEach((i) => ok("在表里：" + i, ids.indexOf(i) >= 0));
+/* 题型三分：What→金点子／How→中华智问／Why→动力智能体。轻松版跑完要据这张对应关系
+   直接摆出对口那一台，不该再让读者从六台里自己挑。三台缺一台，那个出口就哑了。 */
+ok("题型三分的三台齐（是什么/怎么办/为什么各有对口）", ["idea", "zhiwen", "dynamics"].every((i) => ids.indexOf(i) >= 0), ids);
+ok("前端有唯一的题型→机器对应表 DEEP_OF，且三件都指对了台",
+  /var DEEP_OF = \{ what: "idea", how: "zhiwen", why: "dynamics" \}/.test(WDS));
+ok("轻松版跑完摆出对口那一台的深入按钮（读 cell.tool，不读当下的 curTool）",
+  /DEEP_OF\[cell\.tool \|\| ""\]/.test(WDS) && /tool: curTool \}/.test(WDS));
+ok("表里没有那一台时不摆死按钮（失败不拦路）", /if \(!ag\) return;/.test(WDS));
 ok("\u91d1\u70b9\u5b50\u4e0e\u4e2d\u534e\u667a\u95ee\u662f\u7528\u6237\u70b9\u540d\u7684\u90a3\u4e24\u53f0",
   /\u91d1\u70b9\u5b50/.test(H.byId("idea").name) && /\u4e2d\u534e\u667a\u95ee/.test(H.byId("zhiwen").name));
 ok("\u6bcf\u53f0\u90fd\u6709 url / \u5165\u53e3 id / \u5e72\u4ec0\u4e48 / \u591a\u5c11\u4ee3\u4ef7",

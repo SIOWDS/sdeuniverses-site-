@@ -508,6 +508,7 @@
       tlWhat: "是什么", tlWhatS: "三刀合看它到底是什么（更狠的用金点子）",
       tlHow: "怎么办", tlHowS: "三个落点合出一套可操作的做法（更狠的用中华智问）",
       tlWhy: "为什么", tlWhyS: "推翻问题里那条没说出口的动力（更狠的用动力智能体）",
+      goDeep: "⇥ 进入细节：", goDeepH: "轻松版只给一个当场能拿走的判断；要进细节，就交给对口的那一台跑完整一趟（新标签打开，只填不跑）。",
       fgTitle: "学科通融 · 二阶碰撞", fgPlan: "十四道工序，顺序不可换", fgSteps: "这一趟 {n} 道工序",
       fgJudge: "只到判断，不成文",
       tlGrid: "27 宫格定位", tlGridS: "C⊗M⊗V 与一二三号位，中心位轮到谁",
@@ -652,6 +653,7 @@
       tlWhat: "What is it", tlWhatS: "Three cuts, read together (full run: the Idea Generator)",
       tlHow: "What to do", tlHowS: "Three landing points into one workable method (full run: Zhiwen)",
       tlWhy: "Why", tlWhyS: "Overturn the drive claim hidden in the question (full run: SDE Dynamics)",
+      goDeep: "⇥ Go deeper with ", goDeepH: "The short form gives one claim you can take away now; for detail, hand it to the matching agent for a full run (new tab, filled not started).",
       fgTitle: "Cross-discipline forge", fgPlan: "Fourteen stages, order fixed", fgSteps: "{n} stages",
       fgJudge: "stop at the claim, no full draft",
       tlGrid: "27-cell placement", tlGridS: "C⊗M⊗V and positions one/two/three; whose turn at centre",
@@ -1900,7 +1902,10 @@
     for (var ti = 0; ti < all.length - 1; ti++) all[ti].style.minHeight = "";
     turn.style.minHeight = Math.max(0, bodyEl.clientHeight - 88) + "px";
     setStick(true); scrollBottom();
-    var cell = { turn: turn, a: a, q: q, qs: qs, qbar: qbar, think: null, thinkC: null, thinkL: null, acts: null, follows: null, refsBound: 0 };
+    var cell = { turn: turn, a: a, q: q, qs: qs, qbar: qbar, think: null, thinkC: null, thinkL: null, acts: null, follows: null, refsBound: 0,
+      // 记下这一轮走的是哪道工序：轻松版三件跑完要据它摆出对口那一台的深入入口。
+      // 记在 cell 上而不是读 curTool——读者答完就可能改工序，那时 curTool 已经不是这一轮的了。
+      tool: curTool };
     mountQBar(cell);
     return cell;
   }
@@ -2313,6 +2318,25 @@
     var ps = el("button", "wdsm-act", t("aPass"));
     ps.onclick = function () { passPanel(cell, ps); };
     row.appendChild(ps);
+    /* 轻松版（是什么／怎么办／为什么）跑完，直接给出对口那一台的深入入口——
+       题型三分已经定了该去哪一台，不该再让读者从六台里自己挑。
+       仍守交接的两条纪律：新标签打开、只填不跑。 */
+    (function () {
+      var deepId = DEEP_OF[cell.tool || ""];
+      if (!deepId) return;
+      var H = window.SDEHandoff;
+      var ag = null;
+      if (H && H.AGENTS) { for (var i = 0; i < H.AGENTS.length; i++) if (H.AGENTS[i].id === deepId) ag = H.AGENTS[i]; }
+      if (!ag) return;                                   // 表里没有就不摆死按钮（纪律④：失败不拦路）
+      var db = el("button", "wdsm-act", t("goDeep") + ag.icon + " " + ag.name);
+      db.title = t("goDeepH") + "  " + ag.what + "（" + ag.cost + "）";
+      db.onclick = function () {
+        var q = String(cell.q || "").trim();
+        if (!q) return;
+        try { H.send(deepId, q, "chatsde"); } catch (e) {}
+      };
+      row.appendChild(db);
+    })();
     // 候选卡：把这一答里的一句压成 50 字级承重命题，查一遍占位库，再交给微信顶回。
     var cdb = el("button", "wdsm-act", t("cdBtn"));
     cdb.title = t("cdSelTip");
@@ -4009,6 +4033,10 @@
     { k: "nine", n: "tlNine", s: "tlNineS", cmd: ["九宫", "nine"] },
     { k: "map", n: "tlMap", s: "tlMapS", cmd: ["结构图", "map", "导图"] }
   ];
+  /* 题型三分 → 对口的那一台完整机器。
+     轻松版只回答一个当场能拿走的判断；要进细节，就交给那一台跑完整一趟。
+     这张表是唯一来源——别处要用就读它，不许再抄一份（抄一份就会有一天两份不一样）。 */
+  var DEEP_OF = { what: "idea", how: "zhiwen", why: "dynamics" };
   var curTool = "";
   function toolInfo(k) { for (var i = 0; i < TOOLS.length; i++) if (TOOLS[i].k === k) return TOOLS[i]; return null; }
   var toolBtn = layer.querySelector(".wdsm-toolbtn");
