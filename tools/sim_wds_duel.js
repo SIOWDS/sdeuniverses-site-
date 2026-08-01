@@ -68,8 +68,20 @@ ok(/if \(triOn\) \{ duV = ""; duPaint\(\); \}/.test(F), "开对撞就关并排�
 ok(F.indexOf("if (triOn && !streaming)") < F.indexOf("if (duV && !streaming)"), "send 里对撞分支排在并排之前");
 ok(/rows\[1\]\.bd\.textContent = t\("triFail"\)/.test(F), "上一家空手就如实停下，不让空文本流下去凑满三栏");
 
+console.log("⑦b 三席可选（读者点名，不只是自动排座）");
+ok(/var triB2 = "", triB3 = "";/.test(F), "②③ 两席有可指定的变量");
+ok(/function triFill\(menu\)/.test(F) && /menuAt\(triBtn, triFill\)/.test(F), "对撞按钮弹菜单，不再是纯 toggle");
+ok(/function triSeatRow\(/.test(F), "每一席一组可选项");
+ok(/setTimeout\(function \(\) \{\s*var m = document\.querySelector\("\.wdsm-menu"\);/.test(F),
+  "菜单重绘走 setTimeout（同步清空会让 target 脱离 DOM，menu.contains 判假、菜单自己关掉）");
+ok(/\[triB2, triB3\]\.forEach/.test(F), "triSeats 先让点名的两席坐下");
+ok(/if \(!k\) return;/.test(F), "点名了却没 Key 的当没点名（不拦路，回落自动）");
+ok(/triDupWarn/.test(F), "选同家不拦死但当场标注异质会打折");
+ok(/wdsKeyPanel\(function \(\) \{\}\); return;/.test(F), "点没 Key 的家直接端出设置面板");
+ok(/triOn \? t\("triStop"\) : t\("triGo"\)/.test(F), "菜单末尾才是开关（选完席再开跑）");
+
 console.log("⑧ 文案两语齐备");
-["triBtn", "triTip", "triNeed", "triA", "triB", "triC", "triSame", "triFail"].forEach(function (k) {
+["triBtn", "triTip", "triNeed", "triA", "triB", "triC", "triSame", "triFail", "triSeat", "triFixed", "triPick2", "triPick3", "triAuto", "triDupWarn", "triGo", "triStop"].forEach(function (k) {
   ok((F.match(new RegExp("\\b" + k + ":")) || []).length >= 1 && (F.match(new RegExp("\\b" + k + ":", "g")) || []).length === 2,
     k + " 中英各一份");
 });

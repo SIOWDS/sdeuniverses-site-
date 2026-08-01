@@ -750,6 +750,11 @@
       triSame: "⚠ 只有两家有 Key，第三家沿用了第一家——结算者参与过写作，这一轮的结论只作参考。填第三家的 Key 可解。",
       triFail: "上一家没写出东西，这一步没法往下走。",
       triSave: "⤓ 存这一场",
+      triSeat: "对撞三席", triFixed: "① 出判断（你当前的基底）",
+      triPick2: "② 攻击它的用谁", triPick3: "③ 结算的用谁",
+      triAuto: "自动（按已填 Key 依次取）",
+      triDupWarn: "（与前一席同家，撞不出异质）", triGo: "⚔ 开始对撞", triStop: "不对撞",
+
 
       pjAll: "全部对话", pjTitle: "项目", pjNew: "＋ 新建项目", pjAsk: "项目叫什么？",
       pjAbout: "✎ 这个项目的常驻说明", pjAboutAsk: "这个项目里，每一问都要 WDS 知道的背景与要求（会随每问带上）",
@@ -803,6 +808,11 @@
       triSame: "\u26a0 Only two keys found, so the third seat reuses the first model \u2014 the judge also wrote. Treat this verdict as provisional; add a third key to fix it.",
       triFail: "The previous model produced nothing, so this step cannot proceed.",
       triSave: "\u2913 Save this clash",
+      triSeat: "The three seats", triFixed: "1. The claim (your current model)",
+      triPick2: "2. Who attacks it", triPick3: "3. Who settles it",
+      triAuto: "Auto (take keyed models in order)",
+      triDupWarn: "(same vendor as the seat before \u2014 no heterogeneity)", triGo: "\u2694 Start the clash", triStop: "No clash",
+
 
       pjAll: "All chats", pjTitle: "Projects", pjNew: "＋ New project", pjAsk: "Project name?",
       pjAbout: "✎ Standing instructions for this project", pjAboutAsk: "Background and requirements SDE should know for every question in this project",
@@ -885,6 +895,7 @@
     ".wdsm-tri{display:flex;flex-direction:column;gap:16px}" +
     ".wdsm-tric{border-left:2px solid var(--wline);padding-left:12px}" +
     ".wdsm-tric .wdsm-duh b{color:var(--wgold)}" +
+    ".wdsm-menu .mnote{font-size:12px;color:var(--wdim);padding:4px 10px 8px;line-height:1.5}" +
     ".wdsm-tinote{font-size:12px;color:var(--wdim);border:1px solid var(--wline);border-radius:6px;padding:8px 10px;line-height:1.6}" +
     "@media(max-width:760px){.wdsm-du{flex-direction:column;gap:18px}}" +
     "@media(max-width:900px){.wdsm-cv{position:absolute;inset:0;width:auto;z-index:30;border-left:none}}";
@@ -3086,11 +3097,63 @@
     if (triOn) triBtn.classList.add("on"); else triBtn.classList.remove("on");
   }
   triPaint();                        // 初始就要有字——不画一次就是一颗空框（模式条空按钮的老漏法）
+  // 读者指定的 ②③ 两席（空＝自动）。① 不给选：它就是设置里当前那家，
+  // 另开一个"出判断的用谁"只会和设置面板打架。
+  var triB2 = "", triB3 = "";
+  // 菜单原地重绘：选完一席还要选下一席，关掉再点太难用。
+  // **重绘必须放进 setTimeout**——menuAt 挂在 document 上的关闭监听要看 menu.contains(ev.target)，
+  // 同步清空会让 target 先脱离 DOM，contains 返回 false，菜单当场把自己关掉。
+  function triRedraw() {
+    setTimeout(function () {
+      var m = document.querySelector(".wdsm-menu");
+      if (!m) return;
+      while (m.firstChild) m.removeChild(m.firstChild);
+      triFill(m);
+    }, 0);
+  }
+  function triSeatRow(menu, label, cur, set, prevV) {
+    menu.appendChild(el("div", "mh", label));
+    var au = el("button");
+    au.appendChild(document.createTextNode((cur ? "" : "\u2713 ") + t("triAuto")));
+    au.onclick = function () { set(""); triPaint(); triRedraw(); };
+    menu.appendChild(au);
+    var mine = null; try { mine = wdsKeyGet(); } catch (e) {}
+    VENDORS.forEach(function (v) {
+      var has = !!vkeyGet(v.v);
+      var b = el("button");
+      b.appendChild(document.createTextNode((cur === v.v ? "\u2713 " : "") + v.name));
+      if (!has) b.appendChild(el("span", "sub", t("duNoKey")));
+      // 同家不拦死（只有两家 Key 时第三席本来就得沿用），但要当场说清异质会打折
+      else if (v.v === prevV || (mine && v.v === mine.vendor && prevV !== null)) {
+        b.appendChild(el("span", "sub", t("triDupWarn")));
+      }
+      b.onclick = function () {
+        if (!has) { closeMenu(); wdsKeyPanel(function () {}); return; }   // 没 Key 就直接端出设置面板
+        set(v.v); triPaint(); triRedraw();
+      };
+      menu.appendChild(b);
+    });
+  }
+  function triFill(menu) {
+    var mine = null; try { mine = wdsKeyGet(); } catch (e) {}
+    menu.appendChild(el("div", "mh", t("triSeat")));
+    var fx = el("div", "mnote");
+    fx.textContent = t("triFixed") + "：" + (mine ? vinfo(mine.vendor).name : "—");
+    menu.appendChild(fx);
+    triSeatRow(menu, t("triPick2"), triB2, function (v) { triB2 = v; }, mine ? mine.vendor : null);
+    triSeatRow(menu, t("triPick3"), triB3, function (v) { triB3 = v; }, triB2 || (mine ? mine.vendor : null));
+    var go = el("button", null, triOn ? t("triStop") : t("triGo"));
+    go.onclick = function () {
+      closeMenu();
+      triOn = !triOn;
+      if (triOn) { duV = ""; duPaint(); }      // 并排与对撞是两种模式，不并存
+      triPaint();
+    };
+    menu.appendChild(go);
+  }
   if (triBtn) triBtn.onclick = function () {
     if (streaming) return;
-    triOn = !triOn;
-    if (triOn) { duV = ""; duPaint(); }        // 并排与对撞是两种模式，不并存
-    triPaint();
+    menuAt(triBtn, triFill);
   };
   // 排座：主基底坐 ①，另外两家从"有 Key 且尚未坐过"的厂商里按 VENDORS 顺序取。
   // 只有两家时第三席沿用第一家，并如实标注（失败不拦路，但不许假装它是干净的结算）。
@@ -3098,6 +3161,13 @@
     var mine = null; try { mine = wdsKeyGet(); } catch (e) {}
     if (!mine) return null;
     var seats = [{ vendor: mine.vendor, key: mine.key, model: mine.model || "" }];
+    // 读者点名的两席优先坐下；点名了却没 Key 的当没点名（不拦路，回落自动）
+    [triB2, triB3].forEach(function (v) {
+      if (!v || seats.length >= 3) return;
+      var k = vkeyGet(v);
+      if (!k) return;
+      seats.push({ vendor: v, key: k, model: vmodelGet(v) || "" });
+    });
     for (var i = 0; i < VENDORS.length && seats.length < 3; i++) {
       var v = VENDORS[i].v, k = vkeyGet(v);
       if (!k) continue;
