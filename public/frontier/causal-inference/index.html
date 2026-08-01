@@ -1,0 +1,59 @@
+<!DOCTYPE html><html lang="zh"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>因果推断与计量 · 新思想前沿 | SDE Universes</title>
+<meta name="description" content="这十年的思想转向：双向固定效应的双重差分被证明在交错处理下会给出错误权重甚至反号；整套工具箱被重建，而重心从「识别得干净」转向「外推到哪里」。">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Noto+Serif+SC:wght@300;400;500;600&display=swap">
+<style>
+:root{--bg:#F5EFE0;--card:#FAF6EC;--gold:#8A6817;--gold2:#A88233;--text:#2A2315;--text2:#6B5D47;--muted:#98886C;--border:rgba(138,104,23,0.22)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'Noto Serif SC',Georgia,serif;line-height:1.9;-webkit-font-smoothing:antialiased}
+.top{max-width:760px;margin:0 auto;padding:1.4rem 1.5rem 0;font-size:.86rem}
+.top a{color:var(--gold);text-decoration:none;font-weight:600}.top a:hover{text-decoration:underline}
+.top .sep{color:var(--muted);margin:0 .5rem}
+main{max-width:760px;margin:0 auto;padding:1.5rem 1.5rem 4rem}
+.kicker{font-size:.82rem;letter-spacing:.18em;color:var(--gold2);font-weight:600;margin-bottom:.9rem}
+h1{font-size:2rem;line-height:1.3;font-weight:700;margin-bottom:.7rem;letter-spacing:.01em}
+.meta{font-size:.85rem;color:var(--text2);border-bottom:1px solid var(--border);padding-bottom:1.1rem;margin-bottom:1.6rem}
+.lede{font-size:1.12rem;color:var(--text);font-weight:500;margin-bottom:1.5rem}
+h2{font-size:1.18rem;font-weight:600;color:var(--gold);margin:1.9rem 0 .6rem}
+p{margin:0 0 1.1rem;text-align:justify}
+.end{margin-top:2rem;padding-top:1.2rem;border-top:1px solid var(--border);font-size:.86rem;color:var(--muted)}
+.end b{color:var(--text2)}
+</style></head><body>
+<div class="top"><a href="/browse/">SDE Universes</a><span class="sep">·</span><a href="/frontier/">新思想前沿</a><span class="sep">›</span><span style="color:var(--text2)">经济·管理·决策</span></div>
+<main>
+<div class="kicker">新思想前沿 · 经济·管理·决策</div>
+<h1>因果推断与计量</h1>
+<div class="meta">近十年最新思想摘要 · 约 1700 字 · 王德生 亲撰 · 2026 年 8 月</div>
+<p class="lede">这十年计量经济学最要紧的转向，是一次针对自家主力工具的清算。双重差分是社会科学最常用的因果识别方法，而它的标准做法——加入个体与时间固定效应做一次回归——被证明在各单位于不同时间受处理的常见情形下，会给出带负权重的、可能与所有真实效应都反号的估计量。这个发现引发了一轮工具箱的整体重建。与此同时，可信性革命进入第二阶段：识别干净已经不够，还要说清这个结论能外推到哪里。</p>
+<h2>一、可信性革命的第一阶段</h2>
+<p>上世纪九十年代起，应用微观经济学的重心从结构估计转向识别策略：随机实验、自然实验、工具变量、断点回归、双重差分。判据从「模型设定是否合理」变成「变异从哪里来、它为什么可以被当作外生」。</p>
+<p>这场革命在 2021 年获得诺贝尔经济学奖的认可，也早已扩散到政治学、社会学、流行病学、教育与法学（见相邻面板）。它改变的不只是方法，还有论文的结构：识别策略的辩护取代了理论模型，成为论文的核心章节。</p>
+<h2>二、双重差分的隐患</h2>
+<p>问题出在最常用的那个实现上。当所有单位同时受处理时，双向固定效应回归给出的就是标准的双重差分。但在现实中，政策往往分批推行——不同州、不同年份陆续实施。</p>
+<p>这十年的分解结果表明：此时的回归系数其实是许多个两两比较的加权平均，而其中包含一类有害的比较——把后受处理组与已受处理组相比。当处理效应随时间变化时，这类比较会带上负权重，使总估计量可能与每一个真实效应都反号。</p>
+<p>换句话说，一个被用了几十年、教科书上写着的标准做法，在最常见的应用情形下可能给出方向错误的答案。这是这十年计量领域最有分量的一条结果。</p>
+<h2>三、重建工具箱</h2>
+<p>此后数年出现了一批替代估计量，思路各不相同但共享一个原则：只用干净的比较——把从未受处理或尚未受处理的单位作为对照，按处理批次与相对时点分组估计，再按明确的权重加总。</p>
+<p>与之配套的是事件研究图的规范化：把处理前的各期系数一并画出，用来检验平行趋势在事前是否成立；同时明确处理前系数不显著并不等于平行趋势成立，因为检验功效往往很低。</p>
+<p>合成控制方法在同一时期成熟并扩展：用若干未处理单位的加权组合构造一个反事实，尤其适合只有一个处理单位的宏观案例；其推断方式（安慰剂检验、排列检验）也被系统化。</p>
+<p>这一整轮重建的意义在于它是自下而上的：由应用研究者发现异常、由理论计量学者形式化、再由软件包在两三年内普及到全学科。</p>
+<h2>四、设计导向的推断</h2>
+<p>更深一层的转向是把随机性的来源说清楚。传统的标准误建立在「样本从一个总体中随机抽取」这一假设上；而在很多准实验中，样本就是全体，真正的随机性来自处理分配。</p>
+<p>设计导向的推断因此把不确定性建立在分配机制上，这会改变标准误的算法，也改变聚类的选择——一条被反复强调的实践规则是：按处理被分配的层级聚类，而不是按数据被记录的层级。</p>
+<p>这类修正往往让置信区间变宽，也让一部分既有结论失去显著性。这是一个健康的方向：把不确定性算准，比把点估计算准更重要。</p>
+<h2>五、机器学习进入因果估计</h2>
+<p>第三条线是把机器学习用在因果问题上，但用对地方：不是用它直接预测结果，而是用它去估计那些高维的干扰函数（倾向得分、条件期望），再通过具有正交性质的估计式把偏差抵消掉，并配合样本分割避免过拟合传染。</p>
+<p>同一族方法被用于估计异质性处理效应：谁受益最多、谁没有反应，以及由此构造的最优处理分配规则。</p>
+<p>要点在于纪律：机器学习提高的是对干扰成分的拟合能力，识别仍然完全依赖设计。把预测精度当作因果证据，是这十年被反复警告的错误。</p>
+<h2>六、第二阶段：外推与一般均衡</h2>
+<p>干净识别的代价是范围狭窄。一个在某地某时估计出来的局部处理效应，未必适用于其他人群、其他规模、其他制度环境——这正是公共政策面板那个规模化落差的计量学表述（见相邻面板）。</p>
+<p>这十年的应对有三条：把结构模型与实验结合，用实验识别关键参数、用模型做外推；显式建模溢出效应与一般均衡反应，而不是假设个体之间互不影响；以及多地点协同实验，直接测量效应的异质性分布。</p>
+<p>同时，工具变量与断点回归的解释也被收紧：它们识别的是特定人群（被工具影响的那部分人、临界点附近的人）的效应，把它当作总体平均效应是常见的误读。</p>
+<p>第三阶段的雏形也已出现：把估计出来的效应用于决策，而不只是用于发表。这要求报告的不是一个点估计与显著性，而是决策相关的量——按人群分的效应分布、成本效益比、以及在多大的先验不确定性下结论仍然成立。计量学的产出形态，正在从「论文里的一张表」向「决策者能用的一份区间」移动。</p>
+<h2>七、一句话</h2>
+<p>因果推断的新思想是：先承认自家最常用的工具会算错——交错处理下的双向固定效应可能全盘反号；重建之后，真正的难题不再是识别得干净，而是这个干净的结论究竟能外推到哪里。</p>
+<div class="end"><b>新思想前沿</b> 是一个持续撰写的专栏：近十年，各主要领域最新思想的摘要，每领域约 2000 字，共 100 个学科面板，由王德生亲撰、逐月填充。 · <a href="/frontier/" style="color:var(--gold);text-decoration:none">← 回到 100 学科面板</a></div>
+</main><script src="/wds-mode.js?v=20260801h" defer></script>
+</body></html>

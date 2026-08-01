@@ -1,0 +1,60 @@
+<!DOCTYPE html><html lang="zh"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>机制设计与市场 · 新思想前沿 | SDE Universes</title>
+<meta name="description" content="这十年的思想转向：市场设计从理论走成工程——频谱与广告拍卖、匹配市场、肾脏交换的实际部署；同时算法定价把「合谋」这个法律概念逼到了重新定义的边缘。">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Noto+Serif+SC:wght@300;400;500;600&display=swap">
+<style>
+:root{--bg:#F5EFE0;--card:#FAF6EC;--gold:#8A6817;--gold2:#A88233;--text:#2A2315;--text2:#6B5D47;--muted:#98886C;--border:rgba(138,104,23,0.22)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'Noto Serif SC',Georgia,serif;line-height:1.9;-webkit-font-smoothing:antialiased}
+.top{max-width:760px;margin:0 auto;padding:1.4rem 1.5rem 0;font-size:.86rem}
+.top a{color:var(--gold);text-decoration:none;font-weight:600}.top a:hover{text-decoration:underline}
+.top .sep{color:var(--muted);margin:0 .5rem}
+main{max-width:760px;margin:0 auto;padding:1.5rem 1.5rem 4rem}
+.kicker{font-size:.82rem;letter-spacing:.18em;color:var(--gold2);font-weight:600;margin-bottom:.9rem}
+h1{font-size:2rem;line-height:1.3;font-weight:700;margin-bottom:.7rem;letter-spacing:.01em}
+.meta{font-size:.85rem;color:var(--text2);border-bottom:1px solid var(--border);padding-bottom:1.1rem;margin-bottom:1.6rem}
+.lede{font-size:1.12rem;color:var(--text);font-weight:500;margin-bottom:1.5rem}
+h2{font-size:1.18rem;font-weight:600;color:var(--gold);margin:1.9rem 0 .6rem}
+p{margin:0 0 1.1rem;text-align:justify}
+.end{margin-top:2rem;padding-top:1.2rem;border-top:1px solid var(--border);font-size:.86rem;color:var(--muted)}
+.end b{color:var(--text2)}
+</style></head><body>
+<div class="top"><a href="/browse/">SDE Universes</a><span class="sep">·</span><a href="/frontier/">新思想前沿</a><span class="sep">›</span><span style="color:var(--text2)">经济·管理·决策</span></div>
+<main>
+<div class="kicker">新思想前沿 · 经济·管理·决策</div>
+<h1>机制设计与市场</h1>
+<div class="meta">近十年最新思想摘要 · 约 1600 字 · 王德生 亲撰 · 2026 年 8 月</div>
+<p class="lede">这十年机制设计最要紧的转向，是它从一门定理科学变成了一门工程学科。经济学家不再只证明某种规则具有某种性质，而是真的去建市场：设计频谱拍卖的清算规则、重排学生择校的匹配算法、组织跨院的肾脏交换链、重写全球广告拍卖的计价方式。随之而来的是工程学科特有的处境——理论上最优的机制，常常输给能被参与者理解、能被计算出来、能被主管部门解释的那一个。</p>
+<h2>一、从定理到工地</h2>
+<p>机制设计的经典成果给出了漂亮的不可能性与可能性定理：什么样的目标可以被激励相容地实现、什么样的不能。但真实市场里，参与者数量有限、偏好复杂、信息不对称、还有法律与政治约束。</p>
+<p>这十年被实际交付的系统包括：把广播频段从电视台买回、重新打包卖给移动运营商的双向拍卖；多个城市的中小学统一录取系统；医学院毕业生的分配；以及跨医院的活体肾脏配对交换。</p>
+<p>共同的经验是：设计的成败往往取决于看似次要的细节——如何收集偏好、如何处理并列、如何防止参与者钻空子、以及规则能否被非专业人士读懂。</p>
+<h2>二、可解释性作为约束</h2>
+<p>匹配领域最清楚的一课来自择校。理论上有多种机制可选，而被广泛采用的那一类之所以胜出，很大程度上是因为它对家长「说实话最优」——你不必猜别人怎么填，照真实偏好填就是最优策略。</p>
+<p>这条性质的价值不在效率数字上，而在公平上：不具备策略知识的家庭不会因此吃亏。旧机制惩罚的正是那些老实填报的人。</p>
+<p>由此形成的一般判据是：一个机制若要求参与者做复杂的策略推演，它就会系统性地偏向懂行的人。可解释与防策略操纵，在真实市场里往往比理论最优更重要。</p>
+<h2>三、拍卖：一价还是二价</h2>
+<p>在线广告是全世界规模最大的自动化拍卖市场。这十年发生的一件大事，是主要交易平台从第二价格拍卖转向第一价格拍卖。</p>
+<p>转变的原因很有教育意义：二价拍卖在单一拍卖场里有优良的理论性质（如实出价是占优策略），但当拍卖被嵌套在多层中介、且卖方可以私下设置底价与优先规则时，这些性质就失效了，买方无法验证自己付的价格是怎么来的。</p>
+<p>于是市场选择了理论性质更差、但可核验的规则：出多少付多少。这是这十年最鲜明的一个案例——透明性击败了最优性。</p>
+<h2>四、算法定价与合谋的重新定义</h2>
+<p>最尖锐的新议题来自定价算法。仿真与实验研究显示，若干独立运行的强化学习定价算法在反复互动中会自发收敛到高于竞争水平的价格，而它们之间没有任何通讯，也没有被编程去合谋。</p>
+<p>这对反垄断法构成直接挑战：现行法律的核心是「协议」——需要证明存在合意。而算法达成的超竞争价格没有合意，只有学习。</p>
+<p>与之并行的是另一类更传统的问题：多个竞争者共同使用同一家供应商提供的定价软件，并向它交出各自的非公开数据。这类安排更接近经典的轴辐合谋，也正是近年若干诉讼的焦点。</p>
+<p>这十年学界的主流建议是把重心从「有没有协议」转向可观测的结构与后果：谁提供算法、共享了什么数据、市场结果是否偏离竞争基准。这实质上是在建议用市场设计的语言重写反垄断的判据。</p>
+<h2>五、匹配之外的分配</h2>
+<p>第三条线是没有价格的分配问题：疫苗、器官、住房、学位、算力。它们的共同特征是不能或不宜用支付意愿来配置，因而必须用规则。</p>
+<p>这十年的实践把一批理论工具推到了公共政策现场：优先级序列的设计、保留名额的实现方式、随机化如何被接受、以及公平与效率的显式取舍。</p>
+<p>一个反复出现的教训是：分配规则一旦公开，就会重塑参与者的行为——名额政策会改变申请策略与地理选择。因此规则必须在均衡里评估，而不是在静态人口上评估。</p>
+<h2>六、复杂性与实验的地位</h2>
+<p>两条方法学补充值得记。其一是计算复杂性成为筛选机制的判据：一个在理论上最优、但求解需要指数时间的机制，等于不可实现；实践中被采用的往往是有快速近似解、且近似质量可保证的设计。</p>
+<p>其二是实验室与实地实验成为交付前的标准环节。频谱拍卖在正式开拍前会做多轮模拟拍卖，参与者用真实激励演练，用来发现规则漏洞——这与工程行业的压力测试是同一件事。</p>
+<p>这两条合起来，标志着这个领域的成熟：它不再假设参与者是理想的求解器，而把人的认知限度写进了设计约束。</p>
+<p>还有一条不常被写进论文的经验：机制上线之后会被反复攻击。参与者会发现规则的空隙、会组织串通、会在申报里注水。因此现实中的市场设计包含一个持续的运维环节——监测异常、打补丁、再公布。设计一次就完的市场是不存在的。</p>
+<h2>七、一句话</h2>
+<p>机制设计的新思想是：能被理解、能被计算、能被核验的规则，胜过理论上最优的规则；而当定价交给会学习的算法之后，「合谋」这个概念本身正等着被重写。</p>
+<div class="end"><b>新思想前沿</b> 是一个持续撰写的专栏：近十年，各主要领域最新思想的摘要，每领域约 2000 字，共 100 个学科面板，由王德生亲撰、逐月填充。 · <a href="/frontier/" style="color:var(--gold);text-decoration:none">← 回到 100 学科面板</a></div>
+</main><script src="/wds-mode.js?v=20260801h" defer></script>
+</body></html>

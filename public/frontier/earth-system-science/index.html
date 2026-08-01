@@ -1,0 +1,57 @@
+<!DOCTYPE html><html lang="zh"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>地球系统科学 · 新思想前沿 | SDE Universes</title>
+<meta name="description" content="这十年的思想转向：机器学习模型在中期预报上追平并超过了数值天气预报，且算力成本低几个量级——ECMWF 的 AIFS 于 2025 年 2 月起投入业务运行；预报从解方程变成了学统计。">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Noto+Serif+SC:wght@300;400;500;600&display=swap">
+<style>
+:root{--bg:#F5EFE0;--card:#FAF6EC;--gold:#8A6817;--gold2:#A88233;--text:#2A2315;--text2:#6B5D47;--muted:#98886C;--border:rgba(138,104,23,0.22)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'Noto Serif SC',Georgia,serif;line-height:1.9;-webkit-font-smoothing:antialiased}
+.top{max-width:760px;margin:0 auto;padding:1.4rem 1.5rem 0;font-size:.86rem}
+.top a{color:var(--gold);text-decoration:none;font-weight:600}.top a:hover{text-decoration:underline}
+.top .sep{color:var(--muted);margin:0 .5rem}
+main{max-width:760px;margin:0 auto;padding:1.5rem 1.5rem 4rem}
+.kicker{font-size:.82rem;letter-spacing:.18em;color:var(--gold2);font-weight:600;margin-bottom:.9rem}
+h1{font-size:2rem;line-height:1.3;font-weight:700;margin-bottom:.7rem;letter-spacing:.01em}
+.meta{font-size:.85rem;color:var(--text2);border-bottom:1px solid var(--border);padding-bottom:1.1rem;margin-bottom:1.6rem}
+.lede{font-size:1.12rem;color:var(--text);font-weight:500;margin-bottom:1.5rem}
+h2{font-size:1.18rem;font-weight:600;color:var(--gold);margin:1.9rem 0 .6rem}
+p{margin:0 0 1.1rem;text-align:justify}
+.end{margin-top:2rem;padding-top:1.2rem;border-top:1px solid var(--border);font-size:.86rem;color:var(--muted)}
+.end b{color:var(--text2)}
+</style></head><body>
+<div class="top"><a href="/browse/">SDE Universes</a><span class="sep">·</span><a href="/frontier/">新思想前沿</a><span class="sep">›</span><span style="color:var(--text2)">地球·环境·空间</span></div>
+<main>
+<div class="kicker">新思想前沿 · 地球·环境·空间</div>
+<h1>地球系统科学</h1>
+<div class="meta">近十年最新思想摘要 · 约 1700 字 · 王德生 亲撰 · 2026 年 8 月</div>
+<p class="lede">这十年地球系统科学最要紧的转向，发生在一个最不该被颠覆的地方。数值天气预报是二十世纪科学最扎实的成就之一：把大气运动写成偏微分方程，用超级计算机一步步积分，六十年里每十年多准一天。而在过去三年里，一批完全不解方程、只从历史数据里学统计规律的机器学习模型，在多项中期预报指标上追平并超过了它——而且推理成本低了几个数量级。欧洲中期天气预报中心的数据驱动模型已于 2025 年 2 月起正式投入业务运行。</p>
+<h2>一、六十年的老路</h2>
+<p>数值天气预报的逻辑无可挑剔：大气服从已知的物理定律，把这些定律离散化到网格上，给定初始状态就能往前积分。它的进步来自三条线——更密的观测、更好的资料同化、更细的网格与更精的次网格参数化。</p>
+<p>它也有众所周知的代价：一次全球高分辨率预报需要在超级计算机上跑数小时；集合预报要跑几十遍，成本再乘以几十。这个成本决定了分辨率、集合规模与更新频率的上限。</p>
+<h2>二、不解方程的模型追上来了</h2>
+<p>2023 年，几个团队几乎同时发布了纯数据驱动的全球预报模型：用几十年的再分析资料训练神经网络，输入当前大气状态，直接输出若干小时后的状态，迭代推进。</p>
+<p>结果出乎意料：在多数标准检验指标上，这些模型在三到十天的中期预报上与顶级业务模型相当或更好，而一次十天预报只需在单块加速卡上跑不到一分钟。</p>
+<p>更关键的是机构的反应。欧洲中期天气预报中心没有把它当作外部挑战，而是自建了同类模型，并于 2025 年 2 月让确定性版本正式业务化，随后是集合版本——这是数据驱动预报第一次进入一线业务链。到 2026 年，该中心甚至停止了对外部实验模型的日常并行运行，因为自家模型已经够用。</p>
+<h2>三、它们凭什么行，又不行在哪</h2>
+<p>解释并不神秘：训练用的再分析资料本身是用物理模型同化观测生成的，机器学习模型学到的是这套物理在过去几十年里的实际统计表现。它没有绕过物理，它是在物理的产物上做了压缩。</p>
+<p>短板同样明确且被公开报告：这类模型倾向于输出过度平滑的场，把小雨预报得太多、把极端值削平；它们不保证守恒律；它们对训练分布之外的状态（前所未有的极端事件、变化中的气候背景）是否可靠，尚无定论。</p>
+<p>这引出一个结构性的依赖：数据驱动模型需要物理模型生产的分析场来初始化，也需要它来提供训练资料。二者目前不是替代关系，而是一个上下游关系——而这也意味着，如果物理模型的投入被削减，数据驱动模型的地基也会跟着塌。</p>
+<p>正在推进的下一步是把这条依赖切断：端到端地从原始观测直接学习预报，跳过资料同化与分析场。若它成立，气象业务的整条技术链都要重排；若不成立，物理模型就仍是不可替代的基础设施。这大概是这个领域接下来几年最要紧的一个悬念。</p>
+<h2>四、耦合：把地球当成一个系统</h2>
+<p>与预报并行的是另一条老主线的成熟：把大气、海洋、海冰、陆面、水文、碳循环与人类活动耦合到同一个模型里。这十年的进展在于耦合的紧密程度与分辨率——公里级的全球模式已能显式解析深对流，而不必再用参数化去猜。</p>
+<p>「数字孪生地球」这类计划把它推得更远：把高分辨率模拟、实时观测与情景交互接在一起，让使用者可以对具体区域问「如果这样，会怎样」。</p>
+<p>需要清醒的是分辨率不等于可信：更细的网格能解析更多过程，也会放大误差与初值不确定性；而对决策最要紧的往往不是单次模拟的细节，而是集合给出的概率分布。</p>
+<h2>五、观测这一侧的变化</h2>
+<p>地球观测在这十年从「几颗大卫星」变成「大星座＋小卫星＋商业数据」。重访周期从几天缩到几小时，光谱与雷达能力下放到小平台，商业公司成为重要数据源。</p>
+<p>这带来新的问题：数据的连续性与可比性依赖长期一致的定标，而商业星座的寿命、定标与存续都由市场决定；一旦某个数据源停售或退役，长期序列就断了。地球科学最宝贵的资产是几十年不间断的记录，而这个资产正越来越多地建在别人的地基上（与遥感面板呼应）。</p>
+<h2>六、临界要素与不可逆</h2>
+<p>概念层面这十年最受关注的是临界要素：大西洋经向翻转环流、格陵兰与西南极冰盖、亚马孙、永久冻土、暖水珊瑚。它们的共同特征是存在自我强化的反馈，越过某个阈值后即使停止外强迫也不会自行恢复。</p>
+<p>证据状况参差不齐，必须分开说：珊瑚礁的处境最紧迫，已被判断为最接近或已越过阈值；冰盖的部分不稳定性有较强的动力学基础但时间尺度极长；翻转环流的减弱有观测与代用证据，但对其崩溃概率与时间的估计分歧极大。</p>
+<p>方法论上的自觉也在增长：把「不确定性大」直接等同于「风险小」是错的——正是因为尾部不确定，才需要按风险管理而不是按最佳估计来决策。</p>
+<h2>七、一句话</h2>
+<p>地球系统科学的新思想是：预报可以不解方程——机器在物理模型的产物上学到了它的统计，并以千分之一的成本还原了它；但学生依赖老师提供的教材，这条依赖关系才是这场革命真正的边界。</p>
+<div class="end"><b>新思想前沿</b> 是一个持续撰写的专栏：近十年，各主要领域最新思想的摘要，每领域约 2000 字，共 100 个学科面板，由王德生亲撰、逐月填充。 · <a href="/frontier/" style="color:var(--gold);text-decoration:none">← 回到 100 学科面板</a></div>
+</main><script src="/wds-mode.js?v=20260801h" defer></script>
+</body></html>
