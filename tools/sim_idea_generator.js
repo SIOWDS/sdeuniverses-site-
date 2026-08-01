@@ -189,6 +189,49 @@ process.on("unhandledRejection", (e) => { PAGE_ERRS.push("unhandledRejection: " 
 
   });
 
+  await step("⑨ 二阶碰撞的结构定位（第〇阶：三维度碰撞必须真的传进涌现）", async () => {
+    // 背景：pick3() 早已按对角线约束抽格（S/D/E 各一、层号各一），但涌现阶段长期只拿到一串中文
+    // 视角标签，EMERGE_SPEC 里没有任何一句要求它用维度——于是选源是三维度碰撞、涌现却退回成
+    // 无维度的两两相撞。这一节守住修好之后的那条通路，别再被改回去。
+    ok(typeof w.pick3 === "function", "pick3 可取");
+    if (typeof w.pick3 === "function") {
+      let diagOK = true;
+      for (let i = 0; i < 60; i++) {
+        const c = w.pick3();
+        const dims = c.map(x => x.dim), idxs = c.map(x => x.idx);
+        if (new Set(dims).size !== 3 || new Set(idxs).size !== 3) diagOK = false;
+      }
+      ok(diagOK, "连抽 60 次，维度 S/D/E 各一且层号 1/2/3 各一（对角线约束仍在）");
+    }
+
+    ok(typeof w.buildEmergeInput === "function", "buildEmergeInput 可取");
+    if (typeof w.buildEmergeInput === "function") {
+      const rows = [
+        { view: "显露(S) · S2 · 模态M（粒子·波·场）", dimLetter: "S", cellName: "S2 · 模态M（粒子·波·场）", sde: "金点子一正文" },
+        { view: "差异(D) · D1 · 意义（特征律·自由律·幸福律）", dimLetter: "D", cellName: "D1 · 意义", sde: "金点子二正文" },
+        { view: "纠缠(E) · E3 · 能量（内能·动能·势能）", dimLetter: "E", cellName: "E3 · 能量", sde: "金点子三正文" }
+      ];
+      const inp = w.buildEmergeInput(rows, "测试问题", "");
+      ok(inp.indexOf("结构定位") >= 0, "涌现输入里带结构定位段");
+      ok(/金点子① 站在 S 维/.test(inp) && /金点子② 站在 D 维/.test(inp) && /金点子③ 站在 E 维/.test(inp),
+         "三个金点子的维度逐条写明");
+      // 向后兼容：老结果没有 dimLetter，应能从 view 标签回读
+      const legacy = rows.map(r => ({ view: r.view, sde: r.sde }));
+      const inp2 = w.buildEmergeInput(legacy, "测试问题", "");
+      ok(inp2.indexOf("结构定位") >= 0, "老结果（无 dimLetter）也能从 view 回读出维度");
+      // 维度残缺时不应硬塞一段假的结构定位
+      const broken = [{ view: "视角一", sde: "a" }, { view: "视角二", sde: "b" }, { view: "视角三", sde: "c" }];
+      ok(w.buildEmergeInput(broken, "q", "").indexOf("结构定位") < 0, "维度读不出时不硬塞结构定位段");
+    }
+
+    const spec = require("fs").readFileSync(HTML_PATH, "utf8");
+    ok(spec.indexOf("第〇阶 · 结构定位") > 0, "EMERGE_SPEC 里有第〇阶");
+    ok(spec.indexOf("共有前提") > 0, "第〇阶要求说出共有前提");
+    ok(spec.indexOf("必须来自三个金点子之一自己") > 0, "推翻材料必须来自三家自己（不许外搬）");
+    ok(spec.indexOf("严格依次四阶") > 0, "纪律已从三阶改为四阶");
+    ok(spec.indexOf("〇、结构定位") > 0, "输出格式里留了第〇阶的位置");
+  });
+
   await step("⑧ 页面运行期没有抛错", async () => {
     ok(PAGE_ERRS.length === 0, "运行期 0 个未捕获错误" + (PAGE_ERRS.length ? "，第一个：" + PAGE_ERRS[0].split("\n")[0] : ""));
   });
