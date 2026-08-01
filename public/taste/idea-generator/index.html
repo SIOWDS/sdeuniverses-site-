@@ -937,7 +937,7 @@ let SDE_BASE_LOADED = false;
 // 页面加载即拉取完整内功。用一个 Promise 记录加载过程，生成前可 await 它，确保用的是完整内功而非兜底精简版。
 let neigongPromise = (async function loadNeigong(){
   try{
-    const resp = await fetch('/taste/assets/sde-neigong.txt?v=3.5', {cache:'force-cache'});
+    const resp = await fetch('/taste/assets/sde-neigong.txt?v=3.6', {cache:'force-cache'});
     if(resp.ok){
       const full = await resp.text();
       if(full && full.length > 5000){   // 确认拿到的是完整内功
@@ -961,7 +961,7 @@ async function ensureNeigong(){
     // 重试一次
     neigongPromise = (async ()=>{
       try{
-        const resp = await fetch('/taste/assets/sde-neigong.txt?v=3.5', {cache:'no-store'});
+        const resp = await fetch('/taste/assets/sde-neigong.txt?v=3.6', {cache:'no-store'});
         if(resp.ok){ const full = await resp.text(); if(full && full.length>5000){ SDE_BASE=full; SDE_BASE_LOADED=true; return true; } }
       }catch(e){}
       return false;
