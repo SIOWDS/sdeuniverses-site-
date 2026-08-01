@@ -185,14 +185,14 @@ $("modelSel").addEventListener("change",loadKeyUI);
 /* ===== SDE 内功加载（与发生器同源文件） ===== */
 var NEIGONG="", NG_MIN=5000;
 (function loadNG(){
-  fetch("/taste/assets/sde-neigong.txt?v=3.4",{cache:"force-cache"})
+  fetch("/taste/assets/sde-neigong.txt?v=3.5",{cache:"force-cache"})
   .then(function(r){ if(!r.ok) throw 0; return r.text(); })
   .then(function(t){
     if(t && t.length>NG_MIN){ NEIGONG=t; $("ngStatus").textContent="✓ SDE 内功已加载（"+t.length+" 字）"; $("ngStatus").style.color="#2E7D4F"; }
     else throw 0;
   })
   .catch(function(){
-    fetch("/taste/assets/sde-neigong.txt?v=3.4",{cache:"no-store"})
+    fetch("/taste/assets/sde-neigong.txt?v=3.5",{cache:"no-store"})
     .then(function(r){ return r.text(); })
     .then(function(t){ if(t && t.length>NG_MIN){ NEIGONG=t; $("ngStatus").textContent="✓ SDE 内功已加载（"+t.length+" 字）"; $("ngStatus").style.color="#2E7D4F"; } else { $("ngStatus").textContent="⚠ 内功加载失败——仍可答题，深度略降"; } })
     .catch(function(){ $("ngStatus").textContent="⚠ 内功加载失败——仍可答题，深度略降"; });
