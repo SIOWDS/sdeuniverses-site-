@@ -1,0 +1,59 @@
+<!DOCTYPE html><html lang="zh"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>范畴论 · 新思想前沿 | SDE Universes</title>
+<meta name="description" content="这十年的思想转向：∞-范畴从专家工具变成几何与拓扑的日常语言；同时应用范畴论把它带出数学，成为描述系统、协议与流程的组合语法。">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Noto+Serif+SC:wght@300;400;500;600&display=swap">
+<style>
+:root{--bg:#F5EFE0;--card:#FAF6EC;--gold:#8A6817;--gold2:#A88233;--text:#2A2315;--text2:#6B5D47;--muted:#98886C;--border:rgba(138,104,23,0.22)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'Noto Serif SC',Georgia,serif;line-height:1.9;-webkit-font-smoothing:antialiased}
+.top{max-width:760px;margin:0 auto;padding:1.4rem 1.5rem 0;font-size:.86rem}
+.top a{color:var(--gold);text-decoration:none;font-weight:600}.top a:hover{text-decoration:underline}
+.top .sep{color:var(--muted);margin:0 .5rem}
+main{max-width:760px;margin:0 auto;padding:1.5rem 1.5rem 4rem}
+.kicker{font-size:.82rem;letter-spacing:.18em;color:var(--gold2);font-weight:600;margin-bottom:.9rem}
+h1{font-size:2rem;line-height:1.3;font-weight:700;margin-bottom:.7rem;letter-spacing:.01em}
+.meta{font-size:.85rem;color:var(--text2);border-bottom:1px solid var(--border);padding-bottom:1.1rem;margin-bottom:1.6rem}
+.lede{font-size:1.12rem;color:var(--text);font-weight:500;margin-bottom:1.5rem}
+h2{font-size:1.18rem;font-weight:600;color:var(--gold);margin:1.9rem 0 .6rem}
+p{margin:0 0 1.1rem;text-align:justify}
+.end{margin-top:2rem;padding-top:1.2rem;border-top:1px solid var(--border);font-size:.86rem;color:var(--muted)}
+.end b{color:var(--text2)}
+</style></head><body>
+<div class="top"><a href="/browse/">SDE Universes</a><span class="sep">·</span><a href="/frontier/">新思想前沿</a><span class="sep">›</span><span style="color:var(--text2)">数学与逻辑</span></div>
+<main>
+<div class="kicker">新思想前沿 · 数学与逻辑</div>
+<h1>范畴论</h1>
+<div class="meta">近十年最新思想摘要 · 约 1600 字 · 王德生 亲撰 · 2026 年 8 月</div>
+<p class="lede">这十年范畴论最要紧的转向有两个方向，恰好相反。向内：∞-范畴不再是少数专家的技术，而成了代数几何、拓扑与表示论写论文时默认的语言——十年前需要专门解释的构造，如今被当作基本词汇直接使用。向外：一个称作应用范畴论的社群把这套语言带出了数学，用它描述数据库、量子协议、化学反应网络与工程系统。这门被戏称为「抽象废话」的学科，这十年同时变成了两种具体的东西。</p>
+<h2>一、为什么要加高一层</h2>
+<p>经典范畴论处理对象与它们之间的映射，并规定何时两个映射相等。问题是在拓扑与几何里，「相等」几乎从来不是正确的关系——两条路径不相等，但可以同伦；两个复形不相等，但拟同构。</p>
+<p>强行取等价类会丢信息，而丢掉的信息恰恰是后续构造需要的。∞-范畴的做法是把「相等」换成一整套高阶的可逆映射：映射之间有映射，映射的映射之间还有映射，无穷层。</p>
+<p>代价是理论本身变得极其繁重，收益是许多此前必须手工检查的一致性条件被自动处理掉了。</p>
+<h2>二、从技术到基础设施</h2>
+<p>这十年发生的事是普及。∞-范畴的基础理论在此前十年被系统建立，而这十年它被大规模使用：导出代数几何、谱代数几何、凝聚数学、几何朗兰兹的证明，都以它为默认语言（见相邻面板）。</p>
+<p>判断一个理论是否成为基础设施，有个简单标准：论文里还需不需要为它写引言。按这个标准，∞-范畴在这十年跨过了这条线。</p>
+<p>与之伴随的是教学与文献的重整：多套系统性的基础文本出现，把散落的技术整理成可教的形态。这类工作很少获奖，却决定了一个理论能否被下一代直接使用。</p>
+<h2>三、内部的技术推进</h2>
+<p>几条内部主线值得记：高阶代数（把交换环、模、谱系统地提升到高阶语境）、稳定 ∞-范畴作为同调代数的正确框架、以及各种「六函子形式」的统一表述——把不同几何理论中反复出现的同一组算子关系抽象出来一次讲清。</p>
+<p>另一条是合成方法：与其把 ∞-范畴当作某个模型（拟范畴、完全 Segal 空间）里的具体对象，不如给它一套自己的公理化语言，在其中直接推理。这条路线与类型论的接口紧密，也让部分论证可以被机器检查。</p>
+<p>还有一条与凝聚数学、导出几何互相支撑：许多新框架之所以能被建立，正是因为 ∞-范畴提供了处理「一致性条件无穷多」这件事的现成办法。它的普及与那两次地基重铸在时间上重合，不是巧合（见相邻面板）。</p>
+<p>这些工作有共同的形状：把「每次都要重做一遍的检查」变成「一次证明、处处可用的框架」。</p>
+<h2>四、走出数学：应用范畴论</h2>
+<p>向外的一支在这十年成型为一个有会议、有期刊、有社群的领域。它的基本主张是：范畴论擅长描述「组合」——把小的东西拼成大的东西，并保证拼法之间的兼容性；而这正是工程与科学里反复出现的问题。</p>
+<p>具体成果包括：用函子语义描述数据库与数据迁移，使模式变换成为可验证的操作；用字符串图描述量子协议，把复杂的线性代数推演变成图形规则；用 Petri 网与开放系统的范畴描述化学反应网络与流行病模型的组装；以及用共设计范畴处理工程中的资源权衡。</p>
+<p>这条线的现实检验标准是它能否给出别的方法给不出的东西。目前最有说服力的例子在量子计算的图形演算与系统组装的正确性验证上，其余多数仍处于「换一种说法」的阶段——这是这个社群自己也承认的处境。</p>
+<p>值得记的是它的社会形态：这个社群刻意保持低门槛，办面向工程师与科学家的暑期学校、写不预设代数几何背景的教材。一个以抽象著称的学科主动降低准入，本身就是这十年的一处新鲜事。</p>
+<h2>五、与逻辑和计算的接口</h2>
+<p>范畴论与计算机科学的联系并不新，但这十年更紧：类型论的语义、依值类型的范畴模型、以及把程序等价性表述为高阶结构的工作，让证明助手的理论基础与范畴论直接接壤。</p>
+<p>一个有意思的循环由此形成：范畴论提供语言，类型论提供可执行的形式，证明助手提供检验；而被检验的对象里又包括范畴论自身的定理。</p>
+<p>这与逻辑哲学面板里「逻辑成为可执行基础设施」是同一件事的数学侧（见相邻面板）。</p>
+<h2>六、抽象的代价</h2>
+<p>批评始终存在，且不无道理：高阶抽象的入门成本极高，可能把一个领域的准入门槛抬到只剩少数人；而「用更一般的语言重述已知结果」并不等于新知识。</p>
+<p>这十年比较公允的评价标准也因此清晰起来：一套抽象框架的价值，取决于它是否让此前做不到的具体计算变得可做，或者让此前分头处理的多个定理变成一个定理。按这个标准，∞-范畴过关了，而应用范畴论仍在证明自己。</p>
+<h2>七、一句话</h2>
+<p>范畴论的新思想是同时向两个方向落地：向内，∞-范畴从技术变成几何学家的日常语言；向外，它试图成为描述「怎么把东西拼起来」的通用语法——而后者能否成立，要看它是否给出了别的方法给不出的东西。</p>
+<div class="end"><b>新思想前沿</b> 是一个持续撰写的专栏：近十年，各主要领域最新思想的摘要，每领域约 2000 字，共 100 个学科面板，由王德生亲撰、逐月填充。 · <a href="/frontier/" style="color:var(--gold);text-decoration:none">← 回到 100 学科面板</a></div>
+</main><script src="/wds-mode.js?v=20260801h" defer></script>
+</body></html>

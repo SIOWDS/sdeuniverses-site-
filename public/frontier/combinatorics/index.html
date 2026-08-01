@@ -1,0 +1,59 @@
+<!DOCTYPE html><html lang="zh"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>组合与图论 · 新思想前沿 | SDE Universes</title>
+<meta name="description" content="这十年的思想转向：一批被认为需要全新范式的老猜想，被几页纸的熵与随机化论证攻下——拉姆齐上界九十年来第一次指数改进；而机器搜索第一次给出了更好的构造。">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Noto+Serif+SC:wght@300;400;500;600&display=swap">
+<style>
+:root{--bg:#F5EFE0;--card:#FAF6EC;--gold:#8A6817;--gold2:#A88233;--text:#2A2315;--text2:#6B5D47;--muted:#98886C;--border:rgba(138,104,23,0.22)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'Noto Serif SC',Georgia,serif;line-height:1.9;-webkit-font-smoothing:antialiased}
+.top{max-width:760px;margin:0 auto;padding:1.4rem 1.5rem 0;font-size:.86rem}
+.top a{color:var(--gold);text-decoration:none;font-weight:600}.top a:hover{text-decoration:underline}
+.top .sep{color:var(--muted);margin:0 .5rem}
+main{max-width:760px;margin:0 auto;padding:1.5rem 1.5rem 4rem}
+.kicker{font-size:.82rem;letter-spacing:.18em;color:var(--gold2);font-weight:600;margin-bottom:.9rem}
+h1{font-size:2rem;line-height:1.3;font-weight:700;margin-bottom:.7rem;letter-spacing:.01em}
+.meta{font-size:.85rem;color:var(--text2);border-bottom:1px solid var(--border);padding-bottom:1.1rem;margin-bottom:1.6rem}
+.lede{font-size:1.12rem;color:var(--text);font-weight:500;margin-bottom:1.5rem}
+h2{font-size:1.18rem;font-weight:600;color:var(--gold);margin:1.9rem 0 .6rem}
+p{margin:0 0 1.1rem;text-align:justify}
+.end{margin-top:2rem;padding-top:1.2rem;border-top:1px solid var(--border);font-size:.86rem;color:var(--muted)}
+.end b{color:var(--text2)}
+</style></head><body>
+<div class="top"><a href="/browse/">SDE Universes</a><span class="sep">·</span><a href="/frontier/">新思想前沿</a><span class="sep">›</span><span style="color:var(--text2)">数学与逻辑</span></div>
+<main>
+<div class="kicker">新思想前沿 · 数学与逻辑</div>
+<h1>组合与图论</h1>
+<div class="meta">近十年最新思想摘要 · 约 1700 字 · 王德生 亲撰 · 2026 年 8 月</div>
+<p class="lede">这十年组合数学最要紧的转向，是一批被公认极难、被认为需要全新范式的老问题，接连被出人意料地短的证明攻下。拉姆齐数的上界自 1935 年以来第一次得到指数级改进；一个关于随机图阈值的猜想被一篇几页纸的论文解决；一个悬置四十余年的集合族猜想被一个来自信息论的想法撬开。共同的工具不是更复杂的机器，而是熵、随机化与一个恰当的视角。</p>
+<h2>一、拉姆齐：九十年的第一次</h2>
+<p>拉姆齐数问的是：多大的图才能保证出现指定大小的单色团。1935 年给出的上界是四的 k 次方，此后近九十年，所有改进都只动了指数上的低阶项，底数四纹丝不动。</p>
+<p>2023 年 3 月，一篇论文把上界改进为「四减去某个正常数」的 k 次方——第一次指数级的改进。方法上的关键是一种被称作「书」的结构与逐步构造的算法式论证，而不是全新的理论。</p>
+<p>此后的两年里，这个结果被反复简化与优化：出现了显著更短的证明，底数被压到更小，方法被推广到多色与非对角情形；下界一侧也在 2025 年前后得到了对应的指数改进。这条时间线本身很说明问题——一旦第一道口子被撕开，后续改进会迅速涌入。</p>
+<h2>二、阈值：几页纸解决的猜想</h2>
+<p>随机图有一个基本现象：当边的概率越过某个阈值，某种结构（如完美匹配、哈密顿圈）会突然几乎必然出现。有一个猜想断言，这个阈值与一个容易计算的下界之间只差一个对数因子。</p>
+<p>2022 年，两位研究者用几页纸给出了证明。论证的核心是一个巧妙的覆盖构造与随机化选择，几乎不依赖问题的具体结构。</p>
+<p>这个结果的实用意义很大：它把大量原本需要逐个费力估计的阈值问题，变成了一次简单的计算。而它的方法论意义在于印证了这十年的模式——真正的障碍常常是视角，而不是技术难度。</p>
+<h2>三、熵方法</h2>
+<p>第三个例子来自一个关于并封闭集族的老猜想：若一个集族对并运算封闭，是否总有某个元素出现在至少一半的成员中。四十余年里，连「出现在某个固定正比例的成员中」都无人能证。</p>
+<p>2022 年底，一位研究者用信息论的语言给出了一个常数——把集合族随机化，估计相关随机变量的熵，从而得到下界。虽然离二分之一还远，但它第一次证明了正比例的存在，此后几周内被多人独立改进到更好的常数。</p>
+<p>熵方法这十年在组合中反复奏效：容斥与计数被换成了对信息量的估计，而后者往往对结构的依赖更少。这是一种视角的迁移，也是这个领域近年最有生产力的工具之一。</p>
+<h2>四、机器给出了更好的构造</h2>
+<p>组合学的另一半是构造：找到尽可能好的例子。这十年出现了一件新事——用大语言模型驱动的程序搜索，产出了若干超过人类此前最好构造的例子，其中包括一个著名的上限集问题上的改进，以及若干装填与几何组合问题上的新纪录。</p>
+<p>机制值得说清：机器并不证明定理，它生成的是「构造这个例子的程序」，由确定性的检验器打分，再迭代改进。也就是说，它的产出可以被完全独立地验证——这与需要人来判断的领域完全不同。</p>
+<p>组合学之所以成为这类方法最早见效的地方，正是因为它的许多问题满足三个条件：答案是一个可以写下的有限对象、好坏可以自动打分、搜索空间大到人手无法穷尽。</p>
+<h2>五、极值与结构的老主线</h2>
+<p>主流工作仍在稳步推进：图的正则性方法与容器法成为处理稀疏结构的标准工具；超图的匹配与覆盖问题、图着色与色数的界、图极限理论都有实质进展；而离散几何中若干距离与关联问题因多项式方法而被解决。</p>
+<p>一条贯穿的经验是：许多长期困难来自「稀疏」情形，而这十年发展的工具（容器、假随机性、熵）恰恰是为稀疏而生的。</p>
+<p>加性组合这一支也在继续：关于稠密集合中算术级数、以及无算术级数集合的最大密度问题，在这十年得到了接近最优的界。它与解析数论共用同一批工具，也是两边社群往来最密的地方（见相邻面板）。</p>
+<p>另一条与计算机科学接壤的是极值组合在算法与复杂性中的应用：伪随机构造、扩张图与纠错码共享同一批技术，而这三样分别是随机化算法、网络设计与通信可靠性的基础。组合学的定理常常在别的领域以工程组件的形式出现。</p>
+<h2>六、这个领域的形态</h2>
+<p>组合学有一个与其他数学分支不同的特点：问题容易陈述，证明可以很短，因此单篇突破的密度很高，而且新人更容易切入。这十年的几项大结果都出自相对年轻的研究者，且多为小团队。</p>
+<p>也正因为陈述简单、验证明确，它成了形式化验证与机器辅助最先落地的数学分支之一——上述拉姆齐结果在公开后半年内就被完整形式化验证。</p>
+<p>一个务实的判断是：在可自动检验的领域，机器会先来；而组合学恰好是数学里最可自动检验的那一块。</p>
+<h2>七、一句话</h2>
+<p>组合学的新思想是：卡住几十年的往往不是难度而是视角——熵、随机化与一个恰当的构造，就够撬开九十年没动过的底数；而在这个答案可以被自动打分的领域，机器已经开始给出比人更好的构造。</p>
+<div class="end"><b>新思想前沿</b> 是一个持续撰写的专栏：近十年，各主要领域最新思想的摘要，每领域约 2000 字，共 100 个学科面板，由王德生亲撰、逐月填充。 · <a href="/frontier/" style="color:var(--gold);text-decoration:none">← 回到 100 学科面板</a></div>
+</main><script src="/wds-mode.js?v=20260801h" defer></script>
+</body></html>
