@@ -379,8 +379,10 @@ console.log("⑧ 成文（distill）");
   ok(!!menu, "成文菜单弹出");
   // 2026-07-30 加第四档「对外 PPT」；2026-08-01 PDF 一度加在这里随即按用户令搬到顶栏（**不许退回**）；
   // 2026-08-01 再加第五档「凝成一万字论文」→ 八项：报告/成文/一万字/提纲/PPT ＋ 导出 ＋ 选目录 ＋ 成文记录。
-  ok(menu.children.length === 8, "菜单八项（报告/成文/一万字/提纲/对外PPT/导出/选目录/成文记录），实得 " + menu.children.length);
+  // 2026-08-01 再加第六档「总结载入的文章」（对标 SDE 对谈那台读一篇文章的能力）→ 九项。
+  ok(menu.children.length === 9, "菜单九项（报告/成文/一万字/提纲/总结文章/对外PPT/导出/选目录/成文记录），实得 " + menu.children.length);
   ok(menu.textContent.indexOf("一万字") >= 0, "一万字论文那一档在菜单里");
+  ok(menu.textContent.indexOf("总结载入的文章") >= 0, "总结全文那一档在菜单里");
   ok(menu.textContent.indexOf("PDF") < 0, "PDF 不在成文菜单里（它在顶栏）");
   menu.children[0].click();
   await new Promise((r) => setTimeout(r, 220));

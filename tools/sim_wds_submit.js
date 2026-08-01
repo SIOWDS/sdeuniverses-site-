@@ -91,7 +91,7 @@ step("⑥ 一万字档：前后端都接上了", () => {
   ok(WORKER.indexOf("判决性对照预测") > 0, "规格要求逐条划界带判决性预测");
   ok(WORKER.indexOf("更强调／更深入／更系统／视角不同") > 0, "挡住不可判定的假划界");
   ok(WORKER.indexOf("不要靠复述凑字数") > 0, "写不到一万字就如实说，不许凑");
-  ok(/KIND_KEYS = \["report", "essay", "paper", "outline", "deck"\]/.test(M), "前端档位表含 paper 且排在 essay 之后");
+  ok(/KIND_KEYS = \["report", "essay", "paper", "outline", "sumdoc", "deck"\]/.test(M), "前端档位表含 paper 且排在 essay 之后");
   ok(M.indexOf("kPaper:") > 0 && M.indexOf("kPaperS:") > 0, "中文文案在位");
   ok(M.indexOf("Forge a 10,000-word paper") > 0, "英文文案在位");
 });
@@ -115,6 +115,23 @@ step("⑧ 两颗按钮只摆在文章类档位上", () => {
   ok(/if \(kind === "essay" \|\| kind === "paper"\)/.test(M), "只有 essay/paper 摆 Word 与投稿（报告/提纲/PPT 不是投稿物）");
   ok(M.indexOf("mDocx") > 0 && M.indexOf("mSub") > 0, "两颗按钮的文案都在");
   ok(/sc\.src = "\/assets\/sde-docx\.js/.test(M), "docx 模块是懒加载进来的");
+});
+
+step("⑨ 总结全文档：正主是文章，不是对话", () => {
+  ok(/sumdoc: 1/.test(WORKER), "后端白名单里有 sumdoc");
+  ok(/sumdoc: \{ name: "总结全文"/.test(WORKER), "后端有 sumdoc 规格");
+  ok(WORKER.indexOf("正主是那篇文章，不是这场对话") > 0, "写明正主是文章");
+  ok(WORKER.indexOf("原样引出那一句") > 0, "承重句要逐字引，不许转述");
+  ok(WORKER.indexOf("找不到一句承重的，就如实说") > 0, "没有承重句要如实说（那本身是读数）");
+  ok(WORKER.indexOf("论证还可更充分") > 0, "挡住「论证还可更充分」这类空话");
+  ok(WORKER.indexOf("原文没有的结论一句都不许补") > 0, "只依据原文");
+  ok(/docBlock && kind === "sumdoc"/.test(WORKER), "sumdoc 时文章摆在最前当正主");
+  ok(WORKER.indexOf("正主仍是上面这场对话") > 0, "其余档载了文章只作背景");
+  ok(/if \(kind === "sumdoc" && !docBlock\)/.test(WORKER), "没载入文章时如实报错，不空跑");
+  ok(/KIND_KEYS = \["report", "essay", "paper", "outline", "sumdoc", "deck"\]/.test(M), "前端档位表含 sumdoc");
+  ok(M.indexOf("kSumdoc:") > 0 && M.indexOf("kSumdocS:") > 0, "中英文案在位");
+  ok(/docs: \(typeof atts/.test(M), "请求体把附件正文送过去");
+  ok(M.indexOf("取段会让它读到半篇就下判断") > 0, "送全文不送取段，且写明了理由");
 });
 
 console.log("\n===== " + P + " PASS / " + F + " FAIL =====");

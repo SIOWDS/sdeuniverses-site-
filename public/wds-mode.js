@@ -453,6 +453,7 @@
       kEssay: "提炼成文", kEssayS: "锻成一篇独立成立的文章，约三千字",
       kOutline: "写作提纲", kOutlineS: "母题 + 章节骨架，照着就能写",
       kPaper: "凝成一万字论文", kPaperS: "承重命题 + 不含情态词的判据 + 逐条划界 + 证伪条件，约一万字",
+      kSumdoc: "总结载入的文章", kSumdocS: "读完那篇：它在说什么 · 承重句 · 哪里脆 · 没看见什么 · 千字概写（需先载入文章）",
       mDocx: "\u2913 Word (.docx)", mDocxS: "把这一篇存成 Word 文档",
       mSub: "\u2709 \u6295\u7a3f\u5230\u6536\u4ef6\u7bb1", mSubS: "把这一篇投给编辑部（需要投稿密码）",
       subT: "\u6295\u7a3f\u5230\u6536\u4ef6\u7bb1", subName: "\u4f5c\u8005\u540d", subPass: "\u6295\u7a3f\u5bc6\u7801",
@@ -606,6 +607,7 @@
       kEssay: "Forge into an essay", kEssayS: "A piece that stands on its own, about 3,000 words",
       kOutline: "Writing outline", kOutlineS: "A motif plus a chapter skeleton you can write from",
       kPaper: "Forge a 10,000-word paper", kPaperS: "Load-bearing claim + a modal-free test + demarcations + falsifiers",
+      kSumdoc: "Read the loaded article", kSumdocS: "What it claims \u00b7 its load-bearing line \u00b7 where it is brittle \u00b7 a 1,000-word condensation",
       mDocx: "\u2913 Word (.docx)", mDocxS: "Save this piece as a Word document",
       mSub: "\u2709 Submit to the inbox", mSubS: "Send this piece to the editors (needs the submission password)",
       subT: "Submit to the inbox", subName: "Author", subPass: "Submission password",
@@ -3956,11 +3958,11 @@
   }
 
   /* ── 成文：把整场对话锻成 报告 / 文章 / 提纲，或直接导出 ── */
-  function kindT(k) { return t(({ report: "kReport", essay: "kEssay", outline: "kOutline", paper: "kPaper", deck: "kDeck" })[k]); }
-  function kindS(k) { return t(({ report: "kReportS", essay: "kEssayS", outline: "kOutlineS", paper: "kPaperS", deck: "kDeckS" })[k]); }
+  function kindT(k) { return t(({ report: "kReport", essay: "kEssay", outline: "kOutline", paper: "kPaper", sumdoc: "kSumdoc", deck: "kDeck" })[k]); }
+  function kindS(k) { return t(({ report: "kReportS", essay: "kEssayS", outline: "kOutlineS", paper: "kPaperS", sumdoc: "kSumdocS", deck: "kDeckS" })[k]); }
   // paper 排在 essay 之后：它是 essay 的重档（三千字 → 一万字），
   // 而 deck 是另一种东西（给听众的），不该夹在两者中间。
-  var KIND_KEYS = ["report", "essay", "paper", "outline", "deck"];
+  var KIND_KEYS = ["report", "essay", "paper", "outline", "sumdoc", "deck"];
   try { layer.querySelector(".wdsm-pdfbtn").onclick = function () { exportPdf(); }; } catch (e) {}
   layer.querySelector(".wdsm-distbtn").onclick = function (ev) {
     var old = document.querySelector(".wdsm-menu");
@@ -4301,6 +4303,10 @@
     dBump();
 
     fetch(API_DISTILL, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ kind: kind, history: history, key: kv.key, vendor: kv.vendor, model: kv.model || "", lang: LANG, tpl: tpl || "",
+        // 载入的文章一并送过去：sumdoc 那一档拿它当正主，其余几档只作背景。
+        // 这里送**全文**而不是按问题取段——成文是一次性的活，取段会让它读到半篇就下判断。
+        docs: (typeof atts !== "undefined" ? atts : []).filter(function (d) { return d && d.text && !d.img; })
+                .slice(0, 6).map(function (d) { return { n: d.name, t: d.text }; }),
         fix: (again && again.fix) || "", prev: (again && again.prev) || "" }) })
       .then(function (resp) {
         if (!resp.ok || !resp.body) throw new Error("HTTP " + resp.status);
