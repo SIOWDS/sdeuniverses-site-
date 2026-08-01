@@ -1,0 +1,57 @@
+<!DOCTYPE html><html lang="zh"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>计算神经科学 · 新思想前沿 | SDE Universes</title>
+<meta name="description" content="这十年的思想转向：从手工模型转向「训练出来的网络作为大脑模型」，从单神经元调谐转向群体流形动力学；同时完整连接组第一次到手，也第一次暴露了连接组不等于功能。">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Noto+Serif+SC:wght@300;400;500;600&display=swap">
+<style>
+:root{--bg:#F5EFE0;--card:#FAF6EC;--gold:#8A6817;--gold2:#A88233;--text:#2A2315;--text2:#6B5D47;--muted:#98886C;--border:rgba(138,104,23,0.22)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'Noto Serif SC',Georgia,serif;line-height:1.9;-webkit-font-smoothing:antialiased}
+.top{max-width:760px;margin:0 auto;padding:1.4rem 1.5rem 0;font-size:.86rem}
+.top a{color:var(--gold);text-decoration:none;font-weight:600}.top a:hover{text-decoration:underline}
+.top .sep{color:var(--muted);margin:0 .5rem}
+main{max-width:760px;margin:0 auto;padding:1.5rem 1.5rem 4rem}
+.kicker{font-size:.82rem;letter-spacing:.18em;color:var(--gold2);font-weight:600;margin-bottom:.9rem}
+h1{font-size:2rem;line-height:1.3;font-weight:700;margin-bottom:.7rem;letter-spacing:.01em}
+.meta{font-size:.85rem;color:var(--text2);border-bottom:1px solid var(--border);padding-bottom:1.1rem;margin-bottom:1.6rem}
+.lede{font-size:1.12rem;color:var(--text);font-weight:500;margin-bottom:1.5rem}
+h2{font-size:1.18rem;font-weight:600;color:var(--gold);margin:1.9rem 0 .6rem}
+p{margin:0 0 1.1rem;text-align:justify}
+.end{margin-top:2rem;padding-top:1.2rem;border-top:1px solid var(--border);font-size:.86rem;color:var(--muted)}
+.end b{color:var(--text2)}
+</style></head><body>
+<div class="top"><a href="/browse/">SDE Universes</a><span class="sep">·</span><a href="/frontier/">新思想前沿</a><span class="sep">›</span><span style="color:var(--text2)">脑与认知</span></div>
+<main>
+<div class="kicker">新思想前沿 · 脑与认知</div>
+<h1>计算神经科学</h1>
+<div class="meta">近十年最新思想摘要 · 约 1700 字 · 王德生 亲撰 · 2026 年 8 月</div>
+<p class="lede">这十年计算神经科学最要紧的转向有三层。其一，大脑模型不再由人手工写出，而是被训练出来——用任务目标训练一个网络，它的内部表征常常与真实神经元的响应高度相似。其二，分析单位从单个神经元的调谐曲线，换成了成千上万个神经元共同构成的低维动力学轨迹。其三，果蝇全脑与小鼠一立方毫米皮层的完整连接图第一次到手——而它立刻提出了一个尖锐问题：知道全部接线，离知道它怎么工作还有多远。</p>
+<h2>一、目标驱动模型</h2>
+<p>传统做法是：观察神经元对什么刺激反应最强，写下一个调谐函数，再拼成一个手工模型。这条路在初级感觉区走得不错，越往高级区越难——因为高级区的神经元对什么都有点反应，对什么都不专一。</p>
+<p>这十年的替代方案是目标驱动：不去拟合神经元，而是用一个真实任务（识别物体、导航、预测下一步）去训练网络，然后把训练好的网络的内部层与真实神经活动相比。结果反复出现——这类网络的中间层能相当好地预测视觉、听觉与部分语言相关脑区的响应，且往往优于几十年积累的手工模型。</p>
+<p>哲学上的争论随即而来：预测得准，是否等于解释了？主流的谨慎回答是不等于——这类模型说明了「什么样的计算目标与架构约束能产生这种表征」，但它本身仍是需要被解释的黑箱。计算神经科学因此获得了一个新的研究对象：它自己的模型。</p>
+<h2>二、群体动力学与流形</h2>
+<p>大规模记录技术（高密度电极、双光子成像）让同时记录成千上万个神经元成为常规，这直接改变了分析范式。</p>
+<p>核心发现是：尽管神经元数目巨大，群体活动通常被限制在一个维度低得多的流形上。于是运动准备、决策积累、工作记忆这些过程，可以被描述为状态在流形上的轨迹——有吸引子、有旋转、有固定点。</p>
+<p>这个视角的力量在于它把「神经元代表什么」换成了「群体在算什么」。一个单看毫无意义、混杂多种变量的神经元，在群体层面可能只是同一条轨迹的一个投影方向。这十年的一条重要教训是：单神经元的可解释性，可能根本不是大脑的组织原则。</p>
+<h2>三、连接组到手了</h2>
+<p>2024 年，成年果蝇的全脑连接图完成——十几万个神经元、数千万个突触，全部标注到细胞类型。2025 年，小鼠视觉皮层一立方毫米的功能连接组发表：同一块组织既有活体钙成像记录的活动，又有电镜重建的完整接线与逾五亿个突触。电镜连接组学在 2025 年被列为年度方法。</p>
+<p>这些数据的直接价值已经显现：果蝇连接组让听觉、导航与视觉回路的具体机制可以被从接线上读出来，并用模拟去预测扰动的后果。</p>
+<p>但它同时暴露了界限：接线图是静态的，而神经调质会在几秒内重设整张网络的有效连接强度；突触的符号与权重多数无法从形态直接读出；不同个体的接线并不完全一致。「有了连接组就能算出行为」这个期待，在这十年被数据本身温和地否定了。</p>
+<h2>四、学习规则这一层</h2>
+<p>一个长期的空白是：大脑用什么规则改突触？反向传播在工程上极其有效，但它要求误差信号沿着与前向连接精确对称的路径回传，这在生物上难以实现。</p>
+<p>这十年的工作分两路。一路是找出生物可实现的近似：局部误差、反馈对齐、预测编码式的分层误差、以及树突分区把前馈与反馈信号分开处理。另一路是实证：在活体中观察突触可塑性的实际规则，发现它对时序、位置与神经调质状态的依赖远比经典的时序依赖可塑性复杂。</p>
+<p>目前的共识是谦逊的：大脑很可能不用反向传播，但也不用任何一条已被写下的简单规则；它更像是多种局部规则在不同层次与时间尺度上的组合。</p>
+<h2>五、神经科学与人工智能的互相抽血</h2>
+<p>这十年两边的关系变得实际。工程一侧从神经科学拿走的主要是灵感与旧概念（注意、情景记忆、世界模型）；神经科学一侧拿走的则是具体工具：训练好的模型当作表征的量化基准、大规模拟合方法、可微分的模拟框架。</p>
+<p>值得警惕的一点已经被反复指出：用一个模型解释另一个模型，容易变成循环。若我们用深度网络的层来解释脑区，又用脑区来论证深度网络的合理性，两边都没有得到独立检验。</p>
+<p>这十年比较稳妥的做法是让模型做出可分辨的预测——例如在扰动实验（光遗传抑制某群细胞）中预测行为的具体变化方向，而不只是比对表征相似度。</p>
+<h2>六、模型该有多细</h2>
+<p>一个长期争论在这十年有了更清晰的表述：模型的细节应当由问题决定，而不是由「越真实越好」决定。带上千个离子通道参数的详细模型，往往有大量参数组合能产生相同行为，因而对机制的约束反而更弱。</p>
+<p>与之相关的是可复现性要求的提高：共享代码与仿真配置、报告参数敏感性、说明哪些结论依赖哪些假设。计算学科的复制危机不表现为实验做不出来，而表现为「换个参数就没了」。</p>
+<h2>七、一句话</h2>
+<p>计算神经科学的新思想是：模型从手工写变成训练出来，分析单位从单个神经元变成群体轨迹；而当完整的接线图终于摆在面前时，它教给我们的第一课是——接线不等于功能。</p>
+<div class="end"><b>新思想前沿</b> 是一个持续撰写的专栏：近十年，各主要领域最新思想的摘要，每领域约 2000 字，共 100 个学科面板，由王德生亲撰、逐月填充。 · <a href="/frontier/" style="color:var(--gold);text-decoration:none">← 回到 100 学科面板</a></div>
+</main><script src="/wds-mode.js?v=20260801h" defer></script>
+</body></html>
