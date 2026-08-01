@@ -1,0 +1,59 @@
+<!DOCTYPE html><html lang="zh"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>量子计算与算法 · 新思想前沿 | SDE Universes</title>
+<meta name="description" content="这十年算法侧的思想转向：一批被宣称的指数加速被「去量子化」证明并不存在；资源估计成为常规，问题从「有没有加速」变成「扣掉纠错开销后还剩多少」。">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Noto+Serif+SC:wght@300;400;500;600&display=swap">
+<style>
+:root{--bg:#F5EFE0;--card:#FAF6EC;--gold:#8A6817;--gold2:#A88233;--text:#2A2315;--text2:#6B5D47;--muted:#98886C;--border:rgba(138,104,23,0.22)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'Noto Serif SC',Georgia,serif;line-height:1.9;-webkit-font-smoothing:antialiased}
+.top{max-width:760px;margin:0 auto;padding:1.4rem 1.5rem 0;font-size:.86rem}
+.top a{color:var(--gold);text-decoration:none;font-weight:600}.top a:hover{text-decoration:underline}
+.top .sep{color:var(--muted);margin:0 .5rem}
+main{max-width:760px;margin:0 auto;padding:1.5rem 1.5rem 4rem}
+.kicker{font-size:.82rem;letter-spacing:.18em;color:var(--gold2);font-weight:600;margin-bottom:.9rem}
+h1{font-size:2rem;line-height:1.3;font-weight:700;margin-bottom:.7rem;letter-spacing:.01em}
+.meta{font-size:.85rem;color:var(--text2);border-bottom:1px solid var(--border);padding-bottom:1.1rem;margin-bottom:1.6rem}
+.lede{font-size:1.12rem;color:var(--text);font-weight:500;margin-bottom:1.5rem}
+h2{font-size:1.18rem;font-weight:600;color:var(--gold);margin:1.9rem 0 .6rem}
+p{margin:0 0 1.1rem;text-align:justify}
+.end{margin-top:2rem;padding-top:1.2rem;border-top:1px solid var(--border);font-size:.86rem;color:var(--muted)}
+.end b{color:var(--text2)}
+</style></head><body>
+<div class="top"><a href="/browse/">SDE Universes</a><span class="sep">·</span><a href="/frontier/">新思想前沿</a><span class="sep">›</span><span style="color:var(--text2)">计算与人工智能</span></div>
+<main>
+<div class="kicker">新思想前沿 · 计算与人工智能</div>
+<h1>量子计算与算法</h1>
+<div class="meta">近十年最新思想摘要 · 约 1800 字 · 王德生 亲撰 · 2026 年 8 月</div>
+<p class="lede">这十年量子计算在算法这一侧最要紧的转向，是一次自我修剪。上一个十年最激动人心的成果是一批号称对机器学习任务有指数加速的量子算法；而这十年，其中相当一部分被「去量子化」——有人构造出使用同样数据访问假设的经典算法，把所谓的指数优势削到只剩多项式。与此同时，资源估计成为常规工序：任何加速主张都要先扣掉纠错的开销，再看还剩多少。硬件那一侧的进展见「量子信息与量子计算」面板，这里只谈算法能不能算得过。</p>
+<h2>一、三类加速本来就不一样</h2>
+<p>把「量子加速」当成一个东西是这个领域最常见的误解。至少要分三类。第一类是指数级且有坚实理论基础的：对大数分解与离散对数（由此威胁现行公钥密码），以及对量子系统本身的模拟——后者是费曼最初的动机，也是最被看好的实用方向。</p>
+<p>第二类是平方级的：无结构搜索及其衍生。平方加速听起来诱人，但在真实系统里，它要与经典硬件几十年积累的常数因子优势和并行度竞争，往往被抵消。</p>
+<p>第三类是启发式的：变分算法、量子近似优化。它们没有加速证明，效果只能靠实验判断——而这十年的实验结果并不乐观。</p>
+<h2>二、去量子化</h2>
+<p>2018 年一位本科生的工作是转折点：她为一个被广泛引用的量子推荐系统算法构造了经典对应物，运行时间只慢多项式倍，从而说明原先宣称的指数优势并不来自量子性，而来自那个算法对数据访问方式的强假设。</p>
+<p>随后几年，同一套技术被系统化，把一整族基于量子线性代数的机器学习算法逐个降级：主成分分析、监督分类、若干矩阵求解问题。要点始终一样——如果你允许量子算法以某种便捷方式访问经典数据，那么允许经典算法用相应的抽样方式访问同一份数据，它也能做得差不多快。</p>
+<p>这条工作的价值是双向的。它删掉了一批虚假的承诺，也澄清了真正的加速必须来自哪里：要么问题本身是量子的，要么优势不能依赖于对经典数据的理想化访问假设。</p>
+<h2>三、数据加载这堵墙</h2>
+<p>与去量子化互为表里的是输入输出问题。许多量子算法假设可以在对数时间内把一个巨大的经典数据集装进量子态，这需要一种至今没有可行工程方案的量子随机访问存储。</p>
+<p>如果加载本身要花与数据规模成正比的时间，那么后续再快的处理也救不回整体复杂度——这正是许多纸面加速在现实里蒸发的地方。</p>
+<p>同理还有输出：量子算法常常只能给出一个量子态，而你想要的是具体数值，读出又要重复测量许多次。这十年的一条共识是：真正有希望的应用，输入小、输出小、中间的计算难——量子化学与材料模拟恰好符合这个形状，大数据分析恰好不符合。</p>
+<h2>四、资源估计成为必答题</h2>
+<p>第二条纪律来自纠错。逻辑运算要靠大量物理比特编码保护，某些关键门还需要昂贵的资源态制备，开销可能达到几个数量级。因此一个算法的渐近复杂度好看，说明不了它能不能在真实机器上跑完。</p>
+<p>这十年的规范做法是端到端资源估计：给定目标问题规模与错误率，算出需要多少物理比特、多少逻辑操作、跑多久。这类估计把许多应用推到了遥远的未来，也把注意力集中到少数几个即使按保守估计也值得做的目标上。</p>
+<p>一个有意思的副作用是它成了对经典算法的激励：每当一个量子加速被宣称，经典算法研究者就会去改进对应的最好经典解法，有时直接把差距抹平。近年的量子优势宣称与经典反扑的反复拉锯，正是这种良性对抗。</p>
+<p>这条拉锯也改变了「量子优势」这个词的用法。早期它指某个刻意挑选的采样任务上的一次性演示；如今被认真对待的表述要苛刻得多——在一个有人真正关心的问题上、用端到端的资源核算、并与当下最好的经典方法比较。按这个标准，公认成立的例子目前还没有。</p>
+<h2>五、启发式路线的降温</h2>
+<p>含噪中等规模时代的主打方案是变分算法：用浅电路加经典优化器，希望在没有纠错的条件下拿到实用价值。这十年积累的结果并不支持这个希望。</p>
+<p>主要障碍有两个。其一是贫瘠高原：随着比特数与电路深度增加，代价函数的梯度以指数速度趋于零，优化无从下手。其二是可模拟性：不少此类电路被证明可以被经典方法有效近似——能被经典模拟的东西，自然谈不上加速。</p>
+<p>结论不是这条路完全无用，而是它的定位变了：从「近期实用价值的主要来源」，降级为「在容错机器到来之前的实验与基准工具」。</p>
+<h2>六、还剩下什么是硬的</h2>
+<p>经过这一轮修剪，被普遍认为最可能率先带来实用价值的，是模拟量子系统本身：分子的电子结构、强关联材料、以及核物理与高能物理中的某些格点问题。理由很直接——问题本身就是量子的，不存在把经典数据搬进去的瓶颈。</p>
+<p>密码学相关的应用则属于另一类：算法早已确定，缺的只是足够大的容错机器，因此防御必须提前进行（见相邻面板）。</p>
+<p>优化与机器学习这两块最被市场期待的领域，反而是这十年被削减得最厉害的。诚实的现状是：没有可信的证据表明它们能获得指数加速，而多项式加速能否抵过纠错开销，目前是否定多于肯定。</p>
+<h2>七、一句话</h2>
+<p>量子算法的新思想是给自己做减法：把依赖理想数据访问的指数加速一个个去量子化，把纠错开销算进总账；剩下的那份清单短得多，却第一次是可信的。</p>
+<div class="end"><b>新思想前沿</b> 是一个持续撰写的专栏：近十年，各主要领域最新思想的摘要，每领域约 2000 字，共 100 个学科面板，由王德生亲撰、逐月填充。 · <a href="/frontier/" style="color:var(--gold);text-decoration:none">← 回到 100 学科面板</a></div>
+</main><script src="/wds-mode.js?v=20260801h" defer></script>
+</body></html>

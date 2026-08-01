@@ -1,0 +1,60 @@
+<!DOCTYPE html><html lang="zh"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>计算机视觉 · 新思想前沿 | SDE Universes</title>
+<meta name="description" content="这十年的思想转向：「任务」消失了——从为每个任务标注训练，变成语言对齐的通用表示加可提示的通用模型；同时三维表示被辐射场与高斯泼溅改写。">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Noto+Serif+SC:wght@300;400;500;600&display=swap">
+<style>
+:root{--bg:#F5EFE0;--card:#FAF6EC;--gold:#8A6817;--gold2:#A88233;--text:#2A2315;--text2:#6B5D47;--muted:#98886C;--border:rgba(138,104,23,0.22)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'Noto Serif SC',Georgia,serif;line-height:1.9;-webkit-font-smoothing:antialiased}
+.top{max-width:760px;margin:0 auto;padding:1.4rem 1.5rem 0;font-size:.86rem}
+.top a{color:var(--gold);text-decoration:none;font-weight:600}.top a:hover{text-decoration:underline}
+.top .sep{color:var(--muted);margin:0 .5rem}
+main{max-width:760px;margin:0 auto;padding:1.5rem 1.5rem 4rem}
+.kicker{font-size:.82rem;letter-spacing:.18em;color:var(--gold2);font-weight:600;margin-bottom:.9rem}
+h1{font-size:2rem;line-height:1.3;font-weight:700;margin-bottom:.7rem;letter-spacing:.01em}
+.meta{font-size:.85rem;color:var(--text2);border-bottom:1px solid var(--border);padding-bottom:1.1rem;margin-bottom:1.6rem}
+.lede{font-size:1.12rem;color:var(--text);font-weight:500;margin-bottom:1.5rem}
+h2{font-size:1.18rem;font-weight:600;color:var(--gold);margin:1.9rem 0 .6rem}
+p{margin:0 0 1.1rem;text-align:justify}
+.end{margin-top:2rem;padding-top:1.2rem;border-top:1px solid var(--border);font-size:.86rem;color:var(--muted)}
+.end b{color:var(--text2)}
+</style></head><body>
+<div class="top"><a href="/browse/">SDE Universes</a><span class="sep">·</span><a href="/frontier/">新思想前沿</a><span class="sep">›</span><span style="color:var(--text2)">计算与人工智能</span></div>
+<main>
+<div class="kicker">新思想前沿 · 计算与人工智能</div>
+<h1>计算机视觉</h1>
+<div class="meta">近十年最新思想摘要 · 约 1800 字 · 王德生 亲撰 · 2026 年 8 月</div>
+<p class="lede">这十年计算机视觉最要紧的转向，是它的「任务」消失了。这门学科过去由一串独立任务定义：分类、检测、分割、检索、描述，每一个都有自己的数据集、模型与会议专场。而这十年它被两件事重组：一是用海量图文对把视觉与语言对齐，得到一个不需要为新类别重新训练的表示；二是把分割这类任务改造成可提示的通用能力——你给一个点、一个框或一句话，模型给出结果。与此同时，三维表示被彻底改写了两次。</p>
+<h2>一、封闭集合的终结</h2>
+<p>经典范式的隐含前提是封闭集合：先定义一千个类别，标注、训练、评测；遇到第一千零一个类别，就得重新来一遍。这个前提让视觉系统在实验室里很好看，在开放世界里很脆。</p>
+<p>打破它的做法出人意料地简单：用互联网上大量的图像与其伴随文本作训练材料，让图像编码器与文本编码器把对应的图文映射到相近的位置。得到的模型可以对任何用语言描述的类别做零样本识别——类别不再是训练时固定的，而是使用时给定的。</p>
+<p>这一步的深层意义是把标签换成了语言。标签是封闭的、需要预先约定的；语言是开放的、可组合的。视觉从此不再是一门独立学科，而成了多模态系统的一个感官。</p>
+<h2>二、可提示的通用模型</h2>
+<p>第二步把同样的思路推到密集预测。分割过去按场景细分为语义分割、实例分割、医学分割、遥感分割，各自训练。这十年出现的通用分割模型把它重述为一个可提示的任务：给一个点、一个框、一段文字，模型输出对应的掩码，且对未见过的物体类别同样有效。</p>
+<p>支撑它的是一套数据引擎：先用少量标注训练模型，再用模型去标注更多数据、由人修正，循环放大，最终得到规模远超人工标注上限的数据集。这个「模型参与生产自己的训练数据」的做法，此后被广泛复制。</p>
+<p>实践后果是下游应用的门槛骤降：一个此前需要标注数千张图的专业分割任务，如今常常只需要提示与少量微调。</p>
+<h2>三、三维被改写两次</h2>
+<p>第一次是辐射场：不再显式重建网格，而是用一个神经网络表示空间中每一点的密度与颜色，通过可微渲染，用一组照片反推出这个场，从而合成任意新视角。它一举把新视角合成的质量提升到照片级。</p>
+<p>第二次是三维高斯泼溅：把场景表示为大量各向异性的高斯点，用光栅化而非逐光线积分来渲染。质量相当，速度快到可实时，训练时间从小时降到分钟。</p>
+<p>两次改写的共同点是把三维重建变成了一个优化问题——不是先做特征匹配、再做三角化、再做网格化的流水线，而是端到端地用渲染误差反向优化一个表示。传统的多视图几何并没有消失，但它从主干退到了初始化与约束的位置。</p>
+<h2>四、视觉与语言合流之后</h2>
+<p>当图像编码器被接进语言模型，视觉任务的输出形式统一成了文本：描述、问答、定位、读图表、看文档、操作界面。这既带来通用性，也带来新的失败模式——模型会自信地描述图中不存在的东西。</p>
+<p>由此产生的评测重心转向了细粒度的忠实性：计数、空间关系、属性绑定、否定。这些恰恰是当前多模态系统最不稳的地方，也是纯语言的评测集测不出来的。</p>
+<p>值得记的是一个方法论后果：视觉领域延续二十年的、以固定基准排名推动进步的模式在这里失灵了——通用模型的能力面太宽，任何单一基准都只能照亮一角。</p>
+<h2>五、还没被通用模型吃掉的</h2>
+<p>几块阵地依然由专用方法把守，理由一致：数据分布与代价结构特殊。医学影像的关键在极低的假阴性容忍与稀缺的标注；工业质检要在极高吞吐下检出罕见缺陷；遥感的尺度、光谱与地理泛化问题独特（见相邻面板）；而自动驾驶的感知必须在毫秒级延迟与功能安全约束下工作。</p>
+<p>这些领域采用的通常是折中方案：用通用模型做主干或做预训练，再用领域数据与显式约束把可靠性补上。</p>
+<p>这也是本栏目反复出现的模式——通用配方提供底座，专用知识负责最后那段可靠性。</p>
+<p>另一块没被吃掉的是效率极限场景：手机、摄像头与嵌入式设备上的实时视觉，仍高度依赖专门设计的小模型与算子优化。通用大模型能给出更好的教师，却给不出更小的学生——蒸馏与量化因此成了这两类工作之间的固定接口（见相邻面板）。</p>
+<h2>六、数据、偏斜与真实性</h2>
+<p>两个持续存在的问题在这十年被更认真地对待。其一是数据集偏斜：网络图文语料在地域、肤色、语言与场景上分布极不均匀，模型的错误率因此在特定人群上系统性偏高；应对包括分组报告精度与针对性补数据，但根源在语料。</p>
+<p>其二是真实性：生成图像的普及使「照片作为证据」的默认地位被削弱。视觉领域因此多了一项此前不属于它的任务——来源认证与篡改检测，而这在技术上被证明比生成本身更难。</p>
+<p>这条线与传播研究、艺术理论那边的讨论汇合（见相邻面板）：问题不再是能不能看出来，而是证明真实的成本由谁承担。</p>
+<p>一个技术上的现实是：被动的伪造检测长期处于劣势——检测器一旦公开，生成方就能针对它优化。因此重心已经转向主动的来源标注与拍摄端签名，也就是把举证方向反过来：不去证明某张图是假的，而是让真的那张能自证出身。</p>
+<h2>七、一句话</h2>
+<p>计算机视觉的新思想是：任务被提示取代、标签被语言取代、三维重建被优化取代——这门学科没有消失，它变成了多模态系统的眼睛，而它最后守住的地盘，是那些错一次代价极高的地方。</p>
+<div class="end"><b>新思想前沿</b> 是一个持续撰写的专栏：近十年，各主要领域最新思想的摘要，每领域约 2000 字，共 100 个学科面板，由王德生亲撰、逐月填充。 · <a href="/frontier/" style="color:var(--gold);text-decoration:none">← 回到 100 学科面板</a></div>
+</main><script src="/wds-mode.js?v=20260801h" defer></script>
+</body></html>

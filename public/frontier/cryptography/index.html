@@ -1,0 +1,58 @@
+<!DOCTYPE html><html lang="zh"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>现代密码学 · 新思想前沿 | SDE Universes</title>
+<meta name="description" content="这十年的思想转向：主业从「保密」扩展到「证明」——零知识证明从理论走向工程；同时后量子标准落地，全球开始一场以十年计的算法迁移。">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Noto+Serif+SC:wght@300;400;500;600&display=swap">
+<style>
+:root{--bg:#F5EFE0;--card:#FAF6EC;--gold:#8A6817;--gold2:#A88233;--text:#2A2315;--text2:#6B5D47;--muted:#98886C;--border:rgba(138,104,23,0.22)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'Noto Serif SC',Georgia,serif;line-height:1.9;-webkit-font-smoothing:antialiased}
+.top{max-width:760px;margin:0 auto;padding:1.4rem 1.5rem 0;font-size:.86rem}
+.top a{color:var(--gold);text-decoration:none;font-weight:600}.top a:hover{text-decoration:underline}
+.top .sep{color:var(--muted);margin:0 .5rem}
+main{max-width:760px;margin:0 auto;padding:1.5rem 1.5rem 4rem}
+.kicker{font-size:.82rem;letter-spacing:.18em;color:var(--gold2);font-weight:600;margin-bottom:.9rem}
+h1{font-size:2rem;line-height:1.3;font-weight:700;margin-bottom:.7rem;letter-spacing:.01em}
+.meta{font-size:.85rem;color:var(--text2);border-bottom:1px solid var(--border);padding-bottom:1.1rem;margin-bottom:1.6rem}
+.lede{font-size:1.12rem;color:var(--text);font-weight:500;margin-bottom:1.5rem}
+h2{font-size:1.18rem;font-weight:600;color:var(--gold);margin:1.9rem 0 .6rem}
+p{margin:0 0 1.1rem;text-align:justify}
+.end{margin-top:2rem;padding-top:1.2rem;border-top:1px solid var(--border);font-size:.86rem;color:var(--muted)}
+.end b{color:var(--text2)}
+</style></head><body>
+<div class="top"><a href="/browse/">SDE Universes</a><span class="sep">·</span><a href="/frontier/">新思想前沿</a><span class="sep">›</span><span style="color:var(--text2)">计算与人工智能</span></div>
+<main>
+<div class="kicker">新思想前沿 · 计算与人工智能</div>
+<h1>现代密码学</h1>
+<div class="meta">近十年最新思想摘要 · 约 1600 字 · 王德生 亲撰 · 2026 年 8 月</div>
+<p class="lede">这十年密码学最要紧的转向，是它的主业变了。这门学科过去的中心是保密：如何让别人读不到。而这十年最活跃的分支是证明：如何让别人相信一件事是真的，却不必看到它凭什么是真的。零知识证明从教科书里的奇观变成了可以工程化部署的组件。与此同时，一件更紧迫的事在同步发生——后量子标准已经落地，全球正在开始一场以十年计的算法迁移。</p>
+<h2>一、后量子迁移：从论文到时间表</h2>
+<p>威胁的逻辑早已清楚：一台足够大的容错量子计算机能击破现行的公钥体系（见相邻面板）。真正的转折是它从威胁描述变成了行政日程。</p>
+<p>2024 年 8 月，美国标准机构发布了首批后量子标准：基于格的密钥封装与签名，以及一个基于哈希的保守备份签名；2025 年 3 月又选定了一个基于编码的备份密钥封装方案，以免所有鸡蛋都放在格问题这一个篮子里。多国随后给出迁移时间表，大致口径是本世纪三十年前后停用现行公钥算法。</p>
+<p>推动紧迫感的是「先存后解」：攻击者今天截获并保存密文，等未来有了机器再解密。因此对长期保密的数据而言，迁移的截止日期不是量子计算机出现的那天，而是今天。</p>
+<h2>二、迁移的真实难度不在算法</h2>
+<p>换算法本身并不难，主流库与浏览器已经在用混合方案（经典与后量子并联，任一安全即安全）做密钥交换。难的是别的。</p>
+<p>后量子密钥与签名比现行算法大很多，带宽敏感的协议、证书链、以及资源受限的嵌入式设备都要重新设计；固件烧死算法的工业与物联网设备根本无法在相关时间尺度内更换。</p>
+<p>由此浮现的核心概念是密码敏捷性：系统能否在不重写的前提下更换算法。这十年的一个共识是，敏捷性比选对算法更重要——因为标准还会变，而这次迁移暴露的正是过去几十年把算法硬编码进协议的代价。</p>
+<h2>三、零知识证明工程化</h2>
+<p>零知识证明的概念有四十年历史，这十年才真正可用。变化来自实现：简洁证明系统让证明大小与验证时间与被证明计算的规模几乎无关，验证可以在毫秒内完成。</p>
+<p>技术演进的主线是去掉可信设置、把安全假设收窄到哈希函数、并把证明生成的成本一路压低。同时出现了专门的中间语言与编译器，使开发者不必手工把程序翻译成算术电路。</p>
+<p>应用的形状因此变了：从「证明我知道一个秘密」，扩展到「证明这一大批计算是按规则执行的」。这实质上把密码学变成了可验证计算的工具——一个与保密无关的用途。</p>
+<h2>四、可验证计算与它的社会含义</h2>
+<p>这个能力的社会含义值得单独说。它允许把「我做对了」与「我给你看全部数据」分开：可以证明一个人满足年龄条件而不透露生日，证明一份财报符合规则而不公开账目，证明一个模型是在承诺过的数据集上训练的而不交出权重。</p>
+<p>这与本栏目其他面板反复出现的主题接上了：遥感把排放变成可核实的事实，碳中和要求可验证的账本，认识论关心可被审计的依赖。零知识证明提供的，正是「可核实但不必全盘公开」这一档中间选项——而现代治理缺的往往就是这一档。</p>
+<p>需要保持清醒的是它的边界：证明保证的是计算按规则执行，不保证输入是真的。垃圾进、垃圾出，只不过现在有了一份垃圾被正确处理的证明。</p>
+<h2>五、在加密数据上计算</h2>
+<p>第三条主线是让数据在被使用时也保持加密。全同态加密允许直接在密文上做计算，这十年通过自举优化、更好的参数选择与专用硬件，性能提升了几个数量级——从完全不可用变成在特定窄场景下可用。</p>
+<p>与之并行的是安全多方计算：几方各持一部分数据，共同算出结果而不互相泄露输入；以及可信执行环境这一硬件路线——它快得多，但把信任托付给芯片厂商，且这十年反复被侧信道攻击攻破。</p>
+<p>这三条路线的取舍很清楚：同态加密的信任假设最干净、代价最高；多方计算居中；硬件飞地最快、信任最重。真实部署往往是三者的组合。</p>
+<h2>六、实现比数学更容易出错</h2>
+<p>一个贯穿十年的经验是：现代密码的破解极少来自数学被攻破，绝大多数来自实现与部署——侧信道泄漏、随机数源不良、协议状态机的边角、以及把参数配错。</p>
+<p>相应的进展也在这一层：形式化验证的密码库与协议（把安全性证明写成机器可检的形式）、常数时间实现的自动检查、以及协议的机器验证模型。这条线与逻辑哲学面板里「逻辑成为可执行基础设施」是同一件事的另一端（见相邻面板）。</p>
+<p>另一个被这十年反复确认的教训是：为执法开的「例外通道」在密码学上无法被限定给特定使用者——一个后门就是一个漏洞，这一点在技术上没有折中余地，虽然在政治上争论从未停止。</p>
+<h2>七、一句话</h2>
+<p>密码学的新思想是：主业从保密扩展到证明——零知识让「可核实但不公开」第一次成为可部署的选项；而迫在眉睫的那件事叫迁移，它考的不是数学，是几十年来把算法焊死在协议里的旧账。</p>
+<div class="end"><b>新思想前沿</b> 是一个持续撰写的专栏：近十年，各主要领域最新思想的摘要，每领域约 2000 字，共 100 个学科面板，由王德生亲撰、逐月填充。 · <a href="/frontier/" style="color:var(--gold);text-decoration:none">← 回到 100 学科面板</a></div>
+</main><script src="/wds-mode.js?v=20260801h" defer></script>
+</body></html>

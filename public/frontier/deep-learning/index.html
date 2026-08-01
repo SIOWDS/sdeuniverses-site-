@@ -1,0 +1,59 @@
+<!DOCTYPE html><html lang="zh"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>深度学习 · 新思想前沿 | SDE Universes</title>
+<meta name="description" content="这十年的思想转向：从「为每个任务设计架构、标注数据」到「一套通用配方横扫所有模态与学科」——归纳偏置退场、自监督取代标注，而评估体系跟不上了。">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Noto+Serif+SC:wght@300;400;500;600&display=swap">
+<style>
+:root{--bg:#F5EFE0;--card:#FAF6EC;--gold:#8A6817;--gold2:#A88233;--text:#2A2315;--text2:#6B5D47;--muted:#98886C;--border:rgba(138,104,23,0.22)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'Noto Serif SC',Georgia,serif;line-height:1.9;-webkit-font-smoothing:antialiased}
+.top{max-width:760px;margin:0 auto;padding:1.4rem 1.5rem 0;font-size:.86rem}
+.top a{color:var(--gold);text-decoration:none;font-weight:600}.top a:hover{text-decoration:underline}
+.top .sep{color:var(--muted);margin:0 .5rem}
+main{max-width:760px;margin:0 auto;padding:1.5rem 1.5rem 4rem}
+.kicker{font-size:.82rem;letter-spacing:.18em;color:var(--gold2);font-weight:600;margin-bottom:.9rem}
+h1{font-size:2rem;line-height:1.3;font-weight:700;margin-bottom:.7rem;letter-spacing:.01em}
+.meta{font-size:.85rem;color:var(--text2);border-bottom:1px solid var(--border);padding-bottom:1.1rem;margin-bottom:1.6rem}
+.lede{font-size:1.12rem;color:var(--text);font-weight:500;margin-bottom:1.5rem}
+h2{font-size:1.18rem;font-weight:600;color:var(--gold);margin:1.9rem 0 .6rem}
+p{margin:0 0 1.1rem;text-align:justify}
+.end{margin-top:2rem;padding-top:1.2rem;border-top:1px solid var(--border);font-size:.86rem;color:var(--muted)}
+.end b{color:var(--text2)}
+</style></head><body>
+<div class="top"><a href="/browse/">SDE Universes</a><span class="sep">·</span><a href="/frontier/">新思想前沿</a><span class="sep">›</span><span style="color:var(--text2)">计算与人工智能</span></div>
+<main>
+<div class="kicker">新思想前沿 · 计算与人工智能</div>
+<h1>深度学习</h1>
+<div class="meta">近十年最新思想摘要 · 约 1600 字 · 王德生 亲撰 · 2026 年 8 月</div>
+<p class="lede">这十年深度学习最要紧的转向，不是某个模型变强了，而是方法论被压缩成了一套通用配方：拿一个几乎不含领域假设的架构，用自监督目标在海量未标注数据上预训练，再用少量标注适配到具体任务。这套配方随后横扫了视觉、语音、蛋白质、天气、材料与神经数据。代价是各学科几十年积累的建模传统被替换掉，而衡量进步的评估体系，至今没跟上。</p>
+<h2>一、归纳偏置的退场</h2>
+<p>深度学习的第一个十年，进步来自把领域知识写进架构：卷积编码平移不变性，循环结构编码时序，图网络编码关系。设计一个好的归纳偏置，是那时候研究者的核心手艺。</p>
+<p>这十年发生的事情正好相反：偏置更弱、更通用的架构，在数据与算力足够时反而更好。注意力机制取代卷积成为视觉的主力，同一种架构被原封不动地搬去处理光谱、点云、分子图与脑信号。</p>
+<p>这个现象有一个被反复引用的概括：从长远看，能利用更多计算的通用方法总会胜过依赖人类知识的专用方法。它令人不适，因为它贬低的正是研究者最擅长的那部分工作——而这十年的经验，大体上支持了它。</p>
+<h2>二、标注不再是瓶颈</h2>
+<p>第二条转向是训练目标。监督学习需要人来标注，而标注昂贵、偏斜、且规模有上限。自监督学习把监督信号从数据本身取出来：遮住一部分让模型补全，或者要求同一对象的不同视角在表示空间里靠拢。</p>
+<p>结果是表示学习与任务学习被分开了。先学一个通用表示，再用极少量标注做适配——「每个任务训一个模型」的旧范式，在多数领域被「一个底座加若干轻量适配」取代。</p>
+<p>对小数据学科而言这是决定性的：医学影像、地球观测、材料谱学的标注永远不够，而未标注数据几乎无限。</p>
+<h2>三、同一套配方进了别的学科</h2>
+<p>这十年最值得记的不是模型排行榜，而是同一套配方在别处的接连生效：蛋白质结构预测、天气预报、势能面计算、连接组重建、震相拾取、生态声学识别。这些在本栏目其他面板里各自作为「那个学科的转向」出现，而它们共享同一套技术底座。</p>
+<p>共同的模式也一致：先是被本领域专家质疑「它不懂物理/化学/生物」，随后在标准检验上超过传统方法，最后被接受为工具，同时留下一个未解的问题——它到底学到了机制，还是学到了训练分布里的统计规律。</p>
+<p>这个问题在每个学科的答案可能不同，但提问方式是共通的：让它在训练分布之外做出可被证伪的预测。</p>
+<h2>四、评估跟不上了</h2>
+<p>与能力增长形成反差的是评估的失效。基准测试被反复优化到饱和；测试集通过网络进入训练语料造成污染；排行榜的名次差异常常小于随机种子造成的波动；而许多论文的改进在严格重做后消失。</p>
+<p>这十年出现的应对包括：动态与持续更新的评测集、由人类偏好构成的对战式排名、以及要求报告多次随机种子与置信区间。但没有哪一项解决了根本困难——当模型的训练数据是整个互联网时，很难保证任何测试集是干净的。</p>
+<p>这与其他学科的复制清算是同一件事（见相邻面板），只是这里的病因略有不同：不是发表偏倚，而是评估集与训练集之间的边界正在消失。</p>
+<h2>五、效率成为独立的研究对象</h2>
+<p>规模增长把成本推到前台，于是一条独立的技术线成熟起来：量化（用更少的比特存权重）、蒸馏（用大模型教小模型）、稀疏与专家混合（每次只激活一部分参数）、以及针对具体硬件的算子重写。</p>
+<p>这条线的意义超出省钱：它决定了技术能否落到本地设备、能否被算力有限的机构复现、以及研究能否独立于少数几家拥有大规模算力的机构进行。</p>
+<p>它也带来一个方法学要求：报告结果时必须报告计算预算。两个模型在不同算力下的比较没有意义，而这一点在这十年才逐渐成为规范。</p>
+<h2>六、可靠性这一层还是空的</h2>
+<p>几个老问题并未随规模解决：对分布外输入的失效、对抗样本、置信度校准不良（错得越离谱越自信）、以及在训练数据稀疏的角落里的系统性错误。</p>
+<p>这十年比较扎实的进展是把它们变成可测量的：分布外检测的标准评测、校准误差的指标、以及对模型在子群体上的表现分别报告。而解决方案仍是零碎的。</p>
+<p>一个由此产生的实用规范是：把深度模型当作一个在其训练分布内表现优异、在分布外无保证的组件，并在系统层面为它配上兜底逻辑——而不是指望模型自己知道自己不知道。</p>
+<p>还有一处常被忽略的代价：配方通用化让研究门槛在两头分化。跑通一个已知配方比十年前容易得多，而要在最前沿做出可信的比较，需要的算力已超出多数机构。这十年学界的实际应对是分工——把最大规模的验证留给少数机构，把可复现的、小规模的机制研究留给其余人。</p>
+<h2>七、一句话</h2>
+<p>深度学习的新思想是：把领域知识从架构里拿出来、把监督信号从数据里挖出来，一套配方横扫所有学科；而它留下的两个空缺——评估的干净与失败的可预期——至今没人填上。</p>
+<div class="end"><b>新思想前沿</b> 是一个持续撰写的专栏：近十年，各主要领域最新思想的摘要，每领域约 2000 字，共 100 个学科面板，由王德生亲撰、逐月填充。 · <a href="/frontier/" style="color:var(--gold);text-decoration:none">← 回到 100 学科面板</a></div>
+</main><script src="/wds-mode.js?v=20260801h" defer></script>
+</body></html>

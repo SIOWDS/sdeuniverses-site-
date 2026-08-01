@@ -1,0 +1,59 @@
+<!DOCTYPE html><html lang="zh"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>机器人学 · 新思想前沿 | SDE Universes</title>
+<meta name="description" content="这十年的思想转向：从「建模与编程」到「从数据里学策略」——跨形态数据池与视觉-语言-动作模型成为主流路线，而真正的瓶颈从算法变成了数据。">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Noto+Serif+SC:wght@300;400;500;600&display=swap">
+<style>
+:root{--bg:#F5EFE0;--card:#FAF6EC;--gold:#8A6817;--gold2:#A88233;--text:#2A2315;--text2:#6B5D47;--muted:#98886C;--border:rgba(138,104,23,0.22)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'Noto Serif SC',Georgia,serif;line-height:1.9;-webkit-font-smoothing:antialiased}
+.top{max-width:760px;margin:0 auto;padding:1.4rem 1.5rem 0;font-size:.86rem}
+.top a{color:var(--gold);text-decoration:none;font-weight:600}.top a:hover{text-decoration:underline}
+.top .sep{color:var(--muted);margin:0 .5rem}
+main{max-width:760px;margin:0 auto;padding:1.5rem 1.5rem 4rem}
+.kicker{font-size:.82rem;letter-spacing:.18em;color:var(--gold2);font-weight:600;margin-bottom:.9rem}
+h1{font-size:2rem;line-height:1.3;font-weight:700;margin-bottom:.7rem;letter-spacing:.01em}
+.meta{font-size:.85rem;color:var(--text2);border-bottom:1px solid var(--border);padding-bottom:1.1rem;margin-bottom:1.6rem}
+.lede{font-size:1.12rem;color:var(--text);font-weight:500;margin-bottom:1.5rem}
+h2{font-size:1.18rem;font-weight:600;color:var(--gold);margin:1.9rem 0 .6rem}
+p{margin:0 0 1.1rem;text-align:justify}
+.end{margin-top:2rem;padding-top:1.2rem;border-top:1px solid var(--border);font-size:.86rem;color:var(--muted)}
+.end b{color:var(--text2)}
+</style></head><body>
+<div class="top"><a href="/browse/">SDE Universes</a><span class="sep">·</span><a href="/frontier/">新思想前沿</a><span class="sep">›</span><span style="color:var(--text2)">计算与人工智能</span></div>
+<main>
+<div class="kicker">新思想前沿 · 计算与人工智能</div>
+<h1>机器人学</h1>
+<div class="meta">近十年最新思想摘要 · 约 1700 字 · 王德生 亲撰 · 2026 年 8 月</div>
+<p class="lede">这十年机器人学最要紧的转向，是控制策略的来源变了。传统路线是建模：写出动力学方程、做状态估计、规划轨迹、设计控制器，每换一个任务重来一遍。这十年的主流路线是学：把多台不同形态机器人的遥操作数据汇成一个池子，在视觉—语言预训练的底座上训练一个直接输出动作的模型。架构之争已经基本结束，而新的瓶颈完全不同——文本可以从互联网上爬，机器人动作数据必须一条条做出来。</p>
+<h2>一、建模路线的成就与它的边界</h2>
+<p>基于模型的路线在过去几十年造就了极高的可靠性：工业机械臂的重复定位精度、四足与双足的动态平衡、无人机的姿态控制，都建立在精确建模与最优控制之上。在结构化环境里，它至今没有对手。</p>
+<p>它的边界在于非结构化：一旦对象是柔软的、可变形的、位置不确定的，或者任务要用自然语言给出，显式建模就迅速失效。折叠衣物、整理杂乱的桌面、在陌生厨房里找到抹布——这些对人是琐事，对建模路线是灾难。</p>
+<p>因此这十年的分工逐渐清楚：结构化、高精度、高节拍的场合仍归控制理论；开放世界的操作交给学习。</p>
+<h2>二、模仿学习先跑通了</h2>
+<p>让学习路线真正落地的是模仿：人用遥操作演示若干次，模型直接学从观测到动作的映射。它绕开了强化学习在真实机器人上的两大难题——没有安全的试错机会，也没有可靠的奖励函数。</p>
+<p>关键的技术细节有两处。其一是动作分块：一次预测未来一小段动作序列而不是单步，缓解了误差累积与抖动。其二是用生成模型来表示策略——同一个场景下人的合理做法不止一种，用扩散一类的多峰分布去建模，比强行回归到平均动作稳定得多。</p>
+<p>低成本遥操作装置的普及让演示数据的采集从实验室特权变成了可复制的流程，这一点的重要性不亚于任何算法。</p>
+<h2>三、跨形态数据池与视觉-语言-动作模型</h2>
+<p>2023 年前后成形的路线有两块基石。其一是把几十个实验室、二十多种机器人本体的数据汇成统一格式的公共数据集，证明了跨形态联合训练是有效的——在别的机器人数据上训练，能提升本机器人的表现。</p>
+<p>其二是把动作接到视觉—语言模型上：底座已经理解「杯子」「桌子」「把它放进抽屉」，只需要学会把这种理解翻译成关节指令。由此得到的视觉-语言-动作模型能听懂没被专门训练过的指令，也能对没见过的物体做出合理反应。</p>
+<p>此后数年，这条配方从桌面单臂扩展到双臂移动操作与人形本体，开放实现与商用系统并行。可以说，机器人学第一次有了自己的「基础模型」路线。</p>
+<h2>四、数据才是瓶颈</h2>
+<p>与语言和视觉不同，机器人没有现成语料。每一条轨迹都要有人操作真实硬件产生，成本以小时计，且带着具体本体的印记。这决定了这条路线的所有取舍。</p>
+<p>几条缓解路线在同时推进：大规模并行仿真配合随机化，把训练搬到便宜的地方，再想办法跨越仿真与现实的差距；从人类视频中学习交互先验，再用少量真机数据落地；用手持式采集装置让非专家也能产出可用数据；以及用生成式世界模型合成经验（见生成模型面板）。</p>
+<p>每条都有效，也都有折扣：仿真里学到的接触与摩擦最不可靠，人类视频没有动作标签与力反馈，合成经验会继承生成模型的错误。数据问题至今没有一劳永逸的解。</p>
+<h2>五、评估的困难</h2>
+<p>一个不上镜却决定学科健康的问题是：机器人研究几乎没有可比的基准。每个实验室的本体、相机、光照、物体、任务定义都不同，成功率的数字无法互相比较；而真机实验次数少，几十次试验的成功率差异往往在噪声范围内。</p>
+<p>这十年的应对包括标准化的硬件套件、公开的远程评测平台、以及强制报告试验次数与置信区间。但与语言模型可以在同一批题目上打分相比，机器人的评测仍处在前科学阶段。</p>
+<p>这一点值得写下来，因为它解释了这个领域为什么容易被演示视频误导：一段成功的视频不告诉你它是第几次拍成的。</p>
+<h2>六、人形与现实</h2>
+<p>这十年后半段最热闹的是人形机器人。支持它的论证是环境适配——世界是按人的身体造的，楼梯、门把手、工具都假定了一双手和两条腿。反对的论证是效率——轮式底盘加一条手臂在绝大多数场景下更稳、更省、更安全。</p>
+<p>技术上确实有实质进展：全身动态控制、从人类动作捕捉迁移技能、以及在本体上部署视觉-语言-动作模型。但公开可核实的成果多为受控演示，长时间自主作业的连续可靠性数据仍然稀少。</p>
+<p>一个中性的判断是：把人形当作研究平台是合理的（它逼出全身控制与通用操作的难题），把它当作近期的经济方案则缺乏证据。分清这两件事，是读这个领域新闻时最有用的一条纪律。</p>
+<p>与之相对，这十年真正安静落地的是仓储、分拣、农业采摘与最后一公里配送——它们的共同点是环境半结构化、任务重复、且可以接受由人兜底的失败率。机器人学的商业史一再重复同一条规律：先赢的从来不是最像人的那种。</p>
+<h2>七、一句话</h2>
+<p>机器人学的新思想是：策略从建出来变成学出来，跨形态的数据池加视觉-语言底座成了共同配方；而当算法之争落幕后，剩下的瓶颈朴素得刺眼——数据得有人一条一条做出来。</p>
+<div class="end"><b>新思想前沿</b> 是一个持续撰写的专栏：近十年，各主要领域最新思想的摘要，每领域约 2000 字，共 100 个学科面板，由王德生亲撰、逐月填充。 · <a href="/frontier/" style="color:var(--gold);text-decoration:none">← 回到 100 学科面板</a></div>
+</main><script src="/wds-mode.js?v=20260801h" defer></script>
+</body></html>

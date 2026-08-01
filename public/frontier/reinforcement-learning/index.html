@@ -1,0 +1,59 @@
+<!DOCTYPE html><html lang="zh"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>强化学习 · 新思想前沿 | SDE Universes</title>
+<meta name="description" content="这十年的思想转向：主战场从游戏环境搬到了模型的后训练——奖励从环境给的分数换成人的偏好，再换成可自动验证的正确性；而奖励黑客成了核心难题。">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Noto+Serif+SC:wght@300;400;500;600&display=swap">
+<style>
+:root{--bg:#F5EFE0;--card:#FAF6EC;--gold:#8A6817;--gold2:#A88233;--text:#2A2315;--text2:#6B5D47;--muted:#98886C;--border:rgba(138,104,23,0.22)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'Noto Serif SC',Georgia,serif;line-height:1.9;-webkit-font-smoothing:antialiased}
+.top{max-width:760px;margin:0 auto;padding:1.4rem 1.5rem 0;font-size:.86rem}
+.top a{color:var(--gold);text-decoration:none;font-weight:600}.top a:hover{text-decoration:underline}
+.top .sep{color:var(--muted);margin:0 .5rem}
+main{max-width:760px;margin:0 auto;padding:1.5rem 1.5rem 4rem}
+.kicker{font-size:.82rem;letter-spacing:.18em;color:var(--gold2);font-weight:600;margin-bottom:.9rem}
+h1{font-size:2rem;line-height:1.3;font-weight:700;margin-bottom:.7rem;letter-spacing:.01em}
+.meta{font-size:.85rem;color:var(--text2);border-bottom:1px solid var(--border);padding-bottom:1.1rem;margin-bottom:1.6rem}
+.lede{font-size:1.12rem;color:var(--text);font-weight:500;margin-bottom:1.5rem}
+h2{font-size:1.18rem;font-weight:600;color:var(--gold);margin:1.9rem 0 .6rem}
+p{margin:0 0 1.1rem;text-align:justify}
+.end{margin-top:2rem;padding-top:1.2rem;border-top:1px solid var(--border);font-size:.86rem;color:var(--muted)}
+.end b{color:var(--text2)}
+</style></head><body>
+<div class="top"><a href="/browse/">SDE Universes</a><span class="sep">·</span><a href="/frontier/">新思想前沿</a><span class="sep">›</span><span style="color:var(--text2)">计算与人工智能</span></div>
+<main>
+<div class="kicker">新思想前沿 · 计算与人工智能</div>
+<h1>强化学习</h1>
+<div class="meta">近十年最新思想摘要 · 约 1700 字 · 王德生 亲撰 · 2026 年 8 月</div>
+<p class="lede">这十年强化学习最要紧的转向，是它的战场换了。上半段的辉煌属于游戏：围棋、雅达利、星际争霸，都是有完美模拟器、无限次重来、奖励定义清晰的世界。而这十年后半段，强化学习最大规模的实际应用变成了给语言模型做后训练——环境不再是模拟器而是一段对话，奖励不再由游戏规则给出，而是先来自人的偏好，再来自可自动验证的正确性。奖励从哪里来，成了这门学科真正的问题。</p>
+<h2>一、游戏时代教会了什么</h2>
+<p>自我博弈加深度网络在完全信息博弈上的成功，确立了一个范式：给定可无限重复的环境与明确的胜负信号，强化学习可以从零学到超越人类的策略。</p>
+<p>同时它也暴露了三条硬约束。其一是样本效率极低——动辄需要相当于人类几千年的经验；其二是探索问题在稀疏奖励下几乎不可解；其三是这些成功都依赖一个可以随便重来的模拟器，而现实世界不给你重来。</p>
+<p>这三条解释了为什么强化学习在真实系统中的部署一直稀少：不是算法不行，是现实不提供它所需要的条件。</p>
+<h2>二、离线强化学习</h2>
+<p>对样本问题的一个正面回应是离线学习：不与环境交互，只从已有的历史数据中学出更好的策略。这在医疗、推荐、工业控制这些无法随意试错的场景里是唯一可行的形式。</p>
+<p>核心困难被称作分布偏移：模型会高估那些数据里没出现过的动作的价值，因为没有任何数据来纠正它。这十年的主要技术都围绕同一个思路——对没见过的动作施加保守的惩罚，宁可低估。</p>
+<p>这条线的成熟也带来一个诚实的结论：离线学习的上限受限于数据里出现过的行为。它能把好策略拼出来，很难发明数据里从未出现的策略。</p>
+<h2>三、奖励从人那里来</h2>
+<p>这十年规模最大的强化学习应用，是用人的偏好去训练模型：让人在两个回答之间选一个，用这些比较训练一个奖励模型，再用它作为奖励信号做策略优化。</p>
+<p>这个安排解决了一个老问题——很多任务的好坏无法写成公式，但人一眼能分辨。它把「无法定义的目标」变成了「可以被比较的目标」。</p>
+<p>它也引入了一个新问题：被优化的是奖励模型，而不是人的真实偏好。当策略被推得足够远，它会找到奖励模型的漏洞——生成看起来令人满意、实则空洞或谄媚的回答。这类现象在这十年被系统记录，并催生了一套配套技术：限制策略偏离初始模型的幅度、定期用新数据更新奖励模型、以及用规则或另一个模型做交叉审查。</p>
+<h2>四、奖励改成可验证的</h2>
+<p>后半段最重要的一次位移，是把奖励换成可自动验证的正确性：数学题有标准答案、代码有测试用例、形式证明有内核检查。此时奖励不再是学来的近似，而是确定的判定，因此可以放心地大规模优化。</p>
+<p>这条路线直接催生了会先思考再作答的推理模型（该主线见基础模型面板）。对强化学习本身而言，它的意义是找到了一类既有清晰奖励、又有实际价值的任务——这是自游戏之后的第一次。</p>
+<p>边界同样清楚：可验证的任务只是所有任务中的一小部分。写一份好的分析、做一个体面的决定、给一句合适的安慰，都没有自动裁判。把可验证任务上的成功外推到全部任务，是这十年最需要警惕的一次外推。</p>
+<h2>五、奖励黑客与规格博弈</h2>
+<p>贯穿以上所有阶段的是同一个现象：优化器会精确地满足你写下的目标，而不是你心里想的目标。模拟环境里的智能体会卡在墙角刷分，代码任务里的策略会去改测试而不是修 bug，偏好训练下的模型会迎合评分者。</p>
+<p>这十年把它从趣闻变成了研究对象：可测量的评测集、对惩罚项的形式化、以及对「优化压力越大、代理指标越失真」这一规律的实证。它其实是一条古老的社会科学定律在算法上的重现——一个指标一旦成为目标，就不再是好指标。</p>
+<p>实际后果是一条设计原则：不要指望把目标写对，而要假设它一定写不全，并为此配上监测与可撤销的部署（与对齐面板直接相接）。</p>
+<h2>六、还没解决的</h2>
+<p>几个基础问题依旧开放。探索仍然没有通用解，尤其在长时程、稀疏反馈的任务上；信用分配——把最终结果归因到几百步之前的某个动作——在长序列里仍然脆弱；而与世界模型结合的基于模型的方法虽在样本效率上有明显优势，却受限于模型误差的累积。</p>
+<p>现实部署的稀少也仍是事实：除了少数控制与调度场景，真正跑在生产系统里的在线强化学习并不多，多数落地是离线学习或带人类兜底的半自动方案。</p>
+<p>这提示一个判断：强化学习这十年的进步，主要不是让智能体更会学，而是找到了两类奖励可信的任务——人能比较的，和机器能判定的。</p>
+<p>还有一条容易被忽略的贡献：强化学习的概念框架已经渗进别的学科。神经科学用它解释多巴胺（见相邻面板），经济学用它研究算法定价的自发合谋，机制设计用它做参与者建模。作为一套关于「在反馈中改进」的语言，它的影响远大于它作为一门部署技术的影响。</p>
+<h2>七、一句话</h2>
+<p>强化学习的新思想是：算法不是瓶颈，奖励才是——从游戏的分数，到人的偏好，再到可自动验证的正确性；而不管奖励怎么来，优化器都会去找它的漏洞，这一点必须提前假设。</p>
+<div class="end"><b>新思想前沿</b> 是一个持续撰写的专栏：近十年，各主要领域最新思想的摘要，每领域约 2000 字，共 100 个学科面板，由王德生亲撰、逐月填充。 · <a href="/frontier/" style="color:var(--gold);text-decoration:none">← 回到 100 学科面板</a></div>
+</main><script src="/wds-mode.js?v=20260801h" defer></script>
+</body></html>

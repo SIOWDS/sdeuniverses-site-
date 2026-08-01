@@ -1,0 +1,59 @@
+<!DOCTYPE html><html lang="zh"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>分布式系统与区块链 · 新思想前沿 | SDE Universes</title>
+<meta name="description" content="这十年的思想转向：区块链从「取代一切」被重新定位为一种昂贵的、专用于无信任场景的协调机制；而分布式系统这边，形式化验证与模块化把共识变成了可组装的组件。">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Noto+Serif+SC:wght@300;400;500;600&display=swap">
+<style>
+:root{--bg:#F5EFE0;--card:#FAF6EC;--gold:#8A6817;--gold2:#A88233;--text:#2A2315;--text2:#6B5D47;--muted:#98886C;--border:rgba(138,104,23,0.22)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'Noto Serif SC',Georgia,serif;line-height:1.9;-webkit-font-smoothing:antialiased}
+.top{max-width:760px;margin:0 auto;padding:1.4rem 1.5rem 0;font-size:.86rem}
+.top a{color:var(--gold);text-decoration:none;font-weight:600}.top a:hover{text-decoration:underline}
+.top .sep{color:var(--muted);margin:0 .5rem}
+main{max-width:760px;margin:0 auto;padding:1.5rem 1.5rem 4rem}
+.kicker{font-size:.82rem;letter-spacing:.18em;color:var(--gold2);font-weight:600;margin-bottom:.9rem}
+h1{font-size:2rem;line-height:1.3;font-weight:700;margin-bottom:.7rem;letter-spacing:.01em}
+.meta{font-size:.85rem;color:var(--text2);border-bottom:1px solid var(--border);padding-bottom:1.1rem;margin-bottom:1.6rem}
+.lede{font-size:1.12rem;color:var(--text);font-weight:500;margin-bottom:1.5rem}
+h2{font-size:1.18rem;font-weight:600;color:var(--gold);margin:1.9rem 0 .6rem}
+p{margin:0 0 1.1rem;text-align:justify}
+.end{margin-top:2rem;padding-top:1.2rem;border-top:1px solid var(--border);font-size:.86rem;color:var(--muted)}
+.end b{color:var(--text2)}
+</style></head><body>
+<div class="top"><a href="/browse/">SDE Universes</a><span class="sep">·</span><a href="/frontier/">新思想前沿</a><span class="sep">›</span><span style="color:var(--text2)">计算与人工智能</span></div>
+<main>
+<div class="kicker">新思想前沿 · 计算与人工智能</div>
+<h1>分布式系统与区块链</h1>
+<div class="meta">近十年最新思想摘要 · 约 1600 字 · 王德生 亲撰 · 2026 年 8 月</div>
+<p class="lede">这十年这个领域最要紧的转向，是一次定价的修正。区块链一度被宣传为可以取代金融、供应链与身份系统的通用基础设施；十年下来的结论要冷静得多——它提供的是一种极其昂贵的协调服务，只在参与者互不信任且没有可接受的仲裁者时才划算。而绝大多数现实场景并不满足这个条件。与此同时，底下那门更老的学科——分布式系统——反而收获颇丰：共识协议被形式化验证，架构被拆成可组装的层。</p>
+<h2>一、共识便宜，信任昂贵</h2>
+<p>经典分布式系统解决的是崩溃容错：机器会宕机、网络会分区，但参与者不作恶。这类共识协议成熟、高效，是所有云服务的地基。</p>
+<p>区块链解决的是拜占庭容错加开放准入：参与者可能作恶，且任何人可以随时加入。代价是巨大的——冗余执行、全局排序、以及为了防止女巫攻击而必须消耗的稀缺资源。</p>
+<p>这十年被反复验证的一条判据是：在存在可接受的仲裁者（法院、监管者、可信托管方）时，中心化方案在成本与性能上有压倒性优势。「去中心化」不是免费的美德，而是一项需要理由的昂贵选择。</p>
+<h2>二、从工作量到权益</h2>
+<p>技术上最有分量的一件事是主流公链在 2022 年完成了从工作量证明到权益证明的切换，能耗随之下降了三个数量级以上。</p>
+<p>这不只是环保问题，它改变了安全模型：安全不再由外部能源消耗担保，而由内部锁定的资产与惩罚机制担保。由此带来的新问题是内生的——质押的集中化、流动性质押衍生品的层层嵌套、以及惩罚规则本身的博弈。</p>
+<p>它也让长期存在的一个理论问题变得现实：权益证明下的最终性依赖于经济假设，而经济假设的失效方式与工程假设不同——这一点与金融面板讨论的「杠杆化中介在压力下同时平仓」结构上同构（见相邻面板）。</p>
+<h2>三、模块化：把一整块拆开</h2>
+<p>第二条主线是架构的分层。早期的链把执行、共识、数据可用性与结算捆在一起，因而无法在不牺牲去中心化的情况下扩容。</p>
+<p>这十年的解法是把它们拆开：执行搬到二层，只把压缩后的数据与证明写回主链；主链退化为结算与数据可用性层。配套的技术是欺诈证明或有效性证明——后者正是零知识证明工程化的最大实际用例（见相邻面板）。</p>
+<p>这个拆分在系统研究上是有普遍意义的：它把「谁来执行」与「谁来担保执行是对的」分开，而这两件事的信任要求完全不同。</p>
+<h2>四、崩塌与它的教训</h2>
+<p>2022 年前后的一系列崩塌值得准确归因。一个算法稳定币的螺旋失败，是机制设计问题——它的稳定依赖于对反身性预期的假设。而规模最大的那次交易所倒闭，根本不是链上失败：它是一家中心化托管机构挪用客户资产，属于最古老的那类金融欺诈。</p>
+<p>教训因此是双向的。对批评者：链上系统在那段时间里如常运行，问题出在链外。对支持者：绝大多数用户实际使用的入口是中心化机构，因此「无需信任」的技术承诺在用户实际面对的那一层并不成立。</p>
+<p>这十年留下的最实用的结论是把「协议风险」与「中介风险」分开评估——它们几乎没有相关性，而公共讨论一直在混用。</p>
+<h2>五、区块链之外的分布式系统</h2>
+<p>同期这门更老的学科自己也有硬进展。共识协议的形式化验证成为常规——用规约语言把协议写成可被模型检查的形式，从而在部署前排除边角状态；这类工具已经在主流云厂商的核心服务上找出过真实缺陷。</p>
+<p>一致性模型的工程化也趋于成熟：从「强一致还是最终一致」的二选一，变成按操作选择级别；无冲突复制数据类型让协同编辑与离线优先的应用可以在不加锁的前提下自动合并。</p>
+<p>而支撑现代大规模训练与服务的调度、容错与通信基础设施，本身就是这十年分布式系统最大的应用场景（与深度学习面板互为上下游）。</p>
+<h2>六、真正留下的用途</h2>
+<p>经过一轮清算，被公认站得住的用途相当具体：跨境与跨机构的价值转移与结算，尤其在缺乏共同法律框架的场景；受监管的稳定币作为支付轨道；公开可验证的时间戳与存在性证明；以及需要多方共同维护、彼此又不完全互信的登记簿。</p>
+<p>被证伪或至少被大幅降格的同样具体：用链来做供应链溯源（链上真实性无法保证链下录入的真实性）、用链来做通用数据库、以及绝大多数把既有业务简单上链的方案。</p>
+<p>这个清单本身就是这十年最有价值的产出——它是靠大量失败换来的。</p>
+<p>值得补一句的是监管的位置变了：从最初的「要不要允许」，转向对稳定币储备、托管与信息披露的具体规则。也就是说，公共部门最终监管的仍是中介，而不是协议——这恰好印证了上一节那条归因：风险主要在链外。</p>
+<h2>七、一句话</h2>
+<p>分布式系统的新思想是：把「谁来执行」与「谁担保执行是对的」拆开；而区块链这十年学到的是一条定价常识——去中心化不是美德，是一项昂贵的服务，只在没有可接受的仲裁者时才值得买。</p>
+<div class="end"><b>新思想前沿</b> 是一个持续撰写的专栏：近十年，各主要领域最新思想的摘要，每领域约 2000 字，共 100 个学科面板，由王德生亲撰、逐月填充。 · <a href="/frontier/" style="color:var(--gold);text-decoration:none">← 回到 100 学科面板</a></div>
+</main><script src="/wds-mode.js?v=20260801h" defer></script>
+</body></html>
