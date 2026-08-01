@@ -742,6 +742,15 @@
       duPick: "第二家用谁？", duNoKey: "（还没填 Key）", duOff: "不并排",
       duCmp: "⇄ 让 WDS 对照这两份", duCmpQ: "下面是同一个问题交给两家基底得到的两份回答。请对照它们，只说四件事：①两边各自看见了对方没看见的什么；②它们在哪一点上正面矛盾（指到具体句子）；③哪一份更经得起反驳、为什么；④两份都漏掉的是什么。不要复述它们的内容。",
       duNeed: "并排需要两家都填了 Key（在设置里填）。",
+      triBtn: "⚔ 三家对撞", triOn: "⚔ 三家对撞：开",
+      triTip: "同一问三家接力：第一家给判断，第二家读到原文专门拆它，第三家找出他们俩都默认、却谁也没提的那样东西。三家各是不同厂商——别处不会请对手来拆自己的台。",
+      triNeed: "对撞需要至少两家填了 Key（在设置里填）。填满三家最好：第三家没参与前面的写作，结算才算数。",
+      triA: "① 出判断", triB: "② 攻击它", triC: "③ 他们都没说的那一条",
+      triWait: "（等上一家写完）",
+      triSame: "⚠ 只有两家有 Key，第三家沿用了第一家——结算者参与过写作，这一轮的结论只作参考。填第三家的 Key 可解。",
+      triFail: "上一家没写出东西，这一步没法往下走。",
+      triSave: "⤓ 存这一场",
+
       pjAll: "全部对话", pjTitle: "项目", pjNew: "＋ 新建项目", pjAsk: "项目叫什么？",
       pjAbout: "✎ 这个项目的常驻说明", pjAboutAsk: "这个项目里，每一问都要 WDS 知道的背景与要求（会随每问带上）",
       pjDel: "删掉这个项目？（里面的对话不会删，只是回到「全部」）", pjNone: "还没有项目。项目＝一组对话＋一段常驻说明，适合一本书、一门课、一个长活。",
@@ -786,6 +795,15 @@
       duPick: "Which second model?", duNoKey: "(no key yet)", duOff: "Single model",
       duCmp: "⇄ Have SDE compare these", duCmpQ: "Below are two answers to the same question from two different models. Compare them and say only four things: (1) what each saw that the other missed; (2) where they flatly contradict each other (point to the sentences); (3) which holds up better under attack, and why; (4) what both missed. Do not restate their content.",
       duNeed: "Side-by-side needs a key for both models (add them in settings).",
+      triBtn: "\u2694 Three-way clash", triOn: "\u2694 Three-way clash: on",
+      triTip: "One question, three models in relay: the first makes a claim, the second reads it verbatim and attacks it, the third finds the premise neither of them said out loud. Three different vendors \u2014 nowhere else will a model invite a rival to tear it apart.",
+      triNeed: "A clash needs keys for at least two models (add them in settings). Three is better: the third one did not write anything earlier, which is what makes its verdict worth something.",
+      triA: "1. The claim", triB: "2. The attack", triC: "3. The shared premise",
+      triWait: "(waiting for the previous model)",
+      triSame: "\u26a0 Only two keys found, so the third seat reuses the first model \u2014 the judge also wrote. Treat this verdict as provisional; add a third key to fix it.",
+      triFail: "The previous model produced nothing, so this step cannot proceed.",
+      triSave: "\u2913 Save this clash",
+
       pjAll: "All chats", pjTitle: "Projects", pjNew: "＋ New project", pjAsk: "Project name?",
       pjAbout: "✎ Standing instructions for this project", pjAboutAsk: "Background and requirements SDE should know for every question in this project",
       pjDel: "Delete this project? (its chats stay, they just move back to All)", pjNone: "No projects yet. A project = a group of chats + standing instructions — good for a book, a course, a long job.",
@@ -864,6 +882,10 @@
     ".wdsm-duc{flex:1;min-width:0}" +
     ".wdsm-duh{font-size:12px;color:var(--wgold);border-bottom:1px solid var(--wline);padding-bottom:5px;margin-bottom:8px;display:flex;gap:6px;align-items:baseline}" +
     ".wdsm-duh i{font-style:normal;color:var(--wdim);font-size:11px}" +
+    ".wdsm-tri{display:flex;flex-direction:column;gap:16px}" +
+    ".wdsm-tric{border-left:2px solid var(--wline);padding-left:12px}" +
+    ".wdsm-tric .wdsm-duh b{color:var(--wgold)}" +
+    ".wdsm-tinote{font-size:12px;color:var(--wdim);border:1px solid var(--wline);border-radius:6px;padding:8px 10px;line-height:1.6}" +
     "@media(max-width:760px){.wdsm-du{flex-direction:column;gap:18px}}" +
     "@media(max-width:900px){.wdsm-cv{position:absolute;inset:0;width:auto;z-index:30;border-left:none}}";
   var CSS =
@@ -1193,6 +1215,7 @@
           "<button class='wdsm-mode wdsm-rsbtn'></button>" +
           "<button class='wdsm-mode wdsm-lnkbtn'></button>" +
           "<button class='wdsm-mode wdsm-dubtn'></button>" +
+          "<button class='wdsm-mode wdsm-tribtn'></button>" +
           "<span class='wdsm-mode-tip'></span>" +
         "</div>" +
         "<div class='wdsm-atts' style='display:none'></div>" +
@@ -2740,6 +2763,13 @@
       if (qPush(q) && forceQ == null) { inEl.value = ""; inEl.style.height = "auto"; }
       return;
     }
+    // 三家对撞挂着时：一问串行走三家（排在并排之前——两者互斥，对撞更重）
+    if (triOn && !streaming) {
+      var ktr = wdsKeyGet(); if (!ktr) { wdsKeyPanel(function () { send(q); }); return; }
+      if (turns() >= MAX) { updTurns(); return; }
+      if (forceQ == null) { inEl.value = ""; inEl.style.height = "auto"; }
+      if (sendTri(q, addTurn(q))) return;
+    }
     // 并排挂着时：一问同时交给两家
     if (duV && !streaming) {
       var kvd = wdsKeyGet(); if (!kvd) { wdsKeyPanel(function () { send(q); }); return; }
@@ -3037,6 +3067,124 @@
         });
     }
     cols.forEach(one);
+    return true;
+  }
+
+  /* ══════════════ 三家对撞 ══════════════
+     并排（sendDual）是两家**各答各的**，互不见面，跑完由主基底自己综合——
+     那是并列不是碰撞，而且综合者本身就是参赛者（自评）。
+     对撞改成串行接力，三家各是不同厂商：
+       ① A 出一个能被攻击的判断 → ② B 读到 A 的**原文**、专职攻它 → ③ C 找出他们都默认却谁也没提的那一条，并结算。
+     C 没参与前两步的写作，所以「评估基底与写作基底不得同厂」那道闸天然满足。
+     角色 sys 全在服务端（前端只递 role 与上一家的原文）。 */
+  var triOn = false;
+  var triBtn = layer.querySelector(".wdsm-tribtn");
+  function triPaint() {
+    if (!triBtn) return;
+    triBtn.textContent = triOn ? t("triOn") : t("triBtn");
+    triBtn.title = t("triTip");
+    if (triOn) triBtn.classList.add("on"); else triBtn.classList.remove("on");
+  }
+  triPaint();                        // 初始就要有字——不画一次就是一颗空框（模式条空按钮的老漏法）
+  if (triBtn) triBtn.onclick = function () {
+    if (streaming) return;
+    triOn = !triOn;
+    if (triOn) { duV = ""; duPaint(); }        // 并排与对撞是两种模式，不并存
+    triPaint();
+  };
+  // 排座：主基底坐 ①，另外两家从"有 Key 且尚未坐过"的厂商里按 VENDORS 顺序取。
+  // 只有两家时第三席沿用第一家，并如实标注（失败不拦路，但不许假装它是干净的结算）。
+  function triSeats() {
+    var mine = null; try { mine = wdsKeyGet(); } catch (e) {}
+    if (!mine) return null;
+    var seats = [{ vendor: mine.vendor, key: mine.key, model: mine.model || "" }];
+    for (var i = 0; i < VENDORS.length && seats.length < 3; i++) {
+      var v = VENDORS[i].v, k = vkeyGet(v);
+      if (!k) continue;
+      var dup = false;
+      for (var j = 0; j < seats.length; j++) if (seats[j].vendor === v) dup = true;
+      if (dup) continue;
+      seats.push({ vendor: v, key: k, model: vmodelGet(v) || "" });
+    }
+    if (seats.length < 2) return null;                 // 一家自己跟自己撞没有意义
+    var degraded = false;
+    if (seats.length === 2) { seats.push(seats[0]); degraded = true; }
+    seats.degraded = degraded;
+    return seats;
+  }
+  function sendTri(q, cell) {
+    var seats = triSeats();
+    if (!seats) { toast(t("triNeed")); return false; }
+    history.push({ role: "reader", text: q }); updTurns();
+    streaming = true; stoppedByUser = false; RS.stop = false;
+    busyUI(true); stopBarShow(true);
+
+    var wrap = el("div", "wdsm-tri");
+    var LB = [t("triA"), t("triB"), t("triC")];
+    var rows = seats.map(function (who, i) {
+      var c = el("div", "wdsm-tric");
+      var hd = el("div", "wdsm-duh");
+      hd.appendChild(el("b", null, LB[i]));
+      hd.appendChild(el("i", null, vinfo(who.vendor).name));
+      var bd = el("div", "wdsm-a plain");
+      bd.textContent = i === 0 ? "\u258a" : t("triWait");
+      c.appendChild(hd); c.appendChild(bd); wrap.appendChild(c);
+      return { who: who, bd: bd, text: "" };
+    });
+    cell.a.innerHTML = ""; cell.a.appendChild(wrap);
+    if (seats.degraded) {
+      var warn = el("div", "wdsm-tinote");
+      warn.textContent = t("triSame");
+      wrap.appendChild(warn);
+    }
+
+    var ROLES = ["a", "b", "c"];
+    function step(i, prior) {
+      var row = rows[i];
+      row.bd.className = "wdsm-a";
+      row.bd.innerHTML = "<span class='cur'>\u258a</span>";
+      var pl = {
+        q: q, history: histPack(compFrom()), umem: memRecall(q),
+        key: row.who.key, vendor: row.who.vendor, model: row.who.model,
+        mode: thinkMode, web: webOn ? 1 : 0, skey: wdsSearchKey(),
+        about: aboutPlus(), lang: LANG,
+        duel: { role: ROLES[i], prior: prior }
+      };
+      if (COMP.text) pl.comp = COMP.text;
+      return rsStream(API, pl, function (txt) {
+        row.text = txt; row.bd.innerHTML = mdRender(txt) + "<span class='cur'>\u258a</span>";
+      }).then(function (txt) {
+        row.text = txt; row.bd.innerHTML = mdRender(txt);
+        return txt;
+      }).catch(function (e) {
+        row.bd.className = "wdsm-a plain wdsm-err";
+        row.bd.textContent = (e && e.message) || "?";
+        return "";
+      });
+    }
+    // 串行：下一家必须拿到上一家的原文才动。任一步空手，后面就没有可攻/可裁的东西了——
+    // 这时如实停下并说明，不要让空文本一路流下去凑满三栏。
+    step(0, "").then(function (a) {
+      if (!a) { rows[1].bd.textContent = t("triFail"); rows[2].bd.textContent = t("triFail"); return; }
+      return step(1, a).then(function (b) {
+        if (!b) { rows[2].bd.textContent = t("triFail"); return; }
+        var both = "【" + vinfo(seats[0].vendor).name + " · 判断】\n" + a
+          + "\n\n【" + vinfo(seats[1].vendor).name + " · 攻击】\n" + b;
+        return step(2, both);
+      });
+    }).then(function () {
+      streaming = false; curReader = null;
+      busyUI(false); stopBarShow(false);
+      var all = rows.map(function (r, i) {
+        return "【" + LB[i] + " · " + vinfo(r.who.vendor).name + "】\n" + r.text;
+      }).join("\n\n");
+      history.push({ role: "wds", text: all }); stSave(history); updTurns(); compTick();
+      var row2 = el("div", "wdsm-acts");
+      var sv = el("button", "wdsm-act", t("triSave"));
+      sv.onclick = function () { cvAdd("md", q.slice(0, 24), "# " + q + "\n\n" + all); };
+      row2.appendChild(sv);
+      cell.turn.appendChild(row2); cell.acts = row2;
+    });
     return true;
   }
 

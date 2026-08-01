@@ -34,7 +34,7 @@ ok(/WDS_TOOL_KEYS\.indexOf\(String\(b\.tool \|\| ""\)\) >= 0 \? String\(b\.tool\
    "认不出的 tool 一律当没选（不把读者传来的字符串拼进 system）");
 
 console.log("③ 工序块拼进 system；近邻名单前置");
-ok(/function WDS_CHAT_SYS\(reflect, SDEM, siteCtx, webCtx, deep, docCtx, about, lang, docNote, tool(?:, rs)?\)/.test(W),
+ok(/function WDS_CHAT_SYS\(reflect, SDEM, siteCtx, webCtx, deep, docCtx, about, lang, docNote, tool(?:, rs)?(?:, duel)?\)/.test(W),
    "WDS_CHAT_SYS 收 tool");
 ok(/\+ wdsToolSys\(tool\)/.test(W), "system 里拼了 wdsToolSys(tool)");
 ok(/WDS_CHAT_SYS\(reflect, SDEM, \(nbrCtx \? nbrCtx \+ "\\n" : ""\) \+ ctxText/.test(W),

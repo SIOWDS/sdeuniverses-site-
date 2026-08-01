@@ -3872,6 +3872,64 @@ function WDS_IQ_SYS(siteCtx, docCtx, docNote, lang) {
     + (lang === "en" ? "\n\n【LANGUAGE】The reader is using the English interface. Write the entire scoring report in English." : "");
 }
 
+// ===== 三家对撞：A 出判断 → B 攻击 → C 裁决 =====
+// 为什么这件事只有本站做得到：读者的 Key 在读者手里，八家都配得上。
+// Claude 不会主动请 GPT 来反驳自己，DeepSeek 也不会——任何单一厂商的产品都不会。
+// 而三路碰撞跑在同一个基底上，撞出来的三个观点就是同一判断的三种说法（I 常年卡在 115），
+// **异质性买不来，换一家模型却是免费的**。
+//
+// 角色文本一律在服务端：① 前端拼会被 q 的字数钳位吃掉；② 顺序与角色不该由前端说了算
+// （与 FORGE_STAGES 同口径）。三段都**不装心得、不装 SDE 骨架**——攻击者和裁决者
+// 一旦戴上同一副眼镜，就会开始互相附和，对撞当场退化成合唱。
+const DUEL_ROLES = { a: 1, b: 1, c: 1 };
+function WDS_DUEL_SYS(role, prior, siteCtx, lang) {
+  const EN = (lang === "en") ? "\n\n【LANGUAGE】Write your entire answer in English." : "";
+  const SITE = "\n\n【站内已有的相关文本（参照系，不是要你复述它）】\n" + (siteCtx || "（这次没检索到相关篇目）");
+
+  if (role === "a") {
+    return "你是三家对撞里的**第一家**。你的活是把读者这一问答成一个**能被攻击的判断**。"
+      + "\n\n· 给一条判断，不是给一篇综述。判断要有承重命题——一句抽掉它整段就散的话。"
+      + "\n· **不要面面俱到**。「这有多方面原因」「需要综合考虑」这类写法在这里是废票：它没有可被攻击的表面，"
+      + "下一家无从下口，整场对撞就空转了。宁可把话说得偏一点、狠一点，也不要说得四平八稳。"
+      + "\n· 明确标出你这条判断**最脆的一环**在哪——你自己知道它站不太住的那个地方。"
+      + "\n· 六百字以内。你不是在写终稿，你是在给下一家递一个够硬的靶子。"
+      + SITE + EN;
+  }
+
+  if (role === "b") {
+    return "你是三家对撞里的**第二家**，**由另一家模型写下的判断刚刚摆在你面前**。"
+      + "\n你的活只有一件：**攻击它**。"
+      + "\n\n· **不许补充，不许附和，不许「它说得对，我再补一点」。**你和它出自不同的训练语料、不同的取舍，"
+      + "你能看见的恰恰是它看不见的那部分——那才是你被请来的理由。附和等于弃权。"
+      + "\n· 至少给三处，每处都要落到**它的原话**上（引一句它逐字写过的），并说清：这一处为什么站不住"
+      + "［事实错／概念偷换／推理跳步／循环论证／隐藏前提／类比不说理／不可证伪］。"
+      + "\n· 其中**至少一处必须是它的承重命题**——只挑边角料的错，是假攻击。"
+      + "\n· 给一条**判决性对照**：如果某个观测结果是 X，那么它错、你对。要具体到能去查。"
+      + "\n· 最后一句留给诚实：它有没有哪一处是你攻不动的？攻不动就直说攻不动，**不要为了显得锋利而硬凑**。"
+      + "\n\n【第一家写下的判断（逐字，就是你要攻的东西）】\n" + (prior || "（上一家没有产出，直接说无从攻起）")
+      + SITE + EN;
+  }
+
+  // c：裁决者。它没参与前两步的写作，所以它是全场唯一有资格结算的人。
+  return "你是三家对撞里的**第三家**。前两家已经交过手：一家出判断，另一家攻它。"
+    + "\n**你没有参与前面任何一步的写作**——所以这一场只有你有资格结算。你不是裁判长，不是和事佬，"
+    + "你的活也不是宣布谁赢。"
+    + "\n\n你要做的是这件事：**找出他们两个共有的那个没有说出口的前提。**"
+    + "\n吵得起来，说明他们在某样东西上是一致的——他们都默认了它，所以谁也没提它。那样东西才是这一场真正的产物。"
+    + "\n\n· ① 先各用一句话复述两家的立场（不带评价，复述错了后面全错）。"
+    + "\n· ② **共有前提**：写出那条他们都没说、却都靠着它站立的东西。判据是——它必须能由**任意一家单独读出**，"
+    + "而不是要把两家拼起来才看得见；拼起来才有的，那是你自己加的。"
+    + "\n· ③ **推翻它的那件材料**：能让这条共有前提失效的东西是什么？**这件材料必须来自前两家自己写过的话**"
+    + "（他们的某句自曝、某个例外、某处让步）——从外面另搬一个理由来，那是第四家的立场，不是这一场的结算。"
+    + "\n· ④ 结算出**一句谁都没有单独说出来的话**。它必须同时满足：不能由第一家的判断直接推出；不能由第二家的攻击直接推出；"
+    + "**不含任何情态词**（可能、也许、往往、在某种程度上、值得注意的是——这些词一出现，这句话就变成了永远不会错因而永远没用的话）。"
+    + "\n· ⑤ 一条证伪条件：什么样的观测会让第 ④ 句失败。"
+    + "\n\n**这一场撞不出东西，就直说撞不出来，并指明卡在哪一步**——两家其实在说同一件事、或者攻击没落到承重位，都是撞不出来的正当理由。"
+    + "**不要为了交差凑一个漂亮的合题**：温和综合（「双方各有道理，应辩证看待」）是这套流程唯一不许出现的产物。"
+    + "\n\n【第一家的判断与第二家的攻击（逐字）】\n" + (prior || "（前两步没有产出）")
+    + SITE + EN;
+}
+
 function wdsToolSys(tool) {
   const b = WDS_TOOLS[tool];
   if (!b) return "";
@@ -3892,7 +3950,10 @@ function wdsResearchSys(rs) {
     + "\n每提到一篇站内文章就写成可点链接；凡是\"据资料/据搜索\"的说法都要落到具体出处。"
     + "\n这一步若没有可靠依据，就直说这一步查不到、说清缺的是哪一类证据——**不要拿泛论把这一节填满**。";
 }
-function WDS_CHAT_SYS(reflect, SDEM, siteCtx, webCtx, deep, docCtx, about, lang, docNote, tool, rs) {
+function WDS_CHAT_SYS(reflect, SDEM, siteCtx, webCtx, deep, docCtx, about, lang, docNote, tool, rs, duel) {
+  // 三家对撞：三段角色 sys 各自独立，同样不装心得与骨架（戴同一副眼镜就会开始附和）。
+  // 与 iq 一样必须排在最前——落进下面那串 + 号，reflect 与 SDEM 就已经进 system 了。
+  if (duel && DUEL_ROLES[duel.role]) return WDS_DUEL_SYS(duel.role, duel.prior || "", siteCtx, lang);
   // iq 工序整段改道：评分者不装心得/骨架/方法论，也不用老师人格（防过度通胀，见 WDS_IQ_SYS 注释）。
   // 必须排在最前——一旦落进下面那串 + 号，reflect 与 SDEM 就已经进 system 了。
   if (tool === "iq") return WDS_IQ_SYS(siteCtx, docCtx, docNote, lang);
@@ -5599,6 +5660,11 @@ export default {
       const lang = b.lang === "en" ? "en" : "zh";                 // 界面语言：决定用哪种语言作答
       // SDE 工序：白名单校验，认不出的一律当没选（绝不把读者传来的字符串拼进 system）
       const tool = WDS_TOOL_KEYS.indexOf(String(b.tool || "")) >= 0 ? String(b.tool) : "";
+      // 三家对撞的角色与上一家的原文。role 走白名单（认不出就当没开）；
+      // prior 是别家模型的产出，只作材料读，切到 24000 字防撑爆输入窗。
+      const duelRaw = (b && typeof b.duel === "object" && b.duel) ? b.duel : null;
+      const duel = (duelRaw && DUEL_ROLES[String(duelRaw.role || "")])
+        ? { role: String(duelRaw.role), prior: String(duelRaw.prior || "").slice(0, 24000) } : null;
       // COMPACTION：本场更早的对话已在读者本机压成一份「账本」（只留判断/否决/分离线/悬案）。
       // 它替代的是被裁掉的原文，所以位置在历史之前、且必须**标明它是账本不是原文**——
       // 否则它会照着账本复述，把压缩过的结论当成自己刚说过的话。
@@ -5702,7 +5768,7 @@ export default {
             }
             let reflect = ""; try { reflect = await ensureReflect(env, url, rvendor, VC, KEY); } catch (e) {}
             const SDEM = "\n\nSDE 骨架：显露 S / 差异序列 D / 特征纠缠 E；三大方程 S=F(D,E)·D=G(S,E)·E=H(S,D)；六路径；意义三律（特征·自由·幸福）；发生学——追问事物为何如此发生，而非如何被发现。";
-            const sys = WDS_CHAT_SYS(reflect, SDEM, (nbrCtx ? nbrCtx + "\n" : "") + ctxText, webCtx, deep, docCtx, about, lang, docNote, tool, rs);
+            const sys = WDS_CHAT_SYS(reflect, SDEM, (nbrCtx ? nbrCtx + "\n" : "") + ctxText, webCtx, deep, docCtx, about, lang, docNote, tool, rs, duel);
             const messages = [{ role: "system", content: sys }];
             // 历史预算随 system 实际体量收缩：站内资料/附件/心得都在 system 里，
             // 一起顶上去会撞输入窗（400 context too long）。超预算才从最旧处裁，并明标省略。
