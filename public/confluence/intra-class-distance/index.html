@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>类内距——论一份规范只写了什么算同类，没写同类之间有多近；而后者要单独花钱买 · 学科通融 | SDE Universes</title>
+<meta name="description" content="「同一类，所以可以互相替代」是两句话：边界由规范给出，而同类之间有多近，规范从来不给。本文命名后者为类内距，论证可替换性由它决定、与边界写得多细无关；压缩它的功夫不会消失，只会换地方——在工程里叫成本，在艺术里叫风格，在语言里叫变异。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&display=swap">
+<style>
+/* 学科通融 · 学术纸面版式 v2 —— 为长时间的思辨性阅读设计 */
+:root{
+  --paper:#F5F2E9; --paper2:#FBF9F3; --sheet:#FDFCF7;
+  --ink:#23201A; --ink2:#5C5647; --ink3:#8A8271;
+  --rule:#2A3B50; --rule2:#41586F;
+  --mark:#9E3D2C; --mark2:#B85A44;
+  --line:rgba(35,32,26,.13); --line2:rgba(35,32,26,.28);
+  --measure:700px;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0; color:var(--ink);
+  background:var(--paper);
+  background-image:
+    radial-gradient(circle at 18% 8%, rgba(42,59,80,.035), transparent 46%),
+    radial-gradient(circle at 84% 72%, rgba(158,61,44,.030), transparent 44%);
+  background-attachment:fixed;
+  font-family:"Noto Serif SC","Source Han Serif SC","Songti SC","SimSun",Georgia,serif;
+  font-size:18.5px; line-height:2.06; letter-spacing:.012em;
+  font-feature-settings:"kern" 1;
+  text-rendering:optimizeLegibility;
+}
+a{color:inherit}
+::selection{background:rgba(158,61,44,.16)}
+
+/* 阅读进度：细，不抢注意力 */
+#pbar{position:fixed;top:0;left:0;height:2px;width:0;background:var(--mark);z-index:99;opacity:.85}
+
+/* 顶栏 */
+.readbar{position:sticky;top:0;z-index:10;background:rgba(245,242,233,.94);
+  backdrop-filter:blur(10px);border-bottom:1px solid var(--line);
+  display:flex;justify-content:space-between;align-items:center;
+  padding:11px 26px;font-size:13.5px;gap:12px;flex-wrap:wrap;letter-spacing:.02em}
+.nav-back{text-decoration:none;color:var(--mark)}
+.rb-modes{display:flex;gap:8px}
+.rb-btn{padding:5px 13px;border:1px solid var(--line2);border-radius:0;
+  text-decoration:none;font-size:12.5px;color:var(--ink2);letter-spacing:.04em}
+.rb-btn:hover{border-color:var(--mark);color:var(--mark)}
+.rb-btn.cur{background:var(--rule);color:var(--sheet);border-color:var(--rule)}
+
+/* 题头：论文首页 */
+.art{max-width:800px;margin:auto;padding:78px 26px 8px;text-align:center}
+.art-series{color:var(--mark);letter-spacing:.42em;font-size:11.5px;text-transform:uppercase}
+.art-title{font-size:clamp(30px,4.4vw,45px);line-height:1.38;margin:26px 0 0;font-weight:700;letter-spacing:.01em}
+.art-title:after{content:"";display:block;width:56px;height:1px;background:var(--line2);margin:26px auto 0}
+.art-sub{color:var(--ink2);font-size:17px;line-height:1.94;max-width:620px;margin:22px auto 0;font-weight:400}
+.art-meta{color:var(--ink3);font-size:12.5px;margin-top:26px;letter-spacing:.09em}
+
+/* 正文栏宽：每行约三十四个汉字，是长文思辨阅读最省力的宽度 */
+.wrap{max-width:var(--measure);margin:auto;padding:8px 26px 46px}
+
+/* 摘要块 */
+.deck{position:relative;background:var(--paper2);border:0;border-top:2px solid var(--rule);
+  border-bottom:1px solid var(--line);border-radius:0;
+  padding:30px 30px 26px;margin:44px 0 8px;font-size:16.2px;line-height:2.0;color:var(--ink2);text-align:justify}
+.deck:before{content:"题 解";position:absolute;top:-11px;left:26px;background:var(--paper);
+  padding:0 10px;font-size:11px;letter-spacing:.34em;color:var(--rule)}
+
+/* 目录：带引导点的学术目次 */
+.toc{background:transparent;border:0;border-top:1px solid var(--line2);
+  border-bottom:1px solid var(--line2);border-radius:0;padding:24px 4px 20px;margin:44px 0 56px}
+.toc .tl{font-size:11px;letter-spacing:.44em;color:var(--mark);margin-bottom:16px;text-align:center}
+.toc a{display:flex;align-items:baseline;gap:6px;padding:6px 2px;color:var(--ink2);
+  font-size:15px;text-decoration:none;border:0;line-height:1.7}
+.toc a:after{content:"";flex:1;border-bottom:1px dotted var(--line2);transform:translateY(-4px)}
+.toc a:hover{color:var(--mark)}
+
+/* 章节层级 */
+h2{font-size:23px;margin:74px 0 22px;padding:26px 0 0;border:0;border-top:1px solid var(--line2);
+  line-height:1.55;scroll-margin-top:78px;letter-spacing:.02em;font-weight:700}
+h2:first-of-type{margin-top:48px}
+h2:target{background:linear-gradient(transparent 68%,rgba(158,61,44,.14) 68%)}
+h3{font-size:18.5px;margin:44px 0 14px;color:var(--rule);font-weight:700;
+  padding-left:12px;border-left:2px solid var(--mark);line-height:1.7}
+h4{font-size:17px;margin:30px 0 10px;color:var(--mark);font-weight:700}
+
+p{margin:0 0 17px;text-align:justify;hyphens:auto}
+strong,b{color:var(--rule);font-weight:700}
+i,cite{font-style:italic;color:var(--ink2)}
+
+/* 命题框：承重判断单独立出来，读者一眼可辨 */
+blockquote{position:relative;margin:38px 0;padding:26px 34px;background:var(--sheet);
+  border:0;border-top:1px solid var(--line2);border-bottom:1px solid var(--line2);border-radius:0;
+  font-size:19px;line-height:1.95;font-weight:600;color:var(--ink);text-align:justify}
+blockquote:before,blockquote:after{position:absolute;color:var(--mark);font-size:26px;line-height:1;opacity:.55}
+blockquote:before{content:"⌜";top:9px;left:10px}
+blockquote:after{content:"⌟";bottom:9px;right:10px}
+blockquote p{margin:0}
+blockquote p+p{margin-top:12px}
+
+ul{margin:0 0 18px;padding-left:1.5em}
+ol{margin:0 0 18px;padding-left:1.7em}
+li{margin:0 0 10px;text-align:justify}
+li::marker{color:var(--mark)}
+
+hr{border:0;height:1px;background:var(--line);margin:52px auto;width:62%}
+
+em{font-style:normal;color:var(--ink3);font-size:15px}
+
+/* 三线表 */
+.tbl{width:100%;border-collapse:collapse;margin:32px 0;font-size:15.5px;line-height:1.8}
+.tbl th,.tbl td{padding:12px 14px;text-align:left;vertical-align:top;border:0}
+.tbl thead th{border-top:2px solid var(--ink);border-bottom:1px solid var(--line2);
+  font-weight:700;color:var(--rule);font-size:14.5px;letter-spacing:.04em}
+.tbl tbody tr:last-child td{border-bottom:2px solid var(--ink)}
+.tbl tbody td{border-bottom:1px solid var(--line)}
+.tbl caption{caption-side:bottom;font-size:13px;color:var(--ink3);padding-top:10px;text-align:left}
+
+/* 来源盒：参考文献式，悬挂缩进 */
+.src{margin:64px 0 8px;padding:30px 0 8px;border:0;border-top:2px solid var(--rule);
+  border-radius:0;background:transparent;counter-reset:srcn}
+.src .sl{font-size:11px;letter-spacing:.42em;color:var(--mark);margin-bottom:12px}
+.src .sd{font-size:14.8px;color:var(--ink2);line-height:1.95;margin:0 0 22px;text-align:justify}
+.src a.one{display:block;text-decoration:none;padding:16px 0 16px 34px;position:relative;
+  border-top:1px solid var(--line)}
+.src a.one:before{counter-increment:srcn;content:"[" counter(srcn) "]";position:absolute;left:0;top:16px;
+  color:var(--mark);font-size:13px;letter-spacing:.02em}
+.src a.one:hover .t{color:var(--mark)}
+.src a.one .k{font-size:12px;color:var(--mark);letter-spacing:.14em}
+.src a.one .t{font-size:16px;font-weight:700;color:var(--rule);margin:5px 0;line-height:1.72}
+.src a.one .g{font-size:14.5px;color:var(--ink2);line-height:1.9;text-align:justify}
+
+.endbox{text-align:center;border-top:1px solid var(--line2);margin-top:56px;padding:38px 20px;color:var(--ink2);font-size:15px}
+.endbox a{color:var(--mark);text-decoration:none}
+footer{text-align:center;border-top:1px solid var(--line);padding:32px;color:var(--ink3);font-size:12.5px;letter-spacing:.04em}
+
+#totop{position:fixed;right:22px;bottom:26px;width:40px;height:40px;border-radius:0;
+  background:var(--rule);color:var(--sheet);border:0;font-size:16px;cursor:pointer;display:none;z-index:98}
+
+@media(max-width:760px){
+  body{font-size:17px;line-height:2.0}
+  .art{padding:52px 18px 6px}
+  .wrap{padding:6px 18px 34px}
+  h2{font-size:20.5px;margin:56px 0 18px;padding-top:22px}
+  h3{font-size:17.5px}
+  blockquote{padding:22px 24px;font-size:17.5px}
+  blockquote:before{left:6px}blockquote:after{right:6px}
+  .tbl{font-size:14px}
+  .tbl th,.tbl td{padding:9px 8px}
+}
+
+@media print{
+  body{background:#fff;font-size:11.5pt;line-height:1.85}
+  .readbar,#pbar,#totop,.endbox,footer{display:none}
+  .wrap,.art{max-width:100%}
+  h2{page-break-after:avoid}
+  blockquote,.tbl,.src a.one{page-break-inside:avoid}
+  a{text-decoration:none}
+}
+</style></head><body>
+<div id="pbar"></div>
+<div class="readbar">
+  <a class="nav-back" href="/confluence/">‹ 学科通融</a>
+  <div class="rb-modes"><span class="rb-btn cur">📖 长文阅读</span>
+  <a class="rb-btn" href="read.html">📄 在线 PDF</a>
+  <a class="rb-btn" href="intra-class-distance.pdf" download>⬇ 下载 PDF</a></div>
+</div>
+<header class="art">
+  <div class="art-series">学 科 通 融 · 之十九 · 语言学 × 工程学 × 艺术学</div>
+  <h1 class="art-title">类内距</h1>
+  <div class="art-sub">论一份规范只写了什么算同类，没写同类之间有多近；而后者要单独花钱买</div>
+  <div class="art-meta">王德生 ＋ Claude · 约 1.1 万字 · 三种阅读方式 · 发表于2026年8月1日</div>
+</header>
+<div class="wrap">
+<div class="deck">「这两件是同一类，所以可以互相替代」——这句话被当作一句话，其实是两句。第一句由规范给出：什么算符合。第二句规范从来不给：符合的那些彼此有多近。本文把后者命名为<b>类内距</b>，并论证：<b>可替换性由类内距决定，与边界写得多精确无关</b>；把规范写得更细不会提高可替换性，只有单独投入把类内距压下去才会。本文进一步论证，压缩类内距的那笔功夫<b>不会因为没人付钱而消失，只会换一个地方发生</b>——它在工程里被记作成本，在艺术里被称为风格，在语言里被称为变异，三者是同一件事在三种记账口径下的三个名字。本文给出二维辨别表（谁承担压缩 × 是否入账），指认其中最常见的一格：规范写得极细、边界毫无歧义，而全部适配功夫压在使用侧且从不入账。本文在十个领域兑现，其中两个反过来迫使命题收窄：选择装配证明压缩类内距的手段之一会把类切碎，类内距与类的大小此消彼长；柔性界面则证明这笔功夫可以由第三方吸收，「由谁承担」不是二值的。本文给出两条独立的可证伪条件，其中一条以公开的标准文本与返工记录即可执行。</div>
+<div class="toc"><div class="tl">目 录</div><a href="#s1">一、导论：三个不该同时为真的命题</a><a href="#s2">二、文献综述</a><a href="#s3">三、冲突定位</a><a href="#s4">四、类内距</a><a href="#s5">五、二维辨别表</a><a href="#s6">六、逐领域兑现</a><a href="#s7">七、判据、可观测代理与可证伪条件</a><a href="#s8">八、与最近的几种说法的分界</a><a href="#s9">九、三家各自为何到不了这一条</a><a href="#s10">十、推论、适用边界与反噬预言</a><a href="#s11">十一、本判断对它自己适用吗</a><a href="#s12">结　论</a><a href="#s13">注　释</a><a href="#s14">参考文献</a><a href="#s15">人机分工声明</a></div>
+<h2 id="s1">一、导论：三个不该同时为真的命题</h2>
+<p>三场争论，分属语言学、工程学与艺术学，各自都有厚实的支撑，而它们不能同时为真。</p>
+<p><b>第一场在历史语言学。</b> 十九世纪末的新语法学派留下一句纲领：语音规律无例外。音变作用于音位，凡处在同一语音环境里的词一律跟着变；正是这条假定支撑起了比较法与整套语言谱系的重建。二十世纪后半叶出现了相反的证据：对汉语方言与达罗毗荼语的研究显示，音变可以逐词扩散，同一条变化在不同的词里进度不同，而无论把语音环境切得多细都无法解释那种分裂；有研究者据此断言，这些变化以<b>词</b>而不是以音位为基本单位。一位重要的调解者提出：两种机制在不同的抽象层次上各自为真，音位层的规则是规律的，低层输出规则则可能逐词扩散——但这条调解至今仍在被反驳。争点是：<b>变化的基本单位是类，还是个体？</b></p>
+<p><b>第二场在制造工程。</b> 现代制造的根基是互换性：任何一件合格件都可以替换任何另一件合格件，因为它们都落在图纸规定的公差带内。这是标准化最实在的成果——在它之前，零件由工匠逐件手工配作，每一台装配都是独一无二的、彼此不兼容的。但工程界同时长期使用一种与互换性观念不一致的做法：<b>选择装配</b>。它把公差放宽、把制造出来的零件按实测尺寸分组，只在对应组之间装配，从而用相对低精度的零件获得高精度的配合。它省钱，因为收紧公差的成本随精度上升得极快；代价是它<b>不保证完全互换</b>——只有同组的件才能换。争点是：<b>可替换性靠把每一件都做进同一条带子，还是靠把做出来的件配成对？</b></p>
+<p><b>第三场在艺术学。</b> 一种有影响的分类把艺术分成两类：一类作品的同一性由记谱法给定，任何符合记谱的实例都是那件作品，因而没有伪作问题；另一类作品的同一性由它的制作历史给定，一件复制品即使与原作在感知上不可分辨，也不是那件作品。前者的典型是音乐与文学，后者的典型是绘画。这个区分至今是艺术哲学的一根支柱，也至今被争论：完全合乎乐谱的两次演奏可以听起来判若两曲，而人们仍然说它们是同一首曲子。争点是：<b>作品的同一性由规范给定，还是由个体历史给定？</b></p>
+<p>三场争论互不相干，却在同一个问题上互相顶撞：<b>「同一类」这件事，是被什么保证的？</b></p>
+<p>第一场里最强的一方说：<b>不是被规则保证的</b>——规则再无例外，实际发生的变化也是逐词参差的。第二场里最省钱的一方说：<b>不是被公差带保证的</b>——不必把每一件都做进带子里，配成对也行。第三场里最锋利的一方说：<b>是被记谱保证的</b>——凡合谱者皆是同一作品，历史无关。</p>
+<p>三条不能同真。若记谱能保证同一，则语言的音位系统（语言学里的记谱法）也该保证同一，而词汇扩散显示它不能。若配对能替代公差带，则「同一类」根本不是一个整体属性，只是一堆两两关系，那么记谱法所许诺的那种整体性就落空了。若逐词参差是常态，则工程的互换性就该是不可能的，而它显然可能——只是很贵。</p>
+<p>本文认为，僵局来自一个三方共有、却从未被单独说出的前提：<b>「同一类」是一件事。</b></p>
+<p>本文撤销这个前提。「同一类，所以可以互相替代」这句话，实际上是两句：</p>
+<blockquote><p><b>第一句由规范给出：什么算符合。第二句规范从来不给：符合的那些彼此有多近。</b></p></blockquote>
+<p>本文把第二句所说的量命名为<b>类内距</b>。</p>
+<p>于是本文的判断是：</p>
+<blockquote><p><b>一件东西能不能被同类的另一件替代，不取决于规范写得多精确，而取决于类内距被压到了多小；而类内距不写在任何规范里，它要单独花钱买。</b></p></blockquote>
+<p>三个案例在这一点上是同一个形状：图纸规定了什么算合格（边界），公差带的宽度决定了合格件彼此有多近（类内距），而收窄公差的成本随精度非线性上升——<b>类内距是被买来的</b>。音位系统规定了什么算同一个音（边界），而实际发音在词与词之间有多近，没有任何机制去保证——<b>语言里没有人买过这笔账</b>，于是那个距离就一直在，表现为逐词参差。记谱法规定了什么算符合这首曲子（边界），而两次合谱的演奏彼此有多近，记谱法一个字都没说——<b>没买，而且不打算买</b>，那个距离被留下来并被命名为风格。</p>
+<p>由此得到本文的承重推论：</p>
+<blockquote><p><b>压缩类内距的那笔功夫不会因为没人付钱而消失，它只会换一个地方发生。它在工程里被记作成本，在艺术里被称为风格，在语言里被称为变异——三者是同一件事在三种记账口径下的三个名字。</b></p></blockquote>
+<p>本文余下的安排：第二节梳理四条既有路径并指认它们停在哪里；第三节定位冲突；第四节界定类内距与它的三个构成条件；第五节升成二维辨别表；第六节在十个领域兑现，其中两个迫使本文收窄；第七节给出判据与可证伪条件；第八节交代与最近几种说法的分界；第九节说明三家为何各自到不了；第十节给出推论、边界与反噬预言；第十一节处理本判断对自身的适用。</p>
+<h2 id="s2">二、文献综述</h2>
+<h3>2.1 同一由规范给定</h3>
+<p>第一条路径把同一性交给规范：一套足够穷尽的记号系统规定了什么算符合，凡符合者即同一。艺术哲学里那个著名的两分是它最清晰的形态——有记谱法的艺术门类没有伪作问题，因为作品就是记谱所规定的那个类。历史语言学的新语法学派纲领在结构上与之同型：音变律无例外，凡处在同一环境者一律同变。</p>
+<p>这条路径的长处是它可操作：边界写下来，判定就有依据。它的盲区是本文的起点——<b>它只规定了边界，没有规定符合者彼此有多近</b>，而后者才是替代能不能发生的条件。一个完全合谱的演奏与另一个完全合谱的演奏可以相距极远；两件都在公差带内的零件，如果公差带本身很宽，装到一起仍然不能用。</p>
+<h3>2.2 同一由个体历史给定</h3>
+<p>第二条路径把同一性交给因果历史：一件东西之所以是它，因为它是那样被做出来的；复制品不是原作，哪怕不可分辨。词汇扩散在结构上与之同型——变化的载体是词这个个体，不是音位这个类；每个词有它自己的进度。</p>
+<p>这条路径的长处是它诚实地承认了参差。它的盲区在于它<b>把参差当作终点</b>：它指出个体各不相同，但没有追问「彼此有多不同」是不是一个可以被独立操纵的量。而工程给出的答案恰恰是可以——公差带就是那个操纵手段。</p>
+<h3>2.3 层次调解</h3>
+<p>第三条路径是那位调解者的方案：两种机制在不同的抽象层次各自为真。这是目前最被广泛接受的立场，也确实解释了一批经验：同一处方言里，某些变化呈现规律性，某些呈现逐词分裂。</p>
+<p>它停在哪里？停在<b>它把差别归给了对象</b>（哪一层的规则），而没有归给<b>有没有人在压缩距离</b>。在工程里，同一批零件既可以走互换性也可以走选择装配，这不是零件的层次不同，是投资方式不同。本文主张语言的情形与此同构：规律性不是某一层的属性，而是压缩机制存不存在的结果——而语言里那个机制从来不是工程性的，只有使用中的相互校准，因此它慢、不彻底、且对高频词与低频词作用不同。</p>
+<h3>2.4 互换性与它的替代品</h3>
+<p>第四条路径是工程自己的实践知识，也是本文最重要的材料来源。它包含三件本文全部依赖的事实：</p>
+<p>其一，<b>互换性要靠公差带，而收紧公差的成本上升得极快</b>；工程教科书把「选择功能上足够用的最松公差」当作设计者的基本功。</p>
+<p>其二，<b>存在一种与互换性观念不一致、却长期在用的替代做法</b>：放宽公差、逐件测量、按尺寸分组，只在对应组之间装配，从而用低精度零件得到高精度配合。它在滚动轴承、发动机活塞与缸体配合等场合有几十年的工业使用史。</p>
+<p>其三，<b>这条替代路省的正是精度钱，付的是检验与分组钱</b>，且它换来的高精度配合<b>不含互换性</b>——只有同组的件才能换。</p>
+<p>这三件事合起来说明了本文的核心区分：<b>边界（图纸）与类内距（公差带宽度）是两件可以分别操纵的东西，而后者是被购买的。</b> 工程学是三个领域里唯一把这笔账明确记下来的一门。</p>
+<h2 id="s3">三、冲突定位</h2>
+<p>三条命题的冲突可以写死为三条。</p>
+<p><b>冲突一（规则无例外 vs 逐词参差）。</b> 若音变作用于音位这个类，则同环境的词一律同变；若变化以词为单位，则类在变化期间不成立。两条不能同真，而双方都有硬证据：一方有大量呈现规律性的进行中变化，另一方有无论怎样细分环境都无法解释的逐词分裂。</p>
+<p><b>冲突二（公差带 vs 配对）。</b> 若可替换性靠把每一件都做进同一条带子，则配对装配是一种妥协；若配对能得到同样甚至更好的配合，则「同一类」不是整体属性而是两两关系。两条不能同真：前者预测放宽公差必然降低装配质量，后者预测放宽公差加分组可以提高装配质量而降低成本——<b>而后者是工业实践反复验证过的</b>。</p>
+<p><b>冲突三（合谱即同一 vs 不可分辨也不同一）。</b> 若记谱给定同一，则历史无关；若历史给定同一，则记谱不足。两条不能同真。</p>
+<p>三条冲突有一个共同点，此前没有被指出：<b>它们全都发生在同一个位置上——「符合」与「足够接近」之间那道缝。</b></p>
+<p>第一场：音位系统规定了什么算同一个音（符合），而实际发音有多接近没人管（距离）。第二场：图纸规定了什么算合格（符合），公差带宽度决定合格件有多接近（距离）——<b>这一场是唯一把两者分开写下来的</b>。第三场：记谱规定了什么算这首曲子（符合），两次演奏有多接近记谱一个字没说（距离）。</p>
+<p>三方都在争「同一类由什么保证」，而三方共享的前提是：<b>保证只有一道。</b> 一旦承认有两道——边界与距离——三条冲突就不再需要判谁对，而可以被重述为同一张表上的不同格。</p>
+<h2 id="s4">四、类内距</h2>
+<h3>4.1 定义与三个构成条件</h3>
+<blockquote><p><b>类内距</b>：一个类中，所有符合边界的成员彼此之间的最大差距，就使用者关心的那些维度而言。</p></blockquote>
+<p>它与边界是两件事：边界回答「算不算」，类内距回答「差多少」。一份规范只能给出前者；后者由实际做出来的那批东西决定。</p>
+<p>类内距要成为一个可操纵的量，需要三个条件，缺一它就只能被动地是它所是：</p>
+<p><b>其一，有一个可测的维度。</b> 必须知道在哪一个量上比较接近程度。工程有尺寸、形位、粗糙度；语言有共振峰、时长；音乐演奏有速度、力度、音准。没有这个维度，类内距只能被感觉到，不能被压缩。</p>
+<p><b>其二，有检验。</b> 必须有人真的去量并据以处置——超出的返工、报废，或者按实测分组。<b>没有检验的公差带只是一句话。</b> 这一条是三个领域最大的差别所在：工程有检验部门，语言与艺术都没有。</p>
+<p><b>其三，有人承担压缩的代价。</b> 收窄类内距要么靠提高制造精度（贵），要么靠检验分组（便宜但牺牲互换），要么靠让使用者每次现场适配（对制造侧免费）。三条路都要花力气，区别只在花在谁身上、记不记账。</p>
+<h3>4.2 为什么把规范写得更细没有用</h3>
+<p>这是本文最直接、也最反直觉的一条推论。</p>
+<p>面对「同一标准的两件东西装不到一起」这类问题，最自然的反应是<b>把标准写得更细</b>：补充条款、加严定义、明确歧义。本文预测这条路无效，理由是纯结构性的：<b>歧义与距离是两回事。</b> 一份毫无歧义的规范可以配一条很宽的公差带——每一件都毫无争议地合格，而彼此相距甚远。把边界画得再清楚，也不会让已经在里面的东西彼此靠近。</p>
+<p>工程学把这一点写在了成本曲线上：想让合格件彼此更近，只有一个办法——<b>收窄公差带，而它的成本随精度非线性上升</b>。补充条款不改变公差带，因此不花钱，也因此不产生效果。</p>
+<p>这条推论有一个可以立刻检验的形式，见第七节：<b>标准文本的详细程度与实际适配工作量之间，不应当出现负相关。</b></p>
+<h3>4.3 那笔功夫的三个名字</h3>
+<p>若没有人付钱压缩类内距，距离并不消失，它只是必须在每一次使用时被就地跨过。跨过它需要功夫，而这笔功夫在三个领域里被记进了三本不同的账：</p>
+<p><b>在工程里它叫成本。</b> 现场配作、返工、修锉、加垫片，都进工时。正因为它入账，工程才有动力去比较「事前收窄公差」与「事后现场适配」哪个更划算——这个比较本身就是选择装配这套方法的来源。</p>
+<p><b>在艺术里它叫风格。</b> 两次合谱的演奏之间的距离没有被消除，它被保留下来并被重新命名为演奏者的个性。<b>同一个量，在工程里是待消除的偏差，在艺术里是被珍视的价值。</b> 这不是修辞上的巧合：正因为无人试图压缩它，它才有条件积累成一个可辨认的个人特征。</p>
+<p><b>在语言里它叫变异。</b> 词与词之间的实现差距没有被任何机构压缩，于是它以逐词参差的形式一直存在，并在音变进行期间表现为词汇扩散。规律性之所以最终常常出现，靠的是使用中的相互校准——一种极慢、无人负责、且对高频词与低频词作用不同的压缩机制。<b>语言里唯一的「检验员」是听者，而听者不返工，只是听懂了。</b></p>
+<p>三个名字对应三种记账，而不对应三种事情。这是本文认为三家合起来才能得出的那一步：任何一家单独看，都只看得见自己账本上的那一栏。</p>
+<h2 id="s5">五、二维辨别表</h2>
+<p>第一条轴：<b>谁承担压缩类内距的功夫</b>（制造侧／使用侧）。第二条轴：<b>这笔功夫是否入账</b>（记成本／不记）。</p>
+<table class="tbl"><thead><tr><th></th><th><b>入账</b></th><th><b>不入账</b></th></tr></thead><tbody><tr><td><b>制造侧承担</b></td><td><b>甲格　真互换</b>。收窄公差＋检验，成本明确写在工艺卡上：标准紧固件、可换镜头卡口、集装箱角件</td><td><b>丙格　手艺</b>。师傅的准头长在身体里，做出来的东西彼此极近，而没有任何一栏工时叫「保持准头」：传统匠作、成熟乐团的声部齐整</td></tr><tr><td><b>使用侧承担</b></td><td><b>乙格　显性配作</b>。选择装配、现场修配、系统集成合同里单列的适配工时——距离仍在，但被算清了</td><td><b>丁格　名义同类（本文的靶）</b>。规范写得极细、边界毫无歧义，而每一次使用都要现场跨过距离，且这笔功夫从不入任何一本账</td></tr></tbody></table>
+<p>这张表的承重之处在丁格，而丁格之所以值得单列，有三个理由。</p>
+<p><b>其一，它在文件上与甲格无法区分。</b> 两格的规范都合规、都无歧义、都能通过审核。差别只在类内距，而类内距不在任何文件里。</p>
+<p><b>其二，它是默认状态。</b> 写规范是一次性投入且成果可见；压缩类内距是持续投入且成果不可见（它表现为「没出事」）。任何一个把规范当作交付物的体系，都会自然地滑进丁格。</p>
+<p><b>其三，它把成本推给了最没有能力比较的人。</b> 制造侧知道收窄公差要多少钱，因而能做取舍；使用侧不知道自己每次多花的那一点钟点合起来是多少，因而不会去要求收窄。<b>乙格与丁格的差别不是谁干活，是干活的人知不知道自己在干活。</b></p>
+<p>由此得到本文的实践含义：拿到一份「符合标准所以可以互换」的承诺时，要问的不是标准写得严不严，而是——<b>上一次有人真的量过合格件彼此差多少吗？谁量的？量完之后做了什么？</b></p>
+<h2 id="s6">六、逐领域兑现</h2>
+<p><b>（一）历史音变。</b> 读数：同一条变化在不同词中的进度差。预测：进度差与音变律描述的精细程度无关，与是否存在使词与词之间相互校准的场合（诵读、教学、广播、拼写规范）相关。</p>
+<p><b>（二）机械装配。</b> 读数：装配返工率与图纸条款数。预测：不相关；返工率只随公差带宽度与检验强度变化。</p>
+<p><b>（三）音乐演奏。</b> 读数：同一乐谱不同演奏在速度与力度上的离散度。预测：离散度不随记谱精细程度下降；只有排练（即使用侧的压缩投入）能降低它。这解释了乐团与独奏的差别：<b>乐团买了类内距，独奏不买。</b></p>
+<p><b>（四）软件接口。</b> 读数：声称兼容的两套实现之间所需的胶合代码量与规范文本长度。预测：不相关或正相关。符合性测试套件（即检验）才是有效手段——而它正是「买类内距」在软件里的形态。</p>
+<p><b>（五）学历与证书。</b> 读数：同一证书持有者在同一岗位上的上手时间离散度。预测：与标准文本的详细程度无关；与是否存在统一实操考核（检验）相关。</p>
+<p><b>（六）医学诊断标准。</b> 读数：同一诊断在不同医生间的处置差异。手册加细不降低它，评分者间信度训练（检验）才降低它。</p>
+<p><b>（七）翻译中的「等值」。</b> 距离由读者每次跨过，从不入账；因此译本之间的差距被称为译者风格。</p>
+<p><b>（八）法律条文的适用。</b> 条文写细相当于加严边界；判决的一致性取决于是否存在指导性案例与统一裁判尺度（检验）。</p>
+<p><b>（九）选择装配——第一条让步。</b></p>
+<p>这一领域迫使本文收窄，而且是从内部。</p>
+<p>选择装配证明了类内距<b>可以在不收窄边界的情况下被压缩</b>：放宽公差、逐件测量、按尺寸分组，组内配合极紧。这直接支持本文的核心区分——边界与类内距确实是两件可分别操纵的事。</p>
+<p>但它同时削掉了本文一个便利的说法。分组之后，<b>互换性只在组内成立</b>：A 组的件换不上 B 组的位置。也就是说，压缩类内距的这条路是靠<b>把类切碎</b>换来的。于是：</p>
+<blockquote><p><b>类内距与类的大小此消彼长。</b> 把一个类的内部距离压到很小，往往等于把它拆成若干更小的类；「同一类且彼此很近」这两件事不能无代价地同时最大化。</p></blockquote>
+<p>这条收窄不是补丁：它把本文从「压缩类内距总是好的」拉回到一个取舍问题，并解释了为什么很多领域宁可停在丁格——<b>因为把类切碎会毁掉标准化本来要买的那个东西：不必问出身的可替换性。</b></p>
+<p><b>（十）柔性界面——第二条让步。</b></p>
+<p>第二条让步同样来自工程。当两个刚性件之间的配合难以保证时，常见的解法既不是收窄公差也不是分组，而是<b>在中间放一个能变形的件</b>——垫片、密封件、弹性联轴器——由它吸收两侧的偏差。</p>
+<p>这削掉了本文第二条轴的二分。「谁承担压缩」不是「制造侧或使用侧」两选一，还存在第三种：<b>由界面吸收</b>。而这第三种有它自己的特征——它把距离转成了另一个件的寿命：垫片会老化，弹性件会疲劳，缓冲层会磨完。</p>
+<blockquote><p><b>由界面吸收的类内距不会消失，它变成了界面件的更换周期。</b> 因此判断一个系统在哪一格时，必须先问有没有这样一个吸收件；有的话，它的更换记录就是那笔功夫的账本，而这一栏往往被记在维护费里，与标准化完全脱钩。</p></blockquote>
+<p>两条让步合起来，把本文的适用条件收窄为：<b>存在可测维度、且未设置吸收件的类。</b> 三个引发本文的案例全部满足——音变没有吸收件，乐谱没有吸收件，而工程的例子里我们只讨论刚性配合。</p>
+<h2 id="s7">七、判据、可观测代理与可证伪条件</h2>
+<h3>7.1 核心可裁决判据</h3>
+<blockquote><p><b>可替换性由类内距决定，与边界的精确程度无关：在不改变检验强度与制造精度的前提下，把规范写得更细不会降低适配工作量。</b></p></blockquote>
+<p>这条判据可裁决，因为它预测的是<b>一个应当不相关的关系</b>，而通行做法预设的是负相关（写得越细越好用）。任何一批案例上测出稳定的负相关——规范加细本身带来适配量下降——都直接驳倒它。</p>
+<h3>7.2 可观测代理</h3>
+<p>- <b>边界的精确程度</b>：规范文本的条款数、定义数、修订次数。全部公开可得。</p>
+<p>- <b>类内距</b>：合格样本在使用者关心的维度上的离散度（标准差或极差）。</p>
+<p>- <b>适配工作量</b>：装配返工率、胶合代码行数、上手时间、排练次数、现场调整记录。</p>
+<p>- <b>检验强度</b>：是否有第三方一致性测试、抽检比例、评分者间信度训练时数。</p>
+<p>四个里前三个大多已有现成记录，而它们<b>从来没有被放在同一张表上看过</b>——这本身是本文的一个推论：只有承认边界与类内距是两件事，才会想到去做这张表。</p>
+<h3>7.3 现有资料即可执行的证伪条件</h3>
+<p>取若干个有长期修订史的接口标准（软件协议、机械连接、数据交换格式），对每一次修订记录两件事：<b>该版规范的条款数变化</b>，以及<b>该版发布后一年内相关实现之间所需胶合代码量的变化</b>（开源生态中这两项都可统计）。</p>
+<p>- 通行看法预测：条款数上升、胶合量下降（负相关）。</p>
+<p>- 本文预测：两者不相关；胶合量只在<b>引入一致性测试套件</b>的那些版本之后下降。</p>
+<p>这个检验不需要新数据，只需要把已有的两类记录对齐。</p>
+<h3>7.4 第二条独立证伪条件</h3>
+<p>若能找到一个案例：规范加细之后适配工作量显著下降，而同期没有引入任何检验、没有提高制造精度、也没有新增吸收件——则本文的核心机制错。</p>
+<p>两条是独立的：第一条针对相关结构，第二条针对机制的必要性。本文刻意不采用「若找到一个类内距很大而仍可互换的例子则本文失效」这类说法——那句话可以被「说明那个维度不是使用者关心的维度」无限吸收。</p>
+<h3>7.5 两个交出去的洞</h3>
+<p>第一，<b>「使用者关心的维度」由谁定，本文没答</b>。同一批零件在不同用途下的类内距不同，而本文没有给出确定维度的独立办法；这使得类内距在跨用途比较时不可通约。</p>
+<p>第二，<b>丙格（手艺）难以证实</b>。说「师傅们做出来的东西彼此极近而没有入账」，需要一个不依赖成本记录的类内距读数；在没有测量传统的行当里，这个读数往往只能靠事后重建，而重建者本身带着自己的尺子。</p>
+<h2 id="s8">八、与最近的几种说法的分界</h2>
+<p><b>与记谱法给定同一（艺术哲学的两分）。</b> 该框架把有记谱法的艺术门类判为没有伪作问题。分界：它给的是<b>边界</b>，本文追问的是<b>内聚</b>。分岔情形——两次完全合谱、彼此相距极远的演奏：按那个框架，它们无疑是同一作品，问题到此为止；按本文，这正是类内距未被购买的现场，而「风格」是这笔未付账款的名字。二者不矛盾，但本文预测一件那个框架不预测的事：<b>排练强度上升，同一乐团不同场次的离散度下降，而「作品同一性」这件事在那个框架里不该随排练变化。</b></p>
+<p><b>与音变律无例外（新语法学派）。</b> 分界：它把规律性当作变化的性质，本文把它当作压缩机制的结果。分岔：按它，规律性与是否存在标准化诵读、拼写规范、广播语音等场合无关；按本文，相关。这是可以用不同社会条件下同类音变的进度差来分开的。</p>
+<p><b>与词汇扩散（王士元一路；Krishnamurti 的达罗毗荼语证据）。</b> 该路径指出变化以词为单位。分界：本文同意它的观察而不同意它的落点——<b>「单位是词」不是一个关于语言的本体事实，而是「没有人压缩过类内距」的表现形式</b>。分岔预测：在存在强力校准场合的语言社群里，同一类变化应当更接近规律性；这是可以在有无标准语教育的社群之间比较的。</p>
+<p><b>与层次调解（Labov 1981）。</b> 那条方案把两种机制分配给两个抽象层次。分界：本文把差别归给<b>有没有压缩投入</b>而不是归给层次。分岔：按层次说，同一层的变化应当呈现同一种模式，与社会条件无关；按本文，同一层的变化在不同社群可以呈现不同模式。</p>
+<p><b>与互换性的经济史。</b> 关于标准化如何降低成本、如何使不同来源的零件得以装配，已有大量研究。分界：那些研究把互换性当作<b>一个成就</b>来叙述，本文把它当作<b>一笔持续开支</b>——互换性不是达成之后就保有的状态，公差带需要被持续地维持，检验一停它就退回丁格。</p>
+<p><b>与选择装配的成本模型。</b> 工程界已有比较传统装配与选择装配成本的模型。本文完全依赖它的事实，并只在一处推进：<b>那些模型比较的是两种购买方式的价钱，从未把「不买」作为第三个选项列进去</b>——因为在工程里不买等于装不上。而在语言与艺术里，不买是常态，这正是三家合起来才看得见的东西。</p>
+<p><b>与通约化（Espeland &amp; Stevens 1998）。</b> 该工作论证把不同的东西按同一把尺子换算会剥掉情境。分界：通约化处理的是<b>跨类比较</b>，本文处理的是<b>同类内部的距离</b>。二者可同时成立且互不覆盖。</p>
+<p><b>与分类的残余（Bowker &amp; Star 1999）。</b> 那里关心边界之外被处理不了的东西，本文关心边界之内成员彼此的距离。<b>一个是外面，一个是里面。</b></p>
+<p><b>与本栏《双链型》（之十七）。</b> 那一篇论证重复可以由制作链或判读链两条独立的链产生，因而重复不能区分型是被做出来的还是被读出来的。本文与它自变量正交：那一篇问<b>重复从哪来</b>，本文问<b>适配功夫落在哪</b>。可分开的情形：一个由判读链单方面稳定的型（投影型），其类内距完全由判读办法决定，而本文的表在那里退化——因为没有制造侧可以承担压缩。这一格是两篇的接缝，也是两篇都不能单独处理的地方。</p>
+<p><b>与本栏《路存》（之十二）。</b> 那一篇论证有一类系统的储备由路线而非持有者定义。分界：那里是储备的位置，这里是功夫的落点。二者在同一个系统里可以各自为真。</p>
+<h2 id="s9">九、三家各自为何到不了这一条</h2>
+<p><b>艺术学到不了，因为距离在它那里是价值不是缺陷。</b> 一门以个别性为核心价值的学问，不会把「合格者彼此相距多远」当作一个要被压缩的量。它因此拥有最丰富的关于距离的描述（风格、手笔、气质），却没有一个位置去问「这段距离本来可以被买掉吗」——那个问题在它的价值体系里近乎冒犯。</p>
+<p><b>语言学到不了，因为它没有检验员，也没有委托人。</b> 语言没有制造侧、没有质检部门、没有人为「这两个词的实现应当更接近」付钱。因此在语言学的视野里，参差只能是<b>被观察的现象</b>，不可能是<b>未被购买的服务</b>。它能极精细地测量距离，却不会把距离读成一笔没人付的账。</p>
+<p><b>工程学到不了，因为它的三样都齐。</b> 工程有可测维度、有检验、有成本科目——正因为三样都齐，「买类内距」这件事在工程内部是背景常识，不构成一个需要被命名的发现。<b>一个把某件事做得最好的领域，通常是最不可能把它说出来的领域</b>：它太顺手了，顺手到不像一个变量。</p>
+<p>三家的边界都不是能力问题，是<b>账本结构问题</b>：一个把它记成价值，一个根本没有账，一个记得太熟以至于不再看它。三本账并排放着，那个共同的量才显出来。</p>
+<h2 id="s10">十、推论、适用边界与反噬预言</h2>
+<h3>10.1 推论</h3>
+<p><b>推论一。</b> 任何以「符合同一标准」为据的可替换性承诺，若不附一个类内距读数，其强度不明。而现行的合规文件几乎都不附这个读数。</p>
+<p><b>推论二。</b> 面对适配困难，加细规范是最便宜、最可见、也最无效的一步；它之所以被反复选择，正是因为它便宜且可见。</p>
+<p><b>推论三。</b> 一个体系可以在完全合规的状态下持续变差：只要检验放松、公差带实际放宽，而规范文本不动，所有文件都仍然正确。<b>丁格没有告警信号，因为它的唯一读数不在任何报表上。</b></p>
+<h3>10.2 适用边界</h3>
+<p>其一，没有可测维度的类（第七节第一个洞），本文只能定性使用。</p>
+<p>其二，设置了吸收件的系统（第六节第十条），本文的第二条轴退化，须先查吸收件的更换记录。</p>
+<p>其三，一次性的、不需要替换的东西。类内距以「能不能拿另一件顶上」为讨论对象。</p>
+<h3>10.3 反噬预言</h3>
+<p>按本文设计干预，最自然的做法是要求每份标准附报一个类内距读数。</p>
+<p>这会适得其反，方式可以精确说出：类内距读数一旦成为申报项，最省钱的达标办法<b>不是压缩距离，而是收窄「使用者关心的维度」的定义</b>——只报那些本来就很齐的维度。由于本文自己承认「关心哪个维度」没有独立的确定办法（第七节第一个洞），这条路是敞开的。于是：<b>申报出来的类内距会稳定地变小，而实际适配工作量不变。</b></p>
+<p>这条预言同时说明了那个洞为什么必须留在明处：它是本文最容易被拿去干坏事的地方，写出来比藏起来安全。</p>
+<p>因此本文不推荐把类内距做成申报项，只推荐一件成本很低、且不能被优化的事：<b>每隔一段时间，随机取两件合格品，让一个不知道规范细节的人试着互换，并记下他花了多久。</b> 这个动作之所以不能被优化，是因为它测的是使用侧的实际功夫，而不是任何一方声称的维度。</p>
+<h2 id="s11">十一、本判断对它自己适用吗</h2>
+<p>本文给出了一份规范：四个格、一条判据、几个代理指标。那么它自己落在哪一格？</p>
+<p>按它自己的表：<b>丁格。</b></p>
+<p>理由是本文写的全是边界——什么算类内距、什么算入账、什么算吸收件——而<b>它一个字都没有规定「两个人用这四格去分同一批案例，结果应当有多接近」</b>。我没有测过，也没有为它花过任何一笔钱。任何人拿这四格去判自己手上的系统，都要在现场自己跨过一段我留下来的距离；而那段距离不会出现在这篇文章的任何地方。</p>
+<p>更具体一点：第五节那三条丁格的理由（文件上与甲格不可分、是默认状态、把成本推给最没能力比较的人），逐条适用于本文。写这四格是一次性投入且成果可见；测两个人分类结果的接近程度是持续投入且成果不可见。<b>我做了便宜的那一半。</b></p>
+<p>按第十节那条不能被优化的建议，本文自己该做的动作是：请两个没读过本文推导过程的人，各拿这四格去分同一批案例，记下分歧率。<b>这件事我没有做，而做它的成本很低。</b> 在有人做之前，本文的正确说法是「它给出了一条可检验的区分」，而不是「这四格是可用的」。</p>
+<h2 id="s12">结　论</h2>
+<p>本文提出并论证：「同一类，所以可以互相替代」是两句话——边界由规范给出，<b>类内距</b>规范从来不给。可替换性由后者决定，与边界写得多精确无关；把规范写得更细不会降低适配工作量，只有单独投入压缩类内距才会。</p>
+<p>压缩类内距的那笔功夫不会因为无人付钱而消失，它只会换一个地方发生，并在三种记账口径下得到三个名字：工程里的<b>成本</b>、艺术里的<b>风格</b>、语言里的<b>变异</b>。</p>
+<p>二维辨别表的靶格是丁格——规范极细、边界毫无歧义，而全部适配功夫压在使用侧且从不入账。它在文件上与真互换无法区分，它是默认状态，而且它把成本推给了最没有能力比较的那一方。</p>
+<p>十个领域的兑现中，选择装配与柔性界面各迫使本文收窄一次：前者说明压缩类内距的一条主要路径是把类切碎，<b>类内距与类的大小此消彼长</b>；后者说明这笔功夫可以由第三方吸收，而<b>吸收件的更换周期就是那笔功夫的账本</b>。</p>
+<p>最后给一条写死日期的赌注：</p>
+<blockquote><p><b>到 2033 年 12 月 31 日，若在接口标准、职业资格与演出实践三个领域中，仍没有任何一项研究把「合格样本之间的离散度」作为独立于规范文本详细程度的变量单独报告，或报告之后未能观测到本文所预测的零相关，则本文的核心主张作废，不再申辩。</b></p></blockquote>
+<h2 id="s13">注　释</h2>
+<p>1. 本文所称「类内距」限于<b>使用者关心的那些维度</b>上的差距，不是全维度差距。这一限定是必要的，也是本文最大的软处，见第七节第一个洞。</p>
+<p>2. 「入账」指这笔功夫在某个具体的记录体系里占有一个可被查询的条目，不指它是否被感知到。手艺人当然知道自己在保持准头，但没有一栏工时叫这个名字。</p>
+<p>3. 第五节表中「制造侧」与「使用侧」是相对于某一次替换而言的位置，不是固定的组织身份；同一个部门在不同环节可以分处两侧。</p>
+<p>4. 第六节第九条所述选择装配的事实（放宽公差、逐件测量、按尺寸分组、组内互换、不保证完全互换、在滚动轴承与活塞—缸体配合上有数十年工业使用史）依据可公开获取的工程文献与教科书表述。</p>
+<p>5. 本文对三家来源的转述限于其公开发表的核心论证；三场争论各自的内部分歧远比本文所述细密。<b>语言学与艺术学两家的关键文献本文未逐条核对原文页码</b>，需精确引证者请核原文。</p>
+<h2 id="s14">参考文献</h2>
+<p>Bowker, G. C., &amp; Star, S. L. (1999). <em>Sorting Things Out: Classification and Its Consequences</em>. MIT Press.</p>
+<p>Bybee, J. (2002). Word frequency and context of use in the lexical diffusion of phonetically conditioned sound change. <em>Language Variation and Change</em>, 14(3), 261–290.</p>
+<p>Chen, M., &amp; Wang, W. S.-Y. (1975). Sound change: Actuation and implementation. <em>Language</em>, 51(2), 255–281.</p>
+<p>Espeland, W. N., &amp; Stevens, M. L. (1998). Commensuration as a social process. <em>Annual Review of Sociology</em>, 24, 313–343.</p>
+<p>Goodman, N. (1968). <em>Languages of Art: An Approach to a Theory of Symbols</em>. Bobbs-Merrill.</p>
+<p>Kiparsky, P. (2016). Labov, sound change, and phonological theory. <em>Journal of Sociolinguistics</em>, 20(4), 464–488.</p>
+<p>Krishnamurti, Bh. (1978). Areal and lexical diffusion of sound change: Evidence from Dravidian. <em>Language</em>, 54(1), 1–20.</p>
+<p>Labov, W. (1981). Resolving the Neogrammarian controversy. <em>Language</em>, 57(2), 267–308.</p>
+<p>Labov, W. (1994). <em>Principles of Linguistic Change, Volume 1: Internal Factors</em>. Blackwell.</p>
+<p>Mansoor, E. M. (1961). Selective assembly — its analysis and applications. <em>International Journal of Production Research</em>, 1(1), 13–24.</p>
+<p>Wang, W. S.-Y. (1969). Competing changes as a cause of residue. <em>Language</em>, 45(1), 9–25.</p>
+<p>Colosimo, B. M., et al. (2018). An economic decision model for selective assembly. <em>International Journal of Production Economics</em>.（选择装配与传统互换装配的成本比较模型）</p>
+<h2 id="s15">人机分工声明</h2>
+<p>本文由王德生与 Claude 共同署名。三个学科由王德生指定（语言学＋工程学＋艺术学），三家对立理论由检索确定；判断的形成、二维辨别表、十领域兑现（含两条收窄）、判据与证伪设计以及全部文字，由 Claude 生成；所依据的方法论框架与发表裁定由王德生给出。</p>
+<p>工程侧的事实依据可公开获取的工程文献与教科书表述；语言学与艺术学两家的关键文献<b>未逐条核对原文页码</b>，引用限于其公认的核心论点。本文未调取任何一手实验或生产数据，第七节所述两项检验给出了设计而未执行——这一限制已写进第十一节。</p>
+<p><b>字数</b>　纯汉字约 1.2 万　<b>版本</b>　v1.0 · 2026-08-01</p>
+<div class="src"><div class="sl">这一篇由哪三个领域的争论撞成</div><p class="sd">三个学科由王德生指定。三边在「同一类这件事被什么保证」上给出互相排斥的答案：语言学那边说规则再无例外、实际变化仍逐词参差；工程那边说不必把每一件都做进公差带、配成对也行；艺术学那边说凡合乎记谱者即同一作品、历史无关。三家的主要争论至今未决，出处可自行核对。</p><a class="one" href="https://www.cambridge.org/core/services/aop-cambridge-core/content/view/4C8CB50D4C8271DF77E2517231CDE024/S0097850781059614a.pdf/div-class-title-resolving-the-neogrammarian-controversy-div.pdf"><div class="k">语言学 · 新语法学派 ↔ 词汇扩散</div><div class="t">Resolving the Neogrammarian Controversy（Language 57, 1981）／Wang 1969、Chen &amp; Wang 1975、Krishnamurti 1978</div><div class="g">「语音规律无例外」是比较法与谱系重建的地基；而对汉语方言与达罗毗荼语的研究显示音变可逐词扩散，无论把语音环境切得多细都无法解释那种分裂，有研究者据此断言这些变化以词而非音位为基本单位。Labov 的层次调解至今仍被反驳（Kiparsky 2016）。</div></a><a class="one" href="https://www.sciencedirect.com/science/article/abs/pii/S0925527318304432"><div class="k">工程学 · 完全互换性 ↔ 选择装配</div><div class="t">An economic decision model for selective assembly（Int. J. Production Economics, 2018）</div><div class="g">互换性靠把每一件都做进公差带，而收紧公差的成本随精度非线性上升；选择装配则放宽公差、逐件测量、按尺寸分组，只在对应组间装配，用低精度零件得到高精度配合——它更省钱，但不保证完全互换，在滚动轴承与活塞—缸体配合上已有数十年工业使用史。</div></a><a class="one" href="https://plato.stanford.edu/entries/goodman-aesthetics/"><div class="k">艺术学 · 记谱给定同一 ↔ 历史给定同一</div><div class="t">Nelson Goodman, Languages of Art（1968）及其后续争论</div><div class="g">一类作品的同一性由记谱法给定，凡符合记谱的实例都是那件作品，因而没有伪作问题；另一类由制作历史给定，复制品即使不可分辨也不是原作。这个区分至今是艺术哲学的支柱，也至今被争论：完全合谱的两次演奏可以听起来判若两曲，而人们仍说它们是同一首曲子。</div></a></div>
+<div class="endbox"><p>三种读法 · 网页长文 · 在线 PDF 翻页 · PDF 下载</p>
+<p><a href="/paradigm/">返回每日必读 →</a></p></div>
+</div>
+<button id="totop" aria-label="回到顶部">↑</button>
+<footer>每日必读 · 典范文 · 作者 王德生 ＋ Claude · © 德麦国际 Demai International · <a href="/browse/">sdeuniverses.com</a></footer>
+<script>
+(function(){var b=document.getElementById('pbar'),t=document.getElementById('totop');
+function u(){var d=document.documentElement,h=d.scrollHeight-d.clientHeight;
+b.style.width=(h>0?(d.scrollTop/h*100):0)+'%';t.style.display=d.scrollTop>700?'block':'none';}
+addEventListener('scroll',u,{passive:true});u();
+t.onclick=function(){scrollTo({top:0,behavior:'smooth'});};})();
+</script>
+<script src="/wds-mode.js?v=20260731i" defer></script>
+<script src="/assets/sde-talk.js?v=20260731b" defer></script>
+</body></html>
