@@ -128,6 +128,9 @@
   // 入口页的门牌。进站落在裸域名上时，地址栏改写成这一个——地址与页面一一对应，
   // 收藏 /home/ 拿到入口、收藏 /browse/ 拿到浏览页，各是各的。
   var HOME = "/home/";
+  // 平台介绍页的门牌。底部那颗按钮从「直接浏览」改成「平台介绍」（2026-08-01 用户定）：
+  // 浏览的去处三角上顶点已经有一个了，这一颗留给"这里到底是个什么地方"。
+  var ABOUT = "/about/";
 
   /* 烧 TOKEN 的火色（用户定）：浏览烧绿 · 对话烧红 · 微信烧蓝。
      注意它与节点自身的色相（NODES[].c 青/金/紫）是两回事：色相标身份，火色标烧的是哪一种 TOKEN。
@@ -290,8 +293,8 @@
     ".sdep-foot{position:relative;text-align:center;animation:sdepFootIn .6s ease 1.35s both}" +
     "@keyframes sdepFootIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}" +
     ".sdep-foot i{display:block;font-style:normal;font-size:12px;color:#7C8894;letter-spacing:.5px;margin-bottom:10px}" +
-    ".sdep-skip{background:none;border:1px solid rgba(255,255,255,.14);border-radius:999px;color:#9AA6B2;" +
-    "font:12.5px/1 inherit;cursor:pointer;padding:9px 18px;transition:all .18s}" +
+    ".sdep-skip{display:inline-block;text-decoration:none;background:none;border:1px solid rgba(255,255,255,.14);" +
+    "border-radius:999px;color:#9AA6B2;font:12.5px/1 inherit;cursor:pointer;padding:9px 18px;transition:all .18s}" +
     ".sdep-skip:hover{color:#F0DCA6;border-color:rgba(240,220,166,.5)}" +
     "@media(max-width:620px){.sdep-stage{width:92vw;height:56vh}.sdep-dot{width:58px;height:58px;font-size:22px}.sdep-dotwrap{width:58px;height:58px}" +
     /* 窄屏只缩“燃烧核”：火星的射程现在是按视口现算的，
@@ -697,12 +700,13 @@
     tip.textContent = T("\u4e09\u4e2a\u677f\u5757 \u00b7 \u5e76\u5217\u800c\u7acb \u00b7 \u968f\u65f6\u4e92\u5207",
                         "Three sections \u00b7 equal footing \u00b7 switch anytime");
     foot.appendChild(tip);
-    var skip = document.createElement("button");
-    skip.className = "sdep-skip";
-    skip.type = "button";
-    skip.textContent = T("\u76f4\u63a5\u6d4f\u89c8 \u203a", "Just browse \u203a");
-    skip.onclick = function () { close(); };
-    foot.appendChild(skip);
+    /* 这一颗是真跳转（一整页两万字的平台说明），不是就地揭开，
+       所以用 <a> 而不是 <button>：中键新开、右键复制链接、爬虫都要它是条真链接。 */
+    var about = document.createElement("a");
+    about.className = "sdep-skip";
+    about.href = ABOUT;
+    about.textContent = T("\u5e73\u53f0\u4ecb\u7ecd \u203a", "About the platform \u203a");
+    foot.appendChild(about);
     box.appendChild(foot);
 
     document.body.appendChild(box);
@@ -731,7 +735,8 @@
          两者不能共用一个网址——否则收藏、分享、刷新拿到的都是"入口"，而人明明在浏览页。
          走 replaceState 不跳转：内容本来就已经在这一页上，再发一次请求纯属浪费，
          后退历史也不该多出一格（按后退该回到进站之前，不是回到门口）。
-         三个出口都经过这里：入口卡「SDE 浏览」、底部「直接浏览 ›」、Esc。 */
+         两个出口都经过这里：入口卡「SDE 浏览」与 Esc。底部那颗现在是「平台介绍」，
+         它是真跳转、不走 close()。 */
       try {
         if (window.history && history.replaceState) history.replaceState(null, "", BROWSE);
       } catch (e) {}

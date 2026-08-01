@@ -70,9 +70,32 @@ var closeBody = (src.match(/function close\(\) \{[\s\S]*?\n    \}/) || [, ""])[0
 ok("close() 里把地址换成 BROWSE", /history\.replaceState\(null, "", BROWSE\)/.test(closeBody));
 ok("换地址用 replaceState 而不是跳转（内容已在本页，跳转是白发一次请求）",
    !/location\.href\s*=/.test(closeBody) && !/location\.assign/.test(closeBody) && !/location\.replace/.test(closeBody));
-ok("三个出口共用同一个 close（入口卡「SDE 浏览」/ 底部「直接浏览 ›」/ Esc）",
-   /if \(!href\) close\(\);/.test(src) && /skip\.onclick = function \(\) \{ close\(\); \};/.test(src) &&
+/* 2026-08-01：底部那颗从「直接浏览」改成「平台介绍」，于是走 close() 的出口只剩两个。 */
+ok("两个出口共用同一个 close（入口卡「SDE 浏览」/ Esc）",
+   /if \(!href\) close\(\);/.test(src) &&
    /e\.key === "Escape"[\s\S]{0,40}close\(\)/.test(src));
+ok("⚠ 底部不再是「直接浏览」那颗按钮（旧口径必须从源码里消失）",
+   !/skip\.onclick/.test(src) && !/createElement\("button"\)/.test(src));
+var ABOUT = (src.match(/var ABOUT = "([^"]+)"/) || [, ""])[1];
+ok("平台介绍的门牌是 /about/，实得 " + ABOUT, ABOUT === "/about/");
+ok("底部那颗是真链接（<a href=ABOUT>），不是 button——要能中键新开、右键复制",
+   /about = document\.createElement\("a"\)/.test(src) && /about\.href = ABOUT;/.test(src) &&
+   /foot\.appendChild\(about\)/.test(src));
+ok("⚠ 它不走 close()（是真跳转，不是就地揭开）", !/about\.onclick/.test(src));
+ok(".sdep-skip 挂到 <a> 上之后补了 inline-block 与去下划线",
+   /\.sdep-skip\{display:inline-block;text-decoration:none;/.test(src));
+{
+  var fsA = require("fs"), pA = path.join(ROOT, "public", "about", "index.html");
+  ok("平台介绍页真的存在", fsA.existsSync(pA));
+  var A = fsA.existsSync(pA) ? fsA.readFileSync(pA, "utf8") : "";
+  ok("平台介绍页引了两张图（三位一体 / 文明增长飞轮）",
+     /\/about\/trinity\.svg/.test(A) && /\/about\/flywheel\.svg/.test(A));
+  ok("两张 SVG 文件都在", fsA.existsSync(path.join(ROOT, "public", "about", "trinity.svg")) &&
+     fsA.existsSync(path.join(ROOT, "public", "about", "flywheel.svg")));
+  ok("平台介绍页挂了三态面板脚本 wds-mode.js", /wds-mode\.js\?v=/.test(A));
+  var plain = A.replace(/<[^>]+>/g, "").replace(/\s/g, "");
+  ok("正文体量达到「两万字」口径，实得 " + plain.length, plain.length >= 19000);
+}
 {
   var W = fs.readFileSync(path.join(ROOT, "src", "worker.js"), "utf8");
   ok("worker 认 /home/ 与 /browse/（带不带尾斜杠都认）",
@@ -165,9 +188,8 @@ console.log("[接线]");
 ok("真的用 shouldOpen(readEnv()) 把关", /if \(!shouldOpen\(readEnv\(\)\)\) return;/.test(src));
 ok("⚠ 不再是「一会话只拦一次」那句老判断",
    !/if \(!FORCE && sessionStorage\.getItem\(KEY\)\) return;/.test(src));
-ok("三个出口（点入口 · 直接浏览 · Esc）都不再记账、也没留下空调用",
+ok("两个出口（点入口 · Esc）都不再记账、也没留下空调用",
    /a\.onclick = function \(\) \{ if \(!href\) close\(\); \}/.test(src) &&
-   /skip\.onclick = function \(\) \{ close\(\); \}/.test(src) &&
    /e\.key === "Escape"\) \{ close\(\); \}/.test(src) &&
    !/ seen\(\);/.test(src));
 
