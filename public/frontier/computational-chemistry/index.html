@@ -1,0 +1,50 @@
+<!DOCTYPE html><html lang="zh"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>计算化学 · 新思想前沿 | SDE Universes</title>
+<meta name="description" content="这十年计算化学的转向：势能面不再一个体系一个体系地拟合，而被一个通吃周期表的预训练模型接管，精度与规模的老取舍被打破，新的代价随之出现。">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Noto+Serif+SC:wght@300;400;500;600&display=swap">
+<style>
+:root{--bg:#F5EFE0;--card:#FAF6EC;--gold:#8A6817;--gold2:#A88233;--text:#2A2315;--text2:#6B5D47;--muted:#98886C;--border:rgba(138,104,23,0.22)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'Noto Serif SC',Georgia,serif;line-height:1.9;-webkit-font-smoothing:antialiased}
+.top{max-width:760px;margin:0 auto;padding:1.4rem 1.5rem 0;font-size:.86rem}
+.top a{color:var(--gold);text-decoration:none;font-weight:600}.top a:hover{text-decoration:underline}
+.top .sep{color:var(--muted);margin:0 .5rem}
+main{max-width:760px;margin:0 auto;padding:1.5rem 1.5rem 4rem}
+.kicker{font-size:.82rem;letter-spacing:.18em;color:var(--gold2);font-weight:600;margin-bottom:.9rem}
+h1{font-size:2rem;line-height:1.3;font-weight:700;margin-bottom:.7rem;letter-spacing:.01em}
+.meta{font-size:.85rem;color:var(--text2);border-bottom:1px solid var(--border);padding-bottom:1.1rem;margin-bottom:1.6rem}
+.lede{font-size:1.12rem;color:var(--text);font-weight:500;margin-bottom:1.5rem}
+h2{font-size:1.18rem;font-weight:600;color:var(--gold);margin:1.9rem 0 .6rem}
+p{margin:0 0 1.1rem;text-align:justify}
+.end{margin-top:2rem;padding-top:1.2rem;border-top:1px solid var(--border);font-size:.86rem;color:var(--muted)}
+.end b{color:var(--text2)}
+</style></head><body>
+<div class="top"><a href="/browse/">SDE Universes</a><span class="sep">·</span><a href="/frontier/">新思想前沿</a><span class="sep">›</span><span style="color:var(--text2)">化学与材料</span></div>
+<main>
+<div class="kicker">新思想前沿 · 化学与材料</div>
+<h1>计算化学</h1>
+<div class="meta">近十年最新思想摘要 · 约 1300 字 · 王德生 亲撰 · 2026 年 8 月</div>
+<p class="lede">这十年计算化学最要紧的转向，是原子间作用力的计算方式换了记账单位——从「每个体系单独拟合一套势」变成「一个预训练模型通吃周期表」。量子精度与经典速度之间那道几十年不动的取舍，第一次被绕过去了，同时也换来了一批新的、更隐蔽的错误来源。</p>
+<h2>一、老账：精度与规模的取舍</h2>
+<p>从头算方法精度高但代价陡：体系稍大、时间尺度稍长就算不动。经典力场快上几个数量级，却要人手为每类分子调参，遇到成键断键就失效。几十年里，计算化学的实际工作大半消耗在这道取舍上：要么算得准而小，要么算得大而糙。</p>
+<h2>二、三步走到等变网络</h2>
+<p>机器学习势的思路很朴素：既然势能面是原子坐标的函数，就直接把它学下来。第一代靠手工设计的原子环境描述符；第二代换成图神经网络；第三代引入等变性——让网络的内部表示在旋转与平移下按物理该有的方式变换，而不是靠数据去背诵对称性。</p>
+<p>等变消息传递这一步是分水岭。同样的数据量下，精度与外推能力都上了一个台阶，训练一套可用的势从「几万次量化计算」降到「几千次」。</p>
+<h2>三、基础模型进场</h2>
+<p>真正的转向发生在 2023 至 2024 年：出现了不必为具体体系重新训练、拿来就能用的通用势。有的在十几万个晶体结构、八十余种元素上训练；有的把训练集扩到千万量级并覆盖极宽的温压范围；配套的图网络搜索一次性给出两百万量级的新稳定结构候选。</p>
+<p>对使用者而言，变化是体感级的：过去做一个新体系的分子动力学，第一件事是造数据集；现在第一件事是下载一个模型，跑起来再看要不要微调。</p>
+<p>这里发生的其实是同一个时代逻辑在化学里的重演：与其为每个任务造一个专用模型，不如先在尽可能宽的数据上训练一个通用底子，再针对具体问题微调。差别在于，化学的「语料」不是文本，而是要靠昂贵的量子化学计算一条条生成出来的。</p>
+<h2>四、从预测到生成</h2>
+<p>紧接着是反向的一步：不再只判断给定结构好不好，而是按目标条件直接生成结构。扩散式的生成模型可以按带隙、弹性模量、空间群或成分作条件采样，产出稳定、独特且新颖的候选。</p>
+<p>同期出现的公共基准把这门手艺变成可比较的学科——各模型在同一套发现任务上排名，虚报的精度不再容易蒙混过关。</p>
+<h2>五、清醒的部分</h2>
+<p>一，通用不等于可靠：这些模型在训练分布内很稳，一旦碰到反应势垒、相变、稀有事件就常常失准，而失准时它照样给出一个像样的数字。二，它们继承了参考数据的系统误差——学的是密度泛函的结果，不是实验，泛函本身的偏差被一并学走。三，「两百万个稳定候选」这类数字容易被误读：能算出来与能合成出来之间隔着巨大的落差，真正的瓶颈已经从算力挪到了实验验证与自动化合成。</p>
+<p>所以这个领域现在最要紧的问题不是再快十倍，而是不确定性量化：模型得学会说「这个我不知道」。</p>
+<p>还有一个容易被忽略的收益：可复现性。过去一篇分子动力学论文的结果，别人常常复现不出来，因为力场参数散落在补充材料里；现在权重与训练集是公开的、有版本号的对象，至少「用的是同一把尺子」这件事变得可核对。</p>
+<h2>六、一句话</h2>
+<p>计算化学的基本单位从「一次计算」变成了「一个模型」；速度与精度的老矛盾被绕开，代价是把可靠性问题从物理近似挪到了数据分布上。</p>
+<div class="end"><b>新思想前沿</b> 是一个持续撰写的专栏：近十年，各主要领域最新思想的摘要，每领域约 2000 字，共 100 个学科面板，由王德生亲撰、逐月填充。 · <a href="/frontier/" style="color:var(--gold);text-decoration:none">← 回到 100 学科面板</a></div>
+</main><script src="/wds-mode.js?v=20260801h" defer></script>
+</body></html>

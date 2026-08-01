@@ -1,0 +1,51 @@
+<!DOCTYPE html><html lang="zh"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>半导体与芯片 · 新思想前沿 | SDE Universes</title>
+<meta name="description" content="摩尔定律没有停，它换了记账单位：从平面缩微换到环绕栅、背面供电、芯粒与先进封装，性能来源从晶体管尺寸转移到系统级协同与内存带宽。">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Noto+Serif+SC:wght@300;400;500;600&display=swap">
+<style>
+:root{--bg:#F5EFE0;--card:#FAF6EC;--gold:#8A6817;--gold2:#A88233;--text:#2A2315;--text2:#6B5D47;--muted:#98886C;--border:rgba(138,104,23,0.22)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'Noto Serif SC',Georgia,serif;line-height:1.9;-webkit-font-smoothing:antialiased}
+.top{max-width:760px;margin:0 auto;padding:1.4rem 1.5rem 0;font-size:.86rem}
+.top a{color:var(--gold);text-decoration:none;font-weight:600}.top a:hover{text-decoration:underline}
+.top .sep{color:var(--muted);margin:0 .5rem}
+main{max-width:760px;margin:0 auto;padding:1.5rem 1.5rem 4rem}
+.kicker{font-size:.82rem;letter-spacing:.18em;color:var(--gold2);font-weight:600;margin-bottom:.9rem}
+h1{font-size:2rem;line-height:1.3;font-weight:700;margin-bottom:.7rem;letter-spacing:.01em}
+.meta{font-size:.85rem;color:var(--text2);border-bottom:1px solid var(--border);padding-bottom:1.1rem;margin-bottom:1.6rem}
+.lede{font-size:1.12rem;color:var(--text);font-weight:500;margin-bottom:1.5rem}
+h2{font-size:1.18rem;font-weight:600;color:var(--gold);margin:1.9rem 0 .6rem}
+p{margin:0 0 1.1rem;text-align:justify}
+.end{margin-top:2rem;padding-top:1.2rem;border-top:1px solid var(--border);font-size:.86rem;color:var(--muted)}
+.end b{color:var(--text2)}
+</style></head><body>
+<div class="top"><a href="/browse/">SDE Universes</a><span class="sep">·</span><a href="/frontier/">新思想前沿</a><span class="sep">›</span><span style="color:var(--text2)">工程与技术</span></div>
+<main>
+<div class="kicker">新思想前沿 · 工程与技术</div>
+<h1>半导体与芯片</h1>
+<div class="meta">近十年最新思想摘要 · 约 1200 字 · 王德生 亲撰 · 2026 年 8 月</div>
+<p class="lede">摩尔定律这十年的真实状况，不是停下来，而是换了记账的单位。晶体管还在变多，但性能的来源已经从「把图形画得更小」，转移到了晶体管的形状、供电的走向、芯片的拼装方式，以及内存与互连——过去被视为配角的那些部分。</p>
+<h2>一、平面缩微的终点</h2>
+<p>鳍式晶体管把二维缩微延续了十年，但每一代的收益在递减、成本却在上升：一座先进晶圆厂的造价以百亿美元计，能负担最先进工艺的厂商从十余家收缩到三家。「每两年翻一倍」从对物理现象的观察，变成了一句需要巨额资本去兑现的商业承诺。</p>
+<p>工艺节点的名字也早已不再是任何实际尺寸——所谓两纳米，只是一个代际标签。</p>
+<p>另一层代价在设计侧：先进节点上一次流片的费用以亿计，掩模、验证与设计工具的门槛把中小玩家挡在外面。工艺越先进，能用得起它的产品品类反而越少，这本身就是缩微减速的一种表现。</p>
+<h2>二、晶体管换形</h2>
+<p>2025 年第四季度，环绕栅纳米片进入量产：栅极从三面包住沟道改为四面完全环绕，静电控制更强、漏电更小。这是自鳍式结构以来主流逻辑晶体管的第一次换形，两家领先厂商在同一时间窗内先后进入这一代。</p>
+<p>下一步的候选是互补场效应晶体管——把 N 型与 P 型上下叠起来。真正的缩微已经开始向第三个维度要空间。</p>
+<h2>三、把供电搬到背面</h2>
+<p>另一处不那么显眼、意义却同样大的改动：供电网络从芯片正面挪到背面。信号与电源不再挤在同一侧的金属层里，压降更小、布线更松，密度与频率都能上一台阶。十年前几乎没有人会把「供电网络」列为性能的来源。</p>
+<h2>四、从单片到拼装</h2>
+<p>第二条主线是封装。既然整块大芯片的良率随面积急剧下降，就把它切成芯粒——各用最合适的工艺制造，再用高密度封装拼回一个系统。计算用最先进节点，输入输出与模拟部分用成熟节点，成本与良率同时改善。</p>
+<p>结果是封装从后段工序变成了产业的咽喉：过去两年限制人工智能算力交付的，多数时候不是晶圆产能，而是先进封装的产能。</p>
+<p>拼装同时改写了产业分工：接口标准、基板、硅中介层、散热，这些原本属于封装厂的事项，如今在架构阶段就要与逻辑设计一起决定。系统级协同优化取代单点工艺，成为性能提升的主要来源。</p>
+<h2>五、瓶颈挪到内存与地缘政治</h2>
+<p>计算单元的算力增长长期快于内存带宽的增长，于是「内存墙」成为大模型时代的实际约束——高带宽内存的堆叠层数与供货，直接决定了一代加速器的性能上限。芯片设计的中心从每秒运算次数，移向每一次数据搬运的代价。</p>
+<p>与此同时，工艺变成了国策：出口管制、巨额补贴、把产能从单一地区分散到北美与欧洲的新厂。技术路线图第一次要和地图一起读。</p>
+<p>光刻仍在往前推：数值孔径更高的极紫外设备已在高产量逻辑生产中投入使用，单台造价再上一个台阶。它带来的分辨率红利与它带来的成本压力，几乎是同一件事的两面。</p>
+<h2>六、一句话</h2>
+<p>缩微没有结束，但它不再是唯一的引擎：性能的来源转移到晶体管的立体化、供电与封装的重构，以及数据搬运的经济学——芯片从一件产品变成了一个系统工程问题。</p>
+<div class="end"><b>新思想前沿</b> 是一个持续撰写的专栏：近十年，各主要领域最新思想的摘要，每领域约 2000 字，共 100 个学科面板，由王德生亲撰、逐月填充。 · <a href="/frontier/" style="color:var(--gold);text-decoration:none">← 回到 100 学科面板</a></div>
+</main><script src="/wds-mode.js?v=20260801h" defer></script>
+</body></html>

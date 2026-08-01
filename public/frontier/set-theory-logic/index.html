@@ -1,0 +1,50 @@
+<!DOCTYPE html><html lang="zh"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>数理逻辑与集合论 · 新思想前沿 | SDE Universes</title>
+<meta name="description" content="这十年数理逻辑的两次转向：证明整个搬进机器，由内核而非同行的眼力裁决对错；以及连续统问题上，两条互不相让的公理路线被证明通向同一处。">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Noto+Serif+SC:wght@300;400;500;600&display=swap">
+<style>
+:root{--bg:#F5EFE0;--card:#FAF6EC;--gold:#8A6817;--gold2:#A88233;--text:#2A2315;--text2:#6B5D47;--muted:#98886C;--border:rgba(138,104,23,0.22)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'Noto Serif SC',Georgia,serif;line-height:1.9;-webkit-font-smoothing:antialiased}
+.top{max-width:760px;margin:0 auto;padding:1.4rem 1.5rem 0;font-size:.86rem}
+.top a{color:var(--gold);text-decoration:none;font-weight:600}.top a:hover{text-decoration:underline}
+.top .sep{color:var(--muted);margin:0 .5rem}
+main{max-width:760px;margin:0 auto;padding:1.5rem 1.5rem 4rem}
+.kicker{font-size:.82rem;letter-spacing:.18em;color:var(--gold2);font-weight:600;margin-bottom:.9rem}
+h1{font-size:2rem;line-height:1.3;font-weight:700;margin-bottom:.7rem;letter-spacing:.01em}
+.meta{font-size:.85rem;color:var(--text2);border-bottom:1px solid var(--border);padding-bottom:1.1rem;margin-bottom:1.6rem}
+.lede{font-size:1.12rem;color:var(--text);font-weight:500;margin-bottom:1.5rem}
+h2{font-size:1.18rem;font-weight:600;color:var(--gold);margin:1.9rem 0 .6rem}
+p{margin:0 0 1.1rem;text-align:justify}
+.end{margin-top:2rem;padding-top:1.2rem;border-top:1px solid var(--border);font-size:.86rem;color:var(--muted)}
+.end b{color:var(--text2)}
+</style></head><body>
+<div class="top"><a href="/browse/">SDE Universes</a><span class="sep">·</span><a href="/frontier/">新思想前沿</a><span class="sep">›</span><span style="color:var(--text2)">数学与逻辑</span></div>
+<main>
+<div class="kicker">新思想前沿 · 数学与逻辑</div>
+<h1>数理逻辑与集合论</h1>
+<div class="meta">近十年最新思想摘要 · 约 1500 字 · 王德生 亲撰 · 2026 年 8 月</div>
+<p class="lede">这十年数理逻辑最要紧的思想转向有两个：一是把证明搬进机器，让「对不对」由一个不能被说服的内核裁决，而不再由同行的眼力裁决；二是在连续统这个百年老问题上，两条几十年互不相干的公理路线，被证明其实通向同一个答案。前者改变了数学的生产方式，后者改变了「独立性之后还能不能继续追问真」这个态度。</p>
+<h2>一、证明从纸上搬进机器</h2>
+<p>形式化证明并不新鲜，新鲜的是它终于跨过了那道使用门槛。以 de Moura 主持的 Lean 与它的数学库 Mathlib 为轴心，一个由数百名志愿者维护的公共库积累到十万量级的定义与二十余万条定理——从本科课程到当代研究前沿的常用工具，第一次成套地存在于一个机器可检验的形式里。</p>
+<p>转折点是 2023 年陶哲轩组织的多项式 Freiman–Ruzsa 猜想形式化：一篇刚刚证出来的前沿论文，用蓝图分工的方式在数周内被完整形式化。它证明的不是某条定理，而是一件工序上的事——形式化不再只能追认几十年前的老结果，它可以跟得上研究的当下。</p>
+<h2>二、机器不只是校对，它开始参与生产</h2>
+<p>紧接着的方程理论项目更能说明问题：约四千七百条至多四变量的代数律之间，两千两百万条蕴涵关系需要逐条判定。五十来人在不到半年里把它们全部找出并在 Lean 中验证完毕。这个规模不是「一个人做得慢一点」，而是靠传统论文写作永远不可能完成——数学第一次有了工业化生产的形态。</p>
+<p>另一侧是自动证明。2025 年国际数学奥林匹克上，数套系统达到金牌水平，且解答由 Lean 4 自动验证、无需人工核对；到 2026 年，若干厄尔多什遗留问题出现了机器辅助乃至自动给出的证明。一个曾在人类专家手里停滞十八个月的素数定理强形式的形式化，被机器在三周内补完。</p>
+<h2>三、为什么内核比模型重要</h2>
+<p>强化学习最擅长的事情就是找漏洞。一个只被奖励「看起来像证明」的系统，会精确地学会伪造证明。形式化系统的价值在这里显出来：它的内核不能被说服，只能被满足。</p>
+<p>于是形式化从数学家的洁癖变成了人工智能时代的基础设施——一个无法讨价还价的裁判。这也是这门老学问在这十年最出人意料的位置变化：数理逻辑从数学的地下室，搬到了机器可信性的门口。</p>
+<h2>四、集合论：连续统问题上的合流</h2>
+<p>另一半故事在集合论。哥德尔与科恩之后，连续统假设（CH）被证明独立于标准公理系统 ZFC，一度被读作「问题到此为止」。近十年的主流态度不是接受这个终点，而是追问：那么应该添哪条公理。</p>
+<p>两个主要候选都推出连续统等于第二个不可数基数（即 CH 为假），却互不相干地发展了几十年：一条是强制公理路线，以马丁极大为代表，其直觉是「凡能被合理设想的对象就应当存在」；另一条是伍丁基于 P_max 的公理 (*)。1990 年代就有人问二者是什么关系，一直悬着。</p>
+<p>2021 年，Asperó 与 Schindler 在《数学年刊》上证明：马丁极大的加强形式蕴涵伍丁的公理 (*)。两条独立的路线并成了一条。</p>
+<h2>五、这件事到底证明了什么</h2>
+<p>它没有证明 CH 是假的——公理是选出来的，不是发现的现成事实。但「两种独立发展起来的极大性直觉指向同一个答案」这件事本身带有证据的分量：如果不同方向的最大化冲动在同一处会合，那个答案更可能刻画的是数学宇宙本身，而不只是某一派的偏好。</p>
+<p>反方仍在：伍丁本人的另一条纲领指向相反的结论，而多宇宙立场干脆认为「唯一的宇宙」这个前提就该放弃。争论没有了结，但它的性质变了——不再是「不可判定所以无话可说」，而是「有几条互相竞争的公理，各有代价，可以论证」。</p>
+<h2>六、一句话</h2>
+<p>数学的两个根问题同时松动了：真在哪里被裁决——从人的共识挪向机器的内核；以及在独立性之后还能不能追问真——从「不可判定」挪向「以极大性择公理」。</p>
+<div class="end"><b>新思想前沿</b> 是一个持续撰写的专栏：近十年，各主要领域最新思想的摘要，每领域约 2000 字，共 100 个学科面板，由王德生亲撰、逐月填充。 · <a href="/frontier/" style="color:var(--gold);text-decoration:none">← 回到 100 学科面板</a></div>
+</main><script src="/wds-mode.js?v=20260801h" defer></script>
+</body></html>
