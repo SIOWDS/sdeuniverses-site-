@@ -473,7 +473,7 @@ let SDE_BASE = `你是一位思想极其深刻、善于穿透常识的跨学科�
 let SDE_BASE_LOADED = false;
 let neigongPromise = (async function loadNeigong(){
   try{
-    const resp = await fetch('/taste/assets/sde-neigong.txt?v=3.6', {cache:'force-cache'});
+    const resp = await fetch('/taste/assets/sde-neigong.txt?v=3.7', {cache:'force-cache'});
     if(resp.ok){
       const full = await resp.text();
       if(full && full.length > 5000){
@@ -490,7 +490,7 @@ async function ensureNeigong(){
   if(!ok || !SDE_BASE_LOADED){
     neigongPromise = (async ()=>{
       try{
-        const resp = await fetch('/taste/assets/sde-neigong.txt?v=3.6', {cache:'no-store'});
+        const resp = await fetch('/taste/assets/sde-neigong.txt?v=3.7', {cache:'no-store'});
         if(resp.ok){ const full = await resp.text(); if(full && full.length>5000){ SDE_BASE=full; SDE_BASE_LOADED=true; return true; } }
       }catch(e){}
       return false;
