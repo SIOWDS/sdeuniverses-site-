@@ -76,9 +76,9 @@ sec("① 六路径：把表抠出来重算，不是查字符串");
 /* ══ ② 三台智能体的分工必须硬 ═══════════════════ */
 sec("② 三台：共创动脑、修改动内容、编辑动文字");
 {
-  ok(AGENTS.length === 3, "不是三台：" + AGENTS.length);
+  ok(AGENTS.length === 4, "不是四台：" + AGENTS.length);
   const byK = {}; AGENTS.forEach(a => { byK[a.k] = a; });
-  ["co", "rev", "ed"].forEach(k => ok(!!byK[k], "缺 " + k));
+  ["co", "rev", "ed", "on"].forEach(k => ok(!!byK[k], "缺 " + k));
 
   AGENTS.forEach(a => {
     ok(a.n && a.d && a.sys && a.quick && a.quick.length >= 4, a.k + " 的定义不全");
@@ -101,8 +101,20 @@ sec("② 三台：共创动脑、修改动内容、编辑动文字");
   ok(/只输出编校后的整篇/.test(byK.ed.sys), "编辑没要求只交回整篇");
   ok(/语感|同一种腔调/.test(byK.ed.sys), "编辑没被拦住「把所有人改成同一种腔调」");
 
-  /* 三台的 system 不许雷同（雷同＝其实只有一台） */
-  ok(byK.co.sys !== byK.rev.sys && byK.rev.sys !== byK.ed.sys, "有两台的 system 一模一样");
+  /* 接着写：只推一小步，写完把笔交回去 */
+  ok(/最多写一段/.test(byK.on.sys), "接着写没有「最多一段」这条硬规矩");
+  ok(/写完就停|不许接着往下写第二段/.test(byK.on.sys), "接着写没被拦住一路写下去");
+  ok(/接着他的上文写/.test(byK.on.sys) && /不许换成你自己的腔调/.test(byK.on.sys),
+    "接着写没被要求随他的人称语气（会写成另一个人）");
+  ok(/不许.{0,6}(总结|升华|点题)|总结、升华、点题/.test(byK.on.sys), "接着写没被拦住替他点题");
+  ok(/〔接着你写〕/.test(byK.on.sys), "接着写没有交回笔的标记 —— 引导语和正文就分不开了");
+  ok(/不是\\"你可以继续展开\\"|要具体到能落笔/.test(byK.on.sys), "接着写的引导没被要求具体到能落笔");
+  ok(/别硬写/.test(byK.on.sys), "接着写没有「接不下去就别硬写」的出口");
+  ok(/落点/.test(byK.on.sys), "接着写没盯着落点推进");
+
+  /* 四台的 system 不许两两雷同（雷同＝其实少一台） */
+  const sysList = AGENTS.map(a => a.sys);
+  ok(new Set(sysList).size === 4, "有两台的 system 一模一样");
 }
 
 /* ══ ③ 页面接线 ═══════════════════════════════ */
@@ -119,6 +131,19 @@ sec("③ 页面接线");
 
   /* 修改/编辑交回整篇就落版；共创**绝不**自动落版 */
   ok(/A\.k === "rev" \|\| A\.k === "ed"/.test(H), "没有区分哪几台自动落版");
+  /* 接着写自己一条路：段落接进正文，引导语留在对话里 */
+  ok(/var GO_MARK = "〔接着你写〕"/.test(H), "没有交回笔的标记常量");
+  const onSeg = H.slice(H.indexOf('if (A.k === "on") {'), H.indexOf('if (A.k === "rev" || A.k === "ed") {'));
+  ok(onSeg.length > 200, "接着写没有自己的落地分支");
+  ok(/commit\(/.test(onSeg), "接着写没有落成新版本");
+  ok(/base0\.replace/.test(onSeg) || /\+ "\\n\\n"/.test(onSeg), "接着写是覆盖不是接在末尾");
+  ok(/blocks\.slice\(0, 2\)/.test(onSeg), "它写多了没有截住（会一路写完整篇）");
+  ok(/它一次写多了/.test(onSeg), "截了却不吭声");
+  ok(/没写出可以接的段落/.test(onSeg), "接不出来时没有交代");
+  /* 每台一份的结构必须从 AGENTS 派生 —— 写死一份列表，加一台就会漏（已经漏过一次） */
+  ok(/function emptyChat\(\)/.test(H) && /AGENTS\.forEach/.test(H.slice(H.indexOf("function emptyChat"))),
+    "每台的对话槽是写死的列表，加一台必漏");
+  ok(!/chat: \{ co: \[\], rev: \[\], ed: \[\] \}/.test(H), "还留着写死的槽位列表");
   ok(!/A\.k === "co"[\s\S]{0,120}commit\(/.test(H), "共创竟然会自动落版 —— 那会让人不敢开口问");
   ok(/function stripFence/.test(H), "回稿外层围栏没剥（基底常裹一层）");
 

@@ -261,6 +261,9 @@ h2.sec{font-size:19px;margin:32px 0 8px;letter-spacing:.04em;border-bottom:1px s
     { k: "rev", n: "✎ WDS 修改", d: "动内容：判断、结构、论证、落点。它会**交回改好的整篇**，落成一个新版本，原版还在，可以退回去。",
       quick: ["按落点改一遍", "中项写虚了，补实它", "把结论改成可被推翻的", "删掉万能话", "补一个反例", "结构重排"],
       sys: "你是【WDS 修改】。你动的是**内容**：判断、结构、论证、落点，不是遣词造句（那是【WDS 编辑】的活）。规矩五条：①**只输出改好的整篇正文，不要解说、不要前后缀**；②保住作者的判断与他的话语风格——你是改稿不是重写，凡是你改动的判断，必须是原来站不住的那几处；③**盯着落点改**：这一篇要交出的果子若是 S 就要能被复述成画面、是 D 就要能照着做、是 E 就要读完关系有变；④中项写虚的地方要补实——那是全篇原地打转的真原因；⑤删掉万能话（永远对因而永远没用的句子）与情态词堆砌。改不动就直说改不动，不要为了交差硬改。" },
+    { k: "on", n: "✒ WDS 接着写", d: "接着你写的往下写**一段**就停，然后把笔交回给你，并告诉你下一段该写什么。它写的会直接接到正文末尾、落成一个新版本，退得回去。",
+      quick: ["接着写一段", "换一种写法接着写", "从我们刚讨论的那句起", "只写一两句就停", "把上一段收个尾", "开个新段"],
+      sys: "你是【WDS 接着写】。你的活儿是**替他把卡住的地方推过去一小步**，不是替他写完。\n\n硬规矩六条：\n① **最多写一段**（三到六句）。宁可少写，绝不多写。写完就停，不许接着往下写第二段。\n② **接着他的上文写**：人称、时态、语气、称呼、详略，一律随他，不许换成你自己的腔调；他写得糙就跟着糙。\n③ 不许在这一段里下总结、升华、点题——那是他的活儿。\n④ **写完另起一行，写一句 `〔接着你写〕`，然后用一句话告诉他下一段该写什么**——要具体到能落笔（\"接下来写他把剪下来的指甲收进一个铁盒\"），不是\"你可以继续展开\"。这一行之前的内容会被直接接进他的正文，之后的内容只给他看。\n⑤ 盯着这一篇的**落点**推进：落在让人看见就往画面上推，落在让人会做就往做法上推，落在让人被牵动就往关系上推。\n⑥ 接不下去（上文太少、方向不明）就**别硬写**：只写那一行 `〔接着你写〕` 和一句反问，问清楚再说。" },
     { k: "ed", n: "🖉 WDS 编辑", d: "动文字：语句、段落、衔接、体例、标题、冗余、术语统一。**不动你的判断**。同样交回整篇并落成新版本。",
       quick: ["通篇编校", "理顺长句", "统一术语", "拟三个标题", "分段与小标题", "去掉冗余"],
       sys: "你是【WDS 编辑】。你动的是**文字**不是判断：语句、段落、衔接、体例、标题、冗余、术语一致、标点与数字格式。规矩五条：①**一个判断都不许改**——发现内容有问题，改完之后在末尾另起一节「编辑存疑」列出来，不要动手；②**只输出编校后的整篇正文**（存疑那一节除外），不要解说；③长句拆短、重复删净、代词指代明确、术语前后统一；④标题与小标题要**是判断不是话题词**；⑤保住作者的语感——编校不是把所有人改成同一种腔调。" }
@@ -268,7 +271,11 @@ h2.sec{font-size:19px;margin:32px 0 8px;letter-spacing:.04em;border-bottom:1px s
 
   /* ══════════ 状态 ══════════════════════════════════════ */
   var LS = "sde_writing_v1";
-  var ST = { path: "", vers: [""], vi: 0, chat: { co: [], rev: [], ed: [] }, agent: "co", rich: true, diff: false, busy: false };
+  /* ⚠ 每台的对话槽**从 AGENTS 派生**，不写死一份列表：
+     加第四台时我就漏了这里（`ST.chat.on` 是 undefined，一点就 push 报错），
+     端到端干跑当场抓到。凡"每台一份"的结构，一律照 AGENTS 生成。 */
+  function emptyChat() { var o = {}; AGENTS.forEach(function (a) { o[a.k] = []; }); return o; }
+  var ST = { path: "", vers: [""], vi: 0, chat: emptyChat(), agent: "co", rich: true, diff: false, busy: false };
   function save() {
     try { localStorage.setItem(LS, JSON.stringify({ path: ST.path, vers: ST.vers, vi: ST.vi, chat: ST.chat, agent: ST.agent })); } catch (e) {}
   }
@@ -279,8 +286,8 @@ h2.sec{font-size:19px;margin:32px 0 8px;letter-spacing:.04em;border-bottom:1px s
       ST.path = o.path || "";
       ST.vers = (Array.isArray(o.vers) && o.vers.length) ? o.vers : [""];
       ST.vi = (typeof o.vi === "number" && o.vi < ST.vers.length) ? o.vi : 0;
-      ST.chat = (o.chat && typeof o.chat === "object") ? o.chat : { co: [], rev: [], ed: [] };
-      ["co", "rev", "ed"].forEach(function (k) { if (!Array.isArray(ST.chat[k])) ST.chat[k] = []; });
+      ST.chat = (o.chat && typeof o.chat === "object") ? o.chat : emptyChat();
+      AGENTS.forEach(function (a) { if (!Array.isArray(ST.chat[a.k])) ST.chat[a.k] = []; });
       ST.agent = o.agent || "co";
     } catch (e) {}
   }
@@ -524,7 +531,9 @@ h2.sec{font-size:19px;margin:32px 0 8px;letter-spacing:.04em;border-bottom:1px s
     if (!log.length) {
       $("ms").innerHTML = '<p style="color:var(--wdim2);font-size:13.5px;line-height:1.8">' +
         (ST.agent === "co"
-          ? "写卡住了就问一句。它每一轮都带着你正在写的这一篇，以及你选的路径与落点。"
+          ? "写卡住了就问一句。它每一轮都带着你正在写的这一篇。"
+          : ST.agent === "on"
+          ? "点「接着写一段」，它接着你写的往下推<b style=\"color:var(--wtx)\">一段</b>就停，直接接到正文末尾并落成新版本（退得回去），然后告诉你下一段写什么。"
           : "点上面的快捷动作，或直接告诉它怎么改。<b style=\"color:var(--wtx)\">它会交回改好的整篇，落成一个新版本</b>，原版还在。") + "</p>";
       return;
     }
@@ -586,7 +595,7 @@ h2.sec{font-size:19px;margin:32px 0 8px;letter-spacing:.04em;border-bottom:1px s
     if (!kv) { note("还没配大模型 Key。去 <a href='/taste/chatsde/' target='_blank'>ChatSDE</a> 填一次，全站共用。"); return; }
     ST.vers[ST.vi] = grab();
     var A = ag();
-    var log = ST.chat[A.k];
+    var log = ST.chat[A.k] || (ST.chat[A.k] = []);   // 再兜一道：老留存里没有新台的槽
     log.push({ r: "me", t: q });
     var cell = { r: "wds", t: "", on: 1 };
     log.push(cell);
@@ -674,6 +683,28 @@ h2.sec{font-size:19px;margin:32px 0 8px;letter-spacing:.04em;border-bottom:1px s
       /* 修改／编辑交回的是整篇 ⇒ 直接落版。门槛只用来挡「它说改不动」那种拒绝，
          ⚠ 但**挡掉了要说一声**：原来门槛是 30 字且一声不吭，短稿被静默丢掉，
          读者看着回话在、版本却没多，只会以为功能坏了。 */
+      /* 【接着写】的产物**不是整篇**，是接在末尾的一段。所以它自己一条路：
+         `〔接着你写〕` 之前的接进正文并落成新版本，之后的只留在对话里当引导。
+         这是唯一一台会自动改动正文的 —— 因为读者点它就是在说"你来写一段"；
+         但仍落成**新版本**（退得回去），绝不覆盖当前版。 */
+      if (A.k === "on") {
+        var cut = cell.t.indexOf(GO_MARK);
+        var para = stripFence(cut >= 0 ? cell.t.slice(0, cut) : cell.t).trim();
+        var guide = cut >= 0 ? cell.t.slice(cut + GO_MARK.length).trim() : "";
+        // 它写多了就只收前两块 —— 硬截半句更坏，所以按空行切块，并如实说一声
+        var blocks = para.split(/\n{2,}/).filter(function (x) { return x.trim(); });
+        var trimmed = blocks.length > 2;
+        if (trimmed) para = blocks.slice(0, 2).join("\n\n");
+        if (para) {
+          var base0 = grab();
+          commit((base0 ? base0.replace(/\s+$/, "") + "\n\n" : "") + para, A.n);
+          note((trimmed ? "它一次写多了，只接了前两段。" : "已接到正文末尾并落成新版本。") +
+            (guide ? "" : " 它没给下一段的提示。"));
+        } else {
+          note("它没写出可以接的段落（多半是上文太少，先跟它说两句）。");
+        }
+        cell.t = (para ? "（已接进正文）\n\n" : "") + (guide || cell.t);
+      }
       if (A.k === "rev" || A.k === "ed") {
         var body2 = stripFence(cell.t);
         if (body2.length >= 24) commit(body2, A.n);
@@ -708,6 +739,7 @@ h2.sec{font-size:19px;margin:32px 0 8px;letter-spacing:.04em;border-bottom:1px s
     if (p) note("这一篇的活儿定了：<b>" + DIM[p.fruit].t + "</b>" + (why ? "（" + esc(why) + "）" : "") + "。你接着写就是。");
   }
 
+  var GO_MARK = "〔接着你写〕";
   function stripFence(s) {
     var m = String(s || "").trim().match(/^```[A-Za-z0-9_+-]*[ \t]*\r?\n([\s\S]*?)```\s*$/);
     return m ? m[1].trim() : String(s || "").trim();

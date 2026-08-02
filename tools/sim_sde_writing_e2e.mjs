@@ -94,7 +94,7 @@ sec("① 真装载");
   ok(!!A.$("seed") && !!A.$("seedgo"), "首屏没有开场入口");
   ok(A.$("start").style.display !== "none", "一进来就把开场框藏了");
   ok(A.$("fruit").style.display === "none", "还没定路径就亮出了「这一篇的活儿」");
-  ok(A.d.querySelectorAll(".ags button").length === 3, "不是三台智能体");
+  ok(A.d.querySelectorAll(".ags button").length === 4, "不是四台智能体");
   ok(A.d.querySelectorAll(".rtb button").length >= 12, "排版工具条按钮太少");
   ok(A.d.querySelectorAll(".quick button").length >= 4, "没有快捷问");
   /* 弹层里才有路径选单，首屏没有 */
@@ -248,6 +248,63 @@ sec("④b 修改说「改不动」时不许静默");
   ok(st.vers.length === 1, "「改不动」也被落成了一版");
   ok(A.$("note").textContent.indexOf("没有落成新版本") > -1,
     "没落版却一声不吭 —— 读者只会以为功能坏了：" + A.$("note").textContent);
+}
+
+/* ══ ④c WDS 接着写：只推一段，然后把笔交回去 ═════ */
+sec("④c 接着写：一段就停，接进正文并落版");
+{
+  const A = await mount({ queue: [[tok(
+    "他把剪下来的指甲收进一个铁盒，盖子拧了两圈。\n\n" +
+    "〔接着你写〕\n接下来写这个铁盒是哪来的——一句就够。")]] });
+  A.$("ed").innerHTML = "<p>他坐在阳台上，剪指甲。</p>";
+  A.$("ed").dispatchEvent(new A.w.Event("input"));
+  const agBtn = (kw) => [...A.d.querySelectorAll(".ags button")].find(b => b.textContent.indexOf(kw) > -1);
+  agBtn("接着写").click(); await A.wait(30);
+  ok(A.$("agdesc").textContent.indexOf("一段") > -1, "切到接着写之后说明没跟上");
+  A.$("in").value = "接着写一段"; A.$("go").click();
+  await A.wait(160);
+
+  const p = A.lastPost();
+  ok(p.body.q.indexOf("你是【WDS 接着写】") > -1, "没走接着写那台的 system");
+  ok(p.body.q.indexOf("最多写一段") > -1, "「最多一段」没带过去");
+  ok(p.body.q.indexOf("他坐在阳台上") > -1, "没把上文带过去（接不上就成了另起一篇）");
+
+  const st = JSON.parse(A.store["sde_writing_v1"] || "{}");
+  ok(st.vers.length === 2, "接着写没落成新版本：" + st.vers.length);
+  const v = String(st.vers[1]);
+  ok(v.indexOf("他坐在阳台上") > -1, "接着写把原文冲掉了（应当是接在末尾）");
+  ok(v.indexOf("铁盒") > -1, "写的那一段没接进正文");
+  ok(v.indexOf("接着你写") === -1, "交回笔的标记被写进了正文");
+  ok(v.indexOf("接下来写这个铁盒是哪来的") === -1, "引导语被写进了正文");
+
+  /* 引导语只留在对话里 */
+  const ms = A.$("ms").textContent;
+  ok(ms.indexOf("接下来写这个铁盒是哪来的") > -1, "引导语没留在对话里");
+  ok(ms.indexOf("已接进正文") > -1, "没告诉读者那一段已经接进去了");
+
+  /* 它写多了：只收前两段，并如实说一声 */
+  const B = await mount({ queue: [[tok("第一段。\n\n第二段。\n\n第三段。\n\n第四段。\n\n〔接着你写〕\n接着写第五段。")]] });
+  B.$("ed").innerHTML = "<p>原文。</p>";
+  B.$("ed").dispatchEvent(new B.w.Event("input"));
+  [...B.d.querySelectorAll(".ags button")].find(b => b.textContent.indexOf("接着写") > -1).click();
+  B.$("in").value = "接着写一段"; B.$("go").click();
+  await B.wait(160);
+  const sb = JSON.parse(B.store["sde_writing_v1"] || "{}");
+  const vb = String(sb.vers[sb.vi]);
+  ok(vb.indexOf("第二段") > -1 && vb.indexOf("第三段") === -1, "写多了没有截住：" + vb.slice(0, 60));
+  ok(B.$("note").textContent.indexOf("写多了") > -1, "截了却不吭声");
+
+  /* 接不下去：不硬写、不落版 */
+  const C = await mount({ queue: [[tok("〔接着你写〕\n你想让读的人记住哪一件具体的事？说一句我再往下接。")]] });
+  C.$("ed").innerHTML = "<p>短。</p>";
+  C.$("ed").dispatchEvent(new C.w.Event("input"));
+  [...C.d.querySelectorAll(".ags button")].find(b => b.textContent.indexOf("接着写") > -1).click();
+  C.$("in").value = "接着写一段"; C.$("go").click();
+  await C.wait(160);
+  const sc = JSON.parse(C.store["sde_writing_v1"] || "{}");
+  ok(sc.vers.length === 1, "它只反问了一句，却也被落成一版");
+  ok(C.$("note").textContent.indexOf("没写出可以接的段落") > -1, "接不出来时不吭声");
+  ok(C.$("ms").textContent.indexOf("你想让读的人记住哪一件") > -1, "反问没留在对话里");
 }
 
 /* ══ ⑤ 失败路径 ════════════════════════════════ */
