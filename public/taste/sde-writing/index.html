@@ -623,7 +623,11 @@ h2.sec{font-size:19px;margin:32px 0 8px;letter-spacing:.04em;border-bottom:1px s
       body: JSON.stringify({
         q: A.sys + "\n\n" + ctxOf() + "\n【他的话】\n" + q,
         history: hist, umem: "", key: kv.key, vendor: kv.vendor, model: kv.model || "",
-        mode: "std", web: 0, skey: "", about: "", lang: "zh", tool: ""
+        mode: "std", web: 0, skey: "", about: "", lang: "zh", tool: "",
+        /* nosite：这四台改的是读者自己的稿子，不需要全站检索。
+           那一段是最重的（一次基底调用 ＋ 逐分片取索引 ＋ 知识库），
+           线上诊断回执 `48 B · quota×1 · done · 2.6s` 正落在那里。 */
+        nosite: 1
       })
     }).then(function (resp) {
       diag.http = resp.status;

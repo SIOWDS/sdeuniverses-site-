@@ -126,6 +126,13 @@ sec("③ 页面接线");
   ok(/j\.t === "token"/.test(H), "SSE 正文事件名不是 token");
   ok(!/j\.t === "(text|delta)"/.test(H), "又按直觉写了 text/delta —— 那样一个字都不会出");
   ok(/诊断回执/.test(H), "没有诊断回执 —— 出问题查不下去");
+  /* 这四台改的是读者自己的稿子，不需要全站检索；那一段是最重的一段，
+     也正是线上把流掐断的地方（回执 48 B · quota×1 · done · 2.6s）。 */
+  ok(/nosite: 1/.test(H), "请求没带 nosite —— 会白跑一遍全站检索");
+  const W2 = fs.readFileSync(path.join(ROOT, "src/worker.js"), "utf8");
+  ok(/const noSite = b\.nosite === 1/.test(W2), "服务端没有 nosite 开关（前端带了也没人认）");
+  ok(/if \(!noSite\) try \{/.test(W2), "检索块没有按 nosite 跳过");
+  ok(!/if \(noSite\) throw/.test(W2), "用 throw 跳过检索 —— 会被 catch 吞掉，日后加日志就成了假错误");
   ok(/watchdog/.test(H), "没有看门狗");
   ok(/toMd\(\$\("ed"\)\.innerHTML\)/.test(H), "富文本没有序列化回 markdown（版本链与导出全建在它上面）");
 

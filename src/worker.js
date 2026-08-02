@@ -6047,6 +6047,14 @@ export default {
       // ①system 是可被基底前缀缓存的固定段，每轮换内容会把缓存打散；②这几条只对这一问相关，不该长驻。
       // 明确告诉它这是摘要不是原文，免得它照着复述、或假装记得摘要里没写的事。
       const umem = String(b.umem || "").slice(0, UMEM_MAX);
+      /* ── nosite：跳过全站检索 ────────────────────────────────
+         作文共创那四台（共创／修改／编辑／接着写）改的是**读者自己的稿子**，
+         不是回答站内问题；全站检索对它们一点用没有，却是最重的一段
+         （扩展检索词一次基底调用 ＋ 逐分片取索引 ＋ 结构化知识库）。
+         2026-08-02 线上诊断回执 `HTTP 200 · 48 B · 1 块 · quota×1 · done · 2.6s`
+         正落在这一段里：流在检索期被掐断，既没有 error 也没有 [DONE]。
+         ⇒ 给一个显式开关，让这类"就着你给的文本干活"的调用整段跳过。 */
+      const noSite = b.nosite === 1 || b.nosite === true;
       const userKey = String(b.key || "").trim();
       if (userKey.length < 8) return _sseResp([{ t: "error", v: "SDE 助教用你自己的 API Key 运行（在设置里填入，只存在你的浏览器本地，与本站无关）。", code: "need_key" }]);
       const vd = wdsVendorOf(b.vendor);
@@ -6137,7 +6145,9 @@ export default {
             if (imgs.length && !canSee) controller.enqueue(_sseBytes({ t: "note", v: "你传了 " + imgs.length + " 张图，但你现在选的这家基底在本站的接口下看不了图（能看图的是 智谱 GLM / 千问 Qwen / Kimi）。这一轮它**没有看到图**，只能就你的文字作答——要它真看图，去顶栏换一家。" }));
             else if (canSee) controller.enqueue(_sseBytes({ t: "note", v: "已把 " + imgs.length + " 张图直接交给 " + VC.name + " 的视觉档（" + VC.model + "）看——不是文字识别。" }));
             if (qCut > 0) controller.enqueue(_sseBytes({ t: "note", v: "你这一问超过 " + WDS_CHAT_Q_MAX + " 字，只带上了前 " + WDS_CHAT_Q_MAX + " 字（后面 " + qCut + " 字没进去）。这么长的材料建议用「＋」当附件传，别塞进提问框。" }));
-            try {
+            /* nosite 时整段跳过。用条件闸而不是 throw —— throw 会被下面那个
+               catch 吞掉，日后谁给 catch 加一行日志，"跳过"就会被报成"出错"。 */
+            if (!noSite) try {
               _st.stage = "扩展检索词";
               const expTerms = await sdeExpandQuery(VC, KEY, q);
               _st.stage = "站内检索";

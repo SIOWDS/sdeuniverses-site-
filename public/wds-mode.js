@@ -4576,7 +4576,8 @@
            而这种错在前端看不出来（表现是基底那边一句莫名其妙的报错）。 */
         q: tx("cvLabSys") + "\n\n" + cvLabCtx(it) + "\n【他的问题】\n" + q,
         history: hist, umem: "", key: kv.key, vendor: kv.vendor, model: kv.model || "",
-        mode: thinkMode, web: 0, skey: wdsSearchKey(), about: aboutPlus(), lang: LANG, tool: ""
+        mode: thinkMode, web: 0, skey: wdsSearchKey(), about: aboutPlus(), lang: LANG, tool: "",
+        nosite: 1     // 共创台就着画布这一件干活，不需要全站检索（那一段最重，也正是线上掐断的地方）
       })
     }).then(function (resp) {
       diag.http = resp.status;
