@@ -136,7 +136,9 @@ function defaultAnswer(userMsg, ctx) {
       : '打磨后的正文若干句，够长，末尾有句号。'.repeat(800);
   if (/请把它与既有说法逐一划清界线/.test(userMsg)) return demarcOK();
   if (/请执行涌现/.test(userMsg)) return '涌现物：命名为「外化固定症」。' + '一句判断撑住它。'.repeat(20);
-  if (/你是评审/.test(userMsg)) return '总分：152\n五维：S=150 D=151 E=152 I=153 F=150\n判级：典范级\n最该补的一刀：' + '再往下切一层。'.repeat(6);
+  if (/你是评审/.test(userMsg)) return (ctx && ctx.lowScore)
+    ? '总分：138\n五维：S=140 D=138 E=139 I=134 F=140\n判级：合格\n最该补的一刀：回炉到「涌现」，' + '再往下切一层。'.repeat(6)
+    : '总分：152\n五维：S=150 D=151 E=152 I=153 F=150\n判级：典范级\n最该补的一刀：' + '再往下切一层。'.repeat(6);
   if (/请先做体检/.test(userMsg))
     return '闸一：分数 8/10 ｜ 打架点一句话：三方把病根安在三个位置 ｜ 结局对立：有 ｜ 三方各自的硬证据：各有一条\n'
       + '闸二：同源度 低 ｜ 共享零件：无 ｜ 建议撞点：落在病根位置那一处\n闸三：最近的已发篇目：无 ｜ 处置：可发\n总判：放行';
@@ -155,7 +157,7 @@ function sseFor(text) {
 async function boot(opts) {
   opts = opts || {};
   const ctx = { calls: [], errors: [], saved: [], webQ: [], nbrQ: [], pulls: [], webBody: [],
-                pickOpt: opts.pickOpt, shortRewrite: opts.shortRewrite };
+                pickOpt: opts.pickOpt, shortRewrite: opts.shortRewrite, lowScore: opts.lowScore, drafts: [] };
   const vc = new VirtualConsole();
   vc.on('jsdomError', e => ctx.errors.push('jsdomError: ' + (e && e.message)));
   vc.on('error', (...a) => ctx.errors.push('console.error: ' + a.join(' ')));
@@ -223,12 +225,31 @@ async function boot(opts) {
       win.HTMLAnchorElement.prototype.click = function () {};
       win.scrollTo = function () {}; win.alert = function () {};
       win.URL.createObjectURL = () => 'blob:fake'; win.URL.revokeObjectURL = () => {};
+      // 存稿是逐格发生的，跑完再读只能读到最后一次——把每一次都记下来
+      const _set = win.Storage.prototype.setItem;
+      win.Storage.prototype.setItem = function (k, v) {
+        if (k === 'sde_conf_draft') { try { ctx.drafts.push(JSON.parse(v)); } catch (e) {} }
+        return _set.call(this, k, v);
+      };
       win.docx = {
         Document: function (o) { this.o = o; win.__lastDoc = o; },
         Packer: { toBlob: () => Promise.resolve(new win.Blob(['docx-bytes'])) },
         Paragraph: function (o) { this.o = o; }, TextRun: function (o) { this.o = o; },
         AlignmentType: { CENTER: 'center' }, HeadingLevel: { HEADING_1: 'h1', HEADING_2: 'h2' }
       };
+      if (opts.withSaveDir) {
+        win.WDSSaveDir = {
+          supported: () => true, name: () => '通融产出',
+          ensure: () => Promise.resolve(true), forget: () => Promise.resolve(true),
+          onChange: cb => { try { cb('通融产出'); } catch (e) {} },
+          save: (name, blob) => {
+            const rec = { name, size: blob && blob.size };
+            ctx.saved.push(rec);
+            if (blob && blob.text) { try { blob.text().then(t => { rec.text = t; }).catch(() => {}); } catch (e) {} }
+            return Promise.resolve({ where: 'dir', dir: '通融产出', name });
+          }
+        };
+      }
     }
   });
   ctx.dom = dom; ctx.win = dom.window; ctx.doc = dom.window.document;
@@ -581,6 +602,113 @@ function userOf(c, re) { const x = c.calls.filter(k => re.test(k.user)); return 
     await sleep(1200);
     ok('按停之后不再发新调令', c.calls.length === n1, n1 + ' → ' + c.calls.length);
     ok('没有跑到评审', !/创新智商/.test(c.$('stat-review').textContent), c.$('stat-review').textContent);
+  });
+
+  /* ---- 自动存稿：与分数无关 ---- */
+  await step('二十六、成文与打磨各存一次底稿（没选文件夹也不丢）', async () => {
+    const c = await boot();
+    fillQ(c, '为什么组织越想留住经验越留不住？', '认知心理学', '制度经济学', '组织社会学');
+    c.click('#goBtn');
+    await waitFor(() => /✓|⚠/.test(c.$('stat-write').textContent), 30000);
+    ok('交付区在成文那一格就露出来（不必等跑完）', c.$('deliver').style.display === '');
+    await waitFor(() => /创新智商|✓/.test(c.$('stat-review').textContent), 35000);
+    const tags = c.drafts.map(d => d.tag);
+    const d1 = c.drafts.find(d => d.tag === '成文');
+    ok('成文那一格存了一次', !!d1 && d1.md.length > 500, tags.join(' → '));
+    ok('打磨那一格又存了一次', tags.indexOf('打磨') > tags.indexOf('成文'), tags.join(' → '));
+    ok('评审与终稿也各存了一次', tags.some(t => /^评审/.test(t)) && tags.indexOf('终稿') >= 0, tags.join(' → '));
+    ok('底稿带着问题与题型', d1 && /question: 为什么组织/.test(d1.md) && /qtype: Why/.test(d1.md));
+    ok('底稿带着三家出处', d1 && /sources:/.test(d1.md) && /example\.org/.test(d1.md));
+    ok('存稿提示写明与评分无关', /存稿与评分无关/.test(c.$('draftNote').textContent), c.$('draftNote').textContent);
+  });
+
+  await step('二十七、不到 150 一样存（这正是此前会丢的那一格）', async () => {
+    const c = await boot({ lowScore: true, withSaveDir: true });
+    fillQ(c, '为什么组织越想留住经验越留不住？', '认知心理学', '制度经济学', '组织社会学');
+    c.click('#goBtn');
+    await waitFor(() => !!c.$('choice-review'), 35000);
+    const d = JSON.parse(c.win.localStorage.getItem('sde_conf_draft') || 'null');
+    ok('评审判了 138 分，稿子照样存了', !!d && /iq_self: 138/.test(d.md), d ? d.tag : '(无)');
+    ok('底稿的标签写着评审那一步与分数', d && /评审 138 分/.test(d.tag), d && d.tag);
+    ok('选了文件夹就直接落盘', c.saved.some(x => /^学科通融_.*_评审 138 分\.md$/.test(x.name)),
+       c.saved.map(x => x.name).join(' | '));
+    ok('落盘的是完整发布包（含正文与划界）', c.saved.length > 0);
+    c.click('#choice-review button[data-choice="keep"]');
+    await sleep(400);
+    ok('选了就这样交付之后，交付横幅出来了', /跑完了/.test(c.$('doneBanner').textContent), c.$('doneBanner').textContent);
+    ok('横幅如实写未过线', /未过线/.test(c.$('doneBanner').textContent));
+    ok('终稿又存了一次', c.saved.some(x => /_终稿\.md$/.test(x.name)), c.saved.map(x => x.name).join(' | '));
+  });
+
+  /* ---- 回炉由用户选 ---- */
+  await step('二十八、不到 150 当场给两个按钮，不自作主张', async () => {
+    const c = await boot({ lowScore: true });
+    fillQ(c, '为什么组织越想留住经验越留不住？', '认知心理学', '制度经济学', '组织社会学');
+    c.click('#goBtn');
+    const got = await waitFor(() => !!c.$('choice-review'), 35000);
+    ok('评审那一格弹出了选择', got);
+    const btns = Array.from(c.doc.querySelectorAll('#choice-review button[data-choice]')).map(b => b.getAttribute('data-choice'));
+    ok('正好两个选项：回炉 / 就这样交付', btns.length === 2 && btns.indexOf('redo') >= 0 && btns.indexOf('keep') >= 0, btns.join(','));
+    ok('问句里点名了回炉到哪一格', /回炉/.test(c.$('choice-review').textContent) && /涌现/.test(c.$('choice-review').textContent),
+       c.$('choice-review').textContent.slice(0, 70));
+    ok('问句里说清稿子已经存了', /已经自动存下来了/.test(c.$('choice-review').textContent));
+    ok('没等他点就先不动', !/跑完了/.test(c.$('doneBanner').textContent));
+    c.click('#choice-review button[data-choice="redo"]');
+    await sleep(600);
+    ok('选了回炉就真的回去重跑', c.win.eval('ST.rounds') === 1, String(c.win.eval('ST.rounds')));
+    ok('回的是评审点名的那一格', c.win.eval('ST.notes.join("|")').indexOf('涌现') >= 0, c.win.eval('ST.notes.join("|")'));
+    ok('记了一笔是他选的（不是机器自作主张）', c.win.eval('ST.notes.join("|")').indexOf('你选的') >= 0);
+  });
+
+  await step('二十九、勾了「自动回炉」才不问', async () => {
+    const c = await boot({ lowScore: true });
+    fillQ(c, '为什么组织越想留住经验越留不住？', '认知心理学', '制度经济学', '组织社会学');
+    c.$('autoRedoChk').checked = true;
+    c.click('#goBtn');
+    // 若它中途停下来问，rounds 会卡住不动——能一路走到 2，就证明两轮都没问
+    const two = await waitFor(() => c.win.eval('ST.rounds') >= 2, 35000);
+    ok('两轮回炉全自动，中途一次没停下来问', two, 'rounds=' + c.win.eval('ST.rounds'));
+    ok('两轮用满之后才开始问', !!c.$('choice-review') || c.win.eval('ST.rounds') === 2);
+    ok('红字写明是按他勾的那一项办的', /按你勾的/.test(c.$('errBox').textContent), c.$('errBox').textContent.slice(0, 60));
+    ok('并说明稿子已存', /已经存下来了/.test(c.$('errBox').textContent));
+  });
+
+  await step('三十、卡在选择上时按「停下」，不能卡死', async () => {
+    const c = await boot({ lowScore: true });
+    fillQ(c, '为什么组织越想留住经验越留不住？', '认知心理学', '制度经济学', '组织社会学');
+    c.click('#goBtn');
+    await waitFor(() => !!c.$('choice-review'), 35000);
+    c.click('#stopBtn');
+    await sleep(500);
+    ok('等待被解开、选择框收起', !c.$('choice-review'));
+    ok('产线真的停了（按钮复位）', c.$('goBtn').disabled === false && c.$('stopBtn').style.display === 'none');
+    ok('停下之前那一稿仍在', !!JSON.parse(c.win.localStorage.getItem('sde_conf_draft') || 'null'));
+  });
+
+  await step('三十一、下次开页面能把上一稿捞回来', async () => {
+    const c = await boot();
+    c.win.localStorage.setItem('sde_conf_draft', JSON.stringify({
+      t: Date.now(), title: '那一段谁走的', tag: '评审 138 分', score: 138, words: 19728, md: '# 那一段谁走的\n正文若干。' }));
+    c.win.eval('draftRestore()');
+    await sleep(80);
+    const bar = c.$('draftRestore');
+    ok('找回条露出来了', bar.style.display === '');
+    ok('写清是哪一稿、多少字、多少分', /那一段谁走的/.test(bar.textContent) && /19728/.test(bar.textContent) && /138/.test(bar.textContent),
+       bar.textContent.slice(0, 80));
+    ok('给了下载与丢掉两个口子', !!c.$('draftGet') && !!c.$('draftDrop'));
+    c.click('#draftDrop');
+    await sleep(80);
+    ok('丢掉之后条子收起、底稿也清了', bar.style.display === 'none' && !c.win.localStorage.getItem('sde_conf_draft'));
+  });
+
+  await step('三十二、清空重来不动上一场的底稿', async () => {
+    const c = await boot();
+    c.win.localStorage.setItem('sde_conf_draft', JSON.stringify({ t: Date.now(), title: 'X', words: 9, md: '# X' }));
+    c.$('apiKey').value = 'sk-fake';
+    c.click('#resetBtn');
+    await sleep(150);
+    ok('底稿还在（清的是这一场，不是他上一场的成果）', !!c.win.localStorage.getItem('sde_conf_draft'));
+    ok('找回条被重新挂上', c.$('draftRestore').style.display === '');
   });
 
   if (process.env.DUMP) {
