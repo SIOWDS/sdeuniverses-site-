@@ -766,7 +766,7 @@
       cvLabIns: "⤵ 插入正文", cvLabVer: "⟳ 落成新版本", cvLabCopy: "复制",
       cvLabInsOk: "已插到正文末尾（还没存版本，看一眼再「✓ 存为新版」）。",
       cvLabInsSel: "已换掉选中的那一段（还没存版本）。",
-      cvLabDiag: "〔诊断回执：{d}〕",
+      cvLabDiag: "〔诊断回执：{d}〕", cvLabRetry: "第一次一个字都没回来，自动重问一次…",
       cvLabEmpty: "流走完了，但**一个字节正文都没收到**。这不像网络断了——多半是这一档基底那边没吐出东西。再问一次，或到顶栏换一档（标准／深度思考）／换一家基底。",
       cvLabTimeout: "等了 {s} 秒一个字节都没来，判定这条连接已经死了。再问一次试试。",
       cvLabBadModel: "这一家说**这个型号不存在**——多半是默认型号过时了，或者你的账号没开通它。到顶栏的模型选择器里换一个型号再问（换完主对话也一起生效）。",
@@ -891,7 +891,7 @@
       cvLabIns: "\u2935 Insert", cvLabVer: "\u27f3 Save as version", cvLabCopy: "Copy",
       cvLabInsOk: "Appended to the end (not saved as a version yet).",
       cvLabInsSel: "Replaced the selected passage (not saved as a version yet).",
-      cvLabDiag: "[diagnostic: {d}]",
+      cvLabDiag: "[diagnostic: {d}]", cvLabRetry: "Nothing came back \u2014 retrying once\u2026",
       cvLabEmpty: "The stream finished but not a single byte of body arrived. Ask again, or switch tier/provider in the top bar.",
       cvLabTimeout: "No bytes for {s}s \u2014 the connection is dead. Ask again.",
       cvLabBadModel: "The provider says this model does not exist \u2014 the default is probably outdated, or your account has no access. Pick another model in the top bar selector and ask again.",
@@ -4526,7 +4526,7 @@
     return out;
   }
 
-  function cvLabAsk(it, q) {
+  function cvLabAsk(it, q, retry) {
     q = String(q || "").trim();
     if (!q || CV.labBusy) return;
     cvGrab();          // 先把编辑框里正在打的那句收下来，否则问的是上一版
@@ -4550,11 +4550,13 @@
     /* ⚠ 原来所有失败都收敛成同一句「没答上来（网络或额度）」——
        线上出问题时**根本查不下去**（HTTP 挂了？流是空的？事件名对不上？分不出来）。
        站上早有这条做法：**诊断回执**。这里如实记下走到哪一步、收到了什么。 */
-    var diag = { http: 0, ev: {}, bytes: 0, err: "" };
+    var diag = { http: 0, ev: {}, bytes: 0, err: "", chunks: 0, ended: "", t0: Date.now() };
     function diagLine() {
       var ks = Object.keys(diag.ev).map(function (k) { return k + "\u00d7" + diag.ev[k]; });
-      return "HTTP " + (diag.http || "?") + " \u00b7 " + diag.bytes + " B \u00b7 "
-        + (ks.length ? ks.join(" ") : "\u65e0\u4e8b\u4ef6") + (diag.err ? " \u00b7 " + diag.err : "");
+      return "HTTP " + (diag.http || "?") + " \u00b7 " + diag.bytes + " B \u00b7 " + diag.chunks + " \u5757 \u00b7 "
+        + (ks.length ? ks.join(" ") : "\u65e0\u4e8b\u4ef6")
+        + " \u00b7 " + (diag.ended || "?") + " \u00b7 " + Math.round((Date.now() - diag.t0) / 100) / 10 + "s"
+        + (diag.err ? " \u00b7 " + diag.err : "");
     }
     var ctrl = null;
     try { ctrl = new AbortController(); } catch (e) {}
@@ -4582,7 +4584,9 @@
       var reader = resp.body.getReader(), dec = new TextDecoder(), buf = "";
       function pump() {
         return reader.read().then(function (r) {
-          if (r.done) return;
+          /* 「怎么结束的」要分开记：`done`（对端关流）与 `[DONE]`（正常收尾）是两件事。 */
+          if (r.done) { diag.ended = "done"; return; }
+          diag.chunks++;
           bump();
           diag.bytes += (r.value && r.value.length) || 0;
           buf += dec.decode(r.value, { stream: true });
@@ -4591,7 +4595,7 @@
             var line = buf.slice(0, idx).trim(); buf = buf.slice(idx + 1);
             if (line.slice(0, 5) !== "data:") continue;
             var p = line.slice(5).trim();
-            if (p === "[DONE]") return;
+            if (p === "[DONE]") { diag.ended = "DONE"; return; }
             var j; try { j = JSON.parse(p); } catch (e) { diag.ev["\u574fjson"] = (diag.ev["\u574fjson"] || 0) + 1; continue; }
             var _t = String(j.t || "?"); diag.ev[_t] = (diag.ev[_t] || 0) + 1;
             /* ⚠ 正文事件名是 `token`（照主流程那条 pump 核对过）。
@@ -4616,11 +4620,23 @@
     }).then(function () {
       clearTimeout(wdT); delete cell.on;
       // 流走完却一个字节正文都没有：这不是"网络或额度"，要分开说，否则查不下去
+      /* 空正文自动重问一次（站上 llmText 那条中央修复同一做法）。只重一次，
+         且重之前把这一轮的空回话与提问撤掉 —— 留在历史里下一轮会更糟。 */
+      if (!cell.t && !retry) {
+        var lg = cvChat(it), i0 = lg.indexOf(cell);
+        if (i0 >= 0) lg.splice(i0, 1);
+        for (var i1 = lg.length - 1; i1 >= 0; i1--) { if (lg[i1].r === "me") { lg.splice(i1, 1); break; } }
+        CV.labBusy = false; cvLabPaint(it);
+        toast(tx("cvLabRetry"));
+        setTimeout(function () { cvLabAsk(it, q, 1); }, 400);
+        return;
+      }
       if (!cell.t) cell.t = tx("cvLabEmpty") + "\n\n" + tx("cvLabDiag", { d: diagLine() });
       CV.labBusy = false; labAbort = null; cvSave(); cvLabPaint(it);
     }, function (e) {
       clearTimeout(wdT); delete cell.on;
       diag.err = String((e && e.message) || e || "").slice(0, 120);
+      diag.ended = "throw";
       if (!cell.t) {
         cell.t = (diag.err === "watchdog" || /abort/i.test(diag.err))
           ? tx("cvLabTimeout", { s: 60 })

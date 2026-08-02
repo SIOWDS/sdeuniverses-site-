@@ -566,7 +566,7 @@ h2.sec{font-size:19px;margin:32px 0 8px;letter-spacing:.04em;border-bottom:1px s
   }
 
   var abortC = null;
-  function ask(q) {
+  function ask(q, retry) {
     q = String(q || "").trim();
     if (!q || ST.busy) return;
     var kv = keyGet();
@@ -584,10 +584,13 @@ h2.sec{font-size:19px;margin:32px 0 8px;letter-spacing:.04em;border-bottom:1px s
     hist = hist.slice(-8); hist.pop();
 
     /* 诊断回执：把三类失败分开说，否则线上出问题查不下去（ChatSDE 那边吃过这个亏）。 */
-    var diag = { http: 0, ev: {}, bytes: 0, err: "" };
+    var diag = { http: 0, ev: {}, bytes: 0, err: "", chunks: 0, ended: "", t0: Date.now() };
     function diagLine() {
       var ks = Object.keys(diag.ev).map(function (k) { return k + "×" + diag.ev[k]; });
-      return "HTTP " + (diag.http || "?") + " · " + diag.bytes + " B · " + (ks.length ? ks.join(" ") : "无事件") + (diag.err ? " · " + diag.err : "");
+      return "HTTP " + (diag.http || "?") + " · " + diag.bytes + " B · " + diag.chunks + " 块 · "
+        + (ks.length ? ks.join(" ") : "无事件")
+        + " · " + (diag.ended || "?") + " · " + Math.round((Date.now() - diag.t0) / 100) / 10 + "s"
+        + (diag.err ? " · " + diag.err : "");
     }
     try { abortC = new AbortController(); } catch (e) { abortC = null; }
     var wd = setTimeout(function () { diag.err = "watchdog"; try { if (abortC) abortC.abort(); } catch (e) {} }, 90000);
@@ -606,7 +609,10 @@ h2.sec{font-size:19px;margin:32px 0 8px;letter-spacing:.04em;border-bottom:1px s
       var rd = resp.body.getReader(), dec = new TextDecoder(), buf = "";
       function pump() {
         return rd.read().then(function (r) {
-          if (r.done) return;
+          /* ⚠ 「怎么结束的」必须记下来：`done`（对端关流）与 `[DONE]`（正常收尾）
+             是两件完全不同的事，收敛成一句话就再也分不出来了。 */
+          if (r.done) { diag.ended = "done"; return; }
+          diag.chunks++;
           clearTimeout(wd); wd = setTimeout(function () { diag.err = "watchdog"; try { if (abortC) abortC.abort(); } catch (e) {} }, 90000);
           diag.bytes += (r.value && r.value.length) || 0;
           buf += dec.decode(r.value, { stream: true });
@@ -615,7 +621,7 @@ h2.sec{font-size:19px;margin:32px 0 8px;letter-spacing:.04em;border-bottom:1px s
             var line = buf.slice(0, idx).trim(); buf = buf.slice(idx + 1);
             if (line.slice(0, 5) !== "data:") continue;
             var pp = line.slice(5).trim();
-            if (pp === "[DONE]") return;
+            if (pp === "[DONE]") { diag.ended = "DONE"; return; }
             var j; try { j = JSON.parse(pp); } catch (e) { diag.ev["坏json"] = (diag.ev["坏json"] || 0) + 1; continue; }
             var t0 = String(j.t || "?"); diag.ev[t0] = (diag.ev[t0] || 0) + 1;
             // ⚠ 正文事件名是 token（照 ChatSDE 主流程核对过，不许凭印象写 text/delta）
@@ -632,7 +638,20 @@ h2.sec{font-size:19px;margin:32px 0 8px;letter-spacing:.04em;border-bottom:1px s
       return pump();
     }).then(function () {
       clearTimeout(wd); delete cell.on; ST.busy = false; $("go").textContent = "送"; abortC = null;
-      if (!cell.t) cell.t = "流走完了，但一个字节正文都没收到。再问一次，或换一档／换一家基底。\n\n〔诊断回执：" + diagLine() + "〕";
+      /* 空正文自动重问一次 —— 与站上 llmText 那条中央修复同一条做法。
+         只重一次：重两次就成了自动烧额度。重之前把这一轮的空回话撤掉，
+         否则历史里会留下一条空的 wds 发言，下一轮喂回去反而更糟。 */
+      if (!cell.t && !retry) {
+        var idx0 = log.indexOf(cell);
+        if (idx0 >= 0) log.splice(idx0, 1);
+        var idx1 = log.lastIndexOf(log.filter(function (m) { return m.r === "me"; }).pop());
+        if (idx1 >= 0) log.splice(idx1, 1);
+        note("第一次一个字都没回来，自动重问一次…〔" + diagLine() + "〕");
+        paintMs();
+        setTimeout(function () { ask(q, 1); }, 400);
+        return;
+      }
+      if (!cell.t) cell.t = "问了两次都没吐出字来。多半是这一档基底那边的事——换一档或换一家试试。\n\n〔诊断回执：" + diagLine() + "〕";
       /* 修改与编辑交回的是整篇 —— 直接落成新版本，不必再按一次。共创**绝不**自动落版。 */
       if (A.k === "co") {
         var tk = takePath(cell.t);
@@ -644,6 +663,7 @@ h2.sec{font-size:19px;margin:32px 0 8px;letter-spacing:.04em;border-bottom:1px s
     }, function (e) {
       clearTimeout(wd); delete cell.on; ST.busy = false; $("go").textContent = "送"; abortC = null;
       diag.err = String((e && e.message) || e || "").slice(0, 120);
+      diag.ended = "throw";
       if (!cell.t) cell.t = ((diag.err === "watchdog" || /abort/i.test(diag.err)) ? "等了 90 秒一个字节都没来。" : "没答上来（网络或额度）。") +
         "\n\n〔诊断回执：" + diagLine() + "〕";
       save(); paintMs();

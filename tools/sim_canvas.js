@@ -144,7 +144,7 @@ function boot(opts) {
     cvLabSys: "你现在在画布的共创台上，和作者一起写这一件东西。",
     cvLabBadModel: "这一家说这个型号不存在——到顶栏的模型选择器里换一个型号再问。",
     cvLabDiag: "〔诊断回执：{d}〕", cvLabEmpty: "流走完了，但一个字节正文都没收到。",
-    cvLabTimeout: "等了 {s} 秒一个字节都没来。",
+    cvLabTimeout: "等了 {s} 秒一个字节都没来。", cvLabRetry: "自动重问一次…",
     cvNew: "＋ 新建", cvNewT: "新建", cvNewTitle: "无题 {n}", cvWrite: "✍ 现在就写一篇",
     cvToBox: "📥 投进草稿箱", cvToBoxT: "投稿", cvToBoxAsk: "留一句话", cvToBoxNo: "投不进去",
     cvKb: "⇧ 存进知识库", cvKbT: "存进知识库", cvKbNo: "模块没装载",
@@ -195,7 +195,10 @@ function boot(opts) {
     alert: () => {},
     LANG: "zh",
     inEl: { value: "", focus() {}, style: {}, scrollHeight: 40 },
-    setTimeout: (f, ms) => { if (opts.runTimers) f(); return 1; },
+    /* ⚠ 定时器桩要**按时长分**，不能"全跑或全不跑"：
+       短的（cvSave 400ms、空正文重试 400ms）该跑，长的（看门狗 60s）跑了就等于
+       每次请求一开始就自我 abort，测出来的全是假的失败。 */
+    setTimeout: (f, ms) => { if (opts.runTimers && (ms || 0) <= 1000) f(); return 1; },
     clearTimeout: () => {},
     Date, JSON, Math, String, Number, Object, Array, RegExp, parseInt, isNaN
   };
@@ -1201,13 +1204,20 @@ sec("⑱ 共创台：随时问两句，回话不自动进正文");
      原来 HTTP 挂了／流是空的／事件名对不上，全都收敛成同一句
      「没答上来（网络或额度）」—— 线上出问题时根本查不下去。 */
   // ① 流走完但零字节正文：不许再说成"网络或额度"
-  const C9 = boot({ labSse: ['data: {"t":"beat","v":{"sec":1}}', "data: [DONE]"] });
+  const C9 = boot({ runTimers: true, labSse: ['data: {"t":"beat","v":{"sec":1}}', "data: [DONE]"] });
   C9.cvAdd("md", "稿子", body); C9.cvPaint();
   C9.cvLabAsk(C9.CV.items[0], "问一句");
   await new Promise(r => setTimeout(r, 60));
   const l9 = C9.cvChat(C9.CV.items[0]);
-  const t9 = l9[l9.length - 1].t;
-  ok(t9.indexOf("一个字节正文都没收到") > -1, "流空却说成了网络或额度：" + t9);
+  /* ⚠ 按新事实更新：空正文现在会**先自动重问一次**（站上 llmText 那条做法），
+     两次都空才落到这句话上。所以要多等一轮再判。 */
+  await new Promise(r => setTimeout(r, 600));
+  const l9b = C9.cvChat(C9.CV.items[0]);
+  const t9b = l9b[l9b.length - 1].t;
+  ok(t9b.indexOf("一个字节正文都没收到") > -1, "两次都空却说成了网络或额度：" + t9b);
+  ok(C9._.toasts.some(m => String(m).indexOf("自动重问") > -1), "空正文没有自动重问一次");
+  ok((C9._.ctx._posts || []).length === 2, "自动重试没有真的再发一次：" + (C9._.ctx._posts || []).length);
+  const t9 = t9b;   // 下面几条回执断言沿用这一份
   ok(t9.indexOf("诊断回执") > -1, "没有诊断回执 —— 下一次还是查不下去");
   ok(/beat×1/.test(t9), "回执没记下收到了哪些事件：" + t9);
   ok(/HTTP 200/.test(t9), "回执没记 HTTP 状态：" + t9);
@@ -1216,6 +1226,25 @@ sec("⑱ 共创台：随时问两句，回话不自动进正文");
   const mB = /\s(\d+) B\s/.exec(t9);
   ok(!!mB, "回执没记字节数：" + t9);
   ok(mB && Number(mB[1]) > 0, "收到了事件却记成 0 字节 —— 那就分不出「流是空的」和「连接没通」：" + t9);
+  /* 块数与「怎么结束的」是这次线上定位的关键两读数：
+     `done`（对端把流关了）与 `DONE`（正常收尾）是两件完全不同的事。 */
+  // ⚠ 要判**非零**：写成 `\d+ 块` 时，压根不记（恒为 0 块）也照样匹配
+  const mC = /·\s*(\d+)\s*块\s*·/.exec(t9);
+  ok(!!mC && Number(mC[1]) > 0, "回执没记块数（或恒为 0）：" + t9);
+  ok(/·\s*DONE\s*·/.test(t9), "正常收尾没记成 DONE：" + t9);
+  // ⚠ 回执被〔…〕包着，末尾是 `0s〕` —— 别要求后面必须是空白或行尾
+  ok(/·\s*[\d.]+s/.test(t9), "回执没记用了多久：" + JSON.stringify(t9));
+
+  /* ⚠ 「怎么结束的」要分两种情形测：
+     上面那条走的是 `[DONE]` 分支，动不到 `r.done` 那一行。
+     这里补一个**对端不发 [DONE] 直接关流**的用例 —— 那才是线上遇到的形状。 */
+  const C9b = boot({ runTimers: true, labSse: ['data: {"t":"beat","v":{"sec":1}}'] });
+  C9b.cvAdd("md", "稿子", body); C9b.cvPaint();
+  C9b.cvLabAsk(C9b.CV.items[0], "问一句");
+  await new Promise(r => setTimeout(r, 700));
+  const lb9 = C9b.cvChat(C9b.CV.items[0]);
+  const tb = lb9[lb9.length - 1].t;
+  ok(/·\s*done\s*·/.test(tb), "对端直接关流没记成 done（与正常收尾 DONE 分不开了）：" + tb);
 
   // ② 请求异常：回执要带上异常本身
   const C10 = boot({ labFail: true });
