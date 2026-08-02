@@ -139,8 +139,8 @@ console.log("\n【七】接线：answerWDS 真的把历史装进 messages");
 {
   const src = fs.readFileSync(new URL("../src/worker.js", import.meta.url), "utf8");
   ok("旧的 _wdsChatContext 已彻底移除", !/_wdsChatContext/.test(src));
-  ok("answerWDS 收 beforeId", /async answerWDS\(question, beforeId\)/.test(src));
-  ok("调用点递了当前消息 id", /answerWDS\(_wq, msg\.id\)/.test(src));
+  ok("answerWDS 收 beforeId", /async answerWDS\(question, beforeId\b/.test(src));
+  ok("调用点递了当前消息 id", /answerWDS\(_wq, msg\.id\b/.test(src));
   const seg = src.slice(src.indexOf("async answerWDS"), src.indexOf("async answerWDS") + 9000);
   ok("取历史时带上 tier、beforeId 与现算的预算", /_wdsHistory\(tier, beforeId, Math\.max\(WDS_HIST_FLOOR/.test(seg));
   ok("历史铺进 messages 数组（system 之后、当前问题之前）",

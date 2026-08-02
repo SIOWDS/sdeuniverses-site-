@@ -376,6 +376,23 @@ const WDS_IMG_MAX = 4, WDS_IMG_BYTES = 6 * 1024 * 1024;
 /* 装全能之后固定部分（内功≈3.3 万字＋心得＋完整方法论≈4 千字＋站内资料）已经很厚，
    历史预算按「总预算 − 固定部分」现算，且不低于 WDS_HIST_FLOOR——
    宁可少记几轮，也不要因为撞爆上下文窗而整条答不出来。 */
+/* @WDS 改走 BYOK（2026-08-02）：**烧的是提问者自己的 Key，不再是平台的**。
+   Key 由前端随消息带上来（同全站 BYOK 规范键 sde_wds_key / sde_wds_vendor），
+   服务端**只透传给厂商，不落库、不进日志、不回显**。
+   WDS_PLATFORM_FALLBACK=false ⇒ 没带 Key 就如实说，不拿平台的钱替他答；
+   改成 true 即恢复旧行为（平台兜底），一行可切。 */
+const WDS_PLATFORM_FALLBACK = false;
+const WDS_VD_ALIAS = { ds: "deepseek", glm: "zhipu", deepseek: "deepseek", zhipu: "zhipu", kimi: "kimi", qwen: "qwen", minimax: "minimax" };
+function wdsByok(raw) {
+  try {
+    if (!raw || typeof raw !== "object") return null;
+    const k = String(raw.key || "").trim();
+    if (k.length < 8 || k.length > 200) return null;
+    const vd = WDS_VD_ALIAS[String(raw.vendor || "ds").toLowerCase()];
+    if (!vd || !WDS_VENDORS[vd]) return null;
+    return { key: k, vd: vd };
+  } catch (e) { return null; }
+}
 const WDS_TOTAL_CHARS = { deep: 100000, quick: 60000 };
 const WDS_HIST_FLOOR = 8000;
 const WDS_CTX = {
@@ -1754,7 +1771,7 @@ async function drScan(ctx) {
           return Response.json({ ok: true, items: st.log.filter((m) => m.id > since), recalls: st.log.filter((m) => m.recalled).map((m) => m.id), last: st.seq, online: this.ctx.getWebSockets().length }, { headers: { "cache-control": "no-store" } });
         }
         if (body.op === "recall") { const rr = await this.chatRecall(who.name, body.id); return Response.json(rr.ok ? { ok: true } : { ok: false, msg: rr.msg }, { status: rr.ok ? 200 : 400 }); }
-        const r = await this.chatAdd(who.name, body.text, _dmc ? { parties: _dmc, uid: who.uid } : (_gidc ? { gid: _gidc, uid: who.uid } : null), body.re);
+        const r = await this.chatAdd(who.name, body.text, _dmc ? { parties: _dmc, uid: who.uid } : (_gidc ? { gid: _gidc, uid: who.uid } : null), body.re, wdsByok(body.byok));
         return Response.json(r.ok ? { ok: true } : { ok: false, msg: r.msg }, { status: r.ok ? 200 : (r.code || 400) });
       }
       return new Response("method", { status: 405 });
@@ -1855,7 +1872,7 @@ async function drScan(ctx) {
     const seq = (await this.ctx.storage.get("cseq")) || 0;
     return { log, seq };
   }
-  async chatAdd(name, rawText, im, reId) {
+  async chatAdd(name, rawText, im, reId, byok) {
     const clean = (s, n) => String(s || "").replace(/[\u0000-\u0009\u000b-\u001f]/g, "").trim().slice(0, n);
     name = clean(name, 20);
     const text = clean(rawText, 500);
@@ -1886,7 +1903,8 @@ async function drScan(ctx) {
     if (im) this._imBump(im, name, text);
     const _wq = wdsQuestion(text);
     // 把当前这条的 id 一起递过去：历史只取它**之前**的，否则当前提问会重复出现一次。
-    if (_wq) { try { this.ctx.waitUntil(this.answerWDS(_wq, msg.id).catch(() => {})); } catch (e) { this.answerWDS(_wq, msg.id).catch(() => {}); } }
+    // byok 只在本次请求里活着——不写 clog、不写 storage、不进广播。
+    if (_wq) { try { this.ctx.waitUntil(this.answerWDS(_wq, msg.id, byok).catch(() => {})); } catch (e) { this.answerWDS(_wq, msg.id, byok).catch(() => {}); } }
     return { ok: true };
   }
   async chatRecall(name, id) {
@@ -2009,7 +2027,7 @@ async function drScan(ctx) {
       return s.length > 2200 ? s.slice(0, 2200) : s;
     } catch (e) { return ""; }
   }
-  async answerWDS(question, beforeId) {
+  async answerWDS(question, beforeId, byok) {
     const now = Date.now();
     const last = (await this.ctx.storage.get("wdslast")) || 0;
     if (now - last < 2000) return;
@@ -2018,7 +2036,16 @@ async function drScan(ctx) {
     const tier = /快答|简答/i.test(question) ? "quick" : "deep";
     const q = tier === "quick" ? (String(question).replace(/快答|简答/g, "").replace(/\s+/g, " ").trim() || question) : question;
     let VC = null, key = "", rvendor = "glm";
-    try {
+    /* ① 首选提问者自己的 Key。谁 @ 的谁付钱——这也让每个人对自己的用量有感。
+          注意群聊里答案是全群可见的，但账记在提问者头上，界面上已写明这一点。 */
+    if (byok && byok.key) {
+      const _b = WDS_VENDORS[byok.vd];
+      VC = { url: _b.url, model: _b.model };
+      key = byok.key;
+      rvendor = ({ zhipu: "glm", deepseek: "ds" })[byok.vd] || byok.vd;
+    }
+    // ② 平台兜底：默认关。开着等于门卡形同虚设（没配 Key 的人照样花平台的钱）。
+    if (!key && WDS_PLATFORM_FALLBACK) try {
       const cv = this.env.CONFIG_VAULT.get(this.env.CONFIG_VAULT.idFromName("global"));
       const r = await (await cv.fetch(new Request("https://cfg.internal/", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ op: "getVendor" }) }))).json();
       if (r && r.vendor && WDS_VENDORS[r.vendor] && r.key) {
@@ -2027,15 +2054,18 @@ async function drScan(ctx) {
         rvendor = ({ zhipu: "glm", deepseek: "ds" })[r.vendor] || r.vendor;
       }
     } catch (e) {}
-    if (!key) {
+    if (!key && WDS_PLATFORM_FALLBACK) {
       try {
         const cv = this.env.CONFIG_VAULT.get(this.env.CONFIG_VAULT.idFromName("global"));
         const r = await (await cv.fetch(new Request("https://cfg.internal/", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ op: "get" }) }))).json();
         if (r && r.key) { VC = { url: "https://open.bigmodel.cn/api/paas/v4/chat/completions", model: "glm-5" }; key = r.key; rvendor = "glm"; }
       } catch (e) {}
     }
-    if (!key) key = (this.env && this.env.SDE_SEARCH_KEY) || "";
-    if (!key || !VC) { await this.chatAddBot("（WDS智能体暂时不可用：管理员还没配置基底密钥——点右上角 ⚙ 选基底、填密钥。）"); return; }
+    if (!key && WDS_PLATFORM_FALLBACK) key = (this.env && this.env.SDE_SEARCH_KEY) || "";
+    if (!key || !VC) {
+      await this.chatAddBot("（我要用**你自己的 API Key** 才能作答——在「我」页点「🔑 基底 Key」填一个，再 @我一次。答案全群可见，但这一次调用记在你的账上。）");
+      return;
+    }
     const base = "https://sdeuniverses.com/";
     // 满血：完整原始内功先验（96KB sde-neigong，模块级缓存）
     let neigong = "";
@@ -2192,7 +2222,7 @@ async function drScan(ctx) {
     if (d.t === "msg") {
       const att = ws.deserializeAttachment() || {};
       if (!att.name || ((att.dm || att.g) && !att.uid)) { try { ws.send(JSON.stringify({ t: "err", m: "login" })); } catch (e) {} return; }
-      const r = await this.chatAdd(att.name, d.text, att.dm ? { parties: att.dm, uid: att.uid } : (att.g ? { gid: att.g, uid: att.uid } : null), d.re);
+      const r = await this.chatAdd(att.name, d.text, att.dm ? { parties: att.dm, uid: att.uid } : (att.g ? { gid: att.g, uid: att.uid } : null), d.re, wdsByok(d.byok));
       if (!r.ok) { try { ws.send(JSON.stringify({ t: "err", m: r.msg || "发送失败" })); } catch (e) {} }
       return;
     }

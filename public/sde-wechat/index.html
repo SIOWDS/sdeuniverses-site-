@@ -506,6 +506,31 @@ a{color:var(--disc)}
       <div class="scroll" id="nw-list"><div class="hint">正在加载…</div></div>
     </div>
 
+    <div class="view" id="v-key">
+      <div style="padding:14px 16px;max-width:560px;margin:0 auto">
+        <h2 id="key-ttl" style="font-size:1.05rem;margin:6px 0 4px">🔑 配置你的基底 Key</h2>
+        <p id="key-why" style="font-size:0.82rem;color:var(--muted);line-height:1.7;margin:0 0 14px">
+          SDE 社区里的 <b>@WDS 智能体</b>用的是<b>你自己的</b> API Key——谁 @ 它，就记在谁账上。
+          你的 Key 只存在这台机器的浏览器里，发问时随那一次请求转给厂商，<b>本站不保存、不记录</b>。
+          在 ChatSDE 或站上任何一篇文章的陪读里填过 Key 的话，下面会自动带出来。
+        </p>
+        <label style="display:block;font-size:0.8rem;color:var(--muted);margin-bottom:4px">选一家基底</label>
+        <select id="key-vd" style="width:100%;padding:9px;border-radius:8px;border:1px solid var(--line);margin-bottom:12px">
+          <option value="ds">DeepSeek（platform.deepseek.com）</option>
+          <option value="glm">智谱 GLM（open.bigmodel.cn）</option>
+          <option value="kimi">Kimi（platform.moonshot.cn）</option>
+          <option value="qwen">千问 Qwen（bailian.console.aliyun.com）</option>
+        </select>
+        <label style="display:block;font-size:0.8rem;color:var(--muted);margin-bottom:4px">粘贴 API Key</label>
+        <input id="key-in" type="password" autocomplete="off" placeholder="sk-…" style="width:100%;padding:9px;border-radius:8px;border:1px solid var(--line)">
+        <div id="key-probe-slot" style="margin-top:10px"></div>
+        <div style="display:flex;gap:8px;margin-top:14px">
+          <button id="key-save" style="flex:1">保存并进入</button>
+          <button id="key-skip" style="display:none">稍后再说</button>
+        </div>
+        <div id="key-msg" style="font-size:0.8rem;margin-top:10px;min-height:1.2em"></div>
+      </div>
+    </div>
     <div class="view" id="v-me">
       <div class="scroll">
         <div class="me-card">
@@ -518,6 +543,7 @@ a{color:var(--disc)}
             <div class="me-item"><span>SDE 会议室</span><a href="/meeting/"><button>进入</button></a></div>
             <div class="me-item"><span>💡 思想库存<br><span style="font-size:0.74rem;color:var(--muted)">对话里撞出来的东西存在这儿，发社区动态、立候选卡都从这儿取</span></span><button id="b-vault">进入</button></div>
             <div class="me-item"><span>📦 我的知识库<br><span style="font-size:0.74rem;color:var(--muted)">画布上锻出来的稿子存在这儿——只有你看得见，换台机器也还在</span></span><button id="b-kb">进入</button></div>
+            <div class="me-item"><span>🔑 基底 Key<br><span style="font-size:0.74rem;color:var(--muted)">@WDS 用的是你自己的 Key；随时可换、可检测</span></span><button id="b-key">设置</button></div>
             <div class="me-item"><span>📚 文章库<br><span style="font-size:0.74rem;color:var(--muted)">站上的文章收在这儿；发帖发社区动态时可以随时插一篇进去</span></span><button id="b-lib">进入</button></div>
             <div class="me-item"><span>全权管理</span><button id="b-admin">进入</button></div>
             <div class="me-item"><span>退出登录</span><button id="b-out">退出</button></div>
@@ -584,9 +610,9 @@ function setStat(state){var d=el("t-dot"),s=el("t-stat");
 
 /* ── 视图 ── */
 function show(v){
-  ["gate","who","home","chats","book","talk","gnew","ginfo","me","fwd","admin","moments","mopost","monews","dtalk","cand","cdnew","cdone","cdnews","vault","lib","kb"].forEach(function(x){el("v-"+x).classList.toggle("on",x===v)});
+  ["gate","who","home","chats","book","talk","gnew","ginfo","me","fwd","admin","moments","mopost","monews","dtalk","cand","cdnew","cdone","cdnews","vault","lib","kb","key"].forEach(function(x){el("v-"+x).classList.toggle("on",x===v)});
   el("tabs").style.display=(v==="gate")?"none":"flex";
-  el("t-back").style.display=(v==="talk"||v==="gnew"||v==="ginfo"||v==="fwd"||v==="admin"||v==="mopost"||v==="monews"||v==="dtalk"||v==="cdnew"||v==="cdone"||v==="cdnews"||v==="vault"||v==="lib"||v==="kb"||v==="who"||(v==="moments"&&moWho)||(v==="cand"&&cdWho))?"block":"none";
+  el("t-back").style.display=(v==="talk"||v==="gnew"||v==="ginfo"||v==="fwd"||v==="admin"||v==="mopost"||v==="monews"||v==="dtalk"||v==="cdnew"||v==="cdone"||v==="cdnews"||v==="vault"||v==="lib"||v==="kb"||(v==="key"&&!keyGate)||v==="who"||(v==="moments"&&moWho)||(v==="cand"&&cdWho))?"block":"none";
   el("t-sub").style.display=(v==="talk")?"flex":"none";
   el("t-act").style.display=(v==="talk"&&cur&&cur.kind==="g")?"block":"none";
   el("t-plaza").style.display=(v==="home"||v==="chats"||v==="book"||v==="me")?"block":"none";
@@ -603,7 +629,7 @@ function show(v){
   else if(v==="cdone")el("t-ttl").textContent="候选卡";
   else if(v==="cdnews")el("t-ttl").textContent="顶回提醒";
   else if(v==="who")el("t-ttl").textContent=whoName||"成员";
-  else if(v==="vault")el("t-ttl").textContent="💡 思想库存";   else if(v==="lib")el("t-ttl").textContent="📚 文章库";   else if(v==="kb")el("t-ttl").textContent="📦 我的知识库";
+  else if(v==="vault")el("t-ttl").textContent="💡 思想库存";   else if(v==="lib")el("t-ttl").textContent="📚 文章库";   else if(v==="kb")el("t-ttl").textContent="📦 我的知识库";   else if(v==="key")el("t-ttl").textContent="🔑 基底 Key";
   else if(v==="cand")el("t-ttl").textContent=cdWho?(cdWhoName+"的候选"):"候选";
   else if(v==="moments")el("t-ttl").textContent=moWho?(moWhoName+"的社区动态"):"社区动态";
   else if(v!=="talk")el("t-ttl").textContent="SDE 社区";
@@ -1004,6 +1030,66 @@ el("b-admin").onclick=function(){
 el("ad-go").onclick=adUnlock;
 el("ad-pw").addEventListener("keydown",function(e){if(e.key==="Enter")adUnlock();});
 
+/* ── 基底 Key（BYOK）──────────────────────────────────────────────
+   与全站陪读 wds-read.js 用**同一套键名与借位顺序**：sde_wds_key / sde_wds_vendor，
+   本入口没存过就借品尝系列/ChatSDE 已存的规范键。反过来，这里保存也回写规范键，
+   于是「在哪儿填过一次，处处都有」。**Key 只在本机 localStorage，发问时随那一次请求走。** */
+var keyGate=false;
+var KEY_VDS=["ds","glm","kimi","qwen"];
+function wdsKeyGet(){try{
+  var k=(localStorage.getItem("sde_wds_key")||"").trim(),v=localStorage.getItem("sde_wds_vendor")||"ds";
+  if(k.length>=8&&KEY_VDS.indexOf(v)>=0)return{key:k,vendor:v};
+  for(var i=0;i<KEY_VDS.length;i++){var d=(localStorage.getItem("sde_"+KEY_VDS[i]+"_key")||"").trim();if(d.length>=8)return{key:d,vendor:KEY_VDS[i]};}
+  return null;}catch(e){return null;}}
+function wdsKeySave(k,v){try{
+  localStorage.setItem("sde_wds_key",k);localStorage.setItem("sde_wds_vendor",v);
+  localStorage.setItem("sde_"+v+"_key",k);return true;}catch(e){return false;}}
+/* 只有真的 @了它才把 Key 递上去——普通聊天一个字节都不多传。 */
+function byokFor(t){if(!/@\s*(sde|wds|王德生)/i.test(String(t||"")))return undefined;var kv=wdsKeyGet();return kv?{key:kv.key,vendor:kv.vendor}:undefined;}
+function keyOpen(){
+  var kv=wdsKeyGet()||{key:"",vendor:"ds"};
+  el("key-vd").value=kv.vendor;el("key-in").value=kv.key;
+  el("key-msg").textContent="";
+  el("key-ttl").textContent=keyGate?"🔑 先配一个基底 Key":"🔑 基底 Key";
+  el("key-save").textContent=keyGate?"保存并进入":"保存";
+  show("key");
+}
+var keyWired=false;
+function keyWire(){
+  if(keyWired)return;keyWired=true;
+  var b=el("b-key");if(b)b.onclick=function(){keyGate=false;keyOpen();};
+  el("key-save").onclick=function(){
+    var k=el("key-in").value.trim(),v=el("key-vd").value;
+    if(k.length<8){el("key-msg").style.color="#c33";el("key-msg").textContent="这个 Key 看起来太短了，请检查。";return;}
+    if(!wdsKeySave(k,v)){el("key-msg").style.color="#c33";el("key-msg").textContent="这台浏览器不让存本地数据（无痕模式？），换个窗口再试。";return;}
+    el("key-msg").style.color="var(--muted)";el("key-msg").textContent="已保存在这台机器上。";
+    if(keyGate){keyGate=false;show("home");homeLoad();}else{show("me");}
+  };
+  el("key-in").addEventListener("input",function(){el("key-msg").textContent="";});
+  el("key-vd").addEventListener("change",function(){el("key-msg").textContent="";});
+  keyProbeWire();
+}
+/* 检测：复用全站共享件 sde-keyprobe.js（判档口径全站一份，改一处四页都变）。
+   懒加载——大多数人不会点它，不该为它给每次进社区加一个请求。装不上不拦路。 */
+function keyProbeWire(){
+  var slot=el("key-probe-slot");if(!slot||slot.__on)return;slot.__on=1;
+  var s=document.createElement("script");s.src="/taste/assets/sde-keyprobe.js?v=1";
+  s.onload=function(){try{
+    if(!window.SDEKeyProbe)return;
+    window.SDEKeyProbe.attach([{key:"key-in",sel:"key-vd"}],{
+      isOverseas:function(){return false;},
+      apiUrl:function(sel){return({ds:"https://api.deepseek.com/v1/chat/completions",
+        glm:"https://open.bigmodel.cn/api/paas/v4/chat/completions",
+        kimi:"https://api.moonshot.cn/v1/chat/completions",
+        qwen:"https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions"})[sel];},
+      chatHeaders:function(sel,k){return{"content-type":"application/json","authorization":"Bearer "+k};},
+      buildPayload:function(sel,sys,usr,tok){return{model:({ds:"deepseek-v4-flash",glm:"glm-5-air",kimi:"kimi-k2.6",qwen:"qwen-plus"})[sel],
+        max_tokens:tok,stream:false,messages:[{role:"system",content:sys},{role:"user",content:usr}]};}
+    });
+  }catch(e){}};
+  s.onerror=function(){/* 检测装不上就没有那个钮，保存照常可用 */};
+  document.head.appendChild(s);
+}
 el("t-back").onclick=function(){
   if(el("v-dtalk").classList.contains("on")){show("chats");loadInbox();return;}
   if(el("v-mopost").classList.contains("on")||el("v-monews").classList.contains("on")){show("moments");return;}
@@ -1011,6 +1097,7 @@ el("t-back").onclick=function(){
   if(el("v-admin").classList.contains("on")){show("me");return;}
   if(el("v-cdnew").classList.contains("on")||el("v-cdone").classList.contains("on")||el("v-cdnews").classList.contains("on")){show("cand");return;}
   if(el("v-kb").classList.contains("on")){if(kbOpen){kbOpen=null;kbLoad();return;}show("me");return;}
+  if(el("v-key").classList.contains("on")){show("me");return;}
   if(el("v-lib").classList.contains("on")){show(lbFrom||"me");return;}
   if(el("v-vault").classList.contains("on")){show(vtFrom||"me");return;}
   if(el("v-cand").classList.contains("on")&&cdWho){cdGo("","");return;}
@@ -1067,6 +1154,9 @@ function afterLogin(){
     if(x.s===401||!x.d||!x.d.ok){logout();return;}
     ME=x.d.me;contacts=x.d.contacts||[];
     el("me-nm").textContent=ME.name;el("me-uid").textContent="ID "+ME.uid;
+    keyWire();
+    // 门卡：没配 Key 就停在配置页，不进社区。@WDS 是这里的公共设施，而它烧的是各人自己的 Key。
+    if(!wdsKeyGet()){keyGate=true;keyOpen();loadInbox();loadGroups();return;}
     show("home");homeLoad();loadInbox();loadGroups();moBadge();cdWire();cdBadge();whoWire();vtWire();lbWire();insWire();dtBadge();
     if(inboxT)clearInterval(inboxT);
     inboxT=setInterval(function(){loadInbox(true);moBadge();dtBadge();},15000);
@@ -1405,7 +1495,7 @@ function doSend(){
   var re=replyTo?replyTo.id:undefined;
   if(usePoll){
     el("b-send").disabled=true;
-    fetch("/api/chat?room="+encodeURIComponent(cur.room),{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({credential:CRED,text:t,re:re})})
+    fetch("/api/chat?room="+encodeURIComponent(cur.room),{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({credential:CRED,text:t,re:re,byok:byokFor(t)})})
     .then(function(r){return r.json().then(function(d){return{s:r.status,d:d}})}).then(function(x){
       el("b-send").disabled=false;
       if(x.d&&x.d.ok){clearInput();}
@@ -1414,7 +1504,7 @@ function doSend(){
     }).catch(function(){el("b-send").disabled=false;note("网络异常。")});
   }else{
     if(!(ws&&connected)){note("正在重连，请稍候…");return;}
-    wsSend({t:"msg",text:t,re:re});clearInput();
+    wsSend({t:"msg",text:t,re:re,byok:byokFor(t)});clearInput();
   }
 }
 function clearInput(){if(cur&&cur.key)draftSet(cur.key,"");el("text").value="";note("");el("text").style.height="40px";replyTo=null;el("replybar").classList.remove("on");}
