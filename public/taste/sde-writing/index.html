@@ -469,8 +469,21 @@ h2.sec{font-size:19px;margin:32px 0 8px;letter-spacing:.04em;border-bottom:1px s
   };
 
   /* ══════════ Key ══════════════════════════════════ */
-  var VENDORS = [["ds", "DeepSeek"], ["glm", "智谱 GLM"], ["kimi", "Kimi"], ["qwen", "千问 Qwen"], ["mm", "MiniMax"]];
-  function vKey(v) { try { return (localStorage.getItem("sde_wds_key_" + v) || (v === "ds" ? (localStorage.getItem("sde_wds_key") || "") : "")).trim(); } catch (e) { return ""; } }
+  /* ⚠ Key 的存储键名**逐字照抄 wds-mode.js 的 VENDORS[].ks**，不许自己拼。
+     我第一版按 `sde_wds_key_<短码>` 拼了一套 —— 那个键根本不存在，
+     结果是：读者明明在 ChatSDE 配好了 Key，这一页一律说「还没配 Key」。
+     语法没错、静态断言也全绿，是端到端干跑抓到的。 */
+  var VENDORS = [["ds", "DeepSeek", "sde_ds_key"], ["glm", "智谱 GLM", "sde_glm_key"],
+    ["kimi", "Kimi", "sde_kimi_key"], ["qwen", "千问 Qwen", "sde_qwen_key"], ["mm", "MiniMax", "sde_mm_key"]];
+  function vKs(v) { for (var i = 0; i < VENDORS.length; i++) if (VENDORS[i][0] === v) return VENDORS[i][2]; return VENDORS[0][2]; }
+  function vKey(v) {
+    try {
+      var k = (localStorage.getItem(vKs(v)) || "").trim();
+      // 老读者可能还留着最早那个不分厂商的键
+      if (!k && v === "ds") k = (localStorage.getItem("sde_wds_key") || "").trim();
+      return k;
+    } catch (e) { return ""; }
+  }
   function keyGet() {
     var v = "";
     try { v = localStorage.getItem("sde_wds_vendor") || "ds"; } catch (e) { v = "ds"; }
@@ -658,7 +671,14 @@ h2.sec{font-size:19px;margin:32px 0 8px;letter-spacing:.04em;border-bottom:1px s
         cell.t = tk.t;
         if (tk.hit) setPath(tk.hit, "共创判的");
       }
-      if ((A.k === "rev" || A.k === "ed") && cell.t.length > 30) commit(stripFence(cell.t), A.n);
+      /* 修改／编辑交回的是整篇 ⇒ 直接落版。门槛只用来挡「它说改不动」那种拒绝，
+         ⚠ 但**挡掉了要说一声**：原来门槛是 30 字且一声不吭，短稿被静默丢掉，
+         读者看着回话在、版本却没多，只会以为功能坏了。 */
+      if (A.k === "rev" || A.k === "ed") {
+        var body2 = stripFence(cell.t);
+        if (body2.length >= 24) commit(body2, A.n);
+        else note("它没有交回整篇（多半是说改不动）。<b>没有落成新版本</b>——要留就按回话下面的「⟳ 落成新版本」。");
+      }
       save(); paintMs();
     }, function (e) {
       clearTimeout(wd); delete cell.on; ST.busy = false; $("go").textContent = "送"; abortC = null;

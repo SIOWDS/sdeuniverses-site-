@@ -131,6 +131,21 @@ sec("③ 页面接线");
   ok(/function commit\(/.test(H) && /ST\.vers\.push/.test(H), "没有版本链");
   ok(/id="verDiff"/.test(H), "没有版本比对");
 
+  /* ⚠ Key 的存储键名必须**逐字**与 wds-mode.js 的 VENDORS[].ks 一致。
+     我第一版自己拼了 `sde_wds_key_<短码>`，那个键根本不存在 ——
+     结果是读者在 ChatSDE 配好了 Key，这一页一律说「还没配 Key」。
+     静态断言与 node --check 都照不出来，是端到端干跑抓到的。 */
+  {
+    const M2 = fs.readFileSync(path.join(ROOT, "public/wds-mode.js"), "utf8");
+    const ks = [...M2.matchAll(/ks:\s*"([a-z_]+)"/g)].map(m => m[1]);
+    ok(ks.length >= 5, "在 wds-mode.js 里没找到 Key 键名表");
+    ks.forEach(k => ok(H.indexOf('"' + k + '"') > -1, "作文页少了 Key 键名 " + k));
+    /* ⚠ 钉在**真实调用**上，不许按词扫：我在注释里就写着这个错误写法，
+       按词扫会被自己的注释满足。（同一个坑第四次：sim_growth 的排行榜词、
+       sim_wds_rte 的 innerHTML、sim_sde_writing 的 sde_wds_theme，都是它。） */
+    ok(!/getItem\("sde_wds_key_/.test(H), "作文页还在自己拼 Key 键名（sde_wds_key_…）");
+  }
+
   /* BYOK 与零责任 */
   ok(/只存.{0,6}浏览器本地|只存你的浏览器本地|只存本地/.test(H), "没写明 Key 只存本地");
   ok(!/sk-[A-Za-z0-9]{10,}/.test(H), "页面里出现了疑似真 Key");
