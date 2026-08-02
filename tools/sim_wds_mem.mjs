@@ -208,7 +208,7 @@ console.log("\n【十】可缓存前缀：变动的东西一律不许进 system"
   ok("内功有模块级缓存（不重复取文件）", /NEIGONG_CACHE|let NEIGONG|NEIGONG =/.test(src));
 }
 
-console.log("\n【十】What / How / Why 三类模式：与 ChatSDE 取同一份");
+console.log("\n【十一】What / How / Why 三类模式：与 ChatSDE 取同一份");
 {
   const src = fs.readFileSync(new URL("../src/worker.js", import.meta.url), "utf8");
   const seg = src.slice(src.indexOf("async answerWDS"), src.indexOf("async answerWDS") + 13000);
