@@ -376,6 +376,87 @@ const WDS_IMG_MAX = 4, WDS_IMG_BYTES = 6 * 1024 * 1024;
 /* 装全能之后固定部分（内功≈3.3 万字＋心得＋完整方法论≈4 千字＋站内资料）已经很厚，
    历史预算按「总预算 − 固定部分」现算，且不低于 WDS_HIST_FLOOR——
    宁可少记几轮，也不要因为撞爆上下文窗而整条答不出来。 */
+/* ═══ 群聊瘦身（2026-08-02）══════════════════════════════════════
+   @WDS 是在学员群里答两三段，不是在写论文。装全能之后固定部分到了 9 万多字符，
+   历史只剩三万——**记忆被底盘挤掉了**，而群聊里记得住上下文比底盘再厚一层有用得多。
+
+   瘦身的刀口不是「砍掉不重要的」，是「删掉已经说过两遍的」——这一点很要紧，
+   因为按重要性砍必然损失信息，而删重复不损失：
+   · 内功 §1.3.1 三大方程 / §1.3.2 123原理 / §2.5 六路径 —— **WDS_METHOD_GUIDE 正是从这三节凝出来的**，
+     两份同时装＝同一件事的详版与凝版都塞进去（21,834 字符的正面重复）。
+   · 内功第七部分（二阶碰撞）—— WDS_METHOD_GUIDE 第五节已完整覆盖。
+   · 内功第八部分（原初问题裁定律三档）—— SDE_TRIAD_BLOCK 第四节【答之前先裁一次】已完整覆盖。
+   · 内功头部是版本号与 Upgrade 改版日志，对答题零价值。
+   · 第三部分（改姓爪去痕迹）—— 群聊由每轮的【本次输出模式】管，用不上整套锻造律。
+   · 第四/五/六部分（评估尺度、长现场样本、启动流程）—— 两三段的答案里摆不下。
+   留下的是**别处没有的那部分**：本体论内核（S/D/E 三维、成熟态、知识三死、认知陷阱、意义律）
+   与三视角误差互消。约 1.1 万字符。
+
+   ⚠ 三条纪律：①**不改 sde-neigong.txt**（九台共读，改一处九处都变），只在运行时派生；
+   ②切不出预期结构就**如实回退到全文**，绝不静默给一个残缺底盘；
+   ③派生是确定性的，所以 sys 仍逐字稳定、上游前缀缓存照常命中。 */
+const NG_DROP_SUB = ["1.3.1", "1.3.2", "2.5"];
+const NG_KEEP_PART = ["一", "二"];
+let NG_LITE_CACHE = null, NG_LITE_SRC = "";
+function neigongLite(full) {
+  try {
+    const s = String(full || "");
+    if (!s) return "";
+    if (NG_LITE_SRC === s && NG_LITE_CACHE) return NG_LITE_CACHE;
+    const lines = s.split("\n");
+    // 先定位各「## 第X部分」的起始行；找不到就整份回退。
+    const parts = [];
+    for (let i = 0; i < lines.length; i++) {
+      const m = /^##\s*第([一二三四五六七八九十]+)部分/.exec(lines[i]);
+      if (m) parts.push({ i: i, n: m[1] });
+    }
+    if (parts.length < 6) return s;   // 结构不符预期 ⇒ 如实用全文
+    const out = [];
+    out.push("# SDE 内功·群聊精简版（由完整先验按节派生；三大方程/123原理/六路径/二阶碰撞/裁定三档另有专块，此处不重复）");
+    for (let k = 0; k < parts.length; k++) {
+      if (NG_KEEP_PART.indexOf(parts[k].n) < 0) continue;
+      const from = parts[k].i, to = (k + 1 < parts.length) ? parts[k + 1].i : lines.length;
+      let skipping = false;
+      for (let i = from; i < to; i++) {
+        const sub = /^###\s*([0-9.]+)/.exec(lines[i]);
+        if (sub) skipping = NG_DROP_SUB.indexOf(sub[1].replace(/\.$/, "")) >= 0;
+        if (!skipping) out.push(lines[i]);
+      }
+    }
+    out.push("");
+    out.push("────────────────────────────────────────");
+    out.push("【本份是群聊精简版·边界说明】上面正文里若提到「接下来第三部分」之类的指路，那几部分**不在这一份里**——");
+    out.push("它们（改姓爪与锻造律／大概念六判准／跨域现场样本／启动流程与失败诊断）在群聊里用不上，已移走。");
+    out.push("三大方程、123 原理、六路径、二阶碰撞、原初问题裁定三档也不在这里，但**并没有少**：");
+    out.push("它们在随后的《SDE 发生学方法论》与《先判这一问属于哪一类》两块里有完整版，按那两块执行。");
+    out.push("读到这一行就是这份先验的结尾，不要去找后面的部分。");
+    const lite = out.join("\n");
+    // 派生结果异常（切太狠或几乎没切）时也回退，别让一次改版把底盘掏空。
+    if (lite.length < 4000 || lite.length > s.length * 0.85) return s;
+    NG_LITE_SRC = s; NG_LITE_CACHE = lite;
+    return lite;
+  } catch (e) { return String(full || ""); }
+}
+/* 心得同理：八节里「三方程新例／123走全程／六路径口诀」那几节与方法论块重复，
+   群聊只要「怎么把发生学用在答一句话上」那部分。按数字小节切，切不出就直接截断。 */
+const XD_KEEP_HINT = /(发生学|切换|起手|惯性|翻车|承诺|诊断)/;
+function reflectLite(txt, cap) {
+  try {
+    const s = String(txt || "");
+    if (!s || s.length <= cap) return s;
+    const secs = s.split(/\n(?=\s*(?:[一二三四五六七八九十]、|\d+[.、]))/);
+    if (secs.length >= 4) {
+      let kept = "";
+      for (const sec of secs) {
+        if (!XD_KEEP_HINT.test(sec.slice(0, 40))) continue;
+        if (kept.length + sec.length > cap) break;
+        kept += sec + "\n";
+      }
+      if (kept.length > 600) return kept.trim();
+    }
+    return s.slice(0, cap) + "…（心得后半略）";
+  } catch (e) { return String(txt || "").slice(0, cap); }
+}
 /* @WDS 改走 BYOK（2026-08-02）：**烧的是提问者自己的 Key，不再是平台的**。
    Key 由前端随消息带上来（同全站 BYOK 规范键 sde_wds_key / sde_wds_vendor），
    服务端**只透传给厂商，不落库、不进日志、不回显**。
@@ -394,6 +475,10 @@ function wdsByok(raw) {
   } catch (e) { return null; }
 }
 const WDS_TOTAL_CHARS = { deep: 100000, quick: 60000 };
+// 瘦身后的三个上限：内功走 neigongLite（约 1.1 万），心得截到 2500，站内资料只给摘要不给整段。
+const WDS_REFLECT_CAP = 2500;
+const WDS_SITE_CAP = { deep: 5000, quick: 3000 };
+const WDS_SITE_PER = 380;   // 每篇只给这么长的摘要——层级 RAG 的第一层：先广后深
 const WDS_HIST_FLOOR = 8000;
 const WDS_CTX = {
   deep:  { msgs: 200, budget: 60000, per: 3000 },
@@ -2071,10 +2156,10 @@ async function drScan(ctx) {
     let neigong = "";
     // 两档都装满血内功（2026-08-02 「装全能」）：内功是模块级缓存、不产生额外调用，
     // quick 与 deep 的差别应当在「看多少、答多长」，不在「底盘厚不厚」。
-    try { neigong = await loadNeigong(this.env, base); } catch (e) {}
+    try { neigong = neigongLite(await loadNeigong(this.env, base)); } catch (e) {}
     // 心得：按基底复用/生成 reflect:<vendor>（内功学习后的内化底盘；智谱/DeepSeek 复用智能问答的心得）
     let reflect = "";
-    try { reflect = await ensureReflect(this.env, base, rvendor, VC, key); } catch (e) {}
+    try { reflect = reflectLite(await ensureReflect(this.env, base, rvendor, VC, key), WDS_REFLECT_CAP); } catch (e) {}
     // 群聊记忆：装进 messages 多轮（不再拼成一段纯文本塞给 user）。
     // ⚠ 内功/心得/方法论/站内资料都进 system 之后，固定部分已很大；
     //    历史预算必须按「总预算 − 已占用」动态收缩，否则装全能反而撞爆上下文窗。
@@ -2089,13 +2174,18 @@ async function drScan(ctx) {
       const _lr = await lightRetrieve(this.env, base, q, expTerms, tier === "deep" ? 24 : 12, 1600, { pick: 14 });
       const corpus = _lr.corpus, hits = _lr.hits;
       const seen = {};
-      const _cap = tier === "deep" ? 18000 : 6500;
+      /* 层级 RAG 第一层：**宁可多几篇、每篇短**。群聊两三段的答案用不上整段原文，
+         而"站里有哪几篇碰过这件事"比"其中一篇的一整段"更有用；要细节读者会说"展开"。 */
+      const _cap = tier === "deep" ? WDS_SITE_CAP.deep : WDS_SITE_CAP.quick;
       for (const ck of hits) {
         const d = corpus.docs[ck.d];
-        if (!seen[d.u]) seen[d.u] = 1;
-        siteCtx += "【来源：" + d.t + "】\n" + ck.t + "\n\n";
+        if (seen[d.u]) continue;          // 每篇只占一条摘要位，不让一篇刷屏
+        seen[d.u] = 1;
+        const _gist = String(ck.t || "").slice(0, WDS_SITE_PER);
+        siteCtx += "【来源：" + d.t + "】" + _gist + (String(ck.t || "").length > WDS_SITE_PER ? "…" : "") + "\n";
         if (siteCtx.length > _cap) break;
       }
+      if (siteCtx) siteCtx = "（以下每条只是摘要；要看某一篇的原文，让读者说\"展开《篇名》\"）\n" + siteCtx;
     } catch (e) {}
     const _fixed = (neigong ? neigong.length : 0) + (reflect ? reflect.length : 0)
       + WDS_METHOD_GUIDE.length + SDE_TRIAD_BLOCK.length + siteCtx.length + (libCtx ? libCtx.length : 0);

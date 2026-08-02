@@ -164,8 +164,9 @@ console.log("\n【八】装全能：内功＋心得＋完整方法论＋记忆�
   ok("③b2 六步法在 WDS_SYS 里仍标在 D2 路径组织层（没被误删）", /D2 意义?路径组织\(六步法：猜想/.test(src) || /六步法：猜想→执行/.test(src));
   ok("③c 完整指引里确有真六路径", /S→D→E 学科本体论分析/.test(src) && /E→D→S 综述与建制/.test(src));
   ok("④ 记忆装进 messages（见第七组）", /\.\.\.hist/.test(seg));
-  ok("⑤ 网站 RAG 仍是全站检索且 deep 档加宽到 K=24 / 18000",
-    /lightRetrieve\(this\.env, base, q, expTerms, tier === "deep" \? 24 : 12/.test(seg) && /tier === "deep" \? 18000 : 6500/.test(seg));
+  ok("⑤ 网站 RAG 仍是全站检索，deep 仍比 quick 召回多（体量口径见 sim_wds_slim）",
+    /lightRetrieve\(this\.env, base, q, expTerms, tier === "deep" \? 24 : 12/.test(seg)
+    && /tier === "deep" \? WDS_SITE_CAP\.deep : WDS_SITE_CAP\.quick/.test(seg));
   ok("固定部分现算进 _fixed（内功＋心得＋方法论＋三类块＋站内资料＋两个库）",
     /const _fixed = \(neigong \? neigong\.length : 0\)/.test(seg) && /WDS_METHOD_GUIDE\.length \+ SDE_TRIAD_BLOCK\.length \+ siteCtx\.length/.test(seg));
   ok("总预算两档都定义了", /WDS_TOTAL_CHARS = \{ deep: 100000, quick: 60000 \}/.test(src) && /WDS_HIST_FLOOR = 8000/.test(src));
