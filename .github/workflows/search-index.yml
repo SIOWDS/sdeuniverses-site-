@@ -34,6 +34,16 @@ on:
   schedule:
     - cron: '0 18 * * *'
   workflow_dispatch:                 # 想立刻跑：Actions 页面 → search-index → Run workflow
+  # 【2026-08-02 加】第二条手动路子：站点 PAT 没有 actions:write，用它调
+  #   workflow_dispatch 一律 403（实测），于是"发了重要的一批不想等"每次都得人去点按钮。
+  #   repository_dispatch 只要 contents:write，PAT 有——所以助手也能拉这根绳：
+  #     curl -X POST -H "Authorization: Bearer <PAT>" \
+  #       https://api.github.com/repos/SIOWDS/sdeuniverses-site-/dispatches \
+  #       -d '{"event_type":"reindex"}'
+  #   **只是多一条手动入口，不改频率**：它不挂在 push 上，只在被显式调用时跑一次，
+  #   每日一次那条 cron 与 2026-07-29 的决定原样不动。
+  repository_dispatch:
+    types: [reindex]
 
 concurrency:
   group: search-index
