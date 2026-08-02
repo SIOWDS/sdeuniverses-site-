@@ -156,6 +156,21 @@ sec("② 两道门：不对外开放");
       " —— 一旦进前端它就退化成前端级口令，那时就不该再给读和删");
     ok(A.indexOf(val) === -1, "管理页里印了钥匙");
   }
+  /* ⚠ 作用域断言。第一版把 DRAFT_KEY 写在了 DO 类方法里（深度 3），
+     而路由在 fetch 处理器里（深度 2）—— 运行时 ReferenceError，线上是一句 1101。
+     `node --check` 和"这个字符串在不在"都照不出来，只能算花括号深度。
+     凡在 worker.js 里跨块引用常量，都该这么钉一条。 */
+  const depthAt = (needle) => {
+    const i = W.indexOf(needle);
+    if (i < 0) return -1;
+    let d = 0;
+    for (let k = 0; k < i; k++) { const c = W[k]; if (c === "{") d++; else if (c === "}") d--; }
+    return d;
+  };
+  ok(depthAt("const DRAFT_KEY") === 0, "DRAFT_KEY 不在顶层（深度 " + depthAt("const DRAFT_KEY") +
+    "）—— 路由取不到它，线上会是 1101");
+  ok(depthAt('url.pathname === "/api/admin/draft"') >= 1, "路由位置不对");
+
   const A2 = W.indexOf('url.pathname === "/api/admin/draft"');
   ok(A2 > 0, "找不到 /api/admin/draft");
   const seg2 = W.slice(A2, A2 + 1400);

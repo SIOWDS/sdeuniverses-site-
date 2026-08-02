@@ -1145,10 +1145,7 @@ export class CommentBox {
          分开存是因为**列表不该把十件两万字的稿子一起拖回来**。
          两个键都带 uid ⇒ 天然隔离：别人查不到，也删不掉（与 lb: 同一路数）。 */
       const KB_CHARS = 30000;      // 单件上限（两万字中文约 20000 字符，留冗余）
-/* ── 草稿箱：画布 → 管理系统。不对外开放。 ──────────────────
-   `DRAFT_KEY` 只在本文件里，**绝不写进 public/**（写进去它就退化成前端级口令，
-   那时就只能像 SDE2013 那样把能力收窄到"只能加不能删"了）。 */
-const DRAFT_KEY = "sde-draft-2026-wds-claude";
+/* ── 草稿箱的三条配额（DO 方法内部用，放这儿就够） ────────── */
 const DR_CHARS = 60000;        // 单件上限
 const DR_COUNT = 300;          // 件数上限
 const DR_TOTAL = 4000000;      // 合计上限
@@ -2431,6 +2428,15 @@ function _sseResp(objs) {
   const body = objs.map((o) => "data: " + JSON.stringify(o) + "\n\n").join("") + "data: [DONE]\n\n";
   return new Response(body, { headers: { "content-type": "text/event-stream; charset=utf-8", "cache-control": "no-store", "access-control-allow-origin": "*" } });
 }
+/* ── 草稿箱：画布 → 管理系统。不对外开放。 ──────────────────
+   `DRAFT_KEY` 只在本文件里，**绝不写进 public/**（写进去它就退化成前端级口令，
+   那时就只能像 SDE2013 那样把能力收窄到"只能加不能删"了）。
+
+   ⚠ **必须放在顶层。** 第一版我把它写在 DO 类方法里（与 KB_CHARS 作伴，花括号深度 3），
+   而 /api/admin/draft 在 fetch 处理器里（深度 2）—— 取不到，运行时 ReferenceError，
+   线上表现是 Cloudflare 的 1101，看不出是哪一行。
+   `node --check` 与源码级断言都照不出作用域，**是线上黑盒探测抓到的**。 */
+const DRAFT_KEY = "sde-draft-2026-wds-claude";
 function _cors() { return { "access-control-allow-origin": "*", "access-control-allow-methods": "POST, OPTIONS", "access-control-allow-headers": "content-type" }; }
 
 let CORPUS = null; // 模块级缓存：isolate 内复用，避免每次问答重载 ~15MB 索引
