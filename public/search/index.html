@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>站内搜索 · SDE Universes</title>
-<meta name="description" content="SDE Universes 站内搜索 · 关键词全文检索 + 智能问答 · 检索德麦国际 915+ 篇文章与专著">
+<meta name="description" content="SDE Universes 站内搜索 · 关键词全文检索 + 智能问答 · 检索德麦国际 2000+ 篇文章与专著、5000 万字正文">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <style>
 :root{
@@ -138,8 +138,8 @@ a.reco .rw{font-size:0.8rem;color:var(--muted,#8a8a8a);margin-top:3px;line-heigh
   <div class="eyebrow">SDE Universes</div>
   <h1><span class="zh-only">站内搜索</span><span class="en-only">Search</span></h1>
   <p class="sub">
-    <span class="zh-only">全文索引 <b id="indexN">91,609</b> 条 · 覆盖 <b id="docN">1,145</b> 篇文章与专著</span>
-    <span class="en-only"><b id="indexNe">91,609</b> full-text index entries · <b id="docNe">1,145</b> documents</span>
+    <span class="zh-only">全文索引 <b id="indexN">130,956</b> 条 · 覆盖 <b id="docN">2,006</b> 篇文章与专著 · 正文 <b id="charN">5063</b> 万字</span>
+    <span class="en-only"><b id="indexNe">130,956</b> full-text index entries · <b id="docNe">2,006</b> documents · <b id="charNe">50,636,583</b> characters</span>
   </p>
 
   <div class="modes">
@@ -344,13 +344,16 @@ fetch('/search/manifest.json?v='+Date.now(),{cache:'no-store'}).then(r=>r.json()
   MANIFEST=m;
   m.docs.forEach(function(d){ d.l=d.t.toLowerCase(); });
   (function(){
-    var docs = m.counts.docs, chunks = m.counts.chunks;
+    var docs = m.counts.docs, chunks = m.counts.chunks, chars = m.counts.chars;
     var fmt = function(n){ return Number(n||0).toLocaleString('en-US'); };
+    // 中文按「万」向下取整：这是收录量的下限声明，宁可少说不可多说
+    var wan = function(n){ return String(Math.floor(Number(n||0)/10000)); };
     var set = function(id, v){ var el = document.getElementById(id); if (el) el.textContent = v; };
     set('indexN', fmt(chunks));
     set('indexNe', fmt(chunks));
     set('docN', fmt(docs));
     set('docNe', fmt(docs));
+    if (chars) { set('charN', wan(chars)); set('charNe', fmt(chars)); }
   })();
   // 栏目筛选 chips
   var ch = document.getElementById('chips');
