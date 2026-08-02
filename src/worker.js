@@ -8072,8 +8072,10 @@ export default {
     // 与普通请求的 content-length 对不上，就是这个毛病。
     // ⚠ 同样只清当前机房，可能要多打几次；一小时后路由那条 TTL 会自己收干净。
     if (url.pathname === "/api/admin/r2-purge" && request.method === "POST") {
-      const b = await request.json().catch(function () { return {}; });
-      if (String(b.pass || "") !== "SDE2013") return J({ ok: false, msg: "口令不对" }, 403);
+      // ⚠ 这一区每个 handler 都各自声明一份局部 J（外层没有），漏了就是 ReferenceError → 1101。
+      const J = (o, st) => Response.json(o, { status: st || 200, headers: _cors() });
+      let b = {}; try { b = await request.json(); } catch (e) {}
+      if (String(b.pass || "") !== "SDE2013") return J({ ok: false, msg: "口令不对。" }, 401);
       const paths = Array.isArray(b.paths) ? b.paths.slice(0, 200) : [];
       const out = [];
       const _c = (typeof caches !== "undefined" && caches.default) ? caches.default : null;
