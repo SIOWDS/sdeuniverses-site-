@@ -153,6 +153,14 @@ sec("③b 学画布那套背景 · 说明收进一颗按钮");
     ok(H.indexOf("var(" + v.replace(":", "") + ")") === -1, "还留着自造变量 " + v));
 
   /* 首屏不许再铺说明：那几段整块搬进了弹层 */
+  /* 标签配平在 check_page_integrity 里查，但那一关我曾被自己的命令绕过去
+     （`python3 check | tail -1 && git add` —— `&&` 判的是 tail 的退出码，守卫形同虚设），
+     结果带着一个重复的 <main> 上了线。这里再钉一道，改这页时先在自己的 sim 里红。 */
+  ["main", "body", "html"].forEach(function (t) {
+    var open = (H.match(new RegExp("<" + t + "[ >]", "g")) || []).length;
+    var close = (H.match(new RegExp("</" + t + ">", "g")) || []).length;
+    ok(open === close, "<" + t + "> 不配对：开 " + open + " 闭 " + close);
+  });
   ok(/id="whatb"/.test(H), "没有「何谓作文」那颗按钮");
   ok(/id="mask"/.test(H) && /id="sbd"/.test(H), "没有弹层");
   const hero = H.slice(H.indexOf('<div class="w hero">'), H.indexOf("<main"));
