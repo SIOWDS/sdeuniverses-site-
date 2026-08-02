@@ -142,12 +142,49 @@ console.log("\n【七】接线：answerWDS 真的把历史装进 messages");
   ok("answerWDS 收 beforeId", /async answerWDS\(question, beforeId\)/.test(src));
   ok("调用点递了当前消息 id", /answerWDS\(_wq, msg\.id\)/.test(src));
   const seg = src.slice(src.indexOf("async answerWDS"), src.indexOf("async answerWDS") + 9000);
-  ok("取历史时带上 tier 与 beforeId", /_wdsHistory\(tier, beforeId\)/.test(seg));
+  ok("取历史时带上 tier、beforeId 与现算的预算", /_wdsHistory\(tier, beforeId, Math\.max\(WDS_HIST_FLOOR/.test(seg));
   ok("历史铺进 messages 数组（system 之后、当前问题之前）",
     /messages: \[\{ role: "system", content: sys \+ _modeInstr \}, \.\.\.hist, \{ role: "user", content: usr \}\]/.test(seg));
   ok("usr 里不再拼群聊上下文（避免同一份历史进两遍）", !/群里最近的讨论/.test(seg));
   ok("两档预算都在代码里", /deep:\s*\{ msgs: 200, budget: 60000, per: 3000 \}/.test(src) && /quick:\s*\{ msgs: 60,\s*budget: 12000, per: 1200 \}/.test(src));
   ok("站内检索与两个库仍在（这次没碰它们）", /_wdsLibContext/.test(seg) && /siteCtx/.test(seg));
+}
+
+console.log("\n【八】装全能：内功＋心得＋完整方法论＋记忆＋网站 RAG 五件齐");
+{
+  const src = fs.readFileSync(new URL("../src/worker.js", import.meta.url), "utf8");
+  const seg = src.slice(src.indexOf("async answerWDS"), src.indexOf("async answerWDS") + 11000);
+  ok("① 内功两档都装（不再只有 deep）", /await loadNeigong\(this\.env, base\)/.test(seg) && !/tier === "deep"\) \{ try \{ neigong/.test(seg));
+  ok("② 心得仍在（按基底复用 reflect:<vendor>）", /ensureReflect\(this\.env, base, rvendor, VC, key\)/.test(seg));
+  ok("③ 装的是全站唯一那份完整方法论指引", /WDS_METHOD_GUIDE/.test(seg));
+  // 「猜想→执行→评估→反馈→修正→迭代」本身没错——那是**六步法**（D2 路径组织层），
+  // WDS_SYS 里就是这么标的。错的是旧摘要把它标成了「六路径/六步法」，
+  // 把 D2 的六步法与 S/D/E 六种排列的六路径混为一谈。守的是这个混淆不许回来。
+  ok("③b 六路径与六步法不再被混为一谈", !/六路径\/六步法/.test(src), "仍有「六路径/六步法」的写法");
+  ok("③b2 六步法在 WDS_SYS 里仍标在 D2 路径组织层（没被误删）", /D2 意义?路径组织\(六步法：猜想/.test(src) || /六步法：猜想→执行/.test(src));
+  ok("③c 完整指引里确有真六路径", /S→D→E 学科本体论分析/.test(src) && /E→D→S 综述与建制/.test(src));
+  ok("④ 记忆装进 messages（见第七组）", /\.\.\.hist/.test(seg));
+  ok("⑤ 网站 RAG 仍是全站检索且 deep 档加宽到 K=24 / 18000",
+    /lightRetrieve\(this\.env, base, q, expTerms, tier === "deep" \? 24 : 12/.test(seg) && /tier === "deep" \? 18000 : 6500/.test(seg));
+  ok("固定部分现算进 _fixed（内功＋心得＋方法论＋站内资料＋两个库）",
+    /const _fixed = \(neigong \? neigong\.length : 0\)/.test(seg) && /WDS_METHOD_GUIDE\.length \+ siteCtx\.length/.test(seg));
+  ok("总预算两档都定义了", /WDS_TOTAL_CHARS = \{ deep: 100000, quick: 60000 \}/.test(src) && /WDS_HIST_FLOOR = 8000/.test(src));
+}
+
+console.log("\n【九】动态预算的行为：只许更小，且有地板");
+{
+  const many = [];
+  for (let i = 0; i < 100; i++) many.push({ name: "张琼", text: "乙".repeat(1200) });
+  await seed(many);
+  const wide = await box._wdsHistory("deep", 9999);
+  const tight = await box._wdsHistory("deep", 9999, 9000);
+  const tot = (a) => a.reduce((n, x) => n + x.content.length, 0);
+  ok("传了更小的预算就真的记得少", tot(tight) < tot(wide), { wide: tot(wide), tight: tot(tight) });
+  ok("小预算守得住", tot(tight) <= 9000 + 1600, tot(tight));
+  const huge = await box._wdsHistory("deep", 9999, 999999);
+  ok("传超大预算也不许超过本档上限（上限仍由常量把关）", tot(huge) <= 60000 + 1600, tot(huge));
+  ok("即使预算很紧，最近一轮仍在场", tight.length >= 1 && tight[tight.length - 1].content.includes("乙"));
+  ok("预算为 0/未传时走本档默认", tot(await box._wdsHistory("deep", 9999, 0)) === tot(wide));
 }
 
 console.log("\n" + (fail === 0 ? "✅" : "❌") + "  " + pass + " PASS / " + fail + " FAIL\n");
