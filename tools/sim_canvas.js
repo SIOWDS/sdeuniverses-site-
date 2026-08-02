@@ -143,6 +143,8 @@ function boot(opts) {
     cvLabClear: "清空这一件的共创记录", cvLabWith: "带着这一件在问：{t}", cvLabSel: "（并带上你选中的 {n} 字）",
     cvLabSys: "你现在在画布的共创台上，和作者一起写这一件东西。",
     cvLabBadModel: "这一家说这个型号不存在——到顶栏的模型选择器里换一个型号再问。",
+    cvLabDiag: "〔诊断回执：{d}〕", cvLabEmpty: "流走完了，但一个字节正文都没收到。",
+    cvLabTimeout: "等了 {s} 秒一个字节都没来。",
     cvNew: "＋ 新建", cvNewT: "新建", cvNewTitle: "无题 {n}", cvWrite: "✍ 现在就写一篇",
     cvToBox: "📥 投进草稿箱", cvToBoxT: "投稿", cvToBoxAsk: "留一句话", cvToBoxNo: "投不进去",
     cvKb: "⇧ 存进知识库", cvKbT: "存进知识库", cvKbNo: "模块没装载",
@@ -228,8 +230,9 @@ function boot(opts) {
       "data: [DONE]"
     ]).join("\n") + "\n";
     let served = false;
+    // ⚠ 桩要忠实：真 Response 有 status，少一个字段就会让"回执记了 HTTP 状态"这条测成假的
     return Promise.resolve({
-      ok: true,
+      ok: true, status: 200,
       body: { getReader: () => ({ read: () => served ? Promise.resolve({ done: true })
         : (served = true, Promise.resolve({ done: false, value: lines })) }) }
     });
@@ -1182,6 +1185,38 @@ sec("⑱ 共创台：随时问两句，回话不自动进正文");
   const last8 = l8[l8.length - 1].t;
   ok(last8.indexOf("型号") > -1 && last8.indexOf("模型选择器") > -1, "型号报错没换成人话：" + last8);
   ok(last8.indexOf("1211") === -1 && last8.indexOf("{") === -1, "还在往读者脸上甩 JSON：" + last8);
+
+  /* ── 失败必须分得开、说得清 ────────────────────────────
+     原来 HTTP 挂了／流是空的／事件名对不上，全都收敛成同一句
+     「没答上来（网络或额度）」—— 线上出问题时根本查不下去。 */
+  // ① 流走完但零字节正文：不许再说成"网络或额度"
+  const C9 = boot({ labSse: ['data: {"t":"beat","v":{"sec":1}}', "data: [DONE]"] });
+  C9.cvAdd("md", "稿子", body); C9.cvPaint();
+  C9.cvLabAsk(C9.CV.items[0], "问一句");
+  await new Promise(r => setTimeout(r, 60));
+  const l9 = C9.cvChat(C9.CV.items[0]);
+  const t9 = l9[l9.length - 1].t;
+  ok(t9.indexOf("一个字节正文都没收到") > -1, "流空却说成了网络或额度：" + t9);
+  ok(t9.indexOf("诊断回执") > -1, "没有诊断回执 —— 下一次还是查不下去");
+  ok(/beat×1/.test(t9), "回执没记下收到了哪些事件：" + t9);
+  ok(/HTTP 200/.test(t9), "回执没记 HTTP 状态：" + t9);
+  /* 字节数是分"流是空的"与"连接根本没通"的关键读数：
+     0 B 说明一个字节都没来（网络层），>0 B 说明来了但没正文（基底那边的事）。 */
+  const mB = /\s(\d+) B\s/.exec(t9);
+  ok(!!mB, "回执没记字节数：" + t9);
+  ok(mB && Number(mB[1]) > 0, "收到了事件却记成 0 字节 —— 那就分不出「流是空的」和「连接没通」：" + t9);
+
+  // ② 请求异常：回执要带上异常本身
+  const C10 = boot({ labFail: true });
+  C10.cvAdd("md", "稿子", body); C10.cvPaint();
+  C10.cvLabAsk(C10.CV.items[0], "问一句");
+  await new Promise(r => setTimeout(r, 60));
+  const l10 = C10.cvChat(C10.CV.items[0]);
+  ok(l10[l10.length - 1].t.indexOf("诊断回执") > -1, "请求异常时没有回执");
+  ok(l10[l10.length - 1].t.indexOf("net") > -1, "回执没带上异常本身");
+
+  // ③ 有看门狗（不设它，卡住就是永远转圈）
+  ok(/function bump\(\)[\s\S]{0,260}ctrl\.abort\(\)/.test(SRC), "共创台没有看门狗");
 
   /* 与另外两件的分工不许混：共创台不设 want（那是共创动作干的事） */
   ok(!/cvLabAsk[\s\S]{0,900}CV\.want =/.test(SRC), "共创台设了 want —— 回话会被收成新版本，那是「⚡ 共创」的活");

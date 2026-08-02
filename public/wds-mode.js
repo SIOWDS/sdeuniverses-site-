@@ -766,6 +766,9 @@
       cvLabIns: "⤵ 插入正文", cvLabVer: "⟳ 落成新版本", cvLabCopy: "复制",
       cvLabInsOk: "已插到正文末尾（还没存版本，看一眼再「✓ 存为新版」）。",
       cvLabInsSel: "已换掉选中的那一段（还没存版本）。",
+      cvLabDiag: "〔诊断回执：{d}〕",
+      cvLabEmpty: "流走完了，但**一个字节正文都没收到**。这不像网络断了——多半是这一档基底那边没吐出东西。再问一次，或到顶栏换一档（标准／深度思考）／换一家基底。",
+      cvLabTimeout: "等了 {s} 秒一个字节都没来，判定这条连接已经死了。再问一次试试。",
       cvLabBadModel: "这一家说**这个型号不存在**——多半是默认型号过时了，或者你的账号没开通它。到顶栏的模型选择器里换一个型号再问（换完主对话也一起生效）。",
       cvLabNoKey: "还没配大模型 Key —— 共创台用的是你自己那把，和主对话同一把。",
       cvLabErr: "没答上来（网络或额度）。再问一次试试。",
@@ -888,6 +891,9 @@
       cvLabIns: "\u2935 Insert", cvLabVer: "\u27f3 Save as version", cvLabCopy: "Copy",
       cvLabInsOk: "Appended to the end (not saved as a version yet).",
       cvLabInsSel: "Replaced the selected passage (not saved as a version yet).",
+      cvLabDiag: "[diagnostic: {d}]",
+      cvLabEmpty: "The stream finished but not a single byte of body arrived. Ask again, or switch tier/provider in the top bar.",
+      cvLabTimeout: "No bytes for {s}s \u2014 the connection is dead. Ask again.",
       cvLabBadModel: "The provider says this model does not exist \u2014 the default is probably outdated, or your account has no access. Pick another model in the top bar selector and ask again.",
       cvLabNoKey: "No model key yet \u2014 the co-lab uses the same one as the main chat.",
       cvLabErr: "No answer (network or quota). Try once more.",
@@ -4541,9 +4547,25 @@
     hist = hist.slice(-10);
     hist.pop();                       // 最后一条就是这一问，别重复喂
 
+    /* ⚠ 原来所有失败都收敛成同一句「没答上来（网络或额度）」——
+       线上出问题时**根本查不下去**（HTTP 挂了？流是空的？事件名对不上？分不出来）。
+       站上早有这条做法：**诊断回执**。这里如实记下走到哪一步、收到了什么。 */
+    var diag = { http: 0, ev: {}, bytes: 0, err: "" };
+    function diagLine() {
+      var ks = Object.keys(diag.ev).map(function (k) { return k + "\u00d7" + diag.ev[k]; });
+      return "HTTP " + (diag.http || "?") + " \u00b7 " + diag.bytes + " B \u00b7 "
+        + (ks.length ? ks.join(" ") : "\u65e0\u4e8b\u4ef6") + (diag.err ? " \u00b7 " + diag.err : "");
+    }
     var ctrl = null;
     try { ctrl = new AbortController(); } catch (e) {}
     labAbort = ctrl;
+    /* 看门狗：60 秒没有任何字节就判连接已死。不设它，卡住就是永远转圈。 */
+    var wdT = null;
+    function bump() {
+      clearTimeout(wdT);
+      wdT = setTimeout(function () { diag.err = "watchdog"; try { if (ctrl) ctrl.abort(); } catch (e) {} }, 60000);
+    }
+    bump();
     fetch(API, {
       method: "POST", headers: { "content-type": "application/json" },
       signal: ctrl ? ctrl.signal : undefined,
@@ -4555,11 +4577,14 @@
         mode: thinkMode, web: 0, skey: wdsSearchKey(), about: aboutPlus(), lang: LANG, tool: ""
       })
     }).then(function (resp) {
+      diag.http = resp.status;
       if (!resp.ok || !resp.body) throw new Error("HTTP " + resp.status);
       var reader = resp.body.getReader(), dec = new TextDecoder(), buf = "";
       function pump() {
         return reader.read().then(function (r) {
           if (r.done) return;
+          bump();
+          diag.bytes += (r.value && r.value.length) || 0;
           buf += dec.decode(r.value, { stream: true });
           var idx;
           while ((idx = buf.indexOf("\n")) >= 0) {
@@ -4567,7 +4592,8 @@
             if (line.slice(0, 5) !== "data:") continue;
             var p = line.slice(5).trim();
             if (p === "[DONE]") return;
-            var j; try { j = JSON.parse(p); } catch (e) { continue; }
+            var j; try { j = JSON.parse(p); } catch (e) { diag.ev["\u574fjson"] = (diag.ev["\u574fjson"] || 0) + 1; continue; }
+            var _t = String(j.t || "?"); diag.ev[_t] = (diag.ev[_t] || 0) + 1;
             /* ⚠ 正文事件名是 `token`（照主流程那条 pump 核对过）。
                我第一版按直觉写了 text/delta —— 语法没错、断言也全绿，
                但共创台会一个字都不出。**凡自己另起一条 SSE 解析，
@@ -4588,12 +4614,19 @@
       }
       return pump();
     }).then(function () {
-      delete cell.on;
-      if (!cell.t) cell.t = tx("cvLabErr");
+      clearTimeout(wdT); delete cell.on;
+      // 流走完却一个字节正文都没有：这不是"网络或额度"，要分开说，否则查不下去
+      if (!cell.t) cell.t = tx("cvLabEmpty") + "\n\n" + tx("cvLabDiag", { d: diagLine() });
       CV.labBusy = false; labAbort = null; cvSave(); cvLabPaint(it);
-    }, function () {
-      delete cell.on;
-      if (!cell.t) cell.t = tx("cvLabErr");
+    }, function (e) {
+      clearTimeout(wdT); delete cell.on;
+      diag.err = String((e && e.message) || e || "").slice(0, 120);
+      if (!cell.t) {
+        cell.t = (diag.err === "watchdog" || /abort/i.test(diag.err))
+          ? tx("cvLabTimeout", { s: 60 })
+          : tx("cvLabErr");
+        cell.t += "\n\n" + tx("cvLabDiag", { d: diagLine() });
+      }
       CV.labBusy = false; labAbort = null; cvSave(); cvLabPaint(it);
     });
   }
