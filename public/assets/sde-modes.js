@@ -1,4 +1,4 @@
-/* SDE 三态切换器 —— 全站的核心三元素：浏览 · SDE 微信 · SDE 对话。
+/* SDE 三态切换器 —— 全站的核心三元素：浏览 · SDE 社区 · SDE 对话。
  *
  * 为什么单独一个文件：这三个是并列的三种"待在站里的方式"，不是某一个页面的功能。
  * 定义只该有一处（下面的 SDE_MODES），谁需要谁引；否则三处各写一份，改一处就漏两处。
@@ -49,7 +49,7 @@
     gl0.textContent = "\u25b3";
     if (!isHome()) { a.appendChild(gl0); return a; }          // 内页：一颗安静的 △
     // 首页：三角＝入口页那张图，认得出；火裹着它，与它指向的那张图同一种火。
-    // 三股火＝入口页三团 TOKEN 火的收束：SDE 浏览烧草叶绿、SDE 对话烧血红、SDE 微信烧蓝天蓝。
+    // 三股火＝入口页三团 TOKEN 火的收束：SDE 浏览烧草叶绿、SDE 对话烧血红、SDE 社区烧蓝天蓝。
     // 正色口径与 sde-portal.js 的 FIRE 表一致（血红不许偏橙、绿不许偏薄荷、蓝偏青不偏紫）。
     var fire = document.createElement("span");
     fire.className = "sdemx-fire";
@@ -158,7 +158,7 @@
     "padding:4px!important;margin:0!important;line-height:1!important;box-sizing:border-box;gap:2px;" +
     "border-radius:14px 0 0 14px!important;border-right:0!important;" +
     "box-shadow:-4px 0 18px rgba(0,0,0,.32);background:var(--wbg2,#12100C)}" +
-    /* 每档＝图标在上、文字在下。「SDE 微信」会自然折成两行，正是竖条要的形状。 */
+    /* 每档＝图标在上、文字在下。「SDE 社区」会自然折成两行，正是竖条要的形状。 */
     ".sdemx-float a{flex:0 0 auto!important;display:flex!important;flex-direction:column!important;" +
     "align-items:center!important;justify-content:center!important;gap:3px!important;" +
     "height:auto!important;min-height:0!important;max-height:none!important;" +
@@ -208,9 +208,9 @@
       || null;
   }
 
-  // 浏览态的顶栏：紧跟「✦ ChatSDE」插一颗「💬 SDE 微信」。
+  // 浏览态的顶栏：紧跟「✦ ChatSDE」插一颗「💬 SDE 社区」。
   // 为什么不是三段条：人在浏览态时，"浏览"就是他所在的地方——顶栏需要的是通往另外两态的门，
-  // 不是一个把自己也画进去的三段条。会议与讨论都并进了微信这一格，所以顶栏这两颗就够了。
+  // 不是一个把自己也画进去的三段条。会议与讨论都并进了社区这一格，所以顶栏这两颗就够了。
   // 站点的中英是靠 body 上的 class 切 .zh-only/.en-only，所以要成对插。
   function pills(nav) {
     var im = SDE_MODES[1];

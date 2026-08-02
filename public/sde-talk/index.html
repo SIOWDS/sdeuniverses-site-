@@ -105,7 +105,7 @@ select.cfg-in{appearance:auto;-webkit-appearance:menulist;cursor:pointer}
 <div class="top">
   <a class="back" href="/browse/">← 首页</a>
   <div class="tt">SDE 讨论<span class="sub"><span class="dot off" id="tk-dot"></span><span id="tk-status">连接中…</span></span></div>
-  <div class="who-wrap"><a class="imbtn" id="im-entry" href="/sde-wechat/" title="SDE 微信 · 群聊与私聊">💬<span class="imlbl">微信</span><span class="imdot" id="im-dot"></span></a><span class="who" id="tk-who"></span><button class="gear" id="cfg-open" type="button" title="管理员配置 API">⚙</button></div>
+  <div class="who-wrap"><a class="imbtn" id="im-entry" href="/sde-wechat/" title="SDE 社区 · 群聊与私聊">💬<span class="imlbl">社区</span><span class="imdot" id="im-dot"></span></a><span class="who" id="tk-who"></span><button class="gear" id="cfg-open" type="button" title="管理员配置 API">⚙</button></div>
 </div>
 
 <div class="wds-bar">
@@ -468,9 +468,9 @@ if(el("cfg-save"))el("cfg-save").onclick=function(){
 </script>
 
 <script>window.WDS_READ={selector:".wrap"};</script>
-<script src="/taste/wds-companion/wds-read.js?v=20260801a" defer></script>
+<script src="/taste/wds-companion/wds-read.js?v=20260802a" defer></script>
 
-<script src="/wds-mode.js?v=20260801m" defer></script>
+<script src="/wds-mode.js?v=20260802a" defer></script>
 <script>
 /* 顶栏「私聊」未读红点：读同一份 sde_gauth 登录态，轮询 /api/im 的未读总数。
    未登录、或接口不通时静默——绝不影响群聊本身。 */
@@ -485,7 +485,7 @@ if(el("cfg-save"))el("cfg-save").onclick=function(){
       var n=(d&&d.ok&&d.unread)||0;
       dot.textContent=n>99?"99+":String(n);
       dot.classList.toggle("on",n>0);
-      ent.title=n>0?("SDE 微信 · "+n+" 条未读"):"SDE 微信 · 群聊与私聊";
+      ent.title=n>0?("SDE 社区 · "+n+" 条未读"):"SDE 社区 · 群聊与私聊";
     }).catch(function(){});
   }
   setTimeout(tick,1500);setInterval(tick,20000);

@@ -51,9 +51,9 @@ ok(warned.every(p => !fs.existsSync(path.join(ROOT, "public", p, "index.html")))
    "被明示「别送到这里」的路径（" + (warned.join(" ") || "无") + "）确实不存在——若它后来建起来了，这条警告就该撤掉");
 
 console.log("③ 三部分齐备，且认成三个维度不是三个入口");
-["SDE浏览", "ChatSDE", "SDE微信"].forEach(k => ok(seg.indexOf(k) > 0, "三部分之一：" + k));
+["SDE浏览", "ChatSDE", "SDE社区"].forEach(k => ok(seg.indexOf(k) > 0, "三部分之一：" + k));
 ok(seg.indexOf("不是三个入口") > 0, "明写不是三个入口");
-ok(/SDE浏览＝显露[\s\S]{0,60}ChatSDE＝发生[\s\S]{0,60}SDE微信＝纠缠/.test(seg), "三维对应：浏览=显露／ChatSDE=发生／微信=纠缠");
+ok(/SDE浏览＝显露[\s\S]{0,60}ChatSDE＝发生[\s\S]{0,60}SDE社区＝纠缠/.test(seg), "三维对应：浏览=显露／ChatSDE=发生／社区=纠缠");
 ok(seg.indexOf("新思想的发生") > 0, "写明平台目标只有一句");
 ok(seg.indexOf("你就是中间那一维") > 0, "写明 ChatSDE 自己的位置");
 ok(seg.indexOf("把他推到下一维去") > 0, "写明它的活是往下一维推，不是把人留住");
@@ -66,7 +66,7 @@ ok(seg.indexOf("烧的是他自己的 Key") > 0, "送人过去要说清烧谁的
 ok(seg.indexOf("不要替他按开始") > 0, "不许替读者按开始（越权）");
 ok(seg.indexOf("要一段经典原文，不是一个问题") > 0, "经典解构器的入口差别写明了");
 
-console.log("⑤ 微信那一维：说清它凭什么值得去");
+console.log("⑤ 社区那一维：说清它凭什么值得去");
 ok(seg.indexOf("顶回") > 0 && seg.indexOf("三选一") > 0, "结构化顶回三选一");
 ok(seg.indexOf("不共享同一套语汇") > 0, "写明它的价值在于异质他者");
 ok(seg.indexOf("这是你这一维的天花板") > 0, "诚实交代 ChatSDE 自己的天花板");

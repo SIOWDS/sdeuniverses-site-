@@ -99,8 +99,8 @@
     }
     var c = cred();
     if (!c) {
-      note(box, '这些要点还没进库存——先在 <a href="/sde-wechat/" target="_blank">SDE 微信</a> 登录一次（全站通用），'
-        + '以后每次产出都会自动存进「💡 思想库存」，发朋友圈和立候选卡都能从那里取。');
+      note(box, '这些要点还没进库存——先在 <a href="/sde-wechat/" target="_blank">SDE 社区</a> 登录一次（全站通用），'
+        + '以后每次产出都会自动存进「💡 思想库存」，发社区动态和立候选卡都能从那里取。');
       return Promise.resolve({ ok: false, n: 0, dup: 0, noAuth: 1 });
     }
     note(box, "正在把要点存进思想库存…");
@@ -113,7 +113,7 @@
       var n = rs.filter(function (x) { return x && x.ok; }).length;
       var dup = rs.filter(function (x) { return x && x.dup; }).length;
       if (!n) {
-        note(box, "要点没存进库存（可能是登录过期），可稍后在微信里手动补。");
+        note(box, "要点没存进库存（可能是登录过期），可稍后在社区里手动补。");
         return { ok: false, n: 0, dup: 0 };
       }
       note(box, "已自动存进思想库存 " + n + " 条" + (dup ? ("（其中 " + dup + " 条早就存过）") : "")
@@ -121,7 +121,7 @@
         + '　<span style="opacity:.75">存错了可以在那里删。</span>');
       return { ok: true, n: n, dup: dup };
     }).catch(function () {
-      note(box, "要点没存进库存（网络出错），可稍后在微信里手动补。");
+      note(box, "要点没存进库存（网络出错），可稍后在社区里手动补。");
       return { ok: false, n: 0, dup: 0 };
     });
   }
@@ -132,7 +132,7 @@
      各页各写一遍 = 改一处漏四处，那正是这个模块存在的理由。
      **它存的是指针不是副本**：站上文章已有规范索引，这里只递 slug/title。
      **收藏是私人书签**——不计数、不公开、不排热度；要让别人看见，
-     得在微信里另按一次「推给大家」并写一句它切开了什么。 */
+     得在社区里另按一次「推给大家」并写一句它切开了什么。 */
   function fav(a, box) {
     var slug = String((a && a.slug) || "").replace(/^\/+|\/+$/g, "");
     var title = String((a && a.title) || "").trim().slice(0, 120);
@@ -142,8 +142,8 @@
     }
     var c = cred();
     if (!c) {
-      note(box, '还没收进文章库——先在 <a href="/sde-wechat/" target="_blank">SDE 微信</a> 登录一次（全站通用），'
-        + '以后读到好文章按一下就收进「📚 文章库」，发帖发朋友圈时能随时插一篇。');
+      note(box, '还没收进文章库——先在 <a href="/sde-wechat/" target="_blank">SDE 社区</a> 登录一次（全站通用），'
+        + '以后读到好文章按一下就收进「📚 文章库」，发帖发社区动态时能随时插一篇。');
       return Promise.resolve({ ok: false, noAuth: 1 });
     }
     note(box, "正在收进文章库…");

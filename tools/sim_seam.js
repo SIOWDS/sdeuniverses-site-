@@ -1,4 +1,4 @@
-// 对话 → 微信 接缝的模拟：把涌现档撞出的典范「立成候选卡」。
+// 对话 → 社区 接缝的模拟：把涌现档撞出的典范「立成候选卡」。
 // 跑法：node tools/sim_seam.js
 //
 // 这条缝此前是**完全断的**：典范只活在一次会话的内存里，刷新即失。
@@ -65,7 +65,7 @@ ok("空输入不炸", box.cdSection("", ["二、承重命题"]) === "" && box.cd
 
 group("四、三段是硬门（缺一段就不许落卡）");
 ok("缺承重命题时明说去手动立卡，且点出是哪一段",
-  /没解析出「承重命题」/.test(js) && /先手动去微信立卡/.test(js));
+  /没解析出「承重命题」/.test(js) && /先手动去社区立卡/.test(js));
 ok("缺辨别面时给的理由是「缺这一段就没法被顶回」",
   /缺这一段就没法被顶回/.test(js));
 ok("缺判据时给的理由是「没有判据别人只能表态」",
@@ -87,7 +87,7 @@ group("五、身份：复用全站单点登录（改测模块本体，行为实�
 {
   W.sessionStorage = { getItem: (k) => (k === "sde_gauth" ? "u1:p:名" : null) };
   W.localStorage = { getItem: () => null };
-  ok("先读 sessionStorage 的 sde_gauth（与 SDE 微信同一个键）", C.cred() === "u1:p:名");
+  ok("先读 sessionStorage 的 sde_gauth（与 SDE 社区同一个键）", C.cred() === "u1:p:名");
   W.sessionStorage = { getItem: () => null };
   W.localStorage = { getItem: (k) => (k === "sde_talk_id" ? JSON.stringify({ cred: "u2:p:名", exp: Date.now() + 60000 }) : null) };
   ok("再退到 localStorage 的 sde_talk_id 跨标签副本", C.cred() === "u2:p:名");

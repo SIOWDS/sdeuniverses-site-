@@ -238,9 +238,9 @@
     return body;
   }
 
-  /* ───────── 浏览 → 微信 / 浏览 → 产线：这一层此前完全没有 ─────────
+  /* ───────── 浏览 → 社区 / 浏览 → 产线：这一层此前完全没有 ─────────
    * 陪读浮层铺在两千多个正文页上，是全站最宽的入口，而它此前是条死胡同：
-   * 读者在文章页问出一个好问题，既落不成候选卡（送不到微信去被顶回），
+   * 读者在文章页问出一个好问题，既落不成候选卡（送不到社区去被顶回），
    * 也转不去任何一台产线。两个模块（sde-cand / sde-handoff）站内早就有，这里只是把线接上。
    * ⚠ 两个模块一律**懒加载**：这份脚本在 2000+ 页上跑，不能为一个多数人不点的按钮
    *   给每一页都加两个请求。第一次点才拉，拉不到就如实说，不拦路。 */
@@ -273,7 +273,7 @@
     var box = bubble._acts;
     if (!box) { box = el("div", "wdsr-acts"); bubble._wrap.appendChild(box); bubble._acts = box; }
     box.innerHTML = ""; box.style.display = "";
-    var bCard = actBtn("\u27e1 \u7acb\u6210\u5019\u9009\u5361", "把这一段压成一条承重命题，送去 SDE 微信让别人顶回");
+    var bCard = actBtn("\u27e1 \u7acb\u6210\u5019\u9009\u5361", "把这一段压成一条承重命题，送去 SDE 社区让别人顶回");
     var bPass = actBtn("\uD83E\uDD1D \u4ea4\u7ed9\u667a\u80fd\u4f53", "把这一问原样递给一台完整产线（只填不跑，用你自己的 Key）");
     box.appendChild(bCard); box.appendChild(bPass);
     bCard.onclick = function () { candPanel(box, answer); };
@@ -281,7 +281,7 @@
   }
 
 
-  /* ── 候选卡面板（浏览 → 微信）──
+  /* ── 候选卡面板（浏览 → 社区）──
    * 三段硬门与占位闸门全部交给 SDECand，这里一行都不重写——
    * 抄第二遍必漂，而这类漂移是静默的：卡照样落、闸照样显示一行字，只是某一关已经不在把关了。 */
   function candPanel(box, answer) {

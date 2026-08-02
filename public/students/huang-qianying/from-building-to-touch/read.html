@@ -42,7 +42,7 @@ canvas{display:block;max-width:100%;height:auto}
     <div class="pagebox"><input id="pageInput" type="number" min="1" value="1"><span class="total">/ <span id="totalPages">…</span></span></div>
     <button class="btn" id="next" disabled>下一页 ›</button>
     <div class="zoom"><button class="btn" id="zoomOut">−</button><button class="btn" id="zoomIn">＋</button></div>
-    <a class="btn" href="from-building-to-touch.pdf?v=20260724" target="_blank" style="text-decoration:none">下载 PDF</a>
+    <a class="btn" href="from-building-to-touch.pdf?v=20260802a" target="_blank" style="text-decoration:none">下载 PDF</a>
   </div>
 </div>
 <div class="stage">
@@ -62,7 +62,7 @@ canvas{display:block;max-width:100%;height:auto}
 <div class="navhint">← → 方向键翻页 · 点击页面两侧翻页 · 可输入页码跳转</div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script>
-const PDF_URL = "from-building-to-touch.pdf?v=20260724";
+const PDF_URL = "from-building-to-touch.pdf?v=20260802a";
 pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
 let pdfDoc=null, pageNum=1, rendering=false, pending=null, scale=1.3;
 const canvas=document.getElementById('pdfCanvas'), ctx=canvas.getContext('2d');
@@ -111,10 +111,10 @@ document.addEventListener('keydown',e=>{
 });
 </script>
 
-<script>window.WDS_PDF={url:"from-building-to-touch.pdf?v=20260724",curSel:"#pageInput",curAttr:"value"};</script>
-<script src="/taste/wds-companion/wds-pdf.js?v=20260731g" defer></script>
+<script>window.WDS_PDF={url:"from-building-to-touch.pdf?v=20260802a",curSel:"#pageInput",curAttr:"value"};</script>
+<script src="/taste/wds-companion/wds-pdf.js?v=20260802a" defer></script>
 <script>window.WDS_READ={bodyEl:function(){return document.getElementById("canvas-wrap")||document.body;},docTextFn:function(){return window.__wdsPdfText||"";}};</script>
-<script src="/taste/wds-companion/wds-read.js?v=20260801a" defer></script>
-<script src="/wds-mode.js?v=20260801m" defer></script>
+<script src="/taste/wds-companion/wds-read.js?v=20260802a" defer></script>
+<script src="/wds-mode.js?v=20260802a" defer></script>
 </body>
 </html>

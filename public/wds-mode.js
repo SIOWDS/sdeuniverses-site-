@@ -764,7 +764,7 @@
       qTip: "它正在答——现在发出的会排队，答完自动接着问", qBar: "⏳ 已排队 {n} 条",
       qPausedT: "⏸ 已暂停 · {n} 条待发", qResume: "继续发", qClear: "清空队列",
       qFull: "队列最多 10 条", qNext: "下一句：",
-      tabBrowse: "▤ 浏览", tabIm: "💬 SDE 微信",
+      tabBrowse: "▤ 浏览", tabIm: "💬 SDE 社区",
       duBtn: "⇉ 双基底", duTip: "同一问同时问两家，左右并排；答完可再让 WDS 做一次对照",
       duPick: "第二家用谁？", duNoKey: "（还没填 Key）", duOff: "不并排",
       duCmp: "⇄ 让 WDS 对照这两份", duCmpQ: "下面是同一个问题交给两家基底得到的两份回答。请对照它们，只说四件事：①两边各自看见了对方没看见的什么；②它们在哪一点上正面矛盾（指到具体句子）；③哪一份更经得起反驳、为什么；④两份都漏掉的是什么。不要复述它们的内容。",
@@ -1890,13 +1890,13 @@
     b.onclick = function () { window.location.href = PAGE_URL; };
     document.body.appendChild(b);
   }
-  // 全站三态（浏览 / SDE 微信 / SDE 对话）：本脚本已在两千多个页面上，
+  // 全站三态（浏览 / SDE 社区 / SDE 对话）：本脚本已在两千多个页面上，
   // 让它去把三态条请来，于是所有页面自动长出切换器，一个页面都不用改。
   // 模块拉不到时退回老的单按钮注入——宁可只有ChatSDE入口，也不能一个入口都没有。
   function loadModes() {
     if (window.SDEModes) return;
     var sc = document.createElement("script");
-    sc.src = "/assets/sde-modes.js?v=20260731v"; sc.async = true;
+    sc.src = "/assets/sde-modes.js?v=20260802a"; sc.async = true;
     sc.onerror = injectNav;
     document.head.appendChild(sc);
   }
@@ -2288,8 +2288,8 @@
     } catch (e) { return ""; }
   }
 
-  /* —— 候选卡出口（对话 → 微信）＋ 近邻一级闸门 ——
-     三大体系是一次「发生」的三个相位：浏览＝遭遇 → 对话＝逼问（产出候选）→ 微信＝对撞
+  /* —— 候选卡出口（对话 → 社区）＋ 近邻一级闸门 ——
+     三大体系是一次「发生」的三个相位：浏览＝遭遇 → 对话＝逼问（产出候选）→ 社区＝对撞
      （交给不共享语汇族的他者顶回）→ 回到浏览沉淀。这一头此前是断的：ChatSDE 里撞出来的
      判断只活在这一场的内存里，刷新即失，没有任何路径把它送到一个人面前。
      四条纪律（三段硬门／库未命中不得据以放行／查库失败不拦路／未登录给去处）
@@ -2398,7 +2398,7 @@
       };
       row.appendChild(db);
     })();
-    // 候选卡：把这一答里的一句压成 50 字级承重命题，查一遍占位库，再交给微信顶回。
+    // 候选卡：把这一答里的一句压成 50 字级承重命题，查一遍占位库，再交给社区顶回。
     var cdb = el("button", "wdsm-act", t("cdBtn"));
     cdb.title = t("cdSelTip");
     var cdSel = "";
@@ -2443,7 +2443,7 @@
      实现不在这里：全站共用 /assets/wds-savedir.js（window.WDSSaveDir），金点子发生器等
      也用同一份。这里只做三件事：尽早把它拉进来（目录句柄要在点击那一刻已在内存里，
      否则 requestPermission 拿不到用户手势）、把结果译成本页文案、没有它就退回普通下载。 ── */
-  var SAVEDIR_SRC = "/assets/wds-savedir.js?v=20260730a";
+  var SAVEDIR_SRC = "/assets/wds-savedir.js?v=20260802a";
   function dirApi() { return window.WDSSaveDir || null; }
   function dirSupported() { var A = dirApi(); return !!(A && A.supported()); }
   function dirName() { var A = dirApi(); return A ? A.name() : ""; }

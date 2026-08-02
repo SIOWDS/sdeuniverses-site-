@@ -31,7 +31,7 @@ async function imUid(sub) {
 }
 // 私聊房间号＝dm/<小的uid>-<大的uid>：一对人永远得同一个房间，双方各自算出的完全相同，
 // 无需在服务端另存"会话表"。房间名仍落在 /api/chat 的 room 正则（小写字母数字与连字符）内。
-// ── 口令登录通道（「SDE 微信」专用，Google 之外的第二条门）────────────
+// ── 口令登录通道（「SDE 社区」专用，Google 之外的第二条门）────────────
 // 大陆学员打不开 Google 登录，故为 IM/聊天另开一条共享口令通道。
 // 口令真值放 Cloudflare 环境变量 IM_PW（Workers → Settings → Variables → Encrypt）。
 // 本仓库是公开仓，源码里只留一个 SHA-256 回退值；一旦设了 IM_PW，回退即整条失效。
@@ -460,7 +460,7 @@ const MUSE_KINDS = {
   fun: "带点自嘲或幽默，可以轻，但不许油。",
   now: "只写这一刻的具体：此时此地看见的、手上正在做的那件事。",
 };
-const MUSE_SYS = "你是「SDE金句生产机」，为 SDE 学员在朋友圈的「说点什么」处现几句备选。\n"
+const MUSE_SYS = "你是「SDE金句生产机」，为 SDE 学员在社区动态的「说点什么」处现几句备选。\n"
   + "\n【用什么眼睛看】\n"
   + "· 看发生：这件事是怎么发生出来的，不是它“是什么”。\n"
   + "· 看差异：哪一条分界线在这里被划了出来，划在哪两样东西之间。\n"
@@ -473,7 +473,7 @@ const MUSE_SYS = "你是「SDE金句生产机」，为 SDE 学员在朋友圈的
   + "4. 可以锋利（“X 不是 Y，是 Z”），但不许教育别人、不许居高临下。\n"
   + "5. 事实、人名、篇名、数字**只能来自给你的材料**，一个都不许现编；没材料就写眼前的事，不写像真的假事。\n"
   + "6. **一篇长一条，五篇出五条**：第 i 条必须是从编号 i 的那篇里长出来的，不许两条抽同一篇。\n"
-  + "   长出来≠摘要：把那篇的判断搬到**读者今天过的日子里**，能被发在朋友圈而不像在发论文。\n"
+  + "   长出来≠摘要：把那篇的判断搬到**读者今天过的日子里**，能被发在社区动态而不像在发论文。\n"
   + "   你拿到的只是题目与一句判断，**别假装读过全文**，不许编文中细节、不许把篇名写进句子里。\n"
   + "7. 五条要是五个不同角度，不是同一句话的五种说法；宁可都短，不要凑字。\n"
   + "8. 术语最多出现一处，且必须是这句话本身非它不可。\n"
@@ -554,7 +554,7 @@ export class CommentBox {
         const body = await request.json().catch(() => null);
         if (!body || !body.data) return Response.json({ ok: false, msg: "请求格式不对。" }, { status: 400 });
         const who = await verifyIdent(body.credential);
-        if (!who) return Response.json({ ok: false, msg: "请先在「SDE 微信」用名字和密码登录，再发图片。" }, { status: 401 });
+        if (!who) return Response.json({ ok: false, msg: "请先在「SDE 社区」用名字和密码登录，再发图片。" }, { status: 401 });
         const _dmi = dmParties(_u.searchParams.get("room") || "");
         if (_dmi && (!who.uid || _dmi.indexOf(who.uid) < 0)) return Response.json({ ok: false, msg: "你不在这个私聊里。" }, { status: 403 });
         let bytes;
@@ -918,7 +918,7 @@ export class CommentBox {
       };
 
       /* ═══ 命题账本（ledger）═══
-         用户定的口径：三个子系统＝S/D/E 三个维度（浏览＝显露／ChatSDE＝发生／微信＝纠缠），
+         用户定的口径：三个子系统＝S/D/E 三个维度（浏览＝显露／ChatSDE＝发生／社区＝纠缠），
          而**纠缠的最小充分条件是三处操作同一个对象**。那个对象只能是承重命题——
          50 字级、可被反对的一句：它本来就是 I 维那把刀、近邻库的查询键、候选卡的第一段。
 
@@ -987,7 +987,7 @@ export class CommentBox {
            而对话里冒出来的多数东西还没成型——一个命名、一句金句、一条观察。
            它们不该被硬门挡在门外白白丢掉（现在的下场是刷新即失），也不该冒充候选卡。
          ⇒ **两个门槛，一条通路**：库存低门槛先接住，够硬的再一键升格成候选卡。
-         库存是**全站共用的一池**：对话侧存进来，朋友圈「说点什么」从里面取，候选卡从里面升格。
+         库存是**全站共用的一池**：对话侧存进来，社区动态「说点什么」从里面取，候选卡从里面升格。
          键：vt:<inv>:<rnd> ＝一条；vu:<uid>:… ＝个人索引。inv 口径同朋友圈（升序即倒序）。 */
       const vtKinds = { line: "金句", name: "命名", claim: "命题", note: "观察" };
       if (op === "vtadd") {
@@ -1556,7 +1556,7 @@ export class CommentBox {
         const body = await request.json().catch(() => null);
         if (!body) return Response.json({ ok: false, msg: "请求格式不对。" }, { status: 400 });
         const who = await verifyIdent(body.credential);
-        if (!who) return Response.json({ ok: false, msg: "请先在「SDE 微信」用名字和密码登录，再发言。" }, { status: 401 });
+        if (!who) return Response.json({ ok: false, msg: "请先在「SDE 社区」用名字和密码登录，再发言。" }, { status: 401 });
         if (_dmc && (!who.uid || _dmc.indexOf(who.uid) < 0)) return Response.json({ ok: false, msg: "你不在这个私聊里。" }, { status: 403 });
         if (_gidc) { // 群：必须在成员名单里
           const gi = await this._gCheck(_gidc, who.uid);
@@ -3539,7 +3539,7 @@ const SDE_TRIAD_BLOCK = "\n\n════ 先判这一问属于哪一类：是�
   + "而且事后分不出你是改切了还是跑题了。**改就明说改了什么、为什么改。**"
   + "\n（这一段是判断纪律，不是回答格式：不要每次都写成「本轮裁定：承接」那样的表格。承接时一句带过甚至不提，改切与驳回必须说。）";
 
-/* ═══════════ 平台自述：ChatSDE / SDE微信 / SDE浏览 ═══════════
+/* ═══════════ 平台自述：ChatSDE / SDE社区 / SDE浏览 ═══════════
    你不是一个独立的聊天产品，你是这个平台的**前台与总机**。读者的第一句话落在你这里，
    平台的其余部分要由你调起来。所以你必须知道站里有什么、什么时候该把人送到哪儿。
    ⚠ 名录里的东西都是真实存在的页面。**不在这份名录里的智能体、栏目、网址一律不许编**——
@@ -3547,9 +3547,9 @@ const SDE_TRIAD_BLOCK = "\n\n════ 先判这一问属于哪一类：是�
    ⚠ 名录会随建站变动。若读者说某处打不开，如实说可能已改动，别硬撑。 */
 const SDE_PLATFORM_BLOCK = "\n\n════ 你所在的平台：爱思乐园（SDE Universes）════"
   + "\n平台由三部分组成，它们不是三个入口，是**同一件事的三个维度**——"
-  + "**SDE浏览＝显露（已经长出来的东西）｜ChatSDE＝发生（新东西在这里被逼出来）｜SDE微信＝纠缠（它交给别人去顶）**。"
+  + "**SDE浏览＝显露（已经长出来的东西）｜ChatSDE＝发生（新东西在这里被逼出来）｜SDE社区＝纠缠（它交给别人去顶）**。"
   + "整个平台的目标只有一句：**新思想的发生**。凡你拿不准该怎么答，回到这一句。"
-  + "\n**你就是中间那一维。** 你的活不是把读者留在对话里，是把他推到下一维去——该读的送去浏览，该被顶的送去微信，该开产线的送去对应那台机器。"
+  + "\n**你就是中间那一维。** 你的活不是把读者留在对话里，是把他推到下一维去——该读的送去浏览，该被顶的送去社区，该开产线的送去对应那台机器。"
 
   + "\n\n──【一 · SDE浏览】已经长出来的东西──"
   + "\n站内有三十多个栏目与十二部专著。读者问到相关内容时，**指名篇目并挂成可点链接**（网址只从《可点开的站内篇目》里照抄）。几个主要去处："
@@ -3576,13 +3576,13 @@ const SDE_PLATFORM_BLOCK = "\n\n════ 你所在的平台：爱思乐园�
   + "｜**/taste/sde-art/ 艺术绘画**｜**/taste/uplift-compare/ 对话智商大比拼**（裸答 vs 提智，盲评对比）｜**/taste/sde-dialogue/ SDE 对谈**"
   + "\n**送人过去时要说三件**：它拿这句话去做什么、大约要多久、烧的是他自己的 Key。**不要替他按开始。**"
 
-  + "\n\n──【三 · SDE微信】交给别人去顶──"
-  + "\n**/sde-wechat/**：群聊、私聊、朋友圈、通讯录，以及这个平台真正特别的那一件——**候选卡与顶回**。"
+  + "\n\n──【三 · SDE社区】交给别人去顶──"
+  + "\n**/sde-wechat/**：群聊、私聊、社区动态、通讯录，以及这个平台真正特别的那一件——**候选卡与顶回**。"
   + "\n· 读者在这场对话里逼出一条像样的新判断时，**告诉他可以把它落成一张候选卡**（卡＝一条 50 字级的承重命题＋它切开的辨别面＋一条可裁决的判据）。"
-  + "\n· 微信那边不是点赞评论，是**结构化顶回三选一**：①我这儿有一个占位者（人名／外文原题）②我给一条方向相反的预测 ③我换一个承重层级重述它。"
+  + "\n· 社区那边不是点赞评论，是**结构化顶回三选一**：①我这儿有一个占位者（人名／外文原题）②我给一条方向相反的预测 ③我换一个承重层级重述它。"
   + "\n· **为什么值得去**：一条判断能走多远，取决于它被**不共享同一套语汇的人**顶过没有。你和他在这场对话里用的是同一批词，"
   + "**再撞也撞不出那个词以外的东西**——这是你这一维的天花板，不是你不努力。**顶回记录本身就是分离线的原料。**"
-  + "\n· 微信侧另有：**思想库存**（存着还没被顶过的命题）｜**文章库**（可附 PDF/Word 的推荐位）｜金句。"
+  + "\n· 社区侧另有：**思想库存**（存着还没被顶过的命题）｜**文章库**（可附 PDF/Word 的推荐位）｜金句。"
 
   + "\n\n──【怎么用这份名录】──"
   + "\n· **名录会随建站变动。** 读者说某处打不开，如实说它可能已经改动或下线，别硬撑、别替它编一个新地址。"
@@ -4642,13 +4642,13 @@ async function askCore(request, env, url, body, SINK) {
   return new Response(stream, { headers: { ..._cors(), "content-type": "text/event-stream; charset=utf-8", "cache-control": "no-store" } });
 }
 
-// ===== SDE 微信库：朋友圈附件只在 R2 里存 7 天 =====
+// ===== SDE 社区库：社区动态附件只在 R2 里存 7 天 =====
 // 为什么要有这个：朋友圈的文章是「推荐给朋友读一读」，不是站内出版物——站内出版物走
 // /students/ 那条线、永久保存。这些附件单份可到 20MB，不设期限迟早把桶撑爆
 // （站点仓已经因为二进制失控到 4.37GB，同一个教训不想再来一次）。
 // 做法是定时扫，不是靠 R2 的 lifecycle 规则——lifecycle 只能在控制台点，
 // 写在代码里的东西才跟着仓库走、才能被复核。
-const WX_LIB = "sde-wechat/lib/";        // SDE 微信库（新件都进这里）
+const WX_LIB = "sde-wechat/lib/";        // SDE 社区库（新件都进这里）
 const WX_LIB_OLD = "moments/doc/";       // 首版的落点，一并扫，扫完自然清空
 const WX_TTL_MS = 7 * 24 * 3600 * 1000;
 
@@ -4722,7 +4722,7 @@ export default {
     if (url.pathname === "/api/wds/analyze" && request.method === "POST") {
       const b = await request.json().catch(() => ({}));
       const who = await verifyIdent(b.credential);
-      if (!who) return Response.json({ ok: false, msg: "请先在「SDE 微信」用名字和密码登录，再上传文档。" }, { status: 401 });
+      if (!who) return Response.json({ ok: false, msg: "请先在「SDE 社区」用名字和密码登录，再上传文档。" }, { status: 401 });
       const room = (b.room || "").toLowerCase();
       if (!/^[a-z0-9-]+(\/[a-z0-9-]+)*$/.test(room)) return Response.json({ ok: false, msg: "bad room" }, { status: 400 });
       const text = String(b.text || "").slice(0, 16000);
@@ -4743,7 +4743,7 @@ export default {
     if (url.pathname === "/api/wds/paper" && request.method === "POST") {
       const b = await request.json().catch(() => ({}));
       const who = await verifyIdent(b.credential);
-      if (!who) return Response.json({ ok: false, msg: "请先在「SDE 微信」用名字和密码登录，再提炼论文。" }, { status: 401 });
+      if (!who) return Response.json({ ok: false, msg: "请先在「SDE 社区」用名字和密码登录，再提炼论文。" }, { status: 401 });
       const room = (b.room || "").toLowerCase();
       if (!/^[a-z0-9-]+(\/[a-z0-9-]+)*$/.test(room)) return Response.json({ ok: false, msg: "bad room" }, { status: 400 });
       const vc = await wdsPaperVC(env);
@@ -6620,7 +6620,7 @@ export default {
       const r = await env.COMMENTS.get(env.COMMENTS.idFromName("chat:" + room)).fetch(new Request("https://do/_clear", { method: "POST" }));
       return Response.json(await r.json(), { headers: { "access-control-allow-origin": "*" } });
     }
-    // 私聊页已升级为「SDE 微信」整套系统，换到 /sde-wechat/；老链接不作废，301 过去。
+    // 私聊页已升级为「SDE 社区」整套系统，换到 /sde-wechat/；老链接不作废，301 过去。
     if (url.pathname === "/sde-talk/im" || url.pathname === "/sde-talk/im/") {
       return new Response(null, { status: 301, headers: { location: "/sde-wechat/", "cache-control": "no-store" } });
     }
@@ -6654,7 +6654,7 @@ export default {
         if (obj) { kind = "docx"; break; }
       }
       // 过期被清掉的和从来没有过的，对读者是同一件事：告诉他这篇已经不在了。
-      if (!obj) return new Response("这篇文章已超过 7 天保留期，已从 SDE 微信库清除。请让作者重新发一次。", {
+      if (!obj) return new Response("这篇文章已超过 7 天保留期，已从 SDE 社区库清除。请让作者重新发一次。", {
         status: 404, headers: { "content-type": "text/plain; charset=utf-8" } });
       const nm = (obj.customMetadata && obj.customMetadata.n) || ("article." + kind);
       // 文件名里的非 ASCII 只能走 filename*（RFC 5987），否则中文名会在部分浏览器上乱码或截断
@@ -6723,7 +6723,7 @@ export default {
         if (!(await adminPassExists())) return Response.json({ ok: false, msg: "本站还没有设定过管理密码。请先在文章讨论区的管理入口设定一次，之后这里就能用同一个密码。" }, { status: 403 });
         if (!(await adminPassOk(b.pass))) return Response.json({ ok: false, msg: "管理密码不正确。" }, { status: 403 });
         const a = String(b.a || "");
-        // 手动清一次 SDE 微信库（cron 每天自己跑，这个是给人按的）。
+        // 手动清一次 SDE 社区库（cron 每天自己跑，这个是给人按的）。
         // 放在管理员双因子门里：它只删已过期的、不会误删，但每调用一次就要把整个前缀列一遍，
         // 开给所有学员等于白送一个算力放大器。
         if (a === "gc") {
@@ -6996,7 +6996,7 @@ export default {
           }
           return Response.json(d || { ok: false }, { status: (d && d.ok) ? 200 : ((d && d.code) || 400) });
         }
-        return Response.json({ ok: false, msg: "未知的朋友圈动作。" }, { status: 400 });
+        return Response.json({ ok: false, msg: "未知的社区动态动作。" }, { status: 400 });
       }
       if (op === "hello") { await call({ op: "hello", uid: who.uid, name: who.name }); return Response.json({ ok: true, me }); }
       if (op === "contacts") {
@@ -7082,7 +7082,7 @@ export default {
         const clean = (s, n) => String(s || "").replace(/[\u0000-\u0009\u000b-\u001f]/g, "").trim().slice(0, n);
         let name;
         const googleOn = GOOGLE_CLIENT_ID.length > 0;
-        // 2026-07-31 解禁：发言身份 = 站内名字+密码 ∪ Google（与「SDE 微信」同一套身份）。
+        // 2026-07-31 解禁：发言身份 = 站内名字+密码 ∪ Google（与「SDE 社区」同一套身份）。
         // 大陆学员打不开 Google，此前 845 篇文章底下的讨论区对他们等于不存在。
         const whoIdent = await verifyIdent(body.credential);
         if (whoIdent && whoIdent.uid) {
@@ -7124,7 +7124,7 @@ export default {
         const data = await resp.json().catch(() => null);
         if (data && data.ok) { // 发言成功 → 在全局登记该文章（供管理页发现）
           await names.fetch(new Request("https://do/", { method: "POST", body: JSON.stringify({ op: "reg", slug }) }));
-          // ——— 把这条发言接回「SDE 微信」：进全站讨论流，并提醒该提醒的人 ———
+          // ——— 把这条发言接回「SDE 社区」：进全站讨论流，并提醒该提醒的人 ———
           // 不接这一步，1407 个讨论区就是只写的：没人会为了看有没有回复而重开一篇文章。
           try {
             const rm = await rosterMap();

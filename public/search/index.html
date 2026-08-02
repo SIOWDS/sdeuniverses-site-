@@ -1325,12 +1325,12 @@ function paradigmName(t){
   var first=String(t||'').split('\n')[0].trim().replace(/^[#＃\s]+/,'');
   return first.slice(0,40)||'（未命名典范）';
 }
-/* ═══ 对话 → 微信：把撞出来的典范立成候选卡 ═══
-   三系统是一次「发生」的三个相位：浏览＝遭遇 → 对话＝逼问（产出候选）→ 微信＝对撞（交给
+/* ═══ 对话 → 社区：把撞出来的典范立成候选卡 ═══
+   三系统是一次「发生」的三个相位：浏览＝遭遇 → 对话＝逼问（产出候选）→ 社区＝对撞（交给
    不共享语汇族的他者顶回）→ 回到浏览沉淀。这条接缝此前是**完全断的**：涌现档撞出的典范
    只活在一次会话的内存里，刷新即失，没有任何路径把候选送到一个人面前。
    身份复用全站单点登录（sessionStorage["sde_gauth"] ／ localStorage["sde_talk_id"]），
-   与「SDE 微信」是同一个键——在微信登录过一次，这里就能直接落卡。 */
+   与「SDE 社区」是同一个键——在社区登录过一次，这里就能直接落卡。 */
 /* 身份取用与「典范骨架八节 → 候选卡三段」的切节都搬进了全站共用模块
    /taste/assets/sde-cand.js——这条缝现在有第二个出口（ChatSDE 的每一答与成文），
    同一套纪律抄两遍必漂，而这类漂移是静默的：卡照样落，只是某一关不再把关。
@@ -1340,7 +1340,7 @@ function cdSection(txt,names){ return (window.SDECand && window.SDECand.section(
 /* 存进库存：**低门槛的那条路**。
    候选卡要三段硬门，而典范名／承重命题这类东西哪怕只有一句也值得留下来——
    否则它只活在这一次会话的内存里，刷新即失。存进去之后，
-   朋友圈「说点什么」能从里面挑，够硬的还能在微信里一键升格成候选卡。 */
+   社区动态「说点什么」能从里面挑，够硬的还能在社区里一键升格成候选卡。 */
 /* ═══ 精华要点 → 自动进库存 ═══
    用户定的：「SDE对话里面产生出来的『精华要点』需要**自动**进入『库存』」。
    「精华要点」＝这条产线的枢纽产物《论文入口资料》——两个来源、两套栏目：
@@ -1367,8 +1367,8 @@ function autoVault(text, kindLabel){
   }
   var cred = cdCred();
   if(!cred){
-    tip.innerHTML = '这份精华要点还没进库存——先在 <a href="/sde-wechat/" target="_blank">SDE 微信</a> 登录一次（全站通用），'
-      + '以后每次提炼都会自动存进「💡 思想库存」，发朋友圈和立候选卡都能从那里取。';
+    tip.innerHTML = '这份精华要点还没进库存——先在 <a href="/sde-wechat/" target="_blank">SDE 社区</a> 登录一次（全站通用），'
+      + '以后每次提炼都会自动存进「💡 思想库存」，发社区动态和立候选卡都能从那里取。';
     return;
   }
   var jobs = [], seen = {};
@@ -1390,7 +1390,7 @@ function autoVault(text, kindLabel){
   })).then(function(rs){
     var okn = rs.filter(function(x){ return x && x.ok; }).length;
     var dup = rs.filter(function(x){ return x && x.dup; }).length;
-    if(!okn){ tip.textContent = "要点没存进库存（可能是登录过期），可稍后在微信里手动补。"; return; }
+    if(!okn){ tip.textContent = "要点没存进库存（可能是登录过期），可稍后在社区里手动补。"; return; }
     tip.innerHTML = "已自动存进思想库存 " + okn + " 条"
       + (dup ? ("（其中 " + dup + " 条早就存过）") : "")
       + ' → <a href="/sde-wechat/" target="_blank">去「💡 思想库存」看</a>'
@@ -1401,7 +1401,7 @@ function toVault(ix){
   var p=paradigms[ix]; if(!p)return;
   var msg=document.getElementById("cdmsg"+ix);
   var cred=cdCred();
-  if(!cred){ msg.innerHTML='要先在 <a href="/sde-wechat/" target="_blank">SDE 微信</a> 登录一次（全站通用）。'; return; }
+  if(!cred){ msg.innerHTML='要先在 <a href="/sde-wechat/" target="_blank">SDE 社区</a> 登录一次（全站通用）。'; return; }
   /* 存两条：典范名（命名）与承重命题（命题）。取不到就少存一条，绝不编造。 */
   var name=paradigmName(p.text);
   var prop=cdSection(p.text,["二、承重命题","承重命题"]);
@@ -1432,7 +1432,7 @@ function toCandidate(ix){
   var prop=cdSection(p.text,["二、承重命题","承重命题"]);
   var face=cdSection(p.text,["三、它切开的辨别面","它切开的辨别面","辨别面"]);
   var crit=cdSection(p.text,["五、可裁决判据","可裁决判据","六、可裁决判据"]);
-  if(!prop){ msg.textContent="这张典范里没解析出「承重命题」，先手动去微信立卡。"; return; }
+  if(!prop){ msg.textContent="这张典范里没解析出「承重命题」，先手动去社区立卡。"; return; }
   if(!face){ msg.textContent="没解析出「它切开的辨别面」——候选卡缺这一段就没法被顶回，先手动立卡。"; return; }
   if(!crit){ msg.textContent="没解析出「可裁决判据」——没有判据别人只能表态，先手动立卡。"; return; }
   msg.textContent="正在查占位库、落卡…";
@@ -1461,7 +1461,7 @@ function renderParadigms(sel){
       +(p.verdict?'<div style="font-size:0.77rem;color:var(--text2);line-height:1.65;margin-top:6px">'+esc(String(p.verdict).slice(0,240))+'</div>':'')
       +(p.err?'<div style="font-size:0.75rem;color:#A85B2B;margin-top:6px">创新检查未完成：'+esc(p.err)+'（本卡按 0 分参与择优）</div>':'')
       +'<div style="font-size:0.76rem;color:var(--text2);line-height:1.75;margin-top:7px;max-height:'+(win?'none':'7.5em')+';overflow:hidden;white-space:pre-wrap">'+esc(p.text.slice(0,win?4000:420))+'</div>'
-      /* 对话 → 微信 这条接缝：典范骨架的第二、三、五节，正好就是候选卡的三段。
+      /* 对话 → 社区 这条接缝：典范骨架的第二、三、五节，正好就是候选卡的三段。
          不接的话，撞出来的东西只活在这一次会话的内存里，刷新即失。 */
       +'<div style="margin-top:9px"><button class="actbtn" style="font-size:0.76rem;padding:5px 11px" onclick="toCandidate('+ix+')">📤 立成候选卡（交给不共享语汇的人顶回）</button>'
       +' <button class="actbtn" style="font-size:0.76rem;padding:5px 11px" onclick="toVault('+ix+')">💡 存进库存</button>'
@@ -1641,9 +1641,9 @@ function saveKey(){
 </script>
 
 <script>window.WDS_READ={selector:".wrap"};</script>
-<script src="/taste/wds-companion/wds-read.js?v=20260801a" defer></script>
+<script src="/taste/wds-companion/wds-read.js?v=20260802a" defer></script>
 
-<script src="/wds-mode.js?v=20260801m" defer></script>
+<script src="/wds-mode.js?v=20260802a" defer></script>
 <script src="/taste/assets/sde-handoff.js?v=2"></script>
 <script>
 /* 接住从 SDE 对话交过来的那一问：只填框、不开跑（纪律见 sde-handoff.js）。 */

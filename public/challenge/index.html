@@ -329,12 +329,12 @@ button:hover{opacity:.88}
     try {
       SDECand.gate(v).then(function (g) {
         el("gate").innerHTML = (g && g.line ? esc(g.line) : "查不出来——按〔库未命中〕处理，不得据此认为没被占。") +
-          "　<a href=\"/sde-wechat/\">去微信立卡 →</a>";
+          "　<a href=\"/sde-wechat/\">去社区立卡 →</a>";
       }, function () {
-        el("gate").innerHTML = "占位查询没跑起来·按<b>库未命中</b>处理（不等于没被占）。　<a href=\"/sde-wechat/\">去微信立卡 →</a>";
+        el("gate").innerHTML = "占位查询没跑起来·按<b>库未命中</b>处理（不等于没被占）。　<a href=\"/sde-wechat/\">去社区立卡 →</a>";
       });
     } catch (e) {
-      el("gate").innerHTML = "占位查询没跑起来·按<b>库未命中</b>处理。　<a href=\"/sde-wechat/\">去微信立卡 →</a>";
+      el("gate").innerHTML = "占位查询没跑起来·按<b>库未命中</b>处理。　<a href=\"/sde-wechat/\">去社区立卡 →</a>";
     }
   }
 
@@ -379,6 +379,6 @@ button:hover{opacity:.88}
   };
 })();
 </script>
-<script src="/wds-mode.js?v=20260801m" defer></script>
+<script src="/wds-mode.js?v=20260802a" defer></script>
 </body>
 </html>

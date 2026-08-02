@@ -6,7 +6,7 @@
  *
  * 本件包三样东西，缺一不可：
  *   ① 讨论区本身（样式 + 结构 + 拉取/发言/回复）
- *   ② 名字与密码登录（与「SDE 微信」同一个身份，一处登录全站通用）
+ *   ② 名字与密码登录（与「SDE 社区」同一个身份，一处登录全站通用）
  *   ③ 阅读量计数——⚠️ 原先这段就藏在内联讨论脚本的尾巴里，857 页里有 832 页
  *      没有独立的 pv 脚本。把内联块删掉而不把它接过来，这 832 页的阅读量会静默归零。
  *
@@ -15,7 +15,7 @@
 (function () {
   "use strict";
   var USE_GOOGLE = 0;
-  var SKEY = "sde_gauth";         // 与「SDE 微信」共用
+  var SKEY = "sde_gauth";         // 与「SDE 社区」共用
   var LKEY = "sde_talk_id";       // 跨标签页副本（sessionStorage 不跨标签）
   var TTL = 12 * 3600 * 1000;
 
@@ -85,7 +85,7 @@
     '<input id="tk-pw-code" type="password" maxlength="60" placeholder="进入密码" autocomplete="off">' +
     '<button id="tk-pw-go" type="button">进 入</button>' +
     '</div><datalist id="tk-pw-roster"></datalist><div class="m" id="tk-pw-msg"></div>' +
-    '<p class="tip">名字要和你在站上发表用的名字一致（点一下输入框可以从名录里选）；进入密码向学员发放。这个身份与「<a href="/sde-wechat/">SDE 微信</a>」是同一个，登录一次，全站通用。</p>' +
+    '<p class="tip">名字要和你在站上发表用的名字一致（点一下输入框可以从名录里选）；进入密码向学员发放。这个身份与「<a href="/sde-wechat/">SDE 社区</a>」是同一个，登录一次，全站通用。</p>' +
     '</div>' +
     '<textarea id="tk-text" maxlength="1000" placeholder="你的问题，或你的见解…" style="display:none;margin-top:10px"></textarea>' +
     '<div class="tk-bar" id="tk-sendbar" style="display:none"><span class="tk-note">最多 1000 字 · 每人每天最多 30 条</span><button id="tk-send">发 言</button></div>' +
@@ -270,7 +270,7 @@
       note("发送中…");
       fetch(API, {
         method: "POST", headers: { "content-type": "application/json" },
-        // 带上标题：讨论回流到「SDE 微信」时要显示「谁在哪篇文章下说了什么」
+        // 带上标题：讨论回流到「SDE 社区」时要显示「谁在哪篇文章下说了什么」
         body: JSON.stringify({ credential: cred, text: text, parent: parent, title: (document.title || "").split(" | ")[0].split(" · ")[0].slice(0, 90) }),
       }).then(function (r) { return r.json().then(function (d) { return { s: r.status, d: d }; }); })
         .then(function (x) {

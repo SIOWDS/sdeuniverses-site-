@@ -5,7 +5,7 @@
  *     SDECand.gate(prop).then(function (g) { box.textContent = g.line; });   // 零调用、不烧 Key
  *     SDECand.post({ prop: …, face: …, crit: …, src: "ChatSDE · 这一答" });
  *
- * 为什么要抽出来：这条「对话 → 微信」的缝现在有**两个以上**出口——涌现档撞出的典范卡、
+ * 为什么要抽出来：这条「对话 → 社区」的缝现在有**两个以上**出口——涌现档撞出的典范卡、
  * ChatSDE 的每一条回答与成文。三段硬门的话术、库未命中的口径、身份两级取用，
  * 抄第二遍就一定会漂，而这类漂移是**静默的**：卡照样落、闸照样显示一行字，
  * 只是某一关实际上已经不在把关了，没有人会收到报错。所以只写在这里。
@@ -170,7 +170,7 @@
     if (!cr) {
       return Promise.resolve({
         ok: false, noAuth: 1,
-        msg: '要先在 <a href="' + WX + '" target="_blank">SDE 微信</a> 用名字和密码登录一次'
+        msg: '要先在 <a href="' + WX + '" target="_blank">SDE 社区</a> 用名字和密码登录一次'
            + '（全站通用，登好回来再点）。'
       });
     }
@@ -188,7 +188,7 @@
           credential: cr, op: "cd", a: "post",
           prop: v.card.prop, face: v.card.face, crit: v.card.crit,
           nbr: pack, src: String((c && c.src) || "").slice(0, 80),
-          // 账本两件：sys＝它在哪个维度上冒出来（S 浏览／D 对话／E 微信，默认 D）；
+          // 账本两件：sys＝它在哪个维度上冒出来（S 浏览／D 对话／E 社区，默认 D）；
           // kin＝血缘，它从哪几条命题分叉出来。**共同创造用分叉不用共编**，见 worker 里 ppUp 那段口径。
           sys: String((c && c.sys) || "D"), kin: (c && c.kin) || []
         })

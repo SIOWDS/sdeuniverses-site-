@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>SDE 微信 · 群聊与私聊 | SDE Universes</title>
-<meta name="description" content="SDE 微信：站内聊天系统——群聊、一对一私聊、朋友圈（发文字与图片、点赞、评论）、通讯录、建群、群公告、@提及、引用回复、未读提醒。输入名字和密码即用，无需安装。">
+<title>SDE 社区 · 群聊与私聊 | SDE Universes</title>
+<meta name="description" content="SDE 社区：站内聊天系统——群聊、一对一私聊、社区动态（发文字与图片、点赞、评论）、通讯录、建群、群公告、@提及、引用回复、未读提醒。输入名字和密码即用，无需安装。">
 <meta name="robots" content="noindex">
 <style>
 :root{
@@ -134,7 +134,7 @@ a{color:var(--disc)}
 .dt .w{font-size:0.75rem;color:var(--muted);margin-top:4px}
 .dt .w em{font-style:normal;color:var(--gold2)}
 .dt.new{background:#FBF6E9}
-/* ── 朋友圈 ── */
+/* ── 社区动态 ── */
 .mo{display:flex;gap:11px;padding:0.95rem 1rem;background:var(--card);border-bottom:1px solid var(--border2)}
 .mo .av{cursor:pointer}
 .mo .mm{flex:1;min-width:0}
@@ -200,7 +200,7 @@ a{color:var(--disc)}
 .nw b{color:var(--disc)}
 .nw .t{font-size:0.72rem;color:var(--muted)}
 
-/* 朋友圈里的文章条 */
+/* 社区动态里的文章条 */
 .mo-doc{display:flex;align-items:center;gap:10px;margin:8px 0 2px;padding:10px 12px;border:1px solid rgba(201,168,76,.34);
   border-radius:8px;background:rgba(201,168,76,.06);cursor:pointer}
 .mo-doc:hover{background:rgba(201,168,76,.12)}
@@ -213,8 +213,8 @@ a{color:var(--disc)}
 .mo-doc .dg{flex:0 0 auto;font-size:12px}
 .mo-doc-s.dead{color:#C9584C}
 </style>
-<!-- 全站三态：浏览 / SDE 微信 / SDE 对话。模块自己会挂到 .top 顶栏上 -->
-<script src="/assets/sde-modes.js?v=20260731v" defer></script>
+<!-- 全站三态：浏览 / SDE 社区 / SDE 对话。模块自己会挂到 .top 顶栏上 -->
+<script src="/assets/sde-modes.js?v=20260802a" defer></script>
   <script src="/assets/sde-nbr.js"></script>
   <script src="/assets/sde-dist.js?v=1"></script>
 </head>
@@ -226,7 +226,7 @@ a{color:var(--disc)}
   <div class="top">
     <span class="back" id="t-back" style="display:none">‹</span>
     <div class="ttlwrap" id="t-ttlwrap">
-      <div class="ttl" id="t-ttl">SDE 微信</div>
+      <div class="ttl" id="t-ttl">SDE 社区</div>
       <div class="sub" id="t-sub"><span class="dot" id="t-dot"></span><span id="t-stat"></span></div>
     </div>
     <button class="act" id="t-act" type="button" style="display:none">群资料</button>
@@ -239,8 +239,8 @@ a{color:var(--disc)}
 
     <div class="view on" id="v-gate">
       <div id="gate">
-        <h2>SDE 微信</h2>
-        <p>站内的聊天系统：群聊、一对一私聊、<b>朋友圈</b>、通讯录、建群、群公告、@提及、引用回复、未读提醒。输入名字和进入密码即可，无需安装、无需翻墙。密码向学员发放；名字须与学员名录一致。</p>
+        <h2>SDE 社区</h2>
+        <p>站内的聊天系统：群聊、一对一私聊、<b>社区动态</b>、通讯录、建群、群公告、@提及、引用回复、未读提醒。输入名字和进入密码即可，无需安装、无需翻墙。密码向学员发放；名字须与学员名录一致。</p>
         <div id="gsi" style="display:none"></div>
         <div id="pwbox" style="margin-top:14px">
           <p style="font-size:0.8rem;color:var(--muted);margin:0 0 8px">输入名字和进入密码：</p>
@@ -444,7 +444,7 @@ a{color:var(--disc)}
           <div class="mp-thumbs" id="mp-thumbs"></div>
           <input type="file" id="mp-file" accept="image/*" multiple style="display:none">
           <label>文章（PDF 或 Word，可选，单篇不超过 20MB）</label>
-          <div class="hint" style="margin:-4px 0 6px">文章存在「SDE 微信库」里，<b>保留 7 天后自动清除</b>——是给朋友读一读的，不是站内存档。<br><b>站上已经有的篇目不必上传</b>：用下面的「📎 插一篇文章」贴链接就行——链接不会过期，别人点进去读的还是最新那一版。</div>
+          <div class="hint" style="margin:-4px 0 6px">文章存在「SDE 社区库」里，<b>保留 7 天后自动清除</b>——是给朋友读一读的，不是站内存档。<br><b>站上已经有的篇目不必上传</b>：用下面的「📎 插一篇文章」贴链接就行——链接不会过期，别人点进去读的还是最新那一版。</div>
           <div id="mp-docbox"></div>
           <button class="btn gh" id="mp-docpick" type="button">＋ 附一篇文章</button>
           <input type="file" id="mp-doc" accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" style="display:none">
@@ -468,15 +468,15 @@ a{color:var(--disc)}
             <div class="me-item"><span>新消息桌面提醒</span><button id="b-notify">开启</button></div>
             <div class="me-item"><span>SDE 讨论（公开广场）</span><a href="/sde-talk/"><button>进入</button></a></div>
             <div class="me-item"><span>SDE 会议室</span><a href="/meeting/"><button>进入</button></a></div>
-            <div class="me-item"><span>💡 思想库存<br><span style="font-size:0.74rem;color:var(--muted)">对话里撞出来的东西存在这儿，发朋友圈、立候选卡都从这儿取</span></span><button id="b-vault">进入</button></div>
-            <div class="me-item"><span>📚 文章库<br><span style="font-size:0.74rem;color:var(--muted)">站上的文章收在这儿；发帖发朋友圈时可以随时插一篇进去</span></span><button id="b-lib">进入</button></div>
+            <div class="me-item"><span>💡 思想库存<br><span style="font-size:0.74rem;color:var(--muted)">对话里撞出来的东西存在这儿，发社区动态、立候选卡都从这儿取</span></span><button id="b-vault">进入</button></div>
+            <div class="me-item"><span>📚 文章库<br><span style="font-size:0.74rem;color:var(--muted)">站上的文章收在这儿；发帖发社区动态时可以随时插一篇进去</span></span><button id="b-lib">进入</button></div>
             <div class="me-item"><span>全权管理</span><button id="b-admin">进入</button></div>
             <div class="me-item"><span>退出登录</span><button id="b-out">退出</button></div>
           </div>
           <p style="font-size:0.79rem;color:var(--muted);margin-top:1rem;line-height:1.95">
-            聊天是<b>纯文字</b>的：只发文字与表情，不发语音、文件；<b>图片请发在朋友圈</b>。<br>
+            聊天是<b>纯文字</b>的：只发文字与表情，不发语音、文件；<b>图片请发在社区动态</b>。<br>
             <b>文章讨论</b>＝全站 1400 多篇文章底下的讨论都汇到消息列表最上面那条，谁回了你会有提醒。<br>
-            <b>朋友圈</b>＝站内所有登录过的人共见的一条时间线：发文字与图片、点赞、评论、回复；点名字看某人的全部。<br>
+            <b>社区动态</b>＝站内所有登录过的人共见的一条时间线：发文字与图片、点赞、评论、回复；点名字看某人的全部。<br>
             通讯录里是所有在本站登录过的人——学员一登录就出现，可直接私聊或拉进群。<br>
             群里 <b>@某人</b> 会给他一个红标；<b>@所有人</b> 全员提醒。<br>
             任何会话里都能 <b>@WDS</b> 提问，答案只落在这个会话里。<br>
@@ -492,7 +492,7 @@ a{color:var(--disc)}
     <div class="tab on" data-go="chats"><i>💬</i>聊天<span class="tb" id="tb-unread"></span></div>
     <div class="tab" data-go="book"><i>👥</i>通讯录</div>
     <div class="tab" data-go="cand"><i>🎯</i>候选<span class="tb" id="tb-cd"></span></div>
-  <div class="tab" data-go="moments"><i>🌿</i>朋友圈<span class="tb" id="tb-mo"></span></div>
+  <div class="tab" data-go="moments"><i>🌿</i>社区动态<span class="tb" id="tb-mo"></span></div>
     <div class="tab" data-go="me"><i>👤</i>我</div>
   </div>
 
@@ -503,7 +503,7 @@ a{color:var(--disc)}
 "use strict";
 function el(id){return document.getElementById(id)}
 var GCID="985037699618-de3smmqf2rer0pfhf4mrtrj3rgahgu5u.apps.googleusercontent.com";
-var TITLE="SDE 微信 · 群聊与私聊 | SDE Universes";
+var TITLE="SDE 社区 · 群聊与私聊 | SDE Universes";
 var CRED="",ME=null,contacts=[],groups=[],chats=[],roster={},unread=0;
 var cur=null,ws=null,connected=false,tries=0,usePoll=false,pollT=null,lastId=0,seen={},nodes={},pendingNew=0,inboxT=null,notifyOn=false;
 var replyTo=null,gMembers=[],gOwner=false,pickSel={};
@@ -554,8 +554,8 @@ function show(v){
   else if(v==="cdnews")el("t-ttl").textContent="顶回提醒";
   else if(v==="vault")el("t-ttl").textContent="💡 思想库存";   else if(v==="lib")el("t-ttl").textContent="📚 文章库";
   else if(v==="cand")el("t-ttl").textContent=cdWho?(cdWhoName+"的候选"):"候选";
-  else if(v==="moments")el("t-ttl").textContent=moWho?(moWhoName+"的朋友圈"):"朋友圈";
-  else if(v!=="talk")el("t-ttl").textContent="SDE 微信";
+  else if(v==="moments")el("t-ttl").textContent=moWho?(moWhoName+"的社区动态"):"社区动态";
+  else if(v!=="talk")el("t-ttl").textContent="SDE 社区";
   Array.prototype.forEach.call(document.querySelectorAll(".tab"),function(t){t.classList.toggle("on",v===t.getAttribute("data-go"))});
 }
 Array.prototype.forEach.call(document.querySelectorAll(".tab"),function(t){
@@ -594,9 +594,9 @@ function adLoad(){
     h+='<h3 style="margin:0 0 6px;font-size:0.95rem">合并身份（国内／海外同一个人）</h3>';
     h+='<p style="font-size:0.76rem;color:var(--muted);margin:0 0 8px;line-height:1.7">'
       +'大陆用名字＋密码进，海外用 Google 进——<b>是两拨真实的人，两个入口都保留</b>；'
-      +'但同一个人换通道进来会变成通讯录里的另一个人，群、朋友圈都跟着旧身份走。'
+      +'但同一个人换通道进来会变成通讯录里的另一个人，群、社区动态都跟着旧身份走。'
       +'在下面选中那个旧身份，填他在<b>学员名录里的名字</b>，就把一切改挂过去。<br>'
-      +'⚠️ <b>群聊与朋友圈都能完整搬走；私聊的历史消息搬不走</b>'
+      +'⚠️ <b>群聊与社区动态都能完整搬走；私聊的历史消息搬不走</b>'
       +'（私聊房号由两个 uid 算出来，换了 uid 就是另一个房间）——会话还在，里面会写明。</p>';
     h+='<div class="me-item" style="display:block;padding:10px 0">'
       +'<select id="ad-mg-from" style="width:100%;box-sizing:border-box;padding:8px;margin-bottom:6px;border:1px solid var(--line,#ddd);border-radius:8px">'
@@ -659,7 +659,7 @@ function adBind(){
     var from=(el("ad-mg-from")||{}).value||"",to=((el("ad-mg-to")||{}).value||"").trim();
     if(!from){adNote("先选一个要并掉的旧身份。",1);return;}
     if(!to){adNote("填上要合并到的名录名字。",1);return;}
-    if(!confirm("把 "+from+" 名下的群籍、会话、朋友圈全部改挂到「"+to+"」？\n私聊的历史消息搬不走（会话仍在）。此操作不可撤销。"))return;
+    if(!confirm("把 "+from+" 名下的群籍、会话、社区动态全部改挂到「"+to+"」？\n私聊的历史消息搬不走（会话仍在）。此操作不可撤销。"))return;
     adNote("正在合并…");
     adCall("merge",{from:from,toName:to}).then(function(x){
       var d=x.d||{};
@@ -1369,7 +1369,7 @@ function dtBadge(){
   }).catch(function(){});
 }
 
-/* ── 朋友圈 ── */
+/* ── 社区动态 ── */
 var moPosts=[],moNext="",moMore=false,moWho="",moWhoName="",moLoading=false,moPick=[],moBadgeN=0,moFresh=0;
 
 function mkEl(tag,cls,txt){var d=document.createElement(tag);if(cls)d.className=cls;if(txt!=null)d.textContent=txt;return d}
@@ -1428,10 +1428,10 @@ function cdBadge(){
 }
 /* ═══ 思想库存 ═══
    用户定的：「对话产生的很多新思想，要能自动进入微信的某个库存……可以自动点击那个库存去发现。
-   这样对话产生的新思想和朋友圈可以共用，或者微信整个共用。」
+   这样对话产生的新思想和社区动态可以共用，或者微信整个共用。」
    **两个门槛，一条通路**：库存低门槛（一句话就存）先接住对话里冒出来的东西，
    够硬的再一键升格成候选卡（三段硬门）。库存是全站共用的一池——
-   对话侧存进来、朋友圈「说点什么」从里面取、候选卡从里面升格。 */
+   对话侧存进来、社区动态「说点什么」从里面取、候选卡从里面升格。 */
 var vtFrom="", vtMode="new", vtPick=null;
 var VT_KIND={line:"金句",name:"命名",claim:"命题",note:"观察"};
 function vtApi(a,extra){return api("vt",Object.assign({a:a},extra||{})).then(unwrap);}
@@ -1547,7 +1547,7 @@ function lbBind(){
 }
 
 /* 📎 聊天现场插一篇／插一句 ——「S 维度」在群聊与私聊里的在场。
-   两个库此前只在「我」页与朋友圈发表页够得着，聊天里完全够不着；
+   两个库此前只在「我」页与社区动态发表页够得着，聊天里完全够不着；
    而聊天恰恰是纠缠真正发生的地方（E 的现场）。
    插入一律**追加**、不覆盖已经写了的字；插完回到会话。 */
 function insWire(){
@@ -1592,7 +1592,7 @@ function vtWire(){
   var b=el("b-vault");
   if(b)b.onclick=function(){vtMode="new";vtGo("me",null);};
   var mv=el("mu-vault");
-  // 朋友圈这一条正是用户点名的场景：「有的时候，加入了图片，不知道今天想说什么」
+  // 社区动态这一条正是用户点名的场景：「有的时候，加入了图片，不知道今天想说什么」
   // ——金句生产机是现造，库存是**已经攒下的**，两条路并排放。
   if(mv)mv.onclick=function(){
     vtMode="new";
@@ -1603,7 +1603,7 @@ function vtWire(){
     });
   };
 }
-/* from＝从哪进来的（决定返回键回哪）；onPick＝点一条要干什么（朋友圈是填进正文） */
+/* from＝从哪进来的（决定返回键回哪）；onPick＝点一条要干什么（社区动态是填进正文） */
 function vtGo(from,onPick){vtFrom=from||"me";vtPick=onPick||null;show("vault");vtLoad();}
 function vtLoad(){
   var box=el("vt-body");box.innerHTML='<div class="hint">正在加载…</div>';
@@ -1617,7 +1617,7 @@ function vtLoad(){
     var h='<div style="padding:12px 14px 0">'
       +'<p style="font-size:0.8rem;color:var(--muted);line-height:1.8;margin:0 0 10px">'
       +'库存是<b>全站共用的一池</b>：对话里撞出来的东西存进这里，'
-      +'发朋友圈时可以从这里挑一句，够硬的还能一键升格成候选卡去被人顶回。<br>'
+      +'发社区动态时可以从这里挑一句，够硬的还能一键升格成候选卡去被人顶回。<br>'
       +'<b>门槛故意放低</b>——一句能站住的话就值得存下来，别让它刷新即失。</p>'
       +'<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">'
       +['new:最新','pick:🎲 随便翻翻','fresh:还没被用过','mine:我存的'].map(function(x){
@@ -1896,7 +1896,7 @@ function moRender(){
   var L=el("mo-list");L.textContent="";
   if(!moPosts.length){
     var h=mkEl("div","hint");
-    h.innerHTML=moWho?"他还没有发过朋友圈。":"朋友圈还空着。<br>点右上角 <b>发表</b>，说点什么。";
+    h.innerHTML=moWho?"他还没有发过社区动态。":"社区动态还空着。<br>点右上角 <b>发表</b>，说点什么。";
     L.appendChild(h);return;
   }
   moPosts.forEach(function(p){L.appendChild(moCard(p))});
@@ -1908,14 +1908,14 @@ function moRender(){
     L.appendChild(mkEl("div","mo-more","—— 到底了 ——")).style.color="var(--muted)";
   }
 }
-/* 朋友圈里的一篇文章：PDF 点开就在浏览器里翻，Word 浏览器读不了、只能下载。
+/* 社区动态里的一篇文章：PDF 点开就在浏览器里翻，Word 浏览器读不了、只能下载。
    两者都走 /api/im/doc?k= —— 与图片同一道门（键不可枚举）。 */
 function moSize(n){n=Number(n)||0;return n<1024?n+" B":n<1048576?(n/1024).toFixed(0)+" KB":(n/1048576).toFixed(1)+" MB";}
-/* 附件只在 SDE 微信库里存 7 天（服务端每天定时清）。这里按发布时间算个剩余天数，
+/* 附件只在 SDE 社区库里存 7 天（服务端每天定时清）。这里按发布时间算个剩余天数，
    让读者知道"现在不看，过几天就没了"，而不是点开才发现 404。 */
 function moDocLife(ts){
   var t=Number(ts)||0;
-  if(!t)return {dead:false,txt:"文章在 SDE 微信库保留 7 天"};
+  if(!t)return {dead:false,txt:"文章在 SDE 社区库保留 7 天"};
   var left=t+7*24*3600*1000-Date.now();
   if(left<=0)return {dead:true,txt:"已超过 7 天保留期，可能已被清除——可请作者重发"};
   var d=Math.floor(left/86400000),hh=Math.floor(left%86400000/3600000);
@@ -2283,7 +2283,7 @@ var IC_KIND={
   flip:"反着说：把看图的人默认会说的那句话翻过来，但要翻得站得住。",
   fun:"带点自嘲或幽默，可以轻，但不许油。"
 };
-var IC_SYS="你是「吃图出金句」：先用 SDE 解构一张图，再从解构里长出五句能发朋友圈的话。\n"
+var IC_SYS="你是「吃图出金句」：先用 SDE 解构一张图，再从解构里长出五句能发社区动态的话。\n"
 +"\n【第一步·看见什么】先只列图里**真看得见**的东西：物件、动作、地方、光线、时间。"
 +"看不清就写看不清。**不许写图里没有的东西**，不许猜人名地名品牌与心情。\n"
 +"\n【第二步·三格解构】只靠上一步列出的东西做：\n"
@@ -2418,7 +2418,7 @@ el("ic-go").onclick=function(){
     var body={model:model,max_tokens:3000,messages:[
       {role:"system",content:IC_SYS},
       {role:"user",content:[{type:"text",text:"【口味】"+(IC_KIND[el("ic-kind").value]||IC_KIND.asis)
-        +"\n\n这是读者要发朋友圈的 "+imgs.length+" 张图。按三步来，只输出那段 JSON。"}]
+        +"\n\n这是读者要发社区动态的 "+imgs.length+" 张图。按三步来，只输出那段 JSON。"}]
         .concat(imgs.map(function(d){return {type:"image_url",image_url:{url:d}}}))}
     ]};
     if(c.k==="sde_glm_key")body.thinking={type:"disabled"};

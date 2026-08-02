@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
-<title>阅读 · SDE 微信</title>
+<title>阅读 · SDE 社区</title>
 <style>
 :root{--bg:#0E0B08;--panel:#161109;--gold:#C9A84C;--gold2:#E7D9A6;--ink:#E7DFC8;--muted:#9A906F;--line:rgba(201,168,76,.28)}
 *{box-sizing:border-box}
@@ -53,7 +53,7 @@ iframe{width:100%;height:calc(100vh - 52px);border:0;background:#fff}
 <div id="stage"><div id="msg">正在加载…</div></div>
 
 <script>
-/* 朋友圈文章阅读器。
+/* 社区动态文章阅读器。
    两个库都自托管在 /assets/lib/ ——站内既有的 read.html 走 cdnjs 外链，
    大陆学员每次都要在那条外链上等超时；这一页不重复那个错误。
    PDF 用 pdf.js 翻页＋重渲染缩放（与站内翻页版同一套做法：s = fit × zoom，
@@ -63,10 +63,10 @@ iframe{width:100%;height:calc(100vh - 52px);border:0;background:#fff}
   var K=(Q.get("k")||"").toLowerCase(), T=(Q.get("t")||"").toLowerCase(), N=Q.get("n")||"";
   var stage=document.getElementById("stage"), msg=document.getElementById("msg");
   function say(h){ stage.innerHTML='<div id="msg">'+h+'</div>'; }
-  if(!/^[0-9a-f]{16}$/.test(K)||(T!=="pdf"&&T!=="docx")){ say("这个阅读链接不完整。<br>请回到朋友圈重新点开。"); return; }
+  if(!/^[0-9a-f]{16}$/.test(K)||(T!=="pdf"&&T!=="docx")){ say("这个阅读链接不完整。<br>请回到社区动态重新点开。"); return; }
   var SRC="/api/im/doc?k="+encodeURIComponent(K);
   document.getElementById("nm").textContent=N||("文章."+T);
-  document.title=(N||"文章")+" · SDE 微信";
+  document.title=(N||"文章")+" · SDE 社区";
   var dl=document.getElementById("dl"); dl.href=SRC; dl.setAttribute("download",N||("文章."+T));
 
   function load(src,cb,err){ var s=document.createElement("script"); s.src=src; s.onload=cb; s.onerror=err; document.head.appendChild(s); }
