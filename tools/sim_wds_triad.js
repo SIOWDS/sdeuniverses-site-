@@ -24,7 +24,11 @@ console.log("① 常驻注入（不是只在深度档）");
 ok(i > 0, "SDE_TRIAD_BLOCK 存在");
 ok(/\+ SDEM\s*\n\s*\+ SDE_TRIAD_BLOCK/.test(W), "在 WDS_CHAT_SYS 里无条件拼进去（紧跟 SDEM，不带 deep 三元）");
 ok(!/deep \? SDE_TRIAD_BLOCK/.test(W), "没有被写成只在深度档注入");
-ok(W.indexOf("if (tool === \"iq\") return WDS_IQ_SYS") < W.indexOf("+ SDE_TRIAD_BLOCK"),
+// ⚠ 这里不能用「全文第一处 + SDE_TRIAD_BLOCK」当基准：2026-08-02 起 SDE 社区的 @WDS
+//    也装了同一份块（answerWDS，位置比 WDS_CHAT_SYS 靠前），全文首次出现就落到它身上了。
+//    这条要守的是 **ChatSDE 这一处**的注入次序，所以基准取 ChatSDE 的注入点（紧跟 SDEM 那处）。
+const chatInject = W.search(/\+ SDEM\s*\n\s*\+ SDE_TRIAD_BLOCK/);
+ok(chatInject > 0 && W.indexOf("if (tool === \"iq\") return WDS_IQ_SYS") < chatInject,
    "iq 改道仍排在它前面（评分者不装这块，防通胀）");
 
 console.log("② 判题型的判据是「答案的形状」，不是疑问词");

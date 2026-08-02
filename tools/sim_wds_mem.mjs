@@ -166,8 +166,8 @@ console.log("\n【八】装全能：内功＋心得＋完整方法论＋记忆�
   ok("④ 记忆装进 messages（见第七组）", /\.\.\.hist/.test(seg));
   ok("⑤ 网站 RAG 仍是全站检索且 deep 档加宽到 K=24 / 18000",
     /lightRetrieve\(this\.env, base, q, expTerms, tier === "deep" \? 24 : 12/.test(seg) && /tier === "deep" \? 18000 : 6500/.test(seg));
-  ok("固定部分现算进 _fixed（内功＋心得＋方法论＋站内资料＋两个库）",
-    /const _fixed = \(neigong \? neigong\.length : 0\)/.test(seg) && /WDS_METHOD_GUIDE\.length \+ siteCtx\.length/.test(seg));
+  ok("固定部分现算进 _fixed（内功＋心得＋方法论＋三类块＋站内资料＋两个库）",
+    /const _fixed = \(neigong \? neigong\.length : 0\)/.test(seg) && /WDS_METHOD_GUIDE\.length \+ SDE_TRIAD_BLOCK\.length \+ siteCtx\.length/.test(seg));
   ok("总预算两档都定义了", /WDS_TOTAL_CHARS = \{ deep: 100000, quick: 60000 \}/.test(src) && /WDS_HIST_FLOOR = 8000/.test(src));
 }
 
@@ -206,6 +206,29 @@ console.log("\n【十】可缓存前缀：变动的东西一律不许进 system"
     /REFLECT_MEM\[vendor\]/.test(er) && /op: "getReflect"/.test(er) && /op: "setReflect"/.test(er));
   ok("心得有失败负缓存（坏 Key 不连撞）", /REFLECT_FAIL_TTL/.test(er));
   ok("内功有模块级缓存（不重复取文件）", /NEIGONG_CACHE|let NEIGONG|NEIGONG =/.test(src));
+}
+
+console.log("\n【十】What / How / Why 三类模式：与 ChatSDE 取同一份");
+{
+  const src = fs.readFileSync(new URL("../src/worker.js", import.meta.url), "utf8");
+  const seg = src.slice(src.indexOf("async answerWDS"), src.indexOf("async answerWDS") + 13000);
+  // ⚠ 这条正则必须排除 `+ SDE_TRIAD_BLOCK.length`（_fixed 里的那处），否则块被整个删掉
+  // 断言仍然绿——变异检验第一次跑就撞上了这个假阳性。
+  ok("装的是 ChatSDE 那个同一个常量，不是另抄一份", /\+ SDE_TRIAD_BLOCK(?![.\w])/.test(seg));
+  ok("全站只有一处 SDE_TRIAD_BLOCK 的定义（两台共用，改一处两台都变）",
+    (src.match(/const SDE_TRIAD_BLOCK/g) || []).length === 1);
+  ok("三类都在那份块里", /是什么 \/ 怎么办 \/ 为什么/.test(src) && /【一 · 是什么】/.test(src) && /【二 · 怎么办】/.test(src) && /【三 · 为什么】/.test(src));
+  ok("判据是「要拿到的东西是什么形状」，不是疑问词", /判据不是疑问词/.test(src));
+  ok("① 骨架照走：三类各自的骨架都点名了", /落在哪一维哪一格/.test(seg) && /写成 X→Y→Z/.test(seg) && /回写到哪里/.test(seg));
+  ok("② 群聊场景下只收细节、不收骨架", /展开的详尽程度按群聊来/.test(seg) && /骨架不许省/.test(seg));
+  ok("③ 明写与输出模式（用不用术语）是两回事，别混", /本轮消息末尾那条【本次输出模式】/.test(seg) && /两者各判各的/.test(seg));
+  ok("④ 方法论指引退为「详解与破法」，不再自称每一答的工序", /三件工具详解与二阶碰撞破法/.test(seg));
+  ok("⑤ 二阶碰撞仍在（群里学员问「这想法新不新」时要用）", /二阶碰撞/.test(seg));
+  ok("三类块排在方法论详解之前（工序在前、工具书在后）",
+    seg.indexOf("+ SDE_TRIAD_BLOCK") < seg.indexOf("三件工具详解与二阶碰撞破法"));
+  ok("三类块的体量算进了 _fixed（否则历史预算会算多、撞窗）",
+    /SDE_TRIAD_BLOCK\.length \+ siteCtx\.length/.test(seg));
+  ok("输出模式那两档仍在（clean / sde 没被顺手改掉）", /_mode === "sde"/.test(seg) && /本次输出模式 = 去痕迹/.test(seg));
 }
 
 console.log("\n" + (fail === 0 ? "✅" : "❌") + "  " + pass + " PASS / " + fail + " FAIL\n");
