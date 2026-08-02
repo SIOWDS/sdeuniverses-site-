@@ -1,0 +1,478 @@
+#!/usr/bin/env node
+/* 「SDE 学科通融」全流程模拟 —— 用 jsdom 跑 public/taste/confluence/index.html 里的真代码。
+ *
+ * 铁律：改 tools/confluence/confluence.template.html（或重跑 build_confluence_page.py）必跑本脚本。
+ *   node tools/sim_confluence.js
+ *   CONF_HTML=/tmp/broken.html node tools/sim_confluence.js     # 变异检验：指向改坏的副本
+ *
+ * 覆盖本页与「碰撞出典范」相比新长出来的那五处：
+ *   ① 入口是一个问题＋三个学科（不是三个源）· ② 工序 −1 题型判别（自动／手动／判不出即停）·
+ *   ③ 定三家两路取材（站内库＋联网、锁定学科照抄、只认真链接、站内源抓全文、联网不通时降级）·
+ *   ④ 成文之后的打磨（自查十项＋整篇重写；重写稿被截断时保留原稿）· ⑤ 体例锁死论文体。
+ * 另加：问题穿进每一格的 system、一键跑到底、清空复位、术语零容忍照旧生效。
+ */
+const fs = require('fs');
+const path = require('path');
+
+const JSDOM_MOD = process.env.JSDOM_PATH || '/home/claude/node_modules/jsdom';
+let jsdom;
+try { jsdom = require(JSDOM_MOD); }
+catch (e) { try { jsdom = require('jsdom'); } catch (e2) { console.error('缺 jsdom：cd /home/claude && npm install jsdom'); process.exit(2); } }
+const { JSDOM, VirtualConsole } = jsdom;
+
+const HTML_PATH = process.env.CONF_HTML ||
+  path.join(__dirname, '..', 'public', 'taste', 'confluence', 'index.html');
+const HTML = fs.readFileSync(HTML_PATH, 'utf8');
+const ASSETS = path.join(__dirname, '..', 'public', 'taste', 'assets');
+const RAG_JS = fs.readFileSync(path.join(ASSETS, 'sde-rag.js'), 'utf8');
+const NBR_JS = fs.readFileSync(path.join(ASSETS, 'sde-nbr-gate.js'), 'utf8');
+
+let pass = 0, fail = 0;
+const fails = [];
+function ok(name, cond, extra) {
+  if (cond) { pass++; console.log('  ✓ ' + name); }
+  else { fail++; fails.push(name + (extra ? '  ← ' + extra : '')); console.log('  ✗ ' + name + (extra ? '  ← ' + extra : '')); }
+}
+async function step(name, fn) {
+  console.log('\n— ' + name);
+  try { await fn(); }
+  catch (e) { fail++; fails.push(name + ' 抛错：' + (e && e.message)); console.log('  ✗ 抛错：' + (e && e.message)); }
+}
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+async function waitFor(fn, ms) {
+  const t0 = Date.now();
+  while (Date.now() - t0 < (ms || 9000)) { if (fn()) return true; await sleep(30); }
+  return false;
+}
+
+/* ---------------- 假数据 ---------------- */
+const CATALOG = { generated: '2026-08-02', items: Array.from({ length: 20 }, (_, i) => ({
+  t: '站上长文之' + i, u: '/column/fake-' + i + '/', d: '描述' + i, w: 12000, c: i < 4 ? '学科通融' : '今日长文' })) };
+const STUDENTS = { generated: '2026-08-02', students: [
+  { slug: 'zhang-qiong', name: '张琼', count: 2, items: [
+    { title: '留白', url: '/students/zhang-qiong/a/', kind: '发展心理学', summary: '撤手是德' },
+    { title: '伪生', url: '/students/zhang-qiong/b/', kind: '技术哲学', summary: '顶撞才养人' }] }] };
+const ARTICLE_HTML = '<html><head><title>假文章</title></head><body><nav>导航</nav>' +
+  '<article>' + '这是一篇站内文章的正文，够长够厚。'.repeat(120) + '</article>' +
+  '<script>console.log(1)<\/script><footer>页脚</footer></body></html>';
+const FAKE_NEIGONG = 'SDE 内功正文段落。'.repeat(6000).slice(0, 60000);
+
+function WEB_ITEMS(q) {
+  return [0, 1, 2].map(i => ({
+    t: '关于「' + q.slice(0, 8) + '」的理论 ' + (i + 1), u: 'https://example.org/paper-' + i,
+    s: '这一家主张若干。'.repeat(12), m: '期刊 ' + i, d: '2025-0' + (i + 1) + '-01' }));
+}
+function NBR_BLOCK(q) {
+  return '【站内近邻（sdeuniverses.com 已发表的相关篇目）——这一节是硬要求：\n'
+    + '对下列每一篇，必须说清它已经说到哪一步，以及你这一次的判断与它的分离线在哪；\n'
+    + '凡划不出分离线的，直接说明本次判断与该篇重复，不要另起新名。】\n'
+    + '1、《自噬性稳态》（/students/zhang-qiong/x/）｜作者 张琼\n'
+    + '　　该篇的判断：系统靠自己吃掉自己维持稳定。\n'
+    + '2、《改不动的机器》（/students/zhang-qiong/y/）\n'
+    + '　　该篇的判断：越是修得动的地方越先被修死。\n';
+}
+function demarcOK() {
+  return '近邻检测\n本文所属学科：社会学\n'
+    + '一、可取用困难（Bjork 1994）（学科：认知心理学）｜它说到哪一步：难一点记得牢。｜分离线：本文讲的是那道难度被谁读出来。｜判决性对照预测：若把难度撤掉而效果不变，则本文错。\n'
+    + '二、《规训与惩罚》（学科：哲学）｜它说到哪一步：可见性生产服从。｜分离线：本文讲的是不可见者被判为不存在。｜判决性对照预测：若不可测项照样进入分配，则本文错。\n'
+    + '三、古德哈特定律（Goodhart 1975）（学科：经济学）｜它说到哪一步：度量一旦成目标就变坏。｜分离线：病灶在固定这个动作本身。｜判决性对照预测：若换更好的度量能恢复流失的能力，则本文错。\n'
+    + '四、《自噬性稳态》（学科：社会学）｜它说到哪一步：系统吃自己维稳。｜分离线：本文的是外化-固定。\n'
+    + '五、《改不动的机器》（学科：社会学）｜它说到哪一步：修得动的先被修死。｜分离线：本文给的是成因不是现象。';
+}
+/* 定三家那一趟的产物：三家、含一家站内（链接以 / 开头） */
+function pickAnswer(o) {
+  o = o || {};
+  const one = (n, disc, inside) => ['===源' + n,
+    '标题：' + disc + '的那一家理论',
+    '学科：' + disc,
+    '来源：' + (inside ? '站内' : '站外'),
+    '出处：某人 2025 · 《某篇》',
+    '链接：' + (o.noLink ? '（材料里没有）' : (inside ? '/students/zhang-qiong/a/' : 'https://example.org/paper-' + n)),
+    '论点：这一家认为那件事的病根在' + disc + '这一层。',
+    '位置：站在' + (n === 1 ? '结果' : n === 2 ? '路径' : '条件') + '这一位置上。',
+    '正文：' + '论证若干句。'.repeat(40)].join('\n');
+  const three = o.onlyTwo ? [one(1, '认知心理学', false), one(2, '制度经济学', false)]
+    : [one(1, '认知心理学', false), one(2, '制度经济学', false), one(3, '组织社会学', true)];
+  return three.concat(['===', '对立点：三家把病根安在三个不同的位置上，互相取消对方的前提。']).join('\n\n');
+}
+const LONG_ARTICLE = '正文若干句，够长，末尾有句号。'.repeat(700);
+function defaultAnswer(userMsg, ctx) {
+  if (/先判它要的答案是什么形状/.test(userMsg))
+    return '题型：Why\n理由：提问的人要的是什么在逼动它，不是一个分辨用的读数。\n自测：留经验的动作与用经验的动作的矛盾驱动了经验流失。';
+  if (/定出\*\*三个学科\*\*/.test(userMsg))
+    return '1｜认知心理学｜认知负荷 理论 争论\n2｜制度经济学｜度量 制度 批评\n3｜组织社会学｜组织记忆 争论';
+  if (/请为\*\*每一门各挑出一家\*\*/.test(userMsg)) return pickAnswer(ctx && ctx.pickOpt);
+  if (/这是 SDE 内功的第/.test(userMsg)) return '这一段的承重判断若干。' + '要点。'.repeat(20);
+  if (/合成一份 ≤3000 字的作业底盘/.test(userMsg)) return '一、本体论要害……' + '铁律一条。'.repeat(80);
+  if (/你是验收员/.test(userMsg))
+    return '主题1：病根在认知层 ｜ 主题2：病根在制度层 ｜ 主题3：病根在组织层\n烈度：8/10 ｜ 同源度：低 ｜ 打架点：病根到底在哪一层\n判词：三方对同一件事给了互相取消的答案';
+  if (/一个主题观点/.test(userMsg) && /支撑观点/.test(userMsg)) {
+    const blk = n => ['【源' + n + '】《假文章' + n + '》',
+      '主题观点：第' + n + '家主张的那一条判断，够长够像判断句。',
+      '支撑观点 ' + n + 'a：结果层的理由，独立成立。　〔依据：原文若干字〕',
+      '支撑观点 ' + n + 'b：路径层的理由，独立成立。　〔依据：原文若干字〕',
+      '支撑观点 ' + n + 'c：条件层的理由，独立成立。　〔依据：原文若干字〕',
+      '互不包含自检：a×b 不同层 ｜ a×c 不同层 ｜ b×c 不同层'].join('\n');
+    return [blk(1), blk(2), blk(3), '冲突 1×2：不能同时成立。', '冲突 1×3：不能同时成立。',
+      '冲突 2×3：不能同时成立。', '主题冲突：三对全冲突'].join('\n\n');
+  }
+  if (/列一份学术论文的节次目录/.test(userMsg))
+    return Array.from({ length: 16 }, (_, i) => '第' + (i + 1) + '章、章名' + (i + 1) + ' —— 落一件事').join('\n');
+  if (/照下面的目录，把整篇文章/.test(userMsg)) return LONG_ARTICLE;
+  if (/逐条查下面十项/.test(userMsg))
+    return ['1. 题型对口 ｜ 过 ｜ 承重命题填得进那句话，走的正是驱动型。',
+      '2. 位置三分 ｜ 不过 ｜ 二、三两家都站在路径这一位置。｜怎么改：把第三家换到条件位置上重写第五节。',
+      '3. 反转模板查名 ｜ 不过 ｜ 剥出来是「X 越成功越失败」而正文一个正主都没点名。｜怎么改：点名成功陷阱与能力刚性。',
+      '4. 证伪两档 ｜ 不过 ｜ 只验证了现象存在。｜怎么改：写出控制掉竞争解释后的剂量-反应式。',
+      '5. 样本纪律 ｜ 过 ｜ 没有拿两个国家充数。',
+      '6. 划界黑名单 ｜ 过 ｜ 没有靠"更系统"来划。',
+      '7. 新读数还是新存在物 ｜ 过 ｜ 删掉这个读数那件事就不存在。',
+      '8. 出处可核对 ｜ 过 ｜ 三条链接都对得上。',
+      '9. 零术语零痕迹 ｜ 过 ｜ 没有学派专名。',
+      '10. 收尾两件 ｜ 不过 ｜ 缺写死日期的赌注。｜怎么改：补一条。',
+      '最要紧的三处：位置撞车、现象证伪、模板没点名。'].join('\n');
+  if (/照下面的自查结果，把这篇文章\*\*整篇重写一遍\*\*/.test(userMsg))
+    return (ctx && ctx.shortRewrite) ? '重写了一小截就没了。'.repeat(20)
+      : '打磨后的正文若干句，够长，末尾有句号。'.repeat(800);
+  if (/请把它与既有说法逐一划清界线/.test(userMsg)) return demarcOK();
+  if (/请执行涌现/.test(userMsg)) return '涌现物：命名为「外化固定症」。' + '一句判断撑住它。'.repeat(20);
+  if (/你是评审/.test(userMsg)) return '总分：152\n五维：S=150 D=151 E=152 I=153 F=150\n判级：典范级\n最该补的一刀：' + '再往下切一层。'.repeat(6);
+  if (/请先做体检/.test(userMsg))
+    return '闸一：分数 8/10 ｜ 打架点一句话：三方把病根安在三个位置 ｜ 结局对立：有 ｜ 三方各自的硬证据：各有一条\n'
+      + '闸二：同源度 低 ｜ 共享零件：无 ｜ 建议撞点：落在病根位置那一处\n闸三：最近的已发篇目：无 ｜ 处置：可发\n总判：放行';
+  return '产物：一段假的工序输出。'.repeat(6);
+}
+function sseFor(text) {
+  const out = ['data: ' + JSON.stringify({ choices: [{ delta: { reasoning_content: '思考…' } }] }) + '\n\n'];
+  for (let i = 0; i < text.length; i += 400)
+    out.push('data: ' + JSON.stringify({ choices: [{ delta: { content: text.slice(i, i + 400) } }] }) + '\n\n');
+  out.push('data: ' + JSON.stringify({ choices: [{ delta: {}, finish_reason: 'stop' }] }) + '\n\n');
+  out.push('data: [DONE]\n\n');
+  return out;
+}
+
+/* ---------------- 起一个页面 ---------------- */
+async function boot(opts) {
+  opts = opts || {};
+  const ctx = { calls: [], errors: [], saved: [], webQ: [], nbrQ: [], pulls: [],
+                pickOpt: opts.pickOpt, shortRewrite: opts.shortRewrite };
+  const vc = new VirtualConsole();
+  vc.on('jsdomError', e => ctx.errors.push('jsdomError: ' + (e && e.message)));
+  vc.on('error', (...a) => ctx.errors.push('console.error: ' + a.join(' ')));
+  const answer = opts.answer || (u => defaultAnswer(u, ctx));
+
+  function makeFetch() {
+    return function (url, init) {
+      url = String(url); init = init || {};
+      const J = o => Promise.resolve({ ok: true, status: 200, json: () => Promise.resolve(o), text: () => Promise.resolve(JSON.stringify(o)) });
+      const T = s => Promise.resolve({ ok: true, status: 200, text: () => Promise.resolve(s), json: () => Promise.resolve({}) });
+      const BAD = c => Promise.resolve({ ok: false, status: c, statusText: 'ERR', text: () => Promise.resolve(''), json: () => Promise.resolve({}) });
+
+      if (url.indexOf('catalog.json') >= 0) return J(CATALOG);
+      if (url.indexOf('publications.json') >= 0) return J(STUDENTS);
+      if (url.indexOf('sde-neigong.txt') >= 0) return T(FAKE_NEIGONG);
+      if (url.indexOf('sde-collide-heart.txt') >= 0) return T('二阶碰撞心法：先找矛盾再找高分。'.repeat(80));
+      if (url.indexOf('sde-innovation-iq.txt') >= 0) return T('创新智商评分标尺：五维 S/D/E/I/F。'.repeat(80));
+      if (url.indexOf('/api/kb/retrieve') >= 0) return opts.kbFail ? BAD(500) : J({ block: '【站内材料】假的检索块' });
+      if (url.indexOf('/api/wds/websearch') >= 0) {
+        const q = (JSON.parse(init.body || '{}').q) || '';
+        ctx.webQ.push(q);
+        if (opts.webNoKey) return J({ ok: false, reason: 'need_search_key', items: [] });
+        if (opts.webThin) return J({ ok: true, reason: '', items: [] });
+        return J({ ok: true, reason: '', items: WEB_ITEMS(q) });
+      }
+      if (url.indexOf('/api/kb/neighbors') >= 0) {
+        if (opts.nbrFail) return BAD(500);
+        const q = (JSON.parse(init.body || '{}').q) || '';
+        ctx.nbrQ.push(q);
+        return J({ n: 2, block: NBR_BLOCK(q) });
+      }
+      if (url.indexOf('chat/completions') >= 0 || url.indexOf('/api/llm-proxy') >= 0) {
+        const body = JSON.parse(init.body);
+        const msgs = body.messages || [];
+        const user = (msgs[msgs.length - 1] || {}).content || '';
+        const budget = body.max_tokens != null ? body.max_tokens
+          : (body.max_completion_tokens != null ? body.max_completion_tokens
+          : ((body.generationConfig || {}).maxOutputTokens));
+        ctx.calls.push({ url, max_tokens: budget, model: body.model, system: (msgs[0] || {}).content || '', user });
+        const chunks = sseFor(answer(user));
+        let i = 0;
+        const nextChunk = () => i < chunks.length ? { done: false, value: Buffer.from(chunks[i++]) } : { done: true, value: undefined };
+        return Promise.resolve({ ok: true, status: 200, body: { getReader: () => ({ read: () => Promise.resolve(nextChunk()) }) } });
+      }
+      // 站内正文抓取
+      ctx.pulls.push(url);
+      if (opts.articleFail) return BAD(404);
+      return T(ARTICLE_HTML);
+    };
+  }
+
+  const dom = new JSDOM(HTML, {
+    runScripts: 'dangerously', url: 'https://sdeuniverses.com/taste/confluence/',
+    virtualConsole: vc, pretendToBeVisual: true,
+    beforeParse(win) {
+      win.fetch = makeFetch();
+      try { win.eval(RAG_JS); win.eval(NBR_JS); } catch (e) { ctx.errors.push('共用模块注入失败: ' + e.message); }
+      win.TextDecoder = TextDecoder; win.TextEncoder = TextEncoder;
+      win.AbortController = AbortController;
+      win.Element.prototype.scrollIntoView = function () {};
+      win.HTMLElement.prototype.scrollIntoView = function () {};
+      win.HTMLAnchorElement.prototype.click = function () {};
+      win.scrollTo = function () {}; win.alert = function () {};
+      win.URL.createObjectURL = () => 'blob:fake'; win.URL.revokeObjectURL = () => {};
+      win.docx = {
+        Document: function (o) { this.o = o; win.__lastDoc = o; },
+        Packer: { toBlob: () => Promise.resolve(new win.Blob(['docx-bytes'])) },
+        Paragraph: function (o) { this.o = o; }, TextRun: function (o) { this.o = o; },
+        AlignmentType: { CENTER: 'center' }, HeadingLevel: { HEADING_1: 'h1', HEADING_2: 'h2' }
+      };
+    }
+  });
+  ctx.dom = dom; ctx.win = dom.window; ctx.doc = dom.window.document;
+  ctx.$ = id => ctx.doc.getElementById(id);
+  ctx.click = sel => { const el = typeof sel === 'string' ? ctx.doc.querySelector(sel) : sel;
+    el.dispatchEvent(new ctx.win.MouseEvent('click', { bubbles: true })); };
+  await sleep(250);
+  return ctx;
+}
+
+function fillQ(c, q, d1, d2, d3) {
+  c.$('cQuestion').value = q || '为什么组织越是想把经验留下来，经验反而流失得越快？';
+  c.$('cQuestion').dispatchEvent(new c.win.Event('input', { bubbles: true }));
+  [['cD1', d1], ['cD2', d2], ['cD3', d3]].forEach(([id, v]) => {
+    if (v != null) { c.$(id).value = v; c.$(id).dispatchEvent(new c.win.Event('input', { bubbles: true })); }
+  });
+  c.$('apiKey').value = 'sk-fake';
+}
+function userOf(c, re) { const x = c.calls.filter(k => re.test(k.user)); return x.length ? x[x.length - 1] : null; }
+
+/* ======================= 场景 ======================= */
+(async function main() {
+  console.log('页面：' + HTML_PATH + '\n' + '='.repeat(56));
+
+  const c1 = await boot();
+  await step('一、页面起得来（静态结构）', async () => {
+    const stages = c1.doc.querySelectorAll('.stage');
+    ok('十五道工序面板都在', stages.length === 15, '实际 ' + stages.length);
+    ok('工序顺序：内化 → 题型 → 定三家 …… 成文 → 打磨 → 评审',
+      ['warmup','qtype','select','gate','spine','collide','expand','nbrgate','collide2','selforg','emerge','demarc','write','polish','review']
+        .every((id, i) => stages[i] && stages[i].id === 'stage-' + id));
+    ok('入口是问题＋三个学科', !!c1.$('cQuestion') && !!c1.$('cD1') && !!c1.$('cD2') && !!c1.$('cD3'));
+    ok('题型可手动指定（含 auto/What/How/Why 四项）', c1.doc.querySelectorAll('#cType option').length === 4);
+    ok('站内库那一路默认开着', c1.$('cUseKB').checked === true);
+    ok('本站检索通道默认勾着、自备 Key 那格先藏着', c1.$('cSiteKey').checked === true && c1.$('cSkey').style.display === 'none');
+    ok('旧的选源模式已收进隐藏容器', !!c1.$('legacyPick') && c1.$('legacyPick').style.display === 'none');
+    ok('八家基底都在选择器里', ['ds:pro','glm:pro','kimi:pro','qwen:pro','minimax:pro','gpt:pro','claude:pro','gemini:pro']
+      .every(v => !!c1.doc.querySelector('option[value="' + v + '"]')));
+    ok('体例锁死为论文体', c1.$('genreSel').value === 'paper');
+    ok('体例说明写的是论文体', /论文体/.test(c1.$('genreNote').textContent), c1.$('genreNote').textContent);
+    ok('页面起来没有 JS 错误', c1.errors.length === 0, c1.errors.join(' | '));
+    ok('状态条提示先写问题', /先写一个要解决的问题/.test(c1.$('srcState').textContent), c1.$('srcState').textContent);
+    ok('交付区一开始是收起的', c1.$('deliver').style.display === 'none');
+  });
+
+  await step('二、填了问题与学科，状态条跟着变', async () => {
+    fillQ(c1, null, '认知心理学', '制度经济学', '组织社会学');
+    ok('状态条报出三个学科', /认知心理学×制度经济学×组织社会学/.test(c1.$('srcState').textContent), c1.$('srcState').textContent);
+    c1.$('cSiteKey').checked = false;
+    c1.$('cSiteKey').dispatchEvent(new c1.win.Event('change', { bubbles: true }));
+    ok('取消本站通道后，自备 Key 那一格露出来', c1.$('cSkey').style.display === '');
+  });
+
+  /* ---- 全流程 ---- */
+  const c2 = await boot();
+  await step('三、一键跑到底（问题＋三学科 → 打磨 → 评审）', async () => {
+    fillQ(c2, '为什么组织越是想把经验留下来，经验反而流失得越快？', '认知心理学', '制度经济学', '组织社会学');
+    c2.click('#goBtn');
+    const done = await waitFor(() => /创新智商|✓/.test(c2.$('stat-review').textContent), 30000);
+    ok('跑到评审那一格', done, c2.$('stat-review').textContent);
+    ok('题型判成 Why', /题型 Why/.test(c2.$('stat-qtype').textContent), c2.$('stat-qtype').textContent);
+    ok('三家就位（站内 1 · 站外 2）', /站内 1 · 站外 2/.test(c2.$('stat-select').textContent), c2.$('stat-select').textContent);
+    ok('打磨那一格跑完了', /已打磨/.test(c2.$('stat-polish').textContent), c2.$('stat-polish').textContent);
+    ok('交付横幅亮了并报出题型与三学科',
+      /题型 Why/.test(c2.$('doneBanner').textContent) && /认知心理学×制度经济学×组织社会学/.test(c2.$('doneBanner').textContent),
+      c2.$('doneBanner').textContent);
+    ok('横幅里写着已打磨', /已打磨/.test(c2.$('doneBanner').textContent));
+    ok('横幅体例是学科通融体', /学科通融体/.test(c2.$('doneBanner').textContent));
+    ok('全程无 JS 错误', c2.errors.length === 0, c2.errors.join(' | '));
+  });
+
+  await step('四、问题穿进了每一格的 system（不是只在定源那一格）', async () => {
+    // 内化那几趟是读内功、与题无关，本来就不该带；其余每一趟都必须带
+    const notWarm = c2.calls.filter(k => !/这是 SDE 内功的第|作业底盘/.test(k.user));
+    const withQ = notWarm.filter(k => /本次要解决的问题/.test(k.system));
+    ok('除内化外，每一趟调令都带着这道问题', withQ.length === notWarm.length,
+       withQ.length + '/' + notWarm.length);
+    ok('评审那一趟也拿到了这道题（否则它只会评写得好不好）',
+       c2.calls.some(k => /只评不写/.test(k.system) && /本次要解决的问题/.test(k.system)));
+    ok('评审被要求先看答没答到那道题',
+       c2.calls.some(k => /只评不写/.test(k.system) && /答没答到那道题/.test(k.system)));
+    const emerge = userOf(c2, /请执行涌现/);
+    ok('涌现那一格的 system 里有这道问题', emerge && /经验反而流失得越快/.test(emerge.system));
+    ok('题型判出来之后，位置要求也跟着进 system',
+      c2.calls.some(k => /三条不同的动力机制/.test(k.system)));
+  });
+
+  await step('五、定三家：两路取材都真的走了', async () => {
+    ok('联网检索跑了三轮（三门各一轮）', c2.webQ.length >= 3, '实际 ' + c2.webQ.length);
+    ok('站内近邻在定三家时也查了（三门各一次）',
+      c2.nbrQ.filter(q => /认知心理学|制度经济学|组织社会学/.test(q)).length >= 3, c2.nbrQ.length + ' 次');
+    const pick = userOf(c2, /请为\*\*每一门各挑出一家\*\*/);
+    ok('挑三家的调令里两路材料都在',
+      pick && /〔站外·联网检索〕/.test(pick.user) && /〔站内·本站已有篇目〕/.test(pick.user));
+    ok('挑三家的调令里写死了"三家必须都在回答同一道题"', pick && /三家必须都在回答同一道题/.test(pick.user));
+    ok('位置要求压过学科（学科可撞车、位置不许撞）', pick && /学科可以撞车而位置不许撞车/.test(pick.user));
+    ok('铁律：一个字都不许编', pick && /一个字都不许编/.test(pick.user));
+    ok('站内那一家去抓了全文', c2.pulls.some(u => /\/students\/zhang-qiong\/a\//.test(u)), c2.pulls.join(','));
+  });
+
+  await step('六、锁定的学科被照抄，不许基底改名', async () => {
+    const c = await boot({ answer: u => {
+      if (/定出\*\*三个学科\*\*/.test(u)) return '1｜法理学｜法 理论 争论\n2｜制度经济学｜度量 制度\n3｜组织社会学｜组织记忆';
+      return defaultAnswer(u, {});
+    } });
+    fillQ(c, '为什么规则越细，越没人守？', '法学', '', '');
+    c.click('#goBtn');
+    await waitFor(() => /✓|⚠|中断/.test(c.$('stat-select').textContent), 20000);
+    ok('人锁的「法学」没被改成「法理学」', c.$('cD1').value === '法学', c.$('cD1').value);
+    ok('另两门由基底补齐', c.$('cD2').value === '制度经济学' && c.$('cD3').value === '组织社会学',
+      c.$('cD2').value + '/' + c.$('cD3').value);
+  });
+
+  /* ---- 题型闸 ---- */
+  await step('七、题型：手动指定时不花一次调用', async () => {
+    const c = await boot();
+    fillQ(c, '内卷的根源是什么？', '经济学', '生物学', '音乐学');
+    c.$('cType').value = 'Why';
+    c.click('#goBtn');
+    await waitFor(() => /✓/.test(c.$('stat-qtype').textContent), 12000);
+    ok('题型格标出手动指定', /手动指定/.test(c.$('stat-qtype').textContent), c.$('stat-qtype').textContent);
+    ok('没有为判题型发过调令', !c.calls.some(k => /先判它要的答案是什么形状/.test(k.user)));
+  });
+
+  await step('八、题型：判不出就停下并指路（不闷头往下跑）', async () => {
+    const c = await boot({ answer: u => {
+      if (/先判它要的答案是什么形状/.test(u)) return '这道题挺有意思的，可以从很多角度看。'.repeat(4);
+      return defaultAnswer(u, {});
+    } });
+    fillQ(c, '这件事该怎么看？', '甲学', '乙学', '丙学');
+    c.click('#goBtn');
+    await waitFor(() => c.$('errBox').style.display === 'block', 12000);
+    ok('停下来并说清没判出题型', /没能判出题型/.test(c.$('errBox').textContent), c.$('errBox').textContent);
+    ok('给了可操作的下一步（自己选题型＋自测句）',
+      /题型.*那一格自己选/.test(c.$('errBox').textContent) && /矛盾驱动了/.test(c.$('errBox').textContent));
+    ok('没有往下跑到定三家', !/✓/.test(c.$('stat-select').textContent), c.$('stat-select').textContent);
+  });
+
+  await step('九、没写问题就点跑：当场说清，不空转', async () => {
+    const c = await boot();
+    c.$('apiKey').value = 'sk-fake';
+    c.click('#goBtn');
+    await waitFor(() => c.$('errBox').style.display === 'block', 12000);
+    ok('提示先写问题', /先在上面写清你要解决的那个问题/.test(c.$('errBox').textContent), c.$('errBox').textContent);
+  });
+
+  /* ---- 取材失败路径 ---- */
+  await step('十、联网不通但站内库有料：降级往下走，并替他切到自备 Key', async () => {
+    const c = await boot({ webNoKey: true });
+    fillQ(c, '为什么组织越想留住经验越留不住？', '认知心理学', '制度经济学', '组织社会学');
+    c.click('#goBtn');
+    await waitFor(() => /✓/.test(c.$('stat-select').textContent), 25000);
+    ok('三家仍然定了下来（用站内库的材料）', /三家已就位/.test(c.$('stat-select').textContent), c.$('stat-select').textContent);
+    ok('替他取消了本站通道那个勾', c.$('cSiteKey').checked === false);
+    ok('自备 Key 那一格露了出来', c.$('cSkey').style.display === '');
+    ok('如实说了这一路不通、三家会偏站内', /只用站内库的材料/.test(c.$('errBox').textContent), c.$('errBox').textContent);
+  });
+
+  await step('十一、两路都空：如实停下，不假装挑到了三家', async () => {
+    const c = await boot({ webNoKey: true, nbrFail: true });
+    fillQ(c, '为什么组织越想留住经验越留不住？', '认知心理学', '制度经济学', '组织社会学');
+    c.click('#goBtn');
+    await waitFor(() => c.$('errBox').style.display === 'block', 25000);
+    ok('说清两路都空', /两路都空/.test(c.$('errBox').textContent), c.$('errBox').textContent);
+    ok('并指了一步能走通的路（填自己的智谱 Key）', /智谱 Key/.test(c.$('errBox').textContent));
+  });
+
+  await step('十二、假链接不当真链接（拿不到就如实标"无链接"）', async () => {
+    const c = await boot({ pickOpt: { noLink: true } });
+    fillQ(c, '为什么组织越想留住经验越留不住？', '认知心理学', '制度经济学', '组织社会学');
+    c.click('#goBtn');
+    await waitFor(() => /✓/.test(c.$('stat-select').textContent), 25000);
+    ok('提醒有几家没拿到链接', /没拿到可点开的链接/.test(c.$('errBox').textContent), c.$('errBox').textContent);
+    await waitFor(() => c.calls.some(k => /文献综述与参考文献要用它/.test(k.user)), 25000);
+    const w = userOf(c, /文献综述与参考文献要用它/);
+    ok('出处清单里写的是"无链接，须自行补"，不是那句假话',
+      w && /无链接，须自行补/.test(w.user) && !/材料里没有/.test(w.user));
+  });
+
+  await step('十三、只挑到两家：停下重挑，不凑数', async () => {
+    const c = await boot({ pickOpt: { onlyTwo: true } });
+    fillQ(c, '为什么组织越想留住经验越留不住？', '认知心理学', '制度经济学', '组织社会学');
+    c.click('#goBtn');
+    await waitFor(() => c.$('errBox').style.display === 'block', 25000);
+    ok('如实说只读出两个源', /读出 2 个成形的源/.test(c.$('errBox').textContent), c.$('errBox').textContent);
+  });
+
+  /* ---- 打磨 ---- */
+  await step('十四、打磨：先逐条自查十项，再照自查整篇重写', async () => {
+    const audit = userOf(c2, /逐条查下面十项/);
+    ok('自查调令十项齐全', audit &&
+      ['题型对口','位置三分','反转模板查名','证伪两档','样本纪律','划界黑名单','新读数还是新存在物','出处可核对','零术语零痕迹','收尾两件']
+        .every(k => audit.user.indexOf(k) >= 0));
+    ok('自查用的是评审 system（带评分标尺），不是写手 system',
+      audit && /只评不写/.test(audit.system) && /评分标尺/.test(audit.system));
+    ok('自查把承重命题的填空自测写进去了', audit && /矛盾驱动了/.test(audit.user));
+    ok('反转模板的四个正主都点了名', audit &&
+      ['成功陷阱','伊卡洛斯悖论','能力刚性','内卷化','目标置换'].every(k => audit.user.indexOf(k) >= 0));
+    const rw = userOf(c2, /整篇重写一遍/);
+    ok('重写调令带上了自查结果与原稿', rw && /【自查结果】/.test(rw.user) && /【原稿全文】/.test(rw.user));
+    ok('重写明令篇幅不许缩水', rw && /篇幅不许缩水/.test(rw.user));
+    ok('重写明令不许留"修改说明"', rw && /不许出现"修改说明"/.test(rw.user));
+    ok('重写用的是论文体写手 system', rw && /学术创新论文/.test(rw.system));
+    ok('重写预算是成文那一档（32000）', rw && rw.max_tokens === 32000, rw && String(rw.max_tokens));
+  });
+
+  await step('十五、打磨稿被截断：保留原稿，不交半篇', async () => {
+    const c = await boot({ shortRewrite: true });
+    fillQ(c, '为什么组织越想留住经验越留不住？', '认知心理学', '制度经济学', '组织社会学');
+    c.click('#goBtn');
+    await waitFor(() => /⚠|✓/.test(c.$('stat-polish').textContent), 30000);
+    ok('判为疑似被截断并保留原稿', /疑似被截断 · 已保留原稿/.test(c.$('stat-polish').textContent), c.$('stat-polish').textContent);
+    ok('提示换能长输出的基底重跑本格', /重跑本格/.test(c.$('errBox').textContent), c.$('errBox').textContent);
+    ok('自查结果仍然留着可用', /自查结果照样可用/.test(c.$('errBox').textContent));
+  });
+
+  /* ---- 术语闸 · 清空 ---- */
+  await step('十六、术语零容忍照旧生效（打磨稿里留了痕迹要拦）', async () => {
+    const c = await boot({ answer: u => {
+      if (/照下面的自查结果，把这篇文章\*\*整篇重写一遍\*\*/.test(u))
+        return ('这一稿用了 SDE 的差异序列来说明矛盾轴。' + '正文若干句，够长，末尾有句号。'.repeat(800));
+      return defaultAnswer(u, {});
+    } });
+    fillQ(c, '为什么组织越想留住经验越留不住？', '认知心理学', '制度经济学', '组织社会学');
+    c.click('#goBtn');
+    await waitFor(() => /✓|⚠/.test(c.$('stat-polish').textContent), 30000);
+    ok('打磨后仍点名残留的术语与痕迹',
+      /SDE/.test(c.$('stat-polish').textContent) && /矛盾轴/.test(c.$('stat-polish').textContent), c.$('stat-polish').textContent);
+    ok('默认不自动重写，停下来交给用户决定', /上站硬门槛/.test(c.$('errBox').textContent), c.$('errBox').textContent);
+  });
+
+  await step('十七、导出与清空复位', async () => {
+    c2.click('#dlPack');
+    await sleep(120);
+    c2.click('#dlEngine');
+    await sleep(120);
+    ok('导出没炸', c2.errors.length === 0, c2.errors.join(' | '));
+    c2.click('#resetBtn');
+    await sleep(120);
+    ok('十五格全复位', Array.from(c2.doc.querySelectorAll('.st-status')).every(e => e.textContent === '待命'));
+    ok('交付区收起来了', c2.$('deliver').style.display === 'none');
+    ok('题型与三学科的记账也清了',
+      !/题型 Why/.test(c2.$('stat-qtype').textContent) && c2.$('doneBanner').innerHTML === '');
+  });
+
+  console.log('\n' + '='.repeat(56));
+  console.log('通过 ' + pass + ' · 失败 ' + fail);
+  if (fails.length) { console.log('\n失败清单：'); fails.forEach(f => console.log('  · ' + f)); }
+  process.exit(fail ? 1 : 0);
+})();
