@@ -366,6 +366,17 @@ function wdsVisionLadder(vd, want) {
 // 图片钳位：4 张、总计 6MB base64。**必须校验 data URL 的形状**——这串是要原样转给上游的，
 // 不校验就等于把读者传来的任意字符串塞进上游请求体。
 const WDS_IMG_MAX = 4, WDS_IMG_BYTES = 6 * 1024 * 1024;
+/* @WDS 在群里的对话记忆（2026-08-02）。
+   旧做法只取最近 30 条、拼成一段纯文本、并且 **丢掉任何超过 400 字符的消息** ——
+   而 WDS 自己 deep 档的回答（max_tokens 1200）几乎条条超过 400 字符，
+   于是它永远看不见自己上一句说过什么，表现出来就是"没有记忆"。
+   现在：①按轮数取（deep 约百轮）②单条超长改 **截断** 不再整条丢弃
+   ③装进真正的 messages 多轮（自己的话 = assistant），模型分得清谁说的
+   ④预算之内一条不裁，超预算才从最旧处裁并明标省略。 */
+const WDS_CTX = {
+  deep:  { msgs: 200, budget: 60000, per: 3000 },
+  quick: { msgs: 60,  budget: 12000, per: 1200 },
+};
 function wdsPickImgs(list) {
   const out = [];
   if (!Array.isArray(list)) return out;
@@ -1869,7 +1880,8 @@ async function drScan(ctx) {
     this.broadcast({ t: "msg", id: msg.id, name: msg.name, text: msg.text, ts: msg.ts, re: re || undefined });
     if (im) this._imBump(im, name, text);
     const _wq = wdsQuestion(text);
-    if (_wq) { try { this.ctx.waitUntil(this.answerWDS(_wq).catch(() => {})); } catch (e) { this.answerWDS(_wq).catch(() => {}); } }
+    // 把当前这条的 id 一起递过去：历史只取它**之前**的，否则当前提问会重复出现一次。
+    if (_wq) { try { this.ctx.waitUntil(this.answerWDS(_wq, msg.id).catch(() => {})); } catch (e) { this.answerWDS(_wq, msg.id).catch(() => {}); } }
     return { ok: true };
   }
   async chatRecall(name, id) {
@@ -1933,15 +1945,34 @@ async function drScan(ctx) {
     await this.ctx.storage.put("cseq", seq);
     this.broadcast({ t: "msg", id: msg.id, name: msg.name, text: msg.text, ts: msg.ts, bot: 1, tier: msg.tier });
   }
-  async _wdsChatContext() {
+  /* 群聊记忆 → 真正的 messages 多轮。
+     · beforeId：只取当前这条提问**之前**的消息（当前提问单独作最后一条 user）。
+     · 自己发的（bot:1）落 assistant，别人发的落 user 并前缀发言人名字（群里多人，名字是承重信息）。
+     · 单条超 per 字符 **截断**并标（…略），绝不整条丢弃——那正是旧版失忆的原因。
+     · 预算之内一条不裁；超了从最旧处裁，并在最前面明说省略了多少条。 */
+  async _wdsHistory(tier, beforeId) {
     try {
+      const C = WDS_CTX[tier === "quick" ? "quick" : "deep"] || WDS_CTX.deep;
       const { log } = await this.chatRead();
-      const recent = log.slice(-30).filter((m) => !m.recalled && m.text);
-      const lines = recent.map((m) => m.name + "：" + (m.img ? "[图片]" : String(m.text || ""))).filter((s) => s.length < 400);
-      let s = lines.join("\n");
-      if (s.length > 3500) s = s.slice(-3500);
-      return s;
-    } catch (e) { return ""; }
+      let items = log.filter((m) => !m.recalled && (m.text || m.img));
+      if (beforeId) items = items.filter((m) => m.id < beforeId);
+      items = items.slice(-C.msgs);
+      const cut = (s) => { s = String(s || ""); return s.length > C.per ? (s.slice(0, C.per) + "…（略）") : s; };
+      const out = [];
+      let used = 0, dropped = 0;
+      for (let i = items.length - 1; i >= 0; i--) {
+        const m = items[i];
+        const body = m.img ? "[图片]" : cut(m.text);
+        if (!body) continue;
+        const isBot = !!m.bot;
+        const content = isBot ? body : (String(m.name || "").slice(0, 20) + "：" + body);
+        if (used + content.length > C.budget) { dropped = i + 1; break; }
+        used += content.length;
+        out.unshift({ role: isBot ? "assistant" : "user", content: content });
+      }
+      if (dropped > 0) out.unshift({ role: "user", content: "（更早的 " + dropped + " 条已省略，这是同一场讨论的延续。）" });
+      return out;
+    } catch (e) { return []; }
   }
   /* 让 @WDS 看得见「S 维度」带进微信的两样东西：文章精选库与思想库存。
      **这不是给它加语料**——全站 840 篇它本来就能 RAG 检索到；
@@ -1971,7 +2002,7 @@ async function drScan(ctx) {
       return s.length > 2200 ? s.slice(0, 2200) : s;
     } catch (e) { return ""; }
   }
-  async answerWDS(question) {
+  async answerWDS(question, beforeId) {
     const now = Date.now();
     const last = (await this.ctx.storage.get("wdslast")) || 0;
     if (now - last < 2000) return;
@@ -2005,8 +2036,8 @@ async function drScan(ctx) {
     // 心得：按基底复用/生成 reflect:<vendor>（内功学习后的内化底盘；智谱/DeepSeek 复用智能问答的心得）
     let reflect = "";
     try { reflect = await ensureReflect(this.env, base, rvendor, VC, key); } catch (e) {}
-    // 群聊 RAG：把最近的群讨论作上下文
-    const ctx = await this._wdsChatContext();
+    // 群聊记忆：装进 messages 多轮（不再拼成一段纯文本塞给 user）
+    const hist = await this._wdsHistory(tier, beforeId);
     // S 维度带进来的两个库（见 _wdsLibContext 的注释）
     const libCtx = await this._wdsLibContext();
     // 全站 RAG：不仅群内，从站内索引检索全站相关段落（可引用具体篇目）
@@ -2037,7 +2068,7 @@ async function drScan(ctx) {
     const _modeInstr = _mode === "sde"
       ? "\n\n════ 本次输出模式 = 纯正 SDE 语言 ════\n放开使用 SDE 本体论的完整术语：显露 S / 差异序列 D / 特征纠缠 E、三大方程 S=F(D,E)·D=G(S,E)·E=H(S,D)、六路径、意义三律、发生学、显影、中心位轮转 等，把术语讲透、用得精准，像给 SDE 学员上专业课；该用术语就用术语，不必回避。"
       : "\n\n════ 本次输出模式 = 去痕迹 ════\n用日常或该问题所属领域的母语回答，把道理讲透；输出里绝不出现『显露 / 差异 / 纠缠 / SDE / 发生学 / 三大方程 / 六路径 / 意义三律 / 中心位 / 显影』等任何 SDE 术语标签——这套框架只在你脑子里当隐性引擎，前台说人话。";
-    const usr = (siteCtx ? ("《站内资料》（从全站检索到的相关段落——可核验的书名/引文/数据/篇名以此为准；引用时标（来源：篇名）；资料里没有的别编）\n" + siteCtx + "\n") : "") + (ctx ? ("【群里最近的讨论·供你了解上下文】\n" + ctx + "\n\n") : "") + (libCtx || "") + "【提问者的问题】\n" + String(q).slice(0, 1000);
+    const usr = (siteCtx ? ("《站内资料》（从全站检索到的相关段落——可核验的书名/引文/数据/篇名以此为准；引用时标（来源：篇名）；资料里没有的别编）\n" + siteCtx + "\n") : "") + (libCtx || "") + "【提问者的问题】\n" + String(q).slice(0, 1000);
     let reply = "";
     try {
       const ctrl = new AbortController();
@@ -2045,7 +2076,7 @@ async function drScan(ctx) {
       const resp = await fetch(VC.url, {
         method: "POST",
         headers: { "content-type": "application/json", "authorization": "Bearer " + key },
-        body: JSON.stringify({ model: VC.model, temperature: 0.6, max_tokens: tier === "deep" ? 1200 : 800, messages: [{ role: "system", content: sys + _modeInstr }, { role: "user", content: usr }] }),
+        body: JSON.stringify({ model: VC.model, temperature: 0.6, max_tokens: tier === "deep" ? 1200 : 800, messages: [{ role: "system", content: sys + _modeInstr }, ...hist, { role: "user", content: usr }] }),
         signal: ctrl.signal,
       });
       clearTimeout(to);
