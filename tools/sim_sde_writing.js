@@ -159,7 +159,13 @@ sec("③b 学画布那套背景 · 说明收进一颗按钮");
   ok(hero.length < 900, "首屏还是太长（说明没收进弹层）：" + hero.length + " 字符");
   ok(!/六条路径就不是六个口号/.test(hero), "首屏还铺着六路径那段说明");
   ok(!/三台智能体/.test(hero), "首屏还铺着三台的说明");
-  ok(/class="pstrip"/.test(H), "路径没有改成紧凑的一条");
+  /* ⚠ 这条**反转**了（不是放宽）：读者是从零开始的，首屏摆一张理论选单等于
+     先考他一遍。现在路径由共创在对话里判，选单只留在弹层里当"想换就换"。 */
+  ok(!/id="paths"/.test(hero), "首屏还摆着路径选单 —— 读者不懂理论，选不了");
+  ok(/id="seed"/.test(H) && /id="seedgo"/.test(H), "首屏没有「你想说什么」这个入口");
+  ok(/id="fruit"/.test(H), "没有那行「这一篇的活儿是什么」");
+  const sheet = H.slice(H.indexOf("function paintSheet"), H.indexOf("function paintTable"));
+  ok(/id='paths'/.test(sheet), "弹层里没有路径选单（想手动换也换不了）");
 
   /* 弹层内容必须**由 PATHS/AGENTS 现算**，不许另抄一份文案 */
   ok(/function paintSheet/.test(H), "没有弹层渲染");
@@ -176,6 +182,49 @@ sec("③b 学画布那套背景 · 说明收进一颗按钮");
   ok(/Escape/.test(H), "Esc 关不掉弹层");
   ok(/ev\.target === \$\("mask"\)/.test(H), "点遮罩关不掉弹层");
   ok(/id="mx"/.test(H), "没有关闭按钮");
+}
+
+/* ══ ③c 共创引导：路径由它判，不由读者选 ═════════ */
+sec("③c 从零开始：共创引导并判落点");
+{
+  const byK = {}; AGENTS.forEach(a => { byK[a.k] = a; });
+  /* 共创的首要职责变了：先把人问清楚，再判，且**不许对他讲 S/D/E** */
+  ok(/首要职责/.test(byK.co.sys), "共创没有被赋予「带一个不懂理论的人写出来」这个首要职责");
+  /* ⚠ 不许写成"或"：两半各管一件事，写成 A|B 时改坏 A 也会被 B 放过去
+     （变异检验当场证明：把「绝不对他讲」改成「可以讲」，因为「不需要知道」还在，断言照样绿）。 */
+  ok(/绝不对他讲 S\/D\/E/.test(byK.co.sys), "共创没被拦住「上来就讲 S/D/E」");
+  ok(/不需要知道/.test(byK.co.sys), "共创没被告知「他不需要知道这些理论」");
+  ok(/让人看见/.test(byK.co.sys) && /让人会做/.test(byK.co.sys) && /让人心里被牵动|被牵动/.test(byK.co.sys),
+    "共创没有把三个落点翻成人话");
+  ok(/别做问卷|一次只问一两个/.test(byK.co.sys), "共创没被拦住把引导做成问卷");
+  ok(/〔SDE路径：XXX〕|SDE路径/.test(byK.co.sys), "共创没有回执协议 —— 判了也传不回来");
+  ok(/判不了就\*\*别写这一行\*\*|判不了就/.test(byK.co.sys), "没给「判不了就别写」的出口（会逼它瞎判）");
+  ok(/第一段/.test(byK.co.sys), "判完没有要求给第一段怎么起手");
+  /* 修改/编辑不该背这套引导 —— 它们不判路径 */
+  ok(!/SDE路径/.test(byK.rev.sys) && !/SDE路径/.test(byK.ed.sys), "修改/编辑也被塞了判路径的活");
+
+  /* 回执解析：三条纪律 */
+  ok(/var PATH_RE = /.test(H), "没有回执正则");
+  ok(/PATHS\.some\(function \(p\) \{ return p\.id === id; \}\)/.test(H),
+    "回执没有校验合法 id —— 基底瞎写一个就把路径设歪了");
+  ok(/\.replace\(PATH_RE, ""\)/.test(H), "回执没有从显示里抹掉（会当成乱码露在脸上）");
+  const tail = H.slice(H.indexOf('if (A.k === "co") {'), H.indexOf('if ((A.k === "rev"'));
+  ok(/takePath\(cell\.t\)/.test(tail), "共创的回话没有走回执解析");
+  ok(!/A\.k === "rev"[\s\S]{0,80}takePath/.test(H), "修改/编辑的整篇正文也被当成回执解析了");
+
+  /* 首屏的开场把第一句话送进共创，而不是要读者先选路径 */
+  ok(/function seedGo\(\)/.test(H), "没有开场入口");
+  ok(/ask\("我想写的是：" \+ v/.test(H), "开场没有把那句话送进共创");
+  ok(/ST\.agent = "co"/.test(H.slice(H.indexOf("function seedGo"))), "开场没有切到共创台");
+  ok(/也不懂那些方法/.test(H), "开场没有告诉它「这人不懂理论」");
+
+  /* 已经动过手的人，重进不该再被问一遍 */
+  ok(/if \(cur\(\)\.trim\(\) \|\| \(ST\.chat\.co \|\| \[\]\)\.length\)/.test(H),
+    "回头再进还会被问一遍「你想说什么」");
+
+  /* 弹层里的选单：委托必须挂在稳定的容器上 */
+  ok(/\$\("sbd"\)\.addEventListener\("click"/.test(H),
+    "选单的委托挂在了 #paths 上 —— 它每次重画都是新元素，监听会失效并累加");
 }
 
 /* ══ ④ 首页挂载（铁律 3：孤儿页等于不存在）══════ */
