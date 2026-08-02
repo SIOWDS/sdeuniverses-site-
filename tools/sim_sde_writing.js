@@ -76,7 +76,13 @@ sec("① 六路径：把表抠出来重算，不是查字符串");
 /* ══ ② 三台智能体的分工必须硬 ═══════════════════ */
 sec("② 三台：共创动脑、修改动内容、编辑动文字");
 {
-  ok(AGENTS.length === 4, "不是四台：" + AGENTS.length);
+  /* ⚠ 不钉死台数——钉死数目的断言在每次加台时都会红一次（这已经是第二次：
+     加第四台时红过，加第五台又红）。要守的是**每一台都还在**，不是"恰好几台"。 */
+  {
+    const ks = AGENTS.map(a => a.k);
+    ["co", "rev", "ed", "on", "gap"].forEach(k => ok(ks.indexOf(k) >= 0, "少了一台：" + k));
+    ok(AGENTS.length >= 5, "台数少于已知的五台：" + AGENTS.length);
+  }
   const byK = {}; AGENTS.forEach(a => { byK[a.k] = a; });
   ["co", "rev", "ed", "on"].forEach(k => ok(!!byK[k], "缺 " + k));
 
@@ -112,9 +118,9 @@ sec("② 三台：共创动脑、修改动内容、编辑动文字");
   ok(/别硬写/.test(byK.on.sys), "接着写没有「接不下去就别硬写」的出口");
   ok(/落点/.test(byK.on.sys), "接着写没盯着落点推进");
 
-  /* 四台的 system 不许两两雷同（雷同＝其实少一台） */
+  /* 各台的 system 不许两两雷同（雷同＝其实少一台）。判据从 AGENTS.length 派生，别钉数目。 */
   const sysList = AGENTS.map(a => a.sys);
-  ok(new Set(sysList).size === 4, "有两台的 system 一模一样");
+  ok(new Set(sysList).size === AGENTS.length, "有两台的 system 一模一样（雷同＝其实少一台）");
 }
 
 /* ══ ③ 页面接线 ═══════════════════════════════ */

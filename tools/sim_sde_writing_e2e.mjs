@@ -94,7 +94,8 @@ sec("① 真装载");
   ok(!!A.$("seed") && !!A.$("seedgo"), "首屏没有开场入口");
   ok(A.$("start").style.display !== "none", "一进来就把开场框藏了");
   ok(A.$("fruit").style.display === "none", "还没定路径就亮出了「这一篇的活儿」");
-  ok(A.d.querySelectorAll(".ags button").length === 4, "不是四台智能体");
+  // 按钮数不钉死（加台就红）；守的是「每一台都渲染出了按钮」。
+  ok(A.d.querySelectorAll(".ags button").length >= 5, "智能体按钮少于五个：" + A.d.querySelectorAll(".ags button").length);
   ok(A.d.querySelectorAll(".rtb button").length >= 12, "排版工具条按钮太少");
   ok(A.d.querySelectorAll(".quick button").length >= 4, "没有快捷问");
   /* 弹层里才有路径选单，首屏没有 */

@@ -52,6 +52,8 @@ padding:8px 12px;gap:7px;overflow-x:auto;white-space:nowrap;-webkit-overflow-scr
 .way{border:1px solid var(--line);background:transparent;color:#C9CFBC;border-radius:15px;
 padding:5px 12px;font-size:12.5px;cursor:pointer;margin-right:7px;line-height:1.4}
 .way:hover{border-color:var(--olive2);color:#fff}
+.way-mine{border-color:rgba(126,154,85,.6);color:#DCE3CC}
+.way-mine:hover{background:rgba(126,154,85,.16)}
 #err{color:#E2A0A0;font-size:13px;margin-top:12px;min-height:1.2em}
 @media(max-width:640px){.ttl,#chap{display:none}#bar{padding:0 10px;gap:6px}#stage{padding:14px 8px 56px}}
 </style></head>
@@ -91,6 +93,7 @@ padding:5px 12px;font-size:12.5px;cursor:pointer;margin-right:7px;line-height:1.
         <li><b style="color:#C9CFBC">按三类拆</b>——它在答 What／How／Why 的哪一类</li>
         <li><b style="color:#C9CFBC">缝隙</b>——它和上下章之间空着什么</li>
         <li><b style="color:#C9CFBC">顶回它</b>——站内哪篇跟它撞了，分离线在哪</li>
+        <li><b style="color:#C9CFBC">我把它组织成了什么</b>——<span style="color:#A8B396">这一条的产出属于你，不属于这本书；两个人在这里必然分岔，而分岔正是共读要的</span></li>
       </ol>
     </div>
     <div id="err"></div>
@@ -104,6 +107,7 @@ padding:5px 12px;font-size:12.5px;cursor:pointer;margin-right:7px;line-height:1.
   <button class="way" data-w="4">④ 按三类拆</button>
   <button class="way" data-w="5">⑤ 缝隙</button>
   <button class="way" data-w="6">⑥ 顶回它</button>
+  <button class="way way-mine" data-w="7">⑦ 我把它组织成了什么</button>
 </div>
 
 <script src="/assets/lib/pdf.min.js"></script>
@@ -300,7 +304,12 @@ padding:5px 12px;font-size:12.5px;cursor:pointer;margin-right:7px;line-height:1.
     "3": "按读法③：这一章哪里是脆的？至少三处，每处要指得出是哪一句，别说「论证还可更充分」这类话。",
     "4": "按读法④：这一章在答 What／How／Why 里的哪一类？照那一类的做法给我骨架。",
     "5": "按读法⑤：这一章和上下章之间空着什么？能不能造一个概念把这条缝填上。",
-    "6": "按读法⑥：站内哪一篇跟这一章撞了？给我一条分离线——它们俩到底在什么地方分开。"
+    "6": "按读法⑥：站内哪一篇跟这一章撞了？给我一条分离线——它们俩到底在什么地方分开。",
+    /* ⑦ 与前六条不是一类：前六条产出「关于这本书的判断」，两个人读得好会趋同；
+       这一条产出的是**读者自己的东西**，两个人必然分岔——而共读要的正是分岔。
+       所以填进去的不是一个问题，是一个**留着空等他自己填**的句子：
+       预填一个完整的问句等于替他起了头，他多半就顺着答了。 */
+    "7": "按读法⑦：这一章在我这儿组织成了——\n（我先写，写完你再帮我压成一句、指出它和原书在哪儿分开、以及它要什么才站得住。别先给我你的版本。）"
   };
   ways.addEventListener("click", function (e) {
     var b = e.target.closest ? e.target.closest(".way") : null;
