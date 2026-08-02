@@ -27,7 +27,9 @@ const ok = (name, cond) => { if (cond) { pass++; } else { fail++; console.log(" 
 
 /* ── ① 接线四处 ────────────────────────────────────────── */
 console.log("① 接线四处一次改齐");
-ok('show() 白名单含 home', /\["gate","home","chats"/.test(H));
+/* ⚠️ 不钉顺序：白名单是会被后续功能插队的（成员面 who 就插在了 home 前面）。
+   只断言「home 在这个数组里」，否则每加一个视图就假红一次。 */
+ok('show() 白名单含 home', /\[("[a-z]+",)*"home"(,"[a-z]+")*\]\.forEach/.test(H));
 ok('视图 v-home 存在，且带滚动容器 hm-body', /id="v-home"[\s\S]{0,120}id="hm-body"/.test(H));
 ok('标签条第一颗是 data-go="home"', /<div class="tabs"[\s\S]{0,200}data-go="home"/.test(H));
 ok('标签分派把 home 接到 homeGo（且排在 moments 之前）',
