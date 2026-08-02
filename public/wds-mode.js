@@ -757,6 +757,21 @@
       cvTalkAsk: "⚡ 就这条问 WDS", cvTalkDel: "删",
       cvTalkPre: "下面是画布《{t}》里的一段，以及我对它的批注。请就这一处跟我讨论，不要重写整段：",
       cvTalkSent: "已把这一条递给 WDS —— 讨论出来的话留在对话里；要落成新版本，用「⚡ 共创」。",
+      cvLab: "🤝 共创台", cvLabT: "随时问 WDS 两句：这句接下去怎么写、这条站不站得住、还缺什么",
+      cvLabPh: "写卡住了？问问看…（它看得见你正在写的这一件）",
+      cvLabSend: "问", cvLabStop: "停",
+      cvLabNone: "这是**与 WDS 共创**的地方——不是让它替你写，是卡住的时候有个人可以问。\n\n它每一轮都带着你正在写的这一件去问：件名、当前这一版的正文、以及你选中的那一段。\n\n回话不会自动写进正文。看着行，再按「⤵ 插入正文」。",
+      cvLabQ1: "接下去怎么写", cvLabQ2: "这一段站得住吗", cvLabQ3: "给我三个方向",
+      cvLabQ4: "这里缺什么", cvLabQ5: "谁已经说过这件事", cvLabQ6: "举一个具体例子",
+      cvLabIns: "⤵ 插入正文", cvLabVer: "⟳ 落成新版本", cvLabCopy: "复制",
+      cvLabInsOk: "已插到正文末尾（还没存版本，看一眼再「✓ 存为新版」）。",
+      cvLabInsSel: "已换掉选中的那一段（还没存版本）。",
+      cvLabNoKey: "还没配大模型 Key —— 共创台用的是你自己那把，和主对话同一把。",
+      cvLabErr: "没答上来（网络或额度）。再问一次试试。",
+      cvLabOn: "正在想…", cvLabClear: "清空这一件的共创记录",
+      cvLabWith: "带着这一件在问：{t}",
+      cvLabSel: "（并带上你选中的 {n} 字）",
+      cvLabSys: "你现在在**画布的共创台**上，和作者一起写这一件东西。规矩四条：①这是讨论，不是替他写全文——除非他明说「写一段」，否则不要整段代笔；②答得短，能一句说清就别写三段；③**可以反问**，问不清楚就先问回去；④凡是给方向就给**具体的**（一个例子、一句可以直接用的话、一个能查的判据），不要给「可以从多个角度考虑」这类。下面是他正在写的东西与他的问题。",
       cvNew: "＋ 新建", cvNewT: "开一篇空白稿，直接在这儿写（不必等东西落进来）",
       cvNewTitle: "无题 {n}", cvWrite: "✍ 现在就写一篇",
       cvToBox: "📥 投进草稿箱", cvToBoxT: "投给站上的管理系统（不对外开放，只有管理员看得到），等着被改成站上的一页",
@@ -863,6 +878,21 @@
       cvTalkAsk: "\u26a1 Take this to SDE", cvTalkDel: "Delete",
       cvTalkPre: "Below is a passage from the canvas \u201c{t}\u201d and my note on it. Discuss this one point with me; do not rewrite the passage:",
       cvTalkSent: "Sent. The discussion stays in the conversation; to turn it into a new version, use Co-create.",
+      cvLab: "\ud83e\udd1d Co-lab", cvLabT: "Ask SDE anything while you write \u2014 it sees the piece you are working on",
+      cvLabPh: "Stuck? Ask\u2026 (it can see what you are writing)",
+      cvLabSend: "Ask", cvLabStop: "Stop",
+      cvLabNone: "This is where you **co-create with SDE** \u2014 not to have it write for you, but so there is someone to ask when you are stuck.\n\nEvery turn carries the piece you are writing: its name, the current version, and whatever you have selected.\n\nReplies never go into the text on their own. Press Insert when one is worth keeping.",
+      cvLabQ1: "How should this continue?", cvLabQ2: "Does this passage hold up?", cvLabQ3: "Give me three directions",
+      cvLabQ4: "What is missing here?", cvLabQ5: "Who has already said this?", cvLabQ6: "Give a concrete example",
+      cvLabIns: "\u2935 Insert", cvLabVer: "\u27f3 Save as version", cvLabCopy: "Copy",
+      cvLabInsOk: "Appended to the end (not saved as a version yet).",
+      cvLabInsSel: "Replaced the selected passage (not saved as a version yet).",
+      cvLabNoKey: "No model key yet \u2014 the co-lab uses the same one as the main chat.",
+      cvLabErr: "No answer (network or quota). Try once more.",
+      cvLabOn: "Thinking\u2026", cvLabClear: "Clear the co-lab log for this piece",
+      cvLabWith: "Working on: {t}",
+      cvLabSel: "(and the {n} characters you selected)",
+      cvLabSys: "You are in the canvas co-lab, writing this piece together with the author. Four rules: (1) this is discussion, not ghost-writing \u2014 do not draft whole sections unless asked; (2) keep it short; (3) ask back when the question is unclear; (4) any direction you give must be concrete \u2014 an example, a usable sentence, a checkable test \u2014 never \u201cthere are several angles to consider\u201d. Below is what the author is writing and their question.",
       cvNew: "\uff0b New", cvNewT: "Start a blank draft and write it here",
       cvNewTitle: "Untitled {n}", cvWrite: "\u270d Write something now",
       cvToBox: "\ud83d\udce5 To draft box", cvToBoxT: "Send to the site admin draft box (private)",
@@ -1000,6 +1030,33 @@
       "border-radius:8px;padding:12px 14px;font:13px/1.75 ui-monospace,Menlo,Consolas,monospace;resize:vertical;white-space:pre-wrap}" +
     ".wdsm-cved:focus{outline:none}" +
     ".wdsm-cvnote{color:var(--wgold);font-size:11.5px;padding:6px 0 0}" +
+    /* 共创台是**坞**不是视图：与正文同屏并存。
+       问"这句接下去怎么写"的时候，那句话必须还在眼前。 */
+    ".wdsm-lab{flex:none;display:none;flex-direction:column;border-top:1px solid var(--wgold);" +
+      "background:var(--wbg2);max-height:46%;min-height:200px}" +
+    ".wdsm-cv.labon .wdsm-lab{display:flex}" +
+    ".wdsm-cv.labon .wdsm-cvwrap{flex:1 1 54%}" +
+    ".wdsm-labhd{flex:none;display:flex;align-items:center;gap:8px;padding:8px 14px;border-bottom:1px solid var(--wline);font-size:12px;color:var(--wdim)}" +
+    ".wdsm-labhd b{color:var(--wgold);font-weight:600;font-size:12.5px}" +
+    ".wdsm-labhd .sp{flex:1}" +
+    ".wdsm-labx{background:none;border:1px solid var(--wline);color:var(--wdim);font:11.5px/1 inherit;padding:4px 8px;border-radius:6px;cursor:pointer}" +
+    ".wdsm-labx:hover{color:var(--wgold);border-color:var(--wgold)}" +
+    ".wdsm-labms{flex:1;overflow:auto;padding:12px 14px}" +
+    ".wdsm-labr{margin:0 0 12px}" +
+    ".wdsm-labr.me{text-align:right}" +
+    ".wdsm-labr.me .bb{display:inline-block;background:var(--wfill2);border-radius:12px 12px 3px 12px;padding:7px 11px;font-size:13.5px;text-align:left;max-width:86%;white-space:pre-wrap;word-break:break-word}" +
+    ".wdsm-labr.wds .bb{font-size:14px;line-height:1.8;color:var(--wtx)}" +
+    ".wdsm-labr .acts{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}" +
+    ".wdsm-labr .acts button{background:none;border:1px solid var(--wline);color:var(--wdim);font:11.5px/1 inherit;padding:4px 8px;border-radius:6px;cursor:pointer}" +
+    ".wdsm-labr .acts button:hover{color:var(--wgold);border-color:var(--wgold)}" +
+    ".wdsm-labq{display:flex;gap:6px;flex-wrap:wrap;padding:0 14px 8px}" +
+    ".wdsm-labq button{background:var(--wfill);border:1px solid var(--wline);color:var(--wdim);font:11.5px/1 inherit;padding:5px 10px;border-radius:999px;cursor:pointer}" +
+    ".wdsm-labq button:hover{color:var(--wgold);border-color:var(--wgold)}" +
+    ".wdsm-labin{flex:none;display:flex;gap:8px;padding:8px 14px 12px;align-items:flex-end}" +
+    ".wdsm-labin textarea{flex:1;min-height:38px;max-height:120px;background:var(--wbg);color:var(--wtx);" +
+      "border:1px solid var(--wline);border-radius:10px;padding:9px 12px;font:inherit;font-size:13.5px;line-height:1.6;resize:none}" +
+    ".wdsm-labin textarea:focus{outline:none;border-color:var(--wgold)}" +
+    ".wdsm-labin button{flex:none;background:var(--wgold);color:#17130A;border:0;border-radius:10px;padding:9px 16px;font:inherit;font-size:13px;cursor:pointer}" +
     /* 展开：画布占满整层。用 display:none 藏聊天列而不是改宽度——
        改宽度会让里面那些按 clientWidth 量的东西（fitWide 那一类）拿到中间态。 */
     ".wdsm-layer.cvfull .wdsm-main{display:none}" +
@@ -1437,6 +1494,13 @@
       "<div class='wdsm-cvtop'><b></b><div class='wdsm-cvtabs'></div><button class='wdsm-cvb wdsm-cvx'>\u00d7</button></div>" +
       "<div class='wdsm-cvbar'></div>" +
       "<div class='wdsm-cvwrap'></div>" +
+      "<div class='wdsm-lab'>" +
+        "<div class='wdsm-labhd'><b></b><span class='w'></span><span class='sp'></span>" +
+          "<button class='wdsm-labx lx-clr'></button><button class='wdsm-labx lx-x'>\u00d7</button></div>" +
+        "<div class='wdsm-labms'></div>" +
+        "<div class='wdsm-labq'></div>" +
+        "<div class='wdsm-labin'><textarea rows='1'></textarea><button></button></div>" +
+      "</div>" +
     "</div>";
   document.body.appendChild(layer);
 
@@ -3689,7 +3753,7 @@
   var cvTabsEl = layer.querySelector(".wdsm-cvtabs");
   var cvBarEl = layer.querySelector(".wdsm-cvbar");
   var cvWrapEl = layer.querySelector(".wdsm-cvwrap");
-  var CV = { items: [], cur: -1, src: false, sel: "", want: null, note: "", edit: false, diff: false, rich: true, talk: false, full: false };
+  var CV = { items: [], cur: -1, src: false, sel: "", want: null, note: "", edit: false, diff: false, rich: true, talk: false, full: false, lab: false, labBusy: false };
   var CV_LS = "sde_wds_cv";          // 画布随刷新留存（成品不该因为按了 F5 就消失）
   var CV_MAX = 20;
   var CV_KIND = { html: "html", svg: "svg", mermaid: "mermaid", md: "md", markdown: "md", csv: "csv", tsv: "csv", json: "json" };
@@ -3832,6 +3896,14 @@
     return tb;
   }
   function cvPaint() {
+    /* ⚠ 共创台与正文**并存**，所以它的重画不能放在 cvPaint 里那些
+       `return` 之后 —— 编辑态/diff/讨论态都是提前 return 的，放后面必然被跳过。
+       放在最前面，先把坞画好，再去画正文。 */
+    (function () {
+      var it0 = cvCur();
+      if (cvEl) { if (CV.lab && it0) cvEl.classList.add("labon"); else cvEl.classList.remove("labon"); }
+      if (CV.lab && it0) cvLabPaint(it0);
+    })();
     if (cvBtn) {
       // 常驻。**不要**在画布为空时把它藏起来——那等于把功能藏成不存在，
       // 读者永远等不到"它自己冒出来"的那一刻，只会以为没有这个东西。
@@ -3967,6 +4039,8 @@
       if (CV.talk) { cvGrab(); CV.edit = false; CV.diff = false; }
       cvPaint();
     }, CV.talk).title = tx("cvTalkT");
+    mk(tx("cvLab") + (cvChat(it).length ? " " + Math.ceil(cvChat(it).length / 2) : ""),
+      function () { cvLabSet(!CV.lab); }, CV.lab).title = tx("cvLabT");
     mk(CV.full ? tx("cvUnfull") : tx("cvFull"), function () { cvFullSet(!CV.full); }, CV.full).title = tx("cvFullT");
     sec2(tx("cvRen"), "", function () {
       var n = window.prompt(tx("cvRenAsk"), it.title);
@@ -4273,7 +4347,11 @@
          md→html→md 不保证逐字相同（`*斜*` 与 `_斜_`、表格里的空格这类），
          拿原文当基线的话，**光打开一次富文本就会被判成"改过了"**，
          版本链上从此多出一堆没人改过的版本。 */
-      var base = window.WDSRte.toMd(window.WDSRte.toHtml(md));
+      /* ⚠ 基线要取**当前版本**的往返结果，不是"当前显示的内容"的。
+         取后者的话：共创台刚把一段话插进 draft、随即打开编辑器，
+         md 就是那份 draft，cur2 === base ⇒ 草稿被判成"没改"当场删掉，
+         插进去的字凭空消失。（与 cvGrab 用同一个基线，两处必须一致。） */
+      var base = window.WDSRte.toMd(window.WDSRte.toHtml(it.vers[it.vi] || ""));
       function sync() {
         var cur2 = window.WDSRte.toMd(ed.innerHTML);
         if (cur2 === base) delete it.draft; else it.draft = cur2;
@@ -4398,6 +4476,191 @@
     cvEditOn(it);          // 开出来就在编辑态，不必再点一下「✎ 编辑」
     return it;
   }
+
+  /* ══════════ 共创台（与 WDS 共创）══════════════════════
+     与已有两件的分工（别做成第三个重复品）：
+       `⚡ 共创` 一点即出**新版本**；`💬 讨论` 留下**批注**；
+       **共创台产出的是灵感** —— 要不要进正文，由人按一下决定。
+     四条决定写在补丁脚本里，最要紧的两条：
+       ① 它是**坞**不是视图：与正文同屏并存（问"这句怎么接"时那句话必须在眼前）。
+       ② **自成一场对话**（记在 `it.chat`），不进主对话流 —— 混进去主对话会被
+          "这里改个词"塞满，画布这边的上下文也丢了。 */
+  var labEl = layer.querySelector(".wdsm-lab");
+  var labMs = layer.querySelector(".wdsm-labms");
+  var labQs = layer.querySelector(".wdsm-labq");
+  var labIn = labEl && labEl.querySelector("textarea");
+  var labGo = labEl && labEl.querySelector(".wdsm-labin button");
+  var labAbort = null;
+
+  function cvChat(it) { if (!it.chat) it.chat = []; return it.chat; }
+
+  function cvLabSet(on) {
+    CV.lab = !!on;
+    if (cvEl) { if (CV.lab) cvEl.classList.add("labon"); else cvEl.classList.remove("labon"); }
+    cvPaint();
+    if (CV.lab && labIn) { try { labIn.focus(); } catch (e) {} }
+  }
+
+  /* 每一轮都带着现场去问 —— 陪读智能体之所以有用，正是因为它看得见你在读哪一页。 */
+  function cvLabCtx(it) {
+    var body = cvText();
+    var draft = (typeof it.draft === "string") ? it.draft : body;   // 正在手改就以草稿为准
+    var sel = CV.sel && cvFind(draft, CV.sel) ? CV.sel : "";
+    var out = "【正在写的这一件】《" + it.title + "》（第 " + (it.vi + 1) + "/" + it.vers.length + " 版）\n";
+    out += "【当前正文】\n" + String(draft || "（还是空的，一个字都没写）").slice(0, 7000) + "\n";
+    if (sel) out += "\n【他选中的一段】\n" + sel.slice(0, 1200) + "\n";
+    return out;
+  }
+
+  function cvLabAsk(it, q) {
+    q = String(q || "").trim();
+    if (!q || CV.labBusy) return;
+    var kv = wdsKeyGet();
+    if (!kv) { cvChat(it).push({ r: "sys", t: tx("cvLabNoKey"), at: stampTime() }); cvLabPaint(it); return; }
+    cvChat(it).push({ r: "me", t: q, at: stampTime() });
+    var cell = { r: "wds", t: "", at: stampTime(), on: 1 };
+    cvChat(it).push(cell);
+    CV.labBusy = true;
+    cvLabPaint(it);
+
+    /* 自成一场：history 只喂共创台自己的来回，不碰主对话的 history。 */
+    var hist = [];
+    cvChat(it).forEach(function (m) {
+      if (m.on || m.r === "sys") return;
+      hist.push({ role: m.r === "me" ? "reader" : "wds", text: String(m.t).slice(0, 3000) });
+    });
+    hist = hist.slice(-10);
+    hist.pop();                       // 最后一条就是这一问，别重复喂
+
+    var ctrl = null;
+    try { ctrl = new AbortController(); } catch (e) {}
+    labAbort = ctrl;
+    fetch(API, {
+      method: "POST", headers: { "content-type": "application/json" },
+      signal: ctrl ? ctrl.signal : undefined,
+      body: JSON.stringify({
+        q: tx("cvLabSys") + "\n\n" + cvLabCtx(it) + "\n【他的问题】\n" + q,
+        history: hist, key: kv.key, vendor: kv.vendor, model: kv.model || "",
+        mode: "std", web: 0, lang: LANG, about: aboutPlus()
+      })
+    }).then(function (resp) {
+      if (!resp.ok || !resp.body) throw new Error("HTTP " + resp.status);
+      var reader = resp.body.getReader(), dec = new TextDecoder(), buf = "";
+      function pump() {
+        return reader.read().then(function (r) {
+          if (r.done) return;
+          buf += dec.decode(r.value, { stream: true });
+          var idx;
+          while ((idx = buf.indexOf("\n")) >= 0) {
+            var line = buf.slice(0, idx).trim(); buf = buf.slice(idx + 1);
+            if (line.slice(0, 5) !== "data:") continue;
+            var p = line.slice(5).trim();
+            if (p === "[DONE]") return;
+            var j; try { j = JSON.parse(p); } catch (e) { continue; }
+            /* ⚠ 正文事件名是 `token`（照主流程那条 pump 核对过）。
+               我第一版按直觉写了 text/delta —— 语法没错、断言也全绿，
+               但共创台会一个字都不出。**凡自己另起一条 SSE 解析，
+               事件名必须逐个对着主流程抄，不许凭印象。** */
+            if (j.t === "token") { cell.t += j.v; cvLabPaint(it); }
+            else if (j.t === "error") {
+              cell.t = String(j.v || tx("cvLabErr"));
+              if (j.code === "need_key" || j.code === "bad_key") cell.t = tx("cvLabNoKey");
+              cvLabPaint(it);
+            }
+          }
+          return pump();
+        });
+      }
+      return pump();
+    }).then(function () {
+      delete cell.on;
+      if (!cell.t) cell.t = tx("cvLabErr");
+      CV.labBusy = false; labAbort = null; cvSave(); cvLabPaint(it);
+    }, function () {
+      delete cell.on;
+      if (!cell.t) cell.t = tx("cvLabErr");
+      CV.labBusy = false; labAbort = null; cvSave(); cvLabPaint(it);
+    });
+  }
+
+  /* 回话**不自动进正文**：自动写入会让人不敢开口问。 */
+  function cvLabInsert(it, text) {
+    var base = (typeof it.draft === "string") ? it.draft : cvText();
+    var rng = CV.sel ? cvFind(base, CV.sel) : null;
+    if (rng) { it.draft = base.slice(0, rng.a) + text + base.slice(rng.b); cvNote(tx("cvLabInsSel")); }
+    else { it.draft = (base ? base.replace(/\s+$/, "") + "\n\n" : "") + text; cvNote(tx("cvLabInsOk")); }
+    CV.sel = "";
+    cvSave();
+    if (!CV.edit) cvEditOn(it); else cvPaint();
+  }
+
+  function cvLabPaint(it) {
+    if (!labEl || !labMs) return;
+    var hd = labEl.querySelector(".wdsm-labhd b"); if (hd) hd.textContent = tx("cvLab");
+    var wh = labEl.querySelector(".wdsm-labhd .w");
+    if (wh) {
+      var sel = CV.sel && cvFind((typeof it.draft === "string") ? it.draft : cvText(), CV.sel) ? CV.sel : "";
+      wh.textContent = tx("cvLabWith", { t: it.title }) + (sel ? tx("cvLabSel", { n: sel.length }) : "");
+    }
+    var cl = labEl.querySelector(".lx-clr"); if (cl) { cl.textContent = tx("cvLabClear"); cl.onclick = function () { it.chat = []; cvSave(); cvLabPaint(it); }; }
+    var xx = labEl.querySelector(".lx-x"); if (xx) xx.onclick = function () { cvLabSet(false); };
+    if (labIn) labIn.placeholder = tx("cvLabPh");
+    if (labGo) labGo.textContent = CV.labBusy ? tx("cvLabStop") : tx("cvLabSend");
+
+    labQs.innerHTML = "";
+    ["cvLabQ1", "cvLabQ2", "cvLabQ3", "cvLabQ4", "cvLabQ5", "cvLabQ6"].forEach(function (k) {
+      var b = el("button", null, tx(k));
+      b.onclick = function () { cvLabAsk(it, tx(k)); };
+      labQs.appendChild(b);
+    });
+
+    labMs.innerHTML = "";
+    var log = cvChat(it);
+    if (!log.length) {
+      var none = el("div", "wdsm-cvempty");
+      tx("cvLabNone").split("\n\n").forEach(function (p) {
+        var pe = el("p"); pe.innerHTML = mdRender(p); none.appendChild(pe);
+      });
+      labMs.appendChild(none);
+      return;
+    }
+    log.forEach(function (m, i) {
+      var r = el("div", "wdsm-labr " + (m.r === "me" ? "me" : "wds"));
+      var bb = el("div", "bb");
+      if (m.r === "me" || m.r === "sys") bb.textContent = m.t;
+      else { bb.innerHTML = mdRender(m.t || tx("cvLabOn")) + (m.on ? "<span class='cur'>\u258a</span>" : ""); typesetSync(bb); }
+      r.appendChild(bb);
+      if (m.r === "wds" && !m.on && m.t) {
+        var acts = el("div", "acts");
+        var ib = el("button", null, tx("cvLabIns"));
+        ib.onclick = function () { cvLabInsert(it, m.t); };
+        acts.appendChild(ib);
+        var vb2 = el("button", null, tx("cvLabVer"));
+        vb2.onclick = function () { cvPush(it, m.t, "wds", tx("cvLab").replace(/^\S+\s*/, "")); cvSave(); cvPaint(); };
+        acts.appendChild(vb2);
+        var cb = el("button", null, tx("cvLabCopy"));
+        cb.onclick = function () { copyText(m.t); cb.textContent = t("aCopied"); setTimeout(function () { cb.textContent = tx("cvLabCopy"); }, 1200); };
+        acts.appendChild(cb);
+        r.appendChild(acts);
+      }
+      labMs.appendChild(r);
+    });
+    try { labMs.scrollTop = labMs.scrollHeight; } catch (e) {}
+  }
+
+  (function () {
+    if (!labGo || !labIn) return;
+    labGo.onclick = function () {
+      if (CV.labBusy) { try { if (labAbort) labAbort.abort(); } catch (e) {} return; }
+      var it = cvCur(); if (!it) return;
+      var q = labIn.value; labIn.value = ""; labIn.style.height = "auto";
+      cvLabAsk(it, q);
+    };
+    labIn.onkeydown = function (ev) {
+      if (ev.key === "Enter" && !ev.shiftKey) { ev.preventDefault(); labGo.onclick(); }
+    };
+    labIn.oninput = function () { labIn.style.height = "auto"; labIn.style.height = Math.min(labIn.scrollHeight, 120) + "px"; };
+  })();
 
   function cvNotes(it) { if (!it.notes) it.notes = []; return it.notes; }
   function cvTalkAdd(it, q, text) {
@@ -4703,6 +4966,8 @@
   function cvReset() {
     CV.items = []; CV.cur = -1; CV.src = false; CV.sel = ""; CV.want = null; CV.note = "";
     CV.edit = false; CV.diff = false; CV.rich = true; CV.talk = false;
+    CV.lab = false; CV.labBusy = false;
+    if (cvEl) cvEl.classList.remove("labon");
     CV.full = false; layer.classList.remove("cvfull");
     try { localStorage.removeItem(CV_LS); } catch (e) {}
     cvShow(false); cvPaint();

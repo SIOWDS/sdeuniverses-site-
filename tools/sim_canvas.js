@@ -100,7 +100,14 @@ function boot(opts) {
   [langB, distB, pdfB, memB, keyB, moreB].forEach(b => top.appendChild(b));
   cvEl._q = { ".wdsm-cvtop b": cvTopB, ".wdsm-cvx": cvX };
   const layer = mkEl("div", "wdsm-layer");
-  layer._q = { ".wdsm-cv": cvEl, ".wdsm-cvtabs": tabs, ".wdsm-cvbar": bar, ".wdsm-cvwrap": wrap, ".wdsm-cvbtn": btn,
+  const lab = mkEl("div", "wdsm-lab");
+  const labHdB = mkEl("b"), labHdW = mkEl("span", "w");
+  const labClr = mkEl("button", "wdsm-labx lx-clr"), labX = mkEl("button", "wdsm-labx lx-x");
+  const labMs = mkEl("div", "wdsm-labms"), labQs = mkEl("div", "wdsm-labq");
+  const labTa = mkEl("textarea"), labBtn = mkEl("button");
+  lab._q = { ".wdsm-labhd b": labHdB, ".wdsm-labhd .w": labHdW, ".lx-clr": labClr, ".lx-x": labX,
+             "textarea": labTa, ".wdsm-labin button": labBtn };
+  layer._q = { ".wdsm-lab": lab, ".wdsm-labms": labMs, ".wdsm-labq": labQs, ".wdsm-cv": cvEl, ".wdsm-cvtabs": tabs, ".wdsm-cvbar": bar, ".wdsm-cvwrap": wrap, ".wdsm-cvbtn": btn,
     ".wdsm-top": top, ".wdsm-morebtn": moreB,
     ".wdsm-membtn .wdsm-mbadge": memBadgeEl, ".wdsm-morebtn .wdsm-mbadge": moreBadge,
     ".wdsm-top .wdsm-langbtn": langB, ".wdsm-top .wdsm-distbtn": distB, ".wdsm-top .wdsm-pdfbtn": pdfB,
@@ -126,6 +133,15 @@ function boot(opts) {
     cvTalkSent: "已递给 WDS", cvKbBack: "⇩ 从知识库取回", cvKbBackT: "取回",
     cvKbBackNone: "知识库里还没有东西。", cvKbBackNo: "取不到", cvKbBackOn: "正在取…",
     cvKbBackOk: "已取回画布", cvFromKb: "从知识库取回",
+    cvLab: "🤝 共创台", cvLabT: "共创台", cvLabPh: "写卡住了？", cvLabSend: "问", cvLabStop: "停",
+    cvLabNone: "这是与 WDS 共创的地方。\n\n它带着你正在写的这一件。\n\n回话不会自动写进正文。",
+    cvLabQ1: "接下去怎么写", cvLabQ2: "这一段站得住吗", cvLabQ3: "给我三个方向",
+    cvLabQ4: "这里缺什么", cvLabQ5: "谁已经说过这件事", cvLabQ6: "举一个具体例子",
+    cvLabIns: "⤵ 插入正文", cvLabVer: "⟳ 落成新版本", cvLabCopy: "复制",
+    cvLabInsOk: "已插到正文末尾", cvLabInsSel: "已换掉选中的那一段",
+    cvLabNoKey: "还没配大模型 Key", cvLabErr: "没答上来", cvLabOn: "正在想…",
+    cvLabClear: "清空这一件的共创记录", cvLabWith: "带着这一件在问：{t}", cvLabSel: "（并带上你选中的 {n} 字）",
+    cvLabSys: "你现在在画布的共创台上，和作者一起写这一件东西。",
     cvNew: "＋ 新建", cvNewT: "新建", cvNewTitle: "无题 {n}", cvWrite: "✍ 现在就写一篇",
     cvToBox: "📥 投进草稿箱", cvToBoxT: "投稿", cvToBoxAsk: "留一句话", cvToBoxNo: "投不进去",
     cvKb: "⇧ 存进知识库", cvKbT: "存进知识库", cvKbNo: "模块没装载",
@@ -162,8 +178,15 @@ function boot(opts) {
     toast: m => toasts.push(m),
     narrow: () => false,
     // pdfBoot / diffBoot 定义在画布段之外，抠段时带不进来，这里按真行为打桩
-    // pdfBoot 定义在画布段之外，抠段带不进来，按真行为打桩
+    // pdfBoot / wdsKeyGet / aboutPlus / API 定义在画布段之外，抠段带不进来，按真行为打桩
     pdfBoot: (then) => then(!opts.noPdf),
+    API: "/api/wds/chat",
+    wdsKeyGet: () => (opts.noKey ? null : { key: "k", vendor: "ds", model: "" }),
+    aboutPlus: () => "",
+    typesetSync: () => {},
+    copyText: () => {},
+    AbortController: class { constructor() { this.signal = {}; } abort() { this.aborted = 1; } },
+    TextDecoder: class { decode(v) { return String(v || ""); } },
     alert: () => {},
     LANG: "zh",
     inEl: { value: "", focus() {}, style: {}, scrollHeight: 40 },
@@ -190,6 +213,24 @@ function boot(opts) {
     removeItem: k => { delete store[k]; }
   };
   ctx.location = { origin: "https://sdeuniverses.com" };
+  /* 共创台是**直接 fetch** 对话端点的（不走主对话的 send），这里喂一段真 SSE。
+     ⚠ 事件名必须与产品一致（`token`）—— 第一版我按直觉写了 text/delta，
+     语法没错、断言也全绿，但共创台一个字都不会出。 */
+  ctx.fetch = (u, init) => {
+    ctx._posts = (ctx._posts || []).concat([{ u: u, body: JSON.parse(init.body) }]);
+    if (opts.labFail) return Promise.reject(new Error("net"));
+    const lines = (opts.labSse || [
+      'data: {"t":"token","v":"接下去可以先"}',
+      'data: {"t":"token","v":"给一条可裁决判据。"}',
+      "data: [DONE]"
+    ]).join("\n") + "\n";
+    let served = false;
+    return Promise.resolve({
+      ok: true,
+      body: { getReader: () => ({ read: () => served ? Promise.resolve({ done: true })
+        : (served = true, Promise.resolve({ done: false, value: lines })) }) }
+    });
+  };
   /* diffBoot 在段内，用的是真装载逻辑（createElement + head.appendChild + onload）。
      给一个最小 document 桩，让那条路真的跑一遍，而不是拿假的 diffBoot 糊过去。 */
   ctx.menuAt = (anchor, fill) => { const m = mkEl("div", "wdsm-menu"); fill(m); ctx._menu = m; return m; };
@@ -220,11 +261,12 @@ function boot(opts) {
   vm.runInContext(SEG + "\nthis.__x = { CV: CV, cvAdd: cvAdd, cvScan: cvScan, cvTake: cvTake, cvPaint: cvPaint, " +
     "cvAskRevise: cvAskRevise, cvFind: cvFind, cvNorm: cvNorm, cvStrip: cvStrip, cvReset: cvReset, " +
     "cvFrameDoc: cvFrameDoc, cvText: cvText, cvCur: cvCur, cvSave: cvSave, cvRestore: cvRestore, cvSelCatch: cvSelCatch, " +
-    "cvNewItem: cvNewItem, cvEditCommit: cvEditCommit, cvTalkAdd: cvTalkAdd, cvNotes: cvNotes, cvTalkAsk: cvTalkAsk, cvFullSet: cvFullSet, cvKbBack: cvKbBack, " +
+    "cvLabSet: cvLabSet, cvLabAsk: cvLabAsk, cvLabCtx: cvLabCtx, cvLabInsert: cvLabInsert, cvChat: cvChat, cvLabPaint: cvLabPaint, cvNewItem: cvNewItem, cvEditCommit: cvEditCommit, cvTalkAdd: cvTalkAdd, cvNotes: cvNotes, cvTalkAsk: cvTalkAsk, cvFullSet: cvFullSet, cvKbBack: cvKbBack, " +
     "topFit: topFit, MORE_BTNS: MORE_BTNS, cvShow: cvShow, cvMeta: cvMeta, cvPush: cvPush, cvByLabel: cvByLabel, CO_OPS: CO_OPS, coOp: coOp, cvCoRun: cvCoRun, cvGrab: cvGrab };", ctx);
   const x = ctx.__x;
   x._ = { layer, cvEl, tabs, bar, wrap, btn, store, toasts, prompts, confirms, prints, ctx, TX,
-          top, memB, memBadgeEl, moreB, moreBadge, langB, distB, pdfB, keyB };
+          top, memB, memBadgeEl, moreB, moreBadge, langB, distB, pdfB, keyB,
+          lab, labMs, labQs, labTa, labBtn, labClr };
   return x;
 }
 
@@ -992,6 +1034,115 @@ sec("⑰ 文案表：同名键会静默覆盖");
   ok(/cvToBox: /.test(SRC_FULL), "草稿箱那一族没有改名，仍在和「有未存的草稿」抢 cvDraft");
 }
 
+/* ══ ⑱ 共创台 ══════════════════════════════════ */
+(async function () {
+sec("⑱ 共创台：随时问两句，回话不自动进正文");
+{
+  const body = "# 稿子\n\n关键句：他说了甲。";
+  const C = boot();
+  C.cvAdd("md", "稿子", body);
+  C.cvPaint();
+
+  /* 按钮在主行（不是收进「⋯」——写卡住时要一眼看得见） */
+  const lb = C._.bar.children.filter(b => String(b.textContent).indexOf("共创台") > -1)[0];
+  ok(!!lb, "工具条主行没有共创台");
+  lb.onclick();
+  ok(C.CV.lab === true, "共创台没开");
+  /* 它是**坞**不是视图：开了之后正文还得在 */
+  ok(C._.cvEl.classList.contains("labon"), "画布上没有 labon 这个态");
+  ok(C._.wrap.children.length > 0, "开了共创台，正文区竟然空了 —— 它应当与正文同屏并存");
+
+  /* 空态说明 + 六个快捷问 */
+  ok(C._.labQs.children.length === 6, "快捷问不是六个：" + C._.labQs.children.length);
+  ok(C._.labMs.children.length === 1, "空态没画出来");
+
+  /* 问一句：带着现场去问 */
+  const ctxs = C.cvLabCtx(C.CV.items[0]);
+  ok(ctxs.indexOf("《稿子》") > -1, "上下文没带件名");
+  ok(ctxs.indexOf("关键句：他说了甲。") > -1, "上下文没带正文");
+  C.CV.sel = "关键句：他说了甲。";
+  ok(C.cvLabCtx(C.CV.items[0]).indexOf("他选中的一段") > -1, "选中了却没带进上下文");
+  C.CV.sel = "";
+
+  C.cvLabAsk(C.CV.items[0], "这句接下去怎么写？");
+  await new Promise(r => setTimeout(r, 60));
+  const log = C.cvChat(C.CV.items[0]);
+  ok(log.length === 2, "一问一答应当是两条，实得 " + log.length);
+  ok(log[0].r === "me" && log[1].r === "wds", "角色记错了");
+  ok(log[1].t.indexOf("可裁决判据") > -1, "回话没收到（多半是 SSE 事件名对不上）：" + JSON.stringify(log[1].t));
+  ok(!log[1].on, "答完了还挂着流式标记");
+
+  /* 发出去的那一包：自成一场，不碰主对话 */
+  const post = (C._.ctx._posts || []).pop();
+  ok(!!post && post.u === "/api/wds/chat", "没发到对话端点");
+  ok(post.body.q.indexOf("共创台") > -1, "没带共创台的规矩");
+  ok(post.body.q.indexOf("关键句：他说了甲。") > -1, "没把正在写的东西带过去");
+  ok(Array.isArray(post.body.history) && post.body.history.length === 0, "第一问就带了历史");
+  ok((C._.ctx._sent || []).length === 0, "共创台竟然走了主对话的 send（会把主对话塞满）");
+
+  /* 第二问要带上第一轮 */
+  C.cvLabAsk(C.CV.items[0], "再说说");
+  await new Promise(r => setTimeout(r, 60));
+  const post2 = (C._.ctx._posts || []).pop();
+  ok(post2.body.history.length === 2, "第二问没带上第一轮：" + JSON.stringify(post2.body.history));
+
+  /* 回话不自动进正文 */
+  ok(C.CV.items[0].draft === undefined && C.CV.items[0].vers.length === 1,
+    "回话自动写进正文了 —— 那会让人不敢开口问");
+
+  /* 按一下才插入 */
+  C.cvLabPaint(C.CV.items[0]);
+  const wdsRow = C._.labMs.children.filter(x => String(x.className).indexOf("wds") > -1).pop();
+  ok(!!wdsRow, "找不到回话那一行");
+  const ins = wdsRow.children.filter(x => String(x.className) === "acts")[0];
+  ok(!!ins, "回话下面没有动作条");
+  const insBtn = ins.children.filter(x => String(x.textContent).indexOf("插入正文") > -1)[0];
+  ok(!!insBtn, "没有「⤵ 插入正文」");
+  insBtn.onclick();
+  ok(String(C.CV.items[0].draft || "").indexOf("可裁决判据") > -1, "插不进去");
+  ok(String(C.CV.items[0].draft || "").indexOf("关键句：他说了甲。") > -1, "插入把原文冲掉了");
+  ok(C.CV.items[0].vers.length === 1, "插入不该直接落成版本（要人再按「存为新版」）");
+
+  /* 选中一段时，插入是**换掉那一段** */
+  const C2 = boot();
+  C2.cvAdd("md", "稿子", body); C2.cvPaint();
+  C2.CV.sel = "关键句：他说了甲。";
+  C2.cvLabInsert(C2.CV.items[0], "关键句：他说了乙。");
+  ok(String(C2.CV.items[0].draft).indexOf("他说了乙") > -1 &&
+     String(C2.CV.items[0].draft).indexOf("他说了甲") === -1, "有选区时没有换掉那一段");
+
+  /* 没配 Key：如实说，不空转 */
+  const C3 = boot({ noKey: true });
+  C3.cvAdd("md", "稿子", body); C3.cvPaint();
+  C3.cvLabAsk(C3.CV.items[0], "问一句");
+  ok(C3.cvChat(C3.CV.items[0]).some(m => String(m.t).indexOf("Key") > -1), "没配 Key 却不吭声");
+  ok((C3._.ctx._posts || []).length === 0, "没配 Key 还发了请求");
+
+  /* 网络挂了：如实说 */
+  const C4 = boot({ labFail: true });
+  C4.cvAdd("md", "稿子", body); C4.cvPaint();
+  C4.cvLabAsk(C4.CV.items[0], "问一句");
+  await new Promise(r => setTimeout(r, 60));
+  const l4 = C4.cvChat(C4.CV.items[0]);
+  ok(l4[l4.length - 1].t.indexOf("没答上来") > -1, "网络挂了却不吭声");
+  ok(C4.CV.labBusy === false, "出错之后还卡在忙态（按钮会一直是「停」）");
+
+  /* 记录跟着这一件走、随画布留存 */
+  const C5 = boot({ runTimers: true });
+  C5.cvAdd("md", "稿子", body); C5.cvPaint();
+  C5.cvChat(C5.CV.items[0]).push({ r: "me", t: "记一句", at: "10:00" });
+  C5.cvLabPaint(C5.CV.items[0]);
+  C5.cvSave();
+  ok(String(C5._.store["sde_wds_cv"] || "").indexOf("记一句") > -1, "共创记录没跟着画布落本机");
+
+  /* 换场归位 */
+  C.cvReset();
+  ok(C.CV.lab === false && C.CV.labBusy === false, "换场没把共创台归位");
+
+  /* 与另外两件的分工不许混：共创台不设 want（那是共创动作干的事） */
+  ok(!/cvLabAsk[\s\S]{0,900}CV\.want =/.test(SRC), "共创台设了 want —— 回话会被收成新版本，那是「⚡ 共创」的活");
+}
+
 (async function () {
 sec("⑮ 从知识库取回（资料库此前是单向的）");
 {
@@ -1052,4 +1203,5 @@ sec("⑮ 从知识库取回（资料库此前是单向的）");
 
 console.log("\n" + PASS + " PASS / " + FAIL + " FAIL");
 process.exit(FAIL ? 1 : 0);
+})();
 })();
