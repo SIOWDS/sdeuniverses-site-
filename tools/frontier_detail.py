@@ -26,6 +26,7 @@ import io, os, re, sys, importlib
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 FR = os.path.join(ROOT, "public", "frontier")
 MARK = "<!--fd1-->"
+ANCHOR = '<div class="end">'   # 新板块插在哪一段之前；第二轮由数据模块覆盖为「※ 争议现场」
 
 # 小节由首字定位：甲乙丙丁戊己庚 = 上一个十年；一二三…八 = 这十年
 BOUND = re.compile(r'<h2>|<div class="era">|<div class="end">')
@@ -73,9 +74,9 @@ def build(slug, item):
         t = t[:pos] + txt + t[pos:]
 
     # ② 两节新板块：插在尾块之前
-    k = t.find('<div class="end">')
+    k = t.find(ANCHOR)
     if k < 0:
-        raise SystemExit("✗ %s 找不到尾块" % slug)
+        raise SystemExit("✗ %s 找不到插入锚点" % slug)
     blk = []
     for title, paras in item["n"]:
         blk.append("<h2>%s</h2>" % title)
@@ -127,6 +128,9 @@ if __name__ == "__main__":
         raise SystemExit(0)
 
     mod = importlib.import_module(sys.argv[1])
+    # 数据模块可覆盖幂等标记与插入锚点（第二轮扩充用 fd2 + 插在争议现场之前）
+    MARK = getattr(mod, "MARK", MARK)
+    ANCHOR = getattr(mod, "ANCHOR", ANCHOR)
     out, tot, skip = {}, 0, 0
     for slug, item in mod.DETAIL.items():
         pth, txt, add, done = build(slug, item)
