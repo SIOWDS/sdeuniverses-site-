@@ -444,7 +444,8 @@ F 可证伪性(权重0.15)：怎样会被证伪；找不到→≤100。80口号�
 
 【硬性纪律】① 只看文本本身，不看出处/作者。② 给≥1个"关键扣分句"：精确引用原文某句+扣分原因。③ 给"如何同时提升两个分"的具体可操作动作。④ 不用"真"作强调修饰词。
 
-【输出格式·严格】把全文读完再评。思考可尽情展开，但最终只输出一个 JSON 对象，不要任何前言/结语/代码围栏。分数一律整数或一位小数：
+【输出格式·严格】把全文读完再评。思考可尽情展开，但最终只输出一个 JSON 对象，不要任何前言/结语/代码围栏。分数一律整数或一位小数。
+【JSON 字符串硬约束·违反一条整张卡作废】evidence/note/quote/reason/verdict 里引用原文时一律用中文引号「」，绝不出现英文双引号与反斜杠；字符串内部不许换行（要断句用中文分号）；不留尾逗号、不写注释。
 {"title":"论文标题(用户给了就用,没给据内容拟≤20字)","wordcount":字数整数,
 "iq":{"dims":{"S":{"score":分,"evidence":"原文证据"},"D":{"score":分,"evidence":"..."},"E":{"score":分,"evidence":"..."},"I":{"score":分,"evidence":"..."},"F":{"score":分,"evidence":"..."}},"composite":创新智商综合一位小数,"level":"层级判定"},
 "paper":{"aspects":{"completeness":{"score":分,"note":"简评"},"evidence":{"score":分,"note":"简评"},"format":{"score":分,"note":"简评"},"candor":{"score":分,"note":"简评"}},"composite":论文完善性综合一位小数,"grade":"档位如:可用 B"},
@@ -777,7 +778,44 @@ async function getReflection(sel,key,statusEl2){
 }
 
 /* ═══ 解析 & 计算 ═══ */
-function extractJSON(raw){ let t=raw.trim().replace(/^```(?:json)?/i,'').replace(/```$/,'').trim(); const a=t.indexOf('{'),b=t.lastIndexOf('}'); if(a>=0&&b>a) t=t.slice(a,b+1); return JSON.parse(t); }
+/* 基底在 evidence/quote 里逐字引原文时，常把英文双引号或换行原样带进字符串，
+   于是整张卡因为一个引号报「Expected ',' or '}'」。所以先原样解析，失败再结构修复：
+   串内多出来的引号就地转义、裸换行转义、非法转义去掉、尾逗号删掉、被截断的括号补齐。 */
+function jsonRepair(s){
+  let out='', inStr=false, esc=false; const stack=[];
+  for(let i=0;i<s.length;i++){
+    const ch=s.charAt(i);
+    if(inStr){
+      if(esc){ out+=ch; esc=false; continue; }
+      if(ch==='\\'){ const nc=s.charAt(i+1); if(nc&&'"\\/bfnrtu'.indexOf(nc)>=0){ out+=ch; esc=true; } continue; }
+      if(ch==='"'){
+        let k=i+1; while(k<s.length && ' \t\r\n'.indexOf(s.charAt(k))>=0) k++;
+        const nx=s.charAt(k)||'';
+        if(nx===''||nx===','||nx===':'||nx==='}'||nx===']'){ inStr=false; out+=ch; } else out+='\\"';
+        continue;
+      }
+      if(ch==='\n'){ out+='\\n'; continue; }
+      if(ch==='\r'){ out+='\\r'; continue; }
+      if(ch==='\t'){ out+='\\t'; continue; }
+      if(ch<' ') continue;
+      out+=ch; continue;
+    }
+    if(ch==='"'){ inStr=true; out+=ch; continue; }
+    if(ch==='{'||ch==='['){ stack.push(ch==='{'?'}':']'); out+=ch; continue; }
+    if(ch==='}'||ch===']'){ if(stack.length) stack.pop(); out+=ch; continue; }
+    out+=ch;
+  }
+  if(inStr) out+='"';
+  out=out.replace(/,\s*$/,'').replace(/,?\s*"[^"]*"\s*:\s*$/,'').replace(/,(\s*[}\]])/g,'$1');
+  while(stack.length) out+=stack.pop();
+  return out;
+}
+function extractJSON(raw){
+  let t=raw.trim().replace(/^```(?:json)?/i,'').replace(/```$/,'').trim();
+  const a=t.indexOf('{'),b=t.lastIndexOf('}');
+  if(a>=0) t=(b>a)?t.slice(a,b+1):t.slice(a);
+  try{ return JSON.parse(t); }catch(e){ return JSON.parse(jsonRepair(t)); }
+}
 const IQ_W={S:0.20,D:0.25,E:0.20,I:0.20,F:0.15}, PP_W={completeness:0.30,evidence:0.30,format:0.20,candor:0.20};
 function num(x){ const v=Number(x); return isFinite(v)?v:NaN; }
 function recomputeIQ(dims){ let s=0; for(const k in IQ_W){ const v=num(dims?.[k]?.score); if(isNaN(v)) return NaN; s+=v*IQ_W[k]; } return Math.round(s*10)/10; }

@@ -1057,12 +1057,83 @@ function iqSourceText(){
   var t=(el&&el.value||'').trim();
   return t || polishAll || paperAll || '';
 }
-/* 基底偶尔会在 JSON 外面套一层围栏或寒暄；不信任模型输出，取第一个 { 到最后一个 } */
+/* 基底偶尔会在 JSON 外面套一层围栏或寒暄；不信任模型输出，取第一个 { 到最后一个 }。
+   更常见的坏法在里面：它在 evidence/quote 里逐字引原文时，把英文双引号或换行原样带了进来，
+   字符串被提前收尾，浏览器就报「Expected ',' or '}' ... at position N」——一次盲评要跑一两分钟，
+   为一个引号丢掉整张卡不划算。所以解析走三关：原样 → 结构修复 → 逐字段抢救。 */
+function iqJsonRepair(s){
+  var out='', inStr=false, esc=false, stack=[];
+  for(var i=0;i<s.length;i++){
+    var ch=s.charAt(i);
+    if(inStr){
+      if(esc){ out+=ch; esc=false; continue; }
+      if(ch==='\\'){
+        var nc=s.charAt(i+1);
+        if(nc && '"\\/bfnrtu'.indexOf(nc)>=0){ out+=ch; esc=true; }  /* 合法转义原样放行 */
+        continue;                                                     /* 非法转义：丢掉反斜杠 */
+      }
+      if(ch==='"'){
+        /* 向后看第一个非空白字符：只有 , : } ] 或串尾才可能是真收尾，
+           其余一律判为原文里的引号，就地转义——这一条修的正是本次故障 */
+        var k=i+1; while(k<s.length && ' \t\r\n'.indexOf(s.charAt(k))>=0) k++;
+        var nx=s.charAt(k)||'';
+        if(nx===''||nx===','||nx===':'||nx==='}'||nx===']'){ inStr=false; out+=ch; }
+        else out+='\\"';
+        continue;
+      }
+      if(ch==='\n'){ out+='\\n'; continue; }
+      if(ch==='\r'){ out+='\\r'; continue; }
+      if(ch==='\t'){ out+='\\t'; continue; }
+      if(ch<' ') continue;
+      out+=ch; continue;
+    }
+    if(ch==='"'){ inStr=true; out+=ch; continue; }
+    if(ch==='{'||ch==='['){ stack.push(ch==='{'?'}':']'); out+=ch; continue; }
+    if(ch==='}'||ch===']'){ if(stack.length) stack.pop(); out+=ch; continue; }
+    out+=ch;
+  }
+  if(inStr) out+='"';                          /* 截断在半句话里 */
+  out=out.replace(/,\s*$/,'');
+  out=out.replace(/,?\s*"[^"]*"\s*:\s*$/,'');  /* 截断在半个键值对上 */
+  out=out.replace(/,(\s*[}\]])/g,'$1');        /* 尾逗号 */
+  while(stack.length) out+=stack.pop();        /* 补齐没闭合的括号（被 MAXTOK 截断时） */
+  return out;
+}
+/* 第三关：结构已经修不回来时，逐字段把五维分捞出来。
+   五维不全就返回 null —— 半张卡比没有卡更误导人。 */
+function iqSalvage(s){
+  var j={_salvaged:true}, got=0;
+  ['S','D','E','I','F'].forEach(function(k){
+    var m=new RegExp('"'+k+'"\\s*:\\s*\\{([\\s\\S]{0,1500}?)(?:\\}|$)').exec(s);
+    if(!m) return;
+    var blk=m[1], sc=/"score"\s*:\s*(\d{2,3})/.exec(blk);
+    if(!sc) return;
+    got++;
+    var wh=/"why"\s*:\s*"([\s\S]*?)"\s*(?:[,}]|$)/.exec(blk), ev=/"evidence"\s*:\s*"([\s\S]*?)"\s*(?:[,}]|$)/.exec(blk);
+    j[k]={score:parseInt(sc[1],10), why:wh?wh[1]:'', evidence:ev?ev[1]:''};
+  });
+  if(got<5) return null;
+  var g=function(f){ var m=new RegExp('"'+f+'"\\s*:\\s*"([\\s\\S]*?)"\\s*(?:[,}]|$)').exec(s); return m?m[1]:''; };
+  j.title=g('title'); j.corpus=g('corpus'); j.verdict=g('verdict');
+  return j;
+}
+/* 综合分是五维加权算出来的，缺一维就不是分数而是假分——所以解析完还要过这道齐不齐的关 */
+function iqHasDims(j){
+  return !!j && ['S','D','E','I','F'].every(function(k){ return j[k] && isFinite(parseInt(j[k].score,10)); });
+}
 function parseIqJson(raw){
   var s=String(raw||'').replace(/```json/gi,'').replace(/```/g,'').trim();
-  var a=s.indexOf('{'), b=s.lastIndexOf('}');
-  if(a<0||b<=a) throw new Error('评分基底没有返回可解析的评分卡');
-  return JSON.parse(s.slice(a,b+1));
+  var a=s.indexOf('{');
+  if(a<0) throw new Error('评分基底这一轮没交评分卡（返回里没有 JSON）。请再点一次，或换一个基底。');
+  var b=s.lastIndexOf('}');
+  var body=(b>a)?s.slice(a,b+1):s.slice(a);   /* 没有收尾括号＝被截断，照样往下修 */
+  var j=null;
+  try{ j=JSON.parse(body); }catch(e0){}
+  if(!iqHasDims(j)){ try{ var r=JSON.parse(iqJsonRepair(body)); if(iqHasDims(r)){ r._repaired=true; j=r; } }catch(e1){} }
+  if(iqHasDims(j)) return j;
+  var sv=iqSalvage(s.slice(a)); if(sv) return sv;   /* 抢救走全文而不是 body：被截断时最后那截也还捞得着 */
+  if(j) throw new Error('评分卡缺了五维分里的一维或几维（综合分按五维加权算，缺项就算不出来，宁可不给分也不给假分）。请再点一次「🎯 SDE 创新智商」。');
+  throw new Error('评分基底这一版没按 JSON 交卷（自动修复与逐字段抢救都没救回来）。请再点一次「🎯 SDE 创新智商」，或换另一个基底。');
 }
 function iqBar(score, gate){
   var pct=Math.max(0,Math.min(100,(score-80)/95*100));
@@ -1084,6 +1155,9 @@ function renderIqCard(j, meta){
     +'<div style="font-size:2.1rem;font-weight:800;color:'+big+';line-height:1">'+total+'</div>'
     +'<div style="font-size:0.82rem;color:var(--text2)">'+esc(iqLevel(total))+'</div>'
     +(narTotal!==null?'<div style="font-size:0.74rem;color:var(--muted);margin-left:auto">收窄口径 '+narTotal+'　·　语料风险敞口 '+(narTotal-total)+' 分</div>':'')+'</div>';
+  if(j._repaired||j._salvaged) o+='<div style="background:#FDF6E7;border:1px solid #E0C589;color:#8A6813;border-radius:8px;padding:8px 11px;font-size:0.74rem;line-height:1.65;margin-bottom:10px">⚠ 基底交回的 JSON 有破损（多半是它在证据句里带进了英文引号或换行），页面已'
+    +(j._salvaged?'逐字段抢救出五维分 —— 敌意最近邻、扣分记录与提升路径可能整段缺失':'自动修复')
+    +'。综合分照常由页面按固定权重计算；若这张卡要拿去作数，建议再评一次比对。</div>';
   if(j.title) o+='<div style="font-size:0.9rem;font-weight:700;margin-bottom:10px">'+esc(String(j.title).slice(0,90))+'</div>';
   dims.forEach(function(k){
     var it=j[k]||{}, gate=(k==='I'||k==='F');
@@ -1527,7 +1601,7 @@ function doEmerge(again){
             var j=parseIqJson(raw);
             var d={S:iqNum(j.S&&j.S.score),D:iqNum(j.D&&j.D.score),E:iqNum(j.E&&j.E.score),I:iqNum(j.I&&j.I.score),F:iqNum(j.F&&j.F.score)};
             p.dims=d; p.total=pyRound(iqComposite(d)); p.verdict=j.verdict||''; p.card=j;
-          }catch(e){ p.total=0; p.err='评分卡解析失败（基底没按 JSON 交卷）'; }
+          }catch(e){ p.total=0; p.err='评分卡没读出来：'+(e.message||'基底没按 JSON 交卷'); }
           renderParadigms(-1);
         },function(err){ p.total=0; p.err=errText(err); renderParadigms(-1); });
       });
