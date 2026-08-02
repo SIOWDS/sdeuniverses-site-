@@ -46,7 +46,8 @@ function mkEl(tag, cls, txt) {
     value: "", oninput: null, focus() {},
     tagName: String(tag || "div").toUpperCase(), className: cls || "", _txt: txt || "",
     children: [], style: { cssText: "" }, title: "", onclick: null, _attrs: {}, _html: "",
-    appendChild(c) { this.children.push(c); c.parentNode = this; return c; },
+    appendChild(c) { this.children.push(c); if (c) c.parentNode = this; return c; },
+    insertBefore(c, ref) { const i = this.children.indexOf(ref); this.children.splice(i < 0 ? this.children.length : i, 0, c); if (c) c.parentNode = this; return c; },
     setAttribute(k, v) { this._attrs[k] = String(v); },
     getAttribute(k) { return this._attrs[k]; },
     addEventListener(t, f) { (this._ev = this._ev || {})[t] = f; },
@@ -98,6 +99,15 @@ function boot(opts) {
     cvRen: "✎ 改名", cvRenAsk: "叫什么？", cvDel: "🗑 删除", cvDelAsk: "删掉《{t}》？",
     cvEdit: "✎ 编辑", cvEditT: "手改", cvEditSave: "✓ 存为新版", cvEditCancel: "丢弃改动",
     cvEditKeep: "改了 {n} 字还没存", cvEditNo: "一个字都没改", cvDraft: "有未存的草稿",
+    cvCo: "⚡ 共创", cvCoT: "共创", cvCoWrite: "改写法", cvCoShape: "改结构", cvCoSde: "SDE 的动作",
+    cvCoOn: "正在让 WDS {op}…", cvCoWhole: "整版", cvCoSeg: "选中的 {n} 字",
+    cvByMe: "我手改", cvByWds: "WDS", cvByUnknown: "来处不明",
+    cvVerOf: "{i}/{n} · {by}", cvVerList: "版本历史", cvWords: "{n} 字",
+    cvRich: "所见即所得", cvPlain: "⌨ 源码",
+    cvRteBad: "有富文本扶不住的东西", cvRteNo: "排版模块没拉到",
+    rtB: "粗", rtI: "斜", rtS: "删", rtH1: "标题", rtH2: "小标", rtH3: "小小标", rtP: "正文",
+    rtQuote: "引用", rtUl: "• 列表", rtOl: "1. 列表", rtHr: "分隔线", rtLink: "链接",
+    rtLinkAsk: "地址", rtTable: "表格", rtClear: "清格式", rtUndo: "撤销", rtRedo: "重做",
     cvDiff: "⇄ 改了什么", cvDiffT: "比上一版", cvDiffNone: "两版逐字相同。", cvDiffBig: "太长不算",
     cvDiffFold: "… 未改 {n} 行 …", cvDiffStat: "改 {c} 处 · 加 {a} 行 · 删 {d} 行", cvDiffOne: "只有一版",
     cvPdf: "⤓ PDF", cvPdfT: "pdf", cvCap: "已到 {n} 件上限，最旧的《{t}》被移出画布。",
@@ -146,16 +156,26 @@ function boot(opts) {
   ctx.location = { origin: "https://sdeuniverses.com" };
   /* diffBoot 在段内，用的是真装载逻辑（createElement + head.appendChild + onload）。
      给一个最小 document 桩，让那条路真的跑一遍，而不是拿假的 diffBoot 糊过去。 */
+  ctx.menuAt = (anchor, fill) => { const m = mkEl("div", "wdsm-menu"); fill(m); ctx._menu = m; return m; };
+  ctx.closeMenu = () => { ctx._menu = null; };
+  ctx.send = (q) => { ctx._sent = (ctx._sent || []).concat(q); };
+  ctx.CO_SENT = [];
   ctx.document = {
+    execCommand: (c, x, v) => { ctx._cmds = (ctx._cmds || []).concat(c + (v ? ":" + v : "")); return true; },
+    createTextNode: (t2) => ({ tagName: "#text", _txt: t2, textContent: t2, children: [] }),
     createElement: () => {
       const sc = { src: "", async: false, onload: null, onerror: null };
       return sc;
     },
     head: {
       appendChild: (sc) => {
+        /* ⚠ 必须按 src 分发。只喂 diff 的话，rteBoot 永远 then(false)、
+           富文本那条路走的一直是**降级分支**——护栏看着全绿，其实没测到东西。 */
         ctx._scripts = (ctx._scripts || []).concat(sc.src);
-        if (opts.noDiff) { if (sc.onerror) sc.onerror(); return; }
-        ctx.window.WDSDiff = require(path.join(ROOT, "public/assets/wds-diff.js"));
+        const isRte = String(sc.src).indexOf("wds-rte") > -1;
+        if (isRte ? opts.noRte : opts.noDiff) { if (sc.onerror) sc.onerror(); return; }
+        if (isRte) ctx.window.WDSRte = require(path.join(ROOT, "public/assets/wds-rte.js"));
+        else ctx.window.WDSDiff = require(path.join(ROOT, "public/assets/wds-diff.js"));
         if (sc.onload) sc.onload();
       }
     }
@@ -163,7 +183,8 @@ function boot(opts) {
   vm.createContext(ctx);
   vm.runInContext(SEG + "\nthis.__x = { CV: CV, cvAdd: cvAdd, cvScan: cvScan, cvTake: cvTake, cvPaint: cvPaint, " +
     "cvAskRevise: cvAskRevise, cvFind: cvFind, cvNorm: cvNorm, cvStrip: cvStrip, cvReset: cvReset, " +
-    "cvFrameDoc: cvFrameDoc, cvText: cvText, cvCur: cvCur, cvSave: cvSave, cvRestore: cvRestore, cvSelCatch: cvSelCatch };", ctx);
+    "cvFrameDoc: cvFrameDoc, cvText: cvText, cvCur: cvCur, cvSave: cvSave, cvRestore: cvRestore, cvSelCatch: cvSelCatch, " +
+    "cvMeta: cvMeta, cvPush: cvPush, cvByLabel: cvByLabel, CO_OPS: CO_OPS, coOp: coOp, cvCoRun: cvCoRun, cvGrab: cvGrab };", ctx);
   const x = ctx.__x;
   x._ = { layer, cvEl, tabs, bar, wrap, btn, store, toasts, prompts, confirms, prints, ctx, TX };
   return x;
@@ -412,8 +433,10 @@ sec("⑦ 手改：草稿、存为新版、别被回稿吃掉");
   const edit = C._.bar.children.filter(b => b.textContent === "✎ 编辑")[0];
   ok(!!edit, "工具条没有「编辑」按钮");
   edit.onclick();
+  ok(!!C._.wrap.querySelector(".wdsm-cvrt"), "md 件点编辑没有进所见即所得");
+  C._.bar.children.filter(b => b.textContent === "⌨ 源码")[0].onclick();   // 切到源码
   const ta = C._.wrap.querySelector(".wdsm-cved");
-  ok(!!ta, "点了编辑却没有编辑框");
+  ok(!!ta, "切到源码却没有编辑框");
   ok(ta.value === body, "编辑框里不是当前版的内容");
   const labels = C._.bar.children.map(b => b.textContent);
   ok(labels.indexOf("✓ 存为新版") > -1 && labels.indexOf("丢弃改动") > -1, "编辑态的工具条不对：" + JSON.stringify(labels));
@@ -436,6 +459,7 @@ sec("⑦ 手改：草稿、存为新版、别被回稿吃掉");
   const C2 = boot();
   C2.cvAdd("md", "稿子", body); C2.cvPaint();
   C2._.bar.children.filter(b => b.textContent === "✎ 编辑")[0].onclick();
+  C2._.bar.children.filter(b => b.textContent === "⌨ 源码")[0].onclick();
   C2._.bar.children.filter(b => b.textContent === "✓ 存为新版")[0].onclick();
   ok(C2.CV.items[0].vers.length === 1, "一字未改也堆了一版");
   ok(C2.CV.note.indexOf("没改") > -1, "一字未改却不吭声");
@@ -444,6 +468,7 @@ sec("⑦ 手改：草稿、存为新版、别被回稿吃掉");
   const C3 = boot();
   C3.cvAdd("md", "稿子", body); C3.cvPaint();
   C3._.bar.children.filter(b => b.textContent === "✎ 编辑")[0].onclick();
+  C3._.bar.children.filter(b => b.textContent === "⌨ 源码")[0].onclick();
   const ta3 = C3._.wrap.querySelector(".wdsm-cved");
   ta3.value = "乱改的"; ta3.oninput();
   C3._.bar.children.filter(b => b.textContent === "丢弃改动")[0].onclick();
@@ -454,6 +479,7 @@ sec("⑦ 手改：草稿、存为新版、别被回稿吃掉");
   C4.cvAdd("md", "甲", body); C4.cvAdd("md", "乙", body); C4.cvPaint();
   C4.CV.cur = 0; C4.cvPaint();
   C4._.bar.children.filter(b => b.textContent === "✎ 编辑")[0].onclick();
+  C4._.bar.children.filter(b => b.textContent === "⌨ 源码")[0].onclick();
   const ta4 = C4._.wrap.querySelector(".wdsm-cved");
   ta4.value = body + "正在打的字"; 
   C4._.tabs.children[1].onclick();              // 直接切走，不触发 oninput
@@ -467,6 +493,7 @@ sec("⑦ 手改：草稿、存为新版、别被回稿吃掉");
   C5.cvAdd("md", "稿子", body); C5.cvPaint();
   C5.cvAskRevise(C5.CV.items[0]);
   C5._.bar.children.filter(b => b.textContent === "✎ 编辑")[0].onclick();
+  C5._.bar.children.filter(b => b.textContent === "⌨ 源码")[0].onclick();
   const ta5 = C5._.wrap.querySelector(".wdsm-cved");
   ta5.value = body + "\n\n手改的内容。"; ta5.oninput();
   C5.cvTake("机器改好的整版内容，够长够长够长。");
@@ -506,6 +533,176 @@ sec("⑧ 版本 diff");
   C6.cvAdd("md", "报告", "# 报告\n\n" + "字".repeat(500));
   C6.cvPaint();
   ok(C6._.bar.children.some(b => b.textContent === "⤓ PDF"), "模块还没装载时 PDF 按钮就该在（点了才去装）");
+}
+
+/* ══ ⑨ 版本归属 ══════════════════════════════════ */
+sec("⑨ 每一版记「谁改的」");
+{
+  const body = "# 稿子\n\n第一段。";
+  const C = boot();
+  C.cvAdd("md", "稿子", body);
+  ok(C.CV.items[0].meta && C.CV.items[0].meta.length === 1, "新件没有归属记录");
+  ok(C.cvByLabel(C.CV.items[0].meta[0]) === "WDS", "首版归属不对：" + C.cvByLabel(C.CV.items[0].meta[0]));
+
+  /* 手改 → 我 */
+  C.cvPaint();
+  C._.bar.children.filter(b => b.textContent === "✎ 编辑")[0].onclick();
+  C._.bar.children.filter(b => b.textContent === "⌨ 源码")[0].onclick();
+  const ta = C._.wrap.querySelector(".wdsm-cved");
+  ta.value = body + "\n\n我加的一段。"; ta.oninput();
+  C._.bar.children.filter(b => b.textContent === "✓ 存为新版")[0].onclick();
+  ok(C.cvByLabel(C.CV.items[0].meta[1]) === "我手改", "手改那一版没记成「我手改」");
+  ok(!!C.CV.items[0].meta[1].at, "没记时间");
+
+  /* 共创 → WDS · 动作名 */
+  const op = C.coOp("brief");
+  ok(!!op, "找不到「概括成三句」这个动作");
+  C.cvCoRun(C.CV.items[0], op);
+  ok(C.CV.want && C.CV.want.op === "概括成三句", "共创没把动作名记进 want");
+  C.cvTake("概括之后的三句话，够长够长够长。");
+  const lastMeta = C.CV.items[0].meta[C.CV.items[0].meta.length - 1];
+  ok(lastMeta.by === "wds" && lastMeta.op === "概括成三句", "回稿那一版没写清是哪个动作：" + JSON.stringify(lastMeta));
+  ok(C.cvByLabel(lastMeta).indexOf("概括成三句") > -1, "版本条上看不到动作名");
+
+  /* 版本条上直接写着谁改的，不是藏进二级菜单 */
+  C.cvPaint();
+  ok(C._.bar.children.some(b => /\d\/\d · /.test(b.textContent)), "版本条没写出归属：" +
+    JSON.stringify(C._.bar.children.map(b => b.textContent)));
+
+  /* 老件（没有 meta）要能补齐成「来处不明」，不许崩也不许瞎认 */
+  const C2 = boot();
+  C2.CV.items = [{ kind: "md", title: "老件", vers: ["一", "二", "三"], vi: 2 }];
+  C2.CV.cur = 0;
+  const m = C2.cvMeta(C2.CV.items[0]);
+  ok(m.length === 3, "老件的归属没补齐");
+  ok(C2.cvByLabel(m[0]) === "来处不明", "老件被瞎认成了某个人");
+}
+
+/* ══ ⑩ 共创动作 ═════════════════════════════════ */
+sec("⑩ 共创：一点即发，选中就只改那一段");
+{
+  const body = "# 稿子\n\n" + "前段。".repeat(20) + "\n\n关键句：他说了甲。\n\n" + "后段。".repeat(20);
+  const C = boot();
+  C.cvAdd("md", "稿子", body);
+
+  ok(C.CO_OPS.length >= 18, "共创动作太少：" + C.CO_OPS.length);
+  const groups = {};
+  C.CO_OPS.forEach(o => { groups[o.g] = (groups[o.g] || 0) + 1; });
+  ok(groups.w >= 6 && groups.s >= 4 && groups.d >= 6, "三组分布不对：" + JSON.stringify(groups));
+  /* SDE 那一组才是这台画布和通用产品的分野 —— 逐条点名，别哪天被人顺手删了 */
+  ["prop", "waffle", "sep", "crit", "falsify", "triple", "timing"].forEach(k =>
+    ok(!!C.coOp(k), "SDE 动作缺了 " + k));
+  C.CO_OPS.forEach(o => {
+    ok(o.p && o.p.length > 20, "动作 " + o.k + " 的指令太短，等于没写");
+    ok(o.n && o.e, "动作 " + o.k + " 缺中文或英文名");
+  });
+  /* 指令正文不许泄露到前端文案表（与 forge/duel 同一条纪律） */
+  ok(!/cvCoWrite:[^\n]*不许|rtB:[^\n]*情态词/.test(SRC), "动作指令正文漏进了前端文案");
+
+  /* 一点即发：不是"帮你把提示词填好，请自己按回车" */
+  C.cvCoRun(C.CV.items[0], C.coOp("hard"));
+  ok((C._.ctx._sent || []).length === 1, "共创没有直接发出去");
+  ok(C._.ctx._sent[0].indexOf("情态词") > -1, "发出去的没带动作指令");
+  ok(C._.ctx._sent[0].indexOf("来自画布《稿子》") > -1, "发出去的没带来处");
+
+  /* 选中一段 → 只发那一段 */
+  const C2 = boot();
+  C2.cvAdd("md", "稿子", body);
+  C2.CV.sel = "关键句：他说了甲。";
+  C2.cvCoRun(C2.CV.items[0], C2.coOp("rewrite"));
+  ok(C2._.ctx._sent[0].indexOf("关键句：他说了甲。") > -1, "没把选中那一段发出去");
+  ok(C2._.ctx._sent[0].indexOf("后段。") === -1, "选中一段却把整篇发了出去");
+  ok(C2.CV.want.a > 0, "选中时没记下区间（回稿就没法只替换那一段）");
+  C2.cvTake("关键句：他说了乙。");
+  ok(C2.CV.items[0].vers[1].indexOf("后段。") > -1, "只改一段却把别处弄丢了");
+
+  /* 菜单里三组都摆出来了 */
+  C.cvPaint();
+  const co = C._.bar.children.filter(b => b.textContent === "⚡ 共创")[0];
+  ok(!!co, "工具条没有共创按钮");
+  co.onclick();
+  const menu = C._.ctx._menu;
+  ok(!!menu, "共创菜单没开");
+  const heads = menu.children.filter(x => x.className === "mh").map(x => x.textContent);
+  ok(heads.length === 3, "共创菜单不是三组：" + JSON.stringify(heads));
+}
+
+/* ══ ⑪ 所见即所得 ═══════════════════════════════ */
+sec("⑪ 富文本编辑（Word 那一套）");
+{
+  const md = "# 标题\n\n正文**粗**一段。\n\n- 甲\n- 乙";
+  const C = boot();
+  C.cvAdd("md", "稿子", md);
+  C.cvPaint();
+  C._.bar.children.filter(b => b.textContent === "✎ 编辑")[0].onclick();
+  const ed = C._.wrap.querySelector(".wdsm-cvrt");
+  ok(!!ed, "md 件没有进所见即所得");
+  ok(ed.getAttribute("contenteditable") === "true", "编辑区不可编辑");
+  ok(ed.innerHTML.indexOf("<h1>") > -1 && ed.innerHTML.indexOf("<strong>") > -1,
+    "markdown 没被渲染成可编辑的 html：" + ed.innerHTML.slice(0, 80));
+
+  /* 工具条：Word 该有的那几样 */
+  const bar = C._.wrap.querySelector(".wdsm-rtbar");
+  ok(!!bar, "没有排版工具条");
+  const names = bar.children.map(b => b.title);
+  ["标题", "小标", "正文", "粗", "斜", "删", "引用", "• 列表", "1. 列表", "分隔线", "链接", "表格", "清格式", "撤销", "重做"]
+    .forEach(n => ok(names.indexOf(n) > -1, "工具条缺「" + n + "」"));
+
+  /* 点粗体真的发出了命令，且不许在 mousedown 时丢掉选区 */
+  const b = bar.children.filter(x => x.title === "粗")[0];
+  ok(typeof b.onmousedown === "function", "工具条按钮没有拦 mousedown（一点选区就没了）");
+  b.onclick();
+  ok((C._.ctx._cmds || []).indexOf("bold") > -1, "点粗体没有发出 execCommand");
+
+  /* 改了之后收草稿：必须序列化回 markdown，不能把 html 存进版本链 */
+  ed.innerHTML = "<h1>标题</h1><p>正文<strong>粗</strong>一段。改过了。</p>";
+  ed.oninput();
+  ok(typeof C.CV.items[0].draft === "string", "富文本改动没收成草稿");
+  ok(C.CV.items[0].draft.indexOf("# 标题") > -1, "草稿不是 markdown（版本链/diff/存盘全建在 markdown 上）");
+  ok(C.CV.items[0].draft.indexOf("<h1>") === -1, "草稿里混进了 html 标签");
+  ok(C.CV.items[0].draft.indexOf("改过了") > -1, "改的字丢了");
+
+  /* 光打开一次富文本，不许被判成"改过了"。
+     md→html→md 不保证逐字相同，基线若取原文，**开一次就会多出一个没人改过的版本**。
+     （这一条是变异检验查出来漏的：修好了却没有断言护住。） */
+  /* ⚠ 用例必须挑一段**往返不逐字相同**的稿子（`1)` 会被规范成 `1.`、
+     表格分隔行的空格会被重排），否则基线取原文还是取往返结果，行为一模一样，
+     变异检验根本看不出差别 —— 第一版就是这么漏过去的。 */
+  const md0 = "# 标题\n\n1) 甲\n2) 乙\n\n|甲|乙|\n|---|---|\n|一|二|";
+  const rtSame = require(path.join(ROOT, "public/assets/wds-rte.js"));
+  ok(rtSame.toMd(rtSame.toHtml(md0)) !== md0, "这段用例往返竟逐字相同，测不出基线取错");
+  const C0 = boot();
+  C0.cvAdd("md", "稿子", md0); C0.cvPaint();
+  C0._.bar.children.filter(x => x.textContent === "✎ 编辑")[0].onclick();
+  ok(C0.CV.items[0].draft === undefined, "只是打开富文本就产生了草稿");
+  C0._.bar.children.filter(x => x.textContent === "✓ 存为新版")[0].onclick();
+  ok(C0.CV.items[0].vers.length === 1, "打开又关上竟多出了一版");
+  ok(C0.CV.note.indexOf("没改") > -1, "一字未改却不吭声");
+
+  /* cvGrab 也要认富文本 */
+  const C2 = boot();
+  C2.cvAdd("md", "稿子", md); C2.cvPaint();
+  C2._.bar.children.filter(x => x.textContent === "✎ 编辑")[0].onclick();
+  const ed2 = C2._.wrap.querySelector(".wdsm-cvrt");
+  ed2.innerHTML = "<p>只剩这一句了。</p>";     // 不触发 oninput，模拟"正打字就切走"
+  C2.cvGrab();
+  ok((C2.CV.items[0].draft || "").indexOf("只剩这一句了") > -1, "切走时没把富文本里的字收下来");
+
+  /* 非 md 的件不给富文本 —— 网页/图/代码改的就是源码本身 */
+  const C3 = boot();
+  C3.cvAdd("html", "网页", "<div>" + "x".repeat(200) + "</div>");
+  C3.cvPaint();
+  C3._.bar.children.filter(x => x.textContent === "✎ 编辑")[0].onclick();
+  ok(!C3._.wrap.querySelector(".wdsm-cvrt"), "非 md 的件也套了所见即所得（会把源码改坏）");
+  ok(!!C3._.wrap.querySelector(".wdsm-cved"), "非 md 的件没有源码编辑框");
+
+  /* 排版模块拉不到：退回源码并说清楚，不拦路 */
+  const C4 = boot({ noRte: true });
+  C4.cvAdd("md", "稿子", md); C4.cvPaint();
+  C4._.bar.children.filter(x => x.textContent === "✎ 编辑")[0].onclick();
+  ok(!!C4._.wrap.querySelector(".wdsm-cved"), "模块拉不到时没有退回源码");
+  ok(JSON.stringify(C4._.wrap.children.map(c => c.textContent)).indexOf("没拉到") > -1,
+    "模块拉不到却不吭声");
 }
 
 console.log("\n" + PASS + " PASS / " + FAIL + " FAIL");

@@ -739,11 +739,25 @@
      t() 先查 TXT 再查这里。 */
   var TX2 = {
     zh: {
-      cvTitle: "画布", cvOpen: "⧉ 画布", cvClose: "收起画布",       cvEmpty: "画布还是空的。会自动落到这儿的是：结构图（/结构图）、深度研究的报告、以及回答里成块的图/网页/表格/长文稿。\n\n想手动放一件进来：在任意一条回答下面点「⧉ 落到画布」。\n\n落进来之后可以切版本、预览、下载、存到本机，也可以选中其中一段让 WDS 就地改。",
+      cvTitle: "画布", cvOpen: "⧉ 画布", cvClose: "收起画布",       cvEmpty: "画布还是空的。会自动落到这儿的是：结构图（/结构图）、深度研究的报告、以及回答里成块的图/网页/表格/长文稿。\n\n想手动放一件进来：在任意一条回答下面点「⧉ 落到画布」。\n\n落进来之后：可以用「✎ 编辑」像 Word 那样直接排版改字（标题、加粗、列表、表格都有），\
+也可以点「⚡ 共创」让 WDS 重写／概括／压成承重命题／划一条分离线——\
+选中一段就只改那一段。每改一次落一个新版本，版本条上写着这一版是谁改的，\
+「⇄ 改了什么」能看到两版之间动了哪几处。",
       cvTip: "画布：放长产出与图，可切版本、就地改",
       cvPrev: "预览", cvSrc: "源码", cvCopy: "复制", cvDl: "下载", cvSave: "存到本机", cvSaved: "已存",
       cvAsk: "让 WDS 改这一段", cvAskAll: "让 WDS 改这一版", cvVer: "版本", cvDrop: "⧉ 落到画布", cvDropped: "已落到画布",
       cvPick: "选中画布里的一段，再点这里", cvNoPrev: "这一类只能看源码",
+      cvCo: "⚡ 共创", cvCoT: "让 WDS 就着这一件动手：选中一段就只改那一段，没选中就改整版",
+      cvCoWrite: "改写法", cvCoShape: "改结构", cvCoSde: "SDE 的动作",
+      cvCoOn: "正在让 WDS {op}…", cvCoWhole: "整版", cvCoSeg: "选中的 {n} 字",
+      cvByMe: "我手改", cvByWds: "WDS", cvByUnknown: "来处不明",
+      cvVerOf: "{i}/{n} · {by}", cvVerList: "版本历史",
+      cvRich: "所见即所得", cvPlain: "⌨ 源码", cvWords: "{n} 字",
+      cvRteBad: "这一篇里有富文本扶不住的东西（原始 HTML／公式一类），改完可能会掉格式——建议点「⌨ 源码」改。",
+      cvRteNo: "排版模块没拉到，先用源码改（内容一个字都不会少）。",
+      rtB: "粗", rtI: "斜", rtS: "删", rtH1: "标题", rtH2: "小标", rtH3: "小小标", rtP: "正文",
+      rtQuote: "引用", rtUl: "• 列表", rtOl: "1. 列表", rtHr: "分隔线", rtLink: "链接",
+      rtLinkAsk: "链接地址：", rtTable: "表格", rtClear: "清格式", rtUndo: "撤销", rtRedo: "重做",
       cvEdit: "✎ 编辑", cvEditT: "直接用键盘改。改完点「存为新版」，原来那一版还留在版本链里",
       cvEditSave: "✓ 存为新版", cvEditCancel: "丢弃改动", cvEditKeep: "改了 {n} 字还没存 —— 切走会留着草稿",
       cvEditNo: "一个字都没改", cvDraft: "有未存的草稿",
@@ -814,6 +828,17 @@
       cvPrev: "Preview", cvSrc: "Source", cvCopy: "Copy", cvDl: "Download", cvSave: "Save locally", cvSaved: "Saved",
       cvAsk: "ChatSDE to revise this", cvAskAll: "ChatSDE to revise this version", cvVer: "Version", cvDrop: "⧉ To canvas", cvDropped: "On the canvas",
       cvPick: "Select something on the canvas first", cvNoPrev: "Source only for this kind",
+      cvCo: "\u26a1 Co-create", cvCoT: "Have SDE work on this item: selected passage only, or the whole version",
+      cvCoWrite: "Rewrite", cvCoShape: "Restructure", cvCoSde: "SDE moves",
+      cvCoOn: "Asking SDE to {op}\u2026", cvCoWhole: "whole version", cvCoSeg: "{n} selected chars",
+      cvByMe: "edited by me", cvByWds: "SDE", cvByUnknown: "unknown",
+      cvVerOf: "{i}/{n} \u00b7 {by}", cvVerList: "Version history",
+      cvRich: "Rich text", cvPlain: "\u2328 Source", cvWords: "{n} chars",
+      cvRteBad: "This item contains things rich-text editing cannot hold (raw HTML, formulas). Use Source to be safe.",
+      cvRteNo: "The layout module did not load; use Source instead (no content is lost).",
+      rtB: "B", rtI: "I", rtS: "S", rtH1: "H1", rtH2: "H2", rtH3: "H3", rtP: "Body",
+      rtQuote: "Quote", rtUl: "\u2022 List", rtOl: "1. List", rtHr: "Divider", rtLink: "Link",
+      rtLinkAsk: "Link URL:", rtTable: "Table", rtClear: "Clear", rtUndo: "Undo", rtRedo: "Redo",
       cvEdit: "\u270e Edit", cvEditT: "Type directly. Hit Save as new version when done; the old one stays in the chain",
       cvEditSave: "\u2713 Save as new version", cvEditCancel: "Discard changes", cvEditKeep: "{n} chars unsaved \u2014 the draft is kept if you switch away",
       cvEditNo: "Nothing changed", cvDraft: "unsaved draft",
@@ -922,6 +947,21 @@
       "border-radius:8px;padding:12px 14px;font:13px/1.75 ui-monospace,Menlo,Consolas,monospace;resize:vertical;white-space:pre-wrap}" +
     ".wdsm-cved:focus{outline:none}" +
     ".wdsm-cvnote{color:var(--wgold);font-size:11.5px;padding:6px 0 0}" +
+    ".wdsm-rtbar{display:flex;flex-wrap:wrap;gap:4px;padding:0 0 8px}" +
+    ".wdsm-rtb{background:var(--wfill);border:1px solid var(--wline);color:var(--wdim);" +
+      "font:12px/1 inherit;padding:5px 9px;border-radius:6px;cursor:pointer}" +
+    ".wdsm-rtb:hover{color:var(--wtx);border-color:var(--wgold)}" +
+    ".wdsm-rtb b{font-weight:800}.wdsm-rtb i{font-style:italic}.wdsm-rtb s{text-decoration:line-through}" +
+    ".wdsm-cvrt{min-height:340px;background:var(--wbg);color:var(--wtx);border:1px solid var(--wgold);" +
+      "border-radius:8px;padding:14px 16px;font-size:14.5px;line-height:1.85;outline:none;overflow:auto}" +
+    ".wdsm-cvrt h1{font-size:20px;margin:.8em 0 .4em}.wdsm-cvrt h2{font-size:17px;margin:.8em 0 .4em}" +
+    ".wdsm-cvrt h3{font-size:15.5px;margin:.7em 0 .35em}" +
+    ".wdsm-cvrt p{margin:0 0 .7em}.wdsm-cvrt ul,.wdsm-cvrt ol{margin:0 0 .7em 1.3em}" +
+    ".wdsm-cvrt blockquote{margin:0 0 .7em;padding-left:12px;border-left:2px solid var(--wgold);color:var(--wdim)}" +
+    ".wdsm-cvrt pre{background:var(--wfill);padding:10px 12px;border-radius:6px;overflow:auto;font-size:12.5px}" +
+    ".wdsm-cvrt table{border-collapse:collapse;font-size:13px;margin:0 0 .7em}" +
+    ".wdsm-cvrt td,.wdsm-cvrt th{border:1px solid var(--wline);padding:5px 9px}" +
+    ".wdsm-cvrt hr{border:0;border-top:1px solid var(--wline);margin:1em 0}" +
     /* diff：靠左那一列的 +/− 是给色盲与打印用的，颜色不是唯一判据 */
     ".wdsd{font:12.5px/1.75 ui-monospace,Menlo,Consolas,monospace;white-space:pre-wrap;word-break:break-word}" +
     ".wdsd-r{display:flex;gap:8px;padding:1px 4px;border-radius:3px}" +
@@ -3566,7 +3606,7 @@
   var cvTabsEl = layer.querySelector(".wdsm-cvtabs");
   var cvBarEl = layer.querySelector(".wdsm-cvbar");
   var cvWrapEl = layer.querySelector(".wdsm-cvwrap");
-  var CV = { items: [], cur: -1, src: false, sel: "", want: null, note: "", edit: false, diff: false };
+  var CV = { items: [], cur: -1, src: false, sel: "", want: null, note: "", edit: false, diff: false, rich: true };
   var CV_LS = "sde_wds_cv";          // 画布随刷新留存（成品不该因为按了 F5 就消失）
   var CV_MAX = 20;
   var CV_KIND = { html: "html", svg: "svg", mermaid: "mermaid", md: "md", markdown: "md", csv: "csv", tsv: "csv", json: "json" };
@@ -3597,14 +3637,41 @@
     CV.items.forEach(function (it) { if (it.kind === kind) n++; });
     return ({ html: "网页", svg: "图", mermaid: "结构图", md: "文稿", csv: "表", json: "数据", code: "代码" })[kind] + " " + (n + 1);
   }
+  /* ── 版本归属 ────────────────────────────────────────
+     共创的前提是**看得见谁改的**。两个人（一个是机器）改同一份东西，
+     三轮之后没有归属就再也说不清哪一版是谁的手笔、为什么变成这样。
+     老件没有 meta，读到时按长度补齐成「来处不明」，不假装知道。 */
+  function cvMeta(it) {
+    if (!it.meta || it.meta.length !== it.vers.length) {
+      var m = it.meta || [];
+      while (m.length < it.vers.length) m.unshift({ by: "?", op: "" });
+      it.meta = m.slice(-it.vers.length);
+    }
+    return it.meta;
+  }
+  function cvPush(it, text, by, op) {
+    it.vers.push(text);
+    cvMeta(it).push({ by: by || "?", op: op || "", at: stampTime() });
+    it.vi = it.vers.length - 1;
+  }
+  function stampTime() {
+    var d = new Date();
+    return String(d.getHours()).padStart(2, "0") + ":" + String(d.getMinutes()).padStart(2, "0");
+  }
+  function cvByLabel(m) {
+    if (!m || m.by === "?") return tx("cvByUnknown");
+    if (m.by === "me") return tx("cvByMe");
+    return tx("cvByWds") + (m.op ? " \u00b7 " + m.op : "");
+  }
+
   function cvAdd(kind, title, text, quiet) {
     var i, it = null;
     for (i = 0; i < CV.items.length; i++) if (CV.items[i].kind === kind && CV.items[i].title === title) { it = CV.items[i]; break; }
     if (it) {
       if (it.vers[it.vers.length - 1] === text) return it;   // 一模一样就不再堆一版
-      it.vers.push(text); it.vi = it.vers.length - 1;
+      cvPush(it, text, "wds", "");
     } else {
-      it = { kind: kind, title: title, vers: [text], vi: 0 };
+      it = { kind: kind, title: title, vers: [text], vi: 0, meta: [{ by: "wds", op: "", at: stampTime() }] };
       CV.items.push(it);
       // 到顶了要说一声。静默 shift 掉最旧的一件，读者只会以为"它自己没了"。
       if (CV.items.length > CV_MAX) {
@@ -3712,8 +3779,23 @@
       mk(tx("cvSrc"), function () { CV.src = true; cvPaint(); }, CV.src);
     }
     if (it.vers.length > 1) {
-      var vb = el("span", null, tx("cvVer") + " " + (it.vi + 1) + "/" + it.vers.length);
-      vb.style.cssText = "color:var(--wdim);font-size:11.5px";
+      var mt = cvMeta(it)[it.vi];
+      // 版本号旁边直接写谁改的 —— 共创里"这一版是谁的手笔"必须一眼看见，
+      // 藏进二级菜单等于没有。点它展开完整的版本历史。
+      var vb = el("button", "wdsm-cvb", tx("cvVerOf", { i: it.vi + 1, n: it.vers.length, by: cvByLabel(mt) }));
+      vb.title = tx("cvVerList");
+      vb.onclick = function () {
+        menuAt(vb, function (menu) {
+          menu.appendChild(el("div", "mh", tx("cvVerList")));
+          cvMeta(it).forEach(function (m, i) {
+            var b = el("button");
+            b.appendChild(document.createTextNode((i + 1) + " \u00b7 " + cvByLabel(m)));
+            b.appendChild(el("span", "sub", (m.at || "") + " \u00b7 " + (it.vers[i] || "").length + tx("cvWords", { n: "" })));
+            b.onclick = function () { closeMenu(); cvGrab(); it.vi = i; cvPaint(); };
+            menu.appendChild(b);
+          });
+        });
+      };
       mk("\u2039", function () { if (it.vi > 0) { cvGrab(); it.vi--; cvPaint(); } });
       cvBarEl.appendChild(vb);
       mk("\u203a", function () { if (it.vi < it.vers.length - 1) { cvGrab(); it.vi++; cvPaint(); } });
@@ -3730,6 +3812,21 @@
     mk(tx("cvPdf"), function () {
       pdfBoot(function (okp) { if (okp) cvPdf(it); else alert(t("pdfNo")); });
     }).title = tx("cvPdfT");
+    var coBtn = mk(tx("cvCo"), function () {
+      menuAt(coBtn, function (menu) {
+        [["w", "cvCoWrite"], ["s", "cvCoShape"], ["d", "cvCoSde"]].forEach(function (g) {
+          menu.appendChild(el("div", "mh", tx(g[1])));
+          CO_OPS.forEach(function (o) {
+            if (o.g !== g[0]) return;
+            var b = el("button");
+            b.appendChild(document.createTextNode(coName(o)));
+            menu.appendChild(b);
+            b.onclick = function () { closeMenu(); cvCoRun(it, o); };
+          });
+        });
+      });
+    });
+    coBtn.title = tx("cvCoT");
     mk(tx("cvEdit"), function () { cvEditOn(it); }, CV.edit).title = tx("cvEditT");
     if (it.vers.length > 1) {
       mk(tx("cvDiff"), function () {
@@ -3754,10 +3851,27 @@
       cvBarEl.innerHTML = "";
       mk(tx("cvEditSave"), function () { cvEditCommit(it); }, true);
       mk(tx("cvEditCancel"), function () { cvEditCancel(it); });
+      // 富文本只对 md 开；别的类型（网页/图/代码/数据）改的就是源码本身，
+      // 套一层所见即所得只会把它们改坏。
+      var canRich = (it.kind === "md");
+      if (canRich) {
+        mk(CV.rich ? tx("cvPlain") : tx("cvRich"), function () {
+          cvGrab(); CV.rich = !CV.rich; cvPaint();
+          var e2 = CV.rich ? cvRtEl() : cvDraftEl();
+          if (e2) { try { e2.focus(); } catch (e) {} }
+        });
+      }
+      var cur = typeof it.draft === "string" ? it.draft : cvText();
+      if (canRich && CV.rich) { cvRichPaint(it, cur); return; }
       var ta = el("textarea", "wdsm-cved");
-      ta.value = typeof it.draft === "string" ? it.draft : cvText();
+      ta.value = cur;
       ta.oninput = function () { it.draft = ta.value; cvSave(); cvEditTip(ta, it); };
       cvWrapEl.appendChild(ta);
+      if (CV.rteFail) {
+        var why = el("div", "wdsm-cvnote", tx("cvRteNo"));
+        why.style.color = "#c4735c";
+        cvWrapEl.appendChild(why);
+      }
       var tip = el("div", "wdsm-cvnote");
       cvWrapEl.appendChild(tip);
       cvEditTip(ta, it, tip);
@@ -3883,11 +3997,11 @@
         // 读者可能正在手改：先把他打的字存成一版，再把回稿叠上去。
         // 不这么做，等一次 cvPaint 过去，正在编辑的草稿就没了——**别人的字不能被机器的回稿吃掉**。
         if (CV.edit && typeof it.draft === "string" && it.draft !== it.vers[it.vers.length - 1]) {
-          it.vers.push(it.draft); it.vi = it.vers.length - 1;
+          cvPush(it, it.draft, "me", "");
         }
         delete it.draft; CV.edit = false;
         if (next !== it.vers[it.vers.length - 1]) {
-          it.vers.push(next); it.vi = it.vers.length - 1;
+          cvPush(it, next, "wds", want.op || "");
           CV.cur = CV.items.indexOf(it);
           cvShow(true); cvPaint();
           toast(tx("cvNewVer", { n: it.vers.length }));
@@ -3915,6 +4029,51 @@
   /* 画布这一件单独出 PDF。走的是和整场对话导出同一个模块与同一条打印管线
      （排版＋浏览器打印，不自己吐字节 —— 仓库里没有中日韩字体，也不该有）。 */
   /* diff 模块按需装 —— 与 wds-pdf 同一路数。改模块必须 bump DIFF_WANT。 */
+  /* ── 共创动作 ────────────────────────────────────────
+     前两组是任何写作工具都该有的；**第三组才是这台画布和通用产品的分野**——
+     它做的不是"让文字更好看"，是把 SDE 的几个招式变成一次点击。
+     每条 = { k 唯一键, g 分组, n 中文名, e 英文名, p 指令正文 }。
+     指令正文一律在这里，不进前端文案表（那是给标签用的）。 */
+  var CO_OPS = [
+    { k: "rewrite", g: "w", n: "重写这一段", e: "Rewrite", p: "重写它。保住原意与全部事实，换一套说法；不要加新主张，也不要把它写长。" },
+    { k: "brief", g: "w", n: "概括成三句", e: "Summarize in 3", p: "把它概括成三句话。第一句说它在讲什么，第二句说它的承重判断，第三句说它没解决什么。" },
+    { k: "expand", g: "w", n: "扩写", e: "Expand", p: "扩写它。只在**已有**的判断上补细节、补一个具体场景；不许引入新命题。" },
+    { k: "shorten", g: "w", n: "缩短一半", e: "Halve it", p: "把它压到大约一半长度，判断一条都不许丢。删的应该是修饰与重复，不是内容。" },
+    { k: "plain", g: "w", n: "换个说法", e: "Say it differently", p: "换一套完全不同的词把它说一遍——不许沿用原文的关键词，看看换了词之后它还站不站得住。" },
+    { k: "hard", g: "w", n: "更硬更直", e: "Make it blunt", p: "去掉全部情态词与缓冲语（应当／有必要／具有重要意义／在一定程度上／值得关注），把每一句改成能被推翻的陈述句。" },
+    { k: "polish", g: "w", n: "润色语句", e: "Polish", p: "只改语句，不改判断：理顺长句、去掉重复、统一术语。改完把改动最大的三处列在末尾。" },
+    { k: "en", g: "w", n: "译成英文", e: "To English", p: "译成英文。保住 markdown 的结构（标题、列表、表格原样对应），术语首次出现时括注中文原文；拿不准的专名保留原文不硬译。" },
+    { k: "zh", g: "w", n: "译成中文", e: "To Chinese", p: "译成中文。保住 markdown 的结构（标题、列表、表格原样对应），术语首次出现时括注外文原文；已有通行译名的用通行译名，没有的自拟并标注。" },
+
+    { k: "outline", g: "s", n: "列成提纲", e: "Outline", p: "改写成分层提纲：每一层只写一句，且每一句都必须是判断，不许写成话题词。" },
+    { k: "points", g: "s", n: "提炼要点", e: "Key points", p: "提炼要点，每条一行。**只许写文里真有的**，凡是你补上去的另起一节标明。" },
+    { k: "example", g: "s", n: "补一个例子", e: "Add an example", p: "补一个具体例子（有人、有时间、有可核对的细节）。例子必须能被这段话的判断解释，不是插图。" },
+    { k: "counter", g: "s", n: "补一条反例", e: "Add a counter-case", p: "补一条**反例**：一个按这段话应当不会发生、但实际发生过的情形。找不到就直说找不到。" },
+    { k: "table", g: "s", n: "整理成表格", e: "As a table", p: "把其中可以对照的部分整理成 markdown 表格，表外保留必要的说明。凑不出对照维度就直说。" },
+
+    { k: "prop", g: "d", n: "压成五十字承重命题", e: "50-char proposition", p: "把它压成一句五十字以内的承重命题，形状是「X 不是 Y₁ 也不是 Y₂ 而是 Z」，不许出现情态词。" },
+    { k: "waffle", g: "d", n: "指出这里的万能话", e: "Find the empty claims", p: "逐句检查：哪几句是**永远对因而永远没用**的（没有任何观测能推翻它）？逐条引出原句，并各给一个能被推翻的改法。一句都没有就直说。" },
+    { k: "sep", g: "d", n: "划一条分离线", e: "Draw a separation line", p: "指出最可能已经占住这块地的那个人或说法，再给一条分离线：一句能让他那条与这一段在**同一个具体场景**里给出方向相反读数的话。划不出来就直说划不出来。" },
+    { k: "crit", g: "d", n: "给一条可裁决判据", e: "Give a decidable test", p: "给一句零情态词的判别：在什么条件下、多久之后、能观测到什么，才算它成立。再拿它到三个不同场景各跑一遍，三个答案必须互不相同。" },
+    { k: "falsify", g: "d", n: "补两条证伪条件", e: "Two falsifiers", p: "写两条能让它翻车的观测，两条互相独立，且至少一条今天就能查。全称否定式（「若能找到一个完全未被 X 的案例」）只算一条。" },
+    { k: "triple", g: "d", n: "改写成三重否定", e: "Triple negation", p: "改写成「X 不是 Y₁，也不是 Y₂，而是 Z」，其中 Y₁ Y₂ 要是真有人主张过的两种现成说法。能从 Y₁ 或 Y₂ 直接推出的 Z 是复述，重写。" },
+    { k: "timing", g: "d", n: "给时序读数", e: "Add sequence", p: "把因果写成带时序的链：这一轮谁逼动谁 → 改完回写到哪 → 下一轮先动的换成谁。挡住「三者相互影响、共同作用」。" }
+  ];
+  function coOp(k) { for (var i = 0; i < CO_OPS.length; i++) if (CO_OPS[i].k === k) return CO_OPS[i]; return null; }
+  function coName(o) { return LANG === "en" ? o.e : o.n; }
+
+  /* 一点即发：读者点一下就该看到新版本，而不是"帮你把提示词填好了，请自己按回车"。 */
+  function cvCoRun(it, o) {
+    var whole = cvText(), sel = CV.sel, rng = sel ? cvFind(whole, sel) : null;
+    var seg = rng ? whole.slice(rng.a, rng.b) : whole;
+    var pre = tx("cvAskPre", { t: it.title });
+    CV.want = { title: it.title, kind: it.kind, pre: pre, a: rng ? rng.a : -1, b: rng ? rng.b : -1, base: whole, op: coName(o) };
+    toast(tx("cvCoOn", { op: coName(o) }) + " \u00b7 " +
+      (rng ? tx("cvCoSeg", { n: seg.length }) : tx("cvCoWhole")));
+    if (narrow()) cvShow(false);
+    send(pre + "\n\n" + seg.slice(0, 6000) + "\n\n" + o.p);
+  }
+
   var DIFF_WANT = 1;
   function diffBoot(then, forced) {
     if (window.WDSDiff && window.WDSDiff.VERSION >= DIFF_WANT) { then(true); return; }
@@ -3926,6 +4085,102 @@
     sc.onerror = function () { then(false); };
     document.head.appendChild(sc);
   }
+  /* ── 所见即所得 ────────────────────────────────────────
+     底子始终是 markdown。开之前先跑一次 md→html→md 自检：
+     **扶不住就当场说出来并劝去源码**，绝不让读者在富文本里改完才发现掉了东西。 */
+  function cvRichPaint(it, md) {
+    var host = el("div");
+    cvWrapEl.appendChild(host);
+    host.textContent = "\u2026";
+    rteBoot(function (okr) {
+      if (!okr || !window.WDSRte) {
+        /* 拉不到就退回源码，并说清楚为什么——不拦路，也不假装能排版。
+           ⚠ 提示不能直接 append 到 cvWrapEl：紧接着的 cvPaint() 会把它清掉。
+           必须挂在状态上，由源码分支去渲染。 */
+        CV.rteFail = true; CV.rich = false; cvPaint();
+        return;
+      }
+      CV.rteFail = false;
+      var chk = window.WDSRte.check(md);
+      host.textContent = "";
+      var bar = el("div", "wdsm-rtbar");
+      host.appendChild(bar);
+      var ed = el("div", "wdsm-cvrt");
+      ed.setAttribute("contenteditable", "true");
+      ed.setAttribute("spellcheck", "false");
+      ed.innerHTML = window.WDSRte.toHtml(md);
+      host.appendChild(ed);
+      var tip = el("div", "wdsm-cvnote");
+      host.appendChild(tip);
+      if (!chk.ok) {
+        var bad = el("div", "wdsm-cvnote", tx("cvRteBad"));
+        bad.style.color = "#c4735c";
+        host.insertBefore(bad, ed);
+      }
+      cvRtBar(bar, ed);
+      /* ⚠ 基线取的是**往返之后**的那一份，不是原文。
+         md→html→md 不保证逐字相同（`*斜*` 与 `_斜_`、表格里的空格这类），
+         拿原文当基线的话，**光打开一次富文本就会被判成"改过了"**，
+         版本链上从此多出一堆没人改过的版本。 */
+      var base = window.WDSRte.toMd(window.WDSRte.toHtml(md));
+      function sync() {
+        var cur2 = window.WDSRte.toMd(ed.innerHTML);
+        if (cur2 === base) delete it.draft; else it.draft = cur2;
+        cvSave();
+        tip.textContent = tx("cvWords", { n: cur2.replace(/\s/g, "").length }) +
+          (cur2 === base ? " \u00b7 " + tx("cvEditNo") : "");
+      }
+      ed.oninput = sync;
+      sync();
+      try { ed.focus(); } catch (e) {}
+    });
+  }
+  /* 工具条。用 execCommand —— 它虽然被标了废弃，但所有浏览器都还实现着，
+     而自己实现选区上的加粗/列表/标题要多写一整套 Range 逻辑，那不是这一步该花的力气。 */
+  function cvRtBar(bar, ed) {
+    function cmd(c, v) {
+      return function () {
+        try { ed.focus(); document.execCommand(c, false, v || null); } catch (e) {}
+        if (ed.oninput) ed.oninput();
+      };
+    }
+    function btn(label, fn, html) {
+      var b = el("button", "wdsm-rtb");
+      if (html) b.innerHTML = html; else b.textContent = label;
+      b.title = label;
+      b.onmousedown = function (ev) { if (ev && ev.preventDefault) ev.preventDefault(); };  // 别把选区弄丢
+      b.onclick = fn;
+      bar.appendChild(b);
+      return b;
+    }
+    btn(tx("rtH1"), cmd("formatBlock", "<h1>"));
+    btn(tx("rtH2"), cmd("formatBlock", "<h2>"));
+    btn(tx("rtH3"), cmd("formatBlock", "<h3>"));
+    btn(tx("rtP"), cmd("formatBlock", "<p>"));
+    btn(tx("rtB"), cmd("bold"), "<b>" + tx("rtB") + "</b>");
+    btn(tx("rtI"), cmd("italic"), "<i>" + tx("rtI") + "</i>");
+    btn(tx("rtS"), cmd("strikeThrough"), "<s>" + tx("rtS") + "</s>");
+    btn(tx("rtQuote"), cmd("formatBlock", "<blockquote>"));
+    btn(tx("rtUl"), cmd("insertUnorderedList"));
+    btn(tx("rtOl"), cmd("insertOrderedList"));
+    btn(tx("rtHr"), cmd("insertHorizontalRule"));
+    btn(tx("rtLink"), function () {
+      var u = window.prompt(tx("rtLinkAsk"), "https://");
+      if (!u) return;
+      try { ed.focus(); document.execCommand("createLink", false, u); } catch (e) {}
+      if (ed.oninput) ed.oninput();
+    });
+    btn(tx("rtTable"), function () {
+      var html = "<table><thead><tr><th>甲</th><th>乙</th></tr></thead>" +
+        "<tbody><tr><td></td><td></td></tr><tr><td></td><td></td></tr></tbody></table><p><br></p>";
+      try { ed.focus(); document.execCommand("insertHTML", false, html); } catch (e) {}
+      if (ed.oninput) ed.oninput();
+    });
+    btn(tx("rtClear"), cmd("removeFormat"));
+    btn(tx("rtUndo"), cmd("undo"));
+    btn(tx("rtRedo"), cmd("redo"));
+  }
+
   // 编辑态下面那一行提示：改了多少字、切走会不会丢
   function cvEditTip(ta, it, box) {
     var el2 = box || (cvWrapEl && cvWrapEl.querySelector(".wdsm-cvnote"));
@@ -3946,6 +4201,17 @@
       });
       box.textContent = ""; box.appendChild(head); box.appendChild(body);
     });
+  }
+  var RTE_WANT = 1;
+  function rteBoot(then, forced) {
+    if (window.WDSRte && window.WDSRte.VERSION >= RTE_WANT) { then(true); return; }
+    if (window.WDSRte && !forced) { delete window.WDSRte; return rteBoot(then, true); }
+    var sc = document.createElement("script");
+    sc.src = "/assets/wds-rte.js?v=" + RTE_WANT + (forced ? ("&r=" + Date.now()) : "");
+    sc.async = true;
+    sc.onload = function () { then(!!(window.WDSRte && window.WDSRte.VERSION >= RTE_WANT)); };
+    sc.onerror = function () { then(false); };
+    document.head.appendChild(sc);
   }
   function cvOrigin() {
     try { if (typeof location !== "undefined" && location && location.origin) return location.origin; } catch (e) {}
@@ -3999,10 +4265,25 @@
      否则「改坏了想退回去」就没了，而那正是画布区别于聊天流的那一点。
      草稿存在 it.draft 上，跟着画布一起落本机；切走再回来还在。 */
   function cvDraftEl() { return cvWrapEl && cvWrapEl.querySelector(".wdsm-cved"); }
+  function cvRtEl() { return cvWrapEl && cvWrapEl.querySelector(".wdsm-cvrt"); }
   // 重画之前先把编辑框里的字收走 —— cvPaint 会把 innerHTML 清掉，收晚了就丢了
   function cvGrab() {
-    var ta = cvDraftEl(), it = cvCur();
-    if (ta && it) it.draft = ta.value;
+    var it = cvCur();
+    if (!it) return;
+    var rt = cvRtEl();
+    // 富文本态要把 html 序列化回 markdown 再收 —— 画布的底子始终是 markdown，
+    // 版本链、diff、存盘、PDF 全建在它上面，存 html 会把这四样一起弄坏。
+    if (rt && window.WDSRte) {
+      /* ⚠ 这里也要走"与往返基线比"那条规则，不能无条件写草稿。
+         md→html→md 不逐字相同，无条件写的话，光打开一次富文本再点「存为新版」
+         就会多出一个没人改过的版本 —— sync() 那边防住了，这里绕过去照样中招。 */
+      var got = window.WDSRte.toMd(rt.innerHTML);
+      var bse = window.WDSRte.toMd(window.WDSRte.toHtml(it.vers[it.vi] || ""));
+      if (got === bse) delete it.draft; else it.draft = got;
+      return;
+    }
+    var ta = cvDraftEl();
+    if (ta) it.draft = ta.value;
   }
   function cvEditOn(it) {
     CV.edit = true; CV.diff = false; CV.src = false;
@@ -4013,9 +4294,11 @@
   }
   function cvEditCommit(it) {
     cvGrab();
-    var v = typeof it.draft === "string" ? it.draft : "";
+    // 没有 draft ＝ 一个字都没改（富文本态下"与基线相同"就会把 draft 删掉），
+    // 当成空串会存出一个空版本 —— 那是把整篇稿子清空
+    var v = typeof it.draft === "string" ? it.draft : cvText();
     if (v === cvText()) { CV.note = tx("cvEditNo"); CV.edit = false; delete it.draft; cvPaint(); return; }
-    it.vers.push(v); it.vi = it.vers.length - 1;
+    cvPush(it, v, "me", "");
     delete it.draft; CV.edit = false; CV.note = "";
     cvPaint();
     toast(tx("cvNewVer", { n: it.vers.length }));
@@ -4044,7 +4327,7 @@
   // 画布上的成品属于那一场对话，换场就该跟着走（要留下的走「存到本机」）
   function cvReset() {
     CV.items = []; CV.cur = -1; CV.src = false; CV.sel = ""; CV.want = null; CV.note = "";
-    CV.edit = false; CV.diff = false;
+    CV.edit = false; CV.diff = false; CV.rich = true;
     try { localStorage.removeItem(CV_LS); } catch (e) {}
     cvShow(false); cvPaint();
   }

@@ -46,7 +46,25 @@ ok(/forge: fg \? 1 : 0/.test(F), "每一步的 rs 带 forge 位");
 ok(/rsRun\(fgq\.topic, \{ judge: fgq\.judge \}\)/.test(F), "认出来就整趟跑，不当成一次普通问答");
 ok(F.indexOf("var fgq = forgePick(q);") < F.indexOf("var sl = slashPick(q);"), "产线入口排在单轮工序之前（/通融 不该被当成挂一道工序）");
 ok(/if \(fg\) return done\(""\);/.test(F), "学科通融不跑「总判断」那一步（会把结论摆到论证前面，还白烧一次额度）");
-ok(!/共有前提|门类三分|零情态词|靶格/.test(F), "前端不含任何工序正文（工序文本一律在后端，否则会被 q 的字数钳位吃掉，且顺序会被改得动）");
+/* ⚠ 这条**收窄**过一次，不是放宽（2026-08-02）。
+   规则的两条理由是：① 前端拼的正文会被 q 的字数钳位吃掉 ② 顺序不该由前端说了算。
+   这两条对 forge 的十八道工序成立（几千字、顺序不可换），对画布的「共创动作」
+   （CO_OPS：各自独立、约百字、且**必须在对话里让读者看见自己让它做了什么**）不成立。
+   所以判据改成「**除 CO_OPS 之外**的前端不含工序正文」，并另钉两条：
+   CO_OPS 那一段必须找得到（找不到说明它被挪走了，这条豁免就该失效），
+   且里面每条都得短（超过 400 字就是把产线伪装成动作了，那时这条豁免不再成立）。 */
+const CO_A = F.indexOf("var CO_OPS = [");
+const CO_B = CO_A > 0 ? F.indexOf("];", CO_A) + 2 : -1;
+ok(CO_A > 0 && CO_B > CO_A, "找不到 CO_OPS 段 —— 豁免的前提不成立，请复核这条断言");
+const F_NO_CO = CO_A > 0 ? (F.slice(0, CO_A) + F.slice(CO_B)) : F;
+ok(!/共有前提|门类三分|零情态词|靶格/.test(F_NO_CO), "前端（CO_OPS 之外）含工序正文：会被 q 的字数钳位吃掉，且顺序会被改得动");
+ok(!/FORGE_STAGES|FORGE_HEART/.test(F), "十八道工序表/心法漏进了前端");
+{
+  const seg = CO_A > 0 ? F.slice(CO_A, CO_B) : "";
+  const ps = seg.match(/p: "([^"]{1,2000})"/g) || [];
+  ok(ps.length >= 18, "CO_OPS 条数对不上：" + ps.length);
+  ok(ps.every(x => x.length < 400), "有共创动作的指令超过 400 字 —— 那是把产线伪装成一个动作，豁免不适用");
+}
 ["tlForge", "tlForgeS", "fgTitle", "fgPlan", "fgSteps", "fgJudge"].forEach((k) => {
   ok((F.match(new RegExp("\\b" + k + ":", "g")) || []).length === 2, k + " 中英两套文案都齐");
 });
