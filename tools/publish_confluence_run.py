@@ -19,59 +19,44 @@ TPL = ROOT / "public" / "paradigm" / "taken-out" / "index.html"
 PUBDATE = "2026年8月2日"
 
 PAPERS = [{
-    "slug": "discarded-glance",
-    "src": Path("/home/claude/conf/authorless-threshold.md"),
-    "title": "被丢掉的那一眼",
-    "sub": "论未被接受的产出如何在无人记账处合成一条判定基线，以及生成成本趋零之后内卷机制的改变",
+    "slug": "undivided-difference",
+    "src": Path("/home/claude/conf49/article.md"),
+    "title": "未分之别",
+    "sub": "多出来的努力提高的是同一种类的强度，而系统缺的是种类——论可分辨的种类数不是背景而是一项产出",
     "cross": "经济学 × 艺术学 × 工程学",
-    "no": "之四十七",
-    "deck": ("生成一件东西的成本降到接近零之后，投的人更多、交出的更多，通过的人没有变多，而通过所需的水准在上升。"
-             "三个互不引用的领域给出互斥解释：竞赛经济学说投入由名额与单位成本决定，多出来的是纯耗散；"
-             "价值化理论说什么算新由一份被共同承认的收藏名录决定，名录之外只是堆积；"
-             "约束理论与近年的交付研究说吞吐由最窄的一段决定，写得快只是把拥堵从写挪到了看。三条不能同真。"
-             "本文指出三家共同假定了一件从未说出的事——**稀缺先在，行为随后**，因此没有通过的那些产出，"
-             "因为不在任何账上，不可能反过来驱动任何事；而推翻它的材料来自三家自己："
-             "竞赛实验里反复出现的**过度耗散**、约束理论第五步自己写下的告诫（别让惯性成为下一个约束）、"
-             "以及价值化理论自己承认的成立条件（这套体系预设名录与日常世界之间有一条守得住的界线）。"
-             "承重判断是：**内卷不是投入的浪费，不是新意的耗尽，也不是瓶颈的转移，"
-             "而是未被接受的产出在无人记账处合成了一条判定基线，并单向抬升它**——本文称之为暗基线。"
-             "它没有作者（每个人都在诚实执行同一份细则）、它单向（抬高它的人已经出局）、它不入账（没有字段记它）。"
-             "判据不含判断词：把上一轮全部落判件移出参照集，这一轮的合格线会降多少？"
-             "答案在期刊的决定日志、招聘系统的评分记录、代码评审历史里已经存在，取出来只需一次盲掉年份的重判。"
-             "文中给出两轴四格辨别表、一个三领域量纲不同而比率相同的读数（**暗基线抬升度**，与录取率、吞吐正交）、"
-             "十三个行当的逐项兑现、一处关键收窄（**抬升只在名额先定死的择优制里发生，不在达标即过的定标制里发生**，"
-             "这条区分同时给出出路）、九条机制证伪条件、三处反过来削弱本文的外来约束"
-             "（其中一处把价值排序改了：判准解体比门槛抬高更坏），以及一条写死到二〇二八年十二月三十一日的赌注。"
-             "文中另与同栏同日、同取这三个学科的三篇逐条分清：《认领物》的缺口在**生产者一侧**、"
-             "《这道关拦下过谁》的缺口在**关口一侧**、《两种「不」》的缺口在**未阅一侧**，本文的缺口在**参照一侧**。"
-             "与《两种「不」》的关系最紧也最干净——本文的机制要求那件东西**被看过一眼**，那一篇的机制要求它**没有被打开过**，"
-             "两篇恰好把落判件切成互斥的两半，且在同一通道里此消彼长：未阅率越高，线就越不是被抬高的，而是变得任意。"),
-    "clash": ("三家在「这场竞争里真正稀缺的那一样该放在哪儿」这同一问题上给出互斥答案："
-              "竞赛经济学把它放在名额与单位成本上（规则与成本决定投入形态，落败投入记为无去向的耗散）；"
-              "价值化理论把它放在收藏名录的容量上（名录单方面决定什么算新，名录之外是无结构的日常世界）；"
-              "约束理论把它放在最窄那一段的通过能力上（困境必须有位置、可指认、可扩容）。"
-              "三条处方在同一处境里分岔到互相取消的方向——把奖品做小、把名录扩容、把评审撑开，不能同时执行，"
-              "而三条都已被试过且都不管用。"),
+    "no": "之四十九",
+    "deck": ("同一个「越努力越没有差别」，三个行当给出三条互不相容的驱动：经济学说报酬按相对位次结算，"
+             "绝对产出的普遍提高在原理上不改变任何人的位次；艺术学说重组既有形式比开出新形式便宜得多，"
+             "在「可能性似乎已被穷尽」的处境下重组是理性选择；控制论说调节方的变异度不足时，"
+             "唯一可行的是削减被控方的状态种类。三家共同假定了一件从未被说出的事——"
+             "**可被分辨的种类数是给定的**。推翻它的材料来自控制论自己：艾什比在给变异度下定义时用一个括号写明，"
+             "**若两个观察者所能作的区分不同，同一组元素对他们就有不同的变异度**——种类数不是系统的自然属性，"
+             "它由观察者的分辨集合与系统状态共同决定；既然可改，它就是被生产的。"
+             "本文据此提出一个在三家形式体系里都不构成一样东西的对象——**未分之别**："
+             "实际存在于产出之间、而在当前分辨集合下不构成一个种类的那些差别（在变异度的定义里，不可区分的不计数，"
+             "因此它在字面上不存在）。由此得到的判断是：**内卷不是投入增加而产出不增加，而是分辨集合停止扩张之后，"
+             "全部努力被迫落在既有种类之内——努力提高的是同一种类的强度，而系统缺的是种类。**"
+             "文中给出一句不含判断词的问话、一张二维辨别格、一个三领域量纲不同而比率相同的读数（**新种率**）、"
+             "六条可由既有记录低成本执行的失效条件，以及三条各对一家的出路——"
+             "其中第三条是艾什比定律本身的另一半：削减被控方在账上是免费的，所以它必然被选中。"),
+    "clash": ("三家对「什么在驱动竞争形态的改变」给出互相取消的指派：经济学说先动的是技术条件而规则不动，"
+              "艺术学说先动的是判据，控制论说先动的是被控方的状态种类——三者不可能同时先动。"
+              "更硬的是三家各自撑不住的那一处，恰好指向同一个地方：经济学自曝排序轴是因为便宜才被选中，"
+              "艺术学自曝可能性空间的边界随「什么被算作一件作品」而移动，控制论自曝变异度相对于观察者——"
+              "三处合起来，正是三家共同当作背景的那样东西。"),
     "sources": [
-        ("经济学 · 竞赛理论与租金耗散",
-         "Dickson, MacKenzie & Sekeris《简单图洛克竞赛中的租金耗散》Games 13(6):83, 2022；"
-         "Dechenaux, Kovenock & Sheremeta《竞赛、全付出拍卖与锦标赛的实验研究综述》Experimental Economics 18(4), 2015；Tullock (1980)",
-         "https://doi.org/10.3390/g13060083",
-         "投入的多少由名额与单位成本共同决定：成本坍塌，均衡投入涨到把奖品价值吃光为止，多出来的是无去向的耗散、本轮结清不进入下一轮。"
-         "而这一家自己的实验里反复出现过度耗散——总投入系统性超过奖品价值，被当作行为侧异常处理。"),
-        ("艺术学 · 「新」的价值化理论",
-         "Boris Groys《论新》(Über das Neue, 1992 / On the New, Verso 2014)、《怀疑之下》(2000)；"
-         "Doshi & Hauser《生成式人工智能提升个体创造力却降低新内容的集体多样性》Science Advances 10(28):eadn5290, 2024",
-         "https://www.science.org/doi/10.1126/sciadv.adn5290",
-         "一件东西算不算新，取决于它有没有跨过日常世界与被共同承认的收藏名录之间那条线；新是一次从未有人做过的比较，"
-         "因此驱动方向是名录决定什么算新。而这一家自己写下了成立条件：这套经济学预设那条界线守得住——并承认在与日常空间的对抗里赢的永远是日常空间。"),
-        ("工程学 · 约束理论与交付研究",
-         "Goldratt《目标》(1984)、《约束理论》(1990) 的五步聚焦；"
-         "DORA / Google Cloud《人工智能辅助软件开发现状》2025（近 5000 名从业者）",
-         "https://services.google.com/fh/files/misc/2025_state_of_ai_assisted_software_development.pdf",
-         "吞吐由最窄的一段决定，改善非约束环节只增加在制品；2025 年的数据显示人工智能与吞吐已由负相关转正，"
-         "而与不稳定性的正相关始终没有消失，瓶颈被指向下游的测试与评审。而这一家的第五步自己写着：别让惯性成为系统的约束——"
-         "等于承认为服从旧约束而做的安排，会成为下一轮的约束。"),
+        ("经济学 · 等级序列竞赛与相对位次结算",
+         "Lazear & Rosen, Rank-Order Tournaments as Optimum Labor Contracts (JPE 1981); Tournament-Based Performance Evaluation and Systematic Misallocation (arXiv:2512.06583)",
+         "https://www.journals.uchicago.edu/doi/10.1086/261010",
+         "当个人产出难以度量而相对名次容易观察时，按名次结算优于计件——排序比计量便宜；而一旦按位次结算，绝对产出的普遍提高在原理上不改变任何人的收益。"),
+        ("艺术学 · 概念拼贴作为枯竭之后的理性选择",
+         "Artism: AI-Driven Dual-Engine System for Art Generation and Critique (arXiv:2512.15710); Tracing Generative AI in Digital Art (arXiv:2511.03117)",
+         "https://arxiv.org/pdf/2512.15710",
+         "概念拼贴占据主导不是道德失败，而是最经济、风险最低的策略——在「所有可能性似乎已被探索过」的处境下，重组既有框架是阻力最小的路径，而人工智能使它空前高效且普遍。"),
+        ("工程学与控制论 · 必要变异度定律",
+         "W. R. Ashby, An Introduction to Cybernetics (1956) / Requisite Variety and its Implications for the Control of Complex Systems (1958); 当代应用见 arXiv:2506.09878",
+         "https://www.edge.org/response-detail/27150",
+         "只有变异度才能吸收变异度；调节方跟不上时，维持可控只有两条路——提高自己的变异度，或削减被控方的。而变异度是「可被区分的元素个数」，若两个观察者所能作的区分不同，同一组元素对他们就有不同的变异度。"),
     ],
 }]
 
@@ -146,13 +131,13 @@ def build_page(p, body, toc, pages):
     t = re.sub(r"<title>.*?</title>",
                f'<title>{p["title"]}——{p["sub"]} · 学科通融 | SDE Universes</title>', t, flags=re.S)
     t = re.sub(r'(<meta name="description" content=")[^"]*(")',
-               lambda m: m.group(1) + html.escape(p["deck"][:190], quote=True) + m.group(2), t)
+               lambda m: m.group(1) + html.escape(p["deck"].replace("**", "")[:190], quote=True) + m.group(2), t)
     t = re.sub(r'<div class="art-series">.*?</div>',
                f'<div class="art-series">学 科 通 融 · {p["no"]} · {html.escape(p["cross"])}</div>', t, flags=re.S)
     t = re.sub(r'<h1 class="art-title">.*?</h1>', f'<h1 class="art-title">{p["title"]}</h1>', t, flags=re.S)
     t = re.sub(r'<p class="art-sub">.*?</p>', f'<p class="art-sub">{p["sub"]}</p>', t, flags=re.S)
     t = re.sub(r'<div class="art-meta">.*?</div>',
-               f'<div class="art-meta">王德生 ＋ Claude · 约 2.8 万字 · {pages} 页 · '
+               f'<div class="art-meta">王德生 ＋ Claude · 约 2.2 万字 · {pages} 页 · '
                f'三种阅读方式 · 发表于{PUBDATE}</div>', t, flags=re.S)
     t = re.sub(r'<div class="deck">.*?</div>', f'<div class="deck">{strongify(p["deck"])}</div>', t, flags=re.S)
     links = "".join(f'<a href="#{i}">{html.escape(x)}</a>' for i, x in toc)
@@ -214,7 +199,7 @@ def build_index(built):
         cards += (f'<div class="item"><div class="n">之一 · 三学科交叉：{html.escape(p["cross"])}</div>'
                   f'<h2><a href="/confluence/{p["slug"]}/">{html.escape(p["title"])}</a></h2>'
                   f'<p class="sub">{html.escape(p["sub"])}</p>'
-                  f'<p class="hk">{html.escape(p["deck"])}</p>'
+                  f'<p class="hk">{strongify(p["deck"])}</p>'
                   f'<div class="trio">{ones}</div>'
                   f'<a class="rdmore" href="/confluence/{p["slug"]}/">读全文 →</a>'
                   f'<div class="meta">约 {wan} 万字 · {pages} 页 · 三种读法 · '
@@ -264,7 +249,7 @@ def main():
                .replace("taken-out", p["slug"]).replace("一拿出来，就不是它了", p["title"]) \
                .replace("典范文专栏", "学科通融")
         (d / "read.html").write_text(rd, encoding="utf-8")
-        n = len(re.sub(r"<[^>]+>", "", body))
+        n = len(re.findall(r"[\u4e00-\u9fff]", re.sub(r"<[^>]+>", "", body)))
         built.append((p, round(n / 10000, 1), pages))
         print(f'  {p["slug"]}: {n} 字 · {pages} 页 · 目录 {len(toc)} 节 · 来源 {len(p["sources"])} 家')
     idx = CF / "index.html"
@@ -278,7 +263,7 @@ def main():
             card = (f'<div class="item" data-ch="c1"><div class="n">{p["no"]} · 三学科交叉：{html.escape(p["cross"])}</div>'
                     f'<h2><a href="/confluence/{p["slug"]}/">{html.escape(p["title"])}</a></h2>'
                     f'<p class="sub">{html.escape(p["sub"])}</p>'
-                    f'<p class="hk">{html.escape(p["deck"])}</p>'
+                    f'<p class="hk">{strongify(p["deck"])}</p>'
                     f'<div class="trio">{ones}</div>'
                     f'<a class="rdmore" href="/confluence/{p["slug"]}/">读全文 →</a>'
                     f'<div class="meta">约 {wan} 万字 · {pages} 页 · 三种读法 · '

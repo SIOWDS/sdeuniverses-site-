@@ -129,7 +129,7 @@ def build_page(p, body, toc, pages):
     t = re.sub(r"<title>.*?</title>",
                f'<title>{p["title"]}——{p["sub"]} · 学科通融 | SDE Universes</title>', t, flags=re.S)
     t = re.sub(r'(<meta name="description" content=")[^"]*(")',
-               lambda m: m.group(1) + html.escape(p["deck"][:190], quote=True) + m.group(2), t)
+               lambda m: m.group(1) + html.escape(p["deck"].replace("**", "")[:190], quote=True) + m.group(2), t)
     t = re.sub(r'<div class="art-series">.*?</div>',
                f'<div class="art-series">学 科 通 融 · {p["no"]} · {html.escape(p["cross"])}</div>', t, flags=re.S)
     t = re.sub(r'<h1 class="art-title">.*?</h1>', f'<h1 class="art-title">{p["title"]}</h1>', t, flags=re.S)
@@ -197,7 +197,7 @@ def build_index(built):
         cards += (f'<div class="item"><div class="n">之一 · 三学科交叉：{html.escape(p["cross"])}</div>'
                   f'<h2><a href="/confluence/{p["slug"]}/">{html.escape(p["title"])}</a></h2>'
                   f'<p class="sub">{html.escape(p["sub"])}</p>'
-                  f'<p class="hk">{html.escape(p["deck"])}</p>'
+                  f'<p class="hk">{strongify(p["deck"])}</p>'
                   f'<div class="trio">{ones}</div>'
                   f'<a class="rdmore" href="/confluence/{p["slug"]}/">读全文 →</a>'
                   f'<div class="meta">约 {wan} 万字 · {pages} 页 · 三种读法 · '
@@ -247,7 +247,7 @@ def main():
                .replace("taken-out", p["slug"]).replace("一拿出来，就不是它了", p["title"]) \
                .replace("典范文专栏", "学科通融")
         (d / "read.html").write_text(rd, encoding="utf-8")
-        n = len(re.sub(r"<[^>]+>", "", body))
+        n = len(re.findall(r"[\u4e00-\u9fff]", re.sub(r"<[^>]+>", "", body)))
         built.append((p, round(n / 10000, 1), pages))
         print(f'  {p["slug"]}: {n} 字 · {pages} 页 · 目录 {len(toc)} 节 · 来源 {len(p["sources"])} 家')
     idx = CF / "index.html"
@@ -261,7 +261,7 @@ def main():
             card = (f'<div class="item"><div class="n">{p["no"]} · 三学科交叉：{html.escape(p["cross"])}</div>'
                     f'<h2><a href="/confluence/{p["slug"]}/">{html.escape(p["title"])}</a></h2>'
                     f'<p class="sub">{html.escape(p["sub"])}</p>'
-                    f'<p class="hk">{html.escape(p["deck"])}</p>'
+                    f'<p class="hk">{strongify(p["deck"])}</p>'
                     f'<div class="trio">{ones}</div>'
                     f'<a class="rdmore" href="/confluence/{p["slug"]}/">读全文 →</a>'
                     f'<div class="meta">约 {wan} 万字 · {pages} 页 · 三种读法 · '
