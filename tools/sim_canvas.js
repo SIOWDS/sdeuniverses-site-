@@ -1028,9 +1028,20 @@ sec("⑰ 文案表：同名键会静默覆盖");
     while ((m = r2.exec(txt))) { if (seen[m[1]]) d.push(m[1]); else seen[m[1]] = 1; }
     return d;
   };
-  const T0 = SRC_FULL.indexOf("cvTitle: \"画布\"");
-  const T1 = SRC_FULL.indexOf("cvTitle: \"Canvas\"");
+  // 这两个锚只用来**定位中英两张文案表**，不许把显示名钉死：
+  // 2026-08-02「画布」改名成「画布与共创」时，精确匹配版当场假红。前缀匹配即可。
+  const T0 = SRC_FULL.indexOf('cvTitle: "画布');
+  const T1 = SRC_FULL.indexOf('cvTitle: "Canvas');
   ok(T0 > 0 && T1 > T0, "找不到中英两张文案表");
+  // 改名本身也要有护栏，否则哪天被改回去没人知道
+  ok(/cvTitle: "画布与共创", cvOpen: "⧉ 画布与共创", cvClose: "收起画布与共创"/.test(SRC_FULL),
+    "中文侧标题/入口/收起三处都是新名「画布与共创」");
+  ok(/cvTitle: "Canvas & Co-create", cvOpen: "⧉ Canvas & Co-create"/.test(SRC_FULL),
+    "英文侧同步改成 Canvas & Co-create");
+  ok(/cvTip: "画布与共创：[^"]*共创台/.test(SRC_FULL),
+    "悬停说明里讲清了新名后半的「共创」指的就是共创台（改了名不说指什么等于没改）");
+  ok((SRC_FULL.match(/from: "ChatSDE · 画布与共创"/g) || []).length === 2,
+    "存进知识库的归属两处都改了（且中点已统一成原字，原来一处是转义写法）");
   const zhBlock = SRC_FULL.slice(SRC_FULL.lastIndexOf("{", T0), T1);
   const enBlock = SRC_FULL.slice(T1, T1 + 20000);
   const dz = scan(zhBlock), de = scan(enBlock);

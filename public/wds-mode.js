@@ -739,17 +739,17 @@
      t() 先查 TXT 再查这里。 */
   var TX2 = {
     zh: {
-      cvTitle: "画布", cvOpen: "⧉ 画布", cvClose: "收起画布",       cvEmpty: "画布还是空的。会自动落到这儿的是：结构图（/结构图）、深度研究的报告、以及回答里成块的图/网页/表格/长文稿。\n\n想手动放一件进来：在任意一条回答下面点「⧉ 落到画布」。\n\n落进来之后：可以用「✎ 编辑」像 Word 那样直接排版改字（标题、加粗、列表、表格都有），\
+      cvTitle: "画布与共创", cvOpen: "⧉ 画布与共创", cvClose: "收起画布与共创",       cvEmpty: "画布与共创还是空的。会自动落到这儿的是：结构图（/结构图）、深度研究的报告、以及回答里成块的图/网页/表格/长文稿。\n\n想手动放一件进来：在任意一条回答下面点「⧉ 落到画布」。\n\n落进来之后：可以用「✎ 编辑」像 Word 那样直接排版改字（标题、加粗、列表、表格都有），\
 也可以点「⚡ 共创」让 WDS 重写／概括／压成承重命题／划一条分离线——\
 选中一段就只改那一段。每改一次落一个新版本，版本条上写着这一版是谁改的，\
 「⇄ 改了什么」能看到两版之间动了哪几处。",
-      cvTip: "画布：放长产出与图，可切版本、就地改",
+      cvTip: "画布与共创：左边放长产出与图（可切版本、就地改），右边「🤝 共创台」可以一边写一边问",
       cvPrev: "预览", cvSrc: "源码", cvCopy: "复制", cvDl: "下载", cvSave: "存到本机", cvSaved: "已存",
       cvAsk: "让 WDS 改这一段", cvAskAll: "让 WDS 改这一版", cvVer: "版本", cvDrop: "⧉ 落到画布", cvDropped: "已落到画布",
       cvPick: "选中画布里的一段，再点这里", cvNoPrev: "这一类只能看源码",
       moreT: "更多",
       cvMore: "⋯", cvMoreT: "复制 / 下载 / 存到本机 / PDF / 知识库 / 改名 / 删除",
-      cvFull: "⤢ 展开", cvUnfull: "⤡ 收回", cvFullT: "让画布占满整个窗口（长稿子在半栏里改是受罪）",
+      cvFull: "⤢ 展开", cvUnfull: "⤡ 收回", cvFullT: "让画布与共创占满整个窗口（长稿子在半栏里改是受罪）",
       cvTalk: "💬 讨论", cvTalkT: "对选中的一段加一条批注；每条都能就地问 WDS",
       cvTalkAdd: "＋ 加一条批注", cvTalkPh: "对这一段你想说什么？",
       cvTalkOnSel: "批注这一段（{n} 字）", cvTalkOnAll: "对整版加一条批注",
@@ -775,7 +775,7 @@
       cvLabOn: "正在想…", cvLabClear: "清空这一件的共创记录",
       cvLabWith: "带着这一件在问：{t}",
       cvLabSel: "（并带上你选中的 {n} 字）",
-      cvLabSys: "你现在在**画布的共创台**上，和作者一起写这一件东西。规矩四条：①这是讨论，不是替他写全文——除非他明说「写一段」，否则不要整段代笔；②答得短，能一句说清就别写三段；③**可以反问**，问不清楚就先问回去；④凡是给方向就给**具体的**（一个例子、一句可以直接用的话、一个能查的判据），不要给「可以从多个角度考虑」这类。下面是他正在写的东西与他的问题。",
+      cvLabSys: "你现在在**画布与共创**的共创台上，和作者一起写这一件东西。规矩四条：①这是讨论，不是替他写全文——除非他明说「写一段」，否则不要整段代笔；②答得短，能一句说清就别写三段；③**可以反问**，问不清楚就先问回去；④凡是给方向就给**具体的**（一个例子、一句可以直接用的话、一个能查的判据），不要给「可以从多个角度考虑」这类。下面是他正在写的东西与他的问题。",
       cvNew: "＋ 新建", cvNewT: "开一篇空白稿，直接在这儿写（不必等东西落进来）",
       cvNewTitle: "无题 {n}", cvWrite: "✍ 现在就写一篇",
       cvToBox: "📥 投进草稿箱", cvToBoxT: "投给站上的管理系统（不对外开放，只有管理员看得到），等着被改成站上的一页",
@@ -867,8 +867,8 @@
       cdSelTip: "选中回答里的一句再点这里，就用那一句当承重命题；没选中就先替你填了开头那一句——它多半还得再压一压。",
     },
     en: {
-      cvTitle: "Canvas", cvOpen: "⧉ Canvas", cvClose: "Hide canvas",       cvEmpty: "The canvas is empty. What lands here automatically: structure maps (/map), deep-research reports, and any diagram, page, table or long draft that comes back as a block.\n\nTo put something here by hand: hit “⧉ To canvas” under any answer.\n\nOnce here you can switch versions, preview, download, save locally, or select a passage and have SDE revise it in place.",
-      cvTip: "Canvas: long outputs and diagrams — versions, in-place revision",
+      cvTitle: "Canvas & Co-create", cvOpen: "⧉ Canvas & Co-create", cvClose: "Hide canvas",       cvEmpty: "The canvas is empty. What lands here automatically: structure maps (/map), deep-research reports, and any diagram, page, table or long draft that comes back as a block.\n\nTo put something here by hand: hit “⧉ To canvas” under any answer.\n\nOnce here you can switch versions, preview, download, save locally, or select a passage and have SDE revise it in place.",
+      cvTip: "Canvas & Co-create: long outputs and diagrams on the left (versions, in-place edits); the 🤝 Co-create pane on the right lets you write and ask at once",
       cvPrev: "Preview", cvSrc: "Source", cvCopy: "Copy", cvDl: "Download", cvSave: "Save locally", cvSaved: "Saved",
       cvAsk: "ChatSDE to revise this", cvAskAll: "ChatSDE to revise this version", cvVer: "Version", cvDrop: "⧉ To canvas", cvDropped: "On the canvas",
       cvPick: "Select something on the canvas first", cvNoPrev: "Source only for this kind",
@@ -4022,7 +4022,7 @@
       cvGrab();
       SDEVault.kb({
         title: it.title, kind: it.kind, text: cvText(),
-        from: "ChatSDE · 画布", ver: it.vi + 1
+        from: "ChatSDE · 画布与共创", ver: it.vi + 1
       }, cvNoteEl());        // ⚠ 必须传**真 DOM 元素**：模块的 note() 是 box.innerHTML=…，
                              //   传个带 _note 的假壳它会静默什么都不做（看着像存成功了）
     });
@@ -4829,7 +4829,7 @@
       body: JSON.stringify({
         credential: c, op: "dr", a: "add",
         title: it.title, kind: it.kind, text: cvText(),
-        from: "ChatSDE \u00b7 画布", ver: it.vi + 1, note: String(note || "").slice(0, 400)
+        from: "ChatSDE · 画布与共创", ver: it.vi + 1, note: String(note || "").slice(0, 400)
       })
     }).then(function (r) { return r.json(); }).then(function (d) {
       var x = (d && d.d) ? d.d : d;            // 信封只拆一次
