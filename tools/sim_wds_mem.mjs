@@ -144,7 +144,7 @@ console.log("\n【七】接线：answerWDS 真的把历史装进 messages");
   const seg = src.slice(src.indexOf("async answerWDS"), src.indexOf("async answerWDS") + 9000);
   ok("取历史时带上 tier、beforeId 与现算的预算", /_wdsHistory\(tier, beforeId, Math\.max\(WDS_HIST_FLOOR/.test(seg));
   ok("历史铺进 messages 数组（system 之后、当前问题之前）",
-    /messages: \[\{ role: "system", content: sys \+ _modeInstr \}, \.\.\.hist, \{ role: "user", content: usr \}\]/.test(seg));
+    /messages: \[\{ role: "system", content: sys \}, \.\.\.hist, \{ role: "user", content: usr \+ _modeInstr \}\]/.test(seg));
   ok("usr 里不再拼群聊上下文（避免同一份历史进两遍）", !/群里最近的讨论/.test(seg));
   ok("两档预算都在代码里", /deep:\s*\{ msgs: 200, budget: 60000, per: 3000 \}/.test(src) && /quick:\s*\{ msgs: 60,\s*budget: 12000, per: 1200 \}/.test(src));
   ok("站内检索与两个库仍在（这次没碰它们）", /_wdsLibContext/.test(seg) && /siteCtx/.test(seg));
@@ -185,6 +185,27 @@ console.log("\n【九】动态预算的行为：只许更小，且有地板");
   ok("传超大预算也不许超过本档上限（上限仍由常量把关）", tot(huge) <= 60000 + 1600, tot(huge));
   ok("即使预算很紧，最近一轮仍在场", tight.length >= 1 && tight[tight.length - 1].content.includes("乙"));
   ok("预算为 0/未传时走本档默认", tot(await box._wdsHistory("deep", 9999, 0)) === tot(wide));
+}
+
+console.log("\n【十】可缓存前缀：变动的东西一律不许进 system");
+{
+  const src = fs.readFileSync(new URL("../src/worker.js", import.meta.url), "utf8");
+  const seg = src.slice(src.indexOf("async answerWDS"), src.indexOf("async answerWDS") + 12000);
+  ok("system 里只有 sys，不带模式指令（否则同一份前缀被劈成两版，缓存命中减半）",
+    /role: "system", content: sys \}/.test(seg) && !/content: sys \+ _modeInstr/.test(seg));
+  ok("模式指令挂在当轮 user 末尾（顺带占高注意力位）", /content: usr \+ _modeInstr/.test(seg));
+  // sys 的组成必须全是逐字稳定的东西——变动项（站内资料/两个库/提问）都在 usr 里
+  const sysBlock = seg.slice(seg.indexOf("const sys = WDS_SYS"), seg.indexOf("const _mode = wdsMode"));
+  ok("sys 只由内功/心得/方法论这些稳定件拼成", /neigong/.test(sysBlock) && /reflect/.test(sysBlock) && /WDS_METHOD_GUIDE/.test(sysBlock));
+  ok("站内资料不进 sys（它每问都不同，进去就废掉整个前缀）", !/siteCtx/.test(sysBlock));
+  ok("两个库不进 sys（同理，它们随共同体动态变）", !/libCtx/.test(sysBlock));
+  ok("提问本身不进 sys", !/【提问者的问题】/.test(sysBlock));
+  // 心得的缓存链条要完好
+  const er = src.slice(src.indexOf("async function ensureReflect"), src.indexOf("async function ensureReflect") + 2600);
+  ok("心得三级缓存仍在：内存 → CONFIG_VAULT → 才生成",
+    /REFLECT_MEM\[vendor\]/.test(er) && /op: "getReflect"/.test(er) && /op: "setReflect"/.test(er));
+  ok("心得有失败负缓存（坏 Key 不连撞）", /REFLECT_FAIL_TTL/.test(er));
+  ok("内功有模块级缓存（不重复取文件）", /NEIGONG_CACHE|let NEIGONG|NEIGONG =/.test(src));
 }
 
 console.log("\n" + (fail === 0 ? "✅" : "❌") + "  " + pass + " PASS / " + fail + " FAIL\n");
