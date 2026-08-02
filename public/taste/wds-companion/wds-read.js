@@ -331,12 +331,12 @@
           if (!r || !r.ok) { actNote(pan, (r && r.msg) || "\u843d\u5361\u5931\u8d25\u3002", "bad"); return; }
           pan.innerHTML = "<div class='wdsr-pt'>\u2713 " + esc(r.msg || "\u5df2\u7acb\u5361")
             + "</div><div class='wdsr-ph'>\u53bb <a href='" + C.WX
-            + "' target='_blank' rel='noopener'>SDE \u5fae\u4fe1</a> \u770b\u8c01\u9876\u4f60\u3002</div>";
+            + "' target='_blank' rel='noopener'>SDE \u793e\u533a</a> \u770b\u8c01\u9876\u4f60\u3002</div>";
         }).catch(function () { actNote(pan, "\u843d\u5361\u5931\u8d25\uff08\u7f51\u7edc\u51fa\u9519\uff09\u3002", "bad"); });
       };
     }).catch(function () {
       pan.innerHTML = "<div class='wdsr-ph'>\u5019\u9009\u5361\u6a21\u5757\u6ca1\u52a0\u8f7d\u4e0a\u3002\u4f60\u4ecd\u53ef\u4ee5\u76f4\u63a5\u53bb "
-        + "<a href='/sde-wechat/' target='_blank' rel='noopener'>SDE \u5fae\u4fe1</a> \u624b\u52a8\u7acb\u4e00\u5f20\u5361\u3002</div>";
+        + "<a href='/sde-wechat/' target='_blank' rel='noopener'>SDE \u793e\u533a</a> \u624b\u52a8\u7acb\u4e00\u5f20\u5361\u3002</div>";
     });
   }
 

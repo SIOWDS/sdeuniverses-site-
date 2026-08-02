@@ -832,7 +832,7 @@
       qTip: "It is still answering — what you send now is queued and asked next", qBar: "⏳ {n} queued",
       qPausedT: "⏸ Paused · {n} waiting", qResume: "Resume", qClear: "Clear queue",
       qFull: "10 queued messages max", qNext: "Next: ",
-      tabBrowse: "▤ Browse", tabIm: "💬 Messenger",
+      tabBrowse: "▤ Browse", tabIm: "💬 Community",
       duBtn: "⇉ Two models", duTip: "Ask both at once, side by side; then have SDE compare them",
       duPick: "Which second model?", duNoKey: "(no key yet)", duOff: "Single model",
       duCmp: "⇄ Have SDE compare these", duCmpQ: "Below are two answers to the same question from two different models. Compare them and say only four things: (1) what each saw that the other missed; (2) where they flatly contradict each other (point to the sentences); (3) which holds up better under attack, and why; (4) what both missed. Do not restate their content.",
@@ -1906,7 +1906,7 @@
   function loadModes() {
     if (window.SDEModes) return;
     var sc = document.createElement("script");
-    sc.src = "/assets/sde-modes.js?v=20260802a"; sc.async = true;
+    sc.src = "/assets/sde-modes.js?v=20260802b"; sc.async = true;
     sc.onerror = injectNav;
     document.head.appendChild(sc);
   }
@@ -2453,7 +2453,7 @@
      实现不在这里：全站共用 /assets/wds-savedir.js（window.WDSSaveDir），金点子发生器等
      也用同一份。这里只做三件事：尽早把它拉进来（目录句柄要在点击那一刻已在内存里，
      否则 requestPermission 拿不到用户手势）、把结果译成本页文案、没有它就退回普通下载。 ── */
-  var SAVEDIR_SRC = "/assets/wds-savedir.js?v=20260802a";
+  var SAVEDIR_SRC = "/assets/wds-savedir.js?v=20260802b";
   function dirApi() { return window.WDSSaveDir || null; }
   function dirSupported() { var A = dirApi(); return !!(A && A.supported()); }
   function dirName() { var A = dirApi(); return A ? A.name() : ""; }

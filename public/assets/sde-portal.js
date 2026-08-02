@@ -118,7 +118,7 @@
       zhS: "\u4e13\u680f \u00b7 \u4e13\u8457 \u00b7 \u5b66\u5458 \u00b7 \u5168\u7ad9\u68c0\u7d22", enS: "Columns \u00b7 Books \u00b7 Students \u00b7 Search" },
     { k: "wds", x: 88, y: 82, c: "#E0B65C", icon: "\u2726", zh: "SDE \u5bf9\u8bdd", en: "SDE Dialogue",
       zhS: "\u95ee WDS\uff1a\u5168\u7ad9\u95ee\u7b54\u4e0e SDE \u5bf9\u8c08", enS: "ChatSDE about anything here" },
-    { k: "im", x: 12, y: 82, c: "#A981C4", icon: "\ud83d\udcac", zh: "SDE \u5fae\u4fe1", en: "SDE Messenger",
+    { k: "im", x: 12, y: 82, c: "#A981C4", icon: "\ud83d\udcac", zh: "SDE \u793e\u533a", en: "SDE Community",
       zhS: "\u7fa4\u804a \u00b7 \u79c1\u804a \u00b7 \u4f1a\u8bae \u00b7 \u5e7f\u573a", enS: "Groups \u00b7 DMs \u00b7 Meetings \u00b7 Plaza" },
   ];
   var GO = { browse: "", im: "/sde-wechat/", wds: "/taste/chatsde/" };   // browse 留空＝就地揭开

@@ -20,7 +20,7 @@
   // ── 唯一定义。改这里就是改全站。 ──
   var SDE_MODES = [
     { k: "browse", href: "/browse/", icon: "\u25a4", zh: "\u6d4f\u89c8", en: "Browse", zhT: "\u56de\u5230\u7f51\u7ad9\uff1a\u4e13\u680f\u00b7\u4e13\u8457\u00b7\u5b66\u5458", enT: "The site: columns, books, students" },
-    { k: "im", href: "/sde-wechat/", icon: "\ud83d\udcac", zh: "SDE \u5fae\u4fe1", en: "Messenger", zhT: "\u7fa4\u804a\u4e0e\u79c1\u804a", enT: "Groups and direct messages" },
+    { k: "im", href: "/sde-wechat/", icon: "\ud83d\udcac", zh: "SDE \u793e\u533a", en: "Community", zhT: "\u7fa4\u804a\u4e0e\u79c1\u804a", enT: "Groups and direct messages" },
     { k: "wds", href: "/taste/chatsde/", icon: "\u2726", zh: "SDE \u5bf9\u8bdd", en: "Dialogue", zhT: "ChatSDE\uff1a\u5168\u7ad9\u95ee\u7b54\u4e0e SDE \u5bf9\u8c08", enT: "ChatSDE about anything on the site" },
   ];
 
@@ -222,8 +222,8 @@
       a.title = lang() === "en" ? im.enT : im.zhT;
       return a;
     }
-    var zh = mk("zh-only", "\ud83d\udcac SDE \u5fae\u4fe1");
-    var en = mk("en-only", "\ud83d\udcac Messenger");
+    var zh = mk("zh-only", "\ud83d\udcac SDE \u793e\u533a");
+    var en = mk("en-only", "\ud83d\udcac Community");
     var all = nav.querySelectorAll(".wdsm-navbtn");
     var anchor = all.length ? all[all.length - 1] : null;    // 紧跟ChatSDE；它不在就落到末尾
     var hm = homeBtn();
