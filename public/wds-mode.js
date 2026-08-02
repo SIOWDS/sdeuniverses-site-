@@ -766,6 +766,7 @@
       cvLabIns: "⤵ 插入正文", cvLabVer: "⟳ 落成新版本", cvLabCopy: "复制",
       cvLabInsOk: "已插到正文末尾（还没存版本，看一眼再「✓ 存为新版」）。",
       cvLabInsSel: "已换掉选中的那一段（还没存版本）。",
+      cvLabBadModel: "这一家说**这个型号不存在**——多半是默认型号过时了，或者你的账号没开通它。到顶栏的模型选择器里换一个型号再问（换完主对话也一起生效）。",
       cvLabNoKey: "还没配大模型 Key —— 共创台用的是你自己那把，和主对话同一把。",
       cvLabErr: "没答上来（网络或额度）。再问一次试试。",
       cvLabOn: "正在想…", cvLabClear: "清空这一件的共创记录",
@@ -887,6 +888,7 @@
       cvLabIns: "\u2935 Insert", cvLabVer: "\u27f3 Save as version", cvLabCopy: "Copy",
       cvLabInsOk: "Appended to the end (not saved as a version yet).",
       cvLabInsSel: "Replaced the selected passage (not saved as a version yet).",
+      cvLabBadModel: "The provider says this model does not exist \u2014 the default is probably outdated, or your account has no access. Pick another model in the top bar selector and ask again.",
       cvLabNoKey: "No model key yet \u2014 the co-lab uses the same one as the main chat.",
       cvLabErr: "No answer (network or quota). Try once more.",
       cvLabOn: "Thinking\u2026", cvLabClear: "Clear the co-lab log for this piece",
@@ -4072,6 +4074,12 @@
       mk(tx("cvEditCancel"), function () { cvEditCancel(it); });
       // 富文本只对 md 开；别的类型（网页/图/代码/数据）改的就是源码本身，
       // 套一层所见即所得只会把它们改坏。
+      /* ⚠ 编辑态的工具条原来只剩「存为新版/丢弃/源码」，**共创台那颗按钮跟着消失**，
+         于是"一边写一边问"根本做不到 —— 要问还得先退出编辑。
+         写作时恰恰最需要问，所以这两颗（共创台、展开）在编辑态必须留着。 */
+      mk(tx("cvLab") + (cvChat(it).length ? " " + Math.ceil(cvChat(it).length / 2) : ""),
+        function () { cvLabSet(!CV.lab); }, CV.lab).title = tx("cvLabT");
+      mk(CV.full ? tx("cvUnfull") : tx("cvFull"), function () { cvFullSet(!CV.full); }, CV.full).title = tx("cvFullT");
       var canRich = (it.kind === "md");
       if (canRich) {
         mk(CV.rich ? tx("cvPlain") : tx("cvRich"), function () {
@@ -4515,6 +4523,7 @@
   function cvLabAsk(it, q) {
     q = String(q || "").trim();
     if (!q || CV.labBusy) return;
+    cvGrab();          // 先把编辑框里正在打的那句收下来，否则问的是上一版
     var kv = wdsKeyGet();
     if (!kv) { cvChat(it).push({ r: "sys", t: tx("cvLabNoKey"), at: stampTime() }); cvLabPaint(it); return; }
     cvChat(it).push({ r: "me", t: q, at: stampTime() });
@@ -4539,9 +4548,11 @@
       method: "POST", headers: { "content-type": "application/json" },
       signal: ctrl ? ctrl.signal : undefined,
       body: JSON.stringify({
+        /* 请求体逐字对齐主对话那一份：少带一个字段就可能走到别的分支上去，
+           而这种错在前端看不出来（表现是基底那边一句莫名其妙的报错）。 */
         q: tx("cvLabSys") + "\n\n" + cvLabCtx(it) + "\n【他的问题】\n" + q,
-        history: hist, key: kv.key, vendor: kv.vendor, model: kv.model || "",
-        mode: "std", web: 0, lang: LANG, about: aboutPlus()
+        history: hist, umem: "", key: kv.key, vendor: kv.vendor, model: kv.model || "",
+        mode: thinkMode, web: 0, skey: wdsSearchKey(), about: aboutPlus(), lang: LANG, tool: ""
       })
     }).then(function (resp) {
       if (!resp.ok || !resp.body) throw new Error("HTTP " + resp.status);
@@ -4563,8 +4574,12 @@
                事件名必须逐个对着主流程抄，不许凭印象。** */
             if (j.t === "token") { cell.t += j.v; cvLabPaint(it); }
             else if (j.t === "error") {
-              cell.t = String(j.v || tx("cvLabErr"));
-              if (j.code === "need_key" || j.code === "bad_key") cell.t = tx("cvLabNoKey");
+              var ev = String(j.v || tx("cvLabErr"));
+              /* 基底把「模型不存在」原样甩回来是一段 JSON，读者看不懂也不知道该做什么。
+                 认出这一类就换成人话＋去处：换型号在顶栏的模型选择器里。 */
+              if (/1211|模型不存在|model.*not.*(exist|found)|invalid.*model/i.test(ev)) ev = tx("cvLabBadModel");
+              else if (j.code === "need_key" || j.code === "bad_key") ev = tx("cvLabNoKey");
+              cell.t = ev;
               cvLabPaint(it);
             }
           }

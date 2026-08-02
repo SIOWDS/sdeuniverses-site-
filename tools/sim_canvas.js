@@ -142,6 +142,7 @@ function boot(opts) {
     cvLabNoKey: "还没配大模型 Key", cvLabErr: "没答上来", cvLabOn: "正在想…",
     cvLabClear: "清空这一件的共创记录", cvLabWith: "带着这一件在问：{t}", cvLabSel: "（并带上你选中的 {n} 字）",
     cvLabSys: "你现在在画布的共创台上，和作者一起写这一件东西。",
+    cvLabBadModel: "这一家说这个型号不存在——到顶栏的模型选择器里换一个型号再问。",
     cvNew: "＋ 新建", cvNewT: "新建", cvNewTitle: "无题 {n}", cvWrite: "✍ 现在就写一篇",
     cvToBox: "📥 投进草稿箱", cvToBoxT: "投稿", cvToBoxAsk: "留一句话", cvToBoxNo: "投不进去",
     cvKb: "⇧ 存进知识库", cvKbT: "存进知识库", cvKbNo: "模块没装载",
@@ -183,6 +184,8 @@ function boot(opts) {
     API: "/api/wds/chat",
     wdsKeyGet: () => (opts.noKey ? null : { key: "k", vendor: "ds", model: "" }),
     aboutPlus: () => "",
+    thinkMode: "std",
+    wdsSearchKey: () => "",
     typesetSync: () => {},
     copyText: () => {},
     AbortController: class { constructor() { this.signal = {}; } abort() { this.aborted = 1; } },
@@ -1138,6 +1141,47 @@ sec("⑱ 共创台：随时问两句，回话不自动进正文");
   /* 换场归位 */
   C.cvReset();
   ok(C.CV.lab === false && C.CV.labBusy === false, "换场没把共创台归位");
+
+  /* ── 一边写一边问：编辑态的工具条必须留着共创台 ──────────
+     原来编辑态只剩「存为新版/丢弃/源码」，共创台那颗跟着消失，
+     要问还得先退出编辑 —— 而写作时恰恰最需要问。 */
+  const C6 = boot();
+  C6.cvAdd("md", "稿子", body); C6.cvPaint();
+  C6._.bar.children.filter(b => String(b.textContent).indexOf("编辑") > -1)[0].onclick();
+  ok(C6.CV.edit === true, "没进编辑态");
+  const eLabels = C6._.bar.children.map(b => String(b.textContent));
+  ok(eLabels.some(x => x.indexOf("共创台") > -1), "编辑态的工具条上没有共创台 —— 做不到一边写一边问：" + JSON.stringify(eLabels));
+  ok(eLabels.some(x => x.indexOf("展开") > -1), "编辑态没有展开");
+  ok(eLabels.some(x => x.indexOf("存为新版") > -1), "编辑态丢了「存为新版」");
+  /* 开着共创台进编辑，坞不许被关掉 */
+  C6.cvLabSet(true);
+  ok(C6.CV.lab === true && C6._.cvEl.classList.contains("labon"), "编辑态下共创台被关掉了");
+
+  /* 问之前要把正在打的字收下来（否则问的是上一版） */
+  const C7 = boot();
+  C7.cvAdd("md", "稿子", "# 稿子\n\n第一句。"); C7.cvPaint();
+  C7._.bar.children.filter(b => String(b.textContent).indexOf("编辑") > -1)[0].onclick();
+  const ed7 = C7._.wrap.querySelector(".wdsm-cvrt");
+  ed7.innerHTML = "<h1>稿子</h1><p>第一句。刚打的第二句。</p>";   // 不触发 oninput，模拟"正打着就问"
+  C7.cvLabAsk(C7.CV.items[0], "接下去怎么写");
+  await new Promise(r => setTimeout(r, 60));
+  const p7 = (C7._.ctx._posts || []).pop();
+  ok(p7 && p7.body.q.indexOf("刚打的第二句") > -1, "问的时候没带上正在打的那句（问成了上一版）");
+
+  /* 请求体与主对话对齐 */
+  const need = ["umem", "skey", "about", "lang", "tool", "mode", "vendor", "model", "key", "history"];
+  need.forEach(k => ok(Object.prototype.hasOwnProperty.call(p7.body, k),
+    "请求体少了 " + k + " —— 与主对话不对齐，可能走到别的分支上"));
+
+  /* 型号类报错要换成人话，不许甩 JSON */
+  const C8 = boot({ labSse: ['data: {"t":"error","v":"基底返回错误 400: {\\"error\\":{\\"code\\":\\"1211\\",\\"message\\":\\"模型不存在\\"}}"}', "data: [DONE]"] });
+  C8.cvAdd("md", "稿子", body); C8.cvPaint();
+  C8.cvLabAsk(C8.CV.items[0], "问一句");
+  await new Promise(r => setTimeout(r, 60));
+  const l8 = C8.cvChat(C8.CV.items[0]);
+  const last8 = l8[l8.length - 1].t;
+  ok(last8.indexOf("型号") > -1 && last8.indexOf("模型选择器") > -1, "型号报错没换成人话：" + last8);
+  ok(last8.indexOf("1211") === -1 && last8.indexOf("{") === -1, "还在往读者脸上甩 JSON：" + last8);
 
   /* 与另外两件的分工不许混：共创台不设 want（那是共创动作干的事） */
   ok(!/cvLabAsk[\s\S]{0,900}CV\.want =/.test(SRC), "共创台设了 want —— 回话会被收成新版本，那是「⚡ 共创」的活");
