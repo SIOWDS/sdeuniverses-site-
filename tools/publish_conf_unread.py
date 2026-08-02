@@ -130,6 +130,7 @@ def md_to_html(md):
 
 
 def build_page(p, body, toc, pages):
+    _wan = round(len(re.findall(r"[\u4e00-\u9fff]", re.sub(r"<[^>]+>", "", body))) / 10000, 1)
     t = TPL.read_text(encoding="utf-8")
     css = (ROOT / "tools" / "confluence-article.css").read_text(encoding="utf-8")
     t = re.sub(r"<style>.*?</style>", "<style>" + css + "</style>", t, count=1, flags=re.S)
@@ -144,7 +145,7 @@ def build_page(p, body, toc, pages):
     t = re.sub(r'<div class="art-sub">.*?</div>', f'<div class="art-sub">{p["sub"]}</div>', t, count=1, flags=re.S)
     assert p["sub"][:12] in t, "副题没写进去"
     t = re.sub(r'<div class="art-meta">.*?</div>',
-               f'<div class="art-meta">王德生 ＋ Claude · 约 2.8 万字 · {pages} 页 · '
+               f'<div class="art-meta">王德生 ＋ Claude · 约 {_wan} 万字 · {pages} 页 · ' 
                f'三种阅读方式 · 发表于{PUBDATE}</div>', t, flags=re.S)
     t = re.sub(r'<div class="deck">.*?</div>', f'<div class="deck">{strongify(p["deck"])}</div>', t, flags=re.S)
     links = "".join(f'<a href="#{i}">{html.escape(x)}</a>' for i, x in toc)
@@ -256,7 +257,7 @@ def main():
                .replace("taken-out", p["slug"]).replace("一拿出来，就不是它了", p["title"]) \
                .replace("典范文专栏", "学科通融")
         (d / "read.html").write_text(rd, encoding="utf-8")
-        n = len(re.sub(r"<[^>]+>", "", body))
+        n = len(re.findall(r"[\u4e00-\u9fff]", re.sub(r"<[^>]+>", "", body)))
         built.append((p, round(n / 10000, 1), pages))
         print(f'  {p["slug"]}: {n} 字 · {pages} 页 · 目录 {len(toc)} 节 · 来源 {len(p["sources"])} 家')
     idx = CF / "index.html"
