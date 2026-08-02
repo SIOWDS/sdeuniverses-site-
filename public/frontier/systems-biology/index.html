@@ -1,0 +1,57 @@
+<!DOCTYPE html><html lang="zh"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>系统与网络生物学 · 新思想前沿 | SDE Universes</title>
+<meta name="description" content="这十年的思想转向：放弃「画完通路图就懂了」，改走「大规模扰动—读出—学习」；全基因组规模的单细胞扰动筛选成为常规，而「虚拟细胞」成为新的组织性目标。">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Noto+Serif+SC:wght@300;400;500;600&display=swap">
+<style>
+:root{--bg:#F5EFE0;--card:#FAF6EC;--gold:#8A6817;--gold2:#A88233;--text:#2A2315;--text2:#6B5D47;--muted:#98886C;--border:rgba(138,104,23,0.22)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'Noto Serif SC',Georgia,serif;line-height:1.9;-webkit-font-smoothing:antialiased}
+.top{max-width:760px;margin:0 auto;padding:1.4rem 1.5rem 0;font-size:.86rem}
+.top a{color:var(--gold);text-decoration:none;font-weight:600}.top a:hover{text-decoration:underline}
+.top .sep{color:var(--muted);margin:0 .5rem}
+main{max-width:760px;margin:0 auto;padding:1.5rem 1.5rem 4rem}
+.kicker{font-size:.82rem;letter-spacing:.18em;color:var(--gold2);font-weight:600;margin-bottom:.9rem}
+h1{font-size:2rem;line-height:1.3;font-weight:700;margin-bottom:.7rem;letter-spacing:.01em}
+.meta{font-size:.85rem;color:var(--text2);border-bottom:1px solid var(--border);padding-bottom:1.1rem;margin-bottom:1.6rem}
+.lede{font-size:1.12rem;color:var(--text);font-weight:500;margin-bottom:1.5rem}
+h2{font-size:1.18rem;font-weight:600;color:var(--gold);margin:1.9rem 0 .6rem}
+p{margin:0 0 1.1rem;text-align:justify}
+.end{margin-top:2rem;padding-top:1.2rem;border-top:1px solid var(--border);font-size:.86rem;color:var(--muted)}
+.end b{color:var(--text2)}
+</style></head><body>
+<div class="top"><a href="/browse/">SDE Universes</a><span class="sep">·</span><a href="/frontier/">新思想前沿</a><span class="sep">›</span><span style="color:var(--text2)">生命科学</span></div>
+<main>
+<div class="kicker">新思想前沿 · 生命科学</div>
+<h1>系统与网络生物学</h1>
+<div class="meta">近十年最新思想摘要 · 约 1600 字 · 王德生 亲撰 · 2026 年 8 月</div>
+<p class="lede">这十年系统生物学最要紧的转向，是它换掉了自己的成功判据。上一个十年的目标是把细胞里的相互作用网络画全，并写出一套微分方程来模拟整个细胞。这十年的共识是：画全了也不够——网络图不告诉你扰动一个节点会发生什么，而参数从来无法可靠地确定。取而代之的路线是经验的：大规模地扰动、在单细胞分辨率上读出、再让模型从这些扰动—响应对中学习。目标也被重新命名为「虚拟细胞」——一个能预测未见过的扰动会带来什么后果的模型。</p>
+<h2>一、通路图为什么不够</h2>
+<p>把蛋白相互作用、转录调控与代谢反应整理成网络，是这个领域的立身之本，也确实提供了必要的地图。问题在于地图不等于预测：同一张网络，在不同的参数、不同的细胞状态下，行为可以完全不同。</p>
+<p>更根本的是，生物网络高度冗余且带有大量反馈。敲掉一个基因，系统往往通过旁路补偿，表型看起来正常——这被称作稳健性，是生物系统的普遍特征，也是「一个基因一个功能」的思路失效的原因。</p>
+<p>因此这十年的问题从「网络长什么样」变成了「扰动它会怎样」——而后者只能靠做，不能靠看。</p>
+<h2>二、扰动筛选成了主力</h2>
+<p>技术上的关键是把基因编辑筛选与单细胞测序接起来：给每个细胞一个可读出的扰动标签，扰动后直接测它的全转录组。这样一次实验就能得到成千上万种扰动各自的完整分子响应，而不只是「活/死」这一个读数。</p>
+<p>规模已经推到全基因组：单次实验覆盖上万个基因的扰动、数百万个细胞。产出的不是一张图，而是一个巨大的「扰动—响应」矩阵。</p>
+<p>这类数据带来的第一批结论是结构性的：功能相近的基因在响应空间中聚成模块，而这些模块与传统通路划分并不完全重合；此外，许多此前功能未知的基因通过响应相似性被指认了功能——这是一种不依赖同源比对的功能注释方式。</p>
+<h2>三、虚拟细胞</h2>
+<p>有了大规模扰动数据，一个新目标成形：训练模型来预测未做过的扰动的后果——包括未测过的基因组合、未测过的细胞类型、未测过的药物剂量。这被统称为虚拟细胞。</p>
+<p>现有模型多是在大规模单细胞语料上预训练、再在扰动数据上微调的表示模型。它们在「同一细胞系内、单基因扰动」这类插值任务上表现不错。</p>
+<p>而严格的基准评估给出了清醒的结论：在跨细胞类型、跨扰动组合的外推上，多数模型并不明显优于简单基线（例如直接预测「所有扰动的平均响应」）。这个发现本身是这十年最有价值的方法学产出——它把这条路线从宣传拉回到了可比较的评测上（与深度学习面板中的评估问题同源，见相邻面板）。</p>
+<h2>四、因果与可辨识性</h2>
+<p>系统生物学最深的技术困难是因果推断：观察到两个基因表达相关，无法判断谁调控谁，还是共同被第三者调控。这是它与统计学、计量经济学共享的问题（见相邻面板）。</p>
+<p>扰动数据的价值正在于此——它提供了干预，而干预是打破相关性歧义的唯一可靠手段。这十年把因果发现算法与扰动实验设计结合起来的工作，正是在回答「下一步该扰动哪个基因，才能最快确定网络结构」。</p>
+<p>与之相关的是可辨识性：一个动力学模型的参数能否由可获得的数据唯一确定。系统性检查表明，许多已发表模型的参数其实不可辨识——不同参数组合给出同样的拟合，因而基于它们的机制解释是不牢靠的。</p>
+<h2>五、多尺度与空间</h2>
+<p>细胞不是孤立的。这十年的第二条主线是把网络从细胞内扩展到细胞之间：配体—受体通讯的推断、组织中的空间邻域（见相邻面板）、以及器官尺度的代谢模型。</p>
+<p>基因组尺度的代谢模型在这里是少有的成功案例：它基于化学计量与守恒约束而非动力学参数，因而不需要拟合大量未知常数，并已被工业界用于设计生产菌株（与合成生物学面板相接）。</p>
+<p>它的成功也说明了一条经验：在系统生物学里，约束式模型往往比动力学模型更可靠，因为前者只用你确实知道的东西。</p>
+<h2>六、这个领域学到了什么</h2>
+<p>把上面几条合起来，这十年的方法论收获可以写成三句话。第一，观察数据无法给出因果，必须做扰动。第二，任何声称能预测的模型都必须在外推任务上与朴素基线比较，而不是只报告拟合优度。第三，模型的复杂度应当由数据能约束的程度决定，而不是由生物学的真实复杂度决定——写下所有已知的细节，只会得到一个不可辨识的模型。</p>
+<p>这三条并不只适用于生物学。它们与因果推断、机器学习理论、科学哲学几个面板给出的结论几乎逐字相同（见相邻面板），这本身说明了这十年跨学科方法论的一次收敛。</p>
+<h2>七、一句话</h2>
+<p>系统生物学的新思想是：放弃「画完网络就懂了」，改成大规模地扰动、在单细胞上读出、让模型去学；而它最诚实的一条发现是——目前的虚拟细胞在真正的外推上，还赢不过一个朴素基线。</p>
+<div class="end"><b>新思想前沿</b> 是一个持续撰写的专栏：近十年，各主要领域最新思想的摘要，每领域约 2000 字，共 100 个学科面板，由王德生亲撰，现已全部完成。 · <a href="/frontier/" style="color:var(--gold);text-decoration:none">← 回到 100 学科面板</a></div>
+</main><script src="/wds-mode.js?v=20260801h" defer></script>
+</body></html>

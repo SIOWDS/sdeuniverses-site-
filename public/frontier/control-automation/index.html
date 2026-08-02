@@ -1,0 +1,59 @@
+<!DOCTYPE html><html lang="zh"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>控制与自动化 · 新思想前沿 | SDE Universes</title>
+<meta name="description" content="这十年的思想转向：控制器从「按模型设计」变成「在线求解优化」，学习成分进入回路——核心问题随之从稳定性换成「有学习参与时如何仍能给出保证」。">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Noto+Serif+SC:wght@300;400;500;600&display=swap">
+<style>
+:root{--bg:#F5EFE0;--card:#FAF6EC;--gold:#8A6817;--gold2:#A88233;--text:#2A2315;--text2:#6B5D47;--muted:#98886C;--border:rgba(138,104,23,0.22)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'Noto Serif SC',Georgia,serif;line-height:1.9;-webkit-font-smoothing:antialiased}
+.top{max-width:760px;margin:0 auto;padding:1.4rem 1.5rem 0;font-size:.86rem}
+.top a{color:var(--gold);text-decoration:none;font-weight:600}.top a:hover{text-decoration:underline}
+.top .sep{color:var(--muted);margin:0 .5rem}
+main{max-width:760px;margin:0 auto;padding:1.5rem 1.5rem 4rem}
+.kicker{font-size:.82rem;letter-spacing:.18em;color:var(--gold2);font-weight:600;margin-bottom:.9rem}
+h1{font-size:2rem;line-height:1.3;font-weight:700;margin-bottom:.7rem;letter-spacing:.01em}
+.meta{font-size:.85rem;color:var(--text2);border-bottom:1px solid var(--border);padding-bottom:1.1rem;margin-bottom:1.6rem}
+.lede{font-size:1.12rem;color:var(--text);font-weight:500;margin-bottom:1.5rem}
+h2{font-size:1.18rem;font-weight:600;color:var(--gold);margin:1.9rem 0 .6rem}
+p{margin:0 0 1.1rem;text-align:justify}
+.end{margin-top:2rem;padding-top:1.2rem;border-top:1px solid var(--border);font-size:.86rem;color:var(--muted)}
+.end b{color:var(--text2)}
+</style></head><body>
+<div class="top"><a href="/browse/">SDE Universes</a><span class="sep">·</span><a href="/frontier/">新思想前沿</a><span class="sep">›</span><span style="color:var(--text2)">工程与技术</span></div>
+<main>
+<div class="kicker">新思想前沿 · 工程与技术</div>
+<h1>控制与自动化</h1>
+<div class="meta">近十年最新思想摘要 · 约 1700 字 · 王德生 亲撰 · 2026 年 8 月</div>
+<p class="lede">这十年控制理论最要紧的转向，是控制器不再是设计出来的一个公式，而是每一个采样周期在线求解的一次优化。算力的普及让模型预测控制从化工大装置下沉到嵌入式芯片，从而进入汽车、电力电子与机器人。紧接着，学习成分进入了回路——模型从数据里学、策略从经验里学。于是这门以「保证」为立身之本的学科面对一个新的中心问题：当系统里有一部分是学出来的、其行为无法完全刻画时，安全与稳定的保证还能不能给出。</p>
+<h2>一、从设计公式到在线优化</h2>
+<p>经典控制的做法是：给定被控对象的模型，设计一个控制律，证明闭环稳定，然后固定下来运行。它的优点是可分析、可认证；缺点是难以处理约束——执行器有上下限、状态有安全边界，而这些在公式里很难表达。</p>
+<p>模型预测控制的思路不同：在每个时刻，用模型向前预测一段时间，求解一个带约束的优化问题，执行结果的第一步，下一时刻重来。约束天然被写在优化问题里。</p>
+<p>它长期只用在采样周期以分钟计的过程工业，因为求解太慢。这十年的变化来自两头：求解器算法（显式解、快速梯度法、专用代码生成）与嵌入式算力的提升，使毫秒级求解成为可能。控制因此从「设计一个控制器」变成了「部署一个求解器」。</p>
+<h2>二、学习进了回路</h2>
+<p>第二步是让模型或策略来自数据。三条路线各有位置：系统辨识的现代版本用机器学习拟合难以建模的部分（摩擦、气动、接触）；无模型的强化学习直接学策略（见相邻面板）；以及数据驱动控制，绕过显式模型、直接从输入输出数据构造控制律。</p>
+<p>收益明确：对于建模困难的对象，学习能拿到手工建模拿不到的性能。代价同样明确：学出来的东西没有先验保证，而且在训练分布之外可能任意失效。</p>
+<p>这就把学科的中心问题重新定义了。控制理论的价值从来不是性能最好，而是能证明它不会出事；一旦回路里有学习成分，这个证明就必须重建。</p>
+<h2>三、安全的形式化</h2>
+<p>这十年最有分量的技术进展是把「安全」写成可以在线检查的数学条件。控制屏障函数是其中的代表：给定一个必须保持的安全集合，构造一个函数，只要控制输入满足一个线性不等式，系统就永远不会离开该集合。</p>
+<p>它的工程价值在于可组合：任何一个性能控制器（包括神经网络策略）的输出，都可以经过一个最小干预的安全滤波器——在不违反安全条件的前提下尽量接近原输出。学习负责好，滤波器负责不出事。</p>
+<p>限度也要说清：这类保证依赖于对系统动力学与扰动界的正确建模。如果被控对象的真实行为超出假设，保证就失效。安全滤波把问题从「相信策略」转移到了「相信模型的界」，而不是消除了它。</p>
+<h2>四、鲁棒与自适应的复兴</h2>
+<p>与之相关的是老工具的复兴。鲁棒控制处理「模型不准但不确定性有界」的情形，自适应控制处理「参数未知但可在线估计」的情形。它们在这十年被重新拾起，用来给学习型系统提供兜底。</p>
+<p>一个务实的架构正在成为主流：分层——底层是有严格保证的鲁棒控制器，中层是带约束的在线优化，上层才是学习出来的规划或决策。越靠近执行器，越保守、越可证明。</p>
+<p>这个架构的思想很清楚：不要求整个系统可证明，只要求失效时的兜底路径可证明。</p>
+<p>与之配套的是仿真到现实这道坎在控制领域的老版本：控制器在模型上表现完美、上机就振荡，原因通常是未建模的时延、执行器饱和与传感器噪声。这十年的做法是把这些不确定性显式写进设计（而不是事后调参），并用硬件在环测试作为部署前的强制环节。</p>
+<h2>五、数字孪生与它的实际含义</h2>
+<p>工业侧这十年最流行的词是数字孪生。剥掉营销成分，它的实质是：为一台在运设备维护一个持续用实时数据校准的模型，用于状态监测、故障预测与「如果这样操作会怎样」的推演。</p>
+<p>它真正有价值的地方在于把控制与运维接起来：模型不仅用于控制，还用于估计不可直接测量的内部状态（剩余寿命、腐蚀、结垢），从而把维护从定期改为按状态。</p>
+<p>常见的失败模式也清楚：模型建得很漂亮但从不校准，于是很快与真实设备脱节，成为一个昂贵的可视化界面。判断一个数字孪生是否真实的标准，是它有没有闭环校准。</p>
+<h2>六、信息物理系统与安全</h2>
+<p>最后一条是把控制系统当作攻击面。工业控制、电网调度与交通信号一旦联网，就同时暴露于网络攻击，而这类系统的特点是打不了补丁、不能随便重启、且后果是物理的。</p>
+<p>这十年形成的研究方向是攻击检测与韧性控制：从传感器数据中识别被篡改的测量、在部分传感器失效时仍能维持安全运行、以及在设计阶段就假定有一部分组件不可信。</p>
+<p>与之并行的是形式化验证进入控制软件：把控制器与其安全性质写成可机器检查的形式（与逻辑哲学、密码学面板中的同一趋势相接，见相邻面板）。在航空与轨道交通这类高完整性领域，这已是常规要求。</p>
+<h2>七、一句话</h2>
+<p>控制与自动化的新思想是：控制器变成了每周期在线求解的优化，而回路里开始有学出来的东西；于是这门学科的核心问题不再是「稳不稳」，而是「当一部分不可分析时，我还能保证什么」——答案是分层：让兜底那一层可证明。</p>
+<div class="end"><b>新思想前沿</b> 是一个持续撰写的专栏：近十年，各主要领域最新思想的摘要，每领域约 2000 字，共 100 个学科面板，由王德生亲撰，现已全部完成。 · <a href="/frontier/" style="color:var(--gold);text-decoration:none">← 回到 100 学科面板</a></div>
+</main><script src="/wds-mode.js?v=20260801h" defer></script>
+</body></html>

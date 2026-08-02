@@ -1,0 +1,59 @@
+<!DOCTYPE html><html lang="zh"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>传感与物联网 · 新思想前沿 | SDE Universes</title>
+<meta name="description" content="这十年的思想转向：从「把数据传到云」变成「在传感器旁边就把数据变成决策」——边缘智能与无线感知兴起；而这个领域最实在的教训是设备寿命与厂商寿命不匹配。">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Noto+Serif+SC:wght@300;400;500;600&display=swap">
+<style>
+:root{--bg:#F5EFE0;--card:#FAF6EC;--gold:#8A6817;--gold2:#A88233;--text:#2A2315;--text2:#6B5D47;--muted:#98886C;--border:rgba(138,104,23,0.22)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'Noto Serif SC',Georgia,serif;line-height:1.9;-webkit-font-smoothing:antialiased}
+.top{max-width:760px;margin:0 auto;padding:1.4rem 1.5rem 0;font-size:.86rem}
+.top a{color:var(--gold);text-decoration:none;font-weight:600}.top a:hover{text-decoration:underline}
+.top .sep{color:var(--muted);margin:0 .5rem}
+main{max-width:760px;margin:0 auto;padding:1.5rem 1.5rem 4rem}
+.kicker{font-size:.82rem;letter-spacing:.18em;color:var(--gold2);font-weight:600;margin-bottom:.9rem}
+h1{font-size:2rem;line-height:1.3;font-weight:700;margin-bottom:.7rem;letter-spacing:.01em}
+.meta{font-size:.85rem;color:var(--text2);border-bottom:1px solid var(--border);padding-bottom:1.1rem;margin-bottom:1.6rem}
+.lede{font-size:1.12rem;color:var(--text);font-weight:500;margin-bottom:1.5rem}
+h2{font-size:1.18rem;font-weight:600;color:var(--gold);margin:1.9rem 0 .6rem}
+p{margin:0 0 1.1rem;text-align:justify}
+.end{margin-top:2rem;padding-top:1.2rem;border-top:1px solid var(--border);font-size:.86rem;color:var(--muted)}
+.end b{color:var(--text2)}
+</style></head><body>
+<div class="top"><a href="/browse/">SDE Universes</a><span class="sep">·</span><a href="/frontier/">新思想前沿</a><span class="sep">›</span><span style="color:var(--text2)">工程与技术</span></div>
+<main>
+<div class="kicker">新思想前沿 · 工程与技术</div>
+<h1>传感与物联网</h1>
+<div class="meta">近十年最新思想摘要 · 约 1700 字 · 王德生 亲撰 · 2026 年 8 月</div>
+<p class="lede">这十年物联网最要紧的转向，是数据流动的方向变了。最初的构想是万物联网、数据上云、云端出智能；而实际运行下来，带宽、时延、功耗与隐私四项约束一起把计算推回了边缘——今天的主流做法是在传感器旁边就完成识别与判断，只把结论传出去。与此同时，这个领域也交出了一个不那么光彩、却极有分量的教训：设备的物理寿命是十年二十年，而厂商与云服务的寿命常常只有几年。</p>
+<h2>一、把智能搬到边缘</h2>
+<p>推动这次搬迁的是四条现实约束：带宽（视频与振动数据全传上云不现实）、时延（安全相关的判断等不起一个来回）、功耗（无线发送往往比本地计算更耗电）、以及隐私与合规（原始数据一旦离开现场就产生法律责任）。</p>
+<p>技术上使之可行的是模型压缩：量化、剪枝与蒸馏把神经网络塞进只有几百千字节内存的微控制器；配套的是专用的低功耗推理加速单元与面向嵌入式的推理框架。</p>
+<p>结果是设备输出的东西变了——不再是「原始波形」，而是「这台电机的轴承在早期磨损」「画面里有人跌倒」。数据量下降几个数量级，而信息的价值密度上升。</p>
+<h2>二、供能与寿命</h2>
+<p>第二条主线是能量。要在无人维护的条件下运行十年，功耗预算必须以微瓦计。这十年的进展来自三处：亚阈值电路与深度睡眠让平均功耗降到微安级；能量采集（光伏、振动、温差、射频）在特定场景下能完全免电池；以及事件驱动架构——传感器平时休眠，由一个极低功耗的唤醒电路检测到值得处理的事件才启动主处理器。</p>
+<p>这个「常闭而非常开」的架构是这十年嵌入式感知的通用范式，也是它与云中心思路最根本的区别。</p>
+<p>与之相关的是无源标签的演进：把计算与传感能力加到只靠读取器供能的标签上，用于冷链、物流与库存——它们没有电池，因此寿命只受材料限制。</p>
+<h2>三、用无线信号做感知</h2>
+<p>第三条是一个概念上的翻转：把通信信号本身当作传感器。人体与物体的移动会改变无线信道，因此从既有的无线设备中就能提取呼吸、心率、跌倒、手势与人数信息，不需要摄像头也不需要佩戴。毫米波雷达把这类感知的分辨率进一步提高。</p>
+<p>通信与感知的一体化设计已经进入新一代无线标准的讨论，成为网络的原生能力而非附加功能。</p>
+<p>它的伦理面必须并列写出：这类感知是被动的、不可见的、且不需要被感知者的配合。一个房间里的路由器可以在住户不知情的情况下推断出他的作息与呼吸——这是一种在部署上比摄像头更隐蔽的监视能力（与认识论、传播面板中的可核验性主题相关，见相邻面板）。</p>
+<h2>四、安全：这个领域的旧账</h2>
+<p>物联网的安全记录是各类计算系统里最差的一类：默认口令、无签名的固件更新、长期不修补的漏洞、以及被大规模劫持组成僵尸网络的历史。原因不是技术不存在，而是激励错配——安全成本由厂商承担，损失由他人承担。</p>
+<p>这十年的转变来自监管：多个法域立法禁止通用默认口令、强制披露支持期限、并要求提供漏洞报告渠道；而供应链层面的软件物料清单要求也开始适用于嵌入式设备。</p>
+<p>这是一个典型的「市场解决不了、必须靠规则」的案例，与公共政策面板的结论一致（见相邻面板）。</p>
+<h2>五、厂商寿命与设备寿命</h2>
+<p>这十年最有分量的教训不是技术性的。大量消费与楼宇设备的功能依赖厂商的云服务：一旦公司倒闭、被收购或决定停止支持，设备就变成废物——灯泡不亮、门锁不开、摄像头看不到。这类事件在这十年反复发生。</p>
+<p>它揭示的是一个设计层面的错误：把本地功能建立在远程服务之上。相应的对策也很清楚——本地优先架构（云失效时核心功能仍在）、开放协议、以及在停止支持时开源固件或提供本地控制方案。</p>
+<p>这条经验与脑机接口面板中「厂商停产后谁负责维护植入物」的问题是同一类（见相邻面板），只是那边的后果严重得多。</p>
+<h2>六、从设备到系统</h2>
+<p>最后一条是应用层面的收敛。物联网的实际价值集中在几个明确的地方：工业设备的状态监测与预测性维护、能源与楼宇的用能优化（与能源面板相接）、农业的精准灌溉与施肥、冷链与资产追踪、以及环境与基础设施监测。</p>
+<p>这些场景的共同点是：有明确的物理量、有可量化的节省、且判断可以在本地做出。而当年设想中的「万物皆需联网」在消费端基本没有兑现——多数家电并不因为联网而更好用。</p>
+<p>协议碎片化曾是长期障碍，这十年在智能家居领域出现了跨厂商的统一应用层标准，但工业侧的碎片化依旧。</p>
+<p>与之相关的还有网络侧的分化：低功耗广域网络（窄带蜂窝与非授权频段的长距技术）填补了「小数据、远距离、长电池」这一格，而这一格恰恰是传统蜂窝与短距无线都不合适的地方。技术选型的成熟表现，是承认没有一种无线能通吃。</p>
+<h2>七、一句话</h2>
+<p>传感与物联网的新思想是：别把数据传上去，把智能放下来——在传感器旁边就把波形变成结论；而它交出的最实在的一课是，设备能用二十年，而支撑它的公司未必能活五年。</p>
+<div class="end"><b>新思想前沿</b> 是一个持续撰写的专栏：近十年，各主要领域最新思想的摘要，每领域约 2000 字，共 100 个学科面板，由王德生亲撰，现已全部完成。 · <a href="/frontier/" style="color:var(--gold);text-decoration:none">← 回到 100 学科面板</a></div>
+</main><script src="/wds-mode.js?v=20260801h" defer></script>
+</body></html>
