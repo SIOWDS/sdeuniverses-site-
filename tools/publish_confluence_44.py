@@ -36,7 +36,7 @@ PAPERS = [{
         "门槛，而是整体迁出可读区，落到那些不能被生产、只能由会被追究的位置去承担的凭据上；而由于绝大多数"
         "门槛没有作者，饱和的关不会被撤下，只会被继续满足。文中给出一句不含判断词的问话（这道关最近一百次"
         "判定里拦下过几次）、一个三领域量纲不同而比率相同的读数（饱和关占比）、两轴四格与最危险的那一格"
-        "（空关）、一条有固定次序的出路及其插手点、十二处兑现、两处反过来把本文削小的约束、与十种既有说法"
+        "（空关）、一条有固定次序的出路及其插手点、十二处兑现、一条反直觉的推论（**门槛权属不变时，任何提高筛选精度的努力都会缩短这道关自己的存续期**）、两处反过来把本文削小的约束、与十种既有说法"
         "的判决性分界（含与本栏之一、之八、之十五、之二十三、之四十的对照）、七条排除了最强竞争解释的判错"
         "条件，以及一条写死到二〇三〇年底的赌注。**本稿为理论建构与研究设计，不报告任何虚构的样本、统计"
         "结果或实验结论。**"),
@@ -145,11 +145,13 @@ def build_page(p, body, toc, pages):
     t = re.sub(r"<title>.*?</title>",
                f'<title>{p["title"]}——{p["sub"]} · 学科通融 | SDE Universes</title>', t, flags=re.S)
     t = re.sub(r'(<meta name="description" content=")[^"]*(")',
-               lambda m: m.group(1) + html.escape(p["deck"][:190], quote=True) + m.group(2), t)
+               lambda m: m.group(1) + html.escape(p["deck"].replace("**","")[:190], quote=True) + m.group(2), t)
     t = re.sub(r'<div class="art-series">.*?</div>',
                f'<div class="art-series">学 科 通 融 · {p["no"]} · {html.escape(p["cross"])}</div>', t, flags=re.S)
     t = re.sub(r'<h1 class="art-title">.*?</h1>', f'<h1 class="art-title">{p["title"]}</h1>', t, flags=re.S)
-    t = re.sub(r'<p class="art-sub">.*?</p>', f'<p class="art-sub">{p["sub"]}</p>', t, flags=re.S)
+    t, _n = re.subn(r'<(p|div) class="art-sub">.*?</\\1>', f'<div class="art-sub">{p["sub"]}</div>', t, count=1, flags=re.S)
+    assert _n == 1, "art-sub 未被替换——副题会残留上一篇的"
+
     t = re.sub(r'<div class="art-meta">.*?</div>',
                f'<div class="art-meta">王德生 ＋ Claude · 约 {WAN} 万字 · {pages} 页 · '
                f'三种阅读方式 · 发表于{PUBDATE}</div>', t, flags=re.S)
@@ -213,7 +215,7 @@ def build_index(built):
         cards += (f'<div class="item"><div class="n">之一 · 三学科交叉：{html.escape(p["cross"])}</div>'
                   f'<h2><a href="/confluence/{p["slug"]}/">{html.escape(p["title"])}</a></h2>'
                   f'<p class="sub">{html.escape(p["sub"])}</p>'
-                  f'<p class="hk">{html.escape(p["deck"])}</p>'
+                  f'<p class="hk">{strongify(p["deck"])}</p>'
                   f'<div class="trio">{ones}</div>'
                   f'<a class="rdmore" href="/confluence/{p["slug"]}/">读全文 →</a>'
                   f'<div class="meta">约 {wan} 万字 · {pages} 页 · 三种读法 · '
@@ -257,7 +259,7 @@ def main():
         pf.unlink()
         pages = int(subprocess.run(["pdfinfo", str(pdf)], capture_output=True, text=True)
                     .stdout.split("Pages:")[1].split()[0])
-        globals()["WAN"] = round(len(re.sub(r"<[^>]+>", "", body)) / 10000, 1)
+        globals()["WAN"] = round(len(re.findall(r"[\u4e00-\u9fff]", re.sub(r"<[^>]+>", "", body))) / 10000, 1)
         (d / "index.html").write_text(build_page(p, body, toc, pages), encoding="utf-8")
         rd = (ROOT / "public" / "paradigm" / "taken-out" / "read.html").read_text(encoding="utf-8")
         rd = rd.replace("/paradigm/taken-out", f'/confluence/{p["slug"]}') \
@@ -265,7 +267,7 @@ def main():
                .replace("典范文专栏", "学科通融")
         (d / "read.html").write_text(rd, encoding="utf-8")
         n = len(re.sub(r"<[^>]+>", "", body))
-        built.append((p, round(n / 10000, 1), pages))
+        built.append((p, WAN, pages))
         print(f'  {p["slug"]}: {n} 字 · {pages} 页 · 目录 {len(toc)} 节 · 来源 {len(p["sources"])} 家')
     idx = CF / "index.html"
     if idx.exists() and "measurable-face" in idx.read_text(encoding="utf-8"):
@@ -278,7 +280,7 @@ def main():
             card = (f'<div class="item" data-ch="{p["ch"]}"><div class="n">{p["no"]} · 三学科交叉：{html.escape(p["cross"])}</div>'
                     f'<h2><a href="/confluence/{p["slug"]}/">{html.escape(p["title"])}</a></h2>'
                     f'<p class="sub">{html.escape(p["sub"])}</p>'
-                    f'<p class="hk">{html.escape(p["deck"])}</p>'
+                    f'<p class="hk">{strongify(p["deck"])}</p>'
                     f'<div class="trio">{ones}</div>'
                     f'<a class="rdmore" href="/confluence/{p["slug"]}/">读全文 →</a>'
                     f'<div class="meta">约 {wan} 万字 · {pages} 页 · 三种读法 · '
