@@ -16,41 +16,41 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 CF = ROOT / "public" / "confluence"
 TPL = ROOT / "public" / "paradigm" / "taken-out" / "index.html"
-PUBDATE = "2026年7月27日"
+PUBDATE = "2026年8月2日"
 
 PAPERS = [{
-    "slug": "individuation-genesis",
-    "src": Path("/home/claude/conf/individuation-genesis.md"),
-    "title": "个体化的生成",
-    "sub": "论符号学、逻辑学与数学三门形式学科当今三大对立理论，如何是同一个「基本单元凭什么是它自己」问题的三个侧面",
-    "cross": "符号学 × 逻辑学 × 数学",
-    "no": "之九",
-    "deck": ("符号学、逻辑学、数学通常被当作三门各有地基的独立学科。本文论证，三门当今各自最前沿、"
-             "且互相排斥的三个判断，其实是同一个问题的三个侧面：一个基本单元——符号、有效推理、数——凭什么是它自己？"
-             "同一性既非内在实体、亦非纯差异结构、更非无，而是**一束关系经差异呈现、被指称接住的生成事件**；"
-             "三门不是三个争地基的领域，而是对同一场个体化行使的命名、判错、计算三种权能；三门老大难被诊断为同一症结的三种发作，"
-             "打开一门**形式个体化论**。本文如实标明三门坐实的层级不同：数学侧一条**结构身份原则**（为单价基础的「同构即同一」提供本体论动机）、"
-             "逻辑侧一条**本地判准**（并给出四类逻辑的结构性语义方向）、符号侧一条**概念论证**；全文无争议的**定理**只有一条——"
-             "**命名不变性定理**：可被无参数一阶语言命名的单元必为自同构群的不动点（Def⊆Fix），故其数不超过不动点数；"
-             "反向一般不成立（自同构不变不蕴含可描述，实数域自同构平凡而 π 不可一阶定义），这恰给出**命名不能被化约为计算**这一局部非还原支点。"
-             "**本稿经三轮外部审稿逐轮修订**：纠正排中律技术误断（可导出性≠相容性）、补语境封闭、把命名定理收窄为单向正确、"
-             "并把早先偏隐喻的「守恒」降格为启发式动机、承重原则改以自同构不变性为内核。"),
-    "clash": ("三家在「基本单元的同一性从何而来」这同一问题上给出互斥答案："
-              "生物符号学说同一性/意义是真实的、有根的；逻辑多元论与反例外论说没有唯一、先验、普遍的有效性判准；"
-              "单价基础说同一性纯是结构关系、无内在实体（同构即同一）。三者在本文所揭示的统一问题下处于尖锐张力，难以同时为真。"),
+    "slug": "claim-artifact",
+    "src": Path("/home/claude/conf44/article.md"),
+    "title": "认领物",
+    "sub": "一件东西里，有多少是为了证明它是你做的——论「内卷」不是投入增加而产出不增加，而是产出的构成中有一层无账可入之物的占比在持续上升",
+    "cross": "经济学 × 艺术学 × 工程学",
+    "no": "之四十四",
+    "deck": ("三个互不往来的行当同时观察到竞争的加剧，却给出互不相容的驱动：经济学判定稀缺已迁往信任与验证带宽，"
+             "艺术学判定判据已迁往来源链，工程学判定瓶颈已由生成迁往验证。三家共同站在一条从未被说出的假定上——"
+             "**一件东西的生产者是给定的，因而「是谁做的」不需要被单独生产**。推翻它的材料来自艺术学自己："
+             "伦勃朗研究项目用四十余年确定一位画家名下究竟有多少幅画，而这四十年的产出在作品那一栏里是零。"
+             "本文据此提出一个此前没有本体地位的对象——**认领物**：为使一件产出可被归属于某个人，而必须与它一并被生产的那一层东西；"
+             "它不是记录得少，是三家的账本都只给它成本位、不给产出位。由此得到一条与三家都不同的判断："
+             "**内卷不是投入增加而产出不增加，而是产出的构成中认领物占比持续上升，因没有那一栏，同一件事在三处同时显示为「努力增加、产出不变」。**"
+             "本文给出一句不含判断词的问话、一张二维辨别格、一个三领域量纲不同而比率相同的读数（**认领占比**）、"
+             "一条反直觉的机制推论（**归属判据不变时，任何提高本体产出效率的工具都会使账面内卷加剧**）、六条失效条件与三条各对一家的出路。"),
+    "clash": ("三家对「什么在驱动竞争形态的改变」给出互相取消的指派：经济学说先动的是稀缺位，艺术学说先动的是判据，"
+              "工程学说先动的是成本结构——三者不可能同时先动。更硬的是三家各自撑不住的那一处，恰好是另一家主张的原动力："
+              "经济学承认规则锁死则稀缺迁不动（艺术学的判据先行），艺术学承认来源链依赖它保证不了的条件场（工程学的成本先行），"
+              "工程学承认真正在变的是「什么算验证过了」而这不由它决定（经济学的规则与激励先行）。"),
     "sources": [
-        ("符号学 · 生物符号学",
-         "Theses on Biosemiotics: Prolegomena to a Theoretical Biology (Kull, Deacon, Emmeche, Hoffmeyer, Stjernfelt, 2009)",
-         "https://doi.org/10.1007/s12304-009-9050-8",
-         "符号过程是真实的自然事实，凡有生命进行解释处即有意义；解释项是不可还原的真实环节、不必预设外部解释者——意义有根，不可还原为纯差异结构。"),
-        ("逻辑学 · 逻辑多元论与反例外论",
-         "Logical Pluralism (SEP); Beall & Restall, Logical Pluralism (OUP 2006); Hjortland, Anti-Exceptionalism about Logic (Phil. Studies 2017)",
-         "https://plato.stanford.edu/entries/logical-pluralism/",
-         "对逻辑一元论的挑战：多元论主张不止一种正确后承关系，反例外论主张逻辑无先验例外地位、可修正——没有唯一先验普遍的有效性判准。"),
-        ("数学 · 单价基础 / 同伦类型论",
-         "Homotopy Type Theory (Univalent Foundations Program, 2013); Kapulkin & Lumsdaine, 单纯集模型中的排中律 (arXiv:2006.13694); Awodey",
-         "https://homotopytypetheory.org/book/",
-         "单价公理推出「同构即同一」。朴素排中与单价不相容，但命题层排中与单价相容（Kapulkin & Lumsdaine 证于单纯集模型）——故结构化基础中经典排中不可导出、可非构造外加，是本文跨门结论的对账靶。"),
+        ("经济学 · 人工智能的宏观约束与稀缺迁移",
+         "Daron Acemoglu, The Simple Macroeconomics of AI (NBER WP 32487); Some Simple Economics of AGI (arXiv:2602.20946)",
+         "https://www.nber.org/system/files/working_papers/w32487/w32487.pdf",
+         "收益上界由「可被客观验证的任务份额」决定；执行廉价之后约束不再是智力的稀缺，而是信任与验证带宽的稀缺，租金向来源凭证、验证级数据集与责任承保集中。"),
+        ("艺术学 · 归属判据与来源认证",
+         "Could AI Replace Human Art Experts in Attributing Paintings? (Aeon, 2026); Content Authenticities (ACM Creativity & Cognition 2025)",
+         "https://aeon.co/essays/could-ai-replace-human-art-experts-in-attributing-paintings",
+         "可见物不再能区分人手与机器之后，判据整个从成品搬到来源链；而来源信息在再混合与跨平台再发布中经常丢失，技术方案单独不足以支撑永久记录。"),
+        ("工程学 · 生成塌陷与验证缺口",
+         "Debt Behind the AI Boom (arXiv:2603.28592); More Code, Less Reuse (arXiv:2601.21276); Sonar 2026 State of Code",
+         "https://arxiv.org/html/2603.28592v2",
+         "生成成本塌陷而验证成本不降，瓶颈由「造得出」转为「验得起」；真实代码库中人机代码交错、使用未被显式记录，使代码变更的归属本身变难。"),
     ],
 }]
 
@@ -125,13 +125,13 @@ def build_page(p, body, toc, pages):
     t = re.sub(r"<title>.*?</title>",
                f'<title>{p["title"]}——{p["sub"]} · 学科通融 | SDE Universes</title>', t, flags=re.S)
     t = re.sub(r'(<meta name="description" content=")[^"]*(")',
-               lambda m: m.group(1) + html.escape(p["deck"][:190], quote=True) + m.group(2), t)
+               lambda m: m.group(1) + html.escape(p["deck"].replace("**", "")[:190], quote=True) + m.group(2), t)
     t = re.sub(r'<div class="art-series">.*?</div>',
                f'<div class="art-series">学 科 通 融 · {p["no"]} · {html.escape(p["cross"])}</div>', t, flags=re.S)
     t = re.sub(r'<h1 class="art-title">.*?</h1>', f'<h1 class="art-title">{p["title"]}</h1>', t, flags=re.S)
     t = re.sub(r'<p class="art-sub">.*?</p>', f'<p class="art-sub">{p["sub"]}</p>', t, flags=re.S)
     t = re.sub(r'<div class="art-meta">.*?</div>',
-               f'<div class="art-meta">王德生 ＋ Claude · 约 3.5 万字 · {pages} 页 · '
+               f'<div class="art-meta">王德生 ＋ Claude · 约 2.1 万字 · {pages} 页 · '
                f'三种阅读方式 · 发表于{PUBDATE}</div>', t, flags=re.S)
     t = re.sub(r'<div class="deck">.*?</div>', f'<div class="deck">{strongify(p["deck"])}</div>', t, flags=re.S)
     links = "".join(f'<a href="#{i}">{html.escape(x)}</a>' for i, x in toc)
@@ -193,7 +193,7 @@ def build_index(built):
         cards += (f'<div class="item"><div class="n">之一 · 三学科交叉：{html.escape(p["cross"])}</div>'
                   f'<h2><a href="/confluence/{p["slug"]}/">{html.escape(p["title"])}</a></h2>'
                   f'<p class="sub">{html.escape(p["sub"])}</p>'
-                  f'<p class="hk">{html.escape(p["deck"])}</p>'
+                  f'<p class="hk">{strongify(p["deck"])}</p>'
                   f'<div class="trio">{ones}</div>'
                   f'<a class="rdmore" href="/confluence/{p["slug"]}/">读全文 →</a>'
                   f'<div class="meta">约 {wan} 万字 · {pages} 页 · 三种读法 · '
@@ -243,7 +243,7 @@ def main():
                .replace("taken-out", p["slug"]).replace("一拿出来，就不是它了", p["title"]) \
                .replace("典范文专栏", "学科通融")
         (d / "read.html").write_text(rd, encoding="utf-8")
-        n = len(re.sub(r"<[^>]+>", "", body))
+        n = len(re.findall(r"[\u4e00-\u9fff]", re.sub(r"<[^>]+>", "", body)))
         built.append((p, round(n / 10000, 1), pages))
         print(f'  {p["slug"]}: {n} 字 · {pages} 页 · 目录 {len(toc)} 节 · 来源 {len(p["sources"])} 家')
     idx = CF / "index.html"
@@ -257,7 +257,7 @@ def main():
             card = (f'<div class="item"><div class="n">{p["no"]} · 三学科交叉：{html.escape(p["cross"])}</div>'
                     f'<h2><a href="/confluence/{p["slug"]}/">{html.escape(p["title"])}</a></h2>'
                     f'<p class="sub">{html.escape(p["sub"])}</p>'
-                    f'<p class="hk">{html.escape(p["deck"])}</p>'
+                    f'<p class="hk">{strongify(p["deck"])}</p>'
                     f'<div class="trio">{ones}</div>'
                     f'<a class="rdmore" href="/confluence/{p["slug"]}/">读全文 →</a>'
                     f'<div class="meta">约 {wan} 万字 · {pages} 页 · 三种读法 · '
