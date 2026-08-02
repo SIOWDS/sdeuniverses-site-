@@ -23,6 +23,7 @@ const ok = (c, m) => { if (c) PASS++; else { FAIL++; console.log("  ✗ " + m); 
 const sec = t => console.log("\n── " + t + " ──");
 
 const SRC = fs.readFileSync(path.join(ROOT, "public/wds-mode.js"), "utf8");
+const SRC_FULL = SRC;
 
 /* ── 抠段 ─────────────────────────────────────────────
    锚点要够长且**从起点之后再找终点**（同一段注释花括号在这份文件里不止一处）。 */
@@ -125,6 +126,8 @@ function boot(opts) {
     cvTalkSent: "已递给 WDS", cvKbBack: "⇩ 从知识库取回", cvKbBackT: "取回",
     cvKbBackNone: "知识库里还没有东西。", cvKbBackNo: "取不到", cvKbBackOn: "正在取…",
     cvKbBackOk: "已取回画布", cvFromKb: "从知识库取回",
+    cvNew: "＋ 新建", cvNewT: "新建", cvNewTitle: "无题 {n}", cvWrite: "✍ 现在就写一篇",
+    cvToBox: "📥 投进草稿箱", cvToBoxT: "投稿", cvToBoxAsk: "留一句话", cvToBoxNo: "投不进去",
     cvKb: "⇧ 存进知识库", cvKbT: "存进知识库", cvKbNo: "模块没装载",
     cvCo: "⚡ 共创", cvCoT: "共创", cvCoWrite: "改写法", cvCoShape: "改结构", cvCoSde: "SDE 的动作",
     cvCoOn: "正在让 WDS {op}…", cvCoWhole: "整版", cvCoSeg: "选中的 {n} 字",
@@ -217,7 +220,7 @@ function boot(opts) {
   vm.runInContext(SEG + "\nthis.__x = { CV: CV, cvAdd: cvAdd, cvScan: cvScan, cvTake: cvTake, cvPaint: cvPaint, " +
     "cvAskRevise: cvAskRevise, cvFind: cvFind, cvNorm: cvNorm, cvStrip: cvStrip, cvReset: cvReset, " +
     "cvFrameDoc: cvFrameDoc, cvText: cvText, cvCur: cvCur, cvSave: cvSave, cvRestore: cvRestore, cvSelCatch: cvSelCatch, " +
-    "cvTalkAdd: cvTalkAdd, cvNotes: cvNotes, cvTalkAsk: cvTalkAsk, cvFullSet: cvFullSet, cvKbBack: cvKbBack, " +
+    "cvNewItem: cvNewItem, cvEditCommit: cvEditCommit, cvTalkAdd: cvTalkAdd, cvNotes: cvNotes, cvTalkAsk: cvTalkAsk, cvFullSet: cvFullSet, cvKbBack: cvKbBack, " +
     "topFit: topFit, MORE_BTNS: MORE_BTNS, cvShow: cvShow, cvMeta: cvMeta, cvPush: cvPush, cvByLabel: cvByLabel, CO_OPS: CO_OPS, coOp: coOp, cvCoRun: cvCoRun, cvGrab: cvGrab };", ctx);
   const x = ctx.__x;
   x._ = { layer, cvEl, tabs, bar, wrap, btn, store, toasts, prompts, confirms, prints, ctx, TX,
@@ -894,6 +897,101 @@ sec("⑭ 展开：画布占满整层，关掉不许留白屏");
 
 /* ⚠ 这一节要 await（取回是异步的），而本文件是 CommonJS —— 顶层 await 会让 node
    连模块格式都判不出来。包进 async IIFE，收尾的计数也一起放进来。 */
+/* ══ ⑯ 新建：打开就能写 ══════════════════════════ */
+sec("⑯ 新建一篇（画布原来只能等东西落进来）");
+{
+  const C = boot();
+  C.cvPaint();
+  /* 空态第一件事应当是"能开始"，不是读一段说明 */
+  const go = C._.wrap.querySelector(".wdsm-cvb");
+  ok(!!go && String(go.textContent).indexOf("写一篇") > -1, "空态没有「现在就写一篇」");
+  /* 「＋ 新建」必须挂在标签行 —— 工具条在画布空着时根本不渲染 */
+  const nb = C._.tabs.children.find(x => String(x.textContent).indexOf("新建") > -1);
+  ok(!!nb, "标签行上没有「＋ 新建」");
+  /* 它必须有自己的类：站上好几处是数 .wdsm-cvtab 来判"画布上有几件"的，
+     蹭那个类会让件数全部多算一件（sim_wds_mode_v2 当场红五条）。 */
+  ok(nb && nb.className === "wdsm-cvnew", "「＋ 新建」蹭了标签页的类：" + (nb && nb.className));
+  ok(C._.tabs.children.filter(x => String(x.className).indexOf("wdsm-cvtab") > -1).length === 0,
+    "画布空着时不该有任何标签页");
+
+  nb.onclick();
+  ok(C.CV.items.length === 1, "新建没造出一件");
+  const it = C.CV.items[0];
+  ok(it.kind === "md" && it.vers[0] === "", "新件不是空白 md");
+  ok(C.CV.edit === true, "新建之后没有直接进编辑态（还要再点一下「✎ 编辑」）");
+  ok(!!C._.wrap.querySelector(".wdsm-cvrt"), "新建之后没有进所见即所得");
+  ok(C.cvByLabel(C.cvMeta(it)[0]) === "我手改" || C.cvMeta(it)[0].by === "me",
+    "自己开的一篇被记成了 WDS 写的");
+
+  /* 连开两篇不许撞名（撞名会被 cvAdd 当成同一件） */
+  C.cvPaint();
+  C._.tabs.children.find(x => String(x.textContent).indexOf("新建") > -1).onclick();
+  ok(C.CV.items.length === 2, "第二篇没开出来");
+  ok(C.CV.items[0].title !== C.CV.items[1].title, "两篇撞名了：" + C.CV.items[0].title);
+
+  /* 存第一次时用正文的一级标题当件名 */
+  const C2 = boot();
+  C2.cvPaint();
+  C2._.tabs.children.find(x => String(x.textContent).indexOf("新建") > -1).onclick();
+  const it2 = C2.CV.items[0];
+  ok(it2.auto === 1, "新件没有标成自动起名");
+  // ⚠ 要照产品那条路走：cvEditCommit 会先 cvGrab()，富文本态下以编辑区为准，
+  //    直接塞 it.draft 会被当场覆盖（第一版就是这么写的，测出来"没按标题命名"是假象）。
+  const ed2 = C2._.wrap.querySelector(".wdsm-cvrt");
+  ok(!!ed2, "新建之后没有编辑区");
+  ed2.innerHTML = "<h1>关于判准的交接</h1><p>正文一段。</p>";
+  ed2.oninput();
+  C2.cvEditCommit(it2);
+  ok(it2.title === "关于判准的交接", "存了却没按正文标题命名：" + it2.title);
+  ok(it2.auto === undefined, "命过名之后还留着 auto 标记");
+
+  /* 读者自己改过名的，绝不许被正文改回去 */
+  const C3 = boot();
+  C3.cvPaint();
+  C3._.tabs.children.find(x => String(x.textContent).indexOf("新建") > -1).onclick();
+  const it3 = C3.CV.items[0];
+  it3.title = "我自己起的名"; delete it3.auto;
+  const ed3 = C3._.wrap.querySelector(".wdsm-cvrt");
+  ed3.innerHTML = "<h1>正文里的标题</h1><p>内容。</p>";
+  ed3.oninput();
+  C3.cvEditCommit(it3);
+  ok(it3.title === "我自己起的名", "读者起的名被正文标题覆盖了");
+}
+
+/* ══ ⑰ 文案表不许有撞键 ══════════════════════════ */
+sec("⑰ 文案表：同名键会静默覆盖");
+{
+  /* ⚠ 这一条是被真事逼出来的：草稿箱那一族用了 `cvDraft`，
+     而「有未存的草稿」早就占着这个键 —— 同一个对象字面量里后写的赢，
+     于是**投进草稿箱那颗按钮的标签变成了"有未存的草稿"**。
+     源码级断言查的是 `sec2(tx("cvDraft")` 这个字符串，照样全绿。 */
+  const dup = [];
+  ["zh", "en"].forEach(() => {});
+  /* ⚠ 不能只认行首的键。这张表里一行常常写好几个
+     （`cvEditNo: "…", cvDraft: "…"`），而撞的那个恰恰是行内第二个——
+     第一版按行首扫，变异检验当场证明它抓不到。
+     改成认所有「键: "字符串"」。 */
+  const re = /(?:^|[,{])\s*([a-zA-Z][a-zA-Z0-9_]*)\s*:\s*"/gm;
+  // 按语言块切开：两块各自查（跨块同名是正常的）
+  const blocks = SRC_FULL.split(/\n\s{4}(?:zh|en)\s*:\s*\{/).slice(1);
+  const scan = (txt) => {
+    const seen = {}, d = [];
+    let m; const r2 = new RegExp(re.source, "gm");
+    while ((m = r2.exec(txt))) { if (seen[m[1]]) d.push(m[1]); else seen[m[1]] = 1; }
+    return d;
+  };
+  const T0 = SRC_FULL.indexOf("cvTitle: \"画布\"");
+  const T1 = SRC_FULL.indexOf("cvTitle: \"Canvas\"");
+  ok(T0 > 0 && T1 > T0, "找不到中英两张文案表");
+  const zhBlock = SRC_FULL.slice(SRC_FULL.lastIndexOf("{", T0), T1);
+  const enBlock = SRC_FULL.slice(T1, T1 + 20000);
+  const dz = scan(zhBlock), de = scan(enBlock);
+  ok(dz.length === 0, "中文文案表有撞键（后写的会静默覆盖）：" + dz.join(", "));
+  ok(de.length === 0, "英文文案表有撞键：" + de.join(", "));
+  /* 反向再钉：两处不同的意思不许再共用 cvDraft */
+  ok(/cvToBox: /.test(SRC_FULL), "草稿箱那一族没有改名，仍在和「有未存的草稿」抢 cvDraft");
+}
+
 (async function () {
 sec("⑮ 从知识库取回（资料库此前是单向的）");
 {

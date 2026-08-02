@@ -757,12 +757,14 @@
       cvTalkAsk: "⚡ 就这条问 WDS", cvTalkDel: "删",
       cvTalkPre: "下面是画布《{t}》里的一段，以及我对它的批注。请就这一处跟我讨论，不要重写整段：",
       cvTalkSent: "已把这一条递给 WDS —— 讨论出来的话留在对话里；要落成新版本，用「⚡ 共创」。",
-      cvDraft: "📥 投进草稿箱", cvDraftT: "投给站上的管理系统（不对外开放，只有管理员看得到），等着被改成站上的一页",
-      cvDraftOn: "正在投…", cvDraftOk: "已投进草稿箱。",
-      cvDraftDup: "这一件已经在草稿箱里了（同题同文）。",
-      cvDraftNo: "投不进去——先在「SDE 社区」用名字和密码登录一次。",
-      cvDraftShut: "草稿箱不对外开放。",
-      cvDraftAsk: "给它留一句话（要改成什么、发到哪个栏目）——可以空着：",
+      cvNew: "＋ 新建", cvNewT: "开一篇空白稿，直接在这儿写（不必等东西落进来）",
+      cvNewTitle: "无题 {n}", cvWrite: "✍ 现在就写一篇",
+      cvToBox: "📥 投进草稿箱", cvToBoxT: "投给站上的管理系统（不对外开放，只有管理员看得到），等着被改成站上的一页",
+      cvToBoxOn: "正在投…", cvToBoxOk: "已投进草稿箱。",
+      cvToBoxDup: "这一件已经在草稿箱里了（同题同文）。",
+      cvToBoxNo: "投不进去——先在「SDE 社区」用名字和密码登录一次。",
+      cvToBoxShut: "草稿箱不对外开放。",
+      cvToBoxAsk: "给它留一句话（要改成什么、发到哪个栏目）——可以空着：",
       cvKbBack: "⇩ 从知识库取回", cvKbBackT: "把你存进 SDE 个人知识库的成品拉回画布接着改",
       cvKbBackNone: "知识库里还没有东西。画布上任何一件点「⇧ 存进知识库」就存进去了。",
       cvKbBackNo: "取不到——先在「SDE 社区」用名字和密码登录一次（全站通用）。",
@@ -861,12 +863,14 @@
       cvTalkAsk: "\u26a1 Take this to SDE", cvTalkDel: "Delete",
       cvTalkPre: "Below is a passage from the canvas \u201c{t}\u201d and my note on it. Discuss this one point with me; do not rewrite the passage:",
       cvTalkSent: "Sent. The discussion stays in the conversation; to turn it into a new version, use Co-create.",
-      cvDraft: "\ud83d\udce5 To draft box", cvDraftT: "Send to the site admin draft box (private)",
-      cvDraftOn: "Sending\u2026", cvDraftOk: "Sent to the draft box.",
-      cvDraftDup: "Already in the draft box (same title and text).",
-      cvDraftNo: "Could not send \u2014 sign in once at SDE Community.",
-      cvDraftShut: "The draft box is not open to the public.",
-      cvDraftAsk: "One line for it (what to turn it into, which column) \u2014 may be blank:",
+      cvNew: "\uff0b New", cvNewT: "Start a blank draft and write it here",
+      cvNewTitle: "Untitled {n}", cvWrite: "\u270d Write something now",
+      cvToBox: "\ud83d\udce5 To draft box", cvToBoxT: "Send to the site admin draft box (private)",
+      cvToBoxOn: "Sending\u2026", cvToBoxOk: "Sent to the draft box.",
+      cvToBoxDup: "Already in the draft box (same title and text).",
+      cvToBoxNo: "Could not send \u2014 sign in once at SDE Community.",
+      cvToBoxShut: "The draft box is not open to the public.",
+      cvToBoxAsk: "One line for it (what to turn it into, which column) \u2014 may be blank:",
       cvKbBack: "\u21e9 From library", cvKbBackT: "Pull something you saved into your SDE library back onto the canvas",
       cvKbBackNone: "Your library is empty. Use \u21e7 Save to library on any canvas item.",
       cvKbBackNo: "Could not load \u2014 sign in once at SDE Community with your name and password.",
@@ -981,6 +985,9 @@
     ".wdsm-cvtabs{display:flex;gap:5px;overflow-x:auto;flex:1;min-width:0}" +
     ".wdsm-cvtab{background:var(--wfill);border:1px solid var(--wline);color:var(--wdim);font:12px/1 inherit;padding:6px 10px;border-radius:8px;cursor:pointer;white-space:nowrap}" +
     ".wdsm-cvtab.on{background:var(--wfill2);border-color:var(--wgold);color:var(--wgold)}" +
+    ".wdsm-cvnew{background:none;border:1px dashed var(--wline);color:var(--wdim);font:12px/1 inherit;" +
+      "padding:6px 10px;border-radius:8px;cursor:pointer;white-space:nowrap;flex:none}" +
+    ".wdsm-cvnew:hover{color:var(--wgold);border-color:var(--wgold)}" +
     ".wdsm-cvbar{display:flex;align-items:center;gap:6px;padding:7px 12px;border-bottom:1px solid var(--wline);flex-wrap:wrap}" +
     ".wdsm-cvb{background:none;border:1px solid var(--wline);color:var(--wdim);font:12px/1 inherit;padding:6px 10px;border-radius:8px;cursor:pointer}" +
     ".wdsm-cvb.on{border-color:var(--wgold);color:var(--wgold)}" +
@@ -3842,11 +3849,25 @@
       b.onclick = function () { cvGrab(); CV.cur = i; CV.src = false; CV.sel = ""; CV.edit = false; CV.diff = false; CV.talk = false; CV.note = ""; cvPaint(); };
       cvTabsEl.appendChild(b);
     });
+    /* 「＋ 新建」挂在标签行而不是工具条：工具条在画布空着时根本不渲染，
+       挂那儿等于"没有东西的时候才最需要它，偏偏那时候它不在"。 */
+    /* ⚠ 自己的类 `wdsm-cvnew`，不能蹭 `wdsm-cvtab`：
+       站上好几处是**数 .wdsm-cvtab 的个数**来判"画布上有几件"的，
+       蹭了那个类，件数从此全部多算一件（sim_wds_mode_v2 当场红了五条）。 */
+    var nb = el("button", "wdsm-cvnew", tx("cvNew"));
+    nb.title = tx("cvNewT");
+    nb.onclick = function () { cvGrab(); cvNewItem(); };
+    cvTabsEl.appendChild(nb);
     cvBarEl.innerHTML = ""; cvWrapEl.innerHTML = ""; cvAskBtn = null;
     cvSave();
     var it = cvCur();
     if (!it) {
       var em = el("div", "wdsm-cvempty");
+      // 空态第一件事应当是"能开始"，不是读一段说明
+      var go = el("button", "wdsm-cvb on", tx("cvWrite"));
+      go.style.cssText = "font-size:14px;padding:9px 16px;margin:0 0 16px";
+      go.onclick = function () { cvNewItem(); };
+      em.appendChild(go);
       tx("cvEmpty").split("\n\n").forEach(function (p) { em.appendChild(el("p", null, p)); });
       cvWrapEl.appendChild(em);
       return;
@@ -3930,7 +3951,7 @@
        不在名单里的人拿到的是一句人话（不是 404——假装不存在只会让人反复试）。
        这条边此前整条是断的：画布上的成品只能往社区走（知识库/候选卡），
        没有任何路径能把它送到"要改成站上一页"的地方。 */
-    sec2(tx("cvDraft"), tx("cvDraftT"), function () { cvDraftPost(it); });
+    sec2(tx("cvToBox"), tx("cvToBoxT"), function () { cvDraftPost(it); });
     mk(tx("cvEdit"), function () { cvEditOn(it); }, CV.edit).title = tx("cvEditT");
     if (it.vers.length > 1) {
       mk(tx("cvDiff"), function () {
@@ -4358,6 +4379,26 @@
      共创里"讨论"和"改写"是两件事：讨论的产物是**话**，改写的产物是**新版本**。
      所以这里刻意**不设 CV.want** —— 回话留在对话里，不会被收成版本；
      真要落成版本，读者去点「⚡ 共创」。两件混在一起，版本链会被聊天噪音塞满。 */
+  /* ── 新建一篇 ────────────────────────────────────────
+     画布原来只能**等东西落进来**（围栏块、深度研究的报告、手点「落到画布」），
+     开不了一篇空白稿。而它既然已经是个带排版的编辑器，"打开就能写"本来就该有。
+     ⚠ 不走 cvAdd：那条路把归属记成 wds，而这一篇是人自己开的。 */
+  function cvNewItem() {
+    var n = 1, used = {};
+    CV.items.forEach(function (x) { used[x.title] = 1; });
+    while (used[tx("cvNewTitle", { n: n })]) n++;      // 标题撞了会被 cvAdd 当成同一件，先躲开
+    var it = {
+      kind: "md", title: tx("cvNewTitle", { n: n }), vers: [""], vi: 0, auto: 1,
+      meta: [{ by: "me", op: tx("cvNew").replace(/^\S\s*/, ""), at: stampTime() }]
+    };
+    CV.items.push(it);
+    CV.cur = CV.items.length - 1;
+    CV.src = false; CV.diff = false; CV.talk = false; CV.sel = ""; CV.note = "";
+    cvShow(true);
+    cvEditOn(it);          // 开出来就在编辑态，不必再点一下「✎ 编辑」
+    return it;
+  }
+
   function cvNotes(it) { if (!it.notes) it.notes = []; return it.notes; }
   function cvTalkAdd(it, q, text) {
     text = String(text || "").trim();
@@ -4467,11 +4508,11 @@
   function cvDraftPost(it) {
     var c = "";
     try { c = (window.SDEVault && window.SDEVault.cred && window.SDEVault.cred()) || ""; } catch (e) {}
-    if (!c) { cvNote(tx("cvDraftNo")); return; }
-    var note = window.prompt(tx("cvDraftAsk"), "");
+    if (!c) { cvNote(tx("cvToBoxNo")); return; }
+    var note = window.prompt(tx("cvToBoxAsk"), "");
     if (note === null) return;                 // 取消就是取消，不要投
     cvGrab();
-    cvNote(tx("cvDraftOn"));
+    cvNote(tx("cvToBoxOn"));
     fetch("/api/im", {
       method: "POST", headers: { "content-type": "application/json" },
       body: JSON.stringify({
@@ -4482,12 +4523,12 @@
     }).then(function (r) { return r.json(); }).then(function (d) {
       var x = (d && d.d) ? d.d : d;            // 信封只拆一次
       if (x && x.ok) {
-        cvNote((x.dup ? tx("cvDraftDup") : tx("cvDraftOk")) +
+        cvNote((x.dup ? tx("cvToBoxDup") : tx("cvToBoxOk")) +
           ' <a href="/admin/drafts/" target="_blank">去草稿箱 \u2192</a>');
       } else {
-        cvNote(esc((x && x.msg) || tx("cvDraftNo")));
+        cvNote(esc((x && x.msg) || tx("cvToBoxNo")));
       }
-    }, function () { cvNote(tx("cvDraftNo")); });
+    }, function () { cvNote(tx("cvToBoxNo")); });
   }
 
   function cvOrigin() {
@@ -4576,6 +4617,12 @@
     var v = typeof it.draft === "string" ? it.draft : cvText();
     if (v === cvText()) { CV.note = tx("cvEditNo"); CV.edit = false; delete it.draft; cvPaint(); return; }
     cvPush(it, v, "me", "");
+    /* 自动起名的件（「无题 N」）存第一次时，用正文的一级标题当件名。
+       只对 `auto` 的件动 —— 读者自己改过名的，绝不许被正文改回去。 */
+    if (it.auto) {
+      var m1 = /^\s*#{1,3}\s+(.{1,60})/.exec(v);
+      if (m1) { it.title = m1[1].trim().slice(0, 60); delete it.auto; }
+    }
     delete it.draft; CV.edit = false; CV.note = "";
     cvPaint();
     toast(tx("cvNewVer", { n: it.vers.length }));

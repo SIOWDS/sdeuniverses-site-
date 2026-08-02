@@ -182,7 +182,10 @@ sec("② 两道门：不对外开放");
 /* ══ ③ 画布接线 ═════════════════════════════════ */
 sec("③ 画布接线");
 {
-  ok(/sec2\(tx\("cvDraft"\)/.test(M), "画布「⋯」里没有投进草稿箱");
+  /* ⚠ 键名从 cvDraft 改成了 cvToBox：cvDraft 早被「有未存的草稿」占着，
+     同一个对象字面量里后写的赢，当时那颗按钮的标签被静默改成了"有未存的草稿"。 */
+  ok(/sec2\(tx\("cvToBox"\)/.test(M), "画布「⋯」里没有投进草稿箱");
+  ok(!/cvDraft: "\u{1F4E5}/u.test(M), "草稿箱那一族又用回了 cvDraft，会和「有未存的草稿」撞键");
   ok(/function cvDraftPost/.test(M), "cvDraftPost 不在");
   const s = M.slice(M.indexOf("function cvDraftPost"), M.indexOf("function cvDraftPost") + 1600);
   ok(/op: "dr", a: "add"/.test(s), "投稿没走 op:dr");
