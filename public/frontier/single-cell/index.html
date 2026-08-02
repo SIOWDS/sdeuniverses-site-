@@ -1,0 +1,58 @@
+<!DOCTYPE html><html lang="zh"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>单细胞组学 · 新思想前沿 | SDE Universes</title>
+<meta name="description" content="这十年的思想转向：从测细胞到画图谱，再到把图谱放回组织的空间里；而最深的问题是「细胞类型」这个概念本身——数据给出的是连续统，离散分类是我们强加的。">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Noto+Serif+SC:wght@300;400;500;600&display=swap">
+<style>
+:root{--bg:#F5EFE0;--card:#FAF6EC;--gold:#8A6817;--gold2:#A88233;--text:#2A2315;--text2:#6B5D47;--muted:#98886C;--border:rgba(138,104,23,0.22)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'Noto Serif SC',Georgia,serif;line-height:1.9;-webkit-font-smoothing:antialiased}
+.top{max-width:760px;margin:0 auto;padding:1.4rem 1.5rem 0;font-size:.86rem}
+.top a{color:var(--gold);text-decoration:none;font-weight:600}.top a:hover{text-decoration:underline}
+.top .sep{color:var(--muted);margin:0 .5rem}
+main{max-width:760px;margin:0 auto;padding:1.5rem 1.5rem 4rem}
+.kicker{font-size:.82rem;letter-spacing:.18em;color:var(--gold2);font-weight:600;margin-bottom:.9rem}
+h1{font-size:2rem;line-height:1.3;font-weight:700;margin-bottom:.7rem;letter-spacing:.01em}
+.meta{font-size:.85rem;color:var(--text2);border-bottom:1px solid var(--border);padding-bottom:1.1rem;margin-bottom:1.6rem}
+.lede{font-size:1.12rem;color:var(--text);font-weight:500;margin-bottom:1.5rem}
+h2{font-size:1.18rem;font-weight:600;color:var(--gold);margin:1.9rem 0 .6rem}
+p{margin:0 0 1.1rem;text-align:justify}
+.end{margin-top:2rem;padding-top:1.2rem;border-top:1px solid var(--border);font-size:.86rem;color:var(--muted)}
+.end b{color:var(--text2)}
+</style></head><body>
+<div class="top"><a href="/browse/">SDE Universes</a><span class="sep">·</span><a href="/frontier/">新思想前沿</a><span class="sep">›</span><span style="color:var(--text2)">生命科学</span></div>
+<main>
+<div class="kicker">新思想前沿 · 生命科学</div>
+<h1>单细胞组学</h1>
+<div class="meta">近十年最新思想摘要 · 约 1600 字 · 王德生 亲撰 · 2026 年 8 月</div>
+<p class="lede">这十年生命科学最具规模的技术转向，是把测量单位从「一团组织」换成了「一个细胞」。此前的转录组测量给出的是几百万细胞的平均值——而平均值可能不对应任何一个真实细胞。单细胞技术把这层遮蔽揭开后，先是发现了大量此前不知道存在的细胞状态，接着是把它们放回组织的空间位置里。而随之浮现的最深问题不是技术性的：当数据给出的是一片连续统时，「细胞类型」这个用了两百年的概念还成不成立。</p>
+<h2>一、平均值遮蔽了什么</h2>
+<p>组织匀浆后的测量给出的是加权平均：一群细胞的表达谱被混成一条。若两组样本的差异其实只是某种细胞的比例不同，平均值会把它误报为「基因表达改变」。这个混淆在过去二十年的大量文献里都存在。</p>
+<p>单细胞测序把每个细胞的转录本单独打上条形码，从而把平均值拆开。第一批结果就改写了若干组织的细胞清单——肺、肠、免疫系统里都发现了此前未被描述的稀有细胞类型，其中一些与具体疾病直接相关。</p>
+<p>技术上的关键并非测序本身，而是分选与标记：微流控液滴、组合条形码与分子唯一标识，把成本从每细胞数美元压到极低，使一次实验测数十万细胞成为常规。</p>
+<h2>二、从转录组到多组学</h2>
+<p>很快，同一个细胞里被同时测量的东西多了起来：染色质可及性、表面蛋白、DNA 甲基化、以及基因组本身。多模态测量的价值在于把「这个细胞在表达什么」与「它为什么被允许表达」放在同一个细胞里比对。</p>
+<p>与之配套的是谱系追踪：用可积累的编辑痕迹或天然的体细胞突变作为条形码，重建细胞的家谱。它回答的是纯表达数据答不了的问题——这两种状态是同一谱系的两个阶段，还是两条独立来源。</p>
+<p>这条线把发育生物学的老问题重新变成了可测的（与发育医学面板相接）。</p>
+<h2>三、空间回来了</h2>
+<p>单细胞测序的代价是把组织打碎，位置信息随之丢失——而对多数生理与病理问题，「谁挨着谁」恰恰是关键。这十年后半段的主线因此是空间转录组：在保持组织切片完整的前提下测量表达，从几十微米的斑点分辨率推进到亚细胞分辨率。</p>
+<p>两条技术路线并行：一条基于原位杂交与成像，靶向数百到数千个基因但分辨率高；另一条基于空间条形码捕获，可测全转录组但分辨率与捕获效率受限。</p>
+<p>空间数据带来的新概念是「邻域」：细胞的功能状态取决于它周围有什么。肿瘤微环境、免疫浸润的空间格局、以及组织中的局部生态位，从此可以被定量描述而不只是被形容。</p>
+<h2>四、细胞图谱</h2>
+<p>国际协作把这些技术用到了系统性编目：给人体所有器官的所有细胞类型建一份参考图谱，跨年龄、跨人群、跨状态。到这十年中期，覆盖数千万细胞的阶段性版本已经发布，涵盖大部分主要器官。</p>
+<p>图谱的价值不在于清单本身，而在于它成为坐标系：新的实验数据可以被投影到参考上，从而回答「这批细胞是什么、异常在哪」，而不必每次从零开始注释。</p>
+<p>与之伴随的是标准化的必要：不同实验室、不同平台、不同批次之间的技术差异极大，整合算法必须在「消除批次效应」与「不抹掉真实生物差异」之间走钢丝——这是这个领域最主要的方法学争议。</p>
+<h2>五、「细胞类型」这个概念</h2>
+<p>最有思想分量的问题由数据本身逼出来。降维图上看到的往往不是几团离散的点，而是连续的流形：细胞沿着分化轨迹、激活程度、代谢状态连续分布。此时把它切成若干「类型」，究竟是在发现自然的关节，还是在强加我们的分类？</p>
+<p>这十年形成的折中是分层描述：用「类型」指称由发育谱系决定、相对稳定的身份，用「状态」指称可逆的、由环境驱动的变化，并在报告结果时明确说明聚类分辨率与所用参数。</p>
+<p>这与生物学史上的老争论一脉相承——物种、器官、类型这些范畴，从来都是既有自然根据又有约定成分。区别在于，这一次我们有足够的数据看清连续统的形状（与比较宗教、社会本体论那边关于分类的讨论异曲同工，见相邻面板）。</p>
+<h2>六、分析比测量更容易出错</h2>
+<p>一个务实的教训是：单细胞数据的结论对分析选择极其敏感。归一化方式、降维参数、聚类分辨率、以及整合算法的选取，都会改变最终看到的「细胞类型」数量与差异基因清单。</p>
+<p>再加上数据的固有特点——大量零值（一个基因没测到，可能是没表达，也可能是没捕获）与强烈的技术噪声——使得「差异表达」的统计推断远比常规转录组复杂；把细胞当作独立样本做检验会严重高估显著性，因为同一个体的细胞并不独立。</p>
+<p>这十年的规范因此强调：报告分析流程与参数、用多个分辨率检查结论稳健性、并以个体而非细胞为统计单位。这是又一处「方法学比结论更值钱」的例子（见相邻面板）。</p>
+<h2>七、一句话</h2>
+<p>单细胞组学的新思想是：平均值遮蔽了一切，把它拆开之后又必须把位置装回去；而当数据显示细胞其实分布在连续统上时，真正的问题变成了——「类型」是我们发现的，还是我们画的。</p>
+<div class="end"><b>新思想前沿</b> 是一个持续撰写的专栏：近十年，各主要领域最新思想的摘要，每领域约 2000 字，共 100 个学科面板，由王德生亲撰、逐月填充。 · <a href="/frontier/" style="color:var(--gold);text-decoration:none">← 回到 100 学科面板</a></div>
+</main><script src="/wds-mode.js?v=20260801h" defer></script>
+</body></html>
