@@ -757,6 +757,12 @@
       cvTalkAsk: "⚡ 就这条问 WDS", cvTalkDel: "删",
       cvTalkPre: "下面是画布《{t}》里的一段，以及我对它的批注。请就这一处跟我讨论，不要重写整段：",
       cvTalkSent: "已把这一条递给 WDS —— 讨论出来的话留在对话里；要落成新版本，用「⚡ 共创」。",
+      cvDraft: "📥 投进草稿箱", cvDraftT: "投给站上的管理系统（不对外开放，只有管理员看得到），等着被改成站上的一页",
+      cvDraftOn: "正在投…", cvDraftOk: "已投进草稿箱。",
+      cvDraftDup: "这一件已经在草稿箱里了（同题同文）。",
+      cvDraftNo: "投不进去——先在「SDE 社区」用名字和密码登录一次。",
+      cvDraftShut: "草稿箱不对外开放。",
+      cvDraftAsk: "给它留一句话（要改成什么、发到哪个栏目）——可以空着：",
       cvKbBack: "⇩ 从知识库取回", cvKbBackT: "把你存进 SDE 个人知识库的成品拉回画布接着改",
       cvKbBackNone: "知识库里还没有东西。画布上任何一件点「⇧ 存进知识库」就存进去了。",
       cvKbBackNo: "取不到——先在「SDE 社区」用名字和密码登录一次（全站通用）。",
@@ -855,6 +861,12 @@
       cvTalkAsk: "\u26a1 Take this to SDE", cvTalkDel: "Delete",
       cvTalkPre: "Below is a passage from the canvas \u201c{t}\u201d and my note on it. Discuss this one point with me; do not rewrite the passage:",
       cvTalkSent: "Sent. The discussion stays in the conversation; to turn it into a new version, use Co-create.",
+      cvDraft: "\ud83d\udce5 To draft box", cvDraftT: "Send to the site admin draft box (private)",
+      cvDraftOn: "Sending\u2026", cvDraftOk: "Sent to the draft box.",
+      cvDraftDup: "Already in the draft box (same title and text).",
+      cvDraftNo: "Could not send \u2014 sign in once at SDE Community.",
+      cvDraftShut: "The draft box is not open to the public.",
+      cvDraftAsk: "One line for it (what to turn it into, which column) \u2014 may be blank:",
       cvKbBack: "\u21e9 From library", cvKbBackT: "Pull something you saved into your SDE library back onto the canvas",
       cvKbBackNone: "Your library is empty. Use \u21e7 Save to library on any canvas item.",
       cvKbBackNo: "Could not load \u2014 sign in once at SDE Community with your name and password.",
@@ -3914,6 +3926,11 @@
                              //   传个带 _note 的假壳它会静默什么都不做（看着像存成功了）
     });
     sec2(tx("cvKbBack"), tx("cvKbBackT"), function () { cvKbBack(cvMoreBtn || cvBarEl); });
+    /* 画布 → SDE 浏览的管理系统。**不对外开放**：门在服务端的管理员名单上，
+       不在名单里的人拿到的是一句人话（不是 404——假装不存在只会让人反复试）。
+       这条边此前整条是断的：画布上的成品只能往社区走（知识库/候选卡），
+       没有任何路径能把它送到"要改成站上一页"的地方。 */
+    sec2(tx("cvDraft"), tx("cvDraftT"), function () { cvDraftPost(it); });
     mk(tx("cvEdit"), function () { cvEditOn(it); }, CV.edit).title = tx("cvEditT");
     if (it.vers.length > 1) {
       mk(tx("cvDiff"), function () {
@@ -4444,6 +4461,33 @@
         });
       });
     }, function () { cvNote(tx("cvKbBackNo")); });
+  }
+
+  /* 投进草稿箱。走 /api/im op:"dr"，身份用社区那把（与知识库同一把 uid，不另造）。 */
+  function cvDraftPost(it) {
+    var c = "";
+    try { c = (window.SDEVault && window.SDEVault.cred && window.SDEVault.cred()) || ""; } catch (e) {}
+    if (!c) { cvNote(tx("cvDraftNo")); return; }
+    var note = window.prompt(tx("cvDraftAsk"), "");
+    if (note === null) return;                 // 取消就是取消，不要投
+    cvGrab();
+    cvNote(tx("cvDraftOn"));
+    fetch("/api/im", {
+      method: "POST", headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        credential: c, op: "dr", a: "add",
+        title: it.title, kind: it.kind, text: cvText(),
+        from: "ChatSDE \u00b7 画布", ver: it.vi + 1, note: String(note || "").slice(0, 400)
+      })
+    }).then(function (r) { return r.json(); }).then(function (d) {
+      var x = (d && d.d) ? d.d : d;            // 信封只拆一次
+      if (x && x.ok) {
+        cvNote((x.dup ? tx("cvDraftDup") : tx("cvDraftOk")) +
+          ' <a href="/admin/drafts/" target="_blank">去草稿箱 \u2192</a>');
+      } else {
+        cvNote(esc((x && x.msg) || tx("cvDraftNo")));
+      }
+    }, function () { cvNote(tx("cvDraftNo")); });
   }
 
   function cvOrigin() {
