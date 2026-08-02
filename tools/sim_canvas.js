@@ -84,9 +84,26 @@ function boot(opts) {
   const bar = mkEl("div", "wdsm-cvbar");
   const wrap = mkEl("div", "wdsm-cvwrap");
   const btn = mkEl("button", "wdsm-cvbtn");
+  // 顶栏（收纳逻辑要用）
+  const top = mkEl("div", "wdsm-top");
+  const memB = mkEl("button", "wdsm-membtn"); const memBadgeEl = mkEl("i", "wdsm-mbadge");
+  const memLbl = mkEl("span", "mb", "◎ 记忆");        // 真按钮的文字在 .mb 里，不在按钮上
+  memBadgeEl.style.display = "none"; memB.appendChild(memLbl); memB.appendChild(memBadgeEl);
+  memB._q = { ".wdsm-mbadge": memBadgeEl, ".mb": memLbl };
+  const moreB = mkEl("button", "wdsm-morebtn"); const moreBadge = mkEl("i", "wdsm-mbadge");
+  moreBadge.style.display = "none"; moreB.appendChild(moreBadge);
+  moreB._q = { ".wdsm-mbadge": moreBadge };
+  const langB = mkEl("button", "wdsm-langbtn", "EN");
+  const distB = mkEl("button", "wdsm-distbtn", "存盘"); const pdfB = mkEl("button", "wdsm-pdfbtn", "⤓ PDF");
+  const keyB = mkEl("button", "wdsm-keybtn", "Key");
+  [langB, distB, pdfB, memB, keyB, moreB].forEach(b => top.appendChild(b));
   cvEl._q = { ".wdsm-cvtop b": cvTopB, ".wdsm-cvx": cvX };
   const layer = mkEl("div", "wdsm-layer");
-  layer._q = { ".wdsm-cv": cvEl, ".wdsm-cvtabs": tabs, ".wdsm-cvbar": bar, ".wdsm-cvwrap": wrap, ".wdsm-cvbtn": btn };
+  layer._q = { ".wdsm-cv": cvEl, ".wdsm-cvtabs": tabs, ".wdsm-cvbar": bar, ".wdsm-cvwrap": wrap, ".wdsm-cvbtn": btn,
+    ".wdsm-top": top, ".wdsm-morebtn": moreB,
+    ".wdsm-membtn .wdsm-mbadge": memBadgeEl, ".wdsm-morebtn .wdsm-mbadge": moreBadge,
+    ".wdsm-top .wdsm-langbtn": langB, ".wdsm-top .wdsm-distbtn": distB, ".wdsm-top .wdsm-pdfbtn": pdfB,
+    ".wdsm-top .wdsm-membtn": memB, ".wdsm-top .wdsm-keybtn": keyB };
   layer.classList = { _s: {}, add(c) { this._s[c] = 1; }, remove(c) { delete this._s[c]; }, contains(c) { return !!this._s[c]; } };
 
   const store = {};
@@ -99,6 +116,7 @@ function boot(opts) {
     cvRen: "✎ 改名", cvRenAsk: "叫什么？", cvDel: "🗑 删除", cvDelAsk: "删掉《{t}》？",
     cvEdit: "✎ 编辑", cvEditT: "手改", cvEditSave: "✓ 存为新版", cvEditCancel: "丢弃改动",
     cvEditKeep: "改了 {n} 字还没存", cvEditNo: "一个字都没改", cvDraft: "有未存的草稿",
+    moreT: "更多",
     cvCo: "⚡ 共创", cvCoT: "共创", cvCoWrite: "改写法", cvCoShape: "改结构", cvCoSde: "SDE 的动作",
     cvCoOn: "正在让 WDS {op}…", cvCoWhole: "整版", cvCoSeg: "选中的 {n} 字",
     cvByMe: "我手改", cvByWds: "WDS", cvByUnknown: "来处不明",
@@ -184,9 +202,10 @@ function boot(opts) {
   vm.runInContext(SEG + "\nthis.__x = { CV: CV, cvAdd: cvAdd, cvScan: cvScan, cvTake: cvTake, cvPaint: cvPaint, " +
     "cvAskRevise: cvAskRevise, cvFind: cvFind, cvNorm: cvNorm, cvStrip: cvStrip, cvReset: cvReset, " +
     "cvFrameDoc: cvFrameDoc, cvText: cvText, cvCur: cvCur, cvSave: cvSave, cvRestore: cvRestore, cvSelCatch: cvSelCatch, " +
-    "cvMeta: cvMeta, cvPush: cvPush, cvByLabel: cvByLabel, CO_OPS: CO_OPS, coOp: coOp, cvCoRun: cvCoRun, cvGrab: cvGrab };", ctx);
+    "topFit: topFit, MORE_BTNS: MORE_BTNS, cvShow: cvShow, cvMeta: cvMeta, cvPush: cvPush, cvByLabel: cvByLabel, CO_OPS: CO_OPS, coOp: coOp, cvCoRun: cvCoRun, cvGrab: cvGrab };", ctx);
   const x = ctx.__x;
-  x._ = { layer, cvEl, tabs, bar, wrap, btn, store, toasts, prompts, confirms, prints, ctx, TX };
+  x._ = { layer, cvEl, tabs, bar, wrap, btn, store, toasts, prompts, confirms, prints, ctx, TX,
+          top, memB, memBadgeEl, moreB, moreBadge, langB, distB, pdfB, keyB };
   return x;
 }
 
@@ -703,6 +722,62 @@ sec("⑪ 富文本编辑（Word 那一套）");
   ok(!!C4._.wrap.querySelector(".wdsm-cved"), "模块拉不到时没有退回源码");
   ok(JSON.stringify(C4._.wrap.children.map(c => c.textContent)).indexOf("没拉到") > -1,
     "模块拉不到却不吭声");
+}
+
+/* ══ ⑫ 顶栏不许画到画布上 ═══════════════════════ */
+sec("⑫ 顶栏：不许溢出到画布，窄栏收进「⋯」");
+{
+  /* 源码层：这两条是 CSS，只能这么钉 */
+  ok(/\.wdsm-top\{[^"]*flex-wrap:wrap/.test(SRC), "顶栏没允许换行 —— 按钮会溢出画到画布上");
+  ok(/\.wdsm-main\{[^"]*overflow:hidden/.test(SRC), "main 没收 overflow —— 兜底没了");
+  ok(/\.wdsm-top\.narrow[^"]*\.wdsm-membtn\{display:none\}|\.wdsm-top\.narrow \.wdsm-membtn/.test(SRC),
+    "窄栏没有把记忆按钮收起来（截图里浮在画布上的正是它）");
+  /* 只有它带 position，所以只有它会浮上去 —— 这条注释别被删了，下次再遇到才认得出 */
+  ok(/定位元素的绘制层级高于同层的非定位元素/.test(SRC), "根因注释被删了");
+  /* ⚠ 这条要**切到 memBadge 的函数体里**判。同一个选择器源码里有两处
+     （memBadge 与 topFit），只判"某处存在"分不出改坏的是哪一处——
+     变异检验第一次正是这样漏过去的。 */
+  {
+    const mbA = SRC.indexOf("function memBadge()");
+    const mbB = SRC.indexOf("\n  }", mbA);
+    ok(mbA > 0 && mbB > mbA, "找不到 memBadge");
+    const body = SRC.slice(mbA, mbB);
+    ok(/querySelector\("\.wdsm-membtn \.wdsm-mbadge"\)/.test(body),
+      "memBadge 还在按 DOM 顺序取首个 .wdsm-mbadge（多了一个之后会静默取错）");
+    ok(/topFit\(\)/.test(body), "memBadge 更新后没同步「⋯」上的角标");
+  }
+
+  /* 行为层：开画布 → 顶栏变窄栏；关掉 → 复原 */
+  const C = boot();
+  C.cvAdd("md", "稿子", "# 稿子\n\n" + "字".repeat(500));
+  C.cvShow(true);
+  ok(C._.top.classList.contains("narrow"), "画布打开了顶栏却没收起来");
+  C.cvShow(false);
+  ok(!C._.top.classList.contains("narrow"), "画布关掉了顶栏没复原");
+
+  /* 收起来时角标要跟到「⋯」上，不然"有几条待更新"这条信息就没了 */
+  C._.memBadgeEl.textContent = "15"; C._.memBadgeEl.style.display = "";
+  C.cvShow(true);
+  ok(C._.moreBadge.textContent === "15", "角标没跟到「⋯」上");
+  ok(C._.moreBadge.style.display !== "none", "「⋯」上的角标没显示");
+  C.cvShow(false);
+  ok(C._.moreBadge.style.display === "none", "顶栏复原了「⋯」的角标还亮着");
+
+  /* 「⋯」是代点，不是把按钮搬走 —— 搬走就得重接事件，必漂 */
+  ok(C.MORE_BTNS.indexOf(".wdsm-membtn") > -1, "记忆没进「⋯」的名单");
+  ok(C.MORE_BTNS.length >= 5, "「⋯」名单太短：" + C.MORE_BTNS.length);
+  let clicked = 0;
+  C._.memB.click = () => { clicked++; };
+  C.cvShow(true);
+  C._.moreB.onclick();
+  const menu = C._.ctx._menu;
+  ok(!!menu, "「⋯」菜单没开");
+  const mi = menu.children.filter(x => x.tagName === "BUTTON");
+  ok(mi.length === 5, "「⋯」菜单不是五项：" + mi.length + " —— 少了的那颗多半是标签取错了位置");
+  const memItem = mi.find(x => x.children.some(c => String(c.textContent || "").indexOf("记忆") > -1));
+  ok(!!memItem, "「⋯」菜单里找不到记忆：" + JSON.stringify(mi.map(x => x.children.map(c => c.textContent))));
+  if (memItem) { memItem.onclick(); ok(clicked === 1, "点菜单项没有去点那颗被藏起来的按钮"); }
+  ok(C._.top.children.indexOf(C._.memB) > -1, "「⋯」把按钮从顶栏搬走了（应当只是代点）");
 }
 
 console.log("\n" + PASS + " PASS / " + FAIL + " FAIL");

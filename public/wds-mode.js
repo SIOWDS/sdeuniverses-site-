@@ -747,6 +747,7 @@
       cvPrev: "预览", cvSrc: "源码", cvCopy: "复制", cvDl: "下载", cvSave: "存到本机", cvSaved: "已存",
       cvAsk: "让 WDS 改这一段", cvAskAll: "让 WDS 改这一版", cvVer: "版本", cvDrop: "⧉ 落到画布", cvDropped: "已落到画布",
       cvPick: "选中画布里的一段，再点这里", cvNoPrev: "这一类只能看源码",
+      moreT: "更多",
       cvCo: "⚡ 共创", cvCoT: "让 WDS 就着这一件动手：选中一段就只改那一段，没选中就改整版",
       cvCoWrite: "改写法", cvCoShape: "改结构", cvCoSde: "SDE 的动作",
       cvCoOn: "正在让 WDS {op}…", cvCoWhole: "整版", cvCoSeg: "选中的 {n} 字",
@@ -830,6 +831,7 @@
       cvPrev: "Preview", cvSrc: "Source", cvCopy: "Copy", cvDl: "Download", cvSave: "Save locally", cvSaved: "Saved",
       cvAsk: "ChatSDE to revise this", cvAskAll: "ChatSDE to revise this version", cvVer: "Version", cvDrop: "⧉ To canvas", cvDropped: "On the canvas",
       cvPick: "Select something on the canvas first", cvNoPrev: "Source only for this kind",
+      moreT: "More",
       cvCo: "\u26a1 Co-create", cvCoT: "Have SDE work on this item: selected passage only, or the whole version",
       cvCoWrite: "Rewrite", cvCoShape: "Restructure", cvCoSde: "SDE moves",
       cvCoOn: "Asking SDE to {op}\u2026", cvCoWhole: "whole version", cvCoSeg: "{n} selected chars",
@@ -1018,7 +1020,8 @@
     /* 外层由「一列」改为「侧栏＋主区」两列（Claude 式） */
     ".wdsm-layer{position:fixed;inset:0;z-index:100000;background:var(--wbg);display:none;font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;color:var(--wtx)}" +
     ".wdsm-layer.on{display:flex}" +
-    ".wdsm-main{flex:1;min-width:0;display:flex;flex-direction:column}" +
+    /* overflow:hidden 是兜底：无论顶栏/正文怎么算宽，都不许画到画布那一栏上去 */
+    ".wdsm-main{flex:1;min-width:0;display:flex;flex-direction:column;overflow:hidden}" +
     /* ── 侧栏 ── */
     ".wdsm-side{flex:none;width:262px;background:var(--wside);border-right:1px solid var(--wline);display:flex;flex-direction:column;transition:width .18s ease}" +
     ".wdsm-layer.fold .wdsm-side{width:0;overflow:hidden;border-right:none}" +
@@ -1046,7 +1049,16 @@
     ".wdsm-sb{background:none;border:none;color:var(--wdim);font:13px/1 inherit;text-align:left;padding:9px 10px;border-radius:8px;cursor:pointer;text-decoration:none;display:block}" +
     ".wdsm-sb:hover{background:var(--wfill);color:var(--wgold)}" +
     /* ── 顶栏 ── */
-    ".wdsm-top{flex:none;display:flex;align-items:center;gap:8px;padding:12px 18px;border-bottom:1px solid var(--wline2)}" +
+    /* ⚠ 必须允许换行。不换行时按钮会溢出 .wdsm-main 画到画布上——
+       而且**只有带 position 的那一颗**（记忆，为了挂角标）会浮在画布上面——
+       定位元素的绘制层级高于同层的非定位元素，其余按钮被画布背景盖住了。
+       其余被画布背景盖住，于是看起来像"凭空多了一颗记忆按钮"。 */
+    ".wdsm-top{flex:none;display:flex;flex-wrap:wrap;row-gap:6px;align-items:center;gap:8px;padding:12px 18px;border-bottom:1px solid var(--wline2);min-width:0}" +
+    /* 窄栏（画布打开）：次要按钮收进「⋯ 更多」，栏上只留画布与新对话 */
+    ".wdsm-top.narrow .wdsm-turns,.wdsm-top.narrow .wdsm-langbtn,.wdsm-top.narrow .wdsm-distbtn," +
+      ".wdsm-top.narrow .wdsm-pdfbtn,.wdsm-top.narrow .wdsm-membtn,.wdsm-top.narrow .wdsm-keybtn{display:none}" +
+    ".wdsm-morebtn{display:none}.wdsm-top.narrow .wdsm-morebtn{display:inline-block;position:relative}" +
+    ".wdsm-morebtn .wdsm-mbadge{position:absolute;top:-6px;right:-6px}" +
     ".wdsm-burger{display:none;background:none;border:1px solid var(--wline);color:var(--wtx);font-size:15px;border-radius:8px;padding:6px 10px;cursor:pointer;line-height:1}" +
     ".wdsm-tabs{display:flex;gap:4px;background:var(--wfill);border-radius:999px;padding:3px}" +
     ".wdsm-tab{border:none;background:none;color:var(--wdim);font:600 12px/1 inherit;padding:6px 9px;border-radius:999px;cursor:pointer;white-space:nowrap;flex:none}" +
@@ -1318,7 +1330,9 @@
         "<button class='wdsm-tbtn wdsm-pdfbtn'></button>" +
         "<button class='wdsm-tbtn wdsm-histbtn' style='display:none'></button>" +
         "<button class='wdsm-tbtn wdsm-membtn'><span class='mb'></span><i class='wdsm-mbadge' style='display:none'></i></button>" +
-        "<button class='wdsm-tbtn wdsm-keybtn'></button><button class='wdsm-newbtn'></button>" +
+        "<button class='wdsm-tbtn wdsm-keybtn'></button>" +
+        "<button class='wdsm-tbtn wdsm-morebtn'>\u22ef<i class='wdsm-mbadge' style='display:none'></i></button>" +
+        "<button class='wdsm-newbtn'></button>" +
       "</div>" +
       "<div class='wdsm-body empty'>" +
         "<div class='wdsm-hero'>" +
@@ -1456,10 +1470,13 @@
     return m;
   }
   function memBadge() {
-    var b = layer.querySelector(".wdsm-mbadge");
+    // ⚠ 必须显式指到记忆按钮里那一个：顶栏收纳之后「⋯ 更多」上也有一个 .wdsm-mbadge，
+    // 靠 querySelector 取首个匹配等于把正确性押在 DOM 顺序上，改一次结构就会静默取错。
+    var b = layer.querySelector(".wdsm-membtn .wdsm-mbadge");
     if (!b) return;
     var n = (MEM && MEM.state.ready) ? MEM.pending().length : 0;
     if (n > 0) { b.textContent = String(n); b.style.display = ""; } else { b.style.display = "none"; }
+    topFit();          // 收起来的时候角标要跟到「⋯」上
   }
   function memRecall(q) { try { return MEM ? MEM.recall(q) : ""; } catch (e) { return ""; } }
 
@@ -3701,8 +3718,9 @@
     return got;
   }
   function cvShow(on) {
-    if (on === false) { layer.classList.remove("cvon"); return; }
+    if (on === false) { layer.classList.remove("cvon"); topFit(); return; }
     layer.classList.add("cvon");
+    topFit();
   }
   function cvCur() { return CV.cur >= 0 ? CV.items[CV.cur] : null; }
   function cvText() { var it = cvCur(); return it ? it.vers[it.vi] : ""; }
@@ -4333,6 +4351,48 @@
   }
   function cvEditCancel(it) { delete it.draft; CV.edit = false; CV.note = ""; cvPaint(); }
 
+  /* ── 顶栏收放 ────────────────────────────────────────
+     画布一开，聊天列就只剩一半宽，顶栏还塞七颗按钮本身就不清洁。
+     **按钮不从 DOM 里拿走**（那样要重接一遍事件，必漂），菜单只是代点。 */
+  var MORE_BTNS = [".wdsm-langbtn", ".wdsm-distbtn", ".wdsm-pdfbtn", ".wdsm-membtn", ".wdsm-keybtn"];
+  function topFit() {
+    var top = layer.querySelector(".wdsm-top");
+    if (!top) return;
+    var narrow = layer.classList.contains("cvon") && !narrow900();
+    if (narrow) top.classList.add("narrow"); else top.classList.remove("narrow");
+    // 收起来的时候，记忆那个角标要跟到「⋯」上，否则"有几条待更新"这条信息就没了
+    var src = layer.querySelector(".wdsm-membtn .wdsm-mbadge");
+    var dst = layer.querySelector(".wdsm-morebtn .wdsm-mbadge");
+    if (src && dst) {
+      dst.textContent = src.textContent;
+      dst.style.display = (narrow && src.style.display !== "none") ? "" : "none";
+    }
+  }
+  function narrow900() { try { return (window.innerWidth || 1200) <= 900; } catch (e) { return false; } }
+  (function () {
+    var mb = layer.querySelector(".wdsm-morebtn");
+    if (!mb) return;
+    mb.title = tx("moreT");
+    mb.onclick = function () {
+      menuAt(mb, function (menu) {
+        menu.appendChild(el("div", "mh", tx("moreT")));
+        MORE_BTNS.forEach(function (sel) {
+          var b = layer.querySelector(".wdsm-top " + sel);
+          if (!b) return;
+          var label = (b.querySelector(".mb") ? b.querySelector(".mb").textContent : b.textContent) || "";
+          label = String(label).replace(/\s+/g, " ").trim();
+          if (!label) return;
+          var mi = el("button");
+          mi.appendChild(document.createTextNode(label));
+          if (b.title) mi.appendChild(el("span", "sub", b.title));
+          mi.onclick = function () { closeMenu(); try { b.click(); } catch (e) {} };
+          menu.appendChild(mi);
+        });
+      });
+    };
+    try { window.addEventListener("resize", topFit); } catch (e) {}
+  })();
+
   var cvBtn = layer.querySelector(".wdsm-cvbtn");
   (function () {
     var x = cvEl && cvEl.querySelector(".wdsm-cvx");
@@ -4340,6 +4400,7 @@
     if (cvBtn) cvBtn.onclick = function () { cvShow(!layer.classList.contains("cvon")); cvPaint(); };
     cvRestore();
     cvPaint();
+    topFit();
   })();
 
   /* ══════════════════ 本场账本（上下文压缩）══════════════════
