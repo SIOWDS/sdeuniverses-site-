@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="sde-page-kind" content="channel">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SDE 作文共创 · 用文本建造一个具体的 SDE | SDE Universes</title>
+<meta name="description" content="作文＝用文本（文）来建造（作）一个具体的 SDE。不同的 SDE 显现出的果子不一样：有的聚焦 S（让人看见）、有的聚焦 D（让人会做）、有的聚焦 E（让人被牵动）——SDE 方法论的六条路径于是对应六种文章类别与行文方式。页内自带编辑器与三台智能体：与 WDS 共创（问）、WDS 修改（动内容）、WDS 编辑（动文字）。用你自己的大模型 Key，只存浏览器本地。">
+<style>
+:root{--bg:#0F0D0A;--pa:#EFE9DD;--dim:#B9AE99;--faint:#7C7466;--ac:#C9A227;--s:#7FA8C9;--d:#C98F5E;--e:#8FB3A0;--line:#2A2521;--card:#161310;--fill:#1C1815}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--pa);font-family:"Noto Serif CJK SC","Songti SC",Georgia,serif;line-height:1.85}
+a{color:var(--ac);text-decoration:none}a:hover{text-decoration:underline}
+.w{max-width:1180px;margin:0 auto;padding:0 20px}
+header{border-bottom:1px solid var(--line);padding:13px 0;font-size:13px;color:var(--dim)}
+header .w{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center}
+.hero{padding:44px 0 22px;border-bottom:1px solid var(--line)}
+.en{font-size:11px;letter-spacing:.22em;color:var(--faint);text-transform:uppercase}
+h1{font-size:33px;margin:10px 0 8px;letter-spacing:.04em}
+.thesis{font-size:17px;color:var(--pa);max-width:60em;margin:0 0 10px}
+.thesis b{color:var(--ac)}
+.sub{color:var(--dim);font-size:14.5px;max-width:62em}
+button{font:inherit;cursor:pointer}
+.btn{background:var(--ac);color:#17130A;border:0;border-radius:6px;padding:8px 16px;font-size:13.5px}
+.gh{background:transparent;color:var(--dim);border:1px solid var(--line);border-radius:6px;padding:7px 13px;font-size:13px}
+.gh:hover{color:var(--ac);border-color:var(--ac)}
+.gh.on{color:var(--ac);border-color:var(--ac);background:var(--fill)}
+main{padding:24px 0 60px}
+/* 六路径 */
+.paths{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:12px;margin:16px 0 0}
+.pcard{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:15px 16px;cursor:pointer;transition:border-color .15s}
+.pcard:hover{border-color:var(--ac)}
+.pcard.on{border-color:var(--ac);background:var(--fill)}
+.pcard .seq{font-size:14px;letter-spacing:.1em;font-weight:700}
+.pcard .nm{font-size:16.5px;color:var(--pa);margin:5px 0 4px}
+.pcard .fr{font-size:12px;color:var(--ac);letter-spacing:.06em}
+.pcard .ty{font-size:13px;color:var(--dim);margin:6px 0 0}
+.pcard .hw{font-size:13px;color:var(--faint);margin:6px 0 0;line-height:1.7}
+.sS{color:var(--s)}.sD{color:var(--d)}.sE{color:var(--e)}
+/* 工作台 */
+.lab{display:grid;grid-template-columns:1fr 420px;gap:14px;margin:22px 0 0}
+@media(max-width:980px){.lab{grid-template-columns:1fr}}
+.pane{background:var(--card);border:1px solid var(--line);border-radius:10px;display:flex;flex-direction:column;min-height:520px}
+.pbar{display:flex;gap:6px;flex-wrap:wrap;padding:10px 12px;border-bottom:1px solid var(--line);align-items:center}
+.pbar .sp{flex:1}
+.pbar .tag{font-size:11.5px;color:var(--faint);letter-spacing:.06em}
+.ed{flex:1;min-height:380px;background:#100E0B;color:var(--pa);border:0;border-radius:0 0 10px 10px;padding:16px 18px;font-size:15px;line-height:1.9;outline:none;overflow:auto}
+.ed h1{font-size:21px;margin:.8em 0 .4em}.ed h2{font-size:18px;margin:.8em 0 .4em}.ed h3{font-size:16px;margin:.7em 0 .35em}
+.ed p{margin:0 0 .8em}.ed ul,.ed ol{margin:0 0 .8em 1.4em}
+.ed blockquote{margin:0 0 .8em;padding-left:12px;border-left:2px solid var(--ac);color:var(--dim)}
+.ed table{border-collapse:collapse;font-size:13.5px;margin:0 0 .8em}
+.ed td,.ed th{border:1px solid var(--line);padding:5px 9px}
+textarea.src{flex:1;min-height:380px;background:#100E0B;color:var(--pa);border:0;padding:16px 18px;font:13px/1.75 ui-monospace,Menlo,Consolas,monospace;resize:none;outline:none}
+.rtb{display:flex;gap:4px;flex-wrap:wrap;padding:8px 12px;border-bottom:1px solid var(--line)}
+.rtb button{background:var(--fill);border:1px solid var(--line);color:var(--dim);font-size:12px;padding:5px 9px;border-radius:6px}
+.rtb button:hover{color:var(--ac);border-color:var(--ac)}
+/* 三台智能体 */
+.ags{display:flex;gap:6px;padding:10px 12px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.ags button{flex:1;min-width:104px;background:transparent;border:1px solid var(--line);color:var(--dim);font-size:13px;padding:8px 6px;border-radius:8px}
+.ags button.on{border-color:var(--ac);color:var(--ac);background:var(--fill)}
+.agdesc{font-size:12.5px;color:var(--faint);padding:8px 14px;border-bottom:1px solid var(--line);line-height:1.7}
+.ms{flex:1;overflow:auto;padding:12px 14px;min-height:220px}
+.row{margin:0 0 13px}
+.row.me{text-align:right}
+.row.me .bb{display:inline-block;background:var(--fill);border-radius:12px 12px 3px 12px;padding:7px 11px;font-size:13.5px;text-align:left;max-width:88%;white-space:pre-wrap;word-break:break-word}
+.row.wds .bb{font-size:14px;line-height:1.85}
+.row .acts{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.row .acts button{background:none;border:1px solid var(--line);color:var(--dim);font-size:11.5px;padding:4px 8px;border-radius:6px}
+.row .acts button:hover{color:var(--ac);border-color:var(--ac)}
+.quick{display:flex;gap:6px;flex-wrap:wrap;padding:0 14px 8px}
+.quick button{background:var(--fill);border:1px solid var(--line);color:var(--dim);font-size:11.5px;padding:5px 10px;border-radius:999px}
+.quick button:hover{color:var(--ac);border-color:var(--ac)}
+.inb{display:flex;gap:8px;padding:8px 12px 12px;align-items:flex-end;border-top:1px solid var(--line)}
+.inb textarea{flex:1;min-height:40px;max-height:130px;background:#100E0B;color:var(--pa);border:1px solid var(--line);border-radius:10px;padding:9px 12px;font:inherit;font-size:13.5px;resize:none;outline:none}
+.inb textarea:focus{border-color:var(--ac)}
+#note{font-size:12.5px;color:var(--ac);padding:0 14px 8px;min-height:1.2em;line-height:1.7}
+.diagx{font-size:11.5px;color:var(--faint)}
+.foot{border-top:1px solid var(--line);padding:24px 0 60px;font-size:13px;color:var(--faint)}
+.foot a{color:var(--dim)}
+.note{margin:18px 0 0;padding:13px 16px;background:var(--card);border-left:2px solid var(--ac);font-size:13.5px;color:var(--dim)}
+.note b{color:var(--pa)}
+h2.sec{font-size:19px;margin:32px 0 8px;letter-spacing:.04em;border-bottom:1px solid var(--line);padding-bottom:7px}
+.dl{display:flex;flex-wrap:wrap;gap:8px 26px;font-size:13.5px;color:var(--dim);margin:10px 0 0}
+.dl span b{color:var(--pa)}
+@media(max-width:560px){h1{font-size:26px}.thesis{font-size:15.5px}}
+</style>
+</head>
+<body>
+
+<header><div class="w">
+  <span><a href="/browse/">← 爱思乐园</a> · <a href="/taste/chatsde/">ChatSDE</a> · <a href="/challenge/">每日思想挑战</a></span>
+  <span><button class="gh" id="keyb">🔑 大模型 Key</button></span>
+</div></header>
+
+<div class="w hero">
+  <div class="en">SDE Writing Lab</div>
+  <h1>SDE 作文共创</h1>
+  <p class="thesis"><b>作文，是用文本（文）来建造（作）一个具体的 SDE。</b></p>
+  <p class="sub">不同的 SDE 显现出的果子不一样：有的聚焦 <b class="sS">S · 显露</b>（要让人<b>看见</b>）、有的聚焦 <b class="sD">D · 发生</b>（要让人<b>会做</b>）、有的聚焦 <b class="sE">E · 纠缠</b>（要让人<b>被牵动</b>）。<br>
+  于是 SDE 方法论的<b>六条路径</b>就不是六个口号，而是<b>六种文章类别与六套行文方式</b>：<b>落点</b>决定这篇要交出什么果子，<b>起手</b>决定从哪儿下笔，<b>中项</b>决定靠什么推进。</p>
+  <div class="dl">
+    <span><b>三台智能体</b>：与 WDS 共创（问）· WDS 修改（动内容）· WDS 编辑（动文字）</span>
+    <span><b>零责任</b>：用你自己的 Key，只存浏览器本地</span>
+  </div>
+</div>
+
+<main class="w">
+
+  <h2 class="sec">一、先定路径：这一篇要建造哪一种 SDE</h2>
+  <p class="sub">选一条。选错了也不要紧——写到一半发现落点变了，换一条就是，<b style="color:var(--pa)">换路径本身就是一次判断</b>。不知道选哪条，就点「让 WDS 判一下」。</p>
+  <div class="paths" id="paths"></div>
+  <div style="margin:14px 0 0;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+    <button class="gh" id="judge">🧭 让 WDS 判一下我该走哪条</button>
+    <span class="tag" id="ptag" style="font-size:12.5px;color:var(--faint)"></span>
+  </div>
+  <div class="note" id="pdetail" style="display:none"></div>
+
+  <h2 class="sec">二、写：编辑器与三台智能体</h2>
+  <div class="lab">
+    <div class="pane">
+      <div class="pbar">
+        <button class="gh on" id="mRich">所见即所得</button>
+        <button class="gh" id="mSrc">源码</button>
+        <span class="sp"></span>
+        <span class="tag" id="wc">0 字</span>
+        <button class="gh" id="verPrev">‹</button>
+        <span class="tag" id="verTag">1/1</span>
+        <button class="gh" id="verNext">›</button>
+        <button class="gh" id="verDiff">⇄ 改了什么</button>
+      </div>
+      <div class="rtb" id="rtb"></div>
+      <div class="ed" id="ed" contenteditable="true" spellcheck="false"></div>
+      <textarea class="src" id="src" style="display:none"></textarea>
+      <div class="pbar" style="border-top:1px solid var(--line);border-bottom:0">
+        <button class="gh" id="oCopy">复制</button>
+        <button class="gh" id="oDl">下载 .md</button>
+        <button class="gh" id="oKb">⇧ 存进知识库</button>
+        <button class="gh" id="oBox">📥 投进草稿箱</button>
+        <button class="gh" id="oClear">清空重写</button>
+      </div>
+    </div>
+
+    <div class="pane">
+      <div class="ags" id="ags"></div>
+      <div class="agdesc" id="agdesc"></div>
+      <div class="ms" id="ms"></div>
+      <div class="quick" id="quick"></div>
+      <div id="note"></div>
+      <div class="inb">
+        <textarea id="in" rows="1" placeholder="问它、或告诉它怎么改…"></textarea>
+        <button class="btn" id="go">送</button>
+      </div>
+    </div>
+  </div>
+
+  <h2 class="sec">三、六路径为什么是这六种文章</h2>
+  <div class="note">
+    <p style="margin:0 0 10px"><b>落点＝这一篇要交出的果子，也是唯一的验收判据。</b></p>
+    <p style="margin:0 0 6px">· 落在 <b class="sS">S</b>：读完能不能<b>复述成一个画面</b>？复述不出来就是没落地。</p>
+    <p style="margin:0 0 6px">· 落在 <b class="sD">D</b>：读完能不能<b>照着做一遍</b>？做不出来就是只讲了道理。</p>
+    <p style="margin:0 0 10px">· 落在 <b class="sE">E</b>：读完<b>关系有没有变</b>（他和某人、某物、某件事之间）？没变就是自说自话。</p>
+    <p style="margin:0 0 6px"><b>起手＝从哪一维下笔</b>：从 S 起＝从一个看得见的场景/物/画面；从 D 起＝从一个动作或过程；从 E 起＝从一段关系或处境。</p>
+    <p style="margin:0"><b>中项＝转换器</b>：它是把起手那一维换算成落点那一维的机关。中项写虚了，全篇就会在起手那一维原地打转——<b>这是作文最常见的失败，不是"没有文采"</b>。</p>
+  </div>
+  <div id="ptable" style="margin:16px 0 0"></div>
+
+</main>
+
+<div class="w foot">
+  <p>三台智能体都用<b>你自己的大模型 Key</b>（与全站同一把，只存浏览器本地，服务器不经手）。稿子存在本机；要跨设备留存请「⇧ 存进知识库」。</p>
+  <p style="margin-top:8px">同族：<a href="/taste/chatsde/">ChatSDE（画布共创）</a> · <a href="/taste/idea-generator/">金点子发生器</a> · <a href="/taste/zhiwen/">中华智问</a> · <a href="/challenge/">每日思想挑战</a> · <a href="/training/">30天健脑训练</a></p>
+</div>
+
+<script src="/assets/wds-rte.js?v=1"></script>
+<script src="/assets/wds-diff.js?v=1"></script>
+<script src="/taste/assets/sde-vault.js?v=3"></script>
+<script>
+(function () {
+  "use strict";
+  var $ = function (id) { return document.getElementById(id); };
+  function esc(s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+
+  /* ══════════ 六路径：这台机器的内核 ══════════════════════
+     作文＝用文本建造一个具体的 SDE。于是：
+       **落点**（终点那一维）＝这一篇要交出的果子，也是唯一的验收判据；
+       **起手**（起点那一维）＝从哪儿下笔；
+       **中项**＝把起手换算成落点的转换器 —— 中项写虚了，全篇就在起手那一维原地打转。
+     这不是给六条路径各贴一个文体标签，是**从落点反推验收、从起手定笔法、从中项定推进**。 */
+  var PATHS = [
+    { id: "SDE", seq: ["S", "D", "E"], name: "见闻 → 行动 → 感怀",
+      fruit: "E", start: "S", mid: "D",
+      types: "记叙文 · 通讯与纪实 · 人物特写 · 游记",
+      how: "先把场面写实到能被复述（S），再写人在这场面里做了什么（D），最后落在关系被改动的那一刻（E）。",
+      pit: "写完场面直接抒情——中项 D 被跳过，读者不知道凭什么被打动。",
+      check: "读完，他和谁（或什么）之间的关系变了？说得出具体是哪一处变了才算落地。" },
+    { id: "SED", seq: ["S", "E", "D"], name: "现象 → 处境 → 对策",
+      fruit: "D", start: "S", mid: "E",
+      types: "时评 · 问题报道 · 社会评论 · 调查手记",
+      how: "先摆出可核对的现象（S），再写它把人卷进了什么处境、谁被谁牵住（E），最后给出能照着做的对策（D）。",
+      pit: "现象之后直接开药方——中项 E 被跳过，对策就没有承受者，读起来像隔空喊话。",
+      check: "读完能不能照着做一遍？给不出「先动什么、看到什么再动下一步」就是没落地。" },
+    { id: "DSE", seq: ["D", "S", "E"], name: "操作 → 效果 → 意义",
+      fruit: "E", start: "D", mid: "S",
+      types: "说明文 · 教程 · 案例复盘 · 工艺记",
+      how: "先讲怎么做（D），再把做出来的样子摆给人看（S），最后说它改动了什么关系（E）。",
+      pit: "讲完步骤直接升华——中项 S 被跳过，读者没见过成品，意义就是空的。",
+      check: "读完关系有没有变？「做了这件事之后，谁和谁不一样了」要写得出来。" },
+    { id: "DES", seq: ["D", "E", "S"], name: "实践 → 影响 → 新面貌",
+      fruit: "S", start: "D", mid: "E",
+      types: "策论 · 方案书 · 改革论 · 提案",
+      how: "先提出做法（D），再论它会牵动谁、谁会不干（E），最后把改完之后的样子描出来（S）。",
+      pit: "只写做法与好处，不写它牵动谁——中项 E 一虚，方案就只在纸上成立。",
+      check: "读完能不能复述成一个画面？描不出「改完之后是什么样」就是没落地。" },
+    { id: "ESD", seq: ["E", "S", "D"], name: "处境 → 征象 → 出路",
+      fruit: "D", start: "E", mid: "S",
+      types: "议论文 · 批评文 · 诊断文 · 论辩",
+      how: "先指认一种关系或处境（E），再举出它看得见的征象（S），最后给出路（D）。",
+      pit: "指认完处境直接下结论——中项 S 被跳过，判断没有可核对的落点，怎么说都对。",
+      check: "读完能不能照着做？只写出「应当重视」的，等于把问题重复了一遍。" },
+    { id: "EDS", seq: ["E", "D", "S"], name: "牵动 → 行动 → 见证",
+      fruit: "S", start: "E", mid: "D",
+      types: "抒情散文 · 书信 · 演讲 · 回忆与悼念",
+      how: "从被牵动写起（E），写因此做了什么（D），最后落在一个画面上（S）——不是落在一句感慨上。",
+      pit: "从情绪起、又落在情绪上，中间没有 D——通篇是心情，没有事。",
+      check: "读完记住的是不是一个画面？记住的若只是一种情绪，就还没落地。" }
+  ];
+  var DIM = { S: { n: "显露", t: "让人看见", c: "sS" }, D: { n: "发生", t: "让人会做", c: "sD" }, E: { n: "纠缠", t: "让人被牵动", c: "sE" } };
+
+  /* ══════════ 三台智能体 ══════════════════════════════════
+     分工必须硬：**共创动脑、修改动内容、编辑动文字**。
+     混成一台，读者永远拿不准"它这次会不会把我的判断改掉"。 */
+  var AGENTS = [
+    { k: "co", n: "🤝 与 WDS 共创", d: "只讨论，不动你的稿子。写卡住了、拿不准方向、想找个反例，问它。它答得短，也会反问你。",
+      quick: ["接下去怎么写", "这一段站得住吗", "给我三个方向", "这里缺什么", "谁已经说过这件事", "举一个具体例子"],
+      sys: "你是【与 WDS 共创】。规矩五条：①**只讨论，绝不代写全文**——除非他明说「写一段」；②答得短，一句能说清就别写三段；③**可以反问**，问不清楚就先问回去；④凡给方向必须**具体**（一个例子、一句可以直接用的话、一个能查的判据），不许说「可以从多个角度考虑」；⑤时刻记着这一篇的**落点**是哪一维——你的建议必须帮它更接近那个落点，而不是让它更漂亮。" },
+    { k: "rev", n: "✎ WDS 修改", d: "动内容：判断、结构、论证、落点。它会**交回改好的整篇**，落成一个新版本，原版还在，可以退回去。",
+      quick: ["按落点改一遍", "中项写虚了，补实它", "把结论改成可被推翻的", "删掉万能话", "补一个反例", "结构重排"],
+      sys: "你是【WDS 修改】。你动的是**内容**：判断、结构、论证、落点，不是遣词造句（那是【WDS 编辑】的活）。规矩五条：①**只输出改好的整篇正文，不要解说、不要前后缀**；②保住作者的判断与他的话语风格——你是改稿不是重写，凡是你改动的判断，必须是原来站不住的那几处；③**盯着落点改**：这一篇要交出的果子若是 S 就要能被复述成画面、是 D 就要能照着做、是 E 就要读完关系有变；④中项写虚的地方要补实——那是全篇原地打转的真原因；⑤删掉万能话（永远对因而永远没用的句子）与情态词堆砌。改不动就直说改不动，不要为了交差硬改。" },
+    { k: "ed", n: "🖉 WDS 编辑", d: "动文字：语句、段落、衔接、体例、标题、冗余、术语统一。**不动你的判断**。同样交回整篇并落成新版本。",
+      quick: ["通篇编校", "理顺长句", "统一术语", "拟三个标题", "分段与小标题", "去掉冗余"],
+      sys: "你是【WDS 编辑】。你动的是**文字**不是判断：语句、段落、衔接、体例、标题、冗余、术语一致、标点与数字格式。规矩五条：①**一个判断都不许改**——发现内容有问题，改完之后在末尾另起一节「编辑存疑」列出来，不要动手；②**只输出编校后的整篇正文**（存疑那一节除外），不要解说；③长句拆短、重复删净、代词指代明确、术语前后统一；④标题与小标题要**是判断不是话题词**；⑤保住作者的语感——编校不是把所有人改成同一种腔调。" }
+  ];
+
+  /* ══════════ 状态 ══════════════════════════════════════ */
+  var LS = "sde_writing_v1";
+  var ST = { path: "", vers: [""], vi: 0, chat: { co: [], rev: [], ed: [] }, agent: "co", rich: true, diff: false, busy: false };
+  function save() {
+    try { localStorage.setItem(LS, JSON.stringify({ path: ST.path, vers: ST.vers, vi: ST.vi, chat: ST.chat, agent: ST.agent })); } catch (e) {}
+  }
+  function load() {
+    try {
+      var o = JSON.parse(localStorage.getItem(LS) || "null");
+      if (!o) return;
+      ST.path = o.path || "";
+      ST.vers = (Array.isArray(o.vers) && o.vers.length) ? o.vers : [""];
+      ST.vi = (typeof o.vi === "number" && o.vi < ST.vers.length) ? o.vi : 0;
+      ST.chat = (o.chat && typeof o.chat === "object") ? o.chat : { co: [], rev: [], ed: [] };
+      ["co", "rev", "ed"].forEach(function (k) { if (!Array.isArray(ST.chat[k])) ST.chat[k] = []; });
+      ST.agent = o.agent || "co";
+    } catch (e) {}
+  }
+  function cur() { return ST.vers[ST.vi] || ""; }
+  function pathOf() { for (var i = 0; i < PATHS.length; i++) if (PATHS[i].id === ST.path) return PATHS[i]; return null; }
+  function note(h) { $("note").innerHTML = h || ""; }
+
+  /* ══════════ 路径面板 ══════════════════════════════════ */
+  function paintPaths() {
+    $("paths").innerHTML = PATHS.map(function (p) {
+      return '<div class="pcard' + (p.id === ST.path ? " on" : "") + '" data-p="' + p.id + '">' +
+        '<div class="seq">' + p.seq.map(function (x) { return '<span class="' + DIM[x].c + '">' + x + '</span>'; }).join(" → ") + '</div>' +
+        '<div class="nm">' + p.name + '</div>' +
+        '<div class="fr">落点 ' + p.fruit + " · " + DIM[p.fruit].t + '　｜　起手 ' + p.start + '　｜　中项 ' + p.mid + '</div>' +
+        '<div class="ty">' + p.types + '</div>' +
+        '<div class="hw">' + p.how + '</div></div>';
+    }).join("");
+    var p = pathOf();
+    $("ptag").textContent = p ? ("当前：" + p.seq.join("→") + " · " + p.name) : "还没选路径——不选也能写，但没有落点就没有验收判据。";
+    if (p) {
+      $("pdetail").style.display = "";
+      $("pdetail").innerHTML = "<b>验收判据（落点 " + p.fruit + "）</b>：" + esc(p.check) +
+        "<br><br><b>最常见的失败</b>：" + esc(p.pit) +
+        "<br><br><b>常见文体</b>：" + esc(p.types);
+    } else { $("pdetail").style.display = "none"; }
+  }
+  $("paths").addEventListener("click", function (ev) {
+    var c = ev.target.closest && ev.target.closest(".pcard");
+    if (!c) return;
+    ST.path = c.getAttribute("data-p"); save(); paintPaths();
+  });
+
+  function paintTable() {
+    $("ptable").innerHTML = '<table style="border-collapse:collapse;font-size:13.5px;width:100%">' +
+      '<tr><th style="border:1px solid var(--line);padding:7px 10px;text-align:left">路径</th>' +
+      '<th style="border:1px solid var(--line);padding:7px 10px;text-align:left">落点／果子</th>' +
+      '<th style="border:1px solid var(--line);padding:7px 10px;text-align:left">文体</th>' +
+      '<th style="border:1px solid var(--line);padding:7px 10px;text-align:left">最常见的失败</th></tr>' +
+      PATHS.map(function (p) {
+        return '<tr><td style="border:1px solid var(--line);padding:7px 10px;white-space:nowrap">' +
+          p.seq.join("→") + '<br><span style="color:var(--faint);font-size:12px">' + p.name + '</span></td>' +
+          '<td style="border:1px solid var(--line);padding:7px 10px">' + p.fruit + " · " + DIM[p.fruit].t + '</td>' +
+          '<td style="border:1px solid var(--line);padding:7px 10px;color:var(--dim)">' + p.types + '</td>' +
+          '<td style="border:1px solid var(--line);padding:7px 10px;color:var(--faint)">' + esc(p.pit) + '</td></tr>';
+      }).join("") + '</table>';
+  }
+
+  /* ══════════ 编辑器 ══════════════════════════════════ */
+  function rteOk() { return !!(window.WDSRte && window.WDSRte.VERSION >= 1); }
+  function paintEd() {
+    var text = cur();
+    if (ST.diff) {
+      $("ed").style.display = ""; $("src").style.display = "none"; $("rtb").style.display = "none";
+      $("ed").removeAttribute("contenteditable");
+      var prev = ST.vers[ST.vi - 1];
+      $("ed").innerHTML = (typeof prev !== "string")
+        ? '<p style="color:var(--faint)">只有一版，没有可比的上一版。</p>'
+        : (window.WDSDiff ? window.WDSDiff.html(prev, text, { tSame: "… 未改 {n} 行 …" }) : "");
+      return;
+    }
+    $("ed").setAttribute("contenteditable", "true");
+    if (ST.rich && rteOk()) {
+      $("ed").style.display = ""; $("src").style.display = "none"; $("rtb").style.display = "";
+      $("ed").innerHTML = window.WDSRte.toHtml(text);
+    } else {
+      $("ed").style.display = "none"; $("src").style.display = ""; $("rtb").style.display = "none";
+      $("src").value = text;
+    }
+    $("mRich").className = "gh" + (ST.rich ? " on" : "");
+    $("mSrc").className = "gh" + (ST.rich ? "" : " on");
+    $("verTag").textContent = (ST.vi + 1) + "/" + ST.vers.length;
+    $("wc").textContent = text.replace(/\s/g, "").length + " 字";
+  }
+  // 取当前编辑区的内容（富文本要序列化回 markdown —— 版本链与导出全建在 markdown 上）
+  function grab() {
+    if (ST.diff) return cur();
+    if (ST.rich && rteOk()) return window.WDSRte.toMd($("ed").innerHTML);
+    return $("src").value;
+  }
+  function commit(text, why) {
+    text = String(text == null ? "" : text);
+    if (text === ST.vers[ST.vers.length - 1]) return false;
+    ST.vers.push(text); ST.vi = ST.vers.length - 1;
+    if (ST.vers.length > 40) { ST.vers.shift(); ST.vi = ST.vers.length - 1; }
+    save(); paintEd();
+    if (why) note("已落成第 " + ST.vers.length + " 版（" + esc(why) + "）。原版还在，用 ‹ › 退回去。");
+    return true;
+  }
+  function syncFromEditor() { ST.vers[ST.vi] = grab(); save(); $("wc").textContent = cur().replace(/\s/g, "").length + " 字"; }
+  $("ed").addEventListener("input", function () { if (!ST.diff) syncFromEditor(); });
+  $("src").addEventListener("input", syncFromEditor);
+  $("mRich").onclick = function () { if (!ST.diff) ST.vers[ST.vi] = grab(); ST.rich = true; ST.diff = false; paintEd(); };
+  $("mSrc").onclick = function () { if (!ST.diff) ST.vers[ST.vi] = grab(); ST.rich = false; ST.diff = false; paintEd(); };
+  $("verDiff").onclick = function () { if (!ST.diff) ST.vers[ST.vi] = grab(); ST.diff = !ST.diff; paintEd(); };
+  $("verPrev").onclick = function () { if (ST.vi > 0) { if (!ST.diff) ST.vers[ST.vi] = grab(); ST.vi--; save(); paintEd(); } };
+  $("verNext").onclick = function () { if (ST.vi < ST.vers.length - 1) { if (!ST.diff) ST.vers[ST.vi] = grab(); ST.vi++; save(); paintEd(); } };
+
+  var RTB = [["标题", "formatBlock", "<h1>"], ["小标", "formatBlock", "<h2>"], ["小小标", "formatBlock", "<h3>"],
+    ["正文", "formatBlock", "<p>"], ["粗", "bold"], ["斜", "italic"], ["删", "strikeThrough"],
+    ["引用", "formatBlock", "<blockquote>"], ["• 列表", "insertUnorderedList"], ["1. 列表", "insertOrderedList"],
+    ["分隔线", "insertHorizontalRule"], ["清格式", "removeFormat"], ["撤销", "undo"], ["重做", "redo"]];
+  $("rtb").innerHTML = RTB.map(function (r, i) { return '<button data-i="' + i + '">' + r[0] + "</button>"; }).join("");
+  $("rtb").addEventListener("mousedown", function (ev) { if (ev.target.tagName === "BUTTON") ev.preventDefault(); });
+  $("rtb").addEventListener("click", function (ev) {
+    var i = ev.target.getAttribute && ev.target.getAttribute("data-i");
+    if (i === null || i === undefined) return;
+    var r = RTB[+i];
+    try { $("ed").focus(); document.execCommand(r[1], false, r[2] || null); } catch (e) {}
+    syncFromEditor();
+  });
+
+  /* ══════════ 出口 ══════════════════════════════════ */
+  function fname() {
+    var m = /^\s*#{1,3}\s+(.{1,40})/.exec(cur());
+    var t = m ? m[1].trim() : "SDE作文";
+    return t.replace(/[^\w\u4e00-\u9fff-]/g, "_");
+  }
+  $("oCopy").onclick = function () {
+    try { navigator.clipboard.writeText(cur()); note("已复制。"); } catch (e) { note("复制不了，请手动选中。"); }
+  };
+  $("oDl").onclick = function () {
+    var b = new Blob([cur()], { type: "text/markdown" });
+    var a = document.createElement("a"); a.href = URL.createObjectURL(b); a.download = fname() + ".md";
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  };
+  $("oKb").onclick = function () {
+    if (!window.SDEVault || typeof SDEVault.kb !== "function") { note("知识库模块没装载上——可以先「下载 .md」。"); return; }
+    SDEVault.kb({ title: fname(), kind: "note", text: cur(), from: "SDE 作文共创", ver: ST.vi + 1 }, $("note"));
+  };
+  $("oBox").onclick = function () {
+    var c = "";
+    try { c = (window.SDEVault && SDEVault.cred && SDEVault.cred()) || ""; } catch (e) {}
+    if (!c) { note('投不进去——先在 <a href="/sde-wechat/" target="_blank">SDE 社区</a> 用名字和密码登录一次。'); return; }
+    var n = window.prompt("给它留一句话（要改成什么、发到哪个栏目）——可以空着：", "");
+    if (n === null) return;
+    note("正在投…");
+    fetch("/api/im", {
+      method: "POST", headers: { "content-type": "application/json" },
+      body: JSON.stringify({ credential: c, op: "dr", a: "add", title: fname(), kind: "md", text: cur(), from: "SDE 作文共创", ver: ST.vi + 1, note: String(n || "").slice(0, 400) })
+    }).then(function (r) { return r.json(); }).then(function (d) {
+      var x = (d && d.d) ? d.d : d;
+      note(x && x.ok ? ((x.dup ? "这一件已经在草稿箱里了。" : "已投进草稿箱。") + ' <a href="/admin/drafts/" target="_blank">去草稿箱 →</a>') : esc((x && x.msg) || "投不进去。"));
+    }, function () { note("投不进去（网络）。"); });
+  };
+  $("oClear").onclick = function () {
+    if (!window.confirm("清空重写？当前这一版会被清掉（历史版本还在，用 ‹ 退回去）。")) return;
+    ST.vers[ST.vi] = ""; save(); paintEd();
+  };
+
+  /* ══════════ Key ══════════════════════════════════ */
+  var VENDORS = [["ds", "DeepSeek"], ["glm", "智谱 GLM"], ["kimi", "Kimi"], ["qwen", "千问 Qwen"], ["mm", "MiniMax"]];
+  function vKey(v) { try { return (localStorage.getItem("sde_wds_key_" + v) || (v === "ds" ? (localStorage.getItem("sde_wds_key") || "") : "")).trim(); } catch (e) { return ""; } }
+  function keyGet() {
+    var v = "";
+    try { v = localStorage.getItem("sde_wds_vendor") || "ds"; } catch (e) { v = "ds"; }
+    var k = vKey(v);
+    if (k.length >= 8) return { key: k, vendor: v, model: (function () { try { return localStorage.getItem("sde_wds_model_" + v) || ""; } catch (e) { return ""; } })() };
+    for (var i = 0; i < VENDORS.length; i++) { var kk = vKey(VENDORS[i][0]); if (kk.length >= 8) return { key: kk, vendor: VENDORS[i][0], model: "" }; }
+    return null;
+  }
+  $("keyb").onclick = function () {
+    var kv = keyGet();
+    note(kv
+      ? ("现在用的是 <b>" + esc((VENDORS.filter(function (x) { return x[0] === kv.vendor; })[0] || ["", kv.vendor])[1]) + "</b>。要换 Key 或换厂商，去 <a href='/taste/chatsde/' target='_blank'>ChatSDE</a> 的设置里改一次，全站通用。")
+      : "还没配 Key。去 <a href='/taste/chatsde/' target='_blank'>ChatSDE</a> 填一次，本页与全站共用同一把（只存你的浏览器本地）。");
+  };
+
+  /* ══════════ 三台智能体 ══════════════════════════════ */
+  function ag() { for (var i = 0; i < AGENTS.length; i++) if (AGENTS[i].k === ST.agent) return AGENTS[i]; return AGENTS[0]; }
+  function paintAgs() {
+    $("ags").innerHTML = AGENTS.map(function (a) {
+      return '<button data-k="' + a.k + '" class="' + (a.k === ST.agent ? "on" : "") + '">' + a.n + "</button>";
+    }).join("");
+    $("agdesc").textContent = ag().d;
+    $("quick").innerHTML = ag().quick.map(function (q, i) { return '<button data-q="' + i + '">' + esc(q) + "</button>"; }).join("");
+  }
+  $("ags").addEventListener("click", function (ev) {
+    var k = ev.target.getAttribute && ev.target.getAttribute("data-k");
+    if (!k) return;
+    ST.agent = k; save(); paintAgs(); paintMs();
+  });
+  $("quick").addEventListener("click", function (ev) {
+    var i = ev.target.getAttribute && ev.target.getAttribute("data-q");
+    if (i === null || i === undefined) return;
+    ask(ag().quick[+i]);
+  });
+
+  function paintMs() {
+    var log = ST.chat[ST.agent] || [];
+    if (!log.length) {
+      $("ms").innerHTML = '<p style="color:var(--faint);font-size:13.5px;line-height:1.8">' +
+        (ST.agent === "co"
+          ? "写卡住了就问一句。它每一轮都带着你正在写的这一篇，以及你选的路径与落点。"
+          : "点上面的快捷动作，或直接告诉它怎么改。<b style=\"color:var(--pa)\">它会交回改好的整篇，落成一个新版本</b>，原版还在。") + "</p>";
+      return;
+    }
+    $("ms").innerHTML = log.map(function (m, i) {
+      var bb = (m.r === "me")
+        ? '<div class="bb">' + esc(m.t) + "</div>"
+        : '<div class="bb">' + (window.WDSRte ? window.WDSRte.toHtml(m.t || "…") : esc(m.t)) + (m.on ? " ▊" : "") + "</div>";
+      var acts = (m.r === "wds" && !m.on && m.t)
+        ? '<div class="acts"><button data-a="ins" data-i="' + i + '">⤵ 插入正文</button>' +
+          '<button data-a="ver" data-i="' + i + '">⟳ 落成新版本</button>' +
+          '<button data-a="cp" data-i="' + i + '">复制</button></div>'
+        : "";
+      return '<div class="row ' + (m.r === "me" ? "me" : "wds") + '">' + bb + acts + "</div>";
+    }).join("");
+    try { $("ms").scrollTop = $("ms").scrollHeight; } catch (e) {}
+  }
+  $("ms").addEventListener("click", function (ev) {
+    var a = ev.target.getAttribute && ev.target.getAttribute("data-a");
+    if (!a) return;
+    var m = (ST.chat[ST.agent] || [])[+ev.target.getAttribute("data-i")];
+    if (!m) return;
+    if (a === "cp") { try { navigator.clipboard.writeText(m.t); note("已复制。"); } catch (e) {} return; }
+    if (a === "ver") { commit(m.t, ag().n); return; }
+    if (a === "ins") {
+      var b = grab();
+      ST.vers[ST.vi] = (b ? b.replace(/\s+$/, "") + "\n\n" : "") + m.t;
+      save(); paintEd(); note("已插到正文末尾（还没落成新版本）。");
+    }
+  });
+
+  /* 每一轮都带着现场去问：路径、落点、验收判据、正文、选中的一段。 */
+  function ctxOf() {
+    var p = pathOf();
+    var body = grab();
+    var sel = "";
+    try {
+      var g = window.getSelection && window.getSelection();
+      if (g && !g.isCollapsed && g.anchorNode && $("ed").contains(g.anchorNode.nodeType === 1 ? g.anchorNode : g.anchorNode.parentNode)) sel = String(g.toString()).trim();
+    } catch (e) {}
+    var out = "";
+    if (p) {
+      out += "【这一篇要建造的 SDE】路径 " + p.seq.join("→") + "（" + p.name + "）\n";
+      out += "落点＝" + p.fruit + "（" + DIM[p.fruit].t + "）；起手＝" + p.start + "；中项＝" + p.mid + "\n";
+      out += "验收判据：" + p.check + "\n";
+      out += "这条路径最常见的失败：" + p.pit + "\n\n";
+    } else {
+      out += "【还没选路径】——若他的问题需要落点才答得了，先反问他这一篇要落在哪一维（S 让人看见／D 让人会做／E 让人被牵动）。\n\n";
+    }
+    out += "【当前正文】（第 " + (ST.vi + 1) + "/" + ST.vers.length + " 版）\n" + (body || "（还是空的，一个字都没写）").slice(0, 9000) + "\n";
+    if (sel) out += "\n【他选中的一段】\n" + sel.slice(0, 1500) + "\n";
+    return out;
+  }
+
+  var abortC = null;
+  function ask(q) {
+    q = String(q || "").trim();
+    if (!q || ST.busy) return;
+    var kv = keyGet();
+    if (!kv) { note("还没配大模型 Key。去 <a href='/taste/chatsde/' target='_blank'>ChatSDE</a> 填一次，全站共用。"); return; }
+    ST.vers[ST.vi] = grab();
+    var A = ag();
+    var log = ST.chat[A.k];
+    log.push({ r: "me", t: q });
+    var cell = { r: "wds", t: "", on: 1 };
+    log.push(cell);
+    ST.busy = true; $("go").textContent = "停"; paintMs(); note("");
+
+    var hist = [];
+    log.forEach(function (m) { if (m.on) return; hist.push({ role: m.r === "me" ? "reader" : "wds", text: String(m.t).slice(0, 3000) }); });
+    hist = hist.slice(-8); hist.pop();
+
+    /* 诊断回执：把三类失败分开说，否则线上出问题查不下去（ChatSDE 那边吃过这个亏）。 */
+    var diag = { http: 0, ev: {}, bytes: 0, err: "" };
+    function diagLine() {
+      var ks = Object.keys(diag.ev).map(function (k) { return k + "×" + diag.ev[k]; });
+      return "HTTP " + (diag.http || "?") + " · " + diag.bytes + " B · " + (ks.length ? ks.join(" ") : "无事件") + (diag.err ? " · " + diag.err : "");
+    }
+    try { abortC = new AbortController(); } catch (e) { abortC = null; }
+    var wd = setTimeout(function () { diag.err = "watchdog"; try { if (abortC) abortC.abort(); } catch (e) {} }, 90000);
+
+    fetch("/api/wds/chat", {
+      method: "POST", headers: { "content-type": "application/json" },
+      signal: abortC ? abortC.signal : undefined,
+      body: JSON.stringify({
+        q: A.sys + "\n\n" + ctxOf() + "\n【他的话】\n" + q,
+        history: hist, umem: "", key: kv.key, vendor: kv.vendor, model: kv.model || "",
+        mode: "std", web: 0, skey: "", about: "", lang: "zh", tool: ""
+      })
+    }).then(function (resp) {
+      diag.http = resp.status;
+      if (!resp.ok || !resp.body) throw new Error("HTTP " + resp.status);
+      var rd = resp.body.getReader(), dec = new TextDecoder(), buf = "";
+      function pump() {
+        return rd.read().then(function (r) {
+          if (r.done) return;
+          clearTimeout(wd); wd = setTimeout(function () { diag.err = "watchdog"; try { if (abortC) abortC.abort(); } catch (e) {} }, 90000);
+          diag.bytes += (r.value && r.value.length) || 0;
+          buf += dec.decode(r.value, { stream: true });
+          var idx;
+          while ((idx = buf.indexOf("\n")) >= 0) {
+            var line = buf.slice(0, idx).trim(); buf = buf.slice(idx + 1);
+            if (line.slice(0, 5) !== "data:") continue;
+            var pp = line.slice(5).trim();
+            if (pp === "[DONE]") return;
+            var j; try { j = JSON.parse(pp); } catch (e) { diag.ev["坏json"] = (diag.ev["坏json"] || 0) + 1; continue; }
+            var t0 = String(j.t || "?"); diag.ev[t0] = (diag.ev[t0] || 0) + 1;
+            // ⚠ 正文事件名是 token（照 ChatSDE 主流程核对过，不许凭印象写 text/delta）
+            if (j.t === "token") { cell.t += j.v; paintMs(); }
+            else if (j.t === "error") {
+              var ev2 = String(j.v || "");
+              if (/1211|模型不存在|model.*not.*(exist|found)|invalid.*model/i.test(ev2)) ev2 = "这一家说这个型号不存在——多半是默认型号过时或你的账号没开通。去 ChatSDE 的模型选择器换一个型号。";
+              cell.t = ev2 || "出错了。"; paintMs();
+            }
+          }
+          return pump();
+        });
+      }
+      return pump();
+    }).then(function () {
+      clearTimeout(wd); delete cell.on; ST.busy = false; $("go").textContent = "送"; abortC = null;
+      if (!cell.t) cell.t = "流走完了，但一个字节正文都没收到。再问一次，或换一档／换一家基底。\n\n〔诊断回执：" + diagLine() + "〕";
+      /* 修改与编辑交回的是整篇 —— 直接落成新版本，不必再按一次。共创**绝不**自动落版。 */
+      if ((A.k === "rev" || A.k === "ed") && cell.t.length > 30) commit(stripFence(cell.t), A.n);
+      save(); paintMs();
+    }, function (e) {
+      clearTimeout(wd); delete cell.on; ST.busy = false; $("go").textContent = "送"; abortC = null;
+      diag.err = String((e && e.message) || e || "").slice(0, 120);
+      if (!cell.t) cell.t = ((diag.err === "watchdog" || /abort/i.test(diag.err)) ? "等了 90 秒一个字节都没来。" : "没答上来（网络或额度）。") +
+        "\n\n〔诊断回执：" + diagLine() + "〕";
+      save(); paintMs();
+    });
+  }
+  function stripFence(s) {
+    var m = String(s || "").trim().match(/^```[A-Za-z0-9_+-]*[ \t]*\r?\n([\s\S]*?)```\s*$/);
+    return m ? m[1].trim() : String(s || "").trim();
+  }
+  $("go").onclick = function () {
+    if (ST.busy) { try { if (abortC) abortC.abort(); } catch (e) {} return; }
+    var v = $("in").value; $("in").value = ""; $("in").style.height = "auto";
+    ask(v);
+  };
+  $("in").onkeydown = function (ev) { if (ev.key === "Enter" && !ev.shiftKey) { ev.preventDefault(); $("go").onclick(); } };
+  $("in").oninput = function () { $("in").style.height = "auto"; $("in").style.height = Math.min($("in").scrollHeight, 130) + "px"; };
+
+  $("judge").onclick = function () {
+    ST.agent = "co"; paintAgs();
+    ask("我不确定这一篇该走六路径里的哪一条。看看我已经写的（可能还很少）与我想写的，替我判一条，并说清：落点是哪一维、为什么不是相邻那条、以及第一段该怎么起手。判不了就反问我。");
+  };
+
+  /* ══════════ 启动 ══════════════════════════════════ */
+  load();
+  paintPaths(); paintTable(); paintAgs(); paintMs(); paintEd();
+  if (!rteOk()) note("排版模块没拉到，已退回源码模式（内容一个字都不会少）。");
+})();
+</script>
+<script src="/wds-mode.js?v=20260802a" defer></script>
+</body>
+</html>
