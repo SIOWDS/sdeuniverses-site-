@@ -4746,7 +4746,7 @@ async function askCore(request, env, url, body, SINK) {
     // ===== 模式：二阶碰撞（涌现流水线第二环）——三观点撞出一个候选典范 =====
     // 碰撞方式由前端随机抽取（不放回），服务端持有权威方式表：换方式重撞时，换的就是这一段。
     if (mode === "collide") {
-      MAXTOK = 3200;
+      MAXTOK = 6000;   // 思考与正文共用这一个额度：留不出余量，思考一深正文就是 0 字
       const views = String(body.views || "").slice(0, 20000);
       const wayNo = Math.max(1, Math.min(6, parseInt(body.way, 10) || 1));
       const WAYS = {
@@ -4780,7 +4780,7 @@ async function askCore(request, env, url, body, SINK) {
     }
     // ===== 模式：最终综合提炼（涌现流水线末环，也是整条产线最要紧的一步）=====
     else if (mode === "synth") {
-      MAXTOK = 5200;
+      MAXTOK = 8600;   // 同上；这一环最贵，宁可给足
       const winner = String(body.winner || "").slice(0, 6000);
       const others = String(body.others || "").slice(0, 7000);
       const cards = String(body.cards || "").slice(0, 3500);
@@ -4809,7 +4809,7 @@ async function askCore(request, env, url, body, SINK) {
         + "\n\n《站内资料》\n" + ctxText.slice(0, 9000);
     }
     else if (mode === "distill") {
-      MAXTOK = 5200;
+      MAXTOK = 8600;   // 同上：九栏入口资料本身就要三千多字，5200 全给思考也不够
       sys = (neigong ? neigong + "\n\n═══════════\n【你此前带着上面这套完整底盘先验、亲手写下并已内化的心得】\n" + (reflect || "（心得暂缺）") + "\n\n═══════════\n" : "")
         + "你是一位以 SDE 方法论为隐性引擎的资深学者。读者刚刚与你完成了一场连续多轮的问对；现在他点了「提炼精华」，要把这场问对收成一份《论文入口资料》——它将作为下一步「成文一篇」（万字论文）的唯一起点材料。"
         + "你的任务不是复述对话，而是把这场问对里**真正长出来的东西**挑出来、按承重程度排好序，并明确指出它还缺什么。"
@@ -4927,7 +4927,7 @@ async function askCore(request, env, url, body, SINK) {
   // 不告诉评分者它出自谁手、更不告诉它这是本站自己的产出；② 综合分由系统按固定权重算，
   // 模型只给五维分，任何模型手算的综合分都不算数；③ 每一维必附一句逐字引自原文的证据句。
   if (mode === "iq") {
-    MAXTOK = 3600;
+    MAXTOK = 4800;   // 同上：评分卡被截断在半句话里，整张卡就废了
     const text = String(body.text || "").slice(0, 26000);
     sys = "你是一位独立的创新智商评分者。你收到的是一份【匿名来稿】——你不知道它出自谁手，也不必知道。「名家写的」不加分，「机器写的」不减分；文风漂亮、术语密集、读起来像一篇正经论文，一律不加分。你唯一要测的是：一个此前不存在的认知物，在发生意义上走了多深。"
       + "\n\n【这把尺子测的是造新，不是解题】在大模型已吞下人类几乎全部公开文本的今天，一般智商刻度上的 100 分约等于一个基底在零提示语下的默认产出。所以 130 不是「比人聪明 30 分」，而是「比基底张口就来的那段话深 30 个智商点」。一段文本若连基底随口能写的深度都够不到，它在创新意义上就是负分——读起来多顺、多像论文都不算数。"
@@ -5012,34 +5012,69 @@ async function askCore(request, env, url, body, SINK) {
     return _out([{ t: "sources", v: sources }, { t: "error", v: VC.name + " 返回错误 " + upstream.status + "：" + errtxt }]);
   }
 
-  const reader = upstream.body.getReader();
   const dec = new TextDecoder();
+  // 把一条上游流转发给客户端，并回报「正文出了多少字·思考烧了多少字·为什么停」。
+  // 要这三个数，是因为「什么都没出来」有两种完全不同的死法，从前分不开：
+  // 连接断了，与 —— 思考把额度吃光、content 一个字不回（见 wdsPlainBody 头上的注释）。
+  const _drain = async (resp, controller, _st) => {
+    const rd = resp.body.getReader();
+    let buf = "", out = 0, think = 0, fin = "", errs = 0;
+    while (true) {
+      const { done, value } = await rd.read();
+      if (done) break;
+      buf += dec.decode(value, { stream: true });
+      let idx;
+      while ((idx = buf.indexOf("\n")) >= 0) {
+        const line = buf.slice(0, idx).trim();
+        buf = buf.slice(idx + 1);
+        if (!line.startsWith("data:")) continue;
+        const p = line.slice(5).trim();
+        if (p === "[DONE]") continue;
+        let j; try { j = JSON.parse(p); } catch (e) { continue; }
+        if (j.error) { errs++; controller.enqueue(_sseBytes({ t: "error", v: j.error.message || "基底流内错误" })); continue; }
+        const c0 = (j.choices && j.choices[0]) || {};
+        if (c0.finish_reason) fin = c0.finish_reason;
+        const d = c0.delta || {};
+        if (d.reasoning_content) { think += d.reasoning_content.length; if (_st) _st.think += d.reasoning_content.length; controller.enqueue(_sseBytes({ t: "think", v: d.reasoning_content })); }
+        if (d.content) { out += d.content.length; if (_st) _st.out += d.content.length; controller.enqueue(_sseBytes({ t: "token", v: d.content })); }
+      }
+    }
+    return { out: out, think: think, fin: fin, errs: errs };
+  };
   const runMain = async (controller) => {
       let _st = null;   // 这条流不带心跳，但下面共用的转发行会读 _st——严格模式下未声明即抛错
       controller.enqueue(_sseBytes({ t: "sources", v: sources })); // 先给出处，再流答案
       if (expStr) controller.enqueue(_sseBytes({ t: "expand", v: expStr }));
-      let buf = "";
-      try {
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-          buf += dec.decode(value, { stream: true });
-          let idx;
-          while ((idx = buf.indexOf("\n")) >= 0) {
-            const line = buf.slice(0, idx).trim();
-            buf = buf.slice(idx + 1);
-            if (!line.startsWith("data:")) continue;
-            const p = line.slice(5).trim();
-            if (p === "[DONE]") continue;
-            let j; try { j = JSON.parse(p); } catch (e) { continue; }
-            if (j.error) { controller.enqueue(_sseBytes({ t: "error", v: j.error.message || "基底流内错误" })); continue; }
-            const d = (j.choices && j.choices[0] && j.choices[0].delta) || {};
-            if (d.reasoning_content) { if (_st) _st.think += d.reasoning_content.length; controller.enqueue(_sseBytes({ t: "think", v: d.reasoning_content })); }
-            if (d.content) { if (_st) _st.out += d.content.length; controller.enqueue(_sseBytes({ t: "token", v: d.content })); }
-          }
+      let r = { out: 0, think: 0, fin: "", errs: 0 };
+      try { r = await _drain(upstream, controller, _st); }
+      catch (e) { controller.enqueue(_sseBytes({ t: "error", v: "读取基底流失败：" + (e && e.message) })); }
+      // ===== 零正文兜底 =====
+      // 提炼／碰撞／综合这些环节一跑一两分钟，一次哑火作废的是前面十几次调用。
+      // 所以这里不认命：同一份 messages 关掉思考再跑一遍（wdsPlainBody 就是干这个的），
+      // 不思考的那一遍把全部额度都用来写正文，几乎一定出得来。
+      if (r.out === 0) {
+        const _why = r.think > 0
+          ? "把额度全烧在思考上了（思考 " + r.think + " 字、正文 0 字）"
+          : "一个字的正文都没吐出来";
+        controller.enqueue(_sseBytes({ t: "status", v: "⚠ 基底这一轮" + _why + "——正在关掉思考重跑一次…" }));
+        let r2 = null;
+        try {
+          const up2 = await fetch(VC.url, {
+            method: "POST",
+            headers: { "content-type": "application/json", authorization: "Bearer " + KEY },
+            body: JSON.stringify(wdsPlainBody(VC, {
+              model: VC.model, stream: true, max_tokens: MAXTOK,
+              messages: [{ role: "system", content: sys }, { role: "user", content: usr }],
+            })),
+          });
+          if (up2.ok) r2 = await _drain(up2, controller, _st);
+          else controller.enqueue(_sseBytes({ t: "error", v: VC.name + " 关思考重跑返回 " + up2.status }));
+        } catch (e) { controller.enqueue(_sseBytes({ t: "error", v: "关思考重跑失败：" + (e && e.message) })); }
+        if (!r2 || r2.out === 0) {
+          controller.enqueue(_sseBytes({ t: "error", v: "基底没交出正文（第一遍" + _why
+            + (r.fin ? "，停因 " + r.fin : "") + "；关掉思考重跑仍是空）。"
+            + (r.errs ? "上面那条基底自己报的错才是根因。" : "请再点一次；若连着两次都空，换另一个基底。") }));
         }
-      } catch (e) {
-        controller.enqueue(_sseBytes({ t: "error", v: "读取基底流失败：" + (e && e.message) }));
       }
       controller.enqueue(_ENC.encode("data: [DONE]\n\n"));
       controller.close();

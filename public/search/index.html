@@ -796,7 +796,12 @@ function doDistill(){
   }).then(function(){
     box.className='ans';
     brief=acc.trim(); briefKind='distill';
-    if(brief.length<300){ stat.textContent='⚠ 提炼产出过短（'+brief.length+' 字），请重试；本次不作为论文入口。'; brief=''; return; }
+    if(brief.length<300){
+      stat.textContent=(brief.length===0
+        ? '⚠ 基底这一轮没交出正文（多半是把额度全烧在思考上了）。服务端已自动关思考重跑过一次仍是空——请再点一次「🧪 提炼精华」，或换一个基底。'
+        : '⚠ 提炼产出过短（'+brief.length+' 字），请重试；本次不作为论文入口。');
+      brief=''; return;
+    }
     stat.textContent='✓ 论文入口资料已就绪（'+brief.length+' 字，出自 '+turns.length+' 轮问对）· 现在点「成文一篇」，论文将以它为起点逐条兑现。';
   }).catch(function(e){
     box.className='ans';
@@ -1646,10 +1651,15 @@ function doEmerge(again){
       .then(function(t){
         box.className='ans'; box.textContent=String(t||'').trim();
         brief=String(t||'').trim(); briefKind='synth';
-        if(brief.length<300){ bstat.textContent='⚠ 综合提炼产出过短（'+brief.length+' 字），本次不作为论文入口，请重试。'; brief=''; return; }
+        if(brief.length<300){
+          bstat.textContent=(brief.length===0
+            ? '⚠ 基底这一轮没交出正文（多半是把额度全烧在思考上了）。服务端已自动关思考重跑过一次仍是空——三个典范都还在上面，点「🧪 提炼精华」或再跑一次即可。'
+            : '⚠ 综合提炼产出过短（'+brief.length+' 字），本次不作为论文入口，请重试。');
+          brief=''; return;
+        }
         bstat.textContent='✓ 综合提炼完成（'+brief.length+' 字）· 出自 '+turns.length+' 轮问对 → '+paradigms.length+' 个候选典范 → 择优 → 提炼。现在点「成文一篇」，论文将以它为起点逐条兑现。';
+        autoVault(brief, '综合提炼');   /* 从前这一行写在 .then 之后、return 管辖之外＝死代码，综合提炼一次都没入过库存 */
       });
-        autoVault(brief, '综合提炼');
   }).catch(function(e){
     stat.textContent='✗ '+errText(e);
     renderParadigms(paradigms.length?0:-1);
