@@ -136,6 +136,48 @@ sec("③ 页面接线");
   ok(!/sk-[A-Za-z0-9]{10,}/.test(H), "页面里出现了疑似真 Key");
 }
 
+/* ══ ③b 外观与「何谓作文」════════════════════════ */
+sec("③b 学画布那套背景 · 说明收进一颗按钮");
+{
+  /* 配色必须**取自画布那一套变量**，不许另配一份：另配一份就一定会漂开，
+     而这两处读者是来回切的。 */
+  ok(/--wbg:#0F0B07/.test(H) && /--wgold:#D4B25E/.test(H), "暗色不是画布那一套变量");
+  ok(/html\.wdsm-lt\{[\s\S]{0,400}--wbg:#FBF9F3/.test(H), "缺明亮主题（画布有明暗两套）");
+  /* ⚠ 要钉在**赋值**上，不能只查这个词在不在：我在注释里也写了「sde_wds_theme」，
+     按词扫会被自己的注释满足（同一个坑在 sim_growth、sim_wds_rte 各犯过一次）。 */
+  ok(/LS_THEME\s*=\s*"sde_wds_theme"/.test(H), "明暗没跟全站同一个开关（各存各的，读者要切两回）");
+  const M = fs.readFileSync(path.join(ROOT, "public/wds-mode.js"), "utf8");
+  ok(/var LS_THEME = "sde_wds_theme"/.test(M), "wds-mode 那边的主题键名变了，这里要同步");
+  /* 旧的自造变量必须清干净，否则会出现"一半新一半旧"的花脸 */
+  ["--bg:", "--pa:", "--ac:", "--card:"].forEach(v =>
+    ok(H.indexOf("var(" + v.replace(":", "") + ")") === -1, "还留着自造变量 " + v));
+
+  /* 首屏不许再铺说明：那几段整块搬进了弹层 */
+  ok(/id="whatb"/.test(H), "没有「何谓作文」那颗按钮");
+  ok(/id="mask"/.test(H) && /id="sbd"/.test(H), "没有弹层");
+  const hero = H.slice(H.indexOf('<div class="w hero">'), H.indexOf("<main"));
+  ok(hero.length < 900, "首屏还是太长（说明没收进弹层）：" + hero.length + " 字符");
+  ok(!/六条路径就不是六个口号/.test(hero), "首屏还铺着六路径那段说明");
+  ok(!/三台智能体/.test(hero), "首屏还铺着三台的说明");
+  ok(/class="pstrip"/.test(H), "路径没有改成紧凑的一条");
+
+  /* 弹层内容必须**由 PATHS/AGENTS 现算**，不许另抄一份文案 */
+  ok(/function paintSheet/.test(H), "没有弹层渲染");
+  const sh = H.slice(H.indexOf("function paintSheet"), H.indexOf("function paintTable"));
+  ok(/PATHS\.map/.test(sh) && /AGENTS\.map/.test(sh),
+    "弹层的说明是另抄的一份 —— 改了表就会和说明漂开");
+  /* 光"用过 PATHS.map"不够：留着不用照样过。判据要落在**成品里没有硬编码的表**上。 */
+  ok(!/<tr><td[^>]*>\s*S→D→E/.test(sh) && !/记叙文·|记叙<\/td>/.test(sh),
+    "弹层里硬编码了路径表 —— 改了 PATHS 说明就会漂开");
+  ok(/\+ rows \+/.test(sh), "弹层没有把现算出来的 rows 拼进去");
+  ok(/作文，是用文本（文）来建造（作）一个具体的 SDE/.test(sh), "弹层里没有那句总纲");
+  ok(/中项/.test(sh) && /落点/.test(sh) && /起手/.test(sh), "弹层里三分说明不全");
+  /* 关得掉：Esc、点遮罩、× 三条路都要有 */
+  ok(/Escape/.test(H), "Esc 关不掉弹层");
+  ok(/ev\.target === \$\("mask"\)/.test(H), "点遮罩关不掉弹层");
+  ok(/id="mx"/.test(H), "没有关闭按钮");
+}
+
 /* ══ ④ 首页挂载（铁律 3：孤儿页等于不存在）══════ */
 sec("④ 首页挂载");
 {

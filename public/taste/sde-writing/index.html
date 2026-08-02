@@ -7,81 +7,114 @@
 <title>SDE 作文共创 · 用文本建造一个具体的 SDE | SDE Universes</title>
 <meta name="description" content="作文＝用文本（文）来建造（作）一个具体的 SDE。不同的 SDE 显现出的果子不一样：有的聚焦 S（让人看见）、有的聚焦 D（让人会做）、有的聚焦 E（让人被牵动）——SDE 方法论的六条路径于是对应六种文章类别与行文方式。页内自带编辑器与三台智能体：与 WDS 共创（问）、WDS 修改（动内容）、WDS 编辑（动文字）。用你自己的大模型 Key，只存浏览器本地。">
 <style>
-:root{--bg:#0F0D0A;--pa:#EFE9DD;--dim:#B9AE99;--faint:#7C7466;--ac:#C9A227;--s:#7FA8C9;--d:#C98F5E;--e:#8FB3A0;--line:#2A2521;--card:#161310;--fill:#1C1815}
+/* 配色直接取画布那一套（wds-mode.js 的主题变量），不自己另配一份：
+   另配一份就一定会和画布漂开，而这两处读者是来回切的。
+   明/暗跟随全站同一个开关 sde_wds_theme（没设过就跟系统）。 */
+:root{--wbg:#0F0B07;--wbg2:#12100C;--wpanel:#161310;--wtx:#E8E4DA;--wtx2:#F5EFE0;
+  --wdim:#8B98A5;--wdim2:#5f6a7a;--wline:rgba(255,255,255,.10);--wline2:rgba(212,178,94,.18);
+  --wgold:#D4B25E;--wgold2:#C9A227;--wteal:#3DA5A5;--wfill:rgba(255,255,255,.05);--wfill2:rgba(255,255,255,.09);
+  --wmask:rgba(10,8,5,.74);--s:#7FA8C9;--d:#C98F5E;--e:#8FB3A0}
+html.wdsm-lt{--wbg:#FBF9F3;--wbg2:#F5F1E7;--wpanel:#FFFDF8;--wtx:#2C2822;--wtx2:#17140F;
+  --wdim:#6E685D;--wdim2:#948C7E;--wline:rgba(0,0,0,.11);--wline2:rgba(140,106,58,.26);
+  --wgold:#8C6A3A;--wgold2:#7A5A2C;--wteal:#2C7C7C;--wfill:rgba(0,0,0,.04);--wfill2:rgba(0,0,0,.075);
+  --wmask:rgba(244,240,232,.82);--s:#3C6E9C;--d:#9A5F2C;--e:#3F7A5E}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--pa);font-family:"Noto Serif CJK SC","Songti SC",Georgia,serif;line-height:1.85}
-a{color:var(--ac);text-decoration:none}a:hover{text-decoration:underline}
+body{margin:0;background:var(--wbg);color:var(--wtx);font-family:-apple-system,'PingFang SC','Microsoft YaHei',"Noto Serif CJK SC",Georgia,serif;line-height:1.85}
+a{color:var(--wgold);text-decoration:none}a:hover{text-decoration:underline}
 .w{max-width:1180px;margin:0 auto;padding:0 20px}
-header{border-bottom:1px solid var(--line);padding:13px 0;font-size:13px;color:var(--dim)}
+header{border-bottom:1px solid var(--wline);padding:13px 0;font-size:13px;color:var(--wdim)}
 header .w{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center}
-.hero{padding:44px 0 22px;border-bottom:1px solid var(--line)}
-.en{font-size:11px;letter-spacing:.22em;color:var(--faint);text-transform:uppercase}
+.hero{padding:44px 0 22px;border-bottom:1px solid var(--wline)}
+.en{font-size:11px;letter-spacing:.22em;color:var(--wdim2);text-transform:uppercase}
 h1{font-size:33px;margin:10px 0 8px;letter-spacing:.04em}
-.thesis{font-size:17px;color:var(--pa);max-width:60em;margin:0 0 10px}
-.thesis b{color:var(--ac)}
-.sub{color:var(--dim);font-size:14.5px;max-width:62em}
+.thesis{font-size:17px;color:var(--wtx);max-width:60em;margin:0 0 10px}
+.thesis b{color:var(--wgold)}
+.sub{color:var(--wdim);font-size:14.5px;max-width:62em}
 button{font:inherit;cursor:pointer}
-.btn{background:var(--ac);color:#17130A;border:0;border-radius:6px;padding:8px 16px;font-size:13.5px}
-.gh{background:transparent;color:var(--dim);border:1px solid var(--line);border-radius:6px;padding:7px 13px;font-size:13px}
-.gh:hover{color:var(--ac);border-color:var(--ac)}
-.gh.on{color:var(--ac);border-color:var(--ac);background:var(--fill)}
+.btn{background:var(--wgold);color:#17130A;border:0;border-radius:6px;padding:8px 16px;font-size:13.5px}
+.gh{background:transparent;color:var(--wdim);border:1px solid var(--wline);border-radius:6px;padding:7px 13px;font-size:13px}
+.gh:hover{color:var(--wgold);border-color:var(--wgold)}
+.gh.on{color:var(--wgold);border-color:var(--wgold);background:var(--wfill)}
 main{padding:24px 0 60px}
 /* 六路径 */
-.paths{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:12px;margin:16px 0 0}
-.pcard{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:15px 16px;cursor:pointer;transition:border-color .15s}
-.pcard:hover{border-color:var(--ac)}
-.pcard.on{border-color:var(--ac);background:var(--fill)}
+.one{font-size:15px;color:var(--wdim);margin:6px 0 14px}
+.one b{color:var(--wgold)}
+/* 路径改成一条紧凑的条：首屏第一件事是能动手，不是读说明 */
+.pstrip{display:flex;gap:8px;flex-wrap:wrap}
+.pchip{background:var(--wpanel);border:1px solid var(--wline);border-radius:999px;padding:7px 14px;cursor:pointer;font-size:13px;color:var(--wdim);white-space:nowrap}
+.pchip:hover{border-color:var(--wgold);color:var(--wtx)}
+.pchip.on{border-color:var(--wgold);color:var(--wgold);background:var(--wfill)}
+.pchip .sq{font-weight:700;letter-spacing:.06em;margin-right:6px}
+.prow{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:12px 0 0}
+.pdet{margin:10px 0 0;padding:11px 14px;background:var(--wpanel);border-left:2px solid var(--wgold);font-size:13.5px;color:var(--wdim);line-height:1.8}
+.pdet b{color:var(--wtx)}
+/* 弹层：说明全在这儿 */
+.mask{position:fixed;inset:0;background:var(--wmask);z-index:9000;display:none;align-items:center;justify-content:center;padding:24px}
+.mask.on{display:flex}
+.sheet{background:var(--wbg2);border:1px solid var(--wline2);border-radius:14px;max-width:920px;width:100%;max-height:86vh;display:flex;flex-direction:column}
+.shd{display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid var(--wline);font-size:16px;color:var(--wgold)}
+.shd .sp{flex:1}
+.sbd{overflow:auto;padding:18px 20px 26px;font-size:14.5px;line-height:1.9;color:var(--wdim)}
+.sbd h3{font-size:16.5px;color:var(--wtx);margin:22px 0 8px}
+.sbd h3:first-child{margin-top:0}
+.sbd b{color:var(--wtx)}
+.sbd table{border-collapse:collapse;font-size:13px;width:100%;margin:10px 0 0}
+.sbd td,.sbd th{border:1px solid var(--wline);padding:7px 10px;text-align:left;vertical-align:top}
+.paths{display:none}
+.pcard{background:var(--wpanel);border:1px solid var(--wline);border-radius:10px;padding:15px 16px;cursor:pointer;transition:border-color .15s}
+.pcard:hover{border-color:var(--wgold)}
+.pcard.on{border-color:var(--wgold);background:var(--wfill)}
 .pcard .seq{font-size:14px;letter-spacing:.1em;font-weight:700}
-.pcard .nm{font-size:16.5px;color:var(--pa);margin:5px 0 4px}
-.pcard .fr{font-size:12px;color:var(--ac);letter-spacing:.06em}
-.pcard .ty{font-size:13px;color:var(--dim);margin:6px 0 0}
-.pcard .hw{font-size:13px;color:var(--faint);margin:6px 0 0;line-height:1.7}
+.pcard .nm{font-size:16.5px;color:var(--wtx);margin:5px 0 4px}
+.pcard .fr{font-size:12px;color:var(--wgold);letter-spacing:.06em}
+.pcard .ty{font-size:13px;color:var(--wdim);margin:6px 0 0}
+.pcard .hw{font-size:13px;color:var(--wdim2);margin:6px 0 0;line-height:1.7}
 .sS{color:var(--s)}.sD{color:var(--d)}.sE{color:var(--e)}
 /* 工作台 */
 .lab{display:grid;grid-template-columns:1fr 420px;gap:14px;margin:22px 0 0}
 @media(max-width:980px){.lab{grid-template-columns:1fr}}
-.pane{background:var(--card);border:1px solid var(--line);border-radius:10px;display:flex;flex-direction:column;min-height:520px}
-.pbar{display:flex;gap:6px;flex-wrap:wrap;padding:10px 12px;border-bottom:1px solid var(--line);align-items:center}
+.pane{background:var(--wpanel);border:1px solid var(--wline);border-radius:10px;display:flex;flex-direction:column;min-height:520px}
+.pbar{display:flex;gap:6px;flex-wrap:wrap;padding:10px 12px;border-bottom:1px solid var(--wline);align-items:center}
 .pbar .sp{flex:1}
-.pbar .tag{font-size:11.5px;color:var(--faint);letter-spacing:.06em}
-.ed{flex:1;min-height:380px;background:#100E0B;color:var(--pa);border:0;border-radius:0 0 10px 10px;padding:16px 18px;font-size:15px;line-height:1.9;outline:none;overflow:auto}
+.pbar .tag{font-size:11.5px;color:var(--wdim2);letter-spacing:.06em}
+.ed{flex:1;min-height:380px;background:var(--wbg2);color:var(--wtx);border:0;border-radius:0 0 10px 10px;padding:16px 18px;font-size:15px;line-height:1.9;outline:none;overflow:auto}
 .ed h1{font-size:21px;margin:.8em 0 .4em}.ed h2{font-size:18px;margin:.8em 0 .4em}.ed h3{font-size:16px;margin:.7em 0 .35em}
 .ed p{margin:0 0 .8em}.ed ul,.ed ol{margin:0 0 .8em 1.4em}
-.ed blockquote{margin:0 0 .8em;padding-left:12px;border-left:2px solid var(--ac);color:var(--dim)}
+.ed blockquote{margin:0 0 .8em;padding-left:12px;border-left:2px solid var(--wgold);color:var(--wdim)}
 .ed table{border-collapse:collapse;font-size:13.5px;margin:0 0 .8em}
-.ed td,.ed th{border:1px solid var(--line);padding:5px 9px}
-textarea.src{flex:1;min-height:380px;background:#100E0B;color:var(--pa);border:0;padding:16px 18px;font:13px/1.75 ui-monospace,Menlo,Consolas,monospace;resize:none;outline:none}
-.rtb{display:flex;gap:4px;flex-wrap:wrap;padding:8px 12px;border-bottom:1px solid var(--line)}
-.rtb button{background:var(--fill);border:1px solid var(--line);color:var(--dim);font-size:12px;padding:5px 9px;border-radius:6px}
-.rtb button:hover{color:var(--ac);border-color:var(--ac)}
+.ed td,.ed th{border:1px solid var(--wline);padding:5px 9px}
+textarea.src{flex:1;min-height:380px;background:var(--wbg2);color:var(--wtx);border:0;padding:16px 18px;font:13px/1.75 ui-monospace,Menlo,Consolas,monospace;resize:none;outline:none}
+.rtb{display:flex;gap:4px;flex-wrap:wrap;padding:8px 12px;border-bottom:1px solid var(--wline)}
+.rtb button{background:var(--wfill);border:1px solid var(--wline);color:var(--wdim);font-size:12px;padding:5px 9px;border-radius:6px}
+.rtb button:hover{color:var(--wgold);border-color:var(--wgold)}
 /* 三台智能体 */
-.ags{display:flex;gap:6px;padding:10px 12px;border-bottom:1px solid var(--line);flex-wrap:wrap}
-.ags button{flex:1;min-width:104px;background:transparent;border:1px solid var(--line);color:var(--dim);font-size:13px;padding:8px 6px;border-radius:8px}
-.ags button.on{border-color:var(--ac);color:var(--ac);background:var(--fill)}
-.agdesc{font-size:12.5px;color:var(--faint);padding:8px 14px;border-bottom:1px solid var(--line);line-height:1.7}
+.ags{display:flex;gap:6px;padding:10px 12px;border-bottom:1px solid var(--wline);flex-wrap:wrap}
+.ags button{flex:1;min-width:104px;background:transparent;border:1px solid var(--wline);color:var(--wdim);font-size:13px;padding:8px 6px;border-radius:8px}
+.ags button.on{border-color:var(--wgold);color:var(--wgold);background:var(--wfill)}
+.agdesc{font-size:12.5px;color:var(--wdim2);padding:8px 14px;border-bottom:1px solid var(--wline);line-height:1.7}
 .ms{flex:1;overflow:auto;padding:12px 14px;min-height:220px}
 .row{margin:0 0 13px}
 .row.me{text-align:right}
-.row.me .bb{display:inline-block;background:var(--fill);border-radius:12px 12px 3px 12px;padding:7px 11px;font-size:13.5px;text-align:left;max-width:88%;white-space:pre-wrap;word-break:break-word}
+.row.me .bb{display:inline-block;background:var(--wfill);border-radius:12px 12px 3px 12px;padding:7px 11px;font-size:13.5px;text-align:left;max-width:88%;white-space:pre-wrap;word-break:break-word}
 .row.wds .bb{font-size:14px;line-height:1.85}
 .row .acts{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
-.row .acts button{background:none;border:1px solid var(--line);color:var(--dim);font-size:11.5px;padding:4px 8px;border-radius:6px}
-.row .acts button:hover{color:var(--ac);border-color:var(--ac)}
+.row .acts button{background:none;border:1px solid var(--wline);color:var(--wdim);font-size:11.5px;padding:4px 8px;border-radius:6px}
+.row .acts button:hover{color:var(--wgold);border-color:var(--wgold)}
 .quick{display:flex;gap:6px;flex-wrap:wrap;padding:0 14px 8px}
-.quick button{background:var(--fill);border:1px solid var(--line);color:var(--dim);font-size:11.5px;padding:5px 10px;border-radius:999px}
-.quick button:hover{color:var(--ac);border-color:var(--ac)}
-.inb{display:flex;gap:8px;padding:8px 12px 12px;align-items:flex-end;border-top:1px solid var(--line)}
-.inb textarea{flex:1;min-height:40px;max-height:130px;background:#100E0B;color:var(--pa);border:1px solid var(--line);border-radius:10px;padding:9px 12px;font:inherit;font-size:13.5px;resize:none;outline:none}
-.inb textarea:focus{border-color:var(--ac)}
-#note{font-size:12.5px;color:var(--ac);padding:0 14px 8px;min-height:1.2em;line-height:1.7}
-.diagx{font-size:11.5px;color:var(--faint)}
-.foot{border-top:1px solid var(--line);padding:24px 0 60px;font-size:13px;color:var(--faint)}
-.foot a{color:var(--dim)}
-.note{margin:18px 0 0;padding:13px 16px;background:var(--card);border-left:2px solid var(--ac);font-size:13.5px;color:var(--dim)}
-.note b{color:var(--pa)}
-h2.sec{font-size:19px;margin:32px 0 8px;letter-spacing:.04em;border-bottom:1px solid var(--line);padding-bottom:7px}
-.dl{display:flex;flex-wrap:wrap;gap:8px 26px;font-size:13.5px;color:var(--dim);margin:10px 0 0}
-.dl span b{color:var(--pa)}
+.quick button{background:var(--wfill);border:1px solid var(--wline);color:var(--wdim);font-size:11.5px;padding:5px 10px;border-radius:999px}
+.quick button:hover{color:var(--wgold);border-color:var(--wgold)}
+.inb{display:flex;gap:8px;padding:8px 12px 12px;align-items:flex-end;border-top:1px solid var(--wline)}
+.inb textarea{flex:1;min-height:40px;max-height:130px;background:var(--wbg2);color:var(--wtx);border:1px solid var(--wline);border-radius:10px;padding:9px 12px;font:inherit;font-size:13.5px;resize:none;outline:none}
+.inb textarea:focus{border-color:var(--wgold)}
+#note{font-size:12.5px;color:var(--wgold);padding:0 14px 8px;min-height:1.2em;line-height:1.7}
+.diagx{font-size:11.5px;color:var(--wdim2)}
+.foot{border-top:1px solid var(--wline);padding:24px 0 60px;font-size:13px;color:var(--wdim2)}
+.foot a{color:var(--wdim)}
+.note{margin:18px 0 0;padding:13px 16px;background:var(--wpanel);border-left:2px solid var(--wgold);font-size:13.5px;color:var(--wdim)}
+.note b{color:var(--wtx)}
+h2.sec{font-size:19px;margin:32px 0 8px;letter-spacing:.04em;border-bottom:1px solid var(--wline);padding-bottom:7px}
+.dl{display:flex;flex-wrap:wrap;gap:8px 26px;font-size:13.5px;color:var(--wdim);margin:10px 0 0}
+.dl span b{color:var(--wtx)}
 @media(max-width:560px){h1{font-size:26px}.thesis{font-size:15.5px}}
 </style>
 </head>
@@ -89,33 +122,22 @@ h2.sec{font-size:19px;margin:32px 0 8px;letter-spacing:.04em;border-bottom:1px s
 
 <header><div class="w">
   <span><a href="/browse/">← 爱思乐园</a> · <a href="/taste/chatsde/">ChatSDE</a> · <a href="/challenge/">每日思想挑战</a></span>
-  <span><button class="gh" id="keyb">🔑 大模型 Key</button></span>
+  <span><button class="gh" id="whatb">📖 何谓作文</button> <button class="gh" id="themeb">◐ 明暗</button> <button class="gh" id="keyb">🔑 大模型 Key</button></span>
 </div></header>
 
 <div class="w hero">
-  <div class="en">SDE Writing Lab</div>
   <h1>SDE 作文共创</h1>
-  <p class="thesis"><b>作文，是用文本（文）来建造（作）一个具体的 SDE。</b></p>
-  <p class="sub">不同的 SDE 显现出的果子不一样：有的聚焦 <b class="sS">S · 显露</b>（要让人<b>看见</b>）、有的聚焦 <b class="sD">D · 发生</b>（要让人<b>会做</b>）、有的聚焦 <b class="sE">E · 纠缠</b>（要让人<b>被牵动</b>）。<br>
-  于是 SDE 方法论的<b>六条路径</b>就不是六个口号，而是<b>六种文章类别与六套行文方式</b>：<b>落点</b>决定这篇要交出什么果子，<b>起手</b>决定从哪儿下笔，<b>中项</b>决定靠什么推进。</p>
-  <div class="dl">
-    <span><b>三台智能体</b>：与 WDS 共创（问）· WDS 修改（动内容）· WDS 编辑（动文字）</span>
-    <span><b>零责任</b>：用你自己的 Key，只存浏览器本地</span>
+  <p class="one">作文＝用文本建造一个具体的 SDE。<b>落点</b>决定这一篇要交出什么果子。</p>
+  <div class="pstrip" id="paths"></div>
+  <div class="prow">
+    <button class="gh" id="judge">🧭 让 WDS 判一下我该走哪条</button>
+    <span class="tag" id="ptag"></span>
   </div>
+  <div class="pdet" id="pdetail" style="display:none"></div>
 </div>
 
 <main class="w">
-
-  <h2 class="sec">一、先定路径：这一篇要建造哪一种 SDE</h2>
-  <p class="sub">选一条。选错了也不要紧——写到一半发现落点变了，换一条就是，<b style="color:var(--pa)">换路径本身就是一次判断</b>。不知道选哪条，就点「让 WDS 判一下」。</p>
-  <div class="paths" id="paths"></div>
-  <div style="margin:14px 0 0;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
-    <button class="gh" id="judge">🧭 让 WDS 判一下我该走哪条</button>
-    <span class="tag" id="ptag" style="font-size:12.5px;color:var(--faint)"></span>
-  </div>
-  <div class="note" id="pdetail" style="display:none"></div>
-
-  <h2 class="sec">二、写：编辑器与三台智能体</h2>
+  
   <div class="lab">
     <div class="pane">
       <div class="pbar">
@@ -131,7 +153,7 @@ h2.sec{font-size:19px;margin:32px 0 8px;letter-spacing:.04em;border-bottom:1px s
       <div class="rtb" id="rtb"></div>
       <div class="ed" id="ed" contenteditable="true" spellcheck="false"></div>
       <textarea class="src" id="src" style="display:none"></textarea>
-      <div class="pbar" style="border-top:1px solid var(--line);border-bottom:0">
+      <div class="pbar" style="border-top:1px solid var(--wline);border-bottom:0">
         <button class="gh" id="oCopy">复制</button>
         <button class="gh" id="oDl">下载 .md</button>
         <button class="gh" id="oKb">⇧ 存进知识库</button>
@@ -153,18 +175,12 @@ h2.sec{font-size:19px;margin:32px 0 8px;letter-spacing:.04em;border-bottom:1px s
     </div>
   </div>
 
-  <h2 class="sec">三、六路径为什么是这六种文章</h2>
-  <div class="note">
-    <p style="margin:0 0 10px"><b>落点＝这一篇要交出的果子，也是唯一的验收判据。</b></p>
-    <p style="margin:0 0 6px">· 落在 <b class="sS">S</b>：读完能不能<b>复述成一个画面</b>？复述不出来就是没落地。</p>
-    <p style="margin:0 0 6px">· 落在 <b class="sD">D</b>：读完能不能<b>照着做一遍</b>？做不出来就是只讲了道理。</p>
-    <p style="margin:0 0 10px">· 落在 <b class="sE">E</b>：读完<b>关系有没有变</b>（他和某人、某物、某件事之间）？没变就是自说自话。</p>
-    <p style="margin:0 0 6px"><b>起手＝从哪一维下笔</b>：从 S 起＝从一个看得见的场景/物/画面；从 D 起＝从一个动作或过程；从 E 起＝从一段关系或处境。</p>
-    <p style="margin:0"><b>中项＝转换器</b>：它是把起手那一维换算成落点那一维的机关。中项写虚了，全篇就会在起手那一维原地打转——<b>这是作文最常见的失败，不是"没有文采"</b>。</p>
-  </div>
-  <div id="ptable" style="margin:16px 0 0"></div>
-
 </main>
+
+<div class="mask" id="mask"><div class="sheet">
+  <div class="shd"><b>何谓作文</b><span class="sp"></span><button class="gh" id="mx">×</button></div>
+  <div class="sbd" id="sbd"></div>
+</div></div>
 
 <div class="w foot">
   <p>三台智能体都用<b>你自己的大模型 Key</b>（与全站同一把，只存浏览器本地，服务器不经手）。稿子存在本机；要跨设备留存请「⇧ 存进知识库」。</p>
@@ -266,20 +282,16 @@ h2.sec{font-size:19px;margin:32px 0 8px;letter-spacing:.04em;border-bottom:1px s
   /* ══════════ 路径面板 ══════════════════════════════════ */
   function paintPaths() {
     $("paths").innerHTML = PATHS.map(function (p) {
-      return '<div class="pcard' + (p.id === ST.path ? " on" : "") + '" data-p="' + p.id + '">' +
-        '<div class="seq">' + p.seq.map(function (x) { return '<span class="' + DIM[x].c + '">' + x + '</span>'; }).join(" → ") + '</div>' +
-        '<div class="nm">' + p.name + '</div>' +
-        '<div class="fr">落点 ' + p.fruit + " · " + DIM[p.fruit].t + '　｜　起手 ' + p.start + '　｜　中项 ' + p.mid + '</div>' +
-        '<div class="ty">' + p.types + '</div>' +
-        '<div class="hw">' + p.how + '</div></div>';
+      return '<button class="pchip' + (p.id === ST.path ? " on" : "") + '" data-p="' + p.id + '">' +
+        '<span class="sq">' + p.seq.join("→") + '</span>' + p.name + "</button>";
     }).join("");
     var p = pathOf();
-    $("ptag").textContent = p ? ("当前：" + p.seq.join("→") + " · " + p.name) : "还没选路径——不选也能写，但没有落点就没有验收判据。";
+    $("ptag").textContent = p ? ("落点 " + p.fruit + " · " + DIM[p.fruit].t) : "还没选路径——不选也能写，但没有落点就没有验收判据。";
     if (p) {
       $("pdetail").style.display = "";
-      $("pdetail").innerHTML = "<b>验收判据（落点 " + p.fruit + "）</b>：" + esc(p.check) +
-        "<br><br><b>最常见的失败</b>：" + esc(p.pit) +
-        "<br><br><b>常见文体</b>：" + esc(p.types);
+      $("pdetail").innerHTML = "<b>验收判据</b>：" + esc(p.check) +
+        "　<b>常见文体</b>：" + esc(p.types) +
+        "<br><b>这条最常见的失败</b>：" + esc(p.pit);
     } else { $("pdetail").style.display = "none"; }
   }
   $("paths").addEventListener("click", function (ev) {
@@ -288,18 +300,50 @@ h2.sec{font-size:19px;margin:32px 0 8px;letter-spacing:.04em;border-bottom:1px s
     ST.path = c.getAttribute("data-p"); save(); paintPaths();
   });
 
+  /* 弹层里的说明**全部由 PATHS/AGENTS 现算**，不另抄一份文案：
+     抄一份，改了表就一定和说明漂开，而这台机器的价值全在那张表上。 */
+  function paintSheet() {
+    var rows = PATHS.map(function (p) {
+      return "<tr><td style='white-space:nowrap'><b>" + p.seq.join("→") + "</b><br><span style='color:var(--wdim2);font-size:12px'>" + p.name + "</span></td>" +
+        "<td><b>" + p.fruit + "</b> · " + DIM[p.fruit].t + "</td>" +
+        "<td>" + esc(p.types) + "</td>" +
+        "<td style='color:var(--wdim2)'>" + esc(p.pit) + "</td></tr>";
+    }).join("");
+    $("sbd").innerHTML =
+      "<h3>一句话</h3><p style='font-size:16px;color:var(--wtx)'><b>作文，是用文本（文）来建造（作）一个具体的 SDE。</b></p>" +
+      "<p>不同的 SDE 显现出的果子不一样：有的聚焦 <b>S · 显露</b>（要让人<b>看见</b>）、有的聚焦 <b>D · 发生</b>（要让人<b>会做</b>）、有的聚焦 <b>E · 纠缠</b>（要让人<b>被牵动</b>）。于是 SDE 方法论的六条路径就不是六个口号，而是<b>六种文章类别与六套行文方式</b>。</p>" +
+      "<h3>三分：落点 · 起手 · 中项</h3>" +
+      "<p><b>落点</b>（序列末项）＝这一篇要交出的果子，<b>也是唯一的验收判据</b>：<br>" +
+      "· 落在 <b>S</b>：读完能不能<b>复述成一个画面</b>？<br>" +
+      "· 落在 <b>D</b>：读完能不能<b>照着做一遍</b>？<br>" +
+      "· 落在 <b>E</b>：读完<b>关系有没有变</b>？</p>" +
+      "<p><b>起手</b>（首项）＝从哪一维下笔：从 S 起＝一个看得见的场景／物；从 D 起＝一个动作或过程；从 E 起＝一段关系或处境。</p>" +
+      "<p><b>中项</b>（中项）＝把起手那一维换算成落点那一维的<b>转换器</b>。中项写虚了，全篇就会在起手那一维原地打转——<b>这是作文最常见的失败，不是「没有文采」</b>。</p>" +
+      "<h3>六路径 · 六种文章</h3>" +
+      "<table><tr><th>路径</th><th>落点／果子</th><th>文体</th><th>最常见的失败</th></tr>" + rows + "</table>" +
+      "<h3>三台智能体各干什么</h3>" +
+      "<table><tr><th>台</th><th>动什么</th><th>产物</th></tr>" +
+      AGENTS.map(function (a) {
+        var what = a.k === "co" ? "动脑（只讨论，绝不代写）" : (a.k === "rev" ? "动<b>内容</b>：判断、结构、论证、落点" : "动<b>文字</b>：语句、段落、体例、标题；<b>一个判断都不许改</b>");
+        var out = a.k === "co" ? "话——要不要用你说了算" : "改好的整篇，<b>自动落成新版本</b>（原版还在，可退回、可比对）";
+        return "<tr><td style='white-space:nowrap'>" + a.n + "</td><td>" + what + "</td><td>" + out + "</td></tr>";
+      }).join("") + "</table>" +
+      "<h3>为什么这三台要分开</h3>" +
+      "<p>混成一台，你永远拿不准「它这次会不会把我的判断改掉」——于是就不敢让它碰稿子。分开之后：想找灵感找<b>共创</b>（它不动你的字），想动判断找<b>修改</b>，只想把文字理顺找<b>编辑</b>（它不动你的判断）。</p>";
+  }
   function paintTable() {
+    if (!$("ptable")) return;      // 第三节已收进弹层，容器不在了
     $("ptable").innerHTML = '<table style="border-collapse:collapse;font-size:13.5px;width:100%">' +
-      '<tr><th style="border:1px solid var(--line);padding:7px 10px;text-align:left">路径</th>' +
-      '<th style="border:1px solid var(--line);padding:7px 10px;text-align:left">落点／果子</th>' +
-      '<th style="border:1px solid var(--line);padding:7px 10px;text-align:left">文体</th>' +
-      '<th style="border:1px solid var(--line);padding:7px 10px;text-align:left">最常见的失败</th></tr>' +
+      '<tr><th style="border:1px solid var(--wline);padding:7px 10px;text-align:left">路径</th>' +
+      '<th style="border:1px solid var(--wline);padding:7px 10px;text-align:left">落点／果子</th>' +
+      '<th style="border:1px solid var(--wline);padding:7px 10px;text-align:left">文体</th>' +
+      '<th style="border:1px solid var(--wline);padding:7px 10px;text-align:left">最常见的失败</th></tr>' +
       PATHS.map(function (p) {
-        return '<tr><td style="border:1px solid var(--line);padding:7px 10px;white-space:nowrap">' +
-          p.seq.join("→") + '<br><span style="color:var(--faint);font-size:12px">' + p.name + '</span></td>' +
-          '<td style="border:1px solid var(--line);padding:7px 10px">' + p.fruit + " · " + DIM[p.fruit].t + '</td>' +
-          '<td style="border:1px solid var(--line);padding:7px 10px;color:var(--dim)">' + p.types + '</td>' +
-          '<td style="border:1px solid var(--line);padding:7px 10px;color:var(--faint)">' + esc(p.pit) + '</td></tr>';
+        return '<tr><td style="border:1px solid var(--wline);padding:7px 10px;white-space:nowrap">' +
+          p.seq.join("→") + '<br><span style="color:var(--wdim2);font-size:12px">' + p.name + '</span></td>' +
+          '<td style="border:1px solid var(--wline);padding:7px 10px">' + p.fruit + " · " + DIM[p.fruit].t + '</td>' +
+          '<td style="border:1px solid var(--wline);padding:7px 10px;color:var(--wdim)">' + p.types + '</td>' +
+          '<td style="border:1px solid var(--wline);padding:7px 10px;color:var(--wdim2)">' + esc(p.pit) + '</td></tr>';
       }).join("") + '</table>';
   }
 
@@ -312,7 +356,7 @@ h2.sec{font-size:19px;margin:32px 0 8px;letter-spacing:.04em;border-bottom:1px s
       $("ed").removeAttribute("contenteditable");
       var prev = ST.vers[ST.vi - 1];
       $("ed").innerHTML = (typeof prev !== "string")
-        ? '<p style="color:var(--faint)">只有一版，没有可比的上一版。</p>'
+        ? '<p style="color:var(--wdim2)">只有一版，没有可比的上一版。</p>'
         : (window.WDSDiff ? window.WDSDiff.html(prev, text, { tSame: "… 未改 {n} 行 …" }) : "");
       return;
     }
@@ -446,10 +490,10 @@ h2.sec{font-size:19px;margin:32px 0 8px;letter-spacing:.04em;border-bottom:1px s
   function paintMs() {
     var log = ST.chat[ST.agent] || [];
     if (!log.length) {
-      $("ms").innerHTML = '<p style="color:var(--faint);font-size:13.5px;line-height:1.8">' +
+      $("ms").innerHTML = '<p style="color:var(--wdim2);font-size:13.5px;line-height:1.8">' +
         (ST.agent === "co"
           ? "写卡住了就问一句。它每一轮都带着你正在写的这一篇，以及你选的路径与落点。"
-          : "点上面的快捷动作，或直接告诉它怎么改。<b style=\"color:var(--pa)\">它会交回改好的整篇，落成一个新版本</b>，原版还在。") + "</p>";
+          : "点上面的快捷动作，或直接告诉它怎么改。<b style=\"color:var(--wtx)\">它会交回改好的整篇，落成一个新版本</b>，原版还在。") + "</p>";
       return;
     }
     $("ms").innerHTML = log.map(function (m, i) {
@@ -598,9 +642,33 @@ h2.sec{font-size:19px;margin:32px 0 8px;letter-spacing:.04em;border-bottom:1px s
     ask("我不确定这一篇该走六路径里的哪一条。看看我已经写的（可能还很少）与我想写的，替我判一条，并说清：落点是哪一维、为什么不是相邻那条、以及第一段该怎么起手。判不了就反问我。");
   };
 
+  /* ══════════ 弹层与主题 ══════════════════════════════ */
+  $("whatb").onclick = function () { $("mask").classList.add("on"); };
+  $("mx").onclick = function () { $("mask").classList.remove("on"); };
+  $("mask").addEventListener("click", function (ev) { if (ev.target === $("mask")) $("mask").classList.remove("on"); });
+  document.addEventListener("keydown", function (ev) { if (ev.key === "Escape") $("mask").classList.remove("on"); });
+
+  /* 明暗跟全站同一个开关（sde_wds_theme），没设过就跟系统。
+     ⚠ 键名与 wds-mode.js 逐字一致 —— 各存各的，读者切一次要切两回。 */
+  var LS_THEME = "sde_wds_theme";
+  function themeLight() {
+    var m = ""; try { m = localStorage.getItem(LS_THEME) || ""; } catch (e) {}
+    if (m === "light") return true;
+    if (m === "dark") return false;
+    try { return !!(window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches); } catch (e) { return false; }
+  }
+  function themeApply() {
+    try { document.documentElement.classList[themeLight() ? "add" : "remove"]("wdsm-lt"); } catch (e) {}
+  }
+  $("themeb").onclick = function () {
+    try { localStorage.setItem(LS_THEME, themeLight() ? "dark" : "light"); } catch (e) {}
+    themeApply();
+  };
+  themeApply();
+
   /* ══════════ 启动 ══════════════════════════════════ */
   load();
-  paintPaths(); paintTable(); paintAgs(); paintMs(); paintEd();
+  paintPaths(); paintSheet(); paintTable(); paintAgs(); paintMs(); paintEd();
   if (!rteOk()) note("排版模块没拉到，已退回源码模式（内容一个字都不会少）。");
 })();
 </script>
