@@ -43,6 +43,7 @@ ok(/function cvReset/.test(SEG), "cvReset 没被捞进来");
 /* ── 假 DOM ───────────────────────────────────────── */
 function mkEl(tag, cls, txt) {
   const e = {
+    value: "", oninput: null, focus() {},
     tagName: String(tag || "div").toUpperCase(), className: cls || "", _txt: txt || "",
     children: [], style: { cssText: "" }, title: "", onclick: null, _attrs: {}, _html: "",
     appendChild(c) { this.children.push(c); c.parentNode = this; return c; },
@@ -50,7 +51,19 @@ function mkEl(tag, cls, txt) {
     getAttribute(k) { return this._attrs[k]; },
     addEventListener(t, f) { (this._ev = this._ev || {})[t] = f; },
     contains(n) { let p = n; while (p) { if (p === this) return true; p = p.parentNode; } return false; },
-    querySelector(sel) { return this._q[sel] || null; },
+    querySelector(sel) {
+      if (this._q[sel]) return this._q[sel];
+      // 简易后代查找：只按 class 找，够本护栏用
+      const cls = sel.replace(/^\./, "");
+      const walk = n => {
+        for (const c of n.children) {
+          if (String(c.className).split(/\s+/).indexOf(cls) >= 0) return c;
+          const r = walk(c); if (r) return r;
+        }
+        return null;
+      };
+      return walk(this);
+    },
     classList: { _s: {}, add(c) { this._s[c] = 1; }, remove(c) { delete this._s[c]; }, contains(c) { return !!this._s[c]; } },
     _q: {}
   };
@@ -83,6 +96,10 @@ function boot(opts) {
     cvAsk: "让 WDS 改这一段", cvAskAll: "让 WDS 改这一版", cvVer: "版本", cvDrop: "落到画布", cvDropped: "已落",
     cvPick: "选中画布里的一段，再点这里", cvNoPrev: "这一类只能看源码",
     cvRen: "✎ 改名", cvRenAsk: "叫什么？", cvDel: "🗑 删除", cvDelAsk: "删掉《{t}》？",
+    cvEdit: "✎ 编辑", cvEditT: "手改", cvEditSave: "✓ 存为新版", cvEditCancel: "丢弃改动",
+    cvEditKeep: "改了 {n} 字还没存", cvEditNo: "一个字都没改", cvDraft: "有未存的草稿",
+    cvDiff: "⇄ 改了什么", cvDiffT: "比上一版", cvDiffNone: "两版逐字相同。", cvDiffBig: "太长不算",
+    cvDiffFold: "… 未改 {n} 行 …", cvDiffStat: "改 {c} 处 · 加 {a} 行 · 删 {d} 行", cvDiffOne: "只有一版",
     cvPdf: "⤓ PDF", cvPdfT: "pdf", cvCap: "已到 {n} 件上限，最旧的《{t}》被移出画布。",
     cvSegOk: "只改选中的这一段（{n} 字）", cvSegNo: "选中的这一段在源码里定位不到",
     cvNewVer: "改好的已存成第 {n} 版", cvGone: "画布上那一件已经不在了",
@@ -104,6 +121,10 @@ function boot(opts) {
     distSave: (a, b, cb) => cb(true),
     toast: m => toasts.push(m),
     narrow: () => false,
+    // pdfBoot / diffBoot 定义在画布段之外，抠段时带不进来，这里按真行为打桩
+    // pdfBoot 定义在画布段之外，抠段带不进来，按真行为打桩
+    pdfBoot: (then) => then(!opts.noPdf),
+    alert: () => {},
     LANG: "zh",
     inEl: { value: "", focus() {}, style: {}, scrollHeight: 40 },
     setTimeout: (f, ms) => { if (opts.runTimers) f(); return 1; },
@@ -123,6 +144,22 @@ function boot(opts) {
     removeItem: k => { delete store[k]; }
   };
   ctx.location = { origin: "https://sdeuniverses.com" };
+  /* diffBoot 在段内，用的是真装载逻辑（createElement + head.appendChild + onload）。
+     给一个最小 document 桩，让那条路真的跑一遍，而不是拿假的 diffBoot 糊过去。 */
+  ctx.document = {
+    createElement: () => {
+      const sc = { src: "", async: false, onload: null, onerror: null };
+      return sc;
+    },
+    head: {
+      appendChild: (sc) => {
+        ctx._scripts = (ctx._scripts || []).concat(sc.src);
+        if (opts.noDiff) { if (sc.onerror) sc.onerror(); return; }
+        ctx.window.WDSDiff = require(path.join(ROOT, "public/assets/wds-diff.js"));
+        if (sc.onload) sc.onload();
+      }
+    }
+  };
   vm.createContext(ctx);
   vm.runInContext(SEG + "\nthis.__x = { CV: CV, cvAdd: cvAdd, cvScan: cvScan, cvTake: cvTake, cvPaint: cvPaint, " +
     "cvAskRevise: cvAskRevise, cvFind: cvFind, cvNorm: cvNorm, cvStrip: cvStrip, cvReset: cvReset, " +
@@ -268,11 +305,20 @@ sec("③ 选区捕获、按钮标签、切件清选区");
   ok(/20260802-0000/.test(C4._.prints[0].file || ""), "PDF 建议文件名没带时间戳");
   ok((C4._.prints[0].blocks || []).length === 1, "PDF 没把这一件排进去");
 
-  /* 没装 PDF 模块就别摆死按钮 */
+  /* ⚠ 这条在第二轮被**刻意反转**了。第一轮写的是「模块没装载就别摆按钮」，
+     但 WDSPdf 是**按需装载**的 —— 那等于新开一页时按钮永远不出现，
+     要读者先导过一次整场对话才冒出来。现在按钮常在、点了才去装；
+     这条改钉它真正该防的：装不上时必须有反应，不许点了没动静。 */
   const C5 = boot({ noPdf: true });
   C5.cvAdd("md", "报告", "# 报告\n\n" + "字".repeat(500));
   C5.cvPaint();
-  ok(C5._.bar.children.every(b => b.textContent !== "⤓ PDF"), "模块没装载却摆了 PDF 按钮");
+  const pb = C5._.bar.children.filter(b => b.textContent === "⤓ PDF")[0];
+  ok(!!pb, "模块尚未装载时按钮就该在（点了才去装）");
+  let alerted = false;
+  C5._.ctx.alert = () => { alerted = true; };
+  pb.onclick();
+  ok(C5._.prints.length === 0, "模块没装上却还是打印了");
+  ok(alerted, "模块装不上时点 PDF 没有任何反应");
 }
 
 /* ══ ④ mermaid / 上限 / cvNoPrev ════════════════ */
@@ -354,6 +400,112 @@ sec("⑥ 接线");
   ok(/if \(CV\.want && q\.indexOf\(CV\.want\.pre\) < 0\) CV\.want = null;/.test(SRC),
     "send() 里没有放弃过期的改写意图（读者改问别的，回稿仍会被塞成新版本）");
   ok(/cvRestore\(\);\n\s*cvPaint\(\);/.test(SRC), "启动时没有恢复画布");
+}
+
+/* ══ ⑦ 手改 ══════════════════════════════════════ */
+sec("⑦ 手改：草稿、存为新版、别被回稿吃掉");
+{
+  const body = "# 稿子\n\n第一段。\n\n第二段。";
+  const C = boot();
+  C.cvAdd("md", "稿子", body);
+  C.cvPaint();
+  const edit = C._.bar.children.filter(b => b.textContent === "✎ 编辑")[0];
+  ok(!!edit, "工具条没有「编辑」按钮");
+  edit.onclick();
+  const ta = C._.wrap.querySelector(".wdsm-cved");
+  ok(!!ta, "点了编辑却没有编辑框");
+  ok(ta.value === body, "编辑框里不是当前版的内容");
+  const labels = C._.bar.children.map(b => b.textContent);
+  ok(labels.indexOf("✓ 存为新版") > -1 && labels.indexOf("丢弃改动") > -1, "编辑态的工具条不对：" + JSON.stringify(labels));
+
+  /* 改了不存 → 草稿留着，版本不动 */
+  ta.value = body + "\n\n我手改加的第三段。";
+  ta.oninput();
+  ok(C.CV.items[0].draft === ta.value, "草稿没被记下");
+  ok(C.CV.items[0].vers.length === 1, "还没点存就多出了一版");
+
+  /* 存为新版 → 进版本链，原版还在 */
+  C._.bar.children.filter(b => b.textContent === "✓ 存为新版")[0].onclick();
+  ok(C.CV.items[0].vers.length === 2, "存为新版没生效");
+  ok(C.CV.items[0].vers[0] === body, "原来那一版被覆盖了（版本链就退不回去了）");
+  ok(C.CV.items[0].vi === 1, "没切到新版");
+  ok(!C.CV.edit, "存完没退出编辑态");
+  ok(C.CV.items[0].draft === undefined, "存完草稿没清");
+
+  /* 一个字没改就点存 → 不堆版本，如实说 */
+  const C2 = boot();
+  C2.cvAdd("md", "稿子", body); C2.cvPaint();
+  C2._.bar.children.filter(b => b.textContent === "✎ 编辑")[0].onclick();
+  C2._.bar.children.filter(b => b.textContent === "✓ 存为新版")[0].onclick();
+  ok(C2.CV.items[0].vers.length === 1, "一字未改也堆了一版");
+  ok(C2.CV.note.indexOf("没改") > -1, "一字未改却不吭声");
+
+  /* 丢弃 */
+  const C3 = boot();
+  C3.cvAdd("md", "稿子", body); C3.cvPaint();
+  C3._.bar.children.filter(b => b.textContent === "✎ 编辑")[0].onclick();
+  const ta3 = C3._.wrap.querySelector(".wdsm-cved");
+  ta3.value = "乱改的"; ta3.oninput();
+  C3._.bar.children.filter(b => b.textContent === "丢弃改动")[0].onclick();
+  ok(C3.CV.items[0].draft === undefined && C3.CV.items[0].vers.length === 1, "丢弃没丢干净");
+
+  /* 切件先收草稿 —— 正在打的字不能因为点了别的标签就没了 */
+  const C4 = boot();
+  C4.cvAdd("md", "甲", body); C4.cvAdd("md", "乙", body); C4.cvPaint();
+  C4.CV.cur = 0; C4.cvPaint();
+  C4._.bar.children.filter(b => b.textContent === "✎ 编辑")[0].onclick();
+  const ta4 = C4._.wrap.querySelector(".wdsm-cved");
+  ta4.value = body + "正在打的字"; 
+  C4._.tabs.children[1].onclick();              // 直接切走，不触发 oninput
+  ok(C4.CV.items[0].draft === body + "正在打的字", "切走时没把正在打的字收下来");
+  ok(!C4.CV.edit, "切走后还留在编辑态");
+  C4.cvPaint();
+  ok(C4._.tabs.children[0].textContent.indexOf("•") > -1, "标签页没标出「有未存草稿」");
+
+  /* 回稿落版时不许吃掉正在手改的草稿 */
+  const C5 = boot();
+  C5.cvAdd("md", "稿子", body); C5.cvPaint();
+  C5.cvAskRevise(C5.CV.items[0]);
+  C5._.bar.children.filter(b => b.textContent === "✎ 编辑")[0].onclick();
+  const ta5 = C5._.wrap.querySelector(".wdsm-cved");
+  ta5.value = body + "\n\n手改的内容。"; ta5.oninput();
+  C5.cvTake("机器改好的整版内容，够长够长够长。");
+  const vs = C5.CV.items[0].vers;
+  ok(vs.length === 3, "应当是「原版 → 手改 → 回稿」三版，实得 " + vs.length);
+  ok(vs[1].indexOf("手改的内容") > -1, "手改的那一版被机器的回稿吃掉了");
+  ok(vs[2].indexOf("机器改好的") > -1, "回稿没落成最后一版");
+  ok(!C5.CV.edit, "回稿落地后还停在编辑态");
+}
+
+/* ══ ⑧ diff ═════════════════════════════════════ */
+sec("⑧ 版本 diff");
+{
+  const C = boot();
+  C.cvAdd("md", "稿子", "甲\n乙\n丙");
+  C.cvPaint();
+  ok(C._.bar.children.every(b => b.textContent !== "⇄ 改了什么"), "只有一版时不该摆 diff 按钮");
+
+  C.cvAdd("md", "稿子", "甲\n乙改了\n丙");
+  C.cvPaint();
+  const df = C._.bar.children.filter(b => b.textContent === "⇄ 改了什么")[0];
+  ok(!!df, "有两版了却没有 diff 按钮");
+  df.onclick();
+  ok(C.CV.diff === true, "diff 态没开");
+  ok(C.CV.edit === false && C.CV.src === false, "开 diff 时没关掉编辑/源码（三种视图要互斥）");
+
+  /* diff 走的是按需装载的模块：装不上要如实说，不许空着 */
+  ok(/function diffBoot/.test(SRC), "没有 diff 模块的按需装载");
+  ok(/wds-diff\.js\?v=" \+ DIFF_WANT/.test(SRC), "diff 模块没带版本号（改了模块读者拿到的还是旧的）");
+  ok(fs.existsSync(path.join(ROOT, "public/assets/wds-diff.js")), "diff 模块文件不在");
+
+  /* PDF 按钮不许再依赖「WDSPdf 已经装载」这个条件（上一轮的 bug） */
+  ok(!/if \(window\.WDSPdf\) mk\(tx\("cvPdf"\)/.test(SRC),
+    "PDF 按钮还挂在 window.WDSPdf 上——它是按需装的，新开一页时按钮不会出现");
+  ok(/pdfBoot\(function \(okp\)/.test(SRC), "PDF 按钮没把装载放进 onclick");
+  const C6 = boot({ noPdf: true });
+  C6.cvAdd("md", "报告", "# 报告\n\n" + "字".repeat(500));
+  C6.cvPaint();
+  ok(C6._.bar.children.some(b => b.textContent === "⤓ PDF"), "模块还没装载时 PDF 按钮就该在（点了才去装）");
 }
 
 console.log("\n" + PASS + " PASS / " + FAIL + " FAIL");

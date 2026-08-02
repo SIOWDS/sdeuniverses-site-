@@ -744,6 +744,13 @@
       cvPrev: "预览", cvSrc: "源码", cvCopy: "复制", cvDl: "下载", cvSave: "存到本机", cvSaved: "已存",
       cvAsk: "让 WDS 改这一段", cvAskAll: "让 WDS 改这一版", cvVer: "版本", cvDrop: "⧉ 落到画布", cvDropped: "已落到画布",
       cvPick: "选中画布里的一段，再点这里", cvNoPrev: "这一类只能看源码",
+      cvEdit: "✎ 编辑", cvEditT: "直接用键盘改。改完点「存为新版」，原来那一版还留在版本链里",
+      cvEditSave: "✓ 存为新版", cvEditCancel: "丢弃改动", cvEditKeep: "改了 {n} 字还没存 —— 切走会留着草稿",
+      cvEditNo: "一个字都没改", cvDraft: "有未存的草稿",
+      cvDiff: "⇄ 改了什么", cvDiffT: "跟上一版比，看动了哪几处",
+      cvDiffNone: "两版逐字相同。", cvDiffBig: "两版都太长，逐行比对会把浏览器卡住，这里不算了。",
+      cvDiffFold: "… 未改 {n} 行 …", cvDiffStat: "较上一版：改 {c} 处 · 加 {a} 行 · 删 {d} 行",
+      cvDiffOne: "只有一版，没有可比的上一版。",
       cvRen: "✎ 改名", cvRenAsk: "这一件叫什么？", cvDel: "🗑 删除", cvDelAsk: "删掉《{t}》？删了就没有了，要留请先「存到本机」。",
       cvPdf: "⤓ PDF", cvPdfT: "把这一件排版后交给打印框，在那里选「另存为 PDF」",
       cvCap: "已到 {n} 件上限，最旧的《{t}》被移出画布。要留下的请先「存到本机」。",
@@ -807,7 +814,14 @@
       cvPrev: "Preview", cvSrc: "Source", cvCopy: "Copy", cvDl: "Download", cvSave: "Save locally", cvSaved: "Saved",
       cvAsk: "ChatSDE to revise this", cvAskAll: "ChatSDE to revise this version", cvVer: "Version", cvDrop: "⧉ To canvas", cvDropped: "On the canvas",
       cvPick: "Select something on the canvas first", cvNoPrev: "Source only for this kind",
-      cvRen: "✎ Rename", cvRenAsk: "New name?", cvDel: "🗑 Delete", cvDelAsk: "Delete \u201c{t}\u201d? Save it locally first if you want to keep it.",
+      cvEdit: "\u270e Edit", cvEditT: "Type directly. Hit Save as new version when done; the old one stays in the chain",
+      cvEditSave: "\u2713 Save as new version", cvEditCancel: "Discard changes", cvEditKeep: "{n} chars unsaved \u2014 the draft is kept if you switch away",
+      cvEditNo: "Nothing changed", cvDraft: "unsaved draft",
+      cvDiff: "\u21c4 What changed", cvDiffT: "Compare with the previous version",
+      cvDiffNone: "The two versions are identical.", cvDiffBig: "Both versions are too long to diff line by line here.",
+      cvDiffFold: "\u2026 {n} unchanged lines \u2026", cvDiffStat: "vs previous: {c} changed \u00b7 {a} added \u00b7 {d} removed",
+      cvDiffOne: "Only one version \u2014 nothing to compare with.",
+      cvRen: "\u270e Rename", cvRenAsk: "New name?", cvDel: "🗑 Delete", cvDelAsk: "Delete \u201c{t}\u201d? Save it locally first if you want to keep it.",
       cvPdf: "\u2913 PDF", cvPdfT: "Lay this out and hand it to the print dialog; choose Save as PDF there",
       cvCap: "Canvas is full ({n}); the oldest item \u201c{t}\u201d was dropped. Save locally to keep things.",
       cvSegOk: "Revising only the selected passage ({n} chars)", cvSegNo: "The selection could not be located in the source, so the whole version will be revised. Switch to Source view to select precisely.",
@@ -904,6 +918,23 @@
     ".wdsm-cvwrap pre{white-space:pre-wrap;word-break:break-word;font:12.5px/1.6 ui-monospace,Menlo,Consolas,monospace;color:var(--wtx)}" +
     ".wdsm-cvframe{width:100%;height:100%;min-height:420px;border:0;background:#fff;border-radius:8px}" +
     ".wdsm-cvempty{color:var(--wdim);font-size:13px;line-height:1.8;padding:24px 6px}" +
+    ".wdsm-cved{width:100%;min-height:340px;background:var(--wbg);color:var(--wtx);border:1px solid var(--wgold);" +
+      "border-radius:8px;padding:12px 14px;font:13px/1.75 ui-monospace,Menlo,Consolas,monospace;resize:vertical;white-space:pre-wrap}" +
+    ".wdsm-cved:focus{outline:none}" +
+    ".wdsm-cvnote{color:var(--wgold);font-size:11.5px;padding:6px 0 0}" +
+    /* diff：靠左那一列的 +/− 是给色盲与打印用的，颜色不是唯一判据 */
+    ".wdsd{font:12.5px/1.75 ui-monospace,Menlo,Consolas,monospace;white-space:pre-wrap;word-break:break-word}" +
+    ".wdsd-r{display:flex;gap:8px;padding:1px 4px;border-radius:3px}" +
+    ".wdsd-r>i{flex:none;width:12px;color:var(--wdim);font-style:normal;text-align:center}" +
+    ".wdsd-r>span{flex:1;min-width:0}" +
+    ".wdsd-eq{color:var(--wdim);opacity:.72}" +
+    ".wdsd-add{background:rgba(80,160,110,0.16);color:var(--wtx)}" +
+    ".wdsd-del{background:rgba(180,84,60,0.16);color:var(--wtx)}" +
+    ".wdsd-add>i{color:#5fae7e}.wdsd-del>i{color:#c4735c}" +
+    ".wdsd-i{background:rgba(80,160,110,0.42);font-weight:600}" +
+    ".wdsd-x{background:rgba(180,84,60,0.42);font-weight:600;text-decoration:line-through}" +
+    ".wdsd-fold{color:var(--wdim);opacity:.6;padding:4px 4px;font-size:11.5px}" +
+    ".wdsd-note{color:var(--wdim);font-size:13px;padding:10px 4px}" +
     ".wdsm-cvtbl{border-collapse:collapse;font-size:12.5px}" +
     ".wdsm-cvtbl td,.wdsm-cvtbl th{border:1px solid var(--wline);padding:5px 9px;text-align:left}" +
     /* 研究卡 */
@@ -3535,7 +3566,7 @@
   var cvTabsEl = layer.querySelector(".wdsm-cvtabs");
   var cvBarEl = layer.querySelector(".wdsm-cvbar");
   var cvWrapEl = layer.querySelector(".wdsm-cvwrap");
-  var CV = { items: [], cur: -1, src: false, sel: "", want: null, note: "" };
+  var CV = { items: [], cur: -1, src: false, sel: "", want: null, note: "", edit: false, diff: false };
   var CV_LS = "sde_wds_cv";          // 画布随刷新留存（成品不该因为按了 F5 就消失）
   var CV_MAX = 20;
   var CV_KIND = { html: "html", svg: "svg", mermaid: "mermaid", md: "md", markdown: "md", csv: "csv", tsv: "csv", json: "json" };
@@ -3659,8 +3690,10 @@
     var hd = cvEl.querySelector(".wdsm-cvtop b"); if (hd) hd.textContent = tx("cvTitle");
     cvTabsEl.innerHTML = "";
     CV.items.forEach(function (it, i) {
-      var b = el("button", "wdsm-cvtab" + (i === CV.cur ? " on" : ""), it.title);
-      b.onclick = function () { CV.cur = i; CV.src = false; CV.sel = ""; cvPaint(); };
+      var hasDraft = typeof it.draft === "string" && it.draft !== it.vers[it.vi];
+      var b = el("button", "wdsm-cvtab" + (i === CV.cur ? " on" : ""), it.title + (hasDraft ? " \u2022" : ""));
+      if (hasDraft) b.title = tx("cvDraft");
+      b.onclick = function () { cvGrab(); CV.cur = i; CV.src = false; CV.sel = ""; CV.edit = false; CV.diff = false; CV.note = ""; cvPaint(); };
       cvTabsEl.appendChild(b);
     });
     cvBarEl.innerHTML = ""; cvWrapEl.innerHTML = ""; cvAskBtn = null;
@@ -3681,9 +3714,9 @@
     if (it.vers.length > 1) {
       var vb = el("span", null, tx("cvVer") + " " + (it.vi + 1) + "/" + it.vers.length);
       vb.style.cssText = "color:var(--wdim);font-size:11.5px";
-      mk("\u2039", function () { if (it.vi > 0) { it.vi--; cvPaint(); } });
+      mk("\u2039", function () { if (it.vi > 0) { cvGrab(); it.vi--; cvPaint(); } });
       cvBarEl.appendChild(vb);
-      mk("\u203a", function () { if (it.vi < it.vers.length - 1) { it.vi++; cvPaint(); } });
+      mk("\u203a", function () { if (it.vi < it.vers.length - 1) { cvGrab(); it.vi++; cvPaint(); } });
     }
     var cpb = mk(tx("cvCopy"), function () { copyText(cvText()); cpb.textContent = t("aCopied"); setTimeout(function () { cpb.textContent = tx("cvCopy"); }, 1200); });
     mk(tx("cvDl"), function () {
@@ -3691,7 +3724,19 @@
       download(safeName(it.title) + ext, cvText());
     });
     var svb = mk(tx("cvSave"), function () { distSave(tx("cvTitle") + " · " + it.title, cvText(), function (ok) { svb.textContent = ok ? tx("cvSaved") : tx("cvSave"); }); });
-    if (window.WDSPdf) mk(tx("cvPdf"), function () { cvPdf(it); }).title = tx("cvPdfT");
+    /* ⚠ 不能写成 `if (window.WDSPdf) mk(...)` —— WDSPdf 是**按需装载**的，
+       新开一页时它还不在，按钮就要等读者先导过一次整场对话才冒出来（上一轮的 bug）。
+       按钮常在，装载放进 onclick；拉不到就如实说，不拦路。 */
+    mk(tx("cvPdf"), function () {
+      pdfBoot(function (okp) { if (okp) cvPdf(it); else alert(t("pdfNo")); });
+    }).title = tx("cvPdfT");
+    mk(tx("cvEdit"), function () { cvEditOn(it); }, CV.edit).title = tx("cvEditT");
+    if (it.vers.length > 1) {
+      mk(tx("cvDiff"), function () {
+        CV.diff = !CV.diff; if (CV.diff) { cvGrab(); CV.edit = false; CV.src = false; }
+        cvPaint();
+      }, CV.diff).title = tx("cvDiffT");
+    }
     cvAskBtn = mk(tx("cvAskAll"), function () { cvAskRevise(it); });
     cvAskLabel();
     mk(tx("cvRen"), function () {
@@ -3705,6 +3750,30 @@
       CV.cur = CV.items.length ? Math.min(i, CV.items.length - 1) : -1;
       CV.sel = ""; cvSave(); cvPaint();
     });
+    if (CV.edit) {
+      cvBarEl.innerHTML = "";
+      mk(tx("cvEditSave"), function () { cvEditCommit(it); }, true);
+      mk(tx("cvEditCancel"), function () { cvEditCancel(it); });
+      var ta = el("textarea", "wdsm-cved");
+      ta.value = typeof it.draft === "string" ? it.draft : cvText();
+      ta.oninput = function () { it.draft = ta.value; cvSave(); cvEditTip(ta, it); };
+      cvWrapEl.appendChild(ta);
+      var tip = el("div", "wdsm-cvnote");
+      cvWrapEl.appendChild(tip);
+      cvEditTip(ta, it, tip);
+      return;
+    }
+    if (CV.diff) {
+      var prev = it.vers[it.vi - 1];
+      if (typeof prev !== "string") {
+        cvWrapEl.appendChild(el("div", "wdsd-note", tx("cvDiffOne")));
+        return;
+      }
+      var box = el("div");
+      cvWrapEl.appendChild(box);
+      cvDiffPaint(box, prev, cvText());
+      return;
+    }
     if (CV.note) {
       var nt = el("div", null, CV.note);
       nt.style.cssText = "color:var(--wgold);font-size:12px;padding:6px 0 10px;line-height:1.7";
@@ -3811,6 +3880,12 @@
         var next = (want.a >= 0 && want.b > want.a && want.base)
           ? want.base.slice(0, want.a) + body + want.base.slice(want.b)   // 只换选中那一段
           : body;                                                        // 整版换
+        // 读者可能正在手改：先把他打的字存成一版，再把回稿叠上去。
+        // 不这么做，等一次 cvPaint 过去，正在编辑的草稿就没了——**别人的字不能被机器的回稿吃掉**。
+        if (CV.edit && typeof it.draft === "string" && it.draft !== it.vers[it.vers.length - 1]) {
+          it.vers.push(it.draft); it.vi = it.vers.length - 1;
+        }
+        delete it.draft; CV.edit = false;
         if (next !== it.vers[it.vers.length - 1]) {
           it.vers.push(next); it.vi = it.vers.length - 1;
           CV.cur = CV.items.indexOf(it);
@@ -3839,6 +3914,39 @@
   var cvAskBtn = null;
   /* 画布这一件单独出 PDF。走的是和整场对话导出同一个模块与同一条打印管线
      （排版＋浏览器打印，不自己吐字节 —— 仓库里没有中日韩字体，也不该有）。 */
+  /* diff 模块按需装 —— 与 wds-pdf 同一路数。改模块必须 bump DIFF_WANT。 */
+  var DIFF_WANT = 1;
+  function diffBoot(then, forced) {
+    if (window.WDSDiff && window.WDSDiff.VERSION >= DIFF_WANT) { then(true); return; }
+    if (window.WDSDiff && !forced) { delete window.WDSDiff; return diffBoot(then, true); }
+    var sc = document.createElement("script");
+    sc.src = "/assets/wds-diff.js?v=" + DIFF_WANT + (forced ? ("&r=" + Date.now()) : "");
+    sc.async = true;
+    sc.onload = function () { then(!!(window.WDSDiff && window.WDSDiff.VERSION >= DIFF_WANT)); };
+    sc.onerror = function () { then(false); };
+    document.head.appendChild(sc);
+  }
+  // 编辑态下面那一行提示：改了多少字、切走会不会丢
+  function cvEditTip(ta, it, box) {
+    var el2 = box || (cvWrapEl && cvWrapEl.querySelector(".wdsm-cvnote"));
+    if (!el2) return;
+    var base = it.vers[it.vi] || "", n = Math.abs((ta.value || "").length - base.length);
+    el2.textContent = (ta.value === base) ? tx("cvEditNo") : tx("cvEditKeep", { n: n });
+  }
+  // diff 是按需装模块的，所以先摆一句"正在算"，装不上就如实说
+  function cvDiffPaint(box, a, b) {
+    box.textContent = "\u2026";
+    diffBoot(function (okd) {
+      if (!okd || !window.WDSDiff) { box.textContent = tx("cvDiffBig"); return; }
+      var s = window.WDSDiff.stat(window.WDSDiff.lines(a, b));
+      var head = el("div", "wdsd-note", tx("cvDiffStat", { c: s.chg, a: s.add, d: s.del }));
+      var body = el("div");
+      body.innerHTML = window.WDSDiff.html(a, b, {
+        tSame: tx("cvDiffFold"), tBig: tx("cvDiffBig"), tNone: tx("cvDiffNone")
+      });
+      box.textContent = ""; box.appendChild(head); box.appendChild(body);
+    });
+  }
   function cvOrigin() {
     try { if (typeof location !== "undefined" && location && location.origin) return location.origin; } catch (e) {}
     return "";
@@ -3886,6 +3994,34 @@
     } catch (e) { CV.items = []; CV.cur = -1; }
   }
 
+  /* ── 手改 ──────────────────────────────────────────────
+     改完**存为新版**，不直接覆盖当前版：版本链要能回溯，
+     否则「改坏了想退回去」就没了，而那正是画布区别于聊天流的那一点。
+     草稿存在 it.draft 上，跟着画布一起落本机；切走再回来还在。 */
+  function cvDraftEl() { return cvWrapEl && cvWrapEl.querySelector(".wdsm-cved"); }
+  // 重画之前先把编辑框里的字收走 —— cvPaint 会把 innerHTML 清掉，收晚了就丢了
+  function cvGrab() {
+    var ta = cvDraftEl(), it = cvCur();
+    if (ta && it) it.draft = ta.value;
+  }
+  function cvEditOn(it) {
+    CV.edit = true; CV.diff = false; CV.src = false;
+    if (typeof it.draft !== "string") it.draft = cvText();
+    cvPaint();
+    var ta = cvDraftEl();
+    if (ta) { try { ta.focus(); } catch (e) {} }
+  }
+  function cvEditCommit(it) {
+    cvGrab();
+    var v = typeof it.draft === "string" ? it.draft : "";
+    if (v === cvText()) { CV.note = tx("cvEditNo"); CV.edit = false; delete it.draft; cvPaint(); return; }
+    it.vers.push(v); it.vi = it.vers.length - 1;
+    delete it.draft; CV.edit = false; CV.note = "";
+    cvPaint();
+    toast(tx("cvNewVer", { n: it.vers.length }));
+  }
+  function cvEditCancel(it) { delete it.draft; CV.edit = false; CV.note = ""; cvPaint(); }
+
   var cvBtn = layer.querySelector(".wdsm-cvbtn");
   (function () {
     var x = cvEl && cvEl.querySelector(".wdsm-cvx");
@@ -3908,6 +4044,7 @@
   // 画布上的成品属于那一场对话，换场就该跟着走（要留下的走「存到本机」）
   function cvReset() {
     CV.items = []; CV.cur = -1; CV.src = false; CV.sel = ""; CV.want = null; CV.note = "";
+    CV.edit = false; CV.diff = false;
     try { localStorage.removeItem(CV_LS); } catch (e) {}
     cvShow(false); cvPaint();
   }
