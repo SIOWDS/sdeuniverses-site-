@@ -14,6 +14,12 @@
 #   Run workflow。换来的是重建从每天 55-83 次降到 1 次，九成九的速朽副本不再写进历史。
 #   （根治是把索引搬出 git 走 R2，读取侧已上线 commit e5d2753，写入侧待办。）
 #
+# 【2026-08-02 再改】索引已完全搬出 git（写入侧 c60ba37 + 仓库瘦身 ff32b43b），
+#   "每重建一次就往历史里塞 218MB"这个当初砍频率的理由已经不存在，剩下的只有 R2 写次数，
+#   而那点次数离免费额度还远。故 **每天一次 → 每天两趟**，见下方 schedule。
+#   仍然不挂 push：文档编号是 url_list 排序后 enumerate 的，插一篇就把其后编号整体后移，
+#   增量同步省不下来，一天几十趟仍然不划算。快照仍是每天一份（守卫改成问桶，见下）。
+#
 # 学员排名不跟着停：roster.json 只有 126KB，churn 可忽略，已拆到 roster.yml 继续随 push 自动跑。
 #
 # 坐标必须与索引同跑，不能拆成两步：sde-coords.json 按文档编号存，
@@ -31,8 +37,15 @@ on:
   #   若将来仓库瘦身完、或索引改成能增量更新，可再议；那时记得同时加回 paths-ignore
   #   （roster.json 必排除：roster.yml 每次 push 都回推一个 commit，那本身又是一次
   #   push，不排除等于每次推送触发两遍）。
+  # 【2026-08-02 改·每天两趟】一天一次的代价是平均等 12.1 小时才进搜索。按近两周
+  #   1245 条内容提交的实际时段分布（新加坡时 06:00–23:00 全天有货、01:00–05:00 几乎为零）
+  #   算下来，两个时刻放在 13:20 与 23:20 SGT 最省等待：平均陈旧 4.4 小时 → 降到三分之一。
+  #   分钟取 :20 不取 :00 —— 整点是 GitHub 定时任务的高峰，排队延迟最重。
+  #   成本不是问题：一趟约 1600 次 R2 写，两趟 + 每天一份快照 ≈ 4800 次/天 ≈ 14.4 万次/月，
+  #   离 Class A 的 100 万免费额度仍差得远（存储也不变，快照仍是每天一份）。
   schedule:
-    - cron: '0 18 * * *'
+    - cron: '20 5 * * *'    # 13:20 新加坡时
+    - cron: '20 15 * * *'   # 23:20 新加坡时
   workflow_dispatch:                 # 想立刻跑：Actions 页面 → search-index → Run workflow
   # 【2026-08-02 加】第二条手动路子：站点 PAT 没有 actions:write，用它调
   #   workflow_dispatch 一律 403（实测），于是"发了重要的一批不想等"每次都得人去点按钮。
@@ -132,13 +145,18 @@ jobs:
             --endpoint-url "$EP" --delete --exclude "index.html" --only-show-errors
           echo "线上那份已更新"
 
-          # 快照每天只留一份：键名按日期，同一天跑第二次也只是把同一批键覆盖一遍，
-          # 留不下新东西，却要再烧 1590 次写操作。下面这个 push 判断是留给未来的护栏——
-          # 现在没有 push 触发，它不会命中；哪天真加回 push 了，不至于连快照也翻倍。
+          # 快照每天只留一份：键名按日期，同一天再跑只是把同一批键覆盖一遍，
+          # 留不下新东西，却要再烧约 1600 次写操作。
+          # 【2026-08-02 改】原先靠 GITHUB_EVENT_NAME != push 来判"这趟该不该留快照"。
+          #   改成一天两趟后那个判断就失效了（两趟都是 schedule，会各留一次、翻倍）。
+          #   现在直接问桶：当天那份快照在不在。这样与触发方式脱钩——定时、手动、
+          #   repository_dispatch 混着来也只留第一份，多跑几趟都不会翻倍。
+          # 判据取 manifest.json 是否存在：它是快照里必有的一件；真传到一半 sync 会非零退出，
+          #   set -e 会把整步弄红，不会留下一份没人发现的半截快照。
           # 不加 --delete，也不覆盖别的日期；保留期交给桶上的 Object Lifecycle Rule
           # （search-snap/ 前缀 30 天过期）。这是 git 缺的那个能力：能忘。
-          if [ "${GITHUB_EVENT_NAME}" = "push" ]; then
-            echo "push 触发，跳过快照（当日快照由凌晨那趟留）"
+          if aws s3 ls "$B/search-snap/$SNAP/manifest.json" --endpoint-url "$EP" >/dev/null 2>&1; then
+            echo "当日快照 search-snap/$SNAP/ 已存在，跳过（每天只留一份）"
           else
             aws s3 sync public/search/ "$B/search-snap/$SNAP/" \
               --endpoint-url "$EP" --exclude "index.html" --only-show-errors
