@@ -149,7 +149,7 @@ def build_page(p, body, toc, pages):
     t = re.sub(r'<div class="art-series">.*?</div>',
                f'<div class="art-series">学 科 通 融 · {p["no"]} · {html.escape(p["cross"])}</div>', t, flags=re.S)
     t = re.sub(r'<h1 class="art-title">.*?</h1>', f'<h1 class="art-title">{p["title"]}</h1>', t, flags=re.S)
-    t, _n = re.subn(r'<(p|div) class="art-sub">.*?</\\1>', f'<div class="art-sub">{p["sub"]}</div>', t, count=1, flags=re.S)
+    t, _n = re.subn(r'<(p|div) class="art-sub">.*?</\1>', f'<div class="art-sub">{p["sub"]}</div>', t, count=1, flags=re.S)
     assert _n == 1, "art-sub 未被替换——副题会残留上一篇的"
 
     t = re.sub(r'<div class="art-meta">.*?</div>',
