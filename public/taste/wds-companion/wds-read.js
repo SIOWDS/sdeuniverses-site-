@@ -141,6 +141,21 @@
   document.body.appendChild(selBtn);
 
   var msgsEl = q1(".wdsr-msgs", panel), inputEl = q1(".wdsr-input", panel), sendEl = q1(".wdsr-send", panel), focusWrap = q1(".wdsr-focuswrap", panel);
+  /* 对外接口：让承载页（如共读一本书）把一句现成的问题填进来。
+     **只填不跑**——照 sde-handoff 那条纪律：那边一按就是几十秒、烧的是读者自己的 Key，
+     替他按开始是越权。读者已经写了字就不覆盖，改成追加。 */
+  window.WDSRead = window.WDSRead || {};
+  window.WDSRead.fill = function (text) {
+    try {
+      if (!text) return false;
+      openPanel();
+      var cur = String(inputEl.value || "").trim();
+      inputEl.value = cur ? (cur + "\n" + text) : text;
+      inputEl.focus();
+      try { inputEl.setSelectionRange(inputEl.value.length, inputEl.value.length); } catch (e) {}
+      return true;
+    } catch (e) { return false; }
+  };
   var history = [], focusSeg = "", streaming = false, busy = false;
   var lastAsk = "";   // 这一轮读者问的那句；交接面板拿它做预填（选中段优先，没选中就用它）
 
@@ -450,6 +465,7 @@
     var payload = { q: q, docTitle: docTitle(), docText: docText(), focus: seg, history: history, key: kv.key, vendor: kv.vendor };
     if (CFG.room) payload.room = CFG.room;
     if (CFG.guide) payload.guide = 1;
+    if (CFG.book) payload.book = 1;   // 共读一本书：陪读的高级档（内功精简＋三类判＋方法论＋站内旁证）
 
     fetch(API, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(payload) })
       .then(function (resp) {
@@ -493,6 +509,7 @@
 
   function post(body) {
     if (CFG.guide) body.guide = 1;
+    if (CFG.book) body.book = 1;
     if (CFG.paperN) body.paperN = CFG.paperN;
     return fetch(PAPER_API, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) })
       .then(function (r) { return r.json().catch(function () { return { ok: false, msg: "HTTP " + r.status }; }); });

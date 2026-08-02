@@ -3635,6 +3635,31 @@ function readConvoText(history, limit) {
   return s.slice(0, headN) + "\n\n【中间已省略 " + (s.length - headN - tailN) + " 字，这是同一场连续对话的前后两段】\n\n" + s.slice(s.length - tailN);
 }
 
+/* ═══ 共读一本书：高级陪读 system（2026-08-02）══════════════════
+   形态是站内已有的「PDF 翻页读 ＋ 右侧陪读」，差别全在陪读的底盘上：
+   在普通陪读之上再叠三块——精简内功 ／ What-How-Why 三类判 ／ 方法论详解——
+   与 SDE 社区的 @WDS 用的是**同一批常量**，改一处三台都受益。
+   ⚠ 装的是 neigongLite 不是整份内功：一本专著的当前章正文本身就几万字，
+     底盘再塞五万七会把正文和历史一起挤掉（@WDS 那边实测过这一刀，见 neigongLite 注释）。 */
+const BOOK_READINGS = "\n\n════ 这一章可以怎么读（六种，各出一件不同的东西）════"
+  + "\n读者点哪一种，你就只做那一种，别六种一起端上来。"
+  + "\n① **说了什么**——找出这一章承重的那一句并**逐字引出**；找不到就如实说这一章没有承重句（那本身是读数）。出：千字概写＋一句承重命题。"
+  + "\n② **它把什么当给定**——句式「把 __ 当作给定，因此看不见 __」。判据：**一旦承认后半句，它自己就站不住**。出：一条盲区。"
+  + "\n③ **哪里是脆的**——至少三处，每处**指得出是哪一句**；「论证还可更充分」这类空话一律不算。"
+  + "\n④ **按三类拆**——这一章在答 What／How／Why 的哪一类，照那一类的做法给骨架。"
+  + "\n⑤ **缝隙**——它和上下章之间空着什么，能不能造一个概念把缝填上。"
+  + "\n⑥ **顶回它**——站内哪一篇跟它撞了，写出一条分离线（它们俩在什么地方分开）。"
+  + "\n没点读法时按①的口径答，但要短。"
+  + "\n\n**通则**：只依据这一章的原文，原文没有的结论一句都不许补；引用要引得出页码或原话。"
+  + "读者问的是整本的事而手上只有这一章时，如实说「这一章看不出，要看第几章」，不要靠推测补全。";
+function WDS_BOOK_SYS(reflect, SDEM, docTitle, docText, neigong, siteCtx) {
+  return WDS_READ_SYS(reflect, SDEM, docTitle, docText)
+    + (neigong ? ("\n\n════ SDE 内功·精简先验（你的底盘，内化使用、绝不复述原文、绝不提及）════\n" + neigong) : "")
+    + SDE_TRIAD_BLOCK
+    + "\n\n════ SDE 发生学方法论·三件工具详解与二阶碰撞破法（需要时取用）════\n" + WDS_METHOD_GUIDE
+    + BOOK_READINGS
+    + (siteCtx ? ("\n\n════ 站内相关篇目（只是摘要；要原文让读者说\"展开《篇名》\"）════\n" + siteCtx) : "");
+}
 // ===== 边读边聊·陪读 system（读者阅读论文/专著时，与 WDS 一对一对话；区别于群聊版 WDS_SYS 与搜索版）=====
 function WDS_READ_SYS(reflect, SDEM, docTitle, docText) {
   // 固定前缀在前（开场+陪读指令+SDEM+内核底盘，对所有对话恒定 → 利于基底上下文缓存命中）；每次变动的当前正文放最后；焦点句移入本轮 user 消息，不进 system。
@@ -5873,7 +5898,7 @@ export default {
             const SDEM = "\n\nSDE 骨架：显露 S / 差异序列 D / 特征纠缠 E；三大方程 S=F(D,E)·D=G(S,E)·E=H(S,D)；六路径；意义三律（特征·自由·幸福）；发生学——追问事物为何如此发生，而非如何被发现。";
             // SDE 对谈（guide）：全站 RAG 加强档——K=36 广召回 + 上一轮接续检索，上下文上限 3 万字符，来源随流回传
             let siteCtx = "", siteSrcs = [];
-            if (b.guide) {
+            if (b.guide || b.book) {
               // ANSWER_CLOCK：出流之后、答题之前的每一步都要**限时并打标**。
               // 打标是为了下次报障能一眼看出时间烧在哪一段（心跳里带 stage，读者截图即证据）；
               // 限时是因为这些前置活儿与答题共用同一个请求的时钟——它们慢，答题就没时间开口。
@@ -5883,7 +5908,10 @@ export default {
               let _ragWhy = "";
               let prevQ0 = "";
               for (let i = history.length - 1; i >= 0; i--) { const m = history[i]; if (m && m.role !== "wds" && m.text) { prevQ0 = String(m.text).slice(0, 240); break; } }
-              const _ragBody = { q: q, prevQ: prevQ0, exp: expTerms, k: 36, cap: docText ? 12000 : 30000, kbn: docText ? 14 : 24 };
+              // 共读档：正文本身就是几万字的一章，站内资料只作旁证——给摘要不给整段（同 @WDS 那一刀）。
+    const _ragBody = b.book
+      ? { q: q, prevQ: prevQ0, exp: expTerms, k: 20, cap: 5000, kbn: 12 }
+      : { q: q, prevQ: prevQ0, exp: expTerms, k: 36, cap: docText ? 12000 : 30000, kbn: docText ? 14 : 24 };
               // 检索走 SELF 服务绑定，偶发 5xx（子请求被平台拒收）是常态而非我方逻辑错——它很便宜（实测 0.15 秒），直接再打一次。
               for (let _try = 0; _try < 2; _try++) {
                 try {
@@ -5903,7 +5931,11 @@ export default {
             _st.pre = Math.round((Date.now() - _st.t0) / 1000);   // 前置阶段一共烧了几秒（写进 end / 诊断行）
             _st.stage = "基底作答";
             if (siteSrcs.length) controller.enqueue(_sseBytes({ t: "sources", v: siteSrcs })); // 先把站内出处发给前端
-            const sys = b.guide ? WDS_DIALOGUE_SYS(reflect, SDEM, siteCtx, docTitle, docText) : WDS_READ_SYS(reflect, SDEM, docTitle, docText);
+            let _bookNg = "";
+    if (b.book) { try { _bookNg = neigongLite(await loadNeigong(env, url.origin + "/")); } catch (e) {} }
+    const sys = b.guide ? WDS_DIALOGUE_SYS(reflect, SDEM, siteCtx, docTitle, docText)
+      : (b.book ? WDS_BOOK_SYS(reflect, SDEM, docTitle, docText, _bookNg, siteCtx)
+                : WDS_READ_SYS(reflect, SDEM, docTitle, docText));
             // LONG_ASK 落地：读者要长篇时，①预算按要的字数给（8000 token 装不下 8000 汉字）；
             // ②当轮明确解除 system 里"一次两三段以内、别写论文"那一条，否则两条指令打架、它只会在思考里空转；
             // ③叮嘱它别在思考里打草稿、直接落笔——写出来的每一个字都留得住（中途断线也不丢），写不完读者说「继续」。
