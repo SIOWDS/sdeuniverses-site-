@@ -7891,7 +7891,12 @@ export default {
           h.set("etag", obj.httpEtag);
           h.set("accept-ranges", "bytes");
           if (!h.get("content-type")) h.set("content-type", "application/pdf");
-          h.set("cache-control", "public, max-age=31536000, immutable");
+          // ⚠️ 这里**不能**写 immutable + 一年：边缘缓存键是 origin+pathname（下面 _ck 那行，
+          //    刻意去掉了 query），所以一旦某篇改稿重出、r2-migrate 覆盖了桶里的字节，
+          //    边缘那份旧副本从外面**没有任何办法穿透**——加 ?v=、发 no-cache 头都不行，
+          //    而 r2-check 只查桶不查边缘，于是读者拿到旧版且无人发现。
+          //    改成边缘一小时自愈；浏览器那侧仍给长缓存，靠 ETag 协商，读者体验不变。
+          h.set("cache-control", "public, max-age=3600, stale-while-revalidate=86400");
           h.set("x-served-from", "r2");
           if (!("body" in obj)) return new Response(null, { status: 304, headers: h });   // onlyIf 不满足＝没变，回 304
           if (_hasRange && obj.range && obj.range.offset !== undefined) {
@@ -7991,7 +7996,16 @@ export default {
             ? { httpMetadata: { contentType: "application/json; charset=utf-8", cacheControl: "no-cache" } }
             : { httpMetadata: { contentType: "application/pdf", cacheControl: "public, max-age=31536000, immutable" } });
           const hd2 = await env.PDFS.head(p);
-          out.push({ p: p, ok: !!hd2 && hd2.size === buf.byteLength, size: buf.byteLength, r2: hd2 ? hd2.size : 0 });
+          // 覆盖之后必须把边缘那份旧副本清掉，否则读者继续拿旧字节（见路由处的注释）。
+          // ⚠ Cache API 的 delete 只清**当前这次请求落到的那个机房**，不是全球；
+          //    真正兜底的是路由把 cache-control 降到一小时。两条都要，别只留一条。
+          let _purged = false;
+          try {
+            const _c = (typeof caches !== "undefined" && caches.default) ? caches.default : null;
+            if (_c) _purged = await _c.delete(new Request(url.origin + "/" + p, { method: "GET" }));
+          } catch (e) {}
+          out.push({ p: p, ok: !!hd2 && hd2.size === buf.byteLength, size: buf.byteLength,
+                     r2: hd2 ? hd2.size : 0, purged: _purged });
         } catch (e) { out.push({ p: p, ok: false, msg: (e && e.message) || "put 失败" }); }
       }
       return J({ ok: true, done: out });
@@ -8037,12 +8051,44 @@ export default {
             ? { httpMetadata: { contentType: "application/json; charset=utf-8", cacheControl: "no-cache" } }
             : { httpMetadata: { contentType: "application/pdf", cacheControl: "public, max-age=31536000, immutable" } });
           const hd2 = await env.PDFS.head(p);
-          out.push({ p: p, ok: !!hd2 && hd2.size === buf.byteLength, size: buf.byteLength, r2: hd2 ? hd2.size : 0 });
+          // 覆盖之后必须把边缘那份旧副本清掉，否则读者继续拿旧字节（见路由处的注释）。
+          // ⚠ Cache API 的 delete 只清**当前这次请求落到的那个机房**，不是全球；
+          //    真正兜底的是路由把 cache-control 降到一小时。两条都要，别只留一条。
+          let _purged = false;
+          try {
+            const _c = (typeof caches !== "undefined" && caches.default) ? caches.default : null;
+            if (_c) _purged = await _c.delete(new Request(url.origin + "/" + p, { method: "GET" }));
+          } catch (e) {}
+          out.push({ p: p, ok: !!hd2 && hd2.size === buf.byteLength, size: buf.byteLength,
+                     r2: hd2 ? hd2.size : 0, purged: _purged });
         } catch (e) { out.push({ p: p, ok: false, msg: (e && e.message) || "put 失败" }); }
       }
       return J({ ok: true, done: out });
     }
     // R2_CHECK：核对某几个 key 在不在桶里、大小对不对（删仓库文件之前必须逐个过这一关）。
+    // R2_PURGE：只清边缘缓存那一份，不动桶里的字节。
+    // 什么时候用它：桶已经是新的（r2-check 过了）而读者仍拿到旧版——那就是边缘还压着旧副本。
+    // 判断办法：带 Range 请求（会绕过边缘直接问 R2）看 content-range 里的总字节，
+    // 与普通请求的 content-length 对不上，就是这个毛病。
+    // ⚠ 同样只清当前机房，可能要多打几次；一小时后路由那条 TTL 会自己收干净。
+    if (url.pathname === "/api/admin/r2-purge" && request.method === "POST") {
+      const b = await request.json().catch(function () { return {}; });
+      if (String(b.pass || "") !== "SDE2013") return J({ ok: false, msg: "口令不对" }, 403);
+      const paths = Array.isArray(b.paths) ? b.paths.slice(0, 200) : [];
+      const out = [];
+      const _c = (typeof caches !== "undefined" && caches.default) ? caches.default : null;
+      for (const raw of paths) {
+        const p = String(raw || "").replace(/^\/+/, "");
+        if (!/^students\/[A-Za-z0-9._\-\/]+\.pdf$/i.test(p) || p.indexOf("..") >= 0) {
+          out.push({ p: p, ok: false, msg: "路径不在允许范围" }); continue;
+        }
+        try {
+          const done = _c ? await _c.delete(new Request(url.origin + "/" + p, { method: "GET" })) : false;
+          out.push({ p: p, ok: true, purged: done });
+        } catch (e) { out.push({ p: p, ok: false, msg: (e && e.message) || "purge 失败" }); }
+      }
+      return J({ ok: true, done: out });
+    }
     if (url.pathname === "/api/admin/r2-check" && request.method === "POST") {
       let b = {}; try { b = await request.json(); } catch (e) {}
       const J = (o, st) => Response.json(o, { status: st || 200, headers: _cors() });
