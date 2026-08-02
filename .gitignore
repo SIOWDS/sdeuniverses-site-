@@ -4,7 +4,10 @@ node_modules/
 node_modules/
 /package.json
 /package-lock.json
-drafts/
+# ⚠ 必须锚定成 /drafts/。不锚定的话它会吞掉**任何路径**里名叫 drafts 的目录——
+# public/admin/drafts/（草稿箱管理页）就这么被静默吞过一次：
+# 文件在磁盘上、check_page_integrity 也照数，但根本没进仓库，线上直接 404。
+/drafts/
 
 # Phase B 语料挖掘运行产物(本地跑,勿入库)
 public/kb/kb_mine_progress.json

@@ -11,6 +11,7 @@
 import fs from "fs";
 import path from "path";
 import vm from "vm";
+import { execSync } from "child_process";
 
 const ROOT = path.join(path.dirname(new URL(import.meta.url).pathname), "..");
 let PASS = 0, FAIL = 0;
@@ -182,6 +183,18 @@ sec("③ 画布接线");
 sec("④ 管理页 /admin/drafts/");
 {
   ok(fs.existsSync(path.join(ROOT, "public/admin/drafts/index.html")), "管理页不存在");
+  /* ⚠ "文件在磁盘上" ≠ "文件会上线"。.gitignore 里那条没锚定的 `drafts/`
+     曾把这个目录整个吞掉：本地在、check_page_integrity 照数，线上却是 404。
+     所以这里要真的问一次 git。 */
+  {
+    let tracked = "";
+    try {
+      tracked = execSync("git ls-files public/admin/drafts/index.html", { cwd: ROOT }).toString().trim();
+    } catch (e) { tracked = ""; }
+    ok(tracked.length > 0, "管理页没有被 git 跟踪 —— 它上不了线（多半是 .gitignore 吞了）");
+    const gi = fs.existsSync(path.join(ROOT, ".gitignore")) ? read(".gitignore") : "";
+    ok(!/^drafts\/$/m.test(gi), ".gitignore 里的 drafts/ 没有锚定，会吞掉任何同名目录");
+  }
   ok(/name="robots" content="noindex/.test(A), "管理页没有 noindex（不对外开放的页不该被收录）");
   ok(/op: "dr"/.test(A), "管理页没走 op:dr");
   ok(/\(d && d\.d\) \? d\.d : d/.test(A), "管理页没拆信封（页面层那次栽过）");
