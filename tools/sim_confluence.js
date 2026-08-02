@@ -154,7 +154,7 @@ function sseFor(text) {
 /* ---------------- 起一个页面 ---------------- */
 async function boot(opts) {
   opts = opts || {};
-  const ctx = { calls: [], errors: [], saved: [], webQ: [], nbrQ: [], pulls: [],
+  const ctx = { calls: [], errors: [], saved: [], webQ: [], nbrQ: [], pulls: [], webBody: [],
                 pickOpt: opts.pickOpt, shortRewrite: opts.shortRewrite };
   const vc = new VirtualConsole();
   vc.on('jsdomError', e => ctx.errors.push('jsdomError: ' + (e && e.message)));
@@ -175,8 +175,9 @@ async function boot(opts) {
       if (url.indexOf('sde-innovation-iq.txt') >= 0) return T('创新智商评分标尺：五维 S/D/E/I/F。'.repeat(80));
       if (url.indexOf('/api/kb/retrieve') >= 0) return opts.kbFail ? BAD(500) : J({ block: '【站内材料】假的检索块' });
       if (url.indexOf('/api/wds/websearch') >= 0) {
-        const q = (JSON.parse(init.body || '{}').q) || '';
-        ctx.webQ.push(q);
+        const b = JSON.parse(init.body || '{}');
+        const q = b.q || '';
+        ctx.webQ.push(q); ctx.webBody.push(b);
         if (opts.webNoKey) return J({ ok: false, reason: 'need_search_key', items: [] });
         if (opts.webThin) return J({ ok: true, reason: '', items: [] });
         return J({ ok: true, reason: '', items: WEB_ITEMS(q) });
@@ -198,7 +199,9 @@ async function boot(opts) {
         const chunks = sseFor(answer(user));
         let i = 0;
         const nextChunk = () => i < chunks.length ? { done: false, value: Buffer.from(chunks[i++]) } : { done: true, value: undefined };
-        return Promise.resolve({ ok: true, status: 200, body: { getReader: () => ({ read: () => Promise.resolve(nextChunk()) }) } });
+        const read = opts.slow ? () => new Promise(r => setTimeout(() => r(nextChunk()), opts.slow))
+                               : () => Promise.resolve(nextChunk());
+        return Promise.resolve({ ok: true, status: 200, body: { getReader: () => ({ read }) } });
       }
       // 站内正文抓取
       ctx.pulls.push(url);
@@ -311,6 +314,16 @@ function userOf(c, re) { const x = c.calls.filter(k => re.test(k.user)); return 
     ok('涌现那一格的 system 里有这道问题', emerge && /经验反而流失得越快/.test(emerge.system));
     ok('题型判出来之后，位置要求也跟着进 system',
       c2.calls.some(k => /三条不同的动力机制/.test(k.system)));
+  });
+
+  await step('四之二、三家卡片把该看的都摆出来了（站内/站外 · 学科 · 位置 · 链接）', async () => {
+    const t = c2.$('trioBox').textContent;
+    ok('标了站内/站外', /〔站外〕/.test(t) && /〔站内〕/.test(t), t.slice(0, 60));
+    ok('标了各自的学科', /认知心理学/.test(t) && /组织社会学/.test(t));
+    ok('摆出了三家各自的位置（位置撞车只有摆眼前才看得出）',
+       (t.match(/位置：/g) || []).length === 3, String((t.match(/位置：/g) || []).length));
+    ok('站内那一家给的是站内链接', !!c2.doc.querySelector('#trioBox a[href^="/students/"]'));
+    ok('卡片说明改口：三家会写进文献综述', /会正面写进成品的文献综述/.test(c2.doc.querySelector('#trioCard .small').textContent));
   });
 
   await step('五、定三家：两路取材都真的走了', async () => {
@@ -470,6 +483,116 @@ function userOf(c, re) { const x = c.calls.filter(k => re.test(k.user)); return 
     ok('题型与三学科的记账也清了',
       !/题型 Why/.test(c2.$('stat-qtype').textContent) && c2.$('doneBanner').innerHTML === '');
   });
+
+  /* ---- 深挖：交付链路上那几处只有整跑才暴露的 ---- */
+  await step('十八、评审读的是打磨后的那一版（不是原稿）', async () => {
+    const rv = c2.calls.filter(k => /只评不写/.test(k.system));
+    ok('评审确实跑了', rv.length >= 1);
+    const last = rv[rv.length - 1];
+    ok('评审拿到的是打磨稿', last && /打磨后的正文/.test(last.user) && !/^正文若干句/.test(last.user.trim()),
+       last ? last.user.slice(0, 40) : '(无)');
+  });
+
+  await step('十九、成品导出用的是打磨稿', async () => {
+    const c = await boot();
+    fillQ(c, '为什么组织越想留住经验越留不住？', '认知心理学', '制度经济学', '组织社会学');
+    c.click('#goBtn');
+    await waitFor(() => /创新智商|✓/.test(c.$('stat-review').textContent), 30000);
+    c.click('#dlDocx');
+    await sleep(200);
+    const doc = c.win.__lastDoc;
+    const txt = JSON.stringify(doc || {});
+    ok('Word 里是打磨稿', /打磨后的正文/.test(txt), txt.slice(0, 60));
+    ok('Word 页脚署的是学科通融', /由 SDE 学科通融生成/.test(txt));
+    c.__ = c;
+    globalThis.__c19 = c;
+  });
+
+  await step('二十、编辑成文那一格的产物，终稿要跟着变（否则那句"用编辑产物手改"是空话）', async () => {
+    const c = globalThis.__c19;
+    const btn = Array.from(c.doc.querySelectorAll('#stage-write button[data-act="edit"]'))[0];
+    c.click(btn);
+    await sleep(80);
+    const ta = c.doc.querySelector('#stage-write textarea');
+    ok('点开出现编辑框', !!ta);
+    ta.value = '这是我手改过的终稿正文。' + '够长的一段正文，末尾有句号。'.repeat(400);
+    c.click(btn);                       // 存回
+    await sleep(120);
+    ok('编辑框已收起', !c.doc.querySelector('#stage-write textarea'));
+    c.click('#dlDocx');
+    await sleep(200);
+    const txt = JSON.stringify(c.win.__lastDoc || {});
+    ok('导出的 Word 是手改后的那一版', /我手改过的终稿正文/.test(txt), txt.slice(0, 60));
+  });
+
+  await step('二十一、单独重跑打磨：不叠加面板、不重复插框', async () => {
+    const c = globalThis.__c19;
+    const before = c.doc.querySelectorAll('#stage-polish .out').length;
+    const btn = Array.from(c.doc.querySelectorAll('#stage-polish button[data-act="rerun"]'))[0];
+    c.click(btn);
+    await waitFor(() => /✓|⚠/.test(c.$('stat-polish').textContent), 25000);
+    const after = c.doc.querySelectorAll('#stage-polish .out').length;
+    ok('重跑没有把输出框越堆越多', after === before, before + ' → ' + after);
+  });
+
+  await step('二十二、成文重跑之后，"已打磨"这个记号要撤掉', async () => {
+    const c = globalThis.__c19;
+    const btn = Array.from(c.doc.querySelectorAll('#stage-write button[data-act="rerun"]'))[0];
+    c.click(btn);
+    await waitFor(() => /✓|⚠/.test(c.$('stat-write').textContent), 25000);
+    await sleep(200);
+    ok('ST.polished 被撤回（重新写过就不算打磨过）',
+       c.win.eval('typeof ST!=="undefined" && ST.polished === false'), String(c.win.eval('ST.polished')));
+  });
+
+  await step('二十三、只填一个学科：人填的那门不许丢', async () => {
+    const c = await boot({ answer: u => {
+      if (/定出\*\*三个学科\*\*/.test(u)) return '1｜音乐学｜音乐 理论 争论\n2｜制度经济学｜度量 制度\n3｜组织社会学｜组织记忆';
+      return defaultAnswer(u, {});
+    } });
+    fillQ(c, '为什么排练越充分，现场越平庸？', null, '表演研究', null);
+    c.click('#goBtn');
+    await waitFor(() => /✓|⚠|中断/.test(c.$('stat-select').textContent), 25000);
+    const ds = ['cD1', 'cD2', 'cD3'].map(id => c.$(id).value);
+    ok('人填的「表演研究」还在三门里', ds.indexOf('表演研究') >= 0, ds.join('/'));
+    ok('三门都补齐了', ds.every(Boolean), ds.join('/'));
+  });
+
+  await step('二十四、自备的检索 Key 真的传到了检索那一路', async () => {
+    const c = await boot({ keyProbe: true });
+    fillQ(c, '为什么组织越想留住经验越留不住？', '认知心理学', '制度经济学', '组织社会学');
+    c.$('cSiteKey').checked = false;
+    c.$('cSiteKey').dispatchEvent(new c.win.Event('change', { bubbles: true }));
+    c.$('cSkey').value = 'zhipu-fake-key';
+    c.click('#goBtn');
+    await waitFor(() => c.webBody.length >= 1, 25000);
+    ok('检索请求带上了自备 Key', c.webBody.some(b => b.skey === 'zhipu-fake-key'),
+       JSON.stringify(c.webBody[0] || {}));
+  });
+
+  await step('二十五、跑到一半按停：当场停住，不硬跑到底', async () => {
+    const c = await boot({ slow: 6 });
+    fillQ(c, '为什么组织越想留住经验越留不住？', '认知心理学', '制度经济学', '组织社会学');
+    c.click('#goBtn');
+    await waitFor(() => /spinner|✓/.test(c.$('stat-select').innerHTML), 20000);
+    c.click('#stopBtn');
+    await sleep(1200);
+    const n1 = c.calls.length;
+    await sleep(1200);
+    ok('按停之后不再发新调令', c.calls.length === n1, n1 + ' → ' + c.calls.length);
+    ok('没有跑到评审', !/创新智商/.test(c.$('stat-review').textContent), c.$('stat-review').textContent);
+  });
+
+  if (process.env.DUMP) {
+    console.log('\n' + '='.repeat(56) + '\n整条产线的调令流水（第三场整跑）\n' + '='.repeat(56));
+    c2.calls.forEach((k, i) => {
+      const head = k.user.split('\n').filter(Boolean)[0] || '';
+      console.log(String(i + 1).padStart(2) + '. 预算 ' + String(k.max_tokens).padStart(5)
+        + ' ｜ system ' + String(k.system.length).padStart(5) + ' 字'
+        + ' ｜ 带题:' + (/本次要解决的问题/.test(k.system) ? '是' : '否')
+        + ' ｜ ' + head.slice(0, 58));
+    });
+  }
 
   console.log('\n' + '='.repeat(56));
   console.log('通过 ' + pass + ' · 失败 ' + fail);

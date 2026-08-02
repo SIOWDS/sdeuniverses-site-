@@ -511,7 +511,19 @@ const panels = {};
     else if(act==='cont'){ await runFrom(i, STAGES.length-1); }
     else if(act==='edit'){
       const p = panels[id];
-      if(p.editing){ ST.out[id] = p.ta.value; p.out.textContent = ST.out[id]; p.editing=false; p.ta.remove(); b.textContent='编辑产物'; }
+      if(p.editing){
+        ST.out[id] = p.ta.value; p.out.textContent = ST.out[id]; p.editing=false; p.ta.remove(); b.textContent='编辑产物';
+        /* 成文格的产物就是终稿本身——只写 ST.out.write 而不回写 ST.article，
+           交出去的 Word／发布包用的仍是没改过的那一版，而红字偏偏一直在劝人
+           「用编辑产物手改」。照着做了等于没做，且没有任何迹象告诉他。 */
+        if(id==='write'){
+          ST.article = ST.out.write;
+          const wc = ST.article.replace(/\s/g,'').length;
+          const t = termHits(ST.article), tr = traceHits(ST.article), hs = t.concat(tr);
+          ST.termFix = hs.length ? hs : null;
+          setStat('write', '✓ '+wc+' 字（手改）'+(hs.length ? ('　⚠ 仍有残留：'+hs.join('、')) : '　术语零残留 · 无工艺痕迹'), 'done');
+        }
+      }
       else{
         const ta = document.createElement('textarea'); ta.rows=14; ta.value = ST.out[id]||'';
         p.out.parentNode.insertBefore(ta, p.out.nextSibling);

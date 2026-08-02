@@ -246,7 +246,7 @@ select.model-select{max-width:340px}
   <!-- ③ 撞的是这三篇 -->
   <div class="card hidden" id="trioCard">
     <h2>③ 撞的是这三家（每家：一个主题观点 ＋ 三个支撑观点）</h2>
-    <div class="small" style="margin-bottom:10px">这一块是**中间产物**：给你看清撞的是什么、底盘硬不硬。它不会写进成品文章（成品只列三篇来源链接）。</div>
+    <div class="small" style="margin-bottom:10px">这一块是<b>中间产物</b>：给你看清撞的是什么、底盘硬不硬。三家本身会正面写进成品的文献综述（那是论文该做的事），但这些卡片上的抽脊不会进正文。<b>三家的位置要各不相同</b>——两家站在同一个位置就是撞车，学科离得再远也撞不出东西。</div>
     <div id="trioBox"></div>
     <div class="small" id="trioConflict" style="margin-top:10px"></div>
     <div class="st-tools" style="margin-top:10px">
@@ -550,7 +550,19 @@ const panels = {};
     else if(act==='cont'){ await runFrom(i, STAGES.length-1); }
     else if(act==='edit'){
       const p = panels[id];
-      if(p.editing){ ST.out[id] = p.ta.value; p.out.textContent = ST.out[id]; p.editing=false; p.ta.remove(); b.textContent='编辑产物'; }
+      if(p.editing){
+        ST.out[id] = p.ta.value; p.out.textContent = ST.out[id]; p.editing=false; p.ta.remove(); b.textContent='编辑产物';
+        /* 成文格的产物就是终稿本身——只写 ST.out.write 而不回写 ST.article，
+           交出去的 Word／发布包用的仍是没改过的那一版，而红字偏偏一直在劝人
+           「用编辑产物手改」。照着做了等于没做，且没有任何迹象告诉他。 */
+        if(id==='write'){
+          ST.article = ST.out.write;
+          const wc = ST.article.replace(/\s/g,'').length;
+          const t = termHits(ST.article), tr = traceHits(ST.article), hs = t.concat(tr);
+          ST.termFix = hs.length ? hs : null;
+          setStat('write', '✓ '+wc+' 字（手改）'+(hs.length ? ('　⚠ 仍有残留：'+hs.join('、')) : '　术语零残留 · 无工艺痕迹'), 'done');
+        }
+      }
       else{
         const ta = document.createElement('textarea'); ta.rows=14; ta.value = ST.out[id]||'';
         p.out.parentNode.insertBefore(ta, p.out.nextSibling);
@@ -1425,8 +1437,16 @@ function renderTrio(){
   card.classList.remove('hidden');
   box.innerHTML = ST.sources.map((s,i)=>{
     const r = (ST.spineRows||[]).find(x=>x.n===i+1);
-    const head = '<h4>源'+(i+1)+'　'+escTxt(s.title||'')+'</h4>' +
-      '<div class="src">'+(s.author?escTxt(s.author)+'　':'')+(s.url?('<a href="'+s.url+'" target="_blank" rel="noopener">读原文</a>'):'投喂')+'</div>';
+    // 学科通融多标两样：这一家是站内还是站外（出处要不要自己去核），
+    // 以及它的**位置**——题型定下来之后，两家站在同一个位置就是撞车，
+    // 而这一条只有摆在眼前才看得出来。
+    const tag = s.inside ? '<span style="color:var(--ok)">〔站内〕</span>'
+                         : '<span style="color:var(--warn)">〔站外〕</span>';
+    const head = '<h4>源'+(i+1)+'　'+tag+(s.kind?('<span class="small" style="color:var(--muted)">['+escTxt(s.kind)+']</span>　'):'')+escTxt(s.title||'')+'</h4>' +
+      '<div class="src">'+(s.author?escTxt(s.author)+'　':'')
+        +(s.url?('<a href="'+s.url+'" target="_blank" rel="noopener">读原文</a>')
+               :'<span style="color:var(--err)">无链接，须自行补</span>')+'</div>'
+      + (s.pos ? '<div class="small" style="margin-top:6px;color:var(--muted)">位置：'+escTxt(s.pos)+'</div>' : '');
     if(!r) return '<div class="trio-row">'+head+'<div class="small" style="margin-top:8px">观点还没抽出来（跑到「抽脊」那一格才有）。</div></div>';
     return '<div class="trio-row">'+head+
       '<div class="th">主题观点：'+escTxt(r.thesis||'（没读出来，看抽脊那一格原文）')+'</div>'+
@@ -2181,6 +2201,7 @@ async function doPolish(){
   ST.out.polishAudit = audit;
 
   setStat(id, '<span class="spinner"></span> 照自查整篇重写一遍', 'run');
+  p.el.querySelectorAll('.out').forEach((el,i)=>{ if(i>0) el.remove(); });   // 重跑不叠框
   const box = document.createElement('div'); box.className='out'; box.style.marginTop='8px';
   p.out.parentNode.insertBefore(box, p.out.nextSibling);
   const rewriteP = [
@@ -2214,6 +2235,9 @@ async function doPolish(){
   ST.article = txt;
   ST.out.write = txt;
   ST.polished = true;
+  // 正文只认一个当家的：成文格的显示与产物一并换成终稿，
+  // 否则「编辑产物」打开的是终稿、面板上却还印着初稿。
+  try{ panels.write.out.textContent = txt; }catch(e){ }
   const terms = termHits(ST.article), traces = traceHits(ST.article);
   const hits = terms.concat(traces);
   setStat(id, '✓ 已打磨 · '+wc+' 字'+(hits.length ? ('　⚠ 仍有残留：'+hits.join('、')) : '　术语零残留 · 无工艺痕迹'), 'done');
@@ -2447,6 +2471,7 @@ function selHint(s){ selLog('<span style="color:var(--warn)">'+s+'</span>'); }
 async function doWrite(){
   const id='write', p=panels[id];
   openStage(id);
+  ST.polished = false;   // 重新写过就不算打磨过，别让横幅谎称已打磨
   setStat(id, '<span class="spinner"></span> 列目录', 'run');
   const key = needKey(); if(!key) throw new Error('缺 Key');
   const fix = ST.termFix;
