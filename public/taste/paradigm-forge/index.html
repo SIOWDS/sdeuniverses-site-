@@ -450,15 +450,26 @@ function showErr(msg){ errBox.textContent='⚠ '+msg; errBox.style.display='bloc
 function hideErr(){ errBox.style.display='none'; }
 
 /* 全站 RAG：失败即空串，安全退回 */
+/* ===================== 侧路取材：一律带闸 ===================== */
+/* 与「学科通融」那台同一个洞：这些调用原本一个超时都没有，任一路不回就无限期转圈，
+   而「停下」只在两格之间被检查、掐不断已经发出去的请求。2026-08-02 在通融那台上真卡过。 */
+const SIDE_MS = { web:30000, kb:45000 };
+const SIDE_LIVE = [];
+let SIDE_SLOW = 0;
+function sideAbortAll(){ while(SIDE_LIVE.length){ const ac = SIDE_LIVE.pop(); try{ ac.abort(); }catch(e){ } } }
+function sideFetch(url, body, ms){
+  let ac = null, t = null;
+  try{ ac = new AbortController(); }catch(e){ ac = null; }
+  if(ac){ SIDE_LIVE.push(ac); t = setTimeout(()=>{ SIDE_SLOW++; try{ ac.abort(); }catch(e){ } }, ms || 30000); }
+  const done = ()=>{ if(t) clearTimeout(t); const i = ac ? SIDE_LIVE.indexOf(ac) : -1; if(i>=0) SIDE_LIVE.splice(i,1); };
+  return fetch(url, { method:'POST', headers:{'content-type':'application/json'},
+                      body: JSON.stringify(body), signal: ac ? ac.signal : undefined })
+    .then(r => r.ok ? r.json() : null).then(j => { done(); return j; }).catch(() => { done(); return null; });
+}
 async function kbCtx(q){
-  // 契约与金点子发生器一致：/api/kb/retrieve 返回 {block}。无 Key、只读、失败即空串（安全退回）。
-  try{
-    const r = await fetch('/api/kb/retrieve', { method:'POST', headers:{'content-type':'application/json'},
-      body: JSON.stringify({ q:q, k:12, budget:24, cap:9000 }) });
-    if(!r.ok) return '';
-    const j = await r.json();
-    return (j && j.block) ? j.block : '';
-  }catch(e){ return ''; }
+  // 契约与金点子发生器一致：/api/kb/retrieve 返回 {block}。无 Key、只读、失败或超时即空串。
+  const j = await sideFetch('/api/kb/retrieve', { q:q, k:12, budget:24, cap:9000 }, SIDE_MS.kb);
+  return (j && j.block) ? j.block : '';
 }
 
 /* 站内近邻名单 —— 与 kbCtx 的分工是硬的：
@@ -468,14 +479,9 @@ async function kbCtx(q){
 const NBR_CHECK_MARK = '近邻检测';        // 让判据认得出这一节（sde-nbr-gate.js 的 sectionOK 按它找）
 const NBR_DISC_MARK  = '本文所属学科';    // 学科标注的锚：想让什么被检查，先让它有个可解析的形状
 async function nbrOne(q, k){
-  try{
-    if(window.SDERag && window.SDERag.neighbors) return (await window.SDERag.neighbors(q, {k:k||8})) || '';
-    const r = await fetch('/api/kb/neighbors', { method:'POST', headers:{'content-type':'application/json'},
-      body: JSON.stringify({ q:String(q||'').slice(0,2000), k:k||8 }) });
-    if(!r.ok) return '';
-    const j = await r.json();
-    return (j && j.block) ? j.block : '';
-  }catch(e){ return ''; }
+  // 直接走端点，不经 SDERag —— 那一层没有超时，而这一路正是会卡住的那一路。
+  const j = await sideFetch('/api/kb/neighbors', { q:String(q||'').slice(0,2000), k:k||8 }, SIDE_MS.kb);
+  return (j && j.block) ? j.block : '';
 }
 /* 多种子：一个种子只查一个角度。撞车最常发生在**最终那个命名**上——
    概念名往往不在标题里、只在副标题或关键词里，用「话题」去查根本召回不到。
@@ -487,8 +493,11 @@ async function nbrList(seeds, k){
     if(t.length > 3 && qs.indexOf(t) < 0) qs.push(t.slice(0,600));
   });
   if(!qs.length) return '';
-  let blocks = [];
-  try{ blocks = await Promise.all(qs.slice(0,4).map(q=>nbrOne(q, k))); }catch(e){ return ''; }
+  // 串行：这一路每查一次都要把全站语料读一遍，并发是拿自己的后端打自己
+  const blocks = [];
+  for(const qq of qs.slice(0,4)){
+    try{ blocks.push(await nbrOne(qq, k)); }catch(e){ blocks.push(''); }
+  }
   const seen = {}, head = [], rows = [];
   blocks.filter(Boolean).join('\n').split('\n').forEach(ln=>{
     const t = ln.replace(/\s+$/,'');
@@ -2144,12 +2153,9 @@ async function doWarmup(){
    没传就用站点管理端的 Key；两个都没有时返回 need_search_key —— 那时**如实说，指路 F 模式**，
    不假装搜过。 */
 async function webSearch(q, skey){
-  try{
-    const r = await fetch('/api/wds/websearch', { method:'POST', headers:{'content-type':'application/json'},
-      body: JSON.stringify({ q:String(q||'').slice(0,70), skey:skey||'', n:8 }) });
-    if(!r.ok) return { ok:false, reason:'http_'+r.status, items:[] };
-    return await r.json();
-  }catch(e){ return { ok:false, reason:'net', items:[] }; }
+  const j = await sideFetch('/api/wds/websearch', { q:String(q||'').slice(0,70), skey:skey||'', n:8 }, SIDE_MS.web);
+  if(!j) return { ok:false, reason:'timeout', items:[] };
+  return j;
 }
 function webBlockOf(tag, items){
   let s = '', n = 0;
@@ -2737,7 +2743,7 @@ goBtn.addEventListener('click', async ()=>{
   goBtn.disabled = false;
   await runFrom(0, STAGES.length-1);
 });
-$('stopBtn').addEventListener('click', ()=>{ ST.abort = true; });
+$('stopBtn').addEventListener('click', ()=>{ ST.abort = true; sideAbortAll(); });
 $('resetBtn').addEventListener('click', ()=>{
   ST.out = {}; ST.article=''; ST.outline=''; ST.score=null; ST.sources=[];
   ST.tried=[]; ST.seed=null; ST.seedScore=0; ST.outer=0; ST.best=null; ST.pair=null; ST.bestPair=null; ST.usedA=[]; ST.badC=[]; ST.__swap=null; ST.forged=false;   // 心得不清：它按内功+基底缓存，重跑不必重内化
@@ -2950,7 +2956,7 @@ $('dlEngine').addEventListener('click', ()=>{
 });
 
 /* ===================== 起 ===================== */
-const BUILD_TAG = '20260802-1236·v1';
+const BUILD_TAG = '20260802-1349·v1';
 (function(){ const el=$('buildTag'); if(el) el.textContent='构建 '+BUILD_TAG; })();
 loadData();
 </script>

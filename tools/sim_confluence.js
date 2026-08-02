@@ -157,7 +157,7 @@ function sseFor(text) {
 async function boot(opts) {
   opts = opts || {};
   const ctx = { calls: [], errors: [], saved: [], webQ: [], nbrQ: [], pulls: [], webBody: [],
-                pickOpt: opts.pickOpt, shortRewrite: opts.shortRewrite, lowScore: opts.lowScore, drafts: [] };
+                pickOpt: opts.pickOpt, shortRewrite: opts.shortRewrite, lowScore: opts.lowScore, drafts: [], nbrLive: 0, nbrPeak: 0, nbrAborted: 0 };
   const vc = new VirtualConsole();
   vc.on('jsdomError', e => ctx.errors.push('jsdomError: ' + (e && e.message)));
   vc.on('error', (...a) => ctx.errors.push('console.error: ' + a.join(' ')));
@@ -188,7 +188,14 @@ async function boot(opts) {
         if (opts.nbrFail) return BAD(500);
         const q = (JSON.parse(init.body || '{}').q) || '';
         ctx.nbrQ.push(q);
-        return J({ n: 2, block: NBR_BLOCK(q) });
+        ctx.nbrLive++; ctx.nbrPeak = Math.max(ctx.nbrPeak, ctx.nbrLive);
+        if (opts.hangNbr) {                       // 永不返回：模拟真跑时卡住的那一路
+          return new Promise((res, rej) => {
+            if (init.signal) init.signal.addEventListener('abort', () => { ctx.nbrLive--; ctx.nbrAborted++; rej(new Error('AbortError')); });
+          });
+        }
+        return new Promise(res => setTimeout(() => { ctx.nbrLive--; res(null); }, opts.nbrMs || 20))
+          .then(() => J({ n: 2, block: NBR_BLOCK(q) }));
       }
       if (url.indexOf('chat/completions') >= 0 || url.indexOf('/api/llm-proxy') >= 0) {
         const body = JSON.parse(init.body);
@@ -709,6 +716,55 @@ function userOf(c, re) { const x = c.calls.filter(k => re.test(k.user)); return 
     await sleep(150);
     ok('底稿还在（清的是这一场，不是他上一场的成果）', !!c.win.localStorage.getItem('sde_conf_draft'));
     ok('找回条被重新挂上', c.$('draftRestore').style.display === '');
+  });
+
+  /* ---- 取材那一步：卡死的修复 ---- */
+  await step('三十三、站内那一路是串行的（并发正是卡死的来路）', async () => {
+    const c = await boot({ nbrMs: 60 });
+    fillQ(c, '教育的本质是什么？', '社会学', '心理学', '化学');
+    c.click('#goBtn');
+    await waitFor(() => /✓|⚠|中断/.test(c.$('stat-select').textContent), 30000);
+    ok('任何时刻只有一路站内近邻在飞', c.nbrPeak === 1, '峰值并发 ' + c.nbrPeak);
+    ok('三门都查到了', c.nbrQ.filter(q => /社会学|心理学|化学/.test(q)).length >= 3, String(c.nbrQ.length));
+  });
+
+  await step('三十四、取材实时报进度（卡住时看得出是哪一路）', async () => {
+    const c = await boot({ nbrMs: 220 });
+    fillQ(c, '教育的本质是什么？', '社会学', '心理学', '化学');
+    const seen = [];
+    const poll = setInterval(() => { const t = c.$('stat-select').textContent; if (/取材/.test(t)) seen.push(t); }, 40);
+    c.click('#goBtn');
+    await waitFor(() => /✓|⚠|中断/.test(c.$('stat-select').textContent), 30000);
+    clearInterval(poll);
+    ok('状态条报了联网几分之几', seen.some(t => /联网 \d\/3/.test(t)), seen[0] || '(没抓到)');
+    ok('状态条报了站内几分之几', seen.some(t => /站内近邻 \d\/3/.test(t)), seen[seen.length - 1] || '(没抓到)');
+    ok('站内计数确实在往前走', seen.some(t => /站内近邻 0\/3/.test(t)) && seen.some(t => /站内近邻 [23]\/3/.test(t)));
+  });
+
+  await step('三十五、一路永不返回：被闸掉、如实标出，不无限期转圈', async () => {
+    const c = await boot({ hangNbr: true });
+    c.win.eval('SIDE_MS.kb = 300');            // 把闸调短，好在测试里跑完
+    fillQ(c, '教育的本质是什么？', '社会学', '心理学', '化学');
+    c.click('#goBtn');
+    const moved = await waitFor(() => /✓|⚠|中断/.test(c.$('stat-select').textContent), 20000);
+    ok('没有卡死，这一格照样收了尾', moved, c.$('stat-select').textContent);
+    ok('挂住的请求被真的掐掉了', c.nbrAborted >= 3, '掐掉 ' + c.nbrAborted + ' 路');
+    ok('如实记了一笔超时（不假装取到）', c.win.eval('ST.notes.join("|")').indexOf('超时被掐掉') >= 0,
+       c.win.eval('ST.notes.join("|")').slice(0, 80));
+    ok('联网那一路仍然拿到了材料', /三家已就位/.test(c.$('stat-select').textContent), c.$('stat-select').textContent);
+  });
+
+  await step('三十六、卡在取材上按「停下」，当场掐断在飞的请求', async () => {
+    const c = await boot({ hangNbr: true });
+    c.win.eval('SIDE_MS.kb = 60000');          // 闸留得很长，全靠「停下」掐
+    fillQ(c, '教育的本质是什么？', '社会学', '心理学', '化学');
+    c.click('#goBtn');
+    await waitFor(() => c.nbrLive >= 1, 20000);
+    c.click('#stopBtn');
+    await sleep(500);
+    ok('在飞的请求被掐断', c.nbrAborted >= 1, '掐断 ' + c.nbrAborted);
+    ok('产线真的停了（按钮复位）', c.$('goBtn').disabled === false && c.$('stopBtn').style.display === 'none');
+    ok('没有继续往下跑到体检', !/✓/.test(c.$('stat-gate').textContent), c.$('stat-gate').textContent);
   });
 
   if (process.env.DUMP) {
