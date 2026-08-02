@@ -4746,7 +4746,7 @@ async function askCore(request, env, url, body, SINK) {
     // ===== 模式：二阶碰撞（涌现流水线第二环）——三观点撞出一个候选典范 =====
     // 碰撞方式由前端随机抽取（不放回），服务端持有权威方式表：换方式重撞时，换的就是这一段。
     if (mode === "collide") {
-      MAXTOK = 6000;   // 思考与正文共用这一个额度：留不出余量，思考一深正文就是 0 字
+      MAXTOK = 3200;
       const views = String(body.views || "").slice(0, 20000);
       const wayNo = Math.max(1, Math.min(6, parseInt(body.way, 10) || 1));
       const WAYS = {
@@ -4780,7 +4780,7 @@ async function askCore(request, env, url, body, SINK) {
     }
     // ===== 模式：最终综合提炼（涌现流水线末环，也是整条产线最要紧的一步）=====
     else if (mode === "synth") {
-      MAXTOK = 8600;   // 同上；这一环最贵，宁可给足
+      MAXTOK = 5200;
       const winner = String(body.winner || "").slice(0, 6000);
       const others = String(body.others || "").slice(0, 7000);
       const cards = String(body.cards || "").slice(0, 3500);
@@ -4809,7 +4809,7 @@ async function askCore(request, env, url, body, SINK) {
         + "\n\n《站内资料》\n" + ctxText.slice(0, 9000);
     }
     else if (mode === "distill") {
-      MAXTOK = 8600;   // 同上：九栏入口资料本身就要三千多字，5200 全给思考也不够
+      MAXTOK = 5200;
       sys = (neigong ? neigong + "\n\n═══════════\n【你此前带着上面这套完整底盘先验、亲手写下并已内化的心得】\n" + (reflect || "（心得暂缺）") + "\n\n═══════════\n" : "")
         + "你是一位以 SDE 方法论为隐性引擎的资深学者。读者刚刚与你完成了一场连续多轮的问对；现在他点了「提炼精华」，要把这场问对收成一份《论文入口资料》——它将作为下一步「成文一篇」（万字论文）的唯一起点材料。"
         + "你的任务不是复述对话，而是把这场问对里**真正长出来的东西**挑出来、按承重程度排好序，并明确指出它还缺什么。"
@@ -4927,7 +4927,7 @@ async function askCore(request, env, url, body, SINK) {
   // 不告诉评分者它出自谁手、更不告诉它这是本站自己的产出；② 综合分由系统按固定权重算，
   // 模型只给五维分，任何模型手算的综合分都不算数；③ 每一维必附一句逐字引自原文的证据句。
   if (mode === "iq") {
-    MAXTOK = 4800;   // 同上：评分卡被截断在半句话里，整张卡就废了
+    MAXTOK = 3600;
     const text = String(body.text || "").slice(0, 26000);
     sys = "你是一位独立的创新智商评分者。你收到的是一份【匿名来稿】——你不知道它出自谁手，也不必知道。「名家写的」不加分，「机器写的」不减分；文风漂亮、术语密集、读起来像一篇正经论文，一律不加分。你唯一要测的是：一个此前不存在的认知物，在发生意义上走了多深。"
       + "\n\n【这把尺子测的是造新，不是解题】在大模型已吞下人类几乎全部公开文本的今天，一般智商刻度上的 100 分约等于一个基底在零提示语下的默认产出。所以 130 不是「比人聪明 30 分」，而是「比基底张口就来的那段话深 30 个智商点」。一段文本若连基底随口能写的深度都够不到，它在创新意义上就是负分——读起来多顺、多像论文都不算数。"
@@ -5062,8 +5062,10 @@ async function askCore(request, env, url, body, SINK) {
           const up2 = await fetch(VC.url, {
             method: "POST",
             headers: { "content-type": "application/json", authorization: "Bearer " + KEY },
+            // 关思考之外还要降档：站内既有硬教训是「预算越大，思考拖得越久，越容易被平台
+            // 时长上限杀在思考阶段」，所以重跑的意义是降档，不是加码（见 wdsLadder 那条纪律）。
             body: JSON.stringify(wdsPlainBody(VC, {
-              model: VC.model, stream: true, max_tokens: MAXTOK,
+              model: VC.model, stream: true, max_tokens: Math.min(MAXTOK, 4000),
               messages: [{ role: "system", content: sys }, { role: "user", content: usr }],
             })),
           });
