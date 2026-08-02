@@ -212,5 +212,26 @@
     });
   }
 
-  w.SDEVault = { auto: auto, fav: fav, kb: kb, head: head, lead: lead, cred: cred, KINDS: KINDS, KB_KINDS: KB_KINDS };
+  /* ── 知识库的**读**那一半 ────────────────────────────
+     此前只有 kb()（存进去），于是资料库对画布是**单向**的：存得进、取不回。
+     「三个系统通融」要求的正是这条反向路径 —— 在 ChatSDE 里能把自己存过的成品拉回画布接着改。
+     两个动作各自只做一件事：mine 只回元数据（列表不该把十件两万字一起拖回来，
+     这条口径与服务端 kbmine 一致），get 才回正文。 */
+  function kbApi(a, extra) {
+    var c = cred();
+    if (!c) return Promise.resolve({ ok: false, noAuth: 1 });
+    var body = { credential: c, op: "kb", a: a };
+    if (extra) for (var k in extra) if (Object.prototype.hasOwnProperty.call(extra, k)) body[k] = extra[k];
+    return fetch("/api/im", {
+      method: "POST", headers: { "content-type": "application/json" },
+      body: JSON.stringify(body)
+    }).then(function (r) { return r.json(); }).then(function (d) {
+      return (d && d.d) ? d.d : d;            // 信封只拆一次（页面层那次栽过）
+    }, function () { return { ok: false }; });
+  }
+  function kbList() { return kbApi("mine"); }
+  function kbGet(id) { return kbApi("get", { id: String(id || "") }); }
+
+  w.SDEVault = { auto: auto, fav: fav, kb: kb, kbList: kbList, kbGet: kbGet,
+                 head: head, lead: lead, cred: cred, KINDS: KINDS, KB_KINDS: KB_KINDS };
 })(window);

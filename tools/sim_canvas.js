@@ -116,7 +116,16 @@ function boot(opts) {
     cvRen: "✎ 改名", cvRenAsk: "叫什么？", cvDel: "🗑 删除", cvDelAsk: "删掉《{t}》？",
     cvEdit: "✎ 编辑", cvEditT: "手改", cvEditSave: "✓ 存为新版", cvEditCancel: "丢弃改动",
     cvEditKeep: "改了 {n} 字还没存", cvEditNo: "一个字都没改", cvDraft: "有未存的草稿",
-    moreT: "更多",
+    moreT: "更多", cvMore: "⋯", cvMoreT: "更多",
+    cvFull: "⤢ 展开", cvUnfull: "⤡ 收回", cvFullT: "展开",
+    cvTalk: "💬 讨论", cvTalkT: "讨论", cvTalkAdd: "＋ 加一条批注", cvTalkPh: "说点什么",
+    cvTalkOnSel: "批注这一段（{n} 字）", cvTalkOnAll: "对整版加一条批注",
+    cvTalkNone: "还没有批注。", cvTalkAsk: "⚡ 就这条问 WDS", cvTalkDel: "删",
+    cvTalkPre: "下面是画布《{t}》里的一段，以及我对它的批注。请就这一处跟我讨论，不要重写整段：",
+    cvTalkSent: "已递给 WDS", cvKbBack: "⇩ 从知识库取回", cvKbBackT: "取回",
+    cvKbBackNone: "知识库里还没有东西。", cvKbBackNo: "取不到", cvKbBackOn: "正在取…",
+    cvKbBackOk: "已取回画布", cvFromKb: "从知识库取回",
+    cvKb: "⇧ 存进知识库", cvKbT: "存进知识库", cvKbNo: "模块没装载",
     cvCo: "⚡ 共创", cvCoT: "共创", cvCoWrite: "改写法", cvCoShape: "改结构", cvCoSde: "SDE 的动作",
     cvCoOn: "正在让 WDS {op}…", cvCoWhole: "整版", cvCoSeg: "选中的 {n} 字",
     cvByMe: "我手改", cvByWds: "WDS", cvByUnknown: "来处不明",
@@ -164,6 +173,12 @@ function boot(opts) {
     prompt: (q, d) => { prompts.push(q); return opts.rename !== undefined ? opts.rename : d; },
     confirm: q => { confirms.push(q); return opts.confirm !== false; },
     WDSPdf: opts.noPdf ? undefined : { print: (o, cb) => { prints.push(o); cb(true); } },
+    SDEVault: opts.noVault ? undefined : {
+      kb: () => Promise.resolve({ ok: true }),
+      kbList: () => Promise.resolve(opts.kbAuth === false ? { noAuth: 1 }
+        : { ok: true, rows: opts.kbRows || [{ id: "k1", title: "存过的稿子", kind: "md", at: "10:00" }] }),
+      kbGet: () => Promise.resolve({ ok: true, text: "# 存过的稿子\n\n" + "字".repeat(300) })
+    },
     alert: () => {}
   };
   ctx.localStorage = {
@@ -202,11 +217,26 @@ function boot(opts) {
   vm.runInContext(SEG + "\nthis.__x = { CV: CV, cvAdd: cvAdd, cvScan: cvScan, cvTake: cvTake, cvPaint: cvPaint, " +
     "cvAskRevise: cvAskRevise, cvFind: cvFind, cvNorm: cvNorm, cvStrip: cvStrip, cvReset: cvReset, " +
     "cvFrameDoc: cvFrameDoc, cvText: cvText, cvCur: cvCur, cvSave: cvSave, cvRestore: cvRestore, cvSelCatch: cvSelCatch, " +
+    "cvTalkAdd: cvTalkAdd, cvNotes: cvNotes, cvTalkAsk: cvTalkAsk, cvFullSet: cvFullSet, cvKbBack: cvKbBack, " +
     "topFit: topFit, MORE_BTNS: MORE_BTNS, cvShow: cvShow, cvMeta: cvMeta, cvPush: cvPush, cvByLabel: cvByLabel, CO_OPS: CO_OPS, coOp: coOp, cvCoRun: cvCoRun, cvGrab: cvGrab };", ctx);
   const x = ctx.__x;
   x._ = { layer, cvEl, tabs, bar, wrap, btn, store, toasts, prompts, confirms, prints, ctx, TX,
           top, memB, memBadgeEl, moreB, moreBadge, langB, distB, pdfB, keyB };
   return x;
+}
+
+/* 工具条重组之后，次要动作都在画布自己的「⋯」里。
+   断言**不放宽**：改成经菜单去点，行为照验。 */
+function more(C) {
+  const b = C._.bar.children.filter(x => x.textContent === "⋯")[0];
+  if (!b) return null;
+  b.onclick();
+  const menu = C._.ctx._menu;
+  return menu ? menu.children.filter(x => x.tagName === "BUTTON") : null;
+}
+function moreItem(C, label) {
+  const mi = more(C);
+  return mi ? mi.find(x => x.children.some(c => String(c.textContent || "").indexOf(label) > -1)) : null;
 }
 
 /* ══ ① 源码定位 ══════════════════════════════════ */
@@ -312,8 +342,13 @@ sec("③ 选区捕获、按钮标签、切件清选区");
   C.cvPaint();
   const labels = C._.bar.children.map(b => b.textContent);
   ok(labels.indexOf("让 WDS 改这一版") > -1, "没选中时按钮仍写着「改这一段」——标签在骗人");
-  ok(labels.indexOf("⤓ PDF") > -1, "工具条没有 PDF 出口");
-  ok(labels.indexOf("✎ 改名") > -1 && labels.indexOf("🗑 删除") > -1, "没有改名/删除");
+  ok(labels.indexOf("⋯") > -1, "工具条没有「⋯」");
+  ok(!!moreItem(C, "⤓ PDF"), "「⋯」里没有 PDF 出口");
+  ok(!!moreItem(C, "✎ 改名") && !!moreItem(C, "🗑 删除"), "「⋯」里没有改名/删除");
+  ok(!!moreItem(C, "复制") && !!moreItem(C, "下载"), "「⋯」里没有复制/下载");
+  /* 主行不许再摆这些 —— 重组的意义就在于此 */
+  ["⤓ PDF", "✎ 改名", "🗑 删除", "复制", "下载"].forEach(n =>
+    ok(labels.indexOf(n) === -1, "「" + n + "」还留在主行上（重组没生效）"));
 
   /* 切到另一件要清掉上一件的选区 */
   ok(/CV\.cur = i; CV\.src = false; CV\.sel = "";/.test(SRC), "切件时没清选区（会拿 A 的选区去改 B）");
@@ -323,8 +358,8 @@ sec("③ 选区捕获、按钮标签、切件清选区");
   C2.cvAdd("md", "甲", "# 甲\n\n" + "字".repeat(500));
   C2.cvAdd("md", "乙", "# 乙\n\n" + "字".repeat(500));
   C2.cvPaint();
-  const del = C2._.bar.children.filter(b => b.textContent === "🗑 删除")[0];
-  ok(!!del, "找不到删除按钮");
+  const del = moreItem(C2, "🗑 删除");
+  ok(!!del, "「⋯」里找不到删除");
   del.onclick();
   ok(C2.CV.items.length === 1 && C2.CV.items[0].title === "甲", "删除没删对");
   ok(C2._.confirms.length === 1 && C2._.confirms[0].indexOf("乙") > -1, "删除前没有确认（或确认里没写是哪一件）");
@@ -333,14 +368,14 @@ sec("③ 选区捕获、按钮标签、切件清选区");
   const C3 = boot({ rename: "新名字" });
   C3.cvAdd("md", "旧名", "# 旧名\n\n" + "字".repeat(500));
   C3.cvPaint();
-  C3._.bar.children.filter(b => b.textContent === "✎ 改名")[0].onclick();
+  moreItem(C3, "✎ 改名").onclick();
   ok(C3.CV.items[0].title === "新名字", "改名没生效");
 
   /* PDF 真被调起来，且文件名带时间戳（别每次都撞同名） */
   const C4 = boot();
   C4.cvAdd("md", "报告", "# 报告\n\n" + "字".repeat(500));
   C4.cvPaint();
-  C4._.bar.children.filter(b => b.textContent === "⤓ PDF")[0].onclick();
+  moreItem(C4, "⤓ PDF").onclick();
   ok(C4._.prints.length === 1, "PDF 没被调起来");
   ok(/20260802-0000/.test(C4._.prints[0].file || ""), "PDF 建议文件名没带时间戳");
   ok((C4._.prints[0].blocks || []).length === 1, "PDF 没把这一件排进去");
@@ -352,8 +387,8 @@ sec("③ 选区捕获、按钮标签、切件清选区");
   const C5 = boot({ noPdf: true });
   C5.cvAdd("md", "报告", "# 报告\n\n" + "字".repeat(500));
   C5.cvPaint();
-  const pb = C5._.bar.children.filter(b => b.textContent === "⤓ PDF")[0];
-  ok(!!pb, "模块尚未装载时按钮就该在（点了才去装）");
+  const pb = moreItem(C5, "⤓ PDF");
+  ok(!!pb, "模块尚未装载时「⋯」里就该有 PDF（点了才去装）");
   let alerted = false;
   C5._.ctx.alert = () => { alerted = true; };
   pb.onclick();
@@ -551,7 +586,7 @@ sec("⑧ 版本 diff");
   const C6 = boot({ noPdf: true });
   C6.cvAdd("md", "报告", "# 报告\n\n" + "字".repeat(500));
   C6.cvPaint();
-  ok(C6._.bar.children.some(b => b.textContent === "⤓ PDF"), "模块还没装载时 PDF 按钮就该在（点了才去装）");
+  ok(!!moreItem(C6, "⤓ PDF"), "模块还没装载时「⋯」里就该有 PDF（点了才去装）");
 }
 
 /* ══ ⑨ 版本归属 ══════════════════════════════════ */
@@ -780,5 +815,143 @@ sec("⑫ 顶栏：不许溢出到画布，窄栏收进「⋯」");
   ok(C._.top.children.indexOf(C._.memB) > -1, "「⋯」把按钮从顶栏搬走了（应当只是代点）");
 }
 
+/* ══ ⑬ 讨论（批注）══════════════════════════════ */
+sec("⑬ 讨论：批注跟着这一件走，且不许污染版本链");
+{
+  const body = "# 稿子\n\n" + "前段。".repeat(20) + "\n\n关键句：他说了甲。\n\n" + "后段。".repeat(20);
+  const C = boot({ runTimers: true });   // cvSave 是防抖的，不跑定时器就验不到落盘
+  C.cvAdd("md", "稿子", body);
+  C.cvPaint();
+  const tk = C._.bar.children.filter(b => String(b.textContent).indexOf("讨论") > -1)[0];
+  ok(!!tk, "工具条没有讨论按钮");
+  tk.onclick();
+  ok(C.CV.talk === true, "讨论态没开");
+  ok(C.CV.edit === false && C.CV.diff === false, "开讨论没关掉编辑/diff（几种视图要互斥）");
+  ok(!!C._.wrap.querySelector(".wdsm-tk"), "讨论面板没画出来");
+  ok(!!C._.wrap.querySelector(".wdsm-tkin"), "讨论面板里没有写批注的输入框");
+
+  /* 加一条批注 */
+  ok(C.cvTalkAdd(C.CV.items[0], "关键句：他说了甲。", "这里的『甲』没有判据") === true, "批注没加上");
+  ok(C.cvTalkAdd(C.CV.items[0], "", "") === false, "空批注竟然加上了");
+  ok(C.cvNotes(C.CV.items[0]).length === 1, "批注条数不对");
+  ok(C.CV.items[0].vers.length === 1, "加批注竟然多出了一版 —— 讨论不许污染版本链");
+
+  /* 批注跟着画布留存 */
+  ok(String(C._.store["sde_wds_cv"] || "").indexOf("没有判据") > -1, "批注没跟着画布落本机");
+
+  /* 就这条问 WDS：引文与批注一起递过去，且**不设 want**（讨论不是改写） */
+  C.cvTalkAsk(C.CV.items[0], C.cvNotes(C.CV.items[0])[0]);
+  const sent = (C._.ctx._sent || []).pop() || "";
+  ok(sent.indexOf("关键句：他说了甲。") > -1, "递过去的没带原文");
+  ok(sent.indexOf("这里的『甲』没有判据") > -1, "递过去的没带批注");
+  ok(sent.indexOf("不要重写整段") > -1, "没说清这是讨论不是改写");
+  ok(C.CV.want === null || C.CV.want === undefined,
+    "讨论竟然设了 want —— 回话会被收成新版本，版本链会被聊天噪音塞满");
+
+  /* 删批注 */
+  C.cvPaint();
+  ok(C.cvNotes(C.CV.items[0]).length === 1, "删之前条数就不对");
+  C.CV.items[0].notes = [];
+  ok(C.cvNotes(C.CV.items[0]).length === 0, "删不掉");
+
+  /* 切件要清讨论态（否则会拿 A 的面板对着 B） */
+  const C2 = boot();
+  C2.cvAdd("md", "甲", body); C2.cvAdd("md", "乙", body);
+  C2.CV.cur = 0; C2.CV.talk = true; C2.cvPaint();
+  C2._.tabs.children[1].onclick();
+  ok(C2.CV.talk === false, "切件没清讨论态");
+}
+
+/* ══ ⑭ 展开 ═════════════════════════════════════ */
+sec("⑭ 展开：画布占满整层，关掉不许留白屏");
+{
+  const C = boot();
+  C.cvAdd("md", "稿子", "# 稿子\n\n" + "字".repeat(500));
+  C.cvPaint();
+  const fb = C._.bar.children.filter(b => String(b.textContent).indexOf("展开") > -1)[0];
+  ok(!!fb, "工具条没有展开按钮");
+  fb.onclick();
+  ok(C.CV.full === true, "展开态没开");
+  ok(C._.layer.classList.contains("cvfull"), "layer 上没有 cvfull");
+  ok(C._.layer.classList.contains("cvon"), "展开时画布竟然没打开");
+  /* 收回 */
+  C.cvPaint();
+  C._.bar.children.filter(b => String(b.textContent).indexOf("收回") > -1)[0].onclick();
+  ok(C.CV.full === false && !C._.layer.classList.contains("cvfull"), "收不回来");
+
+  /* ⚠ 全屏时关画布必须一并退全屏，否则聊天列是 display:none 的 —— 剩一片白屏 */
+  C.cvFullSet(true);
+  C.cvShow(false);
+  ok(!C._.layer.classList.contains("cvfull"), "关画布没退全屏 —— 会留一片白屏");
+  ok(C.CV.full === false, "关画布后 full 状态没归位");
+  ok(/\.wdsm-layer\.cvfull \.wdsm-main\{display:none\}/.test(SRC), "全屏的 CSS 不对");
+
+  /* 换场也要归位 */
+  C.cvFullSet(true);
+  C.cvReset();
+  ok(C.CV.full === false && C.CV.talk === false, "换场没把展开/讨论归位");
+}
+
+/* ⚠ 这一节要 await（取回是异步的），而本文件是 CommonJS —— 顶层 await 会让 node
+   连模块格式都判不出来。包进 async IIFE，收尾的计数也一起放进来。 */
+(async function () {
+sec("⑮ 从知识库取回（资料库此前是单向的）");
+{
+  const C = boot();
+  C.cvAdd("md", "稿子", "# 稿子\n\n" + "字".repeat(500));
+  C.cvPaint();
+  ok(!!moreItem(C, "⇩ 从知识库取回"), "「⋯」里没有从知识库取回");
+  ok(!!moreItem(C, "⇧ 存进知识库"), "「⋯」里没有存进知识库");
+
+  C.cvKbBack(C._.bar);
+  await new Promise(r => setTimeout(r, 30));
+  const menu = C._.ctx._menu;
+  ok(!!menu, "取回的选单没开");
+  const row = menu.children.filter(x => x.tagName === "BUTTON")[0];
+  ok(!!row, "选单里没有条目");
+  row.onclick();
+  await new Promise(r => setTimeout(r, 30));
+  const got = C.CV.items.find(x => x.title === "存过的稿子");
+  ok(!!got, "取回来的件没落进画布");
+  if (got) {
+    const m = C.cvMeta(got);
+    ok(m[m.length - 1].by === "me", "取回来的是本人存过的东西，归属不能记成 WDS 写的");
+    ok(String(m[m.length - 1].op).indexOf("知识库") > -1, "没写清是从知识库取回的");
+  }
+
+  /* 未登录：给可点的去处，不许崩也不许假装取到了 */
+  const C2 = boot({ kbAuth: false });
+  C2.cvAdd("md", "稿子", "# 稿子\n\n" + "字".repeat(500));
+  C2.cvPaint();
+  C2.cvKbBack(C2._.bar);
+  await new Promise(r => setTimeout(r, 30));
+  const n2 = C2._.wrap.querySelector(".wdsm-cvnote2");
+  ok(n2 && (n2.innerHTML.indexOf("取不到") > -1 || n2.innerHTML.indexOf("登录") > -1), "未登录时不吭声");
+
+  /* 库是空的：如实说，不摆空菜单 */
+  const C3 = boot({ kbRows: [] });
+  C3.cvAdd("md", "稿子", "# 稿子\n\n" + "字".repeat(500));
+  C3.cvPaint();
+  C3.cvKbBack(C3._.bar);
+  await new Promise(r => setTimeout(r, 30));
+  const n3 = C3._.wrap.querySelector(".wdsm-cvnote2");
+  ok(n3 && n3.innerHTML.indexOf("还没有") > -1, "库空却不说明");
+
+  /* 模块没装载：不拦路 */
+  const C4 = boot({ noVault: true });
+  C4.cvAdd("md", "稿子", "# 稿子\n\n" + "字".repeat(500));
+  C4.cvPaint();
+  C4.cvKbBack(C4._.bar);
+  const n4 = C4._.wrap.querySelector(".wdsm-cvnote2");
+  ok(n4 && n4.innerHTML.length > 0, "模块没装载时没有任何交代");
+
+  /* 模块层：读的那一半必须在，且列表只回元数据 */
+  const V = fs.readFileSync(path.join(ROOT, "public/taste/assets/sde-vault.js"), "utf8");
+  ok(/kbList: kbList/.test(V) && /kbGet: kbGet/.test(V), "sde-vault 没导出读接口");
+  ok(/kbApi\("mine"\)/.test(V) && /kbApi\("get"/.test(V), "读接口没走 mine/get 两个动作");
+  ok(/d && d\.d\) \? d\.d : d/.test(V), "信封没拆（页面层那次栽过）");
+}
+
 console.log("\n" + PASS + " PASS / " + FAIL + " FAIL");
 process.exit(FAIL ? 1 : 0);
+})();

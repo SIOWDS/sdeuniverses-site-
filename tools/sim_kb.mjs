@@ -179,7 +179,13 @@ sec("⑤ 画布出口");
 {
   const M = read("public/wds-mode.js");
   ok(/cvKb: "⇧ 存进知识库"/.test(M), "画布没有存进知识库的文案");
-  ok(/mk\(tx\("cvKb"\)/.test(M), "画布工具条没有那颗按钮");
+  /* ⚠ 按新事实更新（2026-08-02，不是放宽）：画布工具条重组之后，
+     次要动作（复制/下载/PDF/知识库两向/改名/删除）收进了画布自己的「⋯」，
+     登记方式从 mk() 变成 sec2()。判据跟着改成"登记了这个动作"，
+     并**补钉一条**：知识库的反向路径（从知识库取回）也必须在。 */
+  ok(/sec2\(tx\("cvKb"\)/.test(M), "画布没有「存进知识库」这个动作");
+  ok(/sec2\(tx\("cvKbBack"\)/.test(M), "画布没有「从知识库取回」——资料库仍是单向的");
+  ok(/function cvKbBack/.test(M), "取回的实现不在");
   ok(/SDEVault\.kb\(\{/.test(M), "按钮没调 SDEVault.kb");
   ok(/typeof SDEVault\.kb !== "function"/.test(M), "没判模块在不在（模块是按需装的）");
   /* 必须传真 DOM 元素：模块的 note() 是 box.innerHTML=… */
