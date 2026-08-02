@@ -1,6 +1,6 @@
 /* sde-vault.js —— 全站共用的「思想库存」入库模块
  * 用法（任何智能体一行接入）：
- *     <script src="/taste/assets/sde-vault.js?v=1"></script>
+ *     <script src="/taste/assets/sde-vault.js?v=2"></script>
  *     SDEVault.auto([{kind:"name", text:"…"}, …], "金点子 · 三视角对决", el)
  *
  * 为什么要有它：来源已经很多——搜索页提炼精华／涌现档典范／金点子的三个金点子与典范点子／
@@ -162,5 +162,55 @@
     }).catch(function () { note(box, "没收成（网络出错）。"); return { ok: false }; });
   }
 
-  w.SDEVault = { auto: auto, fav: fav, head: head, lead: lead, cred: cred, KINDS: KINDS };
+  /* ── 个人知识库入库 ──────────────────────────────────
+     与 auto()/fav() 同住这一个模块，为的是**共用同一把身份与同四条纪律**。
+     它和另外两个的分工别混：
+       auto → 思想库存（一句话，200 字上限，全站共用一池）
+       fav  → 文章库（站内篇目的指针，只存 slug＋题名）
+       kb   → 知识库（**本人产出的成品文档**，画布上那些东西）
+     ⚠ 纪律②在这里尤其要守：未登录**不偷偷存**——知识库是私人的，
+       没有身份就没有"谁的"，存进去也取不回来。 */
+  var KB_KINDS = { md: 1, html: 1, svg: 1, mermaid: 1, csv: 1, json: 1, code: 1, note: 1 };
+  function kb(o, box) {
+    o = o || {};
+    var text = String(o.text == null ? "" : o.text);
+    var title = String(o.title || "").trim().slice(0, 80) || "未命名";
+    var kind = KB_KINDS[String(o.kind || "")] ? String(o.kind) : "note";
+    if (text.trim().length < 20) {
+      note(box, "太短了——知识库装的是成品，一两句话请存进「💡 思想库存」。");
+      return Promise.resolve({ ok: false });
+    }
+    var c = cred();
+    if (!c) {
+      note(box, '还没存——知识库是你私人的，得先有身份。'
+        + '先在 <a href="/sde-wechat/" target="_blank">SDE 社区</a> 用名字和密码登录一次（全站通用），'
+        + '之后画布上的东西按一下就进「📦 我的知识库」，换台机器也还在。');
+      return Promise.resolve({ ok: false, noAuth: 1 });
+    }
+    note(box, "正在存进知识库…");
+    return fetch("/api/im", {
+      method: "POST", headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        credential: c, op: "kb", a: "add",
+        title: title, kind: kind, text: text,
+        from: String(o.from || "").slice(0, 60), pid: String(o.pid || "").slice(0, 40),
+        ver: o.ver || 0
+      })
+    }).then(function (r) { return r.json(); }).then(function (d) {
+      var x = (d && d.d) ? d.d : d;                 // 与 /api/im 的信封对齐（页面层那次栽过）
+      if (x && x.ok) {
+        note(box, (x.dup ? "这一件已经在知识库里了（同题同文）。" : "已存进知识库。")
+          + ' <a href="/sde-wechat/" target="_blank">去看看 →</a>');
+      } else {
+        note(box, (x && x.msg) ? x.msg : "没存上——不拦路，你还可以用「存到本机」。");
+      }
+      return x || { ok: false };
+    }, function () {
+      /* 纪律④：失败不拦路，但要如实说，不许假装存过了 */
+      note(box, "没存上（网络或登录过期）——不拦路，你还可以用「存到本机」。");
+      return { ok: false };
+    });
+  }
+
+  w.SDEVault = { auto: auto, fav: fav, kb: kb, head: head, lead: lead, cred: cred, KINDS: KINDS, KB_KINDS: KB_KINDS };
 })(window);

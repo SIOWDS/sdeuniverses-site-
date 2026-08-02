@@ -356,6 +356,9 @@ a{color:var(--disc)}
       <div class="scroll" id="lb-body"></div>
     </div>
 
+    <div class="view" id="v-kb">
+      <div class="scroll" id="kb-body"></div>
+    </div>
     <div class="view" id="v-vault">
       <div class="scroll" id="vt-body"></div>
     </div>
@@ -514,6 +517,7 @@ a{color:var(--disc)}
             <div class="me-item"><span>SDE 讨论（公开广场）</span><a href="/sde-talk/"><button>进入</button></a></div>
             <div class="me-item"><span>SDE 会议室</span><a href="/meeting/"><button>进入</button></a></div>
             <div class="me-item"><span>💡 思想库存<br><span style="font-size:0.74rem;color:var(--muted)">对话里撞出来的东西存在这儿，发社区动态、立候选卡都从这儿取</span></span><button id="b-vault">进入</button></div>
+            <div class="me-item"><span>📦 我的知识库<br><span style="font-size:0.74rem;color:var(--muted)">画布上锻出来的稿子存在这儿——只有你看得见，换台机器也还在</span></span><button id="b-kb">进入</button></div>
             <div class="me-item"><span>📚 文章库<br><span style="font-size:0.74rem;color:var(--muted)">站上的文章收在这儿；发帖发社区动态时可以随时插一篇进去</span></span><button id="b-lib">进入</button></div>
             <div class="me-item"><span>全权管理</span><button id="b-admin">进入</button></div>
             <div class="me-item"><span>退出登录</span><button id="b-out">退出</button></div>
@@ -580,9 +584,9 @@ function setStat(state){var d=el("t-dot"),s=el("t-stat");
 
 /* ── 视图 ── */
 function show(v){
-  ["gate","who","home","chats","book","talk","gnew","ginfo","me","fwd","admin","moments","mopost","monews","dtalk","cand","cdnew","cdone","cdnews","vault","lib"].forEach(function(x){el("v-"+x).classList.toggle("on",x===v)});
+  ["gate","who","home","chats","book","talk","gnew","ginfo","me","fwd","admin","moments","mopost","monews","dtalk","cand","cdnew","cdone","cdnews","vault","lib","kb"].forEach(function(x){el("v-"+x).classList.toggle("on",x===v)});
   el("tabs").style.display=(v==="gate")?"none":"flex";
-  el("t-back").style.display=(v==="talk"||v==="gnew"||v==="ginfo"||v==="fwd"||v==="admin"||v==="mopost"||v==="monews"||v==="dtalk"||v==="cdnew"||v==="cdone"||v==="cdnews"||v==="vault"||v==="lib"||v==="who"||(v==="moments"&&moWho)||(v==="cand"&&cdWho))?"block":"none";
+  el("t-back").style.display=(v==="talk"||v==="gnew"||v==="ginfo"||v==="fwd"||v==="admin"||v==="mopost"||v==="monews"||v==="dtalk"||v==="cdnew"||v==="cdone"||v==="cdnews"||v==="vault"||v==="lib"||v==="kb"||v==="who"||(v==="moments"&&moWho)||(v==="cand"&&cdWho))?"block":"none";
   el("t-sub").style.display=(v==="talk")?"flex":"none";
   el("t-act").style.display=(v==="talk"&&cur&&cur.kind==="g")?"block":"none";
   el("t-plaza").style.display=(v==="home"||v==="chats"||v==="book"||v==="me")?"block":"none";
@@ -599,7 +603,7 @@ function show(v){
   else if(v==="cdone")el("t-ttl").textContent="候选卡";
   else if(v==="cdnews")el("t-ttl").textContent="顶回提醒";
   else if(v==="who")el("t-ttl").textContent=whoName||"成员";
-  else if(v==="vault")el("t-ttl").textContent="💡 思想库存";   else if(v==="lib")el("t-ttl").textContent="📚 文章库";
+  else if(v==="vault")el("t-ttl").textContent="💡 思想库存";   else if(v==="lib")el("t-ttl").textContent="📚 文章库";   else if(v==="kb")el("t-ttl").textContent="📦 我的知识库";
   else if(v==="cand")el("t-ttl").textContent=cdWho?(cdWhoName+"的候选"):"候选";
   else if(v==="moments")el("t-ttl").textContent=moWho?(moWhoName+"的社区动态"):"社区动态";
   else if(v!=="talk")el("t-ttl").textContent="SDE 社区";
@@ -701,6 +705,7 @@ function homeRender(cards, vault, pubs){
 
   h += '<div class="hm-h">📦 共同体攒下的</div><div class="hm-grid">'
      + '<div class="hm-g" data-go2="vault"><b>💡 思想库存 · ' + vault.length + '＋</b><span>还没成型的命题、命名与观察。够硬的可以一键升格成候选卡。</span></div>'
+     + '<div class="hm-g" data-go2="kb"><b>📦 我的知识库</b><span>画布上锻出来的稿子存在这儿——只有你看得见，换台机器也还在。</span></div>'
      + '<div class="hm-g" data-go2="lib"><b>📚 文章库 · ' + pubs.length + '＋</b><span>推给大家的篇目，每一条都附着推荐人写的那句「它切开了什么」。</span></div>'
      + '<div class="hm-g" data-go2="cand"><b>🎯 候选卡</b><span>三段硬门：承重命题、它切开的辨别面、可裁决的判据。</span></div>'
      + '<div class="hm-g" data-go2="nbr"><b>🔗 近邻库</b><span>先查这块地被谁占过。库未命中≠没被占，不得据以放行。</span></div>'
@@ -725,6 +730,7 @@ function homeRender(cards, vault, pubs){
     a.onclick = function(){
       var g = a.getAttribute("data-go2");
       if (g === "vault") { vtGo("me", null); return; }
+      if (g === "kb")    { kbOpen = null; show("kb"); kbLoad(); return; }
       if (g === "lib")   { lbGo("me", null); return; }
       if (g === "cand")  { cdGo("", ""); return; }
       if (g === "nbr")   { window.open("/nbr/", "_blank"); return; }
@@ -1004,6 +1010,7 @@ el("t-back").onclick=function(){
   if(el("v-moments").classList.contains("on")&&moWho){moGo("","");return;}
   if(el("v-admin").classList.contains("on")){show("me");return;}
   if(el("v-cdnew").classList.contains("on")||el("v-cdone").classList.contains("on")||el("v-cdnews").classList.contains("on")){show("cand");return;}
+  if(el("v-kb").classList.contains("on")){if(kbOpen){kbOpen=null;kbLoad();return;}show("me");return;}
   if(el("v-lib").classList.contains("on")){show(lbFrom||"me");return;}
   if(el("v-vault").classList.contains("on")){show(vtFrom||"me");return;}
   if(el("v-cand").classList.contains("on")&&cdWho){cdGo("","");return;}
@@ -1736,6 +1743,87 @@ function vtApi(a,extra){return api("vt",Object.assign({a:a},extra||{})).then(unw
      · 发现    —— 不由人放，由前端从 publications.json 现算「离你最远」：
                   优先给你**没收过的领域**。零后端零调用，永远有货且永远是陌生的。 */
 var lbFrom="me", lbMode="pub", lbPick=null, lbPubs=null, lbMineCache=[];
+/* ══ 个人知识库 ══════════════════════════════════════════
+   装的是**本人产出的成品文档**（画布上那些）。与另外两个库分工别混：
+     💡 思想库存＝一句话（200 字上限，全站共用一池）
+     📚 文章库＝站上已有篇目的指针（只存 slug＋题名）
+     📦 知识库＝文档本身，**私人**——键里带 uid，别人查不到也删不掉。
+   ⚠ 信封只拆一次：`.then(unwrap)` 之后各调用点直接读 `d.ok`。
+     （候选/库存/文章库三个 tab 全部"加载失败"那次，根因就是拆了两次。） */
+var kbOpen=null,kbCap=null;
+function kbApi(a,extra){return api("kb",Object.assign({a:a},extra||{})).then(unwrap);}
+function kbKindName(k){return ({md:"文稿",html:"网页",svg:"图",mermaid:"结构图",csv:"表",json:"数据",code:"代码",note:"笔记"})[k]||"笔记";}
+function kbLoad(){
+  var box=el("kb-body");box.innerHTML='<div class="hint">正在加载…</div>';
+  kbApi("mine",{}).then(function(d){
+    if(!d.ok){box.innerHTML='<div class="hint">加载失败，请重试。</div>';return;}
+    kbCap=d.cap||null;
+    var head='<div style="padding:12px 14px 0">'
+      +'<p style="font-size:0.8rem;color:var(--muted);line-height:1.8;margin:0 0 10px">'
+      +'这里存的是<b>你自己锻出来的稿子</b>——ChatSDE 画布上的报告、结构图、网页、长稿。'
+      +'<b>只有你看得见</b>，别人打不开也删不掉。<br>'
+      +'站上<b>已经有的篇目不必存进来</b>：那是「📚 文章库」的活，贴链接就行，链接不会过期。'
+      +'</p>'
+      +'<p style="font-size:0.76rem;color:var(--muted);margin:0 0 12px">'
+      +'已用 '+(d.n||0)+' / '+((d.cap&&d.cap.count)||0)+' 件　·　'+(d.chars||0)+' 字'
+      +'</p></div>';
+    if(!(d.items||[]).length){
+      box.innerHTML=head+'<div class="hint" style="line-height:1.9">还是空的。<br><br>'
+        +'去 <a href="/taste/chatsde/" target="_blank">ChatSDE</a> 问一句能出长文的，'
+        +'答完点「⧉ 落到画布」，再在画布工具条上点「⇧ 存进知识库」。</div>';
+      return;
+    }
+    var html=head;
+    (d.items||[]).forEach(function(it){
+      html+='<div class="me-item" style="align-items:flex-start">'
+        +'<span><b>'+esc(it.title||"未命名")+'</b>'
+        +'<br><span style="font-size:0.74rem;color:var(--muted)">'
+        +kbKindName(it.kind)+'　·　'+(it.chars||0)+' 字　·　'+fmtT(it.ts)
+        +(it.from?('　·　'+esc(it.from)):"")
+        +(it.ver?('　·　第 '+it.ver+' 版'):"")
+        +'</span></span>'
+        +'<button data-kbopen="'+esc(it.id)+'">打开</button></div>';
+    });
+    box.innerHTML=html;
+    Array.prototype.forEach.call(box.querySelectorAll("[data-kbopen]"),function(b){
+      b.onclick=function(){kbShow(b.getAttribute("data-kbopen"));};
+    });
+  },function(){box.innerHTML='<div class="hint">加载失败，请重试。</div>';});
+}
+function kbShow(id){
+  var box=el("kb-body");box.innerHTML='<div class="hint">正在打开…</div>';
+  kbApi("get",{id:id}).then(function(d){
+    if(!d.ok){box.innerHTML='<div class="hint">'+esc(d.msg||"打不开。")+'</div>';return;}
+    kbOpen=d.item;
+    var it=d.item,txt=d.text||"";
+    box.innerHTML='<div style="padding:12px 14px">'
+      +'<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px">'
+      +'<b style="flex:1;min-width:0">'+esc(it.title||"未命名")+'</b>'
+      +'<button id="kb-ren">✎ 改名</button><button id="kb-dl">⤓ 下载</button><button id="kb-del">🗑 删除</button>'
+      +'</div>'
+      +'<p style="font-size:0.74rem;color:var(--muted);margin:0 0 10px">'
+      +kbKindName(it.kind)+'　·　'+(it.chars||0)+' 字　·　'+fmtT(it.ts)+'</p>'
+      +'<pre style="white-space:pre-wrap;word-break:break-word;font:0.78rem/1.75 ui-monospace,Menlo,Consolas,monospace;'
+      +'background:var(--card,#161310);padding:12px 14px;border-radius:8px;margin:0">'+esc(txt)+'</pre>'
+      +'</div>';
+    el("kb-ren").onclick=function(){
+      var n=prompt("这一件叫什么？",it.title||"");
+      if(!n||!n.trim())return;
+      kbApi("ren",{id:it.id,title:n.trim()}).then(function(r){if(r.ok)kbShow(it.id);else alert(r.msg||"改不了。");});
+    };
+    el("kb-dl").onclick=function(){
+      var ext=({md:".md",html:".html",svg:".svg",mermaid:".mmd",csv:".csv",json:".json",code:".txt"})[it.kind]||".txt";
+      var a=document.createElement("a");
+      a.href=URL.createObjectURL(new Blob([txt],{type:"text/plain;charset=utf-8"}));
+      a.download=String(it.title||"未命名").replace(/[^\w\u4e00-\u9fff-]/g,"_")+ext;
+      document.body.appendChild(a);a.click();document.body.removeChild(a);
+    };
+    el("kb-del").onclick=function(){
+      if(!confirm("删掉《"+(it.title||"未命名")+"》？删了就没有了。"))return;
+      kbApi("del",{id:it.id}).then(function(r){if(r.ok){kbOpen=null;kbLoad();}else alert(r.msg||"删不了。");});
+    };
+  },function(){box.innerHTML='<div class="hint">打不开，请重试。</div>';});
+}
 function lbApi(a,extra){return api("lb",Object.assign({a:a},extra||{})).then(unwrap);}
 function lbGo(from,onPick){lbFrom=from||"me";lbPick=onPick||null;show("lib");lbLoad();}
 function lbUrl(slug){return "/students/"+String(slug||"").replace(/^\/+|\/+$/g,"")+"/";}
@@ -1866,6 +1954,7 @@ function insAppend(add){
 }
 
 function lbWire(){
+  var bk=el("b-kb");if(bk)bk.onclick=function(){kbOpen=null;show("kb");kbLoad();};
   var b=el("b-lib");if(b)b.onclick=function(){lbMode="pub";lbGo("me",null);};
   var ma=el("mu-article");
   if(ma)ma.onclick=function(){

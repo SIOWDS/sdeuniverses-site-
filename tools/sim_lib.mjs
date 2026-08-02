@@ -108,7 +108,12 @@ ok(/未知的文章库动作/.test(route), "非白名单动作被挡");
 
 console.log("── 7. 页面接线");
 ok(page.includes('id="v-lib"') && page.includes('id="lb-body"'), "新视图与容器存在");
-ok(page.includes('"cdnews","vault","lib"].forEach'), "show() 白名单已加 lib");
+/* ⚠ 不许钉数组尾巴：show() 的白名单**会被后续功能插队**（知识库 kb 加在 lib 之后，
+   当场把这条钉死尾巴的断言弄红）。同一个教训 sim_home 那边已经栽过一次（钉了顺序）。
+   判据改成「lib 在这个数组里」，顺序与相邻元素一概不管。 */
+const wlArr = (page.match(/\[\s*"gate"[^\]]*\]\.forEach/) || [""])[0];
+ok(/"lib"/.test(wlArr), "show() 白名单里没有 lib：" + wlArr.slice(0, 120));
+ok(/"gate"/.test(wlArr) && /"me"/.test(wlArr), "取到的不是那个视图白名单数组");
 ok(page.includes('v==="lib"'), "顶栏返回键条件已加 lib");
 ok(page.includes('el("t-ttl").textContent="📚 文章库"'), "标题已接");
 ok(page.includes('el("v-lib").classList.contains("on")'), "返回键回退路径已接");

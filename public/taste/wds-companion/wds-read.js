@@ -13,7 +13,7 @@
   (function () {
     if (window.SDEVault) return;
     var sc = document.createElement("script");
-    sc.src = "/taste/assets/sde-vault.js?v=1"; sc.defer = true;
+    sc.src = "/taste/assets/sde-vault.js?v=2"; sc.defer = true;
     document.head.appendChild(sc);
   })();
   if (window.__wdsReadMounted) return;

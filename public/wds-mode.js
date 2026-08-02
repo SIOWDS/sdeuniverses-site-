@@ -21,7 +21,7 @@
   (function () {
     if (window.SDEVault) return;
     var sc = document.createElement("script");
-    sc.src = "/taste/assets/sde-vault.js?v=1"; sc.defer = true;
+    sc.src = "/taste/assets/sde-vault.js?v=2"; sc.defer = true;
     document.head.appendChild(sc);
   })();
 
@@ -758,6 +758,8 @@
       rtB: "粗", rtI: "斜", rtS: "删", rtH1: "标题", rtH2: "小标", rtH3: "小小标", rtP: "正文",
       rtQuote: "引用", rtUl: "• 列表", rtOl: "1. 列表", rtHr: "分隔线", rtLink: "链接",
       rtLinkAsk: "链接地址：", rtTable: "表格", rtClear: "清格式", rtUndo: "撤销", rtRedo: "重做",
+      cvKbNo: "知识库模块没装载上——不拦路，你还可以用「存到本机」。",
+      cvKb: "⇧ 存进知识库", cvKbT: "存进你在 SDE 社区的私人知识库（要名字和密码），换台机器也还在",
       cvEdit: "✎ 编辑", cvEditT: "直接用键盘改。改完点「存为新版」，原来那一版还留在版本链里",
       cvEditSave: "✓ 存为新版", cvEditCancel: "丢弃改动", cvEditKeep: "改了 {n} 字还没存 —— 切走会留着草稿",
       cvEditNo: "一个字都没改", cvDraft: "有未存的草稿",
@@ -839,6 +841,8 @@
       rtB: "B", rtI: "I", rtS: "S", rtH1: "H1", rtH2: "H2", rtH3: "H3", rtP: "Body",
       rtQuote: "Quote", rtUl: "\u2022 List", rtOl: "1. List", rtHr: "Divider", rtLink: "Link",
       rtLinkAsk: "Link URL:", rtTable: "Table", rtClear: "Clear", rtUndo: "Undo", rtRedo: "Redo",
+      cvKbNo: "Library module did not load \u2014 you can still use Save locally.",
+      cvKb: "\u21e7 To my library", cvKbT: "Save into your private library in the SDE Community (needs your name and password)",
       cvEdit: "\u270e Edit", cvEditT: "Type directly. Hit Save as new version when done; the old one stays in the chain",
       cvEditSave: "\u2713 Save as new version", cvEditCancel: "Discard changes", cvEditKeep: "{n} chars unsaved \u2014 the draft is kept if you switch away",
       cvEditNo: "Nothing changed", cvDraft: "unsaved draft",
@@ -3827,6 +3831,19 @@
       });
     });
     coBtn.title = tx("cvCoT");
+    /* 存进个人知识库。**画布此前只有本机出口**（localStorage / 下载 / 存到本机目录），
+       换台机器就没了；而画布装的正是成品。走 SDEVault.kb —— 身份与纪律都在模块里，
+       这里一行都不重写（抄第二遍必漂，且漂得静默）。 */
+    var kbb = mk(tx("cvKb"), function () {
+      if (!window.SDEVault || typeof SDEVault.kb !== "function") { cvNote(tx("cvKbNo")); return; }
+      cvGrab();
+      SDEVault.kb({
+        title: it.title, kind: it.kind, text: cvText(),
+        from: "ChatSDE · 画布", ver: it.vi + 1
+      }, cvNoteEl());        // ⚠ 必须传**真 DOM 元素**：模块的 note() 是 box.innerHTML=…，
+                             //   传个带 _note 的假壳它会静默什么都不做（看着像存成功了）
+    });
+    kbb.title = tx("cvKbT");
     mk(tx("cvEdit"), function () { cvEditOn(it); }, CV.edit).title = tx("cvEditT");
     if (it.vers.length > 1) {
       mk(tx("cvDiff"), function () {
@@ -4213,6 +4230,17 @@
     sc.onerror = function () { then(false); };
     document.head.appendChild(sc);
   }
+  /* 模块的 note(box, html) 做的就是 `box.innerHTML = html`，所以**必须给它真 DOM 元素**。
+     这里在画布正文区顶上留一块常驻的回话位，重画时会被清掉、用时再造。 */
+  function cvNoteEl() {
+    var box = cvWrapEl && cvWrapEl.querySelector(".wdsm-cvnote2");
+    if (box) return box;
+    box = el("div", "wdsm-cvnote2");
+    box.style.cssText = "color:var(--wgold);font-size:12px;padding:8px 0 10px;line-height:1.7";
+    if (cvWrapEl) cvWrapEl.insertBefore(box, cvWrapEl.firstChild);
+    return box;
+  }
+  function cvNote(html) { var b = cvNoteEl(); if (b) b.innerHTML = html; }
   function cvOrigin() {
     try { if (typeof location !== "undefined" && location && location.origin) return location.origin; } catch (e) {}
     return "";
