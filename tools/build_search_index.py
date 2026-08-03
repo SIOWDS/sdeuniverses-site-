@@ -25,7 +25,10 @@ SECTION_LABELS = {
 }
 # 这些目录/文件不进搜索索引（工具页、纯脚本、检索页自身）
 SKIP_DIRS = {"search"}
-SKIP_URL_SUBSTR = ("/taste/idea-generator/", "/taste/glm-test", "/check/", "/diag/", "/quotes/", "/fresh")
+# ⚠ 这些是子串匹配，写成不带斜杠的词会误伤同前缀的文章 slug。
+# 2026-08-03：原来的 "/fresh" 把 /confluence/fresh-surface-each-round/ 静默挡在索引之外，
+# 而 public/ 下早已没有 fresh* 目录。凡是想跳一个目录，一律写成 "/名字/"。
+SKIP_URL_SUBSTR = ("/taste/idea-generator/", "/taste/glm-test", "/check/", "/diag/", "/quotes/", "/fresh/")
 
 CJK = re.compile(r"[\u4e00-\u9fff]")
 HTML_ONLY = "--html-only" in sys.argv
