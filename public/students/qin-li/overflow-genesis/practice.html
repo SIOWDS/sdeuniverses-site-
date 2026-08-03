@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>布置一次撞击：选题、堵退路、禁手法，以及什么时候必须停 · 方法实践文 | SDE Universes</title>
+<meta name="description" content="溢出不能被计划，但它的四个条件可以被布置。本篇交付：选题的三问（怎么找到那块你一直绕着走的地）、堵退路的三条具体做法、禁用惯用手法的清单写法、过程中判断「撞上了没有」的三个信号与三个反信号、事后验证的两项可查指标（先例可追溯率、语言增量持续性）、四类误用（把折磨当逼压、把创伤当素材、把集体成果当个人">
+<meta name="author" content="SDE Universes">
+<meta property="og:type" content="article">
+<meta property="og:title" content="布置一次撞击：选题、堵退路、禁手法，以及什么时候必须停 · 方法实践文">
+<meta property="og:description" content="溢出不能被计划，但它的四个条件可以被布置。本篇交付：选题的三问（怎么找到那块你一直绕着走的地）、堵退路的三条具体做法、禁用惯用手法的清单写法、过程中判断「撞上了没有」的三个信号与三个反信号、事后验证的两项可查指标（先例可追溯率、语言增量持续性）、四类误用（把折磨当逼压、把创伤当素材、把集体成果当个人">
+<link rel="canonical" href="https://sdeuniverses.com/students/qin-li/overflow-genesis/practice.html">
+<style>
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:#FBF8F1;color:#2B2620;
+ font-family:"Noto Serif SC","Songti SC","Source Han Serif SC",Georgia,serif;
+ font-size:17px;line-height:1.95;letter-spacing:.01em}
+.wrap{max-width:760px;margin:0 auto;padding:0 22px}
+nav.cnav{background:#2B2620;color:#EDE4CF;position:sticky;top:0;z-index:30;
+ font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif}
+nav.cnav .wrap{display:flex;align-items:center;justify-content:space-between;gap:14px;height:50px}
+nav.cnav a{color:#EDE4CF;text-decoration:none;font-size:14px}
+nav.cnav .cnav-logo{font-weight:700;letter-spacing:.06em}
+nav.cnav .cnav-back{opacity:.82}
+nav.cnav .cnav-back:hover{opacity:1}
+header.art{background:linear-gradient(180deg,#FFFDF8 0%,#F5EFE2 100%);
+ border-bottom:1px solid rgba(43,38,32,.10);padding:44px 0 34px}
+.art-eyebrow{font-size:12.5px;letter-spacing:.16em;color:#2F5470;font-weight:700;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;margin-bottom:16px}
+h1.art-title{font-size:33px;line-height:1.4;margin:0 0 14px;font-weight:800}
+.art-subtitle{font-size:17px;color:#5C5346;line-height:1.7;margin-bottom:16px}
+.art-meta{font-size:13px;color:#8A8071;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif}
+.swap{display:flex;flex-wrap:wrap;gap:10px;margin:22px auto 0}
+.swap a{flex:1 1 240px;display:block;text-decoration:none;padding:12px 15px;border-radius:9px;
+ border:1px solid rgba(43,38,32,.16);background:#fff;color:#2B2620;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;font-size:14px;line-height:1.6}
+.swap a b{display:block;font-size:14.5px;margin-bottom:2px}
+.swap a span{color:#8A8071;font-size:12.5px}
+.swap a:hover{border-color:#2F5470;box-shadow:0 2px 10px rgba(43,38,32,.07)}
+article{padding:30px 0 10px}
+.abs{background:#EFF3F7;border-left:4px solid #2F5470;border-radius:0 8px 8px 0;
+ padding:18px 20px;margin:0 0 26px;font-size:15.5px;line-height:1.85;color:#4A4238}
+.abs b{color:#24425A}
+.toc{border:1px solid rgba(43,38,32,.13);border-radius:9px;padding:16px 20px;margin:0 0 34px;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;font-size:14.5px;background:#FFFDF8}
+.toc .tl{font-size:12.5px;letter-spacing:.14em;color:#2F5470;font-weight:700;margin-bottom:10px}
+.toc ol{margin:0;padding-left:20px;color:#5C5346}
+.toc li{margin:5px 0}
+.toc a{color:#4A4238;text-decoration:none}
+.toc a:hover{color:#2F5470;text-decoration:underline}
+h2{font-size:22px;line-height:1.5;margin:44px 0 16px;padding-top:8px;font-weight:800;
+ border-top:1px solid rgba(43,38,32,.10)}
+h2 .no{display:inline-block;min-width:1.9em;color:#2F5470;font-size:16px;font-weight:700;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif}
+p{margin:0 0 17px;text-align:justify}
+p b,li b{color:#24425A}
+ul.pts{margin:0 0 18px;padding-left:0;list-style:none}
+ul.pts li{position:relative;padding-left:20px;margin:0 0 10px;text-align:justify}
+ul.pts li:before{content:"—";position:absolute;left:0;color:#2F5470}
+blockquote{margin:0 0 20px;padding:14px 18px;background:#FFFDF8;
+ border-left:3px solid rgba(43,38,32,.22);color:#4A4238;font-size:16px}
+.endbox{margin:48px 0 10px;padding:22px;border-radius:10px;background:#EFF3F7;
+ border:1px solid rgba(43,38,32,.12)}
+.endbox .et{font-size:12.5px;letter-spacing:.14em;color:#2F5470;font-weight:700;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;margin-bottom:12px}
+.endbox a{color:#24425A}
+footer{margin-top:46px;padding:26px 0 40px;border-top:1px solid rgba(43,38,32,.12);
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;font-size:13px;color:#8A8071}
+footer a{color:#8A8071}
+@media(max-width:640px){body{font-size:16px}h1.art-title{font-size:26px}h2{font-size:19.5px}}
+</style>
+</head>
+<body>
+<nav class="cnav"><div class="wrap">
+  <a class="cnav-logo" href="/browse/">SDE Universes</a>
+  <a class="cnav-back" href="/students/qin-li/overflow-genesis/">← 回母文《溢出性生成》</a>
+</div></nav>
+
+<header class="art"><div class="wrap">
+  <div class="art-eyebrow">配套读物 · 技术与方法实践 · 母文《溢出性生成》</div>
+  <h1 class="art-title">布置一次撞击：选题、堵退路、禁手法，以及什么时候必须停</h1>
+  <div class="art-subtitle">母文的判断是「有一类能力是在被逼到只有你才有的那块地方时，才第一次长出来的」。这一篇把它落成可执行的布置法——因为撞击不能被安排，但条件可以。</div>
+  <div class="art-meta">SDE 学员专栏 · 配套读物 · 2026年8月 · 约 4927 字</div>
+  <div class="swap">
+    <a href="/students/qin-li/overflow-genesis/"><b>← 母文 · 溢出性生成</b><span>完整论证在这里</span></a>
+    <a href="/students/qin-li/overflow-genesis/explain.html"><b>🌱 白话解释文 · 茧不是先长好再去挑担子的</b><span>用日常生活的类比，把母文讲成人人能懂的话</span></a>
+  </div>
+</div></header>
+
+<article class="wrap">
+<div class="abs"><b>这一篇是什么</b>　溢出不能被计划，但它的四个条件可以被布置。本篇交付：选题的三问（怎么找到那块你一直绕着走的地）、堵退路的三条具体做法、禁用惯用手法的清单写法、过程中判断「撞上了没有」的三个信号与三个反信号、事后验证的两项可查指标（先例可追溯率、语言增量持续性）、四类误用（把折磨当逼压、把创伤当素材、把集体成果当个人溢出、把风格化当新语言），以及一条必须写在最前面的停手线。<br><br><b>读法</b>　这一篇写给：已经认同母文的判断、现在想把它用到自己手头工作上的人。全篇以可操作为准，不重复论证。</div>
+<div class="toc"><div class="tl">目 录</div><ol><li><a href="#s1">先说停手线，再说方法</a></li><li><a href="#s2">选题：怎么找到那块你一直绕着走的地</a></li><li><a href="#s3">堵退路：三条具体做法</a></li><li><a href="#s4">禁手法：把救场的东西先收起来</a></li><li><a href="#s5">过程中：怎么知道撞上了没有</a></li><li><a href="#s6">事后验证：两项可查的指标</a></li><li><a href="#s7">误用一：把折磨当逼压</a></li><li><a href="#s8">误用二：把创伤当素材</a></li><li><a href="#s9">误用三与四：把集体成果当个人溢出，把风格化当新语言</a></li><li><a href="#s10">完整走一遍：一个具体案例</a></li><li><a href="#s11">用在团队与带人上</a></li><li><a href="#s12">五个常见问题的直接回答</a></li><li><a href="#s13">一份不必是创作者也能用的简版</a></li><li><a href="#s14">一页纸操作卡</a></li><li><a href="#s15">最后两条纪律</a></li></ol></div>
+<h2 id="s1"><span class="no">01</span>先说停手线，再说方法</h2>
+<p>这一篇里唯一不能商量的一条，放在最前面。</p>
+<p>母文举的三个例子里，有一个是拍摄失控、周期无限延长、创作者本人几乎崩溃。新东西确实长出来了，代价极其惨重。这件事后来被讲成传奇，但传奇是事后的叙事——在当时，那只是一场看不到头的灾难。</p>
+<p><b>所以：这套东西描述的是一件事怎么发生，不是在建议任何人去追求它。</b></p>
+<p><b>停手线（任何一条出现即停）：</b></p>
+<ul class="pts"><li>睡眠、进食、身体状况出现持续的问题</li><li>亲近的人开始明确表达担心，而你的第一反应是想说服他们「你不懂」</li><li>你已经无法判断自己是在推进还是在原地打转，而且这个状态持续了几周</li><li>你开始觉得停下来等于前功尽弃</li></ul>
+<p><b>最后一条最危险，因为它是最像事业心的一条。</b> 事实上停下来不会失去什么：那块生地会一直在那儿，它跑不掉。跑得掉的是人。</p>
+<p><b>一句朴素的判准：没有一件作品值得用一个人换。</b></p>
+<h2 id="s2"><span class="no">02</span>选题：怎么找到那块你一直绕着走的地</h2>
+<p>撞击的第一个条件是选对题。而选对题的判准不是「难」，是「你一直有理由不碰它」。</p>
+<p><b>三问，按顺序问：</b></p>
+<p><b>问一：有没有一个题材／话题／对象，你想到它就有点不想做，但说不清为什么？</b> 不是因为它不重要，不是因为它没市场，不是因为技术上做不了——就是不想。<b>说不清为什么的那一个，多半就是它。</b></p>
+<p><b>问二：如果要你现在开始做它，你脑子里会不会自动冒出三条很专业的理由说明这不合适？</b> 冒得越快、越顺、越像专业判断，越值得注意。回避常常穿着专业的外衣出场。</p>
+<p><b>问三：你以前处理过它吗？</b> 注意区分「讲述过」和「处理过」。很多人把某段经历讲过几十遍——在酒桌上、在采访里、在作品的边角处——但从来没有正面处理过。<b>讲述是安全的，处理不是。</b> 讲了很多遍的那一件，往往恰恰还是生的。</p>
+<p><b>一个反向排除：</b> 如果这个题材你一想到就兴奋、跃跃欲试、马上能想出五个做法——那多半不是它。那是你已经处理过的地盘。</p>
+<h2 id="s3"><span class="no">03</span>堵退路：三条具体做法</h2>
+<p>撞击之所以能发生，是因为绕不过去。留一条“实在不行就换”的路，你一定会在缺口撕开之前转弯——而且转得毫无察觉，因为转弯永远有充分的理由。</p>
+<p><b>做法一：定一个不许换题的期限。</b> 明确到日期。在这个期限内，只能在这个方向里找办法，不能换题、不能改成“另一个角度切入”。期限到了再重新评估。<b>期限要长到足以撞墙（通常至少几周），短到不至于把人耗死。</b></p>
+<p><b>做法二：把这件事说出去，但只说给一个人。</b> 说给一个不会催你、也不会哄你的人。说出去是为了让退出有一点成本；只说一个人，是为了不让它变成表演——一旦有了观众，你会开始为观众做，而那是完全另一回事。</p>
+<p><b>做法三：不准备 B 方案。</b> 这一条最难，也最关键。B 方案的存在本身就是一个出口，而人在难受的时候一定会往出口走。<b>如果你实在需要一个心理保险，把它设成“到期之后再考虑”，而不是“随时可以切换”。</b></p>
+<h2 id="s4"><span class="no">04</span>禁手法：把救场的东西先收起来</h2>
+<p>已有的手法会在缺口刚撕开的一瞬间赶来救场，把它糊上。糊上之后一切都顺了，作品也能完成——只是那次撞击没了。</p>
+<p><b>做法：开工前写一张禁用清单。</b></p>
+<p><b>怎么写：</b> 列出你最拿手、最常用、别人一看就知道是你的那三到五样东西。可以是一种结构、一种节奏、一个惯用的开头方式、一种你屡试不爽的处理套路。写具体，不写抽象。</p>
+<p><b>规矩：</b> 在这个项目里，这几样一律不用。<b>不是少用，是不用。</b></p>
+<p><b>为什么必须是全禁：</b> 因为“少用”在执行时等于“需要的时候用”，而你最需要它的时刻，恰恰就是缺口刚撕开、最难受的那一刻。那时候你一定会用，而且会觉得自己用得很有道理。</p>
+<p><b>一个预期管理：</b> 禁用清单会让作品在中途看起来很糟。这是正常的，甚至是必要的——<b>顺利就意味着老本事还在工作。</b></p>
+<h2 id="s5"><span class="no">05</span>过程中：怎么知道撞上了没有</h2>
+<p>三个信号和三个反信号，都很具体。</p>
+<p><b>信号一：你想绕开，而且找得出很好的理由。</b> 撞上那块生地的第一反应几乎总是回避，而回避会伪装成专业判断——“这样处理更合适”“受众不会接受”“这条路走不通”。这些话可能都对。<b>但如果它们来得特别快、特别顺，停一下。</b></p>
+<p><b>信号二：你最拿手的办法在这里显得很假。</b> 不是不好用，是用出来之后你自己看着别扭。这种别扭感就是缺口正在撕开。</p>
+<p><b>信号三：你说不清自己在找什么。</b> 你知道现在这个不对，但你说不出对的是什么样。<b>“知道不对但说不出对”是最典型的缺口状态。</b></p>
+<p><b>反信号一：一切都很难，但每一步你都知道该怎么办。</b> 那是在执行，不是在摸索。累不等于撞上。</p>
+<p><b>反信号二：你能完整地讲出自己是怎么做到的。</b> 能完整讲出来，通常说明用的都是老本事。</p>
+<p><b>反信号三：难受的来源是外部条件。</b> 时间不够、预算不够、有人为难你——这些是折磨，不是逼压。<b>折磨会让你想“要是条件好一点就好了”；逼压会让你想“要是我不是我就好了”。</b></p>
+<h2 id="s6"><span class="no">06</span>事后验证：两项可查的指标</h2>
+<p>“我感觉这次很不一样”是不可靠的。母文给了两项可以真的去查的东西，都很笨，也因此可靠。</p>
+<p><b>指标一：先例可追溯率。</b></p>
+<ul class="pts"><li>做法：把成品里你认为有厚度的段落逐一标出来，拿去跟你<b>此前全部作品</b>比对。</li><li>问题：在以前的东西里，能不能找到直接的先例？</li><li>读数：能找到 → 是老本事的一次出色发挥（这没什么不好，但不是溢出）。<b>不止一处找不到 → 值得注意。</b></li><li>注意：要跟“全部作品”比，不是跟最近几件比。人对自己三年前的做法记忆很不可靠。</li></ul>
+<p><b>指标二：语言增量的持续性。</b></p>
+<ul class="pts"><li>做法：那些“没有先例”的处理方式，在此后的作品里有没有被再次用到、被发展？</li><li>读数：<b>溢出长出来的是一样能力，能力会留下来。</b> 只出现过一次、此后再没出现的，多半是一次侥幸。</li><li>时间尺度：这一项至少要等两三件作品之后才能查，急不得。</li></ul>
+<p><b>两项合起来的用处：</b> 把主观印象换成可查证的东西，同时防住一件事——<b>把一次运气好的发挥当成自己的突破，然后在此后几年里反复试图重现它。</b></p>
+<h2 id="s7"><span class="no">07</span>误用一：把折磨当逼压</h2>
+<p>最常见的一种，前面已经给了分辨法，这里给处置。</p>
+<p>很多人长期把自己泡在高压环境里，然后以为自己在经历某种深刻的东西。<b>苦本身不生产任何东西。</b></p>
+<p><b>自查两问：</b></p>
+<ul class="pts"><li>这份阻力，是来自这件事本身，还是来自外部条件（时间、资源、人事）？</li><li>如果外部条件全部改善，这件事还难吗？<b>不难了 → 那是折磨，不是逼压。</b></li></ul>
+<p><b>处置：</b> 该改善的条件就去改善，不要拿“这样才有深度”给恶劣条件辩护。<b>改善条件不会让撞击消失</b>——真正的墙不会因为你多了两个月和一笔预算就不见了。</p>
+<h2 id="s8"><span class="no">08</span>误用二：把创伤当素材</h2>
+<p>第二种更需要小心。</p>
+<p>「艺术家把痛苦转化成作品」和这套讲法方向是反的。前者的起点是一件已经发生的事，创作是对它的加工和再叙述；后者的起点是一次当下的撞击，那块地在此之前一直是生的。</p>
+<p><b>实践上的差别：</b> 你不能靠“我有过很惨的经历”来预支它。有过经历不等于撞上过。</p>
+<p><b>更要紧的一条边界：</b> 如果那块地涉及真正的创伤，正面处理它可能不是一个创作问题，而是一个需要专业支持的问题。<b>先照顾人，再谈作品。</b> 在没有支撑的情况下把自己推向那里，不是布置条件，是另一回事。</p>
+<p><b>判断标准：</b> 处理它的过程中，你是在工作，还是在被淹没？被淹没了就停，并且找人帮忙。</p>
+<h2 id="s9"><span class="no">09</span>误用三与四：把集体成果当个人溢出，把风格化当新语言</h2>
+<p><b>误用三：集体成果记到个人账上。</b> 一件作品里的新东西，可能来自一个团队在共同的失效处一起摸出来的东西。把它整个记成“我的突破”，会导致一个很实际的后果：<b>你会在下一个项目里试图独自重现它，然后失败，并且不知道为什么。</b><b>处置：</b> 事后老实标注——那一处是谁在什么条件下弄出来的。这不是谦虚，是为了让下次的判断准确。</p>
+<p><b>误用四：把风格化当新语言。</b> 你做了一件明显不同于以往的东西：更粗糙、更慢、更极端、更不讨好。看起来像突破。<b>但换个形式不等于长出新能力。</b> 检验就是指标一和指标二：那些“新”的处理，是不是只是把你原来的老办法换了一层皮？它们在此后有没有留下来、被发展？<b>一个很好用的追问：</b> 那个新做法，你能不能用同样的方式在一个完全不同的题材上再用一次？能，说明它是一样能力；不能，说明它只是这一次的一个造型。</p>
+<h2 id="s10"><span class="no">10</span>完整走一遍：一个具体案例</h2>
+<p>把整套布置放在一件真实尺度的事上跑一遍。</p>
+<p><b>场景：</b> 你是一个做了十年访谈类内容的人，手上有一个新选题：一位老人临终前的一段生活。你接下这个题的第一反应是“这个我做得了”，但同时有一点说不清的抗拒。</p>
+<p><b>选题三问。</b> 问一：想到它有点不想做，说不清为什么——中。问二：脑子里立刻冒出“这类题材容易煽情”“家属未必同意”“不好把握分寸”——三条，都很专业，来得很快。中。问三：你父亲去世时的那段日子，你在很多场合讲过，从没在作品里处理过。<b>中。三问全中，就是它。</b></p>
+<p><b>堵退路。</b> 定一个八周的不许换题期。把这件事只告诉一位同行朋友，说明“这八周我不换题，你不用问进度”。不准备 B 方案——不预留“如果不行就做成一个常规的人物专题”。</p>
+<p><b>禁手法。</b> 列出四样最拿手的：开场用一个强钩子；用配乐推情绪；把受访者的话剪成金句；结尾落在一句升华上。<b>这四样全禁。</b></p>
+<p><b>过程中。</b> 第三周你会发现所有素材都很好，但剪出来的东西假得让你自己看不下去（信号二）。你开始想“要不还是按常规做法来吧，这样至少能交”（信号一，而且理由很充分）。你说不出对的应该是什么样（信号三）。<b>三个信号齐了——不要转弯，这里正是缺口。</b></p>
+<p><b>停手线自查。</b> 第五周你连着几天睡不好，家里人问了两次。<b>这时候停三天，不是放弃</b>——停三天再回来。停手线不是终止线，是刹车。</p>
+<p><b>事后。</b> 成片出来，把你觉得有厚度的四处标出来，跟十年里所有作品比对：三处找不到先例。一年后再看，其中两处的做法在此后的两件作品里被你重新用过，而且用在了完全不同的题材上。<b>指标一和指标二都过了。</b></p>
+<h2 id="s11"><span class="no">11</span>用在团队与带人上</h2>
+<p>如果你带人，这套东西有一个很实际、也很容易做错的用法。</p>
+<p><b>可以做的三件事：</b></p>
+<ul class="pts"><li><b>别给范例。</b> 给了范例，对方的老办法（或者你的老办法）会立刻赶来救场，缺口撕不开。等他自己撞过一次再给。</li><li><b>别在他卡住的时候救他。</b> 卡住不是失败，卡住正是老办法失效的那一刻——那是唯一能长出新东西的地方。<b>给他时间，别给他答案。</b></li><li><b>帮他堵退路，但要经他同意。</b> 比如共同确认一个不许换题的期限。<b>必须是他自己定的</b>，你替他定的退路他不认，反而会想办法绕过去。</li></ul>
+<p><b>必须避免的两件事：</b></p>
+<ul class="pts"><li><b>不要制造压力当作“逼压”。</b> 加时间限制、加难度、加否定，这些制造的是折磨。真正的逼压来自题材本身撞上了他那块地，而那块地在哪儿，你不知道。</li><li><b>不要替他判断“他撞上了没有”。</b> 三个信号全都发生在他内部，你从外面看不见。<b>你唯一能问的是事实性问题：你试过哪几条？现在卡在哪里？</b></li></ul>
+<p><b>一条对带人者的提醒：</b> 你要能接受他什么也没长出来。布置了全部条件，撞击也可能不发生——这不是他不够努力，也不是你带得不好。<b>这套东西不承诺产出。</b></p>
+<h2 id="s12"><span class="no">12</span>五个常见问题的直接回答</h2>
+<p><b>问：如果八周到了什么也没撞出来呢？</b>答：那就是很正常的结果。把它当成一次做完的项目结束掉，不要延期，也不要给自己一个“我不够拼”的判决。<b>这套东西描述发生，不承诺发生。</b></p>
+<p><b>问：禁手法会不会让作品质量掉下来？</b>答：会，而且很可能掉得很明显。所以别把这套用在一个输不起的项目上。<b>选一个可以承受不成功的项目来做这件事</b>——这是最实际的一条风控。</p>
+<p><b>问：我怎么知道自己是在“堵退路”还是在“硬撑”？</b>答：看停手线。堵退路是不给自己换题的选项，硬撑是不给自己休息的选项。<b>这两件完全不同：题不能换，人可以歇。</b></p>
+<p><b>问：那块“生地”我好像根本找不到，怎么办？</b>答：那就先不找。这套东西不是必修课。绝大多数好作品是靠熟练做出来的，熟练一点也不可耻。<b>等哪天有一件事你说不清为什么就是不想碰的时候，再回来看这份清单。</b></p>
+<p><b>问：撞出来的东西不被人喜欢，怎么办？</b>答：很可能。母文里那些例子在当时也不都被接受。但这套东西的判据从来不是接受度，是先例可追溯率和语言增量的持续性——<b>你此后还会不会用它。</b> 这两项跟别人喜不喜欢没有关系。</p>
+<h2 id="s13"><span class="no">13</span>一份不必是创作者也能用的简版</h2>
+<p>这套东西的核心结构，跟艺术没有必然关系。凡是“要做一件从没做过、而且只有你能做的事”，它都成立。</p>
+<p><b>换工作、转行、开一家自己的店。</b></p>
+<ul class="pts"><li>选题三问改成：有没有一个方向，你想到就有点不想动，但说不清为什么？（往往就是那个真正在意的方向，因为在意所以怕）</li><li>堵退路：定一个不许回头的期限，别一边试一边留着原来的位置随时可回。<b>留着的那条路，你一定会在最难的那一周走回去。</b></li><li>禁手法：不要用你在旧行当里最拿手的那套去做新的事。它会让你很快做出一个“看起来很专业”的东西，然后你就再也不会往前走了。</li></ul>
+<p><b>写一封很难写的信、说一件很难说的事。</b></p>
+<ul class="pts"><li>禁手法在这里特别有用：禁掉你惯常的开场方式、惯常的自嘲、惯常的“其实也没什么”。这三样是最常见的救场手法。</li><li>停手线同样适用：如果这件事让你连着几天状态很差，先停，找人说说。<b>信可以晚几天写，人不能。</b></li></ul>
+<p><b>带孩子或者带一个新人。</b></p>
+<ul class="pts"><li>最要紧的一条是“别在他卡住的时候救他”。多数人做不到，因为看着他卡住很难受。</li><li>可以做的是陪着，不给答案。<b>卡住不是失败，卡住是唯一能长出新东西的地方。</b></li></ul>
+<p><b>共同的骨架永远是那四步：</b> 选一件你一直绕着走的 → 堵掉退路 → 禁掉救场的老办法 → 守住停手线，然后接受它可能不来。</p>
+<h2 id="s14"><span class="no">14</span>一页纸操作卡</h2>
+<p><b>停手线（最优先，任一出现即停）</b></p>
+<ul class="pts"><li>睡眠／进食／身体持续出问题</li><li>亲近的人担心，而你想说服他们“你不懂”</li><li>数周分不清是在推进还是打转</li><li>觉得停下来等于前功尽弃 ← 最危险的一条</li></ul>
+<p><b>选题三问</b></p>
+<ul class="pts"><li>有没有一件你想到就不太想做、又说不清为什么的？</li><li>一说要做它，是不是立刻冒出三条很专业的反对理由？</li><li>这件事你是<b>讲述</b>过，还是<b>处理</b>过？</li></ul>
+<p><b>堵退路</b></p>
+<ul class="pts"><li>定一个不许换题的期限（几周起）</li><li>只说给一个不催你也不哄你的人</li><li>不准备 B 方案</li></ul>
+<p><b>禁手法</b></p>
+<ul class="pts"><li>开工前列出三到五样最拿手的，全禁，不是少用</li><li>预期：中途一定会看起来很糟。顺利＝老本事还在工作</li></ul>
+<p><b>过程信号</b></p>
+<ul class="pts"><li>撞上了：想绕开／老办法显得假／说不清在找什么</li><li>没撞上：很难但每步都知道怎么办／能完整讲出做法／难在外部条件</li></ul>
+<p><b>事后两查</b></p>
+<ul class="pts"><li>先例可追溯率（跟全部旧作比，不是最近几件）</li><li>语言增量的持续性（此后有没有留下来、被发展）</li></ul>
+<p><b>四条红线</b></p>
+<ul class="pts"><li>别把折磨当逼压／别把创伤当素材（先照顾人）／别把集体成果记到个人账上／别把换个形式当成长出新能力</li></ul>
+<p><b>一句话总纲：</b> 撞击不能安排，条件可以布置。<b>布置完，接受它可能不来——同时守住那条停手线。</b></p>
+<h2 id="s15"><span class="no">15</span>最后两条纪律</h2>
+<p>这一整篇如果只带走两条，带走这两条。</p>
+<p><b>第一条：题不能换，人可以歇。</b></p>
+<p>这两件事最容易被搅在一起。人在难受的时候，最想做的是换题（因为那能立刻缓解），最不肯做的是休息（因为那感觉像认输）。而正确的做法恰好相反——<b>换题会取消整次撞击，休息不会。</b> 那块生地不会因为你歇了三天就消失，它跑不掉。跑得掉的是人。</p>
+<p><b>第二条：布置完条件，就接受它可能不来。</b></p>
+<p>这套东西的全部诚实之处就在这里。它不是一套提高产出的方法，它只是把一件很难得的事的发生条件说清楚了。条件齐备，撞击仍然可能不发生；你可能只是白白难受了一场，然后交出一件平庸的东西。</p>
+<p><b>如果你不能接受这个结果，那就不要开始。</b> 而如果你能接受——那这件事本身就已经值得做了，因为绝大多数人一辈子都没有真正开工过。</p>
+<div class="endbox">
+  <div class="et">接下来读什么</div>
+  <p style="margin-bottom:10px">这一篇只是入口。真正的论证、边界与反驳，都在母文里：<a href="/students/qin-li/overflow-genesis/">《溢出性生成：论文学改编中一种不可还原的语言能力发生机制》</a>。</p>
+  <p style="margin:0">另一条路：<a href="/students/qin-li/overflow-genesis/explain.html">🌱 白话解释文《茧不是先长好再去挑担子的》</a>——用日常生活的类比，把母文讲成人人能懂的话。</p>
+</div>
+</article>
+
+<footer><div class="wrap">
+  © 2026 SDE Universes · 德麦国际 ·
+  <a href="/students/qin-li/overflow-genesis/">回母文</a> ·
+  <a href="/students/qin-li/works/">秦莉 · 全部作品</a> ·
+  <a href="/browse/">首页</a>
+</div></footer>
+<script src="/taste/wds-companion/wds-read.js?v=20260802b" defer></script>
+<script src="/wds-mode.js?v=20260802b" defer></script>
+</body>
+</html>

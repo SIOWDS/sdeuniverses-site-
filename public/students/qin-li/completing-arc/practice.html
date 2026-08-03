@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>把那道弧跑完：接住的四道工序与一条不许翻供的规矩 · 方法实践文 | SDE Universes</title>
+<meta name="description" content="接住是一个动作，不是一种感受，因此它可以被拆成工序，也可以被判定成功或失败。本篇给出三条判据（有动作、有约束、不可豁免）、四道工序（留跑道→不结算→兑现成一个具体改动→到期复核）、三种把它固定下来的老办法在今天的用法、带人与做内容两套现场落地、四类典型失败模式，以及一张年度复盘表和一页纸操作卡。">
+<meta name="author" content="SDE Universes">
+<meta property="og:type" content="article">
+<meta property="og:title" content="把那道弧跑完：接住的四道工序与一条不许翻供的规矩 · 方法实践文">
+<meta property="og:description" content="接住是一个动作，不是一种感受，因此它可以被拆成工序，也可以被判定成功或失败。本篇给出三条判据（有动作、有约束、不可豁免）、四道工序（留跑道→不结算→兑现成一个具体改动→到期复核）、三种把它固定下来的老办法在今天的用法、带人与做内容两套现场落地、四类典型失败模式，以及一张年度复盘表和一页纸操作卡。">
+<link rel="canonical" href="https://sdeuniverses.com/students/qin-li/completing-arc/practice.html">
+<style>
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:#FBF8F1;color:#2B2620;
+ font-family:"Noto Serif SC","Songti SC","Source Han Serif SC",Georgia,serif;
+ font-size:17px;line-height:1.95;letter-spacing:.01em}
+.wrap{max-width:760px;margin:0 auto;padding:0 22px}
+nav.cnav{background:#2B2620;color:#EDE4CF;position:sticky;top:0;z-index:30;
+ font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif}
+nav.cnav .wrap{display:flex;align-items:center;justify-content:space-between;gap:14px;height:50px}
+nav.cnav a{color:#EDE4CF;text-decoration:none;font-size:14px}
+nav.cnav .cnav-logo{font-weight:700;letter-spacing:.06em}
+nav.cnav .cnav-back{opacity:.82}
+nav.cnav .cnav-back:hover{opacity:1}
+header.art{background:linear-gradient(180deg,#FFFDF8 0%,#F5EFE2 100%);
+ border-bottom:1px solid rgba(43,38,32,.10);padding:44px 0 34px}
+.art-eyebrow{font-size:12.5px;letter-spacing:.16em;color:#2F5470;font-weight:700;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;margin-bottom:16px}
+h1.art-title{font-size:33px;line-height:1.4;margin:0 0 14px;font-weight:800}
+.art-subtitle{font-size:17px;color:#5C5346;line-height:1.7;margin-bottom:16px}
+.art-meta{font-size:13px;color:#8A8071;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif}
+.swap{display:flex;flex-wrap:wrap;gap:10px;margin:22px auto 0}
+.swap a{flex:1 1 240px;display:block;text-decoration:none;padding:12px 15px;border-radius:9px;
+ border:1px solid rgba(43,38,32,.16);background:#fff;color:#2B2620;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;font-size:14px;line-height:1.6}
+.swap a b{display:block;font-size:14.5px;margin-bottom:2px}
+.swap a span{color:#8A8071;font-size:12.5px}
+.swap a:hover{border-color:#2F5470;box-shadow:0 2px 10px rgba(43,38,32,.07)}
+article{padding:30px 0 10px}
+.abs{background:#EFF3F7;border-left:4px solid #2F5470;border-radius:0 8px 8px 0;
+ padding:18px 20px;margin:0 0 26px;font-size:15.5px;line-height:1.85;color:#4A4238}
+.abs b{color:#24425A}
+.toc{border:1px solid rgba(43,38,32,.13);border-radius:9px;padding:16px 20px;margin:0 0 34px;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;font-size:14.5px;background:#FFFDF8}
+.toc .tl{font-size:12.5px;letter-spacing:.14em;color:#2F5470;font-weight:700;margin-bottom:10px}
+.toc ol{margin:0;padding-left:20px;color:#5C5346}
+.toc li{margin:5px 0}
+.toc a{color:#4A4238;text-decoration:none}
+.toc a:hover{color:#2F5470;text-decoration:underline}
+h2{font-size:22px;line-height:1.5;margin:44px 0 16px;padding-top:8px;font-weight:800;
+ border-top:1px solid rgba(43,38,32,.10)}
+h2 .no{display:inline-block;min-width:1.9em;color:#2F5470;font-size:16px;font-weight:700;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif}
+p{margin:0 0 17px;text-align:justify}
+p b,li b{color:#24425A}
+ul.pts{margin:0 0 18px;padding-left:0;list-style:none}
+ul.pts li{position:relative;padding-left:20px;margin:0 0 10px;text-align:justify}
+ul.pts li:before{content:"—";position:absolute;left:0;color:#2F5470}
+blockquote{margin:0 0 20px;padding:14px 18px;background:#FFFDF8;
+ border-left:3px solid rgba(43,38,32,.22);color:#4A4238;font-size:16px}
+.endbox{margin:48px 0 10px;padding:22px;border-radius:10px;background:#EFF3F7;
+ border:1px solid rgba(43,38,32,.12)}
+.endbox .et{font-size:12.5px;letter-spacing:.14em;color:#2F5470;font-weight:700;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;margin-bottom:12px}
+.endbox a{color:#24425A}
+footer{margin-top:46px;padding:26px 0 40px;border-top:1px solid rgba(43,38,32,.12);
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;font-size:13px;color:#8A8071}
+footer a{color:#8A8071}
+@media(max-width:640px){body{font-size:16px}h1.art-title{font-size:26px}h2{font-size:19.5px}}
+</style>
+</head>
+<body>
+<nav class="cnav"><div class="wrap">
+  <a class="cnav-logo" href="/browse/">SDE Universes</a>
+  <a class="cnav-back" href="/students/qin-li/completing-arc/">← 回母文《未完成的弧》</a>
+</div></nav>
+
+<header class="art"><div class="wrap">
+  <div class="art-eyebrow">配套读物 · 技术与方法实践 · 母文《未完成的弧》</div>
+  <h1 class="art-title">把那道弧跑完：接住的四道工序与一条不许翻供的规矩</h1>
+  <div class="art-subtitle">母文的判断是「被感知接住的判决才成为重力」。这一篇不再论证，只交付工序：怎么给自己留出跑道、怎么不提前结算、怎么把它兑现成一个具体改动、怎么在一年后复核而不许改口。</div>
+  <div class="art-meta">SDE 学员专栏 · 配套读物 · 2026年8月 · 约 5037 字</div>
+  <div class="swap">
+    <a href="/students/qin-li/completing-arc/"><b>← 母文 · 未完成的弧</b><span>完整论证在这里</span></a>
+    <a href="/students/qin-li/completing-arc/explain.html"><b>🌱 白话解释文 · 接住一个球，手是会疼的</b><span>用日常生活的类比，把母文讲成人人能懂的话</span></a>
+  </div>
+</div></header>
+
+<article class="wrap">
+<div class="abs"><b>这一篇是什么</b>　接住是一个动作，不是一种感受，因此它可以被拆成工序，也可以被判定成功或失败。本篇给出三条判据（有动作、有约束、不可豁免）、四道工序（留跑道→不结算→兑现成一个具体改动→到期复核）、三种把它固定下来的老办法在今天的用法、带人与做内容两套现场落地、四类典型失败模式，以及一张年度复盘表和一页纸操作卡。<br><br><b>读法</b>　这一篇写给：已经认同母文的判断、现在想把它用到自己手头工作上的人。全篇以可操作为准，不重复论证。</div>
+<div class="toc"><div class="tl">目 录</div><ol><li><a href="#s1">这一篇要解决的问题</a></li><li><a href="#s2">三条判据：怎么判断这一次真的接住了</a></li><li><a href="#s3">工序一：留跑道</a></li><li><a href="#s4">工序二：不结算</a></li><li><a href="#s5">工序三：兑现成一个具体改动</a></li><li><a href="#s6">工序四：到期复核，而且不许翻供</a></li><li><a href="#s7">现场用法一：带人的时候，怎么不替别人接</a></li><li><a href="#s8">现场用法二：做内容的人，三个开关和它们的代价</a></li><li><a href="#s9">失败模式一：把收藏当成接住</a></li><li><a href="#s10">失败模式二：把感动、或者把表达，当成接住</a></li><li><a href="#s11">失败模式三：把接住做成人设</a></li><li><a href="#s12">失败模式四：拿判据去审判别人</a></li><li><a href="#s13">年度复盘表与一页纸操作卡</a></li><li><a href="#s14">完整走一遍：一个具体案例</a></li><li><a href="#s15">五个现场问题的直接回答</a></li></ol></div>
+<h2 id="s1"><span class="no">01</span>这一篇要解决的问题</h2>
+<p>母文说清了一件事：我们给创作那一头准备了一百个名字——灵感、天赋、表现、形式意志、心流；给接收这一头只留了几个很软的词——被打动、被启发、有共鸣。这个空缺不是疏忽，是因为接收那一下<b>不留痕迹</b>：它整个跑完在一个人身体内部，然后就消失了。没有痕迹就无法公开，无法公开就无法比较，无法比较就进不了任何理论。</p>
+<p>从这个判断里能直接推出一个实践问题：既然它不留痕迹，那我怎么知道自己到底接住了没有？更要紧的是，我能不能主动让它跑完？</p>
+<p>答案是能，但不是靠「更用心一点」。母文明确把这条路堵死了：这不是态度问题，是<b>条件</b>问题——跑那道弧所需要的三样条件，今天被系统地取消了。取消掉的东西可以自己搭回来，而搭回来是有工序的。</p>
+<p>所以本篇只做交付：三条判据、四道工序、两套现场用法、四类失败、一张卡。凡是不能落成动作的话，一律不写。</p>
+<h2 id="s2"><span class="no">02</span>三条判据：怎么判断这一次真的接住了</h2>
+<p>不靠感受，靠这三条。<b>三条必须同时成立</b>，缺一条即为没接住。这不是苛刻，是因为少了任何一条，它都会退化成一种更常见、更舒服的东西。</p>
+<p><b>判据一：有动作。</b> 它在你身上兑现成了一个具体的、可以描述的做法改变。注意「具体」这两个字的分量：「我更重视家人了」不算，「从此我进门先放下手机再说话」算；「我的审美提高了」不算，「从此我不在片子的结尾加解释性字幕」算。软的说法可以贴在任何东西上，所以它什么也没说。</p>
+<p><b>判据二：有约束。</b> 它不是留下了一段可以温柔回味的记忆，而是留下了一个<b>会硌你的东西</b>——当你想走老路的时候，它会拦你一下。回忆是舒服的，约束是不舒服的。如果一件作品在你心里只有暖意没有阻力，那它多半是被你享用了，不是被你接住了。</p>
+<p><b>判据三：不可豁免。</b> 你没法用后来的认识把它赦免掉。三年后你说「当时太年轻」就能取消的，那是当时的情绪；三年后你已经不喜欢它了、甚至有点烦它，可它还在拦着你——那是接住了。母文举的诺尔德，是在最落魄的多年以后又想起那些画，这一条才算兑现。</p>
+<p><b>用法：</b> 这三条不是让你去追求「接住」，接住不是可以追求来的。它们只是让你<b>分得清</b>——分清哪些是真的落下了，哪些只是过了一遍。分清本身就是最大的收益，因为它会立刻改变你分配注意力的方式。</p>
+<h2 id="s3"><span class="no">03</span>工序一：留跑道</h2>
+<p>母文点名的三样条件，是可以自己搭的，而且成本很低。</p>
+<p><b>第一样，一段没人告诉你该怎么想的时间。</b> 具体做法：接触任何有分量的作品之前，不看解读、不看短评、不看评分、不问「这个好不好看」。事前的十分钟比事后的一小时值钱得多，因为事前一旦被安顿，你后面的一切反应都是在验证别人的结论。</p>
+<p><b>第二样，一次不必立刻表态的相遇。</b> 具体做法：和别人一起看、一起听的时候，事先说好一句——出来先各走各的，半小时后再聊。这句话说出口会有点尴尬，只尴尬第一次。真正毁掉一场相遇的，往往就是散场时那句热情的「怎么样？」它逼你在三秒钟内把一个还没成形的东西压成一句话。</p>
+<p><b>第三样，一个不用把感受兑换成任何东西的空当。</b> 具体做法：结束后设一个明确的窗口——三十分钟、两小时、或者到第二天早上——这个窗口里不发、不评、不搜、不推荐、不写感想。窗口长度按你能守住的来定，宁短勿破。</p>
+<p><b>这一步的验收：</b> 你有没有过一段「不知道该怎么反应」的时间？有多长？这个长度就是你今天实际拥有的跑道。跑道是零，弧就无从跑起——不管作品多好，也不管你多真诚。</p>
+<h2 id="s4"><span class="no">04</span>工序二：不结算</h2>
+<p>这是四道工序里最反直觉的一道，也是最容易破的一道。</p>
+<p>母文有一个很硬的观察：<b>「存起来」这个动作，会把那一下的能量全部吸走。</b> 收藏、加书签、写进待办、发一条动态，这些动作都给了你一个「我已经接住了」的完结感，而正因为这个完结感如此令人满意，你的身体就不必再做任何事了。</p>
+<p>打卡照是同一个机制的极端版：你在画前拍照、发出去、收到十七个赞——这一整套流程是完整的、闭合的、有回报的。而正因为它这么完整，那件作品再也没有机会在你身上做别的事了。</p>
+<p><b>具体的禁止清单（窗口期内）：</b></p>
+<ul class="pts"><li>不打分，不排名，不说「几分」</li><li>不收藏，不加书签（想记就手写一句，见下条）</li><li>不发出去，不转述，不当场跟人讲</li><li>不写「感想」——感想是把没形状的东西提前压成形状</li><li>不搜作者生平、不看解读视频、不查它排第几</li></ul>
+<p><b>唯一允许的动作：</b> 手写一句<b>描述性</b>的话，不带判断。比如「那个长音停了很久」「他最后没有回头」。三个月后回看，描述句还能把你带回现场，判断句不能——判断句只会把你带回你当时的那个判断。</p>
+<p><b>这一步的验收：</b> 你有没有一次，被什么东西击中之后，忍住了没有立刻把它换成话？忍住过一次，你就会发现那个东西在你身上多待了很久。</p>
+<h2 id="s5"><span class="no">05</span>工序三：兑现成一个具体改动</h2>
+<p>不结算不等于什么都不做。窗口期过后，要做的恰恰是最实的一件事。</p>
+<p>母文追踪过历史上三种把接收固定下来的老办法：<b>重做一遍</b>（临摹、翻唱、改编、致敬）、<b>写给自己</b>（书信、日记、批注——不是评论，评论是给别人看的）、<b>守住它</b>（收藏、保存、抄写、一辈子带在身边）。这三种今天都还能用，只是要换个形式。</p>
+<p><b>落到今天的操作，只做一件事：改一个具体做法。</b></p>
+<ul class="pts"><li>写成动作句，不写成心态句。「今后我在收尾处不再加那句总结」是动作句；「我要更克制」是心态句。心态句守不住，动作句守得住。</li><li>只改一件。贪多必崩，改一件能撑住三个月，胜过改五件撑三天。</li><li>尽快兑现一次。窗口期结束后的一周之内，实际做一次。做过一次的东西才算装上了，只写在纸上的一律不算。</li><li>允许它很小。诺尔德的出口是画法，一个种地的人的出口可能是某一片地的处理方式，一位母亲的出口可能是不再用某种语气讲话。小不要紧，具体就行。</li></ul>
+<p><b>这一步的验收：</b> 三个月后，这个改动还在不在？还在，弧跑完了；早就忘了，说明那一下没咬住——这不丢人，母文说得清楚，多数相遇本来就不咬人。</p>
+<h2 id="s6"><span class="no">06</span>工序四：到期复核，而且不许翻供</h2>
+<p>第三条判据（不可豁免）没法当场检验，只能靠时间。所以要给它安排一个复核。</p>
+<p><b>做法：</b> 在你记下那句描述性的话时，同时写一个日期——三个月后与一年后。到期把那句话翻出来，只问两个问题：</p>
+<ul class="pts"><li>那个改动还在吗？还在，就是它还咬着你。</li><li>我现在还喜欢那件作品吗？</li></ul>
+<p>第二个问题是个陷阱，而且是故意的。<b>「现在还喜不喜欢」跟「有没有接住」没有关系。</b> 你完全可能现在已经不喜欢它了、甚至有点烦它，可那个改动还在——这恰恰是最强的证据，因为它证明这件事不是靠好感撑着的。</p>
+<p><b>「不许翻供」是什么意思：</b> 到期复核时，如果那个改动没了，你要如实记「这次没接住」，而不是改口说「其实我现在有了更深的理解」。后一种说法是把失败重新包装成成长，它会让你以后再也分不清真假。</p>
+<p>允许失败，是这套工序能长期用下去的唯一前提。<b>一年里有一次真的接住，已经很多了。</b></p>
+<h2 id="s7"><span class="no">07</span>现场用法一：带人的时候，怎么不替别人接</h2>
+<p>如果你在带学生、带新人、带孩子，你手里握着的是<b>别人</b>那条跑道，责任更重，而且最容易好心办坏事。</p>
+<p><b>三个动作：</b></p>
+<ul class="pts"><li><b>先别说好在哪。</b> 你一开口说出「你注意看这里的处理」，他那道弧就变成了验证你的话。等他先说，哪怕他说得很粗糙、很外行。他说完你再补。</li><li><b>别在结束时立刻提问。</b> 那句热情的「怎么样，有什么感受」，是跑道的终结者。改成一句「先不急着说，我们过会儿聊」，效果完全不同。</li><li><b>别替他兑现。</b> 他被击中之后，别急着建议他「你应该去学某某」「你可以试着写点什么」。他自己的出口只能他自己找，你给的出口他背不动。</li></ul>
+<p><b>一个反向提醒：</b> 你要能接受他什么也没发生。母文说得清楚，接住不留痕迹，所以你多半永远不会知道他接住了没有。带人这件事，得能忍受没有回音。</p>
+<h2 id="s8"><span class="no">08</span>现场用法二：做内容的人，三个开关和它们的代价</h2>
+<p>如果你做展览、课程、出版、视频，那三样条件的开关就在你手上。</p>
+<p><b>开关一：把讲解挪到后面。</b> 说明牌、导语、片头解说，往后放。不是取消信息，是取消「信息必须先到」这个顺序。<b>开关二：不在结尾设表态点。</b> 结束的地方不摆「你觉得怎么样」的互动、不摆评分、不摆立即分享的引导。让它就那么结束。<b>开关三：留一个不产出的空当。</b> 课程、导览、放映之间排一段明确的无引导时间，写进流程表。不写进去，它一定被临时议程吃掉。</p>
+<p><b>必须诚实说出的代价：</b> 这三个开关每一个都会让数据变难看。立刻表态的人多，互动率就高；打卡点顺，转发就多。你放弃的正是这些。</p>
+<p>换回来的是什么？是那批人里可能有几个真的把棒接住了。他们不会当场反馈，不会出现在任何报表里，你多半永远不知道是谁。<b>这一行的性质就是这样：能被立刻测到的，通常正是没接住的那部分。</b></p>
+<h2 id="s9"><span class="no">09</span>失败模式一：把收藏当成接住</h2>
+<p>最普遍的一种。收藏夹里存了一百篇，一年后想不起为什么存。</p>
+<p>它的机制前面说过了：存起来给了你完结感，能量被吸走了。更麻烦的是它有欺骗性——收藏夹是可见的、可数的、可整理的，它看上去像一份成绩单。</p>
+<p><b>自查：</b> 打开你的收藏夹，随机点开五条，看看有几条你能立刻说出「我因为它改了什么」。答案通常是零。</p>
+<p><b>处置：</b> 把收藏这个动作改成<b>用一次</b>。被打动之后，当天之内用它做一件小事——照着写一段、照着做一顿饭、照着改一个原来的做法。用过一次的才留下，没用过的就让它走。收藏夹从一个仓库变成一个待办清单，而且是七天自动清空的那种。</p>
+<h2 id="s10"><span class="no">10</span>失败模式二：把感动、或者把表达，当成接住</h2>
+<p>第二种更隐蔽，因为它带着真诚。</p>
+<p><b>「我看哭了，这还不算吗？」</b> 哭是身体的反应，你没有做任何选择——它发生在你身上，你只是场地。母文说的判决是你<b>做出来的</b>动作。感动留下的是回忆，接住留下的是约束。</p>
+<p><b>「我写了三千字的长评，这还不算吗？」</b> 这一种更值得警惕。写长评是一个高投入、高完成度的动作，它给的完结感比收藏强十倍。但你仔细看那三千字讲的是什么——如果全是「它多好、它好在哪、它在文学史上的位置」，那没有一句是关于你自己的。</p>
+<p><b>分辨法：</b> 一个人讲一件作品，如果讲的全是它，那多半没接住；如果讲着讲着开始讲自己<b>后来做了什么</b>——哪怕讲得很笨、很啰嗦、很不相关——那多半接住了。母文举的诺尔德，留下的不是一篇精彩的评论，是一句很土的话：我必须这样画。</p>
+<h2 id="s11"><span class="no">11</span>失败模式三：把接住做成人设</h2>
+<p>第三种最伤人，也最难自查：你学会了这一套，于是开始<b>展示</b>自己接住了什么。晒改变、讲顿悟、把「这本书改变了我」写进自我介绍。</p>
+<p>一旦它成为可展示的东西，性质就变了：你不再是在跑那道弧，你是在生产一个「我跑过」的证据。而生产证据最省力的办法，永远是把过程做得好看，不是把改动做得实。</p>
+<p><b>自查：</b> 如果这件事从头到尾没有任何人知道，你还会做这个改动吗？犹豫，就是这条犯了。</p>
+<p><b>处置：</b> 给自己加一条硬规矩——<b>兑现出来的那个改动，不对外讲。</b> 做了就是做了。要讲，讲结果，不讲它的来历。</p>
+<h2 id="s12"><span class="no">12</span>失败模式四：拿判据去审判别人</h2>
+<p>第四种：你有了三条判据，于是开始判别人——他那只是感动，他那只是消费，现在的人都不会真正阅读了。</p>
+<p>这跟母文的判断直接冲突。母文反复强调，那道弧<b>跑在别人身体内部，不留痕迹，你根本看不见</b>。你看见的只有结果，而弧在过程里。一个人在深夜里因为一本书悄悄改了自己的一个做法，这件事不会出现在任何地方。</p>
+<p><b>处置：</b> 三条判据只对自己用。对别人，你唯一能做的是<b>把跑道留出来</b>——把讲解往后放、不问「怎么样」、不催他表态——然后接受他可能什么也没发生。</p>
+<h2 id="s13"><span class="no">13</span>年度复盘表与一页纸操作卡</h2>
+<p><b>年度复盘（一年做一次，二十分钟）</b></p>
+<ul class="pts"><li>今年我记下的描述性句子有几条？现在还能带我回现场的有几条？</li><li>从中兑现成具体改动的有几件？三个月后还在的有几件？</li><li>有没有哪一件，我现在已经不喜欢它了，但那个改动还在？（这一条最值钱）</li><li>有没有哪一件，我如实记成了「没接住」？（一条都没有，说明你在给自己粉饰）</li></ul>
+<p><b>一页纸操作卡</b></p>
+<p>*三条判据（须同时成立）*</p>
+<ul class="pts"><li>有动作（具体到可描述）／有约束（会硌你）／不可豁免（后来赦免不掉）</li></ul>
+<p>*工序一：留跑道*</p>
+<ul class="pts"><li>事前不看解读评分／同行者约好散场后半小时再聊／结束后设一个静默窗口</li></ul>
+<p>*工序二：不结算*</p>
+<ul class="pts"><li>不打分、不收藏、不发、不写感想、不搜作者</li><li>只手写一句描述句，不带判断，附上三个月与一年的复核日期</li></ul>
+<p>*工序三：兑现*</p>
+<ul class="pts"><li>只改一件事，写成动作句，一周内实做一次</li></ul>
+<p>*工序四：复核*</p>
+<ul class="pts"><li>到期只问两件：改动还在吗？（不问喜不喜欢）</li><li>没在就如实记「没接住」，不许改口</li></ul>
+<p>*四条红线*</p>
+<ul class="pts"><li>收藏不算接住／感动与长评不算接住／别把它做成人设／别拿判据审判别人</li></ul>
+<p><b>一句话总纲：</b> 别去追求被击中——那不由你决定；你能决定的只有一件事：<b>留出那段没有形状的时间，并且忍住不把它换成话。</b></p>
+<h2 id="s14"><span class="no">14</span>完整走一遍：一个具体案例</h2>
+<p>用一件小事把四道工序跑完，比条款有用。</p>
+<p><b>场景：</b> 有人推荐你看一部纪录片，一百分钟。</p>
+<p><b>工序一，留跑道。</b> 打开之前，不看简介、不看评分、不看谁推荐的以及他怎么夸的。跟一起看的人说好：看完先各干各的，晚饭时再聊。看完之后，给自己定一个到第二天早上的静默窗口。</p>
+<p><b>工序二，不结算。</b> 片子结束，你确实被某一段击中了——那个老人蹲在门口没说话的四十秒。你很想立刻发一条动态，很想去搜这个人后来怎么样了，很想给它打个九分。全都忍住。你只在纸上写一句：「他蹲在那儿，手一直没抬起来。」写完，附上日期，再写两个复核日期：三个月后、一年后。</p>
+<p><b>工序三，兑现。</b> 第二天早上窗口结束，你回头看那句话，问自己：它咬住了我哪个具体做法？想了一会儿，你写下一句动作句——「今后我跟人谈难谈的事，先不急着填那段沉默。」这一周之内，你真的有一次机会：一个同事在你面前说不下去了，你没有像往常那样赶紧接一句缓和气氛，你就等着。那一次，弧算是装上了。</p>
+<p><b>工序四，复核。</b> 三个月后翻出那张纸。那句描述句还能把你带回那四十秒吗？能。那个做法还在吗？大部分时候在，有两次没忍住。一年后再翻一次，这次你甚至已经想不起那部片子叫什么名字了，但你确实变成了一个在沉默里不急着说话的人。</p>
+<p><b>这就是完整的一道弧。</b> 注意它的全部产出：一句话、一个改动、两次翻看。没有一条可以发出去，没有一条能被别人看见，也没有一条能证明给谁看。</p>
+<h2 id="s15"><span class="no">15</span>五个现场问题的直接回答</h2>
+<p><b>问：静默窗口太难守了，我一看完就想跟人说，怎么办？</b>答：把窗口砍短。三十分钟守得住，胜过一整天守不住。关键不是长度，是这个窗口必须是<b>事先定好</b>的，不是临时忍住的。事先定好的是规矩，临时忍住的是意志力，而意志力一定会输。</p>
+<p><b>问：我职业上必须当场评价，比如我是编辑、是老师、是评委，怎么办？</b>答：把两件事分成两轮。第一轮是职业判断，该打分打分、该给意见给意见，这一轮跟接住无关，不必勉强。第二轮，等所有工作结束之后，单独留十分钟问自己一句：抛开职业判断，这东西有没有咬到我？两轮分开，互不干扰。</p>
+<p><b>问：一年下来一件都没接住，是不是我有问题？</b>答：不是。母文说得清楚，这道弧不留痕迹、也不常发生。诺尔德一辈子被记录下来的也就那么一次。真正要紧的不是次数，是你现在<b>分得清</b>了——分得清哪些是真落下了，哪些只是过了一遍。这份分辨力本身就会改变你怎么用时间。</p>
+<p><b>问：那个改动我坚持不下来，算失败吗？</b>答：算，而且要如实记下来。但要区分两种：一种是它压根没咬住你，那是没接住；另一种是它咬住了，可你反复走老路然后每次都难受——那不是失败，那正是「有约束」的表现。第二条判据说的就是它会硌你，硌得你难受恰恰是它还在的证据。</p>
+<p><b>问：这套东西会不会让人变得很沉重？</b>答：会有一点，而且母文没打算否认这一点。接住的东西是欠着的，不是结清的。但它换回来的是另一件事——你不再需要用「我今年读了四十本书」来说服自己有所收获。<b>一件真的咬住你的，比四十件过一遍的，重得多。</b></p>
+<div class="endbox">
+  <div class="et">接下来读什么</div>
+  <p style="margin-bottom:10px">这一篇只是入口。真正的论证、边界与反驳，都在母文里：<a href="/students/qin-li/completing-arc/">《未完成的弧：被感知接住的判决才成为重力》</a>。</p>
+  <p style="margin:0">另一条路：<a href="/students/qin-li/completing-arc/explain.html">🌱 白话解释文《接住一个球，手是会疼的》</a>——用日常生活的类比，把母文讲成人人能懂的话。</p>
+</div>
+</article>
+
+<footer><div class="wrap">
+  © 2026 SDE Universes · 德麦国际 ·
+  <a href="/students/qin-li/completing-arc/">回母文</a> ·
+  <a href="/students/qin-li/works/">秦莉 · 全部作品</a> ·
+  <a href="/browse/">首页</a>
+</div></footer>
+<script src="/taste/wds-companion/wds-read.js?v=20260802b" defer></script>
+<script src="/wds-mode.js?v=20260802b" defer></script>
+</body>
+</html>

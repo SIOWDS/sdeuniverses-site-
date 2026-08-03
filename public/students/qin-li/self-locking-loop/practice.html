@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>解一个自锁闭环：诊断三问、造新证据、和用对方账本换入场券 · 方法实践文 | SDE Universes</title>
+<meta name="description" content="本篇给出一套通用工序：先用三问诊断你面对的到底是不是自锁闭环（不是的话别乱用这套）；再用四个条件设计新证据类型；然后用三重重新框定去换取试点的入场券；最后是最小可行试点的设计要点。另附对方账本的四项调研清单、真假重新框定的分辨法、四类失败模式（继续在旧尺子上刷分、自造标准无人认、重框定沦为话术、以&quot;">
+<meta name="author" content="SDE Universes">
+<meta property="og:type" content="article">
+<meta property="og:title" content="解一个自锁闭环：诊断三问、造新证据、和用对方账本换入场券 · 方法实践文">
+<meta property="og:description" content="本篇给出一套通用工序：先用三问诊断你面对的到底是不是自锁闭环（不是的话别乱用这套）；再用四个条件设计新证据类型；然后用三重重新框定去换取试点的入场券；最后是最小可行试点的设计要点。另附对方账本的四项调研清单、真假重新框定的分辨法、四类失败模式（继续在旧尺子上刷分、自造标准无人认、重框定沦为话术、以&quot;">
+<link rel="canonical" href="https://sdeuniverses.com/students/qin-li/self-locking-loop/practice.html">
+<style>
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:#FBF8F1;color:#2B2620;
+ font-family:"Noto Serif SC","Songti SC","Source Han Serif SC",Georgia,serif;
+ font-size:17px;line-height:1.95;letter-spacing:.01em}
+.wrap{max-width:760px;margin:0 auto;padding:0 22px}
+nav.cnav{background:#2B2620;color:#EDE4CF;position:sticky;top:0;z-index:30;
+ font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif}
+nav.cnav .wrap{display:flex;align-items:center;justify-content:space-between;gap:14px;height:50px}
+nav.cnav a{color:#EDE4CF;text-decoration:none;font-size:14px}
+nav.cnav .cnav-logo{font-weight:700;letter-spacing:.06em}
+nav.cnav .cnav-back{opacity:.82}
+nav.cnav .cnav-back:hover{opacity:1}
+header.art{background:linear-gradient(180deg,#FFFDF8 0%,#F5EFE2 100%);
+ border-bottom:1px solid rgba(43,38,32,.10);padding:44px 0 34px}
+.art-eyebrow{font-size:12.5px;letter-spacing:.16em;color:#2F5470;font-weight:700;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;margin-bottom:16px}
+h1.art-title{font-size:33px;line-height:1.4;margin:0 0 14px;font-weight:800}
+.art-subtitle{font-size:17px;color:#5C5346;line-height:1.7;margin-bottom:16px}
+.art-meta{font-size:13px;color:#8A8071;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif}
+.swap{display:flex;flex-wrap:wrap;gap:10px;margin:22px auto 0}
+.swap a{flex:1 1 240px;display:block;text-decoration:none;padding:12px 15px;border-radius:9px;
+ border:1px solid rgba(43,38,32,.16);background:#fff;color:#2B2620;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;font-size:14px;line-height:1.6}
+.swap a b{display:block;font-size:14.5px;margin-bottom:2px}
+.swap a span{color:#8A8071;font-size:12.5px}
+.swap a:hover{border-color:#2F5470;box-shadow:0 2px 10px rgba(43,38,32,.07)}
+article{padding:30px 0 10px}
+.abs{background:#EFF3F7;border-left:4px solid #2F5470;border-radius:0 8px 8px 0;
+ padding:18px 20px;margin:0 0 26px;font-size:15.5px;line-height:1.85;color:#4A4238}
+.abs b{color:#24425A}
+.toc{border:1px solid rgba(43,38,32,.13);border-radius:9px;padding:16px 20px;margin:0 0 34px;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;font-size:14.5px;background:#FFFDF8}
+.toc .tl{font-size:12.5px;letter-spacing:.14em;color:#2F5470;font-weight:700;margin-bottom:10px}
+.toc ol{margin:0;padding-left:20px;color:#5C5346}
+.toc li{margin:5px 0}
+.toc a{color:#4A4238;text-decoration:none}
+.toc a:hover{color:#2F5470;text-decoration:underline}
+h2{font-size:22px;line-height:1.5;margin:44px 0 16px;padding-top:8px;font-weight:800;
+ border-top:1px solid rgba(43,38,32,.10)}
+h2 .no{display:inline-block;min-width:1.9em;color:#2F5470;font-size:16px;font-weight:700;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif}
+p{margin:0 0 17px;text-align:justify}
+p b,li b{color:#24425A}
+ul.pts{margin:0 0 18px;padding-left:0;list-style:none}
+ul.pts li{position:relative;padding-left:20px;margin:0 0 10px;text-align:justify}
+ul.pts li:before{content:"—";position:absolute;left:0;color:#2F5470}
+blockquote{margin:0 0 20px;padding:14px 18px;background:#FFFDF8;
+ border-left:3px solid rgba(43,38,32,.22);color:#4A4238;font-size:16px}
+.endbox{margin:48px 0 10px;padding:22px;border-radius:10px;background:#EFF3F7;
+ border:1px solid rgba(43,38,32,.12)}
+.endbox .et{font-size:12.5px;letter-spacing:.14em;color:#2F5470;font-weight:700;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;margin-bottom:12px}
+.endbox a{color:#24425A}
+footer{margin-top:46px;padding:26px 0 40px;border-top:1px solid rgba(43,38,32,.12);
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;font-size:13px;color:#8A8071}
+footer a{color:#8A8071}
+@media(max-width:640px){body{font-size:16px}h1.art-title{font-size:26px}h2{font-size:19.5px}}
+</style>
+</head>
+<body>
+<nav class="cnav"><div class="wrap">
+  <a class="cnav-logo" href="/browse/">SDE Universes</a>
+  <a class="cnav-back" href="/students/qin-li/self-locking-loop/">← 回母文《自锁闭环与能力恢复轨迹》</a>
+</div></nav>
+
+<header class="art"><div class="wrap">
+  <div class="art-eyebrow">配套读物 · 技术与方法实践 · 母文《自锁闭环与能力恢复轨迹》</div>
+  <h1 class="art-title">解一个自锁闭环：诊断三问、造新证据、和用对方账本换入场券</h1>
+  <div class="art-subtitle">母文的判断是「破解不在于更努力地在旧标准里证明，而在于造一种旧标准从未要求过、因此从未被设计去拦截的新证据」。这一篇把它落成一套可迁移的操作流程。</div>
+  <div class="art-meta">SDE 学员专栏 · 配套读物 · 2026年8月 · 约 5033 字</div>
+  <div class="swap">
+    <a href="/students/qin-li/self-locking-loop/"><b>← 母文 · 自锁闭环与能力恢复轨迹</b><span>完整论证在这里</span></a>
+    <a href="/students/qin-li/self-locking-loop/explain.html"><b>🌱 白话解释文 · 没有工作经验就找不到工作，找不到工作就没有经验</b><span>用日常生活的类比，把母文讲成人人能懂的话</span></a>
+  </div>
+</div></header>
+
+<article class="wrap">
+<div class="abs"><b>这一篇是什么</b>　本篇给出一套通用工序：先用三问诊断你面对的到底是不是自锁闭环（不是的话别乱用这套）；再用四个条件设计新证据类型；然后用三重重新框定去换取试点的入场券；最后是最小可行试点的设计要点。另附对方账本的四项调研清单、真假重新框定的分辨法、四类失败模式（继续在旧尺子上刷分、自造标准无人认、重框定沦为话术、以“新证据”之名放水），以及一张一页纸操作卡。<br><br><b>读法</b>　这一篇写给：已经认同母文的判断、现在想把它用到自己手头工作上的人。全篇以可操作为准，不重复论证。</div>
+<div class="toc"><div class="tl">目 录</div><ol><li><a href="#s1">先诊断：你遇到的是不是自锁闭环</a></li><li><a href="#s2">停止在旧尺子上刷分：识别那个最像出路的陷阱</a></li><li><a href="#s3">设计新证据：四个必须同时满足的条件</a></li><li><a href="#s4">第二道环：入场券才是真正的难关</a></li><li><a href="#s5">调研对方的账本：四项必做功课</a></li><li><a href="#s6">三重重新框定：写法</a></li><li><a href="#s7">真假重新框定：一句话分辨</a></li><li><a href="#s8">试点怎么设计：三条要点</a></li><li><a href="#s9">失败模式一与二：继续刷分，与自造标准</a></li><li><a href="#s10">失败模式三与四：话术化，与以“新证据”之名放水</a></li><li><a href="#s11">完整走一遍：一个组织内部的例子</a></li><li><a href="#s12">五个常见问题的直接回答</a></li><li><a href="#s13">一页纸操作卡</a></li><li><a href="#s14">最后一条纪律</a></li><li><a href="#s15">附：一句写给守着标准那一方的话</a></li></ol></div>
+<h2 id="s1"><span class="no">01</span>先诊断：你遇到的是不是自锁闭环</h2>
+<p>这套工序成本不低，用错地方会白费很多年。所以第一步是诊断，三问，按顺序问。</p>
+<p><b>问一：谁握着「什么算有效证据」的裁定权？</b>如果裁定权在一个中立的、你也认可的机制手里，那多半不是自锁闭环，那只是你还没做出成果。如果<b>裁定证据标准的一方，同时是要不要接纳你的那一方</b>，才进入下一问。</p>
+<p><b>问二：你需要的那份证据，能不能在现行标准内部被生产出来？</b>关键在“能不能”，不是“难不难”。难 → 那是资源和时间问题，继续做就好。<b>结构上不能</b> → 也就是说，无论投入多少，那套标准的设计都捕捉不到你要证明的那一类东西 → 进入下一问。</p>
+<p><b>问三：证据的缺失，是不是恰好维持了排斥；而排斥又恰好阻断了证据的产生？</b>把这两句话写下来，看它们能不能首尾相接成一个圈。<b>接得上，才是自锁闭环。</b></p>
+<p><b>三问全中，再往下走。</b> 有一条最常见的误诊必须提醒：<b>很多“我被不公平地排斥了”其实是问二没过——它只是难，不是不可能。</b> 那种情况下这套工序不但没用，还会给放弃提供一个体面的理由。</p>
+<h2 id="s2"><span class="no">02</span>停止在旧尺子上刷分：识别那个最像出路的陷阱</h2>
+<p>诊断成立之后，第一件要做的事是“停”，而不是“做”。</p>
+<p>被排斥的一方几乎总会做同一件事：<b>更努力地在旧标准内部证明自己。</b> 这个反应在道义上无可指摘，但按母文的分析，它注定失败——你要证明的那一类东西，恰恰是这套标准的设计无法捕捉的。</p>
+<p><b>更要命的是它的隐性代价：</b> 为了在旧标准里生产证据，你必须把自己的做法改造成可被这套标准测量的形状——拆成标准化单元，去掉依赖整体判断的部分，把判断切成可以逐项打分的条目。</p>
+<p><b>改造几十年之后，那样东西真的变了。</b> 它变成了一个能被那把尺子量出来、却已经不再具备原来那个核心能力的东西。</p>
+<p><b>一个自查信号：</b> 你这几年为了达标而做的那些改造里，有没有哪一项让你自己觉得“这么改就不是原来那件事了”，但你还是改了？有 → 你正在被磨掉，而不是在接近认可。</p>
+<p><b>处置：</b> 不是全面对抗，是<b>分账</b>。保留必要的合规动作（该注册注册、该备案备案），但停止把资源投进“用旧标准证明核心能力”这一条路。<b>那条路的投入产出比是零，且长期为负。</b></p>
+<h2 id="s3"><span class="no">03</span>设计新证据：四个必须同时满足的条件</h2>
+<p>新证据的“新”不是目的，四个条件才是。</p>
+<p><b>条件一：旧标准从来没有要求过它。</b>因此它也从来没有被设计去拦截。这不是钻空子——一套标准的拦截能力只覆盖它预料到的东西。<b>“没有条款”意味着有谈判空间。</b></p>
+<p><b>条件二：它能真正承载你要证明的那样东西。</b>最容易在这里出错：造出一种确实很新、但跟你的核心能力没关系的证据。<b>检验：如果这份证据显示为阳性，它证明的是不是正好是你被否定的那一项？</b></p>
+<p><b>条件三：它可以被独立的第三方核验、重复、推翻。</b>这一条不能松。<b>能被推翻，是新证据和自说自话的唯一分界。</b> 你必须事先写清楚：什么样的结果算失败。</p>
+<p><b>条件四：造它的成本可承受。</b>包括钱、时间、人手和许可难度。一份完美但造不出来的证据，等于没有。</p>
+<p><b>一个形状上的提示：</b> 旧标准往往擅长测量<b>截面</b>（某个时点的某个指标），而很多被排斥的能力体现在<b>过程</b>里（一段时间中的变化路径、恢复轨迹、判断链条）。<b>从“过程”这个方向去找，命中率高。</b> 母文那个案例里的新证据，正是一条恢复的轨迹，而不是某个时点的读数。</p>
+<h2 id="s4"><span class="no">04</span>第二道环：入场券才是真正的难关</h2>
+<p>造新证据需要一块试验地：一个小范围试点、一段时间、一笔预算、一个许可。</p>
+<p>于是你去申请。窗口问你：<b>请说明必要性和预期效益，并提供支持性证据。</b></p>
+<p><b>这是同一个环，而且更难绕。</b> 因为在专业领域里你至少还能跟同行争论“什么算有效”；在预算窗口前，你面对的是一套跟专业无关的逻辑——投入产出。它不问你的主张对不对，只问这笔钱能收回什么。</p>
+<p>母文的判断是：绝大多数被排斥的实践，死在这第二道环上。</p>
+<p><b>破它的钥匙不在你的价值主张里，而在对方的账本上。</b></p>
+<h2 id="s5"><span class="no">05</span>调研对方的账本：四项必做功课</h2>
+<p>在动笔写任何材料之前，先把这四件事查清楚。<b>跳过这一步，翻译一定是无效的。</b></p>
+<p><b>一、决定这件事的人，自己被什么指标考核？</b> 不是他所在机构的宗旨，是<b>他个人年底要交的那几个数</b>。材料必须落在这几个数上。</p>
+<p><b>二、这个体系里，哪一类损失有专门科目，哪一类没有？</b> 没有科目的那一类，就是没人负责、也从没被算过的地方——<b>那是最宽的门缝。</b></p>
+<p><b>三、过去三年里，跟你这件事沾边的项目，哪些被批了？批文上写的理由是什么？</b> 照着被批过的理由的形状写，命中率会高很多。</p>
+<p><b>四、有没有哪一笔损失，是这个体系在内部文件里自己承认、却一直没有解法的？</b><b>这一问最值钱。</b> 一个体系自己承认、却解不掉的问题，就是那道门上唯一没上锁的地方。</p>
+<h2 id="s6"><span class="no">06</span>三重重新框定：写法</h2>
+<p>把你要做的事，翻译成对方账本上三种“已经在发生的损失”。三条不必都用，但至少要有两条。</p>
+<p><b>第一重：把“归不到人头上的麻烦”写成“一个没人管的预算黑洞”。</b></p>
+<ul class="pts"><li>动作：<b>把它算出来。</b> 一年发生多少次，每次的直接与间接成本大致多少，合计多少。</li><li>要求：口径诚实，来源可查，不夸大。宁可给一个保守的区间，也不要给一个漂亮但站不住的点估计。</li><li>效果来源：<b>一个从没被算过的数字，第一次被算出来时冲击力极大</b>——它把“模糊的麻烦”变成了“账本上的一笔钱”。</li></ul>
+<p><b>第二重：把“某种能力正在断代”写成“一笔已经欠下、还没到期的债”。</b></p>
+<ul class="pts"><li>动作：估算重建同等能力需要的年限与费用；估算不重建的话，某类问题的处理成本会上升多少。</li><li>关键句式：<b>“现在不花钱”和“没有成本”是两回事。</b></li></ul>
+<p><b>第三重：把你的方法写成“一件别的部门也能用的基础设施”。</b></p>
+<ul class="pts"><li>动作：明确点名还有哪两三个部门面对同样的问题，以及这套方法怎样可以被他们直接拿去用。</li><li>关键：<b>一件只服务于你的东西是成本，一件多部门能用的东西是投资。</b> 同一样东西，两种记法。</li></ul>
+<p><b>三条共同的纪律：</b> 全部为真，全部可核查，不要求对方接受你的价值观。<b>你说的应该全是对方自己已经承认的损失。</b></p>
+<h2 id="s7"><span class="no">07</span>真假重新框定：一句话分辨</h2>
+<p>这一招极易滑向话术，所以分辨标准必须硬。</p>
+<p><b>分辨：如果对方按你说的那个理由批准了，然后来验收你说的那个效果——你交得出来吗？</b></p>
+<ul class="pts"><li>交得出来 → 重新框定。你没有编造任何东西，你只是换了一个对方能收到的坐标系来陈述同一件事。</li><li>交不出来 → 话术。而且这是透支：这一次拿到了钱，下一次这扇门会对你和你的整个领域一起关上。</li></ul>
+<p><b>第二条分辨：你承诺的那个效果，是不是你要做的事</b>顺带<b>产生的？</b></p>
+<ul class="pts"><li>是 → 成立。</li><li>不是（你得另外做一摊事去凑那个效果） → 那你实际上接了两个项目，其中一个是你不想做的。这种结构撑不过一年。</li></ul>
+<h2 id="s8"><span class="no">08</span>试点怎么设计：三条要点</h2>
+<p>拿到入场券之后，试点本身的设计决定了这次机会是不是被浪费。</p>
+<p><b>要点一：小到能被批准，完整到能产出证据。</b> 这两个要求互相拉扯，取平衡点的办法是：<b>砍范围，不砍环节。</b> 少做几个科室、少做几个月都可以；但从头到尾的完整链条必须走通一次，否则产出的还是碎片。</p>
+<p><b>要点二：事先写死失败标准。</b> 什么样的结果算这次没成。写在申请材料里，白纸黑字。<b>这一条看起来是自找麻烦，实际是最强的信用来源</b>——它同时满足了条件三（可被推翻），也让审批方相信你不是来要钱的。</p>
+<p><b>要点三：把记录方法做成可移交的东西。</b> 不只是产出结论，而是产出一套别人能拿去用的记录与分析方法。这样即使这次结论不理想，你留下的基础设施仍然兑现了第三重框定的承诺——<b>下一次申请时，你手上就有了一个已经交付过的记录。</b></p>
+<h2 id="s9"><span class="no">09</span>失败模式一与二：继续刷分，与自造标准</h2>
+<p><b>失败一：明知是自锁闭环，仍然把主要资源投在旧标准的证明上。</b>往往出于两个原因：一是沉没成本（已经投了很多年），二是“万一呢”。<b>处置：不必全停，但要设上限。</b> 明确规定投入旧路径的资源比例，比如不超过三成，其余投向新证据。<b>关键是这个比例要写下来，否则它一定会回到十成。</b></p>
+<p><b>失败二：自己造了一套标准，但没有人认。</b>这是另一个极端：干脆抛开旧体系，自建评价体系、自发证书、自办认证。<b>问题在于条件三没过：</b> 一套没有外部核验、不能被独立推翻的标准，在任何严肃的场合都不会被采信，而且会连累你原本站得住的部分。<b>分辨：你造的这套东西，能不能被一个跟你无关、甚至对你不友好的第三方拿去检验？</b> 不能 → 那不是新证据，是自说自话。</p>
+<h2 id="s10"><span class="no">10</span>失败模式三与四：话术化，与以“新证据”之名放水</h2>
+<p><b>失败三：重新框定用久了，变成只会说对方的语言。</b>副作用是：你越来越擅长把事情翻译成成本、效率、风险、复用，然后某一天发现自己说不出原来那件事到底好在哪儿了。<b>处置：两套语言分开保存。</b> 对外那份用对方的账本写；对内那份用你自己的语言写清楚你真正要保住什么、为什么重要、怎么判断做到了。<b>两份都要有，且不能互相污染。</b></p>
+<p><b>失败四：拿“新证据”当降低要求的借口。</b>“旧标准太严，我们需要更适合的评价方式”——这句话有时是对的，有时是放水的前奏。<b>硬边界：新证据指的是证据的形式，不是安全与真实性的门槛。</b> 一个更宽松的标准不叫新证据，那叫放水，而放水最终毁掉的恰恰是你想保住的那样东西。<b>检验还是条件三：可核验、可重复、可推翻。三项缺一，就不要往下走。</b></p>
+<h2 id="s11"><span class="no">11</span>完整走一遍：一个组织内部的例子</h2>
+<p>把整套工序放在一件不涉及任何行业专业性的事上跑一遍，是为了说明它的通用性。</p>
+<p><b>场景：</b> 你所在的公司有一批做了十几年的老技工，他们身上有一套没法写进手册的判断力——听声音就知道哪台设备快出问题了。这批人五年内会陆续退休。你想立一个项目，把这套东西记录下来。</p>
+<p><b>诊断三问。</b> 问一：决定立不立项的是财务与运营，而“什么算有效产出”也是他们定的——中。问二：现有的考核只认可量化产出（产量、故障率、工时），而“记录隐性判断力”在这套体系里无法被计为产出，不是难，是结构上不能——中。问三：因为算不出产出，所以不立项；因为不立项，就永远没有数据证明它有产出——圈接得上。<b>三问全中。</b></p>
+<p><b>停。</b> 停止那条“我们先做出一份漂亮的培训材料，证明它有效”的路——那条路要求你先用旧指标证明一个旧指标测不到的东西。</p>
+<p><b>造新证据。</b> 方向选“过程”而不是“截面”：不去证明“培训后故障率下降了多少”（那需要好几年，而且干扰因素无数），而是记录<b>判断链条本身</b>——老技工在做出一次判断时，他先注意到什么、排除了什么、在哪一步定的。这份记录可以被第三方核验（让另一位老技工独立复核），也可以被推翻（如果复核者完全不认同那条链条）。</p>
+<p><b>查账本。</b> 查出三件事：运营总监今年被考核的核心指标是非计划停机时长；“因经验缺失导致的误判”这一项没有科目，从来没被算过；去年批过的一个项目，理由写的是“降低跨班次交接的信息损耗”。</p>
+<p><b>三重框定。</b> 第一重：把过去两年里“事后查不出原因的非计划停机”统计出来——一年十一次，每次平均停机成本可查，合计出一个数。第二重：五年内退休的那批人，重新培养同等判断力需要的年限和费用。第三重：这套记录方法可以被另外两个部门直接拿去用（他们同样面临经验流失）。</p>
+<p><b>试点。</b> 砍范围不砍环节：只做一条产线、只做三个月，但从记录到复核到归档的完整链条走通。事先写死失败标准：如果独立复核者对记录下来的判断链条的认同率低于某个水平，本次试点判定为不成立。</p>
+<p><b>注意整个过程里你没有说过一句“经验很宝贵”。</b> 你说的全是对方账本上已经存在的损失。</p>
+<h2 id="s12"><span class="no">12</span>五个常见问题的直接回答</h2>
+<p><b>问：我要的东西确实没有证据，会不会我其实就是错的？</b>答：完全可能，而且这套讲法不构成任何东西有效的证明。它只主张一件事：<b>“拿不出证据”和“无效”是两回事</b>，而当裁定权与被评价者不对称时，前者不能被自动读成后者。<b>你仍然需要自己诚实地判断——只是别让那套标准替你判断。</b></p>
+<p><b>问：三重框定听起来像是在讨好，会不会显得没骨气？</b>答：分辨在于内容是否为真。<b>你没有改变自己要做的事，你改变的是陈述它的坐标系。</b> 反过来说，坚持只用自己的语言说话、然后二十年拿不到一块试验地，那不是骨气，那是把立场留给了自己，把地盘留给了别人。</p>
+<p><b>问：如果我根本查不到对方的账本呢？</b>答：那就先解决这件事，别急着写材料。找一个在那个体系里待过的人聊两次，往往比自己猜三个月有用。<b>查不到账本就动笔，是这套工序最常见的失败原因。</b></p>
+<p><b>问：试点做完，结论不理想怎么办？</b>答：这正是为什么要“事先写死失败标准”和“把方法做成可移交的东西”。结论不理想时，你至少交付了一套别的部门能用的记录方法——第三重框定的承诺兑现了。<b>下一次申请时，你手上有了一个已经交付过的记录，那比任何材料都管用。</b></p>
+<p><b>问：这套东西会不会被用来给站不住的东西开路？</b>答：会，所以条件三（可核验、可重复、可推翻）不能松。<b>一个不肯写下“什么算失败”的项目，不管它的框定写得多漂亮，都不该被批准——包括你自己的。</b></p>
+<h2 id="s13"><span class="no">13</span>一页纸操作卡</h2>
+<p><b>诊断三问（全中才用这套）</b>1. 裁定“什么算证据”的，是不是同时也是决定接不接纳你的那一方？2. 你要的证据，在现行标准里是<b>难</b>产生，还是<b>结构上不能</b>产生？3. 缺证据 → 维持排斥 → 阻断证据产生：这个圈接得上吗？</p>
+<p><b>停</b></p>
+<ul class="pts"><li>给旧路径设资源上限（写下来），停止用旧标准证明核心能力</li><li>自查：为达标做的改造里，有没有让你觉得“这就不是原来那件事了”的？</li></ul>
+<p><b>造新证据（四条同时满足）</b></p>
+<ul class="pts"><li>旧标准没要求过 ／ 真能承载你的核心能力 ／ 可被第三方核验推翻 ／ 造得起</li><li>找的方向：<b>过程与轨迹</b>，而不是截面指标</li></ul>
+<p><b>查账本（四项功课）</b></p>
+<ul class="pts"><li>决策者本人被什么指标考核 ／ 哪类损失没有科目 ／ 近三年批文的理由长什么样 ／ 有没有它自己承认却解不掉的问题</li></ul>
+<p><b>三重框定（至少用两条，全部为真）</b></p>
+<ul class="pts"><li>没人管的预算黑洞（把它算出来）</li><li>已经欠下、还没到期的债（“现在不花钱”≠“没有成本”）</li><li>别的部门也能用的基础设施（点名复用场景）</li></ul>
+<p><b>真假分辨</b></p>
+<ul class="pts"><li>对方按这个理由验收，你交得出来吗？交不出来＝话术＝透支</li></ul>
+<p><b>试点三要点</b></p>
+<ul class="pts"><li>砍范围不砍环节 ／ 事先写死失败标准 ／ 把方法做成可移交的东西</li></ul>
+<p><b>四条红线</b></p>
+<ul class="pts"><li>别继续在旧尺子上刷分／别自造无人认的标准／别让框定变成话术／别拿“新证据”给放水开门</li></ul>
+<p><b>一句话总纲：</b> 不要再证明你能用他的尺子——<b>去算一笔他自己一直算不平的账，然后用那笔账，换一块能造秤的地方。</b></p>
+<h2 id="s14"><span class="no">14</span>最后一条纪律</h2>
+<p>如果这一整篇你只带走一条，带走这一条：</p>
+<p><b>先要地，后要名分。</b></p>
+<p>被排斥的一方最常犯的错，是把“被承认”当成第一目标——花二十年争一个说法、争一个标准、争一次平反。而“被承认”要走完对方整套评价体系，那正是那个环最紧的地方。</p>
+<p><b>“能做事”往往只需要一块很小的试验地。</b> 而一块试验地，是可以用对方账本上那笔算不平的账换来的。</p>
+<p>拿到地，把事做出来，把证据造出来——名分是那之后的事，而且到那时候它会容易得多。</p>
+<p>顺序反了，两样都拿不到。</p>
+<h2 id="s15"><span class="no">15</span>附：一句写给守着标准那一方的话</h2>
+<p>这套工序全篇都站在被排斥的一方说话，最后补一句给另一边。</p>
+<p>如果你正好是那个握着评价标准的人，母文这套分析对你不是控诉，而是一个提醒：<b>你的标准有一个自己看不见的盲区，而这个盲区是结构性的，跟你的专业水平和职业操守无关。</b></p>
+<p>它的形状是：<b>任何一套标准都只能拦截它预料到的东西，也只能测量它设想过的类型。</b> 落在设想之外的东西，会被一致地、严谨地、毫无恶意地判为“证据不足”——而这个判定看起来跟“确实无效”完全一样。</p>
+<p><b>可以做的一件很小的事：</b> 在任何一次“证据不足”的结论旁边，附一句说明——<b>我们用的是哪一类证据标准，它测量的是什么。</b> 这一句不改变结论，但它把“我们没测到”和“它不存在”分开了。</p>
+<p>这一分开，成本几乎为零，却能让那个环不至于自动锁死。</p>
+<div class="endbox">
+  <div class="et">接下来读什么</div>
+  <p style="margin-bottom:10px">这一篇只是入口。真正的论证、边界与反驳，都在母文里：<a href="/students/qin-li/self-locking-loop/">《自锁闭环与能力恢复轨迹：新加坡中医制度化的排斥机制与一种新证据类型的构造》</a>。</p>
+  <p style="margin:0">另一条路：<a href="/students/qin-li/self-locking-loop/explain.html">🌱 白话解释文《没有工作经验就找不到工作，找不到工作就没有经验》</a>——用日常生活的类比，把母文讲成人人能懂的话。</p>
+</div>
+</article>
+
+<footer><div class="wrap">
+  © 2026 SDE Universes · 德麦国际 ·
+  <a href="/students/qin-li/self-locking-loop/">回母文</a> ·
+  <a href="/students/qin-li/works/">秦莉 · 全部作品</a> ·
+  <a href="/browse/">首页</a>
+</div></footer>
+<script src="/taste/wds-companion/wds-read.js?v=20260802b" defer></script>
+<script src="/wds-mode.js?v=20260802b" defer></script>
+</body>
+</html>
