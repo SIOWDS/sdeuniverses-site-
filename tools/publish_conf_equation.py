@@ -176,6 +176,9 @@ def build_page(p, body, toc, pages):
                f'<div class="src"><div class="sl">这一篇由哪三个学科的理论体系撞成</div>'
                f'<p class="sd">{strongify(p["clash"])}　'
                f'三家均为站外的公开文献，链接直达原始出处，可自行核对。</p>{ones}</div>\n', t, flags=re.S)
+    # 下载按钮的 PDF 名沿用自模板，必须换成本篇 slug，否则 404（2026-08-03 全栏 27 页踩过）
+    t = t.replace('href="taken-out.pdf"', f'href="{p["slug"]}.pdf"')
+    assert "taken-out.pdf" not in t, "下载链接串了：仍指向模板的 PDF"
     t = t.replace("‹ 典范文专栏", "‹ 学科通融").replace("返回典范文专栏 →", "返回学科通融 →")
     t = t.replace("典范文专栏 · 作者 Claude ·", "学科通融 · 作者 王德生 ＋ Claude ·")
     assert t.count("<html") == 1 and t.count("</html>") == 1
