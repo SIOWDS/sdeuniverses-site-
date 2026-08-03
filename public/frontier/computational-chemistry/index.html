@@ -35,12 +35,14 @@ ol.props>li:before{content:counter(pp);position:absolute;left:0;top:.95rem;font-
 .pf{font-size:.9rem;color:var(--text2);line-height:1.8;margin-bottom:.18rem;text-align:justify}
 .pf i{font-style:normal;display:inline-block;min-width:2.9em;color:var(--gold2);font-weight:600}
 .pf.pk{color:var(--muted)}
+.mk{display:inline-block;background:rgba(75,63,160,.12);color:#4B3FA0;border-radius:3px;padding:.02rem .34rem;margin-right:.4rem;font-size:.76rem;font-weight:700}
+.dk{display:inline-block;border:1px solid var(--border);color:var(--muted);border-radius:3px;padding:.02rem .34rem;margin-right:.4rem;font-size:.76rem;font-weight:600}
 </style></head><body>
 <div class="top"><a href="/browse/">SDE Universes</a><span class="sep">·</span><a href="/frontier/">新思想前沿</a><span class="sep">›</span><span style="color:var(--text2)">化学与材料</span></div>
 <main><!--fd2--><!--fd1-->
 <div class="kicker">新思想前沿 · 化学与材料</div>
 <h1>计算化学</h1>
-<div class="meta">近二十年 · 两次转向 ＋ 十条研究命题 · 约 5900 字 · 王德生 亲撰 · 2026 年 8 月</div>
+<div class="meta">近二十年 · 两次转向 ＋ 十条研究命题 · 约 9400 字 · 王德生 亲撰 · 2026 年 8 月</div>
 <p class="lede">这十年计算化学最要紧的转向，是原子间作用力的计算方式换了记账单位——从「每个体系单独拟合一套势」变成「一个预训练模型通吃周期表」。量子精度与经典速度之间那道几十年不动的取舍，第一次被绕过去了，同时也换来了一批新的、更隐蔽的错误来源。</p>
 <div class="era">上一个十年 · 约 2006–2016</div>
 <p class="bridge">这十年通用机器学习势横扫周期表；而它的种子是上一个十年种下的——那时人们刚刚学会用神经网络去拟合一个体系的势能面，而且几乎没人相信它能推广。</p>
@@ -106,7 +108,7 @@ ol.props>li:before{content:counter(pp);position:absolute;left:0;top:.95rem;font-
 <h2>※ 往下五年看什么</h2>
 <p>其一，实验验证率能否被系统统计：从计算预测到实际合成成功的比例，是这门学科二十年来最缺的一个数字。其二，自动实验闭环——把模型预测、机器人合成与表征接成一条自我迭代的回路，若在真实材料体系上跑通一轮完整闭环，研发节奏会被重写。其三，激发态与强关联体系：这是通用势与密度泛函共同的薄弱区，也是光催化、光伏与磁性材料的核心区，谁先在这里拿出可信精度，谁就定义下一个十年。</p>
 <h2 id="programme">※ 十条可做的研究命题</h2>
-<div class="hypbox"><b>以下不是结论，是假说。</b>上文写的是已经发生的事；这一节另行提出十条可证伪的研究命题，每条自带否证条件。共用的研究规程、检验纪律与三十条生成轴，见<a href="/frontier/programme/">研究纲领方法说明</a>。<br><span class="slot">研究单位</span>电子结构、分子构象、反应路径与材料配置 ＋ 近似、采样、能量评估和跨尺度传递 ＋ 训练分布、计算预算、实验噪声与物理约束构成的计算环境，合为一个共同演化的动态单元<br><span class="slot">三轴指标</span>不确定性诚实度 · 外推半径 · 解释可迁移性<br><span class="slot">可用方法</span>量子化学、增强采样和主动学习<br><span class="slot">实质标准</span>建立能知道自己何时不知道的化学计算体系<br><span class="slot">已排除</span>跨元素周期表的通用预训练原子间势——上文已完成的主叙事，不重复</div>
+<div class="hypbox"><b>以下不是结论，是假说。</b>上文写的是已经发生的事；这一节另行提出十条可证伪的研究命题，每条自带否证条件。共用的研究规程、检验纪律与三十条生成轴，见<a href="/frontier/programme/">研究纲领方法说明</a>。<br><span class="slot">研究单位</span>电子结构、分子构象、反应路径与材料配置 ＋ 近似、采样、能量评估和跨尺度传递 ＋ 训练分布、计算预算、实验噪声与物理约束构成的计算环境，合为一个共同演化的动态单元<br><span class="slot">三轴指标</span>不确定性诚实度 · 外推半径 · 解释可迁移性<br><span class="slot">可用方法</span>量子化学、增强采样和主动学习<br><span class="slot">实质标准</span>建立能知道自己何时不知道的化学计算体系<br><span class="slot">已排除</span>跨元素周期表的通用预训练原子间势——上文已完成的主叙事，不重复<br><span class="slot">本组状态</span><span class="dk">初稿</span>四格仍是跨领域通用表述，尚未落到本学科的具体判据；改写标准与已完成的样板见<a href="/frontier/programme/#localize">研究纲领方法说明</a>。</div>
 <ol class="props">
 <li><div class="pt"><span class="ax">生成语法</span>生成电子结构、分子构象、反应路径与材料配置多样形态的最小规则</div><div class="pf"><i>预测</i>少量局部规则能够生成多个看似分离的现象，并对未见形态给出新预测。</div><div class="pf"><i>机制</i>少量局部规则通过迭代、约束和环境选择，可能生成看似互不相关的宏观形态。</div><div class="pf"><i>做法</i>以最小规则生成多类观测，并用未参与建模的新形态检验其覆盖与失败边界。</div><div class="pf pk"><i>否证</i>若规则只能复现训练案例或需要大量例外补丁，生成解释失败。</div></li>
 <li><div class="pt"><span class="ax">解释误差</span>预测正确但关于近似、采样、能量评估和跨尺度传递的机制故事错误</div><div class="pf"><i>预测</i>两个预测同样准确的模型，在定向干预后会给出不同结果，从而暴露机制解释的真假。</div><div class="pf"><i>机制</i>高预测精度可以由替代变量和偶然相关获得，错误解释会在干预时暴露。</div><div class="pf"><i>做法</i>在预测相近的模型之间实施针对性干预，比较其机制预言和实际响应。</div><div class="pf pk"><i>否证</i>若解释差异从不影响行动后果，解释误差的实践价值有限。</div></li>
