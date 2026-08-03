@@ -23,12 +23,27 @@ p{margin:0 0 1.1rem;text-align:justify}
 
 .era{margin:26px 0 6px;padding:7px 0 6px;border-top:1px solid var(--border);border-bottom:1px solid var(--border);font-size:.78rem;letter-spacing:.14em;color:var(--gold2);font-weight:600}
 .bridge{font-size:.92rem;color:var(--text2);line-height:1.95;margin:12px 0 4px}
+
+.hypbox{background:var(--card);border:1px solid var(--border);border-left:3px solid var(--gold2);padding:.9rem 1.1rem;font-size:.9rem;line-height:1.95;margin:0 0 1.3rem}
+.hypbox a{color:var(--gold)}
+.slot{display:inline-block;min-width:5.4em;color:var(--gold2);font-weight:600}
+ol.props{margin:0;padding:0;list-style:none;counter-reset:pp}
+ol.props>li{counter-increment:pp;position:relative;padding:.85rem 0 .85rem 2.1rem;border-top:1px solid var(--border)}
+ol.props>li:before{content:counter(pp);position:absolute;left:0;top:.95rem;font-size:.82rem;color:var(--muted);font-weight:600}
+.pt{font-weight:600;margin-bottom:.35rem;text-align:justify}
+.ax{display:inline-block;background:rgba(138,104,23,.10);color:var(--gold);border-radius:3px;padding:.05rem .45rem;margin-right:.45rem;font-size:.8rem;font-weight:600}
+.pf{font-size:.9rem;color:var(--text2);line-height:1.8;margin-bottom:.18rem;text-align:justify}
+.pf i{font-style:normal;display:inline-block;min-width:2.9em;color:var(--gold2);font-weight:600}
+.pf.pk{color:var(--muted)}
+.mk{display:inline-block;background:rgba(75,63,160,.12);color:#4B3FA0;border-radius:3px;padding:.02rem .34rem;margin-right:.4rem;font-size:.76rem;font-weight:700}
+.dk{display:inline-block;border:1px solid var(--border);color:var(--muted);border-radius:3px;padding:.02rem .34rem;margin-right:.4rem;font-size:.76rem;font-weight:600}
+
 </style></head><body>
 <div class="top"><a href="/browse/">SDE Universes</a><span class="sep">·</span><a href="/frontier/">新思想前沿</a><span class="sep">›</span><span style="color:var(--text2)">计算与人工智能</span></div>
 <main><!--fd2--><!--fd1-->
 <div class="kicker">新思想前沿 · 计算与人工智能</div>
 <h1>机器人学</h1>
-<div class="meta">近二十年 · 两次转向 · 约 4300 字 · 王德生 亲撰 · 2026 年 8 月</div>
+<div class="meta">近二十年 · 两次转向 ＋ 十条研究命题 · 约 6200 字 · 王德生 亲撰 · 2026 年 8 月</div>
 <p class="lede">这十年机器人学最要紧的转向，是控制策略的来源变了。传统路线是建模：写出动力学方程、做状态估计、规划轨迹、设计控制器，每换一个任务重来一遍。这十年的主流路线是学：把多台不同形态机器人的遥操作数据汇成一个池子，在视觉—语言预训练的底座上训练一个直接输出动作的模型。架构之争已经基本结束，而新的瓶颈完全不同——文本可以从互联网上爬，机器人动作数据必须一条条做出来。</p>
 <div class="era">上一个十年 · 约 2006–2016</div>
 <p class="bridge">这十年机器人的策略从建出来变成学出来；而在上一个十年，建模路线正走到它的顶峰——也正是在那时，它的边界被一次次公开的失败标了出来。</p>
@@ -98,6 +113,20 @@ p{margin:0 0 1.1rem;text-align:justify}
 <p>第二场争论关于仿真到现实的路径。一派认为仿真加域随机化可以无限扩大数据量，是唯一可扩展的路线；另一派坚持真实数据不可替代，因为接触动力学与材料属性的建模误差无法靠随机化覆盖。这一场正在被经验回答——在刚性抓取上仿真效果良好，在柔性物体与精密装配上仍需真实数据，边界正逐步清晰。</p>
 <h2>※ 往下五年看什么</h2>
 <p>其一，真实部署数量与任务复杂度：从结构化仓储走向非结构化环境，是判断能力真实提升的唯一标准。其二，公开数据集的规模与多样性能否再涨一个数量级——这是决定通用模型路线成败的直接变量。其三，安全标准与人机共处规范：一旦机器人进入非隔离的工作与生活空间，认证要求会成为比技术更硬的约束，而目前这套标准几乎还是空白。</p>
+<h2 id="programme">※ 十条可做的研究命题</h2>
+<div class="hypbox"><b>以下不是结论，是假说。</b>上文写的是已经发生的事；这一节另行提出十条可证伪的研究命题，每条自带否证条件。共用的研究规程、检验纪律与三十条生成轴，见<a href="/frontier/programme/">研究纲领方法说明</a>。<br><span class="slot">研究单位</span>机器人身体、技能、传感、控制与环境对象 ＋ 感知、规划、接触、学习和维护 ＋ 真实物理、他人行动、设备磨损与组织流程构成的机器人环境，合为一个共同演化的动态单元<br><span class="slot">三轴指标</span>技能迁移率 · 接触安全余量 · 维护认知度<br><span class="slot">可用方法</span>长时部署、跨本体训练和故障注入<br><span class="slot">实质标准</span>建立能在开放现场持续学习且知道何时停手的机器人<br><span class="slot">已排除</span>从控制转向跨本体视觉-语言-动作学习，行动数据瓶颈——上文已完成的主叙事，不重复<br><span class="slot">本组状态</span><span class="dk">初稿</span>四格仍是跨领域通用表述，尚未落到本学科的具体判据；改写标准与已完成的样板见<a href="/frontier/programme/#localize">研究纲领方法说明</a>。</div>
+<ol class="props">
+<li><div class="pt"><span class="ax">迁移合同</span>维护认知度跨场景使用所需保持的最小条件</div><div class="pf"><i>预测</i>跨场景失败可由少数条件的破坏解释；一旦这些条件被显式恢复，维护认知度将明显回升。</div><div class="pf"><i>机制</i>迁移失败往往不是效应不存在，而是关键机制、测量口径或主体结构已改变。</div><div class="pf"><i>做法</i>列出必要条件、可变条件和禁用条件，在多场景中逐项破坏并观察失效次序。</div><div class="pf pk"><i>否证</i>若模型在条件大幅改变后仍稳定工作，合同可被进一步压缩。</div></li>
+<li><div class="pt"><span class="ax">认知-制度双循环</span>机器人学中的判断变化与规则变化如何互相塑造</div><div class="pf"><i>预测</i>只改变个体认知或只改变规则都难以稳定改善维护认知度，双环同步干预才会产生持久效果。</div><div class="pf"><i>机制</i>制度塑造可见信息和激励，个体适应后又通过选择、服从或抵抗改写制度。</div><div class="pf"><i>做法</i>同步记录观念、行为与规则，分别干预信息和制度，比较单环与双环模型。</div><div class="pf pk"><i>否证</i>若制度变量与个体变化长期独立，则双循环不成立。</div></li>
+<li><div class="pt"><span class="ax">跨尺度回写</span>接触安全余量如何在局部与整体之间双向回写</div><div class="pf"><i>预测</i>局部改善只有在整体结构允许时才会转化为维护认知度，高层约束还能反向改变局部响应。</div><div class="pf"><i>机制</i>反馈会产生锁定、补偿和突变，使微观因果在不同宏观结构中不再保持。</div><div class="pf"><i>做法</i>在至少两个尺度同步测量并施加双向干预，比较只建单向模型与双向模型的预测差异。</div><div class="pf pk"><i>否证</i>若加入高层回写后不能改善预测或干预设计，则应回到单向机制。</div></li>
+<li><div class="pt"><span class="ax">冗余智能</span>多条可替代路径如何提高技能迁移率</div><div class="pf"><i>预测</i>正常情境下效率略低的冗余系统，会在扰动后以更快恢复速度换回更高技能迁移率。</div><div class="pf"><i>机制</i>过度优化会删除看似闲置的路径，使小故障迅速变成全局崩溃。</div><div class="pf"><i>做法</i>在正常与扰动场景下比较极简系统与保留冗余系统的总成本、恢复速度和误判率。</div><div class="pf pk"><i>否证</i>若冗余长期只增加成本且不改善恢复，便应缩减而非美化。</div></li>
+<li><div class="pt"><span class="ax">成本曲率</span>实现“建立能在开放现场持续学习且知道何时停手的机器人”时从小规模到大规模的成本弯折</div><div class="pf"><i>预测</i>小规模近似线性的成本会在协调、验证或维护阈值后陡增，从而解释推广失效。</div><div class="pf"><i>机制</i>许多方案在小规模近似线性，越过协调、验证或维护阈值后成本陡升。</div><div class="pf"><i>做法</i>在多个规模点测量边际成本、故障率与协作负担，识别曲率转折和饱和区。</div><div class="pf pk"><i>否证</i>若成本始终近似线性，曲率分析不会改变决策。</div></li>
+<li><div class="pt"><span class="ax">稀缺转移</span>当“建立能在开放现场持续学习且知道何时停手的机器人”初步实现后，瓶颈向何处迁移</div><div class="pf"><i>预测</i>旧瓶颈被解除后，进步速度不会按能力同比增长，限制将转移到验证、维护、协调或信任环节。</div><div class="pf"><i>机制</i>系统会围绕新瓶颈重组，旧指标继续增长却不再代表真实进步。</div><div class="pf"><i>做法</i>追踪一次能力跃迁前后各环节的排队时间、边际成本与失败来源，定位稀缺迁移路径。</div><div class="pf pk"><i>否证</i>若原瓶颈解除后系统吞吐按比例持续增长而无新约束，稀缺转移假说不成立。</div></li>
+<li><div class="pt"><span class="ax">极端压力学</span>感知、规划、接触、学习和维护在复合极端条件下的失效与恢复</div><div class="pf"><i>预测</i>多个中等冲击同步出现时，会产生单因素测试无法预见的级联失效与相变。</div><div class="pf"><i>机制</i>真实崩溃常由多个中等冲击同步叠加，单因素稳健不等于系统稳健。</div><div class="pf"><i>做法</i>构造复合压力矩阵与逐级故障注入，记录相变点、级联路径和恢复窗口。</div><div class="pf pk"><i>否证</i>若极端测试只制造不现实噪声且不提高真实风险识别，应降低其权重。</div></li>
+<li><div class="pt"><span class="ax">退出机制</span>机器人学干预或研究路线失败后的暂停、迁移与善后</div><div class="pf"><i>预测</i>预先演练退出的方案即使初始效率略低，也会在失败时显著减少不可逆损害和恢复时间。</div><div class="pf"><i>机制</i>没有退出通道的成功会制造锁定、依赖和责任空洞，风险被延后而非消失。</div><div class="pf"><i>做法</i>在上线前演练停止、数据迁移、角色替换和损失分摊，记录恢复时间与不可逆损害。</div><div class="pf pk"><i>否证</i>若系统天然可替代且退出几乎无成本，则专门机制可保持轻量。</div></li>
+<li><div class="pt"><span class="ax">协同主体</span>长时部署、跨本体训练与研究共同体构成的协同主体</div><div class="pf"><i>预测</i>保持个体能力不变，只改变权限、通信和否决结构，就会显著改变维护认知度与错误传播。</div><div class="pf"><i>机制</i>成果常来自分工、互补和纠错拓扑，个体能力相同但连接方式不同会产生巨大差异。</div><div class="pf"><i>做法</i>保持成员能力近似不变，只改变通信、权限、记忆和否决结构，测量系统级产出。</div><div class="pf pk"><i>否证</i>若连接结构变化对结果无影响，则协同主体不是必要解释。</div></li>
+<li><div class="pt"><span class="ax">反脆弱学习</span>可控小失败如何提升技能迁移率</div><div class="pf"><i>预测</i>安全范围内的小扰动若被完整回写，将提升下一轮的技能迁移率；缺少回写则只会累积损害。</div><div class="pf"><i>机制</i>可控扰动暴露薄弱环节，若有回写机制，局部损失可换来未来适应力。</div><div class="pf"><i>做法</i>设置安全范围内的周期扰动与复盘回写，对照完全保护组的长期表现。</div><div class="pf pk"><i>否证</i>若扰动只累积损害而没有可测升级，则反脆弱叙事应被拒绝。</div></li>
+</ol>
 <div class="end"><b>新思想前沿</b> 是一个持续撰写的专栏：近二十年，各主要领域的两次思想转向——上一个十年一次、这十年一次，共 100 个学科面板，由王德生亲撰，现已全部完成。 · <a href="/frontier/" style="color:var(--gold);text-decoration:none">← 回到 100 学科面板</a></div>
 </main><script src="/wds-mode.js?v=20260802b" defer></script>
 </body></html>
