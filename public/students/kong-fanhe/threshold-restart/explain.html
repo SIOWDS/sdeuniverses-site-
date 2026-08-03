@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>门上的那个缓冲器坏了，门就只会砰地一声 · 白话解释文 | SDE Universes</title>
+<meta name="description" content="几十年的研究反复得出同一个结论：流派互不相容的各种心理治疗，总体有效率却差不多。母文不满足于把它归为共同因子，而是追问更下面的一层：这些方法到底触动了人身上的什么。它的回答是——痛苦的根源不是想法错了，而是刺激与反应之间那道能让人缓一缓的间隙被击穿了；而有效治疗真正在做的事，是一微米一微米地把那道间">
+<meta property="og:type" content="article">
+<meta property="og:title" content="门上的那个缓冲器坏了，门就只会砰地一声 · 白话解释文">
+<meta property="og:description" content="几十年的研究反复得出同一个结论：流派互不相容的各种心理治疗，总体有效率却差不多。母文不满足于把它归为共同因子，而是追问更下面的一层：这些方法到底触动了人身上的什么。它的回答是——痛苦的根源不是想法错了，而是刺激与反应之间那道能让人缓一缓的间隙被击穿了；而有效治疗真正在做的事，是一微米一微米地把那道间">
+<link rel="canonical" href="https://sdeuniverses.com/students/kong-fanhe/threshold-restart/explain.html">
+<style>
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:#FBF8F1;color:#2B2620;
+ font-family:"Noto Serif SC","Songti SC","Source Han Serif SC",Georgia,serif;
+ font-size:17px;line-height:1.95;letter-spacing:.01em}
+.wrap{max-width:760px;margin:0 auto;padding:0 22px}
+nav.cnav{background:#2B2620;color:#EDE4CF;position:sticky;top:0;z-index:30;
+ font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif}
+nav.cnav .wrap{display:flex;align-items:center;justify-content:space-between;gap:14px;height:50px}
+nav.cnav a{color:#EDE4CF;text-decoration:none;font-size:14px}
+nav.cnav .cnav-logo{font-weight:700;letter-spacing:.06em}
+nav.cnav .cnav-back{opacity:.82}
+nav.cnav .cnav-back:hover{opacity:1}
+header.art{background:linear-gradient(180deg,#FFFDF8 0%,#F5EFE2 100%);
+ border-bottom:1px solid rgba(43,38,32,.10);padding:44px 0 34px}
+.art-eyebrow{font-size:12.5px;letter-spacing:.16em;color:#A8813C;font-weight:700;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;margin-bottom:16px}
+h1.art-title{font-size:33px;line-height:1.4;margin:0 0 14px;font-weight:800}
+.art-subtitle{font-size:17px;color:#5C5346;line-height:1.7;margin-bottom:16px}
+.art-meta{font-size:13px;color:#8A8071;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif}
+.swap{display:flex;flex-wrap:wrap;gap:10px;margin:22px auto 0}
+.swap a{flex:1 1 240px;display:block;text-decoration:none;padding:12px 15px;border-radius:9px;
+ border:1px solid rgba(43,38,32,.16);background:#fff;color:#2B2620;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;font-size:14px;line-height:1.6}
+.swap a b{display:block;font-size:14.5px;margin-bottom:2px}
+.swap a span{color:#8A8071;font-size:12.5px}
+.swap a:hover{border-color:#A8813C;box-shadow:0 2px 10px rgba(43,38,32,.07)}
+article{padding:30px 0 10px}
+.abs{background:#FBF6EA;border-left:4px solid #A8813C;border-radius:0 8px 8px 0;
+ padding:18px 20px;margin:0 0 26px;font-size:15.5px;line-height:1.85;color:#4A4238}
+.abs b{color:#8C6A3A}
+.toc{border:1px solid rgba(43,38,32,.13);border-radius:9px;padding:16px 20px;margin:0 0 34px;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;font-size:14.5px;background:#FFFDF8}
+.toc .tl{font-size:12.5px;letter-spacing:.14em;color:#A8813C;font-weight:700;margin-bottom:10px}
+.toc ol{margin:0;padding-left:20px;color:#5C5346}
+.toc li{margin:5px 0}
+.toc a{color:#4A4238;text-decoration:none}
+.toc a:hover{color:#A8813C;text-decoration:underline}
+h2{font-size:22px;line-height:1.5;margin:44px 0 16px;padding-top:8px;font-weight:800;
+ border-top:1px solid rgba(43,38,32,.10)}
+h2 .no{display:inline-block;min-width:1.9em;color:#A8813C;font-size:16px;font-weight:700;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif}
+p{margin:0 0 17px;text-align:justify}
+p b,li b{color:#8C6A3A}
+ul.pts{margin:0 0 18px;padding-left:0;list-style:none}
+ul.pts li{position:relative;padding-left:20px;margin:0 0 10px;text-align:justify}
+ul.pts li:before{content:"—";position:absolute;left:0;color:#A8813C}
+blockquote{margin:0 0 20px;padding:14px 18px;background:#FFFDF8;
+ border-left:3px solid rgba(43,38,32,.22);color:#4A4238;font-size:16px}
+.endbox{margin:48px 0 10px;padding:22px;border-radius:10px;background:#FBF6EA;
+ border:1px solid rgba(43,38,32,.12)}
+.endbox .et{font-size:12.5px;letter-spacing:.14em;color:#A8813C;font-weight:700;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;margin-bottom:12px}
+.endbox a{color:#8C6A3A}
+footer{margin-top:46px;padding:26px 0 40px;border-top:1px solid rgba(43,38,32,.12);
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;font-size:13px;color:#8A8071}
+footer a{color:#8A8071}
+@media(max-width:640px){body{font-size:16px}h1.art-title{font-size:26px}h2{font-size:19.5px}}
+</style>
+</head>
+<body>
+<nav class="cnav"><div class="wrap">
+  <a class="cnav-logo" href="/browse/">SDE Universes</a>
+  <a class="cnav-back" href="/students/kong-fanhe/threshold-restart/">← 回母文《重启阈限》</a>
+</div></nav>
+
+<header class="art"><div class="wrap">
+  <div class="art-eyebrow">配套读物 · 白话解释文 · 母文《重启阈限》</div>
+  <h1 class="art-title">门上的那个缓冲器坏了，门就只会砰地一声</h1>
+  <div class="art-subtitle">减震器、齿轮之间的游隙、吵架时的那半秒——不用一个术语，把《重启阈限》讲一遍</div>
+  <div class="art-meta">SDE Universes · 配套读物 · 2026年8月 · 约 4887 字</div>
+  <div class="swap">
+    <a href="/students/kong-fanhe/threshold-restart/"><b>← 母文 · 重启阈限</b><span>完整论证在这里</span></a>
+    <a href="/students/kong-fanhe/threshold-restart/practice.html"><b>🛠 技术与方法实践文 · 一微米一微米地撑开：阈限重启的临床工序</b><span>把母文的判断落成可上手的步骤、判据与检查表</span></a>
+  </div>
+</div></header>
+
+<article class="wrap">
+<div class="abs"><b>这一篇是什么</b>　几十年的研究反复得出同一个结论：流派互不相容的各种心理治疗，总体有效率却差不多。母文不满足于把它归为共同因子，而是追问更下面的一层：这些方法到底触动了人身上的什么。它的回答是——痛苦的根源不是想法错了，而是刺激与反应之间那道能让人缓一缓的间隙被击穿了；而有效治疗真正在做的事，是一微米一微米地把那道间隙重新撑开。这一篇用闭门器、减震器、齿轮的游隙、吵架时的那半秒，把这个判断讲清楚。<br><br><b>读法</b>　这一篇写给：读母文时被术语挡在门外、但想真正弄懂它在说什么的人。全篇不假设你读过任何理论书，也不要求你记住任何术语。</div>
+<div class="toc"><div class="tl">目 录</div><ol><li><a href="#s1">先说那个被追问的老问题</a></li><li><a href="#s2">门上的那个闭门器</a></li><li><a href="#s3">吵架时的那半秒</a></li><li><a href="#s4">齿轮之间必须有一点空隙</a></li><li><a href="#s5">它是怎么被击穿的</a></li><li><a href="#s6">那治疗到底在做什么</a></li><li><a href="#s7">为什么各家都能有效</a></li><li><a href="#s8">共情、信任这些东西，为什么有时没用</a></li><li><a href="#s9">它跟那些近邻差在哪</a></li><li><a href="#s10">那有一句流传很广的话呢</a></li><li><a href="#s11">这套说法自己的边界</a></li><li><a href="#s12">收尾：不是懂了，是能停了</a></li></ol></div>
+<h2 id="s1"><span class="no">01</span>先说那个被追问的老问题</h2>
+<p>心理治疗领域有一个尴尬的事实：拿抑郁、焦虑这些常见困扰来比，精神分析、认知行为、人本主义、家庭治疗，各家的总体有效率差别很小。这个结果几十年反复出现，几乎无法回避。它之所以尴尬，是因为这些流派对人的看法互不相容，甚至互相视对方为错误。一个说问题出在不合理的信念上，一个说问题出在早年关系里，一个说问题出在没有被真正听见。前提彼此矛盾，结果却差不多，那么起作用的显然不是各自的前提。通常的解释是共同因子：不管哪一派，都提供了关系、期待、解释框架、一个稳定的仪式。这个答案没有错，但它只是把有效的方法有哪些共同点列了出来，没有回答一个更下面的问题——这些共同点到底触动了人身上的什么，又是怎么触动的。母文要接的就是这一步。它的做法是先不谈治疗，先把痛苦本身重新描述一遍。</p>
+<p>还有一个细节让这个问题更尖锐：不同流派内部对为什么有效的解释，与实际起效的环节常常对不上。研究里反复出现这样的结果——某个流派认为最关键的那个技术成分被拿掉之后，效果并没有明显下降。这说明各家对自己的解释也未必准，真正干活的东西藏在更下面。</p>
+<h2 id="s2"><span class="no">02</span>门上的那个闭门器</h2>
+<p>先看一个日常物件：装在门上的液压缓冲器。它不控制门开还是关，也不决定门往哪边转，它只做一件事——让门在被推动之后，不至于立刻砰地撞上门框。它给出的是一小段时间。这个小东西一旦坏了，门本身完好无损，门框也完好，铰链也没问题，可每一次开合都会变成一次撞击。你会发现整栋楼的动静都变了：人们开始小心翼翼地扶着门，或者干脆躲着那扇门走。母文说的，就是人身上有一个类似的东西。它不决定你怎么想，不决定你的性格，不决定你有什么信念。它只提供一小段时间——在一件事打过来和你做出反应之间的那一小段。有了它，你可以缓一下、怀疑一下、暂时不作数、先放一放。它坏掉之后，人本身没有坏。你的智力、能力、判断力全都在。只是从此以后，每一次外面的动静都会直接变成里面的反应，中间不再有那一小段。</p>
+<p>这个比方还能说清一件常被误会的事：缓冲器坏了不等于门有问题。旁人看到的只是这扇门总是砰砰响，于是会得出结论说这门质量不行、这人脾气不好。而实际坏掉的是一个很小的、几乎没人注意的部件。把人误当成门，是这类痛苦最常遭遇的误解。</p>
+<h2 id="s3"><span class="no">03</span>吵架时的那半秒</h2>
+<p>把它说得更具体一点。两个人吵架，一句话过来，你有两种可能。一种是那句话落地之后，你心里有半秒的空当——在这半秒里你能感觉到自己被刺到了，也能感觉到自己正准备回一句更狠的，然后你可以选择回或不回。另一种是没有这半秒：话音未落，回击已经出去了，等你反应过来，事情已经发生了。这半秒不是修养，也不是情商，更不是有没有道理。有道理的人也可能没有这半秒，而一个说不出什么大道理的人可能有。它跟内容无关，只跟有没有那点余地有关。很多人在治疗里最想要的，其实就是这半秒。他们能把自己的问题分析得非常清楚——为什么会这样、来自哪里、道理上应该怎么办——但那些清楚在事情发生的当下一点用都没有，因为道理是需要时间才能被调用的，而他没有时间。母文的判断就落在这里：不是想法错了，是没有时间去用那些想法。</p>
+<p>再补一个更日常的版本：被领导当众指出错误的那一刻。有半秒的人，可以先感觉到脸发烫，再决定是当场解释还是会后再说；没有半秒的人，解释已经出口了，而且往往是那种事后自己都后悔的语气。两个人对这件事的看法可能完全一样，差别只在那半秒。</p>
+<h2 id="s4"><span class="no">04</span>齿轮之间必须有一点空隙</h2>
+<p>第三个比方来自机械。两个咬合的齿轮之间必须留一点空隙，行话叫游隙。这个空隙看起来是不精确、是缺陷，可如果把它做成零，两个齿轮会立刻卡死或者烧毁。空隙不是精度不够留下的余量，它是让整台机器能转起来的必要条件。人的心理也是这样。一个对外界信号毫无缓冲、完全即时响应的系统，听上去很敏锐，实际上会立刻锁死。它没有出错的余地，也没有修正的余地——因为修正需要在动作发生之前有一点时间。所以母文说，那道间隙给出的不是舒适，是一种最基本的自由：不必立即反应的自由。这个说法很朴素，但它把很多现象串了起来。一个人为什么会陷在同一种反应里出不来？不是因为他不知道那样不好，是因为在那个当口，他没有别的可能——反应是自动发出的，中间没有可以插进去的地方。</p>
+<p>这个比方还有一层值得留意：游隙太大也不行，齿轮会打滑、会晃。所以要恢复的不是无限的余地，而是一个合适的量——足够让人不必立即反应，又不至于让人对什么都无动于衷。母文强调的是重新撑开，不是撑到最大，这个分寸在后面的实践里非常要紧。</p>
+<h2 id="s5"><span class="no">05</span>它是怎么被击穿的</h2>
+<p>母文给出的图景是这样的：一次足够重的冲击（不一定是巨大的灾难，也可能是长期反复的小冲击），会把那道间隙压扁甚至压到零。此后，某一类信号一出现，反应就直接发出——不经过判断，不经过怀疑，也不经过我要不要这样。更麻烦的是，这套反应会自己维持自己。因为反应太快，它带来的后果又会印证原来的判断：你一被误解就立刻反击，于是关系变糟，关系变糟就更印证了别人确实靠不住。这个圈转起来之后不需要外力，它自己就能一直转。所以问题不能被描述为这个人的观念错了。他的观念可能确实偏，但那是这个圈的产物，不是它的原因。你去纠正观念，就像去纠正一扇门撞得太响——你可以贴一层软垫，但只要那个缓冲器还是坏的，砰的一声总会回来。这也是为什么很多人做了大量的自我分析、读了很多书、把道理讲得比谁都透，却一点没变。他们修的一直是门板，而坏的是那个小小的缓冲器。</p>
+<p>还要说清一件容易被误读的事：击穿不一定来自一次大事。长期反复的小冲击同样能把那道间隙一点点压平——比如一个孩子每次表达需要都被否定，几百次之后，需要一冒头，退缩就自动出来了。所以有些人找不出任何创伤事件，却同样没有那半秒。</p>
+<h2 id="s6"><span class="no">06</span>那治疗到底在做什么</h2>
+<p>按这个思路，有效治疗的根本动作就不是给一个更好的解释，而是把那道间隙重新撑开——而且是一微米一微米地撑。具体怎么撑？母文的说法很实在：在那道间隙刚好够不到的地方，由治疗师用稳定的在场和具体的回应，制造一个个很小的中断与停顿。比如在对方那套自动反应正要发出的一瞬间，插进一句不带评判的、指向当下的话，让那个动作卡住半秒。这半秒里什么也没解决，但对方第一次体验到：原来这里可以停一下。这样的半秒需要发生几十次、上百次。它们单独看每一次都微不足道，连当事人自己都不会记住，可累积起来，那道间隙就一点点回来了。关键是那句话：改变就发生在那一刻，而不是后来。不是治疗师说了一句金句让人醍醐灌顶，然后回去照做；是在那半秒被撑开的当下，事情就已经不同了。</p>
+<p>这里有一个对来访者很有用的推论：不必期待某一次谈话带来顿悟。真正在起作用的，是那些当时看起来什么也没发生的时刻。如果你在治疗后觉得今天好像没谈出什么，那未必是浪费——很多时候，那正是这项工作最典型的样子。</p>
+<h2 id="s7"><span class="no">07</span>为什么各家都能有效</h2>
+<p>现在回到那个老问题。母文的答案是：各流派都有效，是因为它们其实都在做同一件事，只是从不同的门进去。认知那一派从想法入手：把自动冒出来的念头拿出来写在纸上、逐条检验。这个动作真正的功效未必是纠正了错误，而是在念头和反应之间硬生生插进了一道程序——写下来、看一看、想一想，这本身就是时间。关系那一派从互动入手：在治疗关系里反复出现的紧张时刻，被慢下来、被谈论、被一起看。慢下来本身就是在撑那道间隙。人本那一派从内部体验入手：让人把说不清的感觉一点点说出来，而说出来这件事必然需要停留，停留就是间隙。三条路完全不同，做的却是同一件事。这就解释了为什么前提互相矛盾却效果相当——起作用的不是各自的前提，是三条路都必须经过的那个动作。</p>
+<p>这也给选流派这件事一个更实际的建议：与其纠结哪一派更科学，不如看哪一种方式让你能待得住。因为三条路都要靠反复停留才起作用，而一个让你极度设防的路径，你根本待不下来。适合与否，比正确与否更决定结果。</p>
+<h2 id="s8"><span class="no">08</span>共情、信任这些东西，为什么有时没用</h2>
+<p>这套判断还解决了另一个长期的困惑。共同因子的说法认为，共情、信任、期待是有效的关键。可临床上常见的情形是：有些人得到了极好的共情与稳定的关系，却几年没有变化。母文给出的解释是顺序问题：共情、信任、期待这些东西是养料，但养料要能被吸收，得先有一个可以接收它的状态。如果间隙是零，所有外来的东西都会被自动反应挡在外面——你说你理解他，他的自动反应是你在敷衍我，中间没有余地让他去斟酌你到底是不是真的理解。反过来，一旦间隙被撑开一点点，同样的一句共情就能进来了。所以不是共同因子无效，是它们的生效需要一个前置条件，而那个条件本身不是共同因子的一部分。这个说法有个很实际的推论：当一段治疗长期没有进展、而关系本身并没有问题时，方向可能不是加大共情的剂量，而是先去看那道间隙撑开了没有。</p>
+<p>这个顺序也解释了一件常被误解的事：为什么有些人对好意会有敌意反应。那不是不识好歹，是在没有余地的状态下，任何靠近都会被自动归入某个熟悉的旧类别，中间没有时间去分辨这一次是不是不一样。对助人者来说，理解这一点能省掉很多受挫感。</p>
+<h2 id="s9"><span class="no">09</span>它跟那些近邻差在哪</h2>
+<p>母文很认真地对付了几位强劲的近邻，这里只讲最能说明问题的三处。第一处，跟那种关于潜在空间的说法。那是一个很美的哲学图景——人在自己与世界之间有一片既非内也非外的地带，游戏、创造、文化都在那里发生。母文说，我讲的不是这片地带的哲学性质，而是它被压扁之后要怎么用具体动作一微米一微米撑回来。一个是关于空间是什么，一个是关于怎么修。第二处，跟那种关于容纳的说法。那个说法讲的是：一个人受不了的情绪，由另一个人接住、消化，再以可承受的形式还回去。母文说，我讲的不是替他消化，是让他自己重新长出消化前的那道缓冲。前者的成品在别人身上，后者的成品必须长在他自己身上。第三处，跟情绪调节技巧与正念训练。那些技巧确实能扩大人对情绪的耐受，但它们是可以学习的策略，需要在有余地的时候被调用。母文关心的是那个更靠前的条件——如果连半秒都没有，任何策略都来不及被想起来。这个先后顺序，是它跟这一大类方法最要紧的分界。</p>
+<p>做这些区分不是为了争地盘，而是因为它们各自指向不同的做法。如果问题是哲学性的空间缺失，出路是创造与游戏；如果是需要有人替你消化，出路是找到那个能接住的人；如果是间隙被压扁，出路是几十上百次的微小停顿。三种做法在具体动作上是不一样的。</p>
+<h2 id="s10"><span class="no">10</span>那有一句流传很广的话呢</h2>
+<p>很多人读到这里会想起一句名言：在刺激与反应之间有一个空间，在那个空间里是我们选择回应的力量。这句话和母文说的听上去几乎一样，所以必须处理。母文的态度是坦率的：这句话说得很对，但它是一句关于结果的箴言——它告诉你那个空间存在，并且鼓励你去用它。而母文要做的是相反的一段工作：解释那个空间为什么会没有、它是怎么没的、以及在它已经没有了的人身上，要靠什么具体动作把它一点点造回来。换句话说，那句名言是给还有空间的人的鼓励；母文是给没有空间的人的工程说明。对前者，念一念那句话可能真的有用；对后者，念一百遍也没有用，因为那句话本身需要空间才能被调用。分清这一点，能省掉很多不必要的自责——那种我明明知道该停一下却停不下来的自责，其实不是意志问题。</p>
+<p>顺带说一句：这类箴言之所以流传广，是因为它对已经有余地的人立刻见效——念一遍，那个空间就被启用了。而对没有余地的人，它反而会成为一种新的自我指责的来源：连这么简单的道理我都做不到。这就是箴言与机制说明的差别，也是母文坚持要做后者的理由。</p>
+<h2 id="s11"><span class="no">11</span>这套说法自己的边界</h2>
+<p>母文在结尾很明确地划了边界，这一节比任何论证都值得读。它说自己不是一套适用于一切心理痛苦的理论。有些情形需要的是稳住当下功能，有些需要的是现实层面的支持，有些需要的是药物与医疗处置——这些场合谈撑开间隙没有意义，甚至有害。它也给出了自己会错的条件：如果那种被描述为前提条件的间隙，在经验研究中显示可以完全由某种可教授的技能替代——也就是说，人可以在没有间隙的情况下靠训练直接获得相同的效果——那么这套说法的核心主张就不成立。写下这一节的意义在于，它让一个关于不可直接观察之物的说法，仍然留在可以被讨论、被检验、被推翻的范围里。对读者来说，这也是一个可以带走的习惯：以后遇到任何一套关于内心机制的说法，先问一句——它在什么情况下会承认自己错。答得出来的，值得认真读；答不出来的，可以放下。</p>
+<p>还有一处边界值得留意：这套说法讲的是机制，不是疗效承诺。理解了机制并不意味着知道对某个具体的人该怎么做，更不意味着可以自己对自己做。机制说明的价值在于让人看懂方向，而方向和路是两回事。</p>
+<h2 id="s12"><span class="no">12</span>收尾：不是懂了，是能停了</h2>
+<p>把整篇文章压成一句：治疗的关键不在于让人明白，而在于让人能停一下。明白是后来的事，而且是有了那半秒之后才可能发生的事。这也给普通读者留下了一个不需要任何专业身份就能用的观察角度：当你想帮一个正陷在某种反应里的人时，最没用的通常是讲道理——因为道理需要时间，而他现在缺的正是时间。相对有用的，是让那一刻慢下来一点：不追问、不催促、不急着给结论，就在那儿多待一会儿。你不能替他撑开那道间隙，但你的稳定和不着急，本身就是在提供那一小段时间。最后要说清楚的是：这篇文章讲的是心理治疗的机制，不是自助方法。如果你或你身边的人正被持续的痛苦困住，尤其是伴随着情绪长期低落、睡不着、对什么都提不起劲，或者有伤害自己的念头，请去找精神科医生或有资质的心理治疗师；需要的话，也可以拨打当地的心理援助热线。看懂一个机制不能代替真正的帮助，而真正的帮助是可以去找的。</p>
+<p>还有一句可以带走的话：对身边正在难受的人，最容易做也最容易被低估的一件事，是不追问。追问会占满那本就很窄的余地，而沉默地待在旁边不会。很多人以为陪伴需要说点什么，其实往往相反——需要的是不说，并且不走开。</p>
+<div class="endbox">
+  <div class="et">接下来读什么</div>
+  <p style="margin-bottom:10px">这一篇只是入口。完整的论证、边界与反驳都在母文里：<a href="/students/kong-fanhe/threshold-restart/">《重启阈限：心理治疗改变机制的发生学重判》</a>。</p>
+  <p style="margin:0">另一条路：<a href="/students/kong-fanhe/threshold-restart/practice.html">🛠 技术与方法实践文《一微米一微米地撑开：阈限重启的临床工序》</a>——把母文的判断落成可上手的步骤、判据与检查表。</p>
+</div>
+</article>
+
+<footer><div class="wrap">
+  © 2026 SDE Universes · 德麦国际 ·
+  <a href="/students/kong-fanhe/threshold-restart/">回母文</a> ·
+  <a href="/students/kong-fanhe/works/">全部作品</a> ·
+  <a href="/browse/">首页</a>
+</div></footer>
+<script src="/taste/wds-companion/wds-read.js?v=20260803a" defer></script>
+<script src="/wds-mode.js?v=20260803a" defer></script>
+</body>
+</html>
