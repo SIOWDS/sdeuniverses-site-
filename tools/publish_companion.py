@@ -7,8 +7,9 @@
 并在母文页「摘要」正下方插入两个入口按钮（不放文末）。
 
 用法：
-  python3 tools/publish_companion.py <slug>            # 生成两篇 + 插入入口
-  python3 tools/publish_companion.py <slug> --dry      # 只看不写
+  python3 tools/publish_companion.py <slug>                         # /column/ 下的母文
+  python3 tools/publish_companion.py <slug> --base students/gao-peng --byline ""
+  加 --dry 只看不写
 
 内容源：content/<slug>.explain.txt / content/<slug>.practice.txt（仓库外，见 CONTENT_DIR）
 格式：
@@ -125,8 +126,8 @@ BAR_TPL = """
 <div class="cmpn-bar">
   <div class="cmpn-t">配套读物 · 两条更好走的路</div>
   <div class="cmpn-g">
-    <a href="/column/{slug}/explain.html"><b>🌱 白话解释文 · {ex_title}</b><span>不用术语，用日常生活的类比把本文讲一遍 · 约5000字</span></a>
-    <a href="/column/{slug}/practice.html"><b>🛠 方法实践文 · {pr_title}</b><span>把本文的判断落成步骤、判据与检查表 · 约5000字</span></a>
+    <a href="/{base}/{slug}/explain.html"><b>🌱 白话解释文 · {ex_title}</b><span>不用术语，用日常生活的类比把本文讲一遍 · 约5000字</span></a>
+    <a href="/{base}/{slug}/practice.html"><b>🛠 方法实践文 · {pr_title}</b><span>把本文的判断落成步骤、判据与检查表 · 约5000字</span></a>
   </div>
 </div>
 <!-- /COMPANION-READS -->
@@ -211,7 +212,7 @@ def render_body(secs):
     return "\n".join(o)
 
 
-def render_page(slug, kind, meta, secs, mother_title, mother_short, sib_title):
+def render_page(slug, kind, meta, secs, mother_title, mother_short, sib_title, base, byline):
     k = KIND[kind]
     other = "practice" if kind == "explain" else "explain"
     ok = KIND[other]
@@ -226,27 +227,27 @@ def render_page(slug, kind, meta, secs, mother_title, mother_short, sib_title):
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{esc(meta['TITLE'])} · {k['label']} | SDE Universes</title>
 <meta name="description" content="{esc(desc)}">
-<meta name="author" content="王德生 · SDE Universes">
+<meta name="author" content="SDE Universes">
 <meta property="og:type" content="article">
 <meta property="og:title" content="{esc(meta['TITLE'])} · {k['label']}">
 <meta property="og:description" content="{esc(desc)}">
-<link rel="canonical" href="https://sdeuniverses.com/column/{slug}/{kind}.html">
+<link rel="canonical" href="https://sdeuniverses.com/{base}/{slug}/{kind}.html">
 <style>{css}</style>
 </head>
 <body>
 <nav class="cnav"><div class="wrap">
   <a class="cnav-logo" href="/browse/">SDE Universes</a>
-  <a class="cnav-back" href="/column/{slug}/">← 回母文《{esc(mother_short)}》</a>
+  <a class="cnav-back" href="/{base}/{slug}/">← 回母文《{esc(mother_short)}》</a>
 </div></nav>
 
 <header class="art"><div class="wrap">
   <div class="art-eyebrow">{k['eyebrow']} · 母文《{esc(mother_short)}》</div>
   <h1 class="art-title">{esc(meta['TITLE'])}</h1>
   <div class="art-subtitle">{inline(meta['SUB'])}</div>
-  <div class="art-meta">王德生 原著 · Claude 撰写 · SDE Universes · 2026年8月 · 约 {nchar} 字</div>
+  <div class="art-meta">{byline}SDE Universes · 2026年8月 · 约 {nchar} 字</div>
   <div class="swap">
-    <a href="/column/{slug}/"><b>← 母文 · {esc(mother_short)}</b><span>完整论证在这里</span></a>
-    <a href="/column/{slug}/{other}.html"><b>{ok['icon']} {ok['label']} · {esc(sib_title)}</b><span>{ok['hint']}</span></a>
+    <a href="/{base}/{slug}/"><b>← 母文 · {esc(mother_short)}</b><span>完整论证在这里</span></a>
+    <a href="/{base}/{slug}/{other}.html"><b>{ok['icon']} {ok['label']} · {esc(sib_title)}</b><span>{ok['hint']}</span></a>
   </div>
 </div></header>
 
@@ -256,14 +257,14 @@ def render_page(slug, kind, meta, secs, mother_title, mother_short, sib_title):
 {render_body(secs)}
 <div class="endbox">
   <div class="et">接下来读什么</div>
-  <p style="margin-bottom:10px">这一篇只是入口。真正的论证、边界与反驳，都在母文里：<a href="/column/{slug}/">《{esc(mother_title)}》</a>。</p>
-  <p style="margin:0">另一条路：<a href="/column/{slug}/{other}.html">{ok['icon']} {ok['label']}《{esc(sib_title)}》</a>——{ok['hint']}。</p>
+  <p style="margin-bottom:10px">这一篇只是入口。真正的论证、边界与反驳，都在母文里：<a href="/{base}/{slug}/">《{esc(mother_title)}》</a>。</p>
+  <p style="margin:0">另一条路：<a href="/{base}/{slug}/{other}.html">{ok['icon']} {ok['label']}《{esc(sib_title)}》</a>——{ok['hint']}。</p>
 </div>
 </article>
 
 <footer><div class="wrap">
   © 2026 SDE Universes · 德麦国际 ·
-  <a href="/column/{slug}/">回母文</a> ·
+  <a href="/{base}/{slug}/">回母文</a> ·
   <a href="/browse/">首页</a>
 </div></footer>
 <script src="/taste/wds-companion/wds-read.js?v={VER}" defer></script>
@@ -319,8 +320,8 @@ def find_anchor(h):
     return None, None
 
 
-def mother_meta(slug):
-    p = os.path.join(PUB, "column", slug, "index.html")
+def mother_meta(slug, base):
+    p = os.path.join(PUB, *base.split("/"), slug, "index.html")
     h = open(p, encoding="utf-8", errors="replace").read()
     m = re.search(r'<h1[^>]*>(.*?)</h1>', h, re.S)
     t = html.unescape(re.sub(r"<[^>]+>", "", m.group(1))).strip() if m else slug
@@ -328,10 +329,20 @@ def mother_meta(slug):
     return h, t
 
 
+def argval(flag, default):
+    if flag in sys.argv:
+        return sys.argv[sys.argv.index(flag) + 1]
+    return default
+
+
 def main():
     slug = sys.argv[1]
     dry = "--dry" in sys.argv
-    h, mtitle = mother_meta(slug)
+    base = argval("--base", "column").strip("/")
+    byline = argval("--byline", "王德生 原著 · Claude 撰写 · ")
+    if byline and not byline.endswith(" · "):
+        byline = byline + " · "
+    h, mtitle = mother_meta(slug, base)
     short = mtitle.split("：")[0].split("——")[0].strip()
     pages = {}
     for kind in ("explain", "practice"):
@@ -340,9 +351,9 @@ def main():
     for kind in ("explain", "practice"):
         meta, secs = pages[kind]
         sib = pages["practice" if kind == "explain" else "explain"][0]["TITLE"]
-        out = render_page(slug, kind, meta, secs, mtitle, short, sib)
+        out = render_page(slug, kind, meta, secs, mtitle, short, sib, base, byline)
         n = sum(len(re.findall(r"[\u4e00-\u9fff]", "".join("".join(b) for _, b in s["blocks"]))) for s in secs)
-        dst = os.path.join(PUB, "column", slug, f"{kind}.html")
+        dst = os.path.join(PUB, *base.split("/"), slug, f"{kind}.html")
         print(f"  {kind:8s} {n:5d}字  {len(secs)}节  → {dst}")
         if not dry:
             open(dst, "w", encoding="utf-8").write(out)
@@ -352,13 +363,13 @@ def main():
         return
     pos, why = find_anchor(h)
     assert pos, f"{slug}: 找不到插入锚点"
-    bar = BAR_TPL.format(style=BAR_STYLE, slug=slug,
+    bar = BAR_TPL.format(style=BAR_STYLE, slug=slug, base=base,
                          ex_title=esc(pages["explain"][0]["TITLE"]),
                          pr_title=esc(pages["practice"][0]["TITLE"]))
     new = h[:pos] + bar + h[pos:]
     print(f"  入口条插入位置：{why}（第 {h[:pos].count(chr(10))+1} 行后）")
     if not dry:
-        open(os.path.join(PUB, "column", slug, "index.html"), "w", encoding="utf-8").write(new)
+        open(os.path.join(PUB, *base.split("/"), slug, "index.html"), "w", encoding="utf-8").write(new)
 
 
 if __name__ == "__main__":

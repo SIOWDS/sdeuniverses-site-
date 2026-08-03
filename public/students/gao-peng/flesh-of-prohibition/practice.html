@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>点与坡：一套判定规则类型、修复在场缺失的规则设计操作法 · 方法实践文 | SDE Universes</title>
+<meta name="description" content="母文的判断是：禁止性规范的优先性不是立法技术的便利，而是因为「不许」的约束力最初来自说话者的身体在场；文字能搬走语义，搬不走在场，而签名、盖章、公示只是三重伪补偿。这一篇不重复论证，只给操作：点坡判定的四道题、坡的三种改造路径、三重在场的补法与它们各自的极限、必须有人到场的五个时刻、一份规则文本的体">
+<meta name="author" content="SDE Universes">
+<meta property="og:type" content="article">
+<meta property="og:title" content="点与坡：一套判定规则类型、修复在场缺失的规则设计操作法 · 方法实践文">
+<meta property="og:description" content="母文的判断是：禁止性规范的优先性不是立法技术的便利，而是因为「不许」的约束力最初来自说话者的身体在场；文字能搬走语义，搬不走在场，而签名、盖章、公示只是三重伪补偿。这一篇不重复论证，只给操作：点坡判定的四道题、坡的三种改造路径、三重在场的补法与它们各自的极限、必须有人到场的五个时刻、一份规则文本的体">
+<link rel="canonical" href="https://sdeuniverses.com/students/gao-peng/flesh-of-prohibition/practice.html">
+<style>
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:#FBF8F1;color:#2B2620;
+ font-family:"Noto Serif SC","Songti SC","Source Han Serif SC",Georgia,serif;
+ font-size:17px;line-height:1.95;letter-spacing:.01em}
+.wrap{max-width:760px;margin:0 auto;padding:0 22px}
+nav.cnav{background:#2B2620;color:#EDE4CF;position:sticky;top:0;z-index:30;
+ font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif}
+nav.cnav .wrap{display:flex;align-items:center;justify-content:space-between;gap:14px;height:50px}
+nav.cnav a{color:#EDE4CF;text-decoration:none;font-size:14px}
+nav.cnav .cnav-logo{font-weight:700;letter-spacing:.06em}
+nav.cnav .cnav-back{opacity:.82}
+nav.cnav .cnav-back:hover{opacity:1}
+header.art{background:linear-gradient(180deg,#FFFDF8 0%,#F5EFE2 100%);
+ border-bottom:1px solid rgba(43,38,32,.10);padding:44px 0 34px}
+.art-eyebrow{font-size:12.5px;letter-spacing:.16em;color:#2F5470;font-weight:700;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;margin-bottom:16px}
+h1.art-title{font-size:33px;line-height:1.4;margin:0 0 14px;font-weight:800}
+.art-subtitle{font-size:17px;color:#5C5346;line-height:1.7;margin-bottom:16px}
+.art-meta{font-size:13px;color:#8A8071;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif}
+.swap{display:flex;flex-wrap:wrap;gap:10px;margin:22px auto 0}
+.swap a{flex:1 1 240px;display:block;text-decoration:none;padding:12px 15px;border-radius:9px;
+ border:1px solid rgba(43,38,32,.16);background:#fff;color:#2B2620;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;font-size:14px;line-height:1.6}
+.swap a b{display:block;font-size:14.5px;margin-bottom:2px}
+.swap a span{color:#8A8071;font-size:12.5px}
+.swap a:hover{border-color:#2F5470;box-shadow:0 2px 10px rgba(43,38,32,.07)}
+article{padding:30px 0 10px}
+.abs{background:#EFF3F7;border-left:4px solid #2F5470;border-radius:0 8px 8px 0;
+ padding:18px 20px;margin:0 0 26px;font-size:15.5px;line-height:1.85;color:#4A4238}
+.abs b{color:#24425A}
+.toc{border:1px solid rgba(43,38,32,.13);border-radius:9px;padding:16px 20px;margin:0 0 34px;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;font-size:14.5px;background:#FFFDF8}
+.toc .tl{font-size:12.5px;letter-spacing:.14em;color:#2F5470;font-weight:700;margin-bottom:10px}
+.toc ol{margin:0;padding-left:20px;color:#5C5346}
+.toc li{margin:5px 0}
+.toc a{color:#4A4238;text-decoration:none}
+.toc a:hover{color:#2F5470;text-decoration:underline}
+h2{font-size:22px;line-height:1.5;margin:44px 0 16px;padding-top:8px;font-weight:800;
+ border-top:1px solid rgba(43,38,32,.10)}
+h2 .no{display:inline-block;min-width:1.9em;color:#2F5470;font-size:16px;font-weight:700;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif}
+p{margin:0 0 17px;text-align:justify}
+p b,li b{color:#24425A}
+ul.pts{margin:0 0 18px;padding-left:0;list-style:none}
+ul.pts li{position:relative;padding-left:20px;margin:0 0 10px;text-align:justify}
+ul.pts li:before{content:"—";position:absolute;left:0;color:#2F5470}
+blockquote{margin:0 0 20px;padding:14px 18px;background:#FFFDF8;
+ border-left:3px solid rgba(43,38,32,.22);color:#4A4238;font-size:16px}
+.endbox{margin:48px 0 10px;padding:22px;border-radius:10px;background:#EFF3F7;
+ border:1px solid rgba(43,38,32,.12)}
+.endbox .et{font-size:12.5px;letter-spacing:.14em;color:#2F5470;font-weight:700;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;margin-bottom:12px}
+.endbox a{color:#24425A}
+footer{margin-top:46px;padding:26px 0 40px;border-top:1px solid rgba(43,38,32,.12);
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;font-size:13px;color:#8A8071}
+footer a{color:#8A8071}
+@media(max-width:640px){body{font-size:16px}h1.art-title{font-size:26px}h2{font-size:19.5px}}
+</style>
+</head>
+<body>
+<nav class="cnav"><div class="wrap">
+  <a class="cnav-logo" href="/browse/">SDE Universes</a>
+  <a class="cnav-back" href="/students/gao-peng/flesh-of-prohibition/">← 回母文《禁令的肉身》</a>
+</div></nav>
+
+<header class="art"><div class="wrap">
+  <div class="art-eyebrow">配套读物 · 技术与方法实践 · 母文《禁令的肉身》</div>
+  <h1 class="art-title">点与坡：一套判定规则类型、修复在场缺失的规则设计操作法</h1>
+  <div class="art-subtitle">把母文的判断落成可执行的东西——怎么判定一条规则是点还是坡、坡该怎么改造、三重在场哪一重丢了怎么补、以及哪几个时刻文件绝对不够。</div>
+  <div class="art-meta">SDE Universes · 2026年8月 · 约 4736 字</div>
+  <div class="swap">
+    <a href="/students/gao-peng/flesh-of-prohibition/"><b>← 母文 · 禁令的肉身</b><span>完整论证在这里</span></a>
+    <a href="/students/gao-peng/flesh-of-prohibition/explain.html"><b>🌱 白话解释文 · 妈妈说「不许碰」的时候，她的手在你手腕上</b><span>用日常生活的类比，把母文讲成人人能懂的话</span></a>
+  </div>
+</div></header>
+
+<article class="wrap">
+<div class="abs"><b>这一篇是什么</b>　母文的判断是：禁止性规范的优先性不是立法技术的便利，而是因为「不许」的约束力最初来自说话者的身体在场；文字能搬走语义，搬不走在场，而签名、盖章、公示只是三重伪补偿。这一篇不重复论证，只给操作：点坡判定的四道题、坡的三种改造路径、三重在场的补法与它们各自的极限、必须有人到场的五个时刻、一份规则文本的体检表，以及七种典型的坏写法与替代。适用于任何要写规矩的场合——法条、公司制度、班规、家规、平台规则。<br><br><b>读法</b>　这一篇写给：已经认同母文的判断、现在想把它用到自己手头工作上的人。全篇以可操作为准，不重复论证。</div>
+<div class="toc"><div class="tl">目 录</div><ol><li><a href="#s1">一、点坡判定：四道题</a></li><li><a href="#s2">二、坡的三种改造路径</a></li><li><a href="#s3">三、三重在场：诊断哪一重丢了</a></li><li><a href="#s4">四、补法与它们各自的极限</a></li><li><a href="#s5">五、必须有人到场的五个时刻</a></li><li><a href="#s6">六、一份规则文本的体检表</a></li><li><a href="#s7">七、三个完整的走查示例</a></li><li><a href="#s8">八、把这套判断用在自己身上</a></li><li><a href="#s9">九、七种典型的坏写法与替代</a></li><li><a href="#s10">十、一页纸操作卡</a></li><li><a href="#s11">十一、什么情况下这套方法不适用</a></li><li><a href="#s12">十二、三个最常被问到的问题</a></li></ol></div>
+<h2 id="s1"><span class="no">01</span>一、点坡判定：四道题</h2>
+<p>所有操作从一件事开始：把手里的每一条规则判定为点或坡。判错了，后面全错。四道题依次问，任何一道答不出就归入坡。第一道，能不能在某个时刻说「这件事我今天已经做完了」？点可以：今天我没有打断别人发言，这件事完成了。坡不行：今天我尊重了同事——尊重到什么程度算完成？这道题最灵，也最省力，建议永远第一个问。第二道，违反与遵守之间有没有中间地带？点是二值的，做了或没做，中间没有过渡。坡是连续的，从勉强及格到无可挑剔之间铺满了刻度。有刻度就是坡。第三道，判定它需不需要知道当事人的内心？点不需要——他有没有碰那个东西，看得见。坡几乎总是需要——他是不是真心关心同事，只能猜，或者靠他表现出来的样子推断。凡是需要推断内心的，一律是坡。第四道，它能不能休眠？点只在快要触碰边界的那一刻才需要被想起来，其余时间完全不占用任何心力。坡一旦被当真，就会一直在后台运行，永远关不掉。问一句：一个认真对待这条规则的人，会不会在没有任何具体事情发生时也想着它？会，就是坡。四道题的判定结果要写下来，因为后面每一步的处理方式完全不同。经验上，一份典型的制度文本里会有三到五成的条款是坡，而其中大部分本来可以被改造成点。</p>
+<h2 id="s2"><span class="no">02</span>二、坡的三种改造路径</h2>
+<p>判定为坡的条款，不是一律要删。有三条路径可选，按优先级排列。路径一，改写成点。这是首选，适用范围比多数人以为的大得多。方法是把「应当具备某种品质」翻译成「在某种具体情形下不得做某个具体动作」或「必须完成某个可验证的动作」。举例：「应当尊重同事」改成「他人发言未结束时不得打断」；「应当积极响应客户」改成「客户来件二十四小时内必须给出首次回复」；「应当关爱学生」改成「不得在全班面前评论单个学生的成绩排名」；「应当具备安全意识」改成「进入车间必须佩戴护目镜」。改写的检验很简单：改完之后重新跑一遍第一节的四道题，能全部答上就成功了。注意改写必然会损失一部分含义——原来那条坡覆盖的范围比新写的点大得多。这个损失是必须接受的，因为覆盖得广而管不住，不如覆盖得窄而真的管得住。路径二，保留为坡，但明确宣布不考核。有些东西确实无法改成点，而你又确实想说出来——比如一个团队真正在乎的东西。这时正确的做法不是删掉它，而是把它放在一个明确标注「这是我们希望的样子，不是评分项」的位置上。这一句声明必须是明文的、反复重申的，否则它会自动被读成软性考核标准，效果和硬考核几乎一样。路径三，删掉。适用于那些既改不成点、又不是真的在乎、只是因为别处都这么写而写上去的条款。判别方法：问一句「如果这条不写，会有什么具体的坏事发生」。答不出具体的坏事，就删。</p>
+<h2 id="s3"><span class="no">03</span>三、三重在场：诊断哪一重丢了</h2>
+<p>母文说「不许」的原始力量来自三样同时在场：说的人在场、被说的人在场、可能有旁观者在场。文字化之后这三样全丢了，而制度用三种伪补偿去填。诊断一条规则时，可以逐一检查这三重。第一重，说的人在场。检查：这条规则在这个组织里，有没有一个具体的人可以被指认为「是他在要求这件事」？如果所有人的答案都是「上面定的」「制度规定的」「系统里就是这样」，那么这一重完全缺失。盖章、发文机关、系统提示都属于伪补偿——章是机构的，机构没有脸。第二重，被说的人在场。检查：这条规则被施加到某个具体的人身上时，有没有一个针对他本人的时刻？群发通知、全员培训、系统弹窗都不算——它们是对所有人说的，而对所有人说等于没对谁说。签字属于伪补偿：一个人一天签二十份文件，和一份都没签过，在身体上没有区别。第三重，有人看着。检查：这条规则被援引的时候，是不是一件公开发生的事？公示、上网公布属于伪补偿——公示的对象是全体，全体等于没有人；没有一个具体的人是因为看着你，才让这件事变得沉重的。三重全缺的规则，就是那种「写得完美、人人知道、从来不起作用」的条款。诊断产出是一句话：这条规则缺的是哪一重，以及能不能补。</p>
+<h2 id="s4"><span class="no">04</span>四、补法与它们各自的极限</h2>
+<p>第一重的补法：给规则找一个人。不是找一个负责人来担责，而是让这条规则有一张脸——在传达时由某个具体的人用自己的话说一遍，说明他为什么在乎这件事。这件事的成本极低，效果极大，而绝大多数组织从来不做，因为它显得不够正式。极限：这一重的补法依赖那个人自己是否真的在乎。让一个不在乎的人去念一段稿子，效果比不补更差——听的人会准确地感受到那份不在乎，并把它当成这条规则真实分量的证据。第二重的补法：第一次必须当面。后面无数次可以靠文件，但一条规矩第一次施加到一个具体的人身上时，必须有人对着他本人说一遍。新员工入职、新生入学、新住户搬入、第一次违规被处理——这几个时刻是不可替代的。极限：这一重补不了群体规模。人一多，就只能靠文件。所以真正的设计问题是把有限的当面机会用在哪里，而不是幻想每条规则都能当面传达。第三重的补法：让援引发生在有人的场合。同样一句提醒，在办公室里对着一个人说，和在有旁人的场合说，重量完全不同。这一重最需要谨慎——它非常有效，也非常容易滑向公开羞辱。极限与红线：公开的目的是让这件事被共同见证，不是让当事人难堪。可操作的边界是：公开的应当是规则本身与情形，不应当是对某个人的评价。凡是会让当事人在事后感到被示众的做法，一律不可用——它短期有效，长期会把这条规则变成人人恐惧的东西，而恐惧和在场是两回事。</p>
+<h2 id="s5"><span class="no">05</span>五、必须有人到场的五个时刻</h2>
+<p>把上面的分析压成一份清单：以下五个时刻，文件一律不够，必须有具体的人参与。第一，第一次。一条规矩第一次进入一个人的生活时。第二，出了事之后。当一个人真的违反了、真的要承担后果时。如果全程只有文件流转，这件事在他心里不会完成，只会留下被机器处理过的感觉——这也正是母文所说那种「完美执行却令人不安」的来源。第三，要求很高的时候。越是要求重大付出、重大风险，越不能只靠文件。严肃的承诺至今仍要当面说、要有人见证，不是形式主义。第四，规则改变的时候。一条被改动的规则，如果只靠通知下发，多数人会继续按旧的做，而且不觉得自己有错。第五，例外被批准的时候。同意一次破例，必须由一个具体的人说出来并说明理由，否则这次破例会被读成规则其实不算数。反过来，日常的、重复的、后果轻微的事，完全应当交给文件。这份清单的用处不是增加会议，是把稀缺的当面机会用在真正决定成败的五个点上。</p>
+<h2 id="s6"><span class="no">06</span>六、一份规则文本的体检表</h2>
+<p>拿到任何一份制度、班规、家规、平台规则，按顺序做完六步。第一步，逐条判点坡，标注在旁边。第二步，统计坡的比例。超过四成的文本，基本可以断定执行中会普遍走形。第三步，对每一条坡，走三路径择一：改成点／保留但明宣布不考核／删。不允许第四种处理，也就是不允许原样保留却又拿它去考核。第四步，对留下的每一条点，跑三重在场诊断，标出缺哪一重。第五步，把五个必须到场的时刻映射到具体的场景与责任人。这一步的产出是一张很小的表：哪个时刻、由谁、对谁、说什么。第六步，删掉所有「用签字代替说话」的设计。签字保留它的法律功能，但不得被当作已经传达的证据。</p>
+<h2 id="s7"><span class="no">07</span>七、三个完整的走查示例</h2>
+<p>方法要落到具体材料上才立得住。以下三例把前六节走了一遍。示例一：一份公司行为准则，共二十六条。第一步逐条判定，结果是点十四条、坡十二条，坡占四成六，超过警戒线。第三步处理：其中七条改成了点——「应当维护公司形象」改成「不得以公司名义对外发布未经审核的信息」，「应当高效协作」改成「跨部门请求须在两个工作日内给出明确答复或转介」，「应当保护公司资产」改成三条具体的禁止条款。三条保留为坡但移入另一份文件，标题明确写「我们希望的样子，不作评分依据」。两条删除，理由是问「不写会有什么具体坏事」时答不出来。剩下的两条无法处理，属于第九节第三种情形，按路径二处理并写明理由。第四步对留下的点跑三重诊断，发现第一重普遍缺失——全公司没有任何人被认为是「他在要求这件事」，所有答案都是「制度规定的」。补法是在新员工入职时，由各自的直属主管用自己的话讲三条与本岗位最相关的规则，讲为什么在乎，不念稿。第五步排出五个时刻的责任人。第六步删掉了原来那句「员工签字即视为已充分知悉」的表述在实操中的证明性用法——签字继续保留，但不再被当作已经传达的依据。示例二：一份小学班规。原文十一条，坡占七条，包括「团结同学」「热爱集体」「养成良好习惯」。改造后：「不得给同学起外号」「值日轮到自己时不得让别人替」「上课铃响后回到座位」等九条点，加一段单独的、明确不打分的话，写班主任希望这个班是什么样子。三重在场的补法是每学期开学第一天，班主任用自己的话讲一遍，不发文件；违规处理时一律单独当面说，不在全班面前评价个人——这一条同时守住了第四节第三重的红线。示例三：一个平台的社区规则。这类文本的特殊困难在于规模——第九节第二种情形，当面传达在物理上不可能。处理办法是把资源集中到前两个时刻：注册时的第一次，用一段真人出镜、讲清楚三条最核心的红线；违规处理时，把模板化通知改为包含具体情形描述与具体条款的说明，并保留一个真人复核的申诉入口。其余全部交给文件与系统。这个例子说明：规模限制不是放弃三重在场的理由，而是要求你更精确地决定把它花在哪里。</p>
+<h2 id="s8"><span class="no">08</span>八、把这套判断用在自己身上</h2>
+<p>最后一类应用是私人的：给自己定的规矩，同样分点和坡。多数人给自己定的目标是坡：多读书、少熬夜、对家人有耐心、成为更好的人。它们全部符合第一节四道题里坡的特征——今天不能算做完、有无限的中间地带、需要判断自己的内心、永远关不掉。于是会发生一件很常见的事：这些目标不但没有让人变好，反而变成了一套持续运行的自我审问，最后靠放弃来关掉它。改造的方法完全一样。「多读书」改成「睡前手机放在客厅」；「对家人有耐心」改成「不在饭桌上讨论工作」；「少熬夜」改成「十一点后不开电脑」。改完之后，每一条都可以在某个时刻被宣告完成，都不需要评价自己，都可以在其余时间彻底休眠。三重在场对个人同样成立，只是形式不同：说的人在场，可以是你把它写下来并且说明自己为什么在乎；被说的人在场，可以是把规则贴在真正会碰到它的那个位置上——放手机的地方、电脑旁边；有人看着，可以是告诉一个具体的人。这三样都做过的规矩，和只在心里想过一遍的规矩，存活率完全不同。这一节和母文的论证严格同构：能被完成的窄规矩，胜过无法被完成的宽愿望。</p>
+<h2 id="s9"><span class="no">09</span>九、七种典型的坏写法与替代</h2>
+<p>第一种，把品质写进条款：「应当具备责任心」。替代：写出在什么情形下必须做什么、不得做什么。第二种，给坡设分数：把「团队精神」做成五分制。替代：如果真的在乎，改用具体行为的点；如果改不出来，就明确不考核。第三种，用「等」字兜底：「不得有其他不当行为」。它把一条点偷偷变成了坡，因为「不当」需要判断。替代：宁可列举不全，也不要用无边界的兜底；确实需要兜底时，明确谁有权判定、依什么程序。第四种，用培训代替当面。全员培训是对所有人说的，不构成第二重在场。替代：培训照做，但保留一个针对个人的时刻。第五种，用系统弹窗代替传达。弹窗的点击率很高，记住率极低。替代：把弹窗留给日常提醒，把第一次交给人。第六种，把提倡与禁止混在同一份文件、同一套罚则里。后果是提倡的部分自动变成软考核。替代：物理上分开，两份文件，两种语气。第七种，出事之后只走文件。这是最常见、也代价最大的一种。替代：无论结果如何，必须有一个具体的人对着当事人把这件事说完。</p>
+<h2 id="s10"><span class="no">10</span>十、一页纸操作卡</h2>
+<ul class="pts"><li>判点坡：四道题——今天能不能算做完？有没有中间地带？要不要猜内心？能不能休眠？</li><li>处理坡：改成点／保留但明说不考核／删。三选一，不许原样保留还拿去考核。</li><li>诊三重：说的人有没有脸？有没有对着他本人？是不是被共同见证？</li><li>补三重：给规则一张脸／第一次当面／让援引发生在有人的场合（不得滑向示众）。</li><li>排五时刻：第一次、出事后、要求高时、规则改变时、批准例外时。列出谁对谁说什么。</li><li>收尾自查：这份文本里，有没有一条我明知道是坡、却仍然打算拿它去评价人的？</li></ul>
+<h2 id="s11"><span class="no">11</span>十一、什么情况下这套方法不适用</h2>
+<p>其一，当规则的对象是机器或流程而不是人时。自动化系统的约束不涉及在场问题，用最精确的文字表述即可。其二，当组织规模大到当面传达在物理上不可能时。此时正确的做法不是放弃，而是把当面的机会集中到五个时刻中的前两个，其余接受由文件承担。其三，当那条坡本身就是这个组织的核心追求、且它拒绝被简化时。有些东西确实不该被改造成点——一个乐团对音乐的追求、一个诊室对病人的态度。此时唯一安全的处理是路径二：说出来，反复说，明确不考核，并靠具体的人示范。最后一条留给使用者：做完全套之后，如果你手里那份文本变得更短、更窄、覆盖面更小，而你有点心虚——那多半说明你做对了。母文的整套论证指向同一件事：管得住的窄规则，胜过管不住的宽要求。</p>
+<h2 id="s12"><span class="no">12</span>十二、三个最常被问到的问题</h2>
+<p>问：改写成点会不会漏掉很多情况？一定会漏。一条点覆盖的范围永远小于它替代的那条坡，这是必须接受的成本。判断标准不是覆盖率，是有效性——一条能被真正遵守的窄规则，胜过一条人人认同却从不落地的宽要求。而且漏掉的部分并没有消失，它回到了第二条路径：说出来，明确不考核，靠具体的人示范。问：三重在场里，如果只能补一重，该补哪一重？补第二重，也就是「第一次当面」。原因是它的时点最集中、成本最可控，而它的效果决定了这条规则在这个人身上是不是活的。第一重需要一个真正在乎的人，第三重有滑向示众的风险，只有第二重几乎没有副作用。问：远程办公、线上教学这类没有物理在场的场合怎么办？在场不等于同处一室。三重在场的实质是：有一张具体的脸、这句话是对着你本人说的、这件事被共同见证。视频通话能保住前两重，第三重需要有意设计——比如让新人的第一次规则说明发生在一个有其他成员在场的小会上。真正丢失在场的不是屏幕，是群发。</p>
+<div class="endbox">
+  <div class="et">接下来读什么</div>
+  <p style="margin-bottom:10px">这一篇只是入口。真正的论证、边界与反驳，都在母文里：<a href="/students/gao-peng/flesh-of-prohibition/">《禁令的肉身：为什么法律守住「不得」比规定「应当」更根本》</a>。</p>
+  <p style="margin:0">另一条路：<a href="/students/gao-peng/flesh-of-prohibition/explain.html">🌱 白话解释文《妈妈说「不许碰」的时候，她的手在你手腕上》</a>——用日常生活的类比，把母文讲成人人能懂的话。</p>
+</div>
+</article>
+
+<footer><div class="wrap">
+  © 2026 SDE Universes · 德麦国际 ·
+  <a href="/students/gao-peng/flesh-of-prohibition/">回母文</a> ·
+  <a href="/browse/">首页</a>
+</div></footer>
+<script src="/taste/wds-companion/wds-read.js?v=20260802b" defer></script>
+<script src="/wds-mode.js?v=20260802b" defer></script>
+</body>
+</html>

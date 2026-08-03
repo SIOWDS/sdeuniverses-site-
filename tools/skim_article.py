@@ -2,7 +2,8 @@
 # 读母文骨架：标题/副标题/摘要/各级小标题+每节首句。给伴读文写作用。
 import sys, re, html, os
 slug = sys.argv[1]
-p = f"public/column/{slug}/index.html"
+base = sys.argv[2].strip("/") if len(sys.argv) > 2 else "column"
+p = f"public/{base}/{slug}/index.html"
 h = open(p, encoding="utf-8", errors="replace").read()
 h = re.sub(r"<(script|style)\b[^>]*>.*?</\1>", "", h, flags=re.S)
 def txt(x): return html.unescape(re.sub(r"<[^>]+>", "", x)).strip()
