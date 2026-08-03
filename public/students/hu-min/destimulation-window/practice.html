@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>开一扇窗，然后守住它 · 方法实践文 | SDE Universes</title>
+<meta name="description" content="母文的判断是问题不在总量而在有没有间隔，因此以“减少使用”为目标的方案会落空。这一篇给出：什么算窗什么不算、算一算自己的无输入时长、五个填塞口、最小窗的三条规格、赋能连接与瘫痪连接的分辨表，以及一条重要的边界——独处与无刺激对某些状态的人并不安全。">
+<meta name="author" content="SDE Universes">
+<meta property="og:type" content="article">
+<meta property="og:title" content="开一扇窗，然后守住它 · 方法实践文">
+<meta property="og:description" content="母文的判断是问题不在总量而在有没有间隔，因此以“减少使用”为目标的方案会落空。这一篇给出：什么算窗什么不算、算一算自己的无输入时长、五个填塞口、最小窗的三条规格、赋能连接与瘫痪连接的分辨表，以及一条重要的边界——独处与无刺激对某些状态的人并不安全。">
+<link rel="canonical" href="https://sdeuniverses.com/students/hu-min/destimulation-window/practice.html">
+<style>
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:#FBF8F1;color:#2B2620;
+ font-family:"Noto Serif SC","Songti SC","Source Han Serif SC",Georgia,serif;
+ font-size:17px;line-height:1.95;letter-spacing:.01em}
+.wrap{max-width:760px;margin:0 auto;padding:0 22px}
+nav.cnav{background:#2B2620;color:#EDE4CF;position:sticky;top:0;z-index:30;
+ font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif}
+nav.cnav .wrap{display:flex;align-items:center;justify-content:space-between;gap:14px;height:50px}
+nav.cnav a{color:#EDE4CF;text-decoration:none;font-size:14px}
+nav.cnav .cnav-logo{font-weight:700;letter-spacing:.06em}
+nav.cnav .cnav-back{opacity:.82}
+nav.cnav .cnav-back:hover{opacity:1}
+header.art{background:linear-gradient(180deg,#FFFDF8 0%,#F5EFE2 100%);
+ border-bottom:1px solid rgba(43,38,32,.10);padding:44px 0 34px}
+.art-eyebrow{font-size:12.5px;letter-spacing:.16em;color:#2F5470;font-weight:700;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;margin-bottom:16px}
+h1.art-title{font-size:33px;line-height:1.4;margin:0 0 14px;font-weight:800}
+.art-subtitle{font-size:17px;color:#5C5346;line-height:1.7;margin-bottom:16px}
+.art-meta{font-size:13px;color:#8A8071;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif}
+.swap{display:flex;flex-wrap:wrap;gap:10px;margin:22px auto 0}
+.swap a{flex:1 1 240px;display:block;text-decoration:none;padding:12px 15px;border-radius:9px;
+ border:1px solid rgba(43,38,32,.16);background:#fff;color:#2B2620;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;font-size:14px;line-height:1.6}
+.swap a b{display:block;font-size:14.5px;margin-bottom:2px}
+.swap a span{color:#8A8071;font-size:12.5px}
+.swap a:hover{border-color:#2F5470;box-shadow:0 2px 10px rgba(43,38,32,.07)}
+article{padding:30px 0 10px}
+.abs{background:#EFF3F7;border-left:4px solid #2F5470;border-radius:0 8px 8px 0;
+ padding:18px 20px;margin:0 0 26px;font-size:15.5px;line-height:1.85;color:#4A4238}
+.abs b{color:#24425A}
+.toc{border:1px solid rgba(43,38,32,.13);border-radius:9px;padding:16px 20px;margin:0 0 34px;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;font-size:14.5px;background:#FFFDF8}
+.toc .tl{font-size:12.5px;letter-spacing:.14em;color:#2F5470;font-weight:700;margin-bottom:10px}
+.toc ol{margin:0;padding-left:20px;color:#5C5346}
+.toc li{margin:5px 0}
+.toc a{color:#4A4238;text-decoration:none}
+.toc a:hover{color:#2F5470;text-decoration:underline}
+h2{font-size:22px;line-height:1.5;margin:44px 0 16px;padding-top:8px;font-weight:800;
+ border-top:1px solid rgba(43,38,32,.10)}
+h2 .no{display:inline-block;min-width:1.9em;color:#2F5470;font-size:16px;font-weight:700;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif}
+p{margin:0 0 17px;text-align:justify}
+p b,li b{color:#24425A}
+ul.pts{margin:0 0 18px;padding-left:0;list-style:none}
+ul.pts li{position:relative;padding-left:20px;margin:0 0 10px;text-align:justify}
+ul.pts li:before{content:"—";position:absolute;left:0;color:#2F5470}
+blockquote{margin:0 0 20px;padding:14px 18px;background:#FFFDF8;
+ border-left:3px solid rgba(43,38,32,.22);color:#4A4238;font-size:16px}
+.endbox{margin:48px 0 10px;padding:22px;border-radius:10px;background:#EFF3F7;
+ border:1px solid rgba(43,38,32,.12)}
+.endbox .et{font-size:12.5px;letter-spacing:.14em;color:#2F5470;font-weight:700;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;margin-bottom:12px}
+.endbox a{color:#24425A}
+footer{margin-top:46px;padding:26px 0 40px;border-top:1px solid rgba(43,38,32,.12);
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;font-size:13px;color:#8A8071}
+footer a{color:#8A8071}
+@media(max-width:640px){body{font-size:16px}h1.art-title{font-size:26px}h2{font-size:19.5px}}
+</style>
+</head>
+<body>
+<nav class="cnav"><div class="wrap">
+  <a class="cnav-logo" href="/browse/">SDE Universes</a>
+  <a class="cnav-back" href="/students/hu-min/destimulation-window/">← 回母文《当坝拆之后河不再流》</a>
+</div></nav>
+
+<header class="art"><div class="wrap">
+  <div class="art-eyebrow">配套读物 · 技术与方法实践 · 母文《当坝拆之后河不再流》</div>
+  <h1 class="art-title">开一扇窗，然后守住它</h1>
+  <div class="art-subtitle">不是断网，不是砍时长——按母文的机制，可做的只有一件：让某一段时间没有东西进来，并且不让它被填上。</div>
+  <div class="art-meta">SDE Universes · 配套读物 · 2026年8月 · 约 4982 字</div>
+  <div class="swap">
+    <a href="/students/hu-min/destimulation-window/"><b>← 母文 · 当坝拆之后河不再流</b><span>完整论证在这里</span></a>
+    <a href="/students/hu-min/destimulation-window/explain.html"><b>🌱 白话解释文 · 一边充电一边玩，手机是充不满的</b><span>用日常生活的类比，把母文讲成人人能懂的话</span></a>
+  </div>
+</div></header>
+
+<article class="wrap">
+<div class="abs"><b>这一篇是什么</b>　母文的判断是问题不在总量而在有没有间隔，因此以“减少使用”为目标的方案会落空。这一篇给出：什么算窗什么不算、算一算自己的无输入时长、五个填塞口、最小窗的三条规格、赋能连接与瘫痪连接的分辨表，以及一条重要的边界——独处与无刺激对某些状态的人并不安全。<br><br><b>读法</b>　这一篇写给：已经认同母文的判断、现在想把它用到自己手头工作上的人。全篇以可操作为准，不重复论证。</div>
+<div class="toc"><div class="tl">目 录</div><ol><li><a href="#s1">先划一条边界</a></li><li><a href="#s2">这套工序管什么、不管什么</a></li><li><a href="#s3">判据：什么算窗，什么不算</a></li><li><a href="#s4">工序一：算一算你的无输入时长</a></li><li><a href="#s5">工序二：找出窗被填掉的位置</a></li><li><a href="#s6">工序三：开一扇最小的窗</a></li><li><a href="#s7">头两周会发生什么</a></li><li><a href="#s8">分辨表：赋能的连接与瘫痪的连接</a></li><li><a href="#s9">进展指标：三条，都不靠自评</a></li><li><a href="#s10">六种典型失败</a></li><li><a href="#s11">一页纸操作卡</a></li><li><a href="#s12">三个场景变体</a></li><li><a href="#s13">走一遍：一个例子</a></li><li><a href="#s14">把这套工序放在可被推翻的位置</a></li><li><a href="#s15">五个实操疑问</a></li><li><a href="#s16">与三类常见方案的分工</a></li><li><a href="#s17">最容易被自己做坏的方式</a></li><li><a href="#s18">一句给做设计与做管理的人</a></li></ol></div>
+<h2 id="s1"><span class="no">01</span>先划一条边界</h2>
+<p><b>这条线优先于本文全部内容。</b></p>
+<p>无输入的独处时间，对大多数人是修复性的，但<b>对某些状态的人不是</b>。以下情形请不要按本工序执行，或先与专业人士商量：</p>
+<ul class="pts"><li><b>正处在明显的抑郁状态、或有持续的反刍思维</b>——安静而无事可做的时段可能显著加重反刍，而不是带来间隔。</li><li><b>创伤后的应激反应期</b>——无刺激的独处可能让侵入性的回忆更容易出现。</li><li><b>强烈的焦虑或惊恐发作史</b>——需要在专业指导下判断合适的形式与长度。</li><li><b>任何时候，如果那段安静让你明显更难受，而不是先难受后平静</b>——停下来，这不是“熬过去就好”的情形。</li></ul>
+<p><b>如果眼下正处在这些状态里，需要的不是一扇窗，是支持。</b> 请联系专业人士或你信得过的人。本工序的其余部分，都在这条线的内侧。</p>
+<h2 id="s2"><span class="no">02</span>这套工序管什么、不管什么</h2>
+<p><b>管</b>：一个不缺休息、不缺内容、不缺选择，却说不出自己想要什么、也很久没有冒出过自己的念头的人；也管一个想在家庭、团队或课堂里不制造全时段填塞的人。</p>
+<p><b>不管</b>：时间确实不够的情况。<b>如果一个人每天真的没有二十分钟属于自己，那是负荷问题，不是间隔问题</b>，加窗只会变成又一项任务。</p>
+<p><b>这套工序不产出什么</b>：它不产出效率、不产出灵感、不产出“想清楚了什么”。<b>任何以“用好这段时间”为目标的版本，都已经不是窗了。</b></p>
+<p><b>一条总纪律</b>：<b>不砍总量，只留间隔。</b> 这条纪律与直觉相反——多数人的第一反应是设限额、删应用、断网，而按机制，那些动作作用在总量上，不作用在结构上。</p>
+<h2 id="s3"><span class="no">03</span>判据：什么算窗，什么不算</h2>
+<p>三条规格，三条全过才算：</p>
+<ul class="pts"><li><b>没有新的输入</b>。可以有活动（走路、洗碗、坐着、做熟悉的手活），但不能有内容进来——没有播客、没有背景视频、没有随手一刷、没有“就看一眼”。</li><li><b>没有待完成的任务</b>。不是“用这段时间想清楚某件事”，也不是“这段时间要放松好”。<b>任何目标都会让它变回一个要求。</b></li><li><b>足够长</b>。短于十五分钟基本无效——那正好是刚觉得无聊、于是伸手掏手机的长度。<b>必须长到熬过那阵无聊。</b></li></ul>
+<p><b>常见的不合格形态</b>：戴耳机走路；一边吃饭一边看；“放松一下”于是打开视频；睡前刷到睡着；开车听播客；健身时听课。<b>这些都不是坏事，它们只是不是窗。</b></p>
+<p><b>一条容易被忽略的</b>：跟人闲聊算不算？<b>看情况</b>——没有议题、不需要应对、可以随时沉默的闲聊，通常算；需要动脑接话、或者带着社交表现的，不算。</p>
+<h2 id="s4"><span class="no">04</span>工序一：算一算你的无输入时长</h2>
+<p><b>做法</b>：取一个普通的工作日，从起床到入睡，把全天切成时段，标出哪些时段<b>完全没有内容进来</b>。</p>
+<p>标的时候要严：通勤听播客不算；吃饭看视频不算；洗澡时手机在旁边放着不算；工作间隙“歇一下”刷两分钟不算。</p>
+<p>把合格的时段加起来，得到<b>当日无输入总时长</b>，以及<b>最长的一段连续无输入时长</b>。</p>
+<p><b>判读</b>：第二个数比第一个数重要得多。<b>总时长四十分钟但由二十个两分钟拼成的人，和只有一段二十分钟的人，处境完全不同</b>——按机制，起作用的是连续的那一段。</p>
+<p><b>经验区间</b>：多数人的最长连续无输入时段落在三到十分钟（通常是洗澡）。<b>超过二十分钟的，本工序不必做。</b></p>
+<h2 id="s5"><span class="no">05</span>工序二：找出窗被填掉的位置</h2>
+<p>窗不是没有，是被填掉的。找出那五个填塞口，比凭空造新时段容易得多：</p>
+<ul class="pts"><li><b>通勤与走路</b>。这是最大的一块，通常也最容易拿回来——那段时间本来就存在。</li><li><b>等待时间</b>。排队、等人、等车、等东西加载。这些碎片本来天然是窗，现在几乎百分之百被填。</li><li><b>家务与身体活动</b>。洗碗、做饭、打扫、跑步。这类活动占着手，恰好适合当窗，却常被配上耳机。</li><li><b>睡前与醒后</b>。这两段的填塞最彻底，也最影响那些“自己冒出来的念头”。</li><li><b>工作之间的缝</b>。写完一段、开完一个会之后那几分钟，几乎自动被填。</li></ul>
+<p><b>做法</b>：对着这五处，看自己各自被填了多少。<b>通常会发现第一处最大，也最容易改</b>——因为改它不需要多出任何时间。</p>
+<h2 id="s6"><span class="no">06</span>工序三：开一扇最小的窗</h2>
+<p><b>只开一扇，只在一处。</b></p>
+<p><b>选法</b>：从五个填塞口里挑一处<b>本来就存在、长度已经够、而且不需要额外安排</b>的时段。绝大多数人的答案是通勤或走路。</p>
+<p><b>做法</b>：那一段不戴耳机、不掏手机。别的什么都不变。</p>
+<p><b>不做什么</b>（这一节比做什么更重要）：</p>
+<ul class="pts"><li><b>不排进日程</b>。排进日程会让它带上“要用好”的属性。</li><li><b>不设目标</b>。不是为了想清楚什么、不是为了放松、不是为了创意。</li><li><b>不记录、不打卡、不统计</b>。一旦有了连续天数，它就变成了一件被评价的事。</li><li><b>不宣布</b>。不告诉别人你在做这个，也不写下来。<b>可展示的东西会被自动优化，而优化的方向必然是“让它更有用”。</b></li></ul>
+<p><b>只开一扇的理由</b>：同时改五处会变成一场自我改造，而自我改造有它自己的失败方式；更重要的是，多处并行你无法判断是哪一处起了作用。</p>
+<h2 id="s7"><span class="no">07</span>头两周会发生什么</h2>
+<p>提前知道这条曲线，是能坚持下去的前提。<b>头两周的体验几乎一律是负面的</b>，这不是做错了。</p>
+<p><b>第一周 · 坐立不安</b>。会不自觉地摸口袋、会觉得这段时间“浪费了”、会强烈地想找点什么听。<b>这阵无聊不是要被消灭的障碍</b>——按机制，它正是这扇窗第一次真的开着的样子。</p>
+<p><b>第二周 · 杂念涌上来</b>。没有输入之后，最先冒出来的往往不是好东西，而是待办事项、担心、翻旧账、社交场合的回放。很多人到这一步会得出“我还是听点什么吧”的结论。<b>这一步是必经的，它说明积压的东西终于排上队了。</b></p>
+<p><b>第三周之后 · 开始出现别的</b>。会开始出现一些跟当下无关的念头：想起一件很久没想的事、突然明白某个卡了很久的问题、或者只是注意到路边一样从来没注意过的东西。</p>
+<p><b>判断点在第二周</b>：如果杂念上来之后<b>逐渐平息</b>，继续；如果杂念是<b>越来越强的自责与反刍、而且不平息</b>，停下来，回到第一节那条边界。</p>
+<h2 id="s8"><span class="no">08</span>分辨表：赋能的连接与瘫痪的连接</h2>
+<p>母文那个判据可以做成一张随手可用的表。同一条内容、同一次交谈、同一个平台，用它来分：</p>
+<p><b>赋能的连接</b>：结束之后有一段空隙；那段空隙里会冒出跟这条内容有关、但不是它说过的东西；过几天你还能想起它，而且说法跟原文不一样了。</p>
+<p><b>瘫痪的连接</b>：结束之后立刻接上下一条；说得出看过什么，说不出想到过什么；两天后回忆不起任何细节，只剩一个模糊的“挺有道理”。</p>
+<p><b>关键在于这张表判的不是内容，是内容后面跟着什么。</b> 一篇很好的文章后面立刻跟着五条短视频，它在这张表里是瘫痪的；一条很无聊的推送后面跟着二十分钟走路，它反而可能是赋能的。</p>
+<p><b>用法</b>：不必逐条判。每周挑一次你觉得“看了很有收获”的经历，事后用这张表对一次。<b>多数人会发现，那种“很有收获”的感觉，跟表上的赋能一栏对不上号。</b></p>
+<h2 id="s9"><span class="no">09</span>进展指标：三条，都不靠自评</h2>
+<p>问“我是不是更有活力了”不可靠。三条替代：</p>
+<ul class="pts"><li><b>自发念头</b>：出现过一次跟当下事务无关、也不是从任何地方看来的念头。<b>一次即算窗在起作用</b>，不需要频繁。</li><li><b>伸手频率</b>：那段无输入时间里，想掏手机的冲动出现了几次。看趋势，不看单次。</li><li><b>无聊耐受</b>：从开始到觉得“待不住”的时长有没有变长。</li></ul>
+<p><b>记录办法</b>：不记录。这是本工序唯一一个明确要求不做记录的地方——记录会把它变成有指标的项目，而有指标的项目不满足第二条规格。<b>偶尔回想一下这三项即可。</b></p>
+<h2 id="s10"><span class="no">10</span>六种典型失败</h2>
+<ul class="pts"><li><b>失败一 · 做成断网</b>。设限额、删应用、周末不上网。这些作用在总量上，不作用在间隔上；而且它们几乎必然反弹，反弹之后人会得出“这套东西不现实”的结论。</li><li><b>失败二 · 给窗设目标</b>。“我要用这段时间想清楚职业方向”。目标一进来，窗就关了。</li><li><b>失败三 · 打卡与统计</b>。连续天数、时长记录、每日复盘。<b>它把一个必须无目的的东西变成了一件有绩效的事。</b></li><li><b>失败四 · 太短</b>。五分钟的窗基本无效，因为它正好停在无聊刚起来的位置上。</li><li><b>失败五 · 熬第二周的杂念不过就放弃</b>。杂念上来是必经阶段，很多人恰好在这一步得出“我不适合”的结论。</li><li><b>失败六 · 拿它要求别人</b>。让孩子发呆、劝伴侣别戴耳机。<b>这会立刻把窗变成一项被要求完成的事</b>，而且在别人身上你无法判断第一节那条边界是否适用。</li></ul>
+<h2 id="s11"><span class="no">11</span>一页纸操作卡</h2>
+<ul class="pts"><li><b>边界</b>：抑郁状态、反刍、创伤应激、焦虑发作史——不按本工序做，先寻求支持。</li><li><b>判据</b>：没有输入／没有任务／够长（十五分钟以上），三条全过才算窗。</li><li><b>算</b>：一个普通日的无输入总时长，以及<b>最长的连续一段</b>（后者才是关键）。</li><li><b>找</b>：通勤走路／等待／家务身体活动／睡前醒后／工作之间的缝，五个填塞口。</li><li><b>开</b>：只开一扇，选本来就存在的那一段；不戴耳机不掏手机，别的都不变。</li><li><b>守</b>：不排日程、不设目标、不记录、不宣布。</li><li><b>熬</b>：第一周坐立不安、第二周杂念上来，都是正常的；第二周不平息则停。</li><li><b>辨</b>：一次连接之后有没有留下空隙——有＝赋能，立刻接下一条＝瘫痪。</li></ul>
+<h2 id="s12"><span class="no">12</span>三个场景变体</h2>
+<p><b>个人</b>：最省事的切口是通勤或走路，因为那段时间本来就存在，改动成本为零。<b>不要从睡前开始</b>——那段最难，而且失败会影响睡眠，得不偿失。</p>
+<p><b>家庭</b>：不要要求任何人。可做的只有一件：<b>减少家里的常驻背景音</b>（长期开着的电视、随时在放的音乐）。这不是给谁开窗，只是不主动填塞。<b>尤其不要把它变成一条家规</b>，那会让它变成任务。</p>
+<p><b>团队与课堂</b>：这里最有效的动作也是减法——<b>在两件事之间留出不安排任何事的几分钟</b>，且明确说明这几分钟不需要做任何事、不检查、不产出。<b>难点在于忍住不给它一个名字</b>（“静思时间”“复盘环节”），一旦有了名字就有了要求。</p>
+<h2 id="s13"><span class="no">13</span>走一遍：一个例子</h2>
+<p>以下为示意。某人内容摄入量极大，抱怨“什么都懂一点，但没有一件事是自己的”。</p>
+<p><b>算</b>：一个普通工作日的无输入总时长约十二分钟，全部来自洗澡；最长连续一段约七分钟。通勤五十分钟全程听播客。</p>
+<p><b>找</b>：五个填塞口全部被填。最大的一块是通勤。</p>
+<p><b>开</b>：只改一处——早上那段二十五分钟的步行加地铁，不戴耳机。<b>其余一切不变</b>：播客照订、视频照看、社交软件照用。</p>
+<p><b>头两周</b>：第三天起明显坐立不安，摸了几次口袋。第二周开始翻旧账，想起几件很久以前的尴尬事，一度想放弃。<b>这一步他没有加大力度也没有减少，只是继续。</b></p>
+<p><b>第四周</b>：第一次出现自发念头——在地铁上突然想通了一件工作上卡了两个月的事，而这件事那天早上根本没在想。</p>
+<p><b>第八周</b>：无聊耐受明显变长，伸手的冲动从每天四五次降到偶尔一次。</p>
+<p><b>读法</b>：不看“他是不是更有想法了”，只看那三项有没有出现。<b>播客的订阅数一个没减，总屏幕时长几乎没变</b>——按母文的机制，这完全正常，因为改的从来不是总量。</p>
+<h2 id="s14"><span class="no">14</span>把这套工序放在可被推翻的位置</h2>
+<p>母文交代了自己的限度：“去刺激窗”是作为一个控制变量提出来的，配有可检验的预测，不是已确认的结论。执行者照做，在开始前写下两句：</p>
+<ul class="pts"><li><b>如果……则不必</b>：如果在完全不开窗、只是照常生活的情况下，自发念头同样在一两个月内出现，那么这套工序在自己身上没有独立价值。</li><li><b>如果……则停止</b>：如果那段安静让你<b>越来越难受而不是先难受后平静</b>，或者出现持续加重的反刍与自责，停止，回到第一节那条边界，并考虑寻求专业帮助。</li></ul>
+<p>最后一句：这套工序不承诺灵感、不承诺效率、也不承诺你会想清楚什么。<b>它只是把某一段时间空出来，然后什么也不做。</b> 按母文的判断，那正是今天最稀缺、也最不需要花钱的东西。</p>
+<h2 id="s15"><span class="no">15</span>五个实操疑问</h2>
+<p><b>问：那段时间里满脑子都是待办事项，一直静不下来，是不是没用？</b>答：这是第二周的典型状态，而且它是有意义的——<b>积压的东西终于排上队了</b>。处理方式不是压制也不是记下来，就让它过。<b>要注意区分的是它有没有在平息</b>：几周内逐渐减弱，继续；持续加重并且带着自责，回到第一节那条边界。</p>
+<p><b>问：走路时不听东西，会不会浪费了通勤时间？</b>答：“浪费”这个判断本身来自把每段时间都要求有产出的习惯。按这套机制，<b>那段“什么也没做”的时间正是它起作用的方式</b>。如果你觉得必须让它有用，那你会不自觉地给它加目标，而加了目标它就不是窗了。</p>
+<p><b>问：能不能听白噪音、纯音乐、或者没有内容的东西？</b>答：<b>纯背景性的声音通常不违反第一条</b>（没有内容进来），但要小心一件事——它常常是“不想让脑子空着”这个冲动的替身。<b>试着有几次完全不放，比较一下</b>：如果没有它你明显更难熬，那说明它正在承担填充的功能。</p>
+<p><b>问：我一天里根本找不到十五分钟连续无输入的时间。</b>答：先做工序二，看是找不到还是被填了。<b>多数人是后者</b>——通勤、等待、家务这三块通常加起来远不止十五分钟，只是全部配了耳机。<b>如果确实找不到，那是负荷问题</b>，先解决负荷，加窗只会变成又一项任务。</p>
+<p><b>问：做了三个月，什么也没发生，是不是不适合我？</b>答：先检查三件事：那段是不是够长（短于十五分钟基本无效）；有没有被悄悄加上目标（“用这段时间想想工作”）；是不是同时改了好几处导致每一处都没坚持。<b>这三条排除之后仍然什么也没发生，那就按开工前写下的那句“如果……则不必”处理</b>——停掉即可，不必解释成自己的问题。</p>
+<h2 id="s16"><span class="no">16</span>与三类常见方案的分工</h2>
+<p><b>与数字极简、断网、屏幕时间管理</b>：这一类作用在总量上。<b>它们不是无效，但它们解决的不是同一个问题</b>；而且按机制，一个总量很低却被切碎铺满的人，处境可能比总量高但有连续空白的人更糟。<b>可以并行，但不要把它们当成本工序的替代。</b></p>
+<p><b>与冥想与正念练习</b>：方向高度接近，而且效果往往更快，因为它天然满足前两条规格。<b>唯一要注意的是别把它做成有指标的项目</b>（时长统计、连续天数、进步评估）——一旦如此，它会连同这扇窗一起滑向“要完成好的事”。</p>
+<p><b>与“深度工作”类的时间管理</b>：形似而实不同。深度工作要求的是<b>没有干扰地专注于一项任务</b>，它有明确的目标与产出；窗要求的是<b>没有任务</b>。两者都有价值，但不能互相替代——<b>一整天全是深度工作块的人，同样可能一扇窗都没有。</b></p>
+<h2 id="s17"><span class="no">17</span>最容易被自己做坏的方式</h2>
+<p>必须点名一个内建的风险，而且它几乎必然出现。</p>
+<p>做了一段时间之后，这扇窗会开始产生一些好东西——想通了某件事、冒出一个不错的念头。人的自然反应是：<b>那我要把这段时间用好一点。</b></p>
+<p>于是它开始被优化：固定时段、带个本子随时记、提前想好今天要想什么、事后复盘有什么收获。</p>
+<p><b>每一步都合情合理，而每一步都在关这扇窗。</b> 按第二条规格，任何目标进来，它就不再是窗了；而没有窗之后，那些好东西也就不再出现——然后人会以为是自己“状态不好了”。</p>
+<p><b>防它的办法只有一条：允许它一直没有产出。</b> 不记、不复盘、不优化、不追求。那些偶尔冒出来的东西，冒出来就冒出来，忘了也不可惜。</p>
+<p><b>这一条是这套工序里唯一需要长期守的纪律，也是最难守的。</b> 它要求的不是自律，是一种反过来的东西——<b>在一件事开始变得有用的时候，忍住不去改进它。</b></p>
+<h2 id="s18"><span class="no">18</span>一句给做设计与做管理的人</h2>
+<p>如果你的工作是设计产品、安排课程、编排流程、组织团队，那么这套框架对你还有另一层含义。</p>
+<p><b>你所设计的每一处衔接，都在决定别人有没有窗。</b></p>
+<p>自动播放下一集、加载时的推荐位、任务完成后立刻弹出的下一项、会议结束就接上的下一个会、课程一节接一节的编排——<b>这些设计里的每一个都在填掉一段本来会空着的时间</b>，而且每一个都是出于好意（不让用户流失、不让时间浪费、让学习更连贯）。</p>
+<p><b>可做的最小动作是留缝</b>：完成之后不自动接下一个；两件事之间空出一段并明说这段不安排；不在等待处填内容。</p>
+<p>这些动作有一个共同点——<b>它们全部会让你的指标变难看</b>（停留时长下降、完成率下降、课时利用率下降）。这是真实的取舍，本文不假装它不存在。</p>
+<p><b>但也值得知道另一面</b>：按母文的判据，一个不留缝的产品或课程，它提供的连接在结构上就是瘫痪型的——<b>用户说得出用过什么，说不出想到过什么</b>。留缝的成本是指标，收益是它真的在别人身上留下了东西。</p>
+<div class="endbox">
+  <div class="et">接下来读什么</div>
+  <p style="margin-bottom:10px">这一篇只是入口。真正的论证、边界与反驳，都在母文里：<a href="/students/hu-min/destimulation-window/">《当坝拆之后河不再流：重思数字资本主义下的主体性危机》</a>。</p>
+  <p style="margin:0">另一条路：<a href="/students/hu-min/destimulation-window/explain.html">🌱 白话解释文《一边充电一边玩，手机是充不满的》</a>——用日常生活的类比，把母文讲成人人能懂的话。</p>
+</div>
+</article>
+
+<footer><div class="wrap">
+  © 2026 SDE Universes · 德麦国际 ·
+  <a href="/students/hu-min/destimulation-window/">回母文</a> ·
+  <a href="/students/hu-min/works/">胡敏 · 全部作品</a> ·
+  <a href="/browse/">首页</a>
+</div></footer>
+<script src="/taste/wds-companion/wds-read.js?v=20260802b" defer></script>
+<script src="/wds-mode.js?v=20260802b" defer></script>
+</body>
+</html>

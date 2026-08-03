@@ -267,7 +267,7 @@ def render_page(slug, kind, meta, secs, mother_title, mother_short, sib_title):
 <footer><div class="wrap">
   © 2026 SDE Universes · 德麦国际 ·
   <a href="{BASE}/">回母文</a> ·
-  <a href="{WORKS}">{AUTHOR} · 全部作品</a> ·
+  <a href="{WORKS}">{AUTHOR}{" · " if AUTHOR else ""}全部作品</a> ·
   <a href="/browse/">首页</a>
 </div></footer>
 <script src="/taste/wds-companion/wds-read.js?v={VER}" defer></script>
@@ -342,6 +342,21 @@ def mother_meta(slug):
     return h, t
 
 
+def _author_from_page(student, slug):
+    """COMPANION_AUTHOR 未给时，从母文页反解学员显示名；解不出就留空（页脚只显示"全部作品"）。"""
+    p = os.path.join(PUB, "students", student, slug, "index.html")
+    try:
+        h = open(p, encoding="utf-8", errors="replace").read()
+    except OSError:
+        return ""
+    for pat in (r'class="art-series"[^>]*>\s*学员专栏\s*[·・]\s*([^<]+?)\s*<',
+                r'class="art-meta"[^>]*>\s*(?:作者\s*)?([\u4e00-\u9fff]{2,4})\s*(?:著|·)'):
+        m = re.search(pat, h)
+        if m:
+            return m.group(1).strip()
+    return ""
+
+
 def _accent_override():
     for kind in ("explain", "practice"):
         v = os.environ.get("COMPANION_ACCENT_" + kind.upper())
@@ -363,7 +378,7 @@ def main():
         student, slug = os.environ["COMPANION_STUDENT"], args[0]
     dry = "--dry" in sys.argv
     BASE = f"/students/{student}/{slug}"
-    AUTHOR = os.environ.get("COMPANION_AUTHOR", student)
+    AUTHOR = os.environ.get("COMPANION_AUTHOR") or _author_from_page(student, slug)
     WORKS = f"/students/{student}/works/"
     h, mtitle = mother_meta(slug)
     short = mtitle.split("：")[0].split("——")[0].strip()
