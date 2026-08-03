@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>引进一套新标准之前，先把这笔账记下来 · 方法实践文 | SDE Universes</title>
+<meta name="description" content="母文的判断是：扩展判准以容纳新对象，与判断内核被外来逻辑蚀空，是同一个动作的两面，不可避免，只能计量。这一篇把它落成可执行的工作：怎么在引进之前记下将要丢的东西、怎么给寄生度打分、怎么守住一处不被小标准覆盖的整体判断、怎么识别那句最危险的“其实是一回事”。含五道工序、三张判据、五种失败模式、两个演练">
+<meta name="author" content="SDE Universes">
+<meta property="og:type" content="article">
+<meta property="og:title" content="引进一套新标准之前，先把这笔账记下来 · 方法实践文">
+<meta property="og:description" content="母文的判断是：扩展判准以容纳新对象，与判断内核被外来逻辑蚀空，是同一个动作的两面，不可避免，只能计量。这一篇把它落成可执行的工作：怎么在引进之前记下将要丢的东西、怎么给寄生度打分、怎么守住一处不被小标准覆盖的整体判断、怎么识别那句最危险的“其实是一回事”。含五道工序、三张判据、五种失败模式、两个演练">
+<link rel="canonical" href="https://sdeuniverses.com/students/zhang-qiong/criterion-parasitism/practice.html">
+<style>
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:#FBF8F1;color:#2B2620;
+ font-family:"Noto Serif SC","Songti SC","Source Han Serif SC",Georgia,serif;
+ font-size:17px;line-height:1.95;letter-spacing:.01em}
+.wrap{max-width:760px;margin:0 auto;padding:0 22px}
+nav.cnav{background:#2B2620;color:#EDE4CF;position:sticky;top:0;z-index:30;
+ font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif}
+nav.cnav .wrap{display:flex;align-items:center;justify-content:space-between;gap:14px;height:50px}
+nav.cnav a{color:#EDE4CF;text-decoration:none;font-size:14px}
+nav.cnav .cnav-logo{font-weight:700;letter-spacing:.06em}
+nav.cnav .cnav-back{opacity:.82}
+nav.cnav .cnav-back:hover{opacity:1}
+header.art{background:linear-gradient(180deg,#FFFDF8 0%,#F5EFE2 100%);
+ border-bottom:1px solid rgba(43,38,32,.10);padding:44px 0 34px}
+.art-eyebrow{font-size:12.5px;letter-spacing:.16em;color:#2F5470;font-weight:700;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;margin-bottom:16px}
+h1.art-title{font-size:33px;line-height:1.4;margin:0 0 14px;font-weight:800}
+.art-subtitle{font-size:17px;color:#5C5346;line-height:1.7;margin-bottom:16px}
+.art-meta{font-size:13px;color:#8A8071;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif}
+.swap{display:flex;flex-wrap:wrap;gap:10px;margin:22px auto 0}
+.swap a{flex:1 1 240px;display:block;text-decoration:none;padding:12px 15px;border-radius:9px;
+ border:1px solid rgba(43,38,32,.16);background:#fff;color:#2B2620;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;font-size:14px;line-height:1.6}
+.swap a b{display:block;font-size:14.5px;margin-bottom:2px}
+.swap a span{color:#8A8071;font-size:12.5px}
+.swap a:hover{border-color:#2F5470;box-shadow:0 2px 10px rgba(43,38,32,.07)}
+article{padding:30px 0 10px}
+.abs{background:#EFF3F7;border-left:4px solid #2F5470;border-radius:0 8px 8px 0;
+ padding:18px 20px;margin:0 0 26px;font-size:15.5px;line-height:1.85;color:#4A4238}
+.abs b{color:#24425A}
+.toc{border:1px solid rgba(43,38,32,.13);border-radius:9px;padding:16px 20px;margin:0 0 34px;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;font-size:14.5px;background:#FFFDF8}
+.toc .tl{font-size:12.5px;letter-spacing:.14em;color:#2F5470;font-weight:700;margin-bottom:10px}
+.toc ol{margin:0;padding-left:20px;color:#5C5346}
+.toc li{margin:5px 0}
+.toc a{color:#4A4238;text-decoration:none}
+.toc a:hover{color:#2F5470;text-decoration:underline}
+h2{font-size:22px;line-height:1.5;margin:44px 0 16px;padding-top:8px;font-weight:800;
+ border-top:1px solid rgba(43,38,32,.10)}
+h2 .no{display:inline-block;min-width:1.9em;color:#2F5470;font-size:16px;font-weight:700;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif}
+p{margin:0 0 17px;text-align:justify}
+p b,li b{color:#24425A}
+ul.pts{margin:0 0 18px;padding-left:0;list-style:none}
+ul.pts li{position:relative;padding-left:20px;margin:0 0 10px;text-align:justify}
+ul.pts li:before{content:"—";position:absolute;left:0;color:#2F5470}
+blockquote{margin:0 0 20px;padding:14px 18px;background:#FFFDF8;
+ border-left:3px solid rgba(43,38,32,.22);color:#4A4238;font-size:16px}
+.endbox{margin:48px 0 10px;padding:22px;border-radius:10px;background:#EFF3F7;
+ border:1px solid rgba(43,38,32,.12)}
+.endbox .et{font-size:12.5px;letter-spacing:.14em;color:#2F5470;font-weight:700;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;margin-bottom:12px}
+.endbox a{color:#24425A}
+footer{margin-top:46px;padding:26px 0 40px;border-top:1px solid rgba(43,38,32,.12);
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;font-size:13px;color:#8A8071}
+footer a{color:#8A8071}
+@media(max-width:640px){body{font-size:16px}h1.art-title{font-size:26px}h2{font-size:19.5px}}
+</style>
+</head>
+<body>
+<nav class="cnav"><div class="wrap">
+  <a class="cnav-logo" href="/browse/">SDE Universes</a>
+  <a class="cnav-back" href="/students/zhang-qiong/criterion-parasitism/">← 回母文《判准寄生的双向吞噬环》</a>
+</div></nav>
+
+<header class="art"><div class="wrap">
+  <div class="art-eyebrow">配套读物 · 技术与方法实践 · 母文《判准寄生的双向吞噬环》</div>
+  <h1 class="art-title">引进一套新标准之前，先把这笔账记下来</h1>
+  <div class="art-subtitle">两栏对照、二十个决定、一次拿掉检验——一套给要引进新衡量办法的人用的寄生度体检法</div>
+  <div class="art-meta">SDE Universes · 配套读物 · 2026年8月 · 约 5157 字</div>
+  <div class="swap">
+    <a href="/students/zhang-qiong/criterion-parasitism/"><b>← 母文 · 判准寄生的双向吞噬环</b><span>完整论证在这里</span></a>
+    <a href="/students/zhang-qiong/criterion-parasitism/explain.html"><b>🌱 白话解释文 · 老面馆上了外卖平台之后</b><span>用日常生活的类比，把母文讲成人人能懂的话</span></a>
+  </div>
+</div></header>
+
+<article class="wrap">
+<div class="abs"><b>这一篇是什么</b>　母文的判断是：扩展判准以容纳新对象，与判断内核被外来逻辑蚀空，是同一个动作的两面，不可避免，只能计量。这一篇把它落成可执行的工作：怎么在引进之前记下将要丢的东西、怎么给寄生度打分、怎么守住一处不被小标准覆盖的整体判断、怎么识别那句最危险的“其实是一回事”。含五道工序、三张判据、五种失败模式、两个演练与一张随身卡。<br><br><b>读法</b>　这一篇写给：已经认同母文的判断、现在想把它用到自己手头工作上的人。全篇以可操作为准，不重复论证。</div>
+<div class="toc"><div class="tl">目 录</div><ol><li><a href="#s1">先把这套东西的用途说准</a></li><li><a href="#s2">工序一：引进之前，先写一份“它测不了什么”</a></li><li><a href="#s3">工序二：两栏对照——墙上那套与手上那套</a></li><li><a href="#s4">工序三：给寄生度打分</a></li><li><a href="#s5">工序四：保住一处不被小标准覆盖的整体判断</a></li><li><a href="#s6">工序五：拿掉检验</a></li><li><a href="#s7">判据一：这是寄生还是应付</a></li><li><a href="#s8">判据二：一个判断内核还在不在</a></li><li><a href="#s9">判据三：三层机制各自到了哪一层</a></li><li><a href="#s10">五种失败模式</a></li><li><a href="#s11">演练一：一家要上新渠道的老店</a></li><li><a href="#s12">演练二：一个引进了新评价体系的团队</a></li><li><a href="#s13">一页纸随身卡</a></li><li><a href="#s14">边界：这套东西管不了什么</a></li><li><a href="#s15">一个容易被忽略的位置：新人</a></li><li><a href="#s16">记录格式：一张只有三栏的纸</a></li><li><a href="#s17">收尾：这套东西做对了是什么样子</a></li></ol></div>
+<h2 id="s1"><span class="no">01</span>先把这套东西的用途说准</h2>
+<p>这不是一份“抵抗量化”的手册，也不是一份“如何设计更好的指标”的手册。它只做一件事：<b>让一笔从来不被记账的成本，变成可以被看见、被估价、被交代的东西。</b>之所以要这样定位，是因为另外两条路都走不通。抵抗走不通：不引进新的衡量办法，通常意味着接不住新业务、看不见新现象、处理不了新问题；而这些代价往往在几年内就致命。设计更好的指标也走不通：任何一套可测量的判准，都只能装那些可被写下来的东西；而原有判断里最要紧的部分恰恰装不进去。<b>指标做得再精细，也只是把外来逻辑铺得更细，不会把说不清楚的那部分接回来。</b>所以剩下的唯一有效动作是记账。它不阻止任何事发生，但它能让一个组织在五年后知道：<b>当初到底用什么换了什么。</b></p>
+<h2 id="s2"><span class="no">02</span>工序一：引进之前，先写一份“它测不了什么”</h2>
+<p>这是全套里唯一必须在事前做的动作，也是最便宜、最容易被跳过的一步。在任何一套新的衡量办法上线之前，花一小时，把三样东西写下来。<b>第一，我们原来靠什么判断？</b>要求写具体的动作和场景，不写抽象的原则。不写“靠专业经验”，写“师傅看客人今天的脸色决定要不要多下一把面”“主任在查房时会多站三十秒看病人的呼吸”。<b>第二，这套新办法能测什么？</b>照抄它的字段即可，这一栏最容易填。<b>第三，第一栏里有哪些，第二栏装不进去？</b>这一栏是全部的价值所在。第三栏的内容有一个共同特征：<b>它们都需要有人在场，而且当事人说不太清楚自己在看什么。</b>这不是他们词穷——那部分本来就没有词，它一直靠人在场来承载。产出物是一张纸，三栏。它不进任何系统，不做汇报，只需要有人保管。<b>它唯一的使用时刻，是几年后有人问“我们到底丢了什么”的时候。</b></p>
+<h2 id="s3"><span class="no">03</span>工序二：两栏对照——墙上那套与手上那套</h2>
+<p>上线之后，每半年做一次这道工序，二十分钟。<b>左栏写“墙上那套”</b>：写在文件里的、开会时说的、对外介绍时说的那个判断标准。原话抄下来。<b>右栏写“手上那套”</b>：列出最近二十个具体决定，每一个后面注明当时真正起决定作用的是什么。决定要选具体的、有后果的：换供应商、改流程、调整排班、录用或辞退一个人、加一项服务、否决一个方案、给一个结论。<b>不要选“我们决定重视质量”这种没有具体动作的。</b>这道工序的全部技术含量在于诚实。有两个常见的自欺要挡住：<b>一是把动机当成依据。</b>“我当时是为了质量才改的流程”——问题不是你为了什么，是你<b>看着什么做的决定</b>。看着评分做的，就记评分。<b>二是把事后解释当成当时依据。</b>很多决定在事后都能被讲成符合墙上那套。<b>判准以当时手边摆着的那个东西为准。</b>两栏摆在同一张纸上，这道工序就成了大半——<b>因为这两套判准在日常里永远不会同框。</b></p>
+<h2 id="s4"><span class="no">04</span>工序三：给寄生度打分</h2>
+<p>把工序二的二十个决定按“实际由外来判准决定”计数，得出一个粗略的比例，对照三档。<b>轻度（三到五个）。</b>正常，是引进新业务的合理代价。此时原有判断仍是主力，外来判准处理的是它本来就处理不了的那一块。<b>这一档不需要任何动作，只需要记录，作为下一次比较的基线。</b><b>中度（约一半）。</b>墙上那套已经和现实脱节，但脱节这件事还有人记得，还能被说出口。这一档是唯一有干预空间的窗口——<b>过了这一档，干预的着力点会消失。</b>该做的是工序四。<b>重度（十七八个以上）。</b>外来判准已经是事实上的唯一判准。识别这一档有一个比计数更可靠的信号：<b>当有人说“这两者其实是一回事”的时候。</b>最后这句话值得单独说：它听起来像一次和解，实际上是原有判准正式退场的讣告。<b>在它被说出口之前，两套判准还是两套；被说出口之后，就只剩一套了，而且没有人会再觉得少了什么。</b></p>
+<h2 id="s5"><span class="no">05</span>工序四：保住一处不被小标准覆盖的整体判断</h2>
+<p>这是唯一有实际效果的干预动作，而且它的规格必须很窄，否则会失效。规格四条：<b>一、范围要小。</b>不是“我们要重视整体判断”，而是一个具体的、有限的位置：每周有一次出品由师傅说了算；每月有一个病例的处置由主任凭经验定；每季度有一次录用由带教的人一票决定。<b>二、不许拆解。</b>这个位置上的判断不许被要求说明理由，不许被拆成几项打分，不许事后复盘“你当时的依据是什么”。<b>一旦要求说明，它就会被翻译成小标准，而翻译完就没了。</b><b>三、不许考核。</b>它的结果不进任何统计，不与任何人的评价挂钩。理由和上一条一样。<b>四、必须真的算数。</b>这个位置上的判断要能改变一个真实的结果。<b>一个只有象征意义的整体判断位，三个月内会自己消失</b>，因为没有人会为一个不改变任何事的动作花心思。这个位置的价值不在于它做出的那几个判断本身，在于<b>它让“整体上不对”这句话还有地方可说</b>。碎裂真正的代价就是取消了这句话的落脚点，而这个位置是把落脚点保住的唯一办法。</p>
+<h2 id="s6"><span class="no">06</span>工序五：拿掉检验</h2>
+<p>每年做一次，五分钟，纯思想实验，不需要真的动任何东西。设想那套外来判准明天消失，然后问三个问题。<b>一、我们还能不能判断？</b>答“那就没法判断了”——寄生已完成，原有判准不是被压制，是已经不存在。<b>二、谁还会判断？</b>如果答案指向某几个具体的人（还在的老师傅、快退休的老主任），那么它还活着，但<b>挂在人身上不在制度里</b>，人一走就断。这时候最要紧的事不是改指标，是<b>在那几个人还在的时候，让年轻人跟着他们做够时间</b>。<b>三、我们会不会立刻去找一个替代品？</b>如果第一反应是“那得赶紧换一套新的指标”，说明这个地方已经受不了没有外来判准的状态。<b>寄生真正的成果不是某一套指标，是让人再也受不了没有指标。</b>第三问最有诊断价值，因为它测的不是某一套工具，是整个组织的判断体质。</p>
+<h2 id="s7"><span class="no">07</span>判据一：这是寄生还是应付</h2>
+<p>两者的处理方式完全不同，不能混。<b>应付（形式主义）</b>：人知道自己在应付；心里有另一套真标准；压力一撤，真东西就回来。处理办法是常规的——减少无效检查、简化流程、改变激励。<b>寄生</b>：没有人在应付；按外来判准做的动作是真心认为该那么做的；新来的人从第一天起学的就是这套，他没有另一套可以回去。分辨只需要一句话：<b>“如果明天那套东西没了，我们靠什么判断？”</b>答得上来是应付，答不上来是寄生。第二个辅助信号：<b>应付的人抱怨，寄生的人不抱怨。</b>一个所有人都很平静、很专业、很认同现行标准的地方，比一个天天抱怨的地方更值得做这次体检。</p>
+<h2 id="s8"><span class="no">08</span>判据二：一个判断内核还在不在</h2>
+<p>针对具体的判断能力，三条。<b>在</b>：老手能说出“这一项达标但整体不行”，并且能举出最近的例子；新人需要一年以上才敢自己判断；同一件事不同的老手会给出不同判断并且能争起来。<b>半在</b>：老手仍能说“整体不行”，但说不出最近的例子（说明这个判断已经很久没有被行使过）；新人半年就上手。<b>不在</b>：所有关于好坏的讨论都能落到某个具体指标上；出现“整体不行”的说法时，标准反应是“那你说是哪一项”；<b>没有人能在所有指标合格的前提下否决一件事。</b>最后这一条是硬判据。<b>一个内核还活着的地方，必然存在“各项都合格但我说不行”这种事，而且这种否决会被接受。</b></p>
+<h2 id="s9"><span class="no">09</span>判据三：三层机制各自到了哪一层</h2>
+<p>用来定位干预点，避免在被托住的地方使劲。<b>第一层（两套判准长期并存）</b>：墙上那句话还在，但日常动作已经换了。<b>信号是那个停顿</b>——问“你们靠什么判断”，对方先说墙上那句，然后停一下，再补一句“不过某某也得看着”。<b>第二层（统一判断碎成小标准）</b>：出现了大量各自合理、各自可测、合起来不再是原来那件事的小项。<b>信号是“说不上来”</b>——有人觉得不对但指不出是哪一项。<b>第三层（反思沉淀成常识）</b>：人人都会说“指标不等于质量”，说完照旧。<b>信号是这句话有固定句式</b>，而且说完之后从来没有任何动作跟着发生。定位的用处：<b>如果三层都到齐了，不要指望从任何一层单独破局</b>——每一层都被另外两层托着。此时唯一还有效的是工序四那个很窄的整体判断位，因为它不试图推翻任何一层，只是在环外另开一小块地。</p>
+<h2 id="s10"><span class="no">10</span>五种失败模式</h2>
+<p><b>失败一：把体检做成对指标的批判。</b>结论写成“现行考核不合理，建议废除”。这会立刻引来一个无法回答的反问：那你说用什么？拆解：<b>体检的产出是账，不是提案。</b>账只回答“我们付了什么”，不回答“该怎么办”。<b>失败二：整体判断位被要求说明理由。</b>设了一个师傅说了算的位置，然后要求他每次写清楚依据。三个月后它变成了又一张评分表。拆解：<b>不许说明、不许拆解、不许考核，三条缺一不可。</b><b>失败三：把工序一留到事后做。</b>新办法上线一年后才想起来记“它测不了什么”。这时候当事人已经开始用新口径回忆旧做法，那份记录会严重失真。拆解：<b>工序一必须在上线前完成，晚一天都会掉质量。</b><b>失败四：用寄生度去指责引进者。</b>“当初就是你引进这套东西的。”这会让体检彻底变成追责，而下一次没有人再肯配合。拆解：<b>明确声明引进是正确的，账是给未来看的，不给过去定性。</b><b>失败五：这套体检本身变成新的指标。</b>“本年度寄生度控制在百分之三十以内”——一旦它进了考核，二十个决定的记录会立刻开始被挑选。拆解：<b>寄生度只许自查，不许上报，不许横向比较。</b></p>
+<h2 id="s11"><span class="no">11</span>演练一：一家要上新渠道的老店</h2>
+<p><b>引进之前（工序一）</b>：三栏纸写好。第三栏（新办法测不了的）列出了四条，其中一条是“看客人今天的状态决定分量”。这一条后来成了整份记录里最有价值的东西。<b>半年后（工序二）</b>：两栏对照。墙上是“以出品为准”，二十个决定里有九个由新渠道的口径决定。判为<b>中度</b>。<b>干预（工序四）</b>：设一个很窄的位置——每周三的午市，出品标准由师傅一人定，不看任何数据，不进统计，不复盘。<b>一年后（工序五）</b>：拿掉检验。第一问答得上来（师傅还在），第二问指向两个具体的人，第三问的反应是“那我们周三那套也能用啊”。<b>判定</b>：内核还在，但挂在两个人身上。<b>最要紧的动作因此不是调指标，是趁那两个人还在，让年轻人在周三那个位置上跟着做够时间。</b>这个结论不是从指标里读出来的，是从工序五第二问里读出来的。</p>
+<h2 id="s12"><span class="no">12</span>演练二：一个引进了新评价体系的团队</h2>
+<p><b>背景</b>：为了承接一类新业务，团队引进了那门业务的一整套考核口径。业务做起来了，两年后老成员普遍觉得“我们不像原来那个团队了”，但说不清哪里变了。<b>工序二</b>：二十个决定里十六个由新口径决定。且访谈中出现了那句话——“其实做得好的项目，指标自然就好看”。判为<b>重度</b>。<b>判据二检查</b>：问“有没有过所有指标合格但被否决的项目”，答案是最近一年一次也没有。<b>内核判为不在。</b><b>工序一补做（迟了但仍有用）</b>：找三位在引进之前就在的老成员，各自写下“当年我们靠什么判断一个项目做得好”。三份写出来的东西重合度很高，而且<b>全部落在新口径的字段之外</b>——比如“客户在第三次会议上开始主动提问题”。<b>动作</b>：不动考核，改在项目复盘里加一个不评分、不记录、不与考核挂钩的问题：“这个项目里，有没有出现过那三条老信号？”<b>六个月后</b>：这个问题被答出过四次。<b>其中一次导致了一个各项指标良好的项目被主动叫停</b>——按判据二，这是内核回来的第一个硬证据。</p>
+<h2 id="s13"><span class="no">13</span>一页纸随身卡</h2>
+<ul class="pts"><li>一、我们原来靠什么判断？（写具体动作，不写原则）</li><li>二、这套新办法能测什么？它测不了上面的哪几条？</li><li>三、墙上那句话是什么？原话。</li><li>四、最近二十个决定，几个是由外来那套决定的？</li><li>五、有没有人说过“这两者其实是一回事”？</li><li>六、有没有过“各项都合格但我说不行”这种事？最近一次是什么时候？</li><li>七、如果那套东西明天没了，我们靠什么判断？</li><li>八、谁还会判断？他们还在吗？年轻人跟他们做过多久？</li><li>九、我们受不受得了一段没有指标的日子？</li><li>十、这半年，有没有一处判断是不看任何数据做出的、而且真的算数？</li></ul>
+<p><b>第六条和第九条是这张卡的秤。</b>第六条测内核还在不在，第九条测这个组织的判断体质——<b>受不了没有指标，比任何一套具体指标都更能说明寄生的深度。</b></p>
+<h2 id="s14"><span class="no">14</span>边界：这套东西管不了什么</h2>
+<p><b>它不给替代方案。</b>体检的产出是账，不是新的判准。任何“那你说该用什么”的追问，正确的回答是“这份账不回答这个问题”。<b>混进方案，账就会开始为方案服务，数字会立刻变形。</b><b>它不适用于刚引进的头一年。</b>新办法上线的头几个月，混乱和不适应是正常的，此时做体检得到的是磨合噪声，不是寄生。<b>至少等一年，等新口径成为日常之后再量。</b><b>它不能用来评价人。</b>寄生度高不说明任何人做错了。引进是对的，使用是正当的，代价是结构性的。<b>把它做成对某个人或某个部门的评价，是这套东西最坏的一种用法。</b><b>最后一条：这套体检自己也会被寄生。</b>当“寄生度”“内核”“拿掉检验”成为一个组织里的流行说法，它们会被写进材料、被要求汇报、被做成年度指标。到那一步，这份账就变成了它自己诊断的那个东西——<b>一套可测量的、说完就完的、不改变任何具体决定的外来判准。</b>所以它最好用得稀一点：一年一次，一张纸，不留副本，不给任何人看。</p>
+<h2 id="s15"><span class="no">15</span>一个容易被忽略的位置：新人</h2>
+<p>整套体检的对象通常是制度和流程，但有一个位置的信息量比它们都大，而且几乎没有成本：<b>新人。</b>一个组织的真实判准，最诚实地写在新人身上——因为老人身上有历史，会不自觉地混用两套；新人没有历史，他学到的就是这里实际在用的那一套。所以每半年花二十分钟，问入职一年以内的人三个问题。<b>第一，你判断一件事做得好不好，看什么？</b>不要给选项，让他自己说。他脱口而出的那几样，就是这里的实际判准。<b>第二，有没有人教过你，什么时候不能只看这几样？</b>如果答案是“没有”，说明第二层机制（碎裂）已经完成——<b>小标准之外没有任何东西被传递。</b><b>第三，你见过有人说“这个各项都合格但我觉得不行”吗？</b>这一问最灵敏。如果新人从来没见过这种场面，那么无论老人怎么说，<b>这个动作在这里事实上已经不存在了</b>——因为不存在的东西没有机会被新人看见。这三问还有一个额外的好处：它给出的答案不需要任何解释就能被理解。<b>当一个干了二十年的人听到新人的回答时，他通常会沉默一下</b>——那个沉默比任何一份体检报告都更能推动事情。</p>
+<h2 id="s16"><span class="no">16</span>记录格式：一张只有三栏的纸</h2>
+<p>所有产出都压在一张纸上，手写，不进系统，一年一张。<b>第一栏 · 我们原来靠什么判断（工序一，只在引进时写一次，此后逐年抄下来不改）。</b>这一栏是基准，抄写这个动作本身有价值——每年重抄一遍，你会发现自己开始看不懂当年写的某几条，那正是它们正在消失的证据。<b>第二栏 · 今年二十个决定的计数。</b>只写一个比例和三个最典型的例子。<b>不要写完整清单</b>，清单会诱使人去核对和辩解。<b>第三栏 · 今年的三个信号。</b>只记三样：有没有人说过“其实是一回事”；有没有过“各项合格但被否决”；拿掉检验的第三问答案是什么。这张纸的用法只有一个：<b>明年拿出来，和新的一张摆在一起看。</b>单看一年的数据说明不了什么——寄生是一个多年过程，它的形状只在纵向对比里显现。纪律：<b>这张纸只许一个人保管，不许公开，不许作为任何讨论的材料。</b>一旦它进入公共讨论，第二栏的数字会在下一年立刻好转，而好转的方式是重新定义“决定”。</p>
+<h2 id="s17"><span class="no">17</span>收尾：这套东西做对了是什么样子</h2>
+<p>最后说清楚成功的样子，因为它同样不像成功。<b>不会有任何指标改善。</b>这份账不改变考核，不改变流程，不改变任何一项数据。做完之后，从外面看，什么也没发生。<b>你会更清楚地知道自己在失去什么。</b>这不是一种愉快的收获。很多人做完工序一之后的反应是有点难受——因为第三栏那几条写出来之后，你会意识到它们已经好几年没被行使过了。<b>偶尔会出现一次不符合任何指标的决定。</b>那个很窄的整体判断位，一年可能只产出三四次真正有分量的判断。其余时候它看起来像浪费。<b>而最好的迹象是一句沉默。</b>当一个老手听完新人回答“我判断好坏看什么”之后，停了两秒没说话——那两秒里发生的事情，比任何一份体检报告都更接近这套东西真正想要的东西。因为整件事从头到尾只有一个目的：<b>让一笔不被记账的成本，在还来得及的时候，被某个人看见一次。</b></p>
+<div class="endbox">
+  <div class="et">接下来读什么</div>
+  <p style="margin-bottom:10px">这一篇只是入口。真正的论证、边界与反驳，都在母文里：<a href="/students/zhang-qiong/criterion-parasitism/">《判准寄生的双向吞噬环：非人行动者与社会学研究范式的转型困境》</a>。</p>
+  <p style="margin:0">另一条路：<a href="/students/zhang-qiong/criterion-parasitism/explain.html">🌱 白话解释文《老面馆上了外卖平台之后》</a>——用日常生活的类比，把母文讲成人人能懂的话。</p>
+</div>
+</article>
+
+<footer><div class="wrap">
+  © 2026 SDE Universes · 德麦国际 ·
+  <a href="/students/zhang-qiong/criterion-parasitism/">回母文</a> ·
+  <a href="/students/zhang-qiong/works/">张琼 · 全部作品</a> ·
+  <a href="/browse/">首页</a>
+</div></footer>
+<script src="/taste/wds-companion/wds-read.js?v=20260802b" defer></script>
+<script src="/wds-mode.js?v=20260802b" defer></script>
+</body>
+</html>
