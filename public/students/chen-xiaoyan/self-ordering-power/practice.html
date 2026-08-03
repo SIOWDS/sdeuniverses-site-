@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>对付一个会重排的系统：五步工序 · 方法实践文 | SDE Universes</title>
+<meta name="description" content="母文的核心是：很多顽固问题的真正对手不是某个点，而是那个被打击后自己重新排队的过程。这一篇把它变成手上的活——怎么判断你面对的是零件问题还是秩序问题，怎么画出承重点与备胎图，四种干预分别在什么时候用，以及怎么用重排时间而不是命中率来验收。">
+<meta name="author" content="王德生 · SDE Universes">
+<meta property="og:type" content="article">
+<meta property="og:title" content="对付一个会重排的系统：五步工序 · 方法实践文">
+<meta property="og:description" content="母文的核心是：很多顽固问题的真正对手不是某个点，而是那个被打击后自己重新排队的过程。这一篇把它变成手上的活——怎么判断你面对的是零件问题还是秩序问题，怎么画出承重点与备胎图，四种干预分别在什么时候用，以及怎么用重排时间而不是命中率来验收。">
+<link rel="canonical" href="https://sdeuniverses.com/students/chen-xiaoyan/self-ordering-power/practice.html">
+<style>
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:#FBF8F1;color:#2B2620;
+ font-family:"Noto Serif SC","Songti SC","Source Han Serif SC",Georgia,serif;
+ font-size:17px;line-height:1.95;letter-spacing:.01em}
+.wrap{max-width:760px;margin:0 auto;padding:0 22px}
+nav.cnav{background:#2B2620;color:#EDE4CF;position:sticky;top:0;z-index:30;
+ font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif}
+nav.cnav .wrap{display:flex;align-items:center;justify-content:space-between;gap:14px;height:50px}
+nav.cnav a{color:#EDE4CF;text-decoration:none;font-size:14px}
+nav.cnav .cnav-logo{font-weight:700;letter-spacing:.06em}
+nav.cnav .cnav-back{opacity:.82}
+nav.cnav .cnav-back:hover{opacity:1}
+header.art{background:linear-gradient(180deg,#FFFDF8 0%,#F5EFE2 100%);
+ border-bottom:1px solid rgba(43,38,32,.10);padding:44px 0 34px}
+.art-eyebrow{font-size:12.5px;letter-spacing:.16em;color:#2F5470;font-weight:700;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;margin-bottom:16px}
+h1.art-title{font-size:33px;line-height:1.4;margin:0 0 14px;font-weight:800}
+.art-subtitle{font-size:17px;color:#5C5346;line-height:1.7;margin-bottom:16px}
+.art-meta{font-size:13px;color:#8A8071;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif}
+.swap{display:flex;flex-wrap:wrap;gap:10px;margin:22px auto 0}
+.swap a{flex:1 1 240px;display:block;text-decoration:none;padding:12px 15px;border-radius:9px;
+ border:1px solid rgba(43,38,32,.16);background:#fff;color:#2B2620;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;font-size:14px;line-height:1.6}
+.swap a b{display:block;font-size:14.5px;margin-bottom:2px}
+.swap a span{color:#8A8071;font-size:12.5px}
+.swap a:hover{border-color:#2F5470;box-shadow:0 2px 10px rgba(43,38,32,.07)}
+article{padding:30px 0 10px}
+.abs{background:#EFF3F7;border-left:4px solid #2F5470;border-radius:0 8px 8px 0;
+ padding:18px 20px;margin:0 0 26px;font-size:15.5px;line-height:1.85;color:#4A4238}
+.abs b{color:#24425A}
+.toc{border:1px solid rgba(43,38,32,.13);border-radius:9px;padding:16px 20px;margin:0 0 34px;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;font-size:14.5px;background:#FFFDF8}
+.toc .tl{font-size:12.5px;letter-spacing:.14em;color:#2F5470;font-weight:700;margin-bottom:10px}
+.toc ol{margin:0;padding-left:20px;color:#5C5346}
+.toc li{margin:5px 0}
+.toc a{color:#4A4238;text-decoration:none}
+.toc a:hover{color:#2F5470;text-decoration:underline}
+h2{font-size:22px;line-height:1.5;margin:44px 0 16px;padding-top:8px;font-weight:800;
+ border-top:1px solid rgba(43,38,32,.10)}
+h2 .no{display:inline-block;min-width:1.9em;color:#2F5470;font-size:16px;font-weight:700;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif}
+p{margin:0 0 17px;text-align:justify}
+p b,li b{color:#24425A}
+ul.pts{margin:0 0 18px;padding-left:0;list-style:none}
+ul.pts li{position:relative;padding-left:20px;margin:0 0 10px;text-align:justify}
+ul.pts li:before{content:"—";position:absolute;left:0;color:#2F5470}
+blockquote{margin:0 0 20px;padding:14px 18px;background:#FFFDF8;
+ border-left:3px solid rgba(43,38,32,.22);color:#4A4238;font-size:16px}
+.endbox{margin:48px 0 10px;padding:22px;border-radius:10px;background:#EFF3F7;
+ border:1px solid rgba(43,38,32,.12)}
+.endbox .et{font-size:12.5px;letter-spacing:.14em;color:#2F5470;font-weight:700;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;margin-bottom:12px}
+.endbox a{color:#24425A}
+footer{margin-top:46px;padding:26px 0 40px;border-top:1px solid rgba(43,38,32,.12);
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;font-size:13px;color:#8A8071}
+footer a{color:#8A8071}
+@media(max-width:640px){body{font-size:16px}h1.art-title{font-size:26px}h2{font-size:19.5px}}
+</style>
+</head>
+<body>
+<nav class="cnav"><div class="wrap">
+  <a class="cnav-logo" href="/browse/">SDE Universes</a>
+  <a class="cnav-back" href="/students/chen-xiaoyan/self-ordering-power/">← 回母文《发生即秩序》</a>
+</div></nav>
+
+<header class="art"><div class="wrap">
+  <div class="art-eyebrow">配套读物 · 技术与方法实践 · 母文《发生即秩序》</div>
+  <h1 class="art-title">对付一个会重排的系统：五步工序</h1>
+  <div class="art-subtitle">——把《发生即秩序·自序力》的判断，落成识别、勘察、干预与验收的可执行工序</div>
+  <div class="art-meta">SDE Universes · 配套读物 · 2026年8月 · 约 4257 字</div>
+  <div class="swap">
+    <a href="/students/chen-xiaoyan/self-ordering-power/"><b>← 母文 · 发生即秩序</b><span>完整论证在这里</span></a>
+    <a href="/students/chen-xiaoyan/self-ordering-power/explain.html"><b>🌱 白话解释文 · 打地鼠：为什么打得越准，它换招越快</b><span>用日常生活的类比，把母文讲成人人能懂的话</span></a>
+  </div>
+</div></header>
+
+<article class="wrap">
+<div class="abs"><b>这一篇是什么</b>　母文的核心是：很多顽固问题的真正对手不是某个点，而是那个被打击后自己重新排队的过程。这一篇把它变成手上的活——怎么判断你面对的是零件问题还是秩序问题，怎么画出承重点与备胎图，四种干预分别在什么时候用，以及怎么用重排时间而不是命中率来验收。<br><br><b>读法</b>　这一篇写给：已经认同母文的判断、现在想把它用到自己手头工作上的人。全篇以可操作为准，不重复论证。</div>
+<div class="toc"><div class="tl">目 录</div><ol><li><a href="#s1">先判断：零件问题，还是秩序问题</a></li><li><a href="#s2">三个必须先量出来的数</a></li><li><a href="#s3">勘察：画一张承重与备胎图</a></li><li><a href="#s4">四种干预，分别什么时候用</a></li><li><a href="#s5">三件别做的事</a></li><li><a href="#s6">指标怎么改</a></li><li><a href="#s7">落到慢病与健康管理上</a></li><li><a href="#s8">落到组织与平台治理上</a></li><li><a href="#s9">落到教育与个人习惯上</a></li><li><a href="#s10">一个走完全套的例子</a></li><li><a href="#s11">为什么“彻底清除”是最贵的一种做法</a></li><li><a href="#s12">怎么把“不追求零”讲上去</a></li><li><a href="#s13">记账：把每一次重排存成地图</a></li><li><a href="#s14">三种最容易误判的情形</a></li><li><a href="#s15">什么时候不该用这套工序</a></li><li><a href="#s16">六种失败模式</a></li><li><a href="#s17">一页纸操作卡</a></li></ol></div>
+<h2 id="s1"><span class="no">01</span>先判断：零件问题，还是秩序问题</h2>
+<p>两类问题的处理方式完全不同，判错了会一路错到底。五个信号，中三个按秩序问题处理：</p>
+<ul class="pts"><li><b>按下葫芦浮起瓢</b>：这个点解决了，问题从另一个点冒出来，且冒出的位置每次不同。</li><li><b>越治越快</b>：加大力度之后，反弹来得更快而不是更慢。</li><li><b>没人下令也能成型</b>：新的绕法没有组织者，各处自己长出来，还很一致。</li><li><b>恢复的样子不一样</b>：系统恢复运转了，但结构和原来不同。</li><li><b>老办法失效得越来越快</b>：同一招的有效期一次比一次短。</li></ul>
+<p>反过来，如果每次问题都出在同一处、加大力度就有效、且不加干预不会自己变形——那是零件问题，直接修，别绕远路。</p>
+<p><b>这一步最常见的错误是把秩序问题当零件问题反复修</b>，修十次不如做一次勘察。</p>
+<h2 id="s2"><span class="no">02</span>三个必须先量出来的数</h2>
+<p>秩序问题要变成可管理的东西，先量三个数。它们比任何满意度调查都能说明系统的真实状态：</p>
+<ul class="pts"><li><b>重排时间</b>：从你施加干预，到新的运转方式成型，用了多久。三天和三个月是完全不同的两种系统。</li><li><b>可用路径数</b>：能达成同一件事的不同走法有几条。路径越多，你单点封堵的收益越低。</li><li><b>承重集中度</b>：现在这套运转，主要压在几个点上。压在一个点上的系统脆弱但好治；压在七八个点上的系统难治但耐操。</li></ul>
+<p><b>这三个数要在干预之前测一次、之后再测一次。</b>只测事后，你永远不知道是自己干预有效还是它本来就会变。</p>
+<h2 id="s3"><span class="no">03</span>勘察：画一张承重与备胎图</h2>
+<p>纸上四步，一小时能画完，别在会上画。</p>
+<ul class="pts"><li><b>一 · 列出现在承重的点</b>：这件事现在主要靠什么在支撑（哪几个人、哪几条通路、哪几项资源）。</li><li><b>二 · 列出闲置的备胎</b>：平时不起眼、但真出事能顶上的有哪些。<b>这一栏最容易漏，也最决定重排速度。</b></li><li><b>三 · 画重排通道</b>：如果砍掉承重点甲，最可能顶上来的是谁？第二顺位是谁？照这个问下去，通常两三层就够。</li><li><b>四 · 标出原料</b>：重排要消耗什么（时间、算力、人手、资金、注意力、变异空间）。这一栏决定了后面能不能用断资源那一招。</li></ul>
+<p><b>勘察的产出不是一份问题清单，是一张“它下一步会往哪走”的图。</b>没有这张图，后面四种干预全是盲打。</p>
+<h2 id="s4"><span class="no">04</span>四种干预，分别什么时候用</h2>
+<p><b>一 · 断资源（釜底抽薪）。</b>不打节点，断掉重排要用的原料。适用条件：原料集中、可控、断掉的副作用可承受。优点是不制造选择压力；缺点是常常伤及无辜——<b>断资源往往同时断掉了好的那部分，用之前先问清楚谁一起挨饿。</b></p>
+<p><b>二 · 改压力（别逼出唯一活路）。</b>把打击从“一律清零”改成“保留一部分”，避免只剩最难对付的那一撮。适用条件：你能承受问题不被彻底清除。这一招最反直觉，也最常被否决——<b>因为它要求你公开接受“不彻底”。</b></p>
+<p><b>三 · 占通道（守在下一站）。</b>用勘察图预测第二顺位，提前守住。适用条件：你有那张图，而且第二顺位数量有限。这是性价比最高的一招，收益直接来自勘察做得细不细。</p>
+<p><b>四 · 给一条更好走的秩序。</b>不堵，让另一套走法更省力，让系统自己选它。适用条件：你手上有能力提供那条路。<b>这一招最慢、最持久，也是唯一一种不制造对抗的。</b></p>
+<p>配法上的经验：<b>短期用三，中期用一，长期用四；二是全程的纪律，不是一次性动作。</b></p>
+<h2 id="s5"><span class="no">05</span>三件别做的事</h2>
+<ul class="pts"><li><b>单点强打到底</b>：把全部力气压在一个点上，等于替对方办一场选拔赛，选出最难对付的那一支。</li><li><b>求快速全歼</b>：越彻底的清除，越可能腾出位置给更凶的填补。生态、市场、组织里都反复验证。</li><li><b>只看命中率</b>：靶点打中了、违规账号封掉了、指标压下去了——这些都是过程量。<b>真正该看的是重排时间有没有变长、可用路径有没有变少。</b></li></ul>
+<p>三件事的共同毛病是：<b>它们都很容易汇报，且都在短期内好看。</b>这正是它们难被戒掉的原因。</p>
+<h2 id="s6"><span class="no">06</span>指标怎么改</h2>
+<p>把考核从“命中”改成“重排”，三个数直接拿来用：</p>
+<ul class="pts"><li><b>重排时间变长</b>＝干预真的起效了。这是首要指标。</li><li><b>可用路径数变少</b>＝对方的活动空间被压缩了。</li><li><b>承重集中度上升</b>＝下一次干预会更有效（但也意味着系统更脆，别一次压太狠）。</li></ul>
+<p>另外加一条护栏指标：<b>副作用面</b>——有多少无关部分被这次干预伤到。断资源那一招尤其需要它。</p>
+<p><b>报表上只要还有“清除数量”这一栏排在最前，行为就一定会退回单点强打。</b>改指标是这套方法里唯一必须先做的事。</p>
+<h2 id="s7"><span class="no">07</span>落到慢病与健康管理上</h2>
+<ul class="pts"><li><b>别只追单项指标回到正常</b>：一项被压住之后，观察其他几项是不是在悄悄重新配平。<b>指标之间的联动比单项的漂亮更能说明问题。</b></li><li><b>把“重排时间”当成好转的标志</b>：受到一次扰动（感冒、加班、旅行）之后，多久回到能正常过日子的状态。这个天数比某个数值更能说明恢复能力。</li><li><b>保留冗余</b>：睡眠、活动、社交、能自己做主的事，都是备胎。<b>在治疗期间把这些全砍掉去换某个指标，是在拆自己的备用系统。</b></li><li>边界要说清：这一段用于理解和沟通，<b>具体的用药、剂量与治疗方案，请由医生决定</b>，不要拿这套框架去改医嘱。</li></ul>
+<h2 id="s8"><span class="no">08</span>落到组织与平台治理上</h2>
+<ul class="pts"><li><b>堵漏之前先算重排时间</b>：上次收紧到新绕法成型用了几周？如果只有两三周，说明单纯堵漏无效，直接跳到改激励。</li><li><b>别追求零违规</b>：把某一类行为压到零，剩下的是最擅长隐蔽的那批，你从此看不见它们。<b>留一条能被看见的路，比全封更安全。</b></li><li><b>给一条更省力的合规路径</b>：绝大多数绕行是因为正门太难走。合规路径每减少一步，绕行率下降的幅度通常超过任何处罚。</li><li><b>警惕“表面恢复”</b>：整改之后一切照常运转，不代表回到原样，可能是有人在硬撑。<b>问一句谁在承重，比看恢复速度更要紧。</b></li></ul>
+<h2 id="s9"><span class="no">09</span>落到教育与个人习惯上</h2>
+<ul class="pts"><li><b>禁掉一件事之前，先想替代动作</b>：禁令的产物几乎总是替代动作，而不是空白。事先给出替代路径，能决定长出来的是什么。</li><li><b>观察自己的第二顺位</b>：戒掉一样东西之后补上来的那个，就是你系统里排第二的承重点。<b>认识它比对抗它有用。</b></li><li><b>给孩子留冗余</b>：完全被排满的时间表意味着零备胎，一次意外就会整体崩。留白不是浪费，是可重排的空间。</li></ul>
+<h2 id="s10"><span class="no">10</span>一个走完全套的例子</h2>
+<p>一个平台反复被薅羊毛，封号封了四轮，每轮三周后又起来。</p>
+<p><b>判断</b>：位置每次不同、封得越狠反弹越快、无人组织却手法一致——三个信号，秩序问题。</p>
+<p><b>量数</b>：重排时间从第一轮的六周缩到第四轮的十九天；可用路径从两条涨到五条；承重集中度下降（从少数大号变成大量小号）。<b>三个数都在往坏的方向走，说明前四轮干预实际上在训练对手。</b></p>
+<p><b>勘察</b>：承重点是身份获取成本与提现通道；备胎是各类可复用的验证方式；原料是低价获取的身份与自动化工具；第二顺位通道很清楚。</p>
+<p><b>干预</b>：不再加大封禁力度（放弃单点强打）；改成提高身份获取成本＋守住提现通道（断资源＋占通道）；同时把正常用户的验证步骤减少两步（给一条更好走的路）；保留一部分低风险行为不处理（改压力，避免只剩最隐蔽的那批）。</p>
+<p><b>验收</b>：三个月后重排时间从十九天回到七周，可用路径降到三条，正常用户投诉下降。<b>注意验收看的是这三个数，而不是“这个月封了多少”。</b></p>
+<h2 id="s11"><span class="no">11</span>为什么“彻底清除”是最贵的一种做法</h2>
+<p>这一条值得单独展开，因为它是最难被接受、也最常被违背的一条。</p>
+<p>彻底清除在直觉上是最负责任的做法：既然是坏东西，为什么要留？留一半算什么态度？这个直觉在处理零件问题时完全正确——螺丝松了就拧紧，没有拧一半的道理。</p>
+<p>问题在于，秩序问题里的“清除”从来不是清空，而是筛选。你能清掉的，永远是那些最容易被你发现、最按常规行事、成本最低的那一批；剩下的是最隐蔽、最耐受、最舍得投入的那一批。清一次，剩下的就精一次。清三轮之后，你面对的是一支由你亲手选拔出来的队伍，而你自己的手段还是原来那几招。</p>
+<p>更麻烦的是可见性。被清掉的那批是你看得见的部分，它们同时也承担着一个你没注意到的功能：占位置。它们在的时候，更凶的那批没有足够空间起来；它们被清空之后，位置腾出来了。生态学里这叫入侵窗口，市场里叫留下真空，组织里叫把老实人赶走之后剩下的全是会来事的。</p>
+<p>所以“保留一部分”不是心慈手软，是三件很冷的算计：保住可见性，保住占位，避免制造一次高强度选拔。它的代价是你必须公开接受一个不好看的数字——问题没有归零。多数组织宁可接受“归零然后反复复发”，也不愿意接受“稳定地存在一小部分”，因为前者每次都能汇报战果，后者从第一天起就要背着一个不体面的数字。</p>
+<p>这一步过不去，后面所有工序都会退回单点强打。它不是技术难点，是叙事难点。</p>
+<h2 id="s12"><span class="no">12</span>怎么把“不追求零”讲上去</h2>
+<p>既然是叙事难点，就得有一套讲法。四句话，按顺序讲。</p>
+<p>第一句先认账：我们不是不想清零，是清零这三轮的数据显示，每清一轮，反弹来得更快、手法更隐蔽。把前几轮的重排时间摆出来——六周、四周、十九天——这条曲线比任何论证都有力，因为它是我们自己打出来的。</p>
+<p>第二句给替代目标：我们把目标从“清除数量”换成“重排时间”。这不是放低要求，是换一个更难作弊的要求。清除数量可以靠加大力度冲上去，重排时间冲不上去，它只会在干预真正有效时变长。</p>
+<p>第三句给护栏：我们保留的是低风险、可观测的那一部分，不是放弃高风险部分；同时新增一条副作用面指标，防止为了好看的数字伤到正常用户。</p>
+<p>第四句给判输条件：如果六个月后重排时间没有变长、可用路径没有变少，这套方案作废，回到原办法。写下判输条件，是让这个提案通过的最有效一招——它把“要不要相信你”变成了“要不要给六个月”。</p>
+<p>一条经验：这四句里最不能省的是第一句。先认自己的账，再谈换目标；顺序反了，听起来就像在为无能找理论。</p>
+<h2 id="s13"><span class="no">13</span>记账：把每一次重排存成地图</h2>
+<p>最后一条，收益最慢也最值钱：给重排记账。</p>
+<p>每一轮干预结束，补一页记录，六栏——这次动的是哪个承重点、当时的三个数是多少、我们用了哪一种干预、它从哪条通道重排、用了多久、新的承重点是谁。写完归档，下一轮开始前先翻。</p>
+<p>坚持四五轮，你会攒下三样别处买不到的东西。一是这个系统的通道地图：它在被打击后会往哪几条路走，第二顺位通常是谁。有了这张图，占通道那一招才真正好用，否则永远是猜。二是自己这套手段的效力档案：哪种干预在哪种条件下让重排时间变长过，哪种从来没有。三是一条对付“这次不一样”的证据链——每当有人说这次情况特殊，翻记录就知道“特殊”出现过几次、每次说的是什么。</p>
+<p>没有记账的团队，每一轮都从惊讶开始，从加大力度结束，三年下来手法一点没长进，只是嗓门更大。有记账的团队，第三年就会明显比同行更早知道对手要往哪儿走——这不是聪明，是攒下来的地形知识。</p>
+<h2 id="s14"><span class="no">14</span>三种最容易误判的情形</h2>
+<p>第一种，把慢反应当成没反应。有些系统的重排要几个月才成型，你在第三周看不见变化，就断定干预无效，于是加码。等到第八周新秩序冒出来时，你已经把力度加到了会制造强选拔的水平。<b>定判断期要按上一轮的重排时间来定，不是按耐心来定。</b></p>
+<p>第二种，把自然波动当成重排。任何系统本来就有起伏。要区分，看两条：新出现的走法是不是有稳定结构（有没有可重复的步骤），以及它是不是在多个地方同时出现。零散、随机、不成套的，多半是波动；成套且到处都是的，才是重排。</p>
+<p>第三种，把外部变化当成自己的功劳。政策变了、季节变了、对手撤了，指标跟着好看，很容易被记成干预有效。<b>防这一条只有一个办法：留一块不做干预的对照区。</b>多数组织不肯留，理由是“不能对那部分不负责任”，代价是从此再也分不清自己哪一招真的有用。</p>
+<h2 id="s15"><span class="no">15</span>什么时候不该用这套工序</h2>
+<p>不是所有麻烦都值得这么大动干戈，四种情况直接跳过。</p>
+<p><b>问题只出现过一次，且条件不可复现。</b>没有重排，就没有可勘察的通道，硬套只会造出一张想象的地图。</p>
+<p><b>必须立即止损时。</b>着火了先灭火。勘察是两轮之间的事，不是现场的事。</p>
+<p><b>涉及安全、合规、法律责任的红线。</b>这些地方“保留一部分”不成立，零就是零。这套工序可以用来理解为什么违规屡禁不止，但不能用来给红线打折。</p>
+<p><b>你没有能力提供替代路径时。</b>四种干预里最持久的那一种需要你手上真有一条更好走的路。如果没有，诚实地承认自己只能做短期的占通道和断资源，别把“给一条更好的秩序”写进方案里当口号——<b>写了做不到，下一轮就没人再信这套框架。</b></p>
+<h2 id="s16"><span class="no">16</span>六种失败模式</h2>
+<ul class="pts"><li><b>把秩序问题当零件问题修</b>：修十次不如勘察一次。</li><li><b>只在事后测数</b>：分不清是干预有效还是它本来就会变。</li><li><b>断资源不算副作用面</b>：把好的那部分一起饿死。</li><li><b>改压力被当成放纵</b>：没有事先说明“保留一部分是为了不逼出最凶的那撮”，第一次质疑就会被推翻。</li><li><b>指标没改</b>：报表首栏还是清除数量，行为必然退回强打。</li><li><b>勘察图不更新</b>：对手重排过两轮之后，你的图已经过期，占通道会守错地方。</li></ul>
+<h2 id="s17"><span class="no">17</span>一页纸操作卡</h2>
+<ul class="pts"><li><b>一 · 判断</b>：五个信号中三个＝秩序问题。</li><li><b>二 · 量数</b>：重排时间／可用路径数／承重集中度，干预前后各测一次。</li><li><b>三 · 勘察</b>：承重点／备胎／重排通道／原料，四栏一张图。</li><li><b>四 · 干预</b>：短期占通道、中期断资源、长期给更好走的路；改压力是全程纪律。</li><li><b>五 · 验收</b>：看重排时间变长、路径变少、副作用面可控，不看清除数量。</li><li><b>六 · 复盘</b>：每轮更新勘察图，记下这次它从哪条路重排——<b>这份记录两年后就是你这行最值钱的地图。</b></li></ul>
+<p>母文负责论证这个对手为什么必须被单独命名，这一页负责让这条判断落到你正在反复失败的那件事上。</p>
+<div class="endbox">
+  <div class="et">接下来读什么</div>
+  <p style="margin-bottom:10px">这一篇只是入口。真正的论证、边界与反驳，都在母文里：<a href="/students/chen-xiaoyan/self-ordering-power/">《发生即秩序——论精准医疗的本体论盲区与“自序力”概念的确立》</a>。</p>
+  <p style="margin:0">另一条路：<a href="/students/chen-xiaoyan/self-ordering-power/explain.html">🌱 白话解释文《打地鼠：为什么打得越准，它换招越快》</a>——用日常生活的类比，把母文讲成人人能懂的话。</p>
+</div>
+</article>
+
+<footer><div class="wrap">
+  © 2026 SDE Universes · 德麦国际 ·
+  <a href="/students/chen-xiaoyan/self-ordering-power/">回母文</a> ·
+  <a href="/students/chen-xiaoyan/works/">全部作品</a>
+</div></footer>
+<script src="/taste/wds-companion/wds-read.js?v=20260802b" defer></script>
+<script src="/wds-mode.js?v=20260802b" defer></script>
+</body>
+</html>
