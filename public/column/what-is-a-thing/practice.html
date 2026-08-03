@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>给一个“东西”做体检：七道工序 · 方法实践文 | SDE Universes</title>
+<meta name="description" content="母文证明了“物”是被稳出来的而不是被找到的。这一篇把它变成手上的活：怎么把一个名词打回原形，怎么验收一个对象够不够格成为对象，怎么识破那些看着很稳其实是空的东西，以及怎么把一张属性表改写成一张能用的开关表。">
+<meta name="author" content="王德生 · SDE Universes">
+<meta property="og:type" content="article">
+<meta property="og:title" content="给一个“东西”做体检：七道工序 · 方法实践文">
+<meta property="og:description" content="母文证明了“物”是被稳出来的而不是被找到的。这一篇把它变成手上的活：怎么把一个名词打回原形，怎么验收一个对象够不够格成为对象，怎么识破那些看着很稳其实是空的东西，以及怎么把一张属性表改写成一张能用的开关表。">
+<link rel="canonical" href="https://sdeuniverses.com/column/what-is-a-thing/practice.html">
+<style>
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:#FBF8F1;color:#2B2620;
+ font-family:"Noto Serif SC","Songti SC","Source Han Serif SC",Georgia,serif;
+ font-size:17px;line-height:1.95;letter-spacing:.01em}
+.wrap{max-width:760px;margin:0 auto;padding:0 22px}
+nav.cnav{background:#2B2620;color:#EDE4CF;position:sticky;top:0;z-index:30;
+ font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif}
+nav.cnav .wrap{display:flex;align-items:center;justify-content:space-between;gap:14px;height:50px}
+nav.cnav a{color:#EDE4CF;text-decoration:none;font-size:14px}
+nav.cnav .cnav-logo{font-weight:700;letter-spacing:.06em}
+nav.cnav .cnav-back{opacity:.82}
+nav.cnav .cnav-back:hover{opacity:1}
+header.art{background:linear-gradient(180deg,#FFFDF8 0%,#F5EFE2 100%);
+ border-bottom:1px solid rgba(43,38,32,.10);padding:44px 0 34px}
+.art-eyebrow{font-size:12.5px;letter-spacing:.16em;color:#2F5470;font-weight:700;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;margin-bottom:16px}
+h1.art-title{font-size:33px;line-height:1.4;margin:0 0 14px;font-weight:800}
+.art-subtitle{font-size:17px;color:#5C5346;line-height:1.7;margin-bottom:16px}
+.art-meta{font-size:13px;color:#8A8071;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif}
+.swap{display:flex;flex-wrap:wrap;gap:10px;margin:22px auto 0}
+.swap a{flex:1 1 240px;display:block;text-decoration:none;padding:12px 15px;border-radius:9px;
+ border:1px solid rgba(43,38,32,.16);background:#fff;color:#2B2620;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;font-size:14px;line-height:1.6}
+.swap a b{display:block;font-size:14.5px;margin-bottom:2px}
+.swap a span{color:#8A8071;font-size:12.5px}
+.swap a:hover{border-color:#2F5470;box-shadow:0 2px 10px rgba(43,38,32,.07)}
+article{padding:30px 0 10px}
+.abs{background:#EFF3F7;border-left:4px solid #2F5470;border-radius:0 8px 8px 0;
+ padding:18px 20px;margin:0 0 26px;font-size:15.5px;line-height:1.85;color:#4A4238}
+.abs b{color:#24425A}
+.toc{border:1px solid rgba(43,38,32,.13);border-radius:9px;padding:16px 20px;margin:0 0 34px;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;font-size:14.5px;background:#FFFDF8}
+.toc .tl{font-size:12.5px;letter-spacing:.14em;color:#2F5470;font-weight:700;margin-bottom:10px}
+.toc ol{margin:0;padding-left:20px;color:#5C5346}
+.toc li{margin:5px 0}
+.toc a{color:#4A4238;text-decoration:none}
+.toc a:hover{color:#2F5470;text-decoration:underline}
+h2{font-size:22px;line-height:1.5;margin:44px 0 16px;padding-top:8px;font-weight:800;
+ border-top:1px solid rgba(43,38,32,.10)}
+h2 .no{display:inline-block;min-width:1.9em;color:#2F5470;font-size:16px;font-weight:700;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif}
+p{margin:0 0 17px;text-align:justify}
+p b,li b{color:#24425A}
+ul.pts{margin:0 0 18px;padding-left:0;list-style:none}
+ul.pts li{position:relative;padding-left:20px;margin:0 0 10px;text-align:justify}
+ul.pts li:before{content:"—";position:absolute;left:0;color:#2F5470}
+blockquote{margin:0 0 20px;padding:14px 18px;background:#FFFDF8;
+ border-left:3px solid rgba(43,38,32,.22);color:#4A4238;font-size:16px}
+.endbox{margin:48px 0 10px;padding:22px;border-radius:10px;background:#EFF3F7;
+ border:1px solid rgba(43,38,32,.12)}
+.endbox .et{font-size:12.5px;letter-spacing:.14em;color:#2F5470;font-weight:700;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;margin-bottom:12px}
+.endbox a{color:#24425A}
+footer{margin-top:46px;padding:26px 0 40px;border-top:1px solid rgba(43,38,32,.12);
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;font-size:13px;color:#8A8071}
+footer a{color:#8A8071}
+@media(max-width:640px){body{font-size:16px}h1.art-title{font-size:26px}h2{font-size:19.5px}}
+</style>
+</head>
+<body>
+<nav class="cnav"><div class="wrap">
+  <a class="cnav-logo" href="/browse/">SDE Universes</a>
+  <a class="cnav-back" href="/column/what-is-a-thing/">← 回母文《何谓物》</a>
+</div></nav>
+
+<header class="art"><div class="wrap">
+  <div class="art-eyebrow">配套读物 · 技术与方法实践 · 母文《何谓物》</div>
+  <h1 class="art-title">给一个“东西”做体检：七道工序</h1>
+  <div class="art-subtitle">——把《何谓物》的判断，落成定义对象、验收实体、识破伪物、写操作定义的可执行工序</div>
+  <div class="art-meta">王德生 原著 · Claude 撰写 · SDE Universes · 2026年8月 · 约 4546 字</div>
+  <div class="swap">
+    <a href="/column/what-is-a-thing/"><b>← 母文 · 何谓物</b><span>完整论证在这里</span></a>
+    <a href="/column/what-is-a-thing/explain.html"><b>🌱 白话解释文 · 番茄在关灯的房间里是什么颜色</b><span>用日常生活的类比，把母文讲成人人能懂的话</span></a>
+  </div>
+</div></header>
+
+<article class="wrap">
+<div class="abs"><b>这一篇是什么</b>　母文证明了“物”是被稳出来的而不是被找到的。这一篇把它变成手上的活：怎么把一个名词打回原形，怎么验收一个对象够不够格成为对象，怎么识破那些看着很稳其实是空的东西，以及怎么把一张属性表改写成一张能用的开关表。<br><br><b>读法</b>　这一篇写给：已经认同母文的判断、现在想把它用到自己手头工作上的人。全篇以可操作为准，不重复论证。</div>
+<div class="toc"><div class="tl">目 录</div><ol><li><a href="#s1">什么时候该把这套工序拿出来</a></li><li><a href="#s2">工序一 · 名词还原</a></li><li><a href="#s3">工序二 · 特征清点与归属</a></li><li><a href="#s4">工序三 · 三指标验收</a></li><li><a href="#s5">工序四 · 伪物检测</a></li><li><a href="#s6">工序五 · 把属性表改写成开关表</a></li><li><a href="#s7">工序六 · 把私人对象造成公共对象</a></li><li><a href="#s8">工序七 · 写退休条款</a></li><li><a href="#s9">落到产品与数据建模上</a></li><li><a href="#s10">落到诊断与健康上</a></li><li><a href="#s11">落到组织与制度上</a></li><li><a href="#s12">一个走完七道工序的例子</a></li><li><a href="#s13">什么时候不该做这件事</a></li><li><a href="#s14">怎么让别人接受一个改过的定义</a></li><li><a href="#s15">六种失败模式</a></li><li><a href="#s16">一页纸操作卡</a></li></ol></div>
+<h2 id="s1"><span class="no">01</span>什么时候该把这套工序拿出来</h2>
+<p>凡是要“定义一个东西”的活，都在射程内：给产品定品类，给数据库建表，给病人下诊断名，给组织画部门框，给合同写标的，给指标起名字，给一个新概念命名。</p>
+<p>这些活有一个共同的危险：<b>一旦名字定下来，后面所有人都会围着这个名字干活，没人再回头问它站不站得住。</b>表建好了，业务就被表的形状规定；病名下了，后面所有检查都朝那个方向做；部门框画了，责任就按框分。</p>
+<p>四个信号提示你该做体检：</p>
+<ul class="pts"><li>同一个名字，两个部门说的显然不是一回事，可谁也说不清差别在哪。</li><li>这个对象的数据总在边缘打架：这条算不算它？那条算不算？</li><li>换一个场景、换一批人，这个东西就不成立了，但名字还在用。</li><li>谁也说不出它什么时候算不成立——一个永远不会错的对象，通常是个空壳。</li></ul>
+<h2 id="s2"><span class="no">02</span>工序一 · 名词还原</h2>
+<p>目标：把名词打回它原本的那件事。</p>
+<p>对着这个名词问三句：</p>
+<ul class="pts"><li><b>它在做什么？</b>用一个动词短语重写它。“用户留存”→“用户在多长时间内还回来”；“企业文化”→“这群人反复做出来的那些不必开会就统一的动作”；“健康”→“身体一天天维持住的一场运行”。</li><li><b>靠什么维持？</b>列出让它保持成立的条件，至少三条。列不出来的，说明你手上只有名字。</li><li><b>停掉哪一样它就散？</b>这一问最狠，它直接指出承重的那条腿。</li></ul>
+<p>写成一句话存档：<b>“____ 不是一件东西，是 ____ 在 ____ 条件下持续维持出来的一个稳定花样；停掉 ____ 它就散。”</b></p>
+<p>这道工序不是要你以后不说名词——名词很省事，照说。它的作用是让你在动手定义之前，先看见维护成本挂在哪里。<b>一件东西不需要维护，一场发生需要</b>；把发生说成东西，责任就自动消失了。</p>
+<p>还有一个副产品值得单说：还原之后，<b>责任人会自己浮出来</b>。“用户留存”是一件东西的时候，没人负责；写成“用户在三十天内还回来”，就必须有人回答“靠什么让他回来”，于是维持条件的那几条腿各自有了主。很多组织里“没人负责”的事，根源不是分工不清，是那件事被说成了一个名词。</p>
+<h2 id="s3"><span class="no">03</span>工序二 · 特征清点与归属</h2>
+<p>列出这个对象最常被提到的八到十条特征，然后逐条判归属。每条问：<b>这条特征，是它自带的，还是在某种互动里冒出来的？</b></p>
+<p>判归属有个简便办法——问“换掉谁它会变”：</p>
+<ul class="pts"><li>换掉观察者/使用者它就变的（比如“操作简单”“口感好”“服务态度好”），是关系里的。</li><li>换掉环境/条件它就变的（比如“响应快”“成本低”“耐用”），是条件里的。</li><li>换掉什么都不变的——<b>这一栏通常是空的</b>，如果你填得很满，多半是没认真想。</li></ul>
+<p>清点完做一件事：把每条特征后面补上“在什么条件下测得”。“耐用”补成“在日均八小时使用、常温、每季度保养一次的条件下，三年内故障率低于百分之五”。这一步做完，一半的扯皮就没了，因为<b>争论从“它是不是耐用”变成了“条件对不对得上”</b>。</p>
+<p>这一栏做完常有一个不舒服的发现：一个用了很多年的核心词，八条特征里有七条都写着“在某种互动里冒出来的”。别急着否定它——<b>这不说明它是假的，只说明它的成立是有条件的</b>，而那些条件从来没被写下来。把条件写下来，就是这道工序的全部收益。</p>
+<h2 id="s4"><span class="no">04</span>工序三 · 三指标验收</h2>
+<p>一个对象够不够格被当成对象，用三条数：</p>
+<ul class="pts"><li><b>抱得住（整体性）</b>：那些特征是不是总一起出现？取三十个真实样本，数一数“该有的特征同时出现”的比例。低于七成，这个对象的边界是糊的。</li><li><b>稳得住（稳定性）</b>：换时间、换场景、换测量人，它还成不成立。做法是取两个相隔较远的时间段各测一次，看结论翻不翻。</li><li><b>离得开（独立性）</b>：能不能从背景里拎出来。做法是做一次“抽掉测试”——抽掉其中一个成分或一个人，它塌不塌；塌了，说明它不是一个对象，是那个成分的影子。</li></ul>
+<p>三条都过，才允许它进入正式定义、进入表、进入考核。<b>过不了就先当作“疑似对象”标注在案</b>，不要急着给它建表、建流程、建考核——那些东西一旦建起来，就会反过来把它撑成看似真实的样子。</p>
+<p>三条的强度不一样，值得分清主次：<b>离得开最贵，抱得住最容易造假，稳得住最容易被时间打脸。</b>很多东西靠不断地喂才存在——每周开会才存在的“协作机制”、每月发通知才存在的“社群”、靠补贴才存在的“需求”。它们在抱得住上分很高（每次都一起出现），一做抽掉测试就现原形。所以三条里如果只来得及做一条，做抽掉测试。</p>
+<h2 id="s5"><span class="no">05</span>工序四 · 伪物检测</h2>
+<p>伪物的标准长相是：<b>宏观很稳，微观很乱。</b>大轮廓天天在报表上，底下的细节谁也没看过。六个信号，中三个就要停下来查：</p>
+<ul class="pts"><li>只有汇总数，没人看过原始记录。</li><li>定义随着场合变，但没人觉得这是问题。</li><li>所有数据都由同一个来源产生，且这个来源受考核影响。</li><li>边缘案例一律靠“具体情况具体分析”处理，且不留记录。</li><li>它从来没有被证伪过，也说不出怎么才算证伪。</li><li>一提出质疑，回答是“大家都这么用”。</li></ul>
+<p>查法很简单：<b>随机抽五个原始样本，自己从头核一遍。</b>伪物在这一步基本都会露馅——要么找不到原始记录，要么五个样本各是各的口径。</p>
+<p>一句提醒：发现伪物不等于要立刻废掉它。很多伪物承担着协调功能，废掉会伤到别的东西。正确处置是<b>先降级</b>：从“事实”降为“约定指标”，注明口径与有效期，再逐步换掉。</p>
+<h2 id="s6"><span class="no">06</span>工序五 · 把属性表改写成开关表</h2>
+<p>这是最省事、见效最快的一道工序。</p>
+<p>原来的写法是属性表：硬度高、可靠性好、扩展性强、责任心强。这类词的毛病是<b>没有对手</b>——什么都能套，套上去也不改变任何决策。</p>
+<p>改写成开关表，一条特征写成两栏：<b>开哪些动作 / 关哪些动作</b>。</p>
+<ul class="pts"><li>材料“硬”→ 开：承重、打磨、精加工定位；关：反复弯折、冲击吸能。</li><li>系统“扩展性强”→ 开：加新模块不改核心、并行开发；关：极致的单点性能、极简部署。</li><li>一个人“细致”→ 开：需要反复核对、需要留痕的活；关：需要临场改主意、需要快速试错的活。</li></ul>
+<p>规则只有一条：<b>只写“开”不写“关”的，一律退回重写。</b>没有关的开是广告词，不是判断。这一条能立刻提高规格书、职位描述、诊断记录、产品文档的信息量。</p>
+<p>改写时有个好用的追问：<b>“那不然呢？”</b>——说一个材料硬，那不然呢？软会怎样。说一个人细致，那不然呢？不细致会怎样。凡是答不上“不然”的形容词，都不带信息，因为它没有排除任何一种可能。开关表逼你把“不然”写出来，写出来就有了取舍，有取舍才叫判断。</p>
+<h2 id="s7"><span class="no">07</span>工序六 · 把私人对象造成公共对象</h2>
+<p>你要让别人也承认这个东西，靠的不是把它说得更真，是造一套谁都能复现的程序。计量史给了现成的四步范本：</p>
+<ul class="pts"><li><b>一 · 挑锚</b>：找一个尽量不受个别人影响的参照。一米当年挑的是子午线，后来挑的是光速。</li><li><b>二 · 脱离具体物件</b>：不要把定义挂在某一件实物上。巴黎那根铂铱棒会磨损、会热胀，那个千克原器会掉重——二〇一九年国际单位制改制，就是把千克从砝码转挂到普朗克常数上。<b>凡是挂在某一件东西、某一个人、某一台机器上的定义，早晚会漂。</b></li><li><b>三 · 写死复现程序</b>：写清楚步骤、条件、允差，写到另一个人照着做能得同一个数。</li><li><b>四 · 跨点校验</b>：至少三个互相独立的点各测一遍，对得上才算立住；对不上，先修程序不修数据。</li></ul>
+<p>给自己行业的对象立标准时，照这四步走一遍。缺第二步的最常见——很多标准实际上挂在“某位老专家的判断”上，那位一走，标准就散。</p>
+<h2 id="s8"><span class="no">08</span>工序七 · 写退休条款</h2>
+<p>一个对象若不能死，它就不是一个对象，是一条教条。所以定义写完，必须补一条退休条款。</p>
+<p>模板：<b>“若出现以下情形，本对象即被视为不再成立：① 特征 A 与特征 B 在连续 __ 个周期内不再同时出现；② 新的测量手段显示原有边界不可维持；③ 抽掉测试证明它可被 ____ 完全解释。届时由 ____ 发起复核。”</b></p>
+<p>这不是自谦，是省钱。燃素、以太、热质当年都是合格对象，它们退场不是因为有人喊了一嗓子，而是<b>支撑它们的那束特征散了</b>。你手上的品类、指标、病名、部门，都会走到那一天。事先写好条款，到时候是走程序；没写，到时候就是一场谁也不肯认错的战争。</p>
+<h2 id="s9"><span class="no">09</span>落到产品与数据建模上</h2>
+<ul class="pts"><li><b>建表之前先跑三指标验收</b>：一张表就是一次“这是一个对象”的宣告。抱不住的对象建成表，后面全是脏数据和例外分支。</li><li><b>字段名带条件</b>：不要“活跃用户”，要“三十天内有过两次以上核心动作的用户”。名字里带口径，跨部门歧义少一半。</li><li><b>给每个核心对象写退休条款</b>：什么条件下这个品类要拆、要合、要下线。</li><li><b>警惕框先于物</b>：先画了架构图再去找内容填，是最典型的造伪物方式。<b>先有稳定共现的特征，再有名字；不要反过来。</b></li></ul>
+<h2 id="s10"><span class="no">10</span>落到诊断与健康上</h2>
+<ul class="pts"><li><b>下名之前先数三条</b>：这一组症状是不是总一起出现（抱得住）、换时间换环境还在不在（稳得住）、抽掉一个诱因它塌不塌（离得开）。</li><li><b>写开关不写标签</b>：与其写“体质差”，不如写“能承受连续两小时中低强度活动，不能承受骤冷与熬夜后的高强度”。开关表能直接指导安排，标签不能。</li><li><b>把名词还原成运行</b>：把“我有失眠”改写成“在什么条件下入睡失败反复发生”，问题立刻从一件所有物变成一场可以调整的运行。</li><li>这一段的用法止于自我理解与沟通；真正的诊断与治疗决定，交给医生。</li></ul>
+<h2 id="s11"><span class="no">11</span>落到组织与制度上</h2>
+<ul class="pts"><li><b>框不等于东西</b>：架构图上一个部门框，不等于那里长着一个抱得住的对象。用三指标数一遍，很多框会现原形。</li><li><b>指标先做伪物检测</b>：任何进入考核的指标，先跑那六个信号；由被考核方自己生产、又没人看过原始记录的指标，几乎必然空转。</li><li><b>岗位描述改成开关表</b>：这个岗位开哪些决定、关哪些决定，比列十条素质有用。</li><li><b>给每个新概念配退休条款</b>：新战略、新品类、新流程，立项时就写清什么条件下承认它不成立——这一条比任何复盘制度都省钱。</li></ul>
+<h2 id="s12"><span class="no">12</span>一个走完七道工序的例子</h2>
+<p>拿一个到处都在用的对象走一遍：<b>高潜客户</b>。</p>
+<p><b>一 · 还原</b>：高潜客户不是一件东西，是“一部分客户在特定接触节奏下持续给出正向反馈”这场运行的一个稳定花样；停掉定期接触它就散。三条维持条件：有人固定跟进、有可感知的价值交付、有反馈通道。</p>
+<p><b>二 · 清点</b>：列出常被提到的八条特征——回复快、愿意试新功能、主动推荐、预算稳定、决策链短、抱怨具体、续约爽快、愿意做案例。判归属后发现：至少五条随着“谁在跟进”而变。这不否定它，但说明它是关系里的对象，不是客户身上的属性。</p>
+<p><b>三 · 验收</b>：取三十个被标为高潜的客户，数“该有的特征同时出现”的比例——常见结果是不到五成，说明边界很糊。做抽掉测试：把那位跟进的同事换掉，三个月后还剩几个是高潜？这一测往往是最扎心的。</p>
+<p><b>四 · 排伪</b>：六个信号一查——数据由销售自己打标、且打标影响考核（中）；口径随场合变（中）；从没定义过什么算“不再高潜”（中）。三个信号中标，停下来。</p>
+<p><b>五 · 改写</b>：把“高潜”这张属性表改成开关表——开：可做深度共创、可承受两周以上的方案打磨、可作为新功能首发对象；关：不能承受频繁变更报价、不能作为压测交付极限的对象。</p>
+<p><b>六 · 公共化</b>：把定义从“某位销售的判断”转挂到可复现的行为记录上（近九十天内的三类可观测动作），写死复现程序，让三个区各标一遍同一批客户，一致率低于七成就先修口径。</p>
+<p><b>七 · 退休</b>：写清什么条件下取消这个标——连续两个季度未出现任一核心动作，或者跟进人变更后三个月内特征不再共现。</p>
+<p>走完七步，“高潜客户”从一个人人在用、各说各话的词，变成一个有口径、有测法、有开关、有退场机制的对象。<b>这件事的收益不在于标得更准，在于以后所有关于它的争论都有地方落脚。</b></p>
+<h2 id="s13"><span class="no">13</span>什么时候不该做这件事</h2>
+<ul class="pts"><li><b>对象已经很稳、争议很小</b>：桌子就是桌子，螺栓就是螺栓。别把工序用在不需要的地方，那只是消耗信誉。</li><li><b>正在救火</b>：体检是常规体检，不是急救手段。系统着火时先灭火，事后再回来查那个对象。</li><li><b>你没有改动权</b>：如果这个定义由外部法规、行业标准、上游系统写死，你能做的是记录偏差、准备证据，而不是自己另起一套——两套定义并行，比一套糟糕的定义更贵。</li><li><b>用它来赢一场辩论</b>：把工序当武器去证明“你们那个概念是假的”，一定失败。它的正确用法是让一群人一起看清自己在用什么、代价在哪。<b>目的是把争“是不是”变成比“凭哪几条”</b>，不是分胜负。</li></ul>
+<h2 id="s14"><span class="no">14</span>怎么让别人接受一个改过的定义</h2>
+<p>改定义比改流程更容易挨打，因为<b>定义连着账</b>：谁的业绩按它算、谁的编制按它设、谁的经费按它批。所以这一步是政治动作，不是技术动作。四条经验：</p>
+<p><b>一 · 先并行，不替换。</b>新口径先只做影子统计，与旧口径并排出报表，跑够两个周期。让人自己看见两条线在哪儿分叉，比你解释十遍管用。</p>
+<p><b>二 · 明说谁会吃亏。</b>新定义一定有人从“达标”掉到“不达标”。提前把这份名单摆到桌上，配一段过渡期与换算规则。没人反对变化，人反对的是被无声地重新计分。</p>
+<p><b>三 · 只改一件事。</b>同时改口径、改考核、改归属，一定失败。先只改口径，考核照旧；等口径立住了再谈考核。</p>
+<p><b>四 · 把退休条款一起交上去。</b>主动写明“这套新定义在什么条件下也要被替换”，是最有力的一招——它把你从“又一个想立山头的人”变成“一个愿意让自己的东西也有终点的人”，反对的成本立刻上升。</p>
+<p>如果这四条做完仍然推不动，那结论也很清楚：<b>阻力不在认知层，在利益层。</b>这时候不要再补论证，去找那个吃亏最多的人，先谈他的账怎么平。</p>
+<h2 id="s15"><span class="no">15</span>六种失败模式</h2>
+<ul class="pts"><li><b>只还原不重建</b>：把所有名词都拆成过程，然后什么也定义不出来。还原是为了看清承重，不是为了取消名字。</li><li><b>三指标当形式</b>：不取样本、拍脑袋打分。没有三十个样本的验收等于没验收。</li><li><b>发现伪物就立刻砍</b>：伪物常有协调功能，直接砍会连带塌方。先降级、注口径、给替代期。</li><li><b>开关表只写开</b>：退回重写。</li><li><b>标准挂在人身上</b>：定义依赖某位专家的判断而不落程序，人走标准散。</li><li><b>没有退休条款</b>：对象变教条，最后靠一场战争才能换掉。</li></ul>
+<h2 id="s16"><span class="no">16</span>一页纸操作卡</h2>
+<ul class="pts"><li><b>一 · 还原</b>：名词打回动词，写出“停掉哪一样它就散”。</li><li><b>二 · 清点</b>：列八到十条特征，逐条判归属并补测量条件。</li><li><b>三 · 验收</b>：抱得住／稳得住／离得开，三十个样本起步，过了才建表建考核。</li><li><b>四 · 排伪</b>：六个信号中三个即停，随机抽五个原始样本自己核。</li><li><b>五 · 改写</b>：属性表→开关表，只写开的一律退回。</li><li><b>六 · 公共化</b>：挑锚→脱离具体物件→写死复现程序→三点校验。</li><li><b>七 · 退休</b>：写清什么条件下它不再成立，谁来发起复核。</li></ul>
+<p>母文负责论证物为什么是发生出来的，这一页负责让这条判断今天下午就能用在你正在建的那张表、写的那份规格、下的那个定义上。</p>
+<div class="endbox">
+  <div class="et">接下来读什么</div>
+  <p style="margin-bottom:10px">这一篇只是入口。真正的论证、边界与反驳，都在母文里：<a href="/column/what-is-a-thing/">《何谓物》</a>。</p>
+  <p style="margin:0">另一条路：<a href="/column/what-is-a-thing/explain.html">🌱 白话解释文《番茄在关灯的房间里是什么颜色》</a>——用日常生活的类比，把母文讲成人人能懂的话。</p>
+</div>
+</article>
+
+<footer><div class="wrap">
+  © 2026 SDE Universes · 德麦国际 ·
+  <a href="/column/what-is-a-thing/">回母文</a> ·
+  <a href="/browse/">首页</a>
+</div></footer>
+<script src="/taste/wds-companion/wds-read.js?v=20260802b" defer></script>
+<script src="/wds-mode.js?v=20260802b" defer></script>
+</body>
+</html>
