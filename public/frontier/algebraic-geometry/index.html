@@ -23,12 +23,24 @@ p{margin:0 0 1.1rem;text-align:justify}
 
 .era{margin:26px 0 6px;padding:7px 0 6px;border-top:1px solid var(--border);border-bottom:1px solid var(--border);font-size:.78rem;letter-spacing:.14em;color:var(--gold2);font-weight:600}
 .bridge{font-size:.92rem;color:var(--text2);line-height:1.95;margin:12px 0 4px}
+
+.hypbox{background:var(--card);border:1px solid var(--border);border-left:3px solid var(--gold2);padding:.9rem 1.1rem;font-size:.9rem;line-height:1.95;margin:0 0 1.3rem}
+.hypbox a{color:var(--gold)}
+.slot{display:inline-block;min-width:5.4em;color:var(--gold2);font-weight:600}
+ol.props{margin:0;padding:0;list-style:none;counter-reset:pp}
+ol.props>li{counter-increment:pp;position:relative;padding:.85rem 0 .85rem 2.1rem;border-top:1px solid var(--border)}
+ol.props>li:before{content:counter(pp);position:absolute;left:0;top:.95rem;font-size:.82rem;color:var(--muted);font-weight:600}
+.pt{font-weight:600;margin-bottom:.35rem;text-align:justify}
+.ax{display:inline-block;background:rgba(138,104,23,.10);color:var(--gold);border-radius:3px;padding:.05rem .45rem;margin-right:.45rem;font-size:.8rem;font-weight:600}
+.pf{font-size:.9rem;color:var(--text2);line-height:1.8;margin-bottom:.18rem;text-align:justify}
+.pf i{font-style:normal;display:inline-block;min-width:2.9em;color:var(--gold2);font-weight:600}
+.pf.pk{color:var(--muted)}
 </style></head><body>
 <div class="top"><a href="/browse/">SDE Universes</a><span class="sep">·</span><a href="/frontier/">新思想前沿</a><span class="sep">›</span><span style="color:var(--text2)">数学与逻辑</span></div>
 <main><!--fd2--><!--fd1-->
 <div class="kicker">新思想前沿 · 数学与逻辑</div>
 <h1>代数几何</h1>
-<div class="meta">近二十年 · 两次转向 · 约 4200 字 · 王德生 亲撰 · 2026 年 8 月</div>
+<div class="meta">近二十年 · 两次转向 ＋ 十条研究命题 · 约 9400 字 · 王德生 亲撰 · 2026 年 8 月</div>
 <p class="lede">这十年代数几何最要紧的转向，不是攻下哪个著名猜想，而是把地基重铸了两次。第一次在 p 进方向：完美空间一类构造让不同特征的世界之间可以互相搬运证明。第二次更激进：为了让拓扑代数在范畴上表现良好，有人提议把「带拓扑的代数对象」整体换成一种叫凝聚集合的新框架——连实数与泛函分析都要按新方式重写。这门学科这十年做的事，是换掉自己说话的语言。</p>
 <div class="era">上一个十年 · 约 2006–2016</div>
 <p class="bridge">这十年的两次地基重铸不是从零开始的。上一个十年，这门学科刚刚做完一件相反的事——把一个悬了近百年的分类纲领在特征零上收了口。</p>
@@ -97,6 +109,20 @@ p{margin:0 0 1.1rem;text-align:justify}
 <p>第二场分歧关于机器。形式化的支持者说，当一个证明长达数百页且只有个位数的人真正读懂时，机器验证不是辅助而是必需；反对者担心形式化会把研究导向易于形式化的问题，并让审稿从理解变成检查。这一派要认错的条件是：出现一个由形式化过程本身发现的实质性错误或实质性改进，且发生在第一流的工作里。</p>
 <h2>※ 往下五年看什么</h2>
 <p>其一，凝聚数学能否在解析几何或 p 进霍奇理论中给出一个非它不可的结果——不是重述，是新定理。其二，形式化的规模：证明助手里完成的重大定理数量，以及会不会出现第一份要求核心引理附形式化验证的期刊政策。其三，特征 p 的极小模型能否推进到更高维，以及朗兰兹纲领的几何化版本在算术侧落回多少可验证的具体命题——那才是这一整套地基重铸的兑现处。</p>
+<h2 id="programme">※ 十条可做的研究命题</h2>
+<div class="hypbox"><b>以下不是结论，是假说。</b>上文写的是已经发生的事；这一节另行提出十条可证伪的研究命题，每条自带否证条件。共用的研究规程、检验纪律与三十条生成轴，见<a href="/frontier/programme/">研究纲领方法说明</a>。<br><span class="slot">研究单位</span>代数簇、层、映射与模空间中的几何对象 ＋ 奇点、退化、变形与紧化之间的转化 ＋ 基域、参数空间、范畴层级和计算表示共同构成的几何环境，合为一个共同演化的动态单元<br><span class="slot">三轴指标</span>退化复杂度 · 不变量保真度 · 构造可迁移性<br><span class="slot">可用方法</span>符号计算、变形理论和形式化验证<br><span class="slot">实质标准</span>把抽象构造转化为可追踪、可比较的几何发生过程<br><span class="slot">已排除</span>极小模型纲领、完备化空间、凝聚数学、导出与无穷范畴基础——上文已完成的主叙事，不重复</div>
+<ol class="props">
+<li><div class="pt"><span class="ax">异质性编排</span>代数簇、层、映射与模空间中的几何对象内部差异如何成为系统资源</div><div class="pf"><i>预测</i>在总资源相同条件下，适度异质组合将比完全同质或无组织差异获得更高退化复杂度。</div><div class="pf"><i>机制</i>不同单元对扰动的响应互补，可避免同步失败；但无组织的差异也会增加摩擦。</div><div class="pf"><i>做法</i>在总资源相同条件下改变异质性的类型、比例与连接方式，寻找收益峰值与失控阈值。</div><div class="pf pk"><i>否证</i>若同质系统在所有压力下都更优，则异质性资源论被否定。</div></li>
+<li><div class="pt"><span class="ax">可能性库</span>代数几何尚未发生但可检验的可能路径库</div><div class="pf"><i>预测</i>保存未实现路径及其前提，会比只积累成功案例更早产生可验证的新方案。</div><div class="pf"><i>机制</i>现实只展示众多可能中的一条，若把现实频率当作可能性边界，会系统性低估创新。</div><div class="pf"><i>做法</i>通过仿真、思想实验和原型构建生成候选路径，记录触发条件、冲突与淘汰原因。</div><div class="pf pk"><i>否证</i>若可能性库长期不能产生可检验预测或可行原型，就只是想象清单。</div></li>
+<li><div class="pt"><span class="ax">解释预算</span>构造可迁移性与模型复杂度之间的解释预算</div><div class="pf"><i>预测</i>超过某一复杂度后，局部拟合仍会提高，但构造可迁移性与跨场景可用性开始下降。</div><div class="pf"><i>机制</i>复杂模型可能以不可见的假设债务换取局部精度，导致维护和迁移时成本陡增。</div><div class="pf"><i>做法</i>对模型的参数、假设、数据依赖与解释收益建立统一账本，并在跨场景测试中计价。</div><div class="pf pk"><i>否证</i>若复杂度增加持续带来稳定外推且维护成本可控，预算约束可相应放宽。</div></li>
+<li><div class="pt"><span class="ax">生成语法</span>生成代数簇、层、映射与模空间中的几何对象多样形态的最小规则</div><div class="pf"><i>预测</i>少量局部规则能够生成多个看似分离的现象，并对未见形态给出新预测。</div><div class="pf"><i>机制</i>少量局部规则通过迭代、约束和环境选择，可能生成看似互不相关的宏观形态。</div><div class="pf"><i>做法</i>以最小规则生成多类观测，并用未参与建模的新形态检验其覆盖与失败边界。</div><div class="pf pk"><i>否证</i>若规则只能复现训练案例或需要大量例外补丁，生成解释失败。</div></li>
+<li><div class="pt"><span class="ax">解释误差</span>预测正确但关于奇点、退化、变形与紧化之间的转化的机制故事错误</div><div class="pf"><i>预测</i>两个预测同样准确的模型，在定向干预后会给出不同结果，从而暴露机制解释的真假。</div><div class="pf"><i>机制</i>高预测精度可以由替代变量和偶然相关获得，错误解释会在干预时暴露。</div><div class="pf"><i>做法</i>在预测相近的模型之间实施针对性干预，比较其机制预言和实际响应。</div><div class="pf pk"><i>否证</i>若解释差异从不影响行动后果，解释误差的实践价值有限。</div></li>
+<li><div class="pt"><span class="ax">延迟核</span>奇点、退化、变形与紧化之间的转化在不同时间尺度上的即时、滞后、累积与反向效应</div><div class="pf"><i>预测</i>同一干预的短期与长期效应可能方向相反，不变量保真度的真实变化只有在多时间窗下可见。</div><div class="pf"><i>机制</i>短期收益可能触发长期反弹，慢变量也可能在阈值后突然显露。</div><div class="pf"><i>做法</i>以多时间窗追踪同一干预，估计即时、滞后、累积和反向效应的核函数。</div><div class="pf pk"><i>否证</i>若各时间窗方向与幅度稳定一致，则无需复杂延迟模型。</div></li>
+<li><div class="pt"><span class="ax">动态边界</span>代数簇、层、映射与模空间中的几何对象的边界如何随奇点、退化、变形与紧化之间的转化而改变</div><div class="pf"><i>预测</i>只要改变对象边界的划法，即使原始数据不变，构造可迁移性和干预责任也会出现可重复的分叉。</div><div class="pf"><i>机制</i>边界变化会重新分配内部变量、外部扰动和责任归属，许多所谓异常其实是边界画错。</div><div class="pf"><i>做法</i>对同一对象采用多种边界定义并实施等价干预，比较预测、解释与治理结果的分叉。</div><div class="pf pk"><i>否证</i>若不同边界只改变语言而不改变任何可观测结论，动态边界论就没有实质增量。</div></li>
+<li><div class="pt"><span class="ax">迁移合同</span>构造可迁移性跨场景使用所需保持的最小条件</div><div class="pf"><i>预测</i>跨场景失败可由少数条件的破坏解释；一旦这些条件被显式恢复，构造可迁移性将明显回升。</div><div class="pf"><i>机制</i>迁移失败往往不是效应不存在，而是关键机制、测量口径或主体结构已改变。</div><div class="pf"><i>做法</i>列出必要条件、可变条件和禁用条件，在多场景中逐项破坏并观察失效次序。</div><div class="pf pk"><i>否证</i>若模型在条件大幅改变后仍稳定工作，合同可被进一步压缩。</div></li>
+<li><div class="pt"><span class="ax">跨尺度回写</span>不变量保真度如何在局部与整体之间双向回写</div><div class="pf"><i>预测</i>局部改善只有在整体结构允许时才会转化为构造可迁移性，高层约束还能反向改变局部响应。</div><div class="pf"><i>机制</i>反馈会产生锁定、补偿和突变，使微观因果在不同宏观结构中不再保持。</div><div class="pf"><i>做法</i>在至少两个尺度同步测量并施加双向干预，比较只建单向模型与双向模型的预测差异。</div><div class="pf pk"><i>否证</i>若加入高层回写后不能改善预测或干预设计，则应回到单向机制。</div></li>
+<li><div class="pt"><span class="ax">冗余智能</span>多条可替代路径如何提高退化复杂度</div><div class="pf"><i>预测</i>正常情境下效率略低的冗余系统，会在扰动后以更快恢复速度换回更高退化复杂度。</div><div class="pf"><i>机制</i>过度优化会删除看似闲置的路径，使小故障迅速变成全局崩溃。</div><div class="pf"><i>做法</i>在正常与扰动场景下比较极简系统与保留冗余系统的总成本、恢复速度和误判率。</div><div class="pf pk"><i>否证</i>若冗余长期只增加成本且不改善恢复，便应缩减而非美化。</div></li>
+</ol>
 <div class="end"><b>新思想前沿</b> 是一个持续撰写的专栏：近二十年，各主要领域的两次思想转向——上一个十年一次、这十年一次，共 100 个学科面板，由王德生亲撰，现已全部完成。 · <a href="/frontier/" style="color:var(--gold);text-decoration:none">← 回到 100 学科面板</a></div>
 </main><script src="/wds-mode.js?v=20260802b" defer></script>
 </body></html>

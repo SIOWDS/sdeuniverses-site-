@@ -23,12 +23,24 @@ p{margin:0 0 1.1rem;text-align:justify}
 
 .era{margin:26px 0 6px;padding:7px 0 6px;border-top:1px solid var(--border);border-bottom:1px solid var(--border);font-size:.78rem;letter-spacing:.14em;color:var(--gold2);font-weight:600}
 .bridge{font-size:.92rem;color:var(--text2);line-height:1.95;margin:12px 0 4px}
+
+.hypbox{background:var(--card);border:1px solid var(--border);border-left:3px solid var(--gold2);padding:.9rem 1.1rem;font-size:.9rem;line-height:1.95;margin:0 0 1.3rem}
+.hypbox a{color:var(--gold)}
+.slot{display:inline-block;min-width:5.4em;color:var(--gold2);font-weight:600}
+ol.props{margin:0;padding:0;list-style:none;counter-reset:pp}
+ol.props>li{counter-increment:pp;position:relative;padding:.85rem 0 .85rem 2.1rem;border-top:1px solid var(--border)}
+ol.props>li:before{content:counter(pp);position:absolute;left:0;top:.95rem;font-size:.82rem;color:var(--muted);font-weight:600}
+.pt{font-weight:600;margin-bottom:.35rem;text-align:justify}
+.ax{display:inline-block;background:rgba(138,104,23,.10);color:var(--gold);border-radius:3px;padding:.05rem .45rem;margin-right:.45rem;font-size:.8rem;font-weight:600}
+.pf{font-size:.9rem;color:var(--text2);line-height:1.8;margin-bottom:.18rem;text-align:justify}
+.pf i{font-style:normal;display:inline-block;min-width:2.9em;color:var(--gold2);font-weight:600}
+.pf.pk{color:var(--muted)}
 </style></head><body>
 <div class="top"><a href="/browse/">SDE Universes</a><span class="sep">·</span><a href="/frontier/">新思想前沿</a><span class="sep">›</span><span style="color:var(--text2)">脑与认知</span></div>
 <main><!--fd2--><!--fd1-->
 <div class="kicker">新思想前沿 · 脑与认知</div>
 <h1>脑机接口</h1>
-<div class="meta">近二十年 · 两次转向 · 约 4400 字 · 王德生 亲撰 · 2026 年 8 月</div>
+<div class="meta">近二十年 · 两次转向 ＋ 十条研究命题 · 约 9400 字 · 王德生 亲撰 · 2026 年 8 月</div>
 <p class="lede">这十年脑机接口最要紧的转向，是它的目标从控制变成了表达。上一代的成就是让瘫痪者用意念移动光标、点击按钮，速度大致相当于用一根手指打字。这十年的成就是解码语言：从运动皮层的活动中还原试图说出的句子，速度接近正常交谈的量级，并且可以近乎实时地合成出声音。与此同时，一个此前只属于科幻的问题进了立法机构：神经数据归谁。</p>
 <div class="era">上一个十年 · 约 2006–2016</div>
 <p class="bridge">这十年脑机接口从控制变成表达；而「意念能不能直接驱动机器」这个问题，是在上一个十年被人体实验正面回答掉的。</p>
@@ -98,6 +110,20 @@ p{margin:0 0 1.1rem;text-align:justify}
 <p>第二场争论关于商业化速度。推进方认为患者在等，监管过缓等于让人继续失能；审慎方指出目前所有成绩都来自个位数受试者、且高度依赖研究团队的现场调校，把它包装成即将上市的产品会重演此前几轮神经技术的过度承诺。要看的是试验设计本身——若开始出现多中心、非发明者团队独立操作的试验，说明技术真的走出实验室。</p>
 <h2>※ 往下五年看什么</h2>
 <p>其一，居家长期使用者的数量：真正的门槛不是能不能解码，而是设备能否在没有工程师在场时连续工作数月；这个数字从个位数走到三位数，才叫产业化。其二，是否出现第一款以治疗而非研究用途获批上市的植入式接口，以及它的适应症有多窄。其三，神经数据立法的扩散速度与实际执行——法条写得早，但如何界定神经数据、谁有权访问、试验后维护责任归谁，都还没有判例。</p>
+<h2 id="programme">※ 十条可做的研究命题</h2>
+<div class="hypbox"><b>以下不是结论，是假说。</b>上文写的是已经发生的事；这一节另行提出十条可证伪的研究命题，每条自带否证条件。共用的研究规程、检验纪律与三十条生成轴，见<a href="/frontier/programme/">研究纲领方法说明</a>。<br><span class="slot">研究单位</span>神经信号、解码器、反馈通道与用户意图 ＋ 记录、解码、行动、学习和共适应 ＋ 电极稳定性、生活场景、数据权利与照护系统构成的接口环境，合为一个共同演化的动态单元<br><span class="slot">三轴指标</span>共适应速度 · 意图保真度 · 退出成本<br><span class="slot">可用方法</span>长期植入随访、在线学习和用户共创<br><span class="slot">实质标准</span>把脑机接口从设备性能转向人与算法共同成长的长期关系<br><span class="slot">已排除</span>从控制转向语言表达以及神经数据所有权——上文已完成的主叙事，不重复</div>
+<ol class="props">
+<li><div class="pt"><span class="ax">冗余智能</span>多条可替代路径如何提高共适应速度</div><div class="pf"><i>预测</i>正常情境下效率略低的冗余系统，会在扰动后以更快恢复速度换回更高共适应速度。</div><div class="pf"><i>机制</i>过度优化会删除看似闲置的路径，使小故障迅速变成全局崩溃。</div><div class="pf"><i>做法</i>在正常与扰动场景下比较极简系统与保留冗余系统的总成本、恢复速度和误判率。</div><div class="pf pk"><i>否证</i>若冗余长期只增加成本且不改善恢复，便应缩减而非美化。</div></li>
+<li><div class="pt"><span class="ax">成本曲率</span>实现“把脑机接口从设备性能转向人与算法共同成长的长期关系”时从小规模到大规模的成本弯折</div><div class="pf"><i>预测</i>小规模近似线性的成本会在协调、验证或维护阈值后陡增，从而解释推广失效。</div><div class="pf"><i>机制</i>许多方案在小规模近似线性，越过协调、验证或维护阈值后成本陡升。</div><div class="pf"><i>做法</i>在多个规模点测量边际成本、故障率与协作负担，识别曲率转折和饱和区。</div><div class="pf pk"><i>否证</i>若成本始终近似线性，曲率分析不会改变决策。</div></li>
+<li><div class="pt"><span class="ax">稀缺转移</span>当“把脑机接口从设备性能转向人与算法共同成长的长期关系”初步实现后，瓶颈向何处迁移</div><div class="pf"><i>预测</i>旧瓶颈被解除后，进步速度不会按能力同比增长，限制将转移到验证、维护、协调或信任环节。</div><div class="pf"><i>机制</i>系统会围绕新瓶颈重组，旧指标继续增长却不再代表真实进步。</div><div class="pf"><i>做法</i>追踪一次能力跃迁前后各环节的排队时间、边际成本与失败来源，定位稀缺迁移路径。</div><div class="pf pk"><i>否证</i>若原瓶颈解除后系统吞吐按比例持续增长而无新约束，稀缺转移假说不成立。</div></li>
+<li><div class="pt"><span class="ax">极端压力学</span>记录、解码、行动、学习和共适应在复合极端条件下的失效与恢复</div><div class="pf"><i>预测</i>多个中等冲击同步出现时，会产生单因素测试无法预见的级联失效与相变。</div><div class="pf"><i>机制</i>真实崩溃常由多个中等冲击同步叠加，单因素稳健不等于系统稳健。</div><div class="pf"><i>做法</i>构造复合压力矩阵与逐级故障注入，记录相变点、级联路径和恢复窗口。</div><div class="pf pk"><i>否证</i>若极端测试只制造不现实噪声且不提高真实风险识别，应降低其权重。</div></li>
+<li><div class="pt"><span class="ax">退出机制</span>脑机接口干预或研究路线失败后的暂停、迁移与善后</div><div class="pf"><i>预测</i>预先演练退出的方案即使初始效率略低，也会在失败时显著减少不可逆损害和恢复时间。</div><div class="pf"><i>机制</i>没有退出通道的成功会制造锁定、依赖和责任空洞，风险被延后而非消失。</div><div class="pf"><i>做法</i>在上线前演练停止、数据迁移、角色替换和损失分摊，记录恢复时间与不可逆损害。</div><div class="pf pk"><i>否证</i>若系统天然可替代且退出几乎无成本，则专门机制可保持轻量。</div></li>
+<li><div class="pt"><span class="ax">协同主体</span>长期植入随访、在线学习与研究共同体构成的协同主体</div><div class="pf"><i>预测</i>保持个体能力不变，只改变权限、通信和否决结构，就会显著改变退出成本与错误传播。</div><div class="pf"><i>机制</i>成果常来自分工、互补和纠错拓扑，个体能力相同但连接方式不同会产生巨大差异。</div><div class="pf"><i>做法</i>保持成员能力近似不变，只改变通信、权限、记忆和否决结构，测量系统级产出。</div><div class="pf pk"><i>否证</i>若连接结构变化对结果无影响，则协同主体不是必要解释。</div></li>
+<li><div class="pt"><span class="ax">反脆弱学习</span>可控小失败如何提升共适应速度</div><div class="pf"><i>预测</i>安全范围内的小扰动若被完整回写，将提升下一轮的共适应速度；缺少回写则只会累积损害。</div><div class="pf"><i>机制</i>可控扰动暴露薄弱环节，若有回写机制，局部损失可换来未来适应力。</div><div class="pf"><i>做法</i>设置安全范围内的周期扰动与复盘回写，对照完全保护组的长期表现。</div><div class="pf pk"><i>否证</i>若扰动只累积损害而没有可测升级，则反脆弱叙事应被拒绝。</div></li>
+<li><div class="pt"><span class="ax">时间厚度</span>记录、解码、行动、学习和共适应的路径记忆与迟滞</div><div class="pf"><i>预测</i>当前状态相同但经历顺序不同的对象，会在共适应速度与意图保真度上走向不同未来。</div><div class="pf"><i>机制</i>迟滞、记忆、顺序效应与等待时间会使相同状态沿不同历史走向不同未来。</div><div class="pf"><i>做法</i>设计终点相同而路径不同的对照，连续追踪恢复、再激活和二次扰动后的差异。</div><div class="pf pk"><i>否证</i>若路径信息在控制当前状态后不再贡献预测，则无需引入时间厚度。</div></li>
+<li><div class="pt"><span class="ax">介生态</span>记录、解码、行动、学习和共适应中的稳定-不稳定中间态</div><div class="pf"><i>预测</i>二元分类之间存在可持续中间态，其停留时间和波动结构能预测最终归属。</div><div class="pf"><i>机制</i>系统常在多个方向的张力中停留很久，微小扰动决定其最终归属，二元分类会丢失关键窗口。</div><div class="pf"><i>做法</i>提高时间分辨率并记录转变前的波动、停留时间和可逆试探，建立中间态词典。</div><div class="pf pk"><i>否证</i>若所谓中间态只是测量噪声且不影响未来路径，则应删除该层。</div></li>
+<li><div class="pt"><span class="ax">概念生命周期</span>脑机接口核心概念如何诞生、固化、变形与失效</div><div class="pf"><i>预测</i>概念进入测量与制度后会改变自身指称，旧指标继续稳定时，研究对象可能已经发生替换。</div><div class="pf"><i>机制</i>测量工具和制度采用会反过来改变概念的使用，最终发生指标替代对象。</div><div class="pf"><i>做法</i>建立跨时期语料、实践和测量对照，追踪概念边界与因果角色的变化。</div><div class="pf pk"><i>否证</i>若概念在语境变化中保持稳定指称与作用，则生命周期模型可简化。</div></li>
+</ol>
 <div class="end"><b>新思想前沿</b> 是一个持续撰写的专栏：近二十年，各主要领域的两次思想转向——上一个十年一次、这十年一次，共 100 个学科面板，由王德生亲撰，现已全部完成。 · <a href="/frontier/" style="color:var(--gold);text-decoration:none">← 回到 100 学科面板</a></div>
 </main><script src="/wds-mode.js?v=20260802b" defer></script>
 </body></html>

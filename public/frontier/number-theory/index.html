@@ -23,12 +23,24 @@ p{margin:0 0 1.1rem;text-align:justify}
 
 .era{margin:26px 0 6px;padding:7px 0 6px;border-top:1px solid var(--border);border-bottom:1px solid var(--border);font-size:.78rem;letter-spacing:.14em;color:var(--gold2);font-weight:600}
 .bridge{font-size:.92rem;color:var(--text2);line-height:1.95;margin:12px 0 4px}
+
+.hypbox{background:var(--card);border:1px solid var(--border);border-left:3px solid var(--gold2);padding:.9rem 1.1rem;font-size:.9rem;line-height:1.95;margin:0 0 1.3rem}
+.hypbox a{color:var(--gold)}
+.slot{display:inline-block;min-width:5.4em;color:var(--gold2);font-weight:600}
+ol.props{margin:0;padding:0;list-style:none;counter-reset:pp}
+ol.props>li{counter-increment:pp;position:relative;padding:.85rem 0 .85rem 2.1rem;border-top:1px solid var(--border)}
+ol.props>li:before{content:counter(pp);position:absolute;left:0;top:.95rem;font-size:.82rem;color:var(--muted);font-weight:600}
+.pt{font-weight:600;margin-bottom:.35rem;text-align:justify}
+.ax{display:inline-block;background:rgba(138,104,23,.10);color:var(--gold);border-radius:3px;padding:.05rem .45rem;margin-right:.45rem;font-size:.8rem;font-weight:600}
+.pf{font-size:.9rem;color:var(--text2);line-height:1.8;margin-bottom:.18rem;text-align:justify}
+.pf i{font-style:normal;display:inline-block;min-width:2.9em;color:var(--gold2);font-weight:600}
+.pf.pk{color:var(--muted)}
 </style></head><body>
 <div class="top"><a href="/browse/">SDE Universes</a><span class="sep">·</span><a href="/frontier/">新思想前沿</a><span class="sep">›</span><span style="color:var(--text2)">数学与逻辑</span></div>
 <main><!--fd2--><!--fd1-->
 <div class="kicker">新思想前沿 · 数学与逻辑</div>
 <h1>数论</h1>
-<div class="meta">近二十年 · 两次转向 · 约 4600 字 · 王德生 亲撰 · 2026 年 8 月</div>
+<div class="meta">近二十年 · 两次转向 ＋ 十条研究命题 · 约 9700 字 · 王德生 亲撰 · 2026 年 8 月</div>
 <p class="lede">这十年数论最要紧的事件，是一个统一纲领的一半从猜想变成了定理。朗兰兹纲领被称作数学的大一统构想，它主张数论与调和分析之间存在系统的对应；2024 年，一个九人团队用五篇、近千页的论文证明了它的几何版本。与此同时，p 进几何给这一整片领域换了地基，而一件此前不会发生的事也发生了：机器在椭圆曲线的数据里看见了人没看见的规律。</p>
 <div class="era">上一个十年 · 约 2006–2016</div>
 <p class="bridge">几何朗兰兹这条路能在这十年走通，是因为上一个十年先发生了另一件事：一批本来不属于数论的方法——组合、遍历、以及一次大规模协作——闯进了素数，并且真的动了那些老问题。</p>
@@ -97,6 +109,20 @@ p{margin:0 0 1.1rem;text-align:justify}
 <p>第二场争论关于机器发现的地位。支持者说提出正确猜想是数学创造的核心环节，机器介入这一环是实质贡献；反对者认为模式识别只是把已有数据的规律显式化，真正的困难在于证明，而那里机器尚未有实质进展。这一场的判据是清单——由机器首先提出、随后被证明且具重要性的命题有多少，这份清单目前很短但正在变长。</p>
 <h2>※ 往下五年看什么</h2>
 <p>其一，几何情形的成果能否被消化并反哺数域情形：这是判断它是终点还是跳板的关键。其二，形式化验证在数论中的推进——若关键引理开始附带机器验证，超长证明的可核查性问题就有了工程解法。其三，长期未决的争议性证明能否收口：数学界如何处理一份声称解决重大猜想却未被接受的工作，这个案例将为学科的验证机制留下先例。</p>
+<h2 id="programme">※ 十条可做的研究命题</h2>
+<div class="hypbox"><b>以下不是结论，是假说。</b>上文写的是已经发生的事；这一节另行提出十条可证伪的研究命题，每条自带否证条件。共用的研究规程、检验纪律与三十条生成轴，见<a href="/frontier/programme/">研究纲领方法说明</a>。<br><span class="slot">研究单位</span>整数关系、算术函数与丢番图对象 ＋ 局部算术约束向全局结论的传递 ＋ 模数、参数族、证明语言与计算资源共同构成的算术环境，合为一个共同演化的动态单元<br><span class="slot">三轴指标</span>结构稳定度 · 反例密度 · 证明压缩率<br><span class="slot">可用方法</span>计算实验、形式化证明和随机算术模型<br><span class="slot">实质标准</span>提升猜想筛选、反例发现与证明路线设计的可靠性<br><span class="slot">已排除</span>几何朗兰兹、p进几何、机器寻找模式、素数有界间隙与众包证明——上文已完成的主叙事，不重复</div>
+<ol class="props">
+<li><div class="pt"><span class="ax">稀缺转移</span>当“提升猜想筛选、反例发现与证明路线设计的可靠性”初步实现后，瓶颈向何处迁移</div><div class="pf"><i>预测</i>旧瓶颈被解除后，进步速度不会按能力同比增长，限制将转移到验证、维护、协调或信任环节。</div><div class="pf"><i>机制</i>系统会围绕新瓶颈重组，旧指标继续增长却不再代表真实进步。</div><div class="pf"><i>做法</i>追踪一次能力跃迁前后各环节的排队时间、边际成本与失败来源，定位稀缺迁移路径。</div><div class="pf pk"><i>否证</i>若原瓶颈解除后系统吞吐按比例持续增长而无新约束，稀缺转移假说不成立。</div></li>
+<li><div class="pt"><span class="ax">极端压力学</span>局部算术约束向全局结论的传递在复合极端条件下的失效与恢复</div><div class="pf"><i>预测</i>多个中等冲击同步出现时，会产生单因素测试无法预见的级联失效与相变。</div><div class="pf"><i>机制</i>真实崩溃常由多个中等冲击同步叠加，单因素稳健不等于系统稳健。</div><div class="pf"><i>做法</i>构造复合压力矩阵与逐级故障注入，记录相变点、级联路径和恢复窗口。</div><div class="pf pk"><i>否证</i>若极端测试只制造不现实噪声且不提高真实风险识别，应降低其权重。</div></li>
+<li><div class="pt"><span class="ax">退出机制</span>数论干预或研究路线失败后的暂停、迁移与善后</div><div class="pf"><i>预测</i>预先演练退出的方案即使初始效率略低，也会在失败时显著减少不可逆损害和恢复时间。</div><div class="pf"><i>机制</i>没有退出通道的成功会制造锁定、依赖和责任空洞，风险被延后而非消失。</div><div class="pf"><i>做法</i>在上线前演练停止、数据迁移、角色替换和损失分摊，记录恢复时间与不可逆损害。</div><div class="pf pk"><i>否证</i>若系统天然可替代且退出几乎无成本，则专门机制可保持轻量。</div></li>
+<li><div class="pt"><span class="ax">协同主体</span>计算实验、形式化证明与研究共同体构成的协同主体</div><div class="pf"><i>预测</i>保持个体能力不变，只改变权限、通信和否决结构，就会显著改变证明压缩率与错误传播。</div><div class="pf"><i>机制</i>成果常来自分工、互补和纠错拓扑，个体能力相同但连接方式不同会产生巨大差异。</div><div class="pf"><i>做法</i>保持成员能力近似不变，只改变通信、权限、记忆和否决结构，测量系统级产出。</div><div class="pf pk"><i>否证</i>若连接结构变化对结果无影响，则协同主体不是必要解释。</div></li>
+<li><div class="pt"><span class="ax">反脆弱学习</span>可控小失败如何提升结构稳定度</div><div class="pf"><i>预测</i>安全范围内的小扰动若被完整回写，将提升下一轮的结构稳定度；缺少回写则只会累积损害。</div><div class="pf"><i>机制</i>可控扰动暴露薄弱环节，若有回写机制，局部损失可换来未来适应力。</div><div class="pf"><i>做法</i>设置安全范围内的周期扰动与复盘回写，对照完全保护组的长期表现。</div><div class="pf pk"><i>否证</i>若扰动只累积损害而没有可测升级，则反脆弱叙事应被拒绝。</div></li>
+<li><div class="pt"><span class="ax">时间厚度</span>局部算术约束向全局结论的传递的路径记忆与迟滞</div><div class="pf"><i>预测</i>当前状态相同但经历顺序不同的对象，会在结构稳定度与反例密度上走向不同未来。</div><div class="pf"><i>机制</i>迟滞、记忆、顺序效应与等待时间会使相同状态沿不同历史走向不同未来。</div><div class="pf"><i>做法</i>设计终点相同而路径不同的对照，连续追踪恢复、再激活和二次扰动后的差异。</div><div class="pf pk"><i>否证</i>若路径信息在控制当前状态后不再贡献预测，则无需引入时间厚度。</div></li>
+<li><div class="pt"><span class="ax">介生态</span>局部算术约束向全局结论的传递中的稳定-不稳定中间态</div><div class="pf"><i>预测</i>二元分类之间存在可持续中间态，其停留时间和波动结构能预测最终归属。</div><div class="pf"><i>机制</i>系统常在多个方向的张力中停留很久，微小扰动决定其最终归属，二元分类会丢失关键窗口。</div><div class="pf"><i>做法</i>提高时间分辨率并记录转变前的波动、停留时间和可逆试探，建立中间态词典。</div><div class="pf pk"><i>否证</i>若所谓中间态只是测量噪声且不影响未来路径，则应删除该层。</div></li>
+<li><div class="pt"><span class="ax">概念生命周期</span>数论核心概念如何诞生、固化、变形与失效</div><div class="pf"><i>预测</i>概念进入测量与制度后会改变自身指称，旧指标继续稳定时，研究对象可能已经发生替换。</div><div class="pf"><i>机制</i>测量工具和制度采用会反过来改变概念的使用，最终发生指标替代对象。</div><div class="pf"><i>做法</i>建立跨时期语料、实践和测量对照，追踪概念边界与因果角色的变化。</div><div class="pf pk"><i>否证</i>若概念在语境变化中保持稳定指称与作用，则生命周期模型可简化。</div></li>
+<li><div class="pt"><span class="ax">测量回写</span>计算实验如何塑造被研究的整数关系、算术函数与丢番图对象</div><div class="pf"><i>预测</i>改变观测频率、反馈公开度或指标用途后，结构稳定度本身会改变，而不仅是测量精度改变。</div><div class="pf"><i>机制</i>一旦指标进入评价或控制，系统会适应指标，观测装置也会选择性放大某些状态。</div><div class="pf"><i>做法</i>随机改变测量频率、公开程度与反馈方式，比较对象在被看见和未被看见时的演化。</div><div class="pf pk"><i>否证</i>若测量制度变化不影响对象行为与结论稳定性，则回写效应可忽略。</div></li>
+<li><div class="pt"><span class="ax">协作拓扑</span>研究连接、否决与反馈结构如何改变证明压缩率</div><div class="pf"><i>预测</i>成员数量和能力相近时，连接拓扑仍会显著改变证明压缩率、盲点和责任可追踪性。</div><div class="pf"><i>机制</i>相同成员在不同拓扑中会产生不同速度、盲点与责任结构。</div><div class="pf"><i>做法</i>随机或准实验地改变通信图、中心节点和反馈回路，比较产出与错误传播。</div><div class="pf pk"><i>否证</i>若拓扑变化不影响结果，则组织关系不是关键变量。</div></li>
+</ol>
 <div class="end"><b>新思想前沿</b> 是一个持续撰写的专栏：近二十年，各主要领域的两次思想转向——上一个十年一次、这十年一次，共 100 个学科面板，由王德生亲撰，现已全部完成。 · <a href="/frontier/" style="color:var(--gold);text-decoration:none">← 回到 100 学科面板</a></div>
 </main><script src="/wds-mode.js?v=20260802b" defer></script>
 </body></html>
