@@ -229,7 +229,7 @@ def render_page(slug, kind, meta, secs, mother_title, mother_short, sib_title):
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{esc(meta['TITLE'])} · {k['label']} | SDE Universes</title>
 <meta name="description" content="{esc(desc)}">
-<meta name="author" content="{AUTHOR} · SDE Universes">
+<meta name="author" content="SDE Universes">
 <meta property="og:type" content="article">
 <meta property="og:title" content="{esc(meta['TITLE'])} · {k['label']}">
 <meta property="og:description" content="{esc(desc)}">
@@ -246,7 +246,7 @@ def render_page(slug, kind, meta, secs, mother_title, mother_short, sib_title):
   <div class="art-eyebrow">{k['eyebrow']} · 母文《{esc(mother_short)}》</div>
   <h1 class="art-title">{esc(meta['TITLE'])}</h1>
   <div class="art-subtitle">{inline(meta['SUB'])}</div>
-  <div class="art-meta">{AUTHOR} 原著 · Claude 撰写 · SDE 学员专栏 · 2026年8月 · 约 {nchar} 字</div>
+  <div class="art-meta">SDE Universes · 配套读物 · 2026年8月 · 约 {nchar} 字</div>
   <div class="swap">
     <a href="{BASE}/"><b>← 母文 · {esc(mother_short)}</b><span>完整论证在这里</span></a>
     <a href="{BASE}/{other}.html"><b>{ok['icon']} {ok['label']} · {esc(sib_title)}</b><span>{ok['hint']}</span></a>
