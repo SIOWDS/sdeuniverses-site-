@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-配套读物生成器（学员专栏版）—— 给 /students/<student>/<slug>/ 的理论母文各配两篇长文：
+配套读物生成器（学员专栏版）—— 给 /students/<student>/<slug>/ 的母文各配两篇长文：
   · explain.html   白话解释文（日常类比，人人能读懂）
   · practice.html  方法实践文（步骤、判据、检查表、失败模式）
 并在母文页「摘要」正下方插入两个入口按钮（不放文末）。
 
 用法：
-  python3 tools/publish_companion.py <slug>            # 生成两篇 + 插入入口
-  python3 tools/publish_companion.py <slug> --dry      # 只看不写
+  python3 tools/publish_companion_student.py <student> <slug>        # 生成两篇 + 插入入口
+  python3 tools/publish_companion_student.py <student> <slug> --dry  # 只看不写
 
 内容源：content/<slug>.explain.txt / content/<slug>.practice.txt（仓库外，见 CONTENT_DIR）
 格式：
@@ -23,15 +23,16 @@ import os, re, sys, html, json
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PUB = os.path.join(ROOT, "public")
 CONTENT_DIR = os.environ.get("COMPANION_CONTENT", "/home/claude/content")
-STUDENT = os.environ.get("COMPANION_STUDENT", "chen-xiaoyan")
-BASE = f"students/{STUDENT}"
 VER = "20260802b"
+BASE = ""      # 形如 /students/hu-min/<slug>
+AUTHOR = ""    # 母文作者，如 胡敏
+WORKS = ""     # 学员全部作品页
 
 KIND = {
     "explain": dict(
         label="白话解释文", icon="🌱",
         eyebrow="配套读物 · 白话解释文",
-        accent="#2E7D46", accent2="#256239", tint="#EFF6EA",
+        accent="#A8813C", accent2="#8C6A3A", tint="#FBF6EA",
         hint="用日常生活的类比，把母文讲成人人能懂的话",
         who="这一篇写给：读母文时被术语挡在门外、但想真正弄懂它在说什么的人。全篇不假设你读过任何理论书。",
     ),
@@ -127,8 +128,8 @@ BAR_TPL = """
 <div class="cmpn-bar">
   <div class="cmpn-t">配套读物 · 两条更好走的路</div>
   <div class="cmpn-g">
-    <a href="/{BASE}/{slug}/explain.html"><b>🌱 白话解释文 · {ex_title}</b><span>不用术语，用日常生活的类比把本文讲一遍 · 约5000字</span></a>
-    <a href="/{BASE}/{slug}/practice.html"><b>🛠 方法实践文 · {pr_title}</b><span>把本文的判断落成步骤、判据与检查表 · 约5000字</span></a>
+    <a href="{base}/explain.html"><b>🌱 白话解释文 · {ex_title}</b><span>不用术语，用日常生活的类比把本文讲一遍 · 约5000字</span></a>
+    <a href="{base}/practice.html"><b>🛠 方法实践文 · {pr_title}</b><span>把本文的判断落成步骤、判据与检查表 · 约5000字</span></a>
   </div>
 </div>
 <!-- /COMPANION-READS -->
@@ -228,27 +229,27 @@ def render_page(slug, kind, meta, secs, mother_title, mother_short, sib_title):
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{esc(meta['TITLE'])} · {k['label']} | SDE Universes</title>
 <meta name="description" content="{esc(desc)}">
-<meta name="author" content="王德生 · SDE Universes">
+<meta name="author" content="{AUTHOR} · SDE Universes">
 <meta property="og:type" content="article">
 <meta property="og:title" content="{esc(meta['TITLE'])} · {k['label']}">
 <meta property="og:description" content="{esc(desc)}">
-<link rel="canonical" href="https://sdeuniverses.com/{BASE}/{slug}/{kind}.html">
+<link rel="canonical" href="https://sdeuniverses.com{BASE}/{kind}.html">
 <style>{css}</style>
 </head>
 <body>
 <nav class="cnav"><div class="wrap">
   <a class="cnav-logo" href="/browse/">SDE Universes</a>
-  <a class="cnav-back" href="/{BASE}/{slug}/">← 回母文《{esc(mother_short)}》</a>
+  <a class="cnav-back" href="{BASE}/">← 回母文《{esc(mother_short)}》</a>
 </div></nav>
 
 <header class="art"><div class="wrap">
   <div class="art-eyebrow">{k['eyebrow']} · 母文《{esc(mother_short)}》</div>
   <h1 class="art-title">{esc(meta['TITLE'])}</h1>
   <div class="art-subtitle">{inline(meta['SUB'])}</div>
-  <div class="art-meta">SDE Universes · 配套读物 · 2026年8月 · 约 {nchar} 字</div>
+  <div class="art-meta">{AUTHOR} 原著 · Claude 撰写 · SDE 学员专栏 · 2026年8月 · 约 {nchar} 字</div>
   <div class="swap">
-    <a href="/{BASE}/{slug}/"><b>← 母文 · {esc(mother_short)}</b><span>完整论证在这里</span></a>
-    <a href="/{BASE}/{slug}/{other}.html"><b>{ok['icon']} {ok['label']} · {esc(sib_title)}</b><span>{ok['hint']}</span></a>
+    <a href="{BASE}/"><b>← 母文 · {esc(mother_short)}</b><span>完整论证在这里</span></a>
+    <a href="{BASE}/{other}.html"><b>{ok['icon']} {ok['label']} · {esc(sib_title)}</b><span>{ok['hint']}</span></a>
   </div>
 </div></header>
 
@@ -258,15 +259,16 @@ def render_page(slug, kind, meta, secs, mother_title, mother_short, sib_title):
 {render_body(secs)}
 <div class="endbox">
   <div class="et">接下来读什么</div>
-  <p style="margin-bottom:10px">这一篇只是入口。真正的论证、边界与反驳，都在母文里：<a href="/{BASE}/{slug}/">《{esc(mother_title)}》</a>。</p>
-  <p style="margin:0">另一条路：<a href="/{BASE}/{slug}/{other}.html">{ok['icon']} {ok['label']}《{esc(sib_title)}》</a>——{ok['hint']}。</p>
+  <p style="margin-bottom:10px">这一篇只是入口。真正的论证、边界与反驳，都在母文里：<a href="{BASE}/">《{esc(mother_title)}》</a>。</p>
+  <p style="margin:0">另一条路：<a href="{BASE}/{other}.html">{ok['icon']} {ok['label']}《{esc(sib_title)}》</a>——{ok['hint']}。</p>
 </div>
 </article>
 
 <footer><div class="wrap">
   © 2026 SDE Universes · 德麦国际 ·
-  <a href="/{BASE}/{slug}/">回母文</a> ·
-  <a href="/{BASE}/works/">全部作品</a>
+  <a href="{BASE}/">回母文</a> ·
+  <a href="{WORKS}">{AUTHOR} · 全部作品</a> ·
+  <a href="/browse/">首页</a>
 </div></footer>
 <script src="/taste/wds-companion/wds-read.js?v={VER}" defer></script>
 <script src="/wds-mode.js?v={VER}" defer></script>
@@ -289,7 +291,7 @@ def close_div(h, start):
 
 
 def find_anchor(h):
-    """返回插入位置(索引)与说明。优先：摘要盒之后 → 摘要段之后 → header 之后。"""
+    """学员页：关键词行之后 → 评分盒之后 → 文章头之后；再回退到 /column/ 那四级。"""
     m = re.search(r'<div[^>]*class="(?:abs|abstract|abstract-box|absbox|deck)\b[^"]*"', h)
     if m:
         end = close_div(h, m.start())
@@ -298,6 +300,16 @@ def find_anchor(h):
             if m2:
                 end = m2.end()
             return end, "摘要盒之后"
+    m = re.search(r'<div[^>]*class="keywords"[^>]*>', h)
+    if m:
+        end = close_div(h, m.start())
+        if end:
+            return end, "关键词行之后（摘要正下方）"
+    m = re.search(r'<div[^>]*>\s*<b[^>]*>\s*SDE 创新智商', h)
+    if m:
+        end = close_div(h, m.start())
+        if end:
+            return end, "评分盒之后（摘要正下方）"
     m = re.search(r"<p>\s*(?:<strong>|<b>)\s*摘要", h)
     if m:
         end = h.index("</p>", m.start()) + 4
@@ -322,7 +334,7 @@ def find_anchor(h):
 
 
 def mother_meta(slug):
-    p = os.path.join(PUB, BASE.split("/")[0], STUDENT, slug, "index.html")
+    p = os.path.join(PUB, BASE.lstrip("/"), "index.html")
     h = open(p, encoding="utf-8", errors="replace").read()
     m = re.search(r'<h1[^>]*>(.*?)</h1>', h, re.S)
     t = html.unescape(re.sub(r"<[^>]+>", "", m.group(1))).strip() if m else slug
@@ -330,9 +342,29 @@ def mother_meta(slug):
     return h, t
 
 
+def _accent_override():
+    for kind in ("explain", "practice"):
+        v = os.environ.get("COMPANION_ACCENT_" + kind.upper())
+        if v:
+            a, a2, t = (v.split(",") + ["", ""])[:3]
+            KIND[kind]["accent"] = a or KIND[kind]["accent"]
+            KIND[kind]["accent2"] = a2 or KIND[kind]["accent2"]
+            KIND[kind]["tint"] = t or KIND[kind]["tint"]
+
+
 def main():
-    slug = sys.argv[1]
+    _accent_override()
+    global BASE, AUTHOR, WORKS
+    args = [a for a in sys.argv[1:] if not a.startswith("--")]
+    if len(args) >= 2:
+        student, slug = args[0], args[1]
+    else:
+        # 兼容单参调用：学员由 COMPANION_STUDENT 给出
+        student, slug = os.environ["COMPANION_STUDENT"], args[0]
     dry = "--dry" in sys.argv
+    BASE = f"/students/{student}/{slug}"
+    AUTHOR = os.environ.get("COMPANION_AUTHOR", student)
+    WORKS = f"/students/{student}/works/"
     h, mtitle = mother_meta(slug)
     short = mtitle.split("：")[0].split("——")[0].strip()
     pages = {}
@@ -344,7 +376,7 @@ def main():
         sib = pages["practice" if kind == "explain" else "explain"][0]["TITLE"]
         out = render_page(slug, kind, meta, secs, mtitle, short, sib)
         n = sum(len(re.findall(r"[\u4e00-\u9fff]", "".join("".join(b) for _, b in s["blocks"]))) for s in secs)
-        dst = os.path.join(PUB, BASE.split("/")[0], STUDENT, slug, f"{kind}.html")
+        dst = os.path.join(PUB, BASE.lstrip("/"), f"{kind}.html")
         print(f"  {kind:8s} {n:5d}字  {len(secs)}节  → {dst}")
         if not dry:
             open(dst, "w", encoding="utf-8").write(out)
@@ -354,13 +386,13 @@ def main():
         return
     pos, why = find_anchor(h)
     assert pos, f"{slug}: 找不到插入锚点"
-    bar = BAR_TPL.format(style=BAR_STYLE, slug=slug, BASE=BASE,
+    bar = BAR_TPL.format(style=BAR_STYLE, base=BASE,
                          ex_title=esc(pages["explain"][0]["TITLE"]),
                          pr_title=esc(pages["practice"][0]["TITLE"]))
     new = h[:pos] + bar + h[pos:]
     print(f"  入口条插入位置：{why}（第 {h[:pos].count(chr(10))+1} 行后）")
     if not dry:
-        open(os.path.join(PUB, BASE.split("/")[0], STUDENT, slug, "index.html"), "w", encoding="utf-8").write(new)
+        open(os.path.join(PUB, BASE.lstrip("/"), "index.html"), "w", encoding="utf-8").write(new)
 
 
 if __name__ == "__main__":
