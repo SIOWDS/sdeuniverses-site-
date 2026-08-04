@@ -75,7 +75,8 @@ footer a{color:var(--gold);text-decoration:none}
 .meet-auth .ma-pw input{flex:1;min-width:132px;padding:0.5rem 0.7rem;border:1px solid var(--border2);border-radius:8px;background:#FFFDF8;font:inherit;font-size:0.86rem;color:var(--text)}
 .meet-auth .ma-pw input:focus{outline:none;border-color:var(--mtg)}
 .meet-auth .ma-pw .btn{padding:0.5rem 1.3rem;font-size:0.82rem;flex:none}
-.meet-auth.maflash{animation:maflash 0.9s ease 2}
+.meet-auth.maflash,.room-card.maflash{animation:maflash 0.9s ease 2}
+input.txt.nm{max-width:230px}
 @keyframes maflash{0%,100%{background:var(--mtg-soft)}50%{background:rgba(15,118,110,0.22)}}
 .rbanner{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;background:var(--mtg);color:#F5F1E6;border-radius:10px;padding:1rem 1.4rem;margin:0 0 1.8rem;font-size:0.95rem}
 .rbanner b{letter-spacing:0.04em}
@@ -117,21 +118,14 @@ footer a{color:var(--gold);text-decoration:none}
   <button class="btn" onclick="enterInvited()">进入会议</button>
 </div>
 
-<!-- 身份条：SDE 社区名字＋密码（Google 通道暂时关闭）-->
+<!-- 身份条：只显示当前名字；名字本身在下面「参加会议」里填 -->
 <div class="meet-auth" id="meet-auth">
   <div class="ma-row">
     <span class="ma-icon">👤</span>
     <div class="ma-body">
-      <div id="ma-out" style="display:none">已进入 · 进入任何会议都会自动显示为 <b id="ma-name"></b> <a id="ma-signout">退出</a></div>
-      <div id="ma-in">进入会议前，先用你在 <b>SDE 社区</b>的名字和密码进入——与社区、讨论区同一个账号，进会议自动带上你的名字，不用在教室里再输入。</div>
+      <div id="ma-out" style="display:none">进入会议将显示为 <b id="ma-name"></b> <a id="ma-signout">换个名字</a></div>
+      <div id="ma-in">参加会议只要两样：<b>你的名字</b>和<b>会议号</b>——在下面「参加会议」里填好，点一下就进视频教室，不用登录、不用装软件。</div>
     </div>
-    <span id="ma-gsi" style="display:none"></span>
-  </div>
-  <div class="ma-pw" id="ma-pw">
-    <input id="ma-pw-name" list="ma-pw-roster" maxlength="20" autocomplete="off" placeholder="社区名字">
-    <datalist id="ma-pw-roster"></datalist>
-    <input id="ma-pw-code" type="password" autocomplete="current-password" placeholder="密码">
-    <button class="btn" id="ma-pw-go">进入</button>
   </div>
   <div class="ma-msg" id="ma-msg"></div>
 </div>
@@ -201,14 +195,14 @@ footer a{color:var(--gold);text-decoration:none}
       <li>入会密码与等候室（Lobby）、一键邀请</li>
       <li>虚拟背景 / 背景虚化、降噪、画质自动+手动调节</li>
       <li>直播到 YouTube 等、实时字幕（Closed Captions）</li>
-      <li>实名显示：全站同一个社区账号，进会议自动带真名</li>
+      <li>实名显示：填一次名字，进任何会议自动带上</li>
     </ul>
     <div class="hintline">少数 Zoom 项 Jitsi 暂无原生对应：共享屏幕上的实时标注（可用白板替代）、同声传译分轨、美颜；录制按钮仅主持人可见。</div>
   </div>
 
   <div class="room-card">
     <h3>会议列表</h3>
-    <p>点「进入教室」即在新标签页打开，自动带上你的社区名字，不限时长。开课时间以下方讨论区预告为准。</p>
+    <p>点「进入教室」即在新标签页打开，自动带上你填的名字，不限时长。开课时间以下方讨论区预告为准。</p>
     <div class="mlist">
       <div class="mrow"><div class="mname">SDE 大教室<span class="mtag">讲课主会场</span></div><div class="mbtns"><button class="btn" onclick="joinRoom('SDE-Universes-Classroom')">进入教室</button></div></div>
       <div class="mrow"><div class="mname">SDE 答疑室<span class="mtag">课后提问 · 讲师值守</span></div><div class="mbtns"><button class="btn" onclick="joinRoom('SDE-QA-Room')">进入教室</button></div></div>
@@ -217,13 +211,16 @@ footer a{color:var(--gold);text-decoration:none}
     </div>
   </div>
 
-  <div class="room-card">
-    <h3>输入会议号</h3>
-    <p>不在列表里的会议，输入会议号加入：数字号（9–11 位）自动走 Zoom；字母教室名进对应视频教室。</p>
+  <div class="room-card" id="joincard">
+    <h3>参加会议</h3>
+    <p>填两样就进：<b>你的名字</b>和<b>会议号</b>。教室名（可含中文、字母、数字）进对应视频教室；数字号（9–11 位）自动走 Zoom。名字本机会记住，下次只填会议号。</p>
     <div class="row">
-      <input class="txt" id="meetCode" maxlength="60" placeholder="会议号，如 123 4567 8901 或 sde-group-3">
-      <button class="btn" onclick="joinByCode()">加入会议</button>
+      <input class="txt nm" id="joinName" list="meet-roster" maxlength="20" autocomplete="off" placeholder="你的名字（学员名字）">
+      <datalist id="meet-roster"></datalist>
+      <input class="txt" id="meetCode" maxlength="60" placeholder="会议号，如 SDE-Group-3 或 123 4567 8901">
+      <button class="btn" onclick="joinByCode()">进入会议</button>
     </div>
+    <div class="ma-msg" id="join-msg"></div>
     <div class="row" style="margin-top:10px">
       <input class="txt" id="zoomLink" placeholder="或粘贴 Zoom 会议链接，如 https://zoom.us/j/…">
       <button class="btn ghost" onclick="openZoom()">按链接加入</button>
@@ -243,7 +240,7 @@ footer a{color:var(--gold);text-decoration:none}
   <div class="notes" style="margin-top:1.4rem">
     <b>使用须知</b>
     <ol>
-      <li>在本页顶部用你在 SDE 社区的名字和密码进入一次（与社区、讨论区同一个账号，本机会记住半天）——之后进入任何会议都会自动显示你的名字，不用在教室里再登录或改名。</li>
+      <li>在「参加会议」里填上你的名字（本机会记住，下次自动带出）——之后点任何教室都会自动显示这个名字，不用在教室里再登录或改名。</li>
       <li>首次进入请允许浏览器使用摄像头与麦克风；听课时建议先静音，提问再开麦。</li><li><b>看不清时：</b>点教室工具栏「全屏」，或双击讲师画面把它设为焦点，都能拿到最清晰的画面。画质会随你的网络自动调整——网络好自动上到高清，网络弱会先保证流畅不卡。</li>
       <li><b>白板、PPT 与屏幕：</b>讲师放 PPT/讲义时点底部工具栏「屏幕共享」——浏览器弹窗里可选「整个屏幕 / Entire Screen」把整台电脑的画面都展示出来，或只选某个 PowerPoint 窗口；需要板书时点工具栏「更多 ⋮ → 白板 / Whiteboard」打开电子白板，师生可在同一块白板上一起书写、画图。讲师若开启录制，你会看到「本次会议正在录制」的提示。</li>
       <li>开课前请在下方讨论区查看时间预告；上课中的提问也可以直接发在讨论区，讲师会集中回应。</li>
@@ -280,7 +277,7 @@ footer a{color:var(--gold);text-decoration:none}
   <div class="notes">
     <ol>
       <li><b>课前：</b>在「开课预告」和讨论区发布时间与主题（讨论区发言署名请固定，便于学生辨认）。</li>
-      <li><b>开房：</b>提前十分钟点「进入 SDE 大教室」，先进者即成为主持人；学生同样用各自社区名字和密码进入。</li>
+      <li><b>开房：</b>提前十分钟点「进入 SDE 大教室」，先进者即成为主持人；学生填各自名字＋会议号即可进入。</li>
       <li><b>课中：</b>用底部工具栏开启屏幕共享放讲义；人多嘈杂时可在参会者面板里一键全员静音，学生举手再开麦。讲义/PPT 用「屏幕共享」分享：浏览器弹窗里选「整个屏幕 / Entire Screen」可把整台电脑画面全展示给学生（首次在 macOS 需到系统「隐私与安全性 → 屏幕录制」给浏览器授权一次），只想给单个窗口就选对应 PPT 窗口。文字按原始分辨率传输最清晰；如需更高画质，进「设置 → 视频质量」选到最高档。</li>
       <li><b>板书：</b>要在课上手写讲解，点工具栏「更多 ⋮ → 白板 / Whiteboard」打开电子白板，师生同屏共写；白板与屏幕共享可随时切换，不冲突。</li>
       <li><b>录课（录整堂课）：</b>点底部工具栏「录制」按钮，两种方式任选：<b>①云端录制（推荐）</b>——授权连接一次 Dropbox，系统把讲师画面＋共享的 PPT/屏幕＋声音合成为一个视频录下，下课后自动存进你的 Dropbox 并邮件发来下载链接；<b>②本地录制</b>——无需任何账号，直接录到本机并下载文件。公共服务的云端录制偶尔因排队占满而暂不可用，此时用本地录制兜底。开始录制后全体学员会收到录制提示，录像自行妥善保管。</li>
@@ -319,24 +316,28 @@ function canonicalRoom(raw){
   return s?("SDE-"+s):"";
 }
 function roomUrl(r){var cfg=["config.prejoinConfig.enabled=true","config.resolution=720","config.constraints.video.height.ideal=720","config.constraints.video.height.max=720","config.constraints.video.height.min=180","config.constraints.video.frameRate.ideal=30","config.constraints.video.frameRate.max=30","config.constraints.video.frameRate.min=15","config.desktopSharingFrameRate.min=5","config.desktopSharingFrameRate.max=30","config.disableSimulcast=false","config.whiteboard.enabled=true"];if(window.SDE_MEET_NAME)cfg.push("userInfo.displayName=%22"+encodeURIComponent(window.SDE_MEET_NAME)+"%22");return "https://meet.jit.si/"+encodeURIComponent(r)+"#"+cfg.join("&")}
-function meetNeedLogin(){var m=document.getElementById("ma-msg");if(m){m.textContent="进入会议前，请先在上方用社区名字和密码进入——进会议会自动显示你的名字。";m.className="ma-msg";}var f=document.getElementById("ma-pw-name");if(f)try{f.focus()}catch(e){}var a=document.getElementById("meet-auth");if(a){a.classList.remove("maflash");void a.offsetWidth;a.classList.add("maflash");a.scrollIntoView({behavior:"smooth",block:"center"});}}
+function meetNeedLogin(){if(window.meetNeedName)window.meetNeedName();}
 // ===== 进入教室：新标签页直接打开 meet.jit.si（不限时长、全功能原生；嵌入方式受 8x8 的 5 分钟限制，已弃用）=====
 function joinRoom(r){
   r=canonicalRoom(r);
   if(!r){alert("会议号无效");return}
-  if(!window.SDE_MEET_NAME){meetNeedLogin();return}
+  var nm=window.SDE_MEET_REMEMBER?window.SDE_MEET_REMEMBER(window.SDE_MEET_PICK()):window.SDE_MEET_NAME;
+  if(!nm){if(window.meetNeedName)window.meetNeedName();return}
   window.open(roomUrl(r),"_blank","noopener");
 }
 function joinByCode(){
+  var nm=window.SDE_MEET_PICK?window.SDE_MEET_PICK():"";
+  if(!nm){if(window.meetNeedName)window.meetNeedName();return}
   var v=(document.getElementById("meetCode").value||"").trim();
-  if(!v){alert("请先输入会议号");return}
+  if(!v){if(window.meetNeedCode)window.meetNeedCode();return}
+  window.SDE_MEET_REMEMBER(nm);
   // 明确的 SDE 教室号（以 SDE- 开头）一律进视频教室，即使主体是数字，避免被误判为 Zoom
   if(!/^sde-/i.test(v)){
     var num=v.replace(/[\s-]/g,"");
     if(/^\d{9,11}$/.test(num)){window.open("https://zoom.us/j/"+num,"_blank","noopener");return}
   }
   var room=canonicalRoom(v);
-  if(!room){alert("会议号是 9-11 位数字（Zoom），或教室名（可含中文、字母、数字）");return}
+  if(!room){if(window.meetSay)window.meetSay("会议号是 9–11 位数字（Zoom），或教室名（可含中文、字母、数字）。",1);return}
   joinRoom(room);
 }
 function openZoom(){
@@ -411,78 +412,70 @@ function enterInvited(){if(window.__invitedRoom)joinRoom(window.__invitedRoom);}
     document.getElementById("roomBanner").style.display="flex";
   }
 }catch(e){}})();
-// ===== 身份：SDE 社区名字＋密码 =====
-// 与 /sde-wechat/ 与 /assets/sde-talk.js 共用同一张身份：sessionStorage sde_gauth ＋ localStorage sde_talk_id
-// （凭证 sdepw1:<密码>:<名字>，服务端 verifyPasscode 校验，名字须在 /students/roster.json 名录里）。
-// Google 通道暂时关闭：把 GOOGLE_ON 改回 true 即恢复（还需页面自行提供 GSI 脚本与 window.__sdeGCb 回调）。
+// ===== 身份：一个名字就够 =====
+// 参加会议＝名字 ＋ 会议号，本页不设登录门（社区 /sde-wechat/ 与文章讨论区的名字+密码那道门不受影响）。
+// 名字记在 localStorage sde_meet_name；若此人已在社区或讨论区登录过（sde_gauth / sde_talk_id），默认带出那个名字。
 (function(){
 function el(id){return document.getElementById(id)}
-var GOOGLE_ON=false;
-var GCID="985037699618-de3smmqf2rer0pfhf4mrtrj3rgahgu5u.apps.googleusercontent.com",tries=0;
-var SKEY="sde_gauth",LKEY="sde_talk_id",TTL=12*3600*1000;
+var NKEY="sde_meet_name",SKEY="sde_gauth",LKEY="sde_talk_id";
 window.SDE_MEET_NAME="";
 function jget(store,k){try{return JSON.parse(store.getItem(k)||"null")}catch(e){return null}}
 function alive(o){return !!(o&&o.cred&&o.exp>Date.now())}
-function readRec(){
-  var ss=jget(sessionStorage,SKEY),ls=jget(localStorage,LKEY);
-  if(!alive(ss)&&alive(ls)){ss=ls;try{sessionStorage.setItem(SKEY,JSON.stringify(ls))}catch(e){}}
-  else if(alive(ss)&&String(ss.cred).slice(0,7)==="sdepw1:"&&!alive(ls)){try{localStorage.setItem(LKEY,JSON.stringify(ss))}catch(e){}}
-  return alive(ss)?ss:null;
+function communityName(){var s=jget(sessionStorage,SKEY);if(alive(s)&&s.name)return s.name;var l=jget(localStorage,LKEY);if(alive(l)&&l.name)return l.name;return""}
+function remembered(){try{return String(localStorage.getItem(NKEY)||"").slice(0,20)}catch(e){return ""}}
+function typed(){var f=el("joinName");return f?(f.value||"").trim().slice(0,20):""}
+function paint(){
+  var nm=window.SDE_MEET_NAME||"",o=el("ma-out"),i=el("ma-in"),n=el("ma-name");
+  if(nm){if(n)n.textContent=nm;if(o)o.style.display="block";if(i)i.style.display="none";}
+  else{if(o)o.style.display="none";if(i)i.style.display="block";}
 }
-function say(t,bad){var m=el("ma-msg");if(m){m.textContent=t||"";m.className="ma-msg"+(bad?" bad":"")}}
-function syncId(){
-  var r=readRec(),nm=r?(r.name||""):"";
-  if(nm){window.SDE_MEET_NAME=nm;var e=el("ma-name");if(e)e.textContent=nm;el("ma-out").style.display="block";el("ma-in").style.display="none";el("ma-pw").style.display="none";}
-  else{window.SDE_MEET_NAME="";el("ma-out").style.display="none";el("ma-in").style.display="block";el("ma-pw").style.display="flex";}
-}
+function jsay(t,bad){var m=el("join-msg");if(m){m.textContent=t||"";m.className="ma-msg"+(bad?" bad":"")}}
+window.meetSay=jsay;
+// 取名字：先看输入框，再看本机记住的，再看社区身份
+window.SDE_MEET_PICK=function(){return typed()||remembered()||communityName()};
+window.SDE_MEET_REMEMBER=function(nm){
+  nm=String(nm||"").trim().slice(0,20);
+  if(!nm)return "";
+  try{localStorage.setItem(NKEY,nm)}catch(e){}
+  window.SDE_MEET_NAME=nm;
+  var f=el("joinName");if(f&&(f.value||"").trim()!==nm)f.value=nm;
+  paint();jsay("");
+  return nm;
+};
+window.meetNeedName=function(){
+  jsay("先填一下你的名字，会议里会用它显示。",1);
+  var f=el("joinName");if(f)try{f.focus()}catch(e){}
+  var c=el("joincard");if(c){c.classList.remove("maflash");void c.offsetWidth;c.classList.add("maflash");try{c.scrollIntoView({behavior:"smooth",block:"center"})}catch(e){}}
+};
+window.meetNeedCode=function(){jsay("再填一下会议号。",1);var f=el("meetCode");if(f)try{f.focus()}catch(e){}};
 var so=el("ma-signout");
 if(so)so.onclick=function(){
-  try{sessionStorage.removeItem(SKEY)}catch(e){}
-  try{localStorage.removeItem(LKEY)}catch(e){}
-  try{if(GOOGLE_ON&&window.google&&google.accounts&&google.accounts.id)google.accounts.id.disableAutoSelect()}catch(e){}
-  syncId();say("已退出。");
+  try{localStorage.removeItem(NKEY)}catch(e){}
+  window.SDE_MEET_NAME="";
+  var f=el("joinName");if(f){f.value="";try{f.focus()}catch(e){}}
+  paint();jsay("换个名字：填好后再点「进入会议」。");
 };
-function pwLogin(){
-  var nm=(el("ma-pw-name").value||"").trim().slice(0,20),pw=el("ma-pw-code").value||"";
-  if(!nm){say("先填名字。",1);return}
-  if(!pw){say("请输入密码。",1);return}
-  var c="sdepw1:"+pw+":"+nm,go=el("ma-pw-go");
-  go.disabled=true;say("正在进入…");
-  fetch("/api/im",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({credential:c,op:"hello"})})
-    .then(function(r){return r.json()})
-    .then(function(d){
-      go.disabled=false;
-      if(!d||!d.ok){say((d&&d.msg)||"进不去，请检查名字和密码。",1);return}
-      var real=(d.me&&d.me.name)||nm,rec={cred:c,name:real,exp:Date.now()+TTL};
-      try{sessionStorage.setItem(SKEY,JSON.stringify(rec))}catch(e){}
-      try{localStorage.setItem(LKEY,JSON.stringify(rec))}catch(e){}
-      el("ma-pw-code").value="";say("");syncId();
-    })
-    .catch(function(){go.disabled=false;say("网络异常，请重试。",1)});
-}
-el("ma-pw-go").onclick=pwLogin;
-el("ma-pw-code").addEventListener("keydown",function(e){if(e.key==="Enter")pwLogin()});
-el("ma-pw-name").addEventListener("keydown",function(e){if(e.key==="Enter")el("ma-pw-code").focus()});
 var rosterLoaded=false;
-el("ma-pw-name").addEventListener("focus",function(){
+function loadRoster(){
   if(rosterLoaded)return;rosterLoaded=true;
   fetch("/students/roster.json").then(function(r){return r.json()}).then(function(j){
-    el("ma-pw-roster").innerHTML=((j&&j.students)||[]).map(function(x){return x&&x.name?'<option value="'+String(x.name).replace(/"/g,"&quot;")+'">':""}).join("");
+    var dl=el("meet-roster");if(!dl)return;
+    dl.innerHTML=((j&&j.students)||[]).map(function(x){return x&&x.name?'<option value="'+String(x.name).replace(/"/g,"&quot;")+'">':""}).join("");
   }).catch(function(){});
-});
-function boot(){
-  if(!GOOGLE_ON)return;
-  if(window.google&&google.accounts&&google.accounts.id&&window.__sdeGCb){
-    try{google.accounts.id.initialize({client_id:GCID,callback:window.__sdeGCb,auto_select:true});}catch(e){}
-    try{var g0=el("ma-gsi");if(g0){g0.style.display="";google.accounts.id.renderButton(g0,{theme:"outline",size:"medium",text:"signin_with",shape:"pill"});}}catch(e){}
-    return;
-  }
-  if(tries++>24){var g=el("ma-gsi");if(g){g.style.display="";g.textContent="Google 登录组件加载失败，请检查网络后刷新。";}return;}
-  setTimeout(boot,250);
 }
-boot();syncId();
-setInterval(syncId,1200);
-window.addEventListener("focus",syncId);
+(function boot(){
+  var f=el("joinName"),c=el("meetCode");
+  var init=remembered()||communityName();
+  if(f&&!(f.value||"").trim()&&init)f.value=init;
+  window.SDE_MEET_NAME=typed()||init||"";
+  paint();
+  if(f){
+    f.addEventListener("input",function(){window.SDE_MEET_NAME=typed();paint()});
+    f.addEventListener("focus",loadRoster);
+    f.addEventListener("keydown",function(e){if(e.key!=="Enter")return;if(c&&!(c.value||"").trim()){try{c.focus()}catch(e2){}}else joinByCode()});
+  }
+  if(c)c.addEventListener("keydown",function(e){if(e.key==="Enter")joinByCode()});
+})();
 })();
 </script>
 
