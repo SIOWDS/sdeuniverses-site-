@@ -203,6 +203,7 @@ footer{border-top:1px solid var(--border);padding:26px 20px;text-align:center;co
     <div class="actions" style="margin-top:16px">
       <button class="btn ghost" id="tidyBtn">整理成稿</button>
       <button class="btn" id="anaBtn">SDE 解析 →</button>
+      <button class="btn ghost" id="stopAna" style="display:none">停下</button>
       <span class="status" id="anaStatus"></span>
     </div>
     <div class="note">「整理成稿」只扶正断句与错字、去口水词，<b>一个观点都不删、语气强度不改</b>——前后矛盾正是要留给下一步看的。「SDE 解析」出五节：观点解析（含没说出口的前提）· S/D/E 语义解构 · 缝隙与断链 · 三个当场可以问的问题 · 一句判断。</div>
@@ -548,50 +549,112 @@ function takeFile(f){
 }
 
 /* ═══ 交给 WDS ═══ */
+/* 状态条上有两类话，必须分开：
+   「指路话」（缺 Key／缺文字）是 refresh 写的，条件一变它自己该收回去；
+   「回执」（跑完多少字、报了什么错）是一次事件的结果，refresh 绝不许碰。
+   一开始没分，于是每次跑完/报错都被随后那次 refresh 当场抹掉——
+   读者看到的是结果出来了却没有任何说明，或者错误信息闪一下就没了。 */
+function hint(t){ var e=$("#anaStatus"); e.textContent=t; e.setAttribute("data-hint","1"); }
+function receipt(x,isHtml){ var e=$("#anaStatus"); if(isHtml) e.innerHTML=x; else e.textContent=x; e.removeAttribute("data-hint"); }
 function refresh(){
   var has = cn($("#tsBox").value)>=20;
   var k = !!anaKey();
   $("#anaBtn").disabled  = busy || !has || !k;
   $("#tidyBtn").disabled = busy || !has || !k;
-  if(!k) $("#anaStatus").textContent = has ? "先在上面填 "+(vendor==="ds"?"DeepSeek":"智谱")+" 的 Key。" : "";
-  else if(!has) $("#anaStatus").textContent = "先录一段，或把文字稿粘进上面的框。";
-  else if(!busy) $("#anaStatus").textContent = "";
+  $("#stopAna").style.display = busy ? "inline-block" : "none";
+  var e=$("#anaStatus"), mine = e.hasAttribute("data-hint") || !e.textContent;
+  if(!k){ if(mine) hint(has ? "先在上面填 "+(vendor==="ds"?"DeepSeek":"智谱")+" 的 Key。" : ""); }
+  else if(!has){ if(mine) hint("先录一段，或把文字稿粘进上面的框。"); }
+  else if(!busy && mine) hint("");
 }
-function post(body){
-  body.tier=tier; body.vendor=vendor; body.key=anaKey();
-  body.text=$("#tsBox").value; body.scene=$("#scene").value.trim();
-  return fetch("/api/wds/voice-sde",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(body)})
-    .then(function(r){return r.json().catch(function(){return {ok:false,msg:"HTTP "+r.status};});});
-}
-function run(mode,label,btn){
+/* 走 SSE 边写边上屏。一次性 JSON 在这条路上是活不下来的：
+   深度档写八千 token 常要一两分钟，后端那道 55 秒护栏会先把它掐了，
+   而读者只看得到「生成失败」。流式还顺带解决了"干等一分钟不知道死没死"。 */
+var abortor=null;
+function run(mode,label){
   if(busy) return;
   busy=true; refresh();
-  $("#anaStatus").innerHTML='<span class="spinner"></span>'+label+"中…"+(tier==="deep"?"（深度思考档，慢一些）":"");
-  post({mode:mode}).then(function(j){
-    busy=false;
-    if(!j||!j.ok){ $("#anaStatus").textContent = (j&&(j.msg||j.code))||"失败了，重试一下。"; refresh(); return; }
-    $("#anaStatus").textContent="";
-    show(mode,j.text); saveDraft(); refresh();
+  var got="", think=0, t0=Date.now();
+  receipt('<span class="spinner"></span>'+label+"中…"+(tier==="deep"?"（深度思考档，会先想一会儿再动笔）":""),1);
+  abortor=new AbortController();
+  fetch("/api/wds/voice-sde",{
+    method:"POST",headers:{"content-type":"application/json"},signal:abortor.signal,
+    body:JSON.stringify({mode:mode,tier:tier,vendor:vendor,key:anaKey(),
+                         text:$("#tsBox").value,scene:$("#scene").value.trim()})
+  }).then(function(r){
+    var ct=r.headers.get("content-type")||"";
+    if(ct.indexOf("event-stream")<0){          // 校验没过时后端仍回 JSON，照旧读
+      return r.json().then(function(j){ throw new Error((j&&(j.msg||j.code))||("HTTP "+r.status)); });
+    }
+    var rd=r.body.getReader(), dec=new TextDecoder(), buf="";
+    function pump(){
+      return rd.read().then(function(x){
+        if(x.done) return;
+        buf+=dec.decode(x.value,{stream:true});
+        var i;
+        while((i=buf.indexOf("\n"))>=0){
+          var line=buf.slice(0,i).trim(); buf=buf.slice(i+1);
+          if(!line) continue;
+          if(line.charAt(0)===":") continue;            // 心跳行，跳过
+          if(line.indexOf("data:")!==0) continue;
+          var pl=line.slice(5).trim();
+          if(pl==="[DONE]") continue;
+          var j; try{ j=JSON.parse(pl); }catch(e){ continue; }
+          if(j.t==="stage"){ receipt('<span class="spinner"></span>'+j.v,1); }
+          else if(j.t==="think"){ think=j.v; receipt('<span class="spinner"></span>'+label+"中…已思考 "+think+" 字，还没动笔",1); }
+          else if(j.t==="token"){ got+=j.v; live(mode,got); }
+          else if(j.t==="error"){ throw new Error(j.v); }
+          else if(j.t==="end"){ ST_end=j.v; }
+        }
+        return pump();
+      });
+    }
+    return pump();
+  }).then(function(){
+    busy=false; abortor=null;
+    if(!got){ receipt("没收到内容，重试一下。"); refresh(); return; }
+    var sec=Math.round((Date.now()-t0)/1000);
+    receipt((ST_end&&ST_end.truncated)
+      ? ("写到额度上限被截断了（"+got.length+" 字）。可以把转写稿分两段分别解析。")
+      : (label+"完成 · "+got.length+" 字 · "+sec+" 秒"));
+    show(mode,got); saveDraft(); refresh();
   }).catch(function(e){
-    busy=false; $("#anaStatus").textContent="出错了："+((e&&e.message)||e); refresh();
+    busy=false; abortor=null;
+    // 已经写出一半才断的，那一半要留下——不能因为收尾出错就把读者等来的东西丢掉
+    if(got){ show(mode,got); saveDraft(); receipt("中途断了（"+((e&&e.message)||e)+"），上面是已经写出来的部分。"); }
+    else receipt((e&&e.name==="AbortError") ? "已停下。" : ("出错了："+((e&&e.message)||e)));
+    refresh();
   });
 }
+var ST_end=null;
 $("#tidyBtn").onclick=function(){ run("tidy","整理"); };
 $("#anaBtn").onclick =function(){ run("analyze","解析"); };
+$("#stopAna").onclick=function(){ if(abortor){ try{abortor.abort();}catch(e){} } };
 
 var out={};
+function live(mode,text){
+  out[mode]=text; render(); 
+}
 function show(mode,text){
-  out[mode]=text;
-  var R=$("#results"); R.style.display="block";
-  R.innerHTML =
-    (out.analyze ? card("ana","SDE 解析",out.analyze,"analyze") : "") +
-    (out.tidy    ? card("tidy","整理成稿",out.tidy,"tidy") : "");
-  R.querySelectorAll("[data-copy]").forEach(function(b){b.onclick=function(){ copy(out[b.dataset.copy]||"", b); };});
-  R.querySelectorAll("[data-dl]").forEach(function(b){b.onclick=function(){
-    var k=b.dataset.dl;
-    dl(new Blob([out[k]||""],{type:"text/plain;charset=utf-8"}), (k==="tidy"?"SDE整理稿-":"SDE语音解析-")+stampName()+".txt");
-  };});
-  R.scrollIntoView({behavior:"smooth",block:"start"});
+  out[mode]=text; render();
+  $("#results").scrollIntoView({behavior:"smooth",block:"start"});
+}
+var painting=null;
+function render(){
+  // 流式一秒能来几十个 chunk，每个都重排整块会把手机端卡死；限到每 120ms 一次
+  if(painting) return;
+  painting=setTimeout(function(){
+    painting=null;
+    var R=$("#results"); R.style.display="block";
+    R.innerHTML =
+      (out.analyze ? card("ana","SDE 解析",out.analyze,"analyze") : "") +
+      (out.tidy    ? card("tidy","整理成稿",out.tidy,"tidy") : "");
+    R.querySelectorAll("[data-copy]").forEach(function(b){b.onclick=function(){ copy(out[b.dataset.copy]||"", b); };});
+    R.querySelectorAll("[data-dl]").forEach(function(b){b.onclick=function(){
+      var k=b.dataset.dl;
+      dl(new Blob([out[k]||""],{type:"text/plain;charset=utf-8"}), (k==="tidy"?"SDE整理稿-":"SDE语音解析-")+stampName()+".txt");
+    };});
+  },120);
 }
 function card(cls,title,text,key){
   return '<div class="rcard '+cls+'"><div class="rhead"><b>'+title+"</b>"+

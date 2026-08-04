@@ -109,6 +109,34 @@ async function testCutter() {
   }
 }
 
+/* 后端这条路是 SSE 的，harness 也必须说 SSE——
+   拿 JSON 假响应去测一个流式前端，测的是一份不存在的契约。 */
+function sse(win, frames, opt) {
+  opt = opt || {};
+  const lines = frames.map((f) => "data: " + JSON.stringify(f) + "\n\n");
+  if (!opt.noDone) lines.push("data: [DONE]\n\n");
+  const enc = new TextEncoder();
+  let i = 0;
+  return {
+    ok: true,
+    status: 200,
+    headers: { get: (k) => (String(k).toLowerCase() === "content-type" ? "text/event-stream; charset=utf-8" : null) },
+    body: {
+      getReader() {
+        return {
+          read() {
+            if (opt.hang && i === opt.hang) return new Promise(() => {});      // 永不返回，测中断
+            if (i >= lines.length) return Promise.resolve({ done: true });
+            const v = enc.encode(lines[i++]);
+            return new Promise((r) => setTimeout(() => r({ done: false, value: v }), opt.delay || 3));
+          },
+        };
+      },
+    },
+    json: () => Promise.resolve({ ok: false, msg: "不该走到这里" }),
+  };
+}
+
 /* ═══ 第二部分：页面（jsdom 跑真代码）═══ */
 function bootPage() {
   const html = fs.readFileSync(HTML, "utf8");
@@ -138,6 +166,13 @@ function bootPage() {
       const realSet = win.Storage.prototype.setItem;
       win.Storage.prototype.setItem = function (k, v) { store[k] = String(v); return realSet.call(this, k, v); };
 
+      const RealAC = win.AbortController;
+      win.AbortController = function () {
+        const a = new RealAC();
+        const ab = a.abort.bind(a);
+        a.abort = function () { win.__aborted = true; return ab(); };
+        return a;
+      };
       win.fetch = function (url, opt) {
         let body = {};
         try { body = JSON.parse((opt && opt.body) || "{}"); } catch (e) {}
@@ -146,7 +181,10 @@ function bootPage() {
         if (DUMP) console.log("    → fetch " + rec.url + "  " + JSON.stringify(Object.keys(body)));
         if (win.__fetchHook) return win.__fetchHook(rec);
         if (/\/api\/wds\/asr/.test(url)) return Promise.resolve({ json: () => Promise.resolve({ ok: true, text: "转写文本" + calls.length }) });
-        if (/\/api\/wds\/voice-sde/.test(url)) return Promise.resolve({ json: () => Promise.resolve({ ok: true, text: "一、他到底说了什么\n主张：某某\n" }) });
+        if (/\/api\/wds\/voice-sde/.test(url)) return Promise.resolve(sse(win, win.__sseFrames || [
+          { t: "stage", v: "解析中…" }, { t: "token", v: "一、他到底说了什么\n" }, { t: "token", v: "主张：某某\n" },
+          { t: "end", v: { out: 20, think: 0, why: "stop" } },
+        ]));
         return Promise.resolve({ json: () => Promise.resolve({ ok: false }) });
       };
 
@@ -308,7 +346,7 @@ const $ = (win, sel) => win.document.querySelector(sel);
     $(win, "#scene").value = "部门周会";
     ok($(win, "#anaBtn").disabled === false, "有 Key 有文字时解析钮可用");
     $(win, "#anaBtn").click();
-    await sleep(120);
+    await sleep(260);
     const c = calls.filter((x) => /voice-sde/.test(x.url)).pop();
     ok(!!c, "确实打到了 /api/wds/voice-sde");
     ok(c && c.body.mode === "analyze", "mode=analyze");
@@ -317,7 +355,7 @@ const $ = (win, sel) => win.document.querySelector(sel);
     ok(c && c.body.scene === "部门周会", "场合字段送过去了（判纠缠条件要用）");
     ok(c && (c.body.key || "").length >= 8, "带上了读者自己的 Key");
     ok(/一、他到底说了什么/.test($(win, "#results").textContent), "结果渲染到页面上", $(win, "#results").textContent.slice(0, 30));
-    $(win, "#tidyBtn").click(); await sleep(120);
+    $(win, "#tidyBtn").click(); await sleep(260);
     const c2 = calls.filter((x) => /voice-sde/.test(x.url)).pop();
     ok(c2 && c2.body.mode === "tidy", "整理走的是 tidy 模式");
   });
@@ -470,6 +508,94 @@ const $ = (win, sel) => win.document.querySelector(sel);
     await sleep(400);
     ok(calls.filter((c) => /asr/.test(c.url)).length === 2, "停止时把最后那截尾巴也转了（不丢最后一句）", calls.filter((c) => /asr/.test(c.url)).length + " 段");
     ok(errs.length === 0, "真模块联跑零运行时错误", errs.slice(0, 2).join(" | "));
+  });
+
+  await step("十五、流式：边写边上屏、断了留一半、能停下", async () => {
+    const key = (win) => { $(win, "#dsKey").value = "sk-deepseek-abcdefg"; $(win, "#dsKey").dispatchEvent(new win.Event("input")); };
+    const talk = (win) => { $(win, "#tsBox").value = "我觉得这个团队的问题其实不在效率，而在于我们从来没问过这件事到底为什么要做。"; $(win, "#tsBox").dispatchEvent(new win.Event("input")); };
+
+    // ① 边到边上屏：不是等 [DONE] 才渲染
+    {
+      const { win } = bootPage();
+      await sleep(40);
+      // 帧放慢到 70ms：3ms 一帧的话整条流十几毫秒就跑完了，"中途态"根本没机会被看见——
+      // 那样测的其实是"跑完之后画上了"，边写边上屏被拿掉也照样通过（变异⑨咬不住就是这个原因）
+      win.__fetchHook = (rec) => /voice-sde/.test(rec.url)
+        ? Promise.resolve(sse(win, [{ t: "stage", v: "解析中…" },
+            { t: "token", v: "一、他到底说了什么\n" }, { t: "token", v: "主张：这个团队" },
+            { t: "token", v: "缺的不是效率\n" }, { t: "end", v: { out: 30, think: 0, why: "stop" } }], { delay: 120 }))
+        : Promise.resolve({ json: () => Promise.resolve({ ok: true }) });
+      key(win); talk(win);
+      $(win, "#anaBtn").click();
+      await sleep(420);                                   // 帧 120ms + 渲染节流 120ms：这时只该有前两个 token 上屏
+      const mid = $(win, "#results").textContent;
+      ok(/他到底说了什么/.test(mid), "流没走完就已经把先到的字画上屏了", JSON.stringify(mid.slice(0, 40)));
+      ok(!/缺的不是效率/.test(mid), "而且这时候后面的字确实还没到（说明看到的是中途态，不是跑完了）");
+      await sleep(500);
+      ok(/缺的不是效率/.test($(win, "#results").textContent), "后到的字接着追加");
+      ok(/完成/.test($(win, "#anaStatus").textContent), "收尾报字数与耗时", $(win, "#anaStatus").textContent);
+    }
+    // ② 思考期如实报「还没动笔」——深度档最容易被当成卡死的就是这一段
+    {
+      const { win } = bootPage();
+      await sleep(40);
+      win.__fetchHook = (rec) => /voice-sde/.test(rec.url)
+        ? Promise.resolve(sse(win, [{ t: "think", v: 1200 }], { hang: 1 }))   // 停在思考期，正是要看的那一刻
+        : Promise.resolve({ json: () => Promise.resolve({ ok: true }) });
+      key(win); talk(win);
+      $(win, "#anaBtn").click(); await sleep(120);
+      ok(/思考|1200/.test($(win, "#anaStatus").textContent), "思考期报的是「已思考 N 字，还没动笔」", $(win, "#anaStatus").textContent);
+    }
+    // ③ 中途报错：已经写出来的那一半必须留下
+    {
+      const { win, store } = bootPage();
+      await sleep(40);
+      win.__sseFrames = [{ t: "token", v: "已经写出来的这半篇" }, { t: "error", v: "上游断了" }];
+      key(win); talk(win);
+      // 先把粘转写稿引发的那次防抖存稿放过去，否则它会在半篇到达之后才落盘、
+      // 顺手把半篇也存了——于是"断了要存底稿"这条断言靠巧合通过，变异咬不住（实测过）
+      await sleep(700);
+      $(win, "#anaBtn").click(); await sleep(350);
+      ok(/已经写出来的这半篇/.test($(win, "#results").textContent), "断了，已经写出来的那半篇还在屏上", JSON.stringify($(win, "#results").textContent.slice(0, 40)));
+      ok(/断了/.test($(win, "#anaStatus").textContent), "并且说明是中途断的", $(win, "#anaStatus").textContent);
+      // 屏上有不等于留得住——刷新一下就没了。真正的保护是那半篇进了底稿。
+      await sleep(700);
+      ok(/已经写出来的这半篇/.test(store["sde_voice_draft"] || ""), "断了的那半篇也落进底稿（刷新不丢）", (store["sde_voice_draft"] || "").slice(0, 60));
+    }
+    // ④ 被截断（finish_reason=length）要指路，不能只说「完成」
+    {
+      const { win } = bootPage();
+      await sleep(40);
+      win.__sseFrames = [{ t: "token", v: "写了一大堆" }, { t: "end", v: { out: 8000, why: "length", truncated: true } }];
+      key(win); talk(win);
+      $(win, "#anaBtn").click(); await sleep(350);
+      ok(/截断|分两段/.test($(win, "#anaStatus").textContent), "截断时告诉他把稿子分两段", $(win, "#anaStatus").textContent);
+    }
+    // ⑤ 「停下」要真能掐断，不是只把按钮变灰
+    {
+      const { win } = bootPage();
+      await sleep(40);
+      win.__fetchHook = (rec) => /voice-sde/.test(rec.url)
+        ? Promise.resolve(sse(win, [{ t: "token", v: "开了个头" }], { hang: 1 }))
+        : Promise.resolve({ json: () => Promise.resolve({ ok: true, text: "x" }) });
+      key(win); talk(win);
+      $(win, "#anaBtn").click(); await sleep(120);
+      ok($(win, "#stopAna").style.display !== "none", "跑起来时「停下」才露出来");
+      ok($(win, "#anaBtn").disabled === true, "跑的时候解析钮锁住，不许并发两条");
+      $(win, "#stopAna").click(); await sleep(60);
+      ok(win.__aborted === true, "停下真的 abort 了请求（不是只改个 UI）");
+    }
+    // ⑥ 后端校验没过时仍回 JSON，前端要读得懂
+    {
+      const { win } = bootPage();
+      await sleep(40);
+      win.__fetchHook = (rec) => /voice-sde/.test(rec.url)
+        ? Promise.resolve({ ok: false, status: 400, headers: { get: () => "application/json" }, json: () => Promise.resolve({ ok: false, msg: "转写稿太短了" }) })
+        : Promise.resolve({ json: () => Promise.resolve({ ok: true }) });
+      key(win); talk(win);
+      $(win, "#anaBtn").click(); await sleep(150);
+      ok(/转写稿太短/.test($(win, "#anaStatus").textContent), "JSON 兜底路径的错误照样显示出来", $(win, "#anaStatus").textContent);
+    }
   });
 
   await step("十四、源码级守卫（行为级量法量不到的那几件）", async () => {

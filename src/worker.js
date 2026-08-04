@@ -5916,6 +5916,10 @@ export default {
     // 口语材料的三个特点决定了这里的提问方式：① 观点埋在重复与迂回里，反复回到的那一条才是真主张；
     // ② 大量前提根本不说出口（在场的人都懂）；③ 语气强度本身是信息，整理时不许把它磨平。
     // mode=tidy 只整理不解释；mode=analyze 出观点解析＋SDE 语义解构。纯 BYOK，音频不经这条路。
+    //
+    // **走 SSE 流式，不走一次性 JSON**：一段半小时的讲话，转写稿两三万字，深度档还要写八千 token——
+    // 一次性调用几乎必然超过 llmText 的 55 秒护栏，读者等满一分钟只等到「生成失败」，再点还是失败。
+    // 流式一开就有字节往外走，既没有那道墙，读者也看得见它在写。
     if (url.pathname === "/api/wds/voice-sde") {
       if (request.method === "OPTIONS") return new Response(null, { headers: _cors() });
       if (request.method !== "POST") return new Response("Method Not Allowed", { status: 405 });
@@ -5938,30 +5942,45 @@ export default {
       if (text.replace(/\s/g, "").length < 20) return J({ ok: false, msg: "转写稿太短了，先录一段或补上文字。" }, 400);
       const scene = String(b.scene || "").replace(/[\u0000-\u001f]/g, "").slice(0, 200);
       const sceneLine = scene ? ("\n【这段话的场合／说话人（读者自填，仅供你判断纠缠条件，不要复述）】" + scene) : "";
+      const vmode = b.mode === "tidy" ? "tidy" : (b.mode === "analyze" ? "analyze" : "");
+      if (!vmode) return J({ ok: false, msg: "bad mode" }, 400);
 
-      if (b.mode === "tidy") {
-        // 整理是"扶正"不是"改写"：机器转写会把同音字听错、把停顿断错句，这些要修；
-        // 但观点、语气强度、他自己的措辞习惯不许动——一动，后面那一步解析的就不是他说的话了。
-        const sys = "你把语音转写稿整理成可读的文字稿。你只做四件事：一、按语义重新断句分段；二、去掉「嗯、啊、那个、就是说」这类口水词与无意义重复；三、按上下文改正明显的同音字错误与断错的句读；四、每隔几段加一个短小标题，标出话题转折处。" +
+      const vstream = new ReadableStream({
+        async start(controller) {
+          // 心跳：思考档在动笔前可能沉默一两分钟，中间没有字节的话代理与浏览器都会把连接当死的掐掉
+          const hb = setInterval(() => { try { controller.enqueue(_ENC.encode(": hb\n\n")); } catch (e) {} }, 15000);
+          let closed = false;
+          const send = (o) => { try { controller.enqueue(_sseBytes(o)); } catch (e) {} };
+          const fin8 = (o) => {
+            if (closed) return; closed = true;
+            clearInterval(hb);
+            try { if (o) send(o); controller.enqueue(_ENC.encode("data: [DONE]\n\n")); controller.close(); } catch (e) {}
+          };
+          try {
+            let sys = "", usr = "", tok = 0;
+            if (vmode === "tidy") {
+              // 整理是"扶正"不是"改写"：机器转写会把同音字听错、把停顿断错句，这些要修；
+              // 但观点、语气强度、他自己的措辞习惯不许动——一动，后面那一步解析的就不是他说的话了。
+              sys = "你把语音转写稿整理成可读的文字稿。你只做四件事：一、按语义重新断句分段；二、去掉「嗯、啊、那个、就是说」这类口水词与无意义重复；三、按上下文改正明显的同音字错误与断错的句读；四、每隔几段加一个短小标题，标出话题转折处。" +
           "\n严禁做的事（比做什么更重要）：不许增加他没说的内容；不许删掉任何一个观点，哪怕它前后矛盾——矛盾正是要留给下一步看的；不许把「我觉得可能」改成「我认为」，语气强度是信息；不许替他把话说圆、说完整；不许加评论、加总结、加开场白。" +
           "\n直接输出整理后的文字稿本身，不要说明你做了什么。不要用 #、* 等 markdown 符号，小标题单独成行即可。";
-        const usr = sceneLine + "\n【语音转写稿（机器转写，可能有错字与断句错误）】\n" + text;
-        const out = await llmText(VC, KEY, sys, usr, deep ? 8000 : 6000);
-        return out ? J({ ok: true, text: out }) : J({ ok: false, msg: "整理失败，请重试。" }, 502);
-      }
-
-      if (b.mode === "analyze") {
-        let reflect = String(b.reflect || "").slice(0, 14000);
-        if (!reflect) { try { reflect = await ensureReflect(env, url.origin + "/", rvendor, VC, KEY); } catch (e) {} }
-        const SDEM = "\n\nSDE 方法论：显露 S / 差异序列 D / 特征纠缠 E；三大方程 S=F(D,E)·D=G(S,E)·E=H(S,D)；六路径；123原理（①D 与 E 矛盾 → ②推动 S 改变 → ③S 改变回写 D、E）；意义三律（特征/自由/幸福）；发生学——追问事物为何如此发生，而非如何被发现。";
-        const BASE = (reflect ? ("\n\n【SDE 内化心得·思考底盘（内化用，别复述）】\n" + reflect) : "") + SDEM;
-        const sys = "你是 SDE 本体论的老师（SDE 由王德生创立），现在读的是一段**说出来的话**的转写稿，不是一篇写出来的文章。" +
+              usr = sceneLine + "\n【语音转写稿（机器转写，可能有错字与断句错误）】\n" + text;
+              tok = deep ? 8000 : 6000;
+            } else {
+              let reflect = String(b.reflect || "").slice(0, 14000);
+              if (!reflect) {
+                send({ t: "stage", v: "WDS 先通读一遍 SDE 内功…" });
+                try { reflect = await ensureReflect(env, url.origin + "/", rvendor, VC, KEY); } catch (e) {}
+              }
+              const SDEM = "\n\nSDE 方法论：显露 S / 差异序列 D / 特征纠缠 E；三大方程 S=F(D,E)·D=G(S,E)·E=H(S,D)；六路径；123原理（①D 与 E 矛盾 → ②推动 S 改变 → ③S 改变回写 D、E）；意义三律（特征/自由/幸福）；发生学——追问事物为何如此发生，而非如何被发现。";
+              const BASE = (reflect ? ("\n\n【SDE 内化心得·思考底盘（内化用，别复述）】\n" + reflect) : "") + SDEM;
+              sys = "你是 SDE 本体论的老师（SDE 由王德生创立），现在读的是一段**说出来的话**的转写稿，不是一篇写出来的文章。" +
           "口语与文章有三处根本不同，你的读法必须为此调整：一、观点埋在重复与迂回里——他反复绕回去的那一条才是真主张，说得最响亮的往往只是口头禅；" +
           "二、大量前提根本没说出口，因为在场的人默认都懂，而那些没出口的前提才是他真正站着的地方；" +
           "三、语气强度是信息——「我觉得可能」和「就是这样」是两种不同的判断，不许把它们当成同一件事。" + BASE +
           "\n用严谨而犀利的汉语，把 SDE 术语讲透、服务论证，不摆空模板、不注水、不写开场白；不要用 #、* 等 markdown 符号，用「一、二、三」与短小标题、自然段分层。" +
           "\n证据纪律：凡是判断他说了什么，都要能落回原话——引用时用短引号引他自己的措辞，不要转述成你的话再当证据。转写稿里若有明显错字，按上下文理解，不要拿错字做文章。";
-        const usr = sceneLine + "\n【语音转写稿】\n" + text +
+              usr = sceneLine + "\n【语音转写稿】\n" + text +
           "\n\n分五节作答，直接从正文写起、不要开场白：\n\n" +
           "一、他到底说了什么（观点解析）\n" +
           "把这段话里的主张一条条抽出来，最多八条，按承重程度排（不是按出现顺序）。每条写四行：\n" +
@@ -5980,11 +5999,60 @@ export default {
           "三条，每条要求：能当面问出口（不是学术提问）、他答不出「随便怎样都行」、并且答完他自己的判断会松动。每条注明它撬的是哪一维（S／D1／D2／D3／E），以及他大概率会怎么挡回来。\n\n" +
           "五、一句判断\n" +
           "最后单起一段，用一句话给出一个他自己不会说、但他这番话合起来只能得出的判断。要反直觉，要能被否证，不许是概括他的话。";
-        const out = await llmText(VC, KEY, sys, usr, deep ? 8000 : 5500);
-        return out ? J({ ok: true, text: out }) : J({ ok: false, msg: "解析生成失败，请重试。" }, 502);
-      }
+              tok = deep ? 8000 : 5500;
+            }
+            send({ t: "stage", v: vmode === "tidy" ? "整理中…" : "解析中…" });
 
-      return J({ ok: false, msg: "bad mode" }, 400);
+            const vbody = { model: VC.model, stream: true, max_tokens: tok, messages: [{ role: "system", content: sys }, { role: "user", content: usr }] };
+            let up;
+            try {
+              up = await fetch(VC.url, { method: "POST", headers: { "content-type": "application/json", authorization: "Bearer " + KEY }, body: JSON.stringify(wdsTopBody(VC, vbody)) });
+            } catch (e) { return fin8({ t: "error", v: VC.name + " 连接失败：" + ((e && e.message) || "") }); }
+            if (!up || !up.ok) {
+              const st = up ? up.status : 0;
+              let et = ""; try { et = (await up.text()).slice(0, 240); } catch (e) {}
+              const msg = (st === 401 || st === 403) ? "这把 Key 用不了（" + VC.name + " 返回 " + st + "）。"
+                : st === 402 ? VC.name + " 账户余额不足。"
+                : st === 429 ? VC.name + " 那边限流了，过一会儿再试。"
+                : VC.name + " 返回错误 " + st + "：" + et;
+              return fin8({ t: "error", v: msg });
+            }
+
+            // 转发上游流。两个计数不是装饰：「什么都没出来」有两种完全不同的死法——
+            // 连接断了，与 思考把额度吃光、content 一个字没回。分不开就没法告诉读者该改什么。
+            const dec = new TextDecoder();
+            const rd = up.body.getReader();
+            let buf = "", out = 0, think = 0, why = "";
+            while (true) {
+              const rr = await rd.read();
+              if (rr.done) break;
+              buf += dec.decode(rr.value, { stream: true });
+              let idx;
+              while ((idx = buf.indexOf("\n")) >= 0) {
+                const line = buf.slice(0, idx).trim();
+                buf = buf.slice(idx + 1);
+                if (!line.startsWith("data:")) continue;
+                const pl = line.slice(5).trim();
+                if (pl === "[DONE]") continue;
+                let j; try { j = JSON.parse(pl); } catch (e) { continue; }
+                if (j.error) { send({ t: "error", v: (j.error && j.error.message) || "基底流内错误" }); continue; }
+                const c0 = (j.choices && j.choices[0]) || {};
+                if (c0.finish_reason) why = c0.finish_reason;
+                const dl = c0.delta || {};
+                if (dl.reasoning_content) { think += dl.reasoning_content.length; send({ t: "think", v: think }); }
+                if (dl.content) { out += dl.content.length; send({ t: "token", v: dl.content }); }
+              }
+            }
+            if (!out) {
+              return fin8({ t: "error", v: think ? ("基底把额度全烧在思考上了（想了 " + think + " 字，正文一个字没写）。换成快速档，或把转写稿截短一些再试。") : "基底没写出内容，重试一次。" });
+            }
+            fin8({ t: "end", v: { out: out, think: think, why: why, truncated: why === "length" } });
+          } catch (e) {
+            fin8({ t: "error", v: "出错了：" + ((e && e.message) || e) });
+          }
+        },
+      });
+      return new Response(vstream, { headers: Object.assign({}, _cors(), { "content-type": "text/event-stream; charset=utf-8", "cache-control": "no-cache, no-transform", "x-accel-buffering": "no" }) });
     }
     // /api/wds/read：读者边读边聊——扣着当前正在读的正文与选中段，与 WDS 一对一多轮对话（流式 SSE）。
     // 纯 BYOK：读者自带 API Key（body.key，存浏览器本地、绝不用平台的）；无 Key 返回 need_key 且不调基底；复用 ensureReflect/AskLimiter。
