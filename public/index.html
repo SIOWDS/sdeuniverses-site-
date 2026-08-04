@@ -392,6 +392,21 @@ body.zh .en-only{display:none}
 @supports not ((-webkit-background-clip:text) or (background-clip:text)){
   .burn{color:#A32E4E;-webkit-text-fill-color:#A32E4E;background-image:none;animation:plg-flicker 1.7s ease-in-out infinite}
 }
+
+/* ── 今天，这个宇宙又长出了什么（#daily）：卡片样式 ＋ 整卡可点 ──
+   此前 .fi/.fk/.fm 三个类名从未有过任何样式，154 张卡片渲染成一片裸文字，
+   且只有 <h3> 里那几个字是链接，点卡片其余部分没有反应。 */
+#daily article.fi{position:relative;display:block;padding:26px 28px;border-bottom:1px solid rgba(138,104,23,0.18);transition:background .18s ease}
+#daily article.fi:last-child{border-bottom:0}
+#daily article.fi:hover{background:#F5EEDE}
+#daily article.fi .fk{font-size:11.5px;letter-spacing:0.26em;color:#8A6817;margin-bottom:11px;line-height:1.6}
+#daily article.fi h3{font-size:20px;line-height:1.5;margin:0 0 12px;font-weight:700;color:#2A2315;letter-spacing:0.01em}
+#daily article.fi h3 a{color:inherit;text-decoration:none}
+#daily article.fi h3 a::after{content:"";position:absolute;top:0;right:0;bottom:0;left:0;z-index:1}
+#daily article.fi:hover h3{color:#7A5A10}
+#daily article.fi p{margin:0 0 12px;font-size:15px;line-height:1.85;color:#5B4F38;text-align:justify}
+#daily article.fi .fm{font-size:12.5px;color:#8A7A55;letter-spacing:0.04em}
+@media(max-width:640px){#daily article.fi{padding:20px 18px}#daily article.fi h3{font-size:17.5px}#daily article.fi p{font-size:14.5px}}
 </style>
 <link rel="stylesheet" href="/wds-glow.css">
 <!-- 入口页：打开网站先见到的那一层（三角形 · 三个入口）。做成首页上的一层，
@@ -3635,7 +3650,7 @@ body.zh .en-only{display:none}
 <div style="max-width:820px;margin:0 auto">
   <div class="zh-only" style="font-size:12.5px;letter-spacing:0.45em;color:#D4B25E;margin-bottom:22px">新书发布 · 专著摘要导读</div>
   <div class="en-only" style="font-size:12.5px;letter-spacing:0.45em;color:#D4B25E;margin-bottom:22px">NEW MONOGRAPH · DIGEST &amp; PREVIEW</div>
-  <h2 style="font-size:clamp(26px,4.2vw,38px);color:#EDE4CF;font-weight:700;letter-spacing:0.04em;margin:0">《SDE本体论入门》</h2>
+  <h2 style="font-size:clamp(26px,4.2vw,38px);color:#EDE4CF;font-weight:700;letter-spacing:0.04em;margin:0"><a href="/books/sde-ontology-intro/" style="color:inherit;text-decoration:none">《SDE本体论入门》</a></h2>
   <div style="font-size:clamp(16px,2.4vw,21px);color:#D4B25E;margin-top:12px;letter-spacing:0.14em">世界是如何发生的</div>
   <p class="zh-only" style="color:#B4A780;max-width:620px;margin:28px auto 0;line-height:1.9;font-size:16px;text-align:justify">把人类的根本追问从"世界是什么"换成"世界如何发生"。39万字，14篇63章：从发现范式的黄昏，到三维发生学的完整地基；从与怀特海、德里达、儒佛道的正面对话，到数学伞模型、教育、艺术、癌症猜想与 AI 时代的落地。终章将全书六个颠覆焊成一根主线——发现范式的六张面孔。</p>
   <p class="en-only" style="color:#B4A780;max-width:620px;margin:28px auto 0;line-height:1.9;font-size:16px">A 390,000-character introduction to SDE ontology in 14 parts and 63 chapters — replacing "what the world is" with "how the world comes to be." Digest and 509-page preview edition now available.</p>
