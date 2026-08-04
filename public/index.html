@@ -204,6 +204,10 @@ section.panel{padding:5rem 2rem}
 .tab-count{font-size:0.7rem;opacity:0.8;font-family:'Playfair Display',serif;font-weight:600}
 .employees-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:1.2rem}
 .emp-card{background:var(--card);border:1px solid var(--border2);border-left:3px solid var(--gold);padding:1.2rem 1.2rem 1rem;transition:all 0.25s;cursor:pointer;display:flex;flex-direction:column;min-height:160px;text-decoration:none;color:inherit}
+.emp-card.emp-soon{cursor:default;opacity:.86}
+.emp-card.emp-soon:hover{transform:none}
+.emp-enter-soon{color:#8A8577;font-weight:600;letter-spacing:.08em}
+
 .emp-card:hover{transform:translateY(-4px);border-left-color:var(--gold2);box-shadow:0 12px 32px rgba(138,104,23,0.10);background:var(--card2)}
 .emp-industry{font-size:0.6rem;letter-spacing:0.15em;color:var(--gold);text-transform:uppercase;margin-bottom:0.4rem;font-weight:600}
 .emp-name{font-size:1rem;font-weight:600;color:var(--text);margin-bottom:0.25rem;line-height:1.3}
@@ -3632,8 +3636,8 @@ body.zh .en-only{display:none}
   <div class="section-label en-only">SDE Agent Cluster · S-Layer</div>
   <h2 class="section-title zh-only">99 个 SDE 智能体</h2>
   <h2 class="section-title en-only">99 SDE Agents</h2>
-  <p class="section-subtitle zh-only">覆盖 10 大行业 · 每个智能体背后是 SDE 发生学的方法论锻造 · 点击卡片进入对应工具</p>
-  <p class="section-subtitle en-only">Across 10 industries · Each agent forged through SDE generativics · Click a card to enter the tool</p>
+  <p class="section-subtitle zh-only">覆盖 10 大行业 · 每个智能体背后是 SDE 发生学的方法论锻造 · <b style="color:#D4B25E">以下 99 个为规划中的行业智能体，均标注「尚未上线」；已经可以用的智能体在上方「<a href="#taste" style="color:#D4B25E;text-decoration:underline">品尝</a>」区</b></p>
+  <p class="section-subtitle en-only">Across 10 industries · Each agent forged through SDE generativics · <b style="color:#D4B25E">These 99 are planned; all are marked NOT YET LIVE. The agents you can actually use are in <a href="#taste" style="color:#D4B25E;text-decoration:underline">Taste</a> above.</b></p>
   <div class="section-divider"></div>
   <div class="industries-tabs" id="industriesTabs"></div>
   <div class="employees-grid" id="employeesGrid"></div>

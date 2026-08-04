@@ -164,17 +164,16 @@ function renderGrid(){
   const filtered=activeInd==='all'?employees:employees.filter(e=>e.i===activeInd);
   gridEl.innerHTML=filtered.map(e=>{
     const ind=industries.find(i=>i.id===e.i);
-    return`<a class="emp-card" href="#" data-emp="${e.en.toLowerCase().replace(/[^a-z0-9]/g,'-')}">
+    return`<div class="emp-card emp-soon" data-emp="${e.en.toLowerCase().replace(/[^a-z0-9]/g,'-')}" role="note" aria-disabled="true">
       <div class="emp-badge-soon">${isZh?'即将开通':'SOON'}</div>
       <div class="emp-industry">${isZh?ind.zh:ind.en}</div>
       <div class="emp-name">${isZh?e.zh:e.en}</div>
       <div class="emp-name-en">${isZh?e.en:e.zh}</div>
       <div class="emp-desc">${isZh?e.zhDesc:e.enDesc}</div>
-      <div class="emp-enter">
-        <span>${isZh?'进入工作台':'ENTER'}</span>
-        <span class="arrow">→</span>
+      <div class="emp-enter emp-enter-soon">
+        <span>${isZh?'尚未上线':'NOT YET LIVE'}</span>
       </div>
-    </a>`;
+    </div>`;
   }).join('');
 }
 
@@ -190,7 +189,10 @@ renderMatrix();
 // Prevent employee cards/claw link from navigating (placeholder URLs)
 document.addEventListener('click',e=>{
   const t=e.target.closest('[data-emp]');
-  if(t){e.preventDefault();alert((document.body.classList.contains('zh')?'此智能体即将开通。':'This SDE agent is coming soon.')+'\n\nID: '+t.dataset.emp);}
+  if(t){e.preventDefault();
+    const el=document.getElementById('taste');
+    if(el) el.scrollIntoView({behavior:'smooth',block:'start'});
+  }
 });
 
 // ===== 访问总次数（Durable Object 计数）=====
