@@ -3564,6 +3564,9 @@ const DECK_TPL = {
 const DISTILL_FIRST_MS = 90000, DISTILL_TOTAL_MS = 300000;   // 成文的两级时钟
 const DISTILL_CONVO_MAX = 100000;            // 成文能看多长的对话原文（原来 4 万且从中间断掉）
 const WDS_ASR_PER_MIN = 6, WDS_ASR_PER_DAY = 120;            // 语音转写：会回落站方 Key，必须限流
+// 自带 Key 的另算：一场半小时的讲话按停顿切出来就是三四十段，6/分钟会在第七段掐断，
+// 而那几十段烧的全是读者自己的钱。窄桶只该守着站方那把 Key。
+const WDS_ASR_BYOK_PER_MIN = 40, WDS_ASR_BYOK_PER_DAY = 1500;
 const WDS_WS_PER_MIN = 10, WDS_WS_PER_DAY = 200;             // 联网搜索：同理
 const WDS_LINK_PER_MIN = 40, WDS_LINK_PER_DAY = 1200;        // 篇名→网址：只读索引不烧 Key，放宽但仍设桶
 const WDS_PER_DAY = 300, WDS_PER_MIN = 20;   // 自带 Key＝用户自付，日上限放到限流器硬顶；分钟档防脚本滥用
@@ -5909,6 +5912,80 @@ export default {
 
       return J({ ok: false, msg: "bad mode" }, 400);
     }
+    // /api/wds/voice-sde：SDE 语音解析。上游是转写稿（口语），不是文章——两者要用不同的读法。
+    // 口语材料的三个特点决定了这里的提问方式：① 观点埋在重复与迂回里，反复回到的那一条才是真主张；
+    // ② 大量前提根本不说出口（在场的人都懂）；③ 语气强度本身是信息，整理时不许把它磨平。
+    // mode=tidy 只整理不解释；mode=analyze 出观点解析＋SDE 语义解构。纯 BYOK，音频不经这条路。
+    if (url.pathname === "/api/wds/voice-sde") {
+      if (request.method === "OPTIONS") return new Response(null, { headers: _cors() });
+      if (request.method !== "POST") return new Response("Method Not Allowed", { status: 405 });
+      let b = {}; try { b = await request.json(); } catch (e) {}
+      const J = (o, st) => Response.json(o, { status: st || 200, headers: _cors() });
+      const userKey = String(b.key || "").trim();
+      if (userKey.length < 8) return J({ ok: false, code: "need_key", msg: "这一步用你自己的 API Key 运行（在上方设置里填入，只存你的浏览器本地）。" }, 400);
+      const vd = wdsVendorOf(b.vendor);
+      const deep = b.tier !== "fast";
+      const VC = deep ? wdsTopVC(vd) : { url: WDS_VENDORS[vd].url, model: WDS_VENDORS[vd].model, name: WDS_VENDORS[vd].name };
+      const KEY = userKey, rvendor = wdsShort(vd);
+      const ip = request.headers.get("cf-connecting-ip") || "unknown";
+      try {
+        const lim = env.ASK_LIMITER.get(env.ASK_LIMITER.idFromName(wdsBucket("voice", ip, userKey)));
+        const lr = await (await lim.fetch(new Request("https://limiter.internal/?w=20&d=200"))).json();
+        if (!lr.ok) return J({ ok: false, msg: lr.reason === "day" ? "今天这台机器的额度用完了，明天再来。" : "太快啦，过十几秒再试。" }, 429);
+      } catch (e) {}
+
+      const text = String(b.text || "").slice(0, 100000);
+      if (text.replace(/\s/g, "").length < 20) return J({ ok: false, msg: "转写稿太短了，先录一段或补上文字。" }, 400);
+      const scene = String(b.scene || "").replace(/[\u0000-\u001f]/g, "").slice(0, 200);
+      const sceneLine = scene ? ("\n【这段话的场合／说话人（读者自填，仅供你判断纠缠条件，不要复述）】" + scene) : "";
+
+      if (b.mode === "tidy") {
+        // 整理是"扶正"不是"改写"：机器转写会把同音字听错、把停顿断错句，这些要修；
+        // 但观点、语气强度、他自己的措辞习惯不许动——一动，后面那一步解析的就不是他说的话了。
+        const sys = "你把语音转写稿整理成可读的文字稿。你只做四件事：一、按语义重新断句分段；二、去掉「嗯、啊、那个、就是说」这类口水词与无意义重复；三、按上下文改正明显的同音字错误与断错的句读；四、每隔几段加一个短小标题，标出话题转折处。" +
+          "\n严禁做的事（比做什么更重要）：不许增加他没说的内容；不许删掉任何一个观点，哪怕它前后矛盾——矛盾正是要留给下一步看的；不许把「我觉得可能」改成「我认为」，语气强度是信息；不许替他把话说圆、说完整；不许加评论、加总结、加开场白。" +
+          "\n直接输出整理后的文字稿本身，不要说明你做了什么。不要用 #、* 等 markdown 符号，小标题单独成行即可。";
+        const usr = sceneLine + "\n【语音转写稿（机器转写，可能有错字与断句错误）】\n" + text;
+        const out = await llmText(VC, KEY, sys, usr, deep ? 8000 : 6000);
+        return out ? J({ ok: true, text: out }) : J({ ok: false, msg: "整理失败，请重试。" }, 502);
+      }
+
+      if (b.mode === "analyze") {
+        let reflect = String(b.reflect || "").slice(0, 14000);
+        if (!reflect) { try { reflect = await ensureReflect(env, url.origin + "/", rvendor, VC, KEY); } catch (e) {} }
+        const SDEM = "\n\nSDE 方法论：显露 S / 差异序列 D / 特征纠缠 E；三大方程 S=F(D,E)·D=G(S,E)·E=H(S,D)；六路径；123原理（①D 与 E 矛盾 → ②推动 S 改变 → ③S 改变回写 D、E）；意义三律（特征/自由/幸福）；发生学——追问事物为何如此发生，而非如何被发现。";
+        const BASE = (reflect ? ("\n\n【SDE 内化心得·思考底盘（内化用，别复述）】\n" + reflect) : "") + SDEM;
+        const sys = "你是 SDE 本体论的老师（SDE 由王德生创立），现在读的是一段**说出来的话**的转写稿，不是一篇写出来的文章。" +
+          "口语与文章有三处根本不同，你的读法必须为此调整：一、观点埋在重复与迂回里——他反复绕回去的那一条才是真主张，说得最响亮的往往只是口头禅；" +
+          "二、大量前提根本没说出口，因为在场的人默认都懂，而那些没出口的前提才是他真正站着的地方；" +
+          "三、语气强度是信息——「我觉得可能」和「就是这样」是两种不同的判断，不许把它们当成同一件事。" + BASE +
+          "\n用严谨而犀利的汉语，把 SDE 术语讲透、服务论证，不摆空模板、不注水、不写开场白；不要用 #、* 等 markdown 符号，用「一、二、三」与短小标题、自然段分层。" +
+          "\n证据纪律：凡是判断他说了什么，都要能落回原话——引用时用短引号引他自己的措辞，不要转述成你的话再当证据。转写稿里若有明显错字，按上下文理解，不要拿错字做文章。";
+        const usr = sceneLine + "\n【语音转写稿】\n" + text +
+          "\n\n分五节作答，直接从正文写起、不要开场白：\n\n" +
+          "一、他到底说了什么（观点解析）\n" +
+          "把这段话里的主张一条条抽出来，最多八条，按承重程度排（不是按出现顺序）。每条写四行：\n" +
+          "主张：<用他的话说清这一条>\n" +
+          "他给的理由：<他实际给出的支撑；若没给就写「未给」——这一栏空着本身就是发现>\n" +
+          "没说出口的前提：<这条主张要成立，还必须有什么他没说、却当成不言自明的东西>\n" +
+          "强度：<断言／倾向／试探，并说明你据哪个措辞判的>\n" +
+          "最后单起一段，指出他**反复绕回去**的是哪一条——那才是这段话真正的重心，往往不是他讲得最起劲的那条。\n\n" +
+          "二、这番话的 SDE（语义解构）\n" +
+          "S 显露：他说出口的是什么形态——是已经完成的结论，还是仍在进行的过程？他把 S、D、E 三维里的哪一维当了主角，哪一维被他整段吞掉了？\n" +
+          "D 差异序列：D1 他真正要达成的目标（未必等于他嘴上说的目标，二者若不一致，这处落差就是最值钱的发现）；D2 他组织路径的方式——先动哪一头、按什么次序推；D3 他拿什么当不可动的约束，即他整段话里从未想过要去碰的那一条。\n" +
+          "E 特征纠缠：这番话与哪些条件纠缠在一起——谁在听、他站在什么位置上说、他的处境给了这番话什么形状？然后做一次替换实验：换掉其中一个纠缠条件（换个听众、换个位置），这番话还成立吗？哪一句会最先塌？\n\n" +
+          "三、缝隙与断链\n" +
+          "挑 2-3 处最承重的，每处必须引一句他的原话作锚，逐条讲清：他把什么当成了现成给定的东西（而那其实是在 D 与 E 中被显露出来的）？123原理里漏了哪一环——尤其第③环「S 改变回写 D、E」，口语里几乎总是漏它，因为人说话时习惯把结果当终点、不再回头改前提。哪里有断链，即从前提跳到结论之间少了一个发生环节？哪里把动词冻成了名词，把一件正在发生的事说成了一个现成的东西？若他前后自相矛盾，把两句都引出来，并判断哪一句是他真正相信的。\n\n" +
+          "四、当场可以问他的三个问题\n" +
+          "三条，每条要求：能当面问出口（不是学术提问）、他答不出「随便怎样都行」、并且答完他自己的判断会松动。每条注明它撬的是哪一维（S／D1／D2／D3／E），以及他大概率会怎么挡回来。\n\n" +
+          "五、一句判断\n" +
+          "最后单起一段，用一句话给出一个他自己不会说、但他这番话合起来只能得出的判断。要反直觉，要能被否证，不许是概括他的话。";
+        const out = await llmText(VC, KEY, sys, usr, deep ? 8000 : 5500);
+        return out ? J({ ok: true, text: out }) : J({ ok: false, msg: "解析生成失败，请重试。" }, 502);
+      }
+
+      return J({ ok: false, msg: "bad mode" }, 400);
+    }
     // /api/wds/read：读者边读边聊——扣着当前正在读的正文与选中段，与 WDS 一对一多轮对话（流式 SSE）。
     // 纯 BYOK：读者自带 API Key（body.key，存浏览器本地、绝不用平台的）；无 Key 返回 need_key 且不调基底；复用 ensureReflect/AskLimiter。
     if (url.pathname === "/api/wds/read") {
@@ -6606,8 +6683,10 @@ export default {
       // 限流：没自带 Key 时这里烧的是站方额度，且单次可传 12MB 音频——此前一个桶都没有。
       const _aip = request.headers.get("cf-connecting-ip") || "unknown";
       try {
+        const _own = String(b.key || "").trim().length >= 8;
         const lim = env.ASK_LIMITER.get(env.ASK_LIMITER.idFromName(wdsBucket("asr", _aip, String(b.key || ""))));
-        const lr = await (await lim.fetch(new Request("https://limiter.internal/?w=" + WDS_ASR_PER_MIN + "&d=" + WDS_ASR_PER_DAY))).json();
+        const _w = _own ? WDS_ASR_BYOK_PER_MIN : WDS_ASR_PER_MIN, _d = _own ? WDS_ASR_BYOK_PER_DAY : WDS_ASR_PER_DAY;
+        const lr = await (await lim.fetch(new Request("https://limiter.internal/?w=" + _w + "&d=" + _d))).json();
         if (!lr.ok) return Response.json({ ok: false, code: "rate", msg: lr.reason === "day" ? "今天的语音转写次数用完了。" : "说得太快啦，过十几秒再来。" }, { headers: _cors() });
       } catch (e) {}
       const b64 = String(b.audio || "");
