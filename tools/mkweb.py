@@ -207,7 +207,7 @@ def main():
 <h1 class="bt">课堂的智慧</h1>
 <div class="sub">课堂内生对象、运行条件与失效动力的可证伪理论纲领</div>
 <div class="cmeta">阳涌 著 · 前言·导论·四编十三章·结语·后记·七附录 · 约 {tot:,} 字 · ISBN 978-1-970820-95-9</div>
-<div class="acts"><a class="btn pri" href="qy/">从头读起 →</a><a class="btn" href="{BOOK}/read.html">翻书版（259 页）</a><a class="btn" href="{BOOK}/Classroom-Wisdom.pdf">下载 PDF</a></div>
+<div class="acts"><a class="btn pri" href="qy/">从头读起 →</a><a class="btn" href="{BOOK}/read.html">翻书版（260 页）</a><a class="btn" href="{BOOK}/Classroom-Wisdom.pdf">下载 PDF</a></div>
 <p class="intro">这是《课堂的智慧》的<b>网页排版版</b>：正文由源文重新排版为可检索、可选句、可在手机上长读的网页，段落与表格均为真段真表，不是从 PDF 抽出来的行。与另两种读法的分别是——<b>翻书版</b>保留纸书页码与版式，适合引用与核对；<b>网页版</b>适合通读、检索与选句发问；<b>三章精读</b>是从书里抽出的三篇独立长文。</p>
 </header>
 {''.join(rows)}
