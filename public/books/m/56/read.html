@@ -1,134 +1,173 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <title>在线翻页阅读 · 治未病立账学</title>
-  <style>
-    :root{--night:#07182d;--night2:#020a14;--paper:#f7f0df;--gold:#d8b95d;--muted:#aa9a74}
-    *{box-sizing:border-box}
-    html,body{margin:0;min-height:100%;background:radial-gradient(circle at 50% 0,#143255,var(--night2) 70%);color:var(--paper);font-family:"Noto Serif SC","Songti SC",serif}
-    .topbar{position:sticky;top:0;z-index:20;min-height:64px;padding:10px 18px;background:rgba(4,13,25,.94);border-bottom:1px solid rgba(216,185,93,.35);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
-    .identity{display:flex;align-items:center;gap:14px;min-width:0}
-    .back{color:var(--muted);text-decoration:none;white-space:nowrap}
-    .title{color:var(--gold);letter-spacing:.08em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .controls{display:flex;align-items:center;justify-content:flex-end;gap:8px;flex-wrap:wrap}
-    button,.download{height:36px;border:1px solid rgba(216,185,93,.48);border-radius:5px;background:rgba(216,185,93,.1);color:var(--paper);padding:0 14px;font:inherit;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center}
-    button:hover,.download:hover{background:rgba(216,185,93,.2)}
-    button:disabled{opacity:.35;cursor:not-allowed}
-    .page-field{display:flex;align-items:center;gap:6px;color:var(--muted)}
-    #pageInput{width:62px;height:36px;border:1px solid rgba(216,185,93,.48);border-radius:5px;background:#07121f;color:var(--gold);text-align:center;font:inherit}
-    .stage{min-height:calc(100vh - 65px);padding:28px 14px 70px;display:flex;justify-content:center;align-items:flex-start}
-    #pageWrap{position:relative;display:none;background:white;line-height:0;box-shadow:0 22px 70px rgba(0,0,0,.68)}
-    #pdfCanvas{display:block;max-width:100%}
-    .loading,.error{padding:13vh 20px;text-align:center;color:var(--muted);line-height:1.9}
-    .spinner{width:44px;height:44px;margin:0 auto 18px;border:3px solid rgba(216,185,93,.2);border-top-color:var(--gold);border-radius:50%;animation:spin .85s linear infinite}
-    @keyframes spin{to{transform:rotate(360deg)}}
-    .error{display:none;color:#efb4ab}.error a{color:var(--gold)}
-    .hint{position:fixed;z-index:15;left:0;right:0;bottom:0;padding:24px 10px 9px;text-align:center;font-size:12px;color:var(--muted);background:linear-gradient(transparent,rgba(2,10,20,.94));pointer-events:none}
-    @media(max-width:760px){
-      .topbar{padding:9px 10px;gap:8px}.identity{width:100%;justify-content:space-between}.title{font-size:14px}
-      .controls{width:100%;justify-content:center}.download{padding:0 10px}.stage{padding:16px 6px 62px}
-      button{padding:0 11px}.zoom-label{display:none}
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>在线翻书 · 治未病立账学 | 德麦国际专著</title>
+<style>
+:root{--ink:#1A1410;--gold:#D4B25E;--gold2:#B8901F;--paper:#F5EFE0;--muted:#8B7E5E}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0F0B07;color:var(--paper);font-family:"Songti SC","Noto Serif SC",Georgia,serif;min-height:100vh}
+.topbar{position:sticky;top:0;z-index:20;background:rgba(15,11,7,0.95);backdrop-filter:blur(8px);border-bottom:1px solid rgba(212,178,94,0.25);display:flex;align-items:center;justify-content:space-between;padding:12px 20px;gap:12px;flex-wrap:wrap}
+.tb-title{font-size:15px;color:var(--gold);letter-spacing:0.05em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:46vw}
+.tb-title a{color:var(--muted);text-decoration:none;font-size:13px;margin-right:14px}
+.controls{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.btn{background:rgba(212,178,94,0.12);border:1px solid rgba(212,178,94,0.45);color:var(--gold);padding:7px 16px;border-radius:3px;font-size:14px;cursor:pointer;font-family:inherit;letter-spacing:0.03em}
+.btn:hover:not(:disabled){background:rgba(212,178,94,0.22)}
+.btn:disabled{opacity:0.35;cursor:not-allowed}
+.pagebox{display:flex;align-items:center;gap:6px;font-size:14px;color:var(--paper)}
+.pagebox input{width:56px;background:#1A1410;border:1px solid rgba(212,178,94,0.4);color:var(--gold);padding:6px 8px;border-radius:3px;text-align:center;font-family:inherit;font-size:14px}
+.pagebox .total{color:var(--muted)}
+.zoom{display:flex;align-items:center;gap:4px}
+.zoom .btn{padding:6px 12px}
+.stage{display:flex;justify-content:center;padding:28px 16px 60px;min-height:60vh}
+#page-wrap{position:relative;display:inline-block;line-height:0;box-shadow:0 20px 60px rgba(0,0,0,0.6);background:#fff;border-radius:2px;overflow:hidden}
+canvas{display:block}
+.textLayer{position:absolute;left:0;top:0;overflow:hidden;line-height:1;opacity:1;z-index:3;text-align:initial}
+.textLayer span{color:transparent;position:absolute;white-space:pre;cursor:text;transform-origin:0 0}
+.textLayer ::selection{background:rgba(61,165,165,0.42)}
+.textLayer ::-moz-selection{background:rgba(61,165,165,0.42)}
+.loading{text-align:center;color:var(--muted);padding:80px 20px;font-size:16px}
+.spinner{width:40px;height:40px;border:3px solid rgba(212,178,94,0.25);border-top-color:var(--gold);border-radius:50%;margin:0 auto 20px;animation:spin 0.9s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.err{text-align:center;color:#E8A0A0;padding:60px 20px;line-height:1.9}
+.err a{color:var(--gold)}
+.navhint{position:fixed;bottom:0;left:0;right:0;text-align:center;padding:10px;font-size:12px;color:var(--muted);background:linear-gradient(transparent,rgba(15,11,7,0.9));pointer-events:none;z-index:15}
+.side-tap{position:fixed;top:64px;bottom:0;width:10%;z-index:5;cursor:pointer}
+.side-tap.left{left:0}.side-tap.right{right:0}
+@media(max-width:640px){.tb-title{font-size:13px;max-width:38vw}.side-tap{width:14%}}
+</style>
 </head>
 <body>
-  <header class="topbar">
-    <div class="identity">
-      <a class="back" href="/books/m/53/">← 返回专著导读</a>
-      <span class="title">治未病立账学</span>
-    </div>
-    <div class="controls" aria-label="翻页控制">
-      <button id="prev" type="button" disabled>← 上一页</button>
-      <label class="page-field"><input id="pageInput" type="number" min="1" value="1" aria-label="页码"> / <span id="totalPages">—</span></label>
-      <button id="next" type="button" disabled>下一页 →</button>
-      <button id="zoomOut" type="button" title="缩小"><span class="zoom-label">缩小 </span>−</button>
-      <button id="zoomIn" type="button" title="放大"><span class="zoom-label">放大 </span>＋</button>
-      <a class="download" href="Weibing-Ledger-Theory.pdf" target="_blank" rel="noopener">下载 PDF</a>
-    </div>
-  </header>
-  <main class="stage" id="stage">
-    <div id="loading" class="loading"><div class="spinner"></div>正在载入全书<br><small>首次打开需要几秒钟</small></div>
-    <div id="pageWrap"><canvas id="pdfCanvas"></canvas></div>
-    <div id="error" class="error"></div>
-  </main>
-  <div class="hint">键盘 ← → 翻页 · 输入页码跳转 · 支持缩放与手机阅读</div>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-  <script>
-  (function(){
-    "use strict";
-    var PDF_URL="Weibing-Ledger-Theory.pdf";
-    var pdf=null,pageNo=1,scale=1.35,rendering=false,pending=null;
-    var canvas=document.getElementById("pdfCanvas");
-    var context=canvas.getContext("2d");
-    var wrap=document.getElementById("pageWrap");
-    function el(id){return document.getElementById(id)}
-    function setButtons(){
-      el("prev").disabled=!pdf||pageNo<=1;
-      el("next").disabled=!pdf||pageNo>=pdf.numPages;
-      el("pageInput").value=pageNo;
-    }
-    function renderPage(number){
-      rendering=true;
-      pdf.getPage(number).then(function(page){
-        var unit=page.getViewport({scale:1});
-        var available=Math.max(260,el("stage").clientWidth-20);
-        var fitted=Math.min(scale,available/unit.width);
-        var viewport=page.getViewport({scale:fitted});
-        var ratio=Math.min(window.devicePixelRatio||1,2.5);
-        canvas.width=Math.floor(viewport.width*ratio);
-        canvas.height=Math.floor(viewport.height*ratio);
-        canvas.style.width=viewport.width+"px";
-        canvas.style.height=viewport.height+"px";
-        wrap.style.width=viewport.width+"px";
-        wrap.style.height=viewport.height+"px";
-        context.setTransform(ratio,0,0,ratio,0,0);
-        return page.render({canvasContext:context,viewport:viewport}).promise;
-      }).then(function(){
-        rendering=false;
-        setButtons();
-        if(pending!==null){var n=pending;pending=null;renderPage(n)}
-      }).catch(showError);
-    }
-    function queue(number){if(rendering){pending=number}else{renderPage(number)}}
-    function go(number){
-      if(!pdf)return;
-      pageNo=Math.max(1,Math.min(pdf.numPages,number));
-      queue(pageNo);
-      window.scrollTo({top:0,behavior:"smooth"});
-    }
-    function showError(err){
-      el("loading").style.display="none";
-      wrap.style.display="none";
-      el("error").style.display="block";
-      el("error").innerHTML="在线翻页暂时未能载入。<br><a href=\""+PDF_URL+"\" target=\"_blank\">请点击这里直接打开或下载 PDF</a><br><small>"+String(err&&err.message||err)+"</small>";
-    }
-    if(!window.pdfjsLib){showError(new Error("PDF 阅读组件加载失败"));return}
-    pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
-    pdfjsLib.getDocument(PDF_URL).promise.then(function(documentRef){
-      pdf=documentRef;
-      el("totalPages").textContent=pdf.numPages;
-      el("pageInput").max=pdf.numPages;
-      el("loading").style.display="none";
-      wrap.style.display="block";
-      renderPage(pageNo);
-    }).catch(showError);
-    el("prev").addEventListener("click",function(){go(pageNo-1)});
-    el("next").addEventListener("click",function(){go(pageNo+1)});
-    el("pageInput").addEventListener("change",function(){go(parseInt(this.value,10)||1)});
-    el("zoomIn").addEventListener("click",function(){scale=Math.min(3,scale+.2);queue(pageNo)});
-    el("zoomOut").addEventListener("click",function(){scale=Math.max(.6,scale-.2);queue(pageNo)});
-    document.addEventListener("keydown",function(event){
-      if(event.target&&/INPUT|TEXTAREA/.test(event.target.tagName))return;
-      if(event.key==="ArrowLeft")go(pageNo-1);
-      if(event.key==="ArrowRight")go(pageNo+1);
+<div class="topbar">
+  <div class="tb-title"><a href="/books/m/56/">← 返回导读页</a>治未病立账学</div>
+  <div class="controls">
+    <button class="btn" id="prev" disabled>‹ 上一页</button>
+    <div class="pagebox"><input id="pageInput" type="number" min="1" value="1"><span class="total">/ <span id="totalPages">…</span></span></div>
+    <button class="btn" id="next" disabled>下一页 ›</button>
+    <div class="zoom">
+      <button class="btn" id="zoomOut">−</button>
+      <button class="btn" id="zoomIn">＋</button>
+    </div>
+    <a class="btn" href="/books/m/56/text/" style="text-decoration:none">网页版</a>
+    <a class="btn" href="Weibing-Ledger-Theory.pdf" target="_blank" style="text-decoration:none">下载 PDF</a>
+  </div>
+</div>
+
+<div class="stage" id="stage">
+  <div id="loading" class="loading"><div class="spinner"></div>正在载入全书…<br><span style="font-size:13px">首次载入需要几秒</span></div>
+  <div id="page-wrap" style="display:none"><canvas id="pdfCanvas"></canvas><div class="textLayer" id="textLayer"></div></div>
+  <div id="error" class="err" style="display:none"></div>
+</div>
+
+<div class="side-tap left" id="tapLeft"></div>
+<div class="side-tap right" id="tapRight"></div>
+<div class="navhint">← → 方向键翻页 · 点击页面两侧翻页 · 选中正文任意一句可问 WDS</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>
+var PDF_URL = "Weibing-Ledger-Theory.pdf";
+var BOOK_TITLE = "治未病立账学";
+pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+
+var pdfDoc=null, pageNum=1, rendering=false, pending=null, baseScale=1.3, currentPageText="";
+var canvas=document.getElementById('pdfCanvas'), ctx=canvas.getContext('2d');
+var pageWrap=document.getElementById('page-wrap'), textLayer=document.getElementById('textLayer');
+var $=function(id){return document.getElementById(id);};
+
+// 自绘文字层：getTextContent + Util.transform 定位透明 span（全 PDF.js 版本稳定），横向按原始字宽校正
+function drawTextLayer(tc, viewport){
+  textLayer.innerHTML='';
+  var frag=document.createDocumentFragment(), fix=[];
+  tc.items.forEach(function(it){
+    if(!it.str) return;
+    var m=pdfjsLib.Util.transform(viewport.transform, it.transform);
+    var fs=Math.hypot(m[2], m[3]);
+    if(!fs) return;
+    var ang=Math.atan2(m[1], m[0]);
+    var sp=document.createElement('span');
+    sp.textContent=it.str;
+    var css='left:'+m[4].toFixed(2)+'px;top:'+(m[5]-fs).toFixed(2)+'px;font-size:'+fs.toFixed(2)+'px;';
+    if(Math.abs(ang)>0.01) css+='transform:rotate('+ang.toFixed(4)+'rad);';
+    sp.style.cssText=css;
+    frag.appendChild(sp);
+    fix.push([sp, it.width*viewport.scale, ang]);
+  });
+  textLayer.appendChild(frag);
+  fix.forEach(function(w){
+    var sp=w[0], target=w[1], ang=w[2];
+    if(!target) return;
+    var real=sp.getBoundingClientRect().width;
+    if(real>1){ var sx=target/real; if(sx>0.1 && sx<10){ sp.style.transform=(Math.abs(ang)>0.01?('rotate('+ang.toFixed(4)+'rad) '):'')+'scaleX('+sx.toFixed(3)+')'; } }
+  });
+}
+
+function render(num){
+  rendering=true;
+  pdfDoc.getPage(num).then(function(page){
+    var avail=($('stage').clientWidth||window.innerWidth)-36;
+    var vp1=page.getViewport({scale:1});
+    var s=baseScale;
+    if(vp1.width*s>avail && avail>120) s=avail/vp1.width;   // 适配容器宽度，避免 CSS 缩放导致文字层错位
+    var vp=page.getViewport({scale:s});
+    var ratio=Math.min(window.devicePixelRatio||1, 2.5);
+    canvas.width=Math.floor(vp.width*ratio); canvas.height=Math.floor(vp.height*ratio);
+    canvas.style.width=vp.width+'px'; canvas.style.height=vp.height+'px';
+    pageWrap.style.width=vp.width+'px'; pageWrap.style.height=vp.height+'px';
+    ctx.setTransform(ratio,0,0,ratio,0,0);
+    page.render({canvasContext:ctx, viewport:vp}).promise.then(function(){
+      return page.getTextContent();
+    }).then(function(tc){
+      currentPageText=tc.items.map(function(i){return i.str;}).join(' ').replace(/\s+/g,' ').trim();
+      drawTextLayer(tc, vp);
+      rendering=false;
+      if(pending!==null){ var p=pending; pending=null; render(p); }
     });
-    var resizeTimer;
-    window.addEventListener("resize",function(){clearTimeout(resizeTimer);resizeTimer=setTimeout(function(){if(pdf)queue(pageNo)},180)});
-  }());
-  </script>
-  <script src="/wds-mode.js?v=20260802b" defer></script>
+    $('pageInput').value=num;
+    $('prev').disabled=(num<=1);
+    $('next').disabled=(num>=pdfDoc.numPages);
+  });
+}
+function queue(num){ if(rendering) pending=num; else render(num); }
+function go(n){ if(!pdfDoc)return; pageNum=Math.min(Math.max(1,n),pdfDoc.numPages); queue(pageNum); window.scrollTo({top:0,behavior:'smooth'}); }
+
+pdfjsLib.getDocument(PDF_URL).promise.then(function(pdf){
+  pdfDoc=pdf;
+  $('totalPages').textContent=pdf.numPages;
+  $('pageInput').max=pdf.numPages;
+  $('loading').style.display='none';
+  $('page-wrap').style.display='inline-block';
+  render(pageNum);
+}).catch(function(err){
+  $('loading').style.display='none';
+  $('error').style.display='block';
+  $('error').innerHTML='全书暂时无法在线载入。<br>你仍可 <a href="'+PDF_URL+'" target="_blank">直接打开 / 下载 PDF</a> 阅读。<br><span style="font-size:12px;color:#8B7E5E">（'+err.message+'）</span>';
+});
+
+$('prev').onclick=function(){go(pageNum-1);};
+$('next').onclick=function(){go(pageNum+1);};
+$('tapLeft').onclick=function(){go(pageNum-1);};
+$('tapRight').onclick=function(){go(pageNum+1);};
+$('pageInput').onchange=function(e){go(parseInt(e.target.value)||1);};
+$('zoomIn').onclick=function(){baseScale=Math.min(baseScale+0.2,3);queue(pageNum);};
+$('zoomOut').onclick=function(){baseScale=Math.max(baseScale-0.2,0.6);queue(pageNum);};
+document.addEventListener('keydown',function(e){
+  if(e.target && (e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA')) return;
+  if(e.key==='ArrowLeft')go(pageNum-1);
+  if(e.key==='ArrowRight')go(pageNum+1);
+});
+window.addEventListener('resize',function(){clearTimeout(window._rz);window._rz=setTimeout(function(){queue(pageNum);},220);});
+
+// —— 接入 SDE 陪读：把「当前页文本 + 页码」喂给助手，文字层让读者能选中某句作焦点 ——
+window.WDS_READ = {
+  title: BOOK_TITLE,
+  bodyEl: function(){ return document.getElementById('page-wrap'); },
+  docTextFn: function(){ return currentPageText ? ('【第 '+pageNum+' 页 / 共 '+(pdfDoc?pdfDoc.numPages:'?')+' 页】\n'+currentPageText) : ''; }
+};
+</script>
+<script src="/taste/wds-companion/wds-read.js?v=20260802b" defer></script>
+
+<script src="/wds-mode.js?v=20260802b" defer></script>
 </body>
 </html>
