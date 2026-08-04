@@ -82,6 +82,13 @@ input.txt.nm{max-width:230px}
 .rbanner b{letter-spacing:0.04em}
 .rbanner .btn{background:#F5F1E6;color:var(--mtg);border-color:#F5F1E6}
 .rbanner .btn:hover{background:#fff}
+.rbanner .rb-head{flex:1;min-width:200px}
+.rbanner .rb-sub{display:block;font-size:0.8rem;opacity:0.88;margin-top:5px;font-weight:400}
+.rbanner .rb-form{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.rbanner input.rb-nm{font:inherit;font-size:0.9rem;color:var(--text);background:#fff;border:1px solid #F5F1E6;border-radius:6px;padding:0.65rem 0.9rem;min-width:148px;max-width:200px;outline:none}
+.rbanner input.rb-nm:focus{border-color:#E4C878}
+.rbanner .rb-msg{flex-basis:100%;font-size:0.82rem;color:#FFE3B8}
+@media(max-width:640px){.rbanner .rb-form{width:100%}.rbanner input.rb-nm{flex:1;max-width:none}}
 .invite{background:var(--mtg-soft);border:1px solid var(--mtg);border-radius:10px;padding:1.3rem 1.5rem;margin-bottom:1.2rem}
 .invite-h{font-weight:800;color:var(--mtg);margin-bottom:0.8rem;font-size:1rem}
 .invite-row{display:flex;gap:12px;align-items:baseline;padding:0.35rem 0;flex-wrap:wrap}
@@ -89,6 +96,8 @@ input.txt.nm{max-width:230px}
 .invite-row b{font-size:1.08rem;letter-spacing:0.04em;word-break:break-all}
 .invite-row a{word-break:break-all;font-size:0.9rem}
 .invite-btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:0.9rem}
+.hostwarn{margin-top:0.9rem;background:#FFF6E0;border:1px solid #D9B45B;border-left:4px solid #B8860B;border-radius:8px;padding:0.85rem 1.05rem;font-size:0.85rem;color:#5A4718;line-height:1.85}
+.hostwarn b{color:#3A2E0E}
 .sch-out{display:none;width:100%;margin-top:12px;min-height:120px;font:inherit;font-size:0.85rem;color:var(--text);background:#fff;border:1px solid var(--border);border-radius:6px;padding:0.7rem 0.9rem;line-height:1.7;resize:vertical;box-sizing:border-box}
 @media(max-width:640px){.invite-btns .btn{flex:1}}
 @media(max-width:640px){input.txt{min-width:0;width:100%}.row{flex-direction:column;align-items:stretch}}
@@ -114,8 +123,13 @@ input.txt.nm{max-width:230px}
 
 <!-- 深链横幅：从邀请链接进来时出现 -->
 <div class="rbanner" id="roomBanner" style="display:none">
-  <div>有人邀请你加入会议 <b id="rb-room"></b></div>
-  <button class="btn" onclick="enterInvited()">进入会议</button>
+  <div class="rb-head">有人邀请你加入会议 <b id="rb-room"></b>
+    <span class="rb-sub">填个名字就能进——不用注册、不用登录、不用装软件。</span></div>
+  <div class="rb-form">
+    <input class="rb-nm" id="rbName" maxlength="20" autocomplete="off" placeholder="你的名字">
+    <button class="btn" onclick="enterInvited()">进入会议</button>
+  </div>
+  <div class="rb-msg" id="rb-msg"></div>
 </div>
 
 <!-- 身份条：只显示当前名字；名字本身在下面「参加会议」里填 -->
@@ -145,6 +159,7 @@ input.txt.nm{max-width:230px}
       <button class="btn ghost" onclick="hostNamed()">用这个名字开</button>
     </div>
     <div class="hintline">起名建议用字母/数字（更好念、更好输）；留空则自动生成会议号。</div>
+    <div class="hostwarn"><b>主持人开课前必看：</b>Jitsi 公共服务规定——房间的<b>第一个人必须先登录</b>才能把会议"开起来"（进房后按提示用 Google / GitHub / Facebook 任一账号登录一次，浏览器会记住）。<br>所以流程是：<b>①</b> 讲师提前 10 分钟进房并登录 → <b>②</b> 再把链接发给学员。顺序反了，学员会停在"等待主持人"的画面上干等。</div>
   </div>
 
   <!-- 邀请信息卡（开会后出现） -->
@@ -240,7 +255,8 @@ input.txt.nm{max-width:230px}
   <div class="notes" style="margin-top:1.4rem">
     <b>使用须知</b>
     <ol>
-      <li>在「参加会议」里填上你的名字（本机会记住，下次自动带出）——之后点任何教室都会自动显示这个名字，不用在教室里再登录或改名。</li>
+      <li><b>不用注册、不用加入社区。</b>收到链接后用浏览器打开，填上你的名字，点「进入会议」就进教室了（名字本机会记住，下次自动带出）。</li>
+      <li>如果画面显示"等待主持人 / Waiting for a moderator"，说明讲师还没进房——不用退出，等着就行，讲师一进来画面自动接通。</li>
       <li>首次进入请允许浏览器使用摄像头与麦克风；听课时建议先静音，提问再开麦。</li><li><b>看不清时：</b>点教室工具栏「全屏」，或双击讲师画面把它设为焦点，都能拿到最清晰的画面。画质会随你的网络自动调整——网络好自动上到高清，网络弱会先保证流畅不卡。</li>
       <li><b>白板、PPT 与屏幕：</b>讲师放 PPT/讲义时点底部工具栏「屏幕共享」——浏览器弹窗里可选「整个屏幕 / Entire Screen」把整台电脑的画面都展示出来，或只选某个 PowerPoint 窗口；需要板书时点工具栏「更多 ⋮ → 白板 / Whiteboard」打开电子白板，师生可在同一块白板上一起书写、画图。讲师若开启录制，你会看到「本次会议正在录制」的提示。</li>
       <li>开课前请在下方讨论区查看时间预告；上课中的提问也可以直接发在讨论区，讲师会集中回应。</li>
@@ -329,6 +345,7 @@ function joinByCode(){
   var nm=window.SDE_MEET_PICK?window.SDE_MEET_PICK():"";
   if(!nm){if(window.meetNeedName)window.meetNeedName();return}
   var v=(document.getElementById("meetCode").value||"").trim();
+  if(!v&&window.__invitedRoom)v=window.__invitedRoom;   // 从邀请链接进来的：号框留空也照样进那个房间
   if(!v){if(window.meetNeedCode)window.meetNeedCode();return}
   window.SDE_MEET_REMEMBER(nm);
   // 明确的 SDE 教室号（以 SDE- 开头）一律进视频教室，即使主体是数字，避免被误判为 Zoom
@@ -402,7 +419,16 @@ function scheduleMeet(){
 }
 function copySchedule(){copyText(document.getElementById("schOut").value,null);var b=document.querySelector("#schBtns button");if(b){var o=b.textContent;b.textContent="已复制";setTimeout(function(){b.textContent=o;},1500);}}
 // ===== 邀请深链：?room= 进来时提示进入 =====
-function enterInvited(){if(window.__invitedRoom)joinRoom(window.__invitedRoom);}
+function rbTyped(){var f=document.getElementById("rbName");return f?(f.value||"").trim().slice(0,20):"";}
+function rbSay(t){var m=document.getElementById("rb-msg");if(m)m.textContent=t||"";}
+function enterInvited(){
+  if(!window.__invitedRoom)return;
+  var nm=rbTyped()||(window.SDE_MEET_PICK?window.SDE_MEET_PICK():"");
+  if(!nm){rbSay("先填一下你的名字——会议里就用它显示。");var f=document.getElementById("rbName");if(f)try{f.focus()}catch(e){}return;}
+  if(window.SDE_MEET_REMEMBER)window.SDE_MEET_REMEMBER(nm);
+  rbSay("");
+  joinRoom(window.__invitedRoom);
+}
 (function(){try{
   var rp=new URLSearchParams(location.search).get("room");
   var rpRoom=rp?canonicalRoom(rp):"";
@@ -410,6 +436,14 @@ function enterInvited(){if(window.__invitedRoom)joinRoom(window.__invitedRoom);}
     window.__invitedRoom=rpRoom;
     document.getElementById("rb-room").textContent=rpRoom;
     document.getElementById("roomBanner").style.display="flex";
+    var mc=document.getElementById("meetCode");
+    if(mc&&!(mc.value||"").trim())mc.value=rpRoom;   // 两条路都能进：横幅进 或 下面「参加会议」进
+    var rf=document.getElementById("rbName");
+    if(rf){
+      var prev="";try{prev=String(localStorage.getItem("sde_meet_name")||"")}catch(e){}
+      if(prev)rf.value=prev.slice(0,20);
+      rf.addEventListener("keydown",function(e){if(e.key==="Enter")enterInvited()});
+    }
   }
 }catch(e){}})();
 // ===== 身份：一个名字就够 =====
@@ -432,7 +466,8 @@ function paint(){
 function jsay(t,bad){var m=el("join-msg");if(m){m.textContent=t||"";m.className="ma-msg"+(bad?" bad":"")}}
 window.meetSay=jsay;
 // 取名字：先看输入框，再看本机记住的，再看社区身份
-window.SDE_MEET_PICK=function(){return typed()||remembered()||communityName()};
+function typedRb(){var f=el("rbName");return f?(f.value||"").trim().slice(0,20):""}
+window.SDE_MEET_PICK=function(){return typed()||typedRb()||remembered()||communityName()};
 window.SDE_MEET_REMEMBER=function(nm){
   nm=String(nm||"").trim().slice(0,20);
   if(!nm)return "";
@@ -443,6 +478,12 @@ window.SDE_MEET_REMEMBER=function(nm){
   return nm;
 };
 window.meetNeedName=function(){
+  var bn=el("roomBanner");
+  if(bn&&bn.style.display!=="none"){
+    if(window.rbSay)window.rbSay("先填一下你的名字——会议里就用它显示。");
+    var rf=el("rbName");if(rf){try{rf.focus()}catch(e){}}
+    return;
+  }
   jsay("先填一下你的名字，会议里会用它显示。",1);
   var f=el("joinName");if(f)try{f.focus()}catch(e){}
   var c=el("joincard");if(c){c.classList.remove("maflash");void c.offsetWidth;c.classList.add("maflash");try{c.scrollIntoView({behavior:"smooth",block:"center"})}catch(e){}}
