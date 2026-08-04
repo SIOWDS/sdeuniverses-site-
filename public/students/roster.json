@@ -7752,6 +7752,37 @@
           "field": "教育学"
         }
       ]
+    },
+    {
+      "slug": "guan-hai-ting-tao",
+      "name": "观海听涛",
+      "small": "预备",
+      "count": 3,
+      "enrolled_order": 38,
+      "status": "preliminary",
+      "papers": [
+        {
+          "slug": "guan-hai-ting-tao/generative-parasitism",
+          "date": "2026-08-04",
+          "words": 25577,
+          "iq": 135,
+          "iq_kind": "blind"
+        },
+        {
+          "slug": "guan-hai-ting-tao/coupling-interval",
+          "date": "2026-08-04",
+          "words": 20513,
+          "iq": 133,
+          "iq_kind": "blind",
+          "field": "教育学"
+        },
+        {
+          "slug": "guan-hai-ting-tao/deputized-work",
+          "date": "2026-08-04",
+          "words": 19277,
+          "field": "教育学"
+        }
+      ]
     }
   ],
   "score_formula": "v5 (2026-07-29): four weighted parts, each normalised across the cohort. (1) activity 0.40 - papers are grouped into three-day windows; each window scores 16 * 0.5^(age_days/60) * sqrt(sum of per-paper depth), so ten pieces dumped on one day do not stack ten-fold over ten pieces spread across months; depth = page-declared <meta name=\"sde:paper-weight\"> when present, else 1.0 for poems, else clamp(sqrt(words/10000), 0.6, 1.8); plus min(20, 4*distinct months). (2) number of published pieces 0.20, as sqrt(count). (3) innovation 0.25 - mean of blind SDE innovation scores only (papers[].iq where iq_kind=='blind'), mapped to 0-100 over 125-150. (4) disciplinary breadth 0.15 - the effective number of primary fields, exp(Shannon entropy) over papers[].field. Entropy rather than a label count: fifty pieces spread evenly over four fields are broader than seventy concentrated in one field that happen to carry forty-nine self-invented labels. Parts (3) and (4) are shrunk toward the site-wide mean with K=10 so a four-paper sample cannot speak for seventy-three; students with no data take the mean and are neither penalised nor rewarded. Total length was trialled as a fifth part and removed: it correlates with the piece count at r=0.985 and only double-counts volume. papers[].iq, iq_kind and field are all derived from the article pages by tools/build_roster.py, never hand-written: roster.json is rebuilt from disk on every content push, so hand-added fields are overwritten."
