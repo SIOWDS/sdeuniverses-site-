@@ -1,0 +1,121 @@
+<!DOCTYPE html><html lang="zh"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>社会网络分析 · 新思想前沿 | SDE Universes</title>
+<meta name="description" content="近二十年社会网络研究的两次转向：上一个十年靠平台数据把网络研究推到全网规模，这十年在大规模实验里把弱连接的因果作用坐实，同时数据通道关闭让同一批方法失去了对象。附十条可证伪的研究命题。">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Noto+Serif+SC:wght@300;400;500;600&display=swap">
+<style>
+:root{--bg:#F5EFE0;--card:#FAF6EC;--gold:#8A6817;--gold2:#A88233;--text:#2A2315;--text2:#6B5D47;--muted:#98886C;--border:rgba(138,104,23,0.22)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'Noto Serif SC',Georgia,serif;line-height:1.9;-webkit-font-smoothing:antialiased}
+.top{max-width:760px;margin:0 auto;padding:1.4rem 1.5rem 0;font-size:.86rem}
+.top a{color:var(--gold);text-decoration:none;font-weight:600}.top a:hover{text-decoration:underline}
+.top .sep{color:var(--muted);margin:0 .5rem}
+main{max-width:760px;margin:0 auto;padding:1.5rem 1.5rem 4rem}
+.kicker{font-size:.82rem;letter-spacing:.18em;color:var(--gold2);font-weight:600;margin-bottom:.9rem}
+h1{font-size:2rem;line-height:1.3;font-weight:700;margin-bottom:.7rem;letter-spacing:.01em}
+.meta{font-size:.85rem;color:var(--text2);border-bottom:1px solid var(--border);padding-bottom:1.1rem;margin-bottom:1.6rem}
+.lede{font-size:1.12rem;color:var(--text);font-weight:500;margin-bottom:1.5rem}
+h2{font-size:1.18rem;font-weight:600;color:var(--gold);margin:1.9rem 0 .6rem}
+p{margin:0 0 1.1rem;text-align:justify}
+.end{margin-top:2rem;padding-top:1.2rem;border-top:1px solid var(--border);font-size:.86rem;color:var(--muted)}
+.end b{color:var(--text2)}
+
+.era{margin:26px 0 6px;padding:7px 0 6px;border-top:1px solid var(--border);border-bottom:1px solid var(--border);font-size:.78rem;letter-spacing:.14em;color:var(--gold2);font-weight:600}
+.bridge{font-size:.92rem;color:var(--text2);line-height:1.95;margin:12px 0 4px}
+
+.hypbox{background:var(--card);border:1px solid var(--border);border-left:3px solid var(--gold2);padding:.9rem 1.1rem;font-size:.9rem;line-height:1.95;margin:0 0 1.3rem}
+.hypbox a{color:var(--gold)}
+.slot{display:inline-block;min-width:5.4em;color:var(--gold2);font-weight:600}
+ol.props{margin:0;padding:0;list-style:none;counter-reset:pp}
+ol.props>li{counter-increment:pp;position:relative;padding:.85rem 0 .85rem 2.1rem;border-top:1px solid var(--border)}
+ol.props>li:before{content:counter(pp);position:absolute;left:0;top:.95rem;font-size:.82rem;color:var(--muted);font-weight:600}
+.pt{font-weight:600;margin-bottom:.35rem;text-align:justify}
+.ax{display:inline-block;background:rgba(138,104,23,.10);color:var(--gold);border-radius:3px;padding:.05rem .45rem;margin-right:.45rem;font-size:.8rem;font-weight:600}
+.pf{font-size:.9rem;color:var(--text2);line-height:1.8;margin-bottom:.18rem;text-align:justify}
+.pf i{font-style:normal;display:inline-block;min-width:2.9em;color:var(--gold2);font-weight:600}
+.pf.pk{color:var(--muted)}
+.mk{display:inline-block;background:rgba(75,63,160,.12);color:#4B3FA0;border-radius:3px;padding:.02rem .34rem;margin-right:.4rem;font-size:.76rem;font-weight:700}
+.dk{display:inline-block;border:1px solid var(--border);color:var(--muted);border-radius:3px;padding:.02rem .34rem;margin-right:.4rem;font-size:.76rem;font-weight:600}
+</style></head><body>
+<div class="top"><a href="/browse/">SDE Universes</a><span class="sep">·</span><a href="/frontier/">新思想前沿</a><span class="sep">›</span><span style="color:var(--text2)">社会与人口</span></div>
+<main>
+<div class="kicker">新思想前沿 · 社会与人口</div>
+<h1>社会网络分析</h1>
+<div class="meta">近二十年 · 两次转向 ＋ 十条研究命题 · 约 5500 字 · 王德生 亲撰 · 2026 年 8 月</div>
+<p class="lede">这十年社会网络研究同时发生了两件方向相反的事。一件是<b>因果化</b>：过去半个世纪，「弱连接更容易带来工作机会」一直只是观察性结论，因为同质性与影响在观测数据里分不开；这十年靠平台内部的大规模长期实验，推荐算法对连接结构的随机扰动第一次让弱连接的因果效应被直接测出来，同时基于数十亿条友谊关系的研究把跨阶层连接确立为向上流动最强的地区级预测变量之一。另一件是<b>数据关闭</b>：随着接口收紧、公开研究工具停摆，让上述结论成为可能的那类数据在几年之内大面积消失。于是本领域处在一个尴尬位置——<b>方法刚刚成熟，对象正在退场</b>；研究者被迫转向手机信令、支付与调查重建的替代网络，而生成内容与自动账号又让「节点是不是人」成为前置问题。</p>
+<div class="era">上一个十年 · 约 2006–2016</div>
+<p class="bridge">这十年在把网络的因果作用坐实、同时失去数据；而上一个十年，它刚刚从抽样问卷走到全网数据，并把同质性与影响不可分这个识别难题摆上台面。</p>
+<h2>甲、结构洞与弱连接从理论走进数据</h2>
+<p>经典的弱连接假说与结构洞理论在这十年第一次有了大样本验证的可能：通讯记录、合作网络与在线好友关系提供了此前无法企及的规模。</p>
+<p><b>规模改变的不是结论而是问题</b>：过去问「弱连接是否有用」，此后开始问「哪一段强度的连接最有用」——这一提法要等到下一个十年的实验才能真正回答。</p>
+<h2>乙、复杂传染与简单传染被区分开</h2>
+<p>疾病式的传播只需一次接触，而行为与观念的采纳往往需要来自多个不同来源的重复接触；两类传播在网络结构上的最优路径正好相反。</p>
+<p><b>它推翻了一条流行的直觉</b>：宽而弱的网络利于信息扩散，却不利于行为改变——<b>利于扩散的结构与利于采纳的结构不是同一个</b>。</p>
+<h2>丙、同质性与影响不可分的识别危机</h2>
+<p>朋友相似既可能因为互相影响，也可能因为本来就相似而成为朋友。这十年的方法学工作证明，在一般条件下仅凭观测网络数据无法把两者分开。</p>
+<p><b>这一条把整个领域的证据等级往下调了一档</b>，也逼出了后来的实验路线：不做干预就不要谈影响。</p>
+<h2>丁、平台数据把网络研究推到全网规模</h2>
+<p>在线社交平台第一次让研究者面对完整的、而非抽样的网络：路径长度、聚类与社群结构在数亿节点上被重新测量。</p>
+<p><b>它带来的副作用是依赖</b>：本领域最好的经验数据自此长在私人基础设施上，这一依赖在下一个十年会被兑现成风险。</p>
+<h2>戊、网络干预与种子选择走进田野</h2>
+<p>在村庄与学校中做的干预实验开始比较不同的种子选择策略：随机选人、选中心节点、或让人推荐熟人，后者常常更有效。</p>
+<p><b>网络因此从描述对象变成干预杠杆</b>：同样的资源，改变从谁开始，扩散结果显著不同。</p>
+<h2>己、时间网络与多层网络的方法成熟</h2>
+<p>静态图被时序图与多层图取代：同一批人在不同关系层（同事、亲属、借贷）上的连接不同，且随时间开合。</p>
+<p><b>它把「一个人的网络」从一张图变成一叠图</b>，为后来处理线上线下不一致提供了工具。</p>
+<div class="era">这十年 · 约 2016–2026</div>
+<p class="bridge">上一个十年把网络推到全网规模、也暴露了识别难题；这十年用平台内部的大规模实验解决了识别，随后又在数据关闭中失去了赖以立论的基础设施。</p>
+<h2>一、弱连接的因果作用被实验坐实</h2>
+<p>平台在多年间对「你可能认识的人」做的大规模随机化，制造了连接强度的外生变化，随访显示<b>中等偏弱的连接对求职结果的因果贡献最大</b>，而最弱的连接反而不如中等连接——弱连接假说被证实的同时被修正。</p>
+<p><b>这一步的方法论意义大于结论本身</b>：它示范了在私有平台内部做长期随机化的可行性，也把整个领域的证据标准提高到了「有没有外生变化」这一档。</p>
+<h2>二、网络成为经济流动的解释变量</h2>
+<p>数十亿条友谊关系与行政收入数据的结合，使<b>跨阶层连接</b>成为地区向上流动最强的预测变量之一，并被分解成曝光与交友偏好两项可分别干预的成分。</p>
+<p>网络研究因此第一次进入分层与公共政策的核心议程：<b>要提高流动，可以不改分配而改谁与谁能成为朋友</b>——这是本领域二十年来最具政策含量的一条结论，也最需要独立复核。</p>
+<h2>三、数据门关闭，方法与对象脱节</h2>
+<p>接口收紧、公开监测工具停摆、研究合作项目终止，使前两条结论所依赖的数据在几年内大面积不可得；新的研究者无法复现，也无法在别的平台上检验。</p>
+<p><b>这带来一个本领域特有的窘境</b>：证据等级最高的一批结论，恰恰是最难被独立复核的一批。<b>可复现性危机在这里不是方法问题，是准入问题。</b></p>
+<h2>四、替代数据接管，但换掉了对象</h2>
+<p>手机信令、支付流水、共同出行与问卷重建成为新的网络来源。它们测的是<b>共处与交易</b>，不是<b>关系</b>。</p>
+<p><b>替换的代价要写进结论</b>：用共处网络得到的传播模型，在需要信任与劝说的行为上会系统性高估扩散——这一点已有零星验证，但尚未成为常规校正。</p>
+<h2>五、节点真实性成为前置问题</h2>
+<p>自动账号、代运营与生成内容使「一个节点是不是一个人」不再默认成立；同一个人在多平台上的多个身份也让节点计数含糊。</p>
+<p><b>网络分析的第一步因此从画图退到验人</b>：在真实性未经检验的图上算出的中心度与社群结构，其误差不是随机的，而是朝着被操纵的方向系统偏移。</p>
+<h2>六、网络干预从学术走向治理</h2>
+<p>平台把种子选择、限流与推荐多样性当作运营手段，监管把「推荐结构」写进合规要求。学术上的干预实验与平台的日常运营开始使用同一套语言。</p>
+<p><b>这带来一个新的伦理与方法交叉</b>：研究者能做的实验规模远小于平台每天例行做的改动，而后者不产生公开记录——<b>最大的一批社会实验正在发生，却没有留下可供检验的日志</b>。</p>
+<h2>七、一句话</h2>
+<p><b>这十年社会网络研究把弱连接从相关做成了因果，又在同一段时间里失去了做这件事所需的数据——方法成熟与对象退场同时发生。</b></p>
+<h2>◎ 二十年连起来看</h2>
+<p>两幕的关系是「先拿到规模，后拿到因果，再失去入口」：<b>上一个十年拿到了全网数据却解决不了识别，这十年靠平台内部的随机化解决了识别，代价是把最好的证据锁进了私人基础设施</b>。</p>
+<p>被继承的判断是那条方法论的：<b>没有外生变化就不要谈影响</b>。它在上一个十年是一句警告，这十年成了准入门槛——不带干预的网络论文，证据等级被整体下调。而两幕共同的形状是：<b>这门学科的研究能力与某家公司的数据政策绑在一起</b>，这在其他社会科学里罕见，也是它最脆弱的地方。</p>
+<h2>※ 三个常见误解</h2>
+<p>其一，以为连接越弱越有用。大规模实验显示效果在中等偏弱处最大，<b>最弱的连接因缺乏推荐动机而作用有限</b>。</p>
+<p>其二，以为社交平台的好友图等于社会关系。它同时包含长期不联系的旧关系与算法推荐产生的新关系，<b>与线下往来的重合度从未被系统测量</b>。</p>
+<p>其三，以为网络分析主要是画图与算指标。若节点真实性与关系定义未经检验，中心度与社群划分的误差是系统性的，不会因样本增大而消失。</p>
+<h2>※ 与相邻领域的接口</h2>
+<p>与社会分层与流动是供给关系：跨阶层连接的全部测量建在这里；与计算社会科学的分工是，那边关心方法与数据基础设施的总体状况，这边关心关系结构本身；与传播与媒介研究的接口在扩散与解释分叉；与流行病学的接口在接触网络与传播模型；与统计物理与复杂系统共享结构方法，但对「节点是人」这一点的要求完全不同。</p>
+<h2>※ 争议现场</h2>
+<p>最热的分歧是平台内部实验的证据地位。支持方指出这是本领域唯一能制造外生变化的手段，规模与随访长度前所未有；批评方指出实验由利益相关方设计与执行、原始数据不可得、失败的实验不进入公开记录——<b>这三条合起来使发表偏倚无法评估</b>。可判之处不在争论而在制度：<b>要求平台在做推荐结构改动前预注册并留存日志</b>，即使日志暂不公开，也能在事后由第三方核验实验的总数与结果分布。</p>
+<p>第二场争论关于替代网络。共处与支付网络的可得性远高于关系网络，但它们测的不是同一件事；两者在同一人群上的系统比对至今没有一份公认的基准。</p>
+<h2>※ 往下五年看什么</h2>
+<p>其一，是否会出现受监管的研究数据通道——若有，这十年被锁住的一批结论会迎来第一次独立复核。</p>
+<p>其二，替代网络与关系网络的比对基准能否建立，这决定了信令与支付数据上的传播研究能不能被当真。</p>
+<p>其三，节点真实性检验能否成为标准前置步骤：一旦成为标准，此前十年基于开放数据的一大批网络指标要重新算一遍。</p>
+<h2 id="programme">※ 十条可做的研究命题</h2>
+<div class="hypbox"><b>以下不是结论，是假说。</b>上文写的是已经发生的事；这一节另行提出十条可证伪的研究命题，每条自带否证条件。共用的研究规程、检验纪律与三十条生成轴，见<a href="/frontier/programme/">研究纲领方法说明</a>。<br><span class="slot">研究单位</span>个体、关系边、社群、平台与线下场所 ＋ 建立、维持、断开、扩散和被推荐 ＋ 平台推荐规则、数据接口政策与线下场所结构构成的连接环境，合为一个共同演化的动态单元<br><span class="slot">三轴指标</span>连接结构可观测度 · 干预可迁移度 · 关系真实度<br><span class="slot">可用方法</span>平台内随机化实验、多来源网络重建与长期随访<br><span class="slot">实质标准</span>把网络研究从「结构的描述」推进为「连接可被干预与可被独立复核的科学」<br><span class="slot">已排除</span>弱连接的实验坐实、跨阶层连接、接口关闭与替代数据接管——上文已完成的主叙事，不重复<br><span class="slot">本组状态</span><b class="mk">样板</b>十条的预测、机制、做法与否证已逐条落到本学科的实际对象、数据源与可数量，不再是跨领域通用表述；改写标准见<a href="/frontier/programme/#localize">研究纲领方法说明</a>。</div>
+<ol class="props">
+<li><div class="pt"><span class="ax">证据血缘</span>平台实验的结论能不能被逆向复原</div><div class="pf"><i>预测</i>对基于平台实验的网络结论做逆向复原时，分歧集中在两步——推荐扰动的强度定义与失败实验是否进入分母，而非原始日志本身；两者可解释七成以上的效应量差异。</div><div class="pf"><i>机制</i>这些实验由平台设计并执行，扰动强度与实验总数只有一方掌握；结论的可信度因此不取决于统计方法，取决于账本是否完整。</div><div class="pf"><i>做法</i>选十条已发表的平台实验结论，要求或重建其扰动定义、实验总数与终止规则，由独立方复算效应量区间。</div><div class="pf pk"><i>否证</i>若不同复原路径下的效应量相差不足两成，完整血缘的边际价值有限。</div></li>
+<li><div class="pt"><span class="ax">开放世界校准</span>节点是不是人，应当先判后算</div><div class="pf"><i>预测</i>在网络指标计算前加一档拒绝判断（真实性存疑的节点不计入中心度与社群划分），关于影响力与社群结构的高置信错误显著减少，代价是有效节点比例下降一到两成。</div><div class="pf"><i>机制</i>自动账号与代运营节点不是随机噪声，它们按被雇佣的方向连接，因此会朝特定方向抬高中心度——不做前置判定，误差就被写进所有下游结论。</div><div class="pf"><i>做法</i>在同一批数据上并行跑「全量」与「带拒判」两套流程，用已知的账号治理结果作留出标签，比较中心度排序与社群划分的差异。</div><div class="pf pk"><i>否证</i>若两套流程给出的前百名中心节点重合度高于九成，前置判定可省。</div></li>
+<li><div class="pt"><span class="ax">迁移合同</span>平台内的结论搬到别处需要保持什么</div><div class="pf"><i>预测</i>一条在某平台上成立的连接效应搬到另一平台或线下场景，失效可由三条条件解释——关系的建立成本、推荐位的可见度、以及关系是否承担资源交换；恢复这三条后效应量回到原研究的六成以上。</div><div class="pf"><i>机制</i>网络效应的大小取决于建立一条边要付出什么、这条边能不能被看见、以及它能否兑换成资源；三者一变，同样的拓扑就不是同一件事。</div><div class="pf"><i>做法</i>列出必要、可变与禁用条件，在两个建立成本差异明显的平台与一个线下场景中逐项破坏，观察求职或采纳结果的失效次序。</div><div class="pf pk"><i>否证</i>若失效次序在三个场景间不可重复，则不存在稳定合同。</div></li>
+<li><div class="pt"><span class="ax">反事实响应面</span>连接强度与推荐可见度的组合会让效应反号</div><div class="pf"><i>预测</i>弱连接的收益在连接强度、推荐可见度与资源稀缺度构成的空间里存在方向反转区：在资源极稀缺处，最弱的连接因缺乏推荐动机而收益转负，中等连接的优势扩大。</div><div class="pf"><i>机制</i>一条边是否兑现成机会，取决于对方有没有动机替你说话；动机随资源稀缺度变化，效应因此在不同区域反号。</div><div class="pf"><i>做法</i>用平台实验数据在三维网格上分层估计求职与推荐成功率，报告响应面、空白区与不确定带。</div><div class="pf pk"><i>否证</i>若线性模型在留出网格点上的预测误差不比响应面模型高出两成，复杂响应面不成立。</div></li>
+<li><div class="pt"><span class="ax">动态边界</span>什么算一条关系，决定了网络是什么形状</div><div class="pf"><i>预测</i>把边定义为好友关系、近三月互动还是共同资源交换，同一批数据算出的社群数与跨阶层连接度相差两倍以上，且干预建议随之改变。</div><div class="pf"><i>机制</i>在线好友图里长期不互动的旧边占很大比例，把它们计入会稀释掉真正起作用的那部分连接——边的定义不是细节，是对象定义。</div><div class="pf"><i>做法</i>对同一批数据用三种边定义各算一次社群结构与跨阶层连接度，比较结论与干预名单的分叉。</div><div class="pf pk"><i>否证</i>若三种定义下的跨阶层连接度相差不足两成，动态边界论没有实质增量。</div></li>
+<li><div class="pt"><span class="ax">稀缺转移</span>数据不再稀缺之后，稀缺的是准入</div><div class="pf"><i>预测</i>在替代数据（信令、支付）供给持续增长的同时，本领域的纠错速度不再同步提高；限制转移到访问审批、伦理审查与跨平台可比性三处。</div><div class="pf"><i>机制</i>网络研究的瓶颈已从「有没有数据」变成「谁被允许看、看到的能不能互相比」，前者可以靠技术缓解，后者只能靠制度。</div><div class="pf"><i>做法</i>追踪一次数据可得性跃迁前后各环节的排队时间：数据申请、伦理审批、清洗对齐、复核与发表。</div><div class="pf pk"><i>否证</i>若替代数据量翻倍时结论被独立复核的比例同比例上升，稀缺转移假说不成立。</div></li>
+<li><div class="pt"><span class="ax">测量回写</span>被研究这件事本身会改变网络</div><div class="pf"><i>预测</i>当推荐系统把「可能认识的人」的排序规则公开或被广泛猜测后，用户的加好友行为随之改变，同一套算法在公开前后产生的连接结构显著不同。</div><div class="pf"><i>机制</i>网络的生成机制部分掌握在平台手里，而用户会针对可见规则调整行为——测量装置与被测对象共用同一套接口。</div><div class="pf"><i>做法</i>利用规则说明公开或媒体广泛报道的时间点做断点分析，比较前后的加好友接受率与新边的社经跨度。</div><div class="pf pk"><i>否证</i>若公开前后新边的社经跨度变化不足一成，回写效应可忽略。</div></li>
+<li><div class="pt"><span class="ax">延迟核</span>连接的收益要几年才显影</div><div class="pf"><i>预测</i>同一次连接扰动的短长期效应方向可能相反：三个月内求职结果无变化甚至略降（注意力被分散），一到三年后显著为正，且收益随关系存续时长累积。</div><div class="pf"><i>机制</i>一条新边要经过维持、信任建立与机会出现三步才兑现，前两步不产生可观测结果，短窗口因此测到的是成本而非收益。</div><div class="pf"><i>做法</i>以三个月、一年、三年、五年四个窗口追踪同一批被扰动的用户，估计即时、滞后、累积与反向效应核函数。</div><div class="pf pk"><i>否证</i>若各时间窗的效应方向一致且幅度相差不足两成，无需复杂延迟模型。</div></li>
+<li><div class="pt"><span class="ax">可逆性账本</span>断开一条边的成本没有被记账</div><div class="pf"><i>预测</i>网络干预（限流、推荐降权、社群解散）的评估应同时记录收益与撤回成本：被解散的社群在恢复访问后的重建率不足三成，而被降权关系的互动量在恢复后半年内不回到基线。</div><div class="pf"><i>机制</i>关系的重建不是开关：连接一旦中断，维系它的日常互动消失，重新连上需要重新经历建立成本——这一栏不在平台的效果报表里。</div><div class="pf"><i>做法</i>为每类干预记录锁定程度（关系存续时长、社群规模、替代渠道有无），在恢复后跟踪半年的重建率与互动恢复曲线。</div><div class="pf pk"><i>否证</i>若被干预关系在恢复后三个月内互动量回到基线的九成以上，账本可以简化。</div></li>
+<li><div class="pt"><span class="ax">协同主体</span>谁能做实验、谁能看日志，决定这门学科能证明什么</div><div class="pf"><i>预测</i>在平台、监管方与研究者构成的协同体中，保持数据规模不变，只改谁能提出实验、谁能否决发表、日志向谁开放，本领域可被独立复核的结论比例会变化一半以上。</div><div class="pf"><i>机制</i>网络研究的能力单位不是某个实验室，而是平台、监管与学界的组合；同样一批数据在不同权限拓扑下能证明的东西完全不同。</div><div class="pf"><i>做法</i>比较几种已有的合作模式（企业内研究、受监管数据室、公开接口），测其产出结论的复核率、预注册比例与阴性结果发表比例。</div><div class="pf pk"><i>否证</i>若三种拓扑下结论的独立复核率相差不足 15%，协同主体不是必要解释。</div></li>
+</ol>
+<div class="end"><b>新思想前沿</b> 是一个持续撰写的专栏：近二十年，各主要领域的两次思想转向——上一个十年一次、这十年一次。第一期 100 个学科面板已全部完成，第二期 200 个领域正在推进，由王德生亲撰。 · <a href="/frontier/" style="color:var(--gold);text-decoration:none">← 回到学科面板</a></div>
+</main><script src="/wds-mode.js?v=20260802b" defer></script>
+</body></html>
