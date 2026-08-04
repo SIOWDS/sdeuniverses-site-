@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>在线翻页阅读 · 治未病立账学</title>
+  <style>
+    :root{--night:#07182d;--night2:#020a14;--paper:#f7f0df;--gold:#d8b95d;--muted:#aa9a74}
+    *{box-sizing:border-box}
+    html,body{margin:0;min-height:100%;background:radial-gradient(circle at 50% 0,#143255,var(--night2) 70%);color:var(--paper);font-family:"Noto Serif SC","Songti SC",serif}
+    .topbar{position:sticky;top:0;z-index:20;min-height:64px;padding:10px 18px;background:rgba(4,13,25,.94);border-bottom:1px solid rgba(216,185,93,.35);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+    .identity{display:flex;align-items:center;gap:14px;min-width:0}
+    .back{color:var(--muted);text-decoration:none;white-space:nowrap}
+    .title{color:var(--gold);letter-spacing:.08em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .controls{display:flex;align-items:center;justify-content:flex-end;gap:8px;flex-wrap:wrap}
+    button,.download{height:36px;border:1px solid rgba(216,185,93,.48);border-radius:5px;background:rgba(216,185,93,.1);color:var(--paper);padding:0 14px;font:inherit;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center}
+    button:hover,.download:hover{background:rgba(216,185,93,.2)}
+    button:disabled{opacity:.35;cursor:not-allowed}
+    .page-field{display:flex;align-items:center;gap:6px;color:var(--muted)}
+    #pageInput{width:62px;height:36px;border:1px solid rgba(216,185,93,.48);border-radius:5px;background:#07121f;color:var(--gold);text-align:center;font:inherit}
+    .stage{min-height:calc(100vh - 65px);padding:28px 14px 70px;display:flex;justify-content:center;align-items:flex-start}
+    #pageWrap{position:relative;display:none;background:white;line-height:0;box-shadow:0 22px 70px rgba(0,0,0,.68)}
+    #pdfCanvas{display:block;max-width:100%}
+    .loading,.error{padding:13vh 20px;text-align:center;color:var(--muted);line-height:1.9}
+    .spinner{width:44px;height:44px;margin:0 auto 18px;border:3px solid rgba(216,185,93,.2);border-top-color:var(--gold);border-radius:50%;animation:spin .85s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .error{display:none;color:#efb4ab}.error a{color:var(--gold)}
+    .hint{position:fixed;z-index:15;left:0;right:0;bottom:0;padding:24px 10px 9px;text-align:center;font-size:12px;color:var(--muted);background:linear-gradient(transparent,rgba(2,10,20,.94));pointer-events:none}
+    @media(max-width:760px){
+      .topbar{padding:9px 10px;gap:8px}.identity{width:100%;justify-content:space-between}.title{font-size:14px}
+      .controls{width:100%;justify-content:center}.download{padding:0 10px}.stage{padding:16px 6px 62px}
+      button{padding:0 11px}.zoom-label{display:none}
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="identity">
+      <a class="back" href="/books/m/53/">← 返回专著导读</a>
+      <span class="title">治未病立账学</span>
+    </div>
+    <div class="controls" aria-label="翻页控制">
+      <button id="prev" type="button" disabled>← 上一页</button>
+      <label class="page-field"><input id="pageInput" type="number" min="1" value="1" aria-label="页码"> / <span id="totalPages">—</span></label>
+      <button id="next" type="button" disabled>下一页 →</button>
+      <button id="zoomOut" type="button" title="缩小"><span class="zoom-label">缩小 </span>−</button>
+      <button id="zoomIn" type="button" title="放大"><span class="zoom-label">放大 </span>＋</button>
+      <a class="download" href="Weibing-Ledger-Theory.pdf" target="_blank" rel="noopener">下载 PDF</a>
+    </div>
+  </header>
+  <main class="stage" id="stage">
+    <div id="loading" class="loading"><div class="spinner"></div>正在载入全书<br><small>首次打开需要几秒钟</small></div>
+    <div id="pageWrap"><canvas id="pdfCanvas"></canvas></div>
+    <div id="error" class="error"></div>
+  </main>
+  <div class="hint">键盘 ← → 翻页 · 输入页码跳转 · 支持缩放与手机阅读</div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script>
+  (function(){
+    "use strict";
+    var PDF_URL="Weibing-Ledger-Theory.pdf";
+    var pdf=null,pageNo=1,scale=1.35,rendering=false,pending=null;
+    var canvas=document.getElementById("pdfCanvas");
+    var context=canvas.getContext("2d");
+    var wrap=document.getElementById("pageWrap");
+    function el(id){return document.getElementById(id)}
+    function setButtons(){
+      el("prev").disabled=!pdf||pageNo<=1;
+      el("next").disabled=!pdf||pageNo>=pdf.numPages;
+      el("pageInput").value=pageNo;
+    }
+    function renderPage(number){
+      rendering=true;
+      pdf.getPage(number).then(function(page){
+        var unit=page.getViewport({scale:1});
+        var available=Math.max(260,el("stage").clientWidth-20);
+        var fitted=Math.min(scale,available/unit.width);
+        var viewport=page.getViewport({scale:fitted});
+        var ratio=Math.min(window.devicePixelRatio||1,2.5);
+        canvas.width=Math.floor(viewport.width*ratio);
+        canvas.height=Math.floor(viewport.height*ratio);
+        canvas.style.width=viewport.width+"px";
+        canvas.style.height=viewport.height+"px";
+        wrap.style.width=viewport.width+"px";
+        wrap.style.height=viewport.height+"px";
+        context.setTransform(ratio,0,0,ratio,0,0);
+        return page.render({canvasContext:context,viewport:viewport}).promise;
+      }).then(function(){
+        rendering=false;
+        setButtons();
+        if(pending!==null){var n=pending;pending=null;renderPage(n)}
+      }).catch(showError);
+    }
+    function queue(number){if(rendering){pending=number}else{renderPage(number)}}
+    function go(number){
+      if(!pdf)return;
+      pageNo=Math.max(1,Math.min(pdf.numPages,number));
+      queue(pageNo);
+      window.scrollTo({top:0,behavior:"smooth"});
+    }
+    function showError(err){
+      el("loading").style.display="none";
+      wrap.style.display="none";
+      el("error").style.display="block";
+      el("error").innerHTML="在线翻页暂时未能载入。<br><a href=\""+PDF_URL+"\" target=\"_blank\">请点击这里直接打开或下载 PDF</a><br><small>"+String(err&&err.message||err)+"</small>";
+    }
+    if(!window.pdfjsLib){showError(new Error("PDF 阅读组件加载失败"));return}
+    pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+    pdfjsLib.getDocument(PDF_URL).promise.then(function(documentRef){
+      pdf=documentRef;
+      el("totalPages").textContent=pdf.numPages;
+      el("pageInput").max=pdf.numPages;
+      el("loading").style.display="none";
+      wrap.style.display="block";
+      renderPage(pageNo);
+    }).catch(showError);
+    el("prev").addEventListener("click",function(){go(pageNo-1)});
+    el("next").addEventListener("click",function(){go(pageNo+1)});
+    el("pageInput").addEventListener("change",function(){go(parseInt(this.value,10)||1)});
+    el("zoomIn").addEventListener("click",function(){scale=Math.min(3,scale+.2);queue(pageNo)});
+    el("zoomOut").addEventListener("click",function(){scale=Math.max(.6,scale-.2);queue(pageNo)});
+    document.addEventListener("keydown",function(event){
+      if(event.target&&/INPUT|TEXTAREA/.test(event.target.tagName))return;
+      if(event.key==="ArrowLeft")go(pageNo-1);
+      if(event.key==="ArrowRight")go(pageNo+1);
+    });
+    var resizeTimer;
+    window.addEventListener("resize",function(){clearTimeout(resizeTimer);resizeTimer=setTimeout(function(){if(pdf)queue(pageNo)},180)});
+  }());
+  </script>
+  <script src="/wds-mode.js?v=20260802b" defer></script>
+</body>
+</html>
