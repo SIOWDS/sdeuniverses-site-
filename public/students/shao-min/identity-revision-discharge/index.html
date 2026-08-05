@@ -58,6 +58,7 @@ footer a{color:var(--gold);text-decoration:none}
 .scorebox b{color:#D4B25E}
 .ref{font-size:14.5px;padding-left:2em;text-indent:-2em;opacity:.86}
 .endbox{text-align:center;border-top:1px solid rgba(201,168,76,0.28);margin-top:48px;padding:38px 20px;opacity:.9}
+.ednote{font-size:.92em;opacity:.78;border-left:3px solid rgba(200,145,23,.45);padding:6px 0 6px 14px;margin:10px 0 18px}
 </style><link rel="stylesheet" href="/sde-read.css">
 </head>
 <body class="sde-read">
@@ -75,7 +76,7 @@ footer a{color:var(--gold);text-decoration:none}
 <div class="abstract"><span class="lb"><b>摘 要</b></span><p>面向长期交互的智能系统把记忆视为个性化与连续性的基础，但记忆会被压缩为画像、转化为推断，并持续塑造未来行为。本文前一版本提出“身份修订权”与“未来不援引”，但“保留记录、限制未来使用”可由《通用数据保护条例》第18条限制处理权与第21条反对权部分表达，因此不能作为独创权利。本文将贡献迁移到履行判定问题：在生成式记忆系统中，法律请求与技术对象之间往往不是一一对应关系；界面状态与处理日志也不足以单独证明旧表示已停止影响行为。本文进一步校准“复发”的含义：相似结论再次出现，并不等于系统重新援引了旧身份，因为该结论也可能来自当前输入或一般知识。真正需要审计的是效力复发——一个已被撤回的身份判断，是否经残余证据重新取得了作为输出理由的因果资格。文章以预注册推断家族、三条件沙箱、候选路径干预和含未闭合项的回执审计这种资格；重建撤回效力残余率、身份修订延迟、跨情境复发率、谱系闭合率和再推导率五项指标；用任意时点有效的置信序列为“非忽略概率”规定通过、失败与不确定三种结论；并把“既有限制处理实现已经足够”与“行为差异不能归因于旧身份路径”同时设为可推翻条件。核心判断是：身份修订的技术履行，不能由记录状态或相似输出单独证明，而应由范围明确、误差可控的因果证据支持。</p><p class="kw"><b>关键词：</b>长期记忆；身份修订；援引效力；履行判定；效力复发；限制处理权；机器遗忘</p></div>
 <div class="abstract"><span class="lb"><b>Abstract</b></span><p>Long-term interactive AI systems treat memory as a basis for personalization, yet records may be compressed into profiles, transformed into inferences, and used to shape later behavior. An earlier version proposed a “right to identity revision” and “future non-invocation,” but retaining a record while restricting future use is already partly expressible through Articles 18 and 21 of the GDPR. This paper therefore relocates its contribution to a discharge-verification problem. A further distinction is necessary: the reappearance of a semantically similar conclusion does not by itself show that an outdated identity was invoked, because the conclusion may follow from current input or general knowledge. The relevant failure is efficacy recurrence: a revoked identity inference regains causal eligibility as a reason for system action through residual evidence or an unclosed propagation path. We operationalize this failure with preregistered inference families, three-condition sandboxes, candidate-path interventions, and receipts that disclose unresolved coverage. Five revised metrics are paired with anytime-valid confidence sequences that force one of three decisions—pass, fail, or inconclusive—under preregistered error bounds. The framework is refuted if an auditable restriction implementation performs equivalently, or if observed output differences cannot be attributed to legacy-identity pathways.</p><p class="kw"><b>Keywords: </b>long-term memory; identity revision; invocation efficacy; discharge problem; efficacy recurrence; restriction of processing; machine unlearning</p></div>
 <div class="scorebox"><b>SDE 创新智商：盲评 147.7</b>
-<p>盲评为投稿原稿未经任何编辑改动时评出的五维结构化评分（S 结构精确度×.20 + D 差异锐度×.25 + E 纠缠深度×.20 + I 不可还原性×.20 + F 可证伪性×.15），近邻比对按全球公开文献口径从严，并计入作者本人既发论文构成的站内自撞。本文正文未经编辑改动，分数对应投稿原稿；按本站铁律须另由独立评分者复核。（评分：Claude · 2026年8月5日）</p></div>
+<p>盲评为投稿原稿未经任何编辑改动时评出的五维结构化评分（S 结构精确度×.20 + D 差异锐度×.25 + E 纠缠深度×.20 + I 不可还原性×.20 + F 可证伪性×.15），近邻比对按全球公开文献口径从严，并计入作者本人既发论文构成的站内自撞。本文正文未经编辑改动，分数对应投稿原稿；文末「站内划界」一节由编辑增补，不计入本分数；按本站铁律须另由独立评分者复核。（评分：Claude · 2026年8月5日）</p></div>
 
 <h2>1. 问题的重新提出：从权利缺口到履行缺口</h2>
 <h3>1.1 立论位置的校准</h3>
@@ -186,6 +187,15 @@ footer a{color:var(--gold);text-decoration:none}
 <p>在法律已经规定更正、限制处理与反对权的地方，重新命名“停止使用”不能构成理论创新。生成式长期记忆真正留下的研究问题，是规范请求如何映射到多种衍生表示，以及什么证据足以说明这些表示在限定用途中的行为效力已经降低到可接受范围。</p>
 <p>本文以条件性的效力复发机制解释记录处置为何可能留下行为残余，并把调用效力层提出为候选工程接口，而非逻辑唯一解。相似文本重现被降格为线索，旧身份路径重新取得因果资格才是机制证据。预注册推断家族、三条件沙箱、候选路径干预、传播谱系与序贯判定共同构成一套可反驳的履行审计方案。若限制处理实现与效力审计无差异，或行为差异不能归因于旧身份路径，本文都应被既有权利和控制机制吸收。</p>
 <p>成熟的长期人机关系，不是系统永远记得同一个人，也不是每次改变都删除过去；而是历史可以继续作为历史存在，已经失效的表示不再未经授权地替现在发言，并且这一变化能够在公开边界内被复验。</p>
+<h2>附论 · 与站内既发论文的划界（编辑增补）</h2>
+<p class="ednote">本节由编辑增补，不属于作者投稿正文，亦不计入本文分数。设此节的理由是：作者在本站已有两篇与本文共用关键动作的论文，而本文未引它们；不点名分工，读者会把三篇读成同一件事的三次重述。</p>
+<h3>一、与《被机器命名之后》（之七）：能力侧与系统侧的分工</h3>
+<p>《被机器命名之后》处理的是人这一侧：当生成式系统持续概括、推断并参与用户的自我叙事时，用户如何察觉命名偏差、如何校准、如何仍然生成差异，并把这种能力命名为「辨伪力」。它的所指在主体自身，纠正权威是本人的经验。</p>
+<p>本文处理的是系统这一侧，且从一个前者不问的时点接手：<strong>假定用户已经察觉、已经不同意、并且已经行使了修订</strong>——然后追问那个被撤回的判断是否仍在起作用。两篇因此不是同一命题的两种说法，而是一条链上的前后段：前者问「我还能不能不同意它」，本文问「就算我已经不同意了，它还在不在充当输出的理由」。</p>
+<p>判决性的分离在证据类型：《被机器命名之后》的证据是用户自评与用户行为，本文明确拒绝把界面状态、处理日志或用户感受当作履行证据，只承认路径干预下的因果读数。若某系统的用户辨伪力显著上升而撤回效力残余率不变，两篇的预测就在同一批数据上分开了。</p>
+<h3>二、与《当一个词不再改变判断》（之八）：同一个「保留记录、停止效力」，两种对象</h3>
+<p>《当一个词不再改变判断》在治理一节提出对受控词汇实行「带理由、版本、复审期和重新启用条件的可逆休眠」；本文的身份修订同样是「保留记录、停止未来效力」，二者共用同一个动作语法。</p>
+<p>分工在于：前者的对象是概念，处置者是共同体，问题止于机制该如何设计；本文的对象是关于个人的身份判断，处置者是系统运营方，问题从机制设计往后再走一步——<strong>该机制是否已被履行，以及用什么才算证明</strong>。前者若失败，表现为词继续被误用；本文若失败，表现为一个已被撤回的判断继续替系统做决定，而所有可见记录都显示它已停用。这个差别不是程度差别：概念休眠的执行者与受影响者是同一批人，身份修订的执行者与受影响者不是，因此后者才需要外部可核验的回执。</p>
 <h2>参考文献</h2>
 <p class="ref">[1] Sparrow, B., Liu, J., &amp; Wegner, D. M. (2011). Google effects on memory: Cognitive consequences of having information at our fingertips. Science, 333(6043), 776-778. https://doi.org/10.1126/science.1207745</p>
 <p class="ref">[2] Risko, E. F., &amp; Gilbert, S. J. (2016). Cognitive offloading. Trends in Cognitive Sciences, 20(9), 676-688. https://doi.org/10.1016/j.tics.2016.07.002</p>
