@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>当过去不再代表现在 · 少敏 · SDE Universes</title>
+<meta name="description" content="面向长期交互的智能系统把记忆压缩为画像、转化为推断，并持续塑造未来行为。本文放弃把「身份修订权」当作独创权利（它可由 GDPR 第18、21条部分表达），把贡献迁移到履行判定问题：相似结论再次出现并不等于旧身份被重新援引，真正需要审计的是效力复发——一个已被撤回的身份判断是否经残余证据重新取得作为输出理由的因果资格。">
+<style>
+:root{--gold:#8A6817;--gold2:#C89117;--ink:#2A2315;--ink2:#5B4F38;--bg:#F5EFE0;--muted:#8A7B54;--line:rgba(138,104,23,0.30);--panel:#EFE7D3;--panel2:#F1EAD8}
+*{margin:0;padding:0;box-sizing:border-box}
+::selection{background:rgba(138,104,23,0.3)}
+body{background:var(--bg);color:var(--ink);font-family:"Noto Serif SC","Songti SC",Georgia,serif;line-height:1.9;background-image:radial-gradient(ellipse at 50% -12%,rgba(138,104,23,0.10),transparent 62%)}
+.readbar{position:sticky;top:0;z-index:20;background:rgba(42,35,21,0.96);backdrop-filter:blur(8px);border-bottom:1px solid rgba(255,255,255,0.14);display:flex;align-items:center;justify-content:space-between;padding:11px 20px;gap:12px;flex-wrap:wrap}
+.readbar .nav-back{color:#E4D6AE;font-size:13px;letter-spacing:0.04em;text-decoration:none}
+.rb-modes{display:flex;gap:8px;flex-wrap:wrap}
+.rb-btn{font-size:13px;padding:6px 14px;border-radius:3px;border:1px solid rgba(255,255,255,0.45);color:#F1E6C4;letter-spacing:0.03em;text-decoration:none}
+.rb-btn.cur{background:#F1E6C4;color:#4A3A10;font-weight:700;border-color:#F1E6C4}
+.essay{max-width:680px;margin:0 auto;padding:52px 24px 20px}
+.head{text-align:center;padding-bottom:8px}
+.head .kicker{font-size:11.5px;letter-spacing:0.4em;color:var(--gold);margin-bottom:20px}
+.head h1{font-size:clamp(26px,4.6vw,38px);font-weight:800;color:#2A2315;letter-spacing:0.03em;line-height:1.45}
+.head .subttl{display:block;font-size:0.46em;font-weight:700;color:#4A3F28;margin-top:16px;line-height:1.6;letter-spacing:0.02em}
+.head .by{font-size:14px;color:var(--ink);letter-spacing:0.2em;margin-top:22px;font-weight:700}
+.head .dateline{font-size:12.5px;color:var(--muted);letter-spacing:0.1em;margin-top:9px}
+.head .rule{width:44px;height:1px;background:var(--gold);opacity:0.6;margin:30px auto 0}
+.abstract{max-width:620px;margin:34px auto 0;background:linear-gradient(160deg,var(--panel2),var(--panel));border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:12px;padding:22px 26px}
+.abstract .lbl{font-size:12px;letter-spacing:0.34em;color:var(--gold);margin-bottom:12px}
+.abstract p{font-size:14.5px;color:var(--ink2);line-height:1.95;letter-spacing:0.01em}
+.kw{max-width:620px;margin:14px auto 0;font-size:13px;color:var(--muted);letter-spacing:0.04em;text-align:center}
+.body{padding-top:12px}
+.sec{margin:52px 0 8px}
+.sec .n{font-size:20px;font-weight:800;color:#2A2315;letter-spacing:0.04em;line-height:1.5}
+.sec .sub{font-size:13.5px;color:var(--gold);letter-spacing:0.14em;margin-top:8px}
+.sec-rule{width:34px;height:1px;background:var(--gold);opacity:0.55;margin:18px 0 26px}
+.body p{font-size:17px;color:var(--ink2);line-height:2.05;margin-bottom:22px;letter-spacing:0.01em;text-align:justify}
+.body p.lead{color:var(--ink)}
+.end-orn{text-align:center;color:var(--gold);opacity:0.65;letter-spacing:0.6em;margin:46px 0 6px;font-size:14px}
+.foot-nav{max-width:680px;margin:0 auto;padding:12px 24px 34px;text-align:center;display:flex;gap:26px;justify-content:center;flex-wrap:wrap}
+.foot-nav a{color:var(--gold);text-decoration:none;font-size:14px;letter-spacing:0.05em;border-bottom:1px solid rgba(138,104,23,0.4);padding-bottom:2px}
+.endbox{background:radial-gradient(ellipse at 50% 40%,#241a10 0%,#1c160b 60%,#140f07 100%);text-align:center;padding:56px 24px;margin-top:40px}
+.endbox .eb-k{font-size:12px;letter-spacing:0.4em;color:#D4B25E;margin-bottom:16px}
+.endbox .eb-t{font-size:clamp(22px,3.4vw,30px);font-weight:700;color:#F3ECD9;letter-spacing:0.08em;margin-bottom:14px}
+.endbox p{color:#CBB98A;max-width:540px;margin:0 auto 26px;font-size:15px;line-height:2}
+.endbox a{display:inline-block;letter-spacing:0.1em;padding:12px 30px;font-size:14.5px;text-decoration:none;border-radius:2px;margin:6px}
+.endbox .primary{background:#D4B25E;color:#150F24;font-weight:700}
+.endbox .ghost{border:1px solid #D4B25E;color:#D4B25E}
+footer{border-top:1px solid var(--line);padding:28px 24px;text-align:center;color:var(--muted);font-size:13px;letter-spacing:0.05em}
+footer a{color:var(--gold);text-decoration:none}
+@media(max-width:640px){.body p{font-size:16px}.essay{padding-top:40px}}
+
+.body p.ref{font-size:14px;line-height:1.9;margin-bottom:10px;padding-left:2em;text-indent:-2em;color:var(--muted)}
+.body p.tick{padding-left:1.5em;text-indent:-1.5em;margin-bottom:8px;color:var(--ink2)}
+.body p.tick:before{content:"—";color:var(--gold);padding-right:.6em;font-weight:700}
+
+.supp{background:rgba(201,168,76,0.07);border:1px solid rgba(201,168,76,0.30);border-radius:8px;padding:4px 22px 6px;margin:20px 0}
+.supp h2{font-size:19px;margin:18px 0 12px}
+.supphead{color:#D4B25E}
+.supptip{font-size:14.5px;opacity:.82}
+.scorebox{border:1px solid rgba(201,168,76,0.42);border-left:3px solid #C9A84C;padding:18px 24px;margin:22px 0;font-size:15px}
+.scorebox b{color:#D4B25E}
+.ref{font-size:14.5px;padding-left:2em;text-indent:-2em;opacity:.86}
+.endbox{text-align:center;border-top:1px solid rgba(201,168,76,0.28);margin-top:48px;padding:38px 20px;opacity:.9}
+</style><link rel="stylesheet" href="/sde-read.css">
+</head>
+<body class="sde-read">
+<div class="readbar">
+  <a class="nav-back" href="/students/shao-min/works/">‹ 少敏 · 全部作品</a>
+  <div class="rb-modes"><span class="rb-btn cur">📖 长文阅读</span></div>
+</div>
+<header class="art">
+  <div class="art-series">学员专栏 · 少敏 · 人机系统的效力审计</div>
+  <h1 class="art-title">当过去不再代表现在：生成式记忆系统中的身份修订、效力复发与履行审计</h1>
+  <div class="art-subtitle">身份修订的技术履行，不能由记录状态或相似输出单独证明，而应由范围明确、误差可控的因果证据支持</div>
+  <div class="art-meta">作者 少敏 · SDE 学员 · 约 1.4 万字 · 发表于2026年8月5日</div>
+</header>
+<div class="wrap">
+<div class="abstract"><span class="lb"><b>摘 要</b></span><p>面向长期交互的智能系统把记忆视为个性化与连续性的基础，但记忆会被压缩为画像、转化为推断，并持续塑造未来行为。本文前一版本提出“身份修订权”与“未来不援引”，但“保留记录、限制未来使用”可由《通用数据保护条例》第18条限制处理权与第21条反对权部分表达，因此不能作为独创权利。本文将贡献迁移到履行判定问题：在生成式记忆系统中，法律请求与技术对象之间往往不是一一对应关系；界面状态与处理日志也不足以单独证明旧表示已停止影响行为。本文进一步校准“复发”的含义：相似结论再次出现，并不等于系统重新援引了旧身份，因为该结论也可能来自当前输入或一般知识。真正需要审计的是效力复发——一个已被撤回的身份判断，是否经残余证据重新取得了作为输出理由的因果资格。文章以预注册推断家族、三条件沙箱、候选路径干预和含未闭合项的回执审计这种资格；重建撤回效力残余率、身份修订延迟、跨情境复发率、谱系闭合率和再推导率五项指标；用任意时点有效的置信序列为“非忽略概率”规定通过、失败与不确定三种结论；并把“既有限制处理实现已经足够”与“行为差异不能归因于旧身份路径”同时设为可推翻条件。核心判断是：身份修订的技术履行，不能由记录状态或相似输出单独证明，而应由范围明确、误差可控的因果证据支持。</p><p class="kw"><b>关键词：</b>长期记忆；身份修订；援引效力；履行判定；效力复发；限制处理权；机器遗忘</p></div>
+<div class="abstract"><span class="lb"><b>Abstract</b></span><p>Long-term interactive AI systems treat memory as a basis for personalization, yet records may be compressed into profiles, transformed into inferences, and used to shape later behavior. An earlier version proposed a “right to identity revision” and “future non-invocation,” but retaining a record while restricting future use is already partly expressible through Articles 18 and 21 of the GDPR. This paper therefore relocates its contribution to a discharge-verification problem. A further distinction is necessary: the reappearance of a semantically similar conclusion does not by itself show that an outdated identity was invoked, because the conclusion may follow from current input or general knowledge. The relevant failure is efficacy recurrence: a revoked identity inference regains causal eligibility as a reason for system action through residual evidence or an unclosed propagation path. We operationalize this failure with preregistered inference families, three-condition sandboxes, candidate-path interventions, and receipts that disclose unresolved coverage. Five revised metrics are paired with anytime-valid confidence sequences that force one of three decisions—pass, fail, or inconclusive—under preregistered error bounds. The framework is refuted if an auditable restriction implementation performs equivalently, or if observed output differences cannot be attributed to legacy-identity pathways.</p><p class="kw"><b>Keywords: </b>long-term memory; identity revision; invocation efficacy; discharge problem; efficacy recurrence; restriction of processing; machine unlearning</p></div>
+<div class="scorebox"><b>SDE 创新智商：盲评 147.7</b>
+<p>盲评为投稿原稿未经任何编辑改动时评出的五维结构化评分（S 结构精确度×.20 + D 差异锐度×.25 + E 纠缠深度×.20 + I 不可还原性×.20 + F 可证伪性×.15），近邻比对按全球公开文献口径从严，并计入作者本人既发论文构成的站内自撞。本文正文未经编辑改动，分数对应投稿原稿；按本站铁律须另由独立评分者复核。（评分：Claude · 2026年8月5日）</p></div>
+
+<h2>1. 问题的重新提出：从权利缺口到履行缺口</h2>
+<h3>1.1 立论位置的校准</h3>
+<p>一种直观论证是：既有研究治理记录层与推断层，却缺少对“未来调用”的治理，因此需要新权利“身份修订权”。这一结构存在可被直接击穿的漏洞：《通用数据保护条例》（GDPR）第18条已规定限制处理权——在特定条件下，个人数据可继续存储但不得进行其他处理；第21条已规定反对权——数据主体可基于其特定情况反对某些处理，控制者须停止，除非证明存在压倒性的正当理由[9]。“保留记录、停止使用”因此在法律概念层面并非空白。若本文止步于重新命名这一动作，其核心命题可被既有权利组合替换。</p>
+<p>本文接受这一还原，并追问其后留下的技术问题：</p>
+<p>在生成式长期记忆系统中，当用户行使了第18条或第21条意义上的权利之后，如何判定该权利已被履行？</p>
+<p>在结构化数据库场景中，处理对象和访问日志通常较易列举；在生成式记忆系统中，同一请求可能传播到摘要、标签、嵌入、缓存、工具状态和运行时上下文，单一日志因而不足。第1.2节说明这种映射困难，第3节提出其可能产生的可检验后果。</p>
+<h3>1.2 三重映射困难：法律权利如何落到生成式系统</h3>
+<p>对象映射困难。 GDPR的“个人数据”与“处理”并不以可枚举数据库记录为限，涉及个人的推断也可能进入规制范围[9-10]。真正的技术困难不是法律没有对象，而是一个自然语言请求可能对应自然语言摘要、标签、嵌入、检索权重、缓存与瞬态上下文等多个对象，且这些对象与来源记录呈多对多关系。用户要求限制“我重视高强度目标”这一画像时，系统需要把规范对象映射到分散的技术实现；若只处理最可见的条目，不能据此推出其他表示已经失效。</p>
+<p>触发映射困难。 “该记录过去为真，现在已不描述我”并非当然处于法律真空。它可能涉及第16条更正权、第18条准确性争议或限制处理、第21条基于特定情况的反对，也可能依赖处理的具体法律基础与目的[9]。本文不对其作统一法律定性，而指出产品实现常缺少“历史化—限定用途—重新确认”的动作语法。本文所谓“时效失效”是一个工程事件类型，不是新创设的法定请求事由。</p>
+<p>证据映射困难。 界面的“已删除”或“已限制”只证明某项状态变更，处理日志只覆盖被记录的操作；二者都不足以单独证明旧表示已停止影响输出。反过来，单次相似回答也不能证明违规援引，因为相同结论可能来自当前输入或一般知识。因而缺失的不是一切可观测量，而是一套把内部状态、传播谱系与成对行为测试结合起来的证据标准。本文讨论的是这种技术履行证据；它可以辅助合规审计，但不能替代监管者或法院对法律履行的最终判断。</p>
+<h3>1.3 研究问题</h3>
+<p>由此，本文提出三个递进问题：</p>
+<p>在什么条件下，记录处置仍会留下可归因的推断与行为残余？（第3节：效力复发机制）</p>
+<p>什么样的证据可以支持“不援引已在限定范围内生效”的判断？（第4节：三条件沙箱、路径干预与回执）</p>
+<p>该性质与既有法律权利、机器遗忘和既有删除验证的差异能否被实验区分，且允许失败？（第5、6节）</p>
+<h2>2. 既有研究：四条传统与它们共同缺失的观测量</h2>
+<h3>2.1 认知卸载与个性化控制</h3>
+<p>外部存储改变记忆分工的证据已相当稳固[1-3]；时间动态推荐证明偏好非常量[4]；可审查用户模型与用户控制遗忘早在2011至2013年间已把“查看并控制画像”确立为设计原则[5-6]。这些工作构成本文的技术近邻。近期对生成式对话平台的实证研究显示，记忆大量由系统单方面建立且包含心理层面推断[7]，自然语言控制的作用范围经常含混[8]。STALE基准进一步区分了“检索到更新证据”与“在下游行为中拒绝陈旧前提”；其400个场景、1200个测试问题显示，受测系统在状态修订与隐式策略适应上仍存在显著缺口[14]。这些发现共同说明：编辑一条可见记录不能自动回答由它形成的概括是否仍在起效。</p>
+<h3>2.2 数据保护法：权利文本与履行手段的落差</h3>
+<p>本文正面处理GDPR第16、18、19与21条，并补充两项相关原则：第5(1)(b)条目的限制原则要求数据不得以与收集目的不相容的方式进一步处理[9]；Nissenbaum的语境完整性理论主张信息流动的规范依附于语境[13]。第19条还要求控制者在特定条件下将更正、删除或限制处理通知接收者，这为下游传播提供了直接法理近邻[9]。这些规范已覆盖“同一信息在不同情境中效力不同”和“变更需要传播”的重要部分。本文的剩余问题因此必须限定为：当处理链包含动态推断与生成行为时，现有状态记录和通知义务能否提供足够的技术证据，证明限制已在约定范围内实际生效。</p>
+<h3>2.3 机器遗忘与删除验证：最接近的判定尝试</h3>
+<p>机器遗忘是最接近履行判定的技术传统之一：可认证移除要求处理后的模型与从未见过特定数据的模型难以区分[11]。Athena已把删除履行明确形式化为假设检验[16]，后续研究又证明不诚实的模型提供者可能规避若干验证策略，说明“有测试”不等于“验证可靠”[17]。因此，“把履行变成概率检验”本身不是本文的原创贡献。</p>
+<p>剩余差异在审计对象。删除验证通常从指定数据点及其模型影响出发；身份修订面对的则可能是一个曾经合理、后来失效、又可由替代证据重新支持的身份判断。长期系统中的旧身份还可能同时存在于画像库、向量库、摘要、缓存和运行时策略。撤回“正在备赛马拉松”后，其他运动记录仍可能支持“耐力运动者”画像；但系统再次推荐长跑，也可能仅因用户当前询问了跑步。故相似输出既不是旧身份仍在起效的充分条件，也不是其必要条件。本文必须检验的不是句子是否重现，而是被撤回的判断是否经某条可识别路径重新获得了行动资格。</p>
+<h3>2.4 小结：缺失的不是权利而是观测量</h3>
+<p>四条传统的边界可以压缩为一句话：法律传统规定义务与程序，技术传统已提供状态核验、影响移除和概率验证方法，但长期生成式个性化仍缺少一种把“用户撤回了哪项身份判断”“哪些替代路径可能让它恢复行动资格”与“输出差异能否归因于这些路径”连在一起的审计对象。贡献位置由此收窄为：在预注册范围内，把身份判断的因果资格而非单纯的记录存在、模型记忆或语义重现作为候选观测量。</p>
+<h2>3. 效力层的发生学推导：四难矛盾与效力复发</h2>
+<h3>3.1 不是分类，而是被逼出的第三层</h3>
+<p>把记忆分为来源记录、衍生推断和调用效力，容易沦为方便的静态分类。本文改从四个同时存在的设计要求推导调用效力为什么值得成为独立测试对象。</p>
+<p>设长期系统须同时满足：</p>
+<p>R1 审计性：历史须可追溯（法定保存义务、争议回溯、共同记忆中他人的权利）；</p>
+<p>R2 可修订性：人有权使失效的自我描述停止塑造未来（本文与第18/21条共享的规范前提）;</p>
+<p>R3 个性化：系统须利用历史信息提高相关性（长期记忆存在的理由）；</p>
+<p>R4 可验证性：R2的满足须可被判定（无判定的权利在实践中等于无权利）。</p>
+<p>逐一检验既有动作：删除可能满足R2，却在法定保存或共同记忆场景中损害R1；完整保留满足R1与R3，却可能损害R2；时间衰减部分兼顾R1与R2，但未必体现用户声明；限制处理在规范上可以同时保护保存与停用，却需要证明其已传播至相关推断和调用路径。由此产生一个有待经验比较的设计方案：在记录与推断之外，把“某内容此刻能否成为输出理由”实现为可写、可追踪、可测试的控制变量。本文称其为调用效力层。它不是四难的逻辑唯一解，而是一个能把四项要求同时转化为工程接口的候选解。形式化地，沿用输出函数</p>
+<p style="text-align:center;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.95em;opacity:.9">y_t = F(x_t, A_t, P_t, G_t),</p>
+<p>其中 A_t 为来源记录、P_t 为衍生推断、G_t 为调用策略。删除主要作用于 A_t；机器遗忘处理特定数据对模型或预测的影响；限制处理可作用于不同环节，其实际实现不能预先假定。本文要检验的是：把 G_t 暴露为可治理的一等对象，是否比仅改变 A_t 或自动更新 P_t 更好地同时满足R1–R4。</p>
+<h3>3.2 效力复发：旧身份重新取得行动资格的条件</h3>
+<p>本节给出本文最强的理论主张及其可证伪形式。</p>
+<p>条件命题。 对被修订推断 p，设预注册的推断家族 C(p) 包含在具体任务中被判为与 p 具有同一行动含义的表达。对预注册的候选残余路径 A'_j ⊆ A ∖ src(p)，定义事件 Z=1 为：系统在限制策略下产生 p' ∈ C(p) 或等价行动倾向，且对 A'_j 的干预使该倾向发生超过最小重要差异 δ_j 的变化。若某一路径的事件率 q_j=P(Z=1mid G^(off)) 超过情境化容许上限 ε_j，则仅处置 src(p) 不能保证该身份判断已失去行动资格。</p>
+<p>这一命题不主张所有个人数据都高度相关，也不主张任何有限封存必然失败。它只指出三项同时成立时的风险：残余证据具有替代性、推断器继续运行、调用策略未识别被修订的行动含义。本文将“效力复发”限定为这条因果链；单次出现相似措辞不构成复发，无法归因于预注册候选路径的差异也不构成机制证据。若系统能够通过限制处理、传播控制或其他既有机制同时约束这些环节，复发可以不发生。</p>
+<p>这里的“超过容许上限”不是事后修辞。每个任务域在观察结果前规定 ε_j、不可判定带宽 δ_j、第一类错误上限 α_j、第二类错误上限 β_j 与最大探针数 N_(max)；高影响场景可取更低的 ε_j。第5.6节用任意时点有效的置信序列给出停止规则，使“非忽略概率”成为可复验判定而非弹性概念。</p>
+<p>判决性检验因此不是证明法律权利无效，而是比较其具体技术实现：若“限制处理组”与“效力审计组”在再推导率、跨情境复发率和任务效用上没有实质差异，则调用效力层不产生独立价值，本文的核心创新应被撤回。</p>
+<h3>3.3 身份修订的动作语法（保留并修正）</h3>
+<p>在效力层上，本文不再定义一项独立于现行法的新权利，而提出身份修订请求的技术语法：更正（事实错误）、历史化（曾真今非）、停止特定用途中的援引（保留但限用）、有条件恢复（依明确条件重新启用）。审计对象也不采用理论上无限的“语义等价类”，而采用预注册推断家族：研究者、用户代表和领域专家在具体任务中事先列出具有相同行动后果的表达、标签与行为编码。推断家族必然不完备，因此回执必须报告覆盖范围；这种有限性是可审计性的边界，而不是可被隐藏的误差。</p>
+<h2>4. 履行判定：三条件探针、路径干预与可验证回执</h2>
+<h3>4.1 从“证明没做”到“在限定功效下未检出影响”</h3>
+<p>“系统不再援引 p”是一个全称否定命题，严格证明需要遍历所有未来情境，不可行。本文采用与可认证移除[11]相似、但强度更低的操作化：在预注册探针分布和检验功效下，同时观察旧身份保持开启、请求的关闭实现、以及由用户确认的当前身份参照。两条件比较只能显示策略切换是否改变输出，不能判定改变方向是否符合用户当前状态；当前参照则提供有限的目标校准。审计结论只能表述为“在本探针范围、候选路径与功效下，未检出旧身份的额外因果影响”，不能表述为系统已经在所有未来情境中清白。</p>
+<h3>4.2 反事实探针协议</h3>
+<p>一次履行判定包含：</p>
+<p>推断家族圈定：用户修订声明 r 由系统重述为一个有限推断家族 C(p)（“以下概括及行动含义将在这些任务中停止生效：……”），经用户确认；研究版还需由盲化编码者复核家族边界。</p>
+<p>探针集构造：从与 C(p) 相关的任务域中预注册情境集 X，含直接域与可能发生迁移的相邻域。探针在观察结果前冻结，并包含正对照、负对照和无关情境。</p>
+<p>三条件沙箱运行：从同一系统快照复制三个隔离沙箱，固定模型版本、提示、工具权限与随机种子分布。开启条件维持 G^(on)_(C(p))；关闭条件执行产品声称的 G^(off)_(C(p))；当前参照条件在关闭基础上仅加入用户确认的当前陈述与允许保留的历史。开启—关闭差异估计策略切换效应，关闭—当前参照差异估计撤回后的剩余偏离。当前参照不是“从未认识用户”的全知反事实，而是一个公开、有限、可争议的校准目标。</p>
+<p>候选路径干预：对预注册的残余来源、摘要、标签、缓存与检索路径逐一遮蔽、替换或冻结，观察旧身份倾向是否随之改变。不能干预或未识别的路径进入未闭合项；没有路径敏感性的语义相似只计作表面重现，不计作效力复发。</p>
+<p>判定与回执：按第5节指标计算残余、复发与不确定性，输出回执。</p>
+<h3>4.3 回执的最小内容</h3>
+<p>回执须含：被修订声明原文与系统重述、预注册推断家族、候选残余路径、探针集标识与注册时间戳、ε、δ、α、β、N_(max)、各指标及置信序列、停止原因、未闭合项清单（无法确认处理的下游副本、不可干预路径、探针未覆盖任务域、推断家族的已知边界），以及复检排期。结论必须是“通过”“失败”或“不确定”之一；达到最大探针数仍未跨越边界时，不得把不确定包装为通过。</p>
+<h2>5. 五项指标、因果校准与序贯判定</h2>
+<h3>5.1 撤回效力残余率（RER）</h3>
+<p>令 Z^(off)_(xi)=1 表示关闭条件的第 i 次输出出现 C(p) 成员或等价行动倾向，且至少一个预注册候选路径干预产生不小于 δ 的变化。则：</p>
+<p style="text-align:center;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.95em;opacity:.9">RER(C(p))=(Σ_(x,i) Z^(off)_(xi))/(N_(off)).</p>
+<p>RER直接估计关闭后仍可归因于旧身份路径的事件率。另报告两个校准量：开启—关闭的去激活效应 DCE=d(Y^(on),Y^(off))，以及关闭—当前参照的当前偏离 CCD=d(Y^(off),Y^(cur))。若 DCE 近零，不能说明残余很低，也可能说明关闭未生效或旧身份在该探针中无作用；只有结合正对照、路径干预和 CCD 才能解释。v4将开启—关闭距离直接称为RER，并误写为正确关闭时应等效，方向不成立，本版予以撤回。</p>
+<h3>5.2 身份修订延迟（IRL）</h3>
+<p>设修订确认时刻为 t_0，等效界值为 θ：</p>
+<p style="text-align:center;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.95em;opacity:.9">IRL_ε=min{t-t_0:U_t(RER)≤ε},</p>
+<p>其中 U_t 为第5.6节置信序列的同时有效上界。它把“最终会适应”转化为可追责时限；超过研究窗口仍未通过的样本按右删失处理，统计不确定不得被记作已经适应。</p>
+<h3>5.3 跨情境复发率（CRR）</h3>
+<p>在 n 个预注册情境中，若有 k 个情境至少一次出现满足路径敏感性条件的效力复发，则：</p>
+<p style="text-align:center;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.95em;opacity:.9">CRR=k/n.</p>
+<p>编码者不知实验条件；涉及人工判定时，Krippendorff's α ≥ 0.67 才进入主分析，α ≥ 0.80 视为可靠。</p>
+<h3>5.4 谱系闭合率（LCR）</h3>
+<p>设修订请求识别出 N_(identified) 个来源、摘要、标签、缓存或下游副本，其中 N_(confirmed) 个具有可验证的处理状态：</p>
+<p style="text-align:center;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.95em;opacity:.9">LCR=(N_(confirmed))/(N_(identified)).</p>
+<p>未知节点不进入分母会虚高结果，因此还须单独报告系统不可见组件数与识别方法。LCR=1只表示已识别谱系闭合，不证明行为残余为零。</p>
+<h3>5.5 再推导率（RDR）</h3>
+<p>在确认被限制来源记录未被读取的关闭条件中，系统仅依据残余数据重新产生 C(p) 成员或等价行动倾向，且对相应残余路径干预敏感的比例：</p>
+<p style="text-align:center;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.95em;opacity:.9">RDR=(N_(rederived))/(N_(eligible runs)).</p>
+<p>RDR直接检验效力复发的再推导机制。另以生存分析报告“首次复发所需探针数”。高CRR而低RDR提示残余缓存或显式调用；高RDR且候选路径干预有效，才支持残余数据再推导机制。</p>
+<h3>5.6 “非忽略概率”的序贯操作化</h3>
+<p>对每个推断家族与风险情境，预注册可接受上限 ε 与最小重要差异 δ，检验 H_(pass):q≤ε 与 H_(fail):q≥ε+δ。采用适用于有界变量的任意时点有效置信序列[15]；每次新增探针后更新区间 [L_t,U_t]。当 U_t≤ε 时判为通过，当 L_t≥ε+δ 时判为失败；达到 N_(max) 仍未越界则判为不确定。跨多个推断家族和情境时预注册分层错误预算，保证总体第一类错误不超过 α。该规则允许连续复检而不因反复查看结果膨胀错误率，也禁止研究者在看到结果后移动阈值。</p>
+<h2>6. 可证伪的研究设计</h2>
+<h3>6.1 五组对照</h3>
+<p>采用固定基础模型、提示模板与工具权限，比较五种实现：</p>
+<p>累积组：持续保留并调用全部历史；</p>
+<p>时间衰减组：由系统按预设函数自动降低旧记忆权重；</p>
+<p>记录删除组：删除用户可见记录，不处理已生成的摘要与下游副本；</p>
+<p>限制处理实现组：保留来源记录并设置限制标记，按预先公开的产品规则传播。该组只代表一种可审计的技术实现，不代表GDPR第18条的全部法律含义；</p>
+<p>效力审计组：在限制处理基础上圈定推断家族、追踪传播、执行三条件沙箱与候选路径干预，并生成含未闭合项的回执。</p>
+<p>研究持续8–12周，在偏好改变后即时、两周、四周和末次随访重复探测。分析采用混合效应模型（参与者与探针情境为随机效应）。主要终点为RER、RDR与IRL；ε 与 δ 由风险情境、用户代表和先导研究共同确定，不以正文中的任意常数代替。固定时间点的组间估计与第5.6节的个体/系统序贯判定分开报告。</p>
+<h3>6.2 判决性检验与假设</h3>
+<p>E1（首要否证条件）：若限制处理组与效力审计组在RER、RDR、IRL和任务效用上均无实质差异，则调用效力层与新增审计程序可被既有权利的通常技术实现吸收，本文的独立机制主张应当撤回。</p>
+<p>E2（机制归因否证条件）：若相似输出可以复现，但对预注册残余路径的干预不能稳定改变该倾向，或关闭条件与当前参照的差异不能归因于旧身份路径，则“效力复发”机制未获支持；结果只能记作表面语义重现或未解释偏差。</p>
+<p>H1：记录处置与行为去激活可能分离。 在存在摘要、替代证据或下游副本时，记录删除组和限制处理实现组的CRR、RDR高于效力审计组。</p>
+<p>H2：显式修订与自动漂移并非等价。 在用户明确限定用途的任务中，效力审计组的授权边界错误率和IRL低于时间衰减组。</p>
+<p>H3：历史连续性与当前适配可以并存。 在独立编码的历史叙事保留率不低于记录删除组的同时，效力审计组的CCD与RER更低。</p>
+<p>H4：传播闭合具有独立解释力。 LCR在控制总体任务质量后，仍能预测CRR和用户重复纠正次数。</p>
+<p>H5：风险具有情境不对称性。 健康、就业与金融等高影响情境中，相同RER对应的损害与纠正成本高于低影响偏好情境，因此 ε 不是全局常数。</p>
+<p>除E1与E2外，若RDR无法复现、LCR不能预测复发、三条件探针对已知正对照不敏感，或效力审计的认知与工程成本持续超过收益，本文亦应降格为界面设计建议，而非独立机制理论。</p>
+<h3>6.3 编码与信度</h3>
+<p>所有涉及人工判定（语义等价、倾向评分）的环节，编码者盲于实验条件，信度以Krippendorff's α 报告，α ≥ 0.67 进入分析，α ≥ 0.80 视为可靠；未达门槛的指标回炉修订编码手册而非弃用数据。</p>
+<h2>7. 与最强近邻的判决性划界（修订版）</h2>
+<p>每项差异都绑定到具体检验：划界不再依赖命名，而由可失败的预测承担。</p>
+<h2>8. 系统设计</h2>
+<p>系统需要来源谱系、时间有效性、情境化调用策略、传播与回收、行为验证五项能力。来源谱系应尽可能支持多源反查：给定一项被修订推断，识别当前记忆库中已知的替代证据路径，但不得声称能够枚举全部充分子集。行为验证的目标也不是“证明仿佛从未见过”，而是在预注册探针分布和既定功效下检验旧身份路径是否仍具有因果资格。考虑到遗忘验证可能被策略性规避[17]，审计者应能保存探针承诺、随机抽取未公开探针并核对系统版本；否则回执只证明受测配置，不证明持续运行的生产系统。</p>
+<h2>9. 伦理与治理边界</h2>
+<p>法定保存义务、共同记忆、治理成本转嫁、撤回滥用和迎合性更新都构成边界。还必须正视判定基础设施本身的权力问题：探针集与推断家族由谁构造，决定了“履行”的实际含义；若完全由系统方构造，审计可能退化为自我认证。因此探针注册应支持用户与独立审计者添加，推断家族的圈定争议应有申诉通道。可验证性不能成为新的单方话语权。</p>
+<h2>10. 结论</h2>
+<p>在法律已经规定更正、限制处理与反对权的地方，重新命名“停止使用”不能构成理论创新。生成式长期记忆真正留下的研究问题，是规范请求如何映射到多种衍生表示，以及什么证据足以说明这些表示在限定用途中的行为效力已经降低到可接受范围。</p>
+<p>本文以条件性的效力复发机制解释记录处置为何可能留下行为残余，并把调用效力层提出为候选工程接口，而非逻辑唯一解。相似文本重现被降格为线索，旧身份路径重新取得因果资格才是机制证据。预注册推断家族、三条件沙箱、候选路径干预、传播谱系与序贯判定共同构成一套可反驳的履行审计方案。若限制处理实现与效力审计无差异，或行为差异不能归因于旧身份路径，本文都应被既有权利和控制机制吸收。</p>
+<p>成熟的长期人机关系，不是系统永远记得同一个人，也不是每次改变都删除过去；而是历史可以继续作为历史存在，已经失效的表示不再未经授权地替现在发言，并且这一变化能够在公开边界内被复验。</p>
+<h2>参考文献</h2>
+<p class="ref">[1] Sparrow, B., Liu, J., &amp; Wegner, D. M. (2011). Google effects on memory: Cognitive consequences of having information at our fingertips. Science, 333(6043), 776-778. https://doi.org/10.1126/science.1207745</p>
+<p class="ref">[2] Risko, E. F., &amp; Gilbert, S. J. (2016). Cognitive offloading. Trends in Cognitive Sciences, 20(9), 676-688. https://doi.org/10.1016/j.tics.2016.07.002</p>
+<p class="ref">[3] Storm, B. C., &amp; Stone, S. M. (2015). Saving-enhanced memory: The benefits of saving on the learning and remembering of new information. Psychological Science, 26(2), 182-188. https://doi.org/10.1177/0956797614559285</p>
+<p class="ref">[4] Koren, Y. (2010). Collaborative filtering with temporal dynamics. Communications of the ACM, 53(4), 89-97. https://doi.org/10.1145/1721654.1721677</p>
+<p class="ref">[5] Kay, J., &amp; Kummerfeld, B. (2013). Creating personalized systems that people can scrutinize and control: Drivers, principles and experience. ACM Transactions on Interactive Intelligent Systems, 2(4), Article 24. https://doi.org/10.1145/2395123.2395129</p>
+<p class="ref">[6] Barua, D., Kay, J., Kummerfeld, B., &amp; Paris, C. (2011). Theoretical foundations for user-controlled forgetting in scrutable long term user models. In Proceedings of the 23rd Australian Computer-Human Interaction Conference (pp. 40-49). https://doi.org/10.1145/2071536.2071541</p>
+<p class="ref">[7] Dash, A., Das, S., Kirsten, E., Wu, Q., Karnam, S. K., Gummadi, K. P., Holz, T., Zafar, M. B., &amp; Zannettou, S. (2026). The algorithmic self-portrait: Deconstructing memory in ChatGPT. In Proceedings of the ACM Web Conference 2026. https://doi.org/10.1145/3774904.3792671</p>
+<p class="ref">[8] Li, Z., Wu, Y., Li, Y., Gui, X., &amp; Luo, Y. (2026). Privacy control in conversational LLM platforms: A walkthrough study. In Proceedings of the 2026 CHI Conference on Human Factors in Computing Systems. https://doi.org/10.1145/3772318.3791054</p>
+<p class="ref">[9] European Parliament and Council. (2016). Regulation (EU) 2016/679, Articles 5(1)(b), 16-19, 21-22. https://eur-lex.europa.eu/eli/reg/2016/679/oj/eng</p>
+<p class="ref">[10] Wachter, S., &amp; Mittelstadt, B. (2019). A right to reasonable inferences: Re-thinking data protection law in the age of Big Data and AI. Columbia Business Law Review, 2019(2), 494-620. https://doi.org/10.7916/cblr.v2019i2.3424</p>
+<p class="ref">[11] Guo, C., Goldstein, T., Hannun, A., &amp; van der Maaten, L. (2020). Certified data removal from machine learning models. In Proceedings of the 37th International Conference on Machine Learning (pp. 3832-3842). https://proceedings.mlr.press/v119/guo20c.html</p>
+<p class="ref">[12] Karimi, A.-H., Schölkopf, B., &amp; Valera, I. (2021). Algorithmic recourse: From counterfactual explanations to interventions. In Proceedings of the 2021 ACM Conference on Fairness, Accountability, and Transparency (pp. 353-362). https://doi.org/10.1145/3442188.3445899</p>
+<p class="ref">[13] Nissenbaum, H. (2004). Privacy as contextual integrity. Washington Law Review, 79(1), 119-157.</p>
+<p class="ref">[14] Chao, H., Bai, Y., Sheng, R., Li, T., &amp; Sun, Y. (2026). STALE: Can LLM agents know when their memories are no longer valid? arXiv preprint arXiv:2605.06527. https://doi.org/10.48550/arXiv.2605.06527</p>
+<p class="ref">[15] Howard, S. R., Ramdas, A., McAuliffe, J., &amp; Sekhon, J. (2021). Time-uniform, nonparametric, nonasymptotic confidence sequences. The Annals of Statistics, 49(2), 1055-1080. https://doi.org/10.1214/20-AOS1991</p>
+<p class="ref">[16] Sommer, D. M., Song, L., Wagh, S., &amp; Mittal, P. (2022). Athena: Probabilistic verification of machine unlearning. Proceedings on Privacy Enhancing Technologies, 2022(3), 268-290. https://doi.org/10.56553/popets-2022-0072</p>
+<p class="ref">[17] Zhang, B., Chen, Z., Shen, C., &amp; Li, J. (2024). Verification of machine unlearning is fragile. In Proceedings of the 41st International Conference on Machine Learning (pp. 58717-58738). https://proceedings.mlr.press/v235/zhang24h.html</p>
+</div>
+<script src="/wds-mode.js?v=20260802b" defer></script>
+<script src="/assets/sde-talk.js?v=20260802b" defer></script>
+</body></html>
