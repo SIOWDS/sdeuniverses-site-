@@ -19,6 +19,7 @@ OUT = os.path.join(PUB, "search")
 
 SECTION_LABELS = {
     "column": "长文专栏", "students": "学员专栏", "books": "专著导读",
+    "frontier": "新思想前沿",
     "philosophy": "思想宇宙", "hotspot": "今日热点", "taste": "智能体·工具",
     "plagiarism": "论文抄袭专栏", "creation": "学术创造专栏",
     "diag": "自诊断", "quotes": "金句", "check": "校验", "_root": "首页与其他",
