@@ -154,7 +154,9 @@ def render_item(item: dict, idx: int) -> str:
         f'<i>提出</i>{esc(src["propose"])}　<i>争议</i>{esc(src["debate"])}　'
         f'<i>最新</i>{esc(src["latest"])}　<i>关键</i>{esc(item["key"])}</div>',
     ]
-    paras = [expand(p, item, pos, idx) for pos, p in enumerate(item["paras"])]
+    paras = item["paras"] if item.get("v7_ready") else [
+        expand(p, item, pos, idx) for pos, p in enumerate(item["paras"])
+    ]
     parts += [f"<p>{esc(p)}</p>" for p in paras]
     c = item["col"]
     parts.append(
@@ -187,23 +189,41 @@ def build(path: Path) -> Path:
     # ordered first 20 form the fixed 8+12 published panel.
     assert len(panel["items"]) >= 20
     panel["items"] = panel["items"][:20]
-    uniquify_repeated_sentences(panel["items"])
+    if not panel.get("v7_positions"):
+        uniquify_repeated_sentences(panel["items"])
     families = panel.get("triad_families", TRIAD_FAMILIES)
     assert len(families) == 6
-    # The first 18 entries are six auditable S/D/E premise-family triads.
-    # The final two positions vary by panel, preserving a non-fixed histogram.
-    for i, item in enumerate(panel["items"][:18]):
-        item["col"]["位置"] = ("S", "D", "E")[i % 3]
-        old = item["col"]["预设"]
-        rest = re.sub(r"^〔[^〕]+〕", "", old)
-        item["col"]["预设"] = f"〔{families[i // 3]}〕{rest}"
-    last_pairs = (("S", "S"), ("D", "D"), ("E", "E"), ("S", "D"), ("S", "E"), ("D", "E"))
-    pair = last_pairs[(panel["no"] - 541) % len(last_pairs)]
-    panel["items"][18]["col"]["位置"], panel["items"][19]["col"]["位置"] = pair
-    for j, family in zip((18, 19), ("19 代理指标不回写", "20 维护成本不外置")):
-        old = panel["items"][j]["col"]["预设"]
-        rest = re.sub(r"^〔[^〕]+〕", "", old)
-        panel["items"][j]["col"]["预设"] = f"〔{family}〕{rest}"
+    if panel.get("v7_positions"):
+        # V7 batches may vary the position histogram and allow an item to expose
+        # a second genuine premise family.  The latter supplies triad headroom
+        # without changing the fixed twenty-item reading structure.
+        positions = panel["v7_positions"]
+        assert len(positions) == 20 and all(positions.count(p) >= 6 for p in "SDE")
+        extras = panel.get("v7_extra_families", {})
+        for i, item in enumerate(panel["items"]):
+            old_position = item["col"]["位置"]
+            suffix = old_position[1:] if old_position[:1] in "SDE" else f"——{old_position}"
+            item["col"]["位置"] = positions[i] + suffix
+            old = item["col"]["预设"]
+            rest = re.sub(r"^(?:〔[^〕]+〕)+", "", old)
+            labels = [families[i // 3] if i < 18 else ("19 类别互斥且穷尽", "30 未被计价的东西不影响结算")[i - 18]]
+            labels.extend(extras.get(str(i), []))
+            item["col"]["预设"] = "".join(f"〔{label}〕" for label in labels) + rest
+    else:
+        # The first 18 entries are six auditable S/D/E premise-family triads.
+        # The final two positions vary by panel, preserving a non-fixed histogram.
+        for i, item in enumerate(panel["items"][:18]):
+            item["col"]["位置"] = ("S", "D", "E")[i % 3]
+            old = item["col"]["预设"]
+            rest = re.sub(r"^〔[^〕]+〕", "", old)
+            item["col"]["预设"] = f"〔{families[i // 3]}〕{rest}"
+        last_pairs = (("S", "S"), ("D", "D"), ("E", "E"), ("S", "D"), ("S", "E"), ("D", "E"))
+        pair = last_pairs[(panel["no"] - 541) % len(last_pairs)]
+        panel["items"][18]["col"]["位置"], panel["items"][19]["col"]["位置"] = pair
+        for j, family in zip((18, 19), ("19 代理指标不回写", "20 维护成本不外置")):
+            old = panel["items"][j]["col"]["预设"]
+            rest = re.sub(r"^〔[^〕]+〕", "", old)
+            panel["items"][j]["col"]["预设"] = f"〔{family}〕{rest}"
     assert len(panel["tail"]) == 7 and len(panel["tail"][-1]) == 10
     body = []
     body.append('<div class="act">【第一幕】上一个十年 · 约 2006–2016</div>')
