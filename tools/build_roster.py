@@ -309,7 +309,12 @@ def build():
             papers.append(rec)
         papers.sort(key=lambda p: (p['date'], p['words']), reverse=True)
         stu['papers'] = papers
-        stu['count'] = len(papers)
+        # count 是**加权篇数**，不是页面数（王德生 2026-08-07 裁定：专著按十篇论文计算）。
+        # 权重来自页面自报的 <meta name="sde:paper-weight">，缺省为 1。
+        # 一部专著抵十篇写在专著条目页里，因此本脚本从磁盘重建后权重仍然存活；
+        # 想知道有多少个页面，用 len(papers)，别用 count。
+        stu['count'] = sum(p.get('weight', 1) for p in papers)
+        stu['items'] = len(papers)
     roster['students'].sort(key=lambda s: s['enrolled_order'])
     roster['updated'] = datetime.date.today().isoformat()
     return roster
