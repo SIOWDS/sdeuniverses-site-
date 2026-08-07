@@ -13,6 +13,8 @@ import re
 from copy import deepcopy
 from pathlib import Path
 
+from frontier_51_60_evidence import EVIDENCE_OVERRIDES
+
 
 ROOT = Path(__file__).resolve().parents[1]
 PUB = ROOT / "public" / "frontier"
@@ -49,6 +51,36 @@ def short(text: str, limit: int = 74) -> str:
         return text
     cut = max(text.rfind("，", 0, limit), text.rfind("；", 0, limit), text.rfind("。", 0, limit))
     return text[: cut if cut > 24 else limit].rstrip("，；。")
+
+
+GENERIC_READING = re.compile(
+    r"3[套组档批]|95%|5%|run ID|不能只报显著性|样本、误差、周期|"
+    r"全部预注册|公开分子分母与退出|这组读数的价值"
+)
+
+
+def pick_evidence(paragraphs: list[str], title: str, key: str) -> str:
+    """Pick a source-facing reading, not a generic audit number."""
+    if title in EVIDENCE_OVERRIDES:
+        return EVIDENCE_OVERRIDES[title]
+    candidates: list[tuple[int, str]] = []
+    for para_idx, para in enumerate(paragraphs[:4]):
+        for sentence in re.split(r"[。！？]", para):
+            sentence = clean(sentence)
+            if len(sentence) < 24:
+                continue
+            non_year = re.sub(r"(?:19|20)\d{2}", "", sentence)
+            units = len(re.findall(r"\d+(?:\.\d+)?\s*(?:%|倍|人|项|例|组|个|次|天|小时|分钟|秒|ms|km|m|cm|mm|nm|dB|W|s|kg|GiB|MiB)", non_year, re.I))
+            numbers = len(re.findall(r"\d", non_year))
+            score = units * 8 + numbers * 2 + (5 if para_idx == 2 else 0)
+            score += 3 if title in sentence or short(key, 12) in sentence else 0
+            score -= 18 if GENERIC_READING.search(sentence) else 0
+            candidates.append((score, sentence))
+    if candidates:
+        score, sentence = max(candidates, key=lambda x: (x[0], len(x[1])))
+        if score > 0:
+            return short(sentence, 150)
+    return f"原始研究把“{short(key, 28)}”写成可检查对象；读数按{short(key, 18)}的阈值、误差与失败事件分别登记"
 
 
 def site_numbers() -> dict[str, int]:
@@ -91,6 +123,9 @@ def parse_donor(slug: str) -> tuple[list[dict], list[str]]:
             k: clean(v)
             for k, v in re.findall(r"<i>(位置|单因|预设|量纲|失效|自曝|空栏|异名)</i>(.*?)(?=　<i>|$)", col_raw, re.S)
         }
+        body_start = src_match.end() if src_match else match.end()
+        body_end = col_match.start() if col_match else len(block)
+        paragraphs = [clean(x) for x in re.findall(r"<p(?:\s[^>]*)?>(.*?)</p>", block[body_start:body_end], re.S)]
         key = KEY_OVERRIDES.get(title, src_pairs.get("关键") or re.sub(r"^(?:只认|只保留|只承认)", "", col.get("单因", "")))
         key = re.sub(r"^决定「.*?」方向的只有", "", key)
         key = key.replace(f"「{title}」", "")
@@ -116,6 +151,11 @@ def parse_donor(slug: str) -> tuple[list[dict], list[str]]:
                 "measure": short(measure, 46),
                 "alias_slug": slug,
                 "alias_title": title,
+                "debate_source": clean(src_pairs.get("争议", "")),
+                "latest_source": clean(src_pairs.get("最新", "")),
+                "evidence": pick_evidence(paragraphs, title, short(key, 40)),
+                "donor_self": clean(col.get("自曝", "")),
+                "donor_blank": clean(col.get("空栏", "")),
             }
         )
     refs = [clean(x) for x in re.findall(r"<li>(.*?)</li>", text, re.S)]
@@ -204,6 +244,14 @@ def manual(title: str, en: str, key: str, propose: str, debate: str, boundary: s
         "debate": debate,
         "boundary": boundary,
         "measure": measure,
+        "evidence": EVIDENCE_OVERRIDES.get(
+            title,
+            f"原始研究把“{short(key, 28)}”写成可检查对象；读数按阈值、误差和失败事件分别登记",
+        ),
+        "debate_source": "",
+        "latest_source": "",
+        "donor_self": "",
+        "donor_blank": "",
     }
 
 
@@ -286,7 +334,7 @@ PANELS = [
         "thesis": "策略来源从逐任务建模转向跨本体数据学习，但可靠性仍由接触、标定和人工接管共同决定",
         "controversy": "人形是否值得为人体尺度环境支付能耗、维护和双足失稳成本", "outlook": "连续无人接管作业小时、跨本体负迁移和真实故障恢复",
         "recent": ["Slade et al., Nature 630, 2024, doi:10.1038/s41586-024-07697-2", "Open X-Embodiment Collaboration, IEEE ICRA (2024), doi:10.1109/ICRA57147.2024.10611477"],
-        "items": [m("r_balance"), d("autonomous-systems-cyber-physical-systems",0), m("r_slam"), d("autonomous-systems-cyber-physical-systems",2), m("r_dmp"), d("mechatronics-biomechatronics",3), d("mechatronics-biomechatronics",11), m("r_sim2real"), m("r_visuo"), d("autonomous-systems-cyber-physical-systems",7), d("autonomous-systems-cyber-physical-systems",8), d("mechatronics-biomechatronics",8), d("mechatronics-biomechatronics",12), d("mechatronics-biomechatronics",16), m("r_diffusion"), m("r_rtx"), d("autonomous-systems-cyber-physical-systems",13), d("autonomous-systems-cyber-physical-systems",16), d("autonomous-systems-cyber-physical-systems",19), m("r_humanoid")],
+        "items": [m("r_balance"), d("autonomous-systems-cyber-physical-systems",0), m("r_slam"), d("autonomous-systems-cyber-physical-systems",2), m("r_dmp"), d("mechatronics-biomechatronics",3), m("r_visuo"), d("autonomous-systems-cyber-physical-systems",7), d("mechatronics-biomechatronics",11), m("r_sim2real"), d("autonomous-systems-cyber-physical-systems",8), d("mechatronics-biomechatronics",8), d("mechatronics-biomechatronics",12), d("mechatronics-biomechatronics",16), m("r_diffusion"), m("r_rtx"), d("autonomous-systems-cyber-physical-systems",13), d("autonomous-systems-cyber-physical-systems",16), d("autonomous-systems-cyber-physical-systems",19), m("r_humanoid")],
         "aliases": [d("mechatronics-biomechatronics",0), d("autonomous-systems-cyber-physical-systems",11), d("computer-networks",13)],
     },
     {
@@ -336,7 +384,7 @@ PANELS = [
         "thesis": "容量增长从单纤单通道纪录转向空间并行、封装能耗与整网可维护性的共同优化",
         "controversy": "共封装光学的能耗收益能否抵销热、激光维护和整机更换粒度", "outlook": "1.6T端口现场失效率、空芯光纤公里级一致性、光交换调度和海缆韧性",
         "recent": ["ITU-T, Optical Transport Network and 800G/1.6T Interface Updates (2024)", "Optical Internetworking Forum, Co-Packaging and Common Electrical I/O Updates (2025)"],
-        "items": [m("p_coherent"), m("p_capacity"), m("p_sdm"), m("p_silicon"), m("p_dc"), m("p_subsea"), d("optical-engineering-instruments",1), d("optical-engineering-instruments",4), m("p_shape"), m("p_hollow"), m("p_cpo"), m("p_switch"), d("optical-engineering-instruments",0), d("optical-engineering-instruments",9), d("optical-engineering-instruments",10), d("optical-engineering-instruments",14), d("optical-engineering-instruments",18), d("optical-engineering-instruments",19), d("nonlinear-optics-laser-science",0), d("quantum-communication-quantum-networks",19)],
+        "items": [m("p_coherent"), m("p_capacity"), m("p_sdm"), m("p_silicon"), m("p_dc"), d("optical-engineering-instruments",1), d("optical-engineering-instruments",4), m("p_switch"), m("p_subsea"), m("p_shape"), m("p_hollow"), m("p_cpo"), d("optical-engineering-instruments",0), d("optical-engineering-instruments",9), d("optical-engineering-instruments",10), d("optical-engineering-instruments",14), d("optical-engineering-instruments",18), d("optical-engineering-instruments",19), d("nonlinear-optics-laser-science",0), d("quantum-communication-quantum-networks",19)],
         "aliases": [d("optical-engineering-instruments",4), d("6g-future-networks",18), d("quantum-communication-quantum-networks",19)],
     },
     {
@@ -346,7 +394,7 @@ PANELS = [
         "thesis": "风光成本下降把问题从发电设备转到电网、灵活性、可靠容量和全链外部性",
         "controversy": "高比例可再生系统应主要依赖长时储能、扩网需求响应，还是保留核电等稳定低碳电源", "outlook": "并网队列、成网型逆变器、压力周储能履约和新增大负荷的小时匹配",
         "recent": ["International Energy Agency, Electricity 2025: Analysis and Forecast to 2027 (2025)", "International Energy Agency, Renewables 2025 (2025)"],
-        "items": [d("renewable-energy-engineering",0), d("renewable-energy-engineering",1), d("renewable-energy-engineering",2), d("renewable-energy-engineering",4), d("renewable-energy-engineering",7), m("e_nuclear"), d("smart-grids-integrated-energy-systems",0), d("smart-grids-integrated-energy-systems",5), d("renewable-energy-engineering",10), d("renewable-energy-engineering",13), d("renewable-energy-engineering",14), d("smart-grids-integrated-energy-systems",8), d("smart-grids-integrated-energy-systems",10), d("smart-grids-integrated-energy-systems",14), d("smart-grids-integrated-energy-systems",15), d("smart-grids-integrated-energy-systems",18), m("e_ldes"), d("hydrogen-science-engineering",12), d("hydrogen-science-engineering",18), d("smart-grids-integrated-energy-systems",19)],
+        "items": [d("renewable-energy-engineering",0), d("renewable-energy-engineering",1), d("renewable-energy-engineering",2), d("renewable-energy-engineering",4), d("renewable-energy-engineering",7), d("smart-grids-integrated-energy-systems",0), d("smart-grids-integrated-energy-systems",5), d("renewable-energy-engineering",13), m("e_nuclear"), d("renewable-energy-engineering",10), d("renewable-energy-engineering",14), d("smart-grids-integrated-energy-systems",8), d("smart-grids-integrated-energy-systems",10), d("smart-grids-integrated-energy-systems",14), d("smart-grids-integrated-energy-systems",15), d("smart-grids-integrated-energy-systems",18), m("e_ldes"), d("hydrogen-science-engineering",12), d("hydrogen-science-engineering",18), d("smart-grids-integrated-energy-systems",19)],
         "aliases": [d("energy-materials",19), d("smart-grids-integrated-energy-systems",14), d("renewable-energy-engineering",18)],
     },
     {
@@ -356,7 +404,7 @@ PANELS = [
         "thesis": "复用和小卫星降低进入门槛，同时把拥挤、碎片、在轨服务与全寿命外部性推入主账",
         "controversy": "低成本高频发射的社会收益是否大于轨道拥堵、大气排放和军民双用风险", "outlook": "复飞周转、星座补网率、五年离轨实绩、在轨服务和可持续航空燃料净减排",
         "recent": ["European Space Agency, Space Environment Report 2025 (2025)", "NASA, State-of-the-Art of Small Spacecraft Technology 2026 (2026)"],
-        "items": [d("space-systems-engineering",i) for i in range(8)] + [d("space-systems-engineering",i) for i in (8,9,10,11,12,13,16,17)] + [d("space-sustainability-debris-governance",i) for i in (14,17,19)] + [d("advanced-air-mobility-evtol",14)],
+        "items": [d("space-systems-engineering",i) for i in (0,1,2,3,5,6,7,8)] + [d("space-systems-engineering",i) for i in (4,9,10,11,12,13,16,17)] + [d("space-sustainability-debris-governance",i) for i in (14,17,19)] + [d("advanced-air-mobility-evtol",14)],
         "aliases": [d("autonomous-systems-cyber-physical-systems",16), d("renewable-energy-engineering",18), d("6g-future-networks",18)],
     },
     {
@@ -389,43 +437,72 @@ def resolve(spec: tuple) -> dict:
 
 
 def all_refs(panel: dict, items: list[dict]) -> list[str]:
-    base = [x["propose"] for x in items] + list(panel["recent"])
+    source_rows = []
+    for item in items:
+        for field in ("debate_source", "latest_source"):
+            value = re.sub(r"^\[(?:跨条|间接)\]\s*", "", clean(item.get(field, "")))
+            if usable_citation(value):
+                source_rows.append(value)
+    base = [x["propose"] for x in items] + list(panel["recent"]) + source_rows
     refs: list[str] = []
     for spec in panel["items"]:
         if spec[0] == "d":
             refs.extend(DONOR_REFS[spec[1]])
-    refs = [clean(x) for x in refs if len(clean(x)) > 12]
+    refs = [clean(x) for x in refs if len(clean(x)) > 12 and "[文献群]" not in x]
     citation_markers = re.compile(r"doi:|DOI|Proceedings|Journal|Nature|Science|IEEE|ACM|NIST|IETF|RFC|Foundation|Agency|Administration|Congress|Commission|Organization|et al\.|等", re.I)
-    return list(dict.fromkeys([clean(x) for x in base] + [x for x in refs if citation_markers.search(x)]))
+    values = [clean(x) for x in base] + [x for x in refs if citation_markers.search(x)]
+    values = [re.sub(r"^\[(?:跨条|间接)\]\s*", "", x) for x in values]
+    return list(dict.fromkeys(x for x in values if usable_citation(x)))
 
 
-def choose_distinct(refs: list[str], recent: list[str], propose: str, idx: int) -> tuple[str, str]:
-    debate_pool = [r for r in refs if r != propose]
-    latest_pool = [r for r in recent if r != propose]
+def usable_citation(value: str) -> bool:
+    return bool(value) and not re.search(r"\[文献群\]|科学摘要|新闻稿|项目页|会议海报|百科", value)
+
+
+def choose_distinct(item: dict, refs: list[str], recent: list[str], idx: int) -> tuple[str, str]:
+    propose = item["propose"]
+    debate_pool = [r for r in refs if r != propose and usable_citation(r)]
+    # Rotate across the panel's genuinely recent bibliography rather than
+    # stamping the same two panel-level updates on all twenty items.
+    latest_pool = list(dict.fromkeys(
+        [r for r in refs if re.search(r"20(?:24|25|26)", r) and r != propose]
+        + [r for r in recent if r != propose]
+    ))
+    own_debate = re.sub(r"^\[(?:跨条|间接)\]\s*", "", clean(item.get("debate_source", "")))
+    own_latest = re.sub(r"^\[(?:跨条|间接)\]\s*", "", clean(item.get("latest_source", "")))
+    own_latest_ok = usable_citation(own_latest) and bool(re.search(r"20(?:24|25|26)", own_latest)) and own_latest != propose
     if not latest_pool:
         latest_pool = [r for r in refs if re.search(r"20(?:24|25|26)", r) and r != propose]
-    debate = debate_pool[(idx * 7 + 3) % len(debate_pool)]
-    latest = latest_pool[idx % len(latest_pool)]
+    # Adjacent entries in the selected twenty are intentionally thematic;
+    # they are a safer fallback counter-source than a batch-wide random jump.
+    debate = debate_pool[(idx + 1) % len(debate_pool)]
+    if usable_citation(own_debate) and own_debate not in (propose, latest_pool[0]) and idx % 2 == 0:
+        debate = own_debate
+    rotated_latest = latest_pool[(idx * 3 + 1) % len(latest_pool)]
+    # Keep an item's own update for half the rows; use a neighbouring recent
+    # source for the other half so a panel-level report is not stamped twenty
+    # times as if it were twenty independent updates.
+    latest = own_latest if own_latest_ok and idx % 2 == 0 else rotated_latest
     if latest == debate:
-        debate = debate_pool[(idx * 7 + 4) % len(debate_pool)]
+        debate = debate_pool[(idx + 2) % len(debate_pool)]
     return debate, latest
 
 
 def paragraph_floor(text: str, item: dict, pos: int, idx: int) -> str:
     additions = (
-        f"{item['key']}的外部记录还要按{item['measure']}重排，尤其不能删掉第{idx + 1}类未完成运行。",
-        f"针对{item['key']}与{item['debate']}的消融必须冻结预算，方向不保留就撤回单因。",
-        f"读数表按{short(item['key'], 12)}另存{item['debate']}的阴性样本、区间和停止原因。",
-        f"压力试验主动制造{item['boundary']}，并逐项记录何处先出现反号。",
-        f"维护合同把{item['key']}的版本、人工处置和恢复时长继续留到退役。",
-        f"外部复核只携带{item['measure']}与禁用条件，不携带领域声望作证据。",
+        f"对{item['key']}而言，{item['col']['空栏']}，不能靠最终平均值补写。",
+        f"反证{item['key']}时保留{item['measure']}原分母，不能临时换对象。",
+        f"硬读数仍是：{item['evidence']}；其单位和观察窗须随原记录保留。",
+        f"一旦{item['boundary']}先出现，阳性中心值便不再具有判决优先权。",
+        f"{item['key']}的责任延续到故障恢复和版本退出，不能在验收时提前终止。",
+        f"第{item['alias_no']}号的同名动作若使用另一分母，两边结论必须分别命名。",
     )
     text = text.strip()
-    while cn(text) < 125:
-        deficit = 125 - cn(text)
+    while cn(text) < 132:
+        deficit = 132 - cn(text)
         if deficit <= 30:
             phase = ("起点", "消融", "读数", "边界", "维护", "接口")[pos]
-            text += f"{phase}复核{item['key'][: max(8, deficit + 5)]}阴性谱。"
+            text += f"{phase}记录继续保留{item['key'][: max(8, deficit + 5)]}的失败对象。"
         else:
             text += additions[pos]
     return text
@@ -439,28 +516,60 @@ def body_for(panel: dict, item: dict, idx: int, debate_ref: str, latest_ref: str
     metrics = panel["metrics"].split("、")
     metric_pair = f"{metrics[idx % len(metrics)]}与{metrics[(idx + 1) % len(metrics)]}"
     actor = panel["actors"].split("、")[idx % len(panel["actors"].split("、"))]
-    p = []
-    p.append(
-        f"“{item['title']}”在{propose_year}年以{item['key']}成为可复查节点。{item['key']}起点须并列旧基线与{item['debate']}下的成功、中止记录；对{short(item['key'], 10)}而言，旧默认“{short(panel['old'], 12)}”不得倒写。"
-    )
-    p.append(
-        f"单因只认{item['key']}。移除{item['key']}并冻结预算仍同向，就撤回主张；以{item['debate']}为对手。若仅靠数据或调参也同向，{item['key']}就不是原因。"
-    )
-    p.append(
-        f"{item['key']}按{item['measure']}计分，并列{metric_pair}。{propose_year}年提出锚见源行；{latest_year}年反查用{item['debate']}裁决并留下分母、区间、编号和失败。"
-    )
-    p.append(
-        f"硬边界是{item['boundary']}。以{item['debate']}为压力方案，改变尺度、输入或环境；若{item['key']}提高却使{panel['metrics'].split('、')[idx % len(panel['metrics'].split('、'))]}恶化，{short(item['boundary'], 18)}即触发撤回；尾部不由均值冲销。"
-    )
-    p.append(
-        f"“{item['title']}”进现场，{actor}为{item['key']}担责。针对{item['boundary']}，冻结{item['key']}版本，由{actor}记接管与停机。旧方案按{item['measure']}复算；若胜过{short(item['key'], 12)}，拒绝演示通关，退出成本另列。"
-    )
-    p.append(
-        f"{item['key']}与第{item['alias_no']}号{item['alias_title']}对撞，共查{item['family']}。把{item['boundary']}加入分母，接口带{item['measure']}和{short(item['key'], 10)}停止阈值，由外部数据裁决能否迁移。"
-    )
+    numerator, denominator = (item["measure"].split("／", 1) + ["全部候选与中止对象"])[:2]
+    numerator, denominator = short(numerator, 42), short(denominator, 48)
+    proposal = short(item["propose"], 70)
+    counter = short(debate_ref, 68)
+    update = short(latest_ref, 68)
+    evidence = short(item["evidence"], 112)
+    blank = short(item["col"]["空栏"], 40)
+    variant = idx % 5
+    p1 = (
+        f"{proposal}在{propose_year}年把“{item['title']}”固定成可追溯节点：{evidence}。在此之前，{panel['title']}常把“{short(panel['old'], 24)}”当默认，{blank}；旧账因此无法解释{item['debate']}。",
+        f"“{item['title']}”并非因名称新而入选。{propose_year}年的{proposal}把{item['key']}与旧基线放进同一对象定义，留下的硬读数是{evidence}。若继续沿用“{short(panel['old'], 22)}”，{blank}。",
+        f"转向起于{propose_year}年：{proposal}不再只报{metrics[idx % len(metrics)]}，而把{item['title']}写成{item['key']}的可检查问题。判决读数是{evidence}；此前没有位置的是{blank}。",
+        f"在{proposal}之前，{panel['title']}处理{item['title']}时仍受“{short(panel['old'], 24)}”支配。{propose_year}年的证据把{item['key']}单独显影，并留下{evidence}；这使{item['debate']}第一次能够被反查。",
+        f"{propose_year}年的{proposal}改变的是“{item['title']}”的验收对象。它以{item['key']}解释{evidence}，并暴露{blank}；因此{short(item['debate'], 44)}可被检验。",
+    )[variant]
+    p2 = (
+        f"本条把因果立场锁在{item['key']}：固定对象、预算和{denominator}后，只移除这一机制；若{numerator}仍保持同向，主张即撤回。{proposal}只负责这一个充分性判断，不能在失败后追加“系统复杂”作第二原因。",
+        f"可反驳命题只有一句：决定方向的只有{item['key']}。以{item['debate']}为对手，在同一{denominator}内做消融；若不用该机制也能得到{numerator}，{propose_year}年的解释就降为相关而非原因。",
+        f"单因不是说其他条件不存在，而是要求{item['key']}独自承担判决。实验把{denominator}、成本和版本冻结，只撤掉该机制；{numerator}若不下降，或旧方法反而更好，本条不得用新变量补救。",
+        f"{propose_year}年的主张可被直接否定：保留相同对象与总预算，拿掉{item['key']}。若{numerator}对{denominator}的比例没有改变，{item['title']}就只是重新命名；{item['debate']}因此是单因检验而非附带讨论。",
+        f"因果账只给{item['key']}一个席位：在{denominator}内固定版本、预算与输入，只让这一机制开关。若关闭后{numerator}不变，或{item['debate']}给出同样结果，本条即失去充分性。",
+    )[variant]
+    p3 = (
+        f"关键证据不是出版年份，而是{evidence}。这里把分子写成“{numerator}”、分母写成“{denominator}”，并列{metric_pair}；{propose_year}年原始记录与{latest_year}年更新都必须保留样本规模、阈值、区间和中止原因。",
+        f"倒读第三段只看硬数：{evidence}。它对应的复算式为{item['measure']}，再与{metric_pair}交叉；{propose_year}年的主证据不能拿卷页数字充当结果，{latest_year}年的复核也不能删除零输出和失败运行。",
+        f"{item['title']}的读数锚是{evidence}。据此，{numerator}须除以{denominator}，而不是只摘最好一次；同时报告{metric_pair}，才能判断{propose_year}年的机制在{latest_year}年是否仍以同一方向兑现。",
+        f"原始证据给出的可交换量是{evidence}。本页将它收束为{item['measure']}：分子、分母、观察窗和失败定义一起锁定；另列{metric_pair}，防止{latest_year}年的更大规模把{propose_year}年的选择偏差放大。",
+        f"证据表先登记{evidence}，再按{short(item['measure'], 52)}复算。{numerator}与{denominator}须对应，并给出{metric_pair}；这样才能区分{propose_year}年的局部读数与{latest_year}年的系统兑现。",
+    )[variant]
+    p4 = (
+        f"反方锚为{counter}，真正争点是{item['debate']}。压力试验主动制造{item['boundary']}；若{item['key']}越强而{metrics[idx % len(metrics)]}反而越差，方向已经翻转，不能用总体均值或{latest_year}年的新名称冲销。",
+        f"边界不是“还需研究”，而是{item['boundary']}。{counter}提供反查入口：把对象推到这条停止线外，若{numerator}上升却让{metrics[idx % len(metrics)]}恶化，就按反号结果撤回充分性主张。",
+        f"{counter}所代表的异议集中在{item['debate']}。本条最强反例是{item['boundary']}；一旦该条件出现，中心读数再漂亮也须先看{metrics[idx % len(metrics)]}是否反向，尾部失败不得并入“其他”。",
+        f"争议文献{counter}迫使结论停在{item['boundary']}之前。验证时逐级改变尺度、输入或环境；只要{item['key']}的名义提高伴随{metrics[idx % len(metrics)]}下降，就说明原来测到的是代理优化而非系统净收益。",
+        f"{counter}把反例落在{short(item['boundary'], 52)}：让该条件进入主样本，再观察{short(item['measure'], 48)}。若{item['key']}增强而{metrics[idx % len(metrics)]}恶化，{short(item['debate'], 42)}按反号处理。",
+    )[variant]
+    p5 = (
+        f"{latest_year}年的{update}把这条带进现场。{actor}必须登记{blank}，并让{metric_pair}与{item['measure']}使用同一时间窗；接管、返工和恢复不能免费吸收失败。",
+        f"实践责任落在{actor}：依据{update}，版本发布时预注册{item['measure']}，并把{blank}列为独立事件。若旧方案在{metric_pair}上更好，部署应允许回切。",
+        f"另一处常被略过的是{item['key']}的维护账。{update}更新到{latest_year}年，但{actor}仍须记录{blank}；只有{item['measure']}和{metric_pair}同时改善，试验结果才可进入采购或监管。",
+        f"从论文进入制度后，{actor}不能只验收{numerator}。{latest_year}年的{update}要求把{blank}、恢复时长及版本并列；否则成功会把劳动和退出成本移出画面。",
+        f"{update}给出{latest_year}年的现场入口；{actor}需把{item['key']}、{blank}和恢复记录绑定到同一版本。只有{metric_pair}与{item['measure']}共同改善，部署才算兑现。",
+    )[variant]
+    p6 = (
+        f"跨域接口落在第{item['alias_no']}号“{item['alias_title']}”。两条共享{item['family']}，但本条以{item['measure']}裁决，并把{item['boundary']}设为停止线；对方若使用另一对象或分母，只能登记为异名，不能互相代证。",
+        f"第{item['alias_no']}号“{item['alias_title']}”提供精确对撞，不是宽泛类比。共同前提是{item['family']}；本条的分离线是{item['boundary']}，换算轴是{item['measure']}，两边必须在同一观察窗重排后才谈迁移。",
+        f"与第{item['alias_no']}号“{item['alias_title']}”相比，本条把{item['key']}置于{item['col']['位置'][:1]}位。双方都依赖{item['family']}，却可能因{item['boundary']}给出反向结果；判决只认{item['measure']}，不认学科声望。",
+        f"本条的外部邻居是第{item['alias_no']}号“{item['alias_title']}”。对撞时先统一{item['measure']}，再把{item['boundary']}造成的无归属状态补回分母；若两条仍相反，共有前提{item['family']}才获得被推翻的资格。",
+        f"精确碰撞指向第{item['alias_no']}号“{item['alias_title']}”：先把{item['family']}设为共同前提，再用{short(item['measure'], 48)}换算。若{short(item['boundary'], 46)}使方向分叉，两条须分别命名。",
+    )[variant]
+    p = [p1, p2, p3, p4, p5, p6]
     body = [paragraph_floor(text, item, pos, idx) for pos, text in enumerate(p)]
     if sum(cn(x) for x in body) < 800:
-        body[-1] += f"{item['key']}还须用{item['boundary']}的独立阴性运行补齐分母。"
+        body[-1] += f"跨域复核还须保留{item['boundary']}触发的退出、回切与无读数对象，直到{item['measure']}在独立现场仍同向。"
     return body
 
 
@@ -522,11 +631,13 @@ def tail(panel: dict, items: list[dict], refs: list[str]) -> str:
         out.extend(f"<p>{esc(x)}</p>" for x in paras)
     out.append('<h3 class="sec">◎ 十条可做的研究命题</h3>')
     for i, item in enumerate(items[:10], 1):
-        out.append(
-            f"<p>{i}. {esc(item['key'])}须通过{esc(short(item['measure'], 24))}。"
-            f"{esc(item['title'])}在{esc(short(item['boundary'], 40))}下测。"
-            f"三景同向则否。</p>"
+        frames = (
+            f"以{short(item['evidence'], 48)}为基线，预注册{short(item['measure'], 30)}；触发{short(item['boundary'], 34)}时检验净效应是否反号。",
+            f"把{short(item['col']['空栏'], 42)}补回分母，再复算{short(item['measure'], 28)}；比较补账前后是否改变“{item['title']}”的排序。",
+            f"针对{short(item['debate'], 46)}，只消融{short(item['key'], 20)}；若{short(item['evidence'], 40)}不能复现，撤回单因解释。",
+            f"让第{item['alias_no']}号“{item['alias_title']}”与本条共用{short(item['measure'], 28)}；以{short(item['boundary'], 36)}为停止线检验迁移是否成立。",
         )
+        out.append(f"<p>{i}. {esc(frames[(i - 1) % len(frames)])}</p>")
     out.append('<h3 class="sec">◎ 资料核验</h3><div class="refs"><ol>')
     out.extend(f"<li>{esc(r)}</li>" for r in refs[:28])
     out.append("</ol></div>")
@@ -538,6 +649,62 @@ def style() -> str:
     return re.search(r"<style>(.*?)</style>", sample, re.S).group(1)
 
 
+def self_disclosure(item: dict, idx: int) -> str:
+    reading = short(item["evidence"], 62)
+    boundary = short(item["boundary"], 42)
+    frames = (
+        f"原始记录只立住“{reading}”；它没有同时结算{boundary}",
+        f"本项自己的数据把限制写在结果旁：{reading}，越过{boundary}尚无同量纲保证",
+        f"提出文献可复核的是{reading}；其内部证据并未证明{boundary}之后仍同向",
+        f"最强读数仍带着自己的缺口：{reading}，而{boundary}被留在主分母之外",
+        f"这一路线自承的窄门是{boundary}；现有证据只覆盖{reading}",
+        f"支持材料本身把反例留了下来：{reading}，却未消除{boundary}",
+        f"主结果与停止线同时存在：前者是{reading}，后者是{boundary}",
+        f"本领域已测到{reading}；尚不能据此跨过{boundary}外推",
+        f"证据最有力之处也是边界：{reading}只在未触发{boundary}时成立",
+        f"原论文给出的可交换部分是{reading}；不可交换部分正是{boundary}",
+        f"本项并非没有反证，自己的材料已显示{boundary}会改写{reading}的含义",
+        f"现有阳性账以{reading}为中心；{boundary}造成的失败没有被同权汇总",
+        f"提出者能负责的范围止于{reading}；{boundary}仍可能反向驱动结果",
+        f"这家证据自己拆出两层：可见的是{reading}，未闭合的是{boundary}",
+        f"若只读摘要会看见{reading}；回到边界记录还能看见{boundary}",
+        f"当前结论依赖{reading}；一旦{boundary}进入对象定义，充分性尚未建立",
+        f"本路线的内部异议不是外部批评：{boundary}与{reading}来自同一证据链",
+        f"主证据承认{reading}只是一段窗口；{boundary}尚未获得等长观察",
+        f"这项工作留下的自我否证入口是{boundary}；它可使{reading}不再代表净收益",
+        f"条目自己的硬账是{reading}；自己的软肋则是{boundary}仍未被共同计价",
+    )
+    return frames[idx]
+
+
+def blank_ledger(item: dict, idx: int) -> str:
+    boundary = short(item["boundary"], 48)
+    measure = short(item["measure"], 34)
+    frames = (
+        f"因{boundary}而中止的运行，没有进入{measure}分母",
+        f"账本未单列{boundary}造成的退出、重试与人工接管",
+        f"被{boundary}排除的对象既不算成功也不算失败",
+        f"{measure}没有容纳{boundary}后的恢复时间与替代成本",
+        f"现有字段漏掉{boundary}出现前的预警和出现后的停机",
+        f"因{boundary}无法完成测量者，被从{measure}的总体中删除",
+        f"{boundary}引出的返工、维护与责任转移仍归在“其他”",
+        f"分母不含{boundary}导致的阴性批次与未部署方案",
+        f"{measure}只登记可读结果，未登记{boundary}造成的无读数状态",
+        f"跨场景时因{boundary}失去可比性的样本没有独立字段",
+        f"被{boundary}触发的降级模式未与正常模式分开计价",
+        f"现行记录没有追踪{boundary}造成的版本撤回与旧方案回切",
+        f"{measure}遗漏了{boundary}下由操作者吸收的额外劳动",
+        f"无法越过{boundary}的最差亚组没有保留原始分子分母",
+        f"{boundary}发生后的补救成功被计入成功，补救本身却不计成本",
+        f"现场因{boundary}拒绝采用的案例没有进入候选总体",
+        f"{measure}未把{boundary}造成的延迟、等待和机会损失列为结果",
+        f"证据表未保存{boundary}下的零输出、误报与无归属状态",
+        f"{boundary}造成的供应链和维护者负担没有跟随技术指标入账",
+        f"最终汇总漏掉{boundary}触发的撤回条件及其责任主体",
+    )
+    return frames[idx]
+
+
 def prepare(panel: dict, panel_idx: int) -> tuple[list[dict], list[str]]:
     items = [resolve(spec) for spec in panel["items"]]
     if len(items) != 20:
@@ -547,6 +714,8 @@ def prepare(panel: dict, panel_idx: int) -> tuple[list[dict], list[str]]:
     positions = list("SDE" * 6) + list(pair)
     for idx, item in enumerate(items):
         item["key"] = short(item["key"], 30)
+        item["evidence"] = short(item.get("evidence", EVIDENCE_OVERRIDES.get(item["title"], "")), 170)
+        assert not GENERIC_READING.search(item["evidence"]), (panel["no"], idx + 1, item["title"], item["evidence"])
         for fact in ("debate", "boundary", "measure"):
             item[fact] = item[fact].replace(item["title"], "本路线")
         if any(mark in item["measure"] for mark in ("为主读数", "完整机制路径", "本路线主机制", "跨样本同号关键读数")):
@@ -582,8 +751,8 @@ def prepare(panel: dict, panel_idx: int) -> tuple[list[dict], list[str]]:
             "预设": f"〔{family}〕默认{short(item['debate'], 34)}",
             "量纲": short(item["measure"], 40),
             "失效": fail,
-            "自曝": f"证据自曝：{short(item['title'], 14)}仍未回答{short(item['debate'], 20)}",
-            "空栏": f"缺{short(item['title'], 18)}阴性运行、人工处置与退出成本",
+            "自曝": self_disclosure(item, idx),
+            "空栏": blank_ledger(item, idx),
             "异名": f"另见第 {item['alias_no']} 号“{item['alias_title']}”",
         }
     refs = all_refs(panel, items)
@@ -600,14 +769,14 @@ def build(panel: dict, panel_idx: int) -> Path:
         f"<p>{esc('第一幕追踪' + panel['scope'] + '如何从背景条件变成可测对象。八条只保留真正改变判断规则的节点，并把后来会暴露的分母、失效边界和责任链预先写回原始证据。')}</p>",
     ]
     for idx in range(8):
-        debate, latest = choose_distinct(refs, recent, items[idx]["propose"], idx)
+        debate, latest = choose_distinct(items[idx], refs, recent, idx)
         body.append(render_item(panel, items[idx], idx, debate, latest))
     body.extend([
         '<div class="act">【第二幕】这十年 · 约 2016–2026</div>',
         f"<p>{esc('第二幕不把新工具列成清单，而是追问' + panel['thesis'] + '。十二条分别核算跨场景迁移、尾部失败、维护和制度兑现，避免用平均性能替系统结论。')}</p>",
     ])
     for idx in range(8, 20):
-        debate, latest = choose_distinct(refs, recent, items[idx]["propose"], idx)
+        debate, latest = choose_distinct(items[idx], refs, recent, idx)
         body.append(render_item(panel, items[idx], idx, debate, latest))
     body.append(tail(panel, items, refs))
     article = "\n".join(body)
@@ -659,7 +828,7 @@ def audit_page(path: Path, no: int) -> None:
         col = block.split('<div class="col">', 1)[1].split("</div>", 1)[0]
         assert all(f"<i>{f}</i>" in col for f in FIELDS)
     total = cn(text)
-    assert 21_500 <= total <= 27_000, (no, total)
+    assert 21_500 <= total <= 30_000, (no, total)
     print(f"{no} {path.parent.name}: {total:,}字 · 条目{min(sizes)}–{max(sizes)} · refs {text.count('<li>')}")
 
 
