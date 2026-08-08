@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SDE 会议 · 视频讲课与群讨论 | SDE Universes</title>
-<meta name="description" content="SDE 会议专栏：王德生 SDE 讲堂。浏览器直连视频教室，免安装参与讲课；会议讨论区支持课前预告、课后答疑与学员群讨论。">
+<title>SDE 讲堂 · 直播讲课与群讨论 | SDE Universes</title>
+<meta name="description" content="SDE 讲堂：王德生 SDE 课程直播。浏览器打开即听课，不用注册、不用装任何软件；提问与课后答疑走本页讨论区；往期课程可在回放专区重看。">
 <style>
 :root{
   --bg:#F7F3E9;--surface:#F1EBDC;--card:#FBF8F0;--card2:#F4EEDF;
@@ -12,6 +12,7 @@
   --text:#2A2318;--text2:#6B6050;--muted:#9A8F7A;
   --gold:#8A6817;--gold2:#A8842B;
   --mtg:#0F766E;--mtg2:#14998F;--mtg-soft:rgba(15,118,110,0.08);
+  --live:#B3261E;
 }
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'Noto Serif SC',Georgia,'Songti SC',serif;background:var(--bg);color:var(--text);line-height:1.9}
@@ -20,7 +21,7 @@ nav{position:sticky;top:0;z-index:50;background:rgba(247,243,233,0.92);backdrop-
 .nav-logo{font-weight:800;letter-spacing:0.05em;color:var(--gold);text-decoration:none;font-size:1.05rem}
 nav .back{font-size:0.85rem;color:var(--text2);text-decoration:none}
 nav .back:hover{color:var(--mtg)}
-header{max-width:960px;margin:0 auto;padding:4.5rem 24px 2.5rem;text-align:center}
+header{max-width:960px;margin:0 auto;padding:4rem 24px 2rem;text-align:center}
 .eyebrow{font-size:0.72rem;letter-spacing:0.32em;color:var(--mtg);text-transform:uppercase;font-weight:700;margin-bottom:1.1rem}
 h1{font-size:clamp(2rem,5vw,3.2rem);font-weight:800;line-height:1.2;margin-bottom:0.9rem}
 h1 span{color:var(--mtg)}
@@ -35,72 +36,50 @@ section.blk{margin:3rem 0}
 .blk .lead{color:var(--text2);font-size:0.95rem;margin-bottom:1.4rem;max-width:720px}
 .room-card{background:var(--card);border:1px solid var(--border2);border-top:3px solid var(--mtg);border-radius:10px;padding:1.6rem 1.6rem 1.4rem;margin-bottom:1.2rem}
 .room-card h3{font-size:1.1rem;font-weight:800;margin-bottom:0.5rem}
-.room-card p{font-size:0.9rem;color:var(--text2);margin-bottom:1rem}
+.room-card p{font-size:0.9rem;color:var(--text2);margin-bottom:0}
 .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
 .btn{display:inline-block;font:inherit;font-size:0.9rem;font-weight:700;letter-spacing:0.08em;padding:0.7rem 1.6rem;border-radius:6px;border:1px solid var(--mtg);background:var(--mtg);color:#F5F1E6;cursor:pointer;text-decoration:none;transition:background 0.2s}
 .btn:hover{background:var(--mtg2)}
 .btn.ghost{background:transparent;color:var(--mtg)}
 .btn.ghost:hover{background:var(--mtg-soft)}
-input.txt{font:inherit;font-size:0.9rem;color:var(--text);background:#fff;border:1px solid var(--border);border-radius:6px;padding:0.65rem 0.9rem;min-width:230px;flex:1;outline:none}
-input.txt:focus{border-color:var(--mtg)}
 .hintline{font-size:0.78rem;color:var(--muted);margin-top:0.7rem}
-#stage{display:none;margin:1.4rem 0 0}
-#stage.on{display:block}
-#stage .stage-bar{display:flex;justify-content:space-between;align-items:center;background:#1E1A12;color:#E8DFC8;border-radius:10px 10px 0 0;padding:0.55rem 1rem;font-size:0.82rem}
-#stage .stage-bar b{letter-spacing:0.06em}
-#stage .stage-bar a{color:#E4C878;text-decoration:none;margin-left:14px;cursor:pointer}
-#stage iframe{display:block;width:100%;height:min(86vh,900px);border:1px solid var(--border);border-top:none;border-radius:0 0 10px 10px;background:#000}
 .notes{background:var(--card2);border:1px solid var(--border2);border-radius:10px;padding:1.3rem 1.5rem;font-size:0.88rem;color:var(--text2)}
 .notes b{color:var(--text)}
-.mlist{border-top:1px solid var(--border2)}
-.mrow{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:0.85rem 2px;border-bottom:1px solid var(--border2);flex-wrap:wrap}
-.mname{font-weight:800;font-size:1rem}
-.mtag{display:inline-block;margin-left:10px;font-size:0.72rem;font-weight:400;color:var(--mtg);background:var(--mtg-soft);border:1px solid var(--mtg);border-radius:20px;padding:2px 10px;letter-spacing:0.05em}
-.mbtns{display:flex;gap:8px}
-.mbtns .btn{padding:0.5rem 1.2rem;font-size:0.82rem}
-@media(max-width:640px){.mrow{flex-direction:column;align-items:stretch}.mbtns .btn{flex:1}}
 .notes ol{margin:0.4rem 0 0 1.3rem}
 .notes li{margin-bottom:0.45rem}
+.notes code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:0.86em;background:#EFE7D4;border:1px solid var(--border2);border-radius:4px;padding:1px 5px}
 footer{border-top:1px solid var(--border2);padding:2rem 24px;text-align:center;font-size:0.75rem;color:var(--muted)}
 footer a{color:var(--gold);text-decoration:none}
-.meet-auth{background:var(--mtg-soft);border:1px solid var(--mtg);border-radius:10px;padding:0.9rem 1.2rem;margin:0 0 1.6rem}
-.meet-auth .ma-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-.meet-auth .ma-icon{font-size:1.3rem;flex:none}
-.meet-auth .ma-body{flex:1;min-width:200px;font-size:0.88rem;color:var(--text2)}
-.meet-auth .ma-body b{color:var(--text)}
-.meet-auth .ma-body a{margin-left:8px;font-size:0.78rem;opacity:0.65;text-decoration:underline;cursor:pointer;color:var(--mtg)}
-.meet-auth .ma-msg{font-size:0.8rem;color:var(--mtg);margin-top:8px}
-.meet-auth .ma-msg.bad{color:#B3261E}
-.meet-auth .ma-pw{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
-.meet-auth .ma-pw input{flex:1;min-width:132px;padding:0.5rem 0.7rem;border:1px solid var(--border2);border-radius:8px;background:#FFFDF8;font:inherit;font-size:0.86rem;color:var(--text)}
-.meet-auth .ma-pw input:focus{outline:none;border-color:var(--mtg)}
-.meet-auth .ma-pw .btn{padding:0.5rem 1.3rem;font-size:0.82rem;flex:none}
-.meet-auth.maflash,.room-card.maflash{animation:maflash 0.9s ease 2}
-input.txt.nm{max-width:230px}
-@keyframes maflash{0%,100%{background:var(--mtg-soft)}50%{background:rgba(15,118,110,0.22)}}
-.rbanner{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;background:var(--mtg);color:#F5F1E6;border-radius:10px;padding:1rem 1.4rem;margin:0 0 1.8rem;font-size:0.95rem}
-.rbanner b{letter-spacing:0.04em}
-.rbanner .btn{background:#F5F1E6;color:var(--mtg);border-color:#F5F1E6}
-.rbanner .btn:hover{background:#fff}
-.rbanner .rb-head{flex:1;min-width:200px}
-.rbanner .rb-sub{display:block;font-size:0.8rem;opacity:0.88;margin-top:5px;font-weight:400}
-.rbanner .rb-form{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.rbanner input.rb-nm{font:inherit;font-size:0.9rem;color:var(--text);background:#fff;border:1px solid #F5F1E6;border-radius:6px;padding:0.65rem 0.9rem;min-width:148px;max-width:200px;outline:none}
-.rbanner input.rb-nm:focus{border-color:#E4C878}
-.rbanner .rb-msg{flex-basis:100%;font-size:0.82rem;color:#FFE3B8}
-@media(max-width:640px){.rbanner .rb-form{width:100%}.rbanner input.rb-nm{flex:1;max-width:none}}
-.invite{background:var(--mtg-soft);border:1px solid var(--mtg);border-radius:10px;padding:1.3rem 1.5rem;margin-bottom:1.2rem}
-.invite-h{font-weight:800;color:var(--mtg);margin-bottom:0.8rem;font-size:1rem}
-.invite-row{display:flex;gap:12px;align-items:baseline;padding:0.35rem 0;flex-wrap:wrap}
-.invite-k{font-size:0.78rem;color:var(--text2);min-width:64px;letter-spacing:0.08em}
-.invite-row b{font-size:1.08rem;letter-spacing:0.04em;word-break:break-all}
-.invite-row a{word-break:break-all;font-size:0.9rem}
-.invite-btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:0.9rem}
-.hostwarn{margin-top:0.9rem;background:#FFF6E0;border:1px solid #D9B45B;border-left:4px solid #B8860B;border-radius:8px;padding:0.85rem 1.05rem;font-size:0.85rem;color:#5A4718;line-height:1.85}
-.hostwarn b{color:#3A2E0E}
-.sch-out{display:none;width:100%;margin-top:12px;min-height:120px;font:inherit;font-size:0.85rem;color:var(--text);background:#fff;border:1px solid var(--border);border-radius:6px;padding:0.7rem 0.9rem;line-height:1.7;resize:vertical;box-sizing:border-box}
-@media(max-width:640px){.invite-btns .btn{flex:1}}
-@media(max-width:640px){input.txt{min-width:0;width:100%}.row{flex-direction:column;align-items:stretch}}
+
+/* ===== 直播厅 ===== */
+.hall{margin:0 0 1.2rem;border:1px solid var(--border2);border-radius:12px;overflow:hidden;background:var(--card)}
+.hall-bar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;background:#1E1A12;color:#E8DFC8;padding:0.6rem 1.1rem;font-size:0.84rem}
+.hall-bar .hb-l{display:flex;align-items:center;gap:10px;min-width:0}
+.hall-bar b{letter-spacing:0.05em;font-weight:800}
+.dot{width:9px;height:9px;border-radius:50%;background:#6B6050;flex:none}
+.dot.on{background:var(--live);animation:pulse 1.6s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.35}}
+.hall-bar .hb-r{font-size:0.78rem;opacity:0.8}
+.pill{display:inline-block;font-size:0.7rem;letter-spacing:0.1em;padding:2px 10px;border-radius:20px;border:1px solid #E4A79F;color:#F0C3BC;background:rgba(179,38,30,0.28);margin-left:10px}
+.screen{position:relative;background:#000;aspect-ratio:16/9;width:100%}
+.screen video{display:block;width:100%;height:100%;background:#000}
+.screen .veil{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:1.5rem;background:linear-gradient(160deg,#211C13,#14110B);color:#E8DFC8}
+.veil .vh{font-size:1.15rem;font-weight:800;margin-bottom:0.5rem;color:#F0E7D0}
+.veil .vp{font-size:0.88rem;color:#B5A98D;max-width:460px;line-height:1.8}
+.veil .vnext{margin-top:1rem;font-size:0.85rem;color:#E4C878;border:1px solid rgba(228,200,120,0.4);border-radius:8px;padding:0.6rem 1.1rem;max-width:520px}
+.veil .vbtn{margin-top:1.1rem;font:inherit;font-size:0.85rem;font-weight:700;letter-spacing:0.06em;padding:0.55rem 1.4rem;border-radius:6px;border:1px solid #E4C878;background:transparent;color:#E4C878;cursor:pointer}
+.veil .vbtn:hover{background:rgba(228,200,120,0.14)}
+.spin{width:30px;height:30px;border:2px solid rgba(232,223,200,0.25);border-top-color:#E4C878;border-radius:50%;animation:sp 0.9s linear infinite;margin-bottom:0.9rem}
+@keyframes sp{to{transform:rotate(360deg)}}
+.hall-foot{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding:0.8rem 1.1rem;font-size:0.8rem;color:var(--text2);border-top:1px solid var(--border2);background:var(--card2)}
+.oldlink{background:#FFF6E0;border:1px solid #D9B45B;border-left:4px solid #B8860B;border-radius:8px;padding:0.85rem 1.05rem;font-size:0.85rem;color:#5A4718;line-height:1.85;margin:0 0 1.6rem;display:none}
+.oldlink b{color:#3A2E0E}
+.rep{border-top:1px solid var(--border2)}
+.rep-row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:0.85rem 2px;border-bottom:1px solid var(--border2);flex-wrap:wrap}
+.rep-row .rn{font-weight:800;font-size:1rem}
+.rep-row .rd{font-size:0.78rem;color:var(--muted);margin-top:2px}
+.rep-row .btn{padding:0.5rem 1.2rem;font-size:0.82rem}
+@media(max-width:640px){.rep-row{flex-direction:column;align-items:stretch}.rep-row .btn{width:100%;text-align:center}}
 </style>
 </head>
 <body>
@@ -111,203 +90,115 @@ input.txt.nm{max-width:230px}
 </nav>
 
 <header>
-  <div class="eyebrow">SDE Meeting · Live Classroom</div>
-  <h1>SDE <span>会议</span></h1>
-  <p class="sub">王德生 SDE 讲堂——视频讲课与群讨论两大功能。学生在浏览器里直接进教室听课、提问；讨论区用于课前预告、课后答疑与日常学习交流。</p>
+  <div class="eyebrow">SDE Lecture Hall · Live</div>
+  <h1>SDE <span>讲堂</span></h1>
+  <p class="sub">王德生 SDE 课程直播。开课时本页直接出现画面——不用注册、不用登录、不用装任何软件；听课时的提问与课后答疑都在下方讨论区。</p>
   <div class="chips">
-    <span>📹 视频讲课</span><span>💬 群讨论</span><span>免安装 · 浏览器直连</span>
+    <span>📡 直播讲课</span><span>💬 提问与答疑</span><span>⏪ 回放重看</span><span>浏览器打开即听</span>
   </div>
 </header>
 
 <main>
 
-<!-- 深链横幅：从邀请链接进来时出现 -->
-<div class="rbanner" id="roomBanner" style="display:none">
-  <div class="rb-head">有人邀请你加入会议 <b id="rb-room"></b>
-    <span class="rb-sub">填个名字就能进——不用注册、不用登录、不用装软件。</span></div>
-  <div class="rb-form">
-    <input class="rb-nm" id="rbName" maxlength="20" autocomplete="off" placeholder="你的名字">
-    <button class="btn" onclick="enterInvited()">进入会议</button>
-  </div>
-  <div class="rb-msg" id="rb-msg"></div>
+<!-- 旧邀请链接（?room=…）落地提示：会议室时代的链接已作废，别让人对着空白页发呆 -->
+<div class="oldlink" id="oldlink">
+  <b>你点的是一条旧的会议室邀请链接。</b>SDE 的课已经改成本页直播，不再需要会议号，也不用再填名字——
+  开课时直接往下看画面就行。若此刻显示未开播，说明还没到上课时间。
 </div>
 
-<!-- 身份条：只显示当前名字；名字本身在下面「参加会议」里填 -->
-<div class="meet-auth" id="meet-auth">
-  <div class="ma-row">
-    <span class="ma-icon">👤</span>
-    <div class="ma-body">
-      <div id="ma-out" style="display:none">进入会议将显示为 <b id="ma-name"></b> <a id="ma-signout">换个名字</a></div>
-      <div id="ma-in">参加会议只要两样：<b>你的名字</b>和<b>会议号</b>——在下面「参加会议」里填好，点一下就进视频教室，不用登录、不用装软件。</div>
+<!-- ① 直播厅 -->
+<section class="blk" id="hall" style="margin-top:1rem">
+  <div class="blk-label">直播讲堂 · Live Classroom</div>
+  <h2 style="margin-bottom:1.1rem">今天的课</h2>
+
+  <div class="hall">
+    <div class="hall-bar">
+      <div class="hb-l">
+        <span class="dot" id="lvDot"></span>
+        <b id="lvTitle">正在查询开播状态…</b>
+      </div>
+      <div class="hb-r" id="lvMeta"></div>
+    </div>
+
+    <div class="screen" id="screen">
+      <video id="lvVideo" playsinline controls preload="none" style="display:none"></video>
+      <div class="veil" id="lvVeil">
+        <div class="spin"></div>
+        <div class="vp">正在查询本节课是否开播…</div>
+      </div>
+    </div>
+
+    <div class="hall-foot">
+      <div id="lvFoot">直播画面比现场约慢半分钟——这是为了让画面不卡而刻意留的余量。</div>
+      <div><a href="#talk-anchor">去讨论区提问 ↓</a></div>
     </div>
   </div>
-  <div class="ma-msg" id="ma-msg"></div>
-</div>
 
-<!-- ⓪ 开设会议（主持人） -->
-<section class="blk" id="host">
-  <div class="blk-label">开设会议 · Host a Meeting</div>
-  <h2>开一个新会议</h2>
-  <p class="lead">像 Zoom 一样：点一下就开一个新会议室，拿到会议号和邀请链接发给学生。谁先进谁就是主持人——可一键静音全员、给房间加密码、管理参会者。音视频经 Jitsi 在浏览器间直传，本站不架设、不经手、不录制。</p>
+  <div class="hintline">画面卡住或长时间转圈：先点一下播放器的播放键；仍不行就刷新本页（Ctrl+F5）。手机、平板、电脑都能看，不必装任何东西。</div>
+</section>
 
-  <div class="room-card">
-    <h3>立即开会</h3>
-    <p>马上开一个新房间，生成专属会议号与邀请链接。</p>
-    <div class="row">
-      <button class="btn" onclick="hostNow()">立即开会</button>
-      <input class="txt" id="hostName" maxlength="30" placeholder="或给会议起个名字，如 daoism-lecture">
-      <button class="btn ghost" onclick="hostNamed()">用这个名字开</button>
+<!-- ② 课程预告 -->
+<section class="blk" id="schedule">
+  <div class="blk-label">课程预告 · Schedule</div>
+  <h2>开课预告</h2>
+  <p class="lead">每次开课前，讲师会在这里和讨论区同步发布时间与主题。到点打开本页即可听课，不必做任何准备。</p>
+  <div id="schBox">
+    <div class="room-card">
+      <h3>首讲 · 筹备中</h3>
+      <p>首次直播课的时间与主题正在安排，确定后在此公布，并在下方讨论区置顶预告。可先在讨论区留言你希望听的主题。</p>
     </div>
-    <div class="hintline">起名建议用字母/数字（更好念、更好输）；留空则自动生成会议号。</div>
-    <div class="hostwarn"><b>主持人开课前必看：</b>Jitsi 公共服务规定——房间的<b>第一个人必须先登录</b>才能把会议"开起来"（进房后按提示用 Google / GitHub / Facebook 任一账号登录一次，浏览器会记住）。<br>所以流程是：<b>①</b> 讲师提前 10 分钟进房并登录 → <b>②</b> 再把链接发给学员。顺序反了，学员会停在"等待主持人"的画面上干等。</div>
-  </div>
-
-  <!-- 邀请信息卡（开会后出现） -->
-  <div class="invite" id="invite" style="display:none">
-    <div class="invite-h">会议已开好 · 把链接发给学员和观众</div>
-    <div class="invite-row"><span class="invite-k">会议号</span><b id="inv-room"></b></div>
-    <div class="invite-row"><span class="invite-k">邀请链接</span><a id="inv-link" href="#" target="_blank" rel="noopener"></a></div>
-    <div class="invite-btns">
-      <button class="btn" onclick="enterHosted()">进入会议室（成为主持人）</button>
-      <button class="btn" onclick="shareInvite()">分享 / 发送链接</button>
-      <button class="btn ghost" onclick="copyLink()">复制链接</button>
-      <button class="btn ghost" onclick="copyInvite()">复制邀请文字</button>
-    </div>
-    <div class="hintline">分享或复制后，发到微信、群、邮件都行；学员和观众用浏览器打开链接即进，无需安装。</div>
-    <div class="hintline" id="inv-msg"></div>
-  </div>
-
-  <div class="room-card">
-    <h3>预约会议</h3>
-    <p>先约好时间，把邀请发到讨论区或群里；到点用同一个链接进入即可。</p>
-    <div class="row">
-      <input class="txt" id="schTopic" maxlength="40" placeholder="会议主题，如 SDE 本体论第三讲">
-      <input class="txt" id="schTime" type="datetime-local" style="min-width:210px">
-      <button class="btn ghost" onclick="scheduleMeet()">生成预约邀请</button>
-    </div>
-    <textarea id="schOut" class="sch-out" readonly></textarea>
-    <div class="row" id="schBtns" style="display:none;margin-top:8px"><button class="btn ghost" onclick="copySchedule()">复制预约邀请</button></div>
   </div>
 </section>
 
-<!-- ① 视频讲课 -->
-<section class="blk" id="video">
-  <div class="blk-label">功能一 · Video Lecture</div>
-  <h2>视频教室</h2>
-  <p class="lead">点击后在<b>新标签页</b>打开全屏视频教室——<b>不限时长</b>，支持多人视频、屏幕共享（放 PPT / 讲义，可共享整个电脑屏幕）、电子白板板书、整堂课录像与举手发言。音视频经由 Jitsi Meet 公共服务在浏览器间传输，本站不架设、不经手任何音视频数据。下课关闭教室标签页，即回到本页讨论区。</p>
-
-  <div class="room-card">
-    <h3>教室功能 · 对标 Zoom</h3>
-    <p>Zoom 的常用会议功能这里基本都有，进入教室后在底部工具栏取用：</p>
-    <ul style="margin:.4rem 0 0;padding-left:1.2em;line-height:1.95">
-      <li>多人音视频，宫格 / 演讲者视图（Tile View）切换</li>
-      <li>屏幕共享：整个电脑屏幕或单个窗口（放 PPT / 讲义）</li>
-      <li>电子白板：工具栏「更多 ⋮ → 白板 / Whiteboard」，多人同屏书写</li>
-      <li>录制：底部「录制」——① 云端录制（连一次 Dropbox，整堂课合成一个视频，邮件发下载链接）；② 本地录制（直接下载到本机，免账号）</li>
-      <li>文字聊天（公聊 / 私聊）、举手、表情反应</li>
-      <li>参会者管理：一键全员静音、把学员设为联席主持人</li>
-      <li>分组讨论（Breakout Rooms）、投票（Polls）——在「参会者 / 聊天」面板</li>
-      <li>入会密码与等候室（Lobby）、一键邀请</li>
-      <li>虚拟背景 / 背景虚化、降噪、画质自动+手动调节</li>
-      <li>直播到 YouTube 等、实时字幕（Closed Captions）</li>
-      <li>实名显示：填一次名字，进任何会议自动带上</li>
-    </ul>
-    <div class="hintline">少数 Zoom 项 Jitsi 暂无原生对应：共享屏幕上的实时标注（可用白板替代）、同声传译分轨、美颜；录制按钮仅主持人可见。</div>
-  </div>
-
-  <div class="room-card">
-    <h3>会议列表</h3>
-    <p>点「进入教室」即在新标签页打开，自动带上你填的名字，不限时长。开课时间以下方讨论区预告为准。</p>
-    <div class="mlist">
-      <div class="mrow"><div class="mname">SDE 大教室<span class="mtag">讲课主会场</span></div><div class="mbtns"><button class="btn" onclick="joinRoom('SDE-Universes-Classroom')">进入教室</button></div></div>
-      <div class="mrow"><div class="mname">SDE 答疑室<span class="mtag">课后提问 · 讲师值守</span></div><div class="mbtns"><button class="btn" onclick="joinRoom('SDE-QA-Room')">进入教室</button></div></div>
-      <div class="mrow"><div class="mname">SDE 讨论室 一<span class="mtag">小组学习</span></div><div class="mbtns"><button class="btn" onclick="joinRoom('SDE-Group-1')">进入教室</button></div></div>
-      <div class="mrow"><div class="mname">SDE 讨论室 二<span class="mtag">小组学习</span></div><div class="mbtns"><button class="btn" onclick="joinRoom('SDE-Group-2')">进入教室</button></div></div>
+<!-- ③ 回放 -->
+<section class="blk" id="replay">
+  <div class="blk-label">回放专区 · Replays</div>
+  <h2>讲课回放</h2>
+  <p class="lead">每堂课结束后，完整录像会挂在这里，随时可以重看。缺一次课不等于丢一次课。</p>
+  <div id="repBox">
+    <div class="room-card" style="border-top-color:var(--border);opacity:0.75">
+      <h3>筹备中</h3>
+      <p>暂无回放。第一次直播课结束后开放。</p>
     </div>
   </div>
+</section>
 
-  <div class="room-card" id="joincard">
-    <h3>参加会议</h3>
-    <p>填两样就进：<b>你的名字</b>和<b>会议号</b>。教室名（可含中文、字母、数字）进对应视频教室；数字号（9–11 位）自动走 Zoom。名字本机会记住，下次只填会议号。</p>
-    <div class="row">
-      <input class="txt nm" id="joinName" list="meet-roster" maxlength="20" autocomplete="off" placeholder="你的名字（学员名字）">
-      <datalist id="meet-roster"></datalist>
-      <input class="txt" id="meetCode" maxlength="60" placeholder="会议号，如 SDE-Group-3 或 123 4567 8901">
-      <button class="btn" onclick="joinByCode()">进入会议</button>
-    </div>
-    <div class="ma-msg" id="join-msg"></div>
-    <div class="row" style="margin-top:10px">
-      <input class="txt" id="zoomLink" placeholder="或粘贴 Zoom 会议链接，如 https://zoom.us/j/…">
-      <button class="btn ghost" onclick="openZoom()">按链接加入</button>
-    </div>
-    <div class="hintline">Zoom 会议如设有密码，加入时在 Zoom 提示框里输入即可。</div>
-  </div>
-
-  <div class="room-card">
-    <h3>SDE 助教 · 听课答疑智能体 <span class="mtag">新</span></h3>
-    <p>你的随堂 AI 助教：上课时开着它，实时把课堂内容转写成文字；随时提问，它基于《SDE本体论》和课堂记录回答、总结要点、出复习题。入门大白话 / 学术术语双档可切换。</p>
-    <div class="row">
-      <a class="btn" href="/meeting/sde-assistant/">打开 SDE 助教</a>
-    </div>
-    <div class="hintline">建议并排开两个标签页：教室一个、SDE 助教一个。使用需自备 DeepSeek 或智谱 Key（与金点子发生器同一套，浏览器直连、本站不经手）。</div>
-  </div>
-
-  <div class="notes" style="margin-top:1.4rem">
-    <b>使用须知</b>
+<!-- ④ 听课须知 -->
+<section class="blk" id="guide">
+  <div class="blk-label">听课须知 · For Students</div>
+  <h2>怎么听课</h2>
+  <div class="notes">
     <ol>
-      <li><b>不用注册、不用加入社区。</b>收到链接后用浏览器打开，填上你的名字，点「进入会议」就进教室了（名字本机会记住，下次自动带出）。</li>
-      <li>如果画面显示"等待主持人 / Waiting for a moderator"，说明讲师还没进房——不用退出，等着就行，讲师一进来画面自动接通。</li>
-      <li>首次进入请允许浏览器使用摄像头与麦克风；听课时建议先静音，提问再开麦。</li><li><b>看不清时：</b>点教室工具栏「全屏」，或双击讲师画面把它设为焦点，都能拿到最清晰的画面。画质会随你的网络自动调整——网络好自动上到高清，网络弱会先保证流畅不卡。</li>
-      <li><b>白板、PPT 与屏幕：</b>讲师放 PPT/讲义时点底部工具栏「屏幕共享」——浏览器弹窗里可选「整个屏幕 / Entire Screen」把整台电脑的画面都展示出来，或只选某个 PowerPoint 窗口；需要板书时点工具栏「更多 ⋮ → 白板 / Whiteboard」打开电子白板，师生可在同一块白板上一起书写、画图。讲师若开启录制，你会看到「本次会议正在录制」的提示。</li>
-      <li>开课前请在下方讨论区查看时间预告；上课中的提问也可以直接发在讨论区，讲师会集中回应。</li>
-      <li>音视频服务由第三方（Jitsi / Zoom）提供并遵循其服务条款；本站不录制、不存储任何音视频内容。</li>
+      <li><b>什么都不用装。</b>到点用手机或电脑打开本页就行——不用注册账号、不用下载软件、不用加任何群。</li>
+      <li><b>画面比现场慢约半分钟。</b>这是刻意换来的：宁可慢一点，也不要一卡一卡。所以本课不设举手上麦。</li>
+      <li><b>提问走讨论区。</b>课中随时把问题发到下方讨论区，讲师会在课上或课后回答；文字提问还有个好处——留得下来，别的同学也看得见。</li>
+      <li><b>卡了怎么办。</b>先点播放键；再不行刷新本页。网络不好时可在播放器里把画质调低。</li>
+      <li><b>错过了不要紧。</b>下课后完整录像会挂到上面的「回放专区」。</li>
     </ol>
   </div>
 </section>
 
-<!-- ①b 课程预告与回放 -->
-<section class="blk" id="schedule">
-  <div class="blk-label">课程预告 · Schedule</div>
-  <h2>开课预告</h2>
-  <p class="lead">每次开课前，讲师会在这里和讨论区同步发布时间与主题。到点进入上方「SDE 大教室」即可。</p>
-  <!-- 新预告添加在此行之下（最新一条放最上面） -->
-  <div class="room-card">
-    <h3>首讲 · 筹备中</h3>
-    <p>首次讲课的时间与主题正在安排，确定后在此公布，并在下方讨论区置顶预告。可先在讨论区留言你希望听的主题。</p>
-  </div>
-</section>
-
-<section class="blk" id="replay">
-  <div class="blk-label">回放专区 · Replays</div>
-  <h2>讲课回放</h2>
-  <p class="lead">课程结束后，如有录制，回放链接将发布在这里。</p>
-  <div class="room-card" style="border-top-color:var(--border);opacity:0.75">
-    <h3>筹备中</h3>
-    <p style="margin-bottom:0">暂无回放。第一次讲课结束后开放。</p>
-  </div>
-</section>
-
+<!-- ⑤ 讲师开课流程 -->
 <section class="blk" id="host-guide">
   <div class="blk-label">讲师须知 · For The Lecturer</div>
   <h2>开课流程（讲师用）</h2>
   <div class="notes">
     <ol>
-      <li><b>课前：</b>在「开课预告」和讨论区发布时间与主题（讨论区发言署名请固定，便于学生辨认）。</li>
-      <li><b>开房：</b>提前十分钟点「进入 SDE 大教室」，先进者即成为主持人；学生填各自名字＋会议号即可进入。</li>
-      <li><b>课中：</b>用底部工具栏开启屏幕共享放讲义；人多嘈杂时可在参会者面板里一键全员静音，学生举手再开麦。讲义/PPT 用「屏幕共享」分享：浏览器弹窗里选「整个屏幕 / Entire Screen」可把整台电脑画面全展示给学生（首次在 macOS 需到系统「隐私与安全性 → 屏幕录制」给浏览器授权一次），只想给单个窗口就选对应 PPT 窗口。文字按原始分辨率传输最清晰；如需更高画质，进「设置 → 视频质量」选到最高档。</li>
-      <li><b>板书：</b>要在课上手写讲解，点工具栏「更多 ⋮ → 白板 / Whiteboard」打开电子白板，师生同屏共写；白板与屏幕共享可随时切换，不冲突。</li>
-      <li><b>录课（录整堂课）：</b>点底部工具栏「录制」按钮，两种方式任选：<b>①云端录制（推荐）</b>——授权连接一次 Dropbox，系统把讲师画面＋共享的 PPT/屏幕＋声音合成为一个视频录下，下课后自动存进你的 Dropbox 并邮件发来下载链接；<b>②本地录制</b>——无需任何账号，直接录到本机并下载文件。公共服务的云端录制偶尔因排队占满而暂不可用，此时用本地录制兜底。开始录制后全体学员会收到录制提示，录像自行妥善保管。</li>
-      <li><b>安全：</b>如遇陌生人扰乱，可在教室安全选项里给房间加密码，并把密码只发在讨论区。</li>
-      <li><b>改用 Zoom：</b>在自己的 Zoom 客户端开会后，把会议链接发到讨论区，学生走上方「Zoom 通道」加入。</li>
+      <li><b>课前：</b>在讨论区发预告（时间＋主题）。本页顶部的状态与「开课预告」卡片都由直播服务器上的 <code>status.json</code> 控制，改一处两处都变。</li>
+      <li><b>开播：</b>电脑上打开 OBS，场景里放好摄像头与 PPT／屏幕，点「开始推流」。推流地址与串流密钥只存在于直播服务器上，不要外发。</li>
+      <li><b>讲课：</b>在 OBS 里切场景，即可在「讲师画面」「PPT 全屏」「板书」之间来回换；学生那边是一路连续画面，不会中断。</li>
+      <li><b>看提问：</b>另开一个窗口停在本页讨论区，学生的问题会实时出现在那里。</li>
+      <li><b>下课：</b>OBS 点「停止推流」，本页自动转回未开播态；整堂录像由服务器合成后挂进回放专区。</li>
+      <li><b>容量：</b>这是一讲多听的直播，不是会议室——<b>听课人数没有上限</b>，100 人和 500 人对讲师端完全一样。</li>
     </ol>
   </div>
 </section>
 
-<!-- ② 群讨论 -->
+<!-- ⑥ 群讨论 -->
 <section class="blk" id="talk-anchor">
   <div class="blk-label">功能二 · Group Discussion</div>
   <h2>会议讨论区</h2>
-  <p class="lead">课程预告、课后答疑、学习心得与同学互助都发在这里。起个名字即可发言，支持一级回复。</p>
+  <p class="lead">课中提问、课后答疑、学习心得与同学互助都发在这里。起个名字即可发言，支持一级回复。</p>
 </section>
 
 <!-- 读者讨论区+阅读计数 · sde-talk v3（社区实名） -->
@@ -315,216 +206,231 @@ input.txt.nm{max-width:230px}
 </main>
 
 <footer>
-  <p>SDE 会议 · SDE Universes</p>
+  <p>SDE 讲堂 · SDE Universes</p>
   <p style="margin-top:6px">© 2026 Demai International Pte. Ltd. · <a href="/browse/">sdeuniverses.com</a></p>
 </footer>
 
 <script>
-function slugOk(s){return /^[A-Za-z0-9-]{1,40}$/.test(s)}
-// 会议号唯一规范化：固定大写 SDE- 前缀 + 小写主体，字符集/大小写/长度全站统一。
-// Jitsi 房间名区分大小写，四条路径（开会/邀请深链/列表/手输）都必须经过这里，否则会进错房。
-function canonicalRoom(raw){
-  var s=(raw||"").trim();
-  if(!s)return "";
-  s=s.replace(/\s+/g,"-").replace(/[^A-Za-z0-9一-鿿-]/g,"");
-  s=s.replace(/^(sde-)+/i,"").replace(/-+/g,"-").replace(/^-+|-+$/g,"");
-  s=s.toLowerCase().slice(0,50);
-  return s?("SDE-"+s):"";
+/* ===========================================================================
+   SDE 讲堂 · 直播厅前端
+   ---------------------------------------------------------------------------
+   数据面：三份文件全在 R2 桶的 live/ 前缀下，由直播服务器写、本页只读。
+     live/status.json   开播状态与本节课标题（推流开始/结束时改写）
+     live/stream.m3u8   HLS 播放列表（推流时每几秒重写一次）
+     live/replays.json  回放清单（下课后追加一条）
+   Worker 的 /live/* 路由负责从桶里取，并给分片挂不可变缓存（见 src/worker.js）。
+
+   为什么是 HLS 而不是 WebRTC／会议室：这是一讲多听，不是对等会议。
+   用 HLS 才能同时做到「听课人数没有上限」和「学生什么都不用装」，
+   代价是约半分钟延迟——对讲课这是划算的交换。
+   =========================================================================== */
+var LIVE = {
+  base: '/live/',
+  hls: '/assets/lib/hls.min.js?v=1520',
+  poll: 15000,          // 未开播时每 15 秒问一次
+  pollLive: 60000       // 已开播就拉长，别白耗手机的电
+};
+
+var _hlsObj = null, _hlsLoading = null, _timer = null, _state = '', _retry = 0;
+
+function $(id){ return document.getElementById(id); }
+function esc(s){ return String(s == null ? '' : s).replace(/[&<>"]/g, function(c){
+  return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]; }); }
+
+/* 一次性把 hls.js 拉下来；失败不抛，交给调用方回落到浏览器原生播放。
+   ⚠ 刻意做成按需加载：未开播时这 400KB 一个字节都不下。 */
+function loadHls(){
+  if (window.Hls) return Promise.resolve(true);
+  if (_hlsLoading) return _hlsLoading;
+  _hlsLoading = new Promise(function(res){
+    var s = document.createElement('script');
+    s.src = LIVE.hls;
+    s.onload = function(){ res(!!window.Hls); };
+    s.onerror = function(){ _hlsLoading = null; res(false); };
+    document.head.appendChild(s);
+  });
+  return _hlsLoading;
 }
-function roomUrl(r){var cfg=["config.prejoinConfig.enabled=true","config.resolution=720","config.constraints.video.height.ideal=720","config.constraints.video.height.max=720","config.constraints.video.height.min=180","config.constraints.video.frameRate.ideal=30","config.constraints.video.frameRate.max=30","config.constraints.video.frameRate.min=15","config.desktopSharingFrameRate.min=5","config.desktopSharingFrameRate.max=30","config.disableSimulcast=false","config.whiteboard.enabled=true"];if(window.SDE_MEET_NAME)cfg.push("userInfo.displayName=%22"+encodeURIComponent(window.SDE_MEET_NAME)+"%22");return "https://meet.jit.si/"+encodeURIComponent(r)+"#"+cfg.join("&")}
-function meetNeedLogin(){if(window.meetNeedName)window.meetNeedName();}
-// ===== 进入教室：新标签页直接打开 meet.jit.si（不限时长、全功能原生；嵌入方式受 8x8 的 5 分钟限制，已弃用）=====
-function joinRoom(r){
-  r=canonicalRoom(r);
-  if(!r){alert("会议号无效");return}
-  var nm=window.SDE_MEET_REMEMBER?window.SDE_MEET_REMEMBER(window.SDE_MEET_PICK()):window.SDE_MEET_NAME;
-  if(!nm){if(window.meetNeedName)window.meetNeedName();return}
-  window.open(roomUrl(r),"_blank","noopener");
-}
-function joinByCode(){
-  var nm=window.SDE_MEET_PICK?window.SDE_MEET_PICK():"";
-  if(!nm){if(window.meetNeedName)window.meetNeedName();return}
-  var v=(document.getElementById("meetCode").value||"").trim();
-  if(!v&&window.__invitedRoom)v=window.__invitedRoom;   // 从邀请链接进来的：号框留空也照样进那个房间
-  if(!v){if(window.meetNeedCode)window.meetNeedCode();return}
-  window.SDE_MEET_REMEMBER(nm);
-  // 明确的 SDE 教室号（以 SDE- 开头）一律进视频教室，即使主体是数字，避免被误判为 Zoom
-  if(!/^sde-/i.test(v)){
-    var num=v.replace(/[\s-]/g,"");
-    if(/^\d{9,11}$/.test(num)){window.open("https://zoom.us/j/"+num,"_blank","noopener");return}
+
+/* 遮罩三态：loading / off / play。play 时把遮罩收掉、露出 video。 */
+function veil(kind, head, msg, next, btn){
+  var v = $('lvVeil'), vid = $('lvVideo');
+  if (!v || !vid) return;
+  if (kind === 'play'){ v.style.display = 'none'; vid.style.display = 'block'; return; }
+  vid.style.display = 'none';
+  v.style.display = 'flex';
+  var h = '';
+  if (kind === 'loading') h += '<div class="spin"></div>';
+  if (head) h += '<div class="vh">' + esc(head) + '</div>';
+  if (msg)  h += '<div class="vp">' + esc(msg) + '</div>';
+  if (next) h += '<div class="vnext">' + esc(next) + '</div>';
+  if (btn)  h += '<button class="vbtn" id="lvBtn">' + esc(btn) + '</button>';
+  v.innerHTML = h;
+  if (btn){
+    var b = $('lvBtn');
+    if (b) b.onclick = function(){ _retry = 0; tick(true); };
   }
-  var room=canonicalRoom(v);
-  if(!room){if(window.meetSay)window.meetSay("会议号是 9–11 位数字（Zoom），或教室名（可含中文、字母、数字）。",1);return}
-  joinRoom(room);
 }
-function openZoom(){
-  var v=(document.getElementById("zoomLink").value||"").trim();
-  if(!/^https:\/\/([a-z0-9-]+\.)*zoom\.(us|com)\//i.test(v)){alert("请粘贴以 https://zoom.us/ 或 https://…zoom.us/ 开头的会议链接");return}
-  window.open(v,"_blank","noopener");
+
+function setBar(live, title, meta){
+  var d = $('lvDot'), t = $('lvTitle'), m = $('lvMeta');
+  if (d) d.className = 'dot' + (live ? ' on' : '');
+  if (t) t.innerHTML = esc(title) + (live ? '<span class="pill">直播中</span>' : '');
+  if (m) m.textContent = meta || '';
 }
-// ===== 开设会议（主持人）=====
-var HOSTED_ROOM="";
-function genRoom(){var A="abcdefghjkmnpqrstuvwxyz23456789",s="";for(var i=0;i<6;i++)s+=A[Math.floor(Math.random()*A.length)];return "SDE-"+s;}
-function inviteUrl(room){return location.origin+"/meeting/?room="+encodeURIComponent(room);}
-function showInvite(room){
-  HOSTED_ROOM=room;
-  document.getElementById("inv-room").textContent=room;
-  var u=inviteUrl(room),a=document.getElementById("inv-link");
-  a.textContent=u;a.href=u;
-  document.getElementById("inv-msg").textContent="";
-  var card=document.getElementById("invite");card.style.display="block";
-  card.scrollIntoView({behavior:"smooth",block:"center"});
-}
-function hostNow(){showInvite(genRoom());}
-function hostNamed(){
-  var v=(document.getElementById("hostName").value||"").trim();
-  if(!v){hostNow();return;}
-  var room=canonicalRoom(v);
-  if(!room){hostNow();return;}
-  showInvite(room);
-}
-function enterHosted(){if(HOSTED_ROOM)joinRoom(HOSTED_ROOM);}
-function fallbackCopy(t,msgEl){
-  var ta=document.createElement("textarea");ta.value=t;ta.style.position="fixed";ta.style.opacity="0";document.body.appendChild(ta);ta.focus();ta.select();
-  try{document.execCommand("copy");if(msgEl)msgEl.textContent="已复制。";}catch(e){if(msgEl)msgEl.textContent="复制失败，请手动选中复制。";}
-  document.body.removeChild(ta);
-}
-function copyText(t,msgEl){
-  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(function(){if(msgEl)msgEl.textContent="已复制。";},function(){fallbackCopy(t,msgEl);});}
-  else fallbackCopy(t,msgEl);
-}
-function copyLink(){copyText(inviteUrl(HOSTED_ROOM),document.getElementById("inv-msg"));}
-function copyInvite(){
-  var u=inviteUrl(HOSTED_ROOM);
-  var t="【SDE 会议邀请】\n会议号："+HOSTED_ROOM+"\n进入链接："+u+"\n用浏览器打开链接即可，无需安装。首次进入请允许摄像头与麦克风。";
-  copyText(t,document.getElementById("inv-msg"));
-}
-function shareInvite(){
-  var u=inviteUrl(HOSTED_ROOM);
-  var text="【SDE 会议邀请】\n会议号："+HOSTED_ROOM+"\n进入链接："+u+"\n用浏览器打开链接即可，无需安装。首次进入请允许摄像头与麦克风。";
-  if(navigator.share){navigator.share({title:"SDE 会议邀请",text:"SDE 会议邀请 · 会议号 "+HOSTED_ROOM+"（用浏览器打开链接即进，无需安装）",url:u}).catch(function(){});return;}
-  var m=document.getElementById("inv-msg");
-  var done=function(){if(m)m.textContent="此设备不支持一键发送——已复制邀请（含链接），粘贴到微信/群/邮件发送即可。";};
-  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(done,function(){fallbackCopy(text,null);done();});}
-  else{fallbackCopy(text,null);done();}
-}
-function scheduleMeet(){
-  var topic=(document.getElementById("schTopic").value||"").trim()||"SDE 会议";
-  var when=document.getElementById("schTime").value;
-  var room=genRoom(),u=inviteUrl(room);
-  var whenStr=when?when.replace("T"," "):"（时间待定）";
-  var t="【SDE 会议预约】\n主题："+topic+"\n时间："+whenStr+"\n会议号："+room+"\n进入链接："+u+"\n到点用浏览器打开链接即可，无需安装。";
-  var out=document.getElementById("schOut");out.value=t;out.style.display="block";
-  document.getElementById("schBtns").style.display="flex";
-}
-function copySchedule(){copyText(document.getElementById("schOut").value,null);var b=document.querySelector("#schBtns button");if(b){var o=b.textContent;b.textContent="已复制";setTimeout(function(){b.textContent=o;},1500);}}
-// ===== 邀请深链：?room= 进来时提示进入 =====
-function rbTyped(){var f=document.getElementById("rbName");return f?(f.value||"").trim().slice(0,20):"";}
-function rbSay(t){var m=document.getElementById("rb-msg");if(m)m.textContent=t||"";}
-function enterInvited(){
-  if(!window.__invitedRoom)return;
-  var nm=rbTyped()||(window.SDE_MEET_PICK?window.SDE_MEET_PICK():"");
-  if(!nm){rbSay("先填一下你的名字——会议里就用它显示。");var f=document.getElementById("rbName");if(f)try{f.focus()}catch(e){}return;}
-  if(window.SDE_MEET_REMEMBER)window.SDE_MEET_REMEMBER(nm);
-  rbSay("");
-  joinRoom(window.__invitedRoom);
-}
-(function(){try{
-  var rp=new URLSearchParams(location.search).get("room");
-  var rpRoom=rp?canonicalRoom(rp):"";
-  if(rpRoom){
-    window.__invitedRoom=rpRoom;
-    document.getElementById("rb-room").textContent=rpRoom;
-    document.getElementById("roomBanner").style.display="flex";
-    var mc=document.getElementById("meetCode");
-    if(mc&&!(mc.value||"").trim())mc.value=rpRoom;   // 两条路都能进：横幅进 或 下面「参加会议」进
-    var rf=document.getElementById("rbName");
-    if(rf){
-      var prev="";try{prev=String(localStorage.getItem("sde_meet_name")||"")}catch(e){}
-      if(prev)rf.value=prev.slice(0,20);
-      rf.addEventListener("keydown",function(e){if(e.key==="Enter")enterInvited()});
+
+/* 开播：把播放器接到 m3u8 上。
+   ⚠ 下面三个参数是这套方案能不能在跨境网络下看住的关键，别按「低延迟」的直觉去调：
+     liveSyncDurationCount 6   播放点退到直播沿后面 6 个分片，网络抖动全被这段缓冲吃掉
+     maxBufferLength 60        允许提前缓冲一分钟，短暂断流观众根本察觉不到
+     lowLatencyMode false      明确关掉低延迟模式——我们要的是稳，不是快 */
+function play(playlist){
+  var vid = $('lvVideo');
+  var src = LIVE.base + (playlist || 'stream.m3u8');
+  if (_state === 'playing' && _hlsObj) return;
+
+  return loadHls().then(function(ok){
+    if (ok && window.Hls && window.Hls.isSupported()){
+      if (_hlsObj){ try { _hlsObj.destroy(); } catch(e){} _hlsObj = null; }
+      _hlsObj = new window.Hls({
+        lowLatencyMode: false,
+        liveSyncDurationCount: 6,
+        liveMaxLatencyDurationCount: 30,
+        maxBufferLength: 60,
+        maxMaxBufferLength: 120,
+        manifestLoadingRetryDelay: 2000,
+        manifestLoadingMaxRetry: 6,
+        levelLoadingMaxRetry: 8,
+        fragLoadingMaxRetry: 8
+      });
+      _hlsObj.on(window.Hls.Events.ERROR, function(_e, data){
+        if (!data || !data.fatal) return;
+        // 致命错误分两类：网络的可以重来，媒体的可以就地修；三次都救不回才认输，
+        // 交回轮询去等下一次开播——不要把页面锁死在错误态。
+        if (data.type === window.Hls.ErrorTypes.NETWORK_ERROR && _retry < 3){
+          _retry++; try { _hlsObj.startLoad(); } catch(e){}
+        } else if (data.type === window.Hls.ErrorTypes.MEDIA_ERROR && _retry < 3){
+          _retry++; try { _hlsObj.recoverMediaError(); } catch(e){}
+        } else {
+          try { _hlsObj.destroy(); } catch(e){}
+          _hlsObj = null; _state = '';
+          veil('off', '画面断了', '直播信号中断，正在等待恢复。可以点下面的按钮手动重连，或稍后刷新本页。', '', '重新连接');
+        }
+      });
+      _hlsObj.loadSource(src);
+      _hlsObj.attachMedia(vid);
+      veil('play');
+      _state = 'playing';
+      try { vid.play(); } catch(e){}
+      return;
     }
-  }
-}catch(e){}})();
-// ===== 身份：一个名字就够 =====
-// 参加会议＝名字 ＋ 会议号，本页不设登录门（社区 /sde-wechat/ 与文章讨论区的名字+密码那道门不受影响）。
-// 名字记在 localStorage sde_meet_name；若此人已在社区或讨论区登录过（sde_gauth / sde_talk_id），默认带出那个名字。
-(function(){
-function el(id){return document.getElementById(id)}
-var NKEY="sde_meet_name",SKEY="sde_gauth",LKEY="sde_talk_id";
-window.SDE_MEET_NAME="";
-function jget(store,k){try{return JSON.parse(store.getItem(k)||"null")}catch(e){return null}}
-function alive(o){return !!(o&&o.cred&&o.exp>Date.now())}
-function communityName(){var s=jget(sessionStorage,SKEY);if(alive(s)&&s.name)return s.name;var l=jget(localStorage,LKEY);if(alive(l)&&l.name)return l.name;return""}
-function remembered(){try{return String(localStorage.getItem(NKEY)||"").slice(0,20)}catch(e){return ""}}
-function typed(){var f=el("joinName");return f?(f.value||"").trim().slice(0,20):""}
-function paint(){
-  var nm=window.SDE_MEET_NAME||"",o=el("ma-out"),i=el("ma-in"),n=el("ma-name");
-  if(nm){if(n)n.textContent=nm;if(o)o.style.display="block";if(i)i.style.display="none";}
-  else{if(o)o.style.display="none";if(i)i.style.display="block";}
+    // Safari／iOS 原生就会放 HLS，不需要 hls.js；这也是 hls.js 下不来时的兜底。
+    if (vid.canPlayType && vid.canPlayType('application/vnd.apple.mpegurl')){
+      vid.src = src;
+      veil('play');
+      _state = 'playing';
+      try { vid.play(); } catch(e){}
+      return;
+    }
+    veil('off', '这个浏览器放不了直播', '请换用 Chrome、Edge、Safari 或手机自带浏览器打开本页。');
+  });
 }
-function jsay(t,bad){var m=el("join-msg");if(m){m.textContent=t||"";m.className="ma-msg"+(bad?" bad":"")}}
-window.meetSay=jsay;
-// 取名字：先看输入框，再看本机记住的，再看社区身份
-function typedRb(){var f=el("rbName");return f?(f.value||"").trim().slice(0,20):""}
-window.SDE_MEET_PICK=function(){return typed()||typedRb()||remembered()||communityName()};
-window.SDE_MEET_REMEMBER=function(nm){
-  nm=String(nm||"").trim().slice(0,20);
-  if(!nm)return "";
-  try{localStorage.setItem(NKEY,nm)}catch(e){}
-  window.SDE_MEET_NAME=nm;
-  var f=el("joinName");if(f&&(f.value||"").trim()!==nm)f.value=nm;
-  paint();jsay("");
-  return nm;
-};
-window.meetNeedName=function(){
-  var bn=el("roomBanner");
-  if(bn&&bn.style.display!=="none"){
-    if(window.rbSay)window.rbSay("先填一下你的名字——会议里就用它显示。");
-    var rf=el("rbName");if(rf){try{rf.focus()}catch(e){}}
-    return;
-  }
-  jsay("先填一下你的名字，会议里会用它显示。",1);
-  var f=el("joinName");if(f)try{f.focus()}catch(e){}
-  var c=el("joincard");if(c){c.classList.remove("maflash");void c.offsetWidth;c.classList.add("maflash");try{c.scrollIntoView({behavior:"smooth",block:"center"})}catch(e){}}
-};
-window.meetNeedCode=function(){jsay("再填一下会议号。",1);var f=el("meetCode");if(f)try{f.focus()}catch(e){}};
-var so=el("ma-signout");
-if(so)so.onclick=function(){
-  try{localStorage.removeItem(NKEY)}catch(e){}
-  window.SDE_MEET_NAME="";
-  var f=el("joinName");if(f){f.value="";try{f.focus()}catch(e){}}
-  paint();jsay("换个名字：填好后再点「进入会议」。");
-};
-var rosterLoaded=false;
-function loadRoster(){
-  if(rosterLoaded)return;rosterLoaded=true;
-  fetch("/students/roster.json").then(function(r){return r.json()}).then(function(j){
-    var dl=el("meet-roster");if(!dl)return;
-    dl.innerHTML=((j&&j.students)||[]).map(function(x){return x&&x.name?'<option value="'+String(x.name).replace(/"/g,"&quot;")+'">':""}).join("");
-  }).catch(function(){});
+
+function stopPlay(){
+  if (_hlsObj){ try { _hlsObj.destroy(); } catch(e){} _hlsObj = null; }
+  var vid = $('lvVideo');
+  if (vid){ try { vid.pause(); } catch(e){} vid.removeAttribute('src'); }
+  _state = '';
 }
-(function boot(){
-  var f=el("joinName"),c=el("meetCode");
-  var init=remembered()||communityName();
-  if(f&&!(f.value||"").trim()&&init)f.value=init;
-  window.SDE_MEET_NAME=typed()||init||"";
-  paint();
-  if(f){
-    f.addEventListener("input",function(){window.SDE_MEET_NAME=typed();paint()});
-    f.addEventListener("focus",loadRoster);
-    f.addEventListener("keydown",function(e){if(e.key!=="Enter")return;if(c&&!(c.value||"").trim()){try{c.focus()}catch(e2){}}else joinByCode()});
+
+/* 预告卡片：status.json 里带 next 就用它，没带就保留页面里写死的「筹备中」。 */
+function renderNext(next){
+  var box = $('schBox');
+  if (!box || !next || !next.title) return;
+  box.innerHTML = '<div class="room-card"><h3>' + esc(next.title) + '</h3><p>' +
+    (next.at ? '<b>' + esc(next.at) + '</b><br>' : '') + esc(next.note || '') + '</p></div>';
+}
+
+function renderReplays(items){
+  var box = $('repBox');
+  if (!box || !items || !items.length) return;
+  var h = '<div class="rep">', n = 0;
+  for (var i = 0; i < items.length; i++){
+    var r = items[i] || {};
+    if (!r.url || !r.title) continue;
+    n++;
+    h += '<div class="rep-row"><div><div class="rn">' + esc(r.title) + '</div><div class="rd">' +
+         esc(r.date || '') + (r.note ? ' · ' + esc(r.note) : '') +
+         '</div></div><a class="btn ghost" href="' + esc(r.url) + '" target="_blank" rel="noopener">重看</a></div>';
   }
-  if(c)c.addEventListener("keydown",function(e){if(e.key==="Enter")joinByCode()});
-})();
-})();
+  h += '</div>';
+  if (n) box.innerHTML = h;
+}
+
+/* 主循环：问一次状态，据此切三态，并按当前态决定下次再问的间隔。 */
+function tick(force){
+  return fetch(LIVE.base + 'status.json?t=' + Date.now(), { cache: 'no-store' })
+    .then(function(r){ return r.json(); })
+    .catch(function(){ return null; })
+    .then(function(st){
+      st = st || {};
+      renderNext(st.next);
+      if (st.live){
+        setBar(true, st.title || 'SDE 讲堂', st.startedAt ? ('开播 ' + st.startedAt) : '');
+        if (_state !== 'playing' || force) play(st.playlist);
+        schedule(LIVE.pollLive);
+      } else {
+        if (_state === 'playing') stopPlay();
+        setBar(false, st.title || '当前没有课在直播', '');
+        veil('off', '现在没有课在直播',
+             '开课时本页会自动出现画面，不用刷新、不用做任何设置。到点打开这一页就行。',
+             (st.next && st.next.title) ? ('下一课：' + st.next.title + (st.next.at ? '　' + st.next.at : '')) : '');
+        schedule(LIVE.poll);
+      }
+      return st;
+    });
+}
+
+function schedule(ms){
+  if (_timer) clearTimeout(_timer);
+  // 页面切到后台就不必频繁去问，省手机的电；切回前台会立刻补问一次（见下面的 visibilitychange）。
+  _timer = setTimeout(function(){ if (!document.hidden) tick(); else schedule(ms); }, ms);
+}
+
+function loadReplays(){
+  return fetch(LIVE.base + 'replays.json?t=' + Date.now(), { cache: 'no-store' })
+    .then(function(r){ return r.json(); })
+    .then(function(d){ renderReplays(d && d.items); })
+    .catch(function(){});
+}
+
+function boot(){
+  // 会议室时代的邀请链接（?room=SDE-xxx）现在没有去处，给一句解释，别让人对着空页发呆。
+  try {
+    var q = new URLSearchParams(location.search);
+    if (q.get('room') || q.get('meet')){
+      var o = $('oldlink');
+      if (o) o.style.display = 'block';
+    }
+  } catch(e){}
+  loadReplays();
+  tick();
+}
+
+document.addEventListener('visibilitychange', function(){
+  if (!document.hidden && _state !== 'playing') tick();
+});
+
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
+else boot();
+
+// 给模拟器用的把手（脱机 DOM 桩里按名字调，不必真起网络）
+window.SDE_LIVE = { tick: tick, play: play, stopPlay: stopPlay, renderReplays: renderReplays,
+                    renderNext: renderNext, veil: veil, setBar: setBar,
+                    state: function(){ return _state; } };
 </script>
 
-
-<script>window.WDS_READ={selector:".wrap"};</script>
-<script src="/taste/wds-companion/wds-read.js?v=20260802b" defer></script>
-
-<script src="/wds-mode.js?v=20260802b" defer></script>
 <script src="/assets/sde-talk.js?v=20260802b" data-slug="meeting/hall" data-pv="1" data-pv-label="本页已被访问" data-title="会议讨论区" defer></script>
+
 </body>
 </html>

@@ -8101,6 +8101,70 @@ export default {
       } catch (e) { /* R2 出任何岔子都不许让读者看不到文章：直接落到下面的 ASSETS */ }
     }
     // ===== R2_IDX：搜索索引数据从 R2 供给，URL 一个字都不改 =====
+    // ===== R2_LIVE：SDE 讲堂直播（HLS）从桶里供给，同源出，不需要 CORS =====
+    // 为什么走 Worker 而不是 R2 自定义域：自定义域要在 Dashboard 配 CORS 才能被 hls.js 取，
+    // 走同源就一道手续都不用；代价是每个分片一次 Worker 请求（见下面第 ③ 条的量级估算）。
+    // 三类键、三种缓存，**分错了直播就废**：
+    // ① *.m3u8 / status.json —— **每几秒就变**，绝不能进边缘缓存，也不能给浏览器缓存。
+    //    播放列表拿到旧的 = 学员永远停在几分钟前那一段，而且不会自愈（这是 HLS 最经典的坑）。
+    // ② *.ts / *.m4s / init.mp4 —— 分片一旦写出**永不改动**，所以 immutable + 一年 + 进边缘缓存。
+    //    这层是整套方案的命根子：100 个学员看同一段，回桶只有第一次，其余全从边缘出。
+    // ③ 量级：2 小时 100 人 ≈ 9 万次分片请求 + 18 万次播放列表轮询 ≈ 30 万次 Worker 请求/堂。
+    //    Workers 付费版 1000 万次/月 ≈ 每月 30 堂课，够用；真要归零就把桶挂自定义域（另配 CORS）。
+    // ④ 只认 live/ 前缀且扩展名在白名单里——桶里 students/、search/、moments/ 一概碰不到。
+    if ((request.method === "GET" || request.method === "HEAD") && env.PDFS && url.pathname.startsWith("/live/")) {
+      const _lk = decodeURIComponent(url.pathname.slice(1));
+      if (_lk.indexOf("..") < 0 && /^live\/[A-Za-z0-9._\-\/]+\.(m3u8|ts|m4s|mp4|json)$/i.test(_lk)) {
+        const _isSeg = /\.(ts|m4s|mp4)$/i.test(_lk);
+        const _lc = (typeof caches !== "undefined" && caches.default) ? caches.default : null;
+        const _lck = new Request(url.origin + url.pathname, { method: "GET" });
+        if (_lc && _isSeg) {
+          try {
+            const hit = await _lc.match(_lck);
+            if (hit) {
+              const hh = new Headers(hit.headers);
+              hh.set("x-served-from", "edge");
+              return new Response(request.method === "HEAD" ? null : hit.body, { status: hit.status, headers: hh });
+            }
+          } catch (e) {}
+        }
+        try {
+          const obj = await env.PDFS.get(_lk);
+          if (obj) {
+            const h2 = new Headers();
+            obj.writeHttpMetadata(h2);
+            h2.set("etag", obj.httpEtag);
+            h2.set("access-control-allow-origin", "*");
+            h2.set("content-length", String(obj.size));
+            if (_isSeg) {
+              if (!h2.get("content-type")) h2.set("content-type", /\.ts$/i.test(_lk) ? "video/mp2t" : "video/mp4");
+              h2.set("cache-control", "public, max-age=31536000, immutable");
+            } else if (/\.m3u8$/i.test(_lk)) {
+              h2.set("content-type", "application/vnd.apple.mpegurl");
+              h2.set("cache-control", "no-store");
+            } else {
+              h2.set("content-type", "application/json; charset=utf-8");
+              h2.set("cache-control", "no-store");
+            }
+            h2.set("x-served-from", "r2");
+            const resp = new Response(request.method === "HEAD" ? null : obj.body, { status: 200, headers: h2 });
+            if (_lc && _isSeg && request.method === "GET") {
+              try { ctx.waitUntil(_lc.put(_lck, resp.clone())); } catch (e) {}
+            }
+            return resp;
+          }
+        } catch (e) { /* 桶出岔子不许把播放器打死：落到下面按 404 处理 */ }
+        // 直播没开时 status.json 本来就不存在——回一个"没在播"，播放器据此显示未开播态，
+        // 不要回 404 让前端去猜网络错误还是没开播。
+        if (/\/live\/status\.json$/i.test(url.pathname)) {
+          return new Response(JSON.stringify({ live: false }), {
+            status: 200,
+            headers: { "content-type": "application/json; charset=utf-8", "cache-control": "no-store", "access-control-allow-origin": "*" }
+          });
+        }
+        return new Response("not found", { status: 404, headers: { "cache-control": "no-store" } });
+      }
+    }
     // 与上面 PDF 那段的三点不同，都是索引"会变"带来的：
     // ① **不加 immutable、不进边缘缓存**——PDF 是死的，索引每次发文都重建。
     //    搜索页取分片时本来就带 ?v=Date.now() + cache:'no-store'，每次都是新 URL，
