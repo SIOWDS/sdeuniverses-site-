@@ -39,7 +39,7 @@ ROSTER = os.path.join(STUDENTS, 'roster.json')
 INDEX_NAMES = {'works', 'submit', 'starter-template',
                # 学员级频道的容器页（卡片目录，不是作品本身）
                'tcm-philosophy', 'cinema-literature', 'precision-medicine',
-               'risk-and-care'}
+               'risk-and-care', 'conflict-peace', 'cancer', 'chronic-disease'}
 
 # 频道容器页的机器可读标记。新建学员级频道时在 hub 页 <head> 里放一行
 #     <meta name="sde-page-kind" content="channel">
