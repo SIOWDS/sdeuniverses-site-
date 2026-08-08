@@ -30,9 +30,9 @@ sec("② 搜索页问答：按谁付钱分档");
 const AS = W.indexOf("// 限流：系统 Key 与自带 Key 各用独立配额桶");
 const ASK = AS > 0 ? W.slice(AS, AS + 1400) : "";
 ok("抠得出调用点", ASK.length > 400);
-ok("自带 Key 传 d=0（不设日上限）", /byok \? \("\?w=" \+ WDS_PER_MIN \+ "&d=0"\) : ""/.test(ASK));
+ok("自带 Key 不设日上限（走共用常量）", /byok \? \("\?w=" \+ WDS_PER_MIN \+ BYOK_NO_DAY\) : ""/.test(ASK));
 ok("系统密钥仍走默认（站方付钱，日上限留着）",
-  /const _lq = byok \? \("\?w=" \+ WDS_PER_MIN \+ "&d=0"\) : "";/.test(ASK));
+  /const _lq = byok \? \("\?w=" \+ WDS_PER_MIN \+ BYOK_NO_DAY\) : "";/.test(ASK));
 ok("两边仍是各自独立的桶（自带 Key 不与系统额度互挤）",
   /idFromName\(byok \? wdsBucket\("ask", ip, userKey\) : \("sys:" \+ ip\)\)/.test(ASK));
 ok("撞上限时的话说清是哪一份额度，并给出路（填自己的 Key）",
@@ -44,10 +44,32 @@ ok("提示语里没有误用 Markdown 加粗（这里是纯文本渲染）", !/\
 
 sec("③ 其余 BYOK 入口没被顺手改坏");
 for (const [name, re] of [
-  ["ChatSDE 仍是 d=WDS_PER_DAY", /"https:\/\/limiter\.internal\/\?w=" \+ WDS_PER_MIN \+ "&d=" \+ WDS_PER_DAY/],
+  ["ChatSDE 走同一个共用常量（不再各写各的数字）", /"https:\/\/limiter\.internal\/\?w=" \+ WDS_PER_MIN \+ BYOK_NO_DAY/],
   ["SDE 对谈仍有独立额度常量", /WDS_DLG_PER_DAY = \d+/],
   ["memo/nbr 独立桶仍在", /wdsBucket\("memo", ip, KEY\)/],
 ]) ok(name, re.test(W));
+
+sec("③之二 全站 BYOK 入口一并放开（2026-08-08 用户裁定）");
+ok("有共用常量 BYOK_NO_DAY，各处不再各写各的数字", /const BYOK_NO_DAY = "&d=0";/.test(W));
+const CALLS = W.match(/limiter\.internal\/\?w=[^)]*/g) || [];
+ok("限流调用点数目未变（15 处）", CALLS.length === 15, "实得 " + CALLS.length);
+// 读者自付的入口：一律不设日上限
+const OPENED = CALLS.filter((c) => /BYOK_NO_DAY/.test(c));
+ok("已放开的入口有 11 处（memo/nbr/dlg/read×2/byok-art/voice/chat×3/asr-BYOK）",
+  OPENED.length === 11, "实得 " + OPENED.length);
+ok("搜索页问答也用同一个常量（它是这条口径的起点，别落在体例外）",
+  /const _lq = byok \? \("\?w=" \+ WDS_PER_MIN \+ BYOK_NO_DAY\) : "";/.test(W));
+// 站方付钱或站方 CPU 的入口：日上限必须还在
+for (const [name, re] of [
+  ["readurl 仍有日上限（零调用，烧的是站方 CPU）", /\?w=10&d=120/],
+  ["link 仍有日上限（零调用，只读索引）", /WDS_LINK_PER_MIN \+ "&d=" \+ WDS_LINK_PER_DAY/],
+  ["web 检索仍有日上限（无 Key 时会回落站方智谱 Key）", /WDS_WS_PER_MIN \+ "&d=" \+ WDS_WS_PER_DAY/],
+  ["金句机仍有日上限（站方付钱）", /\?w=6&d=60/],
+]) ok(name, re.test(W));
+ok("语音转写只放开自带 Key 那一支，回落站方那一支照旧",
+  /_own \? BYOK_NO_DAY : \("&d=" \+ _d\)/.test(W));
+ok("ChatSDE 不再回传\"今日剩余\"（没有日上限还报剩余就是报假数）",
+  !/dayLeft = Math\.max\(0, WDS_PER_DAY/.test(W) && /let dayLeft = null;/.test(W));
 
 sec("④ 真跑：抠出 AskLimiter，连打 400 次");
 let AskLimiter = null;
