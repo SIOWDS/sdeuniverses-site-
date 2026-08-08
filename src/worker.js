@@ -2334,11 +2334,20 @@ export class AskLimiter {
   async fetch(request) {
     const now = Date.now();
     const _u = new URL(request.url);
-    const _n = (k, d, cap) => { const v = parseInt(_u.searchParams.get(k), 10); return v > 0 ? Math.min(v, cap) : d; };
-    const WINDOW = 60000, PER_WINDOW = _n("w", 8, 30);   // 每 IP 每分钟（默认 8；调用方可放宽，硬顶 30）
-    const DAY = 86400000, PER_DAY = _n("d", 60, 300);     // 每 IP 每天（默认 60；调用方可放宽，硬顶 300）
+    // 显式传 0 ＝ 这一档不设上限。只给「自带 Key」用：他烧的是自己的 token，日上限就没有正当理由；
+    // 分钟档仍然保留——那一档防的不是花钱，是脚本把 Worker 的 CPU 刷爆（那是站方的）。
+    const _n = (k, d, cap) => {
+      const raw = _u.searchParams.get(k);
+      if (raw === "0") return Infinity;
+      const v = parseInt(raw, 10);
+      return v > 0 ? Math.min(v, cap) : d;
+    };
+    const WINDOW = 60000, PER_WINDOW = _n("w", 8, 30);   // 每 IP 每分钟（默认 8；调用方可放宽，硬顶 30；传 0 ＝ 不限）
+    const DAY = 86400000, PER_DAY = _n("d", 60, 300);     // 每 IP 每天（默认 60；调用方可放宽，硬顶 300；传 0 ＝ 不限）
     let hits = (await this.ctx.storage.get("hits")) || [];
-    hits = hits.filter((t) => now - t < DAY);
+    // 不设日上限时只需留住"这一分钟"的痕迹——否则重度用户一天下来会在 DO 里堆出上万条时间戳，
+    // 而它们除了被 filter 掉之外没有任何用处。
+    hits = hits.filter((t) => now - t < (PER_DAY === Infinity ? WINDOW : DAY));
     const inWindow = hits.filter((t) => now - t < WINDOW).length;
     const inDay = hits.length;
     let ok = true, reason = "";
@@ -4576,14 +4585,19 @@ async function askCore(request, env, url, body, SINK) {
   }
   if (!KEY) return _out([{ t: "error", v: "智能问答尚未启用：管理员尚未配置系统密钥。你也可以在下方填入自己的 API Key 直接使用。", code: "use_own_key" }]);
 
-  // 限流：系统 Key 与自带 Key 各用独立配额桶（自带 Key 用户自付，不与系统额度互挤）
+  // 限流：系统 Key 与自带 Key 各用独立配额桶（自带 Key 用户自付，不与系统额度互挤）。
+  // ⚠ 两边的上限不是同一件事，也不该是同一个数：
+  //   · 系统密钥＝站方付钱 → 日上限必须留着（默认 60/天、8/分）。
+  //   · 自带 Key＝用户自己烧 token → **不设日上限**（传 d=0），只留分钟档防脚本刷爆 Worker 的 CPU。
+  // 这个入口此前一个参数都没传，于是自带 Key 的人也被按 60/天掐——站上其余 BYOK 入口都传了，唯独漏了它。
   const ip = request.headers.get("cf-connecting-ip") || "unknown";
   try {
     const lim = env.ASK_LIMITER.get(env.ASK_LIMITER.idFromName(byok ? wdsBucket("ask", ip, userKey) : ("sys:" + ip)));
-    const lr = await (await lim.fetch(new Request("https://limiter.internal/"))).json();
+    const _lq = byok ? ("?w=" + WDS_PER_MIN + "&d=0") : "";
+    const lr = await (await lim.fetch(new Request("https://limiter.internal/" + _lq))).json();
     if (!lr.ok) {
       const msg = lr.reason === "day"
-        ? "今日提问次数已达上限，请明天再来，或改用「🔍 关键词检索」。"
+        ? "今日提问次数已达上限——这是「系统密钥」的公共额度。在下方填入你自己的 API Key 即可继续：自带 Key 是你自付 token，不受每日次数限制。也可改用「🔍 关键词检索」。"
         : "提问太频繁了，请过十几秒再试。";
       return _out([{ t: "error", v: msg }]);
     }
