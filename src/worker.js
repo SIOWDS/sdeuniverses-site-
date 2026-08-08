@@ -6698,15 +6698,38 @@ export default {
       const blocked = host === "localhost" || host === "0.0.0.0" || host === "[::1]" || host === "::1"
         || /\.(local|internal|localdomain)$/.test(host)
         || /^127\./.test(host) || /^10\./.test(host) || /^192\.168\./.test(host)
-        || /^169\.254\./.test(host) || /^172\.(1[6-9]|2[0-9]|3[01])\./.test(host)
-        || host === url.hostname.toLowerCase();
-      if (blocked) return J({ ok: false, msg: "这个地址不给取（内网地址、本机地址、或本站自己）。" });
+        || /^169\.254\./.test(host) || /^172\.(1[6-9]|2[0-9]|3[01])\./.test(host);
+      if (blocked) return J({ ok: false, msg: "这个地址不给取（内网地址、本机地址）。" });
       const ip = request.headers.get("cf-connecting-ip") || "unknown";
       try {
         const lim = env.ASK_LIMITER.get(env.ASK_LIMITER.idFromName(wdsBucket("readurl", ip, "")));
         const lr = await (await lim.fetch(new Request("https://limiter.internal/?w=10&d=120"))).json();
         if (!lr.ok) return J({ ok: false, msg: lr.reason === "day" ? "今天取链接的次数用完了，明天再来。" : "取得太快啦，过十几秒再来。" });
       } catch (e) {}
+      // ── 站内分支：本站自己的文章也要能整篇读进来 ─────────────────────────────
+      // 为什么要单独一条：外链走 fetch，而 fetch 本站＝自请求回环（实测 522），所以这里此前把
+      // 本站一律拒了；后果是「贴链接读全文」对站内文章反而用不了——读者能读全世界，唯独读不了这个站。
+      // 而全站检索每篇最多给两段（各 1600 字），"读全文"和"检索到片段"是两件事：
+      // 要它逐字引出承重句、指得出哪一句脆（sumdoc 那一档要求的），非整篇不可。
+      // 走 env.ASSETS 直读就没有回环，也不占外网那份限流；但它是内部通道，边界要自己补上：
+      // 只认站内路径 · 不许读 /api/（那是端点不是文章）· 不许读资源文件 · 仍用同一个正文抽取器。
+      if (host === url.hostname.toLowerCase()) {
+        let p0 = U.pathname || "/";
+        if (/^\/api\//i.test(p0)) return J({ ok: false, msg: "这是接口地址，不是文章页。" });
+        if (/\.(json|js|mjs|css|pdf|png|jpe?g|gif|webp|svg|ico|zip|docx?|xlsx?|pptx?|txt|xml)$/i.test(p0)) {
+          return J({ ok: false, msg: "这是资源文件，不是文章页。PDF/Word 请用「＋」当附件传（那是在你自己机器上解析的）。" });
+        }
+        // 目录形态补斜杠：/confluence/xxx 与 /confluence/xxx/ 指的是同一篇，少一个斜杠就 404
+        if (!/\/$/.test(p0) && !/\.[a-z0-9]{1,5}$/i.test(p0)) p0 += "/";
+        let ar = null;
+        try { ar = await env.ASSETS.fetch(new Request(new URL(p0, url).toString())); } catch (e) { ar = null; }
+        if (!ar || !ar.ok) return J({ ok: false, msg: "站内没有这一页（" + p0 + "）。篇名和路径常常对不上，先在对话里问一句让它把网址给你，别自己拼。" });
+        let ah = "";
+        try { ah = (await ar.text()).slice(0, 3 * 1024 * 1024); } catch (e) { return J({ ok: false, msg: "这一页读不出文字。" }); }
+        const ao = wdsHtmlText(ah);
+        if (!ao.text || ao.text.length < 60) return J({ ok: false, msg: "这一页抽不出正文（多半是栏目目录页或索引页，不是文章页）。" });
+        return J({ ok: true, url: U.toString(), title: ao.title || p0, text: ao.text, note: "站内 · " + host, site: true, chars: ao.text.length });
+      }
       const ac = new AbortController();
       const tm = setTimeout(() => { try { ac.abort(); } catch (e) {} }, 15000);
       let r;
@@ -7834,6 +7857,41 @@ export default {
         return Response.json({ neighbors: list, block: nbBlock(list), n: list.length, terms: nbTerms(q).length }, { headers: _cors() });
       } catch (e) {
         return Response.json({ neighbors: [], block: "", n: 0, error: String(e && e.message) }, { headers: _cors() });
+      }
+    }
+    if (url.pathname === "/api/kb/find") {
+      // 站内找文章：**只回一份可点的篇目清单**（篇名·网址·版块·命中处首句），不写答案、不烧任何 Key。
+      // 与 /api/kb/retrieve 的分工是清楚的：那个把资料喂给基底，这个把清单交给人——
+      // 人要的是自己挑哪一篇读全文，而不是被一段综述裹着；被综述裹着时，没被引到的那几篇就等于不存在。
+      // 每篇只留最高分的那一段当摘要（同一篇出现两次对"挑哪一篇"毫无帮助）。
+      if (request.method === "OPTIONS") return new Response(null, { headers: _cors() });
+      if (request.method !== "POST") return new Response("Method Not Allowed", { status: 405 });
+      let b = {}; try { b = await request.json(); } catch (e) {}
+      const q = String(b.q || "").trim().slice(0, 500);
+      if (q.length < 1) return Response.json({ ok: false, n: 0, docs: [], msg: "要找什么？" }, { headers: _cors() });
+      const K = Math.max(3, Math.min(30, parseInt(b.k, 10) || 12));
+      try {
+        const _lr = await lightRetrieve(env, url, q, [], 60, 500, { pick: Math.max(16, K * 2) });
+        const docs = _lr.corpus.docs || [], lab = _lr.corpus.secLabel || {};
+        const best = new Map();
+        for (const ck of _lr.hits) if (!best.has(ck.d)) best.set(ck.d, ck.t);
+        const list = [];
+        for (const [di, snip] of best) {
+          const d = docs[di]; if (!d) continue;
+          list.push({
+            u: new URL(d.u, url).toString(),
+            t: String(d.t || "").split(" · ")[0],
+            s: lab[d.s] || d.s || "",
+            snip: String(snip || "").replace(/\s+/g, " ").trim().slice(0, 150),
+          });
+          if (list.length >= K) break;
+        }
+        // 一条都没有时如实说，不要回一份空壳让调用方以为站上没有——
+        // 词面检索命中不了 ≠ 站上没写过（近邻库那条纪律同理）。
+        return Response.json({ ok: true, n: list.length, docs: list, q: q,
+          note: list.length ? "" : "这几个词在站内没检出篇目；换个说法再找一次，或直接把话说长一点。" }, { headers: _cors() });
+      } catch (e) {
+        return Response.json({ ok: false, n: 0, docs: [], msg: "检索没接上：" + (e && e.message) }, { headers: _cors() });
       }
     }
     if (url.pathname === "/api/kb/retrieve") {

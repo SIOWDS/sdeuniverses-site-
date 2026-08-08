@@ -827,6 +827,10 @@
       tlMap: "结构图", tlMapS: "把这一问里的结构画成图（落在右侧画布里），并说清哪条边最承重",
       lnkBtn: "🔗 链接", lnkTip: "贴一个网址，把那一篇读进来当附件（本站只抓正文，不带你的任何凭证）",
       lnkAsk: "把哪个网址读进来？", lnkGo: "正在读这一页…", lnkBad: "读不了：",
+      fdBtn: "🔎 找文章", fdTip: "在全站三千多篇里找出篇目清单，自己挑一篇读全文（不烧 Key）",
+      fdAsk: "找什么？（一句话比几个词好）", fdGo: "正在全站找…", fdBad: "没找成：",
+      fdN: "篇", fdRead: "读全文", fdReading: "正在读进来…", fdClose: "收起",
+      fdHead: "站内找到", fdNone: "没检出篇目——换个说法，或把话说长一点。",
       psBtn: "◧ 预设", psTitle: "预设", psNone: "还没有预设。把现在这一套（基底·档位·联网·工序·口吻·自定义指令）存下来，下次一键切回。",
       psSave: "＋ 把现在这套存为预设", psAsk: "给这套预设起个名字", psDel: "删掉这个预设？",
       psExp: "⤓ 导出全部", psImp: "⤒ 导入", psImpAsk: "把导出的预设 JSON 贴在这里", psImpBad: "这段不是预设文件",
@@ -952,6 +956,10 @@
       tlMap: "Structure map", tlMapS: "Draw the structure behind this question (renders on the canvas) and say which edge carries the weight",
       lnkBtn: "🔗 Link", lnkTip: "Paste a URL and this page is pulled in as an attachment (text only, no credentials sent)",
       lnkAsk: "Which URL should I read?", lnkGo: "Reading that page\u2026", lnkBad: "Could not read it: ",
+      fdBtn: "🔎 Find", fdTip: "Search 3,000+ pieces site-wide and pick one to read in full (no key used)",
+      fdAsk: "Find what? (a sentence beats a few words)", fdGo: "Searching the site\u2026", fdBad: "Search failed: ",
+      fdN: " found", fdRead: "Read in full", fdReading: "Pulling it in\u2026", fdClose: "Hide",
+      fdHead: "Found on site", fdNone: "Nothing matched \u2014 try other wording, or say more.",
       psBtn: "◧ Presets", psTitle: "Presets", psNone: "No presets yet. Save the current setup (model, tier, web, procedure, voice, instructions) and switch back in one click.",
       psSave: "＋ Save current setup", psAsk: "Name this preset", psDel: "Delete this preset?",
       psExp: "⤓ Export all", psImp: "⤒ Import", psImpAsk: "Paste the exported preset JSON here", psImpBad: "That is not a preset file",
@@ -1478,6 +1486,7 @@
           "<button class='wdsm-mode' data-k='web'></button>" +
           "<button class='wdsm-mode wdsm-rsbtn'></button>" +
           "<button class='wdsm-mode wdsm-lnkbtn'></button>" +
+          "<button class='wdsm-mode wdsm-findbtn'></button>" +
           "<button class='wdsm-mode wdsm-dubtn'></button>" +
           "<button class='wdsm-mode wdsm-tribtn'></button>" +
           "<span class='wdsm-mode-tip'></span>" +
@@ -1794,7 +1803,7 @@
     q(".wdsm-keybtn").textContent = t("bSet");
     try { q(".wdsm-membtn .mb").textContent = t("bMem"); } catch (e) {}   // 按钮里还有个角标 <i>，不能整体 textContent
     q(".wdsm-newbtn").textContent = t("bNew");
-    try { rsPaint(); lnkPaint(); cvPaint(); compPaint(); duPaint(); pjPaint(); } catch (e) {}
+    try { rsPaint(); lnkPaint(); fdPaint(); cvPaint(); compPaint(); duPaint(); pjPaint(); } catch (e) {}
     q(".wdsm-langbtn").textContent = LANG === "zh" ? "EN" : "中";
     var g = function (sel) { return q(sel) || {}; };   // 防空取：桩环境里某些节点不存在，别为文案崩掉整页
     g(".wdsm-nc").textContent = t("sbNew");
@@ -3651,6 +3660,52 @@
       u = urlIn(u) || u;
       if (inU) { inEl.value = inEl.value.split(inU).join("").trim(); inEl.style.height = "auto"; }
       lnkGrab(u);
+    };
+  }
+
+  /* ══════════════ 找文章：先给清单，再由人挑一篇读全文 ══════════════
+     为什么不做成"直接问一句"：问一句得到的是一段综述加六条来源，没被引到的那几篇就等于不存在；
+     而"我要找文章"这个动作里，读者要的恰恰是自己挑。所以这一步零调用、不烧 Key，只回清单。
+     挑中一篇 → 走 lnkGrab 把整篇读进来当附件（与贴外链同一条线），随后就能对它跑「总结载入的文章」。 */
+  var fdBtn = layer.querySelector(".wdsm-findbtn");
+  function fdPaint() { if (!fdBtn) return; fdBtn.textContent = t("fdBtn"); fdBtn.title = t("fdTip"); }
+  fdPaint();
+  function fdList(q) {
+    attStatus(t("fdGo"));
+    fetch("/api/kb/find", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ q: q, k: 12 }) })
+      .then(function (r) { return r.json().catch(function () { throw new Error(r.ok ? "检索回的不是 JSON" : ("检索出错（" + r.status + "）")); }); })
+      .then(function (j) {
+        if (!j || !j.ok) { attStatus(t("fdBad") + ((j && j.msg) || "?"), 1); return; }
+        if (!j.docs || !j.docs.length) { attStatus(t("fdNone"), 1); return; }
+        attStatus(t("fdHead") + " " + j.docs.length + t("fdN"));
+        menuAt(fdBtn, function (menu) {
+          menu.style.maxWidth = "min(430px,92vw)";
+          menu.style.maxHeight = "min(58vh,440px)";
+          menu.style.overflowY = "auto";
+          menu.appendChild(el("div", "mh", t("fdHead") + " " + j.docs.length + t("fdN")));
+          j.docs.forEach(function (d) {
+            var row = el("button");
+            row.style.whiteSpace = "normal";
+            row.appendChild(el("b", null, "《" + d.t + "》"));
+            var meta = el("span", "sub", (d.s ? d.s + " · " : "") + t("fdRead"));
+            var sn = el("span", "sub", d.snip || "");
+            row.appendChild(sn); row.appendChild(meta);
+            row.onclick = function () { closeMenu(); attStatus(t("fdReading")); lnkGrab(d.u); };
+            menu.appendChild(row);
+          });
+        });
+      })
+      .catch(function (e) { attStatus(t("fdBad") + ((e && e.message) || "?"), 1); });
+  }
+  if (fdBtn) {
+    fdBtn.onclick = function () {
+      if (streaming) return;
+      // 输入框里已经写了话就拿它去找（读者的意思是"找这个"），找完不清空——那句话他多半还要接着问
+      var q = String(inEl.value || "").trim();
+      if (!q) q = window.prompt ? String(window.prompt(t("fdAsk"), "") || "") : "";
+      q = q.trim();
+      if (!q) return;
+      fdList(q.slice(0, 500));
     };
   }
 
