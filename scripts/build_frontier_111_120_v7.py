@@ -110,6 +110,30 @@ NEAR = {
 111:[101,107,109,121,122,123,126,306],112:[101,102,103,106,109,121,122,306],113:[31,35,103,110,121,306],114:[101,107,109,121,123,306],115:[31,33,103,110,121,127,306],116:[101,107,109,121,122,125,126,306],117:[106,108,109,121,122,126,291,306],118:[18,23,31,33,107,121,306],119:[101,102,103,106,109,121,122,127,306],120:[63,77,81,82,84,85,103,121,306]}
 FAMILIES = [
 (1,"谁进入分母"),(2,"单一读数代表复杂对象"),(4,"测量不改变被测对象"),(8,"缺失即不存在"),(12,"成本可外置而不改变结论"),(13,"时间尺度可自由压缩"),(14,"因与果的方向是给定的"),(17,"局部最优可加总为整体最优"),(18,"干预不回写到被干预者"),(20,"窗口内稳定等于长期稳定"),(21,"制度采纳不改变指标含义"),(22,"通过形式审查等于实质合规"),(25,"失败样本不含信息"),(28,"记录存在即可核对"),(29,"越精细越接近真实"),(30,"未被计价的东西不影响结算")]
+DISPLAY_LABELS = {
+    112: [
+        "Clinical-Trial Data Provenance and Traceability",
+        "Independent Data Monitoring Committees",
+        "Estimands and Intercurrent Events",
+        "Heterogeneity and Enrichment Designs",
+        "Patient-Reported Outcome Endpoints",
+        "Recruitment Cost and Efficiency",
+        "Adaptive Platform Trials",
+        "ICH E9(R1) Estimand Framework",
+        "Trial Generalizability and Transportability",
+        "Accelerated Approval and Confirmatory Trials",
+        "Measurement Reactivity and the Hawthorne Effect",
+        "Trial Registration and Selective Reporting",
+        "Basket, Umbrella, and Platform Master Protocols",
+        "Pragmatic Randomized Trials",
+        "Decentralized Clinical Trials and Data Integrity",
+        "External Control Arms and Real-World Data",
+        "Bayesian Borrowing and Historical Controls",
+        "Target Trial Emulation",
+        "Individual Participant Data Sharing",
+        "Trial Representativeness and Inclusivity",
+    ]
+}
 OVERRIDE_PMIDS = {
     # Hay 2014 → Wong 2019 → Sun et al. 2025: three generations of
     # development-success-rate evidence, rather than three unrelated trials.
@@ -492,7 +516,8 @@ def build(number:int) -> Path:
         body="".join(f"<p>{html.escape(x,quote=False)}</p>" for x in ps)
         count=zh(body)
         if not 800<=count<=1000: raise RuntimeError(f"{number}-{i+1} body zh={count}")
-        parts.append(f'<h2>{label}、{html.escape(title)}<span class="en">{html.escape(cfg["queries"][i].title())}</span></h2>'+source_html(b,key)+body+collision(number,i,title,b,cfg,aliases[i],positions[i],fams[i]))
+        display_label=DISPLAY_LABELS.get(number,cfg["queries"])[i]
+        parts.append(f'<h2>{label}、{html.escape(title)}<span class="en">{html.escape(display_label)}</span></h2>'+source_html(b,key)+body+collision(number,i,title,b,cfg,aliases[i],positions[i],fams[i]))
     act1='<div class="act">【第一幕】上一个十年 · 约 2006–2016 · 八条奠基转向</div><p>'+html.escape(f"这一幕追踪{cfg['title']}怎样把成功结果拆回对象、路径与失败分母；以2006—2016年的问题框架为起点，若某议题近年才有可核文献，则保留实际首发年份，不倒填旧来源。")+'</p>'+"".join(parts[:8])
     act2='<div class="act">【第二幕】这十年 · 约 2016–2026 · 十二条部署与清算</div><p>'+html.escape(f"第二幕转向部署、版本与边缘对象：工具进入制度以后，{cfg['measures'][0]}是否仍测同一件事，成为2016—2026年的主问题。")+'</p>'+"".join(parts[8:])
     clos=closure(cfg,titles,bundles,aliases)
