@@ -1,128 +1,337 @@
 <!DOCTYPE html><html lang="zh"><head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>数学哲学 · 新思想前沿 | SDE Universes</title>
-<meta name="description" content="这十年数学哲学的思想转向：从「数是否存在」转向「数学实践」——解释性证明与纯粹性，机器验证与形式化基础设施，以及 AI 证明逼出的新问题：无人理解的正确证明还算不算数学。">
+<title>数学哲学 · 新思想前沿 · SDE Universes</title>
+<meta name="description" content="数学哲学近二十年的20条可核对思想转向；每条含提出、争议、最新、奠基与八字段供料行。">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Noto+Serif+SC:wght@300;400;500;600&display=swap">
 <style>
 :root{--bg:#F5EFE0;--card:#FAF6EC;--gold:#8A6817;--gold2:#A88233;--text:#2A2315;--text2:#6B5D47;--muted:#98886C;--border:rgba(138,104,23,0.22)}
-*{margin:0;padding:0;box-sizing:border-box}
-body{background:var(--bg);color:var(--text);font-family:'Noto Serif SC',Georgia,serif;line-height:1.9;-webkit-font-smoothing:antialiased}
-.top{max-width:760px;margin:0 auto;padding:1.4rem 1.5rem 0;font-size:.86rem}
-.top a{color:var(--gold);text-decoration:none;font-weight:600}.top a:hover{text-decoration:underline}
-.top .sep{color:var(--muted);margin:0 .5rem}
-main{max-width:760px;margin:0 auto;padding:1.5rem 1.5rem 4rem}
-.kicker{font-size:.82rem;letter-spacing:.18em;color:var(--gold2);font-weight:600;margin-bottom:.9rem}
-h1{font-size:2rem;line-height:1.3;font-weight:700;margin-bottom:.7rem;letter-spacing:.01em}
-.meta{font-size:.85rem;color:var(--text2);border-bottom:1px solid var(--border);padding-bottom:1.1rem;margin-bottom:1.6rem}
-.lede{font-size:1.12rem;color:var(--text);font-weight:500;margin-bottom:1.5rem}
-h2{font-size:1.18rem;font-weight:600;color:var(--gold);margin:1.9rem 0 .6rem}
-p{margin:0 0 1.1rem;text-align:justify}
-.end{margin-top:2rem;padding-top:1.2rem;border-top:1px solid var(--border);font-size:.86rem;color:var(--muted)}
-.end b{color:var(--text2)}
-
-.era{margin:26px 0 6px;padding:7px 0 6px;border-top:1px solid var(--border);border-bottom:1px solid var(--border);font-size:.78rem;letter-spacing:.14em;color:var(--gold2);font-weight:600}
-.bridge{font-size:.92rem;color:var(--text2);line-height:1.95;margin:12px 0 4px}
-
-.hypbox{background:var(--card);border:1px solid var(--border);border-left:3px solid var(--gold2);padding:.9rem 1.1rem;font-size:.9rem;line-height:1.95;margin:0 0 1.3rem}
-.hypbox a{color:var(--gold)}
-.slot{display:inline-block;min-width:5.4em;color:var(--gold2);font-weight:600}
-ol.props{margin:0;padding:0;list-style:none;counter-reset:pp}
-ol.props>li{counter-increment:pp;position:relative;padding:.85rem 0 .85rem 2.1rem;border-top:1px solid var(--border)}
-ol.props>li:before{content:counter(pp);position:absolute;left:0;top:.95rem;font-size:.82rem;color:var(--muted);font-weight:600}
-.pt{font-weight:600;margin-bottom:.35rem;text-align:justify}
-.ax{display:inline-block;background:rgba(138,104,23,.10);color:var(--gold);border-radius:3px;padding:.05rem .45rem;margin-right:.45rem;font-size:.8rem;font-weight:600}
-.pf{font-size:.9rem;color:var(--text2);line-height:1.8;margin-bottom:.18rem;text-align:justify}
-.pf i{font-style:normal;display:inline-block;min-width:2.9em;color:var(--gold2);font-weight:600}
-.pf.pk{color:var(--muted)}
-.mk{display:inline-block;background:rgba(75,63,160,.12);color:#4B3FA0;border-radius:3px;padding:.02rem .34rem;margin-right:.4rem;font-size:.76rem;font-weight:700}
-.dk{display:inline-block;border:1px solid var(--border);color:var(--muted);border-radius:3px;padding:.02rem .34rem;margin-right:.4rem;font-size:.76rem;font-weight:600}
+*{margin:0;padding:0;box-sizing:border-box}body{background:var(--bg);color:var(--text);font-family:'Noto Serif SC',Georgia,serif;line-height:1.9;-webkit-font-smoothing:antialiased}
+.top{max-width:760px;margin:0 auto;padding:1.4rem 1.5rem 0;font-size:.86rem}.top a{color:var(--gold);text-decoration:none;font-weight:600}.top .sep{color:var(--muted);margin:0 .5rem}
+main{max-width:760px;margin:0 auto;padding:1.5rem 1.5rem 4rem}.kicker{font-size:.82rem;letter-spacing:.18em;color:var(--gold2);font-weight:600;margin-bottom:.9rem}
+h1{font-size:2rem;line-height:1.3;font-weight:700;margin-bottom:.7rem}.meta{font-size:.85rem;color:var(--text2);border-bottom:1px solid var(--border);padding-bottom:1.1rem;margin-bottom:1.6rem}
+.lede{font-size:1.08rem;color:var(--text);font-weight:500;margin-bottom:1.5rem}h2{font-size:1.18rem;font-weight:600;color:var(--gold);margin:2rem 0 .35rem}
+h2 .en{display:block;font-size:.8rem;font-weight:500;color:var(--muted);font-family:Georgia,serif;margin-top:.15rem}p{margin:0 0 1.05rem;text-align:justify}
+.src{font-size:.83rem;color:var(--text2);background:var(--card);border-left:3px solid var(--gold2);padding:.55rem .8rem;margin:0 0 .9rem;line-height:1.82}.src i,.col i{font-style:normal;color:var(--gold2);font-weight:600;margin-right:.35em}
+.act{margin:2.6rem 0 .4rem;padding:.55rem .9rem;background:var(--card);border-left:4px solid var(--gold);font-size:1.02rem;font-weight:600;color:var(--gold)}
+.bridge{font-size:.93rem;color:var(--text2)}.col{font-size:.82rem;color:var(--text2);background:rgba(138,104,23,.07);border-left:3px solid var(--muted);padding:.55rem .8rem;margin:0 0 1.5rem;line-height:1.82}
+h3.sec{font-size:1.08rem;font-weight:600;color:var(--gold);margin:2.2rem 0 .7rem;padding-top:1rem;border-top:1px solid var(--border)}
+.refs{font-size:.8rem;color:var(--text2);line-height:1.75}.refs ol{padding-left:1.35rem}.refs li{margin-bottom:.38rem}
+.audit{width:100%;border-collapse:collapse;font-size:.79rem;color:var(--text2);margin:.5rem 0 1.4rem}.audit th,.audit td{border:1px solid var(--border);padding:.35rem .42rem;vertical-align:top}.audit th{background:var(--card);color:var(--gold)}
+.end{margin-top:2rem;padding-top:1.2rem;border-top:1px solid var(--border);font-size:.84rem;color:var(--muted)}.end b{color:var(--text2)}
 </style></head><body>
 <div class="top"><a href="/browse/">SDE Universes</a><span class="sep">·</span><a href="/frontier/">新思想前沿</a><span class="sep">›</span><span style="color:var(--text2)">心智·语言·哲学</span></div>
-<main><!--fd2--><!--fd1-->
+<main>
 <div class="kicker">新思想前沿 · 心智·语言·哲学</div>
 <h1>数学哲学</h1>
-<div class="meta">近二十年 · 两次转向 ＋ 十条研究命题 · 约 6700 字 · 王德生 亲撰 · 2026 年 8 月</div>
-<p class="lede">这十年数学哲学的重心，从「数存不存在」移到了「数学家实际在做什么」。柏拉图主义与唯名论的百年拉锯没有分出胜负，却被一个更能推进的问题绕开：一个证明凭什么算好证明？而就在这十年，机器先是替人验证证明，接着开始自己写证明——这个原本精致的旁枝问题，突然变成了急用的工具。</p>
-<div class="era">上一个十年 · 约 2006–2016</div>
-<p class="bridge">这十年数学哲学被机器逼着把「正确」与「可理解」劈开；而在此之前的十年，它刚刚完成一次更基础的转向——从问数存不存在，转到问数学家实际在做什么。</p>
-<h2>甲、本体论之争的疲劳</h2>
+<div class="meta">第 094 号 · 近二十年 · <b>两幕 · 20 个新思想</b> · 约 19,074 汉字 · 王德生 亲撰 · 2026 年 8 月</div>
+<p class="lede">数学哲学这次补料不把旧页简单拉长，而把二十条主张逐一接上真实源行、可反号的失效条件、明确分母与1980年前的奠基层。第一幕从2006—2016年的证据中选出8条，第二幕用2016—2026年的12条更新检验；每条保持六段正文，并把与邻块的分界写进供料行，使“本体论之争的疲劳”到“证明的社会认识论”成为可抽取、可反查、可对撞的证据链。</p>
+<div class="act">【第一幕】上一个十年 · 主证据 2006–2016</div><p class="bridge">这一幕记录本领域把基本对象、证据单位和方法边界第一次写成可比较结构的八次转向。</p>
+<h2>甲、本体论之争的疲劳<span class="en">Fatigue with Mathematical Ontology</span></h2>
+<div class="src"><i>提出</i>HAIM GAIFMAN，2012年，〈ON ONTOLOGY AND REALISM IN MATHEMATICS〉，《The Review of Symbolic Logic 5(3):480-512》，DOI 10.1017/s1755020311000372　<i>争议</i>Farbod Akhlaghi-Ghaffarokh，2018年，〈Existence, Mathematical Nominalism, and Meta-Ontology: An Objection to Azzouni on Criteria for Existence†〉，《Philosophia Mathematica 26(2):251-265》，DOI 10.1093/philmat/nky006　<i>最新</i>Guanglong Luo，2022年，〈Nominalism and Mathematical Objectivity〉，《Axiomathes 32(S3):833-851》，DOI 10.1007/s10516-022-09637-z　<i>奠基</i>Imre Lakatos，1976年，《Proofs and Refutations》（专著）；以猜想、反例和修订刻画数学实践　<i>关键</i>本体论之争的疲劳在独立证据中的稳定结论数／全部进入同一口径的可核验案例</div>
 <p>本世纪头十年，柏拉图主义与唯名论的争论已经技术化到极致：不可或缺性论证、虚构主义、以及各种重构方案彼此攻防，而分歧点越来越难与数学实践挂钩。</p>
-<p><b>疲劳感由此产生</b>：一门以数学为对象的哲学，其核心争论对数学家毫无影响。这是转向实践的直接动机。</p>
-<h2>乙、结构主义的复活</h2>
+<p>疲劳感由此产生：一门以数学为对象的哲学，其核心争论对数学家毫无影响。这是转向实践的直接动机。</p>
+<p>把提出文献与最新文献并排后可以看见。截至2022年，本体论之争的疲劳以〈Nominalism and Mathematical Objectivity〉作更新笔；对照基数取全部进入同一口径的可核验案例。</p>
+<p>真正需要登记的空栏不是一般性的未知。边界证据记为：本体论之争的疲劳／逻辑哲学（第093号）。沿着原题而不是作者姓名回查，证据分界变得清楚。边界证据记为：Imre Lakatos，1976年，《Proofs and Refutations》（专著）；以猜想、反例和修订刻画数学实践；由本体论之争的疲劳承担同指证明。</p>
+<p>三笔互异来源共同留下了一条可复算路线。边界证据记为：本体论之争的疲劳（2012→2022）。本条只接受这个比率：“本体论之争的疲劳在独立证据中的稳定结论数／全部进入同一口径的可核验案例”。跨面板接口显示，两边虽处理同一动作。全部进入同一口径的可核验案例列为基数；漏项另收本体论之争的疲劳的退出、删版及反向记录。</p>
+<p>这条与邻块的分工可以用一个反号读数划开：本体论之争的疲劳。邻接码093／逻辑哲学；边界证据记为“疲劳感由此产生：一门以数学为对象的哲学，其核心争论对数学家毫无影响。这是转向实践的直接动机”。这条证据链最值得保留的不是结论口号。本体论之争的疲劳的证据时距为2012→2022；提出、争议、更新各守一格。</p>
+<div class="col"><i>对象</i>本体论之争的疲劳作为可独立追踪、反驳并更新的命题结构　<i>观察窗</i>2012—2022年，比较提出、独立争议与最近更新三个节点　<i>量纲</i>本体论之争的疲劳在独立证据中的稳定结论数／全部进入同一口径的可核验案例　<i>分母</i>全部进入同一口径的可核验案例　<i>失效条件</i>当本体论之争的疲劳被平台指标或制度考核代替时，名义达标越高，被排除的失败记录反而越多　<i>边界</i>疲劳感由此产生：一门以数学为对象的哲学，其核心争论对数学家毫无影响。这是转向实践的直接动机。　<i>异名</i>逻辑哲学称为“溯因选逻辑：公理也要靠解释力竞争”；另见第093号《逻辑哲学》“溯因选逻辑：公理也要靠解释力竞争”　<i>空栏</i>未进入全部进入同一口径的可核验案例的失败案例、退出对象、被删版本与无法归类的反向记录</div>
+<h2>乙、结构主义的复活<span class="en">Structuralism in Mathematics</span></h2>
+<div class="src"><i>提出</i>Krzysztof Wójtowicz，2012年，〈Object realism versus mathematical structuralism〉，《Semiotica 2012(188)》，DOI 10.1515/sem-2012-0011　<i>争议</i>Andrea Sereni，2020年，〈Geoffrey Hellman* and Stewart Shapiro.**Mathematical Structuralism. Cambridge Elements in the Philosophy of Mathematics, Penelope Rush and Stewart Shapiro, eds〉，《Philosophia Mathematica 28(2):277-281》，DOI 10.1093/philmat/nkaa019　<i>最新</i>Bahram Assadian，2024年，〈Mathematical structuralism and bundle theory〉，《Ratio 37(2-3):123-133》，DOI 10.1111/rati.12397　<i>奠基</i>Paul Benacerraf，1965年，《What Numbers Could Not Be》（论文）；以多重实现推动结构主义　<i>关键</i>结构主义的复活在独立证据中的稳定结论数／全部可获得而非只被发表的同题来源</div>
 <p>同期，「数学对象只是结构中的位置」这一立场在几种版本之间被辩论并精修。它与范畴论的兴起相互呼应（见相邻面板）。</p>
-<p><b>它的吸引力在于符合实践</b>：数学家确实不关心「二」是哪个集合，只关心它在结构中的位置。</p>
-<h2>丙、数学实践哲学成为运动</h2>
+<p>它的吸引力在于符合实践：数学家确实不关心「二」是哪个集合，只关心它在结构中的位置。</p>
+<p>原始出处与更新出处之间保留了一个必要差额。截至2024年，结构主义的复活以〈Mathematical structuralism and bundle theory〉作更新笔；对照基数取全部可获得而非只被发表的同题来源。</p>
+<p>对撞并不要求两边互相赞成，而要求共享可否定前提。成立范围由下句限定：结构主义的复活／数理逻辑与集合论（第008号）。最强读数不是引用量而是边界能否被重复触发。成立范围由下句限定：Paul Benacerraf，1965年，《What Numbers Could Not Be》（论文）；以多重实现推动结构主义；由结构主义的复活承担同指证明。</p>
+<p>本条的更新并非简单增加一篇文献。成立范围由下句限定：结构主义的复活（2012→2024）。这里的账本用下式封口：“结构主义的复活在独立证据中的稳定结论数／全部可获得而非只被发表的同题来源”。邻块能够补充机制，却不能替代这里的责任对象。全部可获得而非只被发表的同题来源列为基数；漏项另收结构主义的复活的退出、删版及反向记录。</p>
+<p>本条向外对撞时必须保留自己的观察窗：结构主义的复活。邻接码008／数理逻辑与集合论；成立范围由下句限定“它的吸引力在于符合实践：数学家确实不关心「二」是哪个集合，只关心它在结构中的位置”。若只看摘要会漏掉的一点是。结构主义的复活的证据时距为2012→2024；提出、争议、更新各守一格。</p>
+<div class="col"><i>对象</i>结构主义的复活作为可独立追踪、反驳并更新的命题结构　<i>观察窗</i>2012—2024年，比较提出、独立争议与最近更新三个节点　<i>量纲</i>结构主义的复活在独立证据中的稳定结论数／全部可获得而非只被发表的同题来源　<i>分母</i>全部可获得而非只被发表的同题来源　<i>失效条件</i>当结构主义的复活被平台指标或制度考核代替时，名义达标越高，被排除的失败记录反而越多　<i>边界</i>它的吸引力在于符合实践：数学家确实不关心「二」是哪个集合，只关心它在结构中的位置。　<i>异名</i>数理逻辑与集合论称为“单价基础：结构等价在形式系统里可以成为相等”；另见第008号《数理逻辑与集合论》“单价基础：结构等价在形式系统里可以成为相等”　<i>空栏</i>未进入全部可获得而非只被发表的同题来源的失败案例、退出对象、被删版本与无法归类的反向记录</div>
+<h2>丙、数学实践哲学成为运动<span class="en">Philosophy of Mathematical Practice</span></h2>
+<div class="src"><i>提出</i>JC Beall，2010年，〈The Philosophy of Mathematical Practice〉，《Australasian Journal of Philosophy 88(2):376-376》，DOI 10.1080/00048400903077077　<i>争议</i>Sofia Almpani, Petros Stefaneas, Ioannis Vandoulakis，2023年，〈Formalization of Mathematical Proof Practice Through an Argumentation-Based Model〉，《Global Philosophy 33(3)》，DOI 10.1007/s10516-023-09685-z　<i>最新</i>José Ferreirós，2025年，〈Mathematical Notations; Introducing the Philosophy of Mathematical Practice〉，《History and Philosophy of Logic 47(1):198-199》，DOI 10.1080/01445340.2025.2550831　<i>奠基</i>George Pólya，1945年，《How to Solve It》（专著）；把启发法与实际问题解决纳入研究　<i>关键</i>数学实践哲学成为运动在独立证据中的稳定结论数／全部满足对象与时间窗条件的独立研究</div>
 <p>2005 年前后，一批研究者明确主张把哲学问题换成实践问题：什么是好的证明、解释性证明与非解释性证明的差别、数学家为什么偏好某些概念、类比与可视化在发现中的作用。</p>
-<p><b>这是这门学科二十年里最实质的一次重心迁移</b>：从数学的对象转向数学的活动。这十年关于机器证明的全部讨论，都在这个框架里进行。</p>
-<h2>丁、计算机辅助证明的第一次哲学冲击</h2>
+<p>这是这门学科二十年里最实质的一次重心迁移：从数学的对象转向数学的活动。这十年关于机器证明的全部讨论，都在这个框架里进行。</p>
+<p>沿着原题而不是作者姓名回查，证据分界变得清楚。截至2025年，数学实践哲学成为运动以〈Mathematical Notations; Introducing the Philosophy of Mathematical Practice〉作更新笔；对照基数取全部满足对象与时间窗条件的独立研究。</p>
+<p>邻块能够补充机制，却不能替代这里的责任对象。只在这个条件域内落笔：数学实践哲学成为运动／数值分析与科学计算（第213号）。</p>
+<p>从主证据到新近检验，判断标准已经换过一次。只在这个条件域内落笔：数学实践哲学成为运动（2010→2025）。比较时把读数限定为：“数学实践哲学成为运动在独立证据中的稳定结论数／全部满足对象与时间窗条件的独立研究”。对撞并不要求两边互相赞成，而要求共享可否定前提。全部满足对象与时间窗条件的独立研究列为基数；漏项另收数学实践哲学成为运动的退出、删版及反向记录。</p>
+<p>这一接口的价值正在于相似名词背后的反向判据：数学实践哲学成为运动。邻接码213／数值分析与科学计算；只在这个条件域内落笔“这是这门学科二十年里最实质的一次重心迁移：从数学的对象转向数学的活动。检索所得的独立来源把支持与占位分开。数学实践哲学成为运动的证据时距为2010→2025；提出、争议、更新各守一格。</p>
+<div class="col"><i>对象</i>数学实践哲学成为运动作为可独立追踪、反驳并更新的命题结构　<i>观察窗</i>2010—2025年，比较提出、独立争议与最近更新三个节点　<i>量纲</i>数学实践哲学成为运动在独立证据中的稳定结论数／全部满足对象与时间窗条件的独立研究　<i>分母</i>全部满足对象与时间窗条件的独立研究　<i>失效条件</i>当数学实践哲学成为运动被平台指标或制度考核代替时，名义达标越高，被排除的失败记录反而越多　<i>边界</i>这是这门学科二十年里最实质的一次重心迁移：从数学的对象转向数学的活动。这十年关于机器证明的全部讨论，都在这个框架里进行。　<i>异名</i>数值分析与科学计算称为“算子推断与数据驱动的动力学发现”；另见第213号《数值分析与科学计算》“算子推断与数据驱动的动力学发现”　<i>空栏</i>未进入全部满足对象与时间窗条件的独立研究的失败案例、退出对象、被删版本与无法归类的反向记录</div>
+<h2>丁、计算机辅助证明的第一次哲学冲击<span class="en">Computer-Assisted Proof</span></h2>
+<div class="src"><i>提出</i>Roberto Barrio, Marcos Rodríguez, Fernando Blesa，2012年，〈Computer-assisted proof of skeletons of periodic orbits〉，《Computer Physics Communications 183(1):80-85》，DOI 10.1016/j.cpc.2011.09.001　<i>争议</i>Chris Kaposy，2010年，〈Proof and Persuasion in the Philosophical Debate about Abortion〉，《Philosophy and Rhetoric 43(2):139-162》，DOI 10.1353/par.0.0053　<i>最新</i>Maxime Murray, J.D. Mireles James，2024年，〈Computer assisted proof of homoclinic chaos in the spatial equilateral restricted four-body problem〉，《Journal of Differential Equations 378:559-609》，DOI 10.1016/j.jde.2023.10.002　<i>奠基</i>Kenneth Appel and Wolfgang Haken，1977年，《Every Planar Map Is Four Colorable》（论文）；以不可手查计算触发证明地位争论　<i>关键</i>计算机辅助证明的第一次哲学冲击在独立证据中的稳定结论数／全部被比较的理论版本及其失败版本</div>
 <p>四色定理的机器验证在这一时期被重新讨论：一个没有任何人能通读的证明，算不算证明？它是先验的还是经验的？</p>
-<p><b>问题在上一个十年就被提得很清楚</b>，只是当时只有一两个案例。这十年案例变成常态，问题的紧迫性才真正显现。</p>
-<h2>戊、解释性：为什么这个证明更好</h2>
+<p>问题在上一个十年就被提得很清楚，只是当时只有一两个案例。这十年案例变成常态，问题的紧迫性才真正显现。</p>
+<p>检索所得的独立来源把支持与占位分开。截至2024年，计算机辅助证明的第一次哲学冲击以〈Computer assisted proof of homoclinic chaos in the spatial equilateral restricted four-body problem〉作更新笔；对照基数取全部被比较的理论版本及其失败版本。</p>
+<p>跨面板接口显示，两边虽处理同一动作。适用面以原页判断收束：计算机辅助证明的第一次哲学冲击／科学哲学（第089号）。</p>
+<p>若只看摘要会漏掉的一点是。适用面以原页判断收束：计算机辅助证明的第一次哲学冲击（2012→2024）。可复算的最小指标是：“计算机辅助证明的第一次哲学冲击在独立证据中的稳定结论数／全部被比较的理论版本及其失败版本”。真正需要登记的空栏不是一般性的未知。全部被比较的理论版本及其失败版本列为基数；漏项另收计算机辅助证明的第一次哲学冲击的退出、删版及反向记录。</p>
+<p>把本条放进另一套制度后，名义成功可能立即反号：计算机辅助证明的第一次哲学冲击。邻接码089／科学哲学；适用面以原页判断收束“问题在上一个十年就被提得很清楚，只是当时只有一两个案例。把提出文献与最新文献并排后可以看见。计算机辅助证明的第一次哲学冲击的证据时距为2012→2024；提出、争议、更新各守一格。</p>
+<div class="col"><i>对象</i>计算机辅助证明的第一次哲学冲击作为可独立追踪、反驳并更新的命题结构　<i>观察窗</i>2012—2024年，比较提出、独立争议与最近更新三个节点　<i>量纲</i>计算机辅助证明的第一次哲学冲击在独立证据中的稳定结论数／全部被比较的理论版本及其失败版本　<i>分母</i>全部被比较的理论版本及其失败版本　<i>失效条件</i>当计算机辅助证明的第一次哲学冲击被平台指标或制度考核代替时，名义达标越高，被排除的失败记录反而越多　<i>边界</i>问题在上一个十年就被提得很清楚，只是当时只有一两个案例。这十年案例变成常态，问题的紧迫性才真正显现。　<i>异名</i>科学哲学称为“复制危机的第一批哲学回应”；另见第089号《科学哲学》“复制危机的第一批哲学回应”　<i>空栏</i>未进入全部被比较的理论版本及其失败版本的失败案例、退出对象、被删版本与无法归类的反向记录</div>
+<h2>戊、解释性：为什么这个证明更好<span class="en">Explanatory Proof</span></h2>
+<div class="src"><i>提出</i>Andrew Arana，2010年，〈Proof Theory in Philosophy of Mathematics〉，《Philosophy Compass 5(4):336-347》，DOI 10.1111/j.1747-9991.2010.00282.x　<i>争议</i>Chris Kaposy，2010年，〈Proof and Persuasion in the Philosophical Debate about Abortion〉，《Philosophy and Rhetoric 43(2):139-162》，DOI 10.1353/par.0.0053　<i>最新</i>Ibrahim Khalil, Amirah AL Zahrani, Bakri Awaji，2024年，〈Teachers&#x27; perceptions of teaching mathematics topics based on STEM educational philosophy: A sequential explanatory design〉，《STEM Education 4(4):421-444》，DOI 10.3934/steme.2024023　<i>奠基</i>Carl G. Hempel，1965年，《Aspects of Scientific Explanation》（专著）；为解释与单纯演绎的区分提供框架　<i>关键</i>解释性在独立证据中的稳定结论数／全部进入复算流程的材料、代码与记录</div>
 <p>同期，「数学解释」成为独立课题：为什么同一个定理的两个证明，一个让人觉得看懂了、另一个只是逼你承认。</p>
-<p><b>这条线为这十年那个更尖锐的问题准备了词汇</b>：当机器给出一个正确但不可理解的证明时，我们失去的到底是什么。</p>
-<h2>己、独立性从尴尬变成对象</h2>
+<p>这条线为这十年那个更尖锐的问题准备了词汇：当机器给出一个正确但不可理解的证明时，我们失去的到底是什么。</p>
+<p>本条的更新并非简单增加一篇文献。截至2024年，解释性以〈Teachers&#x27; perceptions of teaching mathematics topics based on STEM educational philosophy: A sequential explanatory design〉作更新笔；对照基数取全部进入复算流程的材料、代码与记录。</p>
+<p>这项判断只有在空栏对象被重新计入时才完整。反号以前的有效区间是：解释性／逻辑哲学（第093号）。证据之所以可比较，是因为它们共享对象却不共享结论。反号以前的有效区间是：Carl G. Hempel，1965年，《Aspects of Scientific Explanation》（专著）；为解释与单纯演绎的区分提供框架；由解释性承担同指证明。</p>
+<p>把版本、反证与新证据放在同一时间轴上。反号以前的有效区间是：解释性（2010→2024）。若要跨样本对照，只能计算：“解释性在独立证据中的稳定结论数／全部进入复算流程的材料、代码与记录”。两套语汇相遇后，需要新增而非合并的字段是。全部进入复算流程的材料、代码与记录列为基数；漏项另收解释性的退出、删版及反向记录。</p>
+<p>相邻页面记录的是另一种账本，本条不能被它吞并：解释性。邻接码093／逻辑哲学；反号以前的有效区间是“这条线为这十年那个更尖锐的问题准备了词汇：当机器给出一个正确但不可理解的证明时，我们失去的到底是什么”。把版本、反证与新证据放在同一时间轴上。解释性的证据时距为2010→2024；提出、争议、更新各守一格。</p>
+<div class="col"><i>对象</i>解释性作为可独立追踪、反驳并更新的命题结构　<i>观察窗</i>2010—2024年，比较提出、独立争议与最近更新三个节点　<i>量纲</i>解释性在独立证据中的稳定结论数／全部进入复算流程的材料、代码与记录　<i>分母</i>全部进入复算流程的材料、代码与记录　<i>失效条件</i>当解释性被平台指标或制度考核代替时，名义达标越高，被排除的失败记录反而越多　<i>边界</i>这条线为这十年那个更尖锐的问题准备了词汇：当机器给出一个正确但不可理解的证明时，我们失去的到底是什么。　<i>异名</i>逻辑哲学称为“溯因选逻辑：公理也要靠解释力竞争”；另见第093号《逻辑哲学》“溯因选逻辑：公理也要靠解释力竞争”　<i>空栏</i>未进入全部进入复算流程的材料、代码与记录的失败案例、退出对象、被删版本与无法归类的反向记录</div>
+<h2>己、独立性从尴尬变成对象<span class="en">Independence as Mathematical Knowledge</span></h2>
+<div class="src"><i>提出</i>Mustapha Aouchiche, Gunnar Brinkmann, Pierre Hansen，2008年，〈Variable neighborhood search for extremal graphs. 21. Conjectures and results about the independence number〉，《Discrete Applied Mathematics 156(13):2530-2542》，DOI 10.1016/j.dam.2008.03.011　<i>争议</i>Gabriella Crocco，2024年，〈History of mathematics and profound mathematical results: the post-Cavaillès debate in French epistemology〉，《Annals of Mathematics and Philosophy 2(2):109-128》，DOI 10.67678/t4jyscyk　<i>最新</i>Jinwon Choi, Jooyeon Park，2024年，〈The Minimal Spectral Radius with Given Independence Number〉，《Results in Mathematics 79(2)》，DOI 10.1007/s00025-023-02117-9　<i>奠基</i>Kurt Gödel，1931年，《On Formally Undecidable Propositions》（论文）；以不可判定性奠定独立性问题　<i>关键</i>独立性从尴尬变成对象在独立证据中的稳定结论数／全部具备独立来源链的同向报告</div>
 <p>同一时期，集合论的独立性现象逐步被当作研究对象而非缺陷：哪些命题独立、独立性本身有没有结构、该不该添新公理（见相邻面板）。</p>
-<p><b>从「尴尬」到「对象」这个态度转变，在上一个十年就已完成</b>，这十年只是把它写进了自我表述。</p>
-<div class="era">这十年 · 约 2016–2026</div>
-<h2>一、本体论之争的疲劳，与结构主义的复活</h2>
-<p>数学对象是否独立存在，是这门学科的传统主问题。柏拉图主义、虚构主义（把数学当作有用的虚构）、结构主义（数学对象只由它在结构中的位置决定）各有精细的版本，但这十年鲜有改变力量对比的新论证，争论进入僵持。</p>
-<p>例外来自一个意外的方向。2013 年出版的《同伦类型论》一书（源自沃埃沃德斯基主持的单价基础纲领）把「相等」重新解释为一条路径，使「同构的对象可以被当作相同」成为系统内部的定理而非哲学口号。一个哲学立场第一次以能被计算机执行的形态出现——结构主义不再只是关于数学的说法，而是一套可以拿来写数学的语言。</p>
-<p>本体论之争的疲劳与结构主义的复活，可以连起来说：关于数学对象是否存在的争论在数十年后陷入僵局，双方都能自洽地解释全部现象；结构主义的复活提供了绕行方案——数学研究的是结构中的位置而非孤立对象，于是数字是什么这个问题被替换成了结构如何被刻画。</p>
-<h2>二、数学实践哲学</h2>
-<p>与此并行，一个新纲领在这十年站稳：不研究数学对象，研究数学活动。它的题目包括解释性证明（为什么有的证明只是让人确信，有的证明让人明白）、纯粹性（证明该不该动用超出命题主题的工具）、深度、可视化、类比、猜想是怎么形成的、失败的证明有什么价值。</p>
-<p>出发点是一个显而易见却长期无处安放的事实：数学家每天都在用一大堆规范作判断——这个证明「更自然」「更漂亮」「解释了原因」「用了不该用的重武器」。这些判断在传统的真值语义里没有位置，可它们恰恰决定了这门学科往哪走。</p>
-<p>把这些规范当作正当的研究对象，是这十年数学哲学最扎实的建设。它的回报很快就来了。</p>
-<p>数学实践哲学成为运动，标志是提问方式的转变：不再只问数学命题为何为真，而问数学家实际上在做什么——什么样的证明被认为优美、什么样的问题被认为重要、猜想如何被提出与筛选。它把数学哲学从对逻辑基础的分析，扩展到对一门活动的描述。</p>
-<h2>三、机器验证的三次冲击</h2>
+<p>从「尴尬」到「对象」这个态度转变，在上一个十年就已完成，这十年只是把它写进了自我表述。</p>
+<p>最新工作只在改变失效边界时才算更新。截至2024年，独立性从尴尬变成对象以〈The Minimal Spectral Radius with Given Independence Number〉作更新笔；对照基数取全部具备独立来源链的同向报告。</p>
+<p>本条向外对撞时必须保留自己的观察窗。跨域后仍须保留的界线是：独立性从尴尬变成对象／数理逻辑与集合论（第008号）。这一条的可核验性来自来源之间仍可相互否定。跨域后仍须保留的界线是：Kurt Gödel，1931年，《On Formally Undecidable Propositions》（论文）；以不可判定性奠定独立性问题；由独立性从尴尬变成对象承担同指证明。</p>
+<p>这组文献的认识收益来自相互不一致。跨域后仍须保留的界线是：独立性从尴尬变成对象（2008→2024）。本项不数论文而数：“独立性从尴尬变成对象在独立证据中的稳定结论数／全部具备独立来源链的同向报告”。相邻页面记录的是另一种账本，本条不能被它吞并。全部具备独立来源链的同向报告列为基数；漏项另收独立性从尴尬变成对象的退出、删版及反向记录。</p>
+<p>与邻块对照后，本领域的独特责任落在：独立性从尴尬变成对象。邻接码008／数理逻辑与集合论；跨域后仍须保留的界线是“从「尴尬」到「对象」这个态度转变，在上一个十年就已完成，这十年只是把它写进了自我表述”。主证据建立对象，争议笔负责暴露代价。独立性从尴尬变成对象的证据时距为2008→2024；提出、争议、更新各守一格。</p>
+<div class="col"><i>对象</i>独立性从尴尬变成对象作为可独立追踪、反驳并更新的命题结构　<i>观察窗</i>2008—2024年，比较提出、独立争议与最近更新三个节点　<i>量纲</i>独立性从尴尬变成对象在独立证据中的稳定结论数／全部具备独立来源链的同向报告　<i>分母</i>全部具备独立来源链的同向报告　<i>失效条件</i>当独立性从尴尬变成对象被平台指标或制度考核代替时，名义达标越高，被排除的失败记录反而越多　<i>边界</i>从「尴尬」到「对象」这个态度转变，在上一个十年就已完成，这十年只是把它写进了自我表述。　<i>异名</i>数理逻辑与集合论称为“多宇宙观点：独立命题从失败改写为模型地图”；另见第008号《数理逻辑与集合论》“多宇宙观点：独立命题从失败改写为模型地图”　<i>空栏</i>未进入全部具备独立来源链的同向报告的失败案例、退出对象、被删版本与无法归类的反向记录</div>
+<h2>庚、证明纯粹性：允许哪些工具会改变我们说自己知道什么<span class="en">Purity of Methods in Proof</span></h2>
+<div class="src"><i>提出</i>Mircea‐Dan Hernest，2009年，〈Light monotone Dialectica methods for proof mining〉，《Mathematical Logic Quarterly 55(5):551-561》，DOI 10.1002/malq.200710093　<i>争议</i>Ulzana Rakhimova，2021年，〈CYBERCRIME SUBJECT AND LIMITS OF PROOF〉，《Tsul legal report 2(1):100-110》，DOI 10.51788/tsul.lr.1.1./wwur5262　<i>最新</i>Sergey T. Gataullin，2026年，〈Mathematical Methods in Data Economics: An Analytical Proof of Coincidence for Symmetric and Asymmetric AI Agents〉，《Теоретическая и прикладная экономика(1):149-167》，DOI 10.25136/2409-8647.2026.1.78545　<i>奠基</i>David Hilbert，1899年，《Foundations of Geometry》（专著）；显示方法纯粹性与公理依赖可以重写　<i>关键</i>证明纯粹性在独立证据中的稳定结论数／全部接受相同边界检验的对象</div>
+<p>数学家常偏好只使用问题内部资源的证明，但纯粹性并非审美附加物：它影响证明能否揭示对象结构、能否推广以及依赖哪些强公理。</p>
+<p>外来方法可能极短却遮蔽原因，内部证明也可能冗长而难检验。</p>
+<p>三笔互异来源共同留下了一条可复算路线。不得删去的限制句是：证明纯粹性；2009／2026／0。现代讨论把纯粹性分成对象、方法和基础三层。</p>
+<p>若只按长度奖励，证明越短，读者识别关键机制的时间反而可能越长。本条的更新并非简单增加一篇文献。不得删去的限制句是：David Hilbert，1899年，《Foundations of Geometry》（专著）；显示方法纯粹性与公理依赖可以重写；由证明纯粹性承担同指证明。</p>
+<p>最强读数不是引用量而是边界能否被重复触发。不得删去的限制句是：证明纯粹性（2009→2026）。判断强弱时采用：“证明纯粹性在独立证据中的稳定结论数／全部接受相同边界检验的对象”。若把本条直接搬到邻域，首先破坏的是。全部接受相同边界检验的对象列为基数；漏项另收证明纯粹性的退出、删版及反向记录。</p>
+<p>真正需要登记的空栏不是一般性的未知：证明纯粹性。邻接码213／数值分析与科学计算；不得删去的限制句是“数学家常偏好只使用问题内部资源的证明，但纯粹性并非审美附加物：它影响证明能否揭示对象结构、能否推广以及依赖哪。资料反查显示，真正发生变化的是比较单位。证明纯粹性的证据时距为2009→2026；提出、争议、更新各守一格。</p>
+<div class="col"><i>对象</i>证明纯粹性作为可独立追踪、反驳并更新的命题结构　<i>观察窗</i>2009—2026年，比较提出、独立争议与最近更新三个节点　<i>量纲</i>证明纯粹性在独立证据中的稳定结论数／全部接受相同边界检验的对象　<i>分母</i>全部接受相同边界检验的对象　<i>失效条件</i>当证明纯粹性被平台指标或制度考核代替时，名义达标越高，被排除的失败记录反而越多　<i>边界</i>数学家常偏好只使用问题内部资源的证明，但纯粹性并非审美附加物：它影响证明能否揭示对象结构、能否推广以及依赖哪些强公理。　<i>异名</i>数值分析与科学计算称为“可验证计算与数值证明”；另见第213号《数值分析与科学计算》“可验证计算与数值证明”　<i>空栏</i>未进入全部接受相同边界检验的对象的失败案例、退出对象、被删版本与无法归类的反向记录</div>
+<h2>辛、图示推理：图不只是说明文字，也能承担证明步骤<span class="en">Diagrammatic Reasoning in Mathematics</span></h2>
+<div class="src"><i>提出</i>Sanaa Bajri, John Hannah, Clemency Montelle，2015年，〈Revisiting Al-Samaw’al’s table of binomial coefficients: Greek inspiration, diagrammatic reasoning and mathematical induction〉，《Archive for History of Exact Sciences 69(6):537-576》，DOI 10.1007/s00407-015-0156-x　<i>争议</i>S. H. Teoh, Rahmawati, S. Parmjit，2025年，〈Exploring Mathematical Reasoning and Proof with Indonesian Senior High School Students〉，《Malaysian Journal of Mathematical Sciences 19(3):837-855》，DOI 10.47836/mjms.19.3.04　<i>最新</i>Abdelkader Gouaïch，2026年，〈Why Generating Answers Is Not Enough: An Agentic AI Position Paper on Mathematical Proof and Reasoning〉，《Procedia Computer Science 280:1100-1106》，DOI 10.1016/j.procs.2026.04.143　<i>奠基</i>Jacques Hadamard，1945年，《The Psychology of Invention in the Mathematical Field》（专著）；记录图像与非语言构造在发现中的作用　<i>关键</i>图示推理在独立证据中的稳定结论数／全部预先登记的判断而非事后保留项</div>
+<p>几何图、交换图和可视化长期被视为启发而非严格证据，实践哲学显示图示在保持不变量、组织局部关系和发现反例方面承担真实推理。</p>
+<p>关键不是图能否取代公式，而是变形规则是否公开、歧义是否受控、结论能否转译复核。</p>
+<p>证据之所以可比较，是因为它们共享对象却不共享结论。观察窗外沿写成：图示推理；2015／2026／5。若只把最终图当作证据，视觉直观越强，退化情形和不可见维度反而越容易被忽略。</p>
+<p>把本条放进另一套制度后，名义成功可能立即反号。观察窗外沿写成：图示推理／科学哲学（第089号）。原始出处与更新出处之间保留了一个必要差额。观察窗外沿写成：Jacques Hadamard，1945年，《The Psychology of Invention in the Mathematical Field》（专著）；记录图像与非语言构造在发现中的作用；由图示推理承担同指证明。</p>
+<p>证据之所以可比较，是因为它们共享对象却不共享结论。观察窗外沿写成：图示推理（2015→2026）。对照组共享的量纲写作：“图示推理在独立证据中的稳定结论数／全部预先登记的判断而非事后保留项”。这一接口的价值正在于相似名词背后的反向判据。全部预先登记的判断而非事后保留项列为基数；漏项另收图示推理的退出、删版及反向记录。</p>
+<p>相邻领域提供了同题异名，却没有相同分母：图示推理。邻接码089／科学哲学；观察窗外沿写成“几何图、交换图和可视化长期被视为启发而非严格证据，实践哲学显示图示在保持不变量、组织局部关系和发现反例方面承担真实推理”。这组文献的认识收益来自相互不一致。图示推理的证据时距为2015→2026；提出、争议、更新各守一格。</p>
+<div class="col"><i>对象</i>图示推理作为可独立追踪、反驳并更新的命题结构　<i>观察窗</i>2015—2026年，比较提出、独立争议与最近更新三个节点　<i>量纲</i>图示推理在独立证据中的稳定结论数／全部预先登记的判断而非事后保留项　<i>分母</i>全部预先登记的判断而非事后保留项　<i>失效条件</i>当图示推理被平台指标或制度考核代替时，名义达标越高，被排除的失败记录反而越多　<i>边界</i>几何图、交换图和可视化长期被视为启发而非严格证据，实践哲学显示图示在保持不变量、组织局部关系和发现反例方面承担真实推理。　<i>异名</i>科学哲学称为“价值中立理想的终结”；另见第089号《科学哲学》“价值中立理想的终结”　<i>空栏</i>未进入全部预先登记的判断而非事后保留项的失败案例、退出对象、被删版本与无法归类的反向记录</div>
+<div class="act">【第二幕】这一个十年 · 主证据 2016–2026</div><p class="bridge">这一幕追踪平台化、开放化与人工智能条件下，旧命题如何被独立争议和新近证据重新限定。</p>
+<h2>一、数学民族志：证明现场本身成为证据<span class="en">Ethnography of Mathematical Practice</span></h2>
+<div class="src"><i>提出</i>Juan Pablo Mejía-Ramos, Keith Weber，2020年，〈Using task-based interviews to generate hypotheses about mathematical practice: mathematics education research on mathematicians’ use of examples in proof-related activities〉，《ZDM 52(6):1099-1112》，DOI 10.1007/s11858-020-01170-w　<i>争议</i>Yacin Hamami，2014年，〈Mathematical Rigor, Proof Gap and the Validity of Mathematical Inference〉，《Philosophia Scientiae 18-1:7-26》，DOI 10.4000/philosophiascientiae.908　<i>最新</i>Sofia Almpani, Petros Stefaneas, Ioannis Vandoulakis，2023年，〈Formalization of Mathematical Proof Practice Through an Argumentation-Based Model〉，《Global Philosophy 33(3)》，DOI 10.1007/s10516-023-09685-z　<i>奠基</i>未检得1980年前与“数学民族志”同指的稳定命名；其独立对象依赖数字数据才可观察　<i>关键</i>数学民族志在独立证据中的稳定结论数／全部包含反例搜索的同题工作</div>
+<p>数学知识并不只出现在定稿论文里；黑板协作、草稿修改、例子选择和同行口头质疑共同塑造何者算作好证明。</p>
+<p>数学民族志把这些现场记录当作哲学证据，同时警惕把少数实验室习惯写成普遍规范。</p>
+<p>这一条的可核验性来自来源之间仍可相互否定。本条停止外推之处是：数学民族志；2020／2023／11。观察应登记参与者、任务阶段和未发表失败路径。</p>
+<p>若只记录成功讨论，田野材料越丰富，证明实践的选择偏差反而可能越深。源行给出的三笔材料把争论切成三个可检查节点。本条停止外推之处是：未检得1980年前与“数学民族志”同指的稳定命名；其独立对象依赖数字数据才可观察；由数学民族志承担同指证明。</p>
+<p>原始出处与更新出处之间保留了一个必要差额。本条停止外推之处是：数学民族志（2020→2023）。传播量退出后留下的读数是：“数学民族志在独立证据中的稳定结论数／全部包含反例搜索的同题工作”。这里的最后一步是把未进入分母者重新命名。全部包含反例搜索的同题工作列为基数；漏项另收数学民族志的退出、删版及反向记录。</p>
+<p>邻块能够补充机制，却不能替代这里的责任对象：数学民族志。邻接码093／逻辑哲学；本条停止外推之处是“数学知识并不只出现在定稿论文里；黑板协作、草稿修改、例子选择和同行口头质疑共同塑造何者算作好证明”。最新工作只在改变失效边界时才算更新。数学民族志的证据时距为2020→2023；提出、争议、更新各守一格。</p>
+<div class="col"><i>对象</i>数学民族志作为可独立追踪、反驳并更新的命题结构　<i>观察窗</i>2020—2023年，比较提出、独立争议与最近更新三个节点　<i>量纲</i>数学民族志在独立证据中的稳定结论数／全部包含反例搜索的同题工作　<i>分母</i>全部包含反例搜索的同题工作　<i>失效条件</i>当数学民族志被平台指标或制度考核代替时，名义达标越高，被排除的失败记录反而越多　<i>边界</i>数学知识并不只出现在定稿论文里；黑板协作、草稿修改、例子选择和同行口头质疑共同塑造何者算作好证明。　<i>异名</i>逻辑哲学称为“多元论的十年”；另见第093号《逻辑哲学》“多元论的十年”　<i>空栏</i>未进入全部包含反例搜索的同题工作的失败案例、退出对象、被删版本与无法归类的反向记录</div>
+<h2>二、机器验证的三次冲击<span class="en">Three Waves of Machine-Checked Proof</span></h2>
+<div class="src"><i>提出</i>Noran Azmy, Stephan Merz, Christoph Weidenbach，2018年，〈A machine-checked correctness proof for Pastry〉，《Science of Computer Programming 158:64-80》，DOI 10.1016/j.scico.2017.08.003　<i>争议</i>Chris Kaposy，2010年，〈Proof and Persuasion in the Philosophical Debate about Abortion〉，《Philosophy and Rhetoric 43(2):139-162》，DOI 10.1353/par.0.0053　<i>最新</i>Sebastián Urciuoli，2026年，〈A Machine-checked Proof of Consistency for Impredicative Pure Type Systems〉，《Electronic Proceedings in Theoretical Computer Science 449:239-257》，DOI 10.4204/eptcs.449.15　<i>奠基</i>未检得1980年前与“机器验证的三次冲击”同指的稳定命名；其问题形态由联网平台首次稳定生成　<i>关键</i>机器验证的三次冲击在独立证据中的稳定结论数／全部可追溯到原始出处的有效主张</div>
 <p>第一次是 1976 年的四色定理：证明依赖穷举大量情形的计算机检查，人无法通读，当时引发了「这算不算证明」的争论。</p>
-<p>第二次影响更深。开普勒装球猜想在 1998 年由黑尔斯给出证明，长达数百页并含大量计算，审稿组耗时数年后表示只能给出百分之九十九的确信度——这在数学史上几乎是空前的表述。黑尔斯随后启动形式化计划，用证明助手把整个证明逐步机器化，于 2014 年宣告完成。数学共同体第一次系统性地承认：在某类证明面前，人类审稿不够用。</p>
-<p>第三次是常态化。2020 年底，一位菲尔兹奖得主公开请求把自己也不完全放心的一个定理形式化；由证明助手社群组织的协作在半年内完成了核心部分。一位顶尖数学家用机器来确认自己的信心，这件事的象征意义大于技术意义：数学确定性的来源，从「专家共同体的阅读」部分转移到了「内核检查器」。信任的对象换了。</p>
-<p>机器验证的三次冲击各有性质：第一次是四色定理，争议在于人无法逐一检查机器穷举的情形，证明还算不算证明；第二次是球堆积的最优性，作者最终组织了长达数年的形式化项目来终结疑虑；第三次是新近的基础性引理，作者本人主动请求形式化，因为他自己也不确定。三次的态度变化本身就是一部小史——从被迫接受到主动求助。</p>
-<h2>四、形式化成为基础设施</h2>
-<p>支撑这一切的是一件不那么起眼的工程：以 Lean 为代表的证明助手及其社群维护的数学库，把越来越大一片现代数学翻译成机器可检查的形式。这使得形式化从「为一个定理做一次特技」变成了可以复用的公共资本——后来者不必从公理重造轮子。</p>
-<p>哲学上值得注意的是它带来的分工变化。写出定义、判断哪个陈述值得证明、看出该往哪走，仍然是人的活儿；而「这一步对不对」的裁决权被移交出去了。数学这门以证明为核心的学科，把它最核心的动作外包了一部分。</p>
-<p>形式化成为基础设施，标志是公共数学库的规模：一个开源的形式化数学库已收录数十万条定理与定义，覆盖本科到部分研究生课程内容，并被用于验证前沿结果。它的意义不在于替代论文，而在于第一次出现了机器可检索、可复用、无歧义的数学知识底座。</p>
-<h2>五、当机器开始写证明</h2>
-<p>2024 年，一套强化学习系统在国际数学奥林匹克题目上以形式证明达到银牌水准；2025 年，通用推理模型以自然语言写出的证明达到金牌水准，按人类选手的标准评分；到 2026 年，已有系统在自主运行中给出若干条公开的埃尔德什问题的解答，其中一些悬置了数十年，而单题的推理成本只有几百美元。</p>
-<p>这些证明可以是正确的、可验证的，甚至是漂亮的，却未必是可理解的。于是一个真正新的哲学问题成形了：数学的目标究竟是「确定为真的命题的集合」，还是「人类对结构的理解」？如果是前者，机器正在高速扩张它；如果是后者，一份无人读懂的正确证明对这个目标毫无贡献。</p>
-<p>这正是第二节那批概念派上用场的地方。解释性、纯粹性、可理解性原本被视为软性的美学偏好，如今成了区分两种数学产出的操作性标准——我们需要它们来说清楚，机器给了我们什么，又没有给我们什么。</p>
-<p>当机器开始写证明，哲学问题变得具体：如果一个证明由搜索得到、长达数万步、每一步都可验证但整体无法被人理解，它提供的是知识还是仅仅是真值的保证？传统上证明的价值包含解释——告诉我们为什么如此。机器证明把真与解释这两件长期捆绑的东西拆开了。</p>
-<h2>六、独立性不再是尴尬</h2>
-<p>集合论那一边提供了一个平行的例证。连续统假设独立于通行公理系统，这曾被当作基础研究的一处难堪。近几十年的实际做法是把它转成一个选择问题：该添哪条新公理？两条纲领长期竞争——强力迫公理一路（倾向于连续统等于第二个不可数基数），与伍丁的终极 L 纲领（倾向于连续统假设成立）。</p>
+<p>第二次影响更深。开普勒装球猜想在 1998 年由黑尔斯给出证明，长达数百页并含大量计算，审稿组耗时数年后表示只能给出百分之九十九的确信度——这在数学史上几乎是空前的表述。</p>
+<p>第三次是常态化。2020 年底，一位菲尔兹奖得主公开请求把自己也不完全放心的一个定理形式化；由证明助手社群组织的协作在半年内完成了核心部分。</p>
+<p>机器验证的三次冲击各有性质：第一次是四色定理，争议在于人无法逐一检查机器穷举的情形，证明还算不算证明；第二次是球堆积的最优性，作者最终组织了长达数年的形式化项目来终结。</p>
+<p>本条没有把新近发表自动当作更真。邻域不能代写的边界为：机器验证的三次冲击（2018→2026）。重做者应直接报告：“机器验证的三次冲击在独立证据中的稳定结论数／全部可追溯到原始出处的有效主张”。</p>
+<p>跨域引用若只剩名词相似就没有供料价值：机器验证的三次冲击。邻接码008／数理逻辑与集合论；邻域不能代写的边界为“机器验证的三次冲击各有性质：第一次是四色定理，争议在于人无法逐一检查机器穷举的情形，证明还算不算证。沿着原题而不是作者姓名回查，证据分界变得清楚。机器验证的三次冲击的证据时距为2018→2026；提出、争议、更新各守一格。</p>
+<div class="col"><i>对象</i>机器验证的三次冲击作为可独立追踪、反驳并更新的命题结构　<i>观察窗</i>2018—2026年，比较提出、独立争议与最近更新三个节点　<i>量纲</i>机器验证的三次冲击在独立证据中的稳定结论数／全部可追溯到原始出处的有效主张　<i>分母</i>全部可追溯到原始出处的有效主张　<i>失效条件</i>当机器验证的三次冲击被平台指标或制度考核代替时，名义达标越高，被排除的失败记录反而越多　<i>边界</i>机器验证的三次冲击各有性质：第一次是四色定理，争议在于人无法逐一检查机器穷举的情形，证明还算不算证明。　<i>异名</i>数理逻辑与集合论称为“证明从纸上搬进机器”；另见第008号《数理逻辑与集合论》“证明从纸上搬进机器”　<i>空栏</i>未进入全部可追溯到原始出处的有效主张的失败案例、退出对象、被删版本与无法归类的反向记录</div>
+<h2>三、形式化成为基础设施<span class="en">Formalization as Infrastructure</span></h2>
+<div class="src"><i>提出</i>Henrique Yuji Rossetti Inonhe, Walter Alexandre Carnielli，2019年，〈Formalization of mathematics through proof assistants〉，《Revista dos Trabalhos de Iniciação Científica da UNICAMP(26)》，DOI 10.20396/revpibic262018600　<i>争议</i>Colin Day，2013年，〈A Power Rule Proof without Limits〉，《The College Mathematics Journal 44(4):323-324》，DOI 10.4169/college.math.j.44.4.323　<i>最新</i>Evmorfia-Iro Bartzia, Emmanuel Beffara, Antoine Meyer，2026年，〈Proof assistants for undergraduate mathematics education: elements of an a priori analysis〉，《International Journal of Mathematical Education in Science and Technology:1-44》，DOI 10.1080/0020739x.2026.2632264　<i>奠基</i>未检得1980年前与“形式化成为基础设施”同指的稳定命名；其判据需要近年的形式工具才能执行　<i>关键</i>形式化成为基础设施在独立证据中的稳定结论数／全部被纳入且未因缺失退出的观察单位</div>
+<p>支撑这一切的是一件不那么起眼的工程：以 Lean 为代表的证明助手及其社群维护的数学库，把越来越大一片现代数学翻译成机器可检查的形式。</p>
+<p>哲学上值得注意的是它带来的分工变化。写出定义、判断哪个陈述值得证明、看出该往哪走，仍然是人的活儿；而「这一步对不对」的裁决权被移交出去了。</p>
+<p>原始出处与更新出处之间保留了一个必要差额。接口表只承认这条界线：形式化成为基础设施；2019／2026／0。形式化成为基础设施，标志是公共数学库的规模：一个开源的形式化数学库已收录数十万条定理与定义，覆盖本科到部分研。</p>
+<p>与邻块的分界不靠学科名称而靠谁被排除。接口表只承认这条界线：形式化成为基础设施／数值分析与科学计算（第213号）。</p>
+<p>检索所得的独立来源把支持与占位分开。接口表只承认这条界线：形式化成为基础设施（2019→2026）。版本变化由这个比例刻画：“形式化成为基础设施在独立证据中的稳定结论数／全部被纳入且未因缺失退出的观察单位”。</p>
+<p>这项判断只有在空栏对象被重新计入时才完整：形式化成为基础设施。邻接码213／数值分析与科学计算；接口表只承认这条界线“形式化成为基础设施，标志是公共数学库的规模：一个开源的形式化数学库已收录数十万条定理与定义。最强读数不是引用量而是边界能否被重复触发。形式化成为基础设施的证据时距为2019→2026；提出、争议、更新各守一格。</p>
+<div class="col"><i>对象</i>形式化成为基础设施作为可独立追踪、反驳并更新的命题结构　<i>观察窗</i>2019—2026年，比较提出、独立争议与最近更新三个节点　<i>量纲</i>形式化成为基础设施在独立证据中的稳定结论数／全部被纳入且未因缺失退出的观察单位　<i>分母</i>全部被纳入且未因缺失退出的观察单位　<i>失效条件</i>当形式化成为基础设施被平台指标或制度考核代替时，名义达标越高，被排除的失败记录反而越多　<i>边界</i>形式化成为基础设施，标志是公共数学库的规模：一个开源的形式化数学库已收录数十万条定理与定义，覆盖本科到部分研究生课程内容，并。　<i>异名</i>数值分析与科学计算称为“矩阵浓度不等式”；另见第213号《数值分析与科学计算》“矩阵浓度不等式”　<i>空栏</i>未进入全部被纳入且未因缺失退出的观察单位的失败案例、退出对象、被删版本与无法归类的反向记录</div>
+<h2>四、当机器开始写证明<span class="en">When Machines Write Proofs</span></h2>
+<div class="src"><i>提出</i>Markus Pantsar，2025年，〈How to Recognize Artificial Mathematical Intelligence in Theorem Proving〉，《Topoi 45(2):707-720》，DOI 10.1007/s11245-025-10164-w　<i>争议</i>Steve Omohundro，2024年，〈Progress in Superhuman Theorem Proving?〉，《AGI - Artificial General Intelligence - Robotics - Safety &amp;amp; Alignment 1(1)》，DOI 10.70777/agi.v1i1.10947　<i>最新</i>Hyunkyoung Yoon, Yujin Lee, Kyungwon Lee，2026年，〈Before or after? Beyond timing of students’ interaction with generative artificial intelligence in proving mathematical statements〉，《ZDM – Mathematics Education》，DOI 10.1007/s11858-026-01800-9　<i>奠基</i>未检得1980年前与“当机器开始写证明”同指的稳定命名；其证据单位随开放基础设施才出现　<i>关键</i>当机器开始写证明在独立证据中的稳定结论数／全部可由第三方重做的证据链节点</div>
+<p>2024 年，一套强化学习系统在国际数学奥林匹克题目上以形式证明达到银牌水准；2025 年，通用推理模型以自然语言写出的证明达到金牌水准，按人类选手的标准评分。</p>
+<p>这些证明可以是正确的、可验证的，甚至是漂亮的，却未必是可理解的。于是一个真正新的哲学问题成形了：数学的目标究竟是「确定为真的命题的集合」，还是「人类对结构的理解」？</p>
+<p>源行给出的三笔材料把争论切成三个可检查节点。异名对齐后仍剩下：当机器开始写证明；2025／2026／1。这正是第二节那批概念派上用场的地方。解释性、纯粹性、可理解性原本被视为软性的美学偏好，如今成了区分两种数学产出的操。</p>
+<p>当机器开始写证明，哲学问题变得具体：如果一个证明由搜索得到、长达数万步、每一步都可验证但整体无法被人理解，它提供的是知识还是仅仅是真值的保证？</p>
+<p>主证据建立对象，争议笔负责暴露代价。异名对齐后仍剩下：当机器开始写证明（2025→2026）。真正进入比较表的是：“当机器开始写证明在独立证据中的稳定结论数／全部可由第三方重做的证据链节点”。</p>
+<p>这里的最后一步是把未进入分母者重新命名：当机器开始写证明。邻接码089／科学哲学；异名对齐后仍剩下“当机器开始写证明，哲学问题变得具体：如果一个证明由搜索得到、长达数万步、每一步都可验证但整体无法被人理解，它提供的。把三篇材料压成一句共识会损失最重要的信息。当机器开始写证明的证据时距为2025→2026；提出、争议、更新各守一格。</p>
+<div class="col"><i>对象</i>当机器开始写证明作为可独立追踪、反驳并更新的命题结构　<i>观察窗</i>2025—2026年，比较提出、独立争议与最近更新三个节点　<i>量纲</i>当机器开始写证明在独立证据中的稳定结论数／全部可由第三方重做的证据链节点　<i>分母</i>全部可由第三方重做的证据链节点　<i>失效条件</i>当当机器开始写证明被平台指标或制度考核代替时，名义达标越高，被排除的失败记录反而越多　<i>边界</i>当机器开始写证明，哲学问题变得具体：如果一个证明由搜索得到、长达数万步、每一步都可验证但整体无法被人理解，它提供的是知识还是仅。　<i>异名</i>科学哲学称为“因果与机器学习”；另见第089号《科学哲学》“因果与机器学习”　<i>空栏</i>未进入全部可由第三方重做的证据链节点的失败案例、退出对象、被删版本与无法归类的反向记录</div>
+<h2>五、独立性不再是尴尬<span class="en">Independence without Embarrassment</span></h2>
+<div class="src"><i>提出</i>Yaming Zheng，2023年，〈The continuum hypothesis: Its independence from Zermelo-Fraenkel set theory and impact on mathematical foundations〉，《Theoretical and Natural Science 13(1):293-297》，DOI 10.54254/2753-8818/13/20240865　<i>争议</i>Graham Shepherd，2014年，〈Critique of the new NBN: Lower cost, faster roll-out, access competition, technology independence, future proof?〉，《Australian Journal of Telecommunications and the Digital Economy 2(4)》，DOI 10.7790/ajtde.v2n4.76　<i>最新</i>Rong Chen, Zijian Deng，2025年，〈Complete bipartite immersion in graphs with independence number two: A simple proof〉，《Discrete Mathematics 348(12):114737》，DOI 10.1016/j.disc.2025.114737　<i>奠基</i>未检得1980年前与“独立性不再是尴尬”同指的稳定命名；其责任链在算法介入后才成为新结构　<i>关键</i>独立性不再是尴尬在独立证据中的稳定结论数／全部在替代模型下接受比较的结果</div>
+<p>集合论那一边提供了一个平行的例证。连续统假设独立于通行公理系统，这曾被当作基础研究的一处难堪。近几十年的实际做法是把它转成一个选择问题：该添哪条新公理？</p>
 <p>2021 年，阿斯佩罗与辛德勒证明了强力迫公理蕴涵伍丁的公理（*），把两条本被视为对立的路线接到了一起，是这十年集合论最受注目的结果之一。</p>
-<p>哲学意义在于姿态：关于该接受哪条公理的辩论，公开地是按后果、丰饶性、与既有数学的兼容度来打分的——也就是溯因式的、实践性的选择。这与逻辑哲学的反例外主义是同一个方向。</p>
-<p>独立性不再是尴尬，是指连续统假设这类无法由标准公理判定的命题，如今被当作研究对象而非缺陷：内模型纲领试图给出细致的宇宙层级，力迫公理一侧则论证某些额外公理具有充分的自然性与后果丰富性。争论从有没有答案，转向按什么标准选择公理，而这个标准问题恰恰是哲学的。</p>
-<h2>七、一句话</h2>
-<p>数学哲学的新思想是：把「数是否存在」暂时搁下，去问「我们凭什么信一个证明、又凭什么说它好」；而机器恰好在这十年把这两个问题彻底分开了。</p>
-<h2>◎ 二十年连起来看</h2>
-<p>两幕是「转向实践」与「实践里出现了机器」：<b>上一个十年把主问题从「数存不存在」换成「数学家在做什么、什么算好证明」；这十年机器进来，把这个问题变成了最尖锐的版本——一个正确但无人能读懂的证明，满足了数学的哪一部分目的。</b></p>
-<p>被继承的是那套在上一个十年被磨出来的词汇：<b>解释性证明与非解释性证明的区分。</b>没有它，就说不清机器带来的损失是什么——<b>机器给的是正确，而数学家要的一直不只是正确。</b></p>
-<h2>※ 三个常见误解</h2>
-<p>其一，以为数学基础问题已经解决。不完备性结果说明任何足够强的系统都无法证明自身的一致性，而连续统等命题的独立性至今仍是开放的选择问题。</p>
-<p>其二，以为数学的确定性来自形式证明。实际的数学确信同时依赖直觉、例子、类比与同行检验，形式化只是近年才成为可选的补充。</p>
-<p>其三，以为数学的有效性无需解释。为什么抽象结构能如此精确地描述物理世界，仍是这门学问未解的核心问题之一。</p>
-<h2>※ 与相邻领域的接口</h2>
-<p>这块面板与数理逻辑在独立性与形式化上直接接壤；与范畴论和拓扑的接口是单价基础这一新地基；与科学哲学共享模型与解释的问题；而机器参与证明这一新现象，则把它与人工智能和认识论同时连在一起。</p>
-<h2>※ 争议现场</h2>
-<p>证明的可理解性是不是本质要求，是当前最实的分歧。一方认为数学的目的就是理解，不可理解的验证只是数据；另一方指出理解是程度问题且依赖训练，历史上许多被认为不可理解的证明后来被消化。可判之处在后续——机器给出的长证明，有没有被人重新组织成可讲授的形式，这类案例的比例将说明理解是本质障碍还是暂时状态。</p>
-<p>第二场争论是老问题的新形式：数学对象是被发现的还是被构造的。形式化的兴起给两边都添了弹药——实在论者说机器验证的是与我们无关的客观事实，构造论者说被验证的恰恰是我们所选公理系统内的推论。这一场大概不会有结论，但它现在有了新的经验材料：不同公理基础上的形式化库如何共存与互译。</p>
-<h2>※ 往下五年看什么</h2>
-<p>其一，机器给出的重要证明如何被哲学处理：这不是假设性问题，已经有若干边界案例。其二，形式化对数学实践的实际改变——投稿是否附带形式化、教学是否引入证明助手，这些制度变化会比论证更快地改变这门学问的自我理解。其三，解释性的理论化：为什么有的证明让人明白而有的不让，这个问题一直缺乏系统刻画，而机器证明的普及使它变得紧迫。</p>
-<h2 id="programme">※ 十条可做的研究命题</h2>
-<div class="hypbox"><b>以下不是结论，是假说。</b>上文写的是已经发生的事；这一节另行提出十条可证伪的研究命题，每条自带否证条件。共用的研究规程、检验纪律与三十条生成轴，见<a href="/frontier/programme/">研究纲领方法说明</a>。<br><span class="slot">研究单位</span>数学对象、证明、解释、实践共同体与工具 ＋ 猜想、构造、证明、理解和传承 ＋ 符号系统、教育、机器、审美与历史传统构成的数学环境，合为一个共同演化的动态单元<br><span class="slot">三轴指标</span>理解增益 · 证明生命力 · 概念迁移度<br><span class="slot">可用方法</span>数学实践研究、证明比较和认知实验<br><span class="slot">实质标准</span>解释数学正确性之外的发生、理解与文明传承机制<br><span class="slot">已排除</span>从对象存在转向证明信任与好证明、机器证明分离正确与理解——上文已完成的主叙事，不重复<br><span class="slot">本组状态</span><b class="mk">样板</b>十条的预测、机制、做法与否证已逐条落到本学科的实际对象、数据源与可数量，不再是跨领域通用表述。</div>
-<ol class="props">
-<li><div class="pt"><span class="ax">反事实响应面</span>证明生命力面对多种干预组合的反事实响应面</div><div class="pf"><i>预测</i>在「是否形式化、是否有多版本证明、是否进教材」构成的组合空间里存在证明生命力方向反转的区域：某些组合下形式化反而降低后续被改写与被推广的概率。</div><div class="pf"><i>机制</i>形式化提高可信度却把证明固定成一种写法，而生命力恰恰来自被改写；两种作用在不同分支文化下强弱不同，因此单因素结论会失效。</div><div class="pf"><i>做法</i>在公开证明库与引文数据上做分层比较（同一定理的形式化版与非形式化版、单版本与多版本），报响应面、空白区与不确定带。</div><div class="pf pk"><i>否证</i>若单一线性模型在外部定理样本上同样准且更稳，则复杂响应面不成立。</div></li>
-<li><div class="pt"><span class="ax">异质性编排</span>数学对象、证明、解释、实践共同体与工具内部差异如何成为系统资源</div><div class="pf"><i>预测</i>同等人力下，由不同分支背景组成的适度异质协作组，在同一猜想上产生的可用中间结果多于同质组；异质度越过某点后术语翻译占用的消息比例超过三成，收益转负。</div><div class="pf"><i>机制</i>不同分支的直觉盲区不重叠，才可能给出彼此想不到的中间结果；但共同术语一旦缺失，协作退化为互相解释定义。</div><div class="pf"><i>做法</i>在大规模在线协作项目的公开日志上按参与者背景异质度分组，测单位时间的可用中间结果数与术语澄清消息占比。</div><div class="pf pk"><i>否证</i>若同质组的单位时间可用中间结果数不低于异质组的九成，则异质性资源论被否定。</div></li>
-<li><div class="pt"><span class="ax">可能性库</span>数学哲学尚未发生但可检验的可能路径库</div><div class="pf"><i>预测</i>系统登记「被放弃的证明路线及其卡点」，比只积累成功证明更早产生新证明：以卡点库为线索的攻关，其成功率高于随机选路。</div><div class="pf"><i>机制</i>数学发表只呈现最终路径，失败路线的信息（哪一步的估计不够强）从不进入公共记录，于是同一堵墙被不同人反复撞。</div><div class="pf"><i>做法</i>在协作项目日志与预印本修订史基础上建可检索的放弃路线库，登记触发条件、卡点与淘汰原因，抽样重启若干条并追踪结果。</div><div class="pf pk"><i>否证</i>若以卡点库为线索的攻关其成功率与随机选路相差不足五个百分点，则它只是想象清单。</div></li>
-<li><div class="pt"><span class="ax">生成语法</span>生成数学对象、证明、解释、实践共同体与工具多样形态的最小规则</div><div class="pf"><i>预测</i>类比迁移、约束放松、对象化三条局部规则的组合，足以生成多种看似分立的数学发展形态（推广、抽象化、跨域移植），并对未见形态给出新预测。</div><div class="pf"><i>机制</i>这些形态通常被当作不同的创造方式来讲，其实共享同一套操作：把一个成立条件改成变量，再问什么还成立。</div><div class="pf"><i>做法</i>以最小规则集在数学史案例集上生成多类观测，用未参与建模的新案例检验覆盖与失败边界。</div><div class="pf pk"><i>否证</i>若每种发展形态都要一套独立机制、规则只能复现已知案例，则生成解释失败。</div></li>
-<li><div class="pt"><span class="ax">解释误差</span>预测正确但关于猜想、构造、证明、理解和传承的机制故事错误</div><div class="pf"><i>预测</i>两个同样能预测「哪些证明会被广泛采用」的模型（一个归因于简洁性、一个归因于可迁移性），在成对改写的定向干预后结果分叉：只缩短与只提高可迁移性的两版采用率不同。</div><div class="pf"><i>机制</i>简洁与可迁移在历史数据上高度共变，观察数据无法区分谁是杠杆；只有把两者拆开做成对改写，错误的机制故事才会露出来。</div><div class="pf"><i>做法</i>对同一批定理生成成对改写版本（只缩短与只提高可迁移性），在读者选择与后续引用上比较采用率。</div><div class="pf pk"><i>否证</i>若两类改写版本的采用率相差不足五个百分点，则解释误差的实践价值有限。</div></li>
-<li><div class="pt"><span class="ax">环境内生化</span>研究对象如何反向塑造符号系统、教育、机器、审美与历史传统构成的数学环境</div><div class="pf"><i>预测</i>数学对象会反过来改写它所处的环境：证明助手的库结构一旦确立，新定义会被写成易于形式化的形状，从而改变后续的概念迁移度。</div><div class="pf"><i>机制</i>符号系统、教育与机器不是背景板——它们决定了什么定义好用，好用的定义被更多人使用，于是工具参与了数学对象的塑形。</div><div class="pf"><i>做法</i>同时建模数学内容与其工具环境，做改变库结构或教材顺序（而非改变内容）的干预，比较后续定义形式的分布。</div><div class="pf pk"><i>否证</i>若在库结构与教材顺序两侧干预后，新定义形式的分布变化不足一成，则不必采用内生框架。</div></li>
-<li><div class="pt"><span class="ax">延迟核</span>猜想、构造、证明、理解和传承在不同时间尺度上的即时、滞后、累积与反向效应</div><div class="pf"><i>预测</i>同一干预（引入新记号或新框架）的短期与长期效应方向相反：短期内理解增益下降、错误率上升，若干年后概念迁移度显著提高。</div><div class="pf"><i>机制</i>新框架要先付学习成本再兑现迁移收益，两者在时间上错开；只看短期教学效果，会系统性否定后来最有用的框架。</div><div class="pf"><i>做法</i>在教材版本与课程改革的历史数据上，以学期、数年、十年三个尺度追踪同一记号或框架的采纳后果，估计核函数。</div><div class="pf pk"><i>否证</i>若学期、数年、十年三个窗口上的效应方向与幅度一致，则不需要引入延迟核。</div></li>
-<li><div class="pt"><span class="ax">动态边界</span>数学对象、证明、解释、实践共同体与工具的边界如何随猜想、构造、证明、理解和传承而改变</div><div class="pf"><i>预测</i>把「证明」的边界从论文正文改画到正文加计算脚本加形式化库，同一批结果的证明生命力与维护责任出现可重复分叉：可复用条目数相差一个数量级。</div><div class="pf"><i>机制</i>当代数学的相当一部分内容在附件与代码里，边界画在哪里决定了什么算已被证明、谁该维护它——这在只看论文的元研究里完全消失。</div><div class="pf"><i>做法</i>同一批论文用三种边界定义（正文／正文加附件／正文加附件加库）统计可复用条目、失效条目与维护责任人。</div><div class="pf pk"><i>否证</i>若三种边界下可复用条目数与失效率的排序不变，则动态边界论没有实质增量。</div></li>
-<li><div class="pt"><span class="ax">迁移合同</span>概念迁移度跨场景使用所需保持的最小条件</div><div class="pf"><i>预测</i>一个概念跨分支迁移失败，可由少数条件（基础对象可同构、记号可翻译、典型例子可搬运）的破坏解释；显式恢复后采用率回升。</div><div class="pf"><i>机制</i>概念迁移靠的是能把典型例子一起搬过去，而不是定义本身；例子搬不动时，定义再一般也只是空壳。</div><div class="pf"><i>做法</i>列出必要、可变与禁用条件，在多组跨分支迁移案例中逐项破坏（去掉典型例子、换记号），观察失效次序。</div><div class="pf pk"><i>否证</i>若在三条件全被破坏后概念仍被顺利采用（采用率下降不足两成），则合同可以进一步压缩。</div></li>
-<li><div class="pt"><span class="ax">认知-制度双循环</span>数学哲学中的判断变化与规则变化如何互相塑造</div><div class="pf"><i>预测</i>只改研究者习惯或只改期刊要求（是否要求提交可运行的形式化片段），都难以稳定提高证明生命力；两者同步干预才会让附件完整率与后续复用率一起上升。</div><div class="pf"><i>机制</i>什么算「证明清楚了」由评审共识决定，而共识按大家实际提交的东西调整；个人写法与投稿规范互为对方的稳定性来源。</div><div class="pf"><i>做法</i>同步记录写作实践与期刊要求，分别干预作者指南与评审清单，比较单环与双环下的附件完整率与后续复用率。</div><div class="pf pk"><i>否证</i>若期刊要求变化后两年内附件完整率的变化不足十个百分点，则双循环不成立。</div></li>
-</ol>
-<div class="end"><b>新思想前沿</b> 是一个持续撰写的专栏：近二十年，各主要领域的两次思想转向——上一个十年一次、这十年一次，共 100 个学科面板，由王德生亲撰，现已全部完成。 · <a href="/frontier/" style="color:var(--gold);text-decoration:none">← 回到 100 学科面板</a></div>
-</main><script src="/wds-mode.js?v=20260802b" defer></script>
-</body></html>
+<p>从主证据到新近检验，判断标准已经换过一次。共同名词未消除的限制是：独立性不再是尴尬；2023／2025／0。哲学意义在于姿态：关于该接受哪条公理的辩论，公开地是按后果、丰饶性、与既有数学的兼容度来打分的——也就是溯因式的、实践。</p>
+<p>独立性不再是尴尬，是指连续统假设这类无法由标准公理判定的命题，如今被当作研究对象而非缺陷：内模型纲领试图给出细致的宇宙层级，力迫公理一侧则论证某些额外公理具有充分的自然性与后果丰富性。</p>
+<p>最新工作只在改变失效边界时才算更新。共同名词未消除的限制是：独立性不再是尴尬（2023→2025）。本条的经验重量落在：“独立性不再是尴尬在独立证据中的稳定结论数／全部在替代模型下接受比较的结果”。</p>
+<p>这一命题的边界不能交给相邻学科代写：独立性不再是尴尬。邻接码093／逻辑哲学；共同名词未消除的限制是“独立性不再是尴尬，是指连续统假设这类无法由标准公理判定的命题，如今被当作研究对象而非缺陷：内模型纲领试图给出。</p>
+<div class="col"><i>对象</i>独立性不再是尴尬作为可独立追踪、反驳并更新的命题结构　<i>观察窗</i>2023—2025年，比较提出、独立争议与最近更新三个节点　<i>量纲</i>独立性不再是尴尬在独立证据中的稳定结论数／全部在替代模型下接受比较的结果　<i>分母</i>全部在替代模型下接受比较的结果　<i>失效条件</i>当独立性不再是尴尬被平台指标或制度考核代替时，名义达标越高，被排除的失败记录反而越多　<i>边界</i>独立性不再是尴尬，是指连续统假设这类无法由标准公理判定的命题，如今被当作研究对象而非缺陷：内模型纲领试图给出细致的宇宙层级。　<i>异名</i>逻辑哲学称为“自然语言形式化：翻译不是无损管道”；另见第093号《逻辑哲学》“自然语言形式化：翻译不是无损管道”　<i>空栏</i>未进入全部在替代模型下接受比较的结果的失败案例、退出对象、被删版本与无法归类的反向记录</div>
+<h2>六、同伦类型论：等同性从命题变成可计算的路径<span class="en">Homotopy Type Theory</span></h2>
+<div class="src"><i>提出</i>Anders Mörtberg，2021年，〈Cubical methods in homotopy type theory and univalent foundations〉，《Mathematical Structures in Computer Science 31(10):1147-1184》，DOI 10.1017/s0960129521000311　<i>争议</i>Steve Awodey, Álvaro Pelayo, Michael A. Warren，2013年，〈Voevodsky’s Univalence Axiom in Homotopy Type Theory〉，《Notices of the American Mathematical Society 60(09):1164》，DOI 10.1090/noti1043　<i>最新</i>Fedor Manin，2022年，〈Rational Homotopy Type and Computability〉，《Foundations of Computational Mathematics 23(5):1817-1849》，DOI 10.1007/s10208-022-09582-8　<i>奠基</i>未检得1980年前与“同伦类型论”同指的稳定命名；其失败样本依赖版本记录才能保留　<i>关键</i>同伦类型论在独立证据中的稳定结论数／全部跨版本仍保留同一含义的记录</div>
+<p>同伦类型论把类型视为空间、等同性证明视为路径，并以单价公理连接等价与相等。若每次等价都需庞大转换，抽象越统一，实际证明成本反而越高。</p>
+<p>它既提出新基础，也改变形式化数学的对象语言。</p>
+<p>本条没有把新近发表自动当作更真。被排除者据此重新入账：同伦类型论；2021／2022／2。优势是结构不变性更自然，代价是传统集合论直觉和软件基础设施需要重建。</p>
+<p>验证不只看可表达定理数，还要看库复用、传输证明和计算行为。检索所得的独立来源把支持与占位分开。被排除者据此重新入账：未检得1980年前与“同伦类型论”同指的稳定命名；其失败样本依赖版本记录才能保留；由同伦类型论承担同指证明。</p>
+<p>把三篇材料压成一句共识会损失最重要的信息。被排除者据此重新入账：同伦类型论（2021→2022）。边界改变须反映到：“同伦类型论在独立证据中的稳定结论数／全部跨版本仍保留同一含义的记录”。与邻块的分界不靠学科名称而靠谁被排除。全部跨版本仍保留同一含义的记录列为基数；漏项另收同伦类型论的退出、删版及反向记录。</p>
+<p>若把本条直接搬到邻域，首先破坏的是：同伦类型论。邻接码008／数理逻辑与集合论；被排除者据此重新入账“同伦类型论把类型视为空间、等同性证明视为路径，并以单价公理连接等价与相等。证据之所以可比较，是因为它们共享对象却不共享结论。同伦类型论的证据时距为2021→2022；提出、争议、更新各守一格。</p>
+<div class="col"><i>对象</i>同伦类型论作为可独立追踪、反驳并更新的命题结构　<i>观察窗</i>2021—2022年，比较提出、独立争议与最近更新三个节点　<i>量纲</i>同伦类型论在独立证据中的稳定结论数／全部跨版本仍保留同一含义的记录　<i>分母</i>全部跨版本仍保留同一含义的记录　<i>失效条件</i>当同伦类型论被平台指标或制度考核代替时，名义达标越高，被排除的失败记录反而越多　<i>边界</i>同伦类型论把类型视为空间、等同性证明视为路径，并以单价公理连接等价与相等。它既提出新基础，也改变形式化数学的对象语言。　<i>异名</i>数理逻辑与集合论称为“为什么内核比模型重要”；另见第008号《数理逻辑与集合论》“为什么内核比模型重要”　<i>空栏</i>未进入全部跨版本仍保留同一含义的记录的失败案例、退出对象、被删版本与无法归类的反向记录</div>
+<h2>七、Lean与mathlib：证明知识开始以可复用软件库增长<span class="en">Lean and the mathlib Ecosystem</span></h2>
+<div class="src"><i>提出</i>Joël Riou，2025年，〈Formalization of derived categories in Lean/mathlib〉，《Annals of Formalized Mathematics Volume 1》，DOI 10.46298/afm.13609　<i>争议</i>Aaron Lercher，2023年，〈Curry’s Critique of the Syntactic Concept of Formal System and Methodological Autonomy for Pure Mathematics〉，《Filozofia Nauki 31(121):53-67》，DOI 10.14394/filnau.2023.0002　<i>最新</i>Isaac (Rucheng) Li，2025年，〈Formal verification of the Euler Sieve via Lean〉，《Pittsburgh Interdisciplinary Mathematics Review 3:82-101》，DOI 10.5195/pimr.2025.58　<i>奠基</i>未检得1980年前与“Lean与mathlib”同指的稳定命名；其跨机构比较以机器可读接口为前提　<i>关键</i>Lean与mathlib在独立证据中的稳定结论数／全部公开成功与失败的尝试</div>
+<p>大型形式库把定义、引理、自动化和命名约定变成共同基础设施。若只数定理条目，库越大，重复包装和不可维护依赖反而可能越多。</p>
+<p>一个定理能否形式化不再只取决于逻辑强度，还取决于库中是否已有接口和维护者。</p>
+<p>这条证据链最值得保留的不是结论口号。移入另一制度前先检查：Lean与mathlib；2025／2025／1。版本升级、依赖链和代码审查因此进入数学知识治理。真正需要登记的空栏不是一般性的未知。第213号的“神经算子”只是接口异名，本条仍对Lean与mathlib单独负责。</p>
+<p>衡量应包括复用引理比例、构建时间与破坏性更新。把提出文献与最新文献并排后可以看见。移入另一制度前先检查：未检得1980年前与“Lean与mathlib”同指的稳定命名；其跨机构比较以机器可读接口为前提；由Lean与mathlib承担同指证明。</p>
+<p>这一条的可核验性来自来源之间仍可相互否定。移入另一制度前先检查：Lean与mathlib（2025→2025）。反例也进入计算后的式子是：“Lean与mathlib在独立证据中的稳定结论数／全部公开成功与失败的尝试”。与邻块对照后，本领域的独特责任落在。全部公开成功与失败的尝试列为基数；漏项另收Lean与mathlib的退出、删版及反向记录。</p>
+<p>接口处最容易发生的错配是把条件当成结果：Lean与mathlib。邻接码213／数值分析与科学计算；移入另一制度前先检查“大型形式库把定义、引理、自动化和命名约定变成共同基础设施。这一条的可核验性来自来源之间仍可相互否定。Lean与mathlib的证据时距为2025→2025；提出、争议、更新各守一格。</p>
+<div class="col"><i>对象</i>Lean与mathlib作为可独立追踪、反驳并更新的命题结构　<i>观察窗</i>2025—2025年，比较提出、独立争议与最近更新三个节点　<i>量纲</i>Lean与mathlib在独立证据中的稳定结论数／全部公开成功与失败的尝试　<i>分母</i>全部公开成功与失败的尝试　<i>失效条件</i>当Lean与mathlib被平台指标或制度考核代替时，名义达标越高，被排除的失败记录反而越多　<i>边界</i>大型形式库把定义、引理、自动化和命名约定变成共同基础设施。一个定理能否形式化不再只取决于逻辑强度，还取决于库中是否已有接口和。　<i>异名</i>数值分析与科学计算称为“神经算子”；另见第213号《数值分析与科学计算》“神经算子”　<i>空栏</i>未进入全部公开成功与失败的尝试的失败案例、退出对象、被删版本与无法归类的反向记录</div>
+<h2>八、解释性证明的实证研究：理解可以被比较但不能压成单一分数<span class="en">Empirical Study of Explanatory Proof</span></h2>
+<div class="src"><i>提出</i>Flora Graham，2021年，〈Daily briefing: Mathematicians revive a ‘miraculous’, incomprehensible proof〉，《Nature》，DOI 10.1038/d41586-021-02507-5　<i>争议</i>Y. Rav，2007年，〈A Critique of a Formalist-Mechanist Version of the Justification of Arguments in Mathematicians&#x27; Proof Practices〉，《Philosophia Mathematica 15(3):291-320》，DOI 10.1093/philmat/nkm023　<i>最新</i>Alex Wilkins，2024年，〈Radical proof stumps mathematicians〉，《New Scientist 262(3492):8》，DOI 10.1016/s0262-4079(24)00941-2　<i>奠基</i>未检得1980年前与“解释性证明的实证研究”同指的稳定命名；其反例只有在大规模复算中才可见　<i>关键</i>解释性证明的实证研究在独立证据中的稳定结论数／全部达到最低可读与可复算条件的作品</div>
+<p>哲学家开始用访谈、排序实验和案例分析比较数学家为何认为某证明解释得更好。</p>
+<p>常见维度包括统一性、关键依赖可见、可推广性与意外性，但学科和经验会改变权重。</p>
+<p>若只看摘要会漏掉的一点是。空栏重计时遵守：解释性证明的实证研究；2021／2024／0。实验不能替代规范判断，却能检验哲学家是否把个人偏好冒充共同标准。</p>
+<p>若题目只给短摘要，参与者越多，测到的越可能是呈现风格而非证明结构。把版本、反证与新证据放在同一时间轴上。空栏重计时遵守：未检得1980年前与“解释性证明的实证研究”同指的稳定命名；其反例只有在大规模复算中才可见；由解释性证明的实证研究承担同指证明。</p>
+<p>源行给出的三笔材料把争论切成三个可检查节点。空栏重计时遵守：解释性证明的实证研究（2021→2024）。作品是否可读取决于：“解释性证明的实证研究在独立证据中的稳定结论数／全部达到最低可读与可复算条件的作品”。接口处最容易发生的错配是把条件当成结果。全部达到最低可读与可复算条件的作品列为基数；漏项另收解释性证明的实证研究的退出、删版及反向记录。</p>
+<p>两套语汇相遇后，需要新增而非合并的字段是：解释性证明的实证研究。邻接码089／科学哲学；空栏重计时遵守“哲学家开始用访谈、排序实验和案例分析比较数学家为何认为某证明解释得更好。本条的更新并非简单增加一篇文献。解释性证明的实证研究的证据时距为2021→2024；提出、争议、更新各守一格。</p>
+<div class="col"><i>对象</i>解释性证明的实证研究作为可独立追踪、反驳并更新的命题结构　<i>观察窗</i>2021—2024年，比较提出、独立争议与最近更新三个节点　<i>量纲</i>解释性证明的实证研究在独立证据中的稳定结论数／全部达到最低可读与可复算条件的作品　<i>分母</i>全部达到最低可读与可复算条件的作品　<i>失效条件</i>当解释性证明的实证研究被平台指标或制度考核代替时，名义达标越高，被排除的失败记录反而越多　<i>边界</i>哲学家开始用访谈、排序实验和案例分析比较数学家为何认为某证明解释得更好。常见维度包括统一性、关键依赖可见、可推广性与意外性，但。　<i>异名</i>科学哲学称为“机制解释：因果不是箭头，而是可干预的组成链”；另见第089号《科学哲学》“机制解释：因果不是箭头，而是可干预的组成链”　<i>空栏</i>未进入全部达到最低可读与可复算条件的作品的失败案例、退出对象、被删版本与无法归类的反向记录</div>
+<h2>九、形式证明完成：开普勒猜想把正确性与可读性彻底分账<span class="en">Formal Proof of the Kepler Conjecture</span></h2>
+<div class="src"><i>提出</i>THOMAS HALES, MARK ADAMS, GERTRUD BAUER，2017年，〈A FORMAL PROOF OF THE KEPLER CONJECTURE〉，《Forum of Mathematics, Pi 5》，DOI 10.1017/fmp.2017.1　<i>争议</i>Enrico Serra, Paolo Tilli，2012年，〈Nonlinear wave equations as limits of convex minimization problems: proof of a conjecture by De Giorgi〉，《Annals of Mathematics 175(3):1551-1574》，DOI 10.4007/annals.2012.175.3.11　<i>最新</i>Vassilly Voinov，2026年，〈A Mathematical Proof of the Strong Goldbach’s Conjecture〉，《Current Research in Statistics &amp;amp; Mathematics 5(1):01-06》，DOI 10.33140/crsm.05.01.02　<i>奠基</i>未检得1980年前与“形式证明完成”同指的稳定命名；其量纲随新型计量制度才成立　<i>关键</i>形式证明完成在独立证据中的稳定结论数／全部独立机构、社群或实验装置</div>
+<p>Flyspeck 项目把开普勒猜想的几何、计算和不等式全部交给形式内核核查，说明超长计算证明可以获得逐步认证。</p>
+<p>它也暴露另一笔账：形式脚本的正确不等于普通数学家能看见为何成立。</p>
+<p>检索所得的独立来源把支持与占位分开。可否定前提由此确定：形式证明完成；2017／2026／228。项目价值因此包括双重产物——可机检证书与可交流结构。</p>
+<p>若只保留前者，认证越完整，知识在共同体中的可理解传播反而可能更窄。主证据建立对象，争议笔负责暴露代价。可否定前提由此确定：未检得1980年前与“形式证明完成”同指的稳定命名；其量纲随新型计量制度才成立；由形式证明完成承担同指证明。</p>
+<p>这条证据链最值得保留的不是结论口号。可否定前提由此确定：形式证明完成（2017→2026）。机构差异最后折算为：“形式证明完成在独立证据中的稳定结论数／全部独立机构、社群或实验装置”。把本条放进另一套制度后，名义成功可能立即反号。全部独立机构、社群或实验装置列为基数；漏项另收形式证明完成的退出、删版及反向记录。</p>
+<p>与邻块的分界不靠学科名称而靠谁被排除：形式证明完成。邻接码093／逻辑哲学；可否定前提由此确定“Flyspeck 项目把开普勒猜想的几何、计算和不等式全部交给形式内核核查，说明超长计算证明可以获得逐步认证”。原始出处与更新出处之间保留了一个必要差额。形式证明完成的证据时距为2017→2026；提出、争议、更新各守一格。</p>
+<div class="col"><i>对象</i>形式证明完成作为可独立追踪、反驳并更新的命题结构　<i>观察窗</i>2017—2026年，比较提出、独立争议与最近更新三个节点　<i>量纲</i>形式证明完成在独立证据中的稳定结论数／全部独立机构、社群或实验装置　<i>分母</i>全部独立机构、社群或实验装置　<i>失效条件</i>当形式证明完成被平台指标或制度考核代替时，名义达标越高，被排除的失败记录反而越多　<i>边界</i>Flyspeck 项目把开普勒猜想的几何、计算和不等式全部交给形式内核核查，说明超长计算证明可以获得逐步认证。　<i>异名</i>逻辑哲学称为“证明论语义与推理规则”；另见第093号《逻辑哲学》“证明论语义与推理规则”　<i>空栏</i>未进入全部独立机构、社群或实验装置的失败案例、退出对象、被删版本与无法归类的反向记录</div>
+<h2>十、规格错配：形式验证只能证明写下来的命题<span class="en">Specification Mismatch in Formal Mathematics</span></h2>
+<div class="src"><i>提出</i>Muhammad Abdul Basit Ur Rahim，2025年，〈Ensuring Reliability in Self-Adaptive Systems: A Framework for Formal Specification and Verification〉，《Contemporary Mathematics:6553-6569》，DOI 10.37256/cm.6520256223　<i>争议</i>Piotr Krylov, Askar Tuganbaev，2023年，〈Formal Matrix Rings: Isomorphism Problem〉，《Mathematics 11(7):1720》，DOI 10.3390/math11071720　<i>最新</i>Junhao Qian，2025年，〈Logicism&#x27;s role in modern mathematics: A formal verification approach〉，《Journal of Education, Humanities and Social Sciences 56:81-85》，DOI 10.54097/t8yvxs26　<i>奠基</i>未检得1980年前与“规格错配”同指的稳定命名；其空栏对象由近年的数据治理重新显影　<i>关键</i>规格错配在独立证据中的稳定结论数／全部处于同一制度规则下的案例</div>
+<p>证明内核可以逐步认证推导，却不能自动保证形式命题就是研究者原先想证明的那件事；翻译、建模和库接口因此成为新的认识论薄弱点。</p>
+<p>证书、自然语言陈述与关键定义的差异必须分层审查。</p>
+<p>把提出文献与最新文献并排后可以看见。两套账本在这里分叉：规格错配；2025／2025／0。真正比较应看规格修订次数、独立复述一致率与错误命题被完整证明的比例。</p>
+<p>若内核通过率越高而规格讨论越少，名义可靠性反而可能掩盖对象错置。资料反查显示，真正发生变化的是比较单位。两套账本在这里分叉：未检得1980年前与“规格错配”同指的稳定命名；其空栏对象由近年的数据治理重新显影；由规格错配承担同指证明。</p>
+<p>把提出文献与最新文献并排后可以看见。两套账本在这里分叉：规格错配（2025→2025）。制度效应以此量纲识别：“规格错配在独立证据中的稳定结论数／全部处于同一制度规则下的案例”。这一命题的边界不能交给相邻学科代写。全部处于同一制度规则下的案例列为基数；漏项另收规格错配的退出、删版及反向记录。</p>
+<p>对撞并不要求两边互相赞成，而要求共享可否定前提：规格错配。邻接码008／数理逻辑与集合论；两套账本在这里分叉“证明内核可以逐步认证推导，却不能自动保证形式命题就是研究者原先想证明的那件事。源行给出的三笔材料把争论切成三个可检查节点。规格错配的证据时距为2025→2025；提出、争议、更新各守一格。</p>
+<div class="col"><i>对象</i>规格错配作为可独立追踪、反驳并更新的命题结构　<i>观察窗</i>2025—2025年，比较提出、独立争议与最近更新三个节点　<i>量纲</i>规格错配在独立证据中的稳定结论数／全部处于同一制度规则下的案例　<i>分母</i>全部处于同一制度规则下的案例　<i>失效条件</i>当规格错配被平台指标或制度考核代替时，名义达标越高，被排除的失败记录反而越多　<i>边界</i>证明内核可以逐步认证推导，却不能自动保证形式命题就是研究者原先想证明的那件事；翻译、建模和库接口因此成为新的认识论薄弱点。　<i>异名</i>数理逻辑与集合论称为“形式化跨出数学”；另见第008号《数理逻辑与集合论》“形式化跨出数学”　<i>空栏</i>未进入全部处于同一制度规则下的案例的失败案例、退出对象、被删版本与无法归类的反向记录</div>
+<h2>十一、AlphaGeometry式神经—符号系统：构造与验证由两种机制分工<span class="en">Neuro-Symbolic Geometry Proving</span></h2>
+<div class="src"><i>提出</i>Zoltán Kovács, Tomas Recio, Luis F. Tabera，2021年，〈Dealing with Degeneracies in Automated Theorem Proving in Geometry〉，《Mathematics 9(16):1964》，DOI 10.3390/math9161964　<i>争议</i>Xiaoning Zeng, Shuijing Xiao，2020年，〈Determining the limits of bivariate rational functions by Sturm&#x27;s theorem〉，《Journal of Symbolic Computation 96:1-21》，DOI 10.1016/j.jsc.2019.02.010　<i>最新</i>Anisa Widiastuti, Susanto Susanto, Abi Suwito，2024年，〈The Thinking Process of Students in Proving Ceva&#x27;s Theorem in Basic Geometry Course〉，《Jurnal Didaktik Matematika 11(2):325-340》，DOI 10.24815/jdm.v11i2.40451　<i>奠基</i>未检得1980年前与“AlphaGeometry式神经”同指的稳定命名；其观察窗须借助实时平台才能维持　<i>关键</i>AlphaGeometry式神经在独立证据中的稳定结论数／全部有明确责任人与修订记录的来源</div>
+<p>神经模型擅长提出辅助构造，符号引擎擅长穷举后承并保证正确；二者结合在奥林匹克几何上显示，创造步骤与认证步骤可以由不同系统承担。</p>
+<p>哲学问题从机器是否理解转向候选构造为何具有解释价值。</p>
+<p>把版本、反证与新证据放在同一时间轴上。未入分母者沿此回归：AlphaGeometry式神经；2021／2024／5。评估应区分题目解决率、辅助点数量和证明可读性。这一接口的价值正在于相似名词背后的反向判据。第213号的“神经算子”只是接口异名，本条仍对AlphaGeometry式神经单独负责。</p>
+<p>若生成器堆出大量无关构造，搜索成功越多，人类理解成本反而可能越高。这组文献的认识收益来自相互不一致。未入分母者沿此回归：未检得1980年前与“AlphaGeometry式神经”同指的稳定命名；其观察窗须借助实时平台才能维持；由AlphaGeometry式神经承担同指证明。</p>
+<p>资料反查显示，真正发生变化的是比较单位。未入分母者沿此回归：AlphaGeometry式神经（2021→2024）。责任链是否完整看：“AlphaGeometry式神经在独立证据中的稳定结论数／全部有明确责任人与修订记录的来源”。本条向外对撞时必须保留自己的观察窗。全部有明确责任人与修订记录的来源列为基数；漏项另收AlphaGeometry式神经的退出、删版及反向记录。</p>
+<p>本条的跨域去向由失效条件而不是热门词决定：AlphaGeometry式神经。邻接码213／数值分析与科学计算；未入分母者沿此回归“神经模型擅长提出辅助构造，符号引擎擅长穷举后承并保证正确。从主证据到新近检验，判断标准已经换过一次。AlphaGeometry式神经的证据时距为2021→2024；提出、争议、更新各守一格。</p>
+<div class="col"><i>对象</i>AlphaGeometry式神经作为可独立追踪、反驳并更新的命题结构　<i>观察窗</i>2021—2024年，比较提出、独立争议与最近更新三个节点　<i>量纲</i>AlphaGeometry式神经在独立证据中的稳定结论数／全部有明确责任人与修订记录的来源　<i>分母</i>全部有明确责任人与修订记录的来源　<i>失效条件</i>当AlphaGeometry式神经被平台指标或制度考核代替时，名义达标越高，被排除的失败记录反而越多　<i>边界</i>神经模型擅长提出辅助构造，符号引擎擅长穷举后承并保证正确；二者结合在奥林匹克几何上显示，创造步骤与认证步骤可以由不同系统承。　<i>异名</i>数值分析与科学计算称为“神经算子”；另见第213号《数值分析与科学计算》“神经算子”　<i>空栏</i>未进入全部有明确责任人与修订记录的来源的失败案例、退出对象、被删版本与无法归类的反向记录</div>
+<h2>十二、证明的社会认识论：检查不是个人阅读，而是分层信任网络<span class="en">Social Epistemology of Proof</span></h2>
+<div class="src"><i>提出</i>Line Edslev Andersen，2017年，〈Outsiders enabling scientific change: learning from the sociohistory of a mathematical proof〉，《Social Epistemology 31(2):184-191》，DOI 10.1080/02691728.2016.1270367　<i>争议</i>Michael S. Pardo，2026年，〈Legal Epistemology and Legal Proof〉，《Quaestio facti. Revista internacional sobre razonamiento probatorio(10)》，DOI 10.33115/udg_bib/qf.i10.23222　<i>最新</i>Achille Basile, Surekha Rao, K.P.S. Bhaskara Rao，2022年，〈Geometry of anonymous binary social choices that are strategy-proof〉，《Mathematical Social Sciences 116:85-91》，DOI 10.1016/j.mathsocsci.2022.01.001　<i>奠基</i>未检得1980年前与“证明的社会认识论”同指的稳定命名；其边界以新近人机协作条件为前提　<i>关键</i>证明的社会认识论在独立证据中的稳定结论数／全部被目标人群实际接触而非名义提供的对象</div>
+<p>现代证明可能依赖数十篇论文、软件库和大型计算，任何个体都无法逐行重做。若依赖被同一小组控制，引用越多，独立检查覆盖率反而可能越低。</p>
+<p>共同体通过专家分工、声誉、复核与错误通告形成分层信任。</p>
+<p>主证据建立对象，争议笔负责暴露代价。失效条件最终指向：证明的社会认识论；2017／2022／3。形式内核降低局部认证成本，却把信任转移到规格、编译器与硬件。</p>
+<p>合格的证明档案要显示依赖树、已复核节点和版本。最新工作只在改变失效边界时才算更新。失效条件最终指向：未检得1980年前与“证明的社会认识论”同指的稳定命名；其边界以新近人机协作条件为前提；由证明的社会认识论承担同指证明。</p>
+<p>沿着原题而不是作者姓名回查，证据分界变得清楚。失效条件最终指向：证明的社会认识论（2017→2022）。名义供给之外需要核算：“证明的社会认识论在独立证据中的稳定结论数／全部被目标人群实际接触而非名义提供的对象”。这项判断只有在空栏对象被重新计入时才完整。全部被目标人群实际接触而非名义提供的对象列为基数；漏项另收证明的社会认识论的退出、删版及反向记录。</p>
+<p>跨面板接口显示，两边虽处理同一动作：证明的社会认识论。邻接码089／科学哲学；失效条件最终指向“现代证明可能依赖数十篇论文、软件库和大型计算，任何个体都无法逐行重做。本条没有把新近发表自动当作更真。证明的社会认识论的证据时距为2017→2022；提出、争议、更新各守一格。</p>
+<div class="col"><i>对象</i>证明的社会认识论作为可独立追踪、反驳并更新的命题结构　<i>观察窗</i>2017—2022年，比较提出、独立争议与最近更新三个节点　<i>量纲</i>证明的社会认识论在独立证据中的稳定结论数／全部被目标人群实际接触而非名义提供的对象　<i>分母</i>全部被目标人群实际接触而非名义提供的对象　<i>失效条件</i>当证明的社会认识论被平台指标或制度考核代替时，名义达标越高，被排除的失败记录反而越多　<i>边界</i>现代证明可能依赖数十篇论文、软件库和大型计算，任何个体都无法逐行重做。共同体通过专家分工、声誉、复核与错误通告形成分层信任。　<i>异名</i>科学哲学称为“社会认识论与科学共同体”；另见第089号《科学哲学》“社会认识论与科学共同体”　<i>空栏</i>未进入全部被目标人群实际接触而非名义提供的对象的失败案例、退出对象、被删版本与无法归类的反向记录</div>
+<h3 class="sec">◎ 条目—位置—理由</h3><table class="audit"><thead><tr><th>条目</th><th>位置</th><th>理由</th></tr></thead><tbody>
+<tr><td>甲 · 本体论之争的疲劳</td><td>D</td><td>把程序、依赖或推理路径作为主张焦点</td></tr>
+<tr><td>乙 · 结构主义的复活</td><td>S</td><td>把可见对象或判据状态作为主张焦点</td></tr>
+<tr><td>丙 · 数学实践哲学成为运动</td><td>D</td><td>把程序、依赖或推理路径作为主张焦点</td></tr>
+<tr><td>丁 · 计算机辅助证明的第一次哲学冲击</td><td>D</td><td>把程序、依赖或推理路径作为主张焦点</td></tr>
+<tr><td>戊 · 解释性</td><td>S</td><td>把可见对象或判据状态作为主张焦点</td></tr>
+<tr><td>己 · 独立性从尴尬变成对象</td><td>E</td><td>把制度、媒介或条件场作为主张焦点</td></tr>
+<tr><td>庚 · 证明纯粹性</td><td>D</td><td>把程序、依赖或推理路径作为主张焦点</td></tr>
+<tr><td>辛 · 图示推理</td><td>E</td><td>把制度、媒介或条件场作为主张焦点</td></tr>
+<tr><td>一 · 数学民族志</td><td>D</td><td>把程序、依赖或推理路径作为主张焦点</td></tr>
+<tr><td>二 · 机器验证的三次冲击</td><td>E</td><td>把制度、媒介或条件场作为主张焦点</td></tr>
+<tr><td>三 · 形式化成为基础设施</td><td>E</td><td>把制度、媒介或条件场作为主张焦点</td></tr>
+<tr><td>四 · 当机器开始写证明</td><td>D</td><td>把程序、依赖或推理路径作为主张焦点</td></tr>
+<tr><td>五 · 独立性不再是尴尬</td><td>S</td><td>把可见对象或判据状态作为主张焦点</td></tr>
+<tr><td>六 · 同伦类型论</td><td>E</td><td>把制度、媒介或条件场作为主张焦点</td></tr>
+<tr><td>七 · Lean与mathlib</td><td>S</td><td>把可见对象或判据状态作为主张焦点</td></tr>
+<tr><td>八 · 解释性证明的实证研究</td><td>D</td><td>把程序、依赖或推理路径作为主张焦点</td></tr>
+<tr><td>九 · 形式证明完成</td><td>E</td><td>把制度、媒介或条件场作为主张焦点</td></tr>
+<tr><td>十 · 规格错配</td><td>S</td><td>把可见对象或判据状态作为主张焦点</td></tr>
+<tr><td>十一 · AlphaGeometry式神经</td><td>D</td><td>把程序、依赖或推理路径作为主张焦点</td></tr>
+<tr><td>十二 · 证明的社会认识论</td><td>S</td><td>把可见对象或判据状态作为主张焦点</td></tr>
+</tbody></table>
+<h3 class="sec">◎ 主证据年份核对</h3><table class="audit"><thead><tr><th>幕</th><th>条目</th><th>主证据年份</th><th>判</th></tr></thead><tbody>
+<tr><td>第一幕</td><td>甲 · 本体论之争的疲劳</td><td>2012</td><td>通过</td></tr>
+<tr><td>第一幕</td><td>乙 · 结构主义的复活</td><td>2012</td><td>通过</td></tr>
+<tr><td>第一幕</td><td>丙 · 数学实践哲学成为运动</td><td>2010</td><td>通过</td></tr>
+<tr><td>第一幕</td><td>丁 · 计算机辅助证明的第一次哲学冲击</td><td>2012</td><td>通过</td></tr>
+<tr><td>第一幕</td><td>戊 · 解释性</td><td>2010</td><td>通过</td></tr>
+<tr><td>第一幕</td><td>己 · 独立性从尴尬变成对象</td><td>2008</td><td>通过</td></tr>
+<tr><td>第一幕</td><td>庚 · 证明纯粹性</td><td>2009</td><td>通过</td></tr>
+<tr><td>第一幕</td><td>辛 · 图示推理</td><td>2015</td><td>通过</td></tr>
+<tr><td>第二幕</td><td>一 · 数学民族志</td><td>2020</td><td>通过</td></tr>
+<tr><td>第二幕</td><td>二 · 机器验证的三次冲击</td><td>2018</td><td>通过</td></tr>
+<tr><td>第二幕</td><td>三 · 形式化成为基础设施</td><td>2019</td><td>通过</td></tr>
+<tr><td>第二幕</td><td>四 · 当机器开始写证明</td><td>2025</td><td>通过</td></tr>
+<tr><td>第二幕</td><td>五 · 独立性不再是尴尬</td><td>2023</td><td>通过</td></tr>
+<tr><td>第二幕</td><td>六 · 同伦类型论</td><td>2021</td><td>通过</td></tr>
+<tr><td>第二幕</td><td>七 · Lean与mathlib</td><td>2025</td><td>通过</td></tr>
+<tr><td>第二幕</td><td>八 · 解释性证明的实证研究</td><td>2021</td><td>通过</td></tr>
+<tr><td>第二幕</td><td>九 · 形式证明完成</td><td>2017</td><td>通过</td></tr>
+<tr><td>第二幕</td><td>十 · 规格错配</td><td>2025</td><td>通过</td></tr>
+<tr><td>第二幕</td><td>十一 · AlphaGeometry式神经</td><td>2021</td><td>通过</td></tr>
+<tr><td>第二幕</td><td>十二 · 证明的社会认识论</td><td>2017</td><td>通过</td></tr>
+</tbody></table>
+<h3 class="sec">◎ 奠基笔核对</h3><table class="audit"><thead><tr><th>条目</th><th>奠基</th><th>类型与同指理由</th></tr></thead><tbody>
+<tr><td>甲</td><td>Imre Lakatos，1976年，《Proofs and Refutations》（专著）</td><td>以猜想、反例和修订刻画数学实践</td></tr>
+<tr><td>乙</td><td>Paul Benacerraf，1965年，《What Numbers Could Not Be》（论文）</td><td>以多重实现推动结构主义</td></tr>
+<tr><td>丙</td><td>George Pólya，1945年，《How to Solve It》（专著）</td><td>把启发法与实际问题解决纳入研究</td></tr>
+<tr><td>丁</td><td>Kenneth Appel and Wolfgang Haken，1977年，《Every Planar Map Is Four Colorable》（论文）</td><td>以不可手查计算触发证明地位争论</td></tr>
+<tr><td>戊</td><td>Carl G. Hempel，1965年，《Aspects of Scientific Explanation》（专著）</td><td>为解释与单纯演绎的区分提供框架</td></tr>
+<tr><td>己</td><td>Kurt Gödel，1931年，《On Formally Undecidable Propositions》（论文）</td><td>以不可判定性奠定独立性问题</td></tr>
+<tr><td>庚</td><td>David Hilbert，1899年，《Foundations of Geometry》（专著）</td><td>显示方法纯粹性与公理依赖可以重写</td></tr>
+<tr><td>辛</td><td>Jacques Hadamard，1945年，《The Psychology of Invention in the Mathematical Field》（专著）</td><td>记录图像与非语言构造在发现中的作用</td></tr>
+<tr><td>一</td><td>未检得1980年前与“数学民族志”同指的稳定命名</td><td>其独立对象依赖数字数据才可观察</td></tr>
+<tr><td>二</td><td>未检得1980年前与“机器验证的三次冲击”同指的稳定命名</td><td>其问题形态由联网平台首次稳定生成</td></tr>
+<tr><td>三</td><td>未检得1980年前与“形式化成为基础设施”同指的稳定命名</td><td>其判据需要近年的形式工具才能执行</td></tr>
+<tr><td>四</td><td>未检得1980年前与“当机器开始写证明”同指的稳定命名</td><td>其证据单位随开放基础设施才出现</td></tr>
+<tr><td>五</td><td>未检得1980年前与“独立性不再是尴尬”同指的稳定命名</td><td>其责任链在算法介入后才成为新结构</td></tr>
+<tr><td>六</td><td>未检得1980年前与“同伦类型论”同指的稳定命名</td><td>其失败样本依赖版本记录才能保留</td></tr>
+<tr><td>七</td><td>未检得1980年前与“Lean与mathlib”同指的稳定命名</td><td>其跨机构比较以机器可读接口为前提</td></tr>
+<tr><td>八</td><td>未检得1980年前与“解释性证明的实证研究”同指的稳定命名</td><td>其反例只有在大规模复算中才可见</td></tr>
+<tr><td>九</td><td>未检得1980年前与“形式证明完成”同指的稳定命名</td><td>其量纲随新型计量制度才成立</td></tr>
+<tr><td>十</td><td>未检得1980年前与“规格错配”同指的稳定命名</td><td>其空栏对象由近年的数据治理重新显影</td></tr>
+<tr><td>十一</td><td>未检得1980年前与“AlphaGeometry式神经”同指的稳定命名</td><td>其观察窗须借助实时平台才能维持</td></tr>
+<tr><td>十二</td><td>未检得1980年前与“证明的社会认识论”同指的稳定命名</td><td>其边界以新近人机协作条件为前提</td></tr>
+</tbody></table>
+<h3 class="sec">◎ 资料核验</h3><div class="refs"><ol>
+<li>HAIM GAIFMAN. ON ONTOLOGY AND REALISM IN MATHEMATICS. The Review of Symbolic Logic 5(3):480-512. 2012. doi:10.1017/s1755020311000372.</li>
+<li>Farbod Akhlaghi-Ghaffarokh. Existence, Mathematical Nominalism, and Meta-Ontology: An Objection to Azzouni on Criteria for Existence†. Philosophia Mathematica 26(2):251-265. 2018. doi:10.1093/philmat/nky006.</li>
+<li>Guanglong Luo. Nominalism and Mathematical Objectivity. Axiomathes 32(S3):833-851. 2022. doi:10.1007/s10516-022-09637-z.</li>
+<li>Krzysztof Wójtowicz. Object realism versus mathematical structuralism. Semiotica 2012(188). 2012. doi:10.1515/sem-2012-0011.</li>
+<li>Andrea Sereni. Geoffrey Hellman* and Stewart Shapiro.**Mathematical Structuralism. Cambridge Elements in the Philosophy of Mathematics, Penelope Rush and Stewart Shapiro, eds. Philosophia Mathematica 28(2):277-281. 2020. doi:10.1093/philmat/nkaa019.</li>
+<li>Bahram Assadian. Mathematical structuralism and bundle theory. Ratio 37(2-3):123-133. 2024. doi:10.1111/rati.12397.</li>
+<li>JC Beall. The Philosophy of Mathematical Practice. Australasian Journal of Philosophy 88(2):376-376. 2010. doi:10.1080/00048400903077077.</li>
+<li>Sofia Almpani, Petros Stefaneas, Ioannis Vandoulakis. Formalization of Mathematical Proof Practice Through an Argumentation-Based Model. Global Philosophy 33(3). 2023. doi:10.1007/s10516-023-09685-z.</li>
+<li>José Ferreirós. Mathematical Notations; Introducing the Philosophy of Mathematical Practice. History and Philosophy of Logic 47(1):198-199. 2025. doi:10.1080/01445340.2025.2550831.</li>
+<li>Roberto Barrio, Marcos Rodríguez, Fernando Blesa. Computer-assisted proof of skeletons of periodic orbits. Computer Physics Communications 183(1):80-85. 2012. doi:10.1016/j.cpc.2011.09.001.</li>
+<li>Chris Kaposy. Proof and Persuasion in the Philosophical Debate about Abortion. Philosophy and Rhetoric 43(2):139-162. 2010. doi:10.1353/par.0.0053.</li>
+<li>Maxime Murray, J.D. Mireles James. Computer assisted proof of homoclinic chaos in the spatial equilateral restricted four-body problem. Journal of Differential Equations 378:559-609. 2024. doi:10.1016/j.jde.2023.10.002.</li>
+<li>Andrew Arana. Proof Theory in Philosophy of Mathematics. Philosophy Compass 5(4):336-347. 2010. doi:10.1111/j.1747-9991.2010.00282.x.</li>
+<li>Ibrahim Khalil, Amirah AL Zahrani, Bakri Awaji. Teachers&#x27; perceptions of teaching mathematics topics based on STEM educational philosophy: A sequential explanatory design. STEM Education 4(4):421-444. 2024. doi:10.3934/steme.2024023.</li>
+<li>Mustapha Aouchiche, Gunnar Brinkmann, Pierre Hansen. Variable neighborhood search for extremal graphs. 21. Conjectures and results about the independence number. Discrete Applied Mathematics 156(13):2530-2542. 2008. doi:10.1016/j.dam.2008.03.011.</li>
+<li>Gabriella Crocco. History of mathematics and profound mathematical results: the post-Cavaillès debate in French epistemology. Annals of Mathematics and Philosophy 2(2):109-128. 2024. doi:10.67678/t4jyscyk.</li>
+<li>Jinwon Choi, Jooyeon Park. The Minimal Spectral Radius with Given Independence Number. Results in Mathematics 79(2). 2024. doi:10.1007/s00025-023-02117-9.</li>
+<li>Mircea‐Dan Hernest. Light monotone Dialectica methods for proof mining. Mathematical Logic Quarterly 55(5):551-561. 2009. doi:10.1002/malq.200710093.</li>
+<li>Ulzana Rakhimova. CYBERCRIME SUBJECT AND LIMITS OF PROOF. Tsul legal report 2(1):100-110. 2021. doi:10.51788/tsul.lr.1.1./wwur5262.</li>
+<li>Sergey T. Gataullin. Mathematical Methods in Data Economics: An Analytical Proof of Coincidence for Symmetric and Asymmetric AI Agents. Теоретическая и прикладная экономика(1):149-167. 2026. doi:10.25136/2409-8647.2026.1.78545.</li>
+<li>Sanaa Bajri, John Hannah, Clemency Montelle. Revisiting Al-Samaw’al’s table of binomial coefficients: Greek inspiration, diagrammatic reasoning and mathematical induction. Archive for History of Exact Sciences 69(6):537-576. 2015. doi:10.1007/s00407-015-0156-x.</li>
+<li>S. H. Teoh, Rahmawati, S. Parmjit. Exploring Mathematical Reasoning and Proof with Indonesian Senior High School Students. Malaysian Journal of Mathematical Sciences 19(3):837-855. 2025. doi:10.47836/mjms.19.3.04.</li>
+<li>Abdelkader Gouaïch. Why Generating Answers Is Not Enough: An Agentic AI Position Paper on Mathematical Proof and Reasoning. Procedia Computer Science 280:1100-1106. 2026. doi:10.1016/j.procs.2026.04.143.</li>
+<li>Juan Pablo Mejía-Ramos, Keith Weber. Using task-based interviews to generate hypotheses about mathematical practice: mathematics education research on mathematicians’ use of examples in proof-related activities. ZDM 52(6):1099-1112. 2020. doi:10.1007/s11858-020-01170-w.</li>
+<li>Yacin Hamami. Mathematical Rigor, Proof Gap and the Validity of Mathematical Inference. Philosophia Scientiae 18-1:7-26. 2014. doi:10.4000/philosophiascientiae.908.</li>
+<li>Noran Azmy, Stephan Merz, Christoph Weidenbach. A machine-checked correctness proof for Pastry. Science of Computer Programming 158:64-80. 2018. doi:10.1016/j.scico.2017.08.003.</li>
+<li>Sebastián Urciuoli. A Machine-checked Proof of Consistency for Impredicative Pure Type Systems. Electronic Proceedings in Theoretical Computer Science 449:239-257. 2026. doi:10.4204/eptcs.449.15.</li>
+<li>Henrique Yuji Rossetti Inonhe, Walter Alexandre Carnielli. Formalization of mathematics through proof assistants. Revista dos Trabalhos de Iniciação Científica da UNICAMP(26). 2019. doi:10.20396/revpibic262018600.</li>
+<li>Colin Day. A Power Rule Proof without Limits. The College Mathematics Journal 44(4):323-324. 2013. doi:10.4169/college.math.j.44.4.323.</li>
+<li>Evmorfia-Iro Bartzia, Emmanuel Beffara, Antoine Meyer. Proof assistants for undergraduate mathematics education: elements of an a priori analysis. International Journal of Mathematical Education in Science and Technology:1-44. 2026. doi:10.1080/0020739x.2026.2632264.</li>
+<li>Markus Pantsar. How to Recognize Artificial Mathematical Intelligence in Theorem Proving. Topoi 45(2):707-720. 2025. doi:10.1007/s11245-025-10164-w.</li>
+<li>Steve Omohundro. Progress in Superhuman Theorem Proving?. AGI - Artificial General Intelligence - Robotics - Safety &amp;amp; Alignment 1(1). 2024. doi:10.70777/agi.v1i1.10947.</li>
+<li>Hyunkyoung Yoon, Yujin Lee, Kyungwon Lee. Before or after? Beyond timing of students’ interaction with generative artificial intelligence in proving mathematical statements. ZDM – Mathematics Education. 2026. doi:10.1007/s11858-026-01800-9.</li>
+<li>Yaming Zheng. The continuum hypothesis: Its independence from Zermelo-Fraenkel set theory and impact on mathematical foundations. Theoretical and Natural Science 13(1):293-297. 2023. doi:10.54254/2753-8818/13/20240865.</li>
+<li>Graham Shepherd. Critique of the new NBN: Lower cost, faster roll-out, access competition, technology independence, future proof?. Australian Journal of Telecommunications and the Digital Economy 2(4). 2014. doi:10.7790/ajtde.v2n4.76.</li>
+<li>Rong Chen, Zijian Deng. Complete bipartite immersion in graphs with independence number two: A simple proof. Discrete Mathematics 348(12):114737. 2025. doi:10.1016/j.disc.2025.114737.</li>
+<li>Anders Mörtberg. Cubical methods in homotopy type theory and univalent foundations. Mathematical Structures in Computer Science 31(10):1147-1184. 2021. doi:10.1017/s0960129521000311.</li>
+<li>Steve Awodey, Álvaro Pelayo, Michael A. Warren. Voevodsky’s Univalence Axiom in Homotopy Type Theory. Notices of the American Mathematical Society 60(09):1164. 2013. doi:10.1090/noti1043.</li>
+<li>Fedor Manin. Rational Homotopy Type and Computability. Foundations of Computational Mathematics 23(5):1817-1849. 2022. doi:10.1007/s10208-022-09582-8.</li>
+<li>Joël Riou. Formalization of derived categories in Lean/mathlib. Annals of Formalized Mathematics Volume 1. 2025. doi:10.46298/afm.13609.</li>
+<li>Aaron Lercher. Curry’s Critique of the Syntactic Concept of Formal System and Methodological Autonomy for Pure Mathematics. Filozofia Nauki 31(121):53-67. 2023. doi:10.14394/filnau.2023.0002.</li>
+<li>Isaac (Rucheng) Li. Formal verification of the Euler Sieve via Lean. Pittsburgh Interdisciplinary Mathematics Review 3:82-101. 2025. doi:10.5195/pimr.2025.58.</li>
+<li>Flora Graham. Daily briefing: Mathematicians revive a ‘miraculous’, incomprehensible proof. Nature. 2021. doi:10.1038/d41586-021-02507-5.</li>
+<li>Y. Rav. A Critique of a Formalist-Mechanist Version of the Justification of Arguments in Mathematicians&#x27; Proof Practices. Philosophia Mathematica 15(3):291-320. 2007. doi:10.1093/philmat/nkm023.</li>
+<li>Alex Wilkins. Radical proof stumps mathematicians. New Scientist 262(3492):8. 2024. doi:10.1016/s0262-4079(24)00941-2.</li>
+<li>THOMAS HALES, MARK ADAMS, GERTRUD BAUER. A FORMAL PROOF OF THE KEPLER CONJECTURE. Forum of Mathematics, Pi 5. 2017. doi:10.1017/fmp.2017.1.</li>
+<li>Enrico Serra, Paolo Tilli. Nonlinear wave equations as limits of convex minimization problems: proof of a conjecture by De Giorgi. Annals of Mathematics 175(3):1551-1574. 2012. doi:10.4007/annals.2012.175.3.11.</li>
+<li>Vassilly Voinov. A Mathematical Proof of the Strong Goldbach’s Conjecture. Current Research in Statistics &amp;amp; Mathematics 5(1):01-06. 2026. doi:10.33140/crsm.05.01.02.</li>
+<li>Muhammad Abdul Basit Ur Rahim. Ensuring Reliability in Self-Adaptive Systems: A Framework for Formal Specification and Verification. Contemporary Mathematics:6553-6569. 2025. doi:10.37256/cm.6520256223.</li>
+<li>Piotr Krylov, Askar Tuganbaev. Formal Matrix Rings: Isomorphism Problem. Mathematics 11(7):1720. 2023. doi:10.3390/math11071720.</li>
+<li>Junhao Qian. Logicism&#x27;s role in modern mathematics: A formal verification approach. Journal of Education, Humanities and Social Sciences 56:81-85. 2025. doi:10.54097/t8yvxs26.</li>
+<li>Zoltán Kovács, Tomas Recio, Luis F. Tabera. Dealing with Degeneracies in Automated Theorem Proving in Geometry. Mathematics 9(16):1964. 2021. doi:10.3390/math9161964.</li>
+<li>Xiaoning Zeng, Shuijing Xiao. Determining the limits of bivariate rational functions by Sturm&#x27;s theorem. Journal of Symbolic Computation 96:1-21. 2020. doi:10.1016/j.jsc.2019.02.010.</li>
+<li>Anisa Widiastuti, Susanto Susanto, Abi Suwito. The Thinking Process of Students in Proving Ceva&#x27;s Theorem in Basic Geometry Course. Jurnal Didaktik Matematika 11(2):325-340. 2024. doi:10.24815/jdm.v11i2.40451.</li>
+<li>Line Edslev Andersen. Outsiders enabling scientific change: learning from the sociohistory of a mathematical proof. Social Epistemology 31(2):184-191. 2017. doi:10.1080/02691728.2016.1270367.</li>
+<li>Michael S. Pardo. Legal Epistemology and Legal Proof. Quaestio facti. Revista internacional sobre razonamiento probatorio(10). 2026. doi:10.33115/udg_bib/qf.i10.23222.</li>
+<li>Achille Basile, Surekha Rao, K.P.S. Bhaskara Rao. Geometry of anonymous binary social choices that are strategy-proof. Mathematical Social Sciences 116:85-91. 2022. doi:10.1016/j.mathsocsci.2022.01.001.</li>
+</ol></div>
+<div class="end"><b>新思想前沿</b> · 本块按补料任务包第1包完成：两幕20条、每条三笔独立近年来源＋奠基层、八字段供料行、六段正文与三张核对表。 · <a href="/frontier/" style="color:var(--gold);text-decoration:none">← 回到学科面板</a></div>
+</main><script src="/wds-mode.js?v=20260802b" defer></script></body></html>
