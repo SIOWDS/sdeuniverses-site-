@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """为「SDE 碰撞出典范」生成站内碰撞源目录。
 
-扫 public/{column,paradigm,confluence,creation,art,fiction} 下的 index.html，
+扫 public/{column,paradigm,confluence,frontier,creation,art,fiction} 下的 index.html，
 抽出 标题 / 描述 / 字数 / 栏目，写成一份轻量 catalog.json 供页面客户端选源。
 （学员论文不在此列——页面直接读 /students/publications.json。）
 
@@ -21,6 +21,7 @@ SECTIONS = [
     ("column", "今日长文"),
     ("paradigm", "每日必读"),
     ("confluence", "学科通融"),
+    ("frontier", "新思想前沿"),
     ("creation", "学术创造"),
     ("art", "艺术"),
     ("fiction", "小说"),
@@ -61,6 +62,8 @@ def main():
             rel = os.path.relpath(dirpath, PUB).replace(os.sep, "/")
             if rel == sec:
                 continue  # 栏目首页本身不是文章
+            if sec == "frontier" and rel.count("/") > 1:
+                continue  # 面板的 /programme/ 附录属同一块，收进来等于一篇占两个源位
             p = os.path.join(dirpath, "index.html")
             try:
                 html = open(p, encoding="utf-8", errors="ignore").read()
@@ -80,6 +83,7 @@ def main():
                 r'<meta name="description" content="([^"]+)"',
                 r'<div class="deck"[^>]*>(.*?)</div>',
                 r'<div class="abs"[^>]*>(.*?)</div>',
+                r'<p class="lede"[^>]*>(.*?)</p>',
             )[:220]
             words = len(re.sub(r"[^\u4e00-\u9fff]", "", text_of(html)))
             if words < 1500:

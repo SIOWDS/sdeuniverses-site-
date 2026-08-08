@@ -53,17 +53,28 @@ for f in sorted(glob.glob(os.path.join(PUB, "**", "index.html"), recursive=True)
         continue
     if re.match(r"^/students/[^/]+/works/$", u):
         continue
+    # /frontier/ 面板的 /programme/ 附录是同一块的研究纲领，收进来等于同一篇占两个近邻位。
+    if re.match(r"^/frontier/[^/]+/.+", u):
+        continue
     try:
         h = io.open(f, encoding="utf-8", errors="replace").read()
     except Exception:
         skipped += 1; continue
     t = one(r'<h1 class="art-title">(.*?)</h1>', h)
+    if not t and u.startswith("/frontier/"):
+        # 面板页标题是裸 <h1>（没有 art-title）。2026-08-08 之前这一条把 627 块面板
+        # 整体挡在近邻索引之外 —— 而挡掉的后果是静默的：碰撞机查不到它，
+        # 同一个概念会在毫不知情的情况下被第二次发明。
+        t = one(r'<h1[^>]*>(.*?)</h1>', h)
     if not t:
-        continue                                      # 没有 art-title 的不是篇目页
+        continue                                      # 既无 art-title 也无裸 h1 的不是篇目页
     sub = one(r'<div class="art-subtitle">(.*?)</div>', h) or one(r'<div class="art-sub">(.*?)</div>', h)
     kw = one(r'<div class="keywords">(.*?)</div>', h) or one(r'<p class="kw">(.*?)</p>', h)
     kw = re.sub(r"^\s*(关键词|Keywords)\s*[：:]?\s*", "", kw)
     line = one(r'<div class="innov">.*?<div class="txt">(.*?)</div>', h)
+    if u.startswith("/frontier/"):
+        sub = sub or one(r'<div class="kicker"[^>]*>(.*?)</div>', h)   # 「新思想前沿 · 门类」
+        line = line or one(r'<p class="lede"[^>]*>(.*?)</p>', h)       # 面板导语＝那一刀
     it = pub_by_url.get(u) or {}
     if not line:
         line = txt(it.get("summary", ""))
