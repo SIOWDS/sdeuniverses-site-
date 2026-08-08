@@ -75,6 +75,25 @@ for f in sorted(glob.glob(os.path.join(PUB, "**", "index.html"), recursive=True)
     if u.startswith("/frontier/"):
         sub = sub or one(r'<div class="kicker"[^>]*>(.*?)</div>', h)   # 「新思想前沿 · 门类」
         line = line or one(r'<p class="lede"[^>]*>(.*?)</p>', h)       # 面板导语＝那一刀
+        # 面板没有 .keywords，而近邻检索最要匹配的恰是概念名——它们全在二十条理论的
+        # 小标题里：<h2>甲、公允价值会计<span class="en">…</span></h2>。取中文名当关键词，
+        # 否则查「公允价值会计」召不回这块面板，只能靠导语碰运气。
+        if not kw:
+            names = []
+            for raw in re.findall(r'<h2[^>]*>(.*?)</h2>', h, re.S):
+                n = txt(re.split(r'<span[^>]*class="en"', raw)[0])
+                n = re.sub(r'^\s*(?:新思想|新理论|理论)?\s*'
+                           r'(?:\d{1,2}|[甲乙丙丁戊己庚辛壬癸]|[一二三四五六七八九十]{1,3})'
+                           r'\s*[·．.、,:：]\s*', '', n)
+                n = re.split(r'\s*(?:——|—{1,2}|--)\s*', n)[0].strip(' ·：:，,')
+                n = n.lstrip('◎※·•— ').strip()
+                # 末尾几节是固定栏目名（二十年连起来看／三个常见误解／往下五年看什么…），
+                # 不是理论名，混进关键词只会稀释匹配。
+                if re.search(r'(连起来看|常见误解|相邻领域|争议现场|往下\S{0,3}年|可做|一句话|小结|结语|延伸阅读|参考文献|说明)', n):
+                    continue
+                if 1 < len(n) <= 40 and re.search(r'[\u4e00-\u9fffA-Za-z]', n):
+                    names.append(n)
+            kw = "；".join(dict.fromkeys(names))
     it = pub_by_url.get(u) or {}
     if not line:
         line = txt(it.get("summary", ""))
@@ -83,7 +102,9 @@ for f in sorted(glob.glob(os.path.join(PUB, "**", "index.html"), recursive=True)
     seg = u.strip("/").split("/")
     au = name_by_slug.get(seg[1], "") if seg and seg[0] == "students" and len(seg) > 1 else ""
     au_slug = seg[1] if seg and seg[0] == "students" and len(seg) > 1 else ""
-    rows.append(dict(t=t[:200], sub=sub[:220], kw=kw[:220], u=u,
+    # 面板的关键词是二十条理论名，220 字放不下；只有 /frontier/ 放宽到 400。
+    rows.append(dict(t=t[:200], sub=sub[:220],
+                     kw=kw[:400] if u.startswith("/frontier/") else kw[:220], u=u,
                      kind=it.get("kind", "") or (seg[0] if seg else ""),
                      line=line[:400], au=au, auSlug=au_slug, sec=seg[0] if seg else ""))
 
