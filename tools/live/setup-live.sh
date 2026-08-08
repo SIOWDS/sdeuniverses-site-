@@ -2,7 +2,7 @@
 # ============================================================================
 # SDE 讲堂 · 直播服务器一键部署 v2（Ubuntu 22.04/24.04，新加坡节点，2 核 4G）
 #
-#   OBS ─1080p RTMP─> nginx-rtmp ─┬─ 原画  直接复制，不重编码（零 CPU）
+#   OBS ─1080p SRT──> ffmpeg 收 ─> nginx-rtmp ─┬─ 原画  直接复制，不重编码（零 CPU）
 #                                 └─ 720p  转一路给网络差的学员
 #                                        │ 切 HLS 6 秒分片
 #                                        ▼
@@ -19,23 +19,39 @@
 #   一路 1080p→720p 的 x264 veryfast 约吃 1～1.5 核，2 核有余量；三档就要 4 核。
 # · **学员的 200 路不落到这台机器上**——它只服务讲师那一路上行，
 #   分发全部由 Cloudflare 边缘扛。所以机器可以这么小。
+# · **入口用 SRT 不用 RTMP**。讲师走的是 eSIM 漫游（蜂窝网络），特点不是慢而是**抖**：
+#   RTMP 跑在 TCP 上，一丢包就重传、OBS 立刻掉帧，两百人一起卡。
+#   SRT 是专为不稳定链路设计的（自带前向纠错与重传窗口），把丢包在最脆弱的那一跳就吃掉。
+#   进来之后 `-c copy` 原样转成 RTMP 喂给本机 nginx，**全程零重编码**，清晰度一点不损。
+#   RTMP 端口仍然开着作后备——SRT 万一不通，改回 RTMP 就能开课，不至于停摆。
 # ============================================================================
 set -euo pipefail
 
 STREAM_KEY="${STREAM_KEY:-$(head -c 18 /dev/urandom | base64 | tr -d '/+=' | head -c 24)}"
+# SRT 用口令加密而不是靠密钥字符串，长度必须 10–79 位
+SRT_PASS="${SRT_PASS:-$(head -c 24 /dev/urandom | base64 | tr -d '/+=' | head -c 32)}"
 LIVE_DIR=/var/live
 HLS_DIR=$LIVE_DIR/hls
 REC_DIR=$LIVE_DIR/rec
 
-echo "==> 1/7 装 nginx-rtmp、ffmpeg、rclone"
+echo "==> 1/8 装 nginx-rtmp、ffmpeg、rclone"
 export DEBIAN_FRONTEND=noninteractive
 apt-get update -qq
 apt-get install -y -qq libnginx-mod-rtmp nginx ffmpeg rclone jq curl
 
+# ⚠ 发行版的 ffmpeg 不一定编进了 libsrt。缺了的话 SRT 那条通道会静默失效，
+#   而症状只是"OBS 推不上去"，开课当天才发现就晚了——所以现在就查。
+if ! ffmpeg -hide_banner -protocols 2>/dev/null | grep -qw srt; then
+  echo "!! 这台机器的 ffmpeg 不支持 SRT。"
+  echo "   先跑：apt-get install -y libsrt1.5-openssl  然后换一个带 SRT 的 ffmpeg 版本，"
+  echo "   或者先用 RTMP 通道开课（脚本尾部会打印 RTMP 的地址）。"
+  echo "   现在继续安装，SRT 那一路会装但起不来。"
+fi
+
 mkdir -p "$HLS_DIR" "$REC_DIR"
 chown -R www-data:www-data "$LIVE_DIR"
 
-echo "==> 2/7 写 nginx-rtmp 配置（双码率）"
+echo "==> 2/8 写 nginx-rtmp 配置（双码率）"
 cat > /etc/nginx/rtmp.conf <<NGINX
 rtmp {
   server {
@@ -96,7 +112,7 @@ NGINX
 grep -q 'include /etc/nginx/rtmp.conf;' /etc/nginx/nginx.conf \
   || echo 'include /etc/nginx/rtmp.conf;' >> /etc/nginx/nginx.conf
 
-echo "==> 3/7 串流密钥校验（只在本机监听）"
+echo "==> 3/8 串流密钥校验（只在本机监听）"
 cat > /usr/local/bin/live-auth.py <<'PY'
 #!/usr/bin/env python3
 # 极小的 on_publish 校验：串流密钥不对就拒绝推流（返回非 2xx）。
@@ -124,7 +140,35 @@ Restart=always
 WantedBy=multi-user.target
 UNIT
 
-echo "==> 4/7 配 rclone 连 R2"
+echo "==> 4/8 SRT 接收口（讲师主用通道）"
+# ffmpeg 以 listener 模式蹲在 10080 端口收 SRT，收到就原样转成 RTMP 喂给本机 nginx。
+#  · latency=2000000（2 秒，单位微秒）是给蜂窝网络留的重传窗口——
+#    留小了丢包救不回来，留大了徒增延迟；两小时的课延迟多两秒毫无影响，所以宁可留足。
+#  · passphrase 直接把链路加密了，比 RTMP 那种明文推流密钥更稳妥。
+#  · 没人推流时 ffmpeg 会退出，靠 Restart=always 反复蹲守，这是正常状态、不是故障。
+cat > /usr/local/bin/live-srt.sh <<SH
+#!/usr/bin/env bash
+exec ffmpeg -nostdin -loglevel warning \
+  -mode listener -i "srt://0.0.0.0:10080?mode=listener&latency=2000000&passphrase=$SRT_PASS" \
+  -c copy -f flv "rtmp://127.0.0.1/live/$STREAM_KEY"
+SH
+chmod +x /usr/local/bin/live-srt.sh
+
+cat > /etc/systemd/system/live-srt.service <<'UNIT'
+[Unit]
+Description=SDE live SRT ingest
+[Service]
+ExecStart=/usr/local/bin/live-srt.sh
+Restart=always
+RestartSec=2
+[Install]
+WantedBy=multi-user.target
+UNIT
+
+# 只开这两个入口，其余不动
+command -v ufw >/dev/null 2>&1 && { ufw allow 10080/udp >/dev/null 2>&1 || true; ufw allow 1935/tcp >/dev/null 2>&1 || true; }
+
+echo "==> 5/8 配 rclone 连 R2"
 echo "    去 Cloudflare Dashboard → R2 → Manage API Tokens 建一个 Object Read & Write 的令牌"
 read -rp "    R2 Access Key ID: " R2_ID
 read -rsp "    R2 Secret Access Key: " R2_SECRET; echo
@@ -143,7 +187,7 @@ no_check_bucket = true
 CONF
 chmod 600 /root/.config/rclone/rclone.conf
 
-echo "==> 5/7 开播/下课钩子与分片同步"
+echo "==> 6/8 开播/下课钩子与分片同步"
 cat > /usr/local/bin/live-status.sh <<'SH'
 #!/usr/bin/env bash
 # 改写 status.json 并立刻推进桶。网页每 15 秒问一次它，据此切开播/未开播。
@@ -230,7 +274,7 @@ rm -f "$LATEST"
 SH
 chmod +x /usr/local/bin/live-archive.sh
 
-echo "==> 6/7 每天清一次桶里的旧分片（不清回放）"
+echo "==> 7/8 每天清一次桶里的旧分片（不清回放）"
 # 分片只在直播当下有用，留着就是白付存储费：1080p 一堂课约 4GB，一个月二十堂就是 80GB 往上累。
 # ⚠ --include "*.ts" 是护栏：回放的 mp4 在 live/replay/ 下，绝不能被这条扫掉。
 cat > /etc/cron.daily/sde-live-prune <<'CRON'
@@ -239,9 +283,9 @@ rclone delete r2:sdeuniverses-pdf/live --include "*.ts" --min-age 24h --s3-no-ch
 CRON
 chmod +x /etc/cron.daily/sde-live-prune
 
-echo "==> 7/7 起服务"
+echo "==> 8/8 起服务"
 systemctl daemon-reload
-systemctl enable --now live-auth.service
+systemctl enable --now live-auth.service live-srt.service
 nginx -t && systemctl restart nginx
 /usr/local/bin/live-status.sh false
 
@@ -249,28 +293,47 @@ IP=$(curl -s4 ifconfig.me || echo "<本机公网IP>")
 cat <<DONE
 
 ============================================================
- 装好了。OBS → 设置 → 直播 → 服务「自定义」，填这两行：
+ 装好了。
 
-   服务器      rtmp://$IP/live
-   串流密钥    $STREAM_KEY
+ ── OBS 推流设置（设置 → 直播 → 服务「自定义」）──
+   **主用（SRT，抗抖动，走你的 eSIM 就用这条）**
+     服务器      srt://$IP:10080?latency=2000000&passphrase=$SRT_PASS
+     串流密钥    留空
 
- ⚠ 串流密钥等于开课权限，只留在讲师那台电脑上，不要发群里。
+   **后备（RTMP，SRT 万一不通时用）**
+     服务器      rtmp://$IP/live
+     串流密钥    $STREAM_KEY
+
+ ⚠ 上面两行都等于开课权限，只留在讲师那台电脑上，不要发群里。
 
  ── OBS 输出设置（设置 → 输出 → 输出模式「高级」→ 串流）──
-   编码器        x264
+   编码器        优先选 QuickSync H.264 或 NVENC H.264（硬件编码，几乎不占 CPU）
+                 都没有再退回 x264 + veryfast
    码率控制      CBR
    关键帧间隔    2 秒          ← 必须是 2，HLS 靠它对齐分片
-   CPU 预设      veryfast
    配置(Profile) high
 
+ ── 必须打开这一项 ──
+   设置 → 高级 → 网络 → **勾选「动态改变码率以管理拥塞」**
+   蜂窝网络一波动，它会自动降码率而不是掉帧。
+   这一项对 eSIM 漫游是决定性的，不开则前功尽弃。
+
  ── 两个场景，两套参数（设置 → 视频，讲课时切）──
-   讲人：   1920x1080 / 25 fps / 4000 Kbps
+   讲人：   1920x1080 / 25 fps / 2500 Kbps
    讲 PPT 或白板：
-            1920x1080 / 20 fps / 5000 Kbps
+            1920x1080 / 20 fps / 3500 Kbps
             —— 帧率降下来，把码率全给清晰度。
                文字是锐边，最怕码率不够；笔迹不需要每秒 30 帧。
    ⚠ 输出分辨率必须和你屏幕一致（1080p 屏就填 1920x1080）。
      缩放到 720p 再让学员放大看，文字一定糊——这条没有例外。
+   ⚠ 码率是按蜂窝网络定的，比固网保守。等实测证明链路稳，再往上加。
+     3500 Kbps 一堂两小时的课约耗 3.2 GB 流量。
+
+ ── eSIM 漫游的三条实务（比调参数管用）──
+   1. 笔记本**全程插电源**——电池模式会降频，讲到一半开始掉帧，很难查。
+   2. 若用手机共享网络，**用 USB 网络共享（USB tethering），不要用 WiFi 热点**——
+      WiFi 那一跳会再叠一层抖动。
+   3. 开课前在**固定位置**测一遍并记住它，讲课全程别移动；信号格数变化直接反映成画面卡顿。
 
  ── 每次开课前（可选）──
    改标题：  echo "SDE 本体论 · 第三讲" > /var/live/title.txt
@@ -281,5 +344,9 @@ cat <<DONE
    1) https://sdeuniverses.com/live/status.json   应变成 {"live":true,...}
    2) https://sdeuniverses.com/live/sde.m3u8      应出 200，内容里有两行 EXT-X-STREAM-INF
    3) https://sdeuniverses.com/meeting/           应出画面
+
+ ── 出问题时先看这两条日志 ──
+   journalctl -u live-srt  -n 50 --no-pager     # SRT 有没有收到流
+   journalctl -u live-sync -n 50 --no-pager     # 分片有没有传进 R2
 ============================================================
 DONE
