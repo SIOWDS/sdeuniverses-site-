@@ -216,7 +216,8 @@ footer a{color:var(--gold);text-decoration:none}
    ---------------------------------------------------------------------------
    数据面：三份文件全在 R2 桶的 live/ 前缀下，由直播服务器写、本页只读。
      live/status.json   开播状态与本节课标题（推流开始/结束时改写）
-     live/stream.m3u8   HLS 播放列表（推流时每几秒重写一次）
+     live/sde.m3u8      HLS 主播放列表（两档：1080p 原画 / 720p 备份档）
+     live/sde_hi|sde_mid/  各档的分片与子列表
      live/replays.json  回放清单（下课后追加一条）
    Worker 的 /live/* 路由负责从桶里取，并给分片挂不可变缓存（见 src/worker.js）。
 
@@ -286,7 +287,8 @@ function setBar(live, title, meta){
      lowLatencyMode false      明确关掉低延迟模式——我们要的是稳，不是快 */
 function play(playlist){
   var vid = $('lvVideo');
-  var src = LIVE.base + (playlist || 'stream.m3u8');
+  // 默认指主播放列表（多码率）。服务器在 status.json 里也会写 playlist 字段，以那个为准。
+  var src = LIVE.base + (playlist || 'sde.m3u8');
   if (_state === 'playing' && _hlsObj) return;
 
   return loadHls().then(function(ok){

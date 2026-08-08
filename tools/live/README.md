@@ -12,28 +12,37 @@ Google / GitHub / Facebook 登录才能开房——这两条在「100 人、学�
 出路是**换形态**：SDE 讲课本来就是「1 讲 99 听」，不是 100 路对等视频。
 改成单向直播之后，人数上限这件事从根上不存在了——100 人和 500 人对讲师端完全一样。
 
-## 结构
+## 结构（v2，双码率）
 
 ```
-讲师 OBS ──RTMP──> 新加坡 VPS（nginx-rtmp 切 HLS 6 秒分片）
-                     │ rclone 每秒同步
-                     ▼
-                  R2 桶 sdeuniverses-pdf 的 live/ 前缀
-                     │ 零 egress
-                     ▼
-        sdeuniverses.com/live/*（Worker 路由，见 src/worker.js）
-                     │ 分片挂 immutable，100 人看同一片只回桶一次
-                     ▼
-        /meeting/ 页内 hls.js 播放器 —— 学生什么都不用装
+讲师 OBS ─1080p RTMP─> 新加坡 VPS（2核4G）
+                        ├─ 原画  -c copy 不重编码 ──┐
+                        └─ 720p  转一路给网络差的 ──┤ nginx-rtmp 切 6 秒分片
+                                                     │ rclone 每秒同步
+                                                     ▼
+                          R2 桶 sdeuniverses-pdf 的 live/ 前缀
+                                                     │ 零 egress
+                                                     ▼
+              sdeuniverses.com/live/sde.m3u8（Worker 路由，见 src/worker.js）
+                                                     │ 分片挂 immutable，200 人看同一片只回桶一次
+                                                     ▼
+              /meeting/ 页内 hls.js 播放器 —— 学生什么都不用装，网络差的自动降档
 ```
+
+**最高档为什么不重编码**：讲师推什么清晰度学员就看到什么，中间一次都不重压。
+屏幕共享和白板是高频锐边，任何一次转码都会把文字压糊且不可逆——
+这是"PPT 看不清字"的真正原因，跟分辨率够不够无关。
+
+**为什么只转一路**：两档而不是三档，是为了让 2 核机器跑得动
+（一路 1080p→720p 的 x264 veryfast 约吃 1～1.5 核）。三档要 4 核，价钱翻倍。
 
 ## 桶里的三份文件（服务器写，网页只读）
 
 | 键 | 谁写 | 缓存 | 作用 |
 |---|---|---|---|
 | `live/status.json` | `live-status.sh` | no-store | 开播状态、课程标题、下一课预告 |
-| `live/stream.m3u8` | `live-sync.sh` 每秒 | no-store | HLS 播放列表 |
-| `live/*.ts` | `live-sync.sh` 每秒 | immutable 一年 | 分片，只增不改 |
+| `live/sde.m3u8` | nginx 自动生成 | no-store | **主播放列表**（列出两个档） |
+| `live/sde_hi/*`、`live/sde_mid/*` | `live-sync.sh` 每秒 | m3u8 no-store／ts immutable | 各档的子列表与分片 |
 | `live/replays.json` | `live-archive.sh` | no-store | 回放清单 |
 | `live/replay/*.mp4` | `live-archive.sh` | immutable 一年 | 整堂录像 |
 
@@ -47,6 +56,8 @@ Google / GitHub / Facebook 登录才能开房——这两条在「100 人、学�
 ```bash
 bash setup-live.sh
 ```
+
+机器规格：**2 核 4G**（Hetzner CPX22 新加坡一档即可）。转码只有一路，2 核有余量。
 
 跑完按提示填 R2 的 Access Key ID / Secret / Cloudflare 账号 ID
 （Dashboard → R2 → Manage API Tokens，权限选 Object Read & Write）。
@@ -80,3 +91,17 @@ bash setup-live.sh
 - `src/worker.js` —— 新增 `/live/*` 路由（R2_LIVE 段）
 - `tools/sim_meeting_live.mjs` —— 脱机模拟，**改直播厅 JS 必须先跑它**
 - `tools/sim_meeting_guest.mjs` —— 已删（测的是会议室时代的代码）
+
+
+## 存储会自己长胖，已经装了闸
+
+1080p 一堂课的分片约 4GB，一个月二十堂就是 80GB 往上累，且分片过了直播当下就没用了。
+`/etc/cron.daily/sde-live-prune` 每天清一次桶里超过 24 小时的 `.ts`。
+**`--include "*.ts"` 是护栏**：回放的 mp4 在 `live/replay/` 下，绝不能被这条扫掉——改这行前先想清楚。
+
+## 200 人的账
+
+- 分发：边缘 ＋ R2 零 egress，与人数无关。
+- Worker 请求：2 小时 200 人约 50 万次/堂 → 付费版 1000 万/月 ≈ 每月 20 堂，够用。
+- **人数再往上（500＋）就要把桶挂自定义域 `live.sdeuniverses.com`**（Dashboard 配 CORS，
+  再改页面里 `LIVE.base` 一行），Worker 请求归零。现在还不必做。

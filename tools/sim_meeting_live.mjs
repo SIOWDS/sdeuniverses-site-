@@ -135,7 +135,7 @@ function ok(name, cond, detail) {
   await api.tick();
   await new Promise(r => setTimeout(r, 0));
   ok('B 开播：拉了 hls.js', env.scripts.some(s => /hls\.min\.js/.test(s)), JSON.stringify(env.scripts));
-  ok('B 开播：接到了 m3u8', env.lastSrc === '/live/stream.m3u8', String(env.lastSrc));
+  ok('B 开播：接到的是多码率主列表', env.lastSrc === '/live/sde.m3u8', String(env.lastSrc));
   ok('B 开播：video 露出', env.els.lvVideo.style.display === 'block', env.els.lvVideo.style.display);
   ok('B 开播：标题栏亮直播中', env.els.lvTitle.innerHTML.includes('直播中'), env.els.lvTitle.innerHTML);
   ok('B 开播：状态点点亮', env.els.lvDot.className === 'dot on', env.els.lvDot.className);
@@ -144,6 +144,16 @@ function ok(name, cond, detail) {
     cfg.lowLatencyMode === false && cfg.liveSyncDurationCount >= 4 && cfg.maxBufferLength >= 30,
     JSON.stringify(cfg));
   ok('B 开播：调用了 play()', env.played >= 1, String(env.played));
+}
+
+// ---- B2 服务器指定 playlist 时必须听服务器的（换档/改名时的活口）------------
+{
+  const { sandbox, env } = makeEnv([{ live: true, playlist: 'sde_hi/index.m3u8' }]);
+  const api = run(code, sandbox);
+  await api.tick();
+  await new Promise(r => setTimeout(r, 0));
+  ok('B2 status.json 指定的 playlist 优先于默认值',
+    env.lastSrc === '/live/sde_hi/index.m3u8', String(env.lastSrc));
 }
 
 // ---- C 下课 ---------------------------------------------------------------
@@ -214,7 +224,7 @@ function ok(name, cond, detail) {
   await api.tick();
   await new Promise(r => setTimeout(r, 0));
   ok('G hls.js 下不来：回落到原生 HLS 播放',
-    env.els.lvVideo.src === '/live/stream.m3u8' && env.els.lvVideo.style.display === 'block',
+    env.els.lvVideo.src === '/live/sde.m3u8' && env.els.lvVideo.style.display === 'block',
     String(env.els.lvVideo.src) + ' / ' + env.els.lvVideo.style.display);
 }
 
