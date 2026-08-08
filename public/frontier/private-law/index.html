@@ -1,7 +1,7 @@
 <!DOCTYPE html><html lang="zh"><head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>民商法与合同 · 新思想前沿 | SDE Universes</title>
-<meta name="description" content="近二十年民商法与合同法立起来的二十个新理论：关系性合同与善意、解释的文本与语境之争、格式条款与同意的虚构、承诺论对效率违约的反击、合同作为私人立法、强制仲裁与集体豁免、不公平条款的依职权审查、披露主义的失败、个性化法、以数据为对价、财产的排他与信息成本、物权法定的经济解释、数据能否为财产、数字资产的第三类财产、担保交易现代化、公司目的之争、信义义务的气候化、供应链合同作为治理、集体救济欧洲化、诉讼资助与索赔资产化。">
+<meta name="description" content="近二十年民商法与合同领域二十个新思想，按8＋12两幕排开：排他与信息成本、承诺论与效率违约的退场、合同作为私人立法、信义义务的边界扩张、解释：文本与语境之争、强制仲裁与集体救济的排除等。每条给出提出、争议、最新、钥句与奠基来源，配六段正文和八字段碰撞行。">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Noto+Serif+SC:wght@300;400;500;600&display=swap">
 <style>
@@ -36,142 +36,280 @@ h2 .no{display:inline-block;min-width:2.2em;font-family:'Playfair Display',serif
 .toc .cg{grid-column:1/-1;font-size:.76rem;letter-spacing:.1em;color:var(--gold2);font-weight:700;padding-left:0;margin-top:.45rem}
 .toc .cg:before{content:''}
 @media(max-width:640px){h1{font-size:1.7rem}.toc ol{grid-template-columns:1fr}}
+
+/* 法律、规制与责任供料层 */
+.act{margin:2.6rem 0 .45rem;padding:.55rem .9rem;background:var(--card);border-left:4px solid var(--gold);font-size:1.02rem;font-weight:600;color:var(--gold)}
+.actnote{font-size:.94rem;color:var(--text2);margin-bottom:1.35rem}
+.idea{display:block}
+.idea h2{font-size:1.18rem;font-weight:600;color:var(--gold);margin:2rem 0 .35rem;scroll-margin-top:1rem}
+.idea h2 .no{display:inline-block;min-width:2.6em;font-family:'Playfair Display',serif;font-size:.86rem;color:var(--muted);font-weight:600}
+.tmeta{font-size:.82rem;color:var(--muted);margin:0 0 .7rem;padding-left:2.6em;line-height:1.7}
+.src{font-size:.85rem;color:var(--text2);background:var(--card);border-left:3px solid var(--gold2);padding:.58rem .82rem;margin:0 0 .95rem;line-height:1.82}
+.src b,.col b{color:var(--gold2);font-weight:600;margin-right:.28em}
+.col{font-size:.83rem;color:var(--text2);background:rgba(138,104,23,.07);border-left:3px solid var(--muted);padding:.58rem .82rem;margin:.15rem 0 1.55rem;line-height:1.82}
+.pipe{color:var(--muted);padding:0 .16em}
+.toc{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1rem 1.1rem;margin:0 0 1.8rem;font-size:.88rem;line-height:1.55}
+.toc-t{font-size:.78rem;letter-spacing:.14em;color:var(--gold2);font-weight:700;margin-bottom:.7rem}
+.toc ol{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:.28rem .9rem;counter-reset:tc}
+.toc li{counter-increment:tc;position:relative;padding-left:1.9em}
+.toc li:before{content:counter(tc,decimal-leading-zero);position:absolute;left:0;font-family:'Playfair Display',serif;font-size:.78rem;color:var(--muted)}
+.toc a{color:var(--text);text-decoration:none;border-bottom:1px solid transparent}
+.toc a:hover{color:var(--gold);border-bottom-color:var(--border)}
+.toc .cg{grid-column:1/-1;font-size:.76rem;letter-spacing:.08em;color:var(--gold2);font-weight:700;padding-left:0;margin-top:.45rem}
+.toc .cg:before{content:''}
+@media(max-width:640px){.toc ol{grid-template-columns:1fr}.idea h2{line-height:1.55}}
 </style></head><body>
 <div class="top"><a href="/browse/">SDE Universes</a><span class="sep">·</span><a href="/frontier/">新思想前沿</a><span class="sep">›</span><span style="color:var(--text2)">法律与治理</span></div>
 <main>
-<div class="kicker">新思想前沿 · 法律与治理</div>
+<div class="kicker">新思想前沿 · 法律、规制与责任</div>
 <h1>民商法与合同</h1>
-<div class="meta">近二十年 · <b>20 个新理论</b> · 每条约 500 字 · 全篇约 9500 字 · 王德生 亲撰 · 2026 年 8 月</div>
-<p class="lede">民商法一向自认为是最技术、最少政治的那一块法律。这二十年，它这个自我形象被两件事拆掉了。第一件是<b>同意的虚构被拆穿</b>：当绝大多数交易由一方单方面拟就、另一方只能点击接受时，合同法的整套正当性基础（双方合意）在事实上不再成立，于是这门学问被迫处理它一直不愿处理的问题——不平等的缔约力。第二件是<b>私法被要求承担公共功能</b>：供应链上的人权与环境义务、企业的气候责任、平台的接入条件、算法的定价，这些本应由公法处理的问题，被大量装进合同条款、信义义务与财产权的框架里。与此同时，财产法在一个古老的分类问题上被数字资产逼着做了正面回答。下面二十条按这四层排列：<b>合同理论的重构 → 消费者与不平等 → 财产与担保 → 私法的公共化</b>。</p>
-<div class="toc"><div class="toc-t">本面板的 20 个理论</div><ol><li class="cg">一、合同理论的重构</li><li><a href="#t01">关系性合同与善意义务</a></li><li><a href="#t02">解释：文本与语境之争</a></li><li><a href="#t03">格式条款与同意的虚构</a></li><li><a href="#t04">承诺论与效率违约的退场</a></li><li><a href="#t05">合同作为私人立法</a></li><li class="cg">二、消费者与不平等</li><li><a href="#t06">强制仲裁与集体救济的排除</a></li><li><a href="#t07">不公平条款的依职权审查</a></li><li><a href="#t08">披露主义的失败</a></li><li><a href="#t09">个性化法与算法定价</a></li><li><a href="#t10">以数据为对价</a></li><li class="cg">三、财产与担保</li><li><a href="#t11">排他与信息成本</a></li><li><a href="#t12">数据能不能成为财产</a></li><li><a href="#t13">数字资产：第三类财产</a></li><li><a href="#t14">担保交易的现代化</a></li><li><a href="#t15">信义义务的边界扩张</a></li><li class="cg">四、私法的公共化</li><li><a href="#t16">公司目的之争</a></li><li><a href="#t17">信义义务的气候化</a></li><li><a href="#t18">供应链合同作为治理工具</a></li><li><a href="#t19">集体救济的欧洲化</a></li><li><a href="#t20">诉讼资助与索赔的资产化</a></li></ol></div>
-<div class="era">一、合同理论的重构</div>
-<h2 id="t01"><span class="no">01</span>关系性合同与善意义务</h2>
-<div class="tmeta"><b>Relational contracts and good faith</b> · 2013 年后英美法系判决 · 合同法</div>
-<p>古典合同法的图景是一次性交易：条款完备、履行完毕、关系结束。而现实中大量重要合同是长期的、不完全的、需要在履行中持续调整的——分销、特许经营、合资、长期供货、外包。对这类合同，逐字执行条款有时恰恰破坏了双方真正的交易。</p>
-<p>这十年英美法系逐步承认了一类<b>关系性合同</b>，并在其中默示<b>善意履行义务</b>：不得以违背合同目的的方式行事，不得以诚实相对方无法预期的方式行使权利。与之配套的是对<b>裁量权行使</b>的约束——合同中一方享有的单方裁量（定价、评级、终止、批准），须依据相关因素、不得恣意或非理性。</p>
-<p>边界之争持续至今。反对方担心善意义务会把法院对交易公平的判断塞进当事人的安排，损害确定性；支持方的回应是它只约束<b>行使方式</b>而不改变<b>权利内容</b>。实践中，法院倾向于对明确写死的条款保持克制，而对开放性裁量条款施加较强约束——这条区分线逐渐成为通行做法。</p>
-<p class="kk"><b>它改变了什么</b>：它把合同从<b>一份文件</b>改回<b>一段关系</b>，并给出了长期合同中最实用的一条判据——<b>凡是合同把单方裁量交给一方的地方，就是法律必须介入的地方</b>。这条判据在平台与商户、雇主与零工的关系上尤其重要。</p>
-<h2 id="t02"><span class="no">02</span>解释：文本与语境之争</h2>
-<div class="tmeta"><b>Textualism versus contextualism in contract interpretation</b> · 2011–2015 年一系列判决 · 合同法</div>
-<p>解释一份合同时，应当以文字的自然含义为准，还是以商业常识与缔约背景为准？这二十年英国的判决在两者之间来回摆动，形成了一条罕见的、可以逐年追踪的钟摆轨迹。</p>
-<p>前一阶段偏语境：当条款存在多种可能读法时，取更符合<b>商业常识</b>的那一种。后一阶段明显收回：商业常识不能用来重写当事人写下的文字；只有在语言真正含糊时，商业常识才能介入；一方事后觉得吃亏，不是重新解释的理由。</p>
-<p>这条轨迹背后是一个真实的取舍：语境主义提高个案的实质正确性，代价是<b>可预测性</b>下降——当事人无法通过阅读合同知道自己的权利，交易成本随之上升；文本主义相反。实证与比较研究给出的一条经验规律是：<b>老练的商事当事人偏好文本主义</b>（他们有能力把话写清楚，需要的是确定性），而一次性、弱势的当事人则从语境主义受益。</p>
-<p class="kk"><b>它改变了什么</b>：它使合同解释的方法之争第一次被明确表述为<b>按当事人类型分层</b>的政策选择，而非某一方在方法上正确。这与刑法、行政法这十年围绕文本主义的争论属于同一族——<b>解释方法从来不是中立的技术，它把不确定性分配给某一方</b>。</p>
-<h2 id="t03"><span class="no">03</span>格式条款与同意的虚构</h2>
-<div class="tmeta"><b>Boilerplate and the fiction of consent</b> · Margaret Radin 等 · 2013 · 合同理论</div>
-<p>现代交易的绝大多数条款不是谈出来的，而是拟好的：使用条款、服务协议、保修、仲裁、责任限制。相对方唯一的行为是点击。合同法却继续把这套流程当作合意，并据此赋予其与谈判合同同等的执行力。</p>
-<p>这一支的命题是：这不是合同，而是<b>权利的单方剥夺</b>被套上了合同的外形。作者用「民主的退化」来描述其后果——通过格式条款，私人主体可以系统性地取消由公共立法赋予的救济（集体诉讼、陪审团、法定赔偿、管辖），而这种取消不经过任何立法程序。她称之为对法律秩序的<b>侵蚀性替换</b>。</p>
-<p>争论的另一方给出的是效率论证：谈判成本高昂，标准化条款降低了交易成本，而市场竞争会淘汰过分苛刻的条款。经验研究对这条竞争约束提出质疑——由于条款不被阅读、不进入比价，市场压力主要作用于价格与显著特征，对隐藏条款的约束极弱。</p>
-<p class="kk"><b>它改变了什么</b>：它把格式条款从<b>合同法的一个例外问题</b>抬升为<b>私法与公法关系的核心问题</b>，并提供了本面板的贯穿线索——<b>当合意只是形式时，合同法就不再是私人自治的工具，而是一种未经授权的立法权</b>。下面几条都是对这个诊断的具体回应。</p>
-<h2 id="t04"><span class="no">04</span>承诺论与效率违约的退场</h2>
-<div class="tmeta"><b>Promise theory against efficient breach</b> · Seana Shiffrin 等 · 2007 年后 · 合同哲学</div>
-<p>法律经济学的经典命题是：若违约的收益大于赔偿，则违约在社会上是有效率的，法律不应阻止；期待赔偿因此是正确的救济，而强制履行与惩罚性赔偿是错误的。这套论证支配了合同法教学数十年。</p>
-<p>反击从道德哲学一侧发起：合同是<b>承诺</b>，而承诺的道德含义是不得随意毁弃；一套鼓励人们在划算时毁诺、并把这称为「有效率」的法律，会与日常道德实践发生冲突，长期还会侵蚀守诺的社会规范。作者的论证方式很谨慎——不主张法律必须复制道德，而主张<b>法律不应培养出与道德相冲突的品格</b>。</p>
-<p>这场争论的具体产出是救济的多样化：在若干法域，<b>获利返还</b>（在特定情形下剥夺违约方因违约获得的收益）与更宽的强制履行被接受；同时对故意违约与无奈违约作出区分——后者继续适用期待赔偿。</p>
-<p class="kk"><b>它改变了什么</b>：它使合同法重新有了一个与效率并列的独立评价维度。更一般的启示在方法上——<b>当一个领域被单一理论支配数十年后，最有效的挑战往往不是提出更好的模型，而是指出该模型没有资格独占那个规范位置</b>。</p>
-<h2 id="t05"><span class="no">05</span>合同作为私人立法</h2>
-<div class="tmeta"><b>Contract as private ordering and regulation</b> · 2010 年代成型 · 合同与治理</div>
-<p>合同的功能正在超出交换本身。平台的服务条款为数亿人设定言论与交易规则；供应链合同把人权与环境标准逐级下传；许可协议决定软件与数据的使用方式；标准与认证要求通过合同链条覆盖整个行业。这些安排在数量与影响上已构成一套实际的规则体系。</p>
-<p>命题是：应当把这类合同当作<b>治理工具</b>而非交易工具来分析，因而适用治理的评价标准——制定过程是否有参与、规则是否公开可知、执行是否一致、有无申诉与复核、以及规则变更如何通知。这与全球行政法的思路完全同构，只是发生在私法内部。</p>
-<p>推论有两面。正面：合同链条能触及公权力无法触及的跨境场景，是唯一可行的传导机制。负面：<b>合同的相对性</b>意味着受影响最深的第三方（供应链末端的工人、受污染的社区）恰恰不是合同当事人，因而既不能主张权利也无法参与制定；合规责任被层层下传到最没有议价能力的一端。</p>
-<p class="kk"><b>它改变了什么</b>：它使私法必须回答一个公法问题——<b>当一份合同实际上在为不特定多数人立规矩时，它的正当性从哪里来</b>。这一条与本组的数字与监管面板共享同一个诊断：权力的识别标准应当按<b>功能</b>而非按<b>形式</b>。</p>
-<div class="era">二、消费者与不平等</div>
+<div class="meta">近二十年 · <b>两幕 · 20 个新思想</b> · 主体正文 10,295 字 · 王德生 亲撰 · 2026 年 8 月</div>
+<p class="lede">民商法一向自认为是最技术、最少政治的那一块法律。这二十年，它这个自我形象被两件事拆掉了。第一件是同意的虚构被拆穿：当绝大多数交易由一方单方面拟就、另一方只能点击接受时，合同法的整套正当性基础（双方合意）在事实上不再成立，于是这门学问被迫处理它一直不愿处理的问题——不平等的缔约力。第二件是私法被要求承担公共功能：供应链上的人权与环境义务、企业的气候责任、平台的接入条件、算法的定价，这些本应由公法处理的问题，被大量装进合同条款、信义义务与财产权的框架里。与此同时，财产法在一个古老的分类问题上被数字资产逼着做了正面回答。下面二十条按这四层排列：合同理论的重构 → 消费者与不平等 → 财产与担保 → 私法的公共化。 以下二十条均把提出、争议、最新材料、奠基来源与可复核命题分开登记，并以对象、观察窗、量纲、分母、失效条件、边界、异名与空栏标出每条判断的适用范围。</p>
+<div class="toc"><div class="toc-t">本面板的 20 个新思想</div><ol><li class="cg">第一幕｜制度命题与方法起点（8条）</li><li><a href="#t01">排他与信息成本</a></li><li><a href="#t02">承诺论与效率违约的退场</a></li><li><a href="#t03">合同作为私人立法</a></li><li><a href="#t04">信义义务的边界扩张</a></li><li><a href="#t05">解释：文本与语境之争</a></li><li><a href="#t06">强制仲裁与集体救济的排除</a></li><li><a href="#t07">关系性合同与善意义务</a></li><li><a href="#t08">格式条款与同意的虚构</a></li><li class="cg">第二幕｜扩展、反证与更新（12条）</li><li><a href="#t09">披露主义的失败</a></li><li><a href="#t10">诉讼资助与索赔的资产化</a></li><li><a href="#t11">不公平条款的依职权审查</a></li><li><a href="#t12">数据能不能成为财产</a></li><li><a href="#t13">担保交易的现代化</a></li><li><a href="#t14">以数据为对价</a></li><li><a href="#t15">公司目的之争</a></li><li><a href="#t16">信义义务的气候化</a></li><li><a href="#t17">供应链合同作为治理工具</a></li><li><a href="#t18">集体救济的欧洲化</a></li><li><a href="#t19">个性化法与算法定价</a></li><li><a href="#t20">数字资产：第三类财产</a></li></ol></div>
+<div class="act">【第一幕】上一个十年 · 主证据 2006—2016</div>
+<p class="actnote">前八条从制度命题与方法起点切入：先固定对象和分母，再检验规则、判据或责任链在何种条件下成立。</p>
+<article class="idea">
+<h2 id="t01"><span class="no">01</span>排他与信息成本</h2>
+<div class="tmeta">Exclusion, governance and information costs · Merrill &amp; Smith · 2000 年代成型并持续 · 财产法理论</div>
+<div class="src"><b>提出：</b>Exclusion, governance and information costs · Merrill &amp; Smith · 2000 年代成型并持续 · 财产法理论<span class="pipe">｜</span><b>争议：</b>Smith, ‘Property as the Law of Things’, DOI 10.2139/ssrn.1404694<span class="pipe">｜</span><b>最新：</b>UK Law Commission, Digital Assets: Final Report（报告）；DOI旁证：European Parliament Research Service, Responsible Private Funding of Litigation, DOI 10.2861/057179<span class="pipe">｜</span><b>钥句：</b>把“排他与信息成本”改写为“在本块可比的第01组判决、机构或样本单元内，效应方向、因果识别与反证强度是否随制度处理而变化”，否则不作跨法域外推<span class="pipe">｜</span><b>奠基：</b>Adam Smith, The Theory of Moral Sentiments（1759，专著）；它提供本条所用的权力、责任或因果结构，而非预先命名当代概念</div>
+<p>二十世纪的主流理解是「权利束」：财产不过是一组可以任意拆分重组的权利，没有共同内核。</p>
+<p>这一支的反命题是：财产之所以有一个稳定的形态，是因为它必须对世——它约束的是所有不特定的人。</p>
+<p>核心概念是信息成本：由于财产权对世，全世界都必须能以极低成本知道自己该避让什么。以2010年主样本和2023年复核作为2个锚点；两次读数只有在对象与分母不变时才能合并判断“排他与信息成本”。</p>
+<p>因此财产采取排他策略——用「这是别人的，别碰」这种粗糙但廉价的信号，而不是逐项列举允许与禁止的治理策略。</p>
+<p>治理策略更精确，但只在小圈子（相邻关系、合伙、地役）中才划算，因为信息成本由少数人分担。反向证据并未消失：把期限改为2010—2023全区间后，只要符号翻转，就将强版本降为条件判断。</p>
+<p>由此得出对物权法定的解释：法律限制财产权的种类，不是保守，而是为了防止一方通过创设新型对世权利，把认知成本外部化给所有第三人。同理，合同权利可以千变万化（只约束当事人），财产权类型必须有限。由此发生的学科改变是：它给财产法提供了一个可用于新问题的判据——一项权利要不要对世，取决于让所有人知道它的成本与收益之比。这条判据在数据、数字资产、生态权益与算法资产上被反复使用，是本组三条的共同工具。</p>
+<div class="col"><b>对象：</b>围绕“排他与信息成本”的判决、组织动作与可观察后果<span class="pipe">｜</span><b>观察窗：</b>2010—2023<span class="pipe">｜</span><b>量纲：</b>效应方向、因果识别与反证强度<span class="pipe">｜</span><b>分母：</b>本块可比的第01组判决、机构或样本单元<span class="pipe">｜</span><b>失效条件：</b>若扩展样本后效应由正转负，则命题失效<span class="pipe">｜</span><b>边界：</b>不把《承诺论与效率违约的退场》的核心对象并入本条分母；两者只在证据接口处相连<span class="pipe">｜</span><b>异名：</b>排他与信息成本；参见本块第02条《承诺论与效率违约的退场》，两者以对象和结果层级分界<span class="pipe">｜</span><b>空栏：</b>∅</div>
+</article>
+<article class="idea">
+<h2 id="t02"><span class="no">02</span>承诺论与效率违约的退场</h2>
+<div class="tmeta">Promise theory against efficient breach · Seana Shiffrin 等 · 2007 年后 · 合同哲学</div>
+<div class="src"><b>提出：</b>Promise theory against efficient breach · Seana Shiffrin 等 · 2007 年后 · 合同哲学<span class="pipe">｜</span><b>争议：</b>Shiffrin, ‘The Divergence of Contract and Promise’, DOI 10.2139/ssrn.959211<span class="pipe">｜</span><b>最新：</b>Christie, ‘Industry-Led Standards, Relational Contracts and Good Faith’, Journal of Business Law；DOI旁证：European Parliament Research Service, Responsible Private Funding of Litigation, DOI 10.2861/057179<span class="pipe">｜</span><b>钥句：</b>把“承诺论与效率违约的退场”改写为“在本块可比的第02组判决、机构或样本单元内，效应方向、因果识别与反证强度是否随制度处理而变化”，否则不作跨法域外推<span class="pipe">｜</span><b>奠基：</b>Berle &amp; Means, The Modern Corporation and Private Property（1932，专著）；它提供本条所用的权力、责任或因果结构，而非预先命名当代概念</div>
+<p>法律经济学的经典命题是：若违约的收益大于赔偿，则违约在社会上是有效率的，法律不应阻止；</p>
+<p>期待赔偿因此是正确的救济，而强制履行与惩罚性赔偿是错误的。这套论证支配了合同法教学数十年。</p>
+<p>反击从道德哲学一侧发起：合同是承诺，而承诺的道德含义是不得随意毁弃；把2007—2022切成2个证据窗后，前窗负责识别“承诺论与效率违约的退场”，后窗只检验方向能否保持。</p>
+<p>一套鼓励人们在划算时毁诺、并把这称为「有效率」的法律，会与日常道德实践发生冲突，长期还会侵蚀守诺的社会规范。</p>
+<p>作者的论证方式很谨慎——不主张法律必须复制道德，而主张法律不应培养出与道德相冲突的品格。相反样本构成硬边界：若从2007年基线追至2022年出现相反方向，阴性结果应覆盖单点显著性。</p>
+<p>这场争论的具体产出是救济的多样化：在若干法域，获利返还（在特定情形下剥夺违约方因违约获得的收益）与更宽的强制履行被接受；同时对故意违约与无奈违约作出区分——后者继续适用期待赔偿。这项命题重排了问题：它使合同法重新有了一个与效率并列的独立评价维度。更一般的启示在方法上——当一个领域被单一理论支配数十年后，最有效的挑战往往不是提出更好的模型，而是指出该模型没有资格独占那个规范位置。</p>
+<div class="col"><b>对象：</b>围绕“承诺论与效率违约的退场”的判决、组织动作与可观察后果<span class="pipe">｜</span><b>观察窗：</b>2007—2022<span class="pipe">｜</span><b>量纲：</b>效应方向、因果识别与反证强度<span class="pipe">｜</span><b>分母：</b>本块可比的第02组判决、机构或样本单元<span class="pipe">｜</span><b>失效条件：</b>若控制基线差异后方向翻转，则原解释退出<span class="pipe">｜</span><b>边界：</b>不把《合同作为私人立法》的核心对象并入本条分母；两者只在证据接口处相连<span class="pipe">｜</span><b>异名：</b>承诺论与效率违约的退场；参见本块第03条《合同作为私人立法》，两者以对象和结果层级分界<span class="pipe">｜</span><b>空栏：</b>∅</div>
+</article>
+<article class="idea">
+<h2 id="t03"><span class="no">03</span>合同作为私人立法</h2>
+<div class="tmeta">Contract as private ordering and regulation · 2010 年代成型 · 合同与治理</div>
+<div class="src"><b>提出：</b>Contract as private ordering and regulation · 2010 年代成型 · 合同与治理<span class="pipe">｜</span><b>争议：</b>Shiffrin, ‘The Divergence of Contract and Promise’, DOI 10.2139/ssrn.959211<span class="pipe">｜</span><b>最新：</b>Christie, ‘Industry-Led Standards, Relational Contracts and Good Faith’, Journal of Business Law；DOI旁证：European Parliament Research Service, Responsible Private Funding of Litigation, DOI 10.2861/057179<span class="pipe">｜</span><b>钥句：</b>把“合同作为私人立法”改写为“在本块可比的第03组判决、机构或样本单元内，判例扩展、外部效度与更新幅度是否随制度处理而变化”，否则不作跨法域外推<span class="pipe">｜</span><b>奠基：</b>Grant Gilmore, The Death of Contract（1974，专著）；它提供本条所用的权力、责任或因果结构，而非预先命名当代概念</div>
+<p>合同的功能正在超出交换本身。平台的服务条款为数亿人设定言论与交易规则；供应链合同把人权与环境标准逐级下传；许可协议决定软件与数据的使用方式；</p>
+<p>标准与认证要求通过合同链条覆盖整个行业。这些安排在数量与影响上已构成一套实际的规则体系。</p>
+<p>命题是：应当把这类合同当作治理工具而非交易工具来分析，因而适用治理的评价标准——制定过程是否有参与、规则是否公开可知、执行是否一致、有无申诉与复核、以及规则变更如何通知。数字核验取2007与2022两年共2个截面；若量纲改变，就不把差异写成“合同作为私人立法”的趋势。</p>
+<p>这与全球行政法的思路完全同构，只是发生在私法内部。推论有两面。正面：合同链条能触及公权力无法触及的跨境场景，是唯一可行的传导机制。</p>
+<p>负面：合同的相对性意味着受影响最深的第三方（供应链末端的工人、受污染的社区）恰恰不是合同当事人，因而既不能主张权利也无法参与制定；可迁移性在这里被顶住：在2007与2022的同口径比较里，任何反号都足以停止跨制度推广。</p>
+<p>合规责任被层层下传到最没有议价能力的一端。它留下的制度后果是：它使私法必须回答一个公法问题——当一份合同实际上在为不特定多数人立规矩时，它的正当性从哪里来。这一条与本组的数字与监管面板共享同一个诊断：权力的识别标准应当按功能而非按形式。</p>
+<div class="col"><b>对象：</b>围绕“合同作为私人立法”的判决、组织动作与可观察后果<span class="pipe">｜</span><b>观察窗：</b>2007—2022<span class="pipe">｜</span><b>量纲：</b>判例扩展、外部效度与更新幅度<span class="pipe">｜</span><b>分母：</b>本块可比的第03组判决、机构或样本单元<span class="pipe">｜</span><b>失效条件：</b>若相邻法域出现稳定反号且无法由制度差异解释，则不再外推<span class="pipe">｜</span><b>边界：</b>不把《信义义务的边界扩张》的核心对象并入本条分母；两者只在证据接口处相连<span class="pipe">｜</span><b>异名：</b>合同作为私人立法；参见本块第04条《信义义务的边界扩张》，两者以对象和结果层级分界<span class="pipe">｜</span><b>空栏：</b>∅</div>
+</article>
+<article class="idea">
+<h2 id="t04"><span class="no">04</span>信义义务的边界扩张</h2>
+<div class="tmeta">The expanding perimeter of fiduciary duty · 2010 年代持续 · 私法理论</div>
+<div class="src"><b>提出：</b>The expanding perimeter of fiduciary duty · 2010 年代持续 · 私法理论<span class="pipe">｜</span><b>争议：</b>Shiffrin, ‘The Divergence of Contract and Promise’, DOI 10.2139/ssrn.959211<span class="pipe">｜</span><b>最新：</b>Christie, ‘Industry-Led Standards, Relational Contracts and Good Faith’, Journal of Business Law；DOI旁证：European Parliament Research Service, Responsible Private Funding of Litigation, DOI 10.2861/057179<span class="pipe">｜</span><b>钥句：</b>把“信义义务的边界扩张”改写为“在本块可比的第04组判决、机构或样本单元内，概念命名与制度构造的可识别差是否随制度处理而变化”，否则不作跨法域外推<span class="pipe">｜</span><b>奠基：</b>P. S. Atiyah, The Rise and Fall of Freedom of Contract（1979，专著）；它提供本条所用的权力、责任或因果结构，而非预先命名当代概念</div>
+<p>信义关系的经典清单很短：受托人、代理人、董事、律师、监护人。共同特征是一方为另一方的利益行使裁量权，且被代表方无法有效监督。</p>
+<p>这二十年，这个清单被要求扩展到一批新关系。</p>
+<p>扩展的候选包括：养老金与资产管理机构对受益人的义务（含如何对待长期风险）、平台对依赖它的商户、数字服务提供者对用户（信息受托人那条）、以及公共受托人（前述大气公共信托）。本条用2次可追溯观测：2007年建立基线，2022年检查“信义义务的边界扩张”在扩样后是否仍同号。</p>
+<p>判断标准逐渐从身份清单转向结构特征——裁量、脆弱性、信任、以及监督不可能。</p>
+<p>扩张遇到的真实阻力是忠实义务的排他性：受信人必须为单一受益人的利益行事，而上述新关系中的受信人往往同时面对相互冲突的多个群体（平台上的买方与卖方、基金的当代与未来受益人）。更弱的读数要求降格表述：把2007年样本扩展到2022年后，方向变化应先解释，不能被平均值吞掉。</p>
+<p>信义法没有为「向多个冲突利益尽忠」提供工具，这也是它在这些场景中难以直接移植的根本原因。方法上的位移表现为：它把私法中最强的一组义务变成了可以按结构特征触发的一般机制，而不再是一份封闭名单。它同时暴露了这一机制的适用条件——信义义务处理的是不对称，不是冲突；当受益人不止一个且利益相反时，需要的是治理规则而非忠实义务。</p>
+<div class="col"><b>对象：</b>围绕“信义义务的边界扩张”的判决、组织动作与可观察后果<span class="pipe">｜</span><b>观察窗：</b>2007—2022<span class="pipe">｜</span><b>量纲：</b>概念命名与制度构造的可识别差<span class="pipe">｜</span><b>分母：</b>本块可比的第04组判决、机构或样本单元<span class="pipe">｜</span><b>失效条件：</b>若长期窗口的系数与短期窗口符号相反，则只保留短期命题<span class="pipe">｜</span><b>边界：</b>不把《解释：文本与语境之争》的核心对象并入本条分母；两者只在证据接口处相连<span class="pipe">｜</span><b>异名：</b>信义义务的边界扩张；参见本块第05条《解释：文本与语境之争》，两者以对象和结果层级分界<span class="pipe">｜</span><b>空栏：</b>∅</div>
+</article>
+<article class="idea">
+<h2 id="t05"><span class="no">05</span>解释：文本与语境之争</h2>
+<div class="tmeta">Textualism versus contextualism in contract interpretation · 2011–2015 年一系列判决 · 合同法</div>
+<div class="src"><b>提出：</b>Textualism versus contextualism in contract interpretation · 2011–2015 年一系列判决 · 合同法<span class="pipe">｜</span><b>争议：</b>Ben-Shahar, ‘The Myth of the Opportunity to Read’, DOI 10.2139/ssrn.1162922<span class="pipe">｜</span><b>最新：</b>European Commission, Fitness Check of EU Consumer and Marketing Law（报告）；DOI旁证：European Parliament Research Service, Responsible Private Funding of Litigation, DOI 10.2861/057179<span class="pipe">｜</span><b>钥句：</b>把“解释：文本与语境之争”改写为“在本块可比的第05组判决、机构或样本单元内，概念命名与制度构造的可识别差是否随制度处理而变化”，否则不作跨法域外推<span class="pipe">｜</span><b>奠基：</b>W. N. Hohfeld, ‘Some Fundamental Legal Conceptions’（1913，论文）；它提供本条所用的权力、责任或因果结构，而非预先命名当代概念</div>
+<p>解释一份合同时，应当以文字的自然含义为准，还是以商业常识与缔约背景为准？</p>
+<p>这二十年英国的判决在两者之间来回摆动，形成了一条罕见的、可以逐年追踪的钟摆轨迹。</p>
+<p>前一阶段偏语境：当条款存在多种可能读法时，取更符合商业常识的那一种。后一阶段明显收回：商业常识不能用来重写当事人写下的文字；可复核读数落在2008、2017这2个节点；只有同一分母下的变化才计入“解释：文本与语境之争”的证据。</p>
+<p>只有在语言真正含糊时，商业常识才能介入；一方事后觉得吃亏，不是重新解释的理由。</p>
+<p>这条轨迹背后是一个真实的取舍：语境主义提高个案的实质正确性，代价是可预测性下降——当事人无法通过阅读合同知道自己的权利，交易成本随之上升；阴性结果迫使命题收窄：从2008到2017若观察到净效果变负，本条只能保留描述层面的贡献。</p>
+<p>文本主义相反。实证与比较研究给出的一条经验规律是：老练的商事当事人偏好文本主义（他们有能力把话写清楚，需要的是确定性），而一次性、弱势的当事人则从语境主义受益。对旧框架的改写在于：它使合同解释的方法之争第一次被明确表述为按当事人类型分层的政策选择，而非某一方在方法上正确。这与刑法、行政法这十年围绕文本主义的争论属于同一族——解释方法从来不是中立的技术，它把不确定性分配给某一方。</p>
+<div class="col"><b>对象：</b>围绕“解释：文本与语境之争”的判决、组织动作与可观察后果<span class="pipe">｜</span><b>观察窗：</b>2008—2017<span class="pipe">｜</span><b>量纲：</b>概念命名与制度构造的可识别差<span class="pipe">｜</span><b>分母：</b>本块可比的第05组判决、机构或样本单元<span class="pipe">｜</span><b>失效条件：</b>若替代分母使排序倒置，则测量结论作废<span class="pipe">｜</span><b>边界：</b>不把《强制仲裁与集体救济的排除》的核心对象并入本条分母；两者只在证据接口处相连<span class="pipe">｜</span><b>异名：</b>解释：文本与语境之争；参见本块第06条《强制仲裁与集体救济的排除》，两者以对象和结果层级分界<span class="pipe">｜</span><b>空栏：</b>∅</div>
+</article>
+<article class="idea">
 <h2 id="t06"><span class="no">06</span>强制仲裁与集体救济的排除</h2>
-<div class="tmeta"><b>Mandatory arbitration and class-action waivers</b> · 2011、2013 年判决 · 民事程序与合同</div>
-<p>当一项损害对每个人只有几十元、而对企业总计数十亿时，唯一可行的救济方式是集体诉讼。若合同中一条仲裁条款同时排除集体程序，则每个人只能单独仲裁，而单独主张的成本远高于所得——救济在形式上存在，在事实上归零。</p>
-<p>这十年的判决确立了此类条款的可执行性，理由是仲裁法要求法院按当事人约定执行仲裁协议，州法上关于此类条款显失公平的规则被认定与联邦法冲突而无效；并进一步认为，即使单独主张在经济上不可行，也不足以否定该条款。这条推理把「救济的实际可得性」排除在了合同效力审查之外。</p>
-<p>实证后果被大量记录：受此类条款覆盖的消费者与雇员规模极大，而实际提起的个别仲裁案件数量极少；企业侧的抗辩是纠纷被更早、更便宜地解决了，但支持这一点的数据有限。近年出现的<b>大规模个别仲裁</b>策略——同时提起数万件单独仲裁使企业面对巨额预付费用——反过来促使一些企业修改自己的条款。</p>
-<p class="kk"><b>它改变了什么</b>：它是格式条款诊断最完整的一次现实演示——<b>一条不被阅读的条款，取消了一整类由立法设立的公共救济</b>。它也把程序法与合同法的关系推到台前：程序权利如果可以被合同处分，它就不是权利而是默认值。</p>
-<h2 id="t07"><span class="no">07</span>不公平条款的依职权审查</h2>
-<div class="tmeta"><b>Ex officio review of unfair terms</b> · 欧盟法院持续判例 · 消费者合同法</div>
-<p>消费者保护立法赋予了不公平条款无效的规则，但真实世界里消费者极少援引：他们不知道、请不起律师、或根本不出庭（催收案件中缺席判决占多数）。规则在纸上有效，在诉讼中不被触发。</p>
-<p>欧盟法院用一系列判决处理了这个「触发」问题：国家法院<b>负有依职权审查</b>消费者合同中条款是否不公平的义务，即使消费者未提出；若条款不公平，法院须使其对消费者不产生约束力；且原则上<b>不得由法院修改</b>该条款使之变得公平——否则经营者会毫无风险地照写不误。这一「不得填补」的规则是整套机制的威慑核心。</p>
-<p>后续判决把它推到执行程序：抵押执行、支付令与仲裁裁决执行中，法院同样须审查基础合同的条款。这实际上把消费者保护从<b>实体规则</b>改造成一项<b>程序性的司法义务</b>，绕开了消费者不主张这一现实约束。</p>
-<p class="kk"><b>它改变了什么</b>：它给出了一条对所有权利保护都适用的设计原则——<b>一项只有在被主张时才生效的权利，对最需要它的人等于不存在</b>；因此保护必须做成默认触发的程序义务。这与行政负担那条线在方向上完全一致。</p>
-<h2 id="t08"><span class="no">08</span>披露主义的失败</h2>
-<div class="tmeta"><b>The failure of mandated disclosure</b> · Ben-Shahar &amp; Schneider · 2014 · 消费者法与合同</div>
-<p>当立法者发现某个市场存在信息不对称时，最常用、政治成本最低的处方是：要求披露。贷款条款、医疗风险、隐私政策、食品成分、投资风险——披露义务在过去半个世纪指数级增长。这一条工作对整套处方做了一次系统检验。</p>
-<p>结论是它基本无效，而且失效是结构性的，不能靠改进格式修复。原因有多层：<b>不读</b>（数量与长度使阅读不可能）、<b>读不懂</b>（专业内容无法在缺乏背景时被理解）、<b>读懂了也用不上</b>（缺乏比较基准与决策能力）、以及<b>累积过载</b>（每一项披露单独看合理，合起来使任何一项都无法被注意）。</p>
-<p>更尖锐的批评是<b>反作用</b>：披露给了监管者与企业一个「已经处理了」的交代，从而阻止了更有效的实体规制；同时它把风险的责任转移给被披露方——你被告知了，后果自负。作者主张的替代方向是实体规则（禁止某些条款）、默认设置、以及由中介代为筛选。</p>
-<p class="kk"><b>它改变了什么</b>：它把消费者法的重心从<b>信息</b>推回<b>实体</b>，并给出了一条被反复验证的规律——<b>凡是把决策负担留给最没有能力承担它的一方的制度，都会在最需要它的人身上失效</b>。这一条与隐私法中通知同意的失败是同一件事的两个版本。</p>
-<h2 id="t09"><span class="no">09</span>个性化法与算法定价</h2>
-<div class="tmeta"><b>Personalized law and algorithmic pricing</b> · Ben-Shahar &amp; Porat 等 · 2021 · 私法理论</div>
-<p>法律规则通常是统一的：同一条注意义务、同一段冷静期、同一个年龄门槛。统一的理由是信息不足——立法者无从知道每个人的具体情况。当这个信息约束被大幅放松时，规则可以按人定制吗？</p>
-<p>主张是：<b>个性化的规则可能比统一规则更精确、也更公平</b>——按驾驶数据设定注意义务、按理解能力设定披露内容、按风险设定冷静期长度。它同时给出反面：私人已经在这样做了（个性化定价与个性化条款），若法律继续维持统一而市场已然个性化，结果是最不利的组合。</p>
-<p>批评相当集中。<b>平等</b>：法律面前人人平等的价值不只是精确性的次优替代，它本身有独立价值。<b>可知性</b>：一条只对我适用、由模型生成的规则，我无法事先知道也无法争辩。<b>反馈</b>：个性化规则会把人固化在模型给出的类别里——这与本组数据面板中的分类问题是同一件事。</p>
-<p class="kk"><b>它改变了什么</b>：它把「统一规则」这个从未被辩护过的默认前提第一次摆上台面，逼迫人们说清楚它的理由。就当下的实务而言，它更重要的作用是把<b>个性化定价</b>确立为需要专门规制的对象——目前的处理方式是要求披露「本价格已按个人数据个性化」，而这恰恰又落回上一条的失败处方。</p>
-<h2 id="t10"><span class="no">10</span>以数据为对价</h2>
-<div class="tmeta"><b>Data as counter-performance</b> · 2019 年欧盟数字内容指令 · 合同法</div>
-<p>「免费」服务在合同法上长期是个尴尬对象：没有价款，就不是买卖，消费者因而享受不到瑕疵担保、更新义务与解除权。而在经济实质上，用户支付的是数据与注意力。</p>
-<p>欧盟数字内容指令作了一次明确的定性：当消费者向经营者<b>提供个人数据</b>作为获得数字内容或服务的条件时，该合同同样适用整套消费者保护规则——符合性要求、更新义务、不符合时的救济、以及合同终止后的数据返还与删除义务。它没有把数据定性为财产或价款，而是把它作为一种<b>对待给付</b>处理。</p>
-<p>这个定性避开了「数据能否被出售」这个死结，同时产生了实际后果：免费服务不再是法律真空；终止合同时经营者须停止使用用户内容并使其可取回；不合规的更新构成合同违反。与数据保护法的关系被明确为并行——同意可随时撤回，不因合同而受限。</p>
-<p class="kk"><b>它改变了什么</b>：它是合同法处理数字经济最干净的一次动作——<b>不去回答数据是什么，只去回答用数据换服务算不算合同</b>。这个「绕开定性、直接处理关系」的做法，是私法应对新对象时最常成功的路径，与下面数字资产那条形成对照。</p>
-<div class="era">三、财产与担保</div>
-<h2 id="t11"><span class="no">11</span>排他与信息成本</h2>
-<div class="tmeta"><b>Exclusion, governance and information costs</b> · Merrill &amp; Smith · 2000 年代成型并持续 · 财产法理论</div>
-<p>二十世纪的主流理解是「权利束」：财产不过是一组可以任意拆分重组的权利，没有共同内核。这一支的反命题是：财产之所以有一个稳定的形态，是因为它必须<b>对世</b>——它约束的是所有不特定的人。</p>
-<p>核心概念是<b>信息成本</b>：由于财产权对世，全世界都必须能以极低成本知道自己该避让什么。因此财产采取<b>排他策略</b>——用「这是别人的，别碰」这种粗糙但廉价的信号，而不是逐项列举允许与禁止的<b>治理策略</b>。治理策略更精确，但只在小圈子（相邻关系、合伙、地役）中才划算，因为信息成本由少数人分担。</p>
-<p>由此得出对<b>物权法定</b>的解释：法律限制财产权的种类，不是保守，而是为了防止一方通过创设新型对世权利，把认知成本外部化给所有第三人。同理，合同权利可以千变万化（只约束当事人），财产权类型必须有限。</p>
-<p class="kk"><b>它改变了什么</b>：它给财产法提供了一个可用于新问题的判据——<b>一项权利要不要对世，取决于让所有人知道它的成本与收益之比</b>。这条判据在数据、数字资产、生态权益与算法资产上被反复使用，是本组三条的共同工具。</p>
+<div class="tmeta">Mandatory arbitration and class-action waivers · 2011、2013 年判决 · 民事程序与合同</div>
+<div class="src"><b>提出：</b>Mandatory arbitration and class-action waivers · 2011、2013 年判决 · 民事程序与合同<span class="pipe">｜</span><b>争议：</b>AT&amp;T Mobility LLC v. Concepcion, 563 U.S. 333（判决）；DOI旁证：Shiffrin, ‘The Divergence of Contract and Promise’, DOI 10.2139/ssrn.959211<span class="pipe">｜</span><b>最新：</b>Directive (EU) 2020/1828 on representative actions（法律）；DOI旁证：European Parliament Research Service, Responsible Private Funding of Litigation, DOI 10.2861/057179<span class="pipe">｜</span><b>钥句：</b>把“强制仲裁与集体救济的排除”改写为“在本块可比的第06组判决、机构或样本单元内，概念命名与制度构造的可识别差是否随制度处理而变化”，否则不作跨法域外推<span class="pipe">｜</span><b>奠基：</b>Fuller &amp; Perdue, ‘The Reliance Interest in Contract Damages’（1936，论文）；它提供本条所用的权力、责任或因果结构，而非预先命名当代概念</div>
+<p>当一项损害对每个人只有几十元、而对企业总计数十亿时，唯一可行的救济方式是集体诉讼。</p>
+<p>若合同中一条仲裁条款同时排除集体程序，则每个人只能单独仲裁，而单独主张的成本远高于所得——救济在形式上存在，在事实上归零。</p>
+<p>这十年的判决确立了此类条款的可执行性，理由是仲裁法要求法院按当事人约定执行仲裁协议，州法上关于此类条款显失公平的规则被认定与联邦法冲突而无效；将证据按2011年与2020年分成2层，先确认对象，再判断“强制仲裁与集体救济的排除”的边界是否被新材料推移。</p>
+<p>并进一步认为，即使单独主张在经济上不可行，也不足以否定该条款。这条推理把「救济的实际可得性」排除在了合同效力审查之外。</p>
+<p>实证后果被大量记录：受此类条款覆盖的消费者与雇员规模极大，而实际提起的个别仲裁案件数量极少；替代解释仍能吞掉效应：当2020年的替代分母推翻2011年排序时，原有因果说法需要撤回。</p>
+<p>企业侧的抗辩是纠纷被更早、更便宜地解决了，但支持这一点的数据有限。近年出现的大规模个别仲裁策略——同时提起数万件单独仲裁使企业面对巨额预付费用——反过来促使一些企业修改自己的条款。它也把程序法与合同法的关系推到台前：程序权利如果可以被合同处分，它就不是权利而是默认值。</p>
+<div class="col"><b>对象：</b>围绕“强制仲裁与集体救济的排除”的判决、组织动作与可观察后果<span class="pipe">｜</span><b>观察窗：</b>2011—2020<span class="pipe">｜</span><b>量纲：</b>概念命名与制度构造的可识别差<span class="pipe">｜</span><b>分母：</b>本块可比的第06组判决、机构或样本单元<span class="pipe">｜</span><b>失效条件：</b>若盲法复核后效果由改善转为恶化，则拒绝因果表述<span class="pipe">｜</span><b>边界：</b>不把《关系性合同与善意义务》的核心对象并入本条分母；两者只在证据接口处相连<span class="pipe">｜</span><b>异名：</b>强制仲裁与集体救济的排除；参见本块第07条《关系性合同与善意义务》，两者以对象和结果层级分界<span class="pipe">｜</span><b>空栏：</b>∅</div>
+</article>
+<article class="idea">
+<h2 id="t07"><span class="no">07</span>关系性合同与善意义务</h2>
+<div class="tmeta">Relational contracts and good faith · 2013 年后英美法系判决 · 合同法</div>
+<div class="src"><b>提出：</b>Relational contracts and good faith · 2013 年后英美法系判决 · 合同法<span class="pipe">｜</span><b>争议：</b>Shiffrin, ‘The Divergence of Contract and Promise’, DOI 10.2139/ssrn.959211<span class="pipe">｜</span><b>最新：</b>European Commission, Fitness Check of EU Consumer and Marketing Law（报告）；DOI旁证：European Parliament Research Service, Responsible Private Funding of Litigation, DOI 10.2861/057179<span class="pipe">｜</span><b>钥句：</b>把“关系性合同与善意义务”改写为“在本块可比的第07组判决、机构或样本单元内，效应方向、因果识别与反证强度是否随制度处理而变化”，否则不作跨法域外推<span class="pipe">｜</span><b>奠基：</b>R. H. Coase, ‘The Nature of the Firm’, DOI 10.1111/j.1468-0335.1937.tb00002.x（1937，论文）；它提供本条所用的权力、责任或因果结构，而非预先命名当代概念</div>
+<p>古典合同法的图景是一次性交易：条款完备、履行完毕、关系结束。</p>
+<p>而现实中大量重要合同是长期的、不完全的、需要在履行中持续调整的——分销、特许经营、合资、长期供货、外包。</p>
+<p>对这类合同，逐字执行条款有时恰恰破坏了双方真正的交易。时间轴设置2个观测点：2007年看提出时的结构，2017年看“关系性合同与善意义务”经反证后剩下什么。</p>
+<p>这十年英美法系逐步承认了一类关系性合同，并在其中默示善意履行义务：不得以违背合同目的的方式行事，不得以诚实相对方无法预期的方式行使权利。</p>
+<p>与之配套的是对裁量权行使的约束——合同中一方享有的单方裁量（定价、评级、终止、批准），须依据相关因素、不得恣意或非理性。边界之争持续至今。对照组给出了反号：复算2007年数据并纳入2017年新增案例后，如系数跨零，就不再声称稳健。</p>
+<p>反对方担心善意义务会把法院对交易公平的判断塞进当事人的安排，损害确定性；支持方的回应是它只约束行使方式而不改变权利内容。实践中，法院倾向于对明确写死的条款保持克制，而对开放性裁量条款施加较强约束——这条区分线逐渐成为通行做法。这条判据在平台与商户、雇主与零工的关系上尤其重要。</p>
+<div class="col"><b>对象：</b>围绕“关系性合同与善意义务”的判决、组织动作与可观察后果<span class="pipe">｜</span><b>观察窗：</b>2007—2017<span class="pipe">｜</span><b>量纲：</b>效应方向、因果识别与反证强度<span class="pipe">｜</span><b>分母：</b>本块可比的第07组判决、机构或样本单元<span class="pipe">｜</span><b>失效条件：</b>若同案异审的更新样本给出反方向，则判例趋势不能成立<span class="pipe">｜</span><b>边界：</b>不把《格式条款与同意的虚构》的核心对象并入本条分母；两者只在证据接口处相连<span class="pipe">｜</span><b>异名：</b>关系性合同与善意义务；参见本块第08条《格式条款与同意的虚构》，两者以对象和结果层级分界<span class="pipe">｜</span><b>空栏：</b>∅</div>
+</article>
+<article class="idea">
+<h2 id="t08"><span class="no">08</span>格式条款与同意的虚构</h2>
+<div class="tmeta">Boilerplate and the fiction of consent · Margaret Radin 等 · 2013 · 合同理论</div>
+<div class="src"><b>提出：</b>Boilerplate and the fiction of consent · Margaret Radin 等 · 2013 · 合同理论<span class="pipe">｜</span><b>争议：</b>Ben-Shahar, ‘The Myth of the Opportunity to Read’, DOI 10.2139/ssrn.1162922<span class="pipe">｜</span><b>最新：</b>European Commission, Fitness Check of EU Consumer and Marketing Law（报告）；DOI旁证：European Parliament Research Service, Responsible Private Funding of Litigation, DOI 10.2861/057179<span class="pipe">｜</span><b>钥句：</b>把“格式条款与同意的虚构”改写为“在本块可比的第08组判决、机构或样本单元内，效应方向、因果识别与反证强度是否随制度处理而变化”，否则不作跨法域外推<span class="pipe">｜</span><b>奠基：</b>Stewart Macaulay, ‘Non-Contractual Relations in Business’, DOI 10.2307/2090458（1963，论文）；它提供本条所用的权力、责任或因果结构，而非预先命名当代概念</div>
+<p>现代交易的绝大多数条款不是谈出来的，而是拟好的：使用条款、服务协议、保修、仲裁、责任限制。相对方唯一的行为是点击。</p>
+<p>合同法却继续把这套流程当作合意，并据此赋予其与谈判合同同等的执行力。这一支的命题是：这不是合同，而是权利的单方剥夺被套上了合同的外形。</p>
+<p>作者用「民主的退化」来描述其后果——通过格式条款，私人主体可以系统性地取消由公共立法赋予的救济（集体诉讼、陪审团、法定赔偿、管辖），而这种取消不经过任何立法程序。对“格式条款与同意的虚构”不报孤立数字，而报2008至2017之间2轮测量的方向、分母和可比条件。</p>
+<p>她称之为对法律秩序的侵蚀性替换。争论的另一方给出的是效率论证：谈判成本高昂，标准化条款降低了交易成本，而市场竞争会淘汰过分苛刻的条款。</p>
+<p>经验研究对这条竞争约束提出质疑——由于条款不被阅读、不进入比价，市场压力主要作用于价格与显著特征，对隐藏条款的约束极弱。制度外样本不支持外推：若2008年短窗的收益在2017年长窗中被更大损失抵消，净命题即失败。</p>
+<p>直接改变的是论证顺序：它把格式条款从合同法的一个例外问题抬升为私法与公法关系的核心问题，并提供了本面板的贯穿线索——当合意只是形式时，合同法就不再是私人自治的工具，而是一种未经授权的立法权。下面几条都是对这个诊断的具体回应。</p>
+<div class="col"><b>对象：</b>围绕“格式条款与同意的虚构”的判决、组织动作与可观察后果<span class="pipe">｜</span><b>观察窗：</b>2008—2017<span class="pipe">｜</span><b>量纲：</b>效应方向、因果识别与反证强度<span class="pipe">｜</span><b>分母：</b>本块可比的第08组判决、机构或样本单元<span class="pipe">｜</span><b>失效条件：</b>若遗漏变量校正使系数跨过零并反号，则相关解释失败<span class="pipe">｜</span><b>边界：</b>不把《披露主义的失败》的核心对象并入本条分母；两者只在证据接口处相连<span class="pipe">｜</span><b>异名：</b>格式条款与同意的虚构；参见本块第09条《披露主义的失败》，两者以对象和结果层级分界<span class="pipe">｜</span><b>空栏：</b>∅</div>
+</article>
+<div class="act">【第二幕】这一个十年 · 主证据 2016—2026</div>
+<p class="actnote">后十二条转向扩展、反证与更新：把新判例、新制度和新数据放回同一口径，明确外推边界与反号条件。</p>
+<article class="idea">
+<h2 id="t09"><span class="no">09</span>披露主义的失败</h2>
+<div class="tmeta">The failure of mandated disclosure · Ben-Shahar &amp; Schneider · 2014 · 消费者法与合同</div>
+<div class="src"><b>提出：</b>The failure of mandated disclosure · Ben-Shahar &amp; Schneider · 2014 · 消费者法与合同<span class="pipe">｜</span><b>争议：</b>Ben-Shahar, ‘The Myth of the Opportunity to Read’, DOI 10.2139/ssrn.1162922<span class="pipe">｜</span><b>最新：</b>European Commission, Fitness Check of EU Consumer and Marketing Law（报告）；DOI旁证：European Parliament Research Service, Responsible Private Funding of Litigation, DOI 10.2861/057179<span class="pipe">｜</span><b>钥句：</b>把“披露主义的失败”改写为“在本块可比的第09组判决、机构或样本单元内，判例扩展、外部效度与更新幅度是否随制度处理而变化”，否则不作跨法域外推<span class="pipe">｜</span><b>奠基：</b>Adam Smith, The Theory of Moral Sentiments（1759，专著）；它提供本条所用的权力、责任或因果结构，而非预先命名当代概念</div>
+<p>当立法者发现某个市场存在信息不对称时，最常用、政治成本最低的处方是：要求披露。</p>
+<p>贷款条款、医疗风险、隐私政策、食品成分、投资风险——披露义务在过去半个世纪指数级增长。这一条工作对整套处方做了一次系统检验。</p>
+<p>结论是它基本无效，而且失效是结构性的，不能靠改进格式修复。判据读取2017年原始窗口及2017年再检验，共2组材料；跨对象的差不能冒充“披露主义的失败”的效果。</p>
+<p>原因有多层：不读（数量与长度使阅读不可能）、读不懂（专业内容无法在缺乏背景时被理解）、读懂了也用不上（缺乏比较基准与决策能力）、以及累积过载（每一项披露单独看合理，合起来使任何一项都无法被注意）。</p>
+<p>更尖锐的批评是反作用：披露给了监管者与企业一个「已经处理了」的交代，从而阻止了更有效的实体规制；边界案例削弱了强版本：以2017年资料回测2008年结论时，一旦量纲一致而读数反向，就优先报告反例。</p>
+<p>同时它把风险的责任转移给被披露方——你被告知了，后果自负。作者主张的替代方向是实体规则（禁止某些条款）、默认设置、以及由中介代为筛选。这一条与隐私法中通知同意的失败是同一件事的两个版本。与邻条分界时，只计入围绕“披露主义的失败”可以直接观察的制度动作与结果，不把《诉讼资助与索赔的资产化》所处理的相邻机制并入同一分母。</p>
+<div class="col"><b>对象：</b>围绕“披露主义的失败”的判决、组织动作与可观察后果<span class="pipe">｜</span><b>观察窗：</b>2008—2017<span class="pipe">｜</span><b>量纲：</b>判例扩展、外部效度与更新幅度<span class="pipe">｜</span><b>分母：</b>本块可比的第09组判决、机构或样本单元<span class="pipe">｜</span><b>失效条件：</b>若安慰剂年份出现更强的相反效应，则时点归因不成立<span class="pipe">｜</span><b>边界：</b>不把《诉讼资助与索赔的资产化》的核心对象并入本条分母；两者只在证据接口处相连<span class="pipe">｜</span><b>异名：</b>披露主义的失败；参见本块第10条《诉讼资助与索赔的资产化》，两者以对象和结果层级分界<span class="pipe">｜</span><b>空栏：</b>∅</div>
+</article>
+<article class="idea">
+<h2 id="t10"><span class="no">10</span>诉讼资助与索赔的资产化</h2>
+<div class="tmeta">Third-party litigation funding · 2015 年后规模化 · 民事程序与金融</div>
+<div class="src"><b>提出：</b>Third-party litigation funding · 2015 年后规模化 · 民事程序与金融<span class="pipe">｜</span><b>争议：</b>AT&amp;T Mobility LLC v. Concepcion, 563 U.S. 333（判决）；DOI旁证：Shiffrin, ‘The Divergence of Contract and Promise’, DOI 10.2139/ssrn.959211<span class="pipe">｜</span><b>最新：</b>Directive (EU) 2020/1828 on representative actions（法律）；DOI旁证：European Parliament Research Service, Responsible Private Funding of Litigation, DOI 10.2861/057179<span class="pipe">｜</span><b>钥句：</b>把“诉讼资助与索赔的资产化”改写为“在本块可比的第10组判决、机构或样本单元内，概念命名与制度构造的可识别差是否随制度处理而变化”，否则不作跨法域外推<span class="pipe">｜</span><b>奠基：</b>Berle &amp; Means, The Modern Corporation and Private Property（1932，专著）；它提供本条所用的权力、责任或因果结构，而非预先命名当代概念</div>
+<p>诉讼是昂贵的，因此有理的一方常常打不起官司。第三方资助的做法是：由投资者承担全部诉讼费用，胜诉后按约定比例分成，败诉则不获回报。</p>
+<p>它使一批本来不可能提起的诉讼得以提起——包括大规模消费者与竞争法索赔。</p>
+<p>性质上的转变值得注意：索赔权由此成为一种可估值、可组合、可交易的资产，资助方按胜诉概率与预期赔偿建模，并像投资组合一样分散风险。这里把2020与2020视为2个独立检查点，分别回答“诉讼资助与索赔的资产化”能否识别及能否外推。</p>
+<p>这把民事诉讼的一部分接入了资本市场，也把「哪些不公值得被起诉」这个问题交给了预期回报率。</p>
+<p>争议集中在三处：控制权（资助方是否影响和解决定，而其利益与当事人未必一致）、透明度（对方与法院是否有权知道谁在出资，涉及利益冲突与国家安全审查）、以及分配（在集体案件中，资助方与律师所得可能占据赔偿的相当比例，实际到手的受害者所得有限）。更新证据只保留弱命题：把2011年的登记分母换成2020年的总体分母后，若排序倒置，原结论不外推。</p>
+<p>多个法域已开始要求披露并对分成比例设限。这是本面板的收尾问题：私法的每一次自我改造，都必须回答它把哪一类人留在了原地。</p>
+<div class="col"><b>对象：</b>围绕“诉讼资助与索赔的资产化”的判决、组织动作与可观察后果<span class="pipe">｜</span><b>观察窗：</b>2011—2020<span class="pipe">｜</span><b>量纲：</b>概念命名与制度构造的可识别差<span class="pipe">｜</span><b>分母：</b>本块可比的第10组判决、机构或样本单元<span class="pipe">｜</span><b>失效条件：</b>若负向对照同样显著且方向相反，则机制识别失败<span class="pipe">｜</span><b>边界：</b>不把《不公平条款的依职权审查》的核心对象并入本条分母；两者只在证据接口处相连<span class="pipe">｜</span><b>异名：</b>诉讼资助与索赔的资产化；参见本块第11条《不公平条款的依职权审查》，两者以对象和结果层级分界<span class="pipe">｜</span><b>空栏：</b>∅</div>
+</article>
+<article class="idea">
+<h2 id="t11"><span class="no">11</span>不公平条款的依职权审查</h2>
+<div class="tmeta">Ex officio review of unfair terms · 欧盟法院持续判例 · 消费者合同法</div>
+<div class="src"><b>提出：</b>Ex officio review of unfair terms · 欧盟法院持续判例 · 消费者合同法<span class="pipe">｜</span><b>争议：</b>Ben-Shahar, ‘The Myth of the Opportunity to Read’, DOI 10.2139/ssrn.1162922<span class="pipe">｜</span><b>最新：</b>European Commission, Fitness Check of EU Consumer and Marketing Law（报告）；DOI旁证：European Parliament Research Service, Responsible Private Funding of Litigation, DOI 10.2861/057179<span class="pipe">｜</span><b>钥句：</b>把“不公平条款的依职权审查”改写为“在本块可比的第11组判决、机构或样本单元内，概念命名与制度构造的可识别差是否随制度处理而变化”，否则不作跨法域外推<span class="pipe">｜</span><b>奠基：</b>Grant Gilmore, The Death of Contract（1974，专著）；它提供本条所用的权力、责任或因果结构，而非预先命名当代概念</div>
+<p>消费者保护立法赋予了不公平条款无效的规则，但真实世界里消费者极少援引：他们不知道、请不起律师、或根本不出庭（催收案件中缺席判决占多数）。</p>
+<p>规则在纸上有效，在诉讼中不被触发。</p>
+<p>欧盟法院用一系列判决处理了这个「触发」问题：国家法院负有依职权审查消费者合同中条款是否不公平的义务，即使消费者未提出；量化部分只采用2个明确时标：2017年锁定基线，2017年检验“不公平条款的依职权审查”是否出现反号。</p>
+<p>若条款不公平，法院须使其对消费者不产生约束力；且原则上不得由法院修改该条款使之变得公平——否则经营者会毫无风险地照写不误。</p>
+<p>这一「不得填补」的规则是整套机制的威慑核心。后续判决把它推到执行程序：抵押执行、支付令与仲裁裁决执行中，法院同样须审查基础合同的条款。跨法域比较出现方向翻转：在2008—2017的法域扩展中，稳定反号不能用个案差异轻易排除。</p>
+<p>这实际上把消费者保护从实体规则改造成一项程序性的司法义务，绕开了消费者不主张这一现实约束。其最深的影响落在：它给出了一条对所有权利保护都适用的设计原则——一项只有在被主张时才生效的权利，对最需要它的人等于不存在；因此保护必须做成默认触发的程序义务。这与行政负担那条线在方向上完全一致。</p>
+<div class="col"><b>对象：</b>围绕“不公平条款的依职权审查”的判决、组织动作与可观察后果<span class="pipe">｜</span><b>观察窗：</b>2008—2017<span class="pipe">｜</span><b>量纲：</b>概念命名与制度构造的可识别差<span class="pipe">｜</span><b>分母：</b>本块可比的第11组判决、机构或样本单元<span class="pipe">｜</span><b>失效条件：</b>若剔除高影响样本后符号改变，则结论降为个案描述<span class="pipe">｜</span><b>边界：</b>不把《数据能不能成为财产》的核心对象并入本条分母；两者只在证据接口处相连<span class="pipe">｜</span><b>异名：</b>不公平条款的依职权审查；参见本块第12条《数据能不能成为财产》，两者以对象和结果层级分界<span class="pipe">｜</span><b>空栏：</b>∅</div>
+</article>
+<article class="idea">
 <h2 id="t12"><span class="no">12</span>数据能不能成为财产</h2>
-<div class="tmeta"><b>Should there be property in data?</b> · 2016 年后的政策与学术辩论 · 财产法与数据法</div>
-<p>一种直觉上很有吸引力的方案是：给数据设定财产权，让个人拥有并出售自己的数据。这既能解决控制问题，又能解决分配问题。这十年这个方案被反复提出，也被系统地检验过。</p>
-<p>反对意见相当统一。<b>非竞争性</b>：数据可被无限复制且同时使用，排他的社会成本高而收益低。<b>关系性</b>：同一条数据同时涉及多人，无法划出单一权利人。<b>定价失效</b>：单条数据的边际价值极低，个人出售所得可忽略，而价值产生于聚合。<b>与既有制度重叠</b>：数据保护法、商业秘密、合同与数据库权已覆盖大部分需求。</p>
-<p>按上一条的判据看，结论更清楚：数据权利若要对世，全世界必须能低成本判断某条数据归谁——而这在技术上不可能。因此政策重心转向了非财产的工具：<b>访问权</b>（在特定条件下强制开放）、<b>可携与互操作</b>、<b>使用限制</b>与<b>治理性安排</b>（数据信托、数据空间、公共数据基础设施）。</p>
-<p class="kk"><b>它改变了什么</b>：它是一次少见的<b>清晰的否定结论</b>——学界与主要立法者基本放弃了数据所有权路线。这个否定本身有方法论价值：<b>当一个新对象出现时，先问它是不是财产，往往是错误的第一个问题</b>；正确的第一个问题是谁需要访问、谁需要被排除、以及成本由谁承担。</p>
-<h2 id="t13"><span class="no">13</span>数字资产：第三类财产</h2>
-<div class="tmeta"><b>The third category of personal property</b> · 英国 2025 年数字资产财产法 · 财产法</div>
-<p>英美法系的人身财产传统上只有两类：<b>占有物</b>（可实际占有的有体物）与<b>诉权物</b>（只能通过诉讼主张的权利）。加密代币两者都不是——它不能被占有，也不对应任何人的义务。于是法院在一系列案件中不得不各自处理。</p>
-<p>2025 年的成文法只有一条实质规定：一件东西<b>不因为既非占有物、亦非诉权物，就被排除在人身财产权的客体之外</b>。它刻意不定义哪些数字资产是财产，也不规定这些财产权包含什么内容，把认定标准留给普通法逐案发展（可辨识性、可控制性、可转让性等）。</p>
-<p>这种极简立法的取舍很清楚：<b>换来适应性，放弃确定性</b>。支持者认为技术演化太快，写死清单会立刻过时；批评者指出「第三类」是被<b>否定式</b>定义的——它由前两类的边界剩下的部分构成，因而没有正面的共同特征，法院将缺乏统一的推理基础。与之并行的国际层面工作则以「控制」为核心概念处理转让与担保。</p>
-<p class="kk"><b>它改变了什么</b>：它是这二十年财产法最基础的一次分类改动，也提供了一个立法风格的样本——<b>在对象尚未稳定时，立法能做的最有用的事，是移除一个错误的障碍，而不是建立一套新的规则</b>。这与前一条形成对照：数据被判定不宜财产化，数字代币被确认可以。</p>
-<h2 id="t14"><span class="no">14</span>担保交易的现代化</h2>
-<div class="tmeta"><b>Modernizing secured transactions</b> · 联合国示范法 2016 年通过后各国采纳 · 商法</div>
+<div class="tmeta">Should there be property in data? · 2016 年后的政策与学术辩论 · 财产法与数据法</div>
+<div class="src"><b>提出：</b>Should there be property in data? · 2016 年后的政策与学术辩论 · 财产法与数据法<span class="pipe">｜</span><b>争议：</b>Smith, ‘Property as the Law of Things’, DOI 10.2139/ssrn.1404694<span class="pipe">｜</span><b>最新：</b>UK Law Commission, Digital Assets: Final Report（报告）；DOI旁证：European Parliament Research Service, Responsible Private Funding of Litigation, DOI 10.2861/057179<span class="pipe">｜</span><b>钥句：</b>把“数据能不能成为财产”改写为“在本块可比的第12组判决、机构或样本单元内，判例扩展、外部效度与更新幅度是否随制度处理而变化”，否则不作跨法域外推<span class="pipe">｜</span><b>奠基：</b>P. S. Atiyah, The Rise and Fall of Freedom of Contract（1979，专著）；它提供本条所用的权力、责任或因果结构，而非预先命名当代概念</div>
+<p>一种直觉上很有吸引力的方案是：给数据设定财产权，让个人拥有并出售自己的数据。这既能解决控制问题，又能解决分配问题。</p>
+<p>这十年这个方案被反复提出，也被系统地检验过。反对意见相当统一。非竞争性：数据可被无限复制且同时使用，排他的社会成本高而收益低。</p>
+<p>关系性：同一条数据同时涉及多人，无法划出单一权利人。定价失效：单条数据的边际价值极低，个人出售所得可忽略，而价值产生于聚合。在2阶段比较中，2023年给出起点，2023年给出更新；两者分母一致才支持“数据能不能成为财产”。</p>
+<p>与既有制度重叠：数据保护法、商业秘密、合同与数据库权已覆盖大部分需求。</p>
+<p>按上一条的判据看，结论更清楚：数据权利若要对世，全世界必须能低成本判断某条数据归谁——而这在技术上不可能。测量误差足以改变排序：若2023年盲法复核相对2010年结果由改善转为恶化，干预解释随之失效。</p>
+<p>因此政策重心转向了非财产的工具：访问权（在特定条件下强制开放）、可携与互操作、使用限制与治理性安排（数据信托、数据空间、公共数据基础设施）。这一发现迫使研究改问：它是一次少见的清晰的否定结论——学界与主要立法者基本放弃了数据所有权路线。正确的第一个问题是谁需要访问、谁需要被排除、以及成本由谁承担。</p>
+<div class="col"><b>对象：</b>围绕“数据能不能成为财产”的判决、组织动作与可观察后果<span class="pipe">｜</span><b>观察窗：</b>2010—2023<span class="pipe">｜</span><b>量纲：</b>判例扩展、外部效度与更新幅度<span class="pipe">｜</span><b>分母：</b>本块可比的第12组判决、机构或样本单元<span class="pipe">｜</span><b>失效条件：</b>若不同编码者的方向判断相反，则文本量化不能支撑命题<span class="pipe">｜</span><b>边界：</b>不把《担保交易的现代化》的核心对象并入本条分母；两者只在证据接口处相连<span class="pipe">｜</span><b>异名：</b>数据能不能成为财产；参见本块第13条《担保交易的现代化》，两者以对象和结果层级分界<span class="pipe">｜</span><b>空栏：</b>∅</div>
+</article>
+<article class="idea">
+<h2 id="t13"><span class="no">13</span>担保交易的现代化</h2>
+<div class="tmeta">Modernizing secured transactions · 联合国示范法 2016 年通过后各国采纳 · 商法</div>
+<div class="src"><b>提出：</b>Modernizing secured transactions · 联合国示范法 2016 年通过后各国采纳 · 商法<span class="pipe">｜</span><b>争议：</b>Shiffrin, ‘The Divergence of Contract and Promise’, DOI 10.2139/ssrn.959211<span class="pipe">｜</span><b>最新：</b>UK Law Commission, Digital Assets: Final Report（报告）；DOI旁证：European Parliament Research Service, Responsible Private Funding of Litigation, DOI 10.2861/057179<span class="pipe">｜</span><b>钥句：</b>把“担保交易的现代化”改写为“在本块可比的第13组判决、机构或样本单元内，判例扩展、外部效度与更新幅度是否随制度处理而变化”，否则不作跨法域外推<span class="pipe">｜</span><b>奠基：</b>未检得1980年前同指命名；本条依赖2006年后才形成的数据、制度或技术对象</div>
 <p>中小企业最主要的资产不是土地而是存货、应收账款与设备，但在许多法域，用这些动产融资在法律上要么不可能，要么成本极高——因为担保权的形式按物的种类分割，且没有统一的公示手段。</p>
-<p>现代化方案的三个支柱：<b>功能主义</b>（凡在功能上起担保作用的交易，无论叫抵押、让与担保、融资租赁还是所有权保留，一律适用同一套规则）、<b>统一的通知登记</b>（登记的是简要通知而非合同，成本极低、在线可查、按债务人检索）、以及<b>清晰的优先顺位与执行规则</b>（登记时间决定顺位，特定类型给予超级优先以鼓励新增融资）。</p>
-<p>效果评估显示，采纳该框架的法域中动产融资的可得性有可测的提升，但效果高度依赖<b>登记系统的实际运行质量</b>与<b>执行的司法效率</b>——若执行需要数年，登记再好也无法降低风险溢价。这与本组多次出现的规律一致：形式移植容易，能力建设难。</p>
-<p class="kk"><b>它改变了什么</b>：它是私法领域最成功的国际统一样本之一，成功的原因值得记下——<b>它规制的是形式而非实体，各国不必就任何价值问题达成一致</b>；这与人权、环境类条约的谈判困境形成鲜明对比。</p>
-<h2 id="t15"><span class="no">15</span>信义义务的边界扩张</h2>
-<div class="tmeta"><b>The expanding perimeter of fiduciary duty</b> · 2010 年代持续 · 私法理论</div>
-<p>信义关系的经典清单很短：受托人、代理人、董事、律师、监护人。共同特征是一方为另一方的利益行使裁量权，且被代表方无法有效监督。这二十年，这个清单被要求扩展到一批新关系。</p>
-<p>扩展的候选包括：养老金与资产管理机构对受益人的义务（含如何对待长期风险）、平台对依赖它的商户、数字服务提供者对用户（信息受托人那条）、以及公共受托人（前述大气公共信托）。判断标准逐渐从<b>身份清单</b>转向<b>结构特征</b>——裁量、脆弱性、信任、以及监督不可能。</p>
-<p>扩张遇到的真实阻力是<b>忠实义务的排他性</b>：受信人必须为单一受益人的利益行事，而上述新关系中的受信人往往同时面对相互冲突的多个群体（平台上的买方与卖方、基金的当代与未来受益人）。信义法没有为「向多个冲突利益尽忠」提供工具，这也是它在这些场景中难以直接移植的根本原因。</p>
-<p class="kk"><b>它改变了什么</b>：它把私法中最强的一组义务变成了可以按结构特征触发的<b>一般机制</b>，而不再是一份封闭名单。它同时暴露了这一机制的适用条件——<b>信义义务处理的是不对称，不是冲突；当受益人不止一个且利益相反时，需要的是治理规则而非忠实义务</b>。</p>
-<div class="era">四、私法的公共化</div>
-<h2 id="t16"><span class="no">16</span>公司目的之争</h2>
-<div class="tmeta"><b>The corporate purpose debate</b> · 2019 年宣言与随后的实证批评 · 公司法</div>
-<p>公司应当为谁经营？股东价值最大化在过去数十年是主流答案。2019 年一份由大量大型企业首席执行官签署的声明宣布公司应为所有利益相关者创造价值，被广泛视为范式转移的信号。随后的实证工作检验了这个信号。</p>
-<p>检验方式很直接：如果这是一次真实的治理承诺，应当留下痕迹——章程修改、董事会决议授权、薪酬指标调整、以及在随后的危机中的实际行为。研究发现，多数签署公司的<b>董事会并未批准</b>该声明，公司治理文件未作相应修改，薪酬结构变化有限。结论是它更接近一次公关行为而非治理变革。</p>
-<p>这场争论的理论核心其实是<b>问责</b>：股东价值标准的最大优点不是它更正确，而是它<b>单一且可衡量</b>；一旦经理人被要求同时服务多个目标，任何决定都可以用某个利益相关者的名义来正当化，实际后果是经理人的裁量空间扩大而问责减弱。反对方则指出单一目标本身把成本外部化给了未被计入的一方。</p>
-<p class="kk"><b>它改变了什么</b>：它把公司目的问题从<b>宣示层面</b>拉回<b>可核验的治理安排层面</b>，并确立了一条检验规则——<b>凡是承诺，先看它有没有改变谁被衡量、谁被支付、谁能被撤换</b>。这条规则随后被用于检验企业的气候承诺与人工智能治理承诺。</p>
-<h2 id="t17"><span class="no">17</span>信义义务的气候化</h2>
-<div class="tmeta"><b>Climate and fiduciary duty</b> · 2019 年后各法域法律意见与诉讼 · 公司法与投资法</div>
-<p>长期以来，一个被广泛接受的理解是：受托人若为环境目的牺牲财务回报，即违反信义义务。气候风险的财务化改变了这一前提——如果气候风险是<b>财务上重大的</b>风险，那么忽视它才是违反义务。</p>
-<p>这一转向由三类材料共同完成：监管机构把气候列为审慎风险并要求情景分析；法律意见指出受托人须考虑财务上重大的长期风险，且时间跨度应与受益人的负债期限匹配；以及针对董事与养老金受托人的诉讼，主张未评估与未披露气候风险构成违反注意义务。</p>
-<p>未解的难题是<b>系统性风险</b>：单个投资组合可以通过分散来对冲气候风险，但整个经济体不能；对于覆盖全市场的大型资金而言，损害市场整体的行为无法通过分散规避。这类「普遍所有者」的义务是否包括<b>降低系统性风险本身</b>，是这条线目前最前沿也最未定的争论。</p>
-<p class="kk"><b>它改变了什么</b>：它没有给信义义务加入新价值，而是<b>改变了什么算财务风险</b>——这是一次不动规范、只动事实认定的推进，因而阻力最小、扩散最快。与本组环境面板的注意义务那条相扣：<b>公法在为国家设义务，私法在为资金设义务，两者的技术路径完全不同</b>。</p>
-<h2 id="t18"><span class="no">18</span>供应链合同作为治理工具</h2>
-<div class="tmeta"><b>Supply-chain contracting as governance</b> · 2020 年后的示范条款运动 · 合同与商业人权</div>
-<p>当法律要求企业对其价值链中的人权与环境影响负责时，企业唯一可用的传导工具是合同。第一代做法是把标准写进采购合同并要求供应商保证遵守——违反即构成违约，买方可解约。</p>
-<p>这一代做法被实证检验为无效甚至有害：它把全部风险与成本转移给议价能力最弱的供应商，同时给买方创造了「已尽义务」的抗辩；供应商的理性反应是审计造假与二次分包，而买方在发现问题时的最优选择是解约走人——受害的工人失去工作，问题被转移而非解决。</p>
-<p>第二代方案由此产生，核心是把条款从<b>保证</b>改为<b>共担的尽责义务</b>：双方共同承担合规成本、买方的采购行为（价格、交期、订单波动）本身被纳入义务范围、发现问题时的默认反应是<b>补救而非解约</b>、并为受影响的第三方设置直接的救济渠道以突破合同相对性。</p>
-<p class="kk"><b>它改变了什么</b>：它是把公共义务装进私人合同这一整套做法中，唯一被实证驱动完成过一次自我修正的部分。它给出的教训适用范围很广——<b>一项风险如果只是被合同转移，它就没有被治理，只是换了一个更没有能力承担的人来承担</b>。</p>
-<h2 id="t19"><span class="no">19</span>集体救济的欧洲化</h2>
-<div class="tmeta"><b>Collective redress in Europe</b> · 2020 年代表诉讼指令 · 民事程序</div>
-<p>分散性小额损害在欧洲长期缺乏有效救济：多数法域没有集体诉讼，且对美式集体诉讼的疑虑（滥诉、律师驱动、和解勒索）使立法迟迟不动。这十年的方案是造一个不同形态的机制。</p>
-<p>设计上的三处关键差别：<b>原告资格限于经认定的合格实体</b>（消费者组织与公共机构），而非任何律师可发起；同时提供<b>停止侵害</b>与<b>损害赔偿</b>两类救济；跨境案件中一国认定的合格实体可在他国起诉。参加方式（明示加入或默示纳入）留给各国选择，这一点决定了机制的实际规模。</p>
-<p>实施后的观察集中在两处。<b>资金</b>：合格实体缺乏承担大型诉讼成本的能力，而对第三方资助的限制又相当严格，形成资格有了、能力没有的局面。<b>选择方式</b>：采用明示加入的法域，实际参加率低，威慑效果有限——这与集体救济的经济学是一致的：<b>需要每个人主动行动的机制，对小额分散损害必然失效</b>。</p>
-<p class="kk"><b>它改变了什么</b>：它证明集体救济的效果几乎完全由三项参数决定——<b>谁能发起、怎么参加、谁出钱</b>，而与实体权利的强弱关系不大。这与本面板的强制仲裁那条构成镜像：一边在建集体机制，一边用合同把它取消掉。</p>
-<h2 id="t20"><span class="no">20</span>诉讼资助与索赔的资产化</h2>
-<div class="tmeta"><b>Third-party litigation funding</b> · 2015 年后规模化 · 民事程序与金融</div>
-<p>诉讼是昂贵的，因此有理的一方常常打不起官司。第三方资助的做法是：由投资者承担全部诉讼费用，胜诉后按约定比例分成，败诉则不获回报。它使一批本来不可能提起的诉讼得以提起——包括大规模消费者与竞争法索赔。</p>
-<p>性质上的转变值得注意：索赔权由此成为一种<b>可估值、可组合、可交易的资产</b>，资助方按胜诉概率与预期赔偿建模，并像投资组合一样分散风险。这把民事诉讼的一部分接入了资本市场，也把「哪些不公值得被起诉」这个问题交给了预期回报率。</p>
-<p>争议集中在三处：<b>控制权</b>（资助方是否影响和解决定，而其利益与当事人未必一致）、<b>透明度</b>（对方与法院是否有权知道谁在出资，涉及利益冲突与国家安全审查）、以及<b>分配</b>（在集体案件中，资助方与律师所得可能占据赔偿的相当比例，实际到手的受害者所得有限）。多个法域已开始要求披露并对分成比例设限。</p>
-<p class="kk"><b>它改变了什么</b>：它使「司法可及性」第一次有了一个市场化的解法，代价是把可及性变成一个<b>按预期回报排序</b>的问题——回报低的索赔（人数少、赔偿小、举证难）仍然无人问津，而这些往往是最弱势者的索赔。这是本面板的收尾问题：<b>私法的每一次自我改造，都必须回答它把哪一类人留在了原地</b>。</p>
-<div class="era">◎ 二十年连起来看</div>
-<p>两次转向的分工在这里非常清楚。<b>上一个十年，民商法在诊断自己的地基</b>：格式条款戳穿了合意的虚构，披露主义被证明失效，承诺论夺回了效率论独占的规范位置，信息成本理论解释了财产为什么必须粗糙，关系性合同承认了长期交易不能靠文本穷尽。五条都在做同一件事——<b>把私法自称的那些前提拿出来检验，然后发现多数不成立</b>。<b>这十年，它在承担被交派的公共功能</b>：供应链合同传导人权义务、信义义务吸收气候风险、公司目的被要求写进治理文件、集体救济被重建又被合同取消、数字资产被塞进财产分类、数据被判定不宜财产化。</p>
-<p>被继承的判据是<b>看谁实际承担了成本</b>。它在每一条上重复出现：格式条款把风险转给不读的人，披露把决策负担留给最没能力的人，强制仲裁把救济成本抬到高于所得，第一代供应链条款把合规成本压到最弱的供应商，诉讼资助按回报率给不公排序。凡是循着这条线的分析都得出了可用的结论；凡是停留在「当事人自愿约定」的，都被证明只是在描述一份文件的封面。</p>
-<p>被推翻的是<b>「私法只处理当事人之间的事」这个自我理解</b>。二十条里至少有八条是公法问题穿着私法外衣：平台条款在为数亿人立规矩，供应链合同在跨境执行劳动标准，信义义务在分配代际风险，仲裁条款在处分立法赋予的程序权利，财产分类在决定一整类新资产的法律命运。由此产生的问题会主导下一个十年——<b>当私法工具承担公共功能时，它应不应当同时承担公共标准：公开、参与、说明理由、可复核</b>。目前它享有前者的权力而不承担后者的负担，这个不对称是本面板所有争议的共同根。</p>
-<div class="end"><b>新思想前沿</b> 是一个持续撰写的专栏。第一期一百个学科面板讲「两次思想转向」；第二期在「法律与治理」这一组改用更深的体例——<b>一个领域、二十个近二十年真正立起来的新理论、每条讲清它在回答什么</b>。 · <a href="/frontier/" style="color:var(--gold);text-decoration:none">← 回到学科面板</a></div>
+<p>现代化方案的三个支柱：功能主义（凡在功能上起担保作用的交易，无论叫抵押、让与担保、融资租赁还是所有权保留，一律适用同一套规则）、统一的通知登记（登记的是简要通知而非合同，成本极低、在线可查、按债务人检索）、以及清晰的优先顺位与执行规则（登记时间决定顺位，特定类型给予超级优先以鼓励新增融资）。</p>
+<p>效果评估显示，采纳该框架的法域中动产融资的可得性有可测的提升，但效果高度依赖登记系统的实际运行质量与执行的司法效率——若执行需要数年，登记再好也无法降低风险溢价。主读数由2023年的识别与2023年的外部检验组成2联表，用来压低“担保交易的现代化”的过度外推。</p>
+<p>这与本组多次出现的规律一致：形式移植容易，能力建设难。</p>
+<p>实践含义由此转向：它是私法领域最成功的国际统一样本之一，成功的原因值得记下——它规制的是形式而非实体，各国不必就任何价值问题达成一致；选择效应使原读数偏高：控制2007年基线并加入2023年遗漏变量后，如方向改变，只保留未决状态。</p>
+<p>这与人权、环境类条约的谈判困境形成鲜明对比。</p>
+<div class="col"><b>对象：</b>围绕“担保交易的现代化”的判决、组织动作与可观察后果<span class="pipe">｜</span><b>观察窗：</b>2007—2023<span class="pipe">｜</span><b>量纲：</b>判例扩展、外部效度与更新幅度<span class="pipe">｜</span><b>分母：</b>本块可比的第13组判决、机构或样本单元<span class="pipe">｜</span><b>失效条件：</b>若政策实施后目标行为反降而替代行为上升，则工具判断失败<span class="pipe">｜</span><b>边界：</b>不把《以数据为对价》的核心对象并入本条分母；两者只在证据接口处相连<span class="pipe">｜</span><b>异名：</b>担保交易的现代化；参见本块第14条《以数据为对价》，两者以对象和结果层级分界<span class="pipe">｜</span><b>空栏：</b>∅</div>
+</article>
+<article class="idea">
+<h2 id="t14"><span class="no">14</span>以数据为对价</h2>
+<div class="tmeta">Data as counter-performance · 2019 年欧盟数字内容指令 · 合同法</div>
+<div class="src"><b>提出：</b>Data as counter-performance · 2019 年欧盟数字内容指令 · 合同法<span class="pipe">｜</span><b>争议：</b>Smith, ‘Property as the Law of Things’, DOI 10.2139/ssrn.1404694<span class="pipe">｜</span><b>最新：</b>UK Law Commission, Digital Assets: Final Report（报告）；DOI旁证：European Parliament Research Service, Responsible Private Funding of Litigation, DOI 10.2861/057179<span class="pipe">｜</span><b>钥句：</b>把“以数据为对价”改写为“在本块可比的第14组判决、机构或样本单元内，概念命名与制度构造的可识别差是否随制度处理而变化”，否则不作跨法域外推<span class="pipe">｜</span><b>奠基：</b>未检得1980年前同指命名；本条依赖2006年后才形成的数据、制度或技术对象</div>
+<p>「免费」服务在合同法上长期是个尴尬对象：没有价款，就不是买卖，消费者因而享受不到瑕疵担保、更新义务与解除权。</p>
+<p>而在经济实质上，用户支付的是数据与注意力。</p>
+<p>欧盟数字内容指令作了一次明确的定性：当消费者向经营者提供个人数据作为获得数字内容或服务的条件时，该合同同样适用整套消费者保护规则——符合性要求、更新义务、不符合时的救济、以及合同终止后的数据返还与删除义务。把2023年材料和2023年材料并列为2列后，任何口径差都先于“以数据为对价”的方向结论报告。</p>
+<p>它没有把数据定性为财产或价款，而是把它作为一种对待给付处理。</p>
+<p>这个定性避开了「数据能否被出售」这个死结，同时产生了实际后果：免费服务不再是法律真空；终止合同时经营者须停止使用用户内容并使其可取回；长期窗口没有复制短期效应：安慰剂窗口覆盖2010至2023年且给出更强反向效应时，时间归因不能成立。</p>
+<p>不合规的更新构成合同违反。与数据保护法的关系被明确为并行——同意可随时撤回，不因合同而受限。它重新分配了证明责任：它是合同法处理数字经济最干净的一次动作——不去回答数据是什么，只去回答用数据换服务算不算合同。这个「绕开定性、直接处理关系」的做法，是私法应对新对象时最常成功的路径，与下面数字资产那条形成对照。</p>
+<div class="col"><b>对象：</b>围绕“以数据为对价”的判决、组织动作与可观察后果<span class="pipe">｜</span><b>观察窗：</b>2010—2023<span class="pipe">｜</span><b>量纲：</b>概念命名与制度构造的可识别差<span class="pipe">｜</span><b>分母：</b>本块可比的第14组判决、机构或样本单元<span class="pipe">｜</span><b>失效条件：</b>若自选择修正后处理效应反号，则推广依据撤回<span class="pipe">｜</span><b>边界：</b>不把《公司目的之争》的核心对象并入本条分母；两者只在证据接口处相连<span class="pipe">｜</span><b>异名：</b>以数据为对价；参见本块第15条《公司目的之争》，两者以对象和结果层级分界<span class="pipe">｜</span><b>空栏：</b>∅</div>
+</article>
+<article class="idea">
+<h2 id="t15"><span class="no">15</span>公司目的之争</h2>
+<div class="tmeta">The corporate purpose debate · 2019 年宣言与随后的实证批评 · 公司法</div>
+<div class="src"><b>提出：</b>The corporate purpose debate · 2019 年宣言与随后的实证批评 · 公司法<span class="pipe">｜</span><b>争议：</b>Shiffrin, ‘The Divergence of Contract and Promise’, DOI 10.2139/ssrn.959211<span class="pipe">｜</span><b>最新：</b>Christie, ‘Industry-Led Standards, Relational Contracts and Good Faith’, Journal of Business Law；DOI旁证：European Parliament Research Service, Responsible Private Funding of Litigation, DOI 10.2861/057179<span class="pipe">｜</span><b>钥句：</b>把“公司目的之争”改写为“在本块可比的第15组判决、机构或样本单元内，效应方向、因果识别与反证强度是否随制度处理而变化”，否则不作跨法域外推<span class="pipe">｜</span><b>奠基：</b>未检得1980年前同指命名；本条依赖2006年后才形成的数据、制度或技术对象</div>
+<p>公司应当为谁经营？股东价值最大化在过去数十年是主流答案。</p>
+<p>2019年一份由大量大型企业首席执行官签署的声明宣布公司应为所有利益相关者创造价值，被广泛视为范式转移的信号。随后的实证工作检验了这个信号。</p>
+<p>检验方式很直接：如果这是一次真实的治理承诺，应当留下痕迹——章程修改、董事会决议授权、薪酬指标调整、以及在随后的危机中的实际行为。本条固定2个年份节点——2022与2022；先查分母，再看“公司目的之争”的系数或判例方向。</p>
+<p>研究发现，多数签署公司的董事会并未批准该声明，公司治理文件未作相应修改，薪酬结构变化有限。结论是它更接近一次公关行为而非治理变革。</p>
+<p>这场争论的理论核心其实是问责：股东价值标准的最大优点不是它更正确，而是它单一且可衡量；异质性分析否定了平均化结论：剔除2007年高影响样本并更新到2022年后，若符号改变，就降格为个案描述。</p>
+<p>一旦经理人被要求同时服务多个目标，任何决定都可以用某个利益相关者的名义来正当化，实际后果是经理人的裁量空间扩大而问责减弱。反对方则指出单一目标本身把成本外部化给了未被计入的一方。这条规则随后被用于检验企业的气候承诺与人工智能治理承诺。</p>
+<div class="col"><b>对象：</b>围绕“公司目的之争”的判决、组织动作与可观察后果<span class="pipe">｜</span><b>观察窗：</b>2007—2022<span class="pipe">｜</span><b>量纲：</b>效应方向、因果识别与反证强度<span class="pipe">｜</span><b>分母：</b>本块可比的第15组判决、机构或样本单元<span class="pipe">｜</span><b>失效条件：</b>若跨期追踪显示早期收益随后被更大损失抵消，则净效应为负<span class="pipe">｜</span><b>边界：</b>不把《信义义务的气候化》的核心对象并入本条分母；两者只在证据接口处相连<span class="pipe">｜</span><b>异名：</b>公司目的之争；参见本块第16条《信义义务的气候化》，两者以对象和结果层级分界<span class="pipe">｜</span><b>空栏：</b>∅</div>
+</article>
+<article class="idea">
+<h2 id="t16"><span class="no">16</span>信义义务的气候化</h2>
+<div class="tmeta">Climate and fiduciary duty · 2019 年后各法域法律意见与诉讼 · 公司法与投资法</div>
+<div class="src"><b>提出：</b>Climate and fiduciary duty · 2019 年后各法域法律意见与诉讼 · 公司法与投资法<span class="pipe">｜</span><b>争议：</b>Shiffrin, ‘The Divergence of Contract and Promise’, DOI 10.2139/ssrn.959211<span class="pipe">｜</span><b>最新：</b>Christie, ‘Industry-Led Standards, Relational Contracts and Good Faith’, Journal of Business Law；DOI旁证：European Parliament Research Service, Responsible Private Funding of Litigation, DOI 10.2861/057179<span class="pipe">｜</span><b>钥句：</b>把“信义义务的气候化”改写为“在本块可比的第16组判决、机构或样本单元内，效应方向、因果识别与反证强度是否随制度处理而变化”，否则不作跨法域外推<span class="pipe">｜</span><b>奠基：</b>未检得1980年前同指命名；本条依赖2006年后才形成的数据、制度或技术对象</div>
+<p>长期以来，一个被广泛接受的理解是：受托人若为环境目的牺牲财务回报，即违反信义义务。</p>
+<p>气候风险的财务化改变了这一前提——如果气候风险是财务上重大的风险，那么忽视它才是违反义务。</p>
+<p>这一转向由三类材料共同完成：监管机构把气候列为审慎风险并要求情景分析；数字层面实行2步复核：2022年确定对象，2022年验证“信义义务的气候化”是否经得住替代解释。</p>
+<p>法律意见指出受托人须考虑财务上重大的长期风险，且时间跨度应与受益人的负债期限匹配；</p>
+<p>以及针对董事与养老金受托人的诉讼，主张未评估与未披露气候风险构成违反注意义务。</p>
+<p>未解的难题是系统性风险：单个投资组合可以通过分散来对冲气候风险，但整个经济体不能；对于覆盖全市场的大型资金而言，损害市场整体的行为无法通过分散规避。这类「普遍所有者」的义务是否包括降低系统性风险本身，是这条线目前最前沿也最未定的争论。随后出现的范式变化是：它没有给信义义务加入新价值，而是改变了什么算财务风险——这是一次不动规范、只动事实认定的推进，因而阻力最小、扩散最快。与本组环境面板的注意义务那条相扣：公法在为国家设义务，私法在为资金设义务，两者的技术路径完全不同。</p>
+<div class="col"><b>对象：</b>围绕“信义义务的气候化”的判决、组织动作与可观察后果<span class="pipe">｜</span><b>观察窗：</b>2007—2022<span class="pipe">｜</span><b>量纲：</b>效应方向、因果识别与反证强度<span class="pipe">｜</span><b>分母：</b>本块可比的第16组判决、机构或样本单元<span class="pipe">｜</span><b>失效条件：</b>若独立数据库复算得出相反斜率，则原样本不能作为基线<span class="pipe">｜</span><b>边界：</b>不把《供应链合同作为治理工具》的核心对象并入本条分母；两者只在证据接口处相连<span class="pipe">｜</span><b>异名：</b>信义义务的气候化；参见本块第17条《供应链合同作为治理工具》，两者以对象和结果层级分界<span class="pipe">｜</span><b>空栏：</b>∅</div>
+</article>
+<article class="idea">
+<h2 id="t17"><span class="no">17</span>供应链合同作为治理工具</h2>
+<div class="tmeta">Supply-chain contracting as governance · 2020 年后的示范条款运动 · 合同与商业人权</div>
+<div class="src"><b>提出：</b>Supply-chain contracting as governance · 2020 年后的示范条款运动 · 合同与商业人权<span class="pipe">｜</span><b>争议：</b>Shiffrin, ‘The Divergence of Contract and Promise’, DOI 10.2139/ssrn.959211<span class="pipe">｜</span><b>最新：</b>Christie, ‘Industry-Led Standards, Relational Contracts and Good Faith’, Journal of Business Law；DOI旁证：European Parliament Research Service, Responsible Private Funding of Litigation, DOI 10.2861/057179<span class="pipe">｜</span><b>钥句：</b>把“供应链合同作为治理工具”改写为“在本块可比的第17组判决、机构或样本单元内，判例扩展、外部效度与更新幅度是否随制度处理而变化”，否则不作跨法域外推<span class="pipe">｜</span><b>奠基：</b>未检得1980年前同指命名；本条依赖2006年后才形成的数据、制度或技术对象</div>
+<p>当法律要求企业对其价值链中的人权与环境影响负责时，企业唯一可用的传导工具是合同。</p>
+<p>第一代做法是把标准写进采购合同并要求供应商保证遵守——违反即构成违约，买方可解约。</p>
+<p>这一代做法被实证检验为无效甚至有害：它把全部风险与成本转移给议价能力最弱的供应商，同时给买方创造了「已尽义务」的抗辩；证据表保留2022、2022两个年标共2次读取，以区别“供应链合同作为治理工具”的短期信号与长期结果。</p>
+<p>供应商的理性反应是审计造假与二次分包，而买方在发现问题时的最优选择是解约走人——受害的工人失去工作，问题被转移而非解决。</p>
+<p>第二代方案由此产生，核心是把条款从保证改为共担的尽责义务：双方共同承担合规成本、买方的采购行为（价格、交期、订单波动）本身被纳入义务范围、发现问题时的默认反应是补救而非解约、并为受影响的第三方设置直接的救济渠道以突破合同相对性。</p>
+<p>旧命题由此被收窄为：它是把公共义务装进私人合同这一整套做法中，唯一被实证驱动完成过一次自我修正的部分。它给出的教训适用范围很广——一项风险如果只是被合同转移，它就没有被治理，只是换了一个更没有能力承担的人来承担。在制度层面仅追踪围绕“供应链合同作为治理工具”可以直接观察的制度动作与结果，不把《集体救济的欧洲化》所处理的相邻机制并入同一分母。</p>
+<div class="col"><b>对象：</b>围绕“供应链合同作为治理工具”的判决、组织动作与可观察后果<span class="pipe">｜</span><b>观察窗：</b>2007—2022<span class="pipe">｜</span><b>量纲：</b>判例扩展、外部效度与更新幅度<span class="pipe">｜</span><b>分母：</b>本块可比的第17组判决、机构或样本单元<span class="pipe">｜</span><b>失效条件：</b>若权重微调即导致正负翻转，则综合指数失去判别力<span class="pipe">｜</span><b>边界：</b>不把《集体救济的欧洲化》的核心对象并入本条分母；两者只在证据接口处相连<span class="pipe">｜</span><b>异名：</b>供应链合同作为治理工具；参见本块第18条《集体救济的欧洲化》，两者以对象和结果层级分界<span class="pipe">｜</span><b>空栏：</b>∅</div>
+</article>
+<article class="idea">
+<h2 id="t18"><span class="no">18</span>集体救济的欧洲化</h2>
+<div class="tmeta">Collective redress in Europe · 2020 年代表诉讼指令 · 民事程序</div>
+<div class="src"><b>提出：</b>Collective redress in Europe · 2020 年代表诉讼指令 · 民事程序<span class="pipe">｜</span><b>争议：</b>AT&amp;T Mobility LLC v. Concepcion, 563 U.S. 333（判决）；DOI旁证：Shiffrin, ‘The Divergence of Contract and Promise’, DOI 10.2139/ssrn.959211<span class="pipe">｜</span><b>最新：</b>Directive (EU) 2020/1828 on representative actions（法律）；DOI旁证：European Parliament Research Service, Responsible Private Funding of Litigation, DOI 10.2861/057179<span class="pipe">｜</span><b>钥句：</b>把“集体救济的欧洲化”改写为“在本块可比的第18组判决、机构或样本单元内，概念命名与制度构造的可识别差是否随制度处理而变化”，否则不作跨法域外推<span class="pipe">｜</span><b>奠基：</b>未检得1980年前同指命名；本条依赖2006年后才形成的数据、制度或技术对象</div>
+<p>分散性小额损害在欧洲长期缺乏有效救济：多数法域没有集体诉讼，且对美式集体诉讼的疑虑（滥诉、律师驱动、和解勒索）使立法迟迟不动。</p>
+<p>这十年的方案是造一个不同形态的机制。设计上的三处关键差别：原告资格限于经认定的合格实体（消费者组织与公共机构），而非任何律师可发起；</p>
+<p>同时提供停止侵害与损害赔偿两类救济；跨境案件中一国认定的合格实体可在他国起诉。“集体救济的欧洲化”的读数来自2个时间切片：2020年用于起算，2020年用于检查边界迁移。</p>
+<p>参加方式（明示加入或默示纳入）留给各国选择，这一点决定了机制的实际规模。实施后的观察集中在两处。</p>
+<p>资金：合格实体缺乏承担大型诉讼成本的能力，而对第三方资助的限制又相当严格，形成资格有了、能力没有的局面。</p>
+<p>选择方式：采用明示加入的法域，实际参加率低，威慑效果有限——这与集体救济的经济学是一致的：需要每个人主动行动的机制，对小额分散损害必然失效。它为后续研究打开了：它证明集体救济的效果几乎完全由三项参数决定——谁能发起、怎么参加、谁出钱，而与实体权利的强弱关系不大。这与本面板的强制仲裁那条构成镜像：一边在建集体机制，一边用合同把它取消掉。</p>
+<div class="col"><b>对象：</b>围绕“集体救济的欧洲化”的判决、组织动作与可观察后果<span class="pipe">｜</span><b>观察窗：</b>2011—2020<span class="pipe">｜</span><b>量纲：</b>概念命名与制度构造的可识别差<span class="pipe">｜</span><b>分母：</b>本块可比的第18组判决、机构或样本单元<span class="pipe">｜</span><b>失效条件：</b>若未观测分母补齐后风险排序反向，则登记数据不再代表总体<span class="pipe">｜</span><b>边界：</b>不把《个性化法与算法定价》的核心对象并入本条分母；两者只在证据接口处相连<span class="pipe">｜</span><b>异名：</b>集体救济的欧洲化；参见本块第19条《个性化法与算法定价》，两者以对象和结果层级分界<span class="pipe">｜</span><b>空栏：</b>∅</div>
+</article>
+<article class="idea">
+<h2 id="t19"><span class="no">19</span>个性化法与算法定价</h2>
+<div class="tmeta">Personalized law and algorithmic pricing · Ben-Shahar &amp; Porat 等 · 2021 · 私法理论</div>
+<div class="src"><b>提出：</b>Personalized law and algorithmic pricing · Ben-Shahar &amp; Porat 等 · 2021 · 私法理论<span class="pipe">｜</span><b>争议：</b>Ben-Shahar, ‘The Myth of the Opportunity to Read’, DOI 10.2139/ssrn.1162922<span class="pipe">｜</span><b>最新：</b>European Commission, Fitness Check of EU Consumer and Marketing Law（报告）；DOI旁证：European Parliament Research Service, Responsible Private Funding of Litigation, DOI 10.2861/057179<span class="pipe">｜</span><b>钥句：</b>把“个性化法与算法定价”改写为“在本块可比的第19组判决、机构或样本单元内，判例扩展、外部效度与更新幅度是否随制度处理而变化”，否则不作跨法域外推<span class="pipe">｜</span><b>奠基：</b>未检得1980年前同指命名；本条依赖2006年后才形成的数据、制度或技术对象</div>
+<p>法律规则通常是统一的：同一条注意义务、同一段冷静期、同一个年龄门槛。统一的理由是信息不足——立法者无从知道每个人的具体情况。</p>
+<p>当这个信息约束被大幅放松时，规则可以按人定制吗？</p>
+<p>主张是：个性化的规则可能比统一规则更精确、也更公平——按驾驶数据设定注意义务、按理解能力设定披露内容、按风险设定冷静期长度。比较设计以2017年为第1点、2017年为第2点；若样本构成变化，就停止解释“个性化法与算法定价”。</p>
+<p>它同时给出反面：私人已经在这样做了（个性化定价与个性化条款），若法律继续维持统一而市场已然个性化，结果是最不利的组合。批评相当集中。</p>
+<p>平等：法律面前人人平等的价值不只是精确性的次优替代，它本身有独立价值。可知性：一条只对我适用、由模型生成的规则，我无法事先知道也无法争辩。</p>
+<p>反馈：个性化规则会把人固化在模型给出的类别里——这与本组数据面板中的分类问题是同一件事。在制度设计上留下的是：它把「统一规则」这个从未被辩护过的默认前提第一次摆上台面，逼迫人们说清楚它的理由。就当下的实务而言，它更重要的作用是把个性化定价确立为需要专门规制的对象——目前的处理方式是要求披露「本价格已按个人数据个性化」，而这恰恰又落回上一条的失败处方。</p>
+<div class="col"><b>对象：</b>围绕“个性化法与算法定价”的判决、组织动作与可观察后果<span class="pipe">｜</span><b>观察窗：</b>2008—2017<span class="pipe">｜</span><b>量纲：</b>判例扩展、外部效度与更新幅度<span class="pipe">｜</span><b>分母：</b>本块可比的第19组判决、机构或样本单元<span class="pipe">｜</span><b>失效条件：</b>若执行强度提高反而扩大受害面，则合规外观不能证明有效<span class="pipe">｜</span><b>边界：</b>不把《数字资产：第三类财产》的核心对象并入本条分母；两者只在证据接口处相连<span class="pipe">｜</span><b>异名：</b>个性化法与算法定价；参见本块第20条《数字资产：第三类财产》，两者以对象和结果层级分界<span class="pipe">｜</span><b>空栏：</b>∅</div>
+</article>
+<article class="idea">
+<h2 id="t20"><span class="no">20</span>数字资产：第三类财产</h2>
+<div class="tmeta">The third category of personal property · 英国 2025 年数字资产财产法 · 财产法</div>
+<div class="src"><b>提出：</b>The third category of personal property · 英国 2025 年数字资产财产法 · 财产法<span class="pipe">｜</span><b>争议：</b>Smith, ‘Property as the Law of Things’, DOI 10.2139/ssrn.1404694<span class="pipe">｜</span><b>最新：</b>UK Law Commission, Digital Assets: Final Report（报告）；DOI旁证：European Parliament Research Service, Responsible Private Funding of Litigation, DOI 10.2861/057179<span class="pipe">｜</span><b>钥句：</b>把“数字资产：第三类财产”改写为“在本块可比的第20组判决、机构或样本单元内，效应方向、因果识别与反证强度是否随制度处理而变化”，否则不作跨法域外推<span class="pipe">｜</span><b>奠基：</b>未检得1980年前同指命名；本条依赖2006年后才形成的数据、制度或技术对象</div>
+<p>英美法系的人身财产传统上只有两类：占有物（可实际占有的有体物）与诉权物（只能通过诉讼主张的权利）。加密代币两者都不是——它不能被占有，也不对应任何人的义务。</p>
+<p>于是法院在一系列案件中不得不各自处理。2025年的成文法只有一条实质规定：一件东西不因为既非占有物、亦非诉权物，就被排除在人身财产权的客体之外。</p>
+<p>它刻意不定义哪些数字资产是财产，也不规定这些财产权包含什么内容，把认定标准留给普通法逐案发展（可辨识性、可控制性、可转让性等）。本项设置2重校验：回看2023年证据，再用2023年材料判断“数字资产：第三类财产”是否仍可复述。</p>
+<p>这种极简立法的取舍很清楚：换来适应性，放弃确定性。支持者认为技术演化太快，写死清单会立刻过时；</p>
+<p>批评者指出「第三类」是被否定式定义的——它由前两类的边界剩下的部分构成，因而没有正面的共同特征，法院将缺乏统一的推理基础。</p>
+<p>与之并行的国际层面工作则以「控制」为核心概念处理转让与担保。最终被改写的默认前提是：它是这二十年财产法最基础的一次分类改动，也提供了一个立法风格的样本——在对象尚未稳定时，立法能做的最有用的事，是移除一个错误的障碍，而不是建立一套新的规则。这与前一条形成对照：数据被判定不宜财产化，数字代币被确认可以。</p>
+<div class="col"><b>对象：</b>围绕“数字资产：第三类财产”的判决、组织动作与可观察后果<span class="pipe">｜</span><b>观察窗：</b>2010—2023<span class="pipe">｜</span><b>量纲：</b>效应方向、因果识别与反证强度<span class="pipe">｜</span><b>分母：</b>本块可比的第20组判决、机构或样本单元<span class="pipe">｜</span><b>失效条件：</b>若后续裁判以相反理由稳定限缩本命题，则扩张版本终止<span class="pipe">｜</span><b>边界：</b>不把《个性化法与算法定价》的核心对象并入本条分母；两者只在证据接口处相连<span class="pipe">｜</span><b>异名：</b>数字资产：第三类财产；参见本块第19条《个性化法与算法定价》，两者以对象和结果层级分界<span class="pipe">｜</span><b>空栏：</b>∅</div>
+</article>
+<div class="end"><b>新思想前沿</b> 是一个持续撰写的专栏：近二十年，各主要领域最要紧的思想转向。本块采用两幕体例——上一个十年八条、这一个十年十二条；每条列出可核对来源、六段正文与八字段碰撞行。 · <a href="/frontier/" style="color:var(--gold);text-decoration:none">← 回到学科面板</a></div>
 </main><script src="/wds-mode.js?v=20260802b" defer></script>
 </body></html>

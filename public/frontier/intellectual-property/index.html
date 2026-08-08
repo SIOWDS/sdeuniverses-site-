@@ -1,7 +1,7 @@
 <!DOCTYPE html><html lang="zh"><head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>知识产权法 · 新思想前沿 | SDE Universes</title>
-<meta name="description" content="近二十年知识产权法立起来的二十个新理论：禁令的裁量化、专利丛林与专利失灵、专利主张实体、可专利客体收缩、审查经济学、全球 FRAND 费率、反诉禁令、自上而下估值、常青化与印度第三条d款、TRIPS 灵活性、转化性使用的扩张与收缩、中介责任与上传过滤、文本数据挖掘例外、生成式训练的合理使用、AI 产出的可版权性、商业秘密的崛起、2024 年遗传资源条约、开放许可的可执行性、商标的功能扩张、实证知识产权。">
+<meta name="description" content="近二十年知识产权法领域二十个新思想，按8＋12两幕排开：中介责任与通知删除的失效、可及性与条约灵活性、实证知识产权、禁令的裁量化、专利丛林与专利失灵、开放许可的可执行性等。每条给出提出、争议、最新、钥句与奠基来源，配六段正文和八字段碰撞行。">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Noto+Serif+SC:wght@300;400;500;600&display=swap">
 <style>
@@ -36,142 +36,280 @@ h2 .no{display:inline-block;min-width:2.2em;font-family:'Playfair Display',serif
 .toc .cg{grid-column:1/-1;font-size:.76rem;letter-spacing:.1em;color:var(--gold2);font-weight:700;padding-left:0;margin-top:.45rem}
 .toc .cg:before{content:''}
 @media(max-width:640px){h1{font-size:1.7rem}.toc ol{grid-template-columns:1fr}}
+
+/* 法律、规制与责任供料层 */
+.act{margin:2.6rem 0 .45rem;padding:.55rem .9rem;background:var(--card);border-left:4px solid var(--gold);font-size:1.02rem;font-weight:600;color:var(--gold)}
+.actnote{font-size:.94rem;color:var(--text2);margin-bottom:1.35rem}
+.idea{display:block}
+.idea h2{font-size:1.18rem;font-weight:600;color:var(--gold);margin:2rem 0 .35rem;scroll-margin-top:1rem}
+.idea h2 .no{display:inline-block;min-width:2.6em;font-family:'Playfair Display',serif;font-size:.86rem;color:var(--muted);font-weight:600}
+.tmeta{font-size:.82rem;color:var(--muted);margin:0 0 .7rem;padding-left:2.6em;line-height:1.7}
+.src{font-size:.85rem;color:var(--text2);background:var(--card);border-left:3px solid var(--gold2);padding:.58rem .82rem;margin:0 0 .95rem;line-height:1.82}
+.src b,.col b{color:var(--gold2);font-weight:600;margin-right:.28em}
+.col{font-size:.83rem;color:var(--text2);background:rgba(138,104,23,.07);border-left:3px solid var(--muted);padding:.58rem .82rem;margin:.15rem 0 1.55rem;line-height:1.82}
+.pipe{color:var(--muted);padding:0 .16em}
+.toc{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1rem 1.1rem;margin:0 0 1.8rem;font-size:.88rem;line-height:1.55}
+.toc-t{font-size:.78rem;letter-spacing:.14em;color:var(--gold2);font-weight:700;margin-bottom:.7rem}
+.toc ol{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:.28rem .9rem;counter-reset:tc}
+.toc li{counter-increment:tc;position:relative;padding-left:1.9em}
+.toc li:before{content:counter(tc,decimal-leading-zero);position:absolute;left:0;font-family:'Playfair Display',serif;font-size:.78rem;color:var(--muted)}
+.toc a{color:var(--text);text-decoration:none;border-bottom:1px solid transparent}
+.toc a:hover{color:var(--gold);border-bottom-color:var(--border)}
+.toc .cg{grid-column:1/-1;font-size:.76rem;letter-spacing:.08em;color:var(--gold2);font-weight:700;padding-left:0;margin-top:.45rem}
+.toc .cg:before{content:''}
+@media(max-width:640px){.toc ol{grid-template-columns:1fr}.idea h2{line-height:1.55}}
 </style></head><body>
 <div class="top"><a href="/browse/">SDE Universes</a><span class="sep">·</span><a href="/frontier/">新思想前沿</a><span class="sep">›</span><span style="color:var(--text2)">法律与治理</span></div>
 <main>
-<div class="kicker">新思想前沿 · 法律与治理</div>
+<div class="kicker">新思想前沿 · 法律、规制与责任</div>
 <h1>知识产权法</h1>
-<div class="meta">近二十年 · <b>20 个新理论</b> · 每条约 500 字 · 全篇约 9000 字 · 王德生 亲撰 · 2026 年 8 月</div>
-<p class="lede">这二十年知识产权法的核心变化，是它<b>不再被当作财产法的一个分支来讨论</b>。上一个十年的转折点是一个看似技术性的问题——侵权成立之后是否自动发出禁令；一旦答案变成「要衡量」，整个体系的性质就变了：知识产权从一束排他权，变成一套<b>可以按后果调节的政策工具</b>。这十年沿着同一方向走得更远：可专利客体被收缩，全球费率由单一法院裁定，强制的来源披露被写进国际条约，而版权则被生成式技术推到一个它从未处理过的位置——争议不再是「有没有复制」，而是「以学习为目的的大规模摄取算不算使用」，以及「产出的东西有没有作者」。贯穿二十条的判据只有一句：<b>从问「谁拥有」，改为问「这项排他权在真实市场里造成了什么」</b>。</p>
-<div class="toc"><div class="toc-t">本面板的 20 个理论</div><ol><li class="cg">一、专利：从财产到系统效果</li><li><a href="#t01">禁令的裁量化</a></li><li><a href="#t02">专利丛林与专利失灵</a></li><li><a href="#t03">专利主张实体</a></li><li><a href="#t04">可专利客体的收缩</a></li><li><a href="#t05">审查的经济学</a></li><li class="cg">二、标准、竞争与全球定价</li><li><a href="#t06">全球 FRAND 费率的司法裁定</a></li><li><a href="#t07">反诉禁令与管辖冲突</a></li><li><a href="#t08">自上而下的费率估值</a></li><li><a href="#t09">常青化与二次专利</a></li><li><a href="#t10">可及性与条约灵活性</a></li><li class="cg">三、版权：从复制到分发再到训练</li><li><a href="#t11">转化性使用的扩张与收缩</a></li><li><a href="#t12">中介责任与通知删除的失效</a></li><li><a href="#t13">文本与数据挖掘例外</a></li><li><a href="#t14">生成式训练的合理使用之争</a></li><li><a href="#t15">产出侧：机器生成物的可版权性</a></li><li class="cg">四、边界扩张与再分配</li><li><a href="#t16">商业秘密的崛起</a></li><li><a href="#t17">遗传资源与传统知识的来源披露</a></li><li><a href="#t18">开放许可的可执行性</a></li><li><a href="#t19">商标功能的扩张</a></li><li><a href="#t20">实证知识产权</a></li></ol></div>
-<div class="era">一、专利：从财产到系统效果</div>
-<h2 id="t01"><span class="no">01</span>禁令的裁量化</h2>
-<div class="tmeta"><b>eBay v. MercExchange</b> · 美国最高法院 · 2006 · 专利救济</div>
-<p>在此之前的默认规则是：专利有效且被侵权，即发出永久禁令。这条规则的隐含前提是专利即财产，而财产的救济方式是排除他人。2006 年的判决取消了这个自动性。</p>
-<p>判决要求适用衡平救济的<b>四要素检验</b>：不可弥补的损害、金钱赔偿是否足够、双方困难的平衡、公共利益。它没有说不能发禁令，只是说必须逐案衡量。看似温和，后果极大——因为它把「专利权人是否实施该专利」「该专利在产品中占多大比重」这类<b>后果性事实</b>引入了救济判断。</p>
-<p>实证读数是分化的：不实施专利的主体获得禁令的比例明显下降，转而以许可费形式获得赔偿；而实施型竞争者之间的案件中禁令仍然常见。这实际上把专利分成了两类救济待遇，而分类依据不是权利本身，是权利人的身份与行为。批评意见据此认为它损害了权利的可预期性。</p>
-<p class="kk"><b>它改变了什么</b>：它是本面板所有其他条目的总开关——<b>一旦救济可以按后果调节，权利的边界就不再由权利的定义决定，而由法院对该市场的判断决定</b>。此后的专利丛林研究、专利主张实体研究、标准必要专利的费率裁定，都建立在这个开口之上。</p>
-<h2 id="t02"><span class="no">02</span>专利丛林与专利失灵</h2>
-<div class="tmeta"><b>Patent thickets and patent failure</b> · Bessen &amp; Meurer 等 · 2008 · 创新经济学与专利法</div>
-<p>专利制度的正当性论证是：授予临时垄断以换取披露与创新激励。这一条工作把这个论证当作可检验的经验命题，用诉讼成本、许可成本与研发回报的数据做了一次总账。</p>
-<p>结论在多数产业中不利：除化学与制药外，专利诉讼与许可给企业带来的<b>成本超过</b>它们从专利获得的收益——也就是说，作为一项财产制度，它在净效应上未能完成激励功能。作者把主要原因归于<b>边界不清</b>：与土地不同，专利的权利范围只有在诉讼之后才确定，因而事前无法做尽职调查，「不侵权经营」在信息上不可能。</p>
-<p><b>专利丛林</b>是这一诊断的结构版本：当一项产品需要跨越成百上千项重叠专利时，逐一谈判的交易成本可能高到阻断进入，而每个权利人都有过度索价的激励——这是反公地效应在专利上的具体形态。半导体、通信与生物医药是最常被举证的领域。</p>
-<p class="kk"><b>它改变了什么</b>：它把专利政策的评价标准从<b>权利保护是否充分</b>改成<b>整个制度的净收益是多少</b>，并给出了一条至今有效的诊断线索——<b>凡是权利边界只能事后确定的财产制度，事前的交易成本会吃掉制度收益</b>。</p>
-<h2 id="t03"><span class="no">03</span>专利主张实体</h2>
-<div class="tmeta"><b>Patent assertion entities</b> · 2010 年代实证研究 · 创新经济学</div>
-<p>一类不生产任何产品、以收购专利并提起侵权主张为业的主体在这十几年间大量出现。围绕它们的争论最初完全是立场之争：一方称其为寄生，一方称其为专利流动性的提供者，为小发明人变现提供渠道。</p>
-<p>实证研究把争论拆成可测的部分。较稳固的发现是：这类主张高度集中于<b>软件与商业方法</b>类专利（权利边界最模糊的一类）；起诉对象常是<b>终端使用者</b>而非制造者；和解金额分布集中在<b>低于辩护成本</b>的区间——这一点具有决定性，因为它意味着和解与专利的实际效力无关，只与诉讼成本结构有关。</p>
-<p>为发明人变现的辩护则较难得到数据支持：多项研究发现流向原始发明人的收益比例很低。制度回应集中在程序而非实体：败诉方费用转移、成立后的行政无效程序、对起诉通知内容的要求、以及对终端用户诉讼的限制。</p>
-<p class="kk"><b>它改变了什么</b>：它证明了一件对整个法律经济学都有意义的事——<b>当维权成本远高于和解金额时，权利的实际内容由成本结构而非法条决定</b>。这与刑事司法中认罪协商的机制完全同构：程序成本本身就是筹码。</p>
-<h2 id="t04"><span class="no">04</span>可专利客体的收缩</h2>
-<div class="tmeta"><b>Contraction of patent-eligible subject matter</b> · 2012–2014 三案 · 专利法</div>
+<div class="meta">近二十年 · <b>两幕 · 20 个新思想</b> · 主体正文 10,315 字 · 王德生 亲撰 · 2026 年 8 月</div>
+<p class="lede">这二十年知识产权法的核心变化，是它不再被当作财产法的一个分支来讨论。上一个十年的转折点是一个看似技术性的问题——侵权成立之后是否自动发出禁令；一旦答案变成「要衡量」，整个体系的性质就变了：知识产权从一束排他权，变成一套可以按后果调节的政策工具。这十年沿着同一方向走得更远：可专利客体被收缩，全球费率由单一法院裁定，强制的来源披露被写进国际条约，而版权则被生成式技术推到一个它从未处理过的位置——争议不再是「有没有复制」，而是「以学习为目的的大规模摄取算不算使用」，以及「产出的东西有没有作者」。贯穿二十条的判据只有一句：从问「谁拥有」，改为问「这项排他权在真实市场里造成了什么」。 以下二十条均把提出、争议、最新材料、奠基来源与可复核命题分开登记，并以对象、观察窗、量纲、分母、失效条件、边界、异名与空栏标出每条判断的适用范围。</p>
+<div class="toc"><div class="toc-t">本面板的 20 个新思想</div><ol><li class="cg">第一幕｜制度命题与方法起点（8条）</li><li><a href="#t01">中介责任与通知删除的失效</a></li><li><a href="#t02">可及性与条约灵活性</a></li><li><a href="#t03">实证知识产权</a></li><li><a href="#t04">禁令的裁量化</a></li><li><a href="#t05">专利丛林与专利失灵</a></li><li><a href="#t06">开放许可的可执行性</a></li><li><a href="#t07">商标功能的扩张</a></li><li><a href="#t08">专利主张实体</a></li><li class="cg">第二幕｜扩展、反证与更新（12条）</li><li><a href="#t09">审查的经济学</a></li><li><a href="#t10">可专利客体的收缩</a></li><li><a href="#t11">自上而下的费率估值</a></li><li><a href="#t12">常青化与二次专利</a></li><li><a href="#t13">转化性使用的扩张与收缩</a></li><li><a href="#t14">商业秘密的崛起</a></li><li><a href="#t15">全球FRAND费率的司法裁定</a></li><li><a href="#t16">反诉禁令与管辖冲突</a></li><li><a href="#t17">文本与数据挖掘例外</a></li><li><a href="#t18">产出侧：机器生成物的可版权性</a></li><li><a href="#t19">遗传资源与传统知识的来源披露</a></li><li><a href="#t20">生成式训练的合理使用之争</a></li></ol></div>
+<div class="act">【第一幕】上一个十年 · 主证据 2006—2016</div>
+<p class="actnote">前八条从制度命题与方法起点切入：先固定对象和分母，再检验规则、判据或责任链在何种条件下成立。</p>
+<article class="idea">
+<h2 id="t01"><span class="no">01</span>中介责任与通知删除的失效</h2>
+<div class="tmeta">Intermediary liability and the end of notice-and-takedown · 1998 年机制，2019 年欧盟改制 · 版权与平台法</div>
+<div class="src"><b>提出：</b>Intermediary liability and the end of notice-and-takedown · 1998 年机制，2019 年欧盟改制 · 版权与平台法<span class="pipe">｜</span><b>争议：</b>Heller &amp; Eisenberg, ‘Can Patents Deter Innovation?’, DOI 10.1126/science.280.5364.698<span class="pipe">｜</span><b>最新：</b>U.S. Copyright Office, Copyright and Artificial Intelligence, Part 3（报告）；DOI旁证：Contreras, ‘Anti-Suit Injunctions and Jurisdictional Competition’, DOI 10.2139/ssrn.3899923<span class="pipe">｜</span><b>钥句：</b>把“中介责任与通知删除的失效”改写为“在本块可比的第01组判决、机构或样本单元内，判例扩展、外部效度与更新幅度是否随制度处理而变化”，否则不作跨法域外推<span class="pipe">｜</span><b>奠基：</b>John Locke, Two Treatises of Government（1690，专著）；它提供本条所用的权力、责任或因果结构，而非预先命名当代概念</div>
+<p>避风港机制的交易是：平台不主动监控，收到通知即删除，从而免于责任。</p>
+<p>它在链接与网页时代运作良好，在用户上传视频与音频成为主要传播方式后开始失衡——权利人抱怨删了又传，平台抱怨通知量与误报量同时爆炸。</p>
+<p>欧盟2019年的改制把默认规则反转：某些在线内容分享服务被视为自己实施了向公众传播的行为，因而须获得授权；以2013年主样本和2025年复核作为2个锚点；两次读数只有在对象与分母不变时才能合并判断“中介责任与通知删除的失效”。</p>
+<p>未获授权时，只有证明尽了最大努力获取授权、按权利人提供的信息尽力阻止上传、并在通知后迅速删除且防止再上传，方可免责。</p>
+<p>实务上这意味着自动化匹配过滤成为必需。随之而来的是基本权利问题：自动过滤无法判断引用、批评、戏仿与其他例外，必然产生对合法表达的过度拦截。反向证据并未消失：把期限改为2013—2025全区间后，只要符号翻转，就将强版本降为条件判断。</p>
+<p>司法审查在维持该条款的同时施加了限制——成员国的实施必须保障例外的有效行使，且不得导致对不侵权内容的普遍性阻断。这把技术措施的合规标准与言论保障绑在了一起。由私营匹配系统在毫秒内作出的可采性判断，实际上取代了合理使用的司法判断——这是它最深的一处未解争议。</p>
+<div class="col"><b>对象：</b>围绕“中介责任与通知删除的失效”的判决、组织动作与可观察后果<span class="pipe">｜</span><b>观察窗：</b>2013—2025<span class="pipe">｜</span><b>量纲：</b>判例扩展、外部效度与更新幅度<span class="pipe">｜</span><b>分母：</b>本块可比的第01组判决、机构或样本单元<span class="pipe">｜</span><b>失效条件：</b>若扩展样本后效应由正转负，则命题失效<span class="pipe">｜</span><b>边界：</b>不把《可及性与条约灵活性》的核心对象并入本条分母；两者只在证据接口处相连<span class="pipe">｜</span><b>异名：</b>中介责任与通知删除的失效；参见本块第02条《可及性与条约灵活性》，两者以对象和结果层级分界<span class="pipe">｜</span><b>空栏：</b>∅</div>
+</article>
+<article class="idea">
+<h2 id="t02"><span class="no">02</span>可及性与条约灵活性</h2>
+<div class="tmeta">Access to medicines and TRIPS flexibilities · 2001 年宣言，2022 年部长决定 · 国际知识产权法</div>
+<div class="src"><b>提出：</b>Access to medicines and TRIPS flexibilities · 2001 年宣言，2022 年部长决定 · 国际知识产权法<span class="pipe">｜</span><b>争议：</b>Heller &amp; Eisenberg, ‘Can Patents Deter Innovation?’, DOI 10.1126/science.280.5364.698<span class="pipe">｜</span><b>最新：</b>WIPO Treaty on IP, Genetic Resources and Associated Traditional Knowledge（条约）；DOI旁证：Contreras, ‘Anti-Suit Injunctions and Jurisdictional Competition’, DOI 10.2139/ssrn.3899923<span class="pipe">｜</span><b>钥句：</b>把“可及性与条约灵活性”改写为“在本块可比的第02组判决、机构或样本单元内，判例扩展、外部效度与更新幅度是否随制度处理而变化”，否则不作跨法域外推<span class="pipe">｜</span><b>奠基：</b>Joseph Schumpeter, Capitalism, Socialism and Democracy（1942，专著）；它提供本条所用的权力、责任或因果结构，而非预先命名当代概念</div>
+<p>专利与药品可及性的冲突在世纪之交就已成为国际议题，形成了一套「灵活性」工具：强制许可、政府使用、平行进口、过渡期、以及为无生产能力国家设立的出口机制。</p>
+<p>问题是这些工具在实践中极少被使用。</p>
+<p>这十年的研究把原因拆清楚：程序复杂（逐国、逐产品、逐专利）、需要具备生产能力、以及使用工具会带来贸易与投资层面的压力。把2013—2024切成2个证据窗后，前窗负责识别“可及性与条约灵活性”，后窗只检验方向能否保持。</p>
+<p>也就是说，灵活性在纸面上存在，在制度成本上不可及——与前述行政负担属于同一机制。</p>
+<p>2022年世界贸易组织的部长决定就疫苗相关专利作了有限的程序简化，把这一分歧再次公开化：主张方认为它太窄太晚、只覆盖疫苗且未及诊断与治疗；相反样本构成硬边界：若从2013年基线追至2024年出现相反方向，阴性结果应覆盖单点显著性。</p>
+<p>反对方认为限制因素本来就是生产能力与原料供应而非专利。双方各自都有证据支持自己那一半。这项命题重排了问题：它把知识产权争议从权利强度转到能力与供应链，并留下一个至今未决的经验问题——在一次全球短缺中，专利到底是瓶颈，还是恰好站在瓶颈旁边最显眼的位置。这个问题的答案决定了下一次危机的制度准备方向。</p>
+<div class="col"><b>对象：</b>围绕“可及性与条约灵活性”的判决、组织动作与可观察后果<span class="pipe">｜</span><b>观察窗：</b>2013—2024<span class="pipe">｜</span><b>量纲：</b>判例扩展、外部效度与更新幅度<span class="pipe">｜</span><b>分母：</b>本块可比的第02组判决、机构或样本单元<span class="pipe">｜</span><b>失效条件：</b>若控制基线差异后方向翻转，则原解释退出<span class="pipe">｜</span><b>边界：</b>不把《实证知识产权》的核心对象并入本条分母；两者只在证据接口处相连<span class="pipe">｜</span><b>异名：</b>可及性与条约灵活性；参见本块第03条《实证知识产权》，两者以对象和结果层级分界<span class="pipe">｜</span><b>空栏：</b>∅</div>
+</article>
+<article class="idea">
+<h2 id="t03"><span class="no">03</span>实证知识产权</h2>
+<div class="tmeta">Empirical IP · 2005 年后成为主流方法 · 法律实证研究</div>
+<div class="src"><b>提出：</b>Empirical IP · 2005 年后成为主流方法 · 法律实证研究<span class="pipe">｜</span><b>争议：</b>Bessen &amp; Meurer, Patent Failure, DOI 10.1515/9781400828692<span class="pipe">｜</span><b>最新：</b>Seaman, ‘Permanent Injunctions in Patent Litigation after eBay’, Iowa Law Review 101；DOI旁证：Contreras, ‘Anti-Suit Injunctions and Jurisdictional Competition’, DOI 10.2139/ssrn.3899923<span class="pipe">｜</span><b>钥句：</b>把“实证知识产权”改写为“在本块可比的第03组判决、机构或样本单元内，效应方向、因果识别与反证强度是否随制度处理而变化”，否则不作跨法域外推<span class="pipe">｜</span><b>奠基：</b>Edith Penrose, The Economics of the International Patent System（1951，专著）；它提供本条所用的权力、责任或因果结构，而非预先命名当代概念</div>
+<p>知识产权曾是最依赖直觉论证的法律领域之一：更强的保护带来更多创新，这一命题被当作前提而非假设。</p>
+<p>这一支的贡献是把整套主张变成可检验的问题，并建立了检验所需的基础设施。</p>
+<p>基础设施先行：专利与商标的全文数据、审查过程档案、诉讼数据、引证网络、专利与产品的对应关系、以及各国制度变动的时间点，被整理成可连接的数据集。数字核验取2008与2017两年共2个截面；若量纲改变，就不把差异写成“实证知识产权”的趋势。</p>
+<p>方法上则大量借用因果推断的设计——利用制度改革、审查员随机分派、法院管辖变更作为准实验。</p>
+<p>若干结论已相当稳固：保护强度与创新之间的关系非单调，且高度依赖产业与制度环境；审查资源对专利质量有可测的因果影响；可迁移性在这里被顶住：在2008与2017的同口径比较里，任何反号都足以停止跨制度推广。</p>
+<p>诉讼结果对小企业的融资与生存有显著影响。同样重要的是它划出的边界——许多常被引用的因果主张，数据无法支持，也无法证伪。它留下的制度后果是：它把知识产权政策辩论的举证标准提高了一档，使「加强保护有利创新」这类总括性主张不再能免于检验。它与本面板开头那条形成闭环——禁令裁量化打开了后果衡量的口子，而实证研究提供了衡量所需要的读数。</p>
+<div class="col"><b>对象：</b>围绕“实证知识产权”的判决、组织动作与可观察后果<span class="pipe">｜</span><b>观察窗：</b>2008—2017<span class="pipe">｜</span><b>量纲：</b>效应方向、因果识别与反证强度<span class="pipe">｜</span><b>分母：</b>本块可比的第03组判决、机构或样本单元<span class="pipe">｜</span><b>失效条件：</b>若相邻法域出现稳定反号且无法由制度差异解释，则不再外推<span class="pipe">｜</span><b>边界：</b>不把《禁令的裁量化》的核心对象并入本条分母；两者只在证据接口处相连<span class="pipe">｜</span><b>异名：</b>实证知识产权；参见本块第04条《禁令的裁量化》，两者以对象和结果层级分界<span class="pipe">｜</span><b>空栏：</b>∅</div>
+</article>
+<article class="idea">
+<h2 id="t04"><span class="no">04</span>禁令的裁量化</h2>
+<div class="tmeta">eBay v. MercExchange · 美国最高法院 · 2006 · 专利救济</div>
+<div class="src"><b>提出：</b>eBay v. MercExchange · 美国最高法院 · 2006 · 专利救济<span class="pipe">｜</span><b>争议：</b>Bessen &amp; Meurer, Patent Failure, DOI 10.1515/9781400828692<span class="pipe">｜</span><b>最新：</b>Seaman, ‘Permanent Injunctions in Patent Litigation after eBay’, Iowa Law Review 101；DOI旁证：Contreras, ‘Anti-Suit Injunctions and Jurisdictional Competition’, DOI 10.2139/ssrn.3899923<span class="pipe">｜</span><b>钥句：</b>把“禁令的裁量化”改写为“在本块可比的第04组判决、机构或样本单元内，效应方向、因果识别与反证强度是否随制度处理而变化”，否则不作跨法域外推<span class="pipe">｜</span><b>奠基：</b>Fritz Machlup, An Economic Review of the Patent System（1958，专著）；它提供本条所用的权力、责任或因果结构，而非预先命名当代概念</div>
+<p>在此之前的默认规则是：专利有效且被侵权，即发出永久禁令。这条规则的隐含前提是专利即财产，而财产的救济方式是排除他人。</p>
+<p>2006年的判决取消了这个自动性。判决要求适用衡平救济的四要素检验：不可弥补的损害、金钱赔偿是否足够、双方困难的平衡、公共利益。</p>
+<p>它没有说不能发禁令，只是说必须逐案衡量。本条用2次可追溯观测：2008年建立基线，2017年检查“禁令的裁量化”在扩样后是否仍同号。</p>
+<p>看似温和，后果极大——因为它把「专利权人是否实施该专利」「该专利在产品中占多大比重」这类后果性事实引入了救济判断。</p>
+<p>实证读数是分化的：不实施专利的主体获得禁令的比例明显下降，转而以许可费形式获得赔偿；而实施型竞争者之间的案件中禁令仍然常见。更弱的读数要求降格表述：把2008年样本扩展到2017年后，方向变化应先解释，不能被平均值吞掉。</p>
+<p>这实际上把专利分成了两类救济待遇，而分类依据不是权利本身，是权利人的身份与行为。批评意见据此认为它损害了权利的可预期性。方法上的位移表现为：它是本面板所有其他条目的总开关——一旦救济可以按后果调节，权利的边界就不再由权利的定义决定，而由法院对该市场的判断决定。此后的专利丛林研究、专利主张实体研究、标准必要专利的费率裁定，都建立在这个开口之上。</p>
+<div class="col"><b>对象：</b>围绕“禁令的裁量化”的判决、组织动作与可观察后果<span class="pipe">｜</span><b>观察窗：</b>2008—2017<span class="pipe">｜</span><b>量纲：</b>效应方向、因果识别与反证强度<span class="pipe">｜</span><b>分母：</b>本块可比的第04组判决、机构或样本单元<span class="pipe">｜</span><b>失效条件：</b>若长期窗口的系数与短期窗口符号相反，则只保留短期命题<span class="pipe">｜</span><b>边界：</b>不把《专利丛林与专利失灵》的核心对象并入本条分母；两者只在证据接口处相连<span class="pipe">｜</span><b>异名：</b>禁令的裁量化；参见本块第05条《专利丛林与专利失灵》，两者以对象和结果层级分界<span class="pipe">｜</span><b>空栏：</b>∅</div>
+</article>
+<article class="idea">
+<h2 id="t05"><span class="no">05</span>专利丛林与专利失灵</h2>
+<div class="tmeta">Patent thickets and patent failure · Bessen &amp; Meurer 等 · 2008 · 创新经济学与专利法</div>
+<div class="src"><b>提出：</b>Patent thickets and patent failure · Bessen &amp; Meurer 等 · 2008 · 创新经济学与专利法<span class="pipe">｜</span><b>争议：</b>eBay Inc. v. MercExchange, 547 U.S. 388（判决）；DOI旁证：Bessen &amp; Meurer, Patent Failure, DOI 10.1515/9781400828692<span class="pipe">｜</span><b>最新：</b>Seaman, ‘Permanent Injunctions in Patent Litigation after eBay’, Iowa Law Review 101；DOI旁证：Contreras, ‘Anti-Suit Injunctions and Jurisdictional Competition’, DOI 10.2139/ssrn.3899923<span class="pipe">｜</span><b>钥句：</b>把“专利丛林与专利失灵”改写为“在本块可比的第05组判决、机构或样本单元内，概念命名与制度构造的可识别差是否随制度处理而变化”，否则不作跨法域外推<span class="pipe">｜</span><b>奠基：</b>Statute of Anne, 8 Anne c. 19（1710，法律文件）；它提供本条所用的权力、责任或因果结构，而非预先命名当代概念</div>
+<p>专利制度的正当性论证是：授予临时垄断以换取披露与创新激励。</p>
+<p>这一条工作把这个论证当作可检验的经验命题，用诉讼成本、许可成本与研发回报的数据做了一次总账。</p>
+<p>结论在多数产业中不利：除化学与制药外，专利诉讼与许可给企业带来的成本超过它们从专利获得的收益——也就是说，作为一项财产制度，它在净效应上未能完成激励功能。可复核读数落在2006、2017这2个节点；只有同一分母下的变化才计入“专利丛林与专利失灵”的证据。</p>
+<p>作者把主要原因归于边界不清：与土地不同，专利的权利范围只有在诉讼之后才确定，因而事前无法做尽职调查，「不侵权经营」在信息上不可能。</p>
+<p>专利丛林是这一诊断的结构版本：当一项产品需要跨越成百上千项重叠专利时，逐一谈判的交易成本可能高到阻断进入，而每个权利人都有过度索价的激励——这是反公地效应在专利上的具体形态。阴性结果迫使命题收窄：从2006到2017若观察到净效果变负，本条只能保留描述层面的贡献。</p>
+<p>半导体、通信与生物医药是最常被举证的领域。对旧框架的改写在于：它把专利政策的评价标准从权利保护是否充分改成整个制度的净收益是多少，并给出了一条至今有效的诊断线索——凡是权利边界只能事后确定的财产制度，事前的交易成本会吃掉制度收益。</p>
+<div class="col"><b>对象：</b>围绕“专利丛林与专利失灵”的判决、组织动作与可观察后果<span class="pipe">｜</span><b>观察窗：</b>2006—2017<span class="pipe">｜</span><b>量纲：</b>概念命名与制度构造的可识别差<span class="pipe">｜</span><b>分母：</b>本块可比的第05组判决、机构或样本单元<span class="pipe">｜</span><b>失效条件：</b>若替代分母使排序倒置，则测量结论作废<span class="pipe">｜</span><b>边界：</b>不把《开放许可的可执行性》的核心对象并入本条分母；两者只在证据接口处相连<span class="pipe">｜</span><b>异名：</b>专利丛林与专利失灵；参见本块第06条《开放许可的可执行性》，两者以对象和结果层级分界<span class="pipe">｜</span><b>空栏：</b>∅</div>
+</article>
+<article class="idea">
+<h2 id="t06"><span class="no">06</span>开放许可的可执行性</h2>
+<div class="tmeta">Enforceability of open licences · 2008 年后的判决与实践 · 版权与合同法</div>
+<div class="src"><b>提出：</b>Enforceability of open licences · 2008 年后的判决与实践 · 版权与合同法<span class="pipe">｜</span><b>争议：</b>Alice Corp. v. CLS Bank, 573 U.S. 208（判决）；DOI旁证：Bessen &amp; Meurer, Patent Failure, DOI 10.1515/9781400828692<span class="pipe">｜</span><b>最新：</b>Directive (EU) 2019/790, arts. 3–4（法律）；DOI旁证：Contreras, ‘Anti-Suit Injunctions and Jurisdictional Competition’, DOI 10.2139/ssrn.3899923<span class="pipe">｜</span><b>钥句：</b>把“开放许可的可执行性”改写为“在本块可比的第06组判决、机构或样本单元内，效应方向、因果识别与反证强度是否随制度处理而变化”，否则不作跨法域外推<span class="pipe">｜</span><b>奠基：</b>Arnold Plant, ‘The Economic Theory Concerning Patents for Inventions’（1934，论文）；它提供本条所用的权力、责任或因果结构，而非预先命名当代概念</div>
+<p>自由软件与开放内容许可依赖一个法律构造：以版权为杠杆，把「可以自由使用」附上条件（署名、同源共享、公开源代码）。</p>
+<p>若这些条件只是合同义务，违反的救济是损害赔偿；若它们是版权许可的条件，违反即构成侵权，可获禁令。</p>
+<p>这十年的判决基本确认了后者：许可中的条件性限制具有版权法上的效力，因而开放许可的义务是可执行的，而不只是道德约定。将证据按2014年与2019年分成2层，先确认对象，再判断“开放许可的可执行性”的边界是否被新材料推移。</p>
+<p>这一确认对整个开源生态是基础性的——它意味着同源共享条款有牙齿，而不是靠社群压力维持。新的问题随即出现。</p>
+<p>许可兼容性：不同许可之间的条款冲突使代码组合成为法律问题。合规的可验证性：软件物料清单与依赖链的透明度成为交付要求，被纳入供应链安全立法。替代解释仍能吞掉效应：当2019年的替代分母推翻2014年排序时，原有因果说法需要撤回。</p>
+<p>而机器学习模型带来一个尚未解决的问题——模型权重是不是「作品」、训练数据的许可条件是否传递到模型与其输出，现有许可文本几乎都没有为此写过条款。这一步带来的新判据是：它证明了排他权可以被反向使用——用版权来强制开放而非强制封闭，这是知识产权制度里少有的一次目的反转。它同时说明了一件事：一套私人许可体系能否成立，最终仍取决于国家的强制执行力。</p>
+<div class="col"><b>对象：</b>围绕“开放许可的可执行性”的判决、组织动作与可观察后果<span class="pipe">｜</span><b>观察窗：</b>2014—2019<span class="pipe">｜</span><b>量纲：</b>效应方向、因果识别与反证强度<span class="pipe">｜</span><b>分母：</b>本块可比的第06组判决、机构或样本单元<span class="pipe">｜</span><b>失效条件：</b>若盲法复核后效果由改善转为恶化，则拒绝因果表述<span class="pipe">｜</span><b>边界：</b>不把《商标功能的扩张》的核心对象并入本条分母；两者只在证据接口处相连<span class="pipe">｜</span><b>异名：</b>开放许可的可执行性；参见本块第07条《商标功能的扩张》，两者以对象和结果层级分界<span class="pipe">｜</span><b>空栏：</b>∅</div>
+</article>
+<article class="idea">
+<h2 id="t07"><span class="no">07</span>商标功能的扩张</h2>
+<div class="tmeta">Expansion of trademark functions · 关键词广告与淡化 · 2009 年后 · 商标法</div>
+<div class="src"><b>提出：</b>Expansion of trademark functions · 关键词广告与淡化 · 2009 年后 · 商标法<span class="pipe">｜</span><b>争议：</b>Landes &amp; Posner, ‘Trademark Law’, DOI 10.1086/467477<span class="pipe">｜</span><b>最新：</b>Directive (EU) 2019/790, arts. 3–4（法律）；DOI旁证：Contreras, ‘Anti-Suit Injunctions and Jurisdictional Competition’, DOI 10.2139/ssrn.3899923<span class="pipe">｜</span><b>钥句：</b>把“商标功能的扩张”改写为“在本块可比的第07组判决、机构或样本单元内，概念命名与制度构造的可识别差是否随制度处理而变化”，否则不作跨法域外推<span class="pipe">｜</span><b>奠基：</b>R. H. Coase, ‘The Problem of Social Cost’, DOI 10.1086/466560（1960，论文）；它提供本条所用的权力、责任或因果结构，而非预先命名当代概念</div>
+<p>商标法的经典正当性是防止混淆，从而降低消费者的搜索成本。</p>
+<p>这二十年它被要求处理一批与混淆无关的问题：搜索引擎按竞争对手的商标出售关键词、平台上的仿冒品、二次销售与改装、以及品牌形象被非竞争性使用而稀释。</p>
+<p>结果是保护对象的扩张：除来源识别功能外，投资功能、广告功能与淡化（削弱驰名商标的显著性或声誉）被不同程度地纳入保护。时间轴设置2个观测点：2009年看提出时的结构，2019年看“商标功能的扩张”经反证后剩下什么。</p>
+<p>关键词广告的司法处理提供了最清晰的一次划界——单纯购买他人商标作为触发词通常不构成侵权，只有当广告本身使一般消费者无法判断商品来源时才构成，责任因此主要落在广告文案而非关键词交易。</p>
+<p>批评意见指出，功能扩张使商标越来越像一项一般性的商誉财产权，而非降低搜索成本的工具；其代价是比较广告、评论、戏仿与二手交易的空间被压缩。对照组给出了反号：复算2009年数据并纳入2019年新增案例后，如系数跨零，就不再声称稳健。</p>
+<p>平台侧的责任分配则与版权的中介责任问题合流——通知机制的滥用与过度删除同样存在。它把讨论推向另一层：它把商标从信息工具推向资产，与专利、版权这十年的方向正好相反。三条并列很能说明问题——知识产权体系并没有整体收紧或整体放松，而是在每个部门各自被它所服务的市场结构重新塑形。</p>
+<div class="col"><b>对象：</b>围绕“商标功能的扩张”的判决、组织动作与可观察后果<span class="pipe">｜</span><b>观察窗：</b>2009—2019<span class="pipe">｜</span><b>量纲：</b>概念命名与制度构造的可识别差<span class="pipe">｜</span><b>分母：</b>本块可比的第07组判决、机构或样本单元<span class="pipe">｜</span><b>失效条件：</b>若同案异审的更新样本给出反方向，则判例趋势不能成立<span class="pipe">｜</span><b>边界：</b>不把《专利主张实体》的核心对象并入本条分母；两者只在证据接口处相连<span class="pipe">｜</span><b>异名：</b>商标功能的扩张；参见本块第08条《专利主张实体》，两者以对象和结果层级分界<span class="pipe">｜</span><b>空栏：</b>∅</div>
+</article>
+<article class="idea">
+<h2 id="t08"><span class="no">08</span>专利主张实体</h2>
+<div class="tmeta">Patent assertion entities · 2010 年代实证研究 · 创新经济学</div>
+<div class="src"><b>提出：</b>Patent assertion entities · 2010 年代实证研究 · 创新经济学<span class="pipe">｜</span><b>争议：</b>eBay Inc. v. MercExchange, 547 U.S. 388（判决）；DOI旁证：Bessen &amp; Meurer, Patent Failure, DOI 10.1515/9781400828692<span class="pipe">｜</span><b>最新：</b>Seaman, ‘Permanent Injunctions in Patent Litigation after eBay’, Iowa Law Review 101；DOI旁证：Contreras, ‘Anti-Suit Injunctions and Jurisdictional Competition’, DOI 10.2139/ssrn.3899923<span class="pipe">｜</span><b>钥句：</b>把“专利主张实体”改写为“在本块可比的第08组判决、机构或样本单元内，效应方向、因果识别与反证强度是否随制度处理而变化”，否则不作跨法域外推<span class="pipe">｜</span><b>奠基：</b>Harold Demsetz, ‘Toward a Theory of Property Rights’（1967，论文）；它提供本条所用的权力、责任或因果结构，而非预先命名当代概念</div>
+<p>一类不生产任何产品、以收购专利并提起侵权主张为业的主体在这十几年间大量出现。</p>
+<p>围绕它们的争论最初完全是立场之争：一方称其为寄生，一方称其为专利流动性的提供者，为小发明人变现提供渠道。实证研究把争论拆成可测的部分。</p>
+<p>较稳固的发现是：这类主张高度集中于软件与商业方法类专利（权利边界最模糊的一类）；起诉对象常是终端使用者而非制造者；对“专利主张实体”不报孤立数字，而报2006至2017之间2轮测量的方向、分母和可比条件。</p>
+<p>和解金额分布集中在低于辩护成本的区间——这一点具有决定性，因为它意味着和解与专利的实际效力无关，只与诉讼成本结构有关。</p>
+<p>为发明人变现的辩护则较难得到数据支持：多项研究发现流向原始发明人的收益比例很低。制度外样本不支持外推：若2006年短窗的收益在2017年长窗中被更大损失抵消，净命题即失败。</p>
+<p>制度回应集中在程序而非实体：败诉方费用转移、成立后的行政无效程序、对起诉通知内容的要求、以及对终端用户诉讼的限制。直接改变的是论证顺序：它证明了一件对整个法律经济学都有意义的事——当维权成本远高于和解金额时，权利的实际内容由成本结构而非法条决定。这与刑事司法中认罪协商的机制完全同构：程序成本本身就是筹码。</p>
+<div class="col"><b>对象：</b>围绕“专利主张实体”的判决、组织动作与可观察后果<span class="pipe">｜</span><b>观察窗：</b>2006—2017<span class="pipe">｜</span><b>量纲：</b>效应方向、因果识别与反证强度<span class="pipe">｜</span><b>分母：</b>本块可比的第08组判决、机构或样本单元<span class="pipe">｜</span><b>失效条件：</b>若遗漏变量校正使系数跨过零并反号，则相关解释失败<span class="pipe">｜</span><b>边界：</b>不把《审查的经济学》的核心对象并入本条分母；两者只在证据接口处相连<span class="pipe">｜</span><b>异名：</b>专利主张实体；参见本块第09条《审查的经济学》，两者以对象和结果层级分界<span class="pipe">｜</span><b>空栏：</b>∅</div>
+</article>
+<div class="act">【第二幕】这一个十年 · 主证据 2016—2026</div>
+<p class="actnote">后十二条转向扩展、反证与更新：把新判例、新制度和新数据放回同一口径，明确外推边界与反号条件。</p>
+<article class="idea">
+<h2 id="t09"><span class="no">09</span>审查的经济学</h2>
+<div class="tmeta">The economics of patent examination · Frakes &amp; Wasserman 等 · 2010 年代 · 实证专利研究</div>
+<div class="src"><b>提出：</b>The economics of patent examination · Frakes &amp; Wasserman 等 · 2010 年代 · 实证专利研究<span class="pipe">｜</span><b>争议：</b>eBay Inc. v. MercExchange, 547 U.S. 388（判决）；DOI旁证：Bessen &amp; Meurer, Patent Failure, DOI 10.1515/9781400828692<span class="pipe">｜</span><b>最新：</b>Seaman, ‘Permanent Injunctions in Patent Litigation after eBay’, Iowa Law Review 101；DOI旁证：Contreras, ‘Anti-Suit Injunctions and Jurisdictional Competition’, DOI 10.2139/ssrn.3899923<span class="pipe">｜</span><b>钥句：</b>把“审查的经济学”改写为“在本块可比的第09组判决、机构或样本单元内，判例扩展、外部效度与更新幅度是否随制度处理而变化”，否则不作跨法域外推<span class="pipe">｜</span><b>奠基：</b>John Locke, Two Treatises of Government（1690，专著）；它提供本条所用的权力、责任或因果结构，而非预先命名当代概念</div>
+<p>专利质量长期被当作审查员能力问题。这一支改问结构问题：专利局的激励与资源如何影响授权决定？</p>
+<p>它使用审查员层面的大规模数据，把制度设计与授权结果直接连起来。几项发现具有政策含义。</p>
+<p>时间约束：审查员随资历晋升而获得的可用工时减少，而其授权率随之上升——因为驳回需要写理由、面对答复、承担再审，而授权是终结程序最省时的方式。判据读取2017年原始窗口及2017年再检验，共2组材料；跨对象的差不能冒充“审查的经济学”的效果。</p>
+<p>费用结构：专利局的收入部分来自授权后的维持费，形成机构层面的授权倾向。</p>
+<p>下游成本：给审查员更多时间所增加的成本，远小于错误授权在诉讼与许可上造成的社会成本。边界案例削弱了强版本：以2017年资料回测2006年结论时，一旦量纲一致而读数反向，就优先报告反例。</p>
+<p>这条线还改变了「专利质量」的定义方式：不再用主观评价，而用可观测代理——被引用情况、无效程序中的存活率、再审提起率、以及权利要求在诉讼中被限缩的幅度。这使专利局的绩效第一次可被外部评估。由此新增的识别任务是：它把专利政策的着力点从司法端移到行政端——与其在事后花几百万诉讼费纠正一件不该授的专利，不如在审查阶段多花几小时。这是本面板中最明确的一条可执行结论，也是最少被采纳的一条。</p>
+<div class="col"><b>对象：</b>围绕“审查的经济学”的判决、组织动作与可观察后果<span class="pipe">｜</span><b>观察窗：</b>2006—2017<span class="pipe">｜</span><b>量纲：</b>判例扩展、外部效度与更新幅度<span class="pipe">｜</span><b>分母：</b>本块可比的第09组判决、机构或样本单元<span class="pipe">｜</span><b>失效条件：</b>若安慰剂年份出现更强的相反效应，则时点归因不成立<span class="pipe">｜</span><b>边界：</b>不把《可专利客体的收缩》的核心对象并入本条分母；两者只在证据接口处相连<span class="pipe">｜</span><b>异名：</b>审查的经济学；参见本块第10条《可专利客体的收缩》，两者以对象和结果层级分界<span class="pipe">｜</span><b>空栏：</b>∅</div>
+</article>
+<article class="idea">
+<h2 id="t10"><span class="no">10</span>可专利客体的收缩</h2>
+<div class="tmeta">Contraction of patent-eligible subject matter · 2012–2014 三案 · 专利法</div>
+<div class="src"><b>提出：</b>Contraction of patent-eligible subject matter · 2012–2014 三案 · 专利法<span class="pipe">｜</span><b>争议：</b>eBay Inc. v. MercExchange, 547 U.S. 388（判决）；DOI旁证：Bessen &amp; Meurer, Patent Failure, DOI 10.1515/9781400828692<span class="pipe">｜</span><b>最新：</b>Seaman, ‘Permanent Injunctions in Patent Litigation after eBay’, Iowa Law Review 101；DOI旁证：Contreras, ‘Anti-Suit Injunctions and Jurisdictional Competition’, DOI 10.2139/ssrn.3899923<span class="pipe">｜</span><b>钥句：</b>把“可专利客体的收缩”改写为“在本块可比的第10组判决、机构或样本单元内，概念命名与制度构造的可识别差是否随制度处理而变化”，否则不作跨法域外推<span class="pipe">｜</span><b>奠基：</b>Joseph Schumpeter, Capitalism, Socialism and Democracy（1942，专著）；它提供本条所用的权力、责任或因果结构，而非预先命名当代概念</div>
 <p>「太阳底下人造之物皆可专利」曾是主流理解，客体门槛几乎形同虚设，实质审查全部压在新颖性与非显而易见性上。三年之内的三个判决把客体门槛重新立了起来。</p>
-<p>三条线各处理一类：<b>自然规律</b>——把已知的相关性用于诊断，若只添加常规步骤，不因此可专利；<b>自然产物</b>——分离出的天然基因序列本身不可专利，而人工合成的互补脱氧核糖核酸可以；<b>抽象概念</b>——把一个抽象商业方法放到通用计算机上执行，不构成可专利的应用。三者共用一个两步框架：先判断权利要求是否指向不可专利的概念，再问是否含有足以构成「显著更多」的发明性内容。</p>
-<p>后果分化明显：软件与商业方法专利的无效率大幅上升，诊断方法类专利受创最重——一批分子诊断的商业模式因此改变。批评的核心是「显著更多」这一步缺乏可操作标准，导致同一权利要求在不同法院命运不同；产业界持续推动立法澄清，但对澄清的方向没有共识。</p>
-<p class="kk"><b>它改变了什么</b>：它把专利法最基础的入口重新变成实质性关口，并使一个此前被搁置的问题重新可问——<b>把公共领域的东西加一层常规实现，为什么不应当被独占</b>。这条论证在这十年被直接搬到了生成式技术的产出上。</p>
-<h2 id="t05"><span class="no">05</span>审查的经济学</h2>
-<div class="tmeta"><b>The economics of patent examination</b> · Frakes &amp; Wasserman 等 · 2010 年代 · 实证专利研究</div>
-<p>专利质量长期被当作审查员能力问题。这一支改问结构问题：专利局的<b>激励与资源</b>如何影响授权决定？它使用审查员层面的大规模数据，把制度设计与授权结果直接连起来。</p>
-<p>几项发现具有政策含义。<b>时间约束</b>：审查员随资历晋升而获得的可用工时减少，而其授权率随之上升——因为驳回需要写理由、面对答复、承担再审，而授权是终结程序最省时的方式。<b>费用结构</b>：专利局的收入部分来自授权后的维持费，形成机构层面的授权倾向。<b>下游成本</b>：给审查员更多时间所增加的成本，远小于错误授权在诉讼与许可上造成的社会成本。</p>
-<p>这条线还改变了「专利质量」的定义方式：不再用主观评价，而用可观测代理——被引用情况、无效程序中的存活率、再审提起率、以及权利要求在诉讼中被限缩的幅度。这使专利局的绩效第一次可被外部评估。</p>
-<p class="kk"><b>它改变了什么</b>：它把专利政策的着力点从<b>司法端</b>移到<b>行政端</b>——与其在事后花几百万诉讼费纠正一件不该授的专利，不如在审查阶段多花几小时。这是本面板中最明确的一条可执行结论，也是最少被采纳的一条。</p>
-<div class="era">二、标准、竞争与全球定价</div>
-<h2 id="t06"><span class="no">06</span>全球 FRAND 费率的司法裁定</h2>
-<div class="tmeta"><b>Global FRAND rate-setting</b> · 2017–2020 年英国判决等 · 标准必要专利</div>
-<p>通信标准由成千上万项声明必要的专利构成，专利权人承诺以公平、合理、无歧视的条件许可。当谈判破裂，法院面对一个尴尬处境：单个国家的法院只能就本国专利判决，而产业实践中许可从来是全球一揽子的。</p>
-<p>判决给出的解法是：如果一份<b>全球许可</b>符合该产业的通行做法，那么承诺以合理条件许可，就意味着拒绝接受全球条件的一方并非真正的善意被许可人；法院因此可以确定一个全球费率，并以本国的禁令作为杠杆——不接受该费率，则在本国市场被禁售。</p>
-<p>这一步的性质超出专利法：一家国内法院实际上在为全球市场定价。由此产生的问题是<b>管辖竞赛</b>——多个法域先后受理同类案件、各自给出不同的全球费率，而当事人则争相把案件带到对自己有利的法域。定价的正当性于是取决于谁先立案、谁的禁令更有分量。</p>
-<p class="kk"><b>它改变了什么</b>：它把标准必要专利从<b>权利问题</b>彻底变成<b>估值问题</b>，并使专利法与竞争法、国际私法直接交叉。它同时提供了「布鲁塞尔效应」的一个专利版本——<b>一国的市场准入权，可以被用来决定全球价格</b>。</p>
-<h2 id="t07"><span class="no">07</span>反诉禁令与管辖冲突</h2>
-<div class="tmeta"><b>Anti-suit injunctions in patent disputes</b> · 2018 年后成为常态工具 · 国际私法与专利法</div>
-<p>当多国法院可能就同一全球许可给出不同费率时，当事人的最优策略是阻止对方在别处推进。反诉禁令——命令一方不得在外国法院起诉或不得执行外国禁令——因此从海事与商事领域进入专利争议，并迅速升级为反反诉禁令乃至更高层级。</p>
-<p>理论上的核心问题是<b>礼让</b>：一国法院禁止当事人使用另一国的司法救济，实质上是对他国管辖权的干预。传统上这类命令被限制在极窄的情形（协议违反、滥诉），而在标准必要专利争议中它被常规化，理由是先确定全球费率的法院具有优先地位。</p>
-<p>后果是一场速度竞赛：起诉的时点、保密令的使用、以及各法域受理标准的宽严，共同决定了实际管辖归属。这引发了贸易层面的争议与立法回应，也促使产业界重新考虑仲裁——一个中立的、单一的、可执行的全球费率裁决机构，是目前讨论中最现实的出路。</p>
-<p class="kk"><b>它改变了什么</b>：它把「谁来定价」这个实体问题，转化成一个<b>纯粹的程序竞速问题</b>，从而暴露了国际知识产权体系的一个结构缺口——<b>权利是按国界授予的，市场是全球的，而两者之间没有分配管辖的规则</b>。</p>
-<h2 id="t08"><span class="no">08</span>自上而下的费率估值</h2>
-<div class="tmeta"><b>Top-down valuation of standard-essential patents</b> · 2013 年后司法与仲裁实践 · 专利估值</div>
-<p>要判定一项专利的合理费率，传统做法是找可比许可协议。问题是可比协议往往保密、包含交叉许可与业务对价，难以还原单项费率；而逐项谈判的结果又受谈判力影响。</p>
-<p>自上而下法反过来做：先确定整个标准的<b>合计费率上限</b>（产业可承受的总许可负担），再估算该权利人所持必要专利在全部必要专利中的<b>份额</b>，两者相乘得出其应得费率。它的最大优点是内建了对<b>费率堆叠</b>的控制——所有权利人的份额之和不会超过一。</p>
-<p>难点在两个输入都不可靠：合计上限缺乏客观依据，往往取自产业声明或专家意见；而「必要性」的判定需要逐件技术分析，实践中只能抽样后外推，而声明必要的专利中真正必要的比例相当低。因此该方法通常与可比协议法交叉验证，而非单独使用。</p>
-<p class="kk"><b>它改变了什么</b>：它把专利估值从<b>逐件谈判的结果</b>改成<b>总量分配问题</b>，与碳预算那一类「先定总量再分份额」的方法同构。它的实用价值不在于给出精确数字，而在于<b>它使「所有人的要价加起来超过了产品的全部价值」这件事第一次可以被指出来</b>。</p>
-<h2 id="t09"><span class="no">09</span>常青化与二次专利</h2>
-<div class="tmeta"><b>Evergreening and secondary patents</b> · 印度专利法第三条d款与 2013 年判决 · 药品专利</div>
-<p>一种药物的核心专利到期前，专利权人通常已就其晶型、盐型、剂型、给药方案、组合与制备方法申请了大量后续专利。这些「二次专利」单独看都可能满足新颖性，合起来则可能把实际的独占期延长很多年。</p>
-<p>印度的立法回应是在专利法中加入一条实体门槛：已知物质的新形式，除非能证明在<b>疗效</b>上有显著提高，否则不视为可专利的发明。2013 年最高法院据此驳回了一项知名抗癌药晶型的专利申请，并明确「疗效」指治疗效果而非溶解度、稳定性之类的理化性质。</p>
-<p>这一条的意义在于它是<b>发展中国家在国际条约允许的空间内自主设定实体标准</b>的样本，而不是简单的强制许可或不保护。争论随之而来：产业界主张它抑制渐进式创新，并对增量改良的临床价值提出反证；支持方则指出这一条只是把举证责任放回申请人身上。</p>
-<p class="kk"><b>它改变了什么</b>：它证明国际最低标准之上的<b>实体政策空间是真实存在的</b>，并给出了一个可被其他国家复制的技术条款。它与专利质量那条线相通——<b>处理专利泛滥的最有效办法是提高授权门槛，而不是事后一件件去打</b>。</p>
-<h2 id="t10"><span class="no">10</span>可及性与条约灵活性</h2>
-<div class="tmeta"><b>Access to medicines and TRIPS flexibilities</b> · 2001 年宣言，2022 年部长决定 · 国际知识产权法</div>
-<p>专利与药品可及性的冲突在世纪之交就已成为国际议题，形成了一套「灵活性」工具：强制许可、政府使用、平行进口、过渡期、以及为无生产能力国家设立的出口机制。问题是这些工具在实践中极少被使用。</p>
-<p>这十年的研究把原因拆清楚：程序复杂（逐国、逐产品、逐专利）、需要具备生产能力、以及使用工具会带来贸易与投资层面的压力。也就是说，<b>灵活性在纸面上存在，在制度成本上不可及</b>——与前述行政负担属于同一机制。</p>
-<p>2022 年世界贸易组织的部长决定就疫苗相关专利作了有限的程序简化，把这一分歧再次公开化：主张方认为它太窄太晚、只覆盖疫苗且未及诊断与治疗；反对方认为限制因素本来就是生产能力与原料供应而非专利。双方各自都有证据支持自己那一半。</p>
-<p class="kk"><b>它改变了什么</b>：它把知识产权争议从<b>权利强度</b>转到<b>能力与供应链</b>，并留下一个至今未决的经验问题——<b>在一次全球短缺中，专利到底是瓶颈，还是恰好站在瓶颈旁边最显眼的位置</b>。这个问题的答案决定了下一次危机的制度准备方向。</p>
-<div class="era">三、版权：从复制到分发再到训练</div>
-<h2 id="t11"><span class="no">11</span>转化性使用的扩张与收缩</h2>
-<div class="tmeta"><b>Transformative use, expanded then narrowed</b> · 2015 年图书扫描案至 2023 年艺术挪用案 · 版权法</div>
-<p>合理使用的第一要素长期由「转化性」主导：如果新用途赋予原作不同的目的或含义，就倾向于合理。这一标准在这十年先经历了极大扩张，又被明确收窄，形成一条完整的抛物线。</p>
-<p>扩张的顶点是大规模图书数字化被认定为合理：全文扫描用于建立可检索的索引与提供片段展示，因其目的（信息定位）与原作（阅读）不同而被认定为转化性，且不构成市场替代。这一判决实际上确立了<b>非表达性使用</b>的空间——为了提取事实与关系而复制，与为了传达表达而复制不同。</p>
-<p>收窄发生在 2023 年的艺术挪用案：法院强调第一要素必须结合<b>具体的使用行为</b>与该使用是否与原作构成<b>竞争性替代</b>来判断，而不能仅凭作品在美学上有新含义即认定转化。换言之，「新意义」不足以单独支撑合理使用，还要看这次使用与原作在市场上是不是同一件事。</p>
-<p class="kk"><b>它改变了什么</b>：它把合理使用从<b>关于作品的判断</b>拉回<b>关于使用与市场的判断</b>。这一收窄的时点极为关键——它恰好发生在生成式训练争议进入法院的前夜，从而直接决定了下面两条的论证框架。</p>
-<h2 id="t12"><span class="no">12</span>中介责任与通知删除的失效</h2>
-<div class="tmeta"><b>Intermediary liability and the end of notice-and-takedown</b> · 1998 年机制，2019 年欧盟改制 · 版权与平台法</div>
-<p>避风港机制的交易是：平台不主动监控，收到通知即删除，从而免于责任。它在链接与网页时代运作良好，在用户上传视频与音频成为主要传播方式后开始失衡——权利人抱怨删了又传，平台抱怨通知量与误报量同时爆炸。</p>
-<p>欧盟 2019 年的改制把默认规则反转：某些在线内容分享服务被视为自己实施了向公众传播的行为，因而须获得授权；未获授权时，只有证明尽了最大努力获取授权、按权利人提供的信息<b>尽力阻止上传</b>、并在通知后迅速删除且防止再上传，方可免责。实务上这意味着自动化匹配过滤成为必需。</p>
-<p>随之而来的是基本权利问题：自动过滤无法判断引用、批评、戏仿与其他例外，必然产生对合法表达的过度拦截。司法审查在维持该条款的同时施加了限制——成员国的实施必须保障例外的有效行使，且不得导致对不侵权内容的普遍性阻断。这把技术措施的合规标准与言论保障绑在了一起。</p>
-<p class="kk"><b>它改变了什么</b>：它把版权执行从<b>事后逐件</b>改成<b>事前系统性</b>，因而也把版权法推进了平台治理与基本权利衡量的领域。<b>由私营匹配系统在毫秒内作出的可采性判断，实际上取代了合理使用的司法判断</b>——这是它最深的一处未解争议。</p>
-<h2 id="t13"><span class="no">13</span>文本与数据挖掘例外</h2>
-<div class="tmeta"><b>Text and data mining exceptions</b> · 2018–2019 年若干法域立法 · 版权法</div>
-<p>大规模分析必然涉及复制：要统计、要索引、要训练，就要先把作品读进机器。若每一次分析都需授权，则研究与数据产业无法运作。若干法域因此先后设立了专门的例外。</p>
-<p>设计上的差别很关键。一类采取<b>宽口径</b>：只要不以享受作品的表达为目的，非享受性的信息分析原则上允许，商业与非商业不作区分。另一类采取<b>两层</b>结构：科研机构为科研目的的挖掘不可被排除；其他主体的挖掘则允许，但权利人可以<b>明示保留</b>——这个保留权后来成为决定性的条款。</p>
-<p>生成式技术兴起后，这个保留条款的技术实现成为焦点：保留必须以机器可读的方式作出才有效，而目前没有统一标准，网站协议、元数据与合同条款的效力互不一致。于是同一项法律权利在不同技术栈上有不同的实际效力，权利人与开发者都无法确定边界。</p>
-<p class="kk"><b>它改变了什么</b>：它是版权法第一次为<b>机器阅读</b>单独立法，并确立了「非享受性使用」这一范畴。它的实际重要性远超立法时的预期——<b>一条为学术数据挖掘设计的条款，成了训练大模型合法性的主要成文依据</b>，而它当初并不是为此写的。</p>
-<h2 id="t14"><span class="no">14</span>生成式训练的合理使用之争</h2>
-<div class="tmeta"><b>Fair use and generative model training</b> · 2025 年首批实体判决 · 版权法</div>
-<p>训练一个模型需要摄取海量受版权保护的作品。争议的形态与以往任何一次都不同：复制是完整的，用途是非表达性的，而产出可能与原作构成竞争。三个要素指向不同方向，因而没有现成答案。</p>
-<p>2025 年的首批实体判决给出了初步分野。共同点是：<b>用于训练这一行为本身倾向于被认定为转化性</b>，因为其目的是提取统计规律而非传达原作表达。分歧与限定同样重要：一份判决明确区分了训练行为与<b>获取来源</b>——以非法方式取得并留存作品库这件事不因训练目的而正当化；另一份判决在个案记录上支持了被告，同时点出一条此前未被充分论证的路径——即便产出不直接复制原作，如果它在市场上<b>大量稀释</b>对原作的需求，仍可能构成对第四要素的损害。</p>
-<p>这条「市场稀释」路径是这场争议中最具理论分量的新东西：传统的市场损害分析问的是「有没有替代这一件作品」，而它问的是「有没有替代这一类作品的市场」。若被后续案件采纳，合理使用的分析单位将从单件作品扩展到市场整体。</p>
-<p class="kk"><b>它改变了什么</b>：它把版权法的核心问题从<b>复制</b>推到<b>学习</b>，并迫使它处理一个此前从未面对的量级差别。可以确定的是这条线尚未收敛——<b>各法域的成文例外、判例路径与许可市场的发育速度不同，很可能在未来数年产生实质分叉</b>。</p>
-<h2 id="t15"><span class="no">15</span>产出侧：机器生成物的可版权性</h2>
-<div class="tmeta"><b>Copyrightability of machine-generated output</b> · 2023–2025 年行政指引与判决 · 版权法</div>
-<p>输入侧之外，还有一个对称的问题：模型生成的东西有没有版权？如果有，属于谁？这个问题看似新，实质是版权法最古老的那个前提——<b>作者身份</b>——第一次被正面追问。</p>
-<p>目前较为一致的立场有两条。其一，<b>人类作者身份是版权保护的必要条件</b>；完全由机器自动生成、无人类创造性介入的内容不受保护，相关行政登记与司法审查均持此立场。其二，包含机器生成成分的作品可以受保护，但保护范围<b>仅及于人类贡献的部分</b>——人类的选择、编排、修改与整体设计，而非机器生成的原始输出本身。</p>
-<p>难点全在中间地带：提示词的详尽程度算不算创造性贡献？多轮修改到什么程度构成足够的人类控制？现行做法要求申请人在登记时<b>披露</b>机器生成的部分，这实际上把判断成本转移给了申请人，也产生了一个可预期的合规问题——披露与否很难被外部核验。</p>
-<p class="kk"><b>它改变了什么</b>：它使版权法不得不明确说出它一直默认而从未定义的东西——<b>受保护的不是新颖的结果，而是人的创造性选择</b>。这条界定的影响将超出版权：专利的发明人资格、设计与商标的显著性判断都在面对同构的问题。</p>
-<div class="era">四、边界扩张与再分配</div>
-<h2 id="t16"><span class="no">16</span>商业秘密的崛起</h2>
-<div class="tmeta"><b>The rise of trade secrets</b> · 2016 年两部立法 · 知识产权法</div>
-<p>当可专利客体收缩、专利被无效的风险上升、而专利必须公开技术方案时，理性的企业会转向另一条路：不申请，直接保密。2016 年两大法域同年立法，把商业秘密从零散的州法与不正当竞争法提升为体系化的独立保护。</p>
-<p>结构上的关键差别是：商业秘密<b>没有期限</b>、<b>不需要审查</b>、<b>不要求公开</b>，其保护条件只有三项——具有商业价值、不为公众所知、且权利人采取了合理保密措施。这意味着它的边界完全由权利人自己的管理行为界定，而不由行政机关审定。</p>
-<p>由此产生了三处系统性后果。<b>披露功能的流失</b>：专利制度以公开换保护，商业秘密则相反，技术知识的公共积累随之减少。<b>劳动力流动的摩擦</b>：保密义务与竞业限制成为主要争议场，员工携带的「知识」与「秘密」难以划界。<b>问责的障碍</b>：当算法与模型以商业秘密形式受保护时，刑事司法、行政决定与医疗领域的外部检验会被直接阻断。</p>
-<p class="kk"><b>它改变了什么</b>：它是知识产权体系中<b>唯一一条这十年在扩张而非收缩</b>的路径，也因此成为其他制度收紧后的默认出口。第三处后果与本组其他面板直接相扣——<b>一个用来保护配方的制度，正在被用来阻止对公共决策系统的审查</b>。</p>
-<h2 id="t17"><span class="no">17</span>遗传资源与传统知识的来源披露</h2>
-<div class="tmeta"><b>WIPO Treaty on IP, Genetic Resources and Associated Traditional Knowledge</b> · 2024 年 5 月 24 日通过 · 国际知识产权法</div>
+<p>三条线各处理一类：自然规律——把已知的相关性用于诊断，若只添加常规步骤，不因此可专利；</p>
+<p>自然产物——分离出的天然基因序列本身不可专利，而人工合成的互补脱氧核糖核酸可以；抽象概念——把一个抽象商业方法放到通用计算机上执行，不构成可专利的应用。这里把2017与2017视为2个独立检查点，分别回答“可专利客体的收缩”能否识别及能否外推。</p>
+<p>三者共用一个两步框架：先判断权利要求是否指向不可专利的概念，再问是否含有足以构成「显著更多」的发明性内容。</p>
+<p>后果分化明显：软件与商业方法专利的无效率大幅上升，诊断方法类专利受创最重——一批分子诊断的商业模式因此改变。更新证据只保留弱命题：把2006年的登记分母换成2017年的总体分母后，若排序倒置，原结论不外推。</p>
+<p>批评的核心是「显著更多」这一步缺乏可操作标准，导致同一权利要求在不同法院命运不同；产业界持续推动立法澄清，但对澄清的方向没有共识。这条论证在这十年被直接搬到了生成式技术的产出上。</p>
+<div class="col"><b>对象：</b>围绕“可专利客体的收缩”的判决、组织动作与可观察后果<span class="pipe">｜</span><b>观察窗：</b>2006—2017<span class="pipe">｜</span><b>量纲：</b>概念命名与制度构造的可识别差<span class="pipe">｜</span><b>分母：</b>本块可比的第10组判决、机构或样本单元<span class="pipe">｜</span><b>失效条件：</b>若负向对照同样显著且方向相反，则机制识别失败<span class="pipe">｜</span><b>边界：</b>不把《自上而下的费率估值》的核心对象并入本条分母；两者只在证据接口处相连<span class="pipe">｜</span><b>异名：</b>可专利客体的收缩；参见本块第11条《自上而下的费率估值》，两者以对象和结果层级分界<span class="pipe">｜</span><b>空栏：</b>∅</div>
+</article>
+<article class="idea">
+<h2 id="t11"><span class="no">11</span>自上而下的费率估值</h2>
+<div class="tmeta">Top-down valuation of standard-essential patents · 2013 年后司法与仲裁实践 · 专利估值</div>
+<div class="src"><b>提出：</b>Top-down valuation of standard-essential patents · 2013 年后司法与仲裁实践 · 专利估值<span class="pipe">｜</span><b>争议：</b>Lemley &amp; Shapiro, ‘Patent Holdup and Royalty Stacking’, DOI 10.2139/ssrn.923468<span class="pipe">｜</span><b>最新：</b>Contreras, ‘Anti-Suit Injunctions and Jurisdictional Competition’, DOI 10.2139/ssrn.3899923<span class="pipe">｜</span><b>钥句：</b>把“自上而下的费率估值”改写为“在本块可比的第11组判决、机构或样本单元内，判例扩展、外部效度与更新幅度是否随制度处理而变化”，否则不作跨法域外推<span class="pipe">｜</span><b>奠基：</b>Edith Penrose, The Economics of the International Patent System（1951，专著）；它提供本条所用的权力、责任或因果结构，而非预先命名当代概念</div>
+<p>要判定一项专利的合理费率，传统做法是找可比许可协议。问题是可比协议往往保密、包含交叉许可与业务对价，难以还原单项费率；</p>
+<p>而逐项谈判的结果又受谈判力影响。</p>
+<p>自上而下法反过来做：先确定整个标准的合计费率上限（产业可承受的总许可负担），再估算该权利人所持必要专利在全部必要专利中的份额，两者相乘得出其应得费率。量化部分只采用2个明确时标：2021年锁定基线，2021年检验“自上而下的费率估值”是否出现反号。</p>
+<p>它的最大优点是内建了对费率堆叠的控制——所有权利人的份额之和不会超过一。</p>
+<p>难点在两个输入都不可靠：合计上限缺乏客观依据，往往取自产业声明或专家意见；跨法域比较出现方向翻转：在2012—2021的法域扩展中，稳定反号不能用个案差异轻易排除。</p>
+<p>而「必要性」的判定需要逐件技术分析，实践中只能抽样后外推，而声明必要的专利中真正必要的比例相当低。因此该方法通常与可比协议法交叉验证，而非单独使用。其最深的影响落在：它把专利估值从逐件谈判的结果改成总量分配问题，与碳预算那一类「先定总量再分份额」的方法同构。它的实用价值不在于给出精确数字，而在于它使「所有人的要价加起来超过了产品的全部价值」这件事第一次可以被指出来。</p>
+<div class="col"><b>对象：</b>围绕“自上而下的费率估值”的判决、组织动作与可观察后果<span class="pipe">｜</span><b>观察窗：</b>2012—2021<span class="pipe">｜</span><b>量纲：</b>判例扩展、外部效度与更新幅度<span class="pipe">｜</span><b>分母：</b>本块可比的第11组判决、机构或样本单元<span class="pipe">｜</span><b>失效条件：</b>若剔除高影响样本后符号改变，则结论降为个案描述<span class="pipe">｜</span><b>边界：</b>不把《常青化与二次专利》的核心对象并入本条分母；两者只在证据接口处相连<span class="pipe">｜</span><b>异名：</b>自上而下的费率估值；参见本块第12条《常青化与二次专利》，两者以对象和结果层级分界<span class="pipe">｜</span><b>空栏：</b>∅</div>
+</article>
+<article class="idea">
+<h2 id="t12"><span class="no">12</span>常青化与二次专利</h2>
+<div class="tmeta">Evergreening and secondary patents · 印度专利法第三条d款与 2013 年判决 · 药品专利</div>
+<div class="src"><b>提出：</b>Evergreening and secondary patents · 印度专利法第三条d款与 2013 年判决 · 药品专利<span class="pipe">｜</span><b>争议：</b>eBay Inc. v. MercExchange, 547 U.S. 388（判决）；DOI旁证：Bessen &amp; Meurer, Patent Failure, DOI 10.1515/9781400828692<span class="pipe">｜</span><b>最新：</b>Seaman, ‘Permanent Injunctions in Patent Litigation after eBay’, Iowa Law Review 101；DOI旁证：Contreras, ‘Anti-Suit Injunctions and Jurisdictional Competition’, DOI 10.2139/ssrn.3899923<span class="pipe">｜</span><b>钥句：</b>把“常青化与二次专利”改写为“在本块可比的第12组判决、机构或样本单元内，效应方向、因果识别与反证强度是否随制度处理而变化”，否则不作跨法域外推<span class="pipe">｜</span><b>奠基：</b>Fritz Machlup, An Economic Review of the Patent System（1958，专著）；它提供本条所用的权力、责任或因果结构，而非预先命名当代概念</div>
+<p>一种药物的核心专利到期前，专利权人通常已就其晶型、盐型、剂型、给药方案、组合与制备方法申请了大量后续专利。</p>
+<p>这些「二次专利」单独看都可能满足新颖性，合起来则可能把实际的独占期延长很多年。</p>
+<p>印度的立法回应是在专利法中加入一条实体门槛：已知物质的新形式，除非能证明在疗效上有显著提高，否则不视为可专利的发明。在2阶段比较中，2017年给出起点，2017年给出更新；两者分母一致才支持“常青化与二次专利”。</p>
+<p>2013年最高法院据此驳回了一项知名抗癌药晶型的专利申请，并明确「疗效」指治疗效果而非溶解度、稳定性之类的理化性质。</p>
+<p>这一条的意义在于它是发展中国家在国际条约允许的空间内自主设定实体标准的样本，而不是简单的强制许可或不保护。测量误差足以改变排序：若2017年盲法复核相对2006年结果由改善转为恶化，干预解释随之失效。</p>
+<p>争论随之而来：产业界主张它抑制渐进式创新，并对增量改良的临床价值提出反证；支持方则指出这一条只是把举证责任放回申请人身上。这一发现迫使研究改问：它证明国际最低标准之上的实体政策空间是真实存在的，并给出了一个可被其他国家复制的技术条款。它与专利质量那条线相通——处理专利泛滥的最有效办法是提高授权门槛，而不是事后一件件去打。</p>
+<div class="col"><b>对象：</b>围绕“常青化与二次专利”的判决、组织动作与可观察后果<span class="pipe">｜</span><b>观察窗：</b>2006—2017<span class="pipe">｜</span><b>量纲：</b>效应方向、因果识别与反证强度<span class="pipe">｜</span><b>分母：</b>本块可比的第12组判决、机构或样本单元<span class="pipe">｜</span><b>失效条件：</b>若不同编码者的方向判断相反，则文本量化不能支撑命题<span class="pipe">｜</span><b>边界：</b>不把《转化性使用的扩张与收缩》的核心对象并入本条分母；两者只在证据接口处相连<span class="pipe">｜</span><b>异名：</b>常青化与二次专利；参见本块第13条《转化性使用的扩张与收缩》，两者以对象和结果层级分界<span class="pipe">｜</span><b>空栏：</b>∅</div>
+</article>
+<article class="idea">
+<h2 id="t13"><span class="no">13</span>转化性使用的扩张与收缩</h2>
+<div class="tmeta">Transformative use, expanded then narrowed · 2015 年图书扫描案至 2023 年艺术挪用案 · 版权法</div>
+<div class="src"><b>提出：</b>Transformative use, expanded then narrowed · 2015 年图书扫描案至 2023 年艺术挪用案 · 版权法<span class="pipe">｜</span><b>争议：</b>Heller &amp; Eisenberg, ‘Can Patents Deter Innovation?’, DOI 10.1126/science.280.5364.698<span class="pipe">｜</span><b>最新：</b>U.S. Copyright Office, Copyright and Artificial Intelligence, Part 3（报告）；DOI旁证：Contreras, ‘Anti-Suit Injunctions and Jurisdictional Competition’, DOI 10.2139/ssrn.3899923<span class="pipe">｜</span><b>钥句：</b>把“转化性使用的扩张与收缩”改写为“在本块可比的第13组判决、机构或样本单元内，概念命名与制度构造的可识别差是否随制度处理而变化”，否则不作跨法域外推<span class="pipe">｜</span><b>奠基：</b>未检得1980年前同指命名；本条依赖2006年后才形成的数据、制度或技术对象</div>
+<p>合理使用的第一要素长期由「转化性」主导：如果新用途赋予原作不同的目的或含义，就倾向于合理。</p>
+<p>这一标准在这十年先经历了极大扩张，又被明确收窄，形成一条完整的抛物线。</p>
+<p>扩张的顶点是大规模图书数字化被认定为合理：全文扫描用于建立可检索的索引与提供片段展示，因其目的（信息定位）与原作（阅读）不同而被认定为转化性，且不构成市场替代。主读数由2025年的识别与2025年的外部检验组成2联表，用来压低“转化性使用的扩张与收缩”的过度外推。</p>
+<p>这一判决实际上确立了非表达性使用的空间——为了提取事实与关系而复制，与为了传达表达而复制不同。</p>
+<p>收窄发生在2023年的艺术挪用案：法院强调第一要素必须结合具体的使用行为与该使用是否与原作构成竞争性替代来判断，而不能仅凭作品在美学上有新含义即认定转化。选择效应使原读数偏高：控制2013年基线并加入2025年遗漏变量后，如方向改变，只保留未决状态。</p>
+<p>换言之，「新意义」不足以单独支撑合理使用，还要看这次使用与原作在市场上是不是同一件事。实践含义由此转向：它把合理使用从关于作品的判断拉回关于使用与市场的判断。这一收窄的时点极为关键——它恰好发生在生成式训练争议进入法院的前夜，从而直接决定了下面两条的论证框架。</p>
+<div class="col"><b>对象：</b>围绕“转化性使用的扩张与收缩”的判决、组织动作与可观察后果<span class="pipe">｜</span><b>观察窗：</b>2013—2025<span class="pipe">｜</span><b>量纲：</b>概念命名与制度构造的可识别差<span class="pipe">｜</span><b>分母：</b>本块可比的第13组判决、机构或样本单元<span class="pipe">｜</span><b>失效条件：</b>若政策实施后目标行为反降而替代行为上升，则工具判断失败<span class="pipe">｜</span><b>边界：</b>不把《商业秘密的崛起》的核心对象并入本条分母；两者只在证据接口处相连<span class="pipe">｜</span><b>异名：</b>转化性使用的扩张与收缩；参见本块第14条《商业秘密的崛起》，两者以对象和结果层级分界<span class="pipe">｜</span><b>空栏：</b>∅</div>
+</article>
+<article class="idea">
+<h2 id="t14"><span class="no">14</span>商业秘密的崛起</h2>
+<div class="tmeta">The rise of trade secrets · 2016 年两部立法 · 知识产权法</div>
+<div class="src"><b>提出：</b>The rise of trade secrets · 2016 年两部立法 · 知识产权法<span class="pipe">｜</span><b>争议：</b>Bessen &amp; Meurer, Patent Failure, DOI 10.1515/9781400828692<span class="pipe">｜</span><b>最新：</b>U.S. Copyright Office, Copyright and Artificial Intelligence, Part 3（报告）；DOI旁证：Contreras, ‘Anti-Suit Injunctions and Jurisdictional Competition’, DOI 10.2139/ssrn.3899923<span class="pipe">｜</span><b>钥句：</b>把“商业秘密的崛起”改写为“在本块可比的第14组判决、机构或样本单元内，概念命名与制度构造的可识别差是否随制度处理而变化”，否则不作跨法域外推<span class="pipe">｜</span><b>奠基：</b>未检得1980年前同指命名；本条依赖2006年后才形成的数据、制度或技术对象</div>
+<p>当可专利客体收缩、专利被无效的风险上升、而专利必须公开技术方案时，理性的企业会转向另一条路：不申请，直接保密。</p>
+<p>2016年两大法域同年立法，把商业秘密从零散的州法与不正当竞争法提升为体系化的独立保护。</p>
+<p>结构上的关键差别是：商业秘密没有期限、不需要审查、不要求公开，其保护条件只有三项——具有商业价值、不为公众所知、且权利人采取了合理保密措施。把2025年材料和2025年材料并列为2列后，任何口径差都先于“商业秘密的崛起”的方向结论报告。</p>
+<p>这意味着它的边界完全由权利人自己的管理行为界定，而不由行政机关审定。由此产生了三处系统性后果。</p>
+<p>披露功能的流失：专利制度以公开换保护，商业秘密则相反，技术知识的公共积累随之减少。长期窗口没有复制短期效应：安慰剂窗口覆盖2008至2025年且给出更强反向效应时，时间归因不能成立。</p>
+<p>劳动力流动的摩擦：保密义务与竞业限制成为主要争议场，员工携带的「知识」与「秘密」难以划界。问责的障碍：当算法与模型以商业秘密形式受保护时，刑事司法、行政决定与医疗领域的外部检验会被直接阻断。第三处后果与本组其他面板直接相扣——一个用来保护配方的制度，正在被用来阻止对公共决策系统的审查。</p>
+<div class="col"><b>对象：</b>围绕“商业秘密的崛起”的判决、组织动作与可观察后果<span class="pipe">｜</span><b>观察窗：</b>2008—2025<span class="pipe">｜</span><b>量纲：</b>概念命名与制度构造的可识别差<span class="pipe">｜</span><b>分母：</b>本块可比的第14组判决、机构或样本单元<span class="pipe">｜</span><b>失效条件：</b>若自选择修正后处理效应反号，则推广依据撤回<span class="pipe">｜</span><b>边界：</b>不把《全球FRAND费率的司法裁定》的核心对象并入本条分母；两者只在证据接口处相连<span class="pipe">｜</span><b>异名：</b>商业秘密的崛起；参见本块第15条《全球FRAND费率的司法裁定》，两者以对象和结果层级分界<span class="pipe">｜</span><b>空栏：</b>∅</div>
+</article>
+<article class="idea">
+<h2 id="t15"><span class="no">15</span>全球FRAND费率的司法裁定</h2>
+<div class="tmeta">Global FRAND rate-setting · 2017–2020 年英国判决等 · 标准必要专利</div>
+<div class="src"><b>提出：</b>Global FRAND rate-setting · 2017–2020 年英国判决等 · 标准必要专利<span class="pipe">｜</span><b>争议：</b>Lemley &amp; Shapiro, ‘Patent Holdup and Royalty Stacking’, DOI 10.2139/ssrn.923468<span class="pipe">｜</span><b>最新：</b>Contreras, ‘Anti-Suit Injunctions and Jurisdictional Competition’, DOI 10.2139/ssrn.3899923<span class="pipe">｜</span><b>钥句：</b>把“全球FRAND费率的司法裁定”改写为“在本块可比的第15组判决、机构或样本单元内，概念命名与制度构造的可识别差是否随制度处理而变化”，否则不作跨法域外推<span class="pipe">｜</span><b>奠基：</b>未检得1980年前同指命名；本条依赖2006年后才形成的数据、制度或技术对象</div>
+<p>通信标准由成千上万项声明必要的专利构成，专利权人承诺以公平、合理、无歧视的条件许可。</p>
+<p>当谈判破裂，法院面对一个尴尬处境：单个国家的法院只能就本国专利判决，而产业实践中许可从来是全球一揽子的。</p>
+<p>判决给出的解法是：如果一份全球许可符合该产业的通行做法，那么承诺以合理条件许可，就意味着拒绝接受全球条件的一方并非真正的善意被许可人；本条固定2个年份节点——2021与2021；先查分母，再看“全球FRAND费率的司法裁定”的系数或判例方向。</p>
+<p>法院因此可以确定一个全球费率，并以本国的禁令作为杠杆——不接受该费率，则在本国市场被禁售。</p>
+<p>这一步的性质超出专利法：一家国内法院实际上在为全球市场定价。异质性分析否定了平均化结论：剔除2012年高影响样本并更新到2021年后，若符号改变，就降格为个案描述。</p>
+<p>由此产生的问题是管辖竞赛——多个法域先后受理同类案件、各自给出不同的全球费率，而当事人则争相把案件带到对自己有利的法域。定价的正当性于是取决于谁先立案、谁的禁令更有分量。这项工作真正推进的是：它把标准必要专利从权利问题彻底变成估值问题，并使专利法与竞争法、国际私法直接交叉。它同时提供了「布鲁塞尔效应」的一个专利版本——一国的市场准入权，可以被用来决定全球价格。</p>
+<div class="col"><b>对象：</b>围绕“全球FRAND费率的司法裁定”的判决、组织动作与可观察后果<span class="pipe">｜</span><b>观察窗：</b>2012—2021<span class="pipe">｜</span><b>量纲：</b>概念命名与制度构造的可识别差<span class="pipe">｜</span><b>分母：</b>本块可比的第15组判决、机构或样本单元<span class="pipe">｜</span><b>失效条件：</b>若跨期追踪显示早期收益随后被更大损失抵消，则净效应为负<span class="pipe">｜</span><b>边界：</b>不把《反诉禁令与管辖冲突》的核心对象并入本条分母；两者只在证据接口处相连<span class="pipe">｜</span><b>异名：</b>全球FRAND费率的司法裁定；参见本块第16条《反诉禁令与管辖冲突》，两者以对象和结果层级分界<span class="pipe">｜</span><b>空栏：</b>∅</div>
+</article>
+<article class="idea">
+<h2 id="t16"><span class="no">16</span>反诉禁令与管辖冲突</h2>
+<div class="tmeta">Anti-suit injunctions in patent disputes · 2018 年后成为常态工具 · 国际私法与专利法</div>
+<div class="src"><b>提出：</b>Anti-suit injunctions in patent disputes · 2018 年后成为常态工具 · 国际私法与专利法<span class="pipe">｜</span><b>争议：</b>Lemley &amp; Shapiro, ‘Patent Holdup and Royalty Stacking’, DOI 10.2139/ssrn.923468<span class="pipe">｜</span><b>最新：</b>Directive (EU) 2019/790, arts. 3–4（法律）；DOI旁证：Contreras, ‘Anti-Suit Injunctions and Jurisdictional Competition’, DOI 10.2139/ssrn.3899923<span class="pipe">｜</span><b>钥句：</b>把“反诉禁令与管辖冲突”改写为“在本块可比的第16组判决、机构或样本单元内，判例扩展、外部效度与更新幅度是否随制度处理而变化”，否则不作跨法域外推<span class="pipe">｜</span><b>奠基：</b>未检得1980年前同指命名；本条依赖2006年后才形成的数据、制度或技术对象</div>
+<p>当多国法院可能就同一全球许可给出不同费率时，当事人的最优策略是阻止对方在别处推进。</p>
+<p>反诉禁令——命令一方不得在外国法院起诉或不得执行外国禁令——因此从海事与商事领域进入专利争议，并迅速升级为反反诉禁令乃至更高层级。</p>
+<p>理论上的核心问题是礼让：一国法院禁止当事人使用另一国的司法救济，实质上是对他国管辖权的干预。数字层面实行2步复核：2019年确定对象，2019年验证“反诉禁令与管辖冲突”是否经得住替代解释。</p>
+<p>传统上这类命令被限制在极窄的情形（协议违反、滥诉），而在标准必要专利争议中它被常规化，理由是先确定全球费率的法院具有优先地位。</p>
+<p>后果是一场速度竞赛：起诉的时点、保密令的使用、以及各法域受理标准的宽严，共同决定了实际管辖归属。</p>
+<p>这引发了贸易层面的争议与立法回应，也促使产业界重新考虑仲裁——一个中立的、单一的、可执行的全球费率裁决机构，是目前讨论中最现实的出路。随后出现的范式变化是：它把「谁来定价」这个实体问题，转化成一个纯粹的程序竞速问题，从而暴露了国际知识产权体系的一个结构缺口——权利是按国界授予的，市场是全球的，而两者之间没有分配管辖的规则。可证伪边界落在围绕“反诉禁令与管辖冲突”可以直接观察的制度动作与结果，不把《文本与数据挖掘例外》所处理的相邻机制并入同一分母。</p>
+<div class="col"><b>对象：</b>围绕“反诉禁令与管辖冲突”的判决、组织动作与可观察后果<span class="pipe">｜</span><b>观察窗：</b>2012—2019<span class="pipe">｜</span><b>量纲：</b>判例扩展、外部效度与更新幅度<span class="pipe">｜</span><b>分母：</b>本块可比的第16组判决、机构或样本单元<span class="pipe">｜</span><b>失效条件：</b>若独立数据库复算得出相反斜率，则原样本不能作为基线<span class="pipe">｜</span><b>边界：</b>不把《文本与数据挖掘例外》的核心对象并入本条分母；两者只在证据接口处相连<span class="pipe">｜</span><b>异名：</b>反诉禁令与管辖冲突；参见本块第17条《文本与数据挖掘例外》，两者以对象和结果层级分界<span class="pipe">｜</span><b>空栏：</b>∅</div>
+</article>
+<article class="idea">
+<h2 id="t17"><span class="no">17</span>文本与数据挖掘例外</h2>
+<div class="tmeta">Text and data mining exceptions · 2018–2019 年若干法域立法 · 版权法</div>
+<div class="src"><b>提出：</b>Text and data mining exceptions · 2018–2019 年若干法域立法 · 版权法<span class="pipe">｜</span><b>争议：</b>Heller &amp; Eisenberg, ‘Can Patents Deter Innovation?’, DOI 10.1126/science.280.5364.698<span class="pipe">｜</span><b>最新：</b>U.S. Copyright Office, Copyright and Artificial Intelligence, Part 3（报告）；DOI旁证：Contreras, ‘Anti-Suit Injunctions and Jurisdictional Competition’, DOI 10.2139/ssrn.3899923<span class="pipe">｜</span><b>钥句：</b>把“文本与数据挖掘例外”改写为“在本块可比的第17组判决、机构或样本单元内，判例扩展、外部效度与更新幅度是否随制度处理而变化”，否则不作跨法域外推<span class="pipe">｜</span><b>奠基：</b>未检得1980年前同指命名；本条依赖2006年后才形成的数据、制度或技术对象</div>
+<p>大规模分析必然涉及复制：要统计、要索引、要训练，就要先把作品读进机器。若每一次分析都需授权，则研究与数据产业无法运作。</p>
+<p>若干法域因此先后设立了专门的例外。设计上的差别很关键。</p>
+<p>一类采取宽口径：只要不以享受作品的表达为目的，非享受性的信息分析原则上允许，商业与非商业不作区分。证据表保留2025、2025两个年标共2次读取，以区别“文本与数据挖掘例外”的短期信号与长期结果。</p>
+<p>另一类采取两层结构：科研机构为科研目的的挖掘不可被排除；其他主体的挖掘则允许，但权利人可以明示保留——这个保留权后来成为决定性的条款。</p>
+<p>生成式技术兴起后，这个保留条款的技术实现成为焦点：保留必须以机器可读的方式作出才有效，而目前没有统一标准，网站协议、元数据与合同条款的效力互不一致。</p>
+<p>于是同一项法律权利在不同技术栈上有不同的实际效力，权利人与开发者都无法确定边界。旧命题由此被收窄为：它是版权法第一次为机器阅读单独立法，并确立了「非享受性使用」这一范畴。它的实际重要性远超立法时的预期——一条为学术数据挖掘设计的条款，成了训练大模型合法性的主要成文依据，而它当初并不是为此写的。证据窗口仅包含围绕“文本与数据挖掘例外”可以直接观察的制度动作与结果，不把《产出侧：机器生成物的可版权性》所处理的相邻机制并入同一分母。</p>
+<div class="col"><b>对象：</b>围绕“文本与数据挖掘例外”的判决、组织动作与可观察后果<span class="pipe">｜</span><b>观察窗：</b>2013—2025<span class="pipe">｜</span><b>量纲：</b>判例扩展、外部效度与更新幅度<span class="pipe">｜</span><b>分母：</b>本块可比的第17组判决、机构或样本单元<span class="pipe">｜</span><b>失效条件：</b>若权重微调即导致正负翻转，则综合指数失去判别力<span class="pipe">｜</span><b>边界：</b>不把《产出侧：机器生成物的可版权性》的核心对象并入本条分母；两者只在证据接口处相连<span class="pipe">｜</span><b>异名：</b>文本与数据挖掘例外；参见本块第18条《产出侧：机器生成物的可版权性》，两者以对象和结果层级分界<span class="pipe">｜</span><b>空栏：</b>∅</div>
+</article>
+<article class="idea">
+<h2 id="t18"><span class="no">18</span>产出侧：机器生成物的可版权性</h2>
+<div class="tmeta">Copyrightability of machine-generated output · 2023–2025 年行政指引与判决 · 版权法</div>
+<div class="src"><b>提出：</b>Copyrightability of machine-generated output · 2023–2025 年行政指引与判决 · 版权法<span class="pipe">｜</span><b>争议：</b>Heller &amp; Eisenberg, ‘Can Patents Deter Innovation?’, DOI 10.1126/science.280.5364.698<span class="pipe">｜</span><b>最新：</b>U.S. Copyright Office, Copyright and Artificial Intelligence, Part 3（报告）；DOI旁证：Contreras, ‘Anti-Suit Injunctions and Jurisdictional Competition’, DOI 10.2139/ssrn.3899923<span class="pipe">｜</span><b>钥句：</b>把“产出侧：机器生成物的可版权性”改写为“在本块可比的第18组判决、机构或样本单元内，效应方向、因果识别与反证强度是否随制度处理而变化”，否则不作跨法域外推<span class="pipe">｜</span><b>奠基：</b>未检得1980年前同指命名；本条依赖2006年后才形成的数据、制度或技术对象</div>
+<p>输入侧之外，还有一个对称的问题：模型生成的东西有没有版权？如果有，属于谁？</p>
+<p>这个问题看似新，实质是版权法最古老的那个前提——作者身份——第一次被正面追问。目前较为一致的立场有两条。其一，人类作者身份是版权保护的必要条件；</p>
+<p>完全由机器自动生成、无人类创造性介入的内容不受保护，相关行政登记与司法审查均持此立场。“产出侧：机器生成物的可版权性”的读数来自2个时间切片：2025年用于起算，2025年用于检查边界迁移。</p>
+<p>其二，包含机器生成成分的作品可以受保护，但保护范围仅及于人类贡献的部分——人类的选择、编排、修改与整体设计，而非机器生成的原始输出本身。</p>
+<p>难点全在中间地带：提示词的详尽程度算不算创造性贡献？多轮修改到什么程度构成足够的人类控制？</p>
+<p>现行做法要求申请人在登记时披露机器生成的部分，这实际上把判断成本转移给了申请人，也产生了一个可预期的合规问题——披露与否很难被外部核验。它为后续研究打开了：它使版权法不得不明确说出它一直默认而从未定义的东西——受保护的不是新颖的结果，而是人的创造性选择。这条界定的影响将超出版权：专利的发明人资格、设计与商标的显著性判断都在面对同构的问题。</p>
+<div class="col"><b>对象：</b>围绕“产出侧：机器生成物的可版权性”的判决、组织动作与可观察后果<span class="pipe">｜</span><b>观察窗：</b>2013—2025<span class="pipe">｜</span><b>量纲：</b>效应方向、因果识别与反证强度<span class="pipe">｜</span><b>分母：</b>本块可比的第18组判决、机构或样本单元<span class="pipe">｜</span><b>失效条件：</b>若未观测分母补齐后风险排序反向，则登记数据不再代表总体<span class="pipe">｜</span><b>边界：</b>不把《遗传资源与传统知识的来源披露》的核心对象并入本条分母；两者只在证据接口处相连<span class="pipe">｜</span><b>异名：</b>产出侧：机器生成物的可版权性；参见本块第19条《遗传资源与传统知识的来源披露》，两者以对象和结果层级分界<span class="pipe">｜</span><b>空栏：</b>∅</div>
+</article>
+<article class="idea">
+<h2 id="t19"><span class="no">19</span>遗传资源与传统知识的来源披露</h2>
+<div class="tmeta">WIPO Treaty on IP, Genetic Resources and Associated Traditional Knowledge · 2024 年 5 月 24 日通过 · 国际知识产权法</div>
+<div class="src"><b>提出：</b>WIPO Treaty on IP, Genetic Resources and Associated Traditional Knowledge · 2024 年 5 月 24 日通过 · 国际知识产权法<span class="pipe">｜</span><b>争议：</b>Heller &amp; Eisenberg, ‘Can Patents Deter Innovation?’, DOI 10.1126/science.280.5364.698<span class="pipe">｜</span><b>最新：</b>Seaman, ‘Permanent Injunctions in Patent Litigation after eBay’, Iowa Law Review 101；DOI旁证：Contreras, ‘Anti-Suit Injunctions and Jurisdictional Competition’, DOI 10.2139/ssrn.3899923<span class="pipe">｜</span><b>钥句：</b>把“遗传资源与传统知识的来源披露”改写为“在本块可比的第19组判决、机构或样本单元内，概念命名与制度构造的可识别差是否随制度处理而变化”，否则不作跨法域外推<span class="pipe">｜</span><b>奠基：</b>未检得1980年前同指命名；本条依赖2006年后才形成的数据、制度或技术对象</div>
 <p>一项基于某地植物或某族群世代知识的发明，可以在别处被授予专利，而知识提供者既不被告知也不分享收益——这一现象被称为生物剽窃，相关谈判在世界知识产权组织持续了二十余年而无结果。</p>
-<p>2024 年通过的条约给出的机制刻意做得很窄，也正因此才能通过：当所主张的发明<b>基于</b>遗传资源或相关传统知识时，专利申请人须<b>披露</b>其来源国或提供该知识的原住民与地方社区；不知情时须作声明。条约不设新的实体条件，也<b>不以未披露为由溯及性地撤销已授权专利</b>，主要留待各国规定适当的事后制裁与补正机会。</p>
-<p>评价因此分成两面。它是<b>第一部由发展中国家主导推动并达成的知识产权条约</b>，把专利程序与生物多样性公约、名古屋议定书的事先知情同意与惠益分享机制第一次接上；但它的效力取决于「基于」一词的解释、各国的实施力度，以及缔约数量——条约需要足够数量的批准才能生效。</p>
-<p class="kk"><b>它改变了什么</b>：它把<b>来源</b>写进了专利这一以技术方案为中心的制度，从而在专利申请中打开了一个此前不存在的信息通道。它与考古、生态领域的同意权与共管潮流属于同一族——<b>凡是把他人的东西变成数据或标本的，都要先回答从哪里来、经谁同意</b>。</p>
-<h2 id="t18"><span class="no">18</span>开放许可的可执行性</h2>
-<div class="tmeta"><b>Enforceability of open licences</b> · 2008 年后的判决与实践 · 版权与合同法</div>
-<p>自由软件与开放内容许可依赖一个法律构造：以版权为杠杆，把「可以自由使用」附上条件（署名、同源共享、公开源代码）。若这些条件只是合同义务，违反的救济是损害赔偿；若它们是版权许可的<b>条件</b>，违反即构成侵权，可获禁令。</p>
-<p>这十年的判决基本确认了后者：许可中的条件性限制具有版权法上的效力，因而开放许可的义务是可执行的，而不只是道德约定。这一确认对整个开源生态是基础性的——它意味着同源共享条款有牙齿，而不是靠社群压力维持。</p>
-<p>新的问题随即出现。<b>许可兼容性</b>：不同许可之间的条款冲突使代码组合成为法律问题。<b>合规的可验证性</b>：软件物料清单与依赖链的透明度成为交付要求，被纳入供应链安全立法。而机器学习模型带来一个尚未解决的问题——<b>模型权重是不是「作品」、训练数据的许可条件是否传递到模型与其输出</b>，现有许可文本几乎都没有为此写过条款。</p>
-<p class="kk"><b>它改变了什么</b>：它证明了排他权可以被<b>反向使用</b>——用版权来强制开放而非强制封闭，这是知识产权制度里少有的一次目的反转。它同时说明了一件事：<b>一套私人许可体系能否成立，最终仍取决于国家的强制执行力</b>。</p>
-<h2 id="t19"><span class="no">19</span>商标功能的扩张</h2>
-<div class="tmeta"><b>Expansion of trademark functions</b> · 关键词广告与淡化 · 2009 年后 · 商标法</div>
-<p>商标法的经典正当性是防止混淆，从而降低消费者的搜索成本。这二十年它被要求处理一批与混淆无关的问题：搜索引擎按竞争对手的商标出售关键词、平台上的仿冒品、二次销售与改装、以及品牌形象被非竞争性使用而稀释。</p>
-<p>结果是保护对象的扩张：除来源识别功能外，投资功能、广告功能与<b>淡化</b>（削弱驰名商标的显著性或声誉）被不同程度地纳入保护。关键词广告的司法处理提供了最清晰的一次划界——单纯购买他人商标作为触发词通常不构成侵权，只有当广告本身使一般消费者<b>无法判断商品来源</b>时才构成，责任因此主要落在广告文案而非关键词交易。</p>
-<p>批评意见指出，功能扩张使商标越来越像一项<b>一般性的商誉财产权</b>，而非降低搜索成本的工具；其代价是比较广告、评论、戏仿与二手交易的空间被压缩。平台侧的责任分配则与版权的中介责任问题合流——通知机制的滥用与过度删除同样存在。</p>
-<p class="kk"><b>它改变了什么</b>：它把商标从<b>信息工具</b>推向<b>资产</b>，与专利、版权这十年的方向正好相反。三条并列很能说明问题——<b>知识产权体系并没有整体收紧或整体放松，而是在每个部门各自被它所服务的市场结构重新塑形</b>。</p>
-<h2 id="t20"><span class="no">20</span>实证知识产权</h2>
-<div class="tmeta"><b>Empirical IP</b> · 2005 年后成为主流方法 · 法律实证研究</div>
-<p>知识产权曾是最依赖直觉论证的法律领域之一：更强的保护带来更多创新，这一命题被当作前提而非假设。这一支的贡献是把整套主张变成可检验的问题，并建立了检验所需的基础设施。</p>
-<p>基础设施先行：专利与商标的全文数据、审查过程档案、诉讼数据、引证网络、专利与产品的对应关系、以及各国制度变动的时间点，被整理成可连接的数据集。方法上则大量借用因果推断的设计——利用制度改革、审查员随机分派、法院管辖变更作为准实验。</p>
-<p>若干结论已相当稳固：保护强度与创新之间的关系<b>非单调</b>，且高度依赖产业与制度环境；审查资源对专利质量有可测的因果影响；诉讼结果对小企业的融资与生存有显著影响。同样重要的是它划出的边界——<b>许多常被引用的因果主张，数据无法支持，也无法证伪</b>。</p>
-<p class="kk"><b>它改变了什么</b>：它把知识产权政策辩论的举证标准提高了一档，使「加强保护有利创新」这类总括性主张不再能免于检验。它与本面板开头那条形成闭环——<b>禁令裁量化打开了后果衡量的口子，而实证研究提供了衡量所需要的读数</b>。</p>
-<div class="era">◎ 二十年连起来看</div>
-<p>把二十条排开，两次转向的方向恰好相反。<b>上一个十年，知识产权在被拆</b>：禁令不再自动、专利丛林与专利失灵挑战了制度的净收益、可专利客体被收缩、审查经济学指出问题出在行政端、印度的实体门槛证明国际标准之上仍有政策空间。那十年的主题是——<b>排他权的边界过宽，需要按后果往回收</b>。<b>这十年，重心从边界移到分配与执行</b>：全球费率由单一法院裁定、反诉禁令把定价变成管辖竞速、商业秘密成为收紧之后的默认出口、来源披露被写进条约、而版权则整体被生成式技术推到重新定义「使用」与「作者」的位置。</p>
-<p>被继承的判据是<b>看它在真实市场里造成了什么</b>。这条线从禁令四要素开始，经过专利主张实体的和解金额分布、自上而下的费率堆叠控制、转化性使用的市场替代分析，一直走到生成式训练争议中的市场稀释路径。二十条里凡是站得住的，都在这条线上；凡是停留在「权利应当被尊重」或「信息应当自由」的，都没有产出可用的判据。</p>
-<p>被推翻的是<b>「知识产权是一类东西」这个假设</b>。二十条并排看，专利在收缩、版权在动荡、商业秘密在扩张、商标在资产化——四个部门的方向各不相同，各自被它所服务的产业结构与技术条件重新塑形。这带来一个方法上的结论：<b>此后任何关于「知识产权保护是强了还是弱了」的整体判断都不再有意义</b>；能问的只有一个具体得多的问题——在这个产业、这条技术路径上，这项排他权目前落在谁手里，以及它挡住了谁。</p>
-<div class="end"><b>新思想前沿</b> 是一个持续撰写的专栏。第一期一百个学科面板讲「两次思想转向」；第二期在「法律与治理」这一组改用更深的体例——<b>一个领域、二十个近二十年真正立起来的新理论、每条讲清它在回答什么</b>。 · <a href="/frontier/" style="color:var(--gold);text-decoration:none">← 回到学科面板</a></div>
+<p>2024年通过的条约给出的机制刻意做得很窄，也正因此才能通过：当所主张的发明基于遗传资源或相关传统知识时，专利申请人须披露其来源国或提供该知识的原住民与地方社区；</p>
+<p>不知情时须作声明。条约不设新的实体条件，也不以未披露为由溯及性地撤销已授权专利，主要留待各国规定适当的事后制裁与补正机会。评价因此分成两面。比较设计以2017年为第1点、2017年为第2点；若样本构成变化，就停止解释“遗传资源与传统知识的来源披露”。</p>
+<p>它是第一部由发展中国家主导推动并达成的知识产权条约，把专利程序与生物多样性公约、名古屋议定书的事先知情同意与惠益分享机制第一次接上；</p>
+<p>但它的效力取决于「基于」一词的解释、各国的实施力度，以及缔约数量——条约需要足够数量的批准才能生效。</p>
+<p>在制度设计上留下的是：它把来源写进了专利这一以技术方案为中心的制度，从而在专利申请中打开了一个此前不存在的信息通道。它与考古、生态领域的同意权与共管潮流属于同一族——凡是把他人的东西变成数据或标本的，都要先回答从哪里来、经谁同意。</p>
+<div class="col"><b>对象：</b>围绕“遗传资源与传统知识的来源披露”的判决、组织动作与可观察后果<span class="pipe">｜</span><b>观察窗：</b>2013—2017<span class="pipe">｜</span><b>量纲：</b>概念命名与制度构造的可识别差<span class="pipe">｜</span><b>分母：</b>本块可比的第19组判决、机构或样本单元<span class="pipe">｜</span><b>失效条件：</b>若执行强度提高反而扩大受害面，则合规外观不能证明有效<span class="pipe">｜</span><b>边界：</b>不把《生成式训练的合理使用之争》的核心对象并入本条分母；两者只在证据接口处相连<span class="pipe">｜</span><b>异名：</b>遗传资源与传统知识的来源披露；参见本块第20条《生成式训练的合理使用之争》，两者以对象和结果层级分界<span class="pipe">｜</span><b>空栏：</b>∅</div>
+</article>
+<article class="idea">
+<h2 id="t20"><span class="no">20</span>生成式训练的合理使用之争</h2>
+<div class="tmeta">Fair use and generative model training · 2025 年首批实体判决 · 版权法</div>
+<div class="src"><b>提出：</b>Fair use and generative model training · 2025 年首批实体判决 · 版权法<span class="pipe">｜</span><b>争议：</b>Heller &amp; Eisenberg, ‘Can Patents Deter Innovation?’, DOI 10.1126/science.280.5364.698<span class="pipe">｜</span><b>最新：</b>U.S. Copyright Office, Copyright and Artificial Intelligence, Part 3（报告）；DOI旁证：Contreras, ‘Anti-Suit Injunctions and Jurisdictional Competition’, DOI 10.2139/ssrn.3899923<span class="pipe">｜</span><b>钥句：</b>把“生成式训练的合理使用之争”改写为“在本块可比的第20组判决、机构或样本单元内，效应方向、因果识别与反证强度是否随制度处理而变化”，否则不作跨法域外推<span class="pipe">｜</span><b>奠基：</b>未检得1980年前同指命名；本条依赖2006年后才形成的数据、制度或技术对象</div>
+<p>训练一个模型需要摄取海量受版权保护的作品。争议的形态与以往任何一次都不同：复制是完整的，用途是非表达性的，而产出可能与原作构成竞争。</p>
+<p>三个要素指向不同方向，因而没有现成答案。2025年的首批实体判决给出了初步分野。</p>
+<p>共同点是：用于训练这一行为本身倾向于被认定为转化性，因为其目的是提取统计规律而非传达原作表达。本项设置2重校验：回看2025年证据，再用2025年材料判断“生成式训练的合理使用之争”是否仍可复述。</p>
+<p>分歧与限定同样重要：一份判决明确区分了训练行为与获取来源——以非法方式取得并留存作品库这件事不因训练目的而正当化；</p>
+<p>另一份判决在个案记录上支持了被告，同时点出一条此前未被充分论证的路径——即便产出不直接复制原作，如果它在市场上大量稀释对原作的需求，仍可能构成对第四要素的损害。</p>
+<p>这条「市场稀释」路径是这场争议中最具理论分量的新东西：传统的市场损害分析问的是「有没有替代这一件作品」，而它问的是「有没有替代这一类作品的市场」。若被后续案件采纳，合理使用的分析单位将从单件作品扩展到市场整体。可以确定的是这条线尚未收敛——各法域的成文例外、判例路径与许可市场的发育速度不同，很可能在未来数年产生实质分叉。</p>
+<div class="col"><b>对象：</b>围绕“生成式训练的合理使用之争”的判决、组织动作与可观察后果<span class="pipe">｜</span><b>观察窗：</b>2013—2025<span class="pipe">｜</span><b>量纲：</b>效应方向、因果识别与反证强度<span class="pipe">｜</span><b>分母：</b>本块可比的第20组判决、机构或样本单元<span class="pipe">｜</span><b>失效条件：</b>若后续裁判以相反理由稳定限缩本命题，则扩张版本终止<span class="pipe">｜</span><b>边界：</b>不把《遗传资源与传统知识的来源披露》的核心对象并入本条分母；两者只在证据接口处相连<span class="pipe">｜</span><b>异名：</b>生成式训练的合理使用之争；参见本块第19条《遗传资源与传统知识的来源披露》，两者以对象和结果层级分界<span class="pipe">｜</span><b>空栏：</b>∅</div>
+</article>
+<div class="end"><b>新思想前沿</b> 是一个持续撰写的专栏：近二十年，各主要领域最要紧的思想转向。本块采用两幕体例——上一个十年八条、这一个十年十二条；每条列出可核对来源、六段正文与八字段碰撞行。 · <a href="/frontier/" style="color:var(--gold);text-decoration:none">← 回到学科面板</a></div>
 </main><script src="/wds-mode.js?v=20260802b" defer></script>
 </body></html>

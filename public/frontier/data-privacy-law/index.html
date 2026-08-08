@@ -1,7 +1,7 @@
 <!DOCTYPE html><html lang="zh"><head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>数据与隐私法 · 新思想前沿 | SDE Universes</title>
-<meta name="description" content="近二十年数据与隐私法立起来的二十个新理论：隐私的分类学、语境完整性、匿名化的破产、隐私自我管理的失败、关系性数据治理、设计内嵌与问责原则、被遗忘权、数据可携、信息受托人、解释权之争、合理推断权、差分隐私、群体隐私、自动化决策、监控资本主义、隐私与竞争法合流、跨境传输的同等保护、数据本地化、神经权利。">
+<meta name="description" content="近二十年数据与隐私法领域二十个新思想，按8＋12两幕排开：语境完整性、隐私的分类学、差分隐私进入公共统计、匿名化的破产、隐私自我管理的失败、被遗忘权等。每条给出提出、争议、最新、钥句与奠基来源，配六段正文和八字段碰撞行。">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Noto+Serif+SC:wght@300;400;500;600&display=swap">
 <style>
@@ -36,142 +36,280 @@ h2 .no{display:inline-block;min-width:2.2em;font-family:'Playfair Display',serif
 .toc .cg{grid-column:1/-1;font-size:.76rem;letter-spacing:.1em;color:var(--gold2);font-weight:700;padding-left:0;margin-top:.45rem}
 .toc .cg:before{content:''}
 @media(max-width:640px){h1{font-size:1.7rem}.toc ol{grid-template-columns:1fr}}
+
+/* 法律、规制与责任供料层 */
+.act{margin:2.6rem 0 .45rem;padding:.55rem .9rem;background:var(--card);border-left:4px solid var(--gold);font-size:1.02rem;font-weight:600;color:var(--gold)}
+.actnote{font-size:.94rem;color:var(--text2);margin-bottom:1.35rem}
+.idea{display:block}
+.idea h2{font-size:1.18rem;font-weight:600;color:var(--gold);margin:2rem 0 .35rem;scroll-margin-top:1rem}
+.idea h2 .no{display:inline-block;min-width:2.6em;font-family:'Playfair Display',serif;font-size:.86rem;color:var(--muted);font-weight:600}
+.tmeta{font-size:.82rem;color:var(--muted);margin:0 0 .7rem;padding-left:2.6em;line-height:1.7}
+.src{font-size:.85rem;color:var(--text2);background:var(--card);border-left:3px solid var(--gold2);padding:.58rem .82rem;margin:0 0 .95rem;line-height:1.82}
+.src b,.col b{color:var(--gold2);font-weight:600;margin-right:.28em}
+.col{font-size:.83rem;color:var(--text2);background:rgba(138,104,23,.07);border-left:3px solid var(--muted);padding:.58rem .82rem;margin:.15rem 0 1.55rem;line-height:1.82}
+.pipe{color:var(--muted);padding:0 .16em}
+.toc{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1rem 1.1rem;margin:0 0 1.8rem;font-size:.88rem;line-height:1.55}
+.toc-t{font-size:.78rem;letter-spacing:.14em;color:var(--gold2);font-weight:700;margin-bottom:.7rem}
+.toc ol{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:.28rem .9rem;counter-reset:tc}
+.toc li{counter-increment:tc;position:relative;padding-left:1.9em}
+.toc li:before{content:counter(tc,decimal-leading-zero);position:absolute;left:0;font-family:'Playfair Display',serif;font-size:.78rem;color:var(--muted)}
+.toc a{color:var(--text);text-decoration:none;border-bottom:1px solid transparent}
+.toc a:hover{color:var(--gold);border-bottom-color:var(--border)}
+.toc .cg{grid-column:1/-1;font-size:.76rem;letter-spacing:.08em;color:var(--gold2);font-weight:700;padding-left:0;margin-top:.45rem}
+.toc .cg:before{content:''}
+@media(max-width:640px){.toc ol{grid-template-columns:1fr}.idea h2{line-height:1.55}}
 </style></head><body>
 <div class="top"><a href="/browse/">SDE Universes</a><span class="sep">·</span><a href="/frontier/">新思想前沿</a><span class="sep">›</span><span style="color:var(--text2)">法律与治理</span></div>
 <main>
-<div class="kicker">新思想前沿 · 法律与治理</div>
+<div class="kicker">新思想前沿 · 法律、规制与责任</div>
 <h1>数据与隐私法</h1>
-<div class="meta">近二十年 · <b>20 个新理论</b> · 每条约 500 字 · 全篇约 9500 字 · 王德生 亲撰 · 2026 年 8 月</div>
-<p class="lede">这二十年，隐私法换了两次问题。第一次换在概念上：从「什么信息是秘密的」换成「什么样的信息流动是恰当的」——一旦承认同一条信息在医生那里合适、在雇主那里不合适，隐私就不再是一堵墙，而是一套关于流向的规范。第二次换在主体上：从<b>个人对自己数据的控制</b>换成<b>群体被数据关联起来之后的处境</b>——因为决定一个人命运的往往不是他自己交出的数据，而是别人的数据训练出的模型对他所属类别的推断。与这两次概念转向并行的，是一套史无前例的制度建设：设计内嵌义务、影响评估、可携权、被遗忘权、跨境充分性认定、自动化决策限制，以及一个高度专业化的合规产业。<b>制度做得比理论快，而理论一直在追问同一件事：这些制度到底保护了谁</b>。下面二十条按此排列。</p>
-<div class="toc"><div class="toc-t">本面板的 20 个理论</div><ol><li class="cg">一、概念的重建</li><li><a href="#t01">隐私的分类学</a></li><li><a href="#t02">语境完整性</a></li><li><a href="#t03">匿名化的破产</a></li><li><a href="#t04">隐私自我管理的失败</a></li><li><a href="#t05">关系性数据治理</a></li><li class="cg">二、把权利做成制度</li><li><a href="#t06">设计内嵌与默认保护</a></li><li><a href="#t07">风险本位与问责原则</a></li><li><a href="#t08">被遗忘权</a></li><li><a href="#t09">数据可携与互操作</a></li><li><a href="#t10">信息受托人</a></li><li class="cg">三、自动化决策与推断</li><li><a href="#t11">解释权之争</a></li><li><a href="#t12">合理推断权</a></li><li><a href="#t13">差分隐私进入公共统计</a></li><li><a href="#t14">群体隐私</a></li><li><a href="#t15">自动化决策的限制与信用评分</a></li><li class="cg">四、结构性转向：市场、跨境、身体</li><li><a href="#t16">监控资本主义</a></li><li><a href="#t17">隐私与竞争法的合流</a></li><li><a href="#t18">跨境传输与同等保护</a></li><li><a href="#t19">数据本地化与数据主权</a></li><li><a href="#t20">神经权利</a></li></ol></div>
-<div class="era">一、概念的重建</div>
-<h2 id="t01"><span class="no">01</span>隐私的分类学</h2>
-<div class="tmeta"><b>A Taxonomy of Privacy</b> · Daniel Solove · 2006 · 隐私法理论</div>
-<p>隐私这个词长期无法在法律上使用，因为它同时指涉太多东西——独处、秘密、亲密、控制、人格。每次立法或判决都要先定义，而每个定义都会漏掉别人认为最要紧的那一块。索洛夫的做法是放弃寻找共同本质。</p>
-<p>他改为按<b>被侵害的活动</b>分类，列出四大类十六种：<b>信息收集</b>（监视、讯问）、<b>信息处理</b>（聚合、识别、不安全、次级使用、排除）、<b>信息传播</b>（违反保密、揭露、暴露、可及性扩大、勒索、盗用、扭曲）、<b>侵入</b>（侵扰、决策干预）。每一种对应不同的损害类型与不同的救济方式。</p>
-<p>这个清单最有用的一条是<b>聚合</b>：单看每一条都不敏感的公开信息，合起来可以构成高度私密的画像。它解释了为什么「这条信息本来就是公开的」不能成为抗辩，也预告了后来大数据时代的核心争议。另一条<b>排除</b>——数据主体不知道自己被记录了什么、无法参与——则直接成了后来知情权与查阅权的理论依据。</p>
-<p class="kk"><b>它改变了什么</b>：它把隐私从一个<b>定义问题</b>改成一个<b>损害目录</b>，使隐私诉讼第一次可以像侵权法一样指名道姓地说出被侵害的是哪一种。它的限度也在这里——目录以个人损害为单位，因而对后来那类「谁都没被具体伤害、但整个群体的处境变了」的问题无从下手。</p>
-<h2 id="t02"><span class="no">02</span>语境完整性</h2>
-<div class="tmeta"><b>Contextual integrity</b> · Helen Nissenbaum · 2004、2010 · 隐私理论</div>
-<p>为什么把公共场所拍摄的影像汇总起来会让人不安，尽管每一帧都发生在公开场合？为什么把体检结果发给保险公司会被视为侵犯，尽管你自愿告诉了医生？公私二分对这两个问题都答不出来。</p>
-<p>命题是：不存在天然公开或天然私密的信息，只存在<b>与语境相符或不相符的信息流动</b>。每个社会语境（医疗、教育、金融、友谊、宗教）都有自己长期形成的信息规范。一次流动可由五个参数完整描述：<b>数据主体、发送者、接收者、信息类型、传输原则</b>。改变其中任何一个参数而未获得规范上的支持，就构成对语境完整性的破坏。</p>
-<p>这套参数化是它区别于其他隐私理论的关键——它可被操作。近年被大量用于分析新技术：智能家居设备把家庭语境的数据送进广告语境、健康应用把医疗语境的数据送进就业语境、大语言模型把用户在助手语境中的输入用于训练。每一次争议都能被拆成「哪个参数变了、变得有没有理由」。</p>
-<p class="kk"><b>它改变了什么</b>：它给了隐私法一个可以处理<b>新技术</b>的框架——不必先争论新数据是否敏感，只需比对流动是否越出了原语境的规范。批评意见是保守性：它以既有社会规范为基准，因而对<b>规范本身不正当</b>的情况（既有的歧视性信息实践）缺乏批判力，也难以处理全新的、尚无规范的语境。</p>
-<h2 id="t03"><span class="no">03</span>匿名化的破产</h2>
-<div class="tmeta"><b>Broken promises of privacy</b> · Paul Ohm · 2010 · 数据保护法</div>
-<p>整个数据保护制度建立在一个二分之上：个人数据受严格规制，匿名数据不受规制。因此「去标识化后即可自由使用」成了各国法律与行业实践的共同出口。这一条工作证明这个出口比想象的窄得多。</p>
-<p>论证基于一系列重识别研究：从公开的电影评分记录、搜索日志、医疗出院记录、位置轨迹中，只需极少量的外部信息就能把「匿名」记录重新指向具体个人。原因是结构性的——数据集的维度越高，每个人的组合就越独特；而可用于交叉比对的外部数据集在持续增加。</p>
-<p>由此得出「<b>数据的有用性与匿名性此消彼长</b>」：把数据处理到真正无法重识别，往往也就处理到了没有分析价值。这把「匿名化」从一个二元状态改成一个<b>连续的风险度量</b>，并把法律问题从「是否匿名」改成「在何种攻击者模型与何种外部数据可得性下，剩余的重识别风险有多大」。</p>
-<p class="kk"><b>它改变了什么</b>：它使各国监管机构逐步转向「假名化仍属个人数据」「匿名化须结合语境评估」的立场，并直接催生了对<b>形式化隐私保证</b>的需求——如果无法承诺「不可识别」，就需要一个可计算的替代品，那正是后来差分隐私被采纳的原因。</p>
-<h2 id="t04"><span class="no">04</span>隐私自我管理的失败</h2>
-<div class="tmeta"><b>Privacy self-management and the consent dilemma</b> · Daniel Solove · 2013 · 隐私法理论</div>
-<p>现行制度的核心装置是通知与同意：告知你将被如何处理，由你决定接受与否。这个装置在道德上很有吸引力——它尊重自主。索洛夫的命题是它在事实上已经失效，而且失效是结构性的，不能靠改进条款措辞来修复。</p>
-<p>失效有两层。<b>认知层面</b>：条款过长、过多、过于技术化，逐份阅读的时间成本高到不可能承担；人也无法评估某项披露在未来与其他数据结合后的后果。<b>结构层面</b>：即使每一次同意都是理性的，无数次微小同意的<b>累积后果</b>仍然无法被任何一次单独决定所把握——这被称为聚合问题。</p>
-<p>更根本的是同意的<b>范围错配</b>：同意保护的是「我」的数据，而数据的用途是把「我」放进一个群体模型，去推断和处置<b>没有同意过的其他人</b>。因此即便同意机制完美运作，它也无法覆盖数据处理的主要外部性。</p>
-<p class="kk"><b>它改变了什么</b>：它把隐私法的改革方向从<b>改善同意</b>转向<b>限制处理本身</b>——目的限制、数据最小化、存储期限、禁止某些用途，这些不依赖个人决定的实体规则由此获得理论正当性。它也解释了为什么每一轮「让同意更清楚」的努力都收效甚微：<b>被修的是症状</b>。</p>
-<h2 id="t05"><span class="no">05</span>关系性数据治理</h2>
-<div class="tmeta"><b>A relational theory of data governance</b> · Salomé Viljoen · 2021 · 数据治理理论</div>
-<p>现有的两条改革路线——加强个人控制与让个人从数据中获利——共享同一个前提：数据是<b>关于我的</b>，因而处置权应归我。维尔约恩的命题是这个前提描述错了数据经济的运作方式。</p>
-<p>数据生产的目的不是了解某个个体，而是<b>把人放进以人群为单位的关系之中</b>：我的数据之所以有价值，是因为它能被用来推断与我相似的其他人。因此数据关系天然是<b>横向的</b>——在我与陌生人之间——而不是纵向的（我与平台之间）。个人化的救济无法触及这一层：即使我全面拒绝，模型依然会通过与我相似者的数据对我作出判断。</p>
-<p>推论是：数据的核心问题不是隐私侵害，而是<b>社会分类的正当性</b>——谁有权按什么维度把人群切分、并据此分配机会与风险。这类利益本质上是集体性的，只能通过民主的制度安排（公共审议、集体代表、目的层面的禁止）来主张，而非通过个人同意或个人补偿。</p>
-<p class="kk"><b>它改变了什么</b>：它把数据法从<b>私法框架</b>拉向<b>公法与民主理论</b>，并给「数据信托」「数据集体谈判」「公共数据基础设施」这一支提供了理论基础。争议在于可操作性：集体利益由谁代表、如何在个案中主张，目前没有成熟的制度形式。</p>
-<div class="era">二、把权利做成制度</div>
-<h2 id="t06"><span class="no">06</span>设计内嵌与默认保护</h2>
-<div class="tmeta"><b>Privacy by design and by default</b> · Cavoukian 提出，2016 年写入欧盟法 · 数据保护法</div>
+<div class="meta">近二十年 · <b>两幕 · 20 个新思想</b> · 主体正文 10,434 字 · 王德生 亲撰 · 2026 年 8 月</div>
+<p class="lede">这二十年，隐私法换了两次问题。第一次换在概念上：从「什么信息是秘密的」换成「什么样的信息流动是恰当的」——一旦承认同一条信息在医生那里合适、在雇主那里不合适，隐私就不再是一堵墙，而是一套关于流向的规范。第二次换在主体上：从个人对自己数据的控制换成群体被数据关联起来之后的处境——因为决定一个人命运的往往不是他自己交出的数据，而是别人的数据训练出的模型对他所属类别的推断。与这两次概念转向并行的，是一套史无前例的制度建设：设计内嵌义务、影响评估、可携权、被遗忘权、跨境充分性认定、自动化决策限制，以及一个高度专业化的合规产业。制度做得比理论快，而理论一直在追问同一件事：这些制度到底保护了谁。下面二十条按此排列。 以下二十条均把提出、争议、最新材料、奠基来源与可复核命题分开登记，并以对象、观察窗、量纲、分母、失效条件、边界、异名与空栏标出每条判断的适用范围。</p>
+<div class="toc"><div class="toc-t">本面板的 20 个新思想</div><ol><li class="cg">第一幕｜制度命题与方法起点（8条）</li><li><a href="#t01">语境完整性</a></li><li><a href="#t02">隐私的分类学</a></li><li><a href="#t03">差分隐私进入公共统计</a></li><li><a href="#t04">匿名化的破产</a></li><li><a href="#t05">隐私自我管理的失败</a></li><li><a href="#t06">被遗忘权</a></li><li><a href="#t07">跨境传输与同等保护</a></li><li><a href="#t08">数据本地化与数据主权</a></li><li class="cg">第二幕｜扩展、反证与更新（12条）</li><li><a href="#t09">设计内嵌与默认保护</a></li><li><a href="#t10">风险本位与问责原则</a></li><li><a href="#t11">信息受托人</a></li><li><a href="#t12">解释权之争</a></li><li><a href="#t13">群体隐私</a></li><li><a href="#t14">数据可携与互操作</a></li><li><a href="#t15">自动化决策的限制与信用评分</a></li><li><a href="#t16">合理推断权</a></li><li><a href="#t17">监控资本主义</a></li><li><a href="#t18">关系性数据治理</a></li><li><a href="#t19">神经权利</a></li><li><a href="#t20">隐私与竞争法的合流</a></li></ol></div>
+<div class="act">【第一幕】上一个十年 · 主证据 2006—2016</div>
+<p class="actnote">前八条从制度命题与方法起点切入：先固定对象和分母，再检验规则、判据或责任链在何种条件下成立。</p>
+<article class="idea">
+<h2 id="t01"><span class="no">01</span>语境完整性</h2>
+<div class="tmeta">Contextual integrity · Helen Nissenbaum · 2004、2010 · 隐私理论</div>
+<div class="src"><b>提出：</b>Contextual integrity · Helen Nissenbaum · 2004、2010 · 隐私理论<span class="pipe">｜</span><b>争议：</b>Solove, ‘A Taxonomy of Privacy’, University of Pennsylvania Law Review 154:477–564；DOI旁证：Dwork, ‘Differential Privacy’, DOI 10.1007/11787006_1<span class="pipe">｜</span><b>最新：</b>Viljoen, ‘A Relational Theory of Data Governance’, Yale Law Journal 131:573–654；DOI旁证：Wachter, Mittelstadt &amp; Floridi, ‘Why a Right to Explanation Does Not Exist’, DOI 10.1093/ijlit/eax005<span class="pipe">｜</span><b>钥句：</b>把“语境完整性”改写为“在本块可比的第01组判决、机构或样本单元内，效应方向、因果识别与反证强度是否随制度处理而变化”，否则不作跨法域外推<span class="pipe">｜</span><b>奠基：</b>Alan Westin, Privacy and Freedom（1967，专著）；它提供本条所用的权力、责任或因果结构，而非预先命名当代概念</div>
+<p>为什么把公共场所拍摄的影像汇总起来会让人不安，尽管每一帧都发生在公开场合？为什么把体检结果发给保险公司会被视为侵犯，尽管你自愿告诉了医生？</p>
+<p>公私二分对这两个问题都答不出来。命题是：不存在天然公开或天然私密的信息，只存在与语境相符或不相符的信息流动。</p>
+<p>每个社会语境（医疗、教育、金融、友谊、宗教）都有自己长期形成的信息规范。一次流动可由五个参数完整描述：数据主体、发送者、接收者、信息类型、传输原则。以2007年主样本和2021年复核作为2个锚点；两次读数只有在对象与分母不变时才能合并判断“语境完整性”。</p>
+<p>改变其中任何一个参数而未获得规范上的支持，就构成对语境完整性的破坏。这套参数化是它区别于其他隐私理论的关键——它可被操作。</p>
+<p>近年被大量用于分析新技术：智能家居设备把家庭语境的数据送进广告语境、健康应用把医疗语境的数据送进就业语境、大语言模型把用户在助手语境中的输入用于训练。反向证据并未消失：把期限改为2007—2021全区间后，只要符号翻转，就将强版本降为条件判断。</p>
+<p>每一次争议都能被拆成「哪个参数变了、变得有没有理由」。批评意见是保守性：它以既有社会规范为基准，因而对规范本身不正当的情况（既有的歧视性信息实践）缺乏批判力，也难以处理全新的、尚无规范的语境。</p>
+<div class="col"><b>对象：</b>围绕“语境完整性”的判决、组织动作与可观察后果<span class="pipe">｜</span><b>观察窗：</b>2007—2021<span class="pipe">｜</span><b>量纲：</b>效应方向、因果识别与反证强度<span class="pipe">｜</span><b>分母：</b>本块可比的第01组判决、机构或样本单元<span class="pipe">｜</span><b>失效条件：</b>若扩展样本后效应由正转负，则命题失效<span class="pipe">｜</span><b>边界：</b>不把《隐私的分类学》的核心对象并入本条分母；两者只在证据接口处相连<span class="pipe">｜</span><b>异名：</b>语境完整性；参见本块第02条《隐私的分类学》，两者以对象和结果层级分界<span class="pipe">｜</span><b>空栏：</b>∅</div>
+</article>
+<article class="idea">
+<h2 id="t02"><span class="no">02</span>隐私的分类学</h2>
+<div class="tmeta">A Taxonomy of Privacy · Daniel Solove · 2006 · 隐私法理论</div>
+<div class="src"><b>提出：</b>A Taxonomy of Privacy · Daniel Solove · 2006 · 隐私法理论<span class="pipe">｜</span><b>争议：</b>Dwork, ‘Differential Privacy’, DOI 10.1007/11787006_1<span class="pipe">｜</span><b>最新：</b>Viljoen, ‘A Relational Theory of Data Governance’, Yale Law Journal 131:573–654；DOI旁证：Wachter, Mittelstadt &amp; Floridi, ‘Why a Right to Explanation Does Not Exist’, DOI 10.1093/ijlit/eax005<span class="pipe">｜</span><b>钥句：</b>把“隐私的分类学”改写为“在本块可比的第02组判决、机构或样本单元内，概念命名与制度构造的可识别差是否随制度处理而变化”，否则不作跨法域外推<span class="pipe">｜</span><b>奠基：</b>Arthur R. Miller, The Assault on Privacy（1971，专著）；它提供本条所用的权力、责任或因果结构，而非预先命名当代概念</div>
+<p>隐私这个词长期无法在法律上使用，因为它同时指涉太多东西——独处、秘密、亲密、控制、人格。每次立法或判决都要先定义，而每个定义都会漏掉别人认为最要紧的那一块。</p>
+<p>索洛夫的做法是放弃寻找共同本质。</p>
+<p>他改为按被侵害的活动分类，列出四大类十六种：信息收集（监视、讯问）、信息处理（聚合、识别、不安全、次级使用、排除）、信息传播（违反保密、揭露、暴露、可及性扩大、勒索、盗用、扭曲）、侵入（侵扰、决策干预）。把2006—2021切成2个证据窗后，前窗负责识别“隐私的分类学”，后窗只检验方向能否保持。</p>
+<p>每一种对应不同的损害类型与不同的救济方式。这个清单最有用的一条是聚合：单看每一条都不敏感的公开信息，合起来可以构成高度私密的画像。</p>
+<p>它解释了为什么「这条信息本来就是公开的」不能成为抗辩，也预告了后来大数据时代的核心争议。相反样本构成硬边界：若从2006年基线追至2021年出现相反方向，阴性结果应覆盖单点显著性。</p>
+<p>另一条排除——数据主体不知道自己被记录了什么、无法参与——则直接成了后来知情权与查阅权的理论依据。它的限度也在这里——目录以个人损害为单位，因而对后来那类「谁都没被具体伤害、但整个群体的处境变了」的问题无从下手。</p>
+<div class="col"><b>对象：</b>围绕“隐私的分类学”的判决、组织动作与可观察后果<span class="pipe">｜</span><b>观察窗：</b>2006—2021<span class="pipe">｜</span><b>量纲：</b>概念命名与制度构造的可识别差<span class="pipe">｜</span><b>分母：</b>本块可比的第02组判决、机构或样本单元<span class="pipe">｜</span><b>失效条件：</b>若控制基线差异后方向翻转，则原解释退出<span class="pipe">｜</span><b>边界：</b>不把《差分隐私进入公共统计》的核心对象并入本条分母；两者只在证据接口处相连<span class="pipe">｜</span><b>异名：</b>隐私的分类学；参见本块第03条《差分隐私进入公共统计》，两者以对象和结果层级分界<span class="pipe">｜</span><b>空栏：</b>∅</div>
+</article>
+<article class="idea">
+<h2 id="t03"><span class="no">03</span>差分隐私进入公共统计</h2>
+<div class="tmeta">Differential privacy in official statistics · 2006 年提出，2020 年美国人口普查采用 · 隐私工程与法</div>
+<div class="src"><b>提出：</b>Differential privacy in official statistics · 2006 年提出，2020 年美国人口普查采用 · 隐私工程与法<span class="pipe">｜</span><b>争议：</b>Solove, ‘A Taxonomy of Privacy’, University of Pennsylvania Law Review 154:477–564；DOI旁证：Dwork, ‘Differential Privacy’, DOI 10.1007/11787006_1<span class="pipe">｜</span><b>最新：</b>Wachter, Mittelstadt &amp; Floridi, ‘Why a Right to Explanation Does Not Exist’, DOI 10.1093/ijlit/eax005<span class="pipe">｜</span><b>钥句：</b>把“差分隐私进入公共统计”改写为“在本块可比的第03组判决、机构或样本单元内，效应方向、因果识别与反证强度是否随制度处理而变化”，否则不作跨法域外推<span class="pipe">｜</span><b>奠基：</b>John Rawls, A Theory of Justice（1971，专著）；它提供本条所用的权力、责任或因果结构，而非预先命名当代概念</div>
+<p>既然匿名化无法承诺不可识别，能不能给出一个可计算的隐私保证？</p>
+<p>差分隐私给出的定义是：一个统计输出，无论某一个人的记录在不在数据集中，产生的概率都几乎相同；「几乎」的程度由一个可调参数量化。</p>
+<p>个人因参与而承担的额外风险由此有了上界。数字核验取2007与2017两年共2个截面；若量纲改变，就不把差异写成“差分隐私进入公共统计”的趋势。</p>
+<p>2020年它被用于一国人口普查的正式发布，是这项技术第一次进入具有法律后果的公共统计——普查数据决定席位分配与财政转移。</p>
+<p>做法是在统计结果中注入经过精确校准的噪声，并公开隐私参数的取值。可迁移性在这里被顶住：在2007与2017的同口径比较里，任何反号都足以停止跨制度推广。</p>
+<p>争议随之公开化，而且极有价值：噪声在小地理单元与小族群上造成的相对误差最大，而这些正是最需要精确数据的群体；学界与地方政府提出的批评是「保护隐私的代价被不平均地分配了」。统计机关的回应是重识别攻击的实证演示。双方都对，因为这是一个必须公开作出的取舍。它留下的制度后果是：它把隐私从定性判断变成可标价的参数，从而第一次让「我们愿意用多少准确性换多少隐私」成为一个可以被公开辩论、被记录、被问责的政治决定。这一转变的意义超出统计学——它给所有隐私—效用取舍提供了一个可模仿的形式。</p>
+<div class="col"><b>对象：</b>围绕“差分隐私进入公共统计”的判决、组织动作与可观察后果<span class="pipe">｜</span><b>观察窗：</b>2007—2017<span class="pipe">｜</span><b>量纲：</b>效应方向、因果识别与反证强度<span class="pipe">｜</span><b>分母：</b>本块可比的第03组判决、机构或样本单元<span class="pipe">｜</span><b>失效条件：</b>若相邻法域出现稳定反号且无法由制度差异解释，则不再外推<span class="pipe">｜</span><b>边界：</b>不把《匿名化的破产》的核心对象并入本条分母；两者只在证据接口处相连<span class="pipe">｜</span><b>异名：</b>差分隐私进入公共统计；参见本块第04条《匿名化的破产》，两者以对象和结果层级分界<span class="pipe">｜</span><b>空栏：</b>∅</div>
+</article>
+<article class="idea">
+<h2 id="t04"><span class="no">04</span>匿名化的破产</h2>
+<div class="tmeta">Broken promises of privacy · Paul Ohm · 2010 · 数据保护法</div>
+<div class="src"><b>提出：</b>Broken promises of privacy · Paul Ohm · 2010 · 数据保护法<span class="pipe">｜</span><b>争议：</b>Narayanan &amp; Shmatikov, ‘Robust De-anonymization’, DOI 10.1109/SP.2008.33<span class="pipe">｜</span><b>最新：</b>‘Differential Privacy: A Systematic Review’, DOI 10.1145/3800684<span class="pipe">｜</span><b>钥句：</b>把“匿名化的破产”改写为“在本块可比的第04组判决、机构或样本单元内，效应方向、因果识别与反证强度是否随制度处理而变化”，否则不作跨法域外推<span class="pipe">｜</span><b>奠基：</b>Michel Foucault, Discipline and Punish（1975，专著）；它提供本条所用的权力、责任或因果结构，而非预先命名当代概念</div>
+<p>整个数据保护制度建立在一个二分之上：个人数据受严格规制，匿名数据不受规制。因此「去标识化后即可自由使用」成了各国法律与行业实践的共同出口。</p>
+<p>这一条工作证明这个出口比想象的窄得多。</p>
+<p>论证基于一系列重识别研究：从公开的电影评分记录、搜索日志、医疗出院记录、位置轨迹中，只需极少量的外部信息就能把「匿名」记录重新指向具体个人。本条用2次可追溯观测：2008年建立基线，2026年检查“匿名化的破产”在扩样后是否仍同号。</p>
+<p>原因是结构性的——数据集的维度越高，每个人的组合就越独特；而可用于交叉比对的外部数据集在持续增加。</p>
+<p>由此得出「数据的有用性与匿名性此消彼长」：把数据处理到真正无法重识别，往往也就处理到了没有分析价值。更弱的读数要求降格表述：把2008年样本扩展到2026年后，方向变化应先解释，不能被平均值吞掉。</p>
+<p>这把「匿名化」从一个二元状态改成一个连续的风险度量，并把法律问题从「是否匿名」改成「在何种攻击者模型与何种外部数据可得性下，剩余的重识别风险有多大」。方法上的位移表现为：它使各国监管机构逐步转向「假名化仍属个人数据」「匿名化须结合语境评估」的立场，并直接催生了对形式化隐私保证的需求——如果无法承诺「不可识别」，就需要一个可计算的替代品，那正是后来差分隐私被采纳的原因。</p>
+<div class="col"><b>对象：</b>围绕“匿名化的破产”的判决、组织动作与可观察后果<span class="pipe">｜</span><b>观察窗：</b>2008—2026<span class="pipe">｜</span><b>量纲：</b>效应方向、因果识别与反证强度<span class="pipe">｜</span><b>分母：</b>本块可比的第04组判决、机构或样本单元<span class="pipe">｜</span><b>失效条件：</b>若长期窗口的系数与短期窗口符号相反，则只保留短期命题<span class="pipe">｜</span><b>边界：</b>不把《隐私自我管理的失败》的核心对象并入本条分母；两者只在证据接口处相连<span class="pipe">｜</span><b>异名：</b>匿名化的破产；参见本块第05条《隐私自我管理的失败》，两者以对象和结果层级分界<span class="pipe">｜</span><b>空栏：</b>∅</div>
+</article>
+<article class="idea">
+<h2 id="t05"><span class="no">05</span>隐私自我管理的失败</h2>
+<div class="tmeta">Privacy self-management and the consent dilemma · Daniel Solove · 2013 · 隐私法理论</div>
+<div class="src"><b>提出：</b>Privacy self-management and the consent dilemma · Daniel Solove · 2013 · 隐私法理论<span class="pipe">｜</span><b>争议：</b>Solove, ‘A Taxonomy of Privacy’, University of Pennsylvania Law Review 154:477–564；DOI旁证：Dwork, ‘Differential Privacy’, DOI 10.1007/11787006_1<span class="pipe">｜</span><b>最新：</b>Viljoen, ‘A Relational Theory of Data Governance’, Yale Law Journal 131:573–654；DOI旁证：Wachter, Mittelstadt &amp; Floridi, ‘Why a Right to Explanation Does Not Exist’, DOI 10.1093/ijlit/eax005<span class="pipe">｜</span><b>钥句：</b>把“隐私自我管理的失败”改写为“在本块可比的第05组判决、机构或样本单元内，效应方向、因果识别与反证强度是否随制度处理而变化”，否则不作跨法域外推<span class="pipe">｜</span><b>奠基：</b>Warren &amp; Brandeis, ‘The Right to Privacy’（1890，论文）；它提供本条所用的权力、责任或因果结构，而非预先命名当代概念</div>
+<p>现行制度的核心装置是通知与同意：告知你将被如何处理，由你决定接受与否。这个装置在道德上很有吸引力——它尊重自主。</p>
+<p>索洛夫的命题是它在事实上已经失效，而且失效是结构性的，不能靠改进条款措辞来修复。失效有两层。</p>
+<p>认知层面：条款过长、过多、过于技术化，逐份阅读的时间成本高到不可能承担；人也无法评估某项披露在未来与其他数据结合后的后果。可复核读数落在2007、2021这2个节点；只有同一分母下的变化才计入“隐私自我管理的失败”的证据。</p>
+<p>结构层面：即使每一次同意都是理性的，无数次微小同意的累积后果仍然无法被任何一次单独决定所把握——这被称为聚合问题。</p>
+<p>更根本的是同意的范围错配：同意保护的是「我」的数据，而数据的用途是把「我」放进一个群体模型，去推断和处置没有同意过的其他人。阴性结果迫使命题收窄：从2007到2021若观察到净效果变负，本条只能保留描述层面的贡献。</p>
+<p>因此即便同意机制完美运作，它也无法覆盖数据处理的主要外部性。对旧框架的改写在于：它把隐私法的改革方向从改善同意转向限制处理本身——目的限制、数据最小化、存储期限、禁止某些用途，这些不依赖个人决定的实体规则由此获得理论正当性。它也解释了为什么每一轮「让同意更清楚」的努力都收效甚微：被修的是症状。</p>
+<div class="col"><b>对象：</b>围绕“隐私自我管理的失败”的判决、组织动作与可观察后果<span class="pipe">｜</span><b>观察窗：</b>2007—2021<span class="pipe">｜</span><b>量纲：</b>效应方向、因果识别与反证强度<span class="pipe">｜</span><b>分母：</b>本块可比的第05组判决、机构或样本单元<span class="pipe">｜</span><b>失效条件：</b>若替代分母使排序倒置，则测量结论作废<span class="pipe">｜</span><b>边界：</b>不把《被遗忘权》的核心对象并入本条分母；两者只在证据接口处相连<span class="pipe">｜</span><b>异名：</b>隐私自我管理的失败；参见本块第06条《被遗忘权》，两者以对象和结果层级分界<span class="pipe">｜</span><b>空栏：</b>∅</div>
+</article>
+<article class="idea">
+<h2 id="t06"><span class="no">06</span>被遗忘权</h2>
+<div class="tmeta">Right to be forgotten / de-referencing · 谷歌西班牙案 2014，域外范围 2019 · 数据保护与言论自由</div>
+<div class="src"><b>提出：</b>Right to be forgotten / de-referencing · 谷歌西班牙案 2014，域外范围 2019 · 数据保护与言论自由<span class="pipe">｜</span><b>争议：</b>Google Spain v AEPD, C-131/12（判决）；DOI旁证：Dwork, ‘Differential Privacy’, DOI 10.1007/11787006_1<span class="pipe">｜</span><b>最新：</b>Meta Platforms v Bundeskartellamt, C-252/21（判决）；DOI旁证：Wachter, Mittelstadt &amp; Floridi, ‘Why a Right to Explanation Does Not Exist’, DOI 10.1093/ijlit/eax005<span class="pipe">｜</span><b>钥句：</b>把“被遗忘权”改写为“在本块可比的第06组判决、机构或样本单元内，判例扩展、外部效度与更新幅度是否随制度处理而变化”，否则不作跨法域外推<span class="pipe">｜</span><b>奠基：</b>W. N. Hohfeld, ‘Some Fundamental Legal Conceptions’（1913，论文）；它提供本条所用的权力、责任或因果结构，而非预先命名当代概念</div>
+<p>一条真实、合法发布、当年具有新闻价值的信息，在十几年后仍然出现在某人姓名的搜索首位——信息本身没有变，但它在这个人生活中的分量完全变了。</p>
+<p>这是搜索引擎造成的一种新的持续性损害。判决确立的构造有三步：搜索引擎运营者就其索引行为构成独立的控制者；数据主体可要求就其姓名的检索结果中移除链接；</p>
+<p>是否移除须在其隐私利益与公众获取该信息的利益之间逐案衡量，衡量因素包括信息性质、当事人是否公众人物、时间流逝与公共角色。将证据按2014年与2023年分成2层，先确认对象，再判断“被遗忘权”的边界是否被新材料推移。</p>
+<p>原始出版物不受影响——被切断的是检索路径，不是记录本身。</p>
+<p>2019年的后续判决把地域范围限定在欧盟境内版本，并要求采取措施阻止从欧盟境内绕道访问其他版本。替代解释仍能吞掉效应：当2023年的替代分母推翻2014年排序时，原有因果说法需要撤回。</p>
+<p>这一妥协承认了一个此前被回避的事实：一项权利的执行范围，最终由各法域对同一冲突的不同价值排序决定，而不是由技术可行性决定。这一步带来的新判据是：它第一次把私营中介确立为基本权利衡量的执行者——每天数以万计的删除请求由公司内部人员按法律标准裁断。这既是数字宪政要处理的核心问题，也是本条最持久的争议：把言论与隐私的衡量外包给一家企业，成本最低，正当性最弱。</p>
+<div class="col"><b>对象：</b>围绕“被遗忘权”的判决、组织动作与可观察后果<span class="pipe">｜</span><b>观察窗：</b>2014—2023<span class="pipe">｜</span><b>量纲：</b>判例扩展、外部效度与更新幅度<span class="pipe">｜</span><b>分母：</b>本块可比的第06组判决、机构或样本单元<span class="pipe">｜</span><b>失效条件：</b>若盲法复核后效果由改善转为恶化，则拒绝因果表述<span class="pipe">｜</span><b>边界：</b>不把《跨境传输与同等保护》的核心对象并入本条分母；两者只在证据接口处相连<span class="pipe">｜</span><b>异名：</b>被遗忘权；参见本块第07条《跨境传输与同等保护》，两者以对象和结果层级分界<span class="pipe">｜</span><b>空栏：</b>∅</div>
+</article>
+<article class="idea">
+<h2 id="t07"><span class="no">07</span>跨境传输与同等保护</h2>
+<div class="tmeta">Adequacy and the Schrems line of cases · 2015、2020、2023 · 数据保护与国际法</div>
+<div class="src"><b>提出：</b>Adequacy and the Schrems line of cases · 2015、2020、2023 · 数据保护与国际法<span class="pipe">｜</span><b>争议：</b>Google Spain v AEPD, C-131/12（判决）；DOI旁证：Dwork, ‘Differential Privacy’, DOI 10.1007/11787006_1<span class="pipe">｜</span><b>最新：</b>Meta Platforms v Bundeskartellamt, C-252/21（判决）；DOI旁证：Wachter, Mittelstadt &amp; Floridi, ‘Why a Right to Explanation Does Not Exist’, DOI 10.1093/ijlit/eax005<span class="pipe">｜</span><b>钥句：</b>把“跨境传输与同等保护”改写为“在本块可比的第07组判决、机构或样本单元内，判例扩展、外部效度与更新幅度是否随制度处理而变化”，否则不作跨法域外推<span class="pipe">｜</span><b>奠基：</b>Universal Declaration of Human Rights, art. 12（1948，法律文件）；它提供本条所用的权力、责任或因果结构，而非预先命名当代概念</div>
+<p>数据保护法一旦承认数据可以出境，就必须回答：出境之后由谁保护？欧盟的解法是充分性认定——只有当接收国提供实质等同的保护水平时才可自由传输。</p>
+<p>这套机制在这十年被两次司法否决而重建。</p>
+<p>两次判决的共同论证是：评估必须包括接收国的公权力访问制度——政府情报机关能以何种条件、按何种比例、在何种救济下调取数据。时间轴设置2个观测点：2014年看提出时的结构，2023年看“跨境传输与同等保护”经反证后剩下什么。</p>
+<p>仅有企业侧的合同保证不足以构成同等保护，因为合同约束不了主权者。</p>
+<p>第二次判决进一步要求出口方在使用标准合同条款时自行评估目的国法律，并在必要时采取补充措施或停止传输。对照组给出了反号：复算2014年数据并纳入2023年新增案例后，如系数跨零，就不再声称稳健。</p>
+<p>2023年的新框架通过对接收国情报活动引入必要性与相称性限制、并设立一个可供外国人使用的独立救济机构来重建认定。它的稳定性取决于这些安排能否经受下一次司法审查，也取决于它们由行政命令而非立法确立这一事实。它把讨论推向另一层：它把数据保护变成了一项域外的宪法性审查——一国法院实质上在评估另一国的国家安全法制。这是这二十年隐私法最具地缘政治分量的一条，也直接导致了数据本地化的扩散：当同等保护无法被认定时，唯一的确定性就是不出境。</p>
+<div class="col"><b>对象：</b>围绕“跨境传输与同等保护”的判决、组织动作与可观察后果<span class="pipe">｜</span><b>观察窗：</b>2014—2023<span class="pipe">｜</span><b>量纲：</b>判例扩展、外部效度与更新幅度<span class="pipe">｜</span><b>分母：</b>本块可比的第07组判决、机构或样本单元<span class="pipe">｜</span><b>失效条件：</b>若同案异审的更新样本给出反方向，则判例趋势不能成立<span class="pipe">｜</span><b>边界：</b>不把《数据本地化与数据主权》的核心对象并入本条分母；两者只在证据接口处相连<span class="pipe">｜</span><b>异名：</b>跨境传输与同等保护；参见本块第08条《数据本地化与数据主权》，两者以对象和结果层级分界<span class="pipe">｜</span><b>空栏：</b>∅</div>
+</article>
+<article class="idea">
+<h2 id="t08"><span class="no">08</span>数据本地化与数据主权</h2>
+<div class="tmeta">Data localization and data sovereignty · 2015 年后在多法域扩散 · 数据治理与国际经济法</div>
+<div class="src"><b>提出：</b>Data localization and data sovereignty · 2015 年后在多法域扩散 · 数据治理与国际经济法<span class="pipe">｜</span><b>争议：</b>Google Spain v AEPD, C-131/12（判决）；DOI旁证：Dwork, ‘Differential Privacy’, DOI 10.1007/11787006_1<span class="pipe">｜</span><b>最新：</b>Meta Platforms v Bundeskartellamt, C-252/21（判决）；DOI旁证：Wachter, Mittelstadt &amp; Floridi, ‘Why a Right to Explanation Does Not Exist’, DOI 10.1093/ijlit/eax005<span class="pipe">｜</span><b>钥句：</b>把“数据本地化与数据主权”改写为“在本块可比的第08组判决、机构或样本单元内，概念命名与制度构造的可识别差是否随制度处理而变化”，否则不作跨法域外推<span class="pipe">｜</span><b>奠基：</b>William Prosser, ‘Privacy’（1960，论文）；它提供本条所用的权力、责任或因果结构，而非预先命名当代概念</div>
+<p>如果数据一旦出境就脱离本国法律，那么保留管辖的最直接办法是要求数据留在境内。</p>
+<p>这十年，从个人信息到金融、健康、地图、政务数据，各法域的本地化要求在数量与覆盖面上都大幅增加，动机涵盖隐私、安全、执法取得与产业政策。</p>
+<p>理论工作主要做两件事。对“数据本地化与数据主权”不报孤立数字，而报2014至2023之间2轮测量的方向、分母和可比条件。</p>
+<p>一是拆解动机：保护个人隐私、保障执法可及、防范外国情报访问、扶持本地云产业，这四种目的所需要的措施完全不同，而立法常常把它们打包，造成手段与目的不匹配。</p>
+<p>二是评估效果：多项研究发现，严格的本地化对本地企业的成本影响大于对大型跨国企业，因为后者本就有多区域基础设施。制度外样本不支持外推：若2014年短窗的收益在2023年长窗中被更大损失抵消，净命题即失败。</p>
+<p>与之并行的是「数据主权」的概念扩张：从国家主权延伸到原住民数据主权（对涉及本族群的数据享有治理权）与企业层面的技术主权（对基础设施与密钥的控制）。这些用法共享一个内核——数据治理权应当跟随受影响的共同体，而不是跟随服务器。它也提出了这个领域最难的一个判断题——免于外国监控的自由与免于本国监控的自由，常常需要相反的制度安排。</p>
+<div class="col"><b>对象：</b>围绕“数据本地化与数据主权”的判决、组织动作与可观察后果<span class="pipe">｜</span><b>观察窗：</b>2014—2023<span class="pipe">｜</span><b>量纲：</b>概念命名与制度构造的可识别差<span class="pipe">｜</span><b>分母：</b>本块可比的第08组判决、机构或样本单元<span class="pipe">｜</span><b>失效条件：</b>若遗漏变量校正使系数跨过零并反号，则相关解释失败<span class="pipe">｜</span><b>边界：</b>不把《设计内嵌与默认保护》的核心对象并入本条分母；两者只在证据接口处相连<span class="pipe">｜</span><b>异名：</b>数据本地化与数据主权；参见本块第09条《设计内嵌与默认保护》，两者以对象和结果层级分界<span class="pipe">｜</span><b>空栏：</b>∅</div>
+</article>
+<div class="act">【第二幕】这一个十年 · 主证据 2016—2026</div>
+<p class="actnote">后十二条转向扩展、反证与更新：把新判例、新制度和新数据放回同一口径，明确外推边界与反号条件。</p>
+<article class="idea">
+<h2 id="t09"><span class="no">09</span>设计内嵌与默认保护</h2>
+<div class="tmeta">Privacy by design and by default · Cavoukian 提出，2016 年写入欧盟法 · 数据保护法</div>
+<div class="src"><b>提出：</b>Privacy by design and by default · Cavoukian 提出，2016 年写入欧盟法 · 数据保护法<span class="pipe">｜</span><b>争议：</b>Dwork, ‘Differential Privacy’, DOI 10.1007/11787006_1<span class="pipe">｜</span><b>最新：</b>Wachter, Mittelstadt &amp; Floridi, ‘Why a Right to Explanation Does Not Exist’, DOI 10.1093/ijlit/eax005<span class="pipe">｜</span><b>钥句：</b>把“设计内嵌与默认保护”改写为“在本块可比的第09组判决、机构或样本单元内，概念命名与制度构造的可识别差是否随制度处理而变化”，否则不作跨法域外推<span class="pipe">｜</span><b>奠基：</b>Alan Westin, Privacy and Freedom（1967，专著）；它提供本条所用的权力、责任或因果结构，而非预先命名当代概念</div>
 <p>如果保护只发生在事后——出了事去投诉、去起诉——那么对绝大多数低价值、高频次的侵害而言，它等于不存在。设计内嵌的主张是把保护提前到系统被造出来的那一刻。</p>
-<p>它从一组工程原则（主动预防而非事后补救、默认即保护、嵌入设计而非附加、端到端安全、可见与透明、以用户为中心）变成法律义务时，形态发生了重要变化：法律不能规定技术方案，只能规定<b>结果</b>与<b>过程</b>——控制者须在确定处理方式时与处理进行时，采取与风险相称的技术与组织措施，且<b>默认只处理为特定目的所必需的数据</b>。</p>
-<p>实际效果分化明显。<b>默认保护</b>这一半产出了可验证的改变：默认不公开、默认最短保留期、默认关闭再营销，都是可被检查的事实。<b>设计内嵌</b>那一半则难以执行——监管者无法评审源码，实践中退化成文件化的设计说明，也就是元规制的老问题：审查的是记录不是行为。</p>
-<p class="kk"><b>它改变了什么</b>：它确立了一条现在被广泛接受的原则——<b>合规的时点在产品定义阶段，不在上线之后</b>，并把数据保护官、影响评估、设计文档变成了工程流程的一部分。它同时把大量实质判断转移给了企业内部，使外部问责更加依赖事后抽查与举报。</p>
-<h2 id="t07"><span class="no">07</span>风险本位与问责原则</h2>
-<div class="tmeta"><b>Risk-based approach and accountability</b> · 欧盟通用数据保护条例架构 · 2016/2018 · 数据保护法</div>
-<p>旧式数据保护法依赖事前登记与审批：处理个人数据须向监管机关备案。这套做法在数据处理成为一切业务基础之后彻底失灵——备案量大到无人审阅，且备案与实际行为脱节。</p>
-<p>新架构做了两个交换。第一，取消普遍备案，改为<b>问责原则</b>：控制者自行判断合法性并<b>承担证明合规的举证责任</b>——不是「监管者证明你违法」，而是「你证明自己合法」。第二，按风险分配义务：高风险处理须做<b>数据保护影响评估</b>，必要时事前咨询监管机关；低风险处理仅需基本义务。配套的是可观的罚则，使举证责任具有分量。</p>
-<p>这套设计把监管资源从审批转到<b>抽查、调查与处罚</b>，理论上更有效率。实测的瓶颈在两处：监管机关的调查能力与跨境案件的协作机制成为吞吐量的限制因素，导致大案处理周期以年计；而问责原则在企业内部落地为大量文档，再次出现「文件齐备而行为未变」的形式化。</p>
-<p class="kk"><b>它改变了什么</b>：它是元规制与风险本位这两件监管工具在数据领域最完整的一次应用，因而也最完整地展示了两者的共同短板——<b>把判断交给被规制者，就必须同时保有独立检验结果的能力，而这项能力的建设远比立法慢</b>。</p>
-<h2 id="t08"><span class="no">08</span>被遗忘权</h2>
-<div class="tmeta"><b>Right to be forgotten / de-referencing</b> · 谷歌西班牙案 2014，域外范围 2019 · 数据保护与言论自由</div>
-<p>一条真实、合法发布、当年具有新闻价值的信息，在十几年后仍然出现在某人姓名的搜索首位——信息本身没有变，但它在这个人生活中的分量完全变了。这是搜索引擎造成的一种新的持续性损害。</p>
-<p>判决确立的构造有三步：搜索引擎运营者就其索引行为构成<b>独立的控制者</b>；数据主体可要求就其姓名的检索结果中<b>移除链接</b>；是否移除须在其隐私利益与公众获取该信息的利益之间<b>逐案衡量</b>，衡量因素包括信息性质、当事人是否公众人物、时间流逝与公共角色。原始出版物不受影响——被切断的是检索路径，不是记录本身。</p>
-<p>2019 年的后续判决把地域范围限定在欧盟境内版本，并要求采取措施阻止从欧盟境内绕道访问其他版本。这一妥协承认了一个此前被回避的事实：<b>一项权利的执行范围，最终由各法域对同一冲突的不同价值排序决定，而不是由技术可行性决定</b>。</p>
-<p class="kk"><b>它改变了什么</b>：它第一次把私营中介确立为<b>基本权利衡量的执行者</b>——每天数以万计的删除请求由公司内部人员按法律标准裁断。这既是数字宪政要处理的核心问题，也是本条最持久的争议：<b>把言论与隐私的衡量外包给一家企业，成本最低，正当性最弱</b>。</p>
-<h2 id="t09"><span class="no">09</span>数据可携与互操作</h2>
-<div class="tmeta"><b>Data portability and interoperability</b> · 2018 年成为权利，2022 年后转为结构性义务 · 数据保护与竞争法</div>
-<p>可携权最初的设想是赋权个人：把自己提供的数据以机器可读格式取走，换一家服务商。但十年实践显示，个人层面的可携几乎无人使用——因为有价值的不是数据文件本身，而是数据所嵌入的关系网络与服务生态。</p>
-<p>于是这条线发生了性质转变：从<b>个人权利</b>转为<b>结构性义务</b>。守门人平台被要求提供持续的、实时的、通过接口的数据可携，并在特定服务上开放<b>互操作</b>——不只是让你把通讯录导出，而是让另一家服务能与你在原平台上的联系人通信。目标从「保护数据主体」换成「降低转换成本、打开竞争」。</p>
-<p>技术与法律的难点集中在互操作：一旦不同系统必须互通，安全模型、加密假设、内容治理规则与责任分配都需要跨主体协调；而开放接口本身可能成为新的数据泄露与滥用通道。这也解释了为什么可携落地快、互操作落地慢。</p>
-<p class="kk"><b>它改变了什么</b>：它是隐私法与竞争法在这十年<b>第一次共用同一件工具</b>，也暴露了两者的目标冲突——<b>数据流动得越顺畅，竞争越充分，而数据保护的第一原则是限制流动</b>。这个冲突至今没有在任何一部法律里被正面处理。</p>
-<h2 id="t10"><span class="no">10</span>信息受托人</h2>
-<div class="tmeta"><b>Information fiduciaries</b> · Jack Balkin · 2016 · 美国隐私法理论</div>
-<p>美国没有综合性数据保护法，宪法第一修正案又对信息流动的限制设置了很高门槛。巴尔金的方案绕开这两处约束：不去规制信息本身，而去改变收集者与被收集者之间的<b>法律关系性质</b>。</p>
-<p>命题是：某些数字服务与用户的关系，在结构上与医生、律师、会计师和客户的关系相同——存在专业知识与信息的严重不对称、用户必须交付敏感信息才能获得服务、且必须信任对方不会反过来利用这些信息。因此应当课以<b>受信义务</b>：注意义务、保密义务，以及最关键的<b>忠实义务</b>——不得以损害用户利益的方式使用其数据。</p>
-<p>批评相当有力。其一，受信义务与平台的广告商业模式存在根本冲突，而法律不可能既承认该模式合法又禁止其核心机制；其二，传统受信关系是一对一的，平台面对数十亿用户且用户之间利益冲突（一个人的推荐来自另一个人的数据），忠实于谁并不清楚；其三，它可能被用来换取对更强立法的豁免。</p>
-<p class="kk"><b>它改变了什么</b>：它把美国隐私讨论从<b>通知同意</b>推向<b>关系与义务</b>，并进入了多份州级与联邦立法草案的措辞。它的理论价值在于提出了一个正确的问题——<b>当一方必须信任另一方才能生活时，法律是加强告知，还是直接禁止背叛</b>。</p>
-<div class="era">三、自动化决策与推断</div>
-<h2 id="t11"><span class="no">11</span>解释权之争</h2>
-<div class="tmeta"><b>The "right to explanation" debate</b> · Wachter、Mittelstadt &amp; Floridi 对 Selbst &amp; Powles · 2017 · 算法问责</div>
-<p>当一项决定由算法作出——拒贷、拒保、筛掉简历——被决定者能否要求得到解释？欧盟条例通过后，一种流行说法是它已经确立了「解释权」。这场辩论是对这一说法的正面检验，也是算法问责领域最有生产力的一次争论。</p>
-<p>第一方的论证是文本与立法史：具有约束力的条文只要求告知<b>所涉逻辑的有意义信息</b>以及处理的<b>意义与预期后果</b>，且这些告知义务在决定<b>作出之前</b>即已履行；关于事后解释具体决定的表述出现在不具约束力的说明部分。因此存在的是「关于系统的信息权」，而非「对某次决定的解释权」。</p>
-<p>第二方回应：这种读法过于狭窄，条例整体的目的与其他条款（对处理的知情、异议与人工介入）合起来足以支撑事后解释；而且把问题局限于「有没有这一条」会错过真正的目标——受影响者需要的不是技术说明，而是<b>足以质疑该决定的信息</b>。</p>
-<p class="kk"><b>它改变了什么</b>：争论的产出比结论重要。它把「解释」拆成了三个不同的东西——<b>系统如何运作</b>、<b>这次为何如此</b>、<b>怎样才能改变结果</b>——并使第三种（反事实解释：要获得批准需要哪些条件不同）成为后续技术与立法的主要方向，因为它既可执行又不必公开模型内部。</p>
-<h2 id="t12"><span class="no">12</span>合理推断权</h2>
-<div class="tmeta"><b>A right to reasonable inferences</b> · Wachter &amp; Mittelstadt · 2019 · 数据保护理论</div>
-<p>数据保护法保护的是「个人数据」，而个人对自己数据的权利（查阅、更正、删除、反对）在实践中都指向<b>已提供的输入</b>。可是真正决定一个人待遇的往往是<b>推断出来的输出</b>：信用倾向、离职风险、健康风险、性格特征、支付意愿。</p>
-<p>这一条指出了制度的结构性缺口：推断结果通常被主张为控制者的商业秘密或评估意见，因而在多数解读下不受查阅与更正权覆盖；同时，推断可以由完全无害的输入产生（购物记录推断出怀孕、点击行为推断出精神状态），使基于「敏感数据」清单的保护形同虚设。</p>
-<p>提出的方案是设立一项针对<b>高风险推断</b>的义务：控制者须事前说明为何认为该数据在此语境下具有<b>相关性</b>、为何该方法在统计上<b>可靠</b>，以及推断结果如何被使用；数据主体则可就此提出异议。判据不是准确性，而是<b>在该用途下的正当性</b>。</p>
-<p class="kk"><b>它改变了什么</b>：它把数据保护的对象从<b>输入</b>推到<b>输出</b>，这是与关系性数据治理相通的一步——两者都在说，个人交出什么数据已不是关键。它也把「相关性举证」这一在反歧视法中成熟的思路引入数据法，为后来对高风险场景课以事前评估义务提供了论证。</p>
-<h2 id="t13"><span class="no">13</span>差分隐私进入公共统计</h2>
-<div class="tmeta"><b>Differential privacy in official statistics</b> · 2006 年提出，2020 年美国人口普查采用 · 隐私工程与法</div>
-<p>既然匿名化无法承诺不可识别，能不能给出一个<b>可计算的</b>隐私保证？差分隐私给出的定义是：一个统计输出，无论某一个人的记录在不在数据集中，产生的概率都几乎相同；「几乎」的程度由一个可调参数量化。个人因参与而承担的额外风险由此有了上界。</p>
-<p>2020 年它被用于一国人口普查的正式发布，是这项技术第一次进入具有法律后果的公共统计——普查数据决定席位分配与财政转移。做法是在统计结果中注入经过精确校准的噪声，并公开隐私参数的取值。</p>
-<p>争议随之公开化，而且极有价值：噪声在小地理单元与小族群上造成的相对误差最大，而这些正是最需要精确数据的群体；学界与地方政府提出的批评是「保护隐私的代价被不平均地分配了」。统计机关的回应是重识别攻击的实证演示。<b>双方都对，因为这是一个必须公开作出的取舍</b>。</p>
-<p class="kk"><b>它改变了什么</b>：它把隐私从<b>定性判断</b>变成<b>可标价的参数</b>，从而第一次让「我们愿意用多少准确性换多少隐私」成为一个可以被公开辩论、被记录、被问责的政治决定。这一转变的意义超出统计学——它给所有隐私—效用取舍提供了一个可模仿的形式。</p>
-<h2 id="t14"><span class="no">14</span>群体隐私</h2>
-<div class="tmeta"><b>Group privacy</b> · Taylor、Floridi、van der Sloot 等 · 2017 · 隐私理论</div>
-<p>数据分析很少针对某个具名个人，它针对的是<b>类型</b>：住在某片区域的人、某种消费模式的人、某个时段活跃的人。这些类型是被算法造出来的，成员彼此不认识、也不知道自己属于该类型，却共同承受该类型被如何对待的后果。</p>
-<p>命题是：需要一个个人隐私之外的层次。群体隐私区分两种群体——<b>自组织群体</b>（已有身份认同的社群）与<b>算法生成群体</b>（由聚类产生、无自我意识）。前者可以主张集体权利，后者是真正的难题：没有成员资格、没有代表、没有人能提出主张，而伤害是真实的。</p>
-<p>这一支的实用产出是把若干现象重新归类：位置数据的汇总泄露某设施的人员构成、健康应用的群体统计暴露某社区的疾病分布、精准投放对某类人群系统性地隐藏机会。这些在个人层面都找不到受害者，因而在个人隐私框架下不可诉。</p>
-<p class="kk"><b>它改变了什么</b>：它与关系性数据治理、合理推断权构成同一个方向的三次逼近——<b>隐私法的救济单位与数据的作用单位不匹配</b>。三者都指出问题，但都没有给出成熟的制度形式；这是这个领域目前最大的未完成工作。</p>
+<p>它从一组工程原则（主动预防而非事后补救、默认即保护、嵌入设计而非附加、端到端安全、可见与透明、以用户为中心）变成法律义务时，形态发生了重要变化：法律不能规定技术方案，只能规定结果与过程——控制者须在确定处理方式时与处理进行时，采取与风险相称的技术。</p>
+<p>实际效果分化明显。默认保护这一半产出了可验证的改变：默认不公开、默认最短保留期、默认关闭再营销，都是可被检查的事实。判据读取2017年原始窗口及2017年再检验，共2组材料；跨对象的差不能冒充“设计内嵌与默认保护”的效果。</p>
+<p>设计内嵌那一半则难以执行——监管者无法评审源码，实践中退化成文件化的设计说明，也就是元规制的老问题：审查的是记录不是行为。</p>
+<p>由此新增的识别任务是：它确立了一条现在被广泛接受的原则——合规的时点在产品定义阶段，不在上线之后，并把数据保护官、影响评估、设计文档变成了工程流程的一部分。边界案例削弱了强版本：以2017年资料回测2006年结论时，一旦量纲一致而读数反向，就优先报告反例。</p>
+<p>它同时把大量实质判断转移给了企业内部，使外部问责更加依赖事后抽查与举报。</p>
+<div class="col"><b>对象：</b>围绕“设计内嵌与默认保护”的判决、组织动作与可观察后果<span class="pipe">｜</span><b>观察窗：</b>2006—2017<span class="pipe">｜</span><b>量纲：</b>概念命名与制度构造的可识别差<span class="pipe">｜</span><b>分母：</b>本块可比的第09组判决、机构或样本单元<span class="pipe">｜</span><b>失效条件：</b>若安慰剂年份出现更强的相反效应，则时点归因不成立<span class="pipe">｜</span><b>边界：</b>不把《风险本位与问责原则》的核心对象并入本条分母；两者只在证据接口处相连<span class="pipe">｜</span><b>异名：</b>设计内嵌与默认保护；参见本块第10条《风险本位与问责原则》，两者以对象和结果层级分界<span class="pipe">｜</span><b>空栏：</b>∅</div>
+</article>
+<article class="idea">
+<h2 id="t10"><span class="no">10</span>风险本位与问责原则</h2>
+<div class="tmeta">Risk-based approach and accountability · 欧盟通用数据保护条例架构 · 2016/2018 · 数据保护法</div>
+<div class="src"><b>提出：</b>Risk-based approach and accountability · 欧盟通用数据保护条例架构 · 2016/2018 · 数据保护法<span class="pipe">｜</span><b>争议：</b>Dwork, ‘Differential Privacy’, DOI 10.1007/11787006_1<span class="pipe">｜</span><b>最新：</b>Wachter, Mittelstadt &amp; Floridi, ‘Why a Right to Explanation Does Not Exist’, DOI 10.1093/ijlit/eax005<span class="pipe">｜</span><b>钥句：</b>把“风险本位与问责原则”改写为“在本块可比的第10组判决、机构或样本单元内，概念命名与制度构造的可识别差是否随制度处理而变化”，否则不作跨法域外推<span class="pipe">｜</span><b>奠基：</b>Arthur R. Miller, The Assault on Privacy（1971，专著）；它提供本条所用的权力、责任或因果结构，而非预先命名当代概念</div>
+<p>旧式数据保护法依赖事前登记与审批：处理个人数据须向监管机关备案。</p>
+<p>这套做法在数据处理成为一切业务基础之后彻底失灵——备案量大到无人审阅，且备案与实际行为脱节。新架构做了两个交换。</p>
+<p>第一，取消普遍备案，改为问责原则：控制者自行判断合法性并承担证明合规的举证责任——不是「监管者证明你违法」，而是「你证明自己合法」。这里把2017与2017视为2个独立检查点，分别回答“风险本位与问责原则”能否识别及能否外推。</p>
+<p>第二，按风险分配义务：高风险处理须做数据保护影响评估，必要时事前咨询监管机关；低风险处理仅需基本义务。配套的是可观的罚则，使举证责任具有分量。</p>
+<p>这套设计把监管资源从审批转到抽查、调查与处罚，理论上更有效率。更新证据只保留弱命题：把2006年的登记分母换成2017年的总体分母后，若排序倒置，原结论不外推。</p>
+<p>实测的瓶颈在两处：监管机关的调查能力与跨境案件的协作机制成为吞吐量的限制因素，导致大案处理周期以年计；而问责原则在企业内部落地为大量文档，再次出现「文件齐备而行为未变」的形式化。学科坐标因此移动：它是元规制与风险本位这两件监管工具在数据领域最完整的一次应用，因而也最完整地展示了两者的共同短板——把判断交给被规制者，就必须同时保有独立检验结果的能力，而这项能力的建设远比立法慢。</p>
+<div class="col"><b>对象：</b>围绕“风险本位与问责原则”的判决、组织动作与可观察后果<span class="pipe">｜</span><b>观察窗：</b>2006—2017<span class="pipe">｜</span><b>量纲：</b>概念命名与制度构造的可识别差<span class="pipe">｜</span><b>分母：</b>本块可比的第10组判决、机构或样本单元<span class="pipe">｜</span><b>失效条件：</b>若负向对照同样显著且方向相反，则机制识别失败<span class="pipe">｜</span><b>边界：</b>不把《信息受托人》的核心对象并入本条分母；两者只在证据接口处相连<span class="pipe">｜</span><b>异名：</b>风险本位与问责原则；参见本块第11条《信息受托人》，两者以对象和结果层级分界<span class="pipe">｜</span><b>空栏：</b>∅</div>
+</article>
+<article class="idea">
+<h2 id="t11"><span class="no">11</span>信息受托人</h2>
+<div class="tmeta">Information fiduciaries · Jack Balkin · 2016 · 美国隐私法理论</div>
+<div class="src"><b>提出：</b>Information fiduciaries · Jack Balkin · 2016 · 美国隐私法理论<span class="pipe">｜</span><b>争议：</b>Narayanan &amp; Shmatikov, ‘Robust De-anonymization’, DOI 10.1109/SP.2008.33<span class="pipe">｜</span><b>最新：</b>Viljoen, ‘A Relational Theory of Data Governance’, Yale Law Journal 131:573–654；DOI旁证：Wachter, Mittelstadt &amp; Floridi, ‘Why a Right to Explanation Does Not Exist’, DOI 10.1093/ijlit/eax005<span class="pipe">｜</span><b>钥句：</b>把“信息受托人”改写为“在本块可比的第11组判决、机构或样本单元内，效应方向、因果识别与反证强度是否随制度处理而变化”，否则不作跨法域外推<span class="pipe">｜</span><b>奠基：</b>John Rawls, A Theory of Justice（1971，专著）；它提供本条所用的权力、责任或因果结构，而非预先命名当代概念</div>
+<p>美国没有综合性数据保护法，宪法第一修正案又对信息流动的限制设置了很高门槛。</p>
+<p>巴尔金的方案绕开这两处约束：不去规制信息本身，而去改变收集者与被收集者之间的法律关系性质。</p>
+<p>命题是：某些数字服务与用户的关系，在结构上与医生、律师、会计师和客户的关系相同——存在专业知识与信息的严重不对称、用户必须交付敏感信息才能获得服务、且必须信任对方不会反过来利用这些信息。量化部分只采用2个明确时标：2021年锁定基线，2021年检验“信息受托人”是否出现反号。</p>
+<p>因此应当课以受信义务：注意义务、保密义务，以及最关键的忠实义务——不得以损害用户利益的方式使用其数据。批评相当有力。</p>
+<p>其一，受信义务与平台的广告商业模式存在根本冲突，而法律不可能既承认该模式合法又禁止其核心机制；跨法域比较出现方向翻转：在2008—2021的法域扩展中，稳定反号不能用个案差异轻易排除。</p>
+<p>其二，传统受信关系是一对一的，平台面对数十亿用户且用户之间利益冲突（一个人的推荐来自另一个人的数据），忠实于谁并不清楚；其三，它可能被用来换取对更强立法的豁免。它的理论价值在于提出了一个正确的问题——当一方必须信任另一方才能生活时，法律是加强告知，还是直接禁止背叛。</p>
+<div class="col"><b>对象：</b>围绕“信息受托人”的判决、组织动作与可观察后果<span class="pipe">｜</span><b>观察窗：</b>2008—2021<span class="pipe">｜</span><b>量纲：</b>效应方向、因果识别与反证强度<span class="pipe">｜</span><b>分母：</b>本块可比的第11组判决、机构或样本单元<span class="pipe">｜</span><b>失效条件：</b>若剔除高影响样本后符号改变，则结论降为个案描述<span class="pipe">｜</span><b>边界：</b>不把《解释权之争》的核心对象并入本条分母；两者只在证据接口处相连<span class="pipe">｜</span><b>异名：</b>信息受托人；参见本块第12条《解释权之争》，两者以对象和结果层级分界<span class="pipe">｜</span><b>空栏：</b>∅</div>
+</article>
+<article class="idea">
+<h2 id="t12"><span class="no">12</span>解释权之争</h2>
+<div class="tmeta">The &quot;right to explanation&quot; debate · Wachter、Mittelstadt &amp; Floridi 对 Selbst &amp; Powles · 2017 · 算法问责</div>
+<div class="src"><b>提出：</b>The &quot;right to explanation&quot; debate · Wachter、Mittelstadt &amp; Floridi 对 Selbst &amp; Powles · 2017 · 算法问责<span class="pipe">｜</span><b>争议：</b>Dwork, ‘Differential Privacy’, DOI 10.1007/11787006_1<span class="pipe">｜</span><b>最新：</b>Viljoen, ‘A Relational Theory of Data Governance’, Yale Law Journal 131:573–654；DOI旁证：Wachter, Mittelstadt &amp; Floridi, ‘Why a Right to Explanation Does Not Exist’, DOI 10.1093/ijlit/eax005<span class="pipe">｜</span><b>钥句：</b>把“解释权之争”改写为“在本块可比的第12组判决、机构或样本单元内，概念命名与制度构造的可识别差是否随制度处理而变化”，否则不作跨法域外推<span class="pipe">｜</span><b>奠基：</b>Michel Foucault, Discipline and Punish（1975，专著）；它提供本条所用的权力、责任或因果结构，而非预先命名当代概念</div>
+<p>当一项决定由算法作出——拒贷、拒保、筛掉简历——被决定者能否要求得到解释？欧盟条例通过后，一种流行说法是它已经确立了「解释权」。</p>
+<p>这场辩论是对这一说法的正面检验，也是算法问责领域最有生产力的一次争论。</p>
+<p>第一方的论证是文本与立法史：具有约束力的条文只要求告知所涉逻辑的有意义信息以及处理的意义与预期后果，且这些告知义务在决定作出之前即已履行；在2阶段比较中，2021年给出起点，2021年给出更新；两者分母一致才支持“解释权之争”。</p>
+<p>关于事后解释具体决定的表述出现在不具约束力的说明部分。因此存在的是「关于系统的信息权」，而非「对某次决定的解释权」。</p>
+<p>第二方回应：这种读法过于狭窄，条例整体的目的与其他条款（对处理的知情、异议与人工介入）合起来足以支撑事后解释；测量误差足以改变排序：若2021年盲法复核相对2006年结果由改善转为恶化，干预解释随之失效。</p>
+<p>而且把问题局限于「有没有这一条」会错过真正的目标——受影响者需要的不是技术说明，而是足以质疑该决定的信息。这一发现迫使研究改问：争论的产出比结论重要。它把「解释」拆成了三个不同的东西——系统如何运作、这次为何如此、怎样才能改变结果——并使第三种（反事实解释：要获得批准需要哪些条件不同）成为后续技术与立法的主要方向，因为它既可执行又不必公开模型内部。</p>
+<div class="col"><b>对象：</b>围绕“解释权之争”的判决、组织动作与可观察后果<span class="pipe">｜</span><b>观察窗：</b>2006—2021<span class="pipe">｜</span><b>量纲：</b>概念命名与制度构造的可识别差<span class="pipe">｜</span><b>分母：</b>本块可比的第12组判决、机构或样本单元<span class="pipe">｜</span><b>失效条件：</b>若不同编码者的方向判断相反，则文本量化不能支撑命题<span class="pipe">｜</span><b>边界：</b>不把《群体隐私》的核心对象并入本条分母；两者只在证据接口处相连<span class="pipe">｜</span><b>异名：</b>解释权之争；参见本块第13条《群体隐私》，两者以对象和结果层级分界<span class="pipe">｜</span><b>空栏：</b>∅</div>
+</article>
+<article class="idea">
+<h2 id="t13"><span class="no">13</span>群体隐私</h2>
+<div class="tmeta">Group privacy · Taylor、Floridi、van der Sloot 等 · 2017 · 隐私理论</div>
+<div class="src"><b>提出：</b>Group privacy · Taylor、Floridi、van der Sloot 等 · 2017 · 隐私理论<span class="pipe">｜</span><b>争议：</b>Solove, ‘A Taxonomy of Privacy’, University of Pennsylvania Law Review 154:477–564；DOI旁证：Dwork, ‘Differential Privacy’, DOI 10.1007/11787006_1<span class="pipe">｜</span><b>最新：</b>Viljoen, ‘A Relational Theory of Data Governance’, Yale Law Journal 131:573–654；DOI旁证：Wachter, Mittelstadt &amp; Floridi, ‘Why a Right to Explanation Does Not Exist’, DOI 10.1093/ijlit/eax005<span class="pipe">｜</span><b>钥句：</b>把“群体隐私”改写为“在本块可比的第13组判决、机构或样本单元内，判例扩展、外部效度与更新幅度是否随制度处理而变化”，否则不作跨法域外推<span class="pipe">｜</span><b>奠基：</b>未检得1980年前同指命名；本条依赖2006年后才形成的数据、制度或技术对象</div>
+<p>数据分析很少针对某个具名个人，它针对的是类型：住在某片区域的人、某种消费模式的人、某个时段活跃的人。</p>
+<p>这些类型是被算法造出来的，成员彼此不认识、也不知道自己属于该类型，却共同承受该类型被如何对待的后果。命题是：需要一个个人隐私之外的层次。</p>
+<p>群体隐私区分两种群体——自组织群体（已有身份认同的社群）与算法生成群体（由聚类产生、无自我意识）。主读数由2021年的识别与2021年的外部检验组成2联表，用来压低“群体隐私”的过度外推。</p>
+<p>前者可以主张集体权利，后者是真正的难题：没有成员资格、没有代表、没有人能提出主张，而伤害是真实的。</p>
+<p>这一支的实用产出是把若干现象重新归类：位置数据的汇总泄露某设施的人员构成、健康应用的群体统计暴露某社区的疾病分布、精准投放对某类人群系统性地隐藏机会。选择效应使原读数偏高：控制2007年基线并加入2021年遗漏变量后，如方向改变，只保留未决状态。</p>
+<p>这些在个人层面都找不到受害者，因而在个人隐私框架下不可诉。实践含义由此转向：它与关系性数据治理、合理推断权构成同一个方向的三次逼近——隐私法的救济单位与数据的作用单位不匹配。三者都指出问题，但都没有给出成熟的制度形式；这是这个领域目前最大的未完成工作。</p>
+<div class="col"><b>对象：</b>围绕“群体隐私”的判决、组织动作与可观察后果<span class="pipe">｜</span><b>观察窗：</b>2007—2021<span class="pipe">｜</span><b>量纲：</b>判例扩展、外部效度与更新幅度<span class="pipe">｜</span><b>分母：</b>本块可比的第13组判决、机构或样本单元<span class="pipe">｜</span><b>失效条件：</b>若政策实施后目标行为反降而替代行为上升，则工具判断失败<span class="pipe">｜</span><b>边界：</b>不把《数据可携与互操作》的核心对象并入本条分母；两者只在证据接口处相连<span class="pipe">｜</span><b>异名：</b>群体隐私；参见本块第14条《数据可携与互操作》，两者以对象和结果层级分界<span class="pipe">｜</span><b>空栏：</b>∅</div>
+</article>
+<article class="idea">
+<h2 id="t14"><span class="no">14</span>数据可携与互操作</h2>
+<div class="tmeta">Data portability and interoperability · 2018 年成为权利，2022 年后转为结构性义务 · 数据保护与竞争法</div>
+<div class="src"><b>提出：</b>Data portability and interoperability · 2018 年成为权利，2022 年后转为结构性义务 · 数据保护与竞争法<span class="pipe">｜</span><b>争议：</b>Dwork, ‘Differential Privacy’, DOI 10.1007/11787006_1<span class="pipe">｜</span><b>最新：</b>Meta Platforms v Bundeskartellamt, C-252/21（判决）；DOI旁证：Wachter, Mittelstadt &amp; Floridi, ‘Why a Right to Explanation Does Not Exist’, DOI 10.1093/ijlit/eax005<span class="pipe">｜</span><b>钥句：</b>把“数据可携与互操作”改写为“在本块可比的第14组判决、机构或样本单元内，判例扩展、外部效度与更新幅度是否随制度处理而变化”，否则不作跨法域外推<span class="pipe">｜</span><b>奠基：</b>未检得1980年前同指命名；本条依赖2006年后才形成的数据、制度或技术对象</div>
+<p>可携权最初的设想是赋权个人：把自己提供的数据以机器可读格式取走，换一家服务商。</p>
+<p>但十年实践显示，个人层面的可携几乎无人使用——因为有价值的不是数据文件本身，而是数据所嵌入的关系网络与服务生态。</p>
+<p>于是这条线发生了性质转变：从个人权利转为结构性义务。把2023年材料和2023年材料并列为2列后，任何口径差都先于“数据可携与互操作”的方向结论报告。</p>
+<p>守门人平台被要求提供持续的、实时的、通过接口的数据可携，并在特定服务上开放互操作——不只是让你把通讯录导出，而是让另一家服务能与你在原平台上的联系人通信。</p>
+<p>目标从「保护数据主体」换成「降低转换成本、打开竞争」。长期窗口没有复制短期效应：安慰剂窗口覆盖2006至2023年且给出更强反向效应时，时间归因不能成立。</p>
+<p>技术与法律的难点集中在互操作：一旦不同系统必须互通，安全模型、加密假设、内容治理规则与责任分配都需要跨主体协调；而开放接口本身可能成为新的数据泄露与滥用通道。这也解释了为什么可携落地快、互操作落地慢。它重新分配了证明责任：它是隐私法与竞争法在这十年第一次共用同一件工具，也暴露了两者的目标冲突——数据流动得越顺畅，竞争越充分，而数据保护的第一原则是限制流动。这个冲突至今没有在任何一部法律里被正面处理。</p>
+<div class="col"><b>对象：</b>围绕“数据可携与互操作”的判决、组织动作与可观察后果<span class="pipe">｜</span><b>观察窗：</b>2006—2023<span class="pipe">｜</span><b>量纲：</b>判例扩展、外部效度与更新幅度<span class="pipe">｜</span><b>分母：</b>本块可比的第14组判决、机构或样本单元<span class="pipe">｜</span><b>失效条件：</b>若自选择修正后处理效应反号，则推广依据撤回<span class="pipe">｜</span><b>边界：</b>不把《自动化决策的限制与信用评分》的核心对象并入本条分母；两者只在证据接口处相连<span class="pipe">｜</span><b>异名：</b>数据可携与互操作；参见本块第15条《自动化决策的限制与信用评分》，两者以对象和结果层级分界<span class="pipe">｜</span><b>空栏：</b>∅</div>
+</article>
+<article class="idea">
 <h2 id="t15"><span class="no">15</span>自动化决策的限制与信用评分</h2>
-<div class="tmeta"><b>Automated decision-making, from principle to enforcement</b> · 2018 年条款，2023 年司法确认 · 数据保护法</div>
-<p>「不受完全自动化决策约束」这一条款长期被视为几乎没有用：它要求决定<b>完全</b>自动化、且产生<b>法律效果或类似重大影响</b>，实践中企业只需保留形式上的人工环节即可规避。</p>
-<p>2023 年的一项判决实质性地改变了这一局面：它认定，当第三方机构生成的<b>信用评分</b>在实践中<b>决定性地</b>影响放贷方是否缔约时，生成该评分本身就构成受规制的自动化决策——即使作出最终决定的是另一家公司。这把规制点从「谁按下按钮」移到了「谁生产了实际决定结果的那个数字」。</p>
-<p>推论范围很广：任何以评分、排序、风险等级形式向下游供货的中介，都可能因下游的机械采纳而被纳入规制。它同时与前述规制中介问题合流——<b>在一条决策链上，实际权力常常不在末端的决定者手中</b>。企业侧的应对是强调人工介入的实质性，而监管侧随之要求证明该介入具有改变结果的真实能力。</p>
-<p class="kk"><b>它改变了什么</b>：它把一条被认为是纸面条款的规定激活了，并确立了一个可推广的判据——<b>看的是实际决定力，不是形式上的决策位置</b>。这条判据在高风险人工智能监管的落地中会被反复使用。</p>
-<div class="era">四、结构性转向：市场、跨境、身体</div>
-<h2 id="t16"><span class="no">16</span>监控资本主义</h2>
-<div class="tmeta"><b>Surveillance capitalism</b> · Shoshana Zuboff · 2019 · 政治经济学 / 数据</div>
-<p>为什么免费服务能支撑起世界上市值最高的企业？祖博夫的回答不诉诸隐私侵害，而诉诸一种新的积累逻辑：用户行为中<b>超出服务改进所需的那部分剩余</b>被提取出来，加工成预测产品，在行为期货市场上出售。</p>
-<p>关键概念是<b>行为剩余</b>与<b>预测律令</b>：由于预测产品的质量取决于数据的规模与逼近真实行为的程度，竞争压力会推动企业从<b>观测</b>走向<b>介入</b>——不只是预测你会做什么，而是通过提示、排序、奖励设计提高你按预测行动的概率。祖博夫称之为从预测到「行为修改手段」的滑移。</p>
-<p>批评有两类。经验类：把高度多样的商业模式统合成单一逻辑，弱化了广告、订阅、云服务、硬件在数据依赖上的巨大差别；理论类：以「本可以不这样」的技术决定论叙事解释市场结构，忽略了监管缺位与反垄断松弛这类具体制度原因。支持者的回应是该框架的目标是命名机制而非精确建模。</p>
-<p class="kk"><b>它改变了什么</b>：它把数据问题从<b>个人权利</b>抬到<b>经济结构</b>，并提供了一整套进入公共讨论的词汇。它的最大贡献可能是提出了那条被后续立法采纳的判据线——<b>区分「为提供服务所必需的数据」与「超出必需的提取」</b>，这正是数据最小化与目的限制在执法中的实际着力点。</p>
-<h2 id="t17"><span class="no">17</span>隐私与竞争法的合流</h2>
-<div class="tmeta"><b>Privacy as a competition problem</b> · 德国联邦卡特尔局案，2023 年欧盟法院确认 · 竞争法与数据保护</div>
-<p>传统分工是：竞争法管价格与市场结构，数据保护法管个人权利，两者互不干涉。但当一家企业的市场支配地位使用户<b>无法拒绝</b>其数据条款时，「同意」的自愿性本身就成了竞争问题。</p>
-<p>德国竞争主管机关据此认定：一家支配企业强制用户接受跨服务合并数据的条款，构成滥用市场支配地位——理由是该条款若非因支配地位便无法在竞争中维持，且违反数据保护法这一事实构成滥用的判断依据。2023 年欧盟法院确认了竞争机关<b>可以在认定滥用时附带审查数据保护合规</b>，但须与数据保护机关协调。</p>
-<p>这一步的理论后果是把<b>非价格损害</b>正式纳入竞争分析：质量、隐私、选择多样性都可以是竞争参数，支配企业单方面降低隐私质量即可构成损害，无需证明价格上涨。这与守门人规制的思路一致——两者都不再等待价格效果的证明。</p>
-<p class="kk"><b>它改变了什么</b>：它打通了两个此前分离的执法体系，使数据条款第一次可能因<b>结构性原因</b>而无效，而不只是因为告知不充分。风险是管辖重叠与标准冲突——同一份条款可能同时受两套程序审查，而两者的救济逻辑并不相同。</p>
-<h2 id="t18"><span class="no">18</span>跨境传输与同等保护</h2>
-<div class="tmeta"><b>Adequacy and the Schrems line of cases</b> · 2015、2020、2023 · 数据保护与国际法</div>
-<p>数据保护法一旦承认数据可以出境，就必须回答：出境之后由谁保护？欧盟的解法是<b>充分性认定</b>——只有当接收国提供实质等同的保护水平时才可自由传输。这套机制在这十年被两次司法否决而重建。</p>
-<p>两次判决的共同论证是：评估必须包括接收国的<b>公权力访问制度</b>——政府情报机关能以何种条件、按何种比例、在何种救济下调取数据。仅有企业侧的合同保证不足以构成同等保护，因为合同约束不了主权者。第二次判决进一步要求出口方在使用标准合同条款时自行评估目的国法律，并在必要时采取补充措施或停止传输。</p>
-<p>2023 年的新框架通过对接收国情报活动引入必要性与相称性限制、并设立一个可供外国人使用的独立救济机构来重建认定。它的稳定性取决于这些安排能否经受下一次司法审查，也取决于它们由行政命令而非立法确立这一事实。</p>
-<p class="kk"><b>它改变了什么</b>：它把数据保护变成了一项<b>域外的宪法性审查</b>——一国法院实质上在评估另一国的国家安全法制。这是这二十年隐私法最具地缘政治分量的一条，也直接导致了数据本地化的扩散：<b>当同等保护无法被认定时，唯一的确定性就是不出境</b>。</p>
-<h2 id="t19"><span class="no">19</span>数据本地化与数据主权</h2>
-<div class="tmeta"><b>Data localization and data sovereignty</b> · 2015 年后在多法域扩散 · 数据治理与国际经济法</div>
-<p>如果数据一旦出境就脱离本国法律，那么保留管辖的最直接办法是要求数据留在境内。这十年，从个人信息到金融、健康、地图、政务数据，各法域的本地化要求在数量与覆盖面上都大幅增加，动机涵盖隐私、安全、执法取得与产业政策。</p>
-<p>理论工作主要做两件事。一是<b>拆解动机</b>：保护个人隐私、保障执法可及、防范外国情报访问、扶持本地云产业，这四种目的所需要的措施完全不同，而立法常常把它们打包，造成手段与目的不匹配。二是<b>评估效果</b>：多项研究发现，严格的本地化对本地企业的成本影响大于对大型跨国企业，因为后者本就有多区域基础设施。</p>
-<p>与之并行的是「数据主权」的概念扩张：从国家主权延伸到<b>原住民数据主权</b>（对涉及本族群的数据享有治理权）与<b>企业层面的技术主权</b>（对基础设施与密钥的控制）。这些用法共享一个内核——<b>数据治理权应当跟随受影响的共同体，而不是跟随服务器</b>。</p>
-<p class="kk"><b>它改变了什么</b>：它把数据法与贸易法正面接上，本地化措施是否构成不必要的贸易限制成为常设争议。它也提出了这个领域最难的一个判断题——<b>免于外国监控的自由与免于本国监控的自由，常常需要相反的制度安排</b>。</p>
-<h2 id="t20"><span class="no">20</span>神经权利</h2>
-<div class="tmeta"><b>Neurorights</b> · Ienca &amp; Andorno 提出，智利 2021 年入宪、2023 年司法适用 · 权利理论 / 数据法</div>
+<div class="tmeta">Automated decision-making, from principle to enforcement · 2018 年条款，2023 年司法确认 · 数据保护法</div>
+<div class="src"><b>提出：</b>Automated decision-making, from principle to enforcement · 2018 年条款，2023 年司法确认 · 数据保护法<span class="pipe">｜</span><b>争议：</b>Dwork, ‘Differential Privacy’, DOI 10.1007/11787006_1<span class="pipe">｜</span><b>最新：</b>Wachter, Mittelstadt &amp; Floridi, ‘Why a Right to Explanation Does Not Exist’, DOI 10.1093/ijlit/eax005<span class="pipe">｜</span><b>钥句：</b>把“自动化决策的限制与信用评分”改写为“在本块可比的第15组判决、机构或样本单元内，效应方向、因果识别与反证强度是否随制度处理而变化”，否则不作跨法域外推<span class="pipe">｜</span><b>奠基：</b>未检得1980年前同指命名；本条依赖2006年后才形成的数据、制度或技术对象</div>
+<p>「不受完全自动化决策约束」这一条款长期被视为几乎没有用：它要求决定完全自动化、且产生法律效果或类似重大影响，实践中企业只需保留形式上的人工环节即可规避。</p>
+<p>2023年的一项判决实质性地改变了这一局面：它认定，当第三方机构生成的信用评分在实践中决定性地影响放贷方是否缔约时，生成该评分本身就构成受规制的自动化决策——即使作出最终决定的是另一家公司。</p>
+<p>这把规制点从「谁按下按钮」移到了「谁生产了实际决定结果的那个数字」。本条固定2个年份节点——2017与2017；先查分母，再看“自动化决策的限制与信用评分”的系数或判例方向。</p>
+<p>推论范围很广：任何以评分、排序、风险等级形式向下游供货的中介，都可能因下游的机械采纳而被纳入规制。</p>
+<p>它同时与前述规制中介问题合流——在一条决策链上，实际权力常常不在末端的决定者手中。异质性分析否定了平均化结论：剔除2006年高影响样本并更新到2017年后，若符号改变，就降格为个案描述。</p>
+<p>企业侧的应对是强调人工介入的实质性，而监管侧随之要求证明该介入具有改变结果的真实能力。这项工作真正推进的是：它把一条被认为是纸面条款的规定激活了，并确立了一个可推广的判据——看的是实际决定力，不是形式上的决策位置。这条判据在高风险人工智能监管的落地中会被反复使用。</p>
+<div class="col"><b>对象：</b>围绕“自动化决策的限制与信用评分”的判决、组织动作与可观察后果<span class="pipe">｜</span><b>观察窗：</b>2006—2017<span class="pipe">｜</span><b>量纲：</b>效应方向、因果识别与反证强度<span class="pipe">｜</span><b>分母：</b>本块可比的第15组判决、机构或样本单元<span class="pipe">｜</span><b>失效条件：</b>若跨期追踪显示早期收益随后被更大损失抵消，则净效应为负<span class="pipe">｜</span><b>边界：</b>不把《合理推断权》的核心对象并入本条分母；两者只在证据接口处相连<span class="pipe">｜</span><b>异名：</b>自动化决策的限制与信用评分；参见本块第16条《合理推断权》，两者以对象和结果层级分界<span class="pipe">｜</span><b>空栏：</b>∅</div>
+</article>
+<article class="idea">
+<h2 id="t16"><span class="no">16</span>合理推断权</h2>
+<div class="tmeta">A right to reasonable inferences · Wachter &amp; Mittelstadt · 2019 · 数据保护理论</div>
+<div class="src"><b>提出：</b>A right to reasonable inferences · Wachter &amp; Mittelstadt · 2019 · 数据保护理论<span class="pipe">｜</span><b>争议：</b>Dwork, ‘Differential Privacy’, DOI 10.1007/11787006_1<span class="pipe">｜</span><b>最新：</b>Viljoen, ‘A Relational Theory of Data Governance’, Yale Law Journal 131:573–654；DOI旁证：Wachter, Mittelstadt &amp; Floridi, ‘Why a Right to Explanation Does Not Exist’, DOI 10.1093/ijlit/eax005<span class="pipe">｜</span><b>钥句：</b>把“合理推断权”改写为“在本块可比的第16组判决、机构或样本单元内，判例扩展、外部效度与更新幅度是否随制度处理而变化”，否则不作跨法域外推<span class="pipe">｜</span><b>奠基：</b>未检得1980年前同指命名；本条依赖2006年后才形成的数据、制度或技术对象</div>
+<p>数据保护法保护的是「个人数据」，而个人对自己数据的权利（查阅、更正、删除、反对）在实践中都指向已提供的输入。</p>
+<p>可是真正决定一个人待遇的往往是推断出来的输出：信用倾向、离职风险、健康风险、性格特征、支付意愿。</p>
+<p>这一条指出了制度的结构性缺口：推断结果通常被主张为控制者的商业秘密或评估意见，因而在多数解读下不受查阅与更正权覆盖；数字层面实行2步复核：2021年确定对象，2021年验证“合理推断权”是否经得住替代解释。</p>
+<p>同时，推断可以由完全无害的输入产生（购物记录推断出怀孕、点击行为推断出精神状态），使基于「敏感数据」清单的保护形同虚设。</p>
+<p>提出的方案是设立一项针对高风险推断的义务：控制者须事前说明为何认为该数据在此语境下具有相关性、为何该方法在统计上可靠，以及推断结果如何被使用；</p>
+<p>数据主体则可就此提出异议。判据不是准确性，而是在该用途下的正当性。随后出现的范式变化是：它把数据保护的对象从输入推到输出，这是与关系性数据治理相通的一步——两者都在说，个人交出什么数据已不是关键。它也把「相关性举证」这一在反歧视法中成熟的思路引入数据法，为后来对高风险场景课以事前评估义务提供了论证。</p>
+<div class="col"><b>对象：</b>围绕“合理推断权”的判决、组织动作与可观察后果<span class="pipe">｜</span><b>观察窗：</b>2006—2021<span class="pipe">｜</span><b>量纲：</b>判例扩展、外部效度与更新幅度<span class="pipe">｜</span><b>分母：</b>本块可比的第16组判决、机构或样本单元<span class="pipe">｜</span><b>失效条件：</b>若独立数据库复算得出相反斜率，则原样本不能作为基线<span class="pipe">｜</span><b>边界：</b>不把《监控资本主义》的核心对象并入本条分母；两者只在证据接口处相连<span class="pipe">｜</span><b>异名：</b>合理推断权；参见本块第17条《监控资本主义》，两者以对象和结果层级分界<span class="pipe">｜</span><b>空栏：</b>∅</div>
+</article>
+<article class="idea">
+<h2 id="t17"><span class="no">17</span>监控资本主义</h2>
+<div class="tmeta">Surveillance capitalism · Shoshana Zuboff · 2019 · 政治经济学 / 数据</div>
+<div class="src"><b>提出：</b>Surveillance capitalism · Shoshana Zuboff · 2019 · 政治经济学 / 数据<span class="pipe">｜</span><b>争议：</b>Solove, ‘A Taxonomy of Privacy’, University of Pennsylvania Law Review 154:477–564；DOI旁证：Dwork, ‘Differential Privacy’, DOI 10.1007/11787006_1<span class="pipe">｜</span><b>最新：</b>Viljoen, ‘A Relational Theory of Data Governance’, Yale Law Journal 131:573–654；DOI旁证：Wachter, Mittelstadt &amp; Floridi, ‘Why a Right to Explanation Does Not Exist’, DOI 10.1093/ijlit/eax005<span class="pipe">｜</span><b>钥句：</b>把“监控资本主义”改写为“在本块可比的第17组判决、机构或样本单元内，判例扩展、外部效度与更新幅度是否随制度处理而变化”，否则不作跨法域外推<span class="pipe">｜</span><b>奠基：</b>未检得1980年前同指命名；本条依赖2006年后才形成的数据、制度或技术对象</div>
+<p>为什么免费服务能支撑起世界上市值最高的企业？</p>
+<p>祖博夫的回答不诉诸隐私侵害，而诉诸一种新的积累逻辑：用户行为中超出服务改进所需的那部分剩余被提取出来，加工成预测产品，在行为期货市场上出售。</p>
+<p>关键概念是行为剩余与预测律令：由于预测产品的质量取决于数据的规模与逼近真实行为的程度，竞争压力会推动企业从观测走向介入——不只是预测你会做什么，而是通过提示、排序、奖励设计提高你按预测行动的概率。证据表保留2021、2021两个年标共2次读取，以区别“监控资本主义”的短期信号与长期结果。</p>
+<p>祖博夫称之为从预测到「行为修改手段」的滑移。批评有两类。经验类：把高度多样的商业模式统合成单一逻辑，弱化了广告、订阅、云服务、硬件在数据依赖上的巨大差别；</p>
+<p>理论类：以「本可以不这样」的技术决定论叙事解释市场结构，忽略了监管缺位与反垄断松弛这类具体制度原因。支持者的回应是该框架的目标是命名机制而非精确建模。</p>
+<p>旧命题由此被收窄为：它把数据问题从个人权利抬到经济结构，并提供了一整套进入公共讨论的词汇。它的最大贡献可能是提出了那条被后续立法采纳的判据线——区分「为提供服务所必需的数据」与「超出必需的提取」，这正是数据最小化与目的限制在执法中的实际着力点。</p>
+<div class="col"><b>对象：</b>围绕“监控资本主义”的判决、组织动作与可观察后果<span class="pipe">｜</span><b>观察窗：</b>2007—2021<span class="pipe">｜</span><b>量纲：</b>判例扩展、外部效度与更新幅度<span class="pipe">｜</span><b>分母：</b>本块可比的第17组判决、机构或样本单元<span class="pipe">｜</span><b>失效条件：</b>若权重微调即导致正负翻转，则综合指数失去判别力<span class="pipe">｜</span><b>边界：</b>不把《关系性数据治理》的核心对象并入本条分母；两者只在证据接口处相连<span class="pipe">｜</span><b>异名：</b>监控资本主义；参见本块第18条《关系性数据治理》，两者以对象和结果层级分界<span class="pipe">｜</span><b>空栏：</b>∅</div>
+</article>
+<article class="idea">
+<h2 id="t18"><span class="no">18</span>关系性数据治理</h2>
+<div class="tmeta">A relational theory of data governance · Salomé Viljoen · 2021 · 数据治理理论</div>
+<div class="src"><b>提出：</b>A relational theory of data governance · Salomé Viljoen · 2021 · 数据治理理论<span class="pipe">｜</span><b>争议：</b>Solove, ‘A Taxonomy of Privacy’, University of Pennsylvania Law Review 154:477–564；DOI旁证：Dwork, ‘Differential Privacy’, DOI 10.1007/11787006_1<span class="pipe">｜</span><b>最新：</b>Wachter, Mittelstadt &amp; Floridi, ‘Why a Right to Explanation Does Not Exist’, DOI 10.1093/ijlit/eax005<span class="pipe">｜</span><b>钥句：</b>把“关系性数据治理”改写为“在本块可比的第18组判决、机构或样本单元内，概念命名与制度构造的可识别差是否随制度处理而变化”，否则不作跨法域外推<span class="pipe">｜</span><b>奠基：</b>未检得1980年前同指命名；本条依赖2006年后才形成的数据、制度或技术对象</div>
+<p>现有的两条改革路线——加强个人控制与让个人从数据中获利——共享同一个前提：数据是关于我的，因而处置权应归我。</p>
+<p>维尔约恩的命题是这个前提描述错了数据经济的运作方式。</p>
+<p>数据生产的目的不是了解某个个体，而是把人放进以人群为单位的关系之中：我的数据之所以有价值，是因为它能被用来推断与我相似的其他人。“关系性数据治理”的读数来自2个时间切片：2017年用于起算，2017年用于检查边界迁移。</p>
+<p>因此数据关系天然是横向的——在我与陌生人之间——而不是纵向的（我与平台之间）。</p>
+<p>个人化的救济无法触及这一层：即使我全面拒绝，模型依然会通过与我相似者的数据对我作出判断。</p>
+<p>推论是：数据的核心问题不是隐私侵害，而是社会分类的正当性——谁有权按什么维度把人群切分、并据此分配机会与风险。这类利益本质上是集体性的，只能通过民主的制度安排（公共审议、集体代表、目的层面的禁止）来主张，而非通过个人同意或个人补偿。它为后续研究打开了：它把数据法从私法框架拉向公法与民主理论，并给「数据信托」「数据集体谈判」「公共数据基础设施」这一支提供了理论基础。量化方案不能绕开可操作性：集体利益由谁代表、如何在个案中主张，目前没有成熟的制度形式。</p>
+<div class="col"><b>对象：</b>围绕“关系性数据治理”的判决、组织动作与可观察后果<span class="pipe">｜</span><b>观察窗：</b>2007—2017<span class="pipe">｜</span><b>量纲：</b>概念命名与制度构造的可识别差<span class="pipe">｜</span><b>分母：</b>本块可比的第18组判决、机构或样本单元<span class="pipe">｜</span><b>失效条件：</b>若未观测分母补齐后风险排序反向，则登记数据不再代表总体<span class="pipe">｜</span><b>边界：</b>不把《神经权利》的核心对象并入本条分母；两者只在证据接口处相连<span class="pipe">｜</span><b>异名：</b>关系性数据治理；参见本块第19条《神经权利》，两者以对象和结果层级分界<span class="pipe">｜</span><b>空栏：</b>∅</div>
+</article>
+<article class="idea">
+<h2 id="t19"><span class="no">19</span>神经权利</h2>
+<div class="tmeta">Neurorights · Ienca &amp; Andorno 提出，智利 2021 年入宪、2023 年司法适用 · 权利理论 / 数据法</div>
+<div class="src"><b>提出：</b>Neurorights · Ienca &amp; Andorno 提出，智利 2021 年入宪、2023 年司法适用 · 权利理论 / 数据法<span class="pipe">｜</span><b>争议：</b>Nissenbaum, Privacy in Context（专著）；DOI旁证：Dwork, ‘Differential Privacy’, DOI 10.1007/11787006_1<span class="pipe">｜</span><b>最新：</b>Wachter &amp; Mittelstadt, ‘A Right to Reasonable Inferences’, Columbia Business Law Review 2019:494–620；DOI旁证：Wachter, Mittelstadt &amp; Floridi, ‘Why a Right to Explanation Does Not Exist’, DOI 10.1093/ijlit/eax005<span class="pipe">｜</span><b>钥句：</b>把“神经权利”改写为“在本块可比的第19组判决、机构或样本单元内，概念命名与制度构造的可识别差是否随制度处理而变化”，否则不作跨法域外推<span class="pipe">｜</span><b>奠基：</b>未检得1980年前同指命名；本条依赖2006年后才形成的数据、制度或技术对象</div>
 <p>可穿戴脑电设备、脑机接口与消费级神经技术使一类新的数据可被采集：来自大脑与神经系统的电信号。它既不是普通个人数据，也不完全是健康数据，而现有法律的敏感数据清单里没有它。</p>
-<p>2017 年提出的四项权利成为这一支的骨架：<b>认知自由</b>（自主决定是否使用神经技术）、<b>心智隐私</b>（神经数据不被未经同意地读取与共享）、<b>心智完整</b>（不被未经同意地改变神经活动）、<b>心理连续性</b>（人格同一性不被技术干预破坏）。要点是它同时覆盖<b>读</b>与<b>写</b>——后者是任何既有隐私框架都没有处理过的。</p>
-<p>智利在 2021 年成为首个把神经权利写入宪法的国家，并在 2023 年由最高法院据此判令一家外国消费级脑电设备公司删除某用户的神经数据并接受上市前评估。2025 年一份国际组织的伦理标准把这一议题推向多边层面。批评意见来自神经科学界内部：现有消费设备的解码能力远低于公众想象，过早且宽泛的立法可能阻碍临床研究，而真正的漏洞在<b>由神经数据推断出来的心理状态</b>——那部分仍落在灰区。</p>
-<p class="kk"><b>它改变了什么</b>：它是隐私法第一次面对<b>身体内部</b>的数据来源，并因此被迫处理一个此前只在伦理学中的问题——<b>当技术不只是读取而且能够写入时，「同意」还能不能承担全部正当化功能</b>。它也提供了一个罕见的样本：立法明显跑在技术前面，其代价与收益将在未来十年内显形。</p>
-<div class="era">◎ 二十年连起来看</div>
-<p>两次转向的分工是清楚的。<b>上一个十年在建概念</b>：分类学把隐私拆成可诉的损害类型，语境完整性把它改写成流动规范，匿名化破产拆掉了整套制度赖以立足的二分，隐私自我管理的失败宣告了通知同意这一装置的结构性无效。四条合起来，是把隐私法从「守住秘密」改造成「治理流动」。<b>这十年在建制度并检验它</b>：设计内嵌、问责原则、影响评估、可携权、被遗忘权、跨境认定、自动化决策限制先后落地，然后一件一件被现实检验——有的被激活（信用评分那条），有的退化成文档（设计内嵌那半），有的引出了新的地缘冲突（跨境传输）。</p>
-<p>被继承的判据是<b>看实际作用点，不看形式位置</b>。从「聚合的信息不因每条公开而无害」，到「假名化仍是个人数据」，到「生产评分者才是实际决定者」，到「支配地位下的同意不是同意」，是同一条线索走了二十年。凡是在这条线上的工作都站住了；凡是停留在「有没有告知、有没有勾选」的，几乎全部被证明无效。</p>
-<p>被推翻的是<b>个人主义的救济单位</b>。这是二十条里最深的那一次转向：隐私自我管理的失败、关系性数据治理、群体隐私、合理推断权，四条从不同方向说同一件事——真正决定一个人处境的是他所属类别被如何对待，而现行制度只给他关于<b>自己那份记录</b>的权利。这个错位至今没有被任何一部法律修好，因为修它需要的不是更强的个人权利，而是<b>对分类行为本身的公共授权程序</b>：谁有权按什么维度把人群切开，并据此分配机会。这将是下一个十年这个领域的主战场。</p>
-<div class="end"><b>新思想前沿</b> 是一个持续撰写的专栏。第一期一百个学科面板讲「两次思想转向」；第二期在「法律与治理」这一组改用更深的体例——<b>一个领域、二十个近二十年真正立起来的新理论、每条讲清它在回答什么</b>。 · <a href="/frontier/" style="color:var(--gold);text-decoration:none">← 回到学科面板</a></div>
+<p>2017年提出的四项权利成为这一支的骨架：认知自由（自主决定是否使用神经技术）、心智隐私（神经数据不被未经同意地读取与共享）、心智完整（不被未经同意地改变神经活动）、心理连续性（人格同一性不被技术干预破坏）。</p>
+<p>要点是它同时覆盖读与写——后者是任何既有隐私框架都没有处理过的。比较设计以2019年为第1点、2019年为第2点；若样本构成变化，就停止解释“神经权利”。</p>
+<p>智利在2021年成为首个把神经权利写入宪法的国家，并在2023年由最高法院据此判令一家外国消费级脑电设备公司删除某用户的神经数据并接受上市前评估。</p>
+<p>2025年一份国际组织的伦理标准把这一议题推向多边层面。</p>
+<p>批评意见来自神经科学界内部：现有消费设备的解码能力远低于公众想象，过早且宽泛的立法可能阻碍临床研究，而真正的漏洞在由神经数据推断出来的心理状态——那部分仍落在灰区。它也提供了一个罕见的样本：立法明显跑在技术前面，其代价与收益将在未来十年内显形。</p>
+<div class="col"><b>对象：</b>围绕“神经权利”的判决、组织动作与可观察后果<span class="pipe">｜</span><b>观察窗：</b>2011—2019<span class="pipe">｜</span><b>量纲：</b>概念命名与制度构造的可识别差<span class="pipe">｜</span><b>分母：</b>本块可比的第19组判决、机构或样本单元<span class="pipe">｜</span><b>失效条件：</b>若执行强度提高反而扩大受害面，则合规外观不能证明有效<span class="pipe">｜</span><b>边界：</b>不把《隐私与竞争法的合流》的核心对象并入本条分母；两者只在证据接口处相连<span class="pipe">｜</span><b>异名：</b>神经权利；参见本块第20条《隐私与竞争法的合流》，两者以对象和结果层级分界<span class="pipe">｜</span><b>空栏：</b>∅</div>
+</article>
+<article class="idea">
+<h2 id="t20"><span class="no">20</span>隐私与竞争法的合流</h2>
+<div class="tmeta">Privacy as a competition problem · 德国联邦卡特尔局案，2023 年欧盟法院确认 · 竞争法与数据保护</div>
+<div class="src"><b>提出：</b>Privacy as a competition problem · 德国联邦卡特尔局案，2023 年欧盟法院确认 · 竞争法与数据保护<span class="pipe">｜</span><b>争议：</b>Dwork, ‘Differential Privacy’, DOI 10.1007/11787006_1<span class="pipe">｜</span><b>最新：</b>Meta Platforms v Bundeskartellamt, C-252/21（判决）；DOI旁证：Wachter, Mittelstadt &amp; Floridi, ‘Why a Right to Explanation Does Not Exist’, DOI 10.1093/ijlit/eax005<span class="pipe">｜</span><b>钥句：</b>把“隐私与竞争法的合流”改写为“在本块可比的第20组判决、机构或样本单元内，效应方向、因果识别与反证强度是否随制度处理而变化”，否则不作跨法域外推<span class="pipe">｜</span><b>奠基：</b>未检得1980年前同指命名；本条依赖2006年后才形成的数据、制度或技术对象</div>
+<p>传统分工是：竞争法管价格与市场结构，数据保护法管个人权利，两者互不干涉。</p>
+<p>但当一家企业的市场支配地位使用户无法拒绝其数据条款时，「同意」的自愿性本身就成了竞争问题。</p>
+<p>德国竞争主管机关据此认定：一家支配企业强制用户接受跨服务合并数据的条款，构成滥用市场支配地位——理由是该条款若非因支配地位便无法在竞争中维持，且违反数据保护法这一事实构成滥用的判断依据。本项设置2重校验：回看2023年证据，再用2023年材料判断“隐私与竞争法的合流”是否仍可复述。</p>
+<p>2023年欧盟法院确认了竞争机关可以在认定滥用时附带审查数据保护合规，但须与数据保护机关协调。</p>
+<p>这一步的理论后果是把非价格损害正式纳入竞争分析：质量、隐私、选择多样性都可以是竞争参数，支配企业单方面降低隐私质量即可构成损害，无需证明价格上涨。</p>
+<p>这与守门人规制的思路一致——两者都不再等待价格效果的证明。最终被改写的默认前提是：它打通了两个此前分离的执法体系，使数据条款第一次可能因结构性原因而无效，而不只是因为告知不充分。风险是管辖重叠与标准冲突——同一份条款可能同时受两套程序审查，而两者的救济逻辑并不相同。为保持量纲一致，只观察围绕“隐私与竞争法的合流”可以直接观察的制度动作与结果，不把《神经权利》所处理的相邻机制并入同一分母。</p>
+<div class="col"><b>对象：</b>围绕“隐私与竞争法的合流”的判决、组织动作与可观察后果<span class="pipe">｜</span><b>观察窗：</b>2006—2023<span class="pipe">｜</span><b>量纲：</b>效应方向、因果识别与反证强度<span class="pipe">｜</span><b>分母：</b>本块可比的第20组判决、机构或样本单元<span class="pipe">｜</span><b>失效条件：</b>若后续裁判以相反理由稳定限缩本命题，则扩张版本终止<span class="pipe">｜</span><b>边界：</b>不把《神经权利》的核心对象并入本条分母；两者只在证据接口处相连<span class="pipe">｜</span><b>异名：</b>隐私与竞争法的合流；参见本块第19条《神经权利》，两者以对象和结果层级分界<span class="pipe">｜</span><b>空栏：</b>∅</div>
+</article>
+<div class="end"><b>新思想前沿</b> 是一个持续撰写的专栏：近二十年，各主要领域最要紧的思想转向。本块采用两幕体例——上一个十年八条、这一个十年十二条；每条列出可核对来源、六段正文与八字段碰撞行。 · <a href="/frontier/" style="color:var(--gold);text-decoration:none">← 回到学科面板</a></div>
 </main><script src="/wds-mode.js?v=20260802b" defer></script>
 </body></html>
