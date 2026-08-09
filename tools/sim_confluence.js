@@ -357,6 +357,40 @@ function userOf(c, re) { const x = c.calls.filter(k => re.test(k.user)); return 
     ok('全程无 JS 错误', c2.errors.length === 0, c2.errors.join(' | '));
   });
 
+  /* 轨迹输出（TRACE=1 时打开）：不加断言，只把机器在每一格真正收到什么、真正产出什么摊开看。
+     护栏证明的是「写对了」，轨迹回答的是「跑起来长什么样」——两件事，都要看。 */
+  if (process.env.TRACE) {
+    const say = (t) => console.log(t);
+    say('\n' + '━'.repeat(58) + '\n轨迹 · 十八道工序一键跑（桩数据，不烧 Key）\n' + '━'.repeat(58));
+    const STG = ['warmup','qtype','select','gate','spine','collide','expand','nbrgate',
+                 'hostile','collide2','premise','selforg','emerge','demarc','realrun','write','polish','review'];
+    const NAME = {warmup:'内化',qtype:'题型',select:'定三家',gate:'体检',spine:'抽脊',collide:'混沌碰撞',
+      expand:'扩候选',nbrgate:'候选闸',hostile:'敌意拓宽',collide2:'候选互撞',premise:'共有前提',
+      selforg:'自组织',emerge:'涌现',demarc:'近邻划界',realrun:'真跑一条',write:'成文',polish:'打磨',review:'评审'};
+    STG.forEach((id, i) => {
+      const st = c2.$('stat-' + id), out = c2.$('out-' + id);
+      const o = (out && out.textContent || '').replace(/\s+/g, ' ').trim();
+      say(String(i + 1).padStart(2) + '. ' + (NAME[id] + '　').padEnd(10, '　') +
+          ' 状态：' + (st ? st.textContent.replace(/\s+/g, ' ').trim().slice(0, 26) : '?') +
+          '　产出：' + o.length + ' 字');
+    });
+    const dump = (title, re, n) => {
+      const k = c2.calls.filter(x => re.test(x.user));
+      say('\n' + '─'.repeat(58) + '\n【' + title + '】调令 ' + k.length + ' 次');
+      if (k.length) say(k[k.length - 1].user.slice(0, n || 1100).replace(/\n{3,}/g, '\n\n'));
+    };
+    dump('工序 6.5 · 敌意拓宽', /剥到只剩形式层/, 1500);
+    dump('工序 7.5 · 共有前提', /三家共同踩着/, 1500);
+    dump('工序 10.5 · 真跑一条', /预注册\(必须写在看数据之前\)|预注册（必须写在看数据之前）/, 1200);
+    const pick = c2.calls.filter(x => /请为\*\*每一门各挑出一家\*\*/.test(x.user)).pop();
+    if (pick) {
+      say('\n' + '─'.repeat(58) + '\n【选源 · 面板供料层进没进材料块】');
+      const m = pick.user.match(/〔新思想前沿 第\d+号《[^》]+》· 八字段供料层〕[\s\S]{0,420}/);
+      say(m ? m[0] : '（没进——这一路空了）');
+    }
+    say('\n' + '━'.repeat(58) + '\n');
+  }
+
   await step('四、问题穿进了每一格的 system（不是只在定源那一格）', async () => {
     // 内化那几趟是读内功、与题无关，本来就不该带；其余每一趟都必须带
     const notWarm = c2.calls.filter(k => !/这是 SDE 内功的第|作业底盘/.test(k.user));
