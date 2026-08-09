@@ -57,6 +57,10 @@ button.go:disabled{opacity:.5;cursor:default}
 .srcs .lbl{font-size:11.5px;letter-spacing:.2em;color:var(--muted);margin-bottom:7px}
 .srcs a{display:block;border-left:2px solid var(--line);padding:6px 0 6px 12px;margin-bottom:6px;font-size:14px;color:#C6BB9C}
 .srcs a:hover{border-left-color:var(--gold2);color:var(--gold2)}
+.srcs .n{display:inline-block;min-width:22px;color:var(--gold2);font-weight:700}
+.ans a.cite{color:var(--gold2);text-decoration:none;border-bottom:1px dashed rgba(201,168,76,.55);padding-bottom:1px}
+.ans a.cite:hover{border-bottom-style:solid;background:rgba(201,168,76,.12)}
+.ans a.cite sup{font-size:.72em;margin-left:1px;color:var(--gold2)}
 .note{border:1px solid var(--line);border-left:3px solid var(--gold);background:rgba(201,168,76,.04);border-radius:0 11px 11px 0;
   padding:16px 20px;margin:18px 0 4px;font-size:14px;line-height:1.9;color:#B9AE90}
 .note b{color:#E7D9A6}
@@ -127,7 +131,8 @@ footer{border-top:1px solid var(--line);padding:26px 0 44px;text-align:center;co
     它的召回被钉死在「新思想前沿」这一族语料里（<span id="fdocs">六百余</span>个面板页、<span id="fchunks">七万余</span>段），
     别的栏目一段都不会进来。所以它<b>擅长</b>回答「哪些学科在用同一类模型」「某个概念在本栏被哪几块提到、各自怎么讲」这类横跨面板的问题；
     <b>不擅长</b>回答需要学员论文或专著内容才能答的问题——那些请到<a href="/search/" style="color:var(--gold2)">全站搜索</a>去问。
-    答案下方的来源全部是服务端从真实索引里取出的，可以逐条点开核对。
+    <b>答案里的每一处引用都是可以点开的</b>——正文中出现的面板名与「（来源：×××）」标注会自动变成链接，
+    下方另附一份编号的来源清单，两处对得上号。这些来源全部由服务端从真实索引里取出，不是基底自己写的网址。
   </div>
 </div>
 
@@ -303,14 +308,55 @@ function setVendor(v){
   document.getElementById('vGlm').classList.toggle('on', v==='glm');
   document.getElementById('vDs').classList.toggle('on', v==='ds');
 }
+/* ===== 来源：既列成可点的清单，也把答案正文里的引用变成可点的链接 =====
+   服务端给基底的指令是「引用某篇观点时标（来源：篇名）」，所以正文里会出现这种标注；
+   加上基底常常直接写出面板名。两种形态都要能点开——读者验证一句话的出处，不该还要
+   自己回到底部清单里去对名字。 */
+var SRC=[];
+function shortT(t){
+  return String(t||'').replace(/\s*[·|]\s*新思想前沿\s*[·|]\s*SDE Universes\s*$/,'')
+                      .replace(/\s*[·|]\s*SDE Universes\s*$/,'').trim();
+}
+function reEsc(s){ return String(s).replace(/[.*+?^${}()|[\]\\]/g,'\\$&'); }
 function renderSources(list){
   var box=document.getElementById('srcs');
-  if(!list || !list.length){ box.innerHTML=''; return; }
-  var h='<div class="lbl">本栏来源 · '+list.length+' 处</div>';
-  list.forEach(function(s){
-    h+='<a href="'+esc(s.u)+'">'+esc(String(s.t||s.u).replace(/\s*·\s*新思想前沿\s*·\s*SDE Universes\s*$/,''))+'</a>';
+  SRC=(list||[]).map(function(s,i){ return { u:s.u, t:String(s.t||s.u), s:shortT(s.t||s.u), i:i+1 }; });
+  if(!SRC.length){ box.innerHTML=''; return; }
+  var h='<div class="lbl">本栏来源 · '+SRC.length+' 处（正文里的引用也可直接点开）</div>';
+  SRC.forEach(function(s){
+    h+='<a href="'+esc(s.u)+'"><span class="n">['+s.i+']</span> '+esc(s.s)+'</a>';
   });
   box.innerHTML=h;
+}
+/* 把答案文本变成带引用链接的 HTML。
+   顺序要紧：先转义 → 再打占位符 → 最后换成 <a>。这样占位符插进的是已转义文本，
+   锚点是最后一步生成的，不会出现「在 HTML 里再做正则替换、结果替到 href 里去」那种事故。 */
+function linkifyAnswer(text){
+  var out=esc(text);
+  if(!SRC.length) return out;
+  var slots=[];
+  function slot(html){ slots.push(html); return ''+(slots.length-1)+''; }
+  /* 先吃「（来源：篇名）」这种显式标注——长标题优先，免得短名先匹配把长名切碎 */
+  var byLen=SRC.slice().sort(function(a,b){ return b.s.length-a.s.length; });
+  byLen.forEach(function(s){
+    if(!s.s) return;
+    var names=[reEsc(esc(s.t)), reEsc(esc(s.s))].filter(function(v,i,a){ return a.indexOf(v)===i; });
+    names.forEach(function(nm){
+      var re=new RegExp('[（(]\s*来源[：:]\s*'+nm+'\s*[）)]','g');
+      out=out.replace(re, function(){
+        return slot('<a class="cite" href="'+esc(s.u)+'">（来源：'+esc(s.s)+'<sup>['+s.i+']</sup>）</a>');
+      });
+    });
+  });
+  /* 再吃正文里裸写的面板名 */
+  byLen.forEach(function(s){
+    if(!s.s || s.s.length<2) return;
+    var re=new RegExp(reEsc(esc(s.s)),'g');
+    out=out.replace(re, function(){
+      return slot('<a class="cite" href="'+esc(s.u)+'">'+esc(s.s)+'<sup>['+s.i+']</sup></a>');
+    });
+  });
+  return out.replace(/(\d+)/g, function(m, i){ return slots[+i]; });
 }
 function doAsk(){
   if(asking) return;
@@ -335,7 +381,7 @@ function doAsk(){
     var reader=resp.body.getReader(), dec=new TextDecoder(), buf='';
     function pump(){
       return reader.read().then(function(r){
-        if(r.done){ ansEl.className='ans'; return; }
+        if(r.done){ ansEl.className='ans'; if(acc) ansEl.innerHTML=linkifyAnswer(acc); return; }
         buf+=dec.decode(r.value,{stream:true});
         var lines=buf.split('\n'); buf=lines.pop();
         for(var i=0;i<lines.length;i++){
@@ -344,7 +390,9 @@ function doAsk(){
           var pl=s.slice(5).trim();
           if(pl==='[DONE]') continue;
           var j; try{ j=JSON.parse(pl); }catch(e){ continue; }
-          if(j.t==='token'){ acc+=j.v; ansEl.textContent=acc; }
+          if(j.t==='token'){
+            acc+=j.v; ansEl.textContent=acc;   // 流式期间只写文本，最便宜；链接化留到收尾
+          }
           else if(j.t==='status'){ stat.textContent=j.v; }
           else if(j.t==='sources'){ renderSources(j.v); }
           else if(j.t==='expand'){ stat.textContent='🧭 SDE 词义检索：'+j.v; }
@@ -356,7 +404,8 @@ function doAsk(){
     return pump();
   }).catch(function(e){
     ansEl.className='ans';
-    ansEl.innerHTML='<div class="err">请求失败：'+esc(e.message||String(e))+'</div>';
+    /* 中途断了也别把已经出来的字丢掉：把已收到的部分照样链接化留在页面上 */
+    ansEl.innerHTML=(acc?linkifyAnswer(acc):'')+'<div class="err">请求失败：'+esc(e.message||String(e))+'</div>';
   }).then(function(){
     asking=false; btn.disabled=false; stat.textContent='';
   });
