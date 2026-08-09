@@ -4928,7 +4928,7 @@ async function askCore(request, env, url, body, SINK) {
         + "\n\n《这场问对的全部轮次（共 " + hist.length + " 轮）》\n" + (histTxt || "（无）");
     }
     else if (mode === "paper" || mode === "polish") {
-      MAXTOK = 6800;
+      MAXTOK = 16000;   // 最大配置：五六千汉字的正文（≈4000 tok）与 7–9k tok 的思考同吃这一份预算，6800 必被吃光
       const seed = String(body.seed || "").slice(0, 3500);
       const head = String(body.head || "").slice(0, 1200);
       const tail = String(body.tail || "").slice(0, 1100);
@@ -5026,9 +5026,9 @@ async function askCore(request, env, url, body, SINK) {
   // 不告诉评分者它出自谁手、更不告诉它这是本站自己的产出；② 综合分由系统按固定权重算，
   // 模型只给五维分，任何模型手算的综合分都不算数；③ 每一维必附一句逐字引自原文的证据句。
   if (mode === "iq") {
-    // 关思考后额度全归正文；评分卡带三张清单（最近邻／扣分／提升），3600 常常装不下，
-    // 只能靠页面的修复与逐字段抢救层兜——那是最后一道保险，不该当常规路径使。
-    MAXTOK = 4200;
+    // 最大配置：思考实测 ≈8k tok，评分卡本身 2–3k tok（带最近邻／扣分／提升三张清单）。
+    // 3600 那一版整张卡只能靠页面的修复与逐字段抢救层兜——那是最后一道保险，不该当常规路径使。
+    MAXTOK = 12000;
     const text = String(body.text || "").slice(0, 26000);
     sys = "你是一位独立的创新智商评分者。你收到的是一份【匿名来稿】——你不知道它出自谁手，也不必知道。「名家写的」不加分，「机器写的」不减分；文风漂亮、术语密集、读起来像一篇正经论文，一律不加分。你唯一要测的是：一个此前不存在的认知物，在发生意义上走了多深。"
       + "\n\n【这把尺子测的是造新，不是解题】在大模型已吞下人类几乎全部公开文本的今天，一般智商刻度上的 100 分约等于一个基底在零提示语下的默认产出。所以 130 不是「比人聪明 30 分」，而是「比基底张口就来的那段话深 30 个智商点」。一段文本若连基底随口能写的深度都够不到，它在创新意义上就是负分——读起来多顺、多像论文都不算数。"
@@ -5088,18 +5088,23 @@ async function askCore(request, env, url, body, SINK) {
       + "⑤ 三个观点写完就停笔：不要综合、不要下结论、不要调和分歧，也不要评价哪个更好。调和留给后面的碰撞环节——现在就把张力抹平，等于把涌现的原料先烧掉了。";
   }
 
-  // ===== 关思考：两类调用不能把额度分给 reasoning（2026-08-09 线上真跑实测后加）=====
-  // 站内早有一条纪律「短额度的结构化调用必须显式关思考」，但它只写在 llmText 里，
-  // 而这条流式主路自己拼 body，**绕过了那条纪律**。实测两处因此结构性哑火（不是偶发）：
-  //   · iq   ：思考 12,526 字 / 正文 0 字 —— 评分卡是一个必须完整的 JSON，截断即整张卡作废；
-  //   · polish：思考 10,906 字 / 正文 0 字 —— 交出正文的从来是后面那次「关思考重跑」，
-  //             而那一遍被砍到 4000 tok，稿子断在半句上（线上抓到的原样：末句「但他输光」）。
-  // 两处的第一遍都是 100% 浪费，还各烧掉六十到九十秒——正是那条「贴着平台时长上限」的路。
-  // paper／distill／collide／synth 目前实测出得来正文，先不动：改一条能证明的，不改一片猜的。
-  const _noThink = (mode === "iq" || mode === "polish");
-  // 兜底重跑的额度：降档只对短输出成立。长文模式（成文／打磨）要写五六千字，
-  // 砍到 4000 tok 交出来的必然是一篇断在半句上的稿。
-  const _retryTok = (mode === "paper" || mode === "polish") ? MAXTOK : Math.min(MAXTOK, 4000);
+  // ===== 最大配置（[stated] 用户 2026-08-09 令「用最大配置」）=====
+  // 病根是同一个：思考与正文吃**同一份** max_tokens。2026-08-09 线上真跑实测：
+  //   · iq    　思考 12,526 字 / 正文 0 字（3600 tok 的预算被推演吃光）
+  //   · polish 　思考 10,906 字 / 正文 0 字（6800 tok 同样被吃光）
+  // 上一版的处置是「关掉思考」——那是止血，代价是把这两步最值钱的那一半砍掉了。
+  // 现在改成正解：**加预算，不减思考**。按站内那条既有分界定预算——
+  // 判据是「产出本身该有多长」，不是「我希望它想得久一点」（见 wdsLadder 头上那段注释）：
+  //   · paper／polish：正文各要五六千汉字（≈4000 tok），思考实测 7–9k tok ⇒ 16000 有余量，并挂满功率；
+  //   · iq：JSON 评分卡 2–3k tok ＋ 思考 ≈8k tok ⇒ 12000。**但不挂满功率**——
+  //     站内硬教训写死在本文件 4500 行：满功率对「要求结构化短输出」的调用是毒，它会先把时间全花在推演上。
+  // 同时给这条流挂上心跳（wdsBeat）：预算一大，思考期就长，链路上任何一段都可能因为
+  // 「长时间无字节」把连接判死——那正是「流干净结束、正文 0 字、不报任何错」的另一种死法。
+  const _topPower = (mode === "paper" || mode === "polish");
+  const _VCX = _topPower ? { url: VC.url, model: VC.model, name: VC.name, top: 1 } : VC;
+  // 兜底重跑：关思考＋降档，逼它早点停下推演开始写。但长文模式不能降到 4000——
+  // 实测 4000 tok 交出来的是一篇断在半句上的稿（线上原样：6,847 字，末句「但他输光」）。
+  const _retryTok = _topPower ? 8000 : Math.min(MAXTOK, 6000);
   const _mainBody = {
     model: VC.model,
     stream: true,
@@ -5112,7 +5117,7 @@ async function askCore(request, env, url, body, SINK) {
     upstream = await fetch(VC.url, {
       method: "POST",
       headers: { "content-type": "application/json", authorization: "Bearer " + KEY },
-      body: JSON.stringify(_noThink ? wdsPlainBody(VC, _mainBody) : _mainBody),
+      body: JSON.stringify(_topPower ? wdsTopBody(_VCX, _mainBody) : _mainBody),
     });
   } catch (e) {
     return _out([{ t: "sources", v: sources }, { t: "error", v: VC.name + " 连接失败：" + (e && e.message) }]);
@@ -5156,7 +5161,11 @@ async function askCore(request, env, url, body, SINK) {
     return { out: out, think: think, fin: fin, errs: errs };
   };
   const runMain = async (controller) => {
-      let _st = null;   // 这条流不带心跳，但下面共用的转发行会读 _st——严格模式下未声明即抛错
+      // 心跳：预算给大之后，思考期可以长达一两分钟。这期间上游一个字节都不发，
+      // 链路上任何一段（浏览器、边缘、代理）都可能把连接判死——症状与「基底没写」一模一样，
+      // 根因却完全不同。每 5 秒一个 beat（已跑秒数／已推演字数）；前端不认这个帧也无害。
+      const _st = { t0: Date.now(), think: 0, out: 0, stage: mode };
+      const _hb = wdsBeat(controller, _st);
       controller.enqueue(_sseBytes({ t: "sources", v: sources })); // 先给出处，再流答案
       if (expStr) controller.enqueue(_sseBytes({ t: "expand", v: expStr }));
       let r = { out: 0, think: 0, fin: "", errs: 0 };
@@ -5192,6 +5201,7 @@ async function askCore(request, env, url, body, SINK) {
             + (r.errs ? "上面那条基底自己报的错才是根因。" : "请再点一次；若连着两次都空，换另一个基底。") }));
         }
       }
+      try { clearInterval(_hb); } catch (e) {}
       controller.enqueue(_ENC.encode("data: [DONE]\n\n"));
       controller.close();
   };
