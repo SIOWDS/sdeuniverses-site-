@@ -268,7 +268,8 @@ function wdsLadder(VC, want) {
 // ladderOverride：调用方自带阶梯。为什么要有它——wdsLadder 的**非满功率分支忽略 want**，
 // 一律返回 [64000,32000,12000]；那是既有几个调用点依赖着的行为，不在本次射程内，所以不动它，
 // 而是让需要"非满功率也按自己的预算走阶梯"的调用方（askCore 的 iq 档）把阶梯直接递进来。
-async function wdsFetchMax(VC, KEY, messages, stream, want, signal, withUsage, ladderOverride) {
+// plain：显式关思考。与满预算一起用，就是「预算全归正文」那一档——长文实测唯一稳定的形态。
+async function wdsFetchMax(VC, KEY, messages, stream, want, signal, withUsage, ladderOverride, plain) {
   const ladder = (ladderOverride && ladderOverride.length) ? ladderOverride : wdsLadder(VC, want);
   let resp = null;
   for (let i = 0; i < ladder.length; i++) {
@@ -279,7 +280,7 @@ async function wdsFetchMax(VC, KEY, messages, stream, want, signal, withUsage, l
     resp = await fetch(VC.url, {
       method: "POST",
       headers: { "content-type": "application/json", authorization: "Bearer " + KEY },
-      body: JSON.stringify(wdsTopBody(VC, body)),
+      body: JSON.stringify(plain ? wdsPlainBody(VC, body) : wdsTopBody(VC, body)),
       signal: signal || undefined,   // 上层给的时钟护栏：上游卡死时由它掐断，别把整个请求拖到平台上限被无声杀掉
     });
     if (resp.ok || resp.status !== 400 || i === ladder.length - 1) return resp;
@@ -5110,7 +5111,17 @@ async function askCore(request, env, url, body, SINK) {
   // effort:"high" 而不是默认的 "max"：[stated] 用户要「每一次调用都要 MaxToken」，
   // 那就把刹车挪到推理投入档上——预算给满，思考降一格。这一步是**实验性的**，
   // 判据只有一条：线上真跑 paper 上半篇能不能在两分钟内交出正文（上一次 64000＋满功率 是交不出的）。
-  const _VCX = _topPower ? { url: VC.url, model: VC.model, name: VC.name, top: 1, effort: "high" } : VC;
+  // 【长文这两档：满预算 ＋ 关思考。口径是三次线上真跑换来的，改之前先读完】
+  //   ① 64000 ＋ reasoning_effort:"max" → paper 上半篇思考 17,233 字、正文 0 字，第 133 秒无声断流；
+  //   ② 64000 ＋ reasoning_effort:"high"（想把刹车挂到投入档上）→ **一点用都没有**：思考 17,481 字、
+  //      仍是 0 正文，被时钟在第 115 秒掐断，最后交稿的是那次「关思考重跑」（5,013 字，正常收尾）；
+  //   ③ 16000 ＋ 思考开 → polish 83 秒、10,823 字，**是带着思考写完的**。
+  // 与上面深度档那段量出来的是同一条：**预算是油门不是容器，投入档这个旋钮刹不住它**。
+  // 用户要的是「每一次调用都要 MaxToken」，那就把预算给满、把思考关掉，让 64000 全部变成正文——
+  // ② 已经证明：给满预算时它交出来的本来就是关思考那一遍写的，只是白等了两分钟。
+  // iq／distill 不在此列：它们开着思考在满预算下跑得通（iq 实测 99 秒交出完整评分卡），思考对它们有用。
+  const _plainLong = _topPower;
+  const _VCX = _topPower ? { url: VC.url, model: VC.model, name: VC.name } : VC;
   // [stated] 用户 2026-08-09：「DeepSeek 可以非常长的，用最高级配置」——**照做后当场跑出反例，故改成有界的最高档**。
   // 真跑记录（同日，全部线上）：
   //   · 首发 64000 ＋ 满功率：polish 92s 出稿 ✓、iq 99s 出卡 ✓，但 **paper 上半篇在第 133 秒被平台杀掉**
@@ -5144,7 +5155,7 @@ async function askCore(request, env, url, body, SINK) {
   const _heavy = (_topPower || mode === "iq" || mode === "distill" || _deepAns);
   // 满功率档（成文／打磨）用 wdsLadder 自带的 [want,32000,16000]；
   // iq 不挂满功率，但同样首发最高档，所以自带一条阶梯；其余模式保持各自原有的那一个数不变。
-  const _ladder = _topPower ? null
+  const _ladder = _topPower ? [WDS_TOK_HEAVY, 32000, 16000]
     : _deepAns ? [8000, 6000, 4000]
     : ((mode === "iq" || mode === "distill") ? [WDS_TOK_HEAVY, 12000, 8000]
       : [MAXTOK, Math.min(32000, MAXTOK), Math.min(12000, MAXTOK)].filter((v, i, a) => v > 0 && a.indexOf(v) === i));
@@ -5157,13 +5168,14 @@ async function askCore(request, env, url, body, SINK) {
   const _clk = _deepAns ? wdsClock(45000, 75000) : (_heavy ? wdsClock(60000, 115000) : null);
   // 兜底重跑：关思考＋降档，逼它早点停下推演开始写。但长文模式不能降到 4000——
   // 实测 4000 tok 交出来的是一篇断在半句上的稿（线上原样：6,847 字，末句「但他输光」）。
-  const _retryTok = _topPower ? 8000 : Math.min(MAXTOK, 6000);
+  // 长文首发本来就已经是「满预算＋关思考」，重跑与它同形，只降一档预算逼它早点收笔。
+  const _retryTok = _topPower ? 16000 : Math.min(MAXTOK, 6000);
   const _msgs = [{ role: "system", content: sys }, { role: "user", content: usr }];
   // 调基底（境内直连）。自带 Key：仅在内存中转发调用，绝不存储/记录（同 llm-proxy 纪律）
   let upstream;
   try {
     upstream = await wdsFetchMax(_VCX, KEY, _msgs, true, _heavy ? WDS_TOK_HEAVY : MAXTOK,
-      _clk ? _clk.signal : undefined, false, _ladder);
+      _clk ? _clk.signal : undefined, false, _ladder, _plainLong);
   } catch (e) {
     if (_clk) _clk.stop();
     const _cut = _clk && _clk.cut ? _clk.why(VC.name) : ((e && e.message) || String(e));
