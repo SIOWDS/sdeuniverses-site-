@@ -4519,14 +4519,40 @@ async function sdeExpandQuery(VC, KEY, q, ms) {
 // 同仓 /api/wds/read 的三处早就改成「先出流再干活」（见 3450/3618/3854 的注释），这里补最后一条产线。
 // 做法：先把 200 与 event-stream 头交出去，再在流内跑 askCore——出流之后再慢，也只退化成流内
 // 可读的错误与进度提示，不再是一堵读不懂的 503 墙。
-// 例外：recommend 是非流式 JSON（前端 resp.json()），包进 SSE 流会当场读不出来，照旧走老路。
+// 例外：recommend 与 nextq 是非流式 JSON（前端 resp.json()），包进 SSE 流会当场读不出来，照旧走老路。
+// 自动十轮问对的追问阶梯（第 2–10 轮各一级；第 1 轮是读者自己那一问）。
+// 为什么写死成阶梯而不是让基底自由发挥：自由发挥的十轮会在第三轮就开始同义反复——
+// 每一轮都追问「能不能再具体一点」，十轮下来仍停在同一层。这九级是一条发生学的下降线：
+// 承重命题 → 共有前提 → 反例 → 发生次序 → 远学科对撞 → 可裁决读数 → 证伪条件 → 最近邻 → 落地代价，
+// 每一级都必须踩着上一级的产出走，走完十轮，手上才有一份能写成论文的材料而不是一堆回答。
+const AUTO_LADDER = [
+  { n: 2,  k: "承重命题", task: "把上一轮回答里最承重的那一句压成一句话，再追问它凭什么成立、假定了什么才站得住。",
+            fb: "上一轮回答里最承重的是哪一句？它凭什么成立、又假定了什么才站得住？" },
+  { n: 3,  k: "共有前提", task: "找出上一轮里各方（包括回答者自己）都没说出口、却一起默认着的那个前提，把它挖出来并追问取消它会怎样。",
+            fb: "这个问题的各种答法共同默认了什么前提？取消这个前提之后，还剩下什么？" },
+  { n: 4,  k: "反例与边界", task: "追问在什么具体情形下上一轮的结论会不成立，要求举出真实可指的反例，而不是抽象地让一步。",
+            fb: "在什么具体情形下上一轮的结论会不成立？请举出可指的反例，不要抽象地让步。" },
+  { n: 5,  k: "发生次序", task: "把结论改问成发生学问题：这件事是怎么一步步发生的，哪一步先动，它的改变又回写了什么。",
+            fb: "这件事是怎么一步步发生的？哪一步先动，它的改变又回写了什么？" },
+  { n: 6,  k: "远学科对撞", task: "指定一个离本题最远的学科里的真实成熟理论，让它与上一轮的结论正面相撞，追问撞完之后哪一方必须改。",
+            fb: "把上一轮的结论与一个最远学科里的成熟理论正面相撞：撞完之后，哪一方必须改？" },
+  { n: 7,  k: "可裁决读数", task: "追问这条主张能不能落成一个可测的读数——量纲是什么、怎么数、数的是谁，不许停在定性描述上。",
+            fb: "这条主张能不能落成一个可测的读数？量纲是什么、怎么数、数的是谁？" },
+  { n: 8,  k: "证伪条件", task: "追问什么样的具体观测结果会推翻它，要求写成一句「若观测到 X，则本主张作废」。",
+            fb: "什么样的具体观测结果会推翻它？请写成一句「若观测到 X，则本主张作废」。" },
+  { n: 9,  k: "最近邻占位者", task: "追问这个想法在哪些既有理论那里其实已经被人说过（指名道姓），以及与它们之间可裁决的差异在哪里。",
+            fb: "这个想法在哪些既有理论那里其实早已被说过？请指名道姓，并说清与它们之间可裁决的差异。" },
+  { n: 10, k: "落地与代价", task: "追问谁应当因此改变哪一个具体动作，这个改变的代价由谁承担，以及不改会怎样。",
+            fb: "谁应当因此改变哪一个具体动作？代价由谁承担？不改又会怎样？" },
+];
+
 async function handleAsk(request, env, url) {
   if (request.method === "OPTIONS") return new Response(null, { headers: _cors() });
   if (request.method !== "POST") return new Response("Method Not Allowed", { status: 405 });
   let body = {};
   try { body = await request.json(); } catch (e) {}
   body = body || {};
-  if (body.mode === "recommend") return askCore(request, env, url, body, null);
+  if (body.mode === "recommend" || body.mode === "nextq") return askCore(request, env, url, body, null);
   const st = { closed: false };
   const stream = new ReadableStream({
     async start(controller) {
@@ -4563,7 +4589,7 @@ async function askCore(request, env, url, body, SINK) {
 
   // 模式：answer（默认问答）/ recommend（答后点击①·推荐阅读）/ paper（答后点击②·成文一篇，两段续写）
   // 模式：answer / recommend（推荐阅读）/ paper（成文一篇）/ iq（创新智商盲评）/ polish（打磨修改）
-  const _MODES = { recommend: 1, paper: 1, iq: 1, polish: 1, distill: 1, collide: 1, synth: 1 };
+  const _MODES = { recommend: 1, paper: 1, iq: 1, polish: 1, distill: 1, collide: 1, synth: 1, nextq: 1 };
   const mode = _MODES[body.mode] ? body.mode : "answer";
   const part = body.part === 2 ? 2 : 1;
 
@@ -4620,6 +4646,37 @@ async function askCore(request, env, url, body, SINK) {
       return _out([{ t: "error", v: msg }]);
     }
   } catch (e) {}
+
+  // ===== 模式：nextq —— 自动十轮问对的「下一问」（前端「🚀 自动十轮」专用）=====
+  // 刻意排在站内检索之前：这一步只拟一句问题，不需要语料。若让它也跑一遍词表扩展＋三层召回，
+  // 一场自动十轮就白白多跑九遍最贵的那一段（检索是这条链上单次最重的开销，不是基底调用）。
+  // 阶梯写在服务端，是为了让「十轮到底问什么」**只有一处定义**：前端只送 step。
+  // 前端若自带一份阶梯，两边迟早漂移，而漂移后页面一切正常，只是问对不再逼深——静默故障。
+  // 每一级都配一句 fb（兜底问句）：基底拟题失败时**照样把这一轮问出去**，
+  // 十轮里的任何一次拟题都不该有权力中断整场自动运行。
+  if (mode === "nextq") {
+    const stepNo = Math.max(2, Math.min(10, parseInt(body.step, 10) || roundNo));
+    const L = AUTO_LADDER.find((x) => x.n === stepNo) || AUTO_LADDER[0];
+    const lastA = hist.length ? (hist[hist.length - 1].a || "") : String(body.ans || "");
+    const nsys = "你是一场深度问对的提问人，不是回答者。你只输出**一句**中文问句：不加编号、不加引号、不加解释、不超过 60 字。"
+      + "问句必须扣住给定材料里的**具体说法**（可以引用其中的字眼），不许写成换个题目也照样成立的通用问法。";
+    const nusr = "《缘起之问》\n" + originQ
+      + "\n\n《已经问过的问题》\n" + (hist.map((t, i) => (i + 1) + ". " + t.q).join("\n") || "（无）")
+      + "\n\n《上一轮的回答》\n" + String(lastA).slice(0, 2200)
+      + "\n\n———\n这是第 " + stepNo + " 轮。本轮规定的追问动作是【" + L.k + "】：" + L.task
+      + "\n不许重复已经问过的问题。只输出那一句问句。";
+    let raw = "";
+    // 400 tok ⇒ llmText 自动走 wdsPlainBody 关思考：短额度一旦被 reasoning 吃光就一个字都不写。
+    try { raw = await llmText(VC, KEY, nsys, nusr, 400, 30000); } catch (e) {}
+    let nq = String(raw || "").split("\n").map((s) => s.trim()).filter(Boolean)[0] || "";
+    nq = nq.replace(/^[0-9０-９]+\s*[、.．)）:：]\s*/, "").replace(/^第[一二三四五六七八九十]+[轮问]\s*[：:]?\s*/, "")
+           .replace(/^[「『“"'（(【\[]+/, "").replace(/[」』”"'）)】\]]+$/, "").trim().slice(0, 120);
+    const usedFb = !(nq.length >= 6);
+    if (usedFb) nq = L.fb;
+    if (!/[?？]/.test(nq)) nq += "？";   // 只在整句一个问号都没有时才补：兜底问句常是「问句？＋一句要求。」，只看末尾会补出「让步。？」
+    return new Response(JSON.stringify({ ok: true, q: nq, step: stepNo, move: L.k, fallback: usedFb }),
+      { headers: { ..._cors(), "content-type": "application/json" } });
+  }
 
   // 站内检索（按档分级喂料：深度档拿更多材料，普通档保持轻快）
   // 成文与打磨强制走最高提智（完整内功+心得）；创新智商盲评刻意不装内功——

@@ -116,6 +116,17 @@ a.reco .rw{font-size:0.8rem;color:var(--muted,#8a8a8a);margin-top:3px;line-heigh
 .pp-fill.run{background:linear-gradient(90deg,#C9A227,#8A6817,#C9A227);background-size:200% 100%;animation:pp-slide 1.5s linear infinite}
 @keyframes pp-slide{0%{background-position:0 0}100%{background-position:-200% 0}}
 .pp-num{font-size:0.86rem;color:var(--gold,#8A6817);font-variant-numeric:tabular-nums;white-space:nowrap;min-width:88px;text-align:right}
+/* 🚀 自动十轮：无人值守跑完整条产线时，屏幕上唯一能看的就是这块进度 */
+.auto-wrap{display:none;margin-top:16px;padding:14px 17px;border:1px solid var(--gold,#8A6817);border-radius:12px;background:var(--card2)}
+.auto-wrap.show{display:block}
+.auto-step{font-size:0.83rem;line-height:1.65;padding:3px 0;color:var(--text2);display:flex;gap:8px;align-items:flex-start}
+.auto-step .ai{width:1.1em;flex:none;color:var(--muted)}
+.auto-step.ok .ai{color:#3F7A4B}
+.auto-step.fail{color:#B23B3B}
+.auto-step.fail .ai{color:#B23B3B}
+.auto-step.run{color:var(--text);font-weight:600}
+.auto-step.run .ai{color:var(--gold,#8A6817)}
+.auto-step .an{color:var(--muted);font-weight:400}
 .pdf-acts{display:none;gap:10px;margin-top:12px;flex-wrap:wrap;align-items:center}
 .pdf-acts.show{display:flex}
 </style>
@@ -182,6 +193,11 @@ a.reco .rw{font-size:0.8rem;color:var(--muted,#8a8a8a);margin-top:3px;line-heigh
         <button class="seg" id="kOwn" onclick="setKeyMode('own')"><span class="zh-only">自带 Key</span><span class="en-only">My key</span></button>
       </div>
       <div class="ctl-group">
+        <span class="ctl-label"><span class="zh-only">全自动</span><span class="en-only">Auto</span></span>
+        <button class="seg" id="autoBtn" onclick="doAutoRun()"><span class="zh-only">🚀 自动十轮 → 论文 → 评分</span><span class="en-only">🚀 Auto 10 turns</span></button>
+        <button class="seg" id="autoStopBtn" onclick="stopAutoRun()" style="display:none"><span class="zh-only">⏹ 中止</span><span class="en-only">⏹ Stop</span></button>
+      </div>
+      <div class="ctl-group">
         <span class="ctl-label"><span class="zh-only">深度</span><span class="en-only">Depth</span></span>
         <button class="seg" id="deepBtn" onclick="toggleDeep()"><span class="zh-only">🔬 深度回答</span><span class="en-only">🔬 Deep</span></button>
         <button class="seg" id="fourBtn" onclick="toggleFour()" style="display:none"><span class="zh-only">四步法</span><span class="en-only">4-step</span></button>
@@ -190,6 +206,7 @@ a.reco .rw{font-size:0.8rem;color:var(--muted,#8a8a8a);margin-top:3px;line-heigh
     </div>
     <div id="deepHint" style="display:none;font-size:0.78rem;color:var(--gold);margin:9px 2px 0;line-height:1.6">🔬 深度模式：基底先内化内功写心得，再用 <b>SDE 方法论</b>（六路径→S/D/E→三方程→误差互消→逮先验）做一次有指导性的深入研究，现实问题还会给可执行的「怎么办」。默认<b>单次调用</b>（较慢、较费 token，建议自带 Key）。<br>点「四步法」→ 升级为 <b>S/D/E 四次独立调用</b>的完整误差互消（最深，但慢 4 倍、贵 4 倍，只在要冲满时用）。</div>
     <div id="emergeHint" style="display:none;font-size:0.78rem;color:var(--gold);margin:8px 2px 0;line-height:1.6">🌀 涌现档：每一轮不再给一篇答案，而是给<b>三个彼此有分歧的观点</b>（写完就停，不许调和——张力要留给碰撞）。问够 2–10 轮后点「二阶碰撞」：系统<b>随机抽三种不同撞法各撞出一个典范</b>，再用创新智商<b>背靠背盲评择优</b>，最后做<b>综合提炼</b>作为论文入口。全程每次调用都装内功＋心得＋方法论；一轮完整涌现约 17–18 次调用，很费 token，建议自带 Key。</div>
+    <div id="autoHint" style="font-size:0.78rem;color:var(--gold);margin:8px 2px 0;line-height:1.6">🚀 自动十轮：<b>你只交一个问题，中途不用再点任何东西</b>。系统按一条固定的九级追问阶梯（承重命题 → 共有前提 → 反例与边界 → 发生次序 → 远学科对撞 → 可裁决读数 → 证伪条件 → 最近邻占位者 → 落地与代价）自己把问对逼深十轮，然后<b>提炼</b>成论文入口资料、<b>写成万字论文</b>并出 PDF、再做<b>创新智商五维盲评</b>，最后给一份可下载的<b>全程记录</b>。约 <b>23</b> 次基底调用（开涌现档 29 次）、20–50 分钟，<b>期间请勿关闭页面</b>；随时可「⏹ 中止」，已跑出来的一律保留。强烈建议自带 Key。</div>
     <div id="ownKeyRow" style="display:none">
       <input id="userKey" type="password" autocomplete="off" placeholder="填入你的 DeepSeek / 智谱 API Key（仅存本机浏览器，不上传服务器保存）">
     </div>
@@ -201,6 +218,15 @@ a.reco .rw{font-size:0.8rem;color:var(--muted,#8a8a8a);margin-top:3px;line-heigh
       <span class="zh-only">🧵 连续问对 · 第 <b id="turnNo">1</b> / 10 轮：每一轮都带着前面几轮的上下文，问题会被一层层逼深。满 2 轮后可「提炼精华」，把整场问对收成万字论文的入口资料。</span>
       <span class="en-only">🧵 Threaded Q&amp;A · turn <b id="turnNoE">1</b>/10 — each turn carries the earlier ones. After 2 turns you can distill the thread into a paper brief.</span>
       <b style="cursor:pointer;margin-left:6px;text-decoration:underline" onclick="resetThread()"><span class="zh-only">🧹 清空重来</span><span class="en-only">Reset</span></b>
+    </div>
+    <div class="auto-wrap" id="autoWrap">
+      <div class="ans-label"><span class="zh-only">🚀 自动十轮 · 一问到底</span><span class="en-only">Auto run</span></div>
+      <div class="think" id="autoStat"></div>
+      <div id="autoSteps"></div>
+      <div class="pdf-acts" id="autoActs">
+        <button class="actbtn solidbtn" onclick="dlAutoRecord()">⬇ <span class="zh-only">下载全程记录（Markdown）</span><span class="en-only">Download full record</span></button>
+        <button class="actbtn" onclick="copyAutoRecord()">📋 <span class="zh-only">复制全程记录</span><span class="en-only">Copy</span></button>
+      </div>
     </div>
     <div id="threadBox" style="display:none;margin-top:16px"></div>
     <div class="ans-wrap" id="ansWrap">
@@ -633,8 +659,8 @@ function renderThread(){
   }
   box.innerHTML=out; box.style.display='block';
 }
-function resetThread(){
-  if(turns.length && !confirm('清空这场问对（共 '+turns.length+' 轮）与已提炼的入口资料？')) return;
+function resetThread(quiet){
+  if(!quiet && turns.length && !confirm('清空这场问对（共 '+turns.length+' 轮）与已提炼的入口资料？')) return;
   turns=[]; brief=''; lastAns=''; lastQ='';
   document.getElementById('threadBox').style.display='none';
   document.getElementById('briefWrap').classList.remove('show');
@@ -648,15 +674,24 @@ function resetThread(){
   document.getElementById('emergeStat').textContent='';
   document.getElementById('ansWrap').classList.remove('show');
   document.getElementById('askActs').classList.remove('show');
+  /* 全程记录是从 turns/brief/paperAll/iqCard 现拼的，清空问对之后那份记录就不再成立——
+     面板必须跟着清，否则「下载全程记录」会下到一份只剩标题的空壳。 */
+  autoSteps=[]; renderAutoSteps();
+  document.getElementById('autoWrap').classList.remove('show');
+  document.getElementById('autoActs').classList.remove('show');
+  document.getElementById('autoStat').textContent='';
   updateTurnBar();
 }
+/* 返回值：一律返回 Promise（哪怕是被守卫挡下的那几条路）。
+   「🚀 自动十轮」要把这四台机器串成一条链，链上任何一环返回 undefined，
+   下一环就会在上一环还没跑完时开跑——十轮会挤成一团。 */
 function doAsk(){
-  if(asking) return;
+  if(asking) return Promise.resolve();
   var q=document.getElementById('qa').value.trim();
-  if(!q){ document.getElementById('qa').focus(); return; }
+  if(!q){ document.getElementById('qa').focus(); return Promise.resolve(); }
   var uk=(keyMode==='own')?document.getElementById('userKey').value.trim():'';
-  if(keyMode==='own' && !uk){ document.getElementById('userKey').focus(); flashAsk('请先填入你的 API Key，或切回「系统」。'); return; }
-  if(turns.length>=MAXTURNS){ flashAsk('这场问对已满 '+MAXTURNS+' 轮。请先「提炼精华」成论文入口资料，或「清空重来」。'); return; }
+  if(keyMode==='own' && !uk){ document.getElementById('userKey').focus(); flashAsk('请先填入你的 API Key，或切回「系统」。'); return Promise.resolve(); }
+  if(turns.length>=MAXTURNS){ flashAsk('这场问对已满 '+MAXTURNS+' 轮。请先「提炼精华」成论文入口资料，或「清空重来」。'); return Promise.resolve(); }
   asking=true;
   lastQ=q; lastAns='';
   document.getElementById('askActs').classList.remove('show');
@@ -672,7 +707,7 @@ function doAsk(){
   document.getElementById('sdeExpand').textContent='';
   var acc='', thinkChars=0;
 
-  fetch('/api/ask',{
+  return fetch('/api/ask',{
     method:'POST',
     headers:{'content-type':'application/json'},
     body:JSON.stringify(Object.assign({q:q,vendor:vendor}, turns.length?{hist:buildHist(false)}:{}, uk?{key:uk}:{}, deepOn?{deep:true}:{}, (deepOn&&fourOn)?{four:true}:{}, triOn?{tri:true}:{}))
@@ -721,6 +756,237 @@ function finishAsk(ansEl){
   }
 }
 
+/* ================= 🚀 自动十轮：一问到底 =================
+   十轮问对 → 提炼精华 → 万字论文（PDF） → 创新智商五维盲评 → 全程记录。
+   人只交一个问题，中途不再点任何东西。
+
+   为什么值得单独做一条：这条产线原本每一步都要人点一下，而十轮问对的价值恰恰在于「一层层逼深」，
+   逼深靠的是每一轮追问的**动作**，不是靠人守在旁边。所以追问动作被固化成服务端的九级阶梯
+   （worker.js 的 AUTO_LADDER，那里是唯一定义处；这边只送 step，不复制一份阶梯——复制迟早漂移，
+   而漂移之后页面一切正常，只是问对不再逼深，属于看不见的静默故障）。
+
+   四条纪律：
+   ① 中途可中止，中止后已跑出来的东西一律保留（跑了半小时不该被一键清空）；
+   ② 每一轮失败自动重试一次；重试仍失败就**停下收口，不再往下烧**——
+      余下几轮多半会以同一个理由失败（额度、Key、基底不可用），继续跑只是把钱烧完；
+   ③ 提炼没出入口资料就不写论文：没有入口资料的论文会退回单轮底稿，白烧两次最贵的长调用；
+   ④ 全程记录可下载——论文有 PDF，但十轮问答与评分卡此前只活在这一页的内存里，刷新即失。 */
+var AUTO_TARGET=10;
+var AUTO_FB_Q='就上一轮回答里最承重的那一句，追问它凭什么成立、又假定了什么？';
+var autoRunning=false, autoStopped=false, autoT0=0, autoSteps=[], autoNqFail=0;
+function autoElapsed(){
+  var s=Math.max(0,Math.round((Date.now()-autoT0)/1000));
+  return s>=60 ? (Math.floor(s/60)+' 分 '+(s%60)+' 秒') : (s+' 秒');
+}
+function autoStat(msg){ var e=document.getElementById('autoStat'); if(e) e.textContent=msg; }
+function renderAutoSteps(){
+  var box=document.getElementById('autoSteps'); if(!box) return;
+  var ic={run:'…',ok:'✓',fail:'✗',skip:'—'};
+  box.innerHTML=autoSteps.map(function(s){
+    return '<div class="auto-step '+s.state+'"><span class="ai">'+ic[s.state]+'</span><span>'+esc(s.label)
+      +(s.note?'<span class="an"> · '+esc(s.note)+'</span>':'')+'</span></div>';
+  }).join('');
+}
+function autoPush(label){ autoSteps.push({label:label,state:'run',note:''}); renderAutoSteps(); return autoSteps.length-1; }
+function autoDone(ix,state,note){ if(autoSteps[ix]){ autoSteps[ix].state=state; autoSteps[ix].note=note||''; } renderAutoSteps(); }
+/* nextq 是这条链上唯一的非流式 JSON 出口；但 askCore 在拿到 KEY 之前的那几条错误路径
+   （没配密钥、配额用尽）仍会回 SSE。所以这里不直接 r.json()，先取文本再分辨，
+   否则用户看到的会是一句「Unexpected token d」，而真正的原因是额度用完了。 */
+function autoJson(r){
+  return r.text().then(function(t){
+    try{ return JSON.parse(t); }catch(e){}
+    var m=t.match(/"t"\s*:\s*"error"\s*,\s*"v"\s*:\s*"([^"]{0,300})"/);
+    throw new Error(m?m[1]:('拟题接口返回异常：'+String(t).slice(0,80)));
+  });
+}
+function autoNextQ(step){
+  var uk=(keyMode==='own')?document.getElementById('userKey').value.trim():'';
+  return fetch('/api/ask',{
+    method:'POST',headers:{'content-type':'application/json'},
+    body:JSON.stringify(Object.assign({mode:'nextq',q:originQ(),step:step,hist:buildHist(false),vendor:vendor}, uk?{key:uk}:{}))
+  }).then(autoJson).then(function(j){
+    if(j && j.ok && j.q) return {q:String(j.q), move:String(j.move||''), fb:!!j.fallback};
+    throw new Error((j&&j.v)||'拟题没交出问句');
+  });
+}
+function autoRound(n){
+  return autoRoundTry(n, autoPush('第 '+n+'/'+AUTO_TARGET+' 轮'+(n===1?' · 你的问题':'')), 1);
+}
+function autoRoundTry(n, ix, attempt){
+  var before=turns.length;
+  /* 第一轮用读者自己那一问；第 2–10 轮先向服务端要一句追问。
+     拟题失败不许中断整场（十轮里任何一次拟题都没这个权力）：退回一句通用追问继续跑，
+     但**连续两次**拟题失败就认账收手——那已经不是抖动，是接口在系统性地拒绝。 */
+  var pre = (n===1) ? Promise.resolve(null) : autoNextQ(n).catch(function(e){
+    autoNqFail++;
+    return {q:AUTO_FB_Q, move:'通用追问', fb:true, cfail:true, err:errText(e)};
+  });
+  return pre.then(function(nx){
+    if(autoStopped){ autoDone(ix,'skip','已中止'); return false; }
+    if(nx){
+      if(nx.cfail && autoNqFail>=2){ autoDone(ix,'fail','连续两次拟题失败：'+(nx.err||'')); return false; }
+      document.getElementById('qa').value=nx.q;
+      autoSteps[ix].label='第 '+n+'/'+AUTO_TARGET+' 轮 · '+(nx.move||'追问')+'：'+nx.q;
+      renderAutoSteps();
+    }
+    autoStat('🧵 第 '+n+'/'+AUTO_TARGET+' 轮问对中'+(attempt>1?'（重试）':'')+' · 已用 '+autoElapsed()+'…');
+    return doAsk().then(function(){
+      if(turns.length>before){
+        autoNqFail=0;
+        autoDone(ix,'ok',(turns[turns.length-1].a||'').length+' 字');
+        return true;
+      }
+      if(autoStopped){ autoDone(ix,'skip','已中止'); return false; }
+      if(attempt>=2){ autoDone(ix,'fail','两次都没取得回答（原因见上方答复区）'); return false; }
+      autoStat('… 第 '+n+' 轮没取得回答，3 秒后重试一次…');
+      return new Promise(function(r){ setTimeout(r,3000); }).then(function(){ return autoRoundTry(n, ix, attempt+1); });
+    });
+  });
+}
+function stopAutoRun(){
+  if(!autoRunning) return;
+  autoStopped=true;
+  autoStat('⏹ 正在中止——当前这一步跑完就停（网络上已经发出去的那一次调用停不住）。已跑出来的全部保留。');
+}
+function doAutoRun(){
+  if(autoRunning) return Promise.resolve();
+  if(asking||papering||distilling||iqing||polishing||emerging){ flashAsk('有一步正在跑，等它跑完再开自动十轮。'); return Promise.resolve(); }
+  var q=document.getElementById('qa').value.trim();
+  if(!q){ document.getElementById('qa').focus(); flashAsk('先写下你要一问到底的那一个问题。'); return Promise.resolve(); }
+  var uk=(keyMode==='own')?document.getElementById('userKey').value.trim():'';
+  if(keyMode==='own' && !uk){ document.getElementById('userKey').focus(); flashAsk('请先填入你的 API Key，或切回「系统」。'); return Promise.resolve(); }
+  /* 十轮问对 ＋ 九次拟题 ＋ 提炼 ＋ 成文两段 ＋ 盲评 ＝ 23；
+     开涌现档时提炼那一格换成三路碰撞（3 撞 ＋ 3 盲评 ＋ 1 综合）＝ 29。
+     这个数要如实报给用户：用系统密钥的人一次就吃掉公共额度的三分之一。 */
+  var calls=AUTO_TARGET+(AUTO_TARGET-1)+(triOn?7:1)+2+1;
+  if(!confirm('🚀 自动十轮 · 一问到底\n\n只交这一个问题，之后全程无人值守：\n十轮问对（追问由九级阶梯拟定）→ 提炼成论文入口资料 → 万字论文与 PDF → 创新智商五维盲评 → 全程记录。\n\n'
+    +'· 约 '+calls+' 次基底调用（'+(deepOn?'深度档':'普通档')+(triOn?' ＋ 涌现档':'')+'），预计 '+(deepOn?'25–50':'12–25')+' 分钟\n'
+    +'· 期间请勿关闭或刷新页面——这场问对只活在这一页的内存里\n'
+    +'· 随时可「⏹ 中止」，已跑出来的部分全部保留\n\n'
+    +(keyMode==='own'
+      ? '你用的是自带 Key，token 由你自付。'
+      : '⚠ 你用的是系统密钥——那是站方付钱的公共额度（60 次/天），一次自动十轮就会吃掉其中约 '+calls+' 次。建议先切到「自带 Key」。')
+    +'\n\n确定开始吗？')) return Promise.resolve();
+  if(turns.length){
+    if(!confirm('当前已有 '+turns.length+' 轮问对，自动十轮会先把它清空，从这一问重新开始。继续？')) return Promise.resolve();
+    var keep=q; resetThread(true); document.getElementById('qa').value=keep;
+  }
+  autoRunning=true; autoStopped=false; autoT0=Date.now(); autoSteps=[]; autoNqFail=0;
+  document.getElementById('autoWrap').classList.add('show');
+  document.getElementById('autoActs').classList.remove('show');
+  document.getElementById('autoBtn').disabled=true;
+  document.getElementById('goAsk').disabled=true;
+  document.getElementById('autoStopBtn').style.display='inline-block';
+  renderAutoSteps();
+  autoStat('🚀 自动十轮已启动 · 第 1 轮准备中…');
+
+  var chain=Promise.resolve(true), okRounds=0;
+  for(var i=1;i<=AUTO_TARGET;i++){
+    (function(n){
+      chain=chain.then(function(go){
+        if(go!==true || autoStopped) return false;
+        return autoRound(n).then(function(ok){ if(ok) okRounds++; return ok; });
+      });
+    })(i);
+  }
+  return chain.then(function(){
+    if(autoStopped) return;
+    if(okRounds<AUTO_TARGET){
+      throw new Error('第 '+(okRounds+1)+' 轮连续两次没跑成，已停在这里，不再往下烧调用。已完成的 '+okRounds
+        +' 轮全部保留——你可以手动点「🧪 提炼精华」接着走，或换成自带 Key 后重跑。');
+    }
+    var ix=autoPush(triOn?'二阶碰撞 · 三典范择优 → 综合提炼':'提炼精华 · 整场问对 → 论文入口资料');
+    autoStat('🧪 '+(triOn?'三路碰撞与综合提炼':'提炼')+'中 · 已用 '+autoElapsed()+'…');
+    return (triOn?doEmerge():doDistill()).then(function(){
+      if(!brief){ autoDone(ix,'fail','未产出入口资料'); throw new Error('提炼没交出入口资料——就此停手。没有入口资料的论文会退回单轮底稿，白烧两次最贵的长调用。十轮问对都还在上面，可手动重试提炼。'); }
+      autoDone(ix,'ok',brief.length+' 字');
+    });
+  }).then(function(){
+    if(autoStopped) return;
+    var ix=autoPush('成文一篇 · 万字论文（两段续写）→ PDF');
+    autoStat('📝 论文写作中（分两段，约 3–6 分钟）· 已用 '+autoElapsed()+'…');
+    return doPaper().then(function(){
+      if(!paperAll || paperAll.length<600){ autoDone(ix,'fail','未成文'); throw new Error('论文没写成（详见上方成文状态行），止步于此。'); }
+      autoDone(ix,'ok',paperAll.length+' 字');
+    });
+  }).then(function(){
+    if(autoStopped) return;
+    /* 盲评失败不算全盘失败：论文已经在手上了，评分卡可以事后单点重评。 */
+    var ix=autoPush('创新智商 · 五维盲评（评分者不装内功）');
+    autoStat('🎯 盲评中 · 已用 '+autoElapsed()+'…');
+    return doIq().then(function(){
+      if(!iqCard){ autoDone(ix,'fail','评分卡没读出来，可单点「🎯 创新智商评估」重评'); return; }
+      autoDone(ix,'ok','综合分 '+iqCard.total);
+    });
+  }).then(function(){
+    if(autoStopped){
+      autoStat('⏹ 已中止 · 用时 '+autoElapsed()+' · 已完成 '+turns.length+' 轮问对'
+        +(brief?'、入口资料':'')+(paperAll?'、论文':'')+(iqCard?'、评分卡':'')+'。下面可下载全程记录。');
+    }else{
+      autoStat('✅ 自动十轮完成 · 用时 '+autoElapsed()+' · '+turns.length+' 轮问对 → 入口资料 '+brief.length+' 字 → 论文 '
+        +paperAll.length+' 字'+(iqCard?(' → 创新智商 '+iqCard.total):'')+' · 论文 PDF 见下方，全程记录可下载。');
+    }
+    document.getElementById('autoActs').classList.add('show');
+  }).catch(function(e){
+    autoStat('✗ 自动十轮中断：'+errText(e)+'（用时 '+autoElapsed()+'；已跑出来的都留在下面）');
+    document.getElementById('autoActs').classList.add('show');
+  }).finally(function(){
+    autoRunning=false;
+    document.getElementById('autoBtn').disabled=false;
+    document.getElementById('goAsk').disabled=false;
+    document.getElementById('autoStopBtn').style.display='none';
+  });
+}
+/* 全程记录：在本机现拼，不上传。论文有 PDF，但十轮问答与评分卡此前刷新即失。 */
+function autoRecordText(){
+  var L=[];
+  L.push('# 自动十轮问对 · 全程记录');
+  L.push('');
+  L.push('- 缘起之问：'+originQ());
+  L.push('- 基底：'+(vendor==='ds'?'DeepSeek':'GLM-5')+(deepOn?' · 深度档':'')+(triOn?' · 涌现档':'')+(keyMode==='own'?' · 自带 Key':' · 系统密钥'));
+  L.push('- 生成时间：'+new Date().toLocaleString('zh-CN'));
+  L.push('- 出处：SDE Universes 站内搜索 · 智能问答（https://sdeuniverses.com/search/）');
+  L.push('');
+  L.push('> 本记录由页面在你本机拼装，未上传服务器。正文由 AI 生成，请对照页面下方的原文出处核实。');
+  L.push('');
+  L.push('## 一、'+turns.length+' 轮问对');
+  turns.forEach(function(t,i){
+    L.push(''); L.push('### 第 '+(i+1)+' 轮 · '+t.q); L.push(''); L.push(t.a||'（本轮未取得回答）');
+  });
+  if(brief){
+    L.push(''); L.push('## 二、论文入口资料（'+(briefKind==='synth'?'二阶碰撞 · 综合提炼':'提炼精华')+'）'); L.push(''); L.push(brief);
+  }
+  if(paperAll){
+    L.push(''); L.push('## 三、论文正文（'+paperAll.length+' 字）'); L.push(''); L.push(paperAll);
+  }
+  var iqt=iqCardText();
+  if(iqt){ L.push(''); L.push('## 四、创新智商 · 五维盲评'); L.push(''); L.push(iqt); }
+  return L.join('\n');
+}
+function autoFileName(){
+  var d=new Date(), p=function(x){ return (x<10?'0':'')+x; };
+  var s=String(originQ()||'自动十轮').replace(/[\\\/:*?"<>|\s]+/g,'').slice(0,18)||'自动十轮';
+  return 'SDE自动十轮_'+s+'_'+d.getFullYear()+p(d.getMonth()+1)+p(d.getDate())+'.md';
+}
+function dlAutoRecord(){
+  var txt=autoRecordText();
+  var a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([txt],{type:'text/markdown;charset=utf-8'}));
+  a.download=autoFileName();
+  document.body.appendChild(a); a.click();
+  setTimeout(function(){ try{ URL.revokeObjectURL(a.href); }catch(e){} a.remove(); }, 3000);
+}
+function copyAutoRecord(){
+  var t=autoRecordText();
+  var okMsg='📋 全程记录已复制（'+t.length+' 字）。';
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    return navigator.clipboard.writeText(t).then(function(){ autoStat(okMsg); })
+      .catch(function(){ autoStat('复制失败（浏览器不允许），请改用「⬇ 下载全程记录」。'); });
+  }
+  autoStat('这个浏览器不支持一键复制，请改用「⬇ 下载全程记录」。');
+  return Promise.resolve();
+}
+
 /* ===== 答后点击①：推荐阅读（链接全部来自服务端校验过的真实站内目录） ===== */
 function doRecommend(){
   if(!lastQ || !lastAns) return;
@@ -753,10 +1019,10 @@ function doRecommend(){
    先收成一份带栏目的入口资料（承重命题、分离点、未交手的最近邻、张力、证据等级），
    成文那一步才有一份能逐条兑现的清单，而不是一段情绪饱满的底稿。 */
 function doDistill(){
-  if(asking || papering || distilling) return;
-  if(turns.length<2){ flashAsk('至少完成两轮问对，再提炼。'); return; }
+  if(asking || papering || distilling) return Promise.resolve();
+  if(turns.length<2){ flashAsk('至少完成两轮问对，再提炼。'); return Promise.resolve(); }
   var uk=(keyMode==='own')?document.getElementById('userKey').value.trim():'';
-  if(keyMode==='own' && !uk){ document.getElementById('userKey').focus(); flashAsk('请先填入你的 API Key，或切回「系统」。'); return; }
+  if(keyMode==='own' && !uk){ document.getElementById('userKey').focus(); flashAsk('请先填入你的 API Key，或切回「系统」。'); return Promise.resolve(); }
   distilling=true;
   var btn=document.getElementById('btnDistill'); btn.disabled=true;
   var wrap=document.getElementById('briefWrap'); wrap.classList.add('show');
@@ -764,7 +1030,7 @@ function doDistill(){
   var box=document.getElementById('briefBox'); box.textContent=''; box.className='ans blink';
   stat.textContent='🧪 正在把 '+turns.length+' 轮问对提炼成论文入口资料（约 40–90 秒）…';
   var acc='';
-  fetch('/api/ask',{
+  return fetch('/api/ask',{
     method:'POST',
     headers:{'content-type':'application/json'},
     body:JSON.stringify(Object.assign({mode:'distill',q:originQ(),hist:buildHist(true),vendor:vendor}, uk?{key:uk}:{}))
@@ -883,10 +1149,10 @@ function paperHalf(part, extra, minLen, label, attempt){
   });
 }
 function doPaper(){
-  if(papering || asking) return;
-  if(!lastQ || !lastAns){ flashAsk('请先完成一次问答再成文。'); return; }
+  if(papering || asking) return Promise.resolve();
+  if(!lastQ || !lastAns){ flashAsk('请先完成一次问答再成文。'); return Promise.resolve(); }
   var uk=(keyMode==='own')?document.getElementById('userKey').value.trim():'';
-  if(keyMode==='own' && !uk){ document.getElementById('userKey').focus(); flashAsk('请先填入你的 API Key，或切回「系统」。'); return; }
+  if(keyMode==='own' && !uk){ document.getElementById('userKey').focus(); flashAsk('请先填入你的 API Key，或切回「系统」。'); return Promise.resolve(); }
   papering=true;
   genTarget('paperStat','ppFill','ppChars');
   var btn=document.getElementById('btnPaper'); btn.disabled=true;
@@ -899,7 +1165,7 @@ function doPaper(){
   /* 有入口资料就以它为起点（清单式），没有就退回单轮底稿（老路径不变） */
   var qlist=turns.map(function(t,i){ return (i+1)+'. '+t.q; }).join('\n').slice(0,900);
   var seed1 = brief ? {seed:lastAns.slice(0,1200), brief:brief.slice(0,9000), qlist:qlist, briefKind:briefKind} : {seed:lastAns.slice(0,3500)};
-  paperHalf(1,seed1,600,'上半篇').then(function(p1c){
+  return paperHalf(1,seed1,600,'上半篇').then(function(p1c){
     if(p1c.length<600) throw new Error('上半篇产出过短（'+p1c.length+' 字），重试一次后仍未成功，请稍后再点一次。');
     paperAll=p1c+'\n\n';
     setProg(paperAll.length, true);
@@ -1238,14 +1504,14 @@ function iqCardText(){
   return t;
 }
 function doIq(onPolished){
-  if(iqing||polishing||papering||asking) return;
+  if(iqing||polishing||papering||asking) return Promise.resolve();
   var text=onPolished===true?(polishAll||''):iqSourceText();
   if(!text || text.length<200){
     if(!iqSrcOpen) toggleIqSrc();
-    flashAsk('先「成文一篇」，或把要评的文章（至少 200 字）粘贴到下面的框里。'); return;
+    flashAsk('先「成文一篇」，或把要评的文章（至少 200 字）粘贴到下面的框里。'); return Promise.resolve();
   }
   var uk=(keyMode==='own')?document.getElementById('userKey').value.trim():'';
-  if(keyMode==='own' && !uk){ document.getElementById('userKey').focus(); flashAsk('请先填入你的 API Key，或切回「系统」。'); return; }
+  if(keyMode==='own' && !uk){ document.getElementById('userKey').focus(); flashAsk('请先填入你的 API Key，或切回「系统」。'); return Promise.resolve(); }
   iqing=true;
   var btn=document.getElementById('btnIq'); btn.disabled=true;
   var wrap=document.getElementById('iqWrap'); wrap.classList.add('show');
@@ -1253,7 +1519,7 @@ function doIq(onPolished){
   document.getElementById('iqCard').innerHTML='';
   stat.textContent='🎯 盲评中：五维独立打分 + 敌意拓宽（这一步会去找「这个想法在哪儿其实已经有了」）…';
   var acc='';
-  fetch('/api/ask',{
+  return fetch('/api/ask',{
     method:'POST',headers:{'content-type':'application/json'},
     body:JSON.stringify(Object.assign({mode:'iq',q:lastQ||'创新智商评估',text:text.slice(0,26000),vendor:vendor}, uk?{key:uk}:{}))
   }).then(function(resp){

@@ -64,7 +64,9 @@ ok(H.indexOf("if(brief) seed2.brief=brief.slice(0,5000);") > 0, "成文·下半�
 ok(/var qlist=turns\.map/.test(H), "问题清单（走过的路）一并送上去");
 
 /* 清空 */
-ok(H.indexOf("function resetThread()") > 0, "清空重来在位");
+ok(H.indexOf("function resetThread(") > 0, "清空重来在位");
+ok(/function resetThread\(quiet\)\{\s*\n\s*if\(!quiet && turns\.length && !confirm/.test(H),
+   "resetThread(quiet)：只有人工点才弹确认，自动十轮清场不弹（弹了就卡住整场无人值守）");
 ok(/turns=\[\]; brief=''/.test(H), "清空同时清掉入口资料（不许残留上一场的清单）");
 ok(H.indexOf("confirm('清空这场问对") > 0, "清空前确认（十轮问对是贵的）");
 

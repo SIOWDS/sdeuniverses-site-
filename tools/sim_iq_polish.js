@@ -14,7 +14,7 @@ let P = 0, FA = 0;
 const ok = (c, m) => { c ? (P++, console.log("  PASS " + m)) : (FA++, console.log("  FAIL " + m)); };
 
 /* —— 抠出算分器 —— */
-const names = ["iqComposite", "pyRound", "iqLevel", "iqNum", "parseIqJson"];
+const names = ["iqComposite", "pyRound", "iqLevel", "iqNum", "iqJsonRepair", "iqSalvage", "iqHasDims", "parseIqJson"];
 let src = "var IQ_W={S:0.20,D:0.25,E:0.20,I:0.20,F:0.15};\n";
 const lv = html.match(/var IQ_LEVELS=\[[^\n]*\];/);
 if (!lv) { console.log("FAIL 抠不出 IQ_LEVELS"); process.exit(1); }
@@ -56,8 +56,9 @@ ok(/大众水平/.test(F.l(70)), "低于 80 仍给最低档，不返回 undefine
 
 console.log("— 四、脏输入不许把卡片打崩 —");
 ok(F.n("134") === 134 && F.n(null) === 0 && F.n(9999) === 200 && F.n(-5) === 0, "分数钳位 0–200");
-ok(F.p('```json\n{"S":{"score":1}}\n```').S.score === 1, "剥掉 Markdown 围栏后仍能解析");
-ok(F.p('好的，这是评分卡：{"a":1} 以上。').a === 1, "前后有寒暄也能取出 JSON");
+const FIVE = '"S":{"score":1},"D":{"score":2},"E":{"score":3},"I":{"score":4},"F":{"score":5}';
+ok(F.p('```json\n{' + FIVE + '}\n```').S.score === 1, "剥掉 Markdown 围栏后仍能解析");
+ok(F.p('好的，这是评分卡：{"a":1,' + FIVE + '} 以上。').a === 1, "前后有寒暄也能取出 JSON");
 try { F.p("完全没有大括号"); ok(false, "无 JSON 时应抛错"); } catch (e) { ok(true, "无 JSON 时抛错而不是静默出空卡"); }
 
 console.log("— 五、worker.js：iq 模式的硬条款 —");
@@ -90,8 +91,9 @@ ok(/当场交出执行结果|真跑的结果/.test(poBlk), "F：承诺的检验�
 ok(/〔上半篇完·待续〕/.test(poBlk) && /〔全文完〕/.test(poBlk), "上下半篇的收尾标记齐备");
 
 console.log("— 七、路由与守卫 —");
-/* 2026-07-29：涌现流水线又加了 collide 与 synth，白名单从四个长到七个 */
-ok(/_MODES = \{ recommend: 1, paper: 1, iq: 1, polish: 1, distill: 1, collide: 1, synth: 1 \}/.test(wk), "七个模式都在白名单里（iq 与 polish 仍在）");
+/* 2026-07-29：涌现流水线又加了 collide 与 synth，白名单从四个长到七个
+   2026-08-09：自动十轮加了 nextq（拟下一问），长到八个 */
+ok(/_MODES = \{ recommend: 1, paper: 1, iq: 1, polish: 1, distill: 1, collide: 1, synth: 1, nextq: 1 \}/.test(wk), "八个模式都在白名单里（iq 与 polish 仍在）");
 ok(/mode === "paper" \|\| mode === "polish"/.test(wk), "polish 复用成文分支（内功+心得+自检规程 v3 零重复）");
 ok(/mode !== "paper" && mode !== "polish"/.test(wk), "四步法分支不会劫持 polish");
 ok(/deep = body\.deep === true \|\| mode === "paper" \|\| mode === "polish"/.test(wk), "polish 走深度档，iq 不走");
