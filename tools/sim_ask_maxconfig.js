@@ -44,7 +44,7 @@ ok(isHeavy("paper") && isHeavy("polish") && isHeavy("iq") && isHeavy("distill"),
    第 1–4 轮 3405／3673／3135／2838 字 → 第 5 轮 936 字 → 第 6 轮 0 字，整场自动十轮就断在这儿。 */
 ok(isHeavy("answer", true), "真跑：**深度档问答**也算重档（十轮问对全都走这条路）");
 ok(!isHeavy("answer", false) && !isHeavy("nextq") && !isHeavy("collide"), "真跑：普通档问答与其余模式不进重档（各自原有的那一个数不变）");
-ok(/if \(_deepAns\) MAXTOK = 12000;/.test(W), "深度档问答自带预算 12000（思考 3–6k tok ＋ 正文一两千字，要装得下两半）");
+ok(/if \(_deepAns\) MAXTOK = 8000;/.test(W), "深度档问答自带预算 8000（4000 会把正文挤没；12000 实测思考 38,777 字、第 128 秒被平台杀掉）");
 /* 阶梯：真跑一遍，确认 iq 首发最高档、普通模式仍是单一档（＝行为不变） */
 const mL = W.match(/const _ladder = _topPower \? null\n?([\s\S]{0,400}?)\);\n/);
 ok(!!mL, "_ladder 在位");
@@ -54,7 +54,7 @@ ok(JSON.stringify(ladderFn("iq", 32000, 64000, 16000)) === "[16000,12000,8000]",
 ok(JSON.stringify(ladderFn("distill", 12000, 64000, 16000)) === "[16000,12000,8000]", "真跑：distill 走同一条阶梯（它也被实测抓到思考 8,977 / 正文 0）");
 ok(ladderFn("paper", 32000, 64000, 16000) === null, "真跑：满功率档不自带阶梯（用 wdsLadder 的 [want,32000,16000]）");
 ok(JSON.stringify(ladderFn("answer", 4000, 64000, 16000, false)) === "[4000]", "真跑：**普通档**问答仍是单一档 4000——行为一个字都没变");
-ok(JSON.stringify(ladderFn("answer", 12000, 64000, 16000, true)) === "[12000,8000,6000]", "真跑：深度档问答走 12000 → 8000 → 6000");
+ok(JSON.stringify(ladderFn("answer", 8000, 64000, 16000, true)) === "[8000,6000,4000]", "真跑：深度档问答走 8000 → 6000 → 4000");
 ok(JSON.stringify(ladderFn("collide", 5200, 64000, 16000)) === "[5200]", "真跑：碰撞仍是 5200");
 ok(/if \(resp\.ok \|\| resp\.status !== 400 \|\| i === ladder\.length - 1\) return resp;/.test(W),
    "阶梯只在 400 且报 max_tokens 相关时才降档（别的错照原样抛回去）");
@@ -104,8 +104,11 @@ ok(/wdsPlainBody\(VC, \{\s*\n\s*model: VC\.model, stream: true, max_tokens: _ret
 
 /* ===== 四之二、时钟护栏：预算大了，卡死也要看得见 ===== */
 console.log("— 四之二、时钟 —");
-ok(/const _clk = _heavy \? wdsClock\((\d+), (\d+)\) : null;/.test(W), "重档挂时钟（首帧闸＋总时长闸）");
-const mC = W.match(/const _clk = _heavy \? wdsClock\((\d+), (\d+)\) : null;/);
+ok(/const _clk = _deepAns \? wdsClock\(\d+, (\d+)\) : \(_heavy \? wdsClock\((\d+), (\d+)\) : null\);/.test(W), "重档挂时钟（首帧闸＋总时长闸），深度档问答另有更早的一档");
+const mD = W.match(/const _clk = _deepAns \? wdsClock\(\d+, (\d+)\)/);
+/* 深度档问答的闸要早到"兜底还跑得完"：掐断后关思考重跑约二三十秒，仍要落在平台那约 128 秒的墙之内。 */
+ok(mD && Number(mD[1]) <= 90000, "深度档问答闸 " + (mD ? mD[1] / 1000 : "?") + "s ≤ 90s：掐了还来得及关思考重跑一遍，答案照样交得出来");
+const mC = W.match(/_heavy \? wdsClock\((\d+), (\d+)\) : null\);/);
 /* 总时长闸必须**早于平台**：实测平台在约 133 秒无声杀掉整个请求（连 [DONE] 都没有）。
    闸设在它之后＝这台时钟形同虚设，用户仍然只会看到一个说不出理由的 0 字。 */
 ok(mC && Number(mC[1]) >= 30000 && Number(mC[2]) >= 90000 && Number(mC[2]) <= 130000,
