@@ -4911,7 +4911,7 @@ async function askCore(request, env, url, body, SINK) {
         + "\n\n《站内资料》\n" + ctxText.slice(0, 9000);
     }
     else if (mode === "distill") {
-      MAXTOK = 5200;
+      MAXTOK = 12000;   // 首发走 WDS_TOK_HEAVY；这里是降档位。5200 那一版被思考吃光（真跑：思考 8,977 / 正文 0）
       sys = (neigong ? neigong + "\n\n═══════════\n【你此前带着上面这套完整底盘先验、亲手写下并已内化的心得】\n" + (reflect || "（心得暂缺）") + "\n\n═══════════\n" : "")
         + "你是一位以 SDE 方法论为隐性引擎的资深学者。读者刚刚与你完成了一场连续多轮的问对；现在他点了「提炼精华」，要把这场问对收成一份《论文入口资料》——它将作为下一步「成文一篇」（万字论文）的唯一起点材料。"
         + "你的任务不是复述对话，而是把这场问对里**真正长出来的东西**挑出来、按承重程度排好序，并明确指出它还缺什么。"
@@ -5105,21 +5105,31 @@ async function askCore(request, env, url, body, SINK) {
   // 「长时间无字节」把连接判死——那正是「流干净结束、正文 0 字、不报任何错」的另一种死法。
   const _topPower = (mode === "paper" || mode === "polish");
   const _VCX = _topPower ? { url: VC.url, model: VC.model, name: VC.name, top: 1 } : VC;
-  // [stated] 用户 2026-08-09：「DeepSeek 可以非常长的，用最高级配置」。
-  // 于是这三档不再自己定一个数，而是走站内既有的**最高档取数器** wdsFetchMax：
-  //   · 首发给 WDS_TOK_MAX（64000，站内长文线一直在用的那个数）；
-  //   · 基底不接受这么大的 max_tokens 时（400 且报的是 max_tokens 相关）**自动降档**
-  //     ——阶梯的意义不是限制，是"不让一个数字不被接受就把整条链弄断"；
-  //   · 配时钟护栏：上游卡死时由它掐断并给一句人话，而不是被平台无声杀掉。
-  // 注意 max_tokens 是**上限不是目标**：提示语要的仍是五六千汉字，给到 64000 不会让它多写，
-  // 只是让"思考＋正文"永远不必互相挤——这正是这两处此前哑火的全部原因。
-  const _heavy = (_topPower || mode === "iq");
+  // [stated] 用户 2026-08-09：「DeepSeek 可以非常长的，用最高级配置」——**照做后当场跑出反例，故改成有界的最高档**。
+  // 真跑记录（同日，全部线上）：
+  //   · 首发 64000 ＋ 满功率：polish 92s 出稿 ✓、iq 99s 出卡 ✓，但 **paper 上半篇在第 133 秒被平台杀掉**
+  //     ——思考 17,233 字、正文 0 字、**流里没有 [DONE]、没有 error、心跳停在第 120 秒**。
+  //     这正是本文件 WDS_TOK_SAFE 头上那条老警告的原样复现：「预算给得越大，它想得越久，
+  //     一路想到超过平台单请求时长上限被杀在思考阶段——流干净结束、正文 0 字、不报任何错」。
+  //   · 首发 16000 ＋ 满功率：polish 83s / 10,823 字 ✓、iq 72s ✓。
+  // 结论是一条要记住的话：**「最高级配置」不等于「最大的那个数字」**。
+  // max_tokens 是上限不是目标，给到 64000 并不会让它多写（提示语要的仍是五六千汉字），
+  // 却会让它一直想下去——**预算的真正作用是给思考封顶**，而封顶正是活过那两分钟的唯一办法。
+  // 所以最高级配置 = 最强型号 ＋ 满功率 ＋ **有界预算 16000** ＋ 心跳 ＋ 早于平台的时钟 ＋ 关思考兜底。
+  // 阶梯仍保留：它治的是另一件事——基底不收这个数字时（400 且报 max_tokens 相关）自动降档，
+  // 不让一个数字不被接受就把整条链弄断。
+  const WDS_TOK_HEAVY = 16000;
+  // distill 在同一轮真跑里露出同一个病：思考 8,977 字 / 正文 0，靠关思考兜底才交出那 2,861 字入口资料。
+  // 它是整条产线的枢纽（论文水平主要由这份资料定），不该常年靠最后一道保险活着。
+  const _heavy = (_topPower || mode === "iq" || mode === "distill");
   // 满功率档（成文／打磨）用 wdsLadder 自带的 [want,32000,16000]；
   // iq 不挂满功率，但同样首发最高档，所以自带一条阶梯；其余模式保持各自原有的那一个数不变。
   const _ladder = _topPower ? null
-    : (mode === "iq" ? [WDS_TOK_MAX, 32000, 12000]
+    : ((mode === "iq" || mode === "distill") ? [WDS_TOK_HEAVY, 12000, 8000]
       : [MAXTOK, Math.min(32000, MAXTOK), Math.min(12000, MAXTOK)].filter((v, i, a) => v > 0 && a.indexOf(v) === i));
-  const _clk = _heavy ? wdsClock(120000, 420000) : null;   // 首帧 2 分钟、总时长 7 分钟
+  // 时钟必须**早于平台**：实测平台在约 133 秒把整个请求杀掉，那一刀是无声的（连 [DONE] 都没有），
+  // 而我们自己掐断至少能说清掐在哪一闸、第几秒，前端也才有机会重试。首帧 60 秒、总时长 120 秒。
+  const _clk = _heavy ? wdsClock(60000, 120000) : null;
   // 兜底重跑：关思考＋降档，逼它早点停下推演开始写。但长文模式不能降到 4000——
   // 实测 4000 tok 交出来的是一篇断在半句上的稿（线上原样：6,847 字，末句「但他输光」）。
   const _retryTok = _topPower ? 8000 : Math.min(MAXTOK, 6000);
@@ -5127,7 +5137,7 @@ async function askCore(request, env, url, body, SINK) {
   // 调基底（境内直连）。自带 Key：仅在内存中转发调用，绝不存储/记录（同 llm-proxy 纪律）
   let upstream;
   try {
-    upstream = await wdsFetchMax(_VCX, KEY, _msgs, true, _heavy ? WDS_TOK_MAX : MAXTOK,
+    upstream = await wdsFetchMax(_VCX, KEY, _msgs, true, _heavy ? WDS_TOK_HEAVY : MAXTOK,
       _clk ? _clk.signal : undefined, false, _ladder);
   } catch (e) {
     if (_clk) _clk.stop();

@@ -25,22 +25,30 @@ const longTok = grab(/mode === "paper" \|\| mode === "polish"\) \{\s*\n\s*MAXTOK
    max_tokens 是上限不是目标：给到最高档不会让它多写，只是让思考与正文不必互相挤。 */
 ok(iqTok >= 12000, "iq 的降档位 " + iqTok + " ≥ 12000（思考 ≈8k ＋ 评分卡 2–3k 要同吃一份）");
 ok(longTok >= 16000, "paper/polish 的降档位 " + longTok + " ≥ 16000");
-ok(/_heavy \? WDS_TOK_MAX : MAXTOK/.test(W), "三个重档首发给 WDS_TOK_MAX（站内长文线一直在用的那个数）");
-ok(/const WDS_TOK_MAX = 64000;/.test(W), "WDS_TOK_MAX 仍是 64000");
+ok(/_heavy \? WDS_TOK_HEAVY : MAXTOK/.test(W), "三个重档首发给 WDS_TOK_HEAVY");
+/* 【这条判据是用一次线上事故换来的，别顺手放宽】
+   首发 64000 ＋ 满功率时，paper 上半篇在第 133 秒被平台杀掉：思考 17,233 字、正文 0 字，
+   流里没有 [DONE]、没有 error、心跳停在第 120 秒——最难查的那种死法。
+   预算的真正作用是**给思考封顶**，封顶才活得过那两分钟。所以首发必须有界。 */
+const heavyTok = grab(/const WDS_TOK_HEAVY = (\d+);/);
+ok(heavyTok >= 12000 && heavyTok <= 20000,
+   "首发预算 " + heavyTok + " 落在 12000–20000：装得下思考＋正文，又不会让它一路想到被平台杀掉");
+ok(heavyTok < 64000, "首发不许直接给 64000——实测那样 paper 会死在思考阶段（2026-08-09 抓到原样）");
 const mH = W.match(/const _heavy = \(([^)]*)\);/);
 ok(!!mH, "_heavy 判据在位");
 const isHeavy = new Function("mode", "const _topPower = (mode === \"paper\" || mode === \"polish\"); return (" + (mH ? mH[1] : "false") + ");");
-ok(isHeavy("paper") && isHeavy("polish") && isHeavy("iq"), "真跑：成文／打磨／盲评三档都算重档");
-ok(!isHeavy("answer") && !isHeavy("distill") && !isHeavy("nextq"), "真跑：其余模式不进重档（各自原有的那一个数不变）");
+ok(isHeavy("paper") && isHeavy("polish") && isHeavy("iq") && isHeavy("distill"), "真跑：成文／打磨／盲评／提炼四档都算重档");
+ok(!isHeavy("answer") && !isHeavy("nextq") && !isHeavy("collide"), "真跑：其余模式不进重档（各自原有的那一个数不变）");
 /* 阶梯：真跑一遍，确认 iq 首发最高档、普通模式仍是单一档（＝行为不变） */
 const mL = W.match(/const _ladder = _topPower \? null\n?([\s\S]{0,400}?)\);\n/);
 ok(!!mL, "_ladder 在位");
-const ladderFn = new Function("mode", "MAXTOK", "WDS_TOK_MAX",
+const ladderFn = new Function("mode", "MAXTOK", "WDS_TOK_MAX", "WDS_TOK_HEAVY",
   "const _topPower = (mode === \"paper\" || mode === \"polish\"); const _ladder = " + W.slice(W.indexOf("_topPower ? null", W.indexOf("const _ladder =")), W.indexOf(";", W.indexOf("a.indexOf(v) === i))"))) + "; return _ladder;");
-ok(JSON.stringify(ladderFn("iq", 32000, 64000)) === "[64000,32000,12000]", "真跑：iq 阶梯 = 64000 → 32000 → 12000");
-ok(ladderFn("paper", 32000, 64000) === null, "真跑：满功率档不自带阶梯（用 wdsLadder 的 [want,32000,16000]）");
-ok(JSON.stringify(ladderFn("answer", 4000, 64000)) === "[4000]", "真跑：普通问答仍是单一档 4000——行为一个字都没变");
-ok(JSON.stringify(ladderFn("distill", 5200, 64000)) === "[5200]", "真跑：提炼仍是 5200");
+ok(JSON.stringify(ladderFn("iq", 32000, 64000, 16000)) === "[16000,12000,8000]", "真跑：iq 阶梯 = 16000 → 12000 → 8000");
+ok(JSON.stringify(ladderFn("distill", 12000, 64000, 16000)) === "[16000,12000,8000]", "真跑：distill 走同一条阶梯（它也被实测抓到思考 8,977 / 正文 0）");
+ok(ladderFn("paper", 32000, 64000, 16000) === null, "真跑：满功率档不自带阶梯（用 wdsLadder 的 [want,32000,16000]）");
+ok(JSON.stringify(ladderFn("answer", 4000, 64000, 16000)) === "[4000]", "真跑：普通问答仍是单一档 4000——行为一个字都没变");
+ok(JSON.stringify(ladderFn("collide", 5200, 64000, 16000)) === "[5200]", "真跑：碰撞仍是 5200");
 ok(/if \(resp\.ok \|\| resp\.status !== 400 \|\| i === ladder\.length - 1\) return resp;/.test(W),
    "阶梯只在 400 且报 max_tokens 相关时才降档（别的错照原样抛回去）");
 ok(/ladderOverride && ladderOverride\.length\) \? ladderOverride : wdsLadder\(VC, want\)/.test(W),
@@ -57,7 +65,7 @@ ok(isTop("answer") === false && isTop("distill") === false && isTop("nextq") ===
    "真跑：answer / distill / nextq 不挂满功率");
 ok(/const _VCX = _topPower \? \{ url: VC\.url, model: VC\.model, name: VC\.name, top: 1 \} : VC;/.test(W),
    "满功率靠给 VC 挂 top:1（wdsTopBody 认的就是这个标记）");
-ok(/upstream = await wdsFetchMax\(_VCX, KEY, _msgs, true, _heavy \? WDS_TOK_MAX : MAXTOK,/.test(W),
+ok(/upstream = await wdsFetchMax\(_VCX, KEY, _msgs, true, _heavy \? WDS_TOK_HEAVY : MAXTOK,/.test(W),
    "主调用真的走了最高档取数器，并把 _VCX 递进去（算对了没接上，等于没改）");
 ok(/function wdsTopBody\(VC, body\) \{[\s\S]{0,300}?reasoning_effort = "max"/.test(W),
    "wdsTopBody 确实在挂满功率（thinking:enabled ＋ reasoning_effort:max）");
@@ -91,8 +99,10 @@ ok(/wdsPlainBody\(VC, \{\s*\n\s*model: VC\.model, stream: true, max_tokens: _ret
 console.log("— 四之二、时钟 —");
 ok(/const _clk = _heavy \? wdsClock\((\d+), (\d+)\) : null;/.test(W), "重档挂时钟（首帧闸＋总时长闸）");
 const mC = W.match(/const _clk = _heavy \? wdsClock\((\d+), (\d+)\) : null;/);
-ok(mC && Number(mC[1]) >= 60000 && Number(mC[2]) >= 300000,
-   "闸值 " + (mC ? (mC[1] / 1000 + "s / " + mC[2] / 1000 + "s") : "?") + "：首帧不许太紧（思考期本来就长），总时长要够写完一万字");
+/* 总时长闸必须**早于平台**：实测平台在约 133 秒无声杀掉整个请求（连 [DONE] 都没有）。
+   闸设在它之后＝这台时钟形同虚设，用户仍然只会看到一个说不出理由的 0 字。 */
+ok(mC && Number(mC[1]) >= 30000 && Number(mC[2]) >= 90000 && Number(mC[2]) <= 130000,
+   "闸值 " + (mC ? (mC[1] / 1000 + "s / " + mC[2] / 1000 + "s") : "?") + "：首帧不太紧，总时长早于平台那约 133 秒的无声一刀");
 ok(/if \(_clk\) _clk\.firstFrame\(\);/.test(W), "出流即撤首帧闸（后面还有真活要干）");
 ok(/if \(_clk\) _clk\.stop\(\);/.test(W), "收尾停表，不留孤儿定时器");
 ok(/\(_clk && _clk\.cut\) \? _clk\.why\(VC\.name\)/.test(W), "被时钟掐断时说清掐在哪一闸、多少秒——不与「流自己坏了」混为一谈");
