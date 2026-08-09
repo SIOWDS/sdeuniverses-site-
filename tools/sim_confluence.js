@@ -141,6 +141,11 @@ function defaultAnswer(userMsg, ctx) {
   if (/你是评审/.test(userMsg)) return (ctx && ctx.lowScore)
     ? '总分：138\n五维：S=140 D=138 E=139 I=134 F=140\n判级：合格\n最该补的一刀：回炉到「涌现」，' + '再往下切一层。'.repeat(6)
     : '总分：152\n五维：S=150 D=151 E=152 I=153 F=150\n判级：典范级\n最该补的一刀：' + '再往下切一层。'.repeat(6);
+  if (/请先做体检/.test(userMsg) && ctx && ctx.weakGate)
+    /* 撞不起来的体检：闸一低分。学员自己组合时，这一档要触发自动降级。 */
+    return '闸零：三家都占「显露」这一位置 ｜ 位置三分：不成立\n'
+      + '闸一：分数 3/10 ｜ 打架点一句话：说不清，三方其实互补 ｜ 结局对立：无 ｜ 三方各自的硬证据：薄\n'
+      + '闸二：同源度 高 ｜ 共享零件：同一套语汇\n闸三：最近的已发篇目：无\n总判：换源';
   if (/请先做体检/.test(userMsg))
     return '闸一：分数 8/10 ｜ 打架点一句话：三方把病根安在三个位置 ｜ 结局对立：有 ｜ 三方各自的硬证据：各有一条\n'
       + '闸二：同源度 低 ｜ 共享零件：无 ｜ 建议撞点：落在病根位置那一处\n闸三：最近的已发篇目：无 ｜ 处置：可发\n总判：放行';
@@ -159,7 +164,7 @@ function sseFor(text) {
 async function boot(opts) {
   opts = opts || {};
   const ctx = { calls: [], errors: [], saved: [], webQ: [], frontHub: 0, frontPanel: [], nbrQ: [], pulls: [], webBody: [],
-                pickOpt: opts.pickOpt, shortRewrite: opts.shortRewrite, lowScore: opts.lowScore, drafts: [], nbrLive: 0, nbrPeak: 0, nbrAborted: 0 };
+                pickOpt: opts.pickOpt, shortRewrite: opts.shortRewrite, lowScore: opts.lowScore, weakGate: opts.weakGate, drafts: [], nbrLive: 0, nbrPeak: 0, nbrAborted: 0 };
   const vc = new VirtualConsole();
   vc.on('jsdomError', e => ctx.errors.push('jsdomError: ' + (e && e.message)));
   vc.on('error', (...a) => ctx.errors.push('console.error: ' + a.join(' ')));
@@ -702,55 +707,80 @@ function userOf(c, re) { const x = c.calls.filter(k => re.test(k.user)); return 
     ok('存稿提示写明与评分无关', /存稿与评分无关/.test(c.$('draftNote').textContent), c.$('draftNote').textContent);
   });
 
-  await step('二十七、不到 150 一样存（这正是此前会丢的那一格）', async () => {
+  /* ---- v3.8 之后：评审只报分数，一律不回炉（用户裁定：140 线，达不到也不返工） ---- */
+  await step('二十七、低于 140 照常存、照常交付（不回炉）', async () => {
     const c = await boot({ lowScore: true, withSaveDir: true });
     fillQ(c, '为什么组织越想留住经验越留不住？', '认知心理学', '制度经济学', '组织社会学');
     c.click('#goBtn');
-    await waitFor(() => !!c.$('choice-review'), 35000);
+    const done = await waitFor(() => /跑完了/.test(c.$('doneBanner').textContent), 35000);
+    ok('低分不再拦路，一路跑到交付', done, c.$('doneBanner').textContent.slice(0, 60));
+    ok('评审那一格没有弹选择框（回炉已关）', !c.$('choice-review'));
+    ok('横幅按 140 口径如实写', /未到 140 线/.test(c.$('doneBanner').textContent), c.$('doneBanner').textContent);
+    ok('横幅不再出现「回炉」字样', !/回炉/.test(c.$('doneBanner').textContent));
     const d = JSON.parse(c.win.localStorage.getItem('sde_conf_draft') || 'null');
     ok('评审判了 138 分，稿子照样存了', !!d && /iq_self: 138/.test(d.md), d ? d.tag : '(无)');
-    ok('底稿的标签写着评审那一步与分数', d && /评审 138 分/.test(d.tag), d && d.tag);
-    ok('选了文件夹就直接落盘', c.saved.some(x => /^学科通融_.*_评审 138 分\.md$/.test(x.name)),
-       c.saved.map(x => x.name).join(' | '));
-    ok('落盘的是完整发布包（含正文与划界）', c.saved.length > 0);
-    c.click('#choice-review button[data-choice="keep"]');
-    await sleep(400);
-    ok('选了就这样交付之后，交付横幅出来了', /跑完了/.test(c.$('doneBanner').textContent), c.$('doneBanner').textContent);
-    ok('横幅如实写未过线', /未过线/.test(c.$('doneBanner').textContent));
-    ok('终稿又存了一次', c.saved.some(x => /_终稿\.md$/.test(x.name)), c.saved.map(x => x.name).join(' | '));
+    ok('终稿也存了一次', c.saved.some(x => /_终稿\.md$/.test(x.name)), c.saved.map(x => x.name).join(' | '));
+    ok('全程无 JS 错误', c.errors.length === 0, c.errors.join(' | '));
   });
 
-  /* ---- 回炉由用户选 ---- */
-  await step('二十八、不到 150 当场给两个按钮，不自作主张', async () => {
+  await step('二十八、评审那一格只输出分数：不点名回炉、不给按钮', async () => {
     const c = await boot({ lowScore: true });
     fillQ(c, '为什么组织越想留住经验越留不住？', '认知心理学', '制度经济学', '组织社会学');
     c.click('#goBtn');
-    const got = await waitFor(() => !!c.$('choice-review'), 35000);
-    ok('评审那一格弹出了选择', got);
-    const btns = Array.from(c.doc.querySelectorAll('#choice-review button[data-choice]')).map(b => b.getAttribute('data-choice'));
-    ok('正好两个选项：回炉 / 就这样交付', btns.length === 2 && btns.indexOf('redo') >= 0 && btns.indexOf('keep') >= 0, btns.join(','));
-    ok('问句里点名了回炉到哪一格', /回炉/.test(c.$('choice-review').textContent) && /涌现/.test(c.$('choice-review').textContent),
-       c.$('choice-review').textContent.slice(0, 70));
-    ok('问句里说清稿子已经存了', /已经自动存下来了/.test(c.$('choice-review').textContent));
-    ok('没等他点就先不动', !/跑完了/.test(c.$('doneBanner').textContent));
-    c.click('#choice-review button[data-choice="redo"]');
-    await sleep(600);
-    ok('选了回炉就真的回去重跑', c.win.eval('ST.rounds') === 1, String(c.win.eval('ST.rounds')));
-    ok('回的是评审点名的那一格', c.win.eval('ST.notes.join("|")').indexOf('涌现') >= 0, c.win.eval('ST.notes.join("|")'));
-    ok('记了一笔是他选的（不是机器自作主张）', c.win.eval('ST.notes.join("|")').indexOf('你选的') >= 0);
+    await waitFor(() => /跑完了/.test(c.$('doneBanner').textContent), 35000);
+    ok('状态条报出分数', /创新智商 138/.test(c.$('stat-review').textContent), c.$('stat-review').textContent);
+    ok('一轮都没回炉', c.win.eval('ST.rounds') === 0, String(c.win.eval('ST.rounds')));
+    const rv = c.calls.filter(k => /总分：XXX/.test(k.user)).pop();
+    ok('评审调令里写明不必点名回炉', rv && /不必点名回炉/.test(rv.user));
+    ok('评审调令仍要三条「最该补的一刀」（只是不构成退回）', rv && /最该补的一刀/.test(rv.user));
   });
 
-  await step('二十九、勾了「自动回炉」才不问', async () => {
-    const c = await boot({ lowScore: true });
-    fillQ(c, '为什么组织越想留住经验越留不住？', '认知心理学', '制度经济学', '组织社会学');
-    c.$('autoRedoChk').checked = true;
+  /* ---- 学员自己组合三块面板 ---- */
+  await step('二十九、学员自选三块面板：直接用，不再问基底要学科', async () => {
+    const c = await boot();
+    c.$('cQuestion').value = '为什么组织越想留住经验越留不住？';
+    c.$('cQuestion').dispatchEvent(new c.win.Event('input', { bubbles: true }));
+    c.$('apiKey').value = 'sk-fake';
+    c.$('cPickMode').value = 'panel';
+    c.$('cPickMode').dispatchEvent(new c.win.Event('change', { bubbles: true }));
+    await waitFor(() => c.$('cP1') && c.$('cP1').options.length > 1, 8000);
+    ok('三个下拉被面板目录填满', c.$('cP1').options.length > 1, c.$('cP1').options.length + ' 项');
+    ok('选面板那一排露出来了', c.$('panelPick').style.display !== 'none');
+    ok('自由填学科那一排收起来了', c.$('freePick').style.display === 'none');
+    ['cP1','cP2','cP3'].forEach((id, k) => {
+      c.$(id).value = ['471','272','101'][k];
+      c.$(id).dispatchEvent(new c.win.Event('change', { bubbles: true }));
+    });
     c.click('#goBtn');
-    // 若它中途停下来问，rounds 会卡住不动——能一路走到 2，就证明两轮都没问
-    const two = await waitFor(() => c.win.eval('ST.rounds') >= 2, 35000);
-    ok('两轮回炉全自动，中途一次没停下来问', two, 'rounds=' + c.win.eval('ST.rounds'));
-    ok('两轮用满之后才开始问', !!c.$('choice-review') || c.win.eval('ST.rounds') === 2);
-    ok('红字写明是按他勾的那一项办的', /按你勾的/.test(c.$('errBox').textContent), c.$('errBox').textContent.slice(0, 60));
-    ok('并说明稿子已存', /已经存下来了/.test(c.$('errBox').textContent));
+    await waitFor(() => /三家已就位|三家/.test(c.$('stat-select').textContent), 30000);
+    /* 认「定出三个学科」这句，不认「输出正好三行」——后者题型那一格也有，会误报。 */
+    const dcall = c.calls.filter(k => /定出\*\*三个学科\*\*/.test(k.user));
+    ok('没有为「定学科」再花一次调用（学员已经定死了）', dcall.length === 0, '仍调了 ' + dcall.length + ' 次');
+    ok('三块面板的供料层都抓了', c.frontPanel.length >= 3, '实际 ' + c.frontPanel.length + ' 块');
+    ok('全程无 JS 错误', c.errors.length === 0, c.errors.join(' | '));
+  });
+
+  await step('二十九之二、学员组合撞不起来：自动转基底自由组合，不把人卡在那儿', async () => {
+    const c = await boot({ weakGate: true });
+    c.$('cQuestion').value = '为什么组织越想留住经验越留不住？';
+    c.$('cQuestion').dispatchEvent(new c.win.Event('input', { bubbles: true }));
+    c.$('apiKey').value = 'sk-fake';
+    c.$('cPickMode').value = 'panel';
+    c.$('cPickMode').dispatchEvent(new c.win.Event('change', { bubbles: true }));
+    await waitFor(() => c.$('cP1') && c.$('cP1').options.length > 1, 8000);
+    ['cP1','cP2','cP3'].forEach((id, k) => {
+      c.$(id).value = ['471','272','101'][k];
+      c.$(id).dispatchEvent(new c.win.Event('change', { bubbles: true }));
+    });
+    c.click('#goBtn');
+    const fell = await waitFor(() => c.win.eval('ST.forceAuto') === true, 30000);
+    ok('闸一不过时降级了（forceAuto 立起来）', fell, String(c.win.eval('ST.forceAuto')));
+    ok('降级之后真的重挑了三家（问了基底一次定学科）',
+       c.calls.some(k => /定出\*\*三个学科\*\*/.test(k.user)));
+    ok('如实告诉学员为什么换（不是默默换掉）',
+       /撞不起来|位置/.test(c.win.eval('ST.notes.join("|")')), c.win.eval('ST.notes.join("|")').slice(0, 80));
+    ok('只降一次，不来回打转', (c.win.eval('ST.notes.join("|")').match(/已自动转为/g) || []).length <= 1);
+    ok('全程无 JS 错误', c.errors.length === 0, c.errors.join(' | '));
   });
 
   await step('三十、卡在选择上时按「停下」，不能卡死', async () => {

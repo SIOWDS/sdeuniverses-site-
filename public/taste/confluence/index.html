@@ -163,10 +163,25 @@ select.model-select{max-width:340px}
     <label class="lbl">问题 <span class="req">*</span></label>
     <textarea id="cQuestion" rows="3" placeholder="写清你要解决的那个问题。例：为什么组织越是想把经验留下来，经验反而流失得越快？"></textarea>
     <div class="small" style="margin:8px 0;color:var(--muted)">问题决定这篇文章要交出什么形状的答案——<b>一个东西</b>（What）／<b>一条路</b>（How）／<b>一个驱动</b>（Why）。第二格先把它判出来。判错不会报错，只会答得很通顺而答非所问。</div>
-    <div class="row" style="margin-top:6px">
-      <div style="flex:1;min-width:170px"><label class="lbl">学科一</label><input type="text" id="cD1" placeholder="例：制度经济学"></div>
-      <div style="flex:1;min-width:170px"><label class="lbl">学科二</label><input type="text" id="cD2" placeholder="例：认知心理学"></div>
-      <div style="flex:1;min-width:170px"><label class="lbl">学科三</label><input type="text" id="cD3" placeholder="例：生态学"></div>
+    <div class="row" style="margin-top:6px;align-items:center">
+      <div style="min-width:300px">
+        <label class="lbl">三个学科怎么来</label>
+        <select id="cPickMode">
+          <option value="auto" selected>基底自由组合（它按这道题自己挑三门，可跨站外）</option>
+          <option value="panel">我自己组合（从站内 600 多块面板里选三门）</option>
+        </select>
+      </div>
+      <span class="small" style="flex:1;min-width:260px;color:var(--muted)">自己组合的好处是材料厚（每块都带真出处与八字段供料层）；坏处是<b>可能撞不起来</b>——三门站在同一个位置上就撞不出东西。<b>撞不起来会自动转成基底自由组合，不会停在那儿。</b></span>
+    </div>
+    <div class="row" id="panelPick" style="margin-top:6px;display:none">
+      <div style="flex:1;min-width:200px"><label class="lbl">面板一</label><select id="cP1"><option value="">载入中…</option></select></div>
+      <div style="flex:1;min-width:200px"><label class="lbl">面板二</label><select id="cP2"><option value="">载入中…</option></select></div>
+      <div style="flex:1;min-width:200px"><label class="lbl">面板三</label><select id="cP3"><option value="">载入中…</option></select></div>
+    </div>
+    <div class="row" id="freePick" style="margin-top:6px">
+      <div style="flex:1;min-width:170px"><label class="lbl">学科一（可留空）</label><input type="text" id="cD1" placeholder="例：制度经济学"></div>
+      <div style="flex:1;min-width:170px"><label class="lbl">学科二（可留空）</label><input type="text" id="cD2" placeholder="例：认知心理学"></div>
+      <div style="flex:1;min-width:170px"><label class="lbl">学科三（可留空）</label><input type="text" id="cD3" placeholder="例：生态学"></div>
     </div>
     <div class="small" style="margin:8px 0">三格都留空 → 由基底按这道问题自己定三门（它要挑离得远、又都真能回答这道题的）。填了几个就锁几个，其余由基底补齐。</div>
     <div class="row" style="margin-top:6px;align-items:center">
@@ -195,7 +210,7 @@ select.model-select{max-width:340px}
       <input type="checkbox" id="philChk" style="width:auto"> 这是哲学文章（放行本体论、涌现、发生学这类词——只保留学派专名与工序痕迹的封禁）
     </label>
     <label class="small" style="display:flex;gap:6px;align-items:center;margin:6px 0">
-      <input type="checkbox" id="autoRedoChk" style="width:auto"> 不到 150 就自动回炉，别问我（默认关：<b>评审读到分数后当场给你两个按钮</b>——回炉重写，或就这样交付）
+      <input type="checkbox" id="autoRedoChk" style="width:auto" disabled> <s>不到线自动回炉</s>（<b>本机已关掉回炉</b>：评审只报分数，达不达标都照常交付，稿子归你判断）
     </label>
     <div class="small" style="margin-top:10px;color:var(--muted)">⚠ 联网搜来的材料只有摘要级，<b>发表前务必自己点开每个链接核对</b>。取材那一步每一路都有 30–45 秒的闸，超时按空处理并如实标出，不会无限期转圈；站内那一路是<b>串行</b>跑的（每查一次都要把全站语料读一遍），三门大约 20–60 秒。本站检索通道要管理端配过智谱 Key 才通；不通时上面那一格会自动露出来。</div>
 
@@ -308,7 +323,7 @@ select.model-select{max-width:340px}
     </div>
     <div class="small" id="dlNote" style="margin-top:8px"></div>
     <label class="small" style="display:flex;gap:6px;align-items:center;margin-top:10px">
-      <input type="checkbox" id="autoSaveChk" style="width:auto" checked> 自动存盘到你选的文件夹（成文 · 打磨 · 评审 · 交付各存一次）—— <b>与分数无关，不到 150 也照存</b>；没选文件夹时改在浏览器本地留底，下次开页面可找回
+      <input type="checkbox" id="autoSaveChk" style="width:auto" checked> 自动存盘到你选的文件夹（成文 · 打磨 · 评审 · 交付各存一次）—— <b>与分数无关，不到 140 也照存</b>；没选文件夹时改在浏览器本地留底，下次开页面可找回
     </label>
   </div>
 
@@ -969,9 +984,9 @@ const STAGES = [
   {id:'realrun', n:'真跑一条', hint:'挑最便宜的一条证伪条款，用真实可得的数据跑一遍，不利结果照写', tok:TOK_HARD},
   {id:'write',   n:'成文',     hint:'一趟写完整篇两万字（不分段）',          tok:4000},
   {id:'polish',  n:'打磨',     hint:'按封顶清单逐条自查，再照自查整篇重写一遍', tok:4000},
-  {id:'review',  n:'评审',     hint:'创新智商 · 不到 150 点名回炉',      tok:4000}
+  {id:'review',  n:'评审',     hint:'创新智商 · 只报分数，不回炉',        tok:4000}
 ];
-const ST = { mode:'X', sources:[], out:{}, outline:'', article:'', score:null, running:false, abort:false,
+const ST = { mode:'X', forceAuto:false, sources:[], out:{}, outline:'', article:'', score:null, running:false, abort:false,
              qtype:'', discs:[], polished:false,
              manual:false, tried:[], seed:null, seedScore:0, outer:0, best:null, xinde:'',
              redoFrom:null, rounds:0, termRetry:0, termFix:null, notes:[],
@@ -1033,6 +1048,39 @@ async function frontierPanel(slug, maxN){
 function frontierCatBlock(cat){
   if(!cat || !cat.length) return '';
   return cat.map(x=>x.n+' '+x.name).join('　');
+}
+
+/* ============ 学员自己组合：三个面板下拉 ============
+   两种取源方式并存的理由：自己组合材料最厚（每块带真出处与八字段供料层），
+   但三门有可能站在同一个位置上——那种情况撞不出东西，而这不是学员的错，
+   所以撞不起来时自动转基底自由组合，不把人卡在那儿。 */
+let PANEL_OPTS = null;
+async function fillPanelSelects(){
+  const cat = await frontierCat();
+  const boxes = ['cP1','cP2','cP3'].map(id=>$(id)).filter(Boolean);
+  if(!boxes.length) return;
+  if(!cat.length){
+    boxes.forEach(b=> b.innerHTML = '<option value="">（面板目录取不到，改用基底自由组合）</option>');
+    return;
+  }
+  PANEL_OPTS = cat.slice().sort((a,b)=>a.n-b.n);
+  const html = '<option value="">— 请选 —</option>' +
+    PANEL_OPTS.map(x=>'<option value="'+x.n+'">'+String(x.n).padStart(3,'0')+'　'+escTxt(x.name)+'</option>').join('');
+  boxes.forEach(b=>{ b.innerHTML = html; });
+}
+function pickMode(){ const e=$('cPickMode'); return e ? e.value : 'auto'; }
+function panelChosen(){
+  if(pickMode()!=='panel' || !PANEL_OPTS) return [];
+  return ['cP1','cP2','cP3'].map(id=>{
+    const v = $(id) && $(id).value; if(!v) return null;
+    return PANEL_OPTS.find(x=>x.n===parseInt(v,10)) || null;
+  }).filter(Boolean);
+}
+function syncPickMode(){
+  const panel = pickMode()==='panel';
+  if($('panelPick')) $('panelPick').style.display = panel ? '' : 'none';
+  if($('freePick'))  $('freePick').style.display  = panel ? 'none' : '';
+  if(panel && !PANEL_OPTS) fillPanelSelects();
 }
 
 /* ===================== 面板 ===================== */
@@ -1128,6 +1176,10 @@ async function loadData(){
 function optionsFor(items, val, txt){
   return items.map(x=>'<option value="'+val(x)+'">'+txt(x).replace(/</g,'&lt;')+'</option>').join('');
 }
+(function wirePickMode(){
+  const e = document.getElementById('cPickMode');
+  if(e){ e.addEventListener('change', syncPickMode); syncPickMode(); }
+})();
 function renderMode(){
   ['A','B','C','D','F'].forEach(m=> $('m'+m).classList.toggle('hidden', m!==ST.mode));
   syncGenre();
@@ -1981,8 +2033,8 @@ function promptFor(id){
     '总分：XXX',
     '五维：S=… D=… E=… I=… F=…',
     '判级：……',
-    '若总分 < 150：必须点名回炉到哪一道工序（体检／抽脊／混沌碰撞／扩候选／候选互撞／自组织／涌现／近邻划界／成文），并给一句具体动作。',
-    '再给三条"最该补的一刀"。',
+    '**不必点名回炉**——本机不回炉，分数只作读数用。',
+    '再给三条"最该补的一刀"（供作者自己判断要不要改，不构成退回）。',
     '',
     (window.__NBR ? (window.__NBR + '\n') : ''),
     '【待评文章】',
@@ -2305,7 +2357,16 @@ async function runStage(i){
         await doSelect();
         return await runStage(i);
       }
-      showErr('闸一只给了 '+sc+'/10——三个源多半是互补不是打架。可以照旧往下跑，但成品破 150 的机会不大，建议换一位学员或改手挑。');
+      /* 学员自己组合时，撞不起来不是他的错——自动降级为基底自由组合重挑一次，
+         只降一次（ST.forceAuto 是一次性的），避免来回打转。 */
+      if(pickMode()==='panel' && !ST.forceAuto && panelChosen().length===3){
+        ST.forceAuto = true;
+        note('你选的三块面板撞不起来（闸一 '+sc+'/10，多半是三门站在同一个位置上）——已自动转为「基底自由组合」，重新挑三家。这不是你的错，位置撞车靠换学科是换不掉的。');
+        setStat('select','<span class=\"spinner\"></span> 撞不起来，改由基底自由组合重挑','run');
+        await doSelectConf();
+        return await runStage(i);
+      }
+      showErr('闸一只给了 '+sc+'/10——三个源多半是互补不是打架。可以照旧往下跑，但成品分数不会高，建议换三门离得更远的。');
     }
     else hideErr();
   }
@@ -2315,18 +2376,18 @@ async function runStage(i){
     renderScore();
     // 无论多少分，先把这一稿存下来：回炉与否是后面的事，稿子不该押在这个决定上
     await autosave('评审 ' + (ST.score==null ? '未读到分数' : ST.score + ' 分'));
-    if(ST.score !== null && ST.score < 150){
+    if(false && ST.score !== null && ST.score < 140){
       const autoRedo = $('autoRedoChk') && $('autoRedoChk').checked;
       const back = backStageFrom(txt);
       if(autoRedo && ST.rounds < 2){
         ST.rounds++;
         note('第 '+ST.rounds+' 轮回炉：'+ST.score+' 分，从「'+STAGES[back].n+'」重跑。');
-        showErr('创新智商 '+ST.score+'，不到 150——按你勾的「自动回炉」：从「'+STAGES[back].n+'」重跑（第 '+ST.rounds+'/2 轮）。这一稿已经存下来了。');
+        showErr('创新智商 '+ST.score+'，不到 140——按你勾的「自动回炉」：从「'+STAGES[back].n+'」重跑（第 '+ST.rounds+'/2 轮）。这一稿已经存下来了。');
         ST.redoFrom = back;
       } else {
         const many = ST.rounds >= 2;
         const pick = await askChoice('review',
-          '创新智商 <b>'+ST.score+'</b>，不到 150。评审建议从「<b>'+STAGES[back].n+'</b>」回炉'
+          '创新智商 <b>'+ST.score+'</b>，不到 140。评审建议从「<b>'+STAGES[back].n+'</b>」回炉'
           + (many ? ('（已经回过 '+ST.rounds+' 轮了）') : '')
           + '。<b>这一稿已经自动存下来了</b>，回不回炉由你定：',
           [{label:'回炉重写（从「'+STAGES[back].n+'」）', value:'redo', primary:true},
@@ -2584,7 +2645,7 @@ async function doSelectWeb(){
 
 /* ===================== 自动存稿（与分数无关） ===================== */
 /* 稿子是他的，分数是评审的——两件事捆在一起过，是这台机器此前最容易丢东西的地方：
-   评审一判不到 150 就转去回炉，那一稿从没被存过；中途按停、某一格抛错，同样没了。
+   （历史）评审一判不到线就转去回炉，那一稿从没被存过；中途按停、某一格抛错，同样没了。回炉现已关掉，存稿这四处照旧。
    现在成文完一次、打磨完一次、评审读到分数一次、交付一次，四处各存一次。
    没选文件夹的，也在浏览器本地留一份底——落不了盘不等于可以丢。 */
 const DRAFT_KEY = 'sde_conf_draft';
@@ -2632,7 +2693,7 @@ async function autosave(tag){
   const el = $('draftNote');
   if(el) el.innerHTML = where
     ? ('✓ 已自动存稿（' + escTxt(tag) + ' · ' + words + ' 字 · 存到：' + escTxt(where) + '）。'
-       + '<b>存稿与评分无关</b>——不到 150 也照存，回不回炉是另一件事。')
+       + '<b>存稿与评分无关</b>——不到 140 也照存，本机不回炉。')
     : ('⚠ 这个浏览器不让本地留底（隐私模式或空间已满）。' + words + ' 字的稿子只在本页内存里——'
        + '选一个文件夹，或现在就点下面的按钮下载。');
   return where;
@@ -2781,7 +2842,8 @@ async function doSelectConf(){
 
   /* 一、定三个学科，并给每科一条检索词（锁定的照抄，不许换） */
   setStat(id, '<span class="spinner"></span> 定三个学科与检索词', 'run');
-  const CAT = usePanel ? await frontierCat() : [];
+  const CAT = (usePanel || pickMode()==='panel') ? await frontierCat() : [];
+  const CHOSEN = ST.forceAuto ? [] : panelChosen();   // ST.forceAuto：上一轮撞不起来，已降级
   if(usePanel && !CAT.length) note('新思想前沿面板目录这次没取到——本格改用原来的两路取材，不影响往下走。');
   const dp = [
     '要解决的问题：'+q,
@@ -2810,7 +2872,14 @@ async function doSelectConf(){
     CAT.length ? '3｜面板编号或0｜学科名｜检索词' : '3｜学科名｜检索词',
     '不要写别的。'
   ].filter(Boolean).join('\n');
-  const dr = await askFast(sdeSystem(), dp, p.out, p.stat, p.meta, 900, '定学科');
+  let dr;
+  if(CHOSEN.length === 3){
+    /* 学员已经把三门定死了——这一步不必再问基底，省一次调用，也省得它改名。 */
+    selLog('学员自选三块面板：<b>' + CHOSEN.map(x=>'第'+x.n+'号《'+escTxt(x.name)+'》').join('　×　') + '</b>');
+    dr = { text: CHOSEN.map((x,i)=>(i+1)+'｜'+x.n+'｜'+x.name+'｜'+x.name+' 理论 争论').join('\n') };
+  } else {
+    dr = await askFast(sdeSystem(), dp, p.out, p.stat, p.meta, 900, '定学科');
+  }
   let rows;
   if(CAT.length){
     rows = (dr.text||'').split('\n').map(x=>x.trim())
@@ -3432,13 +3501,13 @@ async function nbrPostName(){
 function renderScore(){
   const p = panels.review;
   if(ST.score==null) return;
-  const bad = ST.score < 150;
-  setStat('review', (bad?'⚠ ':'✓ ')+'创新智商 '+ST.score, bad? 'run':'done');
+  const bad = ST.score < 140;
+  setStat('review', (bad?'· ':'✓ ')+'创新智商 '+ST.score, 'done');
   const note = document.createElement('div');
   note.className = 'small'; note.style.marginTop='8px';
   note.innerHTML = bad
-    ? '不到 150。评审已点名回炉工序——回到那一格点「重跑本格」，再点「从这里继续往下」。'
-    : '过线。可以进交付了。';
+    ? '低于 140。<b>本机不回炉</b>——这一稿照常交付，改不改由你定；评审给的三条「最该补的一刀」在上面。'
+    : '到 140 线。可以进交付了。';
   p.out.parentNode.appendChild(note);
 }
 
@@ -3475,7 +3544,7 @@ async function deliver(){
   const hits = termHits(ST.article);
   const bits = [
     '成品 '+words+' 字',
-    ST.score==null ? '评审未读到分数' : ('创新智商 '+ST.score+(ST.score>=150?'（过线）':'（未过线，已回炉 '+ST.rounds+' 轮）')),
+    ST.score==null ? '评审未读到分数' : ('创新智商 '+ST.score+(ST.score>=140?'（到 140 线）':'（未到 140 线，按口径照常交付）')),
     hits.length ? ('⚠ 术语残留：'+hits.join('、')) : '术语零残留',
     isPaper() ? '体例：学科通融体（论文）' : '体例：每日必读体（散文）',
     ST.mode==='X'
@@ -3491,7 +3560,7 @@ async function deliver(){
   $('doneBanner').innerHTML = '✓ 跑完了。' + bits.join('　·　') +
     (ST.notes.length ? ('<br><span style="color:var(--muted)">中途自动修了：'+ST.notes.join('　')+'</span>') : '');
   progress(STAGES.length-1, '完成');
-  await autosave('终稿');        // 与分数无关：过没过 150 都存
+  await autosave('终稿');        // 与分数无关：到没到 140 都存
   const auto = $('autoSaveChk') && $('autoSaveChk').checked;
   const hasDir = window.WDSSaveDir && window.WDSSaveDir.supported() && window.WDSSaveDir.name();
   if(auto && hasDir){
