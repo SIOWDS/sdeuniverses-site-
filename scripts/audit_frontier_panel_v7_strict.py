@@ -34,6 +34,7 @@ TRACE_PATTERNS = (
     "待补", "不计入", "按模板填写", "由 AI 生成", "模型撰写",
 )
 BAD_CITATION_TYPES = ("科学摘要", "新闻稿", "项目页", "百科", "会议海报")
+AWKWARD_PATTERNS = ("当当", "的的", "的是未见", "是所守", "等情形没有稳定位置")
 
 
 def plain(value: str) -> str:
@@ -136,7 +137,23 @@ def parse_items(page: str) -> list[Item]:
     return items
 
 
-def audit(number: int, path: str, page: str, registry: dict[int, tuple[str, bool]]) -> Result:
+def closure_sections(page: str) -> dict[str, list[str]]:
+    matches = list(re.finditer(r'<h3\s+class="sec"[^>]*>(.*?)</h3>', page, re.S))
+    sections: dict[str, list[str]] = {}
+    for index, match in enumerate(matches):
+        end = matches[index + 1].start() if index + 1 < len(matches) else len(page)
+        title = plain(match.group(1))
+        sections[title] = [plain(x) for x in re.findall(r"<p(?:\s[^>]*)?>(.*?)</p>", page[match.end():end], re.S)]
+    return sections
+
+
+def audit(
+    number: int,
+    path: str,
+    page: str,
+    registry: dict[int, tuple[str, bool]],
+    batch_numbers: set[int],
+) -> Result:
     failures: list[str] = []
     warnings: list[str] = []
     name_match = re.search(r"<h1(?:\s[^>]*)?>(.*?)</h1>", page, re.S)
@@ -160,6 +177,24 @@ def audit(number: int, path: str, page: str, registry: dict[int, tuple[str, bool
     traces = [trace for trace in TRACE_PATTERNS if trace in plain(page)]
     if traces:
         failures.append("施工/Skill 痕迹：" + "、".join(traces))
+    awkward = [pattern for pattern in AWKWARD_PATTERNS if pattern in plain(page)]
+    if awkward:
+        failures.append("机械截断/病句模式：" + "、".join(awkward))
+
+    lede_match = re.search(r'<p class="lede">(.*?)</p>', page, re.S)
+    lede_length = zh(lede_match.group(1)) if lede_match else 0
+    if not 350 <= lede_length <= 450:
+        failures.append(f"引言 {lede_length} 汉字，不在 350–450")
+    act_matches = list(re.finditer(r'<div class="act">(.*?)</div>', page, re.S))
+    bridge_lengths: list[int] = []
+    if len(act_matches) != 2:
+        failures.append(f"幕数 {len(act_matches)}，应为 2")
+    for act in act_matches:
+        bridge = re.search(r"<p(?:\s[^>]*)?>(.*?)</p>", page[act.end():], re.S)
+        bridge_lengths.append(zh(bridge.group(1)) if bridge else 0)
+    for index, length in enumerate(bridge_lengths, 1):
+        if not 100 <= length <= 150:
+            failures.append(f"第 {index} 幕过渡 {length} 汉字，不在 100–150")
 
     lengths: list[int] = []
     positions: collections.Counter[str] = collections.Counter()
@@ -176,12 +211,26 @@ def audit(number: int, path: str, page: str, registry: dict[int, tuple[str, bool
     blank_values: list[str] = []
     body_years = 0
     paragraph_counts: list[int] = []
+    source_topic_fit = 0
     for idx, item in enumerate(items, 1):
         paragraph_counts.append(len(item.paragraphs))
         length = zh("".join(item.paragraphs))
         lengths.append(length)
         if len(item.paragraphs) != 6:
             failures.append(f"第 {idx} 条正文段数 {len(item.paragraphs)}，应为 6")
+        if len(item.paragraphs) == 6:
+            semantic_requirements = (
+                ("旧默认", "边界"),
+                ("只锁定", "基准", "边界", "反向", "撤回"),
+                ("主证据", "读数", "不是实验效应量"),
+                ("检索", "边界", "反号", "公开"),
+                ("2026年", "版本", "退出路径", "更新后", "旧结论"),
+                ("接口", "预设", "对方", "第三因素", "复验"),
+            )
+            for pindex, required in enumerate(semantic_requirements):
+                missing_words = [word for word in required if word not in item.paragraphs[pindex]]
+                if missing_words:
+                    failures.append(f"第 {idx} 条第 {pindex + 1} 段功能词缺：{'/'.join(missing_words)}")
         if not 800 <= length <= 1000:
             failures.append(f"第 {idx} 条正文 {length} 汉字，不在 800–1000")
         missing = [key for key, value in item.fields.items() if not value]
@@ -189,9 +238,10 @@ def audit(number: int, path: str, page: str, registry: dict[int, tuple[str, bool
             failures.append(f"第 {idx} 条八字段缺：{'/'.join(missing)}")
         pos = item.fields["位置"][:1]
         positions[pos] += 1
-        fam = re.match(r"[〔\[]\s*(\d+)", item.fields["预设"])
-        if fam:
-            families[fam.group(1)].add(pos)
+        fams = re.findall(r"[〔\[]\s*(\d+)", item.fields["预设"])
+        if fams:
+            for fam in fams:
+                families[fam].add(pos)
         else:
             warnings.append(f"第 {idx} 条预设未以编号前提族开头")
         reverse += bool(re.search(r"反而|反号|反过来|方向.{0,3}相反|越.{1,20}越", item.fields["失效"]))
@@ -206,7 +256,25 @@ def audit(number: int, path: str, page: str, registry: dict[int, tuple[str, bool
             failures.append(f"第 {idx} 条提出/争议/最新缺失或不互异")
         if any(bad in plain(item.source) for bad in BAD_CITATION_TYPES):
             failures.append(f"第 {idx} 条源行含不可引来源类型")
-        latest_recent += bool(re.search(r"(?:2024|2025|2026)\s*年", source["最新"]))
+        title_tokens = {
+            token.lower() for token in re.findall(r"[A-Za-z][A-Za-z'’\-]{2,}", item.title)
+            if token.lower() not in {"the", "and", "for", "with", "from", "into", "art", "language", "philosophy", "study", "studies"}
+        }
+        fitted = True
+        for source_key in ("争议", "最新"):
+            source_value = source[source_key]
+            if "未见" in source_value:
+                continue
+            source_tokens = {token.lower() for token in re.findall(r"[A-Za-z][A-Za-z'’\-]{2,}", source_value)}
+            required_overlap = min(2, len(title_tokens))
+            if required_overlap and len(title_tokens & source_tokens) < required_overlap:
+                fitted = False
+                failures.append(f"第 {idx} 条{source_key}题名与命题英文题名重合不足")
+        source_topic_fit += fitted
+        latest_recent += bool(
+            "未见" not in source["最新"]
+            and re.search(r"(?<!\d)(?:2024|2025|2026)(?!\d)", source["最新"])
+        )
         named_source += bool(re.search(r"[A-Za-z]{3,}|[\u3400-\u9fff]{2,}(?:、|等)", source["提出"]))
         if len(item.paragraphs) >= 3:
             # V7 defines a reading as a sample size, effect, percentage,
@@ -217,7 +285,10 @@ def audit(number: int, path: str, page: str, registry: dict[int, tuple[str, bool
         body_years += len(re.findall(r"(?:19|20)\d{2}", "".join(item.paragraphs)))
         refs_in_alias = [int(x) for x in re.findall(r"第\s*0*(\d{1,3})\s*号", item.fields["异名"])]
         cited_numbers.update(refs_in_alias)
-        if refs_in_alias and (re.search(r"第\s*\d{1,3}\s*号.{0,24}(?:第.{0,5}条|第一幕|第二幕|[“『])", item.fields["异名"])):
+        if refs_in_alias and re.search(
+            r"第\s*0*\d{1,3}\s*号.{0,40}第\s*\d{1,2}\s*条.{0,20}《[^》]+》",
+            item.fields["异名"],
+        ):
             alias_with_pointer += 1
         for ref_no in refs_in_alias:
             if ref_no not in registry:
@@ -230,7 +301,7 @@ def audit(number: int, path: str, page: str, registry: dict[int, tuple[str, bool
     self_prefix = len({value[:26] for value in self_values})
     self_skeletons = len({self_skeleton(value) for value in self_values})
     blank_substantive = sum(len(value) >= 12 and "未见" not in value for value in blank_values)
-    external = {value for value in cited_numbers if not 110 <= value <= 150}
+    external = {value for value in cited_numbers if value not in batch_numbers}
     external_ratio = len(external) / len(cited_numbers) if cited_numbers else 0.0
     if items and min(positions.get(x, 0) for x in "SDE") < 6:
         failures.append(f"位置不平衡：{dict(positions)}")
@@ -248,8 +319,10 @@ def audit(number: int, path: str, page: str, registry: dict[int, tuple[str, bool
         failures.append(f"实质空栏 {blank_substantive}/20，低于 12")
     if source_distinct < 20:
         failures.append(f"源行三笔互异 {source_distinct}/20")
-    if latest_recent < 14:
-        failures.append(f"最新栏 2024–2026 为 {latest_recent}/20，低于金标准基线 14")
+    if latest_recent == 0:
+        failures.append("全块未见一条主题直接相关的 2024–2026 来源")
+    elif latest_recent < 14:
+        warnings.append(f"最新栏 2024–2026 为 {latest_recent}/20；已过硬门槛，未到金标准基线 14")
     elif latest_recent < 18:
         warnings.append(f"最新栏 2024–2026 为 {latest_recent}/20；建议提升到 18–20")
     if named_source < 18:
@@ -260,8 +333,8 @@ def audit(number: int, path: str, page: str, registry: dict[int, tuple[str, bool
         failures.append(f"正文年份 {body_years} 次，低于 40")
     if refs < 20:
         failures.append(f"文献表 {refs} 条，低于 20")
-    if alias_with_pointer < 5:
-        failures.append(f"异名点名到条且带题 {alias_with_pointer}/20，低于 5")
+    if alias_with_pointer < 20:
+        failures.append(f"异名精确点名面板、条号与原标题 {alias_with_pointer}/20，应为 20")
     if cited_numbers and external_ratio < 0.5:
         failures.append(f"批外引用编号比 {external_ratio:.0%}，低于 50%")
 
@@ -294,10 +367,49 @@ def audit(number: int, path: str, page: str, registry: dict[int, tuple[str, bool
     meta_claim = re.search(r"约\s*([\d,]+)\s*字", plain(page))
     claimed = int(meta_claim.group(1).replace(",", "")) if meta_claim else None
     visible_zh = zh(re.search(r"<main>(.*?)</main>", page, re.S).group(1)) if "<main>" in page else zh(page)
+    if not 21500 <= visible_zh <= 27000:
+        failures.append(f"main 可见汉字 {visible_zh:,}，不在 21,500–27,000")
     if claimed is None:
         failures.append("meta 未写实测字数")
     elif abs(visible_zh - claimed) > max(300, claimed * 0.03):
         warnings.append(f"meta 字数 {claimed:,} 与 main 可见汉字 {visible_zh:,} 差异较大；需按站点统一口径复核")
+
+    # F2 paragraph anchors: years, percentages, or named Latin-script authors.
+    anchor_limits = (0.50, 0.30, 0.10, 0.50, 0.50, 0.50)
+    anchor_rates: list[float] = []
+    for pindex, limit in enumerate(anchor_limits):
+        hit = sum(
+            pindex < len(item.paragraphs)
+            and bool(re.search(r"(?:19|20)\d{2}|\d+(?:\.\d+)?%|[A-Z][A-Za-z]{2,}", item.paragraphs[pindex]))
+            for item in items
+        )
+        rate = hit / max(1, len(items))
+        anchor_rates.append(rate)
+        if rate < limit:
+            failures.append(f"第 {pindex + 1} 段锚点覆盖 {hit}/20，低于 {limit:.0%}")
+
+    sections = closure_sections(page)
+    first_key = next((key for key in sections if "二十年连起来看" in key), "")
+    first_paragraphs = sections.get(first_key, [])
+    if len(first_paragraphs) != 3:
+        failures.append(f"总收口段数 {len(first_paragraphs)}，应为 3")
+    for index, paragraph in enumerate(first_paragraphs, 1):
+        length = zh(paragraph)
+        if not 130 <= length <= 180:
+            failures.append(f"总收口第 {index} 段 {length} 汉字，不在 130–180")
+    collision_key = next((key for key in sections if "可与哪些领域对撞" in key), "")
+    collision_paragraphs = sections.get(collision_key, [])
+    if not 3 <= len(collision_paragraphs) <= 4:
+        failures.append(f"对撞段数 {len(collision_paragraphs)}，应为 3–4")
+    for index, paragraph in enumerate(collision_paragraphs, 1):
+        sentence_count = len([x for x in re.split(r"[。！？]", paragraph) if x.strip()])
+        if sentence_count < 4 or not re.search(r"预设|前提", paragraph) or not re.search(r"方向|相反|对方", paragraph) or "第三因素" not in paragraph:
+            failures.append(f"第 {index} 个对撞未写全双方、共享预设、相反方向与第三因素")
+    research_key = next((key for key in sections if "十条可做的研究命题" in key), "")
+    research_paragraphs = sections.get(research_key, [])
+    complete_props = sum(all(word in paragraph for word in ("命题", "方法", "证伪")) for paragraph in research_paragraphs)
+    if len(research_paragraphs) != 10 or complete_props != 10:
+        failures.append(f"研究命题/方法/证伪完整数 {len(research_paragraphs)}/{complete_props}，应为 10/10")
 
     metrics: dict[str, object] = {
         "items": len(items), "h2": h2, "h3": len(h3_titles), "src": src_count, "col": col_count,
@@ -306,10 +418,13 @@ def audit(number: int, path: str, page: str, registry: dict[int, tuple[str, bool
         "self_exact": self_exact, "self_prefix": self_prefix, "self_skeletons": self_skeletons,
         "blank_substantive": blank_substantive, "latest_recent": latest_recent,
         "source_distinct": source_distinct, "body_years": body_years,
+        "source_topic_fit": source_topic_fit,
         "third_with_reading": third_with_reading, "refs": refs,
         "cited_numbers": len(cited_numbers), "external_ratio": external_ratio,
         "alias_with_pointer": alias_with_pointer, "template_rate": template_rate,
         "max_reuse": max_reuse, "sliding_25": sliding, "visible_zh": visible_zh,
+        "lede_length": lede_length, "bridge_lengths": bridge_lengths,
+        "anchor_rates": anchor_rates,
     }
     return Result(number, name, path, items, failures, warnings, metrics)
 
@@ -319,20 +434,65 @@ def main() -> int:
     parser.add_argument("pages", nargs="+", help="NUMBER:PATH")
     args = parser.parse_args()
     registry = parse_registry()
+    specs = [(int(spec.split(":", 1)[0]), spec.split(":", 1)[1]) for spec in args.pages]
+    batch_numbers = {number for number, _ in specs}
     results: list[Result] = []
-    for spec in args.pages:
-        number_text, path = spec.split(":", 1)
+    pages: dict[int, str] = {}
+    for number, path in specs:
         page = Path(path).read_text(encoding="utf-8")
-        results.append(audit(int(number_text), path, page, registry))
+        pages[number] = page
+        results.append(audit(number, path, page, registry, batch_numbers))
+
+    # H4: a seven-panel batch may not reuse a literal closure sentence on five
+    # or more pages for over 15% of any closure section.
+    sentence_owners: collections.defaultdict[tuple[str, str], set[int]] = collections.defaultdict(set)
+    section_sentences: dict[tuple[int, str], list[str]] = {}
+    for number, page in pages.items():
+        for title, paragraphs in closure_sections(page).items():
+            key_title = next((canonical for canonical in CLOSURES if canonical in title), title)
+            sentences = [s.strip() for s in re.split(r"[。！？]", "".join(paragraphs)) if len(s.strip()) >= 12]
+            section_sentences[(number, key_title)] = sentences
+            for sentence in set(sentences):
+                sentence_owners[(key_title, sentence)].add(number)
+    for result in results:
+        for title in CLOSURES:
+            sentences = section_sentences.get((result.number, title), [])
+            total = sum(zh(sentence) for sentence in sentences)
+            common = sum(
+                zh(sentence) for sentence in sentences
+                if len(sentence_owners[(title, sentence)]) >= 5
+            )
+            rate = common / max(1, total)
+            if rate > 0.15:
+                result.failures.append(f"收口《{title}》五页共句占比 {rate:.1%}，高于 15%")
+
+    # H4 zero-margin check: adjacent batch members must not share one fixed
+    # position histogram, reverse count, or premise-triple count.
+    if len(results) >= 5:
+        distributions = {
+            tuple(result.metrics["positions"].get(key, 0) for key in "SDE")
+            for result in results
+        }
+        reverse_counts = {result.metrics["reverse"] for result in results}
+        triple_counts = {result.metrics["triples"] for result in results}
+        if len(distributions) == 1:
+            for result in results:
+                result.failures.append("批次位置分布零方差")
+        if len(reverse_counts) == 1:
+            for result in results:
+                result.failures.append("批次反号数零方差")
+        if len(triple_counts) == 1:
+            for result in results:
+                result.failures.append("批次前提三元组数零方差")
     for result in results:
         m = result.metrics
         print(
             f"{result.number} {result.name} | items/h2/h3/src/col={m['items']}/{m['h2']}/{m['h3']}/{m['src']}/{m['col']} "
             f"| 条目={m['body_min']}–{m['body_max']} | 位置={m['positions']} | 三元组={m['triples']} "
             f"| 反号={m['reverse']} | 自曝={m['self_exact']}/{m['self_prefix']}/{m['self_skeletons']} "
-            f"| 最新={m['latest_recent']}/20 | 三笔={m['source_distinct']}/20 | 读数={m['third_with_reading']}/20 "
+            f"| 最新={m['latest_recent']}/20 | 三笔={m['source_distinct']}/20 | 源题匹配={m['source_topic_fit']}/20 | 读数={m['third_with_reading']}/20 "
             f"| 文献={m['refs']} | 批外引用={m['external_ratio']:.0%} | 模板={m['template_rate']:.2f}% "
-            f"| 滑窗={m['sliding_25']:.2f}%"
+            f"| 滑窗={m['sliding_25']:.2f}% | 引言/过渡={m['lede_length']}/{m['bridge_lengths']}"
         )
         for warning in result.warnings:
             print("  WARN", warning)
@@ -343,7 +503,7 @@ def main() -> int:
         print(f"V7 STRUCTURAL AUDIT: FAIL ({len(failed)}/{len(results)} pages)")
         return 1
     print(f"V7 STRUCTURAL AUDIT: PASS ({len(results)} pages)")
-    print("NOTE: source-topic fit and quoted numerical claims still require item-by-item literature verification.")
+    print("NOTE: PASS includes machine-verifiable title overlap; DOI metadata should still receive periodic resolver checks.")
     return 0
 
 
