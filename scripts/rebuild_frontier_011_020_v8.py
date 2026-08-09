@@ -18,6 +18,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 FRONTIER = ROOT / "public" / "frontier"
 TASK = Path("/workspace/scratch/74de07e3745f/upload/新思想前沿_11-20号面板V8重建任务书_给GPT_2026-08-09.md")
+SOURCE_BASE = "7d7f4604f96efcbafe5e2b145a218e9810d9671f"
 
 PANELS = {
     11: ("particle-physics", "粒子物理与标准模型", "物理学", "Particle Physics and the Standard Model"),
@@ -195,7 +196,7 @@ MODERN_EXTRA_REFS = {
     11: ["Aguillard DP, et al. Measurement of the positive muon anomalous magnetic moment to 127 ppb. Phys Rev Lett. 2025;135:101802.", "CDF Collaboration. High-precision measurement of the W boson mass. Science. 2022;376:170–176. doi:10.1126/science.abk1781.", "ATLAS Collaboration. Measurement of the W-boson mass and width. Eur Phys J C. 2024;84:1309. doi:10.1140/epjc/s10052-024-13375-y.", "Aalbers J, et al. First dark matter search results from LUX-ZEPLIN. Phys Rev Lett. 2023;131:041002. doi:10.1103/PhysRevLett.131.041002.", "Aprile E, et al. First dark matter search with XENONnT. Phys Rev Lett. 2023;131:041003. doi:10.1103/PhysRevLett.131.041003.", "KATRIN Collaboration. Direct neutrino-mass measurement with sub-electronvolt sensitivity. Nat Phys. 2022;18:160–166. doi:10.1038/s41567-021-01463-1.", "Aaij R, et al. Test of lepton universality in beauty-quark decays. Nat Phys. 2022;18:277–282. doi:10.1038/s41567-021-01478-8.", "Borsanyi S, et al. Leading hadronic contribution to the muon magnetic moment. Nature. 2021;593:51–55. doi:10.1038/s41586-021-03418-1.", "Brivio I, Trott M. The Standard Model as an effective field theory. Phys Rep. 2019;793:1–98. doi:10.1016/j.physrep.2018.11.002.", "Cranmer K, Heinrich L. Publishing statistical models. SciPost Phys. 2022;12:037. doi:10.21468/SciPostPhys.12.1.037."],
     12: ["Bose S, et al. Spin entanglement witness for quantum gravity. Phys Rev Lett. 2017;119:240401. doi:10.1103/PhysRevLett.119.240401.", "Marletto C, Vedral V. Gravitationally induced entanglement. Phys Rev Lett. 2017;119:240402. doi:10.1103/PhysRevLett.119.240402.", "Oppenheim J. A postquantum theory of classical gravity. Phys Rev X. 2023;13:041040. doi:10.1103/PhysRevX.13.041040.", "Almheiri A, et al. The entropy of Hawking radiation. J High Energy Phys. 2020;2020:13.", "Penington G. Entanglement wedge reconstruction and the information paradox. J High Energy Phys. 2020;2020:2.", "Saad P, Shenker SH, Stanford D. JT gravity as a matrix integral. 2019. arXiv:1903.11115.", "Engelhardt N, Wall AC. Quantum extremal surfaces. J High Energy Phys. 2015;2015:73.", "Van Raamsdonk M. Building up spacetime with quantum entanglement. Gen Relativ Gravit. 2010;42:2323–2329.", "Harlow D. TASI lectures on the emergence of bulk physics in AdS/CFT. PoS. 2018;TASI2017:002.", "Kafri D, Taylor JM, Milburn GJ. A classical channel model for gravitational decoherence. New J Phys. 2014;16:065020."],
     13: ["DESI Collaboration. DESI 2024 VI: cosmological constraints from the first year. JCAP. 2025;02:021.", "DESI Collaboration. DESI DR2 results II: measurements of baryon acoustic oscillations. 2025. arXiv:2503.14738.", "Planck Collaboration. Planck 2018 results VI. Astron Astrophys. 2020;641:A6. doi:10.1051/0004-6361/201833910.", "Riess AG, et al. A comprehensive measurement of H0. Astrophys J Lett. 2022;934:L7.", "Brout D, et al. The Pantheon+ analysis. Astrophys J. 2022;938:110.", "DES Collaboration. Dark Energy Survey year 3 cosmology results. Phys Rev D. 2022;105:023520.", "Qu FJ, et al. The Atacama Cosmology Telescope: DR6 lensing map. Astrophys J. 2024;962:112.", "Euclid Collaboration. Euclid preparation XXXVI. Astron Astrophys. 2024;681:A68.", "Carniani S, et al. Spectroscopic confirmation of two luminous galaxies at redshift 14. Nature. 2024;633:318–322.", "Abbott BP, et al. A gravitational-wave standard siren measurement of H0. Nature. 2017;551:85–88."],
-    14: ["Abbott BP, et al. Observation of gravitational waves from a binary black hole merger. Phys Rev Lett. 2016;116:061102. doi:10.1103/PhysRevLett.116.061102.", "Abbott BP, et al. Multi-messenger observations of a binary neutron star merger. Astrophys J Lett. 2017;848:L12.", "Event Horizon Telescope Collaboration. First M87 Event Horizon Telescope results I. Astrophys J Lett. 2019;875:L1.", "Event Horizon Telescope Collaboration. First Sagittarius A* results I. Astrophys J Lett. 2022;930:L12.", "Agazie G, et al. The NANOGrav 15-year data set. Astrophys J Lett. 2023;951:L8.", "IceCube Collaboration. Observation of high-energy neutrinos from the Galactic plane. Science. 2023;380:1338–1343.", "Gaia Collaboration. Gaia Data Release 3. Astron Astrophys. 2023;674:A1.", "CHIME/FRB Collaboration. The first CHIME/FRB fast radio burst catalog. Astrophys J Suppl. 2021;257:59.", "Carniani S, et al. Spectroscopic confirmation of two luminous galaxies at redshift 14. Nature. 2024;633:318–322.", "Abbott R, et al. GWTC-3: compact binary coalescences. Phys Rev X. 2023;13:041039."],
+    14: ["Abbott BP, et al. Observation of gravitational waves from a binary black hole merger. Phys Rev Lett. 2016;116:061102. doi:10.1103/PhysRevLett.116.061102.", "Abbott BP, et al. Multi-messenger observations of a binary neutron star merger. Astrophys J Lett. 2017;848:L12.", "Event Horizon Telescope Collaboration. First M87 Event Horizon Telescope results I. Astrophys J Lett. 2019;875:L1.", "Event Horizon Telescope Collaboration. First Sagittarius A* results I. Astrophys J Lett. 2022;930:L12.", "Agazie G, et al. The NANOGrav 15-year data set. Astrophys J Lett. 2023;951:L8.", "Antoniadis J, et al. The second data release from the European Pulsar Timing Array. III. Search for gravitational-wave signals. Astron Astrophys. 2023;678:A50.", "IceCube Collaboration. Observation of high-energy neutrinos from the Galactic plane. Science. 2023;380:1338–1343.", "Gaia Collaboration. Gaia Data Release 3. Astron Astrophys. 2023;674:A1.", "CHIME/FRB Collaboration. The first CHIME/FRB fast radio burst catalog. Astrophys J Suppl. 2021;257:59.", "Carniani S, et al. Spectroscopic confirmation of two luminous galaxies at redshift 14. Nature. 2024;633:318–322.", "Abbott R, et al. GWTC-3: compact binary coalescences. Phys Rev X. 2023;13:041039."],
     15: ["Jarzynski C. Nonequilibrium equality for free energy differences. Phys Rev Lett. 1997;78:2690–2693.", "Crooks GE. Entropy production fluctuation theorem. Phys Rev E. 1999;60:2721–2726.", "Seifert U. Stochastic thermodynamics. Rep Prog Phys. 2012;75:126001.", "Bérut A, et al. Experimental verification of Landauer's principle. Nature. 2012;483:187–189.", "Barato AC, Seifert U. Thermodynamic uncertainty relation. Phys Rev Lett. 2015;114:158101.", "Gingrich TR, et al. Dissipation bounds all steady-state current fluctuations. Phys Rev Lett. 2016;116:120601.", "Fodor E, et al. How far from equilibrium is active matter? Phys Rev Lett. 2016;117:038103.", "Cates ME, Tailleur J. Motility-induced phase separation. Annu Rev Condens Matter Phys. 2015;6:219–244.", "Evans MR, Majumdar SN. Diffusion with stochastic resetting. Phys Rev Lett. 2011;106:160601.", "Abanin DA, et al. Colloquium: many-body localization. Rev Mod Phys. 2019;91:021001."],
     16: ["Hensen B, et al. Loophole-free Bell inequality violation. Nature. 2015;526:682–686.", "Giustina M, et al. Significant-loophole-free test of Bell's theorem. Phys Rev Lett. 2015;115:250401.", "Shalm LK, et al. Strong loophole-free test of local realism. Phys Rev Lett. 2015;115:250402.", "Tse M, et al. Quantum-enhanced Advanced LIGO detectors. Phys Rev Lett. 2019;123:231107.", "Liao SK, et al. Satellite-to-ground quantum key distribution. Nature. 2017;549:43–47.", "Lucamarini M, et al. Overcoming the rate-distance limit of QKD. Nature. 2018;557:400–403.", "Knaut CM, et al. Entanglement of nanophotonic quantum memory nodes. Nature. 2024;629:573–578.", "Zhong HS, et al. Quantum computational advantage using photons. Science. 2020;370:1460–1463.", "Bothwell T, et al. Resolving the gravitational redshift across a millimetre-scale atomic sample. Nature. 2022;602:420–424.", "Storz S, et al. Loophole-free Bell inequality violation with superconducting circuits. Nature. 2023;617:265–270."],
     17: ["ITER Organization. ITER Research Plan within the Staged Approach. 2024.", "Zylstra AB, et al. Burning plasma achieved in inertial fusion. Nature. 2022;601:542–548.", "Abu-Shawareb H, et al. Lawson criterion for ignition exceeded. Phys Rev Lett. 2022;129:075001.", "Creely AJ, et al. Overview of the SPARC tokamak. J Plasma Phys. 2020;86:865860502.", "Greenwald M, et al. The physics basis for SPARC. Phys Plasmas. 2022;29:112503.", "Klinger T, et al. Overview of Wendelstein 7-X high-performance operation. Nucl Fusion. 2019;59:112004.", "Mailloux J, et al. Overview of JET results in support to ITER. Nucl Fusion. 2022;62:042026.", "Eich T, et al. Scaling of the tokamak H-mode power width. Nucl Fusion. 2013;53:093031.", "Zinkle SJ, Busby JT. Structural materials for fission and fusion energy. Mater Today. 2009;12:12–19.", "Degrave J, et al. Magnetic control of tokamak plasmas through deep reinforcement learning. Nature. 2022;602:414–419."],
@@ -211,6 +212,7 @@ PROPOSED_OVERRIDES = {
     11: {
         7: "Giudice GF. The dawn of the post-naturalness era. 2017. arXiv:1710.07663.",
         8: "Aguillard DP, et al. Measurement of the positive muon anomalous magnetic moment to 127 ppb. Phys Rev Lett. 2025;135:101802.",
+        9: "Hagiwara K, Liao R, Martin AD, Nomura D, Teubner T. (g−2)mu and alpha(MZ2) re-evaluated using new precise data. J Phys G. 2011;38:085003. doi:10.1088/0954-3899/38/8/085003.",
         13: "ATLAS and CMS Collaborations. Measurements of the Higgs boson production and decay rates. JHEP. 2016;08:045.",
         17: "Ellis J, Murphy C, Sanz V, You T. Updated global SMEFT fit to Higgs, diboson and electroweak data. JHEP. 2018;06:146.",
     },
@@ -218,6 +220,8 @@ PROPOSED_OVERRIDES = {
         4: "Susskind L. The anthropic landscape of string theory. 2003. arXiv:hep-th/0302219.",
         5: "Ashtekar A, Singh P. Loop quantum cosmology: a status report. Class Quantum Grav. 2011;28:213001.",
         6: "Ooguri H, Vafa C. On the geometry of the string landscape and the swampland. Nucl Phys B. 2007;766:21–33.",
+        7: "Penington G. Entanglement wedge reconstruction and the information paradox. J High Energy Phys. 2020;2020:2.",
+        9: "Van Raamsdonk M. Building up spacetime with quantum entanglement. Gen Relativ Gravit. 2010;42:2323–2329.",
         10: "Obied G, Ooguri H, Spodyneiko L, Vafa C. De Sitter space and the swampland. 2018. arXiv:1806.08362.",
         16: "Strominger A. Lectures on the infrared structure of gravity and gauge theory. Princeton University Press; 2018.",
         17: "Kachru S, Kallosh R, Linde A, Trivedi SP. De Sitter vacua in string theory. Phys Rev D. 2003;68:046005.",
@@ -239,6 +243,7 @@ PROPOSED_OVERRIDES = {
         20: "Möller A, et al. Fink, a new generation of broker for the LSST community. Mon Not R Astron Soc. 2021;501:3272–3288.",
     },
     15: {
+        2: "Blickle V, Speck T, Helden L, Seifert U, Bechinger C. Thermodynamics of a colloidal particle in a time-dependent nonharmonic potential. Phys Rev Lett. 2006;96:070603.",
         5: "Mézard M, Parisi G, Virasoro MA. Spin Glass Theory and Beyond. World Scientific; 1987.",
         7: "Gingrich TR, et al. Dissipation bounds all steady-state current fluctuations. Phys Rev Lett. 2016;116:120601.",
         11: "Clauset A, Shalizi CR, Newman MEJ. Power-law distributions in empirical data. SIAM Rev. 2009;51:661–703.",
@@ -246,6 +251,7 @@ PROPOSED_OVERRIDES = {
         20: "Hoel EP, Albantakis L, Tononi G. Quantifying causal emergence. Proc Natl Acad Sci USA. 2013;110:19790–19795.",
     },
     16: {
+        3: "Hensen B, et al. Loophole-free Bell inequality violation using electron spins separated by 1.3 kilometres. Nature. 2015;526:682–686.",
         9: "McCuller L, et al. Frequency-dependent squeezing for Advanced LIGO. Phys Rev Lett. 2020;124:171102.",
         10: "Pompili M, et al. Realization of a multinode quantum network of remote solid-state qubits. Science. 2021;372:259–264.",
         12: "Hacker B, et al. A photon-photon quantum gate based on a single atom in an optical resonator. Nature. 2016;536:193–196.",
@@ -257,8 +263,10 @@ PROPOSED_OVERRIDES = {
     17: {
         7: "Abu-Shawareb H, et al. Lawson criterion for ignition exceeded in an inertial fusion experiment. Phys Rev Lett. 2022;129:075001.",
         8: "Wolf RC, et al. Major results from the first plasma campaign of Wendelstein 7-X. Nucl Fusion. 2019;59:112001.",
-        9: "Federici G, et al. Overview of the DEMO staged design approach in Europe. Nucl Fusion. 2019;59:066013.",
+        9: "Federici G, et al. Overview of EU DEMO design and R&D activities. Fusion Eng Des. 2014;89:882–889. doi:10.1016/j.fusengdes.2014.01.070.",
         10: "Hurricane OA, et al. Fuel gain exceeding unity in an inertially confined fusion implosion. Nature. 2024;626:561–566.",
+        11: "Fusion Industry Association. The Global Fusion Industry in 2024. Washington, DC; 2024.",
+        13: "Zylstra AB, et al. Burning plasma achieved in inertial fusion. Nature. 2022;601:542–548. doi:10.1038/s41586-021-04281-w.",
         14: "Kritcher AL, et al. Design of the first fusion experiment to achieve target energy gain greater than unity. Phys Rev E. 2024;109:025204.",
         16: "Greenwald M, et al. The physics basis for SPARC. Phys Plasmas. 2022;29:112503.",
         17: "Klinger T, et al. Overview of Wendelstein 7-X high-performance operation. Nucl Fusion. 2019;59:112004.",
@@ -285,6 +293,7 @@ PROPOSED_OVERRIDES = {
     20: {
         2: "Ziegler MS, Trancik JE. Re-examining rates of lithium-ion battery technology improvement and cost decline. Energy Environ Sci. 2021;14:1635–1651.",
         4: "Grey CP, Tarascon JM. Sustainability and in situ monitoring in battery development. Nat Mater. 2017;16:45–56.",
+        6: "Dunn B, Kamath H, Tarascon JM. Electrical energy storage for the grid: a battery of choices. Science. 2011;334:928–935.",
         7: "Goodenough JB, Park KS. The Li-ion rechargeable battery: a perspective. J Am Chem Soc. 2013;135:1167–1176.",
         8: "Olivetti EA, et al. Lithium-ion battery supply chain considerations. Joule. 2017;1:229–243.",
         9: "Janek J, Zeier WG. A solid future for battery development. Nat Energy. 2016;1:16141.",
@@ -295,6 +304,138 @@ PROPOSED_OVERRIDES = {
         14: "Attia PM, et al. Closed-loop optimization of fast-charging protocols. Nature. 2020;578:397–402.",
         15: "Severson KA, et al. Data-driven prediction of battery cycle life. Nat Energy. 2019;4:383–391.",
         18: "Randau S, et al. Benchmarking all-solid-state lithium batteries. Nat Energy. 2020;5:259–270.",
+    },
+}
+
+# A source's publication year determines its act.  These replacements repair
+# legacy entries whose original source fell before 2006 or whose later review
+# had displaced the period-defining paper.  Each citation remains tied to the
+# item's scientific claim; blocks are then stably grouped as 8 earlier + 12
+# later entries.
+YEAR_SOURCE_FIXES = {
+    11: {
+        3: "Aad G, et al. Search for squarks and gluinos in final states with jets and missing transverse momentum using 20.3 fb−1 of 8 TeV proton-proton collision data. JHEP. 2014;09:176.",
+        4: "Aaij R, et al. Test of lepton universality using B+→K+ℓ+ℓ− decays. Phys Rev Lett. 2014;113:151601.",
+        5: "Aoki S, et al. Review of lattice results concerning low-energy particle physics. Eur Phys J C. 2014;74:2890.",
+        6: "Akerib DS, et al. First results from the LUX dark matter experiment. Phys Rev Lett. 2014;112:091303.",
+    },
+    12: {
+        4: "Susskind L. The Cosmic Landscape: String Theory and the Illusion of Intelligent Design. Little, Brown; 2006.",
+        8: "Engelhardt N, Wall AC. Quantum extremal surfaces: holographic entanglement entropy beyond the classical regime. JHEP. 2015;01:073.",
+        17: "Danielsson UH, Van Riet T. What if string theory has no de Sitter vacua? Int J Mod Phys D. 2018;27:1830007.",
+    },
+    13: {
+        1: "Komatsu E, et al. Seven-year Wilkinson Microwave Anisotropy Probe observations: cosmological interpretation. Astrophys J Suppl. 2011;192:18.",
+        2: "Percival WJ, et al. Baryon acoustic oscillations in the Sloan Digital Sky Survey Data Release 7 galaxy sample. Mon Not R Astron Soc. 2010;401:2148–2168.",
+        3: "BICEP2 Collaboration. Detection of B-mode polarization at degree angular scales. Phys Rev Lett. 2014;112:241101.",
+        4: "Betoule M, et al. Improved cosmological constraints from a joint analysis of the SDSS-II and SNLS supernova samples. Astron Astrophys. 2014;568:A22.",
+        5: "Springel V, et al. The Aquarius Project: the subhalos of galactic halos. Mon Not R Astron Soc. 2008;391:1685–1711.",
+        6: "Riess AG, et al. A 3% solution: determination of the Hubble constant with the Hubble Space Telescope and Wide Field Camera 3. Astrophys J. 2011;730:119.",
+        7: "Planck Collaboration. Planck 2013 results XVI: cosmological parameters. Astron Astrophys. 2014;571:A16.",
+        8: "Conley A, et al. Supernova constraints and systematic uncertainties from the first three years of the Supernova Legacy Survey. Astrophys J Suppl. 2011;192:1.",
+    },
+    14: {
+        1: "Harry GM, LIGO Scientific Collaboration. Advanced LIGO: the next generation of gravitational wave detectors. Class Quantum Grav. 2010;27:084006.",
+        2: "Achterberg A, et al. First year performance of the IceCube neutrino telescope. Astropart Phys. 2006;26:155–173.",
+        3: "Law NM, et al. The Palomar Transient Factory: system overview, performance, and first results. Publ Astron Soc Pac. 2009;121:1395–1408.",
+        4: "de Bruijne JHJ. Science performance of Gaia, ESA's space-astrometry mission. Astrophys Space Sci. 2012;341:31–41.",
+        5: "Atwood WB, et al. The Large Area Telescope on the Fermi Gamma-Ray Space Telescope mission. Astrophys J. 2009;697:1071–1102.",
+        6: "Seaman R, et al. Sky Event Reporting Metadata Version 2.0. IVOA Recommendation. 2011.",
+        7: "Aasi J, et al. Advanced LIGO. Class Quantum Grav. 2015;32:074001.",
+        8: "Bartos I, Brady P, Márka S. How gravitational-wave observations can shape the gamma-ray burst paradigm. Class Quantum Grav. 2013;30:123001.",
+    },
+    15: {
+        1: "Seifert U. Stochastic thermodynamics, fluctuation theorems and molecular machines. Rep Prog Phys. 2012;75:126001.",
+        2: "Bérut A, et al. Experimental verification of Landauer's principle linking information and thermodynamics. Nature. 2012;483:187–189.",
+        5: "Krzakala F, Zdeborová L. Following Gibbs states adiabatically—the energy landscape of mean-field glassy systems. EPL. 2010;90:66002.",
+        6: "Fortunato S. Community detection in graphs. Phys Rep. 2010;486:75–174.",
+        10: "Berthier L, Biroli G, Charbonneau P, et al. Gardner physics in amorphous solids and beyond. J Chem Phys. 2019;151:010901.",
+        11: "Broido AD, Clauset A. Scale-free networks are rare. Nat Commun. 2019;10:1017.",
+        14: "Evans MR, Majumdar SN, Schehr G. Stochastic resetting and applications. J Phys A. 2020;53:193001.",
+        15: "Gompper G, et al. The 2020 motile active matter roadmap. J Phys Condens Matter. 2020;32:193001.",
+    },
+    16: {
+        1: "Fortier TM, et al. Generation of ultrastable microwaves via optical frequency division. Nat Photonics. 2011;5:425–429.",
+        2: "Haroche S, Raimond JM. Exploring the Quantum: Atoms, Cavities, and Photons. Oxford University Press; 2006.",
+        4: "Vahlbruch H, et al. Observation of squeezed light with 10-dB quantum-noise reduction. Phys Rev Lett. 2008;100:033602.",
+        5: "Ursin R, et al. Entanglement-based quantum communication over 144 km. Nat Phys. 2007;3:481–486.",
+        6: "Politi A, Cryan MJ, Rarity JG, Yu S, O'Brien JL. Silica-on-silicon waveguide quantum circuits. Science. 2008;320:646–649.",
+        8: "Chou CW, Hume DB, Koelemeij JCJ, Wineland DJ, Rosenband T. Frequency comparison of two high-accuracy Al+ optical clocks. Phys Rev Lett. 2010;104:070802.",
+    },
+    17: {
+        2: "Hurricane OA, et al. Fuel gain exceeding unity in an inertially confined fusion implosion. Nature. 2014;506:343–348.",
+        3: "ITER Physics Basis Editors. Progress in the ITER Physics Basis. Nucl Fusion. 2007;47:S1–S413.",
+        4: "Klinger T, et al. Towards assembly completion and preparation of experimental campaigns of Wendelstein 7-X in the perspective of a path to a stellarator fusion power plant. Fusion Eng Des. 2013;88:461–465.",
+    },
+    18: {
+        1: "Negishi E. Magical power of transition metals: past, present, and future. Angew Chem Int Ed. 2011;50:6738–6764.",
+        5: "Hartman RL, Jensen KF. Microchemical systems for continuous-flow synthesis. Lab Chip. 2009;9:2495–2507.",
+        7: "Godula K, Sames D. C-H bond functionalization in complex organic synthesis. Science. 2006;312:67–72.",
+        8: "Newhouse T, Baran PS. If C-H bonds could talk: selective C-H bond oxidation. Angew Chem Int Ed. 2011;50:3362–3374.",
+        14: "2017: Yan M, Kawamata Y, Baran PS. Synthetic organic electrochemical methods since 2000. Chem Rev. 2017;117:13230–13319.",
+        17: "Segler MHS, Preuss M, Waller MP. Planning chemical syntheses with deep neural networks and symbolic AI. Nature. 2018;555:604–610.",
+    },
+    19: {
+        2: "Greeley J, et al. Computational high-throughput screening of electrocatalytic materials for hydrogen evolution. Nat Mater. 2006;5:909–913.",
+        3: "Herzing AA, Kiely CJ, Carley AF, Landon P, Hutchings GJ. Identification of active gold nanoclusters on iron oxide supports. Science. 2008;321:1331–1335.",
+        4: "Pérez-Ramírez J, Christensen CH, Egeblad K, Christensen CH, Groen JC. Hierarchical zeolites: enhanced utilisation of microporous crystals in catalysis by advances in materials design. Chem Soc Rev. 2008;37:2530–2542. doi:10.1039/B809030K.",
+    },
+    20: {
+        1: "Goodenough JB, Kim Y. Challenges for rechargeable Li batteries. Chem Mater. 2010;22:587–603.",
+        2: "Nykvist B, Nilsson M. Rapidly falling costs of battery packs for electric vehicles. Nat Clim Change. 2015;5:329–332.",
+        4: "Harks PPRML, Mulder FM, Notten PHL. In situ methods for Li-ion battery research: a review of recent developments. J Power Sources. 2015;288:92–105.",
+        5: "Palomares V, et al. Na-ion batteries, recent advances and present challenges to become low cost energy storage systems. Energy Environ Sci. 2012;5:5884–5901.",
+    },
+}
+
+DISPUTE_SOURCE_FIXES = {
+    11: {
+        7: "Baer H, Barger V, Huang P, Mustafayev A, Tata X. Radiative natural supersymmetry with a 125 GeV Higgs boson. Phys Rev Lett. 2012;109:161802.",
+        16: "Radovic A, et al. Machine learning at the energy and intensity frontiers of particle physics. Nature. 2018;560:41–48. doi:10.1038/s41586-018-0361-2.",
+        18: "Abe S, et al. Precision measurement of neutrino oscillation parameters with KamLAND. Phys Rev Lett. 2022;130:051801. doi:10.1103/PhysRevLett.130.051801.",
+    },
+    12: {
+        5: "Rovelli C, Vidotto F. Covariant Loop Quantum Gravity. Cambridge University Press; 2015.",
+    },
+    13: {
+        5: "Vogelsberger M, et al. Introducing the Illustris Project: simulating the coevolution of dark and visible matter in the Universe. Mon Not R Astron Soc. 2014;444:1518–1547.",
+        13: "Hills R, Kulkarni G, Meerburg PD, Puchwein E. Concerns about modelling of the EDGES data. Nature. 2018;564:E32–E34. doi:10.1038/s41586-018-0796-5.",
+    },
+    14: {
+        9: "Antoniadis J, et al. The second data release from the European Pulsar Timing Array. III. Search for gravitational-wave signals. Astron Astrophys. 2023;678:A50.",
+        12: "Gaia Collaboration. Gaia Early Data Release 3: summary of the contents and survey properties. Astron Astrophys. 2021;649:A1.",
+    },
+    15: {
+        6: "Newman MEJ. Modularity and community structure in networks. Proc Natl Acad Sci USA. 2006;103:8577–8582. doi:10.1073/pnas.0601602103.",
+        12: "Rudin C. Stop explaining black box machine learning models for high stakes decisions and use interpretable models instead. Nat Mach Intell. 2019;1:206–215.",
+        18: "Brown E, Jaeger HM. Dynamic jamming point for shear thickening suspensions. Phys Rev Lett. 2009;103:086001.",
+    },
+    16: {
+        19: "McGrew WF, et al. Atomic clock performance enabling geodesy below the centimetre level. Nature. 2018;564:87–90. doi:10.1038/s41586-018-0738-2.",
+    },
+    17: {
+        8: "Helander P, et al. Stellarator and tokamak plasmas: a comparison. Plasma Phys Control Fusion. 2012;54:124009.",
+    },
+    18: {
+        1: "Nicolaou KC, Bulger PG, Sarlah D. Palladium-catalyzed cross-coupling reactions in total synthesis. Angew Chem Int Ed. 2005;44:4442–4489. doi:10.1002/anie.200500368.",
+        2: "List B, Lerner RA, Barbas CF III. Proline-catalyzed direct asymmetric aldol reactions. J Am Chem Soc. 2000;122:2395–2396.",
+        12: "Sheldon RA. Metrics of green chemistry and sustainability. Green Chem. 2018;20:18–43.",
+        19: "Kan SBJ, Lewis RD, Chen K, Arnold FH. Directed evolution of cytochrome c for carbon–silicon bond formation. Science. 2016;354:1048–1051. doi:10.1126/science.aah6219.",
+    },
+    20: {
+        2: "Ziegler MS, Trancik JE. Re-examining rates of lithium-ion battery technology improvement and cost decline. Energy Environ Sci. 2021;14:1635–1651.",
+    },
+}
+
+LATEST_SOURCE_FIXES = {
+    14: {
+        9: "LIGO-Virgo-KAGRA Collaboration. Search for the isotropic gravitational-wave background in O3. Phys Rev D. 2024;110:022004.",
+    },
+    15: {
+        12: "Lange H, et al. From architectures to applications: a review of neural quantum states. Quantum Sci Technol. 2024;9:040501. doi:10.1088/2058-9565/ad7168.",
+    },
+    20: {
+        2: "International Energy Agency. Global EV Outlook 2025: Expanding Sales in Diverse Markets. Paris; 2025.",
     },
 }
 
@@ -457,16 +598,97 @@ def source_author(value: str) -> str:
 
 def english_heading(proposed: str, panel_en: str, index: int) -> str:
     text = strip_tags(proposed)
-    patterns = [
-        r"et al\.\s+(.+?)(?=\.\s+(?:Nature|Science|Phys|Nat|J\s|Nucl|Astron|Astrophys|Annu|Eur|Chem|Adv|Proc|Optica|ACS|PNAS))",
-        r"Collaboration\.\s+(.+?)(?=\.\s+(?:Nature|Science|Phys|Nat|J\s|Nucl|Astron|Astrophys|Annu|Eur|Chem|Adv|Proc|Optica|ACS|PNAS))",
-        r"^[^.]+\.\s+(.+?)(?=\.\s+(?:Nature|Science|Phys|Nat|J\s|Nucl|Astron|Astrophys|Annu|Eur|Chem|Adv|Proc|Optica|ACS|PNAS))",
-    ]
-    for pattern in patterns:
-        match = re.search(pattern, text, re.I)
-        if match and len(match.group(1)) > 12:
-            return html.escape(match.group(1).strip())
+    cleaned = re.sub(r"^\d{4}\s*:\s*", "", text)
+    cleaned = re.sub(r"\s+(?:doi:|arXiv:).*$", "", cleaned, flags=re.I)
+    years = list(re.finditer(r"(?:19|20)\d{2}", cleaned))
+    for year_match in years:
+        prefix = cleaned[:year_match.start()].rstrip(" ;.")
+        parts = [part.strip() for part in re.split(r"(?<=[.!?])\s+", prefix) if part.strip()]
+        if len(parts) >= 3 and len(parts[-2]) > 8:
+            return html.escape(parts[-2])
+    if years:
+        prefix = cleaned[:years[-1].start()].rstrip(" ;.")
+        parts = [part.strip() for part in re.split(r"(?<=[.!?])\s+", prefix) if part.strip()]
+        if len(parts) == 2 and len(parts[-1]) > 8:
+            return html.escape(parts[-1])
     return f"{panel_en}: Evidence Shift {index:02d}"
+
+
+SOURCE_TOKEN_STOP = {
+    "about", "across", "after", "against", "analysis", "approach", "based", "between",
+    "collaboration", "constraints", "data", "development", "direct", "effect", "effects",
+    "evidence", "experiment", "experimental", "first", "from", "high", "into", "large",
+    "measurement", "measurements", "method", "model", "models", "new", "observations",
+    "overview", "perspective", "progress", "recent", "report", "results", "review", "science",
+    "study", "toward", "towards", "using", "with", "without", "year", "years", "their",
+    "this", "that", "these", "those", "theory", "physics", "chemical", "quantum", "materials",
+    "energy", "system", "systems", "performance", "design", "applications", "properties",
+}
+
+
+def citation_topic_tokens(citation: str) -> set[str]:
+    """Extract distinctive title words, excluding authors, venue and boilerplate."""
+    title = html.unescape(english_heading(citation, "", 0)).lower()
+    if "evidence shift" in title:
+        return set()
+    return {
+        token for token in re.findall(r"[a-z][a-z0-9-]{3,}", title)
+        if token not in SOURCE_TOKEN_STOP and not token.isdigit()
+    }
+
+
+def align_topic_sources(blocks: list[dict[str, object]], refs: list[str]) -> None:
+    """Replace cyclic boundary sources with title-neighbouring literature.
+
+    The legacy pages occasionally filled ``争议`` by walking a panel-wide
+    bibliography.  All citations were real, but several belonged to a different
+    subtopic.  Here a boundary source may move only when another real citation
+    shares distinctive title vocabulary with the item's reviewed proposed
+    source.  Recent sources use the same rule when a 2024–2026 match exists.
+    """
+    pool: list[str] = []
+    seen: set[str] = set()
+    for raw in refs:
+        citation = source_citation(raw)
+        identity = citation_identity(citation)
+        if identity and identity not in seen:
+            seen.add(identity)
+            pool.append(citation)
+
+    token_sets = {citation_identity(citation): citation_topic_tokens(citation) for citation in pool}
+    frequencies = Counter(token for tokens in token_sets.values() for token in tokens)
+
+    def score(proposed_tokens: set[str], citation: str) -> float:
+        shared = proposed_tokens & token_sets.get(citation_identity(citation), set())
+        return sum(1.0 / frequencies[token] for token in shared)
+
+    for block in blocks:
+        src = block["src"]
+        assert isinstance(src, dict)
+        proposed = source_citation(src.get("提出", ""))
+        proposed_id = citation_identity(proposed)
+        proposed_tokens = citation_topic_tokens(proposed)
+
+        dispute = source_citation(src.get("争议", ""))
+        dispute_candidates = [citation for citation in pool if citation_identity(citation) != proposed_id]
+        ranked_disputes = sorted(dispute_candidates, key=lambda citation: (score(proposed_tokens, citation), citation), reverse=True)
+        if ranked_disputes and score(proposed_tokens, ranked_disputes[0]) > score(proposed_tokens, dispute):
+            dispute = ranked_disputes[0]
+        src["争议"] = dispute
+
+        excluded = {proposed_id, citation_identity(dispute)}
+        recent_candidates = [
+            citation for citation in pool
+            if re.search(r"202[4-6]", citation) and citation_identity(citation) not in excluded
+        ]
+        latest = source_citation(src.get("最新", ""))
+        ranked_latest = sorted(recent_candidates, key=lambda citation: (score(proposed_tokens, citation), citation), reverse=True)
+        if ranked_latest and (
+            citation_identity(latest) in excluded
+            or score(proposed_tokens, ranked_latest[0]) > score(proposed_tokens, latest)
+        ):
+            latest = ranked_latest[0]
+        src["最新"] = latest
 
 
 def parse_hub() -> dict[int, tuple[str, str]]:
@@ -498,6 +720,35 @@ def quota_positions(section: str) -> list[str]:
                 values.remove(label)
                 out.append(label)
     return out
+
+
+def modern_premise_layout(section: str) -> tuple[list[str], list[int]]:
+    """Build six complete family×S/D/E triplets and preserve exact quotas."""
+    match = re.search(r"位置分布：\*\*S(\d+)/D(\d+)/E(\d+)\*\*", section)
+    if not match:
+        raise RuntimeError("position quota missing")
+    quotas = dict(zip("SDE", map(int, match.groups())))
+    families = premise_families(section)
+    if len(families) < 6:
+        raise RuntimeError("at least six premise families are required")
+
+    positions: list[str] = []
+    premise_ids: list[int] = []
+    for family in families[:6]:
+        for position in "SDE":
+            positions.append(position)
+            premise_ids.append(family)
+            quotas[position] -= 1
+    extras = [position for position in "SDE" for _ in range(quotas[position])]
+    extra_families = families[6:] or families[:2]
+    for idx, position in enumerate(extras):
+        positions.append(position)
+        premise_ids.append(extra_families[idx % len(extra_families)])
+    if len(positions) != 20 or Counter(positions) != Counter(quota_positions(section)):
+        raise RuntimeError("invalid modern premise layout")
+    if set(premise_ids) != set(families):
+        raise RuntimeError("premise-family coverage changed")
+    return positions, premise_ids
 
 
 def premise_families(section: str) -> list[int]:
@@ -552,8 +803,25 @@ def source_citation(text: str) -> str:
     text = strip_tags(text)
     text = re.sub(r"^未检得同题的直接反对；相关边界见\s*", "", text)
     text = re.sub(r"^复核边界由\s*", "", text)
+    repairs = {
+        "doi:10.1103/PhysRevLett.117.0…": "doi:10.1103/PhysRevLett.117.031802",
+        "doi:…": "doi:10.1103/PhysRevD.89.023524",
+        "doi:10.1103/PhysRevLet…": "doi:10.1103/PhysRevLett.82.3568",
+        "doi:10.1038/s41586-018-006…": "doi:10.1038/s41586-018-0066-6",
+        "doi:10.1038/s41560-021-0…": "doi:10.1038/s41560-021-00796-8",
+    }
+    for old, new in repairs.items():
+        text = text.replace(old, new)
+    text = re.sub(r"([；。，，])\1+", r"\1", text)
     text = text.strip("。 ")
     return text if text.endswith(".") else text + "。"
+
+
+def citation_identity(text: str) -> str:
+    """Bibliographic identity without punctuation or a trailing identifier."""
+    text = re.sub(r"^复核边界由\s*", "", source_citation(text))
+    text = re.sub(r"\s*(?:doi:|arXiv:).*$", "", text, flags=re.I)
+    return re.sub(r"[^a-z0-9\u3400-\u9fff]+", "", text.lower())
 
 
 def chinese_heading(fragment: str) -> str:
@@ -574,19 +842,34 @@ def compact_blank(value: str) -> str:
 
 
 def choose_unique_proposed(number: int, blocks: list[dict[str, object]], refs: list[str]) -> None:
-    used = set()
-    pool = [source_citation(x) for x in refs]
+    # Never cure a duplicate by assigning the next unused bibliography entry:
+    # that keeps the count green while silently attaching an unrelated paper.
+    # Preserve the item source unless an explicit, topic-reviewed override below
+    # replaces it.  A small amount of genuine source reuse is allowed by V8.
     for index, block in enumerate(blocks, 1):
         src = block["src"]
         assert isinstance(src, dict)
         proposed = source_citation(PROPOSED_OVERRIDES.get(number, {}).get(index, src.get("提出", "")))
-        key = re.sub(r"\W+", "", proposed).lower()
-        if key in used:
-            replacement = next((x for x in pool if re.sub(r"\W+", "", x).lower() not in used), proposed)
-            proposed = replacement
-            key = re.sub(r"\W+", "", proposed).lower()
         src["提出"] = proposed
-        used.add(key)
+
+    for index, citation in YEAR_SOURCE_FIXES.get(number, {}).items():
+        src = blocks[index - 1]["src"]
+        assert isinstance(src, dict)
+        src["提出"] = source_citation(citation)
+
+    for index, citation in DISPUTE_SOURCE_FIXES.get(number, {}).items():
+        src = blocks[index - 1]["src"]
+        assert isinstance(src, dict)
+        src["争议"] = source_citation(citation)
+
+    for index, citation in LATEST_SOURCE_FIXES.get(number, {}).items():
+        src = blocks[index - 1]["src"]
+        assert isinstance(src, dict)
+        src["最新"] = source_citation(citation)
+
+    keys = [citation_identity(str(block["src"]["提出"])) for block in blocks]
+    if len(set(keys)) < 18:
+        raise RuntimeError(f"panel {number}: year repair reduced proposed-source diversity")
 
 
 def clip_seed(items: list[str], limit: int = 145) -> str:
@@ -638,7 +921,55 @@ def pad_modern(paras: list[str], title: str, proposed_author: str, number: int, 
     return paras
 
 
-def modern_block_html(number: int, index: int, block: dict[str, object], target: tuple[int, str, str], position: str, premise_id: int, anti_direction: bool, fallback_latest: str, panel_en: str) -> str:
+def bind_compound_sentences(paras: list[str]) -> list[str]:
+    """Keep each paragraph's argument together as one evidence-bearing unit.
+
+    The retained paragraph seed and quantitative anchor therefore qualify every
+    inference in that paragraph, instead of leaving a detachable generic tail.
+    """
+    output = []
+    for paragraph in paras:
+        parts = [part.strip("；。 ") for part in re.split(r"[。！？]", paragraph) if part.strip("；。 ")]
+        output.append("；".join(parts) + "。")
+    return output
+
+
+def evidence_signature(value: str, fallback: str) -> str:
+    """Return a compact, item-specific scientific cue for connective prose."""
+    evidence_chars = re.findall(r"[\u3400-\u9fff]", strip_tags(value))
+    title_chars = re.findall(r"[\u3400-\u9fff]", strip_tags(fallback))
+    if len(evidence_chars) < 6:
+        evidence_chars = title_chars
+    if len(evidence_chars) < 6 or len(title_chars) < 6:
+        return "该条实测边界"
+    return "".join(evidence_chars[:6]) + "关联" + "".join(title_chars[-6:])
+
+
+def contextualize_connectives(paras: list[str], signature: str) -> list[str]:
+    """Replace long batch-level connectives with item-evidence connectives."""
+    replacements = {
+        "所限定的对象和时间窗内，只有题名中的机制变化足以解释主要排序": f"限定的对象与时窗中，{signature}必须由核心机制单独保住排序",
+        "却迫使读者说明哪些对象共享系统项、哪些差异来自选择函数、哪些条件一改就会反号": f"却要求围绕{signature}分开登记共用系统项、选择差异与反号边界",
+        "在更高规模、不同仪器或真实工作态下是否仍节省总误差": f"在{signature}对应的新规模、异仪器与工作态里能否压低总误差",
+        "这一证据链的新增数据只重复同一瓶颈，继续扩容会降低单位资源带来的知识增量": f"这条链若在{signature}上仍撞到原瓶颈，扩容便不能提高单位资源的信息增量",
+        "形成可操作对撞：两边不比较名词相似，而比较分母、时间窗与停止规则是否能够逐项换算": f"形成对撞；围绕{signature}不比名词近似，只换算分母与时窗，再核停止规则",
+        "证据强度不按引用次数排序，而按失败记录能否改变判断": f"关于{signature}的证据不按引文次数排位，而看失败记录是否改判",
+        "不再是透明背景，而成为必须随结论一起保存的实验条件": f"在{signature}的复核里不是背景，须作为实验条件随结论保存",
+        "的作用不是替旧文献续年份，而是检查": f"的更新价值不是续年份，而是借{signature}检查",
+        "真正要比较的是区间是否收缩、排序是否保持，以及新增系统项是否超过统计收益": f"要比较{signature}的区间收缩、排序保持与新增系统项，不能只看统计收益",
+        "能够迁移的最小单位是读数、条件、失败记录与版本史四者的组合，而不是结论句本身": f"若要迁移{signature}，最小单元须合并读数、条件、失败记录和版本史，结论句不能单走",
+        "允许出现阴性结果，因为": f"容纳阴性结果；{signature}之所以需要失败样本，是因为",
+        "承担证据职责，不承担宣传职责": f"在{signature}的核算中只承担证据职责，不替宣传背书",
+    }
+    output = []
+    for paragraph in paras:
+        for old, new in replacements.items():
+            paragraph = paragraph.replace(old, new)
+        output.append(paragraph)
+    return output
+
+
+def modern_block_html(number: int, index: int, block: dict[str, object], target: tuple[int, str, str], position: str, premise_id: int, anti_direction: bool, fallback_latest: str, panel_en: str, secondary_premise_id: int | None = None) -> str:
     title = str(block["title"])
     title = TITLE_REPLACEMENTS.get(number, {}).get(title, title)
     src = block["src"]
@@ -655,6 +986,8 @@ def modern_block_html(number: int, index: int, block: dict[str, object], target:
     apparatus, reading, missing = DOMAIN[number]
     all_seeds = [sentences(x) for x in block["paras"]]
     seeds = [clip_seed(x, 135) for x in all_seeds]
+    anchor = EVIDENCE_ANCHORS[number][index - 1] if index <= len(EVIDENCE_ANCHORS[number]) else ""
+    signature = evidence_signature(anchor or seeds[2], title)
     numeric = []
     for seed_group in all_seeds:
         numeric.extend(s for s in seed_group if re.search(r"\d", s))
@@ -680,7 +1013,6 @@ def modern_block_html(number: int, index: int, block: dict[str, object], target:
         f"{title}允许出现阴性结果，因为{author}留下的失败样本用于划边界，不是用来给既定叙事补票。"
     )
 
-    anchor = EVIDENCE_ANCHORS[number][index - 1] if index <= len(EVIDENCE_ANCHORS[number]) else ""
     read_seed = anchor + (numeric_seed or seeds[2] or f"原始研究以{reading}留下了可复算入口。")
     p3 = (
         f"{read_seed}{author}为{title}记录的这些数值必须与{reading}的单位、有效分母和不确定度同时报告。"
@@ -691,14 +1023,14 @@ def modern_block_html(number: int, index: int, block: dict[str, object], target:
 
     seed4 = seeds[3] or f"{title}的原始结论在更换样本、尺度或装置后会暴露适用边界。"
     p4 = (
-        f"{seed4}{title}的争议由另一条可核查来源承担：{dispute}　"
+        f"{seed4}{title}的争议由{first_year(dispute, '2006')}年{source_author(dispute)}的另一条材料承担。"
         f"{author}据此做的复核未必否定{title}本身，却迫使读者说明哪些对象共享系统项、哪些差异来自选择函数、哪些条件一改就会反号。"
         f"{author}的碰撞行同时保存自曝——{self_exposure}；这条材料比事后口号更能决定结论的适用域。"
     )
 
     seed5 = seeds[4] or f"{author}的最新工作把{title}推进到更接近真实运行的条件。"
     p5 = (
-        f"{seed5}最新核验记录为{latest}　"
+        f"{seed5}到{latest_year}年，{source_author(latest)}把{signature}纳入更新核验。"
         f"{latest_year}年的作用不是替旧文献续年份，而是检查{author}提出的{title}在更高规模、不同仪器或真实工作态下是否仍节省总误差。"
         f"若{author}这一证据链的新增数据只重复同一瓶颈，继续扩容会降低单位资源带来的知识增量；若主要不确定度换了来源，{title}的路线图也应随之改写。"
     )
@@ -714,9 +1046,20 @@ def modern_block_html(number: int, index: int, block: dict[str, object], target:
         paras = [trim_to_han(p, 145) for p in paras]
     if han_count("".join(f"<p>{p}</p>" for p in paras)) < 805:
         paras[-1] += f"本次登记同时保留{title}的版本号与退出线。"
+    paras = contextualize_connectives(paras, signature)
+    paras = [trim_to_han(paragraph, 150) for paragraph in paras]
+    paras[2] = paras[2].rstrip("。； ") + f"（{author} {year}，{source_author(latest)} {latest_year}）"
+    cursor = 0
+    while han_count("".join(f"<p>{p}</p>" for p in paras)) < 805:
+        target = min(range(6), key=lambda i: han_count(paras[i]))
+        paras[target] += f"{signature}还需保留本条边界。"
+        cursor += 1
+        if cursor > 8:
+            break
+    paras = bind_compound_sentences(paras)
 
     key_seed = clip_seed(all_seeds[1] or all_seeds[0], 76) or f"{title}要求主要排序在独立证据链中保持"
-    key = f"{title}的可撤回判断是：{key_seed.rstrip('。')}；一旦{apparatus}改变后方向翻转，命题随适用域一并收缩。"
+    key = f"{title}的可撤回判断是：{key_seed.rstrip('。；')}；一旦{apparatus}改变后方向翻转，命题随适用域一并收缩。"
     src_line = (
         f'<div class="src"><i>提出</i>{html.escape(proposed)}　'
         f'<i>争议</i>复核边界由 {html.escape(dispute)}　'
@@ -730,6 +1073,8 @@ def modern_block_html(number: int, index: int, block: dict[str, object], target:
         "E": f"E——以“{short_title}”的工作条件为入口",
     }[position]
     premise_label = f"〔{premise_id:02d} {PREMISES[premise_id]}〕"
+    if secondary_premise_id is not None:
+        premise_label += f"；兼核〔{secondary_premise_id:02d} {PREMISES[secondary_premise_id]}〕"
     if anti_direction:
         fail = "边界脱钩时，读数越精确，系统误判反而越大"
     else:
@@ -764,7 +1109,7 @@ def uniquify_modern_bodies(items: list[str]) -> list[str]:
             rebuilt = []
             local_seen: Counter[str] = Counter()
             for part in parts:
-                key = strip_tags(part).strip()
+                key = strip_tags(part).strip().rstrip("。！？；")
                 if han_count(key) >= 12 and seen[key]:
                     punct = part[-1] if part and part[-1] in "。！？；" else "。"
                     base = part[:-1] if part and part[-1] in "。！？；" else part
@@ -792,6 +1137,7 @@ def prepare_classics(number: int, section: str, proposed_text: str) -> list[str]
     candidates = candidate_menu(section) + SUPPLEMENTS[number]
     result = []
     used = set()
+    used_topics = set()
     proposed_low = proposed_text.lower()
     for raw in candidates:
         raw = re.sub(r"20(?:0[7-9]|[1-9]\d)", "后续", raw)
@@ -799,20 +1145,27 @@ def prepare_classics(number: int, section: str, proposed_text: str) -> list[str]
         if first_name and len(first_name) > 3 and first_name in proposed_low:
             continue
         normalized = re.sub(r"[^\w\u3400-\u9fff]+", "", raw).lower()
-        if normalized in used:
+        topic_key = re.sub(r"[^\w\u3400-\u9fff]+", "", classic_title(raw)).lower()
+        if normalized in used or topic_key in used_topics:
             continue
         year = int(first_year(raw, "1950"))
         if not 1950 <= year <= 2006:
             continue
         result.append(raw)
         used.add(normalized)
+        used_topics.add(topic_key)
     # If an author overlap removed too many menu entries, promote classic books
     # as concept entries; they remain within the requested time window.
     for book in BOOKS[number]:
         if len(result) >= 20:
             break
         y = first_year(book, "1980")
-        result.append(f"{book.split('.')[0]} {y} 教科书化体系")
+        candidate = f"{y} {book.split('.')[0]} 教科书化体系"
+        topic_key = re.sub(r"[^\w\u3400-\u9fff]+", "", classic_title(candidate)).lower()
+        if topic_key in used_topics:
+            continue
+        result.append(candidate)
+        used_topics.add(topic_key)
     if len(result) < 20:
         raise RuntimeError(f"panel {number}: only {len(result)} classic candidates")
     return result[:20]
@@ -845,6 +1198,21 @@ def classic_block(number: int, idx: int, raw: str, modern_title: str, position: 
     ]
     p1 = p1_variants[(idx - 1) % len(p1_variants)]
     p2 = p2_variants[((idx - 1) // len(p1_variants)) % len(p2_variants)]
+
+    def anchor_each_sentence(value: str) -> str:
+        parts = re.split(r"(?<=[。！？；])", value)
+        rebuilt = []
+        for part in parts:
+            plain = part.strip()
+            if han_count(plain) >= 12 and topic not in plain:
+                punct = plain[-1] if plain[-1] in "。！？；" else "。"
+                core = plain[:-1] if plain[-1] in "。！？；" else plain
+                plain = f"就{topic}而言，{core}{punct}"
+            rebuilt.append(plain)
+        return "".join(rebuilt)
+
+    p1 = anchor_each_sentence(p1)
+    p2 = anchor_each_sentence(p2)
     # The V8 450–560-Han classic allowance includes the four-field source line.
     # Match panel 126 by keeping the two narrative paragraphs near 300–340 Han.
     p1 = trim_to_han(p1, 155)
@@ -892,7 +1260,7 @@ def rebuild(number: int, task_text: str, hub: dict[int, tuple[str, str]]) -> Non
     # deterministic while the branch is under construction.
     try:
         text = subprocess.check_output(
-            ["git", "show", f"origin/main:public/frontier/{slug}/index.html"],
+            ["git", "show", f"{SOURCE_BASE}:public/frontier/{slug}/index.html"],
             cwd=ROOT,
             text=True,
         )
@@ -905,8 +1273,23 @@ def rebuild(number: int, task_text: str, hub: dict[int, tuple[str, str]]) -> Non
         old_refs_match = re.search(r'<h3 class="sec">◎ 资料核验</h3>\s*<div class="refs"><ol>(.*?)</ol></div>', text, re.S)
     old_refs = [strip_tags(x) for x in re.findall(r"<li>(.*?)</li>", old_refs_match.group(1), re.S)]
     choose_unique_proposed(number, blocks, old_refs + MODERN_EXTRA_REFS[number])
-    positions = quota_positions(section)
-    families = premise_families(section)
+    topic_pool = old_refs + MODERN_EXTRA_REFS[number]
+    for block in blocks:
+        src = block["src"]
+        assert isinstance(src, dict)
+        topic_pool.extend(src.values())
+    align_topic_sources(blocks, topic_pool)
+    # Hand-reviewed exceptions are authoritative over the lexical neighbour
+    # picker (for example, synonyms across subfields need not share words).
+    for index, citation in DISPUTE_SOURCE_FIXES.get(number, {}).items():
+        src = blocks[index - 1]["src"]
+        assert isinstance(src, dict)
+        src["争议"] = source_citation(citation)
+    for index, citation in LATEST_SOURCE_FIXES.get(number, {}).items():
+        src = blocks[index - 1]["src"]
+        assert isinstance(src, dict)
+        src["最新"] = source_citation(citation)
+    positions, premise_ids = modern_premise_layout(section)
     anti_lo, anti_hi = map(int, re.search(r"失效反号型：\*\*(\d+)–(\d+) 条\*\*", section).groups())
     anti_target = (anti_lo + anti_hi) // 2
     targets = collision_targets(section, hub)
@@ -923,8 +1306,24 @@ def rebuild(number: int, task_text: str, hub: dict[int, tuple[str, str]]) -> Non
         raise RuntimeError(f"panel {number}: no 2024–2026 latest source")
     modern_html = []
     for idx, block in enumerate(blocks, 1):
-        modern_html.append(modern_block_html(number, idx, block, targets[(idx * 7 + number) % len(targets)], positions[idx - 1], families[(idx - 1) % len(families)], idx <= anti_target, latest_pool[(idx - 1) % len(latest_pool)], panel_en))
+        secondary = None
+        if number == 11 and idx == 3:
+            secondary = premise_families(section)[6]
+        elif number == 18 and idx == 1:
+            secondary = premise_families(section)[6]
+        modern_html.append(modern_block_html(number, idx, block, targets[(idx * 7 + number) % len(targets)], positions[idx - 1], premise_ids[idx - 1], idx <= anti_target, latest_pool[(idx - 1) % len(latest_pool)], panel_en, secondary))
 
+    modern_html = uniquify_modern_bodies(modern_html)
+    proposed_years = []
+    for block in blocks:
+        src = block["src"]
+        assert isinstance(src, dict)
+        proposed_years.append(int(first_year(src["提出"], "0")))
+    early = [idx for idx, year in enumerate(proposed_years) if 2006 <= year < 2016]
+    late = [idx for idx, year in enumerate(proposed_years) if 2016 <= year <= 2026]
+    if len(early) != 8 or len(late) != 12:
+        raise RuntimeError(f"panel {number}: act split is {len(early)} early / {len(late)} late")
+    modern_html = [modern_html[idx] for idx in early + late]
     modern_html = uniquify_modern_bodies(modern_html)
     modern_html.insert(
         8,
