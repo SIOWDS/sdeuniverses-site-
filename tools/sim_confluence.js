@@ -167,14 +167,19 @@ function sseFor(text) {
 /* ---------------- 起一个页面 ---------------- */
 async function boot(opts) {
   opts = opts || {};
-  const ctx = { calls: [], errors: [], saved: [], webQ: [], frontHub: 0, frontPanel: [], nbrQ: [], pulls: [], webBody: [],
+  const ctx = { calls: [], errors: [], saved: [], webQ: [], frontHub: 0, frontPanel: [], pickSkill: 0, nbrQ: [], pulls: [], webBody: [],
                 pickOpt: opts.pickOpt, shortRewrite: opts.shortRewrite, lowScore: opts.lowScore, weakGate: opts.weakGate, drafts: [], nbrLive: 0, nbrPeak: 0, nbrAborted: 0 };
   const vc = new VirtualConsole();
   vc.on('jsdomError', e => ctx.errors.push('jsdomError: ' + (e && e.message)));
   vc.on('error', (...a) => ctx.errors.push('console.error: ' + a.join(' ')));
   const answer = opts.answer || (u => defaultAnswer(u, ctx));
 
-  function makeFetch() {
+  const PICK_SKILL_REAL = (function(){
+  try { return fs.readFileSync(require('path').resolve(__dirname, '../public/taste/assets/sde-source-picking.txt'), 'utf8'); }
+  catch (e) { return ''; }
+})();
+
+function makeFetch() {
     return function (url, init) {
       url = String(url); init = init || {};
       const J = o => Promise.resolve({ ok: true, status: 200, json: () => Promise.resolve(o), text: () => Promise.resolve(JSON.stringify(o)) });
@@ -203,6 +208,9 @@ async function boot(opts) {
       if (url.indexOf('catalog.json') >= 0) return J(CATALOG);
       if (url.indexOf('publications.json') >= 0) return J(STUDENTS);
       if (url.indexOf('sde-neigong.txt') >= 0) return T(FAKE_NEIGONG);
+      /* 这一路喂**真资产**而不是假文本：调令里送的是 Skill 全文，
+         所以下面那几条断言同时也在守 Skill 本身——谁把六条问句或大类表删了，这里当场红。 */
+      if (url.indexOf('sde-source-picking.txt') >= 0) { ctx.pickSkill++; return T(PICK_SKILL_REAL); }
       if (url.indexOf('sde-collide-heart.txt') >= 0) return T('二阶碰撞心法：先找矛盾再找高分。'.repeat(80));
       if (url.indexOf('sde-innovation-iq.txt') >= 0) return T('创新智商评分标尺：五维 S/D/E/I/F。'.repeat(80));
       if (url.indexOf('/api/kb/retrieve') >= 0) return opts.kbFail ? BAD(500) : J({ block: '【站内材料】假的检索块' });
@@ -423,6 +431,32 @@ function userOf(c, re) { const x = c.calls.filter(k => re.test(k.user)); return 
       hos && /本次是闭库跑/.test(hos.user) && /检索不足，未核验/.test(hos.user));
     ok('并写死了「检索不足」不许写成「未找到」', hos && /不许写成「未找到」/.test(hos.user));
     ok('全程无 JS 错误', c.errors.length === 0, c.errors.join(' | '));
+  });
+
+  await step('三之三、选源两把尺子：语汇族距离进了定学科与体检两格', async () => {
+    /* 这一条的来由是一次真跑的失手：机器定了 战略管理 × 公共管理与政府治理 × 经济社会学，
+       位置三分做得漂亮而三门同属一个学术共同体。位置三分是必要不是充分——
+       第二把尺子（三门必须来自三个不同的知识生产共同体）此前一处都没写。 */
+    const disc = userOf(c2, /定出\*\*三个学科\*\*/);
+    /* 认的是那张编号问句表本身，不是「投同一批期刊」这种在别处也出现的词——
+       第一次写松了，变异检验（把编号表整段删掉）没红，才发现认错了地方。 */
+    const SIX = ['会不会投同一批期刊', '会不会在同一个学会的年会上碰面', '会不会互相引用',
+                 '共用同一批奠基人吗', '核心名词有没有三个以上是同一个词', '会不会在同一个学院'];
+    ok('定学科的调令里有那六条编号问句', disc && SIX.every(x => disc.user.indexOf(x) >= 0),
+       disc ? SIX.filter(x => disc.user.indexOf(x) < 0).join('／') : '没抓到调令');
+    ok('定学科的调令写死了 ≥2 条就换源', disc && /命中 ≥2 条即判同族，必须换源/.test(disc.user));
+    ok('定学科的调令要求三门落在三个不同大类', disc && /三个不同的大类/.test(disc.user));
+    ok('定学科的调令改了次序：先写占位句再找行当',
+      disc && /不要先想学科/.test(disc.user) && /每天在处理这一句/.test(disc.user));
+    ok('五个坏味道在调令里', disc && /三门的名字里有同一个词/.test(disc.user));
+    ok('实务行当被点名为最容易漏的一类源', disc && /实务行当/.test(disc.user));
+    const gate = userOf(c2, /走四道闸/);
+    ok('体检里立了闸零之二', gate && /闸零之二 · 语汇族距离/.test(gate.user));
+    ok('闸零之二要逐对报命中条数', gate && /一×二 命中 N 条/.test(gate.user));
+    ok('两道闸任一不过一律换源', gate && /闸零与闸零之二任一不过一律换源/.test(gate.user));
+    ok('写明了「位置三分成立而这一道不过」是最容易被放行的坏组合',
+      gate && /最容易被放行的一种坏组合/.test(gate.user));
+    ok('选源 Skill 资产被取过', c2.pickSkill >= 1, '实际 ' + c2.pickSkill + ' 次');
   });
 
   await step('四、问题穿进了每一格的 system（不是只在定源那一格）', async () => {
