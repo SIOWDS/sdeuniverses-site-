@@ -4596,7 +4596,7 @@ async function askCore(request, env, url, body, SINK) {
 
   // 模式：answer（默认问答）/ recommend（答后点击①·推荐阅读）/ paper（答后点击②·成文一篇，两段续写）
   // 模式：answer / recommend（推荐阅读）/ paper（成文一篇）/ iq（创新智商盲评）/ polish（打磨修改）
-  const _MODES = { recommend: 1, paper: 1, iq: 1, polish: 1, distill: 1, collide: 1, synth: 1, nextq: 1 };
+  const _MODES = { recommend: 1, paper: 1, iq: 1, polish: 1, distill: 1, collide: 1, synth: 1, nextq: 1, rounds: 1 };
   const mode = _MODES[body.mode] ? body.mode : "answer";
   const part = body.part === 2 ? 2 : 1;
 
@@ -4695,7 +4695,7 @@ async function askCore(request, env, url, body, SINK) {
   // 评分者一旦被 SDE 内功装载，就会对 SDE 语言过敏性加分，正是「评分者五偏差」里的过度通胀。
   // 「高超智慧」＝每次调用都装内功＋心得＋方法论。除 iq（盲评者刻意裸机，装了会对 SDE 语言过敏性加分）之外，
   // 涌现流水线的每一环——三观点、二阶碰撞、综合提炼、成文、打磨——一律走深度档。
-  const deep = body.deep === true || mode === "paper" || mode === "polish" || mode === "distill" || mode === "collide" || mode === "synth";
+  const deep = body.deep === true || mode === "paper" || mode === "polish" || mode === "distill" || mode === "collide" || mode === "synth" || mode === "rounds";
   const _lightDeep = (mode === "distill" || mode === "collide" || mode === "synth");
   const K = mode === "recommend" ? 48 : (_lightDeep ? 40 : (deep ? 120 : 20));              // 取多少块（深度档广撒网；retrieve 只收相关块、clamp 兜底，窄问题不会被噪声塞满）
   const CTX_MAX = _lightDeep ? 14000 : (deep ? 50000 : 12000);   // 《站内资料》字数上限
@@ -5083,6 +5083,48 @@ async function askCore(request, env, url, body, SINK) {
       + "⑤ 结尾那个升维追问要顺着这几轮的走向出，让下一轮能真往前推，而不是换个话题。";
   }
 
+  // ===== 成批问对：五轮装在一次调用里 =====
+  // [stated] 用户 2026-08-09：「你应该将每 5 次回答放在一次调用里面回答……即 5 次回答都在一次调用里面思考。」
+  // 他说得对，而且这一刀正好治住前面那串故障的根：**思考是按"次调用"付费的，不是按"轮"付费的**。
+  // 一轮一次调用时，每一次都要重新装内功、重新推演一遍（实测一次深度问答思考 10,044 字），
+  // 十轮就白付十遍；而每一次里思考与正文又抢同一份 max_tokens，抢输的那次就是屏幕上那个「0 字」。
+  // 五轮装进一次调用：内功装一遍、检索跑一遍、推演一遍，正文连着写五段——
+  // 省掉的不只是钱和时间，更是**十次独立的失败机会**（每一次调用都是一次可能哑火的机会）。
+  if (mode === "rounds") {
+    MAXTOK = 32000;   // 阶梯降档位；首发走 WDS_TOK_HEAVY（满额）——五轮连写要六千到九千字
+    const from = Math.max(1, Math.min(10, parseInt(body.from, 10) || 1));
+    const n = Math.max(2, Math.min(5, parseInt(body.n, 10) || 5));
+    const steps = [];
+    for (let i = 0; i < n; i++) {
+      const no = from + i;
+      if (no > 10) break;
+      if (no === 1) steps.push("第 1 轮【读者自己那一问】：原样使用读者交来的那个问题，一个字都不要改写，然后作答。");
+      else {
+        const L = AUTO_LADDER.find((x) => x.n === no);
+        steps.push(L ? ("第 " + no + " 轮【" + L.k + "】：" + L.task) : ("第 " + no + " 轮：把上一轮再逼深一层。"));
+      }
+    }
+    sys = (neigong ? neigong + "\n\n═══════════\n【你此前带着上面这套完整底盘先验、亲手写下并已内化的心得】\n" + (reflect || "（心得暂缺）") + "\n\n═══════════\n" : "")
+      + "你是一位以 SDE 方法论为隐性引擎的资深学者。读者交给你一个问题，要你**一口气把它逼深 " + n + " 轮**："
+      + "每一轮你先替读者问出那一句该问的话，再自己作答；下一轮必须踩着上一轮的答案往下走。"
+      + "\n\n【本次这 " + n + " 轮各自的追问动作（写死的，不许换）】\n" + steps.join("\n")
+      + "\n\n【硬性纪律】"
+      + "① **每一轮都必须真的往前走一步**：补一个反例、切一条更细的差异、或把上一轮的结论逼到它开始失效的边界——三者至少做到一样，并且要让读者看得出这一步走在哪。五轮若只是同一判断的五种说法，本次即作废。"
+      + "② 前面轮次写过的段落一律不许重写，同一个概念不必再定义第二遍；每一轮开头第一句先接住上一轮的落点，但绝不复述。"
+      + "③ 问句要扣住上一轮的**具体说法**（可以引用其中的字眼），不许写成换个题目也照样成立的通用问法；每句问句不超过 60 字。"
+      + "④ 用平实现代汉语作答，不堆术语（三视角是你的思考脚手架，不是答案骨架），正文不得出现「S 维度／D 维度／E 维度」「三视角」这类内部环节词。"
+      + "⑤ 可核验事实（书名、逐字引文、章节页码、数据）绝不编造；引用《站内资料》标（来源：篇名），只有逐字来自原文的句子才可加引号。凡超出资料的推演标「（推断）」。"
+      + "⑥ **每一轮 1200–1800 字**，五轮合计约六千到九千字。写完最后一轮就停笔，不做总结、不写结语。"
+      + "\n\n【交付格式——机器要按这两个标记切分，一个字都不能改】\n"
+      + "〔第N轮·问〕后面紧跟那一句问句，单独成行；\n"
+      + "〔第N轮·答〕单独成行，随后是该轮正文。\n"
+      + "除这两种标记外不写任何标题，不用 Markdown（不写 #、不写 **、不画表格）。";
+    usrOverride = "《站内资料》\n" + (ctxText.slice(0, 40000) || "（未检索到相关段落）")
+      + "\n\n《读者的缘起之问》\n" + originQ
+      + (histTxt ? "\n\n《此前已经走过的轮次（不许重写，只许接着走）》\n" + histTxt : "")
+      + "\n\n———\n请从第 " + from + " 轮开始，连写 " + n + " 轮。";
+  }
+
   // ===== 涌现流水线第一环：每轮三观点 =====
   // 一轮一个答案，无论多深，都是一条线；碰撞需要的是三条互相不服的线。
   // 三观点在一次调用里出（不是三次），既省调用又保证它们是彼此知情地分歧，而不是三份独立的自说自话。
@@ -5120,7 +5162,9 @@ async function askCore(request, env, url, body, SINK) {
   // 用户要的是「每一次调用都要 MaxToken」，那就把预算给满、把思考关掉，让 64000 全部变成正文——
   // ② 已经证明：给满预算时它交出来的本来就是关思考那一遍写的，只是白等了两分钟。
   // iq／distill 不在此列：它们开着思考在满预算下跑得通（iq 实测 99 秒交出完整评分卡），思考对它们有用。
-  const _plainLong = _topPower;
+  // rounds 与长文同一口径：满预算 ＋ 关思考。五轮连写要六千到九千字，
+  // 若还让它先推演一遍，实测就是"写不完被墙杀掉"那条路。
+  const _plainLong = _topPower || mode === "rounds";
   const _VCX = _topPower ? { url: VC.url, model: VC.model, name: VC.name } : VC;
   // [stated] 用户 2026-08-09：「DeepSeek 可以非常长的，用最高级配置」——**照做后当场跑出反例，故改成有界的最高档**。
   // 真跑记录（同日，全部线上）：
@@ -5152,10 +5196,10 @@ async function askCore(request, env, url, body, SINK) {
   if (_deepAns) MAXTOK = 8000;
   // distill 在同一轮真跑里露出同一个病：思考 8,977 字 / 正文 0，靠关思考兜底才交出那 2,861 字入口资料。
   // 它是整条产线的枢纽（论文水平主要由这份资料定），不该常年靠最后一道保险活着。
-  const _heavy = (_topPower || mode === "iq" || mode === "distill" || _deepAns);
+  const _heavy = (_topPower || mode === "iq" || mode === "distill" || mode === "rounds" || _deepAns);
   // 满功率档（成文／打磨）用 wdsLadder 自带的 [want,32000,16000]；
   // iq 不挂满功率，但同样首发最高档，所以自带一条阶梯；其余模式保持各自原有的那一个数不变。
-  const _ladder = _topPower ? [WDS_TOK_HEAVY, 32000, 16000]
+  const _ladder = (_topPower || mode === "rounds") ? [WDS_TOK_HEAVY, 32000, 16000]
     : _deepAns ? [8000, 6000, 4000]
     : ((mode === "iq" || mode === "distill") ? [WDS_TOK_HEAVY, 12000, 8000]
       : [MAXTOK, Math.min(32000, MAXTOK), Math.min(12000, MAXTOK)].filter((v, i, a) => v > 0 && a.indexOf(v) === i));
@@ -5169,7 +5213,7 @@ async function askCore(request, env, url, body, SINK) {
   // 兜底重跑：关思考＋降档，逼它早点停下推演开始写。但长文模式不能降到 4000——
   // 实测 4000 tok 交出来的是一篇断在半句上的稿（线上原样：6,847 字，末句「但他输光」）。
   // 长文首发本来就已经是「满预算＋关思考」，重跑与它同形，只降一档预算逼它早点收笔。
-  const _retryTok = _topPower ? 16000 : Math.min(MAXTOK, 6000);
+  const _retryTok = (_topPower || mode === "rounds") ? 16000 : Math.min(MAXTOK, 6000);
   const _msgs = [{ role: "system", content: sys }, { role: "user", content: usr }];
   // 调基底（境内直连）。自带 Key：仅在内存中转发调用，绝不存储/记录（同 llm-proxy 纪律）
   let upstream;
