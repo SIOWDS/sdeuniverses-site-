@@ -182,6 +182,9 @@ select.model-select{max-width:340px}
       <span class="small" style="flex:1;min-width:250px;color:var(--muted)">自测句：把「__ 与 __ 的矛盾驱动了 __ 改变」填实——填得进去就是 Why 题。</span>
     </div>
     <label class="small" style="display:flex;gap:6px;align-items:center;margin:12px 0 6px">
+      <input type="checkbox" id="cUsePanel" style="width:auto" checked> 从<b>新思想前沿</b>的 626 块面板取材（<b>首选</b>：每条带真出处与八字段供料层，位置与自曝两栏只有这一路供得出）
+    </label>
+    <label class="small" style="display:flex;gap:6px;align-items:center;margin:12px 0 6px">
       <input type="checkbox" id="cUseKB" style="width:auto" checked> 同时从<b>站内库</b>取材（全站语料＋近邻名单；三家里允许有一家来自站内，站内源会抓全文，材料比检索到的厚）
     </label>
     <label class="small" style="display:flex;gap:6px;align-items:center;margin:6px 0">
@@ -974,6 +977,63 @@ const ST = { mode:'X', sources:[], out:{}, outline:'', article:'', score:null, r
              redoFrom:null, rounds:0, termRetry:0, termFix:null, notes:[],
              spineRows:[], conflict:'', truncated:false,
              coined:'', finalName:'', nbrWhy:'', nbrMissed:null, nameFix:null, nbrRetry:0, nbrRetry2:0 };
+
+
+/* ===================== 新思想前沿 · 面板供料层 =====================
+   这是本机与另外三台机器最实质的一处分别：站内语料与近邻名单给的是「本站说过什么」，
+   而 /frontier/ 那 626 块面板带的是**为碰撞而写的八字段供料层**——
+   每条 .src 有〔提出／争议／最新／关键〕四笔真出处，每条 .col 有
+   〔位置／单因／预设／量纲／失效／自曝／空栏／异名〕八字段。
+   工序 1（选源）要的位置三分、工序 3（抽脊）要的三条硬话、
+   工序 7.5 要的「三家之一自己的自曝」，这一层直接供得出，不必去猜。 */
+async function frontierCat(){
+  if(window.__FRONTCAT) return window.__FRONTCAT;
+  try{
+    const r = await fetch('/frontier/', {cache:'force-cache'});
+    if(!r.ok) return (window.__FRONTCAT = []);
+    const h = await r.text();
+    const out = [], re = /<a class="tile done" href="\/frontier\/([^"]+)\/"[^>]*>([\s\S]*?)<\/a>/g;
+    let m;
+    while((m = re.exec(h))){
+      const num = /class="num">(\d+)</.exec(m[2]), nm = /class="nm">([^<]+)</.exec(m[2]);
+      if(num && nm) out.push({ n: parseInt(num[1],10), name: nm[1].trim(), slug: m[1] });
+    }
+    return (window.__FRONTCAT = out);
+  }catch(e){ return (window.__FRONTCAT = []); }
+}
+/* 抽一块面板的供料层：条目标题 ＋ .src 四笔 ＋ .col 八字段。
+   只取前 maxN 条——整块两万多字，全塞进去会把后面的工序挤没额度。 */
+async function frontierPanel(slug, maxN){
+  try{
+    const r = await fetch('/frontier/'+slug+'/', {cache:'force-cache'});
+    if(!r.ok) return '';
+    const doc = new DOMParser().parseFromString(await r.text(), 'text/html');
+    const h2s = [...doc.querySelectorAll('h2')];
+    const rows = [];
+    for(const h of h2s){
+      if(rows.length >= (maxN||8)) break;
+      const t = (h.textContent||'').replace(/\s+/g,' ').trim();
+      let src = '', col = '';
+      let el = h.nextElementSibling;
+      for(let k=0; k<3 && el; k++, el = el.nextElementSibling){
+        if(el.classList && el.classList.contains('src')) src = (el.textContent||'').replace(/\s+/g,' ').trim();
+      }
+      el = h.nextElementSibling;
+      for(let k=0; k<12 && el; k++, el = el.nextElementSibling){
+        if(el.tagName === 'H2') break;
+        if(el.classList && el.classList.contains('col')) col = (el.textContent||'').replace(/\s+/g,' ').trim();
+      }
+      if(!src && !col) continue;
+      rows.push('· '+t.slice(0,90)+(src?('\n  〔来源〕'+src.slice(0,320)):'')+(col?('\n  〔碰撞行〕'+col.slice(0,320)):''));
+    }
+    return rows.join('\n');
+  }catch(e){ return ''; }
+}
+/* 目录压成可以塞进提示词的一行一块。626 块约 6KB，够用而不至于挤掉别的材料。 */
+function frontierCatBlock(cat){
+  if(!cat || !cat.length) return '';
+  return cat.map(x=>x.n+' '+x.name).join('　');
+}
 
 /* ===================== 面板 ===================== */
 const panels = {};
@@ -2714,12 +2774,15 @@ async function doSelectConf(){
   const q = confQ();
   if(q.length < 4) throw new Error('先写清你要解决的那个问题。');
   const useKB = !!($('cUseKB') && $('cUseKB').checked);
+  const usePanel = !!($('cUsePanel') && $('cUsePanel').checked);
   const useWeb = true;
   const skey = ($('cSiteKey') && $('cSiteKey').checked) ? '' : ((($('cSkey')||{}).value)||'').trim();
   const locked = confDiscs();
 
   /* 一、定三个学科，并给每科一条检索词（锁定的照抄，不许换） */
   setStat(id, '<span class="spinner"></span> 定三个学科与检索词', 'run');
+  const CAT = usePanel ? await frontierCat() : [];
+  if(usePanel && !CAT.length) note('新思想前沿面板目录这次没取到——本格改用原来的两路取材，不影响往下走。');
   const dp = [
     '要解决的问题：'+q,
     ST.qtype ? ('题型：'+ST.qtype+'——要的答案是 '+TYPE_SHAPE[ST.qtype]) : '',
@@ -2734,16 +2797,36 @@ async function doSelectConf(){
     '· 要能搜到**有名有姓的理论或有争论的文献**——加上学科名、理论名、"理论""争论""critique"这类词；',
     '· 每条 ≤ 14 个字（搜索引擎超长了召回反而差）。',
     '',
+    CAT.length ? '【本站「新思想前沿」的可选学科池（编号 学科名，共 '+CAT.length+' 块）】' : '',
+    CAT.length ? '这一栏里的每一块都带**为碰撞而写的供料层**：每条新思想都有真出处（提出／争议／最新／关键），' : '',
+    CAT.length ? '并标好了它占哪个位置、它的预设是什么、它的读数带不带分母、它在什么条件下失效、它自己承认的弱点是什么。' : '',
+    CAT.length ? '**三门里能从这个池子里挑的就从这里挑**——从这里挑到的材料，比联网搜来的摘要厚一个量级，也是唯一能直接供出「位置」与「自曝」的一路。' : '',
+    CAT.length ? '池子里实在没有对口的那一门，才写 0（表示这一门走联网）。' : '',
+    CAT.length ? frontierCatBlock(CAT) : '',
+    CAT.length ? '' : '',
     '输出正好三行，每行形如：',
-    '1｜学科名｜检索词',
-    '2｜学科名｜检索词',
-    '3｜学科名｜检索词',
+    CAT.length ? '1｜面板编号或0｜学科名｜检索词' : '1｜学科名｜检索词',
+    CAT.length ? '2｜面板编号或0｜学科名｜检索词' : '2｜学科名｜检索词',
+    CAT.length ? '3｜面板编号或0｜学科名｜检索词' : '3｜学科名｜检索词',
     '不要写别的。'
   ].filter(Boolean).join('\n');
   const dr = await askFast(sdeSystem(), dp, p.out, p.stat, p.meta, 900, '定学科');
-  let rows = (dr.text||'').split('\n').map(x=>x.trim())
-    .map(x=>x.match(/^[1-3]\s*[｜|]\s*([^｜|]{2,18})\s*[｜|]\s*(.+)$/))
-    .filter(Boolean).map(m=>({ disc:m[1].trim(), q:m[2].trim().replace(/[。，、]$/,'') }));
+  let rows;
+  if(CAT.length){
+    rows = (dr.text||'').split('\n').map(x=>x.trim())
+      .map(x=>x.match(/^[1-3]\s*[｜|]\s*(\d{1,3})\s*[｜|]\s*([^｜|]{2,18})\s*[｜|]\s*(.+)$/))
+      .filter(Boolean).map(m=>({ pn:parseInt(m[1],10), disc:m[2].trim(), q:m[3].trim().replace(/[。，、]$/,'') }));
+    // 基底常常忘了那一列——退回三列解析，不因为格式让整格失败
+    if(rows.length < 3){
+      rows = (dr.text||'').split('\n').map(x=>x.trim())
+        .map(x=>x.match(/^[1-3]\s*[｜|]\s*([^｜|]{2,18})\s*[｜|]\s*(.+)$/))
+        .filter(Boolean).map(m=>({ pn:0, disc:m[1].trim(), q:m[2].trim().replace(/[。，、]$/,'') }));
+    }
+  } else {
+    rows = (dr.text||'').split('\n').map(x=>x.trim())
+      .map(x=>x.match(/^[1-3]\s*[｜|]\s*([^｜|]{2,18})\s*[｜|]\s*(.+)$/))
+      .filter(Boolean).map(m=>({ pn:0, disc:m[1].trim(), q:m[2].trim().replace(/[。，、]$/,'') }));
+  }
   // 锁定的学科以人给的为准：基底改了名就改回去（它常把「法学」写成「法理学」）
   locked.forEach((d,i)=>{ if(rows[i]) rows[i].disc = d; else rows[i] = { disc:d, q:(q.slice(0,18)+' '+d+' 理论') }; });
   rows = rows.slice(0,3);
@@ -2754,12 +2837,27 @@ async function doSelectConf(){
 
   /* 二、两路取材：联网并发（轻），站内串行（重）。每一路都报进度，卡住时一眼看得出是哪一路。 */
   SIDE_SLOW = 0;
-  const prog = { web:0, kb:0, ctx:0 };
-  const paint = ()=> setStat(id, '<span class="spinner"></span> 取材：联网 ' + prog.web + '/' + rows.length
+  const prog = { web:0, kb:0, ctx:0, pan:0 };
+  const paint = ()=> setStat(id, '<span class="spinner"></span> 取材：' + (CAT.length ? ('面板供料层 ' + prog.pan + '/' + rows.length + '　') : '') + '联网 ' + prog.web + '/' + rows.length
     + (useKB ? ('　站内近邻 ' + prog.kb + '/' + rows.length + (prog.ctx ? '　站内语料 ✓' : '　站内语料 …'))
              : '　（站内库这一路你关掉了）'), 'run');
   paint();
-  let webRes = [], kbRes = ['','',''], kbCtxBlock = '';
+  let webRes = [], kbRes = ['','',''], kbCtxBlock = '', panRes = ['','',''];
+  /* 第三路 · 面板供料层（串行，三块页面各约 100KB，并发没必要） */
+  if(CAT.length){
+    panRes = [];
+    for(const r of rows){
+      if(ST.abort) break;
+      const hit = r.pn ? CAT.find(x=>x.n === r.pn) : null;
+      if(hit){
+        const blk = await frontierPanel(hit.slug, 8);
+        panRes.push(blk ? ('〔新思想前沿 第'+hit.n+'号《'+hit.name+'》· 八字段供料层〕\n'+blk) : '');
+        if(blk) r.panelName = hit.name;
+      } else panRes.push('');
+      prog.pan = panRes.length; paint();
+    }
+    while(panRes.length < rows.length) panRes.push('');
+  }
   webRes = await Promise.all(rows.map(r =>
     webSearch(r.q, skey).then(x => { prog.web++; paint(); return x; })));
   if(useKB){
@@ -2797,17 +2895,26 @@ async function doSelectConf(){
     throw new Error('三轮检索一共只搜到 '+webHits+' 条、站内库也没命中，撑不起三家。把问题写得更具体些重跑本格，或自己指定三个学科。');
   }
 
+  const panHits = panRes.filter(x=>x && x.length>60).length;
   const matBlocks = rows.map((r,i)=>{
     const w = (webRes[i] && webRes[i].ok) ? webBlockOf('W'+(i+1)+'-', (webRes[i].items)||[]) : '（这一门没搜到站外材料）';
     const k = (kbRes[i] && kbRes[i].length>40) ? kbRes[i] : '（这一门站内库没命中）';
-    return '【'+r.disc+'｜检索词：'+r.q+'】\n〔站外·联网检索〕\n'+w+'\n〔站内·本站已有的相关篇目（链接以 / 开头，可直接点开）〕\n'+k;
+    const pn = (panRes[i] && panRes[i].length>60) ? panRes[i] : '';
+    return '【'+r.disc+'｜检索词：'+r.q+'】\n'
+      + (pn ? (pn + '\n') : '')
+      + '〔站外·联网检索〕\n'+w+'\n〔站内·本站已有的相关篇目（链接以 / 开头，可直接点开）〕\n'+k;
   }).join('\n\n');
-  selLog('取材完成：站外 '+webHits+' 条，站内 '+kbHits+' 门命中。');
+  selLog('取材完成：' + (CAT.length ? ('面板供料层 '+panHits+' 门，') : '') + '站外 '+webHits+' 条，站内 '+kbHits+' 门命中。');
+  if(CAT.length && !panHits) note('三门都没落到面板供料层上——这一跑的位置与自曝两栏只能靠基底自己推，工序 7.5 的推翻材料会薄。');
 
   /* 三、从两路材料里为每门学科定一家，要两两斜对立、且都在回答这道题 */
   setStat(id, '<span class="spinner"></span> 为三门各定一家理论（要两两斜对立）', 'run');
   const pp = [
-    '下面是三门学科的取材：每门都有〔站外·联网检索〕与〔站内·本站已有篇目〕两路。',
+    '下面是三门学科的取材。带〔新思想前沿 · 八字段供料层〕的那一路是**首选材料**：',
+    '它的每一条都有真出处，并且已经标好了这一条占哪个位置、预设是什么、读数带不带分母、什么条件下失效、以及**它自己承认的弱点**。',
+    '有这一路的门，就从它的条目里挑那一家，并**照抄它的出处与关键读数**（那是可核对的，联网摘要不是）。',
+    '尤其是〔碰撞行〕里的「自曝」与「失效」两栏——后面工序 7.5 要的「推翻共有前提的材料必须来自三家之一自己」，就从这两栏取。',
+    '',
     '请为**每一门各挑出一家**在这道题上的现行理论或明确判断，一共三家，让它们两两斜着对立。',
     '',
     '**三家必须都在回答同一道题**——就是上面那道问题。一家答的是别的问题，它就不算一家，重挑。',
