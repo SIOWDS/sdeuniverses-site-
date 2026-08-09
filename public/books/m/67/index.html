@@ -12,6 +12,11 @@ background-size:auto,22px 22px;background-position:0 0,0 0;background-attachment
 body::before{content:"";position:fixed;inset:0;background:var(--void);opacity:.72;pointer-events:none;z-index:-1}
 a{color:var(--cy);text-decoration:none}
 .wrap{max-width:940px;margin:0 auto;padding:0 26px}
+.heroin{position:relative}
+.heroin img.cover{position:absolute;right:0;top:0;width:210px;border:1px solid var(--line);box-shadow:0 20px 54px rgba(0,0,0,.6)}
+.heroin .eyebrow,.heroin .pre,.heroin h1,.heroin .st,.heroin .meta{max-width:calc(100% - 250px)}
+@media(max-width:760px){.heroin img.cover{position:static;width:150px;margin-bottom:20px;display:block}
+.heroin .eyebrow,.heroin .pre,.heroin h1,.heroin .st,.heroin .meta{max-width:100%}}
 /* nav */
 nav{position:sticky;top:0;z-index:20;background:rgba(7,10,15,.9);backdrop-filter:blur(9px);border-bottom:1px solid var(--line)}
 nav .wrap{height:54px;display:flex;align-items:center;justify-content:space-between;font-family:var(--mono);font-size:11.5px;letter-spacing:.18em;color:var(--mute)}
@@ -143,6 +148,11 @@ footer{margin-top:80px;border-top:1px solid var(--line);padding:26px 0 46px;font
 .tbl tr:hover td{background:rgba(79,216,232,.04)}
 .note{font-size:14px;color:var(--mute);border-left:2px solid var(--cydim);padding-left:16px;margin-top:24px}
 .wrap{max-width:940px;margin:0 auto;padding:0 26px}
+.heroin{position:relative}
+.heroin img.cover{position:absolute;right:0;top:0;width:210px;border:1px solid var(--line);box-shadow:0 20px 54px rgba(0,0,0,.6)}
+.heroin .eyebrow,.heroin .pre,.heroin h1,.heroin .st,.heroin .meta{max-width:calc(100% - 250px)}
+@media(max-width:760px){.heroin img.cover{position:static;width:150px;margin-bottom:20px;display:block}
+.heroin .eyebrow,.heroin .pre,.heroin h1,.heroin .st,.heroin .meta{max-width:100%}}
 footer{margin-top:80px;padding:34px 0;border-top:1px solid var(--line);font-family:var(--mono);font-size:11.5px;letter-spacing:.14em;color:var(--mute);text-align:center}
 </style></head><body>
 <nav class="top"><div class="topin"><a href="/browse/">SDE UNIVERSES</a><a href="/books/">← 专著栏目</a></div></nav>
@@ -153,10 +163,12 @@ footer{margin-top:80px;padding:34px 0;border-top:1px solid var(--line);font-fami
 <h1 class="bt">战争的资格</h1>
 <div class="st">冲突何时成为战争：九种被换手的资格</div>
 <div class="meta">阳涌 著 · 168 页 · 扉页·凡例·导论·四编十四章·五附录 · 约 18.6 万汉字 · 文献 297 条 · ISBN 979-8-90690-005-0 · 定价 US$20.00</div>
+<img class="cover" src="cover.jpg" alt="《战争的资格》封面">
 <div class="cta">
 <a class="solid" href="read.html">在线翻书</a>
 <a href="WarStanding.pdf">下载 PDF</a>
 <a href="/students/yang-yong/conflict-peace/">九章的原发频道</a>
+<a href="cover-full.jpg">整封大图</a>
 </div>
 </div>
 </header>
