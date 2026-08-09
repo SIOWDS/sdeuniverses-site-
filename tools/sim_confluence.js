@@ -112,6 +112,14 @@ function defaultAnswer(userMsg, ctx) {
   if (/合成一份 ≤3000 字的作业底盘/.test(userMsg)) return '一、本体论要害……' + '铁律一条。'.repeat(80);
   if (/你是验收员/.test(userMsg))
     return '主题1：病根在认知层 ｜ 主题2：病根在制度层 ｜ 主题3：病根在组织层\n烈度：8/10 ｜ 同源度：低 ｜ 打架点：病根到底在哪一层\n判词：三方对同一件事给了互相取消的答案';
+  if (/主题冲突：三对全冲突/.test(userMsg) && ctx && ctx.badSpine)
+    /* 三条主题观点两两相容的抽脊：截图里那一次就是这样
+       （1×3 相容，清洗与巩固同属脑内过程、可并行发生）。 */
+    return '【源1】《甲》\n主题观点：清洗是决定性的。\n支撑观点 1a：一句。　〔依据：原文〕\n'
+      + '【源2】《乙》\n主题观点：节律是决定性的。\n支撑观点 2a：一句。　〔依据：原文〕\n'
+      + '【源3】《丙》\n主题观点：巩固是决定性的。\n支撑观点 3a：一句。　〔依据：原文〕\n'
+      + '冲突 1×2：不能同时成立。\n冲突 1×3：可以并存。\n冲突 2×3：不能同时成立。\n'
+      + '主题冲突：不成立（1×3 相容，清洗与巩固同属脑内过程，可并行发生）';
   if (/一个主题观点/.test(userMsg) && /支撑观点/.test(userMsg)) {
     const blk = n => ['【源' + n + '】《假文章' + n + '》',
       '主题观点：第' + n + '家主张的那一条判断，够长够像判断句。',
@@ -168,7 +176,7 @@ function sseFor(text) {
 async function boot(opts) {
   opts = opts || {};
   const ctx = { calls: [], errors: [], saved: [], webQ: [], frontHub: 0, frontPanel: [], pickSkill: 0, nbrQ: [], pulls: [], webBody: [],
-                pickOpt: opts.pickOpt, shortRewrite: opts.shortRewrite, lowScore: opts.lowScore, weakGate: opts.weakGate, drafts: [], nbrLive: 0, nbrPeak: 0, nbrAborted: 0 };
+                pickOpt: opts.pickOpt, shortRewrite: opts.shortRewrite, lowScore: opts.lowScore, weakGate: opts.weakGate, badSpine: opts.badSpine, drafts: [], nbrLive: 0, nbrPeak: 0, nbrAborted: 0 };
   const vc = new VirtualConsole();
   vc.on('jsdomError', e => ctx.errors.push('jsdomError: ' + (e && e.message)));
   vc.on('error', (...a) => ctx.errors.push('console.error: ' + a.join(' ')));
@@ -851,6 +859,37 @@ function userOf(c, re) { const x = c.calls.filter(k => re.test(k.user)); return 
     ok('如实告诉学员为什么换（不是默默换掉）',
        /撞不起来|位置/.test(c.win.eval('ST.notes.join("|")')), c.win.eval('ST.notes.join("|")').slice(0, 80));
     ok('只降一次，不来回打转', (c.win.eval('ST.notes.join("|")').match(/已自动转为/g) || []).length <= 1);
+    ok('全程无 JS 错误', c.errors.length === 0, c.errors.join(' | '));
+  });
+
+  await step('二十九之三、三条主题观点两两相容：不许照跑，必须重挑学科', async () => {
+    /* 用户 2026-08-09 的截图与裁定：闸判「不成立（1×3 相容，清洗与巩固同属脑内过程）」时，
+       旧行为是「碰撞照跑，但底盘不硬」——那会把一次三家其实相容的整理写成两万字。
+       新行为：重挑三门学科、从体检重来，最多两次；两次仍不过才照跑并说明白。 */
+    const c = await boot({ badSpine: true });
+    fillQ(c, '睡眠到底在做什么？', '认知心理学', '制度经济学', '组织社会学');
+    c.click('#goBtn');
+    const re = await waitFor(() => c.win.eval('ST.reselect') >= 1, 40000);
+    /* 重挑之后还要等体检真的被跑第二次——只等 reselect 会在跳转前就返回。 */
+    await waitFor(() => c.calls.filter(k => /请先做体检/.test(k.user)).length >= 2, 40000);
+    ok('两两相容时重挑了学科（ST.reselect 立起来）', re, String(c.win.eval('ST.reselect')));
+    /* 别断言 ST.redoFrom 的当下值：产线跳回去之后会把它清成 null，
+       断言会在"已经生效"的时候读到 null。改断言体检真的又跑了一次。 */
+    ok('从体检那一格重来（体检被跑了第二次，不是接着往下跑）',
+       c.calls.filter(k => /请先做体检/.test(k.user)).length >= 2,
+       '体检调用 ' + c.calls.filter(k => /请先做体检/.test(k.user)).length + ' 次');
+    ok('真的又问了一次基底要三个学科',
+       c.calls.filter(k => /定出\*\*三个学科\*\*/.test(k.user)).length >= 2,
+       '实际 ' + c.calls.filter(k => /定出\*\*三个学科\*\*/.test(k.user)).length + ' 次');
+    ok('把已判死的组合交回去，禁止在同族里换近义名字',
+       c.calls.some(k => /已经判死的组合，不许再挑同族/.test(k.user) && /至少要换掉两门/.test(k.user)));
+    ok('定学科的调令里写死了两两冲突自检（相容＝拼接，不是新判断）',
+       c.calls.some(k => /再自检一遍两两冲突/.test(k.user) && /相容的三家撞出来的只会是一次拼接/.test(k.user)));
+    ok('如实告诉用户为什么重挑', /没能两两冲突/.test(c.win.eval('ST.notes.join("|")')),
+       c.win.eval('ST.notes.join("|")').slice(0, 90));
+    ok('最多两次，不来回打转', c.win.eval('ST.reselect') <= 2, String(c.win.eval('ST.reselect')));
+    ok('页面上不再出现「碰撞照跑」这句旧口径',
+       !/碰撞照跑，但底盘不硬——换一位学员/.test(c.win.document.body.innerHTML));
     ok('全程无 JS 错误', c.errors.length === 0, c.errors.join(' | '));
   });
 

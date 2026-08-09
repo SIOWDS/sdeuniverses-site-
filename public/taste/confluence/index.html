@@ -996,7 +996,7 @@ const STAGES = [
   {id:'polish',  n:'打磨',     hint:'按封顶清单逐条自查，再照自查整篇重写一遍', tok:4000},
   {id:'review',  n:'评审',     hint:'创新智商 · 只报分数，不回炉',        tok:4000}
 ];
-const ST = { mode:'X', forceAuto:false, sources:[], out:{}, outline:'', article:'', score:null, running:false, abort:false,
+const ST = { mode:'X', forceAuto:false, reselect:0, badPick:[], sources:[], out:{}, outline:'', article:'', score:null, running:false, abort:false,
              qtype:'', discs:[], polished:false,
              manual:false, tried:[], seed:null, seedScore:0, outer:0, best:null, xinde:'',
              redoFrom:null, rounds:0, termRetry:0, termFix:null, notes:[],
@@ -2387,7 +2387,27 @@ async function runStage(i){
         ST.redoFrom = STAGES.findIndex(x=>x.id==='gate');
         return txt;
       }
-      showErr('三条主题观点没能两两冲突：'+ST.conflict+'。碰撞照跑，但底盘不硬——换一位学员或改手挑会更实在。');
+      /* 学科通融模式（X）：两两冲突不成立＝底盘不成立，不许照跑。
+         这道判断与闸零同级——三家能不能撞，在挑这三门的那一刻就定了；
+         此处继续往下走，只会把一次"三家其实相容"的整理写成两万字。
+         处置：重新挑三门学科，从体检重来，最多两次；两次仍不过才照跑并说明白。
+         学员手挑的先降级为基底自由组合（与闸一低分那一处同一条纪律）。 */
+      else if(ST.mode==='X' && ST.reselect < 2){
+        ST.reselect++;
+        ST.badPick = ST.badPick || [];
+        ST.badPick.push((ST.spineRows||[]).map(r=>(r.disc||r.theme||'')).filter(Boolean).join(' × '));
+        const wasPanel = (pickMode()==='panel' && panelChosen().length===3 && !ST.forceAuto);
+        if(wasPanel) ST.forceAuto = true;   // 手挑撞不起来 → 先降级，再重挑
+        note('三条主题观点没能两两冲突（'+ST.conflict+'）——底盘不成立，重新挑三门学科'
+             + (wasPanel ? '（你手挑的那三块撞不起来，已自动转为「基底自由组合」）' : '')
+             + '。第 '+ST.reselect+' 次，最多两次。');
+        showErr('三条主题观点没能两两冲突：'+ST.conflict+'。**这不是可以照跑的情形**——三家其实相容，撞出来的只会是一次共同体内部的整理。正在重新挑三门学科，从体检重来（第 '+ST.reselect+'/2 次）。');
+        setStat('select','<span class=\"spinner\"></span> 底盘不成立，重新挑三门学科','run');
+        await doSelectConf();
+        ST.redoFrom = STAGES.findIndex(x=>x.id==='gate');
+        return txt;
+      }
+      showErr('三条主题观点没能两两冲突：'+ST.conflict+'。已经重挑过 '+(ST.reselect||0)+' 次仍不成立，本轮照跑——但底盘不硬，成品的不可还原性会结构性偏低，发表前请自己换一组更远的学科重跑一遍。');
     }
   }
   if(s.id==='demarc'){
@@ -2944,6 +2964,15 @@ async function doSelectConf(){
     ? ('【选学科的智慧（本站选源 Skill · 全文）】\n' + SKILL.slice(0, 9000))
     : PICK_CORE;
   const CHOSEN = ST.forceAuto ? [] : panelChosen();   // ST.forceAuto：上一轮撞不起来，已降级
+  /* 重挑时把已判死的组合原样交回去：不写这一句，基底极可能在同一个学科族里
+     换一个近义名字（战略管理→组织理论），三对两两问句照样命中，白跑一轮。 */
+  const BADPICK = (ST.badPick && ST.badPick.length)
+    ? ('\n【已经判死的组合，不许再挑同族】\n'
+       + ST.badPick.map((x,i)=>'第 '+(i+1)+' 次：'+x).join('\n')
+       + '\n它们失败的原因是三条主题观点两两相容（不是位置撞车就是语汇族太近）。'
+       + '这一次至少要换掉两门，且新的三门必须落在三个不同的大类里；'
+       + '不要在同一个学科族里换一个近义名字（战略管理→组织理论、经济社会学→制度经济学，都算没换）。\n')
+    : '';
   if(usePanel && !CAT.length) note('新思想前沿面板目录这次没取到——本格改用原来的两路取材，不影响往下走。');
   const dp = [
     '要解决的问题：'+q,
@@ -2959,6 +2988,10 @@ async function doSelectConf(){
     '**定之前先做一件事**：不要先想学科。先按题型写出三句「只有 ____ 是决定性的」，三句必须互相排斥；',
     '再去找**每天在处理这一句**的那个行当。先想学科，挑到的一定是"听起来相关"的三门。',
     '**定完自检**：三对两两过一遍上面那六条问句，任一对命中 ≥2 条就当场换掉一门再输出。',
+    '**再自检一遍两两冲突**：把三门在这道题上的主题观点各写一句，三句必须**两两不能同时为真**。',
+    '「A 说清洗、B 说巩固，两者同属脑内过程、可并行发生」这种就是**相容**，不是冲突——',
+    '相容的三家撞出来的只会是一次拼接，不是新判断。有任何一对相容，当场换掉那一门再输出。',
+    BADPICK,
     '',
     '再给每一门配一条检索词，用来去搜这门学科在这道题上的现行理论：',
     '· 要能搜到**有名有姓的理论或有争论的文献**——加上学科名、理论名、"理论""争论""critique"这类词；',
