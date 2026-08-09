@@ -5026,7 +5026,9 @@ async function askCore(request, env, url, body, SINK) {
   // 不告诉评分者它出自谁手、更不告诉它这是本站自己的产出；② 综合分由系统按固定权重算，
   // 模型只给五维分，任何模型手算的综合分都不算数；③ 每一维必附一句逐字引自原文的证据句。
   if (mode === "iq") {
-    MAXTOK = 3600;
+    // 关思考后额度全归正文；评分卡带三张清单（最近邻／扣分／提升），3600 常常装不下，
+    // 只能靠页面的修复与逐字段抢救层兜——那是最后一道保险，不该当常规路径使。
+    MAXTOK = 4200;
     const text = String(body.text || "").slice(0, 26000);
     sys = "你是一位独立的创新智商评分者。你收到的是一份【匿名来稿】——你不知道它出自谁手，也不必知道。「名家写的」不加分，「机器写的」不减分；文风漂亮、术语密集、读起来像一篇正经论文，一律不加分。你唯一要测的是：一个此前不存在的认知物，在发生意义上走了多深。"
       + "\n\n【这把尺子测的是造新，不是解题】在大模型已吞下人类几乎全部公开文本的今天，一般智商刻度上的 100 分约等于一个基底在零提示语下的默认产出。所以 130 不是「比人聪明 30 分」，而是「比基底张口就来的那段话深 30 个智商点」。一段文本若连基底随口能写的深度都够不到，它在创新意义上就是负分——读起来多顺、多像论文都不算数。"
@@ -5086,18 +5088,31 @@ async function askCore(request, env, url, body, SINK) {
       + "⑤ 三个观点写完就停笔：不要综合、不要下结论、不要调和分歧，也不要评价哪个更好。调和留给后面的碰撞环节——现在就把张力抹平，等于把涌现的原料先烧掉了。";
   }
 
+  // ===== 关思考：两类调用不能把额度分给 reasoning（2026-08-09 线上真跑实测后加）=====
+  // 站内早有一条纪律「短额度的结构化调用必须显式关思考」，但它只写在 llmText 里，
+  // 而这条流式主路自己拼 body，**绕过了那条纪律**。实测两处因此结构性哑火（不是偶发）：
+  //   · iq   ：思考 12,526 字 / 正文 0 字 —— 评分卡是一个必须完整的 JSON，截断即整张卡作废；
+  //   · polish：思考 10,906 字 / 正文 0 字 —— 交出正文的从来是后面那次「关思考重跑」，
+  //             而那一遍被砍到 4000 tok，稿子断在半句上（线上抓到的原样：末句「但他输光」）。
+  // 两处的第一遍都是 100% 浪费，还各烧掉六十到九十秒——正是那条「贴着平台时长上限」的路。
+  // paper／distill／collide／synth 目前实测出得来正文，先不动：改一条能证明的，不改一片猜的。
+  const _noThink = (mode === "iq" || mode === "polish");
+  // 兜底重跑的额度：降档只对短输出成立。长文模式（成文／打磨）要写五六千字，
+  // 砍到 4000 tok 交出来的必然是一篇断在半句上的稿。
+  const _retryTok = (mode === "paper" || mode === "polish") ? MAXTOK : Math.min(MAXTOK, 4000);
+  const _mainBody = {
+    model: VC.model,
+    stream: true,
+    max_tokens: MAXTOK,
+    messages: [{ role: "system", content: sys }, { role: "user", content: usr }],
+  };
   // 调基底（境内直连）。自带 Key：仅在内存中转发调用，绝不存储/记录（同 llm-proxy 纪律）
   let upstream;
   try {
     upstream = await fetch(VC.url, {
       method: "POST",
       headers: { "content-type": "application/json", authorization: "Bearer " + KEY },
-      body: JSON.stringify({
-        model: VC.model,
-        stream: true,
-        max_tokens: MAXTOK,
-        messages: [{ role: "system", content: sys }, { role: "user", content: usr }],
-      }),
+      body: JSON.stringify(_noThink ? wdsPlainBody(VC, _mainBody) : _mainBody),
     });
   } catch (e) {
     return _out([{ t: "sources", v: sources }, { t: "error", v: VC.name + " 连接失败：" + (e && e.message) }]);
@@ -5164,7 +5179,7 @@ async function askCore(request, env, url, body, SINK) {
             // 关思考之外还要降档：站内既有硬教训是「预算越大，思考拖得越久，越容易被平台
             // 时长上限杀在思考阶段」，所以重跑的意义是降档，不是加码（见 wdsLadder 那条纪律）。
             body: JSON.stringify(wdsPlainBody(VC, {
-              model: VC.model, stream: true, max_tokens: Math.min(MAXTOK, 4000),
+              model: VC.model, stream: true, max_tokens: _retryTok,
               messages: [{ role: "system", content: sys }, { role: "user", content: usr }],
             })),
           });
