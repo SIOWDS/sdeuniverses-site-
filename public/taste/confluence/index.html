@@ -2392,7 +2392,7 @@ async function runStage(i){
          此处继续往下走，只会把一次"三家其实相容"的整理写成两万字。
          处置：重新挑三门学科，从体检重来，最多两次；两次仍不过才照跑并说明白。
          学员手挑的先降级为基底自由组合（与闸一低分那一处同一条纪律）。 */
-      else if(ST.mode==='X' && ST.reselect < 2){
+      else if(ST.mode==='X' && ST.reselect < 3){
         ST.reselect++;
         ST.badPick = ST.badPick || [];
         ST.badPick.push((ST.spineRows||[]).map(r=>(r.disc||r.theme||'')).filter(Boolean).join(' × '));
@@ -2400,14 +2400,44 @@ async function runStage(i){
         if(wasPanel) ST.forceAuto = true;   // 手挑撞不起来 → 先降级，再重挑
         note('三条主题观点没能两两冲突（'+ST.conflict+'）——底盘不成立，重新挑三门学科'
              + (wasPanel ? '（你手挑的那三块撞不起来，已自动转为「基底自由组合」）' : '')
-             + '。第 '+ST.reselect+' 次，最多两次。');
-        showErr('三条主题观点没能两两冲突：'+ST.conflict+'。**这不是可以照跑的情形**——三家其实相容，撞出来的只会是一次共同体内部的整理。正在重新挑三门学科，从体检重来（第 '+ST.reselect+'/2 次）。');
+             + '。第 '+ST.reselect+' 次，最多三次。');
+        showErr('三条主题观点没能两两冲突：'+ST.conflict+'。**这不是可以照跑的情形**——三家其实相容，撞出来的只会是一次共同体内部的整理。正在重新挑三门学科，从体检重来（第 '+ST.reselect+'/3 次）。');
         setStat('select','<span class=\"spinner\"></span> 底盘不成立，重新挑三门学科','run');
         await doSelectConf();
         ST.redoFrom = STAGES.findIndex(x=>x.id==='gate');
         return txt;
       }
-      showErr('三条主题观点没能两两冲突：'+ST.conflict+'。已经重挑过 '+(ST.reselect||0)+' 次仍不成立，本轮照跑——但底盘不硬，成品的不可还原性会结构性偏低，发表前请自己换一组更远的学科重跑一遍。');
+      /* 三次都没撞起来：**不许自作主张照跑**。停在这一格问一句——
+         照跑是一个会影响成品性质的决定（底盘不成立的碰撞，产物只是一次拼接），
+         这种决定该由人做，不该由机器默认。 */
+      const pick = await askChoice('spine',
+        '<b>三条主题观点始终没能两两冲突</b>（最后一次：'+escTxt(ST.conflict)+'）。<br>'
+        + '已经自动重挑过 '+(ST.reselect||0)+' 次学科并重新碰撞，每一次都判为相容。'
+        + '相容的三家撞出来的不是新判断，只是一次拼接——<b>底盘不成立，往下写两万字也救不回来</b>。<br>'
+        + '这一步该由你定：',
+        [ { label:'再重挑一次学科，重新碰撞', value:'again', primary:true },
+          { label:'我自己挑三门（转手挑）', value:'manual' },
+          { label:'换一道题', value:'stop' },
+          { label:'知道底盘不硬，照跑', value:'go' } ]);
+      if(pick === 'again'){
+        ST.reselect++;
+        note('第 '+ST.reselect+' 次重挑（你点的）。');
+        setStat('select','<span class=\"spinner\"></span> 重新挑三门学科','run');
+        await doSelectConf();
+        ST.redoFrom = STAGES.findIndex(x=>x.id==='gate');
+        return txt;
+      }
+      if(pick === 'manual'){
+        if($('cPickMode')){ $('cPickMode').value='panel'; $('cPickMode').dispatchEvent(new Event('change',{bubbles:true})); }
+        ST.forceAuto = false;
+        showErr('已切到「学员自选三块面板」——在上面挑三门离得更远的（三门要落三个不同大类），再点「开始」。');
+        throw new Error('已停下');
+      }
+      if(pick === 'stop'){
+        showErr('已停下。换一道题再来——同一道题上三家总是相容，多半是这道题本身只有一条主流答案，先把题问得更窄一点。');
+        throw new Error('已停下');
+      }
+      showErr('三条主题观点没能两两冲突：'+ST.conflict+'。**按你的选择照跑**——但底盘不成立，成品的不可还原性会结构性偏低，发表前请自己换一组更远的学科重跑一遍。');
     }
   }
   if(s.id==='demarc'){

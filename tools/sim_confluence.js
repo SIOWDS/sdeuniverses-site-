@@ -887,7 +887,21 @@ function userOf(c, re) { const x = c.calls.filter(k => re.test(k.user)); return 
        c.calls.some(k => /再自检一遍两两冲突/.test(k.user) && /相容的三家撞出来的只会是一次拼接/.test(k.user)));
     ok('如实告诉用户为什么重挑', /没能两两冲突/.test(c.win.eval('ST.notes.join("|")')),
        c.win.eval('ST.notes.join("|")').slice(0, 90));
-    ok('最多两次，不来回打转', c.win.eval('ST.reselect') <= 2, String(c.win.eval('ST.reselect')));
+    /* 自动重挑上限 3 次；三次都不过就停在抽脊格问一句，不许自作主张照跑。 */
+    const asked = await waitFor(() => !!c.$('choice-spine'), 60000);
+    ok('三次都撞不起来时停下来问一句（不自作主张照跑）', asked);
+    ok('自动重挑正好三次，不来回打转', c.win.eval('ST.reselect') === 3, String(c.win.eval('ST.reselect')));
+    ok('问句里说清了为什么不能照跑',
+       /相容的三家撞出来的不是新判断|底盘不成立/.test((c.$('choice-spine')||{}).innerHTML || ''));
+    ok('四条路都摆出来了（再挑一次／自己挑／换题／照跑）',
+       ['again','manual','stop','go'].every(v => /\[data-choice=/.test('x') ||
+         !!c.$('choice-spine').querySelector('[data-choice="' + v + '"]')));
+    ok('体检被反复重跑（学科真的换了三轮）',
+       c.calls.filter(k => /请先做体检/.test(k.user)).length >= 4,
+       '体检调用 ' + c.calls.filter(k => /请先做体检/.test(k.user)).length + ' 次');
+    c.$('choice-spine').querySelector('[data-choice="stop"]').click();
+    await sleep(400);
+    ok('选「换一道题」就真的停下', c.$('goBtn').disabled === false);
     ok('页面上不再出现「碰撞照跑」这句旧口径',
        !/碰撞照跑，但底盘不硬——换一位学员/.test(c.win.document.body.innerHTML));
     ok('全程无 JS 错误', c.errors.length === 0, c.errors.join(' | '));
