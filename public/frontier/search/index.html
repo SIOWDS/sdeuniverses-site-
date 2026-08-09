@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>栏目内检索与智能问对 · 新思想前沿 | SDE Universes</title>
+<meta name="description" content="只在「新思想前沿」626 个学科面板范围内检索与提问：关键词检索按匹配度给出面板与命中段落；智能问对只从本栏语料召回作答，并附可点开的来源。">
+<style>
+:root{--gold:#C9A84C;--gold2:#D4B25E;--ink:#EFE7D3;--muted:#8A8474;--bg:#0E0B08;--panel:#171310;--line:rgba(201,168,76,.26);--blue:#5A7CA8}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:"Noto Serif SC","Songti SC",Georgia,serif;line-height:1.9;
+background-image:radial-gradient(900px 520px at 10% -8%,rgba(201,168,76,.10),transparent 60%),radial-gradient(760px 470px at 92% 4%,rgba(90,124,168,.10),transparent 62%);background-attachment:fixed;-webkit-text-size-adjust:100%}
+a{color:inherit;text-decoration:none}
+.w{max-width:1000px;margin:0 auto;padding:0 20px}
+nav{border-bottom:1px solid var(--line);padding:13px 0;font-size:14px}
+nav .w{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+nav .r a{color:var(--muted);margin-left:15px}
+nav .r a:hover{color:var(--gold2)}
+header.hero{padding:44px 0 22px;text-align:center}
+.en{font-size:11px;letter-spacing:.34em;color:var(--muted)}
+h1{font-size:clamp(27px,5vw,42px);color:var(--gold2);margin:12px 0 6px;font-weight:600;letter-spacing:.05em}
+.sub{margin:12px auto 0;max-width:760px;color:#CFC4A8;font-size:15px}
+.stat{margin-top:16px;font-size:12.5px;color:var(--muted);letter-spacing:.05em}
+.stat b{color:var(--gold2);font-weight:600}
+.modes{display:flex;justify-content:center;gap:10px;margin:26px 0 6px;flex-wrap:wrap}
+.mbtn{border:1px solid var(--line);background:var(--panel);color:#C6BB9C;border-radius:26px;padding:9px 22px;cursor:pointer;font-family:inherit;font-size:14.5px;transition:.18s}
+.mbtn.active{border-color:var(--gold2);color:#0E0B08;background:var(--gold2);font-weight:700}
+main{padding:14px 0 70px}
+.pane{display:none}
+.pane.on{display:block}
+.bar{display:flex;gap:10px;margin:18px 0 10px;flex-wrap:wrap}
+input[type=text],textarea{flex:1;min-width:220px;background:#12100D;border:1px solid var(--line);border-radius:10px;color:var(--ink);
+  padding:12px 15px;font-family:inherit;font-size:15.5px;line-height:1.7;outline:none}
+input[type=text]:focus,textarea:focus{border-color:var(--gold2)}
+textarea{resize:vertical;min-height:86px;width:100%}
+button.go{background:var(--gold2);border:none;border-radius:10px;color:#0E0B08;padding:12px 26px;font-family:inherit;font-size:15px;font-weight:700;cursor:pointer}
+button.go:disabled{opacity:.5;cursor:default}
+.hint{font-size:12.5px;color:var(--muted);min-height:18px;margin-bottom:6px}
+.res{display:block;border:1px solid var(--line);background:var(--panel);border-radius:11px;padding:15px 17px;margin-bottom:11px;transition:.18s}
+.res:hover{border-color:var(--gold2);background:#1B1611}
+.res .t{font-size:16.5px;color:#F0E6CC;font-weight:600;line-height:1.55;margin-bottom:5px}
+.res .m{font-size:11.5px;color:var(--muted);letter-spacing:.06em;margin-bottom:7px}
+.res .s{font-size:14px;color:#C0B597;line-height:1.85}
+.res em{color:var(--gold2);font-style:normal;font-weight:700}
+.pct{float:right;font-size:11px;color:var(--muted)}
+.empty{border:1px dashed var(--line);border-radius:11px;padding:26px;text-align:center;color:var(--muted);font-size:14.5px}
+.keybox{border:1px solid var(--line);border-radius:11px;padding:13px 16px;margin:10px 0 14px;font-size:13px;color:var(--muted);background:rgba(201,168,76,.035)}
+.keybox input{width:100%;margin-top:8px;font-size:13.5px;padding:9px 12px}
+.seg{border:1px solid var(--line);background:transparent;color:#C6BB9C;border-radius:20px;padding:5px 14px;cursor:pointer;font-family:inherit;font-size:12.5px;margin-right:7px}
+.seg.on{border-color:var(--gold2);color:#0E0B08;background:var(--gold2);font-weight:700}
+.ans{border:1px solid var(--line);background:var(--panel);border-radius:11px;padding:18px 20px;margin-top:14px;
+  white-space:pre-wrap;font-size:15.5px;line-height:2.02;color:#E4DAC0;min-height:40px}
+.ans.blink::after{content:"▍";color:var(--gold2);animation:bk 1s steps(2) infinite}
+@keyframes bk{50%{opacity:0}}
+.err{color:#D98A6A}
+.srcs{margin-top:12px}
+.srcs .lbl{font-size:11.5px;letter-spacing:.2em;color:var(--muted);margin-bottom:7px}
+.srcs a{display:block;border-left:2px solid var(--line);padding:6px 0 6px 12px;margin-bottom:6px;font-size:14px;color:#C6BB9C}
+.srcs a:hover{border-left-color:var(--gold2);color:var(--gold2)}
+.note{border:1px solid var(--line);border-left:3px solid var(--gold);background:rgba(201,168,76,.04);border-radius:0 11px 11px 0;
+  padding:16px 20px;margin:18px 0 4px;font-size:14px;line-height:1.9;color:#B9AE90}
+.note b{color:#E7D9A6}
+footer{border-top:1px solid var(--line);padding:26px 0 44px;text-align:center;color:var(--muted);font-size:12.5px}
+@media(max-width:640px){.res{padding:13px 14px}.ans{padding:15px 15px;font-size:15px}}
+</style>
+</head>
+<body>
+<nav><div class="w">
+  <a href="/browse/" style="letter-spacing:.13em;color:var(--gold2)">SDE Universes</a>
+  <div class="r"><a href="/frontier/">← 新思想前沿</a><a href="/search/">全站搜索</a></div>
+</div></nav>
+
+<header class="hero">
+  <div class="en">FRONTIER &middot; IN-COLUMN SEARCH &amp; ASK</div>
+  <h1>新思想前沿 · 栏目内检索与问对</h1>
+  <p class="sub">本页的检索与问答<b>只在「新思想前沿」这一个栏目里</b>进行——不跨到学员专栏、专著导读或长文专栏。要在全站范围内找，请走<a href="/search/" style="color:var(--gold2)">全站搜索</a>。</p>
+  <div class="stat" id="stat">正在载入本栏索引…</div>
+</header>
+
+<main class="w">
+
+<div class="modes">
+  <button class="mbtn active" id="mKw" onclick="setMode('kw')">🔎 栏目内检索</button>
+  <button class="mbtn" id="mAsk" onclick="setMode('ask')">🧠 栏目内智能问对</button>
+</div>
+
+<!-- ============ 检索 ============ -->
+<div class="pane on" id="kwPane">
+  <div class="bar">
+    <input type="text" id="q" placeholder="输入关键词，例如：临界慢化　情境学习　拓扑数据分析　可解释性" onkeyup="if(event.key==='Enter')doSearch();else scheduleSearch()">
+    <button class="go" onclick="doSearch()">检索</button>
+  </div>
+  <div class="hint" id="kwStat"></div>
+  <div id="results"></div>
+  <div class="note">
+    <b>怎么读这一页的结果。</b>排序键 ＝ 标题命中 ＋ 最佳段落命中 ＋ 0.35×其余段落（封顶四倍最佳，防大部头以量取胜）。
+    每条给出的是该面板<b>命中最强的那一段原文</b>，不是摘要——你看到的就是原话。
+    面板都很长（V7 体例每块约 2.6 万汉字、110–150 段），所以命中段往往在正文深处，点进去后用浏览器的页内查找定位最快。
+  </div>
+</div>
+
+<!-- ============ 问对 ============ -->
+<div class="pane" id="askPane">
+  <div class="keybox">
+    <span style="color:#C6BB9C">基底：</span>
+    <button class="seg on" id="kSys" onclick="setKey('sys')">系统密钥</button>
+    <button class="seg" id="kOwn" onclick="setKey('own')">用我自己的 Key</button>
+    <span style="margin-left:10px">·　厂商：</span>
+    <button class="seg on" id="vGlm" onclick="setVendor('glm')">智谱 GLM</button>
+    <button class="seg" id="vDs" onclick="setVendor('ds')">DeepSeek</button>
+    <div id="keyWrap" style="display:none">
+      <input type="text" id="userKey" placeholder="粘贴你的 API Key（只在本次请求中转发，服务端不存）">
+      <div style="margin-top:6px;font-size:12px">自带 Key 时<b style="color:#C6BB9C">不受每日次数限制</b>（token 由你自己付）；系统密钥走站方公共额度，用完请填自己的 Key。</div>
+    </div>
+  </div>
+  <textarea id="qa" placeholder="用整句提问，例如：这 626 个面板里，哪些学科正在用「临界转变」这一类模型？它们彼此的分歧在哪？"></textarea>
+  <div class="bar" style="margin-top:10px">
+    <button class="go" id="goAsk" onclick="doAsk()">向本栏提问</button>
+    <span class="hint" id="askStat" style="align-self:center;margin:0"></span>
+  </div>
+  <div id="ansWrap" style="display:none">
+    <div class="ans" id="ans"></div>
+    <div class="srcs" id="srcs"></div>
+  </div>
+  <div class="note">
+    <b>这台问对与站内其他智能体的差别只有一条：取材范围。</b>
+    它的召回被钉死在「新思想前沿」这一族语料里（<span id="fdocs">六百余</span>个面板页、<span id="fchunks">七万余</span>段），
+    别的栏目一段都不会进来。所以它<b>擅长</b>回答「哪些学科在用同一类模型」「某个概念在本栏被哪几块提到、各自怎么讲」这类横跨面板的问题；
+    <b>不擅长</b>回答需要学员论文或专著内容才能答的问题——那些请到<a href="/search/" style="color:var(--gold2)">全站搜索</a>去问。
+    答案下方的来源全部是服务端从真实索引里取出的，可以逐条点开核对。
+  </div>
+</div>
+
+</main>
+<footer><a href="/browse/">© 德麦国际 · SDE Universes</a> · 新思想前沿 · 栏目内检索与问对</footer>
+
+<script>
+/* ================= 只在本栏范围内 ================= */
+var SCOPE = 'frontier';
+var MAN=null, DOCS=[], CHUNKS=[], loaded=0, total=0, SECLABEL='新思想前沿';
+
+function esc(s){ return String(s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+function setMode(m){
+  var kw = m==='kw';
+  document.getElementById('kwPane').classList.toggle('on', kw);
+  document.getElementById('askPane').classList.toggle('on', !kw);
+  document.getElementById('mKw').classList.toggle('active', kw);
+  document.getElementById('mAsk').classList.toggle('active', !kw);
+  (kw?document.getElementById('q'):document.getElementById('qa')).focus();
+}
+
+/* ---- 装载：只拉 frontier 这一族的分片 ---- */
+fetch('/search/manifest.json?v='+Date.now(),{cache:'no-store'}).then(function(r){return r.json();}).then(function(m){
+  MAN=m;
+  var sec=null;
+  for(var i=0;i<m.sections.length;i++){ if(m.sections[i].key===SCOPE) sec=m.sections[i]; }
+  if(!sec){ document.getElementById('stat').textContent='本栏索引尚未生成，请稍后重试。'; return; }
+  SECLABEL=sec.label||'新思想前沿';
+  m.docs.forEach(function(d){ if(d.s===SCOPE){ d.l=String(d.t||'').toLowerCase(); DOCS.push(d); } });
+  var fmt=function(n){ return Number(n||0).toLocaleString('en-US'); };
+  document.getElementById('stat').innerHTML='本栏收录 <b>'+fmt(sec.docs)+'</b> 个页面 · <b>'+fmt(sec.chunks)+'</b> 段可检索 · 索引更新于 '+String(m.built||'').slice(0,10);
+  document.getElementById('fdocs').textContent=fmt(sec.docs);
+  document.getElementById('fchunks').textContent=fmt(sec.chunks);
+  var files = sec.files || [sec.key];
+  total = files.length;
+  files.forEach(function(fn){
+    fetch('/search/shard-'+fn+'.json?v='+Date.now(),{cache:'no-store'}).then(function(r){return r.json();}).then(function(d){
+      for(var i=0;i<d.chunks.length;i++){ var c=d.chunks[i]; c.l=String(c.t||'').toLowerCase(); CHUNKS.push(c); }
+      loaded++; loadStat();
+      if(document.getElementById('q').value.trim()) doSearch();
+    }).catch(function(){ loaded++; loadStat(); });
+  });
+}).catch(function(){ document.getElementById('stat').textContent='索引加载失败，请刷新重试。'; });
+
+function loadStat(){
+  var st=document.getElementById('kwStat');
+  if(loaded<total){ st.textContent='本栏全文索引载入中… '+loaded+'/'+total+'（标题已可搜）'; }
+  else if(!document.getElementById('q').value.trim()){ st.textContent='本栏索引就绪。'; }
+}
+
+/* ---- 打分：与全站搜索页同一套算法，逐字复用 ---- */
+function analyzeQuery(raw){
+  var runs=[], keys=[], seen={};
+  function addKey(k){ if(k && !seen[k]){ seen[k]=1; keys.push(k); } }
+  raw.toLowerCase().split(/\s+/).forEach(function(tok){
+    if(!tok) return;
+    var zh=tok.match(/[\u4e00-\u9fff]+/g)||[];
+    var la=tok.match(/[a-z0-9][a-z0-9.\-]*/g)||[];
+    zh.forEach(function(run){
+      if(run.length>=2){ runs.push(run); for(var i=0;i+2<=run.length;i++) addKey(run.slice(i,i+2)); }
+      else addKey(run);
+    });
+    la.forEach(function(w){ runs.push(w); addKey(w); });
+  });
+  return { runs:runs, keys:keys, full:raw.toLowerCase() };
+}
+function countCap(hay, key, cap){ // 出现次数，封顶 cap（防单块刷屏）
+  var n=0, p=hay.indexOf(key);
+  while(p>=0 && n<cap){ n++; p=hay.indexOf(key, p+key.length); }
+  return n;
+}
+/* 软打分：覆盖率(命中了多少个查询要素)是主信号，词频是次信号，
+   整段/整串连续命中给短语加分。返回 0 表示噪声级、应丢弃。 */
+function softScore(lowerText, Q){
+  var hitKeys=0, tf=0;
+  for(var i=0;i<Q.keys.length;i++){
+    var n=countCap(lowerText, Q.keys[i], 3);
+    if(n){ hitKeys++; tf+=n; }
+  }
+  if(!hitKeys) return 0;
+  var coverage=hitKeys/Q.keys.length;
+  var sc=tf*(0.25+0.75*coverage);
+  for(var j=0;j<Q.runs.length;j++){ if(Q.runs[j].length>=2 && lowerText.indexOf(Q.runs[j])>=0) sc+=3; }
+  if(Q.full.length>=2 && lowerText.indexOf(Q.full)>=0) sc+=8;
+  return sc<0.9 ? 0 : sc; // 噪声地板：孤零零一个二元组蹭一下不算命中
+}
+
+var _t=null;
+function scheduleSearch(){ if(_t) clearTimeout(_t); _t=setTimeout(doSearch, 260); }
+
+function highlight(text, terms){
+  var out=esc(text);
+  terms.forEach(function(t){
+    if(!t) return;
+    var re=new RegExp('('+t.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','gi');
+    out=out.replace(re,'<em>$1</em>');
+  });
+  return out;
+}
+
+function doSearch(){
+  if(!MAN) return;
+  var raw=document.getElementById('q').value.trim();
+  var box=document.getElementById('results');
+  if(!raw){ box.innerHTML=''; loadStat(); return; }
+  var Q=analyzeQuery(raw);
+  if(!Q.keys.length){ box.innerHTML=''; loadStat(); return; }
+
+  var byDoc={};
+  function ent(di){ return byDoc[di]||(byDoc[di]={title:0,best:0,total:0,bestText:''}); }
+  /* 本栏之外的一律不进：DOCS 已经只有本栏，CHUNKS 也只来自本栏分片，
+     但仍按 d 下标回查一次 MAN.docs 的版块，防分片里混入别族的块。 */
+  function ok(di){ var d=MAN.docs[di]; return d && d.s===SCOPE; }
+
+  DOCS.forEach(function(d){
+    var s=softScore(d.l||String(d.t).toLowerCase(), Q);
+    if(s) ent(d.i).title = s*6;
+  });
+  for(var i=0;i<CHUNKS.length;i++){
+    var ck=CHUNKS[i], di=ck.d;
+    if(!ok(di)) continue;
+    var sc=softScore(ck.l||String(ck.t).toLowerCase(), Q);
+    if(!sc) continue;
+    var e=ent(di);
+    e.total+=sc;
+    if(sc>e.best){ e.best=sc; e.bestText=ck.t; }
+  }
+
+  var hits=Object.keys(byDoc).map(function(k){
+    var e=byDoc[k];
+    var rest=Math.min(Math.max(e.total-e.best,0), e.best*4);
+    return { di:+k, rank:e.title+e.best+0.35*rest, best:e.bestText };
+  }).filter(function(h){ return h.rank>0 && ok(h.di); }).sort(function(a,b){ return b.rank-a.rank; }).slice(0,40);
+
+  if(!hits.length){
+    box.innerHTML='<div class="empty">本栏没有找到匹配「'+esc(raw)+'」的内容。<br>换个词试试，或到 🧠 栏目内智能问对里用整句提问。</div>';
+    document.getElementById('kwStat').textContent='';
+    return;
+  }
+  var top=hits[0].rank;
+  document.getElementById('kwStat').textContent='本栏命中 '+hits.length+' 块 · 按匹配度排序'+(loaded<total?'（索引仍在载入，结果可能增加）':'');
+  var hl=Q.runs.length?Q.runs:Q.keys;
+  var html='';
+  hits.forEach(function(h){
+    var d=MAN.docs[h.di];
+    var pct=Math.max(1, Math.round(100*h.rank/top));
+    var snip=h.best||'';
+    if(snip){
+      var sl=snip.toLowerCase(), pos=999999;
+      hl.forEach(function(t){ var p=sl.indexOf(t); if(p>=0&&p<pos)pos=p; });
+      if(pos===999999){ Q.keys.forEach(function(t){ var p=sl.indexOf(t); if(p>=0&&p<pos)pos=p; }); }
+      if(pos>60 && pos<999999){ snip='…'+snip.slice(pos-40); }
+      if(snip.length>220) snip=snip.slice(0,220)+'…';
+    }
+    html+='<a class="res" href="'+esc(d.u)+'">'
+        + '<div class="t">'+esc(d.t).replace(/\s*·\s*新思想前沿\s*·\s*SDE Universes\s*$/,'')+'<span class="pct">'+pct+'%</span></div>'
+        + '<div class="m">'+esc(SECLABEL)+' · '+esc(d.u)+'</div>'
+        + '<div class="s">'+highlight(snip, hl)+'</div></a>';
+  });
+  box.innerHTML=html;
+}
+
+/* ================= 栏目内智能问对 ================= */
+var keyMode='sys', vendor='glm', asking=false;
+function setKey(m){
+  keyMode=m;
+  document.getElementById('kSys').classList.toggle('on', m==='sys');
+  document.getElementById('kOwn').classList.toggle('on', m==='own');
+  document.getElementById('keyWrap').style.display = (m==='own')?'block':'none';
+}
+function setVendor(v){
+  vendor=v;
+  document.getElementById('vGlm').classList.toggle('on', v==='glm');
+  document.getElementById('vDs').classList.toggle('on', v==='ds');
+}
+function renderSources(list){
+  var box=document.getElementById('srcs');
+  if(!list || !list.length){ box.innerHTML=''; return; }
+  var h='<div class="lbl">本栏来源 · '+list.length+' 处</div>';
+  list.forEach(function(s){
+    h+='<a href="'+esc(s.u)+'">'+esc(String(s.t||s.u).replace(/\s*·\s*新思想前沿\s*·\s*SDE Universes\s*$/,''))+'</a>';
+  });
+  box.innerHTML=h;
+}
+function doAsk(){
+  if(asking) return;
+  var q=document.getElementById('qa').value.trim();
+  if(!q){ document.getElementById('qa').focus(); return; }
+  var uk=(keyMode==='own')?document.getElementById('userKey').value.trim():'';
+  if(keyMode==='own' && !uk){ document.getElementById('userKey').focus(); document.getElementById('askStat').textContent='请先填入你的 API Key，或切回「系统密钥」。'; return; }
+  asking=true;
+  var btn=document.getElementById('goAsk'); btn.disabled=true;
+  document.getElementById('ansWrap').style.display='block';
+  var ansEl=document.getElementById('ans'); ansEl.className='ans blink'; ansEl.textContent='';
+  document.getElementById('srcs').innerHTML='';
+  var stat=document.getElementById('askStat'); stat.textContent='🔎 正在本栏语料中检索…';
+  var acc='';
+
+  fetch('/api/ask',{
+    method:'POST',
+    headers:{'content-type':'application/json'},
+    body:JSON.stringify(Object.assign({q:q, vendor:vendor, scope:SCOPE}, uk?{key:uk}:{}))
+  }).then(function(resp){
+    if(!resp.ok && resp.status!==200){ return resp.text().then(function(t){ throw new Error('HTTP '+resp.status+' '+t.slice(0,200)); }); }
+    var reader=resp.body.getReader(), dec=new TextDecoder(), buf='';
+    function pump(){
+      return reader.read().then(function(r){
+        if(r.done){ ansEl.className='ans'; return; }
+        buf+=dec.decode(r.value,{stream:true});
+        var lines=buf.split('\n'); buf=lines.pop();
+        for(var i=0;i<lines.length;i++){
+          var s=lines[i].trim();
+          if(!s || s.indexOf('data:')!==0) continue;
+          var pl=s.slice(5).trim();
+          if(pl==='[DONE]') continue;
+          var j; try{ j=JSON.parse(pl); }catch(e){ continue; }
+          if(j.t==='token'){ acc+=j.v; ansEl.textContent=acc; }
+          else if(j.t==='status'){ stat.textContent=j.v; }
+          else if(j.t==='sources'){ renderSources(j.v); }
+          else if(j.t==='expand'){ stat.textContent='🧭 SDE 词义检索：'+j.v; }
+          else if(j.t==='error'){ ansEl.className='ans'; ansEl.innerHTML='<div class="err">'+esc(j.v)+'</div>'; if(j.code==='use_own_key') setKey('own'); }
+        }
+        return pump();
+      });
+    }
+    return pump();
+  }).catch(function(e){
+    ansEl.className='ans';
+    ansEl.innerHTML='<div class="err">请求失败：'+esc(e.message||String(e))+'</div>';
+  }).then(function(){
+    asking=false; btn.disabled=false; stat.textContent='';
+  });
+}
+document.getElementById('qa').addEventListener('keydown', function(e){
+  if((e.ctrlKey||e.metaKey) && e.key==='Enter') doAsk();
+});
+</script>
+</body></html>

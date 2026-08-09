@@ -2975,10 +2975,15 @@ async function ragScan(env, url, q, expTerms, prevQ, k, chunkLimit, opts) {
   const BYTE_BUDGET = Math.max(1000000, Math.min(8000000, o.budget || 3000000));
   const PER_DOC = Math.max(1, Math.min(4, o.perDoc || 2));
   const SEC_FIRST = Math.max(1, Math.min(9, o.sections || 3));
+  // 限定版块（栏目内检索）：o.only = 版块 key（如 "frontier"）。
+  // 只在 L0 选版块与 L1 候选篇这两处收窄；打分、下钻、选段一律照旧，
+  // 这样栏目内问答与全站问答走的是同一条链，出问题只有一处要查。
+  // 传了一个不存在的 key 就等于没传（宁可回全站，也不要回空）。
+  const ONLY = (man.sections || []).some((se) => se.key === o.only) ? o.only : "";
 
   // —— L0：先选版块 ——
   const l0 = await tierGet(env, url, "/search/sections.json", "l0");
-  if (!l0 || !l0.sections) return ragScanShards(env, url, man, coords, baseKeys, exp, prev, k, cut);
+  if (!l0 || !l0.sections) return ragScanShards(env, url, man, coords, baseKeys, exp, prev, k, cut, ONLY);
   const titleHit = {};
   for (const d of man.docs) {
     const tl = String(d.t || "").toLowerCase();
@@ -2988,8 +2993,12 @@ async function ragScan(env, url, q, expTerms, prevQ, k, chunkLimit, opts) {
     if (sc) titleHit[d.s] = (titleHit[d.s] || 0) + sc;
   }
   const secRank = l0.sections
+    .filter((se) => !ONLY || se.s === ONLY)
     .map((se) => ({ s: se.s, sc: _scoreKeys(se.k, baseKeys, exp, prev) * 1.0 + (titleHit[se.s] || 0) * 0.6 }))
     .sort((a, b) => b.sc - a.sc);
+  // 限定版块时，sections.json 里若查不到这一族（索引尚未重建），退回按分片扫这一族，
+  // 而不是悄悄回落到全站——栏目内检索回出别栏的文章，比回不出更糟。
+  if (ONLY && !secRank.length) return ragScanShards(env, url, man, coords, baseKeys, exp, prev, k, cut, ONLY);
 
   // —— L1：只读选中版块的篇层；候选太少就动态放宽 ——
   const docSec = {}; for (const d of man.docs) docSec[d.i] = d.s;
@@ -3018,6 +3027,7 @@ async function ragScan(env, url, q, expTerms, prevQ, k, chunkLimit, opts) {
     await takeSection(secRank[i].s);
     if (secRank[i + 1]) await takeSection(secRank[i + 1].s);
   }
+  if (ONLY) for (const i of Array.from(docScore.keys())) if (docSec[i] !== ONLY) docScore.delete(i);
   if (!docScore.size) return { picked: [], docs: man.docs, coords: coords, secLabel: _secLabel(man) };
   const cand = Array.from(docScore.entries()).map(([i, sc]) => ({ i: i, sc: sc })).sort((a, b) => b.sc - a.sc).slice(0, PICK_DOCS);
 
@@ -3060,7 +3070,7 @@ async function ragScan(env, url, q, expTerms, prevQ, k, chunkLimit, opts) {
   return { picked: picked, docs: man.docs, coords: coords, secLabel: _secLabel(man) };
 }
 // 旧路：索引尚未重建时的退路——按版块相关度排序、限时限片地扫大分片。
-async function ragScanShards(env, url, man, coords, baseKeys, exp, prev, k, cut) {
+async function ragScanShards(env, url, man, coords, baseKeys, exp, prev, k, cut, only) {
   const secScore = {};
   for (const d of man.docs) {
     const tl = String(d.t || "").toLowerCase();
@@ -3069,7 +3079,9 @@ async function ragScanShards(env, url, man, coords, baseKeys, exp, prev, k, cut)
     for (const key of exp) if (tl.indexOf(key) >= 0) sc += 1.5;
     if (sc) secScore[d.s] = (secScore[d.s] || 0) + sc;
   }
-  const order = man.sections.slice().sort((a, b) => (secScore[b.key] || 0) - (secScore[a.key] || 0));
+  const order = man.sections.slice()
+    .filter((sec) => !only || sec.key === only)
+    .sort((a, b) => (secScore[b.key] || 0) - (secScore[a.key] || 0));
   const t0 = Date.now(), MS_BUDGET = 4000, SHARD_BUDGET = 3;
   let top = [], scanned = 0;
   for (const sec of order) {
@@ -4626,7 +4638,9 @@ async function askCore(request, env, url, body, SINK) {
   _stat("🔎 正在检索站内语料…");
   const expTerms = await sdeExpandQuery(VC, KEY, rq); // SDE 词义扩展：问题→SDE 术语，再拿去召回
   const expStr = expTerms.join(" · ");
-  const _lrA = await lightRetrieve(env, url, rq, expTerms, K, 1600, { pick: deep ? 48 : 20, perDoc: deep ? 3 : 2, budget: deep ? 6000000 : 3000000 });
+  // scope：栏目内问答（如 /frontier/search/ 传 "frontier"）——只从该版块召回。
+  const _scope = /^[a-z0-9_]{1,24}$/.test(String(body.scope || "")) ? String(body.scope) : "";
+  const _lrA = await lightRetrieve(env, url, rq, expTerms, K, 1600, { pick: deep ? 48 : 20, perDoc: deep ? 3 : 2, budget: deep ? 6000000 : 3000000, only: _scope });
   const corpus = _lrA.corpus, hits = _lrA.hits;
   const sources = [];
   const seen = {};
@@ -7926,7 +7940,8 @@ export default {
       const K = Math.max(4, Math.min(24, parseInt(b.k, 10) || 12));
       const cap = Math.max(2000, Math.min(16000, parseInt(b.cap, 10) || 9000));
       try {
-        const _lrK = await lightRetrieve(env, url, q, [], K, 1600, { pick: 16 });
+        const _scopeK = /^[a-z0-9_]{1,24}$/.test(String(b.scope || "")) ? String(b.scope) : "";
+        const _lrK = await lightRetrieve(env, url, q, [], K, 1600, { pick: 16, only: _scopeK });
         const corpus = _lrK.corpus;
         const seen = {}, srcs = [];
         let kbBlock = "";
