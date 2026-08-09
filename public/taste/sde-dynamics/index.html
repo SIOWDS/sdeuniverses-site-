@@ -560,7 +560,7 @@ async function run(){
     // 内功（本台与全站共用同一份底盘先验）
     $('hint').textContent = '正在加载底盘先验…';
     if(!window.__NEIGONG){
-      try{ const r = await fetch('/taste/assets/sde-neigong.txt?v=3.7', {cache:'force-cache'});
+      try{ const r = await fetch('/taste/assets/sde-neigong.txt?v=3.8', {cache:'force-cache'});
            if(r.ok) window.__NEIGONG = await r.text(); }catch(e){}
     }
     const BASE = (window.__NEIGONG && window.__NEIGONG.length>5000) ? (window.__NEIGONG + '\n\n' + DYN_PRIOR) : DYN_PRIOR;

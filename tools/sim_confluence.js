@@ -100,7 +100,9 @@ function defaultAnswer(userMsg, ctx) {
   if (/先判它要的答案是什么形状/.test(userMsg))
     return '题型：Why\n理由：提问的人要的是什么在逼动它，不是一个分辨用的读数。\n自测：留经验的动作与用经验的动作的矛盾驱动了经验流失。';
   if (/定出\*\*三个学科\*\*/.test(userMsg))
-    return '1｜认知心理学｜认知负荷 理论 争论\n2｜制度经济学｜度量 制度 批评\n3｜组织社会学｜组织记忆 争论';
+    /* v3.8：定学科那一步多一列面板编号（0＝这一门走联网）。
+       两门落到面板供料层、一门走联网，正好同时测到两条路。 */
+    return '1｜471｜认知心理学｜认知负荷 理论 争论\n2｜0｜制度经济学｜度量 制度 批评\n3｜272｜组织社会学｜组织记忆 争论';
   if (/请为\*\*每一门各挑出一家\*\*/.test(userMsg)) return pickAnswer(ctx && ctx.pickOpt);
   if (/这是 SDE 内功的第/.test(userMsg)) return '这一段的承重判断若干。' + '要点。'.repeat(20);
   if (/合成一份 ≤3000 字的作业底盘/.test(userMsg)) return '一、本体论要害……' + '铁律一条。'.repeat(80);
@@ -156,7 +158,7 @@ function sseFor(text) {
 /* ---------------- 起一个页面 ---------------- */
 async function boot(opts) {
   opts = opts || {};
-  const ctx = { calls: [], errors: [], saved: [], webQ: [], nbrQ: [], pulls: [], webBody: [],
+  const ctx = { calls: [], errors: [], saved: [], webQ: [], frontHub: 0, frontPanel: [], nbrQ: [], pulls: [], webBody: [],
                 pickOpt: opts.pickOpt, shortRewrite: opts.shortRewrite, lowScore: opts.lowScore, drafts: [], nbrLive: 0, nbrPeak: 0, nbrAborted: 0 };
   const vc = new VirtualConsole();
   vc.on('jsdomError', e => ctx.errors.push('jsdomError: ' + (e && e.message)));
@@ -170,6 +172,25 @@ async function boot(opts) {
       const T = s => Promise.resolve({ ok: true, status: 200, text: () => Promise.resolve(s), json: () => Promise.resolve({}) });
       const BAD = c => Promise.resolve({ ok: false, status: c, statusText: 'ERR', text: () => Promise.resolve(''), json: () => Promise.resolve({}) });
 
+      /* 新思想前沿：hub 磁贴与面板供料层。体例逐字照线上——
+         哪天面板页把 .src / .col 的类名改了，这里会当场红，而不是等真跑时静默丢材料。 */
+      if (/\/frontier\/$/.test(url)) {
+        ctx.frontHub++;
+        return T('<html><body>' +
+          '<a class="tile done" href="/frontier/oncology/"><span class="num">101</span><span class="nm">肿瘤学</span></a>' +
+          '<a class="tile done" href="/frontier/cognitive-science/"><span class="num">471</span><span class="nm">认知科学</span></a>' +
+          '<a class="tile done" href="/frontier/political-economy/"><span class="num">272</span><span class="nm">政治经济学</span></a>' +
+          '</body></html>');
+      }
+      if (/\/frontier\/[a-z-]+\/$/.test(url)) {
+        ctx.frontPanel.push(url);
+        return T('<html><body>' +
+          '<h2>甲、某条新思想：一句判断</h2>' +
+          '<div class="src"><i>提出</i>某某，2019 年《某刊》12(3):45–67。　<i>争议</i>另一位，2022 年同刊。　<i>最新</i>第三位，2025 年。　<i>关键</i>一句可通约的读数。</div>' +
+          '<p>正文段。</p>' +
+          '<div class="col"><i>位置</i>S——它把某状态当成单独够用的那一样　<i>单因</i>只有这一样是决定性的　<i>预设</i>〔01 谁进入分母〕　<i>量纲</i>甲数∶乙数　<i>失效</i>当某条件时方向反过来　<i>自曝</i>本家自己承认的那一处弱点　<i>空栏</i>账上不设字段的那一类　<i>异名</i>另见第 999 号</div>' +
+          '</body></html>');
+      }
       if (url.indexOf('catalog.json') >= 0) return J(CATALOG);
       if (url.indexOf('publications.json') >= 0) return J(STUDENTS);
       if (url.indexOf('sde-neigong.txt') >= 0) return T(FAKE_NEIGONG);
@@ -284,10 +305,18 @@ function userOf(c, re) { const x = c.calls.filter(k => re.test(k.user)); return 
   const c1 = await boot();
   await step('一、页面起得来（静态结构）', async () => {
     const stages = c1.doc.querySelectorAll('.stage');
-    ok('十五道工序面板都在', stages.length === 15, '实际 ' + stages.length);
-    ok('工序顺序：内化 → 题型 → 定三家 …… 成文 → 打磨 → 评审',
-      ['warmup','qtype','select','gate','spine','collide','expand','nbrgate','collide2','selforg','emerge','demarc','write','polish','review']
+    ok('十八道工序面板都在（v3.8：补了敌意拓宽／共有前提／真跑）', stages.length === 18, '实际 ' + stages.length);
+    ok('工序顺序：内化 → 题型 → 定三家 …… 敌意拓宽 …… 共有前提 …… 真跑 → 成文 → 打磨 → 评审',
+      ['warmup','qtype','select','gate','spine','collide','expand','nbrgate','hostile','collide2','premise','selforg','emerge','demarc','realrun','write','polish','review']
         .every((id, i) => stages[i] && stages[i].id === 'stage-' + id));
+    /* v3.8 三道新工序的位置是硬的：敌意拓宽必须紧跟候选闸（先淘汰再互撞），
+       共有前提必须在候选互撞之后（要撞完才知道三家共踩的是哪块地），
+       真跑必须在划界之后、成文之前（跑出来的不利结果要来得及写进正文）。 */
+    const stageIds = [...stages].map(x => x.id);
+    const idx = id => stageIds.indexOf('stage-' + id);
+    ok('敌意拓宽紧跟候选闸', idx('hostile') === idx('nbrgate') + 1);
+    ok('共有前提在候选互撞之后、自组织之前', idx('premise') > idx('collide2') && idx('premise') < idx('selforg'));
+    ok('真跑在划界之后、成文之前', idx('realrun') > idx('demarc') && idx('realrun') < idx('write'));
     ok('入口是问题＋三个学科', !!c1.$('cQuestion') && !!c1.$('cD1') && !!c1.$('cD2') && !!c1.$('cD3'));
     ok('题型可手动指定（含 auto/What/How/Why 四项）', c1.doc.querySelectorAll('#cType option').length === 4);
     ok('站内库那一路默认开着', c1.$('cUseKB').checked === true);
@@ -359,8 +388,18 @@ function userOf(c, re) { const x = c.calls.filter(k => re.test(k.user)); return 
     ok('站内近邻在定三家时也查了（三门各一次）',
       c2.nbrQ.filter(q => /认知心理学|制度经济学|组织社会学/.test(q)).length >= 3, c2.nbrQ.length + ' 次');
     const pick = userOf(c2, /请为\*\*每一门各挑出一家\*\*/);
-    ok('挑三家的调令里两路材料都在',
-      pick && /〔站外·联网检索〕/.test(pick.user) && /〔站内·本站已有篇目〕/.test(pick.user));
+    ok('面板目录抓过一次（626 块的可选学科池）', c2.frontHub >= 1, '实际 ' + c2.frontHub + ' 次');
+    ok('三门各抓了自己那块面板的供料层', c2.frontPanel.length >= 1, '实际 ' + c2.frontPanel.length + ' 块');
+    /* 断言认的是**材料块里真正的标记**，不是提示词的导语——
+       导语可以被改写（v3.8 那一轮就改了），材料块的标记不能，因为基底靠它分辨三路。 */
+    ok('挑三家的调令里三路材料都在（面板供料层排在最前）',
+      pick && /〔站外·联网检索〕/.test(pick.user)
+           && /〔站内·本站已有的相关篇目/.test(pick.user)
+           && /〔新思想前沿 第\d+号《[^》]+》· 八字段供料层〕/.test(pick.user));
+    ok('面板那一路排在联网与站内之前（基底先读到的是可核对的那一路）',
+      pick && pick.user.indexOf('八字段供料层〕') < pick.user.indexOf('〔站外·联网检索〕'));
+    ok('调令写明供料层是首选材料，且自曝与失效两栏专供共有前提那一格',
+      pick && /首选材料/.test(pick.user) && /自曝/.test(pick.user) && /失效/.test(pick.user));
     ok('挑三家的调令里写死了"三家必须都在回答同一道题"', pick && /三家必须都在回答同一道题/.test(pick.user));
     ok('位置要求压过学科（学科可撞车、位置不许撞）', pick && /学科可以撞车而位置不许撞车/.test(pick.user));
     ok('铁律：一个字都不许编', pick && /一个字都不许编/.test(pick.user));

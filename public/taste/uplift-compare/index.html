@@ -371,7 +371,7 @@ function loadAsset(url, minLen){
     return t;
   });
 }
-const priorPromise = loadAsset('/taste/assets/sde-neigong.txt?v=3.7', 5000)
+const priorPromise = loadAsset('/taste/assets/sde-neigong.txt?v=3.8', 5000)
   .then(t=>{ PRIOR=t; PRIOR_OK=true; })
   .catch(e=>{ PRIOR_OK=false; console.warn(e); });
 priorPromise.then(()=>{
