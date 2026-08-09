@@ -1,0 +1,148 @@
+name: publish-who-gets-to-settle-once
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/publish-who-gets-to-settle.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out latest main
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Build article and update 每日必读
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          import base64
+          import bz2
+          import hashlib
+          import re
+
+          root = Path('.')
+          payload_dir = root / '.publish' / 'who-gets-to-settle'
+          parts = sorted(payload_dir.glob('part*.b64'))
+          if len(parts) != 4:
+              raise SystemExit(f'Expected 4 payload parts, found {len(parts)}')
+
+          encoded = ''.join(p.read_text(encoding='ascii').strip() for p in parts)
+          article = bz2.decompress(base64.b64decode(encoded))
+          expected_sha = '026afb7a72521866ed3c6ae59c573befed9c69086b5159f582a3083c0c8438f6'
+          actual_sha = hashlib.sha256(article).hexdigest()
+          if actual_sha != expected_sha:
+              raise SystemExit(f'Article SHA-256 mismatch: {actual_sha}')
+          if len(article) != 98497:
+              raise SystemExit(f'Unexpected article size: {len(article)}')
+
+          article_text = article.decode('utf-8')
+          required = [
+              '谁有资格把话说定？',
+              '据责对位、无据闭合与语用语感的三轴理论',
+              '王德生 著',
+              '2031年8月9日',
+              'Evidence–Responsibility Alignment',
+          ]
+          missing = [x for x in required if x not in article_text]
+          if missing:
+              raise SystemExit(f'Article validation failed; missing: {missing}')
+
+          article_path = root / 'public' / 'paradigm' / 'who-gets-to-settle' / 'index.html'
+          article_path.parent.mkdir(parents=True, exist_ok=True)
+          article_path.write_bytes(article)
+
+          new_card = '''<div class="item"><div class="n">之一 · 学术论文：理论语言学 × 会话认识论 × 认识责任</div><h2><a href="/paradigm/who-gets-to-settle/">谁有资格把话说定？</a></h2><p class="sub">据责对位、无据闭合与语用语感的三轴理论</p><p class="hk">一句话一旦“像答案”那样完成，究竟是谁把关系说定？说定它所需的最小证据联盟又由谁启动？本文不再把语感只理解为语法许可、统计顺滑或无法分析的主观感觉，而把研究单位推进为由<b>证据分布、责任指派、表达闭合与事件闭合</b>共同组成的语言事件。论文用三轴六态模型修复原二维公式遗漏责任位的硬伤，区分有据直闭、生成性委托、有据卸责、越位代闭、无据悬置与无据强闭；再以 Heritage、Stevanovic、Brandom、Clark、Sperber 等全球强近邻作敌意拓邻，给出同句异据、同据异责、4×2×2 正交实验、盲编码、竞争模型与写死到 2031 年的撤回赌注。它的核心判断是：<b>语言真正的完成，不是句子看起来已经结束，而是闭合责任落到了能够启动必要证据链的位置；证据尚未到来时，保持可继续本身就是一种完成。</b></p><div class="trio"><div><b>核心对象</b>责任位 × 最小证据联盟</div><div><b>模型升级</b>三轴六态 · M<sub>R</sub> / M<sub>C</sub> / Q</div><div><b>经验风险</b>预注册检验 · 2031 撤回赌注</div></div><a class="rdmore" href="/paradigm/who-gets-to-settle/">阅读全文 →</a><div class="meta">约 3.2 万字 · 35 页 · 标准学术论文 · 作者 王德生 · 发表于2026年8月9日</div></div>'''
+
+          def replace_top_card(text: str, label: str) -> str:
+              pattern = re.compile(
+                  r'<div class="item"><div class="n">之一 ·.*?</div></div>(?=\s*<div class="item">)',
+                  re.S,
+              )
+              updated, count = pattern.subn(new_card, text, count=1)
+              if count != 1:
+                  raise SystemExit(f'{label}: expected one top-card replacement, got {count}')
+              return updated
+
+          # 1. 每日必读主页：替换频道清单中的“之一”，并替换首卡。
+          daily_path = root / 'public' / 'paradigm' / 'index.html'
+          daily = daily_path.read_text(encoding='utf-8')
+          old_list = '<li><a href="/paradigm/civil-war-scar/">内战的灼痕</a><span class="cn-n">之一</span></li>'
+          new_list = '<li><a href="/paradigm/who-gets-to-settle/">谁有资格把话说定？</a><span class="cn-n">之一</span></li>'
+          if daily.count(old_list) != 1:
+              raise SystemExit(f'Daily index: expected one old channel-list entry, got {daily.count(old_list)}')
+          daily = daily.replace(old_list, new_list, 1)
+          daily = replace_top_card(daily, 'Daily index')
+          if daily.count('/paradigm/who-gets-to-settle/') < 3:
+              raise SystemExit('Daily index: new article links are incomplete')
+          daily_path.write_text(daily, encoding='utf-8')
+
+          # 2. “计量与结算”频道：保持 11 篇总数，以新论文替换原“之一”。
+          ledger_path = root / 'public' / 'paradigm' / 'ledger' / 'index.html'
+          ledger = ledger_path.read_text(encoding='utf-8')
+          ledger = replace_top_card(ledger, 'Ledger channel')
+          if ledger.count('/paradigm/who-gets-to-settle/') < 2:
+              raise SystemExit('Ledger channel: new article links are incomplete')
+          ledger_path.write_text(ledger, encoding='utf-8')
+
+          # 3. 原“之一”保留为关联研究，避免同日出现两个“每日必读 · 之一”。
+          old_path = root / 'public' / 'paradigm' / 'civil-war-scar' / 'index.html'
+          old = old_path.read_text(encoding='utf-8')
+          old_series = '<div class="art-series">每 日 必 读 · 典 范 文 · 之 一</div>'
+          new_series = '<div class="art-series">每 日 必 读 · 关 联 研 究</div>'
+          if old.count(old_series) != 1:
+              raise SystemExit(f'Old article: expected one series label, got {old.count(old_series)}')
+          old = old.replace(old_series, new_series, 1)
+          old = old.replace(' · 每日必读 | SDE Universes</title>', ' · 关联研究 | SDE Universes</title>', 1)
+          banner = '''<div style="max-width:1100px;margin:12px auto 0;padding:10px 16px;border:1px solid #d6c7ab;background:#fff7e8;font-family:system-ui,sans-serif;font-size:14px;line-height:1.7;color:#4E5A68">本日“每日必读”主文已更新为 <a href="/paradigm/who-gets-to-settle/" style="color:#B5714A">《谁有资格把话说定？》</a>；本页作为关联研究继续保留。</div>'''
+          marker = '<body>\n'
+          if banner not in old:
+              if marker not in old:
+                  raise SystemExit('Old article: body marker not found')
+              old = old.replace(marker, marker + banner + '\n', 1)
+          old_path.write_text(old, encoding='utf-8')
+
+          # Final structural checks before commit.
+          checks = {
+              article_path: ['<meta name="author" content="王德生">', '<h1 class="art-title">谁有资格把话说定？</h1>'],
+              daily_path: ['/paradigm/who-gets-to-settle/', '标准学术论文 · 作者 王德生'],
+              ledger_path: ['/paradigm/who-gets-to-settle/', '三轴六态'],
+              old_path: ['每 日 必 读 · 关 联 研 究', '本页作为关联研究继续保留'],
+          }
+          for path, needles in checks.items():
+              text = path.read_text(encoding='utf-8')
+              for needle in needles:
+                  if needle not in text:
+                      raise SystemExit(f'{path}: missing final marker {needle!r}')
+
+          print('Publication files prepared successfully.')
+          print(f'Article: {len(article)} bytes, sha256={actual_sha}')
+          PY
+
+          rm -rf .publish/who-gets-to-settle
+          rm -f .github/workflows/publish-who-gets-to-settle.yml
+
+          git config user.name "SDE Publication Bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add -A
+          git commit -m "Publish 王德生《谁有资格把话说定？》 to 每日必读"
+
+          pushed=0
+          for attempt in 1 2 3 4 5; do
+            git pull --rebase origin main
+            if git push origin HEAD:main; then
+              pushed=1
+              break
+            fi
+            echo "Push race on attempt ${attempt}; retrying..."
+            sleep $((attempt * 3))
+          done
+          test "$pushed" -eq 1
