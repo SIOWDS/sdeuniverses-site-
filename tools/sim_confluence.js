@@ -104,6 +104,10 @@ function defaultAnswer(userMsg, ctx) {
        两门落到面板供料层、一门走联网，正好同时测到两条路。 */
     return '1｜471｜认知心理学｜认知负荷 理论 争论\n2｜0｜制度经济学｜度量 制度 批评\n3｜272｜组织社会学｜组织记忆 争论';
   if (/请为\*\*每一门各挑出一家\*\*/.test(userMsg)) return pickAnswer(ctx && ctx.pickOpt);
+  /* 候选闸的「转检索词」那一问必须给出真的 Q1/Q2——否则 qs 为空，联网那一路根本走不到，
+     「闭库时一次联网都没发」那条断言就成了假绿（它绿是因为没人走到那儿，不是因为被挡住了）。 */
+  if (/转成 2 条\*\*英文\*\*学术检索词/.test(userMsg))
+    return 'Q1: knowledge retention organizational memory loss\nQ2: codification tacit knowledge attrition';
   if (/这是 SDE 内功的第/.test(userMsg)) return '这一段的承重判断若干。' + '要点。'.repeat(20);
   if (/合成一份 ≤3000 字的作业底盘/.test(userMsg)) return '一、本体论要害……' + '铁律一条。'.repeat(80);
   if (/你是验收员/.test(userMsg))
