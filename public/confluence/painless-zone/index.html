@@ -1,65 +1,505 @@
-<!doctype html>
-<html lang="zh-CN">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>制造无痛区｜王德生｜SDE Universes 学科通融</title>
-<meta name="description" content="王德生：格式化表单如何在行动发生之前取消学习者的自我出面。提出自我疑存、测度信道制度独立度、四象限与可证伪反转实验。">
-<meta name="author" content="王德生">
-<meta name="keywords" content="教育表单,自我疑存,自我出面,测度信道,无痛区,学科通融,SDE,SIO">
-<meta property="og:type" content="article">
-<meta property="og:title" content="制造无痛区：格式化表单如何在行动发生之前取消学习者的自我出面">
-<meta property="og:description" content="王德生提出‘自我疑存—测度信道制度独立度’二维模型，并给出四象限、微动作代理、反转实验与证伪条件。">
-<meta property="article:author" content="王德生">
-<meta property="article:published_time" content="2026-08-09">
-<link rel="canonical" href="https://sdeuniverses.com/confluence/painless-zone/">
+<!DOCTYPE html>
+<html lang="zh-CN"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>制造无痛区——为自己出面的权能，如何在成形之前被格式化表单代偿取消 · 学科通融 | SDE Universes</title>
+<meta name="description" content="课内表单——实验报告、探究学习单、自评量表——在发放的同一秒同时发出两个信号：一个是请把你做的事写进来，另一个是可计分的形状已经在这里了。本文把三家最近邻放到同一个案例上逐格跑一遍：福柯的规训化裁决预测受罚残余，伊利奇的制度性垄断与失能专业预测反向使用，拉图尔的铭写装置预测过剩返回——三家的代理变量在痛苦消失且效率提升这一格上一起归零。由此本文提出控制变量自我出面：">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&display=swap">
 <style>
-:root{--paper:#f5f2e9;--sheet:#fdfcf7;--ink:#23201a;--muted:#6d6658;--rule:#2a3b50;--mark:#9e3d2c;--line:rgba(35,32,26,.16)}
-*{box-sizing:border-box}html{-webkit-text-size-adjust:100%}body{margin:0;min-height:100vh;background:var(--paper);color:var(--ink);font-family:"Noto Serif SC","Source Han Serif SC","Songti SC","SimSun",Georgia,serif;display:grid;place-items:center;padding:28px}
-main{width:min(780px,100%);background:var(--sheet);border:1px solid var(--line);border-top:3px solid var(--rule);padding:clamp(30px,7vw,64px);box-shadow:0 18px 50px rgba(35,32,26,.08)}
-.kicker{font-size:12px;letter-spacing:.32em;color:var(--mark);margin:0 0 28px}h1{font-size:clamp(38px,8vw,68px);line-height:1.16;margin:0 0 18px}h2{font-weight:500;font-size:clamp(18px,3.2vw,27px);line-height:1.65;color:var(--rule);margin:0 0 24px}.byline{color:var(--muted);font-size:14px;letter-spacing:.08em;border-top:1px solid var(--line);padding-top:18px}.abstract{font-size:16px;line-height:2;text-align:justify;margin-top:30px}.status{margin-top:28px;padding:16px 18px;border-left:3px solid var(--mark);background:#f8f4e9;color:var(--muted);line-height:1.8}.status a{color:var(--mark)}.spinner{display:inline-block;width:12px;height:12px;border:2px solid var(--line);border-top-color:var(--mark);border-radius:50%;animation:spin .8s linear infinite;margin-right:8px;vertical-align:-1px}@keyframes spin{to{transform:rotate(360deg)}}noscript{display:block;margin-top:18px;color:var(--mark)}
+/* 学科通融 · 学术纸面版式 v2 —— 为长时间的思辨性阅读设计 */
+:root{
+  --paper:#F5F2E9; --paper2:#FBF9F3; --sheet:#FDFCF7;
+  --ink:#23201A; --ink2:#5C5647; --ink3:#8A8271;
+  --rule:#2A3B50; --rule2:#41586F;
+  --mark:#9E3D2C; --mark2:#B85A44;
+  --line:rgba(35,32,26,.13); --line2:rgba(35,32,26,.28);
+  --measure:700px;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0; color:var(--ink);
+  background:var(--paper);
+  background-image:
+    radial-gradient(circle at 18% 8%, rgba(42,59,80,.035), transparent 46%),
+    radial-gradient(circle at 84% 72%, rgba(158,61,44,.030), transparent 44%);
+  background-attachment:fixed;
+  font-family:"Noto Serif SC","Source Han Serif SC","Songti SC","SimSun",Georgia,serif;
+  font-size:18.5px; line-height:2.06; letter-spacing:.012em;
+  font-feature-settings:"kern" 1;
+  text-rendering:optimizeLegibility;
+}
+a{color:inherit}
+::selection{background:rgba(158,61,44,.16)}
+
+/* 阅读进度：细，不抢注意力 */
+#pbar{position:fixed;top:0;left:0;height:2px;width:0;background:var(--mark);z-index:99;opacity:.85}
+
+/* 顶栏 */
+.readbar{position:sticky;top:0;z-index:10;background:rgba(245,242,233,.94);
+  backdrop-filter:blur(10px);border-bottom:1px solid var(--line);
+  display:flex;justify-content:space-between;align-items:center;
+  padding:11px 26px;font-size:13.5px;gap:12px;flex-wrap:wrap;letter-spacing:.02em}
+.nav-back{text-decoration:none;color:var(--mark)}
+.rb-modes{display:flex;gap:8px}
+.rb-btn{padding:5px 13px;border:1px solid var(--line2);border-radius:0;
+  text-decoration:none;font-size:12.5px;color:var(--ink2);letter-spacing:.04em}
+.rb-btn:hover{border-color:var(--mark);color:var(--mark)}
+.rb-btn.cur{background:var(--rule);color:var(--sheet);border-color:var(--rule)}
+
+/* 题头：论文首页 */
+.art{max-width:800px;margin:auto;padding:78px 26px 8px;text-align:center}
+.art-series{color:var(--mark);letter-spacing:.42em;font-size:11.5px;text-transform:uppercase}
+.art-title{font-size:clamp(30px,4.4vw,45px);line-height:1.38;margin:26px 0 0;font-weight:700;letter-spacing:.01em}
+.art-title:after{content:"";display:block;width:56px;height:1px;background:var(--line2);margin:26px auto 0}
+.art-sub{color:var(--ink2);font-size:17px;line-height:1.94;max-width:620px;margin:22px auto 0;font-weight:400}
+.art-meta{color:var(--ink3);font-size:12.5px;margin-top:26px;letter-spacing:.09em}
+
+/* 正文栏宽：每行约三十四个汉字，是长文思辨阅读最省力的宽度 */
+.wrap{max-width:var(--measure);margin:auto;padding:8px 26px 46px}
+
+/* 摘要块 */
+.deck{position:relative;background:var(--paper2);border:0;border-top:2px solid var(--rule);
+  border-bottom:1px solid var(--line);border-radius:0;
+  padding:30px 30px 26px;margin:44px 0 8px;font-size:16.2px;line-height:2.0;color:var(--ink2);text-align:justify}
+.deck:before{content:"题 解";position:absolute;top:-11px;left:26px;background:var(--paper);
+  padding:0 10px;font-size:11px;letter-spacing:.34em;color:var(--rule)}
+
+/* 目录：带引导点的学术目次 */
+.toc{background:transparent;border:0;border-top:1px solid var(--line2);
+  border-bottom:1px solid var(--line2);border-radius:0;padding:24px 4px 20px;margin:44px 0 56px}
+.toc .tl{font-size:11px;letter-spacing:.44em;color:var(--mark);margin-bottom:16px;text-align:center}
+.toc a{display:flex;align-items:baseline;gap:6px;padding:6px 2px;color:var(--ink2);
+  font-size:15px;text-decoration:none;border:0;line-height:1.7}
+.toc a:after{content:"";flex:1;border-bottom:1px dotted var(--line2);transform:translateY(-4px)}
+.toc a:hover{color:var(--mark)}
+
+/* 章节层级 */
+h2{font-size:23px;margin:74px 0 22px;padding:26px 0 0;border:0;border-top:1px solid var(--line2);
+  line-height:1.55;scroll-margin-top:78px;letter-spacing:.02em;font-weight:700}
+h2:first-of-type{margin-top:48px}
+h2:target{background:linear-gradient(transparent 68%,rgba(158,61,44,.14) 68%)}
+h3{font-size:18.5px;margin:44px 0 14px;color:var(--rule);font-weight:700;
+  padding-left:12px;border-left:2px solid var(--mark);line-height:1.7}
+h4{font-size:17px;margin:30px 0 10px;color:var(--mark);font-weight:700}
+
+p{margin:0 0 17px;text-align:justify;hyphens:auto}
+strong,b{color:var(--rule);font-weight:700}
+i,cite{font-style:italic;color:var(--ink2)}
+
+/* 命题框：承重判断单独立出来，读者一眼可辨 */
+blockquote{position:relative;margin:38px 0;padding:26px 34px;background:var(--sheet);
+  border:0;border-top:1px solid var(--line2);border-bottom:1px solid var(--line2);border-radius:0;
+  font-size:19px;line-height:1.95;font-weight:600;color:var(--ink);text-align:justify}
+blockquote:before,blockquote:after{position:absolute;color:var(--mark);font-size:26px;line-height:1;opacity:.55}
+blockquote:before{content:"⌜";top:9px;left:10px}
+blockquote:after{content:"⌟";bottom:9px;right:10px}
+blockquote p{margin:0}
+blockquote p+p{margin-top:12px}
+
+ul{margin:0 0 18px;padding-left:1.5em}
+ol{margin:0 0 18px;padding-left:1.7em}
+li{margin:0 0 10px;text-align:justify}
+li::marker{color:var(--mark)}
+
+hr{border:0;height:1px;background:var(--line);margin:52px auto;width:62%}
+
+em{font-style:normal;color:var(--ink3);font-size:15px}
+
+/* 三线表 */
+.tbl{width:100%;border-collapse:collapse;margin:32px 0;font-size:15.5px;line-height:1.8}
+.tbl th,.tbl td{padding:12px 14px;text-align:left;vertical-align:top;border:0}
+.tbl thead th{border-top:2px solid var(--ink);border-bottom:1px solid var(--line2);
+  font-weight:700;color:var(--rule);font-size:14.5px;letter-spacing:.04em}
+.tbl tbody tr:last-child td{border-bottom:2px solid var(--ink)}
+.tbl tbody td{border-bottom:1px solid var(--line)}
+.tbl caption{caption-side:bottom;font-size:13px;color:var(--ink3);padding-top:10px;text-align:left}
+
+/* 来源盒：参考文献式，悬挂缩进 */
+.src{margin:64px 0 8px;padding:30px 0 8px;border:0;border-top:2px solid var(--rule);
+  border-radius:0;background:transparent;counter-reset:srcn}
+.src .sl{font-size:11px;letter-spacing:.42em;color:var(--mark);margin-bottom:12px}
+.src .sd{font-size:14.8px;color:var(--ink2);line-height:1.95;margin:0 0 22px;text-align:justify}
+.src a.one{display:block;text-decoration:none;padding:16px 0 16px 34px;position:relative;
+  border-top:1px solid var(--line)}
+.src a.one:before{counter-increment:srcn;content:"[" counter(srcn) "]";position:absolute;left:0;top:16px;
+  color:var(--mark);font-size:13px;letter-spacing:.02em}
+.src a.one:hover .t{color:var(--mark)}
+.src a.one .k{font-size:12px;color:var(--mark);letter-spacing:.14em}
+.src a.one .t{font-size:16px;font-weight:700;color:var(--rule);margin:5px 0;line-height:1.72}
+.src a.one .g{font-size:14.5px;color:var(--ink2);line-height:1.9;text-align:justify}
+
+.endbox{text-align:center;border-top:1px solid var(--line2);margin-top:56px;padding:38px 20px;color:var(--ink2);font-size:15px}
+.endbox a{color:var(--mark);text-decoration:none}
+footer{text-align:center;border-top:1px solid var(--line);padding:32px;color:var(--ink3);font-size:12.5px;letter-spacing:.04em}
+
+#totop{position:fixed;right:22px;bottom:26px;width:40px;height:40px;border-radius:0;
+  background:var(--rule);color:var(--sheet);border:0;font-size:16px;cursor:pointer;display:none;z-index:98}
+
+@media(max-width:760px){
+  body{font-size:17px;line-height:2.0}
+  .art{padding:52px 18px 6px}
+  .wrap{padding:6px 18px 34px}
+  h2{font-size:20.5px;margin:56px 0 18px;padding-top:22px}
+  h3{font-size:17.5px}
+  blockquote{padding:22px 24px;font-size:17.5px}
+  blockquote:before{left:6px}blockquote:after{right:6px}
+  .tbl{font-size:14px}
+  .tbl th,.tbl td{padding:9px 8px}
+}
+
+@media print{
+  body{background:#fff;font-size:11.5pt;line-height:1.85}
+  .readbar,#pbar,#totop,.endbox,footer{display:none}
+  .wrap,.art{max-width:100%}
+  h2{page-break-after:avoid}
+  blockquote,.tbl,.src a.one{page-break-inside:avoid}
+  a{text-decoration:none}
+}
+
+.reflist{margin-top:6px}
+.reflist p{font-size:15px;line-height:1.95;color:var(--ink2);text-indent:-2em;padding-left:2em;margin:0 0 12px;text-align:justify}
+.reflist i{font-style:italic}
+h3{font-size:18.5px;margin:34px 0 14px;color:var(--rule)}
+.abs-en{margin-top:6px;padding:22px 24px;background:var(--sheet2,#faf8f3);border:1px solid var(--line2)}
+.abs-en p{font-size:14.5px;line-height:1.9;color:var(--ink2);margin:0 0 12px;text-align:justify}
+.kwline{font-size:14.5px;color:var(--ink2);margin:18px 0 0;letter-spacing:.02em}
+</style></head><body>
+
+<style>
+.tblwrap{overflow-x:auto;margin:22px 0}
+.tbl{border-collapse:collapse;width:100%;font-size:15px;line-height:1.75}
+.tbl th,.tbl td{border:1px solid var(--line2);padding:8px 11px;text-align:left;vertical-align:top}
+.tbl th{background:rgba(42,59,80,.07);font-weight:700}
+ol.li{margin:14px 0 14px 24px}ol.li li{margin:6px 0;line-height:1.95}
+ol.cvg{margin:14px 0 14px 24px}ol.cvg li{margin:7px 0;line-height:1.95}
 </style>
-</head>
-<body>
-<main>
-<p class="kicker">SDE UNIVERSES · 学科通融之八十九</p>
-<h1>制造无痛区</h1>
-<h2>格式化表单如何在行动发生之前取消学习者的自我出面</h2>
-<p class="byline">作者：王德生　｜　2026年8月9日　｜　理论建构与可证伪研究设计</p>
-<p class="abstract">本文从福柯的规范化判断、伊利奇的制度性工具批判与拉图尔的铭写装置共同失效的那一格出发，提出“自我疑存”与“测度信道制度独立度”二维模型，完成四象限判别、微动作代理、反转实验、竞争解释与证伪条件。核心判断是：制度制造的“无痛区”，未必来自冲突被解决，也可能来自能够把冲突认作“我的冲突”的内部程序尚未形成。</p>
-<p class="status" id="status"><span class="spinner" aria-hidden="true"></span>正在载入论文全文……</p>
-<noscript>此页面需要启用 JavaScript 才能读取论文全文。请返回<a href="/confluence/">“学科通融”专栏</a>。</noscript>
-</main>
+<div id="pbar"></div>
+<div class="readbar">
+  <a class="nav-back" href="/confluence/">‹ 学科通融</a>
+  <div class="rb-modes"><span class="rb-btn cur">📖 网页长文</span></div>
+</div>
+<header class="art">
+  <div class="art-series">学 科 通 融 · 之八十九 · 规训权力研究 × 制度批判与失能专业 × 科学技术论的铭写装置</div>
+  <h1 class="art-title">制造无痛区</h1>
+  <div class="art-sub">为自己出面的权能，如何在成形之前被格式化表单代偿取消</div>
+  <div class="art-meta">王德生 ＋ Claude · 约 2.2 万字 · 网页长文 · 发表于2026年8月9日</div>
+</header>
+<div class="wrap">
+<div class="deck">课内表单——实验报告、探究学习单、自评量表——在发放的同一秒同时发出两个信号：一个是"请把你做的事写进来"，另一个是"可计分的形状已经在这里了"。本文把三家最近邻放到同一个案例上逐格跑一遍：<b>福柯的规训化裁决</b>预测受罚残余，<b>伊利奇的制度性垄断与失能专业</b>预测反向使用，<b>拉图尔的铭写装置</b>预测过剩返回——三家的代理变量在"痛苦消失且效率提升"这一格上一起归零。由此本文提出控制变量<b>自我出面</b>：承认某物为自己所做的那个内部标记，在成形窗口内被标准形状的替身取代，于是既无痛苦、也<b>不留残余</b>。第二轴不取利害强度而取<b>信道结构</b>——书写介质是否同时是评分数据的物理载体；两轴交叉得四格，单一读数为<b>出面痕迹 R</b>，并以事前划定的自留区、左手位对照与空白对照物三条堵住循环论证。第七节请出九族占位者逐一给出方向相反的判决点，其中布尔迪厄的 doxa 与戈夫曼的角色距离各自占住了本文仅剩的一条增量，本文因此把自己排进一条单向收窄的汇聚系列末位，并写下三条各自对应一次实验的退路。第十一节把主张从"第四象限这个状态"推到<b>一种以未生成之物为条目的记账法</b>，并为这一步单独写下失败条件。全文附四条不利结果的预先承诺、三层撤回、写死不许事后协商的降格规则，以及一条到 2031 年的赌注——<b>并明确认账：本文没有采集任何一例数据。</b></div>
+<p class="kwline"><b>关键词 教育表单；代偿取消；无痛区；自我出面；自我疑存；信道结构；出面痕迹</b></p>
+<div class="toc"><div class="tl">目 录</div><a href="#s1">一、引言：一次没有痛苦的返工</a><a href="#s2">二、共有前提：三个最近邻在同一格上一起失效</a><a href="#s3">三、控制变量 Z：自我出面</a><a href="#s4">四、第二轴强制：从格式到信道</a><a href="#s5">五、二维辨别格：自我出面 × 信道结构</a><a href="#s6">六、读数：出面痕迹（单一口径）</a><a href="#s7">七、与九族最近邻的判决性分离</a><a href="#s8">八、经验部分：起点案例、预注册设计，与一次诚实的认账</a><a href="#s9">九、证伪条件、撤回条款与降格规则</a><a href="#s10">十、限制、伦理与本文自身的认账条款</a><a href="#s11">十一、本文究竟给出了什么：从一个状态名，到一本记不下它的账</a><a href="#s12">十二、与本栏各篇的分界</a><a href="#snote">发表前加固说明</a><a href="#s11">参考文献</a><a href="#s12">附录 A · 观测清点手册（表头与编码规则摘要）</a><a href="#s13">附录 B · 敌意拓宽的检索记录</a></div>
+
+<div class="abs-en"><b>摘 要</b><p>制度化的课内表单——实验报告、探究学习单、自评量表——在其预设赋值槽的结构中不仅阻碍学习者把内部冲动转化为公共可读的形式，更在发放的同一秒发出一个替代信号：槽位已经预设了"什么是可计分的形状"，学习者只需填满它。本文主张，表单介入教学腹地时，在标准化操作的名义下执行的是一种<b>代偿取消</b>（pre-emptive substitution）：它并不剥夺一项已经存在的能力，而是在那项能力的承担者成形<b>之前</b>，先用一个标准形状的替身把它换掉。被换掉的东西，本文称为<b>自我出面</b>（representing oneself）——学习者在动笔之前于内部为自己建立一个"这是我做的事"的疑存标记，并据此决定是否把它移交给外部格式。</p><p>本文把三家最近邻——福柯的规训化裁决、伊利奇的制度性垄断工具与失能专业、拉图尔的铭写装置——放到同一个案例上逐格跑一遍，指出三者的代理变量（受罚残余、反向使用、过剩返回）在"痛苦消失且效率提升"这一格上同时熔断，并从中分离出三者共有的、未被言明的前提：<b>人始终以某种不可化约的非官能形态先行在场</b>。承重命题由此立成：制度在学习中制造的无痛区，不是通过剥夺而致苦，而是通过先于一切剥夺的代偿；反之，凡存在一条不被制度接收的"为自己出面"的路径，痛苦便不再是本文所指的无痛化沉默消失，此时表面症状的消失只是被承受，而非被代偿。</p><p>为把这一命题从现象命名升为可裁决的辨别工具，本文引入一根与控制变量无因果箭头的第二轴：<b>信道结构</b>——学习活动的书写介质是否同时是评分数据的物理载体。两轴交叉得到四格。本文给出<b>单一主读数「出面痕迹」</b>（记为 R，附两个连续量：出手潜伏期比值 λ 与初始位移投影 d），并写死其定义、粒度、阈值与编码规则，在正文、判别、证伪与赌注四处同口径使用；其中"自留区"必须在任务开始前物理划定，以杜绝事后解释。本文还与五族已经走到最近处的研究——温尼科特的假自我、伯恩斯坦的框架与实现规则、伊利奇 1977 年的失能专业、布卢姆的程序性展演、科学教育的认识主体权与自我决定论的评价压力——逐族给出方向相反的判决点，并明写本文因此收回的两句话。最后给出三层撤回条件、降格规则、日期赌注与本文自身的认账条款。</p></div>
+
+<h2 id="s1">一、引言：一次没有痛苦的返工</h2>
+<p>一项越来越趋近于零的痛苦，在过去的课堂上反而不如今天这样稳固。</p>
+<p>一名中学生在本班化学实验课上用手机视频逐帧回放了滴定终点颜色的变化，据此将自己的操作步骤写进实验报告。教师以其步骤描述与报告表单的预置栏目不相匹配为由，将该份报告判为"不规范"。学生换了一张纸，这次他不再写自己的操作，而是按表单逐栏填空。第二次没有冲突，没有返工，也没有痛苦。</p>
+<p>这个瞬间的教育意义通常被理解为一次"适应"：学生学会了按规范书写报告。本文要提出的命题与此方向相反：那一刻发生的不是学会规范，而是学会<b>不在内部为自己建立一个"这是我做的事"的标记</b>。这个标记一旦不在，规范就不再是需要抵抗的东西，它只是需要被填满的槽位。痛苦消失，不是因为冲突被解决，而是因为那个原本可能与规范发生冲突的内部程序，从一开始就没有被生出来。</p>
+<p>需要立刻说明两件事，否则本文会被读成一篇熟悉的批判文章。</p>
+<p><b>第一，本文不是在说表单压抑了学生。</b> 压抑意味着有一个被压住的东西，它还在下面，还会以别的方式冒出来。本文说的恰恰是没有那个东西——不是压住了，是没长出来。这两者在表面症状上极难区分（都表现为顺从、都表现为标准答案），但在可测量的痕迹上完全不同：压抑留下残余（犹豫、涂改、反应延长、私下的反向表达），代偿取消不留残余（速度更快、全程平静、指标全面改善）。本文全部的经验负担，就是把"没有残余"这件事做成可以被推翻的东西。</p>
+<p><b>第二，本文不主张"痛苦是好的"。</b> 本文主张的是一个更窄的东西：<b>存在一类痛苦，它是发生正在进行的信号</b>——当一个尚未成形的内部程序正在被转化为公共可读的形式时，转化的缝隙会以不适的形态被感知到。抹掉这类不适的最经济的办法，不是帮助转化，而是取消需要转化的那一端。本文关心的正是这条捷径，而不是所有的痛苦。教育中大量的痛苦与本文无关：恐惧、羞辱、过载、睡眠不足，那些应当被减少，而且减少它们不会取消任何东西。</p>
+<p>现行解释中，福柯的规训理论会说，这是一次典型的规范化裁决：制度通过表单这一凝视装置，把学生放入可比较、可归档的坐标上，使之成为被观看的客体。伊利奇的制度性垄断工具理论会说，表单是对"怎样学"的法定定义，它把学习工具的定义权从学习者手中收走。拉图尔的铭写装置理论则会说，表单是把三维操作转化为二维固定纸面痕迹所必须付出的格式代价，凡是铭写，必有裁剪。</p>
+<p>本文不主张这三种解释是错的。它们各自在自己的问题上是对的，而且比本文成熟得多。本文主张的是：<b>它们在解释"痛苦为何消失"时，处在一个共同的代理变量上失效了</b>——三者握住的都是"权力剥夺了一个已经存在的行动者的某种能力"，而表单此时真正做的事，是在那个行使能力的主体成形之前，先用一个标准替身把它换掉了。学习者不是失去了为自己出面的权利，而是从未被允许形成一个需要出面的自我。</p>
+<p>本文的推进次序如下。第二节把三家放到同一案例上逐格跑，指出各自的分离点，并抽出三者的共有前提。第三节提取控制变量 Z（自我出面）并立起承重命题。第四节排除四个候选轴、选定结构独立的第二轴（信道结构），并做正交性检验。第五节展开二维辨别格的四个象限，给出五家最近邻与本文在每一格上的对立预测。第六节把主读数写死：定义、粒度、阈值、编码规则，以及"自留区必须事前划定"这条防循环论证的硬规定。第七节与五族最近邻逐族给出判决性分离，并明写本文因此收回的话。第八节给出起点案例、一份预注册设计与不利结果的预先承诺，并诚实说明这份设计<b>尚未执行</b>。第九节给出三层撤回条件、降格规则与日期赌注。第十节是限制、伦理与本文自身的认账条款。</p>
+<h2 id="s2">二、共有前提：三个最近邻在同一格上一起失效</h2>
+<p>本章将三家的解释放到同一个案例上逐格跑一遍，指出三者的预测在"痛苦消失"那一个特定的时间位置上，与本案例的第二次书写可以是一致的。这种一致不是验证，而是重合——重置验证的条件是将案例移到另一格，也就是本章要做的分离点推演。</p>
+<p>需要事先说明取材的诚实边界：本节所依据的案例细节（是否涂改、出手速度、是否有口头补述）来自任课教师的课后回忆与学生本人的自述，<b>不是研究性记录</b>。它只能承担"提出问题"的功能，不能承担任何证据功能。第八节会把这一点再说一遍并给出补救设计。</p>
+<h3>2.1 福柯：规训需要一个被罚过的人留在里面</h3>
+<p>在《规训与惩罚》（Foucault, 1975）的规范化裁决体系中，福柯给出的是一种以处罚微小偏差来生产符合规范的个体的权力技术。考试、排名、操行评估以及实验报告等纸面归档，都是这套技术的载体。</p>
+<p>用福柯的框架看本案例的第一次报告批改，解释是完全自洽的：学生的步骤描述被归入"不规范"，是一次典型的微型处罚——它并不禁止学生做实验，但通过对他做事方式的否定，制造了一个可被比较的差距。学生感到痛苦，是因为他被置于一套坐标中，看到了自己与"规范操作者"之间的距离。</p>
+<p>但这套解释在第二次书写上塌掉了。按照规训的机制，权力恰恰需要受罚的残余保持在主体内部——主体必须记得这个差距，才能在以后先行自我校正。惩罚生产良心，良心是一只看守自我的眼睛，这是福柯分析的核心闭环。那么，第二次书写如果是这个闭环的正常运行，学生应该经历一个内部监控：在填写步骤栏时，头脑中同时伴随着对自己第一次描述的抑制动作——"这是我原来想写的，但不是规范要的"。即便文字是标准解，内部冲突仍然存在。福柯对此冲突是有可观测预测的：受罚之后的主体在类似场合下，反应时间延长、旁写犹豫，或出现自我纠正类涂改。</p>
+<p>而本案例的第二次书写所呈现的方向相反：无涂改、出手更快、全程平静。按福柯的预测，这一格的反应时间应该延长，观察到的却是缩短。这意味着规范化裁决在第二次书写中没有在学生内部形成一个自我监控的焦虑结构——它没有生产出那只"看守自己的眼睛"。福柯的代理变量（受罚残余→自我监控→延迟反应）在"痛苦消失且效率提升"这一格中，与本文要解释的现象发生了分离。本文要解释的，正是这种消失何以不是抑制，而是消解。</p>
+<p>必须补一句公道话：福柯本人从未承诺规训的每一次运作都留下可测的焦虑痕迹，"规训成功即不留痕"也可以是一种福柯式读法。本文对这一读法的回应放在第七节 7.6：若规训的完成态就是无痕，那么规训理论在本文关心的这个区分上<b>不再具有判别力</b>——它对第三象限与第四象限给出同一个说法，而本文给出两个不同的说法，并各带一个可测读数。理论的价值在这里不是对错之别，是分辨率之别。</p>
+<h3>2.2 伊利奇：两个版本的伊利奇，以及为什么强版本仍然不够</h3>
+<p>伊利奇（1971）的"去学校化社会"拒绝学校对教育工具的垄断性定义权。他的"隐蔽课程"分析指出，学校不仅是知识的传递者，更是"什么是学习""怎样算学会了"这些元定义的法定授权者。学习表单正是这种元定义的物化终端。</p>
+<p>从这个框架出发，表单之所以构成伤害，是因为它排斥了其他形态的学习工具——在滴定实验中，手机录像、口头复述、互教互问都是可用的补足工具，而一旦报告表单被设为唯一的可计分信道，其他工具的使用就被自判为"无效"，学习者因此被剥夺了工具配置权。伊利奇会预测：被剥夺者会表现出对法定工具的反向使用——要么敷衍（填最低必要的字），要么对抗（拒绝上交表单），二者都是以扭曲法定工具的方式来保留被压缩的自主权。</p>
+<p>本案例的第二次书写不属于这两种反向使用。他没有敷衍，报告栏里是够格的标准描述——同一个操作如果由一位从未做过视频回放的学生写出，教师会打出满分的同一个文本。他也没有对抗，没有就此事件发表任何抗议，据同学转述他此后还"很认真地填表"。伊利奇预测的工具扭曲使用没有出现，而它与本文的对立是硬的：伊利奇的反向使用模式预设了一个不甘被剥夺的自我——这个自我即便在表单上敷衍，也是在用一种消极的方式表达"我不把这个表格当作我自己的东西"。本案例的第二次书写没有这个动作。他填表时，表格是他的——他没有不把它当自己的，也没有在表格之外另辟一个属于自己的学习工具空间。</p>
+<p><b>然而，到此为止我们讨论的只是 1971 年的伊利奇，而伊利奇本人在六年后写了一个更强的版本。</b> 在《失能的专业》（Illich, 1977）中，他把批判的落点从"工具的垄断"移到了"需要的指派"：专业阶层的真正权力不在于垄断了满足需要的手段，而在于<b>替人指派需要</b>（imputed needs）——由专业来规定人有什么问题、需要什么、什么算解决。这个版本的伊利奇不再预设一个"不甘被剥夺的自我"；它恰恰主张：被指派需要的人，会<b>失去自己命名自己需要的能力</b>，成为一个 client 而不是一个行动者。</p>
+<p>这一点必须说清楚，因为它直接威胁本文的原创性。如果 1977 年的伊利奇已经说了"能力在被行使之前就被专业取消了"，本文的承重命题就只是它的一个教育学脚注。</p>
+<p>本文的回答是：<b>强版本的伊利奇取消的是"命名需要的能力"，本文说的是"承认某物为自己所做的那个标记"，两者的承担者位置不同。</b> 在伊利奇那里，被指派需要的人仍然是一个完整的、有需要的人，只是他关于"我需要什么"的判断被外部替换了；他仍然可以说"我不需要这个"，只是没有人听，而且他自己也逐渐不再这么说。伊利奇的机制是<b>慢性的、社会尺度的、跨年的</b>：一个人经过十年学校教育之后，不再能说出自己想学什么。而本文说的事件是<b>急性的、一张表单尺度的、以秒计的</b>：在一次任务里、在表单发下来的那一秒，那个尚未成形的"我这一次做了什么"的标记，因为答不上"它是什么"而自判不算数。伊利奇的时间尺度上不可能有读数；本文的时间尺度上有一个：动笔前那半秒钟手往哪儿动。</p>
+<p>第七节 7.3 会给出这一分离的判决性设计。这里先记下本文因此<b>收回的第一句话</b>：本文不再主张"三家都预设了一个已经在场的行动者"这条全称判断——<b>伊利奇 1977 年的版本不预设</b>。本文只主张三家的<b>可观测代理变量</b>都需要一个已经在场的行动者才能取值，而这是一个弱得多、也更容易被检验的主张。</p>
+<h3>2.3 拉图尔：铭写装置只裁切已存在的过剩</h3>
+<p>拉图尔的铭写装置理论（Latour &amp; Woolgar, 1979；Latour, 1986）在科学实验室的民族志研究中描述了同一个规律：那些立体的、过程性的、在特定时间与尺度上才能被观察到的实验操作，必须经过一系列缩减与固定，转化为平板纸面上的可携带痕迹（公式、图表、数据表），才能离开原实验室进入论文、报告与档案系统。这个"转译—缩减—固定"的过程，拉图尔称之为铭写。他一再强调，铭写必有损失，但损失是生成一个新的、更强移转能力的文本所必须付出的代价——正是在这个意义上，他把铭写装置的产物称为"不变的动体"（immutable mobile）。</p>
+<p>学生实验报告表单，按其形态，是一种拉图尔意义上高度成熟的铭写终端：实验操作是三维的、有时序的、有伸手与停顿的；报告栏是二维的、共时的、只留结果不留路径的。表单把实验转译为纸面痕迹，必然会裁掉原操作中不可平铺的部分，这是拉图尔的预测 A。他会再给出一条预测 B：被裁掉的部分会以某种形式返回——在前沿科学中，返回形式是"补充说明""附录数据""致谢前一周的争论"；在课堂中，返回形式可能是学生在交报告时口头补充一句"其实我是用视频看的颜色"，或是期末写在反思小结里。</p>
+<p>本案例的第一份报告应和了预测 A——它带着没有被裁干净的路径叙述，结果被判不规范。此后他没有在任何场合以任何形式使那部分返回。口头补充、反思小结、同学间不经意的自我辩解，在他的行为序列中都没有出现。拉图尔会期待一个被裁掉的残余以另类铭写通道返回，而本案例没有。那部分被裁掉的不只是格式，而是连同"是我做的东西"这个归属感一起裁掉了。拉图尔的代理变量（被铭写裁掉的过剩→另寻通道返回→残余始终由行动者自己认领）在"无返回、不认领"这一格上，与本文产生了分离。</p>
+<p>同样要补一句公道话：拉图尔研究的是<b>已经是科学家的人</b>——一个已经把某物认作自己发现的人，才会为它另寻通道。把这套框架搬到"还不是任何东西的学习者"身上，本就超出了它的适用范围。所以这里的"失效"不是拉图尔的失败，而是本文与它的<b>适用域分界</b>：铭写理论管的是<b>已成形之物的转译损失</b>，本文管的是<b>转译界面本身阻止了成形</b>。这一句是本文与拉图尔关系的准确表述，第七节不再对他单列一节。</p>
+<h3>2.4 三家的共有前提</h3>
+<p>三家最近邻被逐一放到本案例反例的那一格上，共同偏离了同一个点：学生在第二次书写中没有任何"为自己保留下来的部分"。他写的是规范要的答案，思考里没有规范不要的残余，速度更快，痛苦消失。三家代理变量之所以在这一格上同时熔断，是因为它们的<b>可观测代理</b>都需要同一个前提才能取值：</p>
+<p><b>共有前提（P）</b>：在制度介入之前，存在一个已经成形的、能够认领某物为自己所有的承担者；制度所做的事，是对这个承担者的某种减损。</p>
+<p>福柯的良心，其存在条件是有"受罚的内疚"，而受罚需要一个先已被判为"我的行为"的事件——那个人已经为自己出过面。伊利奇（1971 版）的反抗，其存在条件是有"被剥夺了某物的不甘"，而剥夺需要一个先被认作"我的配置"的工具——那个人已经为自己画过一个界。拉图尔的过剩返回，其存在条件是有"被裁掉的仍被我认作我的"，仍然以那个做事的人在铭写之后还是同一个人为必备基底。</p>
+<p>三者之中，"为自己出面"是那个先决于它们的必备项。反过来，一旦一整套外部制度介入时，先手将这个尚未成形的"我的"代偿为一个已经成形的替身，那么制度在此刻制造的就不是三个代理变量捕捉到的任何一种痛苦，而是一种更基础的东西：<b>无痛区</b>。</p>
+<p>需要防一个误读：本文并不认为福柯、伊利奇、拉图尔"忘了"这件事。他们各自的研究对象——监狱与学校中的成年主体、被专业化的市民、已经在生产事实的科学家——<b>都是已经成形的承担者</b>。前提 P 对他们是恰当的。本文之所以能在这里插进一格，只是因为本文换了对象：一个还在成形中的、每一堂课都要重新成形一次的学习者。这不是本文比三家高明，是问题的位置不同。</p>
+<h2 id="s3">三、控制变量 Z：自我出面</h2>
+<h3>3.1 现象：动笔前那半秒</h3>
+<p>先把要命名的东西放在它发生的那个位置上。</p>
+<p>在本案例的课间，有一个东西是活的：学生拍视频回放，不是教师任务，不是表单栏目，是自己做出一套步骤然后拿着它去找外部结构。他做这件事的时候，那套步骤还没有名字，还没有形状，甚至他自己也说不清"我这是在干什么"——但他知道<b>这是他在干的</b>。</p>
+<p>在报告栏前，表单发放的同一秒，上面带着已经写好的步骤栏——那个空格的名称和位置本身就在告诉学生：你已经有一个步骤了。对学生而言，"你是否有一个步骤"这个问题在表单到来时被预设为"肯定有"，而尚未成形的内部程序在被人一问"它是什么"而自己答不上来的压力下，最经济的做法不是挣扎转化成形，而是自判"这个答不上的东西大概不算真的步骤"，然后退场。无痛苦，无冲突，指标上全是改善。</p>
+<p>关键的物理位置就在这里：<b>表单接触到笔尖第一次落纸之间的那一小段时间</b>。在这段时间里，一个为自己出过面的人的手，会先朝自己的那一侧动一下——去够草稿纸、去够页边的空白、去把手机翻过来看一眼；一个没有出过面的人的手，直接落在第一个槽位里。这不是隐喻。这是本文全部经验主张的落点，第六节会把它写成可编码的量。</p>
+<h3>3.2 定义：自我出面与自我疑存</h3>
+<p>本文提出两个概念，一个是动作，一个是状态。<b>为避免同名反指，两者在全文、判别格、证伪条款与赌注中的定义逐字同形，不再另作解释。</b></p>
+<p><b>自我出面</b>（representing oneself，记为 Z）：在一次学习任务中，学习者于<b>外部格式接收之前</b>，在内部为自己建立一个"这是我做的事"的归属标记，并据此决定是否、以何种形状把它移交给外部格式。</p>
+<p><b>自我疑存</b>（the self as a site of indeterminate survival）：那个尚未被外部定义、尚未成形、其存在与否连当事人自己也无法确证，但仍在起作用的内部程序状态。自我疑存是自我出面的<b>发生前身</b>：出面是对疑存之物的一次认领与移交决定。</p>
+<p>自我疑存不是明确的自我意识，不是自己能说出"我是谁"的反身判断，而是一个更前置于它的东西。它有四个存在条件，四条同时满足才叫疑存态：</p>
+<ol class="li"><li><b>无外部模板</b>：当前正在做的这件事，尚未被任何外部结构给出形状；</li><li><b>有归属</b>：当事人知道这是自己正在做的，而不是被指派的；</li><li><b>不可陈述</b>：当事人此刻无法用完整语句说出"它是什么"；</li><li><b>可移交性未定</b>：它是否应当、以及以何种形状交给外部，尚未决定。</li></ol>
+<p>条件 3 是关键，也是最容易被误读的一条。它不是说这个东西是神秘的、不可言说的；它是说<b>在这一刻</b>它还没有被说成句子，而说成句子的那一步正是转化，转化正是学习。条件 4 则确保本文谈的不是私人体验，而是一个面向公共形式的<b>决定位</b>——如果永远不打算交出去，那不是本文关心的自我出面，那是别的东西（爱好、私记、自娱），本文不主张它劣于出面，只主张它不在本文的辨别格内。</p>
+<h3>3.3 承重命题：代偿取消</h3>
+<p><b>承重命题</b>：制度在学习中制造的无痛区，不是通过剥夺而致苦，而是通过<b>先于一切剥夺的代偿</b>——把一个尚未成长为可被剥夺之物的内部程序，在它尚以不成形的疑存形态存在的那个窗口里，用标准形状的替身取而代换掉，使学习者再也不可能为自己出面；反之，凡存在一条不被制度接收的"为自己出面"的路径，痛苦便不再是本文所指的无痛化沉默消失，此时表面症状的消失只是<b>被承受</b>，而非<b>被代偿</b>。</p>
+<p>这个命题的形式是"X 不是 Y，而是 Z"：无痛区不是压抑的成功（Y），而是代偿取消的产物（Z）。它的全部力量取决于 Y 与 Z 是否可以在观测上分开。第五、六节做的就是这件事。</p>
+<p>三个直接推论，都写成可被推翻的形式：</p>
+<ol class="li"><li><b>推论一（无残余）</b>：表单代偿一旦完成，学习者不生产负向行为，不表现压抑痕迹，不将被裁掉的知识以另种媒介返回。因为他内部没有一个被归为自己而尚待被承认的东西。</li><li><b>推论二（速度反常）</b>：代偿完成的书写，其出手潜伏期<b>低于</b>该学生在无格式任务上的基线，而非高于。压抑说预测高于基线，本文预测低于或等于。</li><li><b>推论三（非替代出场）</b>：在一条从未被表单代偿过的信道上，代偿完成者<b>仍然</b>可能第一次让自己出场；且这次出场之后，他在制度信道上的下一次提交会呈现出面痕迹回升而合规性不降。压抑—释放说无法同时承认这两件事。</li></ol>
+<h3>3.4 命名与边界：本文不主张什么</h3>
+<p>四条自限，写在前面，免得后面被读成更大的东西：</p>
+<ol class="li"><li>本文<b>不主张</b>表单应当被取消。表单是必要的公共界面；本文主张的是表单发放的<b>时序</b>与<b>信道位置</b>可以改变，而这两件事都不需要取消表单。</li><li>本文<b>不主张</b>"自我出面"是一种美德或一种能力等级。它是一个位置，不是一个成就。一个把自己那套东西认领下来并交出去的学生，可能交出去的是错的。本文测的是有没有出面，不是出得好不好。</li><li>本文<b>不主张</b>代偿取消是不可逆的。第五节第一象限的存在本身说明它可逆。本文只主张它在<b>当次任务</b>内是完成的。</li><li>本文<b>不主张</b>这一机制解释所有的学习困难，也不主张它是表单效应的唯一通道。它只主张：在现有三家与后文九族的解释之外，还剩一个未被覆盖的格子，而那个格子有自己的读数。</li></ol>
+<h2 id="s4">四、第二轴强制：从格式到信道</h2>
+<p>只给出一个控制变量 Z，仍停在命名这一步——它为一个被既有理论共享盲区覆盖的现象提供了新名字，但尚未从这个名字里长出一条新的分法。要往前一步，Z 必须去顶一条<b>结构独立</b>的第二轴，生成一张二维辨别格。在这张格里，回答的不再是"这是什么"（自我出面），而是"如何把两件一直被混为一谈的事分开"——被制度<b>消解</b>了出面权能的学习者，与被制度<b>压制</b>了出面行为的学习者，在现有理论中共享同一套标签，而本文必须证明它们是两种不同的事。</p>
+<h3>4.1 四个被排除的候选轴</h3>
+<p>第二轴的选择受限于一个严格约束：<b>它不能是 Z 的成因，也不能是 Z 的后果</b>。若第二轴与 Z 之间存在因果箭头，那么这张辨别格只是把同一条因果链铺成四个阶段，并未在结构上增加维度。</p>
+<p><b>被排除的候选轴一：制度的强制性强度。</b> 高强制性制度（如闭卷统考）确实比低强制性制度（如开放探究课）更容易触发填平操作，但这种触发关系恰恰说明强制性是自我出面被取消的<b>原因之一</b>，不是与之正交的结构维度。将强制性作为第二轴，得到的辨别格只是"强制性强→出面难／强制性弱→出面易"的单调重述，不产生任何会让最近邻预测相反的知识增量。</p>
+<p><b>被排除的候选轴二：学习者的元认知水平。</b> 元认知水平高的学习者可能更早意识到自己在被代偿，但这同样是一种因果箭头——元认知是出面权能的保护因子。若以它为第二轴，本文将被吸入自我决定论已有的"自主性支持→内在动机→深度投入"因果链，丧失与近邻划界的杀伤力。</p>
+<p><b>被排除的候选轴三：学科的知识结构特性。</b> 硬科学（步骤明确、答案唯一）与软学科（开放解释、多元路径）确实会给出不同形状的表单槽位，但这一差异在本文的框架中不是第二轴——它是触发填平操作的场景条件，属于自变量一侧。把它放在轴的位置上，等于把原因当成维度。</p>
+<p><b>被排除的候选轴四（本文新增，也是最危险的一条）：评价利害（stakes）的高低。</b> 这条必须正面处理，因为它看上去与本文最终选定的轴很像，而且它已经有一整套成熟的实验证据（Grolnick &amp; Ryan, 1987；Amabile, 1979；Deci &amp; Ryan, 1985）。利害高低指的是一次产出会不会带来后果、后果有多重；它是一条<b>心理压力量纲</b>上的连续变量，其效应通道是感知到的控制感与内在动机。若以它为第二轴，本文的四格将退化为自我决定论的经典 2×2（自主支持/控制 × 内在/外在动机），而本文的所有预测都能被"评价压力降低内在动机"这一句覆盖。</p>
+<p>本文选定的轴与它的区别，必须先在这里说清：<b>利害是关于后果的强度，信道是关于介质的身份。</b> 一次不计分的随堂练习，如果写在会被督导直接调取的作业本上，它的利害为零而信道依赖为满；一次决定升学的竞赛，如果学生在自备草稿本上推演、只提交最终答案，它的利害为满而草稿本这一段的信道依赖为零。两者可以取到全部四种组合，因此不是同一根轴。第七节 7.5 会给出把二者分开的判决性设计。</p>
+<h3>4.2 当选的第二轴：信道结构</h3>
+<p>排除上述四项后，一条结构独立、且在五家最近邻的框架中均未被视为变量的维度浮现：<b>学习者所从事的学习活动，在感知和物理界面上，其书写介质是否同时是评分数据的物理载体。</b></p>
+<p><b>信道结构</b>（记为 C）：一次书写动作所使用的物理介质，是否同时是评分数据的传输载体。</p>
+<p>- <b>制度依赖信道（C=1）</b>：学习活动的物理界面（表单、答题纸、提交框）同时是评分数据的传输载体。学生在表单上写下的内容，就是将被制度读取、评分、归档的同一份内容。判据由两个子指标联合读出：（a）书写介质是否可被督导者不经学生允许直接调取；（b）书写内容是否会被转化为可比较的量化指标。<b>两项皆满足，即为制度依赖信道。</b></p>
+<p>- <b>制度独立信道（C=0）</b>：学习活动的物理界面不与评分数据通道重合。学生在草稿纸上写的步骤、在课间用手机录下的操作视频、在竞赛讨论区里给队友画的图解、在课后与同伴互讲时在小白板上画的草稿——这些书写动作的介质不是评分数据的传输载体。制度独立信道上的内容，若要进入评分通道，必须经历一个额外的转化动作：由学生自己决定"把哪个部分、以何种形状、移交给那张表单"。<b>这个转化动作本身，正是自我出面的发生现场。</b></p>
+<p>两条信道的区分不是场景区分（课内 vs 课外），而是结构区分——它只取决于当前的书写介质是否同时是评分数据的物理载体。同一张实验桌上，学生面前摊开的草稿本属于制度独立信道，压在本子下面的实验报告表单属于制度依赖信道。两个信道在物理空间上仅隔一个手臂的距离，但在结构上是两个不同的世界。</p>
+<p>也正因为这个区分是结构性的、不是场景性的，它可以被<b>实验性地设置</b>：只要在桌面上放一张事先声明"不会被收、不会被看"的纸，就在同一时刻、同一课桌上造出了一个 C=0 的信道。第六节要用到的"自留区"正是这样造出来的。</p>
+<h3>4.3 第二轴与承重命题的正交性检验</h3>
+<p>制度依赖信道与独立信道的区分，与自我出面的控制变量 Z 没有因果箭头。在结构上：</p>
+<ol class="li"><li><b>C 描述的是"这个书写动作会不会被制度直接读取"</b>，它来自物质界面的设计，属于外部结构条件；</li><li><b>Z 描述的是"学习者在动笔之前是否为自己建立了一个疑存标记"</b>，它来自学习者的内部分工，属于自我关系形态。</li></ol>
+<p>四个组合都可实现，这是正交性的实质检验：</p>
+<ol class="li"><li>一个学生可以在制度独立信道上<b>拒绝</b>为自己出面——他在草稿纸上直接抄写上次实验的现成公式，从不启动自己的生成（C=0, Z=0）。</li><li>另一个学生可以在制度依赖信道上<b>短暂</b>为自己出面——他在表单的空白处先写下自己的版本，再把它划掉改成标准答案，那个被划掉的残留就是出面的痕迹（C=1, Z=1）。</li></ol>
+<p>两种情形说明这两个维度不是同一根轴的两端，而是两根可以独立取值、互相交叉的轴。它们的交叉产生四个格子，每个格子代表一种特定的"自我关系 × 信道结构"的组合，而现有理论无法用单一机制同时解释四个格子的差异。</p>
+<p>还须做一次反向检验，因为正交不等于无关：若 C 与 Z 在<b>统计上</b>总是共变（例如现实中 C=0 的场合几乎总是 Z=1），那么这张格子虽然逻辑上二维，实际上只有一条对角线上有样本，判别力仍然为零。本文对此的回答是一个可测的预测：<b>第三象限（C=0, Z=0）在自然课堂中不是空格，而是一个占比不低的格子</b>——这正是本文最致命的判决点所在（见 5.3 与 5.6），也是本文最容易被推翻的地方：如果它是空的，本文的第三象限预测无从检验，本文必须降格。</p>
+<h2 id="s5">五、二维辨别格：自我出面 × 信道结构</h2>
+<p>以下逐格展开四个象限的定义、每一格内的可观测签名，以及五家最近邻（福柯的规训凝视、伊利奇的失能专业、拉图尔的铭写装置、温尼科特的假自我、科学教育的认识主体权与自我决定论的评价压力）与本文在这一格上的可裁决对立预测。</p>
+<p>为便于逐格对照，先给出四格的坐标约定：横轴为信道结构 C（右＝制度依赖 C=1，左＝制度独立 C=0），纵轴为自我出面 Z（上＝出面在场 Z=1，下＝出面缺席 Z=0）。</p>
+<h3>5.1 第一象限（Z=1, C=1）：在表单上为自己出面</h3>
+<p>学习者在表单上为自己出面。他拿到表单之后的第一动作，是先在某个空白的物理区域（页边、步骤栏之间的空白行、甚至栏位名称旁边的注释位置）写下自己的程序版本，然后再决定如何把这版本移入槽位。这一格的签名是<b>双重书写</b>：同一份表单上并存两个版本，其中一个被划掉、被覆盖、或被压缩成合规文本。</p>
+<p>三家最近邻均无法解释这一格为什么能在高压制度信道中出现。在福柯的规训装置中，表单的凝视效应应使个体在被观看的同一秒就把自己调整到可比较的位置上，第一象限的行为除非被解释为"规训在个体身上失效了"，但规训失效的签名是混乱与抵抗，不是先写自己的版本然后自主填入槽位；在伊利奇的制度垄断框架中，表单是法定工具，在法定工具上私自开辟一块非法定区域，应被读作反向使用（敷衍或对抗），而第一象限的学生既不敷衍也不对抗，他最终交出的是完全合规的文本；在拉图尔的框架中，这一格是"铭写之前的过剩仍被行动者认领"，这一点拉图尔可以解释，但他无法解释为什么同一间教室里另一些学生连过剩都没有。</p>
+<p><b>本文对这一格的解释与预测</b>：第一象限是自我出面在最不利条件下的存活，其代价是时间——出手潜伏期显著高于基线，且首次落笔位置落在非槽位区域。本文预测这一格的学生在<b>同一课题的后续任务</b>上，表现出更高的独立转化率（把独立信道上的内容主动移交给制度信道的次数）。</p>
+<h3>5.2 第二象限（Z=1, C=0）：在不被读取的介质上为自己出面</h3>
+<p>自我出面在场，且书写介质不是评分数据的载体。典型情境是学生在草稿纸、私人笔记、课外互讲的白板上，先做出自己的版本。</p>
+<p>这一格是五家共同承认的"健康格"，本文对它没有独家主张，也不在这一格与任何人对判。本文只做一个中性的记录：<b>在此条件下，自我出面与测度格式之间的转化缝隙是学习本身的发生窗口，痛苦属于可转换的健康张力，而非代偿性消解。</b> 把这一格写出来的唯一作用，是防止本文被读成"表单有害论"：本文关心的不是有没有表单，而是表单出现在这条转化链的哪一个位置上。</p>
+<h3>5.3 第三象限（Z=0, C=0）：连不被读取的纸上也不出场</h3>
+<p>一个已经没有自我出面的学生，在制度独立信道上也拿不出替代性自我描述。</p>
+<p>这一格是本文的判决核心。三家最近邻可能会将此读为"没有学习发生"——但<b>各自都会期待他在制度信道上仍有残余</b>：福柯期待受罚后的自我监控（填表犹豫、延迟、涂改），伊利奇期待被剥夺后的反向使用（敷衍或对抗），拉图尔期待被裁掉的过剩另寻通道返回，温尼科特期待假自我之下真自我仍在（空虚感、不真实感、事后的自我怀疑）。</p>
+<p><b>本文对这一格的预测是硬的</b>：制度独立信道上一旦仍然零产出且无挣扎，说明消解确实跨信道固着；判定形式是<b>看外部独立信道载体上的出面痕迹是否活着，而非内容</b>。若内容为零且出手微动作也接近基线（即手不曾朝自留区移动、首次落笔直接进入被要求的形式），则本文对这一格的预测超出三家解释力；<b>否则，若独立信道上仍能测到出面痕迹（手朝自留区动了、只是没写出东西），则消解可被"罚没残量"解释，本文的承重命题破产。</b></p>
+<p>这条是本文最愿意押注、也最可能输掉的一条。</p>
+<h3>5.4 第四象限（Z=0, C=1）：标准无痛区</h3>
+<p>本文所称的标准无痛区。自我出面已经被消解，学生只接触课堂内的奖惩式测度，他们仍然继续产出标准答案，速度与合规性双高。此处五家将预测残余（延迟、涂改、不满、微小对抗、事后的空虚），本文预测没有。</p>
+<p>本案例的第二次书写，如果记录属实，就落在这一格。</p>
+<h3>5.5 五家最近邻与本文的逐格对立预测表</h3>
+<div class="tblwrap"><table class="tbl"><tr><th>&lt;w:tcPr&gt;&lt;w:tcW w:type="dxa" w:w="1392"/&gt;&lt;w:shd w:fill="F0EAE0" w:val="clear"/&gt;&lt;w:tcMar&gt;&lt;w:top w:type="dxa" w:w="60"/&gt;&lt;w:left w:type="dxa" w:w="80"/&gt;&lt;w:bottom w:type="dxa" w:w="60"/&gt;&lt;w:right w:type="dxa" w:w="80"/&gt;&lt;/w:tcMar&gt;&lt;/w:tcPr&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:spacing w:line="260"/&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:rPr&gt;&lt;w:b/&gt;&lt;w:bCs/&gt;&lt;w:i w:val="false"/&gt;&lt;w:iCs w:val="false"/&gt;&lt;w:sz w:val="16"/&gt;&lt;w:szCs w:val="16"/&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt;象限</th><th>&lt;w:tcPr&gt;&lt;w:tcW w:type="dxa" w:w="1392"/&gt;&lt;w:shd w:fill="F0EAE0" w:val="clear"/&gt;&lt;w:tcMar&gt;&lt;w:top w:type="dxa" w:w="60"/&gt;&lt;w:left w:type="dxa" w:w="80"/&gt;&lt;w:bottom w:type="dxa" w:w="60"/&gt;&lt;w:right w:type="dxa" w:w="80"/&gt;&lt;/w:tcMar&gt;&lt;/w:tcPr&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:spacing w:line="260"/&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:rPr&gt;&lt;w:b/&gt;&lt;w:bCs/&gt;&lt;w:i w:val="false"/&gt;&lt;w:iCs w:val="false"/&gt;&lt;w:sz w:val="16"/&gt;&lt;w:szCs w:val="16"/&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt;福柯（规训）</th><th>&lt;w:tcPr&gt;&lt;w:tcW w:type="dxa" w:w="1392"/&gt;&lt;w:shd w:fill="F0EAE0" w:val="clear"/&gt;&lt;w:tcMar&gt;&lt;w:top w:type="dxa" w:w="60"/&gt;&lt;w:left w:type="dxa" w:w="80"/&gt;&lt;w:bottom w:type="dxa" w:w="60"/&gt;&lt;w:right w:type="dxa" w:w="80"/&gt;&lt;/w:tcMar&gt;&lt;/w:tcPr&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:spacing w:line="260"/&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:rPr&gt;&lt;w:b/&gt;&lt;w:bCs/&gt;&lt;w:i w:val="false"/&gt;&lt;w:iCs w:val="false"/&gt;&lt;w:sz w:val="16"/&gt;&lt;w:szCs w:val="16"/&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt;伊利奇 1977（失能专业）</th><th>&lt;w:tcPr&gt;&lt;w:tcW w:type="dxa" w:w="1392"/&gt;&lt;w:shd w:fill="F0EAE0" w:val="clear"/&gt;&lt;w:tcMar&gt;&lt;w:top w:type="dxa" w:w="60"/&gt;&lt;w:left w:type="dxa" w:w="80"/&gt;&lt;w:bottom w:type="dxa" w:w="60"/&gt;&lt;w:right w:type="dxa" w:w="80"/&gt;&lt;/w:tcMar&gt;&lt;/w:tcPr&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:spacing w:line="260"/&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:rPr&gt;&lt;w:b/&gt;&lt;w:bCs/&gt;&lt;w:i w:val="false"/&gt;&lt;w:iCs w:val="false"/&gt;&lt;w:sz w:val="16"/&gt;&lt;w:szCs w:val="16"/&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt;拉图尔（铭写）</th><th>&lt;w:tcPr&gt;&lt;w:tcW w:type="dxa" w:w="1392"/&gt;&lt;w:shd w:fill="F0EAE0" w:val="clear"/&gt;&lt;w:tcMar&gt;&lt;w:top w:type="dxa" w:w="60"/&gt;&lt;w:left w:type="dxa" w:w="80"/&gt;&lt;w:bottom w:type="dxa" w:w="60"/&gt;&lt;w:right w:type="dxa" w:w="80"/&gt;&lt;/w:tcMar&gt;&lt;/w:tcPr&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:spacing w:line="260"/&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:rPr&gt;&lt;w:b/&gt;&lt;w:bCs/&gt;&lt;w:i w:val="false"/&gt;&lt;w:iCs w:val="false"/&gt;&lt;w:sz w:val="16"/&gt;&lt;w:szCs w:val="16"/&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt;温尼科特（假自我）</th><th>&lt;w:tcPr&gt;&lt;w:tcW w:type="dxa" w:w="1392"/&gt;&lt;w:shd w:fill="F0EAE0" w:val="clear"/&gt;&lt;w:tcMar&gt;&lt;w:top w:type="dxa" w:w="60"/&gt;&lt;w:left w:type="dxa" w:w="80"/&gt;&lt;w:bottom w:type="dxa" w:w="60"/&gt;&lt;w:right w:type="dxa" w:w="80"/&gt;&lt;/w:tcMar&gt;&lt;/w:tcPr&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:spacing w:line="260"/&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:rPr&gt;&lt;w:b/&gt;&lt;w:bCs/&gt;&lt;w:i w:val="false"/&gt;&lt;w:iCs w:val="false"/&gt;&lt;w:sz w:val="16"/&gt;&lt;w:szCs w:val="16"/&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt;认识主体权／自我决定论</th><th>&lt;w:tcPr&gt;&lt;w:tcW w:type="dxa" w:w="1394"/&gt;&lt;w:shd w:fill="F0EAE0" w:val="clear"/&gt;&lt;w:tcMar&gt;&lt;w:top w:type="dxa" w:w="60"/&gt;&lt;w:left w:type="dxa" w:w="80"/&gt;&lt;w:bottom w:type="dxa" w:w="60"/&gt;&lt;w:right w:type="dxa" w:w="80"/&gt;&lt;/w:tcMar&gt;&lt;/w:tcPr&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:spacing w:line="260"/&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:rPr&gt;&lt;w:b/&gt;&lt;w:bCs/&gt;&lt;w:sz w:val="16"/&gt;&lt;w:szCs w:val="16"/&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt;本文</th></tr><tr><td>&lt;w:tcPr&gt;&lt;w:tcW w:type="dxa" w:w="1392"/&gt;&lt;w:tcMar&gt;&lt;w:top w:type="dxa" w:w="60"/&gt;&lt;w:left w:type="dxa" w:w="80"/&gt;&lt;w:bottom w:type="dxa" w:w="60"/&gt;&lt;w:right w:type="dxa" w:w="80"/&gt;&lt;/w:tcMar&gt;&lt;/w:tcPr&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:spacing w:line="260"/&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:rPr&gt;&lt;w:b w:val="false"/&gt;&lt;w:bCs w:val="false"/&gt;&lt;w:i w:val="false"/&gt;&lt;w:iCs w:val="false"/&gt;&lt;w:sz w:val="16"/&gt;&lt;w:szCs w:val="16"/&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt;一（Z=1,C=1）</td><td>&lt;w:tcPr&gt;&lt;w:tcW w:type="dxa" w:w="1392"/&gt;&lt;w:tcMar&gt;&lt;w:top w:type="dxa" w:w="60"/&gt;&lt;w:left w:type="dxa" w:w="80"/&gt;&lt;w:bottom w:type="dxa" w:w="60"/&gt;&lt;w:right w:type="dxa" w:w="80"/&gt;&lt;/w:tcMar&gt;&lt;/w:tcPr&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:spacing w:line="260"/&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:rPr&gt;&lt;w:b w:val="false"/&gt;&lt;w:bCs w:val="false"/&gt;&lt;w:i w:val="false"/&gt;&lt;w:iCs w:val="false"/&gt;&lt;w:sz w:val="16"/&gt;&lt;w:szCs w:val="16"/&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt;规训失效，签名为抵抗</td><td>&lt;w:tcPr&gt;&lt;w:tcW w:type="dxa" w:w="1392"/&gt;&lt;w:tcMar&gt;&lt;w:top w:type="dxa" w:w="60"/&gt;&lt;w:left w:type="dxa" w:w="80"/&gt;&lt;w:bottom w:type="dxa" w:w="60"/&gt;&lt;w:right w:type="dxa" w:w="80"/&gt;&lt;/w:tcMar&gt;&lt;/w:tcPr&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:spacing w:line="260"/&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:rPr&gt;&lt;w:b w:val="false"/&gt;&lt;w:bCs w:val="false"/&gt;&lt;w:i w:val="false"/&gt;&lt;w:iCs w:val="false"/&gt;&lt;w:sz w:val="16"/&gt;&lt;w:szCs w:val="16"/&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt;未被完全指派需要</td><td>&lt;w:tcPr&gt;&lt;w:tcW w:type="dxa" w:w="1392"/&gt;&lt;w:tcMar&gt;&lt;w:top w:type="dxa" w:w="60"/&gt;&lt;w:left w:type="dxa" w:w="80"/&gt;&lt;w:bottom w:type="dxa" w:w="60"/&gt;&lt;w:right w:type="dxa" w:w="80"/&gt;&lt;/w:tcMar&gt;&lt;/w:tcPr&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:spacing w:line="260"/&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:rPr&gt;&lt;w:b w:val="false"/&gt;&lt;w:bCs w:val="false"/&gt;&lt;w:i w:val="false"/&gt;&lt;w:iCs w:val="false"/&gt;&lt;w:sz w:val="16"/&gt;&lt;w:szCs w:val="16"/&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt;过剩被认领</td><td>&lt;w:tcPr&gt;&lt;w:tcW w:type="dxa" w:w="1392"/&gt;&lt;w:tcMar&gt;&lt;w:top w:type="dxa" w:w="60"/&gt;&lt;w:left w:type="dxa" w:w="80"/&gt;&lt;w:bottom w:type="dxa" w:w="60"/&gt;&lt;w:right w:type="dxa" w:w="80"/&gt;&lt;/w:tcMar&gt;&lt;/w:tcPr&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:spacing w:line="260"/&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:rPr&gt;&lt;w:b w:val="false"/&gt;&lt;w:bCs w:val="false"/&gt;&lt;w:i w:val="false"/&gt;&lt;w:iCs w:val="false"/&gt;&lt;w:sz w:val="16"/&gt;&lt;w:szCs w:val="16"/&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt;真自我尚存</td><td>&lt;w:tcPr&gt;&lt;w:tcW w:type="dxa" w:w="1392"/&gt;&lt;w:tcMar&gt;&lt;w:top w:type="dxa" w:w="60"/&gt;&lt;w:left w:type="dxa" w:w="80"/&gt;&lt;w:bottom w:type="dxa" w:w="60"/&gt;&lt;w:right w:type="dxa" w:w="80"/&gt;&lt;/w:tcMar&gt;&lt;/w:tcPr&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:spacing w:line="260"/&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:rPr&gt;&lt;w:b w:val="false"/&gt;&lt;w:bCs w:val="false"/&gt;&lt;w:i w:val="false"/&gt;&lt;w:iCs w:val="false"/&gt;&lt;w:sz w:val="16"/&gt;&lt;w:szCs w:val="16"/&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt;高认识主体权，或利害不高</td><td>&lt;w:tcPr&gt;&lt;w:tcW w:type="dxa" w:w="1394"/&gt;&lt;w:tcMar&gt;&lt;w:top w:type="dxa" w:w="60"/&gt;&lt;w:left w:type="dxa" w:w="80"/&gt;&lt;w:bottom w:type="dxa" w:w="60"/&gt;&lt;w:right w:type="dxa" w:w="80"/&gt;&lt;/w:tcMar&gt;&lt;/w:tcPr&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:spacing w:line="260"/&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:rPr&gt;&lt;w:b/&gt;&lt;w:bCs/&gt;&lt;w:sz w:val="16"/&gt;&lt;w:szCs w:val="16"/&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt;出面在场，代价是潜伏期延长；后续独立转化率升高</td></tr><tr><td>&lt;w:tcPr&gt;&lt;w:tcW w:type="dxa" w:w="1392"/&gt;&lt;w:tcMar&gt;&lt;w:top w:type="dxa" w:w="60"/&gt;&lt;w:left w:type="dxa" w:w="80"/&gt;&lt;w:bottom w:type="dxa" w:w="60"/&gt;&lt;w:right w:type="dxa" w:w="80"/&gt;&lt;/w:tcMar&gt;&lt;/w:tcPr&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:spacing w:line="260"/&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:rPr&gt;&lt;w:b w:val="false"/&gt;&lt;w:bCs w:val="false"/&gt;&lt;w:i w:val="false"/&gt;&lt;w:iCs w:val="false"/&gt;&lt;w:sz w:val="16"/&gt;&lt;w:szCs w:val="16"/&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt;二（Z=1,C=0）</td><td>&lt;w:tcPr&gt;&lt;w:tcW w:type="dxa" w:w="1392"/&gt;&lt;w:tcMar&gt;&lt;w:top w:type="dxa" w:w="60"/&gt;&lt;w:left w:type="dxa" w:w="80"/&gt;&lt;w:bottom w:type="dxa" w:w="60"/&gt;&lt;w:right w:type="dxa" w:w="80"/&gt;&lt;/w:tcMar&gt;&lt;/w:tcPr&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:spacing w:line="260"/&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:rPr&gt;&lt;w:b w:val="false"/&gt;&lt;w:bCs w:val="false"/&gt;&lt;w:i w:val="false"/&gt;&lt;w:iCs w:val="false"/&gt;&lt;w:sz w:val="16"/&gt;&lt;w:szCs w:val="16"/&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt;权力未渗透的缝隙</td><td>&lt;w:tcPr&gt;&lt;w:tcW w:type="dxa" w:w="1392"/&gt;&lt;w:tcMar&gt;&lt;w:top w:type="dxa" w:w="60"/&gt;&lt;w:left w:type="dxa" w:w="80"/&gt;&lt;w:bottom w:type="dxa" w:w="60"/&gt;&lt;w:right w:type="dxa" w:w="80"/&gt;&lt;/w:tcMar&gt;&lt;/w:tcPr&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:spacing w:line="260"/&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:rPr&gt;&lt;w:b w:val="false"/&gt;&lt;w:bCs w:val="false"/&gt;&lt;w:i w:val="false"/&gt;&lt;w:iCs w:val="false"/&gt;&lt;w:sz w:val="16"/&gt;&lt;w:szCs w:val="16"/&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt;尚未被专业化的区域</td><td>&lt;w:tcPr&gt;&lt;w:tcW w:type="dxa" w:w="1392"/&gt;&lt;w:tcMar&gt;&lt;w:top w:type="dxa" w:w="60"/&gt;&lt;w:left w:type="dxa" w:w="80"/&gt;&lt;w:bottom w:type="dxa" w:w="60"/&gt;&lt;w:right w:type="dxa" w:w="80"/&gt;&lt;/w:tcMar&gt;&lt;/w:tcPr&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:spacing w:line="260"/&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:rPr&gt;&lt;w:b w:val="false"/&gt;&lt;w:bCs w:val="false"/&gt;&lt;w:i w:val="false"/&gt;&lt;w:iCs w:val="false"/&gt;&lt;w:sz w:val="16"/&gt;&lt;w:szCs w:val="16"/&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt;铭写前的原生态</td><td>&lt;w:tcPr&gt;&lt;w:tcW w:type="dxa" w:w="1392"/&gt;&lt;w:tcMar&gt;&lt;w:top w:type="dxa" w:w="60"/&gt;&lt;w:left w:type="dxa" w:w="80"/&gt;&lt;w:bottom w:type="dxa" w:w="60"/&gt;&lt;w:right w:type="dxa" w:w="80"/&gt;&lt;/w:tcMar&gt;&lt;/w:tcPr&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:spacing w:line="260"/&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:rPr&gt;&lt;w:b w:val="false"/&gt;&lt;w:bCs w:val="false"/&gt;&lt;w:i w:val="false"/&gt;&lt;w:iCs w:val="false"/&gt;&lt;w:sz w:val="16"/&gt;&lt;w:szCs w:val="16"/&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt;促成环境在场</td><td>&lt;w:tcPr&gt;&lt;w:tcW w:type="dxa" w:w="1392"/&gt;&lt;w:tcMar&gt;&lt;w:top w:type="dxa" w:w="60"/&gt;&lt;w:left w:type="dxa" w:w="80"/&gt;&lt;w:bottom w:type="dxa" w:w="60"/&gt;&lt;w:right w:type="dxa" w:w="80"/&gt;&lt;/w:tcMar&gt;&lt;/w:tcPr&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:spacing w:line="260"/&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:rPr&gt;&lt;w:b w:val="false"/&gt;&lt;w:bCs w:val="false"/&gt;&lt;w:i w:val="false"/&gt;&lt;w:iCs w:val="false"/&gt;&lt;w:sz w:val="16"/&gt;&lt;w:szCs w:val="16"/&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt;认识主体权被分享</td><td>&lt;w:tcPr&gt;&lt;w:tcW w:type="dxa" w:w="1394"/&gt;&lt;w:tcMar&gt;&lt;w:top w:type="dxa" w:w="60"/&gt;&lt;w:left w:type="dxa" w:w="80"/&gt;&lt;w:bottom w:type="dxa" w:w="60"/&gt;&lt;w:right w:type="dxa" w:w="80"/&gt;&lt;/w:tcMar&gt;&lt;/w:tcPr&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:spacing w:line="260"/&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:rPr&gt;&lt;w:b/&gt;&lt;w:bCs/&gt;&lt;w:sz w:val="16"/&gt;&lt;w:szCs w:val="16"/&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt;健康格，不对判</td></tr><tr><td>&lt;w:tcPr&gt;&lt;w:tcW w:type="dxa" w:w="1392"/&gt;&lt;w:tcMar&gt;&lt;w:top w:type="dxa" w:w="60"/&gt;&lt;w:left w:type="dxa" w:w="80"/&gt;&lt;w:bottom w:type="dxa" w:w="60"/&gt;&lt;w:right w:type="dxa" w:w="80"/&gt;&lt;/w:tcMar&gt;&lt;/w:tcPr&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:spacing w:line="260"/&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:rPr&gt;&lt;w:b w:val="false"/&gt;&lt;w:bCs w:val="false"/&gt;&lt;w:i w:val="false"/&gt;&lt;w:iCs w:val="false"/&gt;&lt;w:sz w:val="16"/&gt;&lt;w:szCs w:val="16"/&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt;三（Z=0,C=0）</td><td>&lt;w:tcPr&gt;&lt;w:tcW w:type="dxa" w:w="1392"/&gt;&lt;w:tcMar&gt;&lt;w:top w:type="dxa" w:w="60"/&gt;&lt;w:left w:type="dxa" w:w="80"/&gt;&lt;w:bottom w:type="dxa" w:w="60"/&gt;&lt;w:right w:type="dxa" w:w="80"/&gt;&lt;/w:tcMar&gt;&lt;/w:tcPr&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:spacing w:line="260"/&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:rPr&gt;&lt;w:b w:val="false"/&gt;&lt;w:bCs w:val="false"/&gt;&lt;w:i w:val="false"/&gt;&lt;w:iCs w:val="false"/&gt;&lt;w:sz w:val="16"/&gt;&lt;w:szCs w:val="16"/&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt;仍应有制度信道上的残余</td><td>&lt;w:tcPr&gt;&lt;w:tcW w:type="dxa" w:w="1392"/&gt;&lt;w:tcMar&gt;&lt;w:top w:type="dxa" w:w="60"/&gt;&lt;w:left w:type="dxa" w:w="80"/&gt;&lt;w:bottom w:type="dxa" w:w="60"/&gt;&lt;w:right w:type="dxa" w:w="80"/&gt;&lt;/w:tcMar&gt;&lt;/w:tcPr&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:spacing w:line="260"/&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:rPr&gt;&lt;w:b w:val="false"/&gt;&lt;w:bCs w:val="false"/&gt;&lt;w:i w:val="false"/&gt;&lt;w:iCs w:val="false"/&gt;&lt;w:sz w:val="16"/&gt;&lt;w:szCs w:val="16"/&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt;仍应有"被指派感"</td><td>&lt;w:tcPr&gt;&lt;w:tcW w:type="dxa" w:w="1392"/&gt;&lt;w:tcMar&gt;&lt;w:top w:type="dxa" w:w="60"/&gt;&lt;w:left w:type="dxa" w:w="80"/&gt;&lt;w:bottom w:type="dxa" w:w="60"/&gt;&lt;w:right w:type="dxa" w:w="80"/&gt;&lt;/w:tcMar&gt;&lt;/w:tcPr&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:spacing w:line="260"/&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:rPr&gt;&lt;w:b w:val="false"/&gt;&lt;w:bCs w:val="false"/&gt;&lt;w:i w:val="false"/&gt;&lt;w:iCs w:val="false"/&gt;&lt;w:sz w:val="16"/&gt;&lt;w:szCs w:val="16"/&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt;过剩应另寻通道返回</td><td>&lt;w:tcPr&gt;&lt;w:tcW w:type="dxa" w:w="1392"/&gt;&lt;w:tcMar&gt;&lt;w:top w:type="dxa" w:w="60"/&gt;&lt;w:left w:type="dxa" w:w="80"/&gt;&lt;w:bottom w:type="dxa" w:w="60"/&gt;&lt;w:right w:type="dxa" w:w="80"/&gt;&lt;/w:tcMar&gt;&lt;/w:tcPr&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:spacing w:line="260"/&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:rPr&gt;&lt;w:b w:val="false"/&gt;&lt;w:bCs w:val="false"/&gt;&lt;w:i w:val="false"/&gt;&lt;w:iCs w:val="false"/&gt;&lt;w:sz w:val="16"/&gt;&lt;w:szCs w:val="16"/&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt;真自我在下面，应有空虚感</td><td>&lt;w:tcPr&gt;&lt;w:tcW w:type="dxa" w:w="1392"/&gt;&lt;w:tcMar&gt;&lt;w:top w:type="dxa" w:w="60"/&gt;&lt;w:left w:type="dxa" w:w="80"/&gt;&lt;w:bottom w:type="dxa" w:w="60"/&gt;&lt;w:right w:type="dxa" w:w="80"/&gt;&lt;/w:tcMar&gt;&lt;/w:tcPr&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:spacing w:line="260"/&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:rPr&gt;&lt;w:b w:val="false"/&gt;&lt;w:bCs w:val="false"/&gt;&lt;w:i w:val="false"/&gt;&lt;w:iCs w:val="false"/&gt;&lt;w:sz w:val="16"/&gt;&lt;w:szCs w:val="16"/&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt;认识主体权被剥夺，应有可恢复性</td><td>&lt;w:tcPr&gt;&lt;w:tcW w:type="dxa" w:w="1394"/&gt;&lt;w:tcMar&gt;&lt;w:top w:type="dxa" w:w="60"/&gt;&lt;w:left w:type="dxa" w:w="80"/&gt;&lt;w:bottom w:type="dxa" w:w="60"/&gt;&lt;w:right w:type="dxa" w:w="80"/&gt;&lt;/w:tcMar&gt;&lt;/w:tcPr&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:spacing w:line="260"/&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:rPr&gt;&lt;w:b/&gt;&lt;w:bCs/&gt;&lt;w:sz w:val="16"/&gt;&lt;w:szCs w:val="16"/&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt;零出面且无挣扎；出面痕迹接近基线</td></tr><tr><td>&lt;w:tcPr&gt;&lt;w:tcW w:type="dxa" w:w="1392"/&gt;&lt;w:tcMar&gt;&lt;w:top w:type="dxa" w:w="60"/&gt;&lt;w:left w:type="dxa" w:w="80"/&gt;&lt;w:bottom w:type="dxa" w:w="60"/&gt;&lt;w:right w:type="dxa" w:w="80"/&gt;&lt;/w:tcMar&gt;&lt;/w:tcPr&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:spacing w:line="260"/&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:rPr&gt;&lt;w:b w:val="false"/&gt;&lt;w:bCs w:val="false"/&gt;&lt;w:i w:val="false"/&gt;&lt;w:iCs w:val="false"/&gt;&lt;w:sz w:val="16"/&gt;&lt;w:szCs w:val="16"/&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt;四（Z=0,C=1）</td><td>&lt;w:tcPr&gt;&lt;w:tcW w:type="dxa" w:w="1392"/&gt;&lt;w:tcMar&gt;&lt;w:top w:type="dxa" w:w="60"/&gt;&lt;w:left w:type="dxa" w:w="80"/&gt;&lt;w:bottom w:type="dxa" w:w="60"/&gt;&lt;w:right w:type="dxa" w:w="80"/&gt;&lt;/w:tcMar&gt;&lt;/w:tcPr&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:spacing w:line="260"/&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:rPr&gt;&lt;w:b w:val="false"/&gt;&lt;w:bCs w:val="false"/&gt;&lt;w:i w:val="false"/&gt;&lt;w:iCs w:val="false"/&gt;&lt;w:sz w:val="16"/&gt;&lt;w:szCs w:val="16"/&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt;延迟、涂改、自我纠正</td><td>&lt;w:tcPr&gt;&lt;w:tcW w:type="dxa" w:w="1392"/&gt;&lt;w:tcMar&gt;&lt;w:top w:type="dxa" w:w="60"/&gt;&lt;w:left w:type="dxa" w:w="80"/&gt;&lt;w:bottom w:type="dxa" w:w="60"/&gt;&lt;w:right w:type="dxa" w:w="80"/&gt;&lt;/w:tcMar&gt;&lt;/w:tcPr&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:spacing w:line="260"/&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:rPr&gt;&lt;w:b w:val="false"/&gt;&lt;w:bCs w:val="false"/&gt;&lt;w:i w:val="false"/&gt;&lt;w:iCs w:val="false"/&gt;&lt;w:sz w:val="16"/&gt;&lt;w:szCs w:val="16"/&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt;敷衍或对抗</td><td>&lt;w:tcPr&gt;&lt;w:tcW w:type="dxa" w:w="1392"/&gt;&lt;w:tcMar&gt;&lt;w:top w:type="dxa" w:w="60"/&gt;&lt;w:left w:type="dxa" w:w="80"/&gt;&lt;w:bottom w:type="dxa" w:w="60"/&gt;&lt;w:right w:type="dxa" w:w="80"/&gt;&lt;/w:tcMar&gt;&lt;/w:tcPr&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:spacing w:line="260"/&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:rPr&gt;&lt;w:b w:val="false"/&gt;&lt;w:bCs w:val="false"/&gt;&lt;w:i w:val="false"/&gt;&lt;w:iCs w:val="false"/&gt;&lt;w:sz w:val="16"/&gt;&lt;w:szCs w:val="16"/&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt;口头补述、反思小结</td><td>&lt;w:tcPr&gt;&lt;w:tcW w:type="dxa" w:w="1392"/&gt;&lt;w:tcMar&gt;&lt;w:top w:type="dxa" w:w="60"/&gt;&lt;w:left w:type="dxa" w:w="80"/&gt;&lt;w:bottom w:type="dxa" w:w="60"/&gt;&lt;w:right w:type="dxa" w:w="80"/&gt;&lt;/w:tcMar&gt;&lt;/w:tcPr&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:spacing w:line="260"/&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:rPr&gt;&lt;w:b w:val="false"/&gt;&lt;w:bCs w:val="false"/&gt;&lt;w:i w:val="false"/&gt;&lt;w:iCs w:val="false"/&gt;&lt;w:sz w:val="16"/&gt;&lt;w:szCs w:val="16"/&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt;顺从伴随不真实感</td><td>&lt;w:tcPr&gt;&lt;w:tcW w:type="dxa" w:w="1392"/&gt;&lt;w:tcMar&gt;&lt;w:top w:type="dxa" w:w="60"/&gt;&lt;w:left w:type="dxa" w:w="80"/&gt;&lt;w:bottom w:type="dxa" w:w="60"/&gt;&lt;w:right w:type="dxa" w:w="80"/&gt;&lt;/w:tcMar&gt;&lt;/w:tcPr&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:spacing w:line="260"/&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:rPr&gt;&lt;w:b w:val="false"/&gt;&lt;w:bCs w:val="false"/&gt;&lt;w:i w:val="false"/&gt;&lt;w:iCs w:val="false"/&gt;&lt;w:sz w:val="16"/&gt;&lt;w:szCs w:val="16"/&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt;内在动机下降、深度加工减少</td><td>&lt;w:tcPr&gt;&lt;w:tcW w:type="dxa" w:w="1394"/&gt;&lt;w:tcMar&gt;&lt;w:top w:type="dxa" w:w="60"/&gt;&lt;w:left w:type="dxa" w:w="80"/&gt;&lt;w:bottom w:type="dxa" w:w="60"/&gt;&lt;w:right w:type="dxa" w:w="80"/&gt;&lt;/w:tcMar&gt;&lt;/w:tcPr&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:spacing w:line="260"/&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:rPr&gt;&lt;w:b/&gt;&lt;w:bCs/&gt;&lt;w:sz w:val="16"/&gt;&lt;w:szCs w:val="16"/&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt;无残余；潜伏期低于基线；合规性与速度双高</td></tr></table></div>
+<p>这张表是本文的全部判别力所在。它的可用性取决于一件事：表里"残余"与"无残余"必须用<b>同一个读数</b>、在<b>同一套阈值</b>下判定，否则每一家都可以事后声称自己说的残余是别的东西。第六节因此把读数写死。</p>
+<h3>5.6 最致命的一格：第一象限内的反转测试</h3>
+<p>本文的最致命判别来自第三象限与第一象限之间的一次反转，而不是第二象限——因为第二象限需要跨制度信道的长程追踪，且变量控制不易。</p>
+<p>最具操作性的单格验证是这样一个设计：在同一个课题上，当学习者在课堂外的一个制度独立的信道上（比如学科竞赛自由提交环节，或课外真人互讲练习，且明确传达"不回传评分"的约定），第四象限的学生如果出现愿意为自己出面的文字或口头记录（不必是高分内容，可以是"我上次想了另一个办法，但没做，大概是这样的"），这个行为本身在五家最近邻的理论里，会被读作<b>制度压抑之后的一个释放窗口</b>——福柯会视作权力未完全渗透的缝隙，伊利奇会视作被剥夺者偷偷创建了替代用法，拉图尔会视作被裁掉的过剩终于找到了次要铭写通道释放，温尼科特会视作真自我在安全环境中的短暂显露。</p>
+<p>而在本文的解释中，这不是释放窗口，这是一场<b>非替代的自我出场</b>——学习者在这个窗口里并没有先被剥夺了什么。他是在一个从未被表单代偿过的信道上，第一次让自己以"是我能做的事"的形态出现。这个出现的唯一前提，就是那条信道自始至终没有发出过"我先给你写好形状"的信号。</p>
+<p>由此得到本文的<b>判决判据</b>：</p>
+<p>在制度独立信道启动后的十五天内，凡在第一次书写中既无延迟亦无涂改的标准合规提交者（即第四象限成员），若其中有人在独立信道上产出了非替代性自我描述（以出面痕迹 R=1 落在事前划定的自留区判定），而五家最近邻将此行为判读为压抑残余释放，本文则判读为非替代出场，那么当同一批学生在课堂制度依赖信道上再次出现第二次合规提交时：</p>
+<p>- <b>五家预测</b>：合规提交仍然伴随压抑残余，即这次提交仍旧包含冲突信号（潜伏期比值 λ 升高、涂改次数增加），未因"已释放"而弹性化；</p>
+<p>- <b>本文预测</b>：合规提交的读数将根据上一次独立信道是否发生了非替代出场而分流——未发生者，λ 与 R 继续在消解线上（λ≤1.0，R=0）；发生者，<b>λ 向课间基线值回涨（λ≥1.2）、R 转为 1，而与此同时合规性（得分）不降</b>。</p>
+<p>五家最近邻因此将此窗口读为"释放"，不能同时承认释放之后合规性仍能稳定而压抑又消失，两者只能预测其一方向；本文因此将此窗口读为"非替代出场"，允许合规性与自我出场在同一阶段成立。</p>
+<p><b>这是全文唯一一处两边预测方向相反且只需一个读数即可裁决的地方。</b></p>
+<h2 id="s6">六、读数：出面痕迹（单一口径）</h2>
+<p>本节把读数写死。定义、粒度、阈值、编码规则在此给出之后，第五节的预测表、第八节的预注册、第九节的证伪条款与赌注，全部使用同一套，不再有第二种口径。</p>
+<h3>6.1 主读数：出面痕迹 R，及其两个连续量</h3>
+<p><b>主读数：出面痕迹</b>（representation trace，记为 <b>R</b>），二元变量。</p>
+<p>R=1 当且仅当，在一次任务中，从<b>学习者的手触及外部格式载体的时刻</b>（t=0）到<b>笔尖第一次接触任何书写面的时刻</b>（t=T₁）之间，同时满足：</p>
+<p>（i）手部标记点在自留区方向上的最大位移投影 <b>d ≥ 1.5 cm</b>；且</p>
+<p>（ii）<b>首次落笔位置落在自留区内</b>。</p>
+<p>否则 R=0。</p>
+<p><b>连续量一：出手潜伏期比值 λ = T₁ / T₀</b>。其中 T₀ 为该学习者在<b>同一课时、同一材料条件下的无格式基线任务</b>上从材料接触到笔尖落纸时长的中位数（至少三次），T₁ 为本次任务的对应时长。</p>
+<p><b>连续量二：初始位移投影 d</b>（厘米），定义同上式（i）。</p>
+<p>三处阈值，全文同值：<b>λ≥1.2 判为潜伏期延长；λ≤1.0 判为潜伏期未延长（消解线）；d≥1.5 cm 判为朝自留区的有效移动。</b></p>
+<h3>6.2 自留区必须事前划定：本文最易被指为循环论证之处</h3>
+<p>如果"自己的存放区"是事后由研究者指认的，那么任何一个手部微动作都能被读成"朝向自己"，读数将不可证伪。这是原始表述中最脆弱的一环，本文在此把它封死：</p>
+<p><b>自留区规定</b>：在任务开始之前，于学习者惯用手一侧、距制度载体（表单）边缘 10 cm 处，放置一张空白 A4 纸（自留纸）。主试以固定话术明确告知："这张纸不会被收，不会被看，也不进入任何评价。"自留区 = 这张纸的物理范围（21 cm × 29.7 cm）。<b>自留区的位置、尺寸与话术在数据采集开始前写入预注册文件，任何情况下不得事后调整。</b></p>
+<p>三条附带规定：</p>
+<ol class="li"><li><b>左手位对照</b>：一半被试的自留纸置于惯用手一侧，另一半置于非惯用手一侧。若 R 的分布随自留纸位置而变（即效应只是"手更容易够到哪边"），则读数被证明是运动便利性的产物，<b>本读数作废</b>。</li><li><b>空白对照物</b>：另设一组，把自留纸换成一张同尺寸的、写有无关内容（如课程表）的纸，其余话术相同。若两组 R 无差异，说明测到的是"朝空白处动"而非"朝可自留处动"，<b>读数需重新构造</b>。</li><li><b>不得以内容判定 R</b>：自留纸上写了什么，与 R 的取值无关。写了三个字与写了三百字，R 均为 1；R 判的是<b>出场</b>，不是产出质量。这一条防止本文偷偷把"写得多"当成"出面"。</li></ol>
+<h3>6.3 编码规程与一致性要求</h3>
+<ol class="li"><li><b>记录方式</b>：桌面上方固定机位摄像，60 fps，桌面贴 1 cm 网格用于位移标定；手部标记点取<b>执笔手食指第二指节</b>（若持笔则取笔尖投影点）。</li><li><b>t=0 的判定</b>：手指与表单纸面发生接触的第一帧。若表单由教师放置且学生未主动触碰，则以<b>表单进入学生桌面边缘的第一帧</b>为 t=0，并在数据中单列标记（这一列必须公开，因为两种起算方式会系统性地影响 λ）。</li><li><b>编码者</b>：至少两名，对研究假设与被试组别<b>双盲</b>；编码手册只含物理判据，不含任何理论词汇（编码手册中不出现"出面""疑存""无痛区"）。</li><li><b>一致性阈值</b>：R 的编码者间一致性 <b>Cohen&amp;apos;s κ ≥ 0.75</b>，d 的组内相关 <b>ICC ≥ 0.80</b>。<b>未达标即判定本读数不可用，本文的全部经验主张随之撤回</b>（见 9.1 第一层）。</li><li><b>不可判读桶</b>：遮挡、手出画面、笔尖不可见等情形归入"不可判读"，单列计数。<b>不可判读率 Q &gt; 1/3 的样本批次，整批作废，不得挑选可判读者作结论。</b></li></ol>
+<h3>6.4 次级指标及其地位</h3>
+<p>以下三项是<b>次级指标</b>，只用于收敛效度检验，<b>不得单独用于判定任何一格，也不得在证伪条款中替代 R</b>：</p>
+<ol class="li"><li>涂改次数（每百字）；</li><li>课后独立转化尝试次数（学生主动把独立信道上的内容移交给制度信道的次数，按周计）；</li><li>事后一句话访谈的自陈（"刚才动笔之前，你脑子里有没有一个自己的做法？"三点量表）。</li></ol>
+<p>明确其地位是为了守住单一口径律：本文见过的多数同类论证失败在这里——正文用一个读数，证伪条款换另一个读数，于是永远推不翻。第三项自陈尤其危险：按 3.2 的条件 3，疑存态本就"不可陈述"，因此<b>自陈为"没有"并不能证明 Z=0</b>，它只能作为反向的弱旁证（自陈为"有"而 R=0，是本文需要解释的不利情形，必须报告）。</p>
+<h3>6.5 清点手册（表头）</h3>
+<p>每一次观测产出一行记录，字段固定如下，缺字段的行不得进入分析：</p>
+<p>被试编号 | 课时 | 任务ID | 组别(自留纸位置/对照物) | T₀中位数 | T₁ | λ | d | 首次落笔区域(自留区/槽位/其他) | R | 不可判读(0/1) | 信道C(0/1) | 合规得分 | 涂改数 | 编码者A | 编码者B | κ批次 | 备注</p>
+<p><b>任何未列入此表头的量，不得出现在结论中。</b></p>
+<h2 id="s7">七、与九族最近邻的判决性分离</h2>
+<p>本节是本文最必要的一节。前一版本只与三家对判，而检索表明（见附录 B），至少还有五族研究已经走到本文命题的最近处，其中两族就在本文所处的教育现场内部。逐族给出：它在自己的领域回答的是哪个问题、与本文的 1:1 替换测试结果、以及一条方向相反的判决点。</p>
+<h3>7.1 温尼科特：假自我（Winnicott, 1960/1965）</h3>
+<p><b>它回答的问题</b>：在早期养育中，当照护者不能接住婴儿的自发姿态（spontaneous gesture）时，人格如何以顺从（compliance）为核心组织起来，形成一个替代性的表层结构。</p>
+<p><b>1:1 替换测试</b>：把本文承重命题压到 50 字——"内部标记在成形前被标准形状的替身换掉，于是无痛苦亦无残余"——与温尼科特的"自发姿态未被接住，顺从取而代之"高度重叠。<b>这是本文最危险的一位占位者，也是本文前一版本完全没有交手的一位。</b></p>
+<p><b>分离点（方向相反的两条）</b>：</p>
+<ol class="li"><li><b>残余的有无。</b> 温尼科特的假自我是一个<b>防御结构</b>：它保护并隐藏真自我，真自我仍在下面（"cowering"），并以空虚感、不真实感、"我从未存在过"的临床主诉返回。本文的代偿取消<b>不预测任何返回</b>。这两个预测在同一读数上方向相反：温尼科特预测在安全环境（C=0）中真自我会显露，因此第三象限应当是<b>不稳定</b>的——独立信道上应出现出面痕迹；本文预测第三象限是<b>稳定</b>的。</li><li><b>时间尺度与可重复性。</b> 假自我是发展早期形成的、跨情境的人格结构，一个人一生只形成一次；本文的代偿取消是<b>每一张表单发生一次</b>的事件性过程，同一个学生可以在第一节课落在第四象限、第三节课因信道条件改变而落在第一象限。<b>判决性设计</b>：对同一批学生在同一天内的三次任务变换信道条件（C=1 / C=0 / C=1），温尼科特的框架预测 R 的取值在三次之间<b>稳定</b>（人格结构不随任务变），本文预测 R <b>随信道条件切换而分流</b>。这是一次不需要长程追踪、单日可完成的裁决。</li></ol>
+<p><b>本文因此收回的第二句话</b>：本文不再声称"没有任何理论描述过成形之前的替换"。温尼科特描述过。本文剩下的增量只有两条——事件性尺度上的可重复取值，以及"无残余"这条与他方向相反的预测。</p>
+<h3>7.2 伯恩斯坦：分类、框架与实现规则（Bernstein, 1990; 1996/2000）</h3>
+<p><b>它回答的问题</b>：教育话语如何通过分类（classification，边界强度）与框架（framing，对选择、组织、节奏与评价标准的控制）来规定"什么是合法文本"，学习者又如何习得辨识规则（recognition rules，认出何为合法）与实现规则（realisation rules，产出合法文本）。</p>
+<p>这是本文所在现场最正统的一族，而前一版本零提及。<b>表单就是框架的物化：一张预置栏目的实验报告，正是把评价规则前置到书写界面上。</b> 伯恩斯坦的框架里，强框架（visible pedagogy）下学生迅速习得实现规则、产出合法文本，这与本文描述的"第二次书写"在<b>行为层面完全同形</b>。</p>
+<p><b>分离点</b>：伯恩斯坦的实现规则问的是"<b>能不能产出</b>合法文本"，本文问的是"<b>产出之前那一下自认</b>是否发生"。二者可以分离取值，而且伯恩斯坦的理论对本文的区分<b>没有判别力</b>：一个先在自留纸上写下自己的版本再移交（Z=1）和一个直接填槽（Z=0）的学生，在伯恩斯坦的框架下同为"实现规则习得良好"，因为最终文本一样合法。</p>
+<p><b>判决性设计</b>：取实现规则习得程度相当（合规得分匹配）的两组学生，只在信道条件上做差异。伯恩斯坦预测两组的文本合法性与得分无差异（这一点本文同意），并且<b>不预测 R 有差异</b>——因为 R 不在他的变量集里；本文预测 R 有显著差异。这不是"谁对谁错"，而是本文声称多出了一个伯恩斯坦框架中不存在的自由度。<b>若 R 与合规得分高度相关（|r| &gt; 0.5），则本文的自由度是假的，R 只是实现规则习得程度的代理，本文应并入伯恩斯坦（见 9.2 降格规则）。</b></p>
+<h3>7.3 伊利奇 1977：失能的专业与被指派的需要（Illich, 1977）</h3>
+<p>已在 2.2 处理其威胁，此处给判决点。</p>
+<p><b>它回答的问题</b>：专业阶层如何通过替人<b>指派需要</b>（imputed needs），使人失去自己命名自身需要的能力，从行动者变为 client。</p>
+<p><b>分离点</b>：被指派需要的人仍有一个<b>承担者位置</b>——他是那个被指派的人，他可以（哪怕越来越少地）说"我不需要这个"。本文说的是<b>承担者位置本身在当次任务中没有被生成</b>。</p>
+<p><b>判决性设计</b>：给同一批学生一个<b>没有任何外部形状的任务</b>（"用你自己的方式记录这次实验，怎么记都行，不会被评分"）。伊利奇 1977 的框架预测：长期被专业化的学生会<b>要一个形状</b>（问"要写多长""有没有格式""老师想要什么"）——这正是被指派需要者的典型行为，他仍在寻找指派者；本文预测第三象限的学生<b>不问</b>，他们直接停在那里，因为不存在一个需要被指派的需要。<b>"是否主动索要形状"是一个可编码的二元行为，两家预测相反。</b></p>
+<h3>7.4 布卢姆：程序性展演（Bloome, Puro &amp; Theodorou, 1989）与认识论框定（Hammer et al., 2005）</h3>
+<p><b>它回答的问题</b>：课堂中师生互相展演一套互动程序，这套程序本身就算"上过一节课"，而这与是否习得学术内容无关（procedural display）。框定研究则问：学生把当前活动<b>框定</b>为什么——"给老师生产答案"还是"造出新的理解"。</p>
+<p>这一族是<b>"填满槽位＝完成学习"这一格的现成命名</b>，本文前一版本零提及，是最不应该漏掉的一位。</p>
+<p><b>分离点</b>：程序性展演是一个<b>交互层</b>的概念——它需要至少两方<b>互相</b>展演，它描述的是课堂作为一场共同完成的表演；它不对个体在动笔前的内部分工作任何主张，也不区分"展演者内部还有一个自己的版本"与"没有"。框定研究更近一步，但框定是<b>认识论立场的选择</b>（把活动看作什么），它预设了一个<b>做选择的人</b>。</p>
+<p><b>判决性设计</b>：程序性展演与框定说均预测，只要把活动的社会意义改掉（明确宣告"这一节不算分、不上交、只为搞清楚"），学生的行为就会改变，因为框定被改了。本文预测：<b>在第三象限的学生身上，宣告改变社会意义不足以改变 R</b>——因为可供框定的那一端不存在。<b>操作</b>：同一批学生，一半接受"不算分"宣告，一半不接受，其余条件相同；框定说预测宣告组 R 显著上升，本文预测第四象限学生上升而第三象限学生不上升（交互效应）。<b>若第三象限学生在宣告后 R 同样上升，则本文的"跨信道固着"为假，本文应并入框定说。</b></p>
+<h3>7.5 认识主体权与评价压力（Scardamalia &amp; Bereiter, 1991; Stroupe, 2014; Miller et al., 2018; Grolnick &amp; Ryan, 1987）</h3>
+<p><b>它回答的问题</b>：认识主体权（epistemic agency）问的是，课堂中谁承担塑造知识与实践的责任与权限；自我决定论的评价压力研究问的是，评分与监视如何降低内在动机与深度加工。</p>
+<p>这两族合并处理，因为它们共同占住了本文第二轴最容易被还原的位置。</p>
+<p><b>分离点一（与认识主体权）</b>：认识主体权是一个<b>分配</b>概念——权限可以从教师手中移交给学生，研究的核心动作是"如何把权限还给学生"。它预设权限是一个可分配之物，因而也预设了一个<b>能够接住权限的接受方</b>。本文说的是接受方那一侧的<b>位置未生成</b>。<b>判决性设计</b>：在认识主体权被充分下放的课堂（学生自定研究问题、自定评价标准）中，认识主体权框架预测学生的知识建构参与度普遍上升；本文预测<b>第三象限学生的 R 不随权限下放而上升</b>，出现"权限已给、无人接"的现象。若权限下放后 R 普遍上升，本文的独立性主张失败。</p>
+<p><b>分离点二（与评价压力）</b>：评价压力是<b>后果强度</b>（stakes）的量纲，其通道是感知控制感；信道结构是<b>介质身份</b>的二值属性。<b>判决性设计（本文最推荐先做的一次实验）</b>：2×2 完全交叉——</p>
+<ol class="li"><li>A 组：高利害 × 制度独立信道（成绩重要，但本段书写写在明确不被调取的草稿本上）；</li><li>B 组：低利害 × 制度依赖信道（这次不算分，但写在会被直接调取归档的表单上）；</li><li>C 组：高利害 × 制度依赖；D 组：低利害 × 制度独立。</li></ol>
+<p>自我决定论预测 R（及深度加工）主要随<b>利害</b>变化：C &lt; A ≈ B &lt; D 或以利害为主效应；本文预测 R 主要随<b>信道</b>变化：B ≈ C（依赖信道上低）而 A ≈ D（独立信道上高），<b>且利害的主效应不显著或远小于信道的主效应</b>。<b>这是两家在同一实验里方向不同的主效应之争，一次数据采集即可裁决。若利害的主效应大于信道，本文的第二轴不成立，整张辨别格作废。</b></p>
+<h3>7.7 布尔迪厄：正统之外的那一层（doxa）</h3>
+<p>它回答的问题：在一个场域里，为什么有些东西根本不进入讨论——不是因为被禁止说，也不是因为说了会挨罚，而是因为它<b>从未作为一个可以被想的东西出现</b>。布尔迪厄把可被言说的部分分为正统与异端，二者都在讨论之内；而 doxa 是二者之外的那一层：它不被辩护，因为无人质疑；它不被质疑，因为质疑本身没有生成。</p>
+<p><b>这是本文最危险的一位，比温尼科特更危险，而前一版本与 v2.0 的七.一至七.五都没有请出它。</b>原因很直接：本文剩下的全部独占增量只有两条，其中一条就是<b>无残余</b>。而 doxa 恰好就是「无残余」这件事的现成命名——它明确<b>不是压抑</b>（压抑预设一个被压抑之物仍在下面），它是一整个「可质疑性」的未生成。把本文压到五十字，与把 doxa 压到五十字，读起来几乎同形。</p>
+<p><b>分离点（两条，方向相反）。</b></p>
+<p><b>其一，尺度与可翻转性。</b>doxa 是场域层面的、长期的、随场域危机才被打开的（布尔迪厄说得很清楚：doxa 只有在场域进入危机、出现竞争性话语时才转为正统与异端之争）。本文的代偿取消是<b>单次任务层面的、可在一天之内随信道条件翻转的事件</b>。判决性设计：同一批学生同一天内三次任务，信道条件按 C=1 / C=0 / C=1 切换。doxa 框架预测 R 三次之间稳定（场域没有进入危机，什么都不会变）；本文预测 R 随信道切换而分流。<b>这是与 7.1 温尼科特那条同一个实验、同一批数据，一次即可同时裁决两家。</b></p>
+<p><b>其二，被取消之物的所在。</b>doxa 说的是<b>某一命题</b>没有进入可质疑域——被取消的是一个内容。本文说的是<b>承担者位置本身</b>没有被生成——被取消的不是「这道题该不该这样写」这个问题，而是「这是我做的」这个标记。二者可分离取值：一个学生完全可以对表单的正当性提出异端质疑（doxa 已被打开），同时在动笔那半秒里仍然不为自己出面（R=0）。判决性设计：把「对表单本身提出过质疑」编码为二元变量，与 R 交叉。doxa 框架预测二者高度相关（质疑一旦生成，doxa 即被打开，行动随之改变）；本文预测<b>存在质疑生成而 R 仍为 0 的一格</b>，且这一格不是罕见例外。若这一格近乎空集，本文应当承认它测的是 doxa 的一个课堂代理，并按 9.2 降格。</p>
+
+<h3>7.8 戈夫曼与霍克希尔德：照做，而内部留着一个自己</h3>
+<p>它们回答的问题：一个人在被规定好的角色里演完全套动作，同时用一些细小的方式表明「我不等于这个角色」——戈夫曼把这类动作叫做角色距离；霍克希尔德则把演出分成两层，表层扮演只改外显、内里那份不一致仍在，深层扮演改到连自己都信，长期下去角色与自我不再分得开。</p>
+<p><b>这一族对着本文的另一条独占增量：事件性尺度上的可重复取值。</b>角色距离恰恰是事件性的、情境性的、同一个人在不同场合取值不同的——这正是本文用来与温尼科特分开的那把刀，而戈夫曼早就把这把刀磨好了。不请出它，本文的「事件性」这条增量没有真正过关。</p>
+<p><b>分离点：本文主张的正是「连角色距离都没有」。</b>角色距离要求存在一个<b>与角色保持距离的人</b>——他知道自己在演，他的小动作是演给谁看的（戈夫曼的角色距离本质上仍是一种<b>面向他人的表达</b>）。本文的第三象限说的是：连这个保持距离者也没有出场，因而也没有任何要向谁表明的东西。</p>
+<p><b>判决性设计。</b>在完全无人观看的条件下（独立信道 C=0，且明确告知无人会看、不会被收）测 R。角色距离预测：<b>无观众则角色距离消失</b>——因为它是一种表达，没有观众就没有必要表达，学生会直接照常完成。本文预测相反：<b>无观众恰恰是 R 最应当出现的条件</b>（第二象限），因为此刻不存在任何要求形状的一方。两家在同一格上给出方向完全相反的预测，且这一格就是本文的第二象限，本来就要测。若无观众条件下 R 显著低于有观众条件，本文的第二象限崩塌，整张辨别格作废。</p>
+<p>与霍克希尔德的分离更短一句：表层扮演明确<b>保留</b>内部不一致（这与本文相反），深层扮演虽消掉不一致，但它是一个<b>长期职业社会化过程</b>（空乘的训练以年计），与本文的单次任务尺度不在一个量级。判决点同上：单日内三次信道切换，若 R 稳定不变，本文归入深层扮演的教育学版本。</p>
+
+<h3>7.9 托兰斯：准则依从（criteria compliance）</h3>
+<p>它回答的问题：当评价准则被明确写给学生看之后，学生会按准则反推产出，准则本身取代了学习目标——「为学习而评价」在实践中滑成「为准则而学习」。这是伯恩斯坦那一支在当代评价研究中的直接后裔，而且它的经验现场就是本文的现场：写着栏目的表单。</p>
+<p><b>分离点与 7.2 同型，但更近一步。</b>准则依从描述的是<b>产出被准则牵引</b>——学生仍在追求某物（拿到分），只是追求的对象被换掉了；它预设一个<b>有目标的追求者</b>。本文说的是产出之前那一下自认没有发生，此时并不存在一个被换掉目标的追求者。<b>判决性设计：</b>把准则彻底撤掉（不给评分标准、不说怎么算好），准则依从预测学生的行为显著改变（失去牵引、出现焦虑或自主重构）；本文预测第三象限学生的 R 不变——没有准则可依从，也不会因此出面。<b>「撤掉准则」是一个比「宣告不算分」更彻底的操作</b>，与 7.4 那条合起来构成一组梯度：改社会意义 → 撤准则 → 撤信道，三级都撤而 R 仍不动，才是本文所说的第三象限。</p>
+<h3>7.6 汇聚系列：九家站成一条线，本文只占最后一格</h3>
+<p>把九族按「被取消之物离成形有多远」排成一条线，本文的位置就清楚了：</p>
+<ol class="cvg">
+<li><b>拉图尔</b>：已经成形、已经被认领之物，在转译中的损失；</li>
+<li><b>福柯</b>：已经成形的主体，其偏差被裁决并内化为监控；</li>
+<li><b>伊利奇 1971</b>：已经成形的行动者，其工具配置权被垄断；</li>
+<li><b>伯恩斯坦 / 托兰斯</b>：合法文本的形状被前置，学习者习得实现规则、并按准则反推产出；</li>
+<li><b>布卢姆 / 认识论框定</b>：活动的社会意义被换成「共同展演一套程序」；</li>
+<li><b>伊利奇 1977</b>：命名自身需要的能力被指派所取代；</li>
+<li><b>戈夫曼 / 霍克希尔德</b>：角色被照做，而一个与角色保持距离的自己仍在场（表层扮演保留不一致；深层扮演经年累月才消掉它）；</li>
+<li><b>温尼科特</b>：自发姿态未被接住，顺从取代真自我（但真自我留存并以空虚感返回）；</li>
+<li><b>布尔迪厄</b>：某一命题从未进入可质疑域，不留任何被压抑物（但那是场域层面的长期状态，且被取消的是一个内容）；</li>
+<li><b>本文</b>：承认某物为自己所做的那个标记，在单次任务的成形窗口内被替身取代，不留残余，且可随信道条件在同一天内翻转。</li>
+</ol>
+<p>这条线是单向收窄的：每往后一格，被取消之物离「已经在那里」更远一步。<b>本文占的是最后一格，而最后一格的全部合法性只剩两条</b>——一是不留残余（与前七家相反，与布尔迪厄同向），二是事件性尺度上的可翻转（与布尔迪厄和温尼科特都相反，与戈夫曼同向）。<b>换句话说，本文并不是在两条战线上都独占：它在「无残余」上与布尔迪厄同侧、靠尺度分开；在「事件性」上与戈夫曼同侧、靠有没有一个保持距离者分开。真正只属于本文的，是这两条的合取。</b></p>
+<p>这也把降格路径写得更细了：若第三象限被证明不稳定（独立信道上出现出面痕迹），本文退回第八格，成为温尼科特的一个教育学事件性版本；若第三象限稳定但随信道切换不翻转，本文退回第九格，成为 doxa 的一个课堂代理；若无观众条件下 R 反而下降，本文退回第七格，被角色距离吸收。<b>三条退路各自对应一次已经写好的实验，不是修辞上的谦虚。</b></p>
+<h2 id="s8">八、经验部分：起点案例、预注册设计，与一次诚实的认账</h2>
+<h3>8.1 起点案例及其不可作为证据的说明</h3>
+<p>第一节的滴定实验案例是本文的<b>起点材料</b>，不是证据。它的全部缺陷必须写在正文里：</p>
+<ol class="li"><li>记录来自任课教师课后回忆与学生自述，<b>无录像、无计时、无编码</b>；</li><li>"出手速度比第一次更快"是印象判断，不是 T₁ 的测量；</li><li>报告者知道结论方向，存在追认偏差；</li><li>N=1，且样本由结论倒选而来。</li></ol>
+<p>因此本文<b>不从这个案例得出任何一条结论</b>。它承担的功能仅是：把一个可被形式化的问题提出来。第五节的所有对立预测，都不以它为支撑。</p>
+<h3>8.2 预注册设计</h3>
+<p><b>设计一（主实验 · 信道 × 利害）</b>：见 7.5 分离点二的 2×2。被试为同一年级平行班学生（目标 N=160，每格 40），任务为同一堂实验课的记录任务，读数按第六节。主要结果：R 的信道主效应与利害主效应之比。<b>预注册要求登记的最小内容</b>：自留纸位置与话术、t=0 判定规则、λ 与 d 的阈值、κ 与 ICC 的达标线、不可判读率上限、分析模型（logistic 混合效应，被试为随机效应）、以及<b>样本量与停止规则</b>。</p>
+<p><b>设计二（单日三次切换 · 与温尼科特对判）</b>：同一批学生同一天内三次任务，信道条件 C=1 / C=0 / C=1，其余匹配。主要结果：R 的被试内变异占总变异的比例。人格结构说预测被试间变异为主，本文预测被试内变异为主。</p>
+<p><b>设计三（十五天反转 · 5.6 的判决判据）</b>：第四象限成员在独立信道上是否出现非替代出场，及其后一次制度提交的 λ 与 R。主要结果：分流交互项。</p>
+<p>三项设计的读数完全相同（R、λ、d），不引入任何新量。</p>
+<h3>8.3 不利结果的预先承诺</h3>
+<p>以下四种结果若出现，<b>必须在正文中报告，且各自触发一条已经写死的处置</b>：</p>
+<ol class="li"><li>利害主效应 &gt; 信道主效应 → 第二轴不成立，<b>整张辨别格作废</b>（见 9.1 第三层）。</li><li>第三象限学生在"不算分"宣告后 R 显著上升 → 跨信道固着为假，<b>本文并入框定说</b>。</li><li>R 与合规得分相关系数 |r| &gt; 0.5 → R 是实现规则的代理，<b>本文并入伯恩斯坦</b>。</li><li>自留纸位置（惯用手/非惯用手）改变 R 的分布 → <b>读数作废</b>，全部经验主张撤回。</li></ol>
+<h3>8.4 认账：本设计尚未执行</h3>
+<p><b>本文没有任何真实数据。</b> 三项设计均为预注册草案，未提交伦理审查，未采集一例数据。因此：</p>
+<ol class="li"><li>本文的层级是<b>理论提议 + 可执行的检验方案</b>，不是实证论文；</li><li>第五节表格中"本文"一列的全部内容都是<b>预测</b>，没有一条已被支持；</li><li>任何引用本文的人，不得把表中任何一格写成"已发现"。</li></ol>
+<p>之所以仍然把设计写到这个粒度，是因为本文的全部价值就在于它<b>可以被做掉</b>。一个提出了新命名却给不出如何被推翻的文本，与本文所批评的"填满槽位"是同一件事：形状齐全，内部程序从未生成。</p>
+<h2 id="s9">九、证伪条件、撤回条款与降格规则</h2>
+<h3>9.1 三层撤回条件</h3>
+<p>本文的主张分三层，每一层各有独立的撤回条件，<b>不得以下层的成立掩护上层的失败</b>。</p>
+<p><b>第一层（读数层）</b>：出面痕迹 R 是一个可稳定编码的量。</p>
+<p><b>撤回条件</b>：双盲编码者的 κ &lt; 0.75，或 ICC &lt; 0.80，或不可判读率 Q &gt; 1/3，或自留纸位置对照显示 R 随手侧变化。</p>
+<p><b>触发后果</b>：本文的全部经验主张撤回，第五节表格作废，只余理论提议。</p>
+<p><b>第二层（机制层）</b>：代偿取消与压抑在读数上可分离，即第四象限"无残余"。</p>
+<p><b>撤回条件</b>：在信道、利害、任务难度、合规得分全部匹配的条件下，第四象限成员的 λ 显著高于基线（λ≥1.2）或涂改数显著高于第二象限，即残余仍在。</p>
+<p><b>触发后果</b>：承重命题中的"不是剥夺而是代偿"被推翻，本文退回为"一种低唤醒度的压抑"，即福柯/温尼科特框架的一个亚型。</p>
+<p><b>第三层（独立性层）</b>：信道结构是一根与利害、与实现规则习得程度都独立的轴。</p>
+<p><b>撤回条件</b>：利害主效应 &gt; 信道主效应；或 R 与合规得分 |r| &gt; 0.5。</p>
+<p><b>触发后果</b>：第二轴不成立，二维辨别格作废，本文降为一个一阶命名（见 9.2）。</p>
+<h3>9.2 降格规则（写死，不许事后协商）</h3>
+<ol class="li"><li>若<b>只有</b>第三层失败：本文降为"自我出面：一个描述性概念"，不得再声称提供辨别工具，第五、六节须整体删除。</li><li>若第二层失败：本文降为"课堂压抑的一种低唤醒亚型"，标题中的"取消"须改为"压制"，且必须在摘要首句写明本文曾主张相反的东西。</li><li>若第一层失败：本文不再是一篇可检验的论文，应当整体撤稿或改写为纯理论札记，不得保留任何带阈值的语句。</li></ol>
+<h3>9.3 日期赌注</h3>
+<p><b>2031-08-09 之前</b>，若上述三项设计中至少设计一（信道 × 利害）在两个以上独立团队、不同学段与学科上完成并公开数据，而信道主效应在其中多数研究中不显著或小于利害主效应，本文的第二轴即判定为失败，作者应公开认账并按 9.2 降格。</p>
+<p><b>同时约束支持性结果</b>：若信道效应仅在实验室化的、有明确"不会被收"话术的人为设置中成立，而在任何自然课堂中都测不到，则本文不得继续以"教育表单"为题占用一般教学场景，须改名为"声明性非评价书写界面下的出面痕迹"，并把适用范围收窄到该设置。<b>支持性结果同样能把本文逼小，这一条与撤回条款同等硬。</b></p>
+<h2 id="s10">十、限制、伦理与本文自身的认账条款</h2>
+<h3>10.1 限制</h3>
+<ol class="li"><li><b>文化与学段边界</b>：全部构想基于中学理科课堂的纸笔任务。手写介质在多数场景中正在消失；数字提交界面上的等价读数（首次击键潜伏期、在非提交区的输入行为、切换窗口的时序）尚未构造，本文不声称它们等价。</li><li><b>微动作的多重解释</b>：手朝自留纸移动可以是犹豫、可以是找橡皮、可以是习惯。6.2 的两项对照只能排除其中两种最常见的替代解释，不能排除全部。</li><li><b>"无残余"的原则性困难</b>：证明某物不存在，永远弱于证明它存在。本文只能把残余的搜索范围写死在 R、λ、涂改数三项上；有人若声称残余以本文未测的形态存在（如三年后的职业选择），本文无法反驳，也<b>不接受这种不可测的反驳</b>——本文只对第六节表头内的量负责。</li><li><b>本文自身的形状风险</b>：本文提出的读数、阈值与表头，正是一套格式。若它被推广为课堂常规观察表，它将以本文所描述的方式取消它所要测量的东西——一个知道自己"朝草稿纸动一下就算出面"的学生，会朝草稿纸动一下。<b>本读数只对不知情被试有效，这一条必须写进任何应用建议里。</b></li></ol>
+<h3>10.2 伦理</h3>
+<ol class="li"><li>摄像记录未成年人书写行为，须取得监护人与学生本人的知情同意，且<b>同意书中不得出现研究假设</b>（否则读数失效），这构成一个真实的伦理张力：知情同意的完整性与读数有效性之间存在冲突，处理办法是<b>事后完整揭盲并给予退出与删除数据的权利</b>，而不是在事前含糊其辞。</li><li>"不会被收、不会被看"的话术必须<b>是真的</b>。若研究者事后调取了自留纸，则本研究不仅在方法上失效，在伦理上也构成对本文所批评之事的复制。</li><li>本文不建议任何学校把 R 用于学生评价。<b>把"是否为自己出面"变成一个被评分的指标，是本文所描述的机制的完美实例。</b></li></ol>
+<h3>10.3 本文的认账条款</h3>
+<ol class="li"><li>本文<b>改了前一版本的两处主张</b>：（a）不再声称三家共有前提是一条全称判断，因为伊利奇 1977 不预设已成形的行动者（见 2.2）；（b）不再声称"没有任何理论描述过成形之前的替换"，温尼科特描述过（见 7.1）。</li><li>本文<b>新增了四族此前未交手的最近邻</b>（伯恩斯坦、布卢姆与框定研究、认识主体权、自我决定论的评价压力），并因此把自己的增量收窄为两条：事件性尺度上的可重复取值，与"无残余"这一条与六家方向相反的预测。</li><li>本文<b>没有数据</b>（8.4）。</li><li>本文的核心概念"自我疑存"在定义上包含"不可陈述"，这使它在原则上<b>无法由自陈证实</b>，只能由行为痕迹间接指示。这是一个真实的弱点，不是修辞：本文因此把全部赌注押在一个物理量（手往哪儿动）上，而这个物理量与那个概念之间的连接，是本文最薄的一处，也是最该被攻击的一处。</li></ol>
+<h2 id="s11">十一、本文究竟给出了什么：从一个状态名，到一本记不下它的账</h2>
+<p>写到这里必须回答一个尖锐的问题：把九家排成一条线之后，本文剩下的东西会不会太薄——不过是在一条现成的收窄序列末尾又加了一格？</p>
+<p>如果本文的产物只是「无痛区」这个状态名，那么这个质疑成立。一个新状态名要立住，须证明它指的东西在别处叫不出来；而经过第七节的九次交手，本文能守住的只有「无残余」与「事件性」两条的合取。这不足以支撑一个新概念的重量。</p>
+<h3>11.1 真正的产物是一本账，不是一个格</h3>
+<p>本文实际主张的是一件更具体、也更容易被检验的事：<b>现行的全部课堂记录，在形状上记不下「承担者位置有没有被生成」这一条。</b></p>
+<p>成绩记的是产出的合规程度；合规分记的是文本是否符合准则；参与度记的是可观察的互动频次；过程性评价记的是阶段性产出；档案袋记的是留下来的东西。<b>这五类记录有一个共同的形状：条目都是「已经产生之物」。</b>而本文所指的那个事件，其全部内容恰恰是<b>某物没有被产生</b>——不是产生得少、产生得差、产生得晚，而是那个本应先于产出出现的自认标记，在那一次任务里没有出现。一本以产出为条目的账，在结构上不可能有一栏用来记「有一样东西没有生成」。</p>
+<p>这一步把本文的层级换了：它不再只是提出「第四象限」这个格，而是提出<b>一种以未生成之物为条目的记账法</b>，并给出这本账的最小可行版本——第六节的出面痕迹 R 就是这本账的第一个、也是目前唯一的条目。<b>R 的价值不在于它测得多准，而在于它是一条现行任何一本课堂账簿里都不存在的栏目。</b></p>
+<h3>11.2 这一步同时改变了失败的形状</h3>
+<p>作为状态名，本文失败的方式是「这个状态别处已有名字」——第七节九次交手就是在应对这种失败。作为记账法，本文失败的方式变成另一件事：<b>如果现有的某一本课堂账，只要换一个读法就能读出「承担者位置未生成」，那么本文不必另起一本。</b>这是一条更具体、也更容易被证伪的主张。</p>
+<p>本文在此明确写下这条失败条件：若能证明「合规得分与参与度的某个组合」可以稳定地区分第三象限与第四象限（AUC ≥ 0.75，跨两个独立样本复现），则本文的记账法主张失败，R 应当被废弃，本文退回为对既有指标的一次重新解释。<b>这一条与 8.3 的四条不利结果承诺同等硬，一并写入预注册。</b></p>
+<h3>11.3 一句必须说清的限度</h3>
+<p>提出一本新账，与证明这本账有用，是两件事。本文只做到了第一件的一半：它给出了栏目的定义、编码规程与三条防循环的对照，但<b>没有采集一例数据</b>（见 8.4）。一本从未记过任何一笔的账，其全部价值在于它可以被记——以及被记了之后，可以被发现记的是空的。</p>
+<h2 id="s12">十二、与本栏各篇的分界</h2>
+<p>本栏已发多篇处理「记不下」这一类问题，其中三篇与本文相邻到必须先划清界线。</p>
+<h3>12.1 与之八十八《语感的本质》（据责对位）</h3>
+<p><b>这是最近的一篇，也是最容易被并掉的一篇。</b>那篇主张语感是对「闭合责任与证据可及位置是否对齐」的身体化敏感，并同样把主张从一个比率推到「一本现行记账法记不下的账」——<b>与本文第十一节是同一个动作</b>。</p>
+<p>分界在<b>被记不下的那一样东西是什么</b>。那篇记的是<b>已经发生的一次闭合</b>及其证据是否在手：无据闭合是一个<b>已经做出</b>的动作，只是做它的人不具备做它的资格。本文记的是<b>未曾发生的一次自认</b>：不存在一个做了却没资格的人，而是那个「做的人」这一位置在当次任务里没有被生成。<b>判决点：</b>取同一批学生的同一批产出，同时算据责错位率与出面痕迹 R。那篇预测无据闭合率与形式合规度无关（形式检查全过的句子照样可以无据闭合）；本文预测 R 与形式合规度同样无关，但二者<b>彼此也应当无关</b>——若 R 与据责错位率相关系数 |r| > 0.5，两篇测的是同一件事，本文应并入之八十八。</p>
+<h3>12.2 与之八十四《同持》（首次断供时刻）</h3>
+<p>那篇问的是一段共同持有的关系何时首次断供，读数是 τ₀。它与本文都把镜头对准「某物停止发生的那一刻」，但对象相反：<b>《同持》测的是一样曾经在供的东西何时不再供</b>——它预设那样东西曾经存在过；本文测的是一样<b>从未开始供</b>的东西。判决点：在本文的第三象限里，τ₀ 无定义（没有初值，谈不上首次断供）。若第三象限的学生身上能测出一个有意义的 τ₀，说明那个自认标记曾经存在过又消失，本文的「未生成」表述错了，应改为「早期消失」，并整体退回温尼科特一格。</p>
+<h3>12.3 与之八十六《残判》（重算率）</h3>
+<p>那篇处理的是判定被撤销之后账上留下什么，主张一种以已撤销判定为条目的记账法。本文与它<b>在记账法这一层同型、在条目上互补</b>：那本账记的是<b>已经做出又被收回的判定</b>，本文这本记的是<b>从未做出的自认</b>。两者不冲突，也不能互相替代——一个学生完全可以同时在两本账上有条目。写下这一条不是为了区分，而是为了说明：<b>本栏正在积累的是一类共同的东西——现行记录形状之外的账目</b>，本文是其中一格，不主张涵盖其余。</p>
+<h2 id="snote">发表前加固说明</h2>
+<p>本文以作者 2026-08-09 的 v2.0 完整稿为底本，正文的论证、读数定义、预注册设计与全部证伪条款<b>一字未改</b>。发表前新增的部分是：第七节的 7.7–7.9 三小节（布尔迪厄的 doxa、戈夫曼的角色距离与霍克希尔德的表层／深层扮演、托兰斯的准则依从），7.6 汇聚系列由七家扩到九家并据此改写降格路径，以及第十一、十二两节。</p>
+<p>补这三位不是为了把文献表做厚。<b>v2.0 经过五次交手之后，能守住的独占增量只剩「无残余」与「事件性可翻转」两条，而这两条各自都有一位现成的占位者：doxa 占着前一条，角色距离占着后一条。</b>不请出它们，本文最独特的那两步都会被读成改名。请出之后，本文的位置反而更清楚：它在无残余上与布尔迪厄同侧、靠尺度分开；在事件性上与戈夫曼同侧、靠有没有一个保持距离者分开；<b>真正只属于它的是这两条的合取</b>。7.6 因此写下了三条各自对应一次实验的退路，而不是一句谦辞。</p>
+<p>第十一节做的是另一件事：把主张从「第四象限这个状态」推到「一种以未生成之物为条目的记账法」，并为这一步单独写下失败条件（若合规得分与参与度的某个组合能以 AUC ≥ 0.75 跨两个独立样本区分第三与第四象限，本文的记账法主张失败）。第十二节与本栏三篇划界，其中与之八十八《语感的本质》那一条最要紧——两篇在「另起一本账」这个动作上同型，分界只能落在被记不下的那一样东西上：一个是已经做出而无资格的闭合，一个是从未生成的自认。</p>
+<p><b>本文没有任何真实数据</b>，三项设计均为预注册草案，未提交伦理审查、未采集一例。作者在 8.4 已就此认账，本站原样保留并在此重申：本文的层级是理论提议加可执行的检验方案，不是实证论文；表中「本文」一列的全部内容都是预测，任何引用者不得把其中任何一格写成「已发现」。</p>
+<h2 id="s11">参考文献</h2>
+<p>Amabile, T. M. (1979). Effects of external evaluation on artistic creativity. Journal of Personality and Social Psychology, 37(2), 221–233.</p>
+<p>Bernstein, B. (1990). The Structuring of Pedagogic Discourse: Class, Codes and Control, Vol. IV. London: Routledge.</p>
+<p>Bernstein, B. (2000). Pedagogy, Symbolic Control and Identity: Theory, Research, Critique (rev. ed.). Lanham: Rowman &amp; Littlefield.</p>
+<p>Bloome, D., Puro, P., &amp; Theodorou, E. (1989). Procedural display and classroom lessons. Curriculum Inquiry, 19(3), 265–291.</p>
+<p>Chinn, C. A., &amp; Malhotra, B. A. (2002). Epistemologically authentic inquiry in schools: A theoretical framework for evaluating inquiry tasks. Science Education, 86(2), 175–218.</p>
+<p>Deci, E. L., &amp; Ryan, R. M. (1985). Intrinsic Motivation and Self-Determination in Human Behavior. New York: Plenum.</p>
+<p>Doyle, W. (1983). Academic work. Review of Educational Research, 53(2), 159–199.</p>
+<p>Foucault, M. (1975). Surveiller et punir: Naissance de la prison. Paris: Gallimard.（中译《规训与惩罚》）</p>
+<p>Grolnick, W. S., &amp; Ryan, R. M. (1987). Autonomy in children&amp;apos;s learning: An experimental and individual difference investigation. Journal of Personality and Social Psychology, 52(5), 890–898.</p>
+<p>Hammer, D., Elby, A., Scherr, R. E., &amp; Redish, E. F. (2005). Resources, framing, and transfer. In J. Mestre (Ed.), Transfer of Learning from a Modern Multidisciplinary Perspective. Greenwich: Information Age Publishing.</p>
+<p>Illich, I. (1971). Deschooling Society. New York: Harper &amp; Row.</p>
+<p>Illich, I. (1977). Disabling professions: Notes for a lecture. Contemporary Crises, 1(4), 359–370.（另见 Illich et al., Disabling Professions, London: Marion Boyars, 1977）</p>
+<p>Latour, B. (1986). Visualization and cognition: Thinking with eyes and hands. Knowledge and Society, 6, 1–40.</p>
+<p>Latour, B., &amp; Woolgar, S. (1979). Laboratory Life: The Construction of Scientific Facts. Beverly Hills: Sage.</p>
+<p>Mehan, H. (1979). Learning Lessons: Social Organization in the Classroom. Cambridge, MA: Harvard University Press.</p>
+<p>Miller, E., Manz, E., Russ, R., Stroupe, D., &amp; Berland, L. (2018). Addressing the epistemic elephant in the room: Epistemic agency and the next generation science standards. Journal of Research in Science Teaching, 55(7), 1053–1075.</p>
+<p>Scardamalia, M., &amp; Bereiter, C. (1991). Higher levels of agency for children in knowledge building: A challenge for the design of new knowledge media. Journal of the Learning Sciences, 1(1), 37–68.</p>
+<p>Stroupe, D. (2014). Examining classroom science practice communities: How teachers and students negotiate epistemic agency and learn science-as-practice. Science Education, 98(3), 487–516.</p>
+<p>Winnicott, D. W. (1960/1965). Ego distortion in terms of true and false self. In The Maturational Processes and the Facilitating Environment. London: Hogarth Press.</p>
+<p><b>文献可核性说明</b>：以上条目的作者、年份、刊名经检索核对；个别条目的卷期页码引自二手转引，投稿前须逐条回原刊复核。凡正文中出现的判断，均可回溯到上列文献中该作者的公开主张，本文未代拟任何一家的原话。</p>
+<h2 id="s12">附录 A · 观测清点手册（表头与编码规则摘要）</h2>
+<div class="tblwrap"><table class="tbl"><tr><th>&lt;w:tcPr&gt;&lt;w:tcW w:type="dxa" w:w="3248"/&gt;&lt;w:shd w:fill="F0EAE0" w:val="clear"/&gt;&lt;w:tcMar&gt;&lt;w:top w:type="dxa" w:w="60"/&gt;&lt;w:left w:type="dxa" w:w="80"/&gt;&lt;w:bottom w:type="dxa" w:w="60"/&gt;&lt;w:right w:type="dxa" w:w="80"/&gt;&lt;/w:tcMar&gt;&lt;/w:tcPr&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:spacing w:line="260"/&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:rPr&gt;&lt;w:b/&gt;&lt;w:bCs/&gt;&lt;w:i w:val="false"/&gt;&lt;w:iCs w:val="false"/&gt;&lt;w:sz w:val="19"/&gt;&lt;w:szCs w:val="19"/&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt;字段</th><th>&lt;w:tcPr&gt;&lt;w:tcW w:type="dxa" w:w="3248"/&gt;&lt;w:shd w:fill="F0EAE0" w:val="clear"/&gt;&lt;w:tcMar&gt;&lt;w:top w:type="dxa" w:w="60"/&gt;&lt;w:left w:type="dxa" w:w="80"/&gt;&lt;w:bottom w:type="dxa" w:w="60"/&gt;&lt;w:right w:type="dxa" w:w="80"/&gt;&lt;/w:tcMar&gt;&lt;/w:tcPr&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:spacing w:line="260"/&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:rPr&gt;&lt;w:b/&gt;&lt;w:bCs/&gt;&lt;w:i w:val="false"/&gt;&lt;w:iCs w:val="false"/&gt;&lt;w:sz w:val="19"/&gt;&lt;w:szCs w:val="19"/&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt;类型</th><th>&lt;w:tcPr&gt;&lt;w:tcW w:type="dxa" w:w="3250"/&gt;&lt;w:shd w:fill="F0EAE0" w:val="clear"/&gt;&lt;w:tcMar&gt;&lt;w:top w:type="dxa" w:w="60"/&gt;&lt;w:left w:type="dxa" w:w="80"/&gt;&lt;w:bottom w:type="dxa" w:w="60"/&gt;&lt;w:right w:type="dxa" w:w="80"/&gt;&lt;/w:tcMar&gt;&lt;/w:tcPr&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:spacing w:line="260"/&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:rPr&gt;&lt;w:b/&gt;&lt;w:bCs/&gt;&lt;w:i w:val="false"/&gt;&lt;w:iCs w:val="false"/&gt;&lt;w:sz w:val="19"/&gt;&lt;w:szCs w:val="19"/&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt;规则</th></tr><tr><td>&lt;w:tcPr&gt;&lt;w:tcW w:type="dxa" w:w="3248"/&gt;&lt;w:tcMar&gt;&lt;w:top w:type="dxa" w:w="60"/&gt;&lt;w:left w:type="dxa" w:w="80"/&gt;&lt;w:bottom w:type="dxa" w:w="60"/&gt;&lt;w:right w:type="dxa" w:w="80"/&gt;&lt;/w:tcMar&gt;&lt;/w:tcPr&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:spacing w:line="260"/&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:rPr&gt;&lt;w:b w:val="false"/&gt;&lt;w:bCs w:val="false"/&gt;&lt;w:i w:val="false"/&gt;&lt;w:iCs w:val="false"/&gt;&lt;w:sz w:val="19"/&gt;&lt;w:szCs w:val="19"/&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt;T₀</td><td>&lt;w:tcPr&gt;&lt;w:tcW w:type="dxa" w:w="3248"/&gt;&lt;w:tcMar&gt;&lt;w:top w:type="dxa" w:w="60"/&gt;&lt;w:left w:type="dxa" w:w="80"/&gt;&lt;w:bottom w:type="dxa" w:w="60"/&gt;&lt;w:right w:type="dxa" w:w="80"/&gt;&lt;/w:tcMar&gt;&lt;/w:tcPr&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:spacing w:line="260"/&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:rPr&gt;&lt;w:b w:val="false"/&gt;&lt;w:bCs w:val="false"/&gt;&lt;w:i w:val="false"/&gt;&lt;w:iCs w:val="false"/&gt;&lt;w:sz w:val="19"/&gt;&lt;w:szCs w:val="19"/&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt;毫秒</td><td>&lt;w:tcPr&gt;&lt;w:tcW w:type="dxa" w:w="3250"/&gt;&lt;w:tcMar&gt;&lt;w:top w:type="dxa" w:w="60"/&gt;&lt;w:left w:type="dxa" w:w="80"/&gt;&lt;w:bottom w:type="dxa" w:w="60"/&gt;&lt;w:right w:type="dxa" w:w="80"/&gt;&lt;/w:tcMar&gt;&lt;/w:tcPr&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:spacing w:line="260"/&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:rPr&gt;&lt;w:b w:val="false"/&gt;&lt;w:bCs w:val="false"/&gt;&lt;w:i w:val="false"/&gt;&lt;w:iCs w:val="false"/&gt;&lt;w:sz w:val="19"/&gt;&lt;w:szCs w:val="19"/&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt;同课时无格式基线任务 ≥3 次的中位数</td></tr><tr><td>&lt;w:tcPr&gt;&lt;w:tcW w:type="dxa" w:w="3248"/&gt;&lt;w:tcMar&gt;&lt;w:top w:type="dxa" w:w="60"/&gt;&lt;w:left w:type="dxa" w:w="80"/&gt;&lt;w:bottom w:type="dxa" w:w="60"/&gt;&lt;w:right w:type="dxa" w:w="80"/&gt;&lt;/w:tcMar&gt;&lt;/w:tcPr&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:spacing w:line="260"/&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:rPr&gt;&lt;w:b w:val="false"/&gt;&lt;w:bCs w:val="false"/&gt;&lt;w:i w:val="false"/&gt;&lt;w:iCs w:val="false"/&gt;&lt;w:sz w:val="19"/&gt;&lt;w:szCs w:val="19"/&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt;T₁</td><td>&lt;w:tcPr&gt;&lt;w:tcW w:type="dxa" w:w="3248"/&gt;&lt;w:tcMar&gt;&lt;w:top w:type="dxa" w:w="60"/&gt;&lt;w:left w:type="dxa" w:w="80"/&gt;&lt;w:bottom w:type="dxa" w:w="60"/&gt;&lt;w:right w:type="dxa" w:w="80"/&gt;&lt;/w:tcMar&gt;&lt;/w:tcPr&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:spacing w:line="260"/&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:rPr&gt;&lt;w:b w:val="false"/&gt;&lt;w:bCs w:val="false"/&gt;&lt;w:i w:val="false"/&gt;&lt;w:iCs w:val="false"/&gt;&lt;w:sz w:val="19"/&gt;&lt;w:szCs w:val="19"/&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt;毫秒</td><td>&lt;w:tcPr&gt;&lt;w:tcW w:type="dxa" w:w="3250"/&gt;&lt;w:tcMar&gt;&lt;w:top w:type="dxa" w:w="60"/&gt;&lt;w:left w:type="dxa" w:w="80"/&gt;&lt;w:bottom w:type="dxa" w:w="60"/&gt;&lt;w:right w:type="dxa" w:w="80"/&gt;&lt;/w:tcMar&gt;&lt;/w:tcPr&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:spacing w:line="260"/&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:rPr&gt;&lt;w:b w:val="false"/&gt;&lt;w:bCs w:val="false"/&gt;&lt;w:i w:val="false"/&gt;&lt;w:iCs w:val="false"/&gt;&lt;w:sz w:val="19"/&gt;&lt;w:szCs w:val="19"/&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt;手触及格式载体 → 笔尖首次接触书写面</td></tr><tr><td>&lt;w:tcPr&gt;&lt;w:tcW w:type="dxa" w:w="3248"/&gt;&lt;w:tcMar&gt;&lt;w:top w:type="dxa" w:w="60"/&gt;&lt;w:left w:type="dxa" w:w="80"/&gt;&lt;w:bottom w:type="dxa" w:w="60"/&gt;&lt;w:right w:type="dxa" w:w="80"/&gt;&lt;/w:tcMar&gt;&lt;/w:tcPr&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:spacing w:line="260"/&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:rPr&gt;&lt;w:b w:val="false"/&gt;&lt;w:bCs w:val="false"/&gt;&lt;w:i w:val="false"/&gt;&lt;w:iCs w:val="false"/&gt;&lt;w:sz w:val="19"/&gt;&lt;w:szCs w:val="19"/&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt;λ</td><td>&lt;w:tcPr&gt;&lt;w:tcW w:type="dxa" w:w="3248"/&gt;&lt;w:tcMar&gt;&lt;w:top w:type="dxa" w:w="60"/&gt;&lt;w:left w:type="dxa" w:w="80"/&gt;&lt;w:bottom w:type="dxa" w:w="60"/&gt;&lt;w:right w:type="dxa" w:w="80"/&gt;&lt;/w:tcMar&gt;&lt;/w:tcPr&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:spacing w:line="260"/&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:rPr&gt;&lt;w:b w:val="false"/&gt;&lt;w:bCs w:val="false"/&gt;&lt;w:i w:val="false"/&gt;&lt;w:iCs w:val="false"/&gt;&lt;w:sz w:val="19"/&gt;&lt;w:szCs w:val="19"/&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt;比值</td><td>&lt;w:tcPr&gt;&lt;w:tcW w:type="dxa" w:w="3250"/&gt;&lt;w:tcMar&gt;&lt;w:top w:type="dxa" w:w="60"/&gt;&lt;w:left w:type="dxa" w:w="80"/&gt;&lt;w:bottom w:type="dxa" w:w="60"/&gt;&lt;w:right w:type="dxa" w:w="80"/&gt;&lt;/w:tcMar&gt;&lt;/w:tcPr&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:spacing w:line="260"/&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:rPr&gt;&lt;w:b w:val="false"/&gt;&lt;w:bCs w:val="false"/&gt;&lt;w:i w:val="false"/&gt;&lt;w:iCs w:val="false"/&gt;&lt;w:sz w:val="19"/&gt;&lt;w:szCs w:val="19"/&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt;T₁/T₀；≥1.2 延长，≤1.0 消解线</td></tr><tr><td>&lt;w:tcPr&gt;&lt;w:tcW w:type="dxa" w:w="3248"/&gt;&lt;w:tcMar&gt;&lt;w:top w:type="dxa" w:w="60"/&gt;&lt;w:left w:type="dxa" w:w="80"/&gt;&lt;w:bottom w:type="dxa" w:w="60"/&gt;&lt;w:right w:type="dxa" w:w="80"/&gt;&lt;/w:tcMar&gt;&lt;/w:tcPr&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:spacing w:line="260"/&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:rPr&gt;&lt;w:b w:val="false"/&gt;&lt;w:bCs w:val="false"/&gt;&lt;w:i w:val="false"/&gt;&lt;w:iCs w:val="false"/&gt;&lt;w:sz w:val="19"/&gt;&lt;w:szCs w:val="19"/&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt;d</td><td>&lt;w:tcPr&gt;&lt;w:tcW w:type="dxa" w:w="3248"/&gt;&lt;w:tcMar&gt;&lt;w:top w:type="dxa" w:w="60"/&gt;&lt;w:left w:type="dxa" w:w="80"/&gt;&lt;w:bottom w:type="dxa" w:w="60"/&gt;&lt;w:right w:type="dxa" w:w="80"/&gt;&lt;/w:tcMar&gt;&lt;/w:tcPr&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:spacing w:line="260"/&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:rPr&gt;&lt;w:b w:val="false"/&gt;&lt;w:bCs w:val="false"/&gt;&lt;w:i w:val="false"/&gt;&lt;w:iCs w:val="false"/&gt;&lt;w:sz w:val="19"/&gt;&lt;w:szCs w:val="19"/&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt;厘米</td><td>&lt;w:tcPr&gt;&lt;w:tcW w:type="dxa" w:w="3250"/&gt;&lt;w:tcMar&gt;&lt;w:top w:type="dxa" w:w="60"/&gt;&lt;w:left w:type="dxa" w:w="80"/&gt;&lt;w:bottom w:type="dxa" w:w="60"/&gt;&lt;w:right w:type="dxa" w:w="80"/&gt;&lt;/w:tcMar&gt;&lt;/w:tcPr&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:spacing w:line="260"/&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:rPr&gt;&lt;w:b w:val="false"/&gt;&lt;w:bCs w:val="false"/&gt;&lt;w:i w:val="false"/&gt;&lt;w:iCs w:val="false"/&gt;&lt;w:sz w:val="19"/&gt;&lt;w:szCs w:val="19"/&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt;手部标记点在自留区方向的最大位移投影；≥1.5 有效</td></tr><tr><td>&lt;w:tcPr&gt;&lt;w:tcW w:type="dxa" w:w="3248"/&gt;&lt;w:tcMar&gt;&lt;w:top w:type="dxa" w:w="60"/&gt;&lt;w:left w:type="dxa" w:w="80"/&gt;&lt;w:bottom w:type="dxa" w:w="60"/&gt;&lt;w:right w:type="dxa" w:w="80"/&gt;&lt;/w:tcMar&gt;&lt;/w:tcPr&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:spacing w:line="260"/&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:rPr&gt;&lt;w:b w:val="false"/&gt;&lt;w:bCs w:val="false"/&gt;&lt;w:i w:val="false"/&gt;&lt;w:iCs w:val="false"/&gt;&lt;w:sz w:val="19"/&gt;&lt;w:szCs w:val="19"/&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt;首次落笔区域</td><td>&lt;w:tcPr&gt;&lt;w:tcW w:type="dxa" w:w="3248"/&gt;&lt;w:tcMar&gt;&lt;w:top w:type="dxa" w:w="60"/&gt;&lt;w:left w:type="dxa" w:w="80"/&gt;&lt;w:bottom w:type="dxa" w:w="60"/&gt;&lt;w:right w:type="dxa" w:w="80"/&gt;&lt;/w:tcMar&gt;&lt;/w:tcPr&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:spacing w:line="260"/&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:rPr&gt;&lt;w:b w:val="false"/&gt;&lt;w:bCs w:val="false"/&gt;&lt;w:i w:val="false"/&gt;&lt;w:iCs w:val="false"/&gt;&lt;w:sz w:val="19"/&gt;&lt;w:szCs w:val="19"/&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt;三分类</td><td>&lt;w:tcPr&gt;&lt;w:tcW w:type="dxa" w:w="3250"/&gt;&lt;w:tcMar&gt;&lt;w:top w:type="dxa" w:w="60"/&gt;&lt;w:left w:type="dxa" w:w="80"/&gt;&lt;w:bottom w:type="dxa" w:w="60"/&gt;&lt;w:right w:type="dxa" w:w="80"/&gt;&lt;/w:tcMar&gt;&lt;/w:tcPr&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:spacing w:line="260"/&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:rPr&gt;&lt;w:b w:val="false"/&gt;&lt;w:bCs w:val="false"/&gt;&lt;w:i w:val="false"/&gt;&lt;w:iCs w:val="false"/&gt;&lt;w:sz w:val="19"/&gt;&lt;w:szCs w:val="19"/&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt;自留区／槽位／其他</td></tr><tr><td>&lt;w:tcPr&gt;&lt;w:tcW w:type="dxa" w:w="3248"/&gt;&lt;w:tcMar&gt;&lt;w:top w:type="dxa" w:w="60"/&gt;&lt;w:left w:type="dxa" w:w="80"/&gt;&lt;w:bottom w:type="dxa" w:w="60"/&gt;&lt;w:right w:type="dxa" w:w="80"/&gt;&lt;/w:tcMar&gt;&lt;/w:tcPr&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:spacing w:line="260"/&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:rPr&gt;&lt;w:b w:val="false"/&gt;&lt;w:bCs w:val="false"/&gt;&lt;w:i w:val="false"/&gt;&lt;w:iCs w:val="false"/&gt;&lt;w:sz w:val="19"/&gt;&lt;w:szCs w:val="19"/&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt;R</td><td>&lt;w:tcPr&gt;&lt;w:tcW w:type="dxa" w:w="3248"/&gt;&lt;w:tcMar&gt;&lt;w:top w:type="dxa" w:w="60"/&gt;&lt;w:left w:type="dxa" w:w="80"/&gt;&lt;w:bottom w:type="dxa" w:w="60"/&gt;&lt;w:right w:type="dxa" w:w="80"/&gt;&lt;/w:tcMar&gt;&lt;/w:tcPr&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:spacing w:line="260"/&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:rPr&gt;&lt;w:b w:val="false"/&gt;&lt;w:bCs w:val="false"/&gt;&lt;w:i w:val="false"/&gt;&lt;w:iCs w:val="false"/&gt;&lt;w:sz w:val="19"/&gt;&lt;w:szCs w:val="19"/&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt;0/1</td><td>&lt;w:tcPr&gt;&lt;w:tcW w:type="dxa" w:w="3250"/&gt;&lt;w:tcMar&gt;&lt;w:top w:type="dxa" w:w="60"/&gt;&lt;w:left w:type="dxa" w:w="80"/&gt;&lt;w:bottom w:type="dxa" w:w="60"/&gt;&lt;w:right w:type="dxa" w:w="80"/&gt;&lt;/w:tcMar&gt;&lt;/w:tcPr&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:spacing w:line="260"/&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:rPr&gt;&lt;w:b w:val="false"/&gt;&lt;w:bCs w:val="false"/&gt;&lt;w:i w:val="false"/&gt;&lt;w:iCs w:val="false"/&gt;&lt;w:sz w:val="19"/&gt;&lt;w:szCs w:val="19"/&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt;d≥1.5 且首次落笔在自留区 → 1</td></tr><tr><td>&lt;w:tcPr&gt;&lt;w:tcW w:type="dxa" w:w="3248"/&gt;&lt;w:tcMar&gt;&lt;w:top w:type="dxa" w:w="60"/&gt;&lt;w:left w:type="dxa" w:w="80"/&gt;&lt;w:bottom w:type="dxa" w:w="60"/&gt;&lt;w:right w:type="dxa" w:w="80"/&gt;&lt;/w:tcMar&gt;&lt;/w:tcPr&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:spacing w:line="260"/&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:rPr&gt;&lt;w:b w:val="false"/&gt;&lt;w:bCs w:val="false"/&gt;&lt;w:i w:val="false"/&gt;&lt;w:iCs w:val="false"/&gt;&lt;w:sz w:val="19"/&gt;&lt;w:szCs w:val="19"/&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt;C</td><td>&lt;w:tcPr&gt;&lt;w:tcW w:type="dxa" w:w="3248"/&gt;&lt;w:tcMar&gt;&lt;w:top w:type="dxa" w:w="60"/&gt;&lt;w:left w:type="dxa" w:w="80"/&gt;&lt;w:bottom w:type="dxa" w:w="60"/&gt;&lt;w:right w:type="dxa" w:w="80"/&gt;&lt;/w:tcMar&gt;&lt;/w:tcPr&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:spacing w:line="260"/&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:rPr&gt;&lt;w:b w:val="false"/&gt;&lt;w:bCs w:val="false"/&gt;&lt;w:i w:val="false"/&gt;&lt;w:iCs w:val="false"/&gt;&lt;w:sz w:val="19"/&gt;&lt;w:szCs w:val="19"/&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt;0/1</td><td>&lt;w:tcPr&gt;&lt;w:tcW w:type="dxa" w:w="3250"/&gt;&lt;w:tcMar&gt;&lt;w:top w:type="dxa" w:w="60"/&gt;&lt;w:left w:type="dxa" w:w="80"/&gt;&lt;w:bottom w:type="dxa" w:w="60"/&gt;&lt;w:right w:type="dxa" w:w="80"/&gt;&lt;/w:tcMar&gt;&lt;/w:tcPr&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:spacing w:line="260"/&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:rPr&gt;&lt;w:b w:val="false"/&gt;&lt;w:bCs w:val="false"/&gt;&lt;w:i w:val="false"/&gt;&lt;w:iCs w:val="false"/&gt;&lt;w:sz w:val="19"/&gt;&lt;w:szCs w:val="19"/&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt;介质是否同时为评分数据载体（两子指标皆满足记 1）</td></tr><tr><td>&lt;w:tcPr&gt;&lt;w:tcW w:type="dxa" w:w="3248"/&gt;&lt;w:tcMar&gt;&lt;w:top w:type="dxa" w:w="60"/&gt;&lt;w:left w:type="dxa" w:w="80"/&gt;&lt;w:bottom w:type="dxa" w:w="60"/&gt;&lt;w:right w:type="dxa" w:w="80"/&gt;&lt;/w:tcMar&gt;&lt;/w:tcPr&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:spacing w:line="260"/&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:rPr&gt;&lt;w:b w:val="false"/&gt;&lt;w:bCs w:val="false"/&gt;&lt;w:i w:val="false"/&gt;&lt;w:iCs w:val="false"/&gt;&lt;w:sz w:val="19"/&gt;&lt;w:szCs w:val="19"/&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt;不可判读</td><td>&lt;w:tcPr&gt;&lt;w:tcW w:type="dxa" w:w="3248"/&gt;&lt;w:tcMar&gt;&lt;w:top w:type="dxa" w:w="60"/&gt;&lt;w:left w:type="dxa" w:w="80"/&gt;&lt;w:bottom w:type="dxa" w:w="60"/&gt;&lt;w:right w:type="dxa" w:w="80"/&gt;&lt;/w:tcMar&gt;&lt;/w:tcPr&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:spacing w:line="260"/&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:rPr&gt;&lt;w:b w:val="false"/&gt;&lt;w:bCs w:val="false"/&gt;&lt;w:i w:val="false"/&gt;&lt;w:iCs w:val="false"/&gt;&lt;w:sz w:val="19"/&gt;&lt;w:szCs w:val="19"/&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt;0/1</td><td>&lt;w:tcPr&gt;&lt;w:tcW w:type="dxa" w:w="3250"/&gt;&lt;w:tcMar&gt;&lt;w:top w:type="dxa" w:w="60"/&gt;&lt;w:left w:type="dxa" w:w="80"/&gt;&lt;w:bottom w:type="dxa" w:w="60"/&gt;&lt;w:right w:type="dxa" w:w="80"/&gt;&lt;/w:tcMar&gt;&lt;/w:tcPr&gt;&lt;w:p&gt;&lt;w:pPr&gt;&lt;w:spacing w:line="260"/&gt;&lt;/w:pPr&gt;&lt;w:r&gt;&lt;w:rPr&gt;&lt;w:b w:val="false"/&gt;&lt;w:bCs w:val="false"/&gt;&lt;w:i w:val="false"/&gt;&lt;w:iCs w:val="false"/&gt;&lt;w:sz w:val="19"/&gt;&lt;w:szCs w:val="19"/&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt;遮挡、出画、笔尖不可见；批次 Q&gt;1/3 整批作废</td></tr></table></div>
+<p>编码手册不含理论词汇；编码者对假设与组别双盲；κ≥0.75、ICC≥0.80 为使用前提。</p>
+<h2 id="s13">附录 B · 敌意拓宽的检索记录</h2>
+<p>检索日期 2026-08-09。检索式（英文为主，中文为辅）：</p>
+<ol class="li"><li>Winnicott false self compliance spontaneous gesture true self not allowed to form → 命中温尼科特族（1960 论文、顺从与自发姿态的关系），判定为最近占位者，处置＝汇聚系列 + 判决点（7.1）。</li><li>Illich disabling professions needs defined before client can name them 1977 → 命中《Disabling Professions》与 Contemporary Crises 1(4) 讲稿，判定为最近邻自家更强的版本，处置＝改落点 + 收回一句话（2.2、7.3）。</li><li>Bernstein recognition rules realisation rules pupils produce legitimate text framing pedagogic discourse → 命中分类/框架/辨识与实现规则族，判定为本现场的正统占位者，处置＝判决点 + 降格规则（7.2、9.1 第三层）。</li><li>Bloome "procedural display" classroom lessons students getting the lesson done without substance → 命中 Curriculum Inquiry 19(3):265–291，并牵出框定研究（学生把科学课框成"给老师生产答案"），处置＝判决点（7.4）。</li><li>"epistemic agency" science education students lab report format cookbook inquiry authorship of knowledge → 命中认识主体权族（Scardamalia &amp; Bereiter 1991、Stroupe 2014、Miller et al. 2018），处置＝判决点（7.5）。</li><li>Amabile evaluation expectation reduces creativity; Deci Ryan surveillance evaluation controlling context undermines intrinsic motivation graded vs ungraded → 命中评价压力族，尤其 Grolnick &amp; Ryan 1987 的评分/不评分实验，判定为第二轴最危险的还原路径，处置＝新增候选轴四并排除 + 2×2 判决实验（4.1、7.5）。</li></ol>
+<p>未命中而仍应注意的方向（留给后续）：数字提交界面的击键潜伏期研究；审计文化中"使某物可审计"如何反向塑造被审计对象；证据获取不平等与认识不正义一族在课堂场景中的应用。</p>
+<p>本文由 SDE 基底独立成文；作者对全文的判断与错误负责。本文未对自身评分——评分须由独立的第三方基底或评审者完成。</p>
+</div>
+<button id="totop" aria-label="回到顶部">↑</button>
+<footer>学科通融 · 三学科交叉 · 作者 王德生 ＋ Claude · © 德麦国际 Demai International · <a href="/browse/">sdeuniverses.com</a></footer>
 <script>
-(async function(){
-  const status=document.getElementById('status');
-  try{
-    if(typeof DecompressionStream==='undefined') throw new Error('当前浏览器不支持流式解压');
-    const files=['part1.b64','part2.b64','part3.b64','part4.b64'];
-    const chunks=await Promise.all(files.map(async function(file){
-      const r=await fetch(file+'?v=20260809a',{cache:'no-store'});
-      if(!r.ok) throw new Error(file+'：HTTP '+r.status);
-      return r.text();
-    }));
-    const b64=chunks.join('').replace(/\s+/g,'');
-    const bin=atob(b64);
-    const zipped=Uint8Array.from(bin,function(c){return c.charCodeAt(0);});
-    const stream=new Blob([zipped]).stream().pipeThrough(new DecompressionStream('gzip'));
-    const raw=await new Response(stream).arrayBuffer();
-    if(window.crypto&&crypto.subtle){
-      const digest=await crypto.subtle.digest('SHA-256',raw);
-      const hex=Array.from(new Uint8Array(digest),function(b){return b.toString(16).padStart(2,'0');}).join('');
-      if(hex!=='cab41cce6b59be35ba5f8a6671823473e27384e84c8121d9ce994992fde0b053') throw new Error('全文完整性校验未通过');
-    }
-    const html=new TextDecoder('utf-8').decode(raw);
-    document.open();
-    document.write(html);
-    document.close();
-  }catch(err){
-    console.error(err);
-    status.innerHTML='全文载入失败。请刷新页面，或返回<a href="/confluence/">“学科通融”专栏</a>。<br><small>'+String(err&&err.message||err)+'</small>';
-  }
-})();
+(function(){var b=document.getElementById('pbar'),t=document.getElementById('totop');
+function u(){var d=document.documentElement,h=d.scrollHeight-d.clientHeight;
+b.style.width=(h>0?(d.scrollTop/h*100):0)+'%';t.style.display=d.scrollTop>700?'block':'none';}
+addEventListener('scroll',u,{passive:true});u();
+t.onclick=function(){scrollTo({top:0,behavior:'smooth'});};})();
 </script>
-</body>
-</html>
+<script src="/wds-mode.js?v=20260808a" defer></script>
+<script src="/assets/sde-talk.js?v=20260802b" defer></script>
+</body></html>
