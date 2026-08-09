@@ -1,0 +1,100 @@
+name: publish-painless-zone-once
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/publish-painless-zone.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Publish 学科通融之八十九 and rebuild search index
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          git fetch origin main
+          git checkout -B main origin/main
+
+          if [ ! -f .publish/painless-zone/part1.b64 ]; then
+            echo 'Payload is absent; the article has already been published.'
+            exit 0
+          fi
+
+          test -f .publish/painless-zone/part2.b64
+          test -f .publish/painless-zone/part3.b64
+          test -f .publish/painless-zone/part4.b64
+
+          mkdir -p public/confluence/painless-zone
+          cat .publish/painless-zone/part{1,2,3,4}.b64 \
+            | base64 -d \
+            | gzip -d \
+            > public/confluence/painless-zone/index.html
+
+          echo 'cab41cce6b59be35ba5f8a6671823473e27384e84c8121d9ce994992fde0b053  public/confluence/painless-zone/index.html' \
+            | sha256sum -c -
+
+          python3 - <<'PY'
+          from pathlib import Path
+
+          page = Path('public/confluence/index.html')
+          text = page.read_text(encoding='utf-8')
+          href = '/confluence/painless-zone/'
+
+          if href not in text:
+              card = '''
+          <div class="item" data-ch="c6">
+            <div class="n">之八十九</div>
+            <div>
+              <div class="t">制造无痛区：格式化表单如何在行动发生之前取消学习者的自我出面</div>
+              <div class="m">权力社会学 × 教育制度批判 × 科学技术与社会 · 约2万字 · 网页长文 · 作者 王德生 · 发表于2026年8月9日</div>
+              <div class="p">从福柯的规范化判断、伊利奇的制度性工具批判与拉图尔的铭写装置共同失效的那一格出发，提出“自我疑存”与“测度信道制度独立度”二维模型，给出四象限、微动作代理、反转实验与明确证伪条件。核心预测：自我出面恢复后，迟疑与修订可以回弹，而合规和得分不必下降。</div>
+              <div class="src">三家来源：Michel Foucault《规训与惩罚》；Ivan Illich《去学校化社会》；Bruno Latour〈Visualization and Cognition〉。</div>
+              <a href="/confluence/painless-zone/">阅读网页长文</a>
+            </div>
+          </div>
+          '''
+              marker = '</main>'
+              if marker not in text:
+                  raise SystemExit('No </main> marker in public/confluence/index.html')
+              text = text.replace(marker, card + '\n' + marker, 1)
+              page.write_text(text, encoding='utf-8')
+          PY
+
+          rm -rf .publish/painless-zone
+
+          git config user.name 'sde-publisher'
+          git config user.email 'actions@users.noreply.github.com'
+          git add -A
+
+          if ! git diff --cached --quiet; then
+            git commit -m 'Publish 学科通融之八十九：制造无痛区'
+          fi
+
+          pushed=false
+          for attempt in 1 2 3; do
+            if git push origin HEAD:main; then
+              pushed=true
+              break
+            fi
+            git fetch origin main
+            git rebase origin/main
+          done
+          test "$pushed" = true
+
+          curl --fail-with-body -sS \
+            -X POST \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H 'Accept: application/vnd.github+json' \
+            -H 'X-GitHub-Api-Version: 2022-11-28' \
+            https://api.github.com/repos/SIOWDS/sdeuniverses-site-/dispatches \
+            -d '{"event_type":"reindex"}'
