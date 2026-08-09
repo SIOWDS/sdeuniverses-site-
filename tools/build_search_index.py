@@ -12,6 +12,7 @@ SDE Universes 站内搜索索引构建器
 每次内容更新后重跑本脚本再提交（索引会随内容过期）。
 """
 import os, re, json, hashlib, subprocess, html as htmllib, datetime, sys
+import base64, zlib
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PUB = os.path.join(ROOT, "public")
@@ -116,8 +117,57 @@ def clean_text(t):
     t = re.sub(r"\n{2,}", "\n", t)
     return t.strip()
 
+def unpack_chunked_payload(path, raw):
+    """壳页：正文被压成 gzip+base64 分块，由前端 DecompressionStream 解开后 document.write。
+    索引器不跑 JS，若不在这里解开，整篇只会留下加载提示那几十个字
+    （实测：/sleep/ 五篇每篇只进 1 块 / 约 195 字，约十万汉字搜不到）。
+    解不开就返回 None，让调用方退回按壳页处理——坏页不该让整次重建失败。"""
+    if "DecompressionStream" not in raw:
+        return None
+    m = re.search(r"const\s+parts\s*=\s*\[([^\]]*)\]", raw)
+    if not m:
+        return None
+    names = re.findall(r'"([^"]+\.b64)"', m.group(1))
+    if not names:
+        return None
+    d = os.path.dirname(path)
+    buf, missing = [], []
+    for n in names:
+        fp = os.path.join(d, n)
+        if os.path.exists(fp):
+            buf.append(open(fp, encoding="utf-8", errors="ignore").read())
+        else:
+            missing.append(n)
+    if missing:
+        print("  ! 分块缺失 %s -> %s" % (path, ",".join(missing)), file=sys.stderr)
+    if not buf:
+        return None
+    s64 = re.sub(r"\s+", "", "".join(buf))
+    try:
+        data = base64.b64decode(s64 + "=" * (-len(s64) % 4))
+    except Exception as e:
+        print("  ! base64 解不开 %s: %s" % (path, e), file=sys.stderr)
+        return None
+    # 用 decompressobj 逐段解：末块缺失或 CRC 不符时仍能拿到已解出的部分，
+    # 好过整篇退回壳页（实测有页面只缺尾块，正文其实完整）。
+    dec = zlib.decompressobj(16 + zlib.MAX_WBITS)
+    out = b""
+    try:
+        # 步长要小：CRC 是在流末校验的，若整块一次喂进去，报错时已解出的部分
+        # 会随异常一起丢掉（实测某页因此从 7 万字变成 0）。分小段喂，坏在哪断在哪。
+        for i in range(0, len(data), 4096):
+            out += dec.decompress(data[i:i + 4096])
+    except Exception as e:
+        print("  ! gzip 中断 %s: %s（保留已解出的 %d 字节）" % (path, e, len(out)), file=sys.stderr)
+    if len(out) < 2000:
+        return None
+    return out.decode("utf-8", "ignore")
+
 def html_title_and_text(path):
     raw = open(path, encoding="utf-8", errors="ignore").read()
+    payload = unpack_chunked_payload(path, raw)
+    if payload:
+        raw = payload
     # 标题：<title> 优先，退回首个 <h1>
     title = ""
     m = re.search(r"<title[^>]*>(.*?)</title>", raw, re.S | re.I)
