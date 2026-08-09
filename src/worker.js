@@ -5211,9 +5211,18 @@ async function askCore(request, env, url, body, SINK) {
       controller.enqueue(_sseBytes({ t: "sources", v: sources })); // 先给出处，再流答案
       if (expStr) controller.enqueue(_sseBytes({ t: "expand", v: expStr }));
       let r = { out: 0, think: 0, fin: "", errs: 0 };
+      let _cutMsg = "";
       try { r = await _drain(upstream, controller, _st); }
-      // 被时钟掐断与"流自己坏了"是两回事，读者必须分得清：前者要说清掐在哪一闸、多少秒。
-      catch (e) { controller.enqueue(_sseBytes({ t: "error", v: "读取基底流失败：" + ((_clk && _clk.cut) ? _clk.why(VC.name) : (e && e.message)) })); }
+      catch (e) {
+        // 三件事必须分开说，从前它们都被写成同一句「读取基底流失败」：
+        //   ① 被我们自己的时钟掐断（要说清掐在哪一闸、第几秒）；② 流自己坏了；
+        //   ③ **掐断时一个字都还没写** —— 这一种下面马上要关思考重跑，
+        //      此刻抛一个红色 error 是骗人的：它其实还没失败，只是换了一条路。
+        _cutMsg = (_clk && _clk.cut) ? _clk.why(VC.name) : ("读取基底流失败：" + ((e && e.message) || String(e)));
+        r = { out: _st.out, think: _st.think, fin: _clk && _clk.cut ? "掐断" : "断流", errs: 0 };
+        if (r.out > 0) controller.enqueue(_sseBytes({ t: "error", v: _cutMsg }));   // 写到一半才断＝真丢字，要报
+        else controller.enqueue(_sseBytes({ t: "status", v: "⏱ " + _cutMsg + "——正在关掉思考重跑一次…" }));
+      }
       // ===== 零正文兜底 =====
       // 提炼／碰撞／综合这些环节一跑一两分钟，一次哑火作废的是前面十几次调用。
       // 所以这里不认命：同一份 messages 关掉思考再跑一遍（wdsPlainBody 就是干这个的），
@@ -5240,7 +5249,7 @@ async function askCore(request, env, url, body, SINK) {
         } catch (e) { controller.enqueue(_sseBytes({ t: "error", v: "关思考重跑失败：" + (e && e.message) })); }
         if (!r2 || r2.out === 0) {
           controller.enqueue(_sseBytes({ t: "error", v: "基底没交出正文（第一遍" + _why
-            + (r.fin ? "，停因 " + r.fin : "") + "；关掉思考重跑仍是空）。"
+            + (r.fin ? "，停因 " + r.fin : "") + (_cutMsg ? "：" + _cutMsg : "") + "；关掉思考重跑仍是空）。"
             + (r.errs ? "上面那条基底自己报的错才是根因。" : "请再点一次；若连着两次都空，换另一个基底。") }));
         }
       }

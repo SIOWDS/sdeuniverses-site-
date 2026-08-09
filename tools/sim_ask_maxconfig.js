@@ -116,6 +116,13 @@ ok(mC && Number(mC[1]) >= 30000 && Number(mC[2]) >= 90000 && Number(mC[2]) <= 13
 ok(/if \(_clk\) _clk\.firstFrame\(\);/.test(W), "出流即撤首帧闸（后面还有真活要干）");
 ok(/if \(_clk\) _clk\.stop\(\);/.test(W), "收尾停表，不留孤儿定时器");
 ok(/\(_clk && _clk\.cut\) \? _clk\.why\(VC\.name\)/.test(W), "被时钟掐断时说清掐在哪一闸、多少秒——不与「流自己坏了」混为一谈");
+/* 掐断时一个字都没写＝下面马上要关思考重跑，此刻抛红色 error 是骗人的：它还没失败，只是换了条路。 */
+ok(/if \(r\.out > 0\) controller\.enqueue\(_sseBytes\(\{ t: "error", v: _cutMsg \}\)\);/.test(W),
+   "掐断时**已经写了一半**才报 error（那才是真丢字）");
+ok(/else controller\.enqueue\(_sseBytes\(\{ t: "status", v: "⏱ " \+ _cutMsg/.test(W),
+   "掐断时一个字都没写 ⇒ 只发 status，不吓人；红色留给「两遍都空」那一句");
+ok(/r = \{ out: _st\.out, think: _st\.think/.test(W),
+   "掐断后用心跳里的活数据接着往下判（否则兜底会把「思考了一万字」误报成「一个字都没吐」）");
 
 /* ===== 五、保险还在 ===== */
 console.log("— 五、零正文兜底 —");
