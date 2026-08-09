@@ -83,6 +83,38 @@ ok(r.q.length <= 121, "超长问句钳到 120 字（+问号）· 实得 " + r.q.
 ok(/[？?]$/.test(clean("它凭什么成立", L0).q), "缺问号自动补");
 ok(clean("它凭什么成立？", L0).q === "它凭什么成立？", "已有问号不重复补");
 
+/* ===== 二之二、成批问对：五轮装进一次调用 =====
+   [stated] 用户 2026-08-09：「每 5 次回答放在一次调用里面」。这一刀治的是「思考按次调用付费」——
+   一轮一调用时每次都要重装内功、重推演一遍（实测一次深度问答思考 10,044 字），
+   而思考与正文抢同一份 max_tokens，抢输的那次就是屏幕上的「0 字」。十轮＝十次哑火机会，两批＝两次。 */
+console.log("— 二之二、成批问对 —");
+ok(/if \(mode === "rounds"\) \{/.test(W), "服务端 rounds 模式在位");
+ok(/_MODES = \{[^}]*rounds: 1[^}]*\}/.test(W), "rounds 在模式白名单里");
+const iRounds = W.indexOf('else if (mode === "rounds") {');
+ok(iRounds > 0, "rounds 是 deep 块里的一支——**必须在 neigong/reflect 的作用域内**（写在块外就是 2026-08-09 那句「neigong is not defined」）");
+ok(W.lastIndexOf("const neigong = await loadNeigong", iRounds) > 0, "rounds 分支排在内功装载之后");
+const rBlk = W.slice(iRounds, W.indexOf("\n    }", iRounds));
+ok(/一口气写完这 " \+ n \+ " 轮/.test(rBlk), "提示词明写「一口气写完」——只写一轮就停是实测第一次跑出来的坏法");
+ok(/只写了一轮就停下的回答，本次作废/.test(rBlk), "并写死了作废条件");
+ok(/〔第N轮·问〕/.test(rBlk) && /〔第N轮·答〕/.test(rBlk), "两个切分标记都在提示词里");
+ok(/AUTO_LADDER\.find/.test(rBlk), "每一轮的追问动作仍取自同一条阶梯（没有第二份）");
+ok(/mode === "rounds"/.test(W.slice(W.indexOf("const _plainLong"), W.indexOf("const _msgs"))),
+   "rounds 与长文同档：满预算 ＋ 关思考（五轮连写六千到九千字，再让它先推演就写不完）");
+
+/* parseRounds 抠出来真跑——切分错了会静默丢轮次 */
+const ps = H.indexOf("function parseRounds(");
+const pe = H.indexOf("function autoBatch(");
+const parseR = new Function("txt", H.slice(ps, pe) + "\nreturn parseRounds(txt);");
+const mk = (no, q, len) => "〔第" + no + "轮·问〕\n" + q + "\n〔第" + no + "轮·答〕\n" + "答".repeat(len) + "\n";
+let R = parseR(mk(1, "何谓睡眠？", 900) + mk(2, "承重命题是哪一句？", 900) + "〔5轮完〕");
+ok(R.length === 2 && R[0].q === "何谓睡眠？" && R[1].q === "承重命题是哪一句？", "两轮全切出来，问句不带标记");
+ok(R[0].a.length === 900 && R[0].a.indexOf("〔") < 0, "答案正文干净（不含标记、不含收尾行）");
+R = parseR(mk(1, "何谓睡眠？", 900) + "〔第2轮·问〕\n被截断的下一问");
+ok(R.length === 1, "只有问没有答的那一轮丢掉——半轮入档，后面每一轮都会错位");
+R = parseR(mk(1, "何谓睡眠？", 900) + mk(2, "太短", 50));
+ok(R.length === 1, "正文过短（<200 字）的那一轮不算数");
+ok(parseR("一段没有任何标记的普通答案").length === 0, "没标记就是 0 轮，交给上层重试");
+
 /* ===== 三、前端：四台机器都必须返回 Promise ===== */
 console.log("— 三、链条接线 —");
 const fnBody = (name, nextName) => {
@@ -107,9 +139,10 @@ const bAuto = H.slice(H.indexOf("function doAutoRun(){"), H.indexOf("function au
 ok(H.indexOf("var AUTO_TARGET=10;") > 0, "目标轮次写死 10");
 ok(/onclick="doAutoRun\(\)"/.test(H) && /id="autoStopBtn"/.test(H) && /id="autoWrap"/.test(H), "按钮与面板都挂上了（孤儿函数等于没做）");
 ok(/if\(!confirm\(/.test(bAuto) && /系统密钥/.test(bAuto), "开跑前必须确认，且如实说清系统密钥会被吃掉多少");
-ok(/var calls=AUTO_TARGET\+\(AUTO_TARGET-1\)\+\(triOn\?7:1\)\+2\+1;/.test(bAuto), "报给用户的调用次数按档现算（涌现档换成三路碰撞＝7 次）");
-ok(/约 <b>23<\/b> 次基底调用（开涌现档 29 次）/.test(H), "说明条里的次数与公式对得上（10+9+1+2+1=23 / 涌现 29）");
-ok(/okRounds<AUTO_TARGET/.test(bAuto) && /不再往下烧调用/.test(bAuto), "某一轮两次都没跑成 ⇒ 停下收口，不把剩下的调用烧完");
+ok(/var calls=2\+\(triOn\?7:1\)\+2\+1;/.test(bAuto), "报给用户的调用次数按档现算（两批问对＋提炼＋成文两段＋盲评＝6；涌现档 12）");
+ok(/约 <b>6<\/b> 次基底调用（开涌现档 12 次）/.test(H), "说明条里的次数与公式对得上（2+1+2+1=6 / 涌现 12）");
+ok(/okRounds<2/.test(bAuto) && /不再往下烧调用/.test(bAuto), "一批两次都没跑成 ⇒ 停下收口，不把剩下的调用烧完");
+ok(/function nextBatch\(\)/.test(bAuto) && /okRounds\+=got;/.test(bAuto), "分批推进：写不满五轮也不算失败，下一批从断点接着要");
 ok(/if\(!brief\)\{[^}]*throw/.test(bAuto), "提炼没出入口资料 ⇒ 不写论文（没有入口资料的论文会退回单轮底稿）");
 ok(bAuto.indexOf("if(!brief)") < bAuto.indexOf("doPaper()"), "这道闸排在成文之前");
 ok(/if\(!paperAll \|\| paperAll\.length<600\)\{[^}]*throw/.test(bAuto), "论文没写成 ⇒ 不进盲评");
@@ -121,17 +154,17 @@ ok(/autoStopped=true/.test(bStop), "中止只置一个旗标");
 ok(!/turns=\[\]/.test(bStop) && !/resetThread/.test(bStop), "中止不清空已跑出来的东西（清了＝用户的半小时当场蒸发）");
 ok(/停不住/.test(bStop), "如实告诉用户：已经发出去的那一次调用停不住");
 
-const bRound = H.slice(H.indexOf("function autoRoundTry("), H.indexOf("function stopAutoRun(){"));
-ok(/attempt>=2/.test(bRound), "每轮失败自动重试一次，只重试一次");
-ok(/autoNqFail>=2/.test(bRound), "连续两次拟题失败 ⇒ 认账收手（那已不是抖动）");
-ok(/AUTO_FB_Q/.test(bRound), "单次拟题失败退回通用追问，不中断整场");
-ok(/if\(turns\.length>before\)/.test(bRound), "以 turns 真的长了一轮为准判成败（报错也会走完 finally，光看 resolve 判不出来）");
+const bRound = H.slice(H.indexOf("function autoBatch("), H.indexOf("function stopAutoRun(){"));
+ok(/attempt>=2/.test(bRound), "每批失败自动重试一次，只重试一次");
+ok(/parseRounds\(acc\)/.test(bRound), "按标记切分，切不出来就当这一批没跑成");
+ok(/turns\.length<MAXTURNS/.test(bRound), "入档时仍守十轮上限");
+ok(/if\(turns\.length>before\)/.test(bRound), "以 turns 真的长了几轮为准判成败（报错也会走完 finally，光看 resolve 判不出来）");
 
 /* ===== 五、阶梯只有一处定义：前端不许复制 ===== */
 console.log("— 五、单一定义处 —");
 ok(!/AUTO_LADDER\s*=\s*\[/.test(H), "页面里没有第二份阶梯（复制一份 ⇒ 迟早漂移，而漂移后页面一切正常，只是不再逼深）");
 ok(H.indexOf("worker.js 的 AUTO_LADDER") > 0, "页面注释指明阶梯的唯一定义处在服务端");
-ok(/mode:'nextq',q:originQ\(\),step:step/.test(H), "前端只送 step，问句由服务端拟");
+ok(/mode:'rounds',q:q,from:from,n:n/.test(H), "前端只送 from/n，五轮的问与答都由服务端一次写出");
 const hint = H.slice(H.indexOf('id="autoHint"'), H.indexOf("</div>", H.indexOf('id="autoHint"')));
 LADDER.forEach((x) => ok(hint.indexOf(x.k) > 0, "说明条里列出了【" + x.k + "】（页面文案与服务端阶梯逐字对得上）"));
 

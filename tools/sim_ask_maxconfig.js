@@ -35,14 +35,14 @@ ok(/_heavy \? WDS_TOK_HEAVY : MAXTOK/.test(W), "三个重档首发给 WDS_TOK_HE
    谁都没有的那一版就是 2026-08-09 第 133 秒断流的那一版。 */
 ok(/const WDS_TOK_HEAVY = WDS_TOK_MAX;/.test(W) || (grab(/const WDS_TOK_HEAVY = (\d+);/) <= 20000),
    "重档预算：要么给满 MaxToken，要么有界——不许介于两者之间地随手写一个大数");
-ok(/const _plainLong = _topPower;/.test(W) || (grab(/const WDS_TOK_HEAVY = (\d+);/) <= 20000),
+ok(/const _plainLong = _topPower \|\| mode === "rounds";/.test(W) || (grab(/const WDS_TOK_HEAVY = (\d+);/) <= 20000),
    "给满预算时长文必须关思考——预算是油门不是容器，投入档刹不住它（实测 high 与 max 的思考一样长）");
 ok(/body\.reasoning_effort = \(VC && VC\.effort\) \? VC\.effort : "max";/.test(W),
    "推理投入档这个旋钮做在 wdsTopBody 里且默认仍是 max（不传 effort 的既有调用点行为不变）");
 const mH = W.match(/const _heavy = \(([^)]*)\);/);
 ok(!!mH, "_heavy 判据在位");
 const isHeavy = new Function("mode", "deep",
-  "const _topPower = (mode === \"paper\" || mode === \"polish\"); const _deepAns = (mode === \"answer\" && deep); return (" + (mH ? mH[1] : "false") + ");");
+  'const _topPower = (mode === "paper" || mode === "polish"); const _deepAns = (mode === "answer" && deep); return (' + (mH ? mH[1] : "false") + ');');
 ok(isHeavy("paper") && isHeavy("polish") && isHeavy("iq") && isHeavy("distill"), "真跑：成文／打磨／盲评／提炼四档都算重档");
 /* 【这条是用户那场真实的自动十轮换来的，别放宽】
    深度档问答的思考与正文共用一份预算，4000 那一版会走出一条必然的下坡：
@@ -51,10 +51,12 @@ ok(isHeavy("answer", true), "真跑：**深度档问答**也算重档（十轮�
 ok(!isHeavy("answer", false) && !isHeavy("nextq") && !isHeavy("collide"), "真跑：普通档问答与其余模式不进重档（各自原有的那一个数不变）");
 ok(/if \(_deepAns\) MAXTOK = 8000;/.test(W), "深度档问答自带预算 8000（4000 会把正文挤没；12000 实测思考 38,777 字、第 128 秒被平台杀掉）");
 /* 阶梯：真跑一遍，确认 iq 首发最高档、普通模式仍是单一档（＝行为不变） */
-const mL = W.match(/const _ladder = _topPower \? \[([\s\S]{0,500}?)\);\n/);
-ok(!!mL, "_ladder 在位");
+const _lStart = W.indexOf("const _ladder =");
+const _lEnd = W.indexOf(";\n", W.indexOf("a.indexOf(v) === i))", _lStart));
+const ladderSrc = W.slice(_lStart, _lEnd);
+ok(_lStart > 0 && _lEnd > _lStart, "_ladder 在位");
 const ladderFn = new Function("mode", "MAXTOK", "WDS_TOK_MAX", "WDS_TOK_HEAVY", "deep",
-  "const _topPower = (mode === \"paper\" || mode === \"polish\"); const _deepAns = (mode === \"answer\" && deep); const _ladder = " + W.slice(W.indexOf("_topPower ? [", W.indexOf("const _ladder =")), W.indexOf(";", W.indexOf("a.indexOf(v) === i))"))) + "; return _ladder;");
+  'const _topPower = (mode === "paper" || mode === "polish"); const _deepAns = (mode === "answer" && deep);\n' + ladderSrc + ';\nreturn _ladder;');
 ok(JSON.stringify(ladderFn("iq", 32000, 64000, 64000)) === "[64000,12000,8000]", "真跑：iq 阶梯首档给满 MaxToken");
 ok(JSON.stringify(ladderFn("distill", 12000, 64000, 64000)) === "[64000,12000,8000]", "真跑：distill 走同一条阶梯（它也被实测抓到思考 8,977 / 正文 0）");
 ok(JSON.stringify(ladderFn("paper", 32000, 64000, 64000)) === "[64000,32000,16000]", "真跑：长文阶梯 = 64000 → 32000 → 16000（首档给满）");
@@ -75,7 +77,7 @@ ok(isTop("paper") === true && isTop("polish") === true, "真跑：paper / polish
 ok(isTop("iq") === false, "真跑：iq **不挂**满功率——满功率对要求结构化短输出的调用是毒（本文件 4500 行的硬教训）");
 ok(isTop("answer") === false && isTop("distill") === false && isTop("nextq") === false,
    "真跑：answer / distill / nextq 不挂满功率");
-ok(/const _plainLong = _topPower;/.test(W) && /wdsFetchMax\(_VCX, KEY, _msgs, true[\s\S]{0,140}_plainLong\)/.test(W),
+ok(/const _plainLong = _topPower \|\| mode === "rounds";/.test(W) && /wdsFetchMax\(_VCX, KEY, _msgs, true[\s\S]{0,140}_plainLong\)/.test(W),
    "长文两档 ＝ 满预算 ＋ 关思考（实测：给满预算时交稿的本来就是关思考那一遍）");
 ok(/plain \? wdsPlainBody\(VC, body\) : wdsTopBody\(VC, body\)/.test(W),
    "关思考这一路真的接到 wdsFetchMax 的 body 上；不传 plain 的既有调用点行为不变");
