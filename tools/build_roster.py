@@ -208,6 +208,23 @@ def paper_weight(idx):
     return int(w) if w == int(w) else w
 
 
+def work_meta(idx):
+    """页面自报的作品类型与书名（专著条目专用）。
+
+    与 sde:paper-weight 同理，写在页面里才能在 roster 自动重建后存活：
+
+        <meta name="sde:work-type"  content="book">
+        <meta name="sde:work-title" content="战争的资格">
+
+    书名要进 roster 是因为学员榜要把「发表的书名」直接列在名次旁边——
+    只报一个加权篇数，读者看不出那二十篇是哪一本书顶上来的。
+    """
+    s = open(idx, encoding='utf-8').read()
+    kind = re.search(r'<meta\s+name=["\']sde:work-type["\']\s+content=["\']([^"\']+)["\']', s)
+    title = re.search(r'<meta\s+name=["\']sde:work-title["\']\s+content=["\']([^"\']+)["\']', s)
+    return (kind.group(1) if kind else None), (title.group(1) if title else None)
+
+
 try:
     from classify_fields import classify as _classify_field
 except ImportError:                                   # 与本文件同目录，CI 里以 tools/ 为 cwd 之外调用时兜底
@@ -306,6 +323,11 @@ def build():
             w = paper_weight(idx)
             if w is not None:
                 rec['weight'] = w
+            kind, title = work_meta(idx)
+            if kind:
+                rec['kind'] = kind
+            if title:
+                rec['title'] = title
             papers.append(rec)
         papers.sort(key=lambda p: (p['date'], p['words']), reverse=True)
         stu['papers'] = papers

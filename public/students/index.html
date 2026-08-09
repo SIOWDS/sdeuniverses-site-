@@ -30,6 +30,7 @@ nav a{color:var(--gold);text-decoration:none;font-size:14px;letter-spacing:0.05e
 .panel p{font-size:15px;color:var(--ink2);line-height:1.95;max-width:560px;margin:0 auto 10px}.roster-head{text-align:center;margin-top:44px}.roster-head .tag{font-size:12px;letter-spacing:0.34em;color:var(--gold);margin-bottom:10px}.roster-head .sub{font-size:14.5px;color:var(--ink2);margin-bottom:6px}.roster-count{font-size:13px;color:var(--accent);letter-spacing:0.14em;margin-bottom:8px}.roster{display:grid;grid-template-columns:repeat(auto-fill,minmax(158px,1fr));gap:12px;margin-top:22px}.stu{display:flex;align-items:center;gap:12px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:13px 16px;text-decoration:none;transition:border-color .15s,transform .15s}a.stu:hover{border-color:rgba(201,168,76,0.6);transform:translateY(-2px)}a.stu:hover .nm{color:#FFF3D6}.stu .no{font-size:13px;color:#1A1410;background:var(--gold);width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0}.stu .nm{font-size:15px;color:#F5EFE0;line-height:1.35}.stu .nm small{display:block;font-size:11.5px;color:var(--ink2);letter-spacing:0.03em;margin-top:1px}.stu.open{border-style:dashed}.stu.prep{border-style:dashed;border-color:rgba(201,168,76,0.45)}.pflag{display:inline-block;margin-left:8px;font-style:normal;font-size:10.5px;letter-spacing:0.1em;padding:1px 6px;border:1px dashed var(--gold);border-radius:9px;color:var(--gold);vertical-align:2px}.stu.prep .no{background:transparent;border:1px dashed var(--gold);color:var(--gold);font-size:11px}.prep-head{grid-column:1/-1;text-align:center;font-size:12px;letter-spacing:0.22em;color:var(--gold);margin:18px 0 2px;padding-top:14px;border-top:1px dashed rgba(201,168,76,0.28)}.prep-note{grid-column:1/-1;text-align:center;font-size:12px;color:var(--ink2);line-height:1.8;margin-bottom:6px}.stu.open .no{background:transparent;border:1px dashed var(--gold);color:var(--gold)}.stu.open .nm{color:var(--ink2)}
 .roster-note{text-align:center;font-size:12px;color:var(--ink2);letter-spacing:0.06em;margin-top:6px;margin-bottom:-6px}
 .stu .cnt{font-size:10px;color:var(--accent);letter-spacing:0.04em;margin-top:2px}
+.stu .bks{font-size:10.5px;color:var(--gold);letter-spacing:0.02em;line-height:1.55;margin-top:3px}
 .stu-loading{grid-column:1/-1;text-align:center;color:var(--ink2);font-size:13.5px;padding:20px 0}
 .what{margin-top:44px}
 .what h3{font-size:13px;letter-spacing:0.28em;color:var(--accent);margin-bottom:16px;text-align:center}
@@ -118,8 +119,8 @@ footer a{color:var(--gold);text-decoration:none}
     <div class="sub zh-only">接龙持续进行，人数不设上限——每一位学员的作品，通过合宪性审读后，都将署名在此陆续发表。</div>
     <div class="sub en-only">Sign-up is ongoing with no cap on numbers — every trainee’s work, once it passes a constitutionality review, will be published here under their name.</div>
   </div>
-  <div class="roster-note zh-only">编号按四维加权分自动排序：<b>活跃度 40%</b>（以三天为一个窗口计一次活跃，同一天连发多篇不按篇数叠加；近期权重更高、持续多月额外加分）· <b>发表篇数 20%</b> · <b>创新度 25%</b>（只采用独立盲评分）· <b>领域广度 15%</b>（一级领域分布的有效领域数）。后两维样本少的向全站均值收缩，暂无数据的按均值计、不罚不奖。每次发表新文章即时更新 · 并列按报名顺序</div>
-  <div class="roster-note en-only">Ranked by four weighted parts: <b>activity 40%</b> (counted in three-day windows, so a single-day batch does not stack per piece) · <b>number of pieces 20%</b> · <b>innovation 25%</b> (blind scores only) · <b>disciplinary breadth 15%</b> (effective number of primary fields). The last two are shrunk toward the site mean when the sample is small; students without data take the mean, neither penalised nor rewarded. Updates the instant a new piece is published · ties by sign-up order</div>
+  <div class="roster-note zh-only">编号按四维加权分自动排序：<b>活跃度 40%</b>（以三天为一个窗口计一次活跃，同一天连发多篇不按篇数叠加；近期权重更高、持续多月额外加分）· <b>发表篇数 20%</b>（<b>一部专著按十篇论文计</b>）· <b>创新度 25%</b>（只采用独立盲评分）· <b>领域广度 15%</b>（一级领域分布的有效领域数）。后两维样本少的向全站均值收缩，暂无数据的按均值计、不罚不奖。每次发表新文章即时更新 · 并列按报名顺序</div>
+  <div class="roster-note en-only">Ranked by four weighted parts: <b>activity 40%</b> (counted in three-day windows, so a single-day batch does not stack per piece) · <b>number of pieces 20%</b> (a monograph counts as ten papers) · <b>innovation 25%</b> (blind scores only) · <b>disciplinary breadth 15%</b> (effective number of primary fields). The last two are shrunk toward the site mean when the sample is small; students without data take the mean, neither penalised nor rewarded. Updates the instant a new piece is published · ties by sign-up order</div>
   <div class="roster" id="roster">
     <div class="stu-loading zh-only">名单加载中…</div>
     <div class="stu-loading en-only">Loading roster…</div>
@@ -257,7 +258,21 @@ fetch('/students/roster.json?v='+Date.now(),{cache:'no-store'}).then(function(r)
     nm.textContent=s.name;
     if(s.status==='preliminary'){ var pf=document.createElement('i'); pf.className='pflag'; pf.textContent='预备'; nm.appendChild(pf); }
     if(s.small){ var sm=document.createElement('small'); sm.textContent=s.small; nm.appendChild(sm); }
-    if(s.count>0){ var cnt=document.createElement('div'); cnt.className='cnt'; cnt.textContent='已发表 '+s.count+' 篇 · 综合分 '+s.score.toFixed(0); nm.appendChild(cnt); }
+    var books=(s.papers||[]).filter(function(p){ return p.kind==='book'; });
+    if(s.count>0){
+      var cnt=document.createElement('div'); cnt.className='cnt';
+      // 已发表＝页面数（作品件数），计分＝加权篇数（一部专著抵十篇）。
+      // 两个数分开写：把加权数写成「已发表 N 篇」会让读者以为他写了 227 篇文章。
+      cnt.textContent = books.length
+        ? '已发表 '+s.items+' 件 · 专著 '+books.length+' 部 · 计分 '+s.count+' 篇 · 综合分 '+s.score.toFixed(0)
+        : '已发表 '+s.count+' 篇 · 综合分 '+s.score.toFixed(0);
+      nm.appendChild(cnt);
+    }
+    if(books.length){
+      var bk=document.createElement('div'); bk.className='bks';
+      bk.textContent = books.map(function(p){ return '《'+(p.title||'专著')+'》'; }).join('');
+      nm.appendChild(bk);
+    }
     a.appendChild(no); a.appendChild(nm);
     host.appendChild(a);
   });
