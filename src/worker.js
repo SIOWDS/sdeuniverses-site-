@@ -4669,8 +4669,13 @@ async function askCore(request, env, url, body, SINK) {
     // 400 tok ⇒ llmText 自动走 wdsPlainBody 关思考：短额度一旦被 reasoning 吃光就一个字都不写。
     try { raw = await llmText(VC, KEY, nsys, nusr, 400, 30000); } catch (e) {}
     let nq = String(raw || "").split("\n").map((s) => s.trim()).filter(Boolean)[0] || "";
-    nq = nq.replace(/^[0-9０-９]+\s*[、.．)）:：]\s*/, "").replace(/^第[一二三四五六七八九十]+[轮问]\s*[：:]?\s*/, "")
-           .replace(/^[「『“"'（(【\[]+/, "").replace(/[」』”"'）)】\]]+$/, "").trim().slice(0, 120);
+    nq = nq.replace(/^[0-9０-９]+\s*[、.．)）:：]\s*/, "").replace(/^第[一二三四五六七八九十]+[轮问]\s*[：:]?\s*/, "").trim();
+    // 引号只在**整句被一对引号裹住**时才剥。无条件剥前引号会把「“不断供”若可测…」削成半个引号，
+    // 线上第一次真跑就是这么出来的（页面上看着像丢了字）。
+    for (const [lq, rq] of [["「", "」"], ["『", "』"], ["“", "”"], ["\"", "\""], ["'", "'"], ["（", "）"], ["(", ")"], ["【", "】"], ["[", "]"]]) {
+      if (nq.length > 2 && nq.startsWith(lq) && nq.endsWith(rq)) { nq = nq.slice(1, -1).trim(); break; }
+    }
+    nq = nq.slice(0, 120);
     const usedFb = !(nq.length >= 6);
     if (usedFb) nq = L.fb;
     if (!/[?？]/.test(nq)) nq += "？";   // 只在整句一个问号都没有时才补：兜底问句常是「问句？＋一句要求。」，只看末尾会补出「让步。？」
