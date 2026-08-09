@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>制造无痛区｜王德生｜SDE Universes 学科通融</title>
+<meta name="description" content="王德生：格式化表单如何在行动发生之前取消学习者的自我出面。提出自我疑存、测度信道制度独立度、四象限与可证伪反转实验。">
+<meta name="author" content="王德生">
+<meta name="keywords" content="教育表单,自我疑存,自我出面,测度信道,无痛区,学科通融,SDE,SIO">
+<meta property="og:type" content="article">
+<meta property="og:title" content="制造无痛区：格式化表单如何在行动发生之前取消学习者的自我出面">
+<meta property="og:description" content="王德生提出‘自我疑存—测度信道制度独立度’二维模型，并给出四象限、微动作代理、反转实验与证伪条件。">
+<meta property="article:author" content="王德生">
+<meta property="article:published_time" content="2026-08-09">
+<link rel="canonical" href="https://sdeuniverses.com/confluence/painless-zone/">
+<style>
+:root{--paper:#f5f2e9;--sheet:#fdfcf7;--ink:#23201a;--muted:#6d6658;--rule:#2a3b50;--mark:#9e3d2c;--line:rgba(35,32,26,.16)}
+*{box-sizing:border-box}html{-webkit-text-size-adjust:100%}body{margin:0;min-height:100vh;background:var(--paper);color:var(--ink);font-family:"Noto Serif SC","Source Han Serif SC","Songti SC","SimSun",Georgia,serif;display:grid;place-items:center;padding:28px}
+main{width:min(780px,100%);background:var(--sheet);border:1px solid var(--line);border-top:3px solid var(--rule);padding:clamp(30px,7vw,64px);box-shadow:0 18px 50px rgba(35,32,26,.08)}
+.kicker{font-size:12px;letter-spacing:.32em;color:var(--mark);margin:0 0 28px}h1{font-size:clamp(38px,8vw,68px);line-height:1.16;margin:0 0 18px}h2{font-weight:500;font-size:clamp(18px,3.2vw,27px);line-height:1.65;color:var(--rule);margin:0 0 24px}.byline{color:var(--muted);font-size:14px;letter-spacing:.08em;border-top:1px solid var(--line);padding-top:18px}.abstract{font-size:16px;line-height:2;text-align:justify;margin-top:30px}.status{margin-top:28px;padding:16px 18px;border-left:3px solid var(--mark);background:#f8f4e9;color:var(--muted);line-height:1.8}.status a{color:var(--mark)}.spinner{display:inline-block;width:12px;height:12px;border:2px solid var(--line);border-top-color:var(--mark);border-radius:50%;animation:spin .8s linear infinite;margin-right:8px;vertical-align:-1px}@keyframes spin{to{transform:rotate(360deg)}}noscript{display:block;margin-top:18px;color:var(--mark)}
+</style>
+</head>
+<body>
+<main>
+<p class="kicker">SDE UNIVERSES · 学科通融之八十九</p>
+<h1>制造无痛区</h1>
+<h2>格式化表单如何在行动发生之前取消学习者的自我出面</h2>
+<p class="byline">作者：王德生　｜　2026年8月9日　｜　理论建构与可证伪研究设计</p>
+<p class="abstract">本文从福柯的规范化判断、伊利奇的制度性工具批判与拉图尔的铭写装置共同失效的那一格出发，提出“自我疑存”与“测度信道制度独立度”二维模型，完成四象限判别、微动作代理、反转实验、竞争解释与证伪条件。核心判断是：制度制造的“无痛区”，未必来自冲突被解决，也可能来自能够把冲突认作“我的冲突”的内部程序尚未形成。</p>
+<p class="status" id="status"><span class="spinner" aria-hidden="true"></span>正在载入论文全文……</p>
+<noscript>此页面需要启用 JavaScript 才能读取论文全文。请返回<a href="/confluence/">“学科通融”专栏</a>。</noscript>
+</main>
+<script>
+(async function(){
+  const status=document.getElementById('status');
+  try{
+    if(typeof DecompressionStream==='undefined') throw new Error('当前浏览器不支持流式解压');
+    const files=['part1.b64','part2.b64','part3.b64','part4.b64'];
+    const chunks=await Promise.all(files.map(async function(file){
+      const r=await fetch(file+'?v=20260809a',{cache:'no-store'});
+      if(!r.ok) throw new Error(file+'：HTTP '+r.status);
+      return r.text();
+    }));
+    const b64=chunks.join('').replace(/\s+/g,'');
+    const bin=atob(b64);
+    const zipped=Uint8Array.from(bin,function(c){return c.charCodeAt(0);});
+    const stream=new Blob([zipped]).stream().pipeThrough(new DecompressionStream('gzip'));
+    const raw=await new Response(stream).arrayBuffer();
+    if(window.crypto&&crypto.subtle){
+      const digest=await crypto.subtle.digest('SHA-256',raw);
+      const hex=Array.from(new Uint8Array(digest),function(b){return b.toString(16).padStart(2,'0');}).join('');
+      if(hex!=='cab41cce6b59be35ba5f8a6671823473e27384e84c8121d9ce994992fde0b053') throw new Error('全文完整性校验未通过');
+    }
+    const html=new TextDecoder('utf-8').decode(raw);
+    document.open();
+    document.write(html);
+    document.close();
+  }catch(err){
+    console.error(err);
+    status.innerHTML='全文载入失败。请刷新页面，或返回<a href="/confluence/">“学科通融”专栏</a>。<br><small>'+String(err&&err.message||err)+'</small>';
+  }
+})();
+</script>
+</body>
+</html>
