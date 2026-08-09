@@ -28,9 +28,10 @@ console.log('② worker：两个入口都能传 scope');
 ok(/const _scope = \/\^\[a-z0-9_\]\{1,24\}\$\/\.test\(String\(body\.scope \|\| ""\)\)/.test(W),
    '/api/ask 没有读 body.scope（或没做字符白名单）');
 ok(/budget: deep \? 6000000 : 3000000, only: _scope/.test(W), '/api/ask 没把 scope 透传给 lightRetrieve');
-ok(/const _scopeK = \/\^\[a-z0-9_\]\{1,24\}\$\/\.test\(String\(b\.scope \|\| ""\)\)/.test(W),
+ok(/const _scopeF = \/\^\[a-z0-9_\]\{1,24\}\$\/\.test\(String\(b\.scope \|\| ""\)\)/.test(W),
    '/api/kb/find 没有读 b.scope');
-ok(/pick: 16, only: _scopeK/.test(W), '/api/kb/find 没把 scope 透传');
+ok(/pick: Math\.max\(16, K \* 2\), only: _scopeF/.test(W), '/api/kb/find 没把 scope 透传（注意别patch到 /api/kb/retrieve 那一处）');
+ok(/const _scopeK = /.test(W) && /pick: 16, only: _scopeK/.test(W), '/api/kb/retrieve 也应支持 scope');
 
 console.log('③ 页面：只吃 frontier 分片');
 ok(H.length > 3000, '页面不存在或过短');

@@ -7905,8 +7905,10 @@ export default {
       const q = String(b.q || "").trim().slice(0, 500);
       if (q.length < 1) return Response.json({ ok: false, n: 0, docs: [], msg: "要找什么？" }, { headers: _cors() });
       const K = Math.max(3, Math.min(30, parseInt(b.k, 10) || 12));
+      // scope：栏目内找文章（如 "frontier"）——只在该版块里找。
+      const _scopeF = /^[a-z0-9_]{1,24}$/.test(String(b.scope || "")) ? String(b.scope) : "";
       try {
-        const _lr = await lightRetrieve(env, url, q, [], 60, 500, { pick: Math.max(16, K * 2) });
+        const _lr = await lightRetrieve(env, url, q, [], 60, 500, { pick: Math.max(16, K * 2), only: _scopeF });
         const docs = _lr.corpus.docs || [], lab = _lr.corpus.secLabel || {};
         const best = new Map();
         for (const ck of _lr.hits) if (!best.has(ck.d)) best.set(ck.d, ck.t);
