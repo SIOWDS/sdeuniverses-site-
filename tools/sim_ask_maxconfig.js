@@ -36,18 +36,25 @@ ok(heavyTok >= 12000 && heavyTok <= 20000,
 ok(heavyTok < 64000, "首发不许直接给 64000——实测那样 paper 会死在思考阶段（2026-08-09 抓到原样）");
 const mH = W.match(/const _heavy = \(([^)]*)\);/);
 ok(!!mH, "_heavy 判据在位");
-const isHeavy = new Function("mode", "const _topPower = (mode === \"paper\" || mode === \"polish\"); return (" + (mH ? mH[1] : "false") + ");");
+const isHeavy = new Function("mode", "deep",
+  "const _topPower = (mode === \"paper\" || mode === \"polish\"); const _deepAns = (mode === \"answer\" && deep); return (" + (mH ? mH[1] : "false") + ");");
 ok(isHeavy("paper") && isHeavy("polish") && isHeavy("iq") && isHeavy("distill"), "真跑：成文／打磨／盲评／提炼四档都算重档");
-ok(!isHeavy("answer") && !isHeavy("nextq") && !isHeavy("collide"), "真跑：其余模式不进重档（各自原有的那一个数不变）");
+/* 【这条是用户那场真实的自动十轮换来的，别放宽】
+   深度档问答的思考与正文共用一份预算，4000 那一版会走出一条必然的下坡：
+   第 1–4 轮 3405／3673／3135／2838 字 → 第 5 轮 936 字 → 第 6 轮 0 字，整场自动十轮就断在这儿。 */
+ok(isHeavy("answer", true), "真跑：**深度档问答**也算重档（十轮问对全都走这条路）");
+ok(!isHeavy("answer", false) && !isHeavy("nextq") && !isHeavy("collide"), "真跑：普通档问答与其余模式不进重档（各自原有的那一个数不变）");
+ok(/if \(_deepAns\) MAXTOK = 12000;/.test(W), "深度档问答自带预算 12000（思考 3–6k tok ＋ 正文一两千字，要装得下两半）");
 /* 阶梯：真跑一遍，确认 iq 首发最高档、普通模式仍是单一档（＝行为不变） */
 const mL = W.match(/const _ladder = _topPower \? null\n?([\s\S]{0,400}?)\);\n/);
 ok(!!mL, "_ladder 在位");
-const ladderFn = new Function("mode", "MAXTOK", "WDS_TOK_MAX", "WDS_TOK_HEAVY",
-  "const _topPower = (mode === \"paper\" || mode === \"polish\"); const _ladder = " + W.slice(W.indexOf("_topPower ? null", W.indexOf("const _ladder =")), W.indexOf(";", W.indexOf("a.indexOf(v) === i))"))) + "; return _ladder;");
+const ladderFn = new Function("mode", "MAXTOK", "WDS_TOK_MAX", "WDS_TOK_HEAVY", "deep",
+  "const _topPower = (mode === \"paper\" || mode === \"polish\"); const _deepAns = (mode === \"answer\" && deep); const _ladder = " + W.slice(W.indexOf("_topPower ? null", W.indexOf("const _ladder =")), W.indexOf(";", W.indexOf("a.indexOf(v) === i))"))) + "; return _ladder;");
 ok(JSON.stringify(ladderFn("iq", 32000, 64000, 16000)) === "[16000,12000,8000]", "真跑：iq 阶梯 = 16000 → 12000 → 8000");
 ok(JSON.stringify(ladderFn("distill", 12000, 64000, 16000)) === "[16000,12000,8000]", "真跑：distill 走同一条阶梯（它也被实测抓到思考 8,977 / 正文 0）");
 ok(ladderFn("paper", 32000, 64000, 16000) === null, "真跑：满功率档不自带阶梯（用 wdsLadder 的 [want,32000,16000]）");
-ok(JSON.stringify(ladderFn("answer", 4000, 64000, 16000)) === "[4000]", "真跑：普通问答仍是单一档 4000——行为一个字都没变");
+ok(JSON.stringify(ladderFn("answer", 4000, 64000, 16000, false)) === "[4000]", "真跑：**普通档**问答仍是单一档 4000——行为一个字都没变");
+ok(JSON.stringify(ladderFn("answer", 12000, 64000, 16000, true)) === "[12000,8000,6000]", "真跑：深度档问答走 12000 → 8000 → 6000");
 ok(JSON.stringify(ladderFn("collide", 5200, 64000, 16000)) === "[5200]", "真跑：碰撞仍是 5200");
 ok(/if \(resp\.ok \|\| resp\.status !== 400 \|\| i === ladder\.length - 1\) return resp;/.test(W),
    "阶梯只在 400 且报 max_tokens 相关时才降档（别的错照原样抛回去）");

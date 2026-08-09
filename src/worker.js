@@ -5119,12 +5119,20 @@ async function askCore(request, env, url, body, SINK) {
   // 阶梯仍保留：它治的是另一件事——基底不收这个数字时（400 且报 max_tokens 相关）自动降档，
   // 不让一个数字不被接受就把整条链弄断。
   const WDS_TOK_HEAVY = 16000;
+  // 【深度档问答也是重档 —— 这条是用户 2026-08-09 那场真实的自动十轮换来的】
+  // 那场跑到第 6 轮断掉：第 1–4 轮 3405／3673／3135／2838 字，**第 5 轮只剩 936 字，第 6 轮 0 字**。
+  // 不是偶发，是一条必然的下坡：深度档装着内功＋心得＋方法论，思考实测就要 3–6k tok，
+  // 而它与正文**共用**那份 4000 的老预算；轮次越往后上下文越厚、思考越长，答案就越短，直到归零。
+  // 复现真跑（5 轮上下文）：思考 4,249 字 ＋ 正文 1,808 字 —— **正正好顶在 4000 那条线上**。
+  const _deepAns = (mode === "answer" && deep);
+  if (_deepAns) MAXTOK = 12000;
   // distill 在同一轮真跑里露出同一个病：思考 8,977 字 / 正文 0，靠关思考兜底才交出那 2,861 字入口资料。
   // 它是整条产线的枢纽（论文水平主要由这份资料定），不该常年靠最后一道保险活着。
-  const _heavy = (_topPower || mode === "iq" || mode === "distill");
+  const _heavy = (_topPower || mode === "iq" || mode === "distill" || _deepAns);
   // 满功率档（成文／打磨）用 wdsLadder 自带的 [want,32000,16000]；
   // iq 不挂满功率，但同样首发最高档，所以自带一条阶梯；其余模式保持各自原有的那一个数不变。
   const _ladder = _topPower ? null
+    : _deepAns ? [12000, 8000, 6000]
     : ((mode === "iq" || mode === "distill") ? [WDS_TOK_HEAVY, 12000, 8000]
       : [MAXTOK, Math.min(32000, MAXTOK), Math.min(12000, MAXTOK)].filter((v, i, a) => v > 0 && a.indexOf(v) === i));
   // 时钟必须**早于平台**：实测平台在约 133 秒把整个请求杀掉，那一刀是无声的（连 [DONE] 都没有），
