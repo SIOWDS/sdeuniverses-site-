@@ -134,7 +134,10 @@ ok('重复 attach 不重复装钮', KP.attach([{ key: 'k1', sel: 's1' }], hooks)
     'zhiwen': { keys: ['apiKey', 'evalKey', 'evalKey2'], sels: ['modelSel', 'evalSel', 'evalSel2'], overseas: true },
     'idea-generator': { keys: ['apiKey', 'osKey', 'osRevAKey', 'osRevBKey', 'osbKey', 'osbRevAKey', 'osbRevBKey', 'fourRevAKey', 'fourRevBKey', 'reviewKeyInputA', 'reviewKeyInputB', 'writerKeyInput'], sels: ['modelSel', 'osModel', 'osRevA', 'osRevB', 'osbModel', 'osbRevA', 'osbRevB', 'fourRevA', 'fourRevB', 'reviewModelSelA', 'reviewModelSelB', 'writerModelSel'], overseas: true },
     'classics-deconstructor': { keys: ['apiKey', 'reviewKey1', 'reviewKey2', 'assessKey'], sels: ['modelSel', 'reviewModelSel1', 'reviewModelSel2', 'assessModelSel'], overseas: true },
-    'iq-scorer': { keys: ['dsKey', 'glmKey'], sels: [], overseas: false, at: true }
+    'iq-scorer': { keys: ['dsKey', 'glmKey'], sels: [], overseas: false, at: true },
+    /* 学科通融机：主基底一把 ＋ 两处只用于联网检索的智谱 Key。
+       后两把此前无从自检——取材那一格失败才知道不通，而那已经是跑了几分钟之后。 */
+    'confluence': { keys: ['apiKey', 'cSkey', 'dSkey'], sels: ['modelSel'], overseas: true }
   };
   for (const [page, spec] of Object.entries(PAGES)) {
     const h = fs.readFileSync(ROOT + page + '/index.html', 'utf8');
@@ -151,6 +154,11 @@ ok('重复 attach 不重复装钮', KP.attach([{ key: 'k1', sel: 's1' }], hooks)
     ok(page + ' 名单条数对得上（' + spec.keys.length + '）', listedKeys.length === spec.keys.length, '实际 ' + listedKeys.length);
     ok(page + ' 名单里的 Key 框都真的存在', listedKeys.every(k => new RegExp('id="' + k + '"').test(h)), listedKeys.filter(k => !new RegExp('id="' + k + '"').test(h)).join(','));
     ok(page + ' 名单里的基底下拉都真的存在', listedSels.every(s => new RegExp('id="' + s + '"').test(h)), listedSels.filter(s => !new RegExp('id="' + s + '"').test(h)).join(','));
+    /* 没跟下拉的那几把必须写死 model:——否则 attach 时 sel 为空、型号取 undefined，
+       按钮点下去打的是一个不存在的厂商。 */
+    const listedModels = (listBlock.match(/model:'([A-Za-z0-9:_-]+)'/g) || []).map(x => x.slice(7, -1));
+    ok(page + ' 无下拉的 Key 都写死了型号', listedKeys.length === listedSels.length + listedModels.length,
+       'key ' + listedKeys.length + ' / sel ' + listedSels.length + ' + model ' + listedModels.length);
     ok(page + ' 一个 Key 框都没漏', spec.keys.every(k => listedKeys.indexOf(k) >= 0), spec.keys.filter(k => listedKeys.indexOf(k) < 0).join(','));
     ok(page + ' 装不上也不许影响跑批（try 包住）', /catch\(e\)\{ \/\* 检测是附加件/.test(h));
     if (spec.at) ok(page + ' 用 at 落位避开不换行的 flex 行', /at:'\.key-card'/.test(h));
