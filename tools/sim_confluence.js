@@ -191,6 +191,9 @@ function makeFetch() {
       if (/\/frontier\/$/.test(url)) {
         ctx.frontHub++;
         return T('<html><body>' +
+          /* 一期 1–100 的磁贴多带 has-prog / is-model 两个修饰类 —— 桩里必须留一块这种式样的，
+             否则「前缀匹配」那条改动在护栏里等于没测（精确匹配同样能过）。 */
+          '<a class="tile done has-prog is-model" href="/frontier/number-theory/"><span class="num">01</span><span class="nm">数论</span><span class="st st-done">已发布</span></a>' +
           '<a class="tile done" href="/frontier/oncology/"><span class="num">101</span><span class="nm">肿瘤学</span></a>' +
           '<a class="tile done" href="/frontier/cognitive-science/"><span class="num">471</span><span class="nm">认知科学</span></a>' +
           '<a class="tile done" href="/frontier/political-economy/"><span class="num">272</span><span class="nm">政治经济学</span></a>' +
@@ -491,6 +494,11 @@ function userOf(c, re) { const x = c.calls.filter(k => re.test(k.user)); return 
       c2.nbrQ.filter(q => /认知心理学|制度经济学|组织社会学/.test(q)).length >= 3, c2.nbrQ.length + ' 次');
     const pick = userOf(c2, /请为\*\*每一门各挑出一家\*\*/);
     ok('面板目录抓过一次（626 块的可选学科池）', c2.frontHub >= 1, '实际 ' + c2.frontHub + ' 次');
+    /* 一期 1–100 的磁贴多带 has-prog / is-model，按精确串匹配会整段漏掉（实测漏 101 块）。
+       这里直接查解析结果里有没有那一块，而不是查正则长什么样——查正则会被下一次重写绕过。 */
+    ok('一期式样的磁贴也进了池子（不只是二期以后那 525 块）',
+      (c2.win.__FRONTCAT || []).some(x => x.n === 1 && x.slug === 'number-theory'),
+      '池子里共 ' + ((c2.win.__FRONTCAT || []).length) + ' 块');
     ok('三门各抓了自己那块面板的供料层', c2.frontPanel.length >= 1, '实际 ' + c2.frontPanel.length + ' 块');
     /* 断言认的是**材料块里真正的标记**，不是提示词的导语——
        导语可以被改写（v3.8 那一轮就改了），材料块的标记不能，因为基底靠它分辨三路。 */

@@ -1052,7 +1052,11 @@ async function frontierCat(){
     const r = await fetch('/frontier/', {cache:'force-cache'});
     if(!r.ok) return (window.__FRONTCAT = []);
     const h = await r.text();
-    const out = [], re = /<a class="tile done" href="\/frontier\/([^"]+)\/"[^>]*>([\s\S]*?)<\/a>/g;
+    /* ⚠ 磁贴有两种式样：二期以后是 class="tile done"，
+       **一期 1–100 多带 has-prog / is-model 两个修饰类**（它们有研究纲领附卷）。
+       按精确串匹配只能抓到 525 块，数学、物理、生命科学那批最老的面板会整段落在池子外——
+       所以这里用前缀匹配 `tile done[^"]*`，626 块一块不缺。 */
+    const out = [], re = /<a class="tile done[^"]*" href="\/frontier\/([^"]+?)\/"[^>]*>([\s\S]*?)<\/a>/g;
     let m;
     while((m = re.exec(h))){
       const num = /class="num">(\d+)</.exec(m[2]), nm = /class="nm">([^<]+)</.exec(m[2]);
