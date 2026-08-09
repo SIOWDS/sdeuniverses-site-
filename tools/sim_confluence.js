@@ -396,6 +396,31 @@ function userOf(c, re) { const x = c.calls.filter(k => re.test(k.user)); return 
     say('\n' + '━'.repeat(58) + '\n');
   }
 
+  await step('三之二、只用站内语料（闭库）：一次都不联网，且如实标明', async () => {
+    const c = await boot();
+    c.$('cScope').value = 'inside'; c.$('cScope').dispatchEvent(new c.win.Event('change'));
+    ok('闭库时联网那两格收起来了',
+      (c.$('cSiteKey').closest('label') || c.$('cSiteKey')).style.display === 'none');
+    ok('闭库时站内两路被锁上（不许再关掉）', c.$('cUseKB').disabled && c.$('cUsePanel').disabled);
+    fillQ(c, '为什么组织越是想把经验留下来，经验反而流失得越快？', '认知心理学', '制度经济学', '组织社会学');
+    c.click('#goBtn');
+    await waitFor(() => /创新智商|✓/.test(c.$('stat-review').textContent), 30000);
+    ok('一次联网都没发', c.webQ.length === 0, '实际 ' + c.webQ.length + ' 次');
+    ok('面板供料层照跑（闭库不等于没材料）', c.frontPanel.length >= 1, '实际 ' + c.frontPanel.length + ' 块');
+    const pick = userOf(c, /请为\*\*每一门各挑出一家\*\*/);
+    ok('调令写死了三家必须全部来自站内', pick && /三家必须全部来自站内材料/.test(pick.user));
+    ok('调令禁掉了记忆里的站外文献', pick && /不许写任何站外出处/.test(pick.user));
+    /* 这一条是本场景的命门：闭库时那一路是"按口径不许搜"，不是"搜了没搜到"。
+       两者在产物里必须分得清，否则读者会把一次实验条件读成一次检索失手。 */
+    ok('材料块写的是「未联网」而不是「没搜到」',
+      pick && /本次闭库，未联网/.test(pick.user) && !/这一门没搜到站外材料/.test(pick.user));
+    const hos = userOf(c, /剥到只剩形式层/);
+    ok('敌意拓宽被告知闭库时经典层与专著两格最容易取不到',
+      hos && /本次是闭库跑/.test(hos.user) && /检索不足，未核验/.test(hos.user));
+    ok('并写死了「检索不足」不许写成「未找到」', hos && /不许写成「未找到」/.test(hos.user));
+    ok('全程无 JS 错误', c.errors.length === 0, c.errors.join(' | '));
+  });
+
   await step('四、问题穿进了每一格的 system（不是只在定源那一格）', async () => {
     // 内化那几趟是读内功、与题无关，本来就不该带；其余每一趟都必须带
     const notWarm = c2.calls.filter(k => !/这是 SDE 内功的第|作业底盘/.test(k.user));

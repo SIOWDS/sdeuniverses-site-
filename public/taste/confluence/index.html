@@ -173,6 +173,16 @@ select.model-select{max-width:340px}
       </div>
       <span class="small" style="flex:1;min-width:260px;color:var(--muted)">自己组合的好处是材料厚（每块都带真出处与八字段供料层）；坏处是<b>可能撞不起来</b>——三门站在同一个位置上就撞不出东西。<b>撞不起来会自动转成基底自由组合，不会停在那儿。</b></span>
     </div>
+    <div class="row" style="margin-top:6px;align-items:center">
+      <div style="min-width:300px">
+        <label class="lbl">取材范围</label>
+        <select id="cScope">
+          <option value="both" selected>站内＋站外（站内面板打底，联网补站外的活争论）</option>
+          <option value="inside">只用站内语料（闭库跑：一次都不联网）</option>
+        </select>
+      </div>
+      <span class="small" style="flex:1;min-width:260px;color:var(--muted)">不选「只用站内」的话，<b>基底会自动去站外找</b>——那正是默认行为。闭库跑的代价要先知道：敌意拓宽的<b>经典层</b>与<b>专著</b>两个方向在库内常常取不到，产出的不可还原性会结构性偏低（站内六次实测，闭库与开库的分差每次都全部落在这一维）。</span>
+    </div>
     <div class="row" id="panelPick" style="margin-top:6px;display:none">
       <div style="flex:1;min-width:200px"><label class="lbl">面板一</label><select id="cP1"><option value="">载入中…</option></select></div>
       <div style="flex:1;min-width:200px"><label class="lbl">面板二</label><select id="cP2"><option value="">载入中…</option></select></div>
@@ -1069,12 +1079,31 @@ async function fillPanelSelects(){
   boxes.forEach(b=>{ b.innerHTML = html; });
 }
 function pickMode(){ const e=$('cPickMode'); return e ? e.value : 'auto'; }
+/* 取材范围：'both'＝站内＋站外；'inside'＝闭库，一次都不联网。
+   这个开关必须存在，因为不给它，基底在「定三家」那一步会自动去站外找——
+   而闭库跑是一个独立的实验条件（取源闭库），不是"少搜一点"。 */
+function scopeMode(){ const e=$('cScope'); return e ? e.value : 'both'; }
+function insideOnly(){ return scopeMode() === 'inside'; }
 function panelChosen(){
   if(pickMode()!=='panel' || !PANEL_OPTS) return [];
   return ['cP1','cP2','cP3'].map(id=>{
     const v = $(id) && $(id).value; if(!v) return null;
     return PANEL_OPTS.find(x=>x.n===parseInt(v,10)) || null;
   }).filter(Boolean);
+}
+function syncScope(){
+  const on = insideOnly();
+  /* 闭库：两格都收起来。开库：只把「用本站检索通道」那一行放出来——
+     自备 Key 那一格的显隐归它自己的勾选框管（默认藏着），这里不许一并放出来，
+     否则页面一载入就露出一个空的 Key 框，看着像必填。 */
+  const kbox = (()=>{ const el=$('cSiteKey'); return el ? ((el.closest && el.closest('label')) || el) : null; })();
+  if(kbox) kbox.style.display = on ? 'none' : '';
+  const skey = $('cSkey');
+  if(skey) skey.style.display = (on || !$('cSiteKey') || $('cSiteKey').checked) ? 'none' : '';
+  const kb = $('cUseKB');
+  if(kb){ if(on){ kb.checked = true; kb.disabled = true; } else { kb.disabled = false; } }
+  const pn = $('cUsePanel');
+  if(pn){ if(on){ pn.checked = true; pn.disabled = true; } else { pn.disabled = false; } }
 }
 function syncPickMode(){
   const panel = pickMode()==='panel';
@@ -1179,6 +1208,8 @@ function optionsFor(items, val, txt){
 (function wirePickMode(){
   const e = document.getElementById('cPickMode');
   if(e){ e.addEventListener('change', syncPickMode); syncPickMode(); }
+  const sc = document.getElementById('cScope');
+  if(sc){ sc.addEventListener('change', syncScope); syncScope(); }
 })();
 function renderMode(){
   ['A','B','C','D','F'].forEach(m=> $('m'+m).classList.toggle('hidden', m!==ST.mode));
@@ -1877,6 +1908,10 @@ function promptFor(id){
     '  · 找到的占位者要**点到名**：作者＋年份，或书名。点不到名的等于没找到。',
     '  · **宁可打死自己的候选**。这一格打死得越多，活下来的那个越硬；一个都没打死，多半是你没真去找。',
     '',
+    insideOnly() ? '**⚠ 本次是闭库跑（不联网）。** 五个方向仍要逐个走，但你只能在站内材料与你自己已有的知识里找。' : '',
+    insideOnly() ? '**方向①经典层与方向④专著／外文这两格，闭库时最容易取不到**——取不到就如实写〔检索不足，未核验〕，' : '',
+    insideOnly() ? '**不许写成「未找到」**。这两者差别很大：「未找到」是查过而没有，「检索不足」是没查成；把后者写成前者，等于替这篇文章伪造了一次清白。' : '',
+    insideOnly() ? '' : '',
     '【本站已发清单（方向五用）】',
     prevList() || '（暂无）',
     '',
@@ -2836,7 +2871,8 @@ async function doSelectConf(){
   if(q.length < 4) throw new Error('先写清你要解决的那个问题。');
   const useKB = !!($('cUseKB') && $('cUseKB').checked);
   const usePanel = !!($('cUsePanel') && $('cUsePanel').checked);
-  const useWeb = true;
+  const INSIDE = insideOnly();
+  const useWeb = !INSIDE;
   const skey = ($('cSiteKey') && $('cSiteKey').checked) ? '' : ((($('cSkey')||{}).value)||'').trim();
   const locked = confDiscs();
 
@@ -2863,7 +2899,9 @@ async function doSelectConf(){
     CAT.length ? '这一栏里的每一块都带**为碰撞而写的供料层**：每条新思想都有真出处（提出／争议／最新／关键），' : '',
     CAT.length ? '并标好了它占哪个位置、它的预设是什么、它的读数带不带分母、它在什么条件下失效、它自己承认的弱点是什么。' : '',
     CAT.length ? '**三门里能从这个池子里挑的就从这里挑**——从这里挑到的材料，比联网搜来的摘要厚一个量级，也是唯一能直接供出「位置」与「自曝」的一路。' : '',
-    CAT.length ? '池子里实在没有对口的那一门，才写 0（表示这一门走联网）。' : '',
+    (CAT.length && !INSIDE) ? '池子里实在没有对口的那一门，才写 0（表示这一门走联网）。' : '',
+    (CAT.length && INSIDE) ? '**本次是闭库跑：不联网，池子是唯一来源。三门都必须从上面这个池子里挑，一律不许写 0。**' : '',
+    (CAT.length && INSIDE) ? '池子里没有那门学科的对口面板时，**换一门池子里有的**——换掉的那一门只要仍然能回答这道题、且与另两门不站在同一个位置上，就是合格的。' : '',
     CAT.length ? frontierCatBlock(CAT) : '',
     CAT.length ? '' : '',
     '输出正好三行，每行形如：',
@@ -2907,7 +2945,7 @@ async function doSelectConf(){
   /* 二、两路取材：联网并发（轻），站内串行（重）。每一路都报进度，卡住时一眼看得出是哪一路。 */
   SIDE_SLOW = 0;
   const prog = { web:0, kb:0, ctx:0, pan:0 };
-  const paint = ()=> setStat(id, '<span class="spinner"></span> 取材：' + (CAT.length ? ('面板供料层 ' + prog.pan + '/' + rows.length + '　') : '') + '联网 ' + prog.web + '/' + rows.length
+  const paint = ()=> setStat(id, '<span class="spinner"></span> 取材：' + (CAT.length ? ('面板供料层 ' + prog.pan + '/' + rows.length + '　') : '') + (INSIDE ? '（闭库：不联网）' : ('联网 ' + prog.web + '/' + rows.length))
     + (useKB ? ('　站内近邻 ' + prog.kb + '/' + rows.length + (prog.ctx ? '　站内语料 ✓' : '　站内语料 …'))
              : '　（站内库这一路你关掉了）'), 'run');
   paint();
@@ -2927,8 +2965,14 @@ async function doSelectConf(){
     }
     while(panRes.length < rows.length) panRes.push('');
   }
-  webRes = await Promise.all(rows.map(r =>
-    webSearch(r.q, skey).then(x => { prog.web++; paint(); return x; })));
+  if(INSIDE){
+    /* 闭库：这一路整条不跑。不是"搜不到"，是"按口径不许搜"——两者在产物里必须分得清，
+       所以下面的材料块会写〔本次闭库，未联网〕而不是〔这一门没搜到站外材料〕。 */
+    webRes = rows.map(()=>({ ok:true, items:[], reason:'inside-only' }));
+  } else {
+    webRes = await Promise.all(rows.map(r =>
+      webSearch(r.q, skey).then(x => { prog.web++; paint(); return x; })));
+  }
   if(useKB){
     // **串行**：这一路每查一次都要把全站语料读一遍，三路并发是拿自己的后端打自己——
     // 那正是 2026-08-02 卡住十几分钟的来路。
@@ -2944,11 +2988,21 @@ async function doSelectConf(){
   if(ST.abort) throw new Error('已停下');
   if(SIDE_SLOW) note('取材有 ' + SIDE_SLOW + ' 路超时被掐掉了（按空处理，不假装取到）。');
 
+  const panHitsPre = panRes.filter(x=>x && x.length>60).length;
   const badWeb = (!webRes.length) || webRes.find(x=>!x || !x.ok);
   const webHits = webRes.reduce((n,x)=>n+((x&&x.items)?x.items.length:0), 0);
   const kbHits  = kbRes.filter(x=>x && x.length>40).length;
 
-  if(badWeb && /need_search_key|bad_search_key/.test((badWeb.reason)||'')){
+  if(INSIDE){
+    /* 闭库的失败判据与开库不同：联网这一路本来就是空的，所以只能看另两路。
+       两路都空时**必须停下**——绝不许静默地退回去联网，那会把实验条件换掉而没人知道。 */
+    if(!panHitsPre && !kbHits) throw new Error(
+      '本次选了「只用站内语料」，而面板供料层与站内库两路都没取到东西——闭库跑撑不起三家。'
+      + '三条路：①换三门在站内面板里有对口块的学科；②把问题写得更具体些重跑本格；'
+      + '③确实需要站外材料就把取材范围改回「站内＋站外」——但那是换了实验条件，成品里要写明。');
+    if(panHitsPre < 3) note('闭库跑，但只有 ' + panHitsPre + ' 门落到了面板供料层上——'
+      + '没落上的那几门只有站内篇目可用，位置与自曝两栏会薄，工序 7.5 的推翻材料可能取不到。');
+  } else if(badWeb && /need_search_key|bad_search_key/.test((badWeb.reason)||'')){
     // 死路要当场变成一步能走通的路：替他切到「用自己的 Key」并把输入框露出来。
     if($('cSiteKey') && $('cSiteKey').checked){
       $('cSiteKey').checked = false;
@@ -2960,13 +3014,14 @@ async function doSelectConf(){
       + '已经替你切到「用自己的智谱 Key」，填进上面那一格再点「重跑本格」。');
     showErr('联网这一路现在不通（'+badWeb.reason+'）——已替你切到「用自己的智谱 Key」，填了再重跑这一格会更实在。'
       + '本次只用站内库的材料往下走：三家会偏站内，站外的活争论撞不到，发表前请自己补几条站外出处。');
-  } else if(webHits < 3 && !kbHits){
+  } else if(!INSIDE && webHits < 3 && !kbHits){
     throw new Error('三轮检索一共只搜到 '+webHits+' 条、站内库也没命中，撑不起三家。把问题写得更具体些重跑本格，或自己指定三个学科。');
   }
 
   const panHits = panRes.filter(x=>x && x.length>60).length;
   const matBlocks = rows.map((r,i)=>{
-    const w = (webRes[i] && webRes[i].ok) ? webBlockOf('W'+(i+1)+'-', (webRes[i].items)||[]) : '（这一门没搜到站外材料）';
+    const w = INSIDE ? '（本次闭库，未联网——不是没搜到，是按口径不许搜）'
+            : ((webRes[i] && webRes[i].ok) ? webBlockOf('W'+(i+1)+'-', (webRes[i].items)||[]) : '（这一门没搜到站外材料）');
     const k = (kbRes[i] && kbRes[i].length>40) ? kbRes[i] : '（这一门站内库没命中）';
     const pn = (panRes[i] && panRes[i].length>60) ? panRes[i] : '';
     return '【'+r.disc+'｜检索词：'+r.q+'】\n'
@@ -2991,6 +3046,11 @@ async function doSelectConf(){
     '',
     sdeOppositeBlock(),
     '',
+    INSIDE ? '**本次是闭库跑：三家必须全部来自站内材料（面板供料层与站内篇目）。**' : '',
+    INSIDE ? '「来源」一栏一律写「站内」；**不许写任何站外出处、站外链接或你记忆里的站外文献**——' : '',
+    INSIDE ? '哪怕你确知某位学者说过同样的话，只要它不在上面的材料里，本次就不许用它当三家之一。' : '',
+    INSIDE ? '这不是材料不够，是这一跑的口径：**取源闭库**。它要检验的正是「只用站内的料能撞出什么」。' : '',
+    INSIDE ? '' : '',
     '**铁律：一个字都不许编。** 作者、年份、书名/篇名、结论、链接，只许用上面材料里真出现过的；',
     '拿不准就不要写进去。宁可明说某一门没挑到，也不许造一个像真的出处。',
     '站内那一路的链接以 / 开头（例 /students/xxx/），照抄即可；站外的链接照抄 http(s) 网址。',
