@@ -1,0 +1,53 @@
+name: verify-painless-zone-once
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/verify-painless-zone.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Poll Cloudflare until the column and paper are live
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 60); do
+            echo "attempt=$attempt"
+            col=$(curl -fsSL --max-time 30 -H 'Cache-Control: no-cache' 'https://sdeuniverses.com/confluence/?verify=20260809-89' || true)
+            art=$(curl -fsSL --max-time 30 -H 'Cache-Control: no-cache' 'https://sdeuniverses.com/confluence/painless-zone/?verify=20260809-89' || true)
+            if grep -q '制造无痛区' <<<"$col" \
+              && grep -q '/confluence/painless-zone/' <<<"$col" \
+              && grep -q '制造无痛区' <<<"$art" \
+              && grep -q '王德生' <<<"$art"; then
+              mkdir -p deploy-verification
+              {
+                echo 'status=live'
+                echo "verified_utc=$(date -u +%FT%TZ)"
+                echo 'column=https://sdeuniverses.com/confluence/'
+                echo 'article=https://sdeuniverses.com/confluence/painless-zone/'
+                echo 'title=制造无痛区：格式化表单如何在行动发生之前取消学习者的自我出面'
+                echo 'author=王德生'
+                echo 'publication_commit=fcf0778bae108a52cc2a2287032cdc967d62a8a7'
+                echo 'article_sha256=cab41cce6b59be35ba5f8a6671823473e27384e84c8121d9ce994992fde0b053'
+              } > deploy-verification/painless-zone-20260809.txt
+              git config user.name 'sde-live-verifier'
+              git config user.email 'actions@users.noreply.github.com'
+              git add deploy-verification/painless-zone-20260809.txt
+              git commit -m 'Verify 学科通融之八十九 live on sdeuniverses.com'
+              git push origin HEAD:main
+              exit 0
+            fi
+            sleep 10
+          done
+          echo 'Timed out waiting for Cloudflare deployment.' >&2
+          exit 1
