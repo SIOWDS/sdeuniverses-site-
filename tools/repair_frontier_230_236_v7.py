@@ -466,7 +466,7 @@ def extract_old_default(paragraph: str) -> str:
 
 
 def concise_clause(value: str, limit: int) -> str:
-    value = old.plain(value).strip("。；，、： ‘ ’“”")
+    value = old.plain(value).strip("。；，、： ")
     if old.zh(value) <= limit:
         return value
     parts = [part.strip("。；，、： ") for part in re.split(r"[，；。、]", value) if part.strip()]
@@ -484,7 +484,7 @@ def concise_clause(value: str, limit: int) -> str:
 
 
 def boundary_core(value: str) -> str:
-    value = re.sub(r"^当", "", value).strip("。；，、： ‘ ’“”")
+    value = re.sub(r"^当", "", value).strip("。；，、： ")
     value = re.sub(r"时(?:，.*)?$", "", value)
     return concise_clause(value, 20)
 
@@ -515,7 +515,7 @@ def proposal_year(value: str) -> int:
 
 
 def topic_of(item: dict[str, object]) -> str:
-    return str(item["chinese"]).split("把", 1)[0].strip("“”‘’ ")
+    return str(item["chinese"]).split("把", 1)[0].strip()
 
 
 def factor_of(item: dict[str, object]) -> str:
@@ -584,7 +584,7 @@ def paragraph_set(
     logic = LOGIC_LABELS[global_index % 20]
 
     p1 = (
-        f"（一）{pyear}年的{logic}显示，旧默认：{old_default_short}。〔{topic}〕暴露：旧账本无法处理“{boundary_short}”这一边界。"
+        f"（一）{pyear}年的{logic}显示，旧默认：{old_default_short}。〔{topic}〕暴露：旧账本无法处理的边界是：{boundary_short}。"
         f"{logic}按“{scale_short}”冻结入口与观察期，以“{metric_short}”追踪退出者；遗漏端未保存，优势只是选择。"
     )
     p2 = (
@@ -605,7 +605,7 @@ def paragraph_set(
             f"{logic}未见题名直接反对论文，不以邻近文献补位"
         )
     p4 = (
-        f"（四）检索截至{c_year}年：{dispute_sentence}。{logic}所守边界是“{boundary_short}”。"
+        f"（四）检索截至{c_year}年：{dispute_sentence}。{logic}所守边界是：{boundary_short}。"
         f"{factor_short}越强而“{metric_short}”越差即反号；只在平均组成立则收窄。{logic}要求公开拒绝者、无法分类者和停止规则。"
     )
     if latest:
@@ -719,7 +719,7 @@ def render_col(
     proposer = citation_author(str(item["proposal"]))
     self_value = (
         f"{SELF_LABELS[global_index % 20]}："
-        f"若“{boundary_short}”成立，{proposer}路线须撤回"
+        f"若出现以下边界：{boundary_short}，{proposer}路线须撤回"
     )
     blank = (
         f"{BLANK_LABELS[global_index % 20]}："
@@ -816,7 +816,7 @@ def closure(
         premise = old.clip_han(re.sub(r"^.*?〕", "", premises[index]), 24)
         out.append(para(
             f"本块第{index + 1}条〔{topics[index]}〕与第{target['number']:03d}号《{target['panel']}》第{target['index']}条"
-            f"《{target['chinese']}》成对。共享预设是“{premise}”。本条把变化归给{compact_factors[index]}并置于"
+            f"《{target['chinese']}》成对。共享预设是：{premise}。本条把变化归给{compact_factors[index]}并置于"
             f"{positions[index]}端，对方从{target['english']}的对象或路径给出相反方向。两边若均成立，单因解释就矛盾；"
             f"{panel_name}须引入环境选择、版本迁移或责任转移这一第三因素，以共同分母复验。"
         ))
@@ -849,7 +849,7 @@ def closure(
     return "\n".join(out)
 
 
-def apply_repair() -> None:
+def apply_repair(base_ref: str | None = None) -> None:
     inventory = source_inventory()
     registry = build_registry()
     if not registry:
@@ -861,13 +861,13 @@ def apply_repair() -> None:
         # This is a one-time migration tool.  Once its distinguishing V7
         # readout and numbered falsifiers are present, a later invocation must
         # be a safe no-op instead of treating repaired prose as raw source.
-        if "透明的论证结构读数" in current_page and f"第{number}号证伪" in current_page:
+        if not base_ref and "透明的论证结构读数" in current_page and f"第{number}号证伪" in current_page:
             print(f"already repaired {number} {name}; no changes")
             continue
         # Always rebuild from the committed pre-repair page so repeated audit
         # iterations do not extract defaults or boundaries from our own prose.
         page = subprocess.check_output(
-            ["git", "show", f"HEAD:public/frontier/{slug}/index.html"],
+            ["git", "show", f"{base_ref or 'HEAD'}:public/frontier/{slug}/index.html"],
             cwd=ROOT, text=True, encoding="utf-8",
         )
         items = old.split_items(page)
@@ -931,11 +931,12 @@ def main() -> None:
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument("--research", action="store_true")
     group.add_argument("--apply", action="store_true")
+    parser.add_argument("--base-ref", help="explicit pre-repair git ref; bypasses the already-repaired no-op guard")
     args = parser.parse_args()
     if args.research:
         research()
     else:
-        apply_repair()
+        apply_repair(args.base_ref)
 
 
 if __name__ == "__main__":
