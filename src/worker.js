@@ -265,8 +265,11 @@ function wdsLadder(VC, want) {
   }
   return WDS_TOK_LADDER;
 }
-async function wdsFetchMax(VC, KEY, messages, stream, want, signal, withUsage) {
-  const ladder = wdsLadder(VC, want);
+// ladderOverride：调用方自带阶梯。为什么要有它——wdsLadder 的**非满功率分支忽略 want**，
+// 一律返回 [64000,32000,12000]；那是既有几个调用点依赖着的行为，不在本次射程内，所以不动它，
+// 而是让需要"非满功率也按自己的预算走阶梯"的调用方（askCore 的 iq 档）把阶梯直接递进来。
+async function wdsFetchMax(VC, KEY, messages, stream, want, signal, withUsage, ladderOverride) {
+  const ladder = (ladderOverride && ladderOverride.length) ? ladderOverride : wdsLadder(VC, want);
   let resp = null;
   for (let i = 0; i < ladder.length; i++) {
     const body = { model: VC.model, stream: !!stream, max_tokens: ladder[i], messages };
@@ -4928,7 +4931,7 @@ async function askCore(request, env, url, body, SINK) {
         + "\n\n《这场问对的全部轮次（共 " + hist.length + " 轮）》\n" + (histTxt || "（无）");
     }
     else if (mode === "paper" || mode === "polish") {
-      MAXTOK = 16000;   // 最大配置：五六千汉字的正文（≈4000 tok）与 7–9k tok 的思考同吃这一份预算，6800 必被吃光
+      MAXTOK = 32000;   // 阶梯的第二档（首发走 WDS_TOK_MAX=64000）；6800 那一版必被思考吃光
       const seed = String(body.seed || "").slice(0, 3500);
       const head = String(body.head || "").slice(0, 1200);
       const tail = String(body.tail || "").slice(0, 1100);
@@ -5028,7 +5031,7 @@ async function askCore(request, env, url, body, SINK) {
   if (mode === "iq") {
     // 最大配置：思考实测 ≈8k tok，评分卡本身 2–3k tok（带最近邻／扣分／提升三张清单）。
     // 3600 那一版整张卡只能靠页面的修复与逐字段抢救层兜——那是最后一道保险，不该当常规路径使。
-    MAXTOK = 12000;
+    MAXTOK = 32000;   // 阶梯首档（首发同样走 WDS_TOK_MAX；不接受再降到这里）
     const text = String(body.text || "").slice(0, 26000);
     sys = "你是一位独立的创新智商评分者。你收到的是一份【匿名来稿】——你不知道它出自谁手，也不必知道。「名家写的」不加分，「机器写的」不减分；文风漂亮、术语密集、读起来像一篇正经论文，一律不加分。你唯一要测的是：一个此前不存在的认知物，在发生意义上走了多深。"
       + "\n\n【这把尺子测的是造新，不是解题】在大模型已吞下人类几乎全部公开文本的今天，一般智商刻度上的 100 分约等于一个基底在零提示语下的默认产出。所以 130 不是「比人聪明 30 分」，而是「比基底张口就来的那段话深 30 个智商点」。一段文本若连基底随口能写的深度都够不到，它在创新意义上就是负分——读起来多顺、多像论文都不算数。"
@@ -5102,25 +5105,34 @@ async function askCore(request, env, url, body, SINK) {
   // 「长时间无字节」把连接判死——那正是「流干净结束、正文 0 字、不报任何错」的另一种死法。
   const _topPower = (mode === "paper" || mode === "polish");
   const _VCX = _topPower ? { url: VC.url, model: VC.model, name: VC.name, top: 1 } : VC;
+  // [stated] 用户 2026-08-09：「DeepSeek 可以非常长的，用最高级配置」。
+  // 于是这三档不再自己定一个数，而是走站内既有的**最高档取数器** wdsFetchMax：
+  //   · 首发给 WDS_TOK_MAX（64000，站内长文线一直在用的那个数）；
+  //   · 基底不接受这么大的 max_tokens 时（400 且报的是 max_tokens 相关）**自动降档**
+  //     ——阶梯的意义不是限制，是"不让一个数字不被接受就把整条链弄断"；
+  //   · 配时钟护栏：上游卡死时由它掐断并给一句人话，而不是被平台无声杀掉。
+  // 注意 max_tokens 是**上限不是目标**：提示语要的仍是五六千汉字，给到 64000 不会让它多写，
+  // 只是让"思考＋正文"永远不必互相挤——这正是这两处此前哑火的全部原因。
+  const _heavy = (_topPower || mode === "iq");
+  // 满功率档（成文／打磨）用 wdsLadder 自带的 [want,32000,16000]；
+  // iq 不挂满功率，但同样首发最高档，所以自带一条阶梯；其余模式保持各自原有的那一个数不变。
+  const _ladder = _topPower ? null
+    : (mode === "iq" ? [WDS_TOK_MAX, 32000, 12000]
+      : [MAXTOK, Math.min(32000, MAXTOK), Math.min(12000, MAXTOK)].filter((v, i, a) => v > 0 && a.indexOf(v) === i));
+  const _clk = _heavy ? wdsClock(120000, 420000) : null;   // 首帧 2 分钟、总时长 7 分钟
   // 兜底重跑：关思考＋降档，逼它早点停下推演开始写。但长文模式不能降到 4000——
   // 实测 4000 tok 交出来的是一篇断在半句上的稿（线上原样：6,847 字，末句「但他输光」）。
   const _retryTok = _topPower ? 8000 : Math.min(MAXTOK, 6000);
-  const _mainBody = {
-    model: VC.model,
-    stream: true,
-    max_tokens: MAXTOK,
-    messages: [{ role: "system", content: sys }, { role: "user", content: usr }],
-  };
+  const _msgs = [{ role: "system", content: sys }, { role: "user", content: usr }];
   // 调基底（境内直连）。自带 Key：仅在内存中转发调用，绝不存储/记录（同 llm-proxy 纪律）
   let upstream;
   try {
-    upstream = await fetch(VC.url, {
-      method: "POST",
-      headers: { "content-type": "application/json", authorization: "Bearer " + KEY },
-      body: JSON.stringify(_topPower ? wdsTopBody(_VCX, _mainBody) : _mainBody),
-    });
+    upstream = await wdsFetchMax(_VCX, KEY, _msgs, true, _heavy ? WDS_TOK_MAX : MAXTOK,
+      _clk ? _clk.signal : undefined, false, _ladder);
   } catch (e) {
-    return _out([{ t: "sources", v: sources }, { t: "error", v: VC.name + " 连接失败：" + (e && e.message) }]);
+    if (_clk) _clk.stop();
+    const _cut = _clk && _clk.cut ? _clk.why(VC.name) : ((e && e.message) || String(e));
+    return _out([{ t: "sources", v: sources }, { t: "error", v: VC.name + " 连接失败：" + _cut }]);
   }
   if (!upstream.ok) {
     const errtxt = (await upstream.text()).slice(0, 300);
@@ -5166,11 +5178,13 @@ async function askCore(request, env, url, body, SINK) {
       // 根因却完全不同。每 5 秒一个 beat（已跑秒数／已推演字数）；前端不认这个帧也无害。
       const _st = { t0: Date.now(), think: 0, out: 0, stage: mode };
       const _hb = wdsBeat(controller, _st);
+      if (_clk) _clk.firstFrame();   // 出流即撤首帧闸：后面还有一段真活要干，那一闸只防"上游一个字都不回"
       controller.enqueue(_sseBytes({ t: "sources", v: sources })); // 先给出处，再流答案
       if (expStr) controller.enqueue(_sseBytes({ t: "expand", v: expStr }));
       let r = { out: 0, think: 0, fin: "", errs: 0 };
       try { r = await _drain(upstream, controller, _st); }
-      catch (e) { controller.enqueue(_sseBytes({ t: "error", v: "读取基底流失败：" + (e && e.message) })); }
+      // 被时钟掐断与"流自己坏了"是两回事，读者必须分得清：前者要说清掐在哪一闸、多少秒。
+      catch (e) { controller.enqueue(_sseBytes({ t: "error", v: "读取基底流失败：" + ((_clk && _clk.cut) ? _clk.why(VC.name) : (e && e.message)) })); }
       // ===== 零正文兜底 =====
       // 提炼／碰撞／综合这些环节一跑一两分钟，一次哑火作废的是前面十几次调用。
       // 所以这里不认命：同一份 messages 关掉思考再跑一遍（wdsPlainBody 就是干这个的），
@@ -5202,6 +5216,7 @@ async function askCore(request, env, url, body, SINK) {
         }
       }
       try { clearInterval(_hb); } catch (e) {}
+      if (_clk) _clk.stop();
       controller.enqueue(_ENC.encode("data: [DONE]\n\n"));
       controller.close();
   };
