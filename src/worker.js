@@ -331,7 +331,10 @@ function wdsTopBody(VC, body) {
   const u = String(VC.url);
   if (u.indexOf("api.deepseek.com") >= 0) {
     body.thinking = { type: "enabled" };
-    body.reasoning_effort = "max";
+    // 推理投入档可由调用方降一格（VC.effort）。为什么需要这个旋钮：**思考与正文吃同一份 max_tokens，
+    // 而思考时长又随预算水涨船高**——要"每次调用都给最大 max_tokens"，就必须另有一处能刹住思考，
+    // 否则它会一路想到被平台无声杀掉（2026-08-09 实测：paper 上半篇思考 17,233 字、正文 0 字、第 133 秒断流）。
+    body.reasoning_effort = (VC && VC.effort) ? VC.effort : "max";
     delete body.temperature; delete body.top_p;
   } else if (u.indexOf("open.bigmodel.cn") >= 0) {
     body.thinking = { type: "enabled" };
@@ -5104,7 +5107,10 @@ async function askCore(request, env, url, body, SINK) {
   // 同时给这条流挂上心跳（wdsBeat）：预算一大，思考期就长，链路上任何一段都可能因为
   // 「长时间无字节」把连接判死——那正是「流干净结束、正文 0 字、不报任何错」的另一种死法。
   const _topPower = (mode === "paper" || mode === "polish");
-  const _VCX = _topPower ? { url: VC.url, model: VC.model, name: VC.name, top: 1 } : VC;
+  // effort:"high" 而不是默认的 "max"：[stated] 用户要「每一次调用都要 MaxToken」，
+  // 那就把刹车挪到推理投入档上——预算给满，思考降一格。这一步是**实验性的**，
+  // 判据只有一条：线上真跑 paper 上半篇能不能在两分钟内交出正文（上一次 64000＋满功率 是交不出的）。
+  const _VCX = _topPower ? { url: VC.url, model: VC.model, name: VC.name, top: 1, effort: "high" } : VC;
   // [stated] 用户 2026-08-09：「DeepSeek 可以非常长的，用最高级配置」——**照做后当场跑出反例，故改成有界的最高档**。
   // 真跑记录（同日，全部线上）：
   //   · 首发 64000 ＋ 满功率：polish 92s 出稿 ✓、iq 99s 出卡 ✓，但 **paper 上半篇在第 133 秒被平台杀掉**
@@ -5118,7 +5124,7 @@ async function askCore(request, env, url, body, SINK) {
   // 所以最高级配置 = 最强型号 ＋ 满功率 ＋ **有界预算 16000** ＋ 心跳 ＋ 早于平台的时钟 ＋ 关思考兜底。
   // 阶梯仍保留：它治的是另一件事——基底不收这个数字时（400 且报 max_tokens 相关）自动降档，
   // 不让一个数字不被接受就把整条链弄断。
-  const WDS_TOK_HEAVY = 16000;
+  const WDS_TOK_HEAVY = WDS_TOK_MAX;   // [stated] 用户 2026-08-09：「每一次调用都要 MaxToken」——预算给满，刹车改挂在 reasoning_effort 上
   // 【深度档问答也是重档 —— 这条是用户 2026-08-09 那场真实的自动十轮换来的】
   // 那场跑到第 6 轮断掉：第 1–4 轮 3405／3673／3135／2838 字，**第 5 轮只剩 936 字，第 6 轮 0 字**。
   // 不是偶发，是一条必然的下坡：深度档装着内功＋心得＋方法论，思考实测就要 3–6k tok，

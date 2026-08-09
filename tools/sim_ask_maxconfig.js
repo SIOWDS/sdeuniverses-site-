@@ -30,10 +30,15 @@ ok(/_heavy \? WDS_TOK_HEAVY : MAXTOK/.test(W), "三个重档首发给 WDS_TOK_HE
    首发 64000 ＋ 满功率时，paper 上半篇在第 133 秒被平台杀掉：思考 17,233 字、正文 0 字，
    流里没有 [DONE]、没有 error、心跳停在第 120 秒——最难查的那种死法。
    预算的真正作用是**给思考封顶**，封顶才活得过那两分钟。所以首发必须有界。 */
-const heavyTok = grab(/const WDS_TOK_HEAVY = (\d+);/);
-ok(heavyTok >= 12000 && heavyTok <= 20000,
-   "首发预算 " + heavyTok + " 落在 12000–20000：装得下思考＋正文，又不会让它一路想到被平台杀掉");
-ok(heavyTok < 64000, "首发不许直接给 64000——实测那样 paper 会死在思考阶段（2026-08-09 抓到原样）");
+/* 用户令「每一次调用都要 MaxToken」⇒ 预算给满，刹车改挂在推理投入档上。
+   于是判据从"预算必须有界"改成"**必须有一处刹得住思考**"——两者必居其一，
+   谁都没有的那一版就是 2026-08-09 第 133 秒断流的那一版。 */
+ok(/const WDS_TOK_HEAVY = WDS_TOK_MAX;/.test(W) || (grab(/const WDS_TOK_HEAVY = (\d+);/) <= 20000),
+   "重档预算：要么给满 MaxToken，要么有界——不许介于两者之间地随手写一个大数");
+ok(/effort: "high"/.test(W) || (grab(/const WDS_TOK_HEAVY = (\d+);/) <= 20000),
+   "给满预算时必须降一格推理投入档（思考时长随预算水涨船高，没有刹车就会被平台无声杀掉）");
+ok(/body\.reasoning_effort = \(VC && VC\.effort\) \? VC\.effort : "max";/.test(W),
+   "推理投入档这个旋钮做在 wdsTopBody 里且默认仍是 max（不传 effort 的既有调用点行为不变）");
 const mH = W.match(/const _heavy = \(([^)]*)\);/);
 ok(!!mH, "_heavy 判据在位");
 const isHeavy = new Function("mode", "deep",
@@ -70,12 +75,12 @@ ok(isTop("paper") === true && isTop("polish") === true, "真跑：paper / polish
 ok(isTop("iq") === false, "真跑：iq **不挂**满功率——满功率对要求结构化短输出的调用是毒（本文件 4500 行的硬教训）");
 ok(isTop("answer") === false && isTop("distill") === false && isTop("nextq") === false,
    "真跑：answer / distill / nextq 不挂满功率");
-ok(/const _VCX = _topPower \? \{ url: VC\.url, model: VC\.model, name: VC\.name, top: 1 \} : VC;/.test(W),
-   "满功率靠给 VC 挂 top:1（wdsTopBody 认的就是这个标记）");
+ok(/const _VCX = _topPower \? \{ url: VC\.url, model: VC\.model, name: VC\.name, top: 1, effort: "high" \} : VC;/.test(W),
+   "思考档靠给 VC 挂 top:1（wdsTopBody 认的就是这个标记），并把投入档降一格递进去");
 ok(/upstream = await wdsFetchMax\(_VCX, KEY, _msgs, true, _heavy \? WDS_TOK_HEAVY : MAXTOK,/.test(W),
    "主调用真的走了最高档取数器，并把 _VCX 递进去（算对了没接上，等于没改）");
-ok(/function wdsTopBody\(VC, body\) \{[\s\S]{0,300}?reasoning_effort = "max"/.test(W),
-   "wdsTopBody 确实在挂满功率（thinking:enabled ＋ reasoning_effort:max）");
+ok(/function wdsTopBody\(VC, body\) \{[\s\S]{0,600}?thinking = \{ type: "enabled" \}/.test(W),
+   "wdsTopBody 确实在开思考（thinking:enabled）");
 ok(/body: JSON\.stringify\(wdsTopBody\(VC, body\)\),/.test(W), "wdsFetchMax 内部按 VC.top 决定挂不挂满功率");
 
 /* ===== 三、心跳：预算一大，思考期就长，链路会把静默判死 ===== */
