@@ -51,6 +51,7 @@
   function render(){
     var zh=isZh();
     var grid=document.getElementById("pressGrid");
+    if(!grid)return;
     var list=active==="all"?PB:PB.filter(function(b){return b.d===active;});
     grid.innerHTML=list.map(function(b){
       var name=zh?b.zh:b.en;
@@ -67,6 +68,7 @@
   function renderFilter(){
     var zh=isZh();
     var fb=document.getElementById("pressFilter");
+    if(!fb)return;
     var btns=[["all",zh?"全部":"All"]];
     ORDER.forEach(function(k){btns.push([k,zh?DM[k].zh:DM[k].en]);});
     fb.innerHTML=btns.map(function(x){
@@ -79,4 +81,39 @@
   }
   renderFilter();render();
   window.__renderPress=function(){renderFilter();render();};
+})();
+
+
+/* 睡眠专栏 · 首页入口（2026-08-09） */
+;(function(){
+  function mountSleepColumn(){
+    var nav=document.querySelector('.nav-bar-sub');
+    if(nav && !nav.querySelector('[data-sleep-column]')){
+      var a=document.createElement('a');
+      a.href='/sleep/';a.setAttribute('data-sleep-column','1');a.textContent='睡眠专栏';
+      a.style.cssText='color:#6D4FB3;font-weight:800;text-shadow:0 0 16px rgba(141,110,220,.18)';
+      nav.appendChild(a);
+    }
+    if(document.getElementById('sleep-column-home')) return;
+    var hero=document.getElementById('hero'); if(!hero)return;
+    var section=document.createElement('section');section.id='sleep-column-home';
+    section.style.cssText='position:relative;overflow:hidden;background:radial-gradient(circle at 72% 18%,rgba(111,87,174,.28),transparent 28%),linear-gradient(145deg,#090D18 0%,#12182B 52%,#080B13 100%);border-bottom:1px solid rgba(196,167,231,.25);padding:76px 24px;color:#EEF3FB';
+    section.innerHTML=''
+      +'<div aria-hidden="true" style="position:absolute;inset:0;opacity:.28;background-image:radial-gradient(circle,#fff 0 1px,transparent 1.5px);background-size:88px 88px;transform:rotate(6deg)"></div>'
+      +'<div style="position:relative;z-index:1;max-width:1120px;margin:auto">'
+      +'<div style="display:flex;align-items:flex-end;justify-content:space-between;gap:28px;flex-wrap:wrap;margin-bottom:34px">'
+      +'<div style="max-width:760px"><div style="font-size:12px;letter-spacing:.34em;color:#C4A7E7;margin-bottom:14px">首页新专栏 · SLEEP · CARE · THOUGHT</div>'
+      +'<h2 style="font-family:Georgia,\'Noto Serif SC\',serif;font-size:clamp(38px,7vw,72px);line-height:1.05;margin:0;color:#F7F1FF;letter-spacing:.06em">睡眠专栏</h2>'
+      +'<p style="font-family:\'Noto Serif SC\',serif;font-size:clamp(17px,2.4vw,23px);line-height:1.9;color:#C8D1E3;margin:22px 0 0">给那些在夜里受苦、无法轻易入睡、又不愿被一句“放松点”打发的人。这里不要求你立刻睡着，先让你不再独自承担这一夜。</p>'
+      +'<div style="margin-top:16px;color:#9DA9BF;font-size:14px">作者 · 王德生</div></div>'
+      +'<a href="/sleep/" style="display:inline-block;text-decoration:none;background:linear-gradient(120deg,#E8D8FF,#C4A7E7);color:#171221;font-weight:800;padding:13px 24px;border-radius:999px;white-space:nowrap;box-shadow:0 10px 34px rgba(196,167,231,.24)">进入睡眠专栏 →</a></div>'
+      +'<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:13px">'
+      +'<a href="/sleep/entrusted-beat/" style="text-decoration:none;color:inherit;border:1px solid rgba(142,202,230,.35);background:rgba(16,24,41,.78);border-radius:14px;padding:22px"><div style="font-size:11px;letter-spacing:.18em;color:#8ECAE6">01 · 托拍事件</div><h3 style="font-size:21px;margin:12px 0 8px;color:#F4F7FC">谁替睡者接住下一拍？</h3><p style="color:#AEBBD0;line-height:1.75;margin:0;font-size:14px">当你躺下以后，是否仍是所有事情的最后接口。</p></a>'
+      +'<a href="/sleep/living-on-the-line/" style="text-decoration:none;color:inherit;border:1px solid rgba(196,167,231,.35);background:rgba(16,24,41,.78);border-radius:14px;padding:22px"><div style="font-size:11px;letter-spacing:.18em;color:#C4A7E7">02 · 界带</div><h3 style="font-size:21px;margin:12px 0 8px;color:#F4F7FC">住在线上</h3><p style="color:#AEBBD0;line-height:1.75;margin:0;font-size:14px">入睡不是跨过一条线，而是穿过一片地带。</p></a>'
+      +'<a href="/sleep/half-minute-passage/" style="text-decoration:none;color:inherit;border:1px solid rgba(242,204,143,.35);background:rgba(16,24,41,.78);border-radius:14px;padding:22px"><div style="font-size:11px;letter-spacing:.18em;color:#F2CC8F">03 · 追认</div><h3 style="font-size:21px;margin:12px 0 8px;color:#F4F7FC">那三十秒算不算一段</h3><p style="color:#AEBBD0;line-height:1.75;margin:0;font-size:14px">一个短暂片段，不应替整夜作出判决。</p></a>'
+      +'<a href="/sleep/never-in-doubt/" style="text-decoration:none;color:inherit;border:1px solid rgba(144,190,109,.35);background:rgba(16,24,41,.78);border-radius:14px;padding:22px"><div style="font-size:11px;letter-spacing:.18em;color:#90BE6D">04 · 判余</div><h3 style="font-size:21px;margin:12px 0 8px;color:#F4F7FC">必须回答，所以从不犹豫</h3><p style="color:#AEBBD0;line-height:1.75;margin:0;font-size:14px">一个确定标签，并不等于一个毫无分歧的夜晚。</p></a>'
+      +'</div></div>';
+    hero.insertAdjacentElement('afterend',section);
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mountSleepColumn);else mountSleepColumn();
 })();
