@@ -1,8 +1,8 @@
 <!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1"><title>诊断 · SDE Universes</title>
-<style>body{background:#0b0820;color:#e8ffe8;font:15px/1.9 Menlo,Consolas,monospace;padding:28px}b{color:#E7C86B}.bad{color:#FF7A7A}</style></head><body>
+<style>body{background:#0b0820;color:#e8ffe8;font:15px/1.9 Menlo,Consolas,monospace;padding:28px}b{color:#E7C86B}.bad{color:#FF7A7A}.box{margin:18px 0;padding:16px;border:1px solid rgba(231,200,107,.35);border-radius:8px}</style></head><body>
 <div><b>SDE Universes 诊断页</b></div>
-<div>页面构建戳: <b>202607130137-hotspot</b>（能看到这行＝本页已绕过旧缓存；若仍显示 202607130056 则边缘还在供旧版）</div>
+<div>页面构建戳: <b>20260809-sleep-column</b>（能看到这行＝睡眠专栏专项诊断已经部署）</div>
 <div id="log">JS 未运行 ✗（一直停在这行＝浏览器 JS 被禁或崩了）</div>
 <script src="/assets/daily-quotes.js?v=20260802b"></script>
 <script>
@@ -13,24 +13,32 @@
   p('JS 运行: <b>✓</b>');
   p('浏览器 UA: '+navigator.userAgent);
   p('共享池加载: <b>'+(window.DQ?('✓ '+window.DQ.length+' 句'):'✗ 未加载')+'</b>');
-  try{var d=new Date();var t=window.DQ_pickForDate(d.getFullYear(),d.getMonth()+1,d.getDate());
-    p('今日抽取: <b>✓</b> '+t.map(function(q){return q.t.slice(0,12)+'…'}).join(' / '));
-  }catch(e){p('<b class="bad">抽取失败:</b> '+e.message);}
   p('本页时间: '+new Date().toString());
-  p('— 今日热点上线探测 —');
+  p('<span class="box">— 睡眠专栏上线探测 —</span>');
+  var results=[];
   function probe(url,label,mark){
     return fetch(url,{cache:'no-store'}).then(function(r){
       return r.text().then(function(tx){
-        var hit = tx.indexOf(mark)>=0;
+        var hit=r.ok&&tx.indexOf(mark)>=0;
+        results.push(hit);
         p(label+': HTTP <b>'+r.status+'</b> · 标记'+(hit?'<b>✓ 命中</b>':'<b class="bad">✗ 未命中</b>'));
         return hit;
       });
-    }).catch(function(e){p(label+': <b class="bad">请求失败</b> '+e.message); return false;});
+    }).catch(function(e){results.push(false);p(label+': <b class="bad">请求失败</b> '+e.message);return false;});
   }
-  probe('/hotspot/three-news-one-mistake/?r='+Date.now(),'① 新文章页(绕缓存)','三条新闻')
-  .then(function(){return probe('/?r='+Date.now(),'② 首页(绕缓存)','three-news-one-mistake');})
-  .then(function(){return probe('/','③ 首页(常规请求)','three-news-one-mistake');})
-  .then(function(){p('判读: ①✓②✓③✓＝一切已上线,问题在你设备; ①✓③✗＝首页边缘缓存滞留; ①✗＝部署未含新文.');});
+  var n=Date.now();
+  probe('/sleep/?r='+n,'① 睡眠专栏首页','今晚先不把睡眠变成任务')
+  .then(function(){return probe('/sleep/entrusted-beat/?r='+n,'② 谁替睡者接住下一拍','何谓睡眠：谁替睡者接住下一拍？');})
+  .then(function(){return probe('/sleep/living-on-the-line/?r='+n,'③ 住在线上','住在线上');})
+  .then(function(){return probe('/sleep/half-minute-passage/?r='+n,'④ 那三十秒算不算一段','那三十秒算不算一段');})
+  .then(function(){return probe('/sleep/never-in-doubt/?r='+n,'⑤ 必须回答，所以从不犹豫','必须回答，所以从不犹豫');})
+  .then(function(){return probe('/js/home-2.js?r='+n,'⑥ 首页入口脚本','sleep-column-home');})
+  .then(function(){return probe('/sleep/assets/sleep.css?r='+n,'⑦ 专栏视觉样式','--reader-size');})
+  .then(function(){
+    var ok=results.length===7&&results.every(Boolean);
+    p('判读: '+(ok?'<b>七项全部命中＝睡眠专栏已经完整上线。</b>':'<b class="bad">存在未命中项＝对应资源尚未部署或路径异常。</b>'));
+    p('<a href="/sleep/" style="color:#E7C86B">进入睡眠专栏 →</a>');
+  });
 })();
 </script>
 <script>window.WDS_READ={};</script>
