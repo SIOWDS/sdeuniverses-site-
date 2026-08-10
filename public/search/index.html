@@ -215,9 +215,10 @@ a.reco .rw{font-size:0.8rem;color:var(--muted,#8a8a8a);margin-top:3px;line-heigh
       <span class="en-only">Retrieves passages from the site's <b>articles and monographs</b>, then an SDE base model composes an answer with <b>sources</b> below. AI-generated — verify against sources.</span>
     </div>
     <div id="turnBar" style="display:none;font-size:0.78rem;color:var(--gold);margin:10px 2px 0;line-height:1.7">
-      <span class="zh-only">🧵 连续问对 · 第 <b id="turnNo">1</b> / 10 轮：每一轮都带着前面几轮的上下文，问题会被一层层逼深。满 2 轮后可「提炼精华」，把整场问对收成一份两万字的论文入口资料（四段连写）。</span>
+      <span class="zh-only">🧵 连续问对 · 第 <b id="turnNo">1</b> / 10 轮：每一轮都带着前面几轮的上下文；每答完一轮，系统会按九级追问阶梯替你拟好下一问并填进输入框（可改）。满 2 轮后可「提炼精华」，把整场问对收成一份两万字的论文入口资料（四段连写）。</span>
       <span class="en-only">🧵 Threaded Q&amp;A · turn <b id="turnNoE">1</b>/10 — each turn carries the earlier ones. After 2 turns you can distill the thread into a paper brief.</span>
       <b style="cursor:pointer;margin-left:6px;text-decoration:underline" onclick="resetThread()"><span class="zh-only">🧹 清空重来</span><span class="en-only">Reset</span></b>
+      <div id="nextQTip" style="display:none;margin-top:6px;color:var(--muted);font-weight:600"></div>
     </div>
     <div class="auto-wrap" id="autoWrap">
       <div class="ans-label"><span class="zh-only">🚀 自动十轮 · 一问到底</span><span class="en-only">Auto run</span></div>
@@ -665,7 +666,8 @@ function renderThread(){
 }
 function resetThread(quiet){
   if(!quiet && turns.length && !confirm('清空这场问对（共 '+turns.length+' 轮）与已提炼的入口资料？')) return;
-  turns=[]; brief=''; lastAns=''; lastQ='';
+  turns=[]; brief=''; lastAns=''; lastQ=''; nextQReady='';
+  var _nt=document.getElementById('nextQTip'); if(_nt){ _nt.style.display='none'; _nt.textContent=''; }
   document.getElementById('threadBox').style.display='none';
   document.getElementById('briefWrap').classList.remove('show');
   document.getElementById('briefBox').textContent='';
@@ -696,6 +698,16 @@ function doAsk(){
   var uk=(keyMode==='own')?document.getElementById('userKey').value.trim():'';
   if(keyMode==='own' && !uk){ document.getElementById('userKey').focus(); flashAsk('请先填入你的 API Key，或切回「系统」。'); return Promise.resolve(); }
   if(turns.length>=MAXTURNS){ flashAsk('这场问对已满 '+MAXTURNS+' 轮。请先「提炼精华」成论文入口资料，或「清空重来」。'); return Promise.resolve(); }
+  /* 【同一问题不得问两遍】输入框不会自己清空，回答完再点一下「问」就是把上一句原样再问一遍——
+     线上真出过：第 1 轮与第 2 轮都是「语言是什么？」。十轮追问的价值全在「层层逐深」上，
+     同一问重复问等于白烧一次百多秒的深度调用，还会把入口资料与论文一起带偏。 */
+  if(turns.some(function(t){ return qNorm(t.q)===qNorm(q); })){
+    flashAsk('这一句前面已经问过了。十轮的价值在于一层层逐深，同一问再问一遍只会得到差不多的答案。'
+      +(nextQReady?'已把本轮该问的那一句填回输入框，可直接问、也可改。':'请换一句再问。'));
+    if(nextQReady){ document.getElementById('qa').value=nextQReady; }
+    document.getElementById('qa').focus();
+    return Promise.resolve();
+  }
   asking=true;
   lastQ=q; lastAns='';
   document.getElementById('askActs').classList.remove('show');
@@ -770,7 +782,40 @@ function finishAsk(ansEl){
     /* 本轮入档：只有真答出来的才算一轮，报错/空答不占轮次 */
     turns.push({q:lastQ, a:lastAns});
     renderThread(); updateTurnBar();
+    suggestNextQ();
   }
+}
+/* 把问题归一化后比对（去空白与句读）：“语言是什么？”与“语言是什么”是同一句 */
+function qNorm(s){ return String(s||'').replace(/[\s\u3000]+/g,'').replace(/[?？。.!！,，、；;：:\-—～~]/g,''); }
+/* ===== 每答完一轮，替用户拟好下一问 =====
+   九级追问阶梯（承重命题 → 共有前提 → 反例与边界 → 发生次序 → 远学科对撞 → 可裁决读数
+   → 证伪条件 → 最近邻占位者 → 落地与代价）本来就写在服务端的 AUTO_LADDER 里，
+   以前却只有「自动十轮」用得上：手动连续问对全靠用户自己想下一句问什么，
+   而输入框又留着上一句——结果就是十轮变成同一问重复十遍，「层层深入」根本没发生。
+   这一步很便宜：400 tok、不跑检索、拟不出来服务端自带兵底问句，失败也不打扰人。 */
+var nextQReady='';
+function suggestNextQ(){
+  var tip=document.getElementById('nextQTip');
+  if(turns.length>=MAXTURNS){ if(tip){ tip.style.display='none'; } return Promise.resolve(); }
+  var uk=(keyMode==='own')?document.getElementById('userKey').value.trim():'';
+  var step=turns.length+1;
+  if(tip){ tip.style.display='block'; tip.textContent='… 正在拟第 '+step+' 轮该追的那一句…'; }
+  return fetch('/api/ask',{
+    method:'POST',headers:{'content-type':'application/json'},
+    body:JSON.stringify(Object.assign({mode:'nextq',q:originQ(),step:step,hist:buildHist(true),vendor:vendor}, uk?{key:uk}:{}))
+  }).then(function(r){ return r.json(); }).then(function(d){
+    if(!d || !d.ok || !d.q) throw new Error('no q');
+    nextQReady=d.q;
+    var qa=document.getElementById('qa');
+    /* 只在输入框仍是上一句（或空）时才替换——用户已经在自己敲下一问时不许抢他的字 */
+    if(qa && (!qa.value.trim() || qNorm(qa.value)===qNorm(lastQ))) qa.value=d.q;
+    if(tip) tip.innerHTML='↓ 第 '+d.step+' 轮的追问动作：<b>'+esc(d.move||'')+'</b>。'
+      +(d.fallback?'（基底没拟出来，用的是这一级的兵底问句）':'')
+      +'已填进输入框，可直接问、也可改成你自己的问法。';
+  }).catch(function(){
+    /* 拟题失败不得中断问对：只收起提示，不报错、不动输入框 */
+    if(tip) tip.style.display='none';
+  });
 }
 
 /* ================= 🚀 自动十轮：一问到底 =================

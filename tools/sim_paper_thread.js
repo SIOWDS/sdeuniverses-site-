@@ -105,5 +105,34 @@ ok(W.indexOf("本场问对未产出") > 0, "distill：没长出来的栏目要�
 ok(W.indexOf('_lightDeep ? 40 :') > 0, "distill/碰撞/提炼：检索档下调到 40 块（装内功但不广撒网，控成本）");
 ok(W.indexOf('_lightDeep ? 14000 :') > 0, "distill/碰撞/提炼：《站内资料》钳到 14000 字");
 
+/* ===== 六、手动连续问对也要层层逐深（2026-08-10 线上真故障）=====
+   截图里第 1 轮与第 2 轮都是「语言是什么？」——九级追问阶梯（AUTO_LADDER）与拟题接口（nextq）
+   都在服务端现成，却只有「自动十轮」用得上；手动路径靠用户自己想下一问，而输入框又留着上一句，
+   点两下就把同一问问了两遍。登山靠的是阶梯，不是只告诉人「请往上走」。 */
+console.log("— 六、手动问对的追问阶梯 —");
+const bFin = H.slice(H.indexOf("function finishAsk("), H.indexOf("function doAutoRun("));
+ok(/turns\.push\(\{q:lastQ, a:lastAns\}\);[\s\S]{0,120}suggestNextQ\(\);/.test(bFin),
+  "每入档一轮就拟好下一问（不是等用户自己想）");
+ok(/mode:'nextq'/.test(bFin) && /step:step/.test(bFin) && /hist:buildHist\(true\)/.test(bFin),
+  "拟题真走服务端那条阶梯：只送 step，不在前端再拄一份阶梯（拄两份迟早漂移，而漂移后页面一切正常）");
+ok(/turns\.length>=MAXTURNS/.test(bFin), "满十轮不再拟题");
+ok(/\.catch\(function\(\)\{[\s\S]{0,200}style\.display='none'/.test(bFin),
+  "拟题失败只收起提示，不报错也不动输入框——一次拟题失败不该有权力中断整场问对");
+ok(/qNorm\(qa\.value\)===qNorm\(lastQ\)/.test(bFin),
+  "只在输入框仍是上一句（或空）时才替换：用户已在自己敲下一问时不许抢他的字");
+/* qNorm 抠出来真跑：去空白与句读后相等就算同一问 */
+const qNorm = new Function("s", H.slice(H.indexOf("function qNorm("), H.indexOf("/* ===== 每答完一轮")) + "\nreturn qNorm(s);");
+ok(qNorm("语言是什么？") === qNorm("语言是什么"), "qNorm：带不带问号算同一句");
+ok(qNorm(" 语言 是什么 ") === qNorm("语言是什么"), "qNorm：空白不算数");
+ok(qNorm("语言是什么") !== qNorm("语言不是什么"), "qNorm：真不同的两句不能被归成一句");
+const bAsk2 = H.slice(H.indexOf("function doAsk("), H.indexOf("function finishAsk("));
+ok(/turns\.some\(function\(t\)\{ return qNorm\(t\.q\)===qNorm\(q\); \}\)/.test(bAsk2),
+  "同一问题重复问直接拦下（白烧一次百多秒的深度调用，还会把入口资料与论文一起带偏）");
+ok(bAsk2.indexOf("turns.some(function(t){ return qNorm(t.q)===qNorm(q); })") < bAsk2.indexOf("asking=true;"),
+  "拦截排在 asking=true 之前（拦完要能再问，不能把页面锁死）");
+ok(/const AUTO_LADDER = \[/.test(W) && /if \(mode === "nextq"\)/.test(W),
+  "服务端仍是阶梯的唯一定义处");
+ok(/拟不出来|fb: "/.test(W), "每一级都配兵底问句（拟题失败也能把这一轮问出去）");
+
 console.log("\n===== " + P + " PASS / " + F + " FAIL =====");
 process.exit(F ? 1 : 0);
