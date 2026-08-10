@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>不计的那一遍 | SDE教育学 | SDE Universes</title>
+<meta name="description" content="戏剧学、经济学与法律学三家共同假定「一次教育发生了没有」在原则上可裁定。本文提出：教育是一批必须不进任何账才承担构成功能的重复，与三套计数装置之间的存量差。含 8,400 个公开拉取请求的预注册真跑，两条假设均未命中。">
+<link rel="canonical" href="https://sdeuniverses.com/sde-education/uncounted-run/">
+<meta property="og:type" content="article">
+<meta property="og:title" content="不计的那一遍 | SDE教育学">
+<meta property="og:description" content="戏剧学、经济学与法律学三家共同假定「一次教育发生了没有」在原则上可裁定。本文提出：教育是一批必须不进任何账才承担构成功能的重复，与三套计数装置之间的存量差。含 8,400 个公开拉取请求的预注册真跑，两条假设均未命中。">
+<meta property="og:url" content="https://sdeuniverses.com/sde-education/uncounted-run/">
+<meta name="sde:column" content="education/intro">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#F5EFE0;--card:#FAF6EC;--card2:#F0E8D3;--gold:#8A6817;--text:#2A2315;--text2:#544733;--muted:#98886C;--border:rgba(138,104,23,0.22);--border2:rgba(138,104,23,0.10);--accent:#8C5A2B;--accent2:#2E86AB}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Noto Serif SC','EB Garamond',Georgia,serif;line-height:1.95;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:0.7rem 3rem;background:rgba(245,239,224,0.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border2)}
+.nav-logo{font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:700;color:var(--gold);letter-spacing:0.05em;text-decoration:none}
+.nav-links{display:flex;align-items:center;gap:1.5rem}
+.nav-links a{color:var(--text2);text-decoration:none;font-size:0.84rem;letter-spacing:0.09em;transition:color .2s}
+.nav-links a:hover,.nav-links a.here{color:var(--accent)}
+.nav-links a.here{font-weight:700}
+.wrap{max-width:760px;margin:0 auto;padding:0 2rem}
+header.hero{padding:8.5rem 2rem 2.6rem;text-align:center;position:relative;overflow:hidden;border-bottom:1px solid var(--border2)}
+.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 72% 58% at 50% 24%,#8C5A2B1a 0%,transparent 72%)}
+.eyebrow{position:relative;font-size:0.7rem;letter-spacing:0.26em;color:var(--accent);margin-bottom:1.15rem}
+.eyebrow a{color:var(--accent);text-decoration:none;border-bottom:1px solid rgba(0,0,0,.14)}
+h1.art-title{position:relative;font-family:'Noto Serif SC',serif;font-size:clamp(1.6rem,3.7vw,2.3rem);font-weight:700;line-height:1.34;color:var(--text);max-width:830px;margin:0 auto}
+.art-sub{position:relative;font-size:clamp(0.96rem,1.8vw,1.08rem);color:var(--text2);max-width:680px;margin:1.05rem auto 0;font-style:italic;font-weight:300;line-height:1.74}
+.art-meta{position:relative;margin-top:1.5rem;font-size:0.79rem;letter-spacing:0.1em;color:var(--muted)}
+section.body{padding:2.8rem 0 1rem}
+.abs{background:var(--card);border:1px solid var(--border2);border-left:3px solid var(--accent);border-radius:5px;padding:1.4rem 1.6rem;margin-bottom:1rem}
+.abs .l{font-size:0.7rem;letter-spacing:0.24em;color:var(--accent);font-weight:700;margin-bottom:0.6rem}
+.abs p{font-size:0.94rem;line-height:1.88;color:var(--text2);text-align:justify}
+.abs.en .l{letter-spacing:0.18em}
+.abs.en p{font-family:'EB Garamond',Georgia,serif;font-style:normal}
+.abs.en .et{font-weight:700;color:var(--text);margin-bottom:0.55rem;font-size:1rem;line-height:1.5}
+.kw{font-size:0.85rem;color:var(--muted);margin-bottom:1rem;letter-spacing:0.02em}
+.kw b{color:var(--accent);font-weight:700;letter-spacing:0.1em}
+.kw.en{margin-bottom:2.4rem}
+.toc{background:var(--card2);border:1px dashed var(--border);border-radius:6px;padding:1.25rem 1.5rem;margin-bottom:3rem}
+.toc .l{font-size:0.7rem;letter-spacing:0.24em;color:var(--accent);font-weight:700;margin-bottom:0.75rem}
+.toc a{display:block;font-size:0.9rem;color:var(--text2);text-decoration:none;padding:0.24rem 0;transition:color .18s,padding-left .18s}
+.toc a:hover{color:var(--accent);padding-left:5px}
+article h2{font-family:'Noto Serif SC',serif;font-size:1.28rem;font-weight:700;color:var(--text);margin:3.1rem 0 1.15rem;padding-bottom:0.5rem;border-bottom:1px solid var(--border2);scroll-margin-top:5.5rem;line-height:1.45}
+article h2::before{content:'';display:inline-block;width:4px;height:0.95em;background:var(--accent);margin-right:0.6rem;vertical-align:-1px;border-radius:2px}
+
+article h4{font-size:1.0rem;margin:1.6rem 0 0.55rem;color:var(--text);font-weight:700}
+.tbl{margin:1.6rem 0;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.tbl table{border-collapse:collapse;width:100%;min-width:520px;font-size:0.9rem;line-height:1.62}
+.tbl th,.tbl td{border:1px solid var(--border2);padding:0.55rem 0.7rem;vertical-align:top;text-align:left}
+.tbl th{background:rgba(20,108,148,0.07);font-weight:700;color:var(--accent)}
+.tbl caption{caption-side:top;text-align:left;font-size:0.88rem;color:var(--text2);margin-bottom:0.5rem;font-weight:700}
+.formula{margin:1.2rem 0;padding:0.75rem 1rem;background:var(--bg2,rgba(0,0,0,0.03));border-left:3px solid var(--accent);font-family:'Courier New',monospace;font-size:0.95rem;overflow-x:auto}
+.revnote{margin:1.8rem 0 0;padding:1rem 1.15rem;border:1px solid var(--border2);border-left:3px solid var(--accent);border-radius:6px;font-size:0.9rem;color:var(--text2);line-height:1.75}
+.revnote b{color:var(--accent)}
+article h3{font-size:1.07rem;margin:2.1rem 0 0.7rem;color:var(--accent);letter-spacing:0.01em;font-weight:700}
+article h4{font-size:0.98rem;margin:1.6rem 0 0.5rem;color:var(--gold);letter-spacing:0.01em;font-weight:700}
+article p{font-size:1.02rem;line-height:2.05;color:var(--text);margin-bottom:1.15rem;text-align:justify;letter-spacing:0.012em}
+article b{color:var(--text);font-weight:700;background:linear-gradient(transparent 62%,#8C5A2B22 62%)}
+article i{font-style:italic}
+hr{border:none;height:1px;background:var(--border2);margin:2.6rem 0}
+.refs{margin:2rem 0 0}
+.refs h2{font-family:'Noto Serif SC',serif;font-size:1.28rem;font-weight:700;color:var(--text);margin:3.1rem 0 1.15rem;padding-bottom:0.5rem;border-bottom:1px solid var(--border2);scroll-margin-top:5.5rem}
+.refs h2::before{content:'';display:inline-block;width:4px;height:0.95em;background:var(--accent);margin-right:0.6rem;vertical-align:-1px;border-radius:2px}
+.refs ol{padding-left:0;list-style:none;counter-reset:r}
+.refs li{position:relative;font-size:0.86rem;line-height:1.75;color:var(--text2);margin:0 0 0.7rem;padding-left:1.9rem;text-align:justify;word-break:break-word}
+.refs li::before{counter-increment:r;content:'['counter(r)']';position:absolute;left:0;color:var(--accent);font-weight:600;font-size:0.8rem}
+.refs li i{font-style:italic}
+.foot-nav{margin:3.4rem 0 0;text-align:center;background:var(--card2);border:1px dashed var(--accent);border-radius:8px;padding:1.6rem 1.4rem}
+.foot-nav .fh{font-size:0.72rem;letter-spacing:0.2em;color:var(--accent);margin-bottom:1rem}
+.foot-nav .cl{display:flex;flex-wrap:wrap;gap:0.7rem;justify-content:center}
+.foot-nav a{text-decoration:none;font-size:0.85rem;letter-spacing:0.06em;padding:0.48rem 1.05rem;border:1px solid var(--border);border-radius:22px;color:var(--text2);background:var(--card);transition:all .2s}
+.foot-nav a:hover{border-color:var(--accent);color:var(--accent)}
+.foot-nav a.cur{opacity:.4;pointer-events:none}
+footer{border-top:1px solid var(--border2);margin-top:3rem;padding:2.4rem 2rem;text-align:center;color:var(--muted);font-size:0.77rem;letter-spacing:0.05em}
+footer a{color:var(--gold);text-decoration:none}
+@media(max-width:640px){
+  nav{padding:0.6rem 1rem}.nav-links{gap:0.9rem}.nav-links a.sib{display:none}
+  header.hero{padding:6.4rem 1.2rem 2rem}
+  .wrap{padding:0 1.25rem}
+  article p{font-size:1rem;line-height:1.98}
+  article h2{font-size:1.16rem;margin:2.5rem 0 1rem}
+}
+/* 三模式：网页 / 在线读PDF / 下载 —— 复用页面 --accent:#8C5A2B */
+.modes{border-bottom:1px solid rgba(20,108,148,.16);background:#FBF9F4}
+.modes .mw{max-width:820px;margin:0 auto;display:flex;gap:12px;justify-content:center;padding:16px 24px;flex-wrap:wrap}
+.modebtn{cursor:pointer;font-family:inherit;font-size:14px;color:#7A7059;background:#fff;border:1px solid rgba(20,108,148,.20);border-radius:6px;padding:9px 18px;transition:all .15s;letter-spacing:.03em}
+.modebtn:hover{color:#23201A}
+.modebtn.on{color:#fff;background:var(--accent);border-color:var(--accent);font-weight:700}
+.modebtn .ic{margin-right:6px}
+.panel{display:none}.panel.on{display:block}
+.rdr{max-width:920px;margin:0 auto}
+.rdr-bar{display:flex;align-items:center;gap:9px;flex-wrap:wrap;justify-content:center;padding:14px 12px;position:sticky;top:0;background:rgba(251,249,244,.97);z-index:6;border-bottom:1px solid rgba(20,108,148,.16)}
+.rbtn{background:#fff;border:1px solid rgba(20,108,148,.20);color:var(--accent);padding:7px 15px;border-radius:5px;font-size:14px;cursor:pointer;font-family:inherit;letter-spacing:.02em}
+.rbtn:hover:not(:disabled){background:#F4F7F9}.rbtn:disabled{opacity:.35;cursor:not-allowed}
+.rbtn.dl{background:var(--accent);color:#fff;border-color:var(--accent)}.rbtn.dl:hover{background:#0F5273;text-decoration:none}
+.pbox{font-size:14px;color:#23201A}.pbox input{width:52px;background:#fff;border:1px solid rgba(20,108,148,.20);color:var(--accent);padding:6px;border-radius:4px;text-align:center;font-family:inherit;font-size:14px}.pbox .ptot{color:#7A7059}
+.zm{display:flex;gap:4px}
+.rdr-stage{position:relative;display:flex;justify-content:center;padding:26px 8px 34px;min-height:62vh;background:#E4E9EC;border-radius:0 0 8px 8px}
+#cwrap{box-shadow:0 16px 46px rgba(0,0,0,.28);background:#fff;border-radius:2px;overflow:hidden;max-width:100%}
+#pcv{display:block;max-width:100%;height:auto}
+.rload{text-align:center;color:#7A7059;padding:72px 20px;font-size:15px}
+.spin{width:38px;height:38px;border:3px solid rgba(20,108,148,.2);border-top-color:var(--accent);border-radius:50%;margin:0 auto 18px;animation:spin .9s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.rerr{text-align:center;color:#9A3B2B;padding:50px 20px;line-height:1.9}.rerr a{color:var(--accent);font-weight:700}
+.tapL,.tapR{position:absolute;top:0;bottom:0;width:14%;cursor:pointer;z-index:3}.tapL{left:0}.tapR{right:0}
+.rhint{text-align:center;font-size:12px;color:#7A7059;padding:12px 0 44px}
+#dl{padding:40px 0 70px}#dl .card{max-width:560px;margin:0 auto;text-align:center;background:#FBF9F4;border:1px solid rgba(20,108,148,.16);border-radius:12px;padding:48px 32px}
+#dl h2{font-size:22px;color:var(--accent);margin-bottom:10px}#dl .sz{color:#7A7059;font-size:13px;margin-top:16px;line-height:1.9}
+.dlbtn{display:inline-block;margin-top:22px;background:var(--accent);color:#fff;font-weight:700;padding:14px 32px;border-radius:8px;letter-spacing:.04em}.dlbtn:hover{background:#0F5273;text-decoration:none}
+
+.edition-link{display:inline-flex;align-items:center;gap:.45em;margin-top:18px;padding:10px 18px;border:1px solid rgba(20,108,148,.32);border-radius:999px;color:var(--accent);background:#fff;font-size:14px;font-weight:700;letter-spacing:.04em;text-decoration:none}.edition-link:hover{background:var(--accent);color:#fff;text-decoration:none}
+
+.fbox{margin:1.6rem 0;padding:1.15rem 1.4rem;background:#FBF3EA;border:1px solid #E4D3BF;border-radius:8px}
+.fbox p{margin:0;font-size:1.06rem;line-height:1.95;color:#3A2F22}
+.tag{margin:1.1rem 0;padding:.55rem .9rem;background:#F4F0E8;border-radius:6px;font-size:.93rem;color:#6B5D47}
+.cases p{margin:.85rem 0;padding:.75rem 1rem;background:#FAF6EC;border-radius:6px;line-height:1.9}
+sup.rf{color:#8C5A2B;font-size:.72em}
+ol.ref{padding-left:1.4rem}
+ol.ref li{margin:.55rem 0;line-height:1.8;font-size:.95rem;color:#4A4235}
+</style>
+</head>
+<body>
+<nav>
+  <a class="nav-logo" href="/browse/">SDE Universes</a>
+  <div class="nav-links">
+    <a href="/browse/">首页</a>
+    <a href="/" class="here">教育专栏</a>
+    <a href="/education/ai-era/" class="sib">AI时代的教育</a>
+  </div>
+</nav>
+<header class="hero">
+  <div class="hero-bg"></div>
+  <div class="eyebrow"><a href="/sde-education/">SDE教育学</a> · 同题四篇</div>
+  <h1 class="art-title">不计的那一遍</h1>
+  <p class="art-sub">论教育由一批必须不进任何账的重复构成，而三套计数装置各自都记得平</p>
+  <div class="art-meta">王德生 · 德麦国际 SDE 学派 · SDE教育学 · 2026年8月10日 · 约 22,094 字 · 20 条参考文献 · 三种阅读模式</div>
+</header>
+
+<div class="modes"><div class="mw">
+  <button class="modebtn on" data-m="web"><span class="ic">📖</span>网页长文</button>
+  <button class="modebtn" data-m="pdf"><span class="ic">📄</span>在线读 PDF</button>
+  <button class="modebtn" data-m="dl"><span class="ic">⬇</span>下载 PDF</button>
+</div></div>
+
+<div id="web" class="panel on">
+<main class="wrap">
+<section class="body">
+  <div class="abs"><div class="l">摘 要</div><p></p></div>
+  <div class="kw">关键词：不计遍；零计比；首计序；计数装置；无酬劳动核算；教育本体</div>
+  <div class="toc"><div class="l">目 录</div><a href="#c1">论教育由一批必须不进任何账的重复构成，而三套计数装置各自都记得平</a>
+<a href="#c2">引言 · 一句问话的三种答法</a>
+<a href="#c3">一 · 三家各自最强的那一条</a>
+<a href="#c4">二 · 三家为什么不能同时成立</a>
+<a href="#c5">三 · 三家共同踩着的那句话</a>
+<a href="#c6">四 · 推翻它的那件材料，来自戏剧学自己</a>
+<a href="#c7">五 · 不计遍：本文说的那样东西</a>
+<a href="#c8">六 · 两根轴，四格，与一条阈值曲线</a>
+<a href="#c9">七 · 一句不含程度词的问话</a>
+<a href="#c10">八 · 零计比：一个跨三领域可比的读数</a>
+<a href="#c11">九 · 一次真跑：8,400 个拉取请求，两条预注册假设都没命中</a>
+<a href="#c12">十 · 十二处跨领域兑现</a>
+<a href="#c13">十一 · 三家反过来给本文加的限制</a>
+<a href="#c14">十二 · 与最近的几种说法的分界</a>
+<a href="#c15">十三 · 与同一作者已发论述的自撞申报</a>
+<a href="#c16">十四 · 同题四篇的互切</a>
+<a href="#c17">十五 · 学术界共同站着的那块地</a>
+<a href="#c18">十六 · 不适用的边界</a>
+<a href="#c19">十七 · 可以使本文为假的条件</a>
+<a href="#c20">十八 · 反噬</a>
+<a href="#c21">十九 · 伦理三条</a>
+<a href="#c22">二十 · 自反：用本文的判据检提出这道题的那个指令</a>
+<a href="#c23">二十一 · 三层可分开引用的主张，与一个写死日期的赌注</a>
+<a href="#c24">参考文献</a>
+<a href="#c25">数据、脚本与可复算性</a></div>
+  <article>
+<p># 不计的那一遍</p>
+<h2 id="c1">论教育由一批必须不进任何账的重复构成，而三套计数装置各自都记得平</h2>
+<p><b>摘要</b>　教育是什么？戏剧学答：是当场发生、一过即逝、无法被记录的那一次。经济学答：是一条把人组织成可结算生产能力的投资路径。法律学答：是一套由授权、强制与承认构成的资格关系。三家不能同时成立，而三家共同假定了一件从未被说出的事——「一次教育发生了没有」在原则上是可裁定的，分歧只在由谁裁。推翻这条假定的材料来自戏剧学自己：一场演出由此前大量<b>按戏剧学自己的本体论根本不算演出</b>的重复构成，而那些重复不出现在任何一次演出的账上。据此本文提出：教育不是当场的那一次，不是可结算的那条路径，也不是可承认的那套资格，而是一批<b>必须不进任何账才承担构成功能的重复</b>，与三套计数装置之间的存量差；本文称之为<b>不计遍</b>。它的辨别装置是一张两轴四格表，那一格是「进账而不承担构成功能」——那一格通过全部形式审查。配套读数为<b>零计比 z</b>：一个人为达到当前状态而做过的全部遍次中，在任何一本账上都不产生一个数的比例；三领域量纲不同而比率相同，且与出勤率、学时达成率、过程记录完备度正交。零情态词判据：<b>这个人为达到现在这个样子而做过的那些遍里，有多少遍在任何一本账上都不产生一个数？</b> 本文以六个公开代码仓的 8,400 个拉取请求做了一次预注册真跑。两条主假设按事先写死的阈值<b>均未命中</b>，且 91% 的首次入账者在记录上完全没有可见的不计遍。这一不利结果把本文的适用范围收缩到「不计遍可被观察到的那一类场所」，并把「这个字段在现有记录里不存在」提为本文最稳的一层主张。</p>
+<p><b>关键词</b>　不计遍；零计比；构成功能；计数装置；教育本体；形成性评价</p>
+<p><b>Uncounted Runs: Education as a Body of Repetitions That Must Stay Off Every Ledger</b></p>
+<p><b>Abstract</b>　What is education? Theatre studies answers: the once-occurring, disappearing event that cannot be recorded. Economics answers: an investment path that organises persons into settleable productive capacity. Law answers: a structure of authorisation, compulsion and recognition. The three cannot hold together, yet all three silently assume that whether “a piece of education has occurred” is in principle adjudicable, disputing only who adjudicates. The material that overturns this assumption comes from theatre studies itself: a performance is constituted by a large body of repetitions which, by theatre studies' own ontology, are not performances at all, and which appear on no performance's ledger. This paper therefore proposes that education is neither the live occurrence, nor the settleable path, nor the recognisable qualification, but a body of repetitions that carry constitutive function <b>only while they remain off every ledger</b> — here termed <b>uncounted runs</b> — together with the stock differential between them and three counting apparatuses. The reading is <b>the zero-count ratio z</b>: the proportion of all runs a person performed in reaching their present state which yield no number on any ledger. A pre-registered empirical run on 8,400 pull requests across six public repositories is reported; <b>both principal hypotheses failed their pre-specified thresholds</b>, and 91% of first-time merged contributors show no visible uncounted runs at all — an adverse result that narrows the paper's scope and promotes “the field does not exist in current records” to its most robust claim.</p>
+<p><b>Keywords</b>　uncounted run; zero-count ratio; constitutive function; counting apparatus; ontology of education; formative assessment</p>
+<h2 id="c2">引言 · 一句问话的三种答法</h2>
+<p>「教育是什么」这个问题之所以难，不是因为答案少，是因为答案太多而且都对。</p>
+<p>把它拿去问三个互不来往的行当，会得到三个各自完整、各自有几十年文献支撑、而彼此无法并存的答案。这三个答案不是同一件事的三种说法——它们对同一个具体情形会给出相反的判断。一堂课，在戏剧学那里可能是教育的全部，在经济学那里可能什么也不是；一张文凭，在法律学那里就是教育本身，在戏剧学那里是教育死掉之后留下的壳。</p>
+<p>本文不打算在三者之间选一个，也不打算说它们「各有侧重、可以互补」。<b>三个答案能并列，恰恰说明它们共享着一个更靠底下的假定，而那个假定没有被说出来。</b> 本文要做的是把它找出来，用其中一家自己的材料把它推翻，然后说明推翻之后那个位置上剩下什么。</p>
+<p>路线是这样的：先让三家各自把最强的话说完（第一节），再说明它们为什么不能同时成立（第二节）；然后找出三家共同踩着的那句话（第三节），并用戏剧学自己的一件常识把它推翻（第四节）。第五节提出本文的那样东西，第六节给出辨别它的装置，第七节给出一句不含程度词的问话，第八节给出一个可以跨三个领域比较的读数。第九节报告一次真跑——两条预注册假设都没命中，而没命中的方式改了本文。此后各节处理兑现、限制、分界、边界、证伪、反噬、伦理与自反。</p>
+<h2 id="c3">一 · 三家各自最强的那一条</h2>
+<h3>一之一 · 戏剧学：教育是那当场发生、随即消失的一次</h3>
+<p>戏剧学在过去三十年里最锋利的一条主张，是关于<b>演出的存在方式</b>的。佩吉·费伦在《未标记：表演的政治》里写下的那一段，是这条主张最常被引用的原文：</p>
+<blockquote class="formula">「表演唯一的生命在当下。表演不能被保存、被记录、被文献化……一旦它这样做了，它就变成了表演之外的别的东西。」（Phelan, <i>Unmarked: The Politics of Performance</i>, Routledge, 1993, p. 146）</blockquote>
+<p>这不是一句关于技术条件的抱怨。它是一个本体论判断：<b>能被保存下来的那个东西，按定义就不是那个东西。</b> 录像不是演出的副本，录像是另一样东西；它可以很有价值，但它不是被记录的那件事。</p>
+<p>把这条主张移到教育上，得到的是一个极强的立场，而且它在教育领域内部有自己的传统。教育戏剧一脉的桃乐丝·希思科特把课堂处理成一次共同承担的当场事件，其效力来自参与者此刻真的处在那个处境里，不来自事后能复述什么。奥古斯托·博阿尔的《被压迫者剧场》（1979）把「观众」这个位置本身取消，理由同样是：只有当场成为行动者，那件事才发生。</p>
+<p>于是戏剧学的答案是：<b>看它当场做成什么样就够了。</b> 一堂课有没有发生教育，答案在那四十五分钟里，不在此后任何地方。教案不是它，录像不是它，成绩不是它，学历更不是它。</p>
+<p><b>这一家的时序读数</b>：教育的发生与它的观察是同一时刻的；错过了就没有第二次机会。</p>
+<h3>一之二 · 经济学：教育是一条把人组织成可结算生产能力的投资路径</h3>
+<p>经济学给的是完全不同形状的答案。加里·贝克尔在《人力资本》里把教育定义为一类<b>投资</b>：</p>
+<blockquote class="formula">「人力资本的投资，是那些通过把资源嵌入人身之中而影响未来实际收入的活动。」（Becker, <i>Human Capital: A Theoretical and Empirical Analysis</i>, 3rd ed., University of Chicago Press, 1993, ch. 2）</blockquote>
+<p>雅各布·明瑟把它做成了可估计的形式：收入的对数是受教育年限与工作经验的函数（Mincer, <i>Schooling, Experience, and Earnings</i>, NBER, 1974）。此后半个世纪的教育经济学，无论争论多激烈，都建立在同一个动作上——<b>把「教育」写成一条从投入经由积累到产出的路径，并在产出端结算。</b></p>
+<p>这条路径的每一段都有名字：入学是投入，在校时长是积累，毕业后的收入差是产出。整套装置的力量在于它可以被加总、被比较、被优化：一个国家可以问「多上一年学值多少」，一个家庭可以问「读这个专业划不划算」，一所学校可以问「这门课的边际贡献是多少」。</p>
+<p>于是经济学的答案是：<b>看它经由什么投入—积累—产出的路径被组织起来就够了。</b> 一次活动算不算教育，取决于它在这条路径上占哪一段；不占任何一段的，在这本账上不存在。</p>
+<p><b>这一家的时序读数</b>：教育的发生早于它的结算，且结算可以推迟很久——十年后的收入仍可用来倒推当年那笔投入的收益率。</p>
+<h3>一之三 · 法律学：教育是一套由授权、强制与承认构成的资格关系</h3>
+<p>法律学的答案既不看当场，也不看产出，它看的是<b>一整套让「教育」得以成立的条件</b>。</p>
+<p>这套条件的骨架写在国际法里。《经济、社会及文化权利国际公约》第十三条第一款：</p>
+<blockquote class="formula">「本公约缔约各国承认，人人有受教育的权利。」（联合国大会 1966 年第 2200A(XXI) 号决议，1976 年生效）</blockquote>
+<p>同一条第二款把初等教育写成<b>强制的、免费的</b>；这一句的法律形状很特别——它同时创设了一项权利与一项义务，而义务的承担者既包括国家也包括家长。此外还有一整套配套：教师在校期间的<b>代位亲权</b>（in loco parentis）、学校的注意义务与救济通道、学术自由的保障，以及最要紧的那一层——<b>资格的承认</b>。</p>
+<p>资格承认这一层近三十年被写成了可跨境操作的制度。欧洲资格框架把学习结果分为八级，其核心动作是让一国颁发的凭证在另一国被承认（Council Recommendation of 22 May 2017 on the European Qualifications Framework, 2017/C 189/03）。爱米·古特曼在《民主教育》里把这一层的政治问题说得最清楚：教育的核心争议不是「教什么好」，是<b>「谁有权决定教什么」</b>——教育权威在国家、家长与专业者之间如何分配（Gutmann, <i>Democratic Education</i>, Princeton University Press, 1987, ch. 1）。</p>
+<p>于是法律学的答案是：<b>看它接在哪一套授权、承认与强制的条件上就够了。</b> 一件事算不算教育，取决于它是否处在这套关系之中：有没有授权的施教者、有没有被强制或被允许的受教者、产生的结果能不能被承认、出了问题有没有救济。</p>
+<p><b>这一家的时序读数</b>：承认往往晚于发生，但承认一旦作出就极难撤回——信赖保护与既得权保护会把它固定下来。</p>
+<h3>一之四 · 三家各自自曝的那一处</h3>
+<p>按本文的选材规矩，每一家都要交出一处「我这条在什么情形下反而撑不住」。三家交出来的分别是：</p>
+<ul><li><b>戏剧学</b>：排练。它自己承认排练不是演出，而演出离了排练长不出来。这一处是第四节全部的材料来源。</li><li><b>经济学</b>：信号问题。迈克尔·斯彭斯指出，教育的一部分收益来自它<b>筛选并传递了本来就存在的差异</b>，而非它产生了什么（Spence, “Job Market Signaling,” <i>Quarterly Journal of Economics</i>, 1973, 87(3): 355–374）。若这一部分占比很大，那么「产出变了」就不能证明「教育发生了」——<b>这一家自己的工具会削掉自己的结算权。</b></li><li><b>法律学</b>：承认的不可逆。一个凭证的法律效力不因持有人后来忘光了而消灭。也就是说，法律承认的对象<b>不是那个学习本身，是那道程序</b>——这一家自己知道自己认的不是它宣称要认的东西。</li></ul>
+<h2 id="c4">二 · 三家为什么不能同时成立</h2>
+<p>三条主张不是三个角度，是三个互相取消的判据。逐对说明。</p>
+<p><b>戏剧学 × 经济学</b>。戏剧学的立身之本是「一过即逝、不可保存」；经济学的立身之本是「可积累、可结算」。经济学要算收益率，前提是那笔投资<b>留下来了</b>；戏剧学说，留下来的那个按定义不是它。若戏剧学对，教育经济学计算的是别的东西的收益率；若经济学对，戏剧学在谈一种不产生任何后果的经验，而那样的东西没有理由被叫作教育。<b>两者不能靠「兼顾过程与结果」调和</b>——它们对「教育有没有留下东西」这一件事给出的是相反的本体论回答。</p>
+<p><b>戏剧学 × 法律学</b>。法律学的整套装置建立在<b>可指认</b>之上：谁教的、教了多久、结果是什么、由谁承认。戏剧学说那一次的核心恰恰是不可指认的。两者对同一堂课会给出相反判断：一堂在法律上完全合规、有教案有课时有考核记录、而当场毫无发生的课，法律学判「教育已提供」，戏剧学判「什么也没发生」。反过来，一次在走廊上的十分钟对话彻底改变了一个人，法律学判「不是教育行为」（因而也不受教育法调整、不产生救济），戏剧学判「这就是教育」。</p>
+<p><b>经济学 × 法律学</b>。这一对表面上最像盟友——凭证正是经济学最常用的教育代理变量。但两者的判据在一个关键处相反。经济学承认<b>没有凭证的学习也可以有产出</b>——在职训练、干中学都写在贝克尔的书里。法律学则明确规定，<b>没有进入承认程序的学习不产生法律上的教育效果</b>：你在家自学到博士水平，法律上你没有学位。经济学能把它算进人力资本，法律学不能把它算进任何东西。<b>同一批实际发生的学习，一家算数，一家不算。</b></p>
+<p>三对全部冲突。这不是三种侧重，是三套互相排斥的裁定权。</p>
+<h2 id="c5">三 · 三家共同踩着的那句话</h2>
+<p>把三家的争论写成同一个句式，会得到这样一句：</p>
+<blockquote class="formula"><b>三家争的是：「一次教育发生了没有」该由谁来裁。</b></blockquote>
+<p>戏剧学说由当场那一次裁，经济学说由后来的产出裁，法律学说由承认程序裁。三家吵得很凶，而吵架本身暴露了一件三家都没说出口的事：</p>
+<blockquote class="formula"><b>三家共同踩着的那句话是：「一次教育发生了没有」是一件在原则上可以被裁定的事。</b></blockquote>
+<p>也就是说，三家共同假定了：<b>教育之发生是一个有确定归属的事件</b>——它总是某个人在某个时刻做的某件事，因而总能落到某本账上、被记成某一笔。三家的分歧只在这本账该由谁记、该记什么。</p>
+<p>验收方法很简单：把这句话念给三家听。三家都会说「这还用说吗」。戏剧学会说当然——它在那四十五分钟里；经济学会说当然——它在那条路径的某一段上；法律学会说当然——它在那道程序的某一步里。<b>没有一家会为这句话争论，这正是它是三家共同踩着的那句话而不是第四家立场的标志。</b></p>
+<p>这条前提的力量在于它塑造了整个提问方式。一旦接受「教育之发生是可裁定的」，剩下的一切工作就都变成了<b>改进裁定</b>：找更好的评价、更细的记录、更全面的框架、更公平的承认。过去半个世纪教育研究的绝大部分努力落在这条线上，而它们互相之间的争论越激烈，就越显得这条前提不需要被检查。</p>
+<h2 id="c6">四 · 推翻它的那件材料，来自戏剧学自己</h2>
+<p>推翻三家共同踩着的那句话的材料不能从外面搬。从外面搬来一个理由，得到的只是第四家立场——你加入了争论，没有取消它。要取消它，材料必须是三家之一<b>自己已经掌握、已经反复引用、只是从没往这个方向用过</b>的事实。</p>
+<p>这件材料在戏剧学手里，而且是这一行的常识。</p>
+<p>理查·谢克纳在《在戏剧与人类学之间》里提出，一切表演都是<b>复原行为</b>：</p>
+<blockquote class="formula">「复原行为是被当作一条胶片来处理的活的行为……复原行为是『在那儿的』，与『我』有距离。」（Schechner, <i>Between Theater and Anthropology</i>, University of Pennsylvania Press, 1985, p. 35）</blockquote>
+<p>他给出的那个短语被引用了四十年：表演是「<b>被做过两次的行为</b>」（twice-behaved behavior）。一次演出不是一次性的爆发，它是此前大量重复的最后一遍。</p>
+<p>关键在下一步，而这一步戏剧学自己从不含糊：<b>那些重复不是演出。</b> 按费伦的本体论，演出的存在方式是消失；按行业惯例，排练场里发生的事不进演出场次、不进票房、不进剧评、不进演出档案；一个演员在排练场里走过的第四十七遍，在任何一本关于这部戏的账上都不产生一个条目。它不是「记录得少的演出」，它<b>根本不算一次演出</b>。</p>
+<p>于是戏剧学同时持有两条它自己从未放在一起看的判断：</p>
+<ol><li>一次演出由此前大量重复构成（复原行为）；</li><li>那些重复不是演出（本体论与行业惯例双重确认）。</li></ol>
+<p><b>两条并置，三家共同踩着的那句话就塌了。</b></p>
+<p>因为如果构成一次演出的那些东西，本身按三家中任何一家的账都不构成「一次演出」，那么「一次演出发生了没有」这个问题的答案，就只能是关于<b>能进账的那一部分</b>的答案。而那一部分不是它的构成物。裁定装置裁的是<b>结果的呈现</b>，而构成它的那批东西从未进入裁定的对象范围。</p>
+<p>换到教育上，这句话的形状是：</p>
+<blockquote class="formula"><b>被裁定的永远是能进账的那一部分，而那一部分不是教育的构成物。三家争由谁裁，而三家要裁的那个东西，恰恰不是使它成为它的那个东西。</b></blockquote>
+<p>这不是说裁定没有用。裁定当然有用——它使资源可以分配、资格可以流通、责任可以追究。它只是不裁那件事。</p>
+<h2 id="c7">五 · 不计遍：本文说的那样东西</h2>
+<h3>五之一 · 命名与定义</h3>
+<p><b>不计遍</b>：一个人为达到当前状态而真实做过、而在任何一本账上都不产生一个条目的那一遍。</p>
+<p>它的三条构成性质，缺一条就不是它：</p>
+<p><b>其一，它真的做过。</b> 它不是缺席、不是空想、不是「本可以做而没做」。它是一次完整的执行——排练场里走完的那一遍，本地写完又删掉的那一版，值班时在旁边看完的那一台手术，作业本上撕掉的那两页。</p>
+<p><b>其二，它在所有账上都不产生条目。</b> 不是「在某一本账上不产生」——那太常见了，形成性评价不进成绩册、观摩不计学分、自学不发学历。不计遍的要求严格得多：<b>它不进成绩册、不计学时、不进教案、不产生工时、不写进档案、不构成可主张的法律事实、也不产生任何可被结算的产出。</b> 只要有一本账记了它一笔，它就不是不计遍了。</p>
+<p><b>其三，也是最要紧的一条——它的构成功能与它的不入账是同一件事的两面。</b> 不是「它恰好没被记，真可惜」；是<b>它一旦被记，它在这次教育里承担的那个功能就换了。</b></p>
+<p>第三条把本文与几乎全部相近的说法分开，因此必须说清它的机制。一个不进任何账的重复，它的执行者在做它的时候不面向任何裁定者。没有人会看这一遍，没有人会因这一遍给他一个数，这一遍的好坏不进入任何关于他的结论。正因如此，这一遍里可以发生几件在进账的那一遍里不可能发生的事。可以整段推翻重来而不必解释；可以故意做坏以看清坏在哪里；可以停在半途去追一个与目标无关的疑问；可以在同一处反复失败十次而不产生任何需要被承担的后果。这些动作合起来，正是把一个人从「能按要求做出结果」变成「知道这件事是怎么回事」的那批动作。</p>
+<p>一旦这一遍进了账，上面每一项都变了性质：推翻重来要解释，做坏要担责，追疑问要占用被计量的时间，失败十次会被读成能力不足。执行者不必改变意愿，<b>这一遍的结构本身已经变了</b>——它现在有了一个读者，而有读者的那一遍，是另一种遍。</p>
+<h3>五之二 · 承重命题</h3>
+<blockquote class="formula"><b>教育不是当场发生、随即消失的那一次；不是一条把人组织成可结算生产能力的投资路径；也不是一套由授权、强制与承认构成的资格关系。教育是一批必须不进任何账才承担构成功能的重复，与三套计数装置之间的存量差——而这个差在三家的账上都不构成一样东西。</b></blockquote>
+<p>三个否定各对应一家，且各自否定的是那一家的<b>裁定权</b>，不是那一家的观察：</p>
+<ul><li>对戏剧学：当场那一次是真的，但它是产物不是构成物；把它当作教育本身，等于把演出当作它的排练。</li><li>对经济学：那条路径是真的，但它结算的是产物；不计遍在投入端不计时、在产出端无对应项，<b>在这条路径上它的坐标是零</b>。</li><li>对法律学：那套资格是真的，但它承认的是程序；不计遍不产生任何可被承认的事实，因而在这套关系里<b>它不存在</b>——不是「不受保护」，是不构成法律上的一样东西。</li></ul>
+<h3>五之三 · 为什么删掉这个读数它就不在了</h3>
+<p>这一节回答一个必须回答的问题：本文说的是一样新东西，还是一样旧东西的新算法？</p>
+<p>判据是这样一句：<b>删掉本文提出的这个读数之后，那个东西是不是就不存在了？</b> 若它照样存在、只是不好测，那么本文做的是测量的改进；若它本来就不构成一样东西、是被这个读数造出来的，本文做的才是别的事。</p>
+<p>不计遍属于后者，理由不在于它难测，在于<b>它在三家的本体论里都不占一个位置</b>：</p>
+<ul><li>在戏剧学那里，它不是演出——演出的定义排除了它。</li><li>在经济学那里，它既不是投入（不计时、不计费、不构成资源配置的对象），也不是产出（不产生可结算的差额）。它在这本账上不是一个小额条目，是<b>没有条目</b>。</li><li>在法律学那里，它不产生任何法律效果——不能被主张、不能被救济、不能被承认、也不能被追责。它不是一个弱的法律事实，是<b>不是法律事实</b>。</li></ul>
+<p>三家不是「记录得少」，是<b>都不给它设字段</b>。它是被同时当成排练废料、非生产时间与法外事实的那一类东西。<b>在本文提出这个位置之前，它不是一样被忽视的东西，它不是一样东西。</b></p>
+<h2 id="c8">六 · 两根轴，四格，与一条阈值曲线</h2>
+<p>一个名字不构成辨别。要辨别，需要第二根轴。</p>
+<ul><li><b>轴一：这一遍进不进账。</b> 判据是机械的——执行完毕后，是否有任何一本账（成绩册、学时表、教案、工时记录、档案、凭证、法律文书）因它而增加一个条目。</li><li><b>轴二：这一遍承不承担构成功能。</b> 判据是事后的——把这一遍从这个人的历史中拿掉，他后来的状态会不会不同。</li></ul>
+<p><b>表 1 · 四格</b></p>
+<table class="tbl"><thead><tr><th></th><th><b>承担构成功能</b></th><th><b>不承担构成功能</b></th></tr></thead><tbody><tr><td><b>进账</b></td><td>① <b>正课</b>：被记了一笔，且拿掉它人会不同。学徒制里被师傅盯着做完并签字的那一台手术；一次真的把人改变了的公开答辩。</td><td>② <b>形式达成</b>：被记了一笔，而拿掉它人不会不同。学时凑满的选修课；为进档案而办的活动；把已经会的东西再演示一遍的过程性材料。</td></tr><tr><td><b>不进账</b></td><td>③ <b>不计遍</b>：没有任何一笔，而拿掉它人会不同。排练场的第四十七遍；被关掉的那个分支；值班时旁观的那一台；撕掉的那两页。</td><td>④ <b>闲耗</b>：没有任何一笔，拿掉它人也不会不同。真正的走神、重复已熟练动作的第一千次、纯粹的等待。</td></tr></tbody></table>
+<h3>六之一 · 那一格是格②，以及它的四条签名</h3>
+<p>本文要打的不是格④。格④（既不计也无效）人人看得见，不需要任何框架；一所学校若充满格④，督导第一天就发现了。</p>
+<p><b>那一格是格②：进账而不承担构成功能。</b> 它的性质是——<b>它通过全部形式审查</b>。四条签名逐条对照：</p>
+<p><b>签名一 · 它在短期指标上表现为改善。</b> 把格③收编成格②，出勤率上升、学时达成率上升、过程性记录完备度上升、家长可见度上升、督导评价上升。所有可报的数都在往好里走。</p>
+<p><b>签名二 · 它的失效不产生任何信号。</b> 一节格②的课与一节格①的课，在记录上完全一样：都有教案、都有课时、都有过程材料、都有考核结果。<b>没有任何现行程序会报告「这一笔是格②」</b>，因为区分它们需要的是一个反事实（拿掉这一遍人会不会不同），而没有一本账记反事实。</p>
+<p><b>签名三 · 它自我加固。</b> 一套记录制度越正规、覆盖越全、留痕越完整，它能收编的格③就越多；而每一次收编都在指标上表现为进步，因而带来继续加密的理由。<b>正规化的方向是单向的：它把格③变成格②，而不是变成格①。</b></p>
+<p><b>签名四（本文补，且它是最容易被误诊的一条）· 它的受害者说不出自己受了什么损失。</b> 一个人被剥夺的是「本来会发生而现在不会发生的那些变化」，而那是反事实，他没有对照组。他能报告的只是一种模糊的感觉——课上得很满，什么也没留下。这种报告在任何评估体系里都会被归入主观感受而降权处理。</p>
+<p><b>四条签名各配一条误诊阻挡</b>（避免把任何不顺眼的东西都判进那一格）：</p>
+<ul><li>若某一格在短期指标上就已经难看 → 它不是格②，是格④，别用本文的框架。</li><li>若某一次失效当场就有人报错（学生投诉、考核不通过、事故） → 那是格①的失败，不是格②。</li><li>若加强记录之后该项指标不升反降 → 这一处不在自我加固回路里，本文的机制不适用。</li><li>若当事人能具体说出「本来会发生的是什么」并给出可核对的对照 → 那已经不是反事实缺失，按常规评估处理即可。</li></ul>
+<h3>六之二 · 一条阈值曲线，而不是「越多越好」</h3>
+<p>必须立刻堵掉一个自然的误读：本文<b>不主张零计比越高越好</b>。</p>
+<p>不计遍与构成功能之间的关系不是单调的。零计比为零时，全部重复都在账上，格③被清空，教育退化为格①与格②的组合，而格②会随正规化不断膨胀。零计比接近一时，没有任何一遍进账，也就没有任何一遍指向一个被计数的完成——第十一节会说明，戏剧学自己会反过来指出：排练之所以有效，恰恰因为<b>它指向一个被计数的首演</b>；没有首演的排练会散掉。</p>
+<p>因此本文主张的形状是一条<b>倒 U</b>：构成功能随零计比先升后降，两端各有一个不同的失效机制——低端是收编，高端是失锚。本文不给出这条曲线的形状参数，因为本文没有数据支持任何具体的形状；本文只主张<b>两端的失效机制不同</b>，这一条是可被证伪的（见第十六节）。</p>
+<h2 id="c9">七 · 一句不含程度词的问话</h2>
+<p>一个辨别装置若只能用来讨论，它就还没落地。落地的标志是：能写出一句不含任何程度词、可以直接拿去问流程文件与日志的问话。</p>
+<blockquote class="formula"><b>这个人为达到现在这个样子而做过的那些遍里，有多少遍在任何一本账上都不产生一个数？</b></blockquote>
+<p>这句话里没有「应当」「充分」「真正」「实质性」「有意义」。它问的是账本，不是判断。</p>
+<p>它在五个具体场所里给出的是五个互不相同的答案：</p>
+<p><b>场景一 · 一所把课外活动全部纳入综合素质评价档案的中学。</b> 答案接近于零——这正是该校的制度目标。每一次社团、每一次志愿服务、每一次读书分享都产生一个条目。<b>这个答案是设计出来的，而本文的判断是：该校格③已被清空，其格②的比重必然高于同类学校。</b></p>
+<p><b>场景二 · 一个话剧排练场。</b> 答案接近于一。一部两小时的话剧，首演前的排练通常在两百至四百小时之间；进入演出记录的只有演出的那几场。按遍次算，不进账的遍次占九成以上。<b>这个答案不是设计出来的，是这一行几百年的默认状态</b>——而它至今没有被当作一个需要被保护的结构。</p>
+<p><b>场景三 · 住院医师的一次夜班。</b> 答案落在中间，且<b>这个答案是查出来的，不是想出来的</b>：现行的住院医师规范化培训手册以「操作例数」为核心记录单位，签字的操作进手册，旁观与协助通常不进。也就是说，同一个夜班里，「看完整台手术」这件事在培训档案上是零。<b>这一处反过来改了本文</b>——本文原本设想不计遍主要是「私下练习」，而这一例说明它同样大量存在于<b>有人在场、有监督、甚至是制度安排的活动</b>之中，只是那个活动的记录单位不数它。定义因此从「私下的重复」放宽为「不产生条目的重复」，这是本节对第五节定义的一次修订。</p>
+<p><b>场景四 · 一个开源项目的新贡献者。</b> 答案可以被真正算出来，第九节报告这次计算。<b>而这一处也反过来改了本文</b>：真跑显示，91% 的首次入账者在公开记录上<b>完全没有可见的不计遍</b>——他们的第一次提交就被合并了。本文原本预期不计遍在这类场所普遍可见；实测说明可见的只是极小一部分，绝大多数发生在提交之前（本地实验、读别人的代码、看讨论），而那些在公开记录里没有字段。<b>本文的适用范围因此收缩</b>，见第九节与第十五节。</p>
+<p><b>场景五 · 一名把练琴时长记入打卡表并与奖励挂钩的琴童。</b> 答案接近于零。而按本文的判断，这不是「记录得更好了」，是<b>格③被整体搬进了格②</b>——练习照做，甚至时长上升，而每一遍的结构已经变了：它现在有读者。第十二节的分界会说明，这一预测与过度理由效应的预测方向不同，因而两者可以被分开检验。</p>
+<p>五个答案互不相同；其中场景三与场景四是查出来的，且都反过来修改了本文——一处放宽了定义，一处收缩了适用范围。</p>
+<h2 id="c10">八 · 零计比：一个跨三领域可比的读数</h2>
+<h3>八之一 · 定义</h3>
+<blockquote class="formula"><b>零计比 z ＝ 一个人（或一次教养过程）为达到当前状态而做过的全部遍次中，在任何一本账上都不产生一个条目的遍次所占的比例。</b></blockquote>
+<p>三个领域里它的量纲完全不同，而比率是同一个：</p>
+<ul><li><b>戏剧</b>：从开排到首演走过的全部遍次中，不被记为一场演出的比例。</li><li><b>经济</b>：一个人形成某项生产能力的全部练习中，不计入任何工时、学时、培训记录或报酬的比例。</li><li><b>法律</b>：一个人取得某项资格的全部准备行为中，不产生任何可被主张、可被承认、可被救济的法律效果的比例。</li></ul>
+<h3>八之二 · 它与既有主要指标正交</h3>
+<p>这一条必须用一个具体例子兑现，否则这个读数会被立刻读成某个现有指标的代理。</p>
+<p><b>既有指标最好看、而零计比最难看的那个真实例子</b>：一所把学生全部学习时间都学分化、全程记录、每一次练习都进过程性档案的学校。它的出勤率、学时达成率、过程性评价覆盖率、家校沟通完备度全部接近满分——按现行任何一套教育质量指标，它都是优等。而它的零计比接近零。</p>
+<p><b>反过来</b>：一个不进任何机构的自学者，所有既有指标为零（无出勤、无学时、无过程材料、无凭证），而零计比接近一。</p>
+<p>两个例子说明 z 与既有主要指标不仅不相关，而且在这两个端点上<b>方向相反</b>。它因此不是任何一个既有指标的代理。</p>
+<h3>八之三 · 清点手册</h3>
+<p>一个读数若没有写死粒度与编码规则，它就还不是读数。本文的手册如下，全文三处（正文、证伪条款、赌注）引用同一份。</p>
+<p>    读数名：零计比　符号：z     定义：不产生任何账本条目的遍次数 ÷ 全部遍次数（N 的取法：以一个可指认的           能力目标为界，从该人首次为此目标执行相关动作起，至该目标被某本账           确认达成止）     粒度：什么算「一遍」——一次有起止、可被旁观者指认为完整执行的动作序列。           边界例：一次被中途放弃的执行算不算？算，只要它已进入执行（已开始，           非仅计划）。一次连续三小时的练习算几遍？按其内部可指认的完整执行           次数计，不按时长计。     编码规则：       1. 「产生条目」＝任一本账因它增加一条可指认记录，含成绩册、学时表、          教案、排班/工时、档案、凭证、法律文书、公开可查的项目记录。       2. 口头表扬、私下反馈、他人记忆，不算条目（不可事后清点）。       3. 同一遍在多本账上各记一笔，仍只计为一遍「进账」。       4. 记了但记的是别的东西（如只记了在场，未记该次执行），仍算进账。       5. 无法确定是否有账记录的，单列为「不可判」，不计入分子与分母，          并报告其占比。     表头：｜人/过程 ｜ 目标 ｜ 起 ｜ 止 ｜ 总遍次 ｜ 进账遍次 ｜ 不计遍次 ｜           不可判 ｜ z ｜ 主要账本清单 ｜     不适用：无法指认「一遍」的连续性活动（如长期共同生活中的濡染）；             目标本身不可指认的过程。     本篇三处引用一致性自查：正文 §八之三 ＝ 证伪 §十六 ＝ 赌注 §二十　✅</p>
+<h3>八之四 · 一个次序读数</h3>
+<p>比率之外，本文另给一个次序读数，它比比率便宜得多，而且在很多场所可以直接查到：</p>
+<blockquote class="formula"><b>首计序 k ＝ 这个人为该目标做过的第几遍，是第一次产生账本条目的那一遍。</b></blockquote>
+<p>k = 1 表示第一遍就进账（该场所不给不计遍留位置）；k 越大，表示在被记之前允许走过的遍数越多。第九节的真跑用的正是这个读数的一个可观测代理。</p>
+<h2 id="c11">九 · 一次真跑：8,400 个拉取请求，两条预注册假设都没命中</h2>
+<h3>九之一 · 为什么跑这个</h3>
+<p>第八节的读数若全是纸面的，本文就只证明了自己想清楚了。因此在成文之前，本文用公开数据把最便宜的那一条跑通了一遍——<b>并把不利结果写进这一节，因为不利结果比有利结果更改变了本文。</b></p>
+<p>选开源代码仓，理由有三：它是少数几个<b>不计遍留下了可见痕迹</b>的场所之一（被关闭而未合并的提交仍在公开记录里）；它的全部数据公开可复算；而它恰好是一个典型的学徒式学习场所——新贡献者主要通过反复提交与被拒来学会这个项目的规矩。</p>
+<p>预注册文件在跑任何统计之前写定并封存，SHA-256 为 `04b33c6eefadb48c43d672983c02f8a326c7795ca7026e938ed60a9e2a8132b2`。全部读数定义、三条假设、判定阈值、竞争解释的控制方式与撤销规则都写在里面，跑完之后一处未改。</p>
+<h3>九之二 · 口径</h3>
+<ul><li><b>一遍</b> ＝ 一次拉取请求（pull request），无论结果。</li><li><b>进账遍</b> ＝ 被合并者。它在提交历史、贡献者统计、发布说明上产生条目。</li><li><b>不计遍</b> ＝ 被关闭而未合并者。它在提交历史上不产生条目，贡献者统计不计它。</li><li><b>零计比 z</b>（仓库层）＝ 不计遍数 ÷ 已结束的全部遍数。</li><li><b>前拒次数 r</b>（人层）＝ 该贡献者首次被合并之前的不计遍数。</li><li><b>此后入账数 m</b>（人层）＝ 首次被合并之后的被合并次数。</li></ul>
+<p>机器人账号全部排除。数据取自六个公开代码仓的全部拉取请求（按创建时间自最早起），合计 <b>8,400 个</b>。</p>
+<h3>九之三 · 仓库层：零计比在 0.17 到 0.39 之间</h3>
+<p><b>表 2 · 六个仓库的零计比</b></p>
+<table class="tbl"><thead><tr><th>仓库</th><th>已结遍次</th><th>进账</th><th>不计遍</th><th><b>z</b></th><th>留存率</th><th>贡献者</th></tr></thead><tbody><tr><td>requests</td><td>1400</td><td>973</td><td>427</td><td><b>0.305</b></td><td>0.274</td><td>441</td></tr><tr><td>flask</td><td>1400</td><td>860</td><td>540</td><td><b>0.386</b></td><td>0.200</td><td>481</td></tr><tr><td>black</td><td>1310</td><td>1085</td><td>225</td><td><b>0.172</b></td><td>0.222</td><td>369</td></tr><tr><td>fastapi</td><td>1385</td><td>894</td><td>491</td><td><b>0.355</b></td><td>0.275</td><td>309</td></tr><tr><td>httpx</td><td>1261</td><td>991</td><td>270</td><td><b>0.214</b></td><td>0.292</td><td>192</td></tr><tr><td>scrapy</td><td>1371</td><td>937</td><td>434</td><td><b>0.317</b></td><td>0.322</td><td>230</td></tr></tbody></table>
+<p>零计比中位数 <b>0.311</b>，区间 0.172–0.386。<b>这是本文这个读数第一次被真的算出来</b>：在这一类场所，接近三分之一的遍次不产生任何条目。</p>
+<h3>九之四 · 三条预注册假设的下场</h3>
+<p><b>H1（本文最愿意押的那一条）</b>：首次入账之前有过不计遍的人（r ≥ 1），其此后入账数 m 的<b>中位数高于</b>从未有过不计遍的人（r = 0）。判定阈值：中位数差 ≥ 1 且单侧 p \&lt; 0.05。</p>
+<p>实测：r ≥ 1 组 185 人，m 中位数 <b>0.0</b>，均值 4.52；r = 0 组 1837 人，m 中位数 <b>0.0</b>，均值 1.57。中位数差 <b>0.0</b>。</p>
+<p><b>按预注册阈值，H1 不命中。</b></p>
+<p>必须同时报告的是：Mann–Whitney 检验 z = 4.942，单侧 p = 3.9 × 10⁻⁷，两组分布的差异极其显著；均值相差 2.9 倍。<b>方向与本文一致，而事先写死的那个阈值判它不命中。</b></p>
+<p>这一处的教训要写清楚，因为它改了本文：<b>m 的分布是零膨胀的</b>——大多数人在首次入账之后再没有第二次，两组的中位数都是 0，中位数对这个分布没有分辨力。<b>我在写预注册时选错了统计量。</b> 按纪律，本文不改阈值重跑，不把这条改判为命中；这条假设按写死的口径就是不命中。事后描述（明确标注为非预注册）为：「首次入账之后还有第二次」的比例，r ≥ 1 组是 <b>0.432</b>，r = 0 组是 <b>0.236</b>，比值 1.83。这个描述可供后续研究预注册，<b>但它不是本次的检验结果</b>。</p>
+<p><b>H2（剂量—反应）</b>：在 r ≥ 1 的人群内，r 与 m 正相关，阈值 ρ ≥ +0.15 且 p \&lt; 0.05。</p>
+<p>实测 ρ = <b>+0.075</b>，p = 0.31，n = 185。<b>不命中。</b></p>
+<p>这一条的不命中比 H1 更有内容：<b>它直接否定了「不计遍越多越好」。</b> 本文第六节之二那条倒 U 主张，在这一处得到的不是支持，是「至少在这一段上不是单调的」——而这正是本文明确拒绝主张单调关系的理由所在。若本文原本打算写「零计比越高构成功能越强」，这条数据会当场推翻它。</p>
+<p><b>H3（零计比不是垃圾率）</b>：仓库层 z 与贡献者留存率不为强负相关（若 ρ ≤ −0.6 则第一层主张撤回）。</p>
+<p>实测 ρ = <b>−0.143</b>，p = 0.80，n = 6。<b>撤销规则未触发</b>，但必须写明：n = 6 几乎没有检验力，这一条<b>没有通过检验，只是没有触发撤销</b>。两者不是一回事。</p>
+<h3>九之五 · 竞争解释的控制</h3>
+<p>最强的竞争解释是那句最朴素的话：<b>「其实不就是投入度差异吗——愿意反复提交的人本来就更投入，所以后来贡献也多。」</b></p>
+<p>预注册的控制方式是分层重做 H1。两套分层：</p>
+<p><b>按「首次提交到首次入账的等待天数」（投入与耐心的代理）四分层</b>：最短的一层因切点落在 0 天而无有效样本，不判；其余三层中，<b>一层消失（p = 0.16），两层仍成立</b>（p = 0.024 与 p = 2.2 × 10⁻⁷）。</p>
+<p><b>按项目阶段（该次入账在该仓库全部遍次中的位置）四分层</b>：<b>四层中三层仍成立</b>（p = 6.6 × 10⁻⁵、0.00096、0.0063），一层消失（p = 0.080）。</p>
+<p>按预注册的判定（「若控制后 H1 在多数层内消失，则竞争解释足以解释全部差异」），<b>多数层内消失这一条件未被满足</b>——差异在多数层内仍在。但这不构成对本文的支持，因为 H1 本身按阈值就没命中；能说的只有一句：<b>这个差异不能被单一的投入度差异完全吸收。</b></p>
+<h3>九之六 · 最重的那个不利结果，以及它改了什么</h3>
+<p>真跑给出的最重一条不在三条假设里：</p>
+<blockquote class="formula"><b>2022 名有过入账的贡献者中，1837 人（91%）的前拒次数为零</b>——他们的第一次提交就被合并了。有 1 次的 141 人，2 次的 29 人，3 次及以上的 15 人。</blockquote>
+<p>也就是说，<b>在这份可观测的记录里，绝大多数入账者根本没有可见的不计遍。</b></p>
+<p>本文原本预期这一类场所的不计遍普遍可见。实测说明可见的只是极小一部分。合理的解释是：真正的不计遍绝大多数发生在<b>提交之前</b>——本地写完又删掉的版本、读别人代码、看历史讨论、在自己的分支上试了又推翻。这些在公开记录里<b>没有字段</b>。第九节能测到的，只是不计遍浮出水面的那一角。</p>
+<p>三处修订，都是这条结果逼出来的：</p>
+<ol><li><b>适用范围收缩</b>：本文的读数只在「不计遍留下痕迹」的场所可算。在绝大多数教育场所，z 目前<b>不可测</b>，因为记录里没有那个字段。</li><li><b>代理变量的诚实声明</b>：「被关闭未合并」代理「不计遍」是不完全的——其中混有明确无效的提交（重复、误开、垃圾），本文未做人工剔除，因此 H1 与 H2 的不命中<b>无法区分「本机制不成立」与「噪声稀释」</b>。</li><li><b>第三层主张被提上来</b>：既然这个字段在多数记录里不存在，那么本文最稳的一层主张不是关于不计遍的功能，而是关于<b>记录本身</b>——见第二十节。</li></ol>
+<h2 id="c12">十 · 十二处跨领域兑现</h2>
+<p>兑现不是打比方。兑现的判据是：<b>在那个领域里能据此预测出一件具体的、可查的事。</b></p>
+<ol><li><b>住院医师培训</b>。培训手册以签字的操作例数为核心记录单位，旁观与协助不计。预测：以操作例数为唯一考核口径的项目，其住院医师的旁观时长会系统性低于以时段为口径的项目——<b>因为不计入的活动会被挤出时间表</b>。</li><li><b>音乐教育</b>。将练琴时长纳入打卡并与奖励挂钩之后，本文预测练习频次不下降甚至上升，而<b>在陌生曲目上的视奏迁移表现下降</b>。这条与过度理由效应的预测方向不同（第十二节）。</li><li><b>软件工程</b>。把「实验性分支」纳入绩效统计的团队，其分支数会上升而<b>分支的平均存活时间下降</b>——被计数的分支会被尽早合并或删除以求好看。</li><li><b>法学教育</b>。模拟法庭的准备过程不产生任何可被主张的法律事实，因此它是纯粹的格③。预测：把模拟法庭的准备过程纳入学分与评价之后，学生在准备阶段的争议性主张（明知会输而要试的那一类）会减少。</li><li><b>戏剧</b>。把排练过程做成公开直播或纪录片素材的剧组，其排练中的整段推翻次数会下降——<b>因为推翻现在有观众</b>。</li><li><b>手工技艺传承</b>。以「作品数量」为承认单位的传承体系，其学徒的废件率报告会低于实际废件率；而废件恰恰是格③的物质形式。</li><li><b>科研训练</b>。把「失败的实验」纳入实验记录本审查的实验室，其记录本上的失败会变得规整而可解释——<b>可解释的失败是格②，不可解释的失败才是格③</b>。</li><li><b>体育训练</b>。把训练中的每一次尝试纳入可穿戴设备记录并进入队内排名之后，预测运动员在训练中主动尝试新技术动作的次数下降。</li><li><b>语言学习</b>。把口语练习纳入自动评分之后，预测学习者的句法冒险度（尝试未掌握结构的比例）下降，而流利度指标上升——<b>两个指标反向，而只有后者被报告</b>。</li><li><b>企业内训</b>。把在岗的非正式请教纳入知识管理系统并计入绩效之后，预测请教的次数上升而<b>请教的问题难度下降</b>——难的问题不适合被记录。</li><li><b>开源社区</b>。本文第九节的实测：六个仓库的零计比在 0.17 至 0.39 之间；预测采用更严格的贡献者门槛（如强制 CLA 与预审）的项目，其零计比会<b>下降</b>，且新贡献者的首次入账序 k 会<b>趋近于 1</b>。</li><li><b>司法实务中的教育救济</b>。因为格③不产生法律事实，一个在不计遍中受到伤害的学生（例如在无记录的额外训练中受伤）在举证上处于结构性劣势。预测：教育侵权案件中，发生在<b>有记录活动</b>中的案件胜诉率显著高于发生在无记录活动中的案件——<b>而这一差别不来自事实本身，来自记录制度</b>。</li></ol>
+<h2 id="c13">十一 · 三家反过来给本文加的限制</h2>
+<p>三家不是本文的材料库，它们各自削掉了本文原本打算主张的一句话。</p>
+<h3>十一之一 · 法律学削掉的：价值排序</h3>
+<p>本文原本会写下的那句更强的话是：<b>「应当保留并扩大不计遍。」</b></p>
+<p>法律学否掉了它，理由是这一行的常识：<b>不入账等于无救济。</b> 一个在任何账上都不留痕的重复，一旦其中出了事——受伤、被欺凌、被无偿占用劳动、被超时强制——受害者没有可主张的事实，没有可追责的主体，没有可援引的程序。教育法之所以要求记录，一大半理由不在评价，在保护。</p>
+<p>这一处<b>动的是本文的价值排序</b>，不是补充条件。本文的主张因此从「应当保留不计遍」限缩为：</p>
+<blockquote class="formula"><b>只有在已经存在独立于教育记录的安全与救济通道的场所，才谈得上保留零计比。</b> 在没有这类通道的场所，收编格③是正确的，代价是构成功能的损失——而这个代价应当被明说，不应被当作没有。</blockquote>
+<h3>十一之二 · 经济学削掉的：普遍性</h3>
+<p>经济学指出一件本文不愿面对的事：<b>不入账的时间在资源分配上等于免费劳动。</b></p>
+<p>零计比高的领域——戏剧、医学规培、开源、艺术、学术——其不计遍的成本全部由个人承担。谁承担得起？有余裕的人。没有余裕的人必须让每一小时都产生可结算的东西。于是高零计比的领域会系统性地筛掉经济上脆弱的人，<b>而这个筛选不出现在任何招生或招聘的记录里</b>。</p>
+<p>这一处削掉的是本文主张的普遍性：<b>保留零计比在分配上不是中性的</b>，它会把入门门槛转移到家庭资源上。本文不能主张「所有教育场所都应提高零计比」；能主张的只是：<b>在决定是否收编格③时，把构成功能的损失与分配的代价一起摆上桌</b>，而现在只有后者被摆上桌，前者根本不在议程里。</p>
+<h3>十一之三 · 戏剧学削掉的：构成的完整性</h3>
+<p>戏剧学的削法最有意思，因为它削的是本文的机制本身。</p>
+<p>戏剧学会说：<b>排练之所以有效，不只是因为它不计数，还因为它指向一个被计数的终点——首演。</b> 没有首演的排练会散掉：动作会漂移，标准会松弛，参与者会失去校准的依据。一个只有格③而没有格①的教养过程不会产生构成功能，它会产生格④。</p>
+<p>这一处逼出了第六节之二那条倒 U，也逼出了本文一句必须补上的话：</p>
+<blockquote class="formula"><b>不计遍的构成功能依赖于存在一个它所指向的、被计数的那一次。</b> 格③不是格①的替代品，是格①的构成物；两者的比例才是问题，任何一端为零都失效。</blockquote>
+<p><b>若没有这一处，本文原本会写下一句更强而且更错的话</b>：「教育的本质在不被计数的那一部分」。那句话漂亮，而且经不起戏剧学自己那一行的经验。</p>
+<h2 id="c14">十二 · 与最近的几种说法的分界</h2>
+<p>本文最容易被读成某个既有概念的改名。逐条处理，每条给出判定形式：<b>若观察到 X 则本文对而该概念错；若观察到 Y 则反之。</b></p>
+<h3>1 · 形成性评价（Scriven 1967；Black &amp; Wiliam 1998）—— 最危险的一位</h3>
+<p><b>它说到哪一步</b>：形成性评价的定义就是「不计入总结性成绩的评价」，其效力被认为恰恰来自不计分——降低焦虑、鼓励试错、把注意力从表现转向学习。这是教育实务共同体用了半个世纪的说法，且证据充分。</p>
+<p><b>分离线</b>：形成性评价管的是<b>评价这一个动作</b>在<b>成绩这一本账</b>上不计分。而形成性评价本身<b>是被安排的</b>：它进教案、进教学设计、占用被计量的课时、由被计工时的教师执行。按本文的编码规则，它是<b>格②或格①，不是格③</b>——它在别的账上计得清清楚楚。本文说的不计遍在<b>所有</b>账上都不产生条目，包括教案与工时。</p>
+<p><b>判定形式</b>：取两组学生，一组把形成性评价改为计分（其余不变），另一组把某类<b>完全不进任何账的自发重复</b>制度化收编（进教案、计工时、但仍不计分）。 - <b>若第一组表现下降而第二组不变</b> → 关键变量是「计不计分」，形成性评价的说法对，本文错。 - <b>若第二组也下降，且下降幅度与是否计分无关</b> → 关键变量是「进不进账」而非「计不计分」，本文对。</p>
+<h3>2 · 过度理由效应（Lepper, Greene &amp; Nisbett 1973）</h3>
+<p><b>它说到哪一步</b>：给一个本来自发的行为加上外部奖励，行为的内在动机被削弱，撤去奖励后行为频次下降（<i>Journal of Personality and Social Psychology</i>, 28(1): 129–137）。</p>
+<p><b>分离线</b>：这一条管的是<b>动机与频次</b>——人不想做了。本文管的是<b>这一遍的构成地位</b>——人照做，甚至做得更多，而这一遍在教育中承担的功能换了格。两者的预测在一个具体点上分开。</p>
+<p><b>判定形式</b>：把某类不计遍收编进账（记录但不给奖励，也不给惩罚）。 - <b>若行为频次下降</b> → 过度理由效应的机制在起作用（尽管本例无奖励，可推广版本仍可解释）。 - <b>若行为频次不变或上升，而同一批人在陌生任务上的迁移表现下降</b> → 本文对：频次没变，功能变了。<b>这个组合是过度理由效应预测不出来的</b>，因为它的因变量是频次。</p>
+<h3>3 · 非正式学习与前期学习认证（Marsick &amp; Watkins 1990；CEDEFOP 的 validation 指南）</h3>
+<p><b>它说到哪一步</b>：存在大量发生在正规体系之外的学习，它没有被承认，因此应当建立机制把它认下来。整个前期学习认证（RPL/APEL）实务领域就是干这个的，已有三十年制度实践。</p>
+<p><b>分离线</b>：这一支的处方是<b>扩大承认范围</b>——把没被认的认下来。本文的判断与它<b>方向相反</b>：不计遍的构成功能与它的不入账是同一件事，<b>认下来它就不是它了</b>。RPL 认的是「已经形成的能力」，这一点本文不反对；但 RPL 若把「正在形成的那些遍」也纳入记录（例如要求学习者提交学习日志作为认证材料），本文预测那些遍的构成功能下降。</p>
+<p><b>判定形式</b>：对同一批自学者，一组只在<b>结果端</b>做认证（考核已形成的能力，不问过程），一组要求<b>过程端</b>留痕（提交学习日志、时长记录作为认证材料）。 - <b>若两组的能力形成速度与迁移表现无差异</b> → 本文错，留痕不改变构成功能。 - <b>若过程端留痕组的能力形成速度不低而迁移表现更差</b> → 本文对。</p>
+<h3>4 · 隐性课程（Jackson 1968）</h3>
+<p><b>它说到哪一步</b>：学校在正式课程之外还教了大量东西——排队、等待、服从、竞争——这些没有写进课表却被有效地学会了（<i>Life in Classrooms</i>, Holt, Rinehart &amp; Winston, 1968）。</p>
+<p><b>分离线</b>：隐性课程说的是「<b>没写进课表而仍在教学之内</b>」的内容；它的载体（上课、排队、点名）本身全部在账上。本文说的是「<b>根本不进任何账</b>」的那一类遍次。隐性课程是关于<b>教了什么</b>的判断，本文是关于<b>哪些遍算数</b>的判断。</p>
+<p><b>判定形式</b>：一所把隐性课程显性化（写进培养目标与评价指标）的学校。 - <b>若显性化之后那些内容仍被有效习得</b> → 隐性课程可被显性化，与本文的收编机制无关。 - <b>若显性化之后指标达成而实际习得下降</b> → 那部分隐性课程原本是格③，本文的机制适用。</p>
+<h3>5 · 合法的边缘性参与（Lave &amp; Wenger 1991）</h3>
+<p><b>它说到哪一步</b>：新手通过在实践共同体边缘的合法参与逐步成为核心成员，学习是参与结构的变化，不是知识的传递（<i>Situated Learning</i>, Cambridge University Press, 1991）。</p>
+<p><b>分离线</b>：这一支把「参与」当作已经成立的起点——边缘参与也是参与，它在共同体的社会账本上是有位置的（新手就是新手，这个位置本身被承认）。本文说的那一类遍次<b>连边缘位置都没有</b>：它不产生任何条目，共同体不知道它发生过。</p>
+<p><b>判定形式</b>：观察一个新贡献者被拒绝的提交。按合法边缘性参与，被拒绝的提交是一次边缘参与，它在共同体内被看见并被回应；按本文，它是不计遍，因为它不进任何账。<b>两者对第九节那份数据给出相反评价</b>：合法边缘性参与会把 427 个被关闭的提交读作「427 次成功的边缘参与」，本文读作「427 次不进账的遍」。若这些被拒者此后的留存率与被拒次数无关（实测 ρ = +0.075，不显著），<b>合法边缘性参与的读法在这份数据上更难成立</b>——因为它预测被看见的边缘参与应当导向更深的参与。</p>
+<h3>6 · 刻意练习（Ericsson, Krampe &amp; Tesch-Römer 1993）</h3>
+<p><b>它说到哪一步</b>：专家水平来自大量有明确目标、即时反馈、超出舒适区的刻意练习（<i>Psychological Review</i>, 100(3): 363–406）。</p>
+<p><b>分离线</b>：刻意练习的定义<b>要求有反馈</b>，而反馈通常来自一个观察者或一套记录。本文说的不计遍<b>恰恰不产生反馈条目</b>。两者不是同一类东西：刻意练习是高强度的格③或格①（视是否被记录而定），而本文关心的是<b>那些没有目标、没有反馈、不产生任何条目的重复</b>——按刻意练习的框架，它们是「无效练习」。</p>
+<p><b>判定形式</b>：把某人的练习分为有反馈与无反馈两类，分别计时。 - <b>若拿掉无反馈的那一部分，后续表现不变</b> → 刻意练习对，无反馈的重复确实无效，本文的格③在这一域内是格④。 - <b>若拿掉之后表现下降</b> → 那些重复承担了构成功能，而刻意练习的框架看不见它们。</p>
+<h3>7 · 目标置换与古德哈特定律（Merton 1940；Goodhart 1975）</h3>
+<p><b>剥到形式层</b>，本文的机制是「<b>一个东西一旦被计数，它承担的功能就变了</b>」。这个纯形式的结构在上游有名字，必须点出来。</p>
+<p>罗伯特·默顿的目标置换：科层制中手段被当成目的，规则的遵守取代了规则要服务的目标（“Bureaucratic Structure and Personality,” <i>Social Forces</i>, 1940, 18(4): 560–568）。古德哈特定律：一旦某个测度成为目标，它就不再是好测度。坎贝尔定律说的是同一件事在社会决策上的版本。</p>
+<p><b>分离线</b>：这三条管的是<b>已经在账上的那个指标</b>如何退化——被计数之后，人朝着指标优化，指标与它要代表的东西脱钩。本文管的是<b>尚未在账上的那一类东西</b>在被纳入账本的那一刻发生了什么。差别是：目标置换的前提是这个东西已经有一个测度；本文说的那一类<b>在被纳入之前没有测度、也没有位置</b>。</p>
+<p><b>判定形式</b>：观察一次收编的后果。 - <b>若收编之后出现的是「朝指标做假」（数字好看而实质不变）</b> → 目标置换的机制，与本文无关。 - <b>若收编之后出现的是「行为照做、数字真实、而功能消失」</b> → 这不是做假，是格的变化，目标置换解释不了。</p>
+<h3>8 · 默会知识（Polanyi 1966）</h3>
+<p><b>它说到哪一步</b>：「我们知道的比我们能说出来的多」（<i>The Tacit Dimension</i>, Doubleday, 1966, p. 4）。有一类知识无法被完全言说，因而无法被完全传递为命题。</p>
+<p><b>分离线</b>：默会知识说的是<b>知识的可言说性</b>；本文说的是<b>遍次的可记账性</b>。一个高度可言说的知识（如某条规则）同样可以在不计遍中被学会；一个默会知识也完全可以在进账的活动中被传递（师傅带徒弟，全程有记录）。两者交叉而不重合。</p>
+<p><b>判定形式</b>：取一项完全可言说、可写成清单的技能（如某个软件的提交规范）。 - <b>若它在不计遍与进账遍中的习得效果相同</b> → 本文的机制对可言说知识不适用，本文应限缩到默会部分。 - <b>若即使这类完全可言说的技能，其习得也依赖不计遍</b> → 本文与默会知识是两条独立的线。（第九节的对象——项目的提交规范——正属于高度可言说的一类，本文因此有理由主张两条线独立，但这一点尚未被单独检验。）</p>
+<h3>9 · 消融实验（机器学习的标准方法）—— 方法学占位者</h3>
+<p><b>它说到哪一步</b>：逐项移除某个组件，看性能变化，以判定该组件是否必要。这是本文轴二（「拿掉这一遍人会不会不同」）的现成范式，且成熟得多。</p>
+<p><b>分离线</b>：消融实验移除的是<b>系统的一个组件</b>，前提是这个组件在系统的描述中已经存在、可被指认、可被移除。本文的困难恰恰在于<b>格③在三家的描述中不存在</b>，因而不可被指认，也就无从被移除。<b>消融实验是本文轴二的方法学理想，而本文的全部问题在于它目前不可执行</b>——这不是本文比它强，是本文承认自己缺一个它已经具备的前提。这一条本文不主张分离，只主张：<b>把格③写进描述，是让消融成为可能的前置步骤。</b></p>
+<h3>10 · 时间使用日志（Juster &amp; Stafford 1991）—— 方法学占位者</h3>
+<p><b>它说到哪一步</b>：通过让被试逐时段记录活动，测量未被机构记录的时间去向；这是测「没被记录的时间」的标准方法（<i>Journal of Economic Literature</i>, 29(2): 471–522）。</p>
+<p><b>分离线</b>：这一方法的动作本身就产生一本账——被试为研究而记录，那一遍因此被记了一笔。<b>它测量不计遍的方式会消灭不计遍。</b> 这构成本文最实的一处方法困难，第十五节与第十七节都要回到它。</p>
+<p><b>判定形式</b>：同一批人，一组做时间日志，一组由旁观者记录（被试不知情，伦理许可下）。 - <b>若两组的构成功能指标无差异</b> → 记录动作本身不改变功能，本文的机制被削弱。 - <b>若自记组的功能指标更差</b> → 记录动作本身就是收编。</p>
+<h3>11 · 无酬劳动的核算（Waring 1988；Illich 1981；联合国国民账户体系的家庭生产卫星账户）—— 全部十一位里最近的一位</h3>
+<p><b>这是本稿修订前最大的一处缺口，而且它本该最先被撞上：本文的经济学那一条腿走的正是国民核算这条路。</b> 它说到哪一步：国民账户系统地不记一大批构成整个经济的劳动——家务、照护、自给生产、伊里奇所说的「影子工作」；而「不被记」正是这批劳动被系统性贬值、被无偿占用的机制。四十年来这一支的补救办法始终一致：<b>造一本卫星账户，把它记下来。</b></p>
+<p><b>分界：方向相反，而且是本文全部分界里反向最彻底的一条。</b> 无酬劳动核算主张「记下来」是补救；本文预测「记下来」就消灭。两者对同一个动作——给一批不进账的重复补一个字段——给出正好相反的结果。</p>
+<p>分离线在于<b>那批劳动的功能是否依赖于它不被记</b>。家务劳动不因为被记进卫星账户就不再是家务劳动：它的内容、它对家庭的贡献、它耗掉的时间，一样也不因记账而改变；变的只是它在分配上的地位，而那正是记它的目的。本文说的那批重复不是这样：它的构成功能恰恰依赖于它不产生条目——第六节那条倒 U 的右支说的就是这件事，第九节八千四百个拉取请求里那批被拒的提交一旦被计入某种「贡献度」，它们就换了格。</p>
+<p>判定形式：<b>给一批不计遍补上记录字段，只记录、不奖惩、不进入任何分配。若它们的构成功能不变而分配后果改善，则 Waring 一路对而本文错；若功能下降，则本文对。</b> 这一条与本节第 3 条（非正式学习与前期学习认证）共用同一个可查场合，两条一起判——<b>而这两条其实是同一件事的两个版本：前期学习认证是教育界的版本，无酬劳动核算是经济学的版本。</b> 本文原先只写了教育界那个版本，漏掉了更老、更成熟、证据更多的经济学版本，这是一处真缺口，不是一处补充。</p>
+<p>顺带交代一位形状相近而机制不同的：情感劳动（Hochschild 1983）。它讲的是一批<b>被计入工时、却不被承认为劳动</b>的付出——那是格②（进账而不被承认），不是本文的格③（不进账而承担构成功能）。两者在本文的四格里落在不同格，可同批清点。</p>
+<h2 id="c15">十三 · 与同一作者已发论述的自撞申报</h2>
+<p>本文与作者已发表的三个构念形状相近，必须逐条指名并给出分离线，不能当作没有。</p>
+<p><b>其一，未追认段</b>（论一段时间因未被后续事件追认而不构成一个可数的段）。两者都说「做过而不构成一个可数的单位」，形状极近。<b>分离线是方向相反的</b>：未追认段是记录制度的<b>遗漏</b>——那一段确实发生了，只是记录规则不给它成段的资格，<b>补上字段就解决</b>。不计遍是记录制度的<b>必要空白</b>——它一旦被记，它承担的功能就没了，<b>补上字段就消灭</b>。判定形式：给某类未被记录的活动补上记录字段，若该活动的可分析性上升而其功能不变，那是未追认段；若可分析性上升而功能下降，那是不计遍。</p>
+<p><b>其二，判余</b>（论一份只允许一个答案的记录如何把候选之间的分差压成零）。两者都关心记录格式扔掉了什么。分离线：判余扔掉的是<b>同一次事件内部的候选间距</b>（第一名与第二名之间差多少），不计遍扔掉的是<b>整次事件</b>。前者是一次记录里的信息损失，后者是一次执行的整体缺席。</p>
+<p><b>其三，默借</b>（论一个人的状态持续依赖另一个人的例行安排而两侧都不知道）。分离线：默借的不入账是<b>跨主体的</b>——支承来自别人，账按主体划分因而记不到；不计遍的不入账是<b>同一主体内的</b>——遍次是自己做的，账本因单位设定而不数它。判定形式：撤走那件东西之后，若两侧都不产生记录，是默借；若执行者自己知道而账本不记，是不计遍。</p>
+<h2 id="c16">十四 · 同题四篇的互切</h2>
+<p>本文与另外三篇同题文章出自同一批工作：四篇都问「教育是什么」，四篇都以「某个口径分不开／算不到的那一类」作答。<b>这一节把四篇摆在一张表上逐列分开，因为不分开，四篇看上去就是一个判断写了四遍。</b></p>
+<table class="tbl"><thead><tr><th>篇</th><th>三门学科</th><th>它命名的那一类</th><th>读数</th><th>那一类相对于什么被定义</th><th>对象是什么</th><th>有没有时间结构</th></tr></thead><tbody><tr><td>它读不出来的，它也造不出来</td><td>工程学·生物学·艺术学</td><td>未张成能力</td><td>张成重合率 λ</td><td>入判口径的<b>边界</b></td><td>能力空间里的<b>方向</b></td><td>无。边界一动即刻整批更换</td></tr><tr><td>那道题还没有被出出来</td><td>符号学·逻辑学·数学</td><td>界题</td><td>分法未定率 u</td><td>已出题目的<b>集合</b></td><td>尚未被出出来的<b>题</b></td><td>无。补一道单属性题就少一批</td></tr><tr><td>同许</td><td>混沌学·舞蹈学·地理学</td><td>同许族</td><td>带宽·同许率·分离视界</td><td>可用观测的<b>粒度</b></td><td>人与人之间的<b>配对</b></td><td>有。同许族会自己散开</td></tr><tr><td>不计的那一遍</td><td>戏剧学·经济学·法律学</td><td>不计遍</td><td>零计比 z·首计序 k</td><td>计数装置的<b>字段表</b></td><td>做过的那些<b>遍</b></td><td>有，且被记录即消灭</td></tr></tbody></table>
+<p>四篇的对象类型互不相同——方向、题、配对、遍——这是最干净的一刀。四类可以同时非空且互不重叠，举一个当场可走的例子：一门课的成果从不进入任何判定（未张成非空），而这门课的考卷恰好每道题只考一项技能，因而能把一切做法分开（界题为空）；同一批学生的分数两两之间差得很开（同许族为空），而他们为达到这个水平所做的重复里有九成不产生任何条目（不计遍非空）。四个读数在同一批人身上可以取到任意组合。</p>
+<p><b>判决性对照：一个动作，四种不同的预测。</b> 取一批本来不进入分配决策的记录，只把它接进判定，其余一概不动。四篇对随后发生的事给出互不相同、且都可证伪的预测：</p>
+<ul><li>本篇之外的《它读不出来的》预测：被切出的那一类<b>整批更换成员，总量不变</b>——不是补漏，是换一副骨架。</li><li>《那道题还没有被出出来》预测：分法未定率<b>不变</b>——接进判定的记录并不增加能把做法分开的题，除非新接进来的恰好是只考一项技能的那种。</li><li>《同许》预测：带宽<b>变窄</b>、同许族变小，而分离视界不随之改变——能动的只是带宽。</li><li>《不计的那一遍》预测：那批重复的<b>构成功能下降</b>——记了就换格，这是倒 U 的右支。</li></ul>
+<p>这四条不能同时为真地被同一次观测满足：第二条说读数不动，第三条说读数变小，第四条说被记的东西性质改变，第一条说总量守恒而成员更换。<b>任何一次真实的口径变更都会至少判掉其中一条。</b> 四篇因此是可以互相证伪的四个判断，不是一个判断的四种说法。</p>
+<p>还要写明一处读者最该起疑的地方，本文不绕过：<b>这四篇出自同一位作者、同一日、同一副骨架</b>（三家现成读法 → 三家共有前提 → 一件来自其中一家自己的推翻材料 → 命名一类 → 两轴辨别格 → 一句不含程度词的判据 → 一个可清点的读数 → 预注册真跑 → 逐条分界 → 编号证伪）。骨架相同这件事本身不构成四篇内容相同的证据，但它确实是四篇最可能出错的地方：<b>一副好用的骨架会让四个不同的问题看起来长得一样。</b> 判据交给读者：上表六列里，若有两篇能在四列以上取到相同的值，那两篇应当合并；四篇现在没有任何两篇在三列以上相同。这条判据可以拿去核对，也可以拿去推翻。</p>
+<h2 id="c17">十五 · 学术界共同站着的那块地</h2>
+<p>第三节取的是三家共同假定的那一条。划完界之后还可以取第二层：<b>逐个问最近的那几位「它结构性看不见什么」</b>。判据只有一条——<b>一旦承认那件事，它自己就塌了</b>。</p>
+<ul><li><b>人力资本理论</b>把「教育量」当作给定的可计量投入，因此<b>看不见没有进入任何投入量的那些重复</b>。一旦承认它们存在且承担构成功能，收益率的分母就无法界定，整套估计的基础动摇。</li><li><b>信号理论</b>把「能力差异」当作先在的、教育只是筛选，因此<b>看不见差异是在不算数的重复里长出来的</b>。一旦承认，「筛选而非生产」这个核心区分就失去边界。</li><li><b>形成性评价</b>把「评价」当作教学设计的一部分，因此<b>看不见根本不在教学设计之内的那一类</b>。一旦承认，它就必须解释为什么被设计出来的不计分评价与自发的不计分重复效果不同——而它的框架里没有这个区分。</li><li><b>合法的边缘性参与</b>把「参与」当作已经成立的起点，因此<b>看不见还没被算作参与的那一段</b>。一旦承认，「合法性」这个前提就需要被追问：谁使它合法，以及在被使其合法之前它是什么。</li><li><b>刻意练习</b>把「反馈」当作练习有效的必要条件，因此<b>看不见没有反馈的那一类重复</b>。一旦承认它们有效，刻意练习与普通练习的分界就要重画。</li><li><b>前期学习认证</b>把「未被承认的学习应当被承认」当作不言自明的善，因此<b>看不见承认本身可能是损失</b>。一旦承认，它的整套政策目标要重新论证。</li></ul>
+<p>六条盲区背后是不是同一个「被当作给定的东西」？是的：</p>
+<blockquote class="formula"><b>所有人——包括互相批判的各派——共同假定：凡是教育，都有一个可指认的发生时刻与持有者。它总是某个人在某个时候做的某件事，因而总能被记在某本账上。</b></blockquote>
+<p>这一条不是任何一派的立场，是所有派别站着的那块地。它解释了一件事：为什么「不进任何账的那一类遍」至今没有被任何学科辨识——<b>不是没人看，是看的人都站在它上面。</b></p>
+<h2 id="c18">十六 · 不适用的边界</h2>
+<p>本文不适用于下列情形，逐条写明：</p>
+<ol><li><b>无法指认「一遍」的连续性过程。</b> 家庭中的长期濡染、语言环境的浸润、共同生活的影响——它们没有可指认的起止，因而 z 不可计算。本文对这些过程不作任何主张。</li><li><b>目标本身不可指认的教养。</b> 「成为一个好人」不构成本文读数所需的目标界定。</li><li><b>缺乏独立安全通道的场所</b>（见第十一节之一）。在这些场所，收编格③是正确的处置，本文的构成功能损失只能被记为代价，不能被用作反对记录的理由。</li><li><b>不计遍不留痕迹的绝大多数场所。</b> 第九节的实测已经说明：本文的读数目前只在极少数场所可算。<b>在其余场所，本文提供的是一个描述与一个待建的字段，不是一个可用的测量。</b></li><li><b>本文不主张零计比越高越好</b>，也不提供任何关于最优值的建议。第九节的 H2 不命中正是这一克制的经验理由。</li><li><b>本文没有一手的教育现场数据。</b> 第九节的对象是代码仓库，不是学校、不是剧团、不是医院。把它读作对教育机构的实证，是过度推广。</li></ol>
+<h2 id="c19">十七 · 可以使本文为假的条件</h2>
+<p>四条，每一条都写明控制变量与判定阈值；口径与第八节之三的清点手册一致。</p>
+<p><b>条件一（机制的核心，最贵也最决定性）</b>：取同一类活动，随机分为两组，一组保持不进任何账，一组仅增加记录（记录内容不公开、不评价、不奖惩、不进入任何决策），其余条件相同。<b>控制掉执行频次与总时长之后</b>，若两组在陌生任务上的迁移表现无差异，则「进账改变构成功能」为伪——届时本文的机制应归因于评价或奖惩，而非记账本身。</p>
+<p><b>条件二（收编的方向性）</b>：观察一次真实的制度收编（把某类原本不进账的活动纳入记录）。若收编后该活动的执行频次上升、记录真实、而迁移表现同步上升，则本文的「格③被收编为格②而非格①」为伪。</p>
+<p><b>条件三（倒 U 的两端机制不同）</b>：若在零计比的低端与高端观察到的失效表现相同（例如两端都表现为频次下降），则本文第六节之二关于「两端失效机制不同」的主张为伪。</p>
+<p><b>条件四（第三层，最便宜）</b>：若在任意二十份教育机构的现行记录规范（课程档案规范、培训手册、教学质量评估指标）中，能找到五份以上明确设有「不产生任何评价后果的执行次数」这一字段，则本文关于「这个字段不存在」的主张为伪。<b>这一条所需材料在多数机构的既有文件里已经存在，一个人一周内可以做完。</b></p>
+<p><b>若本文被证伪，我们会学到什么</b>：条件一为伪，说明关键变量是评价而非记账，那么全部处方应转向「记录但不评价」，这是一个比本文的主张容易实施得多的方向；条件四为伪，说明这个字段已经存在而只是未被使用，问题从「造一个字段」变成「为什么已有的字段没人填」——那是一个完全不同、也更容易着手的问题。</p>
+<h2 id="c20">十八 · 反噬</h2>
+<p>本文的处方若被制度采用，最省事的实现方式恰恰会摧毁它要保护的那个东西。</p>
+<p>一个机构读完本文，最自然的动作是：<b>设立一个「不计遍」字段，要求教师与学生填报。</b> 这个动作在形式上完全正确，而它做的第一件事就是把格③变成格②——被填报的那一遍从此有了读者，它不再是不计遍。<b>填得越认真，消灭得越彻底。</b></p>
+<p>第二个反噬更难躲：<b>零计比一旦成为指标，最省事的达标方式是在文书上做手脚。</b> 把原本记录的活动从记录里删掉，z 就上升了。而这比真的留出不被记录的空间容易得多，也安全得多——删记录不需要改变任何实际安排。</p>
+<p>第三个反噬指向本文自己的读数：<b>测量零计比的动作本身会产生记录</b>（第十二节第 10 条已指出）。一个严格执行本文清点手册的机构，在清点的那一刻就改变了被清点的对象。这不是技术困难，是这个对象的性质。</p>
+<p><b>我看不到出口。</b> 可以想到的缓解都不彻底：抽样而非普查、事后重建而非同步记录、由第三方而非本人清点——三种都只是把污染降低，没有一种能消除它，而且三种都需要先知道要清点什么，也就是先做一次指认。</p>
+<p>因此本文能给的只有一句诚实的话：<b>这个读数在被用于考核的那一刻起就不再可信；它只在诊断性、一次性、非公开的用途下有意义。</b> 这句话本身没有执行力，我知道。</p>
+<h2 id="c21">十九 · 伦理三条</h2>
+<p>零计比是一个比率，而比率必然会被拿去考核人。因此三条必须写死：</p>
+<p><b>其一，这个读数指的是位置，不是人。</b> z 描述的是一个场所的记录制度给不计遍留了多少空间，不是任何个人的努力程度或学习能力。<b>不得用于评价学生、教师或学员个人。</b></p>
+<p><b>其二，不得为了把这个数做好看而在有安全风险的活动中取消记录。</b> 医疗操作、机械操作、高空与水上活动、涉及未成年人的一对一活动——这些场所的记录首先是保护性的。任何以提高零计比为由减少这类记录的做法，本文明确反对。</p>
+<p><b>其三，已经按这个读数做出不利安排的，必须公开编码规则并给出复核通道。</b> 编码规则即第八节之三的清点手册；复核通道至少应允许当事人对「哪些遍被判为进账」提出异议并要求重判。</p>
+<p>三条缺一，本文的读数不应被使用。</p>
+<h2 id="c22">二十 · 自反：用本文的判据检提出这道题的那个指令</h2>
+<p>按常规，自反这一节应当检查本文自己是不是它所描述的东西的标本。本文换一个更难的对象：<b>检查产生本文的那个指令。</b></p>
+<p>产生本文的指令是明确的：用某一套写定的写作规程，就「教育是什么」这个问题，从戏剧学、经济学、法律学三家出发，写一篇两万字的论文，并给出一个目标分数。</p>
+<p>用本文的四格检这个指令：</p>
+<p><b>这条指令要求的产物，是一个必然进账的东西。</b> 它有字数（两万字）、有交付形态（一篇论文）、有评价（一个分数）。按本文的分类，产生它的全部执行——查文献、算数据、写、改——都指向一次会被计数的完成。</p>
+<p>那么这次写作里有没有格③？有，而且不少：查了没用上的十几条文献、试了三个后来废掉的命名、写了又删的两节、一次跑错方向的统计。<b>这些遍没有进入交付物，不在字数里，不在参考文献里，也不会出现在任何对这篇文章的评价中。</b> 按本文自己的读数，这次写作的零计比不低。</p>
+<p><b>而这正是问题所在。</b> 本文主张不计遍的构成功能与它的不入账是同一件事；如果这条主张对，那么<b>这次写作中真正使这篇文章成为这篇文章的那些遍，恰恰是不会被这个指令的评价装置看到的那些</b>。评价装置能看到的是成品：结构是否完整、划界是否充分、数据是否真跑、分数是多少。它看不到那三个被废掉的命名——而如果本文是对的，正是那三次废弃使第四个命名成为可能。</p>
+<p>由此得到一个对本文不利的具体后果：</p>
+<blockquote class="formula"><b>本文若被按其交付形态评价，评价的对象是格①与格②的混合物，而本文自己主张的那个东西不在被评价的范围内。</b> 也就是说，<b>本文无法通过被评价来支持自己的主张</b>——一篇分数高的文章不能证明不计遍有用，一篇分数低的也不能证伪它。</blockquote>
+<p>这个后果不是修辞。它意味着本文的主张只能靠第十六节那四条条件来检验，<b>不能靠这篇文章本身的好坏来检验</b>。任何以「这篇文章写得好，所以它说的对」为形式的支持，按本文自己的判据都是无效的。</p>
+<p>还有更不舒服的一层：这条指令本身要求了一个分数。而按本文的机制，<b>给一个东西定一个目标分数，就是给它设一个读者</b>——写作的每一遍从此都朝那个读者优化。若本文的机制对，这条指令在提出的那一刻就已经压缩了产生它的那批不计遍的空间。<b>本文因此是在一个不利于它自己所描述的那种过程的条件下写成的</b>，这一点我无法排除，也无法量化。</p>
+<h2 id="c23">二十一 · 三层可分开引用的主张，与一个写死日期的赌注</h2>
+<h3>二十之一 · 三层</h3>
+<p>本文的主张分三层，强度递减而稳固度递增。<b>接受第三层不蕴含接受第一层。</b></p>
+<p><b>第一层（最强，最易倒）</b>：存在一类只在不进任何账时才承担构成功能的重复；进账会使其功能换格。检验条件见第十六节条件一。</p>
+<p><b>第二层（分析工具）</b>：两轴四格与那一格四签名，可用于诊断一个教养场所的格②比重。它不依赖第一层的强主张成立——即使「进账改变功能」被证伪，「进账而不承担构成功能」这一格仍然存在且值得诊断。</p>
+<p><b>第三层（最稳，且形状与前两层不同）</b>：<b>这个字段在现行记录里不存在，而它的不存在是自洽的</b>——不是有人忘了设，是任何一本以「产生条目」为记录方式的账，在原理上都无法记录「不产生条目的那一次」。这一层不是一句关于多数机构的经验断言（那样的断言可以靠调查推翻），而是一句关于记录形式的判断：<b>一本账只能记它记下的东西。</b> 因此第十六节的条件四若被满足（有机构真的设了这个字段），推翻的不是这一层本身，而是「已有字段却无人填」——那反而印证了这一层的后半句。</p>
+<p>第九节的真跑把这一层提到了最前面：既然 91% 的入账者连一次可见的不计遍都没有，<b>本文目前能贡献的最实在的东西，是指出这个位置，而不是测量它。</b></p>
+<h3>二十之二 · 赌注</h3>
+<p><b>赌注</b>：到 2031 年 12 月 31 日之前，至少有一份面向教育机构的正式规范文件（国家或地区课程标准、教师专业标准、住院医师培训规范、职业资格框架的实施细则），明确设置一个「不产生任何评价后果的执行次数」类字段，或明确规定某类活动不得进入任何评价记录。</p>
+<p><b>什么不算命中</b>（写死，不许事后放宽）：</p>
+<ul><li>只要求机构「自行说明」如何保护非评价性活动的，<b>不算</b>——必须是可执行、可核查的条款。</li><li>把已有的形成性评价改个名字的，<b>不算</b>——形成性评价进教案、计工时，按本文编码规则不是格③。</li><li>学术论文、政策建议、白皮书、倡议书，<b>一律不算</b>——必须是有约束力的规范文件。</li><li>由本文作者推动写入的，<b>不算</b>。一条预言若靠预言者自己去实现，它测的是影响力，不是判断力。</li><li>仅在单个机构内部试行、未进入任何上位规范的，<b>不算</b>。</li></ul>
+<p><b>赌注引用的读数与阈值</b>与第八节之三的清点手册、第十六节的证伪条件完全一致：一处不一致，这条赌注即不可裁决，本文自愿放弃它。</p>
+<h3>二十之三 · 三个本文解释不了的洞</h3>
+<p><b>第一个</b>：本文说不出一个场所的零计比应该是多少。第九节的 H2 不命中说明它不是越高越好，第十一节之三说明它不能是一，第六节之二说明它是倒 U——而本文没有任何数据支持这条曲线的具体形状。</p>
+<p><b>第二个</b>：本文说不出「进账」这个动作里，究竟是哪一个成分改变了功能。是被人看见？是产生了可追溯的记录？是有了一个可被比较的数？三者在现实中总是同时出现，本文没有把它们分开的设计。第十六节的条件一只能验证「记账 vs 不记账」，分不开这三者。</p>
+<p><b>第三个</b>，也是最要紧的：本文说不出<b>谁应当来做这件事</b>。设置一个「不进任何账」的空间，需要一个有权设置它的位置；而任何有权设置它的位置，其权力都来自它能记账、能评价、能承认。<b>要求一个记账系统主动划出一块自己不记的地方</b>，在制度上是一个悖论——而本文对这个悖论没有解法。</p>
+<h2 id="c24">参考文献</h2>
+<p>Becker, G. S. (1993). <i>Human Capital: A Theoretical and Empirical Analysis, with Special Reference to Education</i> (3rd ed.). University of Chicago Press.</p>
+<p>Black, P., &amp; Wiliam, D. (1998). Assessment and classroom learning. <i>Assessment in Education: Principles, Policy &amp; Practice</i>, 5(1), 7–74.</p>
+<p>Boal, A. (1979). <i>Theatre of the Oppressed</i> (C. A. McBride &amp; M.-O. L. McBride, Trans.). Urizen Books.</p>
+<p>Ericsson, K. A., Krampe, R. T., &amp; Tesch-Römer, C. (1993). The role of deliberate practice in the acquisition of expert performance. <i>Psychological Review</i>, 100(3), 363–406.</p>
+<p>Goodhart, C. A. E. (1975). Problems of monetary management: The U.K. experience. In <i>Papers in Monetary Economics</i> (Vol. 1). Reserve Bank of Australia.</p>
+<p>Gutmann, A. (1987). <i>Democratic Education</i>. Princeton University Press.</p>
+<p>Jackson, P. W. (1968). <i>Life in Classrooms</i>. Holt, Rinehart &amp; Winston.</p>
+<p>Juster, F. T., &amp; Stafford, F. P. (1991). The allocation of time: Empirical findings, behavioral models, and problems of measurement. <i>Journal of Economic Literature</i>, 29(2), 471–522.</p>
+<p>Lave, J., &amp; Wenger, E. (1991). <i>Situated Learning: Legitimate Peripheral Participation</i>. Cambridge University Press.</p>
+<p>Lepper, M. R., Greene, D., &amp; Nisbett, R. E. (1973). Undermining children's intrinsic interest with extrinsic reward: A test of the “overjustification” hypothesis. <i>Journal of Personality and Social Psychology</i>, 28(1), 129–137.</p>
+<p>Marsick, V. J., &amp; Watkins, K. E. (1990). <i>Informal and Incidental Learning in the Workplace</i>. Routledge.</p>
+<p>Merton, R. K. (1940). Bureaucratic structure and personality. <i>Social Forces</i>, 18(4), 560–568.</p>
+<p>Mincer, J. (1974). <i>Schooling, Experience, and Earnings</i>. National Bureau of Economic Research.</p>
+<p>Phelan, P. (1993). <i>Unmarked: The Politics of Performance</i>. Routledge.</p>
+<p>Polanyi, M. (1966). <i>The Tacit Dimension</i>. Doubleday.</p>
+<p>Schechner, R. (1985). <i>Between Theater and Anthropology</i>. University of Pennsylvania Press.</p>
+<p>Scriven, M. (1967). The methodology of evaluation. In R. W. Tyler, R. M. Gagné, &amp; M. Scriven (Eds.), <i>Perspectives of Curriculum Evaluation</i> (pp. 39–83). Rand McNally.</p>
+<p>Spence, M. (1973). Job market signaling. <i>Quarterly Journal of Economics</i>, 87(3), 355–374.</p>
+<p>United Nations. (1966). <i>International Covenant on Economic, Social and Cultural Rights</i>, Art. 13. G.A. Res. 2200A (XXI).</p>
+<p>Council of the European Union. (2017). Council Recommendation of 22 May 2017 on the European Qualifications Framework for lifelong learning. <i>Official Journal of the European Union</i>, 2017/C 189/03.</p>
+<h2 id="c25">数据、脚本与可复算性</h2>
+<p>预注册文件 `PREREG.md`，SHA-256 `04b33c6eefadb48c43d672983c02f8a326c7795ca7026e938ed60a9e2a8132b2`，在跑任何统计之前写定并封存。数据取自 GitHub 公开接口，六个仓库共 8,400 个拉取请求，抓取脚本 `run.py`、分析脚本 `analyze.py` 与分层脚本 `strat.py` 随文提供，原始数据存于 `pulls.json`。任何人可用同一脚本复算本文第九节的每一个数字，<b>包括复算本文的错误</b>。</p>
+<p><b>人机分工声明</b>：文献检索、公开数据抓取与统计计算、结构检查与语言编辑使用了人工智能工具；全部统计脚本经逐项复核，预注册在跑数之前封存。判断、取舍与全部结论由作者负责，包括其中的错误。</p>
+</article>
+</section>
+</main>
+</div><!--/#web-->
+
+<div id="pdf" class="panel"><div class="rdr">
+  <div class="rdr-bar">
+    <button class="rbtn" id="pv" disabled>‹ 上一页</button>
+    <span class="pbox"><input id="pin" type="number" min="1" value="1"> / <span class="ptot" id="ptot">…</span></span>
+    <button class="rbtn" id="nx" disabled>下一页 ›</button>
+    <span class="zm"><button class="rbtn" id="zo" title="缩小">−</button><button class="rbtn" id="zi" title="放大">＋</button></span>
+    <a class="rbtn dl" href="/sde-education/pdf/uncounted-run.pdf" download>⬇ 下载</a>
+  </div>
+  <div class="rdr-stage">
+    <div id="rload" class="rload"><div class="spin"></div>正在载入精排 PDF…</div>
+    <div id="cwrap" style="display:none"><canvas id="pcv"></canvas></div>
+    <div class="tapL" id="tL"></div><div class="tapR" id="tR"></div>
+  </div>
+  <div class="rhint">← → 方向键翻页 · 点击画面两侧翻页 · 可输入页码跳转 · ＋ − 缩放</div>
+</div></div>
+
+<div id="dl" class="panel"><div class="card">
+  <h2>下载精排 PDF</h2>
+  <p style="color:#4A4235;line-height:1.85">《教育：从发现到发生的革命——传道模式的八环链，与它的八处裂缝》<br>SDE教育学入门 · 第一讲 · 王德生 · 德麦国际 SDE 学派</p>
+  <a class="dlbtn" href="/sde-education/pdf/uncounted-run.pdf" download>⬇ 下载 PDF</a>
+  <div class="sz">含题头、摘要、正文与页码的印刷级精排版。如需翻页在线阅读，切换到「在线读 PDF」；如需网页版，切换到「网页长文」。</div>
+</div></div>
+
+<footer>
+  <div>© 德麦国际 Demai International · SDE教育学入门 · <a href="/sde-education/">返回频道</a> · <a href="/browse/">sdeuniverses.com</a></div>
+</footer>
+
+<script>
+document.querySelectorAll('.modebtn').forEach(function(b){
+  b.addEventListener('click',function(){
+    document.querySelectorAll('.modebtn').forEach(function(x){x.classList.remove('on')});
+    document.querySelectorAll('.panel').forEach(function(x){x.classList.remove('on')});
+    b.classList.add('on');
+    var el=document.getElementById(b.dataset.m); if(el) el.classList.add('on');
+    window.scrollTo(0,0);
+  });
+});
+</script>
+<script>var PDF_URL="/sde-education/pdf/uncounted-run.pdf";
+var pdfDoc=null,pageNum=1,rendering=false,pending=null,scale=1.25,pdfInited=false;
+function $(id){return document.getElementById(id);}
+document.querySelectorAll('.modebtn').forEach(function(b){b.addEventListener('click',function(){var m=b.dataset.m;document.querySelectorAll('.modebtn').forEach(function(x){x.classList.toggle('on',x.dataset.m===m);});document.querySelectorAll('.panel').forEach(function(p){p.classList.toggle('on',p.id===m);});window.scrollTo(0,0);if(m==='pdf'){initPdf();}});});
+function initPdf(){if(pdfInited){return;}pdfInited=true;var s=document.createElement('script');s.src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js";s.onload=startPdf;s.onerror=function(){showErr("阅读器脚本加载失败");};document.head.appendChild(s);}
+function showErr(msg){$('rload').style.display='none';var e=$('rerr');e.style.display='block';e.innerHTML='在线阅读暂时无法载入。<br>你仍可 <a href="'+PDF_URL+'" target="_blank">直接打开 / 下载 PDF</a> 阅读。<br><span style="font-size:12px;color:#8A6F5E">（'+msg+'）</span>';}
+function startPdf(){try{pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";pdfjsLib.getDocument(PDF_URL).promise.then(function(pdf){pdfDoc=pdf;$('ptot').textContent=pdf.numPages;$('pin').max=pdf.numPages;$('rload').style.display='none';$('cwrap').style.display='block';render(1);}).catch(function(err){showErr(err.message);});}catch(e){showErr(e.message);}}
+function render(num){rendering=true;pdfDoc.getPage(num).then(function(page){var vp=page.getViewport({scale:scale});var ratio=window.devicePixelRatio||1;var cv=$('pcv'),cx=cv.getContext('2d');cv.width=vp.width*ratio;cv.height=vp.height*ratio;cv.style.width=vp.width+'px';cv.style.height=vp.height+'px';cx.setTransform(ratio,0,0,ratio,0,0);page.render({canvasContext:cx,viewport:vp}).promise.then(function(){rendering=false;if(pending!==null){var p=pending;pending=null;render(p);}});});$('pin').value=num;$('pv').disabled=(num<=1);$('nx').disabled=(num>=pdfDoc.numPages);}
+function queue(num){if(rendering){pending=num;}else{render(num);}}
+function go(n){if(!pdfDoc){return;}pageNum=Math.min(Math.max(1,n),pdfDoc.numPages);queue(pageNum);var st=document.querySelector('.rdr-stage');if(st){st.scrollIntoView({block:'nearest'});}}
+$('pv').onclick=function(){go(pageNum-1);};$('nx').onclick=function(){go(pageNum+1);};$('tL').onclick=function(){go(pageNum-1);};$('tR').onclick=function(){go(pageNum+1);};
+$('pin').onchange=function(e){go(parseInt(e.target.value)||1);};$('zi').onclick=function(){scale=Math.min(scale+0.2,3);queue(pageNum);};$('zo').onclick=function(){scale=Math.max(scale-0.2,0.6);queue(pageNum);};
+document.addEventListener('keydown',function(e){if(!$('pdf').classList.contains('on')){return;}if(e.key==='ArrowLeft'){go(pageNum-1);}if(e.key==='ArrowRight'){go(pageNum+1);}});
+</script>
+<script>window.WDS_READ={selector:"article"};</script>
+<script src="/taste/wds-companion/wds-read.js?v=20260802b" defer></script>
+<script src="/wds-mode.js?v=20260808a" defer></script>
+<script src="/assets/sde-talk.js?v=20260802b" data-pv="1" defer></script>
+</body>
+</html>
