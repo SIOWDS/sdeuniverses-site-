@@ -726,6 +726,9 @@ function doAsk(){
      那一种前端会无限等下去（线上真出过：第 4 轮空白框停了八十分钟）。
      每收到一帧就续一次：首帧给得宽（深度档出流前要检索＋装内功），出流后帧间不应超过一分钟。 */
   var _ac=(typeof AbortController!=='undefined')?new AbortController():null, _wd=null, _stalled=false;
+  /* gotErr：服务端已经报过一句人话了，收尾不得再拿通用文案盖掉它（见 finishAsk）。
+     lastStat：死在哪一步的唯一线索——检索、装内功，还是已经在等基底写。 */
+  var gotErr=false, lastStat='';
   function _bump(ms){ if(_wd) clearTimeout(_wd); _wd=setTimeout(function(){ _stalled=true; try{ _ac && _ac.abort(); }catch(e){} }, ms); }
   _bump(deepOn?150000:70000);
 
@@ -741,7 +744,7 @@ function doAsk(){
     var reader=resp.body.getReader(), dec=new TextDecoder(), buf='';
     function pump(){
       return reader.read().then(({done,value})=>{
-        if(done){ finishAsk(ansEl); return; }
+        if(done){ finishAsk(ansEl, gotErr, lastStat); return; }
         buf+=dec.decode(value,{stream:true});
         var lines=buf.split('\n'); buf=lines.pop();
         for(var i=0;i<lines.length;i++){
@@ -752,11 +755,12 @@ function doAsk(){
           var j; try{ j=JSON.parse(payload); }catch(e){ continue; }
           _bump(75000);
           if(j.t==='token'){ acc+=j.v; lastAns=acc; ansEl.textContent=acc; }
-          else if(j.t==='status'){ thinkEl.textContent=j.v; }
+          else if(j.t==='status'){ lastStat=j.v; thinkEl.textContent=j.v; }
           else if(j.t==='think'){ thinkChars+=(j.v||'').length; thinkEl.textContent='🧠 深度思考中（'+thinkChars+' 字）…'; }
           else if(j.t==='sources'){ renderSources(j.v); }
           else if(j.t==='expand'){ document.getElementById('sdeExpand').textContent='🧭 SDE 词义检索：'+j.v; }
           else if(j.t==='error'){
+            gotErr=true;
             ansEl.className='ans';
             /* 写到一半被掉线：已经流出来的字是真交付物，不许被一句红字盖掉。
                finishAsk 那边本来就会把 lastAns 当作本轮入档，只有屏幕上这一盒在骗人。 */
@@ -784,7 +788,7 @@ function doAsk(){
         var _sb=document.createElement('div'); _sb.className='err';
         _sb.textContent='基底中途停住了（超过一分钟没有新内容），已主动掉线。以上是已经写出来的部分，本轮照常入档。';
         ansEl.appendChild(_sb);
-        finishAsk(ansEl);
+        finishAsk(ansEl, gotErr, lastStat);
       } else {
         ansEl.innerHTML='<div class="err">等了 '+(deepOn?'两半分钟':'一分多钟')+'，一帧都没收到，已主动掉线（再等下去也只是空白框）。本轮没有入档，直接再点一次「问」即可。</div>';
       }
@@ -797,13 +801,19 @@ function doAsk(){
     document.getElementById('thinkBar').textContent='';
   });
 }
-function finishAsk(ansEl){
+function finishAsk(ansEl, gotErr, lastStat){
   ansEl.className='ans';
   /* 【流完了却一个字都没有】旧版在这里完全沉默：空白框停在那儿，不报错也不提示，
      用户只看得到「不动了」。零产出一定是出事了——多半是 Worker 被平台无声杀掉，
      流突然断、没有 [DONE]、连 error 帧都没发出来。必须说一句。 */
   if(!lastAns || !lastAns.length){
-    ansEl.innerHTML='<div class="err">本轮一个字都没回来，连错误也没报——这通常是整个请求被平台无声掉线了（轮次越往后、上下文越长，越容易碰到）。本轮没有入档，直接再点一次「问」即可；若连着两次都空，把问题问短一点、或换一个基底。</div>';
+    /* ⚠ 服务端已经报过一句有名有姓的原因时（额度用完、Key 不能用、上游 4xx、被闸掉线……）
+       不得再拿「被平台无声掉线了」这句猜测盖上去——上一版就是这么写的，
+       当场把一条真错误盖成了猜测，用户和维护者都再也看不见真因。 */
+    if(gotErr) return;
+    ansEl.innerHTML='<div class="err">本轮一个字都没回来，连错误也没报——这通常是整个请求被平台无声掉线了（轮次越往后、上下文越长，越容易碰到）。'
+      +(lastStat?'停住时的最后一步是：'+esc(lastStat)+'　':'')
+      +'本轮没有入档，直接再点一次「问」即可；若连着两次都空，把问题问短一点、或换一个基底。</div>';
     return;
   }
   if(lastAns && lastAns.length>60){

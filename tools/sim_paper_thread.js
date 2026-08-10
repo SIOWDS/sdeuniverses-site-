@@ -149,9 +149,38 @@ ok(/function _bump\(ms\)/.test(bAsk3) && (bAsk3.match(/_bump\(/g) || []).length 
   "看门狗每收一帧就续一次（只设一次等于把正常的长回答也掉了）");
 ok(/_bump\(deepOn\?150000:70000\)/.test(bAsk3),
   "首帧闸给得宽：深度档出流前要跑词表扩展＋全站检索＋装内功");
-ok(/if\(_stalled\)\{/.test(bAsk3) && /finishAsk\(ansEl\);/.test(bAsk3),
+ok(/if\(_stalled\)\{/.test(bAsk3) && /finishAsk\(ansEl, gotErr, lastStat\);/.test(bAsk3),
   "自己掉线时：已写出的字保住并入档，不当成「请求失败」一抄了事");
 ok(/if\(_wd\) clearTimeout\(_wd\);/.test(bAsk3), "收尾清掉看门狗（不清就会在下一轮里乱开枪）");
+
+/* ===== 八、零产出的那句话不得盖掉真因（2026-08-10）=====
+   上一版刚加的「零产出提示」把服务端已经报出的真错误（额度用完、Key 不能用、
+   上游 4xx、被闸掉线）一并盖成了「被平台无声掉线了」这句猜测——真因当场消失。 */
+console.log("— 八、零产出提示不得抹掉真因 —");
+const bFin3 = H.slice(H.indexOf("function finishAsk("), H.indexOf("function qNorm("));
+ok(/function finishAsk\(ansEl, gotErr, lastStat\)/.test(bFin3), "finishAsk 收得到 gotErr 与 lastStat");
+ok(/if\(gotErr\) return;/.test(bFin3), "服务端已报过真因时直接返回，不拿通用文案盖它");
+ok(bFin3.indexOf("if(gotErr) return;") < bFin3.indexOf("本轮一个字都没回来"), "返回排在写通用文案之前");
+ok(/lastStat\?'停住时的最后一步是：'/.test(bFin3), "真的没有真因时，至少把最后一条状态印出来（死在检索还是死在基底，是两回事）");
+const bAsk4 = H.slice(H.indexOf("function doAsk("), H.indexOf("function finishAsk("));
+ok(/var gotErr=false, lastStat='';/.test(bAsk4), "doAsk 里有这两个变量");
+ok(/gotErr=true;/.test(bAsk4), "收到 error 帧就立旗");
+ok(/lastStat=j\.v;/.test(bAsk4), "每条 status 都记下来");
+ok((bAsk4.match(/finishAsk\(ansEl, gotErr, lastStat\)/g) || []).length >= 2, "两个调用点都把旗传下去（漏一个就又盖一次）");
+
+/* ===== 九、深度档连续问对：轮次越往后站内资料越少 =====
+   检索时间与预填时间都算在平台那道 130 秒的墙里，而历轮上下文本身还在变长。 */
+console.log("— 九、轮次越后、资料越少 —");
+ok(/const _thr = \(mode === "answer" && hist\.length\)/.test(W), "阶梯只对深度档连续问对生效（不影响成文／提炼／盲评）");
+const mK = W.match(/const K = mode === "recommend" \? 48 : \(_lightDeep \? 40 : \(deep \? ([^:]*) : 20\)\);/);
+const mC = W.match(/const CTX_MAX = _lightDeep \? 14000 : \(deep \? ([^:]*) : 12000\);/);
+ok(!!mK && !!mC, "K 与 CTX_MAX 都改成了随轮次递减");
+const kFn = new Function("_thr", "return " + (mK ? mK[1] : "120") + ";");
+const cFn = new Function("_thr", "return " + (mC ? mC[1] : "50000") + ";");
+ok(kFn(0) === 120 && cFn(0) === 50000, "第一轮一字不减（它本来就不撞墙）");
+ok(kFn(3) < kFn(0) && cFn(3) < cFn(0), "第四轮确实降下来了· K=" + kFn(3) + " CTX=" + cFn(3));
+ok(kFn(5) >= 48 && cFn(5) >= 18000, "降到底也保底（K≥48、CTX≥18000）· 实得 " + kFn(5) + " / " + cFn(5));
+ok(kFn(9) === kFn(5) && cFn(9) === cFn(5), "_thr 已封顶，不会越减越没");
 
 console.log("\n===== " + P + " PASS / " + F + " FAIL =====");
 process.exit(F ? 1 : 0);

@@ -4703,8 +4703,14 @@ async function askCore(request, env, url, body, SINK) {
   // 涌现流水线的每一环——三观点、二阶碰撞、综合提炼、成文、打磨——一律走深度档。
   const deep = body.deep === true || mode === "paper" || mode === "polish" || mode === "distill" || mode === "collide" || mode === "synth" || mode === "rounds";
   const _lightDeep = (mode === "distill" || mode === "collide" || mode === "synth");
-  const K = mode === "recommend" ? 48 : (_lightDeep ? 40 : (deep ? 120 : 20));              // 取多少块（深度档广撒网；retrieve 只收相关块、clamp 兜底，窄问题不会被噪声塞满）
-  const CTX_MAX = _lightDeep ? 14000 : (deep ? 50000 : 12000);   // 《站内资料》字数上限
+  // 【深度档连续问对：轮次越往后，站内资料给得越少】
+  //   前几轮已经把站内语料吸进上下文了，第五轮再灌五万字的边际收益很低；
+  //   而它的代价是实打实的——**检索时间与预填时间两样都算在平台那道 130 秒的墙里**，
+  //   而历轮上下文本身还在变长。两边一起涨，第四、五轮就撞墙。
+  //   线上真故障（2026-08-10）：第 4 轮空白框、第 3 轮零产出。
+  const _thr = (mode === "answer" && hist.length) ? Math.min(hist.length, 5) : 0;
+  const K = mode === "recommend" ? 48 : (_lightDeep ? 40 : (deep ? Math.max(48, 120 - _thr * 18) : 20));   // 取多少块（深度档广撒网；retrieve 只收相关块、clamp 兜底，窄问题不会被噪声塞满）
+  const CTX_MAX = _lightDeep ? 14000 : (deep ? Math.max(18000, 50000 - _thr * 8000) : 12000);   // 《站内资料》字数上限
   // 检索用问句：连续问对时把「缘起之问」并进去做锚——第七轮问「那这一条呢」这种
   // 指代式短问，单独拿去召回只会漂走；提炼档则用全场问题一起定向。
   const rq = _lightDeep
