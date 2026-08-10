@@ -736,7 +736,20 @@ function doAsk(){
           else if(j.t==='think'){ thinkChars+=(j.v||'').length; thinkEl.textContent='🧠 深度思考中（'+thinkChars+' 字）…'; }
           else if(j.t==='sources'){ renderSources(j.v); }
           else if(j.t==='expand'){ document.getElementById('sdeExpand').textContent='🧭 SDE 词义检索：'+j.v; }
-          else if(j.t==='error'){ ansEl.className='ans'; ansEl.innerHTML='<div class="err">'+esc(j.v)+'</div>'; if(j.code==='use_own_key'){ setKeyMode('own'); } }
+          else if(j.t==='error'){
+            ansEl.className='ans';
+            /* 写到一半被掉线：已经流出来的字是真交付物，不许被一句红字盖掉。
+               finishAsk 那边本来就会把 lastAns 当作本轮入档，只有屏幕上这一盒在骗人。 */
+            if(acc){
+              ansEl.textContent=acc;
+              var _eb=document.createElement('div'); _eb.className='err';
+              _eb.textContent=j.v+'　—— 以上是已经写出来的部分，本轮照常入档，可直接接着问下一轮。';
+              ansEl.appendChild(_eb);
+            } else {
+              ansEl.innerHTML='<div class="err">'+esc(j.v)+'</div>';
+            }
+            if(j.code==='use_own_key'){ setKeyMode('own'); }
+          }
         }
         return pump();
       });
@@ -818,7 +831,7 @@ function autoBatch(from, n, ix, attempt){
   attempt=attempt||1;
   var uk=(keyMode==='own')?document.getElementById('userKey').value.trim():'';
   var q=originQ()||document.getElementById('qa').value.trim();
-  var acc='', before=turns.length;
+  var acc='', before=turns.length, batchErr='';
   var wrap=document.getElementById('ansWrap'); wrap.classList.add('show');
   var ansEl=document.getElementById('ans'); ansEl.className='ans blink'; ansEl.textContent='';
   var thinkEl=document.getElementById('thinkBar');
@@ -848,7 +861,13 @@ function autoBatch(from, n, ix, attempt){
             }
             else if(j.t==='status'){ thinkEl.textContent=j.v; }
             else if(j.t==='sources'){ renderSources(j.v); }
-            else if(j.t==='error'){ rej(new Error(j.v||'基底返回错误')); return; }
+            else if(j.t==='error'){
+              /* 一批三轮，写到第三轮被掉线时，前两轮是写完了的。
+                 旧版一律 rej，整批作废——parseRounds 本来就只收带〔第N轮·答〕且够长的完整轮，
+                 所以只要已经有一轮落地，就改成正常收口，把写完的那几轮入档。 */
+              if(/〔第\d+轮·答〕/.test(acc)){ batchErr=j.v||''; res(); return; }
+              rej(new Error(j.v||'基底返回错误')); return;
+            }
           }
           pump();
         }).catch(rej);
@@ -856,6 +875,9 @@ function autoBatch(from, n, ix, attempt){
     });
   }).then(function(){
     ansEl.className='ans';
+    if(batchErr){ var _be=document.createElement('div'); _be.className='err';
+      _be.textContent=batchErr+'　—— 本批写完的轮次照常入档，没写完的那一轮下一批会接着要。';
+      ansEl.appendChild(_be); }
     var got=parseRounds(acc);
     got.forEach(function(t){ if(turns.length<MAXTURNS) turns.push(t); });
     if(turns.length>before){

@@ -136,6 +136,15 @@ ok(!/\breturn;\s*\}\s*$/m.test(bAsk.split("return fetch")[0]) || true, "（守�
 });
 
 /* ===== 四、前端自动模块的六条纪律 ===== */
+console.log("— 三半、掉线不得丢掉已写好的轮次 —");
+const bBatch = H.slice(H.indexOf("function autoBatch("), H.indexOf("function doAutoRun("));
+ok(/〔第\\d\+轮·答〕\/\.test\(acc\)/.test(bBatch) && /res\(\); return;/.test(bBatch),
+   "一批里已写完的轮次遇错照样收口入档（旧版一律 rej，末轮掉线就把整批丢掉）");
+ok(/batchErr/.test(bBatch), "入档之外还把那句掉线说明印出来，不默默吐掉");
+const bAskE = H.slice(H.indexOf("function doAsk("), H.indexOf("function finishAsk("));
+ok(/if\(acc\)\{[\s\S]{0,400}ansEl\.textContent=acc;/.test(bAskE),
+   "单轮问答掉线时保住已写正文（旧版用一句红字盖掉整个答案框）");
+
 console.log("— 四、自动十轮的纪律 —");
 const bAuto = H.slice(H.indexOf("function doAutoRun(){"), H.indexOf("function autoRecordText(){"));
 ok(/var AUTO_TARGET=10, ROUND_BATCH=(\d+);/.test(H), "目标轮次写死 10，批量提成具名常量");

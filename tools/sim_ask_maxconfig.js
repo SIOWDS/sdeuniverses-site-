@@ -108,6 +108,26 @@ ok(runBlk.indexOf("_hb = wdsBeat") < runBlk.indexOf("_drain(upstream"), "心跳�
 ok(/try \{ clearInterval\(_hb\); \} catch \(e\) \{\}/.test(W.slice(iRun, iRun + 4000)), "收尾清掉定时器，不留孤儿");
 ok(/function wdsBeat\(controller, state\)/.test(W), "wdsBeat 是站内既有的那一台，没另造一份");
 
+/* ===== 三半、时钟与字数是一对 =====
+   2026-08-10 线上真故障：把深度档问答的字数抬到两千多，总时长闸却还停在按 1200–1800 字标定的 75 秒，
+   第 2 轮当场撞出「超过 75 秒还没写完（已掉线）」。这两个数必须一起改。 */
+console.log("— 三半、时钟 —");
+const mClk = W.match(/const _clk = ([^;]*);/);
+ok(!!mClk, "_clk 在位");
+const clkFn = new Function("mode", "deep", "wdsClock",
+  PRE + 'const _heavy = (' + (mH ? mH[1] : "false") + ');\nconst _clk = ' + (mClk ? mClk[1] : "null") + ';\nreturn _clk;');
+const mkClk = (f, t) => ({ first: f, total: t });
+const cAns = clkFn("answer", true, mkClk), cPaper = clkFn("paper", false, mkClk);
+ok(cAns && cAns.total === 115000, "深度档问答的总时长闸 = 115 秒（旧的 75 秒是按 1200–1800 字标定的，抬字数后当场掉线）· 实得 " + (cAns && cAns.total));
+ok(cPaper && cPaper.total === 115000, "长文总时长闸也是 115 秒（全线同一个数，只比平台那道墙早一点）");
+ok(cAns && cAns.first === 45000 && cPaper && cPaper.first === 60000, "首帧闸各自不同：问答 45 秒、长文 60 秒");
+ok(clkFn("nextq", false, mkClk) === null, "不进重档的模式不挂时钟（行为不变）");
+ok(/_clk \? _clk\.signal : undefined/.test(W), "时钟的 signal 真接到了主调用上（算对了没接上等于没改）");
+ok(cPaper.total <= 130000, "总闸早于平台那约 133 秒的无声一刀");
+const wantChars = W.match(/\*\*(\d+)–(\d+) 字\*\*（这一步是论文的原料/);
+ok(!!wantChars && Number(wantChars[2]) <= 3000,
+   "深度档问答的字数上限 ≤ 3000（115 秒里还要先预填内功＋五万字站内资料）· 实得 " + (wantChars ? wantChars[2] : "?"));
+
 /* ===== 四、兜底重跑：关思考＋降档，但长文不许降到断句 ===== */
 console.log("— 四、兜底重跑 —");
 const mR = W.match(/const _retryTok = ([^;]*);/);
@@ -122,17 +142,8 @@ ok(/max_tokens: _retryTok,/.test(W), "重跑真的用了 _retryTok，不是又�
 ok(/wdsPlainBody\(VC, \{\s*\n\s*model: VC\.model, stream: true, max_tokens: _retryTok/.test(W),
    "重跑这一遍是关思考的（wdsPlainBody）——这一遍的意义就是逼它停下推演开始写");
 
-/* ===== 四之二、时钟护栏：预算大了，卡死也要看得见 ===== */
-console.log("— 四之二、时钟 —");
-ok(/const _clk = _deepAns \? wdsClock\(\d+, (\d+)\) : \(_heavy \? wdsClock\((\d+), (\d+)\) : null\);/.test(W), "重档挂时钟（首帧闸＋总时长闸），深度档问答另有更早的一档");
-const mD = W.match(/const _clk = _deepAns \? wdsClock\(\d+, (\d+)\)/);
-/* 深度档问答的闸要早到"兜底还跑得完"：掐断后关思考重跑约二三十秒，仍要落在平台那约 128 秒的墙之内。 */
-ok(mD && Number(mD[1]) <= 90000, "深度档问答闸 " + (mD ? mD[1] / 1000 : "?") + "s ≤ 90s：掐了还来得及关思考重跑一遍，答案照样交得出来");
-const mC = W.match(/_heavy \? wdsClock\((\d+), (\d+)\) : null\);/);
-/* 总时长闸必须**早于平台**：实测平台在约 133 秒无声杀掉整个请求（连 [DONE] 都没有）。
-   闸设在它之后＝这台时钟形同虚设，用户仍然只会看到一个说不出理由的 0 字。 */
-ok(mC && Number(mC[1]) >= 30000 && Number(mC[2]) >= 90000 && Number(mC[2]) <= 130000,
-   "闸值 " + (mC ? (mC[1] / 1000 + "s / " + mC[2] / 1000 + "s") : "?") + "：首帧不太紧，总时长早于平台那约 133 秒的无声一刀");
+/* 旧的「四之二·时钟」三条已并入上面「三半」：它们把 _clk 的**表达式形状**写死在正则里，
+   一改成 `_heavy ? wdsClock(_deepAns ? 45000 : 60000, 115000)` 就全部失效。改成真跑取值，跟着源码走。 */
 ok(/if \(_clk\) _clk\.firstFrame\(\);/.test(W), "出流即撤首帧闸（后面还有真活要干）");
 ok(/if \(_clk\) _clk\.stop\(\);/.test(W), "收尾停表，不留孤儿定时器");
 ok(/\(_clk && _clk\.cut\) \? _clk\.why\(VC\.name\)/.test(W), "被时钟掐断时说清掐在哪一闸、多少秒——不与「流自己坏了」混为一谈");
