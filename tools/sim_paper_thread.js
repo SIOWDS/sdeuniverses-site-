@@ -233,5 +233,28 @@ const bAsk5 = H.slice(H.indexOf("function doAsk("), H.indexOf("function finishAs
 ok(/_gotSrc=false/.test(bAsk5) && /_gotSrc=true/.test(bAsk5) && /if\(!_gotSrc && _prevSrc\)/.test(bAsk5),
   "本轮没发 sources 就把上一轮的出处留在屏幕上（否则第三轮起出处区会整块消失）");
 
+/* ===== 十二、每一步都要报秒数（2026-08-10，连着八轮靠猜之后补的）=====
+   前八轮每一次故障，手里只有一句不带时间的状态，于是只能猜哪一步慢——
+   猜一次改一次，改完又换一处死。状态里多印几个字，下一次就不必再猜。 */
+console.log("— 十二、全链埋秒数 —");
+ok(/const _T0 = Date\.now\(\);[\s\S]{0,200}const _el = \(\) =>/.test(W), "_T0 在 _stat 之前，_el\(\) 算得到秒数");
+ok(/const _stat = \(v\) => \{ if \(SINK\)[\s\S]{0,160}_el\(\) \+ "s）"/.test(W),
+  "**每一条**状态都自动带上秒数（不靠逐处手写，漏一处就又是一个盲点）");
+ok(/_stat\("✅ 站内检索完成 · 命中 "/.test(W), "检索跑完报一声（否则分不清「死在检索」与「检索完了死在下一步」）");
+ok(/_stat\(reflect \? "✅ 内功与心得就绪"/.test(W), "内功／心得装完报一声，并区分有没有心得");
+ok(/_stat\("✍️ 开始作答 · 前置用掉 " \+ Math\.round\(_spent \/ 1000\)[\s\S]{0,80}_budget \/ 1000\)/.test(W),
+  "**最要紧的一条**：开始作答时把「前置吃掉多少、还剩多少给写字」印在屏幕上");
+ok(W.indexOf('_stat("✍️ 开始作答') > W.indexOf('const _clk = _heavy ?'),
+  "那一条排在 _spent/_budget 算出来之后");
+
+/* 心得不得在答题请求里现生成：那是一次自带 45 秒超时的基底调用，
+   而且它发生在**调基底之前**——预算在真正开始写字前就被花光了。 */
+console.log("— 十三、心得不在答题请求里现生成 —");
+ok(/async function ensureReflect\(env, url, vendor, VC, KEY, allowGen\)/.test(W), "ensureReflect 收 allowGen");
+ok(/if \(allowGen === undefined\) allowGen = true;/.test(W), "默认仍可生成，十几个老调用点行为一个字不变");
+ok(/if \(!allowGen\) return "";/.test(W), "allowGen=false 时直接返回空，不走生成");
+ok(/await ensureReflect\(env, url, vendor, VC, KEY, false\)/.test(W), "答题请求那一处传了 false");
+ok(/ctx\.waitUntil\(ensureReflect\(/.test(W), "心得仍有后台预先备好的路（否则就是永远没有心得）");
+
 console.log("\n===== " + P + " PASS / " + F + " FAIL =====");
 process.exit(F ? 1 : 0);

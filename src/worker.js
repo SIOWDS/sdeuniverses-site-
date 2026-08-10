@@ -3279,7 +3279,8 @@ const REFLECT_PROMPT = "请用你自己的话，写一篇《从发现到发生�
 // 生成失败负缓存 60 秒：防止 vault 为空时每条消息都烧一遍完整内功的生成调用。
 let REFLECT_MEM = {}; // vendor -> { text, exp }
 const REFLECT_MEM_TTL = 10 * 60 * 1000, REFLECT_FAIL_TTL = 60 * 1000;
-async function ensureReflect(env, url, vendor, VC, KEY) {
+async function ensureReflect(env, url, vendor, VC, KEY, allowGen) {
+  if (allowGen === undefined) allowGen = true;   // 老调用点行为一个字不变
   const now = Date.now();
   const mem = REFLECT_MEM[vendor];
   if (mem && now < mem.exp) return mem.text;
@@ -3288,6 +3289,8 @@ async function ensureReflect(env, url, vendor, VC, KEY) {
     const r = await (await cv.fetch(new Request("https://cfg.internal/", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ op: "getReflect", vendor }) }))).json();
     if (r.reflect && r.reflect.length > 500) { REFLECT_MEM[vendor] = { text: r.reflect, exp: now + REFLECT_MEM_TTL }; return r.reflect; }
   } catch (e) {}
+  // allowGen=false 的调用方（答题请求）宁可没有心得，也不肯在自己的时间里现生成一份。
+  if (!allowGen) return "";
   const neigong = await loadNeigong(env, url);
   if (!neigong) return "";
   let text = "";
@@ -4596,11 +4599,15 @@ async function askCore(request, env, url, body, SINK) {
     for (const o of objs) SINK.ctl.enqueue(_sseBytes(o));
     return null;
   };
-  // 进度提示：出流之后这些重活要跑十几秒，读者总得看见页面还活着。
-  const _stat = (v) => { if (SINK) SINK.ctl.enqueue(_sseBytes({ t: "status", v: v })); };
   // 【整个请求的起始时间】平台那道约 128–133 秒的墙，是从**请求到达**开始走的，
   //   不是从调基底那一刻开始。词表扩展、全站检索、装内功与心得全在调基底之前。见下面 _clk。
   const _T0 = Date.now();
+  const _el = () => Math.round((Date.now() - _T0) / 1000);
+  // 进度提示：出流之后这些重活要跑十几秒，读者总得看见页面还活着。
+  // ⚠ 【每一条都带秒数】2026-08-10 连着八轮修这台机器，每一轮都是从一句没有时间的状态里**猜**
+  //   哪一步慢。猜一次就改一次，改完又换一处死。前端在零产出时会把最后一条状态原样印出来，
+  //   所以这里多印四个字，下一次故障就不必再猜：谁用了多少秒，写在屏幕上。
+  const _stat = (v) => { if (SINK) SINK.ctl.enqueue(_sseBytes({ t: "status", v: v + "（+" + _el() + "s）" })); };
   const q = String(body.q || "").trim().slice(0, 300); // 输入硬钳位
   if (q.length < 2) return _out([{ t: "error", v: "请输入一个问题（至少 2 个字）。" }]);
 
@@ -4759,6 +4766,7 @@ async function askCore(request, env, url, body, SINK) {
     const _lrA = await _raceRag(lightRetrieve(env, url, rq, expTerms, K, 1600, { pick: deep ? 48 : 20, perDoc: deep ? 3 : 2, budget: deep ? 6000000 : 3000000, only: _scope }), _EMPTY_RAG);
     if (_ragCut) _stat("⏱ 站内检索超时，本轮不带站内资料作答（问对上下文照常带）…");
     corpus = _lrA.corpus; hits = _lrA.hits;
+    _stat("✅ 站内检索完成 · 命中 " + (hits ? hits.length : 0) + " 段");
     const seen = {};
     for (const ck of hits) {
       const d = corpus.docs[ck.d];
@@ -4814,8 +4822,15 @@ async function askCore(request, env, url, body, SINK) {
   // ===== 深度档 =====
   if (deep) {
     _stat("📚 正在装载内功与心得…");
-    const reflect = await ensureReflect(env, url, vendor, VC, KEY);
+    // ⚠ allowGen=false：**答题请求里绝不现生成心得**。
+    //   ensureReflect 在缓存与 Durable Object 都落空时会现调一次基底写心得，那一次自带 45 秒超时——
+    //   而这一轮问答本来就要预填内功、还要写两千字，再塞一次 45 秒的生成，
+    //   合计必然越过平台那道 130 秒的墙，而且是在**调基底之前**就把预算用光。
+    //   心得该在「开工」那一步用 ctx.waitUntil 提前备好（见文件末尾那处调用）；
+    //   这里拿不到就只装内功照常作答，并在状态里说明——降级好过整轮没有答案。
+    const reflect = await ensureReflect(env, url, vendor, VC, KEY, false);
     const neigong = await loadNeigong(env, url);
+    _stat(reflect ? "✅ 内功与心得就绪" : "✅ 内功就绪（本轮没有现成心得，只装内功；心得会在后台补上）");
     // 四步法（S→D→E→整合，四次独立调用；贵 4 倍，仅在「四步法」开关打开时启用）
     if (reflect && neigong && body.four === true && mode !== "paper" && mode !== "polish") {
       const ctx4 = ctxText.slice(0, 15000); // 四步各调用共用《站内资料》，钳 15000 控 4× 成本
@@ -5379,6 +5394,8 @@ async function askCore(request, env, url, body, SINK) {
   const _spent = Date.now() - _T0;
   const _budget = Math.max(25000, 120000 - _spent);   // 115→20：平台墙实测 128–133 秒，留 8–13 秒够把掉线那句话发出去
   const _clk = _heavy ? wdsClock(Math.min(_deepAns ? 45000 : 60000, _budget), _budget) : null;
+  // 一整轮的账，一句话说清：前置吃掉多少、还剩多少给写字。零产出时前端会把这句原样印出来。
+  _stat("✍️ 开始作答 · 前置用掉 " + Math.round(_spent / 1000) + "s，留给写作 " + Math.round(_budget / 1000) + "s");
   // 兜底重跑：关思考＋降档，逼它早点停下推演开始写。但长文模式不能降到 4000——
   // 实测 4000 tok 交出来的是一篇断在半句上的稿（线上原样：6,847 字，末句「但他输光」）。
   // 长文首发本来就已经是「满预算＋关思考」，重跑与它同形，只降一档预算逼它早点收笔。
