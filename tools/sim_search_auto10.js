@@ -151,8 +151,8 @@ ok(/var AUTO_TARGET=10, ROUND_BATCH=(\d+);/.test(H), "目标轮次写死 10，�
 ok(/if\(rem-n===1\) n=Math\.max\(2, ?n-1\);/.test(bAuto), "尾巴不留孤轮（worker 最小收 2 轮，10 轮拆成 3+3+2+2）");
 ok(/onclick="doAutoRun\(\)"/.test(H) && /id="autoStopBtn"/.test(H) && /id="autoWrap"/.test(H), "按钮与面板都挂上了（孤儿函数等于没做）");
 ok(/if\(!confirm\(/.test(bAuto) && /系统密钥/.test(bAuto), "开跑前必须确认，且如实说清系统密钥会被吃掉多少");
-ok(/var calls=4\+\(triOn\?7:4\)\+4\+1;/.test(bAuto), "报给用户的调用次数按档现算（四批问对＋提炼四段＋成文四段＋盲评＝13；涌现档 16）");
-ok(/约 <b>13<\/b> 次基底调用（开涌现档 16 次）/.test(H), "说明条里的次数与公式对得上（4 轮批+4 提炼+4 成文+1 盲评=13 / 涌现档提炼那格换成 7 ⇒ 16）");
+ok(/var calls=4\+\(triOn\?7:3\)\+4\+1;/.test(bAuto), "报给用户的调用次数按档现算（四批问对＋提炼三次（规划＋两段）＋成文四段＋盲评＝12；涌现档 16）");
+ok(/约 <b>12<\/b> 次基底调用（开涌现档 16 次）/.test(H), "说明条里的次数与公式对得上（4 轮批+3 提炼+4 成文+1 盲评=12 / 涌现档提炼那格换成 7 ⇒ 16）");
 ok(/okRounds<2/.test(bAuto) && /不再往下烧调用/.test(bAuto), "一批两次都没跑成 ⇒ 停下收口，不把剩下的调用烧完");
 ok(/function nextBatch\(\)/.test(bAuto) && /okRounds\+=got;/.test(bAuto), "分批推进：写不满五轮也不算失败，下一批从断点接着要");
 ok(/if\(!brief\)\{[^}]*throw/.test(bAuto), "提炼没出入口资料 ⇒ 不写论文（没有入口资料的论文会退回单轮底稿）");

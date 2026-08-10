@@ -43,7 +43,10 @@ ok(/body\.reasoning_effort = \(VC && VC\.effort\) \? VC\.effort : "max";/.test(W
    结果 distill 进 _topPower 那一轮，模拟里重建的还是旧的，阶梯断言全程在测一个已经不存在的版本。 */
 const mTop0 = W.match(/const _topPower = \(([^)]*)\);/);
 const mFull = W.match(/const _fullPower = \(([^)]*)\);/);
-const PRE = 'const _topPower = (' + (mTop0 ? mTop0[1] : 'false') + ');\n'
+const mBP = W.match(/const _briefPlan = ([^;]*);/);
+const PRE = 'const part = 1;\n'
+  + 'const _briefPlan = (' + (mBP ? mBP[1] : 'false') + ');\n'
+  + 'const _topPower = (' + (mTop0 ? mTop0[1] : 'false') + ');\n'
   + 'const _deepAns = (mode === "answer" && deep);\n'
   + 'const _fullPower = (' + (mFull ? mFull[1] : 'false') + ');\n';
 ok(!!mFull, "_fullPower 在位（满预算、关思考、上时钟、兜底 16000 四件事同用这一个集合）");
@@ -87,8 +90,8 @@ ok(isTop("distill") === true,
    "真跑：distill **挂**满功率——它 2026-08-10 改成四段两万字之后就是长文，与成文／打磨同档");
 ok(isTop("answer") === false && isTop("nextq") === false && isTop("collide") === false,
    "真跑：answer / nextq / collide 不挂满功率（深度档问答与碰撞走 _fullPower 抬预算，但不换型号）");
-ok(/const _plainLong = _fullPower;/.test(W) && /wdsFetchMax\(_VCX, KEY, _msgs, true[\s\S]{0,140}_plainLong\)/.test(W),
-   "长文两档 ＝ 满预算 ＋ 关思考（实测：给满预算时交稿的本来就是关思考那一遍）");
+ok(/const _plainLong = _fullPower && !_briefPlan;/.test(W) && /wdsFetchMax\(_VCX, KEY, _msgs, true[\s\S]{0,140}_plainLong\)/.test(W),
+   "长文两档 ＝ 满预算 ＋ 关思考（实测：给满预算时交稿的本来就是关思考那一遍）；**唯一的例外是提炼的规划段**（“总结要先思考”）");
 ok(/plain \? wdsPlainBody\(VC, body\) : wdsTopBody\(VC, body\)/.test(W),
    "关思考这一路真的接到 wdsFetchMax 的 body 上；不传 plain 的既有调用点行为不变");
 ok(/upstream = await wdsFetchMax\(_VCX, KEY, _msgs, true, _heavy \? WDS_TOK_HEAVY : MAXTOK,/.test(W),
