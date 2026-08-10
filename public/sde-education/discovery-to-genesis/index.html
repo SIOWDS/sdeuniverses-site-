@@ -521,7 +521,6 @@ document.querySelectorAll('.modebtn').forEach(function(b){
 });
 </script>
 <script>var PDF_URL="/sde-education/pdf/discovery-to-genesis.pdf";
-var PDF_URL="/education/ai-era/pdf/adjudication-outsourcing.pdf";
 var pdfDoc=null,pageNum=1,rendering=false,pending=null,scale=1.25,pdfInited=false;
 function $(id){return document.getElementById(id);}
 document.querySelectorAll('.modebtn').forEach(function(b){b.addEventListener('click',function(){var m=b.dataset.m;document.querySelectorAll('.modebtn').forEach(function(x){x.classList.toggle('on',x.dataset.m===m);});document.querySelectorAll('.panel').forEach(function(p){p.classList.toggle('on',p.id===m);});window.scrollTo(0,0);if(m==='pdf'){initPdf();}});});
