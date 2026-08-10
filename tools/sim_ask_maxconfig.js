@@ -122,29 +122,32 @@ const clkFn = new Function("mode", "deep", "wdsClock", "_spent",
       + 'const _clk = ' + (mClk ? mClk[1] : "null") + ';\nreturn _clk;');
 const mkClk = (f, t) => ({ first: f, total: t });
 const cAns = clkFn("answer", true, mkClk, 0), cPaper = clkFn("paper", false, mkClk, 0);
-ok(cAns && cAns.total === 115000, "深度档问答的总时长闸 = 115 秒（旧的 75 秒是按 1200–1800 字标定的，抬字数后当场掉线）· 实得 " + (cAns && cAns.total));
-ok(cPaper && cPaper.total === 115000, "长文总时长闸也是 115 秒（全线同一个数，只比平台那道墙早一点）");
+/* 闸值不写死：从源码里抽。写死一个数就是本文件反复被咬的那个病。 */
+const budgetAt = (spent) => clkFn("paper", false, mkClk, spent).total;
+const WALL = budgetAt(0);
+ok(cAns && cAns.total === WALL && WALL >= 90000 && WALL <= 125000, "深度档问答与长文同一个总闸，且早于平台那道 128–133 秒的墙 · 实得 " + WALL / 1000 + "s");
+ok(cPaper && cPaper.total === WALL, "全线同一个总闸（分开写两个数，改一个忘一个是迟早的事）");
 ok(cAns && cAns.first === 45000 && cPaper && cPaper.first === 60000, "首帧闸各自不同：问答 45 秒、长文 60 秒");
 ok(clkFn("nextq", false, mkClk, 0) === null, "不进重档的模式不挂时钟（行为不变）");
 /* 【闸必须从请求到达算起】平台那道约 130 秒的墙不管你前面干了什么：
    词表扩展＋全站检索＋装内功先吃掉几十秒，再给上游满 115 秒，合计必超。
    线上真故障：手动问对第 4 轮空白框停了八十分钟。 */
 ok(/const _T0 = Date\.now\(\);/.test(W), "askCore 顶部埋下了请求起始时间");
-ok(/const _spent = Date\.now\(\) - _T0;/.test(W) && /115000 - _spent/.test(W),
+ok(/const _spent = Date\.now\(\) - _T0;/.test(W) && /\d+ - _spent/.test(W),
    "闸的预算把出流前已经花掉的时间扣掉了（否则总时长永远超平台那道墙）");
-ok(/Math\.max\(25000, 115000 - _spent\)/.test(W),
+ok(/Math\.max\(25000, \d+ - _spent\)/.test(W),
    "扣到最后也留 25 秒：前面再拖也要给基底一段能写出东西的窗口");
 ok(/wdsClock\(Math\.min\(_deepAns \? 45000 : 60000, _budget\), _budget\)/.test(W),
    "首帧闸也不得超过剩余预算（否则首帧闸比总闸还晚，等于没闸）");
 /* 真跑：出流前已经花掉 60 秒时，上游只剩 55 秒，首帧闸也跟着缩 */
 const c60 = clkFn("answer", true, mkClk, 60000), c200 = clkFn("answer", true, mkClk, 200000);
-ok(c60.total === 55000 && c60.first === 45000, "出流前花掉 60s ⇒ 上游只剩 55s · 实得 " + c60.total / 1000 + "s");
+ok(c60.total === WALL - 60000 && c60.first === 45000, "出流前花掉 60s ⇒ 上游只剩 " + c60.total / 1000 + "s（总闸减 60）");
 ok(c200.total === 25000 && c200.first === 25000, "拖到 200s ⇒ 仍留 25s 底线，且首帧闸不得晚于总闸");
 ok(/_clk \? _clk\.signal : undefined/.test(W), "时钟的 signal 真接到了主调用上（算对了没接上等于没改）");
 ok(cPaper.total <= 130000, "总闸早于平台那约 133 秒的无声一刀");
-const wantChars = W.match(/\*\*(\d+)–(\d+) 字\*\*（这一步是论文的原料/);
-ok(!!wantChars && Number(wantChars[2]) <= 3000,
-   "深度档问答的字数上限 ≤ 3000（115 秒里还要先预填内功＋五万字站内资料）· 实得 " + (wantChars ? wantChars[2] : "?"));
+const wantChars = W.match(/\*\*(\d+)–(\d+) 字\*\*，结尾留一个/);
+ok(!!wantChars && Number(wantChars[2]) <= 2200,
+   "深度档问答的字数上限 ≤ 2200：线上实测 107 秒写不完 2800 字（窗口里还要先预填内功与站内资料）· 实得 " + (wantChars ? wantChars[2] : "?"));
 
 /* ===== 四、兜底重跑：关思考＋降档，但长文不许降到断句 ===== */
 console.log("— 四、兜底重跑 —");
