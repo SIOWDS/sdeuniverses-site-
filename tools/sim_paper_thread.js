@@ -134,5 +134,24 @@ ok(/const AUTO_LADDER = \[/.test(W) && /if \(mode === "nextq"\)/.test(W),
   "服务端仍是阶梯的唯一定义处");
 ok(/拟不出来|fb: "/.test(W), "每一级都配兵底问句（拟题失败也能把这一轮问出去）");
 
+/* ===== 七、“不动了”不得再发生（2026-08-10 第二起线上故障）=====
+   第 4 轮：空白框、无报错、等八十分钟仍是空。两处都要堵：
+   ① 流完了却一个字都没有时，finishAsk 必须说话；② 流根本不结束时，前端得有自己的看门狗。 */
+console.log("— 七、静默挂死 —");
+const bFin2 = H.slice(H.indexOf("function finishAsk("), H.indexOf("function qNorm("));
+ok(/if\(!lastAns \|\| !lastAns\.length\)\{[\s\S]{0,400}class="err"/.test(bFin2),
+  "流完了却零产出时给一句能读的话（旧版完全沉默，空白框停在那儿）");
+ok(/本轮没有入档/.test(bFin2), "并告诉用户本轮没入档、直接再问一次就行");
+const bAsk3 = H.slice(H.indexOf("function doAsk("), H.indexOf("function finishAsk("));
+ok(/new AbortController\(\)/.test(bAsk3) && /signal:_ac\?_ac\.signal:undefined/.test(bAsk3),
+  "doAsk 自带 AbortController 且真接到 fetch 上（服务端的闸管不住整个 Worker 被杀）");
+ok(/function _bump\(ms\)/.test(bAsk3) && (bAsk3.match(/_bump\(/g) || []).length >= 3,
+  "看门狗每收一帧就续一次（只设一次等于把正常的长回答也掉了）");
+ok(/_bump\(deepOn\?150000:70000\)/.test(bAsk3),
+  "首帧闸给得宽：深度档出流前要跑词表扩展＋全站检索＋装内功");
+ok(/if\(_stalled\)\{/.test(bAsk3) && /finishAsk\(ansEl\);/.test(bAsk3),
+  "自己掉线时：已写出的字保住并入档，不当成「请求失败」一抄了事");
+ok(/if\(_wd\) clearTimeout\(_wd\);/.test(bAsk3), "收尾清掉看门狗（不清就会在下一轮里乱开枪）");
+
 console.log("\n===== " + P + " PASS / " + F + " FAIL =====");
 process.exit(F ? 1 : 0);

@@ -722,10 +722,17 @@ function doAsk(){
   var srcEl=document.getElementById('sources'); srcEl.innerHTML='';
   document.getElementById('sdeExpand').textContent='';
   var acc='', thinkChars=0;
+  /* 【看门狗】服务端的闸只管得住「上游不写」，管不住「整个 Worker 被平台杀掉」——
+     那一种前端会无限等下去（线上真出过：第 4 轮空白框停了八十分钟）。
+     每收到一帧就续一次：首帧给得宽（深度档出流前要检索＋装内功），出流后帧间不应超过一分钟。 */
+  var _ac=(typeof AbortController!=='undefined')?new AbortController():null, _wd=null, _stalled=false;
+  function _bump(ms){ if(_wd) clearTimeout(_wd); _wd=setTimeout(function(){ _stalled=true; try{ _ac && _ac.abort(); }catch(e){} }, ms); }
+  _bump(deepOn?150000:70000);
 
   return fetch('/api/ask',{
     method:'POST',
     headers:{'content-type':'application/json'},
+    signal:_ac?_ac.signal:undefined,
     body:JSON.stringify(Object.assign({q:q,vendor:vendor}, turns.length?{hist:buildHist(false)}:{}, uk?{key:uk}:{}, deepOn?{deep:true}:{}, (deepOn&&fourOn)?{four:true}:{}, triOn?{tri:true}:{}))
   }).then(resp=>{
     if(!resp.ok && resp.status!==200){
@@ -743,6 +750,7 @@ function doAsk(){
           var payload=s.slice(5).trim();
           if(payload==='[DONE]'){ continue; }
           var j; try{ j=JSON.parse(payload); }catch(e){ continue; }
+          _bump(75000);
           if(j.t==='token'){ acc+=j.v; lastAns=acc; ansEl.textContent=acc; }
           else if(j.t==='status'){ thinkEl.textContent=j.v; }
           else if(j.t==='think'){ thinkChars+=(j.v||'').length; thinkEl.textContent='🧠 深度思考中（'+thinkChars+' 字）…'; }
@@ -769,14 +777,35 @@ function doAsk(){
     return pump();
   }).catch(e=>{
     ansEl.className='ans';
+    if(_stalled){
+      /* 是我们自己掉的线，不是请求失败——已写出的字照样保住并入档 */
+      if(acc){
+        ansEl.textContent=acc;
+        var _sb=document.createElement('div'); _sb.className='err';
+        _sb.textContent='基底中途停住了（超过一分钟没有新内容），已主动掉线。以上是已经写出来的部分，本轮照常入档。';
+        ansEl.appendChild(_sb);
+        finishAsk(ansEl);
+      } else {
+        ansEl.innerHTML='<div class="err">等了 '+(deepOn?'两半分钟':'一分多钟')+'，一帧都没收到，已主动掉线（再等下去也只是空白框）。本轮没有入档，直接再点一次「问」即可。</div>';
+      }
+      return;
+    }
     ansEl.innerHTML='<div class="err">请求失败：'+esc(e.message||String(e))+'</div>';
   }).finally(()=>{
+    if(_wd) clearTimeout(_wd);
     asking=false; goBtn.disabled=false;
     document.getElementById('thinkBar').textContent='';
   });
 }
 function finishAsk(ansEl){
   ansEl.className='ans';
+  /* 【流完了却一个字都没有】旧版在这里完全沉默：空白框停在那儿，不报错也不提示，
+     用户只看得到「不动了」。零产出一定是出事了——多半是 Worker 被平台无声杀掉，
+     流突然断、没有 [DONE]、连 error 帧都没发出来。必须说一句。 */
+  if(!lastAns || !lastAns.length){
+    ansEl.innerHTML='<div class="err">本轮一个字都没回来，连错误也没报——这通常是整个请求被平台无声掉线了（轮次越往后、上下文越长，越容易碰到）。本轮没有入档，直接再点一次「问」即可；若连着两次都空，把问题问短一点、或换一个基底。</div>';
+    return;
+  }
   if(lastAns && lastAns.length>60){
     document.getElementById('askActs').classList.add('show');
     /* 本轮入档：只有真答出来的才算一轮，报错/空答不占轮次 */
