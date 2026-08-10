@@ -18,14 +18,16 @@ function build(part, body) {
   return fn(part, Object.assign({ seed: "S".repeat(50), head: "H", tail: "T" }, body || {}),
     "问题", "资料", "内功正文", "心得正文", "缘起之问", [], "");
 }
-const P1 = build(1), P2 = build(2);
+const P1 = build(1), P2 = build(2), P3 = build(3), P4 = build(4);   /* 2026-08-10：两段改四段·两万字·投稿体例 */
 /* 带《论文入口资料》的那条路（十轮问对提炼后走的就是它） */
 const B1 = build(1, { brief: "入口资料正文".repeat(10), qlist: "1. 第一问\n2. 第二问" });
 const B2 = build(2, { brief: "入口资料正文".repeat(10) });
 
 let P = 0, F = 0;
 const ok = (c, m) => { c ? (P++, console.log("  PASS " + m)) : (F++, console.log("  FAIL " + m)); };
-const both = (s, m) => ok(P1.sys.includes(s) && P2.sys.includes(s), m);
+const both = (s, m) => ok(P1.sys.includes(s) && P2.sys.includes(s) && P3.sys.includes(s) && P4.sys.includes(s), m);
+/* 四段的通用护栏：段与段之间不许换纪律，也不许有哪一段丢了投稿体例清单 */
+const ALL = [P1, P2, P3, P4];
 
 /* —— 规程整体在位（上下半篇共用 base，两边都要有）—— */
 both("出稿前自检规程 v3", "规程标题写进上下半篇的 system prompt");
@@ -113,20 +115,28 @@ both("【成文格式纪律", "格式纪律在位（上下半篇都要有）");
 both("改写成逐格分条", "判据表改用逐格分条（不画表格但不丢内容）");
 
 /* —— 接缝：上半篇断在半句「一旦这些」，下半篇直接另起标题 —— */
-ok(P1.sys.includes("停笔处必须是一个完整句子的句号"), "上半篇：停笔必须落在完整句子上");
+ok(P1.sys.includes("在一个完整句子的句号"), "第一段：停笔必须落在完整句子上");
 ok(P1.sys.includes("也不许停在一个只写了标题的空章上"), "上半篇：不许停在空章标题上");
-ok(P2.sys.includes("把那半句补成一个完整句子"), "下半篇：接到断句要先补完再往下写");
+ok(P2.sys.includes("把它补成完整句子再往下写"), "续写段：接到断句要先补完再往下写");
 ok(P2.sys.includes("绝不允许直接另起标题、把断句丢在那里"), "下半篇：禁止把断句丢下另起标题");
 
 /* —— 下半篇的交付完整性（治三篇都断在末页那件事）—— */
-ok(P2.sys.includes("【结语】与【参考文献】是必交项"), "下半篇：结语与参考文献列为必交项");
-ok(P2.sys.includes("绝不允许在半句话中途停笔"), "下半篇：禁止半句停笔");
-ok(P2.sys.includes("优先压缩前面论证章节的字数"), "下半篇：篇幅吃紧时的取舍次序写明（先压论证、不砍收尾）");
+ok(P4.sys.includes("以下每一项都是必交项，一项不落"), "末段：结论/注释/参考文献/附录/投稿声明列为必交项");
+ok(P4.sys.includes("【参考文献】") && P4.sys.includes("【附录 A") && P4.sys.includes("【投稿声明】"), "末段：投稿体例的收尾四件都点名");
+ok(P1.sys.includes("【Abstract】") && P1.sys.includes("【Keywords】"), "首段：英文题名与中英摘要关键词齐（投稿体例的硬件）");
+ok(P4.sys.includes("必须把结论、参考文献、附录与投稿声明四项完整写完"), "末段：禁止把收尾件写丢");
+ok(P4.sys.includes("优先压缩第八章"), "末段：篇幅吃紧时的取舍次序写明（先压讨论、不砍收尾）");
 ok(P1.sys.includes("其中至少一位须是自检规程（一）要求的外文占位者"), "上半篇：引言处再钉一次外文占位者");
 
 /* —— 回归：老纪律与流程契约不许被这次改动碰掉 —— */
-ok(P1.sys.includes("〔上半篇完·待续〕"), "回归：上半篇收尾标记仍在（前端靠它切分）");
-ok(P2.sys.includes("〔全文完〕"), "回归：下半篇收尾标记仍在");
+ok(P1.sys.includes("〔第一段完·待续〕") && P2.sys.includes("〔第二段完·待续〕") && P3.sys.includes("〔第三段完·待续〕"), "回归：前三段收尾标记仍在（前端靠它切分）");
+ok(P4.sys.includes("〔全文完〕"), "回归：末段收尾标记仍在");
+ok(ALL.every((x) => x.sys.includes("【投稿体例")), "四段每一段都带着投稿体例的元素清单（丢一段＝那一段可能漏元素）");
+ok(ALL.every((x) => x.sys.includes("写满约 4800–5400 字")), "四段各约五千字——两万字靠加段数，不靠加长单段（加长必被平台时钟杀在思考阶段）");
+ok(new Set(ALL.map((x) => x.sys)).size === 4, "四段的 system 各不相同（相同＝分段没生效，会写出四段同样的东西）");
+ok(!P1.sys.includes("无缝续写") && ALL.slice(1).every((x) => x.sys.includes("无缝续写")), "只有续写段被要求接前一段，首段不接");
+ok(P2.sys.includes("【四、控制变量 Z") && P3.sys.includes("【五、第二轴") && P3.sys.includes("【六、可裁决判据"), "章节分工落到具体段上（不靠模型临场分配）");
+ok(build(9).sys === P1.sys, "越界的 part 回落到第一段，不会发出空规格");
 both("二阶碰撞法", "回归：二阶碰撞法仍是核心纪律");
 both("绝不把回答扩写注水", "回归：禁注水仍在");
 both("可核验事实", "回归：不编造可核验事实仍在");
@@ -172,7 +182,7 @@ ok(B1.sys.includes("〔四、反复被触到的分离点〕"), "分离点那一�
 ok(B1.sys.includes("〔六、尚未解决的张力〕必须逐条正面处理"), "张力那一栏必须正面处理");
 ok(B1.sys.includes("一律不得当作已证实的事实去支撑被解释项"), "第八栏证据等级：自引/未核验不得当事实");
 ok(B1.sys.includes("把它扩写成文即为不合格"), "入口资料只是入口，禁止扩写成文");
-ok(B1.usrOverride.includes("《论文入口资料（十轮问对的提炼——这是清单，逐条兑现）》"), "上半篇：入口资料进 user 消息");
+ok(B1.usrOverride.includes("《论文入口资料（这是清单，逐条兑现）》"), "首段：入口资料进 user 消息");
 ok(B1.usrOverride.includes("《这场问对走过的路（问题清单）》"), "上半篇：问题清单进 user 消息");
 ok(B1.usrOverride.includes("《缘起之问》"), "上半篇：缘起之问进 user 消息");
 ok(B2.usrOverride.includes("《论文入口资料"), "下半篇：仍拿着同一份清单");

@@ -206,7 +206,7 @@ a.reco .rw{font-size:0.8rem;color:var(--muted,#8a8a8a);margin-top:3px;line-heigh
     </div>
     <div id="deepHint" style="display:none;font-size:0.78rem;color:var(--gold);margin:9px 2px 0;line-height:1.6">🔬 深度模式：基底先内化内功写心得，再用 <b>SDE 方法论</b>（六路径→S/D/E→三方程→误差互消→逮先验）做一次有指导性的深入研究，现实问题还会给可执行的「怎么办」。默认<b>单次调用</b>（较慢、较费 token，建议自带 Key）。<br>点「四步法」→ 升级为 <b>S/D/E 四次独立调用</b>的完整误差互消（最深，但慢 4 倍、贵 4 倍，只在要冲满时用）。</div>
     <div id="emergeHint" style="display:none;font-size:0.78rem;color:var(--gold);margin:8px 2px 0;line-height:1.6">🌀 涌现档：每一轮不再给一篇答案，而是给<b>三个彼此有分歧的观点</b>（写完就停，不许调和——张力要留给碰撞）。问够 2–10 轮后点「二阶碰撞」：系统<b>随机抽三种不同撞法各撞出一个典范</b>，再用创新智商<b>背靠背盲评择优</b>，最后做<b>综合提炼</b>作为论文入口。全程每次调用都装内功＋心得＋方法论；一轮完整涌现约 17–18 次调用，很费 token，建议自带 Key。</div>
-    <div id="autoHint" style="font-size:0.78rem;color:var(--gold);margin:8px 2px 0;line-height:1.6">🚀 自动十轮：<b>你只交一个问题，中途不用再点任何东西</b>。系统按一条固定的九级追问阶梯（承重命题 → 共有前提 → 反例与边界 → 发生次序 → 远学科对撞 → 可裁决读数 → 证伪条件 → 最近邻占位者 → 落地与代价）自己把问对逼深十轮（<b>分两批，每批五轮装在同一次调用里连写</b>），然后<b>提炼</b>成论文入口资料、<b>写成万字论文</b>并出 PDF、再做<b>创新智商五维盲评</b>，最后给一份可下载的<b>全程记录</b>。约 <b>6</b> 次基底调用（开涌现档 12 次）、6–12 分钟，<b>期间请勿关闭页面</b>；随时可「⏹ 中止」，已跑出来的一律保留。强烈建议自带 Key。</div>
+    <div id="autoHint" style="font-size:0.78rem;color:var(--gold);margin:8px 2px 0;line-height:1.6">🚀 自动十轮：<b>你只交一个问题，中途不用再点任何东西</b>。系统按一条固定的九级追问阶梯（承重命题 → 共有前提 → 反例与边界 → 发生次序 → 远学科对撞 → 可裁决读数 → 证伪条件 → 最近邻占位者 → 落地与代价）自己把问对逼深十轮（<b>分两批，每批五轮装在同一次调用里连写</b>），然后<b>提炼</b>成论文入口资料、<b>写成两万字论文</b>（四段连写，投稿体例）并出 PDF、再做<b>创新智商五维盲评</b>，最后给一份可下载的<b>全程记录</b>。约 <b>8</b> 次基底调用（开涌现档 14 次）、12–22 分钟，<b>期间请勿关闭页面</b>；随时可「⏹ 中止」，已跑出来的一律保留。强烈建议自带 Key。</div>
     <div id="ownKeyRow" style="display:none">
       <input id="userKey" type="password" autocomplete="off" placeholder="填入你的 DeepSeek / 智谱 API Key（仅存本机浏览器，不上传服务器保存）">
     </div>
@@ -238,11 +238,11 @@ a.reco .rw{font-size:0.8rem;color:var(--muted,#8a8a8a);margin-top:3px;line-heigh
         <button class="actbtn" id="btnReco" onclick="doRecommend()">📖 <span class="zh-only">推荐阅读 · 站内领读</span><span class="en-only">Reading picks</span></button>
         <button class="actbtn" id="btnEmerge" onclick="doEmerge()">🌀 <span class="zh-only">二阶碰撞 · 三典范择优 → 综合提炼</span><span class="en-only">Collide → 3 paradigms → synthesis</span></button>
         <button class="actbtn" id="btnDistill" onclick="doDistill()">🧪 <span class="zh-only">提炼精华 · 整场问对 → 论文入口资料</span><span class="en-only">Distill → paper brief</span></button>
-        <button class="actbtn" id="btnPaper" onclick="doPaper()">📝 <span class="zh-only">成文一篇 · 万字论文 → PDF</span><span class="en-only">Write a paper → PDF</span></button>
+        <button class="actbtn" id="btnPaper" onclick="doPaper()">📝 <span class="zh-only">成文一篇 · 两万字论文 → PDF</span><span class="en-only">Write a paper → PDF</span></button>
         <button class="actbtn" id="btnIq" onclick="doIq()">🎯 <span class="zh-only">创新智商评估 · 五维盲评</span><span class="en-only">Innovation IQ</span></button>
         <button class="actbtn" id="btnPolish" onclick="doPolish()">🛠 <span class="zh-only">打磨修改 · 目标 135+</span><span class="en-only">Polish → 135+</span></button>
         <span class="act-hint" style="width:100%"><span class="zh-only">🌀 涌现路线：开「涌现档」→ 连问 2–10 轮（每轮三观点）→「二阶碰撞」三典范择优 → 自动综合提炼 →「成文一篇」。🧵 常规路线：可连问 10 轮，每轮都带着前面的上下文；问够了先「提炼精华」，再「成文一篇」——论文水平主要由这份入口资料决定。</span><span class="en-only">🧵 Up to 10 threaded turns → distill → write. The brief is what lifts the paper.</span></span>
-        <span class="act-hint"><span class="zh-only">「成文一篇」= 两次深度写作 · 约 3–6 分钟 · 建议自带 Key　|　评估约 1 分钟 · 打磨约 4–7 分钟</span><span class="en-only">Paper = 2 deep calls · 3–6 min　|　IQ ≈ 1 min · Polish ≈ 4–7 min</span></span>
+        <span class="act-hint"><span class="zh-only">「成文一篇」= 四段深度写作 · 两万字投稿体例 · 约 8–16 分钟 · 建议自带 Key　|　评估约 1 分钟 · 打磨（也是四段）约 10–18 分钟</span><span class="en-only">Paper = 4 deep calls · ~20k chars, submission-ready · 8–16 min　|　IQ ≈ 1 min · Polish ≈ 10–18 min</span></span>
         <span class="act-hint" style="width:100%;margin-top:2px"><span class="zh-only">🎯 与 🛠 默认作用于刚生成的论文；也可 <b style="cursor:pointer;color:var(--gold)" onclick="toggleIqSrc()">粘贴任意一篇文章</b> 来评、来改。</span><span class="en-only">Works on the generated paper, or <b style="cursor:pointer;color:var(--gold)" onclick="toggleIqSrc()">paste your own text</b>.</span></span>
       </div>
       <div id="iqSrcRow" style="display:none;margin-top:10px">
@@ -757,7 +757,7 @@ function finishAsk(ansEl){
 }
 
 /* ================= 🚀 自动十轮：一问到底 =================
-   十轮问对 → 提炼精华 → 万字论文（PDF） → 创新智商五维盲评 → 全程记录。
+   十轮问对 → 提炼精华 → 两万字论文（四段·投稿体例·PDF） → 创新智商五维盲评 → 全程记录。
    人只交一个问题，中途不再点任何东西。
 
    为什么值得单独做一条：这条产线原本每一步都要人点一下，而十轮问对的价值恰恰在于「一层层逼深」，
@@ -887,7 +887,7 @@ function doAutoRun(){
      开涌现档时提炼那一格换成三路碰撞（3 撞 ＋ 3 盲评 ＋ 1 综合）＝ 12。
      从前是 23／29——十轮各调一次、外加九次拟题。省下的不只是钱，更是十次独立的哑火机会。 */
   var calls=2+(triOn?7:1)+2+1;
-  if(!confirm('🚀 自动十轮 · 一问到底\n\n只交这一个问题，之后全程无人值守：\n十轮问对（分两批，每批五轮装在一次调用里连写）→ 提炼成论文入口资料 → 万字论文与 PDF → 创新智商五维盲评 → 全程记录。\n\n'
+  if(!confirm('🚀 自动十轮 · 一问到底\n\n只交这一个问题，之后全程无人值守：\n十轮问对（分两批，每批五轮装在一次调用里连写）→ 提炼成论文入口资料 → 两万字论文（四段）与 PDF → 创新智商五维盲评 → 全程记录。\n\n'
     +'· 约 '+calls+' 次基底调用（'+(deepOn?'深度档':'普通档')+(triOn?' ＋ 涌现档':'')+'），预计 '+(deepOn?'6–12':'4–8')+' 分钟\n'
     +'· 期间请勿关闭或刷新页面——这场问对只活在这一页的内存里\n'
     +'· 随时可「⏹ 中止」，已跑出来的部分全部保留\n\n'
@@ -936,8 +936,8 @@ function doAutoRun(){
     });
   }).then(function(){
     if(autoStopped) return;
-    var ix=autoPush('成文一篇 · 万字论文（两段续写）→ PDF');
-    autoStat('📝 论文写作中（分两段，约 3–6 分钟）· 已用 '+autoElapsed()+'…');
+    var ix=autoPush('成文一篇 · 两万字论文（四段续写·投稿体例）→ PDF');
+    autoStat('📝 论文写作中（分四段，约 8–16 分钟）· 已用 '+autoElapsed()+'…');
     return doPaper().then(function(){
       if(!paperAll || paperAll.length<600){ autoDone(ix,'fail','未成文'); throw new Error('论文没写成（详见上方成文状态行），止步于此。'); }
       autoDone(ix,'ok',paperAll.length+' 字');
@@ -1171,7 +1171,7 @@ function paperHalf(part, extra, minLen, label, attempt){
   attempt = attempt || 1;
   var stat=document.getElementById(GEN_STAT);
   return streamPaper(part, extra).then(function(txt){
-    var c=String(txt||'').replace(/〔上半篇完·待续〕\s*$/,'').replace(/〔全文完〕\s*$/,'').trim();
+    var c=String(txt||'').replace(/〔(?:上半篇完|第[一二三四]段完)·待续〕\s*$/,'').replace(/〔全文完〕\s*$/,'').trim();
     if(c.length>=minLen || attempt>=2) return c;
     stat.textContent='… '+label+'产出过短（'+c.length+' 字），基底可能中断，正在重试…';
     return paperHalf(part, extra, minLen, label, attempt+1);
@@ -1180,6 +1180,45 @@ function paperHalf(part, extra, minLen, label, attempt){
     stat.textContent='… '+label+'出错（'+((err&&err.message)||err)+'），正在重试…';
     return paperHalf(part, extra, minLen, label, attempt+1);
   });
+}
+/* ===== 四段流水（成文与打磨共用）=====
+   为什么是四段不是两段：单次调用有 ~120 秒的平台时钟上限，5000 字/段是线上真跑量出来的安全区；
+   两万字只能靠加段数，加长单段必被杀在思考阶段（正文 0 字、流干净结束、不报错）。
+   任一段写不出来就地停住、不再往后跑——后面的段要靠前一段的结尾接续，硬跑只会接到空气上。 */
+var PAPER_PARTS=[
+  {min:600 ,name:'第一段',desc:'题名·中英摘要·引言·文献述评'},
+  {min:900 ,name:'第二段',desc:'代理坍缩·控制变量 Z'},
+  {min:900 ,name:'第三段',desc:'第二轴·二维辨别格·可裁决判据'},
+  {min:1000,name:'第四段',desc:'证伪条件·讨论·局限·结论·参考文献·附录·投稿声明'}
+];
+function partHead(t){
+  var cut=t.indexOf('【一、'); if(cut<0) cut=t.indexOf('一、');
+  return (cut>80?t.slice(0,cut):t.slice(0,1200)).slice(0,1200);
+}
+/* done<4 时返回一句话说明缺了哪几段（印到 PDF 首页的红框里），写全了返回 false */
+function missText(done){
+  if(done>=PAPER_PARTS.length) return false;
+  var m=[]; for(var i=done;i<PAPER_PARTS.length;i++) m.push(PAPER_PARTS[i].name+'（'+PAPER_PARTS[i].desc+'）');
+  return '本稿只写完四段中的前 '+done+' 段，缺：'+m.join('、')+'。';
+}
+function runFourParts(seedFor, stat, prefix){
+  var acc='', head='', done=0;
+  function step(i){
+    if(i>=PAPER_PARTS.length) return Promise.resolve();
+    var P=PAPER_PARTS[i];
+    stat.textContent=prefix+' '+P.name+'／共四段（'+P.desc+'）· 已写 '+acc.length+' 字 · 请勿关闭页面…';
+    return paperHalf(i+1, seedFor(i, head, acc.slice(-1000)), P.min, P.name).catch(function(e){
+      if(i===0) throw e;                       /* 第一段拿不到就没有稿子，直接报错 */
+      return '';                               /* 后面某段失败不丢已写的部分 */
+    }).then(function(txt){
+      var c=String(txt||'');
+      if(c){ acc=(acc?acc+'\n\n':'')+c; if(i===0) head=partHead(c); setProg(acc.length,true); }
+      if(c.length<P.min) return;               /* 这一段没成，停住 */
+      done=i+1;
+      return step(i+1);
+    });
+  }
+  return step(0).then(function(){ return {text:acc.trim(), done:done}; });
 }
 function doPaper(){
   if(papering || asking) return Promise.resolve();
@@ -1193,35 +1232,26 @@ function doPaper(){
   document.getElementById('pdfActs').classList.remove('show');
   var stat=document.getElementById('paperStat');
   paperAll=''; setProg(0, true);
-  var halfOnly=false;
-  stat.textContent='📝 上半篇写作中（内功+心得已装载，万字长文分两段完成，请勿关闭页面）…';
   /* 有入口资料就以它为起点（清单式），没有就退回单轮底稿（老路径不变） */
   var qlist=turns.map(function(t,i){ return (i+1)+'. '+t.q; }).join('\n').slice(0,900);
-  var seed1 = brief ? {seed:lastAns.slice(0,1200), brief:brief.slice(0,9000), qlist:qlist, briefKind:briefKind} : {seed:lastAns.slice(0,3500)};
-  return paperHalf(1,seed1,600,'上半篇').then(function(p1c){
-    if(p1c.length<600) throw new Error('上半篇产出过短（'+p1c.length+' 字），重试一次后仍未成功，请稍后再点一次。');
-    paperAll=p1c+'\n\n';
+  var seedFor=function(i, head, tail){
+    var e = brief
+      ? {seed:lastAns.slice(0, i===0?1200:1200), brief:brief.slice(0, i===0?9000:5000), qlist:qlist, briefKind:briefKind}
+      : {seed:lastAns.slice(0, i===0?3500:1500)};
+    if(i>0){ e.head=head; e.tail=tail; }
+    return e;
+  };
+  var miss=false;
+  return runFourParts(seedFor, stat, '📝 写作中').then(function(r){
+    paperAll=r.text; miss=missText(r.done);
     setProg(paperAll.length, true);
-    var cut=p1c.indexOf('【一、');
-    var head=(cut>80?p1c.slice(0,cut):p1c.slice(0,1200)).slice(0,1200);
-    var tail=p1c.slice(-1000);
-    stat.textContent='📝 下半篇续写中（含第二轴、可裁决判据、证伪条件与参考文献）…';
-    /* 下半篇彻底失败也不丢上半篇：拿空串继续，由 halfOnly 一路标到 PDF 封面上 */
-    var seed2 = {seed:lastAns.slice(0,1500),head:head,tail:tail};
-    if(brief) seed2.brief=brief.slice(0,5000);
-    return paperHalf(2,seed2,1200,'下半篇').catch(function(){ return ''; });
-  }).then(function(p2c){
-    halfOnly=(String(p2c||'').length<1200);
-    var full=(paperAll+p2c).trim();
-    paperAll=full;
-    setProg(full.length, true);
-    stat.textContent=(halfOnly?'⚠ 下半篇两次均未生成，正在按「未完成稿」排版 PDF':'🖨 论文完成（'+full.length+' 字）· 正在排版 PDF')+'（约 10–25 秒）…';
-    return buildPdf(full, halfOnly);
+    stat.textContent=(miss?'⚠ '+miss+' 正在按「未完成稿」排版 PDF':'🖨 全文完成（'+paperAll.length+' 字·四段）· 正在排版 PDF')+'（约 20–50 秒）…';
+    return buildPdf(paperAll, miss);
   }).then(function(){
     setProg(paperAll.length, false);
-    stat.textContent = halfOnly
-      ? '⚠ 仅上半篇完成 · '+paperAll.length+' 字 · 本稿缺第二轴与二维辨别格、可裁决判据、证伪条件、结语与参考文献，PDF 首页已标注「未完成稿」。请再点一次「成文一篇」。'
-      : '✓ 全文完成 · '+paperAll.length+' 字 · PDF 已就绪，可在线阅读或下载。';
+    stat.textContent = miss
+      ? '⚠ '+miss+' PDF 首页已标注「未完成稿」，请再点一次「成文一篇」补齐。已写的 '+paperAll.length+' 字都在。'
+      : '✓ 全文完成 · '+paperAll.length+' 字 · 四段齐全（含中英摘要、参考文献、附录与投稿声明）· PDF 已就绪，可在线阅读或下载。';
   }).catch(function(e){
     setProg(paperAll.length, false);
     stat.textContent='✗ '+(e.message||String(e));
@@ -1265,7 +1295,7 @@ function isPaperHead(raw,L){
   if(L.length<=40 && /^\d{1,2}(\.\d{1,2}){1,2}[\s　]*\S/.test(L)) return true;
   return false;
 }
-function buildPdf(text, halfOnly, opt){
+function buildPdf(text, incomplete, opt){
   opt = opt || {};
   var _eyebrow = opt.eyebrow || 'SDE UNIVERSES · 智 能 问 对 · 成 文 一 篇';
   var _fnTag = opt.fnTag || 'paper';
@@ -1289,8 +1319,8 @@ function buildPdf(text, halfOnly, opt){
     var inner='<div style="font-size:10px;letter-spacing:0.32em;color:#8A6817;margin-bottom:14px">'+esc(_eyebrow)+'</div>'
       +'<div style="font-size:22px;font-weight:800;line-height:1.5;margin-bottom:10px;color:#1E1A10">'+esc(title)+'</div>'
       +'<div style="font-size:11px;color:#6b5e44;border-bottom:2px solid #B5860F;padding-bottom:12px;margin-bottom:18px">SDE 基底独立成文 · '+new Date().toLocaleDateString('zh-CN')+' · 缘起之问：'+esc(originQ().slice(0,64))+(turns.length>1?('（'+turns.length+' 轮问对提炼）'):'')+' · 排版v3</div>';
-    if(halfOnly){
-      inner+='<div style="border:1.5px solid #B23B2E;background:#FDF3F1;color:#8E2C22;padding:10px 13px;margin-bottom:18px;font-size:12px;line-height:1.75">⚠ 未完成稿 · 下半篇生成中断，本稿只有上半篇。缺：第二轴与二维辨别格、可裁决判据、证伪条件、结语与参考文献。请勿按完整论文评阅或引用。</div>';
+    if(incomplete){
+      inner+='<div style="border:1.5px solid #B23B2E;background:#FDF3F1;color:#8E2C22;padding:10px 13px;margin-bottom:18px;font-size:12px;line-height:1.75">⚠ 未完成稿 · '+esc(String(incomplete))+'请勿按完整论文评阅或引用。</div>';
     }
     for(var i=1;i<lines.length;i++){
       var raw=lines[i].trim();
@@ -1604,26 +1634,21 @@ function doPolish(){
   /* 只认「评的就是这一篇」的评分卡：拿 A 篇的作业单去改 B 篇，会把改稿引到别人的毛病上 */
   var card=(iqCard && iqCard.src===src.slice(0,120))?iqCardText():'';
   polishAll=''; setProg(0,true);
-  var halfOnly=false;
-  stat.textContent=(card?'🛠 按评分卡打磨上半篇':'🛠 打磨上半篇（未评分，按目标五维自查）')+'（力气按 I＞F＞E＞S＞D 分配，请勿关闭页面）…';
-  paperHalf(1,{gmode:'polish',card:card,orig:src},900,'上半篇').then(function(p1){
-    if(p1.length<900) throw new Error('上半篇产出过短（'+p1.length+' 字），重试一次后仍未成功，请稍后再点一次。');
-    polishAll=p1+'\n\n'; setProg(polishAll.length,true);
-    var cut=p1.indexOf('【一、'); if(cut<0) cut=p1.indexOf('一、');
-    var head=(cut>80?p1.slice(0,cut):p1.slice(0,1200)).slice(0,1200);
-    var tail=p1.slice(-1000);
-    stat.textContent='🛠 打磨下半篇（第二轴、可裁决判据、两条证伪条款与当场执行的检验、结语、参考文献）…';
-    return paperHalf(2,{gmode:'polish',card:card,orig:src,head:head,tail:tail},1200,'下半篇').catch(function(){ return ''; });
-  }).then(function(p2){
-    halfOnly=(String(p2||'').length<1200);
-    polishAll=(polishAll+p2).trim();
+  var seedFor=function(i, head, tail){
+    var e={gmode:'polish', card:card, orig:src};
+    if(i>0){ e.head=head; e.tail=tail; }
+    return e;
+  };
+  var miss=false;
+  runFourParts(seedFor, stat, (card?'🛠 按评分卡打磨':'🛠 打磨（未评分，按目标五维自查）')).then(function(r){
+    polishAll=r.text; miss=missText(r.done);
     setProg(polishAll.length,true);
-    stat.textContent=(halfOnly?'⚠ 下半篇两次均未生成，正在按「未完成稿」排版':'🖨 打磨完成（'+polishAll.length+' 字）· 正在排版 PDF')+'（约 10–25 秒）…';
-    return buildPdf(polishAll, halfOnly, {eyebrow:'SDE UNIVERSES · 智 能 问 对 · 打 磨 修 改 稿', fnTag:'polished', readId:'polishRead', dlId:'polishDl', actsId:'polishActs'});
+    stat.textContent=(miss?'⚠ '+miss+' 正在按「未完成稿」排版':'🖨 打磨完成（'+polishAll.length+' 字·四段）· 正在排版 PDF')+'（约 20–50 秒）…';
+    return buildPdf(polishAll, miss, {eyebrow:'SDE UNIVERSES · 智 能 问 对 · 打 磨 修 改 稿', fnTag:'polished', readId:'polishRead', dlId:'polishDl', actsId:'polishActs'});
   }).then(function(){
     setProg(polishAll.length,false);
-    stat.textContent=halfOnly
-      ? '⚠ 仅上半篇完成 · '+polishAll.length+' 字 · 缺第二轴、判据、证伪条件与参考文献，PDF 首页已标注「未完成稿」。请再点一次。'
+    stat.textContent=miss
+      ? '⚠ '+miss+' PDF 首页已标注「未完成稿」，请再点一次「打磨修改」补齐。'
       : '✓ 打磨稿完成 · '+polishAll.length+' 字 · 建议接着点「🎯 对打磨稿复评」看这一轮抬了几分（同一把尺子前后对比才作数）。';
   }).catch(function(e){
     setProg(polishAll.length,false);

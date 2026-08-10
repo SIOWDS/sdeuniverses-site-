@@ -58,9 +58,9 @@ ok(H.indexOf("brief=''; return;") > 0, "作废时 brief 清空（成文会自动
 ok(/btnDistill.*style\.display = \(turns\.length>=2\)/.test(H.replace(/\n/g, " ")), "满两轮才露出提炼按钮");
 
 /* 成文接线 —— 这条断了就是静默退化 */
-ok(/var seed1 = brief \? \{seed:lastAns\.slice\(0,1200\), brief:brief\.slice\(0,9000\), qlist:qlist, briefKind:briefKind\}/.test(H), "成文·上半篇：有入口资料就以它为起点（并带上它的来源 briefKind）");
-ok(/: \{seed:lastAns\.slice\(0,3500\)\}/.test(H), "成文·上半篇：没有入口资料时退回单轮底稿（老路径不变）");
-ok(H.indexOf("if(brief) seed2.brief=brief.slice(0,5000);") > 0, "成文·下半篇：仍拿着同一份清单");
+ok(/brief\.slice\(0, i===0\?9000:5000\), qlist:qlist, briefKind:briefKind/.test(H), "成文·首段：有入口资料就以它为起点（并带上它的来源 briefKind）");
+ok(/\{seed:lastAns\.slice\(0, i===0\?3500:1500\)\}/.test(H), "成文·首段：没有入口资料时退回单轮底稿（老路径不变）");
+ok(/brief\.slice\(0, i===0\?9000:5000\)/.test(H), "成文·续写段：仍拿着同一份清单（缩到 5000 字）");
 ok(/var qlist=turns\.map/.test(H), "问题清单（走过的路）一并送上去");
 
 /* 清空 */

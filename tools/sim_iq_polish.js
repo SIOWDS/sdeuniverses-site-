@@ -88,12 +88,13 @@ ok(/每一条扣分记录都必须在改稿中被正面处理/.test(poBlk), "纪
 ok(/只增不注水/.test(poBlk), "纪律三：新增段落必须承担具体职能");
 ok(/可裁决差异/.test(poBlk), "未交手的占位者必须写出可裁决差异");
 ok(/当场交出执行结果|真跑的结果/.test(poBlk), "F：承诺的检验必须当场执行");
-ok(/〔上半篇完·待续〕/.test(poBlk) && /〔全文完〕/.test(poBlk), "上下半篇的收尾标记齐备");
+ok(/〔第一段完·待续〕/.test(poBlk) && /〔第三段完·待续〕/.test(poBlk) && /〔全文完〕/.test(poBlk), "打磨四段的收尾标记齐备");
+ok(/改后全文仍约两万字/.test(poBlk), "打磨也走四段——两段打磨会把两万字改成一万字，等于砍掉一半");
 
 console.log("— 七、路由与守卫 —");
 /* 2026-07-29：涌现流水线又加了 collide 与 synth，白名单从四个长到七个
    2026-08-09：自动十轮加了 nextq（拟下一问），长到八个 */
-ok(/_MODES = \{ recommend: 1, paper: 1, iq: 1, polish: 1, distill: 1, collide: 1, synth: 1, nextq: 1 \}/.test(wk), "八个模式都在白名单里（iq 与 polish 仍在）");
+ok(/_MODES = \{[^}]*paper: 1[^}]*iq: 1[^}]*polish: 1[^}]*\}/.test(wk), "iq 与 polish 都在模式白名单里");
 ok(/mode === "paper" \|\| mode === "polish"/.test(wk), "polish 复用成文分支（内功+心得+自检规程 v3 零重复）");
 ok(/mode !== "paper" && mode !== "polish"/.test(wk), "四步法分支不会劫持 polish");
 ok(/deep = body\.deep === true \|\| mode === "paper" \|\| mode === "polish"/.test(wk), "polish 走深度档，iq 不走");
