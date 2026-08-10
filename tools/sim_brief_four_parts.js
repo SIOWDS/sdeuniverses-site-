@@ -145,7 +145,7 @@ const reset = (p) => { plan = p; calls = []; seeds = []; };
   ok(/brief\.length<1500/.test(bd), "过短闸按两万字口径抬到 1500（旧的 300 是三千字那一版的数）");
   ok(/id="bpFill"/.test(h) && /id="bpChars"/.test(h) && /id="briefProg"/.test(h), "进度条三个元素都在页面上（缺一个就是 setProg 静默失效）");
   ok(/GEN_PREV\.length\+pacc\.length/.test(h), "字数计从已写部分接着走（旧版写死 paperAll.length，打磨时把论文长度算了进去）");
-  ok(/约 <b>11<\/b> 次基底调用（开涌现档 17 次）/.test(h), "说明条里的调用次数跟着改了（提炼 1→4 次）");
+  ok(/约 <b>13<\/b> 次基底调用（开涌现档 16 次）/.test(h), "说明条里的调用次数跟着改了（提炼 1→4 次、问对 2→4 批）");
 
   console.log("\n===== " + P + " PASS / " + F + " FAIL =====");
   process.exit(F ? 1 : 0);

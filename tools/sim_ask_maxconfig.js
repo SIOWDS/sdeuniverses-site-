@@ -35,34 +35,42 @@ ok(/_heavy \? WDS_TOK_HEAVY : MAXTOK/.test(W), "三个重档首发给 WDS_TOK_HE
    谁都没有的那一版就是 2026-08-09 第 133 秒断流的那一版。 */
 ok(/const WDS_TOK_HEAVY = WDS_TOK_MAX;/.test(W) || (grab(/const WDS_TOK_HEAVY = (\d+);/) <= 20000),
    "重档预算：要么给满 MaxToken，要么有界——不许介于两者之间地随手写一个大数");
-ok(/const _plainLong = _topPower \|\| mode === "rounds";/.test(W) || (grab(/const WDS_TOK_HEAVY = (\d+);/) <= 20000),
+ok(/const _plainLong = _fullPower;/.test(W) || (grab(/const WDS_TOK_HEAVY = (\d+);/) <= 20000),
    "给满预算时长文必须关思考——预算是油门不是容器，投入档刹不住它（实测 high 与 max 的思考一样长）");
 ok(/body\.reasoning_effort = \(VC && VC\.effort\) \? VC\.effort : "max";/.test(W),
    "推理投入档这个旋钮做在 wdsTopBody 里且默认仍是 max（不传 effort 的既有调用点行为不变）");
+/* 【前置从源码里抽，不写死】以前这里把 _topPower 手抄成 paper||polish，
+   结果 distill 进 _topPower 那一轮，模拟里重建的还是旧的，阶梯断言全程在测一个已经不存在的版本。 */
+const mTop0 = W.match(/const _topPower = \(([^)]*)\);/);
+const mFull = W.match(/const _fullPower = \(([^)]*)\);/);
+const PRE = 'const _topPower = (' + (mTop0 ? mTop0[1] : 'false') + ');\n'
+  + 'const _deepAns = (mode === "answer" && deep);\n'
+  + 'const _fullPower = (' + (mFull ? mFull[1] : 'false') + ');\n';
+ok(!!mFull, "_fullPower 在位（满预算、关思考、上时钟、兜底 16000 四件事同用这一个集合）");
 const mH = W.match(/const _heavy = \(([^)]*)\);/);
 ok(!!mH, "_heavy 判据在位");
-const isHeavy = new Function("mode", "deep",
-  'const _topPower = (mode === "paper" || mode === "polish"); const _deepAns = (mode === "answer" && deep); return (' + (mH ? mH[1] : "false") + ');');
+const isHeavy = new Function("mode", "deep", PRE + 'return (' + (mH ? mH[1] : "false") + ');');
 ok(isHeavy("paper") && isHeavy("polish") && isHeavy("iq") && isHeavy("distill"), "真跑：成文／打磨／盲评／提炼四档都算重档");
+ok(isHeavy("collide") && isHeavy("synth") && isHeavy("rounds"), "真跑：碰撞／综合提炼／成批问对也进重档——抬了预算就必须同时上时钟，否则没人接住平台那一刀");
 /* 【这条是用户那场真实的自动十轮换来的，别放宽】
    深度档问答的思考与正文共用一份预算，4000 那一版会走出一条必然的下坡：
    第 1–4 轮 3405／3673／3135／2838 字 → 第 5 轮 936 字 → 第 6 轮 0 字，整场自动十轮就断在这儿。 */
 ok(isHeavy("answer", true), "真跑：**深度档问答**也算重档（十轮问对全都走这条路）");
-ok(!isHeavy("answer", false) && !isHeavy("nextq") && !isHeavy("collide"), "真跑：普通档问答与其余模式不进重档（各自原有的那一个数不变）");
-ok(/if \(_deepAns\) MAXTOK = 8000;/.test(W), "深度档问答自带预算 8000（4000 会把正文挤没；12000 实测思考 38,777 字、第 128 秒被平台杀掉）");
+ok(!isHeavy("answer", false) && !isHeavy("nextq") && !isHeavy("recommend"), "真跑：普通档问答、拟题、推荐不进重档（它们提示语短、不需要闸）");
+ok(/if \(_deepAns\) MAXTOK = 32000;/.test(W), "深度档问答降档位抬到 32000（首发走满额）——前提是它已经进了 _fullPower 关思考，否则 12000 就是思考 38,777 字、第 128 秒被杀那一版");
 /* 阶梯：真跑一遍，确认 iq 首发最高档、普通模式仍是单一档（＝行为不变） */
 const _lStart = W.indexOf("const _ladder =");
 const _lEnd = W.indexOf(";\n", W.indexOf("a.indexOf(v) === i))", _lStart));
 const ladderSrc = W.slice(_lStart, _lEnd);
 ok(_lStart > 0 && _lEnd > _lStart, "_ladder 在位");
 const ladderFn = new Function("mode", "MAXTOK", "WDS_TOK_MAX", "WDS_TOK_HEAVY", "deep",
-  'const _topPower = (mode === "paper" || mode === "polish"); const _deepAns = (mode === "answer" && deep);\n' + ladderSrc + ';\nreturn _ladder;');
+  PRE + ladderSrc + ';\nreturn _ladder;');
 ok(JSON.stringify(ladderFn("iq", 32000, 64000, 64000)) === "[64000,12000,8000]", "真跑：iq 阶梯首档给满 MaxToken");
-ok(JSON.stringify(ladderFn("distill", 12000, 64000, 64000)) === "[64000,12000,8000]", "真跑：distill 走同一条阶梯（它也被实测抓到思考 8,977 / 正文 0）");
+ok(JSON.stringify(ladderFn("distill", 32000, 64000, 64000)) === "[64000,32000,16000]", "真跑：distill 已升入长文阶梯（四段两万字）");
 ok(JSON.stringify(ladderFn("paper", 32000, 64000, 64000)) === "[64000,32000,16000]", "真跑：长文阶梯 = 64000 → 32000 → 16000（首档给满）");
-ok(JSON.stringify(ladderFn("answer", 4000, 64000, 64000, false)) === "[4000]", "真跑：**普通档**问答仍是单一档 4000——行为一个字都没变");
-ok(JSON.stringify(ladderFn("answer", 8000, 64000, 64000, true)) === "[8000,6000,4000]", "真跑：深度档问答走 8000 → 6000 → 4000");
-ok(JSON.stringify(ladderFn("collide", 5200, 64000, 64000)) === "[5200]", "真跑：碰撞仍是单一档 5200——行为一个字都没变");
+ok(JSON.stringify(ladderFn("answer", 8000, 64000, 64000, false)) === "[8000]", "真跑：**普通档**问答仍是单一档（底数由 4000 抬到 8000）");
+ok(JSON.stringify(ladderFn("answer", 32000, 64000, 64000, true)) === "[64000,32000,16000]", "真跑：**深度档问答**也走满预算长文阶梯——十轮追问就跑在这条路上");
+ok(JSON.stringify(ladderFn("collide", 32000, 64000, 64000)) === "[64000,32000,16000]" && JSON.stringify(ladderFn("synth", 32000, 64000, 64000)) === "[64000,32000,16000]", "真跑：碰撞与综合提炼也抬到满预算阶梯（原 3200／5200 是全链最窄的两处）");
 ok(/if \(resp\.ok \|\| resp\.status !== 400 \|\| i === ladder\.length - 1\) return resp;/.test(W),
    "阶梯只在 400 且报 max_tokens 相关时才降档（别的错照原样抛回去）");
 ok(/ladderOverride && ladderOverride\.length\) \? ladderOverride : wdsLadder\(VC, want\)/.test(W),
@@ -75,9 +83,11 @@ ok(!!mTop, "_topPower 判据在位");
 const isTop = new Function("mode", "return (" + (mTop ? mTop[1] : "false") + ");");
 ok(isTop("paper") === true && isTop("polish") === true, "真跑：paper / polish 挂满功率");
 ok(isTop("iq") === false, "真跑：iq **不挂**满功率——满功率对要求结构化短输出的调用是毒（本文件 4500 行的硬教训）");
-ok(isTop("answer") === false && isTop("distill") === false && isTop("nextq") === false,
-   "真跑：answer / distill / nextq 不挂满功率");
-ok(/const _plainLong = _topPower \|\| mode === "rounds";/.test(W) && /wdsFetchMax\(_VCX, KEY, _msgs, true[\s\S]{0,140}_plainLong\)/.test(W),
+ok(isTop("distill") === true,
+   "真跑：distill **挂**满功率——它 2026-08-10 改成四段两万字之后就是长文，与成文／打磨同档");
+ok(isTop("answer") === false && isTop("nextq") === false && isTop("collide") === false,
+   "真跑：answer / nextq / collide 不挂满功率（深度档问答与碰撞走 _fullPower 抬预算，但不换型号）");
+ok(/const _plainLong = _fullPower;/.test(W) && /wdsFetchMax\(_VCX, KEY, _msgs, true[\s\S]{0,140}_plainLong\)/.test(W),
    "长文两档 ＝ 满预算 ＋ 关思考（实测：给满预算时交稿的本来就是关思考那一遍）");
 ok(/plain \? wdsPlainBody\(VC, body\) : wdsTopBody\(VC, body\)/.test(W),
    "关思考这一路真的接到 wdsFetchMax 的 body 上；不传 plain 的既有调用点行为不变");
@@ -102,11 +112,12 @@ ok(/function wdsBeat\(controller, state\)/.test(W), "wdsBeat 是站内既有的�
 console.log("— 四、兜底重跑 —");
 const mR = W.match(/const _retryTok = ([^;]*);/);
 ok(!!mR, "_retryTok 在位");
-const retryFn = new Function("mode", "MAXTOK", "const _topPower = (" + mTop[1] + "); const _retryTok = " + mR[1] + "; return _retryTok;");
+const retryFn = new Function("mode", "MAXTOK", "deep", PRE + "const _retryTok = " + mR[1] + "; return _retryTok;");
 ok(retryFn("polish", 32000) === 16000, "polish 重跑降一档到 16000（不是砍到 4000 那种断句档）");
 ok(retryFn("paper", 32000) === 16000, "paper 重跑同档");
 ok(retryFn("iq", 12000) === 6000, "iq 重跑 6000（评分卡装得下，又确实降了档）");
-ok(retryFn("answer", 4000) === 4000, "普通问答重跑仍是 4000");
+ok(retryFn("answer", 8000) === 6000, "普通问答重跑封顶 6000");
+ok(retryFn("collide", 32000) === 16000 && retryFn("synth", 32000) === 16000, "碰撞／综合提炼重跑与长文同档 16000（降到 6000 会把它们新抬的字数斩断句）");
 ok(/max_tokens: _retryTok,/.test(W), "重跑真的用了 _retryTok，不是又写死一个数");
 ok(/wdsPlainBody\(VC, \{\s*\n\s*model: VC\.model, stream: true, max_tokens: _retryTok/.test(W),
    "重跑这一遍是关思考的（wdsPlainBody）——这一遍的意义就是逼它停下推演开始写");
