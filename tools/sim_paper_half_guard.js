@@ -100,7 +100,7 @@ t("下半篇收尾标记被剥掉", () => { plan = [{ text: LONG + "\n〔全文�
   ok(/return '';\s*\/\* 后面某段失败不丢已写的部分/.test(h), "后续段失败 → 吞成空串，不丢已写的部分");
   ok(/if\(c\.length<P\.min\) return;/.test(h),
     "某段没写够就地停住，不再往后跑（后段要接前段结尾，硬跑会接到空气上）");
-  ok(/function missText\(done\)/.test(h) && /本稿只写完四段中的前 '\+done\+' 段，缺：/.test(h),
+  ok(/function missText\(done, ?SPEC\)/.test(h) && /本稿只写完四段中的前 '\+done\+' 段，缺：/.test(h),
     "missText：按实际完成段数说清缺了哪几段");
   ok(h.indexOf("return buildPdf(paperAll, miss);") > 0, "doPaper：缺段说明一路传进 PDF 排版");
   ok(/function buildPdf\(text, incomplete, opt\)/.test(h), "buildPdf：接收缺段说明（并已参数化给打磨稿复用）");

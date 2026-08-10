@@ -206,7 +206,7 @@ a.reco .rw{font-size:0.8rem;color:var(--muted,#8a8a8a);margin-top:3px;line-heigh
     </div>
     <div id="deepHint" style="display:none;font-size:0.78rem;color:var(--gold);margin:9px 2px 0;line-height:1.6">🔬 深度模式：基底先内化内功写心得，再用 <b>SDE 方法论</b>（六路径→S/D/E→三方程→误差互消→逮先验）做一次有指导性的深入研究，现实问题还会给可执行的「怎么办」。默认<b>单次调用</b>（较慢、较费 token，建议自带 Key）。<br>点「四步法」→ 升级为 <b>S/D/E 四次独立调用</b>的完整误差互消（最深，但慢 4 倍、贵 4 倍，只在要冲满时用）。</div>
     <div id="emergeHint" style="display:none;font-size:0.78rem;color:var(--gold);margin:8px 2px 0;line-height:1.6">🌀 涌现档：每一轮不再给一篇答案，而是给<b>三个彼此有分歧的观点</b>（写完就停，不许调和——张力要留给碰撞）。问够 2–10 轮后点「二阶碰撞」：系统<b>随机抽三种不同撞法各撞出一个典范</b>，再用创新智商<b>背靠背盲评择优</b>，最后做<b>综合提炼</b>作为论文入口。全程每次调用都装内功＋心得＋方法论；一轮完整涌现约 17–18 次调用，很费 token，建议自带 Key。</div>
-    <div id="autoHint" style="font-size:0.78rem;color:var(--gold);margin:8px 2px 0;line-height:1.6">🚀 自动十轮：<b>你只交一个问题，中途不用再点任何东西</b>。系统按一条固定的九级追问阶梯（承重命题 → 共有前提 → 反例与边界 → 发生次序 → 远学科对撞 → 可裁决读数 → 证伪条件 → 最近邻占位者 → 落地与代价）自己把问对逼深十轮（<b>分两批，每批五轮装在同一次调用里连写</b>），然后<b>提炼</b>成论文入口资料、<b>写成两万字论文</b>（四段连写，投稿体例）并出 PDF、再做<b>创新智商五维盲评</b>，最后给一份可下载的<b>全程记录</b>。约 <b>8</b> 次基底调用（开涌现档 14 次）、12–22 分钟，<b>期间请勿关闭页面</b>；随时可「⏹ 中止」，已跑出来的一律保留。强烈建议自带 Key。</div>
+    <div id="autoHint" style="font-size:0.78rem;color:var(--gold);margin:8px 2px 0;line-height:1.6">🚀 自动十轮：<b>你只交一个问题，中途不用再点任何东西</b>。系统按一条固定的九级追问阶梯（承重命题 → 共有前提 → 反例与边界 → 发生次序 → 远学科对撞 → 可裁决读数 → 证伪条件 → 最近邻占位者 → 落地与代价）自己把问对逼深十轮（<b>分两批，每批五轮装在同一次调用里连写</b>），然后<b>提炼</b>成两万字的论文入口资料（四段连写）、<b>写成两万字论文</b>（四段连写，投稿体例）并出 PDF、再做<b>创新智商五维盲评</b>，最后给一份可下载的<b>全程记录</b>。约 <b>11</b> 次基底调用（开涌现档 17 次）、20–35 分钟，<b>期间请勿关闭页面</b>；随时可「⏹ 中止」，已跑出来的一律保留。强烈建议自带 Key。</div>
     <div id="ownKeyRow" style="display:none">
       <input id="userKey" type="password" autocomplete="off" placeholder="填入你的 DeepSeek / 智谱 API Key（仅存本机浏览器，不上传服务器保存）">
     </div>
@@ -215,7 +215,7 @@ a.reco .rw{font-size:0.8rem;color:var(--muted,#8a8a8a);margin-top:3px;line-heigh
       <span class="en-only">Retrieves passages from the site's <b>articles and monographs</b>, then an SDE base model composes an answer with <b>sources</b> below. AI-generated — verify against sources.</span>
     </div>
     <div id="turnBar" style="display:none;font-size:0.78rem;color:var(--gold);margin:10px 2px 0;line-height:1.7">
-      <span class="zh-only">🧵 连续问对 · 第 <b id="turnNo">1</b> / 10 轮：每一轮都带着前面几轮的上下文，问题会被一层层逼深。满 2 轮后可「提炼精华」，把整场问对收成万字论文的入口资料。</span>
+      <span class="zh-only">🧵 连续问对 · 第 <b id="turnNo">1</b> / 10 轮：每一轮都带着前面几轮的上下文，问题会被一层层逼深。满 2 轮后可「提炼精华」，把整场问对收成一份两万字的论文入口资料（四段连写）。</span>
       <span class="en-only">🧵 Threaded Q&amp;A · turn <b id="turnNoE">1</b>/10 — each turn carries the earlier ones. After 2 turns you can distill the thread into a paper brief.</span>
       <b style="cursor:pointer;margin-left:6px;text-decoration:underline" onclick="resetThread()"><span class="zh-only">🧹 清空重来</span><span class="en-only">Reset</span></b>
     </div>
@@ -241,7 +241,7 @@ a.reco .rw{font-size:0.8rem;color:var(--muted,#8a8a8a);margin-top:3px;line-heigh
         <button class="actbtn" id="btnPaper" onclick="doPaper()">📝 <span class="zh-only">成文一篇 · 两万字论文 → PDF</span><span class="en-only">Write a paper → PDF</span></button>
         <button class="actbtn" id="btnIq" onclick="doIq()">🎯 <span class="zh-only">创新智商评估 · 五维盲评</span><span class="en-only">Innovation IQ</span></button>
         <button class="actbtn" id="btnPolish" onclick="doPolish()">🛠 <span class="zh-only">打磨修改 · 目标 135+</span><span class="en-only">Polish → 135+</span></button>
-        <span class="act-hint" style="width:100%"><span class="zh-only">🌀 涌现路线：开「涌现档」→ 连问 2–10 轮（每轮三观点）→「二阶碰撞」三典范择优 → 自动综合提炼 →「成文一篇」。🧵 常规路线：可连问 10 轮，每轮都带着前面的上下文；问够了先「提炼精华」，再「成文一篇」——论文水平主要由这份入口资料决定。</span><span class="en-only">🧵 Up to 10 threaded turns → distill → write. The brief is what lifts the paper.</span></span>
+        <span class="act-hint" style="width:100%"><span class="zh-only">🌀 涌现路线：开「涌现档」→ 连问 2–10 轮（每轮三观点）→「二阶碰撞」三典范择优 → 自动综合提炼 →「成文一篇」。🧵 常规路线：可连问 10 轮，每轮都带着前面的上下文；问够了先「提炼精华」，再「成文一篇」——论文水平主要由这份入口资料决定，所以它本身也是四段两万字，约 8–16 分钟。</span><span class="en-only">🧵 Up to 10 threaded turns → distill → write. The brief is what lifts the paper.</span></span>
         <span class="act-hint"><span class="zh-only">「成文一篇」= 四段深度写作 · 两万字投稿体例 · 约 8–16 分钟 · 建议自带 Key　|　评估约 1 分钟 · 打磨（也是四段）约 10–18 分钟</span><span class="en-only">Paper = 4 deep calls · ~20k chars, submission-ready · 8–16 min　|　IQ ≈ 1 min · Polish ≈ 10–18 min</span></span>
         <span class="act-hint" style="width:100%;margin-top:2px"><span class="zh-only">🎯 与 🛠 默认作用于刚生成的论文；也可 <b style="cursor:pointer;color:var(--gold)" onclick="toggleIqSrc()">粘贴任意一篇文章</b> 来评、来改。</span><span class="en-only">Works on the generated paper, or <b style="cursor:pointer;color:var(--gold)" onclick="toggleIqSrc()">paste your own text</b>.</span></span>
       </div>
@@ -261,6 +261,10 @@ a.reco .rw{font-size:0.8rem;color:var(--muted,#8a8a8a);margin-top:3px;line-heigh
       <div class="paper-wrap" id="briefWrap">
         <div class="ans-label"><span class="zh-only">论文入口资料 · 整场问对的提炼</span><span class="en-only">Paper brief · distilled from the thread</span></div>
         <div class="think" id="briefStat"></div>
+        <div class="paper-prog" id="briefProg">
+          <div class="pp-bar"><div class="pp-fill" id="bpFill"></div></div>
+          <div class="pp-num"><span id="bpChars">0</span> <span class="zh-only">字</span><span class="en-only">chars</span></div>
+        </div>
         <div class="ans" id="briefBox"></div>
       </div>
       <div class="paper-wrap" id="paperWrap">
@@ -757,7 +761,7 @@ function finishAsk(ansEl){
 }
 
 /* ================= 🚀 自动十轮：一问到底 =================
-   十轮问对 → 提炼精华 → 两万字论文（四段·投稿体例·PDF） → 创新智商五维盲评 → 全程记录。
+   十轮问对 → 提炼精华（四段·两万字入口资料） → 两万字论文（四段·投稿体例·PDF） → 创新智商五维盲评 → 全程记录。
    人只交一个问题，中途不再点任何东西。
 
    为什么值得单独做一条：这条产线原本每一步都要人点一下，而十轮问对的价值恰恰在于「一层层逼深」，
@@ -883,12 +887,13 @@ function doAutoRun(){
   if(!q){ document.getElementById('qa').focus(); flashAsk('先写下你要一问到底的那一个问题。'); return Promise.resolve(); }
   var uk=(keyMode==='own')?document.getElementById('userKey').value.trim():'';
   if(keyMode==='own' && !uk){ document.getElementById('userKey').focus(); flashAsk('请先填入你的 API Key，或切回「系统」。'); return Promise.resolve(); }
-  /* 两批问对（每批五轮装在一次调用里）＋ 提炼 ＋ 成文两段 ＋ 盲评 ＝ 6；
-     开涌现档时提炼那一格换成三路碰撞（3 撞 ＋ 3 盲评 ＋ 1 综合）＝ 12。
-     从前是 23／29——十轮各调一次、外加九次拟题。省下的不只是钱，更是十次独立的哑火机会。 */
-  var calls=2+(triOn?7:1)+2+1;
-  if(!confirm('🚀 自动十轮 · 一问到底\n\n只交这一个问题，之后全程无人值守：\n十轮问对（分两批，每批五轮装在一次调用里连写）→ 提炼成论文入口资料 → 两万字论文（四段）与 PDF → 创新智商五维盲评 → 全程记录。\n\n'
-    +'· 约 '+calls+' 次基底调用（'+(deepOn?'深度档':'普通档')+(triOn?' ＋ 涌现档':'')+'），预计 '+(deepOn?'6–12':'4–8')+' 分钟\n'
+  /* 两批问对（每批五轮装在一次调用里）＋ 提炼四段 ＋ 成文四段 ＋ 盲评 ＝ 11；
+     开涌现档时提炼那四段换成三路碰撞（3 撞 ＋ 3 盲评 ＋ 1 综合）＝ 14。
+     从前是 23／29——十轮各调一次、外加九次拟题。省下的不只是钱，更是十次独立的哑火机会。
+     ⚠ 提炼 2026-08-10 由一次调用改成四段，这个公式跟着改过；再动段数记得回来改这里与说明条。 */
+  var calls=2+(triOn?7:4)+4+1;
+  if(!confirm('🚀 自动十轮 · 一问到底\n\n只交这一个问题，之后全程无人值守：\n十轮问对（分两批，每批五轮装在一次调用里连写）→ 两万字入口资料（四段）→ 两万字论文（四段）与 PDF → 创新智商五维盲评 → 全程记录。\n\n'
+    +'· 约 '+calls+' 次基底调用（'+(deepOn?'深度档':'普通档')+(triOn?' ＋ 涌现档':'')+'），预计 '+(deepOn?'20–35':'15–28')+' 分钟\n'
     +'· 期间请勿关闭或刷新页面——这场问对只活在这一页的内存里\n'
     +'· 随时可「⏹ 中止」，已跑出来的部分全部保留\n\n'
     +(keyMode==='own'
@@ -928,8 +933,8 @@ function doAutoRun(){
         +'已完成的全部保留——可手动点「🧪 提炼精华」接着走，或换成自带 Key 后重跑。');
     }
     if(okRounds<AUTO_TARGET) autoPush('第 '+(okRounds+1)+'–10 轮未跑成，用已完成的 '+okRounds+' 轮继续往下走');
-    var ix=autoPush(triOn?'二阶碰撞 · 三典范择优 → 综合提炼':'提炼精华 · 整场问对 → 论文入口资料');
-    autoStat('🧪 '+(triOn?'三路碰撞与综合提炼':'提炼')+'中 · 已用 '+autoElapsed()+'…');
+    var ix=autoPush(triOn?'二阶碰撞 · 三典范择优 → 综合提炼':'提炼精华 · 整场问对 → 两万字入口资料（四段）');
+    autoStat('🧪 '+(triOn?'三路碰撞与综合提炼':'提炼入口资料（分四段，约 8–16 分钟）')+'中 · 已用 '+autoElapsed()+'…');
     return (triOn?doEmerge():doDistill()).then(function(){
       if(!brief){ autoDone(ix,'fail','未产出入口资料'); throw new Error('提炼没交出入口资料——就此停手。没有入口资料的论文会退回单轮底稿，白烧两次最贵的长调用。十轮问对都还在上面，可手动重试提炼。'); }
       autoDone(ix,'ok',brief.length+' 字');
@@ -1057,53 +1062,43 @@ function doDistill(){
   var uk=(keyMode==='own')?document.getElementById('userKey').value.trim():'';
   if(keyMode==='own' && !uk){ document.getElementById('userKey').focus(); flashAsk('请先填入你的 API Key，或切回「系统」。'); return Promise.resolve(); }
   distilling=true;
+  genTarget('briefStat','bpFill','bpChars','briefBox');
   var btn=document.getElementById('btnDistill'); btn.disabled=true;
   var wrap=document.getElementById('briefWrap'); wrap.classList.add('show');
   var stat=document.getElementById('briefStat');
   var box=document.getElementById('briefBox'); box.textContent=''; box.className='ans blink';
-  stat.textContent='🧪 正在把 '+turns.length+' 轮问对提炼成论文入口资料（约 40–90 秒）…';
-  var acc='';
-  return fetch('/api/ask',{
-    method:'POST',
-    headers:{'content-type':'application/json'},
-    body:JSON.stringify(Object.assign({mode:'distill',q:originQ(),hist:buildHist(true),vendor:vendor}, uk?{key:uk}:{}))
-  }).then(function(resp){
-    if(!resp.ok && resp.status!==200){ return resp.text().then(function(t){ throw new Error('HTTP '+resp.status+' '+t.slice(0,180)); }); }
-    var reader=resp.body.getReader(), dec=new TextDecoder(), buf='';
-    return new Promise(function(resolve,reject){
-      function pump(){
-        reader.read().then(function(r){
-          if(r.done){ resolve(); return; }
-          buf+=dec.decode(r.value,{stream:true});
-          var lines=buf.split('\n'); buf=lines.pop();
-          for(var i=0;i<lines.length;i++){
-            var s=lines[i].trim();
-            if(!s || !s.startsWith('data:')) continue;
-            var payload=s.slice(5).trim();
-            if(payload==='[DONE]') continue;
-            var j; try{ j=JSON.parse(payload); }catch(e){ continue; }
-            if(j.t==='token'){ acc+=j.v; box.textContent=acc; }
-            else if(j.t==='status'){ stat.textContent=j.v; }
-            else if(j.t==='think'){ stat.textContent='🧠 提炼中·深度思考…'; }
-            else if(j.t==='error'){ reject(new Error(j.v||'基底返回错误')); return; }
-          }
-          pump();
-        }).catch(reject);
-      }
-      pump();
-    });
-  }).then(function(){
+  setProg(0, true);
+  /* 四段共用同一份问对上下文；后三段另外拿到已写部分的开头与结尾，接着往下写。 */
+  var hist=buildHist(true);
+  var seedFor=function(i, head, tail){
+    var e={gmode:'distill', hist:hist};
+    if(i>0){ e.head=head; e.tail=tail; }
+    return e;
+  };
+  var miss=false;
+  /* 入口资料没有题名与摘要，开头就是第一栏——partHead 那套「切到【一、之前」对它只会切出
+     一段可能存在的废话。后三段要的只是「前面开头写了什么」，直接取前 1200 字就对。 */
+  return runParts(BRIEF_PARTS, seedFor, stat, '🧪 提炼中', function(t){ return String(t||'').slice(0,1200); }).then(function(r){
     box.className='ans';
-    brief=acc.trim(); briefKind='distill';
-    if(brief.length<300){
+    brief=r.text; briefKind='distill';
+    box.textContent=brief;
+    miss=missText(r.done, BRIEF_PARTS);
+    setProg(brief.length, false);
+    /* 四段两万字的口径下，1500 字以下＝第一段都没写成，不作为论文入口。
+       写成了但缺段的照收：缺栏的入口资料仍比没有强，只是要在状态行里说清缺哪几栏。 */
+    if(brief.length<1500){
       stat.textContent=(brief.length===0
         ? '⚠ 基底这一轮没交出正文（多半是把额度全烧在思考上了）。服务端已自动关思考重跑过一次仍是空——请再点一次「🧪 提炼精华」，或换一个基底。'
-        : '⚠ 提炼产出过短（'+brief.length+' 字），请重试；本次不作为论文入口。');
+        : '⚠ 提炼产出过短（'+brief.length+' 字，目标两万字），本次不作为论文入口，请重试。');
       brief=''; return;
     }
-    stat.textContent='✓ 论文入口资料已就绪（'+brief.length+' 字，出自 '+turns.length+' 轮问对）· 现在点「成文一篇」，论文将以它为起点逐条兑现。';
+    autoVault(brief, '提炼精华');
+    stat.textContent = miss
+      ? '⚠ '+miss+' 已写的 '+brief.length+' 字仍可作论文入口，但缺掉的栏会原样变成论文里的缺口——建议再点一次「🧪 提炼精华」补齐。'
+      : '✓ 论文入口资料已就绪（'+brief.length+' 字 · 四段九栏 · 出自 '+turns.length+' 轮问对）· 现在点「成文一篇」，两万字论文将以它为起点逐条兑现。';
   }).catch(function(e){
     box.className='ans';
+    setProg(brief.length, false);
     autoVault(brief, '提炼精华');
     stat.textContent='✗ 提炼失败：'+errText(e);
   }).finally(function(){
@@ -1115,8 +1110,11 @@ function doDistill(){
 var paperAll='';
 /* 成文一篇与打磨修改共用这台两段续写机：状态行、进度条、字数计都按 GEN_* 切换目标元素，
    不许再把 'paperStat' 写死——写死的那一版会让打磨稿的进度打在成文稿的状态行上。 */
-var GEN_STAT='paperStat', GEN_FILL='ppFill', GEN_CHARS='ppChars';
-function genTarget(stat, fill, chars){ GEN_STAT=stat; GEN_FILL=fill; GEN_CHARS=chars; }
+var GEN_STAT='paperStat', GEN_FILL='ppFill', GEN_CHARS='ppChars', GEN_BOX='', GEN_PREV='';
+/* GEN_PREV = 本次任务里前面几段已写好的正文。两个用处：
+   ① 字数计从它接着往上走——旧版写死 paperAll.length，打磨时会把已完成的论文长度算进打磨进度里；
+   ② 有 GEN_BOX 的任务（提炼）靠它把「已完成段落＋本段实时流」拼起来显示，跑八分钟不至于对着空白框干等。 */
+function genTarget(stat, fill, chars, box){ GEN_STAT=stat; GEN_FILL=fill; GEN_CHARS=chars; GEN_BOX=box||''; GEN_PREV=''; }
 function streamPaper(part, extra){
   var uk=(keyMode==='own')?document.getElementById('userKey').value.trim():'';
   var stat=document.getElementById(GEN_STAT);
@@ -1141,9 +1139,12 @@ function streamPaper(part, extra){
             var payload=s.slice(5).trim();
             if(payload==='[DONE]') continue;
             var j; try{ j=JSON.parse(payload); }catch(e){ continue; }
-            if(j.t==='token'){ pacc+=j.v; setProg(paperAll.length+pacc.length); }
+            if(j.t==='token'){
+              pacc+=j.v; setProg(GEN_PREV.length+pacc.length);
+              if(GEN_BOX){ var _b=document.getElementById(GEN_BOX); if(_b) _b.textContent=GEN_PREV+(GEN_PREV?'\n\n':'')+pacc; }
+            }
             else if(j.t==='status'){ stat.textContent=j.v; }
-            else if(j.t==='think'){ thinkChars+=(j.v||'').length; stat.textContent='🧠 第'+(part===1?'一':'二')+'段·深度思考中（'+thinkChars+' 字）…'; }
+            else if(j.t==='think'){ thinkChars+=(j.v||'').length; stat.textContent='🧠 第'+('一二三四'.charAt((part||1)-1)||'一')+'段·深度思考中（'+thinkChars+' 字）…'; }
             else if(j.t==='error'){ reject(new Error(j.v||'基底返回错误')); return; }
           }
           pump();
@@ -1196,23 +1197,34 @@ function partHead(t){
   return (cut>80?t.slice(0,cut):t.slice(0,1200)).slice(0,1200);
 }
 /* done<4 时返回一句话说明缺了哪几段（印到 PDF 首页的红框里），写全了返回 false */
-function missText(done){
-  if(done>=PAPER_PARTS.length) return false;
-  var m=[]; for(var i=done;i<PAPER_PARTS.length;i++) m.push(PAPER_PARTS[i].name+'（'+PAPER_PARTS[i].desc+'）');
+/* 提炼精华也是四段（2026-08-10）：三千字的入口资料撑不起两万字的论文，
+   差额只会被成文那一步现编补上。九栏不动，字数加在每一栏内部的密度上。 */
+var BRIEF_PARTS=[
+  {min:1200,name:'第一段',desc:'行进轨迹·已立住的判断·候选承重命题'},
+  {min:1500,name:'第二段',desc:'分离点（可裁决判据的唯一原料）'},
+  {min:1500,name:'第三段',desc:'敌意最近邻清单（含尚未交手的）'},
+  {min:1500,name:'第四段',desc:'张力·判据线索·经验材料·边界'}
+];
+function missText(done, SPEC){
+  SPEC=SPEC||PAPER_PARTS;
+  if(done>=SPEC.length) return false;
+  var m=[]; for(var i=done;i<SPEC.length;i++) m.push(SPEC[i].name+'（'+SPEC[i].desc+'）');
   return '本稿只写完四段中的前 '+done+' 段，缺：'+m.join('、')+'。';
 }
-function runFourParts(seedFor, stat, prefix){
+/* 成文、打磨、提炼共用这一台四段流水；差别只在 SPEC 与 seedFor。 */
+function runParts(SPEC, seedFor, stat, prefix, headFn){
   var acc='', head='', done=0;
   function step(i){
-    if(i>=PAPER_PARTS.length) return Promise.resolve();
-    var P=PAPER_PARTS[i];
+    if(i>=SPEC.length) return Promise.resolve();
+    var P=SPEC[i];
+    GEN_PREV=acc;                              /* 字数计与实时正文都从已写部分接着走 */
     stat.textContent=prefix+' '+P.name+'／共四段（'+P.desc+'）· 已写 '+acc.length+' 字 · 请勿关闭页面…';
     return paperHalf(i+1, seedFor(i, head, acc.slice(-1000)), P.min, P.name).catch(function(e){
       if(i===0) throw e;                       /* 第一段拿不到就没有稿子，直接报错 */
       return '';                               /* 后面某段失败不丢已写的部分 */
     }).then(function(txt){
       var c=String(txt||'');
-      if(c){ acc=(acc?acc+'\n\n':'')+c; if(i===0) head=partHead(c); setProg(acc.length,true); }
+      if(c){ acc=(acc?acc+'\n\n':'')+c; if(i===0) head=(headFn||partHead)(c); GEN_PREV=acc; setProg(acc.length,true); }
       if(c.length<P.min) return;               /* 这一段没成，停住 */
       done=i+1;
       return step(i+1);
@@ -1220,6 +1232,7 @@ function runFourParts(seedFor, stat, prefix){
   }
   return step(0).then(function(){ return {text:acc.trim(), done:done}; });
 }
+function runFourParts(seedFor, stat, prefix){ return runParts(PAPER_PARTS, seedFor, stat, prefix); }
 function doPaper(){
   if(papering || asking) return Promise.resolve();
   if(!lastQ || !lastAns){ flashAsk('请先完成一次问答再成文。'); return Promise.resolve(); }

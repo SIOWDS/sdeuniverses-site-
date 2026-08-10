@@ -129,8 +129,8 @@ ok(!/\breturn;\s*\}\s*$/m.test(bAsk.split("return fetch")[0]) || true, "（守�
 ["doDistill", "doPaper", "doIq"].forEach((n) => {
   const nx = { doDistill: "streamPaper", doPaper: "loadHtml2pdf", doIq: "doPolish" }[n];
   const b = fnBody(n, nx);
-  ok(/return (fetch\('\/api\/ask'|paperHalf\(1|runFourParts\()/.test(b), n + " 返回 Promise 链");
-  ok(!/ return;\n/.test(b.split(/return (fetch|paperHalf)/)[0]), n + " 的守卫路径不再裸 return（裸 return ⇒ 下一步立刻抢跑）");
+  ok(/return (fetch\('\/api\/ask'|paperHalf\(1|runFourParts\(|runParts\()/.test(b), n + " 返回 Promise 链");
+  ok(!/ return;\n/.test(b.split(/return (fetch|paperHalf|runParts)/)[0]), n + " 的守卫路径不再裸 return（裸 return ⇒ 下一步立刻抢跑）");
 });
 
 /* ===== 四、前端自动模块的六条纪律 ===== */
@@ -139,8 +139,8 @@ const bAuto = H.slice(H.indexOf("function doAutoRun(){"), H.indexOf("function au
 ok(H.indexOf("var AUTO_TARGET=10;") > 0, "目标轮次写死 10");
 ok(/onclick="doAutoRun\(\)"/.test(H) && /id="autoStopBtn"/.test(H) && /id="autoWrap"/.test(H), "按钮与面板都挂上了（孤儿函数等于没做）");
 ok(/if\(!confirm\(/.test(bAuto) && /系统密钥/.test(bAuto), "开跑前必须确认，且如实说清系统密钥会被吃掉多少");
-ok(/var calls=2\+\(triOn\?7:1\)\+2\+1;/.test(bAuto), "报给用户的调用次数按档现算（两批问对＋提炼＋成文两段＋盲评＝6；涌现档 12）");
-ok(/约 <b>8<\/b> 次基底调用（开涌现档 14 次）/.test(H), "说明条里的次数与公式对得上（2 轮批+1 提炼+4 成文+1 盲评=8 / 涌现 14）");
+ok(/var calls=2\+\(triOn\?7:4\)\+4\+1;/.test(bAuto), "报给用户的调用次数按档现算（两批问对＋提炼四段＋成文四段＋盲评＝11；涌现档 14）");
+ok(/约 <b>11<\/b> 次基底调用（开涌现档 17 次）/.test(H), "说明条里的次数与公式对得上（2 轮批+4 提炼+4 成文+1 盲评=11 / 涌现档提炼那格换成 7 ⇒ 14）");
 ok(/okRounds<2/.test(bAuto) && /不再往下烧调用/.test(bAuto), "一批两次都没跑成 ⇒ 停下收口，不把剩下的调用烧完");
 ok(/function nextBatch\(\)/.test(bAuto) && /okRounds\+=got;/.test(bAuto), "分批推进：写不满五轮也不算失败，下一批从断点接着要");
 ok(/if\(!brief\)\{[^}]*throw/.test(bAuto), "提炼没出入口资料 ⇒ 不写论文（没有入口资料的论文会退回单轮底稿）");
