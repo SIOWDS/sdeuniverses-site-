@@ -178,6 +178,14 @@ h3{font-size:18.5px;margin:34px 0 14px;color:var(--rule)}
   <div class="art-meta">王德生 ＋ Claude · 约 1.9 万字 · 网页长文 · 发表于2026年8月8日</div>
 </header>
 <div class="wrap">
+<!-- companion-series:start -->
+<aside style="margin:26px 0 34px;padding:20px 22px;border:1px solid rgba(158,61,44,.28);background:#fbf6ec;line-height:1.8">
+<div style="font-size:12px;letter-spacing:.18em;color:#9e3d2c;margin-bottom:8px">理论双译计划 · 本文配套阅读</div>
+<a style="display:block;color:#2a3b50;font-weight:700;text-decoration:none;margin:5px 0" href="/confluence/lock-holding-position/explained/">大白话类比解释：职位最低的人为什么能让所有人等——用卫生间钥匙和共享打印机读懂持锁位 →</a>
+<a style="display:block;color:#2a3b50;font-weight:700;text-decoration:none;margin:5px 0" href="/confluence/lock-holding-position/applied/">技术与应用：运行时权力审计——用持锁位和阻塞归属率重画组织、平台与供应链 →</a>
+</aside>
+<!-- companion-series:end -->
+
 <div class="deck">权力的本质是什么？操作系统与体系结构说是一套被指派的权限结构——谁在哪一个特权级、哪块内存对谁可见、隔离边界画在哪里；而推测执行漏洞之所以震动整个领域，正因为它证明了这张表可以在一个字都没被改的情况下被绕过。实时系统说是抢占与调度的次序——谁能打断谁，谁的截止期先被满足。政治经济学说是结构性的枢纽位置——谁占住了别人绕不开的那些节点。三家对同一批对象给出互相取消的判决，却共享一件从未说出口的事：权力是一种可以被指派、并稳定归属于某个位置的属性。推翻它的材料来自实时系统自己：多核共享缓存、内存控制器与总线会产生跨核阻塞，一个「独立」任务的最坏执行时间必须把别人造成的争用上界算进去——也就是说，位阶最高的任务会被位阶最低的任务实际拖住，而拖住它的那个位置不出现在优先级表上。由此得到的判断是：权力的本质，是在运行时持有别人非等不可、且此刻不可绕过的那样东西。本文把这个位置称为持锁位，读数是一段观察窗内全部被迫等待的时长中归于同一持有者的占比。承重推论只有一句：当权力从位阶转移到持锁位时，位阶表毫发无损——审计照旧通过，组织图一个字不必改。</div>
 <p class="kwline"><b>关键词</b>：持锁位　阻塞归属率　运行时权力　位阶与实际支配的分离　不可绕过性</p>
 <div class="toc"><div class="tl">目 录</div><a href="#s1">一、三次等待，同一个形状</a><a href="#s2">二、三张表，三个互相取消的答案</a><a href="#s3">三、三张表下面那块共同的地</a><a href="#s4">四、拆掉它的那件事，写在实时系统自己的认证规程里</a><a href="#s5">五、持锁位</a><a href="#s6">六、把它数出来：阻塞归属率 β</a><a href="#s7">七、两根轴：谁在等 × 表上是谁</a><a href="#s8">八、为什么第Ⅱ格几乎永远认不出来</a><a href="#s9">九、一句问话，五个现场</a><a href="#s10">十、十二处兑现</a><a href="#s11">十一、三处反过来削掉本文的约束</a><a href="#s12">十二、与相邻说法的分界</a><a href="#s13">十三、更早的一层：五十年前就有人走到这里，只是用另一套话说的</a><a href="#s14">十四、与同栏三篇的分界</a><a href="#s15">十五、怎么填这张表：程序、规则与一次演练</a><a href="#s16">十六、一次真跑：预注册、不利结果，以及它改掉的那句话</a><a href="#s17">十七、三个尺度上的同一件事</a><a href="#s18">十八、用不上这套判据的六种情形</a><a href="#s19">十九、可证伪条件</a><a href="#s20">二十、一旦被拿去考核会发生什么</a><a href="#s21">二十一、本文自己在哪一格</a><a href="#s22">二十二、一条写死日期的预测</a><a href="#s23">二十三、结论</a><a href="#s24">English Title and Keywords</a><a href="#s25">附录 A　注释</a><a href="#s26">参考文献</a><a href="#s27">附录 B　版本与篇幅</a><a href="#s28">附录 C　人机分工声明</a></div>
