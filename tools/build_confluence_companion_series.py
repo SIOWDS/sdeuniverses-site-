@@ -469,7 +469,7 @@ def inject_mother(t: dict) -> None:
 <a style="display:block;color:#2a3b50;font-weight:700;text-decoration:none;margin:5px 0" href="/confluence/{t['slug']}/applied/">技术与应用：{esc(t['applied'])} →</a>
 </aside>
 <!-- companion-series:end -->'''
-    text = re.sub(r"<!-- companion-series:start -->.*?<!-- companion-series:end -->", "", text, flags=re.S)
+    text = re.sub(r"\n*<!-- companion-series:start -->.*?<!-- companion-series:end -->\n*", "\n", text, flags=re.S)
     marker = '<div class="wrap">'
     if marker not in text:
         raise RuntimeError(f"mother page has no wrap marker: {path}")
@@ -487,7 +487,7 @@ def catalog() -> str:
 def wire_indexes() -> None:
     base = CF / "base.html"
     text = base.read_text(encoding="utf-8")
-    text = re.sub(r"<!-- companion-catalog:start -->.*?<!-- companion-catalog:end -->", "", text, flags=re.S)
+    text = re.sub(r"\n*<!-- companion-catalog:start -->.*?<!-- companion-catalog:end -->\n*", "\n", text, flags=re.S)
     card = '''<!-- companion-catalog:start -->
 <div class="item" data-ch="c1"><div class="n">理论双译计划 · 十篇理论母文 × 两种配套长文</div><h2><a href="/confluence/companion-series/">高深理论，说给普通人听，也交给真实系统去试</a></h2><p class="sub">二十篇新文一次上线：十篇大白话类比解释，十篇技术与应用方案</p><p class="hk">每篇约五千字。解释文不把理论削成口号，保留类比边界、误读和SIO结构；应用文不把新概念伪装成成熟标准，写清事件单位、数据字段、计算口径、八步流程、三个试点、失败条件与伦理红线。每组都与理论母文双向互链。</p><p class="rdmore"><a href="/confluence/companion-series/">进入理论双译计划 →</a></p><p class="meta">王德生 著 · 20篇 · 2026年8月10日</p></div>
 <!-- companion-catalog:end -->'''
@@ -502,19 +502,6 @@ def wire_indexes() -> None:
     if "/confluence/companion-series/" not in ltxt:
         ltxt = ltxt.replace("</div>\n<noscript>", '<br><a href="/confluence/companion-series/">新上线：理论双译计划 · 二十篇配套长文</a>\n</div>\n<noscript>', 1)
     loader.write_text(ltxt, encoding="utf-8")
-
-    home = ROOT / "public" / "index.html"
-    htxt = home.read_text(encoding="utf-8")
-    htxt = re.sub(r"<!-- companion-home:start -->.*?<!-- companion-home:end -->", "", htxt, flags=re.S)
-    feature = '''<!-- companion-home:start -->
-<article class="fi"><div class="fi-k" style="color:#9A7C22">学科通融 · 理论双译计划 · 二十篇新文一次上线</div><h3><a href="/confluence/companion-series/"><span class="zh-only">十篇高创新理论：每篇一篇大白话类比解释＋一篇技术应用文</span></a></h3><p>从《语感的本质》《独了》《残判》《同缩》到《临界回落》《制造无痛区》《持锁位》《无主段》《同持》《未结转中间体》，十组母文现已形成“理论—解释—应用”三层阅读。</p><div class="fi-m" style="font-size:12.5px;color:#8A6817">王德生 著 · 20篇 · 每篇约5000字 · 2026-08-10</div></article>
-<!-- companion-home:end -->'''
-    needle = '<article class="fi"><div class="fi-k" style="color:#9A7C22">学科通融 · 之八十九</div>'
-    if needle not in htxt:
-        raise RuntimeError("homepage insertion marker not found")
-    htxt = htxt.replace(needle, feature + "\n" + needle, 1)
-    home.write_text(htxt, encoding="utf-8")
-
 
 def main() -> None:
     for no, t in enumerate(THEORIES, 1):
@@ -535,7 +522,7 @@ def main() -> None:
     dest.parent.mkdir(parents=True, exist_ok=True)
     dest.write_text(catalog(), encoding="utf-8")
     wire_indexes()
-    print("wired catalog, mother pages, confluence index and homepage")
+    print("wired catalog, mother pages and confluence index")
 
 
 if __name__ == "__main__":
