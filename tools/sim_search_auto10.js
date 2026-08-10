@@ -42,8 +42,8 @@ ok(kOrder[8] === "落地与代价", "末级＝落地与代价");
 /* ===== 二、nextq 的位置与形态（最贵的一条静默故障就在这儿）===== */
 console.log("— 二、nextq 模式 —");
 const iNext = W.indexOf('if (mode === "nextq") {');
-const iExpand = W.indexOf("const expTerms = await sdeExpandQuery(");
-const iRetr = W.indexOf("const _lrA = await lightRetrieve(");
+const iExpand = W.indexOf("sdeExpandQuery(VC, KEY, rq)");
+const iRetr = W.indexOf("lightRetrieve(env, url, rq");
 const iLimit = W.indexOf("const lim = env.ASK_LIMITER.get(");
 ok(iNext > 0, "nextq 分支在位");
 ok(iNext < iExpand && iNext < iRetr, "nextq 排在词表扩展与三层召回**之前**（否则一场自动十轮白跑九遍最贵的检索）");

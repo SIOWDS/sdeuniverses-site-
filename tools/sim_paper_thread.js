@@ -172,14 +172,14 @@ ok((bAsk4.match(/finishAsk\(ansEl, gotErr, lastStat\)/g) || []).length >= 2, "�
    检索时间与预填时间都算在平台那道 130 秒的墙里，而历轮上下文本身还在变长。 */
 console.log("— 九、轮次越后、资料越少 —");
 ok(/const _thr = \(mode === "answer" && hist\.length\)/.test(W), "阶梯只对深度档连续问对生效（不影响成文／提炼／盲评）");
-const mK = W.match(/const K = mode === "recommend" \? 48 : \(_lightDeep \? 40 : \(deep \? ([^:]*) : 20\)\);/);
-const mC = W.match(/const CTX_MAX = _lightDeep \? 14000 : \(deep \? ([^:]*) : 12000\);/);
+const mK = W.match(/const K = mode === "recommend" \? 48 : \(_lightDeep \? 40 : \(_lateTurn \? 20 : \(deep \? ([^:]*) : 20\)\)\);/);
+const mC = W.match(/const CTX_MAX = _lightDeep \? 14000 : \(_lateTurn \? 12000 : \(deep \? ([^:]*) : 12000\)\);/);
 ok(!!mK && !!mC, "K 与 CTX_MAX 都改成了随轮次递减");
 const kFn = new Function("_thr", "return " + (mK ? mK[1] : "120") + ";");
 const cFn = new Function("_thr", "return " + (mC ? mC[1] : "50000") + ";");
 ok(kFn(0) === 120 && cFn(0) === 50000, "第一轮一字不减（它本来就不撞墙）");
-ok(kFn(3) < kFn(0) && cFn(3) < cFn(0), "第四轮确实降下来了· K=" + kFn(3) + " CTX=" + cFn(3));
-ok(kFn(5) >= 36 && cFn(5) >= 12000, "降到底也保底（K≥36、CTX≥12000）· 实得 " + kFn(5) + " / " + cFn(5));
+ok(kFn(1) < kFn(0) && cFn(1) < cFn(0), "第二轮就开始降· K=" + kFn(1) + " CTX=" + cFn(1));
+ok(kFn(5) >= 36 && cFn(5) >= 12000, "重档那条递减降到底也保底（K≥36、CTX≥12000）· 实得 " + kFn(5) + " / " + cFn(5));
 ok(kFn(9) === kFn(5) && cFn(9) === cFn(5), "_thr 已封顶，不会越减越没");
 
 /* ===== 十、写得完才算数（2026-08-10 第三起线上故障）=====
@@ -197,6 +197,30 @@ ok((W.match(/不写 #、不写 \*\*、不画表格、不写 --- 分隔线/g) || 
 ok(/ansEl\.textContent=acc;/.test(H), "答案框确实是纯文本渲染（所以上一条才是必须的）");
 ok(/Math\.max\(25000, 120000 - _spent\)/.test(W),
   "总闸由 115 秒抬到 120 秒（平台墙 128–133，仍留 8–13 秒把掉线那句话发出去）");
+
+/* ===== 十一、检索段也要有闸（2026-08-10 第三起线上故障）=====
+   第 5 轮零产出，提示里的「停住时的最后一步」是「正在检索站内语料」——
+   Worker 在出流前的检索段被平台无声杀掉（不是异常：异常会被外层 catch 成 error 帧）。
+   真正的省时靠降量（第三轮起走普通档检索、跳过词表扩展），race 只是兜底。 */
+console.log("— 十一、检索段的闸 —");
+ok(/const _lateTurn = \(mode === "answer" && hist\.length >= 2\);/.test(W),
+  "第三轮起认作 late turn（只对问答生效，不碰成文／提炼／盲评）");
+ok(/const expTerms = _lateTurn \? \[\] :/.test(W),
+  "第三轮起跳过 SDE 词表扩展（它本身就是一次模型往返，而这时该召回的早在上下文里）");
+ok(/const _heavyRag = deep && !_lateTurn;/.test(W) && /pick: _heavyRag \? 48 : 20/.test(W),
+  "第三轮起召回参数也降到普通档（pick/perDoc/budget 三项一起降）");
+ok(/_raceRag = \(p, fb\) =>/.test(W) && /Promise\.race\(\[_q,/.test(W) && /_ragCut = true; r\(fb\);/.test(W),
+  "检索段套了一道超时闸，超时带空资料往下走");
+ok(!/Promise\.resolve\(p\)\.catch\(\(\) => fb\)/.test(W) && /_q\.catch\(\(\) => \{\}\)/.test(W),
+  "闸只赛超时、**不吞异常**：检索真报错还是要冒成一帧 error，否则又多一种静默");
+ok(/if \(_ragCut\) _stat\(/.test(W), "真的超时了要在状态里说一句，不得惄惄地交一份没出处的答案");
+ok(/_EMPTY_RAG = \{ corpus: \{ docs: \[\], secLabel: \{\} \}, hits: \[\] \}/.test(W),
+  "超时兜底值的形状与下游用法对得上（hits 空就不会去解 corpus）");
+const mRagMs = W.match(/const _ragMs = _lateTurn \? (\d+) : \(deep \? (\d+) : (\d+)\);/);
+ok(!!mRagMs && Number(mRagMs[1]) <= 25000 && Number(mRagMs[2]) <= 45000,
+  "闸值在平台那道墙之内留得下作答时间 · 实得 " + (mRagMs ? mRagMs[1] / 1000 + "s / " + mRagMs[2] / 1000 + "s" : "?"));
+ok(/_raceRag\(sdeExpandQuery/.test(W) === false || /_lateTurn \? \[\] : await _raceRag\(sdeExpandQuery/.test(W),
+  "非 late turn 的词表扩展也走那道闸");
 
 console.log("\n===== " + P + " PASS / " + F + " FAIL =====");
 process.exit(F ? 1 : 0);

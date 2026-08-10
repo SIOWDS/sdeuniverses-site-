@@ -4709,19 +4709,38 @@ async function askCore(request, env, url, body, SINK) {
   //   而历轮上下文本身还在变长。两边一起涨，第四、五轮就撞墙。
   //   线上真故障（2026-08-10）：第 4 轮空白框、第 3 轮零产出。
   const _thr = (mode === "answer" && hist.length) ? Math.min(hist.length, 5) : 0;
-  const K = mode === "recommend" ? 48 : (_lightDeep ? 40 : (deep ? Math.max(36, 120 - _thr * 24) : 20));   // 取多少块（深度档广撒网；retrieve 只收相关块、clamp 兜底，窄问题不会被噪声塞满）
-  const CTX_MAX = _lightDeep ? 14000 : (deep ? Math.max(12000, 50000 - _thr * 11000) : 12000);   // 《站内资料》字数上限
+  // ⚠⚠ 2026-08-10 第三起线上故障：手动问对第 5 轮零产出，**最后一条状态停在「🔎 正在检索站内语料…」**——
+  //   整个 Worker 在检索段被平台无声杀掉，连一帧 error 都没发出来（不是异常：异常会被外层 catch 成 error 帧）。
+  //   出流前这一段原本没有任何时限：词表扩展是一次模型往返，全站检索是一次重活，两样都算在那道 130 秒的墙里。
+  //   而连续问对越往后，这一遍检索的边际收益越接近零——真正要用的材料早在前几轮进了上下文，
+  //   它却照样有本事把整轮问对拖死。所以第三轮起（hist ≥ 2）**降到普通档的检索量并跳过词表扩展**：
+  //   普通档这条路从来没死过。把省下的时间全部留给作答。
+  const _lateTurn = (mode === "answer" && hist.length >= 2);
+  const K = mode === "recommend" ? 48 : (_lightDeep ? 40 : (_lateTurn ? 20 : (deep ? Math.max(36, 120 - _thr * 24) : 20)));   // 取多少块（深度档广撒网；retrieve 只收相关块、clamp 兜底，窄问题不会被噪声塞满）
+  const CTX_MAX = _lightDeep ? 14000 : (_lateTurn ? 12000 : (deep ? Math.max(12000, 50000 - _thr * 11000) : 12000));   // 《站内资料》字数上限
   // 检索用问句：连续问对时把「缘起之问」并进去做锚——第七轮问「那这一条呢」这种
   // 指代式短问，单独拿去召回只会漂走；提炼档则用全场问题一起定向。
   const rq = _lightDeep
     ? (hist.map((t) => t.q).join(" ").slice(0, 300) || q)
     : (hist.length ? (q + " " + originQ.slice(0, 40)) : q);
-  _stat("🔎 正在检索站内语料…");
-  const expTerms = await sdeExpandQuery(VC, KEY, rq); // SDE 词义扩展：问题→SDE 术语，再拿去召回
+  _stat(_lateTurn ? "🔎 正在检索站内语料（第三轮起走轻量检索，把时间留给作答）…" : "🔎 正在检索站内语料…");
+  // 【检索段也要有闸】超时就带着空资料往下走：**宁可少一份站内资料，也不要整轮没有答案**。
+  //   race 不能取消底下那件事，所以真正的省时靠上面 _lateTurn 那一档降量；这道闸是兜底。
+  const _EMPTY_RAG = { corpus: { docs: [], secLabel: {} }, hits: [] };
+  const _ragMs = _lateTurn ? 20000 : (deep ? 40000 : 25000);
+  let _ragCut = false;
+  // ⚠ 只赛超时，**不吞异常**：检索真报错时还是要冒成一帧 error，
+  //   否则用户拿到一份没有出处的答案而不知道为什么（又一种静默）。
+  //   另接一个空 catch 只为消掉 unhandled rejection，不改变 race 的结果。
+  const _raceRag = (p, fb) => { const _q = Promise.resolve(p); _q.catch(() => {}); return Promise.race([_q, new Promise((r) => setTimeout(() => { _ragCut = true; r(fb); }, _ragMs))]); };
+  // 第三轮起跳过 SDE 词表扩展：它本身就是一次模型往返，而这时该召回的早已在上下文里。
+  const expTerms = _lateTurn ? [] : await _raceRag(sdeExpandQuery(VC, KEY, rq), []);
   const expStr = expTerms.join(" · ");
   // scope：栏目内问答（如 /frontier/search/ 传 "frontier"）——只从该版块召回。
   const _scope = /^[a-z0-9_]{1,24}$/.test(String(body.scope || "")) ? String(body.scope) : "";
-  const _lrA = await lightRetrieve(env, url, rq, expTerms, K, 1600, { pick: deep ? 48 : 20, perDoc: deep ? 3 : 2, budget: deep ? 6000000 : 3000000, only: _scope });
+  const _heavyRag = deep && !_lateTurn;
+  const _lrA = await _raceRag(lightRetrieve(env, url, rq, expTerms, K, 1600, { pick: _heavyRag ? 48 : 20, perDoc: _heavyRag ? 3 : 2, budget: _heavyRag ? 6000000 : 3000000, only: _scope }), _EMPTY_RAG);
+  if (_ragCut) _stat("⏱ 站内检索超时，本轮不带站内资料作答（问对上下文照常带）…");
   const corpus = _lrA.corpus, hits = _lrA.hits;
   const sources = [];
   const seen = {};
