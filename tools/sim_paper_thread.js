@@ -205,22 +205,33 @@ ok(/Math\.max\(25000, 120000 - _spent\)/.test(W),
 console.log("— 十一、检索段的闸 —");
 ok(/const _lateTurn = \(mode === "answer" && hist\.length >= 2\);/.test(W),
   "第三轮起认作 late turn（只对问答生效，不碰成文／提炼／盲评）");
-ok(/const expTerms = _lateTurn \? \[\] :/.test(W),
-  "第三轮起跳过 SDE 词表扩展（它本身就是一次模型往返，而这时该召回的早在上下文里）");
-ok(/const _heavyRag = deep && !_lateTurn;/.test(W) && /pick: _heavyRag \? 48 : 20/.test(W),
-  "第三轮起召回参数也降到普通档（pick/perDoc/budget 三项一起降）");
+/* 降量不够：轻量档照样死，而且**超时闸没响**（二十秒内就被杀）⇒ 不是慢，是峰值内存。
+   改成第三轮起**整段跳过**：不取 manifest、不建 coords、不读 kw、不拉 doc。 */
+const iLate = W.indexOf("if (_lateTurn) {");
+const iElse = W.indexOf("_stat(\"\ud83d\udd0e 正在检索站内语料…\")");
+ok(iLate > 0 && iElse > iLate, "检索整段被包在 if (_lateTurn) … else … 里");
+const lateBlk = W.slice(iLate, iElse);
+ok(!/sdeExpandQuery/.test(lateBlk) && !/lightRetrieve/.test(lateBlk),
+  "late turn 那一支里**一次检索都没有**（既不扩词也不召回）");
+ok(/不再重跑全站检索/.test(lateBlk), "跳过时在状态里明说一句，不惄惄地少一段资料");
+ok(/let expTerms = \[\], expStr = "", corpus = /.test(W),
+  "检索产物改成 let 并给了空初值（跳过时下游照样能用）");
 ok(/_raceRag = \(p, fb\) =>/.test(W) && /Promise\.race\(\[_q,/.test(W) && /_ragCut = true; r\(fb\);/.test(W),
-  "检索段套了一道超时闸，超时带空资料往下走");
+  "前两轮那条路仍然套着超时闸");
+ok(/const _ks = Object\.keys\(TIER\.l1\);[\s\S]{0,120}delete TIER\.l1\[_ks\[0\]\]/.test(W),
+  "篇层索引缓存封顶（全站三十多个版块全缓下来，峰值内存足以把 isolate 顶到平台上限）");
 ok(!/Promise\.resolve\(p\)\.catch\(\(\) => fb\)/.test(W) && /_q\.catch\(\(\) => \{\}\)/.test(W),
   "闸只赛超时、**不吞异常**：检索真报错还是要冒成一帧 error，否则又多一种静默");
 ok(/if \(_ragCut\) _stat\(/.test(W), "真的超时了要在状态里说一句，不得惄惄地交一份没出处的答案");
 ok(/_EMPTY_RAG = \{ corpus: \{ docs: \[\], secLabel: \{\} \}, hits: \[\] \}/.test(W),
   "超时兜底值的形状与下游用法对得上（hits 空就不会去解 corpus）");
-const mRagMs = W.match(/const _ragMs = _lateTurn \? (\d+) : \(deep \? (\d+) : (\d+)\);/);
-ok(!!mRagMs && Number(mRagMs[1]) <= 25000 && Number(mRagMs[2]) <= 45000,
-  "闸值在平台那道墙之内留得下作答时间 · 实得 " + (mRagMs ? mRagMs[1] / 1000 + "s / " + mRagMs[2] / 1000 + "s" : "?"));
-ok(/_raceRag\(sdeExpandQuery/.test(W) === false || /_lateTurn \? \[\] : await _raceRag\(sdeExpandQuery/.test(W),
-  "非 late turn 的词表扩展也走那道闸");
+const mRagMs = W.match(/const _ragMs = deep \? (\d+) : (\d+);/);
+ok(!!mRagMs && Number(mRagMs[1]) <= 45000,
+  "闸值在平台那道墙之内留得下作答时间 · 实得 " + (mRagMs ? mRagMs[1] / 1000 + "s" : "?"));
+ok(/await _raceRag\(sdeExpandQuery/.test(W), "前两轮的词表扩展也走那道闸");
+const bAsk5 = H.slice(H.indexOf("function doAsk("), H.indexOf("function finishAsk("));
+ok(/_gotSrc=false/.test(bAsk5) && /_gotSrc=true/.test(bAsk5) && /if\(!_gotSrc && _prevSrc\)/.test(bAsk5),
+  "本轮没发 sources 就把上一轮的出处留在屏幕上（否则第三轮起出处区会整块消失）");
 
 console.log("\n===== " + P + " PASS / " + F + " FAIL =====");
 process.exit(F ? 1 : 0);

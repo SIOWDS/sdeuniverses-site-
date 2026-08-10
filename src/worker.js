@@ -2960,7 +2960,14 @@ async function tierGet(env, url, path, key) {
   const r = await idxFetch(env, url, path);
   if (!r.ok) return null;
   const j = await r.json();
-  if (key === "l0") TIER.l0 = j; else TIER.l1[key] = j;
+  // 篇层索引单个最大 185KB，解析成对象后还要再涨几倍。全站三十多个版块全缓存下来，
+  // 峰值内存足以把 isolate 顶到平台上限（表现就是「答题流跑到一半无声中断」）。封顶 8 个，先进先出。
+  if (key === "l0") TIER.l0 = j;
+  else {
+    const _ks = Object.keys(TIER.l1);
+    if (_ks.length >= 8) delete TIER.l1[_ks[0]];
+    TIER.l1[key] = j;
+  }
   return j;
 }
 function _scoreKeys(list, baseKeys, exp, prev) {
@@ -4723,33 +4730,42 @@ async function askCore(request, env, url, body, SINK) {
   const rq = _lightDeep
     ? (hist.map((t) => t.q).join(" ").slice(0, 300) || q)
     : (hist.length ? (q + " " + originQ.slice(0, 40)) : q);
-  _stat(_lateTurn ? "🔎 正在检索站内语料（第三轮起走轻量检索，把时间留给作答）…" : "🔎 正在检索站内语料…");
-  // 【检索段也要有闸】超时就带着空资料往下走：**宁可少一份站内资料，也不要整轮没有答案**。
-  //   race 不能取消底下那件事，所以真正的省时靠上面 _lateTurn 那一档降量；这道闸是兜底。
-  const _EMPTY_RAG = { corpus: { docs: [], secLabel: {} }, hits: [] };
-  const _ragMs = _lateTurn ? 20000 : (deep ? 40000 : 25000);
-  let _ragCut = false;
-  // ⚠ 只赛超时，**不吞异常**：检索真报错时还是要冒成一帧 error，
-  //   否则用户拿到一份没有出处的答案而不知道为什么（又一种静默）。
-  //   另接一个空 catch 只为消掉 unhandled rejection，不改变 race 的结果。
-  const _raceRag = (p, fb) => { const _q = Promise.resolve(p); _q.catch(() => {}); return Promise.race([_q, new Promise((r) => setTimeout(() => { _ragCut = true; r(fb); }, _ragMs))]); };
-  // 第三轮起跳过 SDE 词表扩展：它本身就是一次模型往返，而这时该召回的早已在上下文里。
-  const expTerms = _lateTurn ? [] : await _raceRag(sdeExpandQuery(VC, KEY, rq), []);
-  const expStr = expTerms.join(" · ");
-  // scope：栏目内问答（如 /frontier/search/ 传 "frontier"）——只从该版块召回。
+  // ⚠⚠⚠ 2026-08-10 第四起线上故障：第 3 轮零产出，最后一步仍是「🔎 正在检索站内语料」，
+  //   而且**超时闸没响**（没出现「⏱ 站内检索超时」）——说明不是慢，是二十秒内就被杀掉。
+  //   本文件 ragKeys 上面那段注释早就记过同一类病：检索峰值内存超过单个 isolate 上限时，
+  //   平台要么判 503，要么**答题流跑到一半无声中断**。这次就是后者。
+  //   每一轮问答都会把 manifest(263KB)＋sde-coords(86KB，逐篇建 Set)＋sections＋若干 kw 重新取回重新解析
+  //   （CORPUS_TTL 只有 30 秒，而一轮问答要跑一百多秒 ⇒ 每轮必然重建一遍），再顺序拉最多二十个 doc 分片。
+  //   连续问对第三轮起，这一整套的边际收益接近零：该用的材料早在前两轮进了上下文，
+  //   而追问动作（承重命题／共有前提／反例／发生次序…）问的本来就是上一轮的回答，不是语料。
+  //   ⇒ 所以第三轮起**整段跳过**：不取 manifest、不建 coords、不读 kw、不拉 doc。
+  //      宁可这几轮没有站内出处，也不要整轮问对没有答案。
+  let expTerms = [], expStr = "", corpus = { docs: [], secLabel: {} }, hits = [], sources = [], ctxText = "";
   const _scope = /^[a-z0-9_]{1,24}$/.test(String(body.scope || "")) ? String(body.scope) : "";
-  const _heavyRag = deep && !_lateTurn;
-  const _lrA = await _raceRag(lightRetrieve(env, url, rq, expTerms, K, 1600, { pick: _heavyRag ? 48 : 20, perDoc: _heavyRag ? 3 : 2, budget: _heavyRag ? 6000000 : 3000000, only: _scope }), _EMPTY_RAG);
-  if (_ragCut) _stat("⏱ 站内检索超时，本轮不带站内资料作答（问对上下文照常带）…");
-  const corpus = _lrA.corpus, hits = _lrA.hits;
-  const sources = [];
-  const seen = {};
-  let ctxText = "";
-  for (const ck of hits) {
-    const d = corpus.docs[ck.d];
-    if (!seen[d.u]) { seen[d.u] = 1; sources.push({ u: d.u, t: d.t, b: corpus.secLabel[d.s] || d.s }); }
-    ctxText += "【来源：" + d.t + "】\n" + ck.t + "\n\n";
-    if (ctxText.length > CTX_MAX) break; // 上下文钳位·控成本
+  if (_lateTurn) {
+    _stat("🔎 第三轮起不再重跑全站检索（该用的材料已在问对上下文里），直接作答…");
+  } else {
+    _stat("🔎 正在检索站内语料…");
+    // 【检索段也要有闸】超时就带着空资料往下走：**宁可少一份站内资料，也不要整轮没有答案**。
+    //   ⚠ 只赛超时、**不吞异常**：检索真报错时还是要冒成一帧 error，
+    //     否则用户拿到一份没有出处的答案而不知道为什么（又一种静默）。
+    //     另接一个空 catch 只为消掉 unhandled rejection，不改变 race 的结果。
+    const _EMPTY_RAG = { corpus: { docs: [], secLabel: {} }, hits: [] };
+    const _ragMs = deep ? 40000 : 25000;
+    let _ragCut = false;
+    const _raceRag = (p, fb) => { const _q = Promise.resolve(p); _q.catch(() => {}); return Promise.race([_q, new Promise((r) => setTimeout(() => { _ragCut = true; r(fb); }, _ragMs))]); };
+    expTerms = await _raceRag(sdeExpandQuery(VC, KEY, rq), []); // SDE 词义扩展：问题→SDE 术语，再拿去召回
+    expStr = expTerms.join(" · ");
+    const _lrA = await _raceRag(lightRetrieve(env, url, rq, expTerms, K, 1600, { pick: deep ? 48 : 20, perDoc: deep ? 3 : 2, budget: deep ? 6000000 : 3000000, only: _scope }), _EMPTY_RAG);
+    if (_ragCut) _stat("⏱ 站内检索超时，本轮不带站内资料作答（问对上下文照常带）…");
+    corpus = _lrA.corpus; hits = _lrA.hits;
+    const seen = {};
+    for (const ck of hits) {
+      const d = corpus.docs[ck.d];
+      if (!seen[d.u]) { seen[d.u] = 1; sources.push({ u: d.u, t: d.t, b: corpus.secLabel[d.s] || d.s }); }
+      ctxText += "【来源：" + d.t + "】\n" + ck.t + "\n\n";
+      if (ctxText.length > CTX_MAX) break; // 上下文钳位·控成本
+    }
   }
 
   // ===== 模式：推荐阅读（答后点击①）——基底只能从真实站内目录里挑，服务端逐条校验，链接零编造 =====

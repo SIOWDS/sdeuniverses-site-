@@ -719,7 +719,10 @@ function doAsk(){
   var ansEl=document.getElementById('ans'); ansEl.className='ans blink'; ansEl.textContent='';
   var thinkEl=document.getElementById('thinkBar'); thinkEl.textContent='';
   if(deepOn) thinkEl.textContent='🔬 内功提智·深度作答中（首次每个基底要先写心得，约 20–40 秒）…';
-  var srcEl=document.getElementById('sources'); srcEl.innerHTML='';
+  /* 第三轮起后端不再重跑全站检索，本轮不会再发 sources。旧版一上来就清空出处区，
+     于是前两轮查到的出处也跟着消失。改成：本轮真的发来了才换，没发就把上一轮的留在屏幕上。 */
+  var srcEl=document.getElementById('sources'); var _prevSrc=srcEl.innerHTML;
+  var _gotSrc=false;
   document.getElementById('sdeExpand').textContent='';
   var acc='', thinkChars=0;
   /* 【看门狗】服务端的闸只管得住「上游不写」，管不住「整个 Worker 被平台杀掉」——
@@ -757,7 +760,7 @@ function doAsk(){
           if(j.t==='token'){ acc+=j.v; lastAns=acc; ansEl.textContent=acc; }
           else if(j.t==='status'){ lastStat=j.v; thinkEl.textContent=j.v; }
           else if(j.t==='think'){ thinkChars+=(j.v||'').length; thinkEl.textContent='🧠 深度思考中（'+thinkChars+' 字）…'; }
-          else if(j.t==='sources'){ renderSources(j.v); }
+          else if(j.t==='sources'){ _gotSrc=true; renderSources(j.v); }
           else if(j.t==='expand'){ document.getElementById('sdeExpand').textContent='🧭 SDE 词义检索：'+j.v; }
           else if(j.t==='error'){
             gotErr=true;
@@ -797,6 +800,7 @@ function doAsk(){
     ansEl.innerHTML='<div class="err">请求失败：'+esc(e.message||String(e))+'</div>';
   }).finally(()=>{
     if(_wd) clearTimeout(_wd);
+    if(!_gotSrc && _prevSrc) srcEl.innerHTML=_prevSrc;   /* 本轮没检索 ⇒ 留住上一轮的出处 */
     asking=false; goBtn.disabled=false;
     document.getElementById('thinkBar').textContent='';
   });
