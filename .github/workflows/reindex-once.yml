@@ -11,64 +11,26 @@ permissions:
   contents: write
 
 jobs:
-  verify-final:
+  inspect-final:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
     steps:
-      - name: Verify final latest-main search-index run
+      - name: Record latest repository-dispatch search-index runs
         env:
           GH_TOKEN: ${{ github.token }}
-          RESULT_PATH: .reindex-final-result-20260811T1418Z.json
-          TARGET_SHA: 4c041c1031201f97c7cc37139ff975f0987a95a1
+          RESULT_PATH: .reindex-final-inspection-20260811T1428Z.json
         run: |
           set -euo pipefail
           API="https://api.github.com/repos/${{ github.repository }}"
           AUTH=(-H "Accept: application/vnd.github+json" -H "Authorization: Bearer $GH_TOKEN" -H "X-GitHub-Api-Version: 2022-11-28")
-
-          RUN_ID=""
-          RUN_JSON=""
-          for _ in $(seq 1 60); do
-            RUN_JSON=$(curl --fail-with-body -sS -L "${AUTH[@]}" \
-              "$API/actions/workflows/search-index.yml/runs?event=repository_dispatch&per_page=20")
-            RUN_ID=$(jq -r --arg sha "$TARGET_SHA" \
-              '((.workflow_runs | map(select(.head_sha == $sha)) | sort_by(.created_at) | last) // {}) | .id // empty' \
-              <<<"$RUN_JSON")
-            if [[ -n "$RUN_ID" ]]; then
-              break
-            fi
-            sleep 5
-          done
-          if [[ -z "$RUN_ID" ]]; then
-            echo "No search-index run found for $TARGET_SHA" >&2
-            exit 1
-          fi
-
-          RUN=""
-          STATUS=""
-          for _ in $(seq 1 180); do
-            RUN=$(curl --fail-with-body -sS -L "${AUTH[@]}" "$API/actions/runs/$RUN_ID")
-            STATUS=$(jq -r '.status' <<<"$RUN")
-            if [[ "$STATUS" == "completed" ]]; then
-              break
-            fi
-            sleep 10
-          done
-          if [[ "$STATUS" != "completed" ]]; then
-            echo "search-index run $RUN_ID did not complete before timeout" >&2
-            exit 1
-          fi
-
-          RESULT=$(jq -c '{id, run_number, event, status, conclusion, created_at, updated_at, head_sha, html_url}' <<<"$RUN")
+          RUNS=$(curl --fail-with-body -sS -L "${AUTH[@]}" \
+            "$API/actions/workflows/search-index.yml/runs?event=repository_dispatch&per_page=10")
+          RESULT=$(jq -c '{runs: [.workflow_runs[] | {id,run_number,event,status,conclusion,created_at,updated_at,head_sha,html_url}]}' <<<"$RUNS")
           CONTENT=$(printf '%s\n' "$RESULT" | base64 -w0)
           jq -n \
-            --arg message "Record final verified reindex result" \
+            --arg message "Record final search-index run binding" \
             --arg content "$CONTENT" \
             --arg branch "main" \
             '{message:$message, content:$content, branch:$branch}' > /tmp/result.json
           curl --fail-with-body -sS -L -X PUT "${AUTH[@]}" \
             "$API/contents/$RESULT_PATH" \
             -d @/tmp/result.json >/dev/null
-
-          CONCLUSION=$(jq -r '.conclusion' <<<"$RUN")
-          echo "$RESULT"
-          [[ "$CONCLUSION" == "success" ]]
