@@ -23,4 +23,23 @@ jobs:
             -H "Authorization: Bearer $GH_TOKEN" \
             -H "X-GitHub-Api-Version: 2022-11-28" \
             "https://api.github.com/repos/${{ github.repository }}/dispatches" \
-            -d '{"event_type":"reindex","client_payload":{"source":"reindex-once"}}'
+            -d '{"event_type":"reindex","client_payload":{"source":"reindex-once-confirmed"}}'
+
+      - name: Record dispatch acceptance
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MARKER_PATH: .reindex-triggered-20260811T1405Z.txt
+        run: |
+          CONTENT=$(printf 'repository_dispatch reindex accepted at %s\n' "$(date -u +%FT%TZ)" | base64 -w0)
+          jq -n \
+            --arg message "Record reindex dispatch acceptance" \
+            --arg content "$CONTENT" \
+            --arg branch "main" \
+            '{message:$message, content:$content, branch:$branch}' > /tmp/marker.json
+          curl --fail-with-body -L \
+            -X PUT \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "https://api.github.com/repos/${{ github.repository }}/contents/${MARKER_PATH}" \
+            -d @/tmp/marker.json
