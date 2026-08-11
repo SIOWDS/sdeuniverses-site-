@@ -52,7 +52,7 @@ def audit(number: int) -> dict[str, object]:
                 sentences.setdefault(sentence.strip(), []).append(index + 1)
     ref_match = re.search(r"经典层资料核验.*?<ol>(.*?)</ol>", post, re.S)
     refs = re.findall(r"<li\b", ref_match.group(1)) if ref_match else []
-    books = re.findall(r"<li>.*?(?:Press|Springer|Books?|出版社|Blackwell|Garland|Lippincott|Elsevier|Mosby|Wiley|Academic Press|Williams)", ref_match.group(1), re.S | re.I) if ref_match else []
+    books = re.findall(r"<li>.*?(?:Press|Springer|Books?|出版社|Blackwell|Garland|Lippincott|Elsevier|Mosby|Wiley|Academic Press|Williams|Addison-Wesley|Morgan Kaufmann|Prentice Hall|Pearson|Houghton Mifflin|Random House|Van Nostrand|Saunders)", ref_match.group(1), re.S | re.I) if ref_match else []
     duplicates = {sentence: where for sentence, where in sentences.items() if len(where) > 1}
     long_sentences = [sentence for sentence in sentences if han_count(sentence) > 90]
     pos = Counter(positions)
