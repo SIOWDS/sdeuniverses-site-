@@ -302,18 +302,21 @@ def rebuild(panel: int) -> None:
     if marker >= 0:
         end = raw.find('<div class="end">', marker)
         raw = raw[:marker] + raw[end:]
-    # A few V7 pages retained an older transition paragraph immediately before
-    # the reviewed second-act bridge.  Keep the reviewed bridge and remove the
-    # duplicated act label plus its stray paragraph.
+    # Some V7 pages retained a second reviewed bridge after the real second act
+    # had already begun.  Keep the first second-act boundary and remove only
+    # later duplicate labels (plus their bridge paragraph), never intervening
+    # modern items.
+    second_act_seen = [False]
+
+    def keep_first_second_act(match: re.Match[str]) -> str:
+        if not second_act_seen[0]:
+            second_act_seen[0] = True
+            return match.group(0)
+        return ""
+
     raw = re.sub(
-        r'<div class="act">【第二幕】.*?</div>\s*<p>(?![^>]*class=).*?</p>\s*(?=<div class="act">【第二幕】)',
-        "",
-        raw,
-        flags=re.S,
-    )
-    raw = re.sub(
-        r'<div class="act">【第二幕】.*?</div>\s*(?=<div class="act">【第二幕】)',
-        "",
+        r'<div class="act">【第二幕】(?:(?!</div>).)*</div>\s*(?:<p class="bridge">(?:(?!</p>).)*</p>\s*)?',
+        keep_first_second_act,
         raw,
         flags=re.S,
     )
