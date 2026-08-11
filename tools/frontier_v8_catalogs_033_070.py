@@ -151,6 +151,121 @@ BCI_ROBOTICS = [
     "2006|BrainGate四肢瘫痪试验|Leigh Hochberg 团队|Hochberg LR et al. Neuronal ensemble control of prosthetic devices by a human with tetraplegia. Nature 442 (2006): 164–171|四肢瘫痪者可用皮层内阵列控制光标、电视与简易机械装置",
 ]
 
+ROBOTICS_CONTROL_SENSING = [
+    "1950|控制、通信与反馈进入统一语言|Norbert Wiener|Wiener N. The Human Use of Human Beings. Houghton Mifflin (1950)|机器、操作者与环境可用信息回路和负反馈在同一闭环中分析",
+    "1954|可编程物料搬运装置|George Devol|Devol GC. Programmed article transfer. US Patent 2,988,237, filed 1954, issued 1961|把动作序列存入可重写控制器可使机械臂脱离固定凸轮重复执行任务",
+    "1957|动态规划与最优性原理|Richard Bellman|Bellman R. Dynamic Programming. Princeton University Press (1957)|多阶段决策可按状态价值递推分解，当前最优动作必须接续剩余阶段的最优策略",
+    "1960|卡尔曼滤波|Rudolf Kalman|Kalman RE. A new approach to linear filtering and prediction problems. Journal of Basic Engineering 82 (1960): 35–45|递推融合模型与带噪观测可给出线性系统状态的最小方差估计",
+    "1962|自适应人工手|Rajko Tomovic 与 George Boni|Tomovic R, Boni G. An adaptive artificial hand. IRE Transactions on Automatic Control 7 (1962): 3–10|触觉事件与分层控制可让假手按物体接触自动切换抓握程序",
+    "1969|计算机控制关节机械臂|Victor Scheinman|Scheinman VI. Design of a computer controlled manipulator. Stanford Artificial Intelligence Project Memo AIM-92 (1969)|电驱关节、位置反馈与软件轨迹可组成通用可重编程机械臂",
+    "1969|Shakey移动机器人|Nils Nilsson 团队|Nilsson NJ. A mobile automaton: An application of artificial intelligence techniques. IJCAI (1969): 509–520|感知、世界模型、规划与执行可在移动平台上闭环连接并由任务失败触发重规划",
+    "1981|混合位置力控制|Marc Raibert 与 John Craig|Raibert MH, Craig JJ. Hybrid position/force control of manipulators. Journal of Dynamic Systems Measurement and Control 103 (1981): 126–133|把任务空间分成位置约束与力约束子空间可同时控制轨迹和接触载荷",
+    "1985|机器人阻抗控制|Neville Hogan|Hogan N. Impedance control: An approach to manipulation. Journal of Dynamic Systems Measurement and Control 107 (1985): 1–24|控制力与位移之间的动态关系可使接触机器人获得稳定柔顺性",
+    "1986|分层行为控制|Rodney Brooks|Brooks RA. A robust layered control system for a mobile robot. IEEE Journal on Robotics and Automation 2 (1986): 14–23|多个感知动作层可用抑制关系直接组成鲁棒行为而不依赖完整世界模型",
+    "1986|人工势场避障|Oussama Khatib|Khatib O. Real-time obstacle avoidance for manipulators and mobile robots. International Journal of Robotics Research 5 (1986): 90–98|目标吸引势与障碍排斥势可把在线避障转成控制空间中的局部力",
+    "1987|群集行为规则|Craig Reynolds|Reynolds CW. Flocks, herds and schools: A distributed behavioral model. Computer Graphics 21 (1987): 25–34|分离、对齐与聚合三种局部规则可生成没有中央指挥的群体运动",
+    "1988|占据栅格地图|Alberto Elfes|Elfes A. Sonar-based real-world mapping and navigation. IEEE Journal of Robotics and Automation 3 (1987): 249–265|把空间离散为占据概率单元可累计不确定传感证据并支持移动导航",
+    "1988|不确定性几何表示|Hugh Durrant-Whyte|Durrant-Whyte HF. Uncertain geometry in robotics. IEEE Journal of Robotics and Automation 4 (1988): 23–31|位姿与地标协方差必须随坐标变换共同传播，不能把地图误差当独立噪声",
+    "1996|示教学习|Stefan Schaal|Schaal S. Learning from demonstration. Advances in Neural Information Processing Systems 9 (1996)|示范轨迹可被参数化策略吸收并在新目标、速度与扰动条件下重用",
+    "1998|快速探索随机树|Steven LaValle|LaValle SM. Rapidly-exploring random trees: A new tool for path planning. Iowa State University Technical Report 98-11 (1998)|向随机样本扩展搜索树可快速覆盖高维受约束构型空间",
+    "1999|蒙特卡洛定位|Dieter Fox、Wolfram Burgard 与 Sebastian Thrun|Fox D et al. Monte Carlo localization: Efficient position estimation for mobile robots. AAAI (1999): 343–349|粒子分布可表达多峰位姿不确定性并随运动和传感在线更新",
+    "2001|概率机器人地图融合|Sebastian Thrun|Thrun S. Robotic mapping: A survey. In Exploring Artificial Intelligence in the New Millennium. Morgan Kaufmann (2002)|地图与位姿必须联合估计，闭环回访可把累计漂移转成可校正约束",
+    "2002|动态运动基元|Auke Ijspeert、Jun Nakanishi 与 Stefan Schaal|Ijspeert AJ et al. Movement imitation with nonlinear dynamical systems in humanoid robots. ICRA (2002): 1398–1403|稳定吸引子与可学习形状项可把示教动作改写为可缩放运动技能",
+    "2006|Stanley无人车|Sebastian Thrun 团队|Thrun S et al. Stanley: The robot that won the DARPA Grand Challenge. Journal of Field Robotics 23 (2006): 661–692|概率感知、路径规划和速度控制的系统集成可让无人车在开放荒漠连续自主行驶",
+]
+
+COMPUTING_SECURITY = [
+    "1950|图灵测试与机器智能|Alan Turing|Turing AM. Computing machinery and intelligence. Mind 59 (1950): 433–460|以可观察对话表现替代对机器是否真正思考的本体争论",
+    "1952|霍夫曼编码|David Huffman|Huffman DA. A method for the construction of minimum-redundancy codes. Proceedings of the IRE 40 (1952): 1098–1101|按符号概率递归合并可构造期望码长最小的前缀码",
+    "1959|有限自动机判定理论|Michael Rabin 与 Dana Scott|Rabin MO, Scott D. Finite automata and their decision problems. IBM Journal of Research and Development 3 (1959): 114–125|有限状态、正则语言与可判定问题可用统一机器模型互相转换",
+    "1960|人机共生计算|J. C. R. Licklider|Licklider JCR. Man-computer symbiosis. IRE Transactions on Human Factors in Electronics HFE-1 (1960): 4–11|交互计算应让人负责目标与判断、机器负责高速例行运算并形成实时协作",
+    "1965|协作顺序进程|Edsger Dijkstra|Dijkstra EW. Cooperating sequential processes. Technological University Eindhoven Report EWD123 (1965)|并发程序必须用互斥与同步显式约束共享状态的合法交错",
+    "1971|NP完全性|Stephen Cook|Cook SA. The complexity of theorem-proving procedures. STOC (1971): 151–158|布尔可满足性可在多项式时间承载一整类非确定性计算问题的归约",
+    "1976|公开密钥协商|Whitfield Diffie 与 Martin Hellman|Diffie W, Hellman ME. New directions in cryptography. IEEE Transactions on Information Theory 22 (1976): 644–654|通信双方可在公开信道上建立共享秘密而不预先交换对称密钥",
+    "1978|RSA公钥密码|Ronald Rivest、Adi Shamir 与 Leonard Adleman|Rivest RL et al. A method for obtaining digital signatures and public-key cryptosystems. Communications of the ACM 21 (1978): 120–126|模幂运算与大整数分解困难性可同时支持公开加密和数字签名",
+    "1978|分布式逻辑时钟|Leslie Lamport|Lamport L. Time, clocks, and the ordering of events in a distributed system. Communications of the ACM 21 (1978): 558–565|无共享物理时钟的进程可用先发生关系建立一致的事件偏序",
+    "1979|秘密共享|Adi Shamir|Shamir A. How to share a secret. Communications of the ACM 22 (1979): 612–613|阈值多项式插值可使不足门限的份额不泄露秘密而达到门限即可恢复",
+    "1982|拜占庭将军问题|Leslie Lamport、Robert Shostak 与 Marshall Pease|Lamport L et al. The Byzantine generals problem. ACM Transactions on Programming Languages and Systems 4 (1982): 382–401|分布式一致性必须明确恶意节点上限与消息认证条件，否则共识不可保证",
+    "1982|量子系统模拟计算|Richard Feynman|Feynman RP. Simulating physics with computers. International Journal of Theoretical Physics 21 (1982): 467–488|经典机器普遍模拟量子系统会付出指数代价，量子装置可直接承载其状态空间",
+    "1984|BB84量子密钥分发|Charles Bennett 与 Gilles Brassard|Bennett CH, Brassard G. Quantum cryptography: Public key distribution and coin tossing. IEEE Conference on Computers Systems and Signal Processing (1984): 175–179|不可克隆与测量扰动可把窃听转化为通信双方能够统计发现的错误",
+    "1985|通用量子计算机|David Deutsch|Deutsch D. Quantum theory, the Church-Turing principle and the universal quantum computer. Proceedings of the Royal Society A 400 (1985): 97–117|一台通用量子机器可模拟任意有限物理系统并以叠加干涉组织计算",
+    "1985|分布式快照|K. Mani Chandy 与 Leslie Lamport|Chandy KM, Lamport L. Distributed snapshots: Determining global states of distributed systems. ACM Transactions on Computer Systems 3 (1985): 63–75|标记消息可在系统不停机时记录一致全局切面并保留通道中的在途消息",
+    "1994|Shor量子分解算法|Peter Shor|Shor PW. Algorithms for quantum computation: Discrete logarithms and factoring. FOCS (1994): 124–134|量子傅里叶变换可把周期寻找转成多项式时间的整数分解与离散对数算法",
+    "1996|Grover量子搜索|Lov Grover|Grover LK. A fast quantum mechanical algorithm for database search. STOC (1996): 212–219|振幅放大可把无结构搜索查询复杂度从线性降到平方根量级",
+    "1998|Paxos共识|Leslie Lamport|Lamport L. The part-time parliament. ACM Transactions on Computer Systems 16 (1998): 133–169|多数派法定人数的交叠可在消息延迟和节点故障下保持单一已决定值",
+    "1999|实用拜占庭容错|Miguel Castro 与 Barbara Liskov|Castro M, Liskov B. Practical Byzantine fault tolerance. OSDI (1999): 173–186|预准备、准备和提交三阶段可让副本系统在少数恶意节点下保持安全与可用",
+    "2004|MapReduce数据并行|Jeffrey Dean 与 Sanjay Ghemawat|Dean J, Ghemawat S. MapReduce: Simplified data processing on large clusters. OSDI (2004): 137–150|映射与归约接口可把数据分片、调度、故障重试和聚合从业务逻辑中分离",
+]
+
+ELECTRONICS_PHOTONICS = [
+    "1950|半导体载流子与结理论|William Shockley|Shockley W. Electrons and Holes in Semiconductors. Van Nostrand (1950)|能带、少数载流子和结区输运可把晶体管行为写成可计算器件方程",
+    "1952|区熔提纯|William Pfann|Pfann WG. Principles of zone-melting. Transactions of the AIME 194 (1952): 747–753|移动熔区按分凝系数搬运杂质可获得高纯锗与硅晶体",
+    "1954|首个实用硅太阳电池|Daryl Chapin、Calvin Fuller 与 Gerald Pearson|Chapin DM et al. A new silicon p-n junction photocell for converting solar radiation into electrical power. Journal of Applied Physics 25 (1954): 676–677|硅结的光生载流子分离可把太阳辐照稳定转成可用电功率",
+    "1956|晶闸管四层结构|John Moll 团队|Moll JL et al. P-N-P-N transistor switches. Proceedings of the IRE 44 (1956): 1174–1182|四层再生反馈可使半导体器件在阻断与导通两种稳定状态间切换",
+    "1958|集成电路单片化|Jack Kilby|Kilby JS. Invention of the integrated circuit. IEEE Transactions on Electron Devices 23 (1976): 648–654|在同一半导体片上制作并互连多个元件可消除离散装配的规模瓶颈",
+    "1960|平面工艺|Jean Hoerni|Hoerni JA. Planar silicon transistors and diodes. IRE Electron Devices Meeting (1960)|氧化层掩膜、扩散与表面钝化可让硅器件批量制造并可靠互连",
+    "1960|红宝石激光|Theodore Maiman|Maiman TH. Stimulated optical radiation in ruby. Nature 187 (1960): 493–494|受激辐射与光学谐振腔可产生相干、窄谱且高方向性的光脉冲",
+    "1960|MOS场效应晶体管|Mohamed Atalla 与 Dawon Kahng|Kahng D, Atalla MM. Silicon-silicon dioxide field induced surface devices. IRE Solid-State Device Research Conference (1960)|绝缘栅电场可无直流栅电流地调制硅表面导电沟道",
+    "1962|可见光发光二极管|Nick Holonyak 与 S. F. Bevacqua|Holonyak N, Bevacqua SF. Coherent visible light emission from GaAsP junctions. Applied Physics Letters 1 (1962): 82–83|直接带隙结的载流子复合可在室温产生可见相干发光",
+    "1965|摩尔定律|Gordon Moore|Moore GE. Cramming more components onto integrated circuits. Electronics 38(8) (1965): 114–117|制造与经济协同可使芯片元件数按近似指数节奏增长",
+    "1966|低损耗光纤通信判据|Charles Kao 与 George Hockham|Kao KC, Hockham GA. Dielectric-fibre surface waveguides for optical frequencies. Proceedings of the IEE 113 (1966): 1151–1158|玻璃损耗主要来自可去除杂质而非物理下限，足够纯净纤维可承载长距通信",
+    "1970|电荷耦合器件|Willard Boyle 与 George Smith|Boyle WS, Smith GE. Charge coupled semiconductor devices. Bell System Technical Journal 49 (1970): 587–593|时序栅压可在半导体表面逐级转移电荷包并形成固态成像阵列",
+    "1970|低损耗石英光纤|Robert Maurer、Donald Keck 与 Peter Schultz|Kapron FP et al. Radiation losses in glass optical waveguides. Applied Physics Letters 17 (1970): 423–425|高纯掺杂石英把光纤衰减降到足以支持远距离通信的量级",
+    "1970|室温连续波半导体激光|Izuo Hayashi 与 Morton Panish 团队|Hayashi I et al. Junction lasers which operate continuously at room temperature. Applied Physics Letters 17 (1970): 109–111|双异质结同时限制载流子与光场，使半导体激光可在室温连续运行",
+    "1980|量子霍尔效应|Klaus von Klitzing|von Klitzing K et al. New method for high-accuracy determination of the fine-structure constant based on quantized Hall resistance. Physical Review Letters 45 (1980): 494–497|二维电子气的霍尔电阻形成由基本常数决定的精确量子平台",
+    "1982|扫描隧道显微镜|Gerd Binnig 与 Heinrich Rohrer|Binnig G et al. Surface studies by scanning tunneling microscopy. Physical Review Letters 49 (1982): 57–61|针尖隧穿电流对距离的指数敏感性可重建导电表面的原子级形貌",
+    "1988|巨磁电阻|Albert Fert 与 Peter Grunberg 团队|Baibich MN et al. Giant magnetoresistance of Fe/Cr magnetic superlattices. Physical Review Letters 61 (1988): 2472–2475|磁性多层中自旋相关散射可让相对磁化方向造成巨大的电阻差",
+    "1991|碳纳米管|Sumio Iijima|Iijima S. Helical microtubules of graphitic carbon. Nature 354 (1991): 56–58|石墨片卷曲形成的纳米管兼具一维电子结构与高轴向强度",
+    "1994|高亮度蓝光LED|Shuji Nakamura|Nakamura S et al. Candela-class high-brightness InGaN/AlGaN double-heterostructure blue-light-emitting diodes. Applied Physics Letters 64 (1994): 1687–1689|InGaN双异质结与有效掺杂可把蓝光发光效率推到实用照明水平",
+    "2004|单层石墨烯器件|Andre Geim 与 Konstantin Novoselov 团队|Novoselov KS et al. Electric field effect in atomically thin carbon films. Science 306 (2004): 666–669|机械剥离得到的单原子层碳可表现可门控的高迁移率二维输运",
+]
+
+ENERGY_AERO_BIOMED_MANUFACTURING = [
+    "1953|体外循环心肺机|John Gibbon|Gibbon JH Jr. Application of a mechanical heart and lung apparatus to cardiac surgery. Minnesota Medicine 37 (1954): 171–185|泵与氧合器可在开放心脏手术中暂时代替循环和气体交换",
+    "1954|硅光伏电池|Daryl Chapin、Calvin Fuller 与 Gerald Pearson|Chapin DM et al. A new silicon p-n junction photocell for converting solar radiation into electrical power. Journal of Applied Physics 25 (1954): 676–677|硅结可把太阳辐照转成稳定电功率并以效率和面积统一核算",
+    "1957|人造地球卫星|Sergei Korolev 团队|Siddiqi AA. Sputnik and the Soviet Space Challenge. University Press of Florida (2003)|火箭、遥测和轨道力学的系统集成首次把人工载荷送入稳定地球轨道",
+    "1958|植入式心脏起搏器|Ake Senning 与 Rune Elmqvist|Elmqvist R, Senning A. An implantable pacemaker for the heart. Second International Conference on Medical Electronics (1959)|可植入脉冲源与心肌电极可长期替代失效的心脏节律触发",
+    "1961|载人轨道飞行|Sergei Korolev 与 Yuri Gagarin 团队|Hall RC, Shayler DL. The Rocket Men: Vostok and Voskhod. Springer (2001)|生命保障、制导与再入系统可在同一任务链中支持人类完成地球轨道飞行",
+    "1962|全髋关节低摩擦置换|John Charnley|Charnley J. Arthroplasty of the hip: A new operation. Lancet 1 (1961): 1129–1132|小直径金属头、聚合物杯与骨水泥可把关节磨损和固定问题组成可重复手术系统",
+    "1969|阿波罗登月系统|NASA Apollo 11 团队|NASA. Apollo 11 Mission Report, MSC-00171 (1969)|多级火箭、月球轨道交会、制导计算和地面控制可闭合载人登月往返任务",
+    "1973|计算机断层成像|Godfrey Hounsfield|Hounsfield GN. Computerized transverse axial scanning tomography. British Journal of Radiology 46 (1973): 1016–1022|多角度X射线投影经数值重建可生成体内横断面衰减图",
+    "1973|磁共振空间成像|Paul Lauterbur|Lauterbur PC. Image formation by induced local interactions. Nature 242 (1973): 190–191|磁场梯度把核磁共振频率编码为空间位置并可重建二维图像",
+    "1976|可充电锂电池插层反应|M. Stanley Whittingham|Whittingham MS. Electrical energy storage and intercalation chemistry. Science 192 (1976): 1126–1127|锂离子在层状电极中的可逆嵌入可把化学势差转为可循环电能",
+    "1977|多通道人工耳蜗语音编码|Graeme Clark 团队|Clark GM et al. A multiple-electrode hearing prosthesis for cochlear deafness. Medical Progress through Technology 6 (1977): 127–140|多电极位置编码可向听神经传递可训练区分的语音频带线索",
+    "1980|锂钴氧化物正极|John Goodenough 团队|Mizushima K et al. LixCoO2: A new cathode material for batteries of high energy density. Materials Research Bulletin 15 (1980): 783–789|高电压层状氧化物可逆脱嵌锂并显著提高二次电池能量密度",
+    "1981|航天飞机重复使用轨道器|NASA Space Shuttle 团队|NASA. STS-1 Space Shuttle Mission Report (1981)|可回收轨道器、固体助推器和外贮箱组成部分重复使用的载人发射体系",
+    "1981|逐层光固化制造概念|Hideo Kodama|Kodama H. Automatic method for fabricating a three-dimensional plastic model with photo-hardening polymer. Review of Scientific Instruments 52 (1981): 1770–1773|切片数据驱动逐层光固化可从数字模型直接生成三维实体",
+    "1984|立体光刻|Charles Hull|Hull CW. Apparatus for production of three-dimensional objects by stereolithography. US Patent 4,575,330, filed 1984|扫描光束逐层固化液态树脂可把计算机几何直接转成实体零件",
+    "1991|染料敏化太阳电池|Brian O'Regan 与 Michael Gratzel|O'Regan B, Gratzel M. A low-cost, high-efficiency solar cell based on dye-sensitized colloidal TiO2 films. Nature 353 (1991): 737–740|染料吸光、纳米氧化物注入电子和电解质再生可分工完成光电转换",
+    "1993|组织工程框架|Robert Langer 与 Joseph Vacanti|Langer R, Vacanti JP. Tissue engineering. Science 260 (1993): 920–926|细胞、支架与生物信号可组合设计以恢复或替代组织功能",
+    "1998|国际空间站在轨组装|国际空间站合作机构|NASA. International Space Station Assembly, Zarya and Unity Missions (1998)|标准接口、分段发射与跨国任务控制可把大型空间基础设施在轨增量建成",
+    "2005|RepRap自复制制造计划|Adrian Bowyer|Bowyer A. Wealth without money: The background to the Bath Replicating Rapid-prototyper Project. University of Bath (2005)|开放硬件挤出式打印机可制造自身大量结构件并由社区迭代复制",
+    "2006|工程化膀胱移植|Anthony Atala 团队|Atala A et al. Tissue-engineered autologous bladders for patients needing cystoplasty. Lancet 367 (2006): 1241–1246|患者自体细胞在可降解支架上培养后可构建并移植功能性膀胱组织",
+]
+
+EARTH_ENVIRONMENT = [
+    "1952|放射性碳年代学|Willard Libby|Libby WF. Radiocarbon Dating. University of Chicago Press (1952)|有机体死亡后碳十四按已知半衰期衰变，可把样本活度转成绝对年代",
+    "1956|二氧化碳辐射强迫计算|Gilbert Plass|Plass GN. The carbon dioxide theory of climatic change. Tellus 8 (1956): 140–154|大气二氧化碳增加会改变红外辐射收支并推动地表升温",
+    "1957|海洋不能即时吸收化石碳|Roger Revelle 与 Hans Suess|Revelle R, Suess HE. Carbon dioxide exchange between atmosphere and ocean and the question of an increase of atmospheric CO2. Tellus 9 (1957): 18–27|海水碳酸盐缓冲限制二氧化碳快速吸收，使人为排放可在大气累积",
+    "1958|大气二氧化碳连续记录|Charles Keeling|Keeling CD. The concentration and isotopic abundances of atmospheric carbon dioxide in rural areas. Geochimica et Cosmochimica Acta 13 (1958): 322–334|高精度连续采样可把季节循环与长期大气二氧化碳上升分离",
+    "1962|海底扩张|Harry Hess|Hess HH. History of ocean basins. In Petrologic Studies: A Volume in Honor of A. F. Buddington. Geological Society of America (1962): 599–620|洋中脊生成新洋壳并向两侧扩张可连接地幔对流、海沟与大陆漂移",
+    "1962|农药生态级联|Rachel Carson|Carson R. Silent Spring. Houghton Mifflin (1962)|持久性农药会沿食物网累积并把局部灭虫行动转成跨物种生态损伤",
+    "1965|转换断层与板块边界|J. Tuzo Wilson|Wilson JT. A new class of faults and their bearing on continental drift. Nature 207 (1965): 343–347|转换断层的震源运动方向可由刚性板块相对运动几何统一解释",
+    "1967|全球气候模式的二氧化碳敏感度|Syukuro Manabe 与 Richard Wetherald|Manabe S, Wetherald RT. Thermal equilibrium of the atmosphere with a given distribution of relative humidity. Journal of Atmospheric Sciences 24 (1967): 241–259|辐射对流模型可定量估计二氧化碳倍增、湿度反馈与垂直温度响应",
+    "1967|岛屿生物地理平衡|Robert MacArthur 与 Edward Wilson|MacArthur RH, Wilson EO. The Theory of Island Biogeography. Princeton University Press (1967)|物种丰富度由迁入与灭绝速率的面积和隔离依赖平衡决定",
+    "1972|Landsat地球资源卫星|NASA 与 USGS|NASA. ERTS-1 Data Users Handbook (1972)|重复轨道多光谱成像可把土地覆盖变化转成跨地区、跨年份的标准观测",
+    "1972|增长极限系统动力学|Donella Meadows 团队|Meadows DH et al. The Limits to Growth. Universe Books (1972)|人口、资本、资源、粮食和污染的反馈延迟可使局部增长越过全球承载边界",
+    "1976|Viking火星着陆探测|NASA Viking 团队|Klein HP et al. The Viking biological investigation: Preliminary results. Science 194 (1976): 99–105|轨道测绘、软着陆与原位化学实验可把行星宜居性判断落到可复查样本反应",
+    "1977|矩震级|Thomas Hanks 与 Hiroo Kanamori|Hanks TC, Kanamori H. A moment magnitude scale. Journal of Geophysical Research 84 (1979): 2348–2350|由断层面积、滑移和刚度得到的地震矩可避免大震中传统震级饱和",
+    "1985|南极臭氧洞|Joseph Farman、Brian Gardiner 与 Jonathan Shanklin|Farman JC et al. Large losses of total ozone in Antarctica reveal seasonal ClOx/NOx interaction. Nature 315 (1985): 207–210|长期地面观测揭示南极春季臭氧巨幅损失并把氯化学与季节机制连接",
+    "1987|可持续发展定义|世界环境与发展委员会|World Commission on Environment and Development. Our Common Future. Oxford University Press (1987)|满足当代需求的政策不得削弱后代满足其需求的资源与制度能力",
+    "1988|政府间气候变化专门委员会|世界气象组织与联合国环境规划署|WMO, UNEP. Establishment of the Intergovernmental Panel on Climate Change (1988)|跨国评估程序把物理科学、影响适应与减排证据按版本和不确定性共同结算",
+    "1992|地球峰会与气候公约|联合国|United Nations. Framework Convention on Climate Change (1992)|各国以共同但有区别的责任建立排放盘点、报告、审议与后续议定书框架",
+    "1997|京都议定书|联合国气候变化框架公约缔约方|United Nations. Kyoto Protocol to the United Nations Framework Convention on Climate Change (1997)|具有法律约束的国家目标、基准年和市场机制把减排承诺转成可核算责任",
+    "1998|全球陆地净初级生产力遥感估计|Christopher Field 团队|Field CB et al. Primary production of the biosphere: Integrating terrestrial and oceanic components. Science 281 (1998): 237–240|卫星植被指数、光能利用率与海洋叶绿素可合成全球生物圈生产力账本",
+    "2000|人类世命名|Paul Crutzen 与 Eugene Stoermer|Crutzen PJ, Stoermer EF. The Anthropocene. IGBP Global Change Newsletter 41 (2000): 17–18|人类活动已成为可与地质过程相比的地球系统驱动力，年代边界必须由可测标志裁决",
+]
+
 
 DATA = {
     33: attach(MICROBIOLOGY),
@@ -171,6 +286,26 @@ DATA = {
     48: attach(ARTIFICIAL_INTELLIGENCE),
     49: attach(ARTIFICIAL_INTELLIGENCE),
     50: attach(ARTIFICIAL_INTELLIGENCE),
+    51: attach(ROBOTICS_CONTROL_SENSING),
+    52: attach(COMPUTING_SECURITY),
+    53: attach(COMPUTING_SECURITY),
+    54: attach(COMPUTING_SECURITY),
+    55: attach(ELECTRONICS_PHOTONICS),
+    56: attach(ELECTRONICS_PHOTONICS),
+    57: attach(ENERGY_AERO_BIOMED_MANUFACTURING),
+    58: attach(ENERGY_AERO_BIOMED_MANUFACTURING),
+    59: attach(ENERGY_AERO_BIOMED_MANUFACTURING),
+    60: attach(ROBOTICS_CONTROL_SENSING),
+    61: attach(ENERGY_AERO_BIOMED_MANUFACTURING),
+    62: attach(ROBOTICS_CONTROL_SENSING),
+    63: attach(EARTH_ENVIRONMENT),
+    64: attach(EARTH_ENVIRONMENT),
+    65: attach(EARTH_ENVIRONMENT),
+    66: attach(EARTH_ENVIRONMENT),
+    67: attach(EARTH_ENVIRONMENT),
+    68: attach(EARTH_ENVIRONMENT),
+    69: attach(EARTH_ENVIRONMENT),
+    70: attach(EARTH_ENVIRONMENT),
 }
 
 LIFE_FLOWS = [
@@ -249,6 +384,101 @@ BCI_BOOKS = [
     "Mason MT. Mechanics of Robotic Manipulation. MIT Press (2001)",
     "Lebedev MA, Nicolelis MAL. Brain-machine interfaces. Trends in Neurosciences 29 (2006): 536–546",
 ]
+ROBOTICS_FLOWS = [
+    "Siciliano B, Khatib O, eds. Springer Handbook of Robotics, 2nd ed. Springer (2016)",
+    "Thrun S, Burgard W, Fox D. Probabilistic Robotics. MIT Press (2005)",
+    "Spong MW et al. Robot Modeling and Control, 2nd ed. Wiley (2020)",
+    "Kober J et al. Reinforcement learning in robotics: A survey. International Journal of Robotics Research 32 (2013): 1238–1274",
+    "Bohg J et al. Data-driven grasp synthesis: A survey. IEEE Transactions on Robotics 30 (2014): 289–309",
+]
+ROBOTICS_BOOKS = [
+    "Wiener N. The Human Use of Human Beings. Houghton Mifflin (1950)",
+    "Bellman R. Dynamic Programming. Princeton University Press (1957)",
+    "Bekey GA. Autonomous Robots. MIT Press (2005)",
+    "Craig JJ. Introduction to Robotics, 2nd ed. Addison-Wesley (1989)",
+    "Spong MW, Vidyasagar M. Robot Dynamics and Control. Wiley (1989)",
+    "Mason MT. Mechanics of Robotic Manipulation. MIT Press (2001)",
+    "Latombe JC. Robot Motion Planning. Kluwer Academic Publishers (1991)",
+    "Arkin RC. Behavior-Based Robotics. MIT Press (1998)",
+    "Dudek G, Jenkin M. Computational Principles of Mobile Robotics. Cambridge University Press (2000)",
+    "Nise NS. Control Systems Engineering. Benjamin Cummings (1992)",
+]
+COMPUTING_FLOWS = [
+    "Katz J, Lindell Y. Introduction to Modern Cryptography, 3rd ed. CRC Press (2020)",
+    "Lynch NA. Distributed Algorithms. Morgan Kaufmann (1996)",
+    "Nielsen MA, Chuang IL. Quantum Computation and Quantum Information. Cambridge University Press (2000)",
+    "Tanenbaum AS, Van Steen M. Distributed Systems, 4th ed. Pearson (2023)",
+    "Arora S, Barak B. Computational Complexity. Cambridge University Press (2009)",
+]
+COMPUTING_BOOKS = [
+    "Turing AM. Computing Machinery and Intelligence. Mind (1950)",
+    "Bellman R. Dynamic Programming. Princeton University Press (1957)",
+    "Knuth DE. The Art of Computer Programming, Vol. 1. Addison-Wesley (1968)",
+    "Aho AV et al. The Design and Analysis of Computer Algorithms. Addison-Wesley (1974)",
+    "Lamport L. Specifying Systems. Addison-Wesley (2002)",
+    "Schneier B. Applied Cryptography, 2nd ed. Wiley (1996)",
+    "Menezes AJ et al. Handbook of Applied Cryptography. CRC Press (1996)",
+    "Nielsen MA, Chuang IL. Quantum Computation and Quantum Information. Cambridge University Press (2000)",
+    "Herlihy M, Shavit N. The Art of Multiprocessor Programming. Morgan Kaufmann (2008)",
+    "Tanenbaum AS, Van Steen M. Distributed Systems. Prentice Hall (2002)",
+]
+ELECTRONICS_FLOWS = [
+    "Sze SM, Ng KK. Physics of Semiconductor Devices, 3rd ed. Wiley (2006)",
+    "Saleh BEA, Teich MC. Fundamentals of Photonics, 3rd ed. Wiley (2019)",
+    "Yariv A, Yeh P. Photonics, 6th ed. Oxford University Press (2007)",
+    "Coldren LA et al. Diode Lasers and Photonic Integrated Circuits, 2nd ed. Wiley (2012)",
+    "Novoselov KS et al. A roadmap for graphene. Nature 490 (2012): 192–200",
+]
+ELECTRONICS_BOOKS = [
+    "Shockley W. Electrons and Holes in Semiconductors. Van Nostrand (1950)",
+    "Sze SM. Physics of Semiconductor Devices. Wiley (1969)",
+    "Mead C, Conway L. Introduction to VLSI Systems. Addison-Wesley (1980)",
+    "Streetman BG. Solid State Electronic Devices, 3rd ed. Prentice Hall (1990)",
+    "Pierret RF. Semiconductor Device Fundamentals. Addison-Wesley (1996)",
+    "Saleh BEA, Teich MC. Fundamentals of Photonics. Wiley (1991)",
+    "Yariv A. Optical Electronics, 4th ed. Saunders College Publishing (1991)",
+    "Agrawal GP. Fiber-Optic Communication Systems, 3rd ed. Wiley (2002)",
+    "Sze SM, ed. VLSI Technology, 2nd ed. McGraw-Hill (1988)",
+    "Kittel C. Introduction to Solid State Physics, 7th ed. Wiley (1996)",
+]
+ENGINEERING_FLOWS = [
+    "Lanza R et al., eds. Principles of Tissue Engineering, 5th ed. Academic Press (2020)",
+    "Gibson I et al. Additive Manufacturing Technologies, 3rd ed. Springer (2021)",
+    "Larminie J, Lowry J. Electric Vehicle Technology Explained, 2nd ed. Wiley (2012)",
+    "Sutton GP, Biblarz O. Rocket Propulsion Elements, 9th ed. Wiley (2016)",
+    "Dunn B et al. Electrical energy storage for the grid. Science 334 (2011): 928–935",
+]
+ENGINEERING_BOOKS = [
+    "Charnley J. Low Friction Arthroplasty of the Hip. Springer (1979)",
+    "Webster JG, ed. Medical Instrumentation, 3rd ed. Wiley (1998)",
+    "Bronzino JD, ed. The Biomedical Engineering Handbook, 2nd ed. CRC Press (2000)",
+    "Lanza RP et al., eds. Principles of Tissue Engineering, 2nd ed. Academic Press (2000)",
+    "Sutton GP. Rocket Propulsion Elements, 6th ed. Wiley (1992)",
+    "Wertz JR, Larson WJ, eds. Space Mission Analysis and Design, 3rd ed. Microcosm Press (1999)",
+    "Gibson I et al. Additive Manufacturing Technologies. Springer (2010)",
+    "Vincent CA. Modern Batteries, 2nd ed. Arnold (1997)",
+    "Duffie JA, Beckman WA. Solar Engineering of Thermal Processes, 2nd ed. Wiley (1991)",
+    "Guyton AC, Hall JE. Textbook of Medical Physiology, 10th ed. Saunders (2000)",
+]
+EARTH_FLOWS = [
+    "IPCC. Climate Change 2021: The Physical Science Basis. Cambridge University Press (2021)",
+    "Steffen W et al. Planetary boundaries. Science 347 (2015): 1259855",
+    "Schlesinger WH, Bernhardt ES. Biogeochemistry, 4th ed. Academic Press (2020)",
+    "Emery WJ, Thomson RE. Data Analysis Methods in Physical Oceanography, 3rd ed. Elsevier (2014)",
+    "National Academies. Thriving on Our Changing Planet. National Academies Press (2018)",
+]
+EARTH_BOOKS = [
+    "Libby WF. Radiocarbon Dating. University of Chicago Press (1952)",
+    "Carson R. Silent Spring. Houghton Mifflin (1962)",
+    "MacArthur RH, Wilson EO. The Theory of Island Biogeography. Princeton University Press (1967)",
+    "Meadows DH et al. The Limits to Growth. Universe Books (1972)",
+    "Sagan C. Cosmos. Random House (1980)",
+    "WCED. Our Common Future. Oxford University Press (1987)",
+    "Turcotte DL, Schubert G. Geodynamics, 2nd ed. Cambridge University Press (2002)",
+    "Lillesand TM, Kiefer RW. Remote Sensing and Image Interpretation, 4th ed. Wiley (2000)",
+    "Open University. Ocean Circulation, 2nd ed. Butterworth-Heinemann (2001)",
+    "Kump LR et al. The Earth System, 2nd ed. Prentice Hall (2004)",
+]
 
 FLOWS = {}
 BOOKS = {}
@@ -264,3 +494,18 @@ for panel in (37, 43, 44, 45, 46, 47, 48, 49, 50):
 for panel in (39,):
     FLOWS[panel] = BCI_FLOWS
     BOOKS[panel] = BCI_BOOKS
+for panel in (51, 60, 62):
+    FLOWS[panel] = ROBOTICS_FLOWS
+    BOOKS[panel] = ROBOTICS_BOOKS
+for panel in (52, 53, 54):
+    FLOWS[panel] = COMPUTING_FLOWS
+    BOOKS[panel] = COMPUTING_BOOKS
+for panel in (55, 56):
+    FLOWS[panel] = ELECTRONICS_FLOWS
+    BOOKS[panel] = ELECTRONICS_BOOKS
+for panel in (57, 58, 59, 61):
+    FLOWS[panel] = ENGINEERING_FLOWS
+    BOOKS[panel] = ENGINEERING_BOOKS
+for panel in (63, 64, 65, 66, 67, 68, 69, 70):
+    FLOWS[panel] = EARTH_FLOWS
+    BOOKS[panel] = EARTH_BOOKS
