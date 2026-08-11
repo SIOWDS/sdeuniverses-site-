@@ -54,7 +54,7 @@ EVOLUTION = [
     "1982|溯祖过程|John Kingman|Kingman JFC. The coalescent. Stochastic Processes and their Applications 13 (1982): 235–248|从现生样本向过去追踪谱系合并可给群体遗传统计量统一概率模型",
     "1987|线粒体DNA重建人群母系史|Rebecca Cann、Mark Stoneking 与 Allan Wilson|Cann RL, Stoneking M, Wilson AC. Mitochondrial DNA and human evolution. Nature 325 (1987): 31–36|现生线粒体序列差异可估计共同祖先与人群分化时间",
     "1982|外适应概念|Stephen Jay Gould 与 Elisabeth Vrba|Gould SJ, Vrba ES. Exaptation: A missing term in the science of form. Paleobiology 8 (1982): 4–15|当前功能可由为别的作用形成或原本无功能的结构转用而来",
-    "1991|系统地理学|John Avise 等|Avise JC et al. Intraspecific phylogeography: The mitochondrial DNA bridge between population genetics and systematics. Annual Review of Ecology and Systematics 18 (1987): 489–522|谱系树与地理分布联合揭示种内历史、屏障与扩散路径",
+    "1987|系统地理学|John Avise 等|Avise JC et al. Intraspecific phylogeography: The mitochondrial DNA bridge between population genetics and systematics. Annual Review of Ecology and Systematics 18 (1987): 489–522|谱系树与地理分布联合揭示种内历史、屏障与扩散路径",
     "1997|尼安德特人古DNA|Matthias Krings 团队|Krings M et al. Neandertal DNA sequences and the origin of modern humans. Cell 90 (1997): 19–30|直接读取古人类线粒体DNA使现代群体不再是祖先历史的唯一代理",
     "2003|DNA条形码|Paul Hebert 团队|Hebert PDN et al. Biological identifications through DNA barcodes. Proceedings of the Royal Society B 270 (2003): 313–321|标准化短基因片段可批量把未知样本匹配到物种参考库",
 ]
