@@ -93,6 +93,28 @@ DATA = {
         "1997|人Toll受体激活先天免疫|Ruslan Medzhitov、Preston-Hurlburt 与 Janeway|Medzhitov R, Preston-Hurlburt P, Janeway CA Jr. A human homologue of the Drosophila Toll protein signals activation of adaptive immunity. Nature 388 (1997): 394–397|人Toll同源受体触发炎症基因并把先天识别连接到适应性免疫|六",
         "1998|免疫突触的空间组织|Andrey Shaw 与 Michael Dustin 团队|Monks CRF et al. Three-dimensional segregation of supramolecular activation clusters in T cells. Nature 395 (1998): 82–86|T细胞与抗原呈递细胞接触面会把受体和黏附分子重排成有序信号结构|十一",
     ],
+    32: [
+        "1952|核移植检验细胞核等价性|Robert Briggs 与 Thomas King|Briggs R, King TJ. Transplantation of living nuclei from blastula cells into enucleated frogs' eggs. Proceedings of the National Academy of Sciences 38 (1952): 455–463|把胚胎细胞核移入去核卵后仍可支持发育，细胞命运因而不等于基因永久丢失|甲",
+        "1952|反应扩散形态发生|Alan Turing|Turing AM. The chemical basis of morphogenesis. Philosophical Transactions of the Royal Society B 237 (1952): 37–72|局部激活与远程抑制的扩散耦合可从均一场自发生成稳定空间图样|乙",
+        "1957|表观遗传景观|Conrad Waddington|Waddington CH. The Strategy of the Genes. George Allen & Unwin (1957)|发育命运像景观中的分叉路径，基因与环境约束轨迹却不要求结果不可逆|甲",
+        "1958|分化细胞核仍保留发育能力|John Gurdon、Thomas Elsdale 与 Michael Fischberg|Gurdon JB, Elsdale TR, Fischberg M. Sexually mature individuals of Xenopus laevis from the transplantation of single somatic nuclei. Nature 182 (1958): 64–65|单个体细胞核在卵细胞质中可被重编程并支持形成性成熟的非洲爪蟾|甲",
+        "1961|Hayflick有限复制寿命|Leonard Hayflick 与 Paul Moorhead|Hayflick L, Moorhead PS. The serial cultivation of human diploid cell strains. Experimental Cell Research 25 (1961): 585–621|正常人二倍体细胞只完成有限次分裂，衰老不是培养失败的随机噪声|一",
+        "1961|克隆性造血干细胞|James Till 与 Ernest McCulloch|Till JE, McCulloch EA. A direct measurement of the radiation sensitivity of normal mouse bone marrow cells. Radiation Research 14 (1961): 213–222|单个骨髓细胞可形成脾克隆并重建多系造血，使干细胞获得可计数功能定义|五",
+        "1963|差异黏附与组织重排|Malcolm Steinberg|Steinberg MS. Reconstruction of tissues by dissociated cells. Science 141 (1963): 401–408|解离细胞可依黏附差异重新分选并恢复组织层次，自组织无需完整胚胎模板|乙",
+        "1969|位置信息模型|Lewis Wolpert|Wolpert L. Positional information and the spatial pattern of cellular differentiation. Journal of Theoretical Biology 25 (1969): 1–47|细胞读取形态素浓度所编码的位置并在阈值处选择不同分化程序|三",
+        "1969|低温器官保存液|Geoffrey Collins 团队|Collins GM, Bravo-Shugarman M, Terasaki PI. Kidney preservation for transportation: Initial perfusion and 30 hours' ice storage. Lancet 2 (1969): 1219–1222|控制离子与渗透环境可延长离体肾脏冷保存时间并支持跨地点移植|十一",
+        "1971|肿瘤血管生成依赖|Judah Folkman|Folkman J. Tumor angiogenesis: Therapeutic implications. New England Journal of Medicine 285 (1971): 1182–1186|实体瘤持续生长依赖新生血管，微环境供给可成为治疗靶点|辛",
+        "1972|凋亡成为独立死亡程序|John Kerr、Andrew Wyllie 与 Alastair Currie|Kerr JFR, Wyllie AH, Currie AR. Apoptosis: A basic biological phenomenon with wide-ranging implications in tissue kinetics. British Journal of Cancer 26 (1972): 239–257|组织更新中的细胞删除具有一致形态与受控过程，不能并入坏死|丁",
+        "1977|秀丽线虫细胞谱系|John Sulston 与 H. Robert Horvitz|Sulston JE, Horvitz HR. Post-embryonic cell lineages of the nematode Caenorhabditis elegans. Developmental Biology 56 (1977): 110–156|逐细胞追踪可建立可重复的完整谱系并定位程序性死亡和命运分叉|八",
+        "1978|造血干细胞龛假说|Raymond Schofield|Schofield R. The relationship between the spleen colony-forming cell and the haemopoietic stem cell. Blood Cells 4 (1978): 7–25|干细胞身份由局部微环境维持，离开龛位后功能和命运随之改变|庚",
+        "1980|果蝇分节基因筛选|Christiane Nusslein-Volhard 与 Eric Wieschaus|Nusslein-Volhard C, Wieschaus E. Mutations affecting segment number and polarity in Drosophila. Nature 287 (1980): 795–801|饱和突变筛选可按胚胎表型把图样形成拆成层级基因程序|二",
+        "1981|小鼠胚胎干细胞|Martin Evans 与 Matthew Kaufman|Evans MJ, Kaufman MH. Establishment in culture of pluripotential cells from mouse embryos. Nature 292 (1981): 154–156|早期胚胎细胞可在体外长期维持多能性并重新进入胚胎贡献多种组织|五",
+        "1981|体外重建活体皮肤样组织|Eugene Bell 团队|Bell E et al. Living tissue formed in vitro and accepted as skin-equivalent tissue of full thickness. Science 211 (1981): 1052–1054|成纤维细胞与胶原基质可组织成被创面接受的全层皮肤等价物|十二",
+        "1982|细胞外基质调控基因表达|Mina Bissell 团队|Bissell MJ, Hall HG, Parry G. How does the extracellular matrix direct gene expression? Journal of Theoretical Biology 99 (1982): 31–68|细胞外基质的几何与力学信号可维持组织特异表达，培养皿条件并非中性背景|丙",
+        "1997|体细胞克隆多莉羊|Ian Wilmut 团队|Wilmut I et al. Viable offspring derived from fetal and adult mammalian cells. Nature 385 (1997): 810–813|成年体细胞核经卵细胞质重编程后可支持足月哺乳动物发育|甲",
+        "1998|人胚胎干细胞系|James Thomson 团队|Thomson JA et al. Embryonic stem cell lines derived from human blastocysts. Science 282 (1998): 1145–1147|人囊胚内细胞团可建立长期自我更新并保持三胚层分化潜能的细胞系|五",
+        "2006|诱导多能干细胞|Kazutoshi Takahashi 与 Shinya Yamanaka|Takahashi K, Yamanaka S. Induction of pluripotent stem cells from mouse embryonic and adult fibroblast cultures by defined factors. Cell 126 (2006): 663–676|少数组合转录因子足以把成体成纤维细胞重置为可自我更新的多能状态|甲",
+    ],
 }
 
 FLOWS = {
@@ -102,6 +124,13 @@ FLOWS = {
         "Carpenter S, O'Neill LAJ. From periphery to center stage: 50 years of advancements in innate immunity. Cell 187 (2024): 2030–2051",
         "Sakaguchi S et al. Regulatory T cells and human disease. Annual Review of Immunology 38 (2020): 541–566",
         "Davis MM, Bjorkman PJ. T-cell antigen receptor genes and T-cell recognition. Nature 334 (1988): 395–402",
+    ],
+    32: [
+        "Gilbert SF, Barresi MJF. Developmental Biology, 11th ed. Sinauer (2016)",
+        "Slack JMW. Essential Developmental Biology, 3rd ed. Wiley-Blackwell (2012)",
+        "Lanza R, Langer R, Vacanti J, eds. Principles of Tissue Engineering, 4th ed. Academic Press (2014)",
+        "Clevers H. Modeling development and disease with organoids. Cell 165 (2016): 1586–1597",
+        "Atala A et al. Principles of Regenerative Medicine, 3rd ed. Academic Press (2019)",
     ],
 }
 
@@ -117,6 +146,18 @@ BOOKS = {
         "Benacerraf B, Unanue ER. Textbook of Immunology. Williams & Wilkins (1979)",
         "Parham P. The Immune System, 2nd ed. Garland Science (2005)",
         "Clark WR. The Experimental Foundations of Modern Immunology, 4th ed. Wiley (1991)",
+    ],
+    32: [
+        "Waddington CH. The Strategy of the Genes. George Allen & Unwin (1957)",
+        "Gurdon JB. The Control of Gene Expression in Animal Development. Harvard University Press (1974)",
+        "Alberts B et al. Molecular Biology of the Cell, 4th ed. Garland Science (2002)",
+        "Gilbert SF. Developmental Biology, 8th ed. Sinauer (2006)",
+        "Wolpert L et al. Principles of Development, 2nd ed. Oxford University Press (2002)",
+        "Freshney RI. Culture of Animal Cells, 4th ed. Wiley-Liss (2000)",
+        "Lanza RP, Langer R, Vacanti J, eds. Principles of Tissue Engineering, 2nd ed. Academic Press (2000)",
+        "Marshak DR, Gardner RL, Gottlieb D, eds. Stem Cell Biology. Cold Spring Harbor Laboratory Press (2001)",
+        "Potten CS, ed. Stem Cells. Academic Press (1997)",
+        "Slack JMW. Essential Developmental Biology. Blackwell Science (2001)",
     ],
 }
 
@@ -177,13 +218,13 @@ def classic_block(panel: int, index: int, row: str, targets: dict[str, str]) -> 
     )
     p1 = (
         f"在{year}年前后的{title}提出之前，{PANELS[panel][1]}常{old}，阴性对象和成功对象没有进入同一份账。"
-        f"{author}把问题压到一条可被重复检查的{route}路径：先固定样本和操作，再规定哪一个读数会让解释失败。"
-        f"它的硬命题是{core}。{title}没有终结争论，却把术语背后的对象、装置与时间窗暴露出来，使后来研究能够逐项复算而不是只援引权威。"
+        f"第{index}条把问题压到一条可被重复检查的{route}路径：先固定样本和操作，再规定哪一个读数会让解释失败。"
+        f"它的硬命题是{core}。第{index}条路线没有终结争论，却把术语背后的对象、装置与时间窗暴露出来，使后来研究能够逐项复算而不是只援引权威。"
     )
     p2 = (
         f"后续由{flow}重新检查{title}，保留可迁移的结构，同时把原始材料没有覆盖的疾病、物种和组织另列。"
         f"把第{index}条经典与{modern}对读，可见现代层继承了哪一项定义，又在哪个边界上改写旧前提。"
-        f"若纳入原研究排除者、延长观察窗或更换组织后主要排序翻转，{title}就退回{year}年的适用域；经典身份不能代替新证据。"
+        f"若纳入原研究排除者、延长观察窗或更换组织后主要排序翻转，第{index}条就退回{year}年的适用域；经典身份不能代替新证据。"
     )
     fail = f"当原研究排除者补回分母后，该命题的主要排序翻转，结论只保留在{year}年口径内"
     alias = f"思想史称“{title}”，证据路线称“{route}”；另见{modern}"
@@ -245,6 +286,15 @@ def rebuild(panel: int) -> None:
     if marker >= 0:
         end = raw.find('<div class="end">', marker)
         raw = raw[:marker] + raw[end:]
+    # A few V7 pages retained an older transition paragraph immediately before
+    # the reviewed second-act bridge.  Keep the reviewed bridge and remove the
+    # duplicated act label plus its stray paragraph.
+    raw = re.sub(
+        r'<div class="act">【第二幕】.*?</div>\s*<p>(?![^>]*class=).*?</p>\s*(?=<div class="act">【第二幕】)',
+        "",
+        raw,
+        flags=re.S,
+    )
     targets = modern_titles(raw)
     rows = DATA[panel]
     if len(rows) != 20:
