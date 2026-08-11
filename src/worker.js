@@ -7589,7 +7589,7 @@ export default {
             const heavyIn = inChars > 30000;
             const VCuse = (heavyIn && VC.top) ? { url: VC.url, model: VC.model, name: VC.name } : VC;
             if (heavyIn && VC.top) controller.enqueue(_sseBytes({ t: "note", v: "这一场的入参有 " + inChars
-              + " 字：已自动关掉「满功率思考」，把整份预算让给正文——否则思考会把额度吃光、正文一个字都写不出来。" }));
+              + " 字：输出预算已按剩余上下文收窄（成文一律不开思考，整份预算都归正文）。" }));
             const tokWant = Math.max(6000, Math.min(SPEC.tok, Math.round(115000 - inChars * 1.05)));
             const clk = wdsClock(DISTILL_FIRST_MS, DISTILL_TOTAL_MS);
             // 抽成变量：下面"空产出降档重试"那一遍要复用同一份，绝不能两遍喂的不是同一件事
@@ -7613,7 +7613,11 @@ export default {
             try {
               // 走 wdsFetchMax：顶配起步（SPEC.tok），若某家型号嫌大回 400 就自动降档重发，
               // 不必替五家基底各猜一个上限——DeepSeek 能吃下的，别因为别家吃不下就一起压低。
-              upstream = await wdsFetchMax(VCuse, KEY, messages, true, tokWant, clk.signal, true);
+              upstream = await wdsFetchMax(VCuse, KEY, messages, true, tokWant, clk.signal, true, undefined, true);
+              // ↑ 末位 plain=true：显式关思考。这不是降级，是把满预算真的交给正文——
+              // 成文这一档的产出本来就该有几千上万字，思考与正文吃同一份 max_tokens，
+              // 开着思考就是"预算越大想得越久、最后一个字没写"。askCore 早已验过：
+              // 12000 ＋思考 ⇒ 思考 38,777 字、正文 0 字、第 128 秒被平台杀掉。
             } catch (e) {
               clk.stop();
               const emsg = (clk.cut ? clk.why("成文") : ("接不上基底：" + (e && e.message))) + "（可再试一次）";
@@ -7651,7 +7655,9 @@ export default {
                 if (j.usage) usage = j.usage;                                   // 上游自报用量（include_usage）
                 if (j.choices && j.choices[0] && j.choices[0].finish_reason) finish = j.choices[0].finish_reason;
                 const d = (j.choices && j.choices[0] && j.choices[0].delta) || {};
-                if (d.reasoning_content) { clk.firstFrame(); _st.think += d.reasoning_content.length; controller.enqueue(_sseBytes({ t: "think", v: d.reasoning_content })); }
+                // 首帧闸**只认正文**。原来思考也算"来了第一帧"，于是"只思考不写字"这种死法
+                // 当场把闸解除，此后只剩总时长闸——而平台先一步无声杀掉请求，流里一个事件都没有。
+                if (d.reasoning_content) { _st.think += d.reasoning_content.length; controller.enqueue(_sseBytes({ t: "think", v: d.reasoning_content })); }
                 if (d.content) { clk.firstFrame(); _st.out += d.content.length; wrote += d.content.length; controller.enqueue(_sseBytes({ t: "token", v: d.content })); }
               }
             }
@@ -7675,14 +7681,18 @@ export default {
               // 诊断既发 note、也**当正文吐出去**——note 在旧版页面里会被后一条覆盖，正文不会丢。
               controller.enqueue(_sseBytes({ t: "note", v: diag }));
               controller.enqueue(_sseBytes({ t: "token", v: diag }));
-              _st.stage = SPEC.name + "·重试";
+              _st.stage = SPEC.name + "·关思考重写";
+              const _retryTok = Math.min(16000, SPEC.tok);
               const clk2 = wdsClock(DISTILL_FIRST_MS, DISTILL_TOTAL_MS);
               try {
                 const up2 = await fetch(VC.url, {
                   method: "POST",
                   headers: { "content-type": "application/json", authorization: "Bearer " + KEY },
-                  // 刻意不走 wdsTopBody：这一遍就是要**没有思考**，把预算全留给正文
-                  body: JSON.stringify({ model: VC.model, stream: true, max_tokens: Math.min(32000, Math.round(SPEC.tok / 2)), messages }),
+                  // 【2026-08-12 修】原来只是"不走 wdsTopBody"，那只等于没加 reasoning_effort——
+                  // DeepSeek/GLM **默认就在思考**，所以这一遍其实也开着思考，等于把同一个坑再踩一次。
+                  // 现在走 wdsPlainBody 显式关掉。预算按长文口径降到 16000（不是 4000：
+                  // 实测 4000 交回来的是断在半句上的稿），降的是"想多久"不是"能写多长"。
+                  body: JSON.stringify(wdsPlainBody(VC, { model: VC.model, stream: true, max_tokens: _retryTok, messages })),
                   signal: clk2.signal,
                 });
                 const rd2 = up2.body.getReader();
@@ -7699,6 +7709,8 @@ export default {
                     if (pl === "[DONE]") break;
                     try {
                       const d2 = (JSON.parse(pl).choices || [{}])[0].delta || {};
+                      // 收到 reasoning 就说明"关思考"没生效（某家不认这个字段）——记下来，诊断行要说得出。
+                      if (d2.reasoning_content) { _st.think += d2.reasoning_content.length; _st.stage = SPEC.name + "·关思考未生效"; }
                       if (d2.content) { clk2.firstFrame(); _st.out += d2.content.length; wrote += d2.content.length; controller.enqueue(_sseBytes({ t: "token", v: d2.content })); }
                     } catch (e2) {}
                   }
@@ -7709,7 +7721,7 @@ export default {
               clk2.stop();
               if (!wrote) {
                 const diag2 = "（两遍都没写出正文。入参 " + inChars + " 字、要过 " + tokWant + " 与 "
-                  + Math.min(32000, Math.round(SPEC.tok / 2)) + " 两档预算都没出正文。"
+                  + _retryTok + " 两档预算（第二遍已关思考）都没出正文。"
                   + "最可能是这一场太长把上下文窗吃满了：新开一场再成文，或把顶部模式从「深度思考」切到「标准」。）";
                 controller.enqueue(_sseBytes({ t: "note", v: diag2 }));
                 controller.enqueue(_sseBytes({ t: "token", v: diag2 }));

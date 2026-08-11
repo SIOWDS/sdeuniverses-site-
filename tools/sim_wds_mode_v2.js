@@ -104,14 +104,15 @@ const store = {};
 const localStorage = { getItem: (k) => (k in store ? store[k] : null), setItem: (k, v) => { store[k] = String(v); }, removeItem: (k) => { delete store[k]; } };
 
 /* ---------- 假 SSE ---------- */
-function sseBody(events) {
+function sseBody(events, noDone) {
   const enc = new TextEncoder();
   const chunks = events.map((e) => enc.encode("data: " + JSON.stringify(e) + "\n\n"));
-  chunks.push(enc.encode("data: [DONE]\n\n"));
+  // noDone＝模拟"平台在半路把整个请求掐掉"：流就这么没了，连收尾信号都没有。
+  if (!noDone) chunks.push(enc.encode("data: [DONE]\n\n"));
   let i = 0, cancelled = false;
   return { getReader: () => ({ read: () => Promise.resolve(cancelled || i >= chunks.length ? { done: true } : { done: false, value: chunks[i++] }), cancel: () => { cancelled = true; } }) };
 }
-let LAST_PAYLOAD = null, ROUTE = {};
+let LAST_PAYLOAD = null, ROUTE = {}, NO_DONE = {};
 let JSON_ROUTE = {};
 let CALLS = [];   // 研究是多趟请求：只留最后一趟就看不出编排对不对
 const fetchMock = (url, opt) => {
@@ -124,7 +125,7 @@ const fetchMock = (url, opt) => {
     if (val != null) return Promise.resolve({ ok: true, status: 200, json: () => Promise.resolve(val) });
   }
   const ev = ROUTE[url] || [];
-  return Promise.resolve({ ok: true, status: 200, body: sseBody(typeof ev === "function" ? ev(LAST_PAYLOAD) : ev) });
+  return Promise.resolve({ ok: true, status: 200, body: sseBody(typeof ev === "function" ? ev(LAST_PAYLOAD) : ev, NO_DONE[url]) });
 };
 let DOWNLOADS = [];
 const window = {
@@ -1158,6 +1159,35 @@ console.log("⑧ 成文（distill）");
   const e2 = layer.querySelector(".wdsm-msgs").children[0].querySelector(".wdsm-a");
   ok(String(e2.textContent).includes("401"), "上游报的那句错原样保留");
   ok(!String(e2.textContent).includes("标准"), "没有被空答提示覆盖掉（一轮只报一个死因）");
+
+  /* ── 成文空产出：死因要说对 ──────────────────────────────────────
+     2026-08-12 用户截图：「凝成一万字论文」失败，页面只给出客户端那句兜底的
+     「两种可能：…或基底把预算全用在思考上」——而服务端一条诊断都没到。
+     一条都没到就说明 worker 自己都没来得及说话＝这一趟被平台在半路掐掉了，
+     跟"基底一个字没写"是两回事。死因说错，人就会去拧错的旋钮（比如调 max_tokens，
+     而 paper 档的预算早已是全站顶格 64000）。 */
+  console.log("⑱ 成文空产出：收到 [DONE] 与被半路掐断，说的死因必须不同");
+  ROUTE["/api/wds/distill"] = [{ t: "beat", v: { sec: 5, think: 200, stage: "一万字论文" } }];
+  NO_DONE["/api/wds/distill"] = false;
+  layer.querySelector(".wdsm-distbtn").click();
+  document.body.querySelector(".wdsm-menu").children[0].click();
+  await new Promise((r) => setTimeout(r, 240));
+  let dp = document.body.querySelector(".wdsm-dist");
+  ok(String(dp.textContent).includes("两种可能"), "干净的空产出：说「两种可能」（输入窗吃满／预算烧在思考上）");
+  ok(!String(dp.textContent).includes("掐断"), "干净的空产出不该赖平台");
+  dp.querySelector(".dx").click();
+
+  NO_DONE["/api/wds/distill"] = true;      // 这一趟连 [DONE] 都没有
+  layer.querySelector(".wdsm-distbtn").click();
+  document.body.querySelector(".wdsm-menu").children[0].click();
+  await new Promise((r) => setTimeout(r, 240));
+  dp = document.body.querySelector(".wdsm-dist");
+  ok(String(dp.textContent).includes("掐断"), "没收到收尾信号：直说整个请求被平台掐断了");
+  ok(String(dp.textContent).includes("第 5 秒"), "带上最后一次心跳的秒数（下次报障就是证据），实得 " + String(dp.textContent).slice(-90, -40));
+  ok(String(dp.textContent).includes("顶格"), "并写明这一档的预算已经顶格——别再去拧 max_tokens");
+  ok(!String(dp.textContent).includes("两种可能"), "两句死因不许同时出现（一次失败只能有一个死因）");
+  dp.querySelector(".dx").click();
+  NO_DONE["/api/wds/distill"] = false;
 
   console.log("\n===== " + PASS + " PASS / " + FAILS + " FAIL =====");
   process.exit(FAILS ? 1 : 0);

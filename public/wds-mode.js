@@ -565,6 +565,7 @@
     dPptx: "⤓ 存为 .pptx", dPptxWait: "正在生成 .pptx…", dPptxNo: "这份稿子切不出幻灯片（需要 ## 页标题与 - 要点）",
     dPptxOk: "已生成 幻灯片 ",
     dEmptyHint: "两种可能：这一场太长把输入窗吃满了，或基底把预算全用在思考上。换标准档、或新开一场再成文。",
+    dWall1: "这一趟没有收到收尾信号：约第 ", dWall2: " 秒整个请求被平台掐断了（不是基底写不出来，也不是预算不够——这一档的预算已经是全站顶格）。把这一场缩短些、或分两次成文再试。",
     b9Score: "美的九宫格 ", b9Polish: "↻ 按九宫格再打磨一轮", b9Good: "九宫格已达标",
     b9Tip: "统一·多样·和谐（怎么摆）｜完全·活力·纯一（是哪一种）｜爱·自由·平安（看着如何）",
     deckFoot: "SDE Universes · sdeuniverses.com",
@@ -5580,6 +5581,9 @@
     var out = wrap.querySelector(".wdsm-a"), stat = wrap.querySelector(".dst");
     var cbox = wrap.querySelector(".wdsm-dist-c");
     var text = "", dr = null, lastP = 0, dnote = null, dWd = null, dTimedOut = false;
+    // sawDone：有没有收到 worker 的收尾信号 [DONE]。空产出时这一位决定死因说得对不对——
+    // 收到了＝基底真的一个字没写；没收到＝这一趟被平台在半路掐掉（worker 自己都没来得及报诊断）。
+    var sawDone = false, lastSec = 0;
     /* 说明行挂在正文之外：出错或断流时不再把已写出的稿抹掉，稿也不再把说明抹掉
        （原来两者写在同一个容器里，谁后到谁赢，两样都可能丢）。 */
     // **追加**不是覆盖：一次成文可能有好几条说明（截断告知／空产出诊断／断流保稿），
@@ -5653,7 +5657,9 @@
       if (stBtn && stBtn.parentNode) stBtn.parentNode.removeChild(stBtn);   // 写完了就没有可停的了
       if (dStopped && text) dNote(t("stopped"));
       out.innerHTML = text ? mdRender(text) : esc(t("dEmpty"));
-      if (!text) dNote(t("dEmptyHint"), 1);          // 空产出必须给个下一步，不能只说"没有内容"
+      // 空产出必须给个下一步，且**死因要说对**：被掐断和"基底一个字没写"是两回事，
+      // 给错了会把人引到错误的旋钮上（比如去调 max_tokens，而那边早已顶格）。
+      if (!text) dNote(sawDone ? t("dEmptyHint") : (t("dWall1") + (lastSec || "?") + t("dWall2")), 1);
       if (text) autoLink(out, text);            // 成文里提到的站内篇目同样挂链接
       if (text && kind === "deck") deckPrep(text, function () { b9Show(text); });   // 取配图，顺便按九宫格验一遍
       stat.textContent = text ? (t("dDone") + text.length) : t("dFail");
@@ -5736,10 +5742,10 @@
               var line = buf.slice(0, idx).trim(); buf = buf.slice(idx + 1);
               if (line.slice(0, 5) !== "data:") continue;
               var p = line.slice(5).trim();
-              if (p === "[DONE]") { done(); return; }
+              if (p === "[DONE]") { sawDone = true; done(); return; }
               var j; try { j = JSON.parse(p); } catch (e) { continue; }
               if (j.t === "token") { text += j.v; if (Date.now() - lastP > 130) { lastP = Date.now(); out.innerHTML = mdRender(text) + "<span class='cur'>▊</span>"; } }
-              else if (j.t === "beat") { if (!text && j.v) stat.textContent = t("thinking") + " " + (j.v.sec || 0) + "s · " + (j.v.think || 0) + (j.v.stage ? " · " + j.v.stage : ""); }
+              else if (j.t === "beat") { if (j.v && j.v.sec) lastSec = j.v.sec; if (!text && j.v) stat.textContent = t("thinking") + " " + (j.v.sec || 0) + "s · " + (j.v.think || 0) + (j.v.stage ? " · " + j.v.stage : ""); }
               else if (j.t === "note") { dNote(j.v); }
               else if (j.t === "error") { dNote(j.v, 1); stat.textContent = t("dFail"); if (j.code === "need_key" || j.code === "bad_key") setTimeout(function () { wdsKeyPanel(function () {}); }, 400); }
             }
