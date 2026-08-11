@@ -327,7 +327,7 @@ def rebuild(panel: int) -> None:
     blocks = [classic_block(panel, index, row, targets) for index, row in enumerate(rows, 1)]
     classic = (
         '<div class="act">【学科经典思想汇集部分】1950–2006 · 二十条经典思想</div>\n'
-        f'<p class="lede" style="font-size:1rem">以下二十条是{name}在 1950 至 2006 年之间形成的经典思想，与上文近二十年的二十条合成一块面板的两层。经典层不做名人榜；每条都用具名原始材料和后续修订说明旧前提如何成立，又点名它在本块哪一条现代判断里继续被使用或反对。</p>\n'
+        f'<p class="lede" style="font-size:1rem">以下二十条是{name}在 1950 至 2006 年之间形成的经典思想，与上文二十条合成双层面板。每条用原始材料和后续修订说明旧前提，并点名它在本块哪条现代判断里继续被使用或反对。</p>\n'
         + "\n".join(blocks)
         + '\n<h3 class="sec">◎ 这一层怎么用</h3>\n'
         '<p>先按“今用”或“异名”找到上文对应的现代条，再比较两条的对象、分母与停止规则。若它们只共享名词而不共享失败对象，就只登记为异名；若量纲可以逐项换算，再判断现代条究竟继承、修正还是反转了经典命题。</p>\n'
