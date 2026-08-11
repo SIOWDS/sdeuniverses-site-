@@ -226,6 +226,13 @@ def classic_block(panel: int, index: int, row: str, targets: dict[str, str]) -> 
         f'<i>今用</i>{html.escape(modern)}仍正面使用或反驳这条经典建立的对象与证据纪律。　'
         f'<i>关键</i>{html.escape(key)}</div>'
     )
+    if panel >= 55:
+        src = (
+            f'<div class="src"><i>提出</i>{html.escape(author)}，{year} 年，{html.escape(source)}。　'
+            f'<i>流变</i>{html.escape(flow)}据此重检适用边界。　'
+            f'<i>今用</i>{html.escape(modern)}继承或反驳本条。　'
+            f'<i>关键</i>{html.escape(key)}</div>'
+        )
     p1 = (
         f"在{year}年前后的{title}提出之前，{PANELS[panel][1]}常{old}，阴性对象和成功对象没有进入同一份账。"
         f"第{index}条把问题压到一条可被重复检查的{route}路径：先固定样本和操作，再规定哪一个读数会让解释失败。"
