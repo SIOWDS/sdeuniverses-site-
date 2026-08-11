@@ -161,6 +161,16 @@ BOOKS = {
     ],
 }
 
+# The remaining reviewed catalogues are kept in a separate module so the
+# one-page-at-a-time builder remains readable while the 031–070 run grows.
+from frontier_v8_catalogs_033_070 import BOOKS as CATALOG_BOOKS
+from frontier_v8_catalogs_033_070 import DATA as CATALOG_DATA
+from frontier_v8_catalogs_033_070 import FLOWS as CATALOG_FLOWS
+
+DATA.update(CATALOG_DATA)
+FLOWS.update(CATALOG_FLOWS)
+BOOKS.update(CATALOG_BOOKS)
+
 
 def strip_tags(value: str) -> str:
     return html.unescape(re.sub(r"<[^>]+>", "", value)).strip()
@@ -249,6 +259,12 @@ def classic_block(panel: int, index: int, row: str, targets: dict[str, str]) -> 
         f"对{title}的反向检验要先冻结分母，再比较旧读数与新读数。",
     ]
     measured = han_count(p1 + p2 + key + "".join(col_values))
+    if measured > 560:
+        p1 = p1.replace("一条可被重复检查的", "一条可复查的").replace("先固定样本和操作，再规定", "先固定操作，再定")
+        p1 = p1.replace("术语背后的对象、装置与时间窗暴露出来", "对象、装置与时间窗显露出来")
+        p2 = p2.replace("原始材料没有覆盖的", "原材料未覆盖的").replace("可以看见", "可见")
+        p2 = p2.replace("纳入原研究排除者、延长观察窗或更换组织", "补入排除者、延长观察或更换组织")
+        measured = han_count(p1 + p2 + key + "".join(col_values))
     cursor = 0
     while measured < 455:
         p2 += supplements[cursor % len(supplements)]
@@ -291,6 +307,12 @@ def rebuild(panel: int) -> None:
     # duplicated act label plus its stray paragraph.
     raw = re.sub(
         r'<div class="act">【第二幕】.*?</div>\s*<p>(?![^>]*class=).*?</p>\s*(?=<div class="act">【第二幕】)',
+        "",
+        raw,
+        flags=re.S,
+    )
+    raw = re.sub(
+        r'<div class="act">【第二幕】.*?</div>\s*(?=<div class="act">【第二幕】)',
         "",
         raw,
         flags=re.S,
