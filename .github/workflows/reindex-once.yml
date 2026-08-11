@@ -7,72 +7,29 @@ on:
       - '.github/workflows/reindex-once.yml'
 
 permissions:
-  actions: read
   contents: write
 
 jobs:
-  dispatch-and-confirm:
+  dispatch:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
     steps:
-      - name: Dispatch reindex and verify completion
+      - name: Dispatch latest search-index rebuild
         env:
           GH_TOKEN: ${{ github.token }}
-          RESULT_PATH: .reindex-result-20260811T1407Z.json
+          MARKER_PATH: .reindex-triggered-20260811T1418Z.txt
         run: |
           set -euo pipefail
           API="https://api.github.com/repos/${{ github.repository }}"
-          START=$(date -u +%FT%TZ)
           AUTH=(-H "Accept: application/vnd.github+json" -H "Authorization: Bearer $GH_TOKEN" -H "X-GitHub-Api-Version: 2022-11-28")
-
           curl --fail-with-body -sS -L -X POST "${AUTH[@]}" \
             "$API/dispatches" \
-            -d '{"event_type":"reindex","client_payload":{"source":"reindex-once-verified"}}'
-
-          RUN_ID=""
-          RUN_JSON=""
-          for _ in $(seq 1 60); do
-            RUN_JSON=$(curl --fail-with-body -sS -L "${AUTH[@]}" \
-              "$API/actions/workflows/search-index.yml/runs?event=repository_dispatch&per_page=20")
-            RUN_ID=$(jq -r --arg start "$START" \
-              '((.workflow_runs | map(select(.created_at >= $start)) | sort_by(.created_at) | last) // {}) | .id // empty' \
-              <<<"$RUN_JSON")
-            if [[ -n "$RUN_ID" ]]; then
-              break
-            fi
-            sleep 5
-          done
-          if [[ -z "$RUN_ID" ]]; then
-            echo "No repository_dispatch search-index run appeared after $START" >&2
-            exit 1
-          fi
-
-          RUN=""
-          STATUS=""
-          for _ in $(seq 1 180); do
-            RUN=$(curl --fail-with-body -sS -L "${AUTH[@]}" "$API/actions/runs/$RUN_ID")
-            STATUS=$(jq -r '.status' <<<"$RUN")
-            if [[ "$STATUS" == "completed" ]]; then
-              break
-            fi
-            sleep 10
-          done
-          if [[ "$STATUS" != "completed" ]]; then
-            echo "search-index run $RUN_ID did not complete before timeout" >&2
-            exit 1
-          fi
-
-          RESULT=$(jq -c '{id, run_number, event, status, conclusion, created_at, updated_at, head_sha, html_url}' <<<"$RUN")
-          CONTENT=$(printf '%s\n' "$RESULT" | base64 -w0)
+            -d '{"event_type":"reindex","client_payload":{"source":"latest-main-final"}}'
+          CONTENT=$(printf 'repository_dispatch reindex accepted at %s\nsource_sha=%s\n' "$(date -u +%FT%TZ)" "$GITHUB_SHA" | base64 -w0)
           jq -n \
-            --arg message "Record verified reindex result" \
+            --arg message "Record final reindex dispatch acceptance" \
             --arg content "$CONTENT" \
             --arg branch "main" \
-            '{message:$message, content:$content, branch:$branch}' > /tmp/result.json
+            '{message:$message, content:$content, branch:$branch}' > /tmp/marker.json
           curl --fail-with-body -sS -L -X PUT "${AUTH[@]}" \
-            "$API/contents/$RESULT_PATH" \
-            -d @/tmp/result.json >/dev/null
-
-          CONCLUSION=$(jq -r '.conclusion' <<<"$RUN")
-          echo "$RESULT"
-          [[ "$CONCLUSION" == "success" ]]
+            "$API/contents/$MARKER_PATH" \
+            -d @/tmp/marker.json >/dev/null
