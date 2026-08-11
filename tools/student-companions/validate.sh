@@ -21,7 +21,7 @@ do
   interpretations="$(jq -r '.derivatives.interpretations' "$manifest")"
   practices="$(jq -r '.derivatives.practice_guides' "$manifest")"
 
-  if [[ "$selected" -ne 5 || "$interpretations" -ne 5 || "$practices" -ne 5 ]]
+  if [[ "$selected" -lt 5 || "$interpretations" -ne "$selected" || "$practices" -ne "$selected" ]]
   then
     printf 'FAIL manifest counts: %s\n' "$manifest"
     failures=$((failures+1))
