@@ -14,28 +14,25 @@ jobs:
   inspect:
     runs-on: ubuntu-latest
     steps:
-      - name: Record current workflow runs
+      - name: Record current repository workflow runs
         env:
           GH_TOKEN: ${{ github.token }}
-          RESULT_PATH: .reindex-inspection-20260811T1412Z.json
+          RESULT_PATH: .reindex-inspection-20260811T1416Z.json
         run: |
-          set -euo pipefail
+          set -u
           API="https://api.github.com/repos/${{ github.repository }}"
           AUTH=(-H "Accept: application/vnd.github+json" -H "Authorization: Bearer $GH_TOKEN" -H "X-GitHub-Api-Version: 2022-11-28")
-          TRIGGER=$(curl --fail-with-body -sS -L "${AUTH[@]}" "$API/actions/workflows/reindex-once.yml/runs?per_page=10")
-          SEARCH=$(curl --fail-with-body -sS -L "${AUTH[@]}" "$API/actions/workflows/search-index.yml/runs?per_page=10")
+          HTTP=$(curl -sS -L -o /tmp/runs.json -w '%{http_code}' "${AUTH[@]}" "$API/actions/runs?per_page=40")
           RESULT=$(jq -cn \
-            --argjson trigger "$TRIGGER" \
-            --argjson search "$SEARCH" \
-            '{trigger_runs: [$trigger.workflow_runs[] | {id,run_number,event,status,conclusion,created_at,updated_at,head_sha,html_url}], search_runs: [$search.workflow_runs[] | {id,run_number,event,status,conclusion,created_at,updated_at,head_sha,html_url}]}' )
+            --arg http "$HTTP" \
+            --rawfile body /tmp/runs.json \
+            '{http:$http, payload:(try ($body|fromjson) catch $body)}')
           CONTENT=$(printf '%s\n' "$RESULT" | base64 -w0)
           jq -n \
-            --arg message "Record current reindex workflow state" \
+            --arg message "Record current GitHub Actions state" \
             --arg content "$CONTENT" \
             --arg branch "main" \
             '{message:$message, content:$content, branch:$branch}' > /tmp/inspection.json
           curl --fail-with-body -sS -L -X PUT "${AUTH[@]}" \
             "$API/contents/$RESULT_PATH" \
             -d @/tmp/inspection.json >/dev/null
-
-# one-shot update trigger
