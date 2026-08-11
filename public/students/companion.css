@@ -1,0 +1,41 @@
+:root{--c-ink:#20262f;--c-muted:#667085;--c-blue:#245f9f;--c-blue2:#173f6a;--c-pale:#eef5fb;--c-line:#d7e2ed;--c-gold:#a87818;--c-paper:#fffdf9}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:#f6f8fb;color:var(--c-ink);font-family:"Songti SC","Noto Serif SC","Source Han Serif SC",Georgia,serif;font-size:17px;line-height:2}
+a{color:var(--c-blue);text-decoration:none}
+.c-nav{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.96);backdrop-filter:blur(10px);border-bottom:1px solid var(--c-line)}
+.c-nav-in{max-width:980px;margin:auto;padding:10px 22px;display:flex;justify-content:space-between;gap:18px;align-items:center;font-size:13px}
+.c-logo{font-weight:800;letter-spacing:.08em;color:var(--c-blue2)}
+.c-back{color:var(--c-muted)}
+.c-hero{background:linear-gradient(145deg,#173f6a 0%,#245f9f 63%,#467cad 100%);color:#fff;padding:54px 22px 48px;text-align:center}
+.c-eyebrow{font-size:12px;letter-spacing:.3em;color:#d4e8fb;margin-bottom:18px}
+.c-title{max-width:870px;margin:0 auto;font-size:clamp(28px,5vw,44px);line-height:1.42;letter-spacing:.02em}
+.c-subtitle{max-width:760px;margin:18px auto 0;color:#e8f2fb;font-size:16px;line-height:1.8}
+.c-meta{margin-top:20px;color:#c8def1;font-size:13px;letter-spacing:.04em}
+.c-triad-wrap{background:#fff;border-bottom:1px solid var(--c-line)}
+.c-triad{max-width:860px;margin:auto;padding:18px 22px;display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.c-triad a{border:1px solid var(--c-line);border-radius:10px;padding:12px 14px;text-align:center;color:var(--c-blue2);font-size:14px;line-height:1.45;background:#fff}
+.c-triad a.active{background:var(--c-blue);border-color:var(--c-blue);color:#fff;font-weight:700;box-shadow:0 7px 20px rgba(36,95,159,.2)}
+.c-main{max-width:780px;margin:32px auto 70px;padding:0 24px}
+.c-source{background:var(--c-pale);border:1px solid var(--c-line);border-left:5px solid var(--c-blue);border-radius:4px 12px 12px 4px;padding:18px 22px;margin:0 0 34px}
+.c-source .label{font-size:11px;letter-spacing:.24em;color:var(--c-blue);font-weight:800}
+.c-source .name{font-size:18px;line-height:1.65;font-weight:800;color:var(--c-blue2);margin-top:5px}
+.c-source .note{font-size:14px;line-height:1.75;color:var(--c-muted);margin-top:5px}
+.c-body h2{font-size:23px;line-height:1.55;color:var(--c-blue2);margin:46px 0 18px;padding:0 0 9px;border-bottom:2px solid var(--c-line)}
+.c-body h3{font-size:18px;line-height:1.65;color:var(--c-blue);margin:31px 0 11px}
+.c-body p{margin:0 0 20px;text-align:justify}
+.c-body strong{color:#173f6a;background:linear-gradient(transparent 72%,rgba(96,165,226,.2) 0)}
+.c-body blockquote{margin:29px 0;padding:17px 21px;background:#fff;border-left:4px solid var(--c-gold);color:#403521;font-weight:700;border-radius:0 9px 9px 0;box-shadow:0 5px 22px rgba(30,45,60,.06)}
+.c-body ul,.c-body ol{padding-left:1.4em;margin:0 0 22px}
+.c-body li{margin:8px 0;padding-left:.2em}
+.c-body table{width:100%;border-collapse:collapse;margin:24px 0;font-size:15px;background:#fff}
+.c-body th,.c-body td{border:1px solid var(--c-line);padding:10px 12px;text-align:left;vertical-align:top;line-height:1.65}
+.c-body th{background:var(--c-pale);color:var(--c-blue2)}
+.c-end{margin-top:50px;padding:26px 24px;border-radius:14px;background:linear-gradient(145deg,#eef5fb,#fff);border:1px solid var(--c-line);text-align:center}
+.c-end b{display:block;color:var(--c-blue2);font-size:19px;margin-bottom:8px}
+.c-end p{color:var(--c-muted);font-size:14px;margin:0 0 16px;text-align:center}
+.c-end a{display:inline-block;margin:4px;padding:9px 18px;border-radius:7px;border:1px solid var(--c-blue);font-size:13px}
+.c-end a.primary{background:var(--c-blue);color:#fff}
+.c-footer{text-align:center;padding:28px 20px;background:#eaf0f6;color:#6d7785;font-size:13px}
+@media(max-width:640px){body{font-size:16px}.c-triad{grid-template-columns:1fr;padding:14px 18px}.c-triad a{padding:9px 12px}.c-main{padding:0 18px}.c-hero{padding-top:42px}.c-nav-in{align-items:flex-start}.c-body h2{font-size:21px}}
+@media print{.c-nav,.c-triad-wrap,.c-end,.c-footer{display:none}.c-hero{background:#fff;color:#173f6a;padding:20px 0 26px}.c-subtitle,.c-meta,.c-eyebrow{color:#43566d}.c-main{margin-top:10px}.c-body p{orphans:3;widows:3}.c-body h2{break-after:avoid}}
