@@ -236,6 +236,17 @@ def classic_block(panel: int, index: int, row: str, targets: dict[str, str]) -> 
         f"把第{index}条经典与{modern}对读，可见现代层继承了哪一项定义，又在哪个边界上改写旧前提。"
         f"若纳入原研究排除者、延长观察窗或更换组织后主要排序翻转，第{index}条就退回{year}年的适用域；经典身份不能代替新证据。"
     )
+    if panel >= 51:
+        p1 = (
+            f"在{year}年的{title}出现前，{PANELS[panel][1]}常{old}，阴性对象未与成功对象同账。"
+            f"第{index}条沿{route}固定样本、操作和失败读数。硬命题是{core}。"
+            f"第{index}条没有终结争论，却让对象、装置与时间窗可由后人逐项复算。"
+        )
+        p2 = (
+            f"{flow}后来重检{title}，保留可迁移结构，并把未覆盖对象另列。"
+            f"与{modern}对读，可见现代层继承的定义及改写边界。"
+            f"若补回排除者、延长观察或更换组织后主要排序翻转，第{index}条只保留在{year}年适用域；经典身份不能替代新证据。"
+        )
     fail = f"当原研究排除者补回分母后，该命题的主要排序翻转，结论只保留在{year}年口径内"
     alias = f"思想史称“{title}”，证据路线称“{route}”；另见{modern}"
     col_values = [
@@ -245,6 +256,9 @@ def classic_block(panel: int, index: int, row: str, targets: dict[str, str]) -> 
         fail,
         alias,
     ]
+    if panel >= 51:
+        col_values[0] = f"{position}——把“{title}的{route}入口”当成单独够用的那一样"
+        col_values[3] = f"补回排除者后主要排序翻转，只保留{year}年口径"
     col = (
         f'<div class="col"><i>位置</i>{html.escape(col_values[0])}　'
         f'<i>预设</i>{html.escape(col_values[1])}　'
@@ -298,6 +312,15 @@ def rebuild(panel: int) -> None:
     slug, name, _ = PANELS[panel]
     path = FRONTIER / slug / "index.html"
     raw = path.read_text()
+    # Older panels used a paragraph for the page signature.  Normalize it so
+    # classic insertion and later idempotent rebuilds share one end marker.
+    raw = re.sub(
+        r'<p class="end">(.*?)</p>',
+        r'<div class="end">\1</div>',
+        raw,
+        count=1,
+        flags=re.S,
+    )
     marker = raw.find('<div class="act">【学科经典思想汇集部分】')
     if marker >= 0:
         end = raw.find('<div class="end">', marker)
