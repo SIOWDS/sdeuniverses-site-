@@ -6923,20 +6923,28 @@ export default {
             const reader = upstream.body.getReader();
             const dec = new TextDecoder();
             let buf = "", outText = "";
+            // ANSWER_DIAG：空答时唯一能查的东西。上游状态、收到几条流数据、上游给的收束理由、
+            // 首帧长什么样、它自报烧了多少 token —— 没有这些，"只思考不写字"就永远只能靠猜。
+            const _cd = { lines: 0, finish: "", head: "", usage: null, err: false, status: upstream.status };
             try {
             while (true) {
               const { done: rdone, value } = await reader.read();
               if (rdone) break;
-              buf += dec.decode(value, { stream: true });
+              const _ck = dec.decode(value, { stream: true });
+              if (!_cd.head) _cd.head = _ck.slice(0, 160);
+              buf += _ck;
               let idx;
               while ((idx = buf.indexOf("\n")) >= 0) {
                 const line = buf.slice(0, idx).trim();
                 buf = buf.slice(idx + 1);
                 if (!line.startsWith("data:")) continue;
+                _cd.lines++;
                 const p = line.slice(5).trim();
                 if (p === "[DONE]") continue;
                 let j; try { j = JSON.parse(p); } catch (e) { continue; }
-                if (j.error) { controller.enqueue(_sseBytes({ t: "error", v: j.error.message || "基底流内错误" })); continue; }
+                if (j.error) { _cd.err = true; controller.enqueue(_sseBytes({ t: "error", v: j.error.message || "基底流内错误" })); continue; }
+                if (j.usage) _cd.usage = j.usage;
+                if (j.choices && j.choices[0] && j.choices[0].finish_reason) _cd.finish = String(j.choices[0].finish_reason);
                 const d = (j.choices && j.choices[0] && j.choices[0].delta) || {};
                 if (d.reasoning_content) { clk.firstFrame(); if (_st) _st.think += d.reasoning_content.length; controller.enqueue(_sseBytes({ t: "think", v: d.reasoning_content })); }
                 if (d.content) { clk.firstFrame(); if (_st) _st.out += d.content.length; outText += d.content; controller.enqueue(_sseBytes({ t: "token", v: d.content })); }
@@ -6946,9 +6954,63 @@ export default {
               // 中途断线（含被自己的时钟掐断）：已经写出来的一个字都不丢，只补一句说得出原因的说明。
               const why = clk.cut ? clk.why("作答") : ("流中断：" + (e && e.message));
               if (outText) controller.enqueue(_sseBytes({ t: "note", v: why + "——上面已写出的部分保留着，说一句「继续」就接着写。" }));
-              else controller.enqueue(_sseBytes({ t: "error", v: why + "（可再问一次；深度档慢，可先用标准档）" }));
+              else { _cd.err = true; controller.enqueue(_sseBytes({ t: "error", v: why + "（可再问一次；深度档慢，可先用标准档）" })); }
             }
             clk.stop();
+            // ── 空产出兜底 ─────────────────────────────────────────────────
+            // 满功率档（reasoning_effort=max）会把整份 max_tokens 烧在思考上，正文一个字不出；
+            // 上游这时并不报错，流干干净净地结束 —— 于是 worker 直接 fin()，客户端收到一条空流，
+            // 等待行永远停在「正在想…」。这是站内吃过多次的同一个坑（见 /api/wds/read 与 /api/ask）。
+            // 纪律不变：解法是**降档＋关思考**，不是加预算。
+            if (!outText && !_cd.err) {
+              const u2 = _cd.usage || {};
+              const rtok = (u2.completion_tokens_details && u2.completion_tokens_details.reasoning_tokens) || 0;
+              const dg = "【诊断】上游 " + (_cd.status || "?") + " · 收到 " + _cd.lines + " 条流数据 · 思考 "
+                + ((_st && _st.think) || 0) + " 字 · 答题前的准备烧了 " + ((_st && _st.pre) || 0) + " 秒 · 结束原因 "
+                + (_cd.finish || "未给") + (rtok ? ("（上游自报思考 " + rtok + " tok）") : "")
+                + (_cd.head ? (" · 首帧「" + _cd.head.replace(/\s+/g, " ").slice(0, 80) + "」") : "");
+              controller.enqueue(_sseBytes({ t: "note", v: "这一答只出了思考、正文 0 字，正在关掉思考重答一次…" }));
+              _st.stage = "关思考重答";
+              // 重答不能原样再来一遍。常规问答：关思考＋压预算，逼它早点收住开始写；
+              // 长篇请求（askLen）：只关思考，长度一个字不减 —— 降预算等于砍掉正文，那不是解药。
+              const tok2 = askLen ? tokWant : Math.min(tokWant, 3000);
+              const clk2 = wdsClock(CHAT_FIRST_MS, CHAT_TOTAL_MS);
+              try {
+                const up2 = await fetch(VC.url, {
+                  method: "POST",
+                  headers: { "content-type": "application/json", authorization: "Bearer " + KEY },
+                  body: JSON.stringify(wdsPlainBody(VC, { model: VC.model, stream: true, max_tokens: tok2, messages })),
+                  signal: clk2.signal,
+                });
+                if (!up2.ok) throw new Error("上游 " + up2.status);
+                const rd2 = up2.body.getReader();
+                let bf2 = "";
+                while (true) {
+                  const r2 = await rd2.read();
+                  if (r2.done) break;
+                  bf2 += dec.decode(r2.value, { stream: true });
+                  let ix;
+                  while ((ix = bf2.indexOf("\n")) >= 0) {
+                    const ln = bf2.slice(0, ix).trim(); bf2 = bf2.slice(ix + 1);
+                    if (ln.slice(0, 5) !== "data:") continue;
+                    const pl = ln.slice(5).trim();
+                    if (pl === "[DONE]") continue;
+                    try {
+                      const d2 = (JSON.parse(pl).choices || [{}])[0].delta || {};
+                      if (d2.content) { clk2.firstFrame(); if (_st) _st.out += d2.content.length; outText += d2.content; controller.enqueue(_sseBytes({ t: "token", v: d2.content })); }
+                    } catch (e2) {}
+                  }
+                }
+              } catch (e2) {
+                controller.enqueue(_sseBytes({ t: "note", v: "关掉思考重答这一遍也没接上：" + ((e2 && e2.message) || "未知原因") + "。" }));
+              }
+              clk2.stop();
+              if (!outText) {
+                controller.enqueue(_sseBytes({ t: "error", code: "empty",
+                  v: "两遍都没写出正文（第一遍只思考了 " + ((_st && _st.think) || 0) + " 字）。"
+                     + "这一场聊得越长、深度档越容易把额度耗在思考里：把顶部切到「标准」档再问一遍，或点「成文一篇」把这场凝出来后新开一场。\n" + dg }));
+              }
+            }
             // 追问建议：正文已经吐完（读者已在读了），再花一次便宜档补三个「接着可以问什么」。
             // 走 WDS_VENDORS 的快档而非满血档——这一步要快，慢了读者早就自己打字了；失败一律吞掉。
             if (outText.length > 150 && !rs) {

@@ -135,6 +135,7 @@ const window = {
   confirm: () => CONFIRM_NEXT,
 };
 let PROMPT_NEXT = undefined, CONFIRM_NEXT = true;
+function streamingLooksOn() { const k = document.querySelectorAll(".wdsm-stopk")[0]; return !!(k && k.disabled === false); }
 global.window = window; global.document = document; global.localStorage = localStorage;
 global.fetch = fetchMock;
 const navMock = { clipboard: { writeText() {} } };
@@ -1121,6 +1122,42 @@ console.log("⑧ 成文（distill）");
   ok(CALLS.filter((c) => c.url === "/api/wds/chat").length >= 2, "点「继续发」才接着跑");
   layer.querySelectorAll(".wdsm-que").forEach(function (b) { if (b.parentNode) b.parentNode.removeChild(b); });
   QUEUE_CLEANUP: ;
+
+  /* ── 空答不许沉默 ────────────────────────────────────────────────
+     线上症状（2026-08-12 用户截图）：聊几轮之后"卡在那儿"——等待行永远停在
+     「正在想… 5s · 站内检索」。真相是这一轮**早就结束了**：基底只吐了思考、
+     正文 0 字，流干干净净地 [DONE]，finish() 的 if/else 链走空、什么都不说，
+     而等待行只在 mountActs()（有正文才调）里被摘掉。于是它就一直挂在那儿装作还在跑。
+     沉默是最坏的失败：读者分不清"还在想"和"已经死了"。 */
+  console.log("⑯ 只出思考、没有正文，且不带 error —— 不许静默");
+  layer.querySelector(".wdsm-newbtn").click();
+  ROUTE["/api/wds/chat"] = [
+    { t: "beat", v: { sec: 5, think: 0, out: 0, stage: "站内检索" } },
+    { t: "think", v: "我先把这句话拆成显露与差异序列……" },
+    { t: "beat", v: { sec: 20, think: 40, out: 0, stage: "基底作答" } },
+  ];
+  inEl.value = "不冻的方法是什么？";
+  await new Promise((res) => { sendEl.click(); setTimeout(res, 300); });
+  const eTurn = layer.querySelector(".wdsm-msgs").children[0];
+  ok(!!eTurn, "空答也留下一轮（问题不能凭空消失）");
+  const eAns = eTurn.querySelector(".wdsm-a");
+  ok(String(eAns.textContent).trim().length > 0, "空答有话说，不是一片空白，实得「" + String(eAns.textContent).slice(0, 20) + "」");
+  ok(eAns.className.includes("wdsm-err"), "按错误样式呈现（它确实失败了，别装成正常答复）");
+  ok(String(eAns.textContent).includes("思考"), "说清怎么空的：额度花在思考上了");
+  ok(String(eAns.textContent).includes("标准"), "给一条出路：切到标准档");
+  const waitLeft = eTurn.querySelectorAll("div").filter((d) => String(d.textContent).includes("正在想"));
+  ok(waitLeft.length === 0, "滞留的「正在想…」等待行已被摘掉，实得 " + waitLeft.length + " 条");
+  ok(!!eTurn.querySelectorAll("button").find((b) => String(b.textContent).includes("重答")), "空答那一轮给得出「重答」");
+  ok(sendEl.textContent === "\u2191" && !streamingLooksOn(), "发送键已复位（这一轮确实结束了）");
+
+  console.log("⑰ 已经报过 error 的那一轮，不再叠一句空答提示");
+  layer.querySelector(".wdsm-newbtn").click();
+  ROUTE["/api/wds/chat"] = [{ t: "think", v: "想了想…" }, { t: "error", v: "你的 Key 用不了（401）" }];
+  inEl.value = "再问一句";
+  await new Promise((res) => { sendEl.click(); setTimeout(res, 300); });
+  const e2 = layer.querySelector(".wdsm-msgs").children[0].querySelector(".wdsm-a");
+  ok(String(e2.textContent).includes("401"), "上游报的那句错原样保留");
+  ok(!String(e2.textContent).includes("标准"), "没有被空答提示覆盖掉（一轮只报一个死因）");
 
   console.log("\n===== " + PASS + " PASS / " + FAILS + " FAIL =====");
   process.exit(FAILS ? 1 : 0);

@@ -444,6 +444,8 @@
       aCopy: "\u29c9 复制", aCopied: "已复制", aRead: "\ud83d\udd0a 朗读", aStop: "\u23f9 停止", aRegen: "\u21bb 重答", aEdit: "\u270e 改问",
       thinking: "正在想…", thought: "已思考 ", chars: " 字（点开看）", expand: "展开", collapse: "收起",
       stopped: "（你按了停止）", stoppedOnly: "（已停止）",
+      errEmpty: "这一轮只想、没写：基底把额度全花在思考上了（已思考 ", errEmptyNo: "这一轮基底一个字都没写出来（连思考也没有）。可能是这一场太长、或线路被中途切断——把顶部切到「标准」档再问一遍，或新开一场。", errEmptyEnd: " 字），正文一个字都没落。聊得越长越容易这样——把顶部切到「标准」档再问一遍，或新开一场。",
+
       errDead: "连接像是断了（也许想太久被中间层切了）。稍后再问，你这句我记着。",
       errNet: "接不上 WDS 了（", errNetEnd: "）。稍后再问，你这句我记着。",
       webNeedKey: "联网没跑起来：需要一把智谱 Key（在 ⚙ 设置里填智谱，同一把即可）。",
@@ -598,6 +600,8 @@
       aCopy: "\u29c9 Copy", aCopied: "Copied", aRead: "\ud83d\udd0a Read", aStop: "\u23f9 Stop", aRegen: "\u21bb Retry", aEdit: "\u270e Edit",
       thinking: "Thinking…", thought: "Thought for ", chars: " chars (open)", expand: "open", collapse: "close",
       stopped: "(you stopped it)", stoppedOnly: "(stopped)",
+      errEmpty: "All reasoning, no answer: the model spent its whole budget thinking (", errEmptyNo: "The model returned nothing this turn — not even reasoning. The session may be too long, or the connection was cut. Switch the top mode to Standard and ask again, or start a fresh session.", errEmptyEnd: " chars of reasoning) and wrote no text. The longer the session, the likelier this is — switch the top mode to Standard and ask again, or start a fresh session.",
+
       errDead: "The connection dropped — it may have thought too long and been cut. Try again in a moment; your question is still here.",
       errNet: "Couldn't reach SDE (", errNetEnd: "). Try again shortly.",
       webNeedKey: "Web search didn't run: it needs a Zhipu key (put one in ⚙ Settings — the same key works for both).",
@@ -3103,7 +3107,7 @@
       tag.style.cssText = "text-align:right;color:#6f8f8f;font-size:12px;margin:-8px 0 12px";
       cell.turn.insertBefore(tag, cell.a);
     }
-    var answer = "", srcDone = false, thinkTxt = "", lastPaint = 0;
+    var answer = "", srcDone = false, thinkTxt = "", lastPaint = 0, errShown = false;
     var pendSite = null, pendWeb = null;                 // 来源先收着，等正文写完再渲染
     function flushSrcs() {
       if (pendSite) { renderSources(cell, pendSite, "site"); pendSite = null; }
@@ -3126,6 +3130,9 @@
       if (stoppedByUser && answer) noteLine(cell, t("stopped"));
       if (answer) setTimeout(tipDeckShow, 600);           // 答完才提示，别在半路上打断阅读
       if (cell.thinkL && thinkTxt) cell.thinkL.textContent = t("thought") + thinkTxt.length + t("chars");
+      // 等待行等完就该走。原来只有 mountActs()（有正文时才调）摘它，
+      // 于是空答那一轮它永远留在页面上写着「正在想…」，读者只能理解为"卡住了"。
+      if (cell.wait && cell.wait.parentNode) { cell.wait.parentNode.removeChild(cell.wait); cell.wait = null; }
       flushSrcs();                                        // 出错/中途停下时也把收着的来源补上
       updTurns();
       if (stick) scrollBottom();
@@ -3152,6 +3159,17 @@
             cell.a.textContent = t("errDead");
           } else if (stoppedByUser) {
             cell.a.className = "wdsm-a plain"; cell.a.textContent = t("stoppedOnly");
+          } else if (!errShown) {
+            // 流干干净净地结束，却一个正文字都没有 —— 这一支原来是空的，页面于是什么都不说。
+            // 沉默是最坏的一种失败：读者只会以为它还在跑。
+            cell.a.className = "wdsm-a plain wdsm-err";
+            cell.a.textContent = thinkTxt ? (t("errEmpty") + thinkTxt.length + t("errEmptyEnd")) : t("errEmptyNo");
+            var rrow = el("div", null, "");
+            rrow.style.cssText = "margin-top:10px";
+            var rt = el("button", "wdsm-act", t("aRegen"));
+            rt.onclick = function () { regen(cell); };
+            rrow.appendChild(rt);
+            cell.a.appendChild(rrow);
           }
           endUI();
         }
@@ -3187,7 +3205,7 @@
               else if (j.t === "nbrfail") { nbrFailNote(cell); }
               else if (j.t === "follow") { renderFollows(cell, j.v); }
               else if (j.t === "token") { answer += j.v; paint(); }
-              else if (j.t === "error") { cell.a.className = "wdsm-a plain wdsm-err"; cell.a.textContent = j.v; if (j.code === "need_key" || j.code === "bad_key") setTimeout(function () { wdsKeyPanel(function () {}); }, 400); }
+              else if (j.t === "error") { errShown = true; cell.a.className = "wdsm-a plain wdsm-err"; cell.a.textContent = j.v; if (j.code === "need_key" || j.code === "bad_key") setTimeout(function () { wdsKeyPanel(function () {}); }, 400); }
             }
             return pump();
           });
