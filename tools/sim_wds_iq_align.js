@@ -10,7 +10,13 @@ let P = 0, X = 0;
 function ok(c, m) { if (c) { P++; console.log("  PASS " + m); } else { X++; console.log("  FAIL " + m); } }
 
 console.log("① 独立评分者 sys 存在");
-ok(/function WDS_IQ_SYS\(siteCtx, docCtx, docNote, lang\)/.test(W), "WDS_IQ_SYS 已定义");
+/* ⚠ 这一条原来把**整个签名**抄进了正则，于是 2026-08-12 给评分接上站外资料、
+   多一个 webCtx 参数时它当场红——而它要守的用意（这个函数存在）一个字都没变。
+   💡 心法：一条断言因为改口径而红时，先问它当初要守的用意还成不成立——成立就改写落点，别删。
+   改成只认函数名，另立一条盯住"评分拿得到站外资料"这个真正的承重位。 */
+ok(/function WDS_IQ_SYS\(/.test(W), "WDS_IQ_SYS 已定义");
+ok(/function WDS_IQ_SYS\([^)]*\bwebCtx\b/.test(W) && /WDS_IQ_SYS\([^)]*\bwebCtx\)/.test(W),
+  "★ 评分者收得到站外资料（I 维的敌意最近邻要的是外部读数，不是训练记忆）");
 const iqSeg = W.slice(W.indexOf("function WDS_IQ_SYS("), W.indexOf("function wdsToolSys("));
 ok(iqSeg.length > 2500, "评分规程有实体内容（不是空壳），实得 " + iqSeg.length + " 字符");
 

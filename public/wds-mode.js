@@ -435,7 +435,11 @@
       mAtt: "\ud83d\udcce 附件", mStd: "\u26a1 标准", mDeep: "\u25c8 深度思考", mWeb: "\ud83c\udf10 联网",
       tipStd: "快答档，够用且省", tipDeep: "满血基底＋满功率思考＋SDE 全内功与方法论工序，慢但深", tipWeb: " · 已开联网（需智谱 Key）",
       ph: "问 WDS 任何 SDE 问题，或让它帮你找站里读什么…",
-      note: "ChatSDE 会尽力扣着全站内容作答，可核验的书名/引文请以原文为准。用你自己的大模型 Key 运行，只存在浏览器本地。",
+      /* 🔴 原文写的是「只存在浏览器本地」，而每一次提问的请求体里都带着 key 打到本站 Worker。
+         Key 确实不写库、不写日志、不进任何分析——但「不上传本站」这句话与事实不符。
+         口径改成「存在本机；调用时经本站边缘服务内存转发给你选的厂商；本站不写库不写日志」。
+         💡 只有浏览器真正直连厂商、本站完全不接触 Key 时，才能写「不上传本站」。 */
+      note: "ChatSDE 会尽力扣着全站内容作答，可核验的书名/引文请以原文为准。用你自己的大模型 Key 运行：Key 存在你这台机器上，调用时经本站边缘服务内存转发给你选的厂商，本站不写入数据库、不写进日志、不做分析。",
       left: "本场剩余 ", times: " 次", today: " 次 · 今日 ", turnsTitle: "本场＝这一次对话最多 100 轮（点＋新对话可重开）；今日＝本机每天在「全站问答」入口的额度，陪读与「SDE 对谈」各有独立额度。",
       dayOut: "今日本机额度已用完，明天再来（陪读与「SDE 对谈」不受影响）。",
       sessFull: "这场已谈满 100 次，点＋新对话重开。",
@@ -485,7 +489,10 @@
       dDirFail: "写不进去（",
       convoTitle: "与 WDS 的对话", errNoOut: "成文没接上（",
       setTitle: "设置", setKeyH: "用你自己的 API Key",
-      setKeyP: "ChatSDE 用你自己的大模型 Key 运行。<b style=\"color:#C9A227\">Key 只存在你的浏览器本地，不会上传本站</b>，随时可清除。联网搜索走智谱通道，填一把智谱 Key 即可同时用于对话与联网。",
+      /* ⚠ 这一句是全站最显眼的一处 Key 承诺，而它此前与事实不符：每次提问的请求体里都带着 Key
+         打到本站 Worker（由它转发给厂商）。Key 确实不写库、不写日志、不做分析——但那不等于「不会上传本站」。
+         **只有浏览器直连厂商、本站完全不接触 Key 时，才配写那句话。** */
+      setKeyP: "ChatSDE 用你自己的大模型 Key 运行。<b style=\"color:#C9A227\">Key 保存在你这台机器上；调用时会经本站边缘服务内存转发给你选的厂商，本站不写入数据库、不写进日志、不做分析</b>，随时可清除。联网搜索走智谱通道，填一把智谱 Key 即可同时用于对话与联网。",
       setAboutH: "自定义指令（可空）",
       setAboutP: "写一句你是谁、在做什么、想让 WDS 怎么答你。以后每次提问都会带上，不必再重复交代。也只存在你本机。",
       setAboutPh: "例：我是中学生物老师，正在把 SDE 用到备课上。答我时多举课堂能直接用的例子，术语讲一遍就够。",
@@ -534,7 +541,15 @@
       tlHow: "怎么办", tlHowS: "三个落点合出一套可操作的做法（更狠的用中华智问）",
       tlWhy: "为什么", tlWhyS: "推翻问题里那条没说出口的动力（更狠的用动力智能体）",
       goDeep: "⇥ 进入细节：", goDeepH: "轻松版只给一个当场能拿走的判断；要进细节，就交给对口的那一台跑完整一趟（新标签打开，只填不跑）。",
-      fgTitle: "学科通融 · 二阶碰撞", fgPlan: "十四道工序，顺序不可换", fgSteps: "这一趟 {n} 道工序",
+      fgTitle: "学科通融 · 二阶碰撞", fgPlan: "十八道工序，顺序不可换", fgSteps: "这一趟 {n} 道工序",
+      fgGateNo: "这一道没过闸",
+      fgRedo: "这一道自己判了「没做够」，已经停在这里，没有往下跑。",
+      fgBack1: "这一道判定病根在第 ", fgBack2: " 道——往下做没有意义。",
+      fgBlocked: "这一道判了「缺材料」，停在这里等你补。",
+      fgNoGate: "这一道没有交出闸门判决（最后一行应当是【闸门】…）。按不通过处理，没有往下跑。",
+      fgAgain: "\u21bb 重跑这一道", fgGoBack: "\u21a9 退回第 ", fgGoBack2: " 道重跑",
+      fgForce: "仍要往下跑（记一笔降级）", fgForceTag: " 道未过闸仍继续",
+      fgDegraded: "这一趟有工序没过闸而被继续：第 ",
       fgJudge: "只到判断，不成文",
       tlGrid: "27 宫格定位", tlGridS: "C⊗M⊗V 与一二三号位，中心位轮到谁",
       tlNine: "九宫格取三格", tlNineS: "抽三个视角各问各答，再撞成一条",
@@ -609,7 +624,7 @@
     memProfH: "我的画像",
     memDelAsk: "删掉这一条记忆？（原对话不受影响）",
     memClrAsk: "清空全部记忆条目与画像？（对话原文不受影响）",
-    memNote: "摘要与画像只存在你这台设备的浏览器里，不上传本站、不同步。更新时对话原文随你自己的 Key 发往你选的基底（与平常问答同一条路），本站不经手。删除某一场对话时它的记忆一并删除；被自动淘汰的旧对话（超 60 场）只丢原文、记忆仍留着。",
+    memNote: "摘要与画像只存在你这台设备的浏览器里，不上传本站、不同步。更新时对话原文随你自己的 Key 发往你选的基底，走的是与平常问答同一条路——即经本站边缘服务内存转发，本站不写入数据库、不写进日志。删除某一场对话时它的记忆一并删除；被自动淘汰的旧对话（超 60 场）只丢原文、记忆仍留着。",
     arIn: "输入你的问题", arSend: "发送", arStop: "停止生成", arToBot: "回到最新", arMenu: "对话列表", arMsgs: "对话内容",
       cbCopy: "复制", cbCopied: "已复制", dropHint: "松手即作为附件加入本场（图片只读得出其中的文字，走本机 OCR）",
       pasteAdd: "已把粘贴的文件加为附件",
@@ -671,7 +686,7 @@
       dDirFail: "Couldn't write it (",
       convoTitle: "A conversation with SDE", errNoOut: "The write-up didn't connect (",
       setTitle: "Settings", setKeyH: "Use your own API key",
-      setKeyP: "WDS runs on your own model key. <b style=\"color:#C9A227\">The key stays in this browser and is never sent to this site</b>; clear it whenever you like. Web search goes through Zhipu, so one Zhipu key covers both chat and search.",
+      setKeyP: "WDS runs on your own model key. <b style=\"color:#C9A227\">The key is stored on your machine; each call relays it in memory through this site's edge service to the provider you chose. It is never written to a database, a log, or any analytics</b>; clear it whenever you like. Web search goes through Zhipu, so one Zhipu key covers both chat and search.",
       setAboutH: "Custom instructions (optional)",
       setAboutP: "A line about who you are, what you're working on, and how you want SDE to answer. It rides along with every question from then on. Also kept only on this device.",
       setAboutPh: "e.g. I teach secondary-school biology and I'm bringing SDE into my lesson planning. Give me examples I can use in class; one pass on the terminology is enough.",
@@ -720,7 +735,7 @@
       tlHow: "What to do", tlHowS: "Three landing points into one workable method (full run: Zhiwen)",
       tlWhy: "Why", tlWhyS: "Overturn the drive claim hidden in the question (full run: SDE Dynamics)",
       goDeep: "⇥ Go deeper with ", goDeepH: "The short form gives one claim you can take away now; for detail, hand it to the matching agent for a full run (new tab, filled not started).",
-      fgTitle: "Cross-discipline forge", fgPlan: "Fourteen stages, order fixed", fgSteps: "{n} stages",
+      fgTitle: "Cross-discipline forge", fgPlan: "Eighteen stages, order fixed", fgSteps: "{n} stages",
       fgJudge: "stop at the claim, no full draft",
       tlGrid: "27-cell placement", tlGridS: "C⊗M⊗V and positions one/two/three; whose turn at centre",
       tlNine: "Nine-cell, draw three", tlNineS: "Three viewpoints, each asked and answered, then struck together",
@@ -3118,7 +3133,7 @@
       if (forceQ == null) { inEl.value = ""; inEl.style.height = "auto"; }
       RS.on = false; rsPaint(); rsRun(q); return;
     }
-    // 学科通融：这一问不是一次问答，是一整趟十四道工序的产线
+    // 学科通融：这一问不是一次问答，是一整趟十八道工序的产线（只到判断则十三道）
     var fgq = forgePick(q);
     if (fgq && !streaming && !RS.running) {
       if (turns() >= MAX) { updTurns(); return; }
@@ -5260,7 +5275,7 @@
     card.appendChild(head);
     cell.a.innerHTML = ""; cell.a.appendChild(card);
     var base = { key: kv.key, vendor: kv.vendor, model: kv.model || "", lang: LANG };
-    var steps = [], secs = [], title = topic;
+    var steps = [], secs = [], title = topic, degraded = [];
     function fail(msg) {
       note.textContent = msg;
       endRs();
@@ -5298,26 +5313,82 @@
           return { box: box, stat: stat, sb: sb };
         });
         var i = 0;
+        /* 【闸门】每一道的最后一行是机器读得懂的判决（契约写在服务端 wdsForgeSys）。
+           此前「做不出」只是一句写给人看的话，而这里无条件 `i++` 往下跑——
+           于是不合格的产出被当成合格的传下去，下游全部空转、读起来却照样通顺。 */
+        function forgeGate(txt) {
+          var m = String(txt || "").match(/【闸门】\s*(passed|needs_revision|return_to_stage\s*:\s*(\d+)|blocked)\s*(?:[·:：-]\s*([^\n]*))?/i);
+          if (!m) return { d: "unknown", back: 0, why: "" };
+          var raw = String(m[1] || "").toLowerCase();
+          if (raw.indexOf("return_to_stage") === 0) return { d: "return_to_stage", back: parseInt(m[2], 10) || 0, why: (m[3] || "").trim() };
+          return { d: raw, back: 0, why: (m[3] || "").trim() };
+        }
+        /* 停在这一道：把选择权交回读者，不替他决定往下跑。
+           ⚠ 已经跑完的那几道一个字都不动——停下与丢弃是两件事。 */
+        function forgeHalt(r, g, retry) {
+          var bar = el("div", "wdsm-rsgate");
+          bar.style.cssText = "margin:8px 0 2px;padding:8px 10px;border-radius:8px;background:rgba(200,120,90,.10);font-size:12.5px;line-height:1.7";
+          var why = g.why ? ("\u2014\u2014" + g.why) : "";
+          bar.appendChild(el("div", null,
+            g.d === "return_to_stage" ? (tx("fgBack1") + g.back + tx("fgBack2") + why)
+              : g.d === "blocked" ? (tx("fgBlocked") + why)
+              : g.d === "unknown" ? tx("fgNoGate")
+              : (tx("fgRedo") + why)));
+          function mk(label, fn) {
+            var b = el("button", "wdsm-tbtn", label);
+            b.style.cssText = "margin:6px 8px 0 0";
+            b.onclick = function () { bar.parentNode && bar.parentNode.removeChild(bar); fn(); };
+            bar.appendChild(b); return b;
+          }
+          mk(tx("fgAgain"), function () { retry(i); });
+          if (g.d === "return_to_stage" && g.back >= 1 && g.back <= i) {
+            mk(tx("fgGoBack") + g.back + tx("fgGoBack2"), function () {
+              secs = secs.slice(0, g.back - 1);
+              for (var k = g.back - 1; k < rows.length; k++) { rows[k].sb.innerHTML = ""; rows[k].stat.textContent = "\u00b7\u00b7\u00b7"; }
+              retry(g.back - 1);
+            });
+          }
+          mk(tx("fgForce"), function () { degraded.push((i + 1) + tx("fgForceTag")); i++; step(); });
+          r.sb.appendChild(bar);
+          RS.running = false; streaming = false; busyUI(false); stopBarShow(false);
+        }
         function step() {
           if (RS.stop || i >= steps.length) return finalStep();
           var r = rows[i], s = steps[i];
           r.stat.textContent = tx("rsDoing"); r.box.classList.add("open");
-          var done = secs.map(function (x, k) { return (k + 1) + ". " + x.t; }).join("\n");
+          var done = steps.map(function (x, k) { return (k + 1) + ". " + x.t; }).join("\n");
+          /* ⭐⭐ 这一行是这条产线从「十八次各写各的」变成「发生链」的分界：
+             把每一道**写出来的正文**一并递上去，由服务端按依赖表决定这一道该读到哪几道。
+             此前只递标题（`(k+1) + ". " + x.t`），于是第七道看不见第二道的脊柱、
+             第十五道成文看不见第四道的候选命题——每一步都在凭题目重新想一遍。 */
+          var bodies = secs.map(function (x, k) { return { i: k + 1, t: x.t, body: x.body }; });
           var pl = {
             q: s.t, history: [], key: base.key, vendor: base.vendor, model: base.model,
             mode: thinkMode, web: webOn ? 1 : 0, skey: wdsSearchKey(), about: aboutPlus(), lang: LANG,
-            rs: { i: i + 1, n: steps.length, t: s.t, topic: topic, done: done, forge: fg ? 1 : 0 },
+            rs: { i: i + 1, n: steps.length, t: s.t, topic: topic, done: done, bodies: bodies, forge: fg ? 1 : 0 },
           };
           return rsStream(API, pl, function (txt) { r.sb.innerHTML = mdRender(txt); if (stick) scrollBottom(); })
             .then(function (txt) {
-              r.stat.textContent = tx("rsDone") + " \u00b7 " + txt.length;
-              r.box.classList.remove("open");
+              var g = fg ? forgeGate(txt) : { d: "passed" };
+              r.stat.textContent = (g.d === "passed" ? tx("rsDone") : ("\u26a0 " + tx("fgGateNo"))) + " \u00b7 " + txt.length;
               secs.push({ t: s.t, body: txt });
-              i++; return step();
+              if (g.d === "passed") { r.box.classList.remove("open"); i++; return step(); }
+              /* 不合格就停在这里。**不许把失败说明当合格产物继续传递。** */
+              return forgeHalt(r, g, function (back) {
+                secs = secs.slice(0, back); i = back;
+                RS.running = true; streaming = true; busyUI(true); stopBarShow(true);
+                step();
+              });
             })
             .catch(function (e) {
+              /* 技术故障也不许静默跳过——那一节会带着空产物往下跑。 */
               r.stat.textContent = "\u2717 " + ((e && e.message) || "?");
-              i++; return step();
+              if (!fg) { i++; return step(); }
+              return forgeHalt(r, { d: "failed", why: (e && e.message) || "" }, function (back) {
+                secs = secs.slice(0, back); i = back;
+                RS.running = true; streaming = true; busyUI(true); stopBarShow(true);
+                step();
+              });
             });
         }
         function finalStep() {
@@ -5338,6 +5409,9 @@
         }
         function done(verdict) {
           var md = "# " + title + "\n\n> " + tx("rsReport") + " \u00b7 " + topic + "\n\n";
+          /* 【降级要看得见】读者按了「仍要往下跑」的那几道，成品里必须留痕——
+             否则一份没过闸的稿子和一份全过闸的稿子长得一模一样。 */
+          if (degraded.length) md += "> \u26a0 " + tx("fgDegraded") + degraded.join("\u3001") + "\n\n";
           if (verdict) md += "## \u25c6 " + tx("rsFinal").replace(/[\u2026.]+$/, "") + "\n\n" + verdict + "\n\n";
           secs.forEach(function (s, k) { md += "## " + (k + 1) + ". " + s.t + "\n\n" + s.body + "\n\n"; });
           var total = md.length;
