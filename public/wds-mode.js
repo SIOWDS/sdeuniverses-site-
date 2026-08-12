@@ -565,6 +565,10 @@
     dPptx: "⤓ 存为 .pptx", dPptxWait: "正在生成 .pptx…", dPptxNo: "这份稿子切不出幻灯片（需要 ## 页标题与 - 要点）",
     dPptxOk: "已生成 幻灯片 ",
     dEmptyHint: "两种可能：这一场太长把输入窗吃满了，或基底把预算全用在思考上。换标准档、或新开一场再成文。",
+    dPlanning: "正在拟题与提纲…", dPlanFallback: "提纲这一趟没成，改成一趟写完（会短一些）。", 
+    dPlanGot: "提纲已定：分 ", dPlanGot2: " 节写 —— ",
+    dPart: "正在写第 ", dPartRetry: "第 ", dPartRetry2: " 节没出正文，重写一次…",
+    dPartLost: "第 ", dPartLost2: " 节两次都没写出来，先跳过接着往下写（回头可以点「重答」重来）。",
     dAutoSaved: "已自动存进「成文记录」——就算这里显示出问题，稿子也在（成文菜单 → ↺ 成文记录）。",
     dAutoFail: "自动存稿没成（浏览器存储不可用）：请先「⌸ 存到本机」或「⤓ 存为 .md」再关掉这个面板。",
     dRenderFail: "排版这一步出错了，已改用纯文本把稿子摆出来（原因：", dBlankFix: "排版出来是空的（白屏），已改用纯文本把稿子摆出来。稿子本身是完整的，复制/导出都不受影响。",
@@ -5816,44 +5820,106 @@
     out.innerHTML = "<span class='cur'>▊</span>";
     dBump();
 
-    fetch(API_DISTILL, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ kind: kind, history: history, key: kv.key, vendor: kv.vendor, model: kv.model || "", lang: LANG, tpl: tpl || "",
+    var BASEP = { kind: kind, history: history, key: kv.key, vendor: kv.vendor, model: kv.model || "", lang: LANG, tpl: tpl || "",
         // 载入的文章一并送过去：sumdoc 那一档拿它当正主，其余几档只作背景。
         // 这里送**全文**而不是按问题取段——成文是一次性的活，取段会让它读到半篇就下判断。
         docs: (typeof atts !== "undefined" ? atts : []).filter(function (d) { return d && d.text && !d.img; })
                 .slice(0, 6).map(function (d) { return { n: d.name, t: d.text }; }),
-        fix: (again && again.fix) || "", prev: (again && again.prev) || "" }) })
-      .then(function (resp) {
-        if (!resp.ok || !resp.body) throw new Error("HTTP " + resp.status);
-        var reader = resp.body.getReader(); dr = reader;
-        var dec = new TextDecoder(), buf = "";
-        function pump() {
-          return reader.read().then(function (r) {
-            if (r.done) { done(); return; }
-            dBump();
-            buf += dec.decode(r.value, { stream: true });
-            var idx;
-            while ((idx = buf.indexOf("\n")) >= 0) {
-              var line = buf.slice(0, idx).trim(); buf = buf.slice(idx + 1);
-              if (line.slice(0, 5) !== "data:") continue;
-              var p = line.slice(5).trim();
-              if (p === "[DONE]") { sawDone = true; done(); return; }
-              var j; try { j = JSON.parse(p); } catch (e) { continue; }
-              if (j.t === "token") { text += j.v; if (Date.now() - lastP > 130) { lastP = Date.now(); paintD(false); } }
-              else if (j.t === "beat") { if (j.v && j.v.sec) lastSec = j.v.sec; if (!text && j.v) stat.textContent = t("thinking") + " " + (j.v.sec || 0) + "s · " + (j.v.think || 0) + (j.v.stage ? " · " + j.v.stage : ""); }
-              else if (j.t === "note") { dNote(j.v); }
-              else if (j.t === "error") { dNote(j.v, 1); stat.textContent = t("dFail"); if (j.code === "need_key" || j.code === "bad_key") setTimeout(function () { wdsKeyPanel(function () {}); }, 400); }
+        fix: (again && again.fix) || "", prev: (again && again.prev) || "" };
+
+    /* 一趟请求。extra 里是这一趟与别趟的差异（stage / idx / plan / prevTail）。
+       resolve 回来的对象带着这一趟的账：出了多少正文、拿没拿到提纲、报没报错。
+       正文一律直接累加进 text——拆趟对读者应当是不可见的，他看到的就是一篇在长出来。 */
+    function runLeg(extra) {
+      return new Promise(function (resolve) {
+        var res = { out: 0, plan: null, err: "" };
+        var body = {}, k;
+        for (k in BASEP) body[k] = BASEP[k];
+        for (k in (extra || {})) body[k] = extra[k];
+        dBump();
+        fetch(API_DISTILL, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) })
+          .then(function (resp) {
+            if (!resp.ok || !resp.body) throw new Error("HTTP " + resp.status);
+            var reader = resp.body.getReader(); dr = reader;
+            var dec = new TextDecoder(), buf = "";
+            function pump() {
+              return reader.read().then(function (r) {
+                if (r.done) { resolve(res); return; }
+                dBump();
+                buf += dec.decode(r.value, { stream: true });
+                var idx;
+                while ((idx = buf.indexOf("\n")) >= 0) {
+                  var line = buf.slice(0, idx).trim(); buf = buf.slice(idx + 1);
+                  if (line.slice(0, 5) !== "data:") continue;
+                  var p = line.slice(5).trim();
+                  if (p === "[DONE]") { sawDone = true; resolve(res); return; }
+                  var j; try { j = JSON.parse(p); } catch (e) { continue; }
+                  if (j.t === "token") { text += j.v; res.out += j.v.length; if (Date.now() - lastP > 130) { lastP = Date.now(); paintD(false); } }
+                  else if (j.t === "plan") { res.plan = j.v; }
+                  else if (j.t === "beat") { if (j.v && j.v.sec) lastSec = j.v.sec; if (!text && j.v) stat.textContent = t("thinking") + " " + (j.v.sec || 0) + "s · " + (j.v.think || 0) + (j.v.stage ? " · " + j.v.stage : ""); }
+                  else if (j.t === "note") { dNote(j.v); }
+                  else if (j.t === "error") { res.err = j.v; dNote(j.v, 1); if (j.code === "need_key" || j.code === "bad_key") setTimeout(function () { wdsKeyPanel(function () {}); }, 400); }
+                }
+                return pump();
+              });
             }
             return pump();
+          })
+          .catch(function (e) {
+            clearTimeout(dWd);
+            if (!dStopped) { res.err = dTimedOut ? t("dCut") : (t("errNoOut") + (e && e.message) + ")"); dNote(res.err, 1); }
+            resolve(res);
           });
-        }
-        return pump();
-      })
-      .catch(function (e) {
-        clearTimeout(dWd);
-        if (text) { out.innerHTML = mdRender(text); dNote(dTimedOut ? t("dCut") : (t("errNoOut") + (e && e.message) + ")"), 1); }
-        else { out.className = "wdsm-a plain wdsm-err"; out.textContent = t("errNoOut") + (e && e.message) + ")"; }
-        stat.textContent = t("dFail");
       });
+    }
+
+    /* ══ 拆趟成文 ══════════════════════════════════════════════════
+       一万字装不进一趟：平台有单请求时长墙，基底的 max_tokens 有顶，
+       而"想久一点"与"写长一点"吃的是同一份预算——单趟的结局要么被墙掐断、
+       要么把预算耗在思考上交白卷。所以长档改成拟题一趟 ＋ 每节一趟。
+       「再打磨一轮」不拆：它带着上一稿回来，重新拟题等于把上一稿扔了。 */
+    var CHUNKED = { paper: 1 };
+    if (!CHUNKED[kind] || again) { runLeg({}).then(function () { done(); }); return; }
+
+    stat.textContent = t("dPlanning");
+    runLeg({ stage: "plan" }).then(function (r) {
+      if (dStopped) { done(); return; }
+      var plan = r.plan;
+      if (!plan || !plan.sections || !plan.sections.length) {
+        // 提纲没成也得有一篇：退回单趟。报个错就完事，等于让读者白等一趟。
+        dNote(t("dPlanFallback"), 1);
+        runLeg({}).then(function () { done(); });
+        return;
+      }
+      var secs = plan.sections;
+      text += "# " + String(plan.title || kindT(kind)) + "\n\n";
+      if (plan.sub) text += "**" + String(plan.sub) + "**\n\n";
+      paintD(false);
+      dNote(t("dPlanGot") + secs.length + t("dPlanGot2")
+        + secs.map(function (s, i) { return (i + 1) + "、" + String((s && s.h) || ""); }).join("\u3000"));
+      var i = 0;
+      function step() {
+        if (dStopped || i >= secs.length) { done(); return; }
+        stat.textContent = t("dPart") + (i + 1) + "/" + secs.length + " · " + String(secs[i].h || "");
+        var before = text.length;
+        runLeg({ stage: "part", idx: i, plan: plan, prevTail: text.slice(-1200) })
+          .then(function (rr) {
+            // 某一节空了只补这一节——一节坏不该毁全篇。
+            if (rr.out === 0 && !dStopped) {
+              dNote(t("dPartRetry") + (i + 1) + t("dPartRetry2"));
+              return runLeg({ stage: "part", idx: i, plan: plan, prevTail: text.slice(-1200) })
+                .then(function (r2) { if (r2.out === 0) dNote(t("dPartLost") + (i + 1) + t("dPartLost2"), 1); });
+            }
+          })
+          .then(function () {
+            if (text.length > before && text.slice(-2) !== "\n\n") text += "\n\n";
+            paintD(false);
+            i++;
+            setTimeout(step, 0);      // 让出主线程；顺带给每分钟限流留一点空
+          });
+      }
+      step();
+    });
   }
 
   /* ════════════════ SDE 工序（ChatSDE 独有的九道）════════════════

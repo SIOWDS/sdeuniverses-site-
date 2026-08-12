@@ -1277,6 +1277,71 @@ console.log("⑧ 成文（distill）");
   ok(!String(dp5.textContent).includes("白屏"), "别把增量渲染误报成白屏（判据只认 out 自己就会）");
   dp5.querySelector(".dx").click();
 
+  /* ── 拆趟成文（chunked）────────────────────────────────────────
+     一万字装不进一趟：平台有单请求时长墙、基底 max_tokens 有顶，而"想久一点"和
+     "写长一点"吃同一份预算。改成拟题一趟＋每节一趟。三条纪律必须守住：
+     提纲没成也要有一篇 / 一节坏不毁全篇 / 拆趟对读者不可见（他看到的就是一篇在长）。 */
+  console.log("㉒ 一万字论文：拟题一趟 ＋ 每节一趟");
+  const PLAN = { title: "论承重", sub: "一条可裁决的主张", thesis: "X 不是 Y，而是 Z", criterion: "去查日志里有没有那一条",
+                 sections: [{ h: "第一节", ask: "摆出命题", words: 1200 }, { h: "第二节", ask: "撑住它", words: 1200 }, { h: "第三节", ask: "划界", words: 1200 }] };
+  let LEGS = [];
+  ROUTE["/api/wds/distill"] = function (p) {
+    LEGS.push({ stage: p.stage || "", idx: p.idx, hasPlan: !!(p.plan && p.plan.sections), tail: String(p.prevTail || "") });
+    if (p.stage === "plan") return [{ t: "plan", v: PLAN }];
+    if (p.stage === "part") return [{ t: "token", v: "## 第 " + (p.idx + 1) + " 节\n\n这一节的正文。" }];
+    return [{ t: "token", v: "（单趟兜底稿）" }];
+  };
+  layer.querySelector(".wdsm-distbtn").click();
+  document.body.querySelector(".wdsm-menu").children[2].click();     // 第三档＝凝成一万字论文
+  await new Promise((r) => setTimeout(r, 900));
+  let dpc = document.body.querySelector(".wdsm-dist");
+  ok(LEGS.length === 4, "一共四趟：拟题 ＋ 三节，实得 " + LEGS.length + " 趟（" + LEGS.map((l) => l.stage || "单趟").join("/") + "）");
+  ok(LEGS[0].stage === "plan", "第一趟是拟题");
+  ok(LEGS[1].idx === 0 && LEGS[3].idx === 2, "各节按顺序领号，实得 " + JSON.stringify(LEGS.slice(1).map((l) => l.idx)));
+  ok(LEGS.slice(1).every((l) => l.hasPlan), "每节都带着提纲全文（否则它不知道别节在干什么、必然写重）");
+  ok(LEGS[3].tail.length > 0, "后面几节带着上一节的结尾做接缝，实得 " + LEGS[3].tail.length + " 字");
+  const hc = htmlOf(dpc.querySelector(".wdsm-a"));
+  ok(hc.includes("论承重"), "提纲的标题落进了正文");
+  ok(hc.includes("第 1 节") && hc.includes("第 2 节") && hc.includes("第 3 节"), "三节都拼进了同一篇——拆趟对读者不可见");
+  ok(String(dpc.textContent).includes("提纲已定"), "拟题完当场把节次报给读者");
+  dpc.querySelector(".dx").click();
+
+  console.log("㉓ 一节空了只补这一节；提纲没成也要有一篇");
+  LEGS = [];
+  let boom = 0;
+  ROUTE["/api/wds/distill"] = function (p) {
+    LEGS.push({ stage: p.stage || "", idx: p.idx });
+    if (p.stage === "plan") return [{ t: "plan", v: PLAN }];
+    if (p.stage === "part") {
+      if (p.idx === 1 && boom++ < 1) return [];                      // 第二节第一次交白卷
+      return [{ t: "token", v: "## 第 " + (p.idx + 1) + " 节\n\n这一节的正文。" }];
+    }
+    return [{ t: "token", v: "（单趟兜底稿）" }];
+  };
+  layer.querySelector(".wdsm-distbtn").click();
+  document.body.querySelector(".wdsm-menu").children[2].click();
+  await new Promise((r) => setTimeout(r, 1100));
+  const dpr = document.body.querySelector(".wdsm-dist");
+  const idx1 = LEGS.filter((l) => l.stage === "part" && l.idx === 1).length;
+  ok(idx1 === 2, "空掉的那一节重写一次（只补它，不是整篇重来），实得 " + idx1 + " 趟");
+  ok(LEGS.filter((l) => l.stage === "part").length === 4, "其余三节各跑一趟，总计四趟分部");
+  ok(htmlOf(dpr.querySelector(".wdsm-a")).includes("第 3 节"), "第二节出岔子不影响后面继续写");
+  dpr.querySelector(".dx").click();
+
+  LEGS = [];
+  ROUTE["/api/wds/distill"] = function (p) {
+    LEGS.push({ stage: p.stage || "" });
+    if (p.stage === "plan") return [{ t: "note", v: "提纲这一趟没成" }];   // 拿不到 plan
+    return [{ t: "token", v: "（单趟兜底稿）" }];
+  };
+  layer.querySelector(".wdsm-distbtn").click();
+  document.body.querySelector(".wdsm-menu").children[2].click();
+  await new Promise((r) => setTimeout(r, 700));
+  const dpf = document.body.querySelector(".wdsm-dist");
+  ok(LEGS.length === 2 && LEGS[1].stage === "", "提纲没成就退回单趟，实得 " + JSON.stringify(LEGS.map((l) => l.stage || "单趟")));
+  ok(htmlOf(dpf.querySelector(".wdsm-a")).includes("单趟兜底稿"), "读者照样拿得到一篇，而不是只收到一句报错");
+  dpf.querySelector(".dx").click();
+
   console.log("\n===== " + PASS + " PASS / " + FAILS + " FAIL =====");
   process.exit(FAILS ? 1 : 0);
 })();

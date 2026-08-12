@@ -7470,7 +7470,7 @@ export default {
         // 这一档是把一整场谈话锻成一篇**能投出去的论文**——所以它多要三样 essay 不要求的东西：
         // 承重命题写成可被反驳的形状、逐条给证伪条件、以及对最近的既有说法逐条划界。
         // 没有这三样，一万字只会变成三千字兑了水。
-        paper: { name: "一万字论文", tok: WDS_TOK_MAX, spec:
+        paper: { name: "一万字论文", tok: WDS_TOK_MAX, parts: 8, spec:
           "把这场对话【锻成一篇约一万字的论文】。不是把三千字那篇撑长——是把它写成一篇能拿出去、也能被人正面反驳的东西。\n"
           + "读者没参与过这场谈话，也没读过任何前情。全程不出现「读者问」「本次对话」之类痕迹。\n\n"
           + "【必须有的七件，缺一件就说明这一万字是兑了水的】\n"
@@ -7559,6 +7559,155 @@ export default {
       const convoFull = readConvoText(turns, 10000000);          // 先看看这一场到底多长
       const convo = convoFull.length > convoMax ? readConvoText(turns, convoMax) : convoFull;
       const convoCut = convoFull.length - convo.length;
+
+      /* ══ 拆趟成文（chunked）══════════════════════════════════════════
+         为什么必须拆：一万字装不进一趟。平台有单请求时长墙、基底 max_tokens 有顶，
+         而"想久一点"和"写长一点"吃的是同一份预算。单趟的结局要么被墙掐断、
+         要么把预算耗在思考上交白卷——两种今天都撞过了。
+         拆趟之后每一趟都短到稳，且一趟坏只坏一节，不毁全篇。
+         口径与 /api/wds/read-paper 那条早已跑熟的产线一致。 */
+      const dStage = String(b.stage || "");
+      if (dStage === "plan" || dStage === "part") {
+        const planIn = (b.plan && typeof b.plan === "object") ? b.plan : null;
+        const partIdx = Math.max(0, Math.min(40, parseInt(b.idx, 10) || 0));
+        const prevTail = String(b.prevTail || "").slice(0, 2000);   // 上一节的结尾，只作接缝用
+        const secs = (planIn && Array.isArray(planIn.sections)) ? planIn.sections : [];
+        if (dStage === "part" && !secs.length) return _sseResp([{ t: "error", v: "这一节没有提纲可依（提纲这一趟没成）。" }]);
+
+        const cstream = new ReadableStream({
+          async start(controller) {
+            let _hb = null;
+            const fin = () => { if (_hb) clearInterval(_hb); try { controller.enqueue(_ENC.encode("data: [DONE]\n\n")); controller.close(); } catch (e) {} };
+            const _st = { t0: Date.now(), think: 0, out: 0, stage: dStage === "plan" ? "拟题与提纲" : ("写第 " + (partIdx + 1) + " 节") };
+            _hb = wdsBeat(controller, _st);
+            try {
+              let reflect = ""; try { reflect = await ensureReflect(env, url, rvendor, VC, KEY); } catch (e) {}
+              const BASE = "你是 SDE 本体论的老师（SDE 由王德生创立）。"
+                + "\n\nSDE 骨架：显露 S / 差异序列 D / 特征纠缠 E；三大方程 S=F(D,E)·D=G(S,E)·E=H(S,D)；六路径；意义三律；发生学——追问事物为何如此发生，而非如何被发现。"
+                + (reflect ? ("\n\n【SDE 内化心得·思考底盘（别复述、别提\"心得/内功\"）】\n" + reflect) : "")
+                + (dlang === "en" ? "\n\n【LANGUAGE】Write in natural English prose. Keep SDE terms as Show / Difference / Entanglement." : "");
+              const CONVO = "以下是这场对话的全文：\n\n" + convo + "\n———\n"
+                + (docBlock ? ("读者本场还载入了这些材料，可作背景（正主仍是上面这场对话）：\n\n" + docBlock + "\n———\n") : "");
+
+              if (dStage === "plan") {
+                /* 提纲这一趟要的是**紧凑的结构化 JSON**。站内硬教训：结构化 JSON 配满功率必崩
+                   （给了大头寸它反而写散、夹带解释，looseJSON 解不出来）。所以关思考＋有界预算。 */
+                const psys = BASE + "\n\n【本次任务】只出一份提纲，不写正文。\n" + SPEC.spec
+                  + "\n\n【怎么出】通读这场对话，先定下这篇的承重命题，再把它拆成若干节。"
+                  + "每一节要有自己的活干——不是把每一轮问答各写一节，而是让这几节**合起来**把那条命题撑住。"
+                  + "\n\n【只输出一个 JSON，前后不要任何说明、不要代码围栏】格式：\n"
+                  + '{"title":"真标题（是判断不是话题）","sub":"副题：那条可裁决的主张",'
+                  + '"thesis":"承重命题，写成能被反驳的形状（最好是「X 不是 Y，而是 Z」）",'
+                  + '"criterion":"一句判据，不含情态词（禁用：应当／有意义／实质性／充分／真正／恰当／合理），要能拿去问流程、日志、记录",'
+                  + '"sections":[{"h":"这一节的小标题","ask":"这一节要干的活（一两句，说清它替全篇承担什么，别与别节重复）","words":1200}]}\n'
+                  + "sections 给 " + (SPEC.parts || 7) + " 节左右，各节 words 之和约等于全篇目标字数。";
+                const pmsgs = [{ role: "system", content: psys }, { role: "user", content: CONVO + "现在只输出那个 JSON。" }];
+                const pclk = wdsClock(60000, 150000);
+                let plan = null, raw = "";
+                for (let att = 0; att < 2 && !plan; att++) {
+                  try {
+                    // ⚠ wdsLadder 的非满功率分支**忽略 want**、一律 [64000,32000,12000]（见它自己的注释），
+                    // 而这里传的正是去掉 top 的 VC ⇒ 不自带阶梯的话"有界预算"根本没生效。
+                    const _pl = att ? [8000, 6000, 4000] : [12000, 8000, 6000];
+                    const up = await wdsFetchMax({ url: VC.url, model: VC.model, name: VC.name }, KEY, pmsgs, true,
+                      _pl[0], pclk.signal, false, _pl, true);
+                    if (!up.ok) { const et = (await up.text()).slice(0, 200); controller.enqueue(_sseBytes({ t: "error", v: "提纲这一趟基底返回 " + up.status + "：" + et })); break; }
+                    const rd = up.body.getReader(); const dc = new TextDecoder(); let bf = ""; raw = "";
+                    while (true) {
+                      const r = await rd.read(); if (r.done) break;
+                      bf += dc.decode(r.value, { stream: true });
+                      let ix;
+                      while ((ix = bf.indexOf("\n")) >= 0) {
+                        const ln = bf.slice(0, ix).trim(); bf = bf.slice(ix + 1);
+                        if (ln.slice(0, 5) !== "data:") continue;
+                        const pl = ln.slice(5).trim(); if (pl === "[DONE]") continue;
+                        try { const d = (JSON.parse(pl).choices || [{}])[0].delta || {}; if (d.content) { pclk.firstFrame(); _st.out += d.content.length; raw += d.content; } } catch (e) {}
+                      }
+                    }
+                    plan = looseJSON(raw);
+                    if (plan && (!Array.isArray(plan.sections) || !plan.sections.length)) plan = null;
+                  } catch (e) { /* 掐断或断线：下一轮再试一次 */ }
+                }
+                pclk.stop();
+                if (!plan) {
+                  controller.enqueue(_sseBytes({ t: "error", code: "noplan",
+                    v: "提纲这一趟没出来（基底交回 " + raw.length + " 字，解不成 JSON）。可以再点一次；或换标准档。" }));
+                  return fin();
+                }
+                plan.sections = plan.sections.slice(0, 20).map((s) => ({
+                  h: String((s && s.h) || "").slice(0, 80),
+                  ask: String((s && s.ask) || "").slice(0, 400),
+                  words: Math.max(400, Math.min(4000, parseInt(s && s.words, 10) || 1200)),
+                }));
+                controller.enqueue(_sseBytes({ t: "plan", v: plan }));
+                return fin();
+              }
+
+              // ── stage=part：只写这一节 ───────────────────────────────
+              const sec = secs[partIdx] || {};
+              const want = Math.max(400, Math.min(4000, parseInt(sec.words, 10) || 1200));
+              const others = secs.map((s, i) => (i + 1) + "、" + String((s && s.h) || "")).join("\n");
+              const ssys = BASE
+                + "\n\n【全篇的骨架】标题：" + String(planIn.title || "") + "\n副题：" + String(planIn.sub || "")
+                + "\n承重命题：" + String(planIn.thesis || "") + "\n判据：" + String(planIn.criterion || "")
+                + "\n各节：\n" + others
+                + "\n\n【本次任务】**只写第 " + (partIdx + 1) + " 节：" + String(sec.h || "") + "**，约 " + want + " 字。"
+                + "\n这一节要干的活：" + String(sec.ask || "")
+                + "\n\n【硬规矩】"
+                + "\n· 只写这一节。别写别节的内容，别写全篇导言或结语（除非这一节本来就是），别重复别节的题目。"
+                + "\n· 直接从这一节的正文开始，开头写一行 `## " + String(sec.h || "") + "`，此外不要任何说明、不要「以下是」。"
+                + "\n· 判断要锋利、可被反驳，不要正确的废话；忠于这场对话里真出现过的判断与例子，没谈过的别替它补。"
+                + (partIdx === 0 ? "\n· 你是第一节：把承重命题在头一段就摆出来，不铺垫。" : "")
+                + (partIdx + 1 === secs.length ? "\n· 你是最后一节：结尾留一个开口，不自我封顶。" : "")
+                + (prevTail ? ("\n\n【上一节的结尾（只为接得上，别复述它）】\n" + prevTail) : "");
+              // 关思考：这一节要的是几百上千字正文，思考与正文吃同一份预算（见 askCore 的三道闸）。
+              const stok = Math.min(16000, Math.max(3000, Math.round(want * 2.2)));
+              const sclk = wdsClock(60000, 210000);
+              let wrote = 0;
+              try {
+                // 同上：必须自带阶梯，wdsLadder 非满功率分支不看 want。
+                const _sl = [stok, Math.max(3000, Math.round(stok / 2)), 3000];
+                const up = await wdsFetchMax({ url: VC.url, model: VC.model, name: VC.name }, KEY,
+                  [{ role: "system", content: ssys }, { role: "user", content: CONVO + "现在只写第 " + (partIdx + 1) + " 节。" }],
+                  true, stok, sclk.signal, true, _sl, true);
+                if (!up.ok) {
+                  const et = (await up.text()).slice(0, 200);
+                  controller.enqueue(_sseBytes({ t: "error", v: "第 " + (partIdx + 1) + " 节基底返回 " + up.status + "：" + et,
+                    code: (up.status === 401 || up.status === 402 || up.status === 429) ? "bad_key" : "" }));
+                  sclk.stop(); return fin();
+                }
+                const rd = up.body.getReader(); const dc = new TextDecoder(); let bf = "";
+                while (true) {
+                  const r = await rd.read(); if (r.done) break;
+                  bf += dc.decode(r.value, { stream: true });
+                  let ix;
+                  while ((ix = bf.indexOf("\n")) >= 0) {
+                    const ln = bf.slice(0, ix).trim(); bf = bf.slice(ix + 1);
+                    if (ln.slice(0, 5) !== "data:") continue;
+                    const pl = ln.slice(5).trim(); if (pl === "[DONE]") continue;
+                    let j; try { j = JSON.parse(pl); } catch (e) { continue; }
+                    if (j.error) { controller.enqueue(_sseBytes({ t: "error", v: j.error.message || "基底流内错误" })); continue; }
+                    const d = (j.choices && j.choices[0] && j.choices[0].delta) || {};
+                    if (d.reasoning_content) { _st.think += d.reasoning_content.length; }
+                    if (d.content) { sclk.firstFrame(); _st.out += d.content.length; wrote += d.content.length; controller.enqueue(_sseBytes({ t: "token", v: d.content })); }
+                  }
+                }
+              } catch (e) {
+                const why = sclk.cut ? sclk.why("第 " + (partIdx + 1) + " 节") : ("流中断：" + (e && e.message));
+                if (wrote) controller.enqueue(_sseBytes({ t: "note", v: why + "——这一节只写到这里，后面几节照常写。" }));
+                else controller.enqueue(_sseBytes({ t: "error", v: why }));
+              }
+              sclk.stop();
+              if (!wrote) controller.enqueue(_sseBytes({ t: "error", code: "empty",
+                v: "第 " + (partIdx + 1) + " 节没写出正文（思考 " + _st.think + " 字）。" }));
+            } catch (e) {
+              controller.enqueue(_sseBytes({ t: "error", v: "成文出错：" + (e && e.message) }));
+            }
+            fin();
+          },
+        });
+        return new Response(cstream, { headers: { ..._cors(), "content-type": "text/event-stream; charset=utf-8", "cache-control": "no-store" } });
+      }
 
       const stream = new ReadableStream({
         async start(controller) {

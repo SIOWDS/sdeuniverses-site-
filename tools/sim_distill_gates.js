@@ -41,5 +41,19 @@ ok(D.indexOf("_retryTok") > 0 && !/Math\.min\(32000, Math\.round\(SPEC\.tok \/ 2
 console.log("⑤ 关思考没生效要看得见");
 ok(/关思考未生效/.test(D), "重跑流里若仍收到 reasoning，阶段名写明'关思考未生效'（某家不认这个字段时的唯一线索）");
 
+console.log("⑥ 拆趟：长档不许再走单趟");
+ok(/paper: \{ name: "一万字论文", tok: WDS_TOK_MAX, parts: \d+,/.test(D), "paper 档标了 parts（提纲按它定节数）");
+ok(/const dStage = String\(b\.stage \|\| ""\);/.test(D), "端点收 stage");
+ok(/if \(dStage === "plan" \|\| dStage === "part"\)/.test(D), "plan / part 两个分支都在");
+ok(/const _pl = att \? \[8000, 6000, 4000\] : \[12000, 8000, 6000\];/.test(D) && /_pl\[0\], pclk\.signal, false, _pl, true\)/.test(D),
+   "拟题：关思考＋自带阶梯的有界预算（结构化 JSON 配满功率必崩，站内老账）");
+ok(/const _sl = \[stok, Math\.max\(3000/.test(D) && /sclk\.signal, true, _sl, true\)/.test(D),
+   "两处都自带阶梯——wdsLadder 的非满功率分支忽略 want，不自带就等于没设预算");
+ok(/looseJSON\(raw\)/.test(D) && /att < 2/.test(D), "提纲解不出就再试一次，且用 looseJSON 兜住围栏与碎话");
+ok(/sclk\.signal, true, _sl, true\)/.test(D), "分部：同样显式关思考（plain=true）");
+ok(/Math\.min\(16000, Math\.max\(3000, Math\.round\(want \* 2\.2\)\)\)/.test(D), "分部预算按这一节的字数给，不是拍脑袋一个大数");
+ok(/只写这一节/.test(D) && /别写全篇导言或结语/.test(D), "提示语钉死「只写这一节」——否则每节都会重写一遍全篇");
+ok(/上一节的结尾（只为接得上，别复述它）/.test(D), "带上一节结尾做接缝，并明说别复述");
+
 console.log("\n===== " + PASS + " PASS / " + FAIL + " FAIL =====");
 process.exit(FAIL ? 1 : 0);
