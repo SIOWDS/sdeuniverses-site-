@@ -578,6 +578,7 @@
     dPartLost: "第 ", dPartLost2: " 节两次都没写出来，先跳过接着往下写（回头可以点「重答」重来）。",
     dShort1: "\u26a0 第 ", dShort2: " 节两遍都没写够字数，稿子在这几处是短的——把这一稿贴回对话里说「重写第 N 节」即可只补这几节。",
     dAutoSaved: "已自动存进「成文记录」——就算这里显示出问题，稿子也在（成文菜单 → ↺ 成文记录）。",
+    dCloseBusy: "正在写作中，点空白处不会关掉它（免得误点丢稿）。要关就按 Esc、或点右上角的 ✕ —— 两条路都会先把已写的部分存进「成文记录」。",
     dAutoFail: "自动存稿没成（浏览器存储不可用）：请先「⌸ 存到本机」或「⤓ 存为 .md」再关掉这个面板。",
     dRenderFail: "排版这一步出错了，已改用纯文本把稿子摆出来（原因：", dBlankFix: "排版出来是空的（白屏），已改用纯文本把稿子摆出来。稿子本身是完整的，复制/导出都不受影响。",
     dWall1: "这一趟没有收到收尾信号：约第 ", dWall2: " 秒整个请求被平台掐断了（不是基底写不出来，也不是预算不够——这一档的预算已经是全站顶格）。把这一场缩短些、或分两次成文再试。",
@@ -629,6 +630,7 @@
       kPaper: "Forge a 20,000-word paper", kPaperS: "Sixteen sections in full submission format: structured bilingual abstract, research questions, literature review, conceptual definitions, design and methods, three analysis sections, a modal-free test, robustness and falsifiers, validity threats, declarations, references (exports to Word and PDF)",
       kSumdoc: "Read the loaded article", kSumdocS: "What it claims \u00b7 its load-bearing line \u00b7 where it is brittle \u00b7 a 1,000-word condensation",
       mDocx: "\u2913 Word (.docx)", mDocxS: "Save this piece as a Word document",
+      dCloseBusy: "Still writing \u2014 clicking the backdrop will not close it, so a stray click cannot cost you the draft. Press Esc or the \u2715 at the top right; both save what has been written to your saved write-ups first.",
       mPdfx: "\u2913 PDF", mPdfxS: "Typeset this piece and save it as a PDF (choose \u201cSave as PDF\u201d in the print dialog)",
       dChars: " chars",
       mSub: "\u2709 Submit to the inbox", mSubS: "Send this piece to the editors (needs the submission password)",
@@ -1414,6 +1416,9 @@
     ".wdsm-menu .mh{font-size:10.5px;letter-spacing:1px;color:var(--wdim2);padding:6px 12px 4px}" +
     ".wdsm-toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%);z-index:100003;max-width:min(560px,88vw);background:var(--wpanel);border:1px solid var(--wline2);border-radius:10px;color:var(--wtx);font:13px/1.6 inherit;padding:10px 16px;box-shadow:0 10px 30px var(--wsh);opacity:1;transition:opacity .5s}" +
     ".wdsm-dist{position:fixed;inset:0;z-index:100003;background:var(--wmask);display:flex;align-items:center;justify-content:center;padding:20px}" +
+    /* 逃生钮：挂在**遮罩**上而不是盒子里，所以盒子内部无论怎么画不出来，它都在。 */
+    ".wdsm-dist-esc{position:absolute;top:16px;right:20px;z-index:3;width:34px;height:34px;line-height:32px;text-align:center;border-radius:50%;border:1px solid var(--wline2);background:var(--wbg2);color:var(--wtx2);font-size:16px;cursor:pointer;opacity:.85}" +
+    ".wdsm-dist-esc:hover{opacity:1;border-color:var(--wgold)}" +
     ".wdsm-dist-box{max-width:820px;width:100%;max-height:88vh;background:var(--wbg2);border:1px solid var(--wline2);border-radius:18px;display:flex;flex-direction:column;overflow:hidden}" +
     ".wdsm-dist-top{flex:none;display:flex;align-items:center;gap:8px;padding:14px 18px;border-bottom:1px solid var(--wline)}" +
     ".wdsm-dist-t{font:700 15px/1 inherit;color:var(--wtx2);flex:none}" +
@@ -5607,7 +5612,8 @@
       + "<div class='wdsm-dist-top'><span class='wdsm-dist-t'>" + esc(title || kindT(kind)) + "</span>"
       + "<span class='dst' style='color:#8B98A5;font-size:12px;flex:1'>" + esc(t("dWorking")) + "</span>"
       + "<button class='wdsm-tbtn dsv'></button><button class='wdsm-tbtn dcp'></button><button class='wdsm-tbtn ddir'></button><button class='wdsm-tbtn ddl'></button><button class='wdsm-tbtn dx' style='margin-right:0'>✕</button></div>"
-      + "<div class='wdsm-dist-c'><div class='wdsm-a'></div></div></div>";
+      + "<div class='wdsm-dist-c'><div class='wdsm-a'></div></div></div>"
+      + "<button class='wdsm-dist-esc dx' type='button'>\u2715</button>";
     document.body.appendChild(wrap);
     var out = wrap.querySelector(".wdsm-a"), stat = wrap.querySelector(".dst");
     var cbox = wrap.querySelector(".wdsm-dist-c");
@@ -5842,7 +5848,39 @@
       if (beatT) { clearInterval(beatT); beatT = null; }
       }, 240);
     }
-    wrap.querySelector(".dx").onclick = function () { try { if (dr) dr.cancel(); } catch (e) {} wrap.parentNode.removeChild(wrap); };
+    /* ══ 关掉这个面板：四条出口，一条都不依赖顶栏画得出来 ══════════════════
+       原来只有顶栏那颗 ✕ 一条路。而 .wdsm-dist 是 inset:0 的全屏遮罩：顶栏一旦没画出来，
+       整个站就被一层**关不掉**的遮罩盖住，只能刷新页面才出得去——读者今天就卡在这一格。
+       现在四条：① 顶栏 ✕　② 遮罩右上角那颗逃生钮（挂在遮罩上，盒子内部崩了它照样在）
+       ③ Esc　④ 点遮罩空白处。前两条都带 class="dx"，靠**事件委托**认，
+       所以顶栏被心跳重建之后照样管用（直接绑 onclick 的那一版重建后就失灵）。
+       ⚠ 四条出口一律先存稿再摘节点——关窗口不该是丢稿的方式。 */
+    function distClose() {
+      try { dStopped = true; } catch (e) {}
+      try { if (dr) dr.cancel(); } catch (e) {}
+      try { if (text && text.length > 200 && !existing) distSave(kindT(kind), text, function () {}); } catch (e) {}
+      try { if (beatT) { clearInterval(beatT); beatT = null; } } catch (e) {}
+      try { document.removeEventListener("keydown", distEsc, true); } catch (e) {}
+      if (wrap.parentNode) wrap.parentNode.removeChild(wrap);
+    }
+    wrap._close = distClose;          // 供全局 Esc 调用：它只知道节点，不知道这里的闭包
+    function distEsc(ev) {
+      if (!ev || (ev.key !== "Escape" && ev.keyCode !== 27)) return;
+      if (!wrap.parentNode) { document.removeEventListener("keydown", distEsc, true); return; }
+      /* 捕获阶段拦下：不能让它先走到 hotkey 那条 `if (doStop()) return;`——那一句会把按键吞掉。 */
+      ev.stopPropagation(); if (ev.preventDefault) ev.preventDefault();
+      distClose();
+    }
+    document.addEventListener("keydown", distEsc, true);
+    wrap.addEventListener("click", function (ev) {
+      var tg = ev && ev.target;
+      if (tg && tg.closest && tg.closest(".dx")) { distClose(); return; }
+      if (tg !== wrap) return;        // 只认点在**遮罩本身**（点盒子里的任何东西都不算）
+      /* 写作途中误点一下遮罩就丢掉正在写的两万字，代价太大——那时只提示，不关。
+         真要关，Esc 与两颗 ✕ 都还在，而且它们都会先把已写的部分存进「成文记录」。 */
+      if (!pTrace.ok && !dStopped && !existing) { dNote(t("dCloseBusy"), 0); return; }
+      distClose();
+    });
     cpBtn.onclick = function () { copyText(text); cpBtn.textContent = t("aCopied"); setTimeout(function () { cpBtn.textContent = t("dCopy"); }, 1400); };
     dlBtn.onclick = function () { download("WDS-" + kind + "-" + new Date().toISOString().slice(0, 10) + ".md", text); };
     svBtn.onclick = function () {
@@ -5922,8 +5960,8 @@
           cp2.onclick = function () { copyText(text); };
           var dl2 = el("button", "wdsm-tbtn", t("dDl"));
           dl2.onclick = function () { download("WDS-" + kind + "-" + new Date().toISOString().slice(0, 10) + ".md", text); };
-          var x2 = el("button", "wdsm-tbtn", "\u2715");
-          x2.onclick = function () { if (wrap.parentNode) wrap.parentNode.removeChild(wrap); };
+          /* 带上 dx：靠 wrap 上那个委托来关，和顶栏那颗、逃生钮那颗走同一条路（会先存稿）。 */
+          var x2 = el("button", "wdsm-tbtn dx", "\u2715");
           bar.appendChild(tt); bar.appendChild(cp2); bar.appendChild(dl2); bar.appendChild(x2);
           if (bx.firstChild) bx.insertBefore(bar, bx.firstChild); else bx.appendChild(bar);
         }
@@ -6555,8 +6593,19 @@
     if (!e) return;
     var mod = e.metaKey || e.ctrlKey, k = String(e.key || "");
     if (k === "Escape") {
+      /* ⚠ 成文面板要排在 doStop() **前面**：它是全屏遮罩，关不掉就等于整个站被锁住，
+         而 doStop() 只要有东西在生成就返回真、把这一下按键吞掉。
+         另外原来那串 `.wdsm-help || .wdsm-dist || .wdsm-menu` 也有坑：页面上只要还留着
+         一个 help 层，Esc 关掉的永远是它，成文面板纹丝不动。改成先关最上面那个成文面板。 */
+      var dps = document.querySelectorAll(".wdsm-dist");
+      if (dps.length) {
+        var topPanel = dps[dps.length - 1];
+        if (typeof topPanel._close === "function") topPanel._close();
+        else if (topPanel.parentNode) topPanel.parentNode.removeChild(topPanel);
+        return;
+      }
       if (doStop()) return;
-      var pn = document.querySelector(".wdsm-help") || document.querySelector(".wdsm-dist") || document.querySelector(".wdsm-menu");
+      var pn = document.querySelector(".wdsm-help") || document.querySelector(".wdsm-menu");
       if (pn && pn.parentNode) pn.parentNode.removeChild(pn);
       return;
     }

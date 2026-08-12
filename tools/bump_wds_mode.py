@@ -34,10 +34,26 @@ def sha(path):
     return h.hexdigest()[:16]
 
 
+def past_stamps():
+    """曾经用过的戳。⚠ 只看"文件里现在是什么"是不够的：
+    今天从 a 一路推到 d 之后，文件里只剩 d，`used` 就只有 {d}，下一次会挑回 a——
+    而读者浏览器里很可能还缓存着那个 a，等于白推。所以历史要单独记一行。"""
+    try:
+        s = open(STAMP_FILE, encoding="utf-8").read()
+        m = re.search(r"^past=(.*)$", s, re.M)
+        cur = re.search(r"^stamp=(\S+)$", s, re.M)
+        out = set(x for x in (m.group(1).split(",") if m else []) if x.strip())
+        if cur:
+            out.add(cur.group(1))
+        return out
+    except OSError:
+        return set()
+
+
 def next_stamp(old_stamps):
-    """今天日期 + 一个没被用过的字母尾巴。同一天多次改动不会撞戳。"""
+    """今天日期 + 一个**从没用过**的字母尾巴（文件里现有的 ＋ 历史记过的，都要避开）。"""
     base = date.today().strftime("%Y%m%d")
-    used = {s for s in old_stamps if s.startswith(base)}
+    used = {s for s in set(old_stamps) | past_stamps() if s.startswith(base)}
     for c in "abcdefghijklmnopqrstuvwxyz":
         if base + c not in used:
             return base + c
@@ -80,7 +96,7 @@ def main():
         "# 由 tools/bump_wds_mode.py 生成。改了 public/wds-mode.js 就跑一次它。\n"
         "# 左边是全站 <script src=\"/wds-mode.js?v=...\"> 用的戳，右边是当时 wds-mode.js 的 sha256 前 16 位。\n"
         "# tools/sim_wds_mode_stamp.js 会核对这两行：文件变了而戳没变 ⇒ 读者拿到的还是旧脚本。\n"
-        "stamp=%s\nsha256=%s\n" % (stamp, digest))
+        "stamp=%s\nsha256=%s\npast=%s\n" % (stamp, digest, ",".join(sorted(past_stamps() | {stamp}))))
     print("改写了 %d 个文件；戳已写入 tools/wds-mode.stamp" % changed)
 
 

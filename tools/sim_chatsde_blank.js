@@ -126,8 +126,13 @@ ok("稿子太短（没写出东西）→ 不当白屏处理", b4.box.healed === 
 
 /* ═══ ④ 源码级：收尾分帧与早退 ═══ */
 console.log("── 收尾分帧与早退 ──");
-const doneSrc = FSRC.slice(FSRC.indexOf("    function done() {\n      clearTimeout(dWd);"),
-                           FSRC.indexOf('    wrap.querySelector(".dx").onclick'));
+/* ⚠ 终点锚原来是 `wrap.querySelector(".dx").onclick` —— 那一行在「面板关不掉」那一修里被
+   事件委托取代了，锚失效后 indexOf 返回 -1，slice 一路切到文件末尾，
+   于是别处的 setTimeout(..., 0) 被算进"收尾的延时"，这条就红了。
+   改锚到 done() 之后紧跟的那段注释（它属于 done 这一块，不会被别的改动带走）。 */
+const _d0 = FSRC.indexOf("    function done() {\n      clearTimeout(dWd);");
+const _d1 = FSRC.indexOf("    /* ══ 关掉这个面板", _d0);
+const doneSrc = FSRC.slice(_d0, _d1 > _d0 ? _d1 : _d0 + 9000);
 ok("抠得到 done()", doneSrc.length > 800);
 const gaps = (doneSrc.match(/\}, (\d+)\);/g) || []).map((x) => +x.match(/(\d+)/)[1]);
 ok("收尾的延时都不是 0（两个 0ms 任务会紧挨着排，浏览器插不进一帧）", gaps.length >= 2 && gaps.every((g) => g > 0));
