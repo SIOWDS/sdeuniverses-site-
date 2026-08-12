@@ -5707,13 +5707,24 @@
   }
 
   /* ── 成文：把整场对话锻成 报告 / 文章 / 提纲，或直接导出 ── */
-  function kindT(k) { return t(({ report: "kReport", essay: "kEssay", outline: "kOutline", paper: "kPaper", sumdoc: "kSumdoc", deck: "kDeck" })[k]); }
-  function kindS(k) { return t(({ report: "kReportS", essay: "kEssayS", outline: "kOutlineS", paper: "kPaperS", sumdoc: "kSumdocS", deck: "kDeckS" })[k]); }
+  /* 🔴 【同一份清单在两处各有一份口径 —— 改了一处必漏另一处】
+     2026-08-12：`KIND_KEYS` 里加了 paper1，这张映射表忘了加 ⇒ 菜单里那一条直接显示 **undefined**。
+     ⇒ 合成一张表：档位、文案键、说明键都从它来，`KIND_KEYS` 也由它派生，**从此只有一处可改**。
+     💡 心法：**发现"两处要一起改"的那一刻，就是把它们并成一处的时刻**——
+        靠人记得同步，早晚会漏，而漏了的样子就是界面上一个 undefined。 */
+  var KIND_DEF = [
+    { k: "report", t: "kReport" }, { k: "essay", t: "kEssay" },
+    { k: "paper1", t: "kPaper1" }, { k: "paper", t: "kPaper" },
+    { k: "outline", t: "kOutline" }, { k: "sumdoc", t: "kSumdoc" }, { k: "deck", t: "kDeck" },
+  ];
+  function kindDef(k) { for (var i = 0; i < KIND_DEF.length; i++) if (KIND_DEF[i].k === k) return KIND_DEF[i]; return null; }
+  function kindT(k) { var d = kindDef(k); return d ? t(d.t) : String(k || ""); }
+  function kindS(k) { var d = kindDef(k); return d ? t(d.t + "S") : ""; }
   // paper 排在 essay 之后：它是 essay 的重档（三千字 → 一万字），
   // 而 deck 是另一种东西（给听众的），不该夹在两者中间。
   /* paper1 排在 paper 前面：一趟出全篇是**默认该选的那一个**（金点子那台已经跑熟了），
-     十六趟那一档留着做对照。 */
-  var KIND_KEYS = ["report", "essay", "paper1", "paper", "outline", "sumdoc", "deck"];
+     十六趟那一档留着做对照。次序由 KIND_DEF 定，这里只派生。 */
+  var KIND_KEYS = KIND_DEF.map(function (x) { return x.k; });
   try { layer.querySelector(".wdsm-pdfbtn").onclick = function () { exportPdf(); }; } catch (e) {}
   layer.querySelector(".wdsm-distbtn").onclick = function (ev) {
     var old = document.querySelector(".wdsm-menu");

@@ -82,8 +82,39 @@ ok("界面上两档分得清（一趟写完 / 分十六趟）",
   /kPaper1: "凝成两万字论文 · 一趟写完"/.test(F) && /kPaper: "凝成两万字论文 · 分十六趟"/.test(F));
 ok("英文同步（中英双份纪律）", /single pass/.test(F) && /sixteen passes/.test(F));
 ok("★ 出稿三口（Word／PDF／投稿）认得 paper1", /kind === "paper" \|\| kind === "paper1"/.test(F));
-ok("落进「成文记录」的档名也认得", /KIND_KEYS = \["report", "essay", "paper1", "paper"/.test(F));
+/* ⚠ 落点搬家：那份手写清单已被 KIND_DEF 取代（正是为了不再有第二份）。 */
+ok("落进「成文记录」的档名也认得（paper1 在档位表里）",
+  /\{ k: "paper1", t: "kPaper1" \}/.test(F));
 ok("注释记下了这是用户指出来的、我 memory 那条是错判", /是\*\*错判\*\*/.test(W) && /那道题是拆趟自己造出来的/.test(W));
+
+/* ═══ 四、⭐ 每一档都取得到文案（真跑）═══════════════════════
+   🔴 2026-08-12：KIND_KEYS 里加了 paper1，而 kindT/kindS 那张映射表忘了加 ⇒
+   菜单里那一条直接显示 **undefined**，用户截图才发现。
+   💡💡 心法：**发现"两处要一起改"的那一刻，就是把它们并成一处的时刻。**
+      靠人记得同步，早晚会漏，而漏了的样子就是界面上一个 undefined。 */
+console.log("── 档位与文案：只有一处可改，且逐档真跑 ──");
+const ka = F.indexOf("  var KIND_DEF = [");
+const kb = F.indexOf("  try { layer.querySelector", ka);
+ok("抠得到档位表", ka > 0 && kb > ka);
+ok("★★ KIND_KEYS 由 KIND_DEF 派生，不再是第二份手写清单",
+  /var KIND_KEYS = KIND_DEF\.map\(/.test(F));
+ok("★ 文案键由档位表推出（kindT 取 d.t、kindS 取 d.t + \"S\"）",
+  /return d \? t\(d\.t\) : String\(k \|\| ""\)/.test(F) && /t\(d\.t \+ "S"\)/.test(F));
+/* 真跑：把 zh 文案表整个喂进去，任何一档取不到就红。 */
+const zhA = F.indexOf("    zh: {"), zhB = F.indexOf("\n    en: {", zhA);
+const zhSrc = F.slice(zhA, zhB);
+const KM = new Function("t", F.slice(ka, kb)
+  + "\n return { keys: KIND_KEYS, T: kindT, S: kindS };");
+const has = (k) => new RegExp("(^|[\\s{,])" + k + ":").test(zhSrc);
+const api = KM((k) => (has(k) ? "有" : undefined));
+const miss = api.keys.filter((k) => api.T(k) === undefined || api.T(k) === "undefined"
+  || api.S(k) === undefined || api.S(k) === "undefined");
+ok("★★★ 七档逐个取得到标题与说明，一个 undefined 都没有", miss.length === 0,
+  miss.length ? ("缺文案的档：" + miss.join("、")) : "");
+ok("★ 新档排在旧档前面（一趟写完是默认该选的那一个）",
+  api.keys.indexOf("paper1") < api.keys.indexOf("paper"));
+ok("旧档一个没少", ["report", "essay", "paper", "outline", "sumdoc", "deck"].every((k) => api.keys.indexOf(k) >= 0));
+ok("注释留下这条心法（两处要一起改，就该并成一处）", /就是把它们并成一处的时刻/.test(F));
 
 console.log("\n" + (fail ? "✗ " : "✓ ") + pass + " passed, " + fail + " failed");
 process.exit(fail ? 1 : 0);
