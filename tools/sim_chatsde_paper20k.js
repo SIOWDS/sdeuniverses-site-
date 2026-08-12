@@ -240,14 +240,25 @@ ok("抠得到 step()", stepSrc.indexOf("function step()") > 0 && stepSrc.indexOf
 /* runLeg 在真实实现里是**边流边往 text 上加**的，所以假 runLeg 也必须真的加——
    否则「回滚」这条恰恰测不到（回滚的正是那半截已经落进 text 的残稿）。
    壳里注入 __hook.append，让假 runLeg 能碰到闭包里的 text。 */
+/* step() 现在要用到三个闸函数（tailCut / secPass / betterOf），它们就在源码里
+   secBlocks 那一组旁边。壳里**抠真的那一份**进来，不写替身——替身一放宽，
+   这几条断言就成了在测替身。 */
+const _g0 = FSRC.indexOf("    function tailCut(sx) {");
+const _g1 = FSRC.indexOf("    function missingSecs(txt, secs) {");
+const gateSrc = (_g0 > 0 && _g1 > _g0) ? FSRC.slice(_g0, _g1) : "";
+ok("抠得到三道闸（tailCut/secPass/betterOf）",
+  gateSrc.indexOf("function tailCut") > 0 && gateSrc.indexOf("function secPass") > 0 && gateSrc.indexOf("function betterOf") > 0);
+
 function harness2(secs, outs) {
   const box = { notes: [], attempt: {}, done: false, appended: [] };
   const src =
-    "var text='', i=0, dStopped=false, __short=null;\n" +
+    "var text='', i=0, dStopped=false, __short=null, lastMeta=null;\n" + gateSrc + "\n" +
     /* 真实退避是 20 秒（下面单独有一条断言盯住这个数）；行为测试里把它换成 20 毫秒，
        否则四组用例要跑一分多钟。换的是等待时长，不是逻辑——逻辑仍是源码原文。 */
     stepSrc.replace(/var RETRY_WAIT = \d+;/, "var RETRY_WAIT = 20;")
-           .replace("var shortSecs = [], runFail = 0, hitWall = false;", "var shortSecs = [], runFail = 0, hitWall = false; __short = function(){ return shortSecs; };") +
+           /* ⚠ 手抄字面量是站里反复犯的病：这一行前一版就是照抄源码那一整句，
+              源码里多一个变量它就静默失配（钩子没装上、断言全红）。改成只认开头。 */
+           .replace(/var shortSecs = \[\][^;]*;/, "$& __short = function(){ return shortSecs; };") +
     "\n __hook.append = function(s){ text += s; };" +
     "\n __hook.text = function(){ return text; };" +
     "\n __hook.short = function(){ return __short(); };" +
@@ -265,9 +276,15 @@ function harness2(secs, outs) {
       box.attempt[k] = (box.attempt[k] || 0) + 1;
       const arr = outs[k] || [];
       const n = (box.attempt[k] - 1 < arr.length) ? arr[box.attempt[k] - 1] : (secs[k].words || 0);
-      hook.append("<" + (k + 1) + ":" + box.attempt[k] + ">" + "x".repeat(Math.max(0, n - 8)));
+      /* ⚠ 末尾那个句号不是装饰：这一版起「够长但断在半句」也算没写成。
+         不收口的假产出会被尾部闸整片判缺，测的就不再是长度那件事了。
+         专测尾部闸的那两组用例在 outs 里用负数表示"这一遍不收口"。 */
+      const cutIt = n < 0, m = Math.abs(n);
+      /* ⚠ 0 字就一个字都别加。新口径量的是**稿子里真多出来的那一段**（不再信 runLeg 自报的
+         out），fixture 若照旧插一个标记，"两遍都空"这一组就永远测不到。 */
+      if (m > 0) hook.append("<" + (k + 1) + ":" + box.attempt[k] + ">" + "x".repeat(Math.max(0, m - 9)) + (cutIt ? "，" : "。"));
       box.appended.push((k + 1) + ":" + box.attempt[k] + ":" + n);
-      return Promise.resolve({ out: n, plan: null, err: "" });
+      return Promise.resolve({ out: m, plan: null, err: "", meta: { idx: k + 1, out: m, fin: "stop" } });
     },
     () => { box.done = true; }, hook);
   return { hook, box };
@@ -304,7 +321,33 @@ waitDone(A.box, function () {
       const D = harness2(SECS3, {});                                  // 全部达标
       waitDone(D.box, function () {
         ok("全部达标时一遍过、不记账、不报警", D.hook.short().length === 0 && D.box.appended.length === 3 && D.box.notes.length === 0);
-        tail();
+
+        /* ═══ 四之二、2026-08-12 稳健性复查补的两道闸（真跑）═════════════
+           outs 里的**负数**＝这一遍"够长但断在半句"（fixture 用逗号收尾）。 */
+        console.log("── 够长却断在半句 ＋ 重试不许丢稿 ──");
+        const E = harness2(SECS3, { 1: [-1000, 1000] });   // 第 2 节：第一遍断句，第二遍收口
+        waitDone(E.box, function () {
+          ok("★ 够长但断在半句 ⇒ 照样重写（长度闸放它过去的那一种断稿）",
+            E.box.appended.filter((x) => x.startsWith("2:")).length === 2);
+          ok("重写收了口就收下第二遍", E.hook.text().indexOf("<2:2>") > 0 && E.hook.text().indexOf("<2:1>") < 0);
+          ok("断句这一种不记进 shortSecs（它不是上游在挡）", E.hook.short().length === 0);
+          ok("补成功了就不报账（dCut1 只在补完仍断句时才该出现）", E.box.notes.join("|").indexOf("dCut1") < 0);
+
+          const G = harness2(SECS3, { 1: [-1000, 0] });     // 第一遍断句、第二遍一个字没有
+          waitDone(G.box, function () {
+            ok("★★ 第二遍是空的 ⇒ 第一遍那一整节仍留在稿子里（重试不许把稿子弄丢）",
+              G.hook.text().indexOf("<2:1>") > 0);
+            ok("留下来的那一节仍按断句报账，不谎报写成了", G.box.notes.join("|").indexOf("dCut1") >= 0);
+
+            const H = harness2(SECS3, { 1: [300, 0] });     // 第一遍 300 字（不够）、第二遍空
+            waitDone(H.box, function () {
+              ok("★★ 两遍都不达标时留长的那一遍（旧口径这里会把 300 字一起丢掉）",
+                H.hook.text().indexOf("<2:1>") > 0);
+              ok("留了残段也照样记进 shortSecs（不许因为留着就当写成了）", H.hook.short().length === 1);
+              tail();
+            });
+          });
+        });
       });
     });
   });
@@ -325,13 +368,27 @@ function tail() {
   const mWait = stepSrc.match(/var RETRY_WAIT = (\d+);/);
   ok("第二遍是退避之后才打的（立刻重打＝把同一堵墙再撞一次）", !!mWait && +mWait[1] >= 10000);
   ok("退避真的用在第二遍上，不是摆着好看", /setTimeout\(res, RETRY_WAIT\)/.test(stepSrc));
+  console.log("── 链上兜底与尾部闸（源码级）──");
+  ok("★ 链上有 catch：某一趟自己抛了，也照样往下排（否则整台机器静默停住）",
+    /\.catch\(function \(e\)/.test(stepSrc) && /dLegErr/.test(stepSrc));
+  ok("catch 之后仍然推进（catch 排在推进那一段之前）",
+    stepSrc.indexOf(".catch(function (e)") < stepSrc.lastIndexOf("i++;"));
+  ok("排版/存稿也各自包住（它们抛了不该拖垮这一节的推进）",
+    /try \{[\s\S]{0,200}paintD\(false\);[\s\S]{0,200}saveProgress\(/.test(stepSrc));
+  ok("★ 收下一节的判据是两道闸（长度 ＋ 收口），不是只看长度", /secPass\(a1, need\)/.test(stepSrc));
+  ok("★ 两遍取好的那一遍（betterOf），不是无条件收第二遍", /betterOf\(a1, text\.slice\(before\), need\)/.test(stepSrc));
+  ok("判长短量的是稿子里真多出来的那一段，不是 runLeg 自报的数",
+    /var a1 = text\.slice\(before\);/.test(stepSrc) && stepSrc.indexOf("rr.out >= need") < 0);
+  ok("撞墙那句话带上了上游的收束理由（这就是追了一整天的那一行）", /dWallWhy/.test(stepSrc) && /lastMeta/.test(stepSrc));
   const mWall = stepSrc.match(/var WALL_RUN = (\d+);/);
   ok("连着几节全败即判撞墙（阈值从源码取：" + (mWall ? mWall[1] : "?") + "）", !!mWall && +mWall[1] >= 2 && +mWall[1] <= 4);
   ok("写够了要把连败计数清零（别把零星失败攒成假撞墙）", (stepSrc.match(/runFail = 0;/g) || []).length >= 2);
   ok("撞墙后立刻收口，不再往下打", /if \(dStopped \|\| hitWall \|\| i >= secs\.length\)/.test(stepSrc));
   ok("撞墙时明说是上游在挡、并说清还差哪几节", /dWallRun1/.test(stepSrc) && /dWallLeft1/.test(stepSrc));
 
-  const mGapAll = (stepSrc.match(/setTimeout\(step,([^;]*?)\);/) || [])[1] || "";
+  /* ⚠ 只认第一处会量到注释里那句解释（站里犯过一次的病，别再犯）：
+     全局扫，取**带数字**的那一处才是真的调用。 */
+  const mGapAll = (stepSrc.match(/setTimeout\(step, ([^;]*?\d[^;]*?)\);/g) || []).join(" ");
   const gapNums = (mGapAll.match(/\d{3,5}/g) || []).map(Number);
   ok("节间留白取得到数值", gapNums.length > 0);
   ok("最小留白 ≥1200ms（十七趟连打，700 已被两次真跑证明不够）", gapNums.length > 0 && Math.min.apply(null, gapNums) >= 1200);

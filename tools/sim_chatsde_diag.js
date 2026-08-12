@@ -50,5 +50,40 @@ ok("一个字都没有 → 仍是失败，不是未写完", /dFail/.test(label(0
 ok("dSecs 在提纲拿到分节时被赋上", /var secs = plan\.sections; dSecs = secs;/.test(F));
 ok("dSecs 有声明（否则收尾那一行会抛 ReferenceError）", /var dSecs = null;/.test(F));
 
+/* ═══ 拆趟那一条路（part）也要有同一套仪表 ═══════════════════════════
+   ⚠ 上面那一套长在**单趟**那条路上。而两万字论文全程走的是拆趟这一条：
+   于是「第 7–16 节每节只吐几十字」追了整整一天，也判不出是预算被吃光（length）、
+   上游自己收的口（stop）、还是流被掐断（空）——因为这条路一台仪表都没装。 */
+console.log("── 服务端：拆趟那一条路的仪表 ──");
+/* ⚠ 终点锚必须从起点**往后**找：`const stream = new ReadableStream({` 在文件里
+   出现不止一次，且更早的那一处在 part 这一段之前——不带起点找会切出一个空串，
+   下面二十条当场全红（这一版就是这么红过一次的）。 */
+const _p0 = W.indexOf("let pfin = \"\", pusage = null;");
+const pblk = W.slice(_p0, W.indexOf("const stream = new ReadableStream({", _p0));
+ok("抠得到 part 那一段", pblk.length > 1500);
+ok("★ 收 finish_reason（最值钱的那个字段）", /finish_reason\) pfin = j\.choices\[0\]\.finish_reason/.test(pblk));
+ok("★ 收上游自报用量", /if \(j\.usage\) pusage = j\.usage;/.test(pblk));
+ok("这一趟本来就开着 include_usage（不然接也接不到）", /withUsage/.test(W) && /include_usage/.test(W));
+const pthr = +((pblk.match(/const PART_SHORT = (\d+);/) || [])[1] || 0);
+ok("短产出门槛从源码取（" + pthr + "）", pthr > 0);
+ok("★ 写了但不够也发诊断（不再只在零字时才发）", /if \(wrote && wrote < PART_SHORT\)/.test(pblk));
+ok("零字那一支也带上同一份诊断", /if \(!wrote\) controller\.enqueue\(_sseBytes\(\{ t: "error", code: "empty"/.test(pblk) && /_diag/.test(pblk));
+[["第几节", "partIdx + 1"], ["这一节的字数目标", "want"], ["思考了多少字", "_st.think"],
+ ["上游收束理由", "pfin"], ["入 tok", "prompt_tokens"], ["出 tok", "completion_tokens"],
+ ["其中思考多少 tok", "reasoning_tokens"], ["本地时钟掐没掐", "sclk.cut"]]
+  .forEach(([n2, k]) => ok("诊断里说清了" + n2, pblk.indexOf(k) > 0));
+ok("★ 每一趟都发一帧结构化 meta（前端据此把撞墙原因说出来）", /t: "meta", v: \{/.test(pblk));
+[["idx", "idx:"], ["out", "out:"], ["fin", "fin:"], ["ptok", "ptok:"], ["ctok", "ctok:"], ["rtok", "rtok:"], ["cut", "cut:"]]
+  .forEach(([n2, k]) => ok("meta 带着 " + n2, pblk.indexOf(k) > 0));
+ok("前端接得住 meta", /j\.t === "meta"/.test(F) && /lastMeta = j\.v;/.test(F));
+ok("不在服务端重来（重来要放在能回滚残字的客户端那一侧）", /不在服务端重来/.test(W));
+ok("★ 越界的 idx 当场报错，不静默兜成一个无题空节", /code: "badidx"/.test(W));
+
+console.log("── 前端：看门狗够得着还没返回响应的那一趟 ──");
+ok("★ 每趟带 AbortController", /new AbortController\(\)/.test(F) && /signal: ac \? ac\.signal : undefined/.test(F));
+ok("★ 看门狗掐的是 controller，不只是 reader", /if \(dAC\) dAC\.abort\(\)/.test(F));
+ok("dTimedOut 每趟复位（一趟被掐不该污染此后每一节的死因）", /dTimedOut = false;\s+\/\/ 每趟各判各的死因/.test(F));
+ok("整篇被掐过与否另记一位（收尾那句话仍说得出）", /dCutAny = true;/.test(F) && /if \(dCutAny\) dNote\(t\("dCut"\), 1\);/.test(F));
+
 console.log("\n" + (fail ? "✗ " : "✓ ") + pass + " passed, " + fail + " failed");
 process.exit(fail ? 1 : 0);

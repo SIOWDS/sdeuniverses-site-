@@ -585,7 +585,11 @@
     dPlanGot: "提纲已定：分 ", dPlanGot2: " 节写 —— ",
     dPart: "正在写第 ",
     dPartLost: "第 ", dPartLost2: " 节两次都没写出来，先跳过接着往下写（回头可以点「重答」重来）。",
-    dShort1: "\u26a0 第 ", dShort2: " 节两遍都没写够字数，稿子在这几处是短的——把这一稿贴回对话里说「重写第 N 节」即可只补这几节。",
+    dShort1: "\u26a0 第 ", dShort2: " 节两遍都没写够字数，稿子在这几处是短的——点上面的「\u21bb 继续写缺的几节」就只补这几节，已经写好的不动。",
+    dCut1: "\u26a0 第 ", dCut2: " 节字数是够的，但**断在半句上**（末尾没有句号）——多半是这一趟被顶穿了。点「\u21bb 继续写缺的几节」可以只重写这几节；重写不会比现在更差（比现在短就仍旧留着现在这一份）。",
+    dTailRetry: "第 ", dTailRetry2: " 节字数够了却断在半句上（多半是这一趟被顶穿了），等 20 秒重写一遍；写出来的若不如现在这一份，就仍旧留着现在这一份。",
+    dWallWhy: "（上游给最后那一趟的收束理由：", dWallNoFin: "没给（多半是流被掐断）",
+    dLegErr: "第 ", dLegErr2: " 节这一趟自己出岔子了，已跳过接着往下走（原因：",
     dAutoSaved: "已自动存进「成文记录」——就算这里显示出问题，稿子也在（成文菜单 → ↺ 成文记录）。",
     dCloseBusy: "正在写作中，点空白处不会关掉它（免得误点丢稿）。要关就按 Esc、或点右上角的 ✕ —— 两条路都会先把已写的部分存进「成文记录」。",
     dAutoFail: "自动存稿没成（浏览器存储不可用）：请先「⌸ 存到本机」或「⤓ 存为 .md」再关掉这个面板。",
@@ -5633,6 +5637,13 @@
     var out = wrap.querySelector(".wdsm-a"), stat = wrap.querySelector(".dst");
     var cbox = wrap.querySelector(".wdsm-dist-c");
     var text = "", dr = null, lastP = 0, dnote = null, dWd = null, dTimedOut = false;
+    /* dAC：当前这一趟的 AbortController。看门狗原来只会 `dr.cancel()`，而 dr 要等
+       **响应回来**才存在——响应回来之前卡住（连不上、握手不完、笔记本合盖醒来），
+       看门狗一响，能掐的东西一个都没有：fetch 一直挂着，runLeg 的 Promise 永不 settle，
+       step() 就停在那一节上，不报错、不收尾、不存稿。有了它才掐得动。
+       dCutAny：这一整篇里有没有哪一趟被掐过（dTimedOut 现在每趟复位——否则一趟被掐，
+       此后每一节的死因都被写成"被掐断"，读数就废了）。 */
+    var dAC = null, dCutAny = false, lastMeta = null;
     var dSecs = null;          // 提纲拿到的分节表：收尾判「写够没有」要拿它当分母
     var dPlanObj = null;       // 提纲那一趟的全部产物：续写时要原样回传给 part 阶段
     // sawDone：有没有收到 worker 的收尾信号 [DONE]。空产出时这一位决定死因说得对不对——
@@ -5652,7 +5663,11 @@
     // 两头都不设时限时，流被无声掐断就只剩一个永远转着的光标。
     function dBump() {
       clearTimeout(dWd);
-      dWd = setTimeout(function () { dTimedOut = true; try { if (dr) dr.cancel(); } catch (e) {} }, 45000);
+      dWd = setTimeout(function () {
+        dTimedOut = true; dCutAny = true;
+        try { if (dAC) dAC.abort(); } catch (e) {}     // ← 响应还没回来时，只有它掐得动
+        try { if (dr) dr.cancel(); } catch (e) {}
+      }, 45000);
     }
     var svBtn = wrap.querySelector(".dsv"), cpBtn = wrap.querySelector(".dcp"), dlBtn = wrap.querySelector(".ddl"), dirBtn = wrap.querySelector(".ddir");
     var goOnBtn = null;        // 续写钮：确实有缺节时才亮（见收尾那一处）
@@ -5710,38 +5725,68 @@
         var miss = missingSecs(text, secs);
         if (!miss.length) { dNote(t("mGoOnDone")); goOn.style.display = "none"; return; }
         goOn.disabled = true; dStopped = false;
-        var k = 0, fixedN = 0, stillShort = [];
+        var k = 0, fixedN = 0, stillShort = [], gFail = 0, gWall = false;
+        /* 续写这条路原来是"打一趟、收下、下一节"：没有重试、没有退避、撞墙照打到底，
+           而且**不管新的那一块是不是更差都照换**——墙一起来，按一下就能把一份好稿子
+           改成一堆空节。所以这里与主循环用同一套闸：重试一次（退避）、两遍取好的那一遍、
+           连着两节全败就停。 */
         (function nextOne() {
-          if (dStopped || k >= miss.length) {
+          if (dStopped || gWall || k >= miss.length) {
             goOn.disabled = false;
             dNote(t("mGoOnEnd1") + fixedN + t("mGoOnEnd2")
               + (stillShort.length ? (t("mGoOnEnd3") + stillShort.join("、")) : ""), stillShort.length ? 1 : 0);
-            saveProgress("续写完 " + fixedN + " 节");
-            paintD(true);
+            if (gWall) dNote(t("dWallRun1") + (miss[k] ? (miss[k].i + 1) : secs.length) + t("dWallRun2"), 1);
+            try { saveProgress("续写完 " + fixedN + " 节"); paintD(true); } catch (e) {}
             if (!missingSecs(text, secs).length) goOn.style.display = "none";
             return;
           }
           var b = miss[k], i = b.i;
           stat.textContent = t("mGoOnAt") + (i + 1) + "/" + secs.length + " · " + String(secs[i].h || "");
           /* ⚠ 补出来的内容要**插回原位**，不能追加在末尾——按节号成文，位置本身就是信息。
-             先记下这一节原来那一块的起止，写完再把新块换进去。 */
-          var blk = secBlocks(text, secs)[i];
-          var head = blk.from >= 0 ? text.slice(0, blk.from) : text;
-          var tail = blk.from >= 0 ? text.slice(blk.to) : "";
-          var before = text.length;
-          var got = "";
-          var sink = { push: function (s) { got += s; } };
-          runLeg({ stage: "part", idx: i, plan: plan, prevTail: head.slice(-1200), _sink: sink })
-            .then(function (rr) {
-              var w = parseInt(secs[i].words, 10) || 1200;
-              var need = Math.max(260, Math.round(w * 0.4));
-              /* runLeg 是边流边往 text 上加的：这一趟加出来的那一段就是 text 尾部多出来的部分。 */
-              var add = text.slice(before);
-              text = head + (add.replace(/^\s+/, "") ? (add.replace(/^\s+/, "") + "\n\n") : "") + tail;
-              if ((rr.out || 0) >= need) fixedN++; else stillShort.push(i + 1);
-              paintD(false); k++;
-              setTimeout(nextOne, 2200);
+             ⚠⚠ 整节没写的（from < 0）原来一律追加到全稿最后：可真跑里第三节整节没写、
+             后面十三节都在——那样补出来的第三节会排在第十六节后面。所以从缺口往后找
+             第一个**在稿子里找得到的**节，插到它前面去。 */
+          var blocks = secBlocks(text, secs), blk = blocks[i], head, tail, q;
+          if (blk.from >= 0) { head = text.slice(0, blk.from); tail = text.slice(blk.to); }
+          else {
+            var at = text.length;
+            for (q = i + 1; q < blocks.length; q++) { if (blocks[q].from >= 0) { at = blocks[q].from; break; } }
+            head = text.slice(0, at); tail = text.slice(at);
+          }
+          var old = blk.from >= 0 ? text.slice(blk.from, blk.to) : "";
+          var need = b.need || Math.max(260, Math.round((parseInt(secs[i].words, 10) || 1200) * 0.4));
+          function put(add) {
+            var A = String(add || "").replace(/^\s+/, "").replace(/\s+$/, "");
+            /* 【补出来的必须比原来那块好，才准换上去】不然墙一起来，
+               续写就成了删稿的按钮。原样留着永远比换上一段更短的强。 */
+            var keep = betterOf(old.replace(/\s+$/, ""), A, need);
+            text = head + (keep ? (keep + "\n\n") : "") + tail;
+            return keep;
+          }
+          function once() {
+            var before = text.length;
+            return runLeg({ stage: "part", idx: i, plan: plan, prevTail: head.slice(-1200) })
+              .then(function () { var add = text.slice(before); text = text.slice(0, before); return add; });
+          }
+          once().then(function (a1) {
+            if (dStopped || secPass(a1.replace(/^\s+/, "").replace(/\s+$/, ""), need)) return a1;
+            dNote((a1.length >= need ? (t("dTailRetry") + (i + 1) + t("dTailRetry2")) : (t("dPartRetry") + (i + 1) + t("dPartRetry2"))));
+            return new Promise(function (r) { setTimeout(r, 20000); }).then(function () {
+              if (dStopped) return a1;
+              return once().then(function (a2) { return betterOf(a1, a2, need); });
             });
+          }).catch(function (e) {
+            try { dNote(t("dLegErr") + (i + 1) + t("dLegErr2") + ((e && e.message) || "未知") + "）", 1); } catch (e2) {}
+            return "";
+          }).then(function (best) {
+            var keep = put(best);
+            if (secPass(keep, need) && keep !== old.replace(/\s+$/, "")) { fixedN++; gFail = 0; }
+            else if (secPass(keep, need)) { gFail = 0; }
+            else { stillShort.push(i + 1); if (++gFail >= 2) gWall = true; }
+            try { paintD(false); saveProgress("续写到第 " + (i + 1) + " 节"); } catch (e) {}
+            k++;
+            setTimeout(nextOne, 2200);
+          });
         })();
       };
       var pdfB = el("button", "wdsm-tbtn dpdfx", t("mPdfx"));
@@ -5844,7 +5889,7 @@
       var _floor = _want ? Math.round(_want * 0.6) : 400;
       stat.textContent = !text ? t("dFail")
         : (text.length < _floor ? (t("dPartial") + text.length + (_want ? ("/" + _want) : "")) : (t("dDone") + text.length));
-      if (dTimedOut) dNote(t("dCut"), 1);
+      if (dCutAny) dNote(t("dCut"), 1);
       /* ③ 【重活让出主线程】autoLink 要再走一遍整篇、deckPrep 要取配图。
          它们和上面那次整篇排版挤在同一个任务里，一万字的稿子能把主线程占住好几秒——
          那几秒浏览器一帧都画不出来，看上去就是白屏。正文先上屏，这些挪到下一个任务去做。 */
@@ -5924,13 +5969,21 @@
        就别再赌一口气——把"接着写"做成一颗按钮，扫描已有稿、只重跑缺的那几节、插回原位。
        ⚠ 不需要为此改存储：固定骨架档的分节表本来就在骨架里，而"哪几节没写够"完全可以
        **从稿子本身量出来**——按 `## 小标题` 切块，块长不到本节目标的四成就算没写够。 */
+    /* ⚠ 标题只认**行首**。原来最后一步是裸 `txt.indexOf(h)`：而「引言」「结论」这类词
+       多半也出现在别节的正文里，命中的那一处会把切口落在别人段落中间——续写时
+       head/tail 一拼，好好的几百字就被换掉了。切稿的锚点错一个字符就是删稿。 */
+    function headAt(txt, h) {
+      if (!h) return -1;
+      var pre = ["\n## ", "\n### ", "\n# ", "\n"], i, k;
+      for (i = 0; i < pre.length; i++) {
+        if (txt.indexOf(pre[i].slice(1) + h) === 0) return 0;   // 稿子第一行就是它
+        k = txt.indexOf(pre[i] + h);
+        if (k >= 0) return k + 1;
+      }
+      return -1;
+    }
     function secBlocks(txt, secs) {
-      var pos = secs.map(function (s) {
-        var h = String((s && s.h) || "");
-        var k = h ? txt.indexOf("## " + h) : -1;
-        if (k < 0 && h) k = txt.indexOf(h);          // 小标题被基底改过字：退一步只认标题本身
-        return k;
-      });
+      var pos = secs.map(function (s) { return headAt(txt, String((s && s.h) || "")); });
       return secs.map(function (s, i) {
         if (pos[i] < 0) return { i: i, from: -1, to: -1, len: 0 };
         var to = txt.length;
@@ -5938,11 +5991,39 @@
         return { i: i, from: pos[i], to: to, len: to - pos[i] };
       });
     }
+    /* 【够长 ≠ 写完了】真跑读数：盘点表那一节写了 ~3400 字（门槛只有 720），
+       却断在 Kuhn 那条「才被」上——长度闸放它过去，读者拿到的是一份看起来完整的断稿。
+       末字是字、或停在逗号顿号冒号破折号上，就是没写完。
+       ⚠ 这道闸敢开，是因为下面 betterOf 兜着：判错了最多多打一趟，绝不会把稿子弄短。 */
+    function tailCut(sx) {
+      var x = String(sx || "").replace(/[\s>*_`~\u3000]+$/g, "");
+      if (!x) return false;                                   // 空的归长度闸管，这里不重复判
+      var c = x.charAt(x.length - 1);
+      if ("\uff0c\u3001\uff1b\uff1a,;:\u2014\u2500-".indexOf(c) >= 0) return true;
+      return /[0-9A-Za-z\u4e00-\u9fff\u3400-\u4dbf]/.test(c);
+    }
+    function secPass(sx, need) { return sx.length >= need && !tailCut(sx); }
+    /* 【重试不许把稿子弄丢】原来是"回滚 → 重写 → 收下第二遍"：第一遍写了 250 字、
+       第二遍写了 0 字，结果这一节**一个字都不剩**。关窗口不该是丢稿的方式，
+       重试也不该是。两遍取好的那一遍：先看谁两道闸都过，再看谁够长，最后看谁长。 */
+    function betterOf(a, b, need) {
+      var pa = secPass(a, need), pb = secPass(b, need);
+      if (pa !== pb) return pa ? a : b;
+      var la = a.length >= need, lb = b.length >= need;
+      if (la !== lb) return la ? a : b;
+      return b.length > a.length ? b : a;
+    }
+    /* 「缺的那几节」= 没写够的 ＋ 断在半句的。后者稿子看着是满的，尾巴却缺一截，
+       正是最容易被当成写完了收下的那一种。带上 why，续写时才说得清在补什么。 */
     function missingSecs(txt, secs) {
-      return secBlocks(txt, secs).filter(function (b) {
+      return secBlocks(txt, secs).map(function (b) {
         var w = parseInt(secs[b.i].words, 10) || 1200;
-        return b.len < Math.max(260, Math.round(w * 0.4));
-      });
+        var need = Math.max(260, Math.round(w * 0.4));
+        b.need = need;
+        b.body = b.from >= 0 ? txt.slice(b.from, b.to) : "";
+        b.why = b.len < need ? "short" : (tailCut(b.body) ? "cut" : "");
+        return b;
+      }).filter(function (b) { return b.why; });
     }
 
     /* ══ 关掉这个面板：四条出口，一条都不依赖顶栏画得出来 ══════════════════
@@ -6156,12 +6237,17 @@
        正文一律直接累加进 text——拆趟对读者应当是不可见的，他看到的就是一篇在长出来。 */
     function runLeg(extra) {
       return new Promise(function (resolve) {
-        var res = { out: 0, plan: null, err: "" };
+        var res = { out: 0, plan: null, err: "", meta: null };
         var body = {}, k;
         for (k in BASEP) body[k] = BASEP[k];
         for (k in (extra || {})) body[k] = extra[k];
+        dTimedOut = false;                    // 每趟各判各的死因（dCutAny 记着"这一篇里掐过"）
+        var ac = null;
+        try { ac = (typeof AbortController === "function") ? new AbortController() : null; } catch (e) {}
+        dAC = ac;
         dBump();
-        fetch(API_DISTILL, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) })
+        fetch(API_DISTILL, { method: "POST", headers: { "content-type": "application/json" },
+                             body: JSON.stringify(body), signal: ac ? ac.signal : undefined })
           .then(function (resp) {
             if (!resp.ok || !resp.body) throw new Error("HTTP " + resp.status);
             var reader = resp.body.getReader(); dr = reader;
@@ -6182,6 +6268,9 @@
                   var j; try { j = JSON.parse(p); } catch (e) { continue; }
                   if (j.t === "token") { text += j.v; res.out += j.v.length; if (Date.now() - lastP > paintGap) { lastP = Date.now(); paintD(false); } }
                   else if (j.t === "plan") { res.plan = j.v; }
+                  /* meta：服务端每一趟的读数（收束理由／用量／思考字数）。撞墙那句话
+                     终于说得出凭什么这么判——追了一整天没拿到的就是这一行。 */
+                  else if (j.t === "meta") { res.meta = j.v; lastMeta = j.v; }
                   else if (j.t === "beat") { if (j.v && j.v.sec) lastSec = j.v.sec; if (!text && j.v) stat.textContent = t("thinking") + " " + (j.v.sec || 0) + "s · " + (j.v.think || 0) + (j.v.stage ? " · " + j.v.stage : ""); }
                   else if (j.t === "note") { dNote(j.v); }
                   else if (j.t === "error") { res.err = j.v; dNote(j.v, 1); if (j.code === "need_key" || j.code === "bad_key") setTimeout(function () { wdsKeyPanel(function () {}); }, 400); }
@@ -6283,12 +6372,17 @@
          所以两件事：第二遍**退避**再打；**连着两节全败就停**，别再白磨二十分钟。 */
       var RETRY_WAIT = 20000;     // 第二遍等多久再打：立刻重打等于把同一堵墙再撞一次
       var WALL_RUN = 2;           // 连着几节两遍全败就判定撞墙、停下来
-      var shortSecs = [], runFail = 0, hitWall = false;
+      var shortSecs = [], cutSecs = [], runFail = 0, hitWall = false;
       function step() {
         if (dStopped || hitWall || i >= secs.length) {
           if (shortSecs.length) dNote(t("dShort1") + shortSecs.join("、") + t("dShort2"), 1);
+          /* 断在半句的与"没写够字数的"分开报：前者稿子是有的，只是尾巴缺一截；
+             后者是这一节根本没写成。混在一起说，读者判不出该补哪些。 */
+          if (cutSecs.length) dNote(t("dCut1") + cutSecs.join("、") + t("dCut2"), 1);
           if (hitWall && i + 1 < secs.length) {
-            dNote(t("dWallLeft1") + (i + 2) + "–" + secs.length + t("dWallLeft2"), 1);
+            dNote(t("dWallLeft1") + (i + 2) + "–" + secs.length + t("dWallLeft2")
+              + (lastMeta ? (t("dWallWhy") + (lastMeta.fin || t("dWallNoFin"))
+                  + "；这一趟只吐了 " + (lastMeta.out || 0) + " 字）") : ""), 1);
           }
           /* 撞墙／写完都在这里亮续写钮——它是这台机器面对上游墙的唯一正解：
              不赌一口气十六节，而是分几趟把缺的补齐。 */
@@ -6300,16 +6394,24 @@
         var before = text.length, tail0 = text.slice(-1200);
         var need = Math.max(260, Math.round((parseInt(secs[i].words, 10) || 1200) * 0.4));
         runLeg({ stage: "part", idx: i, plan: plan, prevTail: tail0 })
-          .then(function (rr) {
-            if (dStopped || rr.out >= need) { runFail = 0; return; }   // 写够了：连败计数清零
+          .then(function () {
+            var a1 = text.slice(before);
+            if (dStopped || secPass(a1, need)) { runFail = 0; return; }   // 写够且没断在半句：清零
             text = text.slice(0, before);                       // 回滚残稿，退避一会儿再来一遍
-            dNote(t("dPartRetry") + (i + 1) + t("dPartRetry2"));
+            dNote((a1.length >= need ? (t("dTailRetry") + (i + 1) + t("dTailRetry2")) : (t("dPartRetry") + (i + 1) + t("dPartRetry2"))));
             return new Promise(function (res) { setTimeout(res, RETRY_WAIT); }).then(function () {
-              if (dStopped) return;
+              if (dStopped) { text = text.slice(0, before) + a1; return; }
               return runLeg({ stage: "part", idx: i, plan: plan, prevTail: tail0 })
-                .then(function (r2) {
-                  if (r2.out >= need) { runFail = 0; return; }
-                  if (r2.out === 0) { text = text.slice(0, before); dNote(t("dPartLost") + (i + 1) + t("dPartLost2"), 1); }
+                .then(function () {
+                  /* 两遍取好的那一遍——第二遍更差（甚至一个字没有）时，
+                     第一遍那半截仍旧留在稿子里。这一步是"重试不许丢稿"的落点。 */
+                  var kept = betterOf(a1, text.slice(before), need);
+                  text = text.slice(0, before) + kept;
+                  if (secPass(kept, need)) { runFail = 0; return; }
+                  if (kept.length >= need) {                     // 够长但断在半句：不算撞墙
+                    cutSecs.push(i + 1); runFail = 0; return;
+                  }
+                  if (!kept.length) dNote(t("dPartLost") + (i + 1) + t("dPartLost2"), 1);
                   shortSecs.push(i + 1);                         // 两遍都短：记账，收尾时说清是哪几节
                   /* 连着两节都是两遍全败 ⇒ 上游在挡，不是这一节难写。就地停：
                      再往下磨只会把剩下每一节都白打两遍（这一份真跑正是这么烧掉二十次调用的）。 */
@@ -6320,10 +6422,20 @@
                 });
             });
           })
+          /* 【链上任何一处抛错 = 整台机器静默停住】runLeg 自己是不会 reject 的，
+             但这条链上还有 paintD／saveProgress／dNote——它们一旦抛，后面那个
+             下面那个排下一节的定时器就永远不会被排上，界面停在"正在写第 N 节"，
+             不报错、不收尾、连稿子都不再存。所以补一道 catch：出了什么事说一句，
+             然后**照样往下走**。 */
+          .catch(function (e) {
+            try { dNote(t("dLegErr") + (i + 1) + t("dLegErr2") + ((e && e.message) || "未知") + "）", 1); } catch (e2) {}
+          })
           .then(function () {
-            if (text.length > before && text.slice(-2) !== "\n\n") text += "\n\n";
-            paintD(false);
-            saveProgress("写到第 " + (i + 1) + "/" + secs.length + " 节");
+            try {
+              if (text.length > before && text.slice(-2) !== "\n\n") text += "\n\n";
+              paintD(false);
+              saveProgress("写到第 " + (i + 1) + "/" + secs.length + " 节");
+            } catch (e) {}
             i++;
             /* 让出主线程，并给上游的每分钟限流留一点空。十七趟连着打，最容易在后几趟
                撞上限流——而限流的样子恰恰就是"这一节只吐了几十个字"。

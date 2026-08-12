@@ -7778,6 +7778,11 @@ export default {
         const prevTail = String(b.prevTail || "").slice(0, 2000);   // 上一节的结尾，只作接缝用
         const secs = (planIn && Array.isArray(planIn.sections)) ? planIn.sections : [];
         if (dStage === "part" && !secs.length) return _sseResp([{ t: "error", v: "这一节没有提纲可依（提纲这一趟没成）。" }]);
+        /* 【越界的 idx 要当场说出来】原来 `secs[partIdx] || {}` 把越界悄悄兜成一个空对象：
+           标题空、ask 空、字数按 1200 走，于是产出一节**没有题目的正文**接在稿子后面，
+           而调用方以为这一节写成了。缺件必须报，不许兜。 */
+        if (dStage === "part" && partIdx >= secs.length) return _sseResp([{ t: "error", code: "badidx",
+          v: "要写的是第 " + (partIdx + 1) + " 节，而这份提纲只有 " + secs.length + " 节。" }]);
 
         const cstream = new ReadableStream({
           async start(controller) {
@@ -7963,6 +7968,13 @@ export default {
                  `max_tokens` 是上限不是目标：给到 64000 并不会让它多写（提示语要的仍是那几千汉字），
                  但它把「写到一半被顶穿」这一类断稿整个消掉。阶梯照 wdsLadder 顶配支的形状，
                  上游若嫌大会返回 400 并被自动降档（见 wdsFetchMax 里那段 max_tokens 匹配）。 */
+              /* 【这一趟此前一台仪表都没有】——而两万字论文全程走的正是这条路。
+                 单趟那条路早就在收 finish_reason 与 usage 了，这条路却只数了字数：
+                 于是真跑里「第 7–16 节每节只吐几十字」追了整整一天也判不出是**预算被吃光**
+                 （length）、**上游自己收的口**（stop）、还是**流被掐断**（空）。
+                 wdsFetchMax 这一趟本来就带着 withUsage=true，上游的用量帧一直在发，
+                 只是没人接。现在接住，并随 meta 帧交给前端。 */
+              let pfin = "", pusage = null;
               const stok = WDS_TOK_MAX;
               /* 时钟随之放宽：顶配预算下单趟可能写得久一些，别让它刚要收尾就被自己的表掐掉——
                  那会把「预算顶穿」换成「时钟顶穿」，断稿的样子一模一样。 */
@@ -7997,6 +8009,8 @@ export default {
                     const pl = ln.slice(5).trim(); if (pl === "[DONE]") continue;
                     let j; try { j = JSON.parse(pl); } catch (e) { continue; }
                     if (j.error) { controller.enqueue(_sseBytes({ t: "error", v: j.error.message || "基底流内错误" })); continue; }
+                    if (j.usage) pusage = j.usage;                                  // 上游自报用量（include_usage 一直开着）
+                    if (j.choices && j.choices[0] && j.choices[0].finish_reason) pfin = j.choices[0].finish_reason;
                     const d = (j.choices && j.choices[0] && j.choices[0].delta) || {};
                     if (d.reasoning_content) { _st.think += d.reasoning_content.length; }
                     if (d.content) { sclk.firstFrame(); _st.out += d.content.length; wrote += d.content.length; controller.enqueue(_sseBytes({ t: "token", v: d.content })); }
@@ -8008,8 +8022,31 @@ export default {
                 else controller.enqueue(_sseBytes({ t: "error", v: why }));
               }
               sclk.stop();
+              /* 【每一趟都留一份读数】meta 是给前端记账用的结构化帧（前端不认的 t 一律忽略，
+                 老版界面不受影响）。撞墙时那句「上游在挡」终于能说出**凭什么这么判**。 */
+              const _rtok = (pusage && pusage.completion_tokens_details
+                && pusage.completion_tokens_details.reasoning_tokens) || 0;
+              controller.enqueue(_sseBytes({ t: "meta", v: {
+                idx: partIdx + 1, out: wrote, think: _st.think, want: want, fin: pfin,
+                ptok: (pusage && pusage.prompt_tokens) || 0,
+                ctok: (pusage && pusage.completion_tokens) || 0,
+                rtok: _rtok, cut: sclk.cut || "", secs: secs.length } }));
+              /* 【产出很少也是失败，也要有仪表】与单趟那条路同一口径（那边 2026-08-12 就补上了，
+                 这条路漏了）。finish_reason 是这里最值钱的字段：
+                   length ⇒ 预算被吃光｜stop ⇒ 上游自己收的口｜空 ⇒ 流被掐断。
+                 ⚠ 不在服务端重来——重来要放在能回滚残字的客户端那一侧。 */
+              const PART_SHORT = 400;
+              const _diag = "要了 " + stok + " 的输出预算、写第 " + (partIdx + 1) + " 节（目标 " + want + " 字）；"
+                + "思考 " + _st.think + " 字"
+                + (pusage ? ("；上游自报：入 " + (pusage.prompt_tokens || "?") + " tok、出 "
+                    + (pusage.completion_tokens || "?") + " tok"
+                    + (_rtok ? ("（其中思考 " + _rtok + "）") : "")) : "")
+                + (pfin ? ("；上游给的收束理由：" + pfin) : "；上游没给收束理由（多半是流被掐断）")
+                + (sclk.cut ? ("；本地时钟：" + sclk.cut + "闸已掐") : "") + "。";
+              if (wrote && wrote < PART_SHORT) controller.enqueue(_sseBytes({ t: "note",
+                v: "⚠ 第 " + (partIdx + 1) + " 节只写出 " + wrote + " 字就停了。" + _diag }));
               if (!wrote) controller.enqueue(_sseBytes({ t: "error", code: "empty",
-                v: "第 " + (partIdx + 1) + " 节没写出正文（思考 " + _st.think + " 字）。" }));
+                v: "第 " + (partIdx + 1) + " 节没写出正文。" + _diag }));
             } catch (e) {
               controller.enqueue(_sseBytes({ t: "error", v: "成文出错：" + (e && e.message) }));
             }
