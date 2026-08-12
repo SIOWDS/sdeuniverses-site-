@@ -8084,6 +8084,27 @@ export default {
               else controller.enqueue(_sseBytes({ t: "error", v: why + "（可再试一次）" }));
             }
             clk.stop();
+            /* ── 【产出很少 ＝ 也是失败，也要有仪表】────────────────────────────
+               下面那套自报（finish_reason ／ 上游用量 ／ 思考了多少字）原来只在 `!wrote`
+               时才发。可真跑里更常见的不是零字，是**几十个字断在半句上**——那时 wrote>0，
+               整段诊断被跳过，前端只好照字面写「完成 · 54」，我方也查不出到底哪儿断的。
+               这里补一条：写了但远远不够，就把同一套自报发出去（**不在服务端重来**——
+               客户端那道 FLOOR 闸会回滚残字再重写一遍，重来放在能回滚的那一侧才干净）。
+               finish_reason 是这里最值钱的一个字段：
+                 length ⇒ 预算被吃光（多半是思考）｜stop ⇒ 上游自己收的口｜空 ⇒ 流被掐断。 */
+            const SHORT_OUT = 400;
+            if (wrote && wrote < SHORT_OUT) {
+              const u3 = usage ? ("；上游自报：入 " + (usage.prompt_tokens || "?") + " tok、出 "
+                + (usage.completion_tokens || "?") + " tok"
+                + (usage.completion_tokens_details && usage.completion_tokens_details.reasoning_tokens
+                  ? ("（其中思考 " + usage.completion_tokens_details.reasoning_tokens + "）") : "")) : "";
+              controller.enqueue(_sseBytes({ t: "note", v:
+                "⚠ 这一趟只写出 " + wrote + " 字就停了（要的是 " + SPEC.name + "）。"
+                + "要了 " + tokWant + " 的输出预算〔本档上限 " + SPEC.tok + "〕，思考 " + _st.think + " 字；"
+                + "入参 system " + sys.length + " 字 ＋ 对话 " + convo.length + " 字"
+                + (finish ? ("；上游给的收束理由：" + finish) : "；上游没给收束理由（多半是流被掐断）")
+                + u3 + "。" }));
+            }
             // ── 空产出兜底：满功率档会把 max_tokens 花在思考上，正文一个字都没出来。
             //    原来只回一句"没有产出内容"，读者不知道发生了什么、我方也查不出。
             //    现在：说清怎么空的，并**自动降档重试一次**（关掉思考、预算减半），只重试一次。

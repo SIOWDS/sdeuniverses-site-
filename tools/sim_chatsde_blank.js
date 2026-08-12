@@ -131,10 +131,16 @@ console.log("── 收尾分帧与早退 ──");
    于是别处的 setTimeout(..., 0) 被算进"收尾的延时"，这条就红了。
    改锚到 done() 之后紧跟的那段注释（它属于 done 这一块，不会被别的改动带走）。 */
 const _d0 = FSRC.indexOf("    function done() {\n      clearTimeout(dWd);");
-const _d1 = FSRC.indexOf("    /* ══ 关掉这个面板", _d0);
+/* ⚠ 终点锚第二次被改动带走了（上一轮锚 .dx onclick，这一轮锚那段注释，注释又被挪过）。
+   改用**不会被下一次改动带走**的东西：done() 之后紧跟的下一个顶层 function 声明。 */
+const _d1 = FSRC.indexOf("\n    function ", _d0 + 40);
 const doneSrc = FSRC.slice(_d0, _d1 > _d0 ? _d1 : _d0 + 9000);
 ok("抠得到 done()", doneSrc.length > 800);
-const gaps = (doneSrc.match(/\}, (\d+)\);/g) || []).map((x) => +x.match(/(\d+)/)[1]);
+/* ⚠ 别用裸的 /\}, (\d+)\);/ 去捞延时——它会把 `.reduce(function(a,s){…}, 0)` 的**初值 0**
+   当成一个 0 毫秒的 setTimeout（本文件真被这条误报红过一次）。
+   只认「换行 ＋ 六个空格 ＋ }, N);」这一种收尾形态，那是这两块 setTimeout 独有的。 */
+const gaps = (doneSrc.match(/setTimeout\(function[\s\S]*?\n      \}, (\d+)\);/g) || [])
+  .map((x) => +x.match(/\n      \}, (\d+)\);$/)[1]);
 ok("收尾的延时都不是 0（两个 0ms 任务会紧挨着排，浏览器插不进一帧）", gaps.length >= 2 && gaps.every((g) => g > 0));
 ok("两段重活的延时不相同、且递增（先上屏，再锦上添花）", gaps.length >= 2 && gaps[1] > gaps[0]);
 ok("稿子仍然先落地再谈显示（distSave 排在 paintD 之前）",

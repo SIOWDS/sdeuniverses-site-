@@ -574,9 +574,13 @@
     dLastAlive: "——心跳一直是准的，说明当时并没有卡死，那就不是排版的锅，我得换个方向查。",
     dPlanning: "正在拟题与提纲…", dPlanFallback: "提纲两趟都没成，改成一趟写完（会短一些）。", 
     dPlanRetry: "提纲这一趟没吐出可用的分节，隔一会儿再试一次。",
+    dPartial: "\u26a0 未写完 · ",
+    dPartRetry: "第 ", dPartRetry2: " 节写得太少，等 20 秒避开上游的拥堵再写一遍…",
+    dWallRun1: "\u26a0 到第 ", dWallRun2: " 节为止，已经连着两节、每节两遍都写不出来了——这是上游在挡，不是这几节难写。就地停住，不再往下白打（再磨下去每一节都会照样失败两遍）。已写的部分全部保住。",
+    dWallLeft1: "还差第 ", dWallLeft2: " 节没写。稿子已存进「成文记录」；**隔十几二十分钟避开高峰再来一次**通常就能写下去。",
     dOneShort: "\u26a0 这一趟两遍都只写出很少的字（多半是上游把流掐断了）。稿子已存进「成文记录」；隔一两分钟按「重答」再来一次通常就好。",
     dPlanGot: "提纲已定：分 ", dPlanGot2: " 节写 —— ",
-    dPart: "正在写第 ", dPartRetry: "第 ", dPartRetry2: " 节没出正文，重写一次…",
+    dPart: "正在写第 ",
     dPartLost: "第 ", dPartLost2: " 节两次都没写出来，先跳过接着往下写（回头可以点「重答」重来）。",
     dShort1: "\u26a0 第 ", dShort2: " 节两遍都没写够字数，稿子在这几处是短的——把这一稿贴回对话里说「重写第 N 节」即可只补这几节。",
     dAutoSaved: "已自动存进「成文记录」——就算这里显示出问题，稿子也在（成文菜单 → ↺ 成文记录）。",
@@ -5626,6 +5630,7 @@
     var out = wrap.querySelector(".wdsm-a"), stat = wrap.querySelector(".dst");
     var cbox = wrap.querySelector(".wdsm-dist-c");
     var text = "", dr = null, lastP = 0, dnote = null, dWd = null, dTimedOut = false;
+    var dSecs = null;          // 提纲拿到的分节表：收尾判「写够没有」要拿它当分母
     // sawDone：有没有收到 worker 的收尾信号 [DONE]。空产出时这一位决定死因说得对不对——
     // 收到了＝基底真的一个字没写；没收到＝这一趟被平台在半路掐掉（worker 自己都没来得及报诊断）。
     var sawDone = false, lastSec = 0;
@@ -5780,7 +5785,14 @@
       // 空产出必须给个下一步，且**死因要说对**：被掐断和"基底一个字没写"是两回事，
       // 给错了会把人引到错误的旋钮上（比如去调 max_tokens，而那边早已顶格）。
       if (!text) dNote(sawDone ? t("dEmptyHint") : (t("dWall1") + (lastSec || "?") + t("dWall2")), 1);
-      stat.textContent = text ? (t("dDone") + text.length) : t("dFail");
+      /* 【断稿不许写成"完成"】原来只要 text 非空就是「完成 · N」——于是 54 个字断在半句上的稿子，
+         状态栏一样写着"完成"。读者据此以为写完了，我方也据此以为这一趟没事。
+         目标字数取得到就按目标的六成判，取不到就用一个下限。差得远就明写「未写完」。 */
+      var _want = 0;
+      try { _want = (dSecs || []).reduce(function (a, s) { return a + (parseInt(s && s.words, 10) || 0); }, 0); } catch (e) {}
+      var _floor = _want ? Math.round(_want * 0.6) : 400;
+      stat.textContent = !text ? t("dFail")
+        : (text.length < _floor ? (t("dPartial") + text.length + (_want ? ("/" + _want) : "")) : (t("dDone") + text.length));
       if (dTimedOut) dNote(t("dCut"), 1);
       /* ③ 【重活让出主线程】autoLink 要再走一遍整篇、deckPrep 要取配图。
          它们和上面那次整篇排版挤在同一个任务里，一万字的稿子能把主线程占住好几秒——
@@ -6176,7 +6188,7 @@
         });
         return;
       }
-      var secs = plan.sections;
+      var secs = plan.sections; dSecs = secs;
       text += "# " + String(plan.title || kindT(kind)) + "\n\n";
       if (plan.sub) text += "**" + String(plan.sub) + "**\n\n";
       paintD(false);
@@ -6188,10 +6200,19 @@
          读者拿到的就是一份**看起来完整的断稿**——标题都在、正文没了。
          现在按本节字数目标的四成设门槛。⚠ 重试前必须把已落进 text 的那半截**先回滚**：
          runLeg 是边流边往 text 上加的，不回滚，第二遍就接在第一遍的残句后面，拼出两个开头。 */
-      var shortSecs = [];
+      /* ⚠ 2026-08-12 13:23 的真跑：第 1–6 节各写满 1400–2200 字，**第 7–16 节十节、每节两遍、
+         二十次尝试全部只吐几十字就断**。十节连撞一次不成——这形状不是能力不足（那会是零星几节），
+         是上游到了那个点就不给字了。而立刻重打第二遍，撞的是同一堵墙：日志里二十次全败。
+         所以两件事：第二遍**退避**再打；**连着两节全败就停**，别再白磨二十分钟。 */
+      var RETRY_WAIT = 20000;     // 第二遍等多久再打：立刻重打等于把同一堵墙再撞一次
+      var WALL_RUN = 2;           // 连着几节两遍全败就判定撞墙、停下来
+      var shortSecs = [], runFail = 0, hitWall = false;
       function step() {
-        if (dStopped || i >= secs.length) {
+        if (dStopped || hitWall || i >= secs.length) {
           if (shortSecs.length) dNote(t("dShort1") + shortSecs.join("、") + t("dShort2"), 1);
+          if (hitWall && i + 1 < secs.length) {
+            dNote(t("dWallLeft1") + (i + 2) + "–" + secs.length + t("dWallLeft2"), 1);
+          }
           done(); return;
         }
         stat.textContent = t("dPart") + (i + 1) + "/" + secs.length + " · " + String(secs[i].h || "");
@@ -6200,15 +6221,24 @@
         var need = Math.max(260, Math.round((parseInt(secs[i].words, 10) || 1200) * 0.4));
         runLeg({ stage: "part", idx: i, plan: plan, prevTail: tail0 })
           .then(function (rr) {
-            if (dStopped || rr.out >= need) return;
-            text = text.slice(0, before);                       // 回滚残稿，再来一遍
+            if (dStopped || rr.out >= need) { runFail = 0; return; }   // 写够了：连败计数清零
+            text = text.slice(0, before);                       // 回滚残稿，退避一会儿再来一遍
             dNote(t("dPartRetry") + (i + 1) + t("dPartRetry2"));
-            return runLeg({ stage: "part", idx: i, plan: plan, prevTail: tail0 })
-              .then(function (r2) {
-                if (r2.out >= need) return;
-                if (r2.out === 0) { text = text.slice(0, before); dNote(t("dPartLost") + (i + 1) + t("dPartLost2"), 1); }
-                shortSecs.push(i + 1);                           // 两遍都短：记账，收尾时说清是哪几节
-              });
+            return new Promise(function (res) { setTimeout(res, RETRY_WAIT); }).then(function () {
+              if (dStopped) return;
+              return runLeg({ stage: "part", idx: i, plan: plan, prevTail: tail0 })
+                .then(function (r2) {
+                  if (r2.out >= need) { runFail = 0; return; }
+                  if (r2.out === 0) { text = text.slice(0, before); dNote(t("dPartLost") + (i + 1) + t("dPartLost2"), 1); }
+                  shortSecs.push(i + 1);                         // 两遍都短：记账，收尾时说清是哪几节
+                  /* 连着两节都是两遍全败 ⇒ 上游在挡，不是这一节难写。就地停：
+                     再往下磨只会把剩下每一节都白打两遍（这一份真跑正是这么烧掉二十次调用的）。 */
+                  if (++runFail >= WALL_RUN) {
+                    hitWall = true;
+                    dNote(t("dWallRun1") + (i + 1) + t("dWallRun2"), 1);
+                  }
+                });
+            });
           })
           .then(function () {
             if (text.length > before && text.slice(-2) !== "\n\n") text += "\n\n";

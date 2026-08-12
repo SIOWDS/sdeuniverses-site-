@@ -196,7 +196,12 @@ ok("模型没给的退回表里的默认标题（第 2 节）", filled.sections[
 console.log("── step() 短产出重试（真跑）──");
 /* step() 在 wds-mode.js 里不止一处（附件解析那边也有一个同名的），
    所以起点先锚 shortSecs、终点再从起点往后找——不这么做会切到另一个 step 上去。 */
-const _s0 = FSRC.indexOf("      var shortSecs = [];");
+/* 起点锚原来是 `var shortSecs = [];`——2026-08-12 加退避与撞墙检测后，那一行前面多了
+   RETRY_WAIT/WALL_RUN 两个声明，锚点本身还在，但**它们落在了切片之外**，
+   抠出来的 step() 里 RETRY_WAIT 就成了未定义。锚要挪到这一组变量的头一行。 */
+const _s0 = FSRC.indexOf("      var RETRY_WAIT =") >= 0
+  ? FSRC.indexOf("      var RETRY_WAIT =")
+  : FSRC.indexOf("      var shortSecs = [];");
 const _s1 = FSRC.indexOf("      step();", _s0);
 const stepSrc = (_s0 > 0 && _s1 > _s0) ? FSRC.slice(_s0, _s1) : "";
 ok("抠得到 step()", stepSrc.indexOf("function step()") > 0 && stepSrc.indexOf("text.slice(0, before)") > 0);
@@ -208,7 +213,10 @@ function harness2(secs, outs) {
   const box = { notes: [], attempt: {}, done: false, appended: [] };
   const src =
     "var text='', i=0, dStopped=false, __short=null;\n" +
-    stepSrc.replace("var shortSecs = [];", "var shortSecs = []; __short = function(){ return shortSecs; };") +
+    /* 真实退避是 20 秒（下面单独有一条断言盯住这个数）；行为测试里把它换成 20 毫秒，
+       否则四组用例要跑一分多钟。换的是等待时长，不是逻辑——逻辑仍是源码原文。 */
+    stepSrc.replace(/var RETRY_WAIT = \d+;/, "var RETRY_WAIT = 20;")
+           .replace("var shortSecs = [], runFail = 0, hitWall = false;", "var shortSecs = [], runFail = 0, hitWall = false; __short = function(){ return shortSecs; };") +
     "\n __hook.append = function(s){ text += s; };" +
     "\n __hook.text = function(){ return text; };" +
     "\n __hook.short = function(){ return __short(); };" +
@@ -238,11 +246,12 @@ const SECS3 = [{ h: "一", ask: "a", words: 1000 }, { h: "二", ask: "b", words:
 function waitDone(box, cb) {
   const t0 = Date.now();
   (function w() {
-    if (box.done || Date.now() - t0 > 8000) return cb();
+    if (box.done || Date.now() - t0 > 15000) return cb();
     setTimeout(w, 10);
   })();
 }
 
+/* ⚠ 第二遍现在要退避 20 秒才打——等待时间必须放宽，否则 waitDone 先超时，读到的是假失败 */
 const A = harness2(SECS3, { 0: [1000], 1: [90, 950], 2: [1000] });   // 第 2 节第一遍只吐 90 字
 waitDone(A.box, function () {
   const txt = A.hook.text();
@@ -280,6 +289,17 @@ function tail() {
      ⚠ 2026-08-12 两份真跑都从第 7、8 节起连续多节只吐六七十字 ⇒ 后段必须比前段更松。 */
   const gaps = (stepSrc.match(/setTimeout\(step,[^)]*?(\d{3,5})\s*[:)]/g) || [])
     .map((x) => +(x.match(/(\d{3,5})/) || [0, 0])[1]).filter(Boolean);
+  /* ⭐ 2026-08-12 13:23 真跑：第 7–16 节十节、每节两遍、二十次尝试全部只吐几十字。
+     十节连撞一次不成 ⇒ 是上游在挡，不是这几节难写。下面六条盯的就是那次读数逼出来的两条对策。 */
+  const mWait = stepSrc.match(/var RETRY_WAIT = (\d+);/);
+  ok("第二遍是退避之后才打的（立刻重打＝把同一堵墙再撞一次）", !!mWait && +mWait[1] >= 10000);
+  ok("退避真的用在第二遍上，不是摆着好看", /setTimeout\(res, RETRY_WAIT\)/.test(stepSrc));
+  const mWall = stepSrc.match(/var WALL_RUN = (\d+);/);
+  ok("连着几节全败即判撞墙（阈值从源码取：" + (mWall ? mWall[1] : "?") + "）", !!mWall && +mWall[1] >= 2 && +mWall[1] <= 4);
+  ok("写够了要把连败计数清零（别把零星失败攒成假撞墙）", (stepSrc.match(/runFail = 0;/g) || []).length >= 2);
+  ok("撞墙后立刻收口，不再往下打", /if \(dStopped \|\| hitWall \|\| i >= secs\.length\)/.test(stepSrc));
+  ok("撞墙时明说是上游在挡、并说清还差哪几节", /dWallRun1/.test(stepSrc) && /dWallLeft1/.test(stepSrc));
+
   const mGapAll = (stepSrc.match(/setTimeout\(step,([^;]*?)\);/) || [])[1] || "";
   const gapNums = (mGapAll.match(/\d{3,5}/g) || []).map(Number);
   ok("节间留白取得到数值", gapNums.length > 0);
