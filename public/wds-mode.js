@@ -572,7 +572,9 @@
     dLast6: "；心跳最大间隔 ", dLast7: " 秒",
     dLastFroze: "——间隔这么大，说明当时标签页被占死了（是性能问题，我继续减负荷）。",
     dLastAlive: "——心跳一直是准的，说明当时并没有卡死，那就不是排版的锅，我得换个方向查。",
-    dPlanning: "正在拟题与提纲…", dPlanFallback: "提纲这一趟没成，改成一趟写完（会短一些）。", 
+    dPlanning: "正在拟题与提纲…", dPlanFallback: "提纲两趟都没成，改成一趟写完（会短一些）。", 
+    dPlanRetry: "提纲这一趟没吐出可用的分节，隔一会儿再试一次。",
+    dOneShort: "\u26a0 这一趟两遍都只写出很少的字（多半是上游把流掐断了）。稿子已存进「成文记录」；隔一两分钟按「重答」再来一次通常就好。",
     dPlanGot: "提纲已定：分 ", dPlanGot2: " 节写 —— ",
     dPart: "正在写第 ", dPartRetry: "第 ", dPartRetry2: " 节没出正文，重写一次…",
     dPartLost: "第 ", dPartLost2: " 节两次都没写出来，先跳过接着往下写（回头可以点「重答」重来）。",
@@ -1420,7 +1422,13 @@
     ".wdsm-dist-esc{position:absolute;top:16px;right:20px;z-index:3;width:34px;height:34px;line-height:32px;text-align:center;border-radius:50%;border:1px solid var(--wline2);background:var(--wbg2);color:var(--wtx2);font-size:16px;cursor:pointer;opacity:.85}" +
     ".wdsm-dist-esc:hover{opacity:1;border-color:var(--wgold)}" +
     ".wdsm-dist-box{max-width:820px;width:100%;max-height:88vh;background:var(--wbg2);border:1px solid var(--wline2);border-radius:18px;display:flex;flex-direction:column;overflow:hidden}" +
-    ".wdsm-dist-top{flex:none;display:flex;align-items:center;gap:8px;padding:14px 18px;border-bottom:1px solid var(--wline)}" +
+    /* ⚠ flex-wrap 是必须的：顶栏上现在是「标题 ＋ 状态 ＋ 七颗按钮」，820px 一行早就塞不下。
+       不换行的后果不是"挤一挤"——flex 项默认 min-width:auto，按钮带 white-space:nowrap 压不动，
+       于是被压的是状态那一栏：它被挤到一个字宽，汉字就一个一个**竖着排**下来（真的这样上线过）。
+       所以三件一起做：容器允许换行 ／ 按钮一律不许收缩 ／ 状态给下限并用省略号收口。 */
+    ".wdsm-dist-top{flex:none;display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:14px 18px;border-bottom:1px solid var(--wline)}" +
+    ".wdsm-dist-top .wdsm-tbtn{flex:0 0 auto}" +
+    ".wdsm-dist-top .dst{flex:1 1 140px;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}" +
     ".wdsm-dist-t{font:700 15px/1 inherit;color:var(--wtx2);flex:none}" +
     ".wdsm-dist-c{flex:1;overflow-y:auto;padding:20px 22px}" +
     // 写作期的尾巴是纯文本：保住换行与段距，别让正在写的那一段读起来像一坨。
@@ -5610,7 +5618,7 @@
     var wrap = el("div", "wdsm-dist");
     wrap.innerHTML = "<div class='wdsm-dist-box'>"
       + "<div class='wdsm-dist-top'><span class='wdsm-dist-t'>" + esc(title || kindT(kind)) + "</span>"
-      + "<span class='dst' style='color:#8B98A5;font-size:12px;flex:1'>" + esc(t("dWorking")) + "</span>"
+      + "<span class='dst' style='color:#8B98A5;font-size:12px;flex:1 1 140px;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis'>" + esc(t("dWorking")) + "</span>"
       + "<button class='wdsm-tbtn dsv'></button><button class='wdsm-tbtn dcp'></button><button class='wdsm-tbtn ddir'></button><button class='wdsm-tbtn ddl'></button><button class='wdsm-tbtn dx' style='margin-right:0'>✕</button></div>"
       + "<div class='wdsm-dist-c'><div class='wdsm-a'></div></div></div>"
       + "<button class='wdsm-dist-esc dx' type='button'>\u2715</button>";
@@ -6134,13 +6142,38 @@
     }
 
     stat.textContent = t("dPlanning");
-    runLeg({ stage: "plan" }).then(function (r) {
+    /* 【开工那一趟也会失败，而它一失败，后面全塌】提纲这一趟只要没吐出可用的 sections，
+       整篇就退成"一趟写完"——而那条退路上原来一道闸都没有。真跑里它只写了 54 个字、
+       断在半句上，照样被记成「完成 · 54」。所以两处都补：提纲先重试一次；退路也看长度、也重试。
+       ⚠ 重试前把这一趟可能已经流进 text 的残字回滚掉，否则第二遍接在残句后面。 */
+    var FLOOR = 400;          // 单趟的下限：低于这个数不可能是"写完了"，只可能是被掐断
+    function planOnce(n) {
+      var p0 = text.length;
+      return runLeg({ stage: "plan" }).then(function (r) {
+        if (dStopped) return r;
+        if (r && r.plan && r.plan.sections && r.plan.sections.length) return r;
+        if (n >= 2) return r;
+        text = text.slice(0, p0);
+        dNote(t("dPlanRetry"));
+        return new Promise(function (res) { setTimeout(function () { res(planOnce(n + 1)); }, 1200); });
+      });
+    }
+    planOnce(1).then(function (r) {
       if (dStopped) { done(); return; }
-      var plan = r.plan;
+      var plan = r && r.plan;
       if (!plan || !plan.sections || !plan.sections.length) {
-        // 提纲没成也得有一篇：退回单趟。报个错就完事，等于让读者白等一趟。
+        // 提纲两遍都没成也得有一篇：退回单趟——但这一趟同样要过长度这道闸。
         dNote(t("dPlanFallback"), 1);
-        runLeg({}).then(function () { done(); });
+        var f0 = text.length;
+        runLeg({}).then(function (r1) {
+          if (dStopped || (r1 && r1.out >= FLOOR)) { done(); return; }
+          text = text.slice(0, f0);
+          dNote(t("dPartRetry") + 1 + t("dPartRetry2"));
+          return runLeg({}).then(function (r2) {
+            if (!r2 || r2.out < FLOOR) dNote(t("dOneShort"), 1);
+            done();
+          });
+        });
         return;
       }
       var secs = plan.sections;
