@@ -565,6 +565,7 @@
     dPptx: "⤓ 存为 .pptx", dPptxWait: "正在生成 .pptx…", dPptxNo: "这份稿子切不出幻灯片（需要 ## 页标题与 - 要点）",
     dPptxOk: "已生成 幻灯片 ",
     dEmptyHint: "两种可能：这一场太长把输入窗吃满了，或基底把预算全用在思考上。换标准档、或新开一场再成文。",
+    dLast1: "上一次成文没有正常收尾：写到「", dLast2: "」，已出 ", dLast3: " 字；排版 ", dLast4: " 次，最慢一次 ", dLast5: " 毫秒。（那一稿存在「成文记录」里。）",
     dPlanning: "正在拟题与提纲…", dPlanFallback: "提纲这一趟没成，改成一趟写完（会短一些）。", 
     dPlanGot: "提纲已定：分 ", dPlanGot2: " 节写 —— ",
     dPart: "正在写第 ", dPartRetry: "第 ", dPartRetry2: " 节没出正文，重写一次…",
@@ -5670,6 +5671,7 @@
          写出来的这一万字此刻只存在 text 这一个变量里：显示这一步一旦出岔子（渲染抛错、
          主线程被排版占死、读者以为死机把标签页关了），稿子就永久没了，而它可能是几分钟、
          几万 token 换来的。所以进门第一件事是存进「成文记录」，存不成也不拦路。 */
+      pTrace.ok = true; pTrace.leg = "已收尾"; traceSave();   // 走到这里就说明没卡死
       if (text && text.length > 200 && !existing) {
         try {
           distSave(kindT(kind), text, function (okv) {
@@ -5778,44 +5780,69 @@
        切口只挑**安全的空行**：围栏代码块与 $$ 公式必须成对闭合，且下一行不是列表/引用/表格行
        ——从中间切开会把一个列表拆成两个、把表格拦腰斩断。 */
     var rendUpto = 0, tailEl = null, paintedHtml = 0;   // paintedHtml：真正排出来多少 HTML，白屏判据的第三种量法
-    function safeCut(from) {
-      var i = text.lastIndexOf("\n\n");
-      var tries = 0;
-      while (i > from && tries++ < 40) {
-        var head = text.slice(0, i);
-        var okFence = ((head.match(/```/g) || []).length % 2) === 0;
-        var okMath = ((head.match(/\$\$/g) || []).length % 2) === 0;
-        var next = text.slice(i + 2, i + 80).replace(/^\s+/, "");
-        var midBlock = /^([-*+>|]|\d+[.)])/.test(next);
-        if (okFence && okMath && !midBlock) return i;
-        i = text.lastIndexOf("\n\n", i - 1);
+    /* 切口扫描是**增量**的。上一版每一拍都从全文末尾往回找，每个候选都 `text.slice(0,i)` 再
+       正则整段前缀；候选不安全时最多往回走 40 个，每个都重扫一遍。而论文后半段恰恰全是列表
+       （逐条划界、证伪条件三到六条），正是最容易连撞 midBlock 的地方——本该被去掉的 O(N²)
+       就从这里溜了回来。现在只扫新写出来的那一段：围栏与 $$ 的奇偶一路带着走，
+       安全空行边扫边记。全程 O(新增字数)。 */
+    var scanAt = 0, fenceOdd = false, mathOdd = false, lastSafe = -1;
+    function scanForward(final) {
+      while (true) {
+        var nl = text.indexOf("\n\n", scanAt);
+        if (nl < 0) break;
+        // 还没写到下一行就先别判——判早了会把一个列表的头一条当成"下一段"。
+        if (!final && text.length - (nl + 2) < 6) break;
+        var seg = text.slice(scanAt, nl + 2);
+        if ((seg.match(/```/g) || []).length % 2) fenceOdd = !fenceOdd;
+        if ((seg.match(/\$\$/g) || []).length % 2) mathOdd = !mathOdd;
+        var next = text.slice(nl + 2, nl + 82).replace(/^\s+/, "");
+        // 不在围栏/公式里，且下一段不是列表/引用/表格行——从中间切会把列表拆成两个、把表格斩断。
+        if (!fenceOdd && !mathOdd && next && !/^([-*+>|]|\d+[.)])/.test(next)) lastSafe = nl;
+        scanAt = nl + 2;
       }
-      // 一直找不到安全空行（比如一张几万字的大表）：尾巴不能无限长下去，
-      // 退而求其次在换行处切，仍然要求围栏闭合。
-      if (text.length - from > 20000) {
-        var j = text.lastIndexOf("\n", text.length - 4000);
-        if (j > from && ((text.slice(0, j).match(/```/g) || []).length % 2) === 0) return j;
+      // 尾巴不能无限长（一大段列表可能一个安全空行都没有）：超过 8000 字就在换行处硬切一刀，
+      // 否则 mdRender(尾巴) 每一拍又变回 O(N)。
+      if (lastSafe <= rendUpto && text.length - rendUpto > 8000 && !fenceOdd) {
+        var j = text.lastIndexOf("\n", text.length - 2000);
+        if (j > rendUpto) lastSafe = j;
       }
-      return -1;
     }
     function appendSeg(seg) {
       var d = el("div");
       try { var h = mdRender(seg); paintedHtml += h.length; d.innerHTML = h; } catch (e) { d.textContent = seg; paintedHtml += seg.length; }
       out.insertBefore(d, tailEl);
     }
+    /* 留痕：每次排版记下耗时与进度，写进 localStorage。
+       白屏时主线程可能已经动不了了，什么也报不出来——但上一拍写下的痕迹还在。
+       下次打开成文面板会把它摆出来，于是下一张截图自己带着证据。 */
+    var TRACE_K = "sde_wds_dist_trace";
+    var pTrace = { kind: kind, at: Date.now(), leg: "起步", chars: 0, paints: 0, lastMs: 0, maxMs: 0, ok: false };
+    function traceSave() { try { localStorage.setItem(TRACE_K, JSON.stringify(pTrace)); } catch (e) {} }
+    var paintGap = 130;
     function paintD(final) {
+      var t0 = Date.now();
       if (!tailEl) { out.innerHTML = ""; tailEl = el("div"); out.appendChild(tailEl); }
-      var rounds = final ? 400 : 1;          // 收尾时一次把能定的全定下来，写作中每拍只定一块
-      for (var k = 0; k < rounds; k++) {
-        var c = safeCut(rendUpto);
-        if (c <= rendUpto) break;
-        appendSeg(text.slice(rendUpto, c));
-        rendUpto = c;
-      }
+      scanForward(final);
+      if (lastSafe > rendUpto) { appendSeg(text.slice(rendUpto, lastSafe)); rendUpto = lastSafe; }
       var tail = text.slice(rendUpto);
       try { var ht = mdRender(tail); paintedHtml += ht.length; tailEl.innerHTML = ht + (final ? "" : "<span class='cur'>\u258a</span>"); }
       catch (e) { tailEl.textContent = tail; paintedHtml += tail.length; }
+      var ms = Date.now() - t0;
+      pTrace.paints++; pTrace.lastMs = ms; pTrace.chars = text.length;
+      if (ms > pTrace.maxMs) pTrace.maxMs = ms;
+      // 排一次要是慢过 250ms，就把间隔拉开——排版慢的时候更该少排，不是照旧每 130ms 撞一次。
+      if (ms > 250) paintGap = Math.min(2000, ms * 4);
+      traceSave();
     }
+    /* 上一次成文若没有正常收尾，把它留下的痕迹摆出来。
+       白屏的时候主线程多半已经动不了了、什么都报不出来，但上一拍写下的这行还在。 */
+    try {
+      var _pt = JSON.parse(localStorage.getItem(TRACE_K) || "null");
+      if (_pt && !_pt.ok && _pt.chars > 200 && (Date.now() - _pt.at) < 86400000) {
+        dNote(t("dLast1") + (_pt.leg || "?") + t("dLast2") + _pt.chars + t("dLast3")
+          + _pt.paints + t("dLast4") + (_pt.maxMs || 0) + t("dLast5"));
+      }
+    } catch (e) {}
     if (existing) { text = existing; done(); return; }
     out.innerHTML = "<span class='cur'>▊</span>";
     dBump();
@@ -5854,7 +5881,7 @@
                   var p = line.slice(5).trim();
                   if (p === "[DONE]") { sawDone = true; resolve(res); return; }
                   var j; try { j = JSON.parse(p); } catch (e) { continue; }
-                  if (j.t === "token") { text += j.v; res.out += j.v.length; if (Date.now() - lastP > 130) { lastP = Date.now(); paintD(false); } }
+                  if (j.t === "token") { text += j.v; res.out += j.v.length; if (Date.now() - lastP > paintGap) { lastP = Date.now(); paintD(false); } }
                   else if (j.t === "plan") { res.plan = j.v; }
                   else if (j.t === "beat") { if (j.v && j.v.sec) lastSec = j.v.sec; if (!text && j.v) stat.textContent = t("thinking") + " " + (j.v.sec || 0) + "s · " + (j.v.think || 0) + (j.v.stage ? " · " + j.v.stage : ""); }
                   else if (j.t === "note") { dNote(j.v); }
@@ -5881,6 +5908,29 @@
     var CHUNKED = { paper: 1 };
     if (!CHUNKED[kind] || again) { runLeg({}).then(function () { done(); }); return; }
 
+    /* 逐节存稿。原来只在 done() 存一次——写到第七节卡死，前六节一起没了。
+       现在每写完一节就存一次（同一条记录反复覆盖，不会存出八条来）。
+       稿子比显示重要，这条已经是今天第二次写进代码了。 */
+    var dsess = null, dsessTried = false;
+    function saveProgress(tag) {
+      if (!text || text.length < 200) return;
+      function put(A) {
+        if (!A) return;
+        try {
+          if (!dsess) dsess = A.session({ agent: "wds-distill", scope: "", scopeLabel: kindT(kind) });
+          dsess.save([{ role: "reader", text: kindT(kind) + " · " + new Date().toLocaleString() + (tag ? ("（" + tag + "）") : "") },
+                      { role: "wds", text: text }]);
+        } catch (e) {}
+      }
+      if (window.WDSStore) { window.WDSStore.load(put); return; }
+      if (dsessTried) return;
+      dsessTried = true;
+      var sc = document.createElement("script");
+      sc.src = "/assets/wds-store.js"; sc.async = true;
+      sc.onload = function () { if (window.WDSStore) window.WDSStore.load(put); };
+      document.head.appendChild(sc);
+    }
+
     stat.textContent = t("dPlanning");
     runLeg({ stage: "plan" }).then(function (r) {
       if (dStopped) { done(); return; }
@@ -5901,6 +5951,7 @@
       function step() {
         if (dStopped || i >= secs.length) { done(); return; }
         stat.textContent = t("dPart") + (i + 1) + "/" + secs.length + " · " + String(secs[i].h || "");
+        pTrace.leg = "第 " + (i + 1) + "/" + secs.length + " 节"; traceSave();
         var before = text.length;
         runLeg({ stage: "part", idx: i, plan: plan, prevTail: text.slice(-1200) })
           .then(function (rr) {
@@ -5914,6 +5965,7 @@
           .then(function () {
             if (text.length > before && text.slice(-2) !== "\n\n") text += "\n\n";
             paintD(false);
+            saveProgress("写到第 " + (i + 1) + "/" + secs.length + " 节");
             i++;
             setTimeout(step, 0);      // 让出主线程；顺带给每分钟限流留一点空
           });

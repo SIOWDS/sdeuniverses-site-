@@ -1258,7 +1258,12 @@ console.log("⑧ 成文（distill）");
   ok(/if \(j\.t === "token"\) \{ text \+= j\.v;[^\n]*paintD\(false\)/.test(_ds), "改成调增量渲染器 paintD");
   ok(/if \(text\) paintD\(true\);/.test(_ds), "收尾也不整篇重排，只把尾巴排完");
   ok(/text\.length <= 40000/.test(_ds), "超长稿跳过 autoLink（它同样是 O(N²)）");
-  ok(/okFence && okMath && !midBlock/.test(_ds), "只在安全空行切：围栏与 $$ 成对、下一行不是列表/引用/表格");
+  ok(/if \(!fenceOdd && !mathOdd && next && !\/\^\(\[-\*\+>\|\]\|\\d\+\[\.\)\]\)\//.test(_ds),
+     "只在安全空行切：围栏与 $$ 成对、下一行不是列表/引用/表格");
+  ok(/function scanForward/.test(_ds) && !/text\.lastIndexOf\("\\n\\n", i - 1\)/.test(_ds),
+     "切口扫描是增量的（只扫新写出来的那一段），不再每拍从末尾往回重扫整篇");
+  ok(/text\.length - rendUpto > 8000/.test(_ds), "尾巴封顶：找不到安全空行也不许让尾巴无限长（否则 mdRender(尾巴) 又是 O(N)）");
+  ok(/if \(ms > 250\) paintGap = /.test(_ds), "排版慢下来就自动拉开间隔——慢的时候更该少排");
 
   // 真跑一篇长稿：分很多 token 流进来，看它是不是被切成了多块、且正文一字不差
   ROUTE["/api/wds/distill"] = (function () {
@@ -1341,6 +1346,38 @@ console.log("⑧ 成文（distill）");
   ok(LEGS.length === 2 && LEGS[1].stage === "", "提纲没成就退回单趟，实得 " + JSON.stringify(LEGS.map((l) => l.stage || "单趟")));
   ok(htmlOf(dpf.querySelector(".wdsm-a")).includes("单趟兜底稿"), "读者照样拿得到一篇，而不是只收到一句报错");
   dpf.querySelector(".dx").click();
+
+  console.log("㉔ 逐节存稿 ＋ 上一次没收尾就自己报案");
+  let SAVES = [];
+  const _oh = STORE_SESSIONS_HOOK;
+  STORE_SESSIONS_HOOK = function (turns) { turns.forEach(function (x) { if (x && x.role === "wds") SAVES.push(x.text.length); }); };
+  ROUTE["/api/wds/distill"] = function (p) {
+    if (p.stage === "plan") return [{ t: "plan", v: PLAN }];
+    if (p.stage === "part") return [{ t: "token", v: "## 第 " + (p.idx + 1) + " 节\n\n" + "这一节的正文。".repeat(20) }];
+    return [{ t: "token", v: "（单趟兜底稿）" }];
+  };
+  layer.querySelector(".wdsm-distbtn").click();
+  document.body.querySelector(".wdsm-menu").children[2].click();
+  await new Promise((r) => setTimeout(r, 900));
+  ok(SAVES.length >= 3, "写作途中就在存（每写完一节存一次，不是等到最后才存），实得 " + SAVES.length + " 次");
+  ok(SAVES[SAVES.length - 1] > SAVES[0], "存下来的稿子逐节变长（同一条记录反复覆盖）");
+  const tr = JSON.parse(store["sde_wds_dist_trace"] || "null");
+  ok(tr && tr.ok === true, "正常收尾的那一次，痕迹标成已收尾");
+  ok(tr && tr.paints > 0 && typeof tr.maxMs === "number", "痕迹里带着排版次数与最慢一次的毫秒数");
+  document.body.querySelector(".wdsm-dist").querySelector(".dx").click();
+  STORE_SESSIONS_HOOK = _oh;
+
+  // 伪造一次"上次没收尾"，看新面板会不会自己把证据摆出来
+  store["sde_wds_dist_trace"] = JSON.stringify({ kind: "paper", at: Date.now(), leg: "第 7/8 节", chars: 9123, paints: 412, lastMs: 90, maxMs: 4200, ok: false });
+  ROUTE["/api/wds/distill"] = [{ t: "token", v: "新的一稿。" }];
+  layer.querySelector(".wdsm-distbtn").click();
+  document.body.querySelector(".wdsm-menu").children[0].click();
+  await new Promise((r) => setTimeout(r, 300));
+  const dpt = document.body.querySelector(".wdsm-dist");
+  ok(String(dpt.textContent).includes("第 7/8 节") && String(dpt.textContent).includes("4200"),
+     "新面板把上一次的痕迹摆出来（写到哪一节、最慢一次排版多少毫秒）——下一张截图自带证据");
+  dpt.querySelector(".dx").click();
+  delete store["sde_wds_dist_trace"];
 
   console.log("\n===== " + PASS + " PASS / " + FAILS + " FAIL =====");
   process.exit(FAILS ? 1 : 0);
