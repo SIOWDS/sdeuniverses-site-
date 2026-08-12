@@ -566,6 +566,7 @@
     dPptxOk: "已生成 幻灯片 ",
     dEmptyHint: "两种可能：这一场太长把输入窗吃满了，或基底把预算全用在思考上。换标准档、或新开一场再成文。",
     dLast1: "上一次成文没有正常收尾：写到「", dLast2: "」，已出 ", dLast3: " 字；排版 ", dLast4: " 次，最慢一次 ", dLast5: " 毫秒。（那一稿存在「成文记录」里。）",
+    dLastHeal: "；顶栏被重建过 ", dLastHeal2: " 次",
     dLast6: "；心跳最大间隔 ", dLast7: " 秒",
     dLastFroze: "——间隔这么大，说明当时标签页被占死了（是性能问题，我继续减负荷）。",
     dLastAlive: "——心跳一直是准的，说明当时并没有卡死，那就不是排版的锅，我得换个方向查。",
@@ -5676,8 +5677,11 @@
          写出来的这一万字此刻只存在 text 这一个变量里：显示这一步一旦出岔子（渲染抛错、
          主线程被排版占死、读者以为死机把标签页关了），稿子就永久没了，而它可能是几分钟、
          几万 token 换来的。所以进门第一件事是存进「成文记录」，存不成也不拦路。 */
-      pTrace.ok = true; pTrace.leg = "已收尾"; traceSave();   // 走到这里就说明没卡死
-      if (beatT) { clearInterval(beatT); beatT = null; }
+      /* 【仪器不许在嫌疑最大的地方瞎】上一版这里是「先把 ok 置成 true、顺手停掉心跳」——
+         心跳在收尾开始前就停了、痕迹还被标成"已收尾"，于是万一卡死发生在 done() 里，
+         下次面板根本不会把那行痕迹摆出来。而两次白屏都指着最后一节之后这一段。
+         所以：心跳贯穿整个收尾，每一步打标，ok 留到最后一步做完才置。 */
+      pTrace.leg = "收尾·存稿"; traceSave();
       if (text && text.length > 200 && !existing) {
         try {
           distSave(kindT(kind), text, function (okv) {
@@ -5688,6 +5692,7 @@
       }
       /* ② 【渲染必须有兜底】渲染是可能失败的一步，而失败的样子是"白屏"——
          读者看不出是排版崩了还是稿子没了。纯文本一定画得出来，那就是我们的底线形态。 */
+      pTrace.leg = "收尾·排版"; traceSave();
       try {
         // 收尾**不再整篇重排**（那正是压垮主线程的最后一下）：只把还没定稿的尾巴排完。
         if (text) paintD(true);
@@ -5717,16 +5722,19 @@
          它们和上面那次整篇排版挤在同一个任务里，一万字的稿子能把主线程占住好几秒——
          那几秒浏览器一帧都画不出来，看上去就是白屏。正文先上屏，这些挪到下一个任务去做。 */
       setTimeout(function () {
+        pTrace.leg = "收尾·挂链接"; traceSave();
         // autoLink 拿整篇正文扫 out 的每个文本节点，长稿同样是 O(N²)。
         // 超长稿直接跳过——站内链接是锦上添花，把标签页卡死是要命的。
         try { if (text && text.length <= 40000) autoLink(out, text); } catch (e) {}
         try { if (text && kind === "deck") deckPrep(text, function () { b9Show(text); }); } catch (e) {}
+        pTrace.leg = "收尾·挂链接完"; traceSave();
       }, 0);
       /* 精华自动进思想库存。这里是「报告／成文／提纲」三种锻造产物的唯一收口。
          报告与提纲是结构化的，取标题行；成文类取「一句话点题」。
          模块自己管未登录、去重、失败不拦路，这里只负责给它对的那一句。
          同 ③：这两块也不许和排版挤在一个任务里。 */
       setTimeout(function () {
+      pTrace.leg = "收尾·库存"; traceSave();
       try {
         if (window.SDEVault && text && text.length > 80) {
           var _vt = (kind === "paper" || kind === "essay")
@@ -5747,6 +5755,7 @@
          成文是这一场里最像"候选"的产物，却从来没被查过一次占位库——两次真跑的 I=115
          都出在这里（《操作自盲》的正主卢曼从头到尾没被检索过）。闸门放在成文**落地的那一刻**，
          而不是评分时才补：那时命题已经定死，近邻只能给它背书，淘汰不掉任何东西。 */
+      pTrace.leg = "收尾·近邻"; traceSave();
       try {
         if (window.SDECand && text && text.length > 80) {
           var _cd = window.SDECand.draft(text);
@@ -5770,6 +5779,9 @@
           }
         }
       } catch (e) {}
+      // 走到这里，收尾的每一步都过了 —— 现在才敢说"没卡死"，也现在才停心跳。
+      pTrace.leg = "已收尾"; pTrace.ok = true; traceSave();
+      if (beatT) { clearInterval(beatT); beatT = null; }
       }, 0);
     }
     wrap.querySelector(".dx").onclick = function () { try { if (dr) dr.cancel(); } catch (e) {} wrap.parentNode.removeChild(wrap); };
@@ -5890,6 +5902,7 @@
         dNote(t("dLast1") + (_pt.leg || "?") + t("dLast2") + _pt.chars + t("dLast3")
           + _pt.paints + t("dLast4") + (_pt.maxMs || 0) + t("dLast5")
           + t("dLast6") + Math.round((_pt.beatGap || 0) / 100) / 10 + t("dLast7")
+          + ((_pt.heal || 0) ? (t("dLastHeal") + _pt.heal + t("dLastHeal2")) : "")
           + ((_pt.beatGap || 0) > 6000 ? t("dLastFroze") : t("dLastAlive")));
       }
     } catch (e) {}
@@ -5929,7 +5942,9 @@
                   var line = buf.slice(0, idx).trim(); buf = buf.slice(idx + 1);
                   if (line.slice(0, 5) !== "data:") continue;
                   var p = line.slice(5).trim();
-                  if (p === "[DONE]") { sawDone = true; resolve(res); return; }
+                  // 收到收尾信号就把这一趟的流关掉。一篇论文九趟请求，
+                  // 九个不关的流留在那里对内存不是好事（读者的机器不一定宽裕）。
+                  if (p === "[DONE]") { sawDone = true; try { reader.cancel(); } catch (e2) {} resolve(res); return; }
                   var j; try { j = JSON.parse(p); } catch (e) { continue; }
                   if (j.t === "token") { text += j.v; res.out += j.v.length; if (Date.now() - lastP > paintGap) { lastP = Date.now(); paintD(false); } }
                   else if (j.t === "plan") { res.plan = j.v; }

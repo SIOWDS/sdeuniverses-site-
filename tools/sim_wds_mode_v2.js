@@ -1406,6 +1406,33 @@ console.log("⑧ 成文（distill）");
   ok(trh && typeof trh.beatGap === "number", "痕迹里带着心跳读数");
   dph.querySelector(".dx").click();
 
+  console.log("㉖ 仪器不许在嫌疑最大的地方瞎：收尾全程有心跳、逐步打标");
+  const _s6 = require("fs").readFileSync("/home/claude/site/public/wds-mode.js", "utf8");
+  const _dn6 = _s6.slice(_s6.indexOf("    function done() {"), _s6.indexOf("wrap.querySelector(\".dx\").onclick"));
+  ok(_dn6.indexOf('pTrace.leg = "收尾·存稿"') >= 0, "进 done() 先打「收尾·存稿」标");
+  ok(_dn6.indexOf('pTrace.leg = "收尾·排版"') > _dn6.indexOf('pTrace.leg = "收尾·存稿"'), "排版这一步单独打标");
+  ok(_dn6.indexOf('pTrace.leg = "收尾·挂链接"') > 0 && _dn6.indexOf('pTrace.leg = "收尾·库存"') > 0 && _dn6.indexOf('pTrace.leg = "收尾·近邻"') > 0,
+     "挂链接／库存／近邻三步各自打标——下次能指到是哪一步停的");
+  ok(_dn6.indexOf('pTrace.ok = true') > _dn6.indexOf('pTrace.leg = "收尾·近邻"'),
+     "ok 只在最后一步做完才置（上一版在收尾开头就置，等于把嫌疑最大那段盖住了）");
+  ok(_dn6.indexOf("clearInterval(beatT)") > _dn6.indexOf('pTrace.leg = "收尾·近邻"'),
+     "心跳贯穿整个收尾，最后才停");
+  ok(/if \(p === "\[DONE\]"\) \{ sawDone = true; try \{ reader\.cancel\(\)/.test(_s6),
+     "每趟收到收尾信号就关流（九趟不关的流对内存不是好事）");
+
+  // 真跑一遍：正常收尾时 leg 必须落在「已收尾」
+  ROUTE["/api/wds/distill"] = function (p) {
+    if (p.stage === "plan") return [{ t: "plan", v: PLAN }];
+    if (p.stage === "part") return [{ t: "token", v: "## 第 " + (p.idx + 1) + " 节\n\n这一节的正文。" }];
+    return [{ t: "token", v: "（单趟兜底稿）" }];
+  };
+  layer.querySelector(".wdsm-distbtn").click();
+  document.body.querySelector(".wdsm-menu").children[2].click();
+  await new Promise((r) => setTimeout(r, 900));
+  const tr6 = JSON.parse(store["sde_wds_dist_trace"] || "null");
+  ok(tr6 && tr6.leg === "已收尾" && tr6.ok === true, "正常跑完时痕迹停在「已收尾」，实得 " + (tr6 && tr6.leg));
+  document.body.querySelector(".wdsm-dist").querySelector(".dx").click();
+
   console.log("\n===== " + PASS + " PASS / " + FAILS + " FAIL =====");
   process.exit(FAILS ? 1 : 0);
 })();
