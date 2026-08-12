@@ -566,6 +566,9 @@
     dPptxOk: "已生成 幻灯片 ",
     dEmptyHint: "两种可能：这一场太长把输入窗吃满了，或基底把预算全用在思考上。换标准档、或新开一场再成文。",
     dLast1: "上一次成文没有正常收尾：写到「", dLast2: "」，已出 ", dLast3: " 字；排版 ", dLast4: " 次，最慢一次 ", dLast5: " 毫秒。（那一稿存在「成文记录」里。）",
+    dLast6: "；心跳最大间隔 ", dLast7: " 秒",
+    dLastFroze: "——间隔这么大，说明当时标签页被占死了（是性能问题，我继续减负荷）。",
+    dLastAlive: "——心跳一直是准的，说明当时并没有卡死，那就不是排版的锅，我得换个方向查。",
     dPlanning: "正在拟题与提纲…", dPlanFallback: "提纲这一趟没成，改成一趟写完（会短一些）。", 
     dPlanGot: "提纲已定：分 ", dPlanGot2: " 节写 —— ",
     dPart: "正在写第 ", dPartRetry: "第 ", dPartRetry2: " 节没出正文，重写一次…",
@@ -1409,6 +1412,8 @@
     ".wdsm-dist-top{flex:none;display:flex;align-items:center;gap:8px;padding:14px 18px;border-bottom:1px solid var(--wline)}" +
     ".wdsm-dist-t{font:700 15px/1 inherit;color:var(--wtx2);flex:none}" +
     ".wdsm-dist-c{flex:1;overflow-y:auto;padding:20px 22px}" +
+    // 写作期的尾巴是纯文本：保住换行与段距，别让正在写的那一段读起来像一坨。
+    ".wdsm-tail{white-space:pre-wrap;word-break:break-word}" +
     /* 快捷键帮助 / 拖拽遮罩 */
     ".wdsm-lk{color:var(--wgold2);text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1px;text-decoration-color:rgba(190,160,90,.5)}" +
     ".wdsm-lk:hover{text-decoration-color:var(--wgold)}" +
@@ -5672,6 +5677,7 @@
          主线程被排版占死、读者以为死机把标签页关了），稿子就永久没了，而它可能是几分钟、
          几万 token 换来的。所以进门第一件事是存进「成文记录」，存不成也不拦路。 */
       pTrace.ok = true; pTrace.leg = "已收尾"; traceSave();   // 走到这里就说明没卡死
+      if (beatT) { clearInterval(beatT); beatT = null; }
       if (text && text.length > 200 && !existing) {
         try {
           distSave(kindT(kind), text, function (okv) {
@@ -5819,14 +5825,56 @@
     var pTrace = { kind: kind, at: Date.now(), leg: "起步", chars: 0, paints: 0, lastMs: 0, maxMs: 0, ok: false };
     function traceSave() { try { localStorage.setItem(TRACE_K, JSON.stringify(pTrace)); } catch (e) {} }
     var paintGap = 130;
+    /* 心跳。每 2 秒写一次时间戳，并记下**实际最大间隔**。
+       这是分辨死因的仪器，比再多猜一轮值钱：
+       · 白屏时心跳停了（间隔远大于 2 秒）⇒ 主线程被占死，是性能问题；
+       · 心跳一直准点、面板却空了 ⇒ 根本不是卡死，是 DOM 或绘制的问题，该换路查。
+       顺手做一次结构自检：顶栏本该一建面板就写死、此后没有任何代码碰它，
+       它要是不见了，那本身就是一条重要读数——就地重建，至少让稿子还能复制、导出。 */
+    var beatT = null, beatLast = Date.now();
+    pTrace.beatGap = 0; pTrace.heal = 0;
+    beatT = setInterval(function () {
+      var now = Date.now(), gap = now - beatLast; beatLast = now;
+      if (gap > pTrace.beatGap) pTrace.beatGap = gap;
+      pTrace.beatAt = now;
+      try {
+        if (wrap.parentNode && !wrap.querySelector(".wdsm-dist-top")) {
+          pTrace.heal++;
+          var bx = wrap.querySelector(".wdsm-dist-box") || wrap;
+          var bar = el("div", "wdsm-dist-top");
+          var tt = el("span", "wdsm-dist-t", title || kindT(kind));
+          var cp2 = el("button", "wdsm-tbtn", t("dCopy"));
+          cp2.onclick = function () { copyText(text); };
+          var dl2 = el("button", "wdsm-tbtn", t("dDl"));
+          dl2.onclick = function () { download("WDS-" + kind + "-" + new Date().toISOString().slice(0, 10) + ".md", text); };
+          var x2 = el("button", "wdsm-tbtn", "\u2715");
+          x2.onclick = function () { if (wrap.parentNode) wrap.parentNode.removeChild(wrap); };
+          bar.appendChild(tt); bar.appendChild(cp2); bar.appendChild(dl2); bar.appendChild(x2);
+          if (bx.firstChild) bx.insertBefore(bar, bx.firstChild); else bx.appendChild(bar);
+        }
+      } catch (e) {}
+      traceSave();
+      if (!wrap.parentNode) { clearInterval(beatT); beatT = null; }
+    }, 2000);
     function paintD(final) {
       var t0 = Date.now();
       if (!tailEl) { out.innerHTML = ""; tailEl = el("div"); out.appendChild(tailEl); }
       scanForward(final);
       if (lastSafe > rendUpto) { appendSeg(text.slice(rendUpto, lastSafe)); rendUpto = lastSafe; }
       var tail = text.slice(rendUpto);
-      try { var ht = mdRender(tail); paintedHtml += ht.length; tailEl.innerHTML = ht + (final ? "" : "<span class='cur'>\u258a</span>"); }
-      catch (e) { tailEl.textContent = tail; paintedHtml += tail.length; }
+      if (final) {
+        try { var ht = mdRender(tail); paintedHtml += ht.length; tailEl.innerHTML = ht; }
+        catch (e) { tailEl.textContent = tail; paintedHtml += tail.length; }
+      } else {
+        /* 写作期的尾巴走**纯文本**。每一拍唯一还在重做的事就是排这条尾巴，
+           改成 textContent 之后是 O(新增字数)、零正则、零 HTML 解析——
+           这一拍再也不可能成为占死主线程的那一下。
+           已定稿的块照旧是正式排版（那是一次性的），所以读者看到的仍是排好版的正文，
+           只有"正在打的最后一段"是纯文本；这一段写完就跟着变成正式排版。 */
+        tailEl.className = "wdsm-tail";
+        tailEl.textContent = tail + "\u258a";
+        paintedHtml += tail.length;
+      }
       var ms = Date.now() - t0;
       pTrace.paints++; pTrace.lastMs = ms; pTrace.chars = text.length;
       if (ms > pTrace.maxMs) pTrace.maxMs = ms;
@@ -5840,7 +5888,9 @@
       var _pt = JSON.parse(localStorage.getItem(TRACE_K) || "null");
       if (_pt && !_pt.ok && _pt.chars > 200 && (Date.now() - _pt.at) < 86400000) {
         dNote(t("dLast1") + (_pt.leg || "?") + t("dLast2") + _pt.chars + t("dLast3")
-          + _pt.paints + t("dLast4") + (_pt.maxMs || 0) + t("dLast5"));
+          + _pt.paints + t("dLast4") + (_pt.maxMs || 0) + t("dLast5")
+          + t("dLast6") + Math.round((_pt.beatGap || 0) / 100) / 10 + t("dLast7")
+          + ((_pt.beatGap || 0) > 6000 ? t("dLastFroze") : t("dLastAlive")));
       }
     } catch (e) {}
     if (existing) { text = existing; done(); return; }

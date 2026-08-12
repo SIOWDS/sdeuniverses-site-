@@ -1379,6 +1379,33 @@ console.log("⑧ 成文（distill）");
   dpt.querySelector(".dx").click();
   delete store["sde_wds_dist_trace"];
 
+  console.log("㉕ 写作期的尾巴走纯文本；心跳用来分辨「卡死」还是「没卡死但空了」");
+  const _s5 = require("fs").readFileSync("/home/claude/site/public/wds-mode.js", "utf8");
+  const _d5 = _s5.slice(_s5.indexOf("function distill(kind, existing"), _s5.indexOf("SDE 工序（ChatSDE 独有的九道）"));
+  ok(/if \(final\) \{[\s\S]{0,200}mdRender\(tail\)/.test(_d5), "只有收尾那一次把尾巴排成 Markdown");
+  ok(/tailEl\.textContent = tail \+ "\\u258a";/.test(_d5), "写作期尾巴是纯文本——每拍零正则、零 HTML 解析");
+  ok(/wdsm-tail\{white-space:pre-wrap/.test(_s5), "纯文本尾巴保住换行与段距（否则正在写的那段读起来像一坨）");
+  ok(/setInterval\(function \(\) \{[\s\S]{0,400}pTrace\.beatGap = gap/.test(_d5) || /if \(gap > pTrace\.beatGap\) pTrace\.beatGap = gap;/.test(_d5),
+     "心跳把**实际最大间隔**记进痕迹（这是判死因的读数）");
+  ok(/!wrap\.querySelector\("\.wdsm-dist-top"\)/.test(_d5) && /pTrace\.heal\+\+/.test(_d5),
+     "心跳顺手自检顶栏：顶栏本该没人碰，不见了就地重建并记一笔");
+  ok(/dLastFroze/.test(_s5) && /dLastAlive/.test(_s5), "上次痕迹会直接说结论：卡死了 还是 没卡死但空了");
+
+  // 真跑一遍，确认写作途中确实没走 Markdown、收尾后才排版
+  ROUTE["/api/wds/distill"] = function (p) {
+    if (p.stage === "plan") return [{ t: "plan", v: PLAN }];
+    if (p.stage === "part") return [{ t: "token", v: "## 第 " + (p.idx + 1) + " 节\n\n这一节的正文。" }];
+    return [{ t: "token", v: "（单趟兜底稿）" }];
+  };
+  layer.querySelector(".wdsm-distbtn").click();
+  document.body.querySelector(".wdsm-menu").children[2].click();
+  await new Promise((r) => setTimeout(r, 900));
+  const dph = document.body.querySelector(".wdsm-dist");
+  ok(/<h[1-6]>/.test(htmlOf(dph.querySelector(".wdsm-a"))), "收尾之后整篇都是正式排版（纯文本只在写作途中用）");
+  const trh = JSON.parse(store["sde_wds_dist_trace"] || "null");
+  ok(trh && typeof trh.beatGap === "number", "痕迹里带着心跳读数");
+  dph.querySelector(".dx").click();
+
   console.log("\n===== " + PASS + " PASS / " + FAILS + " FAIL =====");
   process.exit(FAILS ? 1 : 0);
 })();
