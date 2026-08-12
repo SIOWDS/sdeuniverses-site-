@@ -87,10 +87,13 @@ ok("块长小于阈值（否则分块等于没分）", !!mThr && !!mChunk && +mC
 console.log("── 心跳自愈：白屏就地退回纯文本 ──");
 const beatSrc = grab("    beatT = setInterval(function () {", "    }, 2000);");
 ok("抠得到心跳", beatSrc.indexOf("bodyHealed") > 0);
-function mkBeat(outHasText, textLen, painted) {
+function mkBeat(outHasText, textLen, painted, hasChild) {
   const notes = [];
   const box = { healed: 0 };
-  const out = { textContent: outHasText ? "有字" : "", innerHTML: outHasText ? "<p>有字</p>" : "" };
+  /* firstChild 是"此刻 DOM 里还有没有东西"的结构量；painted 是历史累计量。
+     两者分开传，才测得出「排过版但正文已经没了」这个唯一要救的场景。 */
+  const out = { textContent: outHasText ? "有字" : "", innerHTML: outHasText ? "<p>有字</p>" : "",
+                firstChild: hasChild ? {} : null };
   const src =
     "var bodyHealed=0, paintedHtml=" + painted + ", text=__b.text, out=__b.out, wrap=__b.wrap," +
     "    beatLast=Date.now(), pTrace={}, beatT=1;" +
@@ -107,14 +110,18 @@ function mkBeat(outHasText, textLen, painted) {
   }));
   return { box, notes, out };
 }
-const b1 = mkBeat(false, 5000, 0);
+const b1 = mkBeat(false, 5000, 0, false);
 ok("正文空 + 稿子有字 → 自愈成纯文本", b1.box.healed === 1 && b1.out.textContent.length === 5000);
 ok("自愈时报了一句给读者（dBlankFix）", b1.notes.join("|").indexOf("dBlankFix") >= 0);
-const b2 = mkBeat(true, 5000, 100);
+const b2 = mkBeat(true, 5000, 100, true);
 ok("正文有字 → 不动它（不许把排好的版白白拆成纯文本）", b2.box.healed === 0);
-const b3 = mkBeat(false, 5000, 500);
-ok("textContent 取不到但确实排出过 HTML → 也不动（第三种量法防误报）", b3.box.healed === 0);
-const b4 = mkBeat(false, 50, 0);
+const b3 = mkBeat(false, 5000, 500, true);
+ok("正文框还有子节点 → 不动（可能是图/canvas 这类没文字的东西，别拆）", b3.box.healed === 0);
+/* ⚠ 这一条是本文件存在的理由：判据原来用 paintedHtml（只增不减的累计量），
+   于是"排过版之后正文又没了"——唯一需要兜底的场景——永远兜不到，自愈从写下那天起就是死的。 */
+const b5 = mkBeat(false, 5000, 999999, false);
+ok("★ 排过很多版但此刻正文空了 → 必须自愈（判据不许用累计量）", b5.box.healed === 1);
+const b4 = mkBeat(false, 50, 0, false);
 ok("稿子太短（没写出东西）→ 不当白屏处理", b4.box.healed === 0);
 
 /* ═══ ④ 源码级：收尾分帧与早退 ═══ */
@@ -130,6 +137,20 @@ ok("稿子仍然先落地再谈显示（distSave 排在 paintD 之前）",
 ok("autoLink 早退：没有书名号就不扫整篇", /text\.indexOf\("\\u300a"\) >= 0/.test(doneSrc));
 ok("autoLink 的长度闸还在", /text\.length <= 40000/.test(doneSrc));
 ok("白屏兜底（done 里那一条）没被删", doneSrc.indexOf("dBlankFix") > 0);
+/* 只查那个三元判据的形状；解释这条病的注释里也写着 paintedHtml，别把注释算成病 */
+ok("★ 两处白屏判据都不再用 paintedHtml 这个累计量",
+  (FSRC.match(/\(paintedHtml > 0 \? /g) || []).length === 0);
+ok("两处白屏判据都改用 out.firstChild 这个此刻的结构量",
+  (FSRC.match(/out\.firstChild \? "1" : ""/g) || []).length === 2);
+
+/* ═══ 五、成文记录还原：kind 不能丢，否则 Word/PDF/投稿三颗按钮全没有 ═══ */
+console.log("── 成文记录还原 ──");
+const rst = FSRC.slice(FSRC.indexOf("onRestore: function (rec)"), FSRC.indexOf("onRestore: function (rec)") + 1200);
+ok("还原不再写死 report", !/distill\("report", body, head\)/.test(rst));
+ok("还原按 scopeLabel 反查 kind（用 KIND_KEYS 派生，不手抄档名）", /KIND_KEYS\.forEach/.test(rst) && /kindT\(x\) === head/.test(rst));
+ok("老记录对不上时按正文形状兜底认成 paper", /\? "paper" : "report"/.test(rst));
+ok("导出按钮仍只挂在 essay/paper 两档（还原回 paper 才拿得到）",
+  /if \(kind === "essay" \|\| kind === "paper"\)/.test(FSRC));
 ok("痕迹逐步打标仍在（收尾·存稿／排版／挂链接／库存）",
   ["收尾·存稿", "收尾·排版", "收尾·挂链接", "收尾·库存", "已收尾"].every((k) => doneSrc.indexOf(k) > 0));
 

@@ -5577,7 +5577,16 @@
         onRestore: function (rec) {
           var body = "", head = rec.scopeLabel || rec.title || "";
           (rec.turns || []).forEach(function (x) { if (x && x.role === "wds") body = x.text; });
-          if (body) distill("report", body, head);
+          if (!body) return;
+          /* ⚠ 这里原来写死 distill("report", …)。而 Word / PDF / 投稿三颗按钮只挂在
+             essay 与 paper 两档上 —— 于是从「成文记录」取回来的论文，一颗导出按钮都没有：
+             稿子明明还在，却拿不出 Word 也拿不出 PDF。
+             存进去的 scopeLabel 就是 kindT(kind)，照着反查即可；档名改过（一万字→两万字→
+             学术论文…），老记录对不上，就按正文形状兜底认成论文。 */
+          var k = "";
+          KIND_KEYS.forEach(function (x) { if (!k && kindT(x) === head) k = x; });
+          if (!k) k = /【摘要】|【关键词】|参考文献|Keywords/.test(body.slice(0, 4000)) ? "paper" : "report";
+          distill(k, body, head);
         },
       });
     }
@@ -5742,7 +5751,14 @@
       // 三种量法取其一：out 的文字、去标签的 out.innerHTML、以及"真正排出来多少 HTML"。
       // 前两种在增量渲染下都可能为空（内容挂在子块上、out 自己是空壳），只认它们会误报白屏，
       // 把排好的版白白拆成纯文本。第三种是最诚实的一种：排出来过就是排出来过。
-      var _shown = String(out.textContent || "").trim() || String(out.innerHTML || "").replace(/<[^>]*>/g, "").trim() || (paintedHtml > 0 ? "1" : "");
+      /* ⚠ 第三种量法原来写的是 `paintedHtml > 0`。paintedHtml 是**只增不减的累计量**：
+         排过一次版它就永远为真，于是"排完之后正文又没了"——这个唯一需要兜底的场景——
+         恰好永远兜不到。判据必须是**此刻的 DOM 状态**，不是历史上排过多少。
+         改用 out.firstChild：还有子节点就别拆（可能是图、canvas 这类没有文字的东西）；
+         一个子节点都没有、也没有文字，那就是真的空。 */
+      var _shown = String(out.textContent || "").trim()
+                || String(out.innerHTML || "").replace(/<[^>]*>/g, "").trim()
+                || (out.firstChild ? "1" : "");
       if (text && !_shown) {
         out.textContent = text;
         dNote(t("dBlankFix"), 1);
@@ -5920,9 +5936,10 @@
          out 自己可能只是空壳、内容挂在子块上——只认一种会误报，把排好的版白白拆成纯文本。 */
       try {
         if (wrap.parentNode && text && text.length > 200 && out && !bodyHealed) {
+          /* 同 done()：不许用 paintedHtml 这个累计量当"此刻有没有东西"的判据（见那边的注）。 */
           var _sn = String(out.textContent || "").trim()
                  || String(out.innerHTML || "").replace(/<[^>]*>/g, "").trim()
-                 || (paintedHtml > 0 ? "1" : "");
+                 || (out.firstChild ? "1" : "");
           if (!_sn) {
             bodyHealed = 1; pTrace.healBody = 1;
             out.textContent = text;
