@@ -59,14 +59,26 @@ ok("续写要用的 plan 在面板作用域留住了", /var dPlanObj = null;/.te
 
 /* ═══ 二之二、这一轮补的闸（2026-08-12 稳健性复查）═══════════════════ */
 console.log("── 尾部完整性判据（真跑）──");
-ok("末字是汉字 ⇒ 判为断在半句", M.tailCut("……而它才被"));
+/* ⚠ 断稿的判据是「**长散文行**停在字上」——短行、列表、标题、标签行都不算，
+   因为有几种收尾本来就不带句号（真跑：第 1 节按体例必须以 `Keywords: …` 收尾）。 */
+const PROSE = "这一处的分离线落在两边的判断之间而不是侧重不同上，因此它是可裁决的";
+ok("长散文行末字是汉字 ⇒ 判为断在半句", M.tailCut(PROSE + "而它才被"));
 ok("停在逗号上 ⇒ 断在半句", M.tailCut("其一，其二，"));
 ok("停在顿号/冒号上 ⇒ 断在半句", M.tailCut("包括：") && M.tailCut("甲、"));
 ok("句号收口 ⇒ 不算断", !M.tailCut("这一节到此为止。"));
 ok("问号叹号省略号收口 ⇒ 不算断", !M.tailCut("是这样吗？") && !M.tailCut("就是它！") && !M.tailCut("大约如此……"));
 ok("英文句点收口 ⇒ 不算断", !M.tailCut("That is the point."));
 ok("右括号/引号收口 ⇒ 不算断", !M.tailCut("（见前文）") && !M.tailCut("他说「不是」"));
-ok("行尾空白与 markdown 装饰不影响判读", !M.tailCut("收口了。**  \n\n") && M.tailCut("没收口 *"));
+ok("行尾空白与 markdown 装饰不影响判读", !M.tailCut("收口了。**  \n\n") && M.tailCut(PROSE + "没收口 *"));
+
+console.log("── 本来就不带句号的收尾：不许误判 ──");
+ok("★ 关键词行（第 1 节按体例必须这么收尾）不算断",
+  !M.tailCut(PROSE + "。\n\n**Keywords:** genesis; freezing; indexicality"));
+ok("★ 中文关键词行也不算断", !M.tailCut(PROSE + "。\n\n【关键词】发生学；冻结；索引性"));
+ok("★ 列表项收尾不算断", !M.tailCut(PROSE + "。\n\n- 甲：某某\n- 乙：某某"));
+ok("★ 标题行收尾不算断", !M.tailCut(PROSE + "。\n\n### 3.4 小结"));
+ok("★ 短行收尾不算断（多半是收束词，不是断稿）", !M.tailCut(PROSE + "。\n\n以上"));
+ok("但停在半句标点上，短行也算断（那是铁证）", M.tailCut(PROSE + "。\n\n其一，"));
 ok("空串归长度闸管，这里不重复判", !M.tailCut("") && !M.tailCut("   \n"));
 
 console.log("── 够长但断在半句：也算缺节 ──");

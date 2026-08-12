@@ -115,5 +115,12 @@ ok("★ 前端按形状正面判提纲成没成（不只看真值）",
 ok("★ 骨架档不再退回一趟写完", /if \(CHUNKED\[kind\]\) \{[\s\S]{0,400}stage: "plan", bare: 1/.test(F));
 ok("自由分节档仍保留一趟写完那条退路（它没有体例表可依）", /dPlanFallback/.test(F) && /runLeg\(\{\}\)/.test(F));
 
+console.log("── 失败的那一趟更需要留读数 ──");
+ok("★ 上游返回非 200 时也发 meta（否则失败的那几趟一个读数都没有）",
+  /fin: "http_" \+ up\.status/.test(pblk));
+ok("meta 排在 error 之前发（早退那一条路上顺序要对）",
+  pblk.indexOf('fin: "http_" + up.status') < pblk.indexOf('节基底返回 " + up.status'));
+ok("注释写明了为什么补这一帧", /用好人的口供定坏人的罪/.test(W));
+
 console.log("\n" + (fail ? "✗ " : "✓ ") + pass + " passed, " + fail + " failed");
 process.exit(fail ? 1 : 0);

@@ -8036,6 +8036,13 @@ export default {
                   true, stok, sclk.signal, true, _sl, true);
                 if (!up.ok) {
                   const et = (await up.text()).slice(0, 200);
+                  /* ⚠ 这条早退原来**跳过了下面那帧 meta** ⇒ 恰恰是失败的那几趟一个读数都没有，
+                     而客户端只好拿最后一趟"写成了"的读数去解释撞墙（真跑里报出来的
+                     「收束理由 stop、吐了 3686 字」就是这么来的——用好人的口供定坏人的罪）。
+                     失败的那一趟更需要留读数。 */
+                  controller.enqueue(_sseBytes({ t: "meta", v: { idx: partIdx + 1, out: 0, think: _st.think,
+                    want: want, fin: "http_" + up.status, ptok: 0, ctok: 0, rtok: 0,
+                    cut: sclk.cut || "", secs: secs.length } }));
                   controller.enqueue(_sseBytes({ t: "error", v: "第 " + (partIdx + 1) + " 节基底返回 " + up.status + "：" + et,
                     code: (up.status === 401 || up.status === 402 || up.status === 429) ? "bad_key" : "" }));
                   sclk.stop(); return fin();

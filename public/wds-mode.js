@@ -588,7 +588,7 @@
     dPart: "正在写第 ",
     dPartLost: "第 ", dPartLost2: " 节两次都没写出来，先跳过接着往下写（回头可以点「重答」重来）。",
     dShort1: "\u26a0 第 ", dShort2: " 节两遍都没写够字数，稿子在这几处是短的——点上面的「\u21bb 继续写缺的几节」就只补这几节，已经写好的不动。",
-    dCut1: "\u26a0 第 ", dCut2: " 节字数是够的，但**断在半句上**（末尾没有句号）——多半是这一趟被顶穿了。点「\u21bb 继续写缺的几节」可以只重写这几节；重写不会比现在更差（比现在短就仍旧留着现在这一份）。",
+    dCut1: "\u26a0 第 ", dCut2: " 节字数是够的，但**断在半句上**（末尾没有句号）——多半是这一趟被顶穿了。这几节没有当场重写：额度先留给一个字都还没写的那些节。等全篇跑完，点「\u21bb 继续写缺的几节」把它们一起补上；重写不会比现在更差（比现在短就仍旧留着现在这一份）。",
     dTailRetry: "第 ", dTailRetry2: " 节字数够了却断在半句上（多半是这一趟被顶穿了），等 20 秒重写一遍；写出来的若不如现在这一份，就仍旧留着现在这一份。",
     dWallWhy: "（上游给最后那一趟的收束理由：", dWallNoFin: "没给（多半是流被掐断）",
     dLegErr: "第 ", dLegErr2: " 节这一趟自己出岔子了，已跳过接着往下走（原因：",
@@ -6001,8 +6001,19 @@
       var x = String(sx || "").replace(/[\s>*_`~\u3000]+$/g, "");
       if (!x) return false;                                   // 空的归长度闸管，这里不重复判
       var c = x.charAt(x.length - 1);
-      if ("\uff0c\u3001\uff1b\uff1a,;:\u2014\u2500-".indexOf(c) >= 0) return true;
-      return /[0-9A-Za-z\u4e00-\u9fff\u3400-\u4dbf]/.test(c);
+      if ("\uff0c\u3001\uff1b\uff1a,;:\u2014\u2500-".indexOf(c) >= 0) return true;   // 停在半句标点上：铁证
+      if (!/[0-9A-Za-z\u4e00-\u9fff\u3400-\u4dbf]/.test(c)) return false;              // 收了口
+      /* ⚠⚠ 末字是"字"还不足以判断稿——**有几种收尾本来就不带句号**，
+         而第一版把它们全判成了断稿：每误判一次就白打一趟、白等二十秒，
+         而那二十秒正是把后段推进限流窗口的东西（真跑：第 1 节按体例必须以
+         `Keywords: a; b; c` 收尾，于是每一篇的第一节都要白重写一遍）。
+         所以只判**最后一行是长散文行**的那一种——真正的断稿（"才被"／"明确本文"／
+         "不构成范式危机；"）无一例外都发生在一段长句的中间。 */
+      var ls = x.split("\n"), ln = ls[ls.length - 1].replace(/^\s+|\s+$/g, "");
+      if (/^#{1,6}\s/.test(ln)) return false;                                   // 标题行
+      if (/^([-*\u00b7\u2022\u2013]|\d+[.、)])\s/.test(ln)) return false;        // 列表项
+      if (/^(\*\*)?[^\s：:]{1,14}(\*\*)?\s*[：:]/.test(ln)) return false;        // 「关键词：…」这类标签行
+      return ln.length >= 24;                                                   // 短行多半是收束词，不当断稿
     }
     function secPass(sx, need) { return sx.length >= need && !tailCut(sx); }
     /* 【重试不许把稿子弄丢】原来是"回滚 → 重写 → 收下第二遍"：第一遍写了 250 字、
@@ -6399,16 +6410,24 @@
       var RETRY_WAIT = 20000;     // 第二遍等多久再打：立刻重打等于把同一堵墙再撞一次
       var WALL_RUN = 2;           // 连着几节两遍全败就判定撞墙、停下来
       var shortSecs = [], cutSecs = [], runFail = 0, hitWall = false;
+      /* legMeta＝最近一趟的读数；failMeta＝最近一趟**失败**的读数。
+         ⚠ 两者必须分开：真跑里报出来的「收束理由 stop、这一趟吐了 3686 字」
+         其实是最后一趟**写成了**的节的读数——拿它去解释撞墙，等于用好人的口供定坏人的罪。 */
+      var legMeta = null, failMeta = null;
       function step() {
         if (dStopped || hitWall || i >= secs.length) {
           if (shortSecs.length) dNote(t("dShort1") + shortSecs.join("、") + t("dShort2"), 1);
           /* 断在半句的与"没写够字数的"分开报：前者稿子是有的，只是尾巴缺一截；
              后者是这一节根本没写成。混在一起说，读者判不出该补哪些。 */
           if (cutSecs.length) dNote(t("dCut1") + cutSecs.join("、") + t("dCut2"), 1);
-          if (hitWall && i + 1 < secs.length) {
-            dNote(t("dWallLeft1") + (i + 2) + "–" + secs.length + t("dWallLeft2")
-              + (lastMeta ? (t("dWallWhy") + (lastMeta.fin || t("dWallNoFin"))
-                  + "；这一趟只吐了 " + (lastMeta.out || 0) + " 字）") : ""), 1);
+          /* ⚠ 少报一节：撞墙时 i 已经加过一次，`i` 指的就是**第一个一个字都没写的节**，
+             1-based 是 `i + 1`。原来写 `i + 2`，于是把第 8 节说成了第 9 节。 */
+          if (hitWall && i < secs.length) {
+            var fm = failMeta || lastMeta;
+            dNote(t("dWallLeft1") + (i + 1) + "–" + secs.length + t("dWallLeft2")
+              + (fm ? (t("dWallWhy") + (fm.fin || t("dWallNoFin"))
+                  + "；那一趟吐了 " + (fm.out || 0) + " 字" + (fm.think ? ("、思考 " + fm.think + " 字") : "")
+                  + (fm.cut ? ("；本地时钟：" + fm.cut + "闸已掐") : "") + "）") : ""), 1);
           }
           /* 撞墙／写完都在这里亮续写钮——它是这台机器面对上游墙的唯一正解：
              不赌一口气十六节，而是分几趟把缺的补齐。 */
@@ -6420,22 +6439,34 @@
         var before = text.length, tail0 = text.slice(-1200);
         var need = Math.max(260, Math.round((parseInt(secs[i].words, 10) || 1200) * 0.4));
         runLeg({ stage: "part", idx: i, plan: plan, prevTail: tail0 })
-          .then(function () {
+          .then(function (rr) {
+            if (rr && rr.meta) legMeta = rr.meta;
             var a1 = text.slice(before);
-            if (dStopped || secPass(a1, need)) { runFail = 0; return; }   // 写够且没断在半句：清零
+            if (dStopped) { runFail = 0; return; }
+            if (a1.length >= need) {
+              runFail = 0;
+              /* 【断在半句的不在这里重写】它已经是一节**能用**的稿子，只差一个收尾；
+                 而中途重写要多花一趟调用 ＋ 二十秒退避，把后面**一个字都还没写**的那些节
+                 推进限流窗口。缺口留给收尾那颗「继续写缺的几节」——它本来就认这一种。
+                 💡 心法：**把额度花在一个字都没有的地方，别花在只差一个句号的地方。** */
+              if (tailCut(a1)) cutSecs.push(i + 1);
+              return;
+            }
             text = text.slice(0, before);                       // 回滚残稿，退避一会儿再来一遍
-            dNote((a1.length >= need ? (t("dTailRetry") + (i + 1) + t("dTailRetry2")) : (t("dPartRetry") + (i + 1) + t("dPartRetry2"))));
+            failMeta = legMeta;
+            dNote(t("dPartRetry") + (i + 1) + t("dPartRetry2"));
             return new Promise(function (res) { setTimeout(res, RETRY_WAIT); }).then(function () {
               if (dStopped) { text = text.slice(0, before) + a1; return; }
               return runLeg({ stage: "part", idx: i, plan: plan, prevTail: tail0 })
-                .then(function () {
+                .then(function (r2) {
+                  if (r2 && r2.meta) { legMeta = r2.meta; failMeta = r2.meta; }
                   /* 两遍取好的那一遍——第二遍更差（甚至一个字没有）时，
                      第一遍那半截仍旧留在稿子里。这一步是"重试不许丢稿"的落点。 */
                   var kept = betterOf(a1, text.slice(before), need);
                   text = text.slice(0, before) + kept;
-                  if (secPass(kept, need)) { runFail = 0; return; }
-                  if (kept.length >= need) {                     // 够长但断在半句：不算撞墙
-                    cutSecs.push(i + 1); runFail = 0; return;
+                  if (kept.length >= need) {                     // 补够了：断句的留给续写，不算撞墙
+                    if (tailCut(kept)) cutSecs.push(i + 1);
+                    runFail = 0; return;
                   }
                   if (!kept.length) dNote(t("dPartLost") + (i + 1) + t("dPartLost2"), 1);
                   shortSecs.push(i + 1);                         // 两遍都短：记账，收尾时说清是哪几节

@@ -324,20 +324,24 @@ waitDone(A.box, function () {
 
         /* ═══ 四之二、2026-08-12 稳健性复查补的两道闸（真跑）═════════════
            outs 里的**负数**＝这一遍"够长但断在半句"（fixture 用逗号收尾）。 */
-        console.log("── 够长却断在半句 ＋ 重试不许丢稿 ──");
-        const E = harness2(SECS3, { 1: [-1000, 1000] });   // 第 2 节：第一遍断句，第二遍收口
+        console.log("── 够长却断在半句：记账不重写 ＋ 重试不许丢稿 ──");
+        const E = harness2(SECS3, { 1: [-1000] });         // 第 2 节：够长但断在半句
         waitDone(E.box, function () {
-          ok("★ 够长但断在半句 ⇒ 照样重写（长度闸放它过去的那一种断稿）",
-            E.box.appended.filter((x) => x.startsWith("2:")).length === 2);
-          ok("重写收了口就收下第二遍", E.hook.text().indexOf("<2:2>") > 0 && E.hook.text().indexOf("<2:1>") < 0);
+          /* ⭐ 政策改了（2026-08-12 18:48 真跑逼出来的）：断在半句的**不在跑的中途重写**。
+             它已经是一节能用的稿子，只差一个收尾；而中途重写要多花一趟 ＋ 二十秒退避，
+             把后面一个字都还没写的那些节推进限流窗口。缺口留给收尾那颗续写钮。 */
+          ok("★ 断在半句的不在中途重写（额度留给一个字都没写的节）",
+            E.box.appended.filter((x) => x.startsWith("2:")).length === 1);
+          ok("★ 但要记账，收尾时说清是哪几节", E.box.notes.join("|").indexOf("dCut1") >= 0);
           ok("断句这一种不记进 shortSecs（它不是上游在挡）", E.hook.short().length === 0);
-          ok("补成功了就不报账（dCut1 只在补完仍断句时才该出现）", E.box.notes.join("|").indexOf("dCut1") < 0);
+          ok("稿子照样留在正文里（能用的不丢）", E.hook.text().indexOf("<2:1>") > 0);
+          ok("后面的节照常往下写", E.hook.text().indexOf("<3:") > 0);
 
-          const G = harness2(SECS3, { 1: [-1000, 0] });     // 第一遍断句、第二遍一个字没有
+          const G = harness2(SECS3, { 1: [300, -1000] });   // 第一遍不够 → 重写；第二遍够长但断句
           waitDone(G.box, function () {
-            ok("★★ 第二遍是空的 ⇒ 第一遍那一整节仍留在稿子里（重试不许把稿子弄丢）",
-              G.hook.text().indexOf("<2:1>") > 0);
-            ok("留下来的那一节仍按断句报账，不谎报写成了", G.box.notes.join("|").indexOf("dCut1") >= 0);
+            ok("★ 长度不够仍旧照常重写一遍", G.box.appended.filter((x) => x.startsWith("2:")).length === 2);
+            ok("补够了就收下，断句那一件转记到 dCut1", G.hook.text().indexOf("<2:2>") > 0
+              && G.box.notes.join("|").indexOf("dCut1") >= 0 && G.hook.short().length === 0);
 
             const H = harness2(SECS3, { 1: [300, 0] });     // 第一遍 300 字（不够）、第二遍空
             waitDone(H.box, function () {
@@ -375,7 +379,14 @@ function tail() {
     stepSrc.indexOf(".catch(function (e)") < stepSrc.lastIndexOf("i++;"));
   ok("排版/存稿也各自包住（它们抛了不该拖垮这一节的推进）",
     /try \{[\s\S]{0,200}paintD\(false\);[\s\S]{0,200}saveProgress\(/.test(stepSrc));
-  ok("★ 收下一节的判据是两道闸（长度 ＋ 收口），不是只看长度", /secPass\(a1, need\)/.test(stepSrc));
+  ok("★ 长度闸与收口闸分开处置：不够长才重写，断在半句只记账",
+    /if \(a1\.length >= need\) \{/.test(stepSrc) && /if \(tailCut\(a1\)\) cutSecs\.push/.test(stepSrc));
+  ok("★ 断句那一支明确不重写（注释写明理由：额度花在一个字都没有的地方）",
+    /别花在只差一个句号的地方/.test(stepSrc));
+  ok("★ 撞墙的读数取**失败**那一趟，不是最后一趟写成的那一趟",
+    /failMeta = /.test(stepSrc) && /var fm = failMeta \|\| lastMeta;/.test(stepSrc));
+  ok("★ 还差哪几节不许少报一节（撞墙时 i 已经加过一次）",
+    /t\("dWallLeft1"\) \+ \(i \+ 1\) \+ "–"/.test(stepSrc) && /if \(hitWall && i < secs\.length\)/.test(stepSrc));
   ok("★ 两遍取好的那一遍（betterOf），不是无条件收第二遍", /betterOf\(a1, text\.slice\(before\), need\)/.test(stepSrc));
   ok("判长短量的是稿子里真多出来的那一段，不是 runLeg 自报的数",
     /var a1 = text\.slice\(before\);/.test(stepSrc) && stepSrc.indexOf("rr.out >= need") < 0);
