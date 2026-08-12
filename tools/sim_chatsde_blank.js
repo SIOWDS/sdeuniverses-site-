@@ -160,8 +160,14 @@ const rst = FSRC.slice(FSRC.indexOf("onRestore: function (rec)"), FSRC.indexOf("
 ok("还原不再写死 report", !/distill\("report", body, head\)/.test(rst));
 ok("还原按 scopeLabel 反查 kind（用 KIND_KEYS 派生，不手抄档名）", /KIND_KEYS\.forEach/.test(rst) && /kindT\(x\) === head/.test(rst));
 ok("老记录对不上时按正文形状兜底认成 paper", /\? "paper" : "report"/.test(rst));
-ok("导出按钮仍只挂在 essay/paper 两档（还原回 paper 才拿得到）",
-  /if \(kind === "essay" \|\| kind === "paper"\)/.test(FSRC));
+/* ⚠ 落点搬家：2026-08-12 加了「一趟写完」那一档（paper1），这条断言把整句抄进了正则、当场红。
+   它守的用意没变，而且**正是我修过的那个病**——从成文记录取回来的论文拿不到 Word 与 PDF。
+   所以不能删，要跟着扩：出稿三口必须认全部会写长文的档。 */
+ok("导出按钮挂在所有会写长文的档上（少认一档＝那一档取回来拿不到 Word/PDF）", (() => {
+  const m = FSRC.match(/if \(kind === "essay"([^)]*)\)/);
+  if (!m) return false;
+  return ["paper", "paper1"].every((k) => m[1].indexOf('"' + k + '"') >= 0);
+})());
 ok("痕迹逐步打标仍在（收尾·存稿／排版／挂链接／库存）",
   ["收尾·存稿", "收尾·排版", "收尾·挂链接", "收尾·库存", "已收尾"].every((k) => doneSrc.indexOf(k) > 0));
 

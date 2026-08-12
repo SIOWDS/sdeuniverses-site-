@@ -511,7 +511,10 @@ function tail() {
    ["章节两级真标题", "真标题行"], ["写完比写长要紧", "写完比写长要紧"]]
     .forEach(([n, k]) => ok("规程里有：" + n, rules.indexOf(k) >= 0));
   ok("规程只挂在骨架档上（PFIX 为真才发）", /\+ \(PFIX \? \("\\n\\n【正规学术论文写作规程/.test(WSRC));
-  ok("论文档的文案已改成两万字", /kPaper: "凝成两万字论文"/.test(FSRC));
+  /* ⚠ 落点搬家：2026-08-12 加了「一趟写完」那一档之后，两档并存，
+   旧档改名成「分十六趟」。用意（界面上说得清这是两万字论文）没变。 */
+ok("论文档的文案已改成两万字", /kPaper: "凝成两万字论文 · 分十六趟"/.test(FSRC)
+  && /kPaper1: "凝成两万字论文 · 一趟写完"/.test(FSRC));
   ok("英文文案同步改了（中英双份纪律）", /Forge a 20,000-word paper/.test(FSRC));
 
   console.log("\n" + (fail ? "✗ " : "✓ ") + pass + " passed, " + fail + " failed");

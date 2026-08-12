@@ -458,7 +458,8 @@
       kReport: "对话报告", kReportS: "结论 · 谈了什么 · 立住的判断 · 未解决 · 下一步",
       kEssay: "提炼成文", kEssayS: "锻成一篇独立成立的文章，约三千字",
       kOutline: "写作提纲", kOutlineS: "母题 + 章节骨架，照着就能写",
-      kPaper: "凝成两万字论文", kPaperS: "按《正规学术论文写作规范》十六节投稿体例：结构化中英摘要 · 研究问题 · 文献述评 · 概念界定 · 研究设计与方法 · 分析三节 · 可裁决判据 · 稳健性与证伪 · 效度威胁 · 声明组 · 参考文献与附录，约两万字（出 Word 与 PDF）",
+      kPaper1: "凝成两万字论文 · 一趟写完", kPaper1S: "照金点子发生器那台已经跑熟的口径：**一次调用出全篇**，十六节体例写进提示语、字数服从内容（18000–22000 字），出 Word 与 PDF。写得快，中途不会停在某一节。",
+      kPaper: "凝成两万字论文 · 分十六趟", kPaperS: "按《正规学术论文写作规范》十六节投稿体例：结构化中英摘要 · 研究问题 · 文献述评 · 概念界定 · 研究设计与方法 · 分析三节 · 可裁决判据 · 稳健性与证伪 · 效度威胁 · 声明组 · 参考文献与附录，约两万字（出 Word 与 PDF）",
       kSumdoc: "总结载入的文章", kSumdocS: "读完那篇：它在说什么 · 承重句 · 哪里脆 · 没看见什么 · 千字概写（需先载入文章）",
       mDocx: "\u2913 Word (.docx)", mDocxS: "把这一篇存成 Word 文档",
       mPdfx: "\u2913 PDF", mPdfxS: "把这一篇排成印刷稿并存成 PDF（打印框里把「目标」选成「另存为 PDF」）",
@@ -599,6 +600,8 @@
     dPlanRetry: "提纲这一趟没吐出可用的分节，隔一会儿再试一次。",
     dPlanBare: "提纲两趟都没成。这一档的十六节分工与字数本来就是写死的（提纲那一趟真正贡献的只有一个题名），所以不退成「一趟写完」——直接按体例开写，题名写完自己改一个即可。",
     dPlanNo: "\u26a0 连体例表都没取回来（多半是网络断了）。稿子已存进「成文记录」；隔一两分钟按「重答」再来一次。",
+    dOneWait: "\u270d 正在写全篇（两万字，约五到八分钟）。这一档不逐字上屏——逐字排版会把浏览器主线程占死、反而让流停住；写完一次性排好给你。",
+    dOneN0: "\u270d 生成中…", dOneN1: "\u270d 已生成 ", dOneN2: " 字",
     dPartial: "\u26a0 未写完 · ",
     dPartRetry: "第 ", dPartRetry2: " 节写得太少，等 20 秒避开上游的拥堵再写一遍…",
     dWallRun1: "\u26a0 到第 ", dWallRun2: " 节为止，已经连着两节、每节两遍都写不出来了——这是上游在挡，不是这几节难写。就地停住，不再往下白打（再磨下去每一节都会照样失败两遍）。已写的部分全部保住。",
@@ -667,7 +670,8 @@
       kReport: "Conversation report", kReportS: "Verdict · what was covered · what held · what didn't · next",
       kEssay: "Forge into an essay", kEssayS: "A piece that stands on its own, about 3,000 words",
       kOutline: "Writing outline", kOutlineS: "A motif plus a chapter skeleton you can write from",
-      kPaper: "Forge a 20,000-word paper", kPaperS: "Sixteen sections in full submission format: structured bilingual abstract, research questions, literature review, conceptual definitions, design and methods, three analysis sections, a modal-free test, robustness and falsifiers, validity threats, declarations, references (exports to Word and PDF)",
+      kPaper1: "Forge a 20,000-word paper (single pass)", kPaper1S: "One call writes the whole thing, the way the idea generator already does it: all sixteen sections specified in the prompt, length serving content (18,000-22,000 characters). Exports to Word and PDF.",
+      kPaper: "Forge a 20,000-word paper (sixteen passes)", kPaperS: "Sixteen sections in full submission format: structured bilingual abstract, research questions, literature review, conceptual definitions, design and methods, three analysis sections, a modal-free test, robustness and falsifiers, validity threats, declarations, references (exports to Word and PDF)",
       kSumdoc: "Read the loaded article", kSumdocS: "What it claims \u00b7 its load-bearing line \u00b7 where it is brittle \u00b7 a 1,000-word condensation",
       mDocx: "\u2913 Word (.docx)", mDocxS: "Save this piece as a Word document",
       dCloseBusy: "Still writing \u2014 clicking the backdrop will not close it, so a stray click cannot cost you the draft. Press Esc or the \u2715 at the top right; both save what has been written to your saved write-ups first.",
@@ -5707,7 +5711,9 @@
   function kindS(k) { return t(({ report: "kReportS", essay: "kEssayS", outline: "kOutlineS", paper: "kPaperS", sumdoc: "kSumdocS", deck: "kDeckS" })[k]); }
   // paper 排在 essay 之后：它是 essay 的重档（三千字 → 一万字），
   // 而 deck 是另一种东西（给听众的），不该夹在两者中间。
-  var KIND_KEYS = ["report", "essay", "paper", "outline", "sumdoc", "deck"];
+  /* paper1 排在 paper 前面：一趟出全篇是**默认该选的那一个**（金点子那台已经跑熟了），
+     十六趟那一档留着做对照。 */
+  var KIND_KEYS = ["report", "essay", "paper1", "paper", "outline", "sumdoc", "deck"];
   try { layer.querySelector(".wdsm-pdfbtn").onclick = function () { exportPdf(); }; } catch (e) {}
   layer.querySelector(".wdsm-distbtn").onclick = function (ev) {
     var old = document.querySelector(".wdsm-menu");
@@ -5999,7 +6005,7 @@
     /* ── Word 与投稿：成文此前只能出 Markdown 与「打印成 PDF」，拿不出一份能直接投出去的稿子。
        两颗都只在**文章类**档位上摆（deck 是 PPT，报告/提纲不是投稿物）。 */
     var dxBtn = null, subBtn = null;
-    if (kind === "essay" || kind === "paper") {
+    if (kind === "essay" || kind === "paper" || kind === "paper1") {
       dxBtn = el("button", "wdsm-tbtn ddocx", t("mDocx"));
       dxBtn.title = t("mDocxS");
       dlBtn.parentNode.insertBefore(dxBtn, dlBtn);
@@ -6132,6 +6138,7 @@
     };
     function done() {
       clearTimeout(dWd);
+      tickStop();                       // 先停，免得收尾期间它还在改状态栏
       if (stBtn && stBtn.parentNode) stBtn.parentNode.removeChild(stBtn);   // 写完了就没有可停的了
       if (dStopped && text) dNote(t("stopped"));
       /* ① 【稿子先落地，再谈显示】——顺序不许调换。
@@ -6225,7 +6232,7 @@
          它们对"读者能不能看见自己的稿子"零贡献，所以既排在最后、也不许因为长而拖住任何东西。 */
       try {
         if (window.SDEVault && text && text.length > 80) {
-          var _vt = (kind === "paper" || kind === "essay")
+          var _vt = (kind === "paper" || kind === "paper1" || kind === "essay")
             ? window.SDEVault.lead(text, 200) : window.SDEVault.head(text, 200);
           if (_vt) {
             var _vb = wrap.querySelector(".wdsm-vaultnote");
@@ -6439,6 +6446,25 @@
     var pTrace = { kind: kind, at: Date.now(), leg: "起步", chars: 0, paints: 0, lastMs: 0, maxMs: 0, ok: false };
     function traceSave() { try { localStorage.setItem(TRACE_K, JSON.stringify(pTrace)); } catch (e) {} }
     var paintGap = 130;
+    /* ⭐⭐ 【一趟出全篇：不逐字排版，只滚动"已生成 N 字"】
+       [stated] 用户 2026-08-12：「不要持续吐字，要做成『完成多少字』的流，来对付 Worker 的限制，
+       就是学习金点子的智慧」。去读了 /taste/idea-generator/，它写得一清二楚：
+         「论文生成不用"流式蹦字"——正文区不显示逐字过程，只让状态栏"✍ 已生成 N 字"滚动，
+           每一步完成后再把整篇一次性显示到正文区。」
+       而成文机这边是 **paintGap = 130ms 排一次版**：两万字连着排几百次 mdRender ＋ innerHTML，
+       主线程被占死 ⇒ 读流的回调排不上 ⇒ 流就停在那里。
+       **这正是那三次白屏的病根，也是它写不下去的原因**——不是上游不给字，是我们这头没在读。
+       💡💡 心法：**长文的瓶颈不在生成端，在渲染端。** 产出量级一变，先去看每个 token 上挂着什么。
+       口径照抄它：oneShot 时正文区完全不排版，另起一个 500ms 的 ticker 只报字数，收尾一次性排。 */
+    var oneShot = false;                  // 由下面按 kind 置位
+    var tickT = null;
+    function tickStart() {
+      tickStop();
+      tickT = setInterval(function () {
+        try { stat.textContent = text.length ? (t("dOneN1") + text.length + t("dOneN2")) : t("dOneN0"); } catch (e) {}
+      }, 500);
+    }
+    function tickStop() { if (tickT) { clearInterval(tickT); tickT = null; } }
     /* 心跳。每 2 秒写一次时间戳，并记下**实际最大间隔**。
        这是分辨死因的仪器，比再多猜一轮值钱：
        · 白屏时心跳停了（间隔远大于 2 秒）⇒ 主线程被占死，是性能问题；
@@ -6589,7 +6615,12 @@
                   // 九个不关的流留在那里对内存不是好事（读者的机器不一定宽裕）。
                   if (p === "[DONE]") { sawDone = true; try { reader.cancel(); } catch (e2) {} resolve(res); return; }
                   var j; try { j = JSON.parse(p); } catch (e) { continue; }
-                  if (j.t === "token") { text += j.v; res.out += j.v.length; if (Date.now() - lastP > paintGap) { lastP = Date.now(); paintD(false); } }
+                  if (j.t === "token") {
+                    text += j.v; res.out += j.v.length;
+                    /* 一趟出全篇：**一个字都不排**。排版全部推到收尾那一次。
+                       （字数由 ticker 每 500ms 读一次 text.length，不占主线程。） */
+                    if (!oneShot && Date.now() - lastP > paintGap) { lastP = Date.now(); paintD(false); }
+                  }
                   else if (j.t === "plan") { res.plan = j.v; }
                   /* meta：服务端每一趟的读数（收束理由／用量／思考字数）。撞墙那句话
                      终于说得出凭什么这么判——追了一整天没拿到的就是这一行。 */
@@ -6616,8 +6647,18 @@
        而"想久一点"与"写长一点"吃的是同一份预算——单趟的结局要么被墙掐断、
        要么把预算耗在思考上交白卷。所以长档改成拟题一趟 ＋ 每节一趟。
        「再打磨一轮」不拆：它带着上一稿回来，重新拟题等于把上一稿扔了。 */
-    var CHUNKED = { paper: 1 };
-    if (!CHUNKED[kind] || again) { runLeg({}).then(function () { done(); }); return; }
+    var CHUNKED = { paper: 1 };          // paper1 不在表里 ⇒ 走单趟那条路，一次出全篇
+    if (!CHUNKED[kind] || again) {
+      /* 一趟出全篇：正文区先摆一句"生成中"，全程只滚字数，收尾一次性排版。
+         ⚠ ticker 必须在 done() 里停——它是 setInterval，不停就一直在跑。 */
+      oneShot = (kind === "paper1");
+      if (oneShot) {
+        try { out.innerHTML = "<div style='color:#8B7B5E;font-size:13px;line-height:1.8'>" + esc(t("dOneWait")) + "</div>"; } catch (e) {}
+        tickStart();
+      }
+      runLeg({}).then(function () { done(); });
+      return;
+    }
 
     /* 逐节存稿。原来只在 done() 存一次——写到第七节卡死，前六节一起没了。
        现在每写完一节就存一次（同一条记录反复覆盖，不会存出八条来）。
