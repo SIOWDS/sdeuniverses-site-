@@ -55,7 +55,20 @@ ok("bare 臂是零提示语（它是 ΔIQ 的分母）",
 ok("★ std/deep 走站内那条真路，不另写一份提示语", /不要在这里另写一份提示语/.test(RUN) && /\/api\/wds\/chat/.test(RUN));
 ok("forge 臂遇闸门不过就停，并记下停在第几道", /stopped_at_/.test(RUN) && /gate !== "passed"/.test(RUN));
 ok("forge 一题十八次调用，默认不跑（要跑自己点名）", /默认不跑/.test(RUN));
-ok("给每分钟限流留白", /sleep\(c\.arm === "forge" \? 3000 : 1200\)/.test(RUN));
+/* ⚠ 站内 WDS_PER_MIN = 20 ⇒ 走站内的臂至少 3 秒一发。发快了限流器会挡，
+   而挡下来的那一条会被记成"失败"，把完成率这个读数弄脏。 */
+const perMin = (parseInt((fs.readFileSync(path.join(ROOT, "src/worker.js"), "utf8")
+  .match(/const WDS_PER_DAY = \d+, WDS_PER_MIN = (\d+)/) || [])[1], 10) || 20);
+const gap = parseInt((RUN.match(/await sleep\(c\.arm === "bare" \? \d+ : (\d+)\)/) || [])[1], 10) || 0;
+ok("★★ 走站内的臂发得比限流慢（限流 " + perMin + "/分钟，实际间隔 " + gap + "ms）",
+  gap > 0 && gap >= (60000 / perMin), "需要 ≥" + Math.ceil(60000 / perMin) + "ms");
+ok("★ 阈值是从 worker 的限流常数**算出来**的，不是这里手抄的一个数", /WDS_PER_DAY = \\d\+, WDS_PER_MIN/.test(fs.readFileSync(path.join(ROOT, "tools/sim_bench.js"), "utf8")));
+ok("forge 逐道之间同样留够（每一道都是一次站内调用）", /await sleep\(3400\);\s*\/\/ 同上/.test(RUN));
+ok("bare 直连厂商，不吃站内那条限流，可以快一点", /c\.arm === "bare" \? 1200/.test(RUN));
+ok("★ 提纲那一趟打的是 research 端点（打错 chat 整条 forge 臂跑不起来）",
+  /fetch\(SITE \+ "\/api\/wds\/research"/.test(RUN));
+ok("std/deep 的档位字段与服务端对得上（b.mode === \"deep\"）", /mode: deep \? "deep" : "std"/.test(RUN));
+ok("--take 能先只跑前 N 题（先要一个读数，别一上来烧满）", /const TAKE = /.test(RUN) && /items\.slice\(0, TAKE\)/.test(RUN));
 
 /* ═══ 三、⭐ 盲评：这套实验的命根子 ═══════════════════════ */
 console.log("── 盲评 ──");

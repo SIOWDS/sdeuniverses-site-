@@ -34,6 +34,7 @@ const SITE = process.env.BENCH_SITE || "https://sdeuniverses.com";
 const ARMS = String(arg("arms", "bare,std,deep")).split(",").map((x) => x.trim()).filter(Boolean);
 const REPS = Math.max(1, Math.min(9, parseInt(arg("n", "3"), 10) || 3));
 const ONLY = String(arg("only", "")).split(",").map((x) => x.trim()).filter(Boolean);
+const TAKE = Math.max(0, parseInt(arg("take", "0"), 10) || 0);   // 只跑前 N 题（先要一个读数，别一上来烧满）
 const DRY = process.argv.indexOf("--dry") > 0;
 
 /* ⚠ Key 一旦落进产物就再也收不回来。这一条比"跑得起来"重要，所以放在最前面。 */
@@ -128,7 +129,11 @@ async function callSite(q, deep) {
    ⚠ 这一臂的「完成率」本身就是一个读数（建议书 §15.3 要报），所以中断不算失败，算一条记录。 */
 async function callForge(q) {
   const t0 = Date.now();
-  const plan = await fetch(SITE + "/api/wds/chat", {
+  /* ⚠ 提纲那一趟打的是 research 那个端点，不是 chat——
+     `plan === "forge"` 这个分支长在 /api/wds/research 里。写错了整条 forge 臂跑不起来，
+     而它失败的样子是「plan_fail」，看上去像上游的锅。
+     💡 心法：**照着前端抄请求时，要连它打的那个 URL 一起抄。** */
+  const plan = await fetch(SITE + "/api/wds/research", {
     method: "POST", headers: { "content-type": "application/json" },
     body: JSON.stringify({ mode: "plan", q: q, n: 4, key: KEY, vendor: VENDOR, plan: "forge", lang: "zh" }),
   }).then((r) => r.json()).catch(() => null);
@@ -155,7 +160,7 @@ async function callForge(q) {
     gate = m ? String(m[1]).toLowerCase() : (txt ? "unknown" : "empty");
     secs.push({ t: steps[i].t, body: txt });
     if (gate !== "passed") { stopped = i + 1; break; }   // 闸门不过就停：这正是这条产线该有的样子
-    await sleep(1500);
+    await sleep(3400);                                   // 同上：站内每分钟 20 次
   }
   const md = secs.map((s, k) => "## " + (k + 1) + ". " + s.t + "\n\n"
     + String(s.body).replace(/\n*【闸门】[^\n]*\s*$/, "")).join("\n\n");
@@ -166,7 +171,8 @@ async function callForge(q) {
 /* ── 主循环 ───────────────────────────────────────────── */
 async function main() {
   const qs = JSON.parse(fs.readFileSync(path.join(BENCH, "questions.json"), "utf8"));
-  const items = ONLY.length ? qs.items.filter((x) => ONLY.indexOf(x.id) >= 0) : qs.items;
+  let items = ONLY.length ? qs.items.filter((x) => ONLY.indexOf(x.id) >= 0) : qs.items;
+  if (TAKE) items = items.slice(0, TAKE);
   if (!items.length) { console.error("没有题目可跑（--only 里那几个 id 都不在题库里）"); process.exit(1); }
   if (!DRY && (!VENDOR || !VENDORS[VENDOR] || KEY.length < 8)) {
     console.error("缺 BENCH_VENDOR / BENCH_KEY。Key 只从环境变量取，不写进文件。");
@@ -224,7 +230,12 @@ async function main() {
     fs.appendFileSync(outFile, JSON.stringify(rec) + "\n");
     console.log((rec.ok ? "✓ " : "✗ ") + rec.chars + " 字 · " + Math.round(rec.ms / 100) / 10 + "s"
       + (rec.err ? (" · " + rec.err) : ""));
-    await sleep(c.arm === "forge" ? 3000 : 1200);         // 给每分钟限流留白
+    /* ⚠ 站内那条路每分钟 20 次（`WDS_PER_MIN`），1.2 秒一发＝50/分钟，会被限流器挡下，
+       而它挡下来的样子是一条「聊得太快啦」——那会变成一批**看着像失败、其实是我发得太快**的数据，
+       并且直接把完成率这个读数弄脏。所以走站内的臂一律 ≥3.2 秒一发。
+       bare 直连厂商、不吃这条限流，可以快一点。
+       💡 心法：**跑批之前先去数一遍对面的限流，别让自己的节奏变成对方的失败率。** */
+    await sleep(c.arm === "bare" ? 1200 : 3400);
   }
   console.log("\n跑完。产物：" + outFile + "\n下一步：node tools/bench_score.js（盲评）");
 }
