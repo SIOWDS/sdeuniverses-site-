@@ -550,6 +550,9 @@
       fgAgain: "\u21bb 重跑这一道", fgGoBack: "\u21a9 退回第 ", fgGoBack2: " 道重跑",
       fgForce: "仍要往下跑（记一笔降级）", fgForceTag: " 道未过闸仍继续",
       fgDegraded: "这一趟有工序没过闸而被继续：第 ",
+      fgResumed1: "接着上一趟跑：前 ", fgResumed2: " 道已经在稿子里，从断点往下写。",
+      fgResumeAsk1: "上一趟《", fgResumeAsk2: "》跑到第 ", fgResumeAsk3: " 道停下了。接着跑，还是重开一趟？",
+      fgResumeGo: "\u21ba 接着跑", fgResumeNew: "重开一趟",
       fgJudge: "只到判断，不成文",
       tlGrid: "27 宫格定位", tlGridS: "C⊗M⊗V 与一二三号位，中心位轮到谁",
       tlNine: "九宫格取三格", tlNineS: "抽三个视角各问各答，再撞成一条",
@@ -3138,7 +3141,23 @@
     if (fgq && !streaming && !RS.running) {
       if (turns() >= MAX) { updTurns(); return; }
       if (forceQ == null) { inEl.value = ""; inEl.style.height = "auto"; }
-      rsRun(fgq.topic, { judge: fgq.judge });
+      /* 开跑之前先看一眼有没有跑到一半的那一趟。**问一句再决定**——
+         替读者选「重开」会白烧掉他已经跑出来的十几道；替他选「接着跑」又可能接错题目。 */
+      forgeLastRun(function (st) {
+        if (!st) { rsRun(fgq.topic, { judge: fgq.judge }); return; }
+        var cell = addTurn(fgq.topic);
+        var box = el("div", "wdsm-rs");
+        box.appendChild(el("div", "rsh", tx("fgResumeAsk1") + String(st.topic || "").slice(0, 40)
+          + tx("fgResumeAsk2") + (st.stage | 0) + "/" + (st.n | 0) + tx("fgResumeAsk3")));
+        var go = el("button", "wdsm-tbtn", tx("fgResumeGo"));
+        go.style.cssText = "margin:8px 8px 0 0";
+        go.onclick = function () { cell.a.innerHTML = ""; rsRun(st.topic, { judge: !!st.judge }, st); };
+        var nw = el("button", "wdsm-tbtn", tx("fgResumeNew"));
+        nw.style.cssText = "margin:8px 0 0";
+        nw.onclick = function () { cell.a.innerHTML = ""; rsRun(fgq.topic, { judge: fgq.judge }); };
+        box.appendChild(go); box.appendChild(nw);
+        cell.a.innerHTML = ""; cell.a.appendChild(box);
+      });
       return;
     }
     // 开头的 /评分 之类：认出来就挂上那道工序，并把命令本身从提问里摘掉
@@ -5263,8 +5282,46 @@
         return pump();
       });
   }
-  function rsRun(topic, fg) {
-    var kv = wdsKeyGet(); if (!kv) { wdsKeyPanel(function () { rsRun(topic, fg); }); return; }
+  /* 【阶段B · 状态契约】与服务端 `fnv1a64` 是同一个算法，逐字对应。
+     ⚠ 不是 sha256：这里要防的是**漂移**（正文被截断、退回重跑之后带上来的还是旧的那一份），
+     不是防篡改——哈希与正文都由这一侧算出来，密码学强度在这里买不到任何东西。
+     换来的是同步、无 crypto.subtle 依赖、非安全上下文里也不会悄悄退化成另一条路。 */
+  function fnv1a64(str) {
+    var s2 = String(str == null ? "" : str), h1 = 0x811c9dc5 >>> 0, h2 = 0x01000193 >>> 0, i, c;
+    for (i = 0; i < s2.length; i++) {
+      c = s2.charCodeAt(i);
+      h1 = Math.imul(h1 ^ (c & 0xff), 0x01000193) >>> 0;
+      h2 = Math.imul(h2 ^ ((c >>> 8) ^ (i & 0xff)), 0x01000193) >>> 0;
+    }
+    return ("00000000" + h1.toString(16)).slice(-8) + ("00000000" + h2.toString(16)).slice(-8);
+  }
+  var FORGE_SV = 2;                                   // 与服务端 FORGE_SCHEMA_VER 同源
+  function runId() { return "r" + Date.now().toString(36) + Math.random().toString(36).slice(2, 8); }
+  /* 找出未跑完的那一趟（同一台机器、同一个浏览器）。只看最近一条：
+     摆一串半成品让人挑，等于把选择成本转嫁给读者。 */
+  function forgeLastRun(cb) {
+    function go(A) {
+      if (!A) return cb(null);
+      A.list("wds-forge").then(function (ms) {
+        if (!ms || !ms.length) return cb(null);
+        A.get(ms[0].id).then(function (rec) {
+          var st = null;
+          try { st = JSON.parse(((rec && rec.turns) || []).filter(function (t) { return t.role === "wds"; }).pop().text); } catch (e) {}
+          if (!st || st.done || !st.secs || !st.secs.length || st.stage >= st.n) return cb(null);
+          if ((st.sv | 0) !== FORGE_SV) return cb(null);       // 格式换代了就别硬接（旧稿仍在记录里）
+          cb(st);
+        }).catch(function () { cb(null); });
+      }).catch(function () { cb(null); });
+    }
+    if (window.WDSStore) { window.WDSStore.load(go); return; }
+    var sc = document.createElement("script");
+    sc.src = "/assets/wds-store.js"; sc.async = true;
+    sc.onload = function () { window.WDSStore ? window.WDSStore.load(go) : cb(null); };
+    sc.onerror = function () { cb(null); };
+    document.head.appendChild(sc);
+  }
+  function rsRun(topic, fg, resume) {
+    var kv = wdsKeyGet(); if (!kv) { wdsKeyPanel(function () { rsRun(topic, fg, resume); }); return; }
     RS.running = true; RS.stop = false; streaming = true;
     busyUI(true); stopBarShow(true);
     var cell = addTurn(topic);
@@ -5276,6 +5333,41 @@
     cell.a.innerHTML = ""; cell.a.appendChild(card);
     var base = { key: kv.key, vendor: kv.vendor, model: kv.model || "", lang: LANG };
     var steps = [], secs = [], title = topic, degraded = [];
+    /* 一趟＝一个 run。attempt 按道次记，幂等键 run:stage:attempt——
+       同一次重试不该在服务端算成两趟。 */
+    var runid = (resume && resume.run) || runId(), attempts = {};
+    /* 【断点恢复】此前这一趟只活在闭包与 DOM 里：刷新一下、误关一个标签页，
+       十几道工序几十分钟的产出一起没了。现在每写完一道就落一次 IndexedDB
+       （复用 wds-store 的 session，agent 另立 `wds-forge`，不动它的表结构）。
+       ⚠ 存的是**规范状态**（run/stage/artifacts/gates），不是渲染出来的 HTML——
+       恢复要恢复的是状态，不是画面。 */
+    var runSess = null, runTried = false;
+    function runState() {
+      return { sv: FORGE_SV, run: runid, topic: topic, title: title, fg: fg ? 1 : 0,
+        judge: (fg && fg.judge) ? 1 : 0, n: steps.length, at: Date.now(),
+        stage: secs.length, done: secs.length >= steps.length && steps.length > 0,
+        steps: steps.map(function (x) { return { t: x.t }; }),
+        secs: secs.map(function (x) { return { t: x.t, body: x.body, gate: x.gate || "", hash: x.hash || "", at: x.at || 0 }; }),
+        degraded: degraded.slice() };
+    }
+    function saveRun() {
+      if (!fg) return;
+      function put(A) {
+        if (!A) return;
+        try {
+          if (!runSess) runSess = A.session({ agent: "wds-forge", scope: "", scopeLabel: tx("fgTitle") });
+          runSess.save([{ role: "reader", text: topic },
+                        { role: "wds", text: JSON.stringify(runState()) }]);
+        } catch (e) {}
+      }
+      if (window.WDSStore) { window.WDSStore.load(put); return; }
+      if (runTried) return;
+      runTried = true;
+      var sc = document.createElement("script");
+      sc.src = "/assets/wds-store.js"; sc.async = true;
+      sc.onload = function () { if (window.WDSStore) window.WDSStore.load(put); };
+      document.head.appendChild(sc);
+    }
     function fail(msg) {
       note.textContent = msg;
       endRs();
@@ -5288,8 +5380,11 @@
     }
     var _planBody = { mode: "plan", q: topic, n: 4, key: base.key, vendor: base.vendor, model: base.model, lang: LANG };
     if (fg) { _planBody.plan = "forge"; if (fg.judge) _planBody.judge = 1; }
-    rsPost(_planBody)
-      .then(function (r) { return r.json(); })
+    /* 接着跑：工序表是写死的，不必再打一次 plan（也不该——重新拟题等于把上一趟的题名换掉）。 */
+    var _plan = resume
+      ? Promise.resolve({ ok: true, title: resume.title || topic, steps: resume.steps || [] })
+      : rsPost(_planBody).then(function (r) { return r.json(); });
+    _plan
       .then(function (j) {
         if (!j || !j.ok) {
           if (j && j.code === "need_key") { wdsKeyPanel(function () {}); }
@@ -5313,6 +5408,18 @@
           return { box: box, stat: stat, sb: sb };
         });
         var i = 0;
+        if (resume && resume.secs && resume.secs.length) {
+          /* 恢复的是**状态**不是画面：把已完成的那几道摆回各自的行里，i 跳到断点。 */
+          secs = resume.secs.slice(0, steps.length);
+          degraded = (resume.degraded || []).slice();
+          secs.forEach(function (x, k) {
+            if (!rows[k]) return;
+            rows[k].sb.innerHTML = mdRender(x.body);
+            rows[k].stat.textContent = tx("rsDone") + " \u00b7 " + x.body.length;
+          });
+          i = secs.length;
+          note.textContent = tx("fgResumed1") + i + "/" + steps.length + tx("fgResumed2");
+        }
         /* 【闸门】每一道的最后一行是机器读得懂的判决（契约写在服务端 wdsForgeSys）。
            此前「做不出」只是一句写给人看的话，而这里无条件 `i++` 往下跑——
            于是不合格的产出被当成合格的传下去，下游全部空转、读起来却照样通顺。 */
@@ -5361,17 +5468,22 @@
              把每一道**写出来的正文**一并递上去，由服务端按依赖表决定这一道该读到哪几道。
              此前只递标题（`(k+1) + ". " + x.t`），于是第七道看不见第二道的脊柱、
              第十五道成文看不见第四道的候选命题——每一步都在凭题目重新想一遍。 */
-          var bodies = secs.map(function (x, k) { return { i: k + 1, t: x.t, body: x.body }; });
+          var bodies = secs.map(function (x, k) { return { i: k + 1, t: x.t, body: x.body, hash: fnv1a64(x.body) }; });
+          var gates = secs.map(function (x, k) { return { i: k + 1, d: x.gate || "passed" }; });
+          attempts[i] = (attempts[i] || 0) + 1;
           var pl = {
             q: s.t, history: [], key: base.key, vendor: base.vendor, model: base.model,
             mode: thinkMode, web: webOn ? 1 : 0, skey: wdsSearchKey(), about: aboutPlus(), lang: LANG,
-            rs: { i: i + 1, n: steps.length, t: s.t, topic: topic, done: done, bodies: bodies, forge: fg ? 1 : 0 },
+            rs: { i: i + 1, n: steps.length, t: s.t, topic: topic, done: done, bodies: bodies, gates: gates,
+                  forge: fg ? 1 : 0, sv: FORGE_SV, run: runid, attempt: attempts[i],
+                  idem: runid + ":" + (i + 1) + ":" + attempts[i] },
           };
           return rsStream(API, pl, function (txt) { r.sb.innerHTML = mdRender(txt); if (stick) scrollBottom(); })
             .then(function (txt) {
               var g = fg ? forgeGate(txt) : { d: "passed" };
               r.stat.textContent = (g.d === "passed" ? tx("rsDone") : ("\u26a0 " + tx("fgGateNo"))) + " \u00b7 " + txt.length;
-              secs.push({ t: s.t, body: txt });
+              secs.push({ t: s.t, body: txt, gate: g.d, hash: fnv1a64(txt), at: Date.now() });
+              saveRun();
               if (g.d === "passed") { r.box.classList.remove("open"); i++; return step(); }
               /* 不合格就停在这里。**不许把失败说明当合格产物继续传递。** */
               return forgeHalt(r, g, function (back) {
@@ -5412,6 +5524,7 @@
           /* 【降级要看得见】读者按了「仍要往下跑」的那几道，成品里必须留痕——
              否则一份没过闸的稿子和一份全过闸的稿子长得一模一样。 */
           if (degraded.length) md += "> \u26a0 " + tx("fgDegraded") + degraded.join("\u3001") + "\n\n";
+          saveRun();                                   // 收尾再存一次：这一份带着 done 标记，恢复时不会再被提出来
           if (verdict) md += "## \u25c6 " + tx("rsFinal").replace(/[\u2026.]+$/, "") + "\n\n" + verdict + "\n\n";
           secs.forEach(function (s, k) { md += "## " + (k + 1) + ". " + s.t + "\n\n" + s.body + "\n\n"; });
           var total = md.length;

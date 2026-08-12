@@ -114,13 +114,17 @@ ok("目录那一段改成了「只是目录，别重复它们」", /只是目录
 
 /* ═══ 五、前端：递真产物 ＋ 不合格不许自动前进 ═══════════════ */
 console.log("── 前端接线 ──");
-const fa = F.indexOf("        var i = 0;\n        /* 【闸门】");
+/* ⚠ 起点锚原来连着下一行的注释（`var i = 0;` ＋「/* 【闸门】」）——阶段B 在两者之间
+   插了一段恢复逻辑，锚当场失配、十一条全红。**锚只认一行代码，别把下一行捎上。** */
+const fa = F.indexOf("        var i = 0;\n");
 const fb = F.indexOf("        function finalStep()", fa);
 const STEP = (fa > 0 && fb > fa) ? F.slice(fa, fb) : "";
 ok("抠得到产线那一段", STEP.length > 1500);
+/* ⚠ 别把整行抄进正则（站里反复犯的病）：阶段B 给每件产物加了 hash，这一条当场红，
+   而它要守的用意——「递的是正文不是标题」——一个字都没变。只认承重的那几个字。 */
 ok("★ 把每一道的正文一并递上去（不再只递标题）",
-  /bodies = secs\.map\(function \(x, k\) \{ return \{ i: k \+ 1, t: x\.t, body: x\.body \}; \}\)/.test(STEP)
-  && /bodies: bodies/.test(STEP));
+  /bodies = secs\.map\([\s\S]{0,120}body: x\.body/.test(STEP) && /bodies: bodies/.test(STEP));
+ok("★ 每件产物随身带 hash（服务端据此判是不是旧版本）", /hash: fnv1a64\(x\.body\)/.test(STEP));
 ok("目录那一份仍旧只给标题（它只是目录）", /done = steps\.map/.test(STEP));
 ok("★ 闸门解析出四态", /passed\|needs_revision\|return_to_stage/.test(STEP));
 ok("★ 只有 passed 才 i++ 往下跑", /if \(g\.d === "passed"\) \{ r\.box\.classList\.remove\("open"\); i\+\+; return step\(\); \}/.test(STEP));
@@ -192,6 +196,96 @@ ok("★ 且综合分要声明自己不可引用", /不作为可引用的读数/.
 ok("报告开头就要挂显著状态（不是藏在末尾）", /报告开头第一行就写/.test(W));
 ok("明写不许假装完成敌意拓邻", /不许假装完成了敌意拓邻/.test(W));
 ok("有站外资料时要求逐条落到出处", /逐条落到上面的出处/.test(W) && /引一条编的文献比不引伤得重/.test(W));
+
+/* ═══ 八、阶段B：状态契约 ═══════════════════════════════════════
+   🔴🔴 这一节的存在本身是一条教训。上一轮那条 P0 修复**在线上是空转的**：
+   前端已经把 bodies 递上来、服务端 forgeCarry 也写好了，而 `/api/wds/chat` 里
+   有一道**逐字段重建 rs 的白名单**，`bodies` 不在单子上 ⇒ 被静默丢掉。
+   而护栏全绿——因为它直接调 wdsForgeSys，**绕过了读者真正会走的那一步**。
+   💡 心法一：改了传输契约，第一件事是去看接收端的白名单。
+   💡 心法二：护栏必须走真正的那条路。绕过清洗去测处理函数，测的是一条读者永远走不到的路。 */
+console.log("── ⭐ 入参白名单：真的那条路 ──");
+const wa = W.indexOf("      const rs = rsRaw ? {");
+const wb = W.indexOf("      // VISION：读者带来的图", wa);
+const SAN = (wa > 0 && wb > wa) ? W.slice(wa, wb) : "";
+ok("抠得到 rs 的清洗那一段", SAN.indexOf("rsRaw.topic") > 0);
+const SANF = new Function("rsRaw", SAN.replace("      const rs = rsRaw ? {", "const rs = rsRaw ? {") + "\n return rs;");
+const sanIn = { i: 7, n: 18, forge: 1, t: "共有前提", topic: "题", done: "1. 选源",
+  sv: 2, run: "r123abc", attempt: 2, idem: "r123abc:7:2",
+  bodies: [{ i: 2, t: "抽脊", body: "甲家承重命题：" + MARK, hash: "deadbeefdeadbeef" },
+           { i: 5, t: "近邻闸", body: "近邻正文" }, { i: 6, t: "候选互撞", body: "候选正文" }],
+  gates: [{ i: 2, d: "passed" }, { i: 5, d: "needs_revision" }] };
+const sanOut = SANF(sanIn);
+ok("★★ bodies 过得了白名单（上一版就死在这里，而护栏全绿）",
+  Array.isArray(sanOut.bodies) && sanOut.bodies.length === 3);
+ok("★★ 正文一个字不少地过来了（不是只剩标题）", sanOut.bodies[0].body.indexOf(MARK) >= 0);
+ok("gates 也过得来", Array.isArray(sanOut.gates) && sanOut.gates.length === 2 && sanOut.gates[1].d === "needs_revision");
+ok("契约字段过得来（sv/run/attempt/idem）",
+  sanOut.sv === 2 && sanOut.run === "r123abc" && sanOut.attempt === 2 && sanOut.idem === "r123abc:7:2");
+ok("★ 走完清洗之后，wdsForgeSys 仍读得到那个标记（端到端）",
+  M.sys(Object.assign({}, sanOut)).indexOf(MARK) >= 0);
+ok("run/idem 做了字符白名单（外部输入不许原样进 system）",
+  SANF({ i: 2, forge: 1, run: "a<script>b", idem: "x'\"y" }).run === "ascriptb");
+ok("单件正文有长度钳位", /slice\(0, 40000\)/.test(SAN));
+ok("总量有封顶（一趟不许把内存吃光）", /200000/.test(SAN));
+ok("超总量时保住最近几道（从后往前收）", /for \(let k = src\.length - 1; k >= 0; k--\)/.test(SAN));
+const big = SANF({ i: 18, forge: 1, bodies: Array.from({ length: 30 }, (_, k) => ({ i: k + 1, t: "x", body: "字".repeat(30000) })) });
+ok("三十件 ×3 万字进来也不炸，且截在限内", big.bodies.length <= 20
+  && big.bodies.reduce((a, b) => a + b.body.length, 0) <= 200000);
+ok("注释写明了这条教训（下一个人别再踩）", /改了传输契约，第一件事是去看接收端的白名单/.test(W));
+
+console.log("── 契约校验（forgeValidate 真跑）──");
+const V = new Function("const FORGE_STAGES = new Array(18).fill({t:'x',d:'y'});" + SRC.slice(SRC.indexOf("const FORGE_SCHEMA_VER"))
+  .slice(0, SRC.slice(SRC.indexOf("const FORGE_SCHEMA_VER")).indexOf("function wdsForgeSys"))
+  + "\n return { v: forgeValidate, h: fnv1a64, SV: FORGE_SCHEMA_VER };")();
+ok("抠得到 forgeValidate 与 fnv1a64", typeof V.v === "function" && typeof V.h === "function");
+ok("正常入参放行", V.v({ i: 7, sv: V.SV, bodies: [{ i: 2, t: "a", body: "x", hash: V.h("x") }] }) === null);
+ok("★ 格式换代了要说出来，不硬接", (V.v({ i: 7, sv: 99, bodies: [] }) || {}).code === "schema");
+ok("★ 道次越界当场退回", (V.v({ i: 99, bodies: [] }) || {}).code === "stage");
+ok("★ 产物标着自己或下游 ⇒ 退回（只能带上游）", (V.v({ i: 7, bodies: [{ i: 7, body: "x" }] }) || {}).code === "artifact");
+ok("没有正文的产物 ⇒ 退回", (V.v({ i: 7, bodies: [{ i: 2 }] }) || {}).code === "artifact");
+ok("★★ hash 对不上 ⇒ 退回（那多半是退回重跑之后带上来的旧版本）",
+  (V.v({ i: 7, bodies: [{ i: 2, body: "新的正文", hash: V.h("旧的正文") }] }) || {}).code === "hash");
+ok("不带 hash 的老客户端仍放行（兼容层，不许一升级就把人拒之门外）",
+  V.v({ i: 7, bodies: [{ i: 2, body: "x" }] }) === null);
+ok("每条退回都说得出是哪一道、错在哪", ["schema", "stage", "artifact", "hash"].every((c) => {
+  const r = c === "schema" ? V.v({ i: 7, sv: 99 }) : c === "stage" ? V.v({ i: 99 })
+    : c === "artifact" ? V.v({ i: 7, bodies: [{ i: 7, body: "x" }] })
+    : V.v({ i: 7, bodies: [{ i: 2, body: "a", hash: V.h("b") }] });
+  return r && r.msg && r.msg.length > 10;
+}));
+ok("端点接上了校验，且带机器可读错误码", /code: "forge_" \+ bad\.code/.test(W) && /const bad = forgeValidate\(rs\);/.test(W));
+ok("校验不过就地收口，不往下跑", /controller\.enqueue\(_sseBytes\(\{ t: "error", code: "forge_"[\s\S]{0,120}return fin\(\);/.test(W));
+
+console.log("── 两侧 hash 必须是同一个算法 ──");
+const CH = new Function(F.slice(F.indexOf("  function fnv1a64(str) {"), F.indexOf("  var FORGE_SV = 2;")) + "\n return fnv1a64;")();
+["", "a", "甲家承重命题：" + MARK, "字".repeat(5000), "mixed 中英 123 !@#"].forEach((x, k) =>
+  ok("第 " + (k + 1) + " 组：前后端算出来同一个值", CH(x) === V.h(x)));
+ok("★ 前端 FORGE_SV 与服务端 FORGE_SCHEMA_VER 同源", /var FORGE_SV = 2;/.test(F) && V.SV === 2);
+ok("注释诚实交代了为什么不是 sha256", /不是防篡改/.test(W) && /不是防篡改/.test(F));
+
+console.log("── 闸门链：下游看得见自己接的是什么货 ──");
+const cg = M.carry(7, [{ i: 2, t: "抽脊", body: "甲" }, { i: 5, t: "近邻闸", body: "乙" }, { i: 6, t: "候选互撞", body: "丙" }],
+  [{ i: 5, d: "needs_revision" }]);
+ok("★ 没过闸的上游被标出来了", /当时判的是 needs_revision、是被强行带下来的/.test(cg.text));
+ok("★ 并要求本道先判这份材料还能不能用", /先判一句：这份材料在你这一道还能不能用/.test(cg.text));
+ok("过了闸的不加噪音", (cg.text.match(/当时判的是/g) || []).length === 1);
+
+console.log("── 幂等与断点恢复 ──");
+ok("★ 每一道带 attempt 与幂等键 run:stage:attempt",
+  /idem: runid \+ ":" \+ \(i \+ 1\) \+ ":" \+ attempts\[i\]/.test(F) && /attempts\[i\] = \(attempts\[i\] \|\| 0\) \+ 1;/.test(F));
+ok("重跑同一道 attempt 会加一（服务端据此分得清是不是同一次）", /attempts = \{\}/.test(F));
+ok("★ 每写完一道就落一次 IndexedDB", /function saveRun\(\)/.test(F) && /agent: "wds-forge"/.test(F) && /saveRun\(\);/.test(F));
+ok("存的是规范状态不是画面", /存的是\*\*规范状态\*\*/.test(F) && /secs: secs\.map/.test(F) && !/innerHTML[^\n]*runState/.test(F));
+ok("状态里带着 gate 与 hash（恢复之后仍验得了）", /gate: x\.gate \|\| ""/.test(F) && /hash: x\.hash \|\| ""/.test(F));
+ok("★ 开跑前问一句要不要接着上一趟（不替读者选）",
+  /forgeLastRun\(function \(st\)/.test(F) && /fgResumeGo/.test(F) && /fgResumeNew/.test(F));
+ok("跑完的那一趟不会再被提出来", /st\.done \|\| !st\.secs/.test(F));
+ok("格式换代的旧 run 不硬接", /\(st\.sv \| 0\) !== FORGE_SV/.test(F));
+ok("★ 接着跑时不再重打一次 plan（重新拟题＝把上一趟的题名换掉）",
+  /resume\s*\?\s*Promise\.resolve\(\{ ok: true, title: resume\.title/.test(F));
+ok("恢复时 i 跳到断点，已完成的摆回各自那一行", /i = secs\.length;/.test(F) && /rows\[k\]\.sb\.innerHTML = mdRender\(x\.body\)/.test(F));
+ok("恢复沿用同一个 run id（同一趟就是同一趟）", /var runid = \(resume && resume\.run\) \|\| runId\(\)/.test(F));
 
 console.log("\n" + (fail ? "✗ " : "✓ ") + pass + " passed, " + fail + " failed");
 process.exit(fail ? 1 : 0);

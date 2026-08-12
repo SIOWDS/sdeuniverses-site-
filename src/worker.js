@@ -4350,11 +4350,64 @@ const FORGE_NEEDS = {
 };
 const FORGE_CARRY_MAX = 26000;   // 一趟最多内联多少字的上游原文（再多就把这一趟自己顶穿）
 
+/* ═══ 阶段B：状态契约 ═══════════════════════════════════════════
+   建议书 §5.3：「不要完全相信前端传来的阶段编号和『已通过』标记。」
+   这一段是那句话的落点。**服务端不猜、也不静默兜底——不合格就带着机器可读的错误码退回。**
+
+   ⚠ hash 用的是 FNV-1a 64 位，不是建议书写的 sha256。理由要说清楚：
+   这里要防的是**漂移**（正文在存储/传输里被截断、退回重跑之后拿了旧版本），
+   不是防篡改——哈希和正文都由同一个前端算出来，密码学强度在这里买不到任何东西。
+   换来的是：同步、无 crypto.subtle 依赖、非安全上下文里也不会悄悄退化成另一条路。
+   要真做防篡改，得先有服务端权威副本，那是另一件事。 */
+const FORGE_SCHEMA_VER = 2;
+function fnv1a64(str) {
+  const s2 = String(str == null ? "" : str);
+  let h1 = 0x811c9dc5 >>> 0, h2 = 0x01000193 >>> 0;   // 两条 32 位链拼成 64 位，避开 BigInt
+  for (let i = 0; i < s2.length; i++) {
+    const c = s2.charCodeAt(i);
+    h1 = Math.imul(h1 ^ (c & 0xff), 0x01000193) >>> 0;
+    h2 = Math.imul(h2 ^ ((c >>> 8) ^ (i & 0xff)), 0x01000193) >>> 0;
+  }
+  return ("00000000" + h1.toString(16)).slice(-8) + ("00000000" + h2.toString(16)).slice(-8);
+}
+
+/* 校验这一趟的入参。返回 null＝过；返回 {code,msg}＝退回。
+   每一条都对应建议书 §5.3 点名的一项，且**每一条都说得出是哪一道、错在哪**。 */
+function forgeValidate(rs) {
+  const n = FORGE_STAGES.length;
+  const i = rs.i | 0;
+  if ((rs.sv | 0) && (rs.sv | 0) !== FORGE_SCHEMA_VER) {
+    return { code: "schema", msg: "这一趟的状态格式是第 " + (rs.sv | 0) + " 版，本站现在跑的是第 " + FORGE_SCHEMA_VER + " 版。请重开一趟（旧稿仍在成文记录里）。" };
+  }
+  if (i < 1 || i > n) return { code: "stage", msg: "第 " + i + " 道不在这条产线上（共 " + n + " 道）。" };
+  const bodies = Array.isArray(rs.bodies) ? rs.bodies : [];
+  /* 形状：每一件产物都要有 i / t / body。少一样就不是产物，是碎片。 */
+  for (const b of bodies) {
+    if (!b || typeof b !== "object") return { code: "artifact", msg: "上游产物里混进了一件不成形的东西。" };
+    const k = b.i | 0;
+    if (k < 1 || k >= i) return { code: "artifact", msg: "上游产物标着第 " + k + " 道，而现在跑的是第 " + i + " 道——只能带上游，不能带自己或下游。" };
+    if (typeof b.body !== "string") return { code: "artifact", msg: "第 " + k + " 道的产物没有正文。" };
+  }
+  /* hash：带了就必须对得上。**对不上宁可退回，也不许拿一份可能是旧版本的材料往下做。** */
+  for (const b of bodies) {
+    if (b.hash && fnv1a64(b.body) !== String(b.hash)) {
+      return { code: "hash", msg: "第 " + (b.i | 0) + " 道的产物与它自报的校验值对不上（多半是那一道被重跑过、而带上来的还是旧的一份）。请重开这一趟或退回那一道。" };
+    }
+  }
+  /* 必需上游：缺了不当场退回，而是让 wdsForgeSys 那段「材料不全」如实写进提示语——
+     缺材料是内容问题，不是请求非法；退回去读者只会看到一句报错，反而不知道缺什么。 */
+  return null;
+}
+
 /* 把上游真产物编成可读的一段。**截断必须看得见**——悄悄截掉一半，
    下游会拿着半截材料写得头头是道，而这正是最难查的一类假产出。 */
-function forgeCarry(i, bodies) {
+function forgeCarry(i, bodies, gates) {
   const need = FORGE_NEEDS[i] || [];
   if (!need.length || !Array.isArray(bodies) || !bodies.length) return { text: "", got: [], miss: need.slice() };
+  /* 闸门链：上游哪一道其实没过闸。建议书 §5.3——不完全相信前端的「已通过」标记；
+     这里不硬拦（读者按了「仍要往下跑」是他的决定），但**必须让下游看见它接的是什么货**。 */
+  const gd = {};
+  for (const g of (Array.isArray(gates) ? gates : [])) { const k = parseInt(g && g.i, 10); if (k > 0) gd[k] = String(g.d || ""); }
   const by = {};
   for (const b of bodies) {
     const k = parseInt(b && b.i, 10);
@@ -4371,7 +4424,11 @@ function forgeCarry(i, bodies) {
     let bd = v.body;
     let cut = "";
     if (bd.length > per) { bd = bd.slice(0, per); cut = "\n〔⚠ 这一道原文共 " + v.body.length + " 字，此处只带来前 " + per + " 字；要用到后半段就退回第 " + k + " 道重跑〕"; }
-    out += "\n\n───── 第 " + k + " 道《" + v.t + "》的产出（原文，供你逐字取用）─────\n" + bd + cut;
+    const bad = gd[k] && gd[k] !== "passed";
+    out += "\n\n───── 第 " + k + " 道《" + v.t + "》的产出（原文，供你逐字取用）"
+      + (bad ? "　⚠ 这一道当时判的是 " + gd[k] + "、是被强行带下来的" : "") + " ─────\n"
+      + (bad ? "〔⚠ 先判一句：这份材料在你这一道还能不能用。用不了就直接给 return_to_stage。〕\n" : "")
+      + bd + cut;
   }
   return { text: out, got: have, miss };
 }
@@ -4380,7 +4437,7 @@ function wdsForgeSys(rs) {
   const i = Math.max(1, Math.min(FORGE_STAGES.length, rs.i | 0));
   const st = FORGE_STAGES[i - 1];
   if (!st) return "";
-  const carry = forgeCarry(i, rs.bodies);
+  const carry = forgeCarry(i, rs.bodies, rs.gates);
   return FORGE_HEART
     + "\n\n【第 " + rs.i + "/" + rs.n + " 道工序 · " + st.t + "】"
     + "\n题目：" + rs.topic
@@ -6871,6 +6928,13 @@ export default {
       const comp = String(b.comp || "").slice(0, 8000);
       // RESEARCH：深度研究的一步。走同一条产线（检索/联网/流式/时钟全都现成），只换口径与预算。
       const rsRaw = (b.rs && typeof b.rs === "object") ? b.rs : null;
+      /* 🔴🔴 【白名单是一把双刃】这里逐字段重建 rs，是对的——外部输入不许原样进 system。
+         但它也意味着：**新加的字段不在这张单子上，就会被静默丢掉**。
+         2026-08-12 就这么栽过一次：前端已经把每一道的正文放进 `rs.bodies` 递上来，
+         服务端 `forgeCarry` 也写好了，而这张单子没加 bodies ⇒ 那条 P0 修复在线上**整个是空转的**，
+         护栏还全绿（它直接调 wdsForgeSys，绕过了这一步）。
+         💡 心法：**改了传输契约，第一件事是去看接收端的白名单。**
+         💡 心法：**护栏必须走真正的那条路。绕过清洗去测处理函数，测的是一条读者永远走不到的路。** */
       const rs = rsRaw ? {
         i: Math.max(1, Math.min(20, parseInt(rsRaw.i, 10) || 1)),
         n: Math.max(1, Math.min(20, parseInt(rsRaw.n, 10) || 1)),
@@ -6878,6 +6942,34 @@ export default {
         t: String(rsRaw.t || "").slice(0, 200),
         topic: String(rsRaw.topic || "").slice(0, 300),
         done: String(rsRaw.done || "").slice(0, 3000),
+        /* 阶段B 的状态契约字段。都做长度与类型钳位——白名单的意义正在于此。 */
+        sv: Math.max(0, Math.min(99, parseInt(rsRaw.sv, 10) || 0)),
+        run: String(rsRaw.run || "").replace(/[^A-Za-z0-9_-]/g, "").slice(0, 40),
+        attempt: Math.max(1, Math.min(9, parseInt(rsRaw.attempt, 10) || 1)),
+        idem: String(rsRaw.idem || "").replace(/[^A-Za-z0-9_:-]/g, "").slice(0, 80),
+        /* ⭐ bodies：上游各道的**真产物**。这条产线是不是发生链，全看它有没有过得来。
+           每件钳到 4 万字、最多 20 件、总量 20 万字封顶——超了就丢最早的那几件
+           （下游最需要的是最近几道，而 forgeCarry 还会按依赖表再挑一遍）。 */
+        bodies: (function () {
+          const src = Array.isArray(rsRaw.bodies) ? rsRaw.bodies.slice(0, 20) : [];
+          const out = []; let tot = 0;
+          for (let k = src.length - 1; k >= 0; k--) {          // 从后往前收，保住最近几道
+            const b = src[k];
+            if (!b || typeof b !== "object") continue;
+            const body = String(b.body || "").slice(0, 40000);
+            if (tot + body.length > 200000) continue;
+            tot += body.length;
+            out.unshift({ i: Math.max(0, Math.min(20, parseInt(b.i, 10) || 0)),
+              t: String(b.t || "").slice(0, 200), body: body,
+              hash: String(b.hash || "").replace(/[^a-f0-9]/g, "").slice(0, 32) });
+          }
+          return out;
+        })(),
+        /* gates：各道的闸门判决。服务端据此在材料里标出「这一道其实没过闸」。 */
+        gates: (Array.isArray(rsRaw.gates) ? rsRaw.gates.slice(0, 20) : []).map((g) => ({
+          i: Math.max(0, Math.min(20, parseInt(g && g.i, 10) || 0)),
+          d: String((g && g.d) || "").replace(/[^a-z_]/g, "").slice(0, 20),
+        })),
       } : null;
       // VISION：读者带来的图。**图不进附件那条文字线**——附件线走的是 OCR 出来的字，
       // 那是"读它印了什么"，不是"看它长什么样"（图表的形状、版式、手写、白板上的箭头，OCR 一个都给不出）。
@@ -6908,6 +7000,21 @@ export default {
           _hb = wdsBeat(controller, _st);
           try {
             if (dayLeft !== null) controller.enqueue(_sseBytes({ t: "quota", v: { left: dayLeft, day: WDS_PER_DAY } })); // 今日真实剩余次数
+            /* 【阶段B · 状态契约校验】建议书 §5.3：不完全相信前端传来的阶段编号和「已通过」标记。
+               不合格就带机器可读的错误码退回，**不静默兜底往下跑**——带着一份可能是旧版本的
+               材料做出来的产出，读起来照样通顺，事后极难发现。 */
+            if (rs && rs.forge) {
+              const bad = forgeValidate(rs);
+              if (bad) {
+                controller.enqueue(_sseBytes({ t: "error", code: "forge_" + bad.code, v: bad.msg }));
+                return fin();
+              }
+              /* 这一趟的读数：让读者与我方都看得见它到底继承了什么。 */
+              const _c = forgeCarry(rs.i | 0, rs.bodies, rs.gates);
+              controller.enqueue(_sseBytes({ t: "forge", v: {
+                sv: FORGE_SCHEMA_VER, i: rs.i | 0, run: rs.run || "", attempt: rs.attempt || 1, idem: rs.idem || "",
+                needs: FORGE_NEEDS[rs.i | 0] || [], got: _c.got, miss: _c.miss, carry: _c.text.length } }));
+            }
             // 全站检索：先调用结构化知识(九库邻域子图,密/准/省token),再以相似句片段补充
             let ctxText = "", sources = [];
             const seen = {};
