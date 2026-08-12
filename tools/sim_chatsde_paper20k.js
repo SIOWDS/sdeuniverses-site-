@@ -25,9 +25,9 @@ const SKEL = mSkel ? new Function("return " + mSkel[1] + ";")() : [];
 const total = SKEL.reduce((a, s) => a + s.words, 0);
 console.log("     节数 " + SKEL.length + " · 合计 " + total + " 字");
 ok("节数在 12–16 之间（两万字靠加节数，不靠加长单节）", SKEL.length >= 12 && SKEL.length <= 16);
-ok("合计字数落在 19000–22000（目标两万）", total >= 19000 && total <= 22000);
+ok("合计字数落在 25000–30000（v2.2 按实测放开到 27,500）", total >= 25000 && total <= 30000);
 ok("每节都有 h 与 ask", SKEL.every((s) => s.h && s.ask && s.ask.length > 40));
-ok("单节字数一律 ≤1900（超过安全区必被时长墙掐在思考阶段）", SKEL.every((s) => s.words <= 1900));
+ok("单节字数一律 ≤3000（v2.2 上调；仍不许再往上，加长单节必被时长墙掐在思考阶段）", SKEL.every((s) => s.words <= 3000));
 ok("单节字数一律 ≥800（太碎会让接缝多于正文）", SKEL.every((s) => s.words >= 800));
 ok("小标题互不重复", new Set(SKEL.map((s) => s.h)).size === SKEL.length);
 
@@ -153,6 +153,26 @@ const INTRO = byH("引言"), REVIEW = byH("文献述评"), NEAR = byH("最近邻
 [["五十年扫描", "最近五十年"], ["缺陷账", "缺陷账"], ["文献三级", "【三】"],
  ["对话四步", "四步形状"], ["主流理论对话", "研究生入学书单"], ["有一位打不赢", "这一条本文没有答案"]]
   .forEach(([n, kw]) => ok("Skill 里也写着：" + n, SKILL.indexOf(kw) >= 0));
+
+/* ── v2.2：额度放开 —— 正文各趟不再重送整份对话，省下的入参额度让给正文 ── */
+console.log("── v2.2：入参重复已砍／字数额度按实测放开 ──");
+ok("v2.2 骨架合计 27,500 字", SKEL.reduce((a, x) => a + x.words, 0) === 27500);
+[["盘点表 3000", "五、最近邻盘点与占位划界", 3000], ["核心命题 2400", "四、核心命题", 2400],
+ ["述评 2600", "二、文献述评", 2600], ["引言 2200", "一、引言", 2200],
+ ["理论框架 2200", "三、理论框架", 2200]]
+  .forEach(([n, kw, w]) => ok("v2.2 额度：" + n, (SKEL.find((x) => x.h.indexOf(kw) >= 0) || {}).words === w));
+/* 入参那一刀：机器层必须真的分出两份对话额度，且 part 用的是短的那一份 */
+ok("worker 里另立了 convoMaxPart", /convoMaxPart\s*=/.test(WSRC));
+ok("convoMaxPart 由 convoMax 折算而非照抄", /convoMaxPart[\s\S]{0,160}convoMax\s*\*/.test(WSRC));
+ok("convoMaxPart 有上下限（9000–18000）", /convoMaxPart[\s\S]{0,120}9000[\s\S]{0,60}18000/.test(WSRC));
+ok("生成了 convoPart 切片", /convoPart\s*=\s*convo\.length\s*>\s*convoMaxPart/.test(WSRC));
+ok("part 那一趟送的是 convoPart", /convoPart[\s\S]{0,200}现在只写第/.test(WSRC));
+ok("part 那一趟不再送整份 convo", !/content:\s*CONVO\s*\+\s*"现在只写第/.test(WSRC));
+ok("plan 那一趟仍通读全场", /content:\s*CONVO\s*\+\s*"现在只输出那个 JSON/.test(WSRC));
+ok("注释写明了这一刀的理由（入参按从不发生的输出量配的）", WSRC.indexOf("从不发生的输出量") >= 0);
+ok("Skill 里也写着 v2.2 为什么放开", SKILL.indexOf("字数额度为什么放开") >= 0);
+ok("Skill 写明放开不等于多烧", SKILL.indexOf("放开」不等于「多烧") >= 0);
+ok("Skill 保留「靠加节数不靠加长单节」那条", SKILL.indexOf("篇幅只能靠加节数") >= 0);
 
 ok("禁编造那一条写进了骨架（参考文献节）", /绝不编造页码与引文/.test(allAsk));
 ok("不含情态词那一条写进了判据节", /禁用：应当／有意义／实质性／充分／真正／恰当／合理/.test(allAsk));
