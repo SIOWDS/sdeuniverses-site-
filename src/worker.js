@@ -7851,6 +7851,21 @@ export default {
                   } catch (e) { /* 掐断或断线：下一轮再试一次 */ }
                 }
                 pclk.stop();
+                /* 【骨架档的提纲不许让整篇失败】真跑读数：基底交回 2375 字却解不成 JSON——
+                   它没被限流，它只是没按格式写。而固定骨架档需要提纲的地方只有一处：题名。
+                   哪一节干什么、写多少字全在表里，十六节的小标题也有默认值。
+                   为一个题名让整篇跑不起来，是设计上的浪费。所以：解不出就合成一份，
+                   题名从基底那 2375 字里捞（第一行像标题的东西），捞不到就用档名。 */
+                if (!plan && FIXED) {
+                  const _t = (String(raw || "").replace(/```[a-z]*|```/g, "")
+                    .split("\n").map((x) => x.trim())
+                    .filter((x) => x && x.length <= 60 && !/[{}\[\]":]/.test(x))[0] || "").slice(0, 60);
+                  plan = { title: _t || SPEC.name, sub: "", thesis: "", criterion: "", sections: [] };
+                  controller.enqueue(_sseBytes({ t: "note",
+                    v: "提纲这一趟没交出可解析的分节（基底回了 " + String(raw || "").length
+                      + " 字，不是 JSON）。本档的十六节体例是写死的，已按体例直接开写"
+                      + (_t ? ("，题名取自基底那一趟：" + _t) : "") + "。" }));
+                }
                 if (!plan) {
                   controller.enqueue(_sseBytes({ t: "error", code: "noplan",
                     v: "提纲这一趟没出来（基底交回 " + raw.length + " 字，解不成 JSON）。可以再点一次；或换标准档。" }));

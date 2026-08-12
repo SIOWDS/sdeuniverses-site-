@@ -458,6 +458,9 @@
       kSumdoc: "总结载入的文章", kSumdocS: "读完那篇：它在说什么 · 承重句 · 哪里脆 · 没看见什么 · 千字概写（需先载入文章）",
       mDocx: "\u2913 Word (.docx)", mDocxS: "把这一篇存成 Word 文档",
       mPdfx: "\u2913 PDF", mPdfxS: "把这一篇排成印刷稿并存成 PDF（打印框里把「目标」选成「另存为 PDF」）",
+      mGoOn: "\u21bb 继续写缺的几节", mGoOnS: "扫描这一稿，只重跑没写够的那几节，写完插回原位（不动已经写好的）",
+      mGoOnNo: "这一稿没有分节表，续写要有提纲才知道补哪一节。", mGoOnDone: "扫了一遍，每一节都写够了，没有要补的。",
+      mGoOnAt: "正在补第 ", mGoOnEnd1: "这一趟补好了 ", mGoOnEnd2: " 节。", mGoOnEnd3: "仍没写够的：第 ",
       dChars: " 字",
       mSub: "\u2709 \u6295\u7a3f\u5230\u6536\u4ef6\u7bb1", mSubS: "把这一篇投给编辑部（需要投稿密码）",
       subT: "\u6295\u7a3f\u5230\u6536\u4ef6\u7bb1", subName: "\u4f5c\u8005\u540d", subPass: "\u6295\u7a3f\u5bc6\u7801",
@@ -5631,6 +5634,7 @@
     var cbox = wrap.querySelector(".wdsm-dist-c");
     var text = "", dr = null, lastP = 0, dnote = null, dWd = null, dTimedOut = false;
     var dSecs = null;          // 提纲拿到的分节表：收尾判「写够没有」要拿它当分母
+    var dPlanObj = null;       // 提纲那一趟的全部产物：续写时要原样回传给 part 阶段
     // sawDone：有没有收到 worker 的收尾信号 [DONE]。空产出时这一位决定死因说得对不对——
     // 收到了＝基底真的一个字没写；没收到＝这一趟被平台在半路掐掉（worker 自己都没来得及报诊断）。
     var sawDone = false, lastSec = 0;
@@ -5651,6 +5655,7 @@
       dWd = setTimeout(function () { dTimedOut = true; try { if (dr) dr.cancel(); } catch (e) {} }, 45000);
     }
     var svBtn = wrap.querySelector(".dsv"), cpBtn = wrap.querySelector(".dcp"), dlBtn = wrap.querySelector(".ddl"), dirBtn = wrap.querySelector(".ddir");
+    var goOnBtn = null;        // 续写钮：确实有缺节时才亮（见收尾那一处）
     var dStopped = false;
     // 成文原来只有 ✕（关掉整个面板）。停下与关掉是两件事：停下要把已经写出来的那一半留在眼前。
     var stBtn = el("button", "wdsm-tbtn dstop", "\u25a0 " + t("stopGen"));
@@ -5693,6 +5698,52 @@
          走 /assets/wds-pdf.js（排版＋浏览器打印管线）：PDF 里的汉字要么落在内嵌字体里、
          要么是个空格，而仓库里没有也不该有中日韩字体——浏览器自己的打印管线带着系统中文字体，
          出来的是真矢量、可选可搜。代价只有一句话要讲清：目标选「另存为 PDF」。 */
+      /* 续写钮：只在「确实有缺节」时才亮，免得在一份完整稿上摆一颗没用的按钮。 */
+      var goOn = el("button", "wdsm-tbtn dgoon", t("mGoOn"));
+      goOn.title = t("mGoOnS");
+      goOn.style.display = "none";
+      dlBtn.parentNode.insertBefore(goOn, dlBtn);
+      goOnBtn = goOn;
+      goOn.onclick = function () {
+        var secs = dSecs, plan = dPlanObj;
+        if (!secs || !secs.length) { dNote(t("mGoOnNo"), 1); return; }
+        var miss = missingSecs(text, secs);
+        if (!miss.length) { dNote(t("mGoOnDone")); goOn.style.display = "none"; return; }
+        goOn.disabled = true; dStopped = false;
+        var k = 0, fixedN = 0, stillShort = [];
+        (function nextOne() {
+          if (dStopped || k >= miss.length) {
+            goOn.disabled = false;
+            dNote(t("mGoOnEnd1") + fixedN + t("mGoOnEnd2")
+              + (stillShort.length ? (t("mGoOnEnd3") + stillShort.join("、")) : ""), stillShort.length ? 1 : 0);
+            saveProgress("续写完 " + fixedN + " 节");
+            paintD(true);
+            if (!missingSecs(text, secs).length) goOn.style.display = "none";
+            return;
+          }
+          var b = miss[k], i = b.i;
+          stat.textContent = t("mGoOnAt") + (i + 1) + "/" + secs.length + " · " + String(secs[i].h || "");
+          /* ⚠ 补出来的内容要**插回原位**，不能追加在末尾——按节号成文，位置本身就是信息。
+             先记下这一节原来那一块的起止，写完再把新块换进去。 */
+          var blk = secBlocks(text, secs)[i];
+          var head = blk.from >= 0 ? text.slice(0, blk.from) : text;
+          var tail = blk.from >= 0 ? text.slice(blk.to) : "";
+          var before = text.length;
+          var got = "";
+          var sink = { push: function (s) { got += s; } };
+          runLeg({ stage: "part", idx: i, plan: plan, prevTail: head.slice(-1200), _sink: sink })
+            .then(function (rr) {
+              var w = parseInt(secs[i].words, 10) || 1200;
+              var need = Math.max(260, Math.round(w * 0.4));
+              /* runLeg 是边流边往 text 上加的：这一趟加出来的那一段就是 text 尾部多出来的部分。 */
+              var add = text.slice(before);
+              text = head + (add.replace(/^\s+/, "") ? (add.replace(/^\s+/, "") + "\n\n") : "") + tail;
+              if ((rr.out || 0) >= need) fixedN++; else stillShort.push(i + 1);
+              paintD(false); k++;
+              setTimeout(nextOne, 2200);
+            });
+        })();
+      };
       var pdfB = el("button", "wdsm-tbtn dpdfx", t("mPdfx"));
       pdfB.title = t("mPdfxS");
       dlBtn.parentNode.insertBefore(pdfB, dlBtn);
@@ -5868,6 +5919,32 @@
       if (beatT) { clearInterval(beatT); beatT = null; }
       }, 240);
     }
+    /* ══ 续写：只补没写够的那几节 ═══════════════════════════════════════
+       两次真跑都是同一个形状：**稳定写完六节，然后撞墙**。既然一口气十六节写不完，
+       就别再赌一口气——把"接着写"做成一颗按钮，扫描已有稿、只重跑缺的那几节、插回原位。
+       ⚠ 不需要为此改存储：固定骨架档的分节表本来就在骨架里，而"哪几节没写够"完全可以
+       **从稿子本身量出来**——按 `## 小标题` 切块，块长不到本节目标的四成就算没写够。 */
+    function secBlocks(txt, secs) {
+      var pos = secs.map(function (s) {
+        var h = String((s && s.h) || "");
+        var k = h ? txt.indexOf("## " + h) : -1;
+        if (k < 0 && h) k = txt.indexOf(h);          // 小标题被基底改过字：退一步只认标题本身
+        return k;
+      });
+      return secs.map(function (s, i) {
+        if (pos[i] < 0) return { i: i, from: -1, to: -1, len: 0 };
+        var to = txt.length;
+        for (var j = i + 1; j < secs.length; j++) { if (pos[j] > pos[i]) { to = pos[j]; break; } }
+        return { i: i, from: pos[i], to: to, len: to - pos[i] };
+      });
+    }
+    function missingSecs(txt, secs) {
+      return secBlocks(txt, secs).filter(function (b) {
+        var w = parseInt(secs[b.i].words, 10) || 1200;
+        return b.len < Math.max(260, Math.round(w * 0.4));
+      });
+    }
+
     /* ══ 关掉这个面板：四条出口，一条都不依赖顶栏画得出来 ══════════════════
        原来只有顶栏那颗 ✕ 一条路。而 .wdsm-dist 是 inset:0 的全屏遮罩：顶栏一旦没画出来，
        整个站就被一层**关不掉**的遮罩盖住，只能刷新页面才出得去——读者今天就卡在这一格。
@@ -6188,7 +6265,7 @@
         });
         return;
       }
-      var secs = plan.sections; dSecs = secs;
+      var secs = plan.sections; dSecs = secs; dPlanObj = plan;
       text += "# " + String(plan.title || kindT(kind)) + "\n\n";
       if (plan.sub) text += "**" + String(plan.sub) + "**\n\n";
       paintD(false);
@@ -6213,6 +6290,9 @@
           if (hitWall && i + 1 < secs.length) {
             dNote(t("dWallLeft1") + (i + 2) + "–" + secs.length + t("dWallLeft2"), 1);
           }
+          /* 撞墙／写完都在这里亮续写钮——它是这台机器面对上游墙的唯一正解：
+             不赌一口气十六节，而是分几趟把缺的补齐。 */
+          try { if (goOnBtn && dSecs && missingSecs(text, dSecs).length) goOnBtn.style.display = ""; } catch (e) {}
           done(); return;
         }
         stat.textContent = t("dPart") + (i + 1) + "/" + secs.length + " · " + String(secs[i].h || "");
