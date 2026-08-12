@@ -3121,7 +3121,10 @@
 
     function paint() {
       var now = Date.now();
-      if (now - lastPaint < 110) return;
+      // 这里仍是整篇重排（对话区一答通常两三段，改造收益不抵风险）。
+      // 但长答会退化成 O(N²)，所以节流随长度放宽：越长越少排，最慢每 700ms 一次。
+      // 真正的增量渲染在成文面板那一侧（一万字起步的是它）。
+      if (now - lastPaint < Math.min(700, 110 + answer.length / 30)) return;
       lastPaint = now;
       cell.a.innerHTML = mdRender(answer) + "<span class='cur'>▊</span>";
       typesetSync(cell.a);            // 与贴 innerHTML 同一个任务里排完，浏览器只画最终形态 ⇒ 不闪
@@ -5674,7 +5677,9 @@
       /* ② 【渲染必须有兜底】渲染是可能失败的一步，而失败的样子是"白屏"——
          读者看不出是排版崩了还是稿子没了。纯文本一定画得出来，那就是我们的底线形态。 */
       try {
-        out.innerHTML = text ? mdRender(text) : esc(t("dEmpty"));
+        // 收尾**不再整篇重排**（那正是压垮主线程的最后一下）：只把还没定稿的尾巴排完。
+        if (text) paintD(true);
+        else out.innerHTML = esc(t("dEmpty"));
       } catch (e) {
         out.textContent = text || "";
         dNote(t("dRenderFail") + ((e && e.message) || "未知") + "）", 1);
@@ -5683,7 +5688,10 @@
       // 判据取"文字量"的两种量法之和：textContent 与去标签后的 innerHTML。
       // 只认其中一种会误伤——某些环境下 textContent 取不到，而页面上明明有字，
       // 那时退回纯文本等于把排好的版白白拆掉。两种都空，才是真的白屏。
-      var _shown = String(out.textContent || "").trim() || String(out.innerHTML || "").replace(/<[^>]*>/g, "").trim();
+      // 三种量法取其一：out 的文字、去标签的 out.innerHTML、以及"真正排出来多少 HTML"。
+      // 前两种在增量渲染下都可能为空（内容挂在子块上、out 自己是空壳），只认它们会误报白屏，
+      // 把排好的版白白拆成纯文本。第三种是最诚实的一种：排出来过就是排出来过。
+      var _shown = String(out.textContent || "").trim() || String(out.innerHTML || "").replace(/<[^>]*>/g, "").trim() || (paintedHtml > 0 ? "1" : "");
       if (text && !_shown) {
         out.textContent = text;
         dNote(t("dBlankFix"), 1);
@@ -5697,7 +5705,9 @@
          它们和上面那次整篇排版挤在同一个任务里，一万字的稿子能把主线程占住好几秒——
          那几秒浏览器一帧都画不出来，看上去就是白屏。正文先上屏，这些挪到下一个任务去做。 */
       setTimeout(function () {
-        try { if (text) autoLink(out, text); } catch (e) {}          // 成文里提到的站内篇目同样挂链接
+        // autoLink 拿整篇正文扫 out 的每个文本节点，长稿同样是 O(N²)。
+        // 超长稿直接跳过——站内链接是锦上添花，把标签页卡死是要命的。
+        try { if (text && text.length <= 40000) autoLink(out, text); } catch (e) {}
         try { if (text && kind === "deck") deckPrep(text, function () { b9Show(text); }); } catch (e) {}
       }, 0);
       /* 精华自动进思想库存。这里是「报告／成文／提纲」三种锻造产物的唯一收口。
@@ -5757,6 +5767,51 @@
       if (!text) return;
       distSave(kindT(kind), text, function (ok) { svBtn.textContent = ok ? t("dSaved") : t("dNoStore"); });
     };
+    /* ── 增量渲染：写定的段落只排一次 ────────────────────────────────
+       原来每 130ms 把**累计全文**重排一遍（O(N²)），一万字就开始卡、十万字必死。
+       现在把正文切成"已定稿的若干块 ＋ 一条还在写的尾巴"：块只排一次就追加上去、
+       再也不碰；每一拍只重排尾巴。于是每拍代价只与尾巴长度有关，与全文多长无关。
+       切口只挑**安全的空行**：围栏代码块与 $$ 公式必须成对闭合，且下一行不是列表/引用/表格行
+       ——从中间切开会把一个列表拆成两个、把表格拦腰斩断。 */
+    var rendUpto = 0, tailEl = null, paintedHtml = 0;   // paintedHtml：真正排出来多少 HTML，白屏判据的第三种量法
+    function safeCut(from) {
+      var i = text.lastIndexOf("\n\n");
+      var tries = 0;
+      while (i > from && tries++ < 40) {
+        var head = text.slice(0, i);
+        var okFence = ((head.match(/```/g) || []).length % 2) === 0;
+        var okMath = ((head.match(/\$\$/g) || []).length % 2) === 0;
+        var next = text.slice(i + 2, i + 80).replace(/^\s+/, "");
+        var midBlock = /^([-*+>|]|\d+[.)])/.test(next);
+        if (okFence && okMath && !midBlock) return i;
+        i = text.lastIndexOf("\n\n", i - 1);
+      }
+      // 一直找不到安全空行（比如一张几万字的大表）：尾巴不能无限长下去，
+      // 退而求其次在换行处切，仍然要求围栏闭合。
+      if (text.length - from > 20000) {
+        var j = text.lastIndexOf("\n", text.length - 4000);
+        if (j > from && ((text.slice(0, j).match(/```/g) || []).length % 2) === 0) return j;
+      }
+      return -1;
+    }
+    function appendSeg(seg) {
+      var d = el("div");
+      try { var h = mdRender(seg); paintedHtml += h.length; d.innerHTML = h; } catch (e) { d.textContent = seg; paintedHtml += seg.length; }
+      out.insertBefore(d, tailEl);
+    }
+    function paintD(final) {
+      if (!tailEl) { out.innerHTML = ""; tailEl = el("div"); out.appendChild(tailEl); }
+      var rounds = final ? 400 : 1;          // 收尾时一次把能定的全定下来，写作中每拍只定一块
+      for (var k = 0; k < rounds; k++) {
+        var c = safeCut(rendUpto);
+        if (c <= rendUpto) break;
+        appendSeg(text.slice(rendUpto, c));
+        rendUpto = c;
+      }
+      var tail = text.slice(rendUpto);
+      try { var ht = mdRender(tail); paintedHtml += ht.length; tailEl.innerHTML = ht + (final ? "" : "<span class='cur'>\u258a</span>"); }
+      catch (e) { tailEl.textContent = tail; paintedHtml += tail.length; }
+    }
     if (existing) { text = existing; done(); return; }
     out.innerHTML = "<span class='cur'>▊</span>";
     dBump();
@@ -5783,7 +5838,7 @@
               var p = line.slice(5).trim();
               if (p === "[DONE]") { sawDone = true; done(); return; }
               var j; try { j = JSON.parse(p); } catch (e) { continue; }
-              if (j.t === "token") { text += j.v; if (Date.now() - lastP > 130) { lastP = Date.now(); out.innerHTML = mdRender(text) + "<span class='cur'>▊</span>"; } }
+              if (j.t === "token") { text += j.v; if (Date.now() - lastP > 130) { lastP = Date.now(); paintD(false); } }
               else if (j.t === "beat") { if (j.v && j.v.sec) lastSec = j.v.sec; if (!text && j.v) stat.textContent = t("thinking") + " " + (j.v.sec || 0) + "s · " + (j.v.think || 0) + (j.v.stage ? " · " + j.v.stage : ""); }
               else if (j.t === "note") { dNote(j.v); }
               else if (j.t === "error") { dNote(j.v, 1); stat.textContent = t("dFail"); if (j.code === "need_key" || j.code === "bad_key") setTimeout(function () { wdsKeyPanel(function () {}); }, 400); }

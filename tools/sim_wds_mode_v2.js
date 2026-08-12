@@ -6,6 +6,9 @@
 "use strict";
 const fs = require("fs");
 let FAILS = 0, PASS = 0;
+// 桩的 innerHTML 是扁平解析、不建文本节点：内容一旦挂在子块上，父节点的 innerHTML/textContent
+// 都取不到东西。要验"排出来了什么"，只能逐层把 _html 拼起来。
+function htmlOf(e) { if (!e) return ""; return String(e.innerHTML || "") + (e.children || []).map(htmlOf).join(""); }
 function curToolShown(btn, name) { return String(btn.textContent || "").includes(name); }
 function ok(c, m) { if (c) { PASS++; console.log("  PASS " + m); } else { FAILS++; console.log("  FAIL " + m); } }
 
@@ -412,7 +415,7 @@ console.log("⑧ 成文（distill）");
   const dist = document.body.querySelector(".wdsm-dist");
   ok(!!dist, "成文面板出现");
   ok(LAST_PAYLOAD.kind === "report" && Array.isArray(LAST_PAYLOAD.history), "distill payload 正确");
-  ok(/<h[1-6]>/.test(dist.querySelector(".wdsm-a").innerHTML), "成文内容按 Markdown 渲染");
+  ok(/<h[1-6]>/.test(htmlOf(dist.querySelector(".wdsm-a"))), "成文内容按 Markdown 渲染");
   dist.querySelector(".dx").click();
   ok(!document.body.querySelector(".wdsm-dist"), "成文面板可关闭");
 
@@ -1226,21 +1229,53 @@ console.log("⑧ 成文（distill）");
   let dp3 = document.body.querySelector(".wdsm-dist");
   ok(SAVED_TEXT.indexOf("承重命题") >= 0, "写完就自动存进「成文记录」，不等读者点存（显示崩了也不丢稿）");
   ok(String(dp3.textContent).includes("已自动存进"), "并且当场告诉读者它已经存下了");
-  ok(String(dp3.querySelector(".wdsm-a").innerHTML).includes("承重命题"), "正文照常摆出来");
+  ok(htmlOf(dp3.querySelector(".wdsm-a")).includes("承重命题"), "正文照常摆出来");
   STORE_SESSIONS_HOOK = _origSess;
   dp3.querySelector(".dx").click();
 
   console.log("⑳ 排版崩了也不许白屏（源码级：mdRender 在模块内部，运行时没法让它抛错而不改产品码）");
   const wm3 = require("fs").readFileSync("/home/claude/site/public/wds-mode.js", "utf8");
   const _dn = wm3.slice(wm3.indexOf("    function done() {"), wm3.indexOf("wrap.querySelector(\".dx\").onclick"));
-  ok(_dn.indexOf("distSave(kindT(kind), text") < _dn.indexOf("mdRender(text)"), "存稿写在渲染之前（顺序不许调换）");
-  ok(/try \{\s*out\.innerHTML = text \? mdRender\(text\)[\s\S]{0,120}\} catch \(e\) \{\s*out\.textContent = text/.test(_dn),
+  ok(_dn.indexOf("distSave(kindT(kind), text") < _dn.indexOf("paintD(true)"), "存稿写在渲染之前（顺序不许调换）");
+  ok(/try \{[\s\S]{0,200}if \(text\) paintD\(true\);[\s\S]{0,80}\} catch \(e\) \{\s*out\.textContent = text/.test(_dn),
      "渲染包在 try/catch 里，崩了退回纯文本");
   ok(/var _shown = String\(out\.textContent[\s\S]{0,140}if \(text && !_shown\) \{\s*out\.textContent = text;/.test(_dn),
      "渲染完自检：出来是空的（白屏）就退回纯文本");
-  ok(/replace\(\/<\[\^>\]\*>\/g, ""\)/.test(_dn), "白屏判据用两种量法（textContent ＋ 去标签的 innerHTML），只认一种会误伤");
-  ok(/setTimeout\(function \(\) \{\s*try \{ if \(text\) autoLink/.test(_dn), "autoLink/deckPrep 挪出同一个任务，正文先上屏");
+  ok(/replace\(\/<\[\^>\]\*>\/g, ""\)/.test(_dn) && /paintedHtml > 0/.test(_dn),
+     "白屏判据用三种量法（textContent ＋ 去标签 innerHTML ＋ 真正排出来的 HTML 量）——增量渲染下前两种都可能为空，只认它们会误报白屏");
+  ok(/setTimeout\(function \(\) \{[\s\S]{0,220}try \{ if \(text && text\.length <= 40000\) autoLink/.test(_dn), "autoLink/deckPrep 挪出同一个任务，正文先上屏");
   ok(_dn.indexOf("window.SDEVault") > _dn.indexOf("setTimeout(function () {"), "库存与近邻闸门也不和排版挤在一个任务里");
+
+  /* ── 十万字：显示端必须与全文长度脱钩 ────────────────────────────
+     用户第二次报白屏后推断"屏幕太短、装不下更多字，要放大到十万字"。
+     面板高度与字数上限都不是原因（代码里根本没有显示端字数上限）；真正的机制是
+     "每写一点就把整篇重排一遍"——O(N²)。要撑十万字，就得让每一拍的代价只与
+     还在写的那一小段有关，与全文多长无关。 */
+  console.log("㉑ 成文流式：只排新写的那一段，不再整篇重排");
+  const _src = require("fs").readFileSync("/home/claude/site/public/wds-mode.js", "utf8");
+  const _ds = _src.slice(_src.indexOf("function distill(kind, existing"), _src.indexOf("SDE 工序（ChatSDE 独有的九道）"));
+  ok(!/out\.innerHTML = mdRender\(text\) \+ "<span class='cur'>/.test(_ds), "流式那一行不再把累计全文重排一遍");
+  ok(/if \(j\.t === "token"\) \{ text \+= j\.v;[^\n]*paintD\(false\)/.test(_ds), "改成调增量渲染器 paintD");
+  ok(/if \(text\) paintD\(true\);/.test(_ds), "收尾也不整篇重排，只把尾巴排完");
+  ok(/text\.length <= 40000/.test(_ds), "超长稿跳过 autoLink（它同样是 O(N²)）");
+  ok(/okFence && okMath && !midBlock/.test(_ds), "只在安全空行切：围栏与 $$ 成对、下一行不是列表/引用/表格");
+
+  // 真跑一篇长稿：分很多 token 流进来，看它是不是被切成了多块、且正文一字不差
+  ROUTE["/api/wds/distill"] = (function () {
+    const evs = [];
+    for (let i = 1; i <= 40; i++) evs.push({ t: "token", v: "## 第 " + i + " 节\n\n这一节的承重命题。\n\n" });
+    return evs;
+  })();
+  layer.querySelector(".wdsm-distbtn").click();
+  document.body.querySelector(".wdsm-menu").children[0].click();
+  await new Promise((r) => setTimeout(r, 400));
+  const dp5 = document.body.querySelector(".wdsm-dist");
+  const out5 = dp5.querySelector(".wdsm-a");
+  ok(out5.children.length > 2, "长稿被切成多块渲染（已定稿的块 ＋ 一条尾巴），实得 " + out5.children.length + " 块");
+  const _h5 = htmlOf(out5);
+  ok(_h5.includes("第 1 节") && _h5.includes("第 40 节"), "首尾都在——切块不许丢字");
+  ok(!String(dp5.textContent).includes("白屏"), "别把增量渲染误报成白屏（判据只认 out 自己就会）");
+  dp5.querySelector(".dx").click();
 
   console.log("\n===== " + PASS + " PASS / " + FAILS + " FAIL =====");
   process.exit(FAILS ? 1 : 0);
