@@ -7783,6 +7783,20 @@ export default {
            而调用方以为这一节写成了。缺件必须报，不许兜。 */
         if (dStage === "part" && partIdx >= secs.length) return _sseResp([{ t: "error", code: "badidx",
           v: "要写的是第 " + (partIdx + 1) + " 节，而这份提纲只有 " + secs.length + " 节。" }]);
+        /* 【骨架档的提纲不许是单点故障】stage=plan 且 bare=1：**一次上游调用都不打**，
+           直接把体例表交回去。缘由是一份真跑读数：提纲两趟都没成 ⇒ 客户端退回"一趟写完"
+           ⇒ 拿两万字去赌一次调用 ⇒ 交回 55 个字。而这一档需要提纲的地方只有一处：题名。
+           哪一节干什么、写多少字全在表里。**为一个题名让整篇跑不起来，是设计上的浪费。** */
+        const FIXED0 = Array.isArray(SPEC.fixed) ? SPEC.fixed : null;
+        if (dStage === "plan" && b.bare && FIXED0) {
+          return _sseResp([
+            { t: "note", v: "提纲这一趟没成，已直接按体例开写：" + FIXED0.length
+                + " 节的分工与字数本来就是写死的，少的只是一个拟好的题名（可以写完自己改）。" },
+            { t: "plan", v: { title: String(b.title || "").slice(0, 80) || SPEC.name,
+                sub: "", thesis: "", criterion: "", empirical: "no", ancestors: [],
+                sections: FIXED0.map((f) => ({ h: f.h, ask: f.ask, words: f.words })) } },
+          ]);
+        }
 
         const cstream = new ReadableStream({
           async start(controller) {
@@ -7830,7 +7844,7 @@ export default {
                     : ("sections 给 " + (SPEC.parts || 7) + " 节左右，各节 words 之和约等于全篇目标字数。"));
                 const pmsgs = [{ role: "system", content: psys }, { role: "user", content: CONVO + "现在只输出那个 JSON。" }];
                 const pclk = wdsClock(60000, 150000);
-                let plan = null, raw = "";
+                let plan = null, raw = "", pfin0 = "", pcut = "";
                 for (let att = 0; att < 2 && !plan; att++) {
                   try {
                     // ⚠ wdsLadder 的非满功率分支**忽略 want**、一律 [64000,32000,12000]（见它自己的注释），
@@ -7848,14 +7862,29 @@ export default {
                         const ln = bf.slice(0, ix).trim(); bf = bf.slice(ix + 1);
                         if (ln.slice(0, 5) !== "data:") continue;
                         const pl = ln.slice(5).trim(); if (pl === "[DONE]") continue;
-                        try { const d = (JSON.parse(pl).choices || [{}])[0].delta || {}; if (d.content) { pclk.firstFrame(); _st.out += d.content.length; raw += d.content; } } catch (e) {}
+                        try {
+                          const jj = JSON.parse(pl);
+                          if (jj.choices && jj.choices[0] && jj.choices[0].finish_reason) pfin0 = jj.choices[0].finish_reason;
+                          const d = ((jj.choices || [{}])[0].delta) || {};
+                          if (d.content) { pclk.firstFrame(); _st.out += d.content.length; raw += d.content; }
+                        } catch (e) {}
                       }
                     }
                     plan = looseJSON(raw);
                     if (plan && !FIXED && (!Array.isArray(plan.sections) || !plan.sections.length)) plan = null;
-                  } catch (e) { /* 掐断或断线：下一轮再试一次 */ }
+                  } catch (e) { pcut = pclk.cut || "断线"; /* 掐断或断线：下一轮再试一次 */ }
                 }
                 pclk.stop();
+                /* 🔴🔴 【plan 必须是一个"普通对象"】——这一条是一份真跑逼出来的，
+                   而它此前**一句话都不会说**：`looseJSON` 只要解出个真值就算数，
+                   而基底在拥堵下常把 `"ancestors":[…]` 那一截单独吐出来 ⇒ 解出来是个**数组**。
+                   数组是真值 ⇒ 下面那道 `!plan && FIXED` 兜底不触发；
+                   `plan.sections = FIXED.map(…)` 在服务端看着是挂上去了，
+                   可 **JSON.stringify 一个带自定义属性的数组只会输出 `[...]`，属性全丢**
+                   ⇒ 客户端收到一个没有 sections 的"提纲"，于是重试、再退回一趟写完，
+                   **全程零 note、零 error**。判读时最难查的正是这一种：不是报错，是无声。
+                   💡 心法：**跨进程传出去的东西，要按"序列化之后还剩什么"来判，不能按内存里的样子判。** */
+                if (plan && (typeof plan !== "object" || Array.isArray(plan))) plan = null;
                 /* 【骨架档的提纲不许让整篇失败】真跑读数：基底交回 2375 字却解不成 JSON——
                    它没被限流，它只是没按格式写。而固定骨架档需要提纲的地方只有一处：题名。
                    哪一节干什么、写多少字全在表里，十六节的小标题也有默认值。
@@ -7868,7 +7897,10 @@ export default {
                   plan = { title: _t || SPEC.name, sub: "", thesis: "", criterion: "", sections: [] };
                   controller.enqueue(_sseBytes({ t: "note",
                     v: "提纲这一趟没交出可解析的分节（基底回了 " + String(raw || "").length
-                      + " 字，不是 JSON）。本档的十六节体例是写死的，已按体例直接开写"
+                      + " 字，不是 JSON"
+                      + (pfin0 ? ("；上游给的收束理由：" + pfin0) : "")
+                      + (pcut ? ("；本地时钟：" + pcut + "闸已掐") : "")
+                      + "）。本档的十六节体例是写死的，已按体例直接开写"
                       + (_t ? ("，题名取自基底那一趟：" + _t) : "") + "。" }));
                 }
                 if (!plan) {
@@ -7896,6 +7928,16 @@ export default {
                   ask: String((s && s.ask) || "").slice(0, 400),
                   words: Math.max(400, Math.min(4000, parseInt(s && s.words, 10) || 1200)),
                 }));
+                /* 【发出去之前验一次合同】上面每一步都以为自己把 sections 挂上了，
+                   而真跑里客户端拿到的偏偏是一份没有 sections 的提纲。合同就在这一行验：
+                   骨架档发出去的必须正好是 FIXED.length 节，对不上当场按表补齐。 */
+                if (FIXED && (!Array.isArray(plan.sections) || plan.sections.length !== FIXED.length)) {
+                  plan = { title: String(plan.title || SPEC.name).slice(0, 80), sub: String(plan.sub || ""),
+                    thesis: String(plan.thesis || ""), criterion: String(plan.criterion || ""),
+                    empirical: "no", ancestors: [],
+                    sections: FIXED.map((f) => ({ h: f.h, ask: f.ask, words: f.words })) };
+                  controller.enqueue(_sseBytes({ t: "note", v: "提纲这一趟交回来的东西不成形，已按体例补齐 " + FIXED.length + " 节。" }));
+                }
                 controller.enqueue(_sseBytes({ t: "plan", v: plan }));
                 return fin();
               }

@@ -577,6 +577,8 @@
     dLastAlive: "——心跳一直是准的，说明当时并没有卡死，那就不是排版的锅，我得换个方向查。",
     dPlanning: "正在拟题与提纲…", dPlanFallback: "提纲两趟都没成，改成一趟写完（会短一些）。", 
     dPlanRetry: "提纲这一趟没吐出可用的分节，隔一会儿再试一次。",
+    dPlanBare: "提纲两趟都没成。这一档的十六节分工与字数本来就是写死的（提纲那一趟真正贡献的只有一个题名），所以不退成「一趟写完」——直接按体例开写，题名写完自己改一个即可。",
+    dPlanNo: "\u26a0 连体例表都没取回来（多半是网络断了）。稿子已存进「成文记录」；隔一两分钟按「重答」再来一次。",
     dPartial: "\u26a0 未写完 · ",
     dPartRetry: "第 ", dPartRetry2: " 节写得太少，等 20 秒避开上游的拥堵再写一遍…",
     dWallRun1: "\u26a0 到第 ", dWallRun2: " 节为止，已经连着两节、每节两遍都写不出来了——这是上游在挡，不是这几节难写。就地停住，不再往下白打（再磨下去每一节都会照样失败两遍）。已写的部分全部保住。",
@@ -6336,11 +6338,31 @@
         return new Promise(function (res) { setTimeout(function () { res(planOnce(n + 1)); }, 1200); });
       });
     }
+    /* 【提纲这一趟"成没成"要按序列化之后的样子判】真跑读数：基底把 ancestors 那个数组
+       单独吐了出来 ⇒ 服务端解出一个**数组**、往上挂 sections 看着也成了，
+       可数组经 JSON 传出来属性全丢 ⇒ 这里拿到一个没有 sections 的"提纲"。
+       所以形状要正面判一遍：普通对象、有 sections、且不为空。 */
+    function planOK(p) {
+      return !!(p && typeof p === "object" && !Array.isArray(p)
+        && p.sections && p.sections.length);
+    }
     planOnce(1).then(function (r) {
       if (dStopped) { done(); return; }
       var plan = r && r.plan;
-      if (!plan || !plan.sections || !plan.sections.length) {
-        // 提纲两遍都没成也得有一篇：退回单趟——但这一趟同样要过长度这道闸。
+      if (!planOK(plan)) {
+        /* 🔴 骨架档**不许**退回"一趟写完"：那是拿两万字去赌一次调用，
+           真跑里它交回 55 个字（而十六节的分工与字数本来就写死在体例表里，
+           提纲那一趟真正贡献的只有一个题名）。改成向服务端要一份免调用的骨架。 */
+        if (CHUNKED[kind]) {
+          dNote(t("dPlanBare"), 1);
+          runLeg({ stage: "plan", bare: 1 }).then(function (rb) {
+            var pb = rb && rb.plan;
+            if (dStopped || !planOK(pb)) { dNote(t("dPlanNo"), 1); done(); return; }
+            startParts(pb);
+          });
+          return;
+        }
+        // 自由分节档没有体例表可依，仍退回单趟——但这一趟同样要过长度这道闸。
         dNote(t("dPlanFallback"), 1);
         var f0 = text.length;
         runLeg({}).then(function (r1) {
@@ -6354,6 +6376,10 @@
         });
         return;
       }
+      startParts(plan);
+    });
+
+    function startParts(plan) {
       var secs = plan.sections; dSecs = secs; dPlanObj = plan;
       text += "# " + String(plan.title || kindT(kind)) + "\n\n";
       if (plan.sub) text += "**" + String(plan.sub) + "**\n\n";
@@ -6446,7 +6472,7 @@
           });
       }
       step();
-    });
+    }
   }
 
   /* ════════════════ SDE 工序（ChatSDE 独有的九道）════════════════

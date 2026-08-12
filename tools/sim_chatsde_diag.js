@@ -85,5 +85,35 @@ ok("★ 看门狗掐的是 controller，不只是 reader", /if \(dAC\) dAC\.abor
 ok("dTimedOut 每趟复位（一趟被掐不该污染此后每一节的死因）", /dTimedOut = false;\s+\/\/ 每趟各判各的死因/.test(F));
 ok("整篇被掐过与否另记一位（收尾那句话仍说得出）", /dCutAny = true;/.test(F) && /if \(dCutAny\) dNote\(t\("dCut"\), 1\);/.test(F));
 
+/* ═══ 提纲那一趟：交回来的东西必须"序列化之后还是那个样子" ═══════════
+   🔴 2026-08-12 18:14 真跑：提纲两趟都没成 → 退回一趟写完 → 交回 55 字，
+   **全程零 note 零 error**。根因：looseJSON 解出一个**数组**（基底把 ancestors
+   那一截单独吐了出来），数组是真值 ⇒ `!plan && FIXED` 那道兜底不触发；
+   sections 挂上去在服务端看着好好的，可 JSON.stringify 一个带自定义属性的数组
+   只输出 `[...]`，属性全丢 ⇒ 客户端拿到一份没有 sections 的"提纲"。 */
+console.log("── 提纲那一趟的形状合同 ──");
+const plk = W.slice(W.indexOf("const pclk = wdsClock(60000, 150000);"), W.indexOf('controller.enqueue(_sseBytes({ t: "plan", v: plan }));'));
+ok("抠得到 plan 那一段", plk.length > 1500);
+ok("★ 非普通对象（数组/数字/字符串）一律当没解析出来",
+  /if \(plan && \(typeof plan !== "object" \|\| Array\.isArray\(plan\)\)\) plan = null;/.test(plk));
+ok("这道判断排在 FIXED 合成兜底之前（否则兜底仍旧不触发）",
+  plk.indexOf("Array.isArray(plan)) plan = null;") < plk.indexOf("if (!plan && FIXED)"));
+ok("★ 发出去之前验一次合同：骨架档必须正好 FIXED.length 节",
+  /plan\.sections\.length !== FIXED\.length/.test(plk) && /已按体例补齐/.test(plk));
+ok("提纲这一趟也收 finish_reason（与 part 同一口径）", /pfin0 = jj\.choices\[0\]\.finish_reason/.test(plk));
+ok("被时钟掐掉也记下来，合成那句话里说得出", /pcut = pclk\.cut/.test(plk) && /pcut \? \("；本地时钟/.test(plk));
+ok("注释写明了这一条是怎么被真跑逼出来的", /序列化之后还剩什么/.test(W));
+
+console.log("── 骨架档：提纲不是单点故障 ──");
+ok("★ 有一条免调用的骨架路径（stage=plan ＋ bare）", /if \(dStage === "plan" && b\.bare && FIXED0\)/.test(W));
+ok("这条路一次上游调用都不打（直接 _sseResp 返回）",
+  /if \(dStage === "plan" && b\.bare && FIXED0\) \{\s*\n\s*return _sseResp\(\[/.test(W));
+ok("交回来的是完整体例（每节带 h/ask/words）", /FIXED0\.map\(\(f\) => \(\{ h: f\.h, ask: f\.ask, words: f\.words \}\)\)/.test(W));
+ok("empirical 缺省仍是 no（宁可少说一句，也不许编造有数据）", /empirical: "no", ancestors: \[\]/.test(W));
+ok("★ 前端按形状正面判提纲成没成（不只看真值）",
+  /function planOK\(p\)/.test(F) && /typeof p === "object" && !Array\.isArray\(p\)/.test(F));
+ok("★ 骨架档不再退回一趟写完", /if \(CHUNKED\[kind\]\) \{[\s\S]{0,400}stage: "plan", bare: 1/.test(F));
+ok("自由分节档仍保留一趟写完那条退路（它没有体例表可依）", /dPlanFallback/.test(F) && /runLeg\(\{\}\)/.test(F));
+
 console.log("\n" + (fail ? "✗ " : "✓ ") + pass + " passed, " + fail + " failed");
 process.exit(fail ? 1 : 0);

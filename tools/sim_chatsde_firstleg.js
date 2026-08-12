@@ -12,31 +12,38 @@ const fs = require("fs");
 const path = require("path");
 const ROOT = path.join(__dirname, "..");
 let pass = 0, fail = 0;
-const ok = (n, c) => { if (c) { pass++; console.log("  ✓ " + n); } else { fail++; console.log("  ✗ " + n); } };
+const ok = (n, c, d) => { if (c) { pass++; console.log("  ✓ " + n); } else { fail++; console.log("  ✗ " + n + (d ? ("  " + d) : "")); } };
 const FSRC = fs.readFileSync(path.join(ROOT, "public/wds-mode.js"), "utf8");
 
 /* ═══ 一、把 planOnce ＋ 回退那一段抠出来真跑 ═══ */
 const a = FSRC.indexOf("    var FLOOR = 400;");
-const b = FSRC.indexOf("      var secs = plan.sections;", a);
-/* 切到 `var secs = plan.sections;` 之前——那一行还在 .then 回调**里面**，所以括号是不平的。
-   补一个合成的收尾把回调闭上：提纲成了就直接 done()，正好当作"没走退路"的读数。
-   （⚠ 别去扩大切片把整套 step() 一起吃进来——那要再补一打 mock，而这一份只测开工那两趟。） */
-const SRC = (a > 0 && b > a) ? (FSRC.slice(a, b) + "\n      done();\n    });\n") : "";
+/* 终点锚改到 `function startParts(plan)` 这一行之前：写正文那一大段已被抽成具名函数，
+   切到这里括号正好是平的，不必再补合成收尾（上一版补的 `});` 现在会多一个右括号）。
+   startParts 在壳里用替身接住——这一份只测开工那两趟，不测写正文。 */
+const b = FSRC.indexOf("    function startParts(plan) {", a);
+const SRC = (a > 0 && b > a) ? FSRC.slice(a, b) : "";
 ok("抠得到 planOnce 与回退那一段", SRC.indexOf("planOnce") > 0 && SRC.indexOf("runLeg({})") > 0);
+ok("切片括号是平的（不必补合成收尾）", SRC.split("{").length === SRC.split("}").length);
 
 const FLOOR = +((SRC.match(/var FLOOR = (\d+);/) || [])[1] || 0);
 ok("下限是从源码取的，不是这里手抄的（" + FLOOR + "）", FLOOR > 0);
 
 /* legs 描述每一趟怎么回：{plan:…} 或 {out:N}；按调用顺序取用 */
-function run(legs, cb) {
-  const box = { calls: [], notes: [], done: false, text: "", planTries: 0, oneTries: 0 };
+function run(legs, cb, opt) {
+  const box = { calls: [], notes: [], done: false, text: "", planTries: 0, oneTries: 0,
+                started: null, bare: 0,
+                kind: (opt && opt.kind) || "essay", chunked: (opt && opt.chunked) || {} };
   const src =
-    "var dStopped=false, text='', pTrace={};" +
+    /* CHUNKED/kind 决定走哪条退路：骨架档要骨架，自由分节档才退回一趟写完。
+       壳里由调用方指定，两条路各测各的。 */
+    "var dStopped=false, text='', pTrace={}, kind=__b.kind, CHUNKED=__b.chunked;" +
+    "function startParts(p){ __b.started=p; __b.done=true; __b.text=text; }" +
     "function dNote(v){ __b.notes.push(String(v)); } function t(k){ return k; }" +
     "function done(){ __b.done=true; __b.text=text; }" +
     "function runLeg(o){" +
     "  var st=(o&&o.stage)||'one'; __b.calls.push(st);" +
-    "  if (st==='plan') __b.planTries++; else __b.oneTries++;" +
+    /* bare 那一趟单独记：它不打上游，不该算进"提纲试了几遍"。 */
+    "  if (st==='plan') { if (o&&o.bare) __b.bare++; else __b.planTries++; } else __b.oneTries++;" +
     "  var r=__b.legs.shift()||{out:0};" +
     "  if (r.out) text += 'x'.repeat(r.out);" +      // 边流边加，才测得出回滚
     "  return Promise.resolve({ plan:r.plan||null, out:r.out||0, err:'' });" +
@@ -78,7 +85,34 @@ run([{ plan: null }, GOODPLAN], (bx) => {
 
           run([{ plan: null }, { plan: null }, { out: FLOOR - 1 }, { out: 5000 }], (bx6) => {
             ok("卡在下限下方一个字也算没写成（闸是硬的）", bx6.oneTries === 2);
-            tail();
+
+            /* ═══ 一之二、骨架档：提纲垮了也不许退成"一趟写完" ══════════════
+               真跑读数（2026-08-12 18:14）：提纲两趟都没成 → 退回一趟写完 → 交回 **55 字**。
+               而这一档的十六节分工与字数本来就写死在体例表里。 */
+            console.log("── 骨架档的退路 ──");
+            const PAPER = { kind: "paper", chunked: { paper: 1 } };
+            const BARE = { plan: { title: "T", sections: [{ h: "一", ask: "a", words: 1000 }] } };
+            run([{ plan: null }, { plan: null }, BARE], (bx7) => {
+              ok("★ 骨架档不退回一趟写完（一次单趟调用都没打）", bx7.oneTries === 0);
+              ok("★ 改成向服务端要一份免调用的骨架（bare=1）", bx7.bare === 1);
+              ok("拿到骨架就照常开写", !!bx7.started && bx7.started.sections.length === 1);
+              ok("跟读者说清为什么不退成一趟写完", bx7.notes.join("|").indexOf("dPlanBare") >= 0);
+              ok("不再报 dPlanFallback（那是自由分节档的话）", bx7.notes.join("|").indexOf("dPlanFallback") < 0);
+
+              run([{ plan: null }, { plan: null }, { plan: null }], (bx8) => {
+                ok("连骨架都没取回来 → 明说并收口，不吊死面板", bx8.done === true
+                  && bx8.notes.join("|").indexOf("dPlanNo") >= 0);
+                ok("这种时候也不去打单趟（别再拿两万字赌一次调用）", bx8.oneTries === 0);
+
+                /* ★ 这就是 18:14 那份真跑的形状：提纲交回一个**数组** */
+                run([{ plan: ["Kuhn 1962", "Polanyi 1966"] }, { plan: ["Kuhn 1962"] }, BARE], (bx9) => {
+                  ok("★★ 提纲交回的是数组（没有 sections）⇒ 判为没成，不当它成了",
+                    bx9.planTries === 2 && bx9.bare === 1 && !!bx9.started);
+                  ok("★★ 数组这一种也不会静默退成一趟写完", bx9.oneTries === 0);
+                  tail();
+                }, PAPER);
+              }, PAPER);
+            }, PAPER);
           });
         });
       });
