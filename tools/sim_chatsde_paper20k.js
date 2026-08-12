@@ -1,4 +1,6 @@
 /* sim_chatsde_paper20k.js —— ChatSDE「成文一篇·论文档」两万字扩容的护栏
+ *   ⓪ 解析 tools/skills/sde-academic-paper.md 第二节那张体例表，与 PAPER_SKELETON **逐条比对**——
+ *      Skill 是唯一权威，机器是它的编译产物；两份一旦不一样，这条先红
  *   ① 从 src/worker.js 里把 PAPER_SKELETON **真取出来跑**（new Function），不手抄形状、不写字面量
  *   ② plan 合并逻辑真跑：模型少给／多给／乱给 sections，合并后必须永远是骨架那几节
  *   ③ 从 public/wds-mode.js 里抠出 step()，配假 runLeg 真跑：短产出要回滚、要重试、要记账
@@ -29,21 +31,52 @@ ok("单节字数一律 ≤1900（超过安全区必被时长墙掐在思考阶�
 ok("单节字数一律 ≥800（太碎会让接缝多于正文）", SKEL.every((s) => s.words >= 800));
 ok("小标题互不重复", new Set(SKEL.map((s) => s.h)).size === SKEL.length);
 
+/* ═══ 一之二、Skill 是唯一权威：体例表 ↔ 机器骨架必须逐条对上 ═══ */
+console.log("── 规范层 ↔ 机器层 一致性 ──");
+const SKILL_P = path.join(ROOT, "tools/skills/sde-academic-paper.md");
+ok("《正规学术论文写作规范》在仓库里", fs.existsSync(SKILL_P));
+const SKILL = fs.existsSync(SKILL_P) ? fs.readFileSync(SKILL_P, "utf8") : "";
+/* 只解析第二节那张表，别把 §五 红线表、§八 分工表也扫进来 */
+const tblSrc = SKILL.slice(SKILL.indexOf("## 二 · 体例"), SKILL.indexOf("## 三 · 逐节的形状要求"));
+const ROWS = [];
+tblSrc.split("\n").forEach((ln) => {
+  const m = ln.match(/^\|\s*(\d+)\s*\|\s*([^|]+?)\s*\|\s*(\d+)\s*\|/);
+  if (m) ROWS.push({ n: +m[1], h: m[2], words: +m[3] });
+});
+ok("解析得到体例表（" + ROWS.length + " 行）", ROWS.length >= 12);
+ok("表里的序号连续，没漏行", ROWS.every((r, i) => r.n === i + 1));
+ok("Skill 的节数 == 机器的节数（" + ROWS.length + " vs " + SKEL.length + "）", ROWS.length === SKEL.length);
+ok("逐节章目一字不差", ROWS.every((r, i) => SKEL[i] && SKEL[i].h === r.h));
+ok("逐节字数一一相等", ROWS.every((r, i) => SKEL[i] && SKEL[i].words === r.words));
+const skillTotal = ROWS.reduce((a, r) => a + r.words, 0);
+ok("Skill 自报的合计字数与逐行相加对得上", new RegExp("合计 \\*\\*" + skillTotal.toLocaleString("en-US") + " 字\\*\\*").test(tblSrc)
+  || tblSrc.indexOf(String(skillTotal)) > 0);
+ok("机器合计 == Skill 合计", skillTotal === total);
+ok("worker.js 里写明了权威出处（改 Skill 必须同步改机器）",
+  WSRC.indexOf("tools/skills/sde-academic-paper.md") > 0);
+
 /* 投稿体例的必交件：缺一件就不是一篇能投出去的论文——这正是上一版真跑翻车的地方 */
 const allAsk = SKEL.map((s) => s.h + "｜" + s.ask).join("\n");
-[["摘要", "摘要"], ["关键词", "关键词"], ["英文摘要", "Abstract"], ["英文关键词", "Keywords"],
- ["引言", "引言"], ["文献述评", "文献述评"], ["证伪", "证伪"], ["参考文献", "参考文献"],
- ["附录", "附录"], ["投稿声明", "投稿声明"], ["结论", "结论"], ["研究局限", "局限"]]
+[["结构化摘要", "结构化摘要"], ["关键词", "关键词"], ["英文摘要", "Abstract"], ["英文关键词", "Keywords"],
+ ["研究问题 RQ", "RQ1"], ["贡献声明", "贡献声明"], ["文献述评", "述评是"], ["名义定义", "名义定义"],
+ ["操作性定义", "操作性定义"], ["测量层次", "测量层次"], ["取样标准", "纳入与排除"], ["分析程序可复现", "能复现"],
+ ["信度与研究者立场", "研究者自身立场"], ["研究伦理", "不涉及人类被试"], ["证伪条款", "证伪条款"],
+ ["当场检验", "当场交出你这次执行的结果"], ["效度四类", "构念效度"], ["研究局限", "局限"],
+ ["作者贡献 CRediT", "CRediT"], ["利益冲突", "利益冲突"], ["数据可得性", "数据与材料可得性"],
+ ["AI 使用声明", "AI 使用声明"], ["参考文献 APA", "APA"], ["附录", "附录"], ["结论对上 RQ", "回答引言里那几条 RQ"]]
   .forEach(([n, k]) => ok("体例必交件在骨架里：" + n, allAsk.indexOf(k) >= 0));
 ok("禁编造那一条写进了骨架（参考文献节）", /绝不编造页码与引文/.test(allAsk));
 ok("不含情态词那一条写进了判据节", /禁用：应当／有意义／实质性／充分／真正／恰当／合理/.test(allAsk));
-ok("当场检验那一条写进了证伪节", /当场交出你这次执行的结果/.test(allAsk));
+ok("分析与讨论分家写进了骨架（两侧各一条）",
+  /分析节只出结果、不出意义解读/.test(allAsk) && /讨论节只解读、不出新证据/.test(allAsk));
+ok("不可判定的比较句被禁在骨架里", /更强调／更深入／更系统/.test(allAsk));
+ok("「随着……的发展」这类开头被明令禁止", /随着……的发展/.test(allAsk));
 
 /* ═══ 二、paper 档挂上骨架 ═══ */
 console.log("── paper 档 ──");
 const mPaper = WSRC.match(/paper: \{ name: "([^"]+)", tok: WDS_TOK_MAX, parts: ([^,]+),\n\s*fixed: (\w+), spec:/);
 ok("paper 表头形状对（name/parts/fixed 三样齐）", !!mPaper);
-ok("档名已改成两万字", !!mPaper && /两万字/.test(mPaper[1]));
+ok("档名标明了投稿体例与字数口径", !!mPaper && /两万字/.test(mPaper[1]) && /体例/.test(mPaper[1]));
 ok("parts 由骨架推导，不是手写的数字", !!mPaper && mPaper[2].trim() === "PAPER_SKELETON.length");
 ok("fixed 指向 PAPER_SKELETON", !!mPaper && mPaper[3] === "PAPER_SKELETON");
 ok("旧的「一万字论文」口径已经不在了", WSRC.indexOf('name: "一万字论文"') < 0);
@@ -181,6 +214,17 @@ function tail() {
   ok("PDF 按钮传的是 aLabel 空串（论文稿不印发言人抬头）", /aLabel: ""/.test(btn));
   ok("排版抛错有纯文本兜底（白屏不是可接受形态）", btn.indexOf("catch") > 0 && btn.indexOf("<pre>") > 0);
   ok("Word 出口仍在", FSRC.indexOf("window.SDEDocx.build(") > 0);
+
+  console.log("── part 阶段的学术规程 ──");
+  const rules = WSRC.slice(WSRC.indexOf("【正规学术论文写作规程"), WSRC.indexOf("【正规学术论文写作规程") + 4000);
+  [["引注三验", "引注三验"], ["作者—年份制", "「作者 年份」制"], ["禁脚注编号", "不得出现脚注编号"],
+   ["诚信红线", "越线即撤稿级"], ["禁编造", "绝不编造"], ["禁伪装引号", "伪装成原文"],
+   ["转引自", "转引自"], ["不利结果也要报", "不利的那一次也要报"],
+   ["禁不可判定比较句", "更强调／更深入／更系统"], ["禁对话痕迹", "读者没参与过任何对话"],
+   ["分析与讨论分家", "分析节只出结果不出意义解读"], ["禁画表格", "不画表格"],
+   ["章节两级真标题", "真标题行"], ["写完比写长要紧", "写完比写长要紧"]]
+    .forEach(([n, k]) => ok("规程里有：" + n, rules.indexOf(k) >= 0));
+  ok("规程只挂在骨架档上（PFIX 为真才发）", /\+ \(PFIX \? \("\\n\\n【正规学术论文写作规程/.test(WSRC));
   ok("论文档的文案已改成两万字", /kPaper: "凝成两万字论文"/.test(FSRC));
   ok("英文文案同步改了（中英双份纪律）", /Forge a 20,000-word paper/.test(FSRC));
 
