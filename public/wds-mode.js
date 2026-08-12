@@ -610,7 +610,10 @@
     dShort1: "\u26a0 第 ", dShort2: " 节两遍都没写够字数，稿子在这几处是短的——点上面的「\u21bb 继续写缺的几节」就只补这几节，已经写好的不动。",
     dCut1: "\u26a0 第 ", dCut2: " 节字数是够的，但**断在半句上**（末尾没有句号）——多半是这一趟被顶穿了。这几节没有当场重写：额度先留给一个字都还没写的那些节。等全篇跑完，点「\u21bb 继续写缺的几节」把它们一起补上；重写不会比现在更差（比现在短就仍旧留着现在这一份）。",
     dTailRetry: "第 ", dTailRetry2: " 节字数够了却断在半句上（多半是这一趟被顶穿了），等 20 秒重写一遍；写出来的若不如现在这一份，就仍旧留着现在这一份。",
-    dWallWhy: "（上游给最后那一趟的收束理由：", dWallNoFin: "没给（多半是流被掐断）",
+    dWallWhy: "（上游给失败那一趟的收束理由：", dWallNoFin: "没给（多半是流被掐断）",
+    dWallNoMeta: "（⚠ 失败的那几趟一条读数都没留下——这本身就说明流在服务端发出读数之前就断了。）",
+    dThrifty1: "\u26a0 到第 ", dThrifty2: " 节为止连着三节没写够。**没有停**——后面的节照常写下去，只是从这里起每节只打一遍、不再重试也不再等二十秒（真是上游在挡就少烧几次；不是的话后面这几节照样写得出来）。",
+    dThriftyEnd: "这一趟跑到了最后一节。没写够的那几节已列在上面——点「\u21bb 继续写缺的几节」单独补，那时是单节请求，压力比一口气十六节小得多。",
     dLegErr: "第 ", dLegErr2: " 节这一趟自己出岔子了，已跳过接着往下走（原因：",
     dAutoSaved: "已自动存进「成文记录」——就算这里显示出问题，稿子也在（成文菜单 → ↺ 成文记录）。",
     dCloseBusy: "正在写作中，点空白处不会关掉它（免得误点丢稿）。要关就按 Esc、或点右上角的 ✕ —— 两条路都会先把已写的部分存进「成文记录」。",
@@ -6290,6 +6293,10 @@
       if (/^#{1,6}\s/.test(ln)) return false;                                   // 标题行
       if (/^([-*\u00b7\u2022\u2013]|\d+[.、)])\s/.test(ln)) return false;        // 列表项
       if (/^(\*\*)?[^\s：:]{1,14}(\*\*)?\s*[：:]/.test(ln)) return false;        // 「关键词：…」这类标签行
+      /* ⚠ 体例写死的是 `【关键词】…` / `【Keywords】…` 这种**方括号**形式，它不带冒号，
+         上一条认不出来 ⇒ 第 1 节每一篇都被误判成断稿（真跑里连着两次都点了第 1 节）。
+         💡 **补豁免时要照着体例表抄它规定的那个形状，别照着自己脑子里的形状抄。** */
+      if (/^[【\[][^】\]]{1,16}[】\]]/.test(ln)) return false;                    // 「【关键词】…」这类
       return ln.length >= 24;                                                   // 短行多半是收束词，不当断稿
     }
     function secPass(sx, need) { return sx.length >= need && !tailCut(sx); }
@@ -6685,26 +6692,46 @@
          是上游到了那个点就不给字了。而立刻重打第二遍，撞的是同一堵墙：日志里二十次全败。
          所以两件事：第二遍**退避**再打；**连着两节全败就停**，别再白磨二十分钟。 */
       var RETRY_WAIT = 20000;     // 第二遍等多久再打：立刻重打等于把同一堵墙再撞一次
-      var WALL_RUN = 2;           // 连着几节两遍全败就判定撞墙、停下来
-      var shortSecs = [], cutSecs = [], runFail = 0, hitWall = false;
+      /* 🔴🔴 2026-08-12 晚的读数把「撞墙」这个判断本身推翻了一半。
+         四次真跑，断点几乎不动：第 6–8 节之间。**真的上游拥堵不会每次都挑同一个位置。**
+         而这几节恰是 ask 最重的那几节（盘点表八行四栏／可裁决判据四件齐／三条撤稿级条件）。
+         再加上收束理由是 `stop`——上游是自己收的口，不是把流掐了。
+         ⇒ 合起来只指一件事：**不是上游在挡，是这几节交不出来，模型早早收了口。**
+         而我那道「连着两节全败就停」的保护，正在把它误判成墙，然后停掉后面八节——
+         那八节（研究设计／分析／讨论／结论／参考文献）多半是写得出来的。
+         💡💡 **心法：一道保护开始比它要防的东西更常误伤时，它就该改判据了。**
+         现在：① 连败三节才谈墙；② 还要有**墙的签名**——那几趟几乎没吐字（out < 200）
+         或上游根本没给收束理由（流被掐断）。`stop` ＋ 吐了几千字，一律不算墙。 */
+      /* ⚠ 我先试过"给墙加一条签名"（几乎没吐字 ／ 没有收束理由），**不成立**：
+         真跑里失败那两节也只吐了几十字，照样落进那条签名。想岔了——
+         **两节的数据量根本不足以判断是哪一种**，判据再聪明也变不出信息来。
+         所以改的是 policy 不是判据：**连败之后不停，改成省电往下跑。**
+         算一笔账就清楚：停下来要放弃后面八节（研究设计／分析／讨论／结论／参考文献，
+         多半是写得出来的）；继续跑，若真是墙，代价只是多打八次调用——而且省电模式下
+         不再重试、不再等二十秒退避。**赌错的代价不对称，就该往代价小的那边赌。** */
+      var WALL_RUN = 3;           // 连败到这个数就进省电模式（不再停）
+      var shortSecs = [], cutSecs = [], runFail = 0, thrifty = false;
       /* legMeta＝最近一趟的读数；failMeta＝最近一趟**失败**的读数。
          ⚠ 两者必须分开：真跑里报出来的「收束理由 stop、这一趟吐了 3686 字」
          其实是最后一趟**写成了**的节的读数——拿它去解释撞墙，等于用好人的口供定坏人的罪。 */
-      var legMeta = null, failMeta = null;
+      var legMeta = null, failMeta = null, failMetas = [];
       function step() {
-        if (dStopped || hitWall || i >= secs.length) {
+        if (dStopped || i >= secs.length) {
           if (shortSecs.length) dNote(t("dShort1") + shortSecs.join("、") + t("dShort2"), 1);
           /* 断在半句的与"没写够字数的"分开报：前者稿子是有的，只是尾巴缺一截；
              后者是这一节根本没写成。混在一起说，读者判不出该补哪些。 */
           if (cutSecs.length) dNote(t("dCut1") + cutSecs.join("、") + t("dCut2"), 1);
           /* ⚠ 少报一节：撞墙时 i 已经加过一次，`i` 指的就是**第一个一个字都没写的节**，
              1-based 是 `i + 1`。原来写 `i + 2`，于是把第 8 节说成了第 9 节。 */
-          if (hitWall && i < secs.length) {
-            var fm = failMeta || lastMeta;
-            dNote(t("dWallLeft1") + (i + 1) + "–" + secs.length + t("dWallLeft2")
+          if (thrifty && shortSecs.length) {
+            /* ⚠ 只认失败那几趟自己的读数。取不到就明说取不到——**「没留下读数」本身是一条读数**，
+               而拿上一节写成了的那一份顶上，就成了用好人的口供定坏人的罪。 */
+            var fm = failMetas.filter(Boolean).pop() || null;
+            dNote(t("dThriftyEnd")
               + (fm ? (t("dWallWhy") + (fm.fin || t("dWallNoFin"))
                   + "；那一趟吐了 " + (fm.out || 0) + " 字" + (fm.think ? ("、思考 " + fm.think + " 字") : "")
-                  + (fm.cut ? ("；本地时钟：" + fm.cut + "闸已掐") : "") + "）") : ""), 1);
+                  + (fm.cut ? ("；本地时钟：" + fm.cut + "闸已掐") : "") + "）")
+                  : t("dWallNoMeta")), 1);
           }
           /* 撞墙／写完都在这里亮续写钮——它是这台机器面对上游墙的唯一正解：
              不赌一口气十六节，而是分几趟把缺的补齐。 */
@@ -6715,6 +6742,13 @@
         pTrace.leg = "第 " + (i + 1) + "/" + secs.length + " 节"; traceSave();
         var before = text.length, tail0 = text.slice(-1200);
         var need = Math.max(260, Math.round((parseInt(secs[i].words, 10) || 1200) * 0.4));
+        /* ⚠ 每趟开工先清空：不清的话，这一趟若没发回读数，legMeta 手里捧着的还是
+           **上一节写成了的那一份**——而下面 failMeta 会拿它去解释这一节的失败。
+           真跑里报出来的「收束理由 stop、那一趟吐了 3585 字」就是这么来的：
+           失败的那两节各只吐了几十字，那个 3585 是上一节的。
+           💡 **我上一轮刚把这条病修掉，又用一句 `failMeta || lastMeta` 的兜底把它请了回来。
+              兜底要问一句：兜进来的那个值，说的是不是同一件事。** */
+        legMeta = null;
         runLeg({ stage: "part", idx: i, plan: plan, prevTail: tail0 })
           .then(function (rr) {
             if (rr && rr.meta) legMeta = rr.meta;
@@ -6729,8 +6763,12 @@
               if (tailCut(a1)) cutSecs.push(i + 1);
               return;
             }
+            failMeta = legMeta;                                 // 可能是 null——那本身就是一条读数
+            if (thrifty) {                                      // 省电模式：不重试，记账、往下走
+              shortSecs.push(i + 1); failMetas.push(failMeta || null);
+              return;
+            }
             text = text.slice(0, before);                       // 回滚残稿，退避一会儿再来一遍
-            failMeta = legMeta;
             dNote(t("dPartRetry") + (i + 1) + t("dPartRetry2"));
             return new Promise(function (res) { setTimeout(res, RETRY_WAIT); }).then(function () {
               if (dStopped) { text = text.slice(0, before) + a1; return; }
@@ -6747,11 +6785,18 @@
                   }
                   if (!kept.length) dNote(t("dPartLost") + (i + 1) + t("dPartLost2"), 1);
                   shortSecs.push(i + 1);                         // 两遍都短：记账，收尾时说清是哪几节
+                  failMetas.push(failMeta || null);
                   /* 连着两节都是两遍全败 ⇒ 上游在挡，不是这一节难写。就地停：
                      再往下磨只会把剩下每一节都白打两遍（这一份真跑正是这么烧掉二十次调用的）。 */
-                  if (++runFail >= WALL_RUN) {
-                    hitWall = true;
-                    dNote(t("dWallRun1") + (i + 1) + t("dWallRun2"), 1);
+                  /* 【判墙要有签名，不能只数连败】墙的样子是「几乎不吐字」或「连收束理由都没有」。
+                     若上游明明白白给了 stop、而且吐了不少字，那是这一节交不出来，不是路被堵了——
+                     **这时候停掉后面所有节，损失比继续大得多**。 */
+                  /* 连败到阈值：进省电模式，**但不停**。省电＝这之后每节只打一遍，
+                     不重试、不等二十秒——墙期的浪费从"每节两遍＋二十秒"降到"每节一遍"，
+                     而万一不是墙，后面那几节照样写得出来。 */
+                  if (++runFail >= WALL_RUN && !thrifty) {
+                    thrifty = true;
+                    dNote(t("dThrifty1") + (i + 1) + t("dThrifty2"), 1);
                   }
                 });
             });

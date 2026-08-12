@@ -235,6 +235,9 @@ const _s0 = FSRC.indexOf("      var RETRY_WAIT =") >= 0
   : FSRC.indexOf("      var shortSecs = [];");
 const _s1 = FSRC.indexOf("      step();", _s0);
 const stepSrc = (_s0 > 0 && _s1 > _s0) ? FSRC.slice(_s0, _s1) : "";
+/* ⚠ 判「某句旧代码已经不在了」时必须**先剥注释**——注释里几乎一定会引到那句旧代码
+   （今天第四次踩它了）。stepBare 专供这一类"不该存在"的断言。 */
+const stepBare = stepSrc.replace(/\/\*[\s\S]*?\*\//g, " ").replace(/^\s*\/\/.*$/gm, " ");
 ok("抠得到 step()", stepSrc.indexOf("function step()") > 0 && stepSrc.indexOf("text.slice(0, before)") > 0);
 
 /* runLeg 在真实实现里是**边流边往 text 上加**的，所以假 runLeg 也必须真的加——
@@ -249,8 +252,8 @@ const gateSrc = (_g0 > 0 && _g1 > _g0) ? FSRC.slice(_g0, _g1) : "";
 ok("抠得到三道闸（tailCut/secPass/betterOf）",
   gateSrc.indexOf("function tailCut") > 0 && gateSrc.indexOf("function secPass") > 0 && gateSrc.indexOf("function betterOf") > 0);
 
-function harness2(secs, outs) {
-  const box = { notes: [], attempt: {}, done: false, appended: [] };
+function harness2(secs, outs, opt) {
+  const box = { notes: [], attempt: {}, done: false, appended: [], fin: (opt && opt.fin) };
   const src =
     "var text='', i=0, dStopped=false, __short=null, lastMeta=null;\n" + gateSrc + "\n" +
     /* 真实退避是 20 秒（下面单独有一条断言盯住这个数）；行为测试里把它换成 20 毫秒，
@@ -284,7 +287,12 @@ function harness2(secs, outs) {
          out），fixture 若照旧插一个标记，"两遍都空"这一组就永远测不到。 */
       if (m > 0) hook.append("<" + (k + 1) + ":" + box.attempt[k] + ">" + "x".repeat(Math.max(0, m - 9)) + (cutIt ? "，" : "。"));
       box.appended.push((k + 1) + ":" + box.attempt[k] + ":" + n);
-      return Promise.resolve({ out: m, plan: null, err: "", meta: { idx: k + 1, out: m, fin: "stop" } });
+      /* meta 的 fin 可由用例指定：判墙要看签名，`stop` 与空是两回事。 */
+      return Promise.resolve({ out: m, plan: null, err: "",
+        /* ⚠ `box.fin || "stop"` 会把**空串**吃掉——而空的收束理由正是"流被掐断"那一种，
+           恰恰是这一组用例要造的那个签名。用 undefined 判，别用真值判。 */
+        meta: (n && typeof n === "object") ? n
+          : { idx: k + 1, out: m, fin: (box.fin === undefined ? "stop" : box.fin) } });
     },
     () => { box.done = true; }, hook);
   return { hook, box };
@@ -343,12 +351,39 @@ waitDone(A.box, function () {
             ok("补够了就收下，断句那一件转记到 dCut1", G.hook.text().indexOf("<2:2>") > 0
               && G.box.notes.join("|").indexOf("dCut1") >= 0 && G.hook.short().length === 0);
 
+            /* ⭐ 三节连败，但上游每趟都正常收口（fin=stop）⇒ 不是墙，必须继续往下写。 */
+            const SECS5 = [1, 2, 3, 4, 5].map((k) => ({ h: "第" + k, ask: "a", words: 1000 }));
+            /* ⚠ outs 的键是**0-based 的节序号**：要让第 1、2、3 节失败，写 0/1/2。
+               而且失败的那几节照样会往稿子里落一个标记，所以"写完了"不能用标记在不在来判——
+               要用 shortSecs 与达标长度来判。 */
+            const K = harness2(SECS5, { 0: [50, 50], 1: [50, 50], 2: [50, 50] }, { fin: "stop" });
+            waitDone(K.box, function () {
+              ok("★★ 连着三节全败、但上游正常收口 ⇒ 不判墙，照样把第 4、5 节写完",
+                K.hook.short().join() === "1,2,3" && K.box.appended.some((x) => x.startsWith("4:"))
+                && K.box.appended.some((x) => x.startsWith("5:")));
+              ok("★★ 并明说进了省电模式", K.box.notes.join("|").indexOf("dThrifty1") >= 0);
+              ok("★★★ 一次都没报撞墙停下（那条路已经拆掉了）", K.box.notes.join("|").indexOf("dWallRun1") < 0);
+
+              /* 对照：同样三节全败，但上游一个字都没吐、也没给收束理由 ⇒ 这才是墙。 */
+              /* 对照：真正像墙的那一组（一个字不吐、没有收束理由）——同样不停，
+                 但省电之后每节只打一遍，总调用数明显少于"每节两遍"。 */
+              const L = harness2(SECS5, { 0: [0, 0], 1: [0, 0], 2: [0, 0] }, { fin: "" });
+              waitDone(L.box, function () {
+                ok("★★ 像墙的那一组也跑到最后一节（不再半路放弃）",
+                  L.box.appended.some((x) => x.startsWith("5:")));
+                ok("★★★ 省电真的省下来了：后两节各只打一遍，不是两遍",
+                  L.box.appended.filter((x) => x.startsWith("4:")).length === 1
+                  && L.box.appended.filter((x) => x.startsWith("5:")).length === 1);
+                ok("前三节仍旧各打两遍（省电是从第三节之后才生效的）",
+                  L.box.appended.filter((x) => x.startsWith("1:")).length === 2);
+                tail();
+              });
+            });
             const H = harness2(SECS3, { 1: [300, 0] });     // 第一遍 300 字（不够）、第二遍空
             waitDone(H.box, function () {
               ok("★★ 两遍都不达标时留长的那一遍（旧口径这里会把 300 字一起丢掉）",
                 H.hook.text().indexOf("<2:1>") > 0);
               ok("留了残段也照样记进 shortSecs（不许因为留着就当写成了）", H.hook.short().length === 1);
-              tail();
             });
           });
         });
@@ -383,19 +418,39 @@ function tail() {
     /if \(a1\.length >= need\) \{/.test(stepSrc) && /if \(tailCut\(a1\)\) cutSecs\.push/.test(stepSrc));
   ok("★ 断句那一支明确不重写（注释写明理由：额度花在一个字都没有的地方）",
     /别花在只差一个句号的地方/.test(stepSrc));
+  /* ⚠ 落点搬家：这一条要守的用意没变（读数要取失败那一趟），
+     但 `failMeta || lastMeta` 那句兜底本身就是病——它会把上一节写成了的读数顶上来，
+     所以现在改成只认失败那几趟自己留下的。 */
   ok("★ 撞墙的读数取**失败**那一趟，不是最后一趟写成的那一趟",
-    /failMeta = /.test(stepSrc) && /var fm = failMeta \|\| lastMeta;/.test(stepSrc));
-  ok("★ 还差哪几节不许少报一节（撞墙时 i 已经加过一次）",
-    /t\("dWallLeft1"\) \+ \(i \+ 1\) \+ "–"/.test(stepSrc) && /if \(hitWall && i < secs\.length\)/.test(stepSrc));
+    /failMetas\.push\(/.test(stepSrc) && stepBare.indexOf("failMeta || lastMeta") < 0);
+  /* ⚠ 「还差第 N–M 节」这句话已经没有落点了：现在一律跑到最后一节，不存在"还差一段没跑"。
+     用意搬到新落点：收尾要把**没写够的那几节**逐个报出来，并指向续写钮。 */
+  ok("★ 收尾把没写够的那几节逐个报出来，并指向续写钮",
+    /dThriftyEnd/.test(stepSrc) && /dShort1/.test(stepSrc));
   ok("★ 两遍取好的那一遍（betterOf），不是无条件收第二遍", /betterOf\(a1, text\.slice\(before\), need\)/.test(stepSrc));
   ok("判长短量的是稿子里真多出来的那一段，不是 runLeg 自报的数",
     /var a1 = text\.slice\(before\);/.test(stepSrc) && stepSrc.indexOf("rr.out >= need") < 0);
   ok("撞墙那句话带上了上游的收束理由（这就是追了一整天的那一行）", /dWallWhy/.test(stepSrc) && /lastMeta/.test(stepSrc));
+  console.log("── ⭐⭐ 连败不再停，改省电往下跑（2026-08-12 晚的真跑推翻了旧 policy）──");
+  ok("★★ 连败门槛提到三节", (stepSrc.match(/var WALL_RUN = (\d+);/) || [])[1] >= 3);
+  ok("★★★ 主循环不再因为连败而中断（旧口径会放弃后面八节）",
+    stepBare.indexOf("hitWall") < 0 && /if \(dStopped \|\| i >= secs\.length\)/.test(stepSrc));
+  ok("★★ 连败到阈值只是进省电模式", /thrifty = true;/.test(stepSrc) && /dThrifty1/.test(stepSrc));
+  ok("★★ 省电模式下不再重试、不再等退避（墙期的浪费降到每节一遍）",
+    /if \(thrifty\) \{/.test(stepSrc) && /shortSecs\.push\(i \+ 1\); failMetas\.push/.test(stepSrc));
+  ok("注释算清了那笔账（赌错的代价不对称）", /赌错的代价不对称/.test(stepSrc));
+  ok("★★ 每趟开工先把 legMeta 清空（否则它捧着上一节的读数）", /legMeta = null;\s*\n\s*runLeg\(\{ stage: "part"/.test(stepSrc));
+  ok("★★ 收尾的读数只取失败那几趟自己的，取不到就明说", /failMetas\.filter\(Boolean\)\.pop\(\) \|\| null/.test(stepSrc)
+    && /dWallNoMeta/.test(stepSrc) && stepBare.indexOf("failMeta || lastMeta") < 0);
+  ok("注释写明了这条兜底是怎么把旧病请回来的", /兜进来的那个值，说的是不是同一件事/.test(stepSrc));
+
   const mWall = stepSrc.match(/var WALL_RUN = (\d+);/);
   ok("连着几节全败即判撞墙（阈值从源码取：" + (mWall ? mWall[1] : "?") + "）", !!mWall && +mWall[1] >= 2 && +mWall[1] <= 4);
   ok("写够了要把连败计数清零（别把零星失败攒成假撞墙）", (stepSrc.match(/runFail = 0;/g) || []).length >= 2);
-  ok("撞墙后立刻收口，不再往下打", /if \(dStopped \|\| hitWall \|\| i >= secs\.length\)/.test(stepSrc));
-  ok("撞墙时明说是上游在挡、并说清还差哪几节", /dWallRun1/.test(stepSrc) && /dWallLeft1/.test(stepSrc));
+  /* ⚠ 这两条守的是旧 policy（撞墙即停）。真跑证明它误伤更多——四次真跑断点都落在第 6–8 节之间，
+     而真的上游拥堵不会每次都挑同一个位置。旧 policy 已拆，断言跟着改成守新的那条。 */
+  ok("★★★ 只有读者按停或跑完才收口，不再因为连败而中断", /if \(dStopped \|\| i >= secs\.length\)/.test(stepSrc));
+  ok("省电模式的说明里讲清了「没有停」", /\*\*没有停\*\*/.test(FSRC));
 
   /* ⚠ 只认第一处会量到注释里那句解释（站里犯过一次的病，别再犯）：
      全局扫，取**带数字**的那一处才是真的调用。 */

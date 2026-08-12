@@ -74,7 +74,16 @@ ok("行尾空白与 markdown 装饰不影响判读", !M.tailCut("收口了。** 
 console.log("── 本来就不带句号的收尾：不许误判 ──");
 ok("★ 关键词行（第 1 节按体例必须这么收尾）不算断",
   !M.tailCut(PROSE + "。\n\n**Keywords:** genesis; freezing; indexicality"));
-ok("★ 中文关键词行也不算断", !M.tailCut(PROSE + "。\n\n【关键词】发生学；冻结；索引性"));
+/* ⚠ 体例表写死的是**方括号**形式 `【关键词】…` / `【Keywords】…`，它不带冒号——
+   而我第一版的豁免只认「关键词：」这种带冒号的，于是每一篇的第 1 节都被误判成断稿
+   （真跑里连着两份稿子都点了第 1 节）。
+   💡 **补豁免要照着体例表抄它规定的那个形状，别照着自己脑子里的形状抄。** */
+ok("★★ 中文方括号关键词行不算断（体例规定的就是这个形状）",
+  !M.tailCut(PROSE + "。\n\n【关键词】发生学；冻结；索引性"));
+ok("★★ 英文方括号关键词行同样不算断",
+  !M.tailCut(PROSE + "。\n\n【Keywords】discovery paradigm; genesis-logy; cryonic state"));
+ok("方括号里太长的就不当标签了（那多半是正文，不是一行标签）",
+  M.tailCut(PROSE + "。\n\n【" + "字".repeat(30) + "】这一段还没写完就断在这里了呀真的断了"));
 ok("★ 列表项收尾不算断", !M.tailCut(PROSE + "。\n\n- 甲：某某\n- 乙：某某"));
 ok("★ 标题行收尾不算断", !M.tailCut(PROSE + "。\n\n### 3.4 小结"));
 ok("★ 短行收尾不算断（多半是收束词，不是断稿）", !M.tailCut(PROSE + "。\n\n以上"));
