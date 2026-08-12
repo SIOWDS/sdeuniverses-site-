@@ -18,7 +18,8 @@
  */
 (function (w) {
   "use strict";
-  var VERSION = 4;   // v4：文件名与封面标题分家（o.file 进 <title> ＝ 打印框的建议文件名）
+  var VERSION = 5;   // v5：aLabel 显式空串 ＝ 不印发言人抬头（成文出的论文稿用）
+  // v4：文件名与封面标题分家（o.file 进 <title> ＝ 打印框的建议文件名）
   // v3：版心宽按 @page 的 178mm 折算，不再问 1px 的 iframe 要
   var PAGE_W_MM = 178;   // A4 210mm − @page 左右各 16mm。改 @page 的 margin 必须同步改这里
   // v2：公式（KaTeX）当一等公民——字体等齐再打印、超宽公式自动缩到版心
@@ -129,7 +130,9 @@
       b = b || {};
       h += "<div class=turn>";
       if (b.q) h += "<div class=q><b>" + esc(b.qLabel || "我") + "</b>" + esc(b.q) + "</div>";
-      if (b.html) h += "<div class=who>" + esc(b.aLabel || "WDS") + "</div><div class=a>" + scrub(b.html) + "</div>";
+      /* aLabel **显式传空串** ＝ 这一块不是某人的发言，不印抬头（成文出的论文稿走这一路）。
+         不传这个键的老调用方拿到的仍是 undefined ⇒ 照旧印 "WDS"，行为不变。 */
+      if (b.html) h += (b.aLabel === "" ? "" : "<div class=who>" + esc(b.aLabel || "WDS") + "</div>") + "<div class=a>" + scrub(b.html) + "</div>";
       h += "</div>";
       if (i < blocks.length - 1) h += "<hr class=rule>";
     });

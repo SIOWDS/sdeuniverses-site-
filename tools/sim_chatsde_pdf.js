@@ -222,7 +222,12 @@ ok("空对话不让导（needTalk）", /function exportPdf\(\) \{\s*\n\s*if \(!h
 });
 ok("公式走自托管 katex（打印时 CDN 未必在）", SRC.indexOf('katex: "/assets/katex/katex.min.css"') > 0);
 ok("出稿带 base", /base: \(location && location\.origin/.test(SRC));
-ok("模块要到 v4（建议文件名带时间戳）", /var PDF_WANT = 4;/.test(SRC));
+/* ⚠ 这里原来手抄了一个 4。手抄的后果不是报错，是它安静地测一个已经不存在的版本——
+   模块升到 v5 之后这条会红，而它本来要守的从来不是"等于 4"，是**两处必须对齐**：
+   PDF_WANT 一旦落后于模块 VERSION，读者拿到的就是缓存里的旧版，新行为静默丢失。 */
+const _pdfVer = +(PDFSRC.match(/var VERSION = (\d+);/) || [0, 0])[1];
+const _pdfWant = +(SRC.match(/var PDF_WANT = (\d+);/) || [0, 0])[1];
+ok("PDF_WANT 与模块 VERSION 对齐（v" + _pdfVer + "）", _pdfVer >= 4 && _pdfWant === _pdfVer);
 /* 打印框的建议文件名 = 印刷稿的 <title>。它必须与封面大标题分家，否则每导一次都撞同名，
    读者每次都被逼进"是否替换"那一步——而替换成不成功不归网页管（文件被阅读器占着就写不进去）。 */
 {

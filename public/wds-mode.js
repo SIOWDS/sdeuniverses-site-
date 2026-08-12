@@ -454,9 +454,11 @@
       kReport: "对话报告", kReportS: "结论 · 谈了什么 · 立住的判断 · 未解决 · 下一步",
       kEssay: "提炼成文", kEssayS: "锻成一篇独立成立的文章，约三千字",
       kOutline: "写作提纲", kOutlineS: "母题 + 章节骨架，照着就能写",
-      kPaper: "凝成一万字论文", kPaperS: "承重命题 + 不含情态词的判据 + 逐条划界 + 证伪条件，约一万字",
+      kPaper: "凝成两万字论文", kPaperS: "投稿体例十四节：中英摘要 · 文献述评 · 代理坍缩 · 二维辨别格 · 不含情态词的判据 · 证伪与当场检验 · 参考文献与附录，约两万字（出 Word 与 PDF）",
       kSumdoc: "总结载入的文章", kSumdocS: "读完那篇：它在说什么 · 承重句 · 哪里脆 · 没看见什么 · 千字概写（需先载入文章）",
       mDocx: "\u2913 Word (.docx)", mDocxS: "把这一篇存成 Word 文档",
+      mPdfx: "\u2913 PDF", mPdfxS: "把这一篇排成印刷稿并存成 PDF（打印框里把「目标」选成「另存为 PDF」）",
+      dChars: " 字",
       mSub: "\u2709 \u6295\u7a3f\u5230\u6536\u4ef6\u7bb1", mSubS: "把这一篇投给编辑部（需要投稿密码）",
       subT: "\u6295\u7a3f\u5230\u6536\u4ef6\u7bb1", subName: "\u4f5c\u8005\u540d", subPass: "\u6295\u7a3f\u5bc6\u7801",
       subGo: "\u6295\u7a3f", subCancel: "\u53d6\u6d88",
@@ -574,6 +576,7 @@
     dPlanGot: "提纲已定：分 ", dPlanGot2: " 节写 —— ",
     dPart: "正在写第 ", dPartRetry: "第 ", dPartRetry2: " 节没出正文，重写一次…",
     dPartLost: "第 ", dPartLost2: " 节两次都没写出来，先跳过接着往下写（回头可以点「重答」重来）。",
+    dShort1: "\u26a0 第 ", dShort2: " 节两遍都没写够字数，稿子在这几处是短的——把这一稿贴回对话里说「重写第 N 节」即可只补这几节。",
     dAutoSaved: "已自动存进「成文记录」——就算这里显示出问题，稿子也在（成文菜单 → ↺ 成文记录）。",
     dAutoFail: "自动存稿没成（浏览器存储不可用）：请先「⌸ 存到本机」或「⤓ 存为 .md」再关掉这个面板。",
     dRenderFail: "排版这一步出错了，已改用纯文本把稿子摆出来（原因：", dBlankFix: "排版出来是空的（白屏），已改用纯文本把稿子摆出来。稿子本身是完整的，复制/导出都不受影响。",
@@ -623,9 +626,11 @@
       kReport: "Conversation report", kReportS: "Verdict · what was covered · what held · what didn't · next",
       kEssay: "Forge into an essay", kEssayS: "A piece that stands on its own, about 3,000 words",
       kOutline: "Writing outline", kOutlineS: "A motif plus a chapter skeleton you can write from",
-      kPaper: "Forge a 10,000-word paper", kPaperS: "Load-bearing claim + a modal-free test + demarcations + falsifiers",
+      kPaper: "Forge a 20,000-word paper", kPaperS: "Fourteen sections in submission format: bilingual abstract, literature review, proxy collapse, 2x2 grid, a modal-free test, falsifiers, references (exports to Word and PDF)",
       kSumdoc: "Read the loaded article", kSumdocS: "What it claims \u00b7 its load-bearing line \u00b7 where it is brittle \u00b7 a 1,000-word condensation",
       mDocx: "\u2913 Word (.docx)", mDocxS: "Save this piece as a Word document",
+      mPdfx: "\u2913 PDF", mPdfxS: "Typeset this piece and save it as a PDF (choose \u201cSave as PDF\u201d in the print dialog)",
+      dChars: " chars",
       mSub: "\u2709 Submit to the inbox", mSubS: "Send this piece to the editors (needs the submission password)",
       subT: "Submit to the inbox", subName: "Author", subPass: "Submission password",
       subGo: "Submit", subCancel: "Cancel",
@@ -5460,7 +5465,7 @@
      把对话排成一份干净的印刷稿，最后一步交给「另存为 PDF」。
      ⚠️ 稿子取的是**已经渲染好的 DOM**（.wdsm-a），不是 mdRender(history)：公式已被
      typeset 过、站内篇目已被 autoLink 挂上，重渲一遍这两样都会掉。取不到 DOM 才回退。 */
-  var PDF_WANT = 4;                 // v4 起：建议文件名带时间戳（v3：版心宽按 @page 折算）见 /assets/wds-pdf.js
+  var PDF_WANT = 5;                 // v4 起：建议文件名带时间戳（v3：版心宽按 @page 折算）见 /assets/wds-pdf.js
   function pdfBoot(then, forced) {
     if (window.WDSPdf && window.WDSPdf.VERSION >= PDF_WANT) { then(true); return; }
     if (window.WDSPdf && !forced) { delete window.WDSPdf; return pdfBoot(then, true); }
@@ -5653,6 +5658,35 @@
         var blob = window.SDEDocx.build({ title: firstTitleOf(text) || kindT(kind), author: "ChatSDE", md: text });
         var nm = "WDS-" + safeName(firstTitleOf(text) || kind) + "-" + stampName() + ".docx";
         saveBlobToDir(nm, blob, function (msg) { if (msg) stat.textContent = msg; });
+      };
+      /* PDF：Word 早就有了，PDF 此前只有「导出整场对话」那一个口——
+         成文出来的稿子反倒拿不到 PDF。两万字论文是要拿去投、拿去给人看的，
+         .md 与 .docx 都不是"打开就是这个样子"的那一份，所以这里补上。
+         走 /assets/wds-pdf.js（排版＋浏览器打印管线）：PDF 里的汉字要么落在内嵌字体里、
+         要么是个空格，而仓库里没有也不该有中日韩字体——浏览器自己的打印管线带着系统中文字体，
+         出来的是真矢量、可选可搜。代价只有一句话要讲清：目标选「另存为 PDF」。 */
+      var pdfB = el("button", "wdsm-tbtn dpdfx", t("mPdfx"));
+      pdfB.title = t("mPdfxS");
+      dlBtn.parentNode.insertBefore(pdfB, dlBtn);
+      pdfB.onclick = function () {
+        if (!text) return;
+        stat.textContent = t("pdfWait");
+        pdfBoot(function (ok) {
+          if (!ok) { stat.textContent = t("pdfNo"); return; }
+          var ttl = firstTitleOf(text) || kindT(kind), body = "";
+          /* 排版失败也得出得来一份：纯文本是底线形态，白屏不是。 */
+          try { body = mdRender(text); } catch (e) { body = "<pre>" + esc(text) + "</pre>"; }
+          window.WDSPdf.print({
+            title: ttl,
+            file: "WDS-" + safeName(ttl) + "-" + stampName(),
+            lang: LANG === "en" ? "en" : "zh",
+            katex: "/assets/katex/katex.min.css",
+            base: (location && location.origin ? location.origin + "/" : ""),
+            meta: [new Date().toLocaleString(), text.length + t("dChars"), "ChatSDE \u00b7 sdeuniverses.com"],
+            blocks: [{ html: body, aLabel: "" }],     // aLabel 空串 ＝ 不印发言人抬头（论文不是对话）
+            foot: t("pdfFoot"),
+          }, function (okp) { stat.textContent = okp ? t("pdfTip") : t("pdfNo"); });
+        });
       };
       subBtn = el("button", "wdsm-tbtn dsub", t("mSub"));
       subBtn.title = t("mSubS");
@@ -6013,26 +6047,41 @@
       dNote(t("dPlanGot") + secs.length + t("dPlanGot2")
         + secs.map(function (s, i) { return (i + 1) + "、" + String((s && s.h) || ""); }).join("\u3000"));
       var i = 0;
+      /* 【短产出＝这一节没写成，不是写完了】旧版只在 out===0 时补写：一节只吐了几十字、
+         断在半句上的，照样被当作"这一节完成"收下。两万字十四节里只要后几节撞上限流，
+         读者拿到的就是一份**看起来完整的断稿**——标题都在、正文没了。
+         现在按本节字数目标的四成设门槛。⚠ 重试前必须把已落进 text 的那半截**先回滚**：
+         runLeg 是边流边往 text 上加的，不回滚，第二遍就接在第一遍的残句后面，拼出两个开头。 */
+      var shortSecs = [];
       function step() {
-        if (dStopped || i >= secs.length) { done(); return; }
+        if (dStopped || i >= secs.length) {
+          if (shortSecs.length) dNote(t("dShort1") + shortSecs.join("、") + t("dShort2"), 1);
+          done(); return;
+        }
         stat.textContent = t("dPart") + (i + 1) + "/" + secs.length + " · " + String(secs[i].h || "");
         pTrace.leg = "第 " + (i + 1) + "/" + secs.length + " 节"; traceSave();
-        var before = text.length;
-        runLeg({ stage: "part", idx: i, plan: plan, prevTail: text.slice(-1200) })
+        var before = text.length, tail0 = text.slice(-1200);
+        var need = Math.max(260, Math.round((parseInt(secs[i].words, 10) || 1200) * 0.4));
+        runLeg({ stage: "part", idx: i, plan: plan, prevTail: tail0 })
           .then(function (rr) {
-            // 某一节空了只补这一节——一节坏不该毁全篇。
-            if (rr.out === 0 && !dStopped) {
-              dNote(t("dPartRetry") + (i + 1) + t("dPartRetry2"));
-              return runLeg({ stage: "part", idx: i, plan: plan, prevTail: text.slice(-1200) })
-                .then(function (r2) { if (r2.out === 0) dNote(t("dPartLost") + (i + 1) + t("dPartLost2"), 1); });
-            }
+            if (dStopped || rr.out >= need) return;
+            text = text.slice(0, before);                       // 回滚残稿，再来一遍
+            dNote(t("dPartRetry") + (i + 1) + t("dPartRetry2"));
+            return runLeg({ stage: "part", idx: i, plan: plan, prevTail: tail0 })
+              .then(function (r2) {
+                if (r2.out >= need) return;
+                if (r2.out === 0) { text = text.slice(0, before); dNote(t("dPartLost") + (i + 1) + t("dPartLost2"), 1); }
+                shortSecs.push(i + 1);                           // 两遍都短：记账，收尾时说清是哪几节
+              });
           })
           .then(function () {
             if (text.length > before && text.slice(-2) !== "\n\n") text += "\n\n";
             paintD(false);
             saveProgress("写到第 " + (i + 1) + "/" + secs.length + " 节");
             i++;
-            setTimeout(step, 0);      // 让出主线程；顺带给每分钟限流留一点空
+            /* 让出主线程，并给上游的每分钟限流留一点空。十五趟连着打，最容易在后几趟
+               撞上限流——而限流的样子恰恰就是"这一节只吐了几十个字"。 */
+            setTimeout(step, 700);
           });
       }
       step();

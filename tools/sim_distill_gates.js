@@ -5,7 +5,8 @@
    /api/ask 2026-08-03 修掉"以为不加 reasoning_effort 就等于关思考"这个误解，
    成文这一档却一直留着同一个误解，直到 2026-08-12 用户报「凝成一万字论文」交白卷。 */
 const fs = require("fs");
-const W = fs.readFileSync("/home/claude/site/src/worker.js", "utf8");
+const path = require("path");
+const W = fs.readFileSync(path.join(__dirname, "..", "src/worker.js"), "utf8");   // 别写死沙盒绝对路径
 let PASS = 0, FAIL = 0;
 const ok = (c, m) => { if (c) { PASS++; console.log("  PASS " + m); } else { FAIL++; console.log("  FAIL " + m); } };
 
@@ -16,7 +17,8 @@ ok(i0 > 0 && i1 > i0, "定位到成文段（SPEC 表 → 路由结束）");
 const D = W.slice(i0, i1);
 
 console.log("① 预算：paper 档已是全站顶格，别再往上拧");
-ok(/paper: \{ name: "一万字论文", tok: WDS_TOK_MAX,/.test(D), "paper 档 tok = WDS_TOK_MAX（顶格）");
+/* 档名不写死：它随字数口径改（一万字 → 两万字），而这一条要守的是 tok 顶格，不是叫什么名字。 */
+ok(/paper: \{ name: "[^"]+", tok: WDS_TOK_MAX,/.test(D), "paper 档 tok = WDS_TOK_MAX（顶格）");
 ok(/const WDS_TOK_MAX = 64000;/.test(W), "WDS_TOK_MAX 仍是 64000");
 
 console.log("② 闸一 · 关思考：满预算只有关掉思考才会变成正文");
@@ -42,7 +44,12 @@ console.log("⑤ 关思考没生效要看得见");
 ok(/关思考未生效/.test(D), "重跑流里若仍收到 reasoning，阶段名写明'关思考未生效'（某家不认这个字段时的唯一线索）");
 
 console.log("⑥ 拆趟：长档不许再走单趟");
-ok(/paper: \{ name: "一万字论文", tok: WDS_TOK_MAX, parts: \d+,/.test(D), "paper 档标了 parts（提纲按它定节数）");
+ok(/paper: \{ name: "[^"]+", tok: WDS_TOK_MAX, parts: [^,\n]+,/.test(D), "paper 档标了 parts（提纲按它定节数）");
+/* 2026-08-12 扩到两万字之后又多一条：论文档的分节是**体例定死的**，不许再交给提纲那一趟发挥。
+   parts 必须由骨架推导（不是一个手写的数），且 plan 合并时 ask/words 一律取表里的。 */
+ok(/parts: PAPER_SKELETON\.length,\n\s*fixed: PAPER_SKELETON,/.test(D), "paper 档挂了固定骨架，parts 由骨架推导");
+ok(/plan\.sections = FIXED\.map\(\(f, i\) => \(\{[\s\S]{0,220}ask: f\.ask,[\s\S]{0,60}words: f\.words,/.test(D),
+  "plan 合并只收模型给的小标题，ask/words 一律取骨架里的");
 ok(/const dStage = String\(b\.stage \|\| ""\);/.test(D), "端点收 stage");
 ok(/if \(dStage === "plan" \|\| dStage === "part"\)/.test(D), "plan / part 两个分支都在");
 ok(/const _pl = att \? \[8000, 6000, 4000\] : \[12000, 8000, 6000\];/.test(D) && /_pl\[0\], pclk\.signal, false, _pl, true\)/.test(D),
