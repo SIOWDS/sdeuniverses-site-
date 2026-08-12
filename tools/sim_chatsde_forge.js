@@ -287,5 +287,74 @@ ok("★ 接着跑时不再重打一次 plan（重新拟题＝把上一趟的题�
 ok("恢复时 i 跳到断点，已完成的摆回各自那一行", /i = secs\.length;/.test(F) && /rows\[k\]\.sb\.innerHTML = mdRender\(x\.body\)/.test(F));
 ok("恢复沿用同一个 run id（同一趟就是同一趟）", /var runid = \(resume && resume\.run\) \|\| runId\(\)/.test(F));
 
+/* ═══ 九、阶段C：重接成文三段 ═══════════════════════════════════ */
+console.log("── 第 14 道：章节表要标出每章消费哪几道 ──");
+const st14 = M.STAGES[13].d;
+ok("★ 每章要标消费哪几道（成文那三步照着它去上游取材料）", /消费：第X道、第Y道/.test(st14));
+ok("★ 前十三道每一道都要被至少一章消费到（没人要＝那一道白跑了）", /前十三道每一道都至少被一章消费到/.test(st14));
+ok("★ 反过来每一章都要有来路（消费不到上游的章多半是临时想的）", /每一章都至少消费一道/.test(st14));
+ok("对不上就直说，不许为了表好看随手配一个道次", /不要为了让表好看而随手配一个道次/.test(st14));
+
+console.log("── 成文三段：写完必须提取结构化主张 ──");
+[15, 16, 17].forEach((k) => {
+  const d = M.STAGES[k - 1].d;
+  ok("第 " + k + " 道要求交出三栏提取件", /【本段提取/.test(d));
+  ok("第 " + k + " 道：主张必须是本段真写出来的", /必须是本段正文里真写出来的/.test(d));
+  ok("第 " + k + " 道：「没解决的」空着是可疑的", /这一栏空着是可疑的/.test(d));
+});
+ok("★ 第 16 道要接住上一段的「没解决的」", /上一段那三栏提取件就是你的起点/.test(M.STAGES[15].d));
+ok("★ 第 17 道要逐条交代前两段没解决的，不许静悄悄消失", /一条都不许静悄悄消失/.test(M.STAGES[16].d));
+ok("提取件写在正文之后、闸门之前（位置不能乱）", /写在正文之后、闸门之前/.test(M.STAGES[14].d));
+
+console.log("── ⭐ 第 18 道：机械检查真的是机械的（真跑）──");
+const AUD = new Function(F.slice(F.indexOf("  var FORGE_MOTHER = ["), F.indexOf("  function rsRun(topic, fg, resume) {"))
+  + "\n return { audit: forgeAudit, text: forgeAuditText, MOTHER: FORGE_MOTHER };")();
+const clean = "# 真标题\n\n**副标题：可裁决的那一句**\n\n摘要：略。关键词：甲；乙。\nAbstract: x. Keywords: y.\n"
+  + "| 轴 | 低 | 高 |\n| --- | --- | --- |\n| 低 | A | B |\n| 高 | C | D |\n"
+  + "若某项检验结果为反，则本文第三章不成立。\n赌注：2027年6月之前若无此现象，本文作废；写明什么不算命中。\n"
+  + "结论：略。\n参考文献\n人机分工：略。\n";
+const a1 = AUD.audit(clean);
+ok("干净稿：术语零命中", a1.hits.length === 0);
+ok("干净稿：前置件一件不缺", a1.miss.length === 0, JSON.stringify(a1.miss));
+ok("★ 真表认得出（三行以上、每行三根竖线）", a1.table === true);
+ok("数得出证伪条款", a1.falsify >= 1);
+ok("赌注的日期与「不算命中」都认得出", a1.betDate === true && a1.betMiss === true);
+ok("干净稿没印分数", a1.score.length === 0);
+
+const dirty = "正文里我们做了一次二阶碰撞，撞出候选判断，并按五维给出综合分 148。\n2×2 我在行文里描述一下就够了。\n";
+const a2 = AUD.audit(dirty);
+ok("★★ 工艺术语命中要报**次数与原句**（「有 3 处」改得动，「未通过」改不动）",
+  a2.hits.length >= 3 && a2.hits.every((h) => h.n >= 1 && h.eg.length > 3));
+ok("★★ 行文里描述一遍不算真表", a2.table === false);
+ok("★★ 偷偷印的分数抓得出（成品上一律不许有分）", a2.score.length >= 1);
+ok("缺件逐件点名，不是只说「不合格」", a2.miss.length >= 5 && a2.miss.indexOf("参考文献") >= 0);
+
+const named = "〔尚未交手〕Kuhn 1962 的范式说；Bourdieu 1977 的惯习。\n"
+  + "正文里我们逐段与 Bourdieu 交手：Bourdieu 认为……而本文认为……Bourdieu 的读法在这里失效。\n";
+const a3 = AUD.audit(named);
+ok("★ 名单里点了名却没在正文交手的，点得出来", a3.unmet.indexOf("Kuhn") >= 0);
+ok("真交手过的不误报", a3.unmet.indexOf("Bourdieu") < 0);
+
+const txt = AUD.text(a2);
+ok("读数摊成一段话，缺的地方加粗提醒", /2×2 真表：\*\*没有\*\*/.test(txt) && /印了分数：\*\*有\*\*/.test(txt));
+ok("读数**不下结论**（判断是第 18 道的活）", !/不合格|未通过|passed/.test(txt));
+
+console.log("── 审计读数真的送到了第 18 道 ──");
+ok("★ 前端只给最后那一道，且不写死「第 18 道」", /i \+ 1 === steps\.length/.test(F) && /audit: audit/.test(F));
+ok("成文不足时不硬凑一份读数", /body18\.replace\(\/\\s\/g, ""\)\.length > 500/.test(F));
+ok("★ audit 过得了白名单", typeof SANF({ i: 18, forge: 1, audit: "字数 100" }).audit === "string"
+  && SANF({ i: 18, forge: 1, audit: "字数 100" }).audit === "字数 100");
+ok("audit 有长度钳位", /String\(rsRaw\.audit \|\| ""\)\.slice\(0, 4000\)/.test(W));
+const s18 = M.sys({ i: 18, n: 18, t: "交付自查", topic: "题", forge: 1, done: "", bodies: [], audit: "字数 21000｜工艺术语命中：二阶×3" });
+ok("★★ 读数摆进了第 18 道的提示语", s18.indexOf("工艺术语命中：二阶×3") > 0);
+ok("★★ 明写读数不许被推翻", /这些数不许推翻/.test(s18));
+ok("★★ 读数说缺的不许打勾，打了这份自查本身作废", /不许在自查表里给它打勾/.test(s18) && /这份自查本身就作废/.test(s18));
+ok("并交代读数只覆盖数得出来的那几件", /数不出来的/.test(s18) && /最容易糊过去的/.test(s18));
+ok("没有读数时不留空壳", M.sys({ i: 18, n: 18, t: "x", topic: "题", forge: 1, bodies: [] }).indexOf("机器读数") < 0);
+
+console.log("── 闸门那一行不进成品 ──");
+ok("★ 拼成品时把末尾的闸门行剥掉（它是工艺痕迹）", /replace\(\/\\n\*【闸门】\[\^\\n\]\*\\s\*\$\/, ""\)/.test(F));
+ok("只从末尾剥，正文里讨论到「闸门」二字不受影响", /只从\*\*末尾\*\*剥/.test(F));
+
 console.log("\n" + (fail ? "✗ " : "✓ ") + pass + " passed, " + fail + " failed");
 process.exit(fail ? 1 : 0);

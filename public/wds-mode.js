@@ -5296,6 +5296,63 @@
     return ("00000000" + h1.toString(16)).slice(-8) + ("00000000" + h2.toString(16)).slice(-8);
   }
   var FORGE_SV = 2;                                   // 与服务端 FORGE_SCHEMA_VER 同源
+
+  /* ═══ 阶段C · 交付自查的机械那一半 ═══════════════════════════════
+     建议书 §六 第 18 道写的是「**执行**机械检查」。而原来这一道是把十一条检查
+     念给基底听、由它自己打勾——一份自己检查自己的清单，最容易全打勾。
+     这里把**算得出来的那些**真算出来：术语出现几次、在哪一句；2×2 是不是一张真表；
+     前置件哪几件不在；证伪几条；赌注有没有写死日期；有没有偷偷印分。
+     模型拿到的是读数，它的活只剩判断与开退回单——**读数不许被它推翻**。
+     💡 心法：能数出来的东西不要问模型，问了就等于把裁判权交给被告。 */
+  var FORGE_MOTHER = ["碰撞", "对撞", "撞出", "二阶", "候选判断", "五重检验", "三视角",
+    "近邻划界", "本文的方法", "创新智商", "综合分", "五维", "SDE", "显露态", "差异序列", "特征纠缠", "工序"];
+  function forgeAudit(md) {
+    var t0 = String(md || ""), out = { chars: t0.replace(/\s/g, "").length, hits: [], miss: [], notes: [] };
+    /* ① 去母体化：报**次数与原句**，不报"有/无"——"有 3 处"改得动，"未通过"改不动。 */
+    FORGE_MOTHER.forEach(function (w) {
+      var n = 0, at = 0, first = "";
+      while ((at = t0.indexOf(w, at)) >= 0) { if (!n) first = t0.slice(Math.max(0, at - 14), at + w.length + 10).replace(/\s+/g, " "); n++; at += w.length; }
+      if (n) out.hits.push({ w: w, n: n, eg: first });
+    });
+    /* ② 前置件：一件一件找，缺的点名。 */
+    [["主标题", /^#\s+\S/m], ["副标题", /^(##\s+|\*\*).{4,}/m], ["摘要", /摘\s*要/], ["关键词", /关键词/],
+     ["英文 Abstract", /Abstract/i], ["英文 Keywords", /Keywords/i], ["结论", /结\s*论/],
+     ["参考文献", /参考文献|References/i], ["人机分工声明", /人机分工|人机协作|AI\s*使用声明/]]
+      .forEach(function (x) { if (!x[1].test(t0)) out.miss.push(x[0]); });
+    /* ③ 2×2 必须是一张**真表**：三行以上、每行至少三根竖线。行文里描述一遍不算。 */
+    var rows = t0.split("\n").filter(function (l) { return (l.match(/\|/g) || []).length >= 3; });
+    out.table = rows.length >= 3;
+    /* ④ 数得出来的几件。 */
+    out.falsify = (t0.match(/若[^。\n]{4,80}(则|，)[^。\n]{0,60}(不成立|失效|作废|须删除|被推翻)/g) || []).length;
+    out.betDate = /20\d\d\s*[年.\-\/]\s*\d{1,2}\s*[月.\-\/]?/.test(t0);
+    out.betMiss = /不算命中|不计命中|不算兑现/.test(t0);
+    /* ⑤ 偷偷印分：成品上一律不许有分数。 */
+    out.score = (t0.match(/(创新智商|综合分|IQ)\s*[:：]?\s*1?\d{2}(\.\d)?/g) || []).slice(0, 3);
+    /* ⑥ 两栏里点名的人有没有在正文交手：先取栏内人名，再回正文数出现次数。 */
+    out.unmet = [];
+    var mSeg = t0.match(/[〔【\[]\s*(尚未交手|同批[^〕】\]]*)\s*[〕】\]]([\s\S]{0,1200})/g) || [];
+    mSeg.forEach(function (seg) {
+      (seg.match(/[A-Z][a-zA-Z.\- ]{2,28}\s*\(?(19|20)\d\d/g) || []).forEach(function (nm) {
+        var who = nm.replace(/\s*\(?(19|20)\d\d$/, "").trim();
+        if (who.length < 3) return;
+        var c = (t0.split(who).length - 1);
+        if (c <= 1 && out.unmet.indexOf(who) < 0) out.unmet.push(who);   // 只在名单里出现过一次＝没交手
+      });
+    });
+    return out;
+  }
+  /* 读数摊成一段人和机器都读得懂的话。**不下结论**——判断是第 18 道的活。 */
+  function forgeAuditText(a) {
+    return "字数 " + a.chars
+      + "｜工艺术语命中：" + (a.hits.length ? a.hits.map(function (h) { return h.w + "×" + h.n + "（如「" + h.eg + "」）"; }).join("；") : "无")
+      + "｜前置件缺：" + (a.miss.length ? a.miss.join("、") : "无")
+      + "｜2×2 真表：" + (a.table ? "有" : "**没有**（行文里描述不算）")
+      + "｜疑似证伪条款 " + a.falsify + " 条"
+      + "｜赌注写死日期：" + (a.betDate ? "有" : "**没有**")
+      + "｜写死「不算命中」：" + (a.betMiss ? "有" : "**没有**")
+      + "｜成品上印了分数：" + (a.score.length ? ("**有**（" + a.score.join("、") + "）") : "无")
+      + "｜名单里点了名却没在正文交手的：" + (a.unmet.length ? a.unmet.join("、") : "无");
+  }
   function runId() { return "r" + Date.now().toString(36) + Math.random().toString(36).slice(2, 8); }
   /* 找出未跑完的那一趟（同一台机器、同一个浏览器）。只看最近一条：
      摆一串半成品让人挑，等于把选择成本转嫁给读者。 */
@@ -5471,12 +5528,21 @@
           var bodies = secs.map(function (x, k) { return { i: k + 1, t: x.t, body: x.body, hash: fnv1a64(x.body) }; });
           var gates = secs.map(function (x, k) { return { i: k + 1, d: x.gate || "passed" }; });
           attempts[i] = (attempts[i] || 0) + 1;
+          /* 交付自查那一道：把**程序算出来的读数**一并递上去。
+             成文三段在 secs 里，拼起来就是要审的那份稿子。 */
+          var audit = "";
+          /* 只给最后那一道（交付自查）。不写死"第 18 道"——道数由服务端的工序表定，
+             前端不该假设它是几；「只到判断」跑十三道时最后一道没有成文，下面那道长度闸自己会拦。 */
+          if (fg && i + 1 === steps.length) {
+            var body18 = secs.slice(14, 17).map(function (x) { return x.body; }).join("\n\n");
+            if (body18.replace(/\s/g, "").length > 500) audit = forgeAuditText(forgeAudit(body18));
+          }
           var pl = {
             q: s.t, history: [], key: base.key, vendor: base.vendor, model: base.model,
             mode: thinkMode, web: webOn ? 1 : 0, skey: wdsSearchKey(), about: aboutPlus(), lang: LANG,
             rs: { i: i + 1, n: steps.length, t: s.t, topic: topic, done: done, bodies: bodies, gates: gates,
                   forge: fg ? 1 : 0, sv: FORGE_SV, run: runid, attempt: attempts[i],
-                  idem: runid + ":" + (i + 1) + ":" + attempts[i] },
+                  idem: runid + ":" + (i + 1) + ":" + attempts[i], audit: audit },
           };
           return rsStream(API, pl, function (txt) { r.sb.innerHTML = mdRender(txt); if (stick) scrollBottom(); })
             .then(function (txt) {
@@ -5526,7 +5592,13 @@
           if (degraded.length) md += "> \u26a0 " + tx("fgDegraded") + degraded.join("\u3001") + "\n\n";
           saveRun();                                   // 收尾再存一次：这一份带着 done 标记，恢复时不会再被提出来
           if (verdict) md += "## \u25c6 " + tx("rsFinal").replace(/[\u2026.]+$/, "") + "\n\n" + verdict + "\n\n";
-          secs.forEach(function (s, k) { md += "## " + (k + 1) + ". " + s.t + "\n\n" + s.body + "\n\n"; });
+          /* 【闸门那一行不进成品】它是给机器读的判决，属于工艺痕迹——
+             留在稿子里，第 18 道自己那条"去母体化"当场就会命中它。
+             ⚠ 只从**末尾**剥：正文里若真讨论到「闸门」二字，不该被动。 */
+          secs.forEach(function (s, k) {
+            var bd = String(s.body || "").replace(/\n*【闸门】[^\n]*\s*$/, "");
+            md += "## " + (k + 1) + ". " + s.t + "\n\n" + bd + "\n\n";
+          });
           var total = md.length;
           note.textContent = tx("rsAllDone", { n: secs.length, c: total });
           cvAdd("md", title, md);                       // 报告落画布：它是成品，不该只活在聊天流里
