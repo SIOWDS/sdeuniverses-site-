@@ -5755,20 +5755,28 @@
       /* ③ 【重活让出主线程】autoLink 要再走一遍整篇、deckPrep 要取配图。
          它们和上面那次整篇排版挤在同一个任务里，一万字的稿子能把主线程占住好几秒——
          那几秒浏览器一帧都画不出来，看上去就是白屏。正文先上屏，这些挪到下一个任务去做。 */
+      /* 【必须让出一帧，不是让出一个任务】原来这里与下面那块都是 setTimeout(..., 0)：
+         两个 0ms 任务会紧挨着排在同一批里，浏览器不一定插得进一次绘制——正文其实已经在 DOM 里了，
+         却因为主线程连着跑完这几段而始终没被画出来，看上去就是白屏。
+         所以拉开到 80ms / 240ms：先保证正文实实在在上屏一帧，再做这些锦上添花的事。 */
       setTimeout(function () {
         pTrace.leg = "收尾·挂链接"; traceSave();
         // autoLink 拿整篇正文扫 out 的每个文本节点，长稿同样是 O(N²)。
         // 超长稿直接跳过——站内链接是锦上添花，把标签页卡死是要命的。
-        try { if (text && text.length <= 40000) autoLink(out, text); } catch (e) {}
+        /* 早退：正文里一个《》都没有时，这一趟纯属白跑（TreeWalker 要遍历整篇的每个文本节点）。
+           按《正规学术论文写作规范》成的稿走作者—年份制，几乎不出现书名号——恰恰是最该早退的一档。 */
+        try { if (text && text.length <= 40000 && text.indexOf("\u300a") >= 0) autoLink(out, text); } catch (e) {}
         try { if (text && kind === "deck") deckPrep(text, function () { b9Show(text); }); } catch (e) {}
         pTrace.leg = "收尾·挂链接完"; traceSave();
-      }, 0);
+      }, 80);
       /* 精华自动进思想库存。这里是「报告／成文／提纲」三种锻造产物的唯一收口。
          报告与提纲是结构化的，取标题行；成文类取「一句话点题」。
          模块自己管未登录、去重、失败不拦路，这里只负责给它对的那一句。
          同 ③：这两块也不许和排版挤在一个任务里。 */
       setTimeout(function () {
       pTrace.leg = "收尾·库存"; traceSave();
+      /* 长稿的候选卡草稿要跑十几条 [\s\S]*? 的正则、近邻闸门还要联一次网。
+         它们对"读者能不能看见自己的稿子"零贡献，所以既排在最后、也不许因为长而拖住任何东西。 */
       try {
         if (window.SDEVault && text && text.length > 80) {
           var _vt = (kind === "paper" || kind === "essay")
@@ -5816,7 +5824,7 @@
       // 走到这里，收尾的每一步都过了 —— 现在才敢说"没卡死"，也现在才停心跳。
       pTrace.leg = "已收尾"; pTrace.ok = true; traceSave();
       if (beatT) { clearInterval(beatT); beatT = null; }
-      }, 0);
+      }, 240);
     }
     wrap.querySelector(".dx").onclick = function () { try { if (dr) dr.cancel(); } catch (e) {} wrap.parentNode.removeChild(wrap); };
     cpBtn.onclick = function () { copyText(text); cpBtn.textContent = t("aCopied"); setTimeout(function () { cpBtn.textContent = t("dCopy"); }, 1400); };
@@ -5849,7 +5857,12 @@
         if ((seg.match(/\$\$/g) || []).length % 2) mathOdd = !mathOdd;
         var next = text.slice(nl + 2, nl + 82).replace(/^\s+/, "");
         // 不在围栏/公式里，且下一段不是列表/引用/表格行——从中间切会把列表拆成两个、把表格斩断。
-        if (!fenceOdd && !mathOdd && next && !/^([-*+>|]|\d+[.)])/.test(next)) lastSafe = nl;
+        /* `\d+[.)]` 本是防着"把一个有序列表从中间拆成两个"。但学术论文里满篇都是
+           `3.1 核心概念的名义定义`、`11.3 适用边界` 这样的**节号**——它们被这条规则一并挡下，
+           于是安全切点长期找不到、尾巴一路顶到 8000 字的硬切上限，收尾那一次排版跟着变重。
+           `N.M`（多级节号）与 `N.`（列表项）形状不同，分开判即可。 */
+        var _isSec = /^\d+\.\d/.test(next);
+        if (!fenceOdd && !mathOdd && next && (_isSec || !/^([-*+>|]|\d+[.)])/.test(next))) lastSafe = nl;
         scanAt = nl + 2;
       }
       // 尾巴不能无限长（一大段列表可能一个安全空行都没有）：超过 8000 字就在换行处硬切一刀，
@@ -5877,7 +5890,7 @@
        · 心跳一直准点、面板却空了 ⇒ 根本不是卡死，是 DOM 或绘制的问题，该换路查。
        顺手做一次结构自检：顶栏本该一建面板就写死、此后没有任何代码碰它，
        它要是不见了，那本身就是一条重要读数——就地重建，至少让稿子还能复制、导出。 */
-    var beatT = null, beatLast = Date.now();
+    var beatT = null, beatLast = Date.now(), bodyHealed = 0;   // 正文只自愈一次，救回来就别再反复拆版
     pTrace.beatGap = 0; pTrace.heal = 0;
     beatT = setInterval(function () {
       var now = Date.now(), gap = now - beatLast; beatLast = now;
@@ -5899,6 +5912,24 @@
           if (bx.firstChild) bx.insertBefore(bar, bx.firstChild); else bx.appendChild(bar);
         }
       } catch (e) {}
+      /* 【自愈不止顶栏，正文也要自愈】——这是白屏这条病唯一一件不依赖"找到根因"的修。
+         心跳是全程唯一被证明活得下来的东西（它已经把顶栏救回来过）。所以把判据挂在它上面：
+         面板还在屏幕上、稿子里明明有字、正文框却一个字都画不出来 ⇒ 就是白屏，就地退回纯文本。
+         两秒内自己好，读者不必再对着一个空盒子猜是排版崩了还是稿子没了。
+         ⚠ 判据要三种量法取其一都为空才算数（见 done() 里同一条）：textContent 可能取不到、
+         out 自己可能只是空壳、内容挂在子块上——只认一种会误报，把排好的版白白拆成纯文本。 */
+      try {
+        if (wrap.parentNode && text && text.length > 200 && out && !bodyHealed) {
+          var _sn = String(out.textContent || "").trim()
+                 || String(out.innerHTML || "").replace(/<[^>]*>/g, "").trim()
+                 || (paintedHtml > 0 ? "1" : "");
+          if (!_sn) {
+            bodyHealed = 1; pTrace.healBody = 1;
+            out.textContent = text;
+            dNote(t("dBlankFix"), 1);
+          }
+        }
+      } catch (e) {}
       traceSave();
       if (!wrap.parentNode) { clearInterval(beatT); beatT = null; }
     }, 2000);
@@ -5909,7 +5940,24 @@
       if (lastSafe > rendUpto) { appendSeg(text.slice(rendUpto, lastSafe)); rendUpto = lastSafe; }
       var tail = text.slice(rendUpto);
       if (final) {
-        try { var ht = mdRender(tail); paintedHtml += ht.length; tailEl.innerHTML = ht; }
+        /* 收尾这一次是全篇唯一一次"把一大坨文本一口气 mdRender ＋ 一口气 innerHTML"。
+           尾巴最长可以到 8000 字（安全切点找不到时的硬切上限），两万字的稿子几乎每次都顶到这个上限。
+           mdRender 是三十来趟正则、innerHTML 还要再解析一遍 HTML——两件挤在同一个任务里，
+           就是那几秒一帧都画不出来的"白屏"。所以超过阈值就按段切块、逐块 appendSeg：
+           每块单独一次 mdRender ＋ 一次 insertBefore，代价与块长有关而不与尾巴多长有关。 */
+        try {
+          if (tail.length > 4000) {
+            var _ps = tail.split(/\n\n/), _buf = "";
+            for (var _i = 0; _i < _ps.length; _i++) {
+              _buf += _ps[_i] + (_i < _ps.length - 1 ? "\n\n" : "");
+              if (_buf.length >= 2000) { appendSeg(_buf); _buf = ""; }
+            }
+            if (_buf) appendSeg(_buf);
+            tailEl.className = ""; tailEl.textContent = "";
+          } else {
+            var ht = mdRender(tail); paintedHtml += ht.length; tailEl.className = ""; tailEl.innerHTML = ht;
+          }
+        }
         catch (e) { tailEl.textContent = tail; paintedHtml += tail.length; }
       } else {
         /* 写作期的尾巴走**纯文本**。每一拍唯一还在重做的事就是排这条尾巴，
