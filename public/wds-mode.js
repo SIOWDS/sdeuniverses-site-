@@ -565,6 +565,9 @@
     dPptx: "⤓ 存为 .pptx", dPptxWait: "正在生成 .pptx…", dPptxNo: "这份稿子切不出幻灯片（需要 ## 页标题与 - 要点）",
     dPptxOk: "已生成 幻灯片 ",
     dEmptyHint: "两种可能：这一场太长把输入窗吃满了，或基底把预算全用在思考上。换标准档、或新开一场再成文。",
+    dAutoSaved: "已自动存进「成文记录」——就算这里显示出问题，稿子也在（成文菜单 → ↺ 成文记录）。",
+    dAutoFail: "自动存稿没成（浏览器存储不可用）：请先「⌸ 存到本机」或「⤓ 存为 .md」再关掉这个面板。",
+    dRenderFail: "排版这一步出错了，已改用纯文本把稿子摆出来（原因：", dBlankFix: "排版出来是空的（白屏），已改用纯文本把稿子摆出来。稿子本身是完整的，复制/导出都不受影响。",
     dWall1: "这一趟没有收到收尾信号：约第 ", dWall2: " 秒整个请求被平台掐断了（不是基底写不出来，也不是预算不够——这一档的预算已经是全站顶格）。把这一场缩短些、或分两次成文再试。",
     b9Score: "美的九宫格 ", b9Polish: "↻ 按九宫格再打磨一轮", b9Good: "九宫格已达标",
     b9Tip: "统一·多样·和谐（怎么摆）｜完全·活力·纯一（是哪一种）｜爱·自由·平安（看着如何）",
@@ -5656,17 +5659,52 @@
       clearTimeout(dWd);
       if (stBtn && stBtn.parentNode) stBtn.parentNode.removeChild(stBtn);   // 写完了就没有可停的了
       if (dStopped && text) dNote(t("stopped"));
-      out.innerHTML = text ? mdRender(text) : esc(t("dEmpty"));
+      /* ① 【稿子先落地，再谈显示】——顺序不许调换。
+         写出来的这一万字此刻只存在 text 这一个变量里：显示这一步一旦出岔子（渲染抛错、
+         主线程被排版占死、读者以为死机把标签页关了），稿子就永久没了，而它可能是几分钟、
+         几万 token 换来的。所以进门第一件事是存进「成文记录」，存不成也不拦路。 */
+      if (text && text.length > 200 && !existing) {
+        try {
+          distSave(kindT(kind), text, function (okv) {
+            if (okv) dNote(t("dAutoSaved"));
+            else dNote(t("dAutoFail"), 1);
+          });
+        } catch (e) {}
+      }
+      /* ② 【渲染必须有兜底】渲染是可能失败的一步，而失败的样子是"白屏"——
+         读者看不出是排版崩了还是稿子没了。纯文本一定画得出来，那就是我们的底线形态。 */
+      try {
+        out.innerHTML = text ? mdRender(text) : esc(t("dEmpty"));
+      } catch (e) {
+        out.textContent = text || "";
+        dNote(t("dRenderFail") + ((e && e.message) || "未知") + "）", 1);
+      }
+      // 渲染完了还是一片空白（而稿子明明有字）：这就是白屏。退回纯文本，别让读者对着空盒子。
+      // 判据取"文字量"的两种量法之和：textContent 与去标签后的 innerHTML。
+      // 只认其中一种会误伤——某些环境下 textContent 取不到，而页面上明明有字，
+      // 那时退回纯文本等于把排好的版白白拆掉。两种都空，才是真的白屏。
+      var _shown = String(out.textContent || "").trim() || String(out.innerHTML || "").replace(/<[^>]*>/g, "").trim();
+      if (text && !_shown) {
+        out.textContent = text;
+        dNote(t("dBlankFix"), 1);
+      }
       // 空产出必须给个下一步，且**死因要说对**：被掐断和"基底一个字没写"是两回事，
       // 给错了会把人引到错误的旋钮上（比如去调 max_tokens，而那边早已顶格）。
       if (!text) dNote(sawDone ? t("dEmptyHint") : (t("dWall1") + (lastSec || "?") + t("dWall2")), 1);
-      if (text) autoLink(out, text);            // 成文里提到的站内篇目同样挂链接
-      if (text && kind === "deck") deckPrep(text, function () { b9Show(text); });   // 取配图，顺便按九宫格验一遍
       stat.textContent = text ? (t("dDone") + text.length) : t("dFail");
       if (dTimedOut) dNote(t("dCut"), 1);
+      /* ③ 【重活让出主线程】autoLink 要再走一遍整篇、deckPrep 要取配图。
+         它们和上面那次整篇排版挤在同一个任务里，一万字的稿子能把主线程占住好几秒——
+         那几秒浏览器一帧都画不出来，看上去就是白屏。正文先上屏，这些挪到下一个任务去做。 */
+      setTimeout(function () {
+        try { if (text) autoLink(out, text); } catch (e) {}          // 成文里提到的站内篇目同样挂链接
+        try { if (text && kind === "deck") deckPrep(text, function () { b9Show(text); }); } catch (e) {}
+      }, 0);
       /* 精华自动进思想库存。这里是「报告／成文／提纲」三种锻造产物的唯一收口。
          报告与提纲是结构化的，取标题行；成文类取「一句话点题」。
-         模块自己管未登录、去重、失败不拦路，这里只负责给它对的那一句。 */
+         模块自己管未登录、去重、失败不拦路，这里只负责给它对的那一句。
+         同 ③：这两块也不许和排版挤在一个任务里。 */
+      setTimeout(function () {
       try {
         if (window.SDEVault && text && text.length > 80) {
           var _vt = (kind === "paper" || kind === "essay")
@@ -5710,6 +5748,7 @@
           }
         }
       } catch (e) {}
+      }, 0);
     }
     wrap.querySelector(".dx").onclick = function () { try { if (dr) dr.cancel(); } catch (e) {} wrap.parentNode.removeChild(wrap); };
     cpBtn.onclick = function () { copyText(text); cpBtn.textContent = t("aCopied"); setTimeout(function () { cpBtn.textContent = t("dCopy"); }, 1400); };

@@ -150,6 +150,27 @@ global.URL = { createObjectURL: (b) => { DOWNLOADS.push(b.parts.join("")); retur
 global.alert = (m) => { console.log("  [alert] " + m); };
 window.document = document; window.localStorage = localStorage; window.fetch = fetchMock;
 window.speechSynthesis = speechMock;
+let STORE_SESSIONS_HOOK = null;
+// wds-store 的桩：只做到"够 wds-mode 跑起来"，重点是能验到成文写完自动存稿这一件事。
+// 凡返回 Promise 的照样返回 Promise——产品码到处 .then()，返回裸值会当场炸在加载阶段。
+window.WDSStore = {
+  load(cb) {
+    cb({
+      session(o) { return { save(turns) { if (STORE_SESSIONS_HOOK) STORE_SESSIONS_HOOK(turns, o); }, reset() {} }; },
+      list() { return Promise.resolve([]); },
+      get() { return Promise.resolve(null); },
+      remove() { return Promise.resolve(); },
+      rename() { return Promise.resolve(); },
+      download() {},
+      memoList() { return Promise.resolve([]); },
+      memoDel() { return Promise.resolve(); },
+      kvGet() { return Promise.resolve(null); },
+      kvSet() { return Promise.resolve(); },
+      stamp(ts) { return new Date(ts).toISOString().slice(0, 10); },
+      openPanel() {},
+    });
+  },
+};
 let WHISPER_OK = true, WHISPER_RUNS = 0, CONFIRMED = true;
 global.confirm = () => CONFIRMED;
 window.confirm = global.confirm;
@@ -1188,6 +1209,38 @@ console.log("⑧ 成文（distill）");
   ok(!String(dp.textContent).includes("两种可能"), "两句死因不许同时出现（一次失败只能有一个死因）");
   dp.querySelector(".dx").click();
   NO_DONE["/api/wds/distill"] = false;
+
+  /* ── 白屏：显示可以失败，稿子不可以丢 ────────────────────────────
+     2026-08-12 用户截图：一万字论文「写到最后，出现了白屏」。面板几何尺寸正常、里面一片空。
+     done() 是全流程唯一一处把整篇稿子同步重排的地方（mdRender→autoLink→库存→近邻），
+     一万字挤在一个任务里能把主线程占死好几秒（那几秒浏览器一帧都画不出来＝白屏）；
+     而稿子只存在 text 这一个变量里，读者以为死机把面板关掉，几万 token 就没了。 */
+  console.log("⑲ 成文写完：先落地存稿，再谈显示");
+  let SAVED_TEXT = "";
+  const _origSess = STORE_SESSIONS_HOOK;
+  STORE_SESSIONS_HOOK = function (turns) { turns.forEach(function (x) { if (x && x.role === "wds") SAVED_TEXT = x.text; }); };
+  ROUTE["/api/wds/distill"] = [{ t: "token", v: "# 一万字论文\n\n" + "承重命题。".repeat(80) }];
+  layer.querySelector(".wdsm-distbtn").click();
+  document.body.querySelector(".wdsm-menu").children[0].click();
+  await new Promise((r) => setTimeout(r, 260));
+  let dp3 = document.body.querySelector(".wdsm-dist");
+  ok(SAVED_TEXT.indexOf("承重命题") >= 0, "写完就自动存进「成文记录」，不等读者点存（显示崩了也不丢稿）");
+  ok(String(dp3.textContent).includes("已自动存进"), "并且当场告诉读者它已经存下了");
+  ok(String(dp3.querySelector(".wdsm-a").innerHTML).includes("承重命题"), "正文照常摆出来");
+  STORE_SESSIONS_HOOK = _origSess;
+  dp3.querySelector(".dx").click();
+
+  console.log("⑳ 排版崩了也不许白屏（源码级：mdRender 在模块内部，运行时没法让它抛错而不改产品码）");
+  const wm3 = require("fs").readFileSync("/home/claude/site/public/wds-mode.js", "utf8");
+  const _dn = wm3.slice(wm3.indexOf("    function done() {"), wm3.indexOf("wrap.querySelector(\".dx\").onclick"));
+  ok(_dn.indexOf("distSave(kindT(kind), text") < _dn.indexOf("mdRender(text)"), "存稿写在渲染之前（顺序不许调换）");
+  ok(/try \{\s*out\.innerHTML = text \? mdRender\(text\)[\s\S]{0,120}\} catch \(e\) \{\s*out\.textContent = text/.test(_dn),
+     "渲染包在 try/catch 里，崩了退回纯文本");
+  ok(/var _shown = String\(out\.textContent[\s\S]{0,140}if \(text && !_shown\) \{\s*out\.textContent = text;/.test(_dn),
+     "渲染完自检：出来是空的（白屏）就退回纯文本");
+  ok(/replace\(\/<\[\^>\]\*>\/g, ""\)/.test(_dn), "白屏判据用两种量法（textContent ＋ 去标签的 innerHTML），只认一种会误伤");
+  ok(/setTimeout\(function \(\) \{\s*try \{ if \(text\) autoLink/.test(_dn), "autoLink/deckPrep 挪出同一个任务，正文先上屏");
+  ok(_dn.indexOf("window.SDEVault") > _dn.indexOf("setTimeout(function () {"), "库存与近邻闸门也不和排版挤在一个任务里");
 
   console.log("\n===== " + PASS + " PASS / " + FAILS + " FAIL =====");
   process.exit(FAILS ? 1 : 0);
