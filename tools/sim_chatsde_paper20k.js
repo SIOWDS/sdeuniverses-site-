@@ -37,7 +37,11 @@ const SKILL_P = path.join(ROOT, "tools/skills/sde-academic-paper.md");
 ok("《正规学术论文写作规范》在仓库里", fs.existsSync(SKILL_P));
 const SKILL = fs.existsSync(SKILL_P) ? fs.readFileSync(SKILL_P, "utf8") : "";
 /* 只解析第二节那张表，别把 §五 红线表、§八 分工表也扫进来 */
-const tblSrc = SKILL.slice(SKILL.indexOf("## 二 · 体例"), SKILL.indexOf("## 三 · 逐节的形状要求"));
+/* ⚠ 切片终点不写死章名——v2.0 在中间插了新的一章，写死就会把后面几章一并扫进来。
+   改成「§二 之后的下一个 ## 标题」，此后再插章也不会失准。 */
+const _tb0 = SKILL.indexOf("## 二 · 体例");
+const _tb1 = SKILL.indexOf("\n## ", _tb0 + 8);
+const tblSrc = SKILL.slice(_tb0, _tb1 > 0 ? _tb1 : SKILL.length);
 const ROWS = [];
 tblSrc.split("\n").forEach((ln) => {
   const m = ln.match(/^\|\s*(\d+)\s*\|\s*([^|]+?)\s*\|\s*(\d+)\s*\|/);
@@ -61,10 +65,67 @@ const allAsk = SKEL.map((s) => s.h + "｜" + s.ask).join("\n");
  ["研究问题 RQ", "RQ1"], ["贡献声明", "贡献声明"], ["文献述评", "述评是"], ["名义定义", "名义定义"],
  ["操作性定义", "操作性定义"], ["测量层次", "测量层次"], ["取样标准", "纳入与排除"], ["分析程序可复现", "能复现"],
  ["信度与研究者立场", "研究者自身立场"], ["研究伦理", "不涉及人类被试"], ["证伪条款", "证伪条款"],
- ["当场检验", "当场交出你这次执行的结果"], ["效度四类", "构念效度"], ["研究局限", "局限"],
+ ["当场检验", "当场交出结果"], ["效度四类", "构念效度"], ["研究局限", "局限"],
  ["作者贡献 CRediT", "CRediT"], ["利益冲突", "利益冲突"], ["数据可得性", "数据与材料可得性"],
  ["AI 使用声明", "AI 使用声明"], ["参考文献 APA", "APA"], ["附录", "附录"], ["结论对上 RQ", "回答引言里那几条 RQ"]]
   .forEach(([n, k]) => ok("体例必交件在骨架里：" + n, allAsk.indexOf(k) >= 0));
+
+/* ═══ 一之三、v2.0：创新智商五维的产出规程（Skill §三 ↔ 机器）═══
+   v1.0 只管体例，两份真跑因此停在 123.3 与 126.2——失分几乎全在 I 与 F 两维。
+   下面这一组保的是「体例齐≠有增量」那一层：产出件在不在、承重节排得够不够前、
+   全局旗标有没有下发到每一节。少任何一条，稿子会退回 126 那个量级。 */
+console.log("── v2.0 · 创新智商五维的产出规程 ──");
+ok("Skill 里有 §三 创新智商五维的产出规程", /## 三 · 创新智商五维的产出规程/.test(SKILL));
+[["I 占位盘点表", "占位盘点表"], ["I 四栏", "撤名条件"], ["I 反稻草人", "他本人会认这句话是他的主张吗"],
+ ["I 外学科配额", "≥3 位来自本命题所属学科之外"], ["I 看似支持者配额", "看起来支持本文"],
+ ["I 最强反对者", "最强反对者"], ["F 撤稿级条件", "撤稿级条件"], ["F 执行状态标注", "[已执行]"],
+ ["F 读数自我否决", "自我否决条款"], ["F 单次事件如何取值", "单次事件如何取值"],
+ ["E 改引擎", "改了它哪一个零件"], ["E 删段自检", "是否一字不改"],
+ ["D 对手最强版本", "最强的那一版"], ["D 不利结果必须报", "不利结果"],
+ ["S 四格给不出独有预测就删", "宁可两格"], ["S 一术语一所指", "一术语一所指"],
+ ["全局旗标 EMPIRICAL", "EMPIRICAL"], ["全局旗标 ANCESTORS", "ANCESTORS"],
+ ["禁写死节号", "禁止写死节号"]]
+  .forEach(([n, k]) => ok("Skill §三 有：" + n, SKILL.indexOf(k) >= 0));
+
+/* 承重节的位置：两次真跑都从第 7、8 节起被限流吃掉。
+   判据一句——只写到第八节就断了，五维承重件也必须全部在手。 */
+const posOf = (kw) => SKEL.findIndex((x) => x.h.indexOf(kw) >= 0) + 1;
+const pThesis = posOf("核心命题"), pBound = posOf("占位划界"), pCrit = posOf("可裁决判据"), pFals = posOf("证伪条件");
+console.log("     承重节位置：核心命题 " + pThesis + " · 划界 " + pBound + " · 判据 " + pCrit + " · 证伪 " + pFals);
+ok("D 承重节（核心命题）排在第 5 节或更前", pThesis > 0 && pThesis <= 5);
+ok("I 承重节（最近邻盘点与占位划界）排在第 6 节或更前", pBound > 0 && pBound <= 6);
+ok("F 承重节（可裁决判据）排在第 7 节或更前", pCrit > 0 && pCrit <= 7);
+ok("F 承重节（稳健性与证伪条件）排在第 8 节或更前", pFals > 0 && pFals <= 8);
+ok("写到第八节就断，五维承重件也全部在手", Math.max(pThesis, pBound, pCrit, pFals) <= 8);
+ok("核心命题排在划界之前（先立论再划界）", pThesis > 0 && pBound > 0 && pThesis < pBound);
+ok("判据排在证伪之前（先给判据才谈怎么判它错）", pCrit > 0 && pFals > 0 && pCrit < pFals);
+
+/* 骨架里那五条产出件的编译产物 */
+[["占位盘点四栏", "撤名条件"], ["反稻草人自问", "他本人会认这句话是他的主张吗"],
+ ["撤稿级条件形状", "则本文第 X 节须删除"], ["执行状态标注", "[已执行]"],
+ ["读数四件齐", "在一次可观测事件里到底怎么取值"], ["读数三条自我否决", "改名嫌疑"],
+ ["机制层辨异", "至少一条须切在机制层"], ["最强的那一版", "最强的那一版"],
+ ["不利结果也要报", "如实写"], ["四格空格直接删", "宁可两格"]]
+  .forEach(([n, k]) => ok("骨架里有：" + n, allAsk.indexOf(k) >= 0));
+
+/* 全局旗标：plan 那一趟产出，part 每一趟都要收到 */
+console.log("── v2.0 · 全局旗标的产出与下发 ──");
+ok("plan 的 JSON 模板里要 empirical", /"empirical"/.test(WSRC));
+ok("plan 的 JSON 模板里要 ancestors", /"ancestors"/.test(WSRC));
+ok("empirical 缺省一律 no（宁可少说，不可编造）", /=== "yes"\) \? "yes" : "no"/.test(WSRC));
+ok("ancestors 做了数组化与截断", /Array\.isArray\(plan\.ancestors\)/.test(WSRC));
+ok("旗标下发到 part（不是只给声明组）", /全局旗标（全篇通用，本节必须遵守）/.test(WSRC));
+ok("EMPIRICAL 为 no 时禁实施测叙述", /不得写「实验表明」/.test(WSRC));
+ok("EMPIRICAL 为 no 时禁凭空给伦理批号", /绝不可凭空给出伦理批号/.test(WSRC));
+ok("ANCESTORS 要求参考文献那一节认账", /一位不漏地列进条目/.test(WSRC));
+ok("part 硬规矩里禁写死节号", /禁止写死节号/.test(WSRC));
+ok("五维产出件只在 PFIX 下发", (function () {
+  const i = WSRC.indexOf("【创新智商五维的产出件");
+  if (i < 0) return false;
+  const head = WSRC.slice(Math.max(0, i - 4000), i);
+  return head.lastIndexOf("PFIX ?") > head.lastIndexOf('") : ""）');
+})());
+
 ok("禁编造那一条写进了骨架（参考文献节）", /绝不编造页码与引文/.test(allAsk));
 ok("不含情态词那一条写进了判据节", /禁用：应当／有意义／实质性／充分／真正／恰当／合理/.test(allAsk));
 ok("分析与讨论分家写进了骨架（两侧各一条）",
@@ -187,8 +248,15 @@ function tail() {
   const mNeed = stepSrc.match(/var need = Math\.max\((\d+), Math\.round\(\(parseInt\(secs\[i\]\.words, 10\) \|\| \d+\) \* ([\d.]+)\)\);/);
   ok("门槛写成「本节目标字数 × 比例」而不是一个死数", !!mNeed);
   ok("比例在 0.3–0.6 之间（太松等于没门槛，太紧会把正常段判成失败）", !!mNeed && +mNeed[2] >= 0.3 && +mNeed[2] <= 0.6);
-  const mGap = stepSrc.match(/setTimeout\(step, (\d+)\)/);
-  ok("节间留白 ≥300ms（十五趟连打最容易在后几趟撞限流）", !!mGap && +mGap[1] >= 300);
+  /* 留白可以是常数，也可以是「前段一个数、后段一个更大的数」。两种写法都取到，取最小的那个来判。
+     ⚠ 2026-08-12 两份真跑都从第 7、8 节起连续多节只吐六七十字 ⇒ 后段必须比前段更松。 */
+  const gaps = (stepSrc.match(/setTimeout\(step,[^)]*?(\d{3,5})\s*[:)]/g) || [])
+    .map((x) => +(x.match(/(\d{3,5})/) || [0, 0])[1]).filter(Boolean);
+  const mGapAll = (stepSrc.match(/setTimeout\(step,([^;]*?)\);/) || [])[1] || "";
+  const gapNums = (mGapAll.match(/\d{3,5}/g) || []).map(Number);
+  ok("节间留白取得到数值", gapNums.length > 0);
+  ok("最小留白 ≥1200ms（十七趟连打，700 已被两次真跑证明不够）", gapNums.length > 0 && Math.min.apply(null, gapNums) >= 1200);
+  ok("后段留白比前段更松（限流是在后几趟撞上的）", gapNums.length >= 2 && Math.max.apply(null, gapNums) > Math.min.apply(null, gapNums));
   ok("回滚只回滚本节（用的是 before 这个游标）", /text = text\.slice\(0, before\)/.test(stepSrc));
   ok("重试用的是同一份 prevTail（不是回滚后的新尾巴）", /prevTail: tail0/.test(stepSrc) && (stepSrc.match(/prevTail: tail0/g) || []).length === 2);
 

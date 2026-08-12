@@ -1,6 +1,7 @@
 # 由 tools/bump_wds_mode.py 生成。改了 public/wds-mode.js 就跑一次它。
 # 左边是全站 <script src="/wds-mode.js?v=..."> 用的戳，右边是当时 wds-mode.js 的 sha256 前 16 位。
 # tools/sim_wds_mode_stamp.js 会核对这两行：文件变了而戳没变 ⇒ 读者拿到的还是旧脚本。
-stamp=20260812f
-sha256=4d3b0d7dc5670085
-past=20260812f
+# past 是**历史上用过的全部戳**，一律不再复用——读者浏览器里可能还缓存着其中任何一个。
+stamp=20260812i
+sha256=c1052df57f722f6a
+past=20260812a,20260812b,20260812c,20260812d,20260812e,20260812f,20260812g,20260812h,20260812i

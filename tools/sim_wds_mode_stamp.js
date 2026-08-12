@@ -77,5 +77,24 @@ const FS2 = fs.readFileSync(JS, "utf8");
     ok(key + " 与 " + path.basename(mod) + " 的 VERSION 对齐（" + want + " vs " + ver + "）", want === ver);
   });
 
+
+/* ═══ past 历史戳：它自己曾经是死的（2026-08-12）═══
+   past 是防「戳退回去撞车」的机制，而它被写成
+   `open(path,"w").write(... past_stamps() ...)` —— open("w") 在参数求值之前就把文件截断了，
+   于是每次都只记下当前这一个戳，历史全丢。⚠ 这条机制自己犯了它要防的那个病。 */
+{
+  const bump = fs.readFileSync(path.join(ROOT, "tools/bump_wds_mode.py"), "utf8");
+  ok("past 在打开写句柄之前就算完（不是在 write 的参数里算）",
+    /past_line = /.test(bump) && bump.indexOf("past_line = ") < bump.indexOf('open(STAMP_FILE, "w"'));
+  ok("写 stamp 文件用 with，不用 open(...).write(...) 这种一次性写法",
+    /with open\(STAMP_FILE, "w"/.test(bump));
+  const pastLine = (rec.match(/^past=(.*)$/m) || [, ""])[1];
+  const pastList = pastLine.split(",").map((x) => x.trim()).filter(Boolean);
+  ok("past 记着不止一个戳（只有一个 ⇒ 历史又被截掉了）", pastList.length >= 2);
+  const curStamp = (rec.match(/^stamp=(\S+)$/m) || [, ""])[1];
+  ok("当前戳在 past 里", !!curStamp && pastList.indexOf(curStamp) >= 0);
+  ok("past 无重复", new Set(pastList).size === pastList.length);
+}
+
 console.log("\n" + (fail ? "✗ " : "✓ ") + pass + " passed, " + fail + " failed");
 process.exit(fail ? 1 : 0);

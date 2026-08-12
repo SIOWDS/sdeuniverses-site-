@@ -92,11 +92,19 @@ def main():
         if s2 != s:
             open(p, "w", encoding="utf-8").write(s2)
             changed += 1
-    open(STAMP_FILE, "w", encoding="utf-8").write(
-        "# 由 tools/bump_wds_mode.py 生成。改了 public/wds-mode.js 就跑一次它。\n"
-        "# 左边是全站 <script src=\"/wds-mode.js?v=...\"> 用的戳，右边是当时 wds-mode.js 的 sha256 前 16 位。\n"
-        "# tools/sim_wds_mode_stamp.js 会核对这两行：文件变了而戳没变 ⇒ 读者拿到的还是旧脚本。\n"
-        "stamp=%s\nsha256=%s\npast=%s\n" % (stamp, digest, ",".join(sorted(past_stamps() | {stamp}))))
+    # ⚠⚠ past 必须**在打开写句柄之前**算完。
+    # `open(path, "w")` 是在参数求值之前就把文件截断的 —— 写成
+    # `open(...).write(... past_stamps() ...)` 时，past_stamps() 读到的已经是一个空文件，
+    # 于是 past 每次都被写成「只有这一次的戳」，整条历史机制形同虚设。
+    # 这正是它要防的那个病（戳退回去撞车）自己犯了一遍。
+    past_line = ",".join(sorted(past_stamps() | {stamp}))
+    with open(STAMP_FILE, "w", encoding="utf-8") as fh:
+        fh.write(
+            "# 由 tools/bump_wds_mode.py 生成。改了 public/wds-mode.js 就跑一次它。\n"
+            "# 左边是全站 <script src=\"/wds-mode.js?v=...\"> 用的戳，右边是当时 wds-mode.js 的 sha256 前 16 位。\n"
+            "# tools/sim_wds_mode_stamp.js 会核对这两行：文件变了而戳没变 ⇒ 读者拿到的还是旧脚本。\n"
+            "# past 是**历史上用过的全部戳**，一律不再复用——读者浏览器里可能还缓存着其中任何一个。\n"
+            "stamp=%s\nsha256=%s\npast=%s\n" % (stamp, digest, past_line))
     print("改写了 %d 个文件；戳已写入 tools/wds-mode.stamp" % changed)
 
 
