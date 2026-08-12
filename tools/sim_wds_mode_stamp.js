@@ -96,5 +96,24 @@ const FS2 = fs.readFileSync(JS, "utf8");
   ok("past 无重复", new Set(pastList).size === pastList.length);
 }
 
+/* 🔴 2026-08-12：一天改到第 27 次时，next_stamp 的兜底交回了**刚刚用过的那一个** ⇒
+   全站 0 个文件被改写、戳不换、读者继续跑旧脚本，而脚本照常打印"戳已写入"、
+   这份 sim 也照样全绿（它只核对戳与哈希自洽）。
+   💡 心法：**兜底不许返回一个"可能已经用过"的值。** */
+console.log("── 戳用完了 26 个字母之后 ──");
+const BUMP = fs.readFileSync(path.join(ROOT, "tools/bump_wds_mode.py"), "utf8");
+/* ⚠ 剥掉注释再查——注释里必然会引到那句旧代码（今天第五次踩它了）。 */
+const BUMPBARE = BUMP.replace(/^\s*#.*$/gm, " ");
+ok("★★ 兜底不再返回写死的末位字母（那多半正是刚用过的那一个）", BUMPBARE.indexOf('return base + "z"') < 0);
+ok("★★ 字母用完往两位走", /for c2 in "abcdefghijklmnopqrstuvwxyz"/.test(BUMP) && /base \+ c \+ c2 not in used/.test(BUMP));
+ok("★ 两位再用完挂时分秒，仍旧不重复", /strftime\("%H%M%S"\)/.test(BUMP));
+ok("★★ past 里没有重复（用过的戳一个都不许再用）", (() => {
+  const src = fs.readFileSync(path.join(ROOT, "tools/wds-mode.stamp"), "utf8");
+  const m = src.match(/past=([^\n]*)/); if (!m) return false;
+  const arr = m[1].split(",").map((x) => x.trim()).filter(Boolean);
+  return arr.length > 1 && new Set(arr).size === arr.length;
+})());
+ok("注释写明了这条兜底当天真的撞上过", /2026-08-12 当天真的撞上了/.test(BUMP));
+
 console.log("\n" + (fail ? "✗ " : "✓ ") + pass + " passed, " + fail + " failed");
 process.exit(fail ? 1 : 0);

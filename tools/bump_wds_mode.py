@@ -57,7 +57,18 @@ def next_stamp(old_stamps):
     for c in "abcdefghijklmnopqrstuvwxyz":
         if base + c not in used:
             return base + c
-    return base + "z"
+    # 🔴 一天改二十六次以上就会走到这里。旧的兜底交回的是那个写死的末位字母——
+    #    而它多半正是**刚刚用过的那一个**，于是戳不换、全站 0 个文件被改写，
+    #    脚本还照常打印"戳已写入"，sim 也照样全绿（它只核对戳与哈希自洽）。
+    #    ⇒ 读者继续跑旧脚本，这一次修复等于白推。2026-08-12 当天真的撞上了。
+    #    💡 心法：**兜底不许返回一个"可能已经用过"的值。** 用完字母就往两位走，
+    #       两位再用完就挂时分秒——宁可戳难看，也不许它重复。
+    for c in "abcdefghijklmnopqrstuvwxyz":
+        for c2 in "abcdefghijklmnopqrstuvwxyz":
+            if base + c + c2 not in used:
+                return base + c + c2
+    from datetime import datetime
+    return base + "t" + datetime.now().strftime("%H%M%S")
 
 
 def main():

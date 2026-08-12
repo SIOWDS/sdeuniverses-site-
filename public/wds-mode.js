@@ -612,6 +612,8 @@
     dTailRetry: "第 ", dTailRetry2: " 节字数够了却断在半句上（多半是这一趟被顶穿了），等 20 秒重写一遍；写出来的若不如现在这一份，就仍旧留着现在这一份。",
     dWallWhy: "（上游给失败那一趟的收束理由：", dWallNoFin: "没给（多半是流被掐断）",
     dWallNoMeta: "（⚠ 失败的那几趟一条读数都没留下——这本身就说明流在服务端发出读数之前就断了。）",
+    dHidden1: "\u26a0 写第 ", dHidden2: " 节的这段时间里，这个标签页被切到了后台（累计 ", dHidden3: " 秒）。浏览器会节流后台标签页的定时器、并可能让正在传输的流停住——**这一节写不出来很可能就是这个原因，不是上游的问题**。把这个标签页放在前台、别让屏幕息屏，再点「\u21bb 继续写缺的几节」补它。",
+    dHidSum1: "\u26a0 这一趟里标签页被切到后台 ", dHidSum2: " 次、累计 ", dHidSum3: " 秒。长文是一趟连着十几次请求跑下来的，中途切走很容易把流掐断。下次跑的时候把它留在前台。",
     dThrifty1: "\u26a0 到第 ", dThrifty2: " 节为止连着三节没写够。**没有停**——后面的节照常写下去，只是从这里起每节只打一遍、不再重试也不再等二十秒（真是上游在挡就少烧几次；不是的话后面这几节照样写得出来）。",
     dThriftyEnd: "这一趟跑到了最后一节。没写够的那几节已列在上面——点「\u21bb 继续写缺的几节」单独补，那时是单节请求，压力比一口气十六节小得多。",
     dLegErr: "第 ", dLegErr2: " 节这一趟自己出岔子了，已跳过接着往下走（原因：",
@@ -5926,6 +5928,25 @@
        dCutAny：这一整篇里有没有哪一趟被掐过（dTimedOut 现在每趟复位——否则一趟被掐，
        此后每一节的死因都被写成"被掐断"，读数就废了）。 */
     var dAC = null, dCutAny = false, lastMeta = null;
+    /* 【标签页有没有被切走，这是目前唯一还没被排除的那条】
+       2026-08-12 夜里三次实测把别的都排掉了：上游连打八次重请求全成功、
+       第 7／8 节单独打站内那条路也各写出 2200 字、fin 都是 stop、时钟没掐。
+       ⇒ 失败只在**整趟连跑**时出现，而且四次都落在开跑后八到十二分钟那一段。
+       浏览器在标签页切到后台之后会节流定时器、并可能让流式连接停住——
+       这与"总在同一段时间崩、断在半句、没有任何错误帧"完全对得上。
+       测不出来就先装仪表：把每一趟里标签页藏起来的时间记下来，
+       失败时一并报出去。**下一次真跑，这一行会自己回答这个问题。** */
+    var hidMs = 0, hidN = 0, hidAt = 0, legHid = 0;
+    function onVis() {
+      try {
+        if (document.hidden) { hidAt = Date.now(); hidN++; }
+        else if (hidAt) { hidMs += Date.now() - hidAt; legHid += Date.now() - hidAt; hidAt = 0; }
+      } catch (e) {}
+    }
+    try { document.addEventListener("visibilitychange", onVis); } catch (e) {}
+    function hidNow() {                                   // 现在还藏着的话，把这一段也算上
+      try { return legHid + (document.hidden && hidAt ? (Date.now() - hidAt) : 0); } catch (e) { return legHid; }
+    }
     var dSecs = null;          // 提纲拿到的分节表：收尾判「写够没有」要拿它当分母
     var dPlanObj = null;       // 提纲那一趟的全部产物：续写时要原样回传给 part 阶段
     // sawDone：有没有收到 worker 的收尾信号 [DONE]。空产出时这一位决定死因说得对不对——
@@ -6172,6 +6193,11 @@
       stat.textContent = !text ? t("dFail")
         : (text.length < _floor ? (t("dPartial") + text.length + (_want ? ("/" + _want) : "")) : (t("dDone") + text.length));
       if (dCutAny) dNote(t("dCut"), 1);
+      /* 整趟的账：切走过几次、一共多久。**这一行是给下一次判读用的**——
+         若失败集中在标签页藏起来的那几分钟，那就不是上游的事。 */
+      try {
+        if (hidN > 0) dNote(t("dHidSum1") + hidN + t("dHidSum2") + Math.round(hidMs / 1000) + t("dHidSum3"), 1);
+      } catch (e) {}
       /* ③ 【重活让出主线程】autoLink 要再走一遍整篇、deckPrep 要取配图。
          它们和上面那次整篇排版挤在同一个任务里，一万字的稿子能把主线程占住好几秒——
          那几秒浏览器一帧都画不出来，看上去就是白屏。正文先上屏，这些挪到下一个任务去做。 */
@@ -6748,7 +6774,7 @@
            失败的那两节各只吐了几十字，那个 3585 是上一节的。
            💡 **我上一轮刚把这条病修掉，又用一句 `failMeta || lastMeta` 的兜底把它请了回来。
               兜底要问一句：兜进来的那个值，说的是不是同一件事。** */
-        legMeta = null;
+        legMeta = null; legHid = 0;
         runLeg({ stage: "part", idx: i, plan: plan, prevTail: tail0 })
           .then(function (rr) {
             if (rr && rr.meta) legMeta = rr.meta;
@@ -6764,6 +6790,8 @@
               return;
             }
             failMeta = legMeta;                                 // 可能是 null——那本身就是一条读数
+            if (hidNow() > 3000) dNote(t("dHidden1") + (i + 1) + t("dHidden2")
+              + Math.round(hidNow() / 1000) + t("dHidden3"), 1);
             if (thrifty) {                                      // 省电模式：不重试，记账、往下走
               shortSecs.push(i + 1); failMetas.push(failMeta || null);
               return;

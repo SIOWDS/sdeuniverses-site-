@@ -255,7 +255,11 @@ ok("抠得到三道闸（tailCut/secPass/betterOf）",
 function harness2(secs, outs, opt) {
   const box = { notes: [], attempt: {}, done: false, appended: [], fin: (opt && opt.fin) };
   const src =
-    "var text='', i=0, dStopped=false, __short=null, lastMeta=null;\n" + gateSrc + "\n" +
+    /* ⚠ 壳里没有 document。真实实现里 hidNow() 自己 try 住了，但 legHid 这些自由变量
+       在壳里是未定义的 ⇒ 抠出来的 step() 当场 ReferenceError，整条链断掉。
+       给它们一个最朴素的替身：**藏起来的时长恒为 0**，等于"标签页一直在前台"。 */
+    "var text='', i=0, dStopped=false, __short=null, lastMeta=null;\n" +
+    "var hidMs=0, hidN=0, hidAt=0, legHid=0; function hidNow(){ return legHid; }\n" + gateSrc + "\n" +
     /* 真实退避是 20 秒（下面单独有一条断言盯住这个数）；行为测试里把它换成 20 毫秒，
        否则四组用例要跑一分多钟。换的是等待时长，不是逻辑——逻辑仍是源码原文。 */
     stepSrc.replace(/var RETRY_WAIT = \d+;/, "var RETRY_WAIT = 20;")
@@ -407,6 +411,16 @@ function tail() {
   const mWait = stepSrc.match(/var RETRY_WAIT = (\d+);/);
   ok("第二遍是退避之后才打的（立刻重打＝把同一堵墙再撞一次）", !!mWait && +mWait[1] >= 10000);
   ok("退避真的用在第二遍上，不是摆着好看", /setTimeout\(res, RETRY_WAIT\)/.test(stepSrc));
+  console.log("── ⭐ 标签页可见性：目前唯一还没被排除的那条 ──");
+  ok("★★ 记下标签页被切走的次数与时长", /visibilitychange/.test(FSRC) && /var hidMs = 0, hidN = 0/.test(FSRC));
+  ok("★★ 每趟开工把本趟的隐藏时长清零（否则算成上一节的账）", /legMeta = null; legHid = 0;/.test(stepSrc));
+  ok("★★ 还藏着的时候也算进去（不能等它回来才开始计）", /document\.hidden && hidAt \? \(Date\.now\(\) - hidAt\) : 0/.test(FSRC));
+  ok("★★ 某一节失败时，若这一趟标签页藏过就当场说出来", /hidNow\(\) > 3000/.test(stepSrc) && /dHidden1/.test(stepSrc));
+  ok("★ 收尾给整趟的总账（下一次判读靠它）", /dHidSum1/.test(FSRC) && /hidN > 0/.test(FSRC));
+  ok("文案说清了这多半不是上游的问题、且给了下一步", /不是上游的问题/.test(FSRC) && /留在前台/.test(FSRC));
+  ok("注释记下了三条已排除的实测（别让下一个人再测一遍）",
+    /上游连打八次重请求全成功/.test(FSRC) && /单独打站内那条路也各写出 2200 字/.test(FSRC));
+
   console.log("── 链上兜底与尾部闸（源码级）──");
   ok("★ 链上有 catch：某一趟自己抛了，也照样往下排（否则整台机器静默停住）",
     /\.catch\(function \(e\)/.test(stepSrc) && /dLegErr/.test(stepSrc));
@@ -439,7 +453,9 @@ function tail() {
   ok("★★ 省电模式下不再重试、不再等退避（墙期的浪费降到每节一遍）",
     /if \(thrifty\) \{/.test(stepSrc) && /shortSecs\.push\(i \+ 1\); failMetas\.push/.test(stepSrc));
   ok("注释算清了那笔账（赌错的代价不对称）", /赌错的代价不对称/.test(stepSrc));
-  ok("★★ 每趟开工先把 legMeta 清空（否则它捧着上一节的读数）", /legMeta = null;\s*\n\s*runLeg\(\{ stage: "part"/.test(stepSrc));
+  /* ⚠ 又是整行抄进正则：同一行后来多了 `legHid = 0;`，断言当场红而用意没变。只认承重的那半句。 */
+  ok("★★ 每趟开工先把 legMeta 清空（否则它捧着上一节的读数）",
+    /legMeta = null;[^\n]*\n\s*runLeg\(\{ stage: "part"/.test(stepSrc));
   ok("★★ 收尾的读数只取失败那几趟自己的，取不到就明说", /failMetas\.filter\(Boolean\)\.pop\(\) \|\| null/.test(stepSrc)
     && /dWallNoMeta/.test(stepSrc) && stepBare.indexOf("failMeta || lastMeta") < 0);
   ok("注释写明了这条兜底是怎么把旧病请回来的", /兜进来的那个值，说的是不是同一件事/.test(stepSrc));
