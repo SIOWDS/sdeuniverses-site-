@@ -162,6 +162,17 @@ ok("v2.2 骨架合计 27,500 字", SKEL.reduce((a, x) => a + x.words, 0) === 275
  ["理论框架 2200", "三、理论框架", 2200]]
   .forEach(([n, kw, w]) => ok("v2.2 额度：" + n, (SKEL.find((x) => x.h.indexOf(kw) >= 0) || {}).words === w));
 /* 入参那一刀：机器层必须真的分出两份对话额度，且 part 用的是短的那一份 */
+/* ── v2.3：正文各趟的 max_tokens 给顶配（真跑里「够长但断在半句」的那一类断稿）── */
+ok("part 的 max_tokens 是顶配常量而非 want 折算", /const stok = WDS_TOK_MAX;/.test(WSRC));
+ok("旧的 min(16000, want*2.2) 口径已拆掉", !/const stok = Math\.min\(16000/.test(WSRC));
+ok("顶配阶梯与 wdsLadder 顶配支同形", /const _sl = \[stok, 32000, 16000\]/.test(WSRC));
+ok("阶梯末档不再降到 3000（那正是顶穿的量级）", !/_sl = \[stok[^\]]*, 3000\]/.test(WSRC));
+ok("单趟时钟随之放宽到 270s", /wdsClock\(60000, 270000\)/.test(WSRC));
+ok("思考仍是关着的（预算全归正文）", /_sl, true\);/.test(WSRC));
+ok("注释写明了为什么顶配在这一档安全", WSRC.indexOf("在这一档**不发作**") >= 0);
+ok("Skill 里也写着 max_tokens 提到顶配", SKILL.indexOf("max_tokens 同时提到顶配") >= 0);
+ok("Skill 写明上限不是目标", SKILL.indexOf("上限不是目标") >= 0);
+
 ok("worker 里另立了 convoMaxPart", /convoMaxPart\s*=/.test(WSRC));
 ok("convoMaxPart 由 convoMax 折算而非照抄", /convoMaxPart[\s\S]{0,160}convoMax\s*\*/.test(WSRC));
 ok("convoMaxPart 有上下限（9000–18000）", /convoMaxPart[\s\S]{0,120}9000[\s\S]{0,60}18000/.test(WSRC));

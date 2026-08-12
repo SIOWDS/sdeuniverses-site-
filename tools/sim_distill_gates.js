@@ -54,11 +54,20 @@ ok(/const dStage = String\(b\.stage \|\| ""\);/.test(D), "端点收 stage");
 ok(/if \(dStage === "plan" \|\| dStage === "part"\)/.test(D), "plan / part 两个分支都在");
 ok(/const _pl = att \? \[8000, 6000, 4000\] : \[12000, 8000, 6000\];/.test(D) && /_pl\[0\], pclk\.signal, false, _pl, true\)/.test(D),
    "拟题：关思考＋自带阶梯的有界预算（结构化 JSON 配满功率必崩，站内老账）");
-ok(/const _sl = \[stok, Math\.max\(3000/.test(D) && /sclk\.signal, true, _sl, true\)/.test(D),
+ok(/const _sl = \[stok, 32000, 16000\]/.test(D) && /sclk\.signal, true, _sl, true\)/.test(D),
    "两处都自带阶梯——wdsLadder 的非满功率分支忽略 want，不自带就等于没设预算");
 ok(/looseJSON\(raw\)/.test(D) && /att < 2/.test(D), "提纲解不出就再试一次，且用 looseJSON 兜住围栏与碎话");
 ok(/sclk\.signal, true, _sl, true\)/.test(D), "分部：同样显式关思考（plain=true）");
-ok(/Math\.min\(16000, Math\.max\(3000, Math\.round\(want \* 2\.2\)\)\)/.test(D), "分部预算按这一节的字数给，不是拍脑袋一个大数");
+/* ⚠ 这一条原来把公式 `min(16000, want*2.2)` 手抄进了正则——正是站内反复点名的那个病。
+   2026-08-12 改口径后它当场红，而它要守的**用意**仍然成立，只是落点变了：
+   「按这一节的字数给」守的是**提示语里那个字数目标**（它必须来自骨架的 sec.words），
+   不是 max_tokens 那个天花板。天花板改成顶配是有账的——旧口径下最大那节上限只有 6,600，
+   而真跑里断在半句的恰恰是它，且长度超过重试门槛而没被判短。故拆成两条分别守。 */
+ok(/const want = Math\.max\(400, Math\.min\(4000, parseInt\(sec\.words/.test(D),
+   "分部的字数目标仍来自骨架这一节的 words，不是拍脑袋一个大数");
+ok(/约 " \+ want \+ " 字/.test(D), "那个字数目标真的写进了提示语（不写进去等于没给）");
+ok(/const stok = WDS_TOK_MAX;/.test(D),
+   "max_tokens 给顶配：它是上限不是目标，用来消掉「写到一半被顶穿」那一类断稿");
 ok(/只写这一节/.test(D) && /别写全篇导言或结语/.test(D), "提示语钉死「只写这一节」——否则每节都会重写一遍全篇");
 ok(/上一节的结尾（只为接得上，别复述它）/.test(D), "带上一节结尾做接缝，并明说别复述");
 
