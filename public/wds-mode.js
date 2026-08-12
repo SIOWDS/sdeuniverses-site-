@@ -553,6 +553,8 @@
       fgResumed1: "接着上一趟跑：前 ", fgResumed2: " 道已经在稿子里，从断点往下写。",
       fgResumeAsk1: "上一趟《", fgResumeAsk2: "》跑到第 ", fgResumeAsk3: " 道停下了。接着跑，还是重开一趟？",
       fgResumeGo: "\u21ba 接着跑", fgResumeNew: "重开一趟",
+      nbrChainN: "敌意最近邻专用链：去重后 ", nbrChainN2: " 条　",
+      nbrChainBad: "　⚠ **覆盖不足**：同向与对立至少各要有一位、去重后至少四条。这一道按〔未核验〕走，不据此放行。",
       fgJudge: "只到判断，不成文",
       tlGrid: "27 宫格定位", tlGridS: "C⊗M⊗V 与一二三号位，中心位轮到谁",
       tlNine: "九宫格取三格", tlNineS: "抽三个视角各问各答，再撞成一条",
@@ -5272,6 +5274,14 @@
               var j; try { j = JSON.parse(p); } catch (e) { continue; }
               if (j.t === "token") { out += j.v; if (onTok) onTok(out); }
               else if (j.t === "note" && onNote) onNote(j.v);
+              /* 敌意最近邻专用链的覆盖读数。**覆盖不足要显著显示**（建议书 §13.3
+                 「诚实显示能力降级」）——不说，读者会以为这一道真的查过占位者。 */
+              else if (j.t === "nbrchain" && onNote) {
+                onNote((j.v && j.v.ok ? "\u2713 " : "\u26a0 ") + t("nbrChainN")
+                  + ((j.v && j.v.n) || 0) + t("nbrChainN2")
+                  + ((j.v && j.v.passes || []).map(function (p) { return p.k + " " + p.n + (p.why ? ("·" + p.why) : ""); }).join("　"))
+                  + (j.v && j.v.ok ? "" : t("nbrChainBad")));
+              }
               else if (j.t === "error") err = j.v;
               else if (j.t === "quota" && j.v && typeof j.v.left === "number") { dayLeft = j.v.left; updTurns(); }
             }
@@ -5544,7 +5554,15 @@
                   forge: fg ? 1 : 0, sv: FORGE_SV, run: runid, attempt: attempts[i],
                   idem: runid + ":" + (i + 1) + ":" + attempts[i], audit: audit },
           };
-          return rsStream(API, pl, function (txt) { r.sb.innerHTML = mdRender(txt); if (stick) scrollBottom(); })
+          /* ⚠ 第四个参数（onNote）此前没传，于是服务端发的 note／nbrchain 全掉在地上——
+             读者看不到「这一道的敌意近邻覆盖不足」，只会以为它真查过占位者。
+             💡 心法：**新加一路事件，要顺着回调一直看到它有没有人接。** */
+          return rsStream(API, pl, function (txt) { r.sb.innerHTML = mdRender(txt); if (stick) scrollBottom(); },
+            function (msg) {
+              var ln = el("div", null, String(msg || ""));
+              ln.style.cssText = "font-size:12.5px;line-height:1.7;margin:6px 0 0;color:#8B7B5E";
+              r.sb.appendChild(ln); r.box.classList.add("open");
+            })
             .then(function (txt) {
               var g = fg ? forgeGate(txt) : { d: "passed" };
               r.stat.textContent = (g.d === "passed" ? tx("rsDone") : ("\u26a0 " + tx("fgGateNo"))) + " \u00b7 " + txt.length;

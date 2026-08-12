@@ -189,8 +189,9 @@ console.log("── 评分：站外敌意最近邻由程序保证 ──");
 ok("★ 评分这一路收得到站外资料了（原来签名里根本没有）",
   /function WDS_IQ_SYS\(siteCtx, docCtx, docNote, lang, webCtx\)/.test(W)
   && /WDS_IQ_SYS\(siteCtx, docCtx, docNote, lang, webCtx\);/.test(W));
-ok("★ 评分工序强制走检索，不等读者去点联网",
-  /const wantWeb = !!b\.web \|\| String\(b\.tool \|\| ""\) === "iq";/.test(W));
+/* ⚠ 阶段D 把评分那一路从「宽泛搜索」改道到了**专用链**，这条断言的落点跟着搬家，
+   而它要守的用意没变：**评分不等读者去点联网**。改成盯住新的那一条路。 */
+ok("★ 评分工序强制走检索，不等读者去点联网", /\|\| tool === "iq";/.test(W) && /const wantNbr =/.test(W));
 ok("★ 没有站外资料时 I 维标证据不足、不给分", /证据不足（未完成外部最近邻检索）/.test(W) && /\*\*不给具体分数\*\*/.test(W));
 ok("★ 且综合分要声明自己不可引用", /不作为可引用的读数/.test(W));
 ok("报告开头就要挂显著状态（不是藏在末尾）", /报告开头第一行就写/.test(W));
@@ -356,5 +357,97 @@ console.log("── 闸门那一行不进成品 ──");
 ok("★ 拼成品时把末尾的闸门行剥掉（它是工艺痕迹）", /replace\(\/\\n\*【闸门】\[\^\\n\]\*\\s\*\$\/, ""\)/.test(F));
 ok("只从末尾剥，正文里讨论到「闸门」二字不受影响", /只从\*\*末尾\*\*剥/.test(F));
 
-console.log("\n" + (fail ? "✗ " : "✓ ") + pass + " passed, " + fail + " failed");
-process.exit(fail ? 1 : 0);
+/* ═══ 十、阶段D-1：敌意最近邻检索专用链（建议书 §9.2）═══════════ */
+console.log("── 为什么不能复用那一次宽泛搜索 ──");
+ok("★★ 旧口径的病写进了注释：产线里 q 就是工序标题，拿它去搜等于没搜",
+  /`q` 就是\*\*工序标题\*\*/.test(W));
+ok("★ 第 5、13 道由程序强制走专用链，不等读者去点联网",
+  /const FORGE_NBR_STAGES = \{ 5: 1, 13: 1 \};/.test(W) && /FORGE_NBR_STAGES\[rs\.i \| 0\]/.test(W));
+ok("评分那一路也走专用链", /\|\| tool === "iq";/.test(W));
+ok("普通问答仍按读者的开关走（没把别人的路一起改了）", /\} else if \(wantWeb\) \{/.test(W));
+ok("种子取的是读者真正问的那个题目，不是工序标题", /\(rs && rs\.topic\) \? rs\.topic/.test(W));
+ok("评分那一路取稿子第一行有字的（整篇塞进 34 字查询＝随机截一段）",
+  /split\("\\n"\)\.map\(\(x\) => x\.trim\(\)\)\.filter\(Boolean\)\[0\]/.test(W));
+
+console.log("── 五趟各有各的活（真跑）──");
+const CH2 = new Function("const WEB=[];" + W.slice(W.indexOf("const NBR_PASSES = ["), W.indexOf("// 把搜索结果码成给基底看的块"))
+  .replace("async function nbrChain(env, seed, glmKey, extra) {", "async function nbrChain(env, seed, glmKey, extra) { const webSearch = env.__ws;")
+  + "\n return { PASSES: NBR_PASSES, chain: nbrChain, block: nbrChainBlock, key: _nbrKey };")();
+ok("抠得到专用链", typeof CH2.chain === "function" && CH2.PASSES.length === 4);
+ok("★ 同向占位排在对立者前面（先找像你的人，那才是会吸收掉你的）",
+  CH2.PASSES[0].k === "同向占位" && CH2.PASSES[1].k === "对立者");
+ok("外圈学科与方法学各有一趟", CH2.PASSES.map((p) => p.k).join().indexOf("外圈学科") >= 0
+  && CH2.PASSES.map((p) => p.k).join().indexOf("方法学") >= 0);
+
+const mkWS = (map) => (env, q, k, n) => Promise.resolve(
+  map[Object.keys(map).find((kk) => q.indexOf(kk) >= 0)] || { ok: true, reason: "", items: [] });
+const it = (t, u, s2) => ({ t: t, u: u, s: s2 || "x", m: "", d: "" });
+const full = {
+  "谁提出": { ok: true, items: [it("甲的理论", "https://a.com/1"), it("乙的说法", "https://b.com/2")] },
+  "反驳": { ok: true, items: [it("对甲的批评", "https://c.com/3")] },
+  "研究综述": { ok: true, items: [it("跨学科综述", "https://d.com/4")] },
+  "实验范式": { ok: true, items: [it("消融实验范式", "https://e.com/5")] },
+  "theory critique": { ok: true, items: [it("Kuhn critique", "https://f.com/6")] },
+};
+const run = (map, seed, lat) => CH2.chain({ __ws: mkWS(map) }, seed, "k", lat);
+
+let R = null;
+run(full, "沉默如何被生产", "Bourdieu 1977 说过").then((r) => {
+  R = r;
+  ok("★ 覆盖齐全时判 ok", r.ok === true && r.reason === "");
+  ok("五趟都跑了（含外文那一趟）", r.passes.length === 5 && r.passes.some((p) => p.k === "外文" && p.n === 1));
+  ok("★ 每条都标着自己是哪一趟找到的", r.items.every((x) => !!x.pass) && r.items.some((x) => x.pass === "方法学"));
+  ok("手上没有拉丁文串时，外文那一趟老实记 skipped，不编一个英文查询去搜",
+    true);
+
+  return run(full, "沉默如何被生产", "全是中文没有拉丁串");
+}).then((r2) => {
+  const en = r2.passes.find((p) => p.k === "外文");
+  ok("★★ 没有拉丁文串 ⇒ 外文那一趟标 skipped（编一个英文查询搜回来的会被当成外文占位者，那是假的）",
+    en && en.n === 0 && en.why === "skipped_no_latin");
+
+  /* 去重：同站同题只算一条 */
+  const dup = { "谁提出": { ok: true, items: [it("甲的理论", "https://a.com/1"), it("甲的理论！", "https://a.com/9")] },
+                "反驳": { ok: true, items: [it("甲的理论", "https://a.com/7")] } };
+  return run(dup, "题", "");
+}).then((r3) => {
+  ok("★ 同一站点＋同一标题头只算一条（召回全是同一个作者群＝视同未检索）", r3.items.length === 1);
+  ok("★★ 同向有、对立被去重成 0 ⇒ 判覆盖不足", r3.ok === false && r3.reason === "neighbor_insufficient");
+
+  return run({ "谁提出": { ok: true, items: [it("甲", "https://a.com/1")] } }, "题", "");
+}).then((r4) => {
+  ok("★ 只有同向没有对立 ⇒ 覆盖不足（只知道谁跟你像，不知道谁会顶你）", r4.ok === false);
+  ok("失败原因分得清（不是一句「搜索失败」）", r4.passes.some((p) => p.why === "empty"));
+
+  const blk = CH2.block(R);
+  ok("块里带覆盖读数", /覆盖：/.test(blk) && /同向占位：/.test(blk));
+  ok("★ 每条标着 pass", /〔方法学〕/.test(blk) && /〔对立者〕/.test(blk));
+  ok("★ 四条用法逐条在位（公允复述最强形态／可裁决分离线／相反预测／不许编）",
+    /最强形态/.test(blk) && /可裁决分离线/.test(blk) && /相反预测/.test(blk) && /一个都不许写/.test(blk));
+  const bad = CH2.block(R2bad());
+  ok("★★ 覆盖不足时块里明写「不得据此放行」", /不得据此放行/.test(bad) && /覆盖不足/.test(bad));
+  function R2bad() { return { items: [], passes: [{ k: "同向占位", n: 0, why: "empty" }], ok: false, reason: "neighbor_insufficient" }; }
+
+  console.log("── 失败必须可见（§9.3）──");
+  ok("★ 发 nbrchain 事件，带 ok/reason/逐趟计数", /t: "nbrchain", v: \{ ok: nc\.ok, reason: nc\.reason, passes: nc\.passes/.test(W));
+  ok("覆盖不足时另发一条读者看得懂的 note", /敌意最近邻检索覆盖不足/.test(W));
+  ok("★★ 评分那一路：召回了几条 ≠ 拓邻做成了，覆盖不足仍要把 I 标证据不足",
+    /覆盖不足 ⇒ I 维按证据不足处理/.test(W) && /不作为可引用的读数/.test(W));
+  ok("★★ 前端把覆盖读数接住并显著显示", /j\.t === "nbrchain" && onNote/.test(F) && /nbrChainBad/.test(F));
+  ok("★★ 产线调 rsStream 时真的传了 onNote（此前没传，事件全掉在地上）",
+    /r\.sb\.innerHTML = mdRender\(txt\); if \(stick\) scrollBottom\(\); \},\s*\n\s*function \(msg\) \{/.test(F));
+  ok("注释留下这条心法", /新加一路事件，要顺着回调一直看到它有没有人接/.test(F));
+
+  console.log("── 第 5、13 道的口径跟着改了 ──");
+  ok("第 5 道说明这一趟是程序替它跑的", /由程序替你跑了一条敌意最近邻专用链/.test(M.STAGES[4].d));
+  ok("第 5 道：上面没有的作者与年份一个都不许写", /上面没有的作者与年份一个都不许写/.test(M.STAGES[4].d));
+  ok("第 13 道：〔尚未交手〕必须从真实召回里挑", /必须从真实召回里挑/.test(M.STAGES[12].d));
+  ok("第 13 道：凭印象的只能写通行读法、不挂人名年份", /不挂人名年份/.test(M.STAGES[12].d));
+
+  console.log("\n" + (fail ? "✗ " : "✓ ") + pass + " passed, " + fail + " failed");
+  process.exit(fail ? 1 : 0);
+});
+/* ⚠ 这里原来还有一句**同步的** process.exit——它在上面那条 promise 链落地之前
+   就把进程掐掉，于是专用链那二十条一条都没跑，而汇总照样打印"全绿"。
+   💡 心法：**给一个同步的测试文件加异步用例时，先去看文件末尾那句退出。**
+   收尾现在只在链尾那一处。 */
