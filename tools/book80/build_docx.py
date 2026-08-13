@@ -56,6 +56,53 @@ def para(text='', size=None, bold=False, align=None, indent=None,
 def pagebreak(): PENDING['brk'] = True
 
 
+GOLD = RGBColor(0xB8, 0x8A, 0x3E)
+
+
+def rule(color='C7D2DC', sz='6'):
+    p = doc.add_paragraph()
+    p.paragraph_format.first_line_indent = Pt(0)
+    p.paragraph_format.space_before = Pt(0)
+    p.paragraph_format.space_after = Pt(6)
+    pPr = p._p.get_or_add_pPr()
+    pbdr = OxmlElement('w:pBdr')
+    bot = OxmlElement('w:bottom')
+    bot.set(qn('w:val'), 'single'); bot.set(qn('w:sz'), sz)
+    bot.set(qn('w:space'), '1'); bot.set(qn('w:color'), color)
+    pbdr.append(bot); pPr.append(pbdr)
+
+
+def set_cell_border(cell, **kw):
+    tcPr = cell._tc.get_or_add_tcPr()
+    borders = OxmlElement('w:tcBorders')
+    for edge in ('top', 'bottom', 'left', 'right'):
+        spec = kw.get(edge)
+        el = OxmlElement('w:' + edge)
+        if spec is None:
+            el.set(qn('w:val'), 'nil')
+        else:
+            el.set(qn('w:val'), 'single')
+            el.set(qn('w:sz'), str(spec[0]))
+            el.set(qn('w:color'), spec[1])
+        borders.append(el)
+    tcPr.append(borders)
+
+
+def add_header():
+    sec.different_first_page_header_footer = True
+    p = sec.header.paragraphs[0]
+    p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    p.paragraph_format.first_line_indent = Pt(0)
+    p.paragraph_format.space_after = Pt(2)
+    setfont(p.add_run('判 断 的 危 机'), SANS, 8, False, ACC2)
+    pPr = p._p.get_or_add_pPr()
+    pbdr = OxmlElement('w:pBdr')
+    bot = OxmlElement('w:bottom')
+    bot.set(qn('w:val'), 'single'); bot.set(qn('w:sz'), '4')
+    bot.set(qn('w:space'), '4'); bot.set(qn('w:color'), 'C7D2DC')
+    pbdr.append(bot); pPr.append(pbdr)
+
+
 def add_footer():
     p = doc.sections[0].footer.paragraphs[0]
     p.alignment = WD_ALIGN_PARAGRAPH.CENTER
@@ -74,15 +121,18 @@ def add_footer():
 def table(rows):
     """rows: list of list[str]，第一行为表头"""
     t = doc.add_table(rows=len(rows), cols=len(rows[0]))
-    t.style = 'Table Grid'
+    n = len(rows)
     for i, row in enumerate(rows):
         for j, cell in enumerate(row):
             c = t.cell(i, j)
+            set_cell_border(c,
+                            top=(12, '1D3955') if i == 0 else None,
+                            bottom=(6, '7A93AE') if i == 0 else ((12, '1D3955') if i == n - 1 else None))
             p = c.paragraphs[0]
             p.paragraph_format.first_line_indent = Pt(0)
             p.paragraph_format.space_after = Pt(1)
             p.paragraph_format.line_spacing = 1.2
-            setfont(p.add_run(cell), SERIF, 8.5, i == 0, ACC if i == 0 else INK)
+            setfont(p.add_run(cell), SANS if i == 0 else SERIF, 8.5, i == 0, ACC if i == 0 else INK)
     para('', after=4)
 
 
@@ -141,6 +191,7 @@ for b in blocks:
              after=4, before=7 if isb else 0, color=ACC if isb else INK)
 pagebreak()
 add_footer()
+add_header()
 
 # ---------- 正文 ----------
 first = False
@@ -154,13 +205,27 @@ while i < len(blocks):
         first = False
         inback = t.startswith('封')
         if t.startswith('编'):
-            para('', after=118)
-            para(t, size=22, bold=True, align=WD_ALIGN_PARAGRAPH.CENTER, indent=0,
+            para('', after=112)
+            head, _, tail = t.partition('·')
+            para(head.strip(), size=13, align=WD_ALIGN_PARAGRAPH.CENTER, indent=0,
+                 color=ACC2, name=SANS, after=10)
+            para(tail.strip(), size=25, bold=True, align=WD_ALIGN_PARAGRAPH.CENTER, indent=0,
                  color=ACC, spacing=1.3)
+            para('· · ·', size=12, align=WD_ALIGN_PARAGRAPH.CENTER, indent=0,
+                 color=GOLD, before=16, name=SANS)
         else:
-            para(t, size=15.5, bold=True, indent=0, after=10, before=4, color=ACC, spacing=1.25)
+            head, _, tail = t.partition('·')
+            para('', after=16)
+            if tail.strip():
+                para(head.strip(), size=10, indent=0, color=ACC2, name=SANS, after=5)
+                rule()
+                para(tail.strip(), size=16.5, bold=True, indent=0, after=13, before=7,
+                     color=ACC, spacing=1.25)
+            else:
+                para(head.strip(), size=16.5, bold=True, indent=0, after=13, before=7,
+                     color=ACC, spacing=1.25)
     elif is_h3(b):
-        para(b[4:].strip(), size=11, bold=True, indent=0, before=9, after=3, color=ACC)
+        para('▍' + b[4:].strip(), size=11, bold=True, indent=0, before=11, after=4, color=ACC)
     elif b.startswith('|') and '\n' in b:
         rows = []
         for line in b.split('\n'):
