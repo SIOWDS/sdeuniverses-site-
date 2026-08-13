@@ -214,7 +214,15 @@ export class VisitCounter {
 // ===== 读者讨论区·每篇文章一个实例（key=cm:<slug>）=====
 // 纪律：只存虚拟名+内容+时间；访客指纹只是当日哈希、仅用于限流且跨天即删，绝不存原始 IP。
 // SDE 对谈（高级会话）专用：各厂商最强档 + DeepSeek 思考模式满功率
-// DeepSeek V4：deepseek-v4-pro（1.6T/49B激活，1M 上下文）＞ flash；thinking:enabled + reasoning_effort:"max" 为最高推理投入档
+// DeepSeek V4：deepseek-v4-pro（1.6T/49B激活，1M 上下文、**最大输出 384K**）＞ flash。
+// 【2026-08-13 核实的三条，都关系到这条链跑得对不对】
+//   ① 稳定 ID 仍是 `deepseek-v4-pro`，当前服务的版本是 DeepSeek-V4-Pro-0813（当日发布的正式版）。
+//      别换成 `deepseek-chat`／`deepseek-reasoner`——那两个是 V4 Flash 非思考/思考模式的旧别名，不是 Pro。
+//   ② 思考**默认就是开的**，默认档位 `high`。合法的 reasoning_effort 只有 `low` / `high` / `max`；
+//      **`xhigh` 与 `medium` 是兼容值，会被映射回 `high`**——写 xhigh 以为是最高档的，实际拿到的是中间档。
+//      本文件用的是 `max`，是真的最高档，不要顺手改成 xhigh。
+//   ③ 思考模式下 temperature / top_p / presence_penalty / frequency_penalty 全部无效，
+//      而且**服务端可能照收不报错**——于是一份没生效的配置看上去像调过参。wdsTopBody 已把前两个删掉。
 // 注意：思考模式下 temperature/top_p/penalty 全部无效，必须不传
 // 深度档型号（满血）。Kimi K3 与 MiniMax M2.x 的思考是常开的，没有单独的开关参数。
 // ⚠️ kimi 深度档一度写成 kimi-k3 —— Kimi 平台的模型表里**没有**这个名字（2026-07-31 实查：
@@ -243,6 +251,22 @@ function wdsBeat(controller, state) {
 }
 const WDS_TOK_MAX = 64000;
 const WDS_TOK_LADDER = [WDS_TOK_MAX, 32000, 12000];
+// 【各家的真上限 —— 2026-08-13 核过，别再拍脑袋】
+//   64000 这个数是本文件早先拍出来的，不是查出来的。而 DeepSeek V4 Pro 的官方口径是
+//   **上下文 1M、最大输出 384K**（稳定 ID deepseek-v4-pro，当前服务的版本 DeepSeek-V4-Pro-0813，
+//   2026-08-13 发布）。也就是说站上一直按真上限的六分之一在给预算。
+//   ⚠ 只有 deepseek 这一格是核实过的。其余四家的真上限**没查**，一律留在 64000——
+//   宁可保守，也不要拿一个没核过的数去换 400。哪家核实了再往这里加，并在这行注明核实日期。
+//   ⚠ 上限不是目标：本文件通篇记着「预算是油门不是容器」。这张表只决定**阶梯的第一档能有多高**，
+//   真正的刹车仍然是那三样：早于平台的时钟、阶梯降档、关思考兜底重跑。
+const WDS_TOK_CAP = { deepseek: 384000 };   // 2026-08-13 核实：官方文档「最大输出 384K」
+function wdsTokCap(VC) {
+  const u = String((VC && VC.url) || "");
+  for (const vd in WDS_TOK_CAP) {
+    if (u.indexOf(vd === "deepseek" ? "api.deepseek.com" : vd) >= 0) return WDS_TOK_CAP[vd];
+  }
+  return WDS_TOK_MAX;
+}
 // 【满功率的硬约束 —— 这是吃过亏的，别再往上调】
 // reasoning_effort=max 的基底，**思考时长随 max_tokens 水涨船高**：预算给得越大，它想得越久。
 // 给到几万，它会一路想到超过平台单请求时长上限被杀在思考阶段——流干净结束、正文 0 字、不报任何错。
@@ -5680,7 +5704,10 @@ async function askCore(request, env, url, body, SINK) {
   // 所以最高级配置 = 最强型号 ＋ 满功率 ＋ **有界预算 16000** ＋ 心跳 ＋ 早于平台的时钟 ＋ 关思考兜底。
   // 阶梯仍保留：它治的是另一件事——基底不收这个数字时（400 且报 max_tokens 相关）自动降档，
   // 不让一个数字不被接受就把整条链弄断。
-  const WDS_TOK_HEAVY = WDS_TOK_MAX;   // [stated] 用户 2026-08-09：「每一次调用都要 MaxToken」——预算给满，刹车改挂在 reasoning_effort 上
+  // [stated] 用户 2026-08-09：「每一次调用都要 MaxToken」／2026-08-13：「maxtoken 要能最大极限」。
+  //   此前这里写死 WDS_TOK_MAX(64000)——那是个拍出来的数。改成按家取真上限：
+  //   DeepSeek 是 384K，其余家没核实、仍落回 64000。刹车不变（时钟／阶梯／关思考兜底）。
+  const WDS_TOK_HEAVY = wdsTokCap(VC);
   // 【深度档问答也是重档 —— 这条是用户 2026-08-09 那场真实的自动十轮换来的】
   // 那场跑到第 6 轮断掉：第 1–4 轮 3405／3673／3135／2838 字，**第 5 轮只剩 936 字，第 6 轮 0 字**。
   // 不是偶发，是一条必然的下坡：深度档装着内功＋心得＋方法论，思考实测就要 3–6k tok，
@@ -5732,8 +5759,13 @@ async function askCore(request, env, url, body, SINK) {
   //   它同时也是最该想久的一段：一万字怎么分给九栏、这场问对到底有没有长出脊梁骨，
   //   全在这一次决定；它想清楚了，后面两段才不会一路平铺到写不完。
   //   三重保险照旧在：早于平台的时钟 `_clk`、阶梯降档、关思考兜底重跑。
-  const _ladder = _briefPlan ? [WDS_TOK_HEAVY, 32000, 16000]
-    : _fullPower ? [WDS_TOK_HEAVY, 32000, 16000]
+  //   阶梯多加一档 64000：首档现在可能是 384K，一步退到 32000 跨度太大——
+  //   基底若因为第一个数太大而 400，第二档还该是个「大但常见」的数，而不是直接掉回小额。
+  //   ⚠ 必须去重：没核实过上限的家 WDS_TOK_HEAVY 仍是 64000，不去重就成了 [64000,64000,…]——
+  //   第一档失败后拿同一个数再打一遍，白烧一次调用（这条链一次调用就是一两分钟）。
+  const _rungs = (a) => a.filter((v, i, arr) => v > 0 && arr.indexOf(v) === i);
+  const _ladder = _briefPlan ? _rungs([WDS_TOK_HEAVY, 64000, 32000, 16000])
+    : _fullPower ? _rungs([WDS_TOK_HEAVY, 64000, 32000, 16000])
     : (mode === "iq" ? [WDS_TOK_HEAVY, 12000, 8000]
       : [MAXTOK, Math.min(32000, MAXTOK), Math.min(12000, MAXTOK)].filter((v, i, a) => v > 0 && a.indexOf(v) === i));
   // 【时钟必须早于平台】实测平台在约 128–133 秒把整个请求无声杀掉（连 [DONE] 都没有），

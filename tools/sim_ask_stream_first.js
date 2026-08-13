@@ -285,8 +285,14 @@ const freshWorker = async () => (await import("../src/worker.js?sim=" + (++_mn))
     ok(!!main, "确实打到了 DeepSeek（挑的是流式那一刀，不是词表扩展）");
     ok(main && main.body.model === "deepseek-v4-pro",
       "系统 Key 的提炼跑最强档 deepseek-v4-pro（不是表内轻档 flash）· 实得 " + (main && main.body.model));
-    ok(main && main.body.max_tokens === 64000,
-      "规划段首发给到最大极限 64000（阶梯首档）· 实得 " + (main && main.body.max_tokens));
+    /* 【2026-08-13 核实】DeepSeek V4 Pro 的真上限是 **384K**，不是本文件早先拍的 64000。
+       ⚠ 这个数必须从源码的 WDS_TOK_CAP 抽出来比，不许在这里手抄一个 384000——
+       手抄的后果不是报错，是它安静地测一个已经不存在的版本（本仓吃过五次这个亏）。 */
+    const _capSrc = /const WDS_TOK_CAP = \{([^}]*)\}/.exec(require("fs").readFileSync("/home/claude/site/src/worker.js", "utf8"));
+    const CAP_DS = _capSrc ? Number((/deepseek:\s*(\d+)/.exec(_capSrc[1]) || [])[1]) : 0;
+    ok(CAP_DS > 64000, "源码里 DeepSeek 的上限已按官方口径抬高 · 实得 " + CAP_DS);
+    ok(main && main.body.max_tokens === CAP_DS,
+      "规划段首发给到真上限（阶梯首档）· 实得 " + (main && main.body.max_tokens));
     ok(main && main.body.thinking && main.body.thinking.type === "enabled",
       "规划段真把思考打开了（此前 VC 没有 top，wdsTopBody 整段空转，从没注入过 thinking）");
     ok(main && main.body.reasoning_effort === "max", "并且是满功率推理投入档 · 实得 " + (main && main.body.reasoning_effort));
@@ -299,7 +305,9 @@ const freshWorker = async () => (await import("../src/worker.js?sim=" + (++_mn))
     await drain(await worker.fetch(askReq({ mode: "distill", part: 1, q: "意义为什么会磨损", hist: [{ q: "一问", a: "一答" }, { q: "二问", a: "二答" }] }), env, {}));
     const main = seen.filter((s) => s.u.indexOf("deepseek.com") >= 0 && s.body.stream === true).pop();
     ok(main && main.body.model === "deepseek-v4-pro", "正文段同样是最强档");
-    ok(main && main.body.max_tokens === 64000, "正文段也是最大极限 64000");
+    const _c2 = /const WDS_TOK_CAP = \{([^}]*)\}/.exec(require("fs").readFileSync("/home/claude/site/src/worker.js", "utf8"));
+    const CAP2 = _c2 ? Number((/deepseek:\s*(\d+)/.exec(_c2[1]) || [])[1]) : 0;
+    ok(main && main.body.max_tokens === CAP2, "正文段也是真上限 · 实得 " + (main && main.body.max_tokens));
     ok(main && main.body.thinking && main.body.thinking.type === "disabled",
       "但正文段**显式关思考**——满预算＋开思考是本文件记着的那条死路，不许顺手改掉");
   }

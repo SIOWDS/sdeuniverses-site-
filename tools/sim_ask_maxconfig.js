@@ -62,18 +62,31 @@ ok(isHeavy("answer", true), "真跑：**深度档问答**也算重档（十轮�
 ok(!isHeavy("answer", false) && !isHeavy("nextq") && !isHeavy("recommend"), "真跑：普通档问答、拟题、推荐不进重档（它们提示语短、不需要闸）");
 ok(/if \(_deepAns\) MAXTOK = 32000;/.test(W), "深度档问答降档位抬到 32000（首发走满额）——前提是它已经进了 _fullPower 关思考，否则 12000 就是思考 38,777 字、第 128 秒被杀那一版");
 /* 阶梯：真跑一遍，确认 iq 首发最高档、普通模式仍是单一档（＝行为不变） */
-const _lStart = W.indexOf("const _ladder =");
+/* 切片要从 `_rungs` 起——阶梯现在靠它去重，只切 `const _ladder =` 会得到
+   「ReferenceError: _rungs is not defined」。抠源码就要把它依赖的东西一起抠进来，
+   不许在本脚本里另写一个同名函数顶上（那就成了测一个自己写的版本）。 */
+const _lStart = W.indexOf("const _rungs =");
 const _lEnd = W.indexOf(";\n", W.indexOf("a.indexOf(v) === i))", _lStart));
 const ladderSrc = W.slice(_lStart, _lEnd);
 ok(_lStart > 0 && _lEnd > _lStart, "_ladder 在位");
 const ladderFn = new Function("mode", "MAXTOK", "WDS_TOK_MAX", "WDS_TOK_HEAVY", "deep",
   PRE + ladderSrc + ';\nreturn _ladder;');
 ok(JSON.stringify(ladderFn("iq", 32000, 64000, 64000)) === "[64000,12000,8000]", "真跑：iq 阶梯首档给满 MaxToken");
-ok(JSON.stringify(ladderFn("distill", 32000, 64000, 64000)) === "[64000,32000,16000]", "真跑：distill 已升入长文阶梯（四段两万字）");
-ok(JSON.stringify(ladderFn("paper", 32000, 64000, 64000)) === "[64000,32000,16000]", "真跑：长文阶梯 = 64000 → 32000 → 16000（首档给满）");
+/* 【2026-08-13 改形状】首档不再是写死的 64000，而是按家取的真上限（DeepSeek 384K）。
+   所以判据从「等于某个字面量数组」改成「形状对不对」：首档＝传进来的上限、严格递减、
+   无重复、末档 16000。手抄一个 [384000,64000,32000,16000] 只会在下次改上限时安静失效。 */
+const shapeOK = (arr, cap) => arr[0] === cap
+  && arr.every((v, i) => i === 0 || v < arr[i - 1])          // 严格递减
+  && new Set(arr).size === arr.length                        // 无重复
+  && arr[arr.length - 1] === 16000;                          // 末档兜底
+ok(shapeOK(ladderFn("distill", 32000, 64000, 384000), 384000), "真跑：distill 阶梯首档＝真上限、逐档递减 · 实得 " + ladderFn("distill", 32000, 64000, 384000));
+ok(shapeOK(ladderFn("paper", 32000, 64000, 384000), 384000), "真跑：长文阶梯首档给到真上限 · 实得 " + ladderFn("paper", 32000, 64000, 384000));
+/* 没核实过上限的家仍是 64000——不去重就成了 [64000,64000,…]，第一档失败后拿同一个数
+   再打一遍，白烧一次调用（这条链一次调用就是一两分钟）。 */
+ok(shapeOK(ladderFn("paper", 32000, 64000, 64000), 64000), "真跑：上限仍是 64000 的家不会退出重复档 · 实得 " + ladderFn("paper", 32000, 64000, 64000));
 ok(JSON.stringify(ladderFn("answer", 8000, 64000, 64000, false)) === "[8000]", "真跑：**普通档**问答仍是单一档（底数由 4000 抬到 8000）");
-ok(JSON.stringify(ladderFn("answer", 32000, 64000, 64000, true)) === "[64000,32000,16000]", "真跑：**深度档问答**也走满预算长文阶梯——十轮追问就跑在这条路上");
-ok(JSON.stringify(ladderFn("collide", 32000, 64000, 64000)) === "[64000,32000,16000]" && JSON.stringify(ladderFn("synth", 32000, 64000, 64000)) === "[64000,32000,16000]", "真跑：碰撞与综合提炼也抬到满预算阶梯（原 3200／5200 是全链最窄的两处）");
+ok(shapeOK(ladderFn("answer", 32000, 64000, 384000, true), 384000), "真跑：**深度档问答**也走满预算长文阶梯——十轮追问就跑在这条路上");
+ok(shapeOK(ladderFn("collide", 32000, 64000, 384000), 384000) && shapeOK(ladderFn("synth", 32000, 64000, 384000), 384000), "真跑：碰撞与综合提炼也抬到满预算阶梯（原 3200／5200 是全链最窄的两处）");
 ok(/if \(resp\.ok \|\| resp\.status !== 400 \|\| i === ladder\.length - 1\) return resp;/.test(W),
    "阶梯只在 400 且报 max_tokens 相关时才降档（别的错照原样抛回去）");
 ok(/ladderOverride && ladderOverride\.length\) \? ladderOverride : wdsLadder\(VC, want\)/.test(W),
