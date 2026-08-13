@@ -251,7 +251,10 @@ ok(W.indexOf('_stat("✍️ 开始作答') > W.indexOf('const _clk = _heavy ?'),
    而且它发生在**调基底之前**——预算在真正开始写字前就被花光了。 */
 console.log("— 十三、心得不在答题请求里现生成 —");
 ok(/async function ensureReflect\(env, url, vendor, VC, KEY, allowGen\)/.test(W), "ensureReflect 收 allowGen");
-ok(/if \(allowGen === undefined\) allowGen = true;/.test(W), "默认仍可生成，十几个老调用点行为一个字不变");
+/* 2026-08-13：默认已由 true 收紧为 false —— 心得只在「开工」那处 ctx.waitUntil 现生成，
+   其余十几个调用点一律只读缓存。默认 true 的旧判据测的是一个不存在的版本。 */
+ok(/if \(allowGen === undefined\) allowGen = false;/.test(W), "默认不生成：答题路径上没有一处能偷偷现生成心得");
+ok(/ctx\.waitUntil\(ensureReflect\([^)]*, true\)/.test(W), "唯一允许现生成的是「开工」那处后台预热（显式传 true）");
 ok(/if \(!allowGen\) return "";/.test(W), "allowGen=false 时直接返回空，不走生成");
 ok(/await ensureReflect\(env, url, vendor, VC, KEY, false\)/.test(W), "答题请求那一处传了 false");
 ok(/ctx\.waitUntil\(ensureReflect\(/.test(W), "心得仍有后台预先备好的路（否则就是永远没有心得）");

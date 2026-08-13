@@ -1210,8 +1210,8 @@ function doDistill(){
        写成了但缺段的照收：缺栏的入口资料仍比没有强，只是要在状态行里说清缺哪几栏。 */
     if(brief.length<1500){
       stat.textContent=(brief.length===0
-        ? '⚠ 基底这一轮没交出正文（多半是把额度全烧在思考上了）。服务端已自动关思考重跑过一次仍是空——请再点一次「🧪 提炼精华」，或换一个基底。'
-        : '⚠ 提炼产出过短（'+brief.length+' 字，目标一万字），本次不作为论文入口，请重试。');
+        ? '⚠ 这一轮一个字的正文都没写出来。读数：'+runWhy()+'　—— 请再点一次「🧪 提炼精华」，或换一个基底。'
+        : '⚠ 提炼产出过短（'+brief.length+' 字，目标一万字），本次不作为论文入口，请重试。读数：'+runWhy());
       brief=''; return;
     }
     autoVault(brief, '提炼精华');
@@ -1237,12 +1237,46 @@ var GEN_STAT='paperStat', GEN_FILL='ppFill', GEN_CHARS='ppChars', GEN_BOX='', GE
    ① 字数计从它接着往上走——旧版写死 paperAll.length，打磨时会把已完成的论文长度算进打磨进度里；
    ② 有 GEN_BOX 的任务（提炼）靠它把「已完成段落＋本段实时流」拼起来显示，跑八分钟不至于对着空白框干等。 */
 function genTarget(stat, fill, chars, box){ GEN_STAT=stat; GEN_FILL=fill; GEN_CHARS=chars; GEN_BOX=box||''; GEN_PREV=''; }
+/* ═══ 一次调用的读数（诊断用 · 2026-08-13）═══
+   线上真故障：提炼精华跑完只有 0 字，屏幕上留下的是一句**写死的猜测**
+   （「多半是把额度全烧在思考上了」）。而服务端其实一路都在报读数——
+   前置用掉几秒、留给写作几秒、思考几字、正文几字、流停在第几秒、停因是什么——
+   这些帧被读进 stat.textContent 后立刻被下一帧盖掉，收尾时又被那句猜测盖掉。
+   十一轮返工全是从「一句没有数字的话」里猜出来的，根因就在这里。
+   RUNLOG 只干一件事：把最后一次调用的读数留住，让零产出能说出自己是怎么死的。 */
+var RUNLOG={stat:'',pre:'',think:0,out:0,sec:0,err:'',stalled:false,frames:0};
+function runReset(){ RUNLOG={stat:'',pre:'',think:0,out:0,sec:0,err:'',stalled:false,frames:0}; }
+/* 零产出的三种死法，从前被写成同一句话，现在必须分得开：
+   ① 基底把额度烧在思考上（think 大、out=0，服务端会补一句停因）；
+   ② 整个 Worker 被平台无声杀掉（流干净结束、没有 error 帧、beat 停在第 12x 秒）；
+   ③ 前置（检索＋装内功）就把窗口吃光了（pre 那条状态会写明剩几秒给写作）。 */
+function runWhy(){
+  var a=[];
+  if(RUNLOG.pre) a.push(RUNLOG.pre);
+  if(RUNLOG.sec) a.push('流停在第 '+RUNLOG.sec+' 秒');
+  if(RUNLOG.think) a.push('思考 '+RUNLOG.think+' 字');
+  a.push('正文 '+RUNLOG.out+' 字');
+  if(RUNLOG.stalled) a.push('久无新帧·前端主动掉线');
+  else if(!RUNLOG.frames) a.push('一帧都没收到');
+  else if(!RUNLOG.err) a.push('流干净结束却没有正文（多半是整个请求被平台无声掉线）');
+  if(RUNLOG.err) a.push('服务端报的错：'+RUNLOG.err);
+  if(RUNLOG.stat) a.push('最后一步：'+RUNLOG.stat);
+  return a.join(' · ');
+}
 function streamPaper(part, extra){
   var uk=(keyMode==='own')?document.getElementById('userKey').value.trim():'';
   var stat=document.getElementById(GEN_STAT);
+  runReset();
+  /* 【看门狗】与问答那条线同一口径：服务端的闸只管得住「上游不写」，
+     管不住「整个 Worker 被平台杀掉」。首帧给得宽——长文出流前要检索＋装内功；
+     出流后每 5 秒有一个 beat，帧间超过 75 秒就是真停住了。 */
+  var _ac=(typeof AbortController!=='undefined')?new AbortController():null, _wd=null, _stalled=false;
+  function _bump(ms){ if(_wd) clearTimeout(_wd); _wd=setTimeout(function(){ _stalled=true; RUNLOG.stalled=true; try{ _ac && _ac.abort(); }catch(e){} }, ms); }
+  _bump(170000);
   return fetch('/api/ask',{
     method:'POST',
     headers:{'content-type':'application/json'},
+    signal:_ac?_ac.signal:undefined,
     body:JSON.stringify(Object.assign({mode:(extra&&extra.gmode)||'paper',part:part,q:originQ(),vendor:vendor}, uk?{key:uk}:{}, extra||{}))
   }).then(function(resp){
     if(!resp.ok && resp.status!==200){
@@ -1261,19 +1295,27 @@ function streamPaper(part, extra){
             var payload=s.slice(5).trim();
             if(payload==='[DONE]') continue;
             var j; try{ j=JSON.parse(payload); }catch(e){ continue; }
+            _bump(75000); RUNLOG.frames++;
             if(j.t==='token'){
-              pacc+=j.v; setProg(GEN_PREV.length+pacc.length);
+              pacc+=j.v; RUNLOG.out=pacc.length; setProg(GEN_PREV.length+pacc.length);
               if(GEN_BOX){ var _b=document.getElementById(GEN_BOX); if(_b) _b.textContent=GEN_PREV+(GEN_PREV?'\n\n':'')+pacc; }
             }
-            else if(j.t==='status'){ stat.textContent=j.v; }
-            else if(j.t==='think'){ thinkChars+=(j.v||'').length; stat.textContent='🧠 第'+('一二三四'.charAt((part||1)-1)||'一')+'段·深度思考中（'+thinkChars+' 字）…'; }
-            else if(j.t==='error'){ reject(new Error(j.v||'基底返回错误')); return; }
+            else if(j.t==='status'){ RUNLOG.stat=j.v; if(j.v.indexOf('开始作答')>=0) RUNLOG.pre=j.v; stat.textContent=j.v; }
+            /* beat 是服务端每 5 秒一帧的心跳（第几秒·思考几字·正文几字）。从前前端整帧丢掉，
+               于是「死在第几秒」这个唯一的时间证据一次都没被看见过。 */
+            else if(j.t==='beat'){ var _v=j.v||{}; if(_v.sec) RUNLOG.sec=_v.sec; if(_v.think) RUNLOG.think=Math.max(RUNLOG.think,_v.think); }
+            else if(j.t==='think'){ thinkChars+=(j.v||'').length; RUNLOG.think=Math.max(RUNLOG.think,thinkChars); stat.textContent='🧠 第'+('一二三四'.charAt((part||1)-1)||'一')+'段·深度思考中（'+thinkChars+' 字'+(RUNLOG.sec?'·第 '+RUNLOG.sec+' 秒':'')+'）…'; }
+            else if(j.t==='error'){ RUNLOG.err=j.v||''; reject(new Error(j.v||'基底返回错误')); return; }
           }
           pump();
         }).catch(reject);
       }
       pump();
     });
+  }).then(function(t){ if(_wd) clearTimeout(_wd); return t; }, function(e){
+    if(_wd) clearTimeout(_wd);
+    /* 我们自己掐的线与请求真失败是两回事，报错必须分开说，否则又回到「猜」。 */
+    throw (_stalled ? new Error('久等无新内容，已主动掉线 —— '+runWhy()) : e);
   });
 }
 /* 进度条：万字论文的总长事先并不知道，所以生成中走不确定态（跑马条 + 真实字数），
@@ -1295,6 +1337,12 @@ function paperHalf(part, extra, minLen, label, attempt){
   var stat=document.getElementById(GEN_STAT);
   return streamPaper(part, extra).then(function(txt){
     var c=String(txt||'').replace(/〔(?:上半篇完|第[一二三四]段完)·待续〕\s*$/,'').replace(/〔规划完〕\s*$/,'').replace(/〔全文完〕\s*$/,'').trim();
+    /* 【末次仍是零字＝失败，不是成功】旧版在 attempt>=2 时无条件 return c：
+       c 是空串时，这一行就把「整条链死在这里」悄悄变成了「成功返回了 0 字」，
+       真因（前置吃掉几秒、思考烧了几字、是不是被平台无声掉线）在这里全部丢光，
+       上层只好拿一句写死的猜测顶上。零字必须带着读数抛出去。
+       写出一部分但没到 minLen 的照旧收下——半段稿仍是稿，那不是静默。 */
+    if(!c.length && attempt>=2) throw new Error(label+'连跑两次都没交出正文 —— '+runWhy());
     if(c.length>=minLen || attempt>=2) return c;
     stat.textContent='… '+label+'产出过短（'+c.length+' 字），基底可能中断，正在重试…';
     return paperHalf(part, extra, minLen, label, attempt+1);
@@ -1836,7 +1884,14 @@ function errText(e){
 function sseCollect(payload, onStat){
   var uk=(keyMode==='own')?document.getElementById('userKey').value.trim():'';
   var acc='';
+  runReset();
+  /* 与 streamPaper 同一套看门狗与读数：这条路（碰撞／盲评／综合提炼）从前
+     在 r.done 处无条件 res(acc)——acc 是空串时，一次静默的死就被交成了「成功」。 */
+  var _ac=(typeof AbortController!=='undefined')?new AbortController():null, _wd=null, _stalled=false;
+  function _bump(ms){ if(_wd) clearTimeout(_wd); _wd=setTimeout(function(){ _stalled=true; RUNLOG.stalled=true; try{ _ac && _ac.abort(); }catch(e){} }, ms); }
+  _bump(170000);
   return fetch('/api/ask',{method:'POST',headers:{'content-type':'application/json'},
+    signal:_ac?_ac.signal:undefined,
     body:JSON.stringify(Object.assign({vendor:vendor}, payload, uk?{key:uk}:{}))
   }).then(function(resp){
     if(!resp.ok && resp.status!==200){ return resp.text().then(function(t){ throw new Error('HTTP '+resp.status+' '+t.slice(0,180)); }); }
@@ -1844,24 +1899,32 @@ function sseCollect(payload, onStat){
     return new Promise(function(res,rej){
       (function pump(){
         reader.read().then(function(r){
-          if(r.done){ res(acc); return; }
+          if(r.done){
+            if(!acc.length){ rej(new Error('这一轮一个字的正文都没写出来 —— '+runWhy())); return; }
+            res(acc); return;
+          }
           buf+=dec.decode(r.value,{stream:true});
           var lines=buf.split('\n'); buf=lines.pop();
           for(var i=0;i<lines.length;i++){
             var s=lines[i].trim(); if(!s||!s.startsWith('data:')) continue;
             var pl=s.slice(5).trim(); if(pl==='[DONE]') continue;
             var j; try{ j=JSON.parse(pl); }catch(e){ continue; }
-            if(j.t==='token'){ acc+=j.v; if(onStat) onStat(acc.length,false); }
+            _bump(75000); RUNLOG.frames++;
+            if(j.t==='token'){ acc+=j.v; RUNLOG.out=acc.length; if(onStat) onStat(acc.length,false); }
+            else if(j.t==='beat'){ var _v=j.v||{}; if(_v.sec) RUNLOG.sec=_v.sec; if(_v.think) RUNLOG.think=Math.max(RUNLOG.think,_v.think); }
             else if(j.t==='think'){ if(onStat) onStat(acc.length,true); }
             /* 服务端「先出流再干活」之后，检索/装内功那十几秒里会先发 status——接住它，
                否则读者盯着一条不动的状态行，以为死了。 */
-            else if(j.t==='status'){ if(onStat) onStat(acc.length,false,j.v); }
-            else if(j.t==='error'){ rej(new Error(j.v||'基底返回错误')); return; }
+            else if(j.t==='status'){ RUNLOG.stat=j.v; if(j.v.indexOf('开始作答')>=0) RUNLOG.pre=j.v; if(onStat) onStat(acc.length,false,j.v); }
+            else if(j.t==='error'){ RUNLOG.err=j.v||''; rej(new Error(j.v||'基底返回错误')); return; }
           }
           pump();
         }).catch(rej);
       })();
     });
+  }).then(function(t){ if(_wd) clearTimeout(_wd); return t; }, function(e){
+    if(_wd) clearTimeout(_wd);
+    throw (_stalled ? new Error('久等无新内容，已主动掉线 —— '+runWhy()) : e);
   });
 }
 function paradigmName(t){
@@ -2114,8 +2177,8 @@ function doEmerge(again){
         brief=String(t||'').trim(); briefKind='synth';
         if(brief.length<300){
           bstat.textContent=(brief.length===0
-            ? '⚠ 基底这一轮没交出正文（多半是把额度全烧在思考上了）。服务端已自动关思考重跑过一次仍是空——三个典范都还在上面，点「🧪 提炼精华」或再跑一次即可。'
-            : '⚠ 综合提炼产出过短（'+brief.length+' 字），本次不作为论文入口，请重试。');
+            ? '⚠ 这一轮一个字的正文都没写出来。读数：'+runWhy()+'　—— 三个典范都还在上面，点「🧪 提炼精华」或再跑一次即可。'
+            : '⚠ 综合提炼产出过短（'+brief.length+' 字），本次不作为论文入口，请重试。读数：'+runWhy());
           brief=''; return;
         }
         bstat.textContent='✓ 综合提炼完成（'+brief.length+' 字）· 出自 '+turns.length+' 轮问对 → '+paradigms.length+' 个候选典范 → 择优 → 提炼。现在点「成文一篇」，论文将以它为起点逐条兑现。';
