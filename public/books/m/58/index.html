@@ -18,7 +18,8 @@ nav .wrap{height:54px;display:flex;align-items:center;justify-content:space-betw
 nav a:hover{color:var(--cy)}
 /* hero */
 header{padding:74px 0 10px}
-.hero{display:grid;grid-template-columns:1fr 208px;gap:52px;align-items:start}
+.hero{display:block}
+.herogrid{display:grid;grid-template-columns:1fr 208px;gap:52px;align-items:start}
 .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.34em;color:var(--cy);opacity:.75}
 h1{font-family:var(--sans);font-weight:800;font-size:clamp(31px,5.6vw,54px);line-height:1.16;letter-spacing:.01em;margin:16px 0 0}
 h1 .lead{display:block;font-size:.52em;font-weight:500;letter-spacing:.34em;opacity:.72;margin-bottom:.28em}
@@ -81,7 +82,7 @@ b{color:var(--paper);font-weight:700}
 .pk:hover .pk-go em{margin-left:5px} .pk-go em{font-style:normal;transition:.2s}
 footer{margin-top:80px;border-top:1px solid var(--line);padding:26px 0 46px;font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:var(--mute);text-align:center}
 @media(max-width:820px){
- .hero{grid-template-columns:1fr} .cover{width:172px}
+ .herogrid{grid-template-columns:1fr} .cover{width:172px}
  .picks,.spec{grid-template-columns:1fr}
  .reads{grid-template-columns:1fr} .rd{border-right:0;border-bottom:1px solid var(--line)} .rd:last-child{border-bottom:0}
  .bk{grid-template-columns:1fr;gap:8px}
@@ -142,6 +143,8 @@ footer{margin-top:80px;border-top:1px solid var(--line);padding:26px 0 46px;font
 
 <header class="hero">
 <div class="heroin">
+<div class="herogrid">
+<div class="herotext">
 <div class="eyebrow">DEMAI INTERNATIONAL PRESS · 专著第 58 号</div>
 <div class="pre">垫得越成功，越不会有信号</div>
 <h1 class="bt">健康发生学导论</h1>
@@ -153,6 +156,9 @@ footer{margin-top:80px;border-top:1px solid var(--line);padding:26px 0 46px;font
 <a class="btn" href="#chapters">三章精读</a>
 </div>
 <div class="note">本书为理论提出稿：三个读数与一个最小模型尚无经过验证的量表，也无任何一条已被独立研究检验；两次外审要求的三项低成本经验检验，本书一项也没有做</div>
+</div>
+<img class="cover" src="cover.jpg" alt="《健康发生学导论》封面">
+</div>
 </div>
 </header>
 
