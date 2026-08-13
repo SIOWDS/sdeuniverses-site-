@@ -25,6 +25,7 @@ parts=[
  '# 答案随时可得之后\n\n**论知识不是存量，及重新推出它的那一段为何不入账**\n\n王德生 ＋ Claude 著\n\n德麦国际出版社 · 专著第 81 号',
  blk(b2,'PUB'),
  blk(b2,'AUTHOR'),
+ rd('reviews.md'),
  blk(b1,'QIANYAN'),
  blk(b1,'DAODU'),
  rd('intro.md'),
@@ -44,7 +45,7 @@ import re as _re
 def demote(x):
     return _re.sub(r'^## ', '### ', x, flags=_re.M)
 # 章与枢纽章/合章保留 ## ；其余部件的 ## 一律降为 ###
-KEEP={6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21}
+KEEP={7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22}
 parts=[demote(p) if i not in KEEP else p for i,p in enumerate(parts)]
 doc='\n\n'.join(p.strip() for p in parts)+'\n'
 open('/mnt/user-data/outputs/答案随时可得之后_稿本v1.md','w',encoding='utf-8').write(doc)

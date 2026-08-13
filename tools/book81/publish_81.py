@@ -8,7 +8,7 @@ NO, TITLE = '81', '答案随时可得之后'
 PDF = TITLE + '.pdf'
 DST = os.path.join(SITE, 'books/m/' + NO)
 SUB = '论知识不是存量，及重新推出它的那一段为何不入账'
-PAGES_N, WAN = '240 页', '约 17.4 万汉字'
+PAGES_N, WAN = '229 页', '约 17.9 万汉字'
 
 os.makedirs(DST, exist_ok=True)
 for f in (PDF, 'cover.jpg', 'cover-full.jpg'):
@@ -29,7 +29,7 @@ raw = re.sub(r'\*\*(.+?)\*\*', r'\1', raw).replace('**', '')
 blocks = [b.strip() for b in raw.split('\n\n') if b.strip()]
 
 SLUG = {'出版信息': 'pub', '作者介绍': 'au', '前言': 'qy', '导读': 'dd', '导论': 'dl',
-        '枢纽章': 'sn', '合章': 'hz', '参考文献': 'ref'}
+        '十二种读法': 'tj', '枢纽章': 'sn', '合章': 'hz', '参考文献': 'ref'}
 
 pages, cur, ci, bi = [], None, 0, 0
 started = False
@@ -161,7 +161,7 @@ idx = (f'<!DOCTYPE html><html lang="zh"><head><meta charset="utf-8">'
        f'<title>{TITLE} · 网页版全书 · 德麦国际专著第 {NO} 号</title>'
        f'<meta name="description" content="{SUB}。王德生＋Claude 著。网页版全书目录。">{CSS}</head><body>'
        f'{BAR}<div class="wrap"><h1>{TITLE}</h1>'
-       f'<div class="meta">{SUB} · 王德生 ＋ Claude 著 · 前言·导读·导论·四编十章·枢纽章·合章·结语·参考文献·三附录·后记 · {WAN} · {PAGES_N} · 德麦国际专著第 {NO} 号</div>'
+       f'<div class="meta">{SUB} · 王德生 ＋ Claude 著 · 十二种读法·前言·导读·导论·四编十章·枢纽章·合章·结语·参考文献·三附录·后记 · {WAN} · {PAGES_N} · 德麦国际专著第 {NO} 号</div>'
        f'<div class="toc">{"".join(toc)}</div>'
        f'<div class="foot">© 德麦国际出版社 · 王德生 ＋ Claude《{TITLE}》</div></div></body></html>')
 open(os.path.join(TXT, 'index.html'), 'w', encoding='utf-8').write(idx)
