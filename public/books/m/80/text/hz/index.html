@@ -11,11 +11,14 @@ h1{font-size:25px;line-height:1.5;margin:14px 0 6px;font-weight:700}
 h2{font-size:18px;color:var(--gold);margin:34px 0 10px;font-weight:700;
 border-top:1px solid var(--line);padding-top:16px}
 .meta{color:var(--dim);font-size:13.5px;margin-bottom:24px}
-blockquote{margin:0 0 22px;padding:12px 16px;border-left:3px solid var(--gold);
-background:var(--card);color:#CFD6DC;font-size:15px}
 p{margin:0 0 15px;text-align:justify}
+table{width:100%;border-collapse:collapse;margin:0 0 20px;font-size:13.5px}
+th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+th{color:var(--gold);background:var(--card)}
 .toc a{display:block;padding:9px 12px;border-bottom:1px solid var(--line);color:var(--fg)}
 .toc a:hover{background:var(--card);text-decoration:none}
+.toc a.bian{color:var(--gold);font-weight:600}
+.toc a.chap{padding-left:30px}
 .nav2{display:flex;justify-content:space-between;gap:12px;margin-top:44px;
 border-top:1px solid var(--line);padding-top:18px;font-size:14px}
 .foot{margin-top:50px;color:var(--dim);font-size:12.5px;text-align:center}
@@ -26,7 +29,22 @@ border-top:1px solid var(--line);padding-top:18px;font-size:14px}
 <p>先说清楚这一章能做到什么、不能做到什么。它不引入任何新的经验材料，只用前四编已经定义过的量。它所建立的关系，全部是从这些量的定义直接推出的会计恒等式或队列约束，而不是经验规律。这意味着两件事：其一，这些关系不需要新数据就可以在既有日志上检验；其二，如果检验不通过，被推翻的不是某个经验假设，而是某一个读数的定义本身出了问题——这比推翻一条经验命题更severe，也更有价值。</p>
 <h2>二、记号</h2>
 <p>沿用枢纽章的记号，并把其余各项接进来。</p>
-<p>| 符号 | 名称 | 出处 ||---|---|---|| N | 一轮的投递总量 | 枢纽章 || ∏p | 各关通过率之积 | 第三章 || K | 下游一轮可过目的产能（份数） | 枢纽章 || u | 未阅率 | 第一章 || δ | 暗基线抬升度 | 第二章 || s | 饱和关占比 | 第三章 || a | 认领占比 | 第四章 || τ | 辨认转嫁比 | 第五章 || w | 无量期占比 | 第六章 || m | 并项率 | 第七章 || k | 种类留存率 | 第八章 || e | 无验收期占比 | 第九章 || σ | 停养率 | 第十章 |</p>
+<table>
+<tr><th>符号</th><th>名称</th><th>出处</th></tr>
+<tr><td>N</td><td>一轮的投递总量</td><td>枢纽章</td></tr>
+<tr><td>∏p</td><td>各关通过率之积</td><td>第三章</td></tr>
+<tr><td>K</td><td>下游一轮可过目的产能（份数）</td><td>枢纽章</td></tr>
+<tr><td>u</td><td>未阅率</td><td>第一章</td></tr>
+<tr><td>δ</td><td>暗基线抬升度</td><td>第二章</td></tr>
+<tr><td>s</td><td>饱和关占比</td><td>第三章</td></tr>
+<tr><td>a</td><td>认领占比</td><td>第四章</td></tr>
+<tr><td>τ</td><td>辨认转嫁比</td><td>第五章</td></tr>
+<tr><td>w</td><td>无量期占比</td><td>第六章</td></tr>
+<tr><td>m</td><td>并项率</td><td>第七章</td></tr>
+<tr><td>k</td><td>种类留存率</td><td>第八章</td></tr>
+<tr><td>e</td><td>无验收期占比</td><td>第九章</td></tr>
+<tr><td>σ</td><td>停养率</td><td>第十章</td></tr>
+</table>
 <p>另设三个辅助量，都是可从工时记录直接读出的常数：h 为被评价方为使一件产出可被辨认所追加的平均工时，c 为评价方核实一件产出的平均工时，A 为一轮的录取数。</p>
 <h2>三、第一条：拥堵参数把四项拴在一起</h2>
 <p>枢纽章给出 u = max(0, 1 − K/(N·∏p))。把括号里那一项记作拥堵参数：</p>
@@ -84,4 +102,4 @@ border-top:1px solid var(--line);padding-top:18px;font-size:14px}
 <p>其三，把 m 算出来之后，u 的跨期上升消失。则第一章观测到的未阅率上升是计数约定变化的假象，本书编一的经验基础被抽掉一半。</p>
 <p>其四，k 与 r_eff 无关。若在类别数显著下降的体系里，判定结果对内容的依赖并未下降，则第八章的核心主张不成立。</p>
 <p>其五，也是最根本的一条：σ 上升多年之后，前八项读数并未随之恶化。则编四与前三编之间没有那个接口，本书的四编不构成一本书，只是十篇各自成立的文章的合集。</p>
-<p>最后一条值得单独说一句。它是本书唯一一条关于这本书自身结构的证伪条件：如果编四与前三编之间那个接口不存在，那么这本书的正确编法就不是四编十章加一条脊梁，而是把编四拆出去另立一册。本章把这条写在这里，是因为它比任何一章内部的证伪条件都更能决定这本书该不该存在。</p><div class="nav2"><a href="/books/m/80/text/c10/">‹ 第十章 · 没有人在养它——</a><a href="/books/m/80/text/jl/">结论 · 不发警报的危机怎么 ›</a></div><div class="foot">© 德麦国际出版社 · 王德生 ＋ Claude《判断的危机》</div></div></body></html>
+<p>最后一条值得单独说一句。它是本书唯一一条关于这本书自身结构的证伪条件：如果编四与前三编之间那个接口不存在，那么这本书的正确编法就不是四编十章加一条脊梁，而是把编四拆出去另立一册。本章把这条写在这里，是因为它比任何一章内部的证伪条件都更能决定这本书该不该存在。</p><div class="nav2"><a href="/books/m/80/text/c10/">‹ 第十章 · 没有人在养它——</a><a href="/books/m/80/text/jy/">结 语 · 不发警报的危机怎 ›</a></div><div class="foot">© 德麦国际出版社 · 王德生 ＋ Claude《判断的危机》</div></div></body></html>
