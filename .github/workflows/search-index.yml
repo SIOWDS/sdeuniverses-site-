@@ -28,6 +28,10 @@
 name: search-index
 
 on:
+  # codex-one-shot-reindex: 仅由本文件这一次变更触发，下一提交立即撤回
+  push:
+    paths:
+      - '.github/workflows/search-index.yml'
   # 【2026-07-29 二改·又改回】曾短暂恢复过 push 触发（迁 R2 之后，"每次重建都往 git
   #   写 218MB 速朽副本"这个当初砍它的理由已不存在）。但账算下来不划算：文档编号是
   #   url_list 排序后 enumerate 出来的，插一篇新文章会把其后所有编号整体后移，于是
