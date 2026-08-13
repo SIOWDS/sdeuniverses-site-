@@ -4944,9 +4944,14 @@ async function askCore(request, env, url, body, SINK) {
   //     · 每轮都跑的（深度档问答、连写）：预填时间算在平台那道 130 秒的墙里，
   //       轮次越往后上下文越厚，放开就是把撞墙提前——**这一档一个字不动**。
   const _fullRead = (mode === "distill" || mode === "paper" || mode === "polish" || mode === "synth");
-  const hist = (Array.isArray(body.hist) ? body.hist : []).slice(_fullRead ? -30 : -10)
-    .map((t) => ({ q: String((t && t.q) || "").trim().slice(0, _fullRead ? 800 : 300),
-                   a: String((t && t.a) || "").trim().slice(0, _fullRead ? 12000 : 2600) }))
+  //   [stated] 用户 2026-08-13：「把 10 轮问对都保存起来，形成一个文档，最后输入基底来进行总结，
+  //   基底可以处理很大的。」——照做：读全场的那几刀**不再截断**。
+  //   下面 40000 这个数不是预算，是防呆：深度档一轮写 1700–2100 字、涌现档约 3000 字，
+  //   四万字是任何一轮都摸不到的天花板；写它只为挡住畸形输入，不是为了省。
+  //   真正的上限是基底窗口（1M token），十轮全文才两三万字，连零头都不到。
+  const hist = (Array.isArray(body.hist) ? body.hist : []).slice(_fullRead ? -40 : -10)
+    .map((t) => ({ q: String((t && t.q) || "").trim().slice(0, _fullRead ? 2000 : 300),
+                   a: String((t && t.a) || "").trim().slice(0, _fullRead ? 40000 : 2600) }))
     .filter((t) => t.q.length >= 2);
   const histTxt = hist.map((t, i) => "〔第 " + (i + 1) + " 轮〕\n问：" + t.q + "\n答：" + (t.a || "（本轮回答未取得）")).join("\n\n");
   const roundNo = hist.length + 1;
@@ -5062,9 +5067,23 @@ async function askCore(request, env, url, body, SINK) {
   //   它却照样有本事把整轮问对拖死。所以第三轮起（hist ≥ 2）**降到普通档的检索量并跳过词表扩展**：
   //   普通档这条路从来没死过。把省下的时间全部留给作答。
   const _lateTurn = (mode === "answer" && hist.length >= 2);
+  // ⚠⚠⚠⚠ 2026-08-13 第五起，与上面第三、第四起**同一个死法**：提炼精华连跑两次都零字，
+  //   最后一条状态停在「🔎 正在检索站内语料…（+0s）」，一次心跳都没收到 —— 不到五秒就没了。
+  //   上面那两条注释早把病理写清楚了：检索段峰值内存超过单个 isolate 上限，平台无声掐断，
+  //   流干净结束、没有 error 帧。当时的修法是 `_lateTurn`：问答第三轮起整段跳过检索。
+  //   **但那一刀只保了问答。**提炼／碰撞／综合走的是 `_lightDeep`，是另一条分支，从没被保过——
+  //   而且它的检索量是全链第二大（K=40，仅次于 recommend 的 48），还要先跑一次词表扩展往返。
+  //   这一次把同一条道理补到这一档上：
+  //     · 提炼要读的是**这场问对本身**，全场轮次已经原样带在 hist 里（现在每轮多到 12000 字）；
+  //     · 站内资料在前几轮问答里早就检索过、答案已进上下文；这一遍重检的边际收益接近零，
+  //       却有本事把整个请求拖死——用户等了几分钟，拿到的是零字。
+  //   ⇒ 提炼／碰撞／综合**整段跳过**：不跑词表扩展、不取 manifest、不建 coords、不读 kw、不拉 doc。
+  //   宁可这一刀没有站内出处，也不要它没有产出。这就是本文件反复写的那条：
+  //   **正确的方向永远是「把一段搬出这次请求」，不是「把一段调小一点」。**
+  const _skipRag = _lateTurn || _lightDeep;
   const K = mode === "recommend" ? 48 : (_lightDeep ? 40 : (_lateTurn ? 20 : (deep ? Math.max(36, 120 - _thr * 24) : 20)));   // 取多少块（深度档广撒网；retrieve 只收相关块、clamp 兜底，窄问题不会被噪声塞满）
-  // 《站内资料》字数上限。_lightDeep（提炼／碰撞／综合）此前是 14000——同样是拍出来的数。
-  // 这几档一次跑完就不再跑，窗口有 1M，给它看全比省那点预填时间划算得多。
+  // 《站内资料》字数上限。⚠ `_lightDeep` 那一档现在**到不了**（见下面 _skipRag：提炼／碰撞／综合
+  // 整段跳过检索），留在这里只为一件事——万一将来把检索放回来，别又从 14000 那个拍出来的数起步。
   const CTX_MAX = _lightDeep ? 45000 : (_lateTurn ? 12000 : (deep ? Math.max(12000, 50000 - _thr * 11000) : 12000));
   // 检索用问句：连续问对时把「缘起之问」并进去做锚——第七轮问「那这一条呢」这种
   // 指代式短问，单独拿去召回只会漂走；提炼档则用全场问题一起定向。
@@ -5083,8 +5102,10 @@ async function askCore(request, env, url, body, SINK) {
   //      宁可这几轮没有站内出处，也不要整轮问对没有答案。
   let expTerms = [], expStr = "", corpus = { docs: [], secLabel: {} }, hits = [], sources = [], ctxText = "";
   const _scope = /^[a-z0-9_]{1,24}$/.test(String(body.scope || "")) ? String(body.scope) : "";
-  if (_lateTurn) {
-    _stat("🔎 第三轮起不再重跑全站检索（该用的材料已在问对上下文里），直接作答…");
+  if (_skipRag) {
+    _stat(_lateTurn
+      ? "🔎 第三轮起不再重跑全站检索（该用的材料已在问对上下文里），直接作答…"
+      : "🔎 本刀不跑全站检索：要读的是整场问对，它已原样带在上下文里（检索段是这条链上死过三次的地方）…");
   } else {
     _stat("🔎 正在检索站内语料…");
     // 【检索段也要有闸】超时就带着空资料往下走：**宁可少一份站内资料，也不要整轮没有答案**。
@@ -5460,7 +5481,13 @@ async function askCore(request, env, url, body, SINK) {
       // 规划段只需要知道「站内有些什么」，给 12000 够；正文段要逐条引，给满。
       usrOverride = "《站内资料》\n" + (ctxText.slice(0, P === 0 ? 12000 : 45000) || "（未检索到相关段落）")
         + "\n\n《缘起之问》\n" + originQ
-        + "\n\n《这场问对的全部轮次（共 " + hist.length + " 轮）》\n" + (histTxt || "（无）")
+        // 【这一整块就是「那份文档」】前端把全场问对拼成一份完整原文，一次建好、三刀共用，
+        //   逐字节相同 ⇒ 命中上游的前缀缓存（命中价约为未命中的百分之一）。所以它必须放在
+        //   会变的东西（规划清单、已写部分）**之前**：前缀一旦变了，缓存就从变动处断掉。
+        + "\n\n《整场问对全文 · 共 " + hist.length + " 轮 · 未做任何截断》\n"
+        + "（这是唯一的原始材料，也是完整的。下面每一轮都是原文，不是摘要；提炼只能从这里面提，"
+        + "凡这里没有的一律不许写进栏目——「应当交手而尚未交手的最近邻」那一栏除外。）\n\n"
+        + (histTxt || "（无）")
         + (P === 0 ? "" : (String(body.plan || "").trim()
             ? "\n\n《本次的取舍清单（你自己刚刚定下的分配，按它写）》\n" + String(body.plan).slice(0, 3000) : ""))
         + (P <= 1 ? "" : "\n\n《已写部分·开头》\n" + (String(body.head || "").slice(0, 1200) || "（缺）")
@@ -5811,8 +5838,9 @@ async function askCore(request, env, url, body, SINK) {
   // 入料也要报：放开钳位之后，「喂进去多少」与「前置花了几秒」必须能对着看，
   // 否则下一次调数又只能猜。三个数分开报——总量、其中问对多少轮多少字、站内资料多少字。
   _stat("📥 本刀入料 · 合计约 " + Math.round((sys.length + (usrOverride === null ? 0 : usrOverride.length)) / 1000)
-    + "k 字（问对 " + hist.length + " 轮 " + Math.round(histTxt.length / 1000)
-    + "k · 站内资料 " + Math.round(ctxText.length / 1000) + "k · 其余为内功心得与方法论）");
+    + "k 字（问对全文 " + hist.length + " 轮 " + Math.round(histTxt.length / 1000)
+    + "k · 站内资料 " + Math.round(ctxText.length / 1000) + "k · 其余为内功心得与方法论）"
+    + (_fullRead ? " · 全文未截断，三刀共用同一份（命中前缀缓存）" : ""));
   // 兜底重跑：关思考＋降档，逼它早点停下推演开始写。但长文模式不能降到 4000——
   // 实测 4000 tok 交出来的是一篇断在半句上的稿（线上原样：6,847 字，末句「但他输光」）。
   // 长文首发本来就已经是「满预算＋关思考」，重跑与它同形，只降一档预算逼它早点收笔。

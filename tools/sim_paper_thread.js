@@ -37,7 +37,7 @@ const full = mkHist(turns)(true);
 const _limSrc = /var lim = full \? (\d+) : \(back<2 \? (\d+) : (\d+)\);/.exec(H);
 ok(!!_limSrc, "buildHist 的三档上限抽得出来");
 const LIM_FULL = _limSrc ? Number(_limSrc[1]) : 0;
-ok(LIM_FULL >= 8000, "提炼档 full=true：每轮给到 " + LIM_FULL + " 字（提炼要看全场，且不能被砍尾）");
+ok(LIM_FULL >= 30000, "提炼档 full=true：每轮给到 " + LIM_FULL + " 字（高到任何一轮都摸不到＝实质不截断）");
 ok(full.every((t) => t.a.length === Math.min(LIM_FULL, t.a.length)), "full=true 时每轮按同一个上限给，不按新旧递减");
 ok(_limSrc && Number(_limSrc[2]) === 1600 && Number(_limSrc[3]) === 500,
   "⚠ full=false 那两档一个字没动（每轮问对自己带的上下文，放宽＝把撞墙提前）");
@@ -88,8 +88,11 @@ const mR = /\.slice\(_fullRead \? -(\d+) : -(\d+)\)/.exec(W);
 ok(!!mR && Number(mR[1]) > Number(mR[2]) && Number(mR[2]) === 10,
   "worker：读全场取 " + (mR && mR[1]) + " 轮，其余仍钳到 10 轮");
 const mA = /a: String\(\(t && t\.a\) \|\| ""\)\.trim\(\)\.slice\(0, _fullRead \? (\d+) : (\d+)\)/.exec(W);
-ok(!!mA && Number(mA[1]) >= 8000 && Number(mA[2]) === 2600,
-  "worker：单轮答案读全场时给 " + (mA && mA[1]) + " 字，其余仍是 2600");
+ok(!!mA && Number(mA[1]) >= 30000 && Number(mA[2]) === 2600,
+  "worker：单轮答案读全场时给 " + (mA && mA[1]) + " 字（实质不截断），其余仍是 2600");
+/* 前后端两个上限必须一致：前端先截一刀、服务端再截一刀，取的是两者的小值——
+   任何一处忘了改，「不截断」就只是半句话。 */
+ok(LIM_FULL === Number(mA && mA[1]), "前端与服务端的上限是同一个数 · 前端 " + LIM_FULL + " / 服务端 " + (mA && mA[1]));
 ok(W.indexOf("const roundNo = hist.length + 1;") > 0, "worker：算得出这是第几轮");
 ok(W.indexOf("const originQ = hist.length ? hist[0].q : q;") > 0, "worker：缘起之问 = 第一轮的问题");
 ok(W.indexOf('const rq = _lightDeep') > 0, "worker：检索用问句按模式分流（distill 与碰撞/提炼同走 _lightDeep）");
@@ -189,6 +192,13 @@ ok((bAsk4.match(/finishAsk\(ansEl, gotErr, lastStat\)/g) || []).length >= 2, "�
    检索时间与预填时间都算在平台那道 130 秒的墙里，而历轮上下文本身还在变长。 */
 console.log("— 九、轮次越后、资料越少 —");
 ok(/const _thr = \(mode === "answer" && hist\.length\)/.test(W), "阶梯只对深度档连续问对生效（不影响成文／提炼／盲评）");
+/* 【2026-08-13 第五起线上故障的修法】提炼连跑两次零字，最后一步停在「🔎 正在检索站内语料…（+0s）」、
+   一次心跳都没有——与 2026-08-10 第三、第四起同一个死法（检索段峰值内存超 isolate 上限，
+   平台无声掐断）。当时的 `_lateTurn` 只保了问答；提炼走 `_lightDeep`，从没被保过，
+   而它的检索量是全链第二大。现在整段跳过：要读的是整场问对，它已原样带在上下文里。 */
+ok(/const _skipRag = _lateTurn \|\| _lightDeep;/.test(W), "提炼／碰撞／综合也整段跳过全站检索（这条链上死过三次的地方）");
+ok(/if \(_skipRag\) \{/.test(W), "跳过分支真的挂在 _skipRag 上（算对了没接上等于没改）");
+ok(/本刀不跑全站检索：要读的是整场问对/.test(W), "跳过的理由印在屏幕上，不是静默省掉一步");
 const mK = W.match(/const K = mode === "recommend" \? 48 : \(_lightDeep \? 40 : \(_lateTurn \? 20 : \(deep \? ([^:]*) : 20\)\)\);/);
 const mC = W.match(/const CTX_MAX = _lightDeep \? \d+ : \(_lateTurn \? 12000 : \(deep \? ([^:]*) : 12000\)\);/);
 ok(!!mK && !!mC, "K 与 CTX_MAX 都改成了随轮次递减");
@@ -224,13 +234,14 @@ ok(/const _lateTurn = \(mode === "answer" && hist\.length >= 2\);/.test(W),
   "第三轮起认作 late turn（只对问答生效，不碰成文／提炼／盲评）");
 /* 降量不够：轻量档照样死，而且**超时闸没响**（二十秒内就被杀）⇒ 不是慢，是峰值内存。
    改成第三轮起**整段跳过**：不取 manifest、不建 coords、不读 kw、不拉 doc。 */
-const iLate = W.indexOf("if (_lateTurn) {");
+const iLate = W.indexOf("if (_skipRag) {");
 const iElse = W.indexOf("_stat(\"\ud83d\udd0e 正在检索站内语料…\")");
-ok(iLate > 0 && iElse > iLate, "检索整段被包在 if (_lateTurn) … else … 里");
+ok(iLate > 0 && iElse > iLate, "检索整段被包在 if (_skipRag) … else … 里");
 const lateBlk = W.slice(iLate, iElse);
 ok(!/sdeExpandQuery/.test(lateBlk) && !/lightRetrieve/.test(lateBlk),
   "late turn 那一支里**一次检索都没有**（既不扩词也不召回）");
-ok(/不再重跑全站检索/.test(lateBlk), "跳过时在状态里明说一句，不惄惄地少一段资料");
+ok(/不再重跑全站检索/.test(lateBlk) && /本刀不跑全站检索/.test(lateBlk),
+  "两种跳过各自在状态里明说一句（问答第三轮起／提炼碰撞综合），不静默少一段资料");
 ok(/let expTerms = \[\], expStr = "", corpus = /.test(W),
   "检索产物改成 let 并给了空初值（跳过时下游照样能用）");
 ok(/_raceRag = \(p, fb\) =>/.test(W) && /Promise\.race\(\[_q,/.test(W) && /_ragCut = true; r\(fb\);/.test(W),

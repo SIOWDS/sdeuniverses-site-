@@ -159,7 +159,10 @@ const freshWorker = async () => (await import("../src/worker.js?sim=" + (++_mn))
   {
     const { env } = makeEnv({ idxThrow: true });
     installFetch();
-    const resp = await worker.fetch(askReq({ q: "意义为什么会磨损", mode: "collide", way: 1 }), env, {});
+    /* ⚠ 2026-08-13 起 collide/distill/synth **整段跳过检索**（见 _skipRag），
+       索引根本不会被读到，用它来测「索引炸了」等于什么都没测。
+       换成首轮深度档问答——它仍然走完整检索，这条保证才有东西可测。 */
+    const resp = await worker.fetch(askReq({ q: "意义为什么会磨损", deep: true }), env, {});
     ok(resp.status === 200, "HTTP 仍是 200（异常没有甩给平台）");
     const evs = await drain(resp);
     ok(evs.some((e) => e.t === "error"), "流里给出了 error 事件：" + JSON.stringify((evs.find((e) => e.t === "error") || {}).v || "").slice(0, 60));

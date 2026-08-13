@@ -112,20 +112,35 @@ console.log("— 四之二、入料上限：读全场的那几刀要看得全（
   const mSlice = /\.slice\(_fullRead \? -(\d+) : -(\d+)\)/.exec(W);
   ok(!!mSlice && Number(mSlice[1]) > Number(mSlice[2]), "读全场时取更多轮次 · 实得 " + (mSlice && mSlice[1]) + " vs " + (mSlice && mSlice[2]));
   const mAns = /a: String\(\(t && t\.a\) \|\| ""\)\.trim\(\)\.slice\(0, _fullRead \? (\d+) : (\d+)\)/.exec(W);
-  ok(!!mAns && Number(mAns[1]) >= 8000,
-    "每轮答案不再被砍尾（≥8000 字，此前 2600 卡在每轮实际字数的边界上）· 实得 " + (mAns && mAns[1]));
+  /* 深度档一轮写 1700–2100 字、涌现档约 3000 字 —— 上限要高到任何一轮都摸不到，
+     那才叫「不截断」；两万字只是把最长的那几轮放过，仍是个会咬人的数。 */
+  ok(!!mAns && Number(mAns[1]) >= 30000,
+    "每轮答案实质不再截断（上限高到任何一轮都摸不到）· 实得 " + (mAns && mAns[1]));
   ok(!!mAns && Number(mAns[2]) === 2600,
     "⚠ 每轮都要跑的那一档**一个字没动**：它的预填时间算在平台 130 秒的墙里，放宽＝把撞墙提前 · 实得 " + (mAns && mAns[2]));
   const mCtx = /const CTX_MAX = _lightDeep \? (\d+)/.exec(W);
   ok(!!mCtx && Number(mCtx[1]) >= 40000, "《站内资料》上限同步放开 · 实得 " + (mCtx && mCtx[1]));
-  ok(/本刀入料 · 合计约/.test(W) && /问对 " \+ hist\.length \+ " 轮/.test(W),
+  ok(/本刀入料 · 合计约/.test(W) && /问对全文 " \+ hist\.length \+ " 轮/.test(W),
     "入料字数印在屏幕上（放开了钳位，就必须能和「前置几秒」对着看，否则下次又只能猜）");
+  /* 用户口径：十轮问对做成**一份文档**送进去。三刀共用同一份、逐字节相同 ⇒ 命中前缀缓存，
+     所以它必须排在会变的东西（规划清单、已写部分）之前——前缀一变，缓存就从变动处断掉。 */
+  ok(/《整场问对全文 · 共 " \+ hist\.length \+ " 轮 · 未做任何截断》/.test(W),
+    "全场问对以「一份完整文档」的名义送进去，并写明未截断");
+  ok(/这是唯一的原始材料，也是完整的/.test(W), "并告诉基底：只能从这份文档里提");
+  for (const [n, X] of [["规划段", B0], ["第一段", B1], ["第二段", B2]]) {
+    const iDoc = X.usrOverride.indexOf("《整场问对全文");
+    const iPlan = X.usrOverride.indexOf("《本次的取舍清单》");
+    const iWrit = X.usrOverride.indexOf("《已写部分");
+    ok(iDoc > 0, n + "：文档在位");
+    ok(iPlan < 0 || iDoc < iPlan, n + "：文档排在会变的规划清单之前（否则前缀缓存断在这里）");
+    ok(iWrit < 0 || iDoc < iWrit, n + "：文档排在会变的已写部分之前");
+  }
 }
 
 console.log("— 五、代价记明账 —");
 const extra = GUIDE.length;
 ok(extra > 1500 && extra < 6000, "方法论块在两千字量级（不是节选、也没膨胀）· 实得 " + extra + " 字");
-console.log("  （一刀入料现为：内功≈3.3万字 ＋ 心得 ＋ 方法论 " + extra + " 字 ＋ 本步工序约 1.2 千字 ＋ 站内资料≤4.5万 ＋ 全场问对≤30轮×1.2万；合计仍远小于 1M 窗口）");
+console.log("  （一刀入料现为：内功≈3.3万字 ＋ 心得 ＋ 方法论 " + extra + " 字 ＋ 本步工序约 1.2 千字 ＋ 站内资料 0（检索已整段跳过）＋ 整场问对全文·未截断；十轮全文约两三万字，远小于 1M 窗口）");
 
 console.log("\n===== " + P + " PASS / " + F + " FAIL =====");
 process.exit(F ? 1 : 0);
