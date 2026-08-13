@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build and strictly validate v1.0 companion essays for /confluence/.
+"""Build and strictly validate v1.1 companion essays for /confluence/.
 
 Sources live at public/confluence/<slug>/{explained,applied}/source.txt and use
 the editor-facing TITLE/SUB/ABS + ``== heading`` format.  This builder refuses
@@ -51,7 +51,8 @@ BANNED_TRANSITIONS = [
     "从承受结果的一端看", "把时间顺序放回来", "让类比保持在同一条线上", "只看可核材料时",
     "把额外代价记入同一本账", "回到现场执行", "从失败后的去向看", "在不扩大采集的前提下",
     "把权限和动作并列后", "把复核责任写清后", "在这次最小试点里", "沿着回告路径检查",
-    "从对象权利一端看",
+    "从对象权利一端看", "具体到这篇母文", "回到母文提出的问题", "在这个日常场景里",
+    "沿着这条形成路径", "具体到这套流程",
 ]
 
 # The v2 editorial audit is deliberately explicit: these are the mother
@@ -101,6 +102,13 @@ ANALOGY_TAGS = {
     "trace-replicability": "那枚印", "suture-to-death": "那团面", "individuation-genesis": "那只箱",
     "closure-residual-gate": "那块牌",
 }
+SCENE_HEADINGS = {
+    "measurable-face": "先看果园门口那只筐", "before-measurement": "先看一场画错线的比赛",
+    "defensive-sedimentation": "先看一堵反复被撞的院墙", "inaccessible-original": "先看一张丢失的祖传菜谱",
+    "discriminative-competence": "先看一次请人代选茶", "binding-fails-where-needed": "先看一扇夜间门禁",
+    "trace-replicability": "先看两间办公室的同样红印", "suture-to-death": "先看一团越揉越光滑的面",
+    "individuation-genesis": "先看车站里两只黑箱", "closure-residual-gate": "先看一家停止接单的餐馆",
+}
 HAN_RE = re.compile(r"[\u3400-\u4dbf\u4e00-\u9fff]")
 NUMBERED_HEADING_RE = re.compile(r"^(?:[一二三四五六七八九十百]+[、．.：:]|第[一二三四五六七八九十百\d]+[章节步])")
 
@@ -144,18 +152,18 @@ def parse_source(path: Path) -> Essay:
 
 def validate(path: Path, slug: str, mode: str, essay: Essay) -> None:
     errors: list[str] = []
-    if essay.han < 4800:
-        errors.append(f"body has {essay.han} Han characters; needs >=4800")
-    if not 14 <= len(essay.sections) <= 24:
-        errors.append(f"has {len(essay.sections)} sections; needs 14-24")
+    if essay.han < 5000:
+        errors.append(f"body has {essay.han} Han characters; needs >=5000")
+    if not 12 <= len(essay.sections) <= 24:
+        errors.append(f"has {len(essay.sections)} sections; needs 12-24")
     headings = [h for h, _ in essay.sections]
     for required in FIXED[mode]:
         if headings.count(required) != 1:
             errors.append(f"fixed heading {required!r} must occur exactly once")
     for heading, body in essay.sections:
         count = len(HAN_RE.findall(body))
-        if not 350 <= count <= 500:
-            errors.append(f"section {heading!r} has {count} Han characters; needs 350-500")
+        if not 350 <= count <= 450:
+            errors.append(f"section {heading!r} has {count} Han characters; needs 350-450")
         if NUMBERED_HEADING_RE.search(heading):
             errors.append(f"section heading is manually numbered: {heading!r}")
     all_text = "\n".join([essay.title, essay.sub, essay.abstract, essay.body])
@@ -178,19 +186,35 @@ def validate(path: Path, slug: str, mode: str, essay: Essay) -> None:
         leaked = [term for term in BANNED if term in all_text and not any(term in keyword for keyword in allowed)]
         if leaked:
             errors.append("banned terms leaked: " + ", ".join(leaked))
-        if not essay.sections or essay.sections[0][0] != "先把母文关键词说清":
-            errors.append("first section must be '先把母文关键词说清'")
+        if not essay.sections or essay.sections[0][0] != SCENE_HEADINGS[slug]:
+            errors.append(f"first section must be the full scene {SCENE_HEADINGS[slug]!r}")
+        elif len(HAN_RE.findall(essay.sections[0][1])) < 200:
+            errors.append("the full analogy scene must contain at least 200 Han characters")
+        elif ANALOGY_TAGS[slug] not in essay.sections[0][1]:
+            errors.append(f"analogy scene must establish short tag {ANALOGY_TAGS[slug]!r}")
+        if len(essay.sections) < 2 or essay.sections[1][0] != "母文真正增加了什么":
+            errors.append("second section must be '母文真正增加了什么'")
         else:
-            opening = essay.sections[0][1]
+            opening = essay.sections[1][1]
             for keyword in allowed:
                 if all_text.count(keyword) < 2:
                     errors.append(f"mother keyword {keyword!r} occurs fewer than twice")
                 if not re.search(rf"母文把这个叫[“「]?{re.escape(keyword)}[”」]?", opening):
                     errors.append(f"mother keyword {keyword!r} lacks an opening plain-language translation")
-        if len(essay.sections) < 2 or len(HAN_RE.findall(essay.sections[1][1])) < 200:
-            errors.append("the single full analogy scene must be section 2 and contain at least 200 Han characters")
-        elif ANALOGY_TAGS[slug] not in essay.sections[1][1]:
-            errors.append(f"analogy scene must establish short tag {ANALOGY_TAGS[slug]!r}")
+        scene = essay.sections[0][1] if essay.sections else ""
+        premature = [keyword for keyword in allowed if keyword in scene]
+        if premature:
+            errors.append("scene gives away mother terminology before the plain-language turn: " + ", ".join(premature))
+        if len(essay.sections) >= 7:
+            for heading, body in essay.sections[2:7]:
+                if "少掉" not in body:
+                    errors.append(f"causal section {heading!r} must state what changes when this step is missing")
+        required_order = ["回到这个日常场景", "把类比再推一步", "与三位最近理论逐一划界", "什么观察会让这个判断失效", "它不能被这样误用"]
+        positions = [headings.index(h) if h in headings else -1 for h in required_order]
+        if -1 in positions or positions != sorted(positions):
+            errors.append("scene return, long-run projection, boundary, falsifier, and misuse sections must all appear in that order")
+        elif "不对应" not in essay.sections[positions[0]][1]:
+            errors.append("return-to-scene section must name at least one non-correspondence")
         back_half = "\n".join(body for _, body in essay.sections[len(essay.sections) // 2 :])
         for person, work in OPPONENTS[slug]:
             if person not in back_half or work not in back_half:
@@ -198,6 +222,15 @@ def validate(path: Path, slug: str, mode: str, essay: Essay) -> None:
         if back_half.count("他解释") < 2 or back_half.count("母文解释") < 2 or back_half.count("分开") < 2:
             errors.append("boundary must state what opponents explain, what the mother explains, and what observation separates them")
     else:
+        required_front = ["这套方法做什么、不做什么", "先守住边界", "先定位：问题究竟卡在哪一环", "一张不下结论的事实底稿"]
+        if headings[:4] != required_front:
+            errors.append(f"practice must open with v1.1 front matter in order: {required_front}")
+        if essay.sections and essay.sections[0][1].count("不负责") < 3:
+            errors.append("scope section must state three explicit '不负责' boundaries")
+        if len(essay.sections) > 1:
+            for token in ("拒绝", "退出", "删除", "通知", "升级"):
+                if token not in essay.sections[1][1]:
+                    errors.append(f"early boundary section lacks executable safeguard {token!r}")
         for term in PRACTICE_TERMS[slug]:
             if all_text.count(term) < 2:
                 errors.append(f"mother-derived practice term {term!r} occurs fewer than twice")
@@ -208,6 +241,48 @@ def validate(path: Path, slug: str, mode: str, essay: Essay) -> None:
         for question in questions:
             if essay.body.count(question) > 3:
                 errors.append(f"diagnostic question is repeated too often: {question!r}")
+        if len(essay.sections) > 3 and not all(token in essay.sections[3][1] for token in ("事实", "推断")):
+            errors.append("fact sheet must separate facts from inferences")
+        if "角色与权限分开" not in headings:
+            errors.append("practice lacks a dedicated role-and-permission section")
+        else:
+            role_i = headings.index("角色与权限分开")
+            role_body = essay.sections[role_i][1]
+            for token in ("执行者", "决策者", "复核者", "对象", "原决策者不得独自复核自己"):
+                if token not in role_body:
+                    errors.append(f"role section lacks {token!r}")
+            action_sections = essay.sections[4:role_i]
+            if not 3 <= len(action_sections) <= 5:
+                errors.append(f"practice needs 3-5 action sections before roles; found {len(action_sections)}")
+            for heading, body in action_sections:
+                checks = {
+                    "动作甲": "动作甲" in body,
+                    "动作乙": "动作乙" in body,
+                    "负责人": "负责人" in body or "负责" in body or "执行" in body,
+                    "复核者": "复核者" in body or "复核" in body,
+                    "时限": "时限" in body,
+                    "禁止": "禁止" in body,
+                }
+                for token, present in checks.items():
+                    if not present:
+                        errors.append(f"action section {heading!r} lacks {token!r}")
+        tail_order = ["读数、采集办法与代价", "最容易把方法做坏的三种方式", "什么时候应该停，什么时候说明理论可能不对"]
+        tail_positions = [headings.index(h) if h in headings else -1 for h in tail_order]
+        if -1 in tail_positions or tail_positions != sorted(tail_positions):
+            errors.append("readings, three failure modes, and stop section must appear in that order")
+        else:
+            readings = essay.sections[tail_positions[0]][1]
+            for term in PRACTICE_TERMS[slug]:
+                line = next((line for line in readings.splitlines() if term in line), "")
+                for token in ("来源", "频率", "缺失", "反向优化", "改善上限"):
+                    if token not in line:
+                        errors.append(f"reading {term!r} lacks {token!r}")
+            bad = essay.sections[tail_positions[1]][1]
+            if len([line for line in bad.splitlines() if line.startswith("- ")]) != 3 or bad.count("保护") < 3:
+                errors.append("failure-mode section must contain exactly three modes, each with a protection")
+            stop = essay.sections[tail_positions[2]][1]
+            if "操作停手线" not in stop or "理论撤回线" not in stop:
+                errors.append("stop section must separate operational stop from theoretical withdrawal")
     if errors:
         raise ValueError(f"{path}:\n  - " + "\n  - ".join(errors))
 
