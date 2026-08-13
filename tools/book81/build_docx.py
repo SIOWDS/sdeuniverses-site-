@@ -2,14 +2,15 @@
 """《判断的危机》docx 构建 · 170×240mm · 完整体例"""
 import re, os
 from docx import Document
-from docx.shared import Pt, Mm, RGBColor
-from docx.enum.text import WD_ALIGN_PARAGRAPH
+from docx.shared import Pt, Mm, RGBColor, Inches
+from docx.enum.text import WD_ALIGN_PARAGRAPH, WD_TAB_ALIGNMENT, WD_TAB_LEADER
 from docx.oxml.ns import qn
 from docx.oxml import OxmlElement
 
 SRC = '/home/claude/book81/manuscript.md'
 OUT = '/home/claude/book81/答案随时可得之后.docx'
 SERIF, SANS = 'Noto Serif CJK SC', 'Noto Sans CJK SC'
+PAGEMAP = '/home/claude/book81/pagemap.json'
 INK, ACC, ACC2 = RGBColor(0x1A, 0x1A, 0x1A), RGBColor(0x1D, 0x39, 0x55), RGBColor(0x7A, 0x93, 0xAE)
 
 doc = Document()
@@ -154,32 +155,6 @@ para('SDE UNIVERSES', size=8.5, align=WD_ALIGN_PARAGRAPH.CENTER, indent=0, befor
      color=ACC2, name=SANS)
 pagebreak()
 
-# ---------- 出版信息页 ----------
-para('出版信息', size=15, bold=True, align=WD_ALIGN_PARAGRAPH.CENTER, indent=0, after=16, color=ACC)
-INFO = [('书　　名', '答案随时可得之后'),
-        ('副　　题', '论知识不是存量，及重新推出它的那一段为何不入账'),
-        ('著　　者', '王德生 ＋ Claude'),
-        ('出版发行', '德麦国际出版社　Demai International Press'),
-        ('版　　次', '2026 年 8 月第 1 版第 1 次印刷'),
-        ('开　　本', '16 开　170mm × 240mm'),
-        ('字　　数', '约 18.6 万汉字'),
-        ('专著编号', '德麦国际专著第 81 号'),
-        ('I S B N', '979-8-90690-014-2'),
-        ('定　　价', 'US$23.50'),
-        ('分　　类', '人工智能 / 知识论 / 学习科学 / 教育评价 / 组织研究')]
-for k, v in INFO:
-    p = doc.add_paragraph(); p.paragraph_format.first_line_indent = Pt(0)
-    p.paragraph_format.space_after = Pt(3)
-    setfont(p.add_run(k + '　'), SANS, 9.5, True, ACC)
-    setfont(p.add_run(v), SERIF, 9.5)
-para('', after=10)
-for s in ['本书十章原为「学科通融」专栏已发表长文，编号为之三十一、之四、之十五、之九十一、之三十七、之九十二、之十九、之二十七、之六十四、之五，发表于二〇二六年七至八月，作者王德生＋Claude。装书改动限于三处：篇内自称由「本文」改为「本章」；对本书之外专栏文章的引用改为「学科通融专栏之N」；各章末参考文献抽出合并为书末分章文献表。正文内容未作删改。',
-          '十二种读法、前言、导读、导论、四篇编序、枢纽章、合章、结语、三附录与后记为装书时新写，约三万三千字。按本栏规程，参与写作者不得为本书出具创新智商认证分；盲评待未参与写作的一方独立完成后公布。',
-          '版权所有　侵权必究。本书内容可自由引用与批评，引用时请注明出处。']:
-    para(s, after=7)
-pagebreak()
-
-
 def is_h1(b): return b.startswith('# ') or b.startswith('## ')
 def h1txt(b): return b.split(' ',1)[1].strip()
 def is_bian(b): return bool(b.startswith('# ') and re.match(r'^第[一二三四]编', h1txt(b)))
@@ -189,14 +164,32 @@ def is_h4(b): return b.startswith('#### ')
 
 
 # ---------- 目录 ----------
+import json as _json
+PMAP = {}
+if os.path.exists(PAGEMAP):
+    PMAP = _json.load(open(PAGEMAP, encoding='utf-8'))
+
+
+def norm(x):
+    return re.sub(r'[\s·　]+', '', x)
+
+
 para('目　录', size=15, bold=True, align=WD_ALIGN_PARAGRAPH.CENTER, indent=0, after=16, color=ACC)
 for b in blocks:
     if is_h1(b):
         t = h1txt(b)
         isb = is_bian(b)
         ischap = is_chap(b)
-        para(t, size=11 if isb else 10, bold=isb, indent=14 if ischap else 0,
-             after=4, before=7 if isb else 0, color=ACC if isb else INK)
+        pg = PMAP.get(norm(t))
+        p = doc.add_paragraph()
+        f = p.paragraph_format
+        f.space_before, f.space_after = Pt(7 if isb else 0), Pt(4)
+        f.first_line_indent = Pt(0)
+        f.left_indent = Pt(14 if ischap else 0)
+        f.tab_stops.add_tab_stop(Inches(5.42), WD_TAB_ALIGNMENT.RIGHT, WD_TAB_LEADER.DOTS)
+        setfont(p.add_run(t), SERIF, 11 if isb else 10, isb, ACC if isb else INK)
+        if pg:
+            setfont(p.add_run('\t' + str(pg)), SANS, 9, False, ACC2)
 pagebreak()
 add_footer()
 add_header()
