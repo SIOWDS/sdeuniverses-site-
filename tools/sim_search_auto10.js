@@ -155,7 +155,11 @@ ok(/if\(!confirm\(/.test(bAuto) && /系统密钥/.test(bAuto), "开跑前必须�
    次数从此**跟着 BRIEF_PARTS 的段数走**，不许写死——手抄一个 12 只会在下次改段数时安静失效。 */
 ok(/var calls=4\+\(triOn\?7:\(1\+BRIEF_PARTS\.length\)\)\+4\+1;/.test(bAuto),
   "报给用户的调用次数按段数现算（四批问对 ＋ 提炼 1+段数 ＋ 成文四段 ＋ 盲评）");
-const nParts = (H.match(/\{min:\d+,name:'第[一二三四]段'/g) || []).length;
+/* ⚠ 只在 BRIEF_PARTS 这一块里数，别全文宽搜——见 sim_brief_four_parts 里同一条注释。 */
+const _bpA = H.indexOf("var BRIEF_PARTS=[");
+const _bpB = H.indexOf("];", _bpA);
+const nParts = (_bpA > 0 && _bpB > _bpA) ? (H.slice(_bpA, _bpB).match(/\{min:\d+,name:/g) || []).length : -1;
+ok(nParts > 0, "数得出 BRIEF_PARTS 的段数 · 实得 " + nParts);
 const expect = 4 + (1 + nParts) + 4 + 1;
 ok(new RegExp("约 <b>" + expect + "<\\/b> 次基底调用（开涌现档 " + (4 + 7 + 4 + 1) + " 次）").test(H),
   "说明条里的次数与公式对得上 · 提炼段数 " + nParts + " ⇒ 应为 " + expect);

@@ -53,7 +53,9 @@ const reset = (p) => { plan = p; calls = []; seeds = []; };
     "每段都有最短长度（≥1000，五千字口径下的截断闸）、段名与职能说明");
   ok(new Set(R.BRIEF_PARTS.map((p) => p.desc)).size === 2, "两段职能互不重复");
   ok(/分离点/.test(R.BRIEF_PARTS[0].desc), "第一段职能点名分离点（可裁决判据的唯一原料）");
-  ok(/最近邻/.test(R.BRIEF_PARTS[1].desc), "第二段职能点名敌意最近邻");
+  /* 2026-08-13 收短后：九栏并进第一段，第二段专写〔十〕论文观点与分章大纲。 */
+  ok(/最近邻/.test(R.BRIEF_PARTS[0].desc), "第一段职能点名敌意最近邻（九栏已并进它）");
+  ok(/分章大纲/.test(R.BRIEF_PARTS[1].desc), "第二段职能点名分章大纲（交给成文的施工图）");
   ok(R.BRIEF_PARTS !== R.PAPER_PARTS && R.PAPER_PARTS.length === 4, "入口资料两段、论文四段，各有各的表");
 
   console.log("— 二、顺利跑完四段 —");
@@ -108,8 +110,18 @@ const reset = (p) => { plan = p; calls = []; seeds = []; };
   ok(/BRIEF_SPEC\s*=\s*\{/.test(dseg) && /0:/.test(dseg) && /2:/.test(dseg), "规格写死在后端，不交给模型临场分配");
   for (const n of ["0", "1", "2"]) ok(new RegExp("^\\s*" + n + ":", "m").test(dseg), "BRIEF_SPEC 有第 " + n + " 档（0＝规划段）");
   ok(/〔规划完〕/.test(dseg) && /〔第一段完·待续〕/.test(dseg) && /〔全文完〕/.test(dseg), "三个收尾标记与前端剥标记的正则对得上");
-  ok(/4700–5300 字/.test(dseg), "正文每段约五千字（两段合计一万）");
-  ok(/合计不得超过一万/.test(dseg), "规划段明写一万字总额（用户定的硬口径：最多 1 万字）");
+  /* 【2026-08-13 收短】用户看过第一份真跑（12,526 字）后：「提炼太长了」。
+     他此前定的下限是「至少 5000 字」，所以收到约七千字——两个数都从源码抽出来验，不手抄。 */
+  /* ⚠ 锚点要够窄：`合计约 X–Y 字` 在**规划段**那一档也有（700–1100），
+     宽正则先撞上它，于是「总量够不够 5000」测的其实是规划段的字数。 */
+  const _w1 = /全部九栏\*\*，栏标题原样照抄、栏号不许重排，合计约 (\d+)–(\d+) 字/.exec(dseg);
+  const _w2 = /栏标题原样照抄，约 (\d+)–(\d+) 字/.exec(dseg);
+  ok(!!_w1 && !!_w2, "两段的字数目标都写进了提示语");
+  const total = _w1 && _w2 ? (Number(_w1[2]) + Number(_w2[2])) : 0;
+  ok(total >= 5000, "总量仍在用户定的下限 5000 字之上 · 实得上界 " + total);
+  ok(total <= 9000, "总量已收短（此前一万四千五百字）· 实得上界 " + total);
+  ok(/合计不得超过四千八百/.test(dseg), "规划段按新口径分字数（九栏 ≤4800，第十栏另算）");
+  ok(/这是一份高密度的报告，不是长文/.test(dseg), "明写「高密度、不是长文」——收短不是把每栏均匀砍一刀");
   ok(/写完比写长要紧/.test(dseg), "正文段明写「写完比写长要紧」——上一版正是最后一段写不完");
   ok(/body\.plan/.test(dseg), "正文段拿得到规划段的取舍清单");
   ok(/_briefPlan = \(mode === "distill" && part === 0\)/.test(w) && /_plainLong = _fullPower && !_briefPlan/.test(w),
@@ -169,7 +181,8 @@ const reset = (p) => { plan = p; calls = []; seeds = []; };
   ok(/gmode:'distill'/.test(bd), "透传 gmode=distill（共用续写机时靠它切后端分支）");
   ok(/missText\(r\.done, BRIEF_PARTS\)/.test(bd), "缺段说明按入口资料自己的四段表算");
   ok(/genTarget\('briefStat','bpFill','bpChars','briefBox'\)/.test(bd), "进度条与实时正文都指到 brief 那一组元素");
-  ok(/brief\.length<1500/.test(bd), "过短闸 1500（旧的 300 是三千字那一版的数）");
+  /* 门槛不再写死：跟着第一段的 min 走。段数与字数一改，写死的数就悄悄失准。 */
+  ok(/brief\.length<BRIEF_PARTS\[0\]\.min/.test(bd), "过短闸跟着第一段的 min 走，不写死一个数");
   ok(/paperHalf\(0, \{gmode:'distill'/.test(bd), "先跑一次 part=0 的规划调用（「总结要先思考」）");
   ok(/\.catch\(function\(\)\{ return ''; \}\)/.test(bd), "规划失败不阻断：拿不到清单就照旧直接写");
   ok(/if\(plan\) e\.plan=plan;/.test(bd), "拿到的清单真的透给了两段正文");
@@ -179,7 +192,13 @@ const reset = (p) => { plan = p; calls = []; seeds = []; };
      从源码把公式与说明条的数各取出来，逼它们对上——手抄一个 12 只会在下次改段数时安静失效。 */
   const mCalls = /var calls=4\+\(triOn\?7:\(1\+BRIEF_PARTS\.length\)\)\+4\+1;/.test(h);
   ok(mCalls, "调用次数按 BRIEF_PARTS 的段数现算，不写死（改段数时最容易漏的就是这一行）");
-  const nParts = (h.match(/\{min:\d+,name:'第[一二三四]段'/g) || []).length;
+  /* ⚠ 只在 BRIEF_PARTS 这一块里数：全文宽搜会把 PAPER_PARTS 的段也数进来。
+   2026-08-13 就是这么假过的一次——BRIEF_PARTS 只有 2 段（第十栏那笔改动在 git 重放时丢了），
+   宽正则却数出 3（多算了 PAPER_PARTS 的第四段），恰好凑出当时期望的 13，判据全绿而病已上线。 */
+const _bpA = h.indexOf("var BRIEF_PARTS=[");
+const _bpB = h.indexOf("];", _bpA);
+const nParts = (_bpA > 0 && _bpB > _bpA) ? (h.slice(_bpA, _bpB).match(/\{min:\d+,name:/g) || []).length : -1;
+ok(nParts > 0, "数得出 BRIEF_PARTS 的段数 · 实得 " + nParts);
   const expect = 4 + (1 + nParts) + 4 + 1;
   ok(new RegExp("约 <b>" + expect + "<\\/b> 次基底调用（开涌现档 " + (4 + 7 + 4 + 1) + " 次）").test(h),
     "说明条里的次数与公式对得上 · 段数 " + nParts + " ⇒ 应为 " + expect);
