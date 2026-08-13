@@ -8,7 +8,7 @@ NO, TITLE = '81', '答案随时可得之后'
 PDF = TITLE + '.pdf'
 DST = os.path.join(SITE, 'books/m/' + NO)
 SUB = '论知识不是存量，及重新推出它的那一段为何不入账'
-PAGES_N, WAN = '229 页', '约 17.9 万汉字'
+PAGES_N, WAN = '236 页', '约 18.3 万汉字'
 
 os.makedirs(DST, exist_ok=True)
 for f in (PDF, 'cover.jpg', 'cover-full.jpg'):

@@ -18,7 +18,7 @@ for i,title,body in refs:
     reflines.append('')
     reflines.append('## 第'+cn(i)+'章　'+title)
     reflines.append('')
-    reflines.append(body)
+    reflines.append('\n\n'.join(x.strip() for x in body.split('\n') if x.strip()))
 REF='\n'.join(reflines)
 
 parts=[
