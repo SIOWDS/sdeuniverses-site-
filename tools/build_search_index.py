@@ -68,6 +68,29 @@ def _check_stale():
             want.add(u)
 
     missing = sorted(want - have)   # 已发布但未进索引 —— 站内搜不到
+    # 生成器对「切不出一个块」的页面一律不登记（见下方 `if not doc_chunks: continue`）。
+    # 跳转桩（<meta http-equiv=refresh> 的升级/搬迁桩）正文只有一句话，属这一类，
+    # 合法缺席，不是搜不到。判据必须与 chunk_text 的块过滤一致：
+    # 去 script/style/head/nav/footer/svg 后，正文 <24 字，或中文 <6 且字母 <20。
+    # 2026-08-13：张琼并蒂文升级到 <slug>/interpretation/ 后留下 34 个 explain/practice
+    # 桩页，本自检把它们报成「已发布但搜不到」，工作流红在这一步、索引整趟不上传。
+    def _no_body(u):
+        rel = u.strip("/")
+        cand = os.path.join(PUB, rel)
+        if os.path.isdir(cand):
+            cand = os.path.join(cand, "index.html")
+        try:
+            raw = open(cand, encoding="utf-8", errors="ignore").read()
+        except OSError:
+            return False
+        for tag in ("script", "style", "head", "nav", "footer", "svg"):
+            raw = re.sub(r"<%s[^>]*>.*?</%s>" % (tag, tag), " ", raw, flags=re.S | re.I)
+        raw = re.sub(r"<!--.*?-->", " ", raw, flags=re.S)
+        body = re.sub(r"\s+", " ", htmllib.unescape(re.sub(r"<[^>]+>", " ", raw))).strip()
+        return len(body) < 24 or (len(CJK.findall(body)) < 6 and len(re.findall(r"[A-Za-z]", body)) < 20)
+
+    hollow = [u for u in missing if _no_body(u)]
+    missing = [u for u in missing if u not in set(hollow)]
     # 孤立 PDF（同目录无 index.html）由生成器以 PDF 自身 URL 建文档，是合法收录，
     # 不在 want 里但也不是死链。只报那些磁盘上真的已经没有对应文件的。
     def _exists(u):
@@ -79,6 +102,8 @@ def _check_stale():
     stale = sorted(u for u in (have - want) if not _exists(u))
 
     print("manifest 构建于 %s · 收录 %d 篇 · 磁盘 %d 篇" % (m.get("built", "?"), len(have), len(want)))
+    if hollow:
+        print("跳过无正文页（跳转桩等，生成器本就不登记）：%d 个，例：%s" % (len(hollow), hollow[0]))
     if not missing and not stale:
         print("[OK] 索引与磁盘一致")
         return 0
