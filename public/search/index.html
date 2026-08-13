@@ -631,7 +631,13 @@ function buildHist(full){
   var out=[];
   for(var i=0;i<turns.length;i++){
     var back=turns.length-1-i;
-    var lim = full ? 2600 : (back<2 ? 1600 : 500);
+    /* 【入料上限 —— 2026-08-13】full=true 的那条路（提炼／成文／打磨／综合）是「读全场」的一刀：
+       它一次跑完就不再跑，而基底窗口有 1M，此前 2600 这个数把每一轮的答案都砍着尾巴送进去
+       ——深度档一轮就写 1700–2100 字、自动十轮每轮 2000–2600 字，正好卡在边界上。
+       金点子若恰在被砍掉的尾巴里，后面装多少内功都找不回来。
+       full=false 那条（每轮问对自己带的上下文）一个字不动：它每轮都要跑，
+       预填时间算在平台那道 130 秒的墙里，放宽就是把撞墙提前。 */
+    var lim = full ? 12000 : (back<2 ? 1600 : 500);
     out.push({q:turns[i].q, a:(turns[i].a||'').slice(0,lim)});
   }
   return out;

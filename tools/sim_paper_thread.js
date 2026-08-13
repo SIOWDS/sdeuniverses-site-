@@ -31,7 +31,16 @@ const total = hist.reduce((s, t) => s + t.a.length + t.q.length, 0);
 ok(total < 12000, "十轮压缩后总量 " + total + " 字 < 12000（单轮不会被上下文烧穿）");
 
 const full = mkHist(turns)(true);
-ok(full.every((t) => t.a.length === 2600), "提炼档 full=true：每轮都给 2600 字（提炼要看全场，不能只看尾巴）");
+/* 【2026-08-13 上限抬高】2600 这个数正好卡在每轮实际字数的边界上（深度档一轮 1700–2100、
+   自动十轮每轮 2000–2600），长的那几轮是被砍着尾巴进提炼的。基底窗口有 1M，这刀砍得毫无必要。
+   ⚠ 数值从源码抽出来比，不手抄——手抄只会在下次改上限时安静失效。 */
+const _limSrc = /var lim = full \? (\d+) : \(back<2 \? (\d+) : (\d+)\);/.exec(H);
+ok(!!_limSrc, "buildHist 的三档上限抽得出来");
+const LIM_FULL = _limSrc ? Number(_limSrc[1]) : 0;
+ok(LIM_FULL >= 8000, "提炼档 full=true：每轮给到 " + LIM_FULL + " 字（提炼要看全场，且不能被砍尾）");
+ok(full.every((t) => t.a.length === Math.min(LIM_FULL, t.a.length)), "full=true 时每轮按同一个上限给，不按新旧递减");
+ok(_limSrc && Number(_limSrc[2]) === 1600 && Number(_limSrc[3]) === 500,
+  "⚠ full=false 那两档一个字没动（每轮问对自己带的上下文，放宽＝把撞墙提前）");
 ok(full.length === 10, "提炼档拿到全部十轮");
 
 turns = mk(1);
@@ -72,8 +81,15 @@ ok(H.indexOf("confirm('清空这场问对") > 0, "清空前确认（十轮问对
 
 /* ===== 三、worker 端契约 ===== */
 ok(/_MODES = \{[^}]*distill: 1/.test(W), "worker：distill 进模式白名单");
-ok(W.indexOf("const hist = (Array.isArray(body.hist) ? body.hist : []).slice(-10)") > 0, "worker：hist 钳到 10 轮");
-ok(/\.slice\(0, 2600\) \}\)\)/.test(W) || W.indexOf('a: String((t && t.a) || "").trim().slice(0, 2600)') > 0, "worker：单轮答案钳到 2600 字");
+/* 分界是「这一刀要不要读全场」：读全场的（提炼/成文/打磨/综合）一次跑完就不再跑，放开换来的是看得全；
+   每轮都跑的（深度档问答、连写）预填时间算在平台 130 秒的墙里，放宽就是把撞墙提前。 */
+ok(/const _fullRead = \(mode === "distill"/.test(W), "worker：读全场的四档单独成一个集合");
+const mR = /\.slice\(_fullRead \? -(\d+) : -(\d+)\)/.exec(W);
+ok(!!mR && Number(mR[1]) > Number(mR[2]) && Number(mR[2]) === 10,
+  "worker：读全场取 " + (mR && mR[1]) + " 轮，其余仍钳到 10 轮");
+const mA = /a: String\(\(t && t\.a\) \|\| ""\)\.trim\(\)\.slice\(0, _fullRead \? (\d+) : (\d+)\)/.exec(W);
+ok(!!mA && Number(mA[1]) >= 8000 && Number(mA[2]) === 2600,
+  "worker：单轮答案读全场时给 " + (mA && mA[1]) + " 字，其余仍是 2600");
 ok(W.indexOf("const roundNo = hist.length + 1;") > 0, "worker：算得出这是第几轮");
 ok(W.indexOf("const originQ = hist.length ? hist[0].q : q;") > 0, "worker：缘起之问 = 第一轮的问题");
 ok(W.indexOf('const rq = _lightDeep') > 0, "worker：检索用问句按模式分流（distill 与碰撞/提炼同走 _lightDeep）");
@@ -103,7 +119,8 @@ ok(W.indexOf("只写这场问对里确实出现过的内容，一个字也不许
 ok(W.indexOf("〔一手来源〕〔站内自引〕〔未核验〕") > 0, "distill：经验材料必须标证据等级");
 ok(W.indexOf("本场问对未产出") > 0, "distill：没长出来的栏目要如实留白，不许拿话填满");
 ok(W.indexOf('_lightDeep ? 40 :') > 0, "distill/碰撞/提炼：检索档下调到 40 块（装内功但不广撒网，控成本）");
-ok(W.indexOf('_lightDeep ? 14000 :') > 0, "distill/碰撞/提炼：《站内资料》钳到 14000 字");
+const mCM = /const CTX_MAX = _lightDeep \? (\d+) :/.exec(W);
+ok(!!mCM && Number(mCM[1]) >= 40000, "distill/碰撞/提炼：《站内资料》上限 " + (mCM && mCM[1]) + " 字（原 14000 是拍出来的）");
 
 /* ===== 六、手动连续问对也要层层逐深（2026-08-10 线上真故障）=====
    截图里第 1 轮与第 2 轮都是「语言是什么？」——九级追问阶梯（AUTO_LADDER）与拟题接口（nextq）
@@ -173,7 +190,7 @@ ok((bAsk4.match(/finishAsk\(ansEl, gotErr, lastStat\)/g) || []).length >= 2, "�
 console.log("— 九、轮次越后、资料越少 —");
 ok(/const _thr = \(mode === "answer" && hist\.length\)/.test(W), "阶梯只对深度档连续问对生效（不影响成文／提炼／盲评）");
 const mK = W.match(/const K = mode === "recommend" \? 48 : \(_lightDeep \? 40 : \(_lateTurn \? 20 : \(deep \? ([^:]*) : 20\)\)\);/);
-const mC = W.match(/const CTX_MAX = _lightDeep \? 14000 : \(_lateTurn \? 12000 : \(deep \? ([^:]*) : 12000\)\);/);
+const mC = W.match(/const CTX_MAX = _lightDeep \? \d+ : \(_lateTurn \? 12000 : \(deep \? ([^:]*) : 12000\)\);/);
 ok(!!mK && !!mC, "K 与 CTX_MAX 都改成了随轮次递减");
 const kFn = new Function("_thr", "return " + (mK ? mK[1] : "120") + ";");
 const cFn = new Function("_thr", "return " + (mC ? mC[1] : "50000") + ";");

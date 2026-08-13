@@ -4932,8 +4932,21 @@ async function askCore(request, env, url, body, SINK) {
   // 服务端不存任何会话状态：已完成的轮次由前端每次原样带上来（body.hist），
   // 与「用户 Key 只在内存中转发」是同一条零责任纪律。前端负责按新旧做预算截断，
   // 这里只做钳位与清洗，免得单轮把上下文撑爆。
-  const hist = (Array.isArray(body.hist) ? body.hist : []).slice(-10)
-    .map((t) => ({ q: String((t && t.q) || "").trim().slice(0, 300), a: String((t && t.a) || "").trim().slice(0, 2600) }))
+  // 【入料上限 —— 2026-08-13 用户「可以更大」】
+  //   算过一遍账才敢动：deepseek-v4-pro 的窗口是 **1M token**，而这台机器一刀喂进去的是
+  //   内功 3.3 万字 ＋ 心得 ＋ 方法论 2 千字 ＋ 站内资料 1.4 万字 ＋ 全场问对 2.6 万字 ≈ 7.5 万字，
+  //   **连窗口的一成都没用到**。真正卡人的从来不是窗口，是那些拍出来的钳位数：
+  //   每轮答案切 2600 字——而深度档一轮就写 1700–2100 字、自动十轮每轮 2000–2600 字，
+  //   正好卡在边界上，**长的那几轮是被砍着尾巴进提炼的**。金点子若恰在被砍掉的尾巴里，
+  //   后面装多少内功、走多少工序都找不回来：提炼提的是它看得见的东西。
+  //   ⚠ 但不是所有模式都该放开。分界是「这一刀要不要读全场」：
+  //     · 读全场的（提炼／成文／打磨／综合）：一次性调用，放开换来的是它看得全；
+  //     · 每轮都跑的（深度档问答、连写）：预填时间算在平台那道 130 秒的墙里，
+  //       轮次越往后上下文越厚，放开就是把撞墙提前——**这一档一个字不动**。
+  const _fullRead = (mode === "distill" || mode === "paper" || mode === "polish" || mode === "synth");
+  const hist = (Array.isArray(body.hist) ? body.hist : []).slice(_fullRead ? -30 : -10)
+    .map((t) => ({ q: String((t && t.q) || "").trim().slice(0, _fullRead ? 800 : 300),
+                   a: String((t && t.a) || "").trim().slice(0, _fullRead ? 12000 : 2600) }))
     .filter((t) => t.q.length >= 2);
   const histTxt = hist.map((t, i) => "〔第 " + (i + 1) + " 轮〕\n问：" + t.q + "\n答：" + (t.a || "（本轮回答未取得）")).join("\n\n");
   const roundNo = hist.length + 1;
@@ -5050,7 +5063,9 @@ async function askCore(request, env, url, body, SINK) {
   //   普通档这条路从来没死过。把省下的时间全部留给作答。
   const _lateTurn = (mode === "answer" && hist.length >= 2);
   const K = mode === "recommend" ? 48 : (_lightDeep ? 40 : (_lateTurn ? 20 : (deep ? Math.max(36, 120 - _thr * 24) : 20)));   // 取多少块（深度档广撒网；retrieve 只收相关块、clamp 兜底，窄问题不会被噪声塞满）
-  const CTX_MAX = _lightDeep ? 14000 : (_lateTurn ? 12000 : (deep ? Math.max(12000, 50000 - _thr * 11000) : 12000));   // 《站内资料》字数上限
+  // 《站内资料》字数上限。_lightDeep（提炼／碰撞／综合）此前是 14000——同样是拍出来的数。
+  // 这几档一次跑完就不再跑，窗口有 1M，给它看全比省那点预填时间划算得多。
+  const CTX_MAX = _lightDeep ? 45000 : (_lateTurn ? 12000 : (deep ? Math.max(12000, 50000 - _thr * 11000) : 12000));
   // 检索用问句：连续问对时把「缘起之问」并进去做锚——第七轮问「那这一条呢」这种
   // 指代式短问，单独拿去召回只会漂走；提炼档则用全场问题一起定向。
   const rq = _lightDeep
@@ -5442,7 +5457,8 @@ async function askCore(request, env, url, body, SINK) {
             + (P === 1 ? "" : "先从《已写部分·结尾》停笔处无缝续写：不重复已写内容、不重写前面几栏、栏号顺着往下编。若那最后一句断在半句，第一件事是把它补成完整句子再往下写。"))
         + "\n" + BRIEF_SPEC[P]
         + "\n最后单独一行输出：" + BRIEF_END[P];
-      usrOverride = "《站内资料》\n" + (ctxText.slice(0, P === 0 ? 4000 : 14000) || "（未检索到相关段落）")
+      // 规划段只需要知道「站内有些什么」，给 12000 够；正文段要逐条引，给满。
+      usrOverride = "《站内资料》\n" + (ctxText.slice(0, P === 0 ? 12000 : 45000) || "（未检索到相关段落）")
         + "\n\n《缘起之问》\n" + originQ
         + "\n\n《这场问对的全部轮次（共 " + hist.length + " 轮）》\n" + (histTxt || "（无）")
         + (P === 0 ? "" : (String(body.plan || "").trim()
@@ -5792,6 +5808,11 @@ async function askCore(request, env, url, body, SINK) {
   _stat("✍️ 开始作答 · 前置用掉 " + Math.round(_spent / 1000) + "s，留给写作 " + Math.round(_budget / 1000) + "s");
   _stat("⚙️ 本刀配置 · " + VC.name + " " + VC.model + " · 预算 " + (_heavy ? WDS_TOK_HEAVY : MAXTOK)
     + "（阶梯 " + _ladder.join("→") + "）· 思考" + (_plainLong ? "关" : (_VCU && _VCU.top ? "开·满功率" : "随基底默认")));
+  // 入料也要报：放开钳位之后，「喂进去多少」与「前置花了几秒」必须能对着看，
+  // 否则下一次调数又只能猜。三个数分开报——总量、其中问对多少轮多少字、站内资料多少字。
+  _stat("📥 本刀入料 · 合计约 " + Math.round((sys.length + (usrOverride === null ? 0 : usrOverride.length)) / 1000)
+    + "k 字（问对 " + hist.length + " 轮 " + Math.round(histTxt.length / 1000)
+    + "k · 站内资料 " + Math.round(ctxText.length / 1000) + "k · 其余为内功心得与方法论）");
   // 兜底重跑：关思考＋降档，逼它早点停下推演开始写。但长文模式不能降到 4000——
   // 实测 4000 tok 交出来的是一篇断在半句上的稿（线上原样：6,847 字，末句「但他输光」）。
   // 长文首发本来就已经是「满预算＋关思考」，重跑与它同形，只降一档预算逼它早点收笔。

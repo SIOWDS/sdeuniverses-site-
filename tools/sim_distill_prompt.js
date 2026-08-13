@@ -102,10 +102,30 @@ ok(B0.usrOverride.indexOf("《已写部分·开头》") < 0, "规划段不带续
 
 /* 装了方法论就是往固定前缀里再加约四千字。它是预填不是新调用，但预填时间照样算在
    平台那道墙里——所以把它记成一条明账，别让下一个人以为这是免费的。 */
+console.log("— 四之二、入料上限：读全场的那几刀要看得全（2026-08-13「可以更大」）—");
+{
+  const W = src;
+  /* 病灶：每轮答案此前切 2600 字，而深度档一轮就写 1700–2100、自动十轮每轮 2000–2600，
+     正好卡在边界上——长的那几轮是**被砍着尾巴**进提炼的。基底窗口有 1M，这刀砍得毫无必要。 */
+  ok(/const _fullRead = \(mode === "distill" \|\| mode === "paper" \|\| mode === "polish" \|\| mode === "synth"\)/.test(W),
+    "「读全场」的四档单独成一个集合（提炼／成文／打磨／综合）");
+  const mSlice = /\.slice\(_fullRead \? -(\d+) : -(\d+)\)/.exec(W);
+  ok(!!mSlice && Number(mSlice[1]) > Number(mSlice[2]), "读全场时取更多轮次 · 实得 " + (mSlice && mSlice[1]) + " vs " + (mSlice && mSlice[2]));
+  const mAns = /a: String\(\(t && t\.a\) \|\| ""\)\.trim\(\)\.slice\(0, _fullRead \? (\d+) : (\d+)\)/.exec(W);
+  ok(!!mAns && Number(mAns[1]) >= 8000,
+    "每轮答案不再被砍尾（≥8000 字，此前 2600 卡在每轮实际字数的边界上）· 实得 " + (mAns && mAns[1]));
+  ok(!!mAns && Number(mAns[2]) === 2600,
+    "⚠ 每轮都要跑的那一档**一个字没动**：它的预填时间算在平台 130 秒的墙里，放宽＝把撞墙提前 · 实得 " + (mAns && mAns[2]));
+  const mCtx = /const CTX_MAX = _lightDeep \? (\d+)/.exec(W);
+  ok(!!mCtx && Number(mCtx[1]) >= 40000, "《站内资料》上限同步放开 · 实得 " + (mCtx && mCtx[1]));
+  ok(/本刀入料 · 合计约/.test(W) && /问对 " \+ hist\.length \+ " 轮/.test(W),
+    "入料字数印在屏幕上（放开了钳位，就必须能和「前置几秒」对着看，否则下次又只能猜）");
+}
+
 console.log("— 五、代价记明账 —");
 const extra = GUIDE.length;
 ok(extra > 1500 && extra < 6000, "方法论块在两千字量级（不是节选、也没膨胀）· 实得 " + extra + " 字");
-console.log("  （固定前缀现为：内功≈3.3万字 ＋ 心得 ＋ 方法论 " + extra + " 字 ＋ 本步工序约 600 字 ＋ 站内资料≤1.4万 ＋ 全场问对≤2万）");
+console.log("  （一刀入料现为：内功≈3.3万字 ＋ 心得 ＋ 方法论 " + extra + " 字 ＋ 本步工序约 1.2 千字 ＋ 站内资料≤4.5万 ＋ 全场问对≤30轮×1.2万；合计仍远小于 1M 窗口）");
 
 console.log("\n===== " + P + " PASS / " + F + " FAIL =====");
 process.exit(F ? 1 : 0);
