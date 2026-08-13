@@ -1,0 +1,291 @@
+# -*- coding: utf-8 -*-
+"""第 81 号落地页：沿用第 80 号的 <style> 整块，只换 head meta 与 body 内容"""
+import os
+
+SITE = '/home/claude/site/public'
+src = open(f'{SITE}/books/m/80/index.html', encoding='utf-8').read()
+style = src[src.find('<style>'):src.find('</style>') + 8]
+
+HEAD = '''<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>答案随时可得之后 · 论知识不是存量 · 王德生＋Claude | 德麦国际专著</title>
+<meta name="description" content="答案随时可得之后——论知识不是存量，及重新推出它的那一段为何不入账。王德生＋Claude 著。德麦国际专著第 81 号。十个互不相同的学科组撞出的十条判断，枢纽章用一个参数把它们推成七条关系，并造出一个新对象：均浅。">
+<meta property="og:title" content="答案随时可得之后"><meta property="og:type" content="book">
+<style>
+:root{--void:#070A0F;--panel:#0C1519;--line:#17303A;--cy:#4FD8E8;--am:#FFC24A;--cydim:#2C7A88;--paper:#EDF3F5;--mute:#8AA0A9;--serif:"Noto Serif SC","Songti SC",Georgia,serif;--sans:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif;--mono:"Noto Sans Mono CJK SC","SFMono-Regular",Menlo,Consolas,monospace}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--void);color:var(--paper);font-family:var(--serif);line-height:1.95;-webkit-font-smoothing:antialiased;
+background-image:radial-gradient(circle at 50% 0,#0E2A34 0,var(--void) 60%),radial-gradient(var(--cydim) .6px,transparent .6px);
+background-size:auto,22px 22px;background-position:0 0,0 0;background-attachment:fixed,fixed}
+body::before{content:"";position:fixed;inset:0;background:var(--void);opacity:.72;pointer-events:none;z-index:-1}
+a{color:var(--cy);text-decoration:none}
+.wrap{max-width:940px;margin:0 auto;padding:0 26px}
+/* nav */
+nav{position:sticky;top:0;z-index:20;background:rgba(7,10,15,.9);backdrop-filter:blur(9px);border-bottom:1px solid var(--line)}
+nav .wrap{height:54px;display:flex;align-items:center;justify-content:space-between;font-family:var(--mono);font-size:11.5px;letter-spacing:.18em;color:var(--mute)}
+nav a:hover{color:var(--cy)}
+/* hero */
+header{padding:74px 0 10px}
+.hero{display:block}
+.herogrid{display:grid;grid-template-columns:1fr 208px;gap:52px;align-items:start}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.34em;color:var(--cy);opacity:.75}
+h1{font-family:var(--sans);font-weight:800;font-size:clamp(31px,5.6vw,54px);line-height:1.16;letter-spacing:.01em;margin:16px 0 0}
+h1 .lead{display:block;font-size:.52em;font-weight:500;letter-spacing:.34em;opacity:.72;margin-bottom:.28em}
+.sub{font-family:var(--sans);font-size:16px;color:var(--cy);opacity:.9;margin:20px 0 0;line-height:1.7}
+.byline{font-family:var(--mono);font-size:12px;color:var(--mute);margin-top:22px;letter-spacing:.08em}
+.cta{display:flex;gap:11px;flex-wrap:wrap;margin-top:30px}
+.cta a{font-family:var(--sans);font-size:14px;padding:11px 20px;border:1px solid var(--cydim);letter-spacing:.06em;transition:.18s}
+.cta a:hover{border-color:var(--cy);background:rgba(79,216,232,.08)}
+.cta a.solid{background:var(--cy);color:#061318;border-color:var(--cy);font-weight:700}
+.cta a.solid:hover{background:#7FE7F3}
+.cover{width:100%;border:1px solid var(--line);box-shadow:0 22px 60px rgba(0,0,0,.65)}
+/* signature schematic */
+.sig{margin:64px 0 0;border:1px solid var(--line);background:var(--panel);padding:28px 22px 20px}
+.sig figcaption{font-family:var(--mono);font-size:11px;letter-spacing:.2em;color:var(--cy);opacity:.7;margin-bottom:6px}
+.sig svg{width:100%;height:auto;display:block}
+.sig .note{font-family:var(--serif);font-size:14.5px;color:var(--mute);margin:14px 2px 0;line-height:1.85}
+.dw{stroke-dasharray:var(--len);stroke-dashoffset:var(--len);animation:draw 1.1s ease forwards}
+.d1{animation-delay:.15s} .d2{animation-delay:.85s} .d3{animation-delay:1.5s}
+.fi{opacity:0;animation:fade .5s ease forwards}
+.f1{animation-delay:.05s} .f2{animation-delay:1.25s} .f3{animation-delay:2.35s}
+@keyframes draw{to{stroke-dashoffset:0}} @keyframes fade{to{opacity:1}}
+@media (prefers-reduced-motion:reduce){.dw{stroke-dashoffset:0;animation:none}.fi{opacity:1;animation:none}}
+@media print{.dw{stroke-dashoffset:0;animation:none}.fi{opacity:1;animation:none}}
+/* sections */
+section{padding:66px 0 0}
+.sec-h{font-family:var(--mono);font-size:11px;letter-spacing:.32em;color:var(--cy);opacity:.7;padding-bottom:12px;border-bottom:1px solid var(--line);margin-bottom:30px}
+h2{font-family:var(--sans);font-weight:700;font-size:25px;letter-spacing:.02em;margin:0 0 16px}
+p{font-size:16.5px;color:#D3E0E4;margin:0 0 16px;text-align:justify}
+b{color:var(--paper);font-weight:700}
+/* thesis */
+.thesis{border-left:2px solid var(--cy);padding:4px 0 4px 24px;margin:0}
+.thesis p{font-family:var(--sans);font-size:19px;line-height:1.85;color:var(--paper);text-align:left;margin:0}
+/* reading paths */
+.reads{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border:1px solid var(--line)}
+.rd{padding:24px 20px;border-right:1px solid var(--line)}
+.rd:last-child{border-right:0}
+.rd-t{font-family:var(--mono);font-size:12px;letter-spacing:.26em;color:var(--cy)}
+.rd-w{font-family:var(--sans);font-size:15px;color:var(--paper);margin:12px 0 8px;line-height:1.7;text-align:left}
+.rd-d{font-size:14px;color:var(--mute);margin:0;text-align:left;line-height:1.8}
+/* spec */
+.spec{display:grid;grid-template-columns:1fr 1fr;gap:0 34px;margin:0}
+.sp{display:flex;gap:16px;padding:11px 0;border-bottom:1px solid var(--line)}
+.sp dt{font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;color:var(--mute);min-width:52px;padding-top:3px}
+.sp dd{margin:0;font-size:14.5px;color:#D3E0E4;line-height:1.7}
+/* books */
+.bk{display:grid;grid-template-columns:74px 1fr;gap:22px;padding:22px 0;border-bottom:1px solid var(--line)}
+.bk:last-child{border-bottom:0}
+.bk-n{font-family:var(--mono);font-size:12px;letter-spacing:.2em;color:var(--cy);opacity:.8;padding-top:6px}
+.bk h4{font-family:var(--sans);font-size:17px;font-weight:700;margin:0 0 7px}
+.bk p{margin:0;font-size:15.5px}
+.dialwrap{display:flex;justify-content:center;padding:6px 0 26px}
+/* picks */
+.picks{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.pk{display:block;border:1px solid var(--line);background:var(--panel);padding:24px 22px;transition:.2s}
+.pk:hover{border-color:var(--cydim);background:#0F1D22;transform:translateY(-2px)}
+.pk-n{font-family:var(--mono);font-size:11px;letter-spacing:.24em;color:var(--cy);opacity:.8}
+.pk h3{font-family:var(--sans);font-size:17.5px;font-weight:700;color:var(--paper);margin:11px 0 10px;line-height:1.5}
+.pk p{font-size:14.5px;color:var(--mute);margin:0 0 14px}
+.pk-go{font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;color:var(--cy)}
+.pk:hover .pk-go em{margin-left:5px} .pk-go em{font-style:normal;transition:.2s}
+footer{margin-top:80px;border-top:1px solid var(--line);padding:26px 0 46px;font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:var(--mute);text-align:center}
+@media(max-width:820px){
+ .herogrid{grid-template-columns:1fr} .cover{width:172px}
+ .picks,.spec{grid-template-columns:1fr}
+ .reads{grid-template-columns:1fr} .rd{border-right:0;border-bottom:1px solid var(--line)} .rd:last-child{border-bottom:0}
+ .bk{grid-template-columns:1fr;gap:8px}
+}
+:focus-visible{outline:2px solid var(--cy);outline-offset:3px}
+
+.am{color:var(--am)}
+.thesis{border-left-color:var(--am)!important}
+.sig .amnote{font-family:var(--mono);font-size:11px;letter-spacing:.2em;color:var(--am);opacity:.8}
+
+.top{position:sticky;top:0;z-index:9;background:#070A0Fe8;border-bottom:1px solid var(--line);backdrop-filter:blur(6px)}
+.topin{max-width:1000px;margin:auto;padding:12px 22px;display:flex;justify-content:space-between;font-family:var(--sans);font-size:13px;letter-spacing:.1em}
+.topin a{color:var(--mute);text-decoration:none}.topin a:hover{color:var(--cy)}
+.heroin{max-width:1000px;margin:auto;padding:64px 22px 52px}
+.pre{font-family:var(--sans);color:var(--am);letter-spacing:.16em;font-size:14px;margin-bottom:10px}
+.bt{font-size:clamp(38px,7vw,72px);line-height:1.12;margin:6px 0 14px;letter-spacing:.04em}
+.st{font-size:clamp(17px,2.4vw,22px);color:var(--cy);margin-bottom:6px}
+.st2{font-size:14px;color:var(--mute);font-family:var(--sans);margin-bottom:20px}
+.meta{font-family:var(--sans);font-size:13.5px;color:var(--mute);line-height:1.9;margin-bottom:26px}
+.acts{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+.btn{display:inline-block;padding:11px 22px;border:1px solid var(--cydim);color:var(--cy);text-decoration:none;font-family:var(--sans);font-size:14px;letter-spacing:.06em;border-radius:2px}
+.btn:hover{background:#0E2A34}
+.btn.primary{background:var(--cy);color:#04222A;border-color:var(--cy);font-weight:600}
+.btn.primary:hover{background:#7BE6F2}
+.blk{max-width:1000px;margin:0 auto;padding:44px 22px;border-top:1px solid var(--line)}
+.blk h2{font-size:clamp(21px,3vw,28px);color:var(--paper);margin:0 0 20px;letter-spacing:.04em}
+.kicker{font-family:var(--sans);font-size:12px;letter-spacing:.22em;color:var(--am);margin-bottom:14px}
+.lead2{font-size:16.5px;color:#C9D8DD;margin-top:14px}
+.cols{font-family:var(--sans);font-size:15px;color:var(--cy);letter-spacing:.04em;padding:14px 18px;border-left:2px solid var(--cydim);background:#0A1418;margin:18px 0}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(268px,1fr));gap:16px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px}
+.card{background:var(--panel);border:1px solid var(--line);padding:20px 20px 6px;border-radius:3px}
+.card p{font-size:14.6px;color:#B7C7CD;line-height:1.9}
+.cn{font-family:var(--sans);font-size:13px;letter-spacing:.14em;color:var(--am);margin-bottom:8px}
+.cd{font-family:var(--sans);font-size:12.5px;color:var(--mute);margin-bottom:10px}
+.ch{display:block;background:var(--panel);border:1px solid var(--cydim);padding:22px;text-decoration:none;border-radius:3px;transition:.2s}
+.ch:hover{background:#0E2A34;border-color:var(--cy)}
+.ch p{font-size:14.6px;color:#B7C7CD;line-height:1.9;margin:0}
+.warn{font-size:14.6px;color:#C9D8DD;background:#12100A;border-left:2px solid var(--am);padding:16px 20px;line-height:1.95}
+.ft{max-width:1000px;margin:auto;padding:34px 22px 70px;font-family:var(--sans);font-size:12.5px;color:var(--mute);letter-spacing:.06em;border-top:1px solid var(--line)}
+
+.tw{overflow-x:auto;margin:18px 0}
+.tw table{border-collapse:collapse;width:100%;font-family:var(--sans);font-size:13.5px}
+.tw th,.tw td{border:1px solid var(--line);padding:8px 10px;text-align:center;color:#B7C7CD}
+.tw th{background:#0E2A34;color:var(--cy);font-weight:600;letter-spacing:.06em}
+.tw td:first-child{text-align:left;color:var(--paper)}
+.tw td.tot{color:var(--am);font-weight:700}
+.avg{font-family:var(--sans);font-size:15px;color:var(--paper);letter-spacing:.04em;padding:12px 18px;border-left:2px solid var(--am);background:#12100A;margin:18px 0}
+.cav{border:1px solid var(--line);background:var(--panel);padding:18px 20px;border-radius:3px}
+.cav p{font-size:14px;color:#A9BAC1;line-height:1.92;margin:0 0 10px}
+.cav p:last-child{margin-bottom:0}
+
+.tg{width:100%;border-collapse:collapse;margin:18px 0;font-size:15px}
+.tg td{padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+</style>
+</head>
+<body>
+<nav class="top"><div class="topin"><a href="/browse/">SDE UNIVERSES</a><a href="/books/">← 专著栏目</a></div></nav>
+
+<header class="hero">
+<div class="heroin">
+<div class="herogrid">
+<div class="herotext">
+<div class="eyebrow">DEMAI INTERNATIONAL PRESS · 专著第 81 号</div>
+<div class="pre">两条线在这张表上，平的那条得分更高</div>
+<h1 class="bt">答案随时可得之后</h1>
+<div class="st">论知识不是存量，及重新推出它的那一段为何不入账</div>
+<div class="meta">王德生 ＋ Claude 著 · 239 页 · 十二种读法·前言·导读·导论·四编十章·枢纽章·合章·结语·参考文献·三附录·后记·十句 · 约 18.6 万汉字 · ISBN 979-8-90690-014-2 · 定价 US$23.50</div>
+<div class="acts">
+<a class="btn primary" href="/books/m/81/text/">网页版全书 · 31 页</a>
+<a class="btn" href="/books/m/81/read.html">在线翻阅 · 239 页</a>
+<a class="btn" href="/books/m/81/答案随时可得之后.pdf">下载 PDF</a>
+<a class="btn" href="#howto">怎么读这本书</a>
+<a class="btn" href="cover-full.jpg">整封大图</a>
+</div>
+<div class="note">全书的兑现物是结语给出的十项体检读数，每一项都注明数据从哪来、什么算异常、以及最容易的作弊方式。第九项「静息变异率」目前没有任何机构在常规测量——这本身就是第九章那条判断的一个读数。</div>
+</div>
+<a href="cover-full.jpg" aria-label="查看整封大图"><img class="cover" src="cover.jpg" alt="《答案随时可得之后》封面"></a>
+</div>
+</div>
+</header>
+
+<main class="wrap">
+
+<section class="blk">
+<div class="kicker">母 题 · CORE THESIS</div>
+<p class="lead">「AI 来了，知识还有价值吗」是一个被问坏了的问题。它把知识当成一批库存，把可及性当成一次降价，于是所有回答都落在同一条线上：有人说库存还值钱，有人说不值钱了。<b>两方争的是比例，共享的是同一个前提。</b></p>
+<p class="lead2">本书主张这个前提是错的：<b>知识不是被持有的存量，是每次被重新推出来的事件。所以贬值的不是知识，是「拥有」这本账——当重新推那一段被外部免费供给，账面上一栏也不会少，而下一次推所需要的东西已经不在了。</b></p>
+</section>
+
+<section class="blk">
+<h2>坏消息的形状：所有读数都会变好</h2>
+<p>如果这场损失会让某个数字变难看，这本书就没有必要写。它的麻烦在形状——它使几乎所有现行读数<b>变好</b>，而不是变坏。</p>
+<p>一批前交叉韧带重建术后的运动员做单腿跳远，患侧与健侧的距离比是<b>百分之九十七</b>，达到几乎所有回归赛场清单的标准；同一次测量里，患侧膝关节在蹬伸阶段做的功只有健侧的<b>百分之六十九</b>。跳出去的距离不知道这件事，这名运动员本人也不知道。</p>
+<p>在一个毫不相干的地方，八百七十九个职业的岗位描述上（预注册检验）：自动化程度与决策频次的相关是 <b>0.042</b>，与决策自由度的相关是 <b>−0.199</b>。<b>步骤留下，岔路删除。</b></p>
+<p>一条测的是人的膝盖，一条测的是八百七十九个职业。它们是同一句话的两次显影：<b>凡进入产物的都留下，凡不进入产物的都在退，而只有前者被记录。</b></p>
+</section>
+
+<section class="blk">
+<h2>十章，十个不同的学科组，十条判断</h2>
+<table class="tg">
+<tr><th>章</th><th>三学科组</th><th>本章命名的那个量</th></tr>
+<tr><td>一</td><td>教育心理学 × 运动学习 × 组织例程</td><td>复推率：规则不被存储，每次被重新生成；学会即重新生成的可靠性上升</td></tr>
+<tr><td>二</td><td>圣经神学 × 物理学 × 文学</td><td>追认：够不着的原物被替身占位，而这次构造随后被表述为一项发现</td></tr>
+<tr><td>三</td><td>软件工程 × 条约法 × 演化遗传学</td><td>影子正本：系统预期几份一致，却没有任何人负责让它们一致</td></tr>
+<tr><td>四</td><td>机器学习 × 免疫学 × 神经科学</td><td>借清率：学会是把有限的清晰度从相邻处搬来，没有搬走就没有学会</td></tr>
+<tr><td>五</td><td>运动控制 × 舞蹈医学 × 学习心理学</td><td>借道：换一条路达成同一结果，结果读数恒为零、省力感符号为正</td></tr>
+<tr><td>六</td><td>认知教育 × 伦理人类学 × 法哲学</td><td>带责分叉：被取消的是岔路不是步骤，因而在全部现行读数上不可见</td></tr>
+<tr><td>七</td><td>语言学 × 工程学 × 艺术学</td><td>类内距：规范只写了什么算同类，压缩「有多近」那笔功夫换个地方发生</td></tr>
+<tr><td>八</td><td>学习科学 × 专利发明人认定 × 作坊归属</td><td>记零位：成果是一个否定的那类动作，能力在共同体层面绝迹而无人察觉</td></tr>
+<tr><td>九</td><td>认知科学 × 物理学 × 工程学</td><td>静息变异：只在无人要求时存在的量，三门学科正同时花钱把它降到零</td></tr>
+<tr><td>十</td><td>美学 × 伦理学 × 知识论</td><td>鉴别独立性：选择听谁本身就是那个判断的一次完整行使</td></tr>
+</table>
+<p class="note">十组学科<b>无一重复</b>。这一点是刻意的：一本由同一组学科撞十次的书，它的书一级结论只是那一次碰撞的重复；十组各撞一次，才使「十章说的是同一件事」成为一条可以被推翻的主张。</p>
+</section>
+
+<section class="blk">
+<h2>枢纽章：一个参数，七条关系，一个新对象</h2>
+<p>枢纽章只引入一个量——<b>可及性 a</b>：面对一个具体任务，一份合格产物由外部即时供给的概率。它是技术条件，不是心理状态，可以被独立测量。</p>
+<p>由第五章的使用依赖可塑性得 <b>λ(t+1) = λ(t) + k·a·(1 − λ(t))</b>，解出 <b>λ → 1</b>：<b>只要 a 严格大于零，借道率单调升至一；a 只决定快慢，不决定终点。</b>「适度使用」因此不是一个状态，是一段速度。</p>
+<p>由第一章得 <b>ρ = ρ_max(1 − λ) → 0</b>：复推率不是被消耗的存量，是每次使用时被重新生产的能力——停止生产不等于折旧，没有半衰期，只有停产。</p>
+<p>而 <b>∂y/∂λ = 0</b>：产物型读数与借道率正交。于是<b>推论一：y 高与 ρ 低不是一对需要权衡的目标，它们是同一个 λ 的两种读法。</b>唯一读法是剥夺落差 Δ（临时封路），而<b>推论二：Δ 的价格与它的诊断价值同向随 a 上升——唯一能读出这件事的动作，恰恰在最需要它的时候最贵。</b></p>
+</section>
+
+<section class="blk">
+<h2>均浅：全书唯一造出来的那样东西</h2>
+<p>接第四章：不重推就不搬，于是借清率 <b>b → 0</b>。这看上去像好消息——不学就不必付学的代价。而把两边合起来看，得到的是一个<b>形状</b>：</p>
+<p>自己重推的人，在重推过的地方有一个<b>峰</b>，在峰的近旁有一个<b>坑</b>；峰与坑是同一次搬运的两端，不能只要一端。随时取用的人两样都没有——一片平地。本书为它命名<b>均浅</b>，配套读数是<b>锐度 κ = 峰高 ÷ 邻坑深</b>。</p>
+<p>枢纽章第六之二节把均浅与七种最接近的说法逐一分开——样样通样样松、T 型人才、广度—深度权衡、专家知识组织、通识教育、狐狸与刺猬、涉猎——每一处给一个两说会给出相反答案的判决性对照。分界都落在同一个地方：<b>既有说法按水平、按投入、按行为倾向、按组织方式分类，而均浅按「有没有发生过一次带代价的搬运」分类。</b>这个判据此前没有被单独使用，是因为在可及性接近于零的年代它与前四种判据高度共变——不下功夫就学不会，学会了就一定搬运过。那个参数上升之后共变解体了，而分类学没有跟上。</p>
+<p class="note">最容易读错的一处：<b>均浅不是知道得少</b>。在覆盖面上，均浅者往往比深学者知道得<b>多</b>。它说的是哪一处也没有被搬运过——κ 在那里不是低，是<b>没有定义</b>。这不是测量精度不够，是那个量在那里不存在。</p>
+<p>由此得到全书的承重判断。一份分格的覆盖型量表上：<b>峰在封顶处失效</b>（一格及格就是满格，峰的高度不进入总分），而<b>坑照常扣分</b>。于是</p>
+<p class="lead2"><b>C(深学者) − C(均浅者) ≤ 0</b>：在任何覆盖型量表上，衡量知识的通行办法不只是读不出这场损失，<b>它给损失的那一方加分。</b></p>
+<p>这条解释了三件此前各自被单独解释的事：为什么随时可得的答案在一切标准化评估上表现为进步；为什么「什么都懂一点」在选拔中长期占优而在使用中长期落空；以及为什么每一次「提高考试覆盖面」的改革都在无意中加大对深学的惩罚——格数越多，坑被格子接住的概率越大。</p>
+</section>
+
+<section class="blk">
+<h2>合章：十项读数被锁进七条关系</h2>
+<p>十个并排的读数有一个致命弱点——<b>它们无法互相否证</b>。合章不引入任何新材料，用七处锁把十项逐一放回七条关系，看它们是否彼此约束。</p>
+<p><b>第一处锁</b>　消去 λ 得 <b>Δ/y₀ = 1 − ρ/ρ_max</b>：复推率与剥夺落差是同一件事的两种测法，一种在正常运行中做、一种要停机做。<b>在同一批人身上同时测，两者应当负相关</b>——这是全书成本最低、也最容易推翻它的一次核对。</p>
+<p><b>第二处锁</b>　第六章说被删的是岔路，第八章说被记零的是否定。<b>「一条没有被走的路」与「一个没有发生的事故」在形式上是同一样东西。</b>两章隔着法哲学与专利法，接口在这里对上了，并给出一条两章各自都推不出的处方：不要试图记录「他做了一次选择」，去记录<b>「他提交了一次不采纳」</b>——这正是航空业几十年前做过的那件事：不给「发现」记功，给「报告」记账。</p>
+<p><b>第三处锁</b>　类内距是覆盖型量表在产物侧的对偶。推论：<b>当一个行当里合格产物突然变得随手可得，它的返工率、上手时间、胶合成本会上升，而合格率同时上升。</b>两条曲线同向背离，是这件事在产物侧最早、最便宜的信号。</p>
+<p><b>第四处锁</b>　一切「让他做点什么」的测量都要求先给任务，而任务一给出，取用就是理性的。<b>静息变异是均浅唯一的无侵入读法</b>，且它的可测性同样随 a 下降。全书三次遇到这个形状（Δ、v、κ），三次都是在测「没有发生的那一半」。</p>
+<p><b>第六处锁</b>　影子正本不是 R3 的一个特例，是它的第三种形态：岔路、否定、「算数的那一份」——三样都是关于产物的事实，而三样都不在产物里。接上可及性后得到一条第三章写不出的判断：<b>a 很高的通道里，副本份数继续上升而「哪一份算数」的分歧度先升后降</b>——不是因为对齐了，是因为没有人再持有任何一份足够久，久到能形成一个关于它的预期。</p>
+<p><b>第七处锁</b>　R7 的自锁与第二章的追认是同一个结构的两次出现：一个立场的维持条件，由使用它所带来的后果供给。于是<b>第二章那四问是自锁的通解，只需换一个宾语</b>——「如果明天起不能使用这个来源，这项工作还能不能进行」。代价要写清楚：这等于承认本书对自锁没有给出新的解，只是指出旧工具适用。</p>
+<p><b>第五处锁</b>　追认链闭合：按第二章的判据，「知识就是可检索、可复述、可即时调用的东西」这个说法，若它在 a 低的年代不成立、在 a 高的年代成立，则它高度可疑地是一次<b>追认</b>，而不是一项发现。</p>
+</section>
+
+<section class="blk">
+<h2>怎么判它错</h2>
+<p>合章给出五条，任何一条成立，相应部分作废：</p>
+<table class="tg">
+<tr><th>条</th><th>若观察到</th><th>作废什么</th></tr>
+<tr><td>一</td><td>某个 a &gt; 0 且无人为封路的环境里，λ 长期稳定在明显低于一的水平</td><td>枢纽章递推形式错，全书脊梁断</td></tr>
+<tr><td>二</td><td>同一批人身上复推率与剥夺落差不相关</td><td>第一章与第五章测的不是同一样东西，第二编不成编</td></tr>
+<tr><td>三</td><td>覆盖型量表上深学者系统性地高于均浅者</td><td>推论三错，第三编与枢纽章第 7 节作废</td></tr>
+<tr><td>四</td><td>a 很高的环境里 v 被无侵入地稳定测出且与复推率不相关</td><td>第九章与枢纽章第 6 节之间没有接口</td></tr>
+<tr><td>五</td><td>a 多年明显上升，而 ρ、Δ、v、κ 没有一项下降</td><td>十章各自可能仍为真，但不是同一件事——这本书应当拆回十篇</td></tr>
+</table>
+<p class="note">第五条不针对任何一章的内容，只针对<b>把这十章放在一起这个动作</b>。一本由十篇已发表文章装成的书，唯一需要单独辩护的就是这个动作；把辩护写成一条可以判它错的条件，是本书能做到的最诚实的形式。</p>
+</section>
+
+<section class="blk" id="howto">
+<h2>怎么读这本书</h2>
+<table class="tg">
+<tr><th>时间</th><th>读什么</th><th>为什么</th></tr>
+<tr><td>一小时</td><td>导论 → 枢纽章 → 结语</td><td>线索完整，不缺任何一环：全书的判断、它的形式表达与它的兑现物都在这三处</td></tr>
+<tr><td>半天</td><td>加第五章与第六章</td><td>唯一一处把测量整个跑完并如实报告打掉了自己两条预测的地方，与唯一一次预注册的职业数据检验</td></tr>
+<tr><td>通读</td><td>十章结构一致</td><td>三家各说各的 → 为何不能同真 → 共有前提 → 推翻它的材料 → 命名 → 读数与判据 → 辨别格 → 兑现 → 划界 → 证伪与赌注 → 自反</td></tr>
+<tr><td>只要工具</td><td>结语第三节那张表 ＋ 附录一十张速查卡</td><td>每一项都注明数据从哪来、什么算异常、最容易的作弊方式</td></tr>
+</table>
+</section>
+
+<section class="blk">
+<h2>体检表十项，与它到期作废的那一天</h2>
+<p>结语交出十项读数：复推率 · 内外表述落差 · 影子正本占比 · 借清率 · 剥夺落差 · 带责分叉数 · 类内距 · 记零位 · 静息变异率 · 鉴别独立性。三件事按顺序做：<b>先测第 1 与第 6 项</b>（都便宜、都不需停机，分别在人的一侧与岗位的一侧）；<b>第 5 项要趁早测</b>（它的价格随 a 上升，应在 a 还低时先留基线，而这件事在任何组织里都不会被提出来——提出它的时候所有读数都还是绿的）；<b>第 8 项最先能改</b>（航空业那条办法可以直接搬用）。</p>
+<p class="note">必须写在这里：<b>这十项一旦被写进考核，它们立刻开始失效。</b>它们测的都是「没有发生的那一半」，而任何把没有发生的事变成考核指标的做法，都会立刻制造出它的表演版本。本书没有解决这个问题，也不认为自己解决了。它给出的建议只有一句：<b>这张表适合自查，不适合考核别人。</b></p>
+</section>
+
+<section class="blk">
+<h2>本书不主张什么</h2>
+<p>不主张可及性应当被降低，不主张任何人应当少用随时可得的答案，不主张借道率高的人能力差——在产物型读数上他可能确实更好。不主张覆盖型量表应当被废除；推论三只说明它在这一件事上有系统偏向。<b>不主张七条关系已被检验</b>：R1、R3、R4 各有一处别人为别的目的做的实测，其余四条目前只有形式推导与逐条可判错的条件。</p>
+<p>也不主张这本书站在一个安全的位置。它由一个人定题、由一台机器成文，而第二章那把刀可以原样砍向它自己：「知识是每次被重新推出来的事件」这个说法，恰好为一种由人定题、由机器成文的写作方式提供了位置。<b>本书能做的只有一件——把第二章的四问原样留在那里，一个字也不削弱。</b></p>
+</section>
+
+<section class="blk">
+<h2>成书与评分声明</h2>
+<p>本书十章原为 sdeuniverses.com「学科通融」专栏已发表长文，编号为之三十一、之四、之十五、之九十一、之三十七、之九十二、之十九、之二十七、之六十四、之五，发表于二〇二六年七月至八月，作者王德生＋Claude。装书改动限于三处：篇内自称由「本文」改为「本章」；对本书之外专栏文章的引用改为「学科通融专栏之 N」；各章末参考文献抽出，合并为书末分章文献表。<b>正文内容未作删改。</b></p>
+<p>前言、导读、导论、四篇编序、枢纽章、合章、结语、三附录与后记为装书时新写，约二万字。</p>
+<p class="note">本书未标注创新智商分数。按本栏规程，参与写作与改写者不为自己参与的文本作认证评分；盲评待未参与写作的一方独立完成后公布。</p>
+</section>
+
+</main>
+<footer class="ft"><div class="ftin">© 德麦国际出版社 Demai International Press · 王德生 ＋ Claude《答案随时可得之后》· 专著第 81 号<br><a href="/books/">← 返回专著栏目</a></div></footer>
+</body></html>
+'''
+
+open(f'{SITE}/books/m/81/index.html', 'w', encoding='utf-8').write(HEAD)
+print('landing bytes', len(HEAD))
