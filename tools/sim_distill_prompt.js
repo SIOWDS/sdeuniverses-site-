@@ -31,7 +31,7 @@ function build(part, body) {
     'const mode = "distill"; let MAXTOK = 0, sys = "", usrOverride = "";\n' + seg + "\nreturn { MAXTOK, sys, usrOverride };");
   return fn(part, body || {}, "问题", "站内资料正文", "内功正文", "心得正文", "缘起之问", [{ q: "一问" }], "〔第1轮〕问：一问\n答", GUIDE);
 }
-const B0 = build(0), B1 = build(1), B2 = build(2);
+const B0 = build(0), B1 = build(1), B2 = build(2), B3 = build(3);
 
 console.log("— 一、全套装载：内功 ＋ 心得 ＋ 完整方法论（用户 2026-08-13 定的口径）—");
 for (const [n, X] of [["规划段", B0], ["第一段", B1], ["第二段", B2]]) {
@@ -94,8 +94,10 @@ ok(B1.sys.includes("〔显露面〕〔差异面〕〔纠缠面〕") && B1.sys.in
 console.log("— 四、回归：原有的九栏契约一个字没动 —");
 ok(B1.sys.includes("栏标题原样照抄，一个字不许改、栏号不许重排"), "栏名与栏号仍然写死（改名即全线取空）");
 ok(B0.sys.includes("本次**不写正文**"), "规划段仍是不进正文的取舍清单");
-ok(B0.MAXTOK === 12000 && B1.MAXTOK === 32000 && B2.MAXTOK === 32000, "预算仍是 12000／32000／32000 · 实得 " + [B0.MAXTOK, B1.MAXTOK, B2.MAXTOK].join("/"));
-ok(B1.sys.includes("〔第一段完·待续〕") && B2.sys.includes("〔全文完〕"), "两段各自的收尾标记仍在");
+ok(B0.MAXTOK === 12000 && B1.MAXTOK === 32000 && B2.MAXTOK === 32000 && B3.MAXTOK === 32000,
+  "四刀预算 12000／32000／32000／32000 · 实得 " + [B0.MAXTOK, B1.MAXTOK, B2.MAXTOK, B3.MAXTOK].join("/"));
+ok(B1.sys.includes("〔第一段完·待续〕") && B2.sys.includes("〔第二段完·待续〕") && B3.sys.includes("〔全文完〕"),
+  "三段各自的收尾标记都在（〔全文完〕已随第三段后移——留在第二段就等于告诉基底写完了）");
 ok(B1.sys.includes("四、反复被触到的分离点") && B2.sys.includes("五、敌意最近邻清单"), "九栏分段仍是 1–4 ／ 5–9");
 ok(B2.sys.includes("先从《已写部分·结尾》停笔处无缝续写"), "第二段仍带续写锚");
 ok(B0.usrOverride.indexOf("《已写部分·开头》") < 0, "规划段不带续写锚（它在最前面）");

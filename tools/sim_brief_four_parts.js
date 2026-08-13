@@ -175,7 +175,14 @@ const reset = (p) => { plan = p; calls = []; seeds = []; };
   ok(/if\(plan\) e\.plan=plan;/.test(bd), "拿到的清单真的透给了两段正文");
   ok(/id="bpFill"/.test(h) && /id="bpChars"/.test(h) && /id="briefProg"/.test(h), "进度条三个元素都在页面上（缺一个就是 setProg 静默失效）");
   ok(/GEN_PREV\.length\+pacc\.length/.test(h), "字数计从已写部分接着走（旧版写死 paperAll.length，打磨时把论文长度算了进去）");
-  ok(/约 <b>12<\/b> 次基底调用（开涌现档 16 次）/.test(h), "说明条里的调用次数跟着改了（提炼四段 → 规划＋两段＝3 次）");
+  /* ⚠ 别手抄次数：2026-08-13 加第十栏时提炼由 3 次变 4 次，说明条、确认框、公式三处要一起动。
+     从源码把公式与说明条的数各取出来，逼它们对上——手抄一个 12 只会在下次改段数时安静失效。 */
+  const mCalls = /var calls=4\+\(triOn\?7:\(1\+BRIEF_PARTS\.length\)\)\+4\+1;/.test(h);
+  ok(mCalls, "调用次数按 BRIEF_PARTS 的段数现算，不写死（改段数时最容易漏的就是这一行）");
+  const nParts = (h.match(/\{min:\d+,name:'第[一二三四]段'/g) || []).length;
+  const expect = 4 + (1 + nParts) + 4 + 1;
+  ok(new RegExp("约 <b>" + expect + "<\\/b> 次基底调用（开涌现档 " + (4 + 7 + 4 + 1) + " 次）").test(h),
+    "说明条里的次数与公式对得上 · 段数 " + nParts + " ⇒ 应为 " + expect);
 
   console.log("\n===== " + P + " PASS / " + F + " FAIL =====");
   process.exit(F ? 1 : 0);
