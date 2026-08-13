@@ -39,6 +39,7 @@ parts=[
  REF,
  blk(b2,'AP1'), blk(b2,'AP2'), blk(b2,'AP3'),
  blk(b2,'HOUJI'),
+ rd('tenlines.md'),
  blk(b2,'FENGDI'),
 ]
 import re as _re
