@@ -105,10 +105,18 @@ console.log("— 三、心跳 —");
 const iRun = W.indexOf("const runMain = async (controller) => {");
 const iDone = W.indexOf('data: [DONE]', iRun);
 const runBlk = W.slice(iRun, iDone);
-ok(/const _hb = wdsBeat\(controller, _st\);/.test(runBlk), "出流后立刻起心跳");
-ok(/const _st = \{ t0: Date\.now\(\), think: 0, out: 0/.test(runBlk), "心跳带活数据（已跑秒数／已推演字数），不是一个空 ping");
-ok(runBlk.indexOf("_hb = wdsBeat") < runBlk.indexOf("_drain(upstream"), "心跳排在 _drain 之前（等它跑完再起，静默期正好没人守）");
-ok(/try \{ clearInterval\(_hb\); \} catch \(e\) \{\}/.test(W.slice(iRun, iRun + 4000)), "收尾清掉定时器，不留孤儿");
+/* 【2026-08-13 契约改了】心跳原本在 runMain 里起——也就是**连上上游之后**。
+   而这条链最长的一段静默恰恰在它前面（词表扩展＋全站检索＋装内功心得＋预填七九万字），
+   那段时间一个字节都不发，链路上任何一环都可能把连接判死。
+   用户口径：「提炼精华需要长时间思考，就要做假心跳」。现在改为 handleAsk 在请求一进来就起，
+   runMain 接过同一个状态对象继续用——**全程只有一台**，秒数才不会中途归零。
+   端到端的真跑证明在 sim_ask_stream_first 的 [八] 组（拖慢检索，数静默期里的心跳帧）。 */
+ok(/const hbT = wdsBeat\(ctl, hb\)/.test(W), "心跳在 handleAsk 起——覆盖出流前那段静默，不是等连上上游");
+ok(/const hb = \{ t0: Date\.now\(\), think: 0, out: 0, stage:/.test(W), "心跳带活数据（已跑秒数／已推演字数／阶段），不是一个空 ping");
+ok(/const _st = \(SINK && SINK\.hb\) \? SINK\.hb : /.test(runBlk), "runMain 接过同一个状态对象（两台各自计时＝时间证据作废）");
+ok(runBlk.indexOf("_hb = ") < runBlk.indexOf("_drain(upstream"), "心跳排在 _drain 之前（等它跑完再起，静默期正好没人守）");
+ok(/try \{ if \(_hb\) clearInterval\(_hb\); \} catch \(e\) \{\}/.test(W.slice(iRun, iRun + 5000)), "runMain 收自己起的那台，不留孤儿");
+ok(/try \{ clearInterval\(hbT\); \} catch \(e\) \{\}/.test(W), "handleAsk 收外层那台，不留孤儿");
 ok(/function wdsBeat\(controller, state\)/.test(W), "wdsBeat 是站内既有的那一台，没另造一份");
 
 /* ===== 三半、时钟与字数是一对 =====

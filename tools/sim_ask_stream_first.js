@@ -234,6 +234,39 @@ const freshWorker = async () => (await import("../src/worker.js?sim=" + (++_mn))
     ok(evs.filter((e) => e.t === "__done__").length === 1, "流干净收尾");
   }
 
+  /* ⑪ 假心跳必须覆盖整个请求 —— 2026-08-13 用户口径：
+        「提炼精华需要长时间思考，就要做假心跳」。
+     旧版心跳在 runMain 里才起，也就是**连上上游之后**；而最长的一段静默恰恰在它前面
+     （词表扩展＋全站检索＋装内功心得＋预填）。那段时间里链路上任何一环都可能把连接判死，
+     症状与「基底没写」一模一样。所以把检索故意拖慢，看那段静默里到底有没有心跳。 */
+  console.log("\n[八] 假心跳覆盖整个请求（出流前那段静默才是最危险的）");
+  worker = await freshWorker();
+  {
+    /* 拖 6 秒：心跳是 5 秒一拍，拖 3 秒一拍都跳不出来——那样测的是「没超时」，不是「有心跳」。
+       本组慢，是因为它证明的正是「静默期里有没有人在跳」，快不了。 */
+    const { env } = makeEnv({ slowMs: 6000 });
+    installFetch({});
+    const evs = await drain(await worker.fetch(askReq({ q: "意义为什么会磨损" }), env, {}));
+    const beats = evs.filter((e) => e.t === "beat");
+    ok(beats.length >= 1, "出流前那段静默里也有心跳（旧版这里一帧都没有）· 实得 " + beats.length + " 帧");
+    /* 秒数必须从请求到达算起、单调不回头。旧版 runMain 里 t0=Date.now() 会让 sec 在开始
+       写作时倒回 0——「死在第几秒」这个唯一的时间证据当场作废。 */
+    const secs = beats.map((b) => (b.v && b.v.sec) || 0);
+    ok(secs.every((s, i) => i === 0 || s >= secs[i - 1]),
+      "心跳秒数单调不回头（两台心跳各自计时＝时间证据作废）· 实得 " + secs.join(","));
+    ok(evs.filter((e) => e.t === "__done__").length === 1, "起了心跳也只收尾一次（没有多出一台没关的 interval）");
+  }
+  /* 源码契约：只许有一台心跳。两台同时跳会各自计时，秒数互相打架。 */
+  {
+    const src = require("fs").readFileSync("/home/claude/site/src/worker.js", "utf8");
+    ok(/const hbT = wdsBeat\(ctl, hb\)/.test(src), "handleAsk：请求一进来就起心跳");
+    ok(/askCore\(request, env, url, body, \{ ctl: ctl, st: st, hb: hb \}\)/.test(src), "心跳状态对象一路传进 askCore");
+    ok(/const _st = \(SINK && SINK\.hb\) \? SINK\.hb : /.test(src), "runMain 接过同一个状态对象，不另起一台");
+    ok(/const _hb = \(SINK && SINK\.hb\) \? null : wdsBeat\(controller, _st\)/.test(src), "外层已有心跳时 runMain 不再起第二台");
+    ok(/try \{ if \(_hb\) clearInterval\(_hb\); \} catch/.test(src), "runMain 只收自己起的那台（外层那台由 handleAsk 收）");
+    ok(/try \{ clearInterval\(hbT\); \} catch \(e\) \{\}/.test(src), "handleAsk 收尾时把心跳停掉（不停＝泄一台 interval）");
+  }
+
   console.log("\n———— sim_ask_stream_first: " + P + " passed, " + F + " failed ————");
   process.exit(F ? 1 : 0);
 })();

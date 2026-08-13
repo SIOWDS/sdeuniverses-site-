@@ -1303,7 +1303,16 @@ function streamPaper(part, extra){
             else if(j.t==='status'){ RUNLOG.stat=j.v; if(j.v.indexOf('开始作答')>=0) RUNLOG.pre=j.v; stat.textContent=j.v; }
             /* beat 是服务端每 5 秒一帧的心跳（第几秒·思考几字·正文几字）。从前前端整帧丢掉，
                于是「死在第几秒」这个唯一的时间证据一次都没被看见过。 */
-            else if(j.t==='beat'){ var _v=j.v||{}; if(_v.sec) RUNLOG.sec=_v.sec; if(_v.think) RUNLOG.think=Math.max(RUNLOG.think,_v.think); }
+            /* 心跳现在从请求一进来就跳（服务端 handleAsk 起，覆盖检索＋装内功＋预填那一大段静默）。
+               把它显示出来：提炼要跑好几分钟，静默期若状态行一动不动，人只会以为它死了。
+               ⚠ 只在还没出正文时接管状态行——已经在写字了就别抢，那时字数计本身就是心跳。 */
+            else if(j.t==='beat'){
+              var _v=j.v||{}; if(_v.sec) RUNLOG.sec=_v.sec; if(_v.think) RUNLOG.think=Math.max(RUNLOG.think,_v.think);
+              if(!pacc.length){
+                var _base=(RUNLOG.stat||'正在处理').replace(/（\+\d+s）\s*$/,'');
+                stat.textContent='⏳ '+_base+' · 已 '+(RUNLOG.sec||0)+' 秒'+(RUNLOG.think?' · 已推演 '+RUNLOG.think+' 字':'')+'…';
+              }
+            }
             else if(j.t==='think'){ thinkChars+=(j.v||'').length; RUNLOG.think=Math.max(RUNLOG.think,thinkChars); stat.textContent='🧠 第'+('一二三四'.charAt((part||1)-1)||'一')+'段·深度思考中（'+thinkChars+' 字'+(RUNLOG.sec?'·第 '+RUNLOG.sec+' 秒':'')+'）…'; }
             else if(j.t==='error'){ RUNLOG.err=j.v||''; reject(new Error(j.v||'基底返回错误')); return; }
           }
@@ -1911,7 +1920,10 @@ function sseCollect(payload, onStat){
             var j; try{ j=JSON.parse(pl); }catch(e){ continue; }
             _bump(75000); RUNLOG.frames++;
             if(j.t==='token'){ acc+=j.v; RUNLOG.out=acc.length; if(onStat) onStat(acc.length,false); }
-            else if(j.t==='beat'){ var _v=j.v||{}; if(_v.sec) RUNLOG.sec=_v.sec; if(_v.think) RUNLOG.think=Math.max(RUNLOG.think,_v.think); }
+            else if(j.t==='beat'){
+              var _v=j.v||{}; if(_v.sec) RUNLOG.sec=_v.sec; if(_v.think) RUNLOG.think=Math.max(RUNLOG.think,_v.think);
+              if(!acc.length && onStat) onStat(0, false, '⏳ '+((RUNLOG.stat||'正在处理').replace(/（\+\d+s）\s*$/,''))+' · 已 '+(RUNLOG.sec||0)+' 秒'+(RUNLOG.think?' · 已推演 '+RUNLOG.think+' 字':'')+'…');
+            }
             else if(j.t==='think'){ if(onStat) onStat(acc.length,true); }
             /* 服务端「先出流再干活」之后，检索/装内功那十几秒里会先发 status——接住它，
                否则读者盯着一条不动的状态行，以为死了。 */
