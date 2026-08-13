@@ -61,7 +61,9 @@ function makeEnv(opt) {
     ASK_LIMITER: doStub(async () => json({ ok: opt.limited ? false : true, reason: "rate" })),
     CONFIG_VAULT: doStub(async (req) => {
       const b = await req.json();
-      if (b.op === "getVendor") return json({});                       // 没设活跃基底 → 回退系统 Key
+      // 缺省：没设活跃基底 → 回退系统 Key。opt.activeVendor 用来模拟「管理员配了基底」那条路
+      // ——站上绝大多数人走的正是它，而它此前取的是各家表内的**轻档**默认型号。
+      if (b.op === "getVendor") return json(opt.activeVendor || {});
       if (b.op === "getReflect") return json({ reflect: "心得正文。".repeat(200) });
       if (b.op === "get") return json({ key: "sk-sim" });
       return json({});
@@ -265,6 +267,49 @@ const freshWorker = async () => (await import("../src/worker.js?sim=" + (++_mn))
     ok(/const _hb = \(SINK && SINK\.hb\) \? null : wdsBeat\(controller, _st\)/.test(src), "外层已有心跳时 runMain 不再起第二台");
     ok(/try \{ if \(_hb\) clearInterval\(_hb\); \} catch/.test(src), "runMain 只收自己起的那台（外层那台由 handleAsk 收）");
     ok(/try \{ clearInterval\(hbT\); \} catch \(e\) \{\}/.test(src), "handleAsk 收尾时把心跳停掉（不停＝泄一台 interval）");
+  }
+
+  /* ⑫ 系统 Key 也必须跑最强档 —— 2026-08-13 用户令：「必须使用 DeepSeek 的最新高级模型」。
+     此前 av.model 缺省时取 WDS_VENDORS[vendor].model，而那是**轻档**（deepseek-v4-flash）。
+     结果：自带 Key 的人跑 v4-pro，用系统 Key 的人（站上绝大多数）一直跑 flash——
+     屏幕上一个字都不会说，只是产出一直差一档。这是静默降智，必须由真跑钉住。 */
+  console.log("\n[九] 型号与预算：系统 Key 的重活也要跑最强档、给最大极限");
+  worker = await freshWorker();
+  {
+    const { env } = makeEnv({ activeVendor: { vendor: "deepseek", key: "sk-sim" } });   // 管理员没显式指定型号
+    const seen = installFetch({});
+    await drain(await worker.fetch(askReq({ mode: "distill", part: 0, q: "意义为什么会磨损", hist: [{ q: "一问", a: "一答" }, { q: "二问", a: "二答" }] }), env, {}));
+    /* ⚠ 词表扩展（sdeExpandQuery）也是一次 DeepSeek 调用，非流式、300 tok。
+       按 messages 条数挑会挑中它——那样测的是扩展那一刀，不是写字这一刀。按 stream 挑。 */
+    const main = seen.filter((s) => s.u.indexOf("deepseek.com") >= 0 && s.body.stream === true).pop();
+    ok(!!main, "确实打到了 DeepSeek（挑的是流式那一刀，不是词表扩展）");
+    ok(main && main.body.model === "deepseek-v4-pro",
+      "系统 Key 的提炼跑最强档 deepseek-v4-pro（不是表内轻档 flash）· 实得 " + (main && main.body.model));
+    ok(main && main.body.max_tokens === 64000,
+      "规划段首发给到最大极限 64000（阶梯首档）· 实得 " + (main && main.body.max_tokens));
+    ok(main && main.body.thinking && main.body.thinking.type === "enabled",
+      "规划段真把思考打开了（此前 VC 没有 top，wdsTopBody 整段空转，从没注入过 thinking）");
+    ok(main && main.body.reasoning_effort === "max", "并且是满功率推理投入档 · 实得 " + (main && main.body.reasoning_effort));
+  }
+  {
+    /* 正文段是另一条口径：满预算 ＋ **显式关思考**。这是三次线上真跑换来的，
+       不许被「最大极限」这四个字顺手改掉——满预算＋开思考＝思考 38,777 字、正文 0 字。 */
+    const { env } = makeEnv({ activeVendor: { vendor: "deepseek", key: "sk-sim" } });
+    const seen = installFetch({});
+    await drain(await worker.fetch(askReq({ mode: "distill", part: 1, q: "意义为什么会磨损", hist: [{ q: "一问", a: "一答" }, { q: "二问", a: "二答" }] }), env, {}));
+    const main = seen.filter((s) => s.u.indexOf("deepseek.com") >= 0 && s.body.stream === true).pop();
+    ok(main && main.body.model === "deepseek-v4-pro", "正文段同样是最强档");
+    ok(main && main.body.max_tokens === 64000, "正文段也是最大极限 64000");
+    ok(main && main.body.thinking && main.body.thinking.type === "disabled",
+      "但正文段**显式关思考**——满预算＋开思考是本文件记着的那条死路，不许顺手改掉");
+  }
+  {
+    /* 管理员显式指定过型号，是人做的决定，不该被代码推翻。 */
+    const { env } = makeEnv({ activeVendor: { vendor: "deepseek", key: "sk-sim", model: "deepseek-v4-flash" } });
+    const seen = installFetch({});
+    await drain(await worker.fetch(askReq({ mode: "distill", part: 1, q: "意义为什么会磨损", hist: [{ q: "一问", a: "一答" }, { q: "二问", a: "二答" }] }), env, {}));
+    const main = seen.filter((s) => s.u.indexOf("deepseek.com") >= 0 && s.body.stream === true).pop();
+    ok(main && main.body.model === "deepseek-v4-flash", "管理员显式指定的型号仍然最优先（代码不推翻人的决定）");
   }
 
   console.log("\n———— sim_ask_stream_first: " + P + " passed, " + F + " failed ————");

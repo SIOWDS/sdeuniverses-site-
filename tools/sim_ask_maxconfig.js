@@ -90,12 +90,26 @@ ok(isTop("distill") === true,
    "真跑：distill **挂**满功率——它 2026-08-10 改成四段两万字之后就是长文，与成文／打磨同档");
 ok(isTop("answer") === false && isTop("nextq") === false && isTop("collide") === false,
    "真跑：answer / nextq / collide 不挂满功率（深度档问答与碰撞走 _fullPower 抬预算，但不换型号）");
-ok(/const _plainLong = _fullPower && !_briefPlan;/.test(W) && /wdsFetchMax\(_VCX, KEY, _msgs, true[\s\S]{0,140}_plainLong\)/.test(W),
+ok(/const _plainLong = _fullPower && !_briefPlan;/.test(W) && /wdsFetchMax\(_VCU, KEY, _msgs, true[\s\S]{0,140}_plainLong\)/.test(W),
    "长文两档 ＝ 满预算 ＋ 关思考（实测：给满预算时交稿的本来就是关思考那一遍）；**唯一的例外是提炼的规划段**（“总结要先思考”）");
+/* 【2026-08-13 新增】满功率旋钮此前在这条路上根本没接上：wdsTopBody 第一行就是
+   `if (!VC || !VC.top) return body;`，而 /api/ask 构造的 VC 从来没有 top 字段。
+   于是「规划段保留思考」实际只是「没显式关掉」，开不开全看基底默认。现在只给规划段接上。 */
+ok(/const _VCU = _briefPlan \? \{ url: _VCX\.url, model: _VCX\.model, name: _VCX\.name, top: 1 \} : _VCX;/.test(W),
+   "满功率只挂在规划段（它失败不阻断，是全链唯一赔得起的一段）");
+ok(W.indexOf("const _VCU = _briefPlan") > W.indexOf("const _briefPlan = "),
+   "_VCU 排在 _briefPlan 之后——写在前面是 const 暂时性死区，整轮当场变「服务端异常」");
 ok(/plain \? wdsPlainBody\(VC, body\) : wdsTopBody\(VC, body\)/.test(W),
    "关思考这一路真的接到 wdsFetchMax 的 body 上；不传 plain 的既有调用点行为不变");
-ok(/upstream = await wdsFetchMax\(_VCX, KEY, _msgs, true, _heavy \? WDS_TOK_HEAVY : MAXTOK,/.test(W),
-   "主调用真的走了最高档取数器，并把 _VCX 递进去（算对了没接上，等于没改）");
+ok(/upstream = await wdsFetchMax\(_VCU, KEY, _msgs, true, _heavy \? WDS_TOK_HEAVY : MAXTOK,/.test(W),
+   "主调用真的走了最高档取数器，并把 _VCU 递进去（算对了没接上，等于没改）");
+/* 【2026-08-13 用户令：「必须使用 DeepSeek 的最新高级模型」】此前系统 Key 缺省取的是
+   各家表内型号，而那是轻档（deepseek-v4-flash）——自带 Key 跑 v4-pro、系统 Key 跑 flash，
+   屏幕上一个字都不说。端到端的真跑证明在 sim_ask_stream_first 的 [九] 组。 */
+ok(/const _mdl = av\.model \|\| \(_needTop \? \(WDS_TOP_MODEL\[av\.vendor\] \|\| WDS_VENDORS\[av\.vendor\]\.model\)/.test(W),
+   "系统 Key 的重活缺省取最强档型号，不再落到表内轻档");
+ok(/_needTop = \(body\.mode === "paper"[\s\S]{0,200}body\.deep === true\)/.test(W),
+   "「重活」的名单写死在一处（成文/打磨/提炼/碰撞/综合/连写/盲评/深度档）");
 ok(/function wdsTopBody\(VC, body\) \{[\s\S]{0,600}?thinking = \{ type: "enabled" \}/.test(W),
    "wdsTopBody 确实在开思考（thinking:enabled）");
 ok(/body: JSON\.stringify\(plain \? wdsPlainBody\(VC, body\) : wdsTopBody\(VC, body\)\),/.test(W), "wdsFetchMax 内部：plain 优先，否则按 VC.top 决定挂不挂满功率");

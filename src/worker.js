@@ -4926,7 +4926,18 @@ async function askCore(request, env, url, body, SINK) {
   if (!byok) {
     const av = await getActiveVendor(env);
     if (av) {
-      VC = { url: WDS_VENDORS[av.vendor].url, model: av.model || WDS_VENDORS[av.vendor].model, name: WDS_VENDORS[av.vendor].name };
+      // 【重活一律最强档 —— 2026-08-13 用户令：「必须使用 DeepSeek 的最新高级模型」】
+      //   此前这里取的是 `av.model || WDS_VENDORS[av.vendor].model`，而各家的**表内默认值是轻档**
+      //   （deepseek-v4-flash／glm-5-air／qwen-plus）。也就是说：自带 Key 的人跑的是 v4-pro，
+      //   而用系统 Key 的人——站上绝大多数人——提炼与成文一直跑在 flash 上。
+      //   这不是配置问题，是一条静默的降智：屏幕上什么都不会说，只是产出一直差一档。
+      //   管理员在设置里显式指定过型号（av.model）仍然最优先——那是人做的决定，不该被代码推翻。
+      const _needTop = (body.mode === "paper" || body.mode === "polish" || body.mode === "distill"
+        || body.mode === "collide" || body.mode === "synth" || body.mode === "rounds"
+        || body.mode === "iq" || body.deep === true);
+      const _mdl = av.model || (_needTop ? (WDS_TOP_MODEL[av.vendor] || WDS_VENDORS[av.vendor].model)
+                                         : WDS_VENDORS[av.vendor].model);
+      VC = { url: WDS_VENDORS[av.vendor].url, model: _mdl, name: WDS_VENDORS[av.vendor].name };
       KEY = av.key;
       vendor = ({ zhipu: "glm", deepseek: "ds" })[av.vendor] || av.vendor;
     } else {
@@ -5642,6 +5653,19 @@ async function askCore(request, env, url, body, SINK) {
   // iq／distill 不在此列：它们开着思考在满预算下跑得通（iq 实测 99 秒交出完整评分卡），思考对它们有用。
   // rounds 与长文同一口径：满预算 ＋ 关思考。三轮连写要六千到七千五百字，
   // 若还让它先推演一遍，实测就是"写不完被墙杀掉"那条路。
+  // 【满功率这个旋钮，此前在这条路上其实一直没接上】
+  //   `wdsTopBody` 的第一行是 `if (!VC || !VC.top) return body;`——而 /api/ask 这条路上构造的 VC
+  //   **从来没有 top 字段**（见上面 VC 的三处赋值）。于是 `thinking:{type:"enabled"}` 与
+  //   `reasoning_effort` 一次都没被注入过：所谓「规划段是全链唯一保留思考的一步」，
+  //   实际只是「没有显式关掉思考」，开不开全看基底自己的默认。
+  //   现在按用户口径把它真接上，但**只接在规划段**：它失败不阻断，是唯一赔得起的一段。
+  //   正文两段维持「满预算＋显式关思考」——那是三次线上真跑换来的口径，不在本次射程内。
+  //   ⚠ 满功率那一格不能写在这里：`_briefPlan` 要到下面几十行才声明，const 有暂时性死区，
+  //     在这里引用它是当场抛错（"Cannot access '_briefPlan' before initialization"）——
+  //     整轮变成一句「服务端异常」，前面的检索与装载全白跑。所以这里只留原样，
+  //     真正决定思考开关的 `_VCU` 挪到 `_briefPlan` 之后算。
+  //     （这个洞是 sim_ask_stream_first 从「请求进入 worker 的那一行」真跑抓到的，
+  //      源码检视看不出来——本文件那条「模拟要从请求那一行开始测」的纪律又验了一次。）
   const _VCX = _topPower ? { url: VC.url, model: VC.model, name: VC.name } : VC;
   // [stated] 用户 2026-08-09：「DeepSeek 可以非常长的，用最高级配置」——**照做后当场跑出反例，故改成有界的最高档**。
   // 真跑记录（同日，全部线上）：
@@ -5686,13 +5710,29 @@ async function askCore(request, env, url, body, SINK) {
   //   它失败不阻断（前端吞掉、照样往下走），所以这里开思考是安全的。
   const _briefPlan = (mode === "distill" && part === 0);
   const _plainLong = _fullPower && !_briefPlan;
+  // 【满功率这个旋钮，此前在这条路上一直没接上】
+  //   `wdsTopBody` 第一行是 `if (!VC || !VC.top) return body;`——而 /api/ask 构造的 VC
+  //   **从来没有 top 字段**。于是 `thinking:{type:"enabled"}` 与 `reasoning_effort` 一次都没被注入过：
+  //   所谓「规划段是全链唯一保留思考的一步」，实际只是「没有显式关掉思考」，开不开全看基底默认。
+  //   现在按用户口径把它真接上，但**只接在规划段**：它失败不阻断（前端 catch 掉、照旧往下写），
+  //   是全链唯一赔得起满预算＋开思考的一段。正文两段维持「满预算＋显式关思考」——
+  //   那是三次线上真跑换来的口径，不在本次射程内。
+  const _VCU = _briefPlan ? { url: _VCX.url, model: _VCX.model, name: _VCX.name, top: 1 } : _VCX;
   if (_deepAns) MAXTOK = 32000;
   // distill 在同一轮真跑里露出同一个病：思考 8,977 字 / 正文 0，靠关思考兜底才交出那 2,861 字入口资料。
   // 它是整条产线的枢纽（论文水平主要由这份资料定），不该常年靠最后一道保险活着。
   const _heavy = (_fullPower || mode === "iq");
   // 满功率档（成文／打磨）用 wdsLadder 自带的 [want,32000,16000]；
   // iq 不挂满功率，但同样首发最高档，所以自带一条阶梯；其余模式保持各自原有的那一个数不变。
-  const _ladder = _briefPlan ? [12000, 8000, 6000]
+  // 【规划段给到最大极限 —— 2026-08-13 用户令：「maxtoken 要能最大极限」】
+  //   为什么偏偏敢在这一段给满，而别处不敢：本文件通篇记着那条铁证——满预算＋开思考 ⇒
+  //   思考 38,777 字、正文 0 字、第 128 秒被平台杀掉。所以「最大极限」不能到处发。
+  //   而规划段是全链**唯一一段失败不阻断**的调用：它不进正文，前端 `.catch(→'')` 吞掉，
+  //   拿不到清单就照旧直接写两段正文。**唯一能安全给满的地方，正是它。**
+  //   它同时也是最该想久的一段：一万字怎么分给九栏、这场问对到底有没有长出脊梁骨，
+  //   全在这一次决定；它想清楚了，后面两段才不会一路平铺到写不完。
+  //   三重保险照旧在：早于平台的时钟 `_clk`、阶梯降档、关思考兜底重跑。
+  const _ladder = _briefPlan ? [WDS_TOK_HEAVY, 32000, 16000]
     : _fullPower ? [WDS_TOK_HEAVY, 32000, 16000]
     : (mode === "iq" ? [WDS_TOK_HEAVY, 12000, 8000]
       : [MAXTOK, Math.min(32000, MAXTOK), Math.min(12000, MAXTOK)].filter((v, i, a) => v > 0 && a.indexOf(v) === i));
@@ -5715,7 +5755,11 @@ async function askCore(request, env, url, body, SINK) {
   const _budget = Math.max(25000, 120000 - _spent);   // 115→20：平台墙实测 128–133 秒，留 8–13 秒够把掉线那句话发出去
   const _clk = _heavy ? wdsClock(Math.min(_deepAns ? 45000 : 60000, _budget), _budget) : null;
   // 一整轮的账，一句话说清：前置吃掉多少、还剩多少给写字。零产出时前端会把这句原样印出来。
+  // 一整轮的账，一句话说清；再加一句「这一刀用的是什么配置」——型号／预算／思考开关。
+  // 没有这一句，「是不是真用了最强档、是不是真给了最大预算」永远只能靠读代码猜。
   _stat("✍️ 开始作答 · 前置用掉 " + Math.round(_spent / 1000) + "s，留给写作 " + Math.round(_budget / 1000) + "s");
+  _stat("⚙️ 本刀配置 · " + VC.name + " " + VC.model + " · 预算 " + (_heavy ? WDS_TOK_HEAVY : MAXTOK)
+    + "（阶梯 " + _ladder.join("→") + "）· 思考" + (_plainLong ? "关" : (_VCU && _VCU.top ? "开·满功率" : "随基底默认")));
   // 兜底重跑：关思考＋降档，逼它早点停下推演开始写。但长文模式不能降到 4000——
   // 实测 4000 tok 交出来的是一篇断在半句上的稿（线上原样：6,847 字，末句「但他输光」）。
   // 长文首发本来就已经是「满预算＋关思考」，重跑与它同形，只降一档预算逼它早点收笔。
@@ -5724,7 +5768,7 @@ async function askCore(request, env, url, body, SINK) {
   // 调基底（境内直连）。自带 Key：仅在内存中转发调用，绝不存储/记录（同 llm-proxy 纪律）
   let upstream;
   try {
-    upstream = await wdsFetchMax(_VCX, KEY, _msgs, true, _heavy ? WDS_TOK_HEAVY : MAXTOK,
+    upstream = await wdsFetchMax(_VCU, KEY, _msgs, true, _heavy ? WDS_TOK_HEAVY : MAXTOK,
       _clk ? _clk.signal : undefined, false, _ladder, _plainLong);
   } catch (e) {
     if (_clk) _clk.stop();
