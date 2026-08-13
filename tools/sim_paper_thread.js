@@ -74,10 +74,14 @@ ok(/var qlist=turns\.map/.test(H), "问题清单（走过的路）一并送上�
 
 /* 清空 */
 ok(H.indexOf("function resetThread(") > 0, "清空重来在位");
-ok(/function resetThread\(quiet\)\{\s*\n\s*if\(!quiet && turns\.length && !confirm/.test(H),
+/* ⚠ 判据别把「confirm 紧跟在函数第一行」写死：2026-08-13 在中间插了一段注释，
+   这条就假失败了。要守的是 `!quiet &&` 这个条件本身——自动十轮清场不许弹窗。 */
+ok(/function resetThread\(quiet\)\{[\s\S]{0,400}?if\(!quiet && turns\.length && !confirm/.test(H),
    "resetThread(quiet)：只有人工点才弹确认，自动十轮清场不弹（弹了就卡住整场无人值守）");
 ok(/turns=\[\]; brief=''/.test(H), "清空同时清掉入口资料（不许残留上一场的清单）");
-ok(H.indexOf("confirm('清空这场问对") > 0, "清空前确认（十轮问对是贵的）");
+ok(H.indexOf("confirm('清空屏幕上这场问对") > 0, "清空前确认（十轮问对是贵的）");
+/* 2026-08-13 起清空**不删本机存档**，确认语必须照实说，否则人会以为点下去就永久没了。 */
+ok(/本机存档不受影响/.test(H), "确认语写明本机存档不受影响、可从存档面板恢复");
 
 /* ===== 三、worker 端契约 ===== */
 ok(/_MODES = \{[^}]*distill: 1/.test(W), "worker：distill 进模式白名单");

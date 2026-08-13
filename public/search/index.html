@@ -219,7 +219,10 @@ a.reco .rw{font-size:0.8rem;color:var(--muted,#8a8a8a);margin-top:3px;line-heigh
       <span class="en-only">🧵 Threaded Q&amp;A · turn <b id="turnNoE">1</b>/10 — each turn carries the earlier ones. After 2 turns you can distill the thread into a paper brief.</span>
       <b style="cursor:pointer;margin-left:6px;text-decoration:underline" onclick="resetThread()"><span class="zh-only">🧹 清空重来</span><span class="en-only">Reset</span></b>
       <div id="nextQTip" style="display:none;margin-top:6px;color:var(--muted);font-weight:600"></div>
+      <b style="cursor:pointer;margin-left:6px;text-decoration:underline" onclick="archDownload(sessionId)"><span class="zh-only">⬇ 保存这一场为文档</span><span class="en-only">Save transcript</span></b>
     </div>
+    <!-- 本机存档面板：一场问对＝一条记录，自动写、可恢复、可下载、可删。只写浏览器本地。 -->
+    <div id="archWrap" style="display:none;font-size:0.78rem;color:var(--gold);margin:8px 2px 0;line-height:1.6"></div>
     <div class="auto-wrap" id="autoWrap">
       <div class="ans-label"><span class="zh-only">🚀 自动十轮 · 一问到底</span><span class="en-only">Auto run</span></div>
       <div class="think" id="autoStat"></div>
@@ -611,16 +614,141 @@ document.getElementById('userKey').addEventListener('input', function(){ try{ va
       if(ck){ kel.value=ck; if(!localStorage.getItem('sde_ask_keymode')) setKeyMode('own'); }
     }
     if(localStorage.getItem('sde_ask_keymode')==='own') setKeyMode('own');
+    /* 一进页面就把存档列出来——存了却看不见，等于没存。 */
+    setTimeout(function(){ try{ renderArch(); }catch(e){} }, 0);
   }catch(e){}
 })();
 
 var asking=false, papering=false, lastQ='', lastAns='';
 /* ===== 连续问对（最多十轮）→ 提炼 → 论文入口资料 =====
    服务端零状态：整场问对存在这个页面的内存里，每次提问原样带上去（body.hist）。
-   刷新即清空，这是刻意的——问对是一次性的思想现场，不做跨会话存储，
-   与「用户 Key 只在本机」是同一条纪律。 */
+   ⚠ 这里原本写着「刷新即清空，这是刻意的」。2026-08-13 用户令：
+   「要做一个 10 轮对话的保存，即所有对话要能保存起来。」——**改**。
+   理由站得住：一场自动十轮要跑 20–38 分钟，误刷一次、断个网、手机切一下后台，
+   十几次基底调用全部白烧，而页面上那句「这场问对只活在这一页的内存里」只是提前认命。
+   ⚠ 改的是「存不存」，**没有改「存在哪」**：仍然只写这台机器的浏览器本地存储，
+   一个字节都不上传——与「用户 Key 只在本机」是同一条纪律，那一条一个字没动。 */
 var MAXTURNS=10;
 var turns=[];      // [{q,a}] 已完成的轮次
+
+/* ═══════ 本机存档 ═══════
+   一场问对＝一条存档记录，随每一轮／每一步产出**自动**覆盖写回，不用点保存。
+   三条纪律：
+   ① **只写本机**：localStorage，不上传。面板上把这句话明写出来，不让人误以为存到了云端。
+   ② **自动不等于静默**：存了几场、存在哪、怎么删，面板上随时看得见（与「精华要点进库存」同一口径）。
+   ③ **清空重来不删存档**：存档就是清空之后的后悔药；`resetThread` 只开新的一场，不动旧的。 */
+var ARCH_KEY='sde_search_archive', ARCH_MAX=8;
+var sessionId='';
+function newSession(){ sessionId='s'+Date.now()+Math.random().toString(36).slice(2,6); }
+newSession();
+function archLoad(){
+  try{ var a=JSON.parse(localStorage.getItem(ARCH_KEY)||'[]'); return Array.isArray(a)?a:[]; }catch(e){ return []; }
+}
+function archWrite(list){
+  /* 配额满了不能一声不吭地丢掉这一场——**先扔最旧的，再扔旧场的论文正文（最占地方的一块）**，
+     两样都试过还写不进去，就照实说一句，不假装存上了。 */
+  for(var pass=0; pass<3; pass++){
+    try{ localStorage.setItem(ARCH_KEY, JSON.stringify(list)); return true; }catch(e){
+      if(list.length>1){ list.pop(); continue; }
+      var shed=false;
+      for(var i=list.length-1;i>0;i--){ if(list[i].paperAll){ list[i].paperAll=''; shed=true; } }
+      if(!shed) return false;
+    }
+  }
+  return false;
+}
+function archSnapshot(){
+  return { id:sessionId, ts:Date.now(), q:originQ()||'', turns:turns.slice(),
+           brief:brief||'', briefKind:(typeof briefKind==='string'?briefKind:'distill'),
+           paperAll:(typeof paperAll==='string'?paperAll:''),
+           vendor:vendor, deepOn:!!deepOn, triOn:!!triOn };
+}
+/* 每一轮、每一步产出之后都调它。空场不存——否则一打开页面就多出一条空记录。 */
+function archSave(){
+  if(!turns.length) return;
+  var list=archLoad(), s=archSnapshot(), ix=-1;
+  for(var i=0;i<list.length;i++){ if(list[i] && list[i].id===sessionId){ ix=i; break; } }
+  if(ix>=0) list.splice(ix,1);
+  list.unshift(s);
+  while(list.length>ARCH_MAX) list.pop();
+  var okw=archWrite(list);
+  renderArch(okw?'':'⚠ 本机存储写满了，这一场没能存进去（可先删几场旧的再试）。');
+}
+function archDrop(id){
+  var list=archLoad().filter(function(x){ return x && x.id!==id; });
+  archWrite(list); renderArch();
+}
+function archRestore(id){
+  var s=null, list=archLoad();
+  for(var i=0;i<list.length;i++){ if(list[i] && list[i].id===id) s=list[i];}
+  if(!s) return;
+  if(turns.length && !confirm('当前这场问对（共 '+turns.length+' 轮）会被替换掉。继续？')) return;
+  resetThread(true);
+  sessionId=s.id;                              /* 沿用原 id：接着往下问就是原地续写，不会多出一条 */
+  turns=(s.turns||[]).slice();
+  brief=s.brief||''; briefKind=s.briefKind||'distill'; paperAll=s.paperAll||'';
+  if(turns.length){
+    lastQ=turns[turns.length-1].q; lastAns=turns[turns.length-1].a||'';
+    /* ⚠ 用页面自己的 renderThread()，别在这里另画一套 DOM：
+       它渲染的是 turns.slice(0,-1)（最后一轮留在主答题区），样式与折叠也都在它那儿。
+       另画一套的后果是恢复出来的问对长得跟原来不一样，而且样式类根本不存在。 */
+    renderThread();
+    var ae=document.getElementById('ans');          /* 页面上答题区的 id 就是 ans，没有 ansBox */
+    if(ae){ ae.className='ans'; ae.textContent=lastAns; }
+    var aw=document.getElementById('ansWrap'); if(aw) aw.classList.add('show');
+    var qa=document.getElementById('qa'); if(qa) qa.value='';
+    document.getElementById('turnBar').style.display='block';
+    var tn=document.getElementById('turnNo'); if(tn) tn.textContent=Math.min(turns.length+1,MAXTURNS);
+    var tne=document.getElementById('turnNoE'); if(tne) tne.textContent=Math.min(turns.length+1,MAXTURNS);
+  }
+  if(brief){
+    var bw=document.getElementById('briefWrap'), bb=document.getElementById('briefBox');
+    if(bw) bw.classList.add('show');
+    if(bb) bb.textContent=brief;
+    var bs=document.getElementById('briefStat'); if(bs) bs.textContent='✓ 已从本机存档恢复（'+brief.length+' 字）';
+  }
+  renderArch('✓ 已恢复这一场（'+turns.length+' 轮）。接着问下一轮即可。');
+}
+function archDownload(id){
+  var list=archLoad(), s=null;
+  for(var i=0;i<list.length;i++){ if(list[i] && list[i].id===id) s=list[i]; }
+  if(!s) return;
+  var L=['# SDE 问对全程记录','','- 缘起之问：'+(s.q||''),'- 轮次：'+((s.turns||[]).length)+' 轮',
+         '- 时间：'+new Date(s.ts).toLocaleString('zh-CN'),
+         '- 出处：SDE Universes 站内搜索 · 智能问答（https://sdeuniverses.com/search/）','',
+         '> 本记录在你本机拼装，未上传服务器。正文由 AI 生成，请对照站内出处核实。',''];
+  L.push('## 一、'+((s.turns||[]).length)+' 轮问对');
+  (s.turns||[]).forEach(function(t,i){ L.push(''); L.push('### 第 '+(i+1)+' 轮 · '+t.q); L.push(''); L.push(t.a||'（本轮未取得回答）'); });
+  if(s.brief){ L.push(''); L.push('## 二、精华报告'); L.push(''); L.push(s.brief); }
+  if(s.paperAll){ L.push(''); L.push('## 三、论文正文（'+s.paperAll.length+' 字）'); L.push(''); L.push(s.paperAll); }
+  var a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([L.join('\n')],{type:'text/markdown;charset=utf-8'}));
+  a.download='SDE问对_'+String(s.q||'记录').replace(/[\\\/:*?"<>|\s]+/g,'').slice(0,18)+'_'
+    +new Date(s.ts).toISOString().slice(0,10).replace(/-/g,'')+'.md';
+  document.body.appendChild(a); a.click(); setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); }, 800);
+}
+function renderArch(note){
+  var el=document.getElementById('archWrap'); if(!el) return;
+  var list=archLoad();
+  if(!list.length && !note){ el.style.display='none'; el.innerHTML=''; return; }
+  el.style.display='block';
+  var rows=list.map(function(s){
+    var n=(s.turns||[]).length, mk=[];
+    if(s.brief) mk.push('精华报告'); if(s.paperAll) mk.push('论文');
+    return '<div style="margin:5px 0;padding:5px 0;border-top:1px solid rgba(160,130,60,.18)">'
+      +'<div style="color:var(--muted);font-weight:600">'+esc(String(s.q||'（无题）').slice(0,42))+'</div>'
+      +'<div style="font-size:0.74rem;margin-top:2px">'+n+' 轮'+(mk.length?' · '+mk.join(' · '):'')
+      +' · '+new Date(s.ts).toLocaleString('zh-CN')
+      +(s.id===sessionId?' · <b>本场</b>':'')
+      +'　<b style="cursor:pointer;text-decoration:underline" onclick="archRestore(\''+s.id+'\')">恢复</b>'
+      +'　<b style="cursor:pointer;text-decoration:underline" onclick="archDownload(\''+s.id+'\')">下载</b>'
+      +'　<b style="cursor:pointer;text-decoration:underline" onclick="if(confirm(\'删掉这一场存档？\'))archDrop(\''+s.id+'\')">删除</b></div></div>';
+  }).join('');
+  el.innerHTML='<div style="font-weight:700">📚 本机存档 · '+list.length+' 场</div>'
+    +'<div style="font-size:0.74rem;color:var(--muted);margin-top:2px">每问完一轮、每出一份产出就自动存一次，'
+    +'<b>只存在这台机器的浏览器里，不上传</b>；最多留 '+ARCH_MAX+' 场，超出自动挤掉最旧的。清空重来不会删存档。</div>'
+    +(note?'<div style="margin-top:4px;font-weight:600">'+esc(note)+'</div>':'')+rows;
+}
 var brief='';      // 提炼出的《论文入口资料》
 var distilling=false;
 function originQ(){ return turns.length ? turns[0].q : lastQ; }
@@ -676,7 +804,10 @@ function renderThread(){
   box.innerHTML=out; box.style.display='block';
 }
 function resetThread(quiet){
-  if(!quiet && turns.length && !confirm('清空这场问对（共 '+turns.length+' 轮）与已提炼的入口资料？')) return;
+  /* ⚠ 只清屏幕上这一场，**不动本机存档**——存档正是「清空重来」之后的后悔药。
+     所以确认语也要照实说，别让人以为点下去就永久没了。 */
+  if(!quiet && turns.length && !confirm('清空屏幕上这场问对（共 '+turns.length+' 轮）与已提炼的精华报告？\n\n（本机存档不受影响，随时可以从下面的「📚 本机存档」恢复。）')) return;
+  if(!quiet) newSession();
   turns=[]; brief=''; lastAns=''; lastQ=''; nextQReady='';
   var _nt=document.getElementById('nextQTip'); if(_nt){ _nt.style.display='none'; _nt.textContent=''; }
   document.getElementById('threadBox').style.display='none';
@@ -835,6 +966,7 @@ function finishAsk(ansEl, gotErr, lastStat){
     document.getElementById('askActs').classList.add('show');
     /* 本轮入档：只有真答出来的才算一轮，报错/空答不占轮次 */
     turns.push({q:lastQ, a:lastAns});
+    archSave();          /* 每轮存一次：跑到第九轮才断电，前八轮不该跟着一起没 */
     renderThread(); updateTurnBar();
     suggestNextQ();
   }
@@ -979,6 +1111,7 @@ function autoBatch(from, n, ix, attempt){
       ansEl.appendChild(_be); }
     var got=parseRounds(acc);
     got.forEach(function(t){ if(turns.length<MAXTURNS) turns.push(t); });
+    archSave();          /* 成批问对：一批三轮，落一批存一次 */
     if(turns.length>before){
       lastQ=turns[turns.length-1].q; lastAns=turns[turns.length-1].a;
       renderThread(); updateTurnBar();
@@ -1216,7 +1349,7 @@ function doDistill(){
       return runParts(BRIEF_PARTS, seedFor, stat, '🧪 提炼中', function(t){ return String(t||'').slice(0,1200); });
     }).then(function(r){
     box.className='ans';
-    brief=r.text; briefKind='distill';
+    brief=r.text; briefKind='distill'; archSave();   /* 精华报告落稿即存：它是十几分钟换来的 */
     box.textContent=brief;
     miss=missText(r.done, BRIEF_PARTS);
     setProg(brief.length, false);
@@ -1451,7 +1584,7 @@ function doPaper(){
   };
   var miss=false;
   return runFourParts(seedFor, stat, '📝 写作中').then(function(r){
-    paperAll=r.text; miss=missText(r.done);
+    paperAll=r.text; miss=missText(r.done); archSave();   /* 两万字论文落稿即存 */
     setProg(paperAll.length, true);
     stat.textContent=(miss?'⚠ '+miss+' 正在按「未完成稿」排版 PDF':'🖨 全文完成（'+paperAll.length+' 字·四段）· 正在排版 PDF')+'（约 20–50 秒）…';
     return buildPdf(paperAll, miss);
