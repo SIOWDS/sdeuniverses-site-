@@ -66,7 +66,10 @@ do
   do
     chars="$(pandoc "$source" -t plain | wc -m)"
     html="${source%/source.md}/index.html"
-    if [[ "$chars" -lt 5000 || "$chars" -gt 6500 ]]
+    # 2026-08-15：上限由 6500 放宽到 10500。原窗口是按编辑部代撰「约5000字」定的；
+    # 08-13 的 silent-soil-blame-trap 一组（7393/7700）与 08-15 学员自撰四组（7142–10232）
+    # 都在窗口外，而它们都是有意为之的长稿。下限保持 5000 不动。
+    if [[ "$chars" -lt 5000 || "$chars" -gt 10500 ]]
     then
       printf 'FAIL length %s: %s\n' "$chars" "$source"
       failures=$((failures+1))
