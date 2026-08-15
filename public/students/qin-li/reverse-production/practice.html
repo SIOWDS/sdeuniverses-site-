@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>不问配不配，问离不离得开：四步一表 · 技术与方法实践 | SDE Universes</title>
+<meta name="description" content="这不是一份「如何被上级看见」的建议，恰恰相反：本篇的第一步就是劝你停止争取承认，并且用一张表把大多数情形排除出去。它交付的是——一张站位判定表（被驱逐／被无害化／在编）、两条路线的成本对照、找缺口的四问筛子、辖域外自建的四样东西与它们的最小可行版本、一张六栏记录表、一张依赖度自测表、临界点的三个信号、换人测试，以及四条写死的反滥用硬条款与一条停手线。凡涉他人健康、安全与金钱的场合，请先读第六节再往下走。">
+<meta name="author" content="SDE Universes">
+<meta property="og:type" content="article">
+<meta property="og:title" content="不问配不配，问离不离得开：四步一表 · 技术与方法实践">
+<meta property="og:description" content="这不是一份「如何被上级看见」的建议，恰恰相反：本篇的第一步就是劝你停止争取承认，并且用一张表把大多数情形排除出去。它交付的是——一张站位判定表（被驱逐／被无害化／在编）、两条路线的成本对照、找缺口的四问筛子、辖域外自建的四样东西与它们的最小可行版本、一张六栏记录表、一张依赖度自测表、临界点的三个信号、换人测试，以及四条写死的反滥用硬条款与一条停手线。凡涉他人健康、安全与金钱的场合，请先读第六节再往下走。">
+<link rel="canonical" href="https://sdeuniverses.com/students/qin-li/reverse-production/practice.html">
+<style>
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:#FBF8F1;color:#2B2620;
+ font-family:"Noto Serif SC","Songti SC","Source Han Serif SC",Georgia,serif;
+ font-size:17px;line-height:1.95;letter-spacing:.01em}
+.wrap{max-width:760px;margin:0 auto;padding:0 22px}
+nav.cnav{background:#2B2620;color:#EDE4CF;position:sticky;top:0;z-index:30;
+ font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif}
+nav.cnav .wrap{display:flex;align-items:center;justify-content:space-between;gap:14px;height:50px}
+nav.cnav a{color:#EDE4CF;text-decoration:none;font-size:14px}
+nav.cnav .cnav-logo{font-weight:700;letter-spacing:.06em}
+nav.cnav .cnav-back{opacity:.82}
+nav.cnav .cnav-back:hover{opacity:1}
+header.art{background:linear-gradient(180deg,#FFFDF8 0%,#F5EFE2 100%);
+ border-bottom:1px solid rgba(43,38,32,.10);padding:44px 0 34px}
+.art-eyebrow{font-size:12.5px;letter-spacing:.16em;color:#A8813C;font-weight:700;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;margin-bottom:16px}
+h1.art-title{font-size:33px;line-height:1.4;margin:0 0 14px;font-weight:800}
+.art-subtitle{font-size:17px;color:#5C5346;line-height:1.7;margin-bottom:16px}
+.art-meta{font-size:13px;color:#8A8071;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif}
+.swap{display:flex;flex-wrap:wrap;gap:10px;margin:22px auto 0}
+.swap a{flex:1 1 240px;display:block;text-decoration:none;padding:12px 15px;border-radius:9px;
+ border:1px solid rgba(43,38,32,.16);background:#fff;color:#2B2620;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;font-size:14px;line-height:1.6}
+.swap a b{display:block;font-size:14.5px;margin-bottom:2px}
+.swap a span{color:#8A8071;font-size:12.5px}
+.swap a:hover{border-color:#A8813C;box-shadow:0 2px 10px rgba(43,38,32,.07)}
+article{padding:30px 0 10px}
+.abs{background:#FAF4E6;border-left:4px solid #A8813C;border-radius:0 8px 8px 0;
+ padding:18px 20px;margin:0 0 26px;font-size:15.5px;line-height:1.85;color:#4A4238}
+.abs b{color:#8A6817}
+.toc{border:1px solid rgba(43,38,32,.13);border-radius:9px;padding:16px 20px;margin:0 0 34px;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;font-size:14.5px;background:#FFFDF8}
+.toc .tl{font-size:12.5px;letter-spacing:.14em;color:#A8813C;font-weight:700;margin-bottom:10px}
+.toc ol{margin:0;padding-left:20px;color:#5C5346}
+.toc li{margin:5px 0}
+.toc a{color:#4A4238;text-decoration:none}
+.toc a:hover{color:#A8813C;text-decoration:underline}
+h2{font-size:22px;line-height:1.5;margin:44px 0 16px;padding-top:8px;font-weight:800;
+ border-top:1px solid rgba(43,38,32,.10)}
+h2 .no{display:inline-block;min-width:1.9em;color:#A8813C;font-size:16px;font-weight:700;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif}
+p{margin:0 0 17px;text-align:justify}
+p b,li b{color:#8A6817}
+ul.pts{margin:0 0 18px;padding-left:0;list-style:none}
+ul.pts li{position:relative;padding-left:20px;margin:0 0 10px;text-align:justify}
+ul.pts li:before{content:"—";position:absolute;left:0;color:#A8813C}
+blockquote{margin:0 0 20px;padding:14px 18px;background:#FFFDF8;
+ border-left:3px solid rgba(43,38,32,.22);color:#4A4238;font-size:16px}
+.endbox{margin:48px 0 10px;padding:22px;border-radius:10px;background:#FAF4E6;
+ border:1px solid rgba(43,38,32,.12)}
+.endbox .et{font-size:12.5px;letter-spacing:.14em;color:#A8813C;font-weight:700;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;margin-bottom:12px}
+.endbox a{color:#8A6817}
+footer{margin-top:46px;padding:26px 0 40px;border-top:1px solid rgba(43,38,32,.12);
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;font-size:13px;color:#8A8071}
+footer a{color:#8A8071}
+@media(max-width:640px){body{font-size:16px}h1.art-title{font-size:26px}h2{font-size:19.5px}}
+</style>
+</head>
+<body>
+<nav class="cnav"><div class="wrap">
+  <a class="cnav-logo" href="/browse/">SDE Universes</a>
+  <a class="cnav-back" href="/students/qin-li/reverse-production/">← 回母文《边缘的逆生产：制度化排斥逻辑下功能权威的意外生成》</a>
+</div></nav>
+
+<header class="art"><div class="wrap">
+  <div class="art-eyebrow">配套读物 · 技术与方法实践 · 母文《边缘的逆生产：制度化排斥逻辑下功能权威的意外生成》</div>
+  <h1 class="art-title">不问配不配，问离不离得开：四步一表</h1>
+  <div class="art-subtitle">母文的判断是「权力可以不经由承认而生成」。这一篇把它落成一条能走的路线：先判位置，再找缺口，在管辖之外自建四样东西，最后带着草案上桌——并且先写死四条不许越过的线。</div>
+  <div class="art-meta">SDE 学员专栏 · 配套读物 · 2026年8月 · 约 5017 字</div>
+  <div class="swap">
+    <a href="/students/qin-li/reverse-production/"><b>← 母文 · 边缘的逆生产：制度化排斥逻辑下功能权威的意外生成</b><span>完整论证在这里</span></a>
+    <a href="explain.html"><b>🌱 墙缝里的那棵树，后来成了那面墙的一部分</b><span>用墙缝里的树、法庭上的被告、小区自排的停车班，把母文讲成人人能懂的话</span></a>
+  </div>
+</div></header>
+
+<div class="wrap"><article>
+  <div class="abs"><b>这一篇是什么　</b>这不是一份「如何被上级看见」的建议，恰恰相反：本篇的第一步就是劝你停止争取承认，并且用一张表把大多数情形排除出去。它交付的是——一张站位判定表（被驱逐／被无害化／在编）、两条路线的成本对照、找缺口的四问筛子、辖域外自建的四样东西与它们的最小可行版本、一张六栏记录表、一张依赖度自测表、临界点的三个信号、换人测试，以及四条写死的反滥用硬条款与一条停手线。凡涉他人健康、安全与金钱的场合，请先读第六节再往下走。</div>
+  <div class="toc"><div class="tl">目 录</div><ol><li><a href="#s01">这一篇不做的事</a></li><li><a href="#s02">第零步：先判清你现在站在哪个位置</a></li><li><a href="#s03">两条路的成本对照</a></li><li><a href="#s04">第一步：找缺口——四问筛子</a></li><li><a href="#s05">缺口的第二种：那些烦琐的杂活</a></li><li><a href="#s06">第二步：认清那块地的两面（含硬条款一）</a></li><li><a href="#s07">第三步：在管辖之外自建四样东西</a></li><li><a href="#s08">记录怎么记才算数</a></li><li><a href="#s09">第四步：把记录做成可以逐条讨论的草案</a></li><li><a href="#s10">依赖度自测表</a></li><li><a href="#s11">临界点的三个信号</a></li><li><a href="#s12">换人测试：分辨真依赖与有人罩着</a></li><li><a href="#s13">判成功的尺子：只有三件事算数</a></li><li><a href="#s14">四种误用（硬条款）</a></li><li><a href="#s15">什么时候必须停手</a></li><li><a href="#s16">这套方法什么时候不成立</a></li><li><a href="#s17">一页纸操作卡</a></li><li><a href="#s18">最后一条纪律</a></li></ol></div>
+<h2 id="s01"><span class="no">01</span>这一篇不做的事</h2>
+<p>先把话说在前面，免得这套方法被用错地方。</p>
+<p><b>它不是教你放弃权利。</b> 如果你面对的是欠薪、歧视、违法、人身安全这一类事，那是维权，要走正门：投诉、举报、仲裁、诉讼、找监管。不要在这些事上「先让自己变得不可替代，再回头谈」——那不是策略，那是把伤害延长。</p>
+<p><b>它不是一套让人看见你的技巧。</b> 恰恰相反，这条路线的第一个动作是<b>停止争取被看见</b>。你要是心里真正想要的是那句承认，这套方法会让你更难受，因为它全程不提供承认。</p>
+<p><b>它不承诺结果。</b> 母文自己在最后一节收回了「已经发生」的说法，把主张降级成了条件命题。本篇沿用这个诚实：走完四步，你会变得难以替代；至于对方会不会因此请你上桌，这是另一件事，另有判据（见第十三节）。</p>
+<p>它适用的情形只有一种：<b>你所在的场里，「承认」这条路在结构上被堵死了，而对方确实有一个它自己填不上的洞。</b> 两个条件缺一，往下都不必看。</p>
+<h2 id="s02"><span class="no">02</span>第零步：先判清你现在站在哪个位置</h2>
+<p>母文的整套机制只在一种位置上启动。三种位置的处置完全不同，判据都可以由外人核对。</p>
+<table style="width:100%;border-collapse:collapse;margin:0 0 20px;font-size:15px"><tr><th style="text-align:left;border-bottom:2px solid rgba(43,38,32,.25);padding:8px 10px;color:#8A6817">位置</th><th style="text-align:left;border-bottom:2px solid rgba(43,38,32,.25);padding:8px 10px;color:#8A6817">可核对的判据</th><th style="text-align:left;border-bottom:2px solid rgba(43,38,32,.25);padding:8px 10px;color:#8A6817">该做什么</th></tr><tr><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">被驱逐</td><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">没有合法身份，做这件事本身违规、会被处罚</td><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">这套不适用。先解决合法存在的问题</td></tr><tr><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">被无害化吸纳</td><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">有名分但带定语（「辅助」「协助」「临时」「顾问」「非编」）；能做事，不能定规则；日常不被严格检查</td><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top"><b>这套方法就是给这一格写的</b></td></tr><tr><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">在编</td><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">在名册与图纸上，有指标、有考核、有预算行</td><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">这套不适用。你已经在规则里了，走内部路径</td></tr></table>
+<p>判断自己是不是第二格，有一个很省事的问法：<b>你出了成绩，会不会有人问「这算不算数」？</b> 会问，说明你在第二格。不会问，说明你在第三格。</p>
+<p>再补一条容易搞混的：<b>第二格不是「被冷落」。</b> 被冷落是没人给你事做；第二格的典型症状恰恰是事很多、人很忙、位置很低。</p>
+<h2 id="s03"><span class="no">03</span>两条路的成本对照</h2>
+<p>站在第二格的人有两条路。这张表不是劝你选哪条，是让你把代价看清楚再选。</p>
+<table style="width:100%;border-collapse:collapse;margin:0 0 20px;font-size:15px"><tr><th style="text-align:left;border-bottom:2px solid rgba(43,38,32,.25);padding:8px 10px;color:#8A6817"></th><th style="text-align:left;border-bottom:2px solid rgba(43,38,32,.25);padding:8px 10px;color:#8A6817">承认路线</th><th style="text-align:left;border-bottom:2px solid rgba(43,38,32,.25);padding:8px 10px;color:#8A6817">供给路线</th></tr><tr><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">你要做的事</td><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">用对方的标准证明自己够格</td><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">把对方缺的一件事稳定做出来</td></tr><tr><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">谁来评判</td><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">对方</td><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">事情本身</td></tr><tr><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">主要代价</td><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">越合格越远离自己原来那套；举证要求可能被随时加码</td><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">长期没有名分、没有掌声、没有加薪</td></tr><tr><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">失败的样子</td><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">反复申请、反复被退回，几年过去还在门口</td><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">你做得很好，但对方并不需要，于是毫无影响</td></tr><tr><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">成功的样子</td><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">拿到一个名分</td><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">对方开始在动手之前问你一句</td></tr><tr><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">见效速度</td><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">快则快，慢则永远</td><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">一律慢，以年计</td></tr></table>
+<p>两条不是互斥的绝对二选一，但<b>资源要押在一条上</b>。母文的核心判断是：当承认路线在结构上被堵死时（判据：对方每次都用你的定语驳回你，而不是用你的成绩驳回你），继续加注在那条路上，等于替对方加固他的审判权。</p>
+<h2 id="s04"><span class="no">04</span>第一步：找缺口——四问筛子</h2>
+<p>缺口不是「我看不惯的地方」，也不是「我擅长的东西」。它有硬定义：<b>对方必须完成、却反复完不成的事。</b></p>
+<p>拿一件候选的事，按顺序过四问。任一问不过，换一件。</p>
+<ul class="pts"><li><b>一、它反复出现吗？</b> 一次性的救火不算。要的是每个季度、每次上新、每逢某种情况都会再来一遍的那一类。</li><li><b>二、它现在归谁管？</b> 找得到明确负责人的，多半不是缺口，那是别人的地盘，进去就是抢活。缺口的典型样子是：出了事所有人都皱眉，但组织图上找不到那一格。</li><li><b>三、他有没有能力自己补上？</b> 如果他只是暂时没排上，那你补进去只是替班，随时被收回。真缺口的特征是<b>结构性的</b>：他的标准、他的成本、他的人力配置注定造不出这件事。</li><li><b>四、补这件事，需不需要我先被承认？</b> 这是最关键的一道筛子。<b>凡是必须先拿到名分才能动手的事，都不是这条路线上的缺口。</b> 能动手的，才算。</li></ul>
+<p>四问全过，再问自己一句：<b>做这件事，会不会让我离自己原来那套东西更远？</b> 会的话，慎重——你可能只是换了个方向去当合格生。</p>
+<h2 id="s05"><span class="no">05</span>缺口的第二种：那些烦琐的杂活</h2>
+<p>大多数人只找业务上的缺口，漏掉了更好进的那一类：<b>对方必须交差、却嫌烦的程序性工作。</b></p>
+<p>具体长这样：</p>
+<ul class="pts"><li>每次都要报、但格式一直没定的那张表。</li><li>跨部门那一段没人写的交接说明。</li><li>一份要交上去、但没人愿意起草的分类口径或编码规则。</li><li>一套年年重来、每次都从零拼的核对清单。</li></ul>
+<p>这类活有三个好处：<b>门槛低</b>（不需要你有名分）、<b>没人争</b>（大家都不想干）、<b>位置好</b>（它天然靠近规则，因为格式就是规则的雏形）。</p>
+<p>做法上有一条纪律：<b>只交答案，不提要求。</b> 你去做这件事的时候，不要附带任何关于自己地位的话。一句都不要。母文那句判断在这里就是操作指令——<b>你是以工具箱的身份进门的，不是以挑战者的身份。</b> 对方的免疫系统对挑战者极敏感，对工具箱完全失明。</p>
+<h2 id="s06"><span class="no">06</span>第二步：认清那块地的两面（含硬条款一）</h2>
+<p>你所在的位置有一份暧昧的礼物：<b>日常不被严格检查。</b> 这是这条路线全部的操作空间。</p>
+<p>但它有两面，都要写在纸上：</p>
+<ul class="pts"><li><b>掩护面</b>：你可以试、可以改、可以按自己的判断做事，不必每一步都过一遍对方那套昂贵的关口。</li><li><b>天花板面</b>：你也永远分不到名册上的那份资源，你的成果默认「不算数」。</li></ul>
+<blockquote><b>硬条款一：不被检查，不等于不需要检查。</b></blockquote>
+<blockquote>凡是涉及他人健康、安全、金钱、隐私的事，「没有人来查我」是一个风险信号，不是一份自由。这类场合必须<b>自己把检查装回去</b>：写明什么情况不做、什么情况必须转出去、出了不良后果如何登记与复盘、谁有权叫停。做不到这三样，这条路线在这个领域对你关闭。</blockquote>
+<p>这一条不是道德提醒，它同时是策略上的：一个在无人看管处出过事的实体，会在一夜之间失去它花十年积累的全部依赖——<b>因为对方切断你的成本，会瞬间低于留着你的成本。</b></p>
+<h2 id="s07"><span class="no">07</span>第三步：在管辖之外自建四样东西</h2>
+<p>这是全套里最慢、也最不可省的一步。四样东西，每样给一个最小可行版本——一个人、业余时间就能起步的那种。</p>
+<table style="width:100%;border-collapse:collapse;margin:0 0 20px;font-size:15px"><tr><th style="text-align:left;border-bottom:2px solid rgba(43,38,32,.25);padding:8px 10px;color:#8A6817">建什么</th><th style="text-align:left;border-bottom:2px solid rgba(43,38,32,.25);padding:8px 10px;color:#8A6817">最小可行版本</th><th style="text-align:left;border-bottom:2px solid rgba(43,38,32,.25);padding:8px 10px;color:#8A6817">什么时候算有了</th></tr><tr><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">人</td><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">教会第二个人做，并把「怎么教」写下来</td><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">你请假一周，事情照转</td></tr><tr><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">标准</td><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">一份两页纸的规程：常见情形怎么做、什么情况停</td><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">新人照着做，结果差不多</td></tr><tr><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">记录</td><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">一个表，每次做完当场填</td><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">连续填满六个月无断档</td></tr><tr><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">钱</td><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">一笔不来自对方的收入或经费，哪怕很小</td><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">对方停掉支持，你还能做三个月</td></tr></table>
+<p>四样里，<b>记录是唯一一个今天就能开始、而且越早开始越值钱的</b>。人和钱要机缘，标准要经验，记录只要你肯当场填。</p>
+<p>反过来说：<b>没有记录的十年，和没有那十年，在谈判桌上是一样的。</b></p>
+<h2 id="s08"><span class="no">08</span>记录怎么记才算数</h2>
+<p>记录的用途不是自我感动，是<b>将来替对方回答一个他答不出来的问题</b>。所以它必须从一开始就按可以被别人读的格式记。</p>
+<table style="width:100%;border-collapse:collapse;margin:0 0 20px;font-size:15px"><tr><th style="text-align:left;border-bottom:2px solid rgba(43,38,32,.25);padding:8px 10px;color:#8A6817">栏</th><th style="text-align:left;border-bottom:2px solid rgba(43,38,32,.25);padding:8px 10px;color:#8A6817">记什么</th><th style="text-align:left;border-bottom:2px solid rgba(43,38,32,.25);padding:8px 10px;color:#8A6817">为什么必须当场记</th></tr><tr><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">日期与场合</td><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">什么时候、在什么情形下发生</td><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">事后回忆一律会往结果的方向靠</td></tr><tr><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">进来时的状况</td><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">对方交到你手上时是什么样</td><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">没有起点就算不出变化</td></tr><tr><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">你做了什么</td><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">具体动作，不写形容词</td><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">「认真处理」不可复现，「做了甲乙丙」可以</td></tr><tr><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">结果</td><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">可观察的结果，包括不好的</td><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top"><b>只记好结果的表，在懂行的人眼里等于没有</b></td></tr><tr><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">没做成的与例外</td><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">失败、放弃、转出去的那些</td><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">这一栏是这张表可信度的全部来源</td></tr><tr><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">花了多少</td><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">时间、人手、钱</td><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">对方最后要算的是这一栏</td></tr></table>
+<p>一条纪律：<b>第五栏空着的表不要拿出去谈。</b> 一张全是成功的记录，只会让对方确认你是在做宣传，谈判当场结束。</p>
+<h2 id="s09"><span class="no">09</span>第四步：把记录做成可以逐条讨论的草案</h2>
+<p>前三步做完，你手里有一堆材料。材料不会自动变成权力，<b>草案才会</b>。</p>
+<p>草案要满足六条：</p>
+<ul class="pts"><li>一、<b>用对方的文体写</b>——他们看惯的那种条文格式、编号、字段。内容是你的，形状是他们的。</li><li>二、<b>逐条可讨论</b>——每一条都要小到可以被单独否决，不要写成一整块「我们的理念」。</li><li>三、<b>含边界条款</b>——写清什么情况不适用、什么情况转出去。含边界的草案比不含的可信十倍。</li><li>四、<b>含成本估算</b>——哪怕是粗的。对方的决定几乎总是成本决定。</li><li>五、<b>不写身份诉求</b>——一句关于「应当承认我们」的话都不要有。写了就前功尽弃：它会把整份草案从技术文件变成政治文件，对方的免疫系统立刻醒来。</li><li>六、<b>留出他改的余地</b>——故意留几条明显可改的。一份没法改的草案会被整份退回；一份被改了七处的草案，会变成他们的文件——<b>而你要的正是这个。</b></li></ul>
+<p>带着草案去，谈判的题目就从「你有没有资格提要求」变成了「你这第七条我们改一改」。母文管这叫<b>以案对案</b>。</p>
+<h2 id="s10"><span class="no">10</span>依赖度自测表</h2>
+<p>判断你现在到底在哪一步，用这五行。逐行写答案，不许写感觉。</p>
+<table style="width:100%;border-collapse:collapse;margin:0 0 20px;font-size:15px"><tr><th style="text-align:left;border-bottom:2px solid rgba(43,38,32,.25);padding:8px 10px;color:#8A6817">问题</th><th style="text-align:left;border-bottom:2px solid rgba(43,38,32,.25);padding:8px 10px;color:#8A6817">不及格</th><th style="text-align:left;border-bottom:2px solid rgba(43,38,32,.25);padding:8px 10px;color:#8A6817">及格</th><th style="text-align:left;border-bottom:2px solid rgba(43,38,32,.25);padding:8px 10px;color:#8A6817">危险级（这才是目标）</th></tr><tr><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">停掉你，多久出问题</td><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">没影响</td><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">一个月内</td><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">一周内，且看得见</td></tr><tr><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">谁来顶</td><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">好几个人</td><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">一个人勉强</td><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">没人现成能顶</td></tr><tr><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">顶起来要多久</td><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">立刻</td><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">数周</td><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">数月，且要重建材料</td></tr><tr><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">有没有第二家</td><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">有很多</td><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">有一两家</td><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">没有可比的</td></tr><tr><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">对方知不知道</td><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">不知道</td><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">隐约</td><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">明确知道，并且写在他的文件里</td></tr></table>
+<p>最后一行最常被忽略，也最关键：<b>没有被对方登记过的依赖，等于不存在。</b> 只有你自己知道你很重要，那是自我感觉，不是依赖。让它被登记的办法不是去说，是让它出现在对方必须填的表里——排班表、流程图、预算行、汇报模板。</p>
+<h2 id="s11"><span class="no">11</span>临界点的三个信号</h2>
+<p>依赖到什么程度，规则才开始移动？不必猜，看行为。三个信号，按出现顺序：</p>
+<ul class="pts"><li><b>一、他开始向你要格式。</b> 「你们那个表能不能给我们一份」——这是第一个，也是最容易被当成小事的一个。<b>格式一旦被借走，你就已经在写规则了。</b></li><li><b>二、他把你画进了流程图。</b> 不是口头感谢，是白纸黑字出现在他的流程、排班、预算或汇报模板里。</li><li><b>三、他开始提前通知你变动。</b> 从「决定了通知你」变成「定之前问你一句」。这一句就是共决权的最小单位。</li></ul>
+<p>三个都没有，说明你还在「有用」的阶段，没有进入「有份」的阶段。这两个阶段可能相隔很多年，而且<b>有可能永远不会跨过去</b>——母文自己的案例正卡在这里。</p>
+<h2 id="s12"><span class="no">12</span>换人测试：分辨真依赖与有人罩着</h2>
+<p>这是全篇最重要的一次检验，也是母文把它写成正式证伪设计的那一条。</p>
+<p>问题是这样的：你现在的好处，是因为整个体系离不开你，还是因为<b>某个人在照顾你</b>？</p>
+<p>两者在顺境里长得一模一样，只有一件事能把它们分开：<b>换人。</b></p>
+<p>对接的人调走、升迁、退休、失势之后，往回看半年：</p>
+<ul class="pts"><li><b>断崖式消失</b>——那些安排在换人后的一两个周期内退回原状：说明你从来没有长出根来，你是被抱着的。补救方向不是再找一个靠山，是回到第三步，把四样东西补齐（尤其是记录与不来自对方的钱）。</li><li><b>只是变冷</b>——节奏慢了、态度不如从前，但格式还在用、流程图上还有你、变动前还会问一句：这才是真的依赖。<b>赞助者的去留只影响温度，不改变事实。</b></li></ul>
+<p>这条测试要在事前就写下来：把当前的对接人是谁、他在什么位置、哪些安排是他给的，记在一张纸上。等到他离开的那一天，你才有的可比。</p>
+<h2 id="s13"><span class="no">13</span>判成功的尺子：只有三件事算数</h2>
+<p>这条最容易被自己骗过去。母文把尺子定得很硬——<b>规模不算，声誉不算，忙不算。</b> 只有这三项算：</p>
+<ul class="pts"><li><b>价钱怎么定</b>：你的这件事定价、结算、走哪条通道，你有没有份。</li><li><b>标准谁来写</b>：那份规程、路径、口径的起草人名单里有没有你，是实质起草还是列名顾问。</li><li><b>资格谁来认</b>：谁能干这件事、考什么、怎么算合格，由谁决定。</li></ul>
+<p>这三项之外的一切好转——活多了、钱多了、口碑好了、被表扬了——都属于<b>「被更好地使用」</b>，不属于<b>「参与了规则」</b>。它们常常同时发生，所以更要分开记账：一份台账写「使用」，一份写「规则」。<b>只有第二份在涨，才叫这条路走通了。</b></p>
+<h2 id="s14"><span class="no">14</span>四种误用（硬条款）</h2>
+<blockquote><b>硬条款二：不许用这套给停滞找理由。</b> 「我不被承认是因为我走的是另一条路」——这句话必须配得上证据：拿出你的四样东西。四样都拿不出来，那你不是在走供给路线，你只是停在那块没人管的地上没动。</blockquote>
+<blockquote><b>硬条款三：不许制造依赖。</b> 故意留一手、把关键信息扣住、让别人学不会——这不是功能权威，这是要挟。它在换人测试里必崩，而且一旦被识破，对方会不惜代价把你切掉。真正的功能权威建立在<b>你教得越多、别人越离不开</b>这件反直觉的事上：因为你教出去的是操作，留在你手里的是标准与记录。</blockquote>
+<blockquote><b>硬条款四：不许把不被承认浪漫化。</b> 名册外的代价是真实的：没有资源、没有保障、随时可能被一句「你本来就是辅助」堵回去。绝大多数长在墙缝里的东西枯掉了。选这条路是因为另一条被堵死，不是因为这条路更高尚。</blockquote>
+<blockquote><b>硬条款五：不许在别人的安全上省检查。</b> 见第六节硬条款一。这一条没有例外，也不因为「对方本来也不查」而放松。</blockquote>
+<h2 id="s15"><span class="no">15</span>什么时候必须停手</h2>
+<p>三条停手线，任一条触发，立刻停，不讨论。</p>
+<ul class="pts"><li><b>出现不良后果而你没有能力兜底的时候。</b> 停手，转出去，如实登记。</li><li><b>你开始需要隐瞒才能继续的时候。</b> 需要瞒着才成立的依赖，不是依赖，是一颗定时炸弹。</li><li><b>这件事开始靠透支你的身体、家庭或积蓄来维持的时候。</b> 这条路线以年计，靠的是可持续，不是拼命。一个把自己耗空的人，撑不到临界点那一天——而临界点很可能根本不来。</li></ul>
+<h2 id="s16"><span class="no">16</span>这套方法什么时候不成立</h2>
+<p>诚实地把失效条件写下来，是母文交给这一篇的纪律。</p>
+<ul class="pts"><li><b>对方并不真的需要那件事。</b> 缺口是假的，你做得再好也没有反力。这是最常见的失败原因。</li><li><b>那件事随时可以被买到。</b> 有第二家、第三家能供，你就没有不可替代性，只有价格。</li><li><b>对方宁可承受损失也要保持纯粹。</b> 有些体系的边界是它的立身之本，它会选择付出代价也不共享规则。这时候依赖再深也换不来席位。</li><li><b>决定权在一个不承担后果的人手里。</b> 成本算式只对承担后果的人有效。对一个不必为断供负责的决策者，你的不可替代对他不构成任何压力。</li><li><b>时间不够。</b> 这套路线以年计。如果你需要的是六个月内的转机，请走别的路。</li></ul>
+<p>以上任一条成立，本篇方法不适用——<b>知道它不适用，本身就是它交付的一部分。</b></p>
+<h2 id="s17"><span class="no">17</span>一页纸操作卡</h2>
+<ul class="pts"><li><b>判位置</b>：有名分带定语、能做事不能定规则、日常不被检查 → 才是这一格。</li><li><b>选缺口</b>：反复出现／无人负责／他造不出／不需要我先被承认。四问全过才动手。</li><li><b>进门姿态</b>：只交答案，不提要求。以工具箱身份，不以挑战者身份。</li><li><b>自建四样</b>：人、标准、记录、钱。今天能开始的只有记录，那就今天开始。</li><li><b>记录六栏</b>：日期／进来时的状况／做了什么／结果／没做成的与例外／花了多少。第五栏不许空。</li><li><b>写草案</b>：用他的文体、逐条可讨论、含边界、含成本、不写诉求、留他改的余地。</li><li><b>量依赖</b>：停掉多久出问题／谁来顶／多久顶得起／有无第二家／<b>对方有没有登记</b>。</li><li><b>看信号</b>：要格式 → 画进流程图 → 变动前先问你。</li><li><b>做换人测试</b>：断崖＝被抱着；变冷但还在＝真依赖。</li><li><b>记两本账</b>：一本「被使用」，一本「进了规则」。只有第二本涨才算数。</li><li><b>五条硬条款</b>：安全不许省检查／不许给停滞找理由／不许制造依赖／不许浪漫化／不许隐瞒。</li></ul>
+<h2 id="s18"><span class="no">18</span>最后一条纪律</h2>
+<p>如果这一整篇你只带走一句，带走这一句：</p>
+<p><b>先让自己成为那件他离不开的事；至于他会不会因此请你上桌，另算，而且要用另一把尺子量。</b></p>
+<p>母文最有分量的地方，正是它在最后一节亲手把这两件事分开了：前一件在新加坡有清楚的对应，后一件<b>尚未发生</b>。一个诚实的方法必须把这两半分开交付——把「变得不可替代」说成「必然会被写进规则」，是这条路线上最容易犯、也最伤人的一个错。</p>
+<p>你能控制的是前半句。后半句取决于对方的成本算式，而那把算盘不在你手里。</p>
+<p>本篇讨论的是制度与工作方法，不涉及也不构成任何医疗、法律或投资建议。</p>
+  <div class="endbox"><div class="et">一篇理论，三种读法</div>
+    <p>先读<a href="/students/qin-li/reverse-production/">理论母文</a>，再用另一篇配套读物换一个角度：<a href="explain.html">墙缝里的那棵树，后来成了那面墙的一部分</a>。</p>
+    <p style="font-size:14px;color:#6B6357;margin:0">本篇由 SDE 编辑部撰写，只负责把母文的判断讲明白或落到地上，不替代原文，也不代表原作者的措辞。读完建议回到母文核对：哪些来自秦莉，哪些属于解释与应用层的展开。</p>
+  </div>
+</article>
+
+<footer><div class="wrap">© 德麦国际 Demai International · SDE Universes · 学员专栏配套读物　·　<a href="/students/qin-li/works/">秦莉 · 全部作品</a></div></footer>
+</div>
+</body>
+</html>
