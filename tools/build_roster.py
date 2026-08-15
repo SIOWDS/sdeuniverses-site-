@@ -160,6 +160,40 @@ def find_items(slug_dir):
     return out
 
 
+COMPANION_FILES = ('explain.html', 'practice.html')
+
+
+def is_redirect_shell(path):
+    """升级到子目录版之后留下的 307/refresh 壳，不是作品。"""
+    s = open(path, encoding='utf-8', errors='ignore').read()
+    if 'http-equiv="refresh"' in s.lower() or '已按新标准升级' in s:
+        return True
+    return body_chars(path) < 500
+
+
+def find_companion_files(slug_dir):
+    """同目录体例的并蒂文（<slug>/explain.html、<slug>/practice.html）。
+
+    2026-08-16 王德生令「并蒂文也要算分」。站上并蒂文有两种落法：
+      · 子目录版 <slug>/interpretation/ 与 <slug>/practice/ —— 本来就被 find_items 收；
+      · 同目录版 <slug>/explain.html 与 <slug>/practice.html —— 是文件不是目录，
+        find_items 只走目录，于是全站 164 页（胡敏 64、秦莉 28、陈晓艳 24、
+        高鹏 20、孔凡鹤 20、阳涌 6、黄倩盈 2）一直不计件、不进排名。
+    同一种内容因为落法不同而一收一漏，是口径不一致，不是设计。此处补齐。
+    """
+    out = []
+    for root, dirs, files in os.walk(slug_dir):
+        if os.path.basename(root) in INDEX_NAMES:
+            dirs[:] = []
+            continue
+        for name in files:
+            if name in COMPANION_FILES:
+                path = os.path.join(root, name)
+                if not is_redirect_shell(path):
+                    out.append(path)
+    return sorted(out)
+
+
 _git_cache = {}
 
 
@@ -335,6 +369,20 @@ def build():
                 rec['kind'] = kind
             if title:
                 rec['title'] = title
+            papers.append(rec)
+        # 同目录体例的并蒂文（explain.html / practice.html）——见 find_companion_files。
+        # 与子目录版一样按「每篇一件」计；不取 iq：并蒂文由编辑部撰写，
+        # 创新维只采母文的原稿盲评，派生页不得重复喂分（实测全站并蒂页零处带分）。
+        for f in find_companion_files(d):
+            date, _src = published_date(f)
+            if not date:
+                print(f"  ⚠ 无法确定发表日期，跳过: {os.path.relpath(f, STUDENTS)}", file=sys.stderr)
+                continue
+            rec = {'slug': os.path.relpath(f, STUDENTS).replace(os.sep, '/'),
+                   'date': date, 'words': body_chars(f), 'kind': 'companion'}
+            fld = paper_field(f)
+            if fld:
+                rec['field'] = fld
             papers.append(rec)
         papers.sort(key=lambda p: (p['date'], p['words']), reverse=True)
         stu['papers'] = papers
