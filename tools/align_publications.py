@@ -45,7 +45,12 @@ def strip_tags(s):
 
 
 def page_path(slug):
-    return os.path.join(PUB, "students", slug.strip("/"), "index.html")
+    # 同目录体例的并蒂文，roster 里的 slug 直接指向文件（<slug>/explain.html），
+    # 不是目录 —— 再拼一层 index.html 会指到不存在的路径上去。
+    slug = slug.strip("/")
+    if slug.endswith(".html"):
+        return os.path.join(PUB, "students", slug)
+    return os.path.join(PUB, "students", slug, "index.html")
 
 
 def extract(slug):
@@ -147,7 +152,8 @@ def main():
             new.append({
                 "number": nmax,
                 "title": title or p["slug"].rsplit("/", 1)[-1],
-                "url": "/students/%s/" % p["slug"].strip("/"),
+                "url": ("/students/%s" % p["slug"].strip("/")) if p["slug"].strip("/").endswith(".html")
+                        else ("/students/%s/" % p["slug"].strip("/")),
                 "kind": kind or (p.get("field") or ""),
                 "summary": summary or "",
             })
