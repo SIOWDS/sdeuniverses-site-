@@ -159,7 +159,7 @@ def cover(meta: dict) -> str:
 <div><b>发表</b>　{e(meta['date'])}</div>
 </div></div>
 <div class="cover-foot">SDE Universes · 德麦国际 Demai International
-　·　本篇由三个分属不同学科、且互相冲突的理论体系碰撞而成；三家来源均为站外公开文献</div>
+　·　{e(meta.get('foot') or '本篇由三个分属不同学科、且互相冲突的理论体系碰撞而成；三家来源均为站外公开文献')}</div>
 </div>"""
 
 
@@ -171,9 +171,11 @@ def extract(page: Path):
         return el.get_text(" ", strip=True) if el else ""
 
     series = re.sub(r"\s+", "", txt(".art-series"))          # 「学科通融·之七·考古学×…」
-    m = re.match(r"(学科通融)·(之[一二三四五六七八九十]+)·(.*)", series)
+    # 第二段既可能是篇号（之七），也可能是频道名（通融创新法）——两种都认
+    m = re.match(r"(学科通融)·([^·]+)·(.*)", series)
     series_no = f"{m.group(1)} · {m.group(2)}" if m else "学科通融"
     cross = m.group(3).replace("×", " × ") if m else ""
+    numbered = bool(re.match(r"之[一二三四五六七八九十]+$", m.group(2))) if m else False
 
     meta_raw = txt(".art-meta")
     author = "王德生 ＋ Claude"
@@ -191,6 +193,9 @@ def extract(page: Path):
         "series_head": series_no,
         "cross": cross,
         "author": author, "extent": extent, "date": date,
+        "foot": ("本篇由三个分属不同学科、且互相冲突的理论体系碰撞而成；三家来源均为站外公开文献"
+                 if numbered else
+                 "本篇是方法论特稿，讲的是本栏所用的那套工序本身，不是一次碰撞的产物"),
     }
 
     # 正文：目录之后到来源盒之前
