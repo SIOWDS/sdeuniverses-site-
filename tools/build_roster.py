@@ -162,6 +162,20 @@ def find_items(slug_dir):
 
 COMPANION_FILES = ('explain.html', 'practice.html')
 
+# 并蒂文（诠释文／实践文）的目录体例：<母文 slug>/interpretation/ 与 /practice/。
+COMPANION_DIRS = ('interpretation', 'practice')
+
+# 2026-08-16 王德生裁定：**并蒂文算 0.5 分，半个 paper**。
+# 件数（items）照记一件，计分篇数（count）与排名的 depth 都按半篇折算——
+# 并蒂文由 SDE 编辑部撰写、依附于母文，全额计入会让「谁配了并蒂文」
+# 比「谁写了什么」更能决定名次（占比曾从 0% 到 29% 不等）。
+COMPANION_WEIGHT = 0.5
+
+
+def is_companion_dir(d):
+    """目录体例的并蒂页：母文目录下的 interpretation/ 或 practice/。"""
+    return os.path.basename(d) in COMPANION_DIRS
+
 
 def is_redirect_shell(path):
     """升级到子目录版之后留下的 307/refresh 壳，不是作品。"""
@@ -364,6 +378,11 @@ def build():
             w = paper_weight(idx)
             if w is not None:
                 rec['weight'] = w
+            if is_companion_dir(item):
+                # 并蒂文半篇计分（COMPANION_WEIGHT）。页面自报 weight 的优先，
+                # 但并蒂页从不自报，实际上这一支总是走 0.5。
+                rec['kind'] = 'companion'
+                rec.setdefault('weight', COMPANION_WEIGHT)
             kind, title = work_meta(idx)
             if kind:
                 rec['kind'] = kind
@@ -379,7 +398,8 @@ def build():
                 print(f"  ⚠ 无法确定发表日期，跳过: {os.path.relpath(f, STUDENTS)}", file=sys.stderr)
                 continue
             rec = {'slug': os.path.relpath(f, STUDENTS).replace(os.sep, '/'),
-                   'date': date, 'words': body_chars(f), 'kind': 'companion'}
+                   'date': date, 'words': body_chars(f), 'kind': 'companion',
+                   'weight': COMPANION_WEIGHT}
             fld = paper_field(f)
             if fld:
                 rec['field'] = fld
@@ -390,7 +410,8 @@ def build():
         # 权重来自页面自报的 <meta name="sde:paper-weight">，缺省为 1。
         # 一部专著抵十篇写在专著条目页里，因此本脚本从磁盘重建后权重仍然存活；
         # 想知道有多少个页面，用 len(papers)，别用 count。
-        stu['count'] = sum(p.get('weight', 1) for p in papers)
+        total = sum(p.get('weight', 1) for p in papers)
+        stu['count'] = int(total) if float(total).is_integer() else round(total, 1)
         stu['items'] = len(papers)
     roster['students'].sort(key=lambda s: s['enrolled_order'])
     roster['updated'] = datetime.date.today().isoformat()
