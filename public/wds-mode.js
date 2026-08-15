@@ -450,6 +450,7 @@
       stopped: "（你按了停止）", stoppedOnly: "（已停止）",
       errEmpty: "这一轮只想、没写：基底把额度全花在思考上了（已思考 ", errEmptyNo: "这一轮基底一个字都没写出来（连思考也没有）。可能是这一场太长、或线路被中途切断——把顶部切到「标准」档再问一遍，或新开一场。", errEmptyEnd: " 字），正文一个字都没落。聊得越长越容易这样——把顶部切到「标准」档再问一遍，或新开一场。",
 
+      errCut: "这一轮没走完就断了——不是基底没写，是整个请求在半路被平台掐断（服务端连一句错都来不及说）。点「重答」再来一次；老是这样就把顶部切到「标准」档，或新开一场。",
       errDead: "连接像是断了（也许想太久被中间层切了）。稍后再问，你这句我记着。",
       errNet: "接不上 WDS 了（", errNetEnd: "）。稍后再问，你这句我记着。",
       webNeedKey: "联网没跑起来：需要一把智谱 Key（在 ⚙ 设置里填智谱，同一把即可）。",
@@ -662,6 +663,7 @@
       stopped: "(you stopped it)", stoppedOnly: "(stopped)",
       errEmpty: "All reasoning, no answer: the model spent its whole budget thinking (", errEmptyNo: "The model returned nothing this turn — not even reasoning. The session may be too long, or the connection was cut. Switch the top mode to Standard and ask again, or start a fresh session.", errEmptyEnd: " chars of reasoning) and wrote no text. The longer the session, the likelier this is — switch the top mode to Standard and ask again, or start a fresh session.",
 
+      errCut: "This turn was cut off mid-flight — the model isn't silent, the stream was severed (most likely the server was killed by the platform, so it never got to report an error). Hit Retry; if it keeps happening, switch the top mode to Standard or start a fresh session.",
       errDead: "The connection dropped — it may have thought too long and been cut. Try again in a moment; your question is still here.",
       errNet: "Couldn't reach SDE (", errNetEnd: "). Try again shortly.",
       webNeedKey: "Web search didn't run: it needs a Zhipu key (put one in ⚙ Settings — the same key works for both).",
@@ -906,6 +908,8 @@
       qTip: "它正在答——现在发出的会排队，答完自动接着问", qBar: "⏳ 已排队 {n} 条",
       qPausedT: "⏸ 已暂停 · {n} 条待发", qResume: "继续发", qClear: "清空队列",
       qFull: "队列最多 10 条", qNext: "下一句：",
+      dgLine: "〔诊断〕第 {sec} 秒 · 收到 {fr} 帧 · 思考 {th} 字 · {st}{end}",
+      dgAt1: "最后停在「", dgAt2: "」 · ", dgOk: "流正常收尾", dgCut: "流被截断（没收到收尾标记）",
       tabBrowse: "▤ 浏览", tabIm: "💬 SDE 社区",
       duBtn: "⇉ 双基底", duTip: "同一问同时问两家，左右并排；答完可再让 WDS 做一次对照",
       duPick: "第二家用谁？", duNoKey: "（还没填 Key）", duOff: "不并排",
@@ -1035,6 +1039,8 @@
       qTip: "It is still answering — what you send now is queued and asked next", qBar: "⏳ {n} queued",
       qPausedT: "⏸ Paused · {n} waiting", qResume: "Resume", qClear: "Clear queue",
       qFull: "10 queued messages max", qNext: "Next: ",
+      dgLine: "[diag] cut at {sec}s · {fr} frames · {th} chars of reasoning · {st}{end}",
+      dgAt1: "last stage \u201c", dgAt2: "\u201d · ", dgOk: "stream closed normally", dgCut: "stream was cut (no end marker)",
       tabBrowse: "▤ Browse", tabIm: "💬 Community",
       duBtn: "⇉ Two models", duTip: "Ask both at once, side by side; then have SDE compare them",
       duPick: "Which second model?", duNoKey: "(no key yet)", duOff: "Single model",
@@ -3205,6 +3211,10 @@
       if (pendWeb) { renderSources(cell, pendWeb, "web"); pendWeb = null; }
     }
     var wd = null, timedOut = false;   // 存活看门狗:靠心跳字节喂,45s 无字节判定连接已死
+    /* 空答取证：三种死法（思考吃光额度／流被中途切断／上游报错）走的下一步完全不同，
+       混成一句「没生出来」等于什么都没说。这四个读数是**客户端唯一还留得住的证据**——
+       服务端 note 挂在 cell.turn 上，导出 PDF 只取 .wdsm-a，一导出全丢。 */
+    var tStart = Date.now(), frames = 0, sawDone = false, lastBeat = null;
 
     function paint() {
       var now = Date.now();
@@ -3216,6 +3226,17 @@
       cell.a.innerHTML = mdRender(answer) + "<span class='cur'>▊</span>";
       typesetSync(cell.a);            // 与贴 innerHTML 同一个任务里排完，浏览器只画最终形态 ⇒ 不闪
       if (stick) scrollBottom();
+    }
+    /* 诊断行**贴进 .wdsm-a**（不是 cell.turn）：只有写在正文里，导出 PDF 才带得走。
+       上一次排障就是栽在这儿——用户交来的导出稿里一条服务端 note 都没有。 */
+    function emptyDiag() {
+      var st = (lastBeat && lastBeat.stage) ? (t("dgAt1") + lastBeat.stage + t("dgAt2")) : "";
+      var d = el("div", null, tx("dgLine", {
+        sec: (lastBeat && lastBeat.sec) || Math.round((Date.now() - tStart) / 1000), fr: frames,
+        th: thinkTxt.length, st: st, end: sawDone ? t("dgOk") : t("dgCut"),
+      }));
+      d.style.cssText = "color:#8B7B5E;font-size:12px;line-height:1.6;margin:10px 0 0";
+      cell.a.appendChild(d);
     }
     function endUI() {
       streaming = false; curReader = null;
@@ -3251,13 +3272,19 @@
           } else if (timedOut) {
             cell.a.className = "wdsm-a plain wdsm-err";
             cell.a.textContent = t("errDead");
+            emptyDiag();
           } else if (stoppedByUser) {
             cell.a.className = "wdsm-a plain"; cell.a.textContent = t("stoppedOnly");
           } else if (!errShown) {
             // 流干干净净地结束，却一个正文字都没有 —— 这一支原来是空的，页面于是什么都不说。
             // 沉默是最坏的一种失败：读者只会以为它还在跑。
             cell.a.className = "wdsm-a plain wdsm-err";
-            cell.a.textContent = thinkTxt ? (t("errEmpty") + thinkTxt.length + t("errEmptyEnd")) : t("errEmptyNo");
+            /* 分三种死法说话。**没收到 [DONE] ＝ 流被截断**，这时候说「基底把额度想光了」
+               是冤枉它：服务端可能早就写完了，是这条流没送到。 */
+            cell.a.textContent = !sawDone
+              ? t("errCut")
+              : (thinkTxt ? (t("errEmpty") + thinkTxt.length + t("errEmptyEnd")) : t("errEmptyNo"));
+            emptyDiag();
             var rrow = el("div", null, "");
             rrow.style.cssText = "margin-top:10px";
             var rt = el("button", "wdsm-act", t("aRegen"));
@@ -3277,8 +3304,9 @@
               var line = buf.slice(0, idx).trim(); buf = buf.slice(idx + 1);
               if (line.slice(0, 5) !== "data:") continue;
               var p = line.slice(5).trim();
-              if (p === "[DONE]") return finish();
+              if (p === "[DONE]") { sawDone = true; return finish(); }
               var j; try { j = JSON.parse(p); } catch (e) { continue; }
+              frames++;
               if (j.t === "quota") { if (j.v && typeof j.v.left === "number") { dayLeft = j.v.left; updTurns(); } }
               else if (j.t === "sources") { if (!srcDone) { srcDone = true; pendSite = j.v; lkPut(j.v); } }
               else if (j.t === "web") { pendWeb = j.v; }
@@ -3291,6 +3319,7 @@
               else if (j.t === "think") { thinkTxt += j.v; thinkBox(cell); cell.thinkC.textContent = thinkTxt; if (!answer) cell.thinkL.textContent = t("thinking") + " " + thinkTxt.length; }
               else if (j.t === "beat") {
                 var bv = j.v || {};
+                lastBeat = bv;                                   // 最后一次心跳报的阶段＝死在哪一步的唯一线索
                 if (!answer && cell.think) cell.thinkL.textContent = t("thinking") + " " + (bv.sec || 0) + "s · " + (bv.think || 0) + (bv.stage ? " · " + bv.stage : "");
                 else if (!answer) waitLine(cell, t("thinking") + " " + (bv.sec || 0) + "s" + (bv.stage ? " · " + bv.stage : ""));
               }

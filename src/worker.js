@@ -7492,7 +7492,17 @@ export default {
             let buf = "", outText = "";
             // ANSWER_DIAG：空答时唯一能查的东西。上游状态、收到几条流数据、上游给的收束理由、
             // 首帧长什么样、它自报烧了多少 token —— 没有这些，"只思考不写字"就永远只能靠猜。
-            const _cd = { lines: 0, finish: "", head: "", usage: null, err: false, status: upstream.status };
+            const _cd = { lines: 0, finish: "", head: "", usage: null, err: false, status: upstream.status, cutThink: 0 };
+            /* 【思考额度看门狗】思考与正文吃同一份 max_tokens。等它把额度想光再兜底，
+               要白等一两分钟——而那一两分钟正是流被平台无声掐死的窗口（isolate 的资源
+               上限是共享的，掐断时连 error 都发不出，页面只看到「什么都没有」）。
+               所以不等它撞线：思考吃掉六成、正文仍一个字没有，就地掐掉这一遍，直接走
+               下面那一遍关思考的。
+               ⚠ 线不是拍一个百分比——**判据是「剩下的额度还够不够写一段答」**：一段像样的
+               回答约 1000 汉字 ⇒ 留 1500 的余量，其余都可以拿去想。按百分比给（0.6）会在
+               标准档 2600 这种小预算上过早开刀，把本来想完就要落笔的那些也一起砍了。
+               中文近似 1 字 1 token，故用字数当读数。 */
+            const _thinkCap = Math.max(1000, tokWant - 1500);
             try {
             while (true) {
               const { done: rdone, value } = await reader.read();
@@ -7515,7 +7525,9 @@ export default {
                 const d = (j.choices && j.choices[0] && j.choices[0].delta) || {};
                 if (d.reasoning_content) { clk.firstFrame(); if (_st) _st.think += d.reasoning_content.length; controller.enqueue(_sseBytes({ t: "think", v: d.reasoning_content })); }
                 if (d.content) { clk.firstFrame(); if (_st) _st.out += d.content.length; outText += d.content; controller.enqueue(_sseBytes({ t: "token", v: d.content })); }
+                if (!outText && _st && _st.think > _thinkCap) { _cd.cutThink = _st.think; break; }
               }
+              if (_cd.cutThink) { try { await reader.cancel(); } catch (e0) {} break; }
             }
             } catch (e) {
               // 中途断线（含被自己的时钟掐断）：已经写出来的一个字都不丢，只补一句说得出原因的说明。
@@ -7535,8 +7547,11 @@ export default {
               const dg = "【诊断】上游 " + (_cd.status || "?") + " · 收到 " + _cd.lines + " 条流数据 · 思考 "
                 + ((_st && _st.think) || 0) + " 字 · 答题前的准备烧了 " + ((_st && _st.pre) || 0) + " 秒 · 结束原因 "
                 + (_cd.finish || "未给") + (rtok ? ("（上游自报思考 " + rtok + " tok）") : "")
+                + (_cd.cutThink ? (" · 思考过线被掐（线 " + _thinkCap + "）") : "")
                 + (_cd.head ? (" · 首帧「" + _cd.head.replace(/\s+/g, " ").slice(0, 80) + "」") : "");
-              controller.enqueue(_sseBytes({ t: "note", v: "这一答只出了思考、正文 0 字，正在关掉思考重答一次…" }));
+              controller.enqueue(_sseBytes({ t: "note", v: _cd.cutThink
+                ? ("这一答已经想了 " + _cd.cutThink + " 字、正文还是 0 字——不等它想完了，现在关掉思考重答一次…")
+                : "这一答只出了思考、正文 0 字，正在关掉思考重答一次…" }));
               _st.stage = "关思考重答";
               // 重答不能原样再来一遍。常规问答：关思考＋压预算，逼它早点收住开始写；
               // 长篇请求（askLen）：只关思考，长度一个字不减 —— 降预算等于砍掉正文，那不是解药。
