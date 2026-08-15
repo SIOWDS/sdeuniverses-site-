@@ -137,9 +137,16 @@ def find_items(slug_dir):
                 # Count the parent when it carries an article signature; plain
                 # collection pages (for example essays/ and poems/) stay excluded.
                 source = open(idx, encoding='utf-8').read()
+                # 2026-08-15：并蒂文批次给母文加了 interpretation/ 与 practice/ 两个子页，
+                # 于是母文自己被这一支静默排除——全站漏掉 9 篇（高鹏 8、孔凡鹤 1，
+                # 其中孔凡鹤那篇还是专著条目页，权重 10）。判据因此放宽到「页面自带
+                # 文章签名」：art-title 标题、并蒂三联块、或旧的 submission-id / readbar。
+                # 学员主页与频道容器页不会命中这三样（频道页另有 CHANNEL_MARK 先行拦下）。
                 if (
                     'sde-submission-id' in source
                     or re.search(r'class=["\'][^"\']*\breadbar\b', source)
+                    or re.search(r'class=["\'][^"\']*\bart-title\b', source)
+                    or 'bindi-triad' in source
                 ):
                     out.append(d)
 
