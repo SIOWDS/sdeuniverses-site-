@@ -5,6 +5,8 @@
  */
 "use strict";
 const fs = require("fs");
+// 不写死沙盒路径：换棵工作树跑就会整套假红（这套护栏历史上栽过一次）
+const SITE = require("path").join(__dirname, "..");
 let FAILS = 0, PASS = 0;
 // 桩的 innerHTML 是扁平解析、不建文本节点：内容一旦挂在子块上，父节点的 innerHTML/textContent
 // 都取不到东西。要验"排出来了什么"，只能逐层把 _html 拼起来。
@@ -53,13 +55,26 @@ class Node {
   removeChild(c) { const i = this.children.indexOf(c); if (i >= 0) this.children.splice(i, 1); c.parentNode = null; return c; }
   remove() { if (this.parentNode) this.parentNode.removeChild(this); }
   contains(n) { if (n === this) return true; return this.children.some((c) => c.contains(n)); }
+  // 事件委托（tg.closest(".dx")）要它。产品从「直接绑 onclick」改成委托是对的
+  // （顶栏被心跳重建后 onclick 那一版会失灵），桩得跟上，不能靠改断言绕过去。
+  closest(sel) { let n = this; while (n) { if (n._match && n._match(sel)) return n; n = n.parentNode; } return null; }
   setAttribute(k, v) { this.attrs[k] = String(v); if (k === "class") this.className = String(v); }
   getAttribute(k) { if (k === "class") return this.className; if (k.slice(0, 5) === "data-") return this.dataset[k.slice(5)] ?? this.attrs[k] ?? null; return this.attrs[k] ?? null; }
   addEventListener(t, f) { (this._listeners[t] = this._listeners[t] || []).push(f); }
   removeEventListener(t, f) { if (this._listeners[t]) this._listeners[t] = this._listeners[t].filter((x) => x !== f); }
   dispatch(t, ev) { (this._listeners[t] || []).forEach((f) => f(ev || {})); }
   getBoundingClientRect() { return { top: 10, bottom: 40, left: 20, right: 90, width: 70, height: 30 }; }
-  click() { if (this.onclick) this.onclick({ currentTarget: this, target: this }); }
+  click() {
+    // 真浏览器里点一颗按钮，事件会一路冒到祖先——委托就是靠这个。
+    // 旧桩只调自己的 onclick，于是"挂在遮罩上的那颗逃生钮"永远点不动。
+    if (this.onclick) this.onclick({ currentTarget: this, target: this });
+    let n = this;
+    while (n) {
+      const ls = (n._listeners && n._listeners.click) || [];
+      ls.slice().forEach((f) => f({ currentTarget: n, target: this }));
+      n = n.parentNode;
+    }
+  }
   _all(out) { out.push(this); this.children.forEach((c) => c._all(out)); return out; }
   _match(sel) {   // 支持复合选择器：tag / .cls / #id / [a='v'] 任意组合，如 .wdsm-tab[data-m='normal']
     const re = /^([a-zA-Z][\w-]*)?((?:[.#][\w-]+)*)((?:\[[^\]]+\])*)$/;
@@ -204,7 +219,7 @@ window.WDSVoice = {
 let PICK_DOCS = null;
 {
   // 直接把真模块跑起来，chunk/selectChunks 用的就是线上那份实现，不另写一份假的
-  const realSrc = fs.readFileSync("/home/claude/site/public/assets/wds-attach.js", "utf8");
+  const realSrc = fs.readFileSync(SITE + "/public/assets/wds-attach.js", "utf8");
   const shim = { FileReader: function () {}, Blob: function () {}, navigator: navMock };
   new Function("window", "document", "navigator", "FileReader", "Promise", realSrc)(window, document, navMock, shim.FileReader, Promise);
   const realApi = window.WDSAttach.api;
@@ -225,7 +240,7 @@ let PICK_DOCS = null;
 }
 
 /* ---------- 载入被测脚本 ---------- */
-const src = fs.readFileSync("/home/claude/site/public/wds-mode.js", "utf8");
+const src = fs.readFileSync(SITE + "/public/wds-mode.js", "utf8");
 console.log("① 载入脚本");
 try { new Function("window", "document", "localStorage", "fetch", "navigator", "TextDecoder", "Blob", "URL", "alert", "setTimeout", "clearTimeout", "Date", src)(
   window, document, localStorage, fetchMock, navMock, global.TextDecoder, global.Blob, global.URL, global.alert, setTimeout, clearTimeout, Date); ok(true, "脚本加载无异常"); }
@@ -357,7 +372,7 @@ ROUTE["/api/wds/chat"] = [
 
   console.log("⑦.5 停止键（三个入口一条路）");
 {
-  const wm = require("fs").readFileSync("/home/claude/site/public/wds-mode.js", "utf8");
+  const wm = require("fs").readFileSync(SITE + "/public/wds-mode.js", "utf8");
   const T = (name, cond) => ok(cond, name);
   T("有一个独立的停止条（不只是发送钮变成方块）", /wdsm-stopbar/.test(wm));
   T("停止条上写着字，不是一个光秃秃的图标", /stopGen: "停止生成"/.test(wm) && /lb\.textContent = t\("stopGen"\)/.test(wm));
@@ -378,7 +393,7 @@ ROUTE["/api/wds/chat"] = [
 
 console.log("⑦.8 对外 PPT 的可见性（找不到＝没有）");
 {
-  const wm = require("fs").readFileSync("/home/claude/site/public/wds-mode.js", "utf8");
+  const wm = require("fs").readFileSync(SITE + "/public/wds-mode.js", "utf8");
   const T = (name, cond) => ok(cond, name);
   T("顶栏按钮自己写着里面有 PPT", /bDistill: "\\u270e 成文 · PPT"/.test(wm) && /Write up · Deck/.test(wm));
   T("空态不再铺大标题/副标题/提示条（对标 Claude·2026-07-31 去掉）", !/class='wdsm-h1'/.test(wm) && !/heroSub:/.test(wm) && !/heroAfter:/.test(wm));
@@ -406,10 +421,18 @@ console.log("⑧ 成文（distill）");
   // 2026-07-30 加第四档「对外 PPT」；2026-08-01 PDF 一度加在这里随即按用户令搬到顶栏（**不许退回**）；
   // 2026-08-01 再加第五档「凝成一万字论文」→ 八项：报告/成文/一万字/提纲/PPT ＋ 导出 ＋ 选目录 ＋ 成文记录。
   // 2026-08-01 再加第六档「总结载入的文章」（对标 SDE 对谈那台读一篇文章的能力）→ 九项。
-  ok(menu.children.length === 9, "菜单九项（报告/成文/一万字/提纲/总结文章/对外PPT/导出/选目录/成文记录），实得 " + menu.children.length);
-  ok(menu.textContent.indexOf("一万字") >= 0, "一万字论文那一档在菜单里");
+  // 2026-08-12 再加第七档「两万字论文 · 一趟写完」（paper1，默认该选的那一个，
+  //   分十六趟那一档留着做对照）→ 十项；同时「一万字」全线改名「两万字」。
+  ok(menu.children.length === 10, "菜单十项（报告/成文/两万字一趟/两万字十六趟/提纲/总结文章/对外PPT/导出/选目录/成文记录），实得 " + menu.children.length);
+  ok(menu.textContent.indexOf("两万字") >= 0, "两万字论文那一档在菜单里");
+  ok(/一趟写完|single pass/.test(menu.textContent) && /十六趟|sixteen passes/.test(menu.textContent),
+    "一趟与十六趟两档并列（单趟是默认，十六趟作对照）");
   ok(menu.textContent.indexOf("总结载入的文章") >= 0, "总结全文那一档在菜单里");
-  ok(menu.textContent.indexOf("PDF") < 0, "PDF 不在成文菜单里（它在顶栏）");
+  // ⚠ 判据只看**档名**：两万字那两档的副标题里本就写着「出 Word 与 PDF」，
+  //   拿整段文本找 "PDF" 会把它们误判成"PDF 导出档回到菜单里了"。要挡的是那一档本身。
+  ok(![].slice.call(menu.children).some((b) => /^[^\n]*PDF/.test(String(b.textContent || "").split("·")[0])
+      && /导出|Export/.test(String(b.textContent || ""))),
+    "PDF 导出档不在成文菜单里（它在顶栏那颗独立按钮上）");
   menu.children[0].click();
   await new Promise((r) => setTimeout(r, 220));
   const dist = document.body.querySelector(".wdsm-dist");
@@ -1234,16 +1257,23 @@ console.log("⑧ 成文（distill）");
   dp3.querySelector(".dx").click();
 
   console.log("⑳ 排版崩了也不许白屏（源码级：mdRender 在模块内部，运行时没法让它抛错而不改产品码）");
-  const wm3 = require("fs").readFileSync("/home/claude/site/public/wds-mode.js", "utf8");
+  const wm3 = require("fs").readFileSync(SITE + "/public/wds-mode.js", "utf8");
   const _dn = wm3.slice(wm3.indexOf("    function done() {"), wm3.indexOf("wrap.querySelector(\".dx\").onclick"));
   ok(_dn.indexOf("distSave(kindT(kind), text") < _dn.indexOf("paintD(true)"), "存稿写在渲染之前（顺序不许调换）");
   ok(/try \{[\s\S]{0,200}if \(text\) paintD\(true\);[\s\S]{0,80}\} catch \(e\) \{\s*out\.textContent = text/.test(_dn),
      "渲染包在 try/catch 里，崩了退回纯文本");
-  ok(/var _shown = String\(out\.textContent[\s\S]{0,140}if \(text && !_shown\) \{\s*out\.textContent = text;/.test(_dn),
+  // 白屏自检后来加到三种量法，中间那段长过 140 字 ⇒ 放宽到 320，但仍钉住
+  // 「先算 _shown、再据它退回纯文本」这个次序（把自检删掉照样当场红）。
+  ok(/var _shown = String\(out\.textContent[\s\S]{0,320}if \(text && !_shown\) \{\s*out\.textContent = text;/.test(_dn),
      "渲染完自检：出来是空的（白屏）就退回纯文本");
   ok(/replace\(\/<\[\^>\]\*>\/g, ""\)/.test(_dn) && /paintedHtml > 0/.test(_dn),
      "白屏判据用三种量法（textContent ＋ 去标签 innerHTML ＋ 真正排出来的 HTML 量）——增量渲染下前两种都可能为空，只认它们会误报白屏");
-  ok(/setTimeout\(function \(\) \{[\s\S]{0,220}try \{ if \(text && text\.length <= 40000\) autoLink/.test(_dn), "autoLink/deckPrep 挪出同一个任务，正文先上屏");
+  // 后来又加了「正文里没有书名号就整段跳过」这个前置条件 ⇒ 条件段放开，
+  //   但 autoLink 必须仍在 setTimeout 里（挪回同一个任务当场红）。
+  ok(/setTimeout\(function \(\) \{[\s\S]{0,900}autoLink\(out, text\);[\s\S]{0,400}\}, 80\);/.test(_dn),
+     "autoLink/deckPrep 挪出同一个任务、放进那颗 80ms 的定时器里（正文先上屏一帧）");
+  ok(/text\.length <= 40000 && text\.indexOf\("\\u300a"\) >= 0/.test(_dn),
+     "两道早退闸都在：超长稿跳过；正文里一个《》都没有也跳过");
   ok(_dn.indexOf("window.SDEVault") > _dn.indexOf("setTimeout(function () {"), "库存与近邻闸门也不和排版挤在一个任务里");
 
   /* ── 十万字：显示端必须与全文长度脱钩 ────────────────────────────
@@ -1252,13 +1282,18 @@ console.log("⑧ 成文（distill）");
      "每写一点就把整篇重排一遍"——O(N²)。要撑十万字，就得让每一拍的代价只与
      还在写的那一小段有关，与全文多长无关。 */
   console.log("㉑ 成文流式：只排新写的那一段，不再整篇重排");
-  const _src = require("fs").readFileSync("/home/claude/site/public/wds-mode.js", "utf8");
+  const _src = require("fs").readFileSync(SITE + "/public/wds-mode.js", "utf8");
   const _ds = _src.slice(_src.indexOf("function distill(kind, existing"), _src.indexOf("SDE 工序（ChatSDE 独有的九道）"));
   ok(!/out\.innerHTML = mdRender\(text\) \+ "<span class='cur'>/.test(_ds), "流式那一行不再把累计全文重排一遍");
-  ok(/if \(j\.t === "token"\) \{ text \+= j\.v;[^\n]*paintD\(false\)/.test(_ds), "改成调增量渲染器 paintD");
+  // 单趟档（paper1）进来之后这一支拆成了多行、并多了 !oneShot 这道闸
+  //   （一趟出全篇时中途一个字都不排）。判据改成跨行找，但 paintD(false) 必须还在。
+  ok(/if \(j\.t === "token"\) \{[\s\S]{0,400}text \+= j\.v;[\s\S]{0,400}paintD\(false\)/.test(_ds), "改成调增量渲染器 paintD");
+  ok(/!oneShot && Date\.now\(\) - lastP > paintGap/.test(_ds), "一趟出全篇那一档中途不排版（排版全推到收尾那一次）");
   ok(/if \(text\) paintD\(true\);/.test(_ds), "收尾也不整篇重排，只把尾巴排完");
   ok(/text\.length <= 40000/.test(_ds), "超长稿跳过 autoLink（它同样是 O(N²)）");
-  ok(/if \(!fenceOdd && !mathOdd && next && !\/\^\(\[-\*\+>\|\]\|\\d\+\[\.\)\]\)\//.test(_ds),
+  // 后来又允许「下一行是新的一节标题」也当安全切口（_isSec）⇒ 中间放开，
+  //   围栏/公式成对与列表行不许切这两条仍钉死。
+  ok(/if \(!fenceOdd && !mathOdd && next && [\s\S]{0,40}\/\^\(\[-\*\+>\|\]\|\\d\+\[\.\)\]\)\//.test(_ds),
      "只在安全空行切：围栏与 $$ 成对、下一行不是列表/引用/表格");
   ok(/function scanForward/.test(_ds) && !/text\.lastIndexOf\("\\n\\n", i - 1\)/.test(_ds),
      "切口扫描是增量的（只扫新写出来的那一段），不再每拍从末尾往回重扫整篇");
@@ -1293,12 +1328,19 @@ console.log("⑧ 成文（distill）");
   ROUTE["/api/wds/distill"] = function (p) {
     LEGS.push({ stage: p.stage || "", idx: p.idx, hasPlan: !!(p.plan && p.plan.sections), tail: String(p.prevTail || "") });
     if (p.stage === "plan") return [{ t: "plan", v: PLAN }];
-    if (p.stage === "part") return [{ t: "token", v: "## 第 " + (p.idx + 1) + " 节\n\n这一节的正文。" }];
+    /* ⚠ 每节必须写足：产品判「这一节写出来没有」的下限是 max(260, 目标字数×0.4)
+       ＝这里的 480 字。桩里只回一句话 ⇒ 每节都判没写出来 ⇒ 退避二十秒重来一遍，
+       四秒内只跑得完两趟，读起来像"产线跑一节就停了"。**假红就是这么来的。** */
+    if (p.stage === "part") return [{ t: "token", v: "## 第 " + (p.idx + 1) + " 节\n\n" + "这一节的正文写足到过得了下限。".repeat(40) }];
     return [{ t: "token", v: "（单趟兜底稿）" }];
   };
   layer.querySelector(".wdsm-distbtn").click();
-  document.body.querySelector(".wdsm-menu").children[2].click();     // 第三档＝凝成一万字论文
-  await new Promise((r) => setTimeout(r, 900));
+  /* ⚠ 2026-08-12 菜单里多了「两万字 · 一趟写完」，它排在分十六趟那一档**前面**——
+     再按 children[2] 点到的就是单趟档，于是这一节整段读成"只跑了一趟"。
+     按档名点（这套护栏自己在⑨那里就写过这条规矩，这里当初没照做）。 */
+  [].slice.call(document.body.querySelector(".wdsm-menu").children)
+    .filter((b) => /十六趟|sixteen passes/.test(String(b.textContent || "")))[0].click();
+  await new Promise((r) => setTimeout(r, 4000));
   let dpc = document.body.querySelector(".wdsm-dist");
   ok(LEGS.length === 4, "一共四趟：拟题 ＋ 三节，实得 " + LEGS.length + " 趟（" + LEGS.map((l) => l.stage || "单趟").join("/") + "）");
   ok(LEGS[0].stage === "plan", "第一趟是拟题");
@@ -1319,13 +1361,17 @@ console.log("⑧ 成文（distill）");
     if (p.stage === "plan") return [{ t: "plan", v: PLAN }];
     if (p.stage === "part") {
       if (p.idx === 1 && boom++ < 1) return [];                      // 第二节第一次交白卷
-      return [{ t: "token", v: "## 第 " + (p.idx + 1) + " 节\n\n这一节的正文。" }];
+      return [{ t: "token", v: "## 第 " + (p.idx + 1) + " 节\n\n" + "这一节的正文写足到过得了下限。".repeat(40) }];
     }
     return [{ t: "token", v: "（单趟兜底稿）" }];
   };
   layer.querySelector(".wdsm-distbtn").click();
-  document.body.querySelector(".wdsm-menu").children[2].click();
-  await new Promise((r) => setTimeout(r, 1100));
+  [].slice.call(document.body.querySelector(".wdsm-menu").children)
+    .filter((b) => /十六趟|sixteen passes/.test(String(b.textContent || "")))[0].click();
+  /* ⚠ 重写不是立刻打的：产品**故意退避 RETRY_WAIT=20 秒**再来第二遍
+     （"立刻重打等于把同一堵墙再撞一次"）。等 1.1 秒当然什么都读不到——
+     这一条曾经是假红。要么等过那 20 秒，要么这条就废了；选等。 */
+  await new Promise((r) => setTimeout(r, 31000));
   const dpr = document.body.querySelector(".wdsm-dist");
   const idx1 = LEGS.filter((l) => l.stage === "part" && l.idx === 1).length;
   ok(idx1 === 2, "空掉的那一节重写一次（只补它，不是整篇重来），实得 " + idx1 + " 趟");
@@ -1335,16 +1381,23 @@ console.log("⑧ 成文（distill）");
 
   LEGS = [];
   ROUTE["/api/wds/distill"] = function (p) {
-    LEGS.push({ stage: p.stage || "" });
-    if (p.stage === "plan") return [{ t: "note", v: "提纲这一趟没成" }];   // 拿不到 plan
+    LEGS.push({ stage: p.stage || "", bare: p.bare });
+    // 第一趟拟题交白卷；第二趟（bare=1）要的是免调用的体例骨架，服务端照样给得出
+    if (p.stage === "plan" && !p.bare) return [{ t: "note", v: "提纲这一趟没成" }];
+    if (p.stage === "plan" && p.bare) return [{ t: "plan", v: PLAN }];
     return [{ t: "token", v: "（单趟兜底稿）" }];
   };
   layer.querySelector(".wdsm-distbtn").click();
-  document.body.querySelector(".wdsm-menu").children[2].click();
-  await new Promise((r) => setTimeout(r, 700));
+  [].slice.call(document.body.querySelector(".wdsm-menu").children)
+    .filter((b) => /十六趟|sixteen passes/.test(String(b.textContent || "")))[0].click();
+  await new Promise((r) => setTimeout(r, 3000));
   const dpf = document.body.querySelector(".wdsm-dist");
-  ok(LEGS.length === 2 && LEGS[1].stage === "", "提纲没成就退回单趟，实得 " + JSON.stringify(LEGS.map((l) => l.stage || "单趟")));
-  ok(htmlOf(dpf.querySelector(".wdsm-a")).includes("单趟兜底稿"), "读者照样拿得到一篇，而不是只收到一句报错");
+  /* 🔴 2026-08-12 反转：**骨架档不许退回"一趟写完"**——那是拿两万字去赌一次调用
+     （真跑里它交回 55 个字）。改成再要一趟**免调用的骨架**（bare）。
+     这条断言原来钉的正是被废掉的那个行为，属于"护栏钉着产品已经否掉的做法"。 */
+  ok(LEGS.some((l) => l.stage === "plan" && l.bare === 1) && !LEGS.some((l) => !l.stage),
+     "提纲那一趟没成 ⇒ 再要一份免调用骨架，不拿两万字去赌单趟，实得 " + JSON.stringify(LEGS.map((l) => (l.stage || "单趟") + (l.bare ? "·bare" : ""))));
+  ok(/提纲|骨架|outline|skeleton/.test(String(dpf.textContent)), "并且当场把「提纲没成、改用骨架」这件事说给读者听");
   dpf.querySelector(".dx").click();
 
   console.log("㉔ 逐节存稿 ＋ 上一次没收尾就自己报案");
@@ -1353,12 +1406,13 @@ console.log("⑧ 成文（distill）");
   STORE_SESSIONS_HOOK = function (turns) { turns.forEach(function (x) { if (x && x.role === "wds") SAVES.push(x.text.length); }); };
   ROUTE["/api/wds/distill"] = function (p) {
     if (p.stage === "plan") return [{ t: "plan", v: PLAN }];
-    if (p.stage === "part") return [{ t: "token", v: "## 第 " + (p.idx + 1) + " 节\n\n" + "这一节的正文。".repeat(20) }];
+    if (p.stage === "part") return [{ t: "token", v: "## 第 " + (p.idx + 1) + " 节\n\n" + "这一节的正文写足到过得了下限。".repeat(40) }];
     return [{ t: "token", v: "（单趟兜底稿）" }];
   };
   layer.querySelector(".wdsm-distbtn").click();
-  document.body.querySelector(".wdsm-menu").children[2].click();
-  await new Promise((r) => setTimeout(r, 900));
+  [].slice.call(document.body.querySelector(".wdsm-menu").children)
+    .filter((b) => /十六趟|sixteen passes/.test(String(b.textContent || "")))[0].click();
+  await new Promise((r) => setTimeout(r, 8000));
   ok(SAVES.length >= 3, "写作途中就在存（每写完一节存一次，不是等到最后才存），实得 " + SAVES.length + " 次");
   ok(SAVES[SAVES.length - 1] > SAVES[0], "存下来的稿子逐节变长（同一条记录反复覆盖）");
   const tr = JSON.parse(store["sde_wds_dist_trace"] || "null");
@@ -1380,9 +1434,13 @@ console.log("⑧ 成文（distill）");
   delete store["sde_wds_dist_trace"];
 
   console.log("㉕ 写作期的尾巴走纯文本；心跳用来分辨「卡死」还是「没卡死但空了」");
-  const _s5 = require("fs").readFileSync("/home/claude/site/public/wds-mode.js", "utf8");
+  const _s5 = require("fs").readFileSync(SITE + "/public/wds-mode.js", "utf8");
   const _d5 = _s5.slice(_s5.indexOf("function distill(kind, existing"), _s5.indexOf("SDE 工序（ChatSDE 独有的九道）"));
-  ok(/if \(final\) \{[\s\S]{0,200}mdRender\(tail\)/.test(_d5), "只有收尾那一次把尾巴排成 Markdown");
+  // 收尾那一段后来长出「尾巴超过 4000 字就按段切块逐块贴」的分支，注释也长了 ⇒ 窗口放到 900；
+  // 但"只有 final 那一次才 mdRender 尾巴"这条判据一个字没松：写作途中那一支仍必须是纯文本。
+  ok(/if \(final\) \{[\s\S]{0,900}mdRender\(tail\)/.test(_d5), "只有收尾那一次把尾巴排成 Markdown");
+  ok(/tail\.length > 4000[\s\S]{0,320}appendSeg\(_buf\)/.test(_d5),
+     "超长尾巴按段切块逐块贴（一口气 mdRender ＋ innerHTML 正是那几秒白屏）");
   ok(/tailEl\.textContent = tail \+ "\\u258a";/.test(_d5), "写作期尾巴是纯文本——每拍零正则、零 HTML 解析");
   ok(/wdsm-tail\{white-space:pre-wrap/.test(_s5), "纯文本尾巴保住换行与段距（否则正在写的那段读起来像一坨）");
   ok(/setInterval\(function \(\) \{[\s\S]{0,400}pTrace\.beatGap = gap/.test(_d5) || /if \(gap > pTrace\.beatGap\) pTrace\.beatGap = gap;/.test(_d5),
@@ -1394,11 +1452,12 @@ console.log("⑧ 成文（distill）");
   // 真跑一遍，确认写作途中确实没走 Markdown、收尾后才排版
   ROUTE["/api/wds/distill"] = function (p) {
     if (p.stage === "plan") return [{ t: "plan", v: PLAN }];
-    if (p.stage === "part") return [{ t: "token", v: "## 第 " + (p.idx + 1) + " 节\n\n这一节的正文。" }];
+    if (p.stage === "part") return [{ t: "token", v: "## 第 " + (p.idx + 1) + " 节\n\n" + "这一节的正文写足到过得了下限。".repeat(40) }];
     return [{ t: "token", v: "（单趟兜底稿）" }];
   };
   layer.querySelector(".wdsm-distbtn").click();
-  document.body.querySelector(".wdsm-menu").children[2].click();
+  [].slice.call(document.body.querySelector(".wdsm-menu").children)
+    .filter((b) => /十六趟|sixteen passes/.test(String(b.textContent || "")))[0].click();
   await new Promise((r) => setTimeout(r, 900));
   const dph = document.body.querySelector(".wdsm-dist");
   ok(/<h[1-6]>/.test(htmlOf(dph.querySelector(".wdsm-a"))), "收尾之后整篇都是正式排版（纯文本只在写作途中用）");
@@ -1407,7 +1466,7 @@ console.log("⑧ 成文（distill）");
   dph.querySelector(".dx").click();
 
   console.log("㉖ 仪器不许在嫌疑最大的地方瞎：收尾全程有心跳、逐步打标");
-  const _s6 = require("fs").readFileSync("/home/claude/site/public/wds-mode.js", "utf8");
+  const _s6 = require("fs").readFileSync(SITE + "/public/wds-mode.js", "utf8");
   const _dn6 = _s6.slice(_s6.indexOf("    function done() {"), _s6.indexOf("wrap.querySelector(\".dx\").onclick"));
   ok(_dn6.indexOf('pTrace.leg = "收尾·存稿"') >= 0, "进 done() 先打「收尾·存稿」标");
   ok(_dn6.indexOf('pTrace.leg = "收尾·排版"') > _dn6.indexOf('pTrace.leg = "收尾·存稿"'), "排版这一步单独打标");
@@ -1423,11 +1482,12 @@ console.log("⑧ 成文（distill）");
   // 真跑一遍：正常收尾时 leg 必须落在「已收尾」
   ROUTE["/api/wds/distill"] = function (p) {
     if (p.stage === "plan") return [{ t: "plan", v: PLAN }];
-    if (p.stage === "part") return [{ t: "token", v: "## 第 " + (p.idx + 1) + " 节\n\n这一节的正文。" }];
+    if (p.stage === "part") return [{ t: "token", v: "## 第 " + (p.idx + 1) + " 节\n\n" + "这一节的正文写足到过得了下限。".repeat(40) }];
     return [{ t: "token", v: "（单趟兜底稿）" }];
   };
   layer.querySelector(".wdsm-distbtn").click();
-  document.body.querySelector(".wdsm-menu").children[2].click();
+  [].slice.call(document.body.querySelector(".wdsm-menu").children)
+    .filter((b) => /十六趟|sixteen passes/.test(String(b.textContent || "")))[0].click();
   await new Promise((r) => setTimeout(r, 900));
   const tr6 = JSON.parse(store["sde_wds_dist_trace"] || "null");
   ok(tr6 && tr6.leg === "已收尾" && tr6.ok === true, "正常跑完时痕迹停在「已收尾」，实得 " + (tr6 && tr6.leg));
