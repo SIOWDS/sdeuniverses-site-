@@ -24,8 +24,10 @@ const chatSeg = (function () {
 })();
 
 console.log("① worker · 思考额度看门狗");
-hasLine(chatSeg, /^\s+const _thinkCap = Math\.max\(1000, tokWant - 1500\);$/m,
-  "额度线＝预算减去「还够写一段答」的余量，不是拍一个百分比，也不是写死的数");
+hasLine(chatSeg, /^\s+const _thinkCap = Math\.round\(Math\.max\(1000, tokWant - 1200\) \* 1\.7\);$/m,
+  "额度线＝(预算 − 还够写一段答的余量) × 1.7，不是拍一个百分比，也不是写死的数");
+ok(/1 token ≈ 1\.7 汉字|\* 1\.7\)/.test(chatSeg),
+  "字数与 token 之间做了换算（真跑实测中文推理 1 token≈1.7 字；按 1:1 比会过早开刀）");
 ok(!/_thinkCap = .*tokWant \* 0\./.test(chatSeg),
   "没退回按百分比给（小预算档会被过早开刀）");
 hasLine(chatSeg, /^\s+if \(!outText && _st && _st\.think > _thinkCap\) \{ _cd\.cutThink = _st\.think; break; \}$/m,
