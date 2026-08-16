@@ -60,7 +60,11 @@ for f in sorted(glob.glob(os.path.join(PUB, "**", "index.html"), recursive=True)
         h = io.open(f, encoding="utf-8", errors="replace").read()
     except Exception:
         skipped += 1; continue
-    t = one(r'<h1 class="art-title">(.*?)</h1>', h)
+    # 2026-08-16：原正则只认裸 class="art-title"，而全站有 71 个页面写作
+    # class="art-title zh-only"（专著条目页与中英双语页多用这种写法），
+    # 它们因此被静默挡在近邻索引之外 —— 症状与 2026-08-08 的面板漏收同型：
+    # 不报错，只是两个智能体查不到这些篇目。改为允许附加类名。
+    t = one(r'<h1 class="art-title[^"]*">(.*?)</h1>', h)
     if not t and u.startswith("/frontier/"):
         # 面板页标题是裸 <h1>（没有 art-title）。2026-08-08 之前这一条把 627 块面板
         # 整体挡在近邻索引之外 —— 而挡掉的后果是静默的：碰撞机查不到它，
@@ -68,7 +72,7 @@ for f in sorted(glob.glob(os.path.join(PUB, "**", "index.html"), recursive=True)
         t = one(r'<h1[^>]*>(.*?)</h1>', h)
     if not t:
         continue                                      # 既无 art-title 也无裸 h1 的不是篇目页
-    sub = one(r'<div class="art-subtitle">(.*?)</div>', h) or one(r'<div class="art-sub">(.*?)</div>', h)
+    sub = one(r'<div class="art-subtitle[^"]*">(.*?)</div>', h) or one(r'<div class="art-sub[^"]*">(.*?)</div>', h)
     kw = one(r'<div class="keywords">(.*?)</div>', h) or one(r'<p class="kw">(.*?)</p>', h)
     kw = re.sub(r"^\s*(关键词|Keywords)\s*[：:]?\s*", "", kw)
     line = one(r'<div class="innov">.*?<div class="txt">(.*?)</div>', h)
