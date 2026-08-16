@@ -24,6 +24,17 @@ border-top:1px solid var(--line);font-size:14px}
 .toc a{display:block;padding:7px 0;border-bottom:1px solid var(--line);color:var(--fg)}
 .toc a:hover{color:var(--am)}
 .foot{margin-top:50px;padding-top:16px;border-top:1px solid var(--line);color:var(--dim);font-size:12.5px;text-align:center}
+
+ul,ol{margin:.9em 0;padding-left:1.6em}
+li{margin:.4em 0;line-height:1.9;text-align:justify}
+li>p{margin:.3em 0}
+code{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.88em;background:var(--card);
+color:#E9C79A;padding:.1em .38em;border-radius:3px;border:1px solid var(--line)}
+strong,b{color:#F5F2ED;font-weight:600}
+hr{border:0;border-top:1px solid var(--line);margin:2em 0}
+h3+p,h4+p{margin-top:.35em}
+.tw table{margin:0}
+@media(max-width:640px){.wrap{padding:26px 16px 70px}h1{font-size:23px}table{font-size:13px}}
 </style></head><body>
 <div class="bar"><a href="/books/m/87/">← 专著首页</a><a href="/books/m/87/text/">目录</a><a href="/books/m/87/read.html">📄 在线 PDF</a><a href="/students/xu-jiaheng/music-vol1/music-vol1.pdf">⬇ 下载</a><span style="color:var(--dim)">德麦国际专著第 87 号</span></div>
 <div class="wrap"><h1>附录五　跨读数相关矩阵（本卷最大一笔欠账的兑现）</h1>
@@ -43,7 +54,7 @@ border-top:1px solid var(--line);font-size:14px}
 <p>撤回 r 之后，能在同一批四声部材料上同时算出来的读数剩三个，因此本场测的是三个，不是十个。三个量都是<strong>代理</strong>，不是各章的完整读数：第八章的 G 未做尺度律拟合；第二章的 w 用并读窗占比而非墙宽的连续长度；第三章的 ν 只报了 m=1。</p>
 <p>本场原本把 r 与 G 的分开单列为 H4，因为两者共享同一个底层机制、只由参照集合一外一内区分。<strong>r 撤回后，H4 无从判定</strong>，第一章与第八章的分界回到“只有论证、没有数据”的状态。</p>
 <p><strong>表 A5-1　三个读数在 130 首上的分布</strong></p>
-<table>
+<div class="tw"><table>
 <thead>
 <tr class="header">
 <th>读数</th>
@@ -72,11 +83,11 @@ border-top:1px solid var(--line);font-size:14px}
 <td>0.067 – 0.632</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <p>三个量的四分位距都不为零，作废条款 F1 未触发。样本量 130 过 100，F2 未触发，故本场结果可写入结语。</p>
 <h3>三、相关矩阵</h3>
 <p><strong>表 A5-2　Spearman 相关矩阵（n = 130，撤回 r 后）</strong></p>
-<table>
+<div class="tw"><table>
 <thead>
 <tr class="header">
 <th></th>
@@ -105,14 +116,14 @@ border-top:1px solid var(--line);font-size:14px}
 <td>1.000</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <p>三个配对的绝对值分别是 0.125、0.112、0.046，<strong>最大 0.125</strong>，全部远低于 0.50 的支持线，也远低于 0.70 的并入线。</p>
 <p><strong>H1 获支持，H2 未触发；H4 因 r 撤回而无从判定。</strong> 三对读数没有任何一对触发并入条款。</p>
 <h3>四、一个必须自己提出的反对：近零相关也可能只是噪声</h3>
 <p>上面这张表有一个很难看的替代解释：<strong>如果四个读数本身都测不准，它们当然互不相关。</strong> 一堆随机数彼此也正交。</p>
 <p>本卷因此加做了一场分半信度检验：把每首曲子前后各半，用完全相同的口径各算一次四个读数，再算两半之间的相关，最后用 Spearman-Brown 公式校正到全长。</p>
 <p><strong>表 A5-3　分半信度（n = 125，撤回 r 后）</strong></p>
-<table>
+<div class="tw"><table>
 <thead>
 <tr class="header">
 <th>读数</th>
@@ -137,13 +148,13 @@ border-top:1px solid var(--line);font-size:14px}
 <td><strong>0.211</strong></td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <p>这个结果对本卷不利，而且是本场最重要的产出：</p>
 <p><strong>第八章的 G 中等（0.547），而第三章的 ν 只有 0.379、第二章的 w 只有 0.211。</strong> 也就是说，<strong>在单曲这个尺度上，w 与 ν 大部分是噪声。</strong> 它们在语料层面上的结论（第二章的族序不一致、第三章的 4% 与无特权持有分）依赖的是跨曲聚合，那些结论不受此影响；但<strong>任何人若想拿 w 或 ν 去评价某一首具体作品，本卷现在明确反对</strong>。</p>
 <h3>五、去衰减校正后，正交仍然成立</h3>
 <p>两个不可靠的量之间，相关系数会被压低，压低的上限是两者信度乘积的平方根。把观测值除以这个上限，得到去衰减后的相关。</p>
 <p><strong>表 A5-4　去衰减校正</strong></p>
-<table>
+<div class="tw"><table>
 <thead>
 <tr class="header">
 <th>配对</th>
@@ -172,7 +183,7 @@ border-top:1px solid var(--line);font-size:14px}
 <td>−0.163</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <p><strong>三个去衰减值最大 0.367，仍全部低于 0.50 的支持线。</strong> 正交这一条在扣掉不可靠性之后依然成立，不是靠噪声撑出来的。</p>
 <h3>六、本场没有做到的四件事</h3>
 <p><strong>其一，只测了三个读数，不是十个。</strong> 第四、五、六、七、九、十章的读数需要各自的语料（撤载事件、承载者字段、边界标记、交付记录），四声部众赞歌上算不出来。因此“十把量尺”这一说法<strong>只被验证了三把</strong>，附录四第 1 条只兑现了一部分，剩下的部分改列为新的欠账。</p>
