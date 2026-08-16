@@ -167,7 +167,10 @@ def audit():
             key = f"paradigm/{sl}" if f"paradigm/{sl}" in slug2disp else f"column/{sl}"
             want = slug2disp.get(key)
             got = parse_cn(nm.group(1))
-            if want != got:
+            if want is None:
+                # 卡片印了篇号，台账里却没有这一篇——照实报，不要在 to_cn(None) 上崩掉
+                problems.append(f"栏目页卡片 {sl}：显示之{to_cn(got)}，但台账里没有这一篇")
+            elif want != got:
                 problems.append(f"栏目页卡片 {sl}：显示之{to_cn(got)}，应为之{to_cn(want)}")
             seen_order.append(got)
         if seen_order and seen_order != sorted(seen_order):
