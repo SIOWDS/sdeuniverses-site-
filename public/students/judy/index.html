@@ -84,6 +84,22 @@ nav a:hover{color:var(--brass)}
 footer{border-top:1px solid var(--flute);padding:32px 28px;text-align:center;color:var(--ink-2);font-size:12.5px;letter-spacing:0.04em}
 footer a{color:var(--brass);text-decoration:none}
 
+/* 飞舞的音符 —— 全页环境层。慢、疏、淡：像谱纸上被风吹起的几个音，
+   不是雪花特效。压在内容之下(z-index:-1)，不接鼠标，关掉动效时整层不出现。 */
+.air{position:fixed;inset:0;z-index:-1;pointer-events:none;overflow:hidden;contain:strict}
+.air .n{position:absolute;bottom:-14vh;color:var(--brass);opacity:0;will-change:transform,opacity;
+  animation:drift linear infinite}
+.air .n svg{display:block;width:100%;height:auto;fill:currentColor}
+@keyframes drift{
+  0%  {transform:translate3d(0,0,0) rotate(-8deg);opacity:0}
+  10% {opacity:var(--o)}
+  50% {transform:translate3d(var(--dx),-62vh,0) rotate(var(--r2))}
+  86% {opacity:var(--o)}
+  100%{transform:translate3d(calc(var(--dx) * 0.4),-124vh,0) rotate(var(--r3));opacity:0}
+}
+@media(prefers-reduced-motion:reduce){.air{display:none}}
+@media(max-width:640px){.air .n:nth-child(n+7){display:none}}
+
 :focus-visible{outline:2px solid var(--brass);outline-offset:3px}
 @media(max-width:640px){
   .hero{padding-top:52px}
@@ -102,6 +118,27 @@ footer a{color:var(--brass);text-decoration:none}
 }
 </style></head>
 <body class="zh">
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
+  <!-- 四分音符 -->
+  <g id="gn-q"><ellipse cx="9" cy="27" rx="8.4" ry="6" transform="rotate(-20 9 27)"/><rect x="15.6" y="1" width="2" height="25"/></g>
+  <!-- 八分音符（带符尾） -->
+  <g id="gn-e"><ellipse cx="9" cy="27" rx="8.4" ry="6" transform="rotate(-20 9 27)"/><rect x="15.6" y="1" width="2" height="25"/><path d="M17.6 1c5.4 3.2 8.4 6.6 8.4 11 0 2.6-1 4.6-3 6.4.5-3.6-1-6.4-5.4-9.4z"/></g>
+  <!-- 两个相连的八分音符 -->
+  <g id="gn-b"><ellipse cx="8" cy="28" rx="7.6" ry="5.4" transform="rotate(-20 8 28)"/><ellipse cx="31" cy="24" rx="7.6" ry="5.4" transform="rotate(-20 31 24)"/><rect x="14" y="4" width="1.9" height="24"/><rect x="37" y="1" width="1.9" height="23"/><path d="M14 4 L38.9 1 L38.9 5.6 L14 8.6 Z"/></g>
+</defs></svg>
+
+<div class="air" aria-hidden="true">
+  <span class="n" style="left:6%;width:20px;--o:0.20;--dx:34px;--r2:9deg;--r3:-5deg;animation-duration:31s;animation-delay:-4s"><svg viewBox="0 0 27 34"><use href="#gn-e"/></svg></span>
+  <span class="n" style="left:17%;width:15px;--o:0.16;--dx:-26px;--r2:-11deg;--r3:6deg;animation-duration:39s;animation-delay:-19s"><svg viewBox="0 0 27 34"><use href="#gn-q"/></svg></span>
+  <span class="n" style="left:29%;width:32px;--o:0.14;--dx:40px;--r2:7deg;--r3:-8deg;animation-duration:46s;animation-delay:-31s"><svg viewBox="0 0 41 34"><use href="#gn-b"/></svg></span>
+  <span class="n" style="left:41%;width:17px;--o:0.18;--dx:-32px;--r2:-8deg;--r3:10deg;animation-duration:34s;animation-delay:-11s"><svg viewBox="0 0 27 34"><use href="#gn-e"/></svg></span>
+  <span class="n" style="left:55%;width:13px;--o:0.15;--dx:28px;--r2:12deg;--r3:-4deg;animation-duration:43s;animation-delay:-26s"><svg viewBox="0 0 27 34"><use href="#gn-q"/></svg></span>
+  <span class="n" style="left:67%;width:22px;--o:0.19;--dx:-38px;--r2:-9deg;--r3:7deg;animation-duration:36s;animation-delay:-8s"><svg viewBox="0 0 27 34"><use href="#gn-e"/></svg></span>
+  <span class="n" style="left:78%;width:28px;--o:0.14;--dx:30px;--r2:8deg;--r3:-9deg;animation-duration:49s;animation-delay:-35s"><svg viewBox="0 0 41 34"><use href="#gn-b"/></svg></span>
+  <span class="n" style="left:88%;width:16px;--o:0.17;--dx:-24px;--r2:-10deg;--r3:5deg;animation-duration:41s;animation-delay:-16s"><svg viewBox="0 0 27 34"><use href="#gn-q"/></svg></span>
+  <span class="n" style="left:95%;width:19px;--o:0.16;--dx:-30px;--r2:9deg;--r3:-6deg;animation-duration:33s;animation-delay:-23s"><svg viewBox="0 0 27 34"><use href="#gn-e"/></svg></span>
+</div>
 
 <nav><div class="wrap">
   <a class="brand" href="/browse/">SDE Universes</a>
