@@ -2,157 +2,297 @@
 <html lang="zh-CN"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Judy · 学员专栏 | SDE Universes</title>
-<meta name="description" content="Judy · SDE 学员 · 音乐发生学九论：三题九论、二十七门与音乐学零交集的外源学科、盲评均分 150.8。Students' Column, SDE Universes">
+<meta name="description" content="Judy · SDE 学员专栏 · 音乐教学与教育研究 · Students' Column, SDE Universes">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Noto+Serif+SC:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-:root{--gold:#C9A84C;--gold2:#D4B25E;--ink:#F0E9D8;--ink2:#B8AE96;--bg:#0D0B09;--panel:#171310;--panel2:#1D1811;--line:rgba(201,168,76,0.22);--accent:#8C6A2E}
+/* ── 香槟 · 五线谱 ────────────────────────────────────────────
+   底色取香槟酒体，笔画取铜管乐器的旧铜，不用金黄。
+   全页只有一个记号系统：五线谱。它在题图里作氛围，在分节处作分隔线，
+   在尚无作品处作休止符。除此之外不加装饰。 */
+:root{
+  --champagne:#F5EAD7;   /* 酒体 · 页面底色 */
+  --champagne-2:#FCF7EC; /* 浅一度 · 抬起的面 */
+  --flute:#E7D7B8;       /* 深一度 · 谱线与压边 */
+  --brass:#A98B4E;       /* 旧铜 · 唯一的重音 */
+  --ink:#2E2820;         /* 深焙 · 正文 */
+  --ink-2:#7A6D57;       /* 淡墨 · 次级信息 */
+  --bloom:#D2A09A;       /* 干玫瑰 · 只用在花上 */
+  --bloom-2:#F0DCD6;     /* 浅花瓣 */
+  --leaf:#B9B08C;        /* 叶 · 香槟里的一点绿灰 */
+}
 *{margin:0;padding:0;box-sizing:border-box}
-::selection{background:rgba(201,168,76,0.35)}
-body{background:var(--bg);color:var(--ink);font-family:"Noto Serif SC",Georgia,"Songti SC",serif;line-height:1.9}
+::selection{background:rgba(169,139,78,0.22)}
+html{-webkit-text-size-adjust:100%}
+body{
+  background:var(--champagne);color:var(--ink);line-height:1.95;
+  font-family:"Noto Serif SC","Songti SC",Georgia,serif;font-weight:300;
+  -webkit-font-smoothing:antialiased;
+}
 body.zh .en-only{display:none!important}
 body.en .zh-only{display:none!important}
-a{text-decoration:none}
-nav{position:sticky;top:0;z-index:20;background:rgba(13,11,9,0.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
-nav .w{max-width:900px;margin:0 auto;padding:13px 24px;display:flex;justify-content:space-between;align-items:center}
-nav a{color:var(--gold);font-size:14px;letter-spacing:0.05em}
-.nav-right{display:flex;align-items:center;gap:16px}
-.lang-toggle{display:flex;border:1px solid var(--line);border-radius:20px;overflow:hidden}
-.lang-btn{background:transparent;border:none;color:var(--ink2);font-family:inherit;font-size:13px;padding:5px 13px;cursor:pointer;letter-spacing:0.05em}
-.lang-btn.active{background:var(--gold);color:#1A1410;font-weight:700}
-.level-tag{max-width:840px;margin:0 auto;padding:0 24px;display:flex;align-items:center;gap:14px}
-.level-tag .n{font-size:12px;letter-spacing:0.2em;color:#1A1410;background:var(--gold);border-radius:20px;padding:3px 12px;font-weight:700}
-.level-tag .t{font-size:12px;letter-spacing:0.32em;color:var(--gold)}
-.level-tag .line{flex:1;height:1px;background:var(--line)}
-.sec{max-width:840px;margin:0 auto;padding:20px 24px 0}
-.sec p.lead{font-size:15.5px;color:var(--ink2);line-height:2.0;text-align:justify;margin-top:16px}
-footer{border-top:1px solid var(--line);margin-top:44px;padding:32px 24px;text-align:center;color:#6B6250;font-size:13px}
-footer a{color:var(--gold)}
-.stats{max-width:840px;margin:26px auto 0;padding:0 24px;display:grid;grid-template-columns:repeat(auto-fit,minmax(126px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:12px;overflow:hidden}
-.stat{background:var(--panel);padding:18px 12px;text-align:center}
-.stat .v{font-family:Georgia,serif;font-size:25px;font-weight:800;color:var(--gold2);letter-spacing:.02em}
-.stat .k{font-size:11px;letter-spacing:.18em;color:#8A7B55;margin-top:7px}
-@media(max-width:640px){.stats{margin-left:24px;margin-right:24px;padding:0}}
-.grp{max-width:840px;margin:0 auto;padding:34px 24px 0}
-.grp-h{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:12px}
-.grp-h h2{font-size:23px;font-weight:800;color:#F5EFE0;letter-spacing:.05em}
-.grp-h .en{font-size:11px;letter-spacing:.3em;color:var(--accent)}
-.grp-h .cnt{margin-left:auto;font-size:12px;color:#8A7B55;letter-spacing:.1em}
-.grp .note{font-size:14.5px;color:var(--ink2);line-height:1.95;margin-top:14px;text-align:justify}
-.work{background:linear-gradient(160deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:14px;padding:25px 26px 21px;margin-top:18px;transition:border-color .18s,transform .18s}
-.work:hover{border-color:rgba(201,168,76,0.55)}
-.work .top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}
-.work .chip{font-size:11px;letter-spacing:0.18em;color:var(--gold);border:1px solid rgba(201,168,76,0.5);border-radius:20px;padding:3px 12px}
-.work .iq{font-size:11.5px;letter-spacing:0.1em;color:#1A1410;background:var(--gold2);border-radius:20px;padding:3px 11px;font-weight:700}
-.work h3{font-size:20.5px;font-weight:800;color:#F5EFE0;line-height:1.5;margin-bottom:8px}
-.work .sub{font-size:14px;color:var(--gold2);line-height:1.8;margin-bottom:13px}
-.work .hook{font-size:14.5px;color:var(--ink2);line-height:1.95;margin-bottom:15px;text-align:justify}
-.work .src{font-size:12.5px;color:#8A7B55;line-height:1.85;border-left:2px solid rgba(201,168,76,.35);padding-left:12px;margin-bottom:16px}
-.work .src b{color:#A99B77}
-.work .src .lb{color:var(--accent);letter-spacing:.12em}
-.modes{display:flex;gap:9px;flex-wrap:wrap}
-.m{font-size:13.5px;letter-spacing:0.03em;border-radius:6px;padding:9px 17px}
-.m.primary{background:var(--gold);color:#1A1410;font-weight:700}
-.m.primary:hover{background:#D9BC63}
-.back{text-align:center;margin-top:40px}
-.back a{color:var(--gold);font-size:14.5px;letter-spacing:0.06em;border-bottom:1px solid rgba(201,168,76,0.4);padding-bottom:2px}
-.motif{max-width:840px;margin:0 auto;padding:0 24px}
-.motif .box{background:linear-gradient(145deg,rgba(201,168,76,.13),rgba(23,19,16,.97));border:1px solid rgba(201,168,76,.45);border-radius:16px;padding:28px 30px;margin-top:18px}
-.motif .box .lb{font-size:11px;letter-spacing:.3em;color:var(--gold);display:block;margin-bottom:14px}
-.motif .box .q{font-size:19px;line-height:1.85;color:#F5EFE0;font-weight:700;letter-spacing:.02em}
-.motif .box p{font-size:14.5px;color:var(--ink2);line-height:1.95;margin-top:16px;text-align:justify}
-.tbl{width:100%;border-collapse:collapse;font-size:13.5px;line-height:1.75;margin-top:18px}
-.tbl th,.tbl td{border:1px solid var(--line);padding:9px 11px;text-align:left;vertical-align:top;color:var(--ink2)}
-.tbl th{background:rgba(201,168,76,.11);color:#E8DDBE;font-weight:700;white-space:nowrap}
-.tbl td b{color:#E8DDBE}
-.tw{overflow-x:auto}
+.wrap{max-width:840px;margin:0 auto;padding:0 28px}
 
-.avatar{width:132px;height:132px;border-radius:50%;flex-shrink:0;background:linear-gradient(160deg,rgba(212,178,94,0.30),rgba(212,178,94,0.06));border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-family:Georgia,serif;font-size:52px;font-weight:800;color:#F5E6BF;position:relative}
-.avatar .ph{font-size:10px;letter-spacing:0.15em;color:var(--ink2);position:absolute;bottom:12px;font-family:"Noto Serif SC",serif}
-.profile{max-width:840px;margin:0 auto;padding:52px 24px 8px;display:flex;gap:34px;align-items:center;flex-wrap:wrap}
-.p-info{flex:1;min-width:240px}
-.p-info h1{font-size:clamp(32px,5vw,44px);font-weight:800;color:#F5EFE0;letter-spacing:0.05em;font-family:Georgia,"Noto Serif SC",serif}
-.p-info .role{font-size:13px;color:var(--accent);letter-spacing:0.2em;margin-top:12px}
-.p-info .bio{font-size:15px;color:var(--ink2);line-height:2.0;margin-top:16px;text-align:justify}
-.banner{max-width:840px;margin:26px auto 0;padding:0 24px}
-.banner .b{display:flex;gap:20px;align-items:center;flex-wrap:wrap;background:linear-gradient(145deg,rgba(201,168,76,.15),rgba(23,19,16,.97));border:1px solid rgba(201,168,76,.45);border-radius:16px;padding:24px 26px}
-.banner .num{font-family:Georgia,serif;font-size:44px;font-weight:800;color:var(--gold2);line-height:1}
-.banner .txt h3{font-size:20px;color:#F5EFE0;font-weight:800;letter-spacing:.04em}
-.banner .txt p{font-size:14px;color:var(--ink2);margin-top:8px;line-height:1.9}
-@media(max-width:640px){.profile{justify-content:center;text-align:center}.p-info{text-align:center}}
+/* 导航 —— 一条发丝线，不喧宾 */
+nav{position:sticky;top:0;z-index:20;background:rgba(245,234,215,0.90);backdrop-filter:blur(10px);border-bottom:1px solid var(--flute)}
+nav .wrap{display:flex;justify-content:space-between;align-items:center;padding-top:15px;padding-bottom:15px}
+nav a{color:var(--ink);text-decoration:none;font-size:13.5px;letter-spacing:0.08em}
+nav a:hover{color:var(--brass)}
+.brand{font-family:"Cormorant Garamond",Georgia,serif;font-size:17px;letter-spacing:0.14em;font-weight:400}
+.nav-right{display:flex;align-items:center;gap:18px}
+.lang{display:flex;border:1px solid var(--flute);border-radius:2px;overflow:hidden}
+.lang button{background:transparent;border:none;color:var(--ink-2);font-family:inherit;font-size:12px;padding:4px 11px;cursor:pointer;letter-spacing:0.1em}
+.lang button.on{background:var(--brass);color:var(--champagne-2)}
+
+/* 题图 —— 照片压在一段谱纸上 */
+.hero{position:relative;padding:74px 0 20px;overflow:hidden}
+.bouquet{position:absolute;top:-34px;right:-6px;width:clamp(230px,31vw,390px);height:auto;
+  pointer-events:none;z-index:0;opacity:0.94}
+.hero .wrap{z-index:1}
+.hero .stave{position:absolute;left:0;right:0;top:88px;width:100%;height:190px;pointer-events:none;opacity:0.62;
+  -webkit-mask-image:linear-gradient(90deg,transparent 0%,transparent 44%,#000 62%,#000 100%);
+          mask-image:linear-gradient(90deg,transparent 0%,transparent 44%,#000 62%,#000 100%)}
+.hero .wrap{position:relative;display:flex;gap:40px;align-items:center;flex-wrap:wrap}
+.portrait{width:148px;height:148px;border-radius:50%;flex-shrink:0;overflow:hidden;
+  border:1px solid var(--brass);box-shadow:0 0 0 7px var(--champagne),0 14px 34px rgba(84,66,32,0.13)}
+.portrait img{width:100%;height:100%;object-fit:cover;display:block}
+.who{flex:1;min-width:250px}
+.who h1{font-family:"Cormorant Garamond",Georgia,serif;font-weight:300;font-size:clamp(46px,8vw,72px);
+  line-height:1.02;letter-spacing:0.02em;color:var(--ink)}
+.who .field{margin-top:14px;font-size:11px;letter-spacing:0.3em;text-transform:uppercase;color:var(--brass);
+  font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;font-weight:500}
+.who .field.zh-only{letter-spacing:0.22em;text-transform:none;font-size:12px}
+.rule{width:52px;height:1px;background:var(--brass);margin:22px 0 0}
+
+/* 简介 */
+.bio{padding:26px 0 10px}
+.bio p{font-size:15.5px;line-height:2.15;color:var(--ink);text-align:justify;max-width:70ch}
+.bio p.en-only{font-family:"Cormorant Garamond",Georgia,serif;font-size:18.5px;line-height:1.85;font-weight:400;text-align:left}
+
+/* 分节 —— 谱线就是分隔线，符头落在谱线上，标题从符头读起 */
+.movement{display:flex;align-items:center;gap:18px;margin:58px 0 0}
+.movement .bars{flex:1;height:34px;min-width:60px}
+.movement .name{font-size:11.5px;letter-spacing:0.3em;color:var(--brass);white-space:nowrap;
+  font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;font-weight:500}
+.movement .name.zh-only{letter-spacing:0.26em;font-size:12.5px}
+
+/* 尚无作品 —— 谱面上的休止 */
+.rest{background:var(--champagne-2);border:1px solid var(--flute);border-radius:3px;
+  padding:44px 34px 40px;text-align:center;margin-top:24px}
+.rest .glyph{display:block;margin:0 auto 20px}
+.rest p{font-size:14.5px;color:var(--ink-2);line-height:2.1;max-width:46ch;margin:0 auto}
+.rest p.en-only{font-family:"Cormorant Garamond",Georgia,serif;font-size:17px}
+.back{text-align:center;margin:38px 0 88px}
+.back a{color:var(--brass);text-decoration:none;font-size:14px;letter-spacing:0.08em;
+  border-bottom:1px solid rgba(169,139,78,0.35);padding-bottom:3px}
+.back a:hover{border-bottom-color:var(--brass)}
+
+footer{border-top:1px solid var(--flute);padding:32px 28px;text-align:center;color:var(--ink-2);font-size:12.5px;letter-spacing:0.04em}
+footer a{color:var(--brass);text-decoration:none}
+
+/* 飞舞的音符 —— 全页环境层。慢、疏、淡：像谱纸上被风吹起的几个音，
+   不是雪花特效。压在内容之下(z-index:-1)，不接鼠标，关掉动效时整层不出现。 */
+.air{position:fixed;inset:0;z-index:-1;pointer-events:none;overflow:hidden;contain:strict}
+.air .n{position:absolute;bottom:-14vh;color:var(--brass);opacity:0;will-change:transform,opacity;
+  animation:drift linear infinite}
+.air .n svg{display:block;width:100%;height:auto;fill:currentColor}
+@keyframes drift{
+  0%  {transform:translate3d(0,0,0) rotate(-8deg);opacity:0}
+  10% {opacity:var(--o)}
+  50% {transform:translate3d(var(--dx),-62vh,0) rotate(var(--r2))}
+  86% {opacity:var(--o)}
+  100%{transform:translate3d(calc(var(--dx) * 0.4),-124vh,0) rotate(var(--r3));opacity:0}
+}
+@media(prefers-reduced-motion:reduce){.air{display:none}}
+@media(max-width:640px){.air .n:nth-child(n+7){display:none}}
+
+:focus-visible{outline:2px solid var(--brass);outline-offset:3px}
+@media(max-width:640px){
+  .hero{padding-top:52px}
+  .hero .wrap{justify-content:center;text-align:center;gap:26px}
+  .who{text-align:center}
+  .rule{margin-left:auto;margin-right:auto}
+  .hero .stave{top:64px;opacity:0.4}
+  .bouquet{width:176px;top:-20px;right:-26px;opacity:0.9}
+  .bio p{text-align:left}
+  .movement .name{letter-spacing:0.2em}
+}
+/* 入场：整页像一次起拍，只做一次，不做散点动效 */
+@media(prefers-reduced-motion:no-preference){
+  .fade{opacity:0;transform:translateY(9px);animation:rise .85s cubic-bezier(.22,.7,.3,1) forwards}
+  .fade.d1{animation-delay:.08s}.fade.d2{animation-delay:.20s}.fade.d3{animation-delay:.32s}
+  @keyframes rise{to{opacity:1;transform:none}}
+}
 </style></head>
 <body class="zh">
-<nav><div class="w"><a href="/browse/">SDE Universes</a>
-<div class="nav-right"><a href="/students/"><span class="zh-only">← 学员专栏</span><span class="en-only">← Students</span></a>
-<div class="lang-toggle"><button class="lang-btn active" onclick="setLang('zh')">中</button><button class="lang-btn" onclick="setLang('en')">EN</button></div></div></div></nav>
 
-<div class="level-tag" style="padding-top:40px">
- <span class="n">01</span><span class="t zh-only">学 员 介 绍 · PROFILE</span><span class="t en-only">PROFILE</span><span class="line"></span></div>
-<div class="profile">
- <div class="avatar">J<span class="ph zh-only">照片待补</span><span class="ph en-only">photo TBA</span></div>
- <div class="p-info"><h1>Judy</h1>
-  <div class="role zh-only">SDE 学员 · 音乐发生学</div>
-  <div class="role en-only">SDE TRAINEE · GENESIS OF MUSIC</div>
-  <p class="bio zh-only">研究方向是音乐的发生学：不问一段声音具备哪些属性才算音乐，而问它在什么时候、以什么方式、记在谁的账上成为音乐。写作方法是把三门与当今音乐学零交集的学科放在一起施压，让它们各自用内部材料推翻共有的那条前提，再在公开语料上做预先写死的检验——包括那些注定对自己不利的检验。</p>
-  <p class="bio en-only">Judy works on the genesis of music: not which properties a stretch of sound must have to count as music, but when, in what way, and on whose ledger it becomes music. Each paper puts three fields with no current contact with musicology under pressure, lets each overturn the premise they share using its own internal material, and then runs preregistered tests on public corpora — including the ones bound to go badly for the author.</p>
- </div></div>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
+  <!-- 四分音符 -->
+  <g id="gn-q"><ellipse cx="9" cy="27" rx="8.4" ry="6" transform="rotate(-20 9 27)"/><rect x="15.6" y="1" width="2" height="25"/></g>
+  <!-- 八分音符（带符尾） -->
+  <g id="gn-e"><ellipse cx="9" cy="27" rx="8.4" ry="6" transform="rotate(-20 9 27)"/><rect x="15.6" y="1" width="2" height="25"/><path d="M17.6 1c5.4 3.2 8.4 6.6 8.4 11 0 2.6-1 4.6-3 6.4.5-3.6-1-6.4-5.4-9.4z"/></g>
+  <!-- 两个相连的八分音符 -->
+  <g id="gn-b"><ellipse cx="8" cy="28" rx="7.6" ry="5.4" transform="rotate(-20 8 28)"/><ellipse cx="31" cy="24" rx="7.6" ry="5.4" transform="rotate(-20 31 24)"/><rect x="14" y="4" width="1.9" height="24"/><rect x="37" y="1" width="1.9" height="23"/><path d="M14 4 L38.9 1 L38.9 5.6 L14 8.6 Z"/></g>
+</defs></svg>
 
-<div class="stats">
- <div class="stat"><div class="v">9</div><div class="k">已发表</div></div>
- <div class="stat"><div class="v">18.9万</div><div class="k">累计汉字</div></div>
- <div class="stat"><div class="v">150.8</div><div class="k">盲评均分</div></div>
- <div class="stat"><div class="v">153.2</div><div class="k">最高分</div></div>
- <div class="stat"><div class="v">27</div><div class="k">外源学科</div></div>
+<div class="air" aria-hidden="true">
+  <span class="n" style="left:6%;width:20px;--o:0.20;--dx:34px;--r2:9deg;--r3:-5deg;animation-duration:31s;animation-delay:-4s"><svg viewBox="0 0 27 34"><use href="#gn-e"/></svg></span>
+  <span class="n" style="left:17%;width:15px;--o:0.16;--dx:-26px;--r2:-11deg;--r3:6deg;animation-duration:39s;animation-delay:-19s"><svg viewBox="0 0 27 34"><use href="#gn-q"/></svg></span>
+  <span class="n" style="left:29%;width:32px;--o:0.14;--dx:40px;--r2:7deg;--r3:-8deg;animation-duration:46s;animation-delay:-31s"><svg viewBox="0 0 41 34"><use href="#gn-b"/></svg></span>
+  <span class="n" style="left:41%;width:17px;--o:0.18;--dx:-32px;--r2:-8deg;--r3:10deg;animation-duration:34s;animation-delay:-11s"><svg viewBox="0 0 27 34"><use href="#gn-e"/></svg></span>
+  <span class="n" style="left:55%;width:13px;--o:0.15;--dx:28px;--r2:12deg;--r3:-4deg;animation-duration:43s;animation-delay:-26s"><svg viewBox="0 0 27 34"><use href="#gn-q"/></svg></span>
+  <span class="n" style="left:67%;width:22px;--o:0.19;--dx:-38px;--r2:-9deg;--r3:7deg;animation-duration:36s;animation-delay:-8s"><svg viewBox="0 0 27 34"><use href="#gn-e"/></svg></span>
+  <span class="n" style="left:78%;width:28px;--o:0.14;--dx:30px;--r2:8deg;--r3:-9deg;animation-duration:49s;animation-delay:-35s"><svg viewBox="0 0 41 34"><use href="#gn-b"/></svg></span>
+  <span class="n" style="left:88%;width:16px;--o:0.17;--dx:-24px;--r2:-10deg;--r3:5deg;animation-duration:41s;animation-delay:-16s"><svg viewBox="0 0 27 34"><use href="#gn-q"/></svg></span>
+  <span class="n" style="left:95%;width:19px;--o:0.16;--dx:-30px;--r2:9deg;--r3:-6deg;animation-duration:33s;animation-delay:-23s"><svg viewBox="0 0 27 34"><use href="#gn-e"/></svg></span>
 </div>
 
-<div class="banner"><div class="b">
- <div class="num">01</div>
- <div class="txt"><h3>开张作即为九篇成组：《音乐发生学九论》</h3>
- <p>九篇一次投出，同属一条问题线，互相划界、互相约束，共用一套读数纪律与写作纪律。全批盲评 148.0–153.2，均分 150.8。</p></div>
-</div></div>
+<nav><div class="wrap">
+  <a class="brand" href="/browse/">SDE Universes</a>
+  <div class="nav-right">
+    <a href="/students/"><span class="zh-only">← 学员专栏</span><span class="en-only">← Students</span></a>
+    <div class="lang"><button class="on" onclick="setLang('zh')">中</button><button onclick="setLang('en')">EN</button></div>
+  </div>
+</div></nav>
 
-<div class="level-tag" style="margin-top:44px">
- <span class="n">02</span><span class="t zh-only">母 题 · MOTIF</span><span class="t en-only">MOTIF</span><span class="line"></span></div>
-<div class="motif">
- <div class="box"><span class="lb">九 篇 共 同 的 那 一 句</span>
- <div class="q">音乐不是在声音里发生的，它在记账的那一层发生；而每一本账都缺同一栏——记这件事本身的那一栏。</div>
- <p>九篇分别把这句话兑现在九个不同的位置上。发生的时点记在判据协议里（冻段），音乐性记在读法系统里（并读壁），不可逆记在记录字段里（空次），成员清单记在通道台账里（途生项），候选集合记在许可模型的稀疏度里（续域迁移），整体的正确性一处也不记（无持项），差异的存活记在谱系的接住窗里（失效差异），未选项的次序记在一次交付里（接出序），而前一事件的退场记在边界的类型里（退占体）。每一篇都走到同一个位置：那个被当作音乐自身性质来读的东西，读出来的其实是那份账本的性质——而账本上没有一栏记这件事。</p></div></div>
+<header class="hero">
+  <svg class="bouquet" viewBox="0 0 320 300" aria-hidden="true" focusable="false">
+    <defs>
+      <g id="bloom">
+        <g fill="var(--bloom-2)" fill-opacity="0.78" stroke="var(--bloom)" stroke-width="0.85" stroke-opacity="0.62">
+          <ellipse cx="0" cy="-11" rx="6.6" ry="11"/>
+          <ellipse cx="0" cy="-11" rx="6.6" ry="11" transform="rotate(60)"/>
+          <ellipse cx="0" cy="-11" rx="6.6" ry="11" transform="rotate(120)"/>
+          <ellipse cx="0" cy="-11" rx="6.6" ry="11" transform="rotate(180)"/>
+          <ellipse cx="0" cy="-11" rx="6.6" ry="11" transform="rotate(240)"/>
+          <ellipse cx="0" cy="-11" rx="6.6" ry="11" transform="rotate(300)"/>
+        </g>
+        <circle r="4.6" fill="var(--bloom)" fill-opacity="0.42"/>
+        <circle r="1.9" fill="#A98B4E" fill-opacity="0.55"/>
+      </g>
+      <g id="bud">
+        <path d="M0 0 C-5.6 -4 -5.6 -14 0 -19 C5.6 -14 5.6 -4 0 0 Z"
+              fill="var(--bloom-2)" fill-opacity="0.8" stroke="var(--bloom)" stroke-width="0.85" stroke-opacity="0.6"/>
+      </g>
+      <g id="leaf">
+        <path d="M0 0 C11 -6 25 -5 33 2 C24 9 10 8 0 0 Z"
+              fill="none" stroke="var(--leaf)" stroke-width="1.1" stroke-opacity="0.85"/>
+        <path d="M1 0 C11 1 22 2 32 2" stroke="var(--leaf)" stroke-width="0.8" stroke-opacity="0.6" fill="none"/>
+      </g>
+    </defs>
 
-<div class="level-tag" style="margin-top:44px">
- <span class="n">03</span><span class="t zh-only">三 题 九 论 · THREE QUESTIONS</span><span class="t en-only">THREE QUESTIONS</span><span class="line"></span></div>
-<div class="grp" style="padding-top:6px"><div class="work">
- <div class="top"><span class="chip">何谓音乐</span><span class="iq">5 篇</span></div>
- <div class="hook">五篇同题异路。每一篇都先指出既有回答共享的那条未被说出的前提，再用三门与音乐学零交集的学科各自的内部材料把它推翻。</div>
- <div class="src">何谓音乐——差异的有效期　·　并读壁　·　接出序　·　无持项　·　退占体</div>
-</div><div class="work">
- <div class="top"><span class="chip">音乐是如何发生的</span><span class="iq">3 篇</span></div>
- <div class="hook">三篇追问同一件事：从声音到音乐，中间那一下究竟做了什么，以及那一下的产物记在谁的账上。</div>
- <div class="src">冻段　·　音乐如何发生：续域迁移与未选未来的重写　·　途生项</div>
-</div><div class="work">
- <div class="top"><span class="chip">音乐对生命的创造性</span><span class="iq">1 篇</span></div>
- <div class="hook">一篇。不问音乐造出了什么新东西，只问：什么东西是真的多出来的。</div>
- <div class="src">空次</div>
-</div></div>
+    <g fill="none" stroke="var(--leaf)" stroke-width="1.1" stroke-opacity="0.7" stroke-linecap="round">
+      <path d="M292 6 C262 44 236 78 214 120"/>
+      <path d="M292 6 C274 52 268 96 268 140"/>
+      <path d="M292 6 C246 30 206 46 166 56"/>
+      <path d="M268 62 C244 74 224 88 208 106"/>
+      <path d="M214 120 C196 142 182 166 176 190"/>
+      <path d="M236 96 C214 128 198 158 190 188"/>
+    </g>
 
-<div class="level-tag" style="margin-top:44px">
- <span class="n">04</span><span class="t zh-only">作 品 一 览 · WORKS</span><span class="t en-only">WORKS</span><span class="line"></span></div>
-<div class="grp" style="padding-top:6px">
- <div class="tw"><table class="tbl">
- <tr><th>篇名</th><th>题</th><th>新存在物</th><th>读数</th><th>盲评</th></tr>
- <tr><td><b><a href="/students/judy/co-reading-wall/" style="color:#E8DDBE">并读壁</a></b></td><td>何谓音乐</td><td>并读壁</td><td>墙宽 w｜(L,θ,P)、可动性 μ、钉扎点</td><td style="white-space:nowrap">153.2</td></tr><tr><td><b><a href="/students/judy/transit-born-term/" style="color:#E8DDBE">途生项</a></b></td><td>音乐是如何发生的</td><td>途生项</td><td>途生率 ν</td><td style="white-space:nowrap">152.6</td></tr><tr><td><b><a href="/students/judy/unheld-term/" style="color:#E8DDBE">无持项</a></b></td><td>何谓音乐</td><td>无持项</td><td>外持份额 ν｜(m,g)、空持率 τ</td><td style="white-space:nowrap">151.8</td></tr><tr><td><b><a href="/students/judy/handover-ordering/" style="color:#E8DDBE">接出序</a></b></td><td>何谓音乐</td><td>接出序</td><td>接出增量 ΔR</td><td style="white-space:nowrap">151.4</td></tr><tr><td><b><a href="/students/judy/empty-count/" style="color:#E8DDBE">空次</a></b></td><td>音乐对生命的创造性</td><td>空次</td><td>次序不可读度 U｜R</td><td style="white-space:nowrap">151.0</td></tr><tr><td><b><a href="/students/judy/frozen-span/" style="color:#E8DDBE">冻段</a></b></td><td>音乐是如何发生的</td><td>冻段</td><td>冻结点 f｜θ、未冻比例 c(θ)</td><td style="white-space:nowrap">150.6</td></tr><tr><td><b><a href="/students/judy/lapsed-difference/" style="color:#E8DDBE">何谓音乐——差异的有效期</a></b></td><td>何谓音乐</td><td>失效差异</td><td>接住窗 h｜n、失效率 q｜n</td><td style="white-space:nowrap">150.2</td></tr><tr><td><b><a href="/students/judy/vacated-occupancy/" style="color:#E8DDBE">退占体</a></b></td><td>何谓音乐</td><td>退占体</td><td>短程条件熵 ΔH_short、长程条件熵 ΔH_long</td><td style="white-space:nowrap">148.2</td></tr><tr><td><b><a href="/students/judy/continuation-domain-shift/" style="color:#E8DDBE">音乐如何发生：续域迁移与未选未来的重写</a></b></td><td>音乐是如何发生的</td><td>饱和余量 σ</td><td>续域迁移率 M、饱和余量 σ</td><td style="white-space:nowrap">148.0</td></tr>
- </table></div>
- <div style="text-align:center;margin-top:28px">
-  <a class="m primary" style="display:inline-block" href="/students/judy/works/">进入作品集 · 九论全文 →</a></div>
+    <g opacity="0.9">
+      <use href="#leaf" transform="translate(258 44) rotate(150)"/>
+      <use href="#leaf" transform="translate(276 96) rotate(196) scale(0.86)"/>
+      <use href="#leaf" transform="translate(232 34) rotate(176) scale(0.78)"/>
+      <use href="#leaf" transform="translate(220 100) rotate(128) scale(0.7)"/>
+      <use href="#leaf" transform="translate(196 62) rotate(184) scale(0.66)"/>
+      <use href="#leaf" transform="translate(200 150) rotate(140) scale(0.72)"/>
+      <use href="#leaf" transform="translate(184 178) rotate(202) scale(0.6)"/>
+    </g>
+
+    <use href="#bud" transform="translate(166 56) rotate(-58) scale(0.95)"/>
+    <use href="#bud" transform="translate(268 142) rotate(8) scale(0.85)"/>
+    <use href="#bud" transform="translate(176 192) rotate(-24) scale(0.8)"/>
+
+    <use href="#bloom" transform="translate(272 34) scale(1.14)"/>
+    <use href="#bloom" transform="translate(240 66) scale(0.92) rotate(24)"/>
+    <use href="#bloom" transform="translate(210 122) scale(0.74) rotate(-16)"/>
+    <use href="#bloom" transform="translate(296 92) scale(0.6) rotate(40)"/>
+    <use href="#bloom" transform="translate(190 168) scale(0.84) rotate(12)"/>
+    <use href="#bloom" transform="translate(226 138) scale(0.56) rotate(-32)"/>
+  </svg>
+  <svg class="stave" viewBox="0 0 840 190" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+    <g stroke="#A98B4E" stroke-opacity="0.26" stroke-width="1">
+      <line x1="0" y1="46" x2="840" y2="46"/><line x1="0" y1="70" x2="840" y2="70"/>
+      <line x1="0" y1="94" x2="840" y2="94"/><line x1="0" y1="118" x2="840" y2="118"/>
+      <line x1="0" y1="142" x2="840" y2="142"/>
+    </g>
+    <g fill="#A98B4E" fill-opacity="0.30">
+      <ellipse cx="516" cy="118" rx="7.8" ry="5.5" transform="rotate(-19 516 118)"/>
+      <ellipse cx="590" cy="94"  rx="7.8" ry="5.5" transform="rotate(-19 590 94)"/>
+      <ellipse cx="664" cy="70"  rx="7.8" ry="5.5" transform="rotate(-19 664 70)"/>
+    </g>
+    <g stroke="#A98B4E" stroke-opacity="0.30" stroke-width="1.4" stroke-linecap="round">
+      <line x1="523" y1="116" x2="523" y2="70"/>
+      <line x1="597" y1="92"  x2="597" y2="46"/>
+      <line x1="671" y1="68"  x2="671" y2="22"/>
+    </g>
+  </svg>
+  <div class="wrap">
+    <div class="portrait fade d1"><img src="/students/judy/judy.jpg" alt="Judy" width="148" height="148"></div>
+    <div class="who fade d2">
+      <h1>Judy</h1>
+      <div class="field zh-only">音乐教学与教育研究 · SDE 学员</div>
+      <div class="field en-only">Music education · SDE trainee</div>
+      <div class="rule"></div>
+    </div>
+  </div>
+</header>
+
+<div class="wrap bio fade d3">
+  <p class="zh-only">深耕音乐教学与教育研究领域多年，具有扎实的专业素养和丰富的一线教学实践经验。长期关注音乐课堂教学改革、学生艺术素养提升及教师专业发展，主持并参与多项教育教学课题研究，积极推动科研成果向课堂实践转化。曾多次获得教师教育教学技能类奖项，在课程建设、教学设计与实践指导方面成绩突出。注重学生创新能力与艺术实践能力培养，指导学生参加市、区级各类项目、展演及竞赛，多次斩获殊荣，育人成效显著。</p>
+  <p class="en-only">A music educator of many years, at home both in the classroom and in education research. Her standing concerns are the reform of music instruction, the growth of students&rsquo; artistic literacy, and the professional development of teachers; she has led and taken part in a number of pedagogical research projects, and works to carry their findings back into the classroom itself. A repeated award-winner in teaching-skills competitions, she is known for curriculum building, instructional design and practical mentoring. She gives particular weight to students&rsquo; creative and performing capacities, and those she guides have won recognition in municipal and district projects, showcases and competitions.</p>
 </div>
 
-<div class="level-tag" style="margin-top:44px">
- <span class="n">05</span><span class="t zh-only">阅 读 提 示 · HOW TO READ</span><span class="t en-only">HOW TO READ</span><span class="line"></span></div>
-<div class="sec">
- <p class="lead">这九篇不是九个答案，是九次失败得起的尝试。作者在每一篇里都先把最漂亮的那个强版本送去检验，再照实登记它怎么死的：有的主读数选错，有的被自己的对照组打平，有的整场因仪器故障作废，有的最后把承重命题整条改写成否定式。<b style="color:#E8DDBE">若只读一篇，建议从《并读壁》（本批最高分 153.2）或《途生项》（152.6）入手；若想看一篇作者如何把自己判死，读《续域迁移》。</b></p>
- <p class="lead">另有四篇同产线作品（《回接段与判定切口》《灌注半径》《把门项》《无率位》）在本批的划界节中被反复引用，但尚未在本站发表；相关分离线的另一侧暂时无法核对，各篇附论二已逐一标明。</p>
+<div class="wrap">
+  <div class="movement">
+    <span class="name zh-only">作 品</span><span class="name en-only">WORKS</span>
+    <svg class="bars" viewBox="0 0 300 34" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+      <g stroke="#A98B4E" stroke-opacity="0.30" stroke-width="1">
+        <line x1="0" y1="7" x2="300" y2="7"/><line x1="0" y1="12.5" x2="300" y2="12.5"/>
+        <line x1="0" y1="18" x2="300" y2="18"/><line x1="0" y1="23.5" x2="300" y2="23.5"/>
+        <line x1="0" y1="29" x2="300" y2="29"/>
+      </g>
+      <ellipse cx="22" cy="18" rx="5" ry="3.6" fill="#A98B4E" transform="rotate(-19 22 18)"/>
+      <line x1="26.6" y1="17" x2="26.6" y2="1" stroke="#A98B4E" stroke-width="1.3"/>
+    </svg>
+  </div>
+
+  <section class="rest">
+    <svg class="glyph" width="132" height="44" viewBox="0 0 132 44" aria-hidden="true" focusable="false">
+      <g stroke="#A98B4E" stroke-opacity="0.30" stroke-width="1">
+        <line x1="0" y1="8" x2="132" y2="8"/><line x1="0" y1="15" x2="132" y2="15"/>
+        <line x1="0" y1="22" x2="132" y2="22"/><line x1="0" y1="29" x2="132" y2="29"/>
+        <line x1="0" y1="36" x2="132" y2="36"/>
+      </g>
+      <rect x="55" y="15" width="22" height="7" fill="#A98B4E" fill-opacity="0.75"/>
+    </svg>
+    <p class="zh-only">此处现在是一段休止。<br>作品经审读后，将署名发表于此。</p>
+    <p class="en-only">A rest, for now.<br>Work will appear here under her name once reviewed.</p>
+  </section>
+
+  <div class="back">
+    <a href="/students/"><span class="zh-only">← 返回学员专栏名单</span><span class="en-only">← Back to the students roster</span></a>
+  </div>
 </div>
 
-<div class="back"><a href="/students/"><span class="zh-only">← 返回学员专栏名单</span><span class="en-only">← Back to the students roster</span></a></div>
-<footer><span class="zh-only">© 德麦国际 Demai International · 学员专栏 · <a href="/browse/">sdeuniverses.com</a></span>
-<span class="en-only">© Demai International · Students' Column · <a href="/browse/">sdeuniverses.com</a></span></footer>
-<script>function setLang(l){document.body.className=l;document.querySelectorAll('.lang-btn').forEach(function(b){b.classList.remove('active')});document.querySelector('.lang-btn'+(l==='en'?':last-child':':first-child')).classList.add('active')}</script>
-<script src="/assets/sde-talk.js?v=20260802b" defer></script>
+<footer>
+  <span class="zh-only">© 德麦国际 Demai International · 学员专栏 · <a href="/browse/">sdeuniverses.com</a></span>
+  <span class="en-only">© Demai International · Students&rsquo;&#8202;Column · <a href="/browse/">sdeuniverses.com</a></span>
+</footer>
+
+<script>
+function setLang(l){
+  document.body.className=l;
+  document.querySelectorAll('.lang button').forEach(function(b){
+    b.classList.toggle('on',(b.textContent==='中'&&l==='zh')||(b.textContent==='EN'&&l==='en'));
+  });
+  document.documentElement.lang=(l==='zh'?'zh-CN':'en');
+}
+</script>
+
+<script>window.WDS_READ={};</script>
+<script src="/taste/wds-companion/wds-read.js?v=20260802b" defer></script>
+
+<script src="/wds-mode.js?v=20260812ae" defer></script>
 </body></html>
