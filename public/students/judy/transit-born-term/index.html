@@ -13,8 +13,9 @@ a{color:var(--gold);text-decoration:none}
 .readbar{position:sticky;top:0;z-index:20;background:rgba(46,40,32,0.96);backdrop-filter:blur(8px);border-bottom:1px solid rgba(231,215,184,0.5);display:flex;align-items:center;justify-content:space-between;padding:11px 20px;gap:12px;flex-wrap:wrap}
 .readbar .nav-back{color:#D6C79E;font-size:13px;letter-spacing:0.04em}
 .rb-modes{display:flex;gap:8px;flex-wrap:wrap}
-.rb-btn{font-size:13px;padding:6px 14px;border-radius:3px;border:1px solid rgba(212,178,94,0.5);color:#EBD9A6;letter-spacing:0.03em}
-.rb-btn.cur{background:#D4B25E;color:#1A1410;font-weight:700;border-color:#D4B25E}
+.rb-btn{font-size:13px;padding:6px 14px;border-radius:3px;border:1px solid rgba(231,215,184,0.45);color:#E7D7B8;letter-spacing:0.03em;text-decoration:none;display:inline-block}
+.rb-modes a.rb-btn:hover{background:rgba(231,215,184,0.16);border-color:#E7D7B8}
+.rb-btn.cur{background:#E7D7B8;color:#2E2820;font-weight:600;border-color:#E7D7B8}
 .art{max-width:760px;margin:0 auto;padding:56px 24px 20px;text-align:center}
 .art-series{font-size:12px;letter-spacing:0.34em;color:var(--gold);margin-bottom:22px}
 .art-title{font-size:clamp(26px,4.6vw,40px);font-weight:800;line-height:1.45;color:var(--paper);letter-spacing:0.04em}
@@ -51,12 +52,20 @@ a{color:var(--gold);text-decoration:none}
 .endbox a{display:inline-block;padding:11px 26px;border:1px solid var(--gold);border-radius:3px;font-size:14px;letter-spacing:0.06em}
 footer{text-align:center;padding:34px 24px 46px;color:var(--muted);font-size:12.5px;letter-spacing:0.06em}
 @media(max-width:640px){body{font-size:16.5px}.wrap table{font-size:13px}.wrap th,.wrap td{padding:7px 8px}}
+.three{border:1px solid var(--flute);background:var(--panel);border-radius:12px;padding:18px 20px;margin:6px 0 26px}
+.three .t3-lb{font-size:11px;letter-spacing:.28em;color:var(--gold);margin-bottom:13px}
+.three .t3-g{display:flex;flex-wrap:wrap;gap:10px}
+.three .t3{flex:1 1 210px;display:block;padding:13px 15px;border-radius:9px;border:1px solid var(--flute);background:rgba(169,139,78,.05);line-height:1.65;color:var(--paper);text-decoration:none}
+.three a.t3:hover{border-color:var(--gold);background:rgba(169,139,78,.11)}
+.three .t3.cur{background:rgba(169,139,78,.16);border-color:var(--gold)}
+.three .t3 b{display:block;font-size:14.5px;margin-bottom:3px;font-weight:600}
+.three .t3 span{display:block;font-size:12.5px;color:var(--muted)}
 </style>
 <link rel="stylesheet" href="/sde-read.css">
 </head>
 <body class="sde-read">
 <div class="readbar"><a class="nav-back" href="/students/judy/works/">‹ Judy · 全部作品</a>
-<div class="rb-modes"><span class="rb-btn cur">📖 长文阅读</span></div></div>
+<div class="rb-modes"><span class="rb-btn cur">📖 长文阅读</span><a class="rb-btn" href="/students/judy/transit-born-term/read.html">📄 PDF 翻页读</a><a class="rb-btn" href="/students/judy/transit-born-term/transit-born-term.pdf" download>⬇ 下载阅读</a></div></div>
 <header class="art"><div class="art-series">学员专栏 · Judy · 何谓音乐 · 音乐如何发生 · 之八</div>
 <h1 class="art-title">途生项</h1>
 <div class="art-subtitle">音乐是如何发生的：一段声音在通过「听」时被生产出来的成员</div>
@@ -68,6 +77,9 @@ footer{text-align:center;padding:34px 24px 46px;color:var(--muted);font-size:12.
 <div class="srcbox"><span class="lb"><b>稿 件 信 息</b></span><p>副题：通道台账、途生率 ν 与「生产不需要模型」</p></div>
 <div class="abstract"><span class="lb"><b>摘 要</b></span><p>本文问的不是一段声音凭什么算音乐，而是：从物理声音到音乐，「听」这一下究竟做了什么。现有回答大致三形：听是筛（把音乐从声音里分出来）、听是搬（把已有的图式套到声音上）、听是过门（注意与加工的若干道门全过才成立）。本文从三个与音乐学零交集的行当取材——加速器与束流物理、色谱与质谱技术、病毒学——发现三者在争论之前共用一条压缩：要被处理的成员清单，在进入通道之前就已经确定；通道只决定其中多少、多快、多准地出来。三家各自提供了推翻它的材料：自放大自发辐射从噪声起振并自组织出微聚束，周期结构在入口不存在；色谱柱上产物与离子源加合物使「进入分析器的离子种数」这个分母本身由通道生产，且下游峰表不标来源；病毒在允许性细胞中复制，出口的颗粒数与序列集合都不是入口那一份。由此本文提出途生项：在通过通道的过程中被生产、且在下游账本上与入口成员不可区分的那些成员；读数为途生率 ν——出口账本中不能由入口内容决定的份额。音乐上的操作化取小节线：物理声音里没有小节线，它由听记者加入，此后与音高时值一起被下游当作同一份材料使用。四场作者预先写定的检验在 The Session 的 55,019 条记谱上执行：内容模型恢复小节相位的准确率为 0.452（打乱对照 0.217），远未达到预注册的被驳线 0.90；在同一任务同一目标上，两个内容模型的 κ 为 0.153 与 0.151，另一位独立转录者的 κ 为 0.272，而一个完全不看内容的常数预测器准确率 0.774，接近人类转录者的 0.781、约为内容模型的两倍；由此 ν = 0.4375。第四场的不可区分性检验在预注册口径上部分被驳，本文如实保留。最后本文提出并检验第二层主张：途生不需要模型——三家中生产新成员的通道没有先验、没有期待、没有表征，充分条件只有两条结构性质（输出再进入输入；下游账本不记来源）。这条主张与从亥姆霍兹到预测加工的一整条构造主义传统划出可检验的分界，并给出 F9、F10 两条自我证伪条款。音乐上的核心主张仍是待检验假说，决定性证据须来自「来源标记」听者实验。</p></div>
 <div class="keywords">关键词　途生项；途生率；通道台账；不可区分性；小节线；主观节拍化；预测加工；音乐发生学</div>
+<!-- THREE-READS -->
+<div class="three"><div class="t3-lb">三 读 · 同 一 篇 的 三 种 读 法</div><div class="t3-g"><span class="t3 cur"><b>📖 长文阅读</b><span>你正在读这一篇 · 网页长卷，可检索、可跳转</span></span><a class="t3" href="/students/judy/transit-born-term/read.html"><b>📄 PDF 翻页读</b><span>印刷版式 · 33 页 · 方向键翻页，可跳页缩放</span></a><a class="t3" href="/students/judy/transit-born-term/transit-born-term.pdf" download><b>⬇ 下载阅读</b><span>A4 印刷级 PDF · 33 页 · 离线与打印用</span></a></div></div>
+<!-- /THREE-READS -->
 <h2>一、问题</h2>
 <p>第一篇文章问的是一段声音凭什么算是一段音乐。本文问的是紧挨着它的另一件事：从声音到音乐，「听」这一下到底做了什么。</p>
 <p>日常场景仍然是那个：走在路上，广播里传来几个音，什么也认不出来，再走两步，忽然认出是哪一首。上一篇关心的是「认出来」这个资格何时成立。本文关心的是更朴素的一问——在那两步之间，声音被加工成了什么。是里面本来就有的东西被挑了出来？是听的人把一副现成的架子套了上去？还是声音连着过了几道关，最后一道过了才算数？</p>

@@ -13,8 +13,9 @@ a{color:var(--gold);text-decoration:none}
 .readbar{position:sticky;top:0;z-index:20;background:rgba(46,40,32,0.96);backdrop-filter:blur(8px);border-bottom:1px solid rgba(231,215,184,0.5);display:flex;align-items:center;justify-content:space-between;padding:11px 20px;gap:12px;flex-wrap:wrap}
 .readbar .nav-back{color:#D6C79E;font-size:13px;letter-spacing:0.04em}
 .rb-modes{display:flex;gap:8px;flex-wrap:wrap}
-.rb-btn{font-size:13px;padding:6px 14px;border-radius:3px;border:1px solid rgba(212,178,94,0.5);color:#EBD9A6;letter-spacing:0.03em}
-.rb-btn.cur{background:#D4B25E;color:#1A1410;font-weight:700;border-color:#D4B25E}
+.rb-btn{font-size:13px;padding:6px 14px;border-radius:3px;border:1px solid rgba(231,215,184,0.45);color:#E7D7B8;letter-spacing:0.03em;text-decoration:none;display:inline-block}
+.rb-modes a.rb-btn:hover{background:rgba(231,215,184,0.16);border-color:#E7D7B8}
+.rb-btn.cur{background:#E7D7B8;color:#2E2820;font-weight:600;border-color:#E7D7B8}
 .art{max-width:760px;margin:0 auto;padding:56px 24px 20px;text-align:center}
 .art-series{font-size:12px;letter-spacing:0.34em;color:var(--gold);margin-bottom:22px}
 .art-title{font-size:clamp(26px,4.6vw,40px);font-weight:800;line-height:1.45;color:var(--paper);letter-spacing:0.04em}
@@ -51,12 +52,20 @@ a{color:var(--gold);text-decoration:none}
 .endbox a{display:inline-block;padding:11px 26px;border:1px solid var(--gold);border-radius:3px;font-size:14px;letter-spacing:0.06em}
 footer{text-align:center;padding:34px 24px 46px;color:var(--muted);font-size:12.5px;letter-spacing:0.06em}
 @media(max-width:640px){body{font-size:16.5px}.wrap table{font-size:13px}.wrap th,.wrap td{padding:7px 8px}}
+.three{border:1px solid var(--flute);background:var(--panel);border-radius:12px;padding:18px 20px;margin:6px 0 26px}
+.three .t3-lb{font-size:11px;letter-spacing:.28em;color:var(--gold);margin-bottom:13px}
+.three .t3-g{display:flex;flex-wrap:wrap;gap:10px}
+.three .t3{flex:1 1 210px;display:block;padding:13px 15px;border-radius:9px;border:1px solid var(--flute);background:rgba(169,139,78,.05);line-height:1.65;color:var(--paper);text-decoration:none}
+.three a.t3:hover{border-color:var(--gold);background:rgba(169,139,78,.11)}
+.three .t3.cur{background:rgba(169,139,78,.16);border-color:var(--gold)}
+.three .t3 b{display:block;font-size:14.5px;margin-bottom:3px;font-weight:600}
+.three .t3 span{display:block;font-size:12.5px;color:var(--muted)}
 </style>
 <link rel="stylesheet" href="/sde-read.css">
 </head>
 <body class="sde-read">
 <div class="readbar"><a class="nav-back" href="/students/judy/works/">‹ Judy · 全部作品</a>
-<div class="rb-modes"><span class="rb-btn cur">📖 长文阅读</span></div></div>
+<div class="rb-modes"><span class="rb-btn cur">📖 长文阅读</span><a class="rb-btn" href="/students/judy/vacated-occupancy/read.html">📄 PDF 翻页读</a><a class="rb-btn" href="/students/judy/vacated-occupancy/vacated-occupancy.pdf" download>⬇ 下载阅读</a></div></div>
 <header class="art"><div class="art-series">学员专栏 · Judy · 何谓音乐 · 音乐如何发生 · 之五</div>
 <h1 class="art-title">退占体</h1>
 <div class="art-subtitle">何谓音乐：声音退出当下占位而不退出后续作用</div>
@@ -68,6 +77,9 @@ footer{text-align:center;padding:34px 24px 46px;color:var(--muted);font-size:12.
 <div class="srcbox"><span class="lb"><b>稿 件 信 息</b></span><p>V2.0　新增：与怀特海、申克—归约传统、组块记忆三位正主的分界；七族语料上的大规模预注册检验；以及由该检验逼出的两处理论收缩</p></div>
 <div class="abstract"><span class="lb"><b>摘 要</b></span><p>本文重新回答”何谓音乐”。它不从音高、节奏、和声、制度或审美意图中再挑一种属性，而问一个更靠前的问题：一个声音发生以后，怎样退出当下而又没有从音乐中消失？为避开音乐学已经吸收的交叉带，本文不使用水声景观、生物音乐学、歌唱呼吸或音乐治疗，而分别从水利调度的防洪库容恢复、组织工程的灌流—基质互惠、呼吸病学的呼气流量受限与动态肺过度充气提取可核验机制。三者共同逼出既非保留亦非消失的第三态：先前事件退出前景占位，把部分作用转写为后续关系的约束，并恢复新的分化容量。本文把这一存在命名为退占体，给出四项必要条件（前景释放、关系回写、容量恢复、声音不可还原）、一张二维辨别格（消散／退占／充塞／痕压）、反事实问法与八条机制证伪条件。</p><p>V2.0 相对 V1.0 有三项实质改动。其一，补上三位此前零交手的经典正主并各给可裁决分离线：怀特海的「现实在消逝中获得客观性、同时失去主观直接性」是本文承重句的最近替换者；申克的前景—中景—背景与生成理论的时值跨度归约、延长归约，是”退出前景却在更高层继续起结构约束”的既有范式；组块记忆与前向掩蔽，是”容量恢复”的既有正主。其二，把与作者同三学科同题另一篇工作的分界补入内部划界表。其三，把 V1.0 中仅有 10 个边界的预实验降格为无功效的探路，并在七个语料族、合计逾十四万个位置上执行一次新的预先写定检验。</p><p>新检验的结果部分支持、部分推翻本文。前景释放（边界处短程条件熵上升）在七族中六族成立，最大一族达 +0.729 比特；蒙特威尔第牧歌为反例（+0.016，区间含零），如实保留。关系回写（跨边界长程条件熵不上升）只在三族成立，在四族被驳。判决性对照显示，短程熵的上升大部分可由边界处音程的边缘分布解释，扣除后的条件性净增量仅 −0.078 至 +0.211 比特。据此本文作两处收缩：退占不是音乐的普遍机制，而是边界的一种类型；四格因此从概念表升级为可测的边界分类器。最终命题为：音乐不是让过去继续充满现在，而是让过去从前景撤出、进入关系，并把可用的下一刻还给新的声音——而这件事在何种边界上真的发生，现在是一个可以算、也可能算不出来的数。</p></div>
 <div class="keywords">关键词　音乐本体论；退占体；前景释放；关系回写；容量恢复；条件熵；边界分类</div>
+<!-- THREE-READS -->
+<div class="three"><div class="t3-lb">三 读 · 同 一 篇 的 三 种 读 法</div><div class="t3-g"><span class="t3 cur"><b>📖 长文阅读</b><span>你正在读这一篇 · 网页长卷，可检索、可跳转</span></span><a class="t3" href="/students/judy/vacated-occupancy/read.html"><b>📄 PDF 翻页读</b><span>印刷版式 · 26 页 · 方向键翻页，可跳页缩放</span></a><a class="t3" href="/students/judy/vacated-occupancy/vacated-occupancy.pdf" download><b>⬇ 下载阅读</b><span>A4 印刷级 PDF · 26 页 · 离线与打印用</span></a></div></div>
+<!-- /THREE-READS -->
 <h2>一、问题：音乐定义为什么总能说对一部分，却说不清边界</h2>
 <p>“音乐是什么”之所以难，不是因为材料不足，而是因为几乎每一种重要定义都能抓住真实经验的一部分。把音乐理解为运动着的声音形式，能解释作品内部的自足结构；理解为被组织的声音，能容纳噪声与电子声；理解为人所组织的声音，能把文化与身体带回来；理解为一种参与活动，又能说明表演与聆听并非作品之外的附属。期待理论解释了尚未出现的下一声如何已在当下起作用，听觉场景分析说明复杂声流怎样被分组，现象学追问刚过去的声音如何仍被意识保有。问题不在这些理论”错”，而在它们把不同层次的真相写成了同一个”本质”。</p>
 <p>只要把音乐定义为”有组织的声音”，演讲、报警序列与工业提示音都可以进入；再加”审美目的”，又会把大量仪式、劳动号子与偶发音乐挡在外面。若定义为共同体授权的实践，边界可以包容，却失去对同一实践内部成功与失败的辨别：同一场音乐会、同一份乐谱，仍可能产生一段音乐，也可能产生一段被声音堵死的时间。若把本质放在期待上，语言与交通信号同样制造强烈期待；期待能解释”下一步可能是什么”，却没有回答”前一步现在是什么”。</p>

@@ -5,58 +5,68 @@
 <meta name="description" content="音乐不是读法之下的那个对象；音乐是「读法系统之间不可通约」这件事在一段材料上留下的界面。七场预注册检验，两场是本文自己的仪器故障，都被自曝并转成操作规则。">
 <meta name="sde:author" content="Judy">
 <meta name="sde:series" content="音乐发生学九论">
-<style>:root{--ink:#1A1410;--gold:#B4892E;--gold2:#8A6A1E;--paper:#241C10;--muted:#8A7C60;--bg:#F6F2E7;--panel:#EFE8D6}
+<style>:root{--ink:#2E2820;--gold:#A98B4E;--gold2:#8A6F3A;--paper:#2E2820;--muted:#7A6D57;--bg:#F5EAD7;--panel:#FCF7EC;--flute:#E7D7B8}
 *{margin:0;padding:0;box-sizing:border-box}
-::selection{background:rgba(180,137,46,0.30)}
-body{background:var(--bg);color:var(--paper);font-family:"Songti SC","Noto Serif SC",Georgia,serif;line-height:2.0;font-size:17.5px}
+::selection{background:rgba(169,139,78,0.30)}
+body{background:var(--bg);color:var(--paper);font-family:"Noto Serif SC","Songti SC",Georgia,serif;font-weight:300;line-height:2.0;font-size:17.5px;-webkit-font-smoothing:antialiased}
 a{color:var(--gold);text-decoration:none}
-.readbar{position:sticky;top:0;z-index:20;background:rgba(28,20,12,0.97);backdrop-filter:blur(8px);border-bottom:1px solid rgba(212,178,94,0.22);display:flex;align-items:center;justify-content:space-between;padding:11px 20px;gap:12px;flex-wrap:wrap}
+.readbar{position:sticky;top:0;z-index:20;background:rgba(46,40,32,0.96);backdrop-filter:blur(8px);border-bottom:1px solid rgba(231,215,184,0.5);display:flex;align-items:center;justify-content:space-between;padding:11px 20px;gap:12px;flex-wrap:wrap}
 .readbar .nav-back{color:#D6C79E;font-size:13px;letter-spacing:0.04em}
 .rb-modes{display:flex;gap:8px;flex-wrap:wrap}
-.rb-btn{font-size:13px;padding:6px 14px;border-radius:3px;border:1px solid rgba(212,178,94,0.5);color:#EBD9A6;letter-spacing:0.03em}
-.rb-btn.cur{background:#D4B25E;color:#1A1410;font-weight:700;border-color:#D4B25E}
+.rb-btn{font-size:13px;padding:6px 14px;border-radius:3px;border:1px solid rgba(231,215,184,0.45);color:#E7D7B8;letter-spacing:0.03em;text-decoration:none;display:inline-block}
+.rb-modes a.rb-btn:hover{background:rgba(231,215,184,0.16);border-color:#E7D7B8}
+.rb-btn.cur{background:#E7D7B8;color:#2E2820;font-weight:600;border-color:#E7D7B8}
 .art{max-width:760px;margin:0 auto;padding:56px 24px 20px;text-align:center}
 .art-series{font-size:12px;letter-spacing:0.34em;color:var(--gold);margin-bottom:22px}
 .art-title{font-size:clamp(26px,4.6vw,40px);font-weight:800;line-height:1.45;color:var(--paper);letter-spacing:0.04em}
 .art-subtitle{font-size:clamp(15px,2.2vw,18px);color:var(--gold2);margin-top:18px;line-height:1.85;letter-spacing:0.02em}
 .art-meta{margin-top:26px;font-size:13px;color:var(--muted);letter-spacing:0.13em}
 .wrap{max-width:760px;margin:0 auto;padding:26px 24px 60px}
-.scorebox{background:rgba(180,137,46,0.09);border:1px solid rgba(180,137,46,0.34);border-radius:4px;padding:16px 20px;margin:6px 0 26px;font-size:14.5px;line-height:1.85}
+.scorebox{background:rgba(169,139,78,0.09);border:1px solid rgba(169,139,78,0.34);border-radius:4px;padding:16px 20px;margin:6px 0 26px;font-size:14.5px;line-height:1.85}
 .scorebox>b{color:var(--gold2);letter-spacing:0.04em}
-.scorebox p{margin-top:7px;color:#4A4130;font-size:13.5px;line-height:1.8}
-.srcbox{border:1px solid rgba(180,137,46,0.28);border-left:3px solid var(--gold);background:rgba(180,137,46,0.045);padding:16px 22px;margin:0 0 26px;font-size:15px;line-height:1.9}
+.scorebox p{margin-top:7px;color:#5C5241;font-size:13.5px;line-height:1.8}
+.srcbox{border:1px solid rgba(169,139,78,0.28);border-left:3px solid var(--gold);background:rgba(169,139,78,0.045);padding:16px 22px;margin:0 0 26px;font-size:15px;line-height:1.9}
 .srcbox .lb{display:block;font-size:11.5px;letter-spacing:0.3em;color:var(--gold);margin-bottom:8px}
-.srcbox p{color:#3A3222;margin:0 0 4px}
+.srcbox p{color:#4A4133;margin:0 0 4px}
 .abstract{background:var(--panel);border-left:3px solid var(--gold);padding:22px 26px;margin:20px 0 22px;font-size:16px;line-height:1.95}
 .abstract .lb{display:block;font-size:12px;letter-spacing:.3em;opacity:.75;margin-bottom:10px;color:var(--gold2)}
-.abstract p{color:#3A3222;margin-bottom:12px}
+.abstract p{color:#4A4133;margin-bottom:12px}
 .abstract p:last-child{margin-bottom:0}
 .keywords{font-size:14px;color:var(--muted);letter-spacing:0.02em;margin:0 0 12px;padding-bottom:14px;border-bottom:1px solid rgba(212,178,94,0.20)}
-.wrap h2{font-size:22px;font-weight:800;color:var(--paper);margin:46px 0 18px;letter-spacing:0.03em;padding-top:10px;border-top:1px solid rgba(180,137,46,0.18)}
+.wrap h2{font-size:22px;font-weight:800;color:var(--paper);margin:46px 0 18px;letter-spacing:0.03em;padding-top:10px;border-top:1px solid rgba(169,139,78,0.18)}
 .wrap h2.part{text-align:center;font-size:19px;letter-spacing:0.3em;color:var(--gold2);border-top:none;margin:56px 0 10px}
-.wrap h3{font-size:18px;font-weight:700;color:#3A3020;margin:32px 0 14px;letter-spacing:0.02em}
-.wrap p{margin-bottom:20px;text-align:justify;color:#2C2618}
+.wrap h3{font-size:18px;font-weight:700;color:#3A3226;margin:32px 0 14px;letter-spacing:0.02em}
+.wrap p{margin-bottom:20px;text-align:justify;color:#2E2820}
 .wrap p.li{margin-left:1.4em;text-indent:0;margin-bottom:10px}
-.wrap p.ref{font-size:14px;line-height:1.75;color:#5A5240;margin-bottom:9px;padding-left:2em;text-indent:-2em;text-align:left}
-.cut{background:rgba(180,137,46,0.07);border:1px solid rgba(180,137,46,0.30);border-left:3px solid var(--gold);padding:18px 24px;margin:26px 0}
+.wrap p.ref{font-size:14px;line-height:1.75;color:#7A6D57;margin-bottom:9px;padding-left:2em;text-indent:-2em;text-align:left}
+.cut{background:rgba(169,139,78,0.07);border:1px solid rgba(169,139,78,0.30);border-left:3px solid var(--gold);padding:18px 24px;margin:26px 0}
 .cut .c-lbl{font-size:11.5px;letter-spacing:0.28em;color:var(--gold);margin-bottom:9px}
 .cut p{margin-bottom:0;font-size:16px}
-.ednote{font-size:.93em;opacity:.85;border-left:3px solid rgba(160,130,60,.5);padding:8px 0 8px 14px;margin:12px 0 22px}
+.ednote{font-size:.93em;opacity:.85;border-left:3px solid rgba(169,139,78,.5);padding:8px 0 8px 14px;margin:12px 0 22px}
 .tw{margin:18px 0 26px;overflow-x:auto}
 .wrap table{border-collapse:collapse;width:100%;font-size:14.5px;line-height:1.7}
-.wrap th,.wrap td{border:1px solid rgba(160,130,60,.32);padding:9px 11px;text-align:left;vertical-align:top;color:#2C2618}
-.wrap th{background:rgba(160,130,60,.13);font-weight:700;color:#3A3020}
-.wrap tr:nth-child(even) td{background:rgba(180,137,46,0.045)}
-.endbox{max-width:760px;margin:10px auto 0;padding:26px 24px;border-top:1px solid rgba(180,137,46,0.22);text-align:center}
+.wrap th,.wrap td{border:1px solid rgba(169,139,78,.32);padding:9px 11px;text-align:left;vertical-align:top;color:#2E2820}
+.wrap th{background:rgba(169,139,78,.13);font-weight:700;color:#3A3226}
+.wrap tr:nth-child(even) td{background:rgba(169,139,78,0.045)}
+.endbox{max-width:760px;margin:10px auto 0;padding:26px 24px;border-top:1px solid rgba(169,139,78,0.22);text-align:center}
 .endbox a{display:inline-block;padding:11px 26px;border:1px solid var(--gold);border-radius:3px;font-size:14px;letter-spacing:0.06em}
 footer{text-align:center;padding:34px 24px 46px;color:var(--muted);font-size:12.5px;letter-spacing:0.06em}
 @media(max-width:640px){body{font-size:16.5px}.wrap table{font-size:13px}.wrap th,.wrap td{padding:7px 8px}}
+
+.three{border:1px solid var(--flute);background:var(--panel);border-radius:12px;padding:18px 20px;margin:6px 0 26px}
+.three .t3-lb{font-size:11px;letter-spacing:.28em;color:var(--gold);margin-bottom:13px}
+.three .t3-g{display:flex;flex-wrap:wrap;gap:10px}
+.three .t3{flex:1 1 210px;display:block;padding:13px 15px;border-radius:9px;border:1px solid var(--flute);background:rgba(169,139,78,.05);line-height:1.65;color:var(--paper);text-decoration:none}
+.three a.t3:hover{border-color:var(--gold);background:rgba(169,139,78,.11)}
+.three .t3.cur{background:rgba(169,139,78,.16);border-color:var(--gold)}
+.three .t3 b{display:block;font-size:14.5px;margin-bottom:3px;font-weight:600}
+.three .t3 span{display:block;font-size:12.5px;color:var(--muted)}
 </style>
 <link rel="stylesheet" href="/sde-read.css">
 </head>
 <body class="sde-read">
 <div class="readbar"><a class="nav-back" href="/students/judy/works/">‹ Judy · 全部作品</a>
-<div class="rb-modes"><span class="rb-btn cur">📖 长文阅读</span><a class="rb-btn" href="read.html">📄 在线 PDF</a><a class="rb-btn" href="co-reading-wall.pdf">⬇ 下载 PDF</a></div></div>
+<div class="rb-modes"><span class="rb-btn cur">📖 长文阅读</span><a class="rb-btn" href="read.html">📄 PDF 翻页读</a><a class="rb-btn" href="co-reading-wall.pdf">⬇ 下载阅读</a></div></div>
 <header class="art"><div class="art-series">学员专栏 · Judy · 何谓音乐 · 音乐如何发生 · 之二</div>
 <h1 class="art-title">并读壁</h1>
 <div class="art-subtitle">何谓音乐：一段声音在两种互不相容的读法之间立起的那道墙</div>
@@ -68,6 +78,9 @@ footer{text-align:center;padding:34px 24px 46px;color:var(--muted);font-size:12.
 <div class="srcbox"><span class="lb"><b>稿 件 信 息</b></span><p>外源三家：晶体学的孪晶与畴壁 × 雷达测量的距离—速度模糊 × 冷冻电镜的三维分类</p><p>研究类型：音乐本体论 · 跨域概念重构　　版本：2026-08-16</p></div>
 <div class="abstract"><span class="lb"><b>摘 要</b></span><p>「音乐是什么」的已有回答，大多落在四个位置：声音对象的属性、形式关系的组织、社会实践的承认、听觉认知的过程。近年又出现第五个——后继位置：音乐被安置在”前一步如何限定下一步”上。本文认为，第五个位置虽把问题从静态推到发生，却与前四个共享一条更深的假定：在任何一个时刻，一段声音只有一种正在生效的读法；多种读法并存是暂时的、是尚未被处置的中间状态。</p><p>本文从三个不在音乐学常规底盘上的领域取材：晶体学的孪晶与畴壁、雷达测量的距离—速度模糊、冷冻电镜的三维分类。三家对”多解并存”给出互不相容的处置——保留为实体、用观测代价解掉、必须拆开否则会平均出一个谁也不具有的对象。推翻材料来自晶体学自身：畴壁与孪晶界是热力学上有定义的存在物（Ni-Mn-Ga 中磁畴壁宽经洛伦兹透射电镜测得约 28 nm，有迁移率、Peierls 势垒与点缺陷钉扎），而磁控形状记忆效应由孪晶界的运动实现，高迁移率是该效应存在的必要条件。也就是说：共存不是通往对象的路，共存生产一个承担主要功能的对象。</p><p>本文据此提出并读壁：两种以上互不相容的读法同时保持合法、且没有一种能靠更细的测量被消掉时，它们之间立起的那道界面。壁有三个可测属性——宽度 w、可动性 μ、钉扎点。</p><p>本文做了七场预注册检验，用 music21 五族公开语料（巴赫众赞歌、帕莱斯特里纳、十四世纪意大利、爱尔兰/美洲提琴曲、Essen 民歌），最大一场 703 首。其中两场整场毁于本文自己的仪器故障，另有一处轴级故障，三处均被自曝并转成操作规则。 第一场（调性读法）主假设被驳（p = 0.72），事后查明读法系统无序而对照只打乱顺序，测不到东西。第二场（节拍读法）整场作废：8 个相位候选因强位集合在半周期旋转下不变而实际只有 4 个互异，Δ 恒为 0——并读读数最具欺骗性的失败模式是”看起来墙很宽”。第六场修好候选集重跑：真实音乐的墙比顺序打乱对照更宽，中位 6.0 对 4.0，p = 2×10⁻¹⁷——显著，但方向与本文事前预测相反，如实记录。</p><p>真正关键的是第三场。三个输入量彼此不重叠的读法系统（调性 / 节拍 / 分句）在同一批 332 首材料上：族内 Spearman 相关中位数 0.09、0.10、0.11；三对族序的 Kendall τ 为 −0.20、−0.20、+0.20；族内标准化后第一主成分只解释 0.407 的方差（预注册的不利线是 0.70）。 第四场把窗口精度提高八倍，并读占比从 0.280 走到 0.289，不随精度消失。第五场的中性扰动实验测得 μ 中位 1.2 &gt; 0 且小于墙宽，且 37.2% 的曲目 μ = 0——墙被钉住，巴赫众赞歌中位数为 0。</p><p>第七场做掉了全文最便宜也最危险的一项检验：墙宽对音符密度与音级熵回归，三个系统的残差方差占比是 0.836 / 0.920 / 0.930，音级熵的标准化系数全部落在 ±0.03 内——墙宽不是复杂度的改名。</p><p>七场把命题推到一个比出发点更强也更容易被打死的位置：不存在一个所有读法系统共同在测的量。 因此——音乐不是被组织的声音，不是被听懂的结构，不是被承认的活动，也不是读法之下的那个对象；音乐是「读法系统之间不可通约」这件事在声音材料上留下的可测痕迹：那道只在两种互不相容的读法同时站着时才存在、会移动、会被钉住的界面。若这一句成立，给一段音乐定调、定拍、定分句就不是对同一对象的三种描述，而是三台没有共同被测量的仪器——音乐学的一整类分析结论在构成上是仪器相对的，不是”暂时不知道哪个对”。</p><p>本文逐条划界的近邻共十一位：节拍不谐、反歧义论、偏好规则、贝叶斯调性推断、双稳知觉、投射理论、风格即约束、库恩式不可通约、分析哲学美学中的概念多元论等。另给出九条判决性证伪（四条已执行且未触发）、一个 2028 年到期的赌注，以及本定义明确不解释的四件事。全部预注册文件、哈希与脚本随稿提交。</p></div>
 <div class="keywords">关键词：音乐本体论；并读壁；读法系统；孪晶界；距离—速度模糊；构象异质性；预注册失败</div>
+<!-- THREE-READS -->
+<div class="three"><div class="t3-lb">三 读 · 同 一 篇 的 三 种 读 法</div><div class="t3-g"><span class="t3 cur"><b>📖 长文阅读</b><span>你正在读这一篇 · 网页长卷，可检索、可跳转</span></span><a class="t3" href="/students/judy/co-reading-wall/read.html"><b>📄 PDF 翻页读</b><span>印刷版式 · 37 页 · 方向键翻页，可跳页缩放</span></a><a class="t3" href="/students/judy/co-reading-wall/co-reading-wall.pdf" download><b>⬇ 下载阅读</b><span>A4 印刷级 PDF · 37 页 · 离线与打印用</span></a></div></div>
+<!-- /THREE-READS -->
 <h2>一、问题不在「哪些声音算音乐」，也不在「下一步是否被限定」</h2>
 <p>把「何谓音乐」当成寻找一组对象属性，很快会撞上反例。旋律、节拍、和声都不是必要条件；人为制作既不必要也不充分；社会命名可以合法地把一段声音叫作音乐，却不能保证听觉上发生了任何区别于通知声的事。这些困难已经被反复指出，本文不再重述。</p>
 <p>近年一个更有力的方向是把音乐从「是什么」改写成「下一步怎样被限定」：前一事件改变对后一事件的期待，或前一轮差异使下一轮的可接受集合变小。这个方向把问题从分类学推进到了发生论，是真正的推进。但它与它所取代的那些答案共享一个更深的假定，而这个假定从来没有被单独写出来过：</p>

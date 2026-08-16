@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="zh-CN"><head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>并读壁 · PDF在线阅读 | 学员专栏 · SDE Universes</title>
-<meta name="description" content="并读壁——何谓音乐：一段声音在两种互不相容的读法之间立起的那道墙｜Judy · 学员专栏 · 37 页 PDF 在线翻页阅读">
+<title>何谓音乐——差异的有效期 · PDF在线阅读 | 学员专栏 · SDE Universes</title>
+<meta name="description" content="何谓音乐——差异的有效期——一次声差在多久之内没有被接住，就不再可能成为音乐｜Judy · 学员专栏 · 30 页 PDF 在线翻页阅读">
 <style>
 :root{--champagne:#F5EAD7;--champagne-2:#FCF7EC;--flute:#E7D7B8;--brass:#A98B4E;--ink:#2E2820;--ink-2:#7A6D57}
 *{margin:0;padding:0;box-sizing:border-box}
@@ -36,28 +36,28 @@ canvas{display:block;max-width:100%;height:auto}
 @media(max-width:640px){.tb-title{font-size:12.5px;max-width:38vw}.side-tap{width:18%}}
 </style></head><body>
 <div class="topbar">
-  <div class="tb-title"><a href="/students/judy/co-reading-wall/">← 返回文章页</a>并读壁</div>
+  <div class="tb-title"><a href="/students/judy/lapsed-difference/">← 返回文章页</a>何谓音乐——差异的有效期</div>
   <div class="controls">
     <button class="btn" id="prev" disabled>‹ 上一页</button>
-    <div class="pagebox"><input id="pageInput" type="number" min="1" value="1"><span class="total">/ <span id="totalPages">37</span></span></div>
+    <div class="pagebox"><input id="pageInput" type="number" min="1" value="1"><span class="total">/ <span id="totalPages">30</span></span></div>
     <button class="btn" id="next" disabled>下一页 ›</button>
     <button class="btn" id="zoomOut">−</button><button class="btn" id="zoomIn">＋</button>
-    <a class="btn solid" href="co-reading-wall.pdf" download>⬇ 下载 PDF</a>
+    <a class="btn solid" href="lapsed-difference.pdf" download>⬇ 下载 PDF</a>
   </div>
 </div>
 <div class="stage">
-  <div id="loading" class="loading"><div class="spinner"></div>正在展开长卷…<br><span style="font-size:13px">37 页 · 首次载入只需一两秒</span></div>
+  <div id="loading" class="loading"><div class="spinner"></div>正在展开长卷…<br><span style="font-size:13px">30 页 · 首次载入只需一两秒</span></div>
   <div id="canvas-wrap" style="display:none"><canvas id="pdfCanvas"></canvas></div>
   <div id="error" class="err" style="display:none"></div>
 </div>
 <div class="side-tap left" id="tapLeft"></div>
 <div class="side-tap right" id="tapRight"></div>
 <div class="navhint">← → 方向键翻页 · 点击页面两侧翻页 · 可输入页码跳转</div>
-<div class="foot">《并读壁》· Judy · 学员专栏 · 盲评 153.2 · <a href="/students/judy/works/">音乐发生学九论</a><br>
+<div class="foot">《何谓音乐——差异的有效期》· Judy · 学员专栏 · 盲评 150.2 · <a href="/students/judy/works/">音乐发生学九论</a><br>
 © 德麦国际 Demai International · <a href="/browse/">sdeuniverses.com</a></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script>
-const PDF_URL = "co-reading-wall.pdf";
+const PDF_URL = "lapsed-difference.pdf";
 pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
 let pdfDoc=null, pageNum=1, rendering=false, pending=null, scale=1.3;
 const canvas=document.getElementById('pdfCanvas'), ctx=canvas.getContext('2d');
@@ -105,7 +105,7 @@ document.addEventListener('keydown',e=>{
   if(e.key==='ArrowRight')go(pageNum+1);
 });
 </script>
-<script>window.WDS_PDF={url:"co-reading-wall.pdf",curSel:"#pageInput",curAttr:"value"};</script>
+<script>window.WDS_PDF={url:"lapsed-difference.pdf",curSel:"#pageInput",curAttr:"value"};</script>
 <script src="/taste/wds-companion/wds-pdf.js?v=20260802b" defer></script>
 <script src="/wds-mode.js?v=20260812ae" defer></script>
 </body></html>

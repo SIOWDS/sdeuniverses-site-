@@ -13,8 +13,9 @@ a{color:var(--gold);text-decoration:none}
 .readbar{position:sticky;top:0;z-index:20;background:rgba(46,40,32,0.96);backdrop-filter:blur(8px);border-bottom:1px solid rgba(231,215,184,0.5);display:flex;align-items:center;justify-content:space-between;padding:11px 20px;gap:12px;flex-wrap:wrap}
 .readbar .nav-back{color:#D6C79E;font-size:13px;letter-spacing:0.04em}
 .rb-modes{display:flex;gap:8px;flex-wrap:wrap}
-.rb-btn{font-size:13px;padding:6px 14px;border-radius:3px;border:1px solid rgba(212,178,94,0.5);color:#EBD9A6;letter-spacing:0.03em}
-.rb-btn.cur{background:#D4B25E;color:#1A1410;font-weight:700;border-color:#D4B25E}
+.rb-btn{font-size:13px;padding:6px 14px;border-radius:3px;border:1px solid rgba(231,215,184,0.45);color:#E7D7B8;letter-spacing:0.03em;text-decoration:none;display:inline-block}
+.rb-modes a.rb-btn:hover{background:rgba(231,215,184,0.16);border-color:#E7D7B8}
+.rb-btn.cur{background:#E7D7B8;color:#2E2820;font-weight:600;border-color:#E7D7B8}
 .art{max-width:760px;margin:0 auto;padding:56px 24px 20px;text-align:center}
 .art-series{font-size:12px;letter-spacing:0.34em;color:var(--gold);margin-bottom:22px}
 .art-title{font-size:clamp(26px,4.6vw,40px);font-weight:800;line-height:1.45;color:var(--paper);letter-spacing:0.04em}
@@ -51,12 +52,20 @@ a{color:var(--gold);text-decoration:none}
 .endbox a{display:inline-block;padding:11px 26px;border:1px solid var(--gold);border-radius:3px;font-size:14px;letter-spacing:0.06em}
 footer{text-align:center;padding:34px 24px 46px;color:var(--muted);font-size:12.5px;letter-spacing:0.06em}
 @media(max-width:640px){body{font-size:16.5px}.wrap table{font-size:13px}.wrap th,.wrap td{padding:7px 8px}}
+.three{border:1px solid var(--flute);background:var(--panel);border-radius:12px;padding:18px 20px;margin:6px 0 26px}
+.three .t3-lb{font-size:11px;letter-spacing:.28em;color:var(--gold);margin-bottom:13px}
+.three .t3-g{display:flex;flex-wrap:wrap;gap:10px}
+.three .t3{flex:1 1 210px;display:block;padding:13px 15px;border-radius:9px;border:1px solid var(--flute);background:rgba(169,139,78,.05);line-height:1.65;color:var(--paper);text-decoration:none}
+.three a.t3:hover{border-color:var(--gold);background:rgba(169,139,78,.11)}
+.three .t3.cur{background:rgba(169,139,78,.16);border-color:var(--gold)}
+.three .t3 b{display:block;font-size:14.5px;margin-bottom:3px;font-weight:600}
+.three .t3 span{display:block;font-size:12.5px;color:var(--muted)}
 </style>
 <link rel="stylesheet" href="/sde-read.css">
 </head>
 <body class="sde-read">
 <div class="readbar"><a class="nav-back" href="/students/judy/works/">‹ Judy · 全部作品</a>
-<div class="rb-modes"><span class="rb-btn cur">📖 长文阅读</span></div></div>
+<div class="rb-modes"><span class="rb-btn cur">📖 长文阅读</span><a class="rb-btn" href="/students/judy/unheld-term/read.html">📄 PDF 翻页读</a><a class="rb-btn" href="/students/judy/unheld-term/unheld-term.pdf" download>⬇ 下载阅读</a></div></div>
 <header class="art"><div class="art-series">学员专栏 · Judy · 何谓音乐 · 音乐如何发生 · 之四</div>
 <h1 class="art-title">无持项</h1>
 <div class="art-subtitle">何谓音乐：一种没有整体持有者的结构</div>
@@ -68,6 +77,9 @@ footer{text-align:center;padding:34px 24px 46px;color:var(--muted);font-size:12.
 
 <div class="abstract"><span class="lb"><b>摘 要</b></span><p>本文回答「何谓音乐」，取的是与当今音乐学没有交集的三家：结构生物学中复合体的定序组装与化学计量、射电天文中的甚长基线干涉、劳动关系中的排他代表与公平代表义务。三家对「多个不完整的局部持有加上没有全局视图」给出互不相容的判决。未装进去的一份不是完成了一部分，而是必须被销毁的危险物。各台记录的不是部分图像，而是各自完整的噪声，图像只在事后互相关中出现。代表持有的那一份既不是全体意志，也不是他自己的意志。三家共享一个没有说出口的前提——每一套多持有系统都配一个外部校验位置。推翻材料全部取自三家内部。相关中心拿到的也只是若干份记录与若干个各自近似的时钟，条纹出现之前没有任何位置持有过那个图像。细胞的质控从不检验整体是否装对，只检验单份有没有裸露疏水面。公平代表义务审的是程序，不审结果是否正确。本文据此提出新存在物无持项。它是在一个多持有系统里被所有持有分共同指向、却不被任何一份持有、也不被那个被指定来校验的位置持有的那一项。音乐由此被定义为一种结构：它的正确性不能在任何单个持有分内部被检验。主读数是外持份额 ν，副读数是空持率 τ。四场预先写定的检验里两场被驳、一场整场因仪器故障作废、一条自己写下的作废条款被触发并执行。巴赫四声部众赞歌 367 首上，即使把其余三份持有分此刻的动作全部作为条件，一份对自己下一步的不确定性也只减少 4.05%。四个声部作为条件源的读数极值比 1.52，不存在特权持有分。弦乐四重奏 46 个乐章上，空持率中位数 0.2122，最大的一份有 68.75% 的时间不出声而仍在占位。本文因此撤回「他者提供的是判定而不是信息」这一挽救性修订。被逼出的结论写成一条可以离开音乐单用的一般命题：凡把整体性操作化为成员之间的互信息的做法，都会测到接近零，并据此错误地宣告该整体不存在。</p></div>
 <div class="keywords">关键词　音乐本体论；无持项；多持有；外持份额；空持率；定序组装；甚长基线干涉；公平代表义务</div>
+<!-- THREE-READS -->
+<div class="three"><div class="t3-lb">三 读 · 同 一 篇 的 三 种 读 法</div><div class="t3-g"><span class="t3 cur"><b>📖 长文阅读</b><span>你正在读这一篇 · 网页长卷，可检索、可跳转</span></span><a class="t3" href="/students/judy/unheld-term/read.html"><b>📄 PDF 翻页读</b><span>印刷版式 · 29 页 · 方向键翻页，可跳页缩放</span></a><a class="t3" href="/students/judy/unheld-term/unheld-term.pdf" download><b>⬇ 下载阅读</b><span>A4 印刷级 PDF · 29 页 · 离线与打印用</span></a></div></div>
+<!-- /THREE-READS -->
 <h2>一、问题：九个答案都写在同一条时间线上</h2>
 <p>「何谓音乐」这个问题最近被回答了很多次，而且答得越来越细。有人说，一段声音算不算一段音乐，取决于它的后继要走多少步才能接回某个已经被承认的东西。有人说，一段音乐最长能有多长而不与自己交换材料，这个上限本身是一个可测量的结构量。有人说，同一时刻一段声音上还站着几套互不相容的读法，音乐就发生在这些读法之间的界面上。还有人说，音乐是一段差异的有效期，是声音退出当下占位而不退出后续作用的过程，是未选项之间的排序在一次实际交付中被生产出来的事情。</p>
 <p>这些回答彼此不同，而且真的不同。但把它们排在一起看，会看见一件它们共同没有处理的事：它们全都写在一条时间线上。先有一段声音，然后有后继；先有一次实现，然后有接手；先有一个差异，然后有它的有效期。凡是它们要问的，都是”这一段与它之后的那些段之间发生了什么”。</p>

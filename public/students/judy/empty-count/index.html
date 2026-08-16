@@ -13,8 +13,9 @@ a{color:var(--gold);text-decoration:none}
 .readbar{position:sticky;top:0;z-index:20;background:rgba(46,40,32,0.96);backdrop-filter:blur(8px);border-bottom:1px solid rgba(231,215,184,0.5);display:flex;align-items:center;justify-content:space-between;padding:11px 20px;gap:12px;flex-wrap:wrap}
 .readbar .nav-back{color:#D6C79E;font-size:13px;letter-spacing:0.04em}
 .rb-modes{display:flex;gap:8px;flex-wrap:wrap}
-.rb-btn{font-size:13px;padding:6px 14px;border-radius:3px;border:1px solid rgba(212,178,94,0.5);color:#EBD9A6;letter-spacing:0.03em}
-.rb-btn.cur{background:#D4B25E;color:#1A1410;font-weight:700;border-color:#D4B25E}
+.rb-btn{font-size:13px;padding:6px 14px;border-radius:3px;border:1px solid rgba(231,215,184,0.45);color:#E7D7B8;letter-spacing:0.03em;text-decoration:none;display:inline-block}
+.rb-modes a.rb-btn:hover{background:rgba(231,215,184,0.16);border-color:#E7D7B8}
+.rb-btn.cur{background:#E7D7B8;color:#2E2820;font-weight:600;border-color:#E7D7B8}
 .art{max-width:760px;margin:0 auto;padding:56px 24px 20px;text-align:center}
 .art-series{font-size:12px;letter-spacing:0.34em;color:var(--gold);margin-bottom:22px}
 .art-title{font-size:clamp(26px,4.6vw,40px);font-weight:800;line-height:1.45;color:var(--paper);letter-spacing:0.04em}
@@ -51,12 +52,20 @@ a{color:var(--gold);text-decoration:none}
 .endbox a{display:inline-block;padding:11px 26px;border:1px solid var(--gold);border-radius:3px;font-size:14px;letter-spacing:0.06em}
 footer{text-align:center;padding:34px 24px 46px;color:var(--muted);font-size:12.5px;letter-spacing:0.06em}
 @media(max-width:640px){body{font-size:16.5px}.wrap table{font-size:13px}.wrap th,.wrap td{padding:7px 8px}}
+.three{border:1px solid var(--flute);background:var(--panel);border-radius:12px;padding:18px 20px;margin:6px 0 26px}
+.three .t3-lb{font-size:11px;letter-spacing:.28em;color:var(--gold);margin-bottom:13px}
+.three .t3-g{display:flex;flex-wrap:wrap;gap:10px}
+.three .t3{flex:1 1 210px;display:block;padding:13px 15px;border-radius:9px;border:1px solid var(--flute);background:rgba(169,139,78,.05);line-height:1.65;color:var(--paper);text-decoration:none}
+.three a.t3:hover{border-color:var(--gold);background:rgba(169,139,78,.11)}
+.three .t3.cur{background:rgba(169,139,78,.16);border-color:var(--gold)}
+.three .t3 b{display:block;font-size:14.5px;margin-bottom:3px;font-weight:600}
+.three .t3 span{display:block;font-size:12.5px;color:var(--muted)}
 </style>
 <link rel="stylesheet" href="/sde-read.css">
 </head>
 <body class="sde-read">
 <div class="readbar"><a class="nav-back" href="/students/judy/works/">‹ Judy · 全部作品</a>
-<div class="rb-modes"><span class="rb-btn cur">📖 长文阅读</span></div></div>
+<div class="rb-modes"><span class="rb-btn cur">📖 长文阅读</span><a class="rb-btn" href="/students/judy/empty-count/read.html">📄 PDF 翻页读</a><a class="rb-btn" href="/students/judy/empty-count/empty-count.pdf" download>⬇ 下载阅读</a></div></div>
 <header class="art"><div class="art-series">学员专栏 · Judy · 何谓音乐 · 音乐如何发生 · 之九</div>
 <h1 class="art-title">空次</h1>
 <div class="art-subtitle">音乐对生命的创造性：每一次都是新的一次，而这个“新”没有任何内容对应物</div>
@@ -68,6 +77,9 @@ footer{text-align:center;padding:34px 24px 46px;color:var(--muted);font-size:12.
 <div class="srcbox"><span class="lb"><b>稿 件 信 息</b></span><p>跨学科理论范文 · v1.0　|　Judy　|　2026 年 8 月</p></div>
 <div class="cut"><div class="c-lbl">核 心 判 断</div><p>核心判断　音乐的创造性不在于它每次都造出不同的东西——数据显示变体史反而是收敛的。它在于它稳定地生产空次：一次实现”是第几次”这件事里，没有任何内容对应物、却不可逆的那一部分。</p></div><div class="abstract"><span class="lb"><b>摘 要</b></span><p>「音乐的意义是什么」通常被答成「音乐是创造性的」，而创造性又被理解为造出新的内容。本文换一条路。它借用三门与音乐学没有交集的学科各一条第一原理——地质年代学的闭合温度（同位素体系在冷却穿过闭合温度以前持续与环境交换、记录被不断重置，“年龄”从交换停止那一刻才开始积累）、民事诉讼法的既判力与诉讼时效（终结的正当性不来自真相，来自可依赖性）、发育生物学的命运限定（潜能逐级丧失是形态获得的条件）——发现三家共享一个未明说的前提：不可逆是代价。而三家自己的材料表明相反：闭合以下才开始有年龄可读，没有既判力就没有可依赖的过去，不限定命运就没有器官。不可逆是产能。</p><p>本文因此做了一场预注册真跑，检验”音乐制造的不可逆会在内容里留下可读的方向”。五条假设全部被驳或未达支持：从旋律轮廓读时间箭头的准确率是 0.4736，比抛硬币还差；越晚的实现反而越贴近最早三条的共识。第二场换上七个更强的内容特征与一个线性判别，最好也只到 0.5361；而改读记录字段则达 0.9942。</p><p>失败的形状正是三家共同指向的地方：不可逆不在内容里，在记录里。年龄不在矿物成分里，既判力不在判决书文字里，命运限定不在细胞形态里。由此提出新存在物 空次，读数 次序不可读度 U ＝ 1 − 2|A|，两场分别得 0.9472 与 0.9278。第二场另确认空次有可指认的实体：617 对音程序列完全相同的实现，其中 72.9% 由不同转录者提交，提交时间中位相隔 1801 天——它们之间除了”第几次”以外没有任何差别。</p><p>在此基础上，「音乐对生命的创造性」得到一个不使用价值词的回答：音乐创造的不是新内容，而是可携带的又一次。</p></div>
 <div class="keywords">关键词：音乐本体论；空次；次序不可读度；闭合温度；既判力；命运限定；类型与个例</div>
+<!-- THREE-READS -->
+<div class="three"><div class="t3-lb">三 读 · 同 一 篇 的 三 种 读 法</div><div class="t3-g"><span class="t3 cur"><b>📖 长文阅读</b><span>你正在读这一篇 · 网页长卷，可检索、可跳转</span></span><a class="t3" href="/students/judy/empty-count/read.html"><b>📄 PDF 翻页读</b><span>印刷版式 · 27 页 · 方向键翻页，可跳页缩放</span></a><a class="t3" href="/students/judy/empty-count/empty-count.pdf" download><b>⬇ 下载阅读</b><span>A4 印刷级 PDF · 27 页 · 离线与打印用</span></a></div></div>
+<!-- /THREE-READS -->
 <h2>一、“音乐是创造性的”这句话里藏着一个假设</h2>
 <p>说音乐有创造性，几乎没人反对。但接着追问一句”它创造了什么”，回答会立刻分叉：有人说新的声音组合，有人说新的情感体验，有人说新的社会联结，有人说新的自我理解。四类回答彼此不合，却共享同一个动作：把创造理解为造出新的内容。</p>
 <p>这个假设有实在的后果。若创造＝新内容，那么衡量创造性就变成衡量新颖度：一首曲子与已有曲目的距离越远越有创造性；一次演奏与谱面偏离越多越有创造性；一个传统内部的变体越丰富越有创造性。今天的计算音乐学、推荐系统的多样性指标、乃至艺术资助的评审表，用的都是这一条。</p>

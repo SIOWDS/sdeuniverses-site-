@@ -13,8 +13,9 @@ a{color:var(--gold);text-decoration:none}
 .readbar{position:sticky;top:0;z-index:20;background:rgba(46,40,32,0.96);backdrop-filter:blur(8px);border-bottom:1px solid rgba(231,215,184,0.5);display:flex;align-items:center;justify-content:space-between;padding:11px 20px;gap:12px;flex-wrap:wrap}
 .readbar .nav-back{color:#D6C79E;font-size:13px;letter-spacing:0.04em}
 .rb-modes{display:flex;gap:8px;flex-wrap:wrap}
-.rb-btn{font-size:13px;padding:6px 14px;border-radius:3px;border:1px solid rgba(212,178,94,0.5);color:#EBD9A6;letter-spacing:0.03em}
-.rb-btn.cur{background:#D4B25E;color:#1A1410;font-weight:700;border-color:#D4B25E}
+.rb-btn{font-size:13px;padding:6px 14px;border-radius:3px;border:1px solid rgba(231,215,184,0.45);color:#E7D7B8;letter-spacing:0.03em;text-decoration:none;display:inline-block}
+.rb-modes a.rb-btn:hover{background:rgba(231,215,184,0.16);border-color:#E7D7B8}
+.rb-btn.cur{background:#E7D7B8;color:#2E2820;font-weight:600;border-color:#E7D7B8}
 .art{max-width:760px;margin:0 auto;padding:56px 24px 20px;text-align:center}
 .art-series{font-size:12px;letter-spacing:0.34em;color:var(--gold);margin-bottom:22px}
 .art-title{font-size:clamp(26px,4.6vw,40px);font-weight:800;line-height:1.45;color:var(--paper);letter-spacing:0.04em}
@@ -51,12 +52,20 @@ a{color:var(--gold);text-decoration:none}
 .endbox a{display:inline-block;padding:11px 26px;border:1px solid var(--gold);border-radius:3px;font-size:14px;letter-spacing:0.06em}
 footer{text-align:center;padding:34px 24px 46px;color:var(--muted);font-size:12.5px;letter-spacing:0.06em}
 @media(max-width:640px){body{font-size:16.5px}.wrap table{font-size:13px}.wrap th,.wrap td{padding:7px 8px}}
+.three{border:1px solid var(--flute);background:var(--panel);border-radius:12px;padding:18px 20px;margin:6px 0 26px}
+.three .t3-lb{font-size:11px;letter-spacing:.28em;color:var(--gold);margin-bottom:13px}
+.three .t3-g{display:flex;flex-wrap:wrap;gap:10px}
+.three .t3{flex:1 1 210px;display:block;padding:13px 15px;border-radius:9px;border:1px solid var(--flute);background:rgba(169,139,78,.05);line-height:1.65;color:var(--paper);text-decoration:none}
+.three a.t3:hover{border-color:var(--gold);background:rgba(169,139,78,.11)}
+.three .t3.cur{background:rgba(169,139,78,.16);border-color:var(--gold)}
+.three .t3 b{display:block;font-size:14.5px;margin-bottom:3px;font-weight:600}
+.three .t3 span{display:block;font-size:12.5px;color:var(--muted)}
 </style>
 <link rel="stylesheet" href="/sde-read.css">
 </head>
 <body class="sde-read">
 <div class="readbar"><a class="nav-back" href="/students/judy/works/">‹ Judy · 全部作品</a>
-<div class="rb-modes"><span class="rb-btn cur">📖 长文阅读</span></div></div>
+<div class="rb-modes"><span class="rb-btn cur">📖 长文阅读</span><a class="rb-btn" href="/students/judy/frozen-span/read.html">📄 PDF 翻页读</a><a class="rb-btn" href="/students/judy/frozen-span/frozen-span.pdf" download>⬇ 下载阅读</a></div></div>
 <header class="art"><div class="art-series">学员专栏 · Judy · 何谓音乐 · 音乐如何发生 · 之七</div>
 <h1 class="art-title">冻段</h1>
 <div class="art-subtitle">音乐是如何发生的：一段声音何时不再能被无痕重排</div>
@@ -68,6 +77,9 @@ footer{text-align:center;padding:34px 24px 46px;color:var(--muted);font-size:12.
 <div class="srcbox"><span class="lb"><b>稿 件 信 息</b></span><p>学员专栏 · HOW 型典范文 · 版本 v2.0 · 2026 年 8 月 16 日</p><p>论文类型：HOW 型研究论文（二阶碰撞方法产出）。</p><p>学科分类：玻璃物理（结构弛豫与假想温度）× 纺织工程（短纤纱加捻与抱合）× 消防工程（室内火轰燃）；音乐发生学。</p><p>版本：v2.0 正规化学术稿（2026-08-16）。本文系同题第六跑，替代同系列《下一拍由谁决定：音乐发生的三次换手》一稿；后者的三条换手路径与本文无继承关系，两稿不得混引。</p><p>正文汉字数（不计文献与声明）：约 1.9 万。</p><p>伦理与使用限制：本文提出的读数指向事件与判据尺度，不得用于对作曲者、演奏者、听者或学习者的能力评价、排名、录用与淘汰。</p></div>
 <div class="cut"><div class="c-lbl">核 心 判 断</div><p>音乐不是在被听见时发生的，也不是在被后来的声音改写时发生的；音乐发生在改写窗口关上的那一刻，而那一刻不属于这段声音。</p></div><div class="abstract"><span class="lb"><b>摘 要</b></span><p>「音乐是如何发生的」通常被回答为：声音被组织、听者形成期待、身体进入同步，或者——在最近一批发生论里——前一事件改变了后续事件的可接受条件，而这个改变又被再后续继承。这些回答共享一个未被说出的前提：发生有一个时点，且这个时点是过程本身的性质。本文取三门与当代音乐学没有交集的学科作为压力源：玻璃的结构弛豫与假想温度、短纤纱的加捻与抱合、室内火的轰燃。三家给出三条互不相容的发生路线，终点分别是冻结、成纱与全室卷入。但三家又各自用自己的材料推翻了那个共有前提。玻璃转变温度依赖降温速率，不是物质常数；纱线的连续性由分布的重叠产生，没有任何单点接头；轰燃的 600 ℃／20 kW·m⁻² 是约定判据，指标全中也可能并未轰燃。由此撞出的新存在物是「冻段」：一段材料中已经不再能被无痕重排的部分。它的读数是冻结点 f，必须与判据尺度 θ 配报为 f｜θ。本文在 music21 公开语料上做了两场预注册检验。第一场被自己判负：预注册的主读数「f 的中位数」被判据压在 0 到 1 之间，对数线性回归 R² 只有 0.083。事后诊断发现真正合律的量是「未冻比例」c(θ)，并据此写下第二份预注册，把这条事后发现的律拿到两个完全不同的语料上做样本外确认：essen 欧洲民歌 ln c 对 θ 的斜率 −1.280（R²=0.9990），palestrina 十六世纪复调 −1.052（R²=0.9917），两者斜率之差 0.228，换判据后斜率变化 23.5% 与 12.7%，θ=6 时未冻比例 1.3% 与 2.3%。但预注册中最危险的 H10 在两个语料上都判负：保留一阶转移的再采样对照给出几乎相同的曲线。本文因此收窄命题，撤回「冻段反映音乐的长程结构」，只保留「发生时点是判据协议的产物，且它随协议以对数速率移动」。全文给出零情态词判据、双时标平面骨架、与 Deborah 数、记忆再巩固、回声记忆、投射、追溯性形式重释等十四位近邻的可裁决分界、六条证伪条款和一个写死日期的赌注。</p></div><div class="abstract"><span class="lb"><b>ABSTRACT</b></span><p>This paper asks how music comes into being, not what music is. It takes three fields with no current contact with musicology as pressure sources: structural relaxation and fictive temperature in glass, twist and cohesion in staple-fibre yarn, and flashover in compartment fires. The three impose incompatible endpoints—freezing, yarn formation, and full-room involvement—yet each supplies material that overturns the premise they share, namely that an occurrence has a time point which is a property of the process itself. Glass transition temperature depends on cooling rate; staple-yarn continuity arises from distributed overlap with no single splice point; flashover indicators are conventions that can be met without flashover occurring. The collision yields a new object, the frozen span: the portion of a passage that can no longer be rearranged without leaving a trace. Its read-out is the freezing point f, reported jointly with the criterion scale θ. Two preregistered runs on public music21 corpora are reported. The first was defeated by its own criterion: the preregistered median of f was compressed to 0–1 and the log-linear fit gave R²=0.083. Post-hoc diagnosis identified the lawful quantity as the never-frozen fraction c(θ); a second preregistration confirmed it out of sample on two unrelated corpora (slopes −1.280 and −1.052, R²=0.9990 and 0.9917). The most dangerous preregistered hypothesis, H10, failed in both corpora: a first-order Markov surrogate reproduced the curve. The paper therefore withdraws the claim that frozen spans track long-range musical structure and retains only the weaker, still falsifiable claim that the time of occurrence is a product of the criterion protocol and moves logarithmically with it.</p></div>
 <div class="keywords">关键词：音乐发生；冻段；冻结点；假想温度；加捻抱合；轰燃；判据尺度；不可回退</div><div class="keywords">Keywords: musical occurrence; frozen span; freezing point; fictive temperature; yarn twist; flashover; criterion scale</div>
+<!-- THREE-READS -->
+<div class="three"><div class="t3-lb">三 读 · 同 一 篇 的 三 种 读 法</div><div class="t3-g"><span class="t3 cur"><b>📖 长文阅读</b><span>你正在读这一篇 · 网页长卷，可检索、可跳转</span></span><a class="t3" href="/students/judy/frozen-span/read.html"><b>📄 PDF 翻页读</b><span>印刷版式 · 29 页 · 方向键翻页，可跳页缩放</span></a><a class="t3" href="/students/judy/frozen-span/frozen-span.pdf" download><b>⬇ 下载阅读</b><span>A4 印刷级 PDF · 29 页 · 离线与打印用</span></a></div></div>
+<!-- /THREE-READS -->
 <h2>一、问题不在第一声，也不在「后来改写前面」</h2>
 <p>「音乐是如何发生的」最容易被读成「第一声从哪里来」。于是答案从空气振动、乐器激发、神经放电、作曲意图或文化命名开始，好像只要找到起点，把后续事件连成序列，发生就被解释了。这条路早已被走过很多遍，也早已被指出不够：起点解释不了为什么同一串声音在一种听法下成段、在另一种听法下只是噪声。</p>
 <p>最近一批发生论把镜头从起点移到了关系上，回答变成：前一事件改变了后续事件的可接受条件，而这个改变又被再后续继承。这是一个更好的回答，它把发生从对象移到了过程。但它有一处一直没有被追问：这种改写能一直进行下去吗？ 如果一段声音的功能永远可以被更后面的声音重新决定，那么任何时刻都没有任何东西真的发生过——发生被无限推迟到未来，而未来永远不会到齐。反过来，如果改写在某处停止，那么发生就落在停止那一处，而不落在改写本身。</p>

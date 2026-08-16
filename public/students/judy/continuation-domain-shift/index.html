@@ -13,8 +13,9 @@ a{color:var(--gold);text-decoration:none}
 .readbar{position:sticky;top:0;z-index:20;background:rgba(46,40,32,0.96);backdrop-filter:blur(8px);border-bottom:1px solid rgba(231,215,184,0.5);display:flex;align-items:center;justify-content:space-between;padding:11px 20px;gap:12px;flex-wrap:wrap}
 .readbar .nav-back{color:#D6C79E;font-size:13px;letter-spacing:0.04em}
 .rb-modes{display:flex;gap:8px;flex-wrap:wrap}
-.rb-btn{font-size:13px;padding:6px 14px;border-radius:3px;border:1px solid rgba(212,178,94,0.5);color:#EBD9A6;letter-spacing:0.03em}
-.rb-btn.cur{background:#D4B25E;color:#1A1410;font-weight:700;border-color:#D4B25E}
+.rb-btn{font-size:13px;padding:6px 14px;border-radius:3px;border:1px solid rgba(231,215,184,0.45);color:#E7D7B8;letter-spacing:0.03em;text-decoration:none;display:inline-block}
+.rb-modes a.rb-btn:hover{background:rgba(231,215,184,0.16);border-color:#E7D7B8}
+.rb-btn.cur{background:#E7D7B8;color:#2E2820;font-weight:600;border-color:#E7D7B8}
 .art{max-width:760px;margin:0 auto;padding:56px 24px 20px;text-align:center}
 .art-series{font-size:12px;letter-spacing:0.34em;color:var(--gold);margin-bottom:22px}
 .art-title{font-size:clamp(26px,4.6vw,40px);font-weight:800;line-height:1.45;color:var(--paper);letter-spacing:0.04em}
@@ -51,12 +52,20 @@ a{color:var(--gold);text-decoration:none}
 .endbox a{display:inline-block;padding:11px 26px;border:1px solid var(--gold);border-radius:3px;font-size:14px;letter-spacing:0.06em}
 footer{text-align:center;padding:34px 24px 46px;color:var(--muted);font-size:12.5px;letter-spacing:0.06em}
 @media(max-width:640px){body{font-size:16.5px}.wrap table{font-size:13px}.wrap th,.wrap td{padding:7px 8px}}
+.three{border:1px solid var(--flute);background:var(--panel);border-radius:12px;padding:18px 20px;margin:6px 0 26px}
+.three .t3-lb{font-size:11px;letter-spacing:.28em;color:var(--gold);margin-bottom:13px}
+.three .t3-g{display:flex;flex-wrap:wrap;gap:10px}
+.three .t3{flex:1 1 210px;display:block;padding:13px 15px;border-radius:9px;border:1px solid var(--flute);background:rgba(169,139,78,.05);line-height:1.65;color:var(--paper);text-decoration:none}
+.three a.t3:hover{border-color:var(--gold);background:rgba(169,139,78,.11)}
+.three .t3.cur{background:rgba(169,139,78,.16);border-color:var(--gold)}
+.three .t3 b{display:block;font-size:14.5px;margin-bottom:3px;font-weight:600}
+.three .t3 span{display:block;font-size:12.5px;color:var(--muted)}
 </style>
 <link rel="stylesheet" href="/sde-read.css">
 </head>
 <body class="sde-read">
 <div class="readbar"><a class="nav-back" href="/students/judy/works/">‹ Judy · 全部作品</a>
-<div class="rb-modes"><span class="rb-btn cur">📖 长文阅读</span></div></div>
+<div class="rb-modes"><span class="rb-btn cur">📖 长文阅读</span><a class="rb-btn" href="/students/judy/continuation-domain-shift/read.html">📄 PDF 翻页读</a><a class="rb-btn" href="/students/judy/continuation-domain-shift/continuation-domain-shift.pdf" download>⬇ 下载阅读</a></div></div>
 <header class="art"><div class="art-series">学员专栏 · Judy · 何谓音乐 · 音乐如何发生 · 之六</div>
 <h1 class="art-title">音乐如何发生：续域迁移与未选未来的重写</h1>
 <div class="art-subtitle">从时间地理学、移动目标防御与营养几何出发的一种发生机制</div>
@@ -68,6 +77,9 @@ footer{text-align:center;padding:34px 24px 46px;color:var(--muted);font-size:12.
 <div class="srcbox"><span class="lb"><b>稿 件 信 息</b></span><p>从时间地理学、移动目标防御与营养几何出发的一种发生机制</p><p>研究型典范稿｜版本 2.0（第二语料复核修订版）｜2026-08-16</p></div>
 <div class="abstract"><span class="lb"><b>摘 要</b></span><p>本文回答的不是”音乐由什么构成”，而是”音乐如何在时间中成为音乐”。为避免把已经被音乐学广泛吸收的跨学科接口重新包装，本文不采用人文地理学中的地方、身份与声景，不采用网络安全中已经进入音乐信息检索的对抗样本，也不采用营养科学中”音乐影响进食”的应用研究；而分别取时间地理学的时空棱柱与路径汇束、网络安全的移动目标防御、营养几何的摄入目标与折衷规则。三者看似无关，却共同逼出一个被音乐理论经常略过的对象：一个事件发生之后，下一时刻仍然属于”可接续”的未来成员集合本身如何改变。本文提出”续域”与”续域迁移”，并以迁移率 M=1−Jaccard(C_t,C_{t+1}) 操作化，在预注册后用 Nottingham Music Database 的 Reels A–C 做了第一次真实检验。</p><p>这一版报告三次连续的失败，以及失败之后剩下的东西。 第一次：强版本”音乐会主动最大化未来分支储备”未获支持，单侧 Wilcoxon p=0.796 与 p=0.344，理论据此撤回”保留更多后路”，改为”迁移后路所在”。第二次：本次修订按本文自己写死的预测一，在一个大出两个数量级的第二语料上复核，等量换址从 81.8% 掉到 0.1%，M 与分支数变化的秩相关达到 0.999——“是哪一些”不再提供独立于”有多少”的信息。第三次：节奏时值轴上的 M 与熵变化的秩相关 0.968，是熵的重述。</p><p>失败的原因被一条饱和曲线定位：固定留出集只改训练规模，等量步中的成员替换率从 87.2%（训练 64 首，复现版本 1.0 的三个数字）单调衰减到 0.0%（训练两万余首），中间没有平台。版本 1.0 测到的不是音乐的结构，是许可模型稀疏的结构。</p><p>本文因此把承重命题改写为一个否定—重命名式的判断：续域不是音乐自身的属性，而是许可模型的属性；真正值得测的是许可模型趋于饱和之后仍不消失的那部分成员置换，本文称之为饱和余量 σ。本次实测给出的答案是负面而明确的：在爱尔兰传统曲调的音高音级四音上下文这一层，σ≈0。本文同时补上一位版本 1.0 漏掉的方法学占位者——生态学早已把 Jaccard 距离分解为 turnover 与 nestedness 两个成分——并给出两条仅存的分离线（时间上的回写方向；把稀疏度从待校正的偏差提升为判据本身）。</p></div>
 <div class="keywords">关键词：音乐发生；续域；饱和余量；许可模型；β 多样性分解；可证伪性</div>
+<!-- THREE-READS -->
+<div class="three"><div class="t3-lb">三 读 · 同 一 篇 的 三 种 读 法</div><div class="t3-g"><span class="t3 cur"><b>📖 长文阅读</b><span>你正在读这一篇 · 网页长卷，可检索、可跳转</span></span><a class="t3" href="/students/judy/continuation-domain-shift/read.html"><b>📄 PDF 翻页读</b><span>印刷版式 · 28 页 · 方向键翻页，可跳页缩放</span></a><a class="t3" href="/students/judy/continuation-domain-shift/continuation-domain-shift.pdf" download><b>⬇ 下载阅读</b><span>A4 印刷级 PDF · 28 页 · 离线与打印用</span></a></div></div>
+<!-- /THREE-READS -->
 <h2>研究入口说明：三个学科保留，但接口必须收窄</h2>
 <p>以下筛选不是声称三个大领域“从未与音乐相遇”，而是避免直接复用音乐学已经非常熟悉的交叉接口。真正被带入正文的是每门学科中更窄、可核验、且彼此给出不同路径终点的理论结构。</p>
 <div class="tw"><table>

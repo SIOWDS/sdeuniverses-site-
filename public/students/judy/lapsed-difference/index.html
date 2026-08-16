@@ -13,8 +13,9 @@ a{color:var(--gold);text-decoration:none}
 .readbar{position:sticky;top:0;z-index:20;background:rgba(46,40,32,0.96);backdrop-filter:blur(8px);border-bottom:1px solid rgba(231,215,184,0.5);display:flex;align-items:center;justify-content:space-between;padding:11px 20px;gap:12px;flex-wrap:wrap}
 .readbar .nav-back{color:#D6C79E;font-size:13px;letter-spacing:0.04em}
 .rb-modes{display:flex;gap:8px;flex-wrap:wrap}
-.rb-btn{font-size:13px;padding:6px 14px;border-radius:3px;border:1px solid rgba(212,178,94,0.5);color:#EBD9A6;letter-spacing:0.03em}
-.rb-btn.cur{background:#D4B25E;color:#1A1410;font-weight:700;border-color:#D4B25E}
+.rb-btn{font-size:13px;padding:6px 14px;border-radius:3px;border:1px solid rgba(231,215,184,0.45);color:#E7D7B8;letter-spacing:0.03em;text-decoration:none;display:inline-block}
+.rb-modes a.rb-btn:hover{background:rgba(231,215,184,0.16);border-color:#E7D7B8}
+.rb-btn.cur{background:#E7D7B8;color:#2E2820;font-weight:600;border-color:#E7D7B8}
 .art{max-width:760px;margin:0 auto;padding:56px 24px 20px;text-align:center}
 .art-series{font-size:12px;letter-spacing:0.34em;color:var(--gold);margin-bottom:22px}
 .art-title{font-size:clamp(26px,4.6vw,40px);font-weight:800;line-height:1.45;color:var(--paper);letter-spacing:0.04em}
@@ -51,12 +52,20 @@ a{color:var(--gold);text-decoration:none}
 .endbox a{display:inline-block;padding:11px 26px;border:1px solid var(--gold);border-radius:3px;font-size:14px;letter-spacing:0.06em}
 footer{text-align:center;padding:34px 24px 46px;color:var(--muted);font-size:12.5px;letter-spacing:0.06em}
 @media(max-width:640px){body{font-size:16.5px}.wrap table{font-size:13px}.wrap th,.wrap td{padding:7px 8px}}
+.three{border:1px solid var(--flute);background:var(--panel);border-radius:12px;padding:18px 20px;margin:6px 0 26px}
+.three .t3-lb{font-size:11px;letter-spacing:.28em;color:var(--gold);margin-bottom:13px}
+.three .t3-g{display:flex;flex-wrap:wrap;gap:10px}
+.three .t3{flex:1 1 210px;display:block;padding:13px 15px;border-radius:9px;border:1px solid var(--flute);background:rgba(169,139,78,.05);line-height:1.65;color:var(--paper);text-decoration:none}
+.three a.t3:hover{border-color:var(--gold);background:rgba(169,139,78,.11)}
+.three .t3.cur{background:rgba(169,139,78,.16);border-color:var(--gold)}
+.three .t3 b{display:block;font-size:14.5px;margin-bottom:3px;font-weight:600}
+.three .t3 span{display:block;font-size:12.5px;color:var(--muted)}
 </style>
 <link rel="stylesheet" href="/sde-read.css">
 </head>
 <body class="sde-read">
 <div class="readbar"><a class="nav-back" href="/students/judy/works/">‹ Judy · 全部作品</a>
-<div class="rb-modes"><span class="rb-btn cur">📖 长文阅读</span></div></div>
+<div class="rb-modes"><span class="rb-btn cur">📖 长文阅读</span><a class="rb-btn" href="/students/judy/lapsed-difference/read.html">📄 PDF 翻页读</a><a class="rb-btn" href="/students/judy/lapsed-difference/lapsed-difference.pdf" download>⬇ 下载阅读</a></div></div>
 <header class="art"><div class="art-series">学员专栏 · Judy · 何谓音乐 · 音乐如何发生 · 之一</div>
 <h1 class="art-title">何谓音乐——差异的有效期</h1>
 <div class="art-subtitle">一次声差在多久之内没有被接住，就不再可能成为音乐</div>
@@ -68,6 +77,9 @@ footer{text-align:center;padding:34px 24px 46px;color:var(--muted);font-size:12.
 <div class="srcbox"><span class="lb"><b>稿 件 信 息</b></span><p>修订稿 v2.0 · 在 v1.2《自生听域本体论》被自己的数据推翻之后重写</p></div>
 <div class="abstract"><span class="lb"><b>摘 要</b></span><p>本文是《音乐不是声音，而是”听域”的自生》（v1.2）的重写。重写不是因为文字不够好，是因为那一稿的核心读数在最大的公开谱系语料上不可计算，而它的第二条轴「判据回写」被实测证明方向相反。</p><p>v1.2 提出两条轴：后继偏置与判据回写，并规定两者必须同时成立。它同时声称「现有音乐数据库不保存谁在何时接续、什么被拒绝、何时改了成员资格」。本文首先推翻这句自陈：The Session 的公开数据转储同时保存事件时间戳、承载者身份与谱系归属，55,019 条 setting 覆盖 23,206 条谱系。字段是有的。</p><p>用这批数据做第三场预注册真跑，四条假设里三条没通过，而三条不通过的方式各不相同：其一，B20 按其自身口径（前后各 20 事件加基线窗）需要至少 60 条 setting 的谱系，全语料一条都没有（最长 42 条），该读数不可计算，且原稿明令不得下调 N；其二，原稿「判据回写」的操作化（候选创新在后 5 个后继中再现）几乎不依赖时间顺序——真实序 0.5006 对随机置换中位 0.4895，差只有 1.11 个百分点，即那个读数里约九成九是组合学；其三，也是最致命的一条，完成接住的那一次出现由新承载者作出的比例是 0.7599，反而低于该谱系的基础比例 0.7758（自助 95% 区间 [−0.0178, −0.0141]），而接住完成之后的后继与谱系最早一条 setting 的相似度不是变远、而是变近（中位差 −0.0190，正 319 负 488，符号检验 p=1）。</p><p>三条反向结果把「后继把边界推开」这一支彻底打掉。唯一通过的是第四条：接住的危险率随后继位单调下降且强烈前置——第一位 0.2225、第二位 0.1181、第三位 0.0917、第四位 0.0801、第五位 0.0652，前两位对后三位的风险比 2.156；剔除「同一提交者紧接自己」的后继位之后仍为 2.013，因而不是自提交造成的伪影。在特征粒度 n=3、4、5 三档下，危险率跌到首位一半的位置全部落在第 3 位，风险比 2.08–2.32。</p><p>由此本文换掉承重命题：音乐不是被组织的声音，不是被承认的声音，也不是听域的自生；音乐是一段差异的有效期。一次声差在被接住以前不是音乐；它能不能被接住有一个极短且可测的窗口；窗口过去之后，它不是”还没有被接住”，而是不再可能被接住。相应地，新存在物是失效差异——一次真实发生、被完整记录、却在窗口内无人接住，从此永久退出该谱系的差异。两项读数是接住窗 h（危险率跌到首位一半所需的后继位数，实测 h=3）与失效率 q（候选差异中删失前从未被第二次使用的比例，实测 n=4 时 0.5178，且必须与 n 配报）。</p><p>这一命题与它最危险的三位近邻给出方向相反的预测。Weitz 的开放概念、艾略特的秩序改动、姚斯的期待视野，三者都主张新事物推开既有边界，且都不设失效期：概念可以在任何时候被决定扩展，秩序在新作到来时即刻重排，视野以世代为单位移动。本文测到的是相反的两件事——被接住的差异把后继拉回锚点，而没被接住的差异在三个后继之内永久出局。</p></div><div class="abstract"><span class="lb"><b>ABSTRACT</b></span><p>This is a rewrite of an earlier draft (v1.2) that proposed music as “the self-generation of a listening field,” resting on two axes: successor bias and criterion rewrite. The rewrite was forced by data, not by style. Using the public dump of The Session (55,019 settings across 23,206 lineages, with timestamps, contributor identity and lineage membership), a third preregistered trial refuted three of four hypotheses. First, the earlier draft’s own reading B20 is not computable: it requires lineages of at least sixty settings and the corpus contains none (maximum forty-two). Second, its operationalisation of “criterion rewrite” is almost order-invariant: 0.5006 observed versus a permutation median of 0.4895, a gap of 1.11 percentage points. Third, and decisively, uptake is performed by new contributors slightly less often than baseline (0.7599 vs 0.7758; bootstrap CI [−0.0178, −0.0141]), and successors after uptake are closer to the lineage’s earliest setting, not further from it (median difference −0.0190; sign test p = 1). Only the fourth hypothesis survived: the hazard of uptake is steeply front-loaded (0.2225, 0.1181, 0.0917, 0.0801, 0.0652 at successor positions one to five; early-to-late ratio 2.156, and 2.013 after removing self-succession), and the half-decay position is invariant at three across feature granularities n = 3, 4, 5.</p><p>The article therefore replaces its own load-bearing claim. Music is not organised sound, not sanctioned sound, and not a self-generating listening field: music is the shelf life of a difference. A sonic difference is not yet music before it is taken up; whether it can be taken up has a short, measurable window; once the window passes it is not merely “not yet taken up” but no longer able to be. The new entity is the lapsed difference; the two readings are the uptake window h and the lapse rate q. Against its three most dangerous neighbours — Weitz’s open concept, Eliot’s altered order, Jauss’s shifting horizon — the claim yields opposite predictions: all three have new work push the boundary outward and none has an expiry date, whereas uptake here pulls successors back toward the anchor and non-uptake is permanent within three successors.</p></div>
 <div class="keywords">关键词：音乐本体论；失效差异；接住窗；失效率；危险率前置；预注册重写</div><div class="keywords">Keywords: ontology of music; lapsed difference; uptake window; lapse rate; front-loaded hazard; preregistered rewrite</div>
+<!-- THREE-READS -->
+<div class="three"><div class="t3-lb">三 读 · 同 一 篇 的 三 种 读 法</div><div class="t3-g"><span class="t3 cur"><b>📖 长文阅读</b><span>你正在读这一篇 · 网页长卷，可检索、可跳转</span></span><a class="t3" href="/students/judy/lapsed-difference/read.html"><b>📄 PDF 翻页读</b><span>印刷版式 · 30 页 · 方向键翻页，可跳页缩放</span></a><a class="t3" href="/students/judy/lapsed-difference/lapsed-difference.pdf" download><b>⬇ 下载阅读</b><span>A4 印刷级 PDF · 30 页 · 离线与打印用</span></a></div></div>
+<!-- /THREE-READS -->
 <h2 class="part">一、这次重写是被什么逼出来的</h2>
 <p>上一稿有一句话写得很自信：现有音乐语料「擅长保存音符，尚不擅长保存音乐如何被接住」，因此它的两项核心读数只能作为研究议程留给未来。这一句话既是它的诚实，也是它的免死金牌——只要字段不存在，核心机制就永远不必接受检验。</p>
 <p>这句话是错的。The Session 的公开数据转储里，每一条 setting 都带有 tune_id（它属于哪个谱系）、date（它什么时候被提交）、username（谁提交的）和 abc（它是什么）。这四个字段合起来正好是上一稿声称缺失的那四类记录：谱系归属、事件时间、承载者身份、以及被接纳的痕迹——一条 setting 出现在某个 tune 的页面上，就是这个共同体对”它属于这个谱系”的一次公开承认。55,019 条 setting，23,206 条谱系，时间跨度 2001 年 5 月到 2026 年 8 月。</p>
