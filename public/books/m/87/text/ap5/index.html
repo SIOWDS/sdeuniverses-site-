@@ -36,7 +36,7 @@ h3+p,h4+p{margin-top:.35em}
 .tw table{margin:0}
 @media(max-width:640px){.wrap{padding:26px 16px 70px}h1{font-size:23px}table{font-size:13px}}
 </style></head><body>
-<div class="bar"><a href="/books/m/87/">← 专著首页</a><a href="/books/m/87/text/">目录</a><a href="/books/m/87/read.html">📄 在线 PDF</a><a href="/students/judy/music-vol1/music-vol1.pdf">⬇ 下载</a><span style="color:var(--dim)">德麦国际专著第 87 号</span></div>
+<div class="bar"><a href="/books/m/87/">← 专著首页</a><a href="/books/m/87/text/">目录</a><a href="/books/m/87/read.html">📄 在线 PDF</a><a href="/students/judy/music-vol1/music-vol1-ed2.pdf">⬇ 下载</a><span style="color:var(--dim)">德麦国际专著第 87 号</span></div>
 <div class="wrap"><h1>附录五　跨读数相关矩阵（本卷最大一笔欠账的兑现）</h1>
 <div class="meta">《音乐初探·卷一》何谓音乐？ · 许佳衡 著 · 三部十章 · 23.8 万汉字 · ISBN 979-8-90690-023-4</div>
 <p>本卷结语原本写着一句话：十个读数彼此正交是本卷的核心主张，而本卷<strong>没有在同一批材料上把它们一起算过</strong>。附录四把这一条列为第 1 号欠账。付印前本卷把它做了，结果记在这里，包括对本卷不利的那一半。</p>
@@ -190,7 +190,104 @@ h3+p,h4+p{margin-top:.35em}
 <p><strong>其二，三个都是代理。</strong> 见本附录第二节的限度声明。若用各章的完整读数重算，相关可能变化。</p>
 <p><strong>其三，只在一个体裁上做。</strong> 四声部众赞歌是本卷唯一能同时承载四个读数的语料，也是最规整的一种音乐。在民歌、即兴、电子音乐上重跑是必须的，本卷没有做。</p>
 <p><strong>其四，w 与 ν 的低信度没有被修。</strong> 本卷只是把它测了出来并写在这里。修法是明确的——加长分析单元、或改用曲内多窗口的稳健统计量——但那要改动第二章与第三章的读数定义，超出付印前所能做的范围。</p>
-<h3>七、这一场对全卷的净影响</h3>
+<h3>七、搬到第二个体裁上：一对复现，两对不可判定，第八章的读数塌了</h3>
+<p>本附录第六节列了四件没做到的事，其中第三条是“只在一个体裁上做”。付印前做了它的第一步：换一个同样是四声部、但风格与年代都不同的体裁——十六世纪的无伴奏复调。</p>
+<p>预注册文件 <code>prereg_cross.md</code>，SHA-256 前十六位 <code>91435891a062ca86</code>，写于第二语料任何统计量之前。口径与巴赫那一场<strong>一处不改</strong>：四分音符网格、有向音程截断到 ±8、跨曲拼声部作对照、曲级中位数、以曲目为单位自助。语料为 music21 内置 <code>palestrina</code> 目录中声部数恰为四者，实际入选 <strong>179 首</strong>，过预注册的 100 首门槛。</p>
+<p><strong>表 A5-5　三个读数在两个体裁上的对照</strong></p>
+<div class="tw"><table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>读数</th>
+<th>巴赫众赞歌净值中位</th>
+<th>帕莱斯特里那净值中位</th>
+<th>巴赫分半信度</th>
+<th>帕氏分半信度</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>G（第八章）</td>
+<td>—</td>
+<td>+18.0</td>
+<td>0.547</td>
+<td><strong>−0.023</strong></td>
+</tr>
+<tr class="even">
+<td>ν（第三章）</td>
+<td>+0.0429</td>
+<td>+0.0471</td>
+<td>0.379</td>
+<td><strong>0.684</strong></td>
+</tr>
+<tr class="odd">
+<td>w（第二章）</td>
+<td>0.331（原始占比）</td>
+<td>0.488（原始占比）</td>
+<td>0.211</td>
+<td>0.277</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>表 A5-6　第二体裁上的三个配对（n = 179）</strong></p>
+<div class="tw"><table>
+<thead>
+<tr class="header">
+<th>配对</th>
+<th>观测 ρ</th>
+<th>去衰减上限</th>
+<th>去衰减 ρ</th>
+<th>判定</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>G × ν</td>
+<td>+0.0089</td>
+<td><strong>0</strong></td>
+<td><strong>不可计算</strong></td>
+<td><strong>不可判定</strong></td>
+</tr>
+<tr class="even">
+<td>G × w</td>
+<td>−0.2858</td>
+<td><strong>0</strong></td>
+<td><strong>不可计算</strong></td>
+<td><strong>不可判定</strong></td>
+</tr>
+<tr class="odd">
+<td>ν × w</td>
+<td>+0.0069</td>
+<td>0.435</td>
+<td><strong>+0.0158</strong></td>
+<td><strong>正交，复现</strong></td>
+</tr>
+</tbody>
+</table></div>
+<h3>结果一：只有一对复现了</h3>
+<p><strong>ν 与 w 在第二个体裁上仍然正交</strong>，而且比在巴赫上更干净——去衰减后 +0.0158，几乎是零。这一对是本卷唯一在两个体裁上都被检验过、都通过的分界。</p>
+<h3>结果二：另两对不可判定，因为第八章的读数在这个体裁上不稳</h3>
+<p><strong>G 的分半信度在帕莱斯特里那上是 −0.023。</strong> 不是低，是<strong>零以下</strong>——同一首曲子的前半与后半算出来的 G，彼此毫无关系。信度为零意味着去衰减的上限（两读数信度乘积的平方根）也是零，<strong>含 G 的两个配对因此在数学上无法判定</strong>：观测到的 +0.0089 与 −0.2858 既可能是真的正交，也可能是两团噪声，本场分不开。</p>
+<p>按预注册的 H4，观测与去衰减落在不同档时以去衰减值为准；此处去衰减值不存在，所以这两对<strong>只能记为“本设计测不动”，不得记为正交</strong>。</p>
+<h3>结果三：H3 被驳，而这一条最值得记住</h3>
+<p>预注册的 H3 押的是“三个读数的信度在两个体裁上同序（G &gt; ν &gt; w）”。实测的次序变成了 <strong>ν &gt; w &gt; G</strong>——不但不同序，最高与最低整个对调。</p>
+<p>这条失败推出一个一般结论：<strong>分半信度不是读数的性质，是“读数 × 体裁”这一对的性质。</strong> 一个量在某类材料上稳，不能推出它在另一类材料上也稳；本卷此前把 0.547、0.379、0.211 三个数当成三把尺子各自的刻度精度来读，<strong>这个读法现在被证明是错的</strong>。</p>
+<h3>诊断：G 是一个极大值统计量</h3>
+<p>原因不神秘，而且事前就该想到。G 的定义是<strong>曲内最大无回归跨度</strong>——它是一个<strong>极大值</strong>。极大值统计量对样本长度极其敏感：材料越长，最大值越被极端个例支配，也越不可重复。</p>
+<p>两个体裁的长度差得很远：<strong>巴赫众赞歌的网格长度中位数是 47，帕莱斯特里那是 304</strong>，最长的一首到 1776。在四十来格的短曲上，“最大跨度”还勉强代表整曲的疏密；在三百格的长篇复调上，它只代表那一处最长的空档在哪里。</p>
+<p><strong>这对第八章是坏消息，本卷不掩饰</strong>：灌注半径 λ 的实测代理是一个极大值，而极大值在长篇材料上不可重复。第八章在众赞歌与爱尔兰口传曲调上得到的三个接近的中位数（26、27、31）不因此作废——那是<strong>语料级</strong>的中位数，靠跨曲聚合；但<strong>任何把 G 用在单首长篇作品上的做法，本卷现在明确反对</strong>，理由与第二章的 w、第三章的 ν 那一条相同，只是失效得更彻底。</p>
+<p>修法是明确的，本卷没有做：把 G 换成<strong>分位数</strong>（如无回归跨度的第 90 百分位）或<strong>长度归一化</strong>的量，两者都不是极大值，理应稳得多。这条列入附录四第 13 号欠账。</p>
+<h3>这一场没有做到的三件事</h3>
+<p><strong>其一，第二个体裁同样是记谱的、四声部的、规整的。</strong> 两个体裁都通过，仍不等于所有音乐都通过。真正的检验在民歌、自由即兴与电子音乐上，本卷仍未做。</p>
+<p><strong>其二，仍不触及连续量。</strong> 附录四第 7 条欠账不销。</p>
+<p><strong>其三，w 在第二体裁上的原始占比从 0.331 涨到 0.488。</strong> 这个数本身有意思——十六世纪复调的调性读法歧义远高于巴赫众赞歌，符合常识——但本卷没有把它做成一条可检验的预测再去测，因此只作为观察记录，不作为结论。</p>
+<h3>八、这一场对全卷的净影响</h3>
 <p><strong>正面</strong>：本卷最核心的结构主张——十章不是十个互相竞争的答案，而是一个对象的十个不同的量——第一次有了经验证据，而且是在扣掉不可靠性之后仍然成立的证据。并入条款执行了，没有触发。</p>
 <p><strong>负面</strong>：本卷交出的十把量尺里，至少有两把在单曲尺度上刻度模糊（附录四第 9 条）；而第一章那一把的代理<strong>根本没做成</strong>，连带撤回三个配对（本附录第〇节）。</p>
 <hr /><div class="nav"><a href="/books/m/87/text/ap4/">← 附录四　本卷未完成事项清单</a><a href="/books/m/87/text/ap6/">附录六　章际分界总表 →</a></div><div class="foot">© 德麦国际出版社 · 许佳衡《音乐初探·卷一 何谓音乐？》· ISBN 979-8-90690-023-4 · 定价 US$19.90<br>本书是理论与研究方法著作。全书四份预注册文件与全部脚本随书交付，读者可在本机复算并据以判定本卷哪一条主张不成立。</div></div></body></html>
