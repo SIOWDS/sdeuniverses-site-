@@ -1,0 +1,82 @@
+<!DOCTYPE html><html lang="zh"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>附录五　F10 并篇检验实录 · 音乐初探·卷三 · 德麦国际专著</title>
+<meta name="description" content="《音乐初探·卷三》为何需要音乐？ · 许佳衡 著 · 三部九章＋尾章 · 19.8 万汉字 · ISBN 979-8-90690-024-1。附录五　F10 并篇检验实录">
+<style>
+:root{--bg:#0D0C10;--fg:#E8E6E2;--dim:#8C8894;--am:#E27A4A;--line:#26242C;--card:#14131A}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);
+font:16px/1.95 "Noto Serif CJK SC","Songti SC",Georgia,serif}
+a{color:var(--am);text-decoration:none}a:hover{text-decoration:underline}
+.bar{position:sticky;top:0;background:rgba(13,12,16,.96);border-bottom:1px solid var(--line);
+padding:10px 18px;display:flex;gap:14px;flex-wrap:wrap;align-items:center;font-size:13px;z-index:9}
+.wrap{max-width:760px;margin:0 auto;padding:34px 20px 90px}
+h1{font-size:27px;line-height:1.5;margin:.2em 0 .1em}
+h3{font-size:17px;margin:1.5em 0 .5em;color:var(--am);font-weight:600}
+h4{font-size:15.5px;margin:1.2em 0 .4em;color:#C6C2CC;font-weight:600}
+p{margin:.85em 0;text-align:justify}p.li{margin:.35em 0 .35em 1em}
+blockquote{margin:1.2em 0;padding:.7em 1.1em;border-left:3px solid var(--am);background:var(--card);color:#F2EFE9}
+.tw{overflow-x:auto;margin:1.2em 0}table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+th{background:#1A1922;color:var(--am)}
+.meta{color:var(--dim);font-size:13.5px;margin:.3em 0 1.6em}
+.nav{display:flex;justify-content:space-between;gap:12px;margin-top:44px;padding-top:18px;
+border-top:1px solid var(--line);font-size:14px}
+.toc a{display:block;padding:7px 0;border-bottom:1px solid var(--line);color:var(--fg)}
+.toc a:hover{color:var(--am)}
+.foot{margin-top:50px;padding-top:16px;border-top:1px solid var(--line);color:var(--dim);font-size:12.5px;text-align:center}
+</style></head>
+<body>
+<div class="bar"><a href="/books/m/88/">← 专著首页</a><a href="/books/m/88/text/">目录</a><a href="/books/m/88/read.html">📄 在线 PDF</a><a href="/students/judy/music-vol3/music-vol3.pdf">⬇ 下载</a><span style="color:var(--dim)">德麦国际专著第 88 号</span></div>
+<div class="wrap"><h1>附录五　F10 并篇检验实录</h1>
+<div class="meta">《音乐初探·卷三》为何需要音乐？ · 许佳衡 著 · 三部九章＋尾章 · 19.8 万汉字 · ISBN 979-8-90690-024-1</div>
+<p>本卷第六章写下一条针对自己的条款：<strong>若它的读数 U 与第五章的 μ 在同一批数据上相关超过 0.8，则第五章与第六章应当合并。</strong> 成书前这条检验尚未执行；导论第七节把它作为“第二处裂缝”原样留在书里。本附录是它的执行记录。</p>
+<h3 id="一执行前写死的东西">一、执行前写死的东西</h3>
+<p>预注册文件 <code>prereg_f10.md</code> 写于任何统计量被计算之前，SHA-256 前二十四位 <strong>93b65e6ce1a37aba461a9199</strong>；数据文件 The Session <code>csv/tunes.csv</code> 同时取哈希 <strong>e359ce71a314f2f499d36ee1</strong>。</p>
+<p>判据分三档，事先写死：|ρ| 大于 0.80 且自助置信区间下界大于 0.70，则两章合并；0.50 至 0.80 之间，两章保留但必须各补一条可裁决的分离线；小于 0.50，判为条款未触发。</p>
+<p>作废条件也写在前面：入选曲调少于 60 首、任一读数标准差小于 0.02、或 ABC 解析失败率超过一成，本检验即不成立。</p>
+<h3 id="二口径">二、口径</h3>
+<p>语料取每首至少有 20 条 setting 的曲调，每曲取最早 20 条，两个读数都在<strong>同一 20 条</strong>上计算，不做任何曲目层筛选。ABC 谱先转成音程序列，装饰、和弦、休止与小节线一律剔除。</p>
+<p>μ 沿用第五章：以最早一条为参照，其余十九条用 Needleman-Wunsch 对齐，参照的每个位置按“有没有出现替代”“替代有没有被第二个人接着用”分成有率位、悬价位、无率位三类，μ 即无率位占比。</p>
+<p>U 沿用第六章：以最早三条的逐位置多数为参照 C，第四条起算到 C 的归一化编辑距离，再在这些实现的两两配对上用“离 C 更远者更晚”判断先后，得准确率 acc，U = 1 − 2|acc − 0.5|。</p>
+<h3 id="三结果">三、结果</h3>
+<p>入选 <strong>123 首</strong>曲调，ABC 解析失败 0 首，两个读数的标准差分别为 0.121 与 0.134，三条作废条件均未触发。</p>
+<div class="tw"><table>
+<thead>
+<tr class="header">
+<th>量</th>
+<th>中位</th>
+<th>均值</th>
+<th>标准差</th>
+<th>范围</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>μ（无率位占比）</td>
+<td>0.1222</td>
+<td>0.1582</td>
+<td>0.121</td>
+<td>0.0000–0.5714</td>
+</tr>
+<tr class="even">
+<td>U（次序不可读度）</td>
+<td>0.8235</td>
+<td>0.8099</td>
+<td>0.134</td>
+<td>0.4779–1.0000</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>主检验：Spearman ρ(μ, U) = 0.0338</strong>，2000 次自助（抽样单位为曲调，种子 20260816）的 95% 置信区间为 <strong>[−0.1363, 0.2138]</strong>，区间含零。Pearson r = 0.0907。</p>
+<p>三项辅助检验方向一致：剔除 U 恰为 1 的 3 首后 ρ = 0.0018；把 μ 换成有率位占比后 ρ = 0.0124；两个读数与曲调位置数的相关分别只有 −0.15 与 −0.12，说明它们也不是被“曲子长短”这一共同因素带着走。按中位数切成四格，123 首曲调分布为 29／32／32／30——几乎是均匀的。</p>
+<p><strong>判决：|ρ| = 0.034，远低于 0.50。F10 条款未触发，第五章与第六章不合并。</strong></p>
+<h3 id="四顺带得到的两件事">四、顺带得到的两件事</h3>
+<p><strong>第一，第五章的三分结构被独立复算了一遍。</strong> 本检验按同一口径重跑，得到有率位、悬价位、无率位的中位占比为 <strong>0.534／0.318／0.122</strong>，与第五章正文报告的 51.95%／35.83%／12.22% 基本一致。第五章的核心分布不是编纂出来的。</p>
+<p><strong>第二，两个极端案例说明这两个读数确实在测不同的东西。</strong> 《Tam Lin》的 μ = 0.000——参照上的每一个位置都至少有过一个被人接着用的替代，一个无率位也没有；而它的 U = 0.868，次序几乎读不出来。反过来，《Lark In The Morning》的 U = 0.478（在本批中最低，次序相对最可读），μ 却是中等的 0.216。一首曲子可以“处处有价而次序不可读”，也可以“多处无价而次序略可读”，两件事互不牵制。</p>
+<h3 id="五这个结果不证明什么">五、这个结果不证明什么</h3>
+<p>它不证明第五章或第六章各自是对的。它只证明：在这批语料上，两章没有在测同一个量，因此不该被合并成一章。</p>
+<p>它也只覆盖了一种语料与一个体裁。两个读数在书面创作传统、非西方传统、或非音乐的采纳史上是否仍然分离，本检验一概没有测——这一条记为新的欠账 <strong>F10-bis</strong>，判据与本次相同。</p>
+<p>导论第七节的第二处裂缝，据此由“挂着一条未执行的条款”改记为“已执行，未触发”；附录四第二条相应更新。<strong>这一卷因此仍是九章。</strong></p>
+
+<div class="nav"><a href="/books/m/88/text/ap4/">← 附录四　本卷未完成事项清单</a></div>
+<div class="foot">© 德麦国际出版社 · 许佳衡《音乐初探·卷三 为何需要音乐？》· ISBN 979-8-90690-024-1 · 定价 US$19.50<br>本书是理论与研究方法著作。全书预注册文件与全部脚本随书交付，读者可在本机复算并据以判定本卷哪一条主张不成立。</div></div></body></html>
