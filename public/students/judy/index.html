@@ -106,6 +106,26 @@ footer a{color:var(--brass);text-decoration:none}
 @media(prefers-reduced-motion:reduce){.air{display:none}}
 @media(max-width:640px){.air .n:nth-child(n+7){display:none}}
 
+.wcard{background:var(--champagne-2);border:1px solid var(--flute);border-radius:2px;padding:30px 30px 26px;margin-top:24px}
+.wchip{display:inline-block;font-size:11px;letter-spacing:0.24em;color:var(--brass);border:1px solid var(--flute);
+  border-radius:2px;padding:3px 11px;background:var(--champagne);
+  font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;font-weight:500}
+.wcard h2{margin:16px 0 0;font-size:clamp(19px,2.6vw,24px);font-weight:500;line-height:1.5;letter-spacing:0.01em}
+.wcard h2 a{color:var(--ink);text-decoration:none}
+.wcard h2 a:hover{color:var(--brass)}
+.wcard h2.en-only{font-family:"Cormorant Garamond",Georgia,serif;font-weight:400}
+.whook{margin-top:13px;font-size:15px;line-height:2.0;color:#4A4234;text-align:justify}
+.wmeta{margin-top:15px;font-size:12.5px;color:var(--ink-2);letter-spacing:0.03em}
+.wbtns{display:flex;gap:9px;flex-wrap:wrap;margin-top:18px}
+.wbtns a{font-size:13px;letter-spacing:0.05em;text-decoration:none;padding:8px 17px;border-radius:2px;
+  border:1px solid var(--flute);color:var(--ink-2);background:var(--champagne)}
+.wbtns a.primary{background:var(--brass);border-color:var(--brass);color:var(--champagne-2)}
+.wbtns a:hover{border-color:var(--brass);color:var(--brass)}
+.wbtns a.primary:hover{color:var(--champagne-2)}
+.wall{text-align:center;margin-top:22px}
+.wall a{color:var(--brass);text-decoration:none;font-size:13.5px;letter-spacing:0.06em;
+  border-bottom:1px solid rgba(169,139,78,0.35);padding-bottom:3px}
+
 :focus-visible{outline:2px solid var(--brass);outline-offset:3px}
 @media(max-width:640px){
   .hero{padding-top:52px}
@@ -115,6 +135,8 @@ footer a{color:var(--brass);text-decoration:none}
   .hero .stave{top:64px;opacity:0.4}
   .bouquet{width:176px;top:-20px;right:-26px;opacity:0.9}
   .bio p{text-align:left}
+  .whook{text-align:left}
+  .wcard{padding:24px 20px}
   .movement .name{letter-spacing:0.2em}
 }
 /* 入场：整页像一次起拍，只做一次，不做散点动效 */
@@ -123,39 +145,6 @@ footer a{color:var(--brass);text-decoration:none}
   .fade.d1{animation-delay:.08s}.fade.d2{animation-delay:.20s}.fade.d3{animation-delay:.32s}
   @keyframes rise{to{opacity:1;transform:none}}
 }
-
-/* ── 九论 · 作品区（香槟同调） ───────────────────────────── */
-.jn-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(122px,1fr));gap:1px;background:var(--flute);border:1px solid var(--flute);border-radius:12px;overflow:hidden;margin:6px 0 34px}
-.jn-stats div{background:var(--champagne-2);padding:17px 10px;text-align:center}
-.jn-stats .v{font-family:Georgia,serif;font-size:24px;font-weight:700;color:var(--brass)}
-.jn-stats .k{font-size:10.5px;letter-spacing:.16em;color:var(--ink-2);margin-top:6px}
-.jn-motif{background:var(--champagne-2);border:1px solid var(--flute);border-left:3px solid var(--brass);border-radius:14px;padding:27px 30px;margin-bottom:36px}
-.jn-motif .lb{display:block;font-size:10.5px;letter-spacing:.3em;color:var(--brass);margin-bottom:14px}
-.jn-motif .q{font-size:18.5px;line-height:1.9;font-weight:600;color:var(--ink)}
-.jn-motif p{font-size:14.5px;color:var(--ink-2);line-height:2.0;margin-top:15px;text-align:justify}
-.jn-grp{margin-bottom:30px}
-.jn-grp .gh{display:flex;align-items:baseline;gap:13px;flex-wrap:wrap;border-bottom:1px solid var(--flute);padding-bottom:11px}
-.jn-grp .gh h3{font-size:21px;font-weight:700;color:var(--ink);letter-spacing:.05em}
-.jn-grp .gh .en{font-size:10px;letter-spacing:.28em;color:var(--brass)}
-.jn-grp .gh .cnt{margin-left:auto;font-size:11.5px;color:var(--ink-2);letter-spacing:.1em}
-.jn-grp .gn{font-size:14px;color:var(--ink-2);line-height:2.0;margin-top:13px;text-align:justify}
-.jn-card{background:var(--champagne-2);border:1px solid var(--flute);border-radius:13px;padding:22px 24px 19px;margin-top:16px;transition:border-color .18s,box-shadow .18s}
-.jn-card:hover{border-color:var(--brass);box-shadow:0 2px 16px rgba(169,139,78,.10)}
-.jn-card .top{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:11px}
-.jn-card .chip{font-size:10.5px;letter-spacing:.16em;color:var(--brass);border:1px solid rgba(169,139,78,.45);border-radius:20px;padding:3px 11px}
-.jn-card .iq{font-size:11px;letter-spacing:.06em;color:var(--champagne-2);background:var(--brass);border-radius:20px;padding:3px 10px;font-weight:600}
-.jn-card h4{font-size:19px;font-weight:700;line-height:1.5;margin-bottom:7px}
-.jn-card h4 a{color:var(--ink)}
-.jn-card h4 a:hover{color:var(--brass)}
-.jn-card .sub{font-size:13.5px;color:#8A6F3A;line-height:1.8;margin-bottom:11px}
-.jn-card .src{font-size:12px;color:var(--ink-2);line-height:1.9;border-left:2px solid rgba(169,139,78,.32);padding-left:11px}
-.jn-card .src .lb{color:var(--brass);letter-spacing:.1em}
-.jn-cta{text-align:center;margin:34px 0 10px}
-.jn-cta a{display:inline-block;background:var(--brass);color:var(--champagne-2);font-size:14px;letter-spacing:.06em;padding:12px 30px;border-radius:6px;font-weight:600}
-.jn-cta a:hover{background:#96793F}
-.jn-note{font-size:14.5px;color:var(--ink-2);line-height:2.05;text-align:justify;margin-top:18px}
-.jn-note b{color:var(--ink);font-weight:600}
-@media(max-width:640px){.jn-motif{padding:22px 20px}.jn-card{padding:19px 18px 16px}}
 </style></head>
 <body class="zh">
 
@@ -291,88 +280,21 @@ footer a{color:var(--brass);text-decoration:none}
     </svg>
   </div>
 
-<section class="judy-nine">
-    <div class="jn-stats">
-      <div><div class="v">9</div><div class="k zh-only">已发表</div><div class="k en-only">PAPERS</div></div>
-      <div><div class="v">18.9万</div><div class="k zh-only">累计汉字</div><div class="k en-only">CHARACTERS</div></div>
-      <div><div class="v">150.8</div><div class="k zh-only">盲评均分</div><div class="k en-only">MEAN SCORE</div></div>
-      <div><div class="v">27</div><div class="k zh-only">外源学科</div><div class="k en-only">FIELDS DRAWN ON</div></div>
-      <div><div class="v">0</div><div class="k zh-only">学科重复</div><div class="k en-only">REPEATS</div></div>
+  <article class="wcard">
+    <span class="wchip">之二 &middot; 何谓音乐</span>
+    <h2 class="zh-only"><a href="/students/judy/co-reading-wall/">并读壁：一段声音在两种互不相容的读法之间立起的那道墙</a></h2>
+    <h2 class="en-only"><a href="/students/judy/co-reading-wall/">The Co-Reading Wall: What Stands Between Two Incompatible Readings</a></h2>
+    <p class="whook zh-only">调性、节拍、分句三套读法系统在同一批 332 首材料上，族内相关中位 0.09，族序两两不一致，第一主成分只解释 0.407 的方差。七场预注册检验里有两场整场毁于作者自己的仪器故障，被自曝并转成了操作规则。</p>
+    <p class="whook en-only">Three reading systems, one corpus of 332 pieces: within-family correlations around 0.09, family orderings that disagree pairwise, a first principal component explaining only 0.407 of the variance. Two of the seven preregistered tests were wrecked by the author&rsquo;s own instrument faults, self-exposed and turned into operating rules.</p>
+    <p class="wmeta zh-only">约 2.8 万字 &middot; 三种读法 &middot; 发表于 2026年8月16日</p>
+    <p class="wmeta en-only">approx. 28,000 characters &middot; three ways to read &middot; Published Aug 16, 2026</p>
+    <div class="wbtns">
+      <a class="primary" href="/students/judy/co-reading-wall/">📖 <span class="zh-only">长文阅读</span><span class="en-only">Read</span></a>
+      <a href="/students/judy/co-reading-wall/read.html">📄 <span class="zh-only">在线 PDF</span><span class="en-only">PDF viewer</span></a>
+      <a href="/students/judy/co-reading-wall/co-reading-wall.pdf">⬇ <span class="zh-only">下载 PDF</span><span class="en-only">Download</span></a>
     </div>
-
-    <div class="jn-motif"><span class="lb zh-only">九 篇 共 同 的 那 一 句</span><span class="lb en-only">THE ONE SENTENCE ALL NINE HANG ON</span>
-      <div class="q zh-only">音乐不是在声音里发生的，它在记账的那一层发生；而每一本账都缺同一栏——记这件事本身的那一栏。</div>
-      <div class="q en-only">Music does not happen in the sound. It happens on the ledger — and every ledger is missing the same column: the one that would record this.</div>
-      <p class="zh-only">九篇分别把这句话兑现在九个不同的位置上。发生的时点记在判据协议里（冻段），音乐性记在读法系统里（并读壁），不可逆记在记录字段里（空次），成员清单记在通道台账里（途生项），候选集合记在许可模型的稀疏度里（续域迁移），整体的正确性一处也不记（无持项），差异的存活记在谱系的接住窗里（失效差异），未选项的次序记在一次交付里（接出序），而前一事件的退场记在边界的类型里（退占体）。每一篇都走到同一个位置：那个被当作音乐自身性质来读的东西，读出来的其实是那份账本的性质——而账本上没有一栏记这件事。</p>
-      <p class="en-only">Nine papers redeem that sentence at nine different sites: the moment of occurrence is recorded in the criterion protocol, musicality in the reading system, irreversibility in the record field, membership in the channel ledger, the candidate set in the sparsity of the permitting model, the correctness of the whole nowhere at all, the survival of a difference in the lineage's uptake window, the ordering of unchosen paths in a single act of handover, and the exit of a prior event in the type of the boundary.</p>
-    </div>
-
-    <div class="jn-grp">
-    <div class="gh"><h3>何谓音乐</h3><span class="en">WHAT IS MUSIC</span><span class="cnt">5 篇</span></div>
-    <div class="gn">五篇同题异路。每一篇都先指出既有回答共享的那条未被说出的前提，再用三门与音乐学零交集的学科各自的内部材料把它推翻。</div>
-    <article class="jn-card">
-      <div class="top"><span class="chip">之一</span><span class="iq">盲评 150.2</span></div>
-      <h4><a href="/students/judy/lapsed-difference/">何谓音乐——差异的有效期</a></h4>
-      <div class="sub">一次声差在多久之内没有被接住，就不再可能成为音乐</div>
-      <div class="src"><span class="lb">三家外源</span>　地质反应输运 × 流行病学暴发调查 × 蚁群集体感觉阈值<br><span class="lb">新存在物</span>　失效差异　<span class="lb">读数</span>　接住窗 h｜n、失效率 q｜n</div>
-    </article><article class="jn-card">
-      <div class="top"><span class="chip">之二</span><span class="iq">盲评 153.2</span></div>
-      <h4><a href="/students/judy/co-reading-wall/">并读壁</a></h4>
-      <div class="sub">何谓音乐：一段声音在两种互不相容的读法之间立起的那道墙</div>
-      <div class="src"><span class="lb">三家外源</span>　晶体学的孪晶与畴壁 × 雷达测量的距离—速度模糊 × 冷冻电镜的三维分类<br><span class="lb">新存在物</span>　并读壁　<span class="lb">读数</span>　墙宽 w｜(L,θ,P)、可动性 μ、钉扎点</div>
-    </article><article class="jn-card">
-      <div class="top"><span class="chip">之三</span><span class="iq">盲评 151.4</span></div>
-      <h4><a href="/students/judy/handover-ordering/">接出序</a></h4>
-      <div class="sub">何谓音乐：未选的那些路，是在被接手时才排出次序的</div>
-      <div class="src"><span class="lb">三家外源</span>　发展心理学 × 建成环境的空间配置 × 和平与冲突研究中的成熟时机<br><span class="lb">新存在物</span>　接出序　<span class="lb">读数</span>　接出增量 ΔR</div>
-    </article><article class="jn-card">
-      <div class="top"><span class="chip">之四</span><span class="iq">盲评 151.8</span></div>
-      <h4><a href="/students/judy/unheld-term/">无持项</a></h4>
-      <div class="sub">何谓音乐：一种没有整体持有者的结构</div>
-      <div class="src"><span class="lb">三家外源</span>　结构生物学的定序组装与化学计量 × 射电天文的甚长基线干涉 × 劳动关系的排他代表与公平代表义务<br><span class="lb">新存在物</span>　无持项　<span class="lb">读数</span>　外持份额 ν｜(m,g)、空持率 τ</div>
-    </article><article class="jn-card">
-      <div class="top"><span class="chip">之五</span><span class="iq">盲评 148.2</span></div>
-      <h4><a href="/students/judy/vacated-occupancy/">退占体</a></h4>
-      <div class="sub">何谓音乐：声音退出当下占位而不退出后续作用</div>
-      <div class="src"><span class="lb">三家外源</span>　水利调度的防洪库容恢复 × 组织工程的灌流—基质互惠 × 呼吸病学的呼气流量受限与动态肺过度充气<br><span class="lb">新存在物</span>　退占体　<span class="lb">读数</span>　短程条件熵 ΔH_short、长程条件熵 ΔH_long</div>
-    </article>
-  </div><div class="jn-grp">
-    <div class="gh"><h3>音乐是如何发生的</h3><span class="en">HOW MUSIC COMES TO BE</span><span class="cnt">3 篇</span></div>
-    <div class="gn">三篇追问同一件事：从声音到音乐，中间那一下究竟做了什么，以及那一下的产物记在谁的账上。</div>
-    <article class="jn-card">
-      <div class="top"><span class="chip">之七</span><span class="iq">盲评 150.6</span></div>
-      <h4><a href="/students/judy/frozen-span/">冻段</a></h4>
-      <div class="sub">音乐是如何发生的：一段声音何时不再能被无痕重排</div>
-      <div class="src"><span class="lb">三家外源</span>　玻璃物理（结构弛豫与假想温度）× 纺织工程（短纤纱加捻与抱合）× 消防工程（室内火轰燃）<br><span class="lb">新存在物</span>　冻段　<span class="lb">读数</span>　冻结点 f｜θ、未冻比例 c(θ)</div>
-    </article><article class="jn-card">
-      <div class="top"><span class="chip">之六</span><span class="iq">盲评 148.0</span></div>
-      <h4><a href="/students/judy/continuation-domain-shift/">音乐如何发生：续域迁移与未选未来的重写</a></h4>
-      <div class="sub">从时间地理学、移动目标防御与营养几何出发的一种发生机制</div>
-      <div class="src"><span class="lb">三家外源</span>　时间地理学的时空棱柱与路径汇束 × 网络安全的移动目标防御 × 营养几何的摄入目标与折衷规则<br><span class="lb">新存在物</span>　饱和余量 σ　<span class="lb">读数</span>　续域迁移率 M、饱和余量 σ</div>
-    </article><article class="jn-card">
-      <div class="top"><span class="chip">之八</span><span class="iq">盲评 152.6</span></div>
-      <h4><a href="/students/judy/transit-born-term/">途生项</a></h4>
-      <div class="sub">音乐是如何发生的：一段声音在通过「听」时被生产出来的成员</div>
-      <div class="src"><span class="lb">三家外源</span>　加速器与束流物理 × 色谱与质谱技术 × 病毒学<br><span class="lb">新存在物</span>　途生项　<span class="lb">读数</span>　途生率 ν</div>
-    </article>
-  </div><div class="jn-grp">
-    <div class="gh"><h3>音乐对生命的创造性</h3><span class="en">WHAT MUSIC CREATES</span><span class="cnt">1 篇</span></div>
-    <div class="gn">一篇。不问音乐造出了什么新东西，只问：什么东西是真的多出来的。</div>
-    <article class="jn-card">
-      <div class="top"><span class="chip">之九</span><span class="iq">盲评 151.0</span></div>
-      <h4><a href="/students/judy/empty-count/">空次</a></h4>
-      <div class="sub">音乐对生命的创造性：每一次都是新的一次，而这个“新”没有任何内容对应物</div>
-      <div class="src"><span class="lb">三家外源</span>　地质年代学的闭合温度 × 民事诉讼法的既判力与诉讼时效 × 发育生物学的命运限定<br><span class="lb">新存在物</span>　空次　<span class="lb">读数</span>　次序不可读度 U｜R</div>
-    </article>
-  </div>
-
-    <div class="jn-cta"><a href="/students/judy/works/"><span class="zh-only">进入作品集 · 九论全文 →</span><span class="en-only">Enter the collection · all nine →</span></a></div>
-
-    <p class="jn-note zh-only">这九篇不是九个答案，是九次失败得起的尝试。每一篇都先把最漂亮的那个强版本送去检验，再照实登记它怎么死的：有的主读数选错，有的被自己的对照组打平，有的整场因仪器故障作废，有的最后把承重命题整条改写成否定式。<b>若只读一篇，建议从《并读壁》（本批最高分 153.2）入手；若想看一篇作者如何把自己判死，读《音乐如何发生：续域迁移》。</b></p>
-    <p class="jn-note en-only">These are not nine answers but nine attempts that could afford to fail. Each sends its strongest, prettiest version to be tested first, then records honestly how it died. <b>If you read only one, begin with the wall of concurrent readings (highest of the batch, 153.2); if you want to watch an author sentence herself, read the one on continuation-domain shift.</b></p>
-    <p class="jn-note zh-only">另有四篇同产线作品（《回接段与判定切口》《灌注半径》《把门项》《无率位》）在这九篇的划界节中被反复引用，但尚未在本站发表；相关分离线的另一侧暂时无法核对，各篇附论二已逐一标明。</p>
-    <p class="jn-note en-only">Four companion papers from the same line are cited repeatedly across these nine but are not yet published here; the far side of those demarcations cannot yet be checked, and each paper's second appendix says so.</p>
-  </section>
+  </article>
+  <div class="wall"><a href="/students/judy/works/"><span class="zh-only">查看全部 9 件作品 &rarr;</span><span class="en-only">See all 9 works &rarr;</span></a></div>
 
   <div class="back">
     <a href="/students/"><span class="zh-only">← 返回学员专栏名单</span><span class="en-only">← Back to the students roster</span></a>
