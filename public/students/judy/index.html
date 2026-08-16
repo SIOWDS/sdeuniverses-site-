@@ -2,86 +2,194 @@
 <html lang="zh-CN"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Judy · 学员专栏 | SDE Universes</title>
-<meta name="description" content="Judy · SDE 学员专栏 · Students' Column, SDE Universes">
+<meta name="description" content="Judy · SDE 学员专栏 · 音乐教学与教育研究 · Students' Column, SDE Universes">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Noto+Serif+SC:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-:root{--gold:#C9A84C;--gold2:#D4B25E;--ink:#F0E9D8;--ink2:#B8AE96;--bg:#0E0B08;--panel:#171310;--panel2:#1C1712;--line:rgba(201,168,76,0.22);--accent:#8C6A2E}
+/* ── 香槟 · 五线谱 ────────────────────────────────────────────
+   底色取香槟酒体，笔画取铜管乐器的旧铜，不用金黄。
+   全页只有一个记号系统：五线谱。它在题图里作氛围，在分节处作分隔线，
+   在尚无作品处作休止符。除此之外不加装饰。 */
+:root{
+  --champagne:#F5EAD7;   /* 酒体 · 页面底色 */
+  --champagne-2:#FCF7EC; /* 浅一度 · 抬起的面 */
+  --flute:#E7D7B8;       /* 深一度 · 谱线与压边 */
+  --brass:#A98B4E;       /* 旧铜 · 唯一的重音 */
+  --ink:#2E2820;         /* 深焙 · 正文 */
+  --ink-2:#7A6D57;       /* 淡墨 · 次级信息 */
+}
 *{margin:0;padding:0;box-sizing:border-box}
-::selection{background:rgba(201,168,76,0.35)}
-body{background:var(--bg);color:var(--ink);font-family:"Noto Serif SC",Georgia,"Songti SC",serif;line-height:1.9}
+::selection{background:rgba(169,139,78,0.22)}
+html{-webkit-text-size-adjust:100%}
+body{
+  background:var(--champagne);color:var(--ink);line-height:1.95;
+  font-family:"Noto Serif SC","Songti SC",Georgia,serif;font-weight:300;
+  -webkit-font-smoothing:antialiased;
+}
 body.zh .en-only{display:none!important}
 body.en .zh-only{display:none!important}
-nav{position:sticky;top:0;z-index:20;background:rgba(14,11,8,0.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
-nav .w{max-width:900px;margin:0 auto;padding:13px 24px;display:flex;justify-content:space-between;align-items:center}
-nav a{color:var(--gold);text-decoration:none;font-size:14px;letter-spacing:0.05em}
-.nav-right{display:flex;align-items:center;gap:16px}
-.lang-toggle{display:flex;border:1px solid var(--line);border-radius:20px;overflow:hidden}
-.lang-btn{background:transparent;border:none;color:var(--ink2);font-family:inherit;font-size:13px;padding:5px 13px;cursor:pointer;letter-spacing:0.05em}
-.lang-btn.active{background:var(--gold);color:#1A1410;font-weight:700}
-.level-tag{max-width:820px;margin:0 auto;padding:0 24px;display:flex;align-items:center;gap:14px}
-.level-tag .n{font-size:12px;letter-spacing:0.2em;color:#1A1410;background:var(--gold);border-radius:20px;padding:3px 12px;font-weight:700}
-.level-tag .t{font-size:12px;letter-spacing:0.32em;color:var(--gold)}
-.level-tag .line{flex:1;height:1px;background:var(--line)}
-.profile{max-width:820px;margin:0 auto;padding:52px 24px 20px;display:flex;gap:34px;align-items:center;flex-wrap:wrap}
-.avatar{width:132px;height:132px;border-radius:50%;flex-shrink:0;background:linear-gradient(160deg,rgba(212,178,94,0.30),rgba(212,178,94,0.06));border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-family:Georgia,serif;font-size:52px;font-weight:800;color:#F5E6BF;position:relative}
-.avatar .ph{font-size:10px;letter-spacing:0.15em;color:var(--ink2);position:absolute;bottom:12px;font-family:"Noto Serif SC",serif}
-.p-info{flex:1;min-width:240px}
-.p-info h1{font-size:clamp(30px,5vw,42px);font-weight:800;color:#F5EFE0;letter-spacing:0.04em;font-family:Georgia,"Noto Serif SC",serif}
-.p-note{font-size:14px;color:var(--ink2);margin-top:6px;letter-spacing:0.04em}
-.p-info .role{font-size:13px;color:var(--accent);letter-spacing:0.2em;margin-top:12px}
-.p-info .bio{font-size:15px;color:#6B6250;line-height:1.9;margin-top:16px;font-style:italic}
-.works{max-width:820px;margin:0 auto;padding:10px 24px 80px}
-.panel{background:linear-gradient(160deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:16px;padding:40px 30px;text-align:center;margin-top:20px}
-.panel .tag{font-size:12px;letter-spacing:0.34em;color:var(--gold);margin-bottom:14px}
-.panel p{font-size:14.5px;color:var(--ink2);line-height:1.9;max-width:520px;margin:0 auto}
-.back{text-align:center;margin-top:30px}
-.back a{color:var(--gold);text-decoration:none;font-size:14.5px;letter-spacing:0.06em;border-bottom:1px solid rgba(201,168,76,0.4);padding-bottom:2px}
-footer{border-top:1px solid var(--line);margin-top:24px;padding:30px 24px;text-align:center;color:#6B6250;font-size:13px}
-footer a{color:var(--gold);text-decoration:none}
-@media(max-width:640px){.profile{justify-content:center;text-align:center}.p-info{text-align:center}}
+.wrap{max-width:840px;margin:0 auto;padding:0 28px}
+
+/* 导航 —— 一条发丝线，不喧宾 */
+nav{position:sticky;top:0;z-index:20;background:rgba(245,234,215,0.90);backdrop-filter:blur(10px);border-bottom:1px solid var(--flute)}
+nav .wrap{display:flex;justify-content:space-between;align-items:center;padding-top:15px;padding-bottom:15px}
+nav a{color:var(--ink);text-decoration:none;font-size:13.5px;letter-spacing:0.08em}
+nav a:hover{color:var(--brass)}
+.brand{font-family:"Cormorant Garamond",Georgia,serif;font-size:17px;letter-spacing:0.14em;font-weight:400}
+.nav-right{display:flex;align-items:center;gap:18px}
+.lang{display:flex;border:1px solid var(--flute);border-radius:2px;overflow:hidden}
+.lang button{background:transparent;border:none;color:var(--ink-2);font-family:inherit;font-size:12px;padding:4px 11px;cursor:pointer;letter-spacing:0.1em}
+.lang button.on{background:var(--brass);color:var(--champagne-2)}
+
+/* 题图 —— 照片压在一段谱纸上 */
+.hero{position:relative;padding:74px 0 20px;overflow:hidden}
+.hero .stave{position:absolute;left:0;right:0;top:88px;width:100%;height:190px;pointer-events:none;opacity:0.62;
+  -webkit-mask-image:linear-gradient(90deg,transparent 0%,transparent 54%,#000 74%,#000 100%);
+          mask-image:linear-gradient(90deg,transparent 0%,transparent 54%,#000 74%,#000 100%)}
+.hero .wrap{position:relative;display:flex;gap:40px;align-items:center;flex-wrap:wrap}
+.portrait{width:148px;height:148px;border-radius:50%;flex-shrink:0;overflow:hidden;
+  border:1px solid var(--brass);box-shadow:0 0 0 7px var(--champagne),0 14px 34px rgba(84,66,32,0.13)}
+.portrait img{width:100%;height:100%;object-fit:cover;display:block}
+.who{flex:1;min-width:250px}
+.who h1{font-family:"Cormorant Garamond",Georgia,serif;font-weight:300;font-size:clamp(46px,8vw,72px);
+  line-height:1.02;letter-spacing:0.02em;color:var(--ink)}
+.who .field{margin-top:14px;font-size:11px;letter-spacing:0.3em;text-transform:uppercase;color:var(--brass);
+  font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;font-weight:500}
+.who .field.zh-only{letter-spacing:0.22em;text-transform:none;font-size:12px}
+.rule{width:52px;height:1px;background:var(--brass);margin:22px 0 0}
+
+/* 简介 */
+.bio{padding:26px 0 10px}
+.bio p{font-size:15.5px;line-height:2.15;color:var(--ink);text-align:justify;max-width:70ch}
+.bio p.en-only{font-family:"Cormorant Garamond",Georgia,serif;font-size:18.5px;line-height:1.85;font-weight:400;text-align:left}
+
+/* 分节 —— 谱线就是分隔线，符头落在谱线上，标题从符头读起 */
+.movement{display:flex;align-items:center;gap:18px;margin:58px 0 0}
+.movement .bars{flex:1;height:34px;min-width:60px}
+.movement .name{font-size:11.5px;letter-spacing:0.3em;color:var(--brass);white-space:nowrap;
+  font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;font-weight:500}
+.movement .name.zh-only{letter-spacing:0.26em;font-size:12.5px}
+
+/* 尚无作品 —— 谱面上的休止 */
+.rest{background:var(--champagne-2);border:1px solid var(--flute);border-radius:3px;
+  padding:44px 34px 40px;text-align:center;margin-top:24px}
+.rest .glyph{display:block;margin:0 auto 20px}
+.rest p{font-size:14.5px;color:var(--ink-2);line-height:2.1;max-width:46ch;margin:0 auto}
+.rest p.en-only{font-family:"Cormorant Garamond",Georgia,serif;font-size:17px}
+.back{text-align:center;margin:38px 0 88px}
+.back a{color:var(--brass);text-decoration:none;font-size:14px;letter-spacing:0.08em;
+  border-bottom:1px solid rgba(169,139,78,0.35);padding-bottom:3px}
+.back a:hover{border-bottom-color:var(--brass)}
+
+footer{border-top:1px solid var(--flute);padding:32px 28px;text-align:center;color:var(--ink-2);font-size:12.5px;letter-spacing:0.04em}
+footer a{color:var(--brass);text-decoration:none}
+
+:focus-visible{outline:2px solid var(--brass);outline-offset:3px}
+@media(max-width:640px){
+  .hero{padding-top:52px}
+  .hero .wrap{justify-content:center;text-align:center;gap:26px}
+  .who{text-align:center}
+  .rule{margin-left:auto;margin-right:auto}
+  .hero .stave{top:64px;opacity:0.4}
+  .bio p{text-align:left}
+  .movement .name{letter-spacing:0.2em}
+}
+/* 入场：整页像一次起拍，只做一次，不做散点动效 */
+@media(prefers-reduced-motion:no-preference){
+  .fade{opacity:0;transform:translateY(9px);animation:rise .85s cubic-bezier(.22,.7,.3,1) forwards}
+  .fade.d1{animation-delay:.08s}.fade.d2{animation-delay:.20s}.fade.d3{animation-delay:.32s}
+  @keyframes rise{to{opacity:1;transform:none}}
+}
 </style></head>
 <body class="zh">
-<nav><div class="w">
-  <a href="/browse/">SDE Universes</a>
+
+<nav><div class="wrap">
+  <a class="brand" href="/browse/">SDE Universes</a>
   <div class="nav-right">
     <a href="/students/"><span class="zh-only">← 学员专栏</span><span class="en-only">← Students</span></a>
-    <div class="lang-toggle"><button class="lang-btn active" onclick="setLang('zh')">中</button><button class="lang-btn" onclick="setLang('en')">EN</button></div>
+    <div class="lang"><button class="on" onclick="setLang('zh')">中</button><button onclick="setLang('en')">EN</button></div>
   </div>
 </div></nav>
 
-<div class="level-tag" style="padding-top:40px">
-  <span class="n">01</span><span class="t zh-only">学 员 介 绍 · PROFILE</span><span class="t en-only">PROFILE</span><span class="line"></span>
-</div>
-<div class="profile">
-  <div class="avatar" style="overflow:hidden;padding:0"><img src="/students/judy/judy.jpg" alt="Judy" style="width:100%;height:100%;object-fit:cover;border-radius:50%"></div>
-  <div class="p-info">
-    <h1>Judy</h1>
-    
-    <div class="role zh-only">SDE 学员 · 音乐教学与教育研究</div>
-    <div class="role en-only">SDE TRAINEE · MUSIC TEACHING &amp; EDUCATION RESEARCH</div>
-    <p class="bio zh-only" style="font-style:normal;color:#B8AE96;text-align:justify">深耕音乐教学与教育研究领域多年，具有扎实的专业素养和丰富的一线教学实践经验。长期关注音乐课堂教学改革、学生艺术素养提升及教师专业发展，主持并参与多项教育教学课题研究，积极推动科研成果向课堂实践转化。曾多次获得教师教育教学技能类奖项，在课程建设、教学设计与实践指导方面成绩突出。注重学生创新能力与艺术实践能力培养，指导学生参加市、区级各类项目、展演及竞赛，多次斩获殊荣，育人成效显著。</p>
-    <p class="bio en-only" style="font-style:normal;color:#B8AE96;text-align:justify">A music educator with many years in classroom teaching and education research, combining solid disciplinary grounding with extensive front-line practice. Her long-standing concerns are the reform of music instruction, the growth of students&rsquo; artistic literacy, and teachers&rsquo; professional development; she has led and taken part in a number of pedagogical research projects, working to carry findings back into the classroom itself. A repeated award-winner in teaching-skills competitions, she is known for her work in curriculum building, instructional design and practical mentoring. She places particular weight on students&rsquo; creative and performing capacities, and those she guides have won recognition in municipal and district projects, showcases and competitions.</p>
+<header class="hero">
+  <svg class="stave" viewBox="0 0 840 190" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+    <g stroke="#A98B4E" stroke-opacity="0.26" stroke-width="1">
+      <line x1="0" y1="46" x2="840" y2="46"/><line x1="0" y1="70" x2="840" y2="70"/>
+      <line x1="0" y1="94" x2="840" y2="94"/><line x1="0" y1="118" x2="840" y2="118"/>
+      <line x1="0" y1="142" x2="840" y2="142"/>
+    </g>
+    <g fill="#A98B4E" fill-opacity="0.30">
+      <ellipse cx="620" cy="118" rx="7.8" ry="5.5" transform="rotate(-19 620 118)"/>
+      <ellipse cx="700" cy="94"  rx="7.8" ry="5.5" transform="rotate(-19 700 94)"/>
+      <ellipse cx="780" cy="70"  rx="7.8" ry="5.5" transform="rotate(-19 780 70)"/>
+    </g>
+    <g stroke="#A98B4E" stroke-opacity="0.30" stroke-width="1.4" stroke-linecap="round">
+      <line x1="627" y1="116" x2="627" y2="70"/>
+      <line x1="707" y1="92"  x2="707" y2="46"/>
+      <line x1="787" y1="68"  x2="787" y2="22"/>
+    </g>
+  </svg>
+  <div class="wrap">
+    <div class="portrait fade d1"><img src="/students/judy/judy.jpg" alt="Judy" width="148" height="148"></div>
+    <div class="who fade d2">
+      <h1>Judy</h1>
+      <div class="field zh-only">音乐教学与教育研究 · SDE 学员</div>
+      <div class="field en-only">Music education · SDE trainee</div>
+      <div class="rule"></div>
+    </div>
   </div>
+</header>
+
+<div class="wrap bio fade d3">
+  <p class="zh-only">深耕音乐教学与教育研究领域多年，具有扎实的专业素养和丰富的一线教学实践经验。长期关注音乐课堂教学改革、学生艺术素养提升及教师专业发展，主持并参与多项教育教学课题研究，积极推动科研成果向课堂实践转化。曾多次获得教师教育教学技能类奖项，在课程建设、教学设计与实践指导方面成绩突出。注重学生创新能力与艺术实践能力培养，指导学生参加市、区级各类项目、展演及竞赛，多次斩获殊荣，育人成效显著。</p>
+  <p class="en-only">A music educator of many years, at home both in the classroom and in education research. Her standing concerns are the reform of music instruction, the growth of students&rsquo; artistic literacy, and the professional development of teachers; she has led and taken part in a number of pedagogical research projects, and works to carry their findings back into the classroom itself. A repeated award-winner in teaching-skills competitions, she is known for curriculum building, instructional design and practical mentoring. She gives particular weight to students&rsquo; creative and performing capacities, and those she guides have won recognition in municipal and district projects, showcases and competitions.</p>
 </div>
 
-<div class="level-tag" style="margin-top:36px">
-  <span class="n">02</span><span class="t zh-only">作 品 与 专 栏 · WORKS</span><span class="t en-only">WORKS &amp; COLUMNS</span><span class="line"></span>
-</div>
-<div class="works">
-  <div class="panel">
-    <div class="tag zh-only">作 品 陆 续 上 线</div>
-    <div class="tag en-only">WORKS COMING SOON</div>
-    <p class="zh-only">借一双「事物如何发生」的眼，在自己的领域里落笔——把 SDE 作为隐性的引擎，用本行的母语写作。作品通过合宪性审读后，将署名发表于此。</p>
-    <p class="en-only">Borrowing an eye trained on how things come to be, and writing in the native idiom of one’s own field — with SDE as a hidden engine. Once a piece passes its constitutionality review, it will be published here under this name.</p>
+<div class="wrap">
+  <div class="movement">
+    <span class="name zh-only">作 品</span><span class="name en-only">WORKS</span>
+    <svg class="bars" viewBox="0 0 300 34" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+      <g stroke="#A98B4E" stroke-opacity="0.30" stroke-width="1">
+        <line x1="0" y1="7" x2="300" y2="7"/><line x1="0" y1="12.5" x2="300" y2="12.5"/>
+        <line x1="0" y1="18" x2="300" y2="18"/><line x1="0" y1="23.5" x2="300" y2="23.5"/>
+        <line x1="0" y1="29" x2="300" y2="29"/>
+      </g>
+      <ellipse cx="22" cy="18" rx="5" ry="3.6" fill="#A98B4E" transform="rotate(-19 22 18)"/>
+      <line x1="26.6" y1="17" x2="26.6" y2="1" stroke="#A98B4E" stroke-width="1.3"/>
+    </svg>
   </div>
-  <div class="back"><a href="/students/"><span class="zh-only">← 返回学员专栏名单</span><span class="en-only">← Back to the students roster</span></a></div>
+
+  <section class="rest">
+    <svg class="glyph" width="132" height="44" viewBox="0 0 132 44" aria-hidden="true" focusable="false">
+      <g stroke="#A98B4E" stroke-opacity="0.30" stroke-width="1">
+        <line x1="0" y1="8" x2="132" y2="8"/><line x1="0" y1="15" x2="132" y2="15"/>
+        <line x1="0" y1="22" x2="132" y2="22"/><line x1="0" y1="29" x2="132" y2="29"/>
+        <line x1="0" y1="36" x2="132" y2="36"/>
+      </g>
+      <rect x="55" y="15" width="22" height="7" fill="#A98B4E" fill-opacity="0.75"/>
+    </svg>
+    <p class="zh-only">此处现在是一段休止。<br>作品经审读后，将署名发表于此。</p>
+    <p class="en-only">A rest, for now.<br>Work will appear here under her name once reviewed.</p>
+  </section>
+
+  <div class="back">
+    <a href="/students/"><span class="zh-only">← 返回学员专栏名单</span><span class="en-only">← Back to the students roster</span></a>
+  </div>
 </div>
 
 <footer>
   <span class="zh-only">© 德麦国际 Demai International · 学员专栏 · <a href="/browse/">sdeuniverses.com</a></span>
-  <span class="en-only">© Demai International · Students’ Column · <a href="/browse/">sdeuniverses.com</a></span>
+  <span class="en-only">© Demai International · Students&rsquo;&#8202;Column · <a href="/browse/">sdeuniverses.com</a></span>
 </footer>
+
 <script>
-function setLang(l){document.body.className=l;document.querySelectorAll('.lang-btn').forEach(function(b){b.classList.toggle('active',(b.textContent==='中'&&l==='zh')||(b.textContent==='EN'&&l==='en'));});document.documentElement.lang=l==='zh'?'zh-CN':'en';}
+function setLang(l){
+  document.body.className=l;
+  document.querySelectorAll('.lang button').forEach(function(b){
+    b.classList.toggle('on',(b.textContent==='中'&&l==='zh')||(b.textContent==='EN'&&l==='en'));
+  });
+  document.documentElement.lang=(l==='zh'?'zh-CN':'en');
+}
 </script>
 
 <script>window.WDS_READ={};</script>
