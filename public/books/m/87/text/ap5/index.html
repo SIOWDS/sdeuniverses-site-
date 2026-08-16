@@ -1,0 +1,185 @@
+<!DOCTYPE html><html lang="zh"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>附录五　跨读数相关矩阵（本卷最大一笔欠账的兑现） · 音乐初探·卷一 · 德麦国际专著</title>
+<meta name="description" content="《音乐初探·卷一》何谓音乐？ · 许佳衡 著 · 三部十章 · 23.8 万汉字 · ISBN 979-8-90690-023-4。附录五　跨读数相关矩阵（本卷最大一笔欠账的兑现）">
+<style>
+:root{--bg:#0D0C10;--fg:#E8E6E2;--dim:#8C8894;--am:#E27A4A;--line:#26242C;--card:#14131A}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);
+font:16px/1.95 "Noto Serif CJK SC","Songti SC",Georgia,serif}
+a{color:var(--am);text-decoration:none}a:hover{text-decoration:underline}
+.bar{position:sticky;top:0;background:rgba(13,12,16,.96);border-bottom:1px solid var(--line);
+padding:10px 18px;display:flex;gap:14px;flex-wrap:wrap;align-items:center;font-size:13px;z-index:9}
+.wrap{max-width:760px;margin:0 auto;padding:34px 20px 90px}
+h1{font-size:27px;line-height:1.5;margin:.2em 0 .1em}
+h3{font-size:17px;margin:1.5em 0 .5em;color:var(--am);font-weight:600}
+h4{font-size:15.5px;margin:1.2em 0 .4em;color:#C6C2CC;font-weight:600}
+p{margin:.85em 0;text-align:justify}p.li{margin:.35em 0 .35em 1em}
+blockquote{margin:1.2em 0;padding:.7em 1.1em;border-left:3px solid var(--am);background:var(--card);color:#F2EFE9}
+.tw{overflow-x:auto;margin:1.2em 0}table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+th{background:#1A1922;color:var(--am)}
+.meta{color:var(--dim);font-size:13.5px;margin:.3em 0 1.6em}
+.nav{display:flex;justify-content:space-between;gap:12px;margin-top:44px;padding-top:18px;
+border-top:1px solid var(--line);font-size:14px}
+.toc a{display:block;padding:7px 0;border-bottom:1px solid var(--line);color:var(--fg)}
+.toc a:hover{color:var(--am)}
+.foot{margin-top:50px;padding-top:16px;border-top:1px solid var(--line);color:var(--dim);font-size:12.5px;text-align:center}
+</style></head><body>
+<div class="bar"><a href="/books/m/87/">← 专著首页</a><a href="/books/m/87/text/">目录</a><a href="/books/m/87/read.html">📄 在线 PDF</a><a href="/students/xu-jiaheng/music-vol1/music-vol1.pdf">⬇ 下载</a><span style="color:var(--dim)">德麦国际专著第 87 号</span></div>
+<div class="wrap"><h1>附录五　跨读数相关矩阵（本卷最大一笔欠账的兑现）</h1>
+<div class="meta">《音乐初探·卷一》何谓音乐？ · 许佳衡 著 · 三部十章 · 23.8 万汉字 · ISBN 979-8-90690-023-4</div>
+<p>本卷结语原本写着一句话：十个读数彼此正交是本卷的核心主张，而本卷<strong>没有在同一批材料上把它们一起算过</strong>。附录四把这一条列为第 1 号欠账。付印前本卷把它做了，结果记在这里，包括对本卷不利的那一半。</p>
+<h3>〇、勘误与撤回：附录五中带 r 的三对全部作废</h3>
+<p>本附录第一版（付印前的内部稿）把第一章的资格第一到达时间做成了一个代理量 r，并据以报出四个读数、六个配对。<strong>其中三个配对是错的，现在撤回。</strong></p>
+<p><strong>错在哪里。</strong> 那个代理把公共落点集合定义成“其余各曲的全部窗口<strong>减去本曲自己的窗口</strong>”。一个窗口只要出现在本曲里，就必然被这一减法剔出集合，因此本曲的任何窗口都<strong>永远不可能</strong>落进去。r 于是恒等于删失值，也就是本曲的窗口总数——<strong>它测的是曲子有多长，不是资格何时到达。</strong></p>
+<p><strong>核查结果：130 首里 130 首的 r 都是删失值。</strong> 比例是 100%，不是“大部分”。它那条漂亮的分半信度 0.988，正是因为曲长本来就完全可重复。</p>
+<p><strong>这一次是怎么被抓住的。</strong> 不是复查代码抓到的，是执行本卷刚给卷二卷三写下的那条纪律时抓到的——“凡读数建在语料规模上的，必须出示饱和曲线”。r 的落点集合由其余各曲构成，所以它在这条线上。做饱和曲线时（预注册 <code>prereg_sat.md</code>，SHA-256 前十六位 <code>3e4441992f7a11a9</code>），语料一放大，r 立刻塌到 0 并触发除零，才反查出定义写错。<strong>一条为别人写的纪律，第一次使用就抓到了自己的错。</strong></p>
+<p><strong>撤回范围。</strong> 表 A5-1 的 r 行、表 A5-2 与表 A5-4 中一切与 r 有关的配对（r×G、r×ν、r×w）、表 A5-3 的 r 行，以及附录六表 A6-1 中依赖 r 的两行（第一章×第八章、第一章×第二章），<strong>全部作废，不得引用</strong>。本附录以下各节已按三个读数重写。</p>
+<p><strong>修不修得回来。</strong> 暂时修不回来。把定义改正（落点集合＝其余各曲的窗口，不作减法）之后，在 4 到 14 各种窗口长度上重算，r 的中位数不是 0 就是大面积删失：窗口短则语料早已覆盖一切，窗口长则本曲根本落不进去。<strong>第一章的资格到达在这个代理形式下测不动</strong>，需要换成该章正文里的 E／K／Q 谓词分离设计，而那需要本卷没有的材料。这一条列入附录四第 12 号欠账。</p>
+<h3>一、预注册与语料</h3>
+<p>预注册文件 <code>prereg_matrix.md</code> 写于任何相关系数被计算之前，SHA-256 前十六位 <code>88efd9e49512703a</code>。语料为 music21 内置巴赫四声部众赞歌中声部数恰为四者，与第三章第三、四场同一子样本，实际入选 <strong>130 首</strong>。网格为一个四分音符，随机种子 20260816。</p>
+<p>判据在事前写死：六个配对的 Spearman 相关系数绝对值<strong>全部小于 0.50</strong> 记为支持正交；<strong>任一超过 0.70</strong> 即触发该对的并入条款，本卷必须写明哪一章并入哪一章，且不得以“代理不完善”为由回避。</p>
+<h3>二、四个读数的代理与限度</h3>
+<p>撤回 r 之后，能在同一批四声部材料上同时算出来的读数剩三个，因此本场测的是三个，不是十个。三个量都是<strong>代理</strong>，不是各章的完整读数：第八章的 G 未做尺度律拟合；第二章的 w 用并读窗占比而非墙宽的连续长度；第三章的 ν 只报了 m=1。</p>
+<p>本场原本把 r 与 G 的分开单列为 H4，因为两者共享同一个底层机制、只由参照集合一外一内区分。<strong>r 撤回后，H4 无从判定</strong>，第一章与第八章的分界回到“只有论证、没有数据”的状态。</p>
+<p><strong>表 A5-1　三个读数在 130 首上的分布</strong></p>
+<table>
+<thead>
+<tr class="header">
+<th>读数</th>
+<th>中位数</th>
+<th>四分位距</th>
+<th>范围</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>G（第八章代理，步）</td>
+<td>27.0</td>
+<td>14.0</td>
+<td>12 – 54</td>
+</tr>
+<tr class="even">
+<td>ν（第三章，净值）</td>
+<td>0.0422</td>
+<td>0.0855</td>
+<td>−0.104 – 0.262</td>
+</tr>
+<tr class="odd">
+<td>w（第二章代理，占比）</td>
+<td>0.3311</td>
+<td>0.1779</td>
+<td>0.067 – 0.632</td>
+</tr>
+</tbody>
+</table>
+<p>三个量的四分位距都不为零，作废条款 F1 未触发。样本量 130 过 100，F2 未触发，故本场结果可写入结语。</p>
+<h3>三、相关矩阵</h3>
+<p><strong>表 A5-2　Spearman 相关矩阵（n = 130，撤回 r 后）</strong></p>
+<table>
+<thead>
+<tr class="header">
+<th></th>
+<th>G</th>
+<th>ν</th>
+<th>w</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>G（第八章）</strong></td>
+<td>1.000</td>
+<td>−0.112</td>
+<td>+0.125</td>
+</tr>
+<tr class="even">
+<td><strong>ν（第三章）</strong></td>
+<td>−0.112</td>
+<td>1.000</td>
+<td>−0.046</td>
+</tr>
+<tr class="odd">
+<td><strong>w（第二章）</strong></td>
+<td>+0.125</td>
+<td>−0.046</td>
+<td>1.000</td>
+</tr>
+</tbody>
+</table>
+<p>三个配对的绝对值分别是 0.125、0.112、0.046，<strong>最大 0.125</strong>，全部远低于 0.50 的支持线，也远低于 0.70 的并入线。</p>
+<p><strong>H1 获支持，H2 未触发；H4 因 r 撤回而无从判定。</strong> 三对读数没有任何一对触发并入条款。</p>
+<h3>四、一个必须自己提出的反对：近零相关也可能只是噪声</h3>
+<p>上面这张表有一个很难看的替代解释：<strong>如果四个读数本身都测不准，它们当然互不相关。</strong> 一堆随机数彼此也正交。</p>
+<p>本卷因此加做了一场分半信度检验：把每首曲子前后各半，用完全相同的口径各算一次四个读数，再算两半之间的相关，最后用 Spearman-Brown 公式校正到全长。</p>
+<p><strong>表 A5-3　分半信度（n = 125，撤回 r 后）</strong></p>
+<table>
+<thead>
+<tr class="header">
+<th>读数</th>
+<th>半长相关</th>
+<th>全长信度</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>G（第八章）</td>
+<td>+0.377</td>
+<td><strong>0.547</strong></td>
+</tr>
+<tr class="even">
+<td>ν（第三章）</td>
+<td>+0.234</td>
+<td><strong>0.379</strong></td>
+</tr>
+<tr class="odd">
+<td>w（第二章）</td>
+<td>+0.118</td>
+<td><strong>0.211</strong></td>
+</tr>
+</tbody>
+</table>
+<p>这个结果对本卷不利，而且是本场最重要的产出：</p>
+<p><strong>第八章的 G 中等（0.547），而第三章的 ν 只有 0.379、第二章的 w 只有 0.211。</strong> 也就是说，<strong>在单曲这个尺度上，w 与 ν 大部分是噪声。</strong> 它们在语料层面上的结论（第二章的族序不一致、第三章的 4% 与无特权持有分）依赖的是跨曲聚合，那些结论不受此影响；但<strong>任何人若想拿 w 或 ν 去评价某一首具体作品，本卷现在明确反对</strong>。</p>
+<h3>五、去衰减校正后，正交仍然成立</h3>
+<p>两个不可靠的量之间，相关系数会被压低，压低的上限是两者信度乘积的平方根。把观测值除以这个上限，得到去衰减后的相关。</p>
+<p><strong>表 A5-4　去衰减校正</strong></p>
+<table>
+<thead>
+<tr class="header">
+<th>配对</th>
+<th>观测 ρ</th>
+<th>可能上限</th>
+<th>去衰减 ρ</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>G × ν</td>
+<td>−0.112</td>
+<td>0.455</td>
+<td>−0.245</td>
+</tr>
+<tr class="even">
+<td>G × w</td>
+<td>+0.125</td>
+<td>0.340</td>
+<td><strong>+0.367</strong></td>
+</tr>
+<tr class="odd">
+<td>ν × w</td>
+<td>−0.046</td>
+<td>0.283</td>
+<td>−0.163</td>
+</tr>
+</tbody>
+</table>
+<p><strong>三个去衰减值最大 0.367，仍全部低于 0.50 的支持线。</strong> 正交这一条在扣掉不可靠性之后依然成立，不是靠噪声撑出来的。</p>
+<h3>六、本场没有做到的四件事</h3>
+<p><strong>其一，只测了三个读数，不是十个。</strong> 第四、五、六、七、九、十章的读数需要各自的语料（撤载事件、承载者字段、边界标记、交付记录），四声部众赞歌上算不出来。因此“十把量尺”这一说法<strong>只被验证了三把</strong>，附录四第 1 条只兑现了一部分，剩下的部分改列为新的欠账。</p>
+<p><strong>其二，三个都是代理。</strong> 见本附录第二节的限度声明。若用各章的完整读数重算，相关可能变化。</p>
+<p><strong>其三，只在一个体裁上做。</strong> 四声部众赞歌是本卷唯一能同时承载四个读数的语料，也是最规整的一种音乐。在民歌、即兴、电子音乐上重跑是必须的，本卷没有做。</p>
+<p><strong>其四，w 与 ν 的低信度没有被修。</strong> 本卷只是把它测了出来并写在这里。修法是明确的——加长分析单元、或改用曲内多窗口的稳健统计量——但那要改动第二章与第三章的读数定义，超出付印前所能做的范围。</p>
+<h3>七、这一场对全卷的净影响</h3>
+<p><strong>正面</strong>：本卷最核心的结构主张——十章不是十个互相竞争的答案，而是一个对象的十个不同的量——第一次有了经验证据，而且是在扣掉不可靠性之后仍然成立的证据。并入条款执行了，没有触发。</p>
+<p><strong>负面</strong>：本卷交出的十把量尺里，至少有两把在单曲尺度上刻度模糊（附录四第 9 条）；而第一章那一把的代理<strong>根本没做成</strong>，连带撤回三个配对（本附录第〇节）。</p>
+<hr /><div class="nav"><a href="/books/m/87/text/ap4/">← 附录四　本卷未完成事项清单</a><a href="/books/m/87/text/ap6/">附录六　章际分界总表 →</a></div><div class="foot">© 德麦国际出版社 · 许佳衡《音乐初探·卷一 何谓音乐？》· ISBN 979-8-90690-023-4 · 定价 US$19.90<br>本书是理论与研究方法著作。全书四份预注册文件与全部脚本随书交付，读者可在本机复算并据以判定本卷哪一条主张不成立。</div></div></body></html>
