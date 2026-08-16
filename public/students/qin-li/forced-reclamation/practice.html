@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>只留最后一段：撤回四问与骨架三检 · 技术与方法实践 | SDE Universes</title>
+<meta name="description" content="这不是一份「把话说得难一点」的建议——本篇第六节专门用来把「难」和「撤回」彻底分开，因为它们看上去一样，结果相反。它交付的是可核对的东西：一条主尺（最后一段由谁完成）、撤回四问、四种可撤服务的对照表、骨架三检（可标注性／方向落在中间带／可撤销检验）、三个走完一遍的例子、留痕与归属两道验收、开荒失败的三种收场与处置，以及四条硬条款：不许把不做功课说成撤回、撤回必须经同意并给退出口、安全与规程不撤回、不许用它给写得难懂背书。">
+<meta name="author" content="SDE Universes">
+<meta property="og:type" content="article">
+<meta property="og:title" content="只留最后一段：撤回四问与骨架三检 · 技术与方法实践">
+<meta property="og:description" content="这不是一份「把话说得难一点」的建议——本篇第六节专门用来把「难」和「撤回」彻底分开，因为它们看上去一样，结果相反。它交付的是可核对的东西：一条主尺（最后一段由谁完成）、撤回四问、四种可撤服务的对照表、骨架三检（可标注性／方向落在中间带／可撤销检验）、三个走完一遍的例子、留痕与归属两道验收、开荒失败的三种收场与处置，以及四条硬条款：不许把不做功课说成撤回、撤回必须经同意并给退出口、安全与规程不撤回、不许用它给写得难懂背书。">
+<link rel="canonical" href="https://sdeuniverses.com/students/qin-li/forced-reclamation/practice.html">
+<style>
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:#FBF8F1;color:#2B2620;
+ font-family:"Noto Serif SC","Songti SC","Source Han Serif SC",Georgia,serif;
+ font-size:17px;line-height:1.95;letter-spacing:.01em}
+.wrap{max-width:760px;margin:0 auto;padding:0 22px}
+nav.cnav{background:#2B2620;color:#EDE4CF;position:sticky;top:0;z-index:30;
+ font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif}
+nav.cnav .wrap{display:flex;align-items:center;justify-content:space-between;gap:14px;height:50px}
+nav.cnav a{color:#EDE4CF;text-decoration:none;font-size:14px}
+nav.cnav .cnav-logo{font-weight:700;letter-spacing:.06em}
+nav.cnav .cnav-back{opacity:.82}
+nav.cnav .cnav-back:hover{opacity:1}
+header.art{background:linear-gradient(180deg,#FFFDF8 0%,#F5EFE2 100%);
+ border-bottom:1px solid rgba(43,38,32,.10);padding:44px 0 34px}
+.art-eyebrow{font-size:12.5px;letter-spacing:.16em;color:#A8813C;font-weight:700;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;margin-bottom:16px}
+h1.art-title{font-size:33px;line-height:1.4;margin:0 0 14px;font-weight:800}
+.art-subtitle{font-size:17px;color:#5C5346;line-height:1.7;margin-bottom:16px}
+.art-meta{font-size:13px;color:#8A8071;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif}
+.swap{display:flex;flex-wrap:wrap;gap:10px;margin:22px auto 0}
+.swap a{flex:1 1 240px;display:block;text-decoration:none;padding:12px 15px;border-radius:9px;
+ border:1px solid rgba(43,38,32,.16);background:#fff;color:#2B2620;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;font-size:14px;line-height:1.6}
+.swap a b{display:block;font-size:14.5px;margin-bottom:2px}
+.swap a span{color:#8A8071;font-size:12.5px}
+.swap a:hover{border-color:#A8813C;box-shadow:0 2px 10px rgba(43,38,32,.07)}
+article{padding:30px 0 10px}
+.abs{background:#FAF4E6;border-left:4px solid #A8813C;border-radius:0 8px 8px 0;
+ padding:18px 20px;margin:0 0 26px;font-size:15.5px;line-height:1.85;color:#4A4238}
+.abs b{color:#8A6817}
+.toc{border:1px solid rgba(43,38,32,.13);border-radius:9px;padding:16px 20px;margin:0 0 34px;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;font-size:14.5px;background:#FFFDF8}
+.toc .tl{font-size:12.5px;letter-spacing:.14em;color:#A8813C;font-weight:700;margin-bottom:10px}
+.toc ol{margin:0;padding-left:20px;color:#5C5346}
+.toc li{margin:5px 0}
+.toc a{color:#4A4238;text-decoration:none}
+.toc a:hover{color:#A8813C;text-decoration:underline}
+h2{font-size:22px;line-height:1.5;margin:44px 0 16px;padding-top:8px;font-weight:800;
+ border-top:1px solid rgba(43,38,32,.10)}
+h2 .no{display:inline-block;min-width:1.9em;color:#A8813C;font-size:16px;font-weight:700;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif}
+p{margin:0 0 17px;text-align:justify}
+p b,li b{color:#8A6817}
+ul.pts{margin:0 0 18px;padding-left:0;list-style:none}
+ul.pts li{position:relative;padding-left:20px;margin:0 0 10px;text-align:justify}
+ul.pts li:before{content:"—";position:absolute;left:0;color:#A8813C}
+blockquote{margin:0 0 20px;padding:14px 18px;background:#FFFDF8;
+ border-left:3px solid rgba(43,38,32,.22);color:#4A4238;font-size:16px}
+.endbox{margin:48px 0 10px;padding:22px;border-radius:10px;background:#FAF4E6;
+ border:1px solid rgba(43,38,32,.12)}
+.endbox .et{font-size:12.5px;letter-spacing:.14em;color:#A8813C;font-weight:700;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;margin-bottom:12px}
+.endbox a{color:#8A6817}
+footer{margin-top:46px;padding:26px 0 40px;border-top:1px solid rgba(43,38,32,.12);
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;font-size:13px;color:#8A8071}
+footer a{color:#8A8071}
+@media(max-width:640px){body{font-size:16px}h1.art-title{font-size:26px}h2{font-size:19.5px}}
+</style>
+</head>
+<body>
+<nav class="cnav"><div class="wrap">
+  <a class="cnav-logo" href="/browse/">SDE Universes</a>
+  <a class="cnav-back" href="/students/qin-li/forced-reclamation/">← 回母文《强制开荒：当意义无法被一路送到终点时》</a>
+</div></nav>
+
+<header class="art"><div class="wrap">
+  <div class="art-eyebrow">配套读物 · 技术与方法实践 · 母文《强制开荒：当意义无法被一路送到终点时》</div>
+  <h1 class="art-title">只留最后一段：撤回四问与骨架三检</h1>
+  <div class="art-subtitle">母文的判断是「意义生成的最后一段由谁完成，决定了对方身上会不会留下东西」。这一篇把它落成能上手的东西：撤回四问、骨架三检、把「难」和「撤回」分开的两条判例，以及四条不许越过的线。</div>
+  <div class="art-meta">SDE 学员专栏 · 配套读物 · 2026年8月 · 约 3516 字</div>
+  <div class="swap">
+    <a href="/students/qin-li/forced-reclamation/"><b>← 母文 · 强制开荒：当意义无法被一路送到终点时</b><span>完整论证在这里</span></a>
+    <a href="explain.html"><b>🌱 被人送了十次，你还是不认得那条路</b><span>用被送十次却不认路、荒地与废墟、断掉的绳子、没有箭头的大陆把本文讲一遍</span></a>
+  </div>
+</div></header>
+
+<div class="wrap"><article>
+  <div class="abs"><b>这一篇是什么　</b>这不是一份「把话说得难一点」的建议——本篇第六节专门用来把「难」和「撤回」彻底分开，因为它们看上去一样，结果相反。它交付的是可核对的东西：一条主尺（最后一段由谁完成）、撤回四问、四种可撤服务的对照表、骨架三检（可标注性／方向落在中间带／可撤销检验）、三个走完一遍的例子、留痕与归属两道验收、开荒失败的三种收场与处置，以及四条硬条款：不许把不做功课说成撤回、撤回必须经同意并给退出口、安全与规程不撤回、不许用它给写得难懂背书。</div>
+  <div class="toc"><div class="tl">目 录</div><ol><li><a href="#s01">这一篇不做的事</a></li><li><a href="#s02">一条主尺</a></li><li><a href="#s03">撤回四问</a></li><li><a href="#s04">四种可撤的服务</a></li><li><a href="#s05">骨架三检</a></li><li><a href="#s06">把「难」和「撤回」分开</a></li><li><a href="#s07">一条反直觉的验收</a></li><li><a href="#s08">反过来用：你是不是一直在被送</a></li><li><a href="#s09">三个走完一遍的例子</a></li><li><a href="#s10">硬条款一：不许把不做功课说成撤回</a></li><li><a href="#s11">硬条款二：撤回必须经同意，且要有退出口</a></li><li><a href="#s12">硬条款三：这些地方不撤回</a></li><li><a href="#s13">硬条款四：不许拿它给写得难懂背书</a></li><li><a href="#s14">开荒失败的三种收场</a></li><li><a href="#s15">两道验收</a></li><li><a href="#s16">这套方法什么时候不成立</a></li><li><a href="#s17">一页纸操作卡</a></li><li><a href="#s18">最后一条纪律</a></li></ol></div>
+<h2 id="s01"><span class="no">01</span>这一篇不做的事</h2>
+<p><b>它不是教你把话说得难一点。</b> 「难」和「撤回」是两件不同的事，做反了会伤人。第六节整节在处理这个，那一节是本篇的地基。</p>
+<p><b>它不是教你少给。</b> 撤回的前提是<b>材料给足</b>。母文那句区分要背下来：<b>废墟是什么也没留下，荒地是地还在、只是没有现成的路。</b> 少给到对方无处落脚，那不是撤回，是撒手。</p>
+<p><b>它不承诺结果。</b> 母文自己写得很清楚：<b>开荒失败是这件事最常见的日常命运。</b> 这一篇能做的是把成功率从很低抬到不那么低，并且写清什么时候必须停。</p>
+<p>它适用的情形只有一种：<b>那件事的价值在过程上，而你手上有足够的材料可以给。</b></p>
+<h2 id="s02"><span class="no">02</span>一条主尺</h2>
+<p>所有操作都挂在这一条上：</p>
+<blockquote><b>意义生成的最后一段，由谁完成？</b></blockquote>
+<ul class="pts"><li>由你完成 → 对方得到一个结论。</li><li>由他完成 → 对方得到一条他自己走过的路。</li></ul>
+<p>注意这条尺子量的<b>不是长度，也不是难度</b>，只量最后那一段归谁。这是母文最反直觉、也最有用的一条：<b>费力多少与开荒无关，最后一段归谁才是全部。</b></p>
+<h2 id="s03"><span class="no">03</span>撤回四问</h2>
+<p>动手之前按序过四问，任一不过就别做。</p>
+<ul class="pts"><li><b>一、我要撤的是哪一路服务？</b> 说得出名字才算数（见下一节的对照表）。说不出名字的「少讲一点」，多半是偷懒。</li><li><b>二、撤掉之后，骨架还在不在？</b> 他脚下还有没有可踩的东西？（第五节给检法。）</li><li><b>三、他的库存够不够？</b> 这件事要用到的经验，他身上有吗？完全没有的人，撤回之后只剩茫然。</li><li><b>四、他同不同意？</b> 母文原话：<b>没有这份同意，撤回就是一种欺凌，而不是一种邀请。</b></li></ul>
+<p>四问全过再动手。第四问最容易被跳过，也最容易出事。</p>
+<h2 id="s04"><span class="no">04</span>四种可撤的服务</h2>
+<table style="width:100%;border-collapse:collapse;margin:0 0 20px;font-size:15px"><tr><th style="text-align:left;border-bottom:2px solid rgba(43,38,32,.25);padding:8px 10px;color:#8A6817">被撤的服务</th><th style="text-align:left;border-bottom:2px solid rgba(43,38,32,.25);padding:8px 10px;color:#8A6817">在你的场合里长什么样</th><th style="text-align:left;border-bottom:2px solid rgba(43,38,32,.25);padding:8px 10px;color:#8A6817">撤掉后剩下的骨架</th></tr><tr><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">再现</td><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">不再替他把抽象的事变成现成的画面或比喻</td><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">语言的节奏、句子的规则性</td></tr><tr><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">组织</td><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">不再标出「这里是重点」「先看这个再看那个」</td><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">材料本身的完整与顺序</td></tr><tr><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">解决</td><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">不再把话收到一个稳定的结论上</td><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">反复出现的动机、前后呼应</td></tr><tr><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">指令</td><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">不再给步骤清单和下一步提示</td><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">环境本身：边界、地形、可用的工具、别人走过的痕迹</td></tr></table>
+<p>用法：<b>先认出你平时最擅长提供的是哪一种服务</b>——那通常就是你最该试着撤掉的那一种。会讲比喻的人撤再现，会列提纲的人撤组织，会下结论的人撤解决，会派活的人撤指令。</p>
+<h2 id="s05"><span class="no">05</span>骨架三检</h2>
+<p>母文最狠的一处自我要求，是它不许自己用「失败了就说骨架不稳、骨架稳不稳又看成败」这种循环。<b>骨架必须在对方接触之前、由第三方测出来。</b> 三检译成个人可做的版本：</p>
+<p><b>检一：可标注性。</b></p>
+<p>找两三个人，<b>不告诉他们你的意图，也不要求他们理解</b>，只让他们各自标出「这里我觉得能站住脚」的位置。</p>
+<p>标注彼此对得上 → 骨架在。</p>
+<p>标得七零八落 → 那是废墟，回去补材料。</p>
+<p><b>检二：方向要落在中间带。</b></p>
+<p>让几个人各自说出他们走出来的那条路。</p>
+<p><b>路径太散</b> → 没有牵引，废墟。</p>
+<p><b>路径几乎一样</b> → 更值得警惕：<b>说明服务其实没停，导航还在，只是藏得深。</b></p>
+<p><b>彼此不同、但共享一个可辨认的方向</b> → 这才是开荒。</p>
+<p><b>检三：可撤销检验。</b></p>
+<p>把骨架故意弄弱，撤回保持不变——打乱节奏但保留不可成像，切碎连续但保留无导航。</p>
+<p>如果效果随之塌掉，说明骨架确实是承重件；<b>如果毫无变化，说明你以为的骨架根本没在起作用。</b></p>
+<h2 id="s06"><span class="no">06</span>把「难」和「撤回」分开</h2>
+<p>这是全篇最要紧的一节。两件事看上去一样，结果相反。</p>
+<table style="width:100%;border-collapse:collapse;margin:0 0 20px;font-size:15px"><tr><th style="text-align:left;border-bottom:2px solid rgba(43,38,32,.25);padding:8px 10px;color:#8A6817"></th><th style="text-align:left;border-bottom:2px solid rgba(43,38,32,.25);padding:8px 10px;color:#8A6817">难</th><th style="text-align:left;border-bottom:2px solid rgba(43,38,32,.25);padding:8px 10px;color:#8A6817">撤回</th></tr><tr><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">路</td><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">作者铺好了，只是很陡</td><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">最后一段没有铺</td></tr><tr><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">对方在做什么</td><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">沿着你的路吃力地走</td><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">自己找方向</td></tr><tr><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">结算</td><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">「我啃下来了」</td><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">「这条路是我劈的」</td></tr><tr><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">投入</td><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">通常极大</td><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top"><b>可以极小，两秒钟也够</b></td></tr></table>
+<p>母文给了两个判例，直接拿来当尺子：</p>
+<ul class="pts"><li><b>判例一</b>：一个人用三周啃完一本晦涩的书。投入巨大，成就感真实——<b>但那条路始终是作者铺的，只是铺得陡。艰深不等于撤回。</b></li><li><b>判例二</b>：一句读起来只用两秒的话，认知负荷极低，却把一段身体记忆钓了出来。<b>投入近乎为零，归属感却是满的。</b></li></ul>
+<p><b>自查一句：我是把路铺陡了，还是把最后一段留了下来？</b> 铺陡是我在使劲，留下才是他在使劲。</p>
+<h2 id="s07"><span class="no">07</span>一条反直觉的验收</h2>
+<p>母文给了一条可以单独推翻它自己的预测，拿来当验收正好：</p>
+<blockquote><b>如果所有人得到的是同一个答案，那么你没有撤回——无论那件事有多难。</b></blockquote>
+<p>所以验收时不要问「他们答对了吗」，要看<b>分布</b>：</p>
+<ul class="pts"><li>答案高度一致 → 你其实全程在指路，只是指得含蓄。</li><li>答案彼此不同、但都朝着一个可辨认的方向 → 成了。</li><li>答案毫无交集 → 骨架塌了。</li></ul>
+<p>这一条和「越难越深」的常识相反，也正因此它好用：<b>它挡住了那种「大家都说太深奥了」的自我满足。</b></p>
+<h2 id="s08"><span class="no">08</span>反过来用：你是不是一直在被送</h2>
+<p>这把尺子对着自己用往往更值。</p>
+<ul class="pts"><li><b>你听完一场讲解，觉得极顺，第二天什么也说不出来。</b> 顺，是因为每一段连接都被人接好了。<b>顺是一个信号，不总是优点。</b></li><li><b>你能背出很多结论，却讲不出任何一条是怎么来的。</b> 结论是别人的落点，路不是你的。</li><li><b>你在一个流程里做了三年，一遇到没被规定过的情况就停住。</b> 你执行过很多次，但从来没有自己判断过一次。</li><li><b>你去过一个地方十次，都是被送去的。</b></li></ul>
+<p>三个自己就能做的动作：</p>
+<ul class="pts"><li><b>先自己写三句再去看。</b> 你猜它会怎么说。写完再读，那个落差就是你自己的路。</li><li><b>看完合上，讲给别人听。</b> 讲不出来的地方，正是被人接过去的地方。</li><li><b>要材料，不要结论。</b> 对给你答案的人说一句：「先别说结论，把你手上的东西给我看看。」——这是<b>加料不加线</b>的反向用法。</li></ul>
+<h2 id="s09"><span class="no">09</span>三个走完一遍的例子</h2>
+<p><b>教一条路。</b></p>
+<p>撤的服务：指令。</p>
+<p>骨架：地标、方向感、来时的痕迹。</p>
+<p>做法：不说「第三个路口左转」，说「你记住那棵歪脖子树在你右手边」，然后让他自己走。</p>
+<p>验收：他能不能反过来带你走一遍。<b>能带路才算，能复述路线不算。</b></p>
+<p><b>写一份材料。</b></p>
+<p>撤的服务：解决。</p>
+<p>骨架：事实、数据、来龙去脉，一样不少。</p>
+<p>做法：把结尾那句「因此我们应该……」删掉。</p>
+<p>判「不过」的情况：删完之后连你自己都串不起来了——<b>那说明缺的是材料，得补第一层，不是留白。</b></p>
+<p><b>带一个新人做一件事。</b></p>
+<p>撤的服务：组织。</p>
+<p>骨架：目标、边界、上次的坑记在哪个文档里、出了事找谁。<b>这些必须给全。</b></p>
+<p>做法：不排步骤，让他自己排；做完之后先问「你觉得哪一步最险」。</p>
+<p>停手线：他卡在同一处超过约定时限，或开始怀疑自己能不能干这份工作。</p>
+<h2 id="s10"><span class="no">10</span>硬条款一：不许把不做功课说成撤回</h2>
+<blockquote><b>骨架是你的活。</b></blockquote>
+<blockquote>撤回只撤服务，不撤材料。你把材料备得越密，撤回才越站得住。</blockquote>
+<blockquote>自检一句：<b>如果他现在要求你把整条路完整讲一遍，你讲得出吗？</b></blockquote>
+<blockquote>讲得出 → 你在撤回。</blockquote>
+<blockquote>讲不出 → 你只是没准备好。<b>这时候正确的动作是回去准备，不是继续保持深奥。</b></blockquote>
+<h2 id="s11"><span class="no">11</span>硬条款二：撤回必须经同意，且要有退出口</h2>
+<blockquote>母文把这一条写成了机制的必要条件，不是礼貌问题：<b>没有同意的撤回是欺凌。</b></blockquote>
+<p>三条具体做法：</p>
+<ul class="pts"><li><b>说清楚你在做什么。</b> 「这一段我先不讲，你自己试十五分钟，卡住了叫我」——一句话，就把不确定变成了一场有边界的尝试。</li><li><b>给退出口。</b> 定一个时限或一个暗号，到了就给答案。</li><li><b>不在赶工时做。</b> 期限压顶、他在替你担责任的时候，他缺的不是成长，是把事做完。</li></ul>
+<h2 id="s12"><span class="no">12</span>硬条款三：这些地方不撤回</h2>
+<blockquote><b>安全操作、应急处置、医疗用药、法律合规、财务与合同、一切涉及他人人身与财产的规程——把话说满是义务。</b></blockquote>
+<blockquote>判据：<b>他猜错了，代价谁付？</b> 代价落在他身上、落在第三方身上、或者不可逆，就说到不可能被误解为止。</blockquote>
+<p>「让他自己想一想印象更深」在这里不成立。<b>印象深不值一次事故。</b></p>
+<h2 id="s13"><span class="no">13</span>硬条款四：不许拿它给写得难懂背书</h2>
+<blockquote>「读者需要自己去开垦」不能用来解释你写得混乱、讲得跳跃、材料给得残缺。</blockquote>
+<blockquote>区分很硬：<b>混乱是骨架塌了，撤回是骨架完好而服务停了。</b> 前者别人对不上标注，后者别人各自站得住。骨架三检的第一检就是专门用来打这个的。</blockquote>
+<h2 id="s14"><span class="no">14</span>开荒失败的三种收场</h2>
+<p>失败是常态，处置比预防更要紧。</p>
+<p><b>收场一：茫然。</b> 他完全无处下手，说不出任何假设。</p>
+<p>诊断：骨架不够，或库存不够。</p>
+<p>处置：<b>补材料，不补结论。</b> 加一个事实、一个反例、一段背景——加料不加线。</p>
+<p><b>收场二：挫败转成自责。</b> 从「这事真难」变成「我是不是不行」。</p>
+<p>处置：<b>立刻停止，把话说满</b>，并且明确告诉他这一段本来就是被我拿掉的，不是他的问题。这一条没有商量余地。</p>
+<p><b>收场三：他把结论要走了。</b> 「你直接说吧」。</p>
+<p>处置：给。给之前可以再问一句「你现在到哪一步了」，问完还是要给。<b>明确要求就是退出信号。</b></p>
+<h2 id="s15"><span class="no">15</span>两道验收</h2>
+<p>母文给了两条可编码的判据，比「他学会了吗」精确得多。</p>
+<p><b>一、留痕：他能不能复述自己走过的那条路？</b></p>
+<p>能说出「我先看了这个，觉得不对，又回头看那个」——路径在。</p>
+<p>只能给出结论——那多半是他从别处拿来的，或者你其实指了路。</p>
+<p><b>二、归属：他把这份理解归给谁？</b></p>
+<p>母文这一条极硬：<b>凡归给作品的，都不是强制开荒。</b></p>
+<p>落到日常就是：他说「你讲得真好」，和他说「我后来自己想明白了一件事」，是两个完全不同的结果。<b>前一句听着舒服，后一句才是你要的。</b></p>
+<h2 id="s16"><span class="no">16</span>这套方法什么时候不成立</h2>
+<ul class="pts"><li><b>对方的库存不够。</b> 这件事要用的经验他身上没有，撤回只会剩下茫然。<b>先补经验，再谈撤回。</b></li><li><b>他要的是结果，不是经历。</b> 他只想把事办完。<b>这时候把答案给他是尊重。</b></li><li><b>关系里没有慢的余地。</b> 没有信任、没有时间、他还要向别人交代——撤回会被理解成刁难。</li><li><b>母文自己给的那条。</b> 在库存相当的人当中，如果「服务被撤而骨架保留」的做法，并不比「服务完整」的做法更多地带来那份自我确证，那么这条机制在现有条件下就已经被削弱了。</li></ul>
+<h2 id="s17"><span class="no">17</span>一页纸操作卡</h2>
+<ul class="pts"><li><b>主尺</b>：最后一段由谁完成。不量难度，不量长度。</li><li><b>四问</b>：撤哪一路服务／骨架还在吗／他库存够吗／他同意吗。</li><li><b>四种服务</b>：再现／组织／解决／指令。先撤你最擅长提供的那一种。</li><li><b>骨架三检</b>：别人标不标得一致／路径落不落在中间带／弱化骨架会不会塌。</li><li><b>难≠撤回</b>：铺陡是我在使劲，留下才是他在使劲。</li><li><b>反直觉验收</b>：答案高度一致＝没撤回；彼此不同但同向＝成了；毫无交集＝废墟。</li><li><b>加料不加线</b>：卡住时补材料，不补结论。</li><li><b>四条硬条款</b>：骨架是你的活／必须经同意并给退出口／安全规程不撤回／不许给写得难懂背书。</li><li><b>两道验收</b>：他复述得出自己的路径吗／他把这份理解归给谁。</li></ul>
+<h2 id="s18"><span class="no">18</span>最后一条纪律</h2>
+<p>如果这一整篇你只带走一句，带走这一句：</p>
+<p><b>你能替他走完，正说明那条路是你的。</b></p>
+<p>这句话同时挡住两个方向。往一边，它挡住了代劳的惯性——<b>你越熟练，就越容易顺手把最后一段也走掉</b>，而那一段恰恰是唯一会留在他身上的部分。往另一边，它挡住了滥用：<b>如果那件事的价值本来就在结果上，就痛痛快快地把结果给他</b>，别拿别人的事去成全自己的教学法。</p>
+<p>分辨的方法母文早写好了：<b>看那件事的产物能不能和过程分开。</b> 能分开的，替他做完是帮忙；不能分开的，替他做完就是取消。</p>
+<p>本篇讨论的是教学、协作与创作方法，不涉及也不构成任何安全、医疗或法律建议；凡涉他人风险的场合，以第十一节硬条款三为准。</p>
+  <div class="endbox"><div class="et">一篇理论，三种读法</div>
+    <p>先读<a href="/students/qin-li/forced-reclamation/">理论母文</a>，再用另一篇配套读物换一个角度：<a href="explain.html">被人送了十次，你还是不认得那条路</a>。</p>
+    <p style="font-size:14px;color:#6B6357;margin:0">本篇由 SDE 编辑部撰写，只负责把母文的判断讲明白或落到地上，不替代原文，也不代表原作者的措辞。读完建议回到母文核对：哪些来自秦莉，哪些属于解释与应用层的展开。</p>
+  </div>
+</article>
+
+<footer><div class="wrap">© 德麦国际 Demai International · SDE Universes · 学员专栏配套读物　·　<a href="/students/qin-li/works/">秦莉 · 全部作品</a></div></footer>
+</div>
+</body>
+</html>

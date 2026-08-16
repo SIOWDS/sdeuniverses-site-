@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>门上挂着「欢迎」，可是门锁着 · 白话解释文 | SDE Universes</title>
+<meta name="description" content="一个东西从「被允许存在」走到「被真正需要」，中间不是一条平滑的坡，而是六道依次串联的门。母文最硬的一条判断是：判断一道门开没开，别去看文件里写了什么，去看某个具体的操作行为有没有发生——病历系统上没上线那个字段，基金指南里有没有改那一条。这一篇用挂着欢迎牌子的锁门、门禁卡上没有的那一栏、「已经纳入规划，我们在等证据」这件合法外衣，讲清六道门分别是什么、每道门的刹车长什么样、以及为什么「表面已整合」的僵持态比干脆被拒绝更难破。">
+<meta name="author" content="SDE Universes">
+<meta property="og:type" content="article">
+<meta property="og:title" content="门上挂着「欢迎」，可是门锁着 · 白话解释文">
+<meta property="og:description" content="一个东西从「被允许存在」走到「被真正需要」，中间不是一条平滑的坡，而是六道依次串联的门。母文最硬的一条判断是：判断一道门开没开，别去看文件里写了什么，去看某个具体的操作行为有没有发生——病历系统上没上线那个字段，基金指南里有没有改那一条。这一篇用挂着欢迎牌子的锁门、门禁卡上没有的那一栏、「已经纳入规划，我们在等证据」这件合法外衣，讲清六道门分别是什么、每道门的刹车长什么样、以及为什么「表面已整合」的僵持态比干脆被拒绝更难破。">
+<link rel="canonical" href="https://sdeuniverses.com/students/qin-li/six-gates/explain.html">
+<style>
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:#FBF8F1;color:#2B2620;
+ font-family:"Noto Serif SC","Songti SC","Source Han Serif SC",Georgia,serif;
+ font-size:17px;line-height:1.95;letter-spacing:.01em}
+.wrap{max-width:760px;margin:0 auto;padding:0 22px}
+nav.cnav{background:#2B2620;color:#EDE4CF;position:sticky;top:0;z-index:30;
+ font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif}
+nav.cnav .wrap{display:flex;align-items:center;justify-content:space-between;gap:14px;height:50px}
+nav.cnav a{color:#EDE4CF;text-decoration:none;font-size:14px}
+nav.cnav .cnav-logo{font-weight:700;letter-spacing:.06em}
+nav.cnav .cnav-back{opacity:.82}
+nav.cnav .cnav-back:hover{opacity:1}
+header.art{background:linear-gradient(180deg,#FFFDF8 0%,#F5EFE2 100%);
+ border-bottom:1px solid rgba(43,38,32,.10);padding:44px 0 34px}
+.art-eyebrow{font-size:12.5px;letter-spacing:.16em;color:#A8813C;font-weight:700;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;margin-bottom:16px}
+h1.art-title{font-size:33px;line-height:1.4;margin:0 0 14px;font-weight:800}
+.art-subtitle{font-size:17px;color:#5C5346;line-height:1.7;margin-bottom:16px}
+.art-meta{font-size:13px;color:#8A8071;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif}
+.swap{display:flex;flex-wrap:wrap;gap:10px;margin:22px auto 0}
+.swap a{flex:1 1 240px;display:block;text-decoration:none;padding:12px 15px;border-radius:9px;
+ border:1px solid rgba(43,38,32,.16);background:#fff;color:#2B2620;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;font-size:14px;line-height:1.6}
+.swap a b{display:block;font-size:14.5px;margin-bottom:2px}
+.swap a span{color:#8A8071;font-size:12.5px}
+.swap a:hover{border-color:#A8813C;box-shadow:0 2px 10px rgba(43,38,32,.07)}
+article{padding:30px 0 10px}
+.abs{background:#FAF4E6;border-left:4px solid #A8813C;border-radius:0 8px 8px 0;
+ padding:18px 20px;margin:0 0 26px;font-size:15.5px;line-height:1.85;color:#4A4238}
+.abs b{color:#8A6817}
+.toc{border:1px solid rgba(43,38,32,.13);border-radius:9px;padding:16px 20px;margin:0 0 34px;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;font-size:14.5px;background:#FFFDF8}
+.toc .tl{font-size:12.5px;letter-spacing:.14em;color:#A8813C;font-weight:700;margin-bottom:10px}
+.toc ol{margin:0;padding-left:20px;color:#5C5346}
+.toc li{margin:5px 0}
+.toc a{color:#4A4238;text-decoration:none}
+.toc a:hover{color:#A8813C;text-decoration:underline}
+h2{font-size:22px;line-height:1.5;margin:44px 0 16px;padding-top:8px;font-weight:800;
+ border-top:1px solid rgba(43,38,32,.10)}
+h2 .no{display:inline-block;min-width:1.9em;color:#A8813C;font-size:16px;font-weight:700;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif}
+p{margin:0 0 17px;text-align:justify}
+p b,li b{color:#8A6817}
+ul.pts{margin:0 0 18px;padding-left:0;list-style:none}
+ul.pts li{position:relative;padding-left:20px;margin:0 0 10px;text-align:justify}
+ul.pts li:before{content:"—";position:absolute;left:0;color:#A8813C}
+blockquote{margin:0 0 20px;padding:14px 18px;background:#FFFDF8;
+ border-left:3px solid rgba(43,38,32,.22);color:#4A4238;font-size:16px}
+.endbox{margin:48px 0 10px;padding:22px;border-radius:10px;background:#FAF4E6;
+ border:1px solid rgba(43,38,32,.12)}
+.endbox .et{font-size:12.5px;letter-spacing:.14em;color:#A8813C;font-weight:700;
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;margin-bottom:12px}
+.endbox a{color:#8A6817}
+footer{margin-top:46px;padding:26px 0 40px;border-top:1px solid rgba(43,38,32,.12);
+ font-family:system-ui,-apple-system,"PingFang SC",sans-serif;font-size:13px;color:#8A8071}
+footer a{color:#8A8071}
+@media(max-width:640px){body{font-size:16px}h1.art-title{font-size:26px}h2{font-size:19.5px}}
+</style>
+</head>
+<body>
+<nav class="cnav"><div class="wrap">
+  <a class="cnav-logo" href="/browse/">SDE Universes</a>
+  <a class="cnav-back" href="/students/qin-li/six-gates/">← 回母文《功能评估的阶梯：新加坡中医药制度演化的六重门径》</a>
+</div></nav>
+
+<header class="art"><div class="wrap">
+  <div class="art-eyebrow">配套读物 · 白话解释文 · 母文《功能评估的阶梯：新加坡中医药制度演化的六重门径》</div>
+  <h1 class="art-title">门上挂着「欢迎」，可是门锁着</h1>
+  <div class="art-subtitle">母文说的「六重闸门」，用一句家常话讲就是：一件事被卡住，往往不是被谁挡在门外，而是前面有六道门，每一道都挂着欢迎的牌子，每一道都有一把不同的锁——而钥匙在不同的人手里。</div>
+  <div class="art-meta">SDE 学员专栏 · 配套读物 · 2026年8月 · 约 3583 字</div>
+  <div class="swap">
+    <a href="/students/qin-li/six-gates/"><b>← 母文 · 功能评估的阶梯：新加坡中医药制度演化的六重门径</b><span>完整论证在这里</span></a>
+    <a href="practice.html"><b>🛠 找那个字段：六道门的进度表与解锁工具设计法</b><span>把母文的判断落成你自己的六道门进度表、解锁工具设计四条与三条反滥用硬条款</span></a>
+  </div>
+</div></header>
+
+<div class="wrap"><article>
+  <div class="abs"><b>这一篇是什么　</b>一个东西从「被允许存在」走到「被真正需要」，中间不是一条平滑的坡，而是六道依次串联的门。母文最硬的一条判断是：判断一道门开没开，别去看文件里写了什么，去看某个具体的操作行为有没有发生——病历系统上没上线那个字段，基金指南里有没有改那一条。这一篇用挂着欢迎牌子的锁门、门禁卡上没有的那一栏、「已经纳入规划，我们在等证据」这件合法外衣，讲清六道门分别是什么、每道门的刹车长什么样、以及为什么「表面已整合」的僵持态比干脆被拒绝更难破。</div>
+  <div class="toc"><div class="tl">目 录</div><ol><li><a href="#s01">门上挂着「欢迎」，可是门锁着</a></li><li><a href="#s02">判据不是文件，是那个字段</a></li><li><a href="#s03">六道门</a></li><li><a href="#s04">每一道门都有自己的刹车</a></li><li><a href="#s05">为什么「已经在推进」比「不行」更难破</a></li><li><a href="#s06">解锁工具：不砸门，去改另一个条件</a></li><li><a href="#s07">三重推力：谁在把门往开里推</a></li><li><a href="#s08">前三道靠外力，后三道自己走</a></li><li><a href="#s09">为什么第一道门必须由门里的人推开</a></li><li><a href="#s10">门会回写，也会退回</a></li><li><a href="#s11">母文自己划的边界</a></li><li><a href="#s12">三个冒牌货</a></li><li><a href="#s13">不只是医疗制度</a></li><li><a href="#s14">收尾：去找那个字段</a></li></ol></div>
+<h2 id="s01"><span class="no">01</span>门上挂着「欢迎」，可是门锁着</h2>
+<p>你去一栋楼里办事。大堂的公告栏写着：<b>欢迎各方参与。</b></p>
+<p>你往里走，第一道门是玻璃的，看得见里面的人，推不开——需要刷卡。你去问，前台说：当然欢迎你进，只是你的卡上没有这一栏权限。</p>
+<p>你想办卡，被告知这一栏权限要另一个部门开。那个部门说：我们支持你进，只是目前还没有为这类情况设过这一栏。</p>
+<p><b>没有人拒绝过你。</b> 每一个人都是好意的，每一句话都合理。你就是进不去。</p>
+<p>母文写的正是这件事。它谈的是新加坡中医药怎样从「被允许存在的辅助养生」走向「被结构需要的功能评估组件」，但它拆出来的结构不挑领域：<b>一件事从边缘走到核心，中间是六道串联的门，每一道门都有自己的锁。</b></p>
+<h2 id="s02"><span class="no">02</span>判据不是文件，是那个字段</h2>
+<p>这是母文最有用的一句话，可以直接拿走。</p>
+<p>它说：判断一道门开没开，<b>不要去看它出现在哪份白皮书的哪一条</b>，要去看<b>一个具体的、外部可以观察到的操作行为有没有发生</b>。</p>
+<p>它举的例子极其具体：判断「这套评估有没有进入临床决策」，判据不是文件里写没写「鼓励整合」，而是——<b>电子病历系统里，那个字段上线了没有。</b></p>
+<p>这句话可以被翻译成一条通用的问法：</p>
+<blockquote><b>不向文件要证据，向流程要证据。</b></blockquote>
+<p>「我们很重视」是一句话；<b>排班表上多出来的一行</b>才是事实。「已经纳入规划」是一句话；<b>申请表上必填栏的改动</b>才是事实。</p>
+<h2 id="s03"><span class="no">03</span>六道门</h2>
+<p>母文把这条路拆成六段，每一段的开启判据都被钉成了一个具体动作：</p>
+<table style="width:100%;border-collapse:collapse;margin:0 0 20px;font-size:15px"><tr><th style="text-align:left;border-bottom:2px solid rgba(43,38,32,.25);padding:8px 10px;color:#8A6817">门</th><th style="text-align:left;border-bottom:2px solid rgba(43,38,32,.25);padding:8px 10px;color:#8A6817">要过的是什么</th><th style="text-align:left;border-bottom:2px solid rgba(43,38,32,.25);padding:8px 10px;color:#8A6817">开启判据（一个具体动作）</th></tr><tr><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">一</td><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">承认现有工具在某类情况下有结构性盲区</td><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">试点结果被写进机构自己的质量改进报告</td></tr><tr><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">二</td><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">证明新信息确实带来了额外的预测价值</td><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">基金申请指南的条款被改了</td></tr><tr><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">三</td><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">让这套评估进入日常操作</td><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">病历系统的协同决策字段上线</td></tr><tr><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">四</td><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">让人才有地方被培养、有岗位可去</td><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">培训里正式设立相应的轮转</td></tr><tr><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">五</td><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">让这份判断具有法律上的分量</td><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">试点内部规定写入「协同建议必须记录」</td></tr><tr><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">六</td><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">让这类知识进入证据体系本身</td><td style="border-bottom:1px solid rgba(43,38,32,.12);padding:8px 10px;vertical-align:top">一定数量的实证数据被正式提交为证据通道论证材料</td></tr></table>
+<p>六道门是<b>串联</b>的：前一道不开，后一道根本不会被激活。</p>
+<h2 id="s04"><span class="no">04</span>每一道门都有自己的刹车</h2>
+<p>母文最见功力的地方，是它给每道门都点了名——那个让门看起来开着、实际锁着的东西：</p>
+<ul class="pts"><li><b>第一道的刹车：「这个问题很复杂，需要更多研究。」</b> 这句话在形式上承认了问题，在操作上把它推进了一个没有期限的规划里。<b>它是所有刹车里最漂亮的一个，因为它听起来完全站在你这边。</b></li><li><b>第二道的刹车：声誉风险。</b> 没有哪个机构愿意为一件「还需要被证明」的事承担出事的风险。</li><li><b>第三道的刹车：地盘。</b> 信息主权是各专科自己的领土，谁也不愿意在自己的表格里给别人开一栏。</li><li><b>第四道的刹车：一个自我锁定的联盟。</b> 老师、学生、考试主管三方互相扶着——考试不考，学生不学；学生不学，老师不教；没人教，考试更不敢考。</li><li><b>第五道的刹车：权限模糊。</b> 一旦权责说不清，法律系统会自动把这份判断降格成「仅供参考」。</li><li><b>第六道的刹车：认知真空。</b> 现行的证据等级体系里，压根没有一格是留给这类知识的。</li></ul>
+<p>六个刹车没有一个是恶意的。<b>它们全都是各自岗位上的理性行为</b>——这正是它们难对付的原因。</p>
+<h2 id="s05"><span class="no">05</span>为什么「已经在推进」比「不行」更难破</h2>
+<p>母文提出了一个我认为极重要的判断：如果前三道门里有两道过不去，事情不会退回原点，而会掉进一个更难的地方。</p>
+<p>它管这个叫<b>僵持态</b>：<b>公开话语上已经把你纳入了，操作层的规则一条没改。</b></p>
+<p>它比干脆被拒绝更难破，理由只有一句，但很致命：</p>
+<blockquote><b>它已经拥有了「我们正在推进」的合法外衣。</b></blockquote>
+<p>于是任何想撬开下一道门的努力，都会被同一句话挡回去：<b>这一项已经纳入规划了，我们在等证据。</b></p>
+<p>你没法反驳这句话。它不是拒绝，它甚至是承诺。<b>但它可以被无限期地重复。</b></p>
+<h2 id="s06"><span class="no">06</span>解锁工具：不砸门，去改另一个条件</h2>
+<p>母文最实用的一个概念是<b>解锁工具</b>，它的定义很讲究：</p>
+<p><b>它不在认识论层面论证「我为什么应该被承认」，而是在操作层面改一个与你间接相关的条件，使得原先按着门的那些人——即便完全不改变立场——也没法再把门按住。</b></p>
+<p>它的共同逻辑被总结成一句话，值得记住：</p>
+<blockquote><b>把自己从「需要被给予承认的受惠者」位置上，挪到「另一个已经成立的需求所需要的技术提供者」位置上。</b></blockquote>
+<p>母文举的例子很能说明问题：不要求医学院在观念上接受你那套东西，而是<b>要求申请某类研究基金的项目组，必须在方案里纳入至少一种功能失稳的评估工具。</b></p>
+<p>这个要求<b>一个字也没给你正名</b>。它只是把你的工具变成了别人申请经费时绕不过去的一个必填项。</p>
+<p>三个特征值得单独点出来：</p>
+<ul class="pts"><li><b>它不要求任何人改变看法。</b></li><li><b>它挂在一个已经成立的需求上</b>，而不是挂在你的诉求上。</li><li><b>它改的是一个操作条件</b>——一张表的必填栏、一个准入条件——而不是一句评价。</li></ul>
+<h2 id="s07"><span class="no">07</span>三重推力：谁在把门往开里推</h2>
+<p>光看锁是不够的，还得知道推力从哪来。母文点了三种，而且它们在不同阶段的分量不一样。</p>
+<p><b>第一重：真实的麻烦在反复暴露。</b> 母文说得很准——<b>裂缝不是门外的人论证出来的，是门里的人在自己手上的活里反复撞到的。</b> 每一次一个复杂个案在现有办法里绕了一圈又回到原点，那堵墙就被自己人再撞一次。<b>这是第一道门唯一真正的推力</b>，它不来自你。</p>
+<p><b>第二重：新东西确实多带来了信息。</b> 门槛在这里从「你有没有道理」换成了一个更冷的问题：<b>加上你这套之后，判断有没有变得更准？</b> 母文特意点明，这一步的关键不是「我这套有没有用」，而是「和原来那套相比，多出来的那部分值不值」。</p>
+<p><b>第三重：制度自己的惯性。</b> 一旦前面两道开了，后面就不必再从零论证——它已经有了一条现成的依据可以引。</p>
+<p>这三重推力有一个共同点，值得单独记住：<b>没有一重是「说服」。</b> 第一重是麻烦，第二重是数据，第三重是惯性。<b>说服在这张单子上根本没有出现过。</b></p>
+<h2 id="s08"><span class="no">08</span>前三道靠外力，后三道自己走</h2>
+<p>母文还发现了一条很有意思的规律，它把这条路分成了两半。</p>
+<p><b>前三道门必须被外力撬开。</b> 需要有人反复暴露那个盲区，需要有人拿出实证，需要有人去改那张表。</p>
+<p><b>后三道门会自己加速。</b> 因为前面几道门一开，就长出了制度接口：</p>
+<ul class="pts"><li>第三道一开，医院里就有了岗位——<b>于是第四道门（教育）不再需要说服任何老师</b>，它只需要变成申请那些岗位的准入条件，学生自然会去修。</li><li>第四道一开，就有了足够的实践基础——<b>第五道门（法律）才可能被摆上议程</b>，因为在此之前根本没有事实可供修法。</li></ul>
+<p>母文管这个叫<b>制度惯性接力</b>：前三道靠人推，后三道靠前门造出来的接口自己走。</p>
+<p>这条规律的实用含义很直接：<b>力气要集中花在前三道门上。</b> 在第五道门上早早发力，多半是白费——因为它的前提还没长出来。</p>
+<h2 id="s09"><span class="no">09</span>为什么第一道门必须由门里的人推开</h2>
+<p>这一条是母文整套结构里最容易被忽略、也最能省人力气的一条。</p>
+<p>第一道门的开启判据是什么？<b>试点结果被写进机构自己的质量改进报告。</b></p>
+<p>注意那个「自己的」。不是你写的报告，不是外部的评估，是<b>他们内部用来管自己的那份材料</b>。</p>
+<p>为什么必须是这一份？因为这份材料是他们承认问题时用的语言。一件事只要进了这份材料，它就从「有人在外面说我们有问题」变成了「我们自己记下了一处不足」——<b>性质完全变了，而且从此不需要你在场也会继续存在。</b></p>
+<p>这也解释了一件常见的事：为什么一份由外部做的、数据更漂亮的报告，往往一点用也没有，而内部一句轻描淡写的「本季度这类个案的处理仍不理想」，反而能撬动后面一长串动作。</p>
+<p><b>前者是别人的意见，后者是他自己的账。</b></p>
+<p>所以在第一道门前，最有效的动作不是把你的证据做得更硬，而是：<b>帮他把他自己那本账记清楚。</b></p>
+<h2 id="s10"><span class="no">10</span>门会回写，也会退回</h2>
+<p>这一点母文说得很克制，但很重要。</p>
+<p>六道门不是一次开完就锁死在「开」的位置上的：<b>后一道门被耽搁太久，已经打开的前一道门也可能被重新拉回。</b></p>
+<p>原因不难理解：一道门开着而后面无路可走，它就变成了一个没有用处的开口；没有用处的开口，迟早会被以「资源优化」的名义关掉。</p>
+<p>所以<b>节奏本身是一个变量</b>：开得太早而后面接不上，和根本没开，最后可能是同一个结果。</p>
+<h2 id="s11"><span class="no">11</span>母文自己划的边界</h2>
+<p>这一节值得敬重——它主动写下了自己不适用的地方。</p>
+<p>母文说，这套六道门的结构要成立，需要三个前提，缺一就别用：</p>
+<ul class="pts"><li><b>得有一个至少在公开文本层面宣称支持的方向。</b> 如果对方从根本上彻底排斥，第一道门连外部合法性都没有，整条链根本不会启动。</li><li><b>得至少有一个愿意合作的接口。</b> 这不是意愿问题，是接口问题——<b>没有那个能插进去的行政通道，你的解锁工具找不到插孔。</b></li><li><b>得有人能进去。</b> 门开了却没有合格的人可以走进来，会出现「裂口开了却是空门」的局面。</li></ul>
+<p>第三条是最容易被忽略的一条：<b>门开的那一刻你手上有没有人，决定了这道门是变成通道还是变成一个笑话。</b></p>
+<h2 id="s12"><span class="no">12</span>三个冒牌货</h2>
+<ul class="pts"><li><b>成立了一个小组。</b> 有名字、有名单、有第一次会议纪要——但没有任何一张表因此改过一个字。</li><li><b>写进了规划。</b> 这是僵持态最常见的形态，而且它自带一句挡箭牌：我们在等证据。</li><li><b>开了一个试点，但流程一条没改。</b> 母文的判据在这里最锋利：<b>试点结果有没有被写进机构自己的质量改进报告？</b> 没有写进去的试点，等于没发生过——它是一个平行世界里的事。</li></ul>
+<h2 id="s13"><span class="no">13</span>不只是医疗制度</h2>
+<ul class="pts"><li><b>公司里推一个新做法。</b> 领导说「挺好的，你们先试试」——这是第一道门的口头版。真正的第一道门是：<b>这次试的结果，有没有进季度复盘的正式材料。</b></li><li><b>学校里开一门课。</b> 开设了，但不排进课表、不算学分、不进考核——那就是三道门全锁着。</li><li><b>家里的一件事。</b> 「以后这事你来定」是一句话；<b>真正的门是那张日程表和那个账户权限。</b></li></ul>
+<p>三个例子的共同点：<b>判据全都不在那句话里，在那张表里。</b></p>
+<h2 id="s14"><span class="no">14</span>收尾：去找那个字段</h2>
+<p>回到那栋楼。</p>
+<p>你可以站在大堂里，一遍遍论证自己有资格进去——那是在第一道门前和守门人辩论，而守门人本来就没说过你不该进。</p>
+<p>也可以换一件事做：去弄清楚你的卡上缺的是哪一栏，那一栏由谁设，以及<b>有没有一个别的理由，能让那个人在不改变对你任何看法的前提下，顺手把它加上。</b></p>
+<p>母文全篇的力气，就花在这句话上：</p>
+<blockquote><b>破解僵持的关键，不在于继续论证「我为什么应该被承认」，而在于为每一道门找到一件不直接挑战守门人、却能在他的权力空间之外改掉一个关键操作条件的工具。</b></blockquote>
+<p>不必砸门。<b>去找那个字段。</b></p>
+<hr style="border:0;border-top:1px solid rgba(43,38,32,.14);margin:38px 0 26px">
+<p><b>四句话版本</b></p>
+<ul class="pts"><li>不向文件要证据，向流程要证据——判据是那个字段有没有上线。</li><li>六道门串联：前一道不开，后一道根本不会被激活。</li><li>「已经纳入规划，我们在等证据」是最难破的一句话，因为它不是拒绝。</li><li>解锁工具的秘诀：不要求任何人改变看法，只改一个别的操作条件。</li></ul>
+  <div class="endbox"><div class="et">一篇理论，三种读法</div>
+    <p>先读<a href="/students/qin-li/six-gates/">理论母文</a>，再用另一篇配套读物换一个角度：<a href="practice.html">找那个字段：六道门的进度表与解锁工具设计法</a>。</p>
+    <p style="font-size:14px;color:#6B6357;margin:0">本篇由 SDE 编辑部撰写，只负责把母文的判断讲明白或落到地上，不替代原文，也不代表原作者的措辞。读完建议回到母文核对：哪些来自秦莉，哪些属于解释与应用层的展开。</p>
+  </div>
+</article>
+
+<footer><div class="wrap">© 德麦国际 Demai International · SDE Universes · 学员专栏配套读物　·　<a href="/students/qin-li/works/">秦莉 · 全部作品</a></div></footer>
+</div>
+</body>
+</html>
