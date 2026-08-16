@@ -111,10 +111,15 @@ h = open(p, encoding='utf-8').read()
 MARK = '<!-- THREE-READS -->'
 if MARK not in h:
     bar = (MARK + '<div class="note" style="margin-top:18px;border-top:1px solid var(--line);'
-           'padding-top:16px"><b>三读</b>：'
-           f'<a href="/books/m/{NO}/text/">① 理论正本</a> · '
-           f'<a href="/books/m/{NO}/explain.html">② 诠释文《你按了铃，灯亮了，可是没人来》</a>（白话，零术语，约 5,600 字） · '
-           f'<a href="/books/m/{NO}/practice.html">③ 实用文《取两个数，再留一处必须自己付款的地方》</a>（诊断与处置流程，约 5,300 字）</div>')
+           'padding-top:16px"><b>配套读物 · 每篇三读</b>（长文 / 在线翻页 / 下载 PDF）：<br>'
+           f'② 诠释文《你按了铃，灯亮了，可是没人来》约 5,600 字 —— '
+           f'<a href="/books/m/{NO}/explain.html">长文</a> · '
+           f'<a href="/books/m/{NO}/explain-read.html">在线翻页</a> · '
+           f'<a href="/books/m/{NO}/yue-shunli-explain.pdf">下载 PDF</a><br>'
+           f'③ 实用文《取两个数，再留一处必须自己付款的地方》约 5,300 字 —— '
+           f'<a href="/books/m/{NO}/practice.html">长文</a> · '
+           f'<a href="/books/m/{NO}/practice-read.html">在线翻页</a> · '
+           f'<a href="/books/m/{NO}/yue-shunli-practice.pdf">下载 PDF</a></div>')
     anchor = '<div class="note">十一位作者互不相识'
     assert anchor in h
     h = h.replace(anchor, bar + anchor, 1)
@@ -130,7 +135,8 @@ if MARK not in h2:
     bar2 = (MARK + '<div style="border:1px solid var(--line);padding:13px 16px;margin:0 0 22px;'
             'font-size:14px;line-height:1.9">三读：本页是 <b>① 理论正本</b> · '
             f'<a href="/books/m/{NO}/explain.html">② 诠释文（白话）</a> · '
-            f'<a href="/books/m/{NO}/practice.html">③ 实用文（方法流程）</a></div>')
+            f'<a href="/books/m/{NO}/practice.html">③ 实用文（方法流程）</a>'
+            '　｜　两篇配套读物各有三读：长文 / 在线翻页 / 下载 PDF</div>')
     anchor2 = '<div class="toc">'
     assert anchor2 in h2
     h2 = h2.replace(anchor2, bar2 + anchor2, 1)
