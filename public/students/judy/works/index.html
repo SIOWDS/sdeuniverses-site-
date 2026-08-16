@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="sde-page-kind" content="channel">
+<title>Judy · 作品 | 学员专栏 · SDE Universes</title>
+<meta name="description" content="Judy · 音乐发生学九论：何谓音乐五篇、音乐是如何发生的三篇、音乐对生命的创造性一篇；二十七门与音乐学零交集的外源学科，篇篇预注册真跑、诚实账表与写死日期的赌注。">
+<style>
+:root{--gold:#C9A84C;--gold2:#D4B25E;--ink:#F0E9D8;--ink2:#B8AE96;--bg:#0D0B09;--panel:#171310;--panel2:#1D1811;--line:rgba(201,168,76,0.22);--accent:#8C6A2E}
+*{margin:0;padding:0;box-sizing:border-box}
+::selection{background:rgba(201,168,76,0.35)}
+body{background:var(--bg);color:var(--ink);font-family:"Noto Serif SC",Georgia,"Songti SC",serif;line-height:1.9}
+body.zh .en-only{display:none!important}
+body.en .zh-only{display:none!important}
+a{text-decoration:none}
+nav{position:sticky;top:0;z-index:20;background:rgba(13,11,9,0.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+nav .w{max-width:900px;margin:0 auto;padding:13px 24px;display:flex;justify-content:space-between;align-items:center}
+nav a{color:var(--gold);font-size:14px;letter-spacing:0.05em}
+.nav-right{display:flex;align-items:center;gap:16px}
+.lang-toggle{display:flex;border:1px solid var(--line);border-radius:20px;overflow:hidden}
+.lang-btn{background:transparent;border:none;color:var(--ink2);font-family:inherit;font-size:13px;padding:5px 13px;cursor:pointer;letter-spacing:0.05em}
+.lang-btn.active{background:var(--gold);color:#1A1410;font-weight:700}
+.level-tag{max-width:840px;margin:0 auto;padding:0 24px;display:flex;align-items:center;gap:14px}
+.level-tag .n{font-size:12px;letter-spacing:0.2em;color:#1A1410;background:var(--gold);border-radius:20px;padding:3px 12px;font-weight:700}
+.level-tag .t{font-size:12px;letter-spacing:0.32em;color:var(--gold)}
+.level-tag .line{flex:1;height:1px;background:var(--line)}
+.sec{max-width:840px;margin:0 auto;padding:20px 24px 0}
+.sec p.lead{font-size:15.5px;color:var(--ink2);line-height:2.0;text-align:justify;margin-top:16px}
+footer{border-top:1px solid var(--line);margin-top:44px;padding:32px 24px;text-align:center;color:#6B6250;font-size:13px}
+footer a{color:var(--gold)}
+.stats{max-width:840px;margin:26px auto 0;padding:0 24px;display:grid;grid-template-columns:repeat(auto-fit,minmax(126px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.stat{background:var(--panel);padding:18px 12px;text-align:center}
+.stat .v{font-family:Georgia,serif;font-size:25px;font-weight:800;color:var(--gold2);letter-spacing:.02em}
+.stat .k{font-size:11px;letter-spacing:.18em;color:#8A7B55;margin-top:7px}
+@media(max-width:640px){.stats{margin-left:24px;margin-right:24px;padding:0}}
+.grp{max-width:840px;margin:0 auto;padding:34px 24px 0}
+.grp-h{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:12px}
+.grp-h h2{font-size:23px;font-weight:800;color:#F5EFE0;letter-spacing:.05em}
+.grp-h .en{font-size:11px;letter-spacing:.3em;color:var(--accent)}
+.grp-h .cnt{margin-left:auto;font-size:12px;color:#8A7B55;letter-spacing:.1em}
+.grp .note{font-size:14.5px;color:var(--ink2);line-height:1.95;margin-top:14px;text-align:justify}
+.work{background:linear-gradient(160deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:14px;padding:25px 26px 21px;margin-top:18px;transition:border-color .18s,transform .18s}
+.work:hover{border-color:rgba(201,168,76,0.55)}
+.work .top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.work .chip{font-size:11px;letter-spacing:0.18em;color:var(--gold);border:1px solid rgba(201,168,76,0.5);border-radius:20px;padding:3px 12px}
+.work .iq{font-size:11.5px;letter-spacing:0.1em;color:#1A1410;background:var(--gold2);border-radius:20px;padding:3px 11px;font-weight:700}
+.work h3{font-size:20.5px;font-weight:800;color:#F5EFE0;line-height:1.5;margin-bottom:8px}
+.work .sub{font-size:14px;color:var(--gold2);line-height:1.8;margin-bottom:13px}
+.work .hook{font-size:14.5px;color:var(--ink2);line-height:1.95;margin-bottom:15px;text-align:justify}
+.work .src{font-size:12.5px;color:#8A7B55;line-height:1.85;border-left:2px solid rgba(201,168,76,.35);padding-left:12px;margin-bottom:16px}
+.work .src b{color:#A99B77}
+.work .src .lb{color:var(--accent);letter-spacing:.12em}
+.modes{display:flex;gap:9px;flex-wrap:wrap}
+.m{font-size:13.5px;letter-spacing:0.03em;border-radius:6px;padding:9px 17px}
+.m.primary{background:var(--gold);color:#1A1410;font-weight:700}
+.m.primary:hover{background:#D9BC63}
+.back{text-align:center;margin-top:40px}
+.back a{color:var(--gold);font-size:14.5px;letter-spacing:0.06em;border-bottom:1px solid rgba(201,168,76,0.4);padding-bottom:2px}
+.motif{max-width:840px;margin:0 auto;padding:0 24px}
+.motif .box{background:linear-gradient(145deg,rgba(201,168,76,.13),rgba(23,19,16,.97));border:1px solid rgba(201,168,76,.45);border-radius:16px;padding:28px 30px;margin-top:18px}
+.motif .box .lb{font-size:11px;letter-spacing:.3em;color:var(--gold);display:block;margin-bottom:14px}
+.motif .box .q{font-size:19px;line-height:1.85;color:#F5EFE0;font-weight:700;letter-spacing:.02em}
+.motif .box p{font-size:14.5px;color:var(--ink2);line-height:1.95;margin-top:16px;text-align:justify}
+.tbl{width:100%;border-collapse:collapse;font-size:13.5px;line-height:1.75;margin-top:18px}
+.tbl th,.tbl td{border:1px solid var(--line);padding:9px 11px;text-align:left;vertical-align:top;color:var(--ink2)}
+.tbl th{background:rgba(201,168,76,.11);color:#E8DDBE;font-weight:700;white-space:nowrap}
+.tbl td b{color:#E8DDBE}
+.tw{overflow-x:auto}
+</style></head>
+<body class="zh">
+<nav><div class="w"><a href="/browse/">SDE Universes</a>
+<div class="nav-right"><a href="/students/judy/">← Judy 学员页</a>
+<div class="lang-toggle"><button class="lang-btn active" onclick="setLang('zh')">中</button><button class="lang-btn" onclick="setLang('en')">EN</button></div></div></div></nav>
+
+<div class="sec" style="padding-top:52px;text-align:center">
+ <div style="font-size:11px;letter-spacing:.4em;color:var(--gold);margin-bottom:16px">学 员 专 栏 · 作 品 集</div>
+ <h1 style="font-size:clamp(30px,5vw,44px);font-weight:800;color:#F5EFE0;letter-spacing:.05em">音乐发生学九论</h1>
+ <div style="font-size:13.5px;color:var(--accent);letter-spacing:.16em;margin-top:14px">Judy · 三题九论 · 二十七门外源学科</div>
+ <div style="width:56px;height:2px;background:var(--gold);margin:24px auto 0;opacity:.7"></div>
+</div>
+
+<div class="stats">
+ <div class="stat"><div class="v">9</div><div class="k">篇</div></div>
+ <div class="stat"><div class="v">18.9万</div><div class="k">汉字</div></div>
+ <div class="stat"><div class="v">150.8</div><div class="k">盲评均分</div></div>
+ <div class="stat"><div class="v">27</div><div class="k">外源学科</div></div>
+ <div class="stat"><div class="v">0</div><div class="k">学科重复</div></div>
+</div>
+
+<div class="motif" style="margin-top:34px">
+ <div class="box"><span class="lb">九 篇 共 同 的 那 一 句</span>
+ <div class="q">音乐不是在声音里发生的，它在记账的那一层发生；而每一本账都缺同一栏——记这件事本身的那一栏。</div>
+ <p>九篇分别把这句话兑现在九个不同的位置上。发生的时点记在判据协议里（冻段），音乐性记在读法系统里（并读壁），不可逆记在记录字段里（空次），成员清单记在通道台账里（途生项），候选集合记在许可模型的稀疏度里（续域迁移），整体的正确性一处也不记（无持项），差异的存活记在谱系的接住窗里（失效差异），未选项的次序记在一次交付里（接出序），而前一事件的退场记在边界的类型里（退占体）。每一篇都走到同一个位置：那个被当作音乐自身性质来读的东西，读出来的其实是那份账本的性质——而账本上没有一栏记这件事。</p></div>
+</div>
+
+<div class="grp">
+ <div class="grp-h"><h2>何谓音乐</h2><span class="en">WHAT IS MUSIC</span><span class="cnt">5 篇</span></div>
+ <div class="note">五篇同题异路。每一篇都先指出既有回答共享的那条未被说出的前提，再用三门与音乐学零交集的学科各自的内部材料把它推翻。</div>
+ <div class="work">
+  <div class="top"><span class="chip">之一</span><span class="iq">盲评 150.2</span></div>
+  <h3><a href="/students/judy/lapsed-difference/" style="color:inherit">何谓音乐——差异的有效期</a></h3>
+  <div class="sub">一次声差在多久之内没有被接住，就不再可能成为音乐</div>
+  <div class="hook">一支曲调的档案越来越厚，能被接住的却越来越少。The Session 的 55,019 条记谱上，387,236 个候选差异里有 200,529 个从未被第二次使用——一半以上的新东西，一次也没有被接住过。危险率在第一个后继位就跌掉一半，接住窗 h = 3。</div>
+  <div class="src"><span class="lb">三家外源</span>　地质反应输运 × 流行病学暴发调查 × 蚁群集体感觉阈值<br><span class="lb">新存在物</span>　失效差异　<span class="lb">读数</span>　接住窗 h｜n、失效率 q｜n</div>
+  <div class="modes"><a class="m primary" href="/students/judy/lapsed-difference/">📖 长文阅读 · 约 2.0 万字</a></div>
+</div><div class="work">
+  <div class="top"><span class="chip">之二</span><span class="iq">盲评 153.2</span></div>
+  <h3><a href="/students/judy/co-reading-wall/" style="color:inherit">并读壁</a></h3>
+  <div class="sub">何谓音乐：一段声音在两种互不相容的读法之间立起的那道墙</div>
+  <div class="hook">调性、节拍、分句三套读法系统在同一批 332 首材料上，族内相关中位 0.09，族序两两不一致，第一主成分只解释 0.407 的方差。七场检验里两场是自己的仪器故障——其中一场，八个候选因对称性折叠成四个，读数恒为满值。</div>
+  <div class="src"><span class="lb">三家外源</span>　晶体学的孪晶与畴壁 × 雷达测量的距离—速度模糊 × 冷冻电镜的三维分类<br><span class="lb">新存在物</span>　并读壁　<span class="lb">读数</span>　墙宽 w｜(L,θ,P)、可动性 μ、钉扎点</div>
+  <div class="modes"><a class="m primary" href="/students/judy/co-reading-wall/">📖 长文阅读 · 约 2.6 万字</a></div>
+</div><div class="work">
+  <div class="top"><span class="chip">之三</span><span class="iq">盲评 151.4</span></div>
+  <h3><a href="/students/judy/handover-ordering/" style="color:inherit">接出序</a></h3>
+  <div class="sub">何谓音乐：未选的那些路，是在被接手时才排出次序的</div>
+  <div class="hook">第一版说音乐是一个开放的下一步分布。四场新检验里三场对它不利：分叉率的打乱对照比真实音乐还高（99.9% 对 92.3%），未选项排序的跨样本恢复只比边际频率高 0.032，区间跨零。于是承重命题被改写：排序不是躺在那里，是在交付里被生产的。</div>
+  <div class="src"><span class="lb">三家外源</span>　发展心理学 × 建成环境的空间配置 × 和平与冲突研究中的成熟时机<br><span class="lb">新存在物</span>　接出序　<span class="lb">读数</span>　接出增量 ΔR</div>
+  <div class="modes"><a class="m primary" href="/students/judy/handover-ordering/">📖 长文阅读 · 约 2.0 万字</a></div>
+</div><div class="work">
+  <div class="top"><span class="chip">之四</span><span class="iq">盲评 151.8</span></div>
+  <h3><a href="/students/judy/unheld-term/" style="color:inherit">无持项</a></h3>
+  <div class="sub">何谓音乐：一种没有整体持有者的结构</div>
+  <div class="hook">一百个人都在按它调整，它错得起来——可它不在任何一页分谱里，不在总谱里，不在指挥手里。巴赫四声部众赞歌 367 首上，把其余三份此刻的动作全部作为条件，一份对自己下一步的不确定性只减少 4.05%。</div>
+  <div class="src"><span class="lb">三家外源</span>　结构生物学的定序组装与化学计量 × 射电天文的甚长基线干涉 × 劳动关系的排他代表与公平代表义务<br><span class="lb">新存在物</span>　无持项　<span class="lb">读数</span>　外持份额 ν｜(m,g)、空持率 τ</div>
+  <div class="modes"><a class="m primary" href="/students/judy/unheld-term/">📖 长文阅读 · 约 1.9 万字</a></div>
+</div><div class="work">
+  <div class="top"><span class="chip">之五</span><span class="iq">盲评 148.2</span></div>
+  <h3><a href="/students/judy/vacated-occupancy/" style="color:inherit">退占体</a></h3>
+  <div class="sub">何谓音乐：声音退出当下占位而不退出后续作用</div>
+  <div class="hook">一个声音发生以后，怎样退出当下而又没有从音乐中消失？七族语料逾十四万个位置的检验给出的答案对本文不利：前景释放六族成立一族反例，关系回写四族被驳，扣除边缘分布后净增量只剩 −0.078 到 +0.211 比特。退占因此从音乐的普遍机制降为边界的一种类型。</div>
+  <div class="src"><span class="lb">三家外源</span>　水利调度的防洪库容恢复 × 组织工程的灌流—基质互惠 × 呼吸病学的呼气流量受限与动态肺过度充气<br><span class="lb">新存在物</span>　退占体　<span class="lb">读数</span>　短程条件熵 ΔH_short、长程条件熵 ΔH_long</div>
+  <div class="modes"><a class="m primary" href="/students/judy/vacated-occupancy/">📖 长文阅读 · 约 1.9 万字</a></div>
+</div>
+</div><div class="grp">
+ <div class="grp-h"><h2>音乐是如何发生的</h2><span class="en">HOW MUSIC COMES TO BE</span><span class="cnt">3 篇</span></div>
+ <div class="note">三篇追问同一件事：从声音到音乐，中间那一下究竟做了什么，以及那一下的产物记在谁的账上。</div>
+ <div class="work">
+  <div class="top"><span class="chip">之七</span><span class="iq">盲评 150.6</span></div>
+  <h3><a href="/students/judy/frozen-span/" style="color:inherit">冻段</a></h3>
+  <div class="sub">音乐是如何发生的：一段声音何时不再能被无痕重排</div>
+  <div class="hook">玻璃转变温度依赖降温速率，不是物质常数；纱线的连续性来自分布的重叠，没有任何接头；轰燃的判据是约定，指标全中也可能并未轰燃。三家各自推翻了同一条共有前提：发生有一个时点，且它是过程本身的性质。</div>
+  <div class="src"><span class="lb">三家外源</span>　玻璃物理（结构弛豫与假想温度）× 纺织工程（短纤纱加捻与抱合）× 消防工程（室内火轰燃）<br><span class="lb">新存在物</span>　冻段　<span class="lb">读数</span>　冻结点 f｜θ、未冻比例 c(θ)</div>
+  <div class="modes"><a class="m primary" href="/students/judy/frozen-span/">📖 长文阅读 · 约 1.9 万字</a></div>
+</div><div class="work">
+  <div class="top"><span class="chip">之六</span><span class="iq">盲评 148.0</span></div>
+  <h3><a href="/students/judy/continuation-domain-shift/" style="color:inherit">音乐如何发生：续域迁移与未选未来的重写</a></h3>
+  <div class="sub">从时间地理学、移动目标防御与营养几何出发的一种发生机制</div>
+  <div class="hook">三次连续的失败，以及失败之后剩下的东西。一条饱和曲线定位了全部问题：只改训练规模，等量换址的成员替换率从 87.2% 单调掉到 0.0%，中间没有平台。版本 1.0 测到的不是音乐的结构，是许可模型稀疏的结构。</div>
+  <div class="src"><span class="lb">三家外源</span>　时间地理学的时空棱柱与路径汇束 × 网络安全的移动目标防御 × 营养几何的摄入目标与折衷规则<br><span class="lb">新存在物</span>　饱和余量 σ　<span class="lb">读数</span>　续域迁移率 M、饱和余量 σ</div>
+  <div class="modes"><a class="m primary" href="/students/judy/continuation-domain-shift/">📖 长文阅读 · 约 2.4 万字</a></div>
+</div><div class="work">
+  <div class="top"><span class="chip">之八</span><span class="iq">盲评 152.6</span></div>
+  <h3><a href="/students/judy/transit-born-term/" style="color:inherit">途生项</a></h3>
+  <div class="sub">音乐是如何发生的：一段声音在通过「听」时被生产出来的成员</div>
+  <div class="hook">物理声音里没有小节线，它由听记者加入，此后与音高时值一起被下游当作同一份材料使用。在同一任务上，一个完全不看内容的常数预测器准确率 0.774，接近人类转录者的 0.781，约为内容模型的两倍。</div>
+  <div class="src"><span class="lb">三家外源</span>　加速器与束流物理 × 色谱与质谱技术 × 病毒学<br><span class="lb">新存在物</span>　途生项　<span class="lb">读数</span>　途生率 ν</div>
+  <div class="modes"><a class="m primary" href="/students/judy/transit-born-term/">📖 长文阅读 · 约 2.2 万字</a></div>
+</div>
+</div><div class="grp">
+ <div class="grp-h"><h2>音乐对生命的创造性</h2><span class="en">WHAT MUSIC CREATES</span><span class="cnt">1 篇</span></div>
+ <div class="note">一篇。不问音乐造出了什么新东西，只问：什么东西是真的多出来的。</div>
+ <div class="work">
+  <div class="top"><span class="chip">之九</span><span class="iq">盲评 151.0</span></div>
+  <h3><a href="/students/judy/empty-count/" style="color:inherit">空次</a></h3>
+  <div class="sub">音乐对生命的创造性：每一次都是新的一次，而这个“新”没有任何内容对应物</div>
+  <div class="hook">从旋律轮廓判断两条实现孰先孰后，准确率 0.4736，比抛硬币还差；加到七个特征也只有 0.5361；而改读记录字段是 0.9942。617 对逐音相同的实现，72.9% 由不同的人写下，中位相隔 1,801 天——它们之间除了「第几次」以外没有任何差别。</div>
+  <div class="src"><span class="lb">三家外源</span>　地质年代学的闭合温度 × 民事诉讼法的既判力与诉讼时效 × 发育生物学的命运限定<br><span class="lb">新存在物</span>　空次　<span class="lb">读数</span>　次序不可读度 U｜R</div>
+  <div class="modes"><a class="m primary" href="/students/judy/empty-count/">📖 长文阅读 · 约 2.0 万字</a></div>
+</div>
+</div>
+
+<div class="grp">
+ <div class="grp-h"><h2>九篇的共同纪律</h2><span class="en">SHARED DISCIPLINE</span></div>
+ <div class="tw"><table class="tbl">
+ <tr><th>纪律</th><th>它在这九篇里长什么样</th></tr>
+ <tr><td><b>读数必须配报协议</b></td><td>f｜θ、h｜n、q｜n、w｜(L,θ,P)、ν｜(m,g)、U｜R——不报协议的读数被本批一律判为没有意义，而不是不够精确。</td></tr>
+ <tr><td><b>三家必须零交集且互不相容</b></td><td>每篇都先做一次选源体检：三门学科与当今音乐学有无交集，三家对同一件事给出的是三个方面还是三条互不相容的判决。</td></tr>
+ <tr><td><b>推翻材料取自三家内部</b></td><td>不是用类比推翻音乐学，而是三家各自用自己的材料推翻它们共有的那条前提。</td></tr>
+ <tr><td><b>预注册在前，不利结果照登</b></td><td>九篇合计报告二十余场预注册检验，其中多场被自己判负、两场整场因仪器故障作废、多条自设作废条款被触发并执行。</td></tr>
+ <tr><td><b>诚实账表</b></td><td>每篇末尾逐条列出全部主张的证据状态，包括「已撤回」「零证据」「方向与预期相反而被保留」。</td></tr>
+ <tr><td><b>写死日期的赌注</b></td><td>每篇押一个带年份、带「什么不算命中」清单的经验赌注，到期不兑现即自行降级。</td></tr>
+ </table></div>
+</div>
+
+<div class="back"><a href="/students/judy/">← 返回 Judy 学员页</a></div>
+<footer><span class="zh-only">© 德麦国际 Demai International · 学员专栏 · <a href="/browse/">sdeuniverses.com</a></span>
+<span class="en-only">© Demai International · Students' Column · <a href="/browse/">sdeuniverses.com</a></span></footer>
+<script>function setLang(l){document.body.className=l;document.querySelectorAll('.lang-btn').forEach(function(b){b.classList.remove('active')});document.querySelector('.lang-btn'+(l==='en'?':last-child':':first-child')).classList.add('active')}</script>
+<script src="/assets/sde-talk.js?v=20260802b" defer></script>
+</body></html>
