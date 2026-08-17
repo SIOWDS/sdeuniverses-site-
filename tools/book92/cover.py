@@ -56,6 +56,66 @@ def panel(w, h):
     return im, ImageDraw.Draw(im)
 
 
+def make_barcode():
+    """真 EAN-13 ＋ EAN-5 价格附加码，白底黑条，含静区；生成后用 pyzbar 实读校验。"""
+    import barcode
+    from barcode.writer import ImageWriter
+    from pyzbar.pyzbar import decode, ZBarSymbol
+
+    CODE, ADDON = '9798906900340', '52150'
+
+    EAN = barcode.get_barcode_class('ean13')
+    bcz = EAN(CODE[:12], writer=ImageWriter())
+    assert bcz.get_fullcode() == CODE, ('EAN13 校验位不符', bcz.get_fullcode())
+    path = bcz.save('/tmp/ean13_92', options=dict(
+        module_width=0.30, module_height=13.0, quiet_zone=3.0,
+        font_size=9, text_distance=3.0, write_text=True, dpi=600))
+    main = Image.open(path).convert('L')
+
+    # ---- EAN-5 附加码（python-barcode 不支持，按规范手绘）----
+    Lc = ['0001101', '0011001', '0010011', '0111101', '0100011',
+          '0110001', '0101111', '0111011', '0110111', '0001011']
+    Gc = ['0100111', '0110011', '0011011', '0100001', '0011101',
+          '0111001', '0000101', '0010001', '0001001', '0010111']
+    PAR = {0: 'GGLLL', 1: 'GLGLL', 2: 'GLLGL', 3: 'GLLLG', 4: 'LGGLL',
+           5: 'LLGGL', 6: 'LLLGG', 7: 'LGLGL', 8: 'LGLLG', 9: 'LLGLG'}
+    d = [int(c) for c in ADDON]
+    pat = PAR[(sum(d[0::2]) * 3 + sum(d[1::2]) * 9) % 10]
+    bits = '01011'
+    for i, (p, dg) in enumerate(zip(pat, d)):
+        bits += (Lc if p == 'L' else Gc)[dg]
+        if i < 4:
+            bits += '01'
+
+    scale = main.size[1] / 462.0          # 与主码等比
+    mw = max(2, int(round(4 * scale)))
+    ah = int(main.size[1] * 0.62)
+    aw = len(bits) * mw + mw * 11
+    add = Image.new('L', (aw, main.size[1]), 255)
+    ad = ImageDraw.Draw(add)
+    top = int(main.size[1] * 0.16)
+    for i, b in enumerate(bits):
+        if b == '1':
+            ad.rectangle([mw * 4 + i * mw, top, mw * 4 + i * mw + mw - 1, top + ah], fill=0)
+    fa = f(MONO, max(10, int(22 * scale)))
+    ad.text((mw * 4 + 2, top - int(24 * scale)), ' '.join(ADDON), font=fa, fill=0)
+
+    gap = int(20 * scale)
+    out = Image.new('L', (main.size[0] + gap + aw, main.size[1]), 255)
+    out.paste(main, (0, 0))
+    out.paste(add, (main.size[0] + gap, 0))
+
+    r13 = decode(out, symbols=[ZBarSymbol.EAN13])
+    r5 = decode(out, symbols=[ZBarSymbol.EAN5])
+    assert r13 and r13[0].data.decode() == CODE, ('EAN13 实读失败', r13)
+    assert r5 and r5[0].data.decode() == ADDON, ('EAN5 实读失败', r5)
+    print('  条码实读通过:', CODE, '+', ADDON)
+
+    target_w = 470
+    out = out.resize((target_w, int(out.size[1] * target_w / out.size[0])), Image.LANCZOS)
+    return out.convert('RGB')
+
+
 # ================= 封面 =================
 cov, d = panel(W, H)
 
@@ -164,18 +224,13 @@ bd.text((92, H - 268), '德麦国际出版社　·　专著第 92 号', font=fs,
 bd.text((92, H - 228), 'ISBN 979-8-90690-034-0', font=fm, fill=(96, 120, 142))
 bd.text((92, H - 192), 'US$21.50', font=fm, fill=(96, 120, 142))
 
-# 装饰性条码（非真 EAN13）
-bx, by = W - 400, H - 250
-bd.rectangle([bx - 14, by - 14, bx + 306, by + 130], fill=(232, 238, 244))
-import random
-random.seed(92)
-x = bx
-while x < bx + 300:
-    w_ = random.choice([2, 2, 3, 4, 6])
-    if random.random() < 0.55:
-        bd.rectangle([x, by, x + w_, by + 96], fill=(12, 18, 26))
-    x += w_ + random.choice([2, 3])
-bd.text((bx + 18, by + 100), '9 798906 900340', font=f(MONO, 20), fill=(12, 18, 26))
+# ===== 真 EAN-13（9798906900340）＋ EAN-5 价格附加码（52150 = USD $21.50）=====
+# 由 make_barcode() 生成并经 pyzbar 实读验证；验证不过则整封不出图。
+bc_img = make_barcode()
+bcw, bch = bc_img.size
+bx, by = W - 92 - bcw, H - 118 - bch
+bk.paste(bc_img, (bx, by))
+bd = ImageDraw.Draw(bk)
 
 full.paste(bk, (0, 0))
 full.paste(cov, (W + SPINE, 0))

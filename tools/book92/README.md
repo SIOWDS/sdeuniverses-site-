@@ -24,3 +24,11 @@ AI 时代的婚姻困境 · 王德生 ＋ Claude 编著 · **ISBN 979-8-90690-03
 3. **改号／改 ISBN 须同步七处**：front.md 出版信息、build_docx 扉页、cover.py（封面／封底／条码数字串）、publish/landing/insert 三脚本；改完必须重跑 asm→docx→PDF 两遍构建
 
 版式：170×240mm，正文 9.5pt / 行距 1.35，边距 17/15/16/15mm。终检：豆腐块 0，目录 29/29 全命中，两遍构建漂移 0。
+
+## 2026-08-17 封底换真条码
+`cover.py` 新增 `make_barcode()`：
+- **EAN-13** `9798906900340` 由 python-barcode 生成（传前 12 位，库自算校验位，再 `assert get_fullcode()==CODE` 回验）
+- **EAN-5 价格附加码** `52150`（＝ USD $21.50；首位 5 表示美元）——python-barcode 不支持，按规范手绘：起始符 `01011`、L/G 编码表、校验位 `(奇位和×3+偶位和×9) mod 10` 决定 L/G 奇偶模式、字符间分隔符 `01`
+- 两者拼成一张白底图后**用 pyzbar 实读校验**，`EAN13` 与 `EAN5` 任一读不出即 `assert` 失败、整封不出图
+装依赖：`pip install python-barcode pyzbar --break-system-packages`
+⚠ 只有 `cover-full.jpg`（整封）含条码；`cover.jpg`（正封）不含，故换条码**不需要重出 PDF**——PDF 的封面图页用的是正封。本轮 cover.jpg md5 未变，已核。
