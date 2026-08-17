@@ -149,6 +149,7 @@ const tabsEl=document.getElementById('industriesTabs');
 const gridEl=document.getElementById('employeesGrid');
 
 function renderTabs(){
+  if(!tabsEl) return;
   const isZh=document.body.classList.contains('zh');
   const all=[{id:'all',zh:'全部',en:'All',count:employees.length}]
     .concat(industries.map(i=>({...i,count:employees.filter(e=>e.i===i.id).length})));
@@ -160,6 +161,7 @@ function renderTabs(){
 }
 
 function renderGrid(){
+  if(!gridEl) return;
   const isZh=document.body.classList.contains('zh');
   const filtered=activeInd==='all'?employees:employees.filter(e=>e.i===activeInd);
   gridEl.innerHTML=filtered.map(e=>{
