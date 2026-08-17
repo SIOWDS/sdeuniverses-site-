@@ -124,8 +124,16 @@ def toc_entry(par, title, level):
 src = open('manuscript.md', encoding='utf-8').read()
 lines = src.split('\n')
 
+# ---------- 封面图页 ----------
+from docx.shared import Emu
+_cw = sec.page_width - sec.left_margin - sec.right_margin
+doc.add_picture('cover.jpg', width=_cw)
+doc.paragraphs[-1].alignment = WD_ALIGN_PARAGRAPH.CENTER
+doc.paragraphs[-1].paragraph_format.first_line_indent = Pt(0)
+
 # ---------- 扉页 ----------
-P(); P(); P(); P()
+P('', pagebreak=True)
+P(); P(); P()
 P('谁来陪伴我？', size=30, bold=True, align=WD_ALIGN_PARAGRAPH.CENTER, indent=0, color=DARK, after=10)
 P('AI 时代的婚姻困境', size=13, align=WD_ALIGN_PARAGRAPH.CENTER, indent=0, color=GREY, after=40)
 P('王德生　＋　Claude　编著', size=11, align=WD_ALIGN_PARAGRAPH.CENTER, indent=0, after=6)
@@ -140,20 +148,21 @@ for l in lines:
     elif l.startswith('# ') and l[2:].startswith('第'):
         TOC_TITLES.append(('b', clean(l[2:].strip())))
 
-P('目　录', size=16, bold=True, align=WD_ALIGN_PARAGRAPH.CENTER, indent=0,
-  color=DARK, pagebreak=True, after=12)
-for kind, t in TOC_TITLES:
-    if t == '封　底':
-        continue
-    p = P('', indent=0, after=2.5)
-    r = p.add_run(('　　' if kind == 'c' else '') + t)
-    r.font.size = Pt(9.5 if kind == 'c' else 10)
-    r.font.name = SERIF
-    r._element.rPr.rFonts.set(qn('w:eastAsia'), SERIF)
-    r.bold = (kind == 'b')
-    if kind == 'b':
-        r.font.color.rgb = DARK
-    toc_entry(p, t, kind)
+def render_toc():
+    P('目　录', size=16, bold=True, align=WD_ALIGN_PARAGRAPH.CENTER, indent=0,
+      color=DARK, pagebreak=True, after=12)
+    for kind, t in TOC_TITLES:
+        if t in ('封　底', '目　录'):
+            continue
+        p = P('', indent=0, after=2.5)
+        r = p.add_run(('　　' if kind == 'c' else '') + t)
+        r.font.size = Pt(9.5 if kind == 'c' else 10)
+        r.font.name = SERIF
+        r._element.rPr.rFonts.set(qn('w:eastAsia'), SERIF)
+        r.bold = (kind == 'b')
+        if kind == 'b':
+            r.font.color.rgb = DARK
+        toc_entry(p, t, kind)
 
 # ---------- 正文 ----------
 i = 0
@@ -214,6 +223,8 @@ while i < len(lines):
         continue
     if l.startswith('## '):
         t = l[3:].strip()
+        if t == '目　录':
+            render_toc(); continue
         p = P('', pagebreak=True, after=0)
         m = re.match(r'^(第[一二三四五六七八九十]+章|枢纽章|合章)　(.*)$', t)
         if m:

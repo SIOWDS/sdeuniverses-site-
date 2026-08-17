@@ -8,7 +8,7 @@ NO, TITLE = '92', '谁来陪伴我？'
 PDFNAME = '谁来陪伴我.pdf'
 DST = os.path.join(SITE, 'books/m/' + NO)
 SUB = 'AI 时代的婚姻困境'
-PAGES_N, WAN = '135 页', '约 7.6 万汉字'
+PAGES_N, WAN = '141 页', '约 8.1 万汉字'
 ISBN = '979-8-90690-040-1'
 
 os.makedirs(DST, exist_ok=True)
@@ -48,6 +48,8 @@ for b in blocks:
         continue                      # 书名页，跳过
     if head is not None:
         flat = head.replace('　', '').replace(' ', '')
+        if flat == '目录':
+            cur = None; continue
         if re.match(r'^第[一二三四]编', flat):
             bi += 1; slug = 'b%d' % bi
         elif re.match(r'^第[一二三四五六七八九十]+章', flat):

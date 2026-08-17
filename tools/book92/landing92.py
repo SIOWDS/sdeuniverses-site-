@@ -42,8 +42,8 @@ ul{{padding-left:22px}}li{{margin:0 0 8px}}
 <div class="hero">
 <h1>{TITLE}</h1>
 <div class="sub">{SUB} · 王德生 ＋ Claude 编著</div>
-<div class="metaline">德麦国际出版社 · 专著第 {NO} 号 · ISBN {ISBN} · US$18.80 · 135 页 · 约 7.6 万汉字 · 二〇二六年八月</div>
-<div class="btns"><a class="btn" href="/books/m/{NO}/text/">📖 网页版全书 · 29 页</a><a class="btn" href="/books/m/{NO}/read.html">📄 在线翻阅 · 135 页</a><a class="btn" href="/books/m/{NO}/{PDF}">⬇ 下载 PDF</a></div>
+<div class="metaline">德麦国际出版社 · 专著第 {NO} 号 · ISBN {ISBN} · US$18.80 · 141 页 · 约 8.1 万汉字 · 二〇二六年八月</div>
+<div class="btns"><a class="btn" href="/books/m/{NO}/text/">📖 网页版全书 · 29 页</a><a class="btn" href="/books/m/{NO}/read.html">📄 在线翻阅 · 141 页</a><a class="btn" href="/books/m/{NO}/{PDF}">⬇ 下载 PDF</a></div>
 </div>
 
 <img class="cover" src="cover.jpg" alt="{TITLE} 封面">
