@@ -23,6 +23,13 @@ h1{font-size:35px;margin:8px 0 10px;letter-spacing:.03em;line-height:1.35}
 .keys{display:flex;gap:10px;flex-wrap:wrap;margin:20px 0 0}
 .keys span{font-size:13px;letter-spacing:.06em;padding:5px 14px;border:1px solid var(--line);border-radius:2px;color:var(--dim)}
 .keys span.hot{border-color:var(--ac);color:var(--ac)}
+.seats{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin:22px 0 0;padding:12px 16px;background:#14120E;border:1px solid var(--line);border-radius:4px}
+.dots{display:flex;gap:7px}
+.dots i{width:13px;height:13px;border-radius:50%;display:block}
+.dots .seat-on{background:var(--ac);border:1px solid var(--ac)}
+.dots .seat-off{background:transparent;border:1px solid #4A4238}
+.seats-txt{font-size:14.2px;color:var(--dim);letter-spacing:.02em}
+.seats-txt b{color:var(--ac)}
 main{padding:34px 0 10px}
 h2{font-size:21px;margin:44px 0 12px;letter-spacing:.04em;padding-left:14px;border-left:3px solid var(--ac)}
 p{margin:0 0 14px;font-size:15.6px;color:var(--dim)}
@@ -92,6 +99,17 @@ li{font-size:15.4px;color:var(--dim);margin:8px 0}
     <span>2026 年 9 月 10 日开班</span>
     <span>湖南娄底</span>
     <span class="hot">带走一个自己的平台</span>
+  </div>
+
+  <!-- ============ 名额进度 · 每周更新此处 ============
+       改两个地方：① 日期 ② 已录取人数
+       席位圆点：已录取用 seat-on，空位用 seat-off，共 5 个，改完人数记得同步圆点
+       ================================================ -->
+  <div class="seats">
+    <div class="dots">
+      <i class="seat-off"></i><i class="seat-off"></i><i class="seat-off"></i><i class="seat-off"></i><i class="seat-off"></i>
+    </div>
+    <div class="seats-txt">截至 <b>8 月 17 日</b>，已录取 <b>0</b> 人，余 <b>5</b> 席 · 报名与面试进行中</div>
   </div>
 </div>
 
