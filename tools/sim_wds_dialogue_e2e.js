@@ -107,7 +107,11 @@ ok("本场心得优先于全站缓存心得（read + read-paper 两处）", W.sp
 ok("guide 预算四元式在位（12万减文章/资料/长期记忆，陪读收缩式不变）", W.includes("b.guide ? Math.max(60000, WDS_GUIDE_HIST_BUDGET - docText.length - siteCtx.length - UMEM.length)") && W.includes("120000 - docText.length - siteCtx.length"));
 ok("长问放宽仅限 guide（4000 vs 500）", W.includes("b.guide ? 4000 : 500"));
 ok("全站 RAG 加强档（K=36 + 接续补捞 + KB留预算的字数上限 + 来源回传）", W.includes("RAG_SUBREQUEST") && /k: 36, cap: docText \? 12000 : 30000, kbn: docText \? 14 : 24/.test(W) && /ragScan\(env, url, q, expTerms, prevQ, K/.test(W) && W.includes('t: "sources"'));
-ok("与WDS对话 RAG 已接九库（子请求里 retrieveKB 邻域子图优先，chunk 让预算）", /retrieveKB\(kb, \{ docs: scan\.docs \}, q, expTerms, kbn\)/.test(W) && W.includes("const chunkCap = Math.max(4000, cap - kbBlock.length)"));
+// 2026-08-16 加了 capkb（ChatSDE 的两档口径）之后，chunkCap 成了三元式：传了 capkb 按两档走，
+// 没传就仍是老公式。断言跟着改成"老公式还在那一支里"，而不是钉整行。
+ok("与WDS对话 RAG 已接九库（子请求里 retrieveKB 邻域子图优先，chunk 让预算）",
+  /retrieveKB\(kb, \{ docs: scan\.docs \}, q, expTerms, kbn\)/.test(W)
+  && W.includes(": Math.max(4000, cap - kbBlock.length)"));
 ok("读者文章走独立首条消息 + 站内资料让位（07-20 修）",
   W.includes('content: "这是我提交给你的文章全文，本场对话就围绕它。') && W.includes("全文我已通读完毕") && !W.includes("【读者提交的文章·全文】"));
 ok("万字论文分部检索走子请求（K=12 / cap 8000 / KB 18 / 片段 900）", /k: 12, cap: 8000, kbn: 18, chunk: 900/.test(W));
@@ -124,8 +128,13 @@ ok("额度按 Key 哈希分桶，无 Key 才回落 IP（同一出口 IP 多人�
 ok("额度用尽的提示带服务端真实计数，便于自查",
   (W.split("(lr.inDay || 0)").length - 1) >= 4 && W.includes("这把 Key 今天在「ChatSDE」入口已用"));
 ok("BYOK 日额度放宽到限流器硬顶 300（分钟档 20/25 防脚本滥用）", W.includes("WDS_PER_DAY = 300, WDS_PER_MIN = 20") && W.includes("WDS_DLG_PER_DAY = 300, WDS_DLG_PER_MIN = 25"));
-ok("全站问答回传今日真实剩余（quota 事件）并说清是哪一档额度",
-  W.includes('{ t: "quota", v: { left: dayLeft, day: WDS_PER_DAY } }') && W.includes("dayLeft = Math.max(0, WDS_PER_DAY - (lr.inDay || 0))")
+/* ⚠ 这一条的意图后来被**反转**了，不是形状变了：自带 Key 已无日上限 ⇒ 再回传"今日剩余"
+   就是显示一个假数字，于是 dayLeft 保持 null、那一帧刻意不发（前端只显示本场轮次）。
+   断言据此重写：quota 帧仍在位、但**必须挂在 dayLeft !== null 的闸后面**；
+   额度用尽那句话仍要说清是哪一档。 */
+ok("有日上限时才回传今日真实剩余（BYOK 无上限则刻意不发，不显示假数字）",
+  W.includes('if (dayLeft !== null) controller.enqueue(_sseBytes({ t: "quota", v: { left: dayLeft, day: WDS_PER_DAY } }))')
+  && W.includes("自带 Key 已无日上限")
   && W.includes("这把 Key 今天在「ChatSDE」入口已用") && W.includes("各有独立额度"));
 ok("服务端不落 Key（无写库/日志痕迹）", !/localStorage|env\.\w+\.put\([^)]*userKey|console\.log\([^)]*key/i.test(W.split("dialogue-reflect")[1] || ""));
 ok("需 Key / 坏 Key 有独立错误码供前端弹面板", W.includes('code: "need_key"') && W.includes('code: "bad_key"'));
@@ -519,7 +528,9 @@ MODE.planFail = null;
 
 head("[阶段十一] 长思考期间的假流式（心跳 + 活数据）");
 ok("worker：全站检索已拆成独立子请求（自带 CPU 预算，失败不连累答题）",
-  W.includes("RAG_SUBREQUEST") && W.includes('url.pathname === "/api/wds/rag"') && /async function wdsRag/.test(W) && (W.match(/await wdsRag\(env, url/g) || []).length === 2);
+  // 2026-08-16 ChatSDE 那一路也搬上子请求 ⇒ 调用点由两处变三处。钉 >=3 而不是等于某个数：
+  // 再多一条入口走这条线是好事，不该让这条断言假红。
+  W.includes("RAG_SUBREQUEST") && W.includes('url.pathname === "/api/wds/rag"') && /async function wdsRag/.test(W) && (W.match(/await wdsRag\(env, url/g) || []).length >= 3);
 ok("worker：子请求走 SELF 服务绑定，不用会 522 的自请求回环", /env\.SELF && env\.SELF\.fetch/.test(W) && (() => { const cfg = require("fs").readFileSync(__dirname + "/../wrangler.jsonc", "utf8"); return /"binding":\s*"SELF"/.test(cfg) && /"service":\s*"steep-band-faf5"/.test(cfg); })());
 ok("worker：答题里已无内联装语料（loadCorpus 只留在 rag 路由与其它入口）",
   (() => { const i = W.indexOf('url.pathname === "/api/wds/read"'); const j = W.indexOf("new ReadableStream", i); const k = W.indexOf('url.pathname === "/api/wds/chat"', j); return W.slice(j, k).indexOf("loadCorpus") < 0; })());
@@ -549,16 +560,18 @@ ok("worker：全站再无整份装载语料（loadCorpus 已无人调用，五�
   !/await loadCorpus\(/.test(W) && (W.match(/lightRetrieve\(/g) || []).length >= 6 && !/retrieve\(corpus, q,/.test(W.replace("function retrieve(corpus, q, k, expTerms)", "")));
 ok("worker：分层索引缺失时退回逐片扫描（限时限片，不开天窗）",
   /async function ragScanShards/.test(W) && /MS_BUDGET = 4000/.test(W) && /SHARD_BUDGET = 3/.test(W) && /if \(!l0 \|\| !l0\.sections\) return ragScanShards/.test(W));
-ok("索引侧产出三层（版块层/篇层按版块切/段层按篇切），且各层都在盘上且够小", (() => {
-  const fs = require("fs"), path = __dirname + "/../public/search/";
+/* ⚠ 这一条原来去 public/search/ 数盘上的文件——而索引 2026-07-29 起就**不再进 git** 了
+   （改由 search-index 工作流直接传 R2，仓库里只剩 index.html）。于是它一直红着，红的却不是
+   它要守的那件事。改成只守生成器这一侧：三层都还在产。
+   ⚠ 体量那一半没法在这里量了（盘上没有文件）；线上实测见下面那条 NOTE。 */
+ok("索引侧产出三层（版块层/篇层按版块切/段层按篇切）", (() => {
+  const fs = require("fs");
   const b = fs.readFileSync(__dirname + "/../tools/build_search_index.py", "utf8");
-  if (!b.includes("TIERED_INDEX") || !b.includes("sections.json") || !b.includes("KW_DIR")) return false;
-  if (!fs.existsSync(path + "sections.json") || !fs.existsSync(path + "doc/0.json")) return false;
-  const l0 = fs.statSync(path + "sections.json").size;
-  const kw = fs.readdirSync(path + "kw");
-  const maxKw = Math.max(...kw.map((f) => fs.statSync(path + "kw/" + f).size));
-  return l0 < 200000 && kw.length >= 5 && maxKw < 400000;
-})(), "L0 与 L1 分片体量");
+  return b.includes("TIERED_INDEX") && b.includes("sections.json") && b.includes("KW_DIR")
+    && b.includes("DOC_DIR") && !fs.existsSync(__dirname + "/../public/search/kw");
+})(), "生成器三层俱在，且索引确实不在仓库里（走 R2）");
+note("篇层分片已长过当年的 400KB 预期（2026-08-17 线上实测 kw/students.json 1.05MB）",
+  "worker 侧已按字节封顶应对；再翻一倍就该在生成器里切分片了");
 ok("每条流的状态变量都在本流内声明（严格模式裸赋值＝当场瘫）", (() => {
   const marker = "async start(controller)";
   let i = -1, bad = 0, n = 0;
@@ -583,7 +596,9 @@ ok("客户端：论文三步都把 beat 画成人话（beatTip）", PAGE.include
 ok("worker：词表扩展卸掉满功率档（配菜不占正菜的时间）", /const LC = \(VC && VC\.top\) \? \{ url: VC\.url, model: VC\.model, name: VC\.name \} : VC;/.test(W));
 ok("worker：词表扩展自带短截止，且远小于原来的 55 秒", /const SDE_EXPAND_MS = (\d+);/.test(W) && Number((W.match(/const SDE_EXPAND_MS = (\d+)/) || [])[1]) <= 10000);
 ok("worker：答题调用终于有时钟（首帧 + 总时长两级护栏，总时长按长篇分档）", /ANS_FIRST_MS = \d+, ANS_TOTAL_MS = askLen \? \d+ : \d+/.test(W) && /wdsFetchMax\(uVC, KEY, messages, true, tokWant, _ac\.signal\)/.test(W));
-ok("worker：wdsFetchMax 收得下 AbortSignal 且不影响老调用点", /async function wdsFetchMax\(VC, KEY, messages, stream, want, signal\)/.test(W) && W.includes("signal: signal || undefined"));
+// ⚠ 签名后来又长了三个可选参数（withUsage / ladderOverride / plain）。只钉住 signal 排第六位，
+// 别钉整串形参——每加一个参数就假红一次的断言，红久了就没人看了。
+ok("worker：wdsFetchMax 收得下 AbortSignal 且不影响老调用点", /async function wdsFetchMax\(VC, KEY, messages, stream, want, signal(?:, \w+)*\)/.test(W) && W.includes("signal: signal || undefined"));
 ok("worker：中途断线时已写出的正文不丢", /if \(got\) \{ controller\.enqueue\(_sseBytes\(\{ t: "note"/.test(W) && W.includes("断在半路"));
 ok("worker：站内检索 5xx 重打一次、4xx 立刻认输", /for \(let _try = 0; _try < 2; _try\+\+\)/.test(W) && W.includes("if (rr.status < 500) break;"));
 ok("worker：每一阶段随心跳回传（下次报障一眼可判时间烧在哪）", W.includes('stage: state.stage || ""') && W.includes('_st.stage = "扩展检索词"') && W.includes('_st.stage = "站内检索"') && W.includes('_st.stage = "基底作答"'));

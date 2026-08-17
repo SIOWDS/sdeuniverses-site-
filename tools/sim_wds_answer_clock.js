@@ -40,7 +40,12 @@ console.log("\n[一] 词表扩展是配菜，不许占答题的时钟");
   const calls = src.match(/sdeExpandQuery\(VC, (?:KEY|key), q[^)]*\)/g) || [];
   ok(calls.length >= 2, "站内共 " + calls.length + " 处调用词表扩展");
   ok(calls.some((c) => /SDE_EXPAND_MS/.test(c)), "答题路径显式带上了短截止");
-  ok(/const SDE_EXPAND_MS = \d+;\nasync function sdeExpandQuery/.test(src), "其余调用点即便不传，缺省也是这个短截止（降档与限时都写在函数内部，堵不漏）");
+  /* ⚠ 原来钉的是"常量紧挨着函数声明"（\d+;\nasync function）——2026-08-16 在两者之间插进
+     sdeExpandTok 与它的注释，这条就假红了，而它守的那件事一天都没坏过。
+     改成钉真正要守的：函数收得下 ms，且不传时**在函数内部**落到 SDE_EXPAND_MS。 */
+  ok(/const SDE_EXPAND_MS = \d+;/.test(src)
+     && /async function sdeExpandQuery\(VC, KEY, q, ms\)/.test(src)
+     && /ms \|\| SDE_EXPAND_MS/.test(src), "其余调用点即便不传，缺省也是这个短截止（降档与限时都写在函数内部，堵不漏）");
 }
 
 /* ── ② wdsFetchMax 收 signal（行为实测：桩 fetch 检查它有没有把 signal 递下去） ── */

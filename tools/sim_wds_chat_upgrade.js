@@ -120,8 +120,14 @@ console.log("── 五 · 复制/原文分工 + 继续");
 console.log("── 六 · Markdown：嵌套列表 / 多行引用 / 有序续号");
 {
   const esc = grab(wm, "esc")();
-  const mdRender = grab(wm, "mdRender", ["esc", "texStub", "codeBlock", "MATH", "CB_LANG", "KW"])(
-    esc, (c) => "\u0000TEX\u0000", (l, b) => "<pre>" + b + "</pre>", [], {}, {}
+  /* ⚠ 这一列必须跟着 mdRender 的**实际**依赖走：页面里给它加一个新依赖（texify 就是），
+     这里不补，整份 sim 在加载期就 ReferenceError 当场炸掉——不是某一条 FAIL，是一条断言都跑不到。
+     **改 mdRender 之前先看这一行。**
+     texify 在这里给的是原样穿过的桩：本节验的是清单/引用/续号这些结构，不是数学扶正，
+     而清单与引用里既没有 $ 也没有键盘写法，真 texify 走到那一步也是原样返回。
+     texify 自己那条线由 tools/sim_texify.js 全套守着（32 项），不在这里重复。 */
+  const mdRender = grab(wm, "mdRender", ["esc", "texify", "texStub", "codeBlock", "MATH", "CB_LANG", "KW"])(
+    esc, (x) => x, (c) => "\u0000TEX\u0000", (l, b) => "<pre>" + b + "</pre>", [], {}, {}
   );
   const nested = mdRender("- 甲\n  - 甲一\n  - 甲二\n- 乙");
   ok((nested.match(/<ul/g) || []).length === 2, "两级清单渲染出两层 ul（原来被压平成一层）");
@@ -145,7 +151,10 @@ console.log("── 六 · Markdown：嵌套列表 / 多行引用 / 有序续号
 console.log("── 七/八/九 · 等待期可见、aria、注释与版本戳");
 {
   ok(/function waitLine\(/.test(wm) && /bv\.stage/.test(wm), "等待行显示秒数与阶段");
-  ok(/_st\.stage = "扩展检索词"/.test(CHAT) && /_st\.stage = "站内检索"/.test(CHAT) && /_st\.stage = "基底作答"/.test(CHAT), "服务端三段阶段打标随心跳回传");
+  // 2026-08-16 起打标走 _stg()：阶段一变**立刻**发一帧，不等下一次心跳（心跳 5 秒一拍，
+  // 诊断行报的"最后停在哪一步"曾因此差 5 秒，分不清死在哪一段）。守的是同一件事：三段都要打标。
+  ok(/_stg\("扩展检索词"\)/.test(CHAT) && /_stg\("站内检索"\)/.test(CHAT) && /_stg\("基底作答"\)/.test(CHAT)
+     && /const _stg = \(s\) => \{/.test(CHAT), "服务端三段阶段打标随心跳回传（现走 _stg 立即发帧）");
   ok(/j\.t === "note"/.test(wm), "客户端认 note 事件（截断提示、断流保稿都靠它）");
   ok(/function noteLine\(/.test(wm), "note 有落点，不至于静默丢弃");
   ok(/function ariaSet\(/.test(wm) && /ariaSet\(\);/.test(wm), "aria 名字有装上（不是只定义不调用）");
@@ -156,7 +165,13 @@ console.log("── 七/八/九 · 等待期可见、aria、注释与版本戳")
      "发送钮的 aria 名字始终是「发送」（它不再变成停止钮）");
   ok(/全站问答 v4/.test(wm), "文件头版本随能力一起走");
   ok(/表格 引用 分隔线 链接 KaTeX 公式/.test(wm), "文件头如实列出实际支持的 Markdown（过期注释已改）");
-  ok(/wds-mode\.js\?v=2026073[0-9][a-z]/.test(shell), "壳页版本戳已 bump（动 wds-mode.js 必 bump）");
+  // ⚠ 别钉死某一天的日期（原来写死 2026073x，一过月就假红，而假红久了就没人看了）。
+  // 真正守这件事的是 tools/sim_wds_mode_stamp.js：它比对 wds-mode.js 的哈希与 tools/wds-mode.stamp。
+  // 这里只守"壳页确实带戳，且与 stamp 文件登记的那个一致"。
+  ok((() => {
+    const want = (fs.readFileSync(ROOT + "/tools/wds-mode.stamp", "utf8").match(/^stamp=(\S+)$/m) || [])[1];
+    return !!want && shell.indexOf("wds-mode.js?v=" + want) >= 0;
+  })(), "壳页版本戳与 tools/wds-mode.stamp 一致（动 wds-mode.js 必跑 bump_wds_mode.py）");
 }
 
 console.log("── 十 · 没有回归：陪读与「和WDS对话」的口径一个字没动");
@@ -193,13 +208,17 @@ console.log("── 十一 · 成文（distill）：整场可见 + 时钟 + 断�
   ok(/readConvoText\(turns, convoMax\)/.test(DIST) && /convoMax = Math\.max\(20000/.test(DIST),
      "仍用 readConvoText（保头 35%＋保尾＋明标省略），且上限随输出预算动态算");
   ok(/DISTILL_CONVO_MAX = 100000/.test(wk), "成文能看的对话原文提到 10 万字符（原 4 万且从中间断掉）");
-  ok(/const clk = wdsClock\(DISTILL_FIRST_MS, DISTILL_TOTAL_MS\)/.test(DIST), "成文戴上时钟（此前是唯一没戴的 WDS 路由）");
-  ok(/wdsFetchMax\(VCuse, KEY, messages, true, tokWant, clk\.signal, true\)/.test(DIST) && /clk\.firstFrame\(\)/.test(DIST) && /clk\.stop\(\)/.test(DIST),
+  // 一趟出全篇（paper1）那一档产出两万汉字，实测要五到八分钟，总时长闸单独放到 900 秒。
+  ok(/const clk = wdsClock\(DISTILL_FIRST_MS, _oneShot \? 900000 : DISTILL_TOTAL_MS\)/.test(DIST), "成文戴上时钟（此前是唯一没戴的 WDS 路由）");
+  // ⚠ wdsFetchMax 的入参后来又长了两个（plain / 强制满预算）——这里只钉住"signal 排在第六位、
+  // 且确实传的是 clk.signal"，别钉死整串实参，否则每加一个参数这条就假红一次。
+  ok(/wdsFetchMax\(VCuse, KEY, messages, true, tokWant, clk\.signal[,)]/.test(DIST) && /clk\.firstFrame\(\)/.test(DIST) && /clk\.stop\(\)/.test(DIST),
      "signal 经 wdsFetchMax 透传、首帧撤护栏、收尾撤钟");
   ok(/if \(wrote\)[\s\S]{0,120}t: "note"/.test(DIST), "断流时已写出的稿保留并发 note");
   ok(/_st\.stage = SPEC\.name/.test(DIST), "心跳带上「在写哪一件」");
   ok(/name: "提炼成文", tok: 32000/.test(DIST), "要三千字就别只给 6000 预算——四档一律走长文档区间");
-  ok(/const tokWant = Math\.max\(6000/.test(DIST), "但真正下单的是按入参算出来的 tokWant（窗是共用的）");
+  // 一趟出全篇不参与收窄（收窄公式按三千字那档配的，会把两万字的稿掐断头）：那一档直接给 SPEC.tok。
+  ok(/const tokWant = _oneShot \? SPEC\.tok\s*\n\s*: Math\.max\(6000/.test(DIST), "但真正下单的是按入参算出来的 tokWant（窗是共用的）");
   // readConvoText 真跑：超限时保头保尾且明标省略
   const rct = grab(wk, "readConvoText", ["WDS_MAX_TURNS"])(100);
   const turns = Array.from({ length: 30 }, (_, i) => ({ role: i % 2 ? "wds" : "reader", text: "第" + i + "段" + "字".repeat(400) }));
@@ -233,8 +252,10 @@ console.log("── 十三 · 会烧站方 Key 的两个端点都上了限流");
 console.log("── 十四 · 客户端：成文说明与稿互不覆盖、看门狗、两处提示、注释");
 {
   ok(/function dNote\(/.test(wm), "成文有独立的说明行（不再往正文上盖）");
-  ok(/else if \(j\.t === "error"\) \{ dNote\(j\.v, 1\)/.test(wm), "出错走说明行，已写出的稿不被抹掉");
-  ok(/if \(text\) \{ out\.innerHTML = mdRender\(text\); dNote\(/.test(wm), "网络异常时也先把稿渲染回来再说明原因");
+  // 成文那条产线后来改成"把读数收进 res、渲染交给调用方"，两句话的落点跟着变了，
+  // 守的仍是同一件事：出错只往说明行写，**绝不碰已经写出来的稿**。
+  ok(/else if \(j\.t === "error"\) \{ res\.err = j\.v; dNote\(j\.v, 1\);/.test(wm), "出错走说明行，已写出的稿不被抹掉");
+  ok(/res\.err = dTimedOut \? t\("dCut"\) : \(t\("errNoOut"\)[\s\S]{0,60}dNote\(res\.err, 1\);/.test(wm), "网络异常时也走说明行，稿不被抹掉");
   ok(/function dBump\(/.test(wm) && /dTimedOut = true/.test(wm), "成文有 45 秒看门狗（原来客户端一个超时都没有）");
   ok(/attGone/.test(wm) && /flex-basis:100%/.test(wm), "附件区明说刷新会丢");
   ok(/sbCap/.test(wm) && /length >= 50/.test(wm), "侧栏快到 60 场上限时先打招呼");
@@ -314,7 +335,10 @@ console.log("── 十六 · 站内篇目自动挂链接");
 {
   const LINK = (() => { const a = wk.indexOf('url.pathname === "/api/wds/link"'); return wk.slice(a, a + 3000); })();
   // 病根：送进上下文的段落头只有篇名没有网址 → 它当站里没有链接（读者实测撞上）
-  ok(/【来源：" \+ d\.t \+ "｜" \+ new URL\(d\.u, url\)/.test(CHAT), "站内段落头带上真网址（原来只有篇名）");
+  // 2026-08-16 全站检索搬进 /api/wds/rag 子请求，这一句跟着搬过去了（CHAT 里已经没有）。
+  // 口径由 abs 开关承接：ChatSDE 那一路传 abs:1 ⇒ 段落头照旧带绝对网址。
+  ok(/【来源：" \+ d\.t \+ \(abs \? \("｜" \+ new URL\(d\.u, url\)\.toString\(\)\) : ""\)/.test(wk)
+     && /abs: 1,/.test(CHAT), "站内段落头带上真网址（已随检索搬进 /api/wds/rag，靠 abs 开关）");
   ok(/可点开的站内篇目/.test(CHAT), "每轮附一份可点清单（篇名＋真网址）");
   ok(/网址只准从这里照抄，不许自己拼/.test(CHAT), "清单明写只准照抄——凭印象拼站内路径必然拼错");
   ok(/绝不许说\\"站里的文章没有链接\\"/.test(wk) || /站里的文章没有链接/.test(wk), "作答纪律直接堵掉那句幻觉");
