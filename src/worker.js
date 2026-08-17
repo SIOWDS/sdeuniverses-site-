@@ -2907,12 +2907,15 @@ async function loadCorpus(env, url) {
 }
 // SDE 坐标（索引侧打标产物；未打标则为 null，检索自动退回纯词义扩展）
 async function loadCoords(env, url) {
-  tierFresh();
+  await tierFresh(env);
   if (TIER.coords !== undefined) return TIER.coords;   // 取回过就复用（null 也算取回过，别每次重试）
   try {
     const cj = await (await idxFetch(env, url, "/search/sde-coords.json")).json();
     const m = {};
-    for (const k in cj) m[k] = new Set((cj[k] || []).map((t) => String(t).toLowerCase()));
+    /* 【存字符串，不存 Set】4318 篇各建一个 Set＝几万个独立小字符串＋几千个 Set 头，
+       在 128MB 的 isolate 里是纯浪费。改存 "|词|词|" 一条串，命中判定用 indexOf，
+       语义与 Set.has 完全一致（词表里没有竖线，已核）。 */
+    for (const k in cj) m[k] = "|" + (cj[k] || []).map((t) => String(t).toLowerCase()).join("|") + "|";
     TIER.coords = Object.keys(m).length ? m : null;
   } catch (e) { TIER.coords = null; }
   return TIER.coords;
@@ -2951,16 +2954,39 @@ async function lightRetrieve(env, url, q, expTerms, k, cut, opts) {
 //   L2 段层  doc/<i>.json → 一轮 8 篇地取，够用就停，不够再取下一轮。
 // 每层都能"动态扩展"：选不出版块就放宽到全站篇层；候选篇太少就多拉两个版块；
 // 资料不够长就再下钻一轮。目标是每次问答只读几百 KB，而不是把 60MB 全搬进来。
-let TIER = { at: 0, l0: null, l1: {}, man: null, coords: undefined };   // 小文件缓存（合计几百 KB，安全）；30 秒复验一次
+let TIER = { at: 0, l0: null, l1: {}, l1b: 0, man: null, coords: undefined, stamp: "" };   // 索引小文件缓存；30 秒**复验**一次（复验≠重解析，见 tierFresh）
 // TIER 的过期判定只在这一处做，manifest/coords/l0/l1 同生同死——半新半旧的索引对不上号，
 // 篇号错一位，取回来的就是另一篇文章。manifest(263KB) 与 sde-coords(86KB) 此前每次调用都
 // 重拉重解，反倒是更小的 sections/kw 有缓存；出流前的 CPU 就是这么一点点堆上平台上限的。
-function tierFresh() {
+/* IDX_STAMP（2026-08-17）——**本次报障的病灶**。
+   旧写法：每 30 秒把 TIER 整份丢掉重来。于是每半分钟就要重新取回并重新解析
+   manifest(692KB·4318 篇)＋sde-coords(逐篇建 Set)＋若干篇层索引（kw/students.json
+   已经 1.05MB／11.7 万个关键词串）。解析产物在 V8 堆上是原始字节的五到十倍，
+   而 **128MB 内存是整个 isolate 共用的**（Cloudflare 文档原话：per-isolate，
+   一个 isolate 同时在跑好几个请求）。旧新两份并存的那一瞬间叠上并发，isolate 撞顶：
+   表现就是「子请求 503（超出资源上限）＋ 正在流的那一答被无声掐断、既无 error 也无 [DONE]」。
+   用户 2026-08-17 那张截图（站内检索 HTTP 503 · 第 3 秒 · 收到 105 帧 · 停在「基底作答」·
+   流被截断）就是这个死法：两次子请求瞬间 503，三秒后连答题那条流一起陪葬。
+   新写法：复验只问 R2 一句 head（不取正文、不解析），etag 没变就**什么都不重建**，
+   只把 at 推后。发新文后索引一重建 etag 就变，半分钟内照样换上新语料——两头都不丢。 */
+async function idxStamp(env) {
+  try {
+    if (env && env.PDFS && env.PDFS.head) {
+      const h = await env.PDFS.head("search/manifest.json");
+      if (h) return String(h.etag || (h.uploaded && h.uploaded.toISOString ? h.uploaded.toISOString() : h.uploaded) || "");
+    }
+  } catch (e) {}
+  return "";   // 取不到 stamp（本地/预览、或桶里还没有索引）就退回旧行为：到点整份重来
+}
+async function tierFresh(env) {
   const now = Date.now();
-  if (now - TIER.at > CORPUS_TTL) TIER = { at: now, l0: null, l1: {}, man: null, coords: undefined };
+  if (now - TIER.at <= CORPUS_TTL) return;
+  const st = await idxStamp(env);
+  if (st && st === TIER.stamp) { TIER.at = now; return; }   // 索引没换：整份留用，一个字节都不重解析
+  TIER = { at: now, l0: null, l1: {}, l1b: 0, man: null, coords: undefined, stamp: st };
 }
 async function idxManifest(env, url) {
-  tierFresh();
+  await tierFresh(env);
   if (TIER.man) return TIER.man;
   const j = await (await idxFetch(env, url, "/search/manifest.json")).json();
   TIER.man = j;
@@ -2982,29 +3008,53 @@ async function idxFetch(env, url, path) {
   }
   return env.ASSETS.fetch(new Request(new URL(path, url)));
 }
+const TIER_L1_ALL = 2600 * 1024;   // 篇层缓存合计**原始字节**上限（够装下 students+books+_root+frontier）
 async function tierGet(env, url, path, key) {
-  tierFresh();
+  await tierFresh(env);
   if (key === "l0" && TIER.l0) return TIER.l0;
-  if (key !== "l0" && TIER.l1[key]) return TIER.l1[key];
+  if (key !== "l0" && TIER.l1[key]) return TIER.l1[key].j;
   const r = await idxFetch(env, url, path);
   if (!r.ok) return null;
-  const j = await r.json();
-  // 篇层索引单个最大 185KB，解析成对象后还要再涨几倍。全站三十多个版块全缓存下来，
-  // 峰值内存足以把 isolate 顶到平台上限（表现就是「答题流跑到一半无声中断」）。封顶 8 个，先进先出。
-  if (key === "l0") TIER.l0 = j;
-  else {
-    const _ks = Object.keys(TIER.l1);
-    if (_ks.length >= 8) delete TIER.l1[_ks[0]];
-    TIER.l1[key] = j;
+  const txt = await r.text();
+  let j; try { j = JSON.parse(txt); } catch (e) { return null; }
+  if (key === "l0") { TIER.l0 = j; return j; }
+  /* 【一行一串，不留关键词数组】kw/students.json 现在 1.05MB／1827 篇／11.7 万个关键词串；
+     每个短字符串在 V8 堆上还要另加对象头，留着数组等于把一份 1MB 的 JSON 放大成十几 MB。
+     压成 "|词|词|" 一条串后常驻体量降到五分之一，命中判定由 _scoreKeys 兼容处理。 */
+  if (j && Array.isArray(j.rows)) {
+    const rows = new Array(j.rows.length);
+    for (let n = 0; n < j.rows.length; n++) {
+      const r0 = j.rows[n] || {};
+      rows[n] = { i: r0.i, k: "|" + (r0.k || []).join("|") + "|" };
+    }
+    j = { rows: rows };
+  }
+  /* 【封顶按字节，不按份数】旧写法封 8 份——那是篇层最大 185KB 时代的账；
+     如今单份就能到 1MB，8 份足以独占 isolate。先进先出，超出就把最早那份让出来。 */
+  const _b = txt.length;
+  if (_b <= TIER_L1_ALL) {
+    let _ks = Object.keys(TIER.l1);
+    while (TIER.l1b + _b > TIER_L1_ALL && _ks.length) {
+      const k0 = _ks.shift();
+      TIER.l1b -= (TIER.l1[k0] && TIER.l1[k0].b) || 0;
+      delete TIER.l1[k0];
+    }
+    TIER.l1[key] = { j: j, b: _b };
+    TIER.l1b += _b;
   }
   return j;
 }
+// list 收两种形态：数组（版块层 sections.json 原样）与 "|词|词|" 串（篇层，见 tierGet）。
+// 串形态必须带竖线比对，否则 "the" 会命中 "theory" —— 数组那一支是**全等**匹配，语义不能走样。
 function _scoreKeys(list, baseKeys, exp, prev) {
   if (!list || !list.length) return 0;
+  const hit = (typeof list === "string")
+    ? (key) => list.indexOf("|" + key + "|") >= 0
+    : (key) => list.indexOf(key) >= 0;
   let sc = 0;
-  for (const key of baseKeys) if (list.indexOf(key) >= 0) sc += 1;
-  for (const key of exp) if (list.indexOf(key) >= 0) sc += 1.2;
-  for (const key of prev) if (list.indexOf(key) >= 0) sc += 0.4;
+  for (const key of baseKeys) if (hit(key)) sc += 1;
+  for (const key of exp) if (hit(key)) sc += 1.2;
+  for (const key of prev) if (hit(key)) sc += 0.4;
   return sc;
 }
 async function ragScan(env, url, q, expTerms, prevQ, k, chunkLimit, opts) {
@@ -3060,7 +3110,7 @@ async function ragScan(env, url, q, expTerms, prevQ, k, chunkLimit, opts) {
         for (const key of baseKeys) if (tl.indexOf(key) >= 0) sc += 3;
         for (const key of exp) if (tl.indexOf(key) >= 0) sc += 2;
       }
-      if (coords && exp.length) { const dc = coords[r.i]; if (dc) { for (const t of exp) if (dc.has(t)) sc += 1.5; } }
+      if (coords && exp.length) { const dc = coords[r.i]; if (dc) { for (const t of exp) if (dc.indexOf("|" + t + "|") >= 0) sc += 1.5; } }
       if (sc > 0) docScore.set(r.i, sc);
     }
   };
@@ -3077,30 +3127,46 @@ async function ragScan(env, url, q, expTerms, prevQ, k, chunkLimit, opts) {
   // —— L2：一轮 8 篇地下钻，够用就停 ——
   const WANT = Math.max(4000, Math.min(30000, o.want || 12000));   // 正文材料想凑够多少字符
   let top = [], bytes = 0, got = 0;
-  for (let i = 0; i < cand.length; i++) {
+  /* 【并行取块】块文件都很小（几 KB 到几十 KB），一次串行 18 篇却要 8.7 秒——
+     时间全花在等 R2 的往返上（实测单篇约 0.4 秒）。改成每批 6 篇并行取回，
+     整段检索从 8.7 秒降到 2 秒上下。这不只是快：站内检索是在**答题那条流已经开着**
+     的时候跑的，它慢一秒，答题就少一秒，被平台掐断的窗口也就多一秒。
+     打分与入选顺序仍按候选名次逐篇处理，结果与串行一致。 */
+  const L2_BATCH = 6;
+  for (let i = 0; i < cand.length; i += L2_BATCH) {
     if (bytes > BYTE_BUDGET) break;
-    // 每 8 篇回头看一眼：命中量已远超所需（选段时只会取其中一小部分）才停止下钻，
+    // 每一批回头看一眼：命中量已远超所需（选段时只会取其中一小部分）才停止下钻，
     // 否则宁可多读两篇——实测过早收手会把资料从 8 千字砍到 4 千字。
-    if (i > 0 && i % 8 === 0 && got >= WANT * 3) break;
-    const c = cand[i];
-    let dj = null;
-    try {
-      const r = await idxFetch(env, url, "/search/doc/" + c.i + ".json");
-      if (!r.ok) continue;
-      const txt = await r.text();
+    if (i > 0 && got >= WANT * 3) break;
+    const batch = cand.slice(i, i + L2_BATCH);
+    const texts = await Promise.all(batch.map(async (c) => {
+      try {
+        const r = await idxFetch(env, url, "/search/doc/" + c.i + ".json");
+        if (!r.ok) return null;
+        return await r.text();
+      } catch (e) { return null; }
+    }));
+    for (let bi = 0; bi < batch.length; bi++) {
+      const txt = texts[bi]; texts[bi] = null;
+      if (!txt) continue;
       bytes += txt.length;
-      dj = JSON.parse(txt);
-    } catch (e) { continue; }
-    for (const t of (dj.c || [])) {
-      const tl = t.toLowerCase();
-      let sc = 0;
-      for (const key of baseKeys) { const n = tl.split(key).length - 1; if (n) sc += n; }
-      for (const key of exp) { const n = tl.split(key).length - 1; if (n) sc += n * 1.2; }
-      for (const key of prev) { const n = tl.split(key).length - 1; if (n) sc += n * 0.4; }
-      if (q && t.indexOf(q) >= 0) sc += 8;
-      if (sc > 0) { top.push({ sc: sc + c.sc * 0.2, d: c.i, t: t.length > cut ? t.slice(0, cut) : t }); got += Math.min(t.length, cut); }
+      const c = batch[bi];
+      let dj = null;
+      try { dj = JSON.parse(txt); } catch (e) { continue; }
+      for (const t of (dj.c || [])) {
+        const tl = t.toLowerCase();
+        let sc = 0;
+        for (const key of baseKeys) { const n = tl.split(key).length - 1; if (n) sc += n; }
+        for (const key of exp) { const n = tl.split(key).length - 1; if (n) sc += n * 1.2; }
+        for (const key of prev) { const n = tl.split(key).length - 1; if (n) sc += n * 0.4; }
+        if (q && t.indexOf(q) >= 0) sc += 8;
+        if (sc > 0) { top.push({ sc: sc + c.sc * 0.2, d: c.i, t: t.length > cut ? t.slice(0, cut) : t }); got += Math.min(t.length, cut); }
+      }
+      dj = null;
     }
-    dj = null;
+    // 候选段落表原来是无界的：一篇长文能贡献上百段，几百段各带 1600 字就是几 MB。
+    // 每批过后削一次，只留分最高的三百段（最终只取 k≤48 段，三百段绰绰有余）。
+    if (top.length > 600) { top.sort((a, b) => b.sc - a.sc); top.length = 300; }
   }
   top.sort((a, b) => b.sc - a.sc);
   const perDoc = {}, picked = [];
@@ -3172,7 +3238,7 @@ function retrieve(corpus, q, k, expTerms) {
     // SDE 坐标匹配：本块所属文档的 SDE 坐标与查询扩展词重叠 → 加分（捞出文本没明说、但 SDE 坐标相关的文章）
     if (coords && exp.length) {
       const dc = coords[ck.d];
-      if (dc) { let ov = 0; for (const t of exp) if (dc.has(t)) ov++; if (ov) sc += ov * 2; }
+      if (dc) { let ov = 0; for (const t of exp) if (dc.indexOf("|" + t + "|") >= 0) ov++; if (ov) sc += ov * 2; }
     }
     if (sc > 0) scored.push({ sc, ck });
   }
@@ -7406,8 +7472,12 @@ export default {
                     _ragWhy = (jr && jr.msg) || "返回不可用";
                     break;
                   }
-                  _ragWhy = "HTTP " + rr.status;
+                  // 平台把子请求判掉时正文里写着是哪一条上限（1102 之类）——不带上它，
+                  // 下次报障就只剩一个光秃秃的 503，等于什么都没说。
+                  let _et = ""; try { _et = (await rr.text()).slice(0, 120).replace(/\s+/g, " "); } catch (e2) {}
+                  _ragWhy = "HTTP " + rr.status + (_et ? ("：" + _et) : "");
                   if (rr.status < 500) break;
+                  await new Promise((rs2) => setTimeout(rs2, 300));   // 隔一拍再试：让它有机会落到另一个 isolate
                 } catch (e) { _ragWhy = "子请求异常：" + ((e && e.message) || ""); }
               }
               // 失败必须可见：静默降级＝把"这一答其实没查过站内"记成查过了。

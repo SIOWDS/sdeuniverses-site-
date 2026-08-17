@@ -450,6 +450,7 @@
       stopped: "（你按了停止）", stoppedOnly: "（已停止）",
       errEmpty: "这一轮只想、没写：基底把额度全花在思考上了（已思考 ", errEmptyNo: "这一轮基底一个字都没写出来（连思考也没有）。可能是这一场太长、或线路被中途切断——把顶部切到「标准」档再问一遍，或新开一场。", errEmptyEnd: " 字），正文一个字都没落。聊得越长越容易这样——把顶部切到「标准」档再问一遍，或新开一场。",
 
+      errCutAuto: "这一趟在半路被平台掐断了（一个字都没写出来）——正在自动重问一次…",
       errCut: "这一轮没走完就断了——不是基底没写，是整个请求在半路被平台掐断（服务端连一句错都来不及说）。点「重答」再来一次；老是这样就把顶部切到「标准」档，或新开一场。",
       errDead: "连接像是断了（也许想太久被中间层切了）。稍后再问，你这句我记着。",
       errNet: "接不上 WDS 了（", errNetEnd: "）。稍后再问，你这句我记着。",
@@ -663,6 +664,7 @@
       stopped: "(you stopped it)", stoppedOnly: "(stopped)",
       errEmpty: "All reasoning, no answer: the model spent its whole budget thinking (", errEmptyNo: "The model returned nothing this turn — not even reasoning. The session may be too long, or the connection was cut. Switch the top mode to Standard and ask again, or start a fresh session.", errEmptyEnd: " chars of reasoning) and wrote no text. The longer the session, the likelier this is — switch the top mode to Standard and ask again, or start a fresh session.",
 
+      errCutAuto: "That attempt was severed by the platform before a single word came back — asking again automatically…",
       errCut: "This turn was cut off mid-flight — the model isn't silent, the stream was severed (most likely the server was killed by the platform, so it never got to report an error). Hit Retry; if it keeps happening, switch the top mode to Standard or start a fresh session.",
       errDead: "The connection dropped — it may have thought too long and been cut. Try again in a moment; your question is still here.",
       errNet: "Couldn't reach SDE (", errNetEnd: "). Try again shortly.",
@@ -1916,6 +1918,11 @@
     try { document.documentElement.lang = LANG; } catch (e) {}
   }
   var history = [], streaming = false, curReader = null, stoppedByUser = false;
+  /* 断流自动重问的节流位：平台掐断是**没有任何回执**的（无 error、无 [DONE]、正文零字），
+     读者看到的只是一段红字，得自己去点「重答」。这一类失败重来一次多半就过去了，
+     所以自动替他点一次。**每 60 秒最多一次**——两次都断说明不是偶发，
+     那就把完整诊断行摆出来让人看见，别在那儿无限重问烧读者的 Key。 */
+  var _cutRetryAt = 0;
 
   // —— 模式（深度思考 / 联网），存本地，跨会话记住 ——
   var thinkMode = "std", webOn = false;
@@ -3276,6 +3283,16 @@
           } else if (stoppedByUser) {
             cell.a.className = "wdsm-a plain"; cell.a.textContent = t("stoppedOnly");
           } else if (!errShown) {
+            /* 【被掐断且零正文：自动重问一次】判据必须是 !sawDone —— 收到过 [DONE]
+               说明服务端把话说完了（那是"只思考没写字"，重问一遍多半还是那样，不自动重来）。 */
+            if (!sawDone && !stoppedByUser && Date.now() - _cutRetryAt > 60000) {
+              _cutRetryAt = Date.now();
+              cell.a.className = "wdsm-a plain";
+              cell.a.textContent = t("errCutAuto");
+              endUI();
+              setTimeout(function () { regen(cell); }, 900);
+              return;
+            }
             // 流干干净净地结束，却一个正文字都没有 —— 这一支原来是空的，页面于是什么都不说。
             // 沉默是最坏的一种失败：读者只会以为它还在跑。
             cell.a.className = "wdsm-a plain wdsm-err";
