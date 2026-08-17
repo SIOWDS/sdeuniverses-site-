@@ -118,7 +118,7 @@ d.text((88, 1452), '十位作者的十条创见 · 全部重写 · 十二个量 
 
 d.text((88, H - 150), '德麦国际出版社　Demai International Press', font=fs, fill=(96, 120, 142))
 d.text((88, H - 112), '专著第 92 号', font=fs, fill=(96, 120, 142))
-d.text((240, H - 108), '·   ISBN 979-8-90690-040-1', font=fm, fill=(96, 120, 142))
+d.text((240, H - 108), '·   ISBN 979-8-90690-034-0', font=fm, fill=(96, 120, 142))
 
 cov.save('cover.jpg', quality=92)
 
@@ -161,7 +161,7 @@ for txt, sz, col in body:
 
 bd.line([(92, H - 300), (W - 92, H - 300)], fill=(30, 50, 70), width=2)
 bd.text((92, H - 268), '德麦国际出版社　·　专著第 92 号', font=fs, fill=(96, 120, 142))
-bd.text((92, H - 228), 'ISBN 979-8-90690-040-1', font=fm, fill=(96, 120, 142))
+bd.text((92, H - 228), 'ISBN 979-8-90690-034-0', font=fm, fill=(96, 120, 142))
 bd.text((92, H - 192), 'US$18.80', font=fm, fill=(96, 120, 142))
 
 # 装饰性条码（非真 EAN13）
@@ -175,7 +175,7 @@ while x < bx + 300:
     if random.random() < 0.55:
         bd.rectangle([x, by, x + w_, by + 96], fill=(12, 18, 26))
     x += w_ + random.choice([2, 3])
-bd.text((bx + 18, by + 100), '9 798906 900401', font=f(MONO, 20), fill=(12, 18, 26))
+bd.text((bx + 18, by + 100), '9 798906 900340', font=f(MONO, 20), fill=(12, 18, 26))
 
 full.paste(bk, (0, 0))
 full.paste(cov, (W + SPINE, 0))

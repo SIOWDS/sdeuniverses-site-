@@ -8,8 +8,8 @@ NO, TITLE = '92', '谁来陪伴我？'
 PDFNAME = '谁来陪伴我.pdf'
 DST = os.path.join(SITE, 'books/m/' + NO)
 SUB = 'AI 时代的婚姻困境'
-PAGES_N, WAN = '141 页', '约 8.1 万汉字'
-ISBN = '979-8-90690-040-1'
+PAGES_N, WAN = '224 页', '约 14.6 万汉字'
+ISBN = '979-8-90690-034-0'
 
 os.makedirs(DST, exist_ok=True)
 shutil.copy(f'{SRC}/{PDFNAME}', f'{DST}/{PDFNAME}')
@@ -55,7 +55,7 @@ for b in blocks:
         elif re.match(r'^第[一二三四五六七八九十]+章', flat):
             ci += 1; slug = 'c%02d' % ci
         elif flat.startswith('附录'):
-            slug = {'一': 'ap1', '二': 'ap2', '三': 'ap3'}[flat[2]]
+            slug = {'一': 'ap1', '二': 'ap2', '三': 'ap3', '四': 'ap4'}[flat[2]]
         else:
             slug = None
             for k, v in SLUG.items():
@@ -175,7 +175,7 @@ idx = (f'<!DOCTYPE html><html lang="zh"><head><meta charset="utf-8">'
        f'<title>{TITLE} · 网页版全书 · 德麦国际专著第 {NO} 号</title>'
        f'<meta name="description" content="{SUB}。王德生＋Claude 编著，据十位作者的十篇论文全部重写。网页版全书目录。">{CSS}</head><body>'
        f'{BAR}<div class="wrap"><h1>{TITLE}</h1>'
-       f'<div class="meta">{SUB} · 王德生 ＋ Claude 编著 · 前言·导读·导论·四编十章·枢纽章·合章·结语·参考书目·三附录·全书十句·后记 · {WAN} · {PAGES_N} · ISBN {ISBN} · 德麦国际专著第 {NO} 号</div>'
+       f'<div class="meta">{SUB} · 王德生 ＋ Claude 编著 · 前言·导读·导论·四编十章·枢纽章·合章·结语·参考书目·四附录·全书十句·后记 · {WAN} · {PAGES_N} · ISBN {ISBN} · 德麦国际专著第 {NO} 号</div>'
        f'<div class="toc">{"".join(toc)}</div>'
        f'<div class="foot">© 德麦国际出版社 · 王德生 ＋ Claude《{TITLE}》</div></div></body></html>')
 open(os.path.join(TXT, 'index.html'), 'w', encoding='utf-8').write(idx)

@@ -4,7 +4,7 @@ NO = '92'
 TITLE = '谁来陪伴我？'
 SUB = 'AI 时代的婚姻困境'
 PDF = '谁来陪伴我.pdf'
-ISBN = '979-8-90690-040-1'
+ISBN = '979-8-90690-034-0'
 DST = f'/home/claude/site/public/books/m/{NO}'
 
 HTML = f"""<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -42,8 +42,8 @@ ul{{padding-left:22px}}li{{margin:0 0 8px}}
 <div class="hero">
 <h1>{TITLE}</h1>
 <div class="sub">{SUB} · 王德生 ＋ Claude 编著</div>
-<div class="metaline">德麦国际出版社 · 专著第 {NO} 号 · ISBN {ISBN} · US$18.80 · 141 页 · 约 8.1 万汉字 · 二〇二六年八月</div>
-<div class="btns"><a class="btn" href="/books/m/{NO}/text/">📖 网页版全书 · 29 页</a><a class="btn" href="/books/m/{NO}/read.html">📄 在线翻阅 · 141 页</a><a class="btn" href="/books/m/{NO}/{PDF}">⬇ 下载 PDF</a></div>
+<div class="metaline">德麦国际出版社 · 专著第 {NO} 号 · ISBN {ISBN} · US$18.80 · 224 页 · 约 14.6 万汉字 · 二〇二六年八月</div>
+<div class="btns"><a class="btn" href="/books/m/{NO}/text/">📖 网页版全书 · 30 页</a><a class="btn" href="/books/m/{NO}/read.html">📄 在线翻阅 · 224 页</a><a class="btn" href="/books/m/{NO}/{PDF}">⬇ 下载 PDF</a></div>
 </div>
 
 <img class="cover" src="cover.jpg" alt="{TITLE} 封面">
@@ -56,7 +56,7 @@ ul{{padding-left:22px}}li{{margin:0 0 8px}}
 
 <h2>这本书是怎么做出来的</h2>
 <p>本书取自站内十位作者已发表的十篇高创新论文——秦莉、刘言言、高鹏、张琼、王德生、陈晓艳、高于涵、胡敏、少敏、胡志英。十个学科域，<b>没有一篇是写婚姻的</b>：亲密关系理论、制度社会学、法哲学、社会学方法论、学术制度、临床心理、思想史、运动医学、创作论、认识论。</p>
-<p><b>十章无一为原文照录。</b> 每一章只取原篇的一个命名与一条机制，论证结构、全部案例、全部判准、全部分界与全部关于婚姻与 AI 的内容，为本书重写。原篇合计 24.8 万字，本书 7.6 万字，重合处为零。逐篇对照与四处与原篇判断不同的地方，写在附录三。</p>
+<p><b>十章无一为原文照录。</b> 每一章只取原篇的一个命名与一条机制，论证结构、全部案例、全部判准、全部分界与全部关于婚姻与 AI 的内容，为本书重写。原篇合计 24.8 万字，本书 14.6 万字，重合处为零。逐篇对照与四处与原篇判断不同的地方，写在附录三。</p>
 <p>站内已有的「婚姻幸福专栏」二十四篇，<b>一篇也未选入</b>——它们在本书中的位置是必须逐条划界的近邻。</p>
 
 <h2>十章十个量</h2>
