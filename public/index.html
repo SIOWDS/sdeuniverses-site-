@@ -34,6 +34,10 @@ body.en{font-family:'EB Garamond','Playfair Display',Georgia,serif}
 nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;flex-direction:column;padding:0.6rem 3rem 0.55rem;background:rgba(245,239,224,0.88);backdrop-filter:blur(12px);border-bottom:1px solid var(--border2)}
 .nav-bar-main{display:flex;align-items:center;justify-content:space-between;width:100%}
 .nav-bar-sub{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:0.55rem 1.5rem;width:100%;margin-top:0.6rem;padding-top:0.7rem;border-top:1px solid var(--border2)}
+.nav-bar-sub.nbs-grid{flex-direction:column;flex-wrap:nowrap;gap:0.30rem}
+.nbs-row{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));width:100%;max-width:880px;margin:0 auto}
+.nbs-row a{text-align:center;padding:3px 4px;white-space:nowrap}
+@media(max-width:820px){.nbs-row{grid-template-columns:repeat(2,minmax(0,1fr))}.nbs-row a{white-space:normal}}
 .nav-bar-sub a{color:var(--text2);text-decoration:none;font-size:0.9rem;font-weight:600;letter-spacing:0.14em;transition:color 0.2s}
 .nav-bar-sub a:hover{text-decoration:underline;text-underline-offset:4px;opacity:0.78}
 .nav-logo{display:inline-flex;flex-direction:column;align-items:stretch;justify-content:center;line-height:1.12;color:var(--gold);text-decoration:none}
@@ -455,31 +459,21 @@ body.zh .en-only{display:none}
   <span class="agent-strip-tag zh-only">🔥 智能体</span><span class="agent-strip-tag en-only">🔥 Agents</span>
   <a href="/taste/" class="ag-chip ag-tag ag-c6" role="group" aria-label="SDE智能体免费品尝"><span class="ag-flame" aria-hidden="true"><i class="ag-ember" style="left:22%;animation-delay:0s"></i><i class="ag-ember" style="left:50%;animation-delay:0.5s"></i><i class="ag-ember" style="left:78%;animation-delay:1.0s"></i></span><span class="ag-label zh-only">免费品尝全部 →</span><span class="ag-label en-only">Taste all agents →</span></a>
 </div>
-<div class="nav-bar-sub">
-    <a href="/brain-gym/" class="col-bgy zh-only">健脑三件</a><a href="/brain-gym/" class="col-bgy en-only">Brain Gym</a><a href="/today/" class="col-tap zh-only">📰 今日文章</a><a href="/today/" class="col-tap en-only">📰 Today's Articles</a>
-    <a href="/monographs/" class="col-tap zh-only">📚 专著栏目</a><a href="/monographs/" class="col-tap en-only">📚 Monographs</a>
-    <a href="/master/" class="col-tap zh-only">解构大师</a><a href="/master/" class="col-tap en-only">Deconstruction Master</a>
-    <a href="/mentor/" class="col-tap zh-only">师范文</a><a href="/mentor/" class="col-tap en-only">Model Essays</a>
-    
-    <a href="/ideas/" class="col-tap zh-only">💡 思想·应用</a><a href="/ideas/" class="col-tap en-only">💡 Ideas &amp; Applications</a>
-    <a href="/western-philosophy/" class="col-wph zh-only">西方哲学</a><a href="/western-philosophy/" class="col-wph en-only">Western Philosophy</a>
-    <a href="/marriage-happiness/" class="col-mar zh-only">婚姻幸福专栏</a><a href="/marriage-happiness/" class="col-mar en-only">Marriage</a>
-    <a href="/family-ethics/" class="col-fam zh-only">家庭与伦理</a><a href="/family-ethics/" class="col-fam en-only">Family &amp; Ethics</a>
-    <a href="/education/" class="col-edu zh-only">教育专栏</a><a href="/education/" class="col-edu en-only">Education</a><a href="/sde-education/" class="col-edu zh-only">SDE教育学</a><a href="/sde-education/" class="col-edu en-only">SDE Pedagogy</a>
-    <a href="/health/" class="col-hea zh-only">健康专栏</a><a href="/health/" class="col-hea en-only">Health</a>
-    <a href="/faith-and-life/" class="col-fai zh-only">信仰与人生</a><a href="/faith-and-life/" class="col-fai en-only">Faith &amp; Life</a>
-      <a href="/art/" class="col-art zh-only">艺术专栏</a><a href="/art/" class="col-art en-only">Art</a>
-      <a href="/involution/" class="col-inv zh-only">内卷与出路</a><a href="/involution/" class="col-inv en-only">Involution &amp; the Way Out</a>
-      <a href="/business/" class="col-biz zh-only">商业与经济</a><a href="/business/" class="col-biz en-only">Business &amp; Economics</a>
-    <a href="/enterprise-ontology/" class="col-ent zh-only">企业本体论</a><a href="/enterprise-ontology/" class="col-ent en-only">Enterprise Ontology</a>
-    <a href="/discovery-vs-genesis/" class="col-dvg zh-only">发现VS发生</a><a href="/discovery-vs-genesis/" class="col-dvg en-only">Discovery vs Genesis</a>
-    <a href="/fiction/" class="col-fic zh-only">小说专栏</a><a href="/fiction/" class="col-fic en-only">Fiction</a>
-    <a href="/column/erji-yanshen/" class="col-eys zh-only">二级延申</a><a href="/column/erji-yanshen/" class="col-eys en-only">Second-Order Extensions</a>
-    <a href="/creation/" class="col-crt zh-only">学术创造专栏</a><a href="/creation/" class="col-crt en-only">Academic Creation</a>
-    <a href="/plagiarism/" class="col-plg zh-only burn">论文抄袭专栏</a><a href="/plagiarism/" class="col-plg en-only burn">Plagiarism</a>
-    <a href="/ai/" class="col-ai zh-only">AI专栏</a><a href="/ai/" class="col-ai en-only">AI</a>
-    <a href="/culture-tech/" class="col-cht zh-only">中华文化与科技创新</a><a href="/culture-tech/" class="col-cht en-only">Chinese Culture &amp; Tech</a>
-    <!-- SDE 会议与 SDE 讨论已并入「SDE 社区」（顶栏紧跟「ChatSDE」那一颗），栏目条不再各占一格 -->
+<div class="nav-bar-sub nbs-grid">
+    <div class="nbs-row">
+      <a href="/today/" class="col-tap zh-only">今日文章</a><a href="/today/" class="col-tap en-only">Today</a>
+      <a href="/monographs/" class="col-tap zh-only">专著栏目</a><a href="/monographs/" class="col-tap en-only">Monographs</a>
+      <a href="/creation/" class="col-crt zh-only">学术创造</a><a href="/creation/" class="col-crt en-only">Academic Creation</a>
+      <a href="/thought/" class="col-wph zh-only">哲学与思想</a><a href="/thought/" class="col-wph en-only">Thought</a>
+      <a href="/ai/" class="col-ai zh-only">AI 专栏</a><a href="/ai/" class="col-ai en-only">AI</a>
+    </div>
+    <div class="nbs-row">
+      <a href="/education/" class="col-edu zh-only">教育专栏</a><a href="/education/" class="col-edu en-only">Education</a>
+      <a href="/health/" class="col-hea zh-only">健康专栏</a><a href="/health/" class="col-hea en-only">Health</a>
+      <a href="/life/" class="col-fam zh-only">人生与家庭</a><a href="/life/" class="col-fam en-only">Life &amp; Family</a>
+      <a href="/business/" class="col-biz zh-only">商业与经济</a><a href="/business/" class="col-biz en-only">Business</a>
+      <a href="/culture/" class="col-art zh-only">文化与艺术</a><a href="/culture/" class="col-art en-only">Culture &amp; Art</a>
+    </div>
   </div>
 </nav>
 

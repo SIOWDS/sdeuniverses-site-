@@ -87,13 +87,8 @@
 /* 睡眠专栏 · 首页入口（2026-08-09） */
 ;(function(){
   function mountSleepColumn(){
-    var nav=document.querySelector('.nav-bar-sub');
-    if(nav && !nav.querySelector('[data-sleep-column]')){
-      var a=document.createElement('a');
-      a.href='/sleep/';a.setAttribute('data-sleep-column','1');a.textContent='睡眠专栏';
-      a.style.cssText='color:#6D4FB3;font-weight:800;text-shadow:0 0 16px rgba(141,110,220,.18)';
-      nav.appendChild(a);
-    }
+    /* 2026-08-17：子导航已并成两排各 5 条（.nbs-grid），再往末尾 append 一条就会破坏对称。
+       睡眠专栏改挂在「健康专栏」页的子导航里（静态 HTML），此处不再动顶栏。 */
     if(document.getElementById('sleep-column-home')) return;
     var hero=document.getElementById('hero'); if(!hero)return;
     var section=document.createElement('section');section.id='sleep-column-home';
