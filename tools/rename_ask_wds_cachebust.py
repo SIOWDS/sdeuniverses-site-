@@ -18,7 +18,7 @@ VER = "20260730c"
 
 SRC_MAP = [
     ('src="/wds-mode.js"', 'src="/wds-mode.js?v=%s"' % VER),
-    ('src="/wds-mode.js?v=20260730b"', 'src="/wds-mode.js?v=%s"' % VER),
+    ('src="/wds-mode.js?v=20260817b"', 'src="/wds-mode.js?v=%s"' % VER),
     ('src="/taste/wds-companion/wds-read.js"', 'src="/taste/wds-companion/wds-read.js?v=%s"' % VER),
     ('src="/taste/wds-companion/wds-pdf.js"', 'src="/taste/wds-companion/wds-pdf.js?v=%s"' % VER),
 ]

@@ -797,7 +797,7 @@ def build(panel: dict, panel_idx: int) -> Path:
 <p class="lede">{esc(lede)}</p>
 {article}
 <p class="end"><b>SDEUniverses.com · 新思想前沿</b>　｜　第 {panel['no']} 号　｜　王德生 亲撰</p>
-</main><script src="/wds-mode.js?v=20260802b" defer></script></body></html>'''
+</main><script src="/wds-mode.js?v=20260817b" defer></script></body></html>'''
     count = cn(shell.replace("@@COUNT@@", ""))
     shell = shell.replace("@@COUNT@@", f"{count:,}")
     target = PUB / panel["slug"] / "index.html"

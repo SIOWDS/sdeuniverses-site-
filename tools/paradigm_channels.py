@@ -121,7 +121,7 @@ def build_pages(db, h):
                  '<span class="lb">别 的 频 道</span><div class="chnav">%s</div></div>\n' % others)
         page += ('</main>\n<footer>每日必读 · %s · 作者 王德生 ＋ Claude · © 德麦国际 Demai International</footer>\n'
                  '<script src="/assets/sde-talk.js?v=20260731b" defer></script>\n'
-                 '<script src="/wds-mode.js?v=20260731i" defer></script>\n</body></html>\n'
+                 '<script src="/wds-mode.js?v=20260817b" defer></script>\n</body></html>\n'
                  % html.escape(c["cn"]))
         assert page.count("<div") == page.count("</div>"), c["id"] + " div 不配平"
         d = ROOT / "public" / "paradigm" / c["id"]

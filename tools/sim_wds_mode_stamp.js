@@ -6,9 +6,13 @@
  * **构建是绿的、线上文件是新的、所有 sim 也是绿的，唯独读者拿到的是旧的。**
  * 这条链上原来一个检查点都没有，本文件就是那个检查点。
  *
- * 查三件：① 记录的哈希与 wds-mode.js 当前内容一致（不一致 ⇒ 改完没跑 bump 工具）
+ * 查四件：① 记录的哈希与 wds-mode.js 当前内容一致（不一致 ⇒ 改完没跑 bump 工具）
  *         ② 全站引用的戳与记录的戳一致（不一致 ⇒ 漏改了页面）
  *         ③ 全站只有一种戳（历史上同时存在过三种，等于三批读者拿三个版本）
+ *         ④ **生成器模板里不许留化石戳**（2026-08-17 查出的复发机制：bump 只扫 public/，
+ *            tools/ 与 scripts/ 里的模板写死着旧戳 ⇒ 每一批新出的页面又带着化石戳出生。
+ *            实测 222 个并蒂文页停在 20260808a、16 个页面停在 20260802b，
+ *            而①②③三条**全都是绿的**——因为它们只看 public/ 里已经被统一过的那份。）
  * 跑法：node tools/sim_wds_mode_stamp.js
  */
 "use strict";
@@ -65,6 +69,31 @@ ok("全站用的就是记录里那个戳（" + wantStamp + "）",
   stamps.length === 1 && stamps[0] === wantStamp);
 if (badFiles.length) console.log("     对不上的前几个：" + badFiles.slice(0, 5).join(" / "));
 ok("引用页面数量合理（>1000，防止 walk 因为路径写错只扫到几个就报绿）", refFiles > 1000);
+
+/* ④ 生成器模板：新页面的戳由它们决定，它们不更新，存量统一多少次都会复发 */
+{
+  const STAMP_LIKE = /^\d{8}[a-z]{1,2}(?:t\d{6})?$/;   // 真戳；{VER}/__VER__/%s 这类占位符不在此列
+  // 这三份里的戳是**记录**不是引用（血案注释、账本、以及本文件自己的正则），跳过。
+  const SKIP = ["tools/bump_wds_mode.py", "tools/wds-mode.stamp", "tools/sim_wds_mode_stamp.js"];
+  const stale = [];
+  (function walkGen(dir) {
+    for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+      if (e.name === ".git" || e.name === "node_modules") continue;
+      const p = path.join(dir, e.name);
+      if (e.isDirectory()) { walkGen(p); continue; }
+      if (!/\.(html?|js|mjs|py)$/.test(e.name)) continue;
+      const rel = path.relative(ROOT, p).split(path.sep).join("/");
+      if (SKIP.indexOf(rel) >= 0 || rel.startsWith("public/")) continue;
+      let s2; try { s2 = fs.readFileSync(p, "utf8"); } catch (err) { continue; }
+      let m2; const R2 = /\/wds-mode\.js\?v=([A-Za-z0-9_.-]+)/g;
+      while ((m2 = R2.exec(s2))) {
+        if (STAMP_LIKE.test(m2[1]) && m2[1] !== wantStamp) stale.push(rel + " → " + m2[1]);
+      }
+    }
+  })(ROOT);
+  if (stale.length) console.log("     化石戳：" + stale.slice(0, 8).join(" / "));
+  ok("生成器/模板里没有化石戳（有 ⇒ 下一批新页面又会带着旧戳出生）", stale.length === 0);
+}
 
 /* 顺带：按需装载的那几个模块，各自的 *_WANT 必须与模块自报 VERSION 对齐——同一类病 */
 const FS2 = fs.readFileSync(JS, "utf8");

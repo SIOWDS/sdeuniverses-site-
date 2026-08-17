@@ -24,6 +24,16 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 JS = os.path.join(ROOT, "public", "wds-mode.js")
 STAMP_FILE = os.path.join(ROOT, "tools", "wds-mode.stamp")
 REF = re.compile(r'(/wds-mode\.js\?v=)([A-Za-z0-9_.-]+)')
+# 真戳长这样：8 位日期 + 一到两个字母（用完字母才挂 t 时分秒）。
+# 生成器里还有 `{VER}` / `__VER__` / `%s` 这类**占位符**——那是运行时才填的，一个都不许动。
+STAMP_RE = re.compile(r'^\d{8}[a-z]{1,2}(?:t\d{6})?$')
+# 这三份文件里出现的戳不是"引用"，是**记录**：bump 自己的血案注释、戳的账本、核对它的 sim。
+# 一起改写会把历史抹平（"四天没动过"那句话里的 20260808a 正是证据本身）。
+SKIP = {
+    os.path.join("tools", "bump_wds_mode.py"),
+    os.path.join("tools", "wds-mode.stamp"),
+    os.path.join("tools", "sim_wds_mode_stamp.js"),
+}
 
 
 def sha(path):
@@ -75,17 +85,23 @@ def main():
     digest = sha(JS)
     # 先扫一遍，看看现在有几种戳（历史上不同批次的页面戳不一样，正好一次统一）
     found, files = {}, []
-    for dirpath, dirnames, filenames in os.walk(os.path.join(ROOT, "public")):
+    # ⚠ 扫的是**整个仓库**，不只是 public/。
+    #   只扫 public 的时候，存量页面每次都被统一，而 tools/ 与 scripts/ 里的生成器模板
+    #   仍写死着一个旧戳 ⇒ 下一批新页面又带着化石戳出生。2026-08-17 查出时，
+    #   222 个并蒂文页停在 20260808a、16 个页面停在 20260802b，正是这么来的。
+    for dirpath, dirnames, filenames in os.walk(ROOT):
         dirnames[:] = [d for d in dirnames if d not in (".git", "node_modules")]
         for fn in filenames:
-            if not fn.endswith((".html", ".js", ".htm")):
+            if not fn.endswith((".html", ".js", ".htm", ".py", ".mjs")):
+                continue
+            if os.path.relpath(os.path.join(dirpath, fn), ROOT) in SKIP:
                 continue
             p = os.path.join(dirpath, fn)
             try:
                 s = open(p, encoding="utf-8").read()
             except (UnicodeDecodeError, OSError):
                 continue
-            ms = REF.findall(s)
+            ms = [m for m in REF.findall(s) if STAMP_RE.match(m[1])]   # 占位符不算、也不动
             if not ms:
                 continue
             files.append((p, s))
@@ -97,12 +113,18 @@ def main():
     print("现有版本戳分布：", ", ".join("%s×%d" % (k, v) for k, v in sorted(found.items())))
     print("新戳：", stamp)
 
-    changed = 0
+    changed, gen = 0, []
     for p, s in files:
-        s2 = REF.sub(lambda m: m.group(1) + stamp, s)
+        s2 = REF.sub(lambda m: m.group(1) + (stamp if STAMP_RE.match(m.group(2)) else m.group(2)), s)
         if s2 != s:
             open(p, "w", encoding="utf-8").write(s2)
             changed += 1
+            rel = os.path.relpath(p, ROOT)
+            if not rel.startswith("public" + os.sep):
+                gen.append(rel)
+    # 生成器改了几个要单独报出来：那才是"下一批新页面会带什么戳"的决定处。
+    if gen:
+        print("其中生成器/模板 %d 个：%s" % (len(gen), "、".join(sorted(gen))))
     # ⚠⚠ past 必须**在打开写句柄之前**算完。
     # `open(path, "w")` 是在参数求值之前就把文件截断的 —— 写成
     # `open(...).write(... past_stamps() ...)` 时，past_stamps() 读到的已经是一个空文件，

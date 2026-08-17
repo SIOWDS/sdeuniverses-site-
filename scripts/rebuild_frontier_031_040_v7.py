@@ -678,7 +678,7 @@ def build(slug: str, cfg: dict[str, object], panel_index: int) -> tuple[int, int
             "".join(blocks[8:])]
     for title, content in tail:
         body += [f'<h3 class="sec">{title}</h3>', content]
-    body += [end, "</main><script src=\"/wds-mode.js?v=20260802b\" defer></script>", "</body></html>"]
+    body += [end, "</main><script src=\"/wds-mode.js?v=20260817b\" defer></script>", "</body></html>"]
     out = "".join(body)
     han = len(re.findall(r"[\u3400-\u4dbf\u4e00-\u9fff]", strip_tags(re.search(r"<main>(.*?)</main>", out, re.S).group(1))))
     out = out.replace("__COUNT__", f"{round(han / 100) * 100:,}")
