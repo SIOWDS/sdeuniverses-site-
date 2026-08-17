@@ -8,7 +8,7 @@ NO, TITLE = '92', '谁来陪伴我？'
 PDFNAME = '谁来陪伴我.pdf'
 DST = os.path.join(SITE, 'books/m/' + NO)
 SUB = 'AI 时代的婚姻困境'
-PAGES_N, WAN = '223 页', '约 14.6 万汉字'
+PAGES_N, WAN = '224 页', '约 14.7 万汉字'
 ISBN = '979-8-90690-034-0'
 
 os.makedirs(DST, exist_ok=True)
