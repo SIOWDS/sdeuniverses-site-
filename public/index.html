@@ -622,235 +622,46 @@ body.zh .en-only{display:none}
     <p class="zh-only" style="color:#8B98A5;font-size:16px;max-width:600px;margin:0 auto 40px">用你自己的 API Key,亲眼尝一口 SDE 发生学的威力——同一个问题,普通 AI 和 SDE 提智 AI,差距一目了然。</p>
     <p class="en-only" style="color:#8B98A5;font-size:16px;max-width:600px;margin:0 auto 40px">Bring your own API Key and taste the power of SDE — see the gap between plain AI and SDE-uplifted AI on the same question.</p>
 
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:18px;max-width:960px;margin:0 auto">
-
-      <!-- 卡0：SDE 语音解析（可用·置顶新上线） -->
-      <a href="/taste/voice-sde/" style="display:block;background:#161B22;border:1px solid rgba(155,123,212,0.45);border-top:3px solid #9B7BD4;border-radius:14px;padding:28px 24px;text-decoration:none;transition:transform .15s,border-color .2s" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
-        <div style="font-size:30px;margin-bottom:14px">🎙</div>
-        <div class="zh-only" style="font-size:11px;letter-spacing:0.2em;color:#B79BE8;margin-bottom:8px">其十六 · 现已上线</div>
-        <div class="en-only" style="font-size:11px;letter-spacing:0.2em;color:#B79BE8;margin-bottom:8px">NO.16 · LIVE</div>
-        <div class="zh-only" style="font-size:19px;font-weight:700;color:#E6EDF3;margin-bottom:8px">SDE 语音解析</div>
-        <div class="en-only" style="font-size:19px;font-weight:700;color:#E6EDF3;margin-bottom:8px">Voice to SDE</div>
-        <div class="zh-only" style="font-size:13.5px;color:#8B98A5;line-height:1.7"><b style="color:#C4B0E0">录下来，出文字，再把这番话拆开看。</b>开麦克风或摄像头讲，也可以直接拖进已有的音视频文件——它在你停顿的地方自己切段、切一段转一段，边讲边出字。转写稿再交给 WDS：<b style="color:#C4B0E0">他到底主张了什么、哪些前提根本没说出口、这番话的 S/D/E 各是什么、缝隙与断链在哪、当场可以问他哪三个问题</b>。说出来的话不能按文章读——观点埋在重复与迂回里，语气强度本身就是信息。三条转写通道任选（本机 Whisper 免费离线／智谱 GLM-ASR／浏览器听写），音视频只在你这台机器上</div>
-        <div class="en-only" style="font-size:13.5px;color:#8B98A5;line-height:1.7">Record from your mic or camera, or drop in an audio/video file. It cuts at your pauses and transcribes segment by segment as you speak. Then WDS reads the transcript the way speech has to be read: what was actually claimed, which premises were never said out loud, the S/D/E of the talk, where the gaps and broken links are, and three questions you could ask on the spot. Three transcription channels; the media never leaves your machine</div>
-        <div style="margin-top:16px;color:#B79BE8;font-size:14px;font-weight:700">立即品尝 →</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(172px,1fr));gap:14px;max-width:1040px;margin:0 auto;text-align:left">
+      <a href="/taste/idea-generator/" style="display:block;background:#161B22;border:1px solid rgba(212,178,94,0.30);border-top:3px solid #D4B25E;border-radius:14px;padding:22px 18px;text-decoration:none;transition:transform .15s" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
+        <div style="font-size:26px;margin-bottom:10px">✦</div>
+        <div class="zh-only" style="font-size:16.5px;font-weight:700;color:#E6EDF3;margin-bottom:7px">金点子发生器</div>
+        <div class="en-only" style="font-size:16.5px;font-weight:700;color:#E6EDF3;margin-bottom:7px">SDE Idea Generator</div>
+        <div class="zh-only" style="font-size:12.8px;color:#8B98A5;line-height:1.66">一个问题，普通 AI 与提智 AI 六路并排</div>
+        <div class="en-only" style="font-size:12.8px;color:#8B98A5;line-height:1.66">Plain AI vs uplifted AI, six answers side by side</div>
       </a>
-
-      <!-- 卡1：创新智商评分官（可用·置顶） -->
-      <a href="/taste/iq-scorer/" style="display:block;background:#161B22;border:1px solid rgba(212,178,94,0.35);border-top:3px solid #D4B25E;border-radius:14px;padding:28px 24px;text-decoration:none;transition:transform .15s,border-color .2s" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
-        <div style="font-size:30px;margin-bottom:14px">◎</div>
-        <div class="zh-only" style="font-size:11px;letter-spacing:0.2em;color:#D4B25E;margin-bottom:8px">其一 · 现已上线</div>
-        <div class="en-only" style="font-size:11px;letter-spacing:0.2em;color:#D4B25E;margin-bottom:8px">NO.1 · LIVE</div>
-        <div class="zh-only" style="font-size:19px;font-weight:700;color:#E6EDF3;margin-bottom:8px">创新智商评分官</div>
-        <div class="en-only" style="font-size:19px;font-weight:700;color:#E6EDF3;margin-bottom:8px">Innovation IQ Scorer</div>
-        <div class="zh-only" style="font-size:13.5px;color:#8B98A5;line-height:1.7">传一篇 Word/PDF，DeepSeek 与 GLM 双基底 SDE 提智后各打分：创新智商（满分160）＋论文水平（满分100），取平均</div>
-        <div class="en-only" style="font-size:13.5px;color:#8B98A5;line-height:1.7">Upload a paper — two SDE-uplifted bases score it: Innovation IQ (max 160) + paper quality (/100), averaged</div>
-        <div style="margin-top:16px;color:#D4B25E;font-size:14px;font-weight:700">立即品尝 →</div>
+      <a href="/taste/chatsde/" style="display:block;background:#161B22;border:1px solid rgba(212,178,94,0.30);border-top:3px solid #E5C86E;border-radius:14px;padding:22px 18px;text-decoration:none;transition:transform .15s" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
+        <div style="font-size:26px;margin-bottom:10px">✧</div>
+        <div class="zh-only" style="font-size:16.5px;font-weight:700;color:#E6EDF3;margin-bottom:7px">ChatSDE</div>
+        <div class="en-only" style="font-size:16.5px;font-weight:700;color:#E6EDF3;margin-bottom:7px">ChatSDE</div>
+        <div class="zh-only" style="font-size:12.8px;color:#8B98A5;line-height:1.66">站内主对话入口，斜杠命令直接开工</div>
+        <div class="en-only" style="font-size:12.8px;color:#8B98A5;line-height:1.66">The main chat entrance, with slash commands</div>
       </a>
-
-      <!-- 卡2：金点子发生器（可用） -->
-      <a href="/taste/idea-generator/" style="display:block;background:#161B22;border:1px solid rgba(212,178,94,0.35);border-top:3px solid #D4B25E;border-radius:14px;padding:28px 24px;text-decoration:none;transition:transform .15s,border-color .2s" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
-        <div style="font-size:30px;margin-bottom:14px">✦</div>
-        <div class="zh-only" style="font-size:11px;letter-spacing:0.2em;color:#D4B25E;margin-bottom:8px">其二 · 现已上线</div>
-        <div class="en-only" style="font-size:11px;letter-spacing:0.2em;color:#D4B25E;margin-bottom:8px">NO.2 · LIVE</div>
-        <div class="zh-only" style="font-size:19px;font-weight:700;color:#E6EDF3;margin-bottom:8px">金点子发生器</div>
-        <div class="en-only" style="font-size:19px;font-weight:700;color:#E6EDF3;margin-bottom:8px">Idea Generator</div>
-        <div class="zh-only" style="font-size:13.5px;color:#8B98A5;line-height:1.7">输入一个问题,并排对比普通 AI vs SDE 提智 AI,看差距</div>
-        <div class="en-only" style="font-size:13.5px;color:#8B98A5;line-height:1.7">One question, plain AI vs SDE-uplifted AI, side by side</div>
-        <div style="margin-top:16px;color:#D4B25E;font-size:14px;font-weight:700">立即品尝 →</div>
+      <a href="/taste/confluence/" style="display:block;background:#161B22;border:1px solid rgba(212,178,94,0.30);border-top:3px solid #D4B25E;border-radius:14px;padding:22px 18px;text-decoration:none;transition:transform .15s" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
+        <div style="font-size:26px;margin-bottom:10px">⚖</div>
+        <div class="zh-only" style="font-size:16.5px;font-weight:700;color:#E6EDF3;margin-bottom:7px">学科通融</div>
+        <div class="en-only" style="font-size:16.5px;font-weight:700;color:#E6EDF3;margin-bottom:7px">Confluence</div>
+        <div class="zh-only" style="font-size:12.8px;color:#8B98A5;line-height:1.66">三个学科的现行理论对撞成一篇两万字</div>
+        <div class="en-only" style="font-size:12.8px;color:#8B98A5;line-height:1.66">Three live theories collide into one paper</div>
       </a>
-
-
-      <!-- 卡3：碰撞出典范（可用·与金点子发生器并列） -->
-      <a href="/taste/paradigm-forge/" style="display:block;background:#161B22;border:1px solid rgba(196,100,62,0.45);border-top:3px solid #C4643E;border-radius:14px;padding:28px 24px;text-decoration:none;transition:transform .15s,border-color .2s" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
-        <div style="font-size:30px;margin-bottom:14px">⚔</div>
-        <div class="zh-only" style="font-size:11px;letter-spacing:0.2em;color:#DD7A52;margin-bottom:8px">其三 · 现已上线</div>
-        <div class="en-only" style="font-size:11px;letter-spacing:0.2em;color:#DD7A52;margin-bottom:8px">NO.3 · LIVE</div>
-        <div class="zh-only" style="font-size:19px;font-weight:700;color:#E6EDF3;margin-bottom:8px">碰撞出典范</div>
-        <div class="en-only" style="font-size:19px;font-weight:700;color:#E6EDF3;margin-bottom:8px">Collide to Paradigm</div>
-        <div class="zh-only" style="font-size:13.5px;color:#8B98A5;line-height:1.7">选三个源——<b style="color:#C9A227">一位学员的三篇、三位学员各一篇、站上三个学科的长文、由它联网去找的站外三家理论，或你自己粘进来的三篇</b>——让它们两两对撞，撞出一句三个源单看都说不出的判断，再<b style="color:#C9A227">写成一篇两万字</b>；十道工序逐格可见、可重跑、可手改，末格独立评审打创新智商，不到 150 点名回炉。这正是「每日必读」与「学科通融」两个栏目背后的那道工序</div>
-        <div class="en-only" style="font-size:13.5px;color:#8B98A5;line-height:1.7">Pick three sources — three papers by one author, one each from three authors, three long reads from different fields, three outside theories it finds on the web, or your own paste-ins. They collide pairwise into a judgement none of the three could reach alone, then get written up as a ~20k-character essay. Ten visible stages, each re-runnable and editable; an independent reviewer scores it at the end</div>
-        <div style="margin-top:16px;color:#DD7A52;font-size:14px;font-weight:700">立即品尝 →</div>
+      <a href="/taste/book-club/" style="display:block;background:#161B22;border:1px solid rgba(212,178,94,0.30);border-top:3px solid #3DA5A5;border-radius:14px;padding:22px 18px;text-decoration:none;transition:transform .15s" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
+        <div style="font-size:26px;margin-bottom:10px">▤</div>
+        <div class="zh-only" style="font-size:16.5px;font-weight:700;color:#E6EDF3;margin-bottom:7px">SDE 共读一本书</div>
+        <div class="en-only" style="font-size:16.5px;font-weight:700;color:#E6EDF3;margin-bottom:7px">Read a Whole Book</div>
+        <div class="zh-only" style="font-size:12.8px;color:#8B98A5;line-height:1.66">你的 PDF 整本，本机解析，陪你读完</div>
+        <div class="en-only" style="font-size:12.8px;color:#8B98A5;line-height:1.66">Your own PDF, parsed locally, read through with you</div>
       </a>
-
-
-      <!-- 卡3之二：学科通融（可用·碰撞出典范的问题驱动版） -->
-      <a href="/taste/confluence/" style="display:block;background:#161B22;border:1px solid rgba(196,100,62,0.45);border-top:3px solid #C4643E;border-radius:14px;padding:28px 24px;text-decoration:none;transition:transform .15s,border-color .2s" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
-        <div style="font-size:30px;margin-bottom:14px">⚖</div>
-        <div class="zh-only" style="font-size:11px;letter-spacing:0.2em;color:#DD7A52;margin-bottom:8px">其十三 · 现已上线</div>
-        <div class="en-only" style="font-size:11px;letter-spacing:0.2em;color:#DD7A52;margin-bottom:8px">NO.13 · LIVE</div>
-        <div class="zh-only" style="font-size:19px;font-weight:700;color:#E6EDF3;margin-bottom:8px">学科通融</div>
-        <div class="en-only" style="font-size:19px;font-weight:700;color:#E6EDF3;margin-bottom:8px">Confluence of Disciplines</div>
-        <div class="zh-only" style="font-size:13.5px;color:#8B98A5;line-height:1.7">给<b style="color:#C9A227">一个问题</b>，再给<b style="color:#C9A227">三个学科</b>——它先判这道题要的答案是什么形状（一个东西／一条路／一个驱动），再从<b style="color:#C9A227">站内库与联网两路</b>找出三家在这道题上互相顶撞的现行理论，撞出一条三家都不会同意、而三家的证据合起来只能得出的判断，写成一篇两万字的<b style="color:#C9A227">学术创新论文</b>，最后按封顶清单逐条自查再整篇打磨一遍。三家出处逐条给可点开的链接。这是顶栏「学科通融」栏目背后的那道工序</div>
-        <div class="en-only" style="font-size:13.5px;color:#8B98A5;line-height:1.7">Give it a question and three disciplines. It first decides what shape of answer the question wants, then hunts — across this site's own corpus and the live web — for three current theories that cannot all be right about it. They collide into a judgement none of the three would accept but their combined evidence forces, written up as a ~20k-character research paper, then audited line by line and rewritten once more. Every source comes with a checkable link</div>
-        <div style="margin-top:16px;color:#DD7A52;font-size:14px;font-weight:700">立即品尝 →</div>
+      <a href="/taste/voice-sde/" style="display:block;background:#161B22;border:1px solid rgba(212,178,94,0.30);border-top:3px solid #9B7BD4;border-radius:14px;padding:22px 18px;text-decoration:none;transition:transform .15s" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
+        <div style="font-size:26px;margin-bottom:10px">🎙</div>
+        <div class="zh-only" style="font-size:16.5px;font-weight:700;color:#E6EDF3;margin-bottom:7px">SDE 语音解析</div>
+        <div class="en-only" style="font-size:16.5px;font-weight:700;color:#E6EDF3;margin-bottom:7px">Voice to SDE</div>
+        <div class="zh-only" style="font-size:12.8px;color:#8B98A5;line-height:1.66">开口就转写，再把这番话拆开看</div>
+        <div class="en-only" style="font-size:12.8px;color:#8B98A5;line-height:1.66">Speak, transcribe, then take the talk apart</div>
       </a>
-
-      <!-- 卡4：经典解构器（可用） -->
-      <a href="/taste/classics-deconstructor/" style="display:block;background:#161B22;border:1px solid rgba(212,178,94,0.35);border-top:3px solid #D4B25E;border-radius:14px;padding:28px 24px;text-decoration:none;transition:transform .15s,border-color .2s" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
-        <div style="font-size:30px;margin-bottom:14px">🜂</div>
-        <div class="zh-only" style="font-size:11px;letter-spacing:0.2em;color:#D4B25E;margin-bottom:8px">其四 · 现已上线</div>
-        <div class="en-only" style="font-size:11px;letter-spacing:0.2em;color:#D4B25E;margin-bottom:8px">NO.4 · LIVE</div>
-        <div class="zh-only" style="font-size:19px;font-weight:700;color:#E6EDF3;margin-bottom:8px">经典解构器</div>
-        <div class="en-only" style="font-size:19px;font-weight:700;color:#E6EDF3;margin-bottom:8px">Classics Deconstructor</div>
-        <div class="zh-only" style="font-size:13.5px;color:#8B98A5;line-height:1.7">贴一段经典（≤500字），<b style="color:#C9A227">四篇学术论文同时并行生成</b>：传统经学对照 + SDE1/2/3各锁定三大方程/六路径/123原理其一，四篇各自独立自审自改两轮，末节均落到教育/健康/商业的具体应用，终稿定稿后再各自送评一次<b style="color:#C9A227">SDE创新智商</b>，全程顶配模型</div>
-        <div class="en-only" style="font-size:13.5px;color:#8B98A5;line-height:1.7">Paste a classic passage (≤500 chars) — four academic papers generated in parallel: a traditional-exegesis one, plus SDE 1/2/3, each independently applying one of the three-equations/six-paths/123-principle tools and self-reviewing itself twice, then each final draft is separately scored for SDE Innovation IQ, all on flagship models</div>
-        <div style="margin-top:16px;color:#D4B25E;font-size:14px;font-weight:700">立即品尝 →</div>
-      </a>
-
-      <!-- 卡4：中华智问知识发生器（可用） -->
-      <a href="/taste/zhiwen/" style="display:block;background:#161B22;border:1px solid rgba(212,178,94,0.35);border-top:3px solid #D4B25E;border-radius:14px;padding:28px 24px;text-decoration:none;transition:transform .15s,border-color .2s" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
-        <div style="font-size:30px;margin-bottom:14px">⟁</div>
-        <div class="zh-only" style="font-size:11px;letter-spacing:0.2em;color:#D4B25E;margin-bottom:8px">其五 · 现已上线</div>
-        <div class="en-only" style="font-size:11px;letter-spacing:0.2em;color:#D4B25E;margin-bottom:8px">NO.5 · LIVE</div>
-        <div class="zh-only" style="font-size:19px;font-weight:700;color:#E6EDF3;margin-bottom:8px">中华智问知识发生器</div>
-        <div class="en-only" style="font-size:19px;font-weight:700;color:#E6EDF3;margin-bottom:8px">Zhiwen Knowledge Generator</div>
-        <div class="zh-only" style="font-size:13.5px;color:#8B98A5;line-height:1.7">输入一个议题,<b style="color:#C9A227">三台路径锁定的智能体并行六轮螺旋提智</b>,各写一篇约两万字学术论文,三篇再两两对撞涌现典范、写成<b style="color:#C9A227">第四篇碰撞论文</b>——每个干活的基底开工前先真读 SDE 内功、<b style="color:#C9A227">亲手写约5000字学习心得</b>,逐轮自审+独立他审(可开双评审席三方取均),手动逐轮档支持学员'刀子'反馈把关,四篇一键下载 Word——还可选装<b style="color:#C9A227">第五件:一键装配硕士/博士学位论文与 18 章学术专著</b>,桌面版《中华智问 0.2》提智内核 + 三步装配引擎完整移植;<b style="color:#C9A227">当前免费开放,将来并入收费高级服务</b></div>
-        <div class="en-only" style="font-size:13.5px;color:#8B98A5;line-height:1.7">One question — three path-locked agents run six uplift rounds in parallel, each writing a ~20k-char academic paper; the three then collide pairwise into an emergent paradigm written as a fourth paper. Every working base first reads the SDE neigong and hand-writes its own ~5,000-char reflection; per-round self + up to two independent reviews (a manual mode lets you inject feedback between rounds); all four papers export to Word — optionally forge a fifth deliverable: a master's or doctoral thesis, or an 18-chapter academic monograph. Free for now; later part of Demai's paid premium tier</div>
-        <div style="margin-top:16px;color:#D4B25E;font-size:14px;font-weight:700">立即品尝 →</div>
-      </a>
-
-      <a href="/taste/wds-companion/" style="display:block;background:#161B22;border:1px solid rgba(212,178,94,0.35);border-top:3px solid #D4B25E;border-radius:14px;padding:28px 24px;text-decoration:none;transition:transform .15s,border-color .2s" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
-        <div style="font-size:30px;margin-bottom:14px">◎</div>
-        <div class="zh-only" style="font-size:11px;letter-spacing:0.2em;color:#D4B25E;margin-bottom:8px">其六 · 现已上线</div>
-        <div class="en-only" style="font-size:11px;letter-spacing:0.2em;color:#D4B25E;margin-bottom:8px">NO.6 · LIVE</div>
-        <div class="zh-only" style="font-size:19px;font-weight:700;color:#E6EDF3;margin-bottom:8px">SDE 陪读 · 边读边聊</div>
-        <div class="en-only" style="font-size:19px;font-weight:700;color:#E6EDF3;margin-bottom:8px">Read with SDE</div>
-        <div class="zh-only" style="font-size:13.5px;color:#8B98A5;line-height:1.7">读一篇论文、一本专著时,<b style="color:#C9A227">在正文里选中任意一句</b>,右侧的 WDS 就扣着你正读的这段文字陪你聊——<b style="color:#C9A227">陪你读,不替你读</b>。它带着完整 SDE 内功当底盘,把术语当场讲透、结尾多留一个反问把你往下一步推。<b style="color:#C9A227">浏览器直接玩、用你自己的大模型 Key（只存本地）</b>;一段脚本即可挂进任意专著/专栏页</div>
-        <div class="en-only" style="font-size:13.5px;color:#8B98A5;line-height:1.7">While reading a paper or monograph, select any sentence and SDE reads it with you — grounded in the full SDE neigong, explaining terms in place and leaving a question that pushes you one step further. It reads with you, not for you. Runs on your own model API key (stored locally in your browser); one script embeds it into any monograph or column page</div>
-        <div style="margin-top:16px;color:#D4B25E;font-size:14px;font-weight:700">立即品尝 →</div>
-      </a>
-
-      <!-- 卡6：SDE 对谈（可用） -->
-      <a href="/taste/sde-dialogue/" style="display:block;background:#161B22;border:1px solid rgba(212,178,94,0.35);border-top:3px solid #D4B25E;border-radius:14px;padding:28px 24px;text-decoration:none;transition:transform .15s,border-color .2s" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
-        <div class="wdsi" aria-hidden="true"><span class="wdsi-rays"></span><span class="wdsi-oval">✧</span></div>
-        <div class="zh-only" style="font-size:11px;letter-spacing:0.2em;color:#D4B25E;margin-bottom:8px">其七 · 现已上线</div>
-        <div class="en-only" style="font-size:11px;letter-spacing:0.2em;color:#D4B25E;margin-bottom:8px">NO.7 · LIVE</div>
-        <div class="zh-only" style="font-size:19px;font-weight:700;color:#E6EDF3;margin-bottom:8px">SDE 对谈 · 问对SDE</div>
-        <div class="en-only" style="font-size:19px;font-weight:700;color:#E6EDF3;margin-bottom:8px">SDE Dialogue</div>
-        <div class="zh-only" style="font-size:13.5px;color:#8B98A5;line-height:1.7">高级会话智能体（跑 <b style="color:#C9A227">DeepSeek-V4-Pro 思考模式最高档</b>）：<b style="color:#C9A227">每场开工，WDS 先通读满血 SDE 内功、亲手写下约 5000 字学习心得</b>，再站在这份刚蒸馏出的认知上回答你——起手按问题种类，从<b style="color:#C9A227">三大方程 / 六路径 / 123原理</b>任一开局。一场最多 <b style="color:#C9A227">100 轮</b>、全面记忆（每答携带全部对话原文）；聊到最后一键把全场<b style="color:#C9A227">凝成一篇约一万字的论文《问对SDE》</b>，可导出 PDF。浏览器直接玩、用你自己的 Key（只存本地）</div>
-        <div class="en-only" style="font-size:13.5px;color:#8B98A5;line-height:1.7">Ask anything — WDS answers every question through the full SDE neigong, its own internalized reflection, and the methodology (three equations · six paths · the 123 principle). Up to 100 turns, all remembered; then distill the whole dialogue into a ~10,000-character paper, "Asking SDE Right", in six parts, exportable to PDF. Runs in your browser on your own key</div>
-        <div style="margin-top:16px;color:#D4B25E;font-size:14px;font-weight:700">立即对话 →</div>
-      </a>
-
-      <!-- 卡7：文章 SDE 解析器（可用） -->
-      <a href="/taste/article-sde/" style="display:block;background:#161B22;border:1px solid rgba(212,178,94,0.35);border-top:3px solid #D4B25E;border-radius:14px;padding:28px 24px;text-decoration:none;transition:transform .15s,border-color .2s" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
-        <div style="font-size:30px;margin-bottom:14px">⧉</div>
-        <div class="zh-only" style="font-size:11px;letter-spacing:0.2em;color:#D4B25E;margin-bottom:8px">其八 · 现已上线</div>
-        <div class="en-only" style="font-size:11px;letter-spacing:0.2em;color:#D4B25E;margin-bottom:8px">NO.8 · LIVE</div>
-        <div class="zh-only" style="font-size:19px;font-weight:700;color:#E6EDF3;margin-bottom:8px">文章 SDE 解析器</div>
-        <div class="en-only" style="font-size:19px;font-weight:700;color:#E6EDF3;margin-bottom:8px">Article SDE Analyzer</div>
-        <div class="zh-only" style="font-size:13.5px;color:#8B98A5;line-height:1.7">传你自己的文章（<b style="color:#C9A227">Word/PDF，单篇 ≤100MB、最多 10 篇</b>），本机浏览器解析、绝不上传（<b style="color:#C9A227">扫描版 PDF 可本机 OCR</b>）；WDS 用 SDE 三大工具（三大方程·六路径·123原理）读出每篇的<b style="color:#C9A227">创新与缝隙</b>，再用 SDE 创造<b style="color:#C9A227">发明新概念把缝隙补上</b>（缝隙创新法），多篇再并置涌现出填补共同缝隙的新概念。浏览器直接玩、用你自己的 Key（只存本地）</div>
-        <div class="en-only" style="font-size:13.5px;color:#8B98A5;line-height:1.7">Upload your own articles (Word/PDF, ≤100MB each, up to 10) — parsed locally, never uploaded (scanned PDFs get local OCR). Using SDE's three tools (three equations · six paths · the 123 principle), WDS reads each article's innovations and its fissures, then forges a new concept via SDE creation to fill each fissure — the fissure-innovation method; across articles, an emergent concept fills the shared fissure. Runs on your own key, stored locally</div>
-        <div style="margin-top:16px;color:#D4B25E;font-size:14px;font-weight:700">立即品尝 →</div>
-      </a>
-
-      <!-- 卡8：SDE提智大模型：对话智商大比拼（可用） -->
-      <a href="/taste/uplift-compare/" style="display:block;background:#161B22;border:1px solid rgba(212,178,94,0.35);border-top:3px solid #D4B25E;border-radius:14px;padding:28px 24px;text-decoration:none;transition:transform .15s,border-color .2s" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
-        <div style="font-size:30px;margin-bottom:14px">⚖</div>
-        <div class="zh-only" style="font-size:11px;letter-spacing:0.2em;color:#D4B25E;margin-bottom:8px">其九 · 现已上线</div>
-        <div class="en-only" style="font-size:11px;letter-spacing:0.2em;color:#D4B25E;margin-bottom:8px">NO.9 · LIVE</div>
-        <div class="zh-only" style="font-size:19px;font-weight:700;color:#E6EDF3;margin-bottom:8px">SDE提智大模型：对话智商大比拼</div>
-        <div class="en-only" style="font-size:19px;font-weight:700;color:#E6EDF3;margin-bottom:8px">Base vs SDE · Side-by-Side Chat</div>
-        <div class="zh-only" style="font-size:13.5px;color:#8B98A5;line-height:1.7">同一个问题、同一个基底，<b style="color:#C9A227">两栏并排作答</b>：左栏直接问<b style="color:#C9A227">大模型</b>（裸调基底，什么都不加），右栏问 <b style="color:#C9A227">WDS</b>（同一基底＋整份 SDE 内功＋它本场亲手写下的心得）。两栏<b style="color:#C9A227">各自累加记忆</b>、都可连着对话 <b style="color:#C9A227">100 次</b>。不看分数，把两边的回答放一起，自己判断"提智"改变了什么</div>
-        <div class="en-only" style="font-size:13.5px;color:#8B98A5;line-height:1.7">One question, one base model, two columns side by side: the left asks the base model raw; the right asks SDE — the same base model plus the full SDE inner-skill and a reflection it writes for the session. Each column accumulates its own memory and both run up to 100 turns. No scores — just put the two answers next to each other. Runs on your own key, stored locally</div>
-        <div style="margin-top:16px;color:#D4B25E;font-size:14px;font-weight:700">立即品尝 →</div>
-      </a>
-
-      <a href="/taste/sde-art/" style="display:block;background:#161B22;border:1px solid rgba(212,178,94,0.35);border-top:3px solid #D4B25E;border-radius:14px;padding:28px 24px;text-decoration:none;transition:transform .15s,border-color .2s" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
-        <div style="font-size:30px;margin-bottom:14px">🎨</div>
-        <div class="zh-only" style="font-size:11px;letter-spacing:0.2em;color:#D4B25E;margin-bottom:8px">其十 · 现已上线</div>
-        <div class="en-only" style="font-size:11px;letter-spacing:0.2em;color:#D4B25E;margin-bottom:8px">NO.10 · LIVE</div>
-        <div class="zh-only" style="font-size:19px;font-weight:700;color:#E6EDF3;margin-bottom:8px">SDE 艺术绘画智能体</div>
-        <div class="en-only" style="font-size:19px;font-weight:700;color:#E6EDF3;margin-bottom:8px">SDE Genesis Painter</div>
-        <div class="zh-only" style="font-size:13.5px;color:#8B98A5;line-height:1.7"><b style="color:#C9A227">不是文生图套壳。</b>别处做的是「描述→图像」；这台先答三问——<b style="color:#C9A227">D</b> 这幅画要把什么和什么分开、<b style="color:#C9A227">E</b> 它落在哪一层沉淀里、<b style="color:#C9A227">S</b> 那一刀显露成什么可见形状。三条视觉进路<b style="color:#C9A227">二阶碰撞</b>出典范，<b style="color:#C9A227">近邻闸门</b>滤掉已被占住的图式（群鸟＝涌现、毛线团＝纠缠这类默认图一律作废），出图后基底<b style="color:#C9A227">看着图</b>按「美的九宫格」打分。三档：文章配图／独立画作／开放作画</div>
-        <div class="en-only" style="font-size:13.5px;color:#8B98A5;line-height:1.7">Not a text-to-image wrapper. It answers three questions first — what does this picture cut apart, which layer of sediment does it land in, and what visible shape does that cut become. Three visual approaches collide into a paradigm; a neighbour gate discards already-occupied imagery; then the base model looks at the result and scores it on the nine-cell grid of beauty. Runs on your own MiniMax key, stored locally</div>
-        <div style="margin-top:16px;color:#D4B25E;font-size:14px;font-weight:700">立即品尝 →</div>
-      </a>
-
-      <!-- 卡14：SDE 作文共创（可用，2026-08-17 由原 #wds-dialogue 区并入） -->
-      <a href="/taste/sde-writing/" style="display:block;background:#161B22;border:1px solid rgba(212,178,94,0.35);border-top:3px solid #C9A227;border-radius:14px;padding:28px 24px;text-decoration:none;transition:transform .15s,border-color .2s" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
-        <div style="font-size:30px;margin-bottom:14px">✍</div>
-        <div class="zh-only" style="font-size:11px;letter-spacing:0.2em;color:#C9A227;margin-bottom:8px">其十四 · 现已上线</div>
-        <div class="en-only" style="font-size:11px;letter-spacing:0.2em;color:#C9A227;margin-bottom:8px">NO.14 · LIVE</div>
-        <div class="zh-only" style="font-size:19px;font-weight:700;color:#E6EDF3;margin-bottom:8px">SDE 作文共创</div>
-        <div class="en-only" style="font-size:19px;font-weight:700;color:#E6EDF3;margin-bottom:8px">SDE Writing Lab</div>
-        <div class="zh-only" style="font-size:13.5px;color:#8B98A5;line-height:1.7"><b style="color:#E6EDF3">作文＝用文本（文）来建造（作）一个具体的 SDE。</b>落在 S 就要让人看见，落在 D 就要让人会做，落在 E 就要让人被牵动——六路径于是就是六种文体与行文法。页内自带编辑器与三台智能体：与 WDS 共创、WDS 修改、WDS 编辑。</div>
-        <div class="en-only" style="font-size:13.5px;color:#8B98A5;line-height:1.7">Writing means building one concrete SDE out of text. Six paths, six genres. Editor plus three agents: co-create, revise, edit.</div>
-        <div style="margin-top:16px;color:#C9A227;font-size:14px;font-weight:700">立即品尝 →</div>
-      </a>
-
-      <!-- 卡15：SDE 共读一本书（可用，2026-08-17 由原 #wds-dialogue 区并入） -->
-      <a href="/taste/book-club/" style="display:block;background:#161B22;border:1px solid rgba(61,165,165,0.35);border-top:3px solid #3DA5A5;border-radius:14px;padding:28px 24px;text-decoration:none;transition:transform .15s,border-color .2s" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
-        <div style="font-size:30px;margin-bottom:14px">▤</div>
-        <div class="zh-only" style="font-size:11px;letter-spacing:0.2em;color:#3DA5A5;margin-bottom:8px">其十五 · 现已上线</div>
-        <div class="en-only" style="font-size:11px;letter-spacing:0.2em;color:#3DA5A5;margin-bottom:8px">NO.15 · LIVE</div>
-        <div class="zh-only" style="font-size:19px;font-weight:700;color:#E6EDF3;margin-bottom:8px">SDE 共读一本书</div>
-        <div class="en-only" style="font-size:19px;font-weight:700;color:#E6EDF3;margin-bottom:8px">Read a Whole Book with SDE</div>
-        <div class="zh-only" style="font-size:13.5px;color:#8B98A5;line-height:1.7"><b style="color:#E6EDF3">把手边任何一本书的 PDF 拖进来，WDS 坐在旁边跟你读完它。</b>翻页读、按书签自动切章，陪读扣着你正读的这一章；正文里选中任意一句，就从那一句开始。六种读法各出一件不同的东西，第七条「我把它组织成了什么」产出的不属于这本书、属于你。书只在你这台机器上解析，一个字节都不上传。</div>
-        <div class="en-only" style="font-size:13.5px;color:#8B98A5;line-height:1.7">Drop in the PDF of any book you own and read it through with WDS beside you. Chapters split from the bookmarks; select any sentence to start there. Six ways in, plus a seventh whose output is yours, not the book's. Parsed on your machine, never uploaded.</div>
-        <div style="margin-top:16px;color:#3DA5A5;font-size:14px;font-weight:700">立即品尝 →</div>
-      </a>
-
-      <!-- 卡17：SDE 数字人视频造（2026-08-17 由顶栏 strip 并入） -->
-      <a href="/taste/heygen-course/" style="display:block;background:#161B22;border:1px solid rgba(212,178,94,0.35);border-top:3px solid #D4B25E;border-radius:14px;padding:28px 24px;text-decoration:none;transition:transform .15s,border-color .2s" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
-        <div style="font-size:30px;margin-bottom:14px">🎬</div>
-        <div class="zh-only" style="font-size:11px;letter-spacing:0.2em;color:#D4B25E;margin-bottom:8px">现已上线</div>
-        <div class="en-only" style="font-size:11px;letter-spacing:0.2em;color:#D4B25E;margin-bottom:8px">LIVE</div>
-        <div class="zh-only" style="font-size:19px;font-weight:700;color:#E6EDF3;margin-bottom:8px">SDE 数字人视频造</div>
-        <div class="en-only" style="font-size:19px;font-weight:700;color:#E6EDF3;margin-bottom:8px">Avatar Course Maker</div>
-        <div class="zh-only" style="font-size:13.5px;color:#8B98A5;line-height:1.7"><b style="color:#E6EDF3">真人分身讲课。</b>选一篇站内文章 → 由 SDE 基底＋全站检索生成讲课稿 → 用你在 HeyGen 训练好的真人数字分身把它讲成视频课。页内自带摄像头与麦克风录制器，就地录素材再拿去训练分身；<b style="color:#E6EDF3">老师训一次分身，之后任意文章都能自动出课。</b></div>
-        <div class="en-only" style="font-size:13.5px;color:#8B98A5;line-height:1.7">Pick an article, let the SDE base write the lecture script, then have your trained HeyGen avatar deliver it as a video course. Built-in recorders for the training footage. Train the avatar once; every later article turns into a course.</div>
-        <div style="margin-top:16px;color:#D4B25E;font-size:14px;font-weight:700">立即品尝 →</div>
-      </a>
-
-      <!-- 卡18：智慧讲解和再创（2026-08-17 由顶栏 strip 并入） -->
-      <a href="/taste/essence-audio/" style="display:block;background:#161B22;border:1px solid rgba(61,165,165,0.35);border-top:3px solid #3DA5A5;border-radius:14px;padding:28px 24px;text-decoration:none;transition:transform .15s,border-color .2s" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
-        <div style="font-size:30px;margin-bottom:14px">🎧</div>
-        <div class="zh-only" style="font-size:11px;letter-spacing:0.2em;color:#3DA5A5;margin-bottom:8px">现已上线</div>
-        <div class="en-only" style="font-size:11px;letter-spacing:0.2em;color:#3DA5A5;margin-bottom:8px">LIVE</div>
-        <div class="zh-only" style="font-size:19px;font-weight:700;color:#E6EDF3;margin-bottom:8px">智慧讲解和再创</div>
-        <div class="en-only" style="font-size:19px;font-weight:700;color:#E6EDF3;margin-bottom:8px">Interpret &amp; Recreate</div>
-        <div class="zh-only" style="font-size:13.5px;color:#8B98A5;line-height:1.7"><b style="color:#E6EDF3">把站内任意一篇文章，讲给你听。</b>搜到文章 → 提智基底（SDE 内功＋心得＋全站检索）深度解读 → 生成约两千字的男女对话体讲解稿，含中心创新观点、挑战、解决了什么、怎么用，配类比与生活举例，落到教育／健康／商业 → 一男一女双声朗读约五分钟，边出稿边可存。</div>
-        <div class="en-only" style="font-size:13.5px;color:#8B98A5;line-height:1.7">Search any article on the site, have the uplifted base read it closely, then turn it into a ~2,000-character two-voice dialogue script — core innovation, challenge, what it solves, how to use it — read aloud by a male and a female voice in about five minutes, saveable as it streams.</div>
-        <div style="margin-top:16px;color:#3DA5A5;font-size:14px;font-weight:700">立即品尝 →</div>
-      </a>
-
-      <!-- 卡19：SDE 动力智能体（2026-08-17 由顶栏 strip 并入） -->
-      <a href="/taste/sde-dynamics/" style="display:block;background:#161B22;border:1px solid rgba(155,123,212,0.45);border-top:3px solid #9B7BD4;border-radius:14px;padding:28px 24px;text-decoration:none;transition:transform .15s,border-color .2s" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
-        <div style="font-size:30px;margin-bottom:14px">⟳</div>
-        <div class="zh-only" style="font-size:11px;letter-spacing:0.2em;color:#B79BE8;margin-bottom:8px">现已上线</div>
-        <div class="en-only" style="font-size:11px;letter-spacing:0.2em;color:#B79BE8;margin-bottom:8px">LIVE</div>
-        <div class="zh-only" style="font-size:19px;font-weight:700;color:#E6EDF3;margin-bottom:8px">SDE 动力智能体</div>
-        <div class="en-only" style="font-size:19px;font-weight:700;color:#E6EDF3;margin-bottom:8px">SDE Dynamics</div>
-        <div class="zh-only" style="font-size:13.5px;color:#8B98A5;line-height:1.7"><b style="color:#C4B0E0">一台证伪机器。</b>给它一个议题，它不回答——它把议题里偷偷预设的那条动力主张挖出来，让三条动力各自主张自己是决定性的，一直撞到有一条撑不住为止；最后交出一组会让原主张翻车的具体观测。<b style="color:#C4B0E0">产物是动力证伪报告，不是答案。</b></div>
-        <div class="en-only" style="font-size:13.5px;color:#8B98A5;line-height:1.7">A falsification machine. Give it a question and it does not answer: it digs out the claim about driving force the question smuggled in, lets three rival forces each argue they are decisive until one breaks, and hands back concrete observations that would overturn the original claim. The output is a falsification report, not an answer.</div>
-        <div style="margin-top:16px;color:#B79BE8;font-size:14px;font-weight:700">立即品尝 →</div>
-      </a>
-
-      <!-- 卡11-12：即将上线 -->
-      <div style="background:#12161C;border:1px solid rgba(255,255,255,0.07);border-radius:14px;padding:28px 24px;opacity:0.6">
-        <div style="font-size:30px;margin-bottom:14px">⟠</div>
-        <div class="zh-only" style="font-size:11px;letter-spacing:0.2em;color:#8B98A5;margin-bottom:8px">其十一 · 即将上线</div>
-        <div class="en-only" style="font-size:11px;letter-spacing:0.2em;color:#8B98A5;margin-bottom:8px">NO.11 · SOON</div>
-        <div class="zh-only" style="font-size:19px;font-weight:700;color:#C7CDD4;margin-bottom:8px">裂缝扫描器</div>
-        <div class="en-only" style="font-size:19px;font-weight:700;color:#C7CDD4;margin-bottom:8px">Fissure Scanner</div>
-        <div class="zh-only" style="font-size:13.5px;color:#6E7B88;line-height:1.7">给一个领域,SDE 找出可锻造新概念的裂缝</div>
-        <div class="en-only" style="font-size:13.5px;color:#6E7B88;line-height:1.7">Give a field, SDE finds fissures to forge new concepts</div>
-        <div style="margin-top:16px;color:#6E7B88;font-size:14px">敬请期待</div>
-      </div>
-
-      <div style="background:#12161C;border:1px solid rgba(255,255,255,0.07);border-radius:14px;padding:28px 24px;opacity:0.6">
-        <div style="font-size:30px;margin-bottom:14px">◇</div>
-        <div class="zh-only" style="font-size:11px;letter-spacing:0.2em;color:#8B98A5;margin-bottom:8px">其十二 · 即将上线</div>
-        <div class="en-only" style="font-size:11px;letter-spacing:0.2em;color:#8B98A5;margin-bottom:8px">NO.12 · SOON</div>
-        <div class="zh-only" style="font-size:19px;font-weight:700;color:#C7CDD4;margin-bottom:8px">跨界联想器</div>
-        <div class="en-only" style="font-size:19px;font-weight:700;color:#C7CDD4;margin-bottom:8px">Cross-Domain Muse</div>
-        <div class="zh-only" style="font-size:13.5px;color:#6E7B88;line-height:1.7">两个不相干的领域,SDE 碰撞出新范式</div>
-        <div class="en-only" style="font-size:13.5px;color:#6E7B88;line-height:1.7">Two unrelated fields, SDE collides a new paradigm</div>
-        <div style="margin-top:16px;color:#6E7B88;font-size:14px">敬请期待</div>
-      </div>
-
+    </div>
+    <div style="margin-top:26px">
+      <a href="/taste/" class="zh-only" style="display:inline-block;padding:12px 32px;border:1px solid #D4B25E;color:#D4B25E;font-weight:700;letter-spacing:0.08em;font-size:14.5px;border-radius:26px;text-decoration:none">全部 18 个智能体 →</a>
+      <a href="/taste/" class="en-only" style="display:inline-block;padding:12px 32px;border:1px solid #D4B25E;color:#D4B25E;font-weight:700;letter-spacing:0.08em;font-size:14.5px;border-radius:26px;text-decoration:none">All 18 agents →</a>
     </div>
   </div>
 </section>
