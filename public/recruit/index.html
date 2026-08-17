@@ -106,11 +106,11 @@ li{font-size:15.4px;color:var(--dim);margin:8px 0}
     <span class="hot">带走一个自己的平台</span>
   </div>
 
-  <!-- ============ 名额进度 · 每周更新此处 ============
-       改两个地方：① 日期 ② 已录取人数
-       席位圆点：已录取用 seat-on，空位用 seat-off，共 5 个，改完人数记得同步圆点
-       ================================================ -->
-  <div class="seats">
+  <!-- ============ 名额进度 · 暂时隐藏（录取 0 人时反而减分）============
+       录到第一个人时：把下面 div 的 style="display:none" 去掉即可显示
+       每周更新：① 日期 ② 已录取人数 ③ 席位圆点（已录取 seat-on，空位 seat-off，共 5 个）
+       ================================================================= -->
+  <div class="seats" style="display:none">
     <div class="dots">
       <i class="seat-off"></i><i class="seat-off"></i><i class="seat-off"></i><i class="seat-off"></i><i class="seat-off"></i>
     </div>
