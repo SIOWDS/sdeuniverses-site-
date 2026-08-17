@@ -174,6 +174,19 @@ footer a{color:var(--gold);text-decoration:none}
 @supports not ((-webkit-background-clip:text) or (background-clip:text)){
   .burn{color:#A32E4E;-webkit-text-fill-color:#A32E4E;background-image:none;animation:plg-flicker 1.7s ease-in-out infinite}
 }
+
+/* 延伸阅读 · 全站二十篇 */
+.rl-group{margin-top:2.2rem}
+.rl-gh{display:flex;align-items:baseline;gap:.7rem;margin-bottom:.9rem;padding-bottom:.5rem;border-bottom:1px solid var(--border)}
+.rl-gn{font-size:.78rem;letter-spacing:.18em;color:var(--accent);font-weight:800}
+.rl-gt{font-size:1.02rem;font-weight:800;color:var(--text)}
+.rl-gs{font-size:.86rem;color:var(--muted)}
+.rl-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.7rem}
+@media(max-width:760px){.rl-grid{grid-template-columns:1fr}}
+.rl-card{display:block;text-decoration:none;background:var(--card);border:1px solid var(--border2);border-left:3px solid var(--accent);border-radius:8px;padding:.75rem .9rem;transition:transform .15s,border-color .2s,box-shadow .2s}
+.rl-card:hover{transform:translateY(-2px);border-color:var(--border);box-shadow:0 6px 18px rgba(42,35,21,.08)}
+.rl-t{font-size:.97rem;font-weight:700;color:var(--text);line-height:1.4;margin-bottom:.3rem}
+.rl-d{font-size:.85rem;color:var(--text2);line-height:1.55}
 </style>
 </head>
 <body class="zh">
@@ -204,6 +217,7 @@ footer a{color:var(--gold);text-decoration:none}
     <a href="#essays" class="zh-only">五篇长论</a><a href="#essays" class="en-only">Five Essays</a>
     <a href="#bench" class="zh-only">对照台</a><a href="#bench" class="en-only">The Bench</a>
     <a href="#method" class="zh-only">为什么要做对照</a><a href="#method" class="en-only">Why Contrast</a>
+    <a href="#more" class="zh-only" style="color:var(--accent);font-weight:700">延伸阅读·20篇</a><a href="#more" class="en-only" style="color:var(--accent);font-weight:700">Further Reading</a>
   </div>
 </nav>
 
@@ -525,6 +539,55 @@ footer a{color:var(--gold);text-decoration:none}
         <a href="/browse/" class="zh-only">← 返回首页</a><a href="/browse/" class="en-only">← Back home</a>
         <a href="/education/" class="zh-only">教育专栏</a><a href="/education/" class="en-only">Education</a>
             <a href="/browse/#taste" class="zh-only">SDE 智能体免费品尝</a><a href="/browse/#taste" class="en-only">Free SDE agent taste</a>
+      </div>
+    </div>
+
+    <div class="block" id="more" style="margin-top:3.4rem">
+      <div class="block-head">
+        <span class="block-num"><span class="zh-only">肆</span><span class="en-only">IV</span></span>
+        <span class="block-title"><span class="zh-only">延伸阅读 · 全站二十篇</span><span class="en-only">Further Reading · Twenty from Across the Site</span></span>
+      </div>
+      <p class="block-desc zh-only">这道分界不只在本栏。全站二十篇文章，各自从一个入口撞上同一件事：那个被叫作「发现」的东西，是一次发生被磨平之后剩下的样子。</p>
+      <p class="block-desc en-only">This divide is not confined to this column. Twenty articles from across the site, each entering from a different door, arrive at the same thing: what we call discovery is what a genesis looks like once it has been smoothed.</p>
+      <div class="rl-group">
+        <div class="rl-gh"><span class="rl-gn">壹</span><span class="rl-gt zh-only">总纲 · 先把这句话说清楚</span><span class="rl-gt en-only">THE THESIS</span><span class="rl-gs zh-only">世界不是被发现的，是发生的——三篇入口。</span><span class="rl-gs en-only">The world is not discovered but occurs — three ways in.</span></div>
+        <div class="rl-grid">
+          <a class="rl-card" href="/column/sde-intro/"><span class="rl-t zh-only">SDE 思想简要入门：世界不是被发现的，是发生的</span><span class="rl-t en-only">SDE in Brief: The World Is Not Discovered, It Occurs</span><span class="rl-d zh-only">五件说不通的事——越努力越贵、达成目标反而空虚、知道却做不到——不是五个问题，是同一块地基的五张脸。给没有哲学背景的人，约两万字。</span><span class="rl-d en-only">Five things that do not add up are not five problems but five faces of one foundation. Written for readers with no philosophy background.</span></a>
+          <a class="rl-card" href="/column/discovery-is-smoothed-genesis/"><span class="rl-t zh-only">发现是发生的光滑化再显露——数学对象的发生学原理</span><span class="rl-t en-only">Discovery Is Genesis Re-shown, Smoothed</span><span class="rl-d zh-only">发现不是发生的对立面，而是它磨去路径与土壤后的再显露。以小学数学为标本：知识以过程存在，故无法递送，只能在每个学习者身上再发生一次。</span><span class="rl-d en-only">Discovery is not the opposite of genesis but genesis re-shown with its path and soil ground away — argued on primary-school mathematics.</span></a>
+          <a class="rl-card" href="/ideas/genesis-vs-discovery/"><span class="rl-t zh-only">发生取代发现：世界不是被发现的，是发生的</span><span class="rl-t en-only">Genesis Replaces Discovery</span><span class="rl-d zh-only">现成世界这个从未被怀疑的假设，藏着三道裂缝：知识化的差异之谜、创造之谜、死亡之谜。三道裂缝各自逼出同一次翻面。</span><span class="rl-d en-only">The unquestioned assumption of a ready-made world hides three fissures — difference, creation, death — and each forces the same reversal.</span></a>
+        </div>
+      </div>
+      <div class="rl-group">
+        <div class="rl-gh"><span class="rl-gn">贰</span><span class="rl-gt zh-only">把大师的「发现」还原成一次「发生」</span><span class="rl-gt en-only">THE MASTERS</span><span class="rl-gs zh-only">同一道手术做七次：先把对手扶到最强，再指出他在哪一步把动词冻成了名词。</span><span class="rl-gs en-only">The same operation seven times: make the opponent strongest, then find where the verb froze into a noun.</span></div>
+        <div class="rl-grid">
+          <a class="rl-card" href="/column/plato-idea-genesis/"><span class="rl-t zh-only">柏拉图的理念，不是被回忆的，而是被发生的</span><span class="rl-t en-only">Plato's Forms Were Not Recollected</span><span class="rl-d zh-only">回忆说、洞穴寓言、分有难题，都是发现范式把「稳定」错读成「先在」的症状。</span><span class="rl-d en-only">Recollection, the cave, the problem of participation: all symptoms of reading stability as pre-existence.</span></a>
+          <a class="rl-card" href="/column/aristotle-substance-genesis/"><span class="rl-t zh-only">亚里士多德的实体，不是万物的地基，而是被冻住的发生</span><span class="rl-t en-only">Aristotle's Substance: A Frozen Genesis</span><span class="rl-d zh-only">一位御医之子把解剖台的语法投射成了宇宙的宪法。四因、潜能现实、不动的动者，逐一显形。</span><span class="rl-d en-only">A physician's son projected the grammar of the dissection table into the constitution of the cosmos.</span></a>
+          <a class="rl-card" href="/column/descartes-cogito-genesis/"><span class="rl-t zh-only">笛卡尔的我思，不是找到的地基，而是清场后的房东</span><span class="rl-t en-only">Descartes' Cogito: Not a Foundation but a Landlord</span><span class="rl-d zh-only">那场大火是按剧本演出的清场，恰好熄灭在「我」的门槛前；无可怀疑的只是「思在发生」。</span><span class="rl-d en-only">The famous fire was a scripted clearing that stopped at the threshold of the “I”; what is beyond doubt is only that thinking occurs.</span></a>
+          <a class="rl-card" href="/column/kant-categories-genesis/"><span class="rl-t zh-only">康德的范畴，不是先天的模具，而是沉淀的纠缠</span><span class="rl-t en-only">Kant's Categories: Sedimented Entanglement</span><span class="rl-d zh-only">先天性是发生史被抹掉之后剩下的那副样子——把模具还原成沉淀，约 1.1 万字。</span><span class="rl-d en-only">The a priori is what a history of genesis looks like once the history has been erased.</span></a>
+          <a class="rl-card" href="/western-philosophy/hegel/dialectics-genesis/"><span class="rl-t zh-only">从「正反合」到「E–D–S」：辩证法的SDE发生学重构</span><span class="rl-t en-only">From Thesis-Antithesis-Synthesis to E–D–S</span><span class="rl-d zh-only">黑格尔造出了那台引擎，却让它只能在一个圆里转——把辩证法从半循环补成完整回写。</span><span class="rl-d en-only">Hegel built the engine and then locked it into a circle; here the half-cycle is completed into full write-back.</span></a>
+          <a class="rl-card" href="/column/schopenhauer-mother-of-living-i/"><span class="rl-t zh-only">叔本华：「活我」之母</span><span class="rl-t en-only">Schopenhauer, Mother of the Living “I”</span><span class="rl-d zh-only">从笛卡尔的死雕像被接生成一团活着的烧灼，经尼采、萨特、福柯，到数字时代的三次火化。</span><span class="rl-d en-only">From Descartes' dead statue delivered as a living burn, through Nietzsche, Sartre and Foucault, to three cremations in the digital age.</span></a>
+          <a class="rl-card" href="/column/causality-river/"><span class="rl-t zh-only">因果之河：休谟的斧头、康德的云梯，与SDE的河床</span><span class="rl-t en-only">The River of Causality</span><span class="rl-d zh-only">休谟砍空了客体之间的必然，康德把它冻进先天范畴表，两人都停在半路——刀该先砍向持斧的「我」。</span><span class="rl-d en-only">Hume cut the necessity out of objects, Kant froze it into a table of categories; both stopped halfway.</span></a>
+        </div>
+      </div>
+      <div class="rl-group">
+        <div class="rl-gh"><span class="rl-gn">叁</span><span class="rl-gt zh-only">AI 是这道分界最新的考场</span><span class="rl-gt en-only">THE AI TEST</span><span class="rl-gs zh-only">一台搬运得比任何人都好的机器，把「搬运不等于发生」这件事逼到了台面上。</span><span class="rl-gs en-only">A machine that hauls better than anyone has forced the difference between hauling and occurring into the open.</span></div>
+        <div class="rl-grid">
+          <a class="rl-card" href="/column/talking-mute/"><span class="rl-t zh-only">会说一切的哑巴</span><span class="rl-t en-only">The Mute Who Can Say Anything</span><span class="rl-d zh-only">大模型为什么「什么都对，又什么都不痛不痒」？E2 极强、E1 为空、E3 不存在——信息发生不等于知识发生。</span><span class="rl-d en-only">Why is a large model always right and never telling? Information genesis is not knowledge genesis.</span></a>
+          <a class="rl-card" href="/column/llm-essence/"><span class="rl-t zh-only">大语言模型的本质</span><span class="rl-t en-only">What a Large Language Model Is</span><span class="rl-d zh-only">一台在纯理念界内部运行、结构近乎完美的意义发生模拟器，却断在第三步回写上，因而永远不是思想。约五万字。</span><span class="rl-d en-only">A near-perfect simulator of meaning-genesis that runs inside the ideal realm alone and breaks at the third step: write-back.</span></a>
+          <a class="rl-card" href="/column/pseudo-genesis/"><span class="rl-t zh-only">伪发生：当机器能流畅生成一切，如何分辨真的新结构</span><span class="rl-t en-only">Pseudo-Genesis</span><span class="rl-d zh-only">最大的风险不是答错，而是看起来发生了、实际什么也没发生。三种形态、八重强制检查与还原判据。</span><span class="rl-d en-only">The real risk is not a wrong answer but an occurrence that only looks like one. Three forms, eight forced checks.</span></a>
+          <a class="rl-card" href="/column/no-unified-world-model/"><span class="rl-t zh-only">没有统一世界模型：世界模型的主体性与 AGI 的重新定义</span><span class="rl-t en-only">No Unified World Model</span><span class="rl-d zh-only">世界模型不是对象的客观属性，而是主体与对象共同发生的画像——因此训练不出统一的那一个。</span><span class="rl-d en-only">A world model is not a property of the object but a portrait co-occurring with a subject — so no single one can be trained.</span></a>
+        </div>
+      </div>
+      <div class="rl-group">
+        <div class="rl-gh"><span class="rl-gn">肆</span><span class="rl-gt zh-only">换一副眼睛之后，各领域会怎么样</span><span class="rl-gt en-only">THE FIELDS</span><span class="rl-gs zh-only">同一次翻面，落到写作、日常、提问、经济、心理与科学史上。</span><span class="rl-gs en-only">The same reversal, landed on writing, daily life, questioning, economics, psychology and the history of science.</span></div>
+        <div class="rl-grid">
+          <a class="rl-card" href="/column/writing-genesis/"><span class="rl-t zh-only">写作的发生学——教科书为什么难读</span><span class="rl-t en-only">The Genesis of Writing</span><span class="rl-d zh-only">「先定义后展开」把理解的发生顺序整个倒装了。五段骨架：ΔE→S→D→E→新ΔE。</span><span class="rl-d en-only">Define-then-elaborate inverts the order in which understanding actually occurs. A five-part skeleton instead.</span></a>
+          <a class="rl-card" href="/column/everyday-genesis/"><span class="rl-t zh-only">每一天，都是一场SDE洪流：日常生活的发生学</span><span class="rl-t en-only">Every Day Is an SDE Torrent</span><span class="rl-d zh-only">从睁眼到闭眼逐段拆开一个普通人的普通一天：每一次「发现」都是一次「发生的再来」。</span><span class="rl-d en-only">An ordinary day taken apart hour by hour: every “discovery” in it is genesis coming round again.</span></a>
+          <a class="rl-card" href="/column/questioning-as-genesis/"><span class="rl-t zh-only">追问即发生：提问的失稳—回写模型</span><span class="rl-t en-only">Questioning as Genesis</span><span class="rl-d zh-only">提问的价值不在问题文本的形态，而在两端：前件是表征的失稳，后件是对自身预设之网的回写。</span><span class="rl-d en-only">The value of a question lies not in its text but at its two ends: destabilised representation before, write-back after.</span></a>
+          <a class="rl-card" href="/business/sde-economics/feedback-and-bubbles/"><span class="rl-t zh-only">回写缺失与增长泡沫：经济发生学</span><span class="rl-t en-only">Missing Write-back and Growth Bubbles</span><span class="rl-d zh-only">增长为何能在成功中制造自己的失败条件——代偿增长是净额核算在构造上无法辨识的一类。</span><span class="rl-d en-only">Why growth manufactures its own failure conditions: a type that net-based accounting structurally cannot see.</span></a>
+          <a class="rl-card" href="/column/confidence-lock/"><span class="rl-t zh-only">自信：扼杀创造之路的锁</span><span class="rl-t en-only">Confidence as a Lock</span><span class="rl-d zh-only">自信不是创造力的催化剂，而是创造力被扼杀后的代偿性症状——受阻态下旧显露态的退行性固化。</span><span class="rl-d en-only">Confidence is not a catalyst of creativity but a compensatory symptom left after it has been strangled.</span></a>
+          <a class="rl-card" href="/culture-tech/needham/path-cutting/"><span class="rl-t zh-only">如何裁出一条新路：解释科学革命的一个发生学框架</span><span class="rl-t en-only">Cutting a New Path</span><span class="rl-d zh-only">李约瑟之问系列之二：科学革命不是被谁发现的，而是一条路被裁了出来。</span><span class="rl-d en-only">The second in the Needham series: the scientific revolution was not found, it was cut.</span></a>
+        </div>
       </div>
     </div>
   </section>
