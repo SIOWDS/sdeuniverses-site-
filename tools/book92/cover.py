@@ -162,7 +162,7 @@ for txt, sz, col in body:
 bd.line([(92, H - 300), (W - 92, H - 300)], fill=(30, 50, 70), width=2)
 bd.text((92, H - 268), '德麦国际出版社　·　专著第 92 号', font=fs, fill=(96, 120, 142))
 bd.text((92, H - 228), 'ISBN 979-8-90690-034-0', font=fm, fill=(96, 120, 142))
-bd.text((92, H - 192), 'US$18.80', font=fm, fill=(96, 120, 142))
+bd.text((92, H - 192), 'US$21.50', font=fm, fill=(96, 120, 142))
 
 # 装饰性条码（非真 EAN13）
 bx, by = W - 400, H - 250
