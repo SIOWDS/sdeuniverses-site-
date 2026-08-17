@@ -34,6 +34,11 @@
 /wds-glow.css
   Cache-Control: no-cache
 
+# 全站 1065 个学员/专著页共用；语言开关（body.zh .en-only）就写在里面，
+# 缓存住它，读者那边中英会继续并列显示。它不带 ?v= 戳，只能靠这条。
+/sde-read.css
+  Cache-Control: no-cache
+
 # 与WDS对话：这台智能体在高频迭代，页面本体不能被浏览器/边缘缓存住
 # （否则读者手里跑的是旧版，昨天修掉的毛病今天照样发作）。
 /taste/wds-dialogue/

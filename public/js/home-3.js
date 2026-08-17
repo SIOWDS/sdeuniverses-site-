@@ -1,6 +1,7 @@
 // ── LANGUAGE
 function setLang(lang){
-  document.body.className=lang;
+  // 只切 zh/en，保留 body 上其它类（sde-read 等），别整个覆盖
+  var cl=document.body.classList; cl.remove('zh'); cl.remove('en'); cl.add(lang);
   document.querySelectorAll('.lang-btn').forEach(b=>b.classList.toggle('active',b.textContent.toLowerCase()===lang||(b.textContent==='中'&&lang==='zh')));
   document.documentElement.lang=lang==='zh'?'zh':'en';
   renderMatrix();

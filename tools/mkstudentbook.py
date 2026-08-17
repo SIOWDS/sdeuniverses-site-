@@ -68,7 +68,8 @@ BODY = f'''
 '''
 
 os.makedirs(OUT_D, exist_ok=True)
-page = head + BODY
+page = head + '\n<body class="zh">' + BODY  # ← body 开标签不能少：缺了它 body 上就没有 zh 类，
+                                              #   于是 body.zh .en-only 这条规则不生效，中英会并列显示
 open(f'{OUT_D}/index.html', 'w', encoding='utf-8').write(page)
 
 assert 'sde:paper-weight" content="10"' in page

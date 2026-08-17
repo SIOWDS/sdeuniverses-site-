@@ -151,7 +151,7 @@ def build(t, path, zh, en, desc, sids):
     body = '\n'.join(cut_section(t, s) for s in sids)
     ret = ('<div class="colret"><a href="/">← 返回首页</a>　·　'
            '<span class="zh-only">%s</span><span class="en-only">%s</span></div>' % (zh, en))
-    page = ('<!doctype html><html lang="zh-CN">\n' + head + '\n<body>\n'
+    page = ('<!doctype html><html lang="zh-CN">\n' + head + '\n<body class="zh">\n'
             + nav + '\n' + ret + '\n<main>\n' + body + '\n</main>\n' + foot + '\n' + scr
             + '\n</body></html>\n')
     page = rewrite_anchors(page, path)

@@ -145,3 +145,7 @@ body.sde-read hr {
   body.sde-read h2, body.sde-read h3 { break-after: avoid; }
   body.sde-read p { orphans: 2; widows: 2; }
 }
+
+/* 语言开关：body 带 zh/en 类时只显示对应语言（缺了这两行，中英会并列显示） */
+body.zh .en-only{display:none}
+body.en .zh-only{display:none}
