@@ -33,6 +33,13 @@ body.en{font-family:'EB Garamond','Playfair Display',Georgia,serif}
 nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;flex-direction:column;padding:0.6rem 3rem 0.55rem;background:rgba(245,239,224,0.88);backdrop-filter:blur(12px);border-bottom:1px solid var(--border2)}
 .nav-bar-main{display:flex;align-items:center;justify-content:space-between;width:100%}
 .nav-bar-sub{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:0.55rem 1.5rem;width:100%;margin-top:0.6rem;padding-top:0.7rem;border-top:1px solid var(--border2)}
+.nav-bar-sub.nbs-grid{flex-direction:column;flex-wrap:nowrap;gap:0.30rem}
+.nbs-row{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));width:100%;max-width:1140px;margin:0 auto}
+.nbs-row.nbs-row5{grid-template-columns:repeat(5,minmax(0,1fr));max-width:950px}
+.nbs-row a{text-align:center;padding:3px 4px;white-space:nowrap}
+.nav-bar-sub.nbs-grid .nbs-row a{font-size:0.82rem;letter-spacing:0.10em}
+@media(max-width:1180px){.nbs-row,.nbs-row.nbs-row5{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:620px){.nbs-row,.nbs-row.nbs-row5{grid-template-columns:repeat(2,minmax(0,1fr))}.nbs-row a{white-space:normal}}
 .nav-bar-sub a{color:var(--text2);text-decoration:none;font-size:0.9rem;font-weight:600;letter-spacing:0.14em;transition:color 0.2s}
 .nav-bar-sub a:hover{text-decoration:underline;text-underline-offset:4px;opacity:0.78}
 .nav-logo{display:inline-flex;flex-direction:column;align-items:stretch;justify-content:center;line-height:1.12;color:var(--gold);text-decoration:none}
@@ -203,6 +210,10 @@ section.panel{padding:5rem 2rem}
 .tab-count{font-size:0.7rem;opacity:0.8;font-family:'Playfair Display',serif;font-weight:600}
 .employees-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:1.2rem}
 .emp-card{background:var(--card);border:1px solid var(--border2);border-left:3px solid var(--gold);padding:1.2rem 1.2rem 1rem;transition:all 0.25s;cursor:pointer;display:flex;flex-direction:column;min-height:160px;text-decoration:none;color:inherit}
+.emp-card.emp-soon{cursor:default;opacity:.86}
+.emp-card.emp-soon:hover{transform:none}
+.emp-enter-soon{color:#8A8577;font-weight:600;letter-spacing:.08em}
+
 .emp-card:hover{transform:translateY(-4px);border-left-color:var(--gold2);box-shadow:0 12px 32px rgba(138,104,23,0.10);background:var(--card2)}
 .emp-industry{font-size:0.6rem;letter-spacing:0.15em;color:var(--gold);text-transform:uppercase;margin-bottom:0.4rem;font-weight:600}
 .emp-name{font-size:1rem;font-weight:600;color:var(--text);margin-bottom:0.25rem;line-height:1.3}
@@ -431,6 +442,7 @@ body.zh .en-only{display:none}
     
     
     <a href="/students/" class="zh-only">学员专栏</a><a href="/students/" class="en-only">Students</a>
+    <a href="/recruit/" class="zh-only" style="color:#C9A227;font-weight:700" title="河源数元 · 智能体平台合作开发学徒招募 · 仅招5人 · 9月10日开班">学徒招募 · 仅5人</a><a href="/recruit/" class="en-only" style="color:#C9A227;font-weight:700" title="Agent Platform Apprenticeship · 5 seats only">Apprenticeship</a>
     <a href="https://huazhi-sde.com" target="_blank" rel="noopener" class="zh-only">娄底华智</a><a href="https://huazhi-sde.com" target="_blank" rel="noopener" class="en-only">Loudi Huazhi</a>
     <div class="lang-toggle">
       <button class="lang-btn active" onclick="setLang('zh')">中</button>
@@ -670,7 +682,8 @@ body.zh .en-only{display:none}
       <li><a href="/master/" class="zh-only">解构大师</a><a href="/master/" class="en-only">Deconstruction Master</a></li>
       <li><a href="/mentor/" class="zh-only">师范文</a><a href="/mentor/" class="en-only">Model Essays</a></li>
       <li><a href="/students/" class="zh-only">学员专栏</a><a href="/students/" class="en-only">Students</a></li>
-      <li><a href="/meeting/" class="zh-only">SDE 会议</a><a href="/meeting/" class="en-only">SDE Meeting</a></li>
+      <li><a href="/recruit/" class="zh-only">学徒招募 · 合作开发智能体平台</a><a href="/recruit/" class="en-only">Apprenticeship · Co-Development</a></li>
+      <li><a href="/meeting/" class="zh-only">SDE 讲堂 · 直播</a><a href="/meeting/" class="en-only">SDE Lecture Hall</a></li>
       <li><a href="/discussions/" class="zh-only">论文讨论区</a><a href="/discussions/" class="en-only">Discussions</a></li>
       <li><a href="/sde-talk/" class="zh-only">SDE讨论（群聊）</a><a href="/sde-talk/" class="en-only">SDE Talk</a></li>
       <li><a href="/sde-wechat/" class="zh-only">SDE 社区（群聊·私聊）</a><a href="/sde-wechat/" class="en-only">SDE Community</a></li>
