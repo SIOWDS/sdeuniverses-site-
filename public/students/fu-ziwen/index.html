@@ -38,6 +38,32 @@ nav a{color:var(--gold);text-decoration:none;font-size:14px;letter-spacing:0.05e
 footer{border-top:1px solid var(--line);margin-top:24px;padding:30px 24px;text-align:center;color:#6B6250;font-size:13px}
 footer a{color:var(--gold);text-decoration:none}
 @media(max-width:640px){.profile{justify-content:center;text-align:center}.p-info{text-align:center}}
+/* ── 新书窄条幅 ── */
+.newbook{max-width:820px;margin:30px auto 0;padding:0 24px}
+.nb{display:flex;gap:20px;align-items:center;text-decoration:none;border:1px solid rgba(201,168,76,.5);border-radius:14px;background:linear-gradient(135deg,rgba(201,168,76,.13),rgba(201,168,76,.03));padding:20px 24px;transition:transform .18s,box-shadow .18s,border-color .18s}
+.nb:hover{transform:translateY(-2px);box-shadow:0 14px 34px rgba(0,0,0,.45);border-color:var(--gold)}
+.nb img{width:74px;flex:0 0 74px;border-radius:4px;border:1px solid var(--line);display:block}
+.nb-lbl{font-size:11.5px;letter-spacing:.28em;color:var(--gold);margin-bottom:7px}
+.nb-t{font-size:23px;font-weight:800;color:#F5EFE0;letter-spacing:.03em;line-height:1.35}
+.nb-s{font-size:14.5px;color:var(--gold2);margin-top:5px}
+.nb-q{font-size:14px;color:#DED6BF;margin-top:9px;line-height:1.8}
+.nb-m{font-size:12.5px;color:var(--ink2);margin-top:8px;letter-spacing:.02em}
+
+/* ── 著作书架 ── */
+.shelf{max-width:820px;margin:0 auto;padding:22px 24px 4px;display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.bk{display:block;text-decoration:none;border:1px solid var(--line);border-radius:14px;background:var(--panel);overflow:hidden;transition:transform .18s,box-shadow .18s,border-color .18s}
+.bk:hover{transform:translateY(-3px);box-shadow:0 16px 36px rgba(0,0,0,.5);border-color:rgba(201,168,76,.55)}
+.bk-cov{display:block;width:100%;height:auto;border-bottom:1px solid var(--line)}
+.bk-b{padding:16px 17px 18px}
+.bk-n{font-size:11px;letter-spacing:.22em;color:var(--gold);opacity:.85}
+.bk-t{font-size:18px;font-weight:800;color:#F5EFE0;margin-top:7px;letter-spacing:.03em}
+.bk-s{font-size:13px;color:var(--gold2);margin-top:5px;line-height:1.6}
+.bk-q{font-size:13px;color:#CFC6AE;margin-top:10px;line-height:1.78}
+.bk-m{font-size:11.5px;color:#8A8168;margin-top:10px;letter-spacing:.02em;line-height:1.6}
+.bk-go{font-size:12px;color:var(--gold);margin-top:11px;letter-spacing:.06em}
+.shelf-note{max-width:820px;margin:0 auto;padding:12px 24px 0;font-size:13.5px;color:var(--ink2);line-height:1.9}
+.shelf-note b{color:var(--gold2)}
+@media(max-width:760px){.shelf{grid-template-columns:1fr;gap:14px}.bk{display:grid;grid-template-columns:96px 1fr;align-items:start}.bk-cov{border-bottom:0;border-right:1px solid var(--line)}}
 </style></head>
 <body class="zh">
 <nav><div class="w">
@@ -47,6 +73,19 @@ footer a{color:var(--gold);text-decoration:none}
     <div class="lang-toggle"><button class="lang-btn active" onclick="setLang('zh')">中</button><button class="lang-btn" onclick="setLang('en')">EN</button></div>
   </div>
 </div></nav>
+
+<div class="newbook">
+<a class="nb" href="/books/m/91/">
+  <img src="/books/m/91/cover.jpg" alt="《文心探幽·卷一》封面">
+  <div>
+    <div class="nb-lbl">◆ 新 书 · 德麦国际出版社 · 专著第 91 号</div>
+    <div class="nb-t">文心探幽·卷一　何谓作文</div>
+    <div class="nb-s">凡直接读得出的，都不是它</div>
+    <div class="nb-q">作文不在成品上：它落在账本没有设的那一格，动一下才显形。</div>
+    <div class="nb-m">400 页 · 导论·四编九章·合编文献 · 约 19.4 万汉字 · 文献 166 条 · US$25.60　|　专著主页 · 分章阅读 · PDF →</div>
+  </div>
+</a>
+</div>
 
 <div class="level-tag" style="padding-top:40px">
   <span class="n">01</span><span class="t zh-only">学 员 介 绍 · PROFILE</span><span class="t en-only">PROFILE</span><span class="line"></span>
@@ -58,22 +97,49 @@ footer a{color:var(--gold);text-decoration:none}
     
     <div class="role zh-only">SDE 学员</div>
     <div class="role en-only">SDE TRAINEE</div>
-    <p class="bio zh-only">个人简介待补 —— 照片与简介陆续补充。</p>
-    <p class="bio en-only">Bio coming soon — photo and introduction to be added.</p>
+    <p class="bio zh-only">著有《文心探幽》丛书。卷一《何谓作文》、卷三《作文的意义是什么？》已由德麦国际出版社出版。</p>
+    <p class="bio en-only">Author of the <i>Wenxin Tanyou</i> series; Volumes I and III are published by Demai International Press.</p>
   </div>
 </div>
 
+
 <div class="level-tag" style="margin-top:36px">
-  <span class="n">02</span><span class="t zh-only">作 品 与 专 栏 · WORKS</span><span class="t en-only">WORKS &amp; COLUMNS</span><span class="line"></span>
+  <span class="n">03</span><span class="t zh-only">著 　 作 · MONOGRAPHS</span><span class="t en-only">MONOGRAPHS</span><span class="line"></span>
+</div>
+<div class="shelf">
+  <a class="bk" href="/books/m/91/">
+    <img class="bk-cov" src="/books/m/91/cover.jpg" alt="《文心探幽·卷一》封面">
+    <div class="bk-b">
+      <div class="bk-n">专著第 91 号 · 2026</div>
+      <div class="bk-t">文心探幽·卷一</div>
+      <div class="bk-s">何谓作文 · 凡直接读得出的，都不是它</div>
+      <div class="bk-q">三件事过去天然重叠：写下这些字的人、经历这场写作的人、为这份成果负责的人。它们第一次分开了。</div>
+      <div class="bk-m">400 页 · 四编九章 · 19.4 万字 · 文献 166 条 · 六章真跑全部不利并原样保留</div>
+      <div class="bk-go">专著主页 · 分章阅读 · PDF →</div>
+    </div>
+  </a>
+  <a class="bk" href="/books/m/90/">
+    <img class="bk-cov" src="/books/m/90/cover.jpg" alt="《文心探幽·卷三》封面">
+    <div class="bk-b">
+      <div class="bk-n">专著第 90 号 · 2026</div>
+      <div class="bk-t">文心探幽·卷三</div>
+      <div class="bk-s">作文的意义是什么 · 作文不结算</div>
+      <div class="bk-q">凡在这一轮能够结清的，都不是作文在做的事；它做的是把结不清的那一部分留成下一轮的条件。</div>
+      <div class="bk-m">415 页 · 四编九章 · 19.3 万字 · 文献 172 条 · 四章真跑全部不利并原样保留</div>
+      <div class="bk-go">专著主页 · 分章阅读 · PDF →</div>
+    </div>
+  </a>
+</div>
+<div class="shelf-note">
+  <span class="zh-only">丛书《文心探幽》以「不入账」为共同的一半：<b>卷一读身份</b>——一篇作文凭什么是这一篇；<b>卷三读结算</b>——为什么它在本轮结不清。两卷各自独立成书，可分开读。</span>
+  <span class="en-only">The <b>Wenxin Tanyou</b> series shares one half: what never enters the ledger. Volume I reads identity; Volume III reads settlement. Each volume stands on its own.</span>
+</div>
+
+<div class="level-tag" style="margin-top:36px">
+  <span class="n">04</span><span class="t zh-only">作 品 与 专 栏 · WORKS</span><span class="t en-only">WORKS &amp; COLUMNS</span><span class="line"></span>
 </div>
 <div class="works">
-  <div class="panel">
-    <div class="tag zh-only">作 品 陆 续 上 线</div>
-    <div class="tag en-only">WORKS COMING SOON</div>
-    <p class="zh-only">借一双「事物如何发生」的眼，在自己的领域里落笔——把 SDE 作为隐性的引擎，用本行的母语写作。作品通过合宪性审读后，将署名发表于此。</p>
-    <p class="en-only">Borrowing an eye trained on how things come to be, and writing in the native idiom of one’s own field — with SDE as a hidden engine. Once a piece passes its constitutionality review, it will be published here under this name.</p>
-  </div>
-  <div class="back"><a href="/students/"><span class="zh-only">← 返回学员专栏名单</span><span class="en-only">← Back to the students roster</span></a></div>
+<div class="back"><a href="/students/"><span class="zh-only">← 返回学员专栏名单</span><span class="en-only">← Back to the students roster</span></a></div>
 </div>
 
 <footer>
