@@ -74,7 +74,7 @@ iframe{width:100%;height:calc(100vh - 52px);border:0;background:#fff}
   /* ---------- Word ---------- */
   if(T==="docx"){
     say("正在载入阅读器…");
-    load("/assets/lib/mammoth.browser.min.js?v=1",function(){
+    load("/assets/lib/mammoth.browser.min.js?v=20260817c",function(){
       say("正在转换文档…");
       fetch(SRC).then(function(r){ if(!r.ok) throw new Error(r.status); return r.arrayBuffer(); })
       .then(function(buf){
@@ -132,9 +132,9 @@ iframe{width:100%;height:calc(100vh - 52px);border:0;background:#fff}
   function setZoom(z){ zoom=Math.max(.5,Math.min(4,z)); try{localStorage.setItem("sde_wxdoc_zoom",String(zoom))}catch(e){} render(); }
 
   say("正在载入阅读器…");
-  load("/assets/lib/pdf.min.js?v=1",function(){
+  load("/assets/lib/pdf.min.js?v=20260817c",function(){
     if(!window.pdfjsLib){ fallback(); return; }
-    window.pdfjsLib.GlobalWorkerOptions.workerSrc="/assets/lib/pdf.worker.min.js?v=1";
+    window.pdfjsLib.GlobalWorkerOptions.workerSrc="/assets/lib/pdf.worker.min.js?v=20260817c";
     say("正在打开文章…");
     window.pdfjsLib.getDocument(SRC).promise.then(function(d){
       pdf=d; total=d.numPages; el("pgw").style.display="inline-flex"; render();

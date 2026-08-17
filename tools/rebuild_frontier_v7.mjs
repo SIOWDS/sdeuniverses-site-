@@ -210,7 +210,7 @@ ${second}
 <h3 class="sec">◎ 十条可做的研究命题</h3>${research(panel.research)}
 <h3 class="sec">◎ 资料核验</h3><div class="refs"><ol>${refs.map(x=>`<li>${esc(x)}</li>`).join('\n')}</ol></div>
 <div class="end"><b>新思想前沿</b> 是一个持续撰写的专栏：近二十年，各主要领域最要紧的思想转向。本块采用两幕体例——上一个十年八条、这一个十年十二条；每条给出提出、争议、最新与关键来源，并附位置／单因／预设／量纲／失效／自曝／空栏／异名八字段，供跨领域对撞。 · <a href="/frontier/" style="color:var(--gold);text-decoration:none">← 回到学科面板</a></div>
-</main><script src="/wds-mode.js?v=20260817b" defer></script></body></html>`;
+</main><script src="/wds-mode.js?v=20260817c" defer></script></body></html>`;
 
 const words = han(html.replace(/<style>[\s\S]*?<\/style>/, '').replace(/<[^>]+>/g,''));
 const out = html.replace('<span id="wc">待核</span>', words.toLocaleString('en-US'));

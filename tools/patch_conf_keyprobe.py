@@ -13,8 +13,8 @@ def rep(old, new):
 
 
 # ① 引资产（放在页尾脚本之前，与另外五台同一个 ?v= 戳）
-rep("""<script src="/taste/assets/sde-handoff.js?v=1"></script>""",
-    """<script src="/taste/assets/sde-keyprobe.js?v=1"></script>
+rep("""<script src="/taste/assets/sde-handoff.js?v=20260817c"></script>""",
+    """<script src="/taste/assets/sde-keyprobe.js?v=20260817c"></script>
 <script>
 /* Key 有效性检测：按钮由 SDEKeyProbe 注入。
    纪律（与另外五台逐字相同）：**探测与真跑共用同一套 chatHeaders / apiUrl / buildPayload / 中转**——
@@ -40,7 +40,7 @@ rep("""<script src="/taste/assets/sde-handoff.js?v=1"></script>""",
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', go); else go();
 })();
 </script>
-<script src="/taste/assets/sde-handoff.js?v=1"></script>""")
+<script src="/taste/assets/sde-handoff.js?v=20260817c"></script>""")
 
 open(p, 'w', encoding='utf-8').write(s)
 print('%d → %d 字节（+%d）' % (len(orig.encode()), len(s.encode()), len(s.encode())-len(orig.encode())))

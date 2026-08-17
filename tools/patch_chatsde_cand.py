@@ -28,10 +28,10 @@ if "SDECand" in h:
 
 # ── 1. 模块自己拉进来（壳页只引 wds-mode.js，不该让每个壳页各记一遍依赖）──
 rep(
-    '    sc.src = "/taste/assets/sde-vault.js?v=1"; sc.defer = true;\n'
+    '    sc.src = "/taste/assets/sde-vault.js?v=20260817c"; sc.defer = true;\n'
     '    document.head.appendChild(sc);\n'
     '  })();\n',
-    '    sc.src = "/taste/assets/sde-vault.js?v=1"; sc.defer = true;\n'
+    '    sc.src = "/taste/assets/sde-vault.js?v=20260817c"; sc.defer = true;\n'
     '    document.head.appendChild(sc);\n'
     '  })();\n'
     '\n'
@@ -39,7 +39,7 @@ rep(
     '  (function () {\n'
     '    if (window.SDECand) return;\n'
     '    var sc = document.createElement("script");\n'
-    '    sc.src = "/taste/assets/sde-cand.js?v=1"; sc.defer = true;\n'
+    '    sc.src = "/taste/assets/sde-cand.js?v=20260817c"; sc.defer = true;\n'
     '    document.head.appendChild(sc);\n'
     '  })();\n',
     "模块注入",

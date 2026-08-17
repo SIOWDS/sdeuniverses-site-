@@ -1,7 +1,7 @@
 /* sde-papers-archive.js —— 跑出来的成篇论文，在本机存一份（刷新、关页、重开都还在）
  *
  * 用法（任何智能体一行接入）：
- *     <script src="/taste/assets/sde-papers-archive.js?v=1"></script>
+ *     <script src="/taste/assets/sde-papers-archive.js?v=20260817c"></script>
  *     await SDEPapers.save({ question, student, dest, label, papers })
  *     const rows = await SDEPapers.list()      // 轻量清单，不带全文
  *     const rec  = await SDEPapers.get(id)     // 带全文

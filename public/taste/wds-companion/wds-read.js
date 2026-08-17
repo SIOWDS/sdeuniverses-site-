@@ -13,7 +13,7 @@
   (function () {
     if (window.SDEVault) return;
     var sc = document.createElement("script");
-    sc.src = "/taste/assets/sde-vault.js?v=2"; sc.defer = true;
+    sc.src = "/taste/assets/sde-vault.js?v=20260817c"; sc.defer = true;
     document.head.appendChild(sc);
   })();
   if (window.__wdsReadMounted) return;
@@ -315,7 +315,7 @@
     var f1 = q1(".wdsr-f1", pan), f2 = q1(".wdsr-f2", pan), f3 = q1(".wdsr-f3", pan), gt = q1(".wdsr-gate", pan);
     q1(".wdsr-cx", pan).onclick = function () { pan.parentNode.removeChild(pan); };
 
-    lazyJs("/taste/assets/sde-cand.js?v=1").then(function () {
+    lazyJs("/taste/assets/sde-cand.js?v=20260817c").then(function () {
       var C = window.SDECand; if (!C) throw new Error("no_mod");
       // 预填：取不到就留空让人自己写，绝不编造（模块纪律⑤）
       var d = {}; try { d = C.draft(answer) || {}; } catch (e) {}
@@ -368,7 +368,7 @@
     var fq = q1(".wdsr-fq", pan);
     fq.value = (focusSeg || lastAsk || "").slice(0, 500);
     q1(".wdsr-cx", pan).onclick = function () { pan.parentNode.removeChild(pan); };
-    lazyJs("/taste/assets/sde-handoff.js?v=2").then(function () {
+    lazyJs("/taste/assets/sde-handoff.js?v=20260817c").then(function () {
       var H = window.SDEHandoff; if (!H || !H.AGENTS) throw new Error("no_mod");
       var list = q1(".wdsr-list", pan);
       H.AGENTS.forEach(function (a) {

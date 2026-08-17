@@ -252,9 +252,9 @@ a{color:var(--disc)}
 .wh-act button{flex:1;padding:9px 0;border-radius:9px}
 </style>
 <!-- 全站三态：浏览 / SDE 社区 / SDE 对话。模块自己会挂到 .top 顶栏上 -->
-<script src="/assets/sde-modes.js?v=20260802b" defer></script>
+<script src="/assets/sde-modes.js?v=20260817c" defer></script>
   <script src="/assets/sde-nbr.js"></script>
-  <script src="/assets/sde-dist.js?v=1"></script>
+  <script src="/assets/sde-dist.js?v=20260817c"></script>
 </head>
 <body>
 <div id="app">
@@ -1073,7 +1073,7 @@ function keyWire(){
    懒加载——大多数人不会点它，不该为它给每次进社区加一个请求。装不上不拦路。 */
 function keyProbeWire(){
   var slot=el("key-probe-slot");if(!slot||slot.__on)return;slot.__on=1;
-  var s=document.createElement("script");s.src="/taste/assets/sde-keyprobe.js?v=1";
+  var s=document.createElement("script");s.src="/taste/assets/sde-keyprobe.js?v=20260817c";
   s.onload=function(){try{
     if(!window.SDEKeyProbe)return;
     window.SDEKeyProbe.attach([{key:"key-in",sel:"key-vd"}],{

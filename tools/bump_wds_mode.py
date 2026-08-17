@@ -12,6 +12,10 @@ PDF 出口），四轮都构建成功、线上文件也确实是新的——但�
 【纪律】改了 public/wds-mode.js，就必须跑一次本工具，再提交。
 `tools/sim_wds_mode_stamp.js` 会核对哈希与戳：文件变了而戳没变，它就红。
 
+⚠ 次序：**先跑 tools/bump_asset.py，再跑本工具。** wds-mode.js 自己也引用别的带 ?v= 的资产
+（sde-vault / sde-cand …），升那些资产就等于改了 wds-mode.js，它的哈希与戳会当场作废。
+反过来跑就要跑两遍。bump_asset.py 结束时会提醒。
+
 用法：python3 tools/bump_wds_mode.py [新戳]      # 不给就按今天日期自动取
 """
 import hashlib

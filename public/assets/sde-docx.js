@@ -7,7 +7,7 @@
  *   两件事需要的是同一样东西，所以只写这一份，两处共用。
  *
  * 用法：
- *     <script src="/assets/sde-docx.js?v=1"></script>
+ *     <script src="/assets/sde-docx.js?v=20260817c"></script>
  *     var blob = SDEDocx.build({ title: "标题", author: "作者", md: "# 标题\n正文…" });
  *     // 下载：SDEDocx.save(blob, "文件名.docx")
  *     // 投稿：直接把 blob 当 file 塞进 FormData（命名成 .zip 也行，docx 首字节本来就是 PK）

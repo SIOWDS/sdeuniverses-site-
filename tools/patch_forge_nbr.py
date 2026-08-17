@@ -38,8 +38,8 @@ def main():
              '<script src="/assets/wds-savedir.js"></script>',
              '<script src="/assets/wds-savedir.js"></script>\n'
              '<!-- 站内近邻：端点客户端 + 三关判据。判据只有一份来源，复制两份必漂，而那种漂是静默的 -->\n'
-             '<script src="/taste/assets/sde-rag.js?v=4"></script>\n'
-             '<script src="/taste/assets/sde-nbr-gate.js?v=1"></script>',
+             '<script src="/taste/assets/sde-rag.js?v=20260817c"></script>\n'
+             '<script src="/taste/assets/sde-nbr-gate.js?v=20260817c"></script>',
              "script 标签")
 
     # ── 二、nbrList()：多种子并发取名单，合并去重 ──

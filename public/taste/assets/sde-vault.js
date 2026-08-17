@@ -1,6 +1,6 @@
 /* sde-vault.js —— 全站共用的「思想库存」入库模块
  * 用法（任何智能体一行接入）：
- *     <script src="/taste/assets/sde-vault.js?v=2"></script>
+ *     <script src="/taste/assets/sde-vault.js?v=20260817c"></script>
  *     SDEVault.auto([{kind:"name", text:"…"}, …], "金点子 · 三视角对决", el)
  *
  * 为什么要有它：来源已经很多——搜索页提炼精华／涌现档典范／金点子的三个金点子与典范点子／

@@ -29,7 +29,7 @@ if "sde-cand.js" in h:
 rep(
     '  <script src="/assets/sde-nbr.js"></script>\n',
     '  <script src="/assets/sde-nbr.js"></script>\n'
-    '  <script src="/taste/assets/sde-cand.js?v=1"></script>\n',
+    '  <script src="/taste/assets/sde-cand.js?v=20260817c"></script>\n',
     "引模块",
 )
 

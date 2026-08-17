@@ -26,9 +26,9 @@ h = io.open(P, encoding="utf-8").read()
 before = h
 
 # ── ① 引入共用模块 ──
-old = '<script src="/taste/assets/sde-rag.js?v=4"></script>'
+old = '<script src="/taste/assets/sde-rag.js?v=20260817c"></script>'
 assert old in h
-h = h.replace(old, old + '\n<script src="/taste/assets/sde-nbr-gate.js?v=1"></script>', 1)
+h = h.replace(old, old + '\n<script src="/taste/assets/sde-nbr-gate.js?v=20260817c"></script>', 1)
 print("① 已引入 sde-nbr-gate.js（window.SDENbr，判据单一来源）")
 
 # ── ② 每轮重取上下文 ──
@@ -177,8 +177,8 @@ io.open(P, "w", encoding="utf-8").write(h)
 P2 = "public/taste/idea-generator/index.html"
 g = io.open(P2, encoding="utf-8").read()
 g0 = g
-g = g.replace('<script src="/taste/assets/sde-rag.js?v=4"></script>',
-              '<script src="/taste/assets/sde-rag.js?v=4"></script>\n<script src="/taste/assets/sde-nbr-gate.js?v=1"></script>', 1)
+g = g.replace('<script src="/taste/assets/sde-rag.js?v=20260817c"></script>',
+              '<script src="/taste/assets/sde-rag.js?v=20260817c"></script>\n<script src="/taste/assets/sde-nbr-gate.js?v=20260817c"></script>', 1)
 for fn, call in (("function nbrSectionOK(text){", "sectionOK"),
                  ("function coinedName(text){", "coinedName"),
                  ("function nbrCrossOK(text){", "crossOK")):

@@ -132,7 +132,7 @@ fs.writeFileSync(path.join(root, "public", "assets", "sde-essential-figures.js")
 for (const url of Object.keys(articles)) {
   const file = path.join(root, "public", url, "index.html");
   let html = fs.readFileSync(file, "utf8");
-  const tag = '<script src="/assets/sde-essential-figures.js?v=20260724c" defer></script>';
+  const tag = '<script src="/assets/sde-essential-figures.js?v=20260817c" defer></script>';
   if (/sde-essential-figures\.js(?:\?[^"]*)?/.test(html)) {
     html = html.replace(/<script src="\/assets\/sde-essential-figures\.js(?:\?[^"]*)?" defer><\/script>/, tag);
   } else {

@@ -45,7 +45,7 @@ SHELL = u'''<!DOCTYPE html>
 <body>
 <div class="fallback">\u6b63\u5728\u8fdb\u5165 ChatSDE\u2026\u2026<br>\u82e5\u957f\u65f6\u95f4\u505c\u5728\u672c\u9875\uff0c\u8bf7\u5237\u65b0\uff0c\u6216<a href="/">\u8fd4\u56de\u9996\u9875</a>\u3002</div>
 <script>window.WDSM_PAGE = 1;</script>
-<script src="/taste/assets/sde-handoff.js?v=1"></script>
+<script src="/taste/assets/sde-handoff.js?v=20260817c"></script>
 <script src="/wds-mode.js?v=__VER__" defer></script>
 </body>
 </html>

@@ -1,7 +1,7 @@
 /* sde-cand.js —— 全站共用的「候选卡出口 ＋ 近邻一级闸门」  window.SDECand
  *
  * 用法（任何智能体两行接入）：
- *     <script src="/taste/assets/sde-cand.js?v=1"></script>
+ *     <script src="/taste/assets/sde-cand.js?v=20260817c"></script>
  *     SDECand.gate(prop).then(function (g) { box.textContent = g.line; });   // 零调用、不烧 Key
  *     SDECand.post({ prop: …, face: …, crit: …, src: "ChatSDE · 这一答" });
  *
