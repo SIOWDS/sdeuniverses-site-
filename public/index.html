@@ -36,10 +36,11 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;flex-direction:
 .nav-bar-sub{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:0.55rem 1.5rem;width:100%;margin-top:0.6rem;padding-top:0.7rem;border-top:1px solid var(--border2)}
 .nav-bar-sub.nbs-grid{flex-direction:column;flex-wrap:nowrap;gap:0.30rem}
 .nbs-row{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));width:100%;max-width:1140px;margin:0 auto}
+.nbs-row.nbs-row5{grid-template-columns:repeat(5,minmax(0,1fr));max-width:950px}
 .nbs-row a{text-align:center;padding:3px 4px;white-space:nowrap}
 .nav-bar-sub.nbs-grid .nbs-row a{font-size:0.82rem;letter-spacing:0.10em}
-@media(max-width:1180px){.nbs-row{grid-template-columns:repeat(3,minmax(0,1fr))}}
-@media(max-width:620px){.nbs-row{grid-template-columns:repeat(2,minmax(0,1fr))}.nbs-row a{white-space:normal}}
+@media(max-width:1180px){.nbs-row,.nbs-row.nbs-row5{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:620px){.nbs-row,.nbs-row.nbs-row5{grid-template-columns:repeat(2,minmax(0,1fr))}.nbs-row a{white-space:normal}}
 .nav-bar-sub a{color:var(--text2);text-decoration:none;font-size:0.9rem;font-weight:600;letter-spacing:0.14em;transition:color 0.2s}
 .nav-bar-sub a:hover{text-decoration:underline;text-underline-offset:4px;opacity:0.78}
 .nav-logo{display:inline-flex;flex-direction:column;align-items:stretch;justify-content:center;line-height:1.12;color:var(--gold);text-decoration:none}
@@ -51,8 +52,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;flex-direction:
 .nav-links a:hover{color:var(--gold)}
 .nav-links a.primary{color:var(--gold);font-weight:600}
 @keyframes navFlow{0%{color:#E23B3B}12.5%{color:#111111}25%{color:#E8590C}37.5%{color:#C9A000}50%{color:#1F9E3D}62.5%{color:#0C8F8F}75%{color:#1E6FD9}87.5%{color:#7C3AED}100%{color:#E23B3B}}.nav-logo{animation:navFlow 4.5s linear infinite}.nav-links a{animation:navFlow 4.5s linear infinite}.nav-links a:nth-child(1){animation-delay:-0.0s}.nav-links a:nth-child(2){animation-delay:-0.0s}.nav-links a:nth-child(3){animation-delay:-0.346s}.nav-links a:nth-child(4){animation-delay:-0.346s}.nav-links a:nth-child(5){animation-delay:-0.692s}.nav-links a:nth-child(6){animation-delay:-0.692s}.nav-links a:nth-child(7){animation-delay:-1.038s}.nav-links a:nth-child(8){animation-delay:-1.038s}.nav-links a:nth-child(9){animation-delay:-1.385s}.nav-links a:nth-child(10){animation-delay:-1.385s}.nav-links a:nth-child(11){animation-delay:-1.731s}.nav-links a:nth-child(12){animation-delay:-1.731s}.nav-links a:nth-child(13){animation-delay:-2.077s}.nav-links a:nth-child(14){animation-delay:-2.077s}.nav-links a:nth-child(15){animation-delay:-2.423s}.nav-links a:nth-child(16){animation-delay:-2.423s}.nav-links a:nth-child(17){animation-delay:-2.769s}.nav-links a:nth-child(18){animation-delay:-2.769s}.nav-links a:nth-child(19){animation-delay:-3.115s}.nav-links a:nth-child(20){animation-delay:-3.115s}.nav-links a:nth-child(21){animation-delay:-3.462s}.nav-links a:nth-child(22){animation-delay:-3.462s}.nav-links a:nth-child(23){animation-delay:-3.808s}.nav-links a:nth-child(24){animation-delay:-3.808s}.nav-links a:nth-child(25){animation-delay:-4.154s}.nav-links a:nth-child(26){animation-delay:-4.154s}.nav-links a:hover{animation-play-state:paused;text-decoration:underline;text-underline-offset:4px}@media(prefers-reduced-motion:reduce){.nav-logo,.nav-links a,.nav-bar-sub a{animation:none}}
-.nav-bar-sub a{animation:none}.nav-bar-sub a.col-hdl{color:#2E5090;font-weight:700}.nav-bar-sub a.col-wph{color:#8C3B32;font-weight:700}
-.nav-bar-sub a.col-wp2{color:#3F5C8C;font-weight:700}.nav-bar-sub a.col-crt{color:#2A6B4A}.nav-bar-sub a.col-edu{color:#336699}.nav-bar-sub a.col-hea{color:#2E8B57}.nav-bar-sub a.col-biz{color:#A0651F}.col-ent{color:#2E4B78}.nav-bar-sub a.col-dvg{color:#7A4A8C}.nav-bar-sub a.col-ai{color:#1B6E7A}.nav-bar-sub a.col-cht{color:#9D2933}.nav-bar-sub a.col-mtg{color:#0F766E;font-weight:700}.nav-bar-sub a.col-tap{color:#8A6A1E;font-weight:700}.nav-bar-sub a.col-disc{color:#3B4E9C;font-weight:700}.nav-bar-sub a.col-eys{color:#9A6E12;font-weight:700}.nav-bar-sub a.col-fic{color:#8C2F39;font-weight:700}.nav-bar-sub a.col-fai{color:#6A4C93;font-weight:700}.nav-bar-sub a.col-fam{color:#7C4A3A;font-weight:700}.col-art{color:#8C6A3A;font-weight:700}.col-par{color:#B5714A;font-weight:700}.nav-bar-sub a.col-bgy{color:#8A6A1E;font-weight:700}.nav-bar-sub a.col-inv{color:#1F7A72;font-weight:700}
+.nav-bar-sub a{animation:none}.nav-bar-sub a.col-hdl{color:#2E5090;font-weight:700}.nav-bar-sub a.col-wph{color:#8C3B32;font-weight:700}.nav-bar-sub a.col-crt{color:#2A6B4A}.nav-bar-sub a.col-edu{color:#336699}.nav-bar-sub a.col-hea{color:#2E8B57}.nav-bar-sub a.col-biz{color:#A0651F}.col-ent{color:#2E4B78}.nav-bar-sub a.col-dvg{color:#7A4A8C}.nav-bar-sub a.col-ai{color:#1B6E7A}.nav-bar-sub a.col-cht{color:#9D2933}.nav-bar-sub a.col-mtg{color:#0F766E;font-weight:700}.nav-bar-sub a.col-tap{color:#8A6A1E;font-weight:700}.nav-bar-sub a.col-disc{color:#3B4E9C;font-weight:700}.nav-bar-sub a.col-eys{color:#9A6E12;font-weight:700}.nav-bar-sub a.col-fic{color:#8C2F39;font-weight:700}.nav-bar-sub a.col-fai{color:#6A4C93;font-weight:700}.nav-bar-sub a.col-fam{color:#7C4A3A;font-weight:700}.col-art{color:#8C6A3A;font-weight:700}.col-par{color:#B5714A;font-weight:700}.nav-bar-sub a.col-bgy{color:#8A6A1E;font-weight:700}.nav-bar-sub a.col-inv{color:#1F7A72;font-weight:700}
 .col-crt{color:#2A6B4A}
 .col-plg{color:#A32E4E}
 /* ── SDE 智能体 · Token之火 frame (wraps the two agent nav links) ── */
@@ -471,13 +471,12 @@ body.zh .en-only{display:none}
       <a href="/monographs/" class="col-tap zh-only">专著栏目</a><a href="/monographs/" class="col-tap en-only">Monographs</a>
       <a href="/creation/" class="col-crt zh-only">学术创造</a><a href="/creation/" class="col-crt en-only">Academic Creation</a>
       <a href="/thought/" class="col-wph zh-only">哲学与思想</a><a href="/thought/" class="col-wph en-only">Thought</a>
-      <a href="/western-philosophy/" class="col-wp2 zh-only">西方哲学</a><a href="/western-philosophy/" class="col-wp2 en-only">Western Philosophy</a>
       <a href="/discovery-vs-genesis/" class="col-dvg zh-only">发现VS发生</a><a href="/discovery-vs-genesis/" class="col-dvg en-only">Discovery vs Genesis</a>
+      <a href="/ai/" class="col-ai zh-only">AI 专栏</a><a href="/ai/" class="col-ai en-only">AI</a>
     </div>
-    <div class="nbs-row">
+    <div class="nbs-row nbs-row5">
       <a href="/education/" class="col-edu zh-only">教育专栏</a><a href="/education/" class="col-edu en-only">Education</a>
       <a href="/health/" class="col-hea zh-only">健康专栏</a><a href="/health/" class="col-hea en-only">Health</a>
-      <a href="/ai/" class="col-ai zh-only">AI 专栏</a><a href="/ai/" class="col-ai en-only">AI</a>
       <a href="/life/" class="col-fam zh-only">人生与家庭</a><a href="/life/" class="col-fam en-only">Life &amp; Family</a>
       <a href="/business/" class="col-biz zh-only">商业与经济</a><a href="/business/" class="col-biz en-only">Business</a>
       <a href="/culture/" class="col-art zh-only">文化与艺术</a><a href="/culture/" class="col-art en-only">Culture &amp; Art</a>
