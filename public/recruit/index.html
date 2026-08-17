@@ -55,7 +55,12 @@ td b{color:var(--pa)}
 ul{margin:12px 0;padding-left:20px}
 li{font-size:15.4px;color:var(--dim);margin:8px 0}
 .apply{margin:22px 0 0;padding:24px 24px 20px;background:#14120E;border:1px solid var(--ac);border-radius:6px}
-.mail{display:inline-block;margin:6px 0 14px;font-size:19px;color:var(--ac);letter-spacing:.02em;word-break:break-all}
+.mail{display:inline-block;margin:2px 0 0;font-size:18px;color:var(--ac);letter-spacing:.02em;word-break:break-all}
+.ways{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:14px 0 12px}
+.ways div{background:#100E0B;border:1px solid var(--line);border-radius:4px;padding:12px 14px}
+.ways b{display:block;font-size:12px;letter-spacing:.12em;color:var(--faint);font-weight:400;margin-bottom:2px}
+.ways .mail{font-size:16.5px}
+@media(max-width:620px){.ways{grid-template-columns:1fr}}
 .ol{margin:10px 0;padding-left:22px}
 .ol li{margin:9px 0}
 .close{margin:52px 0 0;padding:26px 0 0;border-top:1px solid var(--line)}
@@ -159,9 +164,13 @@ li{font-size:15.4px;color:var(--dim);margin:8px 0}
 
 <h2>报名方式</h2>
 <div class="apply">
-  <p>不走表单，<b>直接与我联系</b>：</p>
-  <a class="mail" href="mailto:wangdesheng1234567@gmail.com">wangdesheng1234567@gmail.com</a>
-  <p style="margin-top:-6px;font-size:14px;color:var(--faint)">首席科学家 · 王德生博士</p>
+  <p>不走表单，<b>直接与我联系</b>——首席科学家 王德生博士：</p>
+  <div class="ways">
+    <div><b>手机 / 微信同号</b><a class="mail" href="tel:18142881015">181&nbsp;4288&nbsp;1015</a></div>
+    <div><b>微信号</b><span class="mail">jimmy20061107</span></div>
+    <div><b>邮箱</b><a class="mail" href="mailto:wangdesheng1234567@gmail.com">wangdesheng1234567@gmail.com</a></div>
+  </div>
+  <p style="font-size:13.5px;color:var(--faint);margin-top:-2px">材料较大或不方便发邮件的，可先加微信，我给你另一个接收地址。</p>
   <p>邮件请附三样东西：</p>
   <ol class="ol">
     <li><b>简历</b>；</li>
