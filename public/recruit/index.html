@@ -70,6 +70,11 @@ li{font-size:15.4px;color:var(--dim);margin:8px 0}
 .ways b{display:block;font-size:12px;letter-spacing:.12em;color:var(--faint);font-weight:400;margin-bottom:2px}
 .ways .mail{font-size:16.5px}
 @media(max-width:620px){.ways{grid-template-columns:1fr}}
+.qr{display:flex;gap:18px;align-items:center;margin:6px 0 14px;padding:14px 16px;background:#100E0B;border:1px solid var(--line);border-radius:4px}
+.qr img{display:block;border-radius:3px;flex:none;background:#fff}
+.qr b{display:block;font-size:15px;color:var(--pa);margin-bottom:5px}
+.qr p{margin:0;font-size:13.6px;color:var(--faint);line-height:1.75}
+@media(max-width:520px){.qr{flex-direction:column;align-items:flex-start;gap:12px}}
 .ol{margin:10px 0;padding-left:22px}
 .ol li{margin:9px 0}
 .close{margin:52px 0 0;padding:26px 0 0;border-top:1px solid var(--line)}
@@ -191,7 +196,13 @@ li{font-size:15.4px;color:var(--dim);margin:8px 0}
     <div><b>微信号</b><span class="mail">jimmy20061107</span></div>
     <div><b>邮箱</b><a class="mail" href="mailto:wangdesheng1234567@gmail.com">wangdesheng1234567@gmail.com</a></div>
   </div>
-  <p style="font-size:13.5px;color:var(--faint);margin-top:-2px">材料较大或不方便发邮件的，可先加微信，我给你另一个接收地址。</p>
+  <div class="qr">
+    <img src="/recruit/wechat-qr.jpg" alt="王德生微信二维码" width="150" height="150" loading="lazy">
+    <div>
+      <b>扫码加我微信</b>
+      <p>材料较大或不方便发邮件的，可先加微信，我给你另一个接收地址。手机上长按二维码即可识别。</p>
+    </div>
+  </div>
   <p>邮件请附三样东西：</p>
   <ol class="ol">
     <li><b>简历</b>；</li>
