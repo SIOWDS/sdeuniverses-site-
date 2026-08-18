@@ -2605,6 +2605,46 @@ async function _subHash(s) {
   const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode("sde-submit-v1:" + s));
   return [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, "0")).join("");
 }
+// ===== 注册入口（/register/）=====
+// 站上没有自助开户这回事：名字得先进学员名录，人才登得进社区、留得了言、投得了稿。
+// 所以这个端点做的事只有一件——把申请原样存进私有收件仓 register/ 下，等王德生本人过目。
+// 刻意不碰 Durable Object：DO 免费档每天只有十万行写入，2026-08-18 被一次索引实验写爆，
+// 全站计数与留言当天全废；注册这道门不能跟着一起躺下。
+async function handleRegister(request, env) {
+  const CORS = { "access-control-allow-origin": "*", "access-control-allow-methods": "POST, OPTIONS", "access-control-allow-headers": "content-type" };
+  if (request.method === "OPTIONS") return new Response(null, { headers: CORS });
+  const ip = request.headers.get("cf-connecting-ip") || "unknown";
+  try { // 限流器住在 DO 里，取不到就放行——宁可少拦，不把门关死
+    const lim = env.ASK_LIMITER.get(env.ASK_LIMITER.idFromName("register:" + ip));
+    const lr = await (await lim.fetch(new Request("https://limiter.internal/", { method: "POST" }))).json();
+    if (!lr.ok) return _subJson({ ok: false, msg: "提交太频繁，请过一会儿再试。" }, CORS);
+  } catch (e) {}
+  const b = await request.json().catch(() => null);
+  if (!b) return _subJson({ ok: false, msg: "表单解析失败。" }, CORS);
+  if (String(b.website || "")) return _subJson({ ok: true, msg: "已收到" }, CORS); // 蜜罐：机器人填了就假装收下
+  const name = String(b.name || "").trim().slice(0, 40);
+  const contact = String(b.contact || "").trim().slice(0, 120);
+  const role = String(b.role || "").trim().slice(0, 40);
+  const note = String(b.note || "").trim().slice(0, 800);
+  if (!name) return _subJson({ ok: false, msg: "请填写你的名字。" }, CORS);
+  if (!contact) return _subJson({ ok: false, msg: "请留一个能回复你的联系方式。" }, CORS);
+  const token = env.GH_SUBMIT_TOKEN || "";
+  if (!token) return _subJson({ ok: false, msg: "注册收件箱尚未配置完成（缺少仓库令牌）。请联系管理员。" }, CORS);
+  const ts = new Date().toISOString().replace(/[:.]/g, "-").replace("Z", "");
+  const rand = crypto.randomUUID().slice(0, 8);
+  const safe = name.replace(/[^\w.\-]+/g, "_").replace(/_+/g, "_").slice(0, 40) || "applicant";
+  const rec = { name, contact, role, note, submitted_at: new Date().toISOString(), ip };
+  const r = await fetch("https://api.github.com/repos/" + _SUBMIT_REPO + "/contents/register/" + ts + "__" + rand + "__" + safe + ".json", {
+    method: "PUT",
+    headers: { "authorization": "Bearer " + token, "accept": "application/vnd.github+json", "content-type": "application/json", "user-agent": "sde-register-worker", "x-github-api-version": "2022-11-28" },
+    body: JSON.stringify({ message: "register: " + safe, content: _bytesToB64(new TextEncoder().encode(JSON.stringify(rec, null, 2))) }),
+  });
+  if (!r.ok) {
+    if (r.status === 401 || r.status === 403) return _subJson({ ok: false, msg: "注册收件箱配置有误（仓库令牌无效或无权限）。请联系管理员。" }, CORS);
+    return _subJson({ ok: false, msg: "存档失败（GitHub " + r.status + "）。" }, CORS);
+  }
+  return _subJson({ ok: true, msg: "已收到" }, CORS);
+}
 async function handleSubmit(request, env) {
   const CORS = { "access-control-allow-origin": "*", "access-control-allow-methods": "POST, OPTIONS", "access-control-allow-headers": "content-type" };
   if (request.method === "OPTIONS") return new Response(null, { headers: CORS });
@@ -10064,6 +10104,10 @@ export default {
     }
     if (url.pathname === "/api/ask") {
       return handleAsk(request, env, url);
+    }
+    // ===== 注册入口 =====
+    if (url.pathname === "/api/register" && (request.method === "POST" || request.method === "OPTIONS")) {
+      return handleRegister(request, env);
     }
     // ===== 学员投稿收件箱 =====
     if (url.pathname === "/api/submit" && (request.method === "POST" || request.method === "OPTIONS")) {

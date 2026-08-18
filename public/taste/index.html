@@ -106,9 +106,8 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;flex-direction:
 @media(max-width:640px){.agent-fire{display:none}}
 @media(prefers-reduced-motion:reduce){.agent-fire::after{animation:none}.agent-fire::before{animation:none;opacity:.85}.agent-fire .af-ember{display:none}}
 .lang-toggle{display:flex;background:var(--card);border:1px solid var(--border);border-radius:20px;overflow:hidden;cursor:pointer}
-.visit-badge{margin-left:auto;display:flex;align-items:center;gap:8px;background:var(--gold);color:#FAF6EC;padding:7px 16px;border-radius:20px;box-shadow:0 2px 10px rgba(138,104,23,0.35)}
-.visit-badge .vb-label{font-size:0.7rem;letter-spacing:0.12em;opacity:0.9}
-.visit-badge .vb-num{font-size:1.05rem;font-weight:700;letter-spacing:0.03em;color:#FFE9B0;font-variant-numeric:tabular-nums}
+.nav-links a.reg-entry{margin-left:auto;display:inline-flex;align-items:center;gap:8px;background:var(--gold);color:#FAF6EC;padding:7px 16px;border-radius:20px;box-shadow:0 2px 10px rgba(138,104,23,0.35);text-decoration:none;font-weight:700;letter-spacing:0.14em;animation:none;transition:filter .15s}
+.nav-links a.reg-entry:hover{color:#FFF3D6;filter:brightness(1.08)}
 .lang-btn{padding:0.3rem 0.8rem;font-size:0.75rem;letter-spacing:0.05em;border:none;background:transparent;color:var(--text2);cursor:pointer;transition:all 0.2s;font-family:inherit}
 .lang-btn.active{background:var(--gold);color:#F5EFE0;font-weight:600}
 
@@ -290,8 +289,8 @@ footer{background:var(--bg);border-top:1px solid var(--border2);padding:3rem 2re
   .nav-bar-sub a{font-size:0.76rem;letter-spacing:0.06em}
   .nav-links{gap:1rem}
   .nav-links a{display:none}
-  .nav-links a.primary,.nav-links .lang-toggle,.nav-links .visit-badge{display:flex}
-  .visit-badge{padding:5px 12px}.visit-badge .vb-label{display:none}
+  .nav-links a.primary,.nav-links .lang-toggle,.nav-links .nav-links a.reg-entry{display:inline-flex}
+  .nav-links a.reg-entry{padding:5px 12px;letter-spacing:0.06em}
   .employees-grid{grid-template-columns:1fr}
   .hero-stats{gap:1.5rem}
   .footer-inner{grid-template-columns:1fr}
@@ -448,10 +447,7 @@ body.zh .en-only{display:none}
       <button class="lang-btn active" onclick="setLang('zh')">中</button>
       <button class="lang-btn" onclick="setLang('en')">EN</button>
     </div>
-    <div class="visit-badge" title="Total visits">
-      <span class="vb-label zh-only">访问总次数</span><span class="vb-label en-only">TOTAL VISITS</span>
-      <span class="vb-num" id="visitCount">—</span>
-    </div>
+    <a class="reg-entry" href="/register/" title="注册进入学员名录：社区发言 · 文章留言 · 投稿 · 开专栏"><span class="zh-only">注册入口</span><span class="en-only">REGISTER</span></a>
   </div>
   </div>
 <div class="colret"><a href="/browse/">← 返回首页</a>　·　<span class="zh-only">SDE 智能体品尝系列</span><span class="en-only">SDE Agents · Taste Series</span></div>
