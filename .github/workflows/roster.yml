@@ -41,9 +41,11 @@ on:
       - 'public/fiction/**'
       - '!public/kb/neighbors.json'      # 同上，排除自我触发
       - '!public/taste/paradigm-forge/catalog.json'
+      - '!public/sitemap.xml'                # 同上
       - 'tools/build_roster.py'
       - 'tools/build_neighbors.py'
       - 'tools/build_forge_catalog.py'
+      - 'tools/build_sitemap.py'
   workflow_dispatch:
 
 concurrency:
@@ -73,11 +75,14 @@ jobs:
       - name: 重建碰撞机的站内选源目录
         run: python3 tools/build_forge_catalog.py
 
+      - name: 重建 sitemap.xml
+        run: python3 tools/build_sitemap.py
+
       - name: 有变化就提交回 main
         run: |
-          FILES="public/students/roster.json public/kb/neighbors.json public/taste/paradigm-forge/catalog.json"
+          FILES="public/students/roster.json public/kb/neighbors.json public/taste/paradigm-forge/catalog.json public/sitemap.xml"
           if git diff --quiet -- $FILES; then
-            echo "三份派生数据都已和内容一致，无需提交"
+            echo "四份派生数据都已和内容一致，无需提交"
             exit 0
           fi
           git config user.name "sde-index-bot"
