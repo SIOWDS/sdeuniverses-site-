@@ -29,28 +29,28 @@ html{scroll-behavior:smooth}
 body{background:var(--bg);color:var(--text);font-family:'Noto Serif SC','EB Garamond',Georgia,serif;line-height:1.7;overflow-x:hidden}
 body.en{font-family:'EB Garamond','Playfair Display',Georgia,serif}
 /* ── NAV ── */
-nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;flex-direction:column;padding:0.6rem 3rem 0.55rem;background:rgba(245,239,224,0.88);backdrop-filter:blur(12px);border-bottom:1px solid var(--border2)}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;flex-direction:column;padding:1rem 3rem 0.9rem;background:rgba(245,239,224,0.88);backdrop-filter:blur(12px);border-bottom:1px solid var(--border2)}
 .nav-bar-main{display:flex;align-items:center;justify-content:space-between;width:100%}
-.nav-bar-sub{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:0.55rem 1.5rem;width:100%;margin-top:0.6rem;padding-top:0.7rem;border-top:1px solid var(--border2)}
-.nav-bar-sub.nbs-grid{flex-direction:column;flex-wrap:nowrap;gap:0.30rem}
+.nav-bar-sub{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:0.7rem 1.6rem;width:100%;margin-top:0.85rem;padding-top:0.95rem;border-top:1px solid var(--border2)}
+.nav-bar-sub.nbs-grid{flex-direction:column;flex-wrap:nowrap;gap:0.45rem}
 .nbs-row{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));width:100%;max-width:1140px;margin:0 auto}
-.nbs-row a{text-align:center;padding:3px 4px;white-space:nowrap}
-.nav-bar-sub.nbs-grid .nbs-row a{font-size:0.82rem;letter-spacing:0.10em}
+.nbs-row a{text-align:center;padding:7px 6px;white-space:nowrap}
+.nav-bar-sub.nbs-grid .nbs-row a{font-size:1.05rem;letter-spacing:0.10em}
 @media(max-width:1180px){.nbs-row{grid-template-columns:repeat(3,minmax(0,1fr))}
 }
 @media(max-width:620px){.nbs-row{grid-template-columns:repeat(2,minmax(0,1fr))}
 .nbs-row a{white-space:normal}
 }
-.nav-bar-sub a{color:var(--text2);text-decoration:none;font-size:0.9rem;font-weight:600;letter-spacing:0.14em;transition:color 0.2s}
+.nav-bar-sub a{color:var(--text2);text-decoration:none;font-size:1.12rem;font-weight:600;letter-spacing:0.14em;transition:color 0.2s}
 .nav-bar-sub a:hover{text-decoration:underline;text-underline-offset:4px;opacity:0.78}
 .nav-logo{display:inline-flex;flex-direction:column;align-items:stretch;justify-content:center;line-height:1.12;color:var(--gold);text-decoration:none}
-.nav-logo .nl-en{font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:700;text-align:justify;text-align-last:justify;-moz-text-align-last:justify}
-.nav-logo .nl-cn{font-family:"Noto Serif SC",Georgia,serif;font-size:0.95rem;font-weight:700;opacity:.97;text-align:justify;text-align-last:justify;-moz-text-align-last:justify;letter-spacing:0;text-indent:0}
+.nav-logo .nl-en{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:700;text-align:justify;text-align-last:justify;-moz-text-align-last:justify}
+.nav-logo .nl-cn{font-family:"Noto Serif SC",Georgia,serif;font-size:1.22rem;font-weight:700;opacity:.97;text-align:justify;text-align-last:justify;-moz-text-align-last:justify;letter-spacing:0;text-indent:0}
 @media(max-width:520px){.nav-logo .nl-en{font-size:1rem}
 .nav-logo .nl-cn{font-size:0.84rem}
 }
-.nav-links{display:flex;align-items:center;gap:1.5rem}
-.nav-links a{color:var(--text2);text-decoration:none;font-size:0.85rem;letter-spacing:0.08em;transition:color 0.2s}
+.nav-links{display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-end;gap:0.9rem 1.5rem}
+.nav-links a{color:var(--text2);text-decoration:none;font-size:1.02rem;letter-spacing:0.08em;white-space:nowrap;transition:color 0.2s}
 .nav-links a:hover{color:var(--gold)}
 .nav-links a.primary{color:var(--gold);font-weight:600}
 @keyframes navFlow{0%{color:#E23B3B}
@@ -112,8 +112,8 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;flex-direction:
 /* ── SDE 智能体 · Token之火 frame (wraps the two agent nav links) ── */
 @property --afang{syntax:'<angle>';initial-value:0deg;inherits:false}
 /* ===== AGENT STRIP · 每个智能体一个不同形状的框，内里烧 TOKEN ===== */
-.agent-strip{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:.7rem 1rem;width:100%;margin:.55rem 0 .2rem;padding:.6rem .4rem}
-.agent-strip-tag{font-size:.72rem;font-weight:800;letter-spacing:.18em;color:#FF8A3C;text-shadow:0 0 10px rgba(255,120,20,.5);align-self:center;white-space:nowrap}
+.agent-strip{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:.85rem 1.2rem;width:100%;margin:.85rem 0 .4rem;padding:.7rem .4rem}
+.agent-strip-tag{font-size:.88rem;font-weight:800;letter-spacing:.18em;color:#FF8A3C;text-shadow:0 0 10px rgba(255,120,20,.5);align-self:center;white-space:nowrap}
 /* chip = 一整块 accent 色（即"框"的颜色），内里用 ::before 深色填充留出一圈边 */
 .ag-chip{position:relative;display:inline-flex;align-items:center;justify-content:center;padding:9px 20px;text-decoration:none;isolation:isolate;background:var(--acc);transition:transform .15s,filter .2s;--acc:#E7C349;filter:drop-shadow(0 0 7px rgba(255,150,40,.35))}
 .ag-chip:hover{transform:translateY(-2px);filter:drop-shadow(0 0 11px rgba(255,170,50,.6)) brightness(1.08)}
@@ -122,7 +122,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;flex-direction:
 .ag-flame{position:absolute;inset:1.7px;z-index:2;pointer-events:none;overflow:hidden;clip-path:inherit;border-radius:inherit}
 .ag-flame::before{content:"";position:absolute;left:0;right:0;bottom:-45%;height:130%;background:radial-gradient(60% 80% at 28% 100%,rgba(255,110,0,.6),transparent 62%),radial-gradient(55% 80% at 60% 100%,rgba(255,190,60,.55),transparent 62%),radial-gradient(55% 80% at 86% 100%,rgba(255,70,0,.55),transparent 60%);filter:blur(3px);animation:agFlick 1.6s ease-in-out infinite}
 .ag-ember{position:absolute;bottom:2px;width:4px;height:4px;border-radius:1.4px;background:linear-gradient(180deg,#fff1b0,#ff6a00);box-shadow:0 0 6px 1px rgba(255,150,0,.9);opacity:0;animation:agEmber 2.4s ease-in infinite}
-.ag-label{position:relative;z-index:3;font-size:.83rem;font-weight:800;letter-spacing:.03em;white-space:nowrap;color:#F3ECDA;text-shadow:0 0 8px var(--acc),0 1px 2px rgba(0,0,0,.7)}
+.ag-label{position:relative;z-index:3;font-size:1rem;font-weight:800;letter-spacing:.03em;white-space:nowrap;color:#F3ECDA;text-shadow:0 0 8px var(--acc),0 1px 2px rgba(0,0,0,.7)}
 }
 /* ---- 六种不同形状（chip 与内层同一 clip-path/圆角，边自然描出形状）---- */
 .ag-pill{border-radius:999px}
@@ -148,10 +148,10 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;flex-direction:
 .agent-fire .af-link{animation:none !important;position:relative;z-index:3;font-weight:800 !important;font-size:.82rem;line-height:1.18;letter-spacing:.03em;white-space:nowrap;text-shadow:0 1px 2px rgba(0,0,0,.55)}
 }
 .lang-toggle{display:flex;background:var(--card);border:1px solid var(--border);border-radius:20px;overflow:hidden;cursor:pointer}
-.visit-badge{display:flex;align-items:center;gap:8px;background:var(--gold);color:#FAF6EC;padding:7px 16px;border-radius:20px;box-shadow:0 2px 10px rgba(138,104,23,0.35)}
-.visit-badge .vb-label{font-size:0.7rem;letter-spacing:0.12em;opacity:0.9}
-.visit-badge .vb-num{font-size:1.05rem;font-weight:700;letter-spacing:0.03em;color:#FFE9B0;font-variant-numeric:tabular-nums}
-.lang-btn{padding:0.3rem 0.8rem;font-size:0.75rem;letter-spacing:0.05em;border:none;background:transparent;color:var(--text2);cursor:pointer;transition:all 0.2s;font-family:inherit}
+.visit-badge{display:flex;align-items:center;gap:8px;background:var(--gold);color:#FAF6EC;padding:9px 18px;border-radius:20px;box-shadow:0 2px 10px rgba(138,104,23,0.35)}
+.visit-badge .vb-label{font-size:0.8rem;letter-spacing:0.12em;opacity:0.9}
+.visit-badge .vb-num{font-size:1.18rem;font-weight:700;letter-spacing:0.03em;color:#FFE9B0;font-variant-numeric:tabular-nums}
+.lang-btn{padding:0.38rem 0.95rem;font-size:0.88rem;letter-spacing:0.05em;border:none;background:transparent;color:var(--text2);cursor:pointer;transition:all 0.2s;font-family:inherit}
 .lang-btn.active{background:var(--gold);color:#F5EFE0;font-weight:600}
 .claw-body{font-size:0.95rem;color:#C7BB9E;line-height:1.85;margin-bottom:2rem}
 }
@@ -198,8 +198,8 @@ a.card-l span{display:block;font-size:0.85rem;color:var(--text2);line-height:1.6
 .dir-foot .scroll-note{margin-top:0.9rem;padding:0.9rem 1rem;background:var(--card);border:1px dashed var(--border);font-size:0.86rem}
 @media(max-width:760px){main.dir{padding:0 1.1rem 4rem}.cards{grid-template-columns:1fr}}
 
-body{padding-top:150px}
-@media(max-width:900px){body{padding-top:190px}}
+body{padding-top:230px}
+@media(max-width:900px){body{padding-top:270px}}
 
 /* ══ 每日三句 · 深空晶体版（2026-08-18 从长卷搬来：首页＝顶栏三条静态栏目 ＋ 这一块动态） ══ */
 /* 每日三句 · 深空晶体版 */
@@ -260,8 +260,8 @@ body{padding-top:150px}
 @keyframes llshoot{0%{opacity:0;transform:translate(0,0) rotate(32deg) scaleX(1)}9%{opacity:1}20%{opacity:1;transform:translate(220px,130px) rotate(32deg) scaleX(26)}26%,100%{opacity:0;transform:translate(300px,180px) rotate(32deg) scaleX(1)}}
 @keyframes dqpulse{0%,100%{opacity:0.08}50%{opacity:0.32}}
 @keyframes dqflow{to{stroke-dashoffset:-606}}
-@media(min-width:1650px){#daily-quotes{padding-top:7.2rem!important}}
-@media(max-width:640px){#daily-quotes{padding-top:6.5rem!important}}
+@media(min-width:1650px){#daily-quotes{padding-top:4.2rem!important}}
+@media(max-width:640px){#daily-quotes{padding-top:3.6rem!important}}
 @media (prefers-reduced-motion:reduce){.dq-card,.dq-orb,.dq-crystal,.dq-card::before,.dq-inf .p2,.dq-net line,.dq-net circle,.dq-chips span{animation:none !important;opacity:1;transform:none}}
 </style>
 </head>
@@ -270,7 +270,7 @@ body{padding-top:150px}
   <div class="nav-bar-main">
   <a class="nav-logo" href="/browse/"><span class="nl-en">SDE Universes</span><span class="nl-cn">爱思乐园</span></a>
   <div class="nav-links">
-    <a href="/search/" class="primary zh-only" style="border:1px solid var(--gold);border-radius:16px;padding:3px 13px">🔍 搜索</a><a href="/search/" class="primary en-only" style="border:1px solid var(--gold);border-radius:16px;padding:3px 13px">🔍 Search</a><a href="/taste/chatsde/" class="zh-only wdsm-navbtn wdsm-static" style="border:1px solid var(--gold,#D4B25E);border-radius:16px;padding:3px 13px;background:var(--gold,#D4B25E);color:#0F0B07;font-weight:700;text-decoration:none">✦ ChatSDE</a><a href="/taste/chatsde/" class="en-only wdsm-navbtn wdsm-static" style="border:1px solid var(--gold,#D4B25E);border-radius:16px;padding:3px 13px;background:var(--gold,#D4B25E);color:#0F0B07;font-weight:700;text-decoration:none">✦ ChatSDE</a>
+    <a href="/search/" class="primary zh-only" style="border:1px solid var(--gold);border-radius:18px;padding:6px 17px">🔍 搜索</a><a href="/search/" class="primary en-only" style="border:1px solid var(--gold);border-radius:18px;padding:6px 17px">🔍 Search</a><a href="/taste/chatsde/" class="zh-only wdsm-navbtn wdsm-static" style="border:1px solid var(--gold,#D4B25E);border-radius:18px;padding:6px 17px;background:var(--gold,#D4B25E);color:#0F0B07;font-weight:700;text-decoration:none">✦ ChatSDE</a><a href="/taste/chatsde/" class="en-only wdsm-navbtn wdsm-static" style="border:1px solid var(--gold,#D4B25E);border-radius:18px;padding:6px 17px;background:var(--gold,#D4B25E);color:#0F0B07;font-weight:700;text-decoration:none">✦ ChatSDE</a>
     
     <a href="/paradigm/" class="zh-only" style="color:#B5714A;font-weight:700" title="站内碰撞 —— 三篇站内学员论文撞出的典范文">每日必读</a><a href="/paradigm/" class="en-only" style="color:#B5714A;font-weight:700" title="In-house collisions — three site papers collided">Must Read</a>
     <a href="/confluence/" class="zh-only" style="color:#7E9A55;font-weight:700" title="站外碰撞 —— 三个不同学科的外部理论体系撞出的典范文">学科通融</a><a href="/confluence/" class="en-only" style="color:#7E9A55;font-weight:700" title="Cross-discipline collisions — three external theories collided">Confluence</a><a href="/frontier/" class="zh-only" style="color:#4B3FA0;font-weight:700" title="近十年各主要领域最新思想摘要 · 100 学科面板 · 王德生亲撰">新思想前沿</a><a href="/frontier/" class="en-only" style="color:#4B3FA0;font-weight:700" title="Frontier of new ideas across 100 disciplines">Frontier</a>
@@ -321,7 +321,7 @@ body{padding-top:150px}
   </div>
 </nav>
 <main class="home">
-<section id="daily-quotes" style="min-height:86vh;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;text-align:center;padding:10rem 2rem 3rem;background:radial-gradient(ellipse at 28% 18%,#221743 0%,#141031 46%,#0a0820 100%);border-bottom:1px solid rgba(212,178,94,0.35);position:relative;overflow:hidden">
+<section id="daily-quotes" style="min-height:86vh;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;text-align:center;padding:5.5rem 2rem 3rem;background:radial-gradient(ellipse at 28% 18%,#221743 0%,#141031 46%,#0a0820 100%);border-bottom:1px solid rgba(212,178,94,0.35);position:relative;overflow:hidden">
   <div class="ll-stars" id="dq-stars"></div>
   <div class="dq-orb dq-orb1"></div><div class="dq-orb dq-orb2"></div>
   <svg class="dq-net" viewBox="0 0 1200 620" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
@@ -377,6 +377,19 @@ function setLang(lang){
   try{ localStorage.setItem('sde_wds_lang', lang); }catch(e){}
 }
 try{ var _l=localStorage.getItem('sde_wds_lang'); if(_l==='en') setLang('en'); }catch(e){}
+// 顶栏是 fixed 的，正文得为它让位。让位量以前是写死的 px（150/190），可顶栏一放大、
+// 一换行宽度、或 sde-modes.js 事后往里塞「SDE 社区」与系统入口 △，写死的数就不对了
+// ——窄屏上正文当场被盖住。改成量出来：nav 多高就让多少，改宽、换字体、事后注入都跟得上。
+// CSS 里那两条 padding-top 仍留着当无脚本环境的兜底。
+(function(){
+  var nav=document.querySelector('nav'); if(!nav) return;
+  function fit(){ document.body.style.paddingTop=(nav.offsetHeight+14)+'px'; }
+  fit();
+  window.addEventListener('resize',fit);
+  window.addEventListener('load',fit);
+  try{ if(document.fonts&&document.fonts.ready) document.fonts.ready.then(fit); }catch(e){}
+  try{ new MutationObserver(fit).observe(nav,{childList:true,subtree:true}); }catch(e){}
+})();
 // 访问总次数（与旧首页同一个 Durable Object 计数）
 (async function(){
   try{
