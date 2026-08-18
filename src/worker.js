@@ -2468,7 +2468,11 @@ export class IndexMemory {
     if (!this.env.PDFS) return { ok: false, why: "no bucket" };
     if (this._get("pending")) return { ok: true, why: "rebuilding" };
     const st = await this._stamp();
-    if (!force && st && st === this._get("stamp")) return { ok: true, why: "fresh" };
+    /* 【自愈】表是空的却记着指纹 ＝ 上一次重建留下的一句假话（它半路失败却照样把指纹记了下来）。
+       这种状态最恶劣：复验永远说「没变」，于是它再也不会自己修好，而全站检索静默走退路。
+       所以判据不只是指纹，还要看**表里到底有没有货**——空表一律重建。 */
+    const empty = ![...this.sql.exec("SELECT count(*) AS n FROM docs")][0].n;
+    if (!force && !empty && st && st === this._get("stamp")) return { ok: true, why: "fresh" };
     // 任务清单：先 manifest（它给出版块名单），再逐个 kw 分片，最后坐标。分片跑，一次 alarm 一件。
     this._set("newstamp", st);
     this._set("pending", JSON.stringify(["man"]));

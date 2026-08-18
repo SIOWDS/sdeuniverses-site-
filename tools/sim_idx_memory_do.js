@@ -166,6 +166,18 @@ const ENV = { PDFS: { head: async () => ({ etag: "E1" }),
   const still = im4._query({ baseKeys: ["旧的"], exp: [], prev: [], pick: 10 });
   ok("失败之后查询照常走老索引", still.ok && still.cand.length === 1);
 
+  sect("四之三、自愈：表空却记着指纹，必须无条件重建");
+  const im5 = new IndexMemory(makeCtx(), ENV); im5._init();
+  im5._set("stamp", "E1");                    // 上一次重建半路失败却把指纹记了下来
+  const e5 = await im5._ensure(false);
+  ok("空表 + 指纹相同，仍然排队重建（不许说 fresh）", e5.why === "queued", JSON.stringify(e5));
+  let t5 = 0; while (im5.ctx.storage._alarm() !== null && t5 < 20) { im5.ctx.storage._clr(); await im5.alarm(); t5++; }
+  ok("自愈之后表里真有货", im5._status().docs === N_DOCS);
+  const im6 = new IndexMemory(makeCtx(), ENV); im6._init();
+  await im6._ensure(false);
+  while (im6.ctx.storage._alarm() !== null) { im6.ctx.storage._clr(); await im6.alarm(); }
+  ok("表有货且指纹没变时照旧什么都不做（自愈不许变成每次都重建）", (await im6._ensure(false)).why === "fresh");
+
   sect("五、表还没建好时必须说 ok:false（让调用方退回旧路，绝不回空名单）");
   const im2 = new IndexMemory(makeCtx(), ENV); im2._init();
   const empty = im2._query({ baseKeys: ["显露"], exp: [], prev: [], pick: 10 });
