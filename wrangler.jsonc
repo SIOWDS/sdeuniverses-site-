@@ -39,6 +39,10 @@
     { "tag": "v2", "new_sqlite_classes": ["AskLimiter"] },
     { "tag": "v3", "new_sqlite_classes": ["ConfigVault"] },
     { "tag": "v4", "new_sqlite_classes": ["SubmissionBox"] },
-    { "tag": "v5", "new_sqlite_classes": ["CommentBox"] }
+    { "tag": "v5", "new_sqlite_classes": ["CommentBox"] },
+    /* ⚠ migrations 是**只增**的：一旦某个 tag 上过线，就不许再从配置里删掉，
+       否则部署当场失败（2026-08-18 回滚时踩到，站因此多停了几分钟）。
+       v6 的 IndexMemory 已停用（绑定与调用都已摘掉），但这一条必须原样留着。 */
+    { "tag": "v6", "new_sqlite_classes": ["IndexMemory"] }
   ]
 }

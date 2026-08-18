@@ -2391,6 +2391,16 @@ export class AskLimiter {
   }
 }
 
+/* IndexMemory —— 长期记忆的 SQLite Durable Object（2026-08-18 **已停用**）。
+   为什么留着一个空壳：migrations 只增，v6 一旦上过线就删不得，而 migration 里点名的类
+   必须仍然导出，否则部署失败。实现本身已撤回——线上表现是所有 DO 绑定一起失灵
+   （CONFIG_VAULT 抛 1101、这一个取不到），整台智能问答对外不可用。
+   要再上，先在预览环境把「新增 SQLite DO 类」这件事单独验一遍，别和功能改动混在一笔里。 */
+export class IndexMemory {
+  constructor(ctx, env) { this.ctx = ctx; this.env = env; }
+  async fetch() { return new Response(JSON.stringify({ ok: false, why: "已停用" }), { headers: { "content-type": "application/json" } }); }
+}
+
 // ===== 密钥保险箱·服务端存基底 Key（页面设置，免进 Cloudflare）=====
 // 纪律：key 只写入、只在 Worker 内部（op:get）读取用于调用基底；绝不经任何公开路由回传浏览器。
 export class ConfigVault {
