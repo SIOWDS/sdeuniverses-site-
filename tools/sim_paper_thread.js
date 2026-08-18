@@ -67,9 +67,14 @@ ok(H.indexOf("brief=''; return;") > 0, "作废时 brief 清空（成文会自动
 ok(/btnDistill.*style\.display = \(turns\.length>=2\)/.test(H.replace(/\n/g, " ")), "满两轮才露出提炼按钮");
 
 /* 成文接线 —— 这条断了就是静默退化 */
-ok(/brief\.slice\(0, i===0\?9000:5000\), qlist:qlist, briefKind:briefKind/.test(H), "成文·首段：有入口资料就以它为起点（并带上它的来源 briefKind）");
+ok(/brief\.slice\(0, 30000\), qlist:qlist, briefKind:briefKind/.test(H), "成文·首段：有入口资料就以它为起点（并带上它的来源 briefKind）");
 ok(/\{seed:lastAns\.slice\(0, i===0\?3500:1500\)\}/.test(H), "成文·首段：没有入口资料时退回单轮底稿（老路径不变）");
-ok(/brief\.slice\(0, i===0\?9000:5000\)/.test(H), "成文·续写段：仍拿着同一份清单（缩到 5000 字）");
+/* 【2026-08-18 契约翻面】旧断言要求续写段只吃入口资料的前 5000 字。
+   那两个数是入口资料还只有几千字时定的；现在它约七千字，而**第十栏〔论文观点与分章大纲〕
+   恰恰排在最末**——5000 那一刀正好把写给第 2–4 段看的施工图整块切掉，
+   于是「逐条兑现大纲」的指令永远落空。服务端本来就收到 30000。 */
+ok(/brief\.slice\(0, 30000\)/.test(H), "成文·续写段：拿到的是整份入口资料（含最末的分章大纲）");
+ok(!/brief\.slice\(0, i===0\?9000:5000\)/.test(H), "回归：入口资料不再按段截断");
 ok(/var qlist=turns\.map/.test(H), "问题清单（走过的路）一并送上去");
 
 /* 清空 */

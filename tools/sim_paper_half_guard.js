@@ -48,13 +48,29 @@ function makeHalf() {
 }
 
 const LONG = "字".repeat(2000);
+/* 【2026-08-18 契约新增：段末标记闸】paperHalf 现在先问「收尾标记在不在」再剥它。
+   于是**「成功」的桩必须自己带上收尾标记**——不带的桩表达的是「断在半句上」，
+   会照新契约触发一次重试。旧桩全是不带标记的，所以这一批 D 后缀是必须的，不是装饰。 */
+const DONE = "\n〔全文完〕";
+const LONGD = LONG + DONE;
 const tests = [];
 function t(name, setup, check, wantThrow) { tests.push({ name, setup, check, wantThrow }); }
 
-t("一次就够长 → 只调一次，原样返回", () => { plan = [{ text: LONG }]; },
+t("一次就够长且正常收尾 → 只调一次，原样返回", () => { plan = [{ text: LONGD }]; },
   (r) => r.length === 2000 && calls === 1);
 
-t("第一次空串 → 自动重试；第二次成功 → 返回第二次的稿子", () => { plan = [{ text: "" }, { text: LONG }]; },
+t("第一次空串 → 自动重试；第二次成功 → 返回第二次的稿子", () => { plan = [{ text: "" }, { text: LONGD }]; },
+  (r) => r.length === 2000 && calls === 2);
+
+/* ===== 段末标记闸（2026-08-18）=====
+   线上真现场：提炼精华的第二段断在「第八章 ④ 最难的一处：结论必须」，
+   而屏幕上打的是「✓ 论文入口资料已就绪」——因为旧版只把收尾标记**剥掉**、从不问它在不在，
+   一段断在半句上的稿只要够长就被当成写完了。那份断掉的施工图会把缺口原样带进两万字论文。 */
+t("够长但没有收尾标记（断在半句）→ 重试一次", () => { plan = [{ text: LONG }, { text: LONGD }]; },
+  (r) => r.length === 2000 && calls === 2);
+
+t("两次都断在半句 → 照收已写的，不再第三次（重试封顶仍然管用）",
+  () => { plan = [{ text: LONG }, { text: LONG }, { text: LONGD }]; },
   (r) => r.length === 2000 && calls === 2);
 
 /* 【2026-08-13 契约翻面】旧版：两次都空 → 返回空串。那一行把「整条链死在这里」
@@ -66,14 +82,14 @@ t("两次都空 → 抛错，且错误里带得出读数（不许把死当成 0 
   () => { plan = [{ text: "" }, { text: "" }]; },
   (e) => calls === 2 && /正文 0 字/.test(e.message) && /下半篇/.test(e.message), true);
 
-t("重试封顶两次（不许无限重试烧配额）", () => { plan = [{ text: "" }, { text: "" }, { text: LONG }]; },
+t("重试封顶两次（不许无限重试烧配额）", () => { plan = [{ text: "" }, { text: "" }, { text: LONGD }]; },
   (e) => calls === 2, true);
 
 t("写出一部分但没到最短长度 → 照旧收下（半段稿仍是稿，那不是静默）",
   () => { plan = [{ text: "字".repeat(300) }, { text: "字".repeat(300) }]; },
   (r) => r.length === 300 && calls === 2);
 
-t("第一次报错 → 重试；第二次成功", () => { plan = [{ err: "网络中断" }, { text: LONG }]; },
+t("第一次报错 → 重试；第二次成功", () => { plan = [{ err: "网络中断" }, { text: LONGD }]; },
   (r) => r.length === 2000 && calls === 2);
 
 t("第一段收尾标记被剥掉", () => { plan = [{ text: LONG + "\n〔第一段完·待续〕" }]; },
@@ -129,7 +145,10 @@ t("下半篇收尾标记被剥掉", () => { plan = [{ text: LONG + "\n〔全文�
   const done = h.indexOf("✓ 全文完成 · ");
   const guard = h.indexOf("miss=missText(r.done)");
   ok(done > 0 && guard > 0 && guard < done, "状态栏：✓ 全文完成 只在缺段判定之后给出");
-  ok(/stat\.textContent = miss/.test(h), "状态栏：缺段有专属提示，不冒充完稿");
+  /* 2026-08-18：收尾判据由「缺段」一件事扩成两件——缺段(miss) 与 断段(cut)。
+     断段＝写出来了但没写到收尾标记；它此前完全不可见，屏幕照打「✓ 全文完成」。 */
+  ok(/stat\.textContent = \(miss \|\| cut\)/.test(h), "状态栏：缺段与断段都有专属提示，不冒充完稿");
+  ok(/var cut=CUTLOG\.length\?/.test(h), "状态栏：断段（CUTLOG）参与收尾判定");
   ok(h.indexOf("请再点一次「成文一篇」补齐") > 0, "状态栏：给出重来的动作");
 
   /* 投稿体例：四段合起来要凑齐的元素，前端文案与后端清单必须对得上 */

@@ -1366,8 +1366,9 @@ function doDistill(){
       brief=''; return;
     }
     autoVault(brief, '提炼精华');
-    stat.textContent = miss
-      ? '⚠ '+miss+' 已写的 '+brief.length+' 字仍可作论文入口，但缺掉的栏会原样变成论文里的缺口——建议再点一次「🧪 提炼精华」补齐。'
+    var cut=CUTLOG.length?('⚠ '+CUTLOG.join('、')+'——连跑两次都没写到收尾标记。读数：'+runWhy()+'　'):'';
+    stat.textContent = (miss || cut)
+      ? cut+(miss||'')+' 已写的 '+brief.length+' 字仍可作论文入口，但断掉/缺掉的部分会原样变成论文里的缺口——建议再点一次「🧪 提炼精华」补齐。'
       : '✓ 论文入口资料已就绪（'+brief.length+' 字 · 九栏'+(plan?' · 已先做取舍规划':'')+' · 出自 '+turns.length+' 轮问对）· 现在点「成文一篇」，两万字论文将以它为起点逐条兑现。';
   }).catch(function(e){
     box.className='ans';
@@ -1387,7 +1388,7 @@ var GEN_STAT='paperStat', GEN_FILL='ppFill', GEN_CHARS='ppChars', GEN_BOX='', GE
 /* GEN_PREV = 本次任务里前面几段已写好的正文。两个用处：
    ① 字数计从它接着往上走——旧版写死 paperAll.length，打磨时会把已完成的论文长度算进打磨进度里；
    ② 有 GEN_BOX 的任务（提炼）靠它把「已完成段落＋本段实时流」拼起来显示，跑八分钟不至于对着空白框干等。 */
-function genTarget(stat, fill, chars, box){ GEN_STAT=stat; GEN_FILL=fill; GEN_CHARS=chars; GEN_BOX=box||''; GEN_PREV=''; }
+function genTarget(stat, fill, chars, box){ GEN_STAT=stat; GEN_FILL=fill; GEN_CHARS=chars; GEN_BOX=box||''; GEN_PREV=''; CUTLOG=[]; }
 /* ═══ 一次调用的读数（诊断用 · 2026-08-13）═══
    线上真故障：提炼精华跑完只有 0 字，屏幕上留下的是一句**写死的猜测**
    （「多半是把额度全烧在思考上了」）。而服务端其实一路都在报读数——
@@ -1395,8 +1396,13 @@ function genTarget(stat, fill, chars, box){ GEN_STAT=stat; GEN_FILL=fill; GEN_CH
    这些帧被读进 stat.textContent 后立刻被下一帧盖掉，收尾时又被那句猜测盖掉。
    十一轮返工全是从「一句没有数字的话」里猜出来的，根因就在这里。
    RUNLOG 只干一件事：把最后一次调用的读数留住，让零产出能说出自己是怎么死的。 */
-var RUNLOG={stat:'',pre:'',think:0,out:0,sec:0,err:'',stalled:false,frames:0};
-function runReset(){ RUNLOG={stat:'',pre:'',think:0,out:0,sec:0,err:'',stalled:false,frames:0}; }
+/* fin/done 来自服务端 2026-08-18 新加的「收笔读数」帧：停因是什么、上游有没有发过 [DONE]。
+   这两个数是分辨「基底自己停笔」与「整条流被掐断」的唯一依据。 */
+var RUNLOG={stat:'',pre:'',think:0,out:0,sec:0,err:'',stalled:false,frames:0,fin:'',done:false};
+function runReset(){ RUNLOG={stat:'',pre:'',think:0,out:0,sec:0,err:'',stalled:false,frames:0,fin:'',done:false}; }
+/* CUTLOG＝本次任务里**断在半句上**的段。每个任务开头（genTarget）清一次。
+   有了它，收尾那句话才不会在断稿上写「✓ 已就绪」。 */
+var CUTLOG=[];
 /* 零产出的三种死法，从前被写成同一句话，现在必须分得开：
    ① 基底把额度烧在思考上（think 大、out=0，服务端会补一句停因）；
    ② 整个 Worker 被平台无声杀掉（流干净结束、没有 error 帧、beat 停在第 12x 秒）；
@@ -1410,6 +1416,8 @@ function runWhy(){
   if(RUNLOG.stalled) a.push('久无新帧·前端主动掉线');
   else if(!RUNLOG.frames) a.push('一帧都没收到');
   else if(!RUNLOG.err) a.push('流干净结束却没有正文（多半是整个请求被平台无声掉线）');
+  if(RUNLOG.fin) a.push('停因 '+RUNLOG.fin);
+  if(RUNLOG.frames && !RUNLOG.done) a.push('上游没发 [DONE]（这一段是被掐断的，不是写完的）');
   if(RUNLOG.err) a.push('服务端报的错：'+RUNLOG.err);
   if(RUNLOG.stat) a.push('最后一步：'+RUNLOG.stat);
   return a.join(' · ');
@@ -1465,7 +1473,12 @@ function streamPaper(part, extra){
               }
             }
             else if(j.t==='think'){ thinkChars+=(j.v||'').length; RUNLOG.think=Math.max(RUNLOG.think,thinkChars); stat.textContent='🧠 第'+('一二三四'.charAt((part||1)-1)||'一')+'段·深度思考中（'+thinkChars+' 字'+(RUNLOG.sec?'·第 '+RUNLOG.sec+' 秒':'')+'）…'; }
-            else if(j.t==='error'){ RUNLOG.err=j.v||''; reject(new Error(j.v||'基底返回错误')); return; }
+            else if(j.t==='fin'){ var _f=j.v||{}; RUNLOG.fin=_f.fin||''; RUNLOG.done=!!_f.done; if(_f.sec) RUNLOG.sec=_f.sec; if(_f.think) RUNLOG.think=Math.max(RUNLOG.think,_f.think); }
+            /* 【写到一半的字不许丢 —— 2026-08-18】旧版收到 error 帧就 reject，pacc 里已经流下来的
+               几千字当场作废。而服务端**恰恰只在「写到一半才断」时才发这一帧**（零正文那一支发的是
+               status）。于是被掐断 ⇒ 整段消失 ⇒ 上层重跑一次 ⇒ 再被掐 ⇒ 这一段彻底没有。
+               现在：已经写出字的，带着错误照收，完没完交给下面那道段末标记闸去判。 */
+            else if(j.t==='error'){ RUNLOG.err=j.v||''; if(pacc.length){ resolve(pacc); return; } reject(new Error(j.v||'基底返回错误')); return; }
           }
           pump();
         }).catch(reject);
@@ -1492,17 +1505,40 @@ function setProg(chars, running){
    「✓ 全文完成」，PDF 里只有上半篇——读者看不出少了第二轴、可裁决判据、证伪条件
    与参考文献，拿去评阅就是按半篇打分。宁可重试一次、宁可在封面上写「未完成稿」，
    也不许悄悄交半篇。 */
+/* 【段末标记闸 —— 2026-08-18】每一段的提示词末尾都要求单独一行输出收尾标记
+   （〔规划完〕〔第一段完·待续〕〔全文完〕…）。旧版只把标记**剥掉**，从不问它在不在——
+   于是一段断在半句上的稿，只要字数够长就被当成写完了：doDistill 收尾照样打「✓ 已就绪」，
+   而那份断掉的《论文入口资料》会把缺口原样带进两万字论文。
+   这道闸只做三件事：判断标记在不在、不在就重试一次、第二次仍不在就照收但记进 CUTLOG。
+   ⚠ 标记必须在**剥之前**判，剥完就分不出「本来没有」和「已经剥掉」了。 */
 function paperHalf(part, extra, minLen, label, attempt){
+  /* ⚠ 两件事都不许改：① 这条正则必须写在函数**里面**——护栏 sim_paper_half_guard 与
+     sim_paper_four_parts 是把本函数到 doPaper 之间那一段源码抠出来真跑的，写在外面就抠不到，
+     整组真跑当场 ReferenceError；② 本文件的注释里**不许出现那两个抠取锚点的原文**
+     （"函数 paperHalf 的定义行"与"doPaper 的定义行"那两串字），否则 indexOf 会先命中注释，
+     抠出来的只是一截 139 字的残片——它不会红在断言上，而是整个脚本崩掉。这两条都是刚踩过的。 */
+  var END_RE=/〔(?:(?:上半篇完|第[一二三四]段完)·待续|规划完|全文完)〕\s*$/;
   attempt = attempt || 1;
   var stat=document.getElementById(GEN_STAT);
   return streamPaper(part, extra).then(function(txt){
-    var c=String(txt||'').replace(/〔(?:上半篇完|第[一二三四]段完)·待续〕\s*$/,'').replace(/〔规划完〕\s*$/,'').replace(/〔全文完〕\s*$/,'').trim();
+    var raw=String(txt||'').trim();
+    var ended=END_RE.test(raw);
+    var c=raw.replace(END_RE,'').trim();
     /* 【末次仍是零字＝失败，不是成功】旧版在 attempt>=2 时无条件 return c：
        c 是空串时，这一行就把「整条链死在这里」悄悄变成了「成功返回了 0 字」，
        真因（前置吃掉几秒、思考烧了几字、是不是被平台无声掉线）在这里全部丢光，
        上层只好拿一句写死的猜测顶上。零字必须带着读数抛出去。
        写出一部分但没到 minLen 的照旧收下——半段稿仍是稿，那不是静默。 */
     if(!c.length && attempt>=2) throw new Error(label+'连跑两次都没交出正文 —— '+runWhy());
+    /* 断在半句上（没有收尾标记）与写得太短，是两种毛病、同一种处置：重试一次。
+       第二次仍断的，照收——半段稿仍是稿，但必须记账，收尾那句话要如实说它断了。 */
+    if(c.length && !ended){
+      if(attempt<2){
+        stat.textContent='… '+label+'断在半句上（'+c.length+' 字，缺收尾标记），正在重试一次…';
+        return paperHalf(part, extra, minLen, label, attempt+1);
+      }
+      CUTLOG.push(label+'（'+c.length+' 字，断在半句）');
+    }
     if(c.length>=minLen || attempt>=2) return c;
     stat.textContent='… '+label+'产出过短（'+c.length+' 字），基底可能中断，正在重试…';
     return paperHalf(part, extra, minLen, label, attempt+1);
@@ -1587,9 +1623,16 @@ function doPaper(){
   paperAll=''; setProg(0, true);
   /* 有入口资料就以它为起点（清单式），没有就退回单轮底稿（老路径不变） */
   var qlist=turns.map(function(t,i){ return (i+1)+'. '+t.q; }).join('\n').slice(0,900);
+  /* 【入口资料不再按段截断 —— 2026-08-18】旧版按段截断：首段吃九千字、续写三段各吃五千字。
+     ⚠ 别把那一行旧代码原样抄进注释——护栏 sim_paper_thread 有一条回归断言就是搜它的字面，
+        抄进来就永远红着（同一个洞今天已经踩过一次：抠取锚点被注释抢先命中）。
+     那两个数是入口资料还只有几千字时定的；现在它约七千字，而**第十栏〔论文观点与分章大纲〕
+     恰恰排在最末**——也就是说第 2–4 段（代理坍缩、第二轴、证伪条件）拿到的资料里，
+     那张写给它们看的施工图整块被切掉了，逐条兑现的指令因此落空。
+     服务端本来就收到 30000（本文件 paper 分支 brief 的 slice），是这里没跟着入口资料扩容改。 */
   var seedFor=function(i, head, tail){
     var e = brief
-      ? {seed:lastAns.slice(0, i===0?1200:1200), brief:brief.slice(0, i===0?9000:5000), qlist:qlist, briefKind:briefKind}
+      ? {seed:lastAns.slice(0, 1200), brief:brief.slice(0, 30000), qlist:qlist, briefKind:briefKind}
       : {seed:lastAns.slice(0, i===0?3500:1500)};
     if(i>0){ e.head=head; e.tail=tail; }
     return e;
@@ -1602,8 +1645,9 @@ function doPaper(){
     return buildPdf(paperAll, miss);
   }).then(function(){
     setProg(paperAll.length, false);
-    stat.textContent = miss
-      ? '⚠ '+miss+' PDF 首页已标注「未完成稿」，请再点一次「成文一篇」补齐。已写的 '+paperAll.length+' 字都在。'
+    var cut=CUTLOG.length?('⚠ '+CUTLOG.join('、')+'——连跑两次都没写到收尾标记。读数：'+runWhy()+'　'):'';
+    stat.textContent = (miss || cut)
+      ? cut+(miss?miss+' PDF 首页已标注「未完成稿」。':'')+'请再点一次「成文一篇」补齐。已写的 '+paperAll.length+' 字都在。'
       : '✓ 全文完成 · '+paperAll.length+' 字 · 四段齐全（含中英摘要、参考文献、附录与投稿声明）· PDF 已就绪，可在线阅读或下载。';
   }).catch(function(e){
     setProg(paperAll.length, false);

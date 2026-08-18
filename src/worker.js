@@ -6161,7 +6161,9 @@ async function askCore(request, env, url, body, SINK) {
   // 连接断了，与 —— 思考把额度吃光、content 一个字不回（见 wdsPlainBody 头上的注释）。
   const _drain = async (resp, controller, _st) => {
     const rd = resp.body.getReader();
-    let buf = "", out = 0, think = 0, fin = "", errs = 0;
+    // doneMark：上游有没有正常发过 [DONE]。它是「写到一半被掐」与「写完了」之间唯一的分界线——
+    // 没有它，一段断在半句上的稿与一段正常收尾的稿，在服务端读数里长得一模一样。
+    let buf = "", out = 0, think = 0, fin = "", errs = 0, doneMark = false;
     while (true) {
       const { done, value } = await rd.read();
       if (done) break;
@@ -6172,7 +6174,7 @@ async function askCore(request, env, url, body, SINK) {
         buf = buf.slice(idx + 1);
         if (!line.startsWith("data:")) continue;
         const p = line.slice(5).trim();
-        if (p === "[DONE]") continue;
+        if (p === "[DONE]") { doneMark = true; continue; }
         let j; try { j = JSON.parse(p); } catch (e) { continue; }
         if (j.error) { errs++; controller.enqueue(_sseBytes({ t: "error", v: j.error.message || "基底流内错误" })); continue; }
         const c0 = (j.choices && j.choices[0]) || {};
@@ -6182,7 +6184,7 @@ async function askCore(request, env, url, body, SINK) {
         if (d.content) { out += d.content.length; if (_st) _st.out += d.content.length; controller.enqueue(_sseBytes({ t: "token", v: d.content })); }
       }
     }
-    return { out: out, think: think, fin: fin, errs: errs };
+    return { out: out, think: think, fin: fin, errs: errs, doneMark: doneMark };
   };
   const runMain = async (controller) => {
       // 心跳：预算给大之后，思考期可以长达一两分钟。这期间上游一个字节都不发，
@@ -6215,6 +6217,8 @@ async function askCore(request, env, url, body, SINK) {
         if (r.out > 0) controller.enqueue(_sseBytes({ t: "error", v: _cutMsg }));   // 写到一半才断＝真丢字，要报
         else controller.enqueue(_sseBytes({ t: "status", v: "⏱ " + _cutMsg + "——正在关掉思考重跑一次…" }));
       }
+      // _fin＝这一轮最终交稿的那一次 drain 的读数（首跑，或零正文兜底重跑的那一遍）。
+      let _fin = r;
       // ===== 零正文兜底 =====
       // 提炼／碰撞／综合这些环节一跑一两分钟，一次哑火作废的是前面十几次调用。
       // 所以这里不认命：同一份 messages 关掉思考再跑一遍（wdsPlainBody 就是干这个的），
@@ -6236,7 +6240,7 @@ async function askCore(request, env, url, body, SINK) {
               messages: [{ role: "system", content: sys }, { role: "user", content: usr }],
             })),
           });
-          if (up2.ok) r2 = await _drain(up2, controller, _st);
+          if (up2.ok) { r2 = await _drain(up2, controller, _st); if (r2) _fin = r2; }
           else controller.enqueue(_sseBytes({ t: "error", v: VC.name + " 关思考重跑返回 " + up2.status }));
         } catch (e) { controller.enqueue(_sseBytes({ t: "error", v: "关思考重跑失败：" + (e && e.message) })); }
         if (!r2 || r2.out === 0) {
@@ -6245,6 +6249,20 @@ async function askCore(request, env, url, body, SINK) {
             + (r.errs ? "上面那条基底自己报的错才是根因。" : "请再点一次；若连着两次都空，换另一个基底。") }));
         }
       }
+      // ===== 收笔读数（2026-08-18）=====
+      // 【为什么非加不可】「写出了正文、却断在半句上」这一种死法，此前服务端一个字都不报：
+      //   _drain 早就拿到了 finish_reason，也知道上游有没有发过 [DONE]，
+      //   但只有「零正文」那一支会说话。于是**被截断的一段与正常收尾的一段，在流里长得一模一样**，
+      //   前端照旧宣布「✓ 已就绪」——一份断在第八章的施工图会原样变成论文里的缺口。
+      //   这一帧只报数、不下判断：正文几字·思考几字·停因·上游收没收到 [DONE]·第几秒。
+      //   判「完没完」交给前端的段末标记闸（〔全文完〕之类），两边互为佐证：
+      //     · 有标记 ＋ doneMark ⇒ 正常收笔；
+      //     · 无标记 ＋ doneMark ⇒ 基底自己提前停笔（fin 会说是 length 还是 stop）；
+      //     · 无标记 ＋ 无 doneMark ⇒ 整条流被掐（我们的时钟或平台那道 128–133 秒的墙）。
+      //   ⚠ 未知帧型在两个消费页（/search/、/frontier/search/）都是静默跳过的，加它不破坏旧前端。
+      if (_fin && _fin.out > 0) controller.enqueue(_sseBytes({ t: "fin", v: {
+        out: _st.out, think: _st.think, fin: _fin.fin || "", done: !!_fin.doneMark,
+        sec: Math.round((Date.now() - (_st.t0 || Date.now())) / 1000) } }));
       try { if (_hb) clearInterval(_hb); } catch (e) {}   // 外层心跳由 handleAsk 收，这里只收自己起的那台
       if (_clk) _clk.stop();
       controller.enqueue(_ENC.encode("data: [DONE]\n\n"));

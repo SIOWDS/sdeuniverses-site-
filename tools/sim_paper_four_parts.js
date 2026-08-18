@@ -28,13 +28,21 @@ function makeRunner() {
     calls.push(part);
     return step.err ? Promise.reject(new Error(step.err)) : Promise.resolve(step.text);
   };
-  const fn = new Function("document", "streamPaper", "GEN_STAT", "setProg",
-    seg + "\nreturn { runFourParts: runFourParts, missText: missText, paperHalf: paperHalf, PAPER_PARTS: PAPER_PARTS, partHead: partHead };");
-  return fn(stub, streamPaper, "paperStat", function () { });
+  /* CUTLOG 是页面里的顶层变量（记「断在半句上的段」），定义在本脚本抠取范围之外，
+     所以要像 document/streamPaper 一样喂进来——否则新契约那一支当场 ReferenceError。 */
+  const cutlog = [];
+  const fn = new Function("document", "streamPaper", "GEN_STAT", "setProg", "CUTLOG",
+    seg + "\nreturn { runFourParts: runFourParts, missText: missText, paperHalf: paperHalf, PAPER_PARTS: PAPER_PARTS, partHead: partHead, CUTLOG: CUTLOG };");
+  return fn(stub, streamPaper, "paperStat", function () { }, cutlog);
 }
 const seedFor = (i, head, tail) => ({ i: i, head: head, tail: tail });
 const stat = { set textContent(v) { } };
 const LONG = (n) => "字".repeat(n);
+/* 【2026-08-18】paperHalf 加了段末标记闸：先问收尾标记在不在，不在就当「断在半句」重试一次。
+   所以凡是表达「这一段写成了」的桩，都必须带上它自己那一段的收尾标记；
+   不带标记的桩从此表达的是「被掐断」，不再是「写完了」。 */
+const MK = ["〔第一段完·待续〕", "〔第二段完·待续〕", "〔第三段完·待续〕", "〔全文完〕"];
+const SEG = (i, n) => LONG(n) + "\n" + MK[i];
 /* 每个场景开跑前必须重置：plan 按 calls.length 取步，不清零会串场 */
 const reset = (p) => { plan = p; calls = []; };
 
@@ -49,7 +57,7 @@ const reset = (p) => { plan = p; calls = []; };
     "末段职能里点名参考文献与投稿声明（投稿体例的收尾件）");
 
   console.log("— 二、顺利跑完四段 —");
-  reset([{ text: LONG(5000) + "\n【一、引言】起" }, { text: LONG(5000) }, { text: LONG(5000) }, { text: LONG(5000) }]);
+  reset([{ text: LONG(5000) + "\n【一、引言】起\n" + MK[0] }, { text: SEG(1, 5000) }, { text: SEG(2, 5000) }, { text: SEG(3, 5000) }]);
   let r = await R.runFourParts(seedFor, stat, "写作中");
   ok(calls.join(",") === "1,2,3,4", "四段依次发出 part=1,2,3,4 · 实得 " + calls.join(","));
   ok(r.done === 4, "done=4");
@@ -57,7 +65,7 @@ const reset = (p) => { plan = p; calls = []; };
   ok(R.missText(r.done) === false, "四段齐全时不打未完成稿标记");
 
   console.log("— 三、中途某段写不出来（最要命的一种）—");
-  reset([{ text: LONG(5000) }, { text: LONG(5000) }, { text: "" }, { text: "" }, { text: LONG(5000) }]);
+  reset([{ text: SEG(0, 5000) }, { text: SEG(1, 5000) }, { text: "" }, { text: "" }, { text: SEG(2, 5000) }]);
   r = await R.runFourParts(seedFor, stat, "写作中");
   ok(calls.join(",") === "1,2,3,3", "第三段重试一次后就地停住，绝不硬跑第四段 · 实得 " + calls.join(","));
   ok(r.done === 2, "done=2（只认真正写成的段）");
@@ -74,7 +82,7 @@ const reset = (p) => { plan = p; calls = []; };
   ok(calls.length === 2, "重试封顶两次，不烧配额 · 实得 " + calls.length);
 
   console.log("— 五、末段失败：前三段必须保住 —");
-  reset([{ text: LONG(5000) }, { text: LONG(5000) }, { text: LONG(5000) }, { err: "超时" }, { err: "超时" }]);
+  reset([{ text: SEG(0, 5000) }, { text: SEG(1, 5000) }, { text: SEG(2, 5000) }, { err: "超时" }, { err: "超时" }]);
   r = await R.runFourParts(seedFor, stat, "写作中");
   ok(r.done === 3 && r.text.length > 14000, "末段挂掉不丢前三段 · done=" + r.done + " 字数=" + r.text.length);
 
@@ -89,7 +97,7 @@ const reset = (p) => { plan = p; calls = []; };
   /* 用真实的投稿体例开头：题名+英文题名+中英摘要与关键词，正常有六七百字，
      远超 partHead 里那道 80 字的护栏（护栏是防「引言标记出现得太早＝没有摘要」时切出个空 head）。 */
   const FRONT = "论文题名\nTitle: A Study\n【摘要】" + LONG(400) + "\n【关键词】甲；乙\n【Abstract】" + LONG(200) + "\n【Keywords】a; b\n";
-  reset([{ text: FRONT + "【一、引言】" + LONG(5000) }, { text: LONG(5000) }, { text: LONG(5000) }, { text: LONG(5000) }]);
+  reset([{ text: FRONT + "【一、引言】" + LONG(5000) + "\n" + MK[0] }, { text: SEG(1, 5000) }, { text: SEG(2, 5000) }, { text: SEG(3, 5000) }]);
   const seen = [];
   await R.runFourParts((i, head, tail) => { seen.push({ i: i, head: head, tail: tail }); return {}; }, stat, "写作中");
   ok(seen[0].head === "", "第一段不带 head（它自己就是题名的来源）");
@@ -98,6 +106,20 @@ const reset = (p) => { plan = p; calls = []; };
   ok(/【摘要】/.test(seen[1].head) && /【Abstract】/.test(seen[1].head),
     "head 里带着中英摘要——后三段据此不重写题名与摘要");
   ok(seen[3].tail && seen[3].tail.length === 1000, "末段拿到的续写起点是已写全文的最后 1000 字");
+
+  console.log("— 八、段末标记闸：断在半句的段不许被当成写完（2026-08-18）—");
+  /* 线上真现场：提炼第二段断在「第八章 ④ 最难的一处：结论必须」，
+     状态栏仍打「✓ 已就绪」。病根是只剥标记、不问标记在不在。 */
+  const R2 = makeRunner();
+  reset([{ text: LONG(3000) }, { text: SEG(0, 3000) }]);
+  const one = await R2.paperHalf(1, {}, 600, "第一段");
+  ok(calls.length === 2 && one.length === 3000, "缺收尾标记 → 重试一次 · 实得调用 " + calls.length);
+  const R3 = makeRunner();
+  reset([{ text: LONG(3000) }, { text: LONG(3000) }, { text: SEG(0, 3000) }]);
+  const two = await R3.paperHalf(1, {}, 600, "第一段");
+  ok(calls.length === 2 && two.length === 3000, "两次都缺标记 → 照收，不烧第三次 · 实得调用 " + calls.length);
+  ok(R3.CUTLOG.length === 1 && /第一段/.test(R3.CUTLOG[0]) && /断在半句/.test(R3.CUTLOG[0]),
+    "两次都缺标记 → 记进 CUTLOG（收尾那句话据此不打「✓」）· 实得 " + JSON.stringify(R3.CUTLOG));
 
   console.log("\n===== " + P + " PASS / " + F + " FAIL =====");
   process.exit(F ? 1 : 0);
