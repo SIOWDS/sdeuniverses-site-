@@ -6266,8 +6266,17 @@ export default {
       return r;
     }
     if (url.pathname === "/api/visits") {
-      const id = env.COUNTER.idFromName("site-total");
-      return env.COUNTER.get(id).fetch(request);
+      // 计数坏了不许把整页拖成 500：DO 绑定脱开时（2026-08-18 那次 IndexMemory 迁移的后遗症）
+      // 这里回一个 total:null + why，前端照样静默降级，运维一 curl 就看得见真正的错。
+      try {
+        if (!env.COUNTER) throw new Error("COUNTER binding is undefined");
+        const id = env.COUNTER.idFromName("site-total");
+        return await env.COUNTER.get(id).fetch(request);
+      } catch (e) {
+        return new Response(JSON.stringify({ total: null, ok: false, why: String((e && e.message) || e) }), {
+          headers: { "content-type": "application/json", "cache-control": "no-store" },
+        });
+      }
     }
     // /api/pv：每篇文章阅读次数（复用 VisitCounter，一篇一实例，key=pv:<slug>）
     // GET 只读当前值；POST 尝试自增：同一 IP+UA 同一天（UTC+8）只计一次。
@@ -6280,16 +6289,23 @@ export default {
           headers: { "content-type": "application/json", "cache-control": "no-store" },
         });
       }
-      const id = env.COUNTER.idFromName("pv:" + slug);
-      if (request.method === "POST") {
-        const ip = request.headers.get("CF-Connecting-IP") || "0";
-        const ua = request.headers.get("User-Agent") || "";
-        const day = new Date(Date.now() + 8 * 3600 * 1000).toISOString().slice(0, 10);
-        const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode("sde-pv-v2:" + ip + "|" + ua + "|" + slug + "|" + day));
-        const fp = [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, "0")).join("");
-        return env.COUNTER.get(id).fetch(new Request(request.url, { method: "POST", headers: { "x-pv-fp": fp, "x-pv-day": day } }));
+      try {
+        if (!env.COUNTER) throw new Error("COUNTER binding is undefined");
+        const id = env.COUNTER.idFromName("pv:" + slug);
+        if (request.method === "POST") {
+          const ip = request.headers.get("CF-Connecting-IP") || "0";
+          const ua = request.headers.get("User-Agent") || "";
+          const day = new Date(Date.now() + 8 * 3600 * 1000).toISOString().slice(0, 10);
+          const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode("sde-pv-v2:" + ip + "|" + ua + "|" + slug + "|" + day));
+          const fp = [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, "0")).join("");
+          return await env.COUNTER.get(id).fetch(new Request(request.url, { method: "POST", headers: { "x-pv-fp": fp, "x-pv-day": day } }));
+        }
+        return await env.COUNTER.get(id).fetch(request);
+      } catch (e) {
+        return new Response(JSON.stringify({ total: null, ok: false, why: String((e && e.message) || e) }), {
+          headers: { "content-type": "application/json", "cache-control": "no-store" },
+        });
       }
-      return env.COUNTER.get(id).fetch(request);
     }
     // /api/chat：实时群聊。WebSocket 升级=实时收发；GET=历史/轮询兜底；POST=轮询兜底发言。转发到 COMMENTS 的 chat:<room> 实例。
     if (url.pathname === "/api/wds/analyze" && request.method === "POST") {
