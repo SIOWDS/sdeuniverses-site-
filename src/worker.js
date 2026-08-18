@@ -2909,16 +2909,25 @@ async function loadCorpus(env, url) {
 async function loadCoords(env, url) {
   await tierFresh(env);
   if (TIER.coords !== undefined) return TIER.coords;   // 取回过就复用（null 也算取回过，别每次重试）
-  try {
-    const cj = await (await idxFetch(env, url, "/search/sde-coords.json")).json();
-    const m = {};
-    /* 【存字符串，不存 Set】4318 篇各建一个 Set＝几万个独立小字符串＋几千个 Set 头，
-       在 128MB 的 isolate 里是纯浪费。改存 "|词|词|" 一条串，命中判定用 indexOf，
-       语义与 Set.has 完全一致（词表里没有竖线，已核）。 */
-    for (const k in cj) m[k] = "|" + (cj[k] || []).map((t) => String(t).toLowerCase()).join("|") + "|";
-    TIER.coords = Object.keys(m).length ? m : null;
-  } catch (e) { TIER.coords = null; }
-  return TIER.coords;
+  return _once("coords", async () => {
+    if (TIER.coords !== undefined) return TIER.coords;
+    try {
+      const txt = await (await idxFetch(env, url, "/search/sde-coords.json")).text();
+      const m = {};
+      /* 【存字符串，不存 Set，而且**逐条**建】3,145 篇各一个词表；整份 parse 会在同一瞬间
+         摆出几万个小字符串。改成逐条切出来、单独 parse、立刻压成 "|词|词|" 一条串再丢掉。
+         命中判定用 indexOf，语义与 Set.has 完全一致（词表里没有竖线，已核）。 */
+      let cnt = 0;
+      _scanObjEntries(txt, (k, vTxt) => {
+        let arr; try { arr = JSON.parse(vTxt); } catch (e) { return; }
+        if (!Array.isArray(arr)) return;
+        m[k] = "|" + arr.map((t) => String(t).toLowerCase()).join("|") + "|";
+        cnt++;
+      });
+      TIER.coords = cnt ? m : null;
+    } catch (e) { TIER.coords = null; }
+    return TIER.coords;
+  });
 }
 // RAG_STREAMED_SCAN：SDE 对谈专用的检索。
 // 全站索引现在是 60MB／20 个分片（单片最大 6MB）；旧做法 loadCorpus 把 20 片一次性装进内存再打分，
@@ -2988,9 +2997,31 @@ async function tierFresh(env) {
 async function idxManifest(env, url) {
   await tierFresh(env);
   if (TIER.man) return TIER.man;
-  const j = await (await idxFetch(env, url, "/search/manifest.json")).json();
-  TIER.man = j;
-  return j;
+  return _once("man", async () => {
+    if (TIER.man) return TIER.man;
+    const txt = await (await idxFetch(env, url, "/search/manifest.json")).text();
+    /* manifest 717KB／4,488 篇。整份 parse 一次摆出近两万个字符串；改成逐条切、逐条 parse。
+       另外**在装载时就把标题小写存下来**（tl）：从前 ragScan 每答一次就要对全部 4,488 篇各
+       toLowerCase 一遍、还不止一处——那是每个请求几千个临时字符串的分配风暴，
+       在共用的 isolate 里比常驻体量更致命。小写化只做一次，往后各处直接用 d.tl。 */
+    const docs = [];
+    const n = _scanTopLevel(txt, "docs", (dTxt) => {
+      let d; try { d = JSON.parse(dTxt); } catch (e) { return; }
+      docs.push({ i: d.i, u: d.u, t: d.t, s: d.s, tl: String(d.t || "").toLowerCase() });
+    });
+    let j;
+    if (!n) { try { j = JSON.parse(txt); } catch (e) { return null; } }   // 形状不认识就退回旧路
+    else {
+      const secs = [];
+      _scanTopLevel(txt, "sections", (sTxt) => { try { secs.push(JSON.parse(sTxt)); } catch (e) {} });
+      const mb = txt.match(/"built"\s*:\s*"([^"]*)"/);
+      const mc = txt.match(/"counts"\s*:\s*(\{[^}]*\})/);
+      let counts = {}; if (mc) { try { counts = JSON.parse(mc[1]); } catch (e) {} }
+      j = { built: mb ? mb[1] : "", counts: counts, sections: secs, docs: docs };
+    }
+    TIER.man = j;
+    return j;
+  });
 }
 // IDX_KEYS：允许从 R2 供给的索引数据文件。**只认生成物**——
 // /search/index.html 是搜索页本身，永远留在仓库里，不在此列。
@@ -3008,41 +3039,145 @@ async function idxFetch(env, url, path) {
   }
   return env.ASSETS.fetch(new Request(new URL(path, url)));
 }
+/* ═══ 三层记忆·第一刀：流式逐行解析（2026-08-18）═══
+   病灶（线上实测 error 1102 / Worker exceeded resource limits，rag 5/5 全灭）：
+   tierGet 是**先整份 JSON.parse、再压成串**——峰值在压缩之前。kw/students.json
+   1.08MB／1835 篇解析出 117,408 个短字符串，每个短字符串在 V8 堆上另加对象头，
+   那一瞬间十几 MB；而 128MB 是整个 isolate 共用的。08-17 那一刀治的是**常驻**体量，
+   峰值一次都没被治过。isolate 一被杀，常驻 TIER 就没了 ⇒ 下一个请求又从冷载开始、
+   又付一次峰值 ⇒ 再也回不到热态。这就是「偶发」变成「全灭」的机制。
+   修法：**永不整份 parse**。走一遍文本、切出顶层数组的每一个元素、逐个 parse 再逐个丢，
+   峰值 = 一份文本 + 一个元素 + 最终压缩产物。 */
+function _scanTopLevel(txt, key, onItem) {
+  /* ⚠⚠ 定位这一步曾经错过一次，而且是**安静地错**：manifest 里 "sections" 的每一项都自带
+     一个 "docs": 数字，于是 indexOf('"docs"') 命中的是那个数字字段，再往后找第一个 [
+     就落进了 "files":[…]，结果只扫出 10 条而不是 4,488 条——不报错、不为空、只是少了 99.8%。
+     是 sim 拿线上真文件当夹具当场抓到的。所以判据收紧成三条同时成立：
+     ①「"键"」处在键位（前一个非空白字符是 { 或 ,）；② 紧跟的非空白是 :；③ 再紧跟的非空白是 [。 */
+  let kx = -1, i = -1;
+  const q = '"' + key + '"';
+  for (let p = txt.indexOf(q); p >= 0; p = txt.indexOf(q, p + 1)) {
+    let a = p - 1;
+    while (a >= 0 && (txt[a] === " " || txt[a] === "\n" || txt[a] === "\r" || txt[a] === "\t")) a--;
+    if (a >= 0 && txt[a] !== "{" && txt[a] !== ",") continue;      // 不在键位（多半是某个字符串的内容）
+    let b = p + q.length;
+    while (b < txt.length && (txt[b] === " " || txt[b] === "\n" || txt[b] === "\r" || txt[b] === "\t")) b++;
+    if (txt[b] !== ":") continue;
+    b++;
+    while (b < txt.length && (txt[b] === " " || txt[b] === "\n" || txt[b] === "\r" || txt[b] === "\t")) b++;
+    if (txt[b] !== "[") continue;                                   // 值不是数组（如 "docs": 448）——不是我们要的那个
+    kx = p; i = b; break;
+  }
+  if (kx < 0) return 0;
+  i++;
+  let depth = 0, inStr = false, esc = false, start = -1, n = 0;
+  for (; i < txt.length; i++) {
+    const c = txt.charCodeAt(i);
+    if (inStr) {
+      if (esc) { esc = false; continue; }
+      if (c === 92) { esc = true; continue; }   // \
+      if (c === 34) inStr = false;              // "
+      continue;
+    }
+    if (c === 34) { inStr = true; if (depth === 0 && start < 0) start = i; continue; }
+    if (c === 123 || c === 91) { if (depth === 0) start = i; depth++; continue; }   // { [
+    if (c === 125 || c === 93) {                                                    // } ]
+      depth--;
+      if (depth === 0 && start >= 0) { onItem(txt.slice(start, i + 1)); n++; start = -1; }
+      if (depth < 0) break;   // 数组自己收口
+      continue;
+    }
+  }
+  return n;
+}
+/* 顶层对象（sde-coords.json 是 { "3":["词",…], … }）也要能逐条走，理由同上：
+   3,145 个键各带一个数组，整份 parse 出来的是几万个小字符串。 */
+function _scanObjEntries(txt, onEntry) {
+  let i = txt.indexOf("{");
+  if (i < 0) return 0;
+  i++;
+  let inStr = false, esc = false, kStart = -1, key = "", depth = 0, vStart = -1, n = 0, wantKey = true;
+  for (; i < txt.length; i++) {
+    const c = txt.charCodeAt(i);
+    if (inStr) {
+      if (esc) { esc = false; continue; }
+      if (c === 92) { esc = true; continue; }
+      if (c === 34) {
+        inStr = false;
+        if (wantKey && kStart >= 0) { key = txt.slice(kStart, i); kStart = -1; }
+        else if (!wantKey && depth === 0 && vStart >= 0) { onEntry(key, txt.slice(vStart, i + 1)); n++; vStart = -1; wantKey = true; }
+        continue;
+      }
+      continue;
+    }
+    if (c === 34) {                                   // "
+      inStr = true;
+      if (wantKey) kStart = i + 1; else if (depth === 0 && vStart < 0) vStart = i;
+      continue;
+    }
+    if (c === 58 && wantKey) { wantKey = false; continue; }   // :
+    if (c === 123 || c === 91) { if (!wantKey && depth === 0) vStart = i; depth++; continue; }
+    if (c === 125 || c === 93) {
+      if (depth === 0) break;                          // 顶层对象收口
+      depth--;
+      if (depth === 0 && vStart >= 0) { onEntry(key, txt.slice(vStart, i + 1)); n++; vStart = -1; wantKey = true; }
+      continue;
+    }
+    if (c === 44 && depth === 0 && !wantKey) { wantKey = true; continue; }   // , （数字/布尔值的收口）
+  }
+  return n;
+}
+/* 冷载互斥：并发的两个请求从前会**各自**跑一遍整份解析，峰值直接翻倍。
+   同一个 key 在建的时候，后来者等同一个 Promise，不再另起一遍。 */
+const _IDX_INFLIGHT = new Map();
+function _once(key, fn) {
+  const p0 = _IDX_INFLIGHT.get(key);
+  if (p0) return p0;
+  const p = (async () => { try { return await fn(); } finally { _IDX_INFLIGHT.delete(key); } })();
+  _IDX_INFLIGHT.set(key, p);
+  return p;
+}
 const TIER_L1_ALL = 2600 * 1024;   // 篇层缓存合计**原始字节**上限（够装下 students+books+_root+frontier）
 async function tierGet(env, url, path, key) {
   await tierFresh(env);
   if (key === "l0" && TIER.l0) return TIER.l0;
   if (key !== "l0" && TIER.l1[key]) return TIER.l1[key].j;
-  const r = await idxFetch(env, url, path);
-  if (!r.ok) return null;
-  const txt = await r.text();
-  let j; try { j = JSON.parse(txt); } catch (e) { return null; }
-  if (key === "l0") { TIER.l0 = j; return j; }
-  /* 【一行一串，不留关键词数组】kw/students.json 现在 1.05MB／1827 篇／11.7 万个关键词串；
-     每个短字符串在 V8 堆上还要另加对象头，留着数组等于把一份 1MB 的 JSON 放大成十几 MB。
-     压成 "|词|词|" 一条串后常驻体量降到五分之一，命中判定由 _scoreKeys 兼容处理。 */
-  if (j && Array.isArray(j.rows)) {
-    const rows = new Array(j.rows.length);
-    for (let n = 0; n < j.rows.length; n++) {
-      const r0 = j.rows[n] || {};
-      rows[n] = { i: r0.i, k: "|" + (r0.k || []).join("|") + "|" };
+  /* 并发冷载互斥：两个请求同时来，从前会各跑一遍整份解析，峰值翻倍。 */
+  return _once("l1:" + key, async () => {
+    if (key === "l0" && TIER.l0) return TIER.l0;
+    if (key !== "l0" && TIER.l1[key]) return TIER.l1[key].j;
+    const r = await idxFetch(env, url, path);
+    if (!r.ok) return null;
+    const txt = await r.text();
+    if (key === "l0") { let j0; try { j0 = JSON.parse(txt); } catch (e) { return null; } TIER.l0 = j0; return j0; }
+    /* 【一行一串，且**逐行**建 —— 不再整份 JSON.parse】
+       kw/students.json 1.08MB／1835 篇／117,408 个关键词。整份 parse 会在同一瞬间
+       把这十一万多个短字符串全部摆在堆上（每个另加对象头），十几 MB；而 128MB 是
+       整个 isolate 共用的。改成走一遍文本、切出每一行、单独 parse 出它那 64 个词、
+       立刻压成一条 "|词|词|" 串再丢掉 ⇒ 瞬时峰值只有一行的量。 */
+    const rows = [];
+    let bad = 0;
+    const n = _scanTopLevel(txt, "rows", (rowTxt) => {
+      let r0; try { r0 = JSON.parse(rowTxt); } catch (e) { bad++; return; }
+      rows.push({ i: r0.i, k: "|" + ((r0.k || []).join("|")) + "|" });
+    });
+    if (!n) { let j1; try { j1 = JSON.parse(txt); } catch (e) { return null; } return j1; }   // 形状不认识就退回旧路
+    const j = { rows: rows };
+    /* 【封顶按字节，不按份数】旧写法封 8 份——那是篇层最大 185KB 时代的账；
+       如今单份就能到 1MB，8 份足以独占 isolate。先进先出，超出就把最早那份让出来。 */
+    const _b = txt.length;
+    if (_b <= TIER_L1_ALL) {
+      let _ks = Object.keys(TIER.l1);
+      while (TIER.l1b + _b > TIER_L1_ALL && _ks.length) {
+        const k0 = _ks.shift();
+        TIER.l1b -= (TIER.l1[k0] && TIER.l1[k0].b) || 0;
+        delete TIER.l1[k0];
+      }
+      TIER.l1[key] = { j: j, b: _b };
+      TIER.l1b += _b;
     }
-    j = { rows: rows };
-  }
-  /* 【封顶按字节，不按份数】旧写法封 8 份——那是篇层最大 185KB 时代的账；
-     如今单份就能到 1MB，8 份足以独占 isolate。先进先出，超出就把最早那份让出来。 */
-  const _b = txt.length;
-  if (_b <= TIER_L1_ALL) {
-    let _ks = Object.keys(TIER.l1);
-    while (TIER.l1b + _b > TIER_L1_ALL && _ks.length) {
-      const k0 = _ks.shift();
-      TIER.l1b -= (TIER.l1[k0] && TIER.l1[k0].b) || 0;
-      delete TIER.l1[k0];
-    }
-    TIER.l1[key] = { j: j, b: _b };
-    TIER.l1b += _b;
-  }
-  return j;
+    return j;
+  });
 }
 // list 收两种形态：数组（版块层 sections.json 原样）与 "|词|词|" 串（篇层，见 tierGet）。
 // 串形态必须带竖线比对，否则 "the" 会命中 "theory" —— 数组那一支是**全等**匹配，语义不能走样。
@@ -3079,7 +3214,7 @@ async function ragScan(env, url, q, expTerms, prevQ, k, chunkLimit, opts) {
   if (!l0 || !l0.sections) return ragScanShards(env, url, man, coords, baseKeys, exp, prev, k, cut, ONLY);
   const titleHit = {};
   for (const d of man.docs) {
-    const tl = String(d.t || "").toLowerCase();
+    const tl = d.tl || String(d.t || "").toLowerCase();   // tl 在 idxManifest 装载时就备好了：别每答一次就把全站标题重新小写一遍
     let sc = 0;
     for (const key of baseKeys) if (tl.indexOf(key) >= 0) sc += 3;
     for (const key of exp) if (tl.indexOf(key) >= 0) sc += 2;
@@ -3106,7 +3241,7 @@ async function ragScan(env, url, q, expTerms, prevQ, k, chunkLimit, opts) {
       let sc = _scoreKeys(r.k, baseKeys, exp, prev);
       const d = man.docs[r.i];
       if (d) {
-        const tl = String(d.t || "").toLowerCase();
+        const tl = d.tl || String(d.t || "").toLowerCase();   // tl 在 idxManifest 装载时就备好了：别每答一次就把全站标题重新小写一遍
         for (const key of baseKeys) if (tl.indexOf(key) >= 0) sc += 3;
         for (const key of exp) if (tl.indexOf(key) >= 0) sc += 2;
       }
@@ -3182,7 +3317,7 @@ async function ragScan(env, url, q, expTerms, prevQ, k, chunkLimit, opts) {
 async function ragScanShards(env, url, man, coords, baseKeys, exp, prev, k, cut, only) {
   const secScore = {};
   for (const d of man.docs) {
-    const tl = String(d.t || "").toLowerCase();
+    const tl = d.tl || String(d.t || "").toLowerCase();   // tl 在 idxManifest 装载时就备好了：别每答一次就把全站标题重新小写一遍
     let sc = 0;
     for (const key of baseKeys) if (tl.indexOf(key) >= 0) sc += 2;
     for (const key of exp) if (tl.indexOf(key) >= 0) sc += 1.5;

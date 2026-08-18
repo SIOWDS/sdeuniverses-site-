@@ -28,7 +28,11 @@ const A = SRC.indexOf("let CORPUS = null;");
 const B = SRC.indexOf("function retrieve(corpus, q, k, expTerms) {");
 const BLOCK = (A > 0 && B > A) ? SRC.slice(A, B) : "";
 ok("抠得到索引段", BLOCK.length > 4000);
-ok("抠出来的括号是平的", BLOCK.split("{").length === BLOCK.split("}").length);
+/* ⚠ 这条原本数大括号是否成对。**判据钉错了东西**：它要守的是「切片是完整、能跑的一段」，
+   而数括号只是当时凑巧等价的一个形状——源码里一旦出现字符串字面量里的 "{" 或 "}"
+   （2026-08-18 的流式扫描器就有：txt[a] !== "{"），它当场假红，而切片其实完好。
+   改成守那件要守的事本身：这段能不能被真正解析。 */
+ok("抠出来的是完整可跑的一段", (() => { try { new Function(BLOCK); return true; } catch (e) { return false; } })());
 
 // 这一段引用了段外的 Response/URL/Request；Node 18+ 自带，够用。
 const M = {};
