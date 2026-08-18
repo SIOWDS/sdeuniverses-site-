@@ -869,7 +869,7 @@ def render() -> str:
             parts.append(f'<li>{html.escape(str(item["sources"][key]))}。</li>')
     parts.append('''</ol></div>
 <div class="end"><b>新思想前沿</b> 是一个持续撰写的专栏：近二十年，各主要领域最要紧的思想转向。本块采用两幕体例——第一幕八条、第二幕十二条；每条正文保持六段，正文后附八字段碰撞行，文末附资料核验。 · <a href="/frontier/" style="color:var(--gold);text-decoration:none">← 回到学科面板</a></div>
-</main><script src="/wds-mode.js?v=20260817c" defer></script>
+</main><script src="/wds-mode.js?v=20260818b" defer></script>
 </body></html>''')
     page = ''.join(parts)
     main = re.search(r'<main>(.*?)</main>', page, re.S).group(1)

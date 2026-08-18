@@ -423,7 +423,7 @@ def render(item: Item, kind: str, sections: list[dict[str, str]], source: str) -
 <div class="triad"><a href="/students/zhang-qiong/{item.slug}/">理论母文<small>张琼的理论判断 · {item.score:g}</small></a><a class="{'active' if kind == 'explain' else ''}" href="/students/zhang-qiong/{item.slug}/interpretation/">白话解释文<small>一条日常主类比</small></a><a class="{'active' if kind == 'practice' else ''}" href="/students/zhang-qiong/{item.slug}/practice/">方法实践文<small>动作、判据与停手线</small></a></div></div></header>
 <article class="wrap"><div class="abs"><b>摘要</b>　{html.escape(abstract)}</div><div class="toc"><b>目录</b><ol>{toc}</ol></div>{''.join(body)}
 <div class="end">继续阅读：<a href="/students/zhang-qiong/{item.slug}/">理论母文《{html.escape(item.title)}》</a> · <a href="/students/zhang-qiong/{item.slug}/{sibling_route}/">{html.escape(sibling_title)}</a></div></article>
-<footer><div class="wrap">© 2026 SDE Universes · <a href="/students/zhang-qiong/works/">张琼 · 全部作品</a></div></footer><script src="/wds-mode.js?v=20260817c" defer></script></body></html>'''
+<footer><div class="wrap">© 2026 SDE Universes · <a href="/students/zhang-qiong/works/">张琼 · 全部作品</a></div></footer><script src="/wds-mode.js?v=20260818b" defer></script></body></html>'''
 
 
 TRIAD_STYLE = """<style>

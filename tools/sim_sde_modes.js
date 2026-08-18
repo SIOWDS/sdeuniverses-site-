@@ -84,80 +84,23 @@ console.log("① 浏览态：顶栏紧跟「问WDS」插一颗「SDE 微信」")
   ok(!!nav.querySelector(".wdsm-navbtn"), "「问WDS」原样留着（不是被取代，是并排）");
   ok(!nav.querySelector(".sdemx"), "浏览态不画三段条——人就在浏览态，顶栏要的是通往另外两态的门");
   ok(!!env.head.querySelector("style"), "样式自带，不依赖页面");
-  const home = nav.querySelector(".sdemx-home");
-  // 2026-07-31 改口径：入口严格且唯一地对应域名根地址，第二门牌 /?portal=1 作废，
-  // 这颗 △ 因此改指 "/"（根地址每次打开都是入口，见 tools/sim_portal_gate.js）。
-  ok(!!home && home.href === "/home/", "顶栏有一颗回入口页的 △，指的是入口门牌 /home/，实得 " + (home && home.href));
-  ok(!!home && nav.children.indexOf(home) === nav.children.indexOf(pills[1]) + 1, "△ 排在两颗药丸之后");
-  // 2026-07-31 改口径：这颗 △ 上面要写「系统入口」。原来的断言是 textContent === "△"
-  // （固化"图形按钮不带字"），已随口径作废。保住的是原意里仍成立的那半句——**一颗即可**：
-  // 标签成对是靠 zh-only/en-only 由 CSS 隐掉一个，不是像药丸那样插两颗 <a>。
-  const hlabs = home.querySelectorAll(".sdemx-hlab");
-  ok(hlabs.length === 2, "△ 带一对中英标签，实得 " + hlabs.length + " 个");
-  ok(hlabs[0].className.indexOf("zh-only") >= 0 && hlabs[0].textContent === "系统入口",
-    "中文标签是「系统入口」，实得「" + (hlabs[0] && hlabs[0].textContent) + "」");
-  ok(hlabs[1].className.indexOf("en-only") >= 0 && hlabs[1].textContent === "System Entry",
-    "英文标签是「System Entry」，实得「" + (hlabs[1] && hlabs[1].textContent) + "」");
-  ok(nav.querySelectorAll(".sdemx-home").length === 1, "△ 仍然只有一颗（标签靠 CSS 隐显，不是插两颗按钮）");
-  ok(home.textContent.indexOf("△") >= 0, "△ 字形还在");
-  const kids = Array.prototype.slice.call(home.children);
-  ok(kids.indexOf(hlabs[0]) < kids.findIndex((c) => c.tagName === "I"), "标签排在 △ 之前（字在上、三角在下）");
-  ok(!home.querySelector(".sdemx-fire"), "内页那颗 △ 是安静的（烧一处才是记号，处处都烧就成了噪音）");
+  // 2026-08-18 王德生令：摘掉「系统入口」那颗 △。断言由"必须有一颗"翻面成"一颗都不许有"——
+  // 这一条留着不是形式主义：homeBtn() 的样式仍在 CSS 串里，谁把函数写回来，这里会当场红。
+  ok(!nav.querySelector(".sdemx-home"), "顶栏不再画「系统入口」的 △");
+  ok(!nav.querySelector(".sdemx-hlab"), "「系统入口」的中英标签也一并没了");
+  ok(nav.children.indexOf(pills[1]) === nav.children.indexOf(pills[0]) + 1, "两颗药丸仍紧挨着");
 }
 
-console.log("①b 只有浏览首页那颗 △ 在烧，且火盖住三角形");
+console.log("①b 首页那颗烧着的 △ 已随「系统入口」一起撤掉");
 {
   const env = freshDoc("/");
   const nav = new N("div"); nav.className = "nav-links";
   const wds = new N("a"); wds.className = "zh-only wdsm-navbtn"; wds.href = "/taste/wds-chat/";
   nav.appendChild(wds); env.body.appendChild(nav);
   run(env);
-  const home = nav.querySelector(".sdemx-home");
-  const hf = home.querySelector(".sdemx-fire");
-  ok(!!hf && hf.querySelectorAll("b").length === 3, "首页那颗在烧，三股火");
-  // 2026-07-31 改口径：原来是同一种橙的三层火舌（f1/f2/f3 大中小套着烧）。
-  // 现在是**红绿蓝三股**——绿/红/蓝各一股、位置错开、加色混合，重叠带相加成白亮的芯。
-  // 三色与入口页 sde-portal.js 的 FIRE 表同源：浏览烧草叶绿、对话烧血红、微信烧蓝天蓝。
-  const stems = ["fg", "fr", "fb"].map((c) => hf.querySelector("." + c));
-  ok(stems.every(Boolean), "三股各就各位（fg 绿 / fr 红 / fb 蓝）");
-  const cssOf = (c) => (CSSFLAT.match(new RegExp("\\.sdemx-fire \\." + c + "\\{([^}]*)\\}")) || [, ""])[1];
-  const [cg, cr, cb] = ["fg", "fr", "fb"].map(cssOf);
-  ok(/#7CE06A/.test(cg) && /52,168,50/.test(cg), "绿股用草叶绿（与入口页同一组）");
-  ok(/#FF3B3B/.test(cr) && /212,0,0/.test(cr), "红股用血红（不许偏橙）");
-  ok(/#A6DAFF/.test(cb) && /63,160,240/.test(cb), "蓝股用蓝天蓝（偏青不偏紫）");
-  const lefts = [cg, cr, cb].map((c) => parseFloat((c.match(/left:([\d.]+)%/) || [, "0"])[1]));
-  ok(lefts[0] < lefts[1] && lefts[1] < lefts[2], "三股左中右错开，实得 " + lefts.join(" / "));
-  ok(lefts[2] - lefts[0] > 30, "错开够远，三股才分得出来，实得跨度 " + (lefts[2] - lefts[0]));
-  const wid = parseFloat((CSSFLAT.match(/\.sdemx-fire b\{[^}]*width:([\d.]+)%/) || [, "0"])[1]);
-  ok(wid > (lefts[1] - lefts[0]), "每股比相邻间距宽＝必然重叠，这条重叠带就是「交融」，实得宽 " + wid + "% vs 间距 " + (lefts[1] - lefts[0]) + "%");
-  const durs = [cg, cr, cb].map((c) => parseFloat((c.match(/animation-duration:([\d.]+)s/) || [, "0"])[1]));
-  ok(new Set(durs).size === 3, "三股周期互不相同，不会齐步摇，实得 " + durs.join(" / "));
-  // 加色是"交融"的物理前提：CSS 默认的覆盖式合成只会让后画的盖住先画的，叠出一片灰。
-  ok(/\.sdemx-fire b\{[^}]*mix-blend-mode:plus-lighter/.test(CSSFLAT), "股与股之间用加色混合");
-  ok(/\.sdemx-fire\{[^}]*isolation:isolate/.test(CSSFLAT), "火层自成混合上下文（否则加色会一路加到页面浅底上）");
-  const rgbOf = (t) => { const h = t.replace("#", ""); return [0, 2, 4].map((i) => parseInt(h.slice(i, i + 2), 16)); };
-  const pick = (css) => (css.match(/#[0-9A-Fa-f]{6}/g) || []).map(rgbOf);
-  ok(pick(cr).every(([r, g, b]) => Math.abs(g - b) <= 6 && g < r * 0.35), "红股守血红判据（不许偏橙）");
-  ok(pick(cg).every(([r, g, b]) => g > b * 1.5), "绿股守草叶绿判据（不许偏薄荷）");
-  ok(pick(cb).every(([r, g, b]) => b > g && g > r), "蓝股守蓝天蓝判据（偏青不偏紫）");
-  const ops = [cg, cr, cb].map((c) => parseFloat((c.match(/opacity:([\d.]+)/) || [, "1"])[1]));
-  ok(ops.every((o) => o > 0.3 && o <= 0.72), "三股都压到半透明——三角不被糊没、重叠处又能叠出亮芯，实得 " + ops.join(" / "));
-  ok(hf.querySelectorAll(".sdemx-sp").length === 12, "火星十二粒，实得 " + hf.querySelectorAll(".sdemx-sp").length);
-  const kids = home.children.map((c) => c.className || c.tagName);
-  ok(kids.indexOf("sdemx-fire") === kids.length - 1,
-    "火最后加入＝盖在三角形上面，不是垫在它背后，实得顺序 " + kids.join(" > "));
-  ok(/\.sdemx-fire\{[^"]*z-index:2/.test(SRC), "火层 z-index 在字之上");
-  ok(!/mix-blend-mode:\s*screen/.test(SRC),
-    "不用 screen 混合：顶栏是米色浅底，screen 会把橙色直接洗成白，火就没了");
-  const iCss = (CSSFLAT.match(/\.sdemx-home i\{([^}]*)\}/) || [, ""])[1];
-  ok(/text-shadow:0 0 8px/.test(iCss), "三角形本身仍调成受热的颜色，不然在火里会变成一个黑洞");
-  ok(!/rgba\(255,\s*(140|90),/.test(iCss), "三角的光不再是橙的（不与三色火抢第四色）");
-  // 「系统入口」四个字在烧着的这一颗上也得有，而且必须压在火之上：
-  // 火层是 z-index:2、△ 是 1（有意让火裹住三角），标签若不抬到 3，火苗窜上来就把字糊掉了。
-  ok(home.querySelectorAll(".sdemx-hlab").length === 2, "烧着的这颗也带中英标签");
-  ok(/\.sdemx-hlab\{[^}]*z-index:3/.test(CSSFLAT), "标签 z-index:3，压在火层（2）之上");
-  ok(/\.sdemx-home\{[^}]*flex-direction:column/.test(CSSFLAT), "按钮竖排：字在上、三角在下");
-  ok(/\.sdemx-hlab\{[^}]*white-space:nowrap/.test(CSSFLAT), "四个字不许折行");
+  ok(!nav.querySelector(".sdemx-home"), "浏览首页也不再画 △");
+  ok(!nav.querySelector(".sdemx-fire"), "那三股火（绿/红/蓝）随之熄灭");
+  ok(!nav.querySelector(".sdemx-sp"), "十二粒火星也没了");
 }
 
 console.log("② 当前态按路径判定");
@@ -167,8 +110,8 @@ console.log("② 当前态按路径判定");
   ok(M1.current() === "im", "在 /sde-wechat/ 判为 SDE 微信，实得 " + M1.current());
   const box = e1.body.querySelector(".sdemx");
   ok(box.querySelectorAll("a")[1].className === "on", "高亮的是第二档");
-  ok(box.querySelectorAll("a").length === 4 && box.querySelector(".sdemx-home"),
-    "三段条尾也有回入口的 △（三态＋一个回门口，不是四态），实得 " + box.querySelectorAll("a").length + " 个");
+  ok(box.querySelectorAll("a").length === 3 && !box.querySelector(".sdemx-home"),
+    "三段条就是三态，尾巴上不再挂回入口的 △，实得 " + box.querySelectorAll("a").length + " 个");
   ok(box.parentNode.className === "top", "微信页没有 .nav-links，就近挂到 .top 顶栏");
 }
 {

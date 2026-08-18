@@ -24,7 +24,7 @@ footer{border-top:1px solid var(--line);text-align:center;padding:34px 20px;colo
  const files=["part-00.part", "part-01.part", "part-02.part", "part-03.part", "part-04.part", "part-05.part", "part-06.part", "part-07.part"];
  const parts=await Promise.all(files.map(async f=>{const r=await fetch(f,{cache:'no-cache'});if(!r.ok)throw new Error(f+' '+r.status);return r.text();}));
  document.getElementById('page-root').innerHTML=parts.join('');
- for(const src of ['/assets/sde-talk.js?v=20260817c','/wds-mode.js?v=20260817c']){const s=document.createElement('script');s.src=src;s.defer=true;document.body.appendChild(s);}
+ for(const src of ['/assets/sde-talk.js?v=20260817c','/wds-mode.js?v=20260818b']){const s=document.createElement('script');s.src=src;s.defer=true;document.body.appendChild(s);}
  if(location.hash)requestAnimationFrame(()=>{const id=decodeURIComponent(location.hash.slice(1));document.getElementById(id)?.scrollIntoView();});
 })().catch(err=>{console.error(err);document.getElementById('page-root').innerHTML='<div style="min-height:55vh;display:grid;place-items:center;padding:70px 20px;font-family:serif"><div>正文装配失败，请刷新页面。</div></div>';});
 </script>

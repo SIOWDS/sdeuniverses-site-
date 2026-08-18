@@ -27,52 +27,9 @@
   // 回到入口页。地址只在这里定义一次，wds-mode.js 用的是同一串。
   var PORTAL = "/home/";                                     // 入口页的门牌（裸域名会落到这里）
   // 只有浏览首页那颗烧——烧一处才是记号，处处都烧就成了噪音
-  function isHome() {
-    var p = String(location.pathname || "/");
-    return p === "/" || p === "/index.html";
-  }
-  function homeBtn() {
-    var a = document.createElement("a");
-    a.className = "sdemx-home";
-    a.href = PORTAL;
-    // 标签写在三角上方。没有字的时候，这颗 △ 只对已经知道它是什么的人才是入口；
-    // 站点的中英靠 body 上的 class 切，所以成对插、由 CSS 隐掉另一个——
-    // 不能像 title 那样用 lang() 定死，否则点「中/EN」切换时这四个字不会跟着变。
-    var lz = document.createElement("span");
-    lz.className = "sdemx-hlab zh-only";
-    lz.textContent = "\u7cfb\u7edf\u5165\u53e3";
-    var le = document.createElement("span");
-    le.className = "sdemx-hlab en-only";
-    le.textContent = "System Entry";
-    a.appendChild(lz); a.appendChild(le);
-    var gl0 = document.createElement("i");
-    gl0.textContent = "\u25b3";
-    if (!isHome()) { a.appendChild(gl0); return a; }          // 内页：一颗安静的 △
-    // 首页：三角＝入口页那张图，认得出；火裹着它，与它指向的那张图同一种火。
-    // 三股火＝入口页三团 TOKEN 火的收束：SDE 浏览烧草叶绿、SDE 对话烧血红、SDE 社区烧蓝天蓝。
-    // 正色口径与 sde-portal.js 的 FIRE 表一致（血红不许偏橙、绿不许偏薄荷、蓝偏青不偏紫）。
-    var fire = document.createElement("span");
-    fire.className = "sdemx-fire";
-    fire.setAttribute("aria-hidden", "true");
-    ["fg", "fr", "fb"].forEach(function (fc) {
-      var t = document.createElement("b"); t.className = fc; fire.appendChild(t);
-    });
-    // 火星也三色轮着来，一粒一色——三股火在上面交融，飘出来的火星就该是三色混着走。
-    var HOT = ["#7CE06A", "#FF3B3B", "#A6DAFF", "#34A832", "#D40000", "#3FA0F0"];
-    for (var i2 = 0; i2 < 12; i2++) {
-      var sp = document.createElement("s");
-      sp.className = "sdemx-sp";
-      sp.style.left = (12 + (i2 * 6.6) % 76) + "%";
-      sp.style.background = HOT[i2 % HOT.length];
-      sp.style.animationDuration = (1.6 + (i2 % 4) * 0.34) + "s";
-      sp.style.animationDelay = (i2 * 0.27) + "s";
-      fire.appendChild(sp);
-    }
-    a.appendChild(gl0); a.appendChild(fire);                  // 字在前、火在后加入＝火盖在字上
-    a.title = lang() === "en" ? "Back to the entry page" : "\u56de\u5230\u5165\u53e3\u9875";
-    a.setAttribute("aria-label", a.title);
-    return a;
-  }
+  /* 「系统入口」那颗 △ 已按王德生 2026-08-18 的令摘除：顶栏与三段条都不再画它。
+     入口页 /home/ 本身没动，仍可直达；ChatSDE 侧栏里那一颗是 wds-mode.js 自己画的，不在本文件。
+     .sdemx-home 一族的样式故意留在下面的 CSS 串里——要恢复只需把 homeBtn() 写回来。 */
   function curKey() {
     var p = String(location.pathname || "/");
     for (var i = 0; i < SDE_MODES.length; i++) {
@@ -195,7 +152,6 @@
       a.appendChild(s);
       box.appendChild(a);
     });
-    box.appendChild(homeBtn());
     return box;
   }
 
@@ -226,10 +182,9 @@
     var en = mk("en-only", "\ud83d\udcac Community");
     var all = nav.querySelectorAll(".wdsm-navbtn");
     var anchor = all.length ? all[all.length - 1] : null;    // 紧跟ChatSDE；它不在就落到末尾
-    var hm = homeBtn();
     if (anchor && anchor.nextSibling) {
-      nav.insertBefore(zh, anchor.nextSibling); nav.insertBefore(en, zh.nextSibling); nav.insertBefore(hm, en.nextSibling);
-    } else { nav.appendChild(zh); nav.appendChild(en); nav.appendChild(hm); }
+      nav.insertBefore(zh, anchor.nextSibling); nav.insertBefore(en, zh.nextSibling);
+    } else { nav.appendChild(zh); nav.appendChild(en); }
   }
   function mount() {
     if (document.querySelector(".sdemx") || document.querySelector(".sdemx-pill")) return;

@@ -2233,7 +2233,7 @@
   function loadModes() {
     if (window.SDEModes) return;
     var sc = document.createElement("script");
-    sc.src = "/assets/sde-modes.js?v=20260817c"; sc.async = true;
+    sc.src = "/assets/sde-modes.js?v=20260818b"; sc.async = true;
     sc.onerror = injectNav;
     document.head.appendChild(sc);
   }
