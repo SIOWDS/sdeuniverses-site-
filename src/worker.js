@@ -10398,16 +10398,20 @@ export default {
       return J({ ok: true, n: out.length, hit: out.filter((x) => x.in).length, done: out });
     }
     // Everything else: serve static assets (with configured html/404 handling)
-    // 三个地址、一份 HTML：
-    //   /         裸域名，进站的默认落点（入口脚本会把地址栏改写成 /home/）
-    //   /home/    入口页的门牌
-    //   /browse/  浏览页的门牌
-    // 地址各归各的，内容却是同一份——入口只是这一页上的一层（sde-portal.js 注入），
-    // 开不开门由脚本按 pathname 判定，服务端不必也不该分叉。
+    // 地址表（2026-08-18 起，入口与浏览各是各的一页，不再共用一份 HTML）：
+    //   /         裸域名，进站的默认落点 ＝ 轻量入口页（约 5KB，public/index.html）
+    //   /home/    入口页的门牌（原地取 / 那一份，入口脚本会把地址栏归一到这里）
+    //   /browse/  浏览页 ＝ 栏目总目录（public/browse/index.html，真的一页，不必改写）
+    //   /overview/ 旧的长滚动首页，原样留着
+    // 旧口径里三个地址返回同一份 893KB 长卷——进站看一眼门就得先把整卷下下来，
+    // 而用户裁定"长滚动那页意义不大了，都是点栏目进的"，于是拆开。
     // **原地取内容，不发 30x 跳转**：跳转多一次往返，后退历史还多一格。
     let assetReq = request;
-    if (/^\/(browse|home)\/?$/.test(url.pathname)) {
+    if (/^\/home\/?$/.test(url.pathname)) {
       assetReq = new Request(new URL("/", url), request);
+    } else if (url.pathname === "/browse") {
+      // 不带尾斜杠也认，取的是 /browse/ 那一页本身（不是根那份）
+      assetReq = new Request(new URL("/browse/", url), request);
     }
     const resp = await env.ASSETS.fetch(assetReq);
     const ct = resp.headers.get("content-type") || "";

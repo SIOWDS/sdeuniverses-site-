@@ -1,0 +1,1559 @@
+<!DOCTYPE html>
+<!-- deploy-check 2026-07-19 #2 --><html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>总览长卷 · 一页看完全站 | 爱思乐园 SDE Universes</title>
+<meta name="build" content="202607131226-bylines">
+<link rel="canonical" href="https://sdeuniverses.com/overview/">
+<meta name="description" content="爱思乐园总览长卷：今日三句、SDE 智能体集群、健脑日课、品尝系列、王博士与 SDE、今日长文与每日更新、各专栏预告，一页依次滚完。栏目目录见 /browse/。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=EB+Garamond:wght@400;500&family=Noto+Serif+SC:wght@300;400;500;600&display=swap" media="print" onload="this.media='all';this.onload=null"><noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Noto+Serif+SC:wght@400;600&display=swap"></noscript>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#F5EFE0;
+  --surface:#EBE3CE;
+  --card:#FAF6EC;
+  --card2:#F0E8D3;
+  --gold:#8A6817;
+  --gold2:#A88233;
+  --text:#2A2315;
+  --text2:#6B5D47;
+  --muted:#98886C;
+  --border:rgba(138,104,23,0.22);
+  --border2:rgba(138,104,23,0.10);
+  --claw-bg:#1A1410;
+  --claw-gold:#D4B25E;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Noto Serif SC','EB Garamond',Georgia,serif;line-height:1.7;overflow-x:hidden}
+body.en{font-family:'EB Garamond','Playfair Display',Georgia,serif}
+
+/* ── NAV ── */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;flex-direction:column;padding:0.6rem 3rem 0.55rem;background:rgba(245,239,224,0.88);backdrop-filter:blur(12px);border-bottom:1px solid var(--border2)}
+.nav-bar-main{display:flex;align-items:center;justify-content:space-between;width:100%}
+.nav-bar-sub{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:0.55rem 1.5rem;width:100%;margin-top:0.6rem;padding-top:0.7rem;border-top:1px solid var(--border2)}
+.nav-bar-sub.nbs-grid{flex-direction:column;flex-wrap:nowrap;gap:0.30rem}
+.nbs-row{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));width:100%;max-width:1140px;margin:0 auto}
+.nbs-row a{text-align:center;padding:3px 4px;white-space:nowrap}
+.nav-bar-sub.nbs-grid .nbs-row a{font-size:0.82rem;letter-spacing:0.10em}
+@media(max-width:1180px){.nbs-row{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:620px){.nbs-row{grid-template-columns:repeat(2,minmax(0,1fr))}.nbs-row a{white-space:normal}}
+.nav-bar-sub a{color:var(--text2);text-decoration:none;font-size:0.9rem;font-weight:600;letter-spacing:0.14em;transition:color 0.2s}
+.nav-bar-sub a:hover{text-decoration:underline;text-underline-offset:4px;opacity:0.78}
+.nav-logo{display:inline-flex;flex-direction:column;align-items:stretch;justify-content:center;line-height:1.12;color:var(--gold);text-decoration:none}
+.nav-logo .nl-en{font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:700;text-align:justify;text-align-last:justify;-moz-text-align-last:justify}
+.nav-logo .nl-cn{font-family:"Noto Serif SC",Georgia,serif;font-size:0.95rem;font-weight:700;opacity:.97;text-align:justify;text-align-last:justify;-moz-text-align-last:justify;letter-spacing:0;text-indent:0}
+@media(max-width:520px){.nav-logo .nl-en{font-size:1rem}.nav-logo .nl-cn{font-size:0.84rem}}
+.nav-links{display:flex;align-items:center;gap:1.5rem}
+.nav-links a{color:var(--text2);text-decoration:none;font-size:0.85rem;letter-spacing:0.08em;transition:color 0.2s}
+.nav-links a:hover{color:var(--gold)}
+.nav-links a.primary{color:var(--gold);font-weight:600}
+@keyframes navFlow{0%{color:#E23B3B}12.5%{color:#111111}25%{color:#E8590C}37.5%{color:#C9A000}50%{color:#1F9E3D}62.5%{color:#0C8F8F}75%{color:#1E6FD9}87.5%{color:#7C3AED}100%{color:#E23B3B}}.nav-logo{animation:navFlow 4.5s linear infinite}.nav-links a{animation:navFlow 4.5s linear infinite}.nav-links a:nth-child(1){animation-delay:-0.0s}.nav-links a:nth-child(2){animation-delay:-0.0s}.nav-links a:nth-child(3){animation-delay:-0.346s}.nav-links a:nth-child(4){animation-delay:-0.346s}.nav-links a:nth-child(5){animation-delay:-0.692s}.nav-links a:nth-child(6){animation-delay:-0.692s}.nav-links a:nth-child(7){animation-delay:-1.038s}.nav-links a:nth-child(8){animation-delay:-1.038s}.nav-links a:nth-child(9){animation-delay:-1.385s}.nav-links a:nth-child(10){animation-delay:-1.385s}.nav-links a:nth-child(11){animation-delay:-1.731s}.nav-links a:nth-child(12){animation-delay:-1.731s}.nav-links a:nth-child(13){animation-delay:-2.077s}.nav-links a:nth-child(14){animation-delay:-2.077s}.nav-links a:nth-child(15){animation-delay:-2.423s}.nav-links a:nth-child(16){animation-delay:-2.423s}.nav-links a:nth-child(17){animation-delay:-2.769s}.nav-links a:nth-child(18){animation-delay:-2.769s}.nav-links a:nth-child(19){animation-delay:-3.115s}.nav-links a:nth-child(20){animation-delay:-3.115s}.nav-links a:nth-child(21){animation-delay:-3.462s}.nav-links a:nth-child(22){animation-delay:-3.462s}.nav-links a:nth-child(23){animation-delay:-3.808s}.nav-links a:nth-child(24){animation-delay:-3.808s}.nav-links a:nth-child(25){animation-delay:-4.154s}.nav-links a:nth-child(26){animation-delay:-4.154s}.nav-links a:hover{animation-play-state:paused;text-decoration:underline;text-underline-offset:4px}@media(prefers-reduced-motion:reduce){.nav-logo,.nav-links a,.nav-bar-sub a{animation:none}}
+.nav-bar-sub a{animation:none}.nav-bar-sub a.col-hdl{color:#2E5090;font-weight:700}.nav-bar-sub a.col-wph{color:#8C3B32;font-weight:700}.nav-bar-sub a.col-crt{color:#2A6B4A}.nav-bar-sub a.col-edu{color:#336699}.nav-bar-sub a.col-hea{color:#2E8B57}.nav-bar-sub a.col-biz{color:#A0651F}.col-ent{color:#2E4B78}.nav-bar-sub a.col-dvg{color:#7A4A8C}.nav-bar-sub a.col-ai{color:#1B6E7A}.nav-bar-sub a.col-cht{color:#9D2933}.nav-bar-sub a.col-mtg{color:#0F766E;font-weight:700}.nav-bar-sub a.col-tap{color:#8A6A1E;font-weight:700}.nav-bar-sub a.col-disc{color:#3B4E9C;font-weight:700}.nav-bar-sub a.col-eys{color:#9A6E12;font-weight:700}.nav-bar-sub a.col-fic{color:#8C2F39;font-weight:700}.nav-bar-sub a.col-fai{color:#6A4C93;font-weight:700}.nav-bar-sub a.col-fam{color:#7C4A3A;font-weight:700}.col-art{color:#8C6A3A;font-weight:700}.col-how{color:#1F7A72;font-weight:700}.col-par{color:#B5714A;font-weight:700}.nav-bar-sub a.col-bgy{color:#8A6A1E;font-weight:700}.nav-bar-sub a.col-inv{color:#1F7A72;font-weight:700}
+.col-crt{color:#2A6B4A}
+.col-plg{color:#A32E4E}
+/* ── SDE 智能体 · Token之火 frame (wraps the two agent nav links) ── */
+@property --afang{syntax:'<angle>';initial-value:0deg;inherits:false}
+/* ===== AGENT STRIP · 每个智能体一个不同形状的框，内里烧 TOKEN ===== */
+.agent-strip{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:.7rem 1rem;width:100%;margin:.55rem 0 .2rem;padding:.6rem .4rem}
+.agent-strip-tag{font-size:.72rem;font-weight:800;letter-spacing:.18em;color:#FF8A3C;text-shadow:0 0 10px rgba(255,120,20,.5);align-self:center;white-space:nowrap}
+/* chip = 一整块 accent 色（即"框"的颜色），内里用 ::before 深色填充留出一圈边 */
+.ag-chip{position:relative;display:inline-flex;align-items:center;justify-content:center;padding:9px 20px;text-decoration:none;isolation:isolate;background:var(--acc);transition:transform .15s,filter .2s;--acc:#E7C349;filter:drop-shadow(0 0 7px rgba(255,150,40,.35))}
+.ag-chip:hover{transform:translateY(-2px);filter:drop-shadow(0 0 11px rgba(255,170,50,.6)) brightness(1.08)}
+.ag-chip::before{content:"";position:absolute;inset:1.7px;z-index:1;background:linear-gradient(180deg,#241812 0%,#130c07 100%);clip-path:inherit;border-radius:inherit}
+/* 烧 TOKEN：火焰底光 + 上升火星，裁进内层形状 */
+.ag-flame{position:absolute;inset:1.7px;z-index:2;pointer-events:none;overflow:hidden;clip-path:inherit;border-radius:inherit}
+.ag-flame::before{content:"";position:absolute;left:0;right:0;bottom:-45%;height:130%;background:radial-gradient(60% 80% at 28% 100%,rgba(255,110,0,.6),transparent 62%),radial-gradient(55% 80% at 60% 100%,rgba(255,190,60,.55),transparent 62%),radial-gradient(55% 80% at 86% 100%,rgba(255,70,0,.55),transparent 60%);filter:blur(3px);animation:agFlick 1.6s ease-in-out infinite}
+.ag-ember{position:absolute;bottom:2px;width:4px;height:4px;border-radius:1.4px;background:linear-gradient(180deg,#fff1b0,#ff6a00);box-shadow:0 0 6px 1px rgba(255,150,0,.9);opacity:0;animation:agEmber 2.4s ease-in infinite}
+.ag-label{position:relative;z-index:3;font-size:.83rem;font-weight:800;letter-spacing:.03em;white-space:nowrap;color:#F3ECDA;text-shadow:0 0 8px var(--acc),0 1px 2px rgba(0,0,0,.7)}
+@keyframes agFlick{0%,100%{opacity:.72;transform:scaleY(1)}45%{opacity:1;transform:scaleY(1.12)}70%{opacity:.85;transform:scaleY(.96)}}
+@keyframes agEmber{0%{opacity:0;transform:translateY(0) scale(1)}12%{opacity:1}80%{opacity:.7}100%{opacity:0;transform:translateY(-16px) scale(.5)}}
+/* ---- 六种不同形状（chip 与内层同一 clip-path/圆角，边自然描出形状）---- */
+.ag-pill{border-radius:999px}
+.ag-hex{clip-path:polygon(15% 0,85% 0,100% 50%,85% 100%,15% 100%,0 50%);padding:9px 30px}
+.ag-notch{clip-path:polygon(11px 0,100% 0,100% calc(100% - 11px),calc(100% - 11px) 100%,0 100%,0 11px)}
+.ag-slant{clip-path:polygon(13px 0,100% 0,calc(100% - 13px) 100%,0 100%);padding:9px 24px}
+.ag-round{border-radius:10px}
+.ag-tag{clip-path:polygon(0 0,calc(100% - 15px) 0,100% 50%,calc(100% - 15px) 100%,0 100%);padding-right:30px}
+/* ---- 六种强调（框）色 ---- */
+.ag-c1{--acc:#E7C349}
+.ag-c2{--acc:#7FC8FF}
+.ag-c3{--acc:#8FE0A0}
+.ag-c4{--acc:#82E0D3}
+.ag-c5{--acc:#4CC6C6}
+.ag-c6{--acc:#FF9A3C}
+.ag-c7{--acc:#9B7BD4}
+@media(max-width:640px){.agent-strip{gap:.5rem .55rem}.ag-label{font-size:.75rem}.ag-chip{padding:8px 14px}.ag-hex{padding:8px 22px}}
+.agent-fire{position:relative;display:inline-flex;flex-direction:column;align-items:center;gap:.8rem;padding:6px 14px;margin:0 .15rem;border-radius:12px;--afang:0deg;background:linear-gradient(180deg,#241812 0%,#150E0A 100%)}
+/* flowing fire ring on the border */
+.agent-fire::after{content:"";position:absolute;inset:0;border-radius:13px;padding:1.7px;background:conic-gradient(from var(--afang,0deg),#ff2e00,#ff8a00,#ffd24d,#fff1b0,#ff7a00,#d4b25e,#3da5a5,#ffb300,#ff2e00);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);mask-composite:exclude;animation:afSpin 4.5s linear infinite;pointer-events:none;z-index:2}
+@keyframes afSpin{to{--afang:360deg}}
+/* burning glow licking all four sides */
+.agent-fire::before{content:"";position:absolute;inset:-7px -10px -9px;border-radius:18px;z-index:-1;pointer-events:none;filter:blur(6px);background:radial-gradient(65% 130% at 18% 100%,rgba(255,110,0,.60),transparent 60%),radial-gradient(60% 135% at 42% 100%,rgba(255,196,60,.60),transparent 62%),radial-gradient(60% 130% at 66% 100%,rgba(255,70,0,.55),transparent 60%),radial-gradient(60% 130% at 88% 100%,rgba(255,150,20,.55),transparent 60%),radial-gradient(80% 120% at 50% 0%,rgba(255,140,20,.42),transparent 66%),radial-gradient(120% 60% at 0% 50%,rgba(255,90,0,.32),transparent 60%),radial-gradient(120% 60% at 100% 50%,rgba(255,120,0,.32),transparent 60%);animation:afFlick 1.5s ease-in-out infinite}
+@keyframes afFlick{0%{opacity:.72;transform:scaleY(1) translateY(0)}35%{opacity:1;transform:scaleY(1.08) translateY(-1px)}60%{opacity:.85;transform:scaleY(.98) translateY(0)}100%{opacity:.78;transform:scaleY(1.05) translateY(-.5px)}}
+/* token embers drifting up from the flames */
+.agent-fire .af-ember{position:absolute;bottom:1px;width:5px;height:5px;border-radius:1.5px;background:linear-gradient(180deg,#fff1b0,#ff6a00);box-shadow:0 0 7px 1px rgba(255,150,0,.9);opacity:0;pointer-events:none;z-index:1;animation:afEmber 2.6s ease-in infinite}
+@keyframes afEmber{0%{opacity:0;transform:translateY(0) translateX(0) scale(1)}15%{opacity:1}70%{opacity:.9}100%{opacity:0;transform:translateY(-24px) translateX(var(--drift,3px)) scale(.35)}}
+/* the two links — escape the rainbow navFlow, glow on the dark plaque */
+.agent-fire .af-link{animation:none !important;position:relative;z-index:3;font-weight:800 !important;font-size:.82rem;line-height:1.18;letter-spacing:.03em;white-space:nowrap;text-shadow:0 1px 2px rgba(0,0,0,.55)}
+.agent-fire .af-link.af-taste{color:#FFD466 !important;text-shadow:0 0 12px rgba(255,170,40,.55),0 1px 2px rgba(0,0,0,.6)}
+.agent-fire .af-link.af-wds{color:#82E0D3 !important;text-shadow:0 0 12px rgba(61,165,165,.6),0 1px 2px rgba(0,0,0,.6)}
+.agent-fire .af-link:hover{filter:brightness(1.22);text-decoration:none}
+/* slim flame divider between the two agents */
+.agent-fire .af-div{width:82%;height:1.5px;border-radius:2px;flex:0 0 auto;z-index:3;background:linear-gradient(90deg,transparent,#ffb300 28%,#ff6a00 72%,transparent);box-shadow:0 0 6px rgba(255,140,0,.6)}
+@media(max-width:640px){.agent-fire{display:none}}
+@media(prefers-reduced-motion:reduce){.agent-fire::after{animation:none}.agent-fire::before{animation:none;opacity:.85}.agent-fire .af-ember{display:none}}
+.lang-toggle{display:flex;background:var(--card);border:1px solid var(--border);border-radius:20px;overflow:hidden;cursor:pointer}
+.visit-badge{display:flex;align-items:center;gap:8px;background:var(--gold);color:#FAF6EC;padding:7px 16px;border-radius:20px;box-shadow:0 2px 10px rgba(138,104,23,0.35)}
+.visit-badge .vb-label{font-size:0.7rem;letter-spacing:0.12em;opacity:0.9}
+.visit-badge .vb-num{font-size:1.05rem;font-weight:700;letter-spacing:0.03em;color:#FFE9B0;font-variant-numeric:tabular-nums}
+.lang-btn{padding:0.3rem 0.8rem;font-size:0.75rem;letter-spacing:0.05em;border:none;background:transparent;color:var(--text2);cursor:pointer;transition:all 0.2s;font-family:inherit}
+.lang-btn.active{background:var(--gold);color:#F5EFE0;font-weight:600}
+
+/* ── HERO ── */
+#hero{min-height:92vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:7rem 2rem 4rem;position:relative;overflow:hidden}
+.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 40%,rgba(138,104,23,0.08) 0%,transparent 70%)}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(138,104,23,0.05) 1px,transparent 1px),linear-gradient(90deg,rgba(138,104,23,0.05) 1px,transparent 1px);background-size:60px 60px;opacity:0.5}
+.hero-eyebrow{font-size:0.72rem;letter-spacing:0.3em;color:var(--gold);text-transform:uppercase;margin-bottom:1.5rem;font-weight:600;z-index:1;position:relative}
+.hero-title{font-family:'Playfair Display',serif;font-size:clamp(3rem,8vw,7rem);font-weight:700;line-height:1.05;color:var(--text);margin-bottom:0.5rem;z-index:1;position:relative;text-align:justify;text-align-last:justify;-moz-text-align-last:justify}
+.hero-title span{color:var(--gold)}
+.hero-word{display:flex;flex-direction:column;align-items:stretch;z-index:1;position:relative}
+.hero-word .hero-title{margin-bottom:0.35rem}
+.hero-cn{font-family:"Noto Serif SC",Georgia,serif;font-size:clamp(2.2rem,5.4vw,4.4rem);font-weight:700;color:var(--gold);margin:0 0 1rem;opacity:.97;line-height:1.2;text-align:justify;text-align-last:justify;-moz-text-align-last:justify;letter-spacing:0;text-indent:0}
+.hero-subtitle{font-size:clamp(1.15rem,2.4vw,1.7rem);color:var(--text);margin:1.5rem 0 2.5rem;font-weight:400;z-index:1;position:relative;max-width:680px}
+.hero-subtitle em{color:var(--gold);font-style:normal;font-weight:600}
+.hero-ctas{display:flex;gap:1rem;flex-wrap:wrap;justify-content:center;margin-bottom:3rem;z-index:1;position:relative}
+.btn-primary{display:inline-flex;align-items:center;gap:0.5rem;padding:0.95rem 2rem;background:var(--gold);color:#F5EFE0;font-size:0.9rem;font-weight:600;letter-spacing:0.1em;text-decoration:none;border-radius:2px;transition:all 0.2s;font-family:inherit;border:none;cursor:pointer}
+.btn-primary:hover{background:var(--gold2);transform:translateY(-2px)}
+.btn-secondary{display:inline-flex;align-items:center;gap:0.5rem;padding:0.95rem 2rem;background:transparent;color:var(--text);border:1px solid var(--gold);font-size:0.9rem;font-weight:600;letter-spacing:0.1em;text-decoration:none;border-radius:2px;transition:all 0.2s;font-family:inherit;cursor:pointer}
+.btn-secondary:hover{background:var(--card);border-color:var(--gold2)}
+.hero-stats{display:flex;gap:2.5rem;flex-wrap:wrap;justify-content:center;z-index:1;position:relative;padding-top:2rem;border-top:1px solid var(--border2);max-width:720px}
+.stat{text-align:center}
+.stat-n{font-family:'Playfair Display',serif;font-size:2.2rem;font-weight:700;color:var(--gold);display:block;line-height:1}
+.stat-l{font-size:0.68rem;letter-spacing:0.2em;color:var(--text2);margin-top:0.3rem;display:block;text-transform:uppercase}
+
+/* ── DECONSTRUCTION MASTER (E-layer) ── */
+#master{background:var(--claw-bg);color:#E4D8B8;padding:6rem 2rem;position:relative;overflow:hidden}
+#master::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 80% at 70% 30%,rgba(212,178,94,0.08) 0%,transparent 60%)}
+.claw-inner{max-width:1100px;margin:0 auto;position:relative;z-index:1;display:grid;grid-template-columns:1.3fr 1fr;gap:4rem;align-items:center}
+.claw-label{font-size:0.7rem;letter-spacing:0.35em;color:var(--claw-gold);text-transform:uppercase;margin-bottom:1.2rem;font-weight:600}
+.claw-label::before{content:'◆ ';color:var(--claw-gold);margin-right:0.4rem}
+.claw-title{font-family:'Playfair Display',serif;font-size:clamp(2.4rem,5vw,3.8rem);font-weight:700;color:#F5EFE0;line-height:1.1;margin-bottom:1rem}
+.claw-title .cn{color:var(--claw-gold);display:block;font-size:0.85em;margin-bottom:0.4rem;letter-spacing:0.05em}
+.claw-tagline{font-size:1.15rem;color:#E4D8B8;line-height:1.7;margin-bottom:2rem;font-style:italic;max-width:520px}
+.claw-body{font-size:0.95rem;color:#C7BB9E;line-height:1.85;margin-bottom:2rem}
+.claw-six{display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:2.5rem;align-items:center}
+.claw-step{padding:0.4rem 0.9rem;background:rgba(212,178,94,0.08);border:1px solid rgba(212,178,94,0.22);color:var(--claw-gold);font-size:0.78rem;letter-spacing:0.05em;border-radius:2px}
+.claw-arrow{color:rgba(212,178,94,0.5);font-size:0.7rem}
+.btn-claw{display:inline-flex;align-items:center;gap:0.5rem;padding:1rem 2.2rem;background:var(--claw-gold);color:var(--claw-bg);font-size:0.9rem;font-weight:700;letter-spacing:0.1em;text-decoration:none;border-radius:2px;transition:all 0.2s;font-family:inherit}
+.btn-claw:hover{background:#E8C878;transform:translateY(-2px);box-shadow:0 10px 30px rgba(212,178,94,0.25)}
+/* 解构大师 · 三卡并列(数据驱动) */
+.masters-wrap{max-width:1180px;margin:0 auto;position:relative;z-index:1}
+.masters-head{text-align:center;max-width:820px;margin:0 auto 3.2rem}
+.masters-eyebrow{font-size:0.7rem;letter-spacing:0.35em;color:var(--claw-gold);text-transform:uppercase;font-weight:600;margin-bottom:1.1rem}
+.masters-eyebrow::before{content:'◆ ';margin-right:0.4rem}
+.masters-title{font-size:clamp(1.9rem,3.6vw,2.9rem);font-weight:800;color:#F5EFE0;line-height:1.25;margin-bottom:1.2rem;letter-spacing:0.02em}
+.masters-tag{font-size:1rem;color:#C7BB9E;line-height:1.85;font-style:italic}
+.masters-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.6rem;align-items:stretch}
+.m-card{display:flex;flex-direction:column;background:linear-gradient(160deg,rgba(212,178,94,0.10),rgba(212,178,94,0.02));border:1px solid rgba(212,178,94,0.4);border-radius:14px;padding:28px 26px;transition:border-color 0.25s,transform 0.25s}
+.m-card:hover{border-color:rgba(212,178,94,0.75);transform:translateY(-3px)}
+.m-chip{display:flex;align-items:center;gap:10px;font-size:11px;letter-spacing:0.28em;color:var(--claw-gold);margin-bottom:14px;font-weight:600}
+.m-new{background:var(--claw-gold);color:#1A1410;font-weight:800;letter-spacing:0.06em;font-size:10px;padding:2px 9px;border-radius:20px}
+.m-title{font-size:20px;font-weight:800;color:#F5EFE0;line-height:1.4;margin-bottom:12px;letter-spacing:0.01em}
+.m-hook{font-size:14px;color:#CFC3A0;line-height:1.85;margin-bottom:16px;flex:1}
+.m-words{font-size:12px;color:var(--claw-gold);letter-spacing:0.05em;margin-bottom:16px}
+.m-btns{display:flex;flex-direction:column;gap:9px}
+.m-btn{text-align:center;letter-spacing:0.06em;padding:11px;border-radius:6px;text-decoration:none;font-size:14px;transition:background 0.2s}
+.m-btn.primary{background:var(--claw-gold);color:#1A1410;font-weight:800}
+.m-btn.primary:hover{background:#E8C878}
+.m-btn.ghost{background:rgba(212,178,94,0.10);color:var(--claw-gold);border:1px solid rgba(212,178,94,0.5)}
+.m-btn.ghost:hover{background:rgba(212,178,94,0.20)}
+.masters-more{text-align:center;margin-top:3rem}
+.masters-more-btn{display:inline-flex;align-items:center;gap:0.5rem;padding:0.95rem 2.2rem;background:transparent;color:var(--claw-gold);border:1px solid rgba(212,178,94,0.5);font-size:0.9rem;font-weight:700;letter-spacing:0.08em;text-decoration:none;border-radius:2px;transition:all 0.2s}
+.masters-more-btn:hover{background:rgba(212,178,94,0.12);transform:translateY(-2px)}
+@media(max-width:900px){.masters-grid{grid-template-columns:1fr;gap:1.3rem}}
+.claw-visual{position:relative;aspect-ratio:1;max-width:380px;justify-self:center;width:100%}
+.claw-circle{position:absolute;inset:0;border:1px dashed rgba(212,178,94,0.35);border-radius:50%;animation:rotate 40s linear infinite}
+.claw-circle.inner{inset:15%;border-style:solid;border-width:1px;border-color:rgba(212,178,94,0.22);animation-duration:28s;animation-direction:reverse}
+.claw-circle.core{inset:32%;background:radial-gradient(circle,rgba(212,178,94,0.25) 0%,rgba(212,178,94,0.05) 60%,transparent 100%);border:none;animation:pulse 4s ease-in-out infinite}
+.claw-core-text{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;z-index:2}
+.claw-core-letter{font-family:'Playfair Display',serif;font-size:5rem;font-weight:700;color:var(--claw-gold);line-height:1;margin-bottom:0.3rem}
+.claw-core-label{font-size:0.65rem;letter-spacing:0.3em;color:#E4D8B8;text-transform:uppercase}
+.claw-satellites{position:absolute;inset:0}
+.claw-sat{position:absolute;width:8px;height:8px;background:var(--claw-gold);border-radius:50%;box-shadow:0 0 16px rgba(212,178,94,0.6)}
+.claw-sat:nth-child(1){top:8%;left:50%;margin-left:-4px}
+.claw-sat:nth-child(2){top:30%;right:8%}
+.claw-sat:nth-child(3){top:72%;right:12%}
+.claw-sat:nth-child(4){bottom:8%;left:50%;margin-left:-4px}
+.claw-sat:nth-child(5){top:72%;left:12%}
+.claw-sat:nth-child(6){top:30%;left:8%}
+@keyframes rotate{to{transform:rotate(360deg)}}
+@keyframes pulse{0%,100%{opacity:0.7;transform:scale(1)}50%{opacity:1;transform:scale(1.06)}}
+
+/* ── SECTIONS ── */
+section.panel{padding:5rem 2rem}
+.section-inner{max-width:1200px;margin:0 auto}
+.section-label{font-size:0.7rem;letter-spacing:0.3em;color:var(--gold);text-transform:uppercase;margin-bottom:1rem;display:flex;align-items:center;gap:1rem;font-weight:600}
+.section-label::after{content:'';flex:1;height:1px;background:var(--border)}
+.section-title{font-family:'Playfair Display',serif;font-size:clamp(2rem,4.2vw,3rem);font-weight:600;color:var(--text);line-height:1.15;margin-bottom:0.6rem}
+.section-subtitle{font-size:1rem;color:var(--text2);max-width:700px;line-height:1.8;margin-bottom:0.5rem}
+.section-divider{width:60px;height:2px;background:var(--gold);margin:1.5rem 0 2.5rem}
+
+/* ── SDE AGENT CLUSTER (S-layer) ── */
+#matrix{background:var(--surface)}
+.industries-tabs{display:flex;flex-wrap:wrap;gap:0.5rem;margin:2.5rem 0 2rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border2)}
+.tab-btn{padding:0.55rem 1.1rem;background:var(--card);border:1px solid var(--border2);color:var(--text2);font-family:inherit;font-size:0.82rem;letter-spacing:0.05em;cursor:pointer;transition:all 0.2s;border-radius:2px;display:flex;align-items:center;gap:0.5rem}
+.tab-btn:hover{border-color:var(--gold);color:var(--text)}
+.tab-btn.active{background:var(--gold);color:#F5EFE0;border-color:var(--gold)}
+.tab-count{font-size:0.7rem;opacity:0.8;font-family:'Playfair Display',serif;font-weight:600}
+.employees-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:1.2rem}
+.emp-card{background:var(--card);border:1px solid var(--border2);border-left:3px solid var(--gold);padding:1.2rem 1.2rem 1rem;transition:all 0.25s;cursor:pointer;display:flex;flex-direction:column;min-height:160px;text-decoration:none;color:inherit}
+.emp-card.emp-soon{cursor:default;opacity:.86}
+.emp-card.emp-soon:hover{transform:none}
+.emp-enter-soon{color:#8A8577;font-weight:600;letter-spacing:.08em}
+
+.emp-card:hover{transform:translateY(-4px);border-left-color:var(--gold2);box-shadow:0 12px 32px rgba(138,104,23,0.10);background:var(--card2)}
+.emp-industry{font-size:0.6rem;letter-spacing:0.15em;color:var(--gold);text-transform:uppercase;margin-bottom:0.4rem;font-weight:600}
+.emp-name{font-size:1rem;font-weight:600;color:var(--text);margin-bottom:0.25rem;line-height:1.3}
+.emp-name-en{font-size:0.72rem;color:var(--text2);margin-bottom:0.8rem;font-style:italic;letter-spacing:0.03em}
+.emp-desc{font-size:0.82rem;color:var(--text2);line-height:1.65;flex:1}
+.emp-enter{margin-top:0.9rem;padding-top:0.7rem;border-top:1px solid var(--border2);font-size:0.72rem;letter-spacing:0.12em;color:var(--gold);text-transform:uppercase;font-weight:600;display:flex;align-items:center;justify-content:space-between}
+.emp-enter .arrow{transition:transform 0.2s}
+.emp-card:hover .emp-enter .arrow{transform:translateX(4px)}
+.emp-badge-soon{position:absolute;top:0.6rem;right:0.6rem;font-size:0.58rem;letter-spacing:0.1em;color:var(--muted);padding:0.15rem 0.4rem;background:var(--card2);border-radius:2px;text-transform:uppercase}
+.emp-card{position:relative}
+
+/* industry tab color swatches */
+.tab-btn[data-ind="edu"]::before,.tab-btn[data-ind="law"]::before,.tab-btn[data-ind="med"]::before,.tab-btn[data-ind="ent"]::before,.tab-btn[data-ind="art"]::before,.tab-btn[data-ind="aca"]::before,.tab-btn[data-ind="fin"]::before,.tab-btn[data-ind="mda"]::before,.tab-btn[data-ind="gov"]::before,.tab-btn[data-ind="tec"]::before{content:'';width:8px;height:8px;border-radius:50%;display:inline-block}
+.tab-btn[data-ind="edu"]::before{background:#3A2810}
+.tab-btn[data-ind="law"]::before{background:#102A24}
+.tab-btn[data-ind="med"]::before{background:#2A1010}
+.tab-btn[data-ind="ent"]::before{background:#1A2545}
+.tab-btn[data-ind="art"]::before{background:#3A1820}
+.tab-btn[data-ind="aca"]::before{background:#20201A}
+.tab-btn[data-ind="fin"]::before{background:#1A2A10}
+.tab-btn[data-ind="mda"]::before{background:#2A1840}
+.tab-btn[data-ind="gov"]::before{background:#102828}
+.tab-btn[data-ind="tec"]::before{background:#103040}
+
+/* ── CREDENTIALS STRIP (SDE backing) ── */
+#credentials{background:var(--bg);padding:5rem 2rem}
+.creds-inner{max-width:1100px;margin:0 auto;text-align:center}
+.creds-title{font-family:'Playfair Display',serif;font-size:clamp(1.6rem,3.2vw,2.4rem);font-weight:600;color:var(--text);line-height:1.3;margin-bottom:1rem}
+.creds-sub{color:var(--text2);font-size:1rem;max-width:700px;margin:0 auto 3rem;line-height:1.85}
+.creds-three{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;max-width:900px;margin:0 auto 2.5rem}
+.creds-card{padding:1.8rem 1.5rem;background:var(--card);border:1px solid var(--border2);border-top:2px solid var(--gold)}
+.creds-card h4{font-family:'Playfair Display',serif;font-size:1.15rem;color:var(--text);margin-bottom:0.5rem;font-weight:600}
+.creds-card .letter{font-family:'Playfair Display',serif;font-size:2rem;color:var(--gold);line-height:1;margin-bottom:0.5rem;font-weight:700}
+.creds-card p{font-size:0.85rem;color:var(--text2);line-height:1.75}
+
+/* ── AUTHOR MINI ── */
+#author{background:var(--surface);padding:4rem 2rem;border-top:1px solid var(--border2)}
+.author-inner{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:auto 1fr auto;gap:2.5rem;align-items:center}
+.author-portrait{width:90px;height:120px;background:var(--card);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:0.8rem;color:var(--gold);text-align:center;letter-spacing:0.1em}
+.author-info h3{font-family:'Playfair Display',serif;font-size:1.4rem;color:var(--text);margin-bottom:0.3rem;font-weight:600}
+.author-info .tagline{font-size:0.8rem;color:var(--gold);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:0.8rem}
+.author-info p{font-size:0.9rem;color:var(--text2);line-height:1.7}
+.author-info .meta{margin-top:0.7rem;font-size:0.75rem;color:var(--muted)}
+.author-link{display:flex;align-items:center;gap:0.4rem;color:var(--gold);font-size:0.85rem;font-weight:600;letter-spacing:0.08em;text-decoration:none;padding:0.7rem 1.3rem;border:1px solid var(--gold);border-radius:2px;transition:all 0.2s;white-space:nowrap}
+.author-link:hover{background:var(--gold);color:#F5EFE0}
+
+/* ── FOOTER ── */
+footer{background:var(--bg);border-top:1px solid var(--border2);padding:3rem 2rem}
+.footer-inner{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:3rem}
+.footer-brand h4{color:var(--gold);font-weight:700}
+.fb-word{display:inline-flex;flex-direction:column;align-items:stretch;line-height:1.2}
+.fb-en{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;text-align:justify;text-align-last:justify;-moz-text-align-last:justify}
+.fb-cn{font-family:"Noto Serif SC",Georgia,serif;font-size:0.92rem;font-weight:700;margin-top:4px;opacity:.97;text-align:justify;text-align-last:justify;-moz-text-align-last:justify;letter-spacing:0;text-indent:0}
+.footer-brand p{font-size:0.82rem;color:var(--text2);margin-top:0.8rem;line-height:1.7;max-width:280px}
+.footer-col h4{font-size:0.7rem;letter-spacing:0.2em;color:var(--gold);text-transform:uppercase;margin-bottom:1rem;font-weight:600}
+.footer-col ul{list-style:none}
+.footer-col ul li{margin-bottom:0.55rem}
+.footer-col ul li a{color:var(--text2);text-decoration:none;font-size:0.82rem;transition:color 0.2s}
+.footer-col ul li a:hover{color:var(--gold)}
+.footer-bottom{max-width:1200px;margin:2.5rem auto 0;padding-top:1.5rem;border-top:1px solid var(--border2);display:flex;justify-content:space-between;align-items:center;font-size:0.72rem;color:var(--muted);flex-wrap:wrap;gap:0.5rem}
+
+/* ── RESPONSIVE ── */
+@media(max-width:968px){
+  .claw-inner{grid-template-columns:1fr;gap:3rem}
+  .claw-visual{max-width:300px}
+  .creds-three{grid-template-columns:1fr}
+  .author-inner{grid-template-columns:auto 1fr;gap:1.5rem}
+  .author-link{grid-column:1/-1;justify-content:center}
+  .footer-inner{grid-template-columns:1fr 1fr}
+}
+@media(max-width:640px){
+  nav{padding:0.6rem 1.5rem}
+  .nav-bar-sub{gap:0.4rem 0.9rem;margin-top:0.5rem;padding-top:0.55rem}
+  .nav-bar-sub a{font-size:0.76rem;letter-spacing:0.06em}
+  .nav-links{gap:1rem}
+  .nav-links a{display:none}
+  .nav-links a.primary,.nav-links .lang-toggle,.nav-links .visit-badge{display:flex}
+  .visit-badge{padding:5px 12px}.visit-badge .vb-label{display:none}
+  .employees-grid{grid-template-columns:1fr}
+  .hero-stats{gap:1.5rem}
+  .footer-inner{grid-template-columns:1fr}
+}
+
+/* ── LANGUAGE VISIBILITY ── */
+.zh-only,.en-only{transition:opacity 0.2s}
+body.en .zh-only{display:none}
+body.zh .en-only{display:none}
+
+/* 每日热点红点 */
+@keyframes hsblink{0%,100%{opacity:1}50%{opacity:0.25}}
+.hs-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#E23B3B;animation:hsblink 1.4s ease-in-out infinite;vertical-align:middle;margin-right:8px}
+/* 每日三句 · 深空晶体版 */
+#daily-quotes>*{position:relative;z-index:2}
+@media(min-width:1650px){#daily-quotes{padding-top:7.2rem!important}}@media(max-width:640px){#daily-quotes{padding-top:6.5rem!important}}
+/* decorative layers must stay out of flow — the #daily-quotes>* rule above (ID specificity) was overriding their own position:absolute, dropping them into flow and pushing the title/quotes ~1830px down (the empty dark first screen) */
+#daily-quotes>.ll-stars,#daily-quotes>.dq-orb,#daily-quotes>.dq-net{position:absolute}
+#daily-quotes .ll-stars,#daily-quotes .dq-orb{z-index:0}
+.dq-orb{position:absolute;border-radius:50%;filter:blur(70px);opacity:0.5;pointer-events:none;animation:dqdrift 16s ease-in-out infinite alternate}
+.dq-orb1{width:520px;height:520px;left:-140px;top:-120px;background:radial-gradient(circle,rgba(212,178,94,0.55),rgba(212,178,94,0) 70%)}
+.dq-orb2{width:640px;height:640px;right:-180px;bottom:-200px;background:radial-gradient(circle,rgba(96,150,255,0.4),rgba(150,96,255,0.28) 45%,rgba(96,150,255,0) 72%);animation-delay:-8s}
+@keyframes dqdrift{0%{transform:translate(0,0) scale(1)}100%{transform:translate(60px,40px) scale(1.12)}}
+.dq-crystal{width:46px;height:46px;margin-bottom:26px;position:relative;transform-style:preserve-3d;animation:dqspin 9s linear infinite}
+.dq-crystal i{position:absolute;inset:0;border:1.5px solid rgba(231,200,107,0.9);background:linear-gradient(135deg,rgba(231,200,107,0.18),rgba(120,180,255,0.10));box-shadow:0 0 22px rgba(231,200,107,0.35),inset 0 0 14px rgba(150,200,255,0.2)}
+.dq-crystal i:nth-child(1){transform:rotate(45deg)}
+.dq-crystal i:nth-child(2){transform:rotate(45deg) rotateY(60deg)}
+.dq-crystal i:nth-child(3){transform:rotate(45deg) rotateY(120deg)}
+@keyframes dqspin{from{transform:rotateY(0)}to{transform:rotateY(360deg)}}
+.dq-card{position:relative;display:flex;flex-direction:column;text-align:left;background:linear-gradient(155deg,rgba(24,18,56,0.40),rgba(12,9,34,0.22));backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);border-radius:10px;padding:22px 24px 18px;text-decoration:none;color:#F0E9D8;box-shadow:0 14px 40px rgba(0,0,0,0.42);opacity:0;transform:translateY(26px);animation:dqin .8s cubic-bezier(.2,.7,.2,1) forwards,dqfloat 7s ease-in-out 1.2s infinite;transition:box-shadow .25s;will-change:transform}
+.dq-card:nth-child(1){animation-delay:.05s,1.2s}
+.dq-card:nth-child(2){animation-delay:.22s,1.8s}
+.dq-card:nth-child(3){animation-delay:.39s,2.4s}
+.dq-card::before{content:"";position:absolute;inset:-1px;border-radius:11px;padding:1px;background:conic-gradient(from var(--ga,0deg),#E7C86B,#7FB4FF 30%,#B08CFF 55%,#E7C86B 80%,#E7C86B);-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor;mask-composite:exclude;opacity:0.85;animation:dqring 6s linear infinite;pointer-events:none}
+@property --ga{syntax:"<angle>";initial-value:0deg;inherits:false}
+@keyframes dqring{to{--ga:360deg}}
+@keyframes dqin{to{opacity:1;transform:translateY(0)}}
+@keyframes dqfloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+.dq-card:hover{box-shadow:0 26px 60px rgba(0,0,0,0.55),0 0 40px rgba(231,200,107,0.22),0 0 60px rgba(127,180,255,0.14)}
+.dq-card .cstars{position:absolute;inset:0;border-radius:10px;overflow:hidden;pointer-events:none;z-index:0}
+.dq-card .dq-text,.dq-card .dq-go{position:relative;z-index:1}
+.dq-text{font-family:Georgia,"Songti SC","Noto Serif SC",serif;font-size:16px;font-weight:700;line-height:1.72;letter-spacing:0.015em;flex:1;color:#F5EFE1}
+.dq-go{margin-top:16px;font-size:13px;color:#D9B65E;font-weight:700;letter-spacing:0.14em;transition:color .2s,transform .2s}
+.dq-card:hover .dq-go{color:#F2D889;transform:translateX(3px)}
+.dq-net{position:absolute;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;opacity:0.72}
+.dq-net line{stroke:#7FB4FF;stroke-width:1.2;opacity:0.17;animation:dqpulse 6s ease-in-out infinite}
+.dq-net circle{fill:#E7C86B;opacity:0.48;filter:drop-shadow(0 0 4px rgba(231,200,107,0.8));animation:dqpulse 5s ease-in-out infinite}
+.dq-net line:nth-child(2n){animation-delay:1.4s;stroke:#B08CFF}
+.dq-net line:nth-child(3n){animation-delay:2.8s}
+.dq-net circle:nth-child(2n){animation-delay:2s;fill:#7FB4FF}
+.dq-net circle:nth-child(3n){animation-delay:3.4s}
+@keyframes dqpulse{0%,100%{opacity:0.08}50%{opacity:0.32}}
+.dq-orna{position:relative;width:200px;height:86px;margin-bottom:10px;display:flex;align-items:center;justify-content:center}
+.dq-inf{position:absolute;inset:0;width:100%;height:100%}
+.dq-inf .p1{fill:none;stroke:rgba(231,200,107,0.22);stroke-width:2}
+.dq-inf .p2{fill:none;stroke:url(#dqig);stroke-width:2.6;stroke-linecap:round;stroke-dasharray:46 560;filter:drop-shadow(0 0 6px rgba(127,180,255,0.7));animation:dqflow 5.5s linear infinite}
+@keyframes dqflow{to{stroke-dashoffset:-606}}
+.dq-crystal{width:38px;height:38px;margin:0;position:relative;transform-style:preserve-3d;animation:dqspin 9s linear infinite}
+.dq-chips{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin:4px 0 22px}
+.dq-chips span{font-size:12.5px;letter-spacing:0.14em;padding:5px 15px;border-radius:20px;border:1px solid;background:rgba(255,255,255,0.055);box-shadow:inset 0 0 12px rgba(255,255,255,0.05);backdrop-filter:blur(6px);opacity:0;animation:dqin .7s ease forwards}
+.dq-chips span:nth-child(1){animation-delay:.5s}.dq-chips span:nth-child(2){animation-delay:.62s}.dq-chips span:nth-child(3){animation-delay:.74s}.dq-chips span:nth-child(4){animation-delay:.86s}.dq-chips span:nth-child(5){animation-delay:.98s}.dq-chips span:nth-child(6){animation-delay:1.1s}
+.c-ai{color:#9CC4FF;border-color:rgba(127,180,255,0.55);text-shadow:0 0 12px rgba(127,180,255,0.6)}
+.c-in{color:#C9A9FF;border-color:rgba(176,140,255,0.55);text-shadow:0 0 12px rgba(176,140,255,0.6)}
+.c-wi{color:#E7C86B;border-color:rgba(231,200,107,0.6);text-shadow:0 0 12px rgba(231,200,107,0.6)}
+.c-cl{color:#F0E2C0;border-color:rgba(240,226,192,0.45);font-family:Georgia,"Songti SC",serif}
+.c-vi{color:#8FE0CD;border-color:rgba(143,224,205,0.55);text-shadow:0 0 12px rgba(143,224,205,0.55)}
+.c-if{color:#B0A6E8;border-color:rgba(156,143,208,0.6);text-shadow:0 0 12px rgba(156,143,208,0.6)}
+@media (prefers-reduced-motion:reduce){.dq-card,.dq-orb,.dq-crystal,.dq-card::before,.dq-inf .p2,.dq-net line,.dq-net circle,.dq-chips span{animation:none !important;opacity:1;transform:none}}
+/* 今日长文星光闪烁 */
+.ll-stars{position:absolute;inset:0;pointer-events:none}
+.ll-star{position:absolute;background:#fff;border-radius:50%;opacity:0;animation:lltw var(--d,3s) ease-in-out infinite;animation-delay:var(--dl,0s);box-shadow:0 0 6px 1px rgba(255,245,220,0.8)}
+@keyframes lltw{0%,100%{opacity:0;transform:scale(0.5)}50%{opacity:var(--mo,0.85);transform:scale(1)}}
+.ll-shoot{position:absolute;width:2px;height:2px;background:linear-gradient(90deg,#fff,transparent);border-radius:50%;opacity:0;animation:llshoot 7s linear infinite;box-shadow:0 0 8px 2px rgba(255,245,220,0.6)}
+@keyframes llshoot{0%{opacity:0;transform:translate(0,0) rotate(32deg) scaleX(1)}9%{opacity:1}20%{opacity:1;transform:translate(220px,130px) rotate(32deg) scaleX(26)}26%,100%{opacity:0;transform:translate(300px,180px) rotate(32deg) scaleX(1)}}
+#today-longread a:hover div[style*="border:1px solid rgba(212,178,94,0.35)"]{border-color:rgba(212,178,94,0.7)!important}
+
+
+/* ── 论文抄袭专栏：燃烧警示 ───────────────────────────
+   字身掐在炭底→正红（最亮档 4.90:1，米底上仍可读）；
+   橙黄只走辉光，不进字色——真烧成橙黄，字就糊在米底上，警示反而失效。 */
+@keyframes plg-burn{
+  0%{background-position:50% 100%}
+  100%{background-position:50% 0%}
+}
+@keyframes plg-flicker{
+  0%,100%{filter:drop-shadow(0 0 1px rgba(198,40,40,.40)) drop-shadow(0 1px 5px rgba(217,58,30,.22))}
+  28%{filter:drop-shadow(0 0 2px rgba(226,59,59,.72)) drop-shadow(0 1px 9px rgba(232,80,30,.40))}
+  46%{filter:drop-shadow(0 0 1px rgba(163,46,78,.50)) drop-shadow(0 1px 4px rgba(217,58,30,.18))}
+  63%{filter:drop-shadow(0 0 3px rgba(226,59,59,.80)) drop-shadow(0 2px 12px rgba(245,124,31,.42))}
+  81%{filter:drop-shadow(0 0 1px rgba(198,40,40,.45)) drop-shadow(0 1px 6px rgba(232,80,30,.24))}
+}
+.burn{
+  background-image:linear-gradient(0deg,
+    #4A0810 0%, #5E0A16 14%, #8C1F33 30%, #A32E4E 46%,
+    #B92B36 62%, #C62828 76%, #A32E4E 90%, #5E0A16 100%);
+  background-size:100% 340%;
+  -webkit-background-clip:text;background-clip:text;
+  color:transparent;-webkit-text-fill-color:transparent;
+  animation:plg-burn 3.6s linear infinite, plg-flicker 1.7s ease-in-out infinite;
+  font-weight:800;
+}
+.burn sup{-webkit-text-fill-color:#A32E4E;color:#A32E4E}
+/* 光敏与前庭敏感：停火，退回静态酒红（对比度 5.99:1） */
+@media(prefers-reduced-motion:reduce){
+  .burn{animation:none;background-image:none;color:#A32E4E;-webkit-text-fill-color:#A32E4E}
+}
+/* 不支持 background-clip:text 的浏览器兜底 */
+@supports not ((-webkit-background-clip:text) or (background-clip:text)){
+  .burn{color:#A32E4E;-webkit-text-fill-color:#A32E4E;background-image:none;animation:plg-flicker 1.7s ease-in-out infinite}
+}
+
+/* ── 今天，这个宇宙又长出了什么（#daily）：卡片样式 ＋ 整卡可点 ──
+   此前 .fi/.fk/.fm 三个类名从未有过任何样式，154 张卡片渲染成一片裸文字，
+   且只有 <h3> 里那几个字是链接，点卡片其余部分没有反应。 */
+#daily article.fi{position:relative;display:block;padding:26px 28px;border-bottom:1px solid rgba(138,104,23,0.18);transition:background .18s ease}
+#daily article.fi:last-child{border-bottom:0}
+#daily article.fi:hover{background:#F5EEDE}
+#daily article.fi .fk{font-size:11.5px;letter-spacing:0.26em;color:#8A6817;margin-bottom:11px;line-height:1.6}
+#daily article.fi h3{font-size:20px;line-height:1.5;margin:0 0 12px;font-weight:700;color:#2A2315;letter-spacing:0.01em}
+#daily article.fi h3 a{color:inherit;text-decoration:none}
+#daily article.fi h3 a::after{content:"";position:absolute;top:0;right:0;bottom:0;left:0;z-index:1}
+#daily article.fi:hover h3{color:#7A5A10}
+#daily article.fi p{margin:0 0 12px;font-size:15px;line-height:1.85;color:#5B4F38;text-align:justify}
+#daily article.fi .fm{font-size:12.5px;color:#8A7A55;letter-spacing:0.04em}
+@media(max-width:640px){#daily article.fi{padding:20px 18px}#daily article.fi h3{font-size:17.5px}#daily article.fi p{font-size:14.5px}}
+</style>
+<link rel="stylesheet" href="/wds-glow.css">
+<!-- 入口层脚本已摘除：这一页是 /overview/ 总览长卷，不是入口（入口在 /home/，脚本只由 public/index.html 引） -->
+<style>.sec-open{max-width:1100px;margin:0 auto 18px;text-align:right;font-size:13px;letter-spacing:0.1em}.sec-open a{color:#8A6A1E;text-decoration:none;border-bottom:1px solid rgba(138,106,30,.45);padding-bottom:2px}.sec-open a:hover{opacity:.75}</style></head>
+<body class="zh">
+
+<!-- NAV -->
+<nav>
+  <div class="nav-bar-main">
+  <a class="nav-logo" href="/browse/"><span class="nl-en">SDE Universes</span><span class="nl-cn">爱思乐园</span></a>
+  <div class="nav-links">
+    <a href="/search/" class="primary zh-only" style="border:1px solid var(--gold);border-radius:16px;padding:3px 13px">🔍 搜索</a><a href="/search/" class="primary en-only" style="border:1px solid var(--gold);border-radius:16px;padding:3px 13px">🔍 Search</a><a href="/taste/chatsde/" class="zh-only wdsm-navbtn wdsm-static" style="border:1px solid var(--gold,#D4B25E);border-radius:16px;padding:3px 13px;background:var(--gold,#D4B25E);color:#0F0B07;font-weight:700;text-decoration:none">✦ ChatSDE</a><a href="/taste/chatsde/" class="en-only wdsm-navbtn wdsm-static" style="border:1px solid var(--gold,#D4B25E);border-radius:16px;padding:3px 13px;background:var(--gold,#D4B25E);color:#0F0B07;font-weight:700;text-decoration:none">✦ ChatSDE</a>
+    
+    <a href="/paradigm/" class="zh-only" style="color:#B5714A;font-weight:700" title="站内碰撞 —— 三篇站内学员论文撞出的典范文">每日必读</a><a href="/paradigm/" class="en-only" style="color:#B5714A;font-weight:700" title="In-house collisions — three site papers collided">Must Read</a>
+    <a href="/confluence/" class="zh-only" style="color:#7E9A55;font-weight:700" title="站外碰撞 —— 三个不同学科的外部理论体系撞出的典范文">学科通融</a><a href="/confluence/" class="en-only" style="color:#7E9A55;font-weight:700" title="Cross-discipline collisions — three external theories collided">Confluence</a><a href="/frontier/" class="zh-only" style="color:#4B3FA0;font-weight:700" title="近十年各主要领域最新思想摘要 · 100 学科面板 · 王德生亲撰">新思想前沿</a><a href="/frontier/" class="en-only" style="color:#4B3FA0;font-weight:700" title="Frontier of new ideas across 100 disciplines">Frontier</a>
+    <a href="/drwang/" class="zh-only">王博士与SDE</a><a href="/drwang/" class="en-only">Dr. Wang &amp; SDE</a>
+    
+    
+    
+    
+    
+    <a href="/students/" class="zh-only">学员专栏</a><a href="/students/" class="en-only">Students</a>
+    <a href="/recruit/" class="zh-only" style="color:#C9A227;font-weight:700" title="河源数元 · 智能体平台合作开发学徒招募 · 仅招5人 · 9月10日开班">学徒招募 · 仅5人</a><a href="/recruit/" class="en-only" style="color:#C9A227;font-weight:700" title="Agent Platform Apprenticeship · 5 seats only">Apprenticeship</a>
+    <a href="https://huazhi-sde.com" target="_blank" rel="noopener" class="zh-only">娄底华智</a><a href="https://huazhi-sde.com" target="_blank" rel="noopener" class="en-only">Loudi Huazhi</a>
+    <div class="lang-toggle">
+      <button class="lang-btn active" onclick="setLang('zh')">中</button>
+      <button class="lang-btn" onclick="setLang('en')">EN</button>
+    </div>
+    <div class="visit-badge" title="Total visits">
+      <span class="vb-label zh-only">访问总次数</span><span class="vb-label en-only">TOTAL VISITS</span>
+      <span class="vb-num" id="visitCount">—</span>
+    </div>
+  </div>
+  </div>
+  <!-- AGENT STRIP · 每个智能体一个不同形状的框、内里烧 TOKEN -->
+<div class="agent-strip" aria-label="SDE 智能体（烧 TOKEN 的活体智能体）">
+  <span class="agent-strip-tag zh-only">🔥 智能体</span><span class="agent-strip-tag en-only">🔥 Agents</span>
+  <a href="/taste/idea-generator/" class="ag-chip ag-hex ag-c2" role="group" aria-label="SDE金点子"><span class="ag-flame" aria-hidden="true"><i class="ag-ember" style="left:22%;animation-delay:0s"></i><i class="ag-ember" style="left:50%;animation-delay:0.5s"></i><i class="ag-ember" style="left:78%;animation-delay:1.0s"></i></span><span class="ag-label zh-only">✦ SDE金点子</span><span class="ag-label en-only">✦ SDE Idea Gen</span></a>
+  <a href="/taste/zhiwen/" class="ag-chip ag-notch ag-c3" role="group" aria-label="中华智问"><span class="ag-flame" aria-hidden="true"><i class="ag-ember" style="left:22%;animation-delay:0s"></i><i class="ag-ember" style="left:50%;animation-delay:0.5s"></i><i class="ag-ember" style="left:78%;animation-delay:1.0s"></i></span><span class="ag-label zh-only">⟁ 中华智问</span><span class="ag-label en-only">⟁ Zhiwen</span></a>
+  <a href="/taste/iq-scorer/" class="ag-chip ag-slant ag-c1" role="group" aria-label="SDE创新智商评分官"><span class="ag-flame" aria-hidden="true"><i class="ag-ember" style="left:22%;animation-delay:0s"></i><i class="ag-ember" style="left:50%;animation-delay:0.5s"></i><i class="ag-ember" style="left:78%;animation-delay:1.0s"></i></span><span class="ag-label zh-only">◈ 创新智商测试</span><span class="ag-label en-only">◈ Innovation IQ</span></a>
+  <a href="/taste/" class="ag-chip ag-tag ag-c6" role="group" aria-label="SDE智能体免费品尝"><span class="ag-flame" aria-hidden="true"><i class="ag-ember" style="left:22%;animation-delay:0s"></i><i class="ag-ember" style="left:50%;animation-delay:0.5s"></i><i class="ag-ember" style="left:78%;animation-delay:1.0s"></i></span><span class="ag-label zh-only">免费品尝全部 →</span><span class="ag-label en-only">Taste all agents →</span></a>
+</div>
+<div class="nav-bar-sub nbs-grid">
+    <div class="nbs-row">
+      <a href="/today/" class="col-tap zh-only">今日文章</a><a href="/today/" class="col-tap en-only">Today</a>
+      <a href="/monographs/" class="col-tap zh-only">专著栏目</a><a href="/monographs/" class="col-tap en-only">Monographs</a>
+      <a href="/creation/" class="col-crt zh-only">学术创造</a><a href="/creation/" class="col-crt en-only">Academic Creation</a>
+      <a href="/thought/" class="col-wph zh-only">哲学与思想</a><a href="/thought/" class="col-wph en-only">Thought</a>
+      <a href="/discovery-vs-genesis/" class="col-dvg zh-only">发现VS发生</a><a href="/discovery-vs-genesis/" class="col-dvg en-only">Discovery vs Genesis</a>
+      <a href="/ai/" class="col-ai zh-only">AI 专栏</a><a href="/ai/" class="col-ai en-only">AI</a>
+    </div>
+    <div class="nbs-row">
+      <a href="/education/" class="col-edu zh-only">教育专栏</a><a href="/education/" class="col-edu en-only">Education</a>
+      <a href="/health/" class="col-hea zh-only">健康专栏</a><a href="/health/" class="col-hea en-only">Health</a>
+      <a href="/life/" class="col-fam zh-only">人生与家庭</a><a href="/life/" class="col-fam en-only">Life &amp; Family</a>
+      <a href="/business/" class="col-biz zh-only">商业与经济</a><a href="/business/" class="col-biz en-only">Business</a>
+      <a href="/culture/" class="col-art zh-only">文化与艺术</a><a href="/culture/" class="col-art en-only">Culture &amp; Art</a>
+      <a href="/how/" class="col-how zh-only">怎么做</a><a href="/how/" class="col-how en-only">How To</a>
+    </div>
+  </div>
+</nav>
+
+<!-- TOP FEATURE BANNER · SDE提智大模型：对话智商大比拼（置顶最显眼） -->
+<a href="/taste/uplift-compare/" style="display:block;text-decoration:none;margin:0 auto;max-width:1120px;width:calc(100% - 2rem);margin-top:18px;margin-bottom:2px;background:linear-gradient(120deg,#1a1530 0%,#211a3e 55%,#171228 100%);border:1px solid rgba(212,178,94,0.45);border-radius:16px;padding:22px 26px;box-shadow:0 8px 30px rgba(0,0,0,0.35);transition:transform .15s,border-color .2s" onmouseover="this.style.transform='translateY(-3px)';this.style.borderColor='rgba(212,178,94,0.8)'" onmouseout="this.style.transform='translateY(0)';this.style.borderColor='rgba(212,178,94,0.45)'">
+  <div style="display:flex;align-items:center;gap:18px;flex-wrap:wrap">
+    <div style="font-size:38px;line-height:1">⚖</div>
+    <div style="flex:1;min-width:240px">
+      <div style="font-size:11px;letter-spacing:0.24em;color:#D4B25E;margin-bottom:6px;font-weight:700">现已上线 · 亲自上手比一比 &nbsp;·&nbsp; LIVE · TRY IT YOURSELF</div>
+      <div class="zh-only" style="font-size:23px;font-weight:800;color:#F0E9D8;margin-bottom:6px;line-height:1.3">SDE提智大模型：<span style="color:#E7C349">对话智商大比拼</span></div>
+      <div class="en-only" style="font-size:23px;font-weight:800;color:#F0E9D8;margin-bottom:6px;line-height:1.3">SDE Uplift Face-Off: <span style="color:#E7C349">Base vs SDE</span></div>
+      <div class="zh-only" style="font-size:13.5px;color:#B9B4C7;line-height:1.7">同一个基底、左右两栏各聊各的：左边直接问<b style="color:#C9A227">大模型</b>，右边问经过整套 SDE 提智的 <b style="color:#C9A227">WDS</b>（内功＋心得＋全站检索＋方法论，但只用你所在学科的本地语言作答、不露术语）。每栏都能把对话<b style="color:#C9A227">总结成 5 千／1 万字正式论文</b>，还能让基底用一把<b style="color:#C9A227">与门派无关的科学尺子盲评</b>谁的创新智商更高。</div>
+      <div class="en-only" style="font-size:13.5px;color:#B9B4C7;line-height:1.7">Same base model, two independent threads: ask the raw <b style="color:#C9A227">base model</b> on the left, and <b style="color:#C9A227">WDS</b> — the same model fully SDE-uplifted (inner-skill + reflection + site-wide retrieval + methodology, answering in your own discipline's language) — on the right. Turn either thread into a <b style="color:#C9A227">5k/10k-word formal paper</b>, and have the model <b style="color:#C9A227">blind-score</b> both on a discipline-neutral innovation rubric.</div>
+    </div>
+    <div style="display:flex;align-items:center"><span style="display:inline-block;background:linear-gradient(120deg,#E0B64D,#C9A227);color:#14100A;font-size:14.5px;font-weight:800;padding:12px 24px;border-radius:11px;white-space:nowrap;letter-spacing:0.03em">开始比拼 →</span></div>
+  </div>
+</a>
+
+<!-- HERO -->
+<!-- DAILY THREE QUOTES 每日三句 · 第一屏 -->
+<section id="daily-quotes" style="min-height:86vh;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;text-align:center;padding:10rem 2rem 3rem;background:radial-gradient(ellipse at 28% 18%,#221743 0%,#141031 46%,#0a0820 100%);border-bottom:1px solid rgba(212,178,94,0.35);position:relative;overflow:hidden">
+  <div class="ll-stars" id="dq-stars"></div>
+  <div class="dq-orb dq-orb1"></div><div class="dq-orb dq-orb2"></div>
+  <svg class="dq-net" viewBox="0 0 1200 620" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <g class="dq-edges">
+      <line x1="110" y1="120" x2="300" y2="70"/><line x1="300" y1="70" x2="470" y2="150"/>
+      <line x1="470" y1="150" x2="640" y2="90"/><line x1="640" y1="90" x2="830" y2="140"/>
+      <line x1="830" y1="140" x2="1040" y2="80"/><line x1="150" y1="430" x2="360" y2="520"/>
+      <line x1="360" y1="520" x2="560" y2="470"/><line x1="560" y1="470" x2="780" y2="540"/>
+      <line x1="780" y1="540" x2="1010" y2="480"/><line x1="110" y1="120" x2="150" y2="430"/>
+      <line x1="1040" y1="80" x2="1010" y2="480"/><line x1="470" y1="150" x2="360" y2="520"/>
+      <line x1="830" y1="140" x2="780" y2="540"/>
+    </g>
+    <g class="dq-nodes">
+      <circle cx="110" cy="120" r="3"/><circle cx="300" cy="70" r="2.4"/><circle cx="470" cy="150" r="3.2"/>
+      <circle cx="640" cy="90" r="2.6"/><circle cx="830" cy="140" r="3"/><circle cx="1040" cy="80" r="2.4"/>
+      <circle cx="150" cy="430" r="2.6"/><circle cx="360" cy="520" r="3"/><circle cx="560" cy="470" r="2.4"/>
+      <circle cx="780" cy="540" r="3.2"/><circle cx="1010" cy="480" r="2.6"/>
+    </g>
+  </svg>
+  <div class="dq-orna" aria-hidden="true">
+    <svg class="dq-inf" viewBox="0 0 220 100">
+      <defs><linearGradient id="dqig" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0" stop-color="#E7C86B"/><stop offset="0.5" stop-color="#7FB4FF"/><stop offset="1" stop-color="#B08CFF"/>
+      </linearGradient></defs>
+      <path class="p1" d="M30,50 C30,18 92,18 110,50 C128,82 190,82 190,50 C190,18 128,18 110,50 C92,82 30,82 30,50 Z"/>
+      <path class="p2" d="M30,50 C30,18 92,18 110,50 C128,82 190,82 190,50 C190,18 128,18 110,50 C92,82 30,82 30,50 Z"/>
+    </svg>
+    <div class="dq-crystal"><i></i><i></i><i></i></div>
+  </div>
+  <h2 class="zh-only" style="font-family:Georgia,'Songti SC',serif;font-size:clamp(26px,4.2vw,40px);font-weight:800;color:#F5EADB;letter-spacing:0.06em;margin-bottom:8px;text-shadow:0 2px 30px rgba(212,178,94,0.25)">今日三句 · <span id="dq-date" style="color:#E7C86B;font-weight:900;text-shadow:0 0 26px rgba(231,200,107,0.65),0 0 6px rgba(231,200,107,0.4)">…</span></h2>
+  <h2 class="en-only" style="font-family:Georgia,serif;font-size:clamp(23px,3.8vw,36px);font-weight:800;color:#F5EADB;letter-spacing:0.04em;margin-bottom:8px;text-shadow:0 2px 30px rgba(212,178,94,0.25)">Three Lines, Renewed Daily</h2>
+  <div class="dq-chips zh-only"><span class="c-ai">AI</span><span class="c-in">创新</span><span class="c-wi">智慧</span><span class="c-cl">经典</span><span class="c-vi">活力</span><span class="c-if">∞ 无限</span></div>
+  <div class="dq-chips en-only"><span class="c-ai">AI</span><span class="c-in">Innovation</span><span class="c-wi">Wisdom</span><span class="c-cl">Classics</span><span class="c-vi">Vitality</span><span class="c-if">∞ Infinity</span></div>
+  <div id="dq-cards" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px;max-width:1080px;width:100%"></div>
+  <a href="/quotes/" class="zh-only" style="margin-top:20px;color:#E7C86B;text-decoration:none;font-size:14.5px;letter-spacing:0.14em;border-bottom:1px solid rgba(231,200,107,0.5);padding-bottom:2px">翻阅往日金句池 →</a>
+  <a href="/quotes/" class="en-only" style="margin-top:20px;color:#E7C86B;text-decoration:none;font-size:14.5px;letter-spacing:0.14em;border-bottom:1px solid rgba(231,200,107,0.5);padding-bottom:2px">Browse the Quote Pool →</a>
+  <a href="/column/sde-intro/" class="zh-only" style="margin-top:30px;display:inline-block;border:1px solid rgba(212,178,94,0.6);border-radius:30px;padding:11px 28px;background:rgba(212,178,94,0.08);color:#E9DDB4;text-decoration:none;font-size:14.5px;letter-spacing:0.05em;transition:background .2s" onmouseover="this.style.background='rgba(212,178,94,0.16)'" onmouseout="this.style.background='rgba(212,178,94,0.08)'">第一次来？先读 <b style="color:#D4B25E">SDE 思想简要入门</b> · 约两万字 · 三种读法 · 不需要哲学基础 →</a>
+  <a href="/column/sde-intro/" class="en-only" style="margin-top:30px;display:inline-block;border:1px solid rgba(212,178,94,0.6);border-radius:30px;padding:11px 28px;background:rgba(212,178,94,0.08);color:#E9DDB4;text-decoration:none;font-size:14.5px;letter-spacing:0.05em;transition:background .2s" onmouseover="this.style.background='rgba(212,178,94,0.16)'" onmouseout="this.style.background='rgba(212,178,94,0.08)'">New here? Start with <b style="color:#D4B25E">A Short Introduction to SDE</b> · no philosophy required →</a>
+  <a href="#hero" class="zh-only" style="margin-top:12px;color:#9C8FD0;text-decoration:none;font-size:14px;letter-spacing:0.2em">↓ 进入爱思乐园</a>
+  <a href="#hero" class="en-only" style="margin-top:12px;color:#9C8FD0;text-decoration:none;font-size:14px;letter-spacing:0.2em">↓ Enter SDE Universes</a>
+</section>
+
+<section id="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-eyebrow zh-only">SDE 智能体集群 · 10 大行业 · 1 个母体引擎</div>
+  <div class="hero-eyebrow en-only">SDE AGENT CLUSTER · 10 INDUSTRIES · 1 META-ENGINE</div>
+  <div class="hero-word">
+    <h1 class="hero-title">SDE <span>Universes</span></h1>
+    <div class="hero-cn">爱思乐园</div>
+  </div>
+  <p class="hero-subtitle zh-only">选择你的行业，进入你的 <em>SDE 智能体</em><br>每一个都由 <em>SDE 发生学</em> 锻造，由 55+ 部专著背书</p>
+  <p class="hero-subtitle en-only">Choose your industry, meet your <em>SDE agent</em><br>All forged by <em>SDE Generativics</em>, backed by 55+ monographs</p>
+  <div class="hero-ctas">
+    <a href="/taste/" class="btn-primary zh-only">进入 SDE 智能体 →</a>
+    <a href="/taste/" class="btn-primary en-only">Enter the SDE Agents →</a>
+    <a href="/master/" class="btn-secondary zh-only">解构大师</a>
+    <a href="/master/" class="btn-secondary en-only">Deconstruction Master</a>
+  </div>
+  <div class="hero-stats">
+    <div class="stat"><span class="stat-n">100</span><span class="stat-l zh-only">SDE 智能体</span><span class="stat-l en-only">SDE AGENTS</span></div>
+    <div class="stat"><span class="stat-n">10</span><span class="stat-l zh-only">行业覆盖</span><span class="stat-l en-only">INDUSTRIES</span></div>
+    <div class="stat"><span class="stat-n">55+</span><span class="stat-l zh-only">专著背书</span><span class="stat-l en-only">MONOGRAPHS</span></div>
+    <div class="stat"><span class="stat-n">47</span><span class="stat-l zh-only">顶刊论文</span><span class="stat-l en-only">JOURNAL PAPERS</span></div>
+  </div>
+</section>
+
+<!-- 健脑三件 · 零门槛日课（每日思想挑战 / 30天健脑训练 / 思想成长树） -->
+<section id="brain-gym" style="background:linear-gradient(180deg,#12100C,#0E0C09);border-bottom:1px solid rgba(212,178,94,0.2);padding:66px 24px;scroll-margin-top:70px">
+<div class="sec-open"><a href="/brain-gym/"><span class="zh-only">进入专栏 →</span><span class="en-only">Open column →</span></a></div>
+  <div style="max-width:1000px;margin:0 auto;text-align:center">
+    <div class="zh-only" style="font-size:12.5px;letter-spacing:0.45em;color:#C9A227;margin-bottom:16px">不烧 Key · 无需注册 · 记录只存在你自己的浏览器里</div>
+    <div class="en-only" style="font-size:12.5px;letter-spacing:0.45em;color:#C9A227;margin-bottom:16px">NO API KEY · NO SIGN-UP · DATA STAYS IN YOUR BROWSER</div>
+    <h2 class="zh-only" style="font-size:clamp(28px,4.5vw,42px);font-weight:800;letter-spacing:0.02em;margin:0 0 14px;color:#EFE9DD">健脑<span style="background:linear-gradient(120deg,#C9A227,#E5C86E);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent">三件日课</span></h2>
+    <h2 class="en-only" style="font-size:clamp(28px,4.5vw,42px);font-weight:800;letter-spacing:0.02em;margin:0 0 14px;color:#EFE9DD">Three <span style="background:linear-gradient(120deg,#C9A227,#E5C86E);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent">Daily Exercises</span></h2>
+    <p class="zh-only" style="color:#B9AE99;font-size:16px;max-width:640px;margin:0 auto 38px">智能体是给你跑产线的，这三件是给你自己练的。一天二十分钟，题目从站内 168 张占位者卡里按日期取——同一天，所有人拿到同一道。</p>
+    <p class="en-only" style="color:#B9AE99;font-size:16px;max-width:640px;margin:0 auto 38px">The agents run pipelines for you. These three train you. Twenty minutes a day, drawn from 168 real placeholder cards on this site.</p>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px;max-width:960px;margin:0 auto">
+
+      <a href="/challenge/" style="display:block;background:#161310;border:1px solid rgba(201,162,39,0.35);border-top:3px solid #C9A227;border-radius:14px;padding:28px 24px;text-decoration:none;transition:transform .15s" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
+        <div style="font-size:30px;margin-bottom:14px">◈</div>
+        <div class="zh-only" style="font-size:19px;font-weight:700;color:#EFE9DD;margin-bottom:8px">每日思想挑战</div>
+        <div class="en-only" style="font-size:19px;font-weight:700;color:#EFE9DD;margin-bottom:8px">Daily Challenge</div>
+        <div class="zh-only" style="font-size:13.8px;color:#B9AE99;line-height:1.75">一天一道，五类轮换：划一条分离线／指认谁已经说过／判题型并定位／拆一句万能话／压成一句承重命题。<b style="color:#EFE9DD">写完才看得到参考读数。</b></div>
+        <div class="en-only" style="font-size:13.8px;color:#B9AE99;line-height:1.75">One question a day, five rotating types. The reference reading unlocks only after you answer.</div>
+      </a>
+
+      <a href="/training/" style="display:block;background:#161310;border:1px solid rgba(201,143,94,0.35);border-top:3px solid #C98F5E;border-radius:14px;padding:28px 24px;text-decoration:none;transition:transform .15s" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
+        <div style="font-size:30px;margin-bottom:14px">◐</div>
+        <div class="zh-only" style="font-size:19px;font-weight:700;color:#EFE9DD;margin-bottom:8px">30天健脑训练</div>
+        <div class="en-only" style="font-size:19px;font-weight:700;color:#EFE9DD;margin-bottom:8px">30-Day Training</div>
+        <div class="zh-only" style="font-size:13.8px;color:#B9AE99;line-height:1.75">三程各十天：显露（学会看见）→ 发生（学会撞）→ 纠缠（学会被顶回）。三十天下来你手上会有<b style="color:#EFE9DD">一条经过占位检验的命题</b>，不是三十个勾。</div>
+        <div class="en-only" style="font-size:13.8px;color:#B9AE99;line-height:1.75">Three stages of ten days: Show, Generate, Entangle. You end with one proposition that has survived a placeholder check.</div>
+      </a>
+
+      <a href="/growth-tree/" style="display:block;background:#161310;border:1px solid rgba(143,179,160,0.35);border-top:3px solid #8FB3A0;border-radius:14px;padding:28px 24px;text-decoration:none;transition:transform .15s" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
+        <div style="font-size:30px;margin-bottom:14px">⧉</div>
+        <div class="zh-only" style="font-size:19px;font-weight:700;color:#EFE9DD;margin-bottom:8px">思想成长树</div>
+        <div class="en-only" style="font-size:19px;font-weight:700;color:#EFE9DD;margin-bottom:8px">Growth Tree</div>
+        <div class="zh-only" style="font-size:13.8px;color:#B9AE99;line-height:1.75">它没有自己的数据，画的就是上面两件的真实产出：三程的枝、写成的命题、交手过的学科圈层。<b style="color:#EFE9DD">没做的地方就是暗的</b>，不补空枝。</div>
+        <div class="en-only" style="font-size:13.8px;color:#B9AE99;line-height:1.75">It has no data of its own — it draws exactly what you produced in the other two. Unwalked branches stay dark.</div>
+      </a>
+
+    </div>
+    <p class="zh-only" style="color:#7C7466;font-size:13px;margin:30px auto 0;max-width:640px">这三件不做分数、不做排行榜、不做连胜奖励——任何能排成等级的数字，都会让所有人朝分高的那一套话靠拢，而这套系统唯一稀缺的就是话不一样。</p>
+    <p class="en-only" style="color:#7C7466;font-size:13px;margin:30px auto 0;max-width:640px">No scores, no leaderboards, no streak rewards: any rankable number pulls everyone toward the same vocabulary, and difference is the one scarce thing here.</p>
+  </div>
+</section>
+
+<!-- SDE 智能体品尝系列 · 引流门户 -->
+<section id="taste" style="background:linear-gradient(180deg,#0E1116,#141B22);border-bottom:1px solid rgba(212,178,94,0.2);padding:64px 24px">
+<div class="sec-open"><a href="/taste/"><span class="zh-only">进入专栏 →</span><span class="en-only">Open column →</span></a></div>
+  <div style="max-width:1000px;margin:0 auto;text-align:center">
+    <div class="zh-only" style="font-size:12.5px;letter-spacing:0.45em;color:#D4B25E;margin-bottom:16px">免费品尝 · 无需注册 · 浏览器直接玩</div>
+    <div class="en-only" style="font-size:12.5px;letter-spacing:0.45em;color:#D4B25E;margin-bottom:16px">FREE TASTE · NO SIGN-UP · RUNS IN YOUR BROWSER</div>
+    <h2 class="zh-only" style="font-size:clamp(28px,4.5vw,42px);font-weight:800;letter-spacing:0.02em;margin:0 0 14px;color:#E6EDF3">SDE 智能体<span style="background:linear-gradient(120deg,#D4B25E,#E5C86E);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent">品尝系列</span></h2>
+    <h2 class="en-only" style="font-size:clamp(28px,4.5vw,42px);font-weight:800;letter-spacing:0.02em;margin:0 0 14px;color:#E6EDF3">SDE Agents · <span style="background:linear-gradient(120deg,#D4B25E,#E5C86E);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent">Taste Series</span></h2>
+    <p class="zh-only" style="color:#8B98A5;font-size:16px;max-width:600px;margin:0 auto 40px">用你自己的 API Key,亲眼尝一口 SDE 发生学的威力——同一个问题,普通 AI 和 SDE 提智 AI,差距一目了然。</p>
+    <p class="en-only" style="color:#8B98A5;font-size:16px;max-width:600px;margin:0 auto 40px">Bring your own API Key and taste the power of SDE — see the gap between plain AI and SDE-uplifted AI on the same question.</p>
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(172px,1fr));gap:14px;max-width:1040px;margin:0 auto;text-align:left">
+      <a href="/taste/idea-generator/" style="display:block;background:#161B22;border:1px solid rgba(212,178,94,0.30);border-top:3px solid #D4B25E;border-radius:14px;padding:22px 18px;text-decoration:none;transition:transform .15s" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
+        <div style="font-size:26px;margin-bottom:10px">✦</div>
+        <div class="zh-only" style="font-size:16.5px;font-weight:700;color:#E6EDF3;margin-bottom:7px">金点子发生器</div>
+        <div class="en-only" style="font-size:16.5px;font-weight:700;color:#E6EDF3;margin-bottom:7px">SDE Idea Generator</div>
+        <div class="zh-only" style="font-size:12.8px;color:#8B98A5;line-height:1.66">一个问题，普通 AI 与提智 AI 六路并排</div>
+        <div class="en-only" style="font-size:12.8px;color:#8B98A5;line-height:1.66">Plain AI vs uplifted AI, six answers side by side</div>
+      </a>
+      <a href="/taste/chatsde/" style="display:block;background:#161B22;border:1px solid rgba(212,178,94,0.30);border-top:3px solid #E5C86E;border-radius:14px;padding:22px 18px;text-decoration:none;transition:transform .15s" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
+        <div style="font-size:26px;margin-bottom:10px">✧</div>
+        <div class="zh-only" style="font-size:16.5px;font-weight:700;color:#E6EDF3;margin-bottom:7px">ChatSDE</div>
+        <div class="en-only" style="font-size:16.5px;font-weight:700;color:#E6EDF3;margin-bottom:7px">ChatSDE</div>
+        <div class="zh-only" style="font-size:12.8px;color:#8B98A5;line-height:1.66">站内主对话入口，斜杠命令直接开工</div>
+        <div class="en-only" style="font-size:12.8px;color:#8B98A5;line-height:1.66">The main chat entrance, with slash commands</div>
+      </a>
+      <a href="/taste/confluence/" style="display:block;background:#161B22;border:1px solid rgba(212,178,94,0.30);border-top:3px solid #D4B25E;border-radius:14px;padding:22px 18px;text-decoration:none;transition:transform .15s" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
+        <div style="font-size:26px;margin-bottom:10px">⚖</div>
+        <div class="zh-only" style="font-size:16.5px;font-weight:700;color:#E6EDF3;margin-bottom:7px">学科通融</div>
+        <div class="en-only" style="font-size:16.5px;font-weight:700;color:#E6EDF3;margin-bottom:7px">Confluence</div>
+        <div class="zh-only" style="font-size:12.8px;color:#8B98A5;line-height:1.66">三个学科的现行理论对撞成一篇两万字</div>
+        <div class="en-only" style="font-size:12.8px;color:#8B98A5;line-height:1.66">Three live theories collide into one paper</div>
+      </a>
+      <a href="/taste/book-club/" style="display:block;background:#161B22;border:1px solid rgba(212,178,94,0.30);border-top:3px solid #3DA5A5;border-radius:14px;padding:22px 18px;text-decoration:none;transition:transform .15s" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
+        <div style="font-size:26px;margin-bottom:10px">▤</div>
+        <div class="zh-only" style="font-size:16.5px;font-weight:700;color:#E6EDF3;margin-bottom:7px">SDE 共读一本书</div>
+        <div class="en-only" style="font-size:16.5px;font-weight:700;color:#E6EDF3;margin-bottom:7px">Read a Whole Book</div>
+        <div class="zh-only" style="font-size:12.8px;color:#8B98A5;line-height:1.66">你的 PDF 整本，本机解析，陪你读完</div>
+        <div class="en-only" style="font-size:12.8px;color:#8B98A5;line-height:1.66">Your own PDF, parsed locally, read through with you</div>
+      </a>
+      <a href="/taste/voice-sde/" style="display:block;background:#161B22;border:1px solid rgba(212,178,94,0.30);border-top:3px solid #9B7BD4;border-radius:14px;padding:22px 18px;text-decoration:none;transition:transform .15s" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
+        <div style="font-size:26px;margin-bottom:10px">🎙</div>
+        <div class="zh-only" style="font-size:16.5px;font-weight:700;color:#E6EDF3;margin-bottom:7px">SDE 语音解析</div>
+        <div class="en-only" style="font-size:16.5px;font-weight:700;color:#E6EDF3;margin-bottom:7px">Voice to SDE</div>
+        <div class="zh-only" style="font-size:12.8px;color:#8B98A5;line-height:1.66">开口就转写，再把这番话拆开看</div>
+        <div class="en-only" style="font-size:12.8px;color:#8B98A5;line-height:1.66">Speak, transcribe, then take the talk apart</div>
+      </a>
+    </div>
+    <div style="margin-top:26px">
+      <a href="/taste/" class="zh-only" style="display:inline-block;padding:12px 32px;border:1px solid #D4B25E;color:#D4B25E;font-weight:700;letter-spacing:0.08em;font-size:14.5px;border-radius:26px;text-decoration:none">全部 18 个智能体 →</a>
+      <a href="/taste/" class="en-only" style="display:inline-block;padding:12px 32px;border:1px solid #D4B25E;color:#D4B25E;font-weight:700;letter-spacing:0.08em;font-size:14.5px;border-radius:26px;text-decoration:none">All 18 agents →</a>
+    </div>
+  </div>
+</section>
+
+<!-- DR WANG & SDE COLUMN -->
+<section id="drwang" style="background:#FAF6EC;border-bottom:1px solid rgba(138,104,23,0.22);padding:88px 24px">
+<div class="sec-open"><a href="/drwang/"><span class="zh-only">进入专栏 →</span><span class="en-only">Open column →</span></a></div>
+<div style="max-width:880px;margin:0 auto">
+  <div class="zh-only" style="font-size:12.5px;letter-spacing:0.45em;color:#8A6817;margin-bottom:18px">专栏 · 王博士与 SDE</div>
+  <div class="en-only" style="font-size:12.5px;letter-spacing:0.45em;color:#8A6817;margin-bottom:18px">COLUMN · DR. WANG &amp; SDE</div>
+  <h2 class="zh-only" style="font-size:clamp(26px,4.2vw,38px);font-weight:700;letter-spacing:0.03em;margin:0 0 34px;color:#2A2315">一个具体的问题，长成一套新地基</h2>
+  <h2 class="en-only" style="font-size:clamp(26px,4.2vw,38px);font-weight:700;letter-spacing:0.03em;margin:0 0 34px;color:#2A2315">One Concrete Question, Grown into a New Foundation</h2>
+
+  <div class="zh-only" style="font-size:16.5px;line-height:2.0;color:#2A2315;text-align:justify">
+    <p style="margin:0 0 22px">上世纪九十年代，中国科学院的一间机房里，一位计算数学博士生反复面对同一个问题：<b>一张网格，是如何从一片散点中生成的？</b>点还是那些点，规则还是那些规则，但网一旦织成，就有了点所没有的东西——结构。它从哪里来？</p>
+    <p style="margin:0 0 22px">这个问题跟了他三十年。从中科院博士后（与哥伦比亚大学杜强教授合著 ACVT 奠基性论文），到英国斯旺西大学，再到新加坡南洋理工大学十三年博导生涯——网格生成、有限元、自适应算法，问题越做越深，答案却越过了数学的边界：<b>结构不是被发现的，是被发生的。</b>不止网格如此，万物皆然。</p>
+    <p style="margin:0 0 22px">于是一门手艺长成了一套本体论。任何存在，都是<b style="color:#8A6817">在特征纠缠（E）中，经差异序列（D），成为显露（S）</b>——三维互生，三大方程闭合。以此为引擎，王德生博士在哲学、数学、人工智能、医学、教育、艺术、文明研究等约二十个学科写下五十余部专著；又以此为内核，在新加坡创办德麦国际，锻造 SDE 智能体集群——因为在他看来，通往真正通用智能的，不是更多"已完成的知识"，而是"知识如何发生"的过程本身。</p>
+    <p style="margin:0;color:#98886C;font-size:15px">这个专栏，就从那张网讲起：一个人，一个问题，三十年，与一套正在展开的发生学。</p>
+  </div>
+  <div class="en-only" style="font-size:16.5px;line-height:2.0;color:#2A2315">
+    <p style="margin:0 0 22px">In a 1990s computing lab at the Chinese Academy of Sciences, a doctoral student in computational mathematics kept returning to one question: <b>how does a mesh come into being from scattered points?</b> The points are the same, the rules are the same — yet once woven, the mesh has something the points never had: structure. Where does it come from?</p>
+    <p style="margin:0 0 22px">The question followed him for thirty years — through a CAS postdoc (co-authoring the foundational ACVT paper with Prof. Qiang Du of Columbia), Swansea University, and thirteen years supervising PhDs at NTU Singapore. The deeper the mathematics went, the further the answer moved beyond mathematics: <b>structure is not discovered — it is generated.</b> Not just meshes. Everything.</p>
+    <p style="margin:0 0 22px">A craft grew into an ontology: every being <b style="color:#8A6817">shows forth (S), through difference sequences (D), within feature entanglement (E)</b>. With this engine, Dr. Wang Desheng has written fifty-plus monographs across some twenty disciplines — and founded Demai International in Singapore to forge the SDE agent cluster, convinced that the road to genuine general intelligence runs not through more finished knowledge, but through how knowledge comes to be.</p>
+    <p style="margin:0;color:#98886C;font-size:15px">This column begins with that mesh: one person, one question, thirty years, and a generativics still unfolding.</p>
+  </div>
+
+  <div class="zh-only" style="font-size:12.5px;letter-spacing:0.4em;color:#8A6817;margin:40px 0 18px">今日三篇 · 健康 · 教育 · 艺术</div>
+  <div class="en-only" style="font-size:12.5px;letter-spacing:0.4em;color:#8A6817;margin:40px 0 18px">TODAY · HEALTH · EDUCATION · ART</div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px">
+
+    <a href="/column/thyroid-spinning/" style="display:block;background:#EAF2EF;border:1px solid rgba(14,124,107,0.28);border-top:3px solid #0E7C6B;padding:24px 22px;text-decoration:none">
+      <div class="zh-only" style="font-size:11.5px;letter-spacing:0.28em;color:#0A5A4E;margin-bottom:10px">健康 · 内分泌</div>
+      <div class="en-only" style="font-size:11.5px;letter-spacing:0.28em;color:#0A5A4E;margin-bottom:10px">HEALTH</div>
+      <div class="zh-only" style="font-size:18px;font-weight:700;color:#14211E;line-height:1.5">空转的甲状腺</div>
+      <div class="en-only" style="font-size:18px;font-weight:700;color:#14211E;line-height:1.5">The Idling Thyroid</div>
+      <div class="zh-only" style="font-size:13.5px;color:#6E837D;margin-top:8px;line-height:1.7">一个器官如何"忘了自己是谁"——病不是器官坏了,是互动熄火了</div>
+      <div class="en-only" style="font-size:13.5px;color:#6E837D;margin-top:8px;line-height:1.7">How an organ forgets who it is</div>
+      <div style="margin-top:14px;color:#0E7C6B;font-size:13.5px;font-weight:700">阅读全文 →</div>
+    </a>
+
+    <a href="/column/gifted-child/" style="display:block;background:#F7F1E4;border:1px solid rgba(138,93,18,0.28);border-top:3px solid #B07A1E;padding:24px 22px;text-decoration:none">
+      <div class="zh-only" style="font-size:11.5px;letter-spacing:0.28em;color:#8A5D12;margin-bottom:10px">教育 · 婴幼儿</div>
+      <div class="en-only" style="font-size:11.5px;letter-spacing:0.28em;color:#8A5D12;margin-bottom:10px">EDUCATION</div>
+      <div class="zh-only" style="font-size:18px;font-weight:700;color:#2A2114;line-height:1.5">天才儿童,为何泯然众人?</div>
+      <div class="en-only" style="font-size:18px;font-weight:700;color:#2A2114;line-height:1.5">Why Gifted Children Fade</div>
+      <div class="zh-only" style="font-size:13.5px;color:#8C7A5C;margin-top:8px;line-height:1.7">0-3岁那扇正在关闭的窗——教育不是制造儿童,是为发生提供条件</div>
+      <div class="en-only" style="font-size:13.5px;color:#8C7A5C;margin-top:8px;line-height:1.7">The closing window of ages 0-3</div>
+      <div style="margin-top:14px;color:#B07A1E;font-size:13.5px;font-weight:700">阅读全文 →</div>
+    </a>
+
+    <a href="/column/vangogh-sunflowers/" style="display:block;background:#EAEEF5;border:1px solid rgba(28,68,112,0.28);border-top:3px solid #2B5B8F;padding:24px 22px;text-decoration:none">
+      <div class="zh-only" style="font-size:11.5px;letter-spacing:0.28em;color:#1C4470;margin-bottom:10px">艺术 · 美学</div>
+      <div class="en-only" style="font-size:11.5px;letter-spacing:0.28em;color:#1C4470;margin-bottom:10px">ART</div>
+      <div class="zh-only" style="font-size:18px;font-weight:700;color:#182430;line-height:1.5">梵高的向日葵为什么让你心颤?</div>
+      <div class="en-only" style="font-size:18px;font-weight:700;color:#182430;line-height:1.5">Why Van Gogh's Sunflowers Move You</div>
+      <div class="zh-only" style="font-size:13.5px;color:#6E7E92;margin-top:8px;line-height:1.7">艺术如何"点燃"一个人——画是等待你的视线来点燃的火种</div>
+      <div class="en-only" style="font-size:13.5px;color:#6E7E92;margin-top:8px;line-height:1.7">How art ignites a person</div>
+      <div style="margin-top:14px;color:#2B5B8F;font-size:13.5px;font-weight:700">阅读全文 →</div>
+    </a>
+
+  </div>
+
+  <div style="margin-top:16px;border:1px solid rgba(18,124,110,0.30);background:#EAF2EF;padding:26px 30px;display:flex;flex-wrap:wrap;align-items:center;gap:14px 24px">
+    <div style="flex:1;min-width:260px">
+      <div class="zh-only" style="font-size:12px;letter-spacing:0.3em;color:#0B5A50;margin-bottom:8px">今日专文 · 道德经 · 最新</div>
+      <div class="en-only" style="font-size:12px;letter-spacing:0.3em;color:#0B5A50;margin-bottom:8px">TODAY · DAODEJING · NEW</div>
+      <div class="zh-only" style="font-size:19px;font-weight:700;color:#12211E">老子的道，为何物？</div>
+      <div class="en-only" style="font-size:19px;font-weight:700;color:#12211E">What Is Laozi's Dao?</div>
+      <div class="zh-only" style="font-size:13.5px;color:#6C8880;margin-top:6px">道=SDE · 生而不造 · 名是发生算子 · 上善若水即高发生力 · 器用在无 · 约万字</div>
+      <div class="en-only" style="font-size:13.5px;color:#6C8880;margin-top:6px">Dao = SDE · a generativist answer to a 2,500-year question · ~10k chars</div>
+    </div>
+    <a href="/column/what-is-dao/" class="zh-only" style="display:inline-block;padding:12px 28px;background:#127C6E;color:#EAF7F2;font-weight:700;letter-spacing:0.1em;font-size:14px;white-space:nowrap">阅读全文 →</a>
+    <a href="/column/what-is-dao/" class="en-only" style="display:inline-block;padding:12px 28px;background:#127C6E;color:#EAF7F2;font-weight:700;letter-spacing:0.1em;font-size:14px;white-space:nowrap">Read →</a>
+  </div>
+
+  <div style="margin-top:16px;border:1px solid rgba(124,100,16,0.28);background:#FBF8F0;padding:26px 30px;display:flex;flex-wrap:wrap;align-items:center;gap:14px 24px">
+    <div style="flex:1;min-width:260px">
+      <div class="zh-only" style="font-size:12px;letter-spacing:0.3em;color:#7C6410;margin-bottom:8px">专著导读 · 佛法 · 最新</div>
+      <div class="en-only" style="font-size:12px;letter-spacing:0.3em;color:#7C6410;margin-bottom:8px">MONOGRAPH · BUDDHISM · NEW</div>
+      <div class="zh-only" style="font-size:19px;font-weight:700;color:#2A2517">佛法的 SDE 智慧入门：照见世界如何发生</div>
+      <div class="en-only" style="font-size:19px;font-weight:700;color:#2A2517">An Introduction to the SDE Wisdom of Buddhism</div>
+      <div class="zh-only" style="font-size:13.5px;color:#948A70;margin-top:6px">缘起性空=S=F(D,E) · 三法印重译 · 无明的真身 · 一念三千 · 空之后不是归零而是重组 · 约万字 · 据《佛法的SDE解构导论》</div>
+      <div class="en-only" style="font-size:13.5px;color:#948A70;margin-top:6px">Dependent origination as S=F(D,E) · after emptiness is not zero but recombination · ~10k chars</div>
+    </div>
+    <a href="/column/buddhism-sde-intro/" class="zh-only" style="display:inline-block;padding:12px 28px;background:#7C6410;color:#FBF8F0;font-weight:700;letter-spacing:0.1em;font-size:14px;white-space:nowrap">阅读全文 →</a>
+    <a href="/column/buddhism-sde-intro/" class="en-only" style="display:inline-block;padding:12px 28px;background:#7C6410;color:#FBF8F0;font-weight:700;letter-spacing:0.1em;font-size:14px;white-space:nowrap">Read →</a>
+  </div>
+
+  <div style="margin-top:16px;border:1px solid rgba(138,46,46,0.28);background:#FCF7EE;padding:26px 30px;display:flex;flex-wrap:wrap;align-items:center;gap:14px 24px">
+    <div style="flex:1;min-width:260px">
+      <div class="zh-only" style="font-size:12px;letter-spacing:0.3em;color:#8A2E2E;margin-bottom:8px">专著导读 · 红学 · 最新</div>
+      <div class="en-only" style="font-size:12px;letter-spacing:0.3em;color:#8A2E2E;margin-bottom:8px">MONOGRAPH · REDOLOGY · NEW</div>
+      <div class="zh-only" style="font-size:19px;font-weight:700;color:#2A1E1A">SDE 红学导论：情，不肯被空收编</div>
+      <div class="en-only" style="font-size:19px;font-weight:700;color:#2A1E1A">Introduction to SDE Redology: Feeling Refuses to Be Subsumed by Emptiness</div>
+      <div class="zh-only" style="font-size:13.5px;color:#96806C;margin-top:6px">情为本·悲为色·空为幕 · 一台引擎五个转速 · 后四十回如何两头焊死 · 发生学接续工程 · 约万字 · 据《SDE红学》</div>
+      <div class="en-only" style="font-size:13.5px;color:#96806C;margin-top:6px">A generative reading of Dream of the Red Chamber · the engine and its five gears · ~10k chars</div>
+    </div>
+    <a href="/column/redology-intro/" class="zh-only" style="display:inline-block;padding:12px 28px;background:#8A2E2E;color:#FCF7EE;font-weight:700;letter-spacing:0.1em;font-size:14px;white-space:nowrap">阅读全文 →</a>
+    <a href="/column/redology-intro/" class="en-only" style="display:inline-block;padding:12px 28px;background:#8A2E2E;color:#FCF7EE;font-weight:700;letter-spacing:0.1em;font-size:14px;white-space:nowrap">Read →</a>
+  </div>
+
+  <div style="margin-top:16px;border:1px solid rgba(138,104,23,0.22);background:#F5EFE0;padding:26px 30px;display:flex;flex-wrap:wrap;align-items:center;gap:14px 24px">
+    <div style="flex:1;min-width:260px">
+      <div class="zh-only" style="font-size:12px;letter-spacing:0.3em;color:#8A6817;margin-bottom:8px">专栏 · 第一篇</div>
+      <div class="en-only" style="font-size:12px;letter-spacing:0.3em;color:#8A6817;margin-bottom:8px">COLUMN · No. 1</div>
+      <div class="zh-only" style="font-size:19px;font-weight:700;color:#2A2315">从"是什么"到"如何发生"——《SDE本体论入门》十页解读</div>
+      <div class="en-only" style="font-size:19px;font-weight:700;color:#2A2315">From "What It Is" to "How It Comes to Be" — A Ten-Page Reading of the New Monograph</div>
+      <div class="zh-only" style="font-size:13.5px;color:#98886C;margin-top:6px">一句种子 · 三维引擎 · 成熟态命题 · 三场硬仗 · 六张面孔与一只带走的眼睛 · </div>
+      <div class="en-only" style="font-size:13.5px;color:#98886C;margin-top:6px">One seed sentence · the three-dimensional engine · the maturity thesis · six faces of the discovery paradigm</div>
+    </div>
+    <a href="/column/reading-sde-ontology-intro/" class="zh-only" style="display:inline-block;padding:12px 28px;background:#8A6817;color:#FAF6EC;font-weight:700;letter-spacing:0.1em;font-size:14px;white-space:nowrap">阅读全文 →</a>
+    <a href="/column/reading-sde-ontology-intro/" class="en-only" style="display:inline-block;padding:12px 28px;background:#8A6817;color:#FAF6EC;font-weight:700;letter-spacing:0.1em;font-size:14px;white-space:nowrap">Read →</a>
+  </div>
+
+  <div style="margin-top:16px;border:1px solid rgba(138,104,23,0.22);background:#F5EFE0;padding:26px 30px;display:flex;flex-wrap:wrap;align-items:center;gap:14px 24px">
+    <div style="flex:1;min-width:260px">
+      <div class="zh-only" style="font-size:12px;letter-spacing:0.3em;color:#8A6817;margin-bottom:8px">专栏 · 第二篇</div>
+      <div class="en-only" style="font-size:12px;letter-spacing:0.3em;color:#8A6817;margin-bottom:8px">COLUMN · No. 2</div>
+      <div class="zh-only" style="font-size:19px;font-weight:700;color:#2A2315">"我"为什么最后才亮——SIO 27宫格十页解读</div>
+      <div class="en-only" style="font-size:19px;font-weight:700;color:#2A2315">Why "I" Lights Up Last — A Ten-Page Reading of the SIO 27-Cell Grid</div>
+      <div class="zh-only" style="font-size:13.5px;color:#98886C;margin-top:6px">C⊗M⊗V 张量 · 三号位显影律 · 对笛卡尔的精确清算 · 一张可诊断可补宫的扫描盘 · 据第六章</div>
+      <div class="en-only" style="font-size:13.5px;color:#98886C;margin-top:6px">The C⊗M⊗V tensor · the third-position law · a precise reckoning with Descartes · a diagnostic scanning board</div>
+    </div>
+    <a href="/column/sio-27-grid/" class="zh-only" style="display:inline-block;padding:12px 28px;background:#8A6817;color:#FAF6EC;font-weight:700;letter-spacing:0.1em;font-size:14px;white-space:nowrap">阅读全文 →</a>
+    <a href="/column/sio-27-grid/" class="en-only" style="display:inline-block;padding:12px 28px;background:#8A6817;color:#FAF6EC;font-weight:700;letter-spacing:0.1em;font-size:14px;white-space:nowrap">Read →</a>
+  </div>
+
+  <div style="margin-top:16px;border:1px solid rgba(138,104,23,0.22);background:#F5EFE0;padding:26px 30px;display:flex;flex-wrap:wrap;align-items:center;gap:14px 24px">
+    <div style="flex:1;min-width:260px">
+      <div class="zh-only" style="font-size:12px;letter-spacing:0.3em;color:#8A6817;margin-bottom:8px">专栏 · 第三篇</div>
+      <div class="en-only" style="font-size:12px;letter-spacing:0.3em;color:#8A6817;margin-bottom:8px">COLUMN · No. 3</div>
+      <div class="zh-only" style="font-size:19px;font-weight:700;color:#2A2315">为何派克教授的语言学有问题？——从三视角九宫格到 SDE 洪流</div>
+      <div class="en-only" style="font-size:19px;font-weight:700;color:#2A2315">What Is Wrong with Professor Pike's Linguistics? — From Tagmemics to the SDE Torrent</div>
+      <div class="zh-only" style="font-size:13.5px;color:#98886C;margin-top:6px">河边的拍照者 · "我懂你的意思"的显微镜 · 索绪尔把因果弄反 · 从结构学到发生学 · 约万字 · 据第二十三、二十六章</div>
+      <div class="en-only" style="font-size:13.5px;color:#98886C;margin-top:6px">The photographer by the river · Saussure's inverted causality · from structural to generative linguistics</div>
+    </div>
+    <a href="/column/pike-linguistics/" class="zh-only" style="display:inline-block;padding:12px 28px;background:#8A6817;color:#FAF6EC;font-weight:700;letter-spacing:0.1em;font-size:14px;white-space:nowrap">阅读全文 →</a>
+    <a href="/column/pike-linguistics/" class="en-only" style="display:inline-block;padding:12px 28px;background:#8A6817;color:#FAF6EC;font-weight:700;letter-spacing:0.1em;font-size:14px;white-space:nowrap">Read →</a>
+  </div>
+
+  <div style="margin-top:16px;border:1px solid rgba(138,104,23,0.22);background:#F5EFE0;padding:26px 30px;display:flex;flex-wrap:wrap;align-items:center;gap:14px 24px">
+    <div style="flex:1;min-width:260px">
+      <div class="zh-only" style="font-size:12px;letter-spacing:0.3em;color:#8A6817;margin-bottom:8px">专栏 · 第四篇</div>
+      <div class="en-only" style="font-size:12px;letter-spacing:0.3em;color:#8A6817;margin-bottom:8px">COLUMN · No. 4</div>
+      <div class="zh-only" style="font-size:19px;font-weight:700;color:#2A2315">德里达那一拳，为何砸空？——解构解构主义</div>
+      <div class="en-only" style="font-size:19px;font-weight:700;color:#2A2315">Why Did Derrida's Punch Land on Nothing? — Deconstructing Deconstruction</div>
+      <div class="zh-only" style="font-size:13.5px;color:#98886C;margin-top:6px">打击流沙的人 · 只能拆不能盖的锤子 · 后现代的致命一滑 · 流沙之下有岩床 · 据第二十七章</div>
+      <div class="en-only" style="font-size:13.5px;color:#98886C;margin-top:6px">The man who struck quicksand · a hammer that only demolishes · bedrock beneath: genesis itself</div>
+    </div>
+    <a href="/column/derrida-deconstruction/" class="zh-only" style="display:inline-block;padding:12px 28px;background:#8A6817;color:#FAF6EC;font-weight:700;letter-spacing:0.1em;font-size:14px;white-space:nowrap">阅读全文 →</a>
+    <a href="/column/derrida-deconstruction/" class="en-only" style="display:inline-block;padding:12px 28px;background:#8A6817;color:#FAF6EC;font-weight:700;letter-spacing:0.1em;font-size:14px;white-space:nowrap">Read →</a>
+  </div>
+
+  <div style="margin-top:16px;border:1px solid rgba(138,104,23,0.22);background:#F5EFE0;padding:26px 30px;display:flex;flex-wrap:wrap;align-items:center;gap:14px 24px">
+    <div style="flex:1;min-width:260px">
+      <div class="zh-only" style="font-size:12px;letter-spacing:0.3em;color:#8A6817;margin-bottom:8px">专栏 · 第五篇</div>
+      <div class="en-only" style="font-size:12px;letter-spacing:0.3em;color:#8A6817;margin-bottom:8px">COLUMN · No. 5</div>
+      <div class="zh-only" style="font-size:19px;font-weight:700;color:#2A2315">同一个空，两个方向——佛陀的破、科学的造</div>
+      <div class="en-only" style="font-size:19px;font-weight:700;color:#2A2315">One Emptiness, Two Directions — Buddha's Breaking, Science's Making</div>
+      <div class="zh-only" style="font-size:13.5px;color:#98886C;margin-top:6px">全书最深的一场交锋 · 稳定性表征 · 退出维持还是投入维持 · 造与破是同一循环的两个节拍 · 据第三十一章</div>
+      <div class="en-only" style="font-size:13.5px;color:#98886C;margin-top:6px">The book's deepest encounter · stability representations · making and breaking as two beats of one cycle</div>
+    </div>
+    <a href="/column/buddha-and-science/" class="zh-only" style="display:inline-block;padding:12px 28px;background:#8A6817;color:#FAF6EC;font-weight:700;letter-spacing:0.1em;font-size:14px;white-space:nowrap">阅读全文 →</a>
+    <a href="/column/buddha-and-science/" class="en-only" style="display:inline-block;padding:12px 28px;background:#8A6817;color:#FAF6EC;font-weight:700;letter-spacing:0.1em;font-size:14px;white-space:nowrap">Read →</a>
+  </div>
+
+  <div style="margin-top:16px;border:1px solid rgba(138,104,23,0.22);background:#F5EFE0;padding:26px 30px;display:flex;flex-wrap:wrap;align-items:center;gap:14px 24px">
+    <div style="flex:1;min-width:260px">
+      <div class="zh-only" style="font-size:12px;letter-spacing:0.3em;color:#8A6817;margin-bottom:8px">专栏 · 第六篇</div>
+      <div class="en-only" style="font-size:12px;letter-spacing:0.3em;color:#8A6817;margin-bottom:8px">COLUMN · No. 6</div>
+      <div class="zh-only" style="font-size:19px;font-weight:700;color:#2A2315">一把伞，撑开一个更大的数学——相容性公理与伞模型</div>
+      <div class="en-only" style="font-size:19px;font-weight:700;color:#2A2315">One Umbrella, a Larger Mathematics — the Compatibility Axiom &amp; the Umbrella Model</div>
+      <div class="zh-only" style="font-size:13.5px;color:#98886C;margin-top:6px">两千年没说破的公理 · 三参数伞与 N_SDE · 地震波的验证 · 蛋白质与网格的同构 · 全书理论最高峰 · 据第六篇</div>
+      <div class="en-only" style="font-size:13.5px;color:#98886C;margin-top:6px">The unspoken axiom · the three-parameter umbrella · seismic verification · the book's theoretical summit</div>
+    </div>
+    <a href="/column/umbrella-model/" class="zh-only" style="display:inline-block;padding:12px 28px;background:#8A6817;color:#FAF6EC;font-weight:700;letter-spacing:0.1em;font-size:14px;white-space:nowrap">阅读全文 →</a>
+    <a href="/column/umbrella-model/" class="en-only" style="display:inline-block;padding:12px 28px;background:#8A6817;color:#FAF6EC;font-weight:700;letter-spacing:0.1em;font-size:14px;white-space:nowrap">Read →</a>
+  </div>
+
+  <div class="zh-only" style="font-size:12.5px;letter-spacing:0.4em;color:#8A6817;margin:44px 0 18px">本栏频道</div>
+  <div class="en-only" style="font-size:12.5px;letter-spacing:0.4em;color:#8A6817;margin:44px 0 18px">CHANNELS OF THIS COLUMN</div>
+  <a href="/nine-doorways/" style="display:block;background:#F0E9D6;border:1px solid rgba(138,104,23,0.30);border-left:4px solid #8A6817;padding:26px 30px;text-decoration:none">
+    <div class="zh-only" style="font-size:12px;letter-spacing:0.3em;color:#8A6817;margin-bottom:8px">频道 · SDE 三维九宫</div>
+    <div class="en-only" style="font-size:12px;letter-spacing:0.3em;color:#8A6817;margin-bottom:8px">CHANNEL · NINE CELLS</div>
+    <div class="zh-only" style="font-size:20px;font-weight:700;color:#2A2315">一套本体论的九个入口</div>
+    <div class="en-only" style="font-size:20px;font-weight:700;color:#2A2315">One Ontology, Nine Doorways</div>
+    <div class="zh-only" style="font-size:13.5px;color:#98886C;margin-top:8px;line-height:1.85">在 E 中，经 D，成 S · 三维各分三格，一格一篇万字长文，九格已全部上线；另有专栏长论四种：★ 唯物辩证法的适用域 · 六路径方法论 · 从 123 原理到三原理 · 创新智商五维</div>
+    <div class="en-only" style="font-size:13.5px;color:#98886C;margin-top:8px;line-height:1.85">Show · Difference · Entanglement — three dimensions, three cells each, all nine live, plus four long-form essays</div>
+    <div style="margin-top:14px;color:#8A6817;font-size:13.5px;font-weight:700"><span class="zh-only">进入频道 →</span><span class="en-only">Enter the channel →</span></div>
+  </a>
+
+  <a href="/philosophy/" style="display:block;margin-top:14px;background:#F0E9D6;border:1px solid rgba(138,104,23,0.30);border-left:4px solid #8A6817;padding:26px 30px;text-decoration:none">
+    <div class="zh-only" style="font-size:12px;letter-spacing:0.3em;color:#8A6817;margin-bottom:8px">频道 · 思想宇宙</div>
+    <div class="en-only" style="font-size:12px;letter-spacing:0.3em;color:#8A6817;margin-bottom:8px">CHANNEL · PHILOSOPHY</div>
+    <div class="zh-only" style="font-size:20px;font-weight:700;color:#2A2315">让意义成为文明的第一生产力</div>
+    <div class="en-only" style="font-size:20px;font-weight:700;color:#2A2315">Let Meaning Become the Prime Productive Force</div>
+    <div class="zh-only" style="font-size:13.5px;color:#98886C;margin-top:8px;line-height:1.85">本栏的体系总纲：关于作者 · SDE 发生学 · 意义三律（特征律 · 自由律 · 幸福律，各一篇独立长论）· 七大知识集群 · 55+ 部专著总目 · 意义文明愿景</div>
+    <div class="en-only" style="font-size:13.5px;color:#98886C;margin-top:8px;line-height:1.85">The systematic map of this column: the author, SDE generativics, the three axioms of meaning, seven knowledge clusters, 55+ monographs, and the vision</div>
+    <div style="margin-top:14px;color:#8A6817;font-size:13.5px;font-weight:700"><span class="zh-only">进入频道 →</span><span class="en-only">Enter the channel →</span></div>
+  </a>
+
+  <div style="margin-top:38px;display:flex;gap:16px;flex-wrap:wrap">
+    <a href="/philosophy/" class="zh-only" style="display:inline-block;padding:12px 30px;background:#8A6817;color:#FAF6EC;font-weight:700;letter-spacing:0.1em;font-size:14.5px">频道：思想宇宙 →</a>
+    <a href="/philosophy/" class="en-only" style="display:inline-block;padding:12px 30px;background:#8A6817;color:#FAF6EC;font-weight:700;letter-spacing:0.1em;font-size:14.5px">Channel: Philosophy →</a>
+    <a href="/books/sde-ontology-intro/" class="zh-only" style="display:inline-block;padding:12px 30px;border:1px solid #8A6817;color:#8A6817;letter-spacing:0.1em;font-size:14.5px">读新著《SDE本体论入门》</a>
+    <a href="/books/sde-ontology-intro/" class="en-only" style="display:inline-block;padding:12px 30px;border:1px solid #8A6817;color:#8A6817;letter-spacing:0.1em;font-size:14.5px">Read the New Monograph</a>
+    <a href="/nine-doorways/" class="zh-only" style="display:inline-block;padding:12px 30px;border:1px solid #8A6817;color:#8A6817;letter-spacing:0.1em;font-size:14.5px">频道：SDE 三维九宫 →</a>
+    <a href="/nine-doorways/" class="en-only" style="display:inline-block;padding:12px 30px;border:1px solid #8A6817;color:#8A6817;letter-spacing:0.1em;font-size:14.5px">Channel: Nine Cells →</a>
+  </div>
+</div>
+</section>
+
+<!-- SDE 三维九宫 COLUMN (nine-cell ontology) -->
+<section id="grid" style="background:#F0E9D6;border-bottom:1px solid rgba(138,104,23,0.22);padding:88px 24px">
+<div class="sec-open"><a href="/nine-doorways/"><span class="zh-only">进入频道 →</span><span class="en-only">Open channel →</span></a></div>
+<div style="max-width:980px;margin:0 auto">
+  <div class="zh-only" style="font-size:12.5px;letter-spacing:0.45em;color:#8A6817;margin-bottom:14px"><a href="/drwang/" style="color:#8A6817;text-decoration:none;border-bottom:1px solid rgba(138,104,23,.5)">王博士与 SDE</a> · 频道 · 三维九宫</div>
+  <div class="en-only" style="font-size:12.5px;letter-spacing:0.45em;color:#8A6817;margin-bottom:14px"><a href="/drwang/" style="color:#8A6817;text-decoration:none;border-bottom:1px solid rgba(138,104,23,.5)">DR. WANG &amp; SDE</a> · CHANNEL · NINE CELLS</div>
+  <h2 class="zh-only" style="font-size:clamp(26px,4.4vw,40px);font-weight:700;letter-spacing:0.05em;margin:0 0 8px;color:#2A2315">一套本体论的九个入口</h2>
+  <h2 class="en-only" style="font-size:clamp(26px,4.4vw,40px);font-weight:700;letter-spacing:0.05em;margin:0 0 8px;color:#2A2315">One Ontology, Nine Doorways</h2>
+  <div class="zh-only" style="font-size:15px;color:#8A6817;letter-spacing:0.1em;margin-bottom:16px"><b>在 E 中，经 D，成 S</b> · 三维各分三格，一格一篇万字长文</div>
+  <div class="en-only" style="font-size:15px;color:#8A6817;letter-spacing:0.1em;margin-bottom:16px"><b>Show · Difference · Entanglement</b> · three dimensions, three cells each</div>
+  <p class="zh-only" style="max-width:730px;font-size:16px;line-height:2.0;color:#4A4029;margin:0 0 36px">世界不是被发现的，是被发生的。显露（S）、差异序列（D）、特征纠缠（E）三维互生，各分三格，合成九宫——这九格，是同一套发生学的九个入口。第一格已上线，其余陆续补齐。</p>
+  <p class="en-only" style="max-width:730px;font-size:16px;line-height:2.0;color:#4A4029;margin:0 0 36px">The world is not discovered but generated. Show (S), Difference (D), and Entanglement (E) co-generate; each splits into three cells, making a 3×3 grid — nine doorways into one generativics. The first cell is live; the rest follow.</p>
+
+  <!-- S row -->
+  <div style="margin-bottom:18px">
+    <div style="display:flex;align-items:baseline;gap:12px;margin-bottom:10px;border-bottom:1px solid rgba(138,104,23,0.20);padding-bottom:8px">
+      <span style="font-size:24px;font-weight:700;color:#8A6817;letter-spacing:0.05em">S</span>
+      <span class="zh-only" style="font-size:14px;color:#6E6047;font-weight:700">显露</span><span class="en-only" style="font-size:14px;color:#6E6047;font-weight:700">Show</span>
+      <span class="zh-only" style="font-size:13px;color:#98886C">存在被看见、维持、识别的方式</span><span class="en-only" style="font-size:13px;color:#98886C">how being is seen, held, recognized</span>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">
+      <a href="/column/ontology-grid/s1/" style="display:block;background:#FAF6EC;border:1px solid rgba(138,104,23,0.28);border-top:3px solid #8A6817;padding:18px 18px;text-decoration:none">
+        <div style="font-size:12px;font-weight:700;letter-spacing:0.14em;color:#8A6817;margin-bottom:6px">S1 · <span style="color:#0A7C56">已上线</span></div>
+        <div class="zh-only" style="font-size:17px;font-weight:700;color:#2A2315">显露·规范维</div><div class="en-only" style="font-size:17px;font-weight:700;color:#2A2315">Show · Norming</div>
+        <div class="zh-only" style="font-size:12.5px;color:#98886C;margin-top:4px;letter-spacing:0.06em">对比 · 变化 · 分布</div><div class="en-only" style="font-size:12.5px;color:#98886C;margin-top:4px;letter-spacing:0.06em">Contrast · Change · Distribution</div>
+        <div style="margin-top:12px;color:#8A6817;font-size:12.5px;font-weight:700"><span class="zh-only">阅读全文 →</span><span class="en-only">Read →</span></div>
+      </a>
+      <a href="/column/ontology-grid/s2/" style="display:block;background:#FAF6EC;border:1px solid rgba(138,104,23,0.28);border-top:3px solid #8A6817;padding:18px 18px;text-decoration:none">
+        <div style="font-size:12px;font-weight:700;letter-spacing:0.14em;color:#8A6817;margin-bottom:6px">S2 · <span style="color:#0A7C56">已上线</span></div>
+        <div class="zh-only" style="font-size:17px;font-weight:700;color:#2A2315">显露·模态维</div><div class="en-only" style="font-size:17px;font-weight:700;color:#2A2315">Show · Modality</div>
+        <div class="zh-only" style="font-size:12.5px;color:#98886C;margin-top:4px;letter-spacing:0.06em">粒子 · 波 · 场</div><div class="en-only" style="font-size:12.5px;color:#98886C;margin-top:4px;letter-spacing:0.06em">Particle · Wave · Field</div>
+        <div style="margin-top:12px;color:#8A6817;font-size:12.5px"><span class="zh-only">阅读全文 →</span><span class="en-only">Read →</span></div>
+      </a>
+      <a href="/column/ontology-grid/s3/" style="display:block;background:#FAF6EC;border:1px solid rgba(138,104,23,0.28);border-top:3px solid #8A6817;padding:18px 18px;text-decoration:none">
+        <div style="font-size:12px;font-weight:700;letter-spacing:0.14em;color:#8A6817;margin-bottom:6px">S3 · <span style="color:#0A7C56">已上线</span></div>
+        <div class="zh-only" style="font-size:17px;font-weight:700;color:#2A2315">显露·价值维</div><div class="en-only" style="font-size:17px;font-weight:700;color:#2A2315">Show · Value</div>
+        <div class="zh-only" style="font-size:12.5px;color:#98886C;margin-top:4px;letter-spacing:0.06em">真 · 善 · 美</div><div class="en-only" style="font-size:12.5px;color:#98886C;margin-top:4px;letter-spacing:0.06em">Truth · Good · Beauty</div>
+        <div style="margin-top:12px;color:#8A6817;font-size:12.5px"><span class="zh-only">阅读全文 →</span><span class="en-only">Read →</span></div>
+      </a>
+    </div>
+  </div>
+
+  <!-- D row -->
+  <div style="margin-bottom:18px">
+    <div style="display:flex;align-items:baseline;gap:12px;margin-bottom:10px;border-bottom:1px solid rgba(28,68,112,0.20);padding-bottom:8px">
+      <span style="font-size:24px;font-weight:700;color:#1C4470;letter-spacing:0.05em">D</span>
+      <span class="zh-only" style="font-size:14px;color:#324A63;font-weight:700">差异序列</span><span class="en-only" style="font-size:14px;color:#324A63;font-weight:700">Difference</span>
+      <span class="zh-only" style="font-size:13px;color:#8494A5">形成路径的运行机制</span><span class="en-only" style="font-size:13px;color:#8494A5">the mechanism that forms paths</span>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">
+      <a href="/column/ontology-grid/d1/" style="display:block;background:#F4F8FD;border:1px solid rgba(28,68,112,0.28);border-top:3px solid #1C4470;padding:18px 18px;text-decoration:none">
+        <div style="font-size:12px;font-weight:700;letter-spacing:0.14em;color:#1C4470;margin-bottom:6px">D1 · <span style="color:#0A7C56">已上线</span></div>
+        <div class="zh-only" style="font-size:17px;font-weight:700;color:#22303F">意义目标</div><div class="en-only" style="font-size:17px;font-weight:700;color:#22303F">Meaning-Goal</div>
+        <div class="zh-only" style="font-size:12.5px;color:#64788F;margin-top:4px;letter-spacing:0.06em">创造 · 自由 · 幸福</div><div class="en-only" style="font-size:12.5px;color:#64788F;margin-top:4px;letter-spacing:0.06em">Creation · Freedom · Happiness</div>
+        <div style="margin-top:12px;color:#1C4470;font-size:12.5px"><span class="zh-only">阅读全文 →</span><span class="en-only">Read →</span></div>
+      </a>
+      <a href="/column/ontology-grid/d2/" style="display:block;background:#F4F8FD;border:1px solid rgba(28,68,112,0.28);border-top:3px solid #1C4470;padding:18px 18px;text-decoration:none">
+        <div style="font-size:12px;font-weight:700;letter-spacing:0.14em;color:#1C4470;margin-bottom:6px">D2 · <span style="color:#0A7C56">已上线</span></div>
+        <div class="zh-only" style="font-size:17px;font-weight:700;color:#22303F">路径组织</div><div class="en-only" style="font-size:17px;font-weight:700;color:#22303F">Path Organization</div>
+        <div class="zh-only" style="font-size:12.5px;color:#64788F;margin-top:4px;letter-spacing:0.06em">六步 · 九步</div><div class="en-only" style="font-size:12.5px;color:#64788F;margin-top:4px;letter-spacing:0.06em">Six &amp; Nine Steps</div>
+        <div style="margin-top:12px;color:#1C4470;font-size:12.5px"><span class="zh-only">阅读全文 →</span><span class="en-only">Read →</span></div>
+      </a>
+      <a href="/column/ontology-grid/d3/" style="display:block;background:#F4F8FD;border:1px solid rgba(28,68,112,0.28);border-top:3px solid #1C4470;padding:18px 18px;text-decoration:none">
+        <div style="font-size:12px;font-weight:700;letter-spacing:0.14em;color:#1C4470;margin-bottom:6px">D3 · <span style="color:#0A7C56">已上线</span></div>
+        <div class="zh-only" style="font-size:17px;font-weight:700;color:#22303F">优化约束</div><div class="en-only" style="font-size:17px;font-weight:700;color:#22303F">Optimizing Constraint</div>
+        <div class="zh-only" style="font-size:12.5px;color:#64788F;margin-top:4px;letter-spacing:0.06em">误差 · 冗余 · 损耗</div><div class="en-only" style="font-size:12.5px;color:#64788F;margin-top:4px;letter-spacing:0.06em">Error · Redundancy · Loss</div>
+        <div style="margin-top:12px;color:#1C4470;font-size:12.5px"><span class="zh-only">阅读全文 →</span><span class="en-only">Read →</span></div>
+      </a>
+    </div>
+  </div>
+
+  <!-- E row -->
+  <div style="margin-bottom:8px">
+    <div style="display:flex;align-items:baseline;gap:12px;margin-bottom:10px;border-bottom:1px solid rgba(10,90,78,0.20);padding-bottom:8px">
+      <span style="font-size:24px;font-weight:700;color:#0A5A4E;letter-spacing:0.05em">E</span>
+      <span class="zh-only" style="font-size:14px;color:#1E4E45;font-weight:700">特征纠缠</span><span class="en-only" style="font-size:14px;color:#1E4E45;font-weight:700">Entanglement</span>
+      <span class="zh-only" style="font-size:13px;color:#6E9088">发生的土壤</span><span class="en-only" style="font-size:13px;color:#6E9088">the soil of genesis</span>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">
+      <a href="/column/ontology-grid/e1/" style="display:block;background:#F1F8F5;border:1px solid rgba(10,90,78,0.28);border-top:3px solid #0A5A4E;padding:18px 18px;text-decoration:none">
+        <div style="font-size:12px;font-weight:700;letter-spacing:0.14em;color:#0A5A4E;margin-bottom:6px">E1 · <span style="color:#0A7C56">已上线</span></div>
+        <div class="zh-only" style="font-size:17px;font-weight:700;color:#173A34">三界</div><div class="en-only" style="font-size:17px;font-weight:700;color:#173A34">Three Realms</div>
+        <div class="zh-only" style="font-size:12.5px;color:#4E7068;margin-top:4px;letter-spacing:0.06em">理念 · 现实 · 自我</div><div class="en-only" style="font-size:12.5px;color:#4E7068;margin-top:4px;letter-spacing:0.06em">Ideal · Real · Self</div>
+        <div style="margin-top:12px;color:#0A5A4E;font-size:12.5px"><span class="zh-only">阅读全文 →</span><span class="en-only">Read →</span></div>
+      </a>
+      <a href="/column/ontology-grid/e2/" style="display:block;background:#F1F8F5;border:1px solid rgba(10,90,78,0.28);border-top:3px solid #0A5A4E;padding:18px 18px;text-decoration:none">
+        <div style="font-size:12px;font-weight:700;letter-spacing:0.14em;color:#0A5A4E;margin-bottom:6px">E2 · <span style="color:#0A7C56">已上线</span></div>
+        <div class="zh-only" style="font-size:17px;font-weight:700;color:#173A34">信息三模态</div><div class="en-only" style="font-size:17px;font-weight:700;color:#173A34">Info Modalities</div>
+        <div class="zh-only" style="font-size:12.5px;color:#4E7068;margin-top:4px;letter-spacing:0.06em">符号 · 逻辑 · 数学</div><div class="en-only" style="font-size:12.5px;color:#4E7068;margin-top:4px;letter-spacing:0.06em">Symbol · Logic · Math</div>
+        <div style="margin-top:12px;color:#0A5A4E;font-size:12.5px"><span class="zh-only">阅读全文 →</span><span class="en-only">Read →</span></div>
+      </a>
+      <a href="/column/ontology-grid/e3/" style="display:block;background:#F1F8F5;border:1px solid rgba(10,90,78,0.28);border-top:3px solid #0A5A4E;padding:18px 18px;text-decoration:none">
+        <div style="font-size:12px;font-weight:700;letter-spacing:0.14em;color:#0A5A4E;margin-bottom:6px">E3 · <span style="color:#0A7C56">已上线</span></div>
+        <div class="zh-only" style="font-size:17px;font-weight:700;color:#173A34">能量三状态</div><div class="en-only" style="font-size:17px;font-weight:700;color:#173A34">Energy States</div>
+        <div class="zh-only" style="font-size:12.5px;color:#4E7068;margin-top:4px;letter-spacing:0.06em">内能 · 动能 · 势能</div><div class="en-only" style="font-size:12.5px;color:#4E7068;margin-top:4px;letter-spacing:0.06em">Internal · Kinetic · Potential</div>
+        <div style="margin-top:12px;color:#0A5A4E;font-size:12.5px"><span class="zh-only">阅读全文 →</span><span class="en-only">Read →</span></div>
+      </a>
+    </div>
+  </div>
+
+  <div style="margin-top:26px;padding:18px 24px;background:#EBE3CE;border:1px solid rgba(138,104,23,0.22);font-size:14.5px;line-height:1.9;color:#5A4E33">
+    <span class="zh-only"><b style="color:#8A6817">S 是纠缠开出的花，E 是沉淀下来的壤</b>——所以 S3 与 E3 同是"真·善·美"，S2 与 E2 共着模态骨架。花与壤同一副骨架，D 是让它从壤显为花、又从花沉为壤的引擎。九格环环相扣，谁也不能单独站住。</span>
+    <span class="en-only"><b style="color:#8A6817">S is the flower entanglement opens; E is the soil it settles into</b> — so S3 and E3 are both Truth·Good·Beauty, and S2 and E2 share one modal skeleton. One skeleton, two faces; D is the engine that turns soil into flower and back. The nine cells interlock — none stands alone.</span>
+  </div>
+
+  <div style="margin-top:28px;display:flex;gap:16px;flex-wrap:wrap">
+    <a href="/column/ontology-grid/" class="zh-only" style="display:inline-block;padding:12px 30px;background:#8A6817;color:#FAF6EC;font-weight:700;letter-spacing:0.1em;font-size:14.5px">走进九宫格全图 →</a>
+    <a href="/column/ontology-grid/" class="en-only" style="display:inline-block;padding:12px 30px;background:#8A6817;color:#FAF6EC;font-weight:700;letter-spacing:0.1em;font-size:14.5px">Enter the Nine-Cell Map →</a>
+    <a href="/column/ontology-grid/dialectical-materialism/" class="zh-only" style="display:inline-block;padding:12px 30px;border:2px solid #8A6817;background:#FAF6EC;color:#8A6817;font-weight:700;letter-spacing:0.1em;font-size:14.5px">★ 栏目头条：唯物辩证法适合哪个战场 →</a>
+    <a href="/column/ontology-grid/s1/" class="zh-only" style="display:inline-block;padding:12px 30px;border:1px solid #8A6817;color:#8A6817;letter-spacing:0.1em;font-size:14.5px">先读第一格 S1 →</a>
+    <a href="/column/ontology-grid/dialectical-materialism/" class="en-only" style="display:inline-block;padding:12px 30px;border:2px solid #8A6817;background:#FAF6EC;color:#8A6817;font-weight:700;letter-spacing:0.1em;font-size:14.5px">★ Lead Essay: The Proper Domain of Dialectical Materialism →</a>
+    <a href="/column/ontology-grid/s1/" class="en-only" style="display:inline-block;padding:12px 30px;border:1px solid #8A6817;color:#8A6817;letter-spacing:0.1em;font-size:14.5px">Read Cell S1 →</a>
+  </div>
+</div>
+</section>
+
+<!-- TODAY'S ARTICLES 今日文章 · 大栏目总头 -->
+<!-- SDE 对谈 · 问对SDE（首页中部醒目栏目） -->
+
+
+<section id="today-articles" style="background:#100E0C;border-bottom:1px solid rgba(212,178,94,0.25);padding:64px 24px 40px;text-align:center;scroll-margin-top:70px">
+<div class="sec-open"><a href="/today/"><span class="zh-only">进入专栏 →</span><span class="en-only">Open column →</span></a></div>
+  <div style="max-width:980px;margin:0 auto">
+    <div class="zh-only" style="font-size:13px;letter-spacing:0.5em;color:#D4B25E">今 日 文 章</div>
+    <div class="en-only" style="font-size:13px;letter-spacing:0.5em;color:#D4B25E">TODAY'S ARTICLES</div>
+    <div style="width:56px;height:2px;background:rgba(212,178,94,0.5);margin:18px auto 0"></div>
+    <p class="zh-only" style="color:#9A8F80;font-size:14.5px;letter-spacing:0.08em;margin:22px auto 0;max-width:640px">每天在这里更新的一切：长文与动态。两个子栏目：今日长文、每日更新。</p>
+    <p class="en-only" style="color:#9A8F80;font-size:14.5px;letter-spacing:0.08em;margin:22px auto 0;max-width:640px">Everything updated daily: long reads and updates. Two sub-columns: Long Reads and Daily Updates.</p>
+    <div style="display:flex;flex-wrap:wrap;gap:10px 14px;justify-content:center;margin-top:30px">
+      <a href="/today/#today-longread" class="zh-only" style="padding:9px 20px;border:1px solid rgba(212,178,94,0.5);border-radius:20px;color:#D4B25E;text-decoration:none;font-size:13.5px;letter-spacing:0.08em;font-weight:700">壹 · 今日长文</a><a href="/today/#today-longread" class="en-only" style="padding:9px 20px;border:1px solid rgba(212,178,94,0.5);border-radius:20px;color:#D4B25E;text-decoration:none;font-size:13.5px;letter-spacing:0.08em;font-weight:700">I · Long Reads</a>
+      <a href="/today/#daily" class="zh-only" style="padding:9px 20px;border:1px solid rgba(138,104,23,0.6);border-radius:20px;color:#C9A227;text-decoration:none;font-size:13.5px;letter-spacing:0.08em;font-weight:700">贰 · 每日更新</a><a href="/today/#daily" class="en-only" style="padding:9px 20px;border:1px solid rgba(138,104,23,0.6);border-radius:20px;color:#C9A227;text-decoration:none;font-size:13.5px;letter-spacing:0.08em;font-weight:700">II · Daily Updates</a>
+    </div>
+  </div>
+</section>
+
+
+<!-- 应试教育专栏 -->
+<section id="exam-education-feature" style="padding:70px 22px;background:linear-gradient(135deg,#0d1520,#1d3550);color:#f2ecdd">
+  <div style="max-width:1060px;margin:auto">
+    <div style="font-size:12px;letter-spacing:.38em;color:#c9b06a;margin-bottom:18px">新 专 栏 · 胡 敏 · 9 篇 · 19.7 万字</div>
+    <h2 style="font-family:'Noto Serif SC',serif;font-size:clamp(38px,6vw,66px);line-height:1.15;margin:0 0 20px">应试教育专栏</h2>
+    <p style="font-size:18px;line-height:1.95;color:#e3dac6;margin:0 0 22px;max-width:820px">不谈态度，只做三件事：<b>划线</b>——应试与教育的分界落在哪个可查的地方；<b>清点</b>——被杀掉的到底是哪一类东西，又在链条的哪一段被拦住；<b>算账</b>——为什么每一次削弱应试的改革都在数年内被重新吸收，这件事要花几年，这个年数由什么决定。</p>
+    <p style="font-size:15px;line-height:1.9;color:#b9ad91;margin:0 0 28px;max-width:820px">九篇各给一个此前没有名字的对象和一条可以清点的读数：认痕率、启名时限、确认链长、不留痕动作清单、闭历时刻、解养次序、半返期、证载秩亏、转默阈。<b>每一篇都预注册在先、拿公开材料真跑过一次，并把不利结果照登。</b></p>
+    <div style="display:flex;flex-wrap:wrap;gap:12px 16px">
+      <a href="/exam-education/" style="display:inline-block;padding:12px 24px;border:1px solid #c9b06a;border-radius:28px;color:#f0dfa6;text-decoration:none;font-weight:700">进入专栏 · 阅读 9 篇 →</a>
+      <a href="/students/hu-min/hu-min-talks/" style="display:inline-block;padding:12px 24px;border:1px solid rgba(201,176,106,0.45);border-radius:28px;color:#d8caa4;text-decoration:none;font-weight:700">胡敏谈 · 作者频道 →</a>
+    </div>
+  </div>
+</section>
+
+<!-- 中介频道 -->
+<section id="mediation-feature" style="padding:70px 22px;background:linear-gradient(135deg,#0c1a18,#173d38);color:#f2ecdd">
+  <div style="max-width:1060px;margin:auto">
+    <div style="font-size:12px;letter-spacing:.38em;color:#6FB8B0;margin-bottom:18px">新 频 道 · 胡 敏 · 9 篇 · 18.0 万字</div>
+    <h2 style="font-family:'Noto Serif SC',serif;font-size:clamp(38px,6vw,66px);line-height:1.15;margin:0 0 20px">中介</h2>
+    <p style="font-size:18px;line-height:1.95;color:#e3dac6;margin:0 0 22px;max-width:820px">三道题：<b>中介与抽成在哪里分开</b>、<b>去中介化怎样才走得出去</b>、<b>交易成本每降一次中介为什么反而更强</b>。九门与经济学无关的成熟学问，每篇从三门互相说不里逼出一条三家共同持有而从未说出口的假定，再从其中某一门自己的教科书里找到推翻它的材料。</p>
+    <p style="font-size:15px;line-height:1.9;color:#a9c2bd;margin:0 0 28px;max-width:820px">九篇各给一个此前没有名字的对象和一条可以清点的读数：凭基幅、退计率、阶差、先至率、分记阈、释放曲线、重算比、补线迟滞、可自备阈。<b>九篇全部预注册真跑，并把不利结果照登。</b>其中三篇为投稿原稿盲评认证分，六篇含一节编者增补的主张推进、标「盲评 → 修改设计目标 · 待独立复核」。</p>
+    <div style="display:flex;flex-wrap:wrap;gap:12px 16px">
+      <a href="/students/hu-min/mediation/" style="display:inline-block;padding:12px 24px;border:1px solid #6FB8B0;border-radius:28px;color:#bfe6df;text-decoration:none;font-weight:700">进入频道 · 阅读 9 篇 →</a>
+      <a href="/students/hu-min/works/" style="display:inline-block;padding:12px 24px;border:1px solid rgba(111,184,176,0.45);border-radius:28px;color:#a9c2bd;text-decoration:none;font-weight:700">胡敏 · 全部作品 →</a>
+    </div>
+  </div>
+</section>
+
+
+<!-- 婚姻幸福专栏 -->
+<section id="marriage-happiness-feature" style="padding:70px 22px;background:linear-gradient(135deg,#26090d,#641a24);color:#f7efdf">
+  <div style="max-width:1060px;margin:auto;display:grid;grid-template-columns:1.1fr .9fr;gap:42px;align-items:center">
+    <div><div style="font-size:12px;letter-spacing:.38em;color:#d6b865;margin-bottom:18px">新 专 栏 · 王 德 生 · 24 篇</div>
+      <h2 style="font-family:'Noto Serif SC',serif;font-size:clamp(38px,6vw,66px);line-height:1.15;margin:0 0 20px">婚姻幸福专栏</h2>
+      <p style="font-size:18px;line-height:1.95;color:#eadfcd;margin:0 0 26px">幸福不是没有裂缝，而是两个人仍能在裂缝中生成共同生活。六个频道，从制度退场、AI代偿、爱的内骨骼，一直走到时间、生育、名分与判断。</p>
+      <a href="/marriage-happiness/" style="display:inline-block;padding:12px 24px;border:1px solid #d6b865;border-radius:28px;color:#f3d98e;text-decoration:none;font-weight:700">进入专栏 · 阅读24篇 →</a>
+    </div>
+    <a href="/marriage-happiness/"><picture><source srcset="/marriage-happiness/card.webp" type="image/webp"><img src="/marriage-happiness/card.jpg" alt="婚姻幸福专栏" width="1200" height="628" loading="lazy" decoding="async" style="width:100%;height:auto;display:block;border-radius:8px;box-shadow:0 22px 60px rgba(0,0,0,.35)"></picture></a>
+  </div>
+</section>
+<style>@media(max-width:760px){#marriage-happiness-feature>div{grid-template-columns:1fr!important}}</style>
+
+<!-- 陈晓艳 · 精准医疗与慢病发生学（学员新频道） -->
+<section id="chen-precision-feature" style="padding:60px 22px;background:linear-gradient(140deg,#E9F3E1,#DCEBD0);color:#16301C">
+<div style="max-width:1020px;margin:auto;text-align:center"><div style="font-size:12px;letter-spacing:.4em;color:#2E7D46;margin-bottom:16px">学 员 新 频 道 · 陈 晓 艳 · 十 一 篇</div>
+<h2 style="font-family:'Noto Serif SC',serif;font-size:clamp(32px,5vw,54px);margin:0 0 18px;color:#16301C">精准医疗与慢病发生学</h2>
+<p style="max-width:790px;margin:0 auto 24px;font-size:17px;line-height:2;color:#3d5a45">一个原初问题、三轮独立生成、二十七万字、四个辨别面：自组织权被接管、身体感知被替代、临床认知被削掉、疾病本体论被重判。每篇都写明自己在分工地图上的位置，以及一条会让它与同组另一篇合并的反驳条件。</p>
+<a href="/students/chen-xiaoyan/precision-medicine/" style="display:inline-block;padding:11px 24px;border:1px solid #2E7D46;border-radius:26px;color:#256B3A;text-decoration:none;font-weight:700">进入频道 · 阅读十一篇 →</a>
+</div></section>
+
+<!-- 家庭与伦理专栏 -->
+<section id="family-ethics-feature" style="padding:72px 22px;background:linear-gradient(140deg,#150e0b,#3d241a);color:#f8f1e7">
+<div style="max-width:1060px;margin:auto;text-align:center"><div style="font-size:12px;letter-spacing:.42em;color:#dcb87e;margin-bottom:18px">新 专 栏 · 王 德 生 · 四 篇</div>
+<h2 style="font-family:'Noto Serif SC',serif;font-size:clamp(40px,6vw,68px);margin:0 0 20px">家庭与伦理</h2>
+<p style="max-width:800px;margin:0 auto 28px;font-size:18px;line-height:2;color:#f0e4d8">功能被一样样接走之后，家没有散——痛苦替下了它们，成了最难溶解的那味凝结剂。四篇同题异刀：非清算性债务、共在的脱落、被焊接的共同体、义务的悬浮，每一篇都写明自己会在哪个经验节点上出错。</p>
+<a href="/family-ethics/" style="display:inline-block;padding:12px 25px;border:1px solid #dcb87e;border-radius:28px;color:#f0d29a;text-decoration:none;font-weight:700">进入专栏 · 阅读四篇 →</a>
+<div style="margin-top:26px;font-size:13px;color:#c9b6a6;line-height:1.9">原初问题来自秦莉：愚孝与边界感、婚姻的契约动态、心理退行与虚无主义、冷漠期困局、与孩子的精神共谋<br>四篇在写作中跑题了——离开了这一原初设定的问题，另成一路（说明见各篇致谢）</div>
+</div></section>
+
+<!-- 信仰与人生专栏 -->
+<section id="faith-and-life-feature" style="padding:72px 22px;background:linear-gradient(140deg,#120d21,#38265f);color:#f8f2e7">
+<div style="max-width:1060px;margin:auto;text-align:center"><div style="font-size:12px;letter-spacing:.42em;color:#d9bd73;margin-bottom:18px">新 专 栏 · 王 德 生 · 四 篇</div>
+<h2 style="font-family:'Noto Serif SC',serif;font-size:clamp(40px,6vw,68px);margin:0 0 20px">信仰与人生</h2>
+<p style="max-width:780px;margin:0 auto 28px;font-size:18px;line-height:2;color:#e8dff0">当算法替我们解释世界，信仰从确定性退回承担。四篇长文，从精神锚定、选择代价、意义回锚走向守护幻觉的破除。</p>
+<a href="/faith-and-life/" style="display:inline-block;padding:12px 25px;border:1px solid #d9bd73;border-radius:28px;color:#f0d78e;text-decoration:none;font-weight:700">进入专栏 · 阅读四篇 →</a></div></section>
+
+<!-- 每日必读（典范文） -->
+<section id="paradigm-feature" style="padding:74px 22px;background:linear-gradient(148deg,#161F2B,#243447 58%,#1E2A3A);color:#EDE7DA">
+<div style="max-width:1060px;margin:auto;text-align:center">
+<div style="font-size:12px;letter-spacing:.44em;color:#C99C7A;margin-bottom:18px">每 日 必 读 · 典 范 文 · 王 德 生 ＋ Claude</div>
+<h2 style="font-family:'Noto Serif SC',serif;font-size:clamp(38px,6vw,66px);margin:0 0 18px">每日必读</h2>
+<p style="max-width:820px;margin:0 auto 24px;font-size:18px;line-height:2;color:#D8D0C0">每一篇都叫<b style="color:#E5C9A8">典范文</b>：由 Claude 在<b style="color:#E5C9A8">王德生博士</b>指导下，对站内文章做一次二阶碰撞而涌现出来的高创新智商文章。三篇必须<b style="color:#E5C9A8">分属不同学科</b>、必须在某处正面打架，撞出来的那个判断必须是任何一篇单独看时都看不到的；成文<b style="color:#E5C9A8">不带任何学派术语，普通人一路读得下来</b>。</p>
+<div style="display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-bottom:26px">
+<span style="border:1px solid rgba(201,138,99,.5);border-radius:22px;padding:7px 17px;font-size:13px;color:#E0D6C4">多学科交叉</span>
+<span style="border:1px solid rgba(201,138,99,.5);border-radius:22px;padding:7px 17px;font-size:13px;color:#E0D6C4">观点必须打架</span>
+<span style="border:1px solid rgba(201,138,99,.5);border-radius:22px;padding:7px 17px;font-size:13px;color:#E0D6C4">零术语 · 人人读得懂</span>
+<span style="border:1px solid rgba(201,138,99,.5);border-radius:22px;padding:7px 17px;font-size:13px;color:#E0D6C4">四十三篇 · 约 78 万字</span></div>
+<p style="max-width:860px;margin:0 auto 24px;font-size:14.5px;line-height:1.95;color:#B6AC98">每篇都列明它由哪三篇撞成，可直接点回原文核对。<b style="color:#E5C9A8">之三十八</b>《代签》诗学 × 家庭教育 × 照料生理学——一篇说停止索取是成熟，一篇说大人必须单向留白，一篇说不被回应的照料是一笔按年累积的债；撞出来的是：被说成「你就是这样一个人」，是他被征用去替对方签一张回撤单；<b style="color:#E5C9A8">之三十六</b>《懂了，是一个时刻，还是一段路》教育 × 组织 × 语言哲学 × 急救医学——本栏首篇非碰撞篇，作者王德生，正文专章交代与站内三位对手的分离线；<b style="color:#E5C9A8">之二</b>《一拿出来，就不是它了》神学 × 技艺传承 × 系统价值论；<b style="color:#E5C9A8">之三</b>《抽条》发展心理学 × 技术哲学 × 照护制度；<b style="color:#E5C9A8">之四</b>《账本记不下的那样东西》心理治疗 × 美学 × 法理学；<b style="color:#E5C9A8">之五</b>《为什么最该做的事，算起来总是亏的》医学 × 艺术 × 教育；<b style="color:#E5C9A8">之六</b>《能停下来，是因为不必交代》临床医学 × 教育 × 组织理论；<b style="color:#E5C9A8">之七</b>《账外的东西》亲密关系心理学 × 艺术哲学 × 卫生政策——与之六是同一条线的两半，那一篇做记录端，这一篇做转移端；<b style="color:#E5C9A8">之八</b>《叫不来的那一半》睡眠医学 × 创造社会学 × 人格心理学；<b style="color:#E5C9A8">之九</b>《挂着》课程理论 × 认知科学 × 高等教育社会学；<b style="color:#E5C9A8">之十一《一句对的话，也能把门关上》</b>撞自健康社会学《“查无异常”的暴政》、知识社会学《装判断》与人工智能哲学《会说一切的哑巴》；<b style="color:#E5C9A8">之十四《扶一把，和替他站着》</b>撞自知识社会学《供养》、商业战略《护城河的错觉》与临床医学《形塑》；<b style="color:#E5C9A8">之十五《先坏的不是指标，是那个还觉得别扭的人》</b>撞自战争与和平研究《铸造战争的模具》、劳动政治《赋形与枯竭》与课程改革《认知脱轨的自我预警》；<b style="color:#E5C9A8">之十七《没走的那条路，不留痕》</b>首次不撞站内文章，改撞三套前沿理论——信息学的装配论、哲学的不可预陈与艺术的来源研究；<b style="color:#E5C9A8">之十八《有些本事，是准备不出来的》</b>撞自时间社会学《来不及构成》、教育与天赋研究《厚度的发生》与认识论《重识同一》；<b style="color:#E5C9A8">之二十《抄得越像，坏得越快》</b>让演化生物学的贝氏拟态、文化演化的过度模仿与知识生产的洗稿分析正面撞车——前两方在同一变量上给出相反符号，第三方说这个变量无效；<b style="color:#E5C9A8">之二十二《它不是坏掉的，是被一样一样换掉的》</b>让过程哲学的逐点替换、艺术接受的「接住」与法哲学的「一写下就不是它了」撞在一起——真的那个按定义不留证据，假的那个外形完全相同，于是两者在原理上无从分辨；<b style="color:#E5C9A8">之二十三《谁说它是杂质》</b>让材料工程的提纯与掺杂、免疫学的老朋友假说与临床微生物的位置依赖撞在一起——"是不是杂质"不是它的属性，是一次身份分配的结果；<b style="color:#E5C9A8">之二十四《最深的覆盖，看起来像不干涉》</b>撞自建筑发生学《那双相互改写的手》、对话哲学《引力的形状》与中国思想史《辟思》——一篇说不互相写入就等于没发生，一篇说什么都别动，一篇说得先隔开；<b style="color:#E5C9A8">之二十五《所有的尺子都来得太晚》</b>撞自教育互动《偏折的源头》、亲密关系《爱的他手性》与算法治理《数字是骨头》——被量到的东西里有一部分是量的人自己放进去的；<b style="color:#E5C9A8">之二十六《传得下去的，都是没做完的》</b>撞自技艺传承《自我复制的悖论》、法哲学《裂隙自续》与伦理人类学《沉淀的形态》——保存得越完整，传得越快，活得越短；<b style="color:#E5C9A8">之二十七《「不知道」有三种》</b>撞的是三位<b style="color:#F0D5B0">现在还活着、且彼此驳斥过</b>的哲学家——哈曼、巴拉德、加布里埃尔，三人对「没进来的那一部分」给出三个互不相容的答案；<b style="color:#E5C9A8">之二十八《改一样，另外两样多久跟上》</b>撞的是三位<b style="color:#F0D5B0">在世且互相驳斥过</b>的经济学家——阿西莫格鲁、皮凯蒂、麦克洛斯基，把「谁是因」换成「先动之后另外两个多久跟上」。</p>
+<a href="/confluence/confluence-method/" style="display:block;text-decoration:none;margin-bottom:16px">
+<div style="border:1px solid rgba(230,180,130,0.95);border-radius:3px;background:linear-gradient(135deg,rgba(38,26,18,0.98),rgba(24,19,15,0.98));padding:34px 32px;box-shadow:0 0 0 3px rgba(201,156,122,0.10)">
+  <div style="font-size:11.5px;letter-spacing:0.34em;color:#E8B98C;margin-bottom:14px">学科通融 · 新开「通融创新法」频道 · 方法论特稿</div>
+  <h3 style="font-size:25px;line-height:1.45;color:#F6ECE2;margin:0 0 14px;font-weight:700"><span class="zh-only">SDE 多学科通融创新法——从 0 到 1 不是灵感，是一门可以重复的手艺</span><span class="en-only">The SDE Confluence Method: 0-to-1 as a repeatable craft</span></h3>
+  <p style="font-size:15px;line-height:1.95;color:#D2BBA8;margin:0 0 16px"><span class="zh-only">周三剩下的半锅红烧肉，周六还在冰箱里。做饭的人说菜端上桌就算做完了，排班的人说要等它被吃掉才算走完，管冰箱的人说它还占着格子就没结束——<b style="color:#F0DCC8">三个人不是三个观点，是三个算数的标准</b>。本篇用这件事把整套方法从头走到尾：不看三家吵什么，看他们不吵什么；那句三个人都会说「这还用说吗」的话才是地基，而推翻它的材料就在做饭的人自己手里。另有旧衣服与杂物抽屉两个案例走完另外两种题型，并交出五道闸、发生链五步、可清点的读数、敌意拓宽的五个方向，以及一条必须把不利结果写进正文的真跑。<b style="color:#F0DCC8">本篇是方法论特稿</b>——学科通融栏其余各篇都是这套工序跑出来的产物，这一篇讲的是工序本身；同频道另收站内三篇讲评分与工程实现的方法论长文。</span><span class="en-only">Three people disagree on when a meal counts as finished. They are not three opinions but three standards of what counts — and the method starts where they agree.</span></p>
+  <div style="font-size:12.5px;color:#9C8371">王德生 ＋ Claude · 约 2 万字 · 34 页 · 十三章 ＋ 四个附录 · 三种读法</div>
+</div>
+</a>
+<a href="/paradigm/civil-war-scar/" style="display:block;text-decoration:none;margin-bottom:16px">
+<div style="border:1px solid rgba(181,113,74,0.9);border-radius:3px;background:linear-gradient(135deg,rgba(24,18,16,0.98),rgba(17,14,13,0.98));padding:34px 32px">
+  <div style="font-size:11.5px;letter-spacing:0.34em;color:#D8A57A;margin-bottom:14px">每日必读 · 典范文 · 之一 · 站外三家碰撞</div>
+  <h3 style="font-size:25px;line-height:1.45;color:#F6ECE2;margin:0 0 14px;font-weight:700"><span class="zh-only">内战的灼痕——语感不是一个人拥有的能力，而是两个互相否决的场在判定装置换代之后留下的显影</span><span class="en-only">The Scar of a Civil War</span></h3>
+  <p style="font-size:15px;line-height:1.95;color:#D2BBA8;margin:0 0 16px"><span class="zh-only">一位编辑在语法正确、逻辑连贯、典故恰切的文章旁批下「没语感」；一位集句者用杜甫与辛弃疾的半句拼成的对联，语感反而胜过他自己完全原创的诗。<b style="color:#F0DCC8">工程学、化学、细胞学三套装置各自都能解释语感，却在同一组裂隙上一起失靶</b>——它们共享了一个从未说出口的前提：语感长在一块完整的、属于你一个人的土壤上。本文提出：<b style="color:#F0DCC8">语感是生命史纠缠场与临时碰撞池张力场之间不可调和的冲突所逼出的一次性生成</b>，并为它撞上一条结构独立的第二轴——判定装置是否发生换代。靶格里九家近邻共同预测矛盾终将消解或蒸发，本文预测相反：换代不终结矛盾，反而是矛盾被正式记录在案的唯一条件。另交出两条轴各自的尺子（换代深度 δ 与不可调和度 ζ），以及两次预注册真跑——四条假设全部不获支持，其中一次用本文自己的三个版本实测，把上一版关于自身的声称推翻了。</span><span class="en-only">Language-sense is not a capacity you own; it is the scar left when two mutually vetoing fields are recorded rather than resolved.</span></p>
+  <div style="font-size:12.5px;color:#9C8371">王德生 · 约 2.5 万字 · 20 页 · 三种读法</div>
+</div>
+</a>
+<a href="/paradigm/" style="display:inline-block;padding:12px 25px;border:1px solid #C99C7A;border-radius:28px;color:#E0C0A0;text-decoration:none;font-weight:700">进入每日必读 →</a></div></section>
+
+<!-- 学科通融 -->
+<section id="confluence-feature" style="padding:74px 22px;background:linear-gradient(148deg,#1B2118,#2E3A28 58%,#20261CC);color:#EDEADF">
+<div style="max-width:1060px;margin:auto;text-align:center">
+<div style="font-size:12px;letter-spacing:.44em;color:#A8B888;margin-bottom:18px">新 专 栏 · 王 德 生 ＋ Claude · 九 个 频 道</div>
+<h2 style="font-family:'Noto Serif SC',serif;font-size:clamp(38px,6vw,66px);margin:0 0 18px">学科通融</h2>
+<p style="max-width:820px;margin:0 auto 24px;font-size:18px;line-height:2;color:#D5D2C2">「每日必读」撞的是站内学员的论文，这一栏撞的是<b style="color:#C6D6A6">站外不同学科的理论体系</b>。先在公开文献里找到三个分属不同学科、且在同一个问题上给出互相排斥答案的理论，把各自最承重的判断拆出来两两去撞——只有当两个判断正面顶住、顶出一个任何一家单独都看不见的东西时，才算数。</p>
+<div style="display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-bottom:26px">
+<span style="border:1px solid rgba(168,184,136,.5);border-radius:22px;padding:7px 17px;font-size:13px;color:#DCD8C6">三家来自不同学科</span>
+<span style="border:1px solid rgba(168,184,136,.5);border-radius:22px;padding:7px 17px;font-size:13px;color:#DCD8C6">三家必须互相打架</span>
+<span style="border:1px solid rgba(168,184,136,.5);border-radius:22px;padding:7px 17px;font-size:13px;color:#DCD8C6">来源全在站外 · 链接可核对</span>
+<span style="border:1px solid rgba(168,184,136,.5);border-radius:22px;padding:7px 17px;font-size:13px;color:#DCD8C6">零术语 · 人人读得懂</span></div>
+<div style="max-width:820px;margin:-10px auto 26px;font-size:15px;line-height:1.95;color:#C6D6A6">新开 <a href="/confluence/#c10" style="color:#E8F0D8;font-weight:700">「母亲的力量」频道</a>（同批五篇）；另有 <a href="/confluence/#c9" style="color:#E8F0D8;font-weight:700">「通融创新法」频道</a>：这一栏用的是哪一套工序——<a href="/confluence/confluence-method/" style="color:#E8F0D8;font-weight:700">《SDE 多学科通融创新法》</a>用厨房剩菜、旧衣服与杂物抽屉三个日常案例从头走一遍，同频道另收站内三篇讲评分与工程实现的方法论长文。</div>
+<div style="max-width:880px;margin:0 auto 16px;border:1px solid rgba(168,184,136,.42);border-radius:14px;padding:22px 26px;background:rgba(168,184,136,.07);text-align:left">
+<div style="font-size:11.5px;letter-spacing:.26em;color:#A8B888;margin-bottom:11px">之 五 十 二 · 经济学 × 艺术学 × 工程学 · 约 2.2 万字</div>
+<a href="/confluence/one-edge-short/" style="display:block;text-decoration:none;margin-bottom:16px">
+<div style="border:1px solid rgba(90,160,150,0.85);border-radius:3px;background:linear-gradient(135deg,rgba(12,30,30,0.98),rgba(8,20,20,0.98));padding:34px 32px;box-shadow:0 0 0 1px rgba(90,160,150,0.2) inset,0 0 34px rgba(90,160,150,0.10)">
+<div class="zh-only" style="font-size:12px;letter-spacing:0.28em;color:#6FBFB0;margin-bottom:13px">◆ 学科通融 · 之六十五 · 作者 阳涌 ＋ Claude</div>
+<div class="zh-only" style="font-size:clamp(24px,4vw,37px);font-weight:700;color:#F0EDE4;letter-spacing:0.05em;line-height:1.45">差一条边</div>
+<div class="zh-only" style="font-size:15.5px;color:#CDDCD8;margin-top:14px;line-height:1.88">课堂上学习为何很少发生，三家给出三条不能同真的答案，而它们共有一个前提：<b style="color:#BFE6DC">每一条断掉的边都有理由，修好它就少一处损失</b>。推翻它的材料来自化学自己——集体自催化集：<b style="color:#BFE6DC">自持是集合的性质，不是任何单个反应的性质</b>，而闭合是阈值现象。低于临界密度，修好多少条单边都不形成自持集。据此把课堂写成一张接手图，给出三个可从既有录像算出的读数，并推出三条违反通行判断的结论——其中一条是：<b style="color:#BFE6DC">「教师注意并跟随每一个学生」恰恰把图推向最脆的那种闭合。</b></div>
+<div style="margin-top:20px;display:flex;gap:12px;flex-wrap:wrap"><span style="color:#0C1E1E;background:#6FBFB0;font-size:14px;font-weight:700;letter-spacing:0.06em;padding:9px 20px;border-radius:2px">读全文 →</span><span class="zh-only" style="color:#9FD6C9;border:1px solid rgba(90,160,150,.6);font-size:13px;padding:8px 15px;border-radius:2px">约1.2万字 · 27节 · 22页 · 教育学 × 化学反应网络 × 管理学</span></div>
+</div></a>
+<a href="/confluence/undivided-difference/" style="text-decoration:none"><div style="font-size:clamp(20px,3.2vw,28px);font-weight:700;color:#F1EFE4;line-height:1.5">未分之别</div>
+<div style="font-size:15px;color:#CFCCBB;margin-top:9px;line-height:1.9">三家共同假定可被分辨的种类数是给定的，于是都只在这个数的内部作答：按位次结算、在既有类里做精、把它削下去以维持可控。而艾什比给变异度下定义时那个括号写着：若两个观察者所能作的区分不同，同一组元素对他们就有不同的变异度——种类数是被生产的。内卷因此不是投入增加而产出不增加，是分辨集合停止扩张之后，努力提高的只剩同一种类的强度。</div></a>
+<div style="font-size:12.8px;color:#9FA88C;margin-top:12px;line-height:1.85">撞自：报酬按相对位次结算，因为排序比计量便宜（经济学）· 重组比开新类便宜，于是重组成为理性选择（艺术学）· 调节方跟不上时，唯一可行的是削减被控方的种类（控制论与工程学）</div>
+<div style="font-size:11.5px;letter-spacing:.26em;color:#A8B888;margin-bottom:11px">之 五 十 一 · 教育学 × 哲学 × 经济学 · 约 2.0 万字</div>
+<a href="/confluence/who-walked-it/" style="text-decoration:none"><div style="font-size:clamp(20px,3.2vw,28px);font-weight:700;color:#F1EFE4;line-height:1.5">那一段谁走的</div>
+<div style="font-size:15px;color:#CFCCBB;margin-top:9px;line-height:1.9">教育里有一段当期不产出任何可被验收之物、而日后一切验收能力由它生成的时间。生成式协助做的不是让人变懒，是把这段时间的产出提前兑现——于是它在所有账上记为已完成，实际没有被走过。由此形成的回路不需要人更多，也不需要位置更少，在总投入下降时同样加速。</div></a>
+<div style="font-size:12.8px;color:#9FA88C;margin-top:12px;line-height:1.85">撞自：护栏能止损但没有产生增益，出路在教学设计（教育学）· 收缩发生在入口不在存量，出路在换掉凭据（经济学）· 那种召唤发生在没有产出的时刻，且不可被生产（哲学）</div>
+</div>
+<div style="max-width:880px;margin:0 auto 16px;border:1px solid rgba(168,184,136,.42);border-radius:14px;padding:22px 26px;background:rgba(168,184,136,.07);text-align:left">
+<div style="font-size:11.5px;letter-spacing:.26em;color:#A8B888;margin-bottom:11px">之 五 十 · 经济学 × 艺术学 × 工程学 · 约 2.0 万字</div>
+<a href="/confluence/before-first-reading/" style="text-decoration:none"><div style="font-size:clamp(20px,3.2vw,28px);font-weight:700;color:#F1EFE4;line-height:1.5">第一个读数之前</div>
+<div style="font-size:15px;color:#CFCCBB;margin-top:9px;line-height:1.9">一个领域有没有真的长出新东西？三家各说一处，而三处不能同时算数。本文认为新旧之别不在产出、不在效率、也不在承认，而在一样东西从被做出来到取得第一个读数所需的时间——在此之前，它在三家的账上都不是「小」，是零。</div></a>
+<div style="font-size:12.8px;color:#9FA88C;margin-top:12px;line-height:1.85">撞自：研究生产率与产出代理（经济学）· 基准饱和与构念效度（工程学）· 现场性是被历史地生产出来的范畴（艺术学）</div>
+</div>
+<div style="max-width:880px;margin:0 auto 16px;border:1px solid rgba(168,184,136,.42);border-radius:14px;padding:22px 26px;background:rgba(168,184,136,.07);text-align:left">
+<div style="font-size:11.5px;letter-spacing:.26em;color:#A8B888;margin-bottom:11px">之 四 十 五 · 经济学 × 艺术学 × 工程学 · 约 2.0 万字</div>
+<a href="/confluence/stopped-no-one/" style="text-decoration:none"><div style="font-size:clamp(20px,3.2vw,28px);font-weight:700;color:#F1EFE4;line-height:1.5">这道关拦下过谁</div>
+<div style="font-size:15px;color:#CFCCBB;margin-top:9px;line-height:1.9">生成一份合格证据的成本对所有人同时塌到接近于零之后，投递量暴涨、通过率上升、堵塞加剧，而录取比例不动。本文论证：内卷不是竞争过度，是可读门槛整体失去了分辨力——而由于绝大多数关没有一个有权宣布它作废的位置，饱和的关不会被撤下，只会被继续满足。</div></a>
+<div style="font-size:12.8px;color:#9FA88C;margin-top:12px;line-height:1.85">撞自：生产率 J 曲线，出路在新的可计量产出（经济学）· 加速与稳定的取舍，出路在把过程做稳（工程学）· 作品的地位不在物件而在鉴赏实践，出路在改变什么才算值得（艺术学）</div>
+</div>
+<div style="max-width:880px;margin:0 auto 16px;border:1px solid rgba(168,184,136,.42);border-radius:14px;padding:22px 26px;background:rgba(168,184,136,.07);text-align:left">
+<div style="font-size:11.5px;letter-spacing:.26em;color:#A8B888;margin-bottom:11px">之 三 十 五 · 运动控制 × 舞蹈记谱与重构研究 × 文化学习心理学 · 约 2.3 万字</div>
+<a href="/confluence/orphaned-cut/" style="text-decoration:none"><div style="font-size:clamp(20px,3.2vw,28px);font-weight:700;color:#F1EFE4;line-height:1.5">孤线</div>
+<div style="font-size:15px;color:#CFCCBB;margin-top:9px;line-height:1.9">一个动作里「什么不许变」的那条线由谁切下，以及切它的那台装置退场之后，它为什么还在生效。</div></a>
+</div>
+<div style="max-width:880px;margin:0 auto 16px;border:1px solid rgba(168,184,136,.42);border-radius:14px;padding:22px 26px;background:rgba(168,184,136,.07);text-align:left">
+<div style="font-size:11.5px;letter-spacing:.26em;color:#A8B888;margin-bottom:11px">之 七 · 考古学 × 遗传学 × 历史语言学 · 约 1.9 万字</div>
+<a href="/confluence/trace-replicability/" style="text-decoration:none"><div style="font-size:clamp(20px,3.2vw,28px);font-weight:700;color:#F1EFE4;line-height:1.5">痕迹能不能被复制，决定了这门学科相信什么</div>
+<div style="font-size:15px;color:#CFCCBB;margin-top:9px;line-height:1.9">两地出现同样的东西，是东西走了还是人走了？三家的默认答案系统性地不同——而差异不来自方法优劣，来自各自痕迹的一项物理性质：它能否脱离携带者被复制。陶器可以仿，基因不能借，语言居中。</div></a>
+<div style="font-size:12.8px;color:#9FA88C;margin-top:12px;line-height:1.85">撞自：迁徙的物质足迹难以区分（考古学）· 古代DNA能直接判定迁徙是否发生（遗传学）· 语言转换无需基因替换（历史语言学）</div>
+</div>
+<div style="max-width:880px;margin:0 auto 16px;border:1px solid rgba(168,184,136,.42);border-radius:14px;padding:22px 26px;background:rgba(168,184,136,.07);text-align:left">
+<div style="font-size:11.5px;letter-spacing:.26em;color:#A8B888;margin-bottom:11px">之 五 · 美学 · 审美证言 × 伦理学 · 道德证言悲观论 × 知识论 · 反自主一支 · 约 2.0 万字</div>
+<a href="/confluence/discriminative-competence/" style="text-decoration:none"><div style="font-size:clamp(20px,3.2vw,28px);font-weight:700;color:#F1EFE4;line-height:1.5">选择听谁，本身就是一次判断</div>
+<div style="font-size:15px;color:#CFCCBB;margin-top:9px;line-height:1.9">论鉴别资质的独立性，及证言依赖在何处失效</div></a>
+</div>
+<div style="max-width:880px;margin:0 auto 16px;border:1px solid rgba(168,184,136,.42);border-radius:14px;padding:22px 26px;background:rgba(168,184,136,.07);text-align:left">
+<div style="font-size:11.5px;letter-spacing:.26em;color:#A8B888;margin-bottom:11px">之 六 · 政治学 × 经济学 × 法学 · 约 1.9 万字</div>
+<a href="/confluence/binding-fails-where-needed/" style="text-decoration:none"><div style="font-size:clamp(20px,3.2vw,28px);font-weight:700;color:#F1EFE4;line-height:1.5">约束在最需要它的地方失效</div>
+<div style="font-size:15px;color:#CFCCBB;margin-top:9px;line-height:1.9">宪法、司法审查、央行独立性，共同的承诺都是让掌权者不能做他本来能做的事。而三家各自最强的结果合起来指向一件三家都没说出口的事：约束的力气从不由它自己提供——所以越需要它的地方，它越不生效。由此本文主张它的真实功能不是禁止，是定价。</div></a>
+<div style="font-size:12.8px;color:#9FA88C;margin-top:12px;line-height:1.85">撞自：可信承诺命题与其利率证据的瓦解（政治学）· 委托的限度（经济学）· 反对司法审查的核心论证（法学）</div>
+</div>
+<div style="max-width:880px;margin:0 auto 16px;border:1px solid rgba(168,184,136,.42);border-radius:14px;padding:22px 26px;background:rgba(168,184,136,.07);text-align:left">
+<div style="font-size:11.5px;letter-spacing:.26em;color:#A8B888;margin-bottom:11px">之 四 · 圣经神学 × 物理学 × 文学 · 约 2.0 万字</div>
+<a href="/confluence/inaccessible-original/" style="text-decoration:none"><div style="font-size:clamp(20px,3.2vw,28px);font-weight:700;color:#F1EFE4;line-height:1.5">我们说的「本来的样子」，是我们造出来的</div>
+<div style="font-size:15px;color:#CFCCBB;margin-top:9px;line-height:1.9">新约没有一份作者手稿传世，莎士比亚的戏剧手稿一份也没有，而任何获取电子测量前位置的行为本身就是一次测量。三个领域面对同一个够不着的原物，给出三种互相排斥的处置——而选哪一种，可能由这一行下游要拿它做什么决定，不由它本身决定。</div></a>
+<div style="font-size:12.8px;color:#9FA88C;margin-top:12px;line-height:1.85">撞自：从「原初文本」到「起始文本」（圣经神学）·《自然》二〇二五年量子力学百年调查（物理学）· 阿登第三版《哈姆雷特》拒绝编折衷本（文学）</div>
+</div>
+<div style="max-width:880px;margin:0 auto 16px;border:1px solid rgba(168,184,136,.42);border-radius:14px;padding:22px 26px;background:rgba(168,184,136,.07);text-align:left">
+<div style="font-size:11.5px;letter-spacing:.26em;color:#A8B888;margin-bottom:11px">之 三 · 精神病学 × 演化生物学 × 经济学 · 约 1.9 万字</div>
+<a href="/confluence/defensive-sedimentation/" style="text-decoration:none"><div style="font-size:clamp(20px,3.2vw,28px);font-weight:700;color:#F1EFE4;line-height:1.5">理论的边界是被打出来的</div>
+<div style="font-size:15px;color:#CFCCBB;margin-top:9px;line-height:1.9">一个理论遭遇不利证据时还有第三条路：不改内容、不质疑实验，而是重新说明自己原本主张的范围。三场争论的核心分歧都不在世界怎样，而在「我们的理论究竟主张过什么」——而这个问题，再多实验也答不了。</div></a>
+<div style="font-size:12.8px;color:#9FA88C;margin-top:12px;line-height:1.85">撞自：抑郁症血清素假说之争（精神病学）· 扩展演化综合之争（演化生物学）· 理性假设与行为发现之争（经济学）</div>
+</div>
+<div style="max-width:880px;margin:0 auto 16px;border:1px solid rgba(168,184,136,.42);border-radius:14px;padding:22px 26px;background:rgba(168,184,136,.07);text-align:left">
+<div style="font-size:11.5px;letter-spacing:.26em;color:#A8B888;margin-bottom:11px">之 二 · 意识科学 × 代谢医学 × 人工智能评估 · 约 1.9 万字</div>
+<a href="/confluence/before-measurement/" style="text-decoration:none"><div style="font-size:clamp(20px,3.2vw,28px);font-weight:700;color:#F1EFE4;line-height:1.5">认不出来的东西，争不出结果</div>
+<div style="font-size:15px;color:#CFCCBB;margin-top:9px;line-height:1.9">为什么有些架吵一百年也吵不完，而且吵的人全都在认真做实验。三场架里双方都同意发生了什么，分歧在于这件事该被算作什么——而这一步在任何测量开始之前就已经做完了。</div></a>
+<div style="font-size:12.8px;color:#9FA88C;margin-top:12px;line-height:1.85">撞自：Nature 2025 那场预注册对抗实验（意识科学）· 能量平衡对阵碳水-胰岛素的因果反转（代谢医学）·《思考的幻觉》对阵《思考的幻觉的幻觉》（人工智能）</div>
+</div>
+<div style="max-width:880px;margin:0 auto 26px;border:1px solid rgba(168,184,136,.42);border-radius:14px;padding:22px 26px;background:rgba(168,184,136,.07);text-align:left">
+<div style="font-size:11.5px;letter-spacing:.26em;color:#A8B888;margin-bottom:11px">之 一 · 教育学 × 再生医学 × 行为公共政策 · 约 2 万字</div>
+<a href="/confluence/measurable-face/" style="text-decoration:none"><div style="font-size:clamp(20px,3.2vw,28px);font-weight:700;color:#F1EFE4;line-height:1.5">能被量的那一面</div>
+<div style="font-size:15px;color:#CFCCBB;margin-top:9px;line-height:1.9">为什么一件事最容易被看见的地方，往往正好不是它长东西的地方。三拨互不相识的人各自吵着「该在哪一层动手」，而三边都发现了同一件事却都以为那是自己领域的病：你能测到的那个东西，跟你真正想要的那个东西，方向常常是反的。</div></a>
+<div style="font-size:12.8px;color:#9FA88C;margin-top:12px;line-height:1.85">撞自：可取用困难框架对阵认知负荷理论（教育学）· 集体智能与生物电界面（再生医学）· 个体框架与系统框架之辩（行为公共政策）—— 三家均为站外公开文献，页内链接直达原始出处；文末附 22 条可逐条核对的参考文献，并与坎贝尔定律、古德哈特定律、反应性研究等最近的邻居逐一划界</div>
+</div>
+<a href="/confluence/" style="display:inline-block;padding:12px 25px;border:1px solid #A8B888;border-radius:28px;color:#C6D6A6;text-decoration:none;font-weight:700">进入学科通融 · 读一百零四篇 →</a></div></section>
+<!-- 艺术专栏 -->
+<section id="art-feature" style="padding:72px 22px;background:linear-gradient(140deg,#1A1917,#3A3833 62%,#22201D);color:#f3ede0">
+<div style="max-width:1060px;margin:auto;text-align:center"><div style="font-size:12px;letter-spacing:.42em;color:#c6a468;margin-bottom:18px">新 专 栏 · 王 德 生 · 四 篇</div>
+<h2 style="font-family:'Noto Serif SC',serif;font-size:clamp(40px,6vw,68px);margin:0 0 20px">艺术专栏</h2>
+<p style="max-width:800px;margin:0 auto 28px;font-size:18px;line-height:2;color:#e2dcce">当一切都可以被撤回、代偿、预览、外包，艺术被剩在了那个还要求人亲自踩下去的位置上。四篇长文：裁决的厚度、裁决的生态、守护的悖论，以及创作中真正不可代偿的那一段。</p>
+<a href="/art/" style="display:inline-block;padding:12px 25px;border:1px solid #c6a468;border-radius:28px;color:#e0c084;text-decoration:none;font-weight:700">进入专栏 · 阅读四篇 →</a></div></section>
+
+<!-- SDE教育学 -->
+<section id="sde-edu-feature" style="padding:74px 22px;background:linear-gradient(146deg,#2A1C10,#4A331C 58%,#33240F);color:#F5EDE2">
+<div style="max-width:1060px;margin:auto;text-align:center">
+<div style="font-size:12px;letter-spacing:.44em;color:#D9A566;margin-bottom:18px">新 栏 目 · 王 德 生 · 十 二 讲 与 研 究 论 文</div>
+<h2 style="font-family:'Noto Serif SC',serif;font-size:clamp(38px,6vw,66px);margin:0 0 18px">SDE教育学</h2>
+<p style="max-width:860px;margin:0 auto 24px;font-size:18px;line-height:2;color:#E4D6C4">「师者，所以传道授业解惑也。」这七个字里有一个字做了很重的理论承诺，而它从未被拿出来检查过——那个字是<b style="color:#F0C08A">「传」</b>。要「传」，就必须先有一样已经做好了的东西，它在别处，等着被搬过来。本栏把这条默认的链逐环写出来，标明每一环悄悄承诺了什么，再逐环去敲。</p>
+<div style="display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-bottom:26px">
+<span style="border:1px solid rgba(217,165,102,.55);border-radius:22px;padding:7px 17px;font-size:13px;color:#EDDFC9">不是「让学生自己去发现」</span>
+<span style="border:1px solid rgba(217,165,102,.55);border-radius:22px;padding:7px 17px;font-size:13px;color:#EDDFC9">旧办法先失效，教师随后明确讲授</span>
+<span style="border:1px solid rgba(217,165,102,.55);border-radius:22px;padding:7px 17px;font-size:13px;color:#EDDFC9">每讲自带可证伪条件</span>
+<span style="border:1px solid rgba(217,165,102,.55);border-radius:22px;padding:7px 17px;font-size:13px;color:#EDDFC9">三种读法</span></div>
+<div style="max-width:880px;margin:0 auto 26px;border:1px solid rgba(217,165,102,.32);border-radius:14px;padding:20px 24px;background:rgba(0,0,0,.16);text-align:left">
+<div style="font-size:12.6px;letter-spacing:.2em;color:#D9A566;margin-bottom:9px">第 一 讲 · 已 上 线</div>
+<a href="/sde-education/discovery-to-genesis/" style="color:#F5EDE2;text-decoration:none">
+<div style="font-size:21px;font-weight:700;line-height:1.7;margin-bottom:8px">教育：从发现到发生的革命</div>
+<div style="font-size:15.5px;line-height:1.95;color:#D6C6B2">传道模式的八环链，与它的八处裂缝。八处裂缝指向同一句从未被写在任何教参上的话——那样东西已经做好了，在别处，只等被搬过来。文末以一整节交代本文与「最小指导教学」的分界，以及本文在经验研究上的确切地位。</div></a>
+</div>
+<div style="max-width:880px;margin:0 auto 26px;border:1px solid rgba(217,165,102,.32);border-radius:14px;padding:20px 24px;background:rgba(0,0,0,.16);text-align:left">
+<div style="font-size:12.6px;letter-spacing:.2em;color:#D9A566;margin-bottom:9px">研 究 论 文 · 之 一 · 已 上 线</div>
+<a href="/sde-education/unspanned-capability/" style="color:#F5EDE2;text-decoration:none">
+<div style="font-size:21px;font-weight:700;line-height:1.7;margin-bottom:8px">它读不出来的，它也造不出来</div>
+<div style="font-size:15.5px;line-height:1.95;color:#D6C6B2">两个人在考场上、在工位上表现得完全一样，他们是不是学到了同一样东西？本文的答案是：这个问题问错了对象。教育的产物不是能力，是不可分辨性——一套判定口径装上的那一刻，同时切出一类它既读不出也造不出的能力。约 2.7 万字，含两次预注册实算与五条对本文不利的结果。</div></a>
+</div>
+<div style="max-width:880px;margin:0 auto 26px;border:1px solid rgba(217,165,102,.32);border-radius:14px;padding:20px 24px;background:rgba(0,0,0,.16);text-align:left">
+<div style="font-size:12.6px;letter-spacing:.2em;color:#D9A566;margin-bottom:9px">研 究 论 文 · 之 二 · 已 上 线</div>
+<a href="/sde-education/unasked-question/" style="color:#F5EDE2;text-decoration:none">
+<div style="font-size:21px;font-weight:700;line-height:1.7;margin-bottom:8px">那道题还没有被出出来</div>
+<div style="font-size:15.5px;line-height:1.95;color:#D6C6B2">一个学生把题全做对了，能排除掉几种做法？答案接近于零。教育的产物是一批由做法之差定义、而尚未被任何人出出来的题。含四条形式命题——其中一条证明：一道题的分辨力随它要求的技能数指数下降，难题不是更有信息量的题。约 2.7 万字，一份公开三十余年的数据上有完整实算。</div></a>
+</div>
+<div style="max-width:880px;margin:0 auto 26px;border:1px solid rgba(217,165,102,.32);border-radius:14px;padding:20px 24px;background:rgba(0,0,0,.16);text-align:left">
+<div style="font-size:12.6px;letter-spacing:.2em;color:#D9A566;margin-bottom:9px">研 究 论 文 · 之 三 · 已 上 线</div>
+<a href="/sde-education/tongxu-indiscernible-family/" style="color:#F5EDE2;text-decoration:none">
+<div style="font-size:21px;font-weight:700;line-height:1.7;margin-bottom:8px">同许</div>
+<div style="font-size:15.5px;line-height:1.95;color:#D6C6B2">一个班的分数最整齐的时候，往往正是分不开的人最多的时候。同许指在同一份可用观测下互不可分辨、且被同一套条件同等许可的那一族进程。两份公开成绩数据上预注册实算，三条假设两条被判伪，补跑还推翻了本文原写的一句话。约 2.3 万字，五处不利结果原样写入正文。</div></a>
+</div>
+<div style="max-width:880px;margin:0 auto 26px;border:1px solid rgba(217,165,102,.32);border-radius:14px;padding:20px 24px;background:rgba(0,0,0,.16);text-align:left">
+<div style="font-size:12.6px;letter-spacing:.2em;color:#D9A566;margin-bottom:9px">研 究 论 文 · 之 四 · 已 上 线</div>
+<a href="/sde-education/uncounted-run/" style="color:#F5EDE2;text-decoration:none">
+<div style="font-size:21px;font-weight:700;line-height:1.7;margin-bottom:8px">不计的那一遍</div>
+<div style="font-size:15.5px;line-height:1.95;color:#D6C6B2">一个人为达到现在这个样子做过的那些遍里，有多少遍在任何一本账上都不产生一个数？本文提出：教育由一批必须不进任何账才承担构成功能的重复构成。八千四百个公开拉取请求上的预注册实算，两条假设均未命中；九成入账者的前拒次数为零。约 2.2 万字。</div></a>
+</div>
+<div style="max-width:880px;margin:0 auto 26px;border:1px solid rgba(217,165,102,.32);border-radius:14px;padding:20px 24px;background:rgba(0,0,0,.16);text-align:left">
+<div style="font-size:12.6px;letter-spacing:.2em;color:#D9A566;margin-bottom:9px">研 究 论 文 · 之 五 · 已 上 线</div>
+<a href="/sde-education/what-was-always-so/" style="color:#F5EDE2;text-decoration:none">
+<div style="font-size:21px;font-weight:700;line-height:1.7;margin-bottom:8px">本来就是这样</div>
+<div style="font-size:15.5px;line-height:1.95;color:#D6C6B2">一个传承体系每次交接，都必须把所传之物分成「不许改的」与「必须自己重做的」两份——而这次分派，在它自己的记载里一律被写成发现，从不写成决定。本文把这个动作命名为判形，把尚未被问过这个问题的那部分内容命名为未判之域。约 2.6 万字，两次公开语料回溯检验，其中第二次是为了补上第一次的一处构念裂缝而做的。</div></a>
+</div>
+<div style="max-width:880px;margin:0 auto 26px;border:1px solid rgba(217,165,102,.32);border-radius:14px;padding:20px 24px;background:rgba(0,0,0,.16);text-align:left">
+<div style="font-size:12.6px;letter-spacing:.2em;color:#D9A566;margin-bottom:9px">研 究 论 文 · 之 六 · 已 上 线</div>
+<a href="/sde-education/place-left-empty/" style="color:#F5EDE2;text-decoration:none">
+<div style="font-size:21px;font-weight:700;line-height:1.7;margin-bottom:8px">先空着的那一处</div>
+<div style="font-size:15.5px;line-height:1.95;color:#D6C6B2">同一份含铁膳食，在两个人身上的吸收率能差好几倍——差别不在膳食，在接受者当前那个空。本文提出：教育是在接受端维持一批尚未被任何人认领的空处，而把它标出来就等于开始填它。一千二百余个公开事项的检验里，被标为「留给新手」的位置最终无一例外由核心维护者自己关闭。约 2.2 万字。</div></a>
+</div>
+<div style="max-width:880px;margin:0 auto 26px;border:1px solid rgba(217,165,102,.32);border-radius:14px;padding:20px 24px;background:rgba(0,0,0,.16);text-align:left">
+<div style="font-size:12.6px;letter-spacing:.2em;color:#D9A566;margin-bottom:9px">研 究 论 文 · 之 七 · 已 上 线</div>
+<a href="/sde-education/the-set-counterpart/" style="color:#F5EDE2;text-decoration:none">
+<div style="font-size:21px;font-weight:700;line-height:1.7;margin-bottom:8px">设对</div>
+<div style="font-size:15.5px;line-height:1.95;color:#D6C6B2">「这样做让他更好了」——好过谁？本文提出：任何一次比较性判断都在另一侧放了一样东西，而那样东西有时是人，有时是统计构造，有时根本不存在，三家的记录里都不为它设字段。九十五条现行游泳世界纪录的检验里，二〇〇八至二〇〇九那两年是一座孤岛。约 2.2 万字。</div></a>
+</div>
+<a href="/sde-education/" style="display:inline-block;padding:12px 25px;border:1px solid #D9A566;border-radius:28px;color:#F0C08A;text-decoration:none;font-weight:700">进入 SDE教育学 →</a></div></section>
+
+<!-- 内卷与出路专栏 -->
+<section id="involution-feature" style="padding:74px 22px;background:linear-gradient(148deg,#08282A,#0E3A3C 58%,#123033);color:#EAF1EE">
+<div style="max-width:1060px;margin:auto;text-align:center">
+<div style="font-size:12px;letter-spacing:.44em;color:#D8973C;margin-bottom:18px">新 专 栏 · 王 德 生 · 开 栏 基 座 十 章</div>
+<h2 style="font-family:'Noto Serif SC',serif;font-size:clamp(38px,6vw,66px);margin:0 0 18px">内卷与出路</h2>
+<p style="max-width:840px;margin:0 auto 24px;font-size:18px;line-height:2;color:#CBD8D4">内卷不是竞争太狠，而是 <b style="color:#7FD3C9">0—1 发生窗口</b>缺席之后，价值递减仍被滞留在原地。本栏每篇只做两件事：先把某个具体场域的内卷写成一条<b style="color:#7FD3C9">可以被推翻的机制</b>——它靠什么自我繁殖、在哪一步价值开始递减、这段递减最后由谁买单；再给出那个场域里能落地的出路——不是更快更狠更长，而是把 0—1 的发生窗口重新装回制度、课程与日程里。</p>
+<div style="display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-bottom:26px">
+<span style="border:1px solid rgba(216,151,60,.55);border-radius:22px;padding:7px 17px;font-size:13px;color:#E6D9C4">不收抱怨</span>
+<span style="border:1px solid rgba(216,151,60,.55);border-radius:22px;padding:7px 17px;font-size:13px;color:#E6D9C4">不收口号</span>
+<span style="border:1px solid rgba(216,151,60,.55);border-radius:22px;padding:7px 17px;font-size:13px;color:#E6D9C4">每篇自带证伪条件</span>
+<span style="border:1px solid rgba(216,151,60,.55);border-radius:22px;padding:7px 17px;font-size:13px;color:#E6D9C4">出路要能落到日程上</span></div>
+<div style="max-width:880px;margin:0 auto 16px;border:1px solid rgba(47,140,134,.42);border-radius:14px;padding:22px 26px;background:rgba(47,140,134,.09);text-align:left">
+<div style="font-size:11.5px;letter-spacing:.26em;color:#7FC5BD;margin-bottom:11px">开 栏 基 座 · 第 五 章 · 场 景</div>
+<a href="/books/involution/education/" style="text-decoration:none"><div style="font-size:clamp(19px,3vw,26px);font-weight:700;color:#F0F5F3;line-height:1.5">教育内卷与出路：递减滞留、发生窗口与再生教育学</div>
+<div style="font-size:15px;color:#CBD8D4;margin-top:9px;line-height:1.9">教育不是内卷最严重的行业，而是内卷的总病灶——因为它决定一个社会如何理解成长、如何分配未来。</div></a>
+</div>
+<div style="max-width:880px;margin:0 auto 16px;border:1px solid rgba(47,140,134,.42);border-radius:14px;padding:22px 26px;background:rgba(47,140,134,.09);text-align:left">
+<div style="font-size:11.5px;letter-spacing:.26em;color:#7FC5BD;margin-bottom:11px">开 栏 基 座 · 第 七 章 · 场 景</div>
+<a href="/books/involution/research/" style="text-decoration:none"><div style="font-size:clamp(19px,3vw,26px);font-weight:700;color:#F0F5F3;line-height:1.5">基于 AEI 的科研内卷与出路</div>
+<div style="font-size:15px;color:#CBD8D4;margin-top:9px;line-height:1.9">论文仍在增长，原创却在稀薄——高产而无生，是科研内卷的准确画像。</div></a>
+</div>
+<div style="max-width:880px;margin:0 auto 16px;border:1px solid rgba(47,140,134,.42);border-radius:14px;padding:22px 26px;background:rgba(47,140,134,.09);text-align:left">
+<div style="font-size:11.5px;letter-spacing:.26em;color:#7FC5BD;margin-bottom:11px">开 栏 基 座 · 第 一 章 · 原 理</div>
+<a href="/books/involution/marginal-utility/" style="text-decoration:none"><div style="font-size:clamp(19px,3vw,26px);font-weight:700;color:#F0F5F3;line-height:1.5">边际效用递减原理：SIO 发生学证明</div>
+<div style="font-size:15px;color:#CBD8D4;margin-top:9px;line-height:1.9">效用不是满足度，而是意义体验；递减不是欲望疲劳，而是意义输入的条件被价值持续削减。</div></a>
+</div>
+<a href="/involution/" style="display:inline-block;margin-top:10px;padding:12px 25px;border:1px solid #2F8C86;border-radius:28px;color:#7FD3C9;text-decoration:none;font-weight:700">进入内卷与出路 →</a></div></section>
+
+<!-- 典范文专栏 -->
+
+
+<!-- TODAY'S LONG READ 今日长文 -->
+<!-- today-longread：2026-08-18 起两条 feed 只在 /today/ 一处维护（原来首页与 /today/ 两份并存，/today/ 那份长期落后几十条）。这一页是总览长卷，不再养 feed，去处见上面「今日文章」区。 -->
+<section id="i-culture" style="position:relative;background:radial-gradient(ellipse at 50% 18%,#2E1212 0%,#1F0C0C 52%,#140808 100%);border-bottom:1px solid rgba(176,138,46,0.3);padding:78px 24px;overflow:hidden;scroll-margin-top:70px">
+  <div style="max-width:1000px;margin:0 auto;position:relative;z-index:2">
+    <div style="text-align:center">
+      <div class="zh-only" style="font-size:12.5px;letter-spacing:0.42em;color:#D9B45B;margin-bottom:16px">德麦国际 · 中华文化专著 · SDE 本体论</div>
+      <div class="en-only" style="font-size:12.5px;letter-spacing:0.42em;color:#D9B45B;margin-bottom:16px">DEMAI INTL · A MONOGRAPH ON CHINESE CULTURE · SDE</div>
+      <div class="zh-only" style="font-size:clamp(34px,6.4vw,60px);font-weight:800;color:#FAF3E8;letter-spacing:0.12em;line-height:1.1"><span style="color:#E7A48C">「</span>我<span style="color:#E7A48C">」</span>专栏</div>
+      <div class="en-only" style="font-size:clamp(28px,5vw,46px);font-weight:800;color:#FAF3E8;letter-spacing:0.06em;line-height:1.15">The &ldquo;I&rdquo; Column</div>
+      <div class="zh-only" style="font-size:clamp(14px,2.4vw,17px);color:#E7CFA8;margin-top:18px;line-height:1.75">我文化 ＝ 三号位九宫格文化 · 三大工程协奏可继续性<br>人情稳「时」· 面子稳「场」· 子孙稳「代」· 病理学诊断「递弱代偿」</div>
+      <div class="en-only" style="font-size:clamp(14px,2.4vw,17px);color:#E7CFA8;margin-top:18px;line-height:1.75">Selfhood as a nine-cell ontology, stabilized by three engines — relationship / face / lineage — with a pathology of degenerative compensation.</div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:40px">
+      <a href="/column/renqing/" style="display:block;text-decoration:none;background:rgba(32,14,14,0.72);border:1px solid rgba(190,74,74,0.5);border-radius:9px;padding:24px 26px;box-shadow:0 0 0 1px rgba(190,74,74,0.1) inset">
+        <div style="font-size:11.5px;letter-spacing:0.22em;color:#D9A47E;margin-bottom:11px">① 一号分位 · 稳「时」· 约 2 万字</div>
+        <div class="zh-only" style="font-size:clamp(20px,3vw,24px);font-weight:800;color:#FAF3E8;letter-spacing:0.03em">「我」文化下的人情工程</div>
+        <div class="en-only" style="font-size:clamp(18px,2.6vw,21px);font-weight:800;color:#FAF3E8">Relationship Engineering</div>
+        <div class="zh-only" style="font-size:13.5px;color:#CBA98E;margin-top:11px;line-height:1.8">人情是时间维度的续航装置：E 点火·D 运行·S 固化；「礼尚往来」与「礼轻情义重」两定理，终以三问验收。</div>
+        <div class="en-only" style="font-size:13.5px;color:#CBA98E;margin-top:11px;line-height:1.8">Human feeling as a time-axis engine that keeps relations from breaking — with two theorems and a three-question audit.</div>
+        <div style="margin-top:14px;font-size:12.5px;color:#E7A48C;font-weight:700">阅读全文 · 📖 网页 / 📄 PDF / ⬇ 下载 →</div>
+      </a>
+      <a href="/column/face/" style="display:block;text-decoration:none;background:rgba(30,20,10,0.72);border:1px solid rgba(176,138,46,0.5);border-radius:9px;padding:24px 26px;box-shadow:0 0 0 1px rgba(176,138,46,0.1) inset">
+        <div style="font-size:11.5px;letter-spacing:0.22em;color:#E4C878;margin-bottom:11px">② 二号分位 · 稳「场」· 约 4 万字</div>
+        <div class="zh-only" style="font-size:clamp(20px,3vw,24px);font-weight:800;color:#FAF3E8;letter-spacing:0.03em">「我」文化与面子工程</div>
+        <div class="en-only" style="font-size:clamp(18px,2.6vw,21px);font-weight:800;color:#FAF3E8">Face Engineering</div>
+        <div class="zh-only" style="font-size:13.5px;color:#D6BE94;margin-top:11px;line-height:1.8">面子是外场三号位美结构的稳定化；从过年、婚礼到国家叙事，同一 E-D-S 引擎跑通小我—中我—大我。</div>
+        <div class="en-only" style="font-size:13.5px;color:#D6BE94;margin-top:11px;line-height:1.8">Face as the stabilized aesthetic structure of the outer field — one engine across self, family and nation.</div>
+        <div style="margin-top:14px;font-size:12.5px;color:#E4C878;font-weight:700">阅读全文 · 📖 网页 / 📄 PDF / ⬇ 下载 →</div>
+      </a>
+      <a href="/column/lineage/" style="display:block;text-decoration:none;background:rgba(32,14,14,0.72);border:1px solid rgba(190,74,74,0.5);border-radius:9px;padding:24px 26px;box-shadow:0 0 0 1px rgba(190,74,74,0.1) inset">
+        <div style="font-size:11.5px;letter-spacing:0.22em;color:#D9A47E;margin-bottom:11px">③ 三号分位 · 稳「代」· 约 3.5 万字</div>
+        <div class="zh-only" style="font-size:clamp(20px,3vw,24px);font-weight:800;color:#FAF3E8;letter-spacing:0.03em">「我文化」下的子孙工程</div>
+        <div class="en-only" style="font-size:clamp(18px,2.6vw,21px);font-weight:800;color:#FAF3E8">Lineage Engineering</div>
+        <div class="zh-only" style="font-size:13.5px;color:#CBA98E;margin-top:11px;line-height:1.8">共存不是温情、结构不是等级、和谐不是沉默；面对迁徙与少子化，重建「可回流的远程共存」。</div>
+        <div class="en-only" style="font-size:13.5px;color:#CBA98E;margin-top:11px;line-height:1.8">Cross-generational structure: rebuilding a &ldquo;returnable&rdquo; co-existence against migration and low fertility.</div>
+        <div style="margin-top:14px;font-size:12.5px;color:#E7A48C;font-weight:700">阅读全文 · 📖 网页 / 📄 PDF / ⬇ 下载 →</div>
+      </a>
+      <a href="/column/pathology/" style="display:block;text-decoration:none;background:linear-gradient(180deg,rgba(58,18,18,0.8),rgba(30,12,12,0.72) 60%);border:1px solid rgba(210,90,74,0.6);border-radius:9px;padding:24px 26px;box-shadow:0 0 0 1px rgba(210,90,74,0.12) inset">
+        <div style="font-size:11.5px;letter-spacing:0.22em;color:#EAA089;margin-bottom:11px">④ 病理与纠偏 · 递弱代偿的崩塌链 · 约 4 万字</div>
+        <div class="zh-only" style="font-size:clamp(20px,3vw,24px);font-weight:800;color:#FAF3E8;letter-spacing:0.03em">我文化的病理学</div>
+        <div class="en-only" style="font-size:clamp(18px,2.6vw,21px);font-weight:800;color:#FAF3E8">A Pathology of &ldquo;I&rdquo;-Culture</div>
+        <div class="zh-only" style="font-size:13.5px;color:#E0B4A2;margin-top:11px;line-height:1.8">三工程倒置则九宫格塌陷：债务化人情 × 内卷化面子 × 断裂化子孙，合流为递弱代偿的自毁闭环。</div>
+        <div class="en-only" style="font-size:13.5px;color:#E0B4A2;margin-top:11px;line-height:1.8">When the three engines invert: debt, involution and rupture converge into a self-destroying loop.</div>
+        <div style="margin-top:14px;font-size:12.5px;color:#EAA089;font-weight:700">阅读全文 · 📖 网页 / 📄 PDF / ⬇ 下载 →</div>
+      </a>
+    </div>
+    <div style="text-align:center;margin-top:36px">
+      <a href="/i-culture/" style="display:inline-block;background:#BE4A4A;color:#fff;font-weight:700;font-size:15px;letter-spacing:0.06em;padding:13px 36px;border-radius:6px;text-decoration:none"><span class="zh-only">进入「我」专栏 · 看全书架构 →</span><span class="en-only">Enter the &ldquo;I&rdquo; Column →</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- DAILY UPDATES -->
+
+
+<!-- daily：2026-08-18 起两条 feed 只在 /today/ 一处维护（原来首页与 /today/ 两份并存，/today/ 那份长期落后几十条）。这一页是总览长卷，不再养 feed，去处见上面「今日文章」区。 -->
+<section id="master">
+<div class="sec-open"><a href="/master/"><span class="zh-only">进入专栏 →</span><span class="en-only">Open column →</span></a></div>
+  <div class="masters-wrap">
+    <div class="masters-head">
+      <div class="masters-eyebrow zh-only">解构大师 · 王博士与 SDE 专栏</div>
+      <div class="masters-eyebrow en-only">Deconstruction Master · Dr. Wang × SDE</div>
+      <h2 class="masters-title zh-only">用发生学的眼，解构思想史上的巨人</h2>
+      <h2 class="masters-title en-only">Deconstructing the giants of thought, through the eyes of generativics</h2>
+      <p class="masters-tag zh-only">带着敬意的精确——先把对手扶到最强，再指出他那记重拳，偏了几度。这里不抬杠，也不膜拜：每一篇，都找到一位巨人思想里最承重的那道接缝，看清它怎么拼、哪里拼歪、歪掉的这一处又如何决定了整座建筑的形状。每篇配三种读法：长文阅读、在线 PDF 阅读、下载阅读。</p>
+      <p class="masters-tag en-only">Precision with respect — first raise the opponent to his strongest, then show by how many degrees his punch missed. No quarrel, no worship: each piece finds the load-bearing seam in a giant's thought and shows how that one crooked joint decides the shape of the whole edifice. Each comes in three reading modes: long-form, online PDF, and download.</p>
+    </div>
+
+    <div id="masters-grid" class="masters-grid"></div>
+
+    <div class="masters-more">
+      <a href="/column/deconstruction-master/" class="masters-more-btn zh-only">往期全集 · 全部解构 →</a>
+      <a href="/column/deconstruction-master/" class="masters-more-btn en-only">Full Archive · All Deconstructions →</a>
+    </div>
+  </div>
+
+  <script src="/js/home-1.js" defer></script>
+</section>
+<!-- MATRIX (S-layer: 99 industry employees) -->
+
+<!-- MONOGRAPH DIGEST COLUMN -->
+<section id="monograph" style="background:#1A1410;padding:88px 24px;text-align:center;scroll-margin-top:70px">
+<div class="sec-open"><a href="/monographs/"><span class="zh-only">进入专栏 →</span><span class="en-only">Open column →</span></a></div>
+<div style="max-width:820px;margin:0 auto 56px">
+  <div class="zh-only" style="font-size:13px;letter-spacing:0.5em;color:#D4B25E">专 著 栏 目</div>
+  <div class="en-only" style="font-size:13px;letter-spacing:0.5em;color:#D4B25E">MONOGRAPHS</div>
+  <div style="width:56px;height:2px;background:rgba(212,178,94,0.5);margin:18px auto 0"></div>
+</div>
+<div style="max-width:820px;margin:0 auto">
+  <div class="zh-only" style="font-size:12.5px;letter-spacing:0.45em;color:#D4B25E;margin-bottom:22px">新书发布 · 专著摘要导读</div>
+  <div class="en-only" style="font-size:12.5px;letter-spacing:0.45em;color:#D4B25E;margin-bottom:22px">NEW MONOGRAPH · DIGEST &amp; PREVIEW</div>
+  <h2 style="font-size:clamp(26px,4.2vw,38px);color:#EDE4CF;font-weight:700;letter-spacing:0.04em;margin:0"><a href="/books/sde-ontology-intro/" style="color:inherit;text-decoration:none">《SDE本体论入门》</a></h2>
+  <div style="font-size:clamp(16px,2.4vw,21px);color:#D4B25E;margin-top:12px;letter-spacing:0.14em">世界是如何发生的</div>
+  <p class="zh-only" style="color:#B4A780;max-width:620px;margin:28px auto 0;line-height:1.9;font-size:16px;text-align:justify">把人类的根本追问从"世界是什么"换成"世界如何发生"。39万字，14篇63章：从发现范式的黄昏，到三维发生学的完整地基；从与怀特海、德里达、儒佛道的正面对话，到数学伞模型、教育、艺术、癌症猜想与 AI 时代的落地。终章将全书六个颠覆焊成一根主线——发现范式的六张面孔。</p>
+  <p class="en-only" style="color:#B4A780;max-width:620px;margin:28px auto 0;line-height:1.9;font-size:16px">A 390,000-character introduction to SDE ontology in 14 parts and 63 chapters — replacing "what the world is" with "how the world comes to be." Digest and 509-page preview edition now available.</p>
+  <div style="margin-top:40px;display:flex;gap:16px;justify-content:center;flex-wrap:wrap">
+    <a href="/books/sde-ontology-intro/" class="zh-only" style="display:inline-block;padding:13px 34px;background:#D4B25E;color:#1A1410;font-weight:700;letter-spacing:0.1em;font-size:15px">阅读摘要导读 →</a>
+    <a href="/books/sde-ontology-intro/" class="en-only" style="display:inline-block;padding:13px 34px;background:#D4B25E;color:#1A1410;font-weight:700;letter-spacing:0.1em;font-size:15px">Read the Digest →</a>
+    <a href="https://books.sdeuniverses.com/SDE-Ontology-Intro-Preview-2026.pdf" target="_blank" class="zh-only" style="display:inline-block;padding:13px 34px;border:1px solid #D4B25E;color:#D4B25E;letter-spacing:0.1em;font-size:15px" download="SDE-Ontology-Intro-Preview.pdf">下载试读版（509页）</a>
+    <a href="https://books.sdeuniverses.com/SDE-Ontology-Intro-Preview-2026.pdf" target="_blank" class="en-only" style="display:inline-block;padding:13px 34px;border:1px solid #D4B25E;color:#D4B25E;letter-spacing:0.1em;font-size:15px" download="SDE-Ontology-Intro-Preview.pdf">Download Preview (509 pp.)</a>
+  </div>
+</div>
+
+  <div style="max-width:820px;margin:56px auto 0;padding-top:40px;border-top:1px solid rgba(212,178,94,0.25)">
+    <div class="zh-only" style="font-size:12px;letter-spacing:0.4em;color:#D4B25E;margin-bottom:24px">同系列专著导读</div>
+    <div class="en-only" style="font-size:12px;letter-spacing:0.4em;color:#D4B25E;margin-bottom:24px">MORE MONOGRAPHS</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;text-align:left">
+      <a href="/books/lion-city-glory/" style="display:flex;gap:16px;align-items:center;background:#161B10;border:1px solid rgba(168,118,60,0.34);padding:18px;border-radius:3px">
+        <img src="/students/qin-li/lion-city-glory/lcg-cover.jpg" alt="狮城荣耀 封面" style="width:58px;height:82px;object-fit:cover;flex:0 0 auto;border-radius:2px;box-shadow:0 6px 16px rgba(0,0,0,0.5)" loading="lazy" decoding="async">
+        <div>
+          <div style="color:#EFEBDF;font-size:16px;font-weight:700;letter-spacing:0.02em">狮城荣耀 · 长篇小说</div>
+          <div style="color:#C79350;font-size:12.5px;margin-top:5px;line-height:1.5">斐索（秦莉）著 · 五卷三十章 · 约 21.6 万字</div>
+          <div style="color:#8A8B70;font-size:12px;margin-top:6px">书页 · 服役进程 · 412 页在线翻页阅读 →</div>
+        </div>
+      </a>
+      <a href="/books/logic/" style="display:flex;gap:16px;align-items:center;background:#14162A;border:1px solid rgba(107,118,200,0.30);padding:18px;border-radius:3px">
+        <img src="/books/covers/14.jpg" alt="SIO逻辑学导论 封面" style="width:58px;height:82px;object-fit:cover;flex:0 0 auto;border-radius:2px;box-shadow:0 6px 16px rgba(0,0,0,0.4)" loading="lazy" decoding="async">
+        <div>
+          <div style="color:#E6E7F5;font-size:16px;font-weight:700;letter-spacing:0.02em">SIO 逻辑学导论</div>
+          <div style="color:#8F9AD8;font-size:12.5px;margin-top:5px;line-height:1.5">三公理立宪 · 发生／发展／形成三道归位</div>
+          <div style="color:#6E76A8;font-size:12px;margin-top:6px">封面 · 出版信息 · 全书在线阅读 →</div>
+        </div>
+      </a>
+      <a href="/books/buddhism-sde/" style="display:flex;gap:16px;align-items:center;background:#211A12;border:1px solid rgba(212,178,94,0.28);padding:18px;border-radius:3px">
+        <img src="/books/buddhism-sde/cover-front.jpg" alt="佛法的SDE解构导论 封面" style="width:58px;height:82px;object-fit:cover;flex:0 0 auto;border-radius:2px;box-shadow:0 6px 16px rgba(0,0,0,0.4)" loading="lazy" decoding="async">
+        <div>
+          <div style="color:#EDE4CF;font-size:16px;font-weight:700;letter-spacing:0.02em">佛法的 SDE 解构导论</div>
+          <div style="color:#C9A15A;font-size:12.5px;margin-top:5px;line-height:1.5">缘起性空=S=F(D,E) · 空 · 无我 · 涅槃</div>
+          <div style="color:#9A855C;font-size:12px;margin-top:6px">封面 · 出版信息 →</div>
+        </div>
+      </a>
+      <a href="/books/redology/" style="display:flex;gap:16px;align-items:center;background:#211010;border:1px solid rgba(217,138,106,0.28);padding:18px;border-radius:3px">
+        <img src="/books/redology/cover.svg" alt="SDE红学 封面" style="width:58px;height:87px;flex:0 0 auto;border-radius:2px;box-shadow:0 6px 16px rgba(0,0,0,0.4)" loading="lazy" decoding="async">
+        <div>
+          <div style="color:#F3E0D2;font-size:16px;font-weight:700;letter-spacing:0.02em">SDE 红学</div>
+          <div style="color:#D98A6A;font-size:12.5px;margin-top:5px;line-height:1.5">情悲发生学与空化解释学 · 情不肯被空收编</div>
+          <div style="color:#A66450;font-size:12px;margin-top:6px">封面 · 出版信息 · 在线阅读 →</div>
+        </div>
+      </a>
+      <a href="/books/art-theory/" style="display:flex;gap:16px;align-items:center;background:#111826;border:1px solid rgba(143,169,214,0.28);padding:18px;border-radius:3px">
+        <img src="/books/art-theory/cover.svg" alt="SDE艺术论 封面" style="width:58px;height:87px;flex:0 0 auto;border-radius:2px;box-shadow:0 6px 16px rgba(0,0,0,0.4)" loading="lazy" decoding="async">
+        <div>
+          <div style="color:#E4EAF5;font-size:16px;font-weight:700;letter-spacing:0.02em">SDE 艺术论</div>
+          <div style="color:#8FA9D6;font-size:12.5px;margin-top:5px;line-height:1.5">幸福律与三号位发生 · 艺术如何发生</div>
+          <div style="color:#6E86B0;font-size:12px;margin-top:6px">封面 · 出版信息 →</div>
+        </div>
+      </a>
+      <a href="/books/involution/" style="display:flex;gap:16px;align-items:center;background:#0C1F1E;border:1px solid rgba(63,160,160,0.30);padding:18px;border-radius:3px">
+        <img src="/books/covers/38.jpg" alt="内卷与突围 封面" style="width:58px;height:87px;object-fit:cover;flex:0 0 auto;border-radius:2px;box-shadow:0 6px 16px rgba(0,0,0,0.4)" loading="lazy" decoding="async">
+        <div>
+          <div style="color:#EAF7F5;font-size:16px;font-weight:700;letter-spacing:0.02em">内卷与突围</div>
+          <div style="color:#5FBFB8;font-size:12.5px;margin-top:5px;line-height:1.5">十章 27 万字全书在线 · 递减 × 膨胀 × 发生窗口</div>
+          <div style="color:#4A9090;font-size:12px;margin-top:6px">全书目录 · 在线阅读 →</div>
+        </div>
+      </a>
+      <a href="/books/daodejing/" style="display:flex;gap:16px;align-items:center;background:#0A211F;border:1px solid rgba(28,169,140,0.30);padding:18px;border-radius:3px">
+        <img src="/books/daodejing/cover.svg" alt="道德经SDE解构导论 封面" style="width:58px;height:87px;flex:0 0 auto;border-radius:2px;box-shadow:0 6px 16px rgba(0,0,0,0.4)" loading="lazy" decoding="async">
+        <div>
+          <div style="color:#EAF7F2;font-size:16px;font-weight:700;letter-spacing:0.02em">道德经 SDE 解构导论</div>
+          <div style="color:#5FBFA8;font-size:12.5px;margin-top:5px;line-height:1.5">道 = SDE · 28.6万字全经八十一章解构</div>
+          <div style="color:#4A9080;font-size:12px;margin-top:6px">在线阅读 · 出版信息 →</div>
+        </div>
+      </a>
+    </div>
+  </div>
+
+<!-- DEMAI INTERNATIONAL PRESS 德麦专著（并入专著栏目） -->
+<div id="demai-press" style="max-width:1100px;margin:72px auto 0;padding-top:64px;border-top:1px solid rgba(212,178,94,0.25);scroll-margin-top:70px;text-align:left">
+<div style="max-width:1100px;margin:0 auto">
+  <div style="text-align:center;margin-bottom:8px">
+    <div class="zh-only" style="font-size:12.5px;letter-spacing:0.45em;color:#D4B25E;margin-bottom:18px">德 麦 专 著 · DEMAI INTERNATIONAL PRESS</div>
+    <div class="en-only" style="font-size:12.5px;letter-spacing:0.45em;color:#D4B25E;margin-bottom:18px">DEMAI INTERNATIONAL PRESS</div>
+    <h2 class="zh-only" style="font-size:clamp(26px,4.2vw,40px);color:#EDE4CF;font-weight:700;letter-spacing:0.03em;margin:0">德麦国际出版的跨域专著</h2>
+    <h2 class="en-only" style="font-size:clamp(26px,4.2vw,40px);color:#EDE4CF;font-weight:700;letter-spacing:0.03em;margin:0">Cross-Domain Monographs from Demai International Press</h2>
+    <p class="zh-only" style="color:#B4A780;max-width:680px;margin:24px auto 0;line-height:1.9;font-size:15.5px">德麦国际有限公司（Demai International Pte. Ltd.，新加坡）以 SDE 发生学为共同底盘，已出版三十余部跨越约二十个学科的专著，全部经 Bowker 注册、可按 ISBN 查询。点击任一封面，进入该书的详细介绍。</p>
+    <p class="en-only" style="color:#B4A780;max-width:680px;margin:24px auto 0;line-height:1.9;font-size:15.5px">Demai International Pte. Ltd. (Singapore) has published thirty-plus monographs across some twenty disciplines, all sharing the SDE generative framework and all registered and verifiable on Bowker by ISBN. Click any cover to open that book.</p>
+  </div>
+  <div id="pressFilter" style="text-align:center;margin:34px 0 30px"></div>
+  <div id="pressGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(128px,1fr));gap:20px 16px"></div>
+  <div style="text-align:center;margin-top:48px">
+    <a href="/philosophy/#books" class="zh-only" style="display:inline-block;padding:13px 34px;background:#D4B25E;color:#12100C;font-weight:700;letter-spacing:0.1em;font-size:15px">进入专著全景页 →</a>
+<a href="/books/" class="zh-only" style="display:inline-block;margin-left:12px;padding:13px 34px;border:1px solid rgba(212,178,94,0.75);color:#D4B25E;font-weight:700;letter-spacing:0.1em;font-size:15px">专著总目 · 66 部 →</a>
+    <a href="/philosophy/#books" class="en-only" style="display:inline-block;padding:13px 34px;background:#D4B25E;color:#12100C;font-weight:700;letter-spacing:0.1em;font-size:15px">Full Publications Page →</a>
+<a href="/books/" class="en-only" style="display:inline-block;margin-left:12px;padding:13px 34px;border:1px solid rgba(212,178,94,0.75);color:#D4B25E;font-weight:700;letter-spacing:0.1em;font-size:15px">Full Catalogue · 66 titles →</a>
+  </div>
+</div>
+<script src="/js/home-2.js" defer></script>
+</div>
+</section>
+
+<!-- AUTHOR MINI -->
+<section id="author">
+<div class="author-inner">
+  <div class="author-portrait">王德生<br>Wang<br>Desheng</div>
+  <div class="author-info">
+    <h3 class="zh-only">王德生 博士 · 思想建筑师</h3>
+    <h3 class="en-only">Dr. Wang Desheng · Architect of Thought</h3>
+    <div class="tagline zh-only">SIO 本体论 · SDE 发生学创立者</div>
+    <div class="tagline en-only">Founder of SIO Ontology & SDE Generativics</div>
+    <p class="zh-only">计算数学博士（中国科学院）· 中国科学院博士后（与哥大杜强合作）· 新加坡南洋理工大学 13 年博导 · Demai International 创始人</p>
+    <p class="en-only">PhD Computational Mathematics (CAS) · CAS Postdoc (with Qiang Du of Columbia) · 13 years as PhD supervisor at NTU Singapore · Founder of Demai International</p>
+    <div class="meta zh-only">47 篇国际顶刊论文 · 55+ 部跨域专著 · Bowker authorID 26927366 · ORCID 0009-0009-8196-0030</div>
+    <div class="meta en-only">47 top-tier journal papers · 55+ monographs · Bowker authorID 26927366 · ORCID 0009-0009-8196-0030</div>
+  </div>
+  <a href="/philosophy/#about" class="author-link zh-only">完整学术履历 →</a>
+  <a href="/philosophy/#about" class="author-link en-only">Full Academic Profile →</a>
+</div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+<div class="footer-inner">
+  <div class="footer-brand">
+    <h4><span class="fb-word"><span class="fb-en">SDE Universes</span><span class="fb-cn">爱思乐园</span></span></h4>
+    <p class="zh-only">SDE 智能体集群。SDE 发生学锻造引擎驱动，理论背书，由王德生创立，Demai International 运营，新加坡为基地，面向全球。</p>
+    <p class="en-only">The SDE agent cluster, powered by the SDE Generativics forging engine, theory-backed. Founded by Wang Desheng, operated by Demai International, based in Singapore.</p>
+  </div>
+  <div class="footer-col">
+    <h4 class="zh-only">平台</h4><h4 class="en-only">Platform</h4>
+    <ul>
+      <li><a href="/about/" class="zh-only">平台介绍</a><a href="/about/" class="en-only">About the Platform</a></li>
+      <li><a href="/taste/sde-writing/" class="zh-only">SDE 作文共创</a><a href="/taste/sde-writing/" class="en-only">SDE Writing Lab</a></li>
+      <li><a href="/taste/book-club/" class="zh-only">SDE 共读一本书</a><a href="/taste/book-club/" class="en-only">Read a Book with SDE</a></li>
+      <li><a href="/challenge/" class="zh-only">每日思想挑战</a><a href="/challenge/" class="en-only">Daily Challenge</a></li>
+      <li><a href="/training/" class="zh-only">30天健脑训练</a><a href="/training/" class="en-only">30-Day Training</a></li>
+      <li><a href="/growth-tree/" class="zh-only">思想成长树</a><a href="/growth-tree/" class="en-only">Growth Tree</a></li>
+      <li><a href="/master/" class="zh-only">解构大师</a><a href="/master/" class="en-only">Deconstruction Master</a></li>
+      <li><a href="/mentor/" class="zh-only">师范文</a><a href="/mentor/" class="en-only">Model Essays</a></li>
+      <li><a href="/students/" class="zh-only">学员专栏</a><a href="/students/" class="en-only">Students</a></li>
+      <li><a href="/recruit/" class="zh-only">学徒招募 · 合作开发智能体平台</a><a href="/recruit/" class="en-only">Apprenticeship · Co-Development</a></li>
+      <li><a href="/meeting/" class="zh-only">SDE 讲堂 · 直播</a><a href="/meeting/" class="en-only">SDE Lecture Hall</a></li>
+      <li><a href="/discussions/" class="zh-only">论文讨论区</a><a href="/discussions/" class="en-only">Discussions</a></li>
+      <li><a href="/sde-talk/" class="zh-only">SDE讨论（群聊）</a><a href="/sde-talk/" class="en-only">SDE Talk</a></li>
+      <li><a href="/sde-wechat/" class="zh-only">SDE 社区（群聊·私聊）</a><a href="/sde-wechat/" class="en-only">SDE Community</a></li>
+    </ul>
+  </div>
+  <div class="footer-col">
+    <h4 class="zh-only">思想</h4><h4 class="en-only">Thought</h4>
+    <ul>
+      <li><a href="/philosophy/#sde" class="zh-only">SDE 发生学</a><a href="/philosophy/#sde" class="en-only">SDE Generativics</a></li>
+      <li><a href="/philosophy/#laws" class="zh-only">意义三律</a><a href="/philosophy/#laws" class="en-only">Three Axioms</a></li>
+      <li><a href="/philosophy/#books" class="zh-only">55+ 部专著</a><a href="/philosophy/#books" class="en-only">55+ Monographs</a></li>
+      <li><a href="/philosophy/#vision" class="zh-only">意义文明</a><a href="/philosophy/#vision" class="en-only">Civilization of Meaning</a></li>
+    </ul>
+  </div>
+  <div class="footer-col">
+    <h4 class="zh-only">联系</h4><h4 class="en-only">Contact</h4>
+    <ul>
+      <li><a href="mailto:desheng@sdeuniverses.com">desheng@sdeuniverses.com</a></li>
+      <li><a href="/philosophy/#about" class="zh-only">关于王德生</a><a href="/philosophy/#about" class="en-only">About Author</a></li>
+      <li><a href="https://www.myidentifiers.com" target="_blank">Bowker #26927366</a></li>
+    </ul>
+  </div>
+</div>
+<div class="footer-bottom">
+  <span>© 2026 Demai International Pte. Ltd. · Singapore</span>
+  <span>SDE Universes · 爱思乐园 · sdeuniverses.com</span>
+</div>
+</footer>
+
+<script src="/js/home-3.js" defer></script>
+<script src="/js/home-4.js" defer></script>
+<script src="/js/home-5.js" defer></script>
+
+<script src="/wds-mode.js?v=20260817c" defer></script>
+</body>
+</html>

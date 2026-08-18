@@ -67,13 +67,18 @@ ok("在 /browse/ 刷新照样不开门（这正是它有自己网址的意义）
 var BROWSE = (src.match(/var BROWSE = "([^"]+)"/) || [, ""])[1];
 ok("BROWSE 门牌是 /browse/，实得 " + BROWSE, BROWSE === "/browse/");
 var closeBody = (src.match(/function close\(\) \{[\s\S]*?\n    \}/) || [, ""])[0];
-ok("close() 里把地址换成 BROWSE", /history\.replaceState\(null, "", BROWSE\)/.test(closeBody));
-ok("换地址用 replaceState 而不是跳转（内容已在本页，跳转是白发一次请求）",
-   !/location\.href\s*=/.test(closeBody) && !/location\.assign/.test(closeBody) && !/location\.replace/.test(closeBody));
-/* 2026-08-01：底部那颗从「直接浏览」改成「平台介绍」，于是走 close() 的出口只剩两个。 */
-ok("两个出口共用同一个 close（入口卡「SDE 浏览」/ Esc）",
-   /if \(!href\) close\(\);/.test(src) &&
-   /e\.key === "Escape"[\s\S]{0,40}close\(\)/.test(src));
+/* 2026-08-18 口径变更（用户裁定「长滚动那页意义不大了」）：入口页拆成独立的轻量
+   HTML，这一层底下**不再有浏览页可揭**。于是旧的两条断言（close 里 replaceState、
+   不许出现 location.href）随口径作废——它们钉的正是"就地揭开"那套做法。
+   新口径下 close() 只剩一件事：离开这一页去 /browse/。 */
+ok("close() 是真的离开这一页去 BROWSE（不再是就地揭开）",
+   /location\.href = BROWSE;/.test(closeBody));
+ok("⚠ close() 里不再改地址栏冒充跳转（replaceState 那套已作废）",
+   !/replaceState/.test(closeBody));
+ok("走完退场动画再走（不硬切画面）", /setTimeout\(function \(\) \{[\s\S]{0,120}location\.href = BROWSE/.test(closeBody));
+ok("现在只剩 Esc 走 close（三个入口卡本身都是真 <a>）",
+   /e\.key === "Escape"[\s\S]{0,40}close\(\)/.test(src) &&
+   !/if \(!href\) close\(\);/.test(src));
 ok("⚠ 底部不再是「直接浏览」那颗按钮（旧口径必须从源码里消失）",
    !/skip\.onclick/.test(src) && !/createElement\("button"\)/.test(src));
 var ABOUT = (src.match(/var ABOUT = "([^"]+)"/) || [, ""])[1];
@@ -98,9 +103,12 @@ ok(".sdep-skip 挂到 <a> 上之后补了 inline-block 与去下划线",
 }
 {
   var W = fs.readFileSync(path.join(ROOT, "src", "worker.js"), "utf8");
-  ok("worker 认 /home/ 与 /browse/（带不带尾斜杠都认）",
-     /\/\^\\\/\(browse\|home\)\\\/\?\$\//.test(W));
-  ok("worker 是原地取根那份内容，不是 30x 跳转",
+  /* 2026-08-18：入口与浏览各是各的一页，worker 不再让两个地址取同一份 HTML。
+     /home/ 仍原地取根那一份（＝轻量入口页）；/browse/ 是真目录页，只在没有尾斜杠时补一下。 */
+  ok("worker 让 /home/（带不带尾斜杠）原地取根那一份", /\/\^\\\/home\\\/\?\$\//.test(W));
+  ok("worker 不再把 /browse/ 改写成根（它现在是真的一页）",
+     !/\(browse\|home\)/.test(W) && /url\.pathname === "\/browse"/.test(W));
+  ok("worker 仍是原地取内容，不是 30x 跳转",
      /assetReq = new Request\(new URL\("\/", url\), request\)/.test(W) &&
      !/browse[\s\S]{0,200}status:\s*30\d/.test(W));
   ok("改写后的请求确实喂给了 ASSETS", /env\.ASSETS\.fetch\(assetReq\)/.test(W));
@@ -178,7 +186,12 @@ console.log("[站内那颗回入口的 △ 也指同一个地址]");
 
 console.log("[三大功能体系的去处]");
 ok("三个入口，一个不多一个不少", NODES.length === 3, NODES.map(function (n) { return n.k; }).join("/"));
-ok("浏览＝就地揭开首页（不跳转，不再加载一次首页）", GO.browse === "");
+/* 旧断言「浏览＝就地揭开首页」随 2026-08-18 的拆分作废：当时不揭开就得再加载一次
+   893KB 的首页，所以宁可就地揭；现在入口页只有几 KB、浏览页只有几十 KB，
+   真跳转反而更省，而且三个入口终于形态一致（都能中键新开、右键复制）。 */
+ok("浏览 → /browse/（栏目总目录，真跳转）", GO.browse === "/browse/");
+ok("⚠ 三个入口没有一个是空去处了（空值＝就地揭开的旧做法）",
+   Object.keys(GO).every(function (k) { return !!GO[k]; }));
 ok("微信 → /sde-wechat/", GO.im === "/sde-wechat/");
 ok("对话 → /taste/chatsde/（更名后的正式门牌）", GO.wds === "/taste/chatsde/");
 ok("每个入口都有去处（GO 的键与 NODES 对得上）",
@@ -188,8 +201,8 @@ console.log("[接线]");
 ok("真的用 shouldOpen(readEnv()) 把关", /if \(!shouldOpen\(readEnv\(\)\)\) return;/.test(src));
 ok("⚠ 不再是「一会话只拦一次」那句老判断",
    !/if \(!FORCE && sessionStorage\.getItem\(KEY\)\) return;/.test(src));
-ok("两个出口（点入口 · Esc）都不再记账、也没留下空调用",
-   /a\.onclick = function \(\) \{ if \(!href\) close\(\); \}/.test(src) &&
+ok("入口卡不再挂 onclick（三个都是真链接，交给浏览器走），Esc 仍走 close",
+   !/a\.onclick =/.test(src) &&
    /e\.key === "Escape"\) \{ close\(\); \}/.test(src) &&
    !/ seen\(\);/.test(src));
 

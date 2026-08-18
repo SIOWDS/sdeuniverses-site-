@@ -121,9 +121,14 @@
     { k: "im", x: 12, y: 82, c: "#A981C4", icon: "\ud83d\udcac", zh: "SDE \u793e\u533a", en: "SDE Community",
       zhS: "\u7fa4\u804a \u00b7 \u79c1\u804a \u00b7 \u4f1a\u8bae \u00b7 \u5e7f\u573a", enS: "Groups \u00b7 DMs \u00b7 Meetings \u00b7 Plaza" },
   ];
-  var GO = { browse: "", im: "/sde-wechat/", wds: "/taste/chatsde/" };   // browse 留空＝就地揭开
-  // 浏览页的门牌。根地址 "/" 严格且唯一地属于入口页（第十二刀），所以揭开门之后
-  // 地址要换成这一个。worker 让 /browse/ 返回同一份首页 HTML，因此不必真的跳转。
+  /* 2026-08-18 用户裁定：长滚动的浏览页意义不大了（都是点栏目进的）。于是
+     入口页拆成独立的轻量 HTML（就是 public/index.html 这一页），/browse/ 换成
+     一页栏目总目录，旧长卷迁 /overview/。**「就地揭开」到此为止**——这一页
+     下面已经没有浏览页可揭了，三个入口从此一律是真链接（也因此都能中键新开、
+     右键复制）。旧口径省下的那一次加载，现在换成了进站不必先下 893KB。 */
+  var GO = { browse: "/browse/", im: "/sde-wechat/", wds: "/taste/chatsde/" };
+  // 浏览页的门牌。2026-08-18 起它是**真的一页**（public/browse/index.html，
+  // 栏目总目录），不再是"与首页同一份 HTML 的另一个地址"。
   var BROWSE = "/browse/";
   // 入口页的门牌。进站落在裸域名上时，地址栏改写成这一个——地址与页面一一对应，
   // 收藏 /home/ 拿到入口、收藏 /browse/ 拿到浏览页，各是各的。
@@ -689,7 +694,7 @@
       var sub = document.createElement("span");
       sub.className = "sdep-sub"; sub.textContent = T(n.zhS, n.enS);
       a.appendChild(wrap); a.appendChild(nm); a.appendChild(sub);
-      a.onclick = function () { if (!href) close(); };          // 浏览＝就地揭开，不跳转
+      // 三个入口都有真去处（GO 里一个空值都没有了），点击交给浏览器自己走
       stage.appendChild(a);
     });
     box.appendChild(stage);
@@ -731,18 +736,16 @@
       document.removeEventListener("keydown", onKey);
       window.removeEventListener("resize", drawRing);
       stopFire();                                   // 定时器不收，关掉了还在后台一阵一阵地烧
-      /* 揭开门＝进了浏览页，地址栏就该是浏览页自己的门牌。根地址是入口页的，
-         两者不能共用一个网址——否则收藏、分享、刷新拿到的都是"入口"，而人明明在浏览页。
-         走 replaceState 不跳转：内容本来就已经在这一页上，再发一次请求纯属浪费，
-         后退历史也不该多出一格（按后退该回到进站之前，不是回到门口）。
-         两个出口都经过这里：入口卡「SDE 浏览」与 Esc。底部那颗现在是「平台介绍」，
-         它是真跳转、不走 close()。 */
-      try {
-        if (window.history && history.replaceState) history.replaceState(null, "", BROWSE);
-      } catch (e) {}
+      /* 2026-08-18 起入口页是独立的一页，这一层底下已经没有浏览页了——
+         「关掉门」只能是**离开这一页去 /browse/**，不再是就地揭开 + 改地址栏。
+         现在只剩 Esc 走这里（入口卡「SDE 浏览」自己就是 <a href="/browse/">）。
+         先播完退场动画再走，免得画面硬切；用 location.href 而不是 replace，
+         按后退能回到门口——门本身现在也是一页正经的页面了。 */
       box.className = "sdep out";
       try { document.documentElement.style.overflow = ""; } catch (e) {}
-      setTimeout(function () { if (box.parentNode) box.parentNode.removeChild(box); }, 320);
+      setTimeout(function () {
+        try { location.href = BROWSE; } catch (e) {}
+      }, 300);
     }
     window.SDEPortal = { close: close, nodes: NODES };
   }

@@ -390,7 +390,7 @@ function render(){
   var L=el("agg-list");L.textContent="";
   if(!rows.length){
     var e=document.createElement("div");e.className="agg-empty";
-    e.innerHTML='还没有论文被讨论——挑一篇读，在文末写下第一条。<br><a href="/browse/#feed">去首页看最新长文</a>';
+    e.innerHTML='还没有论文被讨论——挑一篇读，在文末写下第一条。<br><a href="/today/">去首页看最新长文</a>';
     L.appendChild(e);el("agg-stat").textContent="";return;
   }
   var total=rows.reduce(function(s,r){return s+r.posts},0);

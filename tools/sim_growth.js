@@ -237,22 +237,32 @@ sec("④ 纪律");
   ok(/加强／重视／完善／优化/.test(read(PAGES.training)), "训练页没挡住「加强/重视/完善/优化」");
 }
 
-/* ══ ⑤ 首页挂载（铁律 3：孤儿页等于不存在） ══════ */
-sec("⑤ 首页挂载");
+/* ══ ⑤ 挂载（铁律 3：孤儿页等于不存在） ══════ */
+/* 2026-08-18 口径变更：长滚动首页拆开了——public/index.html 现在只是几 KB 的入口页，
+   长卷迁 /overview/、栏目卡片迁 /directory/、/browse/ 只剩顶栏栏目条＋今日三句。
+   所以这一节改成钉住**三件日课现在真正挂在哪儿**：长卷里那一段（带全文案与页脚链）
+   ＋ 目录页里那一组卡片。两处都没有，才叫孤儿。 */
+sec("⑤ 挂载（长卷 + 栏目总目录）");
 {
-  const idx = read("public/index.html");
-  ok(idx.indexOf('id="brain-gym"') > -1, "首页缺 brain-gym section");
-  ok(idx.indexOf('href="#brain-gym"') > -1, "子导航没有入口");
+  const ov = read("public/overview/index.html");
+  ok(ov.indexOf('id="brain-gym"') > -1, "总览长卷缺 brain-gym section");
+  ok(ov.indexOf("col-bgy") > -1, "子导航配色类没加");
   ["/challenge/", "/training/", "/growth-tree/"].forEach(u => {
-    ok(idx.indexOf('href="' + u + '"') > -1, "首页没有链到 " + u);
+    ok(ov.indexOf('href="' + u + '"') > -1, "长卷没有链到 " + u);
     /* 页脚也要有——爬虫看得见，不只靠 JS 注入 */
-    ok(new RegExp('<li><a href="' + u + '"').test(idx), "页脚缺 " + u + "（爬虫看不见）");
+    ok(new RegExp('<li><a href="' + u + '"').test(ov), "页脚缺 " + u + "（爬虫看不见）");
   });
-  ok(idx.indexOf("col-bgy") > -1, "子导航配色类没加");
-  /* 首页那段也不许承诺分数排行 */
-  const seg = idx.slice(idx.indexOf('id="brain-gym"'), idx.indexOf('id="brain-gym"') + 6000);
-  ok(/不做分数、不做排行榜|不做分数/.test(seg), "首页段没写明不做分数排行");
-  ok(/不烧 Key/.test(seg), "首页段没写明零门槛（不烧 Key）");
+  const seg = ov.slice(ov.indexOf('id="brain-gym"'), ov.indexOf('id="brain-gym"') + 6000);
+  ok(/不做分数、不做排行榜|不做分数/.test(seg), "长卷那段没写明不做分数排行");
+  ok(/不烧 Key/.test(seg), "长卷那段没写明零门槛（不烧 Key）");
+
+  const dir = read("public/directory/index.html");
+  ok(dir.indexOf('id="brain-gym"') > -1, "栏目总目录缺 brain-gym 那一组");
+  ["/challenge/", "/training/", "/growth-tree/"].forEach(u => {
+    ok(dir.indexOf('href="' + u + '"') > -1, "栏目总目录没有链到 " + u);
+  });
+  /* 目录页是卡片体例、没有长文案，但「不烧 Key」这条承诺仍须在 */
+  ok(/不烧 Key/.test(dir), "栏目总目录没写明零门槛（不烧 Key）");
 }
 
 console.log("\n" + PASS + " PASS / " + FAIL + " FAIL");
