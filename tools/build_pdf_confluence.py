@@ -175,7 +175,7 @@ def extract(page: Path):
     m = re.match(r"(学科通融)·([^·]+)·(.*)", series)
     series_no = f"{m.group(1)} · {m.group(2)}" if m else "学科通融"
     cross = m.group(3).replace("×", " × ") if m else ""
-    numbered = bool(re.match(r"之[一二三四五六七八九十]+$", m.group(2))) if m else False
+    numbered = bool(re.match(r"之[一二三四五六七八九十百千零〇]+$", m.group(2))) if m else False
 
     meta_raw = txt(".art-meta")
     author = "王德生 ＋ Claude"
