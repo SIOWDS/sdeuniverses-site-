@@ -3200,7 +3200,12 @@ async function ragScan(env, url, q, expTerms, prevQ, k, chunkLimit, opts) {
   const cut = chunkLimit || 1600;
   const o = opts || {};
   const PICK_DOCS = Math.max(6, Math.min(64, o.pick || 16));
-  const BYTE_BUDGET = Math.max(1000000, Math.min(8000000, o.budget || 3000000));
+  /* 【L2 的字节预算 —— 2026-08-18 收紧】段层单文件最大 425KB（doc/0），旧预算 6MB／8MB 上限
+     意味着一个请求能把好几 MB 的正文同时摆在堆上，再逐篇 JSON.parse 成成千上万个块字符串。
+     而 128MB 是**整个 isolate 共用**的：这一份撑坏它，同一瞬间别人正在流的那一答一起陪葬
+     ——线上实测就是「提炼跳过了检索，却照样一半被掐断」。收到 2.5MB 封顶；
+     早停判据（got >= WANT*3）本来就先于预算生效，实际召回量几乎不受影响。 */
+  const BYTE_BUDGET = Math.max(600000, Math.min(2500000, o.budget || 1200000));
   const PER_DOC = Math.max(1, Math.min(4, o.perDoc || 2));
   const SEC_FIRST = Math.max(1, Math.min(9, o.sections || 3));
   // 限定版块（栏目内检索）：o.only = 版块 key（如 "frontier"）。
@@ -3267,7 +3272,7 @@ async function ragScan(env, url, q, expTerms, prevQ, k, chunkLimit, opts) {
      整段检索从 8.7 秒降到 2 秒上下。这不只是快：站内检索是在**答题那条流已经开着**
      的时候跑的，它慢一秒，答题就少一秒，被平台掐断的窗口也就多一秒。
      打分与入选顺序仍按候选名次逐篇处理，结果与串行一致。 */
-  const L2_BATCH = 6;
+  const L2_BATCH = 3;   // 6 → 3：并行的是**整份正文**，单篇能到 425KB，一批六篇就是 2.5MB 同时在堆上
   for (let i = 0; i < cand.length; i += L2_BATCH) {
     if (bytes > BYTE_BUDGET) break;
     // 每一批回头看一眼：命中量已远超所需（选段时只会取其中一小部分）才停止下钻，
@@ -3282,7 +3287,7 @@ async function ragScan(env, url, q, expTerms, prevQ, k, chunkLimit, opts) {
       } catch (e) { return null; }
     }));
     for (let bi = 0; bi < batch.length; bi++) {
-      const txt = texts[bi]; texts[bi] = null;
+      const txt = texts[bi]; texts[bi] = null;   // 取用即从数组上摘掉：整批文本不许一直挂着
       if (!txt) continue;
       bytes += txt.length;
       const c = batch[bi];
@@ -3301,7 +3306,7 @@ async function ragScan(env, url, q, expTerms, prevQ, k, chunkLimit, opts) {
     }
     // 候选段落表原来是无界的：一篇长文能贡献上百段，几百段各带 1600 字就是几 MB。
     // 每批过后削一次，只留分最高的三百段（最终只取 k≤48 段，三百段绰绰有余）。
-    if (top.length > 600) { top.sort((a, b) => b.sc - a.sc); top.length = 300; }
+    if (top.length > 300) { top.sort((a, b) => b.sc - a.sc); top.length = 200; }   // 600/300 → 300/200：最终只取 k≤48 段，留 200 段绰绰有余，而每段带 1600 字
   }
   top.sort((a, b) => b.sc - a.sc);
   const perDoc = {}, picked = [];
@@ -5328,7 +5333,7 @@ async function askCore(request, env, url, body, SINK) {
     const _raceRag = (p, fb) => { const _q = Promise.resolve(p); _q.catch(() => {}); return Promise.race([_q, new Promise((r) => setTimeout(() => { _ragCut = true; r(fb); }, _ragMs))]); };
     expTerms = await _raceRag(sdeExpandQuery(VC, KEY, rq), []); // SDE 词义扩展：问题→SDE 术语，再拿去召回
     expStr = expTerms.join(" · ");
-    const _lrA = await _raceRag(lightRetrieve(env, url, rq, expTerms, K, 1600, { pick: deep ? 48 : 20, perDoc: deep ? 3 : 2, budget: deep ? 6000000 : 3000000, only: _scope }), _EMPTY_RAG);
+    const _lrA = await _raceRag(lightRetrieve(env, url, rq, expTerms, K, 1600, { pick: deep ? 48 : 20, perDoc: deep ? 3 : 2, budget: deep ? 2000000 : 1200000, only: _scope }), _EMPTY_RAG);
     if (_ragCut) _stat("⏱ 站内检索超时，本轮不带站内资料作答（问对上下文照常带）…");
     corpus = _lrA.corpus; hits = _lrA.hits;
     _stat("✅ 站内检索完成 · 命中 " + (hits ? hits.length : 0) + " 段");

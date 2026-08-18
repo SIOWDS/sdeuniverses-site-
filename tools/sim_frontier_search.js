@@ -27,7 +27,10 @@ ok(/\.filter\(\(sec\) => !only \|\| sec\.key === only\)/.test(W), 'ragScanShards
 console.log('② worker：两个入口都能传 scope');
 ok(/const _scope = \/\^\[a-z0-9_\]\{1,24\}\$\/\.test\(String\(body\.scope \|\| ""\)\)/.test(W),
    '/api/ask 没有读 body.scope（或没做字符白名单）');
-ok(/budget: deep \? 6000000 : 3000000, only: _scope/.test(W), '/api/ask 没把 scope 透传给 lightRetrieve');
+// ⚠ 原判据把字节预算的字面量一起钉进了正则（budget: deep ? 6000000 : 3000000）。
+// 它要守的是**scope 有没有透传**，预算是另一件事、会随 isolate 的账调整（2026-08-18 已下调）。
+// 钉在一起的后果是：预算一动，这条就假红，而它要守的事一个字没变。
+ok(/budget: deep \? \d+ : \d+, only: _scope/.test(W), '/api/ask 没把 scope 透传给 lightRetrieve');
 ok(/const _scopeF = \/\^\[a-z0-9_\]\{1,24\}\$\/\.test\(String\(b\.scope \|\| ""\)\)/.test(W),
    '/api/kb/find 没有读 b.scope');
 ok(/pick: Math\.max\(16, K \* 2\), only: _scopeF/.test(W), '/api/kb/find 没把 scope 透传（注意别patch到 /api/kb/retrieve 那一处）');

@@ -197,9 +197,13 @@ const FILES = Object.assign({
     })());
   }
   // 源码级：候选段表封顶那一刀（真跑桩太小，撞不到 600 条）
-  ok("候选段表有封顶（>600 就削到 300）",
-    /if \(top\.length > 600\) \{ top\.sort\(\(a, b\) => b\.sc - a\.sc\); top\.length = 300; \}/.test(SRC));
-  ok("每批 6 篇", /const L2_BATCH = 6;/.test(SRC));
+  /* ⚠ 这两条原本钉死了字面量（600/300、L2_BATCH = 6）。要守的事不是"这几个数"，
+     而是"有封顶、削到更小、并行度有界"——数一旦按账调整（2026-08-18 为压 isolate 峰值
+     收到 300/200 与 3），钉字面量的判据就假红，而它要守的事一件没丢。改成守那件事本身。 */
+  const _capM = SRC.match(/if \(top\.length > (\d+)\) \{ top\.sort\(\(a, b\) => b\.sc - a\.sc\); top\.length = (\d+); \}/);
+  ok("候选段表有封顶，且削到比阈值更小", !!_capM && +_capM[2] < +_capM[1] && +_capM[1] <= 600);
+  const _bM = SRC.match(/const L2_BATCH = (\d+);/);
+  ok("L2 并行度有界（>1 才算并行，且不超过 6 篇——单篇能到 425KB）", !!_bM && +_bM[1] > 1 && +_bM[1] <= 6);
   ok("批内用 Promise.all 并行", /const texts = await Promise\.all\(batch\.map/.test(SRC));
 
   /* ═══ 六、调用侧：三处 tierFresh 都改成了 await，且 rag 失败带回执 ═══ */
