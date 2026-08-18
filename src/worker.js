@@ -2412,6 +2412,12 @@ export class AskLimiter {
    ═══════════════════════════════════════════════════════════════════════ */
 export class IndexMemory {
   constructor(ctx, env) { this.ctx = ctx; this.env = env; this.sql = ctx.storage.sql; }
+  /* ⚠⚠ 【每条语句最多 100 个绑定参数】——Cloudflare 的 DO SQLite 硬限制。
+     第一次上线就栽在这：按**行数**分批（120 行）看着很稳，可 docs 一行五个参数
+     ⇒ 600 个，当场 "too many SQL variables"。所以分批只能按**参数个数**算，
+     不能按行数算：`_CAP / 每行参数数` 才是这一张表的批量。 */
+  static get _CAP() { return 100; }
+  _rows(perRow) { return Math.max(1, Math.floor(IndexMemory._CAP / perRow)); }
 
   _init() {
     if (this._ready) return;
@@ -2467,6 +2473,7 @@ export class IndexMemory {
     this._set("newstamp", st);
     this._set("pending", JSON.stringify(["man"]));
     this._set("err", "");
+    this._set("abort", "");
     await this.ctx.storage.setAlarm(Date.now() + 50);
     return { ok: true, why: "queued" };
   }
@@ -2481,15 +2488,31 @@ export class IndexMemory {
       await this._runTask(task, q);
       this._set("pending", JSON.stringify(q));
     } catch (e) {
-      // 一件失败不许把整次重建卡死在半路：记下来、跳过它、继续下一件。
+      /* ⚠⚠ 一件失败 ⇒ **整次重建作废，绝不换手**。
+         第一次上线就栽在这：manifest 那一件因绑定参数超限失败了，队列却照样跑到底、
+         照样把影子表顶上去 —— 于是线上换上了一张**空表**，还把新指纹记了下来，
+         下次复验"没变"就再也不会重建。老表还在的时候，宁可继续用旧索引。 */
       this._set("err", String(task) + "：" + ((e && e.message) || e));
-      this._set("pending", JSON.stringify(q));
+      this._set("pending", "");
+      this._set("abort", "1");
+      this.sql.exec("DROP TABLE IF EXISTS docs_new"); this.sql.exec("DROP TABLE IF EXISTS terms_new"); this.sql.exec("DROP TABLE IF EXISTS secs_new");
+      return;
     }
     if (q.length) await this.ctx.storage.setAlarm(Date.now() + 50);
     else {
       /* 换手：影子表建好了才顶替老表。重建期间查询走的一直是老表——
          宁可多用半分钟旧索引，也不要在重建那几秒里回一份空名单。 */
       const s = this.sql;
+      /* 换手前的最后一道闸：影子表必须真有货。空表顶上去＝全站检索静默归零，
+         而且新指纹一记，下次复验"没变"就再也不会自己修好。 */
+      const nd = [...s.exec("SELECT count(*) AS n FROM docs_new")][0].n;
+      const nt = [...s.exec("SELECT count(*) AS n FROM terms_new")][0].n;
+      if (!nd || !nt) {
+        this._set("err", "影子表是空的（docs " + nd + " / terms " + nt + "），本次不换手，继续用旧索引");
+        this._set("pending", "");
+        s.exec("DROP TABLE IF EXISTS docs_new"); s.exec("DROP TABLE IF EXISTS terms_new"); s.exec("DROP TABLE IF EXISTS secs_new");
+        return;
+      }
       s.exec("DROP TABLE IF EXISTS docs_old"); s.exec("DROP TABLE IF EXISTS terms_old"); s.exec("DROP TABLE IF EXISTS secs_old");
       s.exec("ALTER TABLE docs RENAME TO docs_old"); s.exec("ALTER TABLE terms RENAME TO terms_old"); s.exec("ALTER TABLE secs RENAME TO secs_old");
       s.exec("ALTER TABLE docs_new RENAME TO docs"); s.exec("ALTER TABLE terms_new RENAME TO terms"); s.exec("ALTER TABLE secs_new RENAME TO secs");
@@ -2524,7 +2547,7 @@ export class IndexMemory {
       _scanTopLevel(txt, "docs", (dTxt) => {
         let d; try { d = JSON.parse(dTxt); } catch (e) { return; }
         batch.push([d.i, d.u, d.t, String(d.t || "").toLowerCase(), d.s]);
-        if (batch.length >= 120) flush();
+        if (batch.length >= this._rows(5)) flush();
       });
       flush();
       const secs = [];
@@ -2548,7 +2571,7 @@ export class IndexMemory {
       };
       _scanTopLevel(txt, "rows", (rowTxt) => {
         let r0; try { r0 = JSON.parse(rowTxt); } catch (e) { return; }
-        for (const w of (r0.k || [])) { batch.push([String(w), r0.i]); if (batch.length >= 120) flush(); }
+        for (const w of (r0.k || [])) { batch.push([String(w), r0.i]); if (batch.length >= this._rows(2)) flush(); }
       });
       flush();
       return;
@@ -2567,7 +2590,7 @@ export class IndexMemory {
         let arr; try { arr = JSON.parse(vTxt); } catch (e) { return; }
         if (!Array.isArray(arr)) return;
         const i = parseInt(k, 10);
-        for (const w of arr) { batch.push([String(w).toLowerCase(), i]); if (batch.length >= 120) flush(); }
+        for (const w of arr) { batch.push([String(w).toLowerCase(), i]); if (batch.length >= this._rows(2)) flush(); }
       });
       flush();
       return;

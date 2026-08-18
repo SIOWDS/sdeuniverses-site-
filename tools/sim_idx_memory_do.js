@@ -26,6 +26,9 @@ function makeSql() {
   const api = {
     exec(q, ...a) {
       const s = q.trim();
+      /* ⚠ 平台硬限制：DO SQLite 每条语句最多 100 个绑定参数。桩必须一起限，
+         否则「按行数分批」这种错在模拟里永远是绿的——线上第一次跑就炸。 */
+      if (a.length > 100) throw new Error("too many SQL variables");
       let m;
       if (/^CREATE TABLE/i.test(s)) { const n = s.match(/CREATE TABLE (?:IF NOT EXISTS )?(\w+)/)[1]; if (!T[n]) T[n] = []; return []; }
       if (/^CREATE INDEX/i.test(s)) { idx[s] = 1; return []; }
@@ -68,12 +71,19 @@ function makeSql() {
   };
   return api;
 }
-const MAN = JSON.stringify({ built: "b1", counts: { docs: 3 },
+/* ⚠ 夹具必须**大到能触发分批**。第一版只有 3 篇 —— 于是「批量按行数算」这个真 bug
+   在模拟里永远是绿的（一批都凑不满），线上第一次跑就 "too many SQL variables"。
+   现在垫到 300 篇 / 每篇 64 词：docs 一批 20 行、terms 一批 50 行，都要 flush 很多次。 */
+const PAD = [];
+for (let n = 3; n < 300; n++) PAD.push({ i: n, u: "/p" + n, t: "填充篇目" + n, s: n % 2 ? "col" : "bk" });
+const MAN = JSON.stringify({ built: "b1", counts: { docs: 300 },
   sections: [{ key: "col", label: "专栏", docs: 2 }, { key: "bk", label: "专著", docs: 1 }],
-  docs: [{ i: 0, u: "/a", t: "显露与差异", s: "col" }, { i: 1, u: "/b", t: "纠缠的发生", s: "col" }, { i: 2, u: "/c", t: "无关的书", s: "bk" }] });
-const KW = { col: JSON.stringify({ rows: [{ i: 0, k: ["显露", "差异", "sde"] }, { i: 1, k: ["纠缠", "发生"] }] }),
-             bk: JSON.stringify({ rows: [{ i: 2, k: ["园林", "水力"] }] }) };
+  docs: [{ i: 0, u: "/a", t: "显露与差异", s: "col" }, { i: 1, u: "/b", t: "纠缠的发生", s: "col" }, { i: 2, u: "/c", t: "无关的书", s: "bk" }].concat(PAD) });
+const padRows = (sec) => PAD.filter((d) => d.s === sec).map((d) => ({ i: d.i, k: Array.from({ length: 64 }, (_, z) => "词" + d.i + "_" + z) }));
+const KW = { col: JSON.stringify({ rows: [{ i: 0, k: ["显露", "差异", "sde"] }, { i: 1, k: ["纠缠", "发生"] }].concat(padRows("col")) }),
+             bk: JSON.stringify({ rows: [{ i: 2, k: ["园林", "水力"] }].concat(padRows("bk")) }) };
 const CO = JSON.stringify({ "0": ["显露"], "1": ["纠缠"] });
+const N_DOCS = 300, N_TERMS = 3 + 2 + 2 + 297 * 64 + 2;   // 篇层词 + 坐标词
 function makeCtx() {
   let alarmAt = null;
   return { storage: { sql: makeSql(), setAlarm: async (t) => { alarmAt = t; }, _alarm: () => alarmAt, _clr: () => { alarmAt = null; } } };
@@ -95,8 +105,8 @@ const ENV = { PDFS: { head: async () => ({ etag: "E1" }),
   while (ticks < 20) { const a = ctx.storage._alarm(); if (a === null) break; ctx.storage._clr(); await im.alarm(); ticks++; }
   ok("分片跑完（manifest + 两个 kw 分片 + 坐标 = 4 件，逐件各一次 alarm）", ticks === 4, "实际 " + ticks + " 次");
   const st = im._status();
-  ok("三篇文档进表", st.docs === 3, JSON.stringify(st));
-  ok("倒排词条进表（5 个篇层词 + 2 个坐标词 + 2 个篇层词 = 7+2）", st.terms === 9, "实际 " + st.terms);
+  ok("全部文档进表（300 篇，足以逼出分批）", st.docs === N_DOCS, JSON.stringify(st));
+  ok("倒排词条全部进表", st.terms === N_TERMS, "实际 " + st.terms + " 应为 " + N_TERMS);
   ok("指纹已落定", st.stamp === "E1");
   ok("队列已清空", st.pending === 0);
   ok("没有报错", !st.err, st.err);
@@ -121,7 +131,7 @@ const ENV = { PDFS: { head: async () => ({ etag: "E1" }),
 
   sect("三、只回候选那几篇的元数据，不回全站");
   const r5 = im._query({ baseKeys: ["显露"], exp: [], prev: [], pick: 10 });
-  ok("docs 只含候选（1 篇），不是全站 3 篇", r5.docs.length === 1 && r5.docs[0].u === "/a", JSON.stringify(r5.docs));
+  ok("docs 只含候选（1 篇），不是全站 300 篇", r5.docs.length === 1 && r5.docs[0].u === "/a", JSON.stringify(r5.docs));
   ok("版块名照常回", r5.secLabel && r5.secLabel.col === "专栏");
 
   sect("四、重建期间老表照常应答（影子表建好才换手）");
@@ -133,7 +143,28 @@ const ENV = { PDFS: { head: async () => ({ etag: "E1" }),
   ok("此时指纹还没换（没换手就不算数）", im._get("stamp") === "E1");
   while (ctx.storage._alarm() !== null) { ctx.storage._clr(); await im.alarm(); }
   ok("跑完才换手：指纹更新", im._get("stamp") === "E2");
-  ok("换手后数据仍完整", im._status().docs === 3 && im._status().terms === 9);
+  ok("换手后数据仍完整", im._status().docs === N_DOCS && im._status().terms === N_TERMS);
+
+  sect("四之二、绑定参数上限与「失败即作废」（第一次上线就栽在这两条）");
+  const im3 = new IndexMemory(makeCtx(), ENV); im3._init();
+  await im3._ensure(false);
+  let t3 = 0; while (im3.ctx.storage._alarm() !== null && t3 < 20) { im3.ctx.storage._clr(); await im3.alarm(); t3++; }
+  ok("整次重建没有触到 100 个绑定参数的上限", !im3._get("err"), im3._get("err"));
+  ok("批量是按参数个数算的，不是按行数", /_rows\(\d+\)/.test(SRC) && /Math\.floor\(IndexMemory\._CAP \/ perRow\)/.test(SRC));
+
+  // 造一件必失败的任务：坐标那一份读不回来时不算失败（跳过），所以改成让 manifest 读崩
+  const badEnv = { PDFS: { head: async () => ({ etag: "E9" }), get: async (k) => k === "search/manifest.json" ? { text: async () => { throw new Error("读崩了"); } } : null } };
+  const im4 = new IndexMemory(makeCtx(), badEnv); im4._init();
+  im4.sql.exec("INSERT INTO docs(i,u,t,tl,sec) VALUES(?,?,?,?,?)", 7, "/old", "旧的", "旧的", "col");
+  im4.sql.exec("INSERT INTO terms(term,i,src) VALUES(?,?,'k')", "旧的", 7);
+  im4._set("stamp", "E-old");
+  await im4._ensure(false);
+  let t4 = 0; while (im4.ctx.storage._alarm() !== null && t4 < 20) { im4.ctx.storage._clr(); await im4.alarm(); t4++; }
+  ok("有一件失败就把整次重建作废（记下来、停住）", !!im4._get("err") && im4._get("abort") === "1", im4._get("err"));
+  ok("失败时**绝不换手**：老表原样留着", im4._status().docs === 1 && im4._status().terms === 1);
+  ok("失败时不许把新指纹记下来（否则下次复验「没变」就再也不会重建）", im4._get("stamp") === "E-old");
+  const still = im4._query({ baseKeys: ["旧的"], exp: [], prev: [], pick: 10 });
+  ok("失败之后查询照常走老索引", still.ok && still.cand.length === 1);
 
   sect("五、表还没建好时必须说 ok:false（让调用方退回旧路，绝不回空名单）");
   const im2 = new IndexMemory(makeCtx(), ENV); im2._init();
