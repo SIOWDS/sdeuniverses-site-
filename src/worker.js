@@ -2391,268 +2391,6 @@ export class AskLimiter {
   }
 }
 
-/* ═══════════════════════════════════════════════════════════════════════
-   IndexMemory —— 三层记忆的【长期记忆】（2026-08-18）
-
-   要解决的事，一句话：**索引不能再住在答题进程里**。
-   128MB 是整个 isolate 共用的，而一个 isolate 同时在跑好几个请求。只要全站索引
-   还要在答题那一侧被取回、被解析、被打分，它就总有撑顶的时候；而撑顶的那一刻，
-   同一瞬间别人正在流的那一答一起陪葬（线上实测：error 1102 / 流被无声掐断、
-   连 [DONE] 都发不出）。08-17 压常驻、08-18 压峰值，都只是把线往后挪。
-
-   所以这一层把索引整个搬进一个自带 SQLite 的 Durable Object：
-     · 倒排表住在 SQLite 里（C 那一侧），**不占任何 JS 堆**；
-     · 答题那一侧只发一次查询、收一份几 KB 的候选名单，从此再不碰索引；
-     · 重建在 DO 自己的 alarm 里分片跑，跑的时候老表照常应答（影子表建好才换手）。
-
-   三层的分工（别混）：
-     长期＝这里，全站底盘，只在索引重建时变；
-     中期＝答题 isolate 里那份按字节封顶的工作集（热问题零往返，也是 DO 不可用时的退路）；
-     短期＝一次请求内的整场问对与已取回的段，随请求死。
-   ═══════════════════════════════════════════════════════════════════════ */
-export class IndexMemory {
-  constructor(ctx, env) { this.ctx = ctx; this.env = env; this.sql = ctx.storage.sql; }
-  /* ⚠⚠ 【每条语句最多 100 个绑定参数】——Cloudflare 的 DO SQLite 硬限制。
-     第一次上线就栽在这：按**行数**分批（120 行）看着很稳，可 docs 一行五个参数
-     ⇒ 600 个，当场 "too many SQL variables"。所以分批只能按**参数个数**算，
-     不能按行数算：`_CAP / 每行参数数` 才是这一张表的批量。 */
-  static get _CAP() { return 100; }
-  _rows(perRow) { return Math.max(1, Math.floor(IndexMemory._CAP / perRow)); }
-
-  _init() {
-    if (this._ready) return;
-    const s = this.sql;
-    s.exec("CREATE TABLE IF NOT EXISTS meta(k TEXT PRIMARY KEY, v TEXT)");
-    s.exec("CREATE TABLE IF NOT EXISTS docs(i INTEGER PRIMARY KEY, u TEXT, t TEXT, tl TEXT, sec TEXT)");
-    /* src：'k'＝篇层关键词（每篇 64 个高频词），'c'＝SDE 坐标词。
-       两种来源的加分口径不同（坐标只在词义扩展命中时加分），所以必须分得开，不能合成一张。 */
-    s.exec("CREATE TABLE IF NOT EXISTS terms(term TEXT, i INTEGER, src TEXT)");
-    s.exec("CREATE INDEX IF NOT EXISTS terms_term ON terms(term)");
-    s.exec("CREATE TABLE IF NOT EXISTS secs(sec TEXT PRIMARY KEY, label TEXT)");
-    this._ready = true;
-  }
-  _get(k) { const r = [...this.sql.exec("SELECT v FROM meta WHERE k=?", k)]; return r.length ? r[0].v : ""; }
-  _set(k, v) { this.sql.exec("INSERT INTO meta(k,v) VALUES(?,?) ON CONFLICT(k) DO UPDATE SET v=excluded.v", k, String(v)); }
-
-  async fetch(request) {
-    this._init();
-    let b = {}; try { b = await request.json(); } catch (e) {}
-    const op = String(b.op || "query");
-    if (op === "status") return this._json(this._status());
-    if (op === "ensure") return this._json(await this._ensure(b.force === true));
-    if (op === "query") {
-      // 查询绝不等重建：老表照常应答，重建在 alarm 里自己跑。
-      this._ensure(false).catch(() => {});
-      return this._json(this._query(b));
-    }
-    return this._json({ ok: false, why: "unknown op" });
-  }
-  _json(o) { return new Response(JSON.stringify(o), { headers: { "content-type": "application/json" } }); }
-
-  _status() {
-    const n = [...this.sql.exec("SELECT count(*) AS n FROM docs")][0].n;
-    const t = [...this.sql.exec("SELECT count(*) AS n FROM terms")][0].n;
-    return { ok: true, docs: n, terms: t, stamp: this._get("stamp"), built: this._get("built"),
-             pending: this._get("pending") ? JSON.parse(this._get("pending")).length : 0, err: this._get("err") };
-  }
-
-  /* ── 指纹复验：manifest 的 etag 没变就什么都不做 ── */
-  async _stamp() {
-    try {
-      const h = this.env.PDFS && this.env.PDFS.head ? await this.env.PDFS.head("search/manifest.json") : null;
-      if (h) return String(h.etag || (h.uploaded && h.uploaded.toISOString ? h.uploaded.toISOString() : h.uploaded) || "");
-    } catch (e) {}
-    return "";
-  }
-  async _ensure(force) {
-    if (!this.env.PDFS) return { ok: false, why: "no bucket" };
-    if (this._get("pending")) return { ok: true, why: "rebuilding" };
-    const st = await this._stamp();
-    /* 【自愈】表是空的却记着指纹 ＝ 上一次重建留下的一句假话（它半路失败却照样把指纹记了下来）。
-       这种状态最恶劣：复验永远说「没变」，于是它再也不会自己修好，而全站检索静默走退路。
-       所以判据不只是指纹，还要看**表里到底有没有货**——空表一律重建。 */
-    const empty = ![...this.sql.exec("SELECT count(*) AS n FROM docs")][0].n;
-    if (!force && !empty && st && st === this._get("stamp")) return { ok: true, why: "fresh" };
-    // 任务清单：先 manifest（它给出版块名单），再逐个 kw 分片，最后坐标。分片跑，一次 alarm 一件。
-    this._set("newstamp", st);
-    this._set("pending", JSON.stringify(["man"]));
-    this._set("err", "");
-    this._set("abort", "");
-    await this.ctx.storage.setAlarm(Date.now() + 50);
-    return { ok: true, why: "queued" };
-  }
-
-  async alarm() {
-    this._init();
-    let q = [];
-    try { q = JSON.parse(this._get("pending") || "[]"); } catch (e) { q = []; }
-    if (!q.length) { this._set("pending", ""); return; }
-    const task = q.shift();
-    try {
-      await this._runTask(task, q);
-      this._set("pending", JSON.stringify(q));
-    } catch (e) {
-      /* ⚠⚠ 一件失败 ⇒ **整次重建作废，绝不换手**。
-         第一次上线就栽在这：manifest 那一件因绑定参数超限失败了，队列却照样跑到底、
-         照样把影子表顶上去 —— 于是线上换上了一张**空表**，还把新指纹记了下来，
-         下次复验"没变"就再也不会重建。老表还在的时候，宁可继续用旧索引。 */
-      this._set("err", String(task) + "：" + ((e && e.message) || e));
-      this._set("pending", "");
-      this._set("abort", "1");
-      this.sql.exec("DROP TABLE IF EXISTS docs_new"); this.sql.exec("DROP TABLE IF EXISTS terms_new"); this.sql.exec("DROP TABLE IF EXISTS secs_new");
-      return;
-    }
-    if (q.length) await this.ctx.storage.setAlarm(Date.now() + 50);
-    else {
-      /* 换手：影子表建好了才顶替老表。重建期间查询走的一直是老表——
-         宁可多用半分钟旧索引，也不要在重建那几秒里回一份空名单。 */
-      const s = this.sql;
-      /* 换手前的最后一道闸：影子表必须真有货。空表顶上去＝全站检索静默归零，
-         而且新指纹一记，下次复验"没变"就再也不会自己修好。 */
-      const nd = [...s.exec("SELECT count(*) AS n FROM docs_new")][0].n;
-      const nt = [...s.exec("SELECT count(*) AS n FROM terms_new")][0].n;
-      if (!nd || !nt) {
-        this._set("err", "影子表是空的（docs " + nd + " / terms " + nt + "），本次不换手，继续用旧索引");
-        this._set("pending", "");
-        s.exec("DROP TABLE IF EXISTS docs_new"); s.exec("DROP TABLE IF EXISTS terms_new"); s.exec("DROP TABLE IF EXISTS secs_new");
-        return;
-      }
-      s.exec("DROP TABLE IF EXISTS docs_old"); s.exec("DROP TABLE IF EXISTS terms_old"); s.exec("DROP TABLE IF EXISTS secs_old");
-      s.exec("ALTER TABLE docs RENAME TO docs_old"); s.exec("ALTER TABLE terms RENAME TO terms_old"); s.exec("ALTER TABLE secs RENAME TO secs_old");
-      s.exec("ALTER TABLE docs_new RENAME TO docs"); s.exec("ALTER TABLE terms_new RENAME TO terms"); s.exec("ALTER TABLE secs_new RENAME TO secs");
-      s.exec("DROP TABLE IF EXISTS docs_old"); s.exec("DROP TABLE IF EXISTS terms_old"); s.exec("DROP TABLE IF EXISTS secs_old");
-      s.exec("CREATE INDEX IF NOT EXISTS terms_term ON terms(term)");
-      this._set("stamp", this._get("newstamp"));
-      this._set("built", new Date().toISOString());
-      this._set("pending", "");
-    }
-  }
-
-  async _text(key) {
-    const o = await this.env.PDFS.get(key);
-    if (!o) throw new Error("桶里没有 " + key);
-    return await o.text();
-  }
-  async _runTask(task, queue) {
-    const s = this.sql;
-    if (task === "man") {
-      s.exec("DROP TABLE IF EXISTS docs_new"); s.exec("DROP TABLE IF EXISTS terms_new"); s.exec("DROP TABLE IF EXISTS secs_new");
-      s.exec("CREATE TABLE docs_new(i INTEGER PRIMARY KEY, u TEXT, t TEXT, tl TEXT, sec TEXT)");
-      s.exec("CREATE TABLE terms_new(term TEXT, i INTEGER, src TEXT)");
-      s.exec("CREATE TABLE secs_new(sec TEXT PRIMARY KEY, label TEXT)");
-      const txt = await this._text("search/manifest.json");
-      let batch = [];
-      const flush = () => {
-        if (!batch.length) return;
-        const ph = batch.map(() => "(?,?,?,?,?)").join(",");
-        s.exec("INSERT OR REPLACE INTO docs_new(i,u,t,tl,sec) VALUES " + ph, ...batch.flat());
-        batch = [];
-      };
-      _scanTopLevel(txt, "docs", (dTxt) => {
-        let d; try { d = JSON.parse(dTxt); } catch (e) { return; }
-        batch.push([d.i, d.u, d.t, String(d.t || "").toLowerCase(), d.s]);
-        if (batch.length >= this._rows(5)) flush();
-      });
-      flush();
-      const secs = [];
-      _scanTopLevel(txt, "sections", (sTxt) => { try { secs.push(JSON.parse(sTxt)); } catch (e) {} });
-      for (const se of secs) s.exec("INSERT OR REPLACE INTO secs_new(sec,label) VALUES(?,?)", se.key, se.label || se.key);
-      // 后面的活：每个版块一份 kw 分片，最后坐标
-      for (const se of secs) queue.push("kw:" + se.key);
-      queue.push("coords");
-      return;
-    }
-    if (task.indexOf("kw:") === 0) {
-      const sec = task.slice(3);
-      let txt = "";
-      try { txt = await this._text("search/kw/" + sec + ".json"); } catch (e) { return; }   // 没有这一份就跳过，不算失败
-      let batch = [];
-      const flush = () => {
-        if (!batch.length) return;
-        const ph = batch.map(() => "(?,?,'k')").join(",");
-        s.exec("INSERT INTO terms_new(term,i,src) VALUES " + ph, ...batch.flat());
-        batch = [];
-      };
-      _scanTopLevel(txt, "rows", (rowTxt) => {
-        let r0; try { r0 = JSON.parse(rowTxt); } catch (e) { return; }
-        for (const w of (r0.k || [])) { batch.push([String(w), r0.i]); if (batch.length >= this._rows(2)) flush(); }
-      });
-      flush();
-      return;
-    }
-    if (task === "coords") {
-      let txt = "";
-      try { txt = await this._text("search/sde-coords.json"); } catch (e) { return; }
-      let batch = [];
-      const flush = () => {
-        if (!batch.length) return;
-        const ph = batch.map(() => "(?,?,'c')").join(",");
-        s.exec("INSERT INTO terms_new(term,i,src) VALUES " + ph, ...batch.flat());
-        batch = [];
-      };
-      _scanObjEntries(txt, (k, vTxt) => {
-        let arr; try { arr = JSON.parse(vTxt); } catch (e) { return; }
-        if (!Array.isArray(arr)) return;
-        const i = parseInt(k, 10);
-        for (const w of arr) { batch.push([String(w).toLowerCase(), i]); if (batch.length >= this._rows(2)) flush(); }
-      });
-      flush();
-      return;
-    }
-  }
-
-  /* ── 查询：口径与旧的 L0/L1 打分逐条对齐，只是算在 SQLite 里而不是 JS 堆里 ──
-     旧口径：篇层关键词 base+1 / exp+1.2 / prev+0.4；标题子串 base+3 / exp+2；坐标只在 exp 命中时 +1.5。
-     旧路还有一层"先选版块、再读那几份篇层"——那是为了少读文件才有的绕行；
-     现在全站倒排就在手边，直接给全站打分，召回只会更全，不会更窄。 */
-  _query(b) {
-    const n = [...this.sql.exec("SELECT count(*) AS n FROM docs")][0].n;
-    if (!n) return { ok: false, why: "empty" };       // 还没建好：调用方退回旧路，绝不回空名单
-    const base = (b.baseKeys || []).slice(0, 80);
-    const exp = (b.exp || []).slice(0, 40);
-    const prev = (b.prev || []).slice(0, 40);
-    const only = String(b.only || "");
-    const pick = Math.max(6, Math.min(64, b.pick | 0 || 16));
-    const sc = new Map();
-    const add = (i, v) => { sc.set(i, (sc.get(i) || 0) + v); };
-    const byTerm = (list, wk, wc) => {
-      for (const key of list) {
-        if (!key) continue;
-        for (const r of this.sql.exec("SELECT i,src FROM terms WHERE term=?", key)) {
-          add(r.i, r.src === "c" ? wc : wk);
-        }
-      }
-    };
-    byTerm(base, 1, 0);        // 坐标不参与 base（与旧口径一致）
-    byTerm(exp, 1.2, 1.5);
-    byTerm(prev, 0.4, 0);
-    const byTitle = (list, w) => {
-      for (const key of list) {
-        if (!key) continue;
-        for (const r of this.sql.exec("SELECT i FROM docs WHERE tl LIKE ? ESCAPE '\\'", "%" + String(key).replace(/[\\%_]/g, "\\$&") + "%")) add(r.i, w);
-      }
-    };
-    byTitle(base, 3);
-    byTitle(exp, 2);
-    if (!sc.size) return { ok: true, cand: [], docs: [], secLabel: this._secLabel() };
-    let cand = Array.from(sc.entries()).map(([i, v]) => ({ i: i, sc: v })).sort((a, b2) => b2.sc - a.sc);
-    if (only) {
-      const keep = new Set();
-      for (const r of this.sql.exec("SELECT i FROM docs WHERE sec=?", only)) keep.add(r.i);
-      cand = cand.filter((c) => keep.has(c.i));
-    }
-    cand = cand.slice(0, pick);
-    // 只回候选那几篇的元数据——**不回全站 docs**。答题那一侧从此不再持有 4,488 篇的表。
-    const docs = [];
-    for (const c of cand) {
-      const r = [...this.sql.exec("SELECT i,u,t,sec FROM docs WHERE i=?", c.i)];
-      if (r.length) docs.push({ i: r[0].i, u: r[0].u, t: r[0].t, s: r[0].sec });
-    }
-    return { ok: true, cand: cand, docs: docs, secLabel: this._secLabel() };
-  }
-  _secLabel() { const m = {}; for (const r of this.sql.exec("SELECT sec,label FROM secs")) m[r.sec] = r.label; return m; }
-}
-
 // ===== 密钥保险箱·服务端存基底 Key（页面设置，免进 Cloudflare）=====
 // 纪律：key 只写入、只在 Worker 内部（op:get）读取用于调用基底；绝不经任何公开路由回传浏览器。
 export class ConfigVault {
@@ -3454,12 +3192,14 @@ function _scoreKeys(list, baseKeys, exp, prev) {
   for (const key of prev) if (hit(key)) sc += 0.4;
   return sc;
 }
-/* ── L2 下钻：抽成共用的一段 ──
-   两条前端都走它：长期记忆（IndexMemory 倒排）给的候选，与旧的 L0/L1 退路给的候选。
-   抽出来是为了**只有一处**在管"取多少块、并行几篇、候选表封顶多少"——
-   两份各调各的数，迟早漂移，而漂移之后页面一切正常、只是召回悄悄变了。 */
-async function ragDrill(env, url, cand, docsArr, secLabel, coords, baseKeys, exp, prev, q, k, cut, o) {
-  // —— L2：一轮 8 篇地下钻，够用就停 ——
+async function ragScan(env, url, q, expTerms, prevQ, k, chunkLimit, opts) {
+  const man = await idxManifest(env, url);
+  const coords = await loadCoords(env, url);
+  const { baseKeys, exp } = ragKeys(q, expTerms);
+  const prev = prevQ && prevQ !== q ? ragKeys(prevQ, []).baseKeys : [];
+  const cut = chunkLimit || 1600;
+  const o = opts || {};
+  const PICK_DOCS = Math.max(6, Math.min(64, o.pick || 16));
   /* 【L2 的字节预算 —— 2026-08-18 收紧】段层单文件最大 425KB（doc/0），旧预算 6MB／8MB 上限
      意味着一个请求能把好几 MB 的正文同时摆在堆上，再逐篇 JSON.parse 成成千上万个块字符串。
      而 128MB 是**整个 isolate 共用**的：这一份撑坏它，同一瞬间别人正在流的那一答一起陪葬
@@ -3467,98 +3207,6 @@ async function ragDrill(env, url, cand, docsArr, secLabel, coords, baseKeys, exp
      早停判据（got >= WANT*3）本来就先于预算生效，实际召回量几乎不受影响。 */
   const BYTE_BUDGET = Math.max(600000, Math.min(2500000, o.budget || 1200000));
   const PER_DOC = Math.max(1, Math.min(4, o.perDoc || 2));
-  const WANT = Math.max(4000, Math.min(30000, o.want || 12000));   // 正文材料想凑够多少字符
-  let top = [], bytes = 0, got = 0;
-  /* 【并行取块】块文件都很小（几 KB 到几十 KB），一次串行 18 篇却要 8.7 秒——
-     时间全花在等 R2 的往返上（实测单篇约 0.4 秒）。改成每批 6 篇并行取回，
-     整段检索从 8.7 秒降到 2 秒上下。这不只是快：站内检索是在**答题那条流已经开着**
-     的时候跑的，它慢一秒，答题就少一秒，被平台掐断的窗口也就多一秒。
-     打分与入选顺序仍按候选名次逐篇处理，结果与串行一致。 */
-  const L2_BATCH = 3;   // 6 → 3：并行的是**整份正文**，单篇能到 425KB，一批六篇就是 2.5MB 同时在堆上
-  for (let i = 0; i < cand.length; i += L2_BATCH) {
-    if (bytes > BYTE_BUDGET) break;
-    // 每一批回头看一眼：命中量已远超所需（选段时只会取其中一小部分）才停止下钻，
-    // 否则宁可多读两篇——实测过早收手会把资料从 8 千字砍到 4 千字。
-    if (i > 0 && got >= WANT * 3) break;
-    const batch = cand.slice(i, i + L2_BATCH);
-    const texts = await Promise.all(batch.map(async (c) => {
-      try {
-        const r = await idxFetch(env, url, "/search/doc/" + c.i + ".json");
-        if (!r.ok) return null;
-        return await r.text();
-      } catch (e) { return null; }
-    }));
-    for (let bi = 0; bi < batch.length; bi++) {
-      const txt = texts[bi]; texts[bi] = null;   // 取用即从数组上摘掉：整批文本不许一直挂着
-      if (!txt) continue;
-      bytes += txt.length;
-      const c = batch[bi];
-      let dj = null;
-      try { dj = JSON.parse(txt); } catch (e) { continue; }
-      for (const t of (dj.c || [])) {
-        const tl = t.toLowerCase();
-        let sc = 0;
-        for (const key of baseKeys) { const n = tl.split(key).length - 1; if (n) sc += n; }
-        for (const key of exp) { const n = tl.split(key).length - 1; if (n) sc += n * 1.2; }
-        for (const key of prev) { const n = tl.split(key).length - 1; if (n) sc += n * 0.4; }
-        if (q && t.indexOf(q) >= 0) sc += 8;
-        if (sc > 0) { top.push({ sc: sc + c.sc * 0.2, d: c.i, t: t.length > cut ? t.slice(0, cut) : t }); got += Math.min(t.length, cut); }
-      }
-      dj = null;
-    }
-    // 候选段落表原来是无界的：一篇长文能贡献上百段，几百段各带 1600 字就是几 MB。
-    // 每批过后削一次，只留分最高的三百段（最终只取 k≤48 段，三百段绰绰有余）。
-    if (top.length > 300) { top.sort((a, b) => b.sc - a.sc); top.length = 200; }   // 600/300 → 300/200：最终只取 k≤48 段，留 200 段绰绰有余，而每段带 1600 字
-  }
-  top.sort((a, b) => b.sc - a.sc);
-  const perDoc = {}, picked = [];
-  for (const it of top) {
-    perDoc[it.d] = perDoc[it.d] || 0;
-    if (perDoc[it.d] >= PER_DOC) continue;
-    perDoc[it.d]++; picked.push(it);
-    if (picked.length >= (k || 36)) break;
-  }
-  return { picked: picked, docs: docsArr, coords: coords, secLabel: secLabel };
-}
-
-/* ── 长期记忆的发车口 ──
-   IndexMemory 是**一个**全站单例（idFromName("global")）：倒排表只建一份，
-   所有请求共用。失败一律吞掉并回 null —— 长期记忆不可用时必须能退回旧路，
-   宁可慢一点、宁可多占一点堆，也不要整站问不出话。 */
-async function idxAsk(env, body) {
-  try {
-    if (!env.IDXMEM) return null;
-    const st = env.IDXMEM.get(env.IDXMEM.idFromName("global"));
-    const r = await st.fetch(new Request("https://idx.internal/", {
-      method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body),
-    }));
-    if (!r.ok) return null;
-    return await r.json();
-  } catch (e) { return null; }
-}
-async function ragScan(env, url, q, expTerms, prevQ, k, chunkLimit, opts) {
-  const { baseKeys, exp } = ragKeys(q, expTerms);
-  const prev = prevQ && prevQ !== q ? ragKeys(prevQ, []).baseKeys : [];
-  const cut = chunkLimit || 1600;
-  const o = opts || {};
-  const PICK_DOCS = Math.max(6, Math.min(64, o.pick || 16));
-
-  /* 【长期记忆优先】候选篇目由 SQLite 里的倒排表算出来，答题这一侧
-     **既不取 manifest、也不建 coords、也不读篇层索引**——四千多篇的表从此不进这个堆。
-     回来的只有几十条候选与它们的元数据（几 KB）。
-     `ok:false` 有两种：桶没配、或表还没建好。两种都退回旧路，不回空名单。 */
-  const lt = await idxAsk(env, { op: "query", baseKeys: baseKeys, exp: exp, prev: prev, only: o.only || "", pick: PICK_DOCS });
-  if (lt && lt.ok) {
-    const docsArr = [];                       // 稀疏数组：调用方一直是按 docs[编号] 取的，形态不变
-    for (const d of (lt.docs || [])) docsArr[d.i] = d;
-    const cand0 = (lt.cand || []).map((c) => ({ i: c.i, sc: c.sc }));
-    if (!cand0.length) return { picked: [], docs: docsArr, coords: null, secLabel: lt.secLabel || {} };
-    return await ragDrill(env, url, cand0, docsArr, lt.secLabel || {}, null, baseKeys, exp, prev, q, k, cut, o);
-  }
-
-  // ↓↓ 以下是退路：长期记忆不可用时，仍按旧的 L0 版块层 → L1 篇层 走一遍（会把索引装进本进程）
-  const man = await idxManifest(env, url);
-  const coords = await loadCoords(env, url);
   const SEC_FIRST = Math.max(1, Math.min(9, o.sections || 3));
   // 限定版块（栏目内检索）：o.only = 版块 key（如 "frontier"）。
   // 只在 L0 选版块与 L1 候选篇这两处收窄；打分、下钻、选段一律照旧，
@@ -3616,8 +3264,59 @@ async function ragScan(env, url, q, expTerms, prevQ, k, chunkLimit, opts) {
   if (!docScore.size) return { picked: [], docs: man.docs, coords: coords, secLabel: _secLabel(man) };
   const cand = Array.from(docScore.entries()).map(([i, sc]) => ({ i: i, sc: sc })).sort((a, b) => b.sc - a.sc).slice(0, PICK_DOCS);
 
-  return await ragDrill(env, url, cand, man.docs, _secLabel(man), coords, baseKeys, exp, prev, q, k, cut, o);
-
+  // —— L2：一轮 8 篇地下钻，够用就停 ——
+  const WANT = Math.max(4000, Math.min(30000, o.want || 12000));   // 正文材料想凑够多少字符
+  let top = [], bytes = 0, got = 0;
+  /* 【并行取块】块文件都很小（几 KB 到几十 KB），一次串行 18 篇却要 8.7 秒——
+     时间全花在等 R2 的往返上（实测单篇约 0.4 秒）。改成每批 6 篇并行取回，
+     整段检索从 8.7 秒降到 2 秒上下。这不只是快：站内检索是在**答题那条流已经开着**
+     的时候跑的，它慢一秒，答题就少一秒，被平台掐断的窗口也就多一秒。
+     打分与入选顺序仍按候选名次逐篇处理，结果与串行一致。 */
+  const L2_BATCH = 3;   // 6 → 3：并行的是**整份正文**，单篇能到 425KB，一批六篇就是 2.5MB 同时在堆上
+  for (let i = 0; i < cand.length; i += L2_BATCH) {
+    if (bytes > BYTE_BUDGET) break;
+    // 每一批回头看一眼：命中量已远超所需（选段时只会取其中一小部分）才停止下钻，
+    // 否则宁可多读两篇——实测过早收手会把资料从 8 千字砍到 4 千字。
+    if (i > 0 && got >= WANT * 3) break;
+    const batch = cand.slice(i, i + L2_BATCH);
+    const texts = await Promise.all(batch.map(async (c) => {
+      try {
+        const r = await idxFetch(env, url, "/search/doc/" + c.i + ".json");
+        if (!r.ok) return null;
+        return await r.text();
+      } catch (e) { return null; }
+    }));
+    for (let bi = 0; bi < batch.length; bi++) {
+      const txt = texts[bi]; texts[bi] = null;   // 取用即从数组上摘掉：整批文本不许一直挂着
+      if (!txt) continue;
+      bytes += txt.length;
+      const c = batch[bi];
+      let dj = null;
+      try { dj = JSON.parse(txt); } catch (e) { continue; }
+      for (const t of (dj.c || [])) {
+        const tl = t.toLowerCase();
+        let sc = 0;
+        for (const key of baseKeys) { const n = tl.split(key).length - 1; if (n) sc += n; }
+        for (const key of exp) { const n = tl.split(key).length - 1; if (n) sc += n * 1.2; }
+        for (const key of prev) { const n = tl.split(key).length - 1; if (n) sc += n * 0.4; }
+        if (q && t.indexOf(q) >= 0) sc += 8;
+        if (sc > 0) { top.push({ sc: sc + c.sc * 0.2, d: c.i, t: t.length > cut ? t.slice(0, cut) : t }); got += Math.min(t.length, cut); }
+      }
+      dj = null;
+    }
+    // 候选段落表原来是无界的：一篇长文能贡献上百段，几百段各带 1600 字就是几 MB。
+    // 每批过后削一次，只留分最高的三百段（最终只取 k≤48 段，三百段绰绰有余）。
+    if (top.length > 300) { top.sort((a, b) => b.sc - a.sc); top.length = 200; }   // 600/300 → 300/200：最终只取 k≤48 段，留 200 段绰绰有余，而每段带 1600 字
+  }
+  top.sort((a, b) => b.sc - a.sc);
+  const perDoc = {}, picked = [];
+  for (const it of top) {
+    perDoc[it.d] = perDoc[it.d] || 0;
+    if (perDoc[it.d] >= PER_DOC) continue;
+    perDoc[it.d]++; picked.push(it);
+    if (picked.length >= (k || 36)) break;
+  }
+  return { picked: picked, docs: man.docs, coords: coords, secLabel: _secLabel(man) };
 }
 // 旧路：索引尚未重建时的退路——按版块相关度排序、限时限片地扫大分片。
 async function ragScanShards(env, url, man, coords, baseKeys, exp, prev, k, cut, only) {
@@ -6857,19 +6556,6 @@ export default {
     // 冷启动时这一步要把全站索引（十几兆 JSON、上百个分片）装进内存，很吃 CPU；和答题挤在同一个
     // 请求里，会被平台按单请求 CPU 上限直接掐死——表现就是"流刚开就断、连来源都没发出来、只收到心跳"。
     // 拆开之后：它有自己的一份 CPU 预算；它失败也只是这一答没有站内资料，不连累答题本身。
-    /* 长期记忆的运维口：看它建到哪一步、必要时手工重建一次。
-       ⚠ status 是只读的、可公开；rebuild 会重建整份倒排表，要管理员口令。 */
-    if (url.pathname === "/api/idx/status") {
-      const r = await idxAsk(env, { op: "status" });
-      return new Response(JSON.stringify(r || { ok: false, why: "长期记忆未绑定（IDXMEM）" }),
-        { headers: { ..._cors(), "content-type": "application/json" } });
-    }
-    if (url.pathname === "/api/idx/rebuild" && request.method === "POST") {
-      let bb = {}; try { bb = await request.json(); } catch (e) {}
-      if (!(await adminPassOk(bb.pass))) return new Response(JSON.stringify({ ok: false, why: "口令不对" }), { status: 403, headers: { ..._cors(), "content-type": "application/json" } });
-      const r = await idxAsk(env, { op: "ensure", force: bb.force === true });
-      return new Response(JSON.stringify(r || { ok: false }), { headers: { ..._cors(), "content-type": "application/json" } });
-    }
     if (url.pathname === "/api/wds/rag") {
       if (request.method === "OPTIONS") return new Response(null, { headers: _cors() });
       if (request.method !== "POST") return new Response("Method Not Allowed", { status: 405 });
