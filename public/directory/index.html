@@ -151,6 +151,9 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;flex-direction:
 .nav-links a.reg-entry:hover{color:#FFF3D6;filter:brightness(1.08)}
 .lang-btn{padding:0.3rem 0.42rem;font-size:0.75rem;letter-spacing:0.05em;border:none;background:transparent;color:var(--text2);cursor:pointer;transition:all 0.2s;font-family:inherit}
 .lang-btn.active{background:var(--gold);color:#F5EFE0;font-weight:600}
+/* 中／EN 两枚必须连着：把相邻那一侧的内边距收掉，只留外侧 —— 王德生 2026-08-18 令 */
+.lang-toggle .lang-btn:first-child{padding-right:0.16rem}
+.lang-toggle .lang-btn:last-child{padding-left:0.16rem}
 .claw-body{font-size:0.95rem;color:#C7BB9E;line-height:1.85;margin-bottom:2rem}
 }
 @media(max-width:640px){
