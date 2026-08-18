@@ -42,6 +42,7 @@ video{width:100%;border-radius:10px;background:#000;display:block}
 .pill{display:inline-block;font-size:11px;background:rgba(231,195,73,.15);color:var(--gold2);border-radius:20px;padding:2px 10px;margin-left:6px}
 @media(max-width:640px){.grid2{grid-template-columns:1fr}}
 </style>
+  <script src="/assets/sde-idx-cache.js?v=20260818a"></script>
 </head>
 <body>
 <div class="wrap">
@@ -431,14 +432,16 @@ async function loadAvatars(){
 
 /* ============ 站内文章索引（复用全站搜索索引） ============ */
 (function loadIndex(){
-  fetch('/search/manifest.json?v='+Date.now(),{cache:'no-store'}).then(function(r){return r.json();}).then(function(m){
+  var IDXV='';
+  SDEIdx.manifest().then(function(m){
     MANIFEST=m;
+    IDXV=SDEIdx.ver(m);
     var files=[];
     (m.sections||[]).forEach(function(s){ (s.files||[]).forEach(function(fn){ files.push(fn); }); });
     SHARDS_TOTAL=files.length;
     if(!SHARDS_TOTAL){ $('loadStatus').textContent='索引为空。'; return; }
     files.forEach(function(fn){
-      fetch('/search/shard-'+fn+'.json?v='+Date.now(),{cache:'no-store'}).then(function(r){return r.json();}).then(function(d){
+      SDEIdx.shard(fn, IDXV).then(function(d){
         (d.chunks||[]).forEach(function(c){ CHUNKS.push(c); });
         SHARDS_LOADED++;
         $('loadStatus').textContent='索引载入中… '+SHARDS_LOADED+'/'+SHARDS_TOTAL+' 片';

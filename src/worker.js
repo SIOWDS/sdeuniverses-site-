@@ -10202,9 +10202,13 @@ export default {
       }
     }
     // 与上面 PDF 那段的三点不同，都是索引"会变"带来的：
-    // ① **不加 immutable、不进边缘缓存**——PDF 是死的，索引每次发文都重建。
-    //    搜索页取分片时本来就带 ?v=Date.now() + cache:'no-store'，每次都是新 URL，
-    //    边缘缓存命不中还白占空间；索引拿旧的比慢更糟，所以这里干脆不缓存。
+    // ① 缓存策略**按 ?b= 分岔**（2026-08-18 改）：
+    //    旧做法是搜索页带 ?v=Date.now()+cache:'no-store'、这里一律 no-cache，
+    //    于是每开一次搜索页就重下 57 片 ≈ 132MB（zstd 后），每人每次。
+    //    新做法：前端把版本键换成 ?b=<manifest.built>（见 assets/sde-idx-cache.js）。
+    //    manifest 仍是唯一真相源、仍每次核对（no-cache + ETag，未变回 304）；
+    //    分片则因 built 没变而 URL 一字不变 → 可 immutable 长缓存。
+    //    索引一重建，built 变、全部分片 URL 同时换新，**拿不到旧索引**。
     // ② 不需要 Range——都是整份 JSON。
     // ③ 只认 IDX_KEYS 列出的生成物；/search/index.html 是页面，照旧走 ASSETS。
     if ((request.method === "GET" || request.method === "HEAD") && env.PDFS && url.pathname.startsWith("/search/")) {
@@ -10217,7 +10221,10 @@ export default {
             obj.writeHttpMetadata(h);
             h.set("etag", obj.httpEtag);
             h.set("content-type", "application/json; charset=utf-8");
-            h.set("cache-control", "no-cache");
+            // 带版本键的才敢长缓存；不带的（manifest、老链接）照旧每次核对
+            h.set("cache-control", url.searchParams.has("b")
+              ? "public, max-age=31536000, immutable"
+              : "no-cache");
             h.set("x-served-from", "r2");
             if (!("body" in obj)) return new Response(null, { status: 304, headers: h });
             h.set("content-length", String(obj.size));

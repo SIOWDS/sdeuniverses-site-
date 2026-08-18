@@ -131,6 +131,7 @@ a.reco .rw{font-size:0.8rem;color:var(--muted,#8a8a8a);margin-top:3px;line-heigh
 .pdf-acts.show{display:flex}
 </style>
   <script src="/assets/sde-nbr.js"></script>
+  <script src="/assets/sde-idx-cache.js?v=20260818a"></script>
   <script src="/taste/assets/sde-cand.js?v=20260817c"></script>
 </head>
 <body class="zh">
@@ -370,13 +371,15 @@ function setMode(m){
 }
 
 /* ================= Tier 1 前端关键词检索 ================= */
-var MANIFEST=null, CHUNKS=[], shardsLoaded=0, shardsTotal=0, activeSection='';
+var MANIFEST=null, CHUNKS=[], shardsLoaded=0, shardsTotal=0, activeSection='', IDXV='';
 
 function esc(s){ return s.replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
 
-fetch('/search/manifest.json?v='+Date.now(),{cache:'no-store'}).then(r=>r.json()).then(m=>{
+SDEIdx.manifest().then(m=>{
   MANIFEST=m;
-  m.docs.forEach(function(d){ d.l=d.t.toLowerCase(); });
+  IDXV=SDEIdx.ver(m);
+  // 只在真有大写拉丁字母时才另存小写副本；纯中文块 .l 留空，检索端回退到 .t
+  m.docs.forEach(function(d){ var lo=String(d.t||'').toLowerCase(); if(lo!==d.t) d.l=lo; });
   (function(){
     var docs = m.counts.docs, chunks = m.counts.chunks, chars = m.counts.chars;
     var fmt = function(n){ return Number(n||0).toLocaleString('en-US'); };
@@ -406,8 +409,8 @@ fetch('/search/manifest.json?v='+Date.now(),{cache:'no-store'}).then(r=>r.json()
   m.sections.forEach(s=>{ (s.files||[s.key]).forEach(f=>shardFiles.push(f)); });
   shardsTotal = shardFiles.length;
   shardFiles.forEach(fn=>{
-    fetch('/search/shard-'+fn+'.json?v='+Date.now(),{cache:'no-store'}).then(r=>r.json()).then(d=>{
-      for(var i=0;i<d.chunks.length;i++){ d.chunks[i].l=d.chunks[i].t.toLowerCase(); CHUNKS.push(d.chunks[i]); }
+    SDEIdx.shard(fn, IDXV).then(d=>{
+      for(var i=0;i<d.chunks.length;i++){ var c=d.chunks[i], lo=String(c.t||'').toLowerCase(); if(lo!==c.t) c.l=lo; CHUNKS.push(c); }
       shardsLoaded++;
       updateLoadStatus();
       var q=document.getElementById('q').value.trim();
@@ -496,7 +499,7 @@ function doSearch(){
   // 标题命中（强加权：标题短，命中即高相关）
   MANIFEST.docs.forEach(d=>{
     if(!docOk(d.i)) return;
-    var s=softScore(d.l||d.t.toLowerCase(), Q);
+    var s=softScore(d.l||d.t, Q);
     if(s) ent(d.i).title = s*6;
   });
 
@@ -504,7 +507,7 @@ function doSearch(){
   for(var i=0;i<CHUNKS.length;i++){
     var ck=CHUNKS[i]; var di=ck.d;
     if(!docOk(di)) continue;
-    var sc=softScore(ck.l||ck.t.toLowerCase(), Q);
+    var sc=softScore(ck.l||ck.t, Q);
     if(!sc) continue;
     var e=ent(di);
     e.total+=sc;

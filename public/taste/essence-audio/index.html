@@ -139,6 +139,7 @@ select:focus,input:focus{border-color:var(--accent)}
 .stuchip .n{opacity:.55;font-size:12px;margin-left:4px}
 .stuhead{margin:12px 0 6px;font-size:13.5px;color:var(--mut,#889)}
 </style>
+  <script src="/assets/sde-idx-cache.js?v=20260818a"></script>
 </head>
 <body>
 <div class="wrap">
@@ -1162,14 +1163,16 @@ var SOLO_STYLE='';            // 单人文体 key（''=深情解读）
 
 /* ---- 载入检索索引（复用 /search 的 manifest + shards） ---- */
 (function loadIndex(){
-  fetch('/search/manifest.json?v='+Date.now(),{cache:'no-store'}).then(function(r){return r.json();}).then(function(m){
+  var IDXV='';
+  SDEIdx.manifest().then(function(m){
     MANIFEST=m;
+    IDXV=SDEIdx.ver(m);
     var files=[];
     (m.sections||[]).forEach(function(s){ (s.files||[]).forEach(function(fn){ files.push(fn); }); });
     SHARDS_TOTAL=files.length;
     if(!SHARDS_TOTAL){ $('loadStatus').textContent='索引为空。'; return; }
     files.forEach(function(fn){
-      fetch('/search/shard-'+fn+'.json?v='+Date.now(),{cache:'no-store'}).then(function(r){return r.json();}).then(function(d){
+      SDEIdx.shard(fn, IDXV).then(function(d){
         var ck=d.chunks||[];
         for(var i=0;i<ck.length;i++) CHUNKS.push(ck[i]);
         SHARDS_LOADED++;

@@ -67,6 +67,7 @@ button.go:disabled{opacity:.5;cursor:default}
 footer{border-top:1px solid var(--line);padding:26px 0 44px;text-align:center;color:var(--muted);font-size:12.5px}
 @media(max-width:640px){.res{padding:13px 14px}.ans{padding:15px 15px;font-size:15px}}
 </style>
+  <script src="/assets/sde-idx-cache.js?v=20260818a"></script>
 </head>
 <body>
 <nav><div class="w">
@@ -155,13 +156,15 @@ function setMode(m){
 }
 
 /* ---- 装载：只拉 frontier 这一族的分片 ---- */
-fetch('/search/manifest.json?v='+Date.now(),{cache:'no-store'}).then(function(r){return r.json();}).then(function(m){
+var IDXV='';
+SDEIdx.manifest().then(function(m){
   MAN=m;
+  IDXV=SDEIdx.ver(m);
   var sec=null;
   for(var i=0;i<m.sections.length;i++){ if(m.sections[i].key===SCOPE) sec=m.sections[i]; }
   if(!sec){ document.getElementById('stat').textContent='本栏索引尚未生成，请稍后重试。'; return; }
   SECLABEL=sec.label||'新思想前沿';
-  m.docs.forEach(function(d){ if(d.s===SCOPE){ d.l=String(d.t||'').toLowerCase(); DOCS.push(d); } });
+  m.docs.forEach(function(d){ if(d.s===SCOPE){ var lo=String(d.t||'').toLowerCase(); if(lo!==d.t) d.l=lo; DOCS.push(d); } });
   var fmt=function(n){ return Number(n||0).toLocaleString('en-US'); };
   document.getElementById('stat').innerHTML='本栏收录 <b>'+fmt(sec.docs)+'</b> 个页面 · <b>'+fmt(sec.chunks)+'</b> 段可检索 · 索引更新于 '+String(m.built||'').slice(0,10);
   document.getElementById('fdocs').textContent=fmt(sec.docs);
@@ -169,8 +172,8 @@ fetch('/search/manifest.json?v='+Date.now(),{cache:'no-store'}).then(function(r)
   var files = sec.files || [sec.key];
   total = files.length;
   files.forEach(function(fn){
-    fetch('/search/shard-'+fn+'.json?v='+Date.now(),{cache:'no-store'}).then(function(r){return r.json();}).then(function(d){
-      for(var i=0;i<d.chunks.length;i++){ var c=d.chunks[i]; c.l=String(c.t||'').toLowerCase(); CHUNKS.push(c); }
+    SDEIdx.shard(fn, IDXV).then(function(d){
+      for(var i=0;i<d.chunks.length;i++){ var c=d.chunks[i], lo=String(c.t||'').toLowerCase(); if(lo!==c.t) c.l=lo; CHUNKS.push(c); }
       loaded++; loadStat();
       if(document.getElementById('q').value.trim()) doSearch();
     }).catch(function(){ loaded++; loadStat(); });
@@ -248,13 +251,13 @@ function doSearch(){
   function ok(di){ var d=MAN.docs[di]; return d && d.s===SCOPE; }
 
   DOCS.forEach(function(d){
-    var s=softScore(d.l||String(d.t).toLowerCase(), Q);
+    var s=softScore(d.l||String(d.t), Q);
     if(s) ent(d.i).title = s*6;
   });
   for(var i=0;i<CHUNKS.length;i++){
     var ck=CHUNKS[i], di=ck.d;
     if(!ok(di)) continue;
-    var sc=softScore(ck.l||String(ck.t).toLowerCase(), Q);
+    var sc=softScore(ck.l||String(ck.t), Q);
     if(!sc) continue;
     var e=ent(di);
     e.total+=sc;
