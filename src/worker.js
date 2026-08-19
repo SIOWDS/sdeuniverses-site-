@@ -8928,6 +8928,12 @@ export default {
                           const jj = JSON.parse(pl);
                           if (jj.choices && jj.choices[0] && jj.choices[0].finish_reason) pfin0 = jj.choices[0].finish_reason;
                           const d = ((jj.choices || [{}])[0].delta) || {};
+                          /* ⚠ 思考帧也算「开口了」。`wdsPlainBody` 只关得掉 DeepSeek／智谱／千问三家；
+                             Kimi 与 MiniMax 的思考**没有开关**（见 wdsPlainBody 自己的注释），
+                             于是这两家在写第一个正文字之前会先想很久 —— 而首帧护栏若只认正文帧，
+                             就永远撤不掉，60 秒一到我们把自己掐了。chat 那条路一直是两种帧都撤的，
+                             成文这条是漏网的。 */
+                          if (d.reasoning_content) { pclk.firstFrame(); _st.think += d.reasoning_content.length; }
                           if (d.content) { pclk.firstFrame(); _st.out += d.content.length; raw += d.content; }
                         } catch (e) {}
                       }
@@ -9123,7 +9129,10 @@ export default {
                     if (j.usage) pusage = j.usage;                                  // 上游自报用量（include_usage 一直开着）
                     if (j.choices && j.choices[0] && j.choices[0].finish_reason) pfin = j.choices[0].finish_reason;
                     const d = (j.choices && j.choices[0] && j.choices[0].delta) || {};
-                    if (d.reasoning_content) { _st.think += d.reasoning_content.length; }
+                    /* ⚠ 同上：思考帧也撤首帧护栏。原来只有 d.content 撤，于是思考关不掉的那两家
+                       每一节都在 60 秒被我方掐断、判成「没写出正文」、客户端等 20 秒重来、再掐 ——
+                       两遍全败、runFail 累到 WALL_RUN，面板还告诉读者「是上游在挡」。那是我们自己掐的。 */
+                    if (d.reasoning_content) { sclk.firstFrame(); _st.think += d.reasoning_content.length; }
                     if (d.content) { sclk.firstFrame(); _st.out += d.content.length; wrote += d.content.length; controller.enqueue(_sseBytes({ t: "token", v: d.content })); }
                   }
                 }

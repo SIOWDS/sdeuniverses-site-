@@ -185,7 +185,7 @@ document.querySelectorAll('.modebtn').forEach(function(b){{
 <script>var PDF_URL="{pdfurl}";{PDFJS}</script>
 <script>window.WDS_READ={{selector:"article"}};</script>
 <script src="/taste/wds-companion/wds-read.js?v=20260817c" defer></script>
-<script src="/wds-mode.js?v=20260818b" defer></script>
+<script src="/wds-mode.js?v=20260819a" defer></script>
 <script src="/assets/sde-talk.js?v=20260817c" data-pv="1" defer></script>
 </body>
 </html>"""
@@ -283,7 +283,7 @@ def build_channel(words1):
 <footer>
   <div>© 德麦国际 Demai International · SDE教育学入门 · <a href="/browse/">sdeuniverses.com</a></div>
 </footer>
-<script src="/wds-mode.js?v=20260818b" defer></script>
+<script src="/wds-mode.js?v=20260819a" defer></script>
 </body>
 </html>"""
 

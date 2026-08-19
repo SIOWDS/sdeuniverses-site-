@@ -45,7 +45,7 @@ h = sub1(h, "<title>WDS 助手 · 全站问答 | SDE Universes</title>",
 h = sub1(h, 'content="WDS 助手独立问答界面：',
          'content="问WDS：', "page description")
 h = sub1(h, "正在进入 WDS 助手……", "正在进入 问WDS……", "page fallback")
-h = sub1(h, 'src="/wds-mode.js?v=20260818b"', 'src="/wds-mode.js?v=20260818b"', "cache bust")
+h = sub1(h, 'src="/wds-mode.js?v=20260819a"', 'src="/wds-mode.js?v=20260819a"', "cache bust")
 wr(PAGE, h)
 
 # 首页导航按钮更名

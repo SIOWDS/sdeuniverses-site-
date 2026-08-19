@@ -616,6 +616,7 @@
     dCut1: "\u26a0 第 ", dCut2: " 节字数是够的，但**断在半句上**（末尾没有句号）——多半是这一趟被顶穿了。这几节没有当场重写：额度先留给一个字都还没写的那些节。等全篇跑完，点「\u21bb 继续写缺的几节」把它们一起补上；重写不会比现在更差（比现在短就仍旧留着现在这一份）。",
     dTailRetry: "第 ", dTailRetry2: " 节字数够了却断在半句上（多半是这一趟被顶穿了），等 20 秒重写一遍；写出来的若不如现在这一份，就仍旧留着现在这一份。",
     dWallWhy: "（上游给失败那一趟的收束理由：", dWallNoFin: "没给（多半是流被掐断）",
+    dWallLocal1: "⚠ 但失败那一趟的读数写着是**本站自己的时钟**掐的（", dWallLocal2: "闸）——不是上游写不出来。这种情况隔多久再来都一样，点「↻ 继续写缺的几节」单节补写更管用（单节请求开口快得多）。",
     dWallNoMeta: "（⚠ 失败的那几趟一条读数都没留下——这本身就说明流在服务端发出读数之前就断了。）",
     dHidden1: "\u26a0 写第 ", dHidden2: " 节的这段时间里，这个标签页被切到了后台（累计 ", dHidden3: " 秒）。浏览器会节流后台标签页的定时器、并可能让正在传输的流停住——**这一节写不出来很可能就是这个原因，不是上游的问题**。把这个标签页放在前台、别让屏幕息屏，再点「\u21bb 继续写缺的几节」补它。",
     dHidSum1: "\u26a0 这一趟里标签页被切到后台 ", dHidSum2: " 次、累计 ", dHidSum3: " 秒。长文是一趟连着十几次请求跑下来的，中途切走很容易把流掐断。下次跑的时候把它留在前台。",
@@ -6092,6 +6093,7 @@
         if (!miss.length) { dNote(t("mGoOnDone")); goOn.style.display = "none"; return; }
         goOn.disabled = true; dStopped = false;
         var k = 0, fixedN = 0, stillShort = [], gFail = 0, gWall = false;
+        var lastLegMeta = null, gFailMeta = null;   // 只有失败那一趟的读数才配用来解释失败
         /* 续写这条路原来是"打一趟、收下、下一节"：没有重试、没有退避、撞墙照打到底，
            而且**不管新的那一块是不是更差都照换**——墙一起来，按一下就能把一份好稿子
            改成一堆空节。所以这里与主循环用同一套闸：重试一次（退避）、两遍取好的那一遍、
@@ -6101,7 +6103,10 @@
             goOn.disabled = false;
             dNote(t("mGoOnEnd1") + fixedN + t("mGoOnEnd2")
               + (stillShort.length ? (t("mGoOnEnd3") + stillShort.join("、")) : ""), stillShort.length ? 1 : 0);
-            if (gWall) dNote(t("dWallRun1") + (miss[k] ? (miss[k].i + 1) : secs.length) + t("dWallRun2"), 1);
+            /* ⚠ 「这是上游在挡」是一句**断言**，而读数里可能明写着是本站的时钟掐的
+               —— 同一句话里自相矛盾。有本地掐断的读数就把话改回来：判词要跟着仪表走。 */
+            if (gWall) dNote(t("dWallRun1") + (miss[k] ? (miss[k].i + 1) : secs.length)
+              + ((gFailMeta && gFailMeta.cut) ? (t("dWallLocal1") + gFailMeta.cut + t("dWallLocal2")) : t("dWallRun2")), 1);
             try { saveProgress("续写完 " + fixedN + " 节"); paintD(true); } catch (e) {}
             if (!missingSecs(text, secs).length) goOn.style.display = "none";
             return;
@@ -6132,7 +6137,7 @@
           function once() {
             var before = text.length;
             return runLeg({ stage: "part", idx: i, plan: plan, prevTail: head.slice(-1200) })
-              .then(function () { var add = text.slice(before); text = text.slice(0, before); return add; });
+              .then(function (r2) { if (r2 && r2.meta) lastLegMeta = r2.meta; var add = text.slice(before); text = text.slice(0, before); return add; });
           }
           once().then(function (a1) {
             if (dStopped || secPass(a1.replace(/^\s+/, "").replace(/\s+$/, ""), need)) return a1;
@@ -6148,7 +6153,7 @@
             var keep = put(best);
             if (secPass(keep, need) && keep !== old.replace(/\s+$/, "")) { fixedN++; gFail = 0; }
             else if (secPass(keep, need)) { gFail = 0; }
-            else { stillShort.push(i + 1); if (++gFail >= 2) gWall = true; }
+            else { stillShort.push(i + 1); gFailMeta = lastLegMeta; if (++gFail >= 2) gWall = true; }
             try { paintD(false); saveProgress("续写到第 " + (i + 1) + " 节"); } catch (e) {}
             k++;
             setTimeout(nextOne, 2200);
@@ -6851,7 +6856,7 @@
             /* ⚠ 只认失败那几趟自己的读数。取不到就明说取不到——**「没留下读数」本身是一条读数**，
                而拿上一节写成了的那一份顶上，就成了用好人的口供定坏人的罪。 */
             var fm = failMetas.filter(Boolean).pop() || null;
-            dNote(t("dThriftyEnd")
+            dNote(t("dThriftyEnd") + ((fm && fm.cut) ? (t("dWallLocal1") + fm.cut + t("dWallLocal2")) : "")
               + (fm ? (t("dWallWhy") + (fm.fin || t("dWallNoFin"))
                   + "；那一趟吐了 " + (fm.out || 0) + " 字" + (fm.think ? ("、思考 " + fm.think + " 字") : "")
                   + (fm.cut ? ("；本地时钟：" + fm.cut + "闸已掐") : "") + "）")

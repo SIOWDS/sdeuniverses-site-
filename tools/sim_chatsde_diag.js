@@ -122,5 +122,37 @@ ok("meta 排在 error 之前发（早退那一条路上顺序要对）",
   pblk.indexOf('fin: "http_" + up.status') < pblk.indexOf('节基底返回 " + up.status'));
 ok("注释写明了为什么补这一帧", /用好人的口供定坏人的罪/.test(W));
 
+console.log("── 首帧护栏：思考帧也算开口了（2026-08-19 查出的病灶）──");
+/* 病灶：wdsPlainBody 只关得掉 DeepSeek／智谱／千问三家的思考，Kimi 与 MiniMax 没有开关。
+   而 plan/part 两趟的 firstFrame() 原来只挂在 d.content 上 ⇒ 那两家在写第一个正文字之前
+   先想很久，60 秒首帧闸一到我们把自己掐了、判成「没写出正文」、客户端等 20 秒重来、再掐，
+   两遍全败累到 WALL_RUN，面板还告诉读者「是上游在挡」。 */
+{
+  const _l0 = W.indexOf("const pclk = wdsClock(");
+  const plblk = W.slice(_l0, W.indexOf("pclk.stop();", _l0));
+  ok("抠得到 plan 那一段", plblk.length > 500);
+  ok("★ plan：思考帧也撤首帧护栏", /if \(d\.reasoning_content\) \{ pclk\.firstFrame\(\)/.test(plblk));
+  ok("plan：正文帧照旧撤", /if \(d\.content\) \{ pclk\.firstFrame\(\)/.test(plblk));
+  ok("★ part：思考帧也撤首帧护栏", /if \(d\.reasoning_content\) \{ sclk\.firstFrame\(\)/.test(pblk));
+  ok("part：正文帧照旧撤", /if \(d\.content\) \{ sclk\.firstFrame\(\)/.test(pblk));
+  // 关不掉思考的那两家必须仍在名单里——它们若被删掉，这条护栏守的事就不存在了
+  const pb = W.slice(W.indexOf("function wdsPlainBody"), W.indexOf("function wdsPlainBody") + 700);
+  ok("wdsPlainBody 确实关不掉 Kimi／MiniMax（这正是本条的前提）",
+    !/moonshot/.test(pb) && !/minimax/i.test(pb));
+  ok("这两家确实在可选基底名单里", /kimi:/.test(W) && /minimax:/.test(W));
+  ok("两趟的时钟都还在（不是靠拆掉护栏来治）", /wdsClock\(60000, 150000\)/.test(W) && /wdsClock\(60000, 270000\)/.test(W));
+}
+
+console.log("── 撞墙的判词要跟着仪表走 ──");
+ok("有本地掐断读数时不许再说「上游在挡」", /dWallLocal1/.test(F) && /gFailMeta && gFailMeta\.cut/.test(F));
+ok("那句话说清是本站自己的时钟", /本站自己的时钟/.test(F));
+ok("★ 续写这个作用域有自己的失败读数（此前一条都没有，写 failMeta 会 ReferenceError）",
+  /var lastLegMeta = null, gFailMeta = null;/.test(F));
+ok("只有失败那一趟才写进 gFailMeta（不是每趟都覆盖）",
+  /stillShort\.push\(i \+ 1\); gFailMeta = lastLegMeta;/.test(F));
+ok("每趟的读数先接进 lastLegMeta（runLeg 原来把结果整个丢掉了）",
+  /then\(function \(r2\) \{ if \(r2 && r2\.meta\) lastLegMeta = r2\.meta;/.test(F));
+ok("主循环那条老路仍只认 failMetas（没被顺手改坏）", /failMetas\.filter\(Boolean\)\.pop\(\)/.test(F));
+
 console.log("\n" + (fail ? "✗ " : "✓ ") + pass + " passed, " + fail + " failed");
 process.exit(fail ? 1 : 0);
