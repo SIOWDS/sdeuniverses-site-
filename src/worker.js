@@ -3547,14 +3547,43 @@ function _scoreKeys(list, baseKeys, exp, prev) {
   for (const key of prev) if (hit(key)) sc += 0.4;
   return sc;
 }
+/* ── 长期记忆的发车口 ──
+   IndexMemory 是**一个**全站单例（idFromName("global")）：倒排表只建一份，所有请求共用。
+   失败一律吞掉并回 null —— 长期记忆不可用时必须能退回旧路，宁可慢一点、宁可多占一点堆，
+   也不要整站问不出话。走 _do() ⇒ 连绑定脱开都只是回 null，不抛。 */
+async function idxAsk(env, body) {
+  try {
+    const ns = _do(env, "IDXMEM");
+    const st = ns.get(ns.idFromName("global"));
+    const r = await st.fetch(new Request("https://idx.internal/", {
+      method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body),
+    }));
+    if (!r.ok) return null;
+    return await r.json();
+  } catch (e) { return null; }
+}
 async function ragScan(env, url, q, expTerms, prevQ, k, chunkLimit, opts) {
-  const man = await idxManifest(env, url);
-  const coords = await loadCoords(env, url);
   const { baseKeys, exp } = ragKeys(q, expTerms);
   const prev = prevQ && prevQ !== q ? ragKeys(prevQ, []).baseKeys : [];
   const cut = chunkLimit || 1600;
   const o = opts || {};
   const PICK_DOCS = Math.max(6, Math.min(64, o.pick || 16));
+  /* ⭐【长期记忆优先】候选篇目由 DO 里那张 SQLite 倒排表算出来，答题这一侧
+     **既不取 manifest、也不建 coords、也不读篇层索引**——四千多篇的表从此不进这个堆，
+     回来的只有几十条候选与它们的元数据（几 KB）。这就是「把索引搬出答题 isolate」的落点。
+     ⚠ 退路必须硬：拿不到、ok:false、或候选为空，一律照旧走下面的 L0/L1，**绝不回空名单**。
+       （ok:false 的两种由来：桶没配、表还没建好。）*/
+  let cand = null, docsArr = null, coords = null, secLabel = null, viaIdx = false;
+  {
+    const lt = await idxAsk(env, { op: "query", baseKeys: baseKeys, exp: exp, prev: prev, only: o.only || "", pick: PICK_DOCS });
+    if (lt && lt.ok && (lt.cand || []).length) {
+      docsArr = [];                             // 稀疏数组：调用方一直按 docs[编号] 取，形态不变
+      for (const d of (lt.docs || [])) docsArr[d.i] = d;
+      cand = lt.cand.map((c) => ({ i: c.i, sc: c.sc }));
+      secLabel = lt.secLabel || {};
+      viaIdx = true;
+    }
+  }
   /* 【L2 的字节预算 —— 2026-08-18 收紧】段层单文件最大 425KB（doc/0），旧预算 6MB／8MB 上限
      意味着一个请求能把好几 MB 的正文同时摆在堆上，再逐篇 JSON.parse 成成千上万个块字符串。
      而 128MB 是**整个 isolate 共用**的：这一份撑坏它，同一瞬间别人正在流的那一答一起陪葬
@@ -3562,6 +3591,14 @@ async function ragScan(env, url, q, expTerms, prevQ, k, chunkLimit, opts) {
      早停判据（got >= WANT*3）本来就先于预算生效，实际召回量几乎不受影响。 */
   const BYTE_BUDGET = Math.max(600000, Math.min(2500000, o.budget || 1200000));
   const PER_DOC = Math.max(1, Math.min(4, o.perDoc || 2));
+  /* ⚠⚠ 分支必须开在这里，不能更早：BYTE_BUDGET 与 PER_DOC 是**分支外的 L2** 要用的。
+     我第一版把 `if (!viaIdx) {` 插在 PICK_DOCS 之后，把这两个常量一起关进了分支里 ——
+     走长期记忆那条路时它们根本没声明，L2 第一行就 ReferenceError，检索整个废掉。
+     `node --check` 查不出块作用域这种事，是 sim_idx_isolate_memory 把 ragScan
+     抠出来真跑才当场抓到的。💡 **只有真跑才查得出作用域错在哪一层。** */
+  if (!viaIdx) {
+  const man = await idxManifest(env, url);
+  coords = await loadCoords(env, url);
   const SEC_FIRST = Math.max(1, Math.min(9, o.sections || 3));
   // 限定版块（栏目内检索）：o.only = 版块 key（如 "frontier"）。
   // 只在 L0 选版块与 L1 候选篇这两处收窄；打分、下钻、选段一律照旧，
@@ -3617,7 +3654,9 @@ async function ragScan(env, url, q, expTerms, prevQ, k, chunkLimit, opts) {
   }
   if (ONLY) for (const i of Array.from(docScore.keys())) if (docSec[i] !== ONLY) docScore.delete(i);
   if (!docScore.size) return { picked: [], docs: man.docs, coords: coords, secLabel: _secLabel(man) };
-  const cand = Array.from(docScore.entries()).map(([i, sc]) => ({ i: i, sc: sc })).sort((a, b) => b.sc - a.sc).slice(0, PICK_DOCS);
+  cand = Array.from(docScore.entries()).map(([i, sc]) => ({ i: i, sc: sc })).sort((a, b) => b.sc - a.sc).slice(0, PICK_DOCS);
+  docsArr = man.docs; secLabel = _secLabel(man);
+  }   // ← if (!viaIdx) 到此为止；下面的 L2 两条路共用，一行未改
 
   // —— L2：一轮 8 篇地下钻，够用就停 ——
   const WANT = Math.max(4000, Math.min(30000, o.want || 12000));   // 正文材料想凑够多少字符
@@ -3671,7 +3710,8 @@ async function ragScan(env, url, q, expTerms, prevQ, k, chunkLimit, opts) {
     perDoc[it.d]++; picked.push(it);
     if (picked.length >= (k || 36)) break;
   }
-  return { picked: picked, docs: man.docs, coords: coords, secLabel: _secLabel(man) };
+  // ⚠ 两条路共用这个出口：走长期记忆时 man 根本不存在，只能用统一的 docsArr/secLabel。
+  return { picked: picked, docs: docsArr, coords: coords, secLabel: secLabel };
 }
 // 旧路：索引尚未重建时的退路——按版块相关度排序、限时限片地扫大分片。
 async function ragScanShards(env, url, man, coords, baseKeys, exp, prev, k, cut, only) {

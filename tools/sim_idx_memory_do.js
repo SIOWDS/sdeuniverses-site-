@@ -145,11 +145,30 @@ const ENV = { PDFS: { head: async () => ({ etag: "E1" }),
   ok("空表回 ok:false 而不是 cand:[]", empty.ok === false && empty.why === "empty", JSON.stringify(empty));
 
   sect("六、接线：调用侧的契约");
-  todo("ragScan 先问长期记忆", /const lt = await idxAsk\(env, \{ op: "query"/.test(SRC));
-  ok("ok:false 或拿不到就往下走旧路（退路仍在）", /const man = await idxManifest\(env, url\);\n  const coords = await loadCoords\(env, url\);/.test(SRC));
-  todo("idxAsk 失败一律吞掉回 null", /async function idxAsk[\s\S]{0,700}catch \(e\) \{ return null; \}/.test(SRC));
-  todo("长期记忆是全站单例", /IDXMEM\.idFromName\("global"\)/.test(SRC));
-  todo("两条前端共用同一台下钻（只有一处在管取多少块）", (SRC.match(/await ragDrill\(/g) || []).length === 2);
+  ok("★ ragScan 先问长期记忆", /const lt = await idxAsk\(env, \{ op: "query"/.test(SRC));
+  ok("ok:false 或拿不到就往下走旧路（退路仍在，钉的是这件事不是行长什么样）",
+    /idxManifest\(env, url\)/.test(SRC) && /loadCoords\(env, url\)/.test(SRC) && /tierGet\(env, url, "\/search\/sections\.json"/.test(SRC));
+  ok("★ idxAsk 失败一律吞掉回 null（退路的命根子）", /async function idxAsk[\s\S]{0,700}catch \(e\) \{ return null; \}/.test(SRC));
+  ok("长期记忆是全站单例（守的是 global 这一个实例，不钉取 namespace 的写法）",
+    /async function idxAsk[\s\S]{0,400}idFromName\("global"\)/.test(SRC));
+  ok("★ idxAsk 走 _do()（绑定脱开也只是回 null，不抛）", /async function idxAsk[\s\S]{0,300}_do\(env, "IDXMEM"\)/.test(SRC));
+  ok("★ 下钻只有一份（两条路共用；别让长期记忆那条自己再长一台）",
+    (SRC.match(/const L2_BATCH = /g) || []).length === 1);
+  ok("★ 出口统一用 docsArr/secLabel（走长期记忆时 man 根本不存在）",
+    /return \{ picked: picked, docs: docsArr, coords: coords, secLabel: secLabel \};/.test(SRC));
+  /* ⚠ 作用域陷阱：分支外的 L2 要用 BYTE_BUDGET 与 PER_DOC，它们必须声明在 if (!viaIdx) 之前。
+     第一版把分支开早了一步，把这两个常量关进了分支里 —— 走长期记忆那条路 L2 第一行就
+     ReferenceError。node --check 查不出来，是 sim_idx_isolate_memory 真跑抓到的。 */
+  ok("★ BYTE_BUDGET 声明在分支之外（L2 要用它）",
+    SRC.indexOf("const BYTE_BUDGET") > 0 && SRC.indexOf("const BYTE_BUDGET") < SRC.indexOf("if (!viaIdx) {"));
+  ok("★ PER_DOC 声明在分支之外（同上）",
+    SRC.indexOf("const PER_DOC") > 0 && SRC.indexOf("const PER_DOC") < SRC.indexOf("if (!viaIdx) {"));
+  ok("★ 旧的 L0/L1 整段包在 if (!viaIdx) 里（退路仍在，不是被删了）",
+    /if \(!viaIdx\) \{[\s\S]{0,200}const man = await idxManifest/.test(SRC));
+  ok("拿到长期记忆才算数：ok 且候选非空，否则照旧走旧路",
+    /if \(lt && lt\.ok && \(lt\.cand \|\| \[\]\)\.length\)/.test(SRC));
+  ok("走长期记忆时不再取 manifest/coords（这才是搬出 isolate 的落点）",
+    !/^\s*const man = await idxManifest\(env, url\);\n\s*const coords = await loadCoords/m.test(SRC));
   const WR = fs.readFileSync(path.join(__dirname, "../wrangler.jsonc"), "utf8");
   ok("wrangler 绑定了 IDXMEM", /"name": "IDXMEM", "class_name": "IndexMemory"/.test(WR));
   ok("migration 里 IndexMemory 是 sqlite 类", /"new_sqlite_classes": \["IndexMemory"\]/.test(WR));
