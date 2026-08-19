@@ -160,6 +160,16 @@ const ENV = { PDFS: { head: async () => ({ etag: "E1" }),
   ok("★ 锁上在 force 那一格", /force && !\(await adminPassOk/.test(SRC));
   ok("不带 force 的重建不要口令（否则等于锁错格）", /if \(url\.searchParams\.get\("build"\) === "1"\) op = "ensure";/.test(SRC));
 
+  console.log("── fresh 的判据（指纹相同 ≠ 我这份是好的）──");
+  ok("★ fresh 要求表里真有东西", /if \(!force && _n > 0 && !_err && st && st === this\._get\("stamp"\)\)/.test(SRC));
+  ok("★ fresh 要求上一趟没留错", /!_err && st && st === this\._get\("stamp"\)/.test(SRC));
+  ok("表里有几篇是当场数的，不是记在别处的旧账", /const _n = \[\.\.\.this\.sql\.exec\("SELECT count\(\*\) AS n FROM docs"\)\]\[0\]\.n;/.test(SRC));
+  ok("★ 留着错时有退避窗（_query 每次都会触发 ensure，不退避就是把 R2 打成筛子）", /Date\.now\(\) - at < 600000/.test(SRC));
+  ok("失败时记下时刻供退避用", /this\._set\("errAt", String\(Date\.now\(\)\)\);/.test(SRC));
+  ok("★ 只有真换手成功了才清 err（失败不许自己把账抹掉）", /this\._set\("pending", ""\);\s*\n\s*this\._set\("err", ""\); this\._set\("errAt", "0"\);/.test(SRC));
+  ok("stamp 只在换手成功那一支推进（失败推进过一次，正是这次的病根）",
+    (SRC.match(/this\._set\("stamp", this\._get\("newstamp"\)\)/g) || []).length === 1);
+
   console.log("── 换手闸与批量上限（2026-08-19 线上真事故）──");
   /* 事故经过：ensure 排的第一件 "man" 撞了 SQLite 绑定变量上限（120 行 × 5 列 = 600 个占位符，
      报 too many SQL variables at offset 294）。catch 记下 err 就继续走，而 "man" 失败意味着

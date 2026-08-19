@@ -2497,7 +2497,21 @@ export class IndexMemory {
     if (!this.env.PDFS) return { ok: false, why: "no bucket" };
     if (this._get("pending")) return { ok: true, why: "rebuilding" };
     const st = await this._stamp();
-    if (!force && st && st === this._get("stamp")) return { ok: true, why: "fresh" };
+    /* 🔴 「指纹相同」只说明**源头没变**，不说明**我这份是好的**（2026-08-19 当场吃到）：
+       上一趟重建在第一件事就失败，却照样把 stamp 推到了新值，于是表空着（docs 0）
+       还自称 fresh，此后再也不肯重建 —— 只能靠 force 破，而 force 是要口令的。
+       ⇒ fresh 的判据必须三条同时成立：指纹没变 **且** 表里真有东西 **且** 上一趟没留错。
+       💡 心法：**判「新不新」不能只看源头的指纹，还要看自己手里那份成不成立。**
+       退避：留着错时不许每次查询都重试一遍（_query 每次都会 fire-and-forget 触发这里），
+       十分钟一次足够自愈，又不会把 R2 打成筛子。 */
+    const _n = [...this.sql.exec("SELECT count(*) AS n FROM docs")][0].n;
+    const _err = this._get("err");
+    if (_err) {
+      const at = parseInt(this._get("errAt") || "0", 10) || 0;
+      if (Date.now() - at < 600000) return { ok: false, why: "上一趟失败，等退避窗过去再重试", err: _err };
+    }
+    if (!force && _n > 0 && !_err && st && st === this._get("stamp")) return { ok: true, why: "fresh" };
+    if (_err) this._set("errAt", String(Date.now()));
     // 任务清单：先 manifest（它给出版块名单），再逐个 kw 分片，最后坐标。分片跑，一次 alarm 一件。
     this._set("newstamp", st);
     this._set("pending", JSON.stringify(["man"]));
@@ -2518,6 +2532,7 @@ export class IndexMemory {
     } catch (e) {
       // 一件失败不许把整次重建卡死在半路：记下来、跳过它、继续下一件。
       this._set("err", String(task) + "：" + ((e && e.message) || e));
+      this._set("errAt", String(Date.now()));   // 退避窗的起点（见 _ensure）
       this._set("pending", JSON.stringify(q));
     }
     if (q.length) { await this.ctx.storage.setAlarm(Date.now() + 50); return; }
@@ -2554,6 +2569,7 @@ export class IndexMemory {
       this._set("stamp", this._get("newstamp"));
       this._set("built", new Date().toISOString());
       this._set("pending", "");
+      this._set("err", ""); this._set("errAt", "0");   // 只有真换手成功了才算清账
     }
   }
 
