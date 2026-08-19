@@ -8263,6 +8263,40 @@ export default {
       } finally { clearTimeout(timer); }
     }
 
+    /* /api/wds/hold：诊断端点，只为量一件事——**这个平台到底允不允许一条 SSE 流开着这么久**。
+       缘起：代码里有八处按「平台墙约 128–133 秒」做预算，而那是 2026-08-09 在成文机上量出来的
+       经验值，**不是 Cloudflare 的文档口径**（文档说 HTTP Worker 没有 wall-clock 上限，只有
+       CPU 30s／isolate 128MB／运行时热更新给在途请求 30 秒宽限）。数来源存疑，却在替我们定预算。
+       两种打法，正好分开两个嫌疑：
+         · 默认      —— 只有一条流在跑，没有任何子请求。活下来 ⇒ 纯流不受限。
+         · ?via=self —— 经 SELF 自绑定把另一条 hold 流转出来，全程有一个**在途子请求**，
+                        这才是真实答题的形状（Worker 一直 await 着上游那条流）。
+       不吃 Key、不调基底、不碰索引、几乎不吃 CPU（全程 setTimeout 空等）。上限 300 秒。 */
+    if (url.pathname === "/api/wds/hold") {
+      if (request.method === "OPTIONS") return new Response(null, { headers: _cors() });
+      const sec = Math.max(1, Math.min(300, parseInt(url.searchParams.get("sec"), 10) || 60));
+      const _h = { ..._cors(), "content-type": "text/event-stream; charset=utf-8", "cache-control": "no-store" };
+      if (url.searchParams.get("via") === "self" && env.SELF && env.SELF.fetch) {
+        const inner = await env.SELF.fetch(new Request(new URL("/api/wds/hold?sec=" + sec, url).toString()));
+        return new Response(inner.body, { headers: _h });
+      }
+      const stream = new ReadableStream({
+        async start(controller) {
+          const t0 = Date.now();
+          try {
+            for (let i = 0; i < sec; i++) {
+              controller.enqueue(_sseBytes({ t: "beat", v: { sec: Math.round((Date.now() - t0) / 1000) } }));
+              await new Promise((r) => setTimeout(r, 1000));
+            }
+            controller.enqueue(_sseBytes({ t: "end", v: { sec: Math.round((Date.now() - t0) / 1000) } }));
+            controller.enqueue(_ENC.encode("data: [DONE]\n\n"));
+            controller.close();
+          } catch (e) {}
+        },
+      });
+      return new Response(stream, { headers: _h });
+    }
+
     // /api/wds/ping：只验一次「这把 Key + 这个型号 + 这家地址」通不通，不产内容、不进检索、不计对话额度。
     // 存在的理由很实在：各家型号改名下线的节奏比本站改代码快，读者得能自己当场验证，而不是对着一句"基底返回错误"猜。
     if (url.pathname === "/api/wds/ping") {
