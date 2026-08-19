@@ -64,8 +64,11 @@ ok("抠得到 part 那一段", pblk.length > 1500);
 ok("★ 收 finish_reason（最值钱的那个字段）", /finish_reason\) pfin = j\.choices\[0\]\.finish_reason/.test(pblk));
 ok("★ 收上游自报用量", /if \(j\.usage\) pusage = j\.usage;/.test(pblk));
 ok("这一趟本来就开着 include_usage（不然接也接不到）", /withUsage/.test(W) && /include_usage/.test(W));
-const pthr = +((pblk.match(/const PART_SHORT = (\d+);/) || [])[1] || 0);
-ok("短产出门槛从源码取（" + pthr + "）", pthr > 0);
+/* 门槛不再是写死的 400：客户端判这一节成不成用的是 max(260, want*0.4)，
+   服务端发不发诊断也必须用同一个数——否则「写了 900 字、客户端判失败重打一遍」
+   的那一类，最需要读数却一句诊断都没有。 */
+const pthr = /const PART_SHORT = Math\.max\(400, Math\.round\(want \* 0\.4\)\);/.test(pblk);
+ok("★ 短产出门槛与客户端同口径（max(400, want*0.4)）", pthr);
 ok("★ 写了但不够也发诊断（不再只在零字时才发）", /if \(wrote && wrote < PART_SHORT\)/.test(pblk));
 ok("零字那一支也带上同一份诊断", /if \(!wrote\) controller\.enqueue\(_sseBytes\(\{ t: "error", code: "empty"/.test(pblk) && /_diag/.test(pblk));
 [["第几节", "partIdx + 1"], ["这一节的字数目标", "want"], ["思考了多少字", "_st.think"],
@@ -136,11 +139,17 @@ console.log("── 首帧护栏：思考帧也算开口了（2026-08-19 查出�
   ok("★ part：思考帧也撤首帧护栏", /if \(d\.reasoning_content\) \{ sclk\.firstFrame\(\)/.test(pblk));
   ok("part：正文帧照旧撤", /if \(d\.content\) \{ sclk\.firstFrame\(\)/.test(pblk));
   // 关不掉思考的那两家必须仍在名单里——它们若被删掉，这条护栏守的事就不存在了
-  const pb = W.slice(W.indexOf("function wdsPlainBody"), W.indexOf("function wdsPlainBody") + 700);
+  /* ⚠ 取样段只切到 wdsPlainBody 自己的结尾：原来切 700 字符，2026-08-19 在它下面新增的
+     wdsCanPlain 注释里就写着 Kimi 与 MiniMax，当场把这条喂成假红。**取样段被邻居喂饱，
+     两个方向都会发生。** */
+  const _pb0 = W.indexOf("function wdsPlainBody");
+  const pb = W.slice(_pb0, W.indexOf("\n}", _pb0));
   ok("wdsPlainBody 确实关不掉 Kimi／MiniMax（这正是本条的前提）",
     !/moonshot/.test(pb) && !/minimax/i.test(pb));
   ok("这两家确实在可选基底名单里", /kimi:/.test(W) && /minimax:/.test(W));
-  ok("两趟的时钟都还在（不是靠拆掉护栏来治）", /wdsClock\(60000, 150000\)/.test(W) && /wdsClock\(60000, 270000\)/.test(W));
+  ok("两趟的时钟都还在（不是靠拆掉护栏来治）",
+    /wdsClock\(60000, 150000\)/.test(W) && /wdsClock\(_noPlain \? 120000 : 60000, _noPlain \? 600000 : 270000\)/.test(W));
+ok("★ 关不掉思考的那一家开工就告诉读者", /思考关不掉（无开关参数）/.test(W) && /partIdx === 0/.test(W));
 }
 
 console.log("── 撞墙的判词要跟着仪表走 ──");
