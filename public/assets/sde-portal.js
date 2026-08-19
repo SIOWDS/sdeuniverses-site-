@@ -283,6 +283,19 @@
     "@media(prefers-reduced-motion:reduce){.sdep-icon .figL,.sdep-icon .figR,.sdep-icon .clash{animation:none}.sdep-icon .clash{opacity:.85}}" +
     ".sdep-nm{font:700 15px/1 inherit;letter-spacing:1px;white-space:nowrap;color:var(--c)}" +
     ".sdep-sub{font-size:11.5px;color:#8B98A5;white-space:nowrap}" +
+    /* 爱思乐园的花园层：花草只沿四周生长，中心三角与入口保持清楚。
+       叶、花与草各用不同的慢节奏，画面像活着，但不会抢走操作焦点。 */
+    ".sdep-vine-main{fill:none;stroke:#5F8F70;stroke-width:.58;stroke-linecap:round;opacity:.72}" +
+    ".sdep-vine-twig{fill:none;stroke:#79A985;stroke-width:.26;stroke-linecap:round;opacity:.62}" +
+    ".sdep-leaf{transform-box:fill-box;transform-origin:center;animation:sdepLeaf 7.8s ease-in-out infinite}" +
+    "@keyframes sdepLeaf{0%,100%{transform:rotate(-2deg)}50%{transform:rotate(3deg)}}" +
+    ".sdep-bloom{transform-box:fill-box;transform-origin:center;animation:sdepBloom 6.6s ease-in-out infinite}" +
+    "@keyframes sdepBloom{0%,100%{transform:scale(.94);opacity:.76}50%{transform:scale(1.08);opacity:1}}" +
+    ".sdep-grass{fill:none;stroke-linecap:round;transform-box:fill-box;transform-origin:bottom center;animation:sdepGrass 8.8s ease-in-out infinite}" +
+    "@keyframes sdepGrass{0%,100%{transform:rotate(-.8deg)}50%{transform:rotate(1.2deg)}}" +
+    ".sdep-pollen{transform-box:fill-box;transform-origin:center;animation:sdepPollen 8s ease-in-out infinite}" +
+    "@keyframes sdepPollen{0%,100%{opacity:.18;transform:translateY(0) scale(.85)}50%{opacity:.9;transform:translateY(-1.8px) scale(1.08)}}" +
+    "@media(prefers-reduced-motion:reduce){.sdep-leaf,.sdep-bloom,.sdep-grass,.sdep-pollen{animation:none}}" +
     /* 正中：letter-spacing 会在末字后面也加一份，右边看着就偏了，补一个等量负边距抵掉 */
     ".sdep-mid{position:absolute;transform:translate(-50%,-50%);pointer-events:none;" +
     "font:700 clamp(21px,3.9vw,40px)/1 inherit;letter-spacing:.34em;margin-right:-.34em;" +
@@ -305,7 +318,7 @@
     /* 窄屏只缩“燃烧核”：火星的射程现在是按视口现算的，
        再给整团火上 scale 会把射程一起缩掉，就到不了边界了。 */
     ".sdep-fire{width:118px;height:118px}.sdep-fire b{width:84px;height:84px}" +
-    ".sdep-nm{font-size:13px}.sdep-sub{display:none}}";
+    ".sdep-nm{font-size:13px}.sdep-sub{display:none}.sdep-garden .sdep-bloom-minor{display:none}}";
 
   var NS = "http://www.w3.org/2000/svg";
   function S(tag, attrs) {
@@ -435,6 +448,97 @@
     pulse.appendChild(S("animate", { attributeName: "r", values: "1.1;2.1;1.1", dur: "3.4s", repeatCount: "indefinite" }));
     comm.appendChild(pulse);
     svg.appendChild(comm);
+
+    // ④ 爱思乐园的花花草草：不再只用抽象粒子装饰，而让三个区域从同一座花园里长出来。
+    // 花草全部在背景层、不能接收点击；中间 36% 的区域刻意留空，三角关系与文字不被遮挡。
+    var garden = S("g", { "class": "sdep-garden", opacity: ".82" });
+
+    function addLeaf(g, x, y, rx, ry, rot, color, delay) {
+      var e = S("ellipse", {
+        "class": "sdep-leaf", cx: x, cy: y, rx: rx, ry: ry,
+        fill: color, opacity: ".76", transform: "rotate(" + rot + " " + x + " " + y + ")"
+      });
+      e.style.animationDelay = delay + "s";
+      g.appendChild(e);
+      var a = rot * Math.PI / 180;
+      var dx = Math.cos(a) * rx * .72, dy = Math.sin(a) * rx * .72;
+      g.appendChild(S("line", {
+        x1: (x - dx).toFixed(2), y1: (y - dy).toFixed(2),
+        x2: (x + dx).toFixed(2), y2: (y + dy).toFixed(2),
+        stroke: "#D4E5C9", "stroke-width": ".12", opacity: ".38"
+      }));
+    }
+
+    function addFlower(g, x, y, r, petal, heart, delay, minor) {
+      var f = S("g", { "class": "sdep-bloom" + (minor ? " sdep-bloom-minor" : "") });
+      f.style.animationDelay = delay + "s";
+      for (var p = 0; p < 5; p++) {
+        var deg = -90 + p * 72, a = deg * Math.PI / 180;
+        var px = x + Math.cos(a) * r * .82, py = y + Math.sin(a) * r * .82;
+        f.appendChild(S("ellipse", {
+          cx: px.toFixed(2), cy: py.toFixed(2), rx: (r * .56).toFixed(2), ry: (r * .9).toFixed(2),
+          fill: petal, opacity: ".88",
+          transform: "rotate(" + (deg + 90) + " " + px.toFixed(2) + " " + py.toFixed(2) + ")"
+        }));
+      }
+      f.appendChild(S("circle", { cx: x, cy: y, r: (r * .42).toFixed(2), fill: heart, opacity: ".96" }));
+      g.appendChild(f);
+    }
+
+    // 顶部两枝藤蔓：从网络节点旁长出来，让“连接”从几何关系过渡为生命关系。
+    garden.appendChild(S("path", { "class": "sdep-vine-main", d: "M-3 28 C7 25 9 15 19 17 C25 18 27 12 35 7" }));
+    garden.appendChild(S("path", { "class": "sdep-vine-main", d: "M103 28 C93 25 91 15 81 17 C75 18 73 12 65 7" }));
+    garden.appendChild(S("path", { "class": "sdep-vine-twig", d: "M8 23 Q5 18 3 16 M18 17 Q16 11 12 9 M26 15 Q30 11 32 8" }));
+    garden.appendChild(S("path", { "class": "sdep-vine-twig", d: "M92 23 Q95 18 97 16 M82 17 Q84 11 88 9 M74 15 Q70 11 68 8" }));
+    [[4,18,2.5,1.15,-30,"#6FA37A",-.4],[10,21,2.8,1.2,28,"#80B98C",-1.8],
+     [13,11,2.4,1.05,-42,"#62956F",-3.1],[22,17,2.9,1.25,24,"#8FC39A",-2.4],
+     [31,10,2.5,1.05,-35,"#73A77F",-4.2],[96,18,2.5,1.15,30,"#6FA37A",-1.1],
+     [90,21,2.8,1.2,-28,"#80B98C",-2.6],[87,11,2.4,1.05,42,"#62956F",-3.7],
+     [78,17,2.9,1.25,-24,"#8FC39A",-1.5],[69,10,2.5,1.05,35,"#73A77F",-4.6]]
+      .forEach(function (q) { addLeaf(garden, q[0], q[1], q[2], q[3], q[4], q[5], q[6]); });
+    addFlower(garden, 2.8, 28.5, 1.45, "#B7D9C0", "#E7C96A", -1.2, true);
+    addFlower(garden, 97.2, 28.5, 1.45, "#B7D9C0", "#E7C96A", -3.8, true);
+    addFlower(garden, 34.5, 7.2, 1.25, "#9CC8B1", "#F0DCA6", -2.4, true);
+    addFlower(garden, 65.5, 7.2, 1.25, "#9CC8B1", "#F0DCA6", -4.7, true);
+
+    // 底部花境：左边偏紫、右边偏金，中间只留少量细草，托住而不堵住“平台介绍”。
+    var stems = [
+      [1,102,5,84,"#628B69",-.8],[5,102,10,89,"#719B72",-2.1],[10,102,14,78,"#577E63",-3.6],
+      [16,102,20,91,"#719B72",-1.4],[22,102,26,82,"#5F8968",-4.2],[28,102,31,94,"#769A68",-2.8],
+      [99,102,95,84,"#8F8954",-1.7],[95,102,90,90,"#9B945B",-3.2],[90,102,86,78,"#7D8558",-4.5],
+      [84,102,80,91,"#9A9258",-2.4],[78,102,74,82,"#7E855B",-3.9],[72,102,69,94,"#8A8D5C",-1.1],
+      [38,103,36,96,"#607D62",-2.7],[62,103,64,96,"#7B8156",-4.1]
+    ];
+    stems.forEach(function (q) {
+      var p = S("path", {
+        "class": "sdep-grass",
+        d: "M" + q[0] + " " + q[1] + " Q" + ((q[0] + q[2]) / 2 + (q[0] < 50 ? -1.4 : 1.4)).toFixed(1) +
+           " " + ((q[1] + q[3]) / 2).toFixed(1) + " " + q[2] + " " + q[3],
+        stroke: q[4], "stroke-width": ".48", opacity: ".78"
+      });
+      p.style.animationDelay = q[5] + "s";
+      garden.appendChild(p);
+      addLeaf(garden, (q[0] * .42 + q[2] * .58), (q[1] * .42 + q[3] * .58), 2.2, .82,
+              q[0] < 50 ? -34 : 34, q[4], q[5] - .7);
+    });
+    addFlower(garden, 5, 84, 1.85, "#B38BD1", "#F0DCA6", -1.1, false);
+    addFlower(garden, 14, 78, 2.05, "#D1A0D2", "#E0B65C", -3.2, false);
+    addFlower(garden, 20, 91, 1.55, "#8EB8A0", "#F0DCA6", -4.6, true);
+    addFlower(garden, 26, 82, 1.8, "#A981C4", "#E8CF73", -2.2, false);
+    addFlower(garden, 95, 84, 1.85, "#E0B65C", "#7A5F2D", -2.7, false);
+    addFlower(garden, 86, 78, 2.05, "#F0D886", "#8B6B30", -4.1, false);
+    addFlower(garden, 80, 91, 1.55, "#C6C77D", "#E9B76A", -1.4, true);
+    addFlower(garden, 74, 82, 1.8, "#D7A864", "#F0DCA6", -3.6, false);
+
+    // 花粉只在花境上方轻轻浮动；数量克制，避免与三团 TOKEN 火星争抢。
+    [[8,72,"#C9A6D9",-1],[23,73,"#A981C4",-3.7],[31,88,"#9BC49A",-5.1],
+     [92,72,"#E0B65C",-2.1],[77,73,"#F0D886",-4.4],[69,88,"#BFC77C",-5.8],
+     [4,63,"#D7B7DB",-2.8],[96,63,"#E8C873",-4.9]].forEach(function (q) {
+      var d = S("circle", { "class": "sdep-pollen", cx: q[0], cy: q[1], r: ".42", fill: q[2] });
+      d.style.animationDelay = q[3] + "s";
+      garden.appendChild(d);
+    });
+    svg.appendChild(garden);
 
     // 四周的浮尘：三色各撒几粒，把空处兜住（很淡，只在边上）
     var dust = S("g", { opacity: ".5" });
